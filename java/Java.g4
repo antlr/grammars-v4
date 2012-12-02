@@ -30,11 +30,30 @@ Java 1.6 grammar derived from:
 
     https://github.com/antlr/examples-v3/blob/master/java/java/Java.g
  */
-grammar JavaLR;
+grammar Java;
 
 @lexer::members {
   protected boolean enumIsKeyword = true;
   protected boolean assertIsKeyword = true;
+}
+
+@parser::members {
+/*
+public void enterRule(ParserRuleContext<Token> localctx, int ruleIndex) {
+	super.enterRule(localctx, ruleIndex);
+	System.out.println("enter "+ruleNames[ruleIndex]+
+              ", LT(1)="+_input.LT(1)+
+              ", LT(2)="+_input.LT(2));
+}
+	@Override
+	public void exitRule(int ruleIndex) {
+		super.exitRule(ruleIndex);
+		System.err.println("exit "+ruleNames[ruleIndex]+
+	              ", LT(1)="+_input.LT(1)+
+	              ", LT(2)="+_input.LT(2));
+	}
+
+*/
 }
 
 // starting point for parsing a java file
@@ -301,8 +320,7 @@ typeName
     :   qualifiedName
     ;
 
-type
-	:	classOrInterfaceType ('[' ']')*
+type:	classOrInterfaceType ('[' ']')*
 	|	primitiveType ('[' ']')*
 	;
 
@@ -490,8 +508,7 @@ statement
     |   'while' parExpression statement
     |   'do' statement 'while' parExpression ';'
     |   'try' block
-        ( catches 'finally' block
-        | catches
+        ( catches ('finally' block)?
         | 'finally' block
         )
     |   'switch' parExpression '{' switchBlockStatementGroups '}'
@@ -518,7 +535,7 @@ formalParameter
     ;
 
 switchBlockStatementGroups
-    :   (switchBlockStatementGroup)*
+    :   switchBlockStatementGroup* switchLabel*
     ;
 
 /* The change here (switchLabel -> switchLabel+) technically makes this grammar
@@ -526,7 +543,7 @@ switchBlockStatementGroups
    appropriate AST, one in which each group, except possibly the last one, has
    labels and statements. */
 switchBlockStatementGroup
-    :   switchLabel+ blockStatement*
+    :   switchLabel+ blockStatement+
     ;
 
 switchLabel
@@ -784,4 +801,3 @@ COMMENT
 LINE_COMMENT
     : '//' ~[\r\n]* '\r'? '\n' -> channel(HIDDEN)
 	;
-    
