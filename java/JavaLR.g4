@@ -37,25 +37,6 @@ grammar JavaLR;
   protected boolean assertIsKeyword = true;
 }
 
-@parser::members {
-/*
-public void enterRule(ParserRuleContext<Token> localctx, int ruleIndex) {
-	super.enterRule(localctx, ruleIndex);
-	System.out.println("enter "+ruleNames[ruleIndex]+
-              ", LT(1)="+_input.LT(1)+
-              ", LT(2)="+_input.LT(2));
-}
-	@Override
-	public void exitRule(int ruleIndex) {
-		super.exitRule(ruleIndex);
-		System.err.println("exit "+ruleNames[ruleIndex]+
-	              ", LT(1)="+_input.LT(1)+
-	              ", LT(2)="+_input.LT(2));
-	}
-
-*/
-}
-
 // starting point for parsing a java file
 /* The annotations are separated out to make parsing faster, but must be associated with
    a packageDeclaration or a typeDeclaration (and not an empty one). */
@@ -646,61 +627,6 @@ primary
     |   'void' '.' 'class'
     ;
     
-/*
-expression_[int _p]
-    :   expression_primary
-        (
-                {13 >= $_p}? ('*'|'/'|'%') expression_[14]
-                          | {12 >= $_p}? ('+'|'-') expression_[13]
-                          | {11 >= $_p}? ('<' '<' | '>' '>' '>' | '>' '>') expression_[12]
-                          | {10 >= $_p}? ('<=' | '>=' | '>' | '<') expression_[11]
-                          | {8 >= $_p}? ('==' | '!=') expression_[9]
-                          | {7 >= $_p}? '&' expression_[8]
-                          | {6 >= $_p}? '^'<assoc=right> expression_[6]
-                          | {5 >= $_p}? '|' expression_[6]
-                          | {4 >= $_p}? '&&' expression_[5]
-                          | {3 >= $_p}? '||' expression_[4]
-                          | {1 >= $_p}? ('^='<assoc=right>
-                        |'+='<assoc=right>
-                        |'-='<assoc=right>
-                        |'*='<assoc=right>
-                        |'/='<assoc=right>
-                        |'&='<assoc=right>
-                        |'|='<assoc=right>
-                        |'='<assoc=right>
-                        |'>' '>' '='<assoc=right>
-                        |'>' '>' '>' '='<assoc=right>
-                        |'<' '<' '='<assoc=right>
-                        |'%='<assoc=right>
-                        )
-                        expression_[1]
-                          | {2 >= $_p}? '?' expression ':' expression_[3]
-                          | {26 >= $_p}? '.' Identifier
-                          | {25 >= $_p}? '.' 'this'
-                          | {24 >= $_p}? '.' 'super' '(' expressionList? ')'
-                          | {23 >= $_p}? '.' 'new' Identifier '(' expressionList? ')'
-                          | {22 >= $_p}? '.' 'super' '.' Identifier arguments?
-                          | {21 >= $_p}? '.' explicitGenericInvocation
-                          | {19 >= $_p}? '[' expression ']'
-                          | {17 >= $_p}? ('++' | '--')
-                          | {16 >= $_p}? '(' expressionList? ')'
-                          | {9 >= $_p}? 'instanceof' type
-        )*
-    ;
-2011-11-30 18:39:48:343 left-recursion LogManager.java:48 expression_primary
-    : '(' type ')' expression_[18]
-    | ('+'|'-'|'++'|'--') expression_[15]
-    | ('~'|'!') expression_[14]
-    | '(' expression ')'
-    | 'this'
-    | 'super'
-    | literal
-    | Identifier
-    | type '.' 'class'
-    | 'new' creator
-    ;
-*/
-
 creator
     :   nonWildcardTypeArguments createdName classCreatorRest
     |   createdName (arrayCreatorRest | classCreatorRest)
@@ -848,14 +774,14 @@ JavaIDDigit
        '\u1040'..'\u1049'
    ;
 
-WS  :  (' '|'\r'|'\t'|'\u000C'|'\n')+ {setChannel(HIDDEN);}
+WS  :  [ \r\t\u000C\n]+ -> channel(HIDDEN)
     ;
 
 COMMENT
-    :   '/*' .* '*/' {setChannel(HIDDEN);}
+    :   '/*' .*? '*/' -> channel(HIDDEN)
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')* '\r'? '\n' {setChannel(HIDDEN);}
+    : '//' ~[\r\n]* '\r'? '\n' -> channel(HIDDEN)
 	;
     
