@@ -614,7 +614,7 @@ expression
     |   expression 'instanceof' type
     |   expression ('==' | '!=') expression
     |   expression '&' expression
-    |   expression '^'<assoc=right> expression
+    |   expression '^' expression
     |   expression '|' expression
     |   expression '&&' expression
     |   expression '||' expression
