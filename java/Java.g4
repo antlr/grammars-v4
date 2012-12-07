@@ -591,20 +591,20 @@ constantExpression
 //expression : expression_[0] ;
 
 expression
-	:   primary
+    :   primary
     |   expression '.' Identifier
     |   expression '.' 'this'
     |   expression '.' 'super' '(' expressionList? ')'
     |   expression '.' 'new' Identifier '(' expressionList? ')'
     |   expression '.' 'super' '.' Identifier arguments?
-    |	expression '.' explicitGenericInvocation
-    |   'new' creator
+    |   expression '.' explicitGenericInvocation
     |   expression '[' expression ']'
-    |   '(' type ')' expression
-    |   expression ('++' | '--')
     |   expression '(' expressionList? ')'
+    |   expression ('++' | '--')
     |   ('+'|'-'|'++'|'--') expression
     |   ('~'|'!') expression
+    |   '(' type ')' expression
+    |   'new' creator
     |   expression ('*'|'/'|'%') expression
     |   expression ('+'|'-') expression
     |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression
