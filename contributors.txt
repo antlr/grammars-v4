@@ -49,3 +49,4 @@ CONTRIBUTORS:
 
 YYYY/MM/DD, github id, Full name, email
 2012/07/12, parrt, Terence Parr, parrt@antlr.org
+2013/01/22, cowang, George S. Cowan, cowan@acm.org
