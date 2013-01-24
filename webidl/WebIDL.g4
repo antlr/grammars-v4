@@ -35,12 +35,6 @@ Web IDL grammar derived from:
 
     Web IDL (Second Edition)
     W3C Editor's Draft 14 January 2013
-
-    Copyright (c) 2013 World Wide Web Consortium, 
-    (Massachusetts Institute of Technology, 
-    European Research Consortium for Informatics and Mathematics, 
-    Keio University). All Rights Reserved. 
-    http://www.w3.org/Consortium/Legal/2002/copyright-documents-20021231
  */
 grammar WebIDL;
 
