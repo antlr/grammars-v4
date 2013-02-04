@@ -799,5 +799,5 @@ COMMENT
     ;
 
 LINE_COMMENT
-    : '//' ~[\r\n]* '\r'? '\n' -> channel(HIDDEN)
+    : '//' ~[\r\n]* ('\r'? '\n' | EOF) -> channel(HIDDEN)
 	;
