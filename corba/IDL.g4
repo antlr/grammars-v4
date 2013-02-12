@@ -37,8 +37,7 @@ CORBA IDL grammar derived from:
  */
 grammar IDL;
 
-/* Replaced keywords: case, import, interface */
-
+// Note: Replaced keywords: case, import, interface.
 
 specification
 	: import_* definition+ EOF
@@ -357,7 +356,7 @@ element_spec
 	: type_spec declarator
 ;
 enum_type
-	: 'enum' identifier '(' enumerator ( ',' enumerator)* '}'
+	: 'enum' identifier '{' enumerator ( ',' enumerator)* '}'
 ;
 enumerator
 	: identifier
