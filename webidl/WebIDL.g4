@@ -189,7 +189,7 @@ floatLiteral
 
 attributeOrOperationOrIterator
  : serializer 
- | qualifier attributeOroperationRest 
+ | qualifier attributeOrOperationRest 
  | attribute 
  | operationOrIterator
 ;
@@ -233,7 +233,7 @@ qualifier
  | 'stringifier'
 ;
 
-attributeOroperationRest
+attributeOrOperationRest
  : attributeRest 
  | returnType operationRest 
  | ';'
