@@ -169,7 +169,7 @@ typeArguments
   ;
 
 typeArgument
-  : classOrInterfaceType
+  : classOrInterfaceType ('[' ']')* // array types are allowed here, as an type argument
   | '?' (('extends' | 'super') classOrInterfaceType)?
   ;
 
