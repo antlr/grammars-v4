@@ -2,8 +2,7 @@
 grammar Postgresqlscript;
 
 sqlscript
-    : (WS sqlstatement)*
-      WS*
+    : sqlstatement*
       EOF
     | sqlstatement
       (WS sqlstatement)*
@@ -13,7 +12,7 @@ sqlscript
     ;
 
 sqlstatement
-    : KEYWORD term+ ';'
+    : KEYWORD term+ SEMI
     ;
 
 KEYWORD :
@@ -941,10 +940,14 @@ LTH	: '<' ;
 term : ID
      | KEYWORD
      | operator
+     | CharacterLiteral
      ;
 
-ID : [A-Za-z_]+;
+ID : [A-Za-z0-9_]+;
 
+CharacterLiteral
+    :   '\'' (  ~('\''|'\\') )* '\''
+    ;
 
 operator : DIVIDE
 |MOD_SYM
@@ -959,7 +962,6 @@ operator : DIVIDE
 |SHIFT_LEFT
 |SHIFT_RIGHT
 |ALL_FIELDS
-|SEMI
 |COLON
 |DOT
 |COMMA
