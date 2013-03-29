@@ -499,7 +499,7 @@ unrestrictedFloatType
 ;
 
 floatType
- : 'FLOAT_WEBIDL' 
+ : 'float' 
  | 'double'
 ;
 
