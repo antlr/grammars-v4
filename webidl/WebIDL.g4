@@ -577,7 +577,7 @@ WHITESPACE_WEBIDL
 ;
 
 COMMENT_WEBIDL
- : ([\t\n\r ]*(('/''/'~[\n\r]*|'/''\\'*(.|'\n')*?'\\'*'/')[\t\n\r ]*)+) -> skip
+ : ('//'~[\n\r]*|'/*'(.|'\n')*?'*/')+ -> skip
 ; // Note: '/''/'~[\n\r]* instead of '/''/'.* (non-greedy because of wildcard).
 
 OTHER_WEBIDL
