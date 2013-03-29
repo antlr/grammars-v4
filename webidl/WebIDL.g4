@@ -34,7 +34,7 @@ Web IDL grammar derived from:
     http://dev.w3.org/2006/webapi/WebIDL/
 
     Web IDL (Second Edition)
-    W3C Editor's Draft 24 January 2013
+    W3C Editor's Draft 26 March 2013
  */
 grammar WebIDL;
 
@@ -573,7 +573,11 @@ STRING_WEBIDL
 ;
 
 WHITESPACE_WEBIDL
- : ([\t\n\r ]+|[\t\n\r ]*(('/''/'~[\n\r]*|'/''\\'*(.|'\n')*?'\\'*'/')[\t\n\r ]*)+) -> skip
+ : [\t\n\r ]+ -> skip
+;
+
+COMMENT_WEBIDL
+ : ([\t\n\r ]*(('/''/'~[\n\r]*|'/''\\'*(.|'\n')*?'\\'*'/')[\t\n\r ]*)+) -> skip
 ; // Note: '/''/'~[\n\r]* instead of '/''/'.* (non-greedy because of wildcard).
 
 OTHER_WEBIDL
