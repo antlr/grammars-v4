@@ -450,7 +450,7 @@ tryStatement
   ;
 
 catchClause
-  : 'catch' '(' variableModifier* typeRef ('|' typeRef)* Identifier ')' block
+  : 'catch' '(' variableModifier* typeName ('|' typeName)* Identifier ')' block
   ;
 
 resources
@@ -586,11 +586,8 @@ explicitGenericInvocation
   ;
 
 arrayCreatorRest
-  : '['
-    (   ']' ('[' ']')* arrayInitializer
-    |   expression ']' ('[' expression ']')* ('[' ']')*
-    |   ']'
-    )
+  : '[' ']' ('[' ']')* arrayInitializer
+  | '[' expression ']' ('[' expression ']')* ('[' ']')*
   ;
 
 classCreatorRest
