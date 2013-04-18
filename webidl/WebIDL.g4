@@ -34,7 +34,7 @@ Web IDL grammar derived from:
     http://dev.w3.org/2006/webapi/WebIDL/
 
     Web IDL (Second Edition)
-    W3C Editor's Draft 24 January 2013
+    W3C Editor's Draft 26 March 2013
  */
 grammar WebIDL;
 
@@ -189,7 +189,7 @@ floatLiteral
 
 attributeOrOperationOrIterator
  : serializer 
- | qualifier attributeOroperationRest 
+ | qualifier attributeOrOperationRest 
  | attribute 
  | operationOrIterator
 ;
@@ -233,7 +233,7 @@ qualifier
  | 'stringifier'
 ;
 
-attributeOroperationRest
+attributeOrOperationRest
  : attributeRest 
  | returnType operationRest 
  | ';'
@@ -499,7 +499,7 @@ unrestrictedFloatType
 ;
 
 floatType
- : 'FLOAT_WEBIDL' 
+ : 'float' 
  | 'double'
 ;
 
@@ -561,7 +561,7 @@ INTEGER_WEBIDL
 ;
 
 FLOAT_WEBIDL
- : '-'?(([0-9]+\.[0-9]*|[0-9]*\.[0-9]+)([Ee][\+\-]?[0-9]+)?|[0-9]+[Ee][\+\-]?[0-9]+)
+ : '-'?(([0-9]+'.'[0-9]*|[0-9]*'.'[0-9]+)([Ee][\+\-]?[0-9]+)?|[0-9]+[Ee][\+\-]?[0-9]+)
 ;
 
 IDENTIFIER_WEBIDL
@@ -573,7 +573,11 @@ STRING_WEBIDL
 ;
 
 WHITESPACE_WEBIDL
- : ([\t\n\r ]+|[\t\n\r ]*(('/''/'~[\n\r]*|'/''\\'*(.|'\n')*?'\\'*'/')[\t\n\r ]*)+) -> skip
+ : [\t\n\r ]+ -> channel(HIDDEN)
+;
+
+COMMENT_WEBIDL
+ : ('//'~[\n\r]*|'/*'(.|'\n')*?'*/')+ -> channel(HIDDEN)
 ; // Note: '/''/'~[\n\r]* instead of '/''/'.* (non-greedy because of wildcard).
 
 OTHER_WEBIDL
