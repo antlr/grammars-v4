@@ -573,11 +573,11 @@ STRING_WEBIDL
 ;
 
 WHITESPACE_WEBIDL
- : [\t\n\r ]+ -> skip
+ : [\t\n\r ]+ -> channel(HIDDEN)
 ;
 
 COMMENT_WEBIDL
- : ('//'~[\n\r]*|'/*'(.|'\n')*?'*/')+ -> skip
+ : ('//'~[\n\r]*|'/*'(.|'\n')*?'*/')+ -> channel(HIDDEN)
 ; // Note: '/''/'~[\n\r]* instead of '/''/'.* (non-greedy because of wildcard).
 
 OTHER_WEBIDL
