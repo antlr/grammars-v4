@@ -169,8 +169,15 @@ typeArguments
   ;
 
 typeArgument
-  : classOrInterfaceType ('[' ']')* // array types are allowed here, as an type argument
-  | '?' (('extends' | 'super') classOrInterfaceType)?
+  : classOrArrayType
+  | '?' ( ('extends' | 'super') classOrArrayType )?
+  ;
+
+classOrArrayType
+// Includes primitive arrays, which are really a kind of class.
+// Just like rule typeRef, except that a simple primative is forbidden.
+  : primitiveType '[' ']' ('[' ']')*
+  | classOrInterfaceType  ('[' ']')*
   ;
 
 interfaceMemberDecl
