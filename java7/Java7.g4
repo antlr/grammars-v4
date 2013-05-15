@@ -331,12 +331,11 @@ formalParameters
   ;
 
 formalParameterDeclarations
-  : variableModifier* typeRef formalParameterVariables
-  ;
-
-formalParameterVariables
-  : '...' variableDeclaratorId // variable-arity parameter must be the last one
-  | variableDeclaratorId (',' formalParameterDeclarations)?
+// if there is a variable arity parameter, it is the last parameter
+  :  variableModifier* typeRef
+       ('...' variableDeclaratorId
+       | variableDeclaratorId (',' formalParameterDeclarations)?
+       )
   ;
 
 methodBody
