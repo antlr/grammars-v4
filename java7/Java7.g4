@@ -79,7 +79,7 @@ classDeclaration
 
 normalClassDeclaration
   : 'class' Identifier typeParameters?
-    ('extends' typeRef)?
+    ('extends' type)?
     ('implements' typeList)?
     classBody
   ;
@@ -93,7 +93,7 @@ typeParameter
   ;
 
 bound
-  : classOrInterfaceType ('&' classOrInterfaceType)*
+  : refType ('&' refType)*
   ;
 
 enumDeclaration
@@ -143,7 +143,7 @@ memberDecl
   ;
 
 fieldDeclaration
-  : typeRef variableDeclarators ';'
+  : type variableDeclarators ';'
   ;
 
 block
@@ -161,7 +161,7 @@ enumConstant
   ;
 
 typeList
-  : classOrInterfaceType (',' classOrInterfaceType)*
+  : refType (',' refType)*
   ;
 
 typeArguments
@@ -191,7 +191,7 @@ interfaceMemberDecl
 
 /** Allows brackets after parameters for backwards compatibility only; do not use. */
 methodDeclaration
-  : typeParameters? (typeRef | 'void')
+  : typeParameters? (type | 'void')
     Identifier formalParameters ('[' ']')*   ('throws' qualifiedIdentifierList)?
     ( methodBody
     | ';'
@@ -212,7 +212,7 @@ variableModifier
   ;
 
 interfaceMethodOrFieldDecl
-  : typeRef Identifier interfaceMethodOrFieldRest
+  : type Identifier interfaceMethodOrFieldRest
   ;
 
 interfaceMethodOrFieldRest
@@ -225,7 +225,7 @@ interfaceMethodDeclaratorRest
   ;
 
 interfaceGenericMethodDecl
-  : typeParameters (typeRef | 'void') Identifier
+  : typeParameters (type | 'void') Identifier
     interfaceMethodDeclaratorRest
   ;
 
@@ -295,19 +295,17 @@ typeName
   : qualifiedIdentifier
   ;
 
-typeRef
-  : classOrInterfaceType ('[' ']')*
+type
+  : refType ('[' ']')*
   | primitiveType ('[' ']')*
   ;
 
-/** classOrInterfaceType is not used in the Java 7 Language Specification. We use
-    it as a substitute name for the ReferenceType that is defined in the Syntax
-    section (Chapter 18, p. 593). The reason that we do not just use the rule name
-    referenceType instead of classOrInterfaceType is that elsewhere in the
-    Java 7 Reference (topic 4.3, p.52), ReferenceType is defined differently.
-    We are doing our best here to avoid confusion.
+/** refType is the ReferenceType that is defined in the JLS7 Syntax
+    section (Chapter 18, p. 593). The reason that we change the rule name
+    is that ReferenceType is defined two different ways in JLS7
+    (see topic 4.3, p.52).
   */
-classOrInterfaceType
+refType
   : Identifier typeArguments? ( '.' Identifier typeArguments? )*
   ;
 
@@ -332,7 +330,7 @@ formalParameters
 
 formalParameterDeclarations
 // if there is a variable arity parameter, it is the last parameter
-  :  variableModifier* typeRef
+  :  variableModifier* type
        ('...' variableDeclaratorId
        | variableDeclaratorId (',' formalParameterDeclarations)?
        )
@@ -407,7 +405,7 @@ annotationTypeDeclaration
   ;
 
 annotationTypeElement
-  : typeRef (annotationMethod | variableDeclarators) ';'
+  : type (annotationMethod | variableDeclarators) ';'
   | classDeclaration ';'?
   | normalInterfaceDeclaration ';'?
   | enumDeclaration ';'?
@@ -425,7 +423,7 @@ defaultValue
 // STATEMENTS / BLOCKS
 
 localVariableDeclaration
-  : variableModifier* typeRef variableDeclarators
+  : variableModifier* type variableDeclarators
   ;
 
 statement
@@ -465,7 +463,7 @@ resources
   ;
 
 resource
-  : variableModifier* classOrInterfaceType variableDeclaratorId '=' expression
+  : variableModifier* refType variableDeclaratorId '=' expression
   ;
 
 switchBlock
@@ -493,7 +491,7 @@ forInit
   ;
 
 enhancedForControl
-  : variableModifier* typeRef Identifier ':' expression
+  : variableModifier* type Identifier ':' expression
   ;
 
 forUpdate
@@ -531,13 +529,13 @@ expression
   | expression ('++' | '--')
   | ('+'|'-'|'++'|'--') expression
   | ('~'|'!') expression
-  | '(' typeRef ')' expression
+  | '(' type ')' expression
   | 'new' creator
   | expression ('*'|'/'|'%') expression
   | expression ('+'|'-') expression
   | expression ('<' '<' | '>' '>' '>' | '>' '>') expression
   | expression ('<' '=' | '>' '=' | '>' | '<') expression
-  | expression 'instanceof' typeRef
+  | expression 'instanceof' type
   | expression ('==' | '!=') expression
   | expression '&' expression
   | expression '^' expression
@@ -568,7 +566,7 @@ primary
   | 'super'
   | literal
   | Identifier
-  | typeRef '.' 'class'
+  | type '.' 'class'
   | 'void' '.' 'class'
   ;
 
@@ -579,7 +577,7 @@ creator
 
 createdName
   : primitiveType
-  | // classOrInterfaceType but with possible <>
+  | // refType but with possible <>
     Identifier (typeArguments | '<' '>')? ('.' Identifier (typeArguments | '<' '>')? )*
   ;
 
