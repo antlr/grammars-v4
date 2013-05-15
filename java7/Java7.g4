@@ -174,10 +174,10 @@ typeArgument
   ;
 
 classOrArrayType
-// Includes primitive arrays, which are really a kind of class.
-// Just like rule typeRef, except that a simple primative is forbidden.
+// includes primitive arrays, which are really a kind of class
+// Just like rule type, except that a simple primative is forbidden
   : primitiveType '[' ']' ('[' ']')*
-  | classOrInterfaceType  ('[' ']')*
+  | refType               ('[' ']')*
   ;
 
 interfaceMemberDecl
