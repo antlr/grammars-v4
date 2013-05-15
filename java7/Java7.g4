@@ -181,9 +181,8 @@ classOrArrayType
   ;
 
 interfaceMemberDecl
-  : interfaceMethodOrFieldDecl
-  | interfaceGenericMethodDecl
-  | 'void' Identifier voidInterfaceMethodDeclaratorRest
+  : type constantDeclarator (',' constantDeclarator)* ';'
+  | typeParameters? (type | 'void') Identifier formalParameters ('[' ']')* ('throws' qualifiedIdentifierList)? ';'
   | interfaceDeclaration
   | classDeclaration
   ;
@@ -211,30 +210,8 @@ variableModifier
   | annotation
   ;
 
-interfaceMethodOrFieldDecl
-  : type Identifier interfaceMethodOrFieldRest
-  ;
-
-interfaceMethodOrFieldRest
-  : constantDeclaratorsRest ';'
-  | interfaceMethodDeclaratorRest
-  ;
-
-interfaceMethodDeclaratorRest
-  : formalParameters ('[' ']')* ('throws' qualifiedIdentifierList)? ';'
-  ;
-
-interfaceGenericMethodDecl
-  : typeParameters (type | 'void') Identifier
-    interfaceMethodDeclaratorRest
-  ;
-
-voidInterfaceMethodDeclaratorRest
-  : formalParameters ('throws' qualifiedIdentifierList)? ';'
-  ;
-
 constantDeclarator
-  : Identifier constantDeclaratorRest
+  : Identifier ('[' ']')* '=' variableInitializer
   ;
 
 variableDeclarators
@@ -243,14 +220,6 @@ variableDeclarators
 
 variableDeclarator
   : variableDeclaratorId ('=' variableInitializer)?
-  ;
-
-constantDeclaratorsRest
-  : constantDeclaratorRest (',' constantDeclarator)*
-  ;
-
-constantDeclaratorRest
-  : ('[' ']')* '=' variableInitializer
   ;
 
 variableDeclaratorId
