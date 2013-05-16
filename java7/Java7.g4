@@ -301,7 +301,7 @@ formalParameterDeclarations
 // if there is a variable arity parameter, it is the last parameter
   :  variableModifier* type
        ('...' variableDeclaratorId
-       | variableDeclaratorId (',' formalParameterDeclarations)?
+       |      variableDeclaratorId ( ',' formalParameterDeclarations )?
        )
   ;
 
@@ -540,8 +540,12 @@ primary
   ;
 
 creator
-  : nonWildcardTypeArguments createdName classCreatorRest
-  | createdName (arrayCreatorRest | classCreatorRest)
+// 'new' objects may be either classes or arrays (with or without initializers)
+  : nonWildcardTypeArguments createdName   arguments classBody?
+  |                          createdName ( arguments classBody?
+                                         | ('['            ']')+ arrayInitializer
+                                         | ('[' expression ']')+ ('[' ']')*
+                                         )
   ;
 
 createdName
@@ -551,20 +555,11 @@ createdName
   ;
 
 innerCreator
-  : (nonWildcardTypeArguments | '<' '>')? Identifier classCreatorRest
+  : (nonWildcardTypeArguments | '<' '>')? Identifier arguments classBody?
   ;
 
 explicitGenericInvocation
   : nonWildcardTypeArguments Identifier arguments
-  ;
-
-arrayCreatorRest
-  : '[' ']' ('[' ']')* arrayInitializer
-  | '[' expression ']' ('[' expression ']')* ('[' ']')*
-  ;
-
-classCreatorRest
-  : arguments classBody?
   ;
 
 nonWildcardTypeArguments
