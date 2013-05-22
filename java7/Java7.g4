@@ -79,7 +79,7 @@ classDeclaration
 
 normalClassDeclaration
   : 'class' Identifier typeParameters?
-    ('extends' typeRef)?
+    ('extends' type)?
     ('implements' typeList)?
     classBody
   ;
@@ -93,7 +93,7 @@ typeParameter
   ;
 
 bound
-  : classOrInterfaceType ('&' classOrInterfaceType)*
+  : refType ('&' refType)*
   ;
 
 enumDeclaration
@@ -143,7 +143,7 @@ memberDecl
   ;
 
 fieldDeclaration
-  : typeRef variableDeclarators ';'
+  : type variableDeclarators ';'
   ;
 
 block
@@ -161,7 +161,7 @@ enumConstant
   ;
 
 typeList
-  : classOrInterfaceType (',' classOrInterfaceType)*
+  : refType (',' refType)*
   ;
 
 typeArguments
@@ -174,16 +174,15 @@ typeArgument
   ;
 
 classOrArrayType
-// Includes primitive arrays, which are really a kind of class.
-// Just like rule typeRef, except that a simple primative is forbidden.
+// includes primitive arrays, which are really a kind of class
+// Just like rule type, except that a simple primative is forbidden
   : primitiveType '[' ']' ('[' ']')*
-  | classOrInterfaceType  ('[' ']')*
+  | refType               ('[' ']')*
   ;
 
 interfaceMemberDecl
-  : interfaceMethodOrFieldDecl
-  | interfaceGenericMethodDecl
-  | 'void' Identifier voidInterfaceMethodDeclaratorRest
+  : type constantDeclarator (',' constantDeclarator)* ';'
+  | typeParameters? (type | 'void') Identifier formalParameters ('[' ']')* ('throws' qualifiedIdentifierList)? ';'
   | interfaceDeclaration
   | classDeclaration
   ;
@@ -191,7 +190,7 @@ interfaceMemberDecl
 
 /** Allows brackets after parameters for backwards compatibility only; do not use. */
 methodDeclaration
-  : typeParameters? (typeRef | 'void')
+  : typeParameters? (type | 'void')
     Identifier formalParameters ('[' ']')*   ('throws' qualifiedIdentifierList)?
     ( methodBody
     | ';'
@@ -211,30 +210,8 @@ variableModifier
   | annotation
   ;
 
-interfaceMethodOrFieldDecl
-  : typeRef Identifier interfaceMethodOrFieldRest
-  ;
-
-interfaceMethodOrFieldRest
-  : constantDeclaratorsRest ';'
-  | interfaceMethodDeclaratorRest
-  ;
-
-interfaceMethodDeclaratorRest
-  : formalParameters ('[' ']')* ('throws' qualifiedIdentifierList)? ';'
-  ;
-
-interfaceGenericMethodDecl
-  : typeParameters (typeRef | 'void') Identifier
-    interfaceMethodDeclaratorRest
-  ;
-
-voidInterfaceMethodDeclaratorRest
-  : formalParameters ('throws' qualifiedIdentifierList)? ';'
-  ;
-
 constantDeclarator
-  : Identifier constantDeclaratorRest
+  : Identifier ('[' ']')* '=' variableInitializer
   ;
 
 variableDeclarators
@@ -243,14 +220,6 @@ variableDeclarators
 
 variableDeclarator
   : variableDeclaratorId ('=' variableInitializer)?
-  ;
-
-constantDeclaratorsRest
-  : constantDeclaratorRest (',' constantDeclarator)*
-  ;
-
-constantDeclaratorRest
-  : ('[' ']')* '=' variableInitializer
   ;
 
 variableDeclaratorId
@@ -295,19 +264,17 @@ typeName
   : qualifiedIdentifier
   ;
 
-typeRef
-  : classOrInterfaceType ('[' ']')*
+type
+  : refType ('[' ']')*
   | primitiveType ('[' ']')*
   ;
 
-/** classOrInterfaceType is not used in the Java 7 Language Specification. We use
-    it as a substitute name for the ReferenceType that is defined in the Syntax
-    section (Chapter 18, p. 593). The reason that we do not just use the rule name
-    referenceType instead of classOrInterfaceType is that elsewhere in the
-    Java 7 Reference (topic 4.3, p.52), ReferenceType is defined differently.
-    We are doing our best here to avoid confusion.
+/** refType is the ReferenceType that is defined in the JLS7 Syntax
+    section (Chapter 18, p. 593). The reason that we change the rule name
+    is that ReferenceType is defined two different ways in JLS7
+    (see topic 4.3, p.52).
   */
-classOrInterfaceType
+refType
   : Identifier typeArguments? ( '.' Identifier typeArguments? )*
   ;
 
@@ -331,12 +298,11 @@ formalParameters
   ;
 
 formalParameterDeclarations
-  : variableModifier* typeRef formalParameterVariables
-  ;
-
-formalParameterVariables
-  : '...' variableDeclaratorId // variable-arity parameter must be the last one
-  | variableDeclaratorId (',' formalParameterDeclarations)?
+// if there is a variable arity parameter, it is the last parameter
+  :  variableModifier* type
+       ('...' variableDeclaratorId
+       |      variableDeclaratorId ( ',' formalParameterDeclarations )?
+       )
   ;
 
 methodBody
@@ -408,7 +374,7 @@ annotationTypeDeclaration
   ;
 
 annotationTypeElement
-  : typeRef (annotationMethod | variableDeclarators) ';'
+  : type (annotationMethod | variableDeclarators) ';'
   | classDeclaration ';'?
   | normalInterfaceDeclaration ';'?
   | enumDeclaration ';'?
@@ -426,7 +392,7 @@ defaultValue
 // STATEMENTS / BLOCKS
 
 localVariableDeclaration
-  : variableModifier* typeRef variableDeclarators
+  : variableModifier* type variableDeclarators
   ;
 
 statement
@@ -466,7 +432,7 @@ resources
   ;
 
 resource
-  : variableModifier* classOrInterfaceType variableDeclaratorId '=' expression
+  : variableModifier* refType variableDeclaratorId '=' expression
   ;
 
 switchBlock
@@ -494,7 +460,7 @@ forInit
   ;
 
 enhancedForControl
-  : variableModifier* typeRef Identifier ':' expression
+  : variableModifier* type Identifier ':' expression
   ;
 
 forUpdate
@@ -532,13 +498,13 @@ expression
   | expression ('++' | '--')
   | ('+'|'-'|'++'|'--') expression
   | ('~'|'!') expression
-  | '(' typeRef ')' expression
+  | '(' type ')' expression
   | 'new' creator
   | expression ('*'|'/'|'%') expression
   | expression ('+'|'-') expression
   | expression ('<' '<' | '>' '>' '>' | '>' '>') expression
   | expression ('<' '=' | '>' '=' | '>' | '<') expression
-  | expression 'instanceof' typeRef
+  | expression 'instanceof' type
   | expression ('==' | '!=') expression
   | expression '&' expression
   | expression '^' expression
@@ -569,36 +535,31 @@ primary
   | 'super'
   | literal
   | Identifier
-  | typeRef '.' 'class'
+  | type '.' 'class'
   | 'void' '.' 'class'
   ;
 
 creator
-  : nonWildcardTypeArguments createdName classCreatorRest
-  | createdName (arrayCreatorRest | classCreatorRest)
+// 'new' objects may be either classes or arrays (with or without initializers)
+  : nonWildcardTypeArguments createdName   arguments classBody?
+  |                          createdName ( arguments classBody?
+                                         | ('['            ']')+ arrayInitializer
+                                         | ('[' expression ']')+ ('[' ']')*
+                                         )
   ;
 
 createdName
   : primitiveType
-  | // classOrInterfaceType but with possible <>
+  | // refType but with possible <>
     Identifier (typeArguments | '<' '>')? ('.' Identifier (typeArguments | '<' '>')? )*
   ;
 
 innerCreator
-  : (nonWildcardTypeArguments | '<' '>')? Identifier classCreatorRest
+  : (nonWildcardTypeArguments | '<' '>')? Identifier arguments classBody?
   ;
 
 explicitGenericInvocation
   : nonWildcardTypeArguments Identifier arguments
-  ;
-
-arrayCreatorRest
-  : '[' ']' ('[' ']')* arrayInitializer
-  | '[' expression ']' ('[' expression ']')* ('[' ']')*
-  ;
-
-classCreatorRest
-  : arguments classBody?
   ;
 
 nonWildcardTypeArguments
