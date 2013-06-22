@@ -295,18 +295,22 @@ qualifiedNameList
     ;
 
 formalParameters
-    :   '(' formalParameterDecls? ')'
+    :   '(' formalParameterList? ')'
     ;
     
-formalParameterDecls
-    :   variableModifiers type formalParameterDeclsRest
+formalParameterList
+    :   formalParameter (',' formalParameter)* (',' lastFormalParameter)?
+    |   lastFormalParameter
     ;
-    
-formalParameterDeclsRest
-    :   variableDeclaratorId (',' formalParameterDecls)?
-    |   '...' variableDeclaratorId
+
+formalParameter
+    :   variableModifier* type variableDeclaratorId
     ;
-    
+
+lastFormalParameter
+    :   variableModifier* type '...' variableDeclaratorId
+    ;
+
 methodBody
     :   block
     ;
@@ -411,13 +415,9 @@ localVariableDeclarationStatement
     ;
 
 localVariableDeclaration
-    :   variableModifiers type variableDeclarators
+    :   variableModifier* type variableDeclarators
     ;
     
-variableModifiers
-    :   variableModifier*
-    ;
-
 statement
     : block
     |   ASSERT expression (':' expression)? ';'
@@ -443,7 +443,7 @@ catches
     ;
 
 catchClause
-    :   'catch' '(' variableModifiers catchType Identifier ')' block
+    :   'catch' '(' variableModifier* catchType Identifier ')' block
     ;
 
 catchType
@@ -463,13 +463,9 @@ resources
 	;
 
 resource
-	:	variableModifiers classOrInterfaceType variableDeclaratorId '=' expression
+	:	variableModifier* classOrInterfaceType variableDeclaratorId '=' expression
 	;
 
-formalParameter
-    :   variableModifiers type variableDeclaratorId
-    ;
-        
 switchBlockStatementGroups
     :   (switchBlockStatementGroup)*
     ;
@@ -499,7 +495,7 @@ forInit
     ;
     
 enhancedForControl
-    :   variableModifiers type Identifier ':' expression
+    :   variableModifier* type Identifier ':' expression
     ;
 
 forUpdate
