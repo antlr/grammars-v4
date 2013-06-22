@@ -143,9 +143,17 @@ memberDeclaration
     |   enumDeclaration
     ;
     
+/* We use rule this even for void methods which cannot have [] after parameters.
+   This simplifies grammar and we can consider void to be a type, which
+   renders the [] matching as a context-sensitive issue or a semantic check
+   for invalid return type after parsing.
+ */
 methodDeclaration
-    :   type   Identifier methodDeclaratorRest
-    |   'void' Identifier voidMethodDeclaratorRest
+    :   (type|'void') Identifier formalParameters ('[' ']')*
+        ('throws' qualifiedNameList)?
+        (   methodBody
+        |   ';'
+        )
     ;
 
 genericMethodDeclaration
@@ -189,16 +197,14 @@ interfaceMethodOrFieldRest
     |   interfaceMethodDeclaratorRest
     ;
     
+/** We use this even for void methods which cannot have [] after parameters.
+    This simplifies grammar and we can consider void to be a type, which
+    renders the [] matching as a context-sensitive issue or a semantic check
+    for invalid return type after parsing.
+ */
 methodDeclaratorRest
     :   formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
-        (   methodBody
-        |   ';'
-        )
-    ;
-    
-voidMethodDeclaratorRest
-    :   formalParameters ('throws' qualifiedNameList)?
         (   methodBody
         |   ';'
         )
