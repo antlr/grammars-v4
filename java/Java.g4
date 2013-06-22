@@ -25,6 +25,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 /** A Java 1.7 grammar for ANTLR v4 derived from ANTLR v3 Java grammar.
  *  Uses ANTLR v4's left-recursive expression notation.
  *  It parses ECJ, Netbeans, JDK etc...
