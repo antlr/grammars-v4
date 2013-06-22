@@ -41,33 +41,24 @@
 grammar Java;
 
 // starting point for parsing a java file
-/* The annotations are separated out to make parsing faster, but must be associated with
-   a packageDeclaration or a typeDeclaration (and not an empty one). */
 compilationUnit
-    :   annotations
-        (   packageDeclaration importDeclaration* typeDeclaration*
-        |   classOrInterfaceDeclaration typeDeclaration*
-        )
-        EOF
-    |   packageDeclaration? importDeclaration* typeDeclaration*
-        EOF
+    :   packageDeclaration? importDeclaration* typeDeclaration* EOF
     ;
 
 packageDeclaration
-    :   'package' qualifiedName ';'
+    :   annotation* 'package' qualifiedName ';'
     ;
-    
+
 importDeclaration
     :   'import' 'static'? qualifiedName ('.' '*')? ';'
     ;
     
 typeDeclaration
-    :   classOrInterfaceDeclaration
+    :   classOrInterfaceModifier* classDeclaration
+    |   classOrInterfaceModifier* enumDeclaration
+    |   classOrInterfaceModifier* interfaceDeclaration
+    |   classOrInterfaceModifier* annotationTypeDeclaration
     |   ';'
-    ;
-    
-classOrInterfaceDeclaration
-    :   classOrInterfaceModifier* (classDeclaration | interfaceDeclaration)
     ;
     
 classOrInterfaceModifier
@@ -83,11 +74,6 @@ classOrInterfaceModifier
     ;
 
 classDeclaration
-    :   normalClassDeclaration
-    |   enumDeclaration
-    ;
-    
-normalClassDeclaration
     :   'class' Identifier typeParameters?
         ('extends' type)?
         ('implements' typeList)?
@@ -116,7 +102,7 @@ enumConstants
     ;
     
 enumConstant
-    :   annotations? Identifier arguments? classBody?
+    :   annotation* Identifier arguments? classBody?
     ;
     
 enumBodyDeclarations
@@ -124,11 +110,6 @@ enumBodyDeclarations
     ;
     
 interfaceDeclaration
-    :   normalInterfaceDeclaration
-    |   annotationTypeDeclaration
-    ;
-    
-normalInterfaceDeclaration
     :   'interface' Identifier typeParameters? ('extends' typeList)? interfaceBody
     ;
     
@@ -156,7 +137,9 @@ memberDecl
     |   'void' Identifier voidMethodDeclaratorRest
     |   Identifier constructorDeclaratorRest
     |   interfaceDeclaration
+    |   annotationTypeDeclaration
     |   classDeclaration
+    |   enumDeclaration
     ;
     
 memberDeclaration
@@ -186,7 +169,9 @@ interfaceMemberDecl
     |   interfaceGenericMethodDecl
     |   'void' Identifier voidInterfaceMethodDeclaratorRest
     |   interfaceDeclaration
+    |   annotationTypeDeclaration
     |   classDeclaration
+    |   enumDeclaration
     ;
     
 interfaceMethodOrFieldDecl
@@ -365,10 +350,6 @@ literal
 
 // ANNOTATIONS
 
-annotations
-    :   annotation+
-    ;
-
 annotation
     :   '@' annotationName ( '(' ( elementValuePairs | elementValue )? ')' )?
     ;
@@ -410,8 +391,8 @@ annotationTypeElementDeclaration
     
 annotationTypeElementRest
     :   type annotationMethodOrConstantRest ';'
-    |   normalClassDeclaration ';'?
-    |   normalInterfaceDeclaration ';'?
+    |   classDeclaration ';'?
+    |   interfaceDeclaration ';'?
     |   enumDeclaration ';'?
     |   annotationTypeDeclaration ';'?
     ;
@@ -441,8 +422,8 @@ block
     
 blockStatement
     :   localVariableDeclarationStatement
-    |   classOrInterfaceDeclaration
     |   statement
+    |   typeDeclaration
     ;
     
 localVariableDeclarationStatement
