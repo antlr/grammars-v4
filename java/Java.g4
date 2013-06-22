@@ -31,6 +31,12 @@
  *  It parses ECJ, Netbeans, JDK etc...
  *
  *  Sam Harwell cleaned this up significantly and updated to 1.7!
+ *
+ *  You can test with 
+ *
+ *  $ antlr4 Java.g4
+ *  $ javac *.java
+ *  $ grun Java compilationUnit *.java
  */
 grammar Java;
 
@@ -61,13 +67,9 @@ typeDeclaration
     ;
     
 classOrInterfaceDeclaration
-    :   classOrInterfaceModifiers (classDeclaration | interfaceDeclaration)
+    :   classOrInterfaceModifier* (classDeclaration | interfaceDeclaration)
     ;
     
-classOrInterfaceModifiers
-    :   classOrInterfaceModifier*
-    ;
-
 classOrInterfaceModifier
     :   annotation       // class or interface
     |   (   'public'     // class or interface
@@ -78,10 +80,6 @@ classOrInterfaceModifier
         |   'final'      // class only -- does not apply to interfaces
         |   'strictfp'   // class or interface
         )
-    ;
-
-modifiers
-    :   modifier*
     ;
 
 classDeclaration
@@ -109,11 +107,8 @@ typeBound
     ;
 
 enumDeclaration
-    :   ENUM Identifier ('implements' typeList)? enumBody
-    ;
-
-enumBody
-    :   '{' enumConstants? ','? enumBodyDeclarations? '}'
+    :   ENUM Identifier ('implements' typeList)?
+        '{' enumConstants? ','? enumBodyDeclarations? '}'
     ;
 
 enumConstants
@@ -152,7 +147,7 @@ interfaceBody
 classBodyDeclaration
     :   ';'
     |   'static'? block
-    |   modifiers memberDecl
+    |   modifier* memberDecl
     ;
     
 memberDecl
@@ -169,14 +164,10 @@ memberDeclaration
     ;
 
 genericMethodOrConstructorDecl
-    :   typeParameters genericMethodOrConstructorRest
+    :   typeParameters (type | 'void') Identifier methodDeclaratorRest
+    |   typeParameters Identifier constructorDeclaratorRest
     ;
     
-genericMethodOrConstructorRest
-    :   (type | 'void') Identifier methodDeclaratorRest
-    |   Identifier constructorDeclaratorRest
-    ;
-
 methodDeclaration
     :   Identifier methodDeclaratorRest
     ;
@@ -186,7 +177,7 @@ fieldDeclaration
     ;
         
 interfaceBodyDeclaration
-    :   modifiers interfaceMemberDecl
+    :   modifier* interfaceMemberDecl
     |   ';'
     ;
 
@@ -413,7 +404,7 @@ annotationTypeBody
     ;
     
 annotationTypeElementDeclaration
-    :   modifiers annotationTypeElementRest
+    :   modifier* annotationTypeElementRest
 	|	';' // this is not allowed by the grammar, but apparently allowed by the actual compiler
     ;
     
