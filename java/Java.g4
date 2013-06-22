@@ -128,37 +128,43 @@ interfaceBody
 classBodyDeclaration
     :   ';'
     |   'static'? block
-    |   modifier* memberDecl
+    |   modifier* memberDeclaration
     ;
     
-memberDecl
-    :   genericMethodOrConstructorDecl
-    |   memberDeclaration
-    |   'void' Identifier voidMethodDeclaratorRest
-    |   Identifier constructorDeclaratorRest
+memberDeclaration
+    :   methodDeclaration
+    |   genericMethodDeclaration
+    |   fieldDeclaration
+    |   constructorDeclaration
+    |   genericConstructorDeclaration
     |   interfaceDeclaration
     |   annotationTypeDeclaration
     |   classDeclaration
     |   enumDeclaration
     ;
     
-memberDeclaration
-    :   type (methodDeclaration | fieldDeclaration)
+methodDeclaration
+    :   type   Identifier methodDeclaratorRest
+    |   'void' Identifier voidMethodDeclaratorRest
     ;
 
-genericMethodOrConstructorDecl
-    :   typeParameters (type | 'void') Identifier methodDeclaratorRest
-    |   typeParameters Identifier constructorDeclaratorRest
+genericMethodDeclaration
+    :   typeParameters methodDeclaration
     ;
-    
-methodDeclaration
-    :   Identifier methodDeclaratorRest
+
+constructorDeclaration
+    :   Identifier formalParameters ('throws' qualifiedNameList)?
+        constructorBody
+    ;
+
+genericConstructorDeclaration
+    :   typeParameters constructorDeclaration
     ;
 
 fieldDeclaration
-    :   variableDeclarators ';'
+    :   type variableDeclarators ';'
     ;
-        
+
 interfaceBodyDeclaration
     :   modifier* interfaceMemberDecl
     |   ';'
@@ -211,10 +217,6 @@ voidInterfaceMethodDeclaratorRest
     :   formalParameters ('throws' qualifiedNameList)? ';'
     ;
     
-constructorDeclaratorRest
-    :   formalParameters ('throws' qualifiedNameList)? constructorBody
-    ;
-
 constantDeclarator
     :   Identifier constantDeclaratorRest
     ;
