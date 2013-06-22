@@ -427,7 +427,7 @@ statement
     |   'do' statement 'while' parExpression ';'
     |   'try' block (catches finallyBlock? | finallyBlock)
 	|	'try' resourceSpecification block catches? finallyBlock?
-    |   'switch' parExpression '{' switchBlockStatementGroups '}'
+    |   'switch' parExpression '{' switchBlockStatementGroup* switchLabel* '}'
     |   'synchronized' parExpression block
     |   'return' expression? ';'
     |   'throw' expression ';'
@@ -466,16 +466,11 @@ resource
 	:	variableModifier* classOrInterfaceType variableDeclaratorId '=' expression
 	;
 
-switchBlockStatementGroups
-    :   (switchBlockStatementGroup)*
-    ;
-    
-/* The change here (switchLabel -> switchLabel+) technically makes this grammar
-   ambiguous; but with appropriately greedy parsing it yields the most
-   appropriate AST, one in which each group, except possibly the last one, has
-   labels and statements. */
+/** Matches cases then statements, both of which are mandatory.
+ *  To handle empty cases at the end, we add switchLabel* to statement.
+ */
 switchBlockStatementGroup
-    :   switchLabel+ blockStatement*
+    :   switchLabel+ blockStatement+
     ;
     
 switchLabel
