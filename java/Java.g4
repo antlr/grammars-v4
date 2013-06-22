@@ -174,74 +174,46 @@ fieldDeclaration
     ;
 
 interfaceBodyDeclaration
-    :   modifier* interfaceMemberDecl
+    :   modifier* interfaceMemberDeclaration
     |   ';'
     ;
 
-interfaceMemberDecl
-    :   interfaceMethodOrFieldDecl
-    |   interfaceGenericMethodDecl
-    |   'void' Identifier voidInterfaceMethodDeclaratorRest
+interfaceMemberDeclaration
+    :   constDeclaration
+    |   interfaceMethodDeclaration
+    |   genericInterfaceMethodDeclaration
     |   interfaceDeclaration
     |   annotationTypeDeclaration
     |   classDeclaration
     |   enumDeclaration
     ;
-    
-interfaceMethodOrFieldDecl
-    :   type Identifier interfaceMethodOrFieldRest
+
+constDeclaration
+    :   type constantDeclarator (',' constantDeclarator)* ';'
     ;
-    
-interfaceMethodOrFieldRest
-    :   constantDeclaratorsRest ';'
-    |   interfaceMethodDeclaratorRest
-    ;
-    
-/** We use this even for void methods which cannot have [] after parameters.
-    This simplifies grammar and we can consider void to be a type, which
-    renders the [] matching as a context-sensitive issue or a semantic check
-    for invalid return type after parsing.
- */
-methodDeclaratorRest
-    :   formalParameters ('[' ']')*
-        ('throws' qualifiedNameList)?
-        (   methodBody
-        |   ';'
-        )
-    ;
-    
-interfaceMethodDeclaratorRest
-    :   formalParameters ('[' ']')* ('throws' qualifiedNameList)? ';'
-    ;
-    
-interfaceGenericMethodDecl
-    :   typeParameters (type | 'void') Identifier
-        interfaceMethodDeclaratorRest
-    ;
-    
-voidInterfaceMethodDeclaratorRest
-    :   formalParameters ('throws' qualifiedNameList)? ';'
-    ;
-    
+
 constantDeclarator
-    :   Identifier constantDeclaratorRest
+    :   Identifier ('[' ']')* '=' variableInitializer
     ;
     
+// see matching of [] comment in methodDeclaratorRest
+interfaceMethodDeclaration
+    :   (type|'void') Identifier formalParameters ('[' ']')* 
+        ('throws' qualifiedNameList)?
+        ';'
+    ;
+
+genericInterfaceMethodDeclaration
+    :   typeParameters interfaceMethodDeclaration
+    ;
+
 variableDeclarators
     :   variableDeclarator (',' variableDeclarator)*
     ;
 
 variableDeclarator
     :   variableDeclaratorId ('=' variableInitializer)?
-    ;
-    
-constantDeclaratorsRest
-    :   constantDeclaratorRest (',' constantDeclarator)*
-    ;
-
-constantDeclaratorRest
-    :   ('[' ']')* '=' variableInitializer
-    ;
+    ;    
     
 variableDeclaratorId
     :   Identifier ('[' ']')*
