@@ -61,16 +61,30 @@ typeDeclaration
     |   ';'
     ;
     
+modifier
+    :   classOrInterfaceModifier
+    |   (   'native'
+        |   'synchronized'
+        |   'transient'
+        |   'volatile'
+        )
+    ;
+
 classOrInterfaceModifier
     :   annotation       // class or interface
     |   (   'public'     // class or interface
         |   'protected'  // class or interface
         |   'private'    // class or interface
-        |   'abstract'   // class or interface
         |   'static'     // class or interface
+        |   'abstract'   // class or interface
         |   'final'      // class only -- does not apply to interfaces
         |   'strictfp'   // class or interface
         )
+    ;
+
+variableModifier
+    :   'final'
+    |   annotation
     ;
 
 classDeclaration
@@ -228,22 +242,6 @@ arrayInitializer
     :   '{' (variableInitializer (',' variableInitializer)* (',')? )? '}'
     ;
 
-modifier
-    :   annotation
-    |   (   'public'
-        |   'protected'
-        |   'private'
-        |   'static'
-        |   'abstract'
-        |   'final'
-        |   'native'
-        |   'synchronized'
-        |   'transient'
-        |   'volatile'
-        |   'strictfp'
-        )
-    ;
-
 packageOrTypeName
     :   qualifiedName
     ;
@@ -274,11 +272,6 @@ primitiveType
     |   'long'
     |   'float'
     |   'double'
-    ;
-
-variableModifier
-    :   'final'
-    |   annotation
     ;
 
 typeArguments
@@ -338,9 +331,7 @@ annotation
     :   '@' annotationName ( '(' ( elementValuePairs | elementValue )? ')' )?
     ;
     
-annotationName
-    : Identifier ('.' Identifier)*
-    ;
+annotationName : qualifiedName ;
 
 elementValuePairs
     :   elementValuePair (',' elementValuePair)*
