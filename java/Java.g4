@@ -513,11 +513,11 @@ expression
     |   expression '.' 'new' nonWildcardTypeArguments? innerCreator
     |   expression '.' 'super' superSuffix
     |	expression '.' explicitGenericInvocation
-    |   'new' creator
     |   expression '[' expression ']'
+    |   expression '(' expressionList? ')'
+    |   'new' creator
     |   '(' type ')' expression
     |   expression ('++' | '--')
-    |   expression '(' expressionList? ')'
     |   ('+'|'-'|'++'|'--') expression
     |   ('~'|'!') expression
     |   expression ('*'|'/'|'%') expression
