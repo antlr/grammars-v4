@@ -120,7 +120,7 @@ enumConstant
     ;
 
 enumBodyDeclarations
-    :   ';' (classBodyDeclaration)*
+    :   ';' classBodyDeclaration*
     ;
 
 interfaceDeclaration
@@ -416,8 +416,8 @@ statement
     |   'for' '(' forControl ')' statement
     |   'while' parExpression statement
     |   'do' statement 'while' parExpression ';'
-    |   'try' block (catches finallyBlock? | finallyBlock)
-    |   'try' resourceSpecification block catches? finallyBlock?
+    |   'try' block (catchClause+ finallyBlock? | finallyBlock)
+    |   'try' resourceSpecification block catchClause* finallyBlock?
     |   'switch' parExpression '{' switchBlockStatementGroup* switchLabel* '}'
     |   'synchronized' parExpression block
     |   'return' expression? ';'
@@ -427,10 +427,6 @@ statement
     |   ';'
     |   statementExpression ';'
     |   Identifier ':' statement
-    ;
-
-catches
-    :   catchClause+
     ;
 
 catchClause
@@ -714,7 +710,7 @@ DecimalNumeral
 
 fragment
 Digits
-    :   Digit (DigitsAndUnderscores? Digit)?
+    :   Digit (DigitOrUnderscore* Digit)?
     ;
 
 fragment
@@ -726,11 +722,6 @@ Digit
 fragment
 NonZeroDigit
     :   [1-9]
-    ;
-
-fragment
-DigitsAndUnderscores
-    :   DigitOrUnderscore+
     ;
 
 fragment
@@ -751,17 +742,12 @@ HexNumeral
 
 fragment
 HexDigits
-    :   HexDigit (HexDigitsAndUnderscores? HexDigit)?
+    :   HexDigit (HexDigitOrUnderscore* HexDigit)?
     ;
 
 fragment
 HexDigit
     :   [0-9a-fA-F]
-    ;
-
-fragment
-HexDigitsAndUnderscores
-    :   HexDigitOrUnderscore+
     ;
 
 fragment
@@ -777,17 +763,12 @@ OctalNumeral
 
 fragment
 OctalDigits
-    :   OctalDigit (OctalDigitsAndUnderscores? OctalDigit)?
+    :   OctalDigit (OctalDigitOrUnderscore* OctalDigit)?
     ;
 
 fragment
 OctalDigit
     :   [0-7]
-    ;
-
-fragment
-OctalDigitsAndUnderscores
-    :   OctalDigitOrUnderscore+
     ;
 
 fragment
@@ -803,17 +784,12 @@ BinaryNumeral
 
 fragment
 BinaryDigits
-    :   BinaryDigit (BinaryDigitsAndUnderscores? BinaryDigit)?
+    :   BinaryDigit (BinaryDigitOrUnderscore* BinaryDigit)?
     ;
 
 fragment
 BinaryDigit
     :   [01]
-    ;
-
-fragment
-BinaryDigitsAndUnderscores
-    :   BinaryDigitOrUnderscore+
     ;
 
 fragment
