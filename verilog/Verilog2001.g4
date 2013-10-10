@@ -724,7 +724,7 @@ event_control :
 '@' event_identifier
 | '@' '(' event_expression ')'
 | '@' '*'
-| '@' '(' '*' ')'
+| '@' (( '(' '*' | '(*' ) ')' |  '(' ('*)' | '*' ')' ))
 ;
 
 event_trigger : '->' hierarchical_event_identifier ';' ;
@@ -1326,7 +1326,7 @@ String : '"' ( ~[\n\r] )* '"' ;
 // 9 General
 // 9.1 Attributes
 
-attribute_instance : '(' '*' attr_spec ( ',' attr_spec )* '*' ')' ;
+attribute_instance : '(*' attr_spec ( ',' attr_spec )* '*)' ;
 attr_spec : attr_name '=' constant_expression
 | attr_name
 ;
