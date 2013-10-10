@@ -36,12 +36,14 @@ This grammar file derived from:
 
     Lua 5.1 grammar written by Nicolai Mainiero
     http://www.antlr3.org/grammar/1178608849736/Lua.g
- */
+
+I tested my grammar with Test suite for Lua 5.2 (http://www.lua.org/tests/5.2/)
+*/
 
 grammar Lua;
 
 chunk
-    : block
+    : block EOF
     ;
 
 block
@@ -190,15 +192,21 @@ NAME
     ;
 
 NORMALSTRING
-    :  '"' ( EscapeSequence | ~('\\'|'"') )* '"' 
+    : '"' ( EscapeSequence | ~('\\'|'"') )* '"' 
     ;
 
 CHARSTRING
-   :	'\'' ( EscapeSequence | ~('\''|'\\') )* '\''
-   ;
+    : '\'' ( EscapeSequence | ~('\''|'\\') )* '\''
+    ;
 
 LONGSTRING
-    :	'[' '='* '[' .*? ']' '='* ']'	// TODO: the numbers of '=' should be same
+    : '[' NESTED_STR ']'
+    ;
+
+fragment
+NESTED_STR
+    : '=' NESTED_STR '='
+    | '[' .*? ']'
     ;
 
 INT
@@ -210,54 +218,54 @@ HEX
     ;
 
 FLOAT
-    :   Digit+ '.' Digit* ExponentPart?
-    |   '.' Digit+ ExponentPart?
-    |   Digit+ ExponentPart
+    : Digit+ '.' Digit* ExponentPart?
+    | '.' Digit+ ExponentPart?
+    | Digit+ ExponentPart
     ;
 
 HEX_FLOAT
-    :   '0' [xX] HexDigit+ '.' HexDigit* HexExponentPart?
-    |   '0' [xX] '.' HexDigit+ HexExponentPart?
-    |   '0' [xX] HexDigit+ HexExponentPart
+    : '0' [xX] HexDigit+ '.' HexDigit* HexExponentPart?
+    | '0' [xX] '.' HexDigit+ HexExponentPart?
+    | '0' [xX] HexDigit+ HexExponentPart
     ;
 
 fragment
 ExponentPart
-    :   [eE] [+-]? Digit+
+    : [eE] [+-]? Digit+
     ;
 
 fragment
 HexExponentPart
-    :   [pP] [+-]? Digit+
+    : [pP] [+-]? Digit+
     ;
 
 fragment
 EscapeSequence
-    :   '\\' [abfnrtvz"'\\]
-    |   DecimalEscape
-    |   HexEscape
+    : '\\' [abfnrtvz"'\\]
+    | DecimalEscape
+    | HexEscape
     ;
     
 fragment
 DecimalEscape
-    :   '\\' Digit
-    |   '\\' Digit Digit
-    |   '\\' [0-2] Digit Digit
+    : '\\' Digit
+    | '\\' Digit Digit
+    | '\\' [0-2] Digit Digit
     ;
     
 fragment
 HexEscape
-    :   '\\' 'x' HexDigit HexDigit
+    : '\\' 'x' HexDigit HexDigit
     ;
 
 fragment
 Digit
-    :   [0-9]
+    : [0-9]
     ;
 
 fragment
 HexDigit
-    :   [0-9a-fA-F]
+    : [0-9a-fA-F]
     ;
 
 COMMENT
@@ -265,8 +273,8 @@ COMMENT
     ;
     
 LINE_COMMENT
-    : '--' ~('\n'|'\r')* '\r'? '\n'-> channel(HIDDEN)
-    ;    
+    : '--' '['? (~('['|'\n'|'\r') ~('\n'|'\r')*)? ('\n'|'\r')* -> channel(HIDDEN)
+    ;
     
 WS  
     : [ \t\u000C]+ -> skip
