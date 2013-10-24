@@ -46,13 +46,25 @@ jsonText
 ;
 
 jsonValue
-	: 'false'
-	| 'null'
-	| 'true'
+	: jsonBoolTrue
+	| jsonNull
+	| jsonBoolFalse
 	| jsonObject
 	| jsonArray
 	| jsonNumber
 	| jsonString
+;
+
+jsonBoolTrue
+	: 'true'
+;
+
+jsonNull
+	: 'null'
+;
+
+jsonBoolFalse
+	: 'false'
 ;
 
 jsonNumber
