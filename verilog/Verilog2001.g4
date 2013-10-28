@@ -724,24 +724,24 @@ event_control :
 '@' event_identifier
 | '@' '(' event_expression ')'
 | '@' '*'
-| '@' (( '(' '*' | '(*' ) ')' |  '(' ('*)' | '*' ')' ))
+| '@' '(' '*' ')'
 ;
 
 event_trigger : '->' hierarchical_event_identifier ';' ;
 
 event_expression :
-expression
-|
-hierarchical_identifier
-|
-'posedge' expression
-|
-'negedge' expression
-|
-event_expression 'or' event_expression
-|
-event_expression ',' event_expression
+  event_primary
+  ( 'or' event_primary
+  | ',' event_primary
+  )*
 ;
+
+event_primary
+    : ( expression
+      | 'posedge' expression
+      | 'negedge' expression
+      )
+    ;
 
 procedural_timing_control_statement : delay_or_event_control statement_or_null ;
 
@@ -1147,13 +1147,15 @@ constant_expression
 dimension_constant_expression : constant_expression ;
 
 expression
-    :   (   unary_operator attribute_instance* primary
-        |   primary
-        |   String
-        )
-        (   binary_operator attribute_instance* expression
-        |   '?' attribute_instance* expression ':' expression
+    :   term
+        (   binary_operator attribute_instance* term
+        |   '?' attribute_instance* expression ':' term
         )*
+    ;
+
+term:   unary_operator attribute_instance* primary
+    |   primary
+    |   String
     ;
 
 lsb_constant_expression : constant_expression ;
@@ -1326,7 +1328,7 @@ String : '"' ( ~[\n\r] )* '"' ;
 // 9 General
 // 9.1 Attributes
 
-attribute_instance : '(*' attr_spec ( ',' attr_spec )* '*)' ;
+attribute_instance : '(' '*' attr_spec ( ',' attr_spec )* '*' ')' ;
 attr_spec : attr_name '=' constant_expression
 | attr_name
 ;
