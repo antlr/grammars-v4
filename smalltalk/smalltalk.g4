@@ -5,7 +5,7 @@
   2013/11/27 James Ladd (object@redline.st)
 */
 
-grammar smalltalk;
+grammar Smalltalk;
 
 script : sequence EOF;
 sequence : ws temps? ws statements? ws;
