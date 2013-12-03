@@ -46,7 +46,7 @@ pseudoVariable : RESERVED_WORD;
 string : STRING;
 symbol : HASH bareSymbol;
 primitive : LT ws KEYWORD ws DIGITS ws GT;
-bareSymbol : (IDENTIFIER | BINARY_SELECTOR) | string;
+bareSymbol : (IDENTIFIER | BINARY_SELECTOR) | KEYWORD+ | string;
 literalArray : LITARR_START literalArrayRest;
 literalArrayRest : ws ((parsetimeLiteral | bareLiteralArray | bareSymbol) ws)* CLOSE_PAREN;
 bareLiteralArray : OPEN_PAREN literalArrayRest;
