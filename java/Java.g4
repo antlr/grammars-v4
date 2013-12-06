@@ -242,16 +242,8 @@ arrayInitializer
     :   '{' (variableInitializer (',' variableInitializer)* (',')? )? '}'
     ;
 
-packageOrTypeName
-    :   qualifiedName
-    ;
-
 enumConstantName
     :   Identifier
-    ;
-
-typeName
-    :   qualifiedName
     ;
 
 type
