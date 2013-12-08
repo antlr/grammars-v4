@@ -67,11 +67,17 @@ repetition
 ;
 
 repeat
-    : INT | (INT? '*' INT?)
+    : INT
+    | (INT? '*' INT?)
 ;
 
 element
-    : ID | group | option | STRING | NumberValue | ProseValue
+    : ID
+    | group
+    | option
+    | STRING
+    | NumberValue
+    | ProseValue
 ;
 
 group
