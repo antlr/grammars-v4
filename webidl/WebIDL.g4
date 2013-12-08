@@ -34,7 +34,7 @@ Web IDL grammar derived from:
     http://dev.w3.org/2006/webapi/WebIDL/
 
     Web IDL (Second Edition)
-    W3C Editor's Draft 26 March 2013
+    W3C Editor's Draft 02 August 2013
  */
 grammar WebIDL;
 
@@ -157,7 +157,7 @@ callbackRest
 ;
 
 typedef
-	: 'typedef' extendedAttributeList type IDENTIFIER_WEBIDL ';'
+	: 'typedef' type IDENTIFIER_WEBIDL ';'
 ;
 
 implementsStatement
@@ -189,7 +189,8 @@ floatLiteral
 
 attributeOrOperationOrIterator
 	: serializer
-	| qualifier attributeOrOperationRest
+	| stringifier
+	| staticMember
 	| attribute
 	| operationOrIterator
 ;
@@ -228,15 +229,23 @@ identifiers
 	| /* empty */
 ;
 
-qualifier
-	: 'static'
-	| 'stringifier'
+stringifier
+	: 'stringifier' stringifierRest
 ;
 
-attributeOrOperationRest
+stringifierRest
 	: attributeRest
 	| returnType operationRest
 	| ';'
+;
+
+staticMember
+	: 'static' staticMemberRest
+;
+
+staticMemberRest
+	: attributeRest
+	| returnType operationRest
 ;
 
 attribute
@@ -553,6 +562,10 @@ extendedAttributeIdent
 
 extendedAttributeNamedArgList
 	: IDENTIFIER_WEBIDL '=' IDENTIFIER_WEBIDL '(' argumentList ')'
+;
+
+extendedAttributeTypePair
+	: '(' type ',' type ')'
 ;
 
 
