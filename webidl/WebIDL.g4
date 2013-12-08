@@ -34,7 +34,7 @@ Web IDL grammar derived from:
     http://dev.w3.org/2006/webapi/WebIDL/
 
     Web IDL (Second Edition)
-    W3C Editor's Draft 02 August 2013
+    W3C Editor's Draft 6 November 2013
  */
 grammar WebIDL;
 
@@ -144,11 +144,16 @@ enum_
 ;
 
 enumValueList
-	: STRING_WEBIDL enumValues
+	: STRING_WEBIDL enumValueListComma
 ;
 
-enumValues
-	: ',' STRING_WEBIDL enumValues
+enumValueListComma
+	: ',' enumValueListString
+	| /* empty */
+;
+
+enumValueListString
+	: STRING_WEBIDL enumValueListComma
 	| /* empty */
 ;
 
@@ -157,7 +162,7 @@ callbackRest
 ;
 
 typedef
-	: 'typedef' type IDENTIFIER_WEBIDL ';'
+	: 'typedef' extendedAttributeList type IDENTIFIER_WEBIDL ';'
 ;
 
 implementsStatement
@@ -182,7 +187,7 @@ booleanLiteral
 
 floatLiteral
 	: FLOAT_WEBIDL
-	| '-' 'Infinity'
+	| '-Infinity'
 	| 'Infinity'
 	| 'NaN'
 ;
