@@ -32,7 +32,7 @@
  *
  *  Sam Harwell cleaned this up significantly and updated to 1.7!
  *
- *  You can test with 
+ *  You can test with
  *
  *  $ antlr4 Java.g4
  *  $ javac *.java
@@ -52,7 +52,7 @@ packageDeclaration
 importDeclaration
     :   'import' 'static'? qualifiedName ('.' '*')? ';'
     ;
-    
+
 typeDeclaration
     :   classOrInterfaceModifier* classDeclaration
     |   classOrInterfaceModifier* enumDeclaration
@@ -60,17 +60,31 @@ typeDeclaration
     |   classOrInterfaceModifier* annotationTypeDeclaration
     |   ';'
     ;
-    
+
+modifier
+    :   classOrInterfaceModifier
+    |   (   'native'
+        |   'synchronized'
+        |   'transient'
+        |   'volatile'
+        )
+    ;
+
 classOrInterfaceModifier
     :   annotation       // class or interface
     |   (   'public'     // class or interface
         |   'protected'  // class or interface
         |   'private'    // class or interface
-        |   'abstract'   // class or interface
         |   'static'     // class or interface
+        |   'abstract'   // class or interface
         |   'final'      // class only -- does not apply to interfaces
         |   'strictfp'   // class or interface
         )
+    ;
+
+variableModifier
+    :   'final'
+    |   annotation
     ;
 
 classDeclaration
@@ -79,7 +93,7 @@ classDeclaration
         ('implements' typeList)?
         classBody
     ;
-    
+
 typeParameters
     :   '<' typeParameter (',' typeParameter)* '>'
     ;
@@ -87,7 +101,7 @@ typeParameters
 typeParameter
     :   Identifier ('extends' typeBound)?
     ;
-        
+
 typeBound
     :   type ('&' type)*
     ;
@@ -100,27 +114,27 @@ enumDeclaration
 enumConstants
     :   enumConstant (',' enumConstant)*
     ;
-    
+
 enumConstant
     :   annotation* Identifier arguments? classBody?
     ;
-    
+
 enumBodyDeclarations
-    :   ';' (classBodyDeclaration)*
+    :   ';' classBodyDeclaration*
     ;
-    
+
 interfaceDeclaration
     :   'interface' Identifier typeParameters? ('extends' typeList)? interfaceBody
     ;
-    
+
 typeList
     :   type (',' type)*
     ;
-    
+
 classBody
     :   '{' classBodyDeclaration* '}'
     ;
-    
+
 interfaceBody
     :   '{' interfaceBodyDeclaration* '}'
     ;
@@ -130,7 +144,7 @@ classBodyDeclaration
     |   'static'? block
     |   modifier* memberDeclaration
     ;
-    
+
 memberDeclaration
     :   methodDeclaration
     |   genericMethodDeclaration
@@ -142,7 +156,7 @@ memberDeclaration
     |   classDeclaration
     |   enumDeclaration
     ;
-    
+
 /* We use rule this even for void methods which cannot have [] after parameters.
    This simplifies grammar and we can consider void to be a type, which
    renders the [] matching as a context-sensitive issue or a semantic check
@@ -195,10 +209,10 @@ constDeclaration
 constantDeclarator
     :   Identifier ('[' ']')* '=' variableInitializer
     ;
-    
+
 // see matching of [] comment in methodDeclaratorRest
 interfaceMethodDeclaration
-    :   (type|'void') Identifier formalParameters ('[' ']')* 
+    :   (type|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
         ';'
     ;
@@ -213,8 +227,8 @@ variableDeclarators
 
 variableDeclarator
     :   variableDeclaratorId ('=' variableInitializer)?
-    ;    
-    
+    ;
+
 variableDeclaratorId
     :   Identifier ('[' ']')*
     ;
@@ -223,47 +237,23 @@ variableInitializer
     :   arrayInitializer
     |   expression
     ;
-        
+
 arrayInitializer
     :   '{' (variableInitializer (',' variableInitializer)* (',')? )? '}'
-    ;
-
-modifier
-    :   annotation
-    |   (   'public'
-        |   'protected'
-        |   'private'
-        |   'static'
-        |   'abstract'
-        |   'final'
-        |   'native'
-        |   'synchronized'
-        |   'transient'
-        |   'volatile'
-        |   'strictfp'
-        )
-    ;
-
-packageOrTypeName
-    :   qualifiedName
     ;
 
 enumConstantName
     :   Identifier
     ;
 
-typeName
-    :   qualifiedName
+type
+    :   classOrInterfaceType ('[' ']')*
+    |   primitiveType ('[' ']')*
     ;
 
-type
-	:	classOrInterfaceType ('[' ']')*
-	|	primitiveType ('[' ']')*
-	;
-
 classOrInterfaceType
-	:	Identifier typeArguments? ('.' Identifier typeArguments? )*
-	;
+    :   Identifier typeArguments? ('.' Identifier typeArguments? )*
+    ;
 
 primitiveType
     :   'boolean'
@@ -276,20 +266,15 @@ primitiveType
     |   'double'
     ;
 
-variableModifier
-    :   'final'
-    |   annotation
-    ;
-
 typeArguments
     :   '<' typeArgument (',' typeArgument)* '>'
     ;
-    
+
 typeArgument
     :   type
     |   '?' (('extends' | 'super') type)?
     ;
-    
+
 qualifiedNameList
     :   qualifiedName (',' qualifiedName)*
     ;
@@ -297,7 +282,7 @@ qualifiedNameList
 formalParameters
     :   '(' formalParameterList? ')'
     ;
-    
+
 formalParameterList
     :   formalParameter (',' formalParameter)* (',' lastFormalParameter)?
     |   lastFormalParameter
@@ -322,8 +307,8 @@ constructorBody
 qualifiedName
     :   Identifier ('.' Identifier)*
     ;
-    
-literal 
+
+literal
     :   IntegerLiteral
     |   FloatingPointLiteral
     |   CharacterLiteral
@@ -337,10 +322,8 @@ literal
 annotation
     :   '@' annotationName ( '(' ( elementValuePairs | elementValue )? ')' )?
     ;
-    
-annotationName
-    : Identifier ('.' Identifier)*
-    ;
+
+annotationName : qualifiedName ;
 
 elementValuePairs
     :   elementValuePair (',' elementValuePair)*
@@ -349,30 +332,30 @@ elementValuePairs
 elementValuePair
     :   Identifier '=' elementValue
     ;
-    
+
 elementValue
     :   expression
     |   annotation
     |   elementValueArrayInitializer
     ;
-    
+
 elementValueArrayInitializer
     :   '{' (elementValue (',' elementValue)*)? (',')? '}'
     ;
-    
+
 annotationTypeDeclaration
     :   '@' 'interface' Identifier annotationTypeBody
     ;
-    
+
 annotationTypeBody
     :   '{' (annotationTypeElementDeclaration)* '}'
     ;
-    
+
 annotationTypeElementDeclaration
     :   modifier* annotationTypeElementRest
-	|	';' // this is not allowed by the grammar, but apparently allowed by the actual compiler
+    |   ';' // this is not allowed by the grammar, but apparently allowed by the actual compiler
     ;
-    
+
 annotationTypeElementRest
     :   type annotationMethodOrConstantRest ';'
     |   classDeclaration ';'?
@@ -380,20 +363,20 @@ annotationTypeElementRest
     |   enumDeclaration ';'?
     |   annotationTypeDeclaration ';'?
     ;
-    
+
 annotationMethodOrConstantRest
     :   annotationMethodRest
     |   annotationConstantRest
     ;
-    
+
 annotationMethodRest
     :   Identifier '(' ')' defaultValue?
     ;
-    
+
 annotationConstantRest
     :   variableDeclarators
     ;
-    
+
 defaultValue
     :   'default' elementValue
     ;
@@ -403,13 +386,13 @@ defaultValue
 block
     :   '{' blockStatement* '}'
     ;
-    
+
 blockStatement
     :   localVariableDeclarationStatement
     |   statement
     |   typeDeclaration
     ;
-    
+
 localVariableDeclarationStatement
     :    localVariableDeclaration ';'
     ;
@@ -417,29 +400,25 @@ localVariableDeclarationStatement
 localVariableDeclaration
     :   variableModifier* type variableDeclarators
     ;
-    
+
 statement
-    : block
+    :   block
     |   ASSERT expression (':' expression)? ';'
     |   'if' parExpression statement ('else' statement)?
     |   'for' '(' forControl ')' statement
     |   'while' parExpression statement
     |   'do' statement 'while' parExpression ';'
-    |   'try' block (catches finallyBlock? | finallyBlock)
-	|	'try' resourceSpecification block catches? finallyBlock?
+    |   'try' block (catchClause+ finallyBlock? | finallyBlock)
+    |   'try' resourceSpecification block catchClause* finallyBlock?
     |   'switch' parExpression '{' switchBlockStatementGroup* switchLabel* '}'
     |   'synchronized' parExpression block
     |   'return' expression? ';'
     |   'throw' expression ';'
     |   'break' Identifier? ';'
     |   'continue' Identifier? ';'
-    |   ';' 
+    |   ';'
     |   statementExpression ';'
     |   Identifier ':' statement
-    ;
-
-catches
-    :   catchClause+
     ;
 
 catchClause
@@ -447,24 +426,24 @@ catchClause
     ;
 
 catchType
-	:	qualifiedName ('|' qualifiedName)*
-	;
+    :   qualifiedName ('|' qualifiedName)*
+    ;
 
 finallyBlock
-	:	'finally' block
-	;
+    :   'finally' block
+    ;
 
 resourceSpecification
-	:	'(' resources ';'? ')'
-	;
+    :   '(' resources ';'? ')'
+    ;
 
 resources
-	:	resource (';' resource)*
-	;
+    :   resource (';' resource)*
+    ;
 
 resource
-	:	variableModifier* classOrInterfaceType variableDeclaratorId '=' expression
-	;
+    :   variableModifier* classOrInterfaceType variableDeclaratorId '=' expression
+    ;
 
 /** Matches cases then statements, both of which are mandatory.
  *  To handle empty cases at the end, we add switchLabel* to statement.
@@ -472,13 +451,13 @@ resource
 switchBlockStatementGroup
     :   switchLabel+ blockStatement+
     ;
-    
+
 switchLabel
     :   'case' constantExpression ':'
     |   'case' enumConstantName ':'
     |   'default' ':'
     ;
-    
+
 forControl
     :   enhancedForControl
     |   forInit? ';' expression? ';' forUpdate?
@@ -488,7 +467,7 @@ forInit
     :   localVariableDeclaration
     |   expressionList
     ;
-    
+
 enhancedForControl
     :   variableModifier* type Identifier ':' expression
     ;
@@ -502,7 +481,7 @@ forUpdate
 parExpression
     :   '(' expression ')'
     ;
-    
+
 expressionList
     :   expression (',' expression)*
     ;
@@ -510,63 +489,63 @@ expressionList
 statementExpression
     :   expression
     ;
-    
+
 constantExpression
     :   expression
     ;
-    
+
 expression
-	:   primary
+    :   primary
     |   expression '.' Identifier
     |   expression '.' 'this'
     |   expression '.' 'new' nonWildcardTypeArguments? innerCreator
     |   expression '.' 'super' superSuffix
-    |	expression '.' explicitGenericInvocation
-    |   'new' creator
+    |   expression '.' explicitGenericInvocation
     |   expression '[' expression ']'
+    |   expression '(' expressionList? ')'
+    |   'new' creator
     |   '(' type ')' expression
     |   expression ('++' | '--')
-    |   expression '(' expressionList? ')'
     |   ('+'|'-'|'++'|'--') expression
     |   ('~'|'!') expression
     |   expression ('*'|'/'|'%') expression
     |   expression ('+'|'-') expression
     |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression
     |   expression ('<=' | '>=' | '>' | '<') expression
-	|   expression 'instanceof' type
-	|   expression ('==' | '!=') expression
-	|   expression '&' expression
-	|   expression '^' expression
-	|   expression '|' expression
-	|   expression '&&' expression
-	|   expression '||' expression
-	|   expression '?' expression ':' expression
-	|   expression
-        (	'='<assoc=right>
-        |	'+='<assoc=right>
-        |	'-='<assoc=right>
-        |	'*='<assoc=right>
-        |	'/='<assoc=right>
-        |	'&='<assoc=right>
-        |	'|='<assoc=right>
-        |	'^='<assoc=right>
-        |	'>>='<assoc=right>
-        |	'>>>='<assoc=right>
-        |	'<<='<assoc=right>
-        |	'%='<assoc=right>
+    |   expression 'instanceof' type
+    |   expression ('==' | '!=') expression
+    |   expression '&' expression
+    |   expression '^' expression
+    |   expression '|' expression
+    |   expression '&&' expression
+    |   expression '||' expression
+    |   expression '?' expression ':' expression
+    |   expression
+        (   '='<assoc=right>
+        |   '+='<assoc=right>
+        |   '-='<assoc=right>
+        |   '*='<assoc=right>
+        |   '/='<assoc=right>
+        |   '&='<assoc=right>
+        |   '|='<assoc=right>
+        |   '^='<assoc=right>
+        |   '>>='<assoc=right>
+        |   '>>>='<assoc=right>
+        |   '<<='<assoc=right>
+        |   '%='<assoc=right>
         )
         expression
     ;
 
 primary
-	:	'(' expression ')'
+    :   '(' expression ')'
     |   'this'
     |   'super'
     |   literal
     |   Identifier
     |   type '.' 'class'
     |   'void' '.' 'class'
-	|	nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
+    |   nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
     ;
 
 creator
@@ -578,7 +557,7 @@ createdName
     :   Identifier typeArgumentsOrDiamond? ('.' Identifier typeArgumentsOrDiamond?)*
     |   primitiveType
     ;
-    
+
 innerCreator
     :   Identifier nonWildcardTypeArgumentsOrDiamond? classCreatorRest
     ;
@@ -593,24 +572,24 @@ arrayCreatorRest
 classCreatorRest
     :   arguments classBody?
     ;
-    
+
 explicitGenericInvocation
-    :	nonWildcardTypeArguments explicitGenericInvocationSuffix
+    :   nonWildcardTypeArguments explicitGenericInvocationSuffix
     ;
-    
+
 nonWildcardTypeArguments
     :   '<' typeList '>'
     ;
 
 typeArgumentsOrDiamond
-	:	'<' '>'
-	|	typeArguments
-	;
+    :   '<' '>'
+    |   typeArguments
+    ;
 
 nonWildcardTypeArgumentsOrDiamond
-	:	'<' '>'
-	|	nonWildcardTypeArguments
-	;
+    :   '<' '>'
+    |   nonWildcardTypeArguments
+    ;
 
 superSuffix
     :   arguments
@@ -618,9 +597,9 @@ superSuffix
     ;
 
 explicitGenericInvocationSuffix
-	:	'super' superSuffix
-	|	Identifier arguments
-	;
+    :   'super' superSuffix
+    |   Identifier arguments
+    ;
 
 arguments
     :   '(' expressionList? ')'
@@ -630,319 +609,299 @@ arguments
 
 // §3.9 Keywords
 
-ABSTRACT : 'abstract';
-ASSERT : 'assert';
-BOOLEAN : 'boolean';
-BREAK : 'break';
-BYTE : 'byte';
-CASE : 'case';
-CATCH : 'catch';
-CHAR : 'char';
-CLASS : 'class';
-CONST : 'const';
-CONTINUE : 'continue';
-DEFAULT : 'default';
-DO : 'do';
-DOUBLE : 'double';
-ELSE : 'else';
-ENUM : 'enum';
-EXTENDS : 'extends';
-FINAL : 'final';
-FINALLY : 'finally';
-FLOAT : 'float';
-FOR : 'for';
-IF : 'if';
-GOTO : 'goto';
-IMPLEMENTS : 'implements';
-IMPORT : 'import';
-INSTANCEOF : 'instanceof';
-INT : 'int';
-INTERFACE : 'interface';
-LONG : 'long';
-NATIVE : 'native';
-NEW : 'new';
-PACKAGE : 'package';
-PRIVATE : 'private';
-PROTECTED : 'protected';
-PUBLIC : 'public';
-RETURN : 'return';
-SHORT : 'short';
-STATIC : 'static';
-STRICTFP : 'strictfp';
-SUPER : 'super';
-SWITCH : 'switch';
-SYNCHRONIZED : 'synchronized';
-THIS : 'this';
-THROW : 'throw';
-THROWS : 'throws';
-TRANSIENT : 'transient';
-TRY : 'try';
-VOID : 'void';
-VOLATILE : 'volatile';
-WHILE : 'while';
+ABSTRACT      : 'abstract';
+ASSERT        : 'assert';
+BOOLEAN       : 'boolean';
+BREAK         : 'break';
+BYTE          : 'byte';
+CASE          : 'case';
+CATCH         : 'catch';
+CHAR          : 'char';
+CLASS         : 'class';
+CONST         : 'const';
+CONTINUE      : 'continue';
+DEFAULT       : 'default';
+DO            : 'do';
+DOUBLE        : 'double';
+ELSE          : 'else';
+ENUM          : 'enum';
+EXTENDS       : 'extends';
+FINAL         : 'final';
+FINALLY       : 'finally';
+FLOAT         : 'float';
+FOR           : 'for';
+IF            : 'if';
+GOTO          : 'goto';
+IMPLEMENTS    : 'implements';
+IMPORT        : 'import';
+INSTANCEOF    : 'instanceof';
+INT           : 'int';
+INTERFACE     : 'interface';
+LONG          : 'long';
+NATIVE        : 'native';
+NEW           : 'new';
+PACKAGE       : 'package';
+PRIVATE       : 'private';
+PROTECTED     : 'protected';
+PUBLIC        : 'public';
+RETURN        : 'return';
+SHORT         : 'short';
+STATIC        : 'static';
+STRICTFP      : 'strictfp';
+SUPER         : 'super';
+SWITCH        : 'switch';
+SYNCHRONIZED  : 'synchronized';
+THIS          : 'this';
+THROW         : 'throw';
+THROWS        : 'throws';
+TRANSIENT     : 'transient';
+TRY           : 'try';
+VOID          : 'void';
+VOLATILE      : 'volatile';
+WHILE         : 'while';
 
 // §3.10.1 Integer Literals
 
 IntegerLiteral
-	:	DecimalIntegerLiteral
-	|	HexIntegerLiteral
-	|	OctalIntegerLiteral
-	|	BinaryIntegerLiteral
-	;
+    :   DecimalIntegerLiteral
+    |   HexIntegerLiteral
+    |   OctalIntegerLiteral
+    |   BinaryIntegerLiteral
+    ;
 
 fragment
 DecimalIntegerLiteral
-	:	DecimalNumeral IntegerTypeSuffix?
-	;
+    :   DecimalNumeral IntegerTypeSuffix?
+    ;
 
 fragment
 HexIntegerLiteral
-	:	HexNumeral IntegerTypeSuffix?
-	;
+    :   HexNumeral IntegerTypeSuffix?
+    ;
 
 fragment
 OctalIntegerLiteral
-	:	OctalNumeral IntegerTypeSuffix?
-	;
+    :   OctalNumeral IntegerTypeSuffix?
+    ;
 
 fragment
 BinaryIntegerLiteral
-	:	BinaryNumeral IntegerTypeSuffix?
-	;
+    :   BinaryNumeral IntegerTypeSuffix?
+    ;
 
 fragment
 IntegerTypeSuffix
-	:	[lL]
-	;
+    :   [lL]
+    ;
 
 fragment
 DecimalNumeral
-	:	'0'
-	|	NonZeroDigit (Digits? | Underscores Digits)
-	;
+    :   '0'
+    |   NonZeroDigit (Digits? | Underscores Digits)
+    ;
 
 fragment
 Digits
-	:	Digit (DigitsAndUnderscores? Digit)?
-	;
+    :   Digit (DigitOrUnderscore* Digit)?
+    ;
 
 fragment
 Digit
-	:	'0'
-	|	NonZeroDigit
-	;
+    :   '0'
+    |   NonZeroDigit
+    ;
 
 fragment
 NonZeroDigit
-	:	[1-9]
-	;
-
-fragment
-DigitsAndUnderscores
-	:	DigitOrUnderscore+
-	;
+    :   [1-9]
+    ;
 
 fragment
 DigitOrUnderscore
-	:	Digit
-	|	'_'
-	;
+    :   Digit
+    |   '_'
+    ;
 
 fragment
 Underscores
-	:	'_'+
-	;
+    :   '_'+
+    ;
 
 fragment
 HexNumeral
-	:	'0' [xX] HexDigits
-	;
+    :   '0' [xX] HexDigits
+    ;
 
 fragment
 HexDigits
-	:	HexDigit (HexDigitsAndUnderscores? HexDigit)?
-	;
+    :   HexDigit (HexDigitOrUnderscore* HexDigit)?
+    ;
 
 fragment
 HexDigit
-	:	[0-9a-fA-F]
-	;
-
-fragment
-HexDigitsAndUnderscores
-	:	HexDigitOrUnderscore+
-	;
+    :   [0-9a-fA-F]
+    ;
 
 fragment
 HexDigitOrUnderscore
-	:	HexDigit
-	|	'_'
-	;
+    :   HexDigit
+    |   '_'
+    ;
 
 fragment
 OctalNumeral
-	:	'0' Underscores? OctalDigits
-	;
+    :   '0' Underscores? OctalDigits
+    ;
 
 fragment
 OctalDigits
-	:	OctalDigit (OctalDigitsAndUnderscores? OctalDigit)?
-	;
+    :   OctalDigit (OctalDigitOrUnderscore* OctalDigit)?
+    ;
 
 fragment
 OctalDigit
-	:	[0-7]
-	;
-
-fragment
-OctalDigitsAndUnderscores
-	:	OctalDigitOrUnderscore+
-	;
+    :   [0-7]
+    ;
 
 fragment
 OctalDigitOrUnderscore
-	:	OctalDigit
-	|	'_'
-	;
+    :   OctalDigit
+    |   '_'
+    ;
 
 fragment
 BinaryNumeral
-	:	'0' [bB] BinaryDigits
-	;
+    :   '0' [bB] BinaryDigits
+    ;
 
 fragment
 BinaryDigits
-	:	BinaryDigit (BinaryDigitsAndUnderscores? BinaryDigit)?
-	;
+    :   BinaryDigit (BinaryDigitOrUnderscore* BinaryDigit)?
+    ;
 
 fragment
 BinaryDigit
-	:	[01]
-	;
-
-fragment
-BinaryDigitsAndUnderscores
-	:	BinaryDigitOrUnderscore+
-	;
+    :   [01]
+    ;
 
 fragment
 BinaryDigitOrUnderscore
-	:	BinaryDigit
-	|	'_'
-	;
+    :   BinaryDigit
+    |   '_'
+    ;
 
 // §3.10.2 Floating-Point Literals
 
 FloatingPointLiteral
-	:	DecimalFloatingPointLiteral
-	|	HexadecimalFloatingPointLiteral
-	;
+    :   DecimalFloatingPointLiteral
+    |   HexadecimalFloatingPointLiteral
+    ;
 
 fragment
 DecimalFloatingPointLiteral
-	:	Digits '.' Digits? ExponentPart? FloatTypeSuffix?
-	|	'.' Digits ExponentPart? FloatTypeSuffix?
-	|	Digits ExponentPart FloatTypeSuffix?
-	|	Digits FloatTypeSuffix
-	;
+    :   Digits '.' Digits? ExponentPart? FloatTypeSuffix?
+    |   '.' Digits ExponentPart? FloatTypeSuffix?
+    |   Digits ExponentPart FloatTypeSuffix?
+    |   Digits FloatTypeSuffix
+    ;
 
 fragment
 ExponentPart
-	:	ExponentIndicator SignedInteger
-	;
+    :   ExponentIndicator SignedInteger
+    ;
 
 fragment
 ExponentIndicator
-	:	[eE]
-	;
+    :   [eE]
+    ;
 
 fragment
 SignedInteger
-	:	Sign? Digits
-	;
+    :   Sign? Digits
+    ;
 
 fragment
 Sign
-	:	[+-]
-	;
+    :   [+-]
+    ;
 
 fragment
 FloatTypeSuffix
-	:	[fFdD]
-	;
+    :   [fFdD]
+    ;
 
 fragment
 HexadecimalFloatingPointLiteral
-	:	HexSignificand BinaryExponent FloatTypeSuffix?
-	;
+    :   HexSignificand BinaryExponent FloatTypeSuffix?
+    ;
 
 fragment
 HexSignificand
-	:	HexNumeral '.'?
-	|	'0' [xX] HexDigits? '.' HexDigits
-	;
+    :   HexNumeral '.'?
+    |   '0' [xX] HexDigits? '.' HexDigits
+    ;
 
 fragment
 BinaryExponent
-	:	BinaryExponentIndicator SignedInteger
-	;
+    :   BinaryExponentIndicator SignedInteger
+    ;
 
 fragment
 BinaryExponentIndicator
-	:	[pP]
-	;
+    :   [pP]
+    ;
 
 // §3.10.3 Boolean Literals
 
 BooleanLiteral
-	:	'true'
-	|	'false'
-	;
+    :   'true'
+    |   'false'
+    ;
 
 // §3.10.4 Character Literals
 
 CharacterLiteral
-	:	'\'' SingleCharacter '\''
-	|	'\'' EscapeSequence '\''
-	;
+    :   '\'' SingleCharacter '\''
+    |   '\'' EscapeSequence '\''
+    ;
 
 fragment
 SingleCharacter
-	:	~['\\]
-	;
+    :   ~['\\]
+    ;
 
 // §3.10.5 String Literals
 
 StringLiteral
-	:	'"' StringCharacters? '"'
-	;
+    :   '"' StringCharacters? '"'
+    ;
 
 fragment
 StringCharacters
-	:	StringCharacter+
-	;
+    :   StringCharacter+
+    ;
 
 fragment
 StringCharacter
-	:	~["\\]
-	|	EscapeSequence
-	;
+    :   ~["\\]
+    |   EscapeSequence
+    ;
 
 // §3.10.6 Escape Sequences for Character and String Literals
 
 fragment
 EscapeSequence
-	:	'\\' [btnfr"'\\]
-	|	OctalEscape
+    :   '\\' [btnfr"'\\]
+    |   OctalEscape
     |   UnicodeEscape
-	;
+    ;
 
 fragment
 OctalEscape
-	:	'\\' OctalDigit
-	|	'\\' OctalDigit OctalDigit
-	|	'\\' ZeroToThree OctalDigit OctalDigit
-	;
+    :   '\\' OctalDigit
+    |   '\\' OctalDigit OctalDigit
+    |   '\\' ZeroToThree OctalDigit OctalDigit
+    ;
 
 fragment
 UnicodeEscape
@@ -951,92 +910,92 @@ UnicodeEscape
 
 fragment
 ZeroToThree
-	:	[0-3]
-	;
+    :   [0-3]
+    ;
 
 // §3.10.7 The Null Literal
 
 NullLiteral
-	:	'null'
-	;
+    :   'null'
+    ;
 
 // §3.11 Separators
 
-LPAREN : '(';
-RPAREN : ')';
-LBRACE : '{';
-RBRACE : '}';
-LBRACK : '[';
-RBRACK : ']';
-SEMI : ';';
-COMMA : ',';
-DOT : '.';
+LPAREN          : '(';
+RPAREN          : ')';
+LBRACE          : '{';
+RBRACE          : '}';
+LBRACK          : '[';
+RBRACK          : ']';
+SEMI            : ';';
+COMMA           : ',';
+DOT             : '.';
 
 // §3.12 Operators
 
-ASSIGN : '=';
-GT : '>';
-LT : '<';
-BANG : '!';
-TILDE : '~';
-QUESTION : '?';
-COLON : ':';
-EQUAL : '==';
-LE : '<=';
-GE : '>=';
-NOTEQUAL : '!=';
-AND : '&&';
-OR : '||';
-INC : '++';
-DEC : '--';
-ADD : '+';
-SUB : '-';
-MUL : '*';
-DIV : '/';
-BITAND : '&';
-BITOR : '|';
-CARET : '^';
-MOD : '%';
+ASSIGN          : '=';
+GT              : '>';
+LT              : '<';
+BANG            : '!';
+TILDE           : '~';
+QUESTION        : '?';
+COLON           : ':';
+EQUAL           : '==';
+LE              : '<=';
+GE              : '>=';
+NOTEQUAL        : '!=';
+AND             : '&&';
+OR              : '||';
+INC             : '++';
+DEC             : '--';
+ADD             : '+';
+SUB             : '-';
+MUL             : '*';
+DIV             : '/';
+BITAND          : '&';
+BITOR           : '|';
+CARET           : '^';
+MOD             : '%';
 
-ADD_ASSIGN : '+=';
-SUB_ASSIGN : '-=';
-MUL_ASSIGN : '*=';
-DIV_ASSIGN : '/=';
-AND_ASSIGN : '&=';
-OR_ASSIGN : '|=';
-XOR_ASSIGN : '^=';
-MOD_ASSIGN : '%=';
-LSHIFT_ASSIGN : '<<=';
-RSHIFT_ASSIGN : '>>=';
-URSHIFT_ASSIGN : '>>>=';
+ADD_ASSIGN      : '+=';
+SUB_ASSIGN      : '-=';
+MUL_ASSIGN      : '*=';
+DIV_ASSIGN      : '/=';
+AND_ASSIGN      : '&=';
+OR_ASSIGN       : '|=';
+XOR_ASSIGN      : '^=';
+MOD_ASSIGN      : '%=';
+LSHIFT_ASSIGN   : '<<=';
+RSHIFT_ASSIGN   : '>>=';
+URSHIFT_ASSIGN  : '>>>=';
 
 // §3.8 Identifiers (must appear after all keywords in the grammar)
 
 Identifier
-	:	JavaLetter JavaLetterOrDigit*
-	;
+    :   JavaLetter JavaLetterOrDigit*
+    ;
 
 fragment
 JavaLetter
-	:	[a-zA-Z$_] // these are the "java letters" below 0xFF
-	|	// covers all characters above 0xFF which are not a surrogate
-		~[\u0000-\u00FF\uD800-\uDBFF]
-		{Character.isJavaIdentifierStart(_input.LA(-1))}?
-	|	// covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-		[\uD800-\uDBFF] [\uDC00-\uDFFF]
-		{Character.isJavaIdentifierStart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
-	;
+    :   [a-zA-Z$_] // these are the "java letters" below 0xFF
+    |   // covers all characters above 0xFF which are not a surrogate
+        ~[\u0000-\u00FF\uD800-\uDBFF]
+        {Character.isJavaIdentifierStart(_input.LA(-1))}?
+    |   // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+        [\uD800-\uDBFF] [\uDC00-\uDFFF]
+        {Character.isJavaIdentifierStart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
+    ;
 
 fragment
 JavaLetterOrDigit
-	:	[a-zA-Z0-9$_] // these are the "java letters or digits" below 0xFF
-	|	// covers all characters above 0xFF which are not a surrogate
-		~[\u0000-\u00FF\uD800-\uDBFF]
-		{Character.isJavaIdentifierPart(_input.LA(-1))}?
-	|	// covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-		[\uD800-\uDBFF] [\uDC00-\uDFFF]
-		{Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
-	;
+    :   [a-zA-Z0-9$_] // these are the "java letters or digits" below 0xFF
+    |   // covers all characters above 0xFF which are not a surrogate
+        ~[\u0000-\u00FF\uD800-\uDBFF]
+        {Character.isJavaIdentifierPart(_input.LA(-1))}?
+    |   // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+        [\uD800-\uDBFF] [\uDC00-\uDFFF]
+        {Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
+    ;
 
 //
 // Additional symbols not defined in the lexical specification
