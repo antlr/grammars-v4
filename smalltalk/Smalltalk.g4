@@ -5,12 +5,6 @@
   2013/11/27 James Ladd (object@redline.st)
 */
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 grammar Smalltalk;
 
 script : sequence EOF;
@@ -57,8 +51,8 @@ literalArray : LITARR_START literalArrayRest;
 literalArrayRest : ws ((parsetimeLiteral | bareLiteralArray | bareSymbol) ws)* CLOSE_PAREN;
 bareLiteralArray : OPEN_PAREN literalArrayRest;
 parseTimeLiteral : pseudoVariable | number | literalArray | string | symbol;
-unaryTail : unaryMessage ws unaryTail? ws;
-unaryMessage : ws unarySelector ~COLON;
+unaryTail : unaryMessage ws unaryTail?;
+unaryMessage : ws unarySelector;
 unarySelector : IDENTIFIER;
 keywords : KEYWORD+;
 reference : variable;
