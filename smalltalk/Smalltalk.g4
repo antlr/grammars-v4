@@ -11,14 +11,15 @@ script : sequence EOF;
 sequence : ws temps? ws statements? ws;
 ws : (SEPARATOR | COMMENT)*;
 temps : PIPE (ws IDENTIFIER)* ws PIPE;
-statements : answer
-           | expressions ws PERIOD ws answer
-           | expressions PERIOD?;
+statements : answer # StatementAnswer
+           | expressions ws PERIOD ws answer # StatementExpressionsAnswer
+           | expressions PERIOD? # StatementExpressions
+           ;
 answer : CARROT ws expression ws PERIOD?;
 expression : assignment | cascade | keywordSend | binarySend | primitive;
 expressions : expression expressionList*;
 expressionList : ws PERIOD ws expression;
-cascade : ws (keywordSend | binarySend) (ws SEMI_COLON ws message ws)+;
+cascade : ws (keywordSend | binarySend) (SEMI_COLON ws message)+;
 message : binaryMessage | unaryMessage | keywordMessage;
 assignment : variable ws ASSIGNMENT ws expression;
 variable : IDENTIFIER;
@@ -40,12 +41,12 @@ number : numberExp | hex | stFloat | stInteger;
 numberExp : (stFloat | stInteger) EXP stInteger;
 charConstant : CHARACTER_CONSTANT;
 hex : MINUS? HEX HEXDIGIT+;
-stInteger : MINUS? DIGITS;
-stFloat : MINUS? DIGITS PERIOD DIGITS;
+stInteger : MINUS? DIGIT+;
+stFloat : MINUS? DIGIT+ PERIOD DIGIT+;
 pseudoVariable : RESERVED_WORD;
 string : STRING;
 symbol : HASH bareSymbol;
-primitive : LT ws KEYWORD ws DIGITS ws GT;
+primitive : LT ws KEYWORD ws DIGIT+ ws GT;
 bareSymbol : (IDENTIFIER | BINARY_SELECTOR) | KEYWORD+ | string;
 literalArray : LITARR_START literalArrayRest;
 literalArrayRest : ws ((parsetimeLiteral | bareLiteralArray | bareSymbol) ws)* CLOSE_PAREN;
@@ -82,7 +83,6 @@ LT : '<';
 GT : '>';
 RESERVED_WORD : 'self' | 'nil' | 'true' | 'false' | 'super';
 DIGIT : '0'..'9';
-DIGITS : ('0'..'9')+;
 HEXDIGIT : 'a'..'z' | 'A'..'Z' | DIGIT;
 BINARY_SELECTOR : ('-' | '\\' | '+' | '*' | '/' | '=' | '>' | '<' | ',' | '@' | '%' | '~' | '|' | '&' | '?')+;
 IDENTIFIER : ('a'..'z' | 'A'..'Z') ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')*;
