@@ -31,8 +31,6 @@
 /** A grammar for ANTLR v4 tokens */
 lexer grammar ANTLRv4Lexer;
 
-@header { package org.antlr.intellij.plugin.parser; }
-
 tokens {
 	TOKEN_REF,
 	RULE_REF,

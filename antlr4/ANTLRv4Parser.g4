@@ -38,8 +38,6 @@ parser grammar ANTLRv4Parser;
 
 options { tokenVocab=ANTLRv4Lexer; superClass=org.antlr.intellij.plugin.adaptors.AdaptorParserBase; }
 
-@header { package org.antlr.intellij.plugin.parser; }
-
 // The main entry point for parsing a v4 grammar.
 grammarSpec
 	:	DOC_COMMENT?
