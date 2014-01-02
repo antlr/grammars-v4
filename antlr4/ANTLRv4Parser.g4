@@ -36,7 +36,7 @@ $ antlr4 -no-listener *.g4
 */
 parser grammar ANTLRv4Parser;
 
-options { tokenVocab=ANTLRv4Lexer; superClass=org.antlr.intellij.plugin.adaptors.AdaptorParserBase; }
+options { tokenVocab=ANTLRv4Lexer; }
 
 // The main entry point for parsing a v4 grammar.
 grammarSpec
