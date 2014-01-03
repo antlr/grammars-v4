@@ -270,11 +270,11 @@ HexDigit
     ;
 
 COMMENT
-    : '--[[' .*? ']]'-> channel(HIDDEN)
+    : '--[' NESTED_STR ']' -> channel(HIDDEN)
     ;
     
 LINE_COMMENT
-    : '--' '['? (~('['|'\n'|'\r') ~('\n'|'\r')*)? ('\n'|'\r')* -> channel(HIDDEN)
+    : '--' ~('\n'|'\r')* -> channel(HIDDEN)
     ;
     
 WS  
