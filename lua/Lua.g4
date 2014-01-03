@@ -242,6 +242,7 @@ HexExponentPart
 fragment
 EscapeSequence
     : '\\' [abfnrtvz"'\\]
+    | '\\' '\r'? '\n'
     | DecimalEscape
     | HexEscape
     ;
@@ -282,4 +283,8 @@ WS
     
 NEWLINE
     : '\r'? '\n' -> skip
+    ;
+
+SHEBANG
+    : '#' '!' ~('\n'|'\r')* -> channel(HIDDEN)
     ;
