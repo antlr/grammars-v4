@@ -274,7 +274,7 @@ COMMENT
     ;
     
 LINE_COMMENT
-    : '--' ~('\n'|'\r')* -> channel(HIDDEN)
+    : '--' ('[' '='*)? (~'['|EOF) ~('\n'|'\r')* -> channel(HIDDEN)
     ;
     
 WS  
