@@ -40,6 +40,14 @@ tokens {
 @members {
 	private int _ruleType;
 
+	public int getRuleType() {
+		return _ruleType;
+	}
+
+	public void setRuleType(int ruleType) {
+		this._ruleType = ruleType;
+	}
+
 	protected void handleBeginArgAction() {
 		if (inLexerRule()) {
 			pushMode(LexerCharSet);
@@ -205,7 +213,7 @@ UNICODE_ESC
 fragment
 HEX_DIGIT : [0-9a-fA-F]	;
 
-WS  :	[ \t\r\n\f]+ ; //-> channel(HIDDEN)	;
+WS  :	[ \t\r\n\f]+ -> channel(HIDDEN)	;
 
 // -----------------
 // Illegal Character
@@ -218,11 +226,9 @@ WS  :	[ \t\r\n\f]+ ; //-> channel(HIDDEN)	;
 // but we will not try to analyse or code generate from a file with lexical
 // errors.
 //
-/*
 ERRCHAR
 	:	.	-> channel(HIDDEN)
 	;
-*/
 
 mode ArgAction; // E.g., [int x, List<String> a[]]
 
