@@ -29,14 +29,12 @@
  */
 
 /** A grammar for ANTLR v4 written in ANTLR v4.
-
-Build with
-
-$ antlr4 -no-listener *.g4
 */
 parser grammar ANTLRv4Parser;
 
-options { tokenVocab=ANTLRv4Lexer; }
+options {
+	tokenVocab=ANTLRv4Lexer;
+}
 
 // The main entry point for parsing a v4 grammar.
 grammarSpec
