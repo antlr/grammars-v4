@@ -242,6 +242,7 @@ HexExponentPart
 fragment
 EscapeSequence
     : '\\' [abfnrtvz"'\\]
+    | '\\' '\r'? '\n'
     | DecimalEscape
     | HexEscape
     ;
@@ -269,17 +270,23 @@ HexDigit
     ;
 
 COMMENT
-    : '--[[' .*? ']]'-> channel(HIDDEN)
+    : '--[' NESTED_STR ']' -> channel(HIDDEN)
     ;
     
 LINE_COMMENT
-    : '--' '['? (~('['|'\n'|'\r') ~('\n'|'\r')*)? ('\n'|'\r')* -> channel(HIDDEN)
+    : '--'
+    (                                               // --
+    | '[' '='*                                      // --[==
+    | '[' '='* ~('='|'['|'\r'|'\n') ~('\r'|'\n')*   // --[==AA
+    | ~('['|'\r'|'\n') ~('\r'|'\n')*                // --AAA
+    ) ('\r\n'|'\r'|'\n'|EOF)
+    -> channel(HIDDEN)
     ;
     
 WS  
-    : [ \t\u000C]+ -> skip
+    : [ \t\u000C\r\n]+ -> skip
     ;
-    
-NEWLINE
-    : '\r'? '\n' -> skip
+
+SHEBANG
+    : '#' '!' ~('\n'|'\r')* -> channel(HIDDEN)
     ;

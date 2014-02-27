@@ -7,18 +7,19 @@
 
 grammar Smalltalk;
 
-script : sequence EOF;
-sequence : ws temps? ws statements? ws;
+script : ws sequence EOF;
+sequence : temps? ws statements? ws;
 ws : (SEPARATOR | COMMENT)*;
 temps : PIPE (ws IDENTIFIER)* ws PIPE;
-statements : answer
-           | expressions ws PERIOD ws answer
-           | expressions PERIOD?;
+statements : answer # StatementAnswer
+           | expressions ws PERIOD ws answer # StatementExpressionsAnswer
+           | expressions PERIOD? # StatementExpressions
+           ;
 answer : CARROT ws expression ws PERIOD?;
 expression : assignment | cascade | keywordSend | binarySend | primitive;
 expressions : expression expressionList*;
 expressionList : ws PERIOD ws expression;
-cascade : ws (keywordSend | binarySend) (ws SEMI_COLON ws message ws)+;
+cascade : ws (keywordSend | binarySend) (ws SEMI_COLON ws message)+;
 message : binaryMessage | unaryMessage | keywordMessage;
 assignment : variable ws ASSIGNMENT ws expression;
 variable : IDENTIFIER;
@@ -31,7 +32,7 @@ operand : literal | reference | subexpression;
 subexpression : OPEN_PAREN ws expression ws CLOSE_PAREN;
 literal : runtimeLiteral | parsetimeLiteral;
 runtimeLiteral : dynamicDictionary | dynamicArray | block;
-block : BLOCK_START blockParamList? sequence? ws BLOCK_END;
+block : BLOCK_START blockParamList? ws sequence? BLOCK_END;
 blockParamList : (ws BLOCK_PARAM)+ ws PIPE?;
 dynamicDictionary : DYNDICT_START ws expressions? ws DYNARR_END;
 dynamicArray : DYNARR_START ws expressions? ws DYNARR_END;
@@ -40,20 +41,20 @@ number : numberExp | hex | stFloat | stInteger;
 numberExp : (stFloat | stInteger) EXP stInteger;
 charConstant : CHARACTER_CONSTANT;
 hex : MINUS? HEX HEXDIGIT+;
-stInteger : MINUS? DIGITS;
-stFloat : MINUS? DIGITS PERIOD DIGITS;
+stInteger : MINUS? DIGIT+;
+stFloat : MINUS? DIGIT+ PERIOD DIGIT+;
 pseudoVariable : RESERVED_WORD;
 string : STRING;
 symbol : HASH bareSymbol;
-primitive : LT ws KEYWORD ws DIGITS ws GT;
+primitive : LT ws KEYWORD ws DIGIT+ ws GT;
 bareSymbol : (IDENTIFIER | BINARY_SELECTOR) | KEYWORD+ | string;
 literalArray : LITARR_START literalArrayRest;
 literalArrayRest : ws ((parsetimeLiteral | bareLiteralArray | bareSymbol) ws)* CLOSE_PAREN;
 bareLiteralArray : OPEN_PAREN literalArrayRest;
-parseTimeLiteral : pseudoVariable | number | literalArray | string | symbol;
 unaryTail : unaryMessage ws unaryTail? ws;
-unaryMessage : ws unarySelector ~COLON;
+unaryMessage : ws unarySelector;
 unarySelector : IDENTIFIER;
+keywords : KEYWORD+;
 reference : variable;
 binaryTail : binaryMessage binaryTail?;
 binaryMessage : ws BINARY_SELECTOR ws (unarySend | operand);
@@ -79,15 +80,15 @@ BLOCK_START : '[';
 BLOCK_END : ']';
 LT : '<';
 GT : '>';
-RESERVED_WORD : 'self' | 'nil' | 'true' | 'false' | 'super';
-DIGIT : '0'..'9';
-DIGITS : ('0'..'9')+;
-HEXDIGIT : 'a'..'z' | 'A'..'Z' | DIGIT;
+RESERVED_WORD : 'nil' | 'true' | 'false' | 'self' | 'super';
+DIGIT : [0-9];
+HEXDIGIT : [0-9a-fA-F];
 BINARY_SELECTOR : ('-' | '\\' | '+' | '*' | '/' | '=' | '>' | '<' | ',' | '@' | '%' | '~' | '|' | '&' | '?')+;
-IDENTIFIER : ('a'..'z' | 'A'..'Z') ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')*;
+IDENTIFIER : [a-zA-Z][a-zA-Z0-9_]*;
 KEYWORD : IDENTIFIER COLON;
 BLOCK_PARAM : COLON IDENTIFIER;
 CHARACTER_CONSTANT : DOLLAR (HEXDIGIT | DOLLAR);
-SEPARATOR : (' ' | '\t' | '\r' | '\n' | '\u00A0' | '\uFEFF' | '\u2028' | '\u2029')+;
+SEPARATOR : ' ' | '\t' | '\r' | '\n';
 STRING : '\'' (.)*? '\'';
 COMMENT : '"' (.)*? '"';
+
