@@ -469,7 +469,7 @@ forInit
     ;
 
 enhancedForControl
-    :   variableModifier* type Identifier ':' expression
+    :   variableModifier* type variableDeclaratorId ':' expression
     ;
 
 forUpdate
