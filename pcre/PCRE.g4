@@ -26,13 +26,8 @@
  *
  * Project      : PCRE Parser, an ANTLR 4 grammar for PCRE
  * Developed by : Bart Kiers, bart@big-o.nl
- * Also see     : https://github.com/bkiers/pcre-grammar
  */
 grammar PCRE;
-
-@parser::members {
-  private boolean insideCharacterClass = false;
-}
 
 // Most single line comments above the lexer- and  parser rules 
 // are copied from the official PCRE man pages (last updated: 
@@ -116,12 +111,12 @@ quantifier_type
 //       default,  but  some  of them use Unicode properties if PCRE_UCP is set.
 //       You can use \Q...\E inside a character class.
 character_class
- : '[' {insideCharacterClass=true;} '^' CharacterClassEnd Hyphen cc_atom+ ']' {insideCharacterClass=false;}
- | '[' {insideCharacterClass=true;} '^' CharacterClassEnd cc_atom* ']' {insideCharacterClass=false;}
- | '[' {insideCharacterClass=true;} '^' cc_atom+ ']' {insideCharacterClass=false;}
- | '[' {insideCharacterClass=true;} CharacterClassEnd Hyphen cc_atom+ ']' {insideCharacterClass=false;}
- | '[' {insideCharacterClass=true;} CharacterClassEnd cc_atom* ']' {insideCharacterClass=false;}
- | '[' {insideCharacterClass=true;} cc_atom+ ']' {insideCharacterClass=false;}
+ : '[' '^' CharacterClassEnd Hyphen cc_atom+ ']'
+ | '[' '^' CharacterClassEnd cc_atom* ']'
+ | '[' '^' cc_atom+ ']'
+ | '[' CharacterClassEnd Hyphen cc_atom+ ']'
+ | '[' CharacterClassEnd cc_atom* ']'
+ | '[' cc_atom+ ']'
  ;
 
 // BACKREFERENCES
@@ -754,3 +749,4 @@ fragment AlphaNumeric            : [a-zA-Z0-9];
 fragment NonAlphaNumeric         : ~[a-zA-Z0-9];
 fragment HexDigit                : [0-9a-fA-F];
 fragment ASCII                   : [\u0000-\u007F];
+
