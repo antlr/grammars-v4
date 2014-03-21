@@ -26,7 +26,7 @@
  *
  * Project      : PCRE Parser, an ANTLR 4 grammar for PCRE
  * Developed by : Bart Kiers, bart@big-o.nl
- * Also see     : https://github.com/bkiers/pcre-grammar
+ * Also see     : https://github.com/bkiers/pcre-parser
  */
 grammar PCRE;
 
