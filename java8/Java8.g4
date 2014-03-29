@@ -1,6 +1,6 @@
 /*
  [The "BSD licence"]
- Copyright (c) 2013 Terence Parr, Sam Harwell
+ Copyright (c) 2014 Terence Parr, Sam Harwell
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -26,19 +26,27 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** A Java 1.7 grammar for ANTLR v4 derived from ANTLR v3 Java grammar.
+/** A Java 8 grammar for ANTLR v4 derived from ANTLR v3 Java grammar.
+ *  Follows syntax from spec:
+ *    http://docs.oracle.com/javase/specs/jls/se8/html/jls-19.html
  *  Uses ANTLR v4's left-recursive expression notation.
- *  It parses ECJ, Netbeans, JDK etc...
- *
- *  Sam Harwell cleaned this up significantly and updated to 1.7!
  *
  *  You can test with
  *
  *  $ antlr4 Java.g4
  *  $ javac *.java
  *  $ grun Java compilationUnit *.java
+ *
+ *  Or,
+~/antlr/code/grammars-v4/java8 $ j Test .
+/Users/parrt/antlr/code/grammars-v4/java8/./Java8BaseListener.java
+/Users/parrt/antlr/code/grammars-v4/java8/./Java8Lexer.java
+/Users/parrt/antlr/code/grammars-v4/java8/./Java8Listener.java
+/Users/parrt/antlr/code/grammars-v4/java8/./Java8Parser.java
+/Users/parrt/antlr/code/grammars-v4/java8/./Test.java
+Total lexer+parser time 384ms.
  */
-grammar Java;
+grammar Java8;
 
 // starting point for parsing a java file
 compilationUnit
@@ -469,7 +477,7 @@ forInit
     ;
 
 enhancedForControl
-    :   variableModifier* type variableDeclaratorId ':' expression
+    :   variableModifier* type Identifier ':' expression
     ;
 
 forUpdate
