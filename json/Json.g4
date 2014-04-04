@@ -31,18 +31,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 JSON grammar derived from:
 
-    http://tools.ietf.org/html/rfc4627
+    http://tools.ietf.org/html/rfc7159
 
-    The application/json Media Type for JavaScript Object Notation (JSON)
-    July 2006
+    The JavaScript Object Notation (JSON) Data Interchange Format
+    March 2014
 
 Terminal rules mainly created by ANTLRWorks 1.5 sample code.
  */
 grammar Json;
 
 jsonText
-	: jsonObject
-	| jsonArray
+	: jsonValue
 ;
 
 jsonValue
