@@ -29,89 +29,120 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-JSON grammar derived from:
+ABNF grammar derived from:
 
-    http://tools.ietf.org/html/rfc7159
+    http://tools.ietf.org/html/rfc5234
 
-    The JavaScript Object Notation (JSON) Data Interchange Format
-    March 2014
+    Augmented BNF for Syntax Specifications: ABNF
+    January 2008
 
 Terminal rules mainly created by ANTLRWorks 1.5 sample code.
  */
-grammar Json;
+grammar Abnf;
 
-jsonText
-	: jsonValue
+// Note: Whitespace handling not as strict as in the specification.
+
+rulelist
+    : rule_* EOF
 ;
 
-jsonValue
-	: 'false'
-	| 'null'
-	| 'true'
-	| jsonObject
-	| jsonArray
-	| jsonNumber
-	| jsonString
+rule_
+    : ID ('=' | '=/') elements
 ;
 
-jsonNumber
-	: NUMBER
+elements
+    : alternation
 ;
 
-jsonString
-	: STRING
+alternation:
+    concatenation ('/' concatenation)*
 ;
 
-jsonObject
-	: '{' (member (',' member)*)? '}'
+concatenation:
+    repetition (repetition)*
 ;
 
-member
-	: STRING ':' jsonValue
+repetition
+    : repeat? element
 ;
 
-jsonArray
-	: '[' (jsonValue (',' jsonValue)*)? ']'
+repeat
+    : INT
+    | (INT? '*' INT?)
 ;
 
-fragment
+element
+    : ID
+    | group
+    | option
+    | STRING
+    | NumberValue
+    | ProseValue
+;
+
+group
+    : '(' alternation ')'
+;
+
+option
+    : '[' alternation ']'
+;
+
+NumberValue
+    : '%' (BinaryValue | DecimalValue | HexValue)
+;
+
+fragment BinaryValue
+    : 'b' BIT+ (('.' BIT+)+ | ('-' BIT+))?
+;
+
+fragment DecimalValue
+    : 'd' DIGIT+ (('.' DIGIT+)+ | ('-' DIGIT+))?
+;
+
+fragment HexValue
+    : 'x' HEX_DIGIT+ (('.' HEX_DIGIT+)+ | ('-' HEX_DIGIT+))?
+;
+
+ProseValue
+    : '<' (~'>')* '>'
+;
+
+
+ID
+    : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-')*
+;
+
 INT
-	: '0'..'9'+
+    : '0'..'9'+
 ;
 
-NUMBER
-	: '-'? ('0' | ( '1'..'9' INT* )) ('.' INT+)? EXPONENT?
+COMMENT
+    : ';' ~('\n'|'\r')* '\r'? '\n' -> channel(HIDDEN)
 ;
 
 WS
-	: ( ' '
-	| '\t'
-	| '\n'
-	| '\r'
-	) -> channel(HIDDEN)
+    : ( ' '
+    | '\t'
+    | '\r'
+    | '\n'
+    ) -> channel(HIDDEN)
 ;
 
 STRING
-	: '"' ( ESC_SEQ | ~('\\'|'"') )* '"'
+    :  '"' (~'"')* '"'
 ;
 
-fragment
-EXPONENT
-	: ('e'|'E') ('+'|'-')? ('0'..'9')+
+fragment BIT
+    : '0'..'1'
 ;
 
+fragment DIGIT
+    : '0'..'9'
+;
+
+// Note: lowercase letters not allowed in specification!
 fragment
 HEX_DIGIT
-	: ('0'..'9'|'a'..'f'|'A'..'F')
-;
-
-fragment
-ESC_SEQ
-	: '\\' ('\"'|'\\'|'/'|'b'|'f'|'n'|'r'|'t')
-	| UNICODE_ESC
-;
-
-fragment
-UNICODE_ESC
-	: '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+    : ('0'..'9'|'a'..'f'|'A'..'F')
 ;
