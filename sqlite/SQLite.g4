@@ -37,8 +37,7 @@ parse
 error
  : UNEXPECTED_CHAR 
    { 
-     // Log this, throw an exception or handle this error
-     // inside your visitor- or listener-class.
+     throw new RuntimeException("UNEXPECTED_CHAR=" + $UNEXPECTED_CHAR.text); 
    }
  ;
 
@@ -297,12 +296,32 @@ conflict_clause
    )?
  ;
 
+/*
+    SQLite understands the following binary operators, in order from highest to
+    lowest precedence:
+
+    ||
+    *    /    %
+    +    -
+    <<   >>   &    |
+    <    <=   >    >=
+    =    ==   !=   <>   IS   IS NOT   IN   LIKE   GLOB   MATCH   REGEXP
+    AND
+    OR
+*/
 expr
  : literal_value
  | BIND_PARAMETER
  | ( ( database_name '.' )? table_name '.' )? column_name
  | unary_operator expr
- | expr binary_operator expr
+ | expr '||' expr
+ | expr ( '*' | '/' | '%' ) expr
+ | expr ( '+' | '-' ) expr
+ | expr ( '<<' | '>>' | '&' | '|' ) expr
+ | expr ( '<' | '<=' | '>' | '>=' ) expr
+ | expr ( '=' | '==' | '!=' | '<>' | K_IS | K_IS K_NOT | K_IN | K_LIKE | K_GLOB | K_MATCH | K_REGEXP ) expr
+ | expr K_AND expr
+ | expr K_OR expr
  | function_name '(' ( K_DISTINCT? expr ( ',' expr )* | '*' )? ')'
  | '(' expr ')'
  | K_CAST '(' expr K_AS type_name ')'
@@ -447,30 +466,6 @@ unary_operator
 
 error_message
  : STRING_LITERAL
- ;
-
-/*
-    SQLite understands the following binary operators, in order from highest to
-    lowest precedence:
-
-    ||
-    *    /    %
-    +    -
-    <<   >>   &    |
-    <    <=   >    >=
-    =    ==   !=   <>   IS   IS NOT   IN   LIKE   GLOB   MATCH   REGEXP
-    AND
-    OR
-*/
-binary_operator
- : '||'
- | ( '*' | '/' | '%' )
- | ( '+' | '-' )
- | ( '<<' | '>>' | '&' | '|' )
- | ( '<' | '<=' | '>' | '>=' )
- | ( '=' | '==' | '!=' | '<>' | K_IS | K_IS K_NOT | K_IN | K_LIKE | K_GLOB | K_MATCH | K_REGEXP )
- | K_AND
- | K_OR
  ;
 
 module_argument // TODO check what exactly is permitted here
