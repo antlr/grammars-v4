@@ -15,21 +15,21 @@ public class TestImports extends TestBase
   public void testImportUrlString()
   {
     ScssParser.ReferenceUrlContext context = parseImport("@import url(\"hello\")");
-    Assert.assertEquals(context.referenceUrlValue().Url().getText(), "\"hello\"");
+    Assert.assertEquals(context.Url().getText(), "\"hello\"");
   }
 
   @Test
   public void testImportUrlNonStrings()
   {
     ScssParser.ReferenceUrlContext context = parseImport("@import url(hello)");
-    Assert.assertEquals(context.referenceUrlValue().Url().getText(), "hello");
+    Assert.assertEquals(context.Url().getText(), "hello");
   }
 
   @Test
   public void testImportUrlNonStringsSpace()
   {
     ScssParser.ReferenceUrlContext context = parseImport("@import url(hello world)");
-    Assert.assertEquals(context.referenceUrlValue().Url().getText(), "hello world");
+    Assert.assertEquals(context.Url().getText(), "hello world");
   }
 
   @Test
@@ -43,9 +43,9 @@ public class TestImports extends TestBase
     };
     ScssParser.StylesheetContext context = parse(lines);
     Assert.assertEquals(context.statement(0).importDeclaration()
-                            .referenceUrl().referenceUrlValue().Url().getText(), "hello world");
+                            .referenceUrl().Url().getText(), "hello world");
     Assert.assertEquals(context.statement(1).importDeclaration()
-                            .referenceUrl().referenceUrlValue().Url().getText(), "\"foobar\"");
+                            .referenceUrl().Url().getText(), "\"foobar\"");
     Assert.assertEquals(context.statement(2).importDeclaration()
                             .referenceUrl().StringLiteral().getText(), "\"hi\"");
   }

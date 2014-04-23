@@ -10,7 +10,7 @@ statement
   : importDeclaration
   | nested
   | ruleset
-  | mixin
+  | mixinDeclaration
   | functionDeclaration
   | variableDeclaration
   | includeDeclaration
@@ -21,45 +21,39 @@ statement
 
 
 
-//MIXINS
-mixin
-  : '@mixin' Identifier (ARGS_START params? ARGS_END)? LBRACE statement* RBRACE
-  ;
+//Params to mixins, includes, etc
 
 params
-  : paramName paramOptionalValue? (VAR_VALUE_SEPER paramName paramOptionalValue?)* '...'?
+  : param (VAR_VALUE_SEPER param)* Ellipsis?
   ;
 
-paramName
-  : VAR_START VariableName
+param
+  : ParamName paramOptionalValue?
   ;
+
 
 variableName
   : DOLLAR Identifier
   ;
 
 paramOptionalValue
-  : VAR_VALUE_START Expr+
+  : VAR_VALUE_START paramValue+
   ;
 
+
+//MIXINS
+mixinDeclaration
+  : '@mixin' Identifier (ArgumentsStart params ArgumentsEnd)? block
+  ;
 
 //Includes
 includeDeclaration
-  : INCLUDE Identifier (';' | (ARGS_START includeParams '...'? ARGS_END ';') | '{' statement* '}')
-  ;
-
-includeParams
-  : includeParam (VAR_VALUE_SEPER includeParam)*
-  ;
-
-includeParam
-  : Expr+
-  | paramName paramOptionalValue?
+  : INCLUDE Identifier (';' | (ArgumentsStart parameters? ArgumentsEnd ';') | block)
   ;
 
 //FUNCTIONS
 functionDeclaration
-  : '@function' Identifier ARGS_START params? ARGS_END LBRACE functionBody? RBRACE
+  : '@function' Identifier ArgumentsStart params? ArgumentsEnd BlockStart functionBody? BlockEnd
   ;
 
 functionBody
@@ -71,8 +65,7 @@ functionStatement
   ;
 
 commandStatement
-  : (NUM | variableName) (MATH_CHAR commandStatement)?
-  | Identifier LPAREN args RPAREN //function call
+  : expression (MathCharacter commandStatement)?
   | LPAREN commandStatement RPAREN
   ;
 
@@ -99,19 +92,19 @@ conditions
   ;
 
 condition
-  : (commandStatement | expr) (COMPARISON conditions)?
+  : commandStatement (COMPARISON conditions)?
   | LPAREN condition RPAREN
   | Identifier
   ;
 
 variableDeclaration
-  : variableName COLON args ';'
+  : variableName COLON value ';'
   ;
 
 
 //for
 forDeclaration
-  : AT_FOR variableName FROM NUM THROUGH NUM block
+  : AT_FOR variableName FROM Number THROUGH Number block
   ;
 
 
@@ -128,12 +121,9 @@ importDeclaration
 
 referenceUrl
     : StringLiteral
-    | URL_START referenceUrlValue URL_END
+    | UrlStart Url UrlEnd
     ;
 
-referenceUrlValue
-   : Url
-   ;
 
 mediaTypes
   : (Identifier (COMMA Identifier)*)
@@ -161,7 +151,7 @@ ruleset
 	;
 
 block
-  :  '{' (statement | properties)* '}'
+  : BlockStart (property ';' | statement)* property? BlockEnd
   ;
 
 selectors
@@ -173,27 +163,22 @@ selector
 	;
 
 selectorOperation
-	: selectop? element
+	: (GT | PLUS) element
 	;
 
-selectop
-	: '>'
-  | '+'
-	;
 
-properties
-	: declaration (';' declaration?)*
-	;
 
 element
 	:     Identifier
 	| '#' Identifier
 	| '.' Identifier
+	| '&'
+	| TIMES
 	;
 
 pseudo
 	: (COLON|COLONCOLON) Identifier
-	| (COLON|COLONCOLON) function
+	| (COLON|COLONCOLON) functionCall
 	;
 
 attrib
@@ -206,23 +191,59 @@ attribRelate
 	| '|='
 	;
 
-declaration
-	: Identifier COLON args
+property
+	: Identifier COLON value
 	;
 
-args
-	: expr (COMMA? expr)*
+value
+	: commandStatement (COMMA? commandStatement)*
 	;
 
-expr
-	: NUM UNIT?
-	| Identifier
-	| COLOR
-	| StringLiteral
-	| function
+url
+  : UrlStart Url UrlEnd
+  ;
+
+measurement
+  : Number Unit?
+  ;
+
+
+expression
+  : measurement
+  | Identifier
+  | Color
+  | StringLiteral
+  | url
+	| variableName
+	| functionCall
 	;
 
-	
-function
-	: Identifier LPAREN args? RPAREN
+
+paramMeasurement
+  : ArgumentNumber ArgumentUnit?
+  ;
+
+paramUrl
+  : UrlArgStart Url UrlEnd
+  ;
+
+paramValue
+  : paramMeasurement
+  | Expression
+  | ParamName
+  | paramUrl
+  ;
+
+parameter
+  : paramValue (MathChar parameter)?
+  | ArgumentsReStart parameter ArgumentsEnd
+  ;
+
+parameters
+  : parameter (VAR_VALUE_SEPER parameter)*
+  ;
+
+functionCall
+      //put the multiple params back in
+	: Identifier ArgumentsStart parameters? ArgumentsEnd
 	;

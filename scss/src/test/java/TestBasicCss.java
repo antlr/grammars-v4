@@ -1,3 +1,4 @@
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -12,6 +13,24 @@ public class TestBasicCss extends TestBase
         "body {}",
     };
     Assert.assertEquals(getSelector(lines).selector(0).element(0).Identifier().getText(), "body");
+  }
+
+  @Test
+  public void testIds()
+  {
+    String [] lines = {
+        "#id1 {}",
+    };
+    Assert.assertEquals(getSelector(lines).selector(0).element(0).Identifier().getText(), "id1");
+  }
+
+  @Test
+  public void testClass()
+  {
+    String [] lines = {
+        ".cls {}",
+    };
+    Assert.assertEquals(getSelector(lines).selector(0).element(0).Identifier().getText(), "cls");
   }
 
   @Test
@@ -53,9 +72,235 @@ public class TestBasicCss extends TestBase
 
   }
 
+  @Test
+  public void testMultipleSelectorsMix()
+  {
+    String [] lines = {
+        ".cls1 .cls2, .cls3, .cls4 > .cls5 {}",
+    };
+    ScssParser.SelectorsContext context = getSelector(lines);
+    Assert.assertEquals(context.selector(0).element(0).getText(), ".cls1");
+    Assert.assertEquals(context.selector(0).element(1).getText(), ".cls2");
+
+    Assert.assertEquals(context.selector(1).element(0).getText(), ".cls3");
+
+    Assert.assertEquals(context.selector(2).element(0).getText(), ".cls4");
+    Assert.assertEquals(context.selector(2).selectorOperation(0).element().getText(), ".cls5");
+
+  }
+
+  @Test
+  public void testNesting()
+  {
+    String [] lines = {
+        "@media hello,world {",
+        "  body, head {}",
+        "}",
+    };
+    ScssParser.StylesheetContext context = parse(lines);
+    Assert.assertEquals(context.statement(0).nested().nest().Identifier(0).getText(), "media");
+    Assert.assertEquals(context.statement(0).nested().nest().Identifier(1).getText(), "hello");
+    Assert.assertEquals(context.statement(0).nested().nest().Identifier(2).getText(), "world");
+
+    ScssParser.StylesheetContext innerSheet = context.statement(0).nested().stylesheet();
+    Assert.assertEquals(innerSheet.statement(0).ruleset().selectors().selector(0).getText(), "body");
+    Assert.assertEquals(innerSheet.statement(0).ruleset().selectors().selector(1).getText(), "head");
+
+  }
+
+  @Test
+  public void testProperties()
+  {
+    String [] lines = {
+        "h1 {",
+        "  display: block",
+        "}",
+    };
+    ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
+    Assert.assertEquals(context.property(0).Identifier().getText(), "display");
+    Assert.assertEquals(context.property(0).value().commandStatement(0).getText(), "block");
+  }
+
+  @Test
+  public void testPropertiesMultiValue()
+  {
+    String [] lines = {
+        "h1 {",
+        "  background: url('a'), 1px 2px",
+        "}",
+    };
+    ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
+    Assert.assertEquals(context.property(0).Identifier().getText(), "background");
+
+    ScssParser.ValueContext val = context.property(0).value();
+    Assert.assertEquals(val.commandStatement(0).expression().url().Url().getText(), "'a'");
+    Assert.assertEquals(val.commandStatement(1).expression().measurement().Number().getText(), "1");
+    Assert.assertEquals(val.commandStatement(1).expression().measurement().Unit().getText(), "px");
+
+    Assert.assertEquals(val.commandStatement(2).expression().measurement().Number().getText(), "2");
+    Assert.assertEquals(val.commandStatement(2).expression().measurement().Unit().getText(), "px");
+
+  }
+
+  @Test
+  public void testPropertiesMultiLines()
+  {
+    String [] lines = {
+        "h1 {",
+        "  color: 1px;",
+        "  font-size: #fff",
+        "}",
+    };
+    ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
+
+    Assert.assertEquals(context.property(0).Identifier().getText(), "color");
+    ScssParser.ValueContext val = context.property(0).value();
+    Assert.assertEquals(val.commandStatement(0).expression().measurement().Number().getText(), "1");
+    Assert.assertEquals(val.commandStatement(0).expression().measurement().Unit().getText(), "px");
+
+    Assert.assertEquals(context.property(1).Identifier().getText(), "font-size");
+    val = context.property(1).value();
+    Assert.assertEquals(val.commandStatement(0).expression().Color().getText(), "#fff");
+
+  }
+
+  @Test
+  public void testPropertyMeasurement()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: 1;");
+    Assert.assertEquals(exp.measurement().Number().getText(), "1");
+    Assert.assertNull(exp.measurement().Unit());
+  }
+
+  @Test
+  public void testPropertyMeasurementAndUnit()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: 1px;");
+    Assert.assertEquals(exp.measurement().Number().getText(), "1");
+    Assert.assertEquals(exp.measurement().Unit().getText(), "px");
+  }
+
+  @Test
+  public void testPropertyShortColor()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: #fff;");
+    Assert.assertEquals(exp.Color().getText(), "#fff");
+  }
+
+  @Test
+  public void testPropertyLongColor()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: #ababab;");
+    Assert.assertEquals(exp.Color().getText(), "#ababab");
+  }
+
+  @Test
+  public void testPropertyIdentifier()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: solid;");
+    Assert.assertEquals(exp.Identifier().getText(), "solid");
+  }
+
+  @Test
+  public void testPropertyUrlString()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: url(\"hello\");");
+    Assert.assertEquals(exp.url().Url().getText(), "\"hello\"");
+  }
+
+  @Test
+  public void testPropertyUrl()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: url(hello);");
+    Assert.assertEquals(exp.url().Url().getText(), "hello");
+  }
+
+  @Test
+  public void testPropertyString()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: \"hello\";");
+    Assert.assertEquals(exp.StringLiteral().getText(), "\"hello\"");
+  }
+
+  @Test
+  public void testPropertyVariable()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: $hello;");
+    Assert.assertEquals(exp.variableName().getText(), "$hello");
+  }
+
+  @Test
+  public void testPropertyFunctionMath()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: calc(100% / 3);");
+    Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
+    Assert.assertEquals(exp.functionCall().parameters().parameter(0).paramValue().getText(), "100%");
+    Assert.assertEquals(exp.functionCall().parameters().parameter(0).MathChar().getText(), "/");
+    Assert.assertEquals(exp.functionCall().parameters().parameter(0).parameter().paramValue()
+                            .paramMeasurement().ArgumentNumber().getText(), "3");
+
+
+  }
+
+  @Test
+  public void testPropertyFunctionMathMinus()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: calc(100% - 80px);");
+    Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
+    Assert.assertEquals(exp.functionCall().parameters().parameter(0).paramValue().paramMeasurement().ArgumentNumber().getText(), "100");
+    Assert.assertEquals(exp.functionCall().parameters().parameter(0).paramValue().paramMeasurement().ArgumentUnit().getText(), "%");
+
+    Assert.assertEquals(exp.functionCall().parameters().parameter(0).MathChar().getText(), "-");
+
+    ScssParser.ParamMeasurementContext measure = exp.functionCall().parameters().parameter(0).parameter().paramValue().paramMeasurement();
+    Assert.assertEquals(measure.ArgumentNumber().getText(), "80");
+    Assert.assertEquals(measure.ArgumentUnit().getText(), "px");
+
+  }
+
+
+  @Test
+  public void testPropertyFunctionMathVar()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: calc(100% - $var);");
+    Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
+    Assert.assertEquals(exp.functionCall().parameters().parameter(0).paramValue().paramMeasurement().ArgumentNumber().getText(), "100");
+    Assert.assertEquals(exp.functionCall().parameters().parameter(0).paramValue().paramMeasurement().ArgumentUnit().getText(), "%");
+
+    Assert.assertEquals(exp.functionCall().parameters().parameter(0).MathChar().getText(), "-");
+
+    Assert.assertEquals(exp.functionCall().parameters().parameter(0).parameter().paramValue().ParamName().getText(), "$var");
+
+  }
+
+  @Test
+  public void testPropertyFunctionMathParen()
+  {
+    ScssParser.ExpressionContext exp = createProperty("p1: calc(((100%)));");
+    Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
+    Assert.assertEquals(exp.functionCall().parameters().parameter(0).parameter().parameter()
+                            .paramValue().paramMeasurement().ArgumentNumber().getText(), "100");
+
+  }
+
+
+
   private ScssParser.SelectorsContext getSelector( String ... lines)
   {
     ScssParser.StylesheetContext context = parse(lines);
     return context.statement(0).ruleset().selectors();
+  }
+
+
+  private ScssParser.ExpressionContext createProperty(String ... lines)
+  {
+    String [] all = new String[lines.length + 2];
+    all[0] = "h1 {";
+    System.arraycopy(lines, 0, all, 1, lines.length);
+    all[all.length - 1] = "}";
+
+    ScssParser.StylesheetContext styleContext = parse(all);
+    ScssParser.BlockContext context = styleContext.statement(0).ruleset().block();
+    return context.property(0).value().commandStatement(0).expression();
   }
 }
