@@ -10,7 +10,7 @@ files.
 ## Parser
 
 The parser needs to read certain tokens from the `HIDDEN` channel
-for proper *semi colon insertion*. The follwoing method signatures
+for proper *semi colon insertion*. The following method signatures
 are therefor embedded inside `@parser::members`:
 
 ```java
