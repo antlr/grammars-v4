@@ -3,8 +3,8 @@
 An ANTLR4 grammar for ECMAScript based on the
 [Standard ECMA-262 5.1 Edition from June 2011](http://www.ecma-international.org/ecma-262/5.1).
 
-This grammar has some embedded code inside its @parser::members and 
-`@parser::members` blocks in order to properly parse ECMA/JS source 
+This grammar has some embedded code inside its `@parser::members` and 
+`@lexer::members` blocks in order to properly parse ECMA/JS source 
 files.
 
 ## Parser
