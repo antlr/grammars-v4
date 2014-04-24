@@ -106,14 +106,12 @@ elseStatement
 
 conditions
   : condition (COMBINE_COMPARE conditions)?
-  | LPAREN conditions RPAREN
   | NULL
   ;
 
 condition
-  : commandStatement (COMPARISON conditions)?
-  | LPAREN condition RPAREN
-  | Identifier
+  : commandStatement (( '==' | LT | GT | '!=') conditions)?
+  | LPAREN conditions RPAREN
   ;
 
 variableDeclaration
@@ -123,13 +121,19 @@ variableDeclaration
 
 //for
 forDeclaration
-  : AT_FOR variableName FROM Number THROUGH Number block
+  : AT_FOR variableName 'from' fromNumber 'through' throughNumber block
   ;
 
+fromNumber
+  : Number
+  ;
+throughNumber
+  : Number
+  ;
 
 //while
 whileDeclaration
-  : AT_WHILE variableName conditions block
+  : AT_WHILE conditions block
   ;
 
 

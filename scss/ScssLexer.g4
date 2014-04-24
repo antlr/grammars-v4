@@ -22,6 +22,9 @@ ArgumentsStart
   : '(' -> pushMode(ARGS_STARTED)
   ;
 
+COMBINE_COMPARE : '&&' | '||';
+
+
 //Separators
 LPAREN          : '(';
 RPAREN          : ')';
@@ -49,9 +52,8 @@ MINUS           : '-';
 PERC            : '%';
 
 
-
-COMPARISON      : '==' | LT | GT | '!=';
-COMBINE_COMPARE : '&&' | '||';
+EQEQ            : '==';
+NOTEQ           : '!=';
 
 
 
@@ -104,10 +106,14 @@ StringLiteral
 	:	STRING
 	;
 
+
+
 Number
 	:	'-' (('0'..'9')* '.')? ('0'..'9')+
 	|	(('0'..'9')* '.')? ('0'..'9')+
 	;
+
+
 
 Color
 	:	'#' ('0'..'9'|'a'..'f'|'A'..'F')+

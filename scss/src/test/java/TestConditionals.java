@@ -52,4 +52,37 @@ public class TestConditionals extends TestBase
     Assert.assertEquals(context.block().property(0).value().getText(), "red");
 
   }
+
+
+
+  @Test
+  public void testForLoop()
+  {
+    String [] lines = {
+        "@for $i from 1 through 3 {}"
+
+    };
+    ScssParser.ForDeclarationContext context = parse(lines).statement(0).forDeclaration();
+    Assert.assertEquals(context.variableName().getText(), "$i");
+    Assert.assertEquals(context.fromNumber().getText(), "1");
+    Assert.assertEquals(context.throughNumber().getText(), "3");
+
+
+
+  }
+
+  @Test
+  public void testWhileLoop()
+  {
+    String [] lines = {
+        "@while $i > 0 {}"
+
+    };
+    ScssParser.WhileDeclarationContext context = parse(lines).statement(0).whileDeclaration();
+    Assert.assertEquals(context.conditions().condition().commandStatement().expression().variableName().getText(), "$i");
+    Assert.assertEquals(context.conditions().condition().conditions().condition().commandStatement().getText(), "0");
+
+
+
+  }
 }
