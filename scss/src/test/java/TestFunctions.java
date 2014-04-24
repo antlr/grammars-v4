@@ -48,7 +48,34 @@ public class TestFunctions extends TestBase
 
    ScssParser.FunctionReturnContext returnContext = context.functionBody().functionReturn();
    Assert.assertEquals(returnContext.commandStatement().expression().getText(), "$color");
-
-
  }
+
+  @Test
+  public void testNestedFunctions()
+  {
+    String [] lines = {
+        "@function grid-width ($a) {",
+        "  @function grid-height($b) {",
+        "    @return $color;",
+        "  }",
+        "  @return $world;",
+        "}"
+    };
+    ScssParser.FunctionDeclarationContext context = parse(lines).statement(0).functionDeclaration();
+    Assert.assertEquals(context.Identifier().getText(), "grid-width");
+    Assert.assertEquals(context.params().param(0).ParamName().getText(), "$a");
+
+    ScssParser.FunctionStatementContext funcContext = context.functionBody().functionStatement(0);
+    Assert.assertEquals(funcContext.statement().functionDeclaration().Identifier().getText(), "grid-height");
+    Assert.assertEquals(funcContext.statement().functionDeclaration().params().param(0).ParamName().getText(), "$b");
+
+    Assert.assertEquals(funcContext.statement().functionDeclaration().functionBody().functionReturn()
+                            .commandStatement().expression().variableName().getText(), "$color");
+
+
+    ScssParser.FunctionReturnContext returnContext = context.functionBody().functionReturn();
+    Assert.assertEquals(returnContext.commandStatement().expression().getText(), "$world");
+
+
+  }
 }
