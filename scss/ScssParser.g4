@@ -43,12 +43,12 @@ paramOptionalValue
 
 //MIXINS
 mixinDeclaration
-  : '@mixin' Identifier (ArgumentsStart params ArgumentsEnd)? block
+  : '@mixin' Identifier (ArgumentsStart params? ArgumentsEnd)? block
   ;
 
 //Includes
 includeDeclaration
-  : INCLUDE Identifier (';' | (ArgumentsStart parameters? ArgumentsEnd ';') | block)
+  : INCLUDE Identifier (';' | (ArgumentsStart parameters? ArgumentsEnd ';'?)? block?)
   ;
 
 //FUNCTIONS
@@ -57,17 +57,36 @@ functionDeclaration
   ;
 
 functionBody
-  : functionStatement* '@return' functionStatement
+  : functionStatement* functionReturn
+  ;
+
+functionReturn
+  : '@return' commandStatement ';'
   ;
 
 functionStatement
   : commandStatement ';' | statement
   ;
 
+mathCharacter
+  : TIMES | PLUS | '/' | '-' | '%'
+  ;
+
 commandStatement
-  : expression (MathCharacter commandStatement)?
+  : expression (mathCharacter commandStatement)?
   | LPAREN commandStatement RPAREN
   ;
+
+
+expression
+  : measurement
+  | identifier
+  | Color
+  | StringLiteral
+  | url
+	| variableName
+	| functionCall
+	;
 
 
 
@@ -98,7 +117,7 @@ condition
   ;
 
 variableDeclaration
-  : variableName COLON value ';'
+  : variableName COLON value '!default'? ';'
   ;
 
 
@@ -134,7 +153,7 @@ mediaTypes
 
 //Nested (stylesheets, etc)
 nested
- 	: '@' nest '{' stylesheet '}'
+ 	: '@' nest BlockStart stylesheet BlockEnd
 	;
 
 nest
@@ -159,21 +178,19 @@ selectors
 	;
 
 selector
-	: element+ selectorOperation* attrib* pseudo?
+	: element (selectorPrefix? element)* attrib* pseudo?
 	;
 
-selectorOperation
-	: (GT | PLUS) element
-	;
-
-
+selectorPrefix
+  : (GT | PLUS | TIL | SPACE)
+  ;
 
 element
-	:     Identifier
-	| '#' Identifier
-	| '.' Identifier
-	| '&'
-	| TIMES
+	: identifier
+  | '#' identifier
+  | '.' identifier
+  | '&'
+  | TIMES
 	;
 
 pseudo
@@ -191,8 +208,12 @@ attribRelate
 	| '|='
 	;
 
+identifier
+  : (Identifier | interpolation)+
+  ;
+
 property
-	: Identifier COLON value
+	: identifier COLON value
 	;
 
 value
@@ -207,16 +228,9 @@ measurement
   : Number Unit?
   ;
 
-
-expression
-  : measurement
-  | Identifier
-  | Color
-  | StringLiteral
-  | url
-	| variableName
-	| functionCall
-	;
+interpolation
+  : '#' BlockStart variableName BlockEnd
+  ;
 
 
 paramMeasurement
@@ -226,12 +240,16 @@ paramMeasurement
 paramUrl
   : UrlArgStart Url UrlEnd
   ;
+paramInterpolation
+  : InterpolateStart ParamName InterpolateEnd
+  ;
 
 paramValue
   : paramMeasurement
   | Expression
   | ParamName
   | paramUrl
+  | paramInterpolation
   ;
 
 parameter

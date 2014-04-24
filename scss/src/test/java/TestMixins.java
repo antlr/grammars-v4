@@ -6,13 +6,13 @@ public class TestMixins extends TestBase
 {
   @Test
    public void testMixin()
-{
-  String [] lines = {
-      "@mixin something-awesome {}"
-  };
-  ScssParser.MixinDeclarationContext context = parseImport(lines);
-  Assert.assertEquals(context.Identifier().getText(), "something-awesome");
-}
+  {
+    String [] lines = {
+        "@mixin something-awesome {}"
+    };
+    ScssParser.MixinDeclarationContext context = parseImport(lines);
+    Assert.assertEquals(context.Identifier().getText(), "something-awesome");
+  }
 
   @Test
   public void testMixinProperties()
@@ -24,7 +24,7 @@ public class TestMixins extends TestBase
     };
     ScssParser.MixinDeclarationContext context = parseImport(lines);
     Assert.assertEquals(context.Identifier().getText(), "test");
-    Assert.assertEquals(context.block().property(0).Identifier().getText(), "display");
+    Assert.assertEquals(context.block().property(0).identifier().getText(), "display");
     Assert.assertEquals(context.block().property(0).value().commandStatement(0).expression()
                             .variableName().Identifier().getText(), "hello");
   }
@@ -104,15 +104,15 @@ public class TestMixins extends TestBase
     Assert.assertEquals(context.params().param(0).ParamName().getText(), "$shadows");
     Assert.assertNotNull(context.params().Ellipsis());
 
-    Assert.assertEquals(context.block().property(0).Identifier().getText(), "-moz-box-shadow");
+    Assert.assertEquals(context.block().property(0).identifier().getText(), "-moz-box-shadow");
     Assert.assertEquals(context.block().property(0).value().commandStatement(0)
                             .expression().variableName().Identifier().getText(), "shadows");
 
-    Assert.assertEquals(context.block().property(1).Identifier().getText(), "-webkit-box-shadow");
+    Assert.assertEquals(context.block().property(1).identifier().getText(), "-webkit-box-shadow");
     Assert.assertEquals(context.block().property(1).value().commandStatement(0)
                             .expression().variableName().Identifier().getText(), "shadows");
 
-    Assert.assertEquals(context.block().property(2).Identifier().getText(), "box-shadow");
+    Assert.assertEquals(context.block().property(2).identifier().getText(), "box-shadow");
     Assert.assertEquals(context.block().property(2).value().commandStatement(0)
                             .expression().variableName().Identifier().getText(), "shadows");
 
@@ -137,14 +137,14 @@ public class TestMixins extends TestBase
     ScssParser.MixinDeclarationContext context = parseImport(lines);
     Assert.assertEquals(context.Identifier().getText(), "clearfix");
 
-    Assert.assertEquals(context.block().property(0).Identifier().getText(), "display");
+    Assert.assertEquals(context.block().property(0).identifier().getText(), "display");
     Assert.assertEquals(context.block().property(0).value().commandStatement(0)
-                            .expression().Identifier().getText(), "inline-block");
+                            .expression().identifier().getText(), "inline-block");
 
     Assert.assertEquals(context.block().statement(0).ruleset().selectors()
                             .selector(0).element(0).getText(), "&");
-    Assert.assertEquals(context.block().statement(0).ruleset().selectors().selector(0).pseudo()
-                            .Identifier().getText(), "after");
+    Assert.assertEquals(context.block().statement(0).ruleset().selectors()
+                            .selector(0).pseudo().Identifier().getText(), "after");
 
 
     Assert.assertEquals(context.block().statement(1).ruleset().selectors()
@@ -154,12 +154,29 @@ public class TestMixins extends TestBase
     Assert.assertEquals(context.block().statement(1).ruleset().selectors()
                             .selector(0).element(2).getText(), "&");
 
-    Assert.assertEquals(context.block().statement(1).ruleset().block().property(0).Identifier().getText(), "height");
+    Assert.assertEquals(context.block().statement(1).ruleset().block().property(0).identifier().getText(), "height");
     Assert.assertEquals(context.block().statement(1).ruleset().block().property(0).value()
                             .commandStatement(0).expression().measurement().getText(), "1px");
 
 
   }
+
+  @Test
+  public void testMixinBlockInterpolation()
+  {
+    String [] lines = {
+        "@mixin test () {",
+        "  #{$attr}-color: blue;"
+        ,"}"
+    };
+    ScssParser.MixinDeclarationContext context = parseImport(lines);
+    Assert.assertEquals(context.Identifier().getText(), "test");
+    Assert.assertEquals(context.block().property(0).identifier().interpolation(0).variableName().getText(), "$attr");
+    Assert.assertEquals(context.block().property(0).identifier().Identifier(0).getText(), "-color");
+  }
+
+
+
 
 
 

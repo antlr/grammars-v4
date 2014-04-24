@@ -22,9 +22,6 @@ ArgumentsStart
   : '(' -> pushMode(ARGS_STARTED)
   ;
 
-
-
-
 //Separators
 LPAREN          : '(';
 RPAREN          : ')';
@@ -33,6 +30,8 @@ BlockEnd        : '}';
 LBRACK          : '[';
 RBRACK          : ']';
 GT              : '>';
+TIL             : '~';
+
 LT              : '<';
 COLON           : ':';
 SEMI            : ';';
@@ -45,12 +44,16 @@ HASH            : '#';
 COLONCOLON      : '::';
 PLUS            : '+';
 TIMES           : '*';
+DIV             : '/';
+MINUS           : '-';
+PERC            : '%';
+
+
 
 COMPARISON      : '==' | LT | GT | '!=';
 COMBINE_COMPARE : '&&' | '||';
 
 
-MathCharacter     :  '*' | '+' | '/' | '-' | '%' ;
 
 EQ              : '=';
 PIPE_EQ         : '|=';
@@ -74,7 +77,7 @@ CHAR_FEED       : '\r';
 
 FROM            : 'from';
 THROUGH         : 'through';
-
+POUND_DEFAULT   : '!default';
 
 
 
@@ -145,6 +148,10 @@ VAR_VALUE_SEPER   : ',';
 ArgumentsEnd      : RPAREN -> popMode;
 ArgumentsReStart  : '(' -> pushMode(ARGS_STARTED);
 ARGS_WS           : Whitespace -> skip;
+
+InterpolateStart  : '#' '{';
+InterpolateEnd    : '}';
+
 
 
 mode URL_STARTED;

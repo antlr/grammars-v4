@@ -12,7 +12,7 @@ public class TestBasicCss extends TestBase
     String [] lines = {
         "body {}",
     };
-    Assert.assertEquals(getSelector(lines).selector(0).element(0).Identifier().getText(), "body");
+    Assert.assertEquals(getSelector(lines).selector(0).element(0).identifier().getText(), "body");
   }
 
   @Test
@@ -21,7 +21,7 @@ public class TestBasicCss extends TestBase
     String [] lines = {
         "#id1 {}",
     };
-    Assert.assertEquals(getSelector(lines).selector(0).element(0).Identifier().getText(), "id1");
+    Assert.assertEquals(getSelector(lines).selector(0).element(0).identifier().getText(), "id1");
   }
 
   @Test
@@ -30,7 +30,7 @@ public class TestBasicCss extends TestBase
     String [] lines = {
         ".cls {}",
     };
-    Assert.assertEquals(getSelector(lines).selector(0).element(0).Identifier().getText(), "cls");
+    Assert.assertEquals(getSelector(lines).selector(0).element(0).identifier().getText(), "cls");
   }
 
   @Test
@@ -51,7 +51,7 @@ public class TestBasicCss extends TestBase
         "body .cls, h1 {}",
     };
     ScssParser.SelectorsContext context = getSelector(lines);
-    Assert.assertEquals(context.selector(0).element(0).getText(), "body");
+    Assert.assertEquals(context.selector(0).element(0).identifier().getText(), "body");
     Assert.assertEquals(context.selector(0).element(1).getText(), ".cls");
 
     Assert.assertEquals(context.selector(1).element(0).getText(), "h1");
@@ -64,7 +64,7 @@ public class TestBasicCss extends TestBase
         "body .cls, h1.cls1 {}",
     };
     ScssParser.SelectorsContext context = getSelector(lines);
-    Assert.assertEquals(context.selector(0).element(0).getText(), "body");
+    Assert.assertEquals(context.selector(0).element(0).identifier().getText(), "body");
     Assert.assertEquals(context.selector(0).element(1).getText(), ".cls");
 
     Assert.assertEquals(context.selector(1).element(0).getText(), "h1");
@@ -85,7 +85,9 @@ public class TestBasicCss extends TestBase
     Assert.assertEquals(context.selector(1).element(0).getText(), ".cls3");
 
     Assert.assertEquals(context.selector(2).element(0).getText(), ".cls4");
-    Assert.assertEquals(context.selector(2).selectorOperation(0).element().getText(), ".cls5");
+
+    Assert.assertEquals(context.selector(2).selectorPrefix(0).getText(), ">");
+    Assert.assertEquals(context.selector(2).element(1).getText(), ".cls5");
 
   }
 
@@ -117,7 +119,7 @@ public class TestBasicCss extends TestBase
         "}",
     };
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
-    Assert.assertEquals(context.property(0).Identifier().getText(), "display");
+    Assert.assertEquals(context.property(0).identifier().getText(), "display");
     Assert.assertEquals(context.property(0).value().commandStatement(0).getText(), "block");
   }
 
@@ -130,7 +132,7 @@ public class TestBasicCss extends TestBase
         "}",
     };
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
-    Assert.assertEquals(context.property(0).Identifier().getText(), "background");
+    Assert.assertEquals(context.property(0).identifier().getText(), "background");
 
     ScssParser.ValueContext val = context.property(0).value();
     Assert.assertEquals(val.commandStatement(0).expression().url().Url().getText(), "'a'");
@@ -153,12 +155,12 @@ public class TestBasicCss extends TestBase
     };
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
 
-    Assert.assertEquals(context.property(0).Identifier().getText(), "color");
+    Assert.assertEquals(context.property(0).identifier().getText(), "color");
     ScssParser.ValueContext val = context.property(0).value();
     Assert.assertEquals(val.commandStatement(0).expression().measurement().Number().getText(), "1");
     Assert.assertEquals(val.commandStatement(0).expression().measurement().Unit().getText(), "px");
 
-    Assert.assertEquals(context.property(1).Identifier().getText(), "font-size");
+    Assert.assertEquals(context.property(1).identifier().getText(), "font-size");
     val = context.property(1).value();
     Assert.assertEquals(val.commandStatement(0).expression().Color().getText(), "#fff");
 
@@ -198,7 +200,7 @@ public class TestBasicCss extends TestBase
   public void testPropertyIdentifier()
   {
     ScssParser.ExpressionContext exp = createProperty("p1: solid;");
-    Assert.assertEquals(exp.Identifier().getText(), "solid");
+    Assert.assertEquals(exp.identifier().getText(), "solid");
   }
 
   @Test
@@ -282,6 +284,24 @@ public class TestBasicCss extends TestBase
                             .paramValue().paramMeasurement().ArgumentNumber().getText(), "100");
 
   }
+
+  @Test
+  public void testInterpolation()
+  {
+    String [] lines = {
+        "p.#{$name} > select2 {}"
+    };
+    ScssParser.StylesheetContext context = parse(lines);
+    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(0).getText(), "p");
+    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(1)
+                            .identifier().interpolation(0).variableName().getText(), "$name");
+
+    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(2).getText(), "select2");
+
+
+  }
+
+
 
 
 
