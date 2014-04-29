@@ -41,6 +41,7 @@ htmlElements
 htmlElement     
     : TAG_OPEN htmlTagName htmlAttribute* TAG_CLOSE htmlContent TAG_OPEN TAG_SLASH htmlTagName TAG_CLOSE
     | TAG_OPEN htmlTagName htmlAttribute* TAG_SLASH_CLOSE
+    | TAG_OPEN htmlTagName htmlAttribute* TAG_CLOSE
     | scriptlet
     ;
 
