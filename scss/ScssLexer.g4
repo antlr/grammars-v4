@@ -27,6 +27,8 @@ ArgumentsStart
  */
 COMBINE_COMPARE : '&&' | '||';
 
+Ellipsis          : '...';
+
 
 //Separators
 LPAREN          : '(';
@@ -54,6 +56,10 @@ DIV             : '/';
 MINUS           : '-';
 PERC            : '%';
 
+
+UrlStart
+  : 'url' LPAREN -> pushMode(URL_STARTED)
+  ;
 
 EQEQ            : '==';
 NOTEQ           : '!=';
@@ -88,6 +94,7 @@ THROUGH         : 'through';
 POUND_DEFAULT   : '!default';
 
 
+MathChar          : '/' | '+' | '-' | '*' | '%';
 
 
 
@@ -125,13 +132,6 @@ Color
 	:	'#' ('0'..'9'|'a'..'f'|'A'..'F')+
 	;
 
-
-UrlStart
-  : 'url' '(' -> pushMode(URL_STARTED)
-  ;
-
-
-
 // Single-line comments
 SL_COMMENT
 	:	'//'
@@ -143,34 +143,6 @@ SL_COMMENT
 COMMENT
 	:	'/*' .*? '*/' -> skip
 	;
-
-/*
-mode ARGS_STARTED;
-
-UrlArgStart       : 'url' '(' -> pushMode(URL_STARTED);
-ArgumentNumber    : Number -> type(Number);
-ArgumentUnit      : MeasurementUnit -> type(Unit);
-Ellipsis          : '...';
-ParamIdentifier   : Identifier -> type(Identifier);
-Color_Arg         : Color -> type(Color);
-StringLiteral_Arg : StringLiteral -> type(StringLiteral);
-UrlStart_Arg      : UrlStart -> type(UrlStart);
-
-
-
-DOLLAR_Arg        : DOLLAR -> type(DOLLAR);
-MathChar          : '/' | '+' | '-' | '*' | '%';
-VAR_VALUE_START   : COLON -> type(COLON);
-VAR_VALUE_SEPER   : COMMA -> type(COMMA);
-ArgumentsEnd      : RPAREN -> popMode;
-ArgumentsReStart  : '(' -> pushMode(ARGS_STARTED), type(ArgumentsStart);
-ARGS_WS           : Whitespace -> skip;
-
-HASH_Args         : HASH -> type(HASH);
-BlockStart_ARGS   : BlockStart -> type(BlockStart);
-BlockEnd_ARGS     : BlockEnd -> type(BlockEnd);
- */
-
 
 mode URL_STARTED;
 UrlEnd                 : RPAREN -> popMode;

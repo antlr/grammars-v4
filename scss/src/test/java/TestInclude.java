@@ -66,10 +66,10 @@ public class TestInclude extends TestBase
     };
     ScssParser.StylesheetContext context = parse(lines);
     Assert.assertEquals(context.statement(0).includeDeclaration().Identifier().getText(), "large-button");
-    Assert.assertEquals(context.statement(0).includeDeclaration().parameters()
-                            .parameter(0).expression().identifier().getText(), "blue");
-    Assert.assertEquals(context.statement(0).includeDeclaration().parameters()
-                            .parameter(1).expression().variableName().getText(), "$var");
+    Assert.assertEquals(context.statement(0).includeDeclaration().value()
+                            .commandStatement(0).expression(0).identifier().getText(), "blue");
+    Assert.assertEquals(context.statement(0).includeDeclaration().value()
+                            .commandStatement(1).expression(0).variableName().getText(), "$var");
 
   }
 
@@ -86,7 +86,7 @@ public class TestInclude extends TestBase
     Assert.assertEquals(context.statement(0).includeDeclaration().Identifier().getText(), "large-button");
     Assert.assertEquals(context.statement(0).includeDeclaration().block().property(0).identifier().getText(), "color");
     Assert.assertEquals(context.statement(0).includeDeclaration().block().property(0)
-                            .value().commandStatement(0).expression().identifier().getText(), "black");
+                            .value().commandStatement(0).expression(0).identifier().getText(), "black");
 
 
   }
@@ -102,7 +102,7 @@ public class TestInclude extends TestBase
     };
     ScssParser.IncludeDeclarationContext context = parse(lines).statement(0).includeDeclaration();
 
-    Assert.assertEquals(context.parameters().parameter(0).expression().identifier().interpolation(0).variableName().getText(), "$var1");
+    Assert.assertEquals(context.value().commandStatement(0).expression(0).identifier().interpolation(0).variableName().getText(), "$var1");
     Assert.assertEquals(context.block().property(0).identifier().Identifier(0).getText(), "color-");
     Assert.assertEquals(context.block().property(0).identifier().interpolation(0).variableName().getText(), "$var2");
 

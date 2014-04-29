@@ -135,12 +135,12 @@ public class TestBasicCss extends TestBase
     Assert.assertEquals(context.property(0).identifier().getText(), "background");
 
     ScssParser.ValueContext val = context.property(0).value();
-    Assert.assertEquals(val.commandStatement(0).expression().url().Url().getText(), "'a'");
-    Assert.assertEquals(val.commandStatement(1).expression().measurement().Number().getText(), "1");
-    Assert.assertEquals(val.commandStatement(1).expression().measurement().Unit().getText(), "px");
+    Assert.assertEquals(val.commandStatement(0).expression(0).url().Url().getText(), "'a'");
+    Assert.assertEquals(val.commandStatement(1).expression(0).measurement().Number().getText(), "1");
+    Assert.assertEquals(val.commandStatement(1).expression(0).measurement().Unit().getText(), "px");
 
-    Assert.assertEquals(val.commandStatement(2).expression().measurement().Number().getText(), "2");
-    Assert.assertEquals(val.commandStatement(2).expression().measurement().Unit().getText(), "px");
+    Assert.assertEquals(val.commandStatement(1).expression(1).measurement().Number().getText(), "2");
+    Assert.assertEquals(val.commandStatement(1).expression(1).measurement().Unit().getText(), "px");
 
   }
 
@@ -157,12 +157,12 @@ public class TestBasicCss extends TestBase
 
     Assert.assertEquals(context.property(0).identifier().getText(), "color");
     ScssParser.ValueContext val = context.property(0).value();
-    Assert.assertEquals(val.commandStatement(0).expression().measurement().Number().getText(), "1");
-    Assert.assertEquals(val.commandStatement(0).expression().measurement().Unit().getText(), "px");
+    Assert.assertEquals(val.commandStatement(0).expression(0).measurement().Number().getText(), "1");
+    Assert.assertEquals(val.commandStatement(0).expression(0).measurement().Unit().getText(), "px");
 
     Assert.assertEquals(context.property(1).identifier().getText(), "font-size");
     val = context.property(1).value();
-    Assert.assertEquals(val.commandStatement(0).expression().Color().getText(), "#fff");
+    Assert.assertEquals(val.commandStatement(0).expression(0).Color().getText(), "#fff");
 
   }
 
@@ -236,9 +236,9 @@ public class TestBasicCss extends TestBase
   {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% / 3);");
     Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
-    Assert.assertEquals(exp.functionCall().parameters().parameter(0).expression().getText(), "100%");
-    Assert.assertEquals(exp.functionCall().parameters().parameter(0).MathChar().getText(), "/");
-    Assert.assertEquals(exp.functionCall().parameters().parameter(0).parameter().expression()
+    Assert.assertEquals(exp.functionCall().value().commandStatement(0).expression(0).getText(), "100%");
+    Assert.assertEquals(exp.functionCall().value().commandStatement(0).mathCharacter().getText(), "/");
+    Assert.assertEquals(exp.functionCall().value().commandStatement(0).commandStatement().expression(0)
                             .measurement().Number().getText(), "3");
 
 
@@ -249,12 +249,12 @@ public class TestBasicCss extends TestBase
   {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% - 80px);");
     Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
-    Assert.assertEquals(exp.functionCall().parameters().parameter(0).expression().measurement().Number().getText(), "100");
-    Assert.assertEquals(exp.functionCall().parameters().parameter(0).expression().measurement().Unit().getText(), "%");
+    Assert.assertEquals(exp.functionCall().value().commandStatement(0).expression(0).measurement().Number().getText(), "100");
+    Assert.assertEquals(exp.functionCall().value().commandStatement(0).expression(0).measurement().Unit().getText(), "%");
 
-    Assert.assertEquals(exp.functionCall().parameters().parameter(0).MathChar().getText(), "-");
+    Assert.assertEquals(exp.functionCall().value().commandStatement(0).mathCharacter().getText(), "-");
 
-    ScssParser.MeasurementContext measure = exp.functionCall().parameters().parameter(0).parameter().expression().measurement();
+    ScssParser.MeasurementContext measure = exp.functionCall().value().commandStatement(0).commandStatement().expression(0).measurement();
     Assert.assertEquals(measure.Number().getText(), "80");
     Assert.assertEquals(measure.Unit().getText(), "px");
 
@@ -266,12 +266,12 @@ public class TestBasicCss extends TestBase
   {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% - $var);");
     Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
-    Assert.assertEquals(exp.functionCall().parameters().parameter(0).expression().measurement().Number().getText(), "100");
-    Assert.assertEquals(exp.functionCall().parameters().parameter(0).expression().measurement().Unit().getText(), "%");
+    Assert.assertEquals(exp.functionCall().value().commandStatement(0).expression(0).measurement().Number().getText(), "100");
+    Assert.assertEquals(exp.functionCall().value().commandStatement(0).expression(0).measurement().Unit().getText(), "%");
 
-    Assert.assertEquals(exp.functionCall().parameters().parameter(0).MathChar().getText(), "-");
+    Assert.assertEquals(exp.functionCall().value().commandStatement(0).mathCharacter().getText(), "-");
 
-    Assert.assertEquals(exp.functionCall().parameters().parameter(0).parameter().expression().variableName().getText(), "$var");
+    Assert.assertEquals(exp.functionCall().value().commandStatement(0).commandStatement().expression(0).variableName().getText(), "$var");
 
   }
 
@@ -280,8 +280,8 @@ public class TestBasicCss extends TestBase
   {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(((100%)));");
     Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
-    Assert.assertEquals(exp.functionCall().parameters().parameter(0).parameter().parameter()
-                            .expression().measurement().Number().getText(), "100");
+    Assert.assertEquals(exp.functionCall().value().commandStatement(0).commandStatement().commandStatement()
+                            .expression(0).measurement().Number().getText(), "100");
 
   }
 
@@ -321,6 +321,6 @@ public class TestBasicCss extends TestBase
 
     ScssParser.StylesheetContext styleContext = parse(all);
     ScssParser.BlockContext context = styleContext.statement(0).ruleset().block();
-    return context.property(0).value().commandStatement(0).expression();
+    return context.property(0).value().commandStatement(0).expression(0);
   }
 }

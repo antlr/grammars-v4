@@ -19,10 +19,10 @@ public class TestFunctions extends TestBase
     Assert.assertEquals(context.params().param(0).variableName().getText(), "$n");
 
     ScssParser.FunctionReturnContext funcContext = context.functionBody().functionReturn();
-    Assert.assertEquals(funcContext.commandStatement().expression().getText(), "$n");
+    Assert.assertEquals(funcContext.commandStatement().expression(0).getText(), "$n");
 
     Assert.assertEquals(funcContext.commandStatement().mathCharacter().getText(), "*");
-    Assert.assertEquals(funcContext.commandStatement().commandStatement().expression().getText(), "$grid-width");
+    Assert.assertEquals(funcContext.commandStatement().commandStatement().expression(0).getText(), "$grid-width");
 
 
   }
@@ -47,7 +47,7 @@ public class TestFunctions extends TestBase
 
 
    ScssParser.FunctionReturnContext returnContext = context.functionBody().functionReturn();
-   Assert.assertEquals(returnContext.commandStatement().expression().getText(), "$color");
+   Assert.assertEquals(returnContext.commandStatement().expression(0).getText(), "$color");
  }
 
   @Test
@@ -70,11 +70,11 @@ public class TestFunctions extends TestBase
     Assert.assertEquals(funcContext.statement().functionDeclaration().params().param(0).variableName().getText(), "$b");
 
     Assert.assertEquals(funcContext.statement().functionDeclaration().functionBody().functionReturn()
-                            .commandStatement().expression().variableName().getText(), "$color");
+                            .commandStatement().expression(0).variableName().getText(), "$color");
 
 
     ScssParser.FunctionReturnContext returnContext = context.functionBody().functionReturn();
-    Assert.assertEquals(returnContext.commandStatement().expression().getText(), "$world");
+    Assert.assertEquals(returnContext.commandStatement().expression(0).getText(), "$world");
 
 
   }

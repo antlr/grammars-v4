@@ -49,7 +49,7 @@ mixinDeclaration
 
 //Includes
 includeDeclaration
-  : INCLUDE Identifier (';' | (LPAREN parameters? RPAREN ';'?)? block?)
+  : INCLUDE Identifier (';' | (LPAREN value? RPAREN ';'?)? block?)
   ;
 
 //FUNCTIONS
@@ -74,8 +74,8 @@ mathCharacter
   ;
 
 commandStatement
-  : expression (mathCharacter commandStatement)?
-  | LPAREN commandStatement ')'
+  : expression+ (mathCharacter commandStatement)?
+  | LPAREN commandStatement RPAREN
   ;
 
 
@@ -144,11 +144,14 @@ eachDeclaration
 
 eachValueList
   :  Identifier (COMMA Identifier)*
-  |  LPAREN identifierListOrMap (COMMA identifierListOrMap)* ')'
+  |  identifierListOrMap (COMMA identifierListOrMap)*
   ;
 
 identifierListOrMap
-  : identifier (COLON value)? (COMMA  identifier (COLON value)?)*
+  : LPAREN identifierValue (COMMA identifierValue)* RPAREN
+  ;
+identifierValue
+  : identifier (COLON value)?
   ;
 
 
@@ -236,7 +239,7 @@ property
 	;
 
 value
-	: commandStatement (COMMA? commandStatement)*
+	: commandStatement (COMMA commandStatement)*
 	;
 
 url
@@ -258,18 +261,7 @@ paramUrl
   ;
 
 
-
-
-parameter
-  : expression (MathChar parameter)?
-  | LPAREN parameter RPAREN
-  ;
-
-parameters
-  : parameter (COMMA parameter)*
-  ;
-
 functionCall
       //put the multiple params back in
-	: Identifier LPAREN parameters? RPAREN
+	: Identifier LPAREN value? RPAREN
 	;

@@ -25,7 +25,7 @@ public class TestMixins extends TestBase
     ScssParser.MixinDeclarationContext context = parseImport(lines);
     Assert.assertEquals(context.Identifier().getText(), "test");
     Assert.assertEquals(context.block().property(0).identifier().getText(), "display");
-    Assert.assertEquals(context.block().property(0).value().commandStatement(0).expression()
+    Assert.assertEquals(context.block().property(0).value().commandStatement(0).expression(0)
                             .variableName().Identifier().getText(), "hello");
   }
 
@@ -106,15 +106,15 @@ public class TestMixins extends TestBase
 
     Assert.assertEquals(context.block().property(0).identifier().getText(), "-moz-box-shadow");
     Assert.assertEquals(context.block().property(0).value().commandStatement(0)
-                            .expression().variableName().Identifier().getText(), "shadows");
+                            .expression(0).variableName().Identifier().getText(), "shadows");
 
     Assert.assertEquals(context.block().property(1).identifier().getText(), "-webkit-box-shadow");
     Assert.assertEquals(context.block().property(1).value().commandStatement(0)
-                            .expression().variableName().Identifier().getText(), "shadows");
+                            .expression(0).variableName().Identifier().getText(), "shadows");
 
     Assert.assertEquals(context.block().property(2).identifier().getText(), "box-shadow");
     Assert.assertEquals(context.block().property(2).value().commandStatement(0)
-                            .expression().variableName().Identifier().getText(), "shadows");
+                            .expression(0).variableName().Identifier().getText(), "shadows");
 
   }
 
@@ -139,7 +139,7 @@ public class TestMixins extends TestBase
 
     Assert.assertEquals(context.block().property(0).identifier().getText(), "display");
     Assert.assertEquals(context.block().property(0).value().commandStatement(0)
-                            .expression().identifier().getText(), "inline-block");
+                            .expression(0).identifier().getText(), "inline-block");
 
     Assert.assertEquals(context.block().statement(0).ruleset().selectors()
                             .selector(0).element(0).getText(), "&");
@@ -156,7 +156,7 @@ public class TestMixins extends TestBase
 
     Assert.assertEquals(context.block().statement(1).ruleset().block().property(0).identifier().getText(), "height");
     Assert.assertEquals(context.block().statement(1).ruleset().block().property(0).value()
-                            .commandStatement(0).expression().measurement().getText(), "1px");
+                            .commandStatement(0).expression(0).measurement().getText(), "1px");
 
 
   }
@@ -174,11 +174,6 @@ public class TestMixins extends TestBase
     Assert.assertEquals(context.block().property(0).identifier().interpolation(0).variableName().getText(), "$attr");
     Assert.assertEquals(context.block().property(0).identifier().Identifier(0).getText(), "-color");
   }
-
-
-
-
-
 
   private ScssParser.MixinDeclarationContext parseImport(String ... lines)
   {
