@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar fasta;
 
 sequence
-    : section+;
+    : section+
+    ;
 
 section
     : descriptionline 
@@ -45,12 +46,8 @@ sequencelines
     : SEQUENCELINE+
     ;
 
-sequenceline
-    : SEQUENCELINE
-    ;
-
 descriptionline
-    : DESCLINE
+    : DESCRIPTIONLINE
     ;
 
 commentline
@@ -61,7 +58,7 @@ COMMENTLINE
     : ';' .*? EOL
     ;
 
-DESCLINE
+DESCRIPTIONLINE
     : '>' TEXT ('|' TEXT )* EOL
     ;
 
