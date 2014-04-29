@@ -33,14 +33,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar fasta;
 
 sequence
-    : line+;
+    : section+;
 
-line
+section
     : descriptionline 
-    | sequenceline
+    | sequencelines
     | commentline 
     ;
-    
+
+sequencelines
+    : SEQUENCELINE+
+    ;
+
 sequenceline
     : SEQUENCELINE
     ;
