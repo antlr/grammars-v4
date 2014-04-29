@@ -46,7 +46,7 @@ sequenceline
     ;
 
 descriptionline
-    : GILINE
+    : DESCLINE
     ;
 
 commentline
@@ -57,8 +57,8 @@ COMMENTLINE
     : ';' .*? EOL
     ;
 
-GILINE
-    : '>gi' ('|' TEXT )* EOL
+DESCLINE
+    : '>' TEXT ('|' TEXT )* EOL
     ;
 
 TEXT
