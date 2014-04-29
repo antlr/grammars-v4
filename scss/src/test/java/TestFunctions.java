@@ -1,3 +1,31 @@
+/*
+ [The "BSD licence"]
+ Copyright (c) 2014 Vlad Shlosberg
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -11,7 +39,7 @@ public class TestFunctions extends TestBase
     //($n - 1) * $gutter-width;
     String [] lines = {
         "@function grid-width($n) {",
-        "  @return $n * $grid-width;",
+        "  @return ($n - 1) * $gutter-width;",
         "}"
     };
     ScssParser.FunctionDeclarationContext context = parse(lines).statement(0).functionDeclaration();
@@ -19,10 +47,12 @@ public class TestFunctions extends TestBase
     Assert.assertEquals(context.params().param(0).variableName().getText(), "$n");
 
     ScssParser.FunctionReturnContext funcContext = context.functionBody().functionReturn();
-    Assert.assertEquals(funcContext.commandStatement().expression(0).getText(), "$n");
+    Assert.assertEquals(funcContext.commandStatement().commandStatement().expression(0).getText(), "$n");
+    Assert.assertEquals(funcContext.commandStatement().commandStatement().mathStatement().commandStatement().getText(), "1");
 
-    Assert.assertEquals(funcContext.commandStatement().mathCharacter().getText(), "*");
-    Assert.assertEquals(funcContext.commandStatement().commandStatement().expression(0).getText(), "$grid-width");
+
+    Assert.assertEquals(funcContext.commandStatement().mathStatement().mathCharacter().getText(), "*");
+    Assert.assertEquals(funcContext.commandStatement().mathStatement().commandStatement().getText(), "$gutter-width");
 
 
   }
@@ -42,7 +72,7 @@ public class TestFunctions extends TestBase
 
    ScssParser.FunctionStatementContext funcContext = context.functionBody().functionStatement(0);
    Assert.assertEquals(funcContext.statement().variableDeclaration().variableName().getText(), "$color");
-   Assert.assertEquals(funcContext.statement().variableDeclaration().value().getText(), "red");
+   Assert.assertEquals(funcContext.statement().variableDeclaration().values().getText(), "red");
 
 
 

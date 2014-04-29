@@ -1,3 +1,30 @@
+/*
+ [The "BSD licence"]
+ Copyright (c) 2014 Vlad Shlosberg
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -101,8 +128,8 @@ public class TestBasicCss extends TestBase
     };
     ScssParser.StylesheetContext context = parse(lines);
     Assert.assertEquals(context.statement(0).nested().nest().Identifier(0).getText(), "media");
-    Assert.assertEquals(context.statement(0).nested().nest().Identifier(1).getText(), "hello");
-    Assert.assertEquals(context.statement(0).nested().nest().Identifier(2).getText(), "world");
+    Assert.assertEquals(context.statement(0).nested().selectors().selector(0).element(0).getText(), "hello");
+    Assert.assertEquals(context.statement(0).nested().selectors().selector(1).element(0).getText(), "world");
 
     ScssParser.StylesheetContext innerSheet = context.statement(0).nested().stylesheet();
     Assert.assertEquals(innerSheet.statement(0).ruleset().selectors().selector(0).getText(), "body");
@@ -120,11 +147,11 @@ public class TestBasicCss extends TestBase
     };
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
     Assert.assertEquals(context.property(0).identifier().getText(), "display");
-    Assert.assertEquals(context.property(0).value().commandStatement(0).getText(), "block");
+    Assert.assertEquals(context.property(0).values().commandStatement(0).getText(), "block");
   }
 
   @Test
-  public void testPropertiesMultiValue()
+  public void testPropertiesMultivalues()
   {
     String [] lines = {
         "h1 {",
@@ -134,7 +161,7 @@ public class TestBasicCss extends TestBase
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
     Assert.assertEquals(context.property(0).identifier().getText(), "background");
 
-    ScssParser.ValueContext val = context.property(0).value();
+    ScssParser.ValuesContext val = context.property(0).values();
     Assert.assertEquals(val.commandStatement(0).expression(0).url().Url().getText(), "'a'");
     Assert.assertEquals(val.commandStatement(1).expression(0).measurement().Number().getText(), "1");
     Assert.assertEquals(val.commandStatement(1).expression(0).measurement().Unit().getText(), "px");
@@ -156,12 +183,12 @@ public class TestBasicCss extends TestBase
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
 
     Assert.assertEquals(context.property(0).identifier().getText(), "color");
-    ScssParser.ValueContext val = context.property(0).value();
+    ScssParser.ValuesContext val = context.property(0).values();
     Assert.assertEquals(val.commandStatement(0).expression(0).measurement().Number().getText(), "1");
     Assert.assertEquals(val.commandStatement(0).expression(0).measurement().Unit().getText(), "px");
 
     Assert.assertEquals(context.property(1).identifier().getText(), "font-size");
-    val = context.property(1).value();
+    val = context.property(1).values();
     Assert.assertEquals(val.commandStatement(0).expression(0).Color().getText(), "#fff");
 
   }
@@ -236,9 +263,9 @@ public class TestBasicCss extends TestBase
   {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% / 3);");
     Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
-    Assert.assertEquals(exp.functionCall().value().commandStatement(0).expression(0).getText(), "100%");
-    Assert.assertEquals(exp.functionCall().value().commandStatement(0).mathCharacter().getText(), "/");
-    Assert.assertEquals(exp.functionCall().value().commandStatement(0).commandStatement().expression(0)
+    Assert.assertEquals(exp.functionCall().values().commandStatement(0).expression(0).getText(), "100%");
+    Assert.assertEquals(exp.functionCall().values().commandStatement(0).mathStatement().mathCharacter().getText(), "/");
+    Assert.assertEquals(exp.functionCall().values().commandStatement(0).mathStatement().commandStatement().expression(0)
                             .measurement().Number().getText(), "3");
 
 
@@ -249,12 +276,13 @@ public class TestBasicCss extends TestBase
   {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% - 80px);");
     Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
-    Assert.assertEquals(exp.functionCall().value().commandStatement(0).expression(0).measurement().Number().getText(), "100");
-    Assert.assertEquals(exp.functionCall().value().commandStatement(0).expression(0).measurement().Unit().getText(), "%");
+    Assert.assertEquals(exp.functionCall().values().commandStatement(0).expression(0).measurement().Number().getText(), "100");
+    Assert.assertEquals(exp.functionCall().values().commandStatement(0).expression(0).measurement().Unit().getText(), "%");
 
-    Assert.assertEquals(exp.functionCall().value().commandStatement(0).mathCharacter().getText(), "-");
+    Assert.assertEquals(exp.functionCall().values().commandStatement(0).mathStatement().mathCharacter().getText(), "-");
 
-    ScssParser.MeasurementContext measure = exp.functionCall().value().commandStatement(0).commandStatement().expression(0).measurement();
+    ScssParser.MeasurementContext measure = exp.functionCall().values().commandStatement(0)
+        .mathStatement().commandStatement().expression(0).measurement();
     Assert.assertEquals(measure.Number().getText(), "80");
     Assert.assertEquals(measure.Unit().getText(), "px");
 
@@ -266,12 +294,12 @@ public class TestBasicCss extends TestBase
   {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% - $var);");
     Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
-    Assert.assertEquals(exp.functionCall().value().commandStatement(0).expression(0).measurement().Number().getText(), "100");
-    Assert.assertEquals(exp.functionCall().value().commandStatement(0).expression(0).measurement().Unit().getText(), "%");
+    Assert.assertEquals(exp.functionCall().values().commandStatement(0).expression(0).measurement().Number().getText(), "100");
+    Assert.assertEquals(exp.functionCall().values().commandStatement(0).expression(0).measurement().Unit().getText(), "%");
 
-    Assert.assertEquals(exp.functionCall().value().commandStatement(0).mathCharacter().getText(), "-");
+    Assert.assertEquals(exp.functionCall().values().commandStatement(0).mathStatement().mathCharacter().getText(), "-");
 
-    Assert.assertEquals(exp.functionCall().value().commandStatement(0).commandStatement().expression(0).variableName().getText(), "$var");
+    Assert.assertEquals(exp.functionCall().values().commandStatement(0).mathStatement().commandStatement().expression(0).variableName().getText(), "$var");
 
   }
 
@@ -280,7 +308,7 @@ public class TestBasicCss extends TestBase
   {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(((100%)));");
     Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
-    Assert.assertEquals(exp.functionCall().value().commandStatement(0).commandStatement().commandStatement()
+    Assert.assertEquals(exp.functionCall().values().commandStatement(0).commandStatement().commandStatement()
                             .expression(0).measurement().Number().getText(), "100");
 
   }
@@ -315,6 +343,6 @@ public class TestBasicCss extends TestBase
 
     ScssParser.StylesheetContext styleContext = parse(all);
     ScssParser.BlockContext context = styleContext.statement(0).ruleset().block();
-    return context.property(0).value().commandStatement(0).expression(0);
+    return context.property(0).values().commandStatement(0).expression(0);
   }
 }

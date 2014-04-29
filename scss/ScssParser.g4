@@ -1,3 +1,31 @@
+/*
+ [The "BSD licence"]
+ Copyright (c) 2014 Vlad Shlosberg
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 parser grammar ScssParser;
 
 options { tokenVocab=ScssLexer; }
@@ -47,7 +75,7 @@ mixinDeclaration
 
 //Includes
 includeDeclaration
-  : INCLUDE Identifier (';' | (LPAREN value? RPAREN ';'?)? block?)
+  : INCLUDE Identifier (';' | (LPAREN values? RPAREN ';'?)? block?)
   ;
 
 //FUNCTIONS
@@ -67,13 +95,17 @@ functionStatement
   : commandStatement ';' | statement
   ;
 
-mathCharacter
-  : TIMES | PLUS | '/' | '-' | '%'
-  ;
 
 commandStatement
-  : expression+ (mathCharacter commandStatement)?
-  | LPAREN commandStatement RPAREN
+  : (expression+ | '(' commandStatement ')') mathStatement?
+  ;
+
+mathCharacter
+  : TIMES | PLUS | DIV | MINUS | PERC
+  ;
+
+mathStatement
+  : mathCharacter commandStatement
   ;
 
 
@@ -82,6 +114,7 @@ expression
   | identifier
   | Color
   | StringLiteral
+  | NULL
   | url
 	| variableName
 	| functionCall
@@ -114,7 +147,7 @@ condition
   ;
 
 variableDeclaration
-  : variableName COLON value '!default'? ';'
+  : variableName COLON values '!default'? ';'
   ;
 
 
@@ -148,8 +181,9 @@ eachValueList
 identifierListOrMap
   : LPAREN identifierValue (COMMA identifierValue)* RPAREN
   ;
+
 identifierValue
-  : identifier (COLON value)?
+  : identifier (COLON values)?
   ;
 
 
@@ -173,7 +207,7 @@ mediaTypes
 
 //Nested (stylesheets, etc)
 nested
- 	: '@' nest BlockStart stylesheet BlockEnd
+ 	: '@' nest selectors BlockStart stylesheet BlockEnd
 	;
 
 nest
@@ -233,10 +267,10 @@ identifier
   ;
 
 property
-	: identifier COLON value
+	: identifier COLON values
 	;
 
-value
+values
 	: commandStatement (COMMA commandStatement)*
 	;
 
@@ -252,14 +286,6 @@ interpolation
   : HASH BlockStart variableName BlockEnd
   ;
 
-
-
-paramUrl
-  : UrlArgStart Url UrlEnd
-  ;
-
-
 functionCall
-      //put the multiple params back in
-	: Identifier LPAREN value? RPAREN
+	: Identifier LPAREN values? RPAREN
 	;
