@@ -69,7 +69,7 @@ public class TestBase
       ScssLexer lexer = new ScssLexer(source);
       TokenStream stream = new BufferedTokenStream(lexer);
       ScssParser par = new ScssParser(stream);
-      par.addErrorListener(new FailOnErrorListener());
+      //par.addErrorListener(new FailOnErrorListener());
       return par.stylesheet();
     }
     catch (IOException e)

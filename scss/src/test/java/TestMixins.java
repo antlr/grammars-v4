@@ -178,11 +178,11 @@ public class TestMixins extends TestBase
 
 
     Assert.assertEquals(context.block().statement(1).ruleset().selectors()
-                            .selector(0).element(0).getText(), "*");
+                            .selector(0).element(0).TIMES().getText(), "*");
     Assert.assertEquals(context.block().statement(1).ruleset().selectors()
-                            .selector(0).element(1).getText(), "html");
+                            .selector(0).element(1).identifier().getText(), "html");
     Assert.assertEquals(context.block().statement(1).ruleset().selectors()
-                            .selector(0).element(2).getText(), "&");
+                            .selector(0).element(2).AND().getText(), "&");
 
     Assert.assertEquals(context.block().statement(1).ruleset().block().property(0).identifier().getText(), "height");
     Assert.assertEquals(context.block().statement(1).ruleset().block().property(0).values()

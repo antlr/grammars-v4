@@ -232,7 +232,7 @@ selectors
 	;
 
 selector
-	: element (selectorPrefix? element)* attrib* pseudo?
+	: element+ (selectorPrefix? element)* attrib* pseudo?
 	;
 
 selectorPrefix
@@ -243,7 +243,7 @@ element
 	: identifier
   | '#' identifier
   | '.' identifier
-  | '&'
+  | AND
   | TIMES
 	;
 

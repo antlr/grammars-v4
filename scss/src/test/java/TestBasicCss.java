@@ -320,7 +320,7 @@ public class TestBasicCss extends TestBase
         "p.#{$name} > select2 {}"
     };
     ScssParser.StylesheetContext context = parse(lines);
-    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(0).getText(), "p");
+    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(0).identifier().getText(), "p");
     Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(1)
                             .identifier().interpolation(0).variableName().getText(), "$name");
 
