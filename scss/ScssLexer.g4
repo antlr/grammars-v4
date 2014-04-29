@@ -11,17 +11,20 @@ WS
   : Whitespace -> skip
   ;
 
+IN              : 'in';
 
 fragment MeasurementUnit
   : ('%'|'px'|'cm'|'mm'|'in'|'pt'|'pc'|'em'|'ex'|'deg'|'rad'|'grad'|'ms'|'s'|'hz'|'khz')
   ;
 
+
 Unit: MeasurementUnit;
 
+/*
 ArgumentsStart
   : '(' -> pushMode(ARGS_STARTED)
   ;
-
+ */
 COMBINE_COMPARE : '&&' | '||';
 
 
@@ -70,6 +73,9 @@ IF              : 'if';
 AT_IF           : '@if';
 AT_FOR          : '@for';
 AT_WHILE        : '@while';
+AT_EACH         : '@each';
+
+
 
 INCLUDE         : '@include';
 IMPORT          : '@import';
@@ -138,26 +144,32 @@ COMMENT
 	:	'/*' .*? '*/' -> skip
 	;
 
+/*
 mode ARGS_STARTED;
 
 UrlArgStart       : 'url' '(' -> pushMode(URL_STARTED);
-ArgumentNumber    : Number;
-ArgumentUnit      : MeasurementUnit;
+ArgumentNumber    : Number -> type(Number);
+ArgumentUnit      : MeasurementUnit -> type(Unit);
 Ellipsis          : '...';
-ParamName         : '$' Identifier;
+ParamIdentifier   : Identifier -> type(Identifier);
+Color_Arg         : Color -> type(Color);
+StringLiteral_Arg : StringLiteral -> type(StringLiteral);
+UrlStart_Arg      : UrlStart -> type(UrlStart);
 
-Expression        : Identifier | Color | StringLiteral | UrlStart;
 
+
+DOLLAR_Arg        : DOLLAR -> type(DOLLAR);
 MathChar          : '/' | '+' | '-' | '*' | '%';
-VAR_VALUE_START   : ':';
-VAR_VALUE_SEPER   : ',';
+VAR_VALUE_START   : COLON -> type(COLON);
+VAR_VALUE_SEPER   : COMMA -> type(COMMA);
 ArgumentsEnd      : RPAREN -> popMode;
-ArgumentsReStart  : '(' -> pushMode(ARGS_STARTED);
+ArgumentsReStart  : '(' -> pushMode(ARGS_STARTED), type(ArgumentsStart);
 ARGS_WS           : Whitespace -> skip;
 
-InterpolateStart  : '#' '{';
-InterpolateEnd    : '}';
-
+HASH_Args         : HASH -> type(HASH);
+BlockStart_ARGS   : BlockStart -> type(BlockStart);
+BlockEnd_ARGS     : BlockEnd -> type(BlockEnd);
+ */
 
 
 mode URL_STARTED;

@@ -29,7 +29,7 @@ public class TestMixins extends TestBase
                             .variableName().Identifier().getText(), "hello");
   }
 
-  //@Test
+  @Test
   public void testMixinNesting()
   {
     String [] lines = {
@@ -52,8 +52,8 @@ public class TestMixins extends TestBase
     };
     ScssParser.MixinDeclarationContext context = parseImport(lines);
     Assert.assertEquals(context.Identifier().getText(), "test");
-    Assert.assertEquals(context.params().param(0).ParamName().getText(), "$val1");
-    Assert.assertEquals(context.params().param(1).ParamName().getText(), "$val2");
+    Assert.assertEquals(context.params().param(0).variableName().getText(), "$val1");
+    Assert.assertEquals(context.params().param(1).variableName().getText(), "$val2");
 
   }
 
@@ -65,14 +65,14 @@ public class TestMixins extends TestBase
     };
     ScssParser.MixinDeclarationContext context = parseImport(lines);
     Assert.assertEquals(context.Identifier().getText(), "test");
-    Assert.assertEquals(context.params().param(0).ParamName().getText(), "$val1");
-    Assert.assertEquals(context.params().param(0).paramOptionalValue().paramValue(0)
-                            .paramMeasurement().ArgumentNumber().getText(), "3");
-    Assert.assertEquals(context.params().param(0).paramOptionalValue().paramValue(0)
-                            .paramMeasurement().ArgumentUnit().getText(), "px");
+    Assert.assertEquals(context.params().param(0).variableName().getText(), "$val1");
+    Assert.assertEquals(context.params().param(0).paramOptionalValue().expression(0)
+                            .measurement().Number().getText(), "3");
+    Assert.assertEquals(context.params().param(0).paramOptionalValue().expression(0)
+                            .measurement().Unit().getText(), "px");
 
 
-    Assert.assertEquals(context.params().param(1).ParamName().getText(), "$val2");
+    Assert.assertEquals(context.params().param(1).variableName().getText(), "$val2");
 
   }
 
@@ -84,8 +84,8 @@ public class TestMixins extends TestBase
     };
     ScssParser.MixinDeclarationContext context = parseImport(lines);
     Assert.assertEquals(context.Identifier().getText(), "test");
-    Assert.assertEquals(context.params().param(0).ParamName().getText(), "$val1");
-    Assert.assertEquals(context.params().param(1).ParamName().getText(), "$val2");
+    Assert.assertEquals(context.params().param(0).variableName().getText(), "$val1");
+    Assert.assertEquals(context.params().param(1).variableName().getText(), "$val2");
     Assert.assertEquals(context.params().Ellipsis().getText(), "...");
   }
 
@@ -101,7 +101,7 @@ public class TestMixins extends TestBase
     };
     ScssParser.MixinDeclarationContext context = parseImport(lines);
     Assert.assertEquals(context.Identifier().getText(), "box-shadow");
-    Assert.assertEquals(context.params().param(0).ParamName().getText(), "$shadows");
+    Assert.assertEquals(context.params().param(0).variableName().getText(), "$shadows");
     Assert.assertNotNull(context.params().Ellipsis());
 
     Assert.assertEquals(context.block().property(0).identifier().getText(), "-moz-box-shadow");

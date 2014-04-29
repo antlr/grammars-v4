@@ -81,7 +81,43 @@ public class TestConditionals extends TestBase
     ScssParser.WhileDeclarationContext context = parse(lines).statement(0).whileDeclaration();
     Assert.assertEquals(context.conditions().condition().commandStatement().expression().variableName().getText(), "$i");
     Assert.assertEquals(context.conditions().condition().conditions().condition().commandStatement().getText(), "0");
+  }
 
+  @Test
+  public void testBasicEach()
+  {
+    String [] lines = {
+        "@each $animal in puma, sea-slug, egret, salamander {}"
+
+    };
+    ScssParser.EachDeclarationContext context = parse(lines).statement(0).eachDeclaration();
+    Assert.assertEquals(context.variableName(0).getText(), "$animal");
+    Assert.assertEquals(context.eachValueList().Identifier(0).getText(), "puma");
+    Assert.assertEquals(context.eachValueList().Identifier(1).getText(), "sea-slug");
+    Assert.assertEquals(context.eachValueList().Identifier(2).getText(), "egret");
+    Assert.assertEquals(context.eachValueList().Identifier(3).getText(), "salamander");
+  }
+
+  @Test
+  public void testBasicEachMultiAssign()
+  {
+    String [] lines = {
+        "@each $animal, $color, $cursor in (puma, black, default),(sea-slug, blue, pointer) {}"
+
+    };
+    ScssParser.EachDeclarationContext context = parse(lines).statement(0).eachDeclaration();
+    Assert.assertEquals(context.variableName(0).getText(), "$animal");
+    Assert.assertEquals(context.variableName(1).getText(), "$color");
+    Assert.assertEquals(context.variableName(2).getText(), "$cursor");
+
+
+    Assert.assertEquals(context.eachValueList().identifierListOrMap(0).identifier(0).getText(), "puma");
+    Assert.assertEquals(context.eachValueList().identifierListOrMap(0).identifier(1).getText(), "black");
+    Assert.assertEquals(context.eachValueList().identifierListOrMap(0).identifier(2).getText(), "default");
+
+    Assert.assertEquals(context.eachValueList().identifierListOrMap(1).identifier(0).getText(), "sea-slug");
+    Assert.assertEquals(context.eachValueList().identifierListOrMap(1).identifier(1).getText(), "blue");
+    Assert.assertEquals(context.eachValueList().identifierListOrMap(1).identifier(2).getText(), "pointer");
 
 
   }

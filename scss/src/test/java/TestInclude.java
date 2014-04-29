@@ -67,9 +67,9 @@ public class TestInclude extends TestBase
     ScssParser.StylesheetContext context = parse(lines);
     Assert.assertEquals(context.statement(0).includeDeclaration().Identifier().getText(), "large-button");
     Assert.assertEquals(context.statement(0).includeDeclaration().parameters()
-                            .parameter(0).paramValue().Expression().getText(), "blue");
+                            .parameter(0).expression().identifier().getText(), "blue");
     Assert.assertEquals(context.statement(0).includeDeclaration().parameters()
-                            .parameter(1).paramValue().ParamName().getText(), "$var");
+                            .parameter(1).expression().variableName().getText(), "$var");
 
   }
 
@@ -102,11 +102,9 @@ public class TestInclude extends TestBase
     };
     ScssParser.IncludeDeclarationContext context = parse(lines).statement(0).includeDeclaration();
 
-    Assert.assertEquals(context.parameters().parameter(0).paramValue().paramInterpolation().ParamName().getText(), "$var1");
+    Assert.assertEquals(context.parameters().parameter(0).expression().identifier().interpolation(0).variableName().getText(), "$var1");
     Assert.assertEquals(context.block().property(0).identifier().Identifier(0).getText(), "color-");
     Assert.assertEquals(context.block().property(0).identifier().interpolation(0).variableName().getText(), "$var2");
-
-
 
   }
 

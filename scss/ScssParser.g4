@@ -17,6 +17,7 @@ statement
   | ifDeclaration
   | forDeclaration
   | whileDeclaration
+  | eachDeclaration
   ;
 
 
@@ -24,11 +25,11 @@ statement
 //Params to mixins, includes, etc
 
 params
-  : param (VAR_VALUE_SEPER param)* Ellipsis?
+  : param (COMMA param)* Ellipsis?
   ;
 
 param
-  : ParamName paramOptionalValue?
+  : variableName paramOptionalValue?
   ;
 
 
@@ -37,23 +38,23 @@ variableName
   ;
 
 paramOptionalValue
-  : VAR_VALUE_START paramValue+
+  : COLON expression+
   ;
 
 
 //MIXINS
 mixinDeclaration
-  : '@mixin' Identifier (ArgumentsStart params? ArgumentsEnd)? block
+  : '@mixin' Identifier (LPAREN params? RPAREN)? block
   ;
 
 //Includes
 includeDeclaration
-  : INCLUDE Identifier (';' | (ArgumentsStart parameters? ArgumentsEnd ';'?)? block?)
+  : INCLUDE Identifier (';' | (LPAREN parameters? RPAREN ';'?)? block?)
   ;
 
 //FUNCTIONS
 functionDeclaration
-  : '@function' Identifier ArgumentsStart params? ArgumentsEnd BlockStart functionBody? BlockEnd
+  : '@function' Identifier LPAREN params? RPAREN BlockStart functionBody? BlockEnd
   ;
 
 functionBody
@@ -74,7 +75,7 @@ mathCharacter
 
 commandStatement
   : expression (mathCharacter commandStatement)?
-  | LPAREN commandStatement RPAREN
+  | LPAREN commandStatement ')'
   ;
 
 
@@ -111,7 +112,7 @@ conditions
 
 condition
   : commandStatement (( '==' | LT | GT | '!=') conditions)?
-  | LPAREN conditions RPAREN
+  | LPAREN conditions ')'
   ;
 
 variableDeclaration
@@ -134,6 +135,20 @@ throughNumber
 //while
 whileDeclaration
   : AT_WHILE conditions block
+  ;
+
+//EACH
+eachDeclaration
+  : AT_EACH variableName (COMMA variableName)* IN eachValueList block
+  ;
+
+eachValueList
+  :  Identifier (COMMA Identifier)*
+  |  LPAREN identifierListOrMap (COMMA identifierListOrMap)* ')'
+  ;
+
+identifierListOrMap
+  : identifier (COLON value)? (COMMA  identifier (COLON value)?)*
   ;
 
 
@@ -233,39 +248,28 @@ measurement
   ;
 
 interpolation
-  : '#' BlockStart variableName BlockEnd
+  : HASH BlockStart variableName BlockEnd
   ;
 
 
-paramMeasurement
-  : ArgumentNumber ArgumentUnit?
-  ;
 
 paramUrl
   : UrlArgStart Url UrlEnd
   ;
-paramInterpolation
-  : InterpolateStart ParamName InterpolateEnd
-  ;
 
-paramValue
-  : paramMeasurement
-  | Expression
-  | ParamName
-  | paramUrl
-  | paramInterpolation
-  ;
+
+
 
 parameter
-  : paramValue (MathChar parameter)?
-  | ArgumentsReStart parameter ArgumentsEnd
+  : expression (MathChar parameter)?
+  | LPAREN parameter RPAREN
   ;
 
 parameters
-  : parameter (VAR_VALUE_SEPER parameter)*
+  : parameter (COMMA parameter)*
   ;
 
 functionCall
       //put the multiple params back in
-	: Identifier ArgumentsStart parameters? ArgumentsEnd
+	: Identifier LPAREN parameters? RPAREN
 	;
