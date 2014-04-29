@@ -29,6 +29,8 @@ COMBINE_COMPARE : '&&' | '||';
 
 Ellipsis          : '...';
 
+//MathCharacter   : DIV | PLUS | MINUS | TIMES | PERC;
+
 
 //Separators
 LPAREN          : '(';
@@ -94,7 +96,6 @@ THROUGH         : 'through';
 POUND_DEFAULT   : '!default';
 
 
-MathChar          : '/' | '+' | '-' | '*' | '%';
 
 
 

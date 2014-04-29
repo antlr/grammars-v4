@@ -297,13 +297,7 @@ public class TestBasicCss extends TestBase
                             .identifier().interpolation(0).variableName().getText(), "$name");
 
     Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(2).getText(), "select2");
-
-
   }
-
-
-
-
 
   private ScssParser.SelectorsContext getSelector( String ... lines)
   {

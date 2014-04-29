@@ -23,7 +23,6 @@ statement
 
 
 //Params to mixins, includes, etc
-
 params
   : param (COMMA param)* Ellipsis?
   ;
@@ -31,7 +30,6 @@ params
 param
   : variableName paramOptionalValue?
   ;
-
 
 variableName
   : DOLLAR Identifier

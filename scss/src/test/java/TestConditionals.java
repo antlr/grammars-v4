@@ -15,10 +15,8 @@ public class TestConditionals extends TestBase
     Assert.assertEquals(context.conditions().condition().commandStatement().mathCharacter().getText(), "+");
     Assert.assertEquals(context.conditions().condition().commandStatement().commandStatement().expression(0).getText(), "1");
 
-    Assert.assertEquals(context.conditions().condition().conditions().condition().commandStatement().expression(0).getText()
-        , "2");
-
-
+    Assert.assertEquals(context.conditions().condition().conditions().condition()
+                            .commandStatement().expression(0).getText(), "2");
   }
 
   @Test
