@@ -322,9 +322,22 @@ public class TestBasicCss extends TestBase
     ScssParser.StylesheetContext context = parse(lines);
     Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(0).identifier().getText(), "p");
     Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(1)
-                            .identifier().interpolation(0).variableName().getText(), "$name");
+                            .identifier().identifierVariableName().getText(), "$name");
 
     Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(2).getText(), "select2");
+  }
+
+  @Test
+  public void testInterpolationSpace()
+  {
+    String [] lines = {
+        "p #{$name} {}"
+    };
+    ScssParser.StylesheetContext context = parse(lines);
+    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(0).identifier().getText(), "p");
+    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(1)
+                            .identifier().identifierVariableName().getText(), "$name");
+
   }
 
   private ScssParser.SelectorsContext getSelector( String ... lines)
