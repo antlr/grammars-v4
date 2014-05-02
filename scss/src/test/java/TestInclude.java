@@ -130,9 +130,9 @@ public class TestInclude extends TestBase
     };
     ScssParser.IncludeDeclarationContext context = parse(lines).statement(0).includeDeclaration();
 
-    Assert.assertEquals(context.values().commandStatement(0).expression(0).identifier().interpolation(0).variableName().getText(), "$var1");
-    Assert.assertEquals(context.block().property(0).identifier().Identifier(0).getText(), "color-");
-    Assert.assertEquals(context.block().property(0).identifier().interpolation(0).variableName().getText(), "$var2");
+    Assert.assertEquals(context.values().commandStatement(0).expression(0).identifier().identifierVariableName().getText(), "$var1");
+    Assert.assertEquals(context.block().property(0).identifier().Identifier().getText(), "color-");
+    Assert.assertEquals(context.block().property(0).identifier().identifierPart(0).identifierVariableName().getText(), "$var2");
 
   }
 

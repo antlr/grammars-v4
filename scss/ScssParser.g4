@@ -232,19 +232,19 @@ selectors
 	;
 
 selector
-	: element+ (selectorPrefix? element)* attrib* pseudo?
+	: element+ (selectorPrefix element)* attrib* pseudo?
 	;
 
 selectorPrefix
-  : (GT | PLUS | TIL | SPACE)
+  : (GT | PLUS | TIL)
   ;
 
 element
 	: identifier
   | '#' identifier
   | '.' identifier
-  | AND
-  | TIMES
+  | '&'
+  | '*'
 	;
 
 pseudo
@@ -263,7 +263,16 @@ attribRelate
 	;
 
 identifier
-  : (Identifier | interpolation)+
+  : Identifier identifierPart*
+  | InterpolationStart identifierVariableName BlockEnd identifierPart*
+  ;
+
+identifierPart
+  : InterpolationStartAfter identifierVariableName BlockEnd
+  | IdentifierAfter
+  ;
+identifierVariableName
+  : DOLLAR (Identifier | IdentifierAfter)
   ;
 
 property
@@ -282,9 +291,6 @@ measurement
   : Number Unit?
   ;
 
-interpolation
-  : HASH BlockStart variableName BlockEnd
-  ;
 
 functionCall
 	: Identifier LPAREN values? RPAREN
