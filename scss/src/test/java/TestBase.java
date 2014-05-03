@@ -39,6 +39,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
@@ -69,7 +70,9 @@ public class TestBase
       ScssLexer lexer = new ScssLexer(source);
       TokenStream stream = new BufferedTokenStream(lexer);
       ScssParser par = new ScssParser(stream);
-      //par.addErrorListener(new FailOnErrorListener());
+      par.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
+
+      par.addErrorListener(new FailOnErrorListener());
       return par.stylesheet();
     }
     catch (IOException e)

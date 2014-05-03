@@ -178,11 +178,11 @@ public class TestMixins extends TestBase
 
 
     Assert.assertEquals(context.block().statement(1).ruleset().selectors()
-                            .selector(0).element(0).TIMES().getText(), "*");
+                            .selector(0).element(0).getText(), "*");
     Assert.assertEquals(context.block().statement(1).ruleset().selectors()
                             .selector(0).element(1).identifier().getText(), "html");
     Assert.assertEquals(context.block().statement(1).ruleset().selectors()
-                            .selector(0).element(2).AND().getText(), "&");
+                            .selector(0).element(2).getText(), "&");
 
     Assert.assertEquals(context.block().statement(1).ruleset().block().property(0).identifier().getText(), "height");
     Assert.assertEquals(context.block().statement(1).ruleset().block().property(0).values()
@@ -201,8 +201,8 @@ public class TestMixins extends TestBase
     };
     ScssParser.MixinDeclarationContext context = parseImport(lines);
     Assert.assertEquals(context.Identifier().getText(), "test");
-    Assert.assertEquals(context.block().property(0).identifier().interpolation(0).variableName().getText(), "$attr");
-    Assert.assertEquals(context.block().property(0).identifier().Identifier(0).getText(), "-color");
+    Assert.assertEquals(context.block().property(0).identifier().identifierVariableName().getText(), "$attr");
+    Assert.assertEquals(context.block().property(0).identifier().identifierPart(0).IdentifierAfter().getText(), "-color");
   }
 
   @Test

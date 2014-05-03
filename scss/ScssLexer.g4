@@ -30,10 +30,6 @@ lexer grammar ScssLexer;
 
 NULL              : 'null';
 
-// Whitespace -- ignored
-WS
-  : (' '|'\t'|'\n'|'\r'|'\r\n')+ -> skip
-  ;
 
 IN              : 'in';
 
@@ -45,8 +41,9 @@ COMBINE_COMPARE : '&&' | '||';
 
 Ellipsis          : '...';
 
-//MathCharacter   : DIV | PLUS | MINUS | TIMES | PERC;
-
+InterpolationStart
+  : HASH BlockStart -> pushMode(IDENTIFY)
+  ;
 
 //Separators
 LPAREN          : '(';
@@ -79,6 +76,8 @@ UrlStart
   : 'url' LPAREN -> pushMode(URL_STARTED)
   ;
 
+
+
 EQEQ            : '==';
 NOTEQ           : '!=';
 
@@ -108,10 +107,10 @@ POUND_DEFAULT   : '!default';
 
 
 Identifier
-	:	('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
+	:	(('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
 		('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*
 	|	'-' ('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
-		('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*
+		('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*) -> pushMode(IDENTIFY)
 	;
 
 
@@ -136,6 +135,12 @@ Color
 	:	'#' ('0'..'9'|'a'..'f'|'A'..'F')+
 	;
 
+
+// Whitespace -- ignored
+WS
+  : (' '|'\t'|'\n'|'\r'|'\r\n')+ -> skip
+  ;
+
 // Single-line comments
 SL_COMMENT
 	:	'//'
@@ -151,6 +156,27 @@ COMMENT
 mode URL_STARTED;
 UrlEnd                 : RPAREN -> popMode;
 Url                    :	STRING | (~(')' | '\n' | '\r' | ';'))+;
+
+mode IDENTIFY;
+SPACE                  : WS -> popMode, skip;
+DOLLAR_ID              : DOLLAR -> type(DOLLAR);
+
+
+InterpolationStartAfter  : InterpolationStart;
+InterpolationEnd_ID    : BlockEnd -> type(BlockEnd);
+
+IdentifierAfter        : Identifier;
+Ellipsis_ID            : Ellipsis -> popMode, type(Ellipsis);
+DOT_ID                 : DOT -> popMode, type(DOT);
+
+LPAREN_ID                 : LPAREN -> popMode, type(LPAREN);
+RPAREN_ID                 : RPAREN -> popMode, type(RPAREN);
+
+COLON_ID                  : COLON -> popMode, type(COLON);
+COMMA_ID                  : COMMA -> popMode, type(COMMA);
+SEMI_ID                  : SEMI -> popMode, type(SEMI);
+
+
 
 
 
