@@ -50,12 +50,16 @@ SEA_WS
     ;
 
 SCRIPT_OPEN
-    : '<script'.*? '>' ->pushMode(SCRIPT)
+    : '<script' .*? '>' ->pushMode(SCRIPT)
     ;
 
 STYLE_OPEN
-    : '<style'.*? '>'  ->pushMode(STYLE)
+    : '<style' .*? '>'  ->pushMode(STYLE)
     ;
+
+HREF_OPEN
+     : '<a href'.*? '>'  ->pushMode(HREF)
+     ;
 
 TAG_OPEN
     : '<' -> pushMode(TAG)
@@ -148,4 +152,18 @@ STYLE_BODY
 
 STYLE_SHORT_BODY
     : .*? '</>' -> popMode
+    ;
+
+mode HREF;
+
+HREF_BODY
+    : .*? '</a>' -> popMode
+    ;
+
+HREF_SHORT_BODY
+    : .*? '</>' -> popMode
+    ;
+
+HREF_UNCLOSED
+    : .*? '>' -> popMode
     ;
