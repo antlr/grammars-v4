@@ -50,17 +50,20 @@ SEA_WS
     ;
 
 SCRIPT_OPEN
-    : '<script'.*? '>' ->pushMode(SCRIPT);
+    : '<script'.*? '>' ->pushMode(SCRIPT)
+    ;
 
 STYLE_OPEN
-    : '<style'.*? '>'  ->pushMode(STYLE);
+    : '<style'.*? '>'  ->pushMode(STYLE)
+    ;
 
 TAG_OPEN
     : '<' -> pushMode(TAG)
     ;
             
 HTML_TEXT
-    : ~'<'+;   
+    : ~'<'+
+    ;   
        
 mode TAG;
 

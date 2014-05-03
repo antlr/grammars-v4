@@ -56,13 +56,16 @@ htmlAttribute
     ;
 
 htmlAttributeName
-    : TAG_NAME;
+    : TAG_NAME
+    ;
 
 htmlAttributeValue
-    : TAG_VALUE;
+    : TAG_VALUE
+    ;
 
 htmlTagName
-    : TAG_NAME;
+    : TAG_NAME
+    ;
 
 htmlChardata    
     : HTML_TEXT 
@@ -83,7 +86,8 @@ xhtmlCDATA
     ;
 
 dtd
-    : DTD;
+    : DTD
+    ;
 
 scriptlet
     : SCRIPTLET
