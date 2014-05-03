@@ -11,6 +11,7 @@ Features
 
 Limitations
 
-* Has trouble with inline scripts and styles
+* attributes of styles, scripts, and hrefs are not processed yet
+
 
 
