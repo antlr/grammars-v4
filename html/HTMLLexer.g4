@@ -50,10 +50,10 @@ SEA_WS
     ;
 
 SCRIPT_OPEN
-    : '<script' ->pushMode(SCRIPT);
+    : '<script>' ->pushMode(SCRIPT);
 
 STYLE_OPEN
-    : '<style' ->pushMode(STYLE);
+    : '<style>'  ->pushMode(STYLE);
 
 TAG_OPEN
     : '<' -> pushMode(TAG)
@@ -130,19 +130,19 @@ TAG_NameStartChar
 mode SCRIPT;
 
 SCRIPT_BODY
-    : '>' .*? '</script>' -> popMode
+    : .*? '</script>' -> popMode
     ;
 
 SCRIPT_SHORT_BODY
-    : '>' .*? '</>' -> popMode
+    : .*? '</>' -> popMode
     ;
 
 mode STYLE;
 
 STYLE_BODY
-    : '>' .*? '</style>' -> popMode
+    : .*? '</style>' -> popMode
     ;
 
 STYLE_SHORT_BODY
-    : '>' .*? '</>' -> popMode
+    : .*? '</>' -> popMode
     ;
