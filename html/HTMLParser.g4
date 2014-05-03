@@ -54,6 +54,7 @@ htmlContent
 
 htmlAttribute   
     : htmlAttributeName TAG_EQUALS htmlAttributeValue
+    | htmlAttributeName
     ;
 
 htmlAttributeName
