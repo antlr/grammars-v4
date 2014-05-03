@@ -49,6 +49,12 @@ SEA_WS
     :  (' '|'\t'|'\r'? '\n')+ 
     ;
 
+SCRIPT_OPEN
+    : '<script' ->pushMode(SCRIPT);
+
+STYLE_OPEN
+    : '<style' ->pushMode(STYLE);
+
 TAG_OPEN
     : '<' -> pushMode(TAG)
     ;
@@ -82,8 +88,7 @@ TAG_VALUE
     ;
 
 TAG_NAME      
-    :
-    TAG_NameStartChar TAG_NameChar* 
+    : TAG_NameStartChar TAG_NameChar* 
     ;
 
 TAG_WHITESPACE
@@ -120,4 +125,24 @@ TAG_NameStartChar
     |   '\u3001'..'\uD7FF' 
     |   '\uF900'..'\uFDCF' 
     |   '\uFDF0'..'\uFFFD'
+    ;
+
+mode SCRIPT;
+
+SCRIPT_BODY
+    : '>' .*? '</script>' -> popMode
+    ;
+
+SCRIPT_SHORT_BODY
+    : '>' .*? '</>' -> popMode
+    ;
+
+mode STYLE;
+
+STYLE_BODY
+    : '>' .*? '</style>' -> popMode
+    ;
+
+STYLE_SHORT_BODY
+    : '>' .*? '</>' -> popMode
     ;

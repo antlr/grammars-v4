@@ -43,6 +43,8 @@ htmlElement
     | TAG_OPEN htmlTagName htmlAttribute* TAG_SLASH_CLOSE
     | TAG_OPEN htmlTagName htmlAttribute* TAG_CLOSE
     | scriptlet
+    | script
+    | style
     ;
 
 htmlContent     
@@ -85,4 +87,12 @@ dtd
 
 scriptlet
     : SCRIPTLET
+    ;
+
+script
+    : SCRIPT_OPEN ( SCRIPT_BODY | SCRIPT_SHORT_BODY)
+    ;
+
+style
+    : STYLE_OPEN ( STYLE_BODY | STYLE_SHORT_BODY)
     ;
