@@ -86,6 +86,9 @@ TAG_SLASH
     : '/' 
     ;
 
+//
+// lexing mode for attribute values
+//
 TAG_EQUALS     
     : '=' -> pushMode(ATTVALUE)
     ;
