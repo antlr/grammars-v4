@@ -31,7 +31,7 @@ parser grammar HTMLParser;
 options { tokenVocab=HTMLLexer; }
 
 htmlDocument    
-    : SEA_WS? dtd? htmlElements*
+    : SEA_WS? scriptlet* dtd? htmlElements*
     ;
 
 htmlElements
