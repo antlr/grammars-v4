@@ -179,11 +179,19 @@ HREF_UNCLOSED
 mode ATTVALUE;
 
 ATTVALUE_VALUE     
-    : ('"' ~[<"]* '"'
-    | '\'' ~[<']* '\''
+    : (DOUBLE_QUOTE_STRING
+    | SINGLE_QUOTE_STRING
     | ATTCHAR+
     | '#' HEXCHAR+
     | DECCHAR+ '%'?) -> popMode
+    ;
+
+fragment DOUBLE_QUOTE_STRING
+    : '"' ~[<"]* '"'
+    ;
+
+fragment SINGLE_QUOTE_STRING
+    : '\'' ~[<']* '\''
     ;
 
 fragment ATTCHAR
