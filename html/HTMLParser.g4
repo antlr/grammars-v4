@@ -62,7 +62,7 @@ htmlAttributeName
     ;
 
 htmlAttributeValue
-    : TAG_VALUE
+    : ATTVALUE_VALUE
     ;
 
 htmlTagName

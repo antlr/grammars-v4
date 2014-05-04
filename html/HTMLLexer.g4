@@ -69,6 +69,9 @@ HTML_TEXT
     : ~'<'+
     ;   
        
+//
+// tag declarations
+//
 mode TAG;
 
 TAG_CLOSE      
@@ -84,14 +87,7 @@ TAG_SLASH
     ;
 
 TAG_EQUALS     
-    : '=' 
-    ;
-
-TAG_VALUE     
-    : '"' ~[<"]* '"'
-    | '\'' ~[<']* '\''
-    | '#' [0-9a-fA-F]+
-    | [0-9]+ '%'?
+    : '=' -> pushMode(ATTVALUE)
     ;
 
 TAG_NAME      
@@ -134,6 +130,9 @@ TAG_NameStartChar
     |   '\uFDF0'..'\uFFFD'
     ;
 
+//
+// <scripts>
+//
 mode SCRIPT;
 
 SCRIPT_BODY
@@ -144,6 +143,9 @@ SCRIPT_SHORT_BODY
     : .*? '</>' -> popMode
     ;
 
+//
+// <styles>
+//
 mode STYLE;
 
 STYLE_BODY
@@ -154,6 +156,9 @@ STYLE_SHORT_BODY
     : .*? '</>' -> popMode
     ;
 
+//
+// hrefs
+//
 mode HREF;
 
 HREF_BODY
@@ -166,4 +171,21 @@ HREF_SHORT_BODY
 
 HREF_UNCLOSED
     : .*? '>' -> popMode
+    ;
+
+//
+// attribute values
+//
+mode ATTVALUE;
+
+ATTVALUE_VALUE     
+    : ('"' ~[<"]* '"'
+    | '\'' ~[<']* '\''
+    | ATTCHAR+
+    | '#' [0-9a-fA-F]+
+    | [0-9]+ '%'?) -> popMode
+    ;
+
+fragment ATTCHAR
+    : [,0-9a-zA-Z]
     ;
