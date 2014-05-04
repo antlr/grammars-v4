@@ -181,9 +181,21 @@ mode ATTVALUE;
 ATTVALUE_VALUE     
     : (DOUBLE_QUOTE_STRING
     | SINGLE_QUOTE_STRING
-    | ATTCHAR+
-    | '#' HEXCHAR+
-    | DECCHAR+ '%'?) -> popMode
+    | ATTCHARS
+    | HEXCHARS
+    | DECCHARS) -> popMode
+    ;
+
+fragment ATTCHARS
+    : [,0-9a-zA-Z]+
+    ;
+
+fragment HEXCHARS
+    : '#' [0-9a-fA-F]+
+    ;
+
+fragment DECCHARS
+    : [0-9]+ '%'?
     ;
 
 fragment DOUBLE_QUOTE_STRING
@@ -194,14 +206,3 @@ fragment SINGLE_QUOTE_STRING
     : '\'' ~[<']* '\''
     ;
 
-fragment ATTCHAR
-    : [,0-9a-zA-Z]
-    ;
-
-fragment HEXCHAR
-    : [0-9a-fA-F]
-    ;
-
-fragment DECCHAR
-    : [0-9]
-    ;
