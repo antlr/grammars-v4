@@ -58,7 +58,7 @@ STYLE_OPEN
     ;
 
 HREF_OPEN
-     : '<a href'.*? '>'  ->pushMode(HREF)
+     : '<a href' .*? '>'  ->pushMode(HREF)
      ;
 
 TAG_OPEN
@@ -190,7 +190,7 @@ ATTVALUE_VALUE
     ;
 
 fragment ATTCHARS
-    : [,0-9a-zA-Z]+
+    : [+,0-9a-zA-Z]+
     ;
 
 fragment HEXCHARS
