@@ -182,10 +182,18 @@ ATTVALUE_VALUE
     : ('"' ~[<"]* '"'
     | '\'' ~[<']* '\''
     | ATTCHAR+
-    | '#' [0-9a-fA-F]+
-    | [0-9]+ '%'?) -> popMode
+    | '#' HEXCHAR+
+    | DECCHAR+ '%'?) -> popMode
     ;
 
 fragment ATTCHAR
     : [,0-9a-zA-Z]
+    ;
+
+fragment HEXCHAR
+    : [0-9a-fA-F]
+    ;
+
+fragment DECCHAR
+    : [0-9]
     ;
