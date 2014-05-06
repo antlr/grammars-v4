@@ -57,10 +57,6 @@ STYLE_OPEN
     : '<style' .*? '>'  ->pushMode(STYLE)
     ;
 
-HREF_OPEN
-     : '<a href' .*? '>'  ->pushMode(HREF)
-     ;
-
 TAG_OPEN
     : '<' -> pushMode(TAG)
     ;
@@ -160,23 +156,6 @@ STYLE_SHORT_BODY
     ;
 
 //
-// hrefs
-//
-mode HREF;
-
-HREF_BODY
-    : .*? '</a>' -> popMode
-    ;
-
-HREF_SHORT_BODY
-    : .*? '</>' -> popMode
-    ;
-
-HREF_UNCLOSED
-    : .*? '>' -> popMode
-    ;
-
-//
 // attribute values
 //
 mode ATTVALUE;
@@ -188,13 +167,27 @@ ATTVALUE_VALUE
 ATTRIBUTE
     : DOUBLE_QUOTE_STRING
     | SINGLE_QUOTE_STRING
-    | ATTCHARS
+    | ATTCHARS 
     | HEXCHARS
     | DECCHARS
     ;
 
+fragment ATTCHAR
+    : '-'
+    | '_'
+    | '.'
+    | '/'
+    | '+'
+    | ','
+    | '?'
+    | '='
+    | ':'
+    | '#'
+    | [0-9a-zA-Z]
+    ;
+
 fragment ATTCHARS
-    : [+,0-9a-zA-Z]+
+    : ATTCHAR+ ' '?
     ;
 
 fragment HEXCHARS

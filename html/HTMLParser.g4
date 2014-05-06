@@ -45,7 +45,6 @@ htmlElement
     | scriptlet
     | script
     | style
-    | href
     ;
 
 htmlContent     
@@ -101,8 +100,4 @@ script
 
 style
     : STYLE_OPEN ( STYLE_BODY | STYLE_SHORT_BODY)
-    ;
-
-href
-    : HREF_OPEN ( HREF_BODY | HREF_SHORT_BODY | HREF_UNCLOSED)
     ;
