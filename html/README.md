@@ -4,14 +4,16 @@
 
 A simple grammar for HTML.  
 
+The grammar is on the source tree at /src/main/antlr4/com/khubla/antlr/
+
 Features
 
 * Able to parse most HTML
 * Can handle "<?" and "<%" scriptlets
 
-Limitations
 
-* attributes of styles, scripts, and hrefs are not processed yet
+
+
 
 
 
