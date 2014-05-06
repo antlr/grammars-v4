@@ -23,25 +23,21 @@ public class TestExamples {
    /**
     * find the example files
     */
-   protected List<File> getAllExampleFiles(String dir, List<File> files) throws Exception {
+   protected List<File> getAllExampleFiles(String dir) throws Exception {
+      final List<File> ret = new ArrayList<File>();
       final File file = new File(dir);
       if (file.exists()) {
          final String[] list = file.list();
          for (int i = 0; i < list.length; i++) {
-            {
-               final String fileName = dir + "/" + list[i];
-               final File f2 = new File(fileName);
-               if (f2.isDirectory()) {
-                  getAllExampleFiles(fileName + "/", files);
-               } else {
-                  if (null == files) {
-                     files = new ArrayList<File>();
-                  }
-                  files.add(f2);
-               }
+            final String fileName = dir + "/" + list[i];
+            final File f2 = new File(fileName);
+            if (f2.isDirectory()) {
+               ret.addAll(getAllExampleFiles(fileName));
+            } else {
+               ret.add(f2);
             }
          }
-         return files;
+         return ret;
       } else {
          return null;
       }
@@ -63,7 +59,7 @@ public class TestExamples {
    @Test
    public void testExamples() {
       try {
-         final List<File> exampleFiles = getAllExampleFiles(EXAMPLES, null);
+         final List<File> exampleFiles = getAllExampleFiles(EXAMPLES);
          if (null != exampleFiles) {
             for (final File file : exampleFiles) {
                System.out.println("Parsing example input '" + file.getAbsolutePath() + "'");
