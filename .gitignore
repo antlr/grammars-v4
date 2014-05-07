@@ -7,3 +7,8 @@
 /fasta/.settings/
 
 /fasta/test-output/
+
+/gff3/.settings/
+/gff3/.project
+
+/gff3/.classpath
