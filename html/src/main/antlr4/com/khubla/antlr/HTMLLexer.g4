@@ -32,6 +32,11 @@ HTML_COMMENT
     : '<!--' .*? '-->'
     ;
 
+
+XML_DECLARATION
+    : '<?xml' .*? '>'
+    ;
+
 CDATA       
     : '<![CDATA[' .*? ']]>' 
     ;
