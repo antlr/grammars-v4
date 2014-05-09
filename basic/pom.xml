@@ -10,6 +10,11 @@
 		<version>1.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
+	<properties>
+		<!-- property overridden from the parent b/c 4.2.2 doesn't seem to generate 
+			a parser that compiles -->
+		<antlr.version>4.2.1</antlr.version>
+	</properties>
 	<build>
 		<plugins>
 			<plugin>
