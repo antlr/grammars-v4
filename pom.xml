@@ -7,6 +7,7 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>ANTLR4 grammars</name>
 	<modules>
+		<module>xml</module>
 		<module>basic</module>
 		<module>gff3</module>
 		<module>fasta</module>
