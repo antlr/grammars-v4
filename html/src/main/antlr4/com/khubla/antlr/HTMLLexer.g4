@@ -165,8 +165,9 @@ STYLE_SHORT_BODY
 //
 mode ATTVALUE;
 
+// an attribute value may have spaces b/t the '=' and the value
 ATTVALUE_VALUE
-    : ATTRIBUTE -> popMode
+    : [ ]* ATTRIBUTE -> popMode 
     ;
 
 ATTRIBUTE
