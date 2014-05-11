@@ -80,6 +80,7 @@ htmlMisc
 
 htmlComment
     : HTML_COMMENT
+    | HTML_CONDITIONAL_COMMENT
     ;
 
 xhtmlCDATA

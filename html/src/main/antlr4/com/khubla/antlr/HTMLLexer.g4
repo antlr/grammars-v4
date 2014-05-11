@@ -32,6 +32,9 @@ HTML_COMMENT
     : '<!--' .*? '-->'
     ;
 
+HTML_CONDITIONAL_COMMENT    
+    : '<![' .*? ']>'
+    ;
 
 XML_DECLARATION
     : '<?xml' .*? '>'
