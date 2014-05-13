@@ -24,3 +24,8 @@
 /basic/.classpath
 /.settings/
 /.project
+
+/xml/.settings/
+/xml/.project
+
+/xml/.classpath

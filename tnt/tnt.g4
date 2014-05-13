@@ -26,83 +26,87 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-parser grammar HTMLParser;
+/**
+* <p>http://en.wikipedia.org/wiki/Typographical_Number_Theory</p>
+*/
+grammar tnt;
 
-options { tokenVocab=HTMLLexer; }
-
-htmlDocument    
-    : (scriptlet | SEA_WS)* xml? (scriptlet | SEA_WS)* dtd? (scriptlet | SEA_WS)* htmlElements*
+equation
+    : expression '=' expression
     ;
 
-htmlElements
-    : htmlMisc* htmlElement htmlMisc*
+atom
+    : number
+    | variable
     ;
 
-htmlElement     
-    : TAG_OPEN htmlTagName htmlAttribute* TAG_CLOSE htmlContent TAG_OPEN TAG_SLASH htmlTagName TAG_CLOSE
-    | TAG_OPEN htmlTagName htmlAttribute* TAG_SLASH_CLOSE
-    | TAG_OPEN htmlTagName htmlAttribute* TAG_CLOSE
-    | scriptlet
-    | script
-    | style
+number
+    : SUCCESSOR* ZERO
     ;
 
-htmlContent     
-    : htmlChardata? ((htmlElement | xhtmlCDATA | htmlComment) htmlChardata?)*
+variable
+    : SUCCESSOR* (A | B | C | D | E) PRIME*
+    ;     
+
+expression
+    : atom
+    | expression '+' expression
+    | expression '*' expression
+    | '(' expression ')'
+    | '~' expression
+    | forevery expression
+    | exists expression  
     ;
 
-htmlAttribute   
-    : htmlAttributeName TAG_EQUALS htmlAttributeValue
-    | htmlAttributeName
+forevery
+    : FOREVERY variable ':'
     ;
 
-htmlAttributeName
-    : TAG_NAME
+exists
+    : EXISTS variable ':'
+    ;
+          
+ZERO
+    : '0'
     ;
 
-htmlAttributeValue
-    : ATTVALUE_VALUE
+SUCCESSOR
+    : 'S'
     ;
 
-htmlTagName
-    : TAG_NAME
+A
+    : 'a'
     ;
 
-htmlChardata    
-    : HTML_TEXT 
-    | SEA_WS
+B
+    : 'b'
     ;
 
-htmlMisc        
-    : htmlComment 
-    | SEA_WS
+C
+    : 'c'
     ;
 
-htmlComment
-    : HTML_COMMENT
-    | HTML_CONDITIONAL_COMMENT
+D
+    : 'd'
     ;
 
-xhtmlCDATA
-    : CDATA
+E
+    : 'e'
     ;
 
-dtd
-    : DTD
+PRIME
+    : '\''
     ;
 
-xml
-    : XML_DECLARATION
+FOREVERY
+    : 'A'
     ;
 
-scriptlet
-    : SCRIPTLET
+EXISTS
+    : 'E'
     ;
 
-script
-    : SCRIPT_OPEN ( SCRIPT_BODY | SCRIPT_SHORT_BODY)
+WS
+    : [ \r\t\n]->skip
     ;
 
-style
-    : STYLE_OPEN ( STYLE_BODY | STYLE_SHORT_BODY)
-    ;
