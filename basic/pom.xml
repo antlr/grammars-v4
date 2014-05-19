@@ -22,6 +22,7 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
+					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>jvmBasic.g4</grammars>
 				</configuration>
 				<executions>
@@ -40,7 +41,7 @@
 					<showTree>true</showTree>
 					<entryPoint>prog</entryPoint>
 					<grammarName>jvmBasic</grammarName>
-					<packageName>com.khubla.antlr</packageName>
+					<packageName></packageName>
 					<exampleFiles>src/test/resources/examples/</exampleFiles>
 				</configuration>
 				<executions>

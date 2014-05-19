@@ -17,6 +17,7 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
+					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>tnt.g4</grammars>
 				</configuration>
 				<executions>
@@ -35,7 +36,7 @@
 					<showTree>true</showTree>
 					<entryPoint>equation</entryPoint>
 					<grammarName>tnt</grammarName>
-					<packageName>com.khubla.tnt</packageName>
+					<packageName></packageName>
 					<exampleFiles>src/test/resources/examples/</exampleFiles>
 				</configuration>
 				<executions>

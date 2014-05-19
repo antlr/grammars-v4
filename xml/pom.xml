@@ -17,6 +17,7 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
+					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>XMLParser.g4</grammars>
 				</configuration>
 				<executions>
@@ -35,7 +36,7 @@
 					<showTree>true</showTree>
 					<entryPoint>document</entryPoint>
 					<grammarName>XML</grammarName>
-					<packageName>org.antlr</packageName>
+					<packageName></packageName>
 					<exampleFiles>src/test/resources/examples/</exampleFiles>
 				</configuration>
 				<executions>
