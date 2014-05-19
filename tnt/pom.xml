@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>xml</artifactId>
+	<artifactId>tnt</artifactId>
 	<packaging>jar</packaging>
-	<name>ANTLR XML grammar</name>
+	<name>khubla.com TNT grammar</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -17,7 +17,7 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
-					<grammars>XMLParser.g4</grammars>
+					<grammars>tnt.g4</grammars>
 				</configuration>
 				<executions>
 					<execution>
@@ -32,9 +32,9 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
 					<verbose>false</verbose>
-					<entryPoint>document</entryPoint>
-					<grammarName>XML</grammarName>
-					<packageName>org.antlr</packageName>
+					<entryPoint>equation</entryPoint>
+					<grammarName>tnt</grammarName>
+					<packageName>com.khubla.tnt</packageName>
 					<exampleFiles>src/test/resources/examples/</exampleFiles>
 				</configuration>
 				<executions>
