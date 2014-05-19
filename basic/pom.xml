@@ -32,6 +32,24 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4test-maven-plugin</artifactId>
+				<configuration>
+					<verbose>false</verbose>
+					<entryPoint>prog</entryPoint>
+					<grammarName>jvmBasic</grammarName>
+					<packageName>com.khubla.antlr</packageName>
+					<exampleFiles>src/test/resources/examples/</exampleFiles>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>
