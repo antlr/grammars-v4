@@ -34,7 +34,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>true</showTree>
-					<entryPoint>document</entryPoint>
+					<entryPoint>markup</entryPoint>
 					<grammarName>creole</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
