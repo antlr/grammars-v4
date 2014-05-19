@@ -42,7 +42,7 @@
 					<entryPoint>prog</entryPoint>
 					<grammarName>jvmBasic</grammarName>
 					<packageName></packageName>
-					<exampleFiles>src/test/resources/examples/</exampleFiles>
+					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>

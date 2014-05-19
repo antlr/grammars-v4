@@ -37,7 +37,7 @@
 					<entryPoint>equation</entryPoint>
 					<grammarName>tnt</grammarName>
 					<packageName></packageName>
-					<exampleFiles>src/test/resources/examples/</exampleFiles>
+					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>

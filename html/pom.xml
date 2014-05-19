@@ -38,7 +38,7 @@
 					<entryPoint>htmlDocument</entryPoint>
 					<grammarName>HTML</grammarName>
 					<packageName></packageName>
-					<exampleFiles>src/test/resources/examples/</exampleFiles>
+					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>
