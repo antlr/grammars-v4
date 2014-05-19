@@ -31,6 +31,7 @@
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
+					<enabled>false</enabled>
 					<verbose>false</verbose>
 					<showTree>true</showTree>
 					<entryPoint>htmlDocument</entryPoint>
