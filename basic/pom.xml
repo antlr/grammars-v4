@@ -37,6 +37,7 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
 					<verbose>false</verbose>
+					<showTree>true</showTree>
 					<entryPoint>prog</entryPoint>
 					<grammarName>jvmBasic</grammarName>
 					<packageName>com.khubla.antlr</packageName>

@@ -32,6 +32,7 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
 					<verbose>false</verbose>
+					<showTree>true</showTree>
 					<entryPoint>document</entryPoint>
 					<grammarName>XML</grammarName>
 					<packageName>org.antlr</packageName>
