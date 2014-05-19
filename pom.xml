@@ -7,6 +7,7 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>ANTLR4 grammars</name>
 	<modules>
+		<module>creole</module>
 		<module>csv</module>
 		<module>tnt</module>
 		<module>json</module>
