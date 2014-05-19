@@ -30,13 +30,9 @@
 * examples here: http://svn.ez.no/svn/ezcomponents/trunk/Document/tests/files/wiki/creole/
 */
 grammar creole;
-
-document
-    : markup*
-    ;
    
 markup
-    : bold
+    : (bold
     | italics
     | href
     | title
@@ -45,7 +41,7 @@ markup
     | listitem
     | image
     | table
-    | nowiki
+    | nowiki)+
     ;
     
 text
@@ -57,15 +53,16 @@ linebreak
     ;
 
 bold
-    : BULLET BULLET markup BULLET BULLET
+    : '**' markup '**'
     ;
 
 italics
-    : SLASH SLASH markup SLASH SLASH
+    : '//' markup '//'
     ;
 
 href
-    : LBRACKET text (BAR text)? RBRACKET
+    : LBRACKET text (BAR markup+)? RBRACKET
+    | LBRACE text BAR markup+ RBRACE // Creole 0.2
     ;
 
 image
@@ -82,64 +79,28 @@ listitem
     ;
 
 tableheader
-    : ('|=' text)+ '|'
+    : ('|=' markup)+ '|' WS*
     ;
 
 tablerow
-    : ('|' text)+ '|'
+    : ('|' markup)+ '|' WS*
     ;
 
 
 table
     : tableheader? tablerow+
     ;
+
 title
-    : title1
-    | title2
-    | title3
-    | title4
-    | title5
-    | title6
-    ;
-
-title1
-    : EQUAL markup EQUAL
-    ;
-
-title2
-    : EQUAL EQUAL markup EQUAL+
-    ;
-
-title3
-    : EQUAL EQUAL EQUAL markup EQUAL+
-    ;
-
-title4
-    : EQUAL EQUAL EQUAL EQUAL markup EQUAL+
-    ;
-
-title5
-    : EQUAL EQUAL EQUAL EQUAL EQUAL markup EQUAL+
-    ;
-
-title6
-    : EQUAL EQUAL EQUAL EQUAL EQUAL EQUAL markup EQUAL+
+    : '='+ markup '='+
     ;
 
 nowiki
     : NOWIKI
     ;
 
-SLASH
-    : '/'
-    ;
-
 BACKSLASH
     : '\\'
-    ;
-
-BULLET
-    : '*'
     ;
 
 HASH
@@ -164,10 +125,6 @@ RBRACE
 
 BAR
     : '|'
-    ;
-
-EQUAL
-    : '='
     ;
 
 TEXT
@@ -200,6 +157,9 @@ fragment SYMBOL
     | '-'
     | '/'
     | '\''
+    | '~'
+    | '"'
+    | '+'
     ;
 
 fragment SPACE
