@@ -39,3 +39,8 @@
 
 /json/.project
 /json/.settings/
+
+/csv/.classpath
+
+/csv/.project
+/csv/.settings/
