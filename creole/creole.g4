@@ -26,7 +26,9 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
+/*
+* examples here: http://svn.ez.no/svn/ezcomponents/trunk/Document/tests/files/wiki/creole/
+*/
 grammar creole;
 
 document
@@ -38,11 +40,20 @@ markup
     | italics
     | href
     | title
+    | line
     | text
+    | listitem
+    | image
+    | table
+    | nowiki
     ;
     
 text
-    : TEXT
+    : TEXT (linebreak TEXT)*
+    ;
+
+linebreak
+    : BACKSLASH BACKSLASH
     ;
 
 bold
@@ -54,9 +65,34 @@ italics
     ;
 
 href
-    : LBRACKET LBRACKET text (BAR text )? RBRACKET RBRACKET
+    : LBRACKET text (BAR text)? RBRACKET
     ;
 
+image
+    : LBRACE text RBRACE
+    ;
+
+line
+    : '----'
+    ;
+
+listitem
+    : ('*'+ markup)
+    | ('#'+ markup)
+    ;
+
+tableheader
+    : ('|=' text)+ '|'
+    ;
+
+tablerow
+    : ('|' text)+ '|'
+    ;
+
+
+table
+    : tableheader? tablerow+
+    ;
 title
     : title1
     | title2
@@ -90,20 +126,40 @@ title6
     : EQUAL EQUAL EQUAL EQUAL EQUAL EQUAL markup EQUAL+
     ;
 
+nowiki
+    : NOWIKI
+    ;
+
 SLASH
     : '/'
+    ;
+
+BACKSLASH
+    : '\\'
     ;
 
 BULLET
     : '*'
     ;
 
+HASH
+    : '#'
+    ;
+
 LBRACKET
-    : '['
+    : '[['
     ;
 
 RBRACKET
-    : ']'
+    : ']]'
+    ;
+
+LBRACE
+    : '{{'
+    ;
+
+RBRACE
+    : '}}'
     ;
 
 BAR
@@ -122,6 +178,10 @@ WS
     : [ \r\n\t]
     ;
 
+NOWIKI
+    : '{{{' .*? '}}}'
+    ;
+
 fragment LETTERS
     : [a-zA-Z]
     ;
@@ -137,6 +197,9 @@ fragment SYMBOL
     | ','
     | '('
     | ')'
+    | '-'
+    | '/'
+    | '\''
     ;
 
 fragment SPACE
