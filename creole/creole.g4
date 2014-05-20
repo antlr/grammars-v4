@@ -48,7 +48,8 @@ markup
     | text
     | listitem
     | image
-    | table
+    | tablerow
+    | tableheader
     | nowiki
     ;
     
@@ -69,8 +70,8 @@ italics
     ;
 
 href
-    : LBRACKET text (BAR markup+)? RBRACKET
-    | LBRACE text BAR markup+ RBRACE // Creole 0.2
+    : LBRACKET text ('|' markup+)? RBRACKET
+    | LBRACE text '|' markup+ RBRACE // Creole 0.2
     ;
 
 image
@@ -92,11 +93,6 @@ tableheader
 
 tablerow
     : ('|' markup)+ '|' WS*
-    ;
-
-
-table
-    : tableheader? tablerow+
     ;
 
 title
@@ -125,10 +121,6 @@ LBRACE
 
 RBRACE
     : '}}'
-    ;
-
-BAR
-    : '|'
     ;
 
 TEXT
