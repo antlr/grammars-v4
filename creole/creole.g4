@@ -92,7 +92,7 @@ tableheader
     ;
 
 tablerow
-    : ('|' markup)+ '|' WS*
+    : ('|' markup+)+ '|' WS*
     ;
 
 title
