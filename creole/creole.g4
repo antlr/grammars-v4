@@ -57,11 +57,11 @@ text
     ;
 
 linebreak
-    : BACKSLASH BACKSLASH
+    : '\\\\'
     ;
 
 bold
-    : '**' markup '**'
+    : '**' markup '**'?
     ;
 
 italics
@@ -87,7 +87,7 @@ listitem
     ;
 
 tableheader
-    : ('|=' markup)+ '|' WS*
+    : ('|=' markup+)+ '|' WS*
     ;
 
 tablerow
@@ -105,10 +105,6 @@ title
 
 nowiki
     : NOWIKI
-    ;
-
-BACKSLASH
-    : '\\'
     ;
 
 HASH
@@ -168,12 +164,9 @@ fragment SYMBOL
     | ')'
     | '-'
     | '/'
+    | '\\'
     | '\''
     | '~'
     | '"'
     | '+'
-    ;
-
-fragment SPACE
-    : ' '
     ;
