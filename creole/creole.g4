@@ -31,17 +31,25 @@
 */
 grammar creole;
    
+document
+    : (line? CR)*
+    ;
+
+line
+    : markup+ 
+    ;
+
 markup
-    : (bold
+    : bold
     | italics
     | href
     | title
-    | line
+    | hline
     | text
     | listitem
     | image
     | table
-    | nowiki)+
+    | nowiki
     ;
     
 text
@@ -69,7 +77,7 @@ image
     : LBRACE text RBRACE
     ;
 
-line
+hline
     : '----'
     ;
 
@@ -92,7 +100,7 @@ table
     ;
 
 title
-    : '='+ markup '='+
+    : '='+ markup '='*
     ;
 
 nowiki
@@ -132,7 +140,11 @@ TEXT
     ;
 
 WS
-    : [ \r\n\t]
+    : [ \t]
+    ;
+
+CR
+    : '\n'
     ;
 
 NOWIKI
