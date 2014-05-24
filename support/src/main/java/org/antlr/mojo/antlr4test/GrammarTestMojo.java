@@ -36,6 +36,7 @@ import java.net.URLClassLoader;
 import java.util.List;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
@@ -240,7 +241,11 @@ public class GrammarTestMojo extends AbstractMojo {
                   System.out.println(tok);
                }
             }
+            /*
+             * get parser
+             */
             final Parser parser = (Parser) parserConstructor.newInstance(tokens);
+            parser.setErrorHandler(new BailErrorStrategy());
             final Method method = parserClass.getMethod(entryPoint);
             final ParserRuleContext parserRuleContext = (ParserRuleContext) method.invoke(parser);
             /*

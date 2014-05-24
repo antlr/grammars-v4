@@ -46,3 +46,8 @@
 /csv/.settings/
 
 /creole/target/
+
+/support/.classpath
+
+/support/.project
+/support/.settings/
