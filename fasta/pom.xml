@@ -17,12 +17,32 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
+					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>fasta.g4</grammars>
 				</configuration>
 				<executions>
 					<execution>
 						<goals>
 							<goal>antlr4</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4test-maven-plugin</artifactId>
+				<configuration>
+					<verbose>false</verbose>
+					<showTree>true</showTree>
+					<entryPoint>sequence</entryPoint>
+					<grammarName>fasta</grammarName>
+					<packageName></packageName>
+					<exampleFiles>examples/</exampleFiles>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test</goal>
 						</goals>
 					</execution>
 				</executions>
