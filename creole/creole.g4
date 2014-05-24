@@ -62,11 +62,11 @@ linebreak
     ;
 
 bold
-    : '**' markup '**'?
+    : '**' markup+ '**'?
     ;
 
 italics
-    : '//' markup '//'
+    : '//' markup+ '//'
     ;
 
 href
@@ -155,7 +155,6 @@ fragment SYMBOL
     | '('
     | ')'
     | '-'
-    | '/'
     | '\\'
     | '\''
     | '~'
