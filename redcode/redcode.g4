@@ -29,11 +29,15 @@
 grammar redcode;
 
 file
-    : instruction+
+    : line+
+    ;
+
+line
+    : (comment | instruction) EOL
     ;
 
 instruction
-    : opcode ('.' modifier)? mmode? number (',' mmode? number)? EOL
+    : opcode ('.' modifier)? mmode? number (',' mmode? number)? comment?
     ;
 
 opcode
@@ -76,6 +80,10 @@ modifier
  number
     : ('+' | '-')? NUMBER
     ;
+ 
+ comment
+     : COMMENT
+     ;
 
 A
     : 'A'
@@ -170,6 +178,10 @@ ORG
 
 NUMBER
     : [0-9]+
+    ;
+
+COMMENT
+    : ';' ~[\r\n]*
     ;
 
 EOL
