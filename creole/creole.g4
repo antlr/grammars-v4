@@ -159,6 +159,7 @@ fragment SYMBOL
     | '~'
     | '"'
     | '+'
+    | '/'
     ;
 
 fragment SPACE
