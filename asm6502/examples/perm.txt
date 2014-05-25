@@ -1,0 +1,33 @@
+SIZE     EQU 4           ; Number of elements to permute
+TEMP     EQU $6          ; (1 byte) Temporary storage
+
+PERMGEN:
+         LDA #0          ; Clear the stack
+         LDX #SIZE-1
+CLRSTK   STA STK,X
+         DEX
+         BPL CLRSTK
+         BMI START       ; Do first permutation
+
+LOOP     LDA STK,X
+         STX TEMP
+         CMP TEMP        ; Swap two elements if stk,x < x
+         BCS NOEXCH      ; else just increment x
+         INC STK,X
+         TAY
+         TXA
+         LSR             ; Check whether x is even or odd
+         BCS XODD        ;  x odd  -> swap x and stk,x
+         LDY #0          ;  x even -> swap x and 0
+XODD     JSR EXCHANGE    ; Swap elements x and y (user-supplied)
+START    JSR PROCESS     ; Use the permutation (user-supplied)
+         LDX #1          ;
+         BNE LOOP        ; (always)
+
+NOEXCH   LDA #0          ; No exchange this pass,
+         STA STK,X       ; so we go up the stack
+         INX
+         CPX #SIZE
+         BCC LOOP        ; Loop until all permutations generated
+         RTS
+STK      DS  SIZE        ; Stack space (ds reserves "size" bytes)
