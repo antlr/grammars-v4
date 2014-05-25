@@ -50,23 +50,63 @@ command
     | home
     | label
     | setxy
+    | make
+    | print
     ;
 
 repeat
     : 'repeat' number '[' command+ ']'
     ;
 
+make
+    : 'make' stringliteral value
+    ;
+
+print
+    : 'print' value
+    ;
+
+name
+    : STRING
+    ;
+
+stringliteral
+    : '"' STRING
+    ;
+
+value
+    : stringliteral
+    | expression
+    | deref 
+    ;
+
+signExpression 
+    : (('+'|'-'))* (number | deref)
+    ;
+
+multiplyingExpression
+    : signExpression (('*' | '/') signExpression)*
+    ;
+
+expression 
+     : multiplyingExpression (('+'|'-') multiplyingExpression)*
+     ;
+
+deref
+    : ':' name
+    ;
+
 fd
-    : ('fd' | 'forward') number;
+    : ('fd' | 'forward') expression;
 
 bk
-    : ('bk' | 'backward') number;
+    : ('bk' | 'backward') expression;
 
 rt
-    : ('rt' | 'right') number;
+    : ('rt' | 'right') expression;
 
 lt
-    : ('lt' | 'left') number;
+    : ('lt' | 'left') expression;
 
 cs
     : ('cs' | 'clearscreen');
@@ -90,12 +130,16 @@ label
     : ('label');
 
 setxy
-    : ('setxy') number number;
+    : ('setxy') expression expression;
 
 number
     : ('+' | '-')? NUMBER
     ;
-      
+     
+STRING
+    : [a-zA-Z] [a-zA-Z0-9_]*
+    ;
+
 NUMBER
     : [0-9]+
     ;
