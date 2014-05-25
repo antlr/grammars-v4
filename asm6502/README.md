@@ -8,6 +8,9 @@ You can download appropriate example files at
 
 [http://6502.org/](http://6502.org/)
 
+This grammar uses the syntax from the [LISA](http://en.wikipedia.org/wiki/Lisa_assembler) Assembler
+
+
 
 
 

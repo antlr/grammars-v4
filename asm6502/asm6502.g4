@@ -39,11 +39,20 @@ prog
 line
     : comment 
     | instruction
+    | assemblerinstruction
     | lbl
     ;
    
 instruction
-    : label? opcode (argumentlist)? (comment)?
+    : label? opcode argumentlist? comment?
+    ;
+
+assemblerinstruction
+    : argument? assembleropcode argumentlist? comment?
+    ;
+
+assembleropcode
+    : ASSEMBLER_INSTRUCTION
     ;
 
 lbl
@@ -51,21 +60,24 @@ lbl
     ;
 
 argumentlist
-    : argument (',' argument)?
+    : argument (',' argumentlist)?
     ;
 
 label
     : name
-    | '*'
     ;
 
 argument
-    : prefix? (number | name) (('+' | '-') number)?
+    : prefix? (number | name | string | '*') (('+' | '-') number)?
     | '(' argument ')'
     ;
 
 prefix
     : '#'
+    ;
+
+string
+    : STRING
     ;
 
 name
@@ -82,13 +94,14 @@ comment
       
 opcode
     : OPCODE
-    | ASSEMBLER_INSTRUCTION
     ;
 
 ASSEMBLER_INSTRUCTION
     : 'ORG'
     | 'EQU'
+    | 'ASC'
     | 'DS'
+    | 'DFC'
     | '='
     ;
 
@@ -218,7 +231,7 @@ OPCODE
     ;
       
 NAME
-    : [a-zA-Z] [a-zA-Z0-9]*
+    : [a-zA-Z] [a-zA-Z0-9."]*
     ;
 
 NUMBER
@@ -227,6 +240,10 @@ NUMBER
 
 COMMENT
     : ';' ~[\r\n]*
+    ;
+
+STRING
+    : '"' ~["]* '"'
     ;
 
 EOL
