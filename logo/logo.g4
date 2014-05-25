@@ -62,11 +62,15 @@ cmd
     ;
 
 procedureInvocation
-    : name
+    : name expression*
     ;
 
 procedureDeclaration
-    : 'to' name EOL (line EOL)+ 'end'
+    : 'to' name parameterDeclarations* EOL (line? EOL)+ 'end'
+    ;
+
+parameterDeclarations
+    : ':' name (',' parameterDeclarations)*
     ;
 
 func
