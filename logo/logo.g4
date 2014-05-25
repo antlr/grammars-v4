@@ -59,6 +59,8 @@ cmd
     | make
     | print
     | procedureInvocation
+    | ife
+    | stop
     ;
 
 procedureInvocation
@@ -66,7 +68,7 @@ procedureInvocation
     ;
 
 procedureDeclaration
-    : 'to' name parameterDeclarations* EOL (line? EOL)+ 'end'
+    : 'to' name parameterDeclarations* EOL? (line? EOL)+ 'end'
     ;
 
 parameterDeclarations
@@ -78,7 +80,25 @@ func
     ;
 
 repeat
-    : 'repeat' number '[' cmd+ ']'
+    : 'repeat' number block
+    ;
+
+block
+    : '[' cmd+ ']'
+    ;
+    
+ife
+    : 'if' comparison block
+    ;
+
+comparison
+    : expression comparisonOperator expression
+    ;
+
+comparisonOperator
+    : '<' 
+    | '>' 
+    | '='
     ;
 
 make
@@ -159,6 +179,10 @@ home
     : 'home'
     ;
 
+stop
+    : 'stop'
+    ;
+        
 label
     : 'label'
     ;
