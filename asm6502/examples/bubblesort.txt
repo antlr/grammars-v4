@@ -29,3 +29,4 @@ CHKEND   DEX           ;END OF LIST?
          BIT $32       ;YES. EXCHANGE FLAG STILL OFF?
          BMI SORT8     ;NO. GO THROUGH LIST AGAIN
          RTS           ;YES. LIST IS NOW ORDERED
+         

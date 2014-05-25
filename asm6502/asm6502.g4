@@ -43,7 +43,7 @@ line
     ;
    
 instruction
-    : label? spaces opcode (spaces argumentlist)? (spaces comment)?
+    : label? opcode (argumentlist)? (comment)?
     ;
 
 lbl
@@ -79,9 +79,6 @@ comment
     : COMMENT
     ;
       
-spaces
-    : ' '+
-    ;
 
 opcode
     : OPCODE
@@ -167,4 +164,8 @@ COMMENT
 
 EOL
     : '\r'? '\n'
+    ;
+
+WS
+    : [ \t]->skip
     ;
