@@ -54,6 +54,10 @@ command
     | print
     ;
 
+func
+    : random
+    ;
+
 repeat
     : 'repeat' number '[' command+ ']'
     ;
@@ -81,7 +85,7 @@ value
     ;
 
 signExpression 
-    : (('+'|'-'))* (number | deref)
+    : (('+'|'-'))* (number | deref | func)
     ;
 
 multiplyingExpression
@@ -97,40 +101,56 @@ deref
     ;
 
 fd
-    : ('fd' | 'forward') expression;
+    : ('fd' | 'forward') expression
+    ;
 
 bk
-    : ('bk' | 'backward') expression;
+    : ('bk' | 'backward') expression
+    ;
 
 rt
-    : ('rt' | 'right') expression;
+    : ('rt' | 'right') expression
+    ;
 
 lt
-    : ('lt' | 'left') expression;
+    : ('lt' | 'left') expression
+    ;
 
 cs
-    : ('cs' | 'clearscreen');
+    : 'cs' | 'clearscreen'
+    ;
 
 pu
-    : ('pu' | 'penup');
+    : 'pu' | 'penup'
+    ;
 
 pd
-    : ('pd' | 'pendown');
+    : 'pd' | 'pendown'
+    ;
 
 ht
-    : ('ht' | 'hideturtle');
+    : 'ht' | 'hideturtle'
+    ;
 
 st
-    : ('st' | 'showturtle');
+    : 'st' | 'showturtle'
+    ;
 
 home
-    : ('home');
+    : 'home'
+    ;
 
 label
-    : ('label');
+    : 'label'
+    ;
 
 setxy
-    : ('setxy') expression expression;
+    : 'setxy' expression expression
+    ;
+
+random
+    : 'random' expression
+    ;
 
 number
     : ('+' | '-')? NUMBER
