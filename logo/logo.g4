@@ -33,10 +33,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar logo;
 
 prog
-    :  command+
+    : (line? EOL)+
     ;
 
-command
+line
+    : cmd+ comment?
+    | comment
+    | procedureDeclaration
+    ;
+     
+cmd
     : repeat
     | fd
     | bk
@@ -52,7 +58,6 @@ command
     | setxy
     | make
     | print
-    | procedureDeclaration
     | procedureInvocation
     ;
 
@@ -61,7 +66,7 @@ procedureInvocation
     ;
 
 procedureDeclaration
-    : 'to' name command+ 'end'
+    : 'to' name EOL (line EOL)+ 'end'
     ;
 
 func
@@ -69,7 +74,7 @@ func
     ;
 
 repeat
-    : 'repeat' number '[' command+ ']'
+    : 'repeat' number '[' cmd+ ']'
     ;
 
 make
@@ -165,6 +170,10 @@ random
 number
     : NUMBER
     ;
+
+comment
+    : COMMENT
+    ;
      
 STRING
     : [a-zA-Z] [a-zA-Z0-9_]*
@@ -172,6 +181,14 @@ STRING
 
 NUMBER
     : [0-9]+
+    ;
+
+COMMENT
+    : ';' ~[\r\n]*
+    ;
+
+EOL
+    : '\r'? '\n'
     ;
 
 WS
