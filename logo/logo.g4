@@ -153,7 +153,7 @@ random
     ;
 
 number
-    : ('+' | '-')? NUMBER
+    : NUMBER
     ;
      
 STRING
