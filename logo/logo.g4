@@ -52,6 +52,16 @@ command
     | setxy
     | make
     | print
+    | procedureDeclaration
+    | procedureInvocation
+    ;
+
+procedureInvocation
+    : name
+    ;
+
+procedureDeclaration
+    : 'to' name command+ 'end'
     ;
 
 func
