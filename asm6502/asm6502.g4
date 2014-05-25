@@ -56,6 +56,7 @@ argumentlist
 
 label
     : name
+    | '*'
     ;
 
 argument
@@ -79,7 +80,6 @@ comment
     : COMMENT
     ;
       
-
 opcode
     : OPCODE
     | ASSEMBLER_INSTRUCTION
