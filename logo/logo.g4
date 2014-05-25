@@ -61,6 +61,7 @@ cmd
     | procedureInvocation
     | ife
     | stop
+    | fore
     ;
 
 procedureInvocation
@@ -193,6 +194,10 @@ setxy
 
 random
     : 'random' expression
+    ;
+
+fore
+    : 'for' '[' name expression expression expression ']' block
     ;
 
 number
