@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>fasta</artifactId>
+	<artifactId>asm6502</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com fasta grammar</name>
+	<name>khubla.com 6502 ASM grammar</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -34,8 +34,8 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>true</showTree>
-					<entryPoint>sequence</entryPoint>
-					<grammarName>fasta</grammarName>
+					<entryPoint>prog</entryPoint>
+					<grammarName>asm6502</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

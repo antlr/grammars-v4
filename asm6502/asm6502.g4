@@ -89,6 +89,7 @@ ASSEMBLER_INSTRUCTION
     : 'ORG'
     | 'EQU'
     | 'DS'
+    | '='
     ;
 
 OPCODE  
