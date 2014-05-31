@@ -125,5 +125,3 @@ Mobile: abc
 === Creole 1.0 ===
  
 If interwiki links are setup in your wiki, this links to the WikiCreole page about Creole 1.0 test cases: [[WikiCreole:Creole1.0TestCases]].
-
- 
