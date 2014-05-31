@@ -57,3 +57,7 @@
 /logo/target/
 /redcode/target/
 
+
+/pgn/target/
+
+/pgn/.DS_Store
