@@ -2,7 +2,7 @@
  [The "BSD licence"]
  Copyright (c) 2013 Tom Everett
  All rights reserved.
-
+ 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -13,7 +13,7 @@
     documentation and/or other materials provided with the distribution.
  3. The name of the author may not be used to endorse or promote products
     derived from this software without specific prior written permission.
-
+ 
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -25,87 +25,144 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-/**
-* <p>http://en.wikipedia.org/wiki/Typographical_Number_Theory</p>
+ 
+/*
+* examples here: http://svn.ez.no/svn/ezcomponents/trunk/Document/tests/files/wiki/creole/
 */
-grammar tnt;
-
-equation
-    : expression '=' expression
+grammar creole;
+   
+document
+    : (line? CR)*
     ;
-
-atom
-    : number
-    | variable
+ 
+line
+    : markup+ 
     ;
-
-number
-    : SUCCESSOR* ZERO
+ 
+markup
+    : bold
+    | italics
+    | href
+    | title
+    | hline
+    | text
+    | listitem
+    | image
+    | tablerow
+    | tableheader
+    | nowiki
     ;
-
-variable
-    : SUCCESSOR* (A | B | C | D | E) PRIME*
-    ;     
-
-expression
-    : atom
-    | expression '+' expression
-    | expression '*' expression
-    | '(' expression ')'
-    | '~' expression
-    | forevery expression
-    | exists expression  
+    
+text
+    : (TEXT | RSLASH)+ ('\\\\' text)*
     ;
-
-forevery
-    : FOREVERY variable ':'
+ 
+bold
+    : '**' markup+ '**'?
     ;
-
-exists
-    : EXISTS variable ':'
+ 
+italics
+    : RSLASH RSLASH markup+ RSLASH RSLASH
     ;
-          
-ZERO
-    : '0'
+ 
+href
+    : LBRACKET text ('|' markup+)? RBRACKET
+    | LBRACE text '|' markup+ RBRACE // Creole 0.2
     ;
-
-SUCCESSOR
-    : 'S'
+ 
+image
+    : LBRACE text RBRACE
     ;
-
-A
-    : 'a'
+ 
+hline
+    : '----'
     ;
-
-B
-    : 'b'
+ 
+listitem
+    : ('*'+ markup)
+    | ('#'+ markup)
     ;
-
-C
-    : 'c'
+ 
+tableheader
+    : ('|=' markup+)+ '|' WS*
     ;
-
-D
-    : 'd'
+ 
+tablerow
+    : ('|' markup+)+ '|' WS*
     ;
-
-E
-    : 'e'
+ 
+title
+    : '='+ markup '='*
     ;
-
-PRIME
-    : '\''
+ 
+nowiki
+    : NOWIKI
     ;
-
-FOREVERY
-    : 'A'
+ 
+HASH
+    : '#'
     ;
-
-EXISTS
-    : 'E'
+ 
+LBRACKET
+    : '[['
     ;
-
+ 
+RBRACKET
+    : ']]'
+    ;
+ 
+LBRACE
+    : '{{'
+    ;
+ 
+RBRACE
+    : '}}'
+    ;
+ 
+TEXT
+    : (LETTERS
+    | DIGITS 
+    | SYMBOL 
+    | WS)+
+    ;
+ 
 WS
-    : [ \r\t\n]->skip
+    : [ \t]
     ;
+ 
+CR
+    : '\n'
+    | EOF
+    ;
+ 
+NOWIKI
+    : '{{{' .*? '}}}'
+    ;
+
+RSLASH
+    : '/'
+    ;
+
+fragment LETTERS
+    : [a-zA-Z]
+    ;
+ 
+fragment DIGITS
+    : [0-9]
+    ;
+ 
+fragment SYMBOL
+    : '.'
+    | ';'
+    | ':'
+    | ','
+    | '('
+    | ')'
+    | '-'
+    | '\\'
+    | '\''
+    | '~'
+    | '"'
+    | '+'
+    ;
+ 
