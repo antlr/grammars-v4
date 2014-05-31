@@ -7,6 +7,7 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>ANTLR4 grammars</name>
 	<modules>
+		<module>creole</module>
 		<module>pgn</module>
 		<module>logo</module>
 		<module>asm6502</module>
