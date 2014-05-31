@@ -129,6 +129,7 @@ WS
  
 CR
     : '\n'
+    | EOF
     ;
  
 NOWIKI
