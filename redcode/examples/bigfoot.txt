@@ -1,0 +1,9 @@
+DAT 8
+DAT 236
+MOV @ -2 , @ -1
+DJZ -3 , 3
+SUB # 1 , -3
+JMP -3
+MOV # 8 , 223
+MOV # 236 , 223
+JMP 223

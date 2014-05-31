@@ -1,0 +1,109 @@
+;*************************************************************;
+;                                                             ;
+; Combination Sort - An improvement on the Bubble Sort        ;
+;                                                             ;
+;*************************************************************;
+;                                                             ;
+; This idea was presented as a BASIC program in a magazine    ;
+; article about 12 years ago. I could not find the orginal    ;
+; article and I do not know who the author was.  I am         ;
+; including the BASIC routine that I had used in some of my   ;
+; BASIC programs.                                             ;
+;                                                             ;
+; As I recall, this sort routine cuts the processing time by  ;
+; reducing the size of the array into smaller chuncks, and    ;
+; moving each elelment more than one position at a time, thus ;
+; reducing the total number of cycles through the loop.  I    ;
+; have not seen a faster, non-recursive sort routine.         ;
+;                                                             ;
+; I have taken the BASIC routine and converted it to 65C02    ;
+; assembly code.  I am using the added opcodes PHX, PHY,      ;
+; PLX, PLY, LDA (zp) & STZ zp to decrease size and increase   ;
+; speed.  By adding an additional zero page temp variable,    ;
+; you can use the basic 6502 opcodes to perform this sort.    ;
+;                                                             ;
+; Here's my copy of the BASIC Routine:                        ;
+;                                                             ;
+; SUB COMBINATION (A())                                       ;
+;   size = A(0)                                               ;
+;   gap = A(0)                                                ;
+;   DO                                                        ;
+;     gap = INT(gap / 1.3)                                    ;
+;     IF gap < 1 THEN gap = 1                                 ;
+;     switch = 0                                              ;
+;     FOR I = 1 TO size - gap                                 ;
+;       J = I + gap                                           ;
+;       IF A(I) > A(J) THEN                                   ;
+;         SWAP A(I), A(J)                                     ;
+;         switch = switch + 1                                 ;
+;       END IF                                                ;
+;     NEXT I                                                  ;
+;   LOOP UNTIL gap = 1 AND switch = 0                         ;
+;                                                             ;
+;  Daryl Rictor - May 2001                                    ;
+;                                                             ;
+;*************************************************************;
+;
+;
+; define variables
+;
+array    =   $30
+flag     =   $32
+gap      =   $33
+;
+;
+; UPPERCASE opcodes are 6502 codes
+; lowercase opcodes are 65C02 codes
+;
+
+SORT8    lda (array)       ; FETCH ELEMENT COUNT
+         STA gap           ; save in gap
+SORTLP   LSR gap           ; divide gap by ~1.3  (gap * 0.7692)
+         LDA gap           ; (not critical to be exact)
+         LSR A             ; this routine calculates it as:
+         CLC               ;
+         ADC gap           ;     gap = gap/2 + gap/4
+         STA gap           ;     (gap * 0.7500)
+         CMP #$00          ;
+         BNE CLFLAG        ; if gap = 0 then set it to 1
+         INC gap           ;
+CLFLAG   stz flag          ; TURN EXCHANGE FLAG OFF (= 0)
+         SEC               ;
+         lda (array)       ; get size
+         SBC gap           ; subract gap to reduce loop size
+         TAX               ; (loop counter & pointer to lower element)
+NXTEL    CLC               ; calc pointer to upper element
+         TXA               ;
+         ADC gap           ;
+         TAY               ; y = x + gap
+         LDA (array),y     ; get upper element
+         PHA               ; save it for swap
+         phy               ; save y for swap
+         phx               ; transfer x reg to y reg
+         ply               ; get pointer to lower element
+         CMP (array),y     ; compare = upper - lower
+         BCS CLRSTK        ; if upper < lower, swap elements
+         LDA (array),y     ; get lower value
+         ply               ; get upper element pointer
+         STA (array),y     ; save lower value in upper element
+         phx               ; transfer x reg to y reg
+         ply               ; get lower element pointer
+         PLA               ; get upper value
+         STA (array),y     ; save upper vaule in lower element
+         LDA #$FF          ; TURN EXCHANGE FLAG ON (= -1)
+         STA flag          ;
+         BNE CHKEND        ; skip over stack maintenance
+CLRSTK   PLA               ; remove upper element & pointer from stack
+         PLA               ;
+CHKEND   DEX               ; END OF LIST?
+         BNE NXTEL         ; NO. FETCH NEXT ELEMENT
+         LDA gap           ;
+         CMP #$01          ;
+         BNE SORTLP        ; repeat loop unitl the gap size = 1
+         BIT $32           ; if gap = 1, IS EXCHANGE FLAG STILL OFF?
+         BMI SORTLP        ; NO. GO THROUGH LIST AGAIN
+         RTS               ; YES. LIST IS NOW ORDERED
+;
+; end SORT8
+;
+;*************************************************************;
