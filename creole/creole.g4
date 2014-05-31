@@ -54,7 +54,7 @@ markup
     ;
     
 text
-    : (TEXT | RSLASH) ('\\\\' text)*
+    : (TEXT | RSLASH)+ ('\\\\' text)*
     ;
  
 bold
@@ -120,7 +120,10 @@ RBRACE
     ;
  
 TEXT
-    : (LETTERS | DIGITS | SYMBOL | WS)+
+    : (LETTERS
+    | DIGITS 
+    | SYMBOL 
+    | WS)+
     ;
  
 WS
