@@ -47,9 +47,13 @@
 
 /creole/target/
 
+
 /support/.classpath
 
 /support/.project
 /support/.settings/
 
 /asm6502/target/
+/logo/target/
+/redcode/target/
+
