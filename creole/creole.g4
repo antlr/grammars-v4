@@ -66,7 +66,7 @@ bold
     ;
  
 italics
-    : '//' markup+ '//'
+    : ITALIC markup+ ITALIC
     ;
  
 href
@@ -138,6 +138,10 @@ CR
 NOWIKI
     : '{{{' .*? '}}}'
     ;
+
+ITALIC
+    : '//'
+    ;
  
 fragment LETTERS
     : [a-zA-Z]
@@ -157,6 +161,7 @@ fragment SYMBOL
     | '-'
     | '\\'
     | '\''
+    | '/'
     | '~'
     | '"'
     | '+'
