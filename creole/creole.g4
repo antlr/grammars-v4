@@ -54,11 +54,7 @@ markup
     ;
     
 text
-    : TEXT (linebreak TEXT)*
-    ;
- 
-linebreak
-    : '\\\\'
+    : (TEXT | RSLASH) ('\\\\' text)*
     ;
  
 bold
@@ -66,7 +62,7 @@ bold
     ;
  
 italics
-    : ITALIC markup+ ITALIC
+    : RSLASH RSLASH markup+ RSLASH RSLASH
     ;
  
 href
@@ -139,10 +135,10 @@ NOWIKI
     : '{{{' .*? '}}}'
     ;
 
-ITALIC
-    : '//'
+RSLASH
+    : '/'
     ;
- 
+
 fragment LETTERS
     : [a-zA-Z]
     ;
@@ -161,7 +157,6 @@ fragment SYMBOL
     | '-'
     | '\\'
     | '\''
-    | '/'
     | '~'
     | '"'
     | '+'
