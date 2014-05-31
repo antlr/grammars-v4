@@ -29,3 +29,25 @@
 /xml/.project
 
 /xml/.classpath
+
+/tnt/.project
+/tnt/.settings/
+
+/tnt/.classpath
+
+/json/.classpath
+
+/json/.project
+/json/.settings/
+
+/csv/.classpath
+
+/csv/.project
+/csv/.settings/
+
+/creole/target/
+
+/support/.classpath
+
+/support/.project
+/support/.settings/
