@@ -1,0 +1,5 @@
+ <vardecl>     ::= var <vardecllist> ;
+  <vardecllist> ::= <varandtype> { ; <varandtype> }
+  <varandtype>  ::= <ident> { , <ident> } : <typespec>
+  <ident>       ::= <letter> { <idchar> }
+  <idchar>      ::= <letter>  |  <digit>  |  _

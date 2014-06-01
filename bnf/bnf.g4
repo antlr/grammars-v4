@@ -33,7 +33,7 @@ rulelist
 ;
 
 rule_
-    : (lhs '::=' rhs)? EOL
+    : lhs '::=' rhs
     ;
 
 lhs
@@ -110,9 +110,6 @@ fragment SYMBOL
     ;
 
 WS
-    : [ \t] -> skip
+    : [ \r\n\t] -> skip
     ;
 
-EOL
-    : '\r'? '\n'
-    ;
