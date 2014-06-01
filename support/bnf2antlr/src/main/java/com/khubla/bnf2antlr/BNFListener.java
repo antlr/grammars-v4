@@ -42,32 +42,7 @@ public class BNFListener implements bnfListener {
    }
 
    @Override
-   public void visitTerminal(TerminalNode node) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void visitErrorNode(ErrorNode node) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterEveryRule(ParserRuleContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitEveryRule(ParserRuleContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterId(IdContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitId(IdContext ctx) {
+   public void enterAlternative(AlternativeContext ctx) {
       // TODO Auto-generated method stub
    }
 
@@ -77,87 +52,12 @@ public class BNFListener implements bnfListener {
    }
 
    @Override
-   public void exitElement(ElementContext ctx) {
+   public void enterEveryRule(ParserRuleContext ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void enterText(TextContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitText(TextContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterOptional(OptionalContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitOptional(OptionalContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterAlternative(AlternativeContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitAlternative(AlternativeContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterRhs(RhsContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitRhs(RhsContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterRule_(Rule_Context ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitRule_(Rule_Context ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterRulelist(RulelistContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitRulelist(RulelistContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterOneormore(OneormoreContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitOneormore(OneormoreContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterZeroormore(ZeroormoreContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitZeroormore(ZeroormoreContext ctx) {
+   public void enterId(IdContext ctx) {
       // TODO Auto-generated method stub
    }
 
@@ -167,7 +67,107 @@ public class BNFListener implements bnfListener {
    }
 
    @Override
+   public void enterOneormore(OneormoreContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterOptional(OptionalContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterRhs(RhsContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterRule_(Rule_Context ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterRulelist(RulelistContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterText(TextContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterZeroormore(ZeroormoreContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitAlternative(AlternativeContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitElement(ElementContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitEveryRule(ParserRuleContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitId(IdContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
    public void exitLhs(LhsContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitOneormore(OneormoreContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitOptional(OptionalContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitRhs(RhsContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitRule_(Rule_Context ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitRulelist(RulelistContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitText(TextContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitZeroormore(ZeroormoreContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void visitErrorNode(ErrorNode node) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void visitTerminal(TerminalNode node) {
       // TODO Auto-generated method stub
    }
 }
