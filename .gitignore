@@ -72,4 +72,11 @@
 /support/antlr4test-maven-plugin/target/
 
 /support/bnf2antlr/target/
+<<<<<<< a981dd4f936ef35bf7e9e7f2c9ae52bd46cbeac6
 >>>>>>> start of bnf2antlr
+=======
+
+/support/bnf2antlr/.settings/
+/support/bnf2antlr/.project
+/support/bnf2antlr/.classpath
+>>>>>>> closer

@@ -30,19 +30,6 @@ public class AbnfBaseListener implements AbnfListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOneOrMore(@NotNull AbnfParser.OneOrMoreContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitOneOrMore(@NotNull AbnfParser.OneOrMoreContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterRepeat(@NotNull AbnfParser.RepeatContext ctx) { }
 	/**
 	 * {@inheritDoc}

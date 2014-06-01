@@ -12,7 +12,7 @@ public class TestConverter {
    @Test
    public void testConverter() {
       try {
-         final InputStream inputStream = TestBNFLexerParser.class.getResourceAsStream("/modelica33.txt");
+         final InputStream inputStream = TestBNFLexerParser.class.getResourceAsStream("/pascal.bnf");
          BNFConverter bnfConverter = new BNFConverter();
          bnfConverter.convert(inputStream, System.out);
       } catch (final Exception e) {

@@ -20,17 +20,6 @@ public interface AbnfListener extends ParseTreeListener {
 	void exitElement(@NotNull AbnfParser.ElementContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link AbnfParser#oneOrMore}.
-	 * @param ctx the parse tree
-	 */
-	void enterOneOrMore(@NotNull AbnfParser.OneOrMoreContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link AbnfParser#oneOrMore}.
-	 * @param ctx the parse tree
-	 */
-	void exitOneOrMore(@NotNull AbnfParser.OneOrMoreContext ctx);
-
-	/**
 	 * Enter a parse tree produced by {@link AbnfParser#repeat}.
 	 * @param ctx the parse tree
 	 */
