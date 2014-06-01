@@ -2,9 +2,10 @@ package com.khubla.bnf2antlr;
 
 import java.io.InputStream;
 
-import org.antlr.abnf.AbnfParser.RulelistContext;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import com.khubla.bnf.bnfParser.RulelistContext;
 
 /**
  * @author tom

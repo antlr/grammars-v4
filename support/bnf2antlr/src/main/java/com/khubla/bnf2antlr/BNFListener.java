@@ -4,25 +4,27 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Stack;
 
-import org.antlr.abnf.AbnfListener;
-import org.antlr.abnf.AbnfParser.AlternationContext;
-import org.antlr.abnf.AbnfParser.ConcatenationContext;
-import org.antlr.abnf.AbnfParser.ElementContext;
-import org.antlr.abnf.AbnfParser.ElementsContext;
-import org.antlr.abnf.AbnfParser.GroupContext;
-import org.antlr.abnf.AbnfParser.OptionContext;
-import org.antlr.abnf.AbnfParser.RepeatContext;
-import org.antlr.abnf.AbnfParser.RepetitionContext;
-import org.antlr.abnf.AbnfParser.Rule_Context;
-import org.antlr.abnf.AbnfParser.RulelistContext;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import com.khubla.bnf.bnfListener;
+import com.khubla.bnf.bnfParser.AlternativeContext;
+import com.khubla.bnf.bnfParser.ElementContext;
+import com.khubla.bnf.bnfParser.IdContext;
+import com.khubla.bnf.bnfParser.LhsContext;
+import com.khubla.bnf.bnfParser.OneormoreContext;
+import com.khubla.bnf.bnfParser.OptionalContext;
+import com.khubla.bnf.bnfParser.RhsContext;
+import com.khubla.bnf.bnfParser.Rule_Context;
+import com.khubla.bnf.bnfParser.RulelistContext;
+import com.khubla.bnf.bnfParser.TextContext;
+import com.khubla.bnf.bnfParser.ZeroormoreContext;
+
 /**
  * @author tom
  */
-public class BNFListener implements AbnfListener {
+public class BNFListener implements bnfListener {
    /**
     * output
     */
@@ -40,119 +42,132 @@ public class BNFListener implements AbnfListener {
    }
 
    @Override
-   public void enterAlternation(AlternationContext ctx) {
-      //
-   }
-
-   @Override
-   public void enterConcatenation(ConcatenationContext ctx) {
-      //
-   }
-
-   @Override
-   public void enterElement(ElementContext ctx) {
-      //
-   }
-
-   @Override
-   public void enterElements(ElementsContext ctx) {
-      //
-   }
-
-   @Override
-   public void enterEveryRule(ParserRuleContext ctx) {
-      //
-   }
-
-   @Override
-   public void enterGroup(GroupContext ctx) {
-      //
-   }
-
-   @Override
-   public void enterOption(OptionContext ctx) {
-      //
-   }
-
-   @Override
-   public void enterRepeat(RepeatContext ctx) {
-      //
-   }
-
-   @Override
-   public void enterRepetition(RepetitionContext ctx) {
-      //
-   }
-
-   @Override
-   public void enterRule_(Rule_Context ctx) {
-      antlrPrintWriter.println(ctx.getText());
-   }
-
-   @Override
-   public void enterRulelist(RulelistContext ctx) {
-   }
-
-   @Override
-   public void exitAlternation(AlternationContext ctx) {
-      System.out.println(ctx.getText());
-   }
-
-   @Override
-   public void exitConcatenation(ConcatenationContext ctx) {
-      //
-   }
-
-   @Override
-   public void exitElement(ElementContext ctx) {
-      parseStack.push(ctx.getText());
-   }
-
-   @Override
-   public void exitElements(ElementsContext ctx) {
-      System.out.println(ctx.getText());
-   }
-
-   @Override
-   public void exitEveryRule(ParserRuleContext ctx) {
-   }
-
-   @Override
-   public void exitGroup(GroupContext ctx) {
-      System.out.println(ctx.getText());
-   }
-
-   @Override
-   public void exitOption(OptionContext ctx) {
-      final String optionalElement = parseStack.pop();
-      parseStack.push(optionalElement + "?");
-   }
-
-   @Override
-   public void exitRepeat(RepeatContext ctx) {
-      System.out.println(ctx.getText());
-   }
-
-   @Override
-   public void exitRepetition(RepetitionContext ctx) {
-      // nada
-   }
-
-   @Override
-   public void exitRule_(Rule_Context ctx) {
-      System.out.println(ctx.getText());
-   }
-
-   @Override
-   public void exitRulelist(RulelistContext ctx) {
-      System.out.println(ctx.getText());
+   public void visitTerminal(TerminalNode node) {
+      // TODO Auto-generated method stub
    }
 
    @Override
    public void visitErrorNode(ErrorNode node) {
+      // TODO Auto-generated method stub
    }
 
    @Override
-   public void visitTerminal(TerminalNode node) {
+   public void enterEveryRule(ParserRuleContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitEveryRule(ParserRuleContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterId(IdContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitId(IdContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterElement(ElementContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitElement(ElementContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterText(TextContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitText(TextContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterOptional(OptionalContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitOptional(OptionalContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterAlternative(AlternativeContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitAlternative(AlternativeContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterRhs(RhsContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitRhs(RhsContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterRule_(Rule_Context ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitRule_(Rule_Context ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterRulelist(RulelistContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitRulelist(RulelistContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterOneormore(OneormoreContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitOneormore(OneormoreContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterZeroormore(ZeroormoreContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitZeroormore(ZeroormoreContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterLhs(LhsContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitLhs(LhsContext ctx) {
+      // TODO Auto-generated method stub
    }
 }
