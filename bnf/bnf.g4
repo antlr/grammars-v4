@@ -33,7 +33,7 @@ rulelist
 ;
 
 rule_
-    : lhs '::=' rhs
+    : lhs ASSIGN rhs
     ;
 
 lhs
@@ -49,7 +49,7 @@ element
     ;
 
 alternative
-    : term ( '|' term)*
+    : term ( BAR term)*
     ;
 
 term
@@ -61,15 +61,15 @@ term
     ;
 
 optional
-    : '[' alternative+ ']'
+    : REND alternative+ LEND
     ;
 
 zeroormore
-    : '{' alternative+ '}'
+    : RBRACE alternative+ LBRACE
     ;
 
 oneormore
-    : '(' alternative+ ')'
+    : RPAREN alternative+ LPAREN
     ;
 
 text
@@ -82,6 +82,38 @@ id
 
 ID
     : '<' .*? '>'+
+    ;
+
+ASSIGN
+    : '::='
+    ;
+
+LPAREN
+    : ')'
+    ;
+
+RPAREN
+    : '('
+    ;
+
+LBRACE
+    : '}'
+    ;
+
+RBRACE
+    : '{'
+    ;
+
+LEND
+    : ']'
+    ;
+
+REND
+    : '['
+    ;
+
+BAR
+    : '|'
     ;
 
 TEXT
