@@ -40,19 +40,16 @@ lhs
     : id
     ;
 
-rhs
-    : element+
+
+rhs 
+    : alternative (BAR alternative)*
+    ;
+
+alternative 
+    : element*
     ;
 
 element
-    : alternative
-    ;
-
-alternative
-    : term ( BAR term)*
-    ;
-
-term
     : optional
     | zeroormore
     | oneormore
@@ -61,15 +58,15 @@ term
     ;
 
 optional
-    : REND alternative+ LEND
+    : REND element+ LEND
     ;
 
 zeroormore
-    : RBRACE alternative+ LBRACE
+    : RBRACE element+ LBRACE
     ;
 
 oneormore
-    : RPAREN alternative+ LPAREN
+    : RPAREN element+ LPAREN
     ;
 
 text
