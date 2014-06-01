@@ -7,8 +7,8 @@
   <typeid>       ::= <ident>
 
   <arraydef>     ::= [ packed ] array <lbrack> <rangedef> <rbrack> of <typeid>
-  <lbrack>       ::= [
-  <rbrack>       ::= ]
+  <lbrack>       ::= "["
+  <rbrack>       ::= "]"
 
   <ptrdef>       ::= ^ <typeid>
 
@@ -16,8 +16,8 @@
   <number>       ::= <digit> [ <number> ]
 
   <enumdef>      ::= <lparen> <idlist> <rparen>
-  <lparen>       ::= (
-  <rparen>       ::= )
+  <lparen>       ::= "("
+  <rparen>       ::= ")"
   <idlist>       ::= <ident> { , <ident> }
 
   <recdef>       ::= record <vardecllist> end ;

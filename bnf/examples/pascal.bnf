@@ -28,7 +28,7 @@
 <record type> ::= record <field list> end
 <field list> ::= <fixed part> | <fixed part> ; <variant part> | <variant part>
 <fixed part> ::= <record section> {;<record section>}
-<record section> ::= <field identifier> {, <field identifier>} : <type> | <empty>
+<record section> ::= <field identifier> {, <field identifier> } : <type> | <empty>
 <variant type> ::= case <tag field> <type identifier> of <variant> { ; <variant>}
 <tag field> ::= <field identifier> : | <empty>
 <variant> ::= <case label list> : ( <field list> ) | <empty>
@@ -75,7 +75,7 @@
 <multiplying operator> ::= * | / | div | mod | and
 <factor> ::= <variable> | <unsigned constant> | ( <expression> ) | <function designator> | <set> | not <factor>
 <unsigned constant> ::= <unsigned number> | <string> | < constant identifier> < nil>
-<function designator> ::= <function identifier> | <function identifier ( <actual parameter> {, <actual parameter>} )
+<function designator> ::= <function identifier> | <function identifier> ( <actual parameter> {, <actual parameter>} )
 <function identifier> ::= <identifier>
 <set> ::= [ <element list> ]
 <element list> ::= <element> {, <element> } | <empty>

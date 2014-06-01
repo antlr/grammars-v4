@@ -48,7 +48,7 @@
 <procedure statement> ::= <procedure identifier> <actual parameter part>
 <actual parameter part> ::= <empty> | ( <actual parameter list> )
 <actual parameter list> ::= <actual parameter> | <actual parameter list> <parameter delimiter> <actual parameter>
-<parameter delimiter> ::= , | ) <letter string> : (
+<parameter delimiter> ::= , | ")" <letter string> : "("
 <actual parameter> ::= <string> | <expression> | <array identifier> | <switch identifier> | <procedure identifier>
 <conditional statement> ::= <if statement> | <if statement> else <statement> | <if clause> <for statement> | <label>: <conditional statement>
 <if statement> ::= <if clause> <unconditional statement>
@@ -104,7 +104,7 @@ A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | 
 <logical operator> ::= ≣ | ⊃ | ∨ | ∧ | ¬
 <sequential operator> ::= goto | if | then | else | for | do
 <separator> ::= , | . | 10 | : | ; | := | _ | step | until | while | comment
-<bracket> ::= ( | ) | [ | ] | ` | ' | begin | end
+<bracket> ::= "(" | ")" | "[" | "]" | ` | ' | begin | end
 <declarator> ::= own | boolean | integer | real | array | switch | procedure
 <specificator> ::= string | label | value
 

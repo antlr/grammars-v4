@@ -70,7 +70,8 @@ oneormore
     ;
 
 text
-    : TEXT
+    : TEXT 
+    | STRINGLITERAL
     ;
 
 id
@@ -117,6 +118,13 @@ TEXT
     : (LETTER | DIGIT| SYMBOL)+
     ;
 
+/*
+ * String literals are not part of BNF.  They are used in this grammar for []{}()
+ */
+STRINGLITERAL
+    : '"' .*? '"'
+    ;
+
 fragment LETTER
     : 'a'..'z'
     | 'A'..'Z'
@@ -127,15 +135,15 @@ fragment DIGIT
     ;
 
 fragment SYMBOL
-    : '\u0021'..'\u002f'
+    : '\u0021'..'\u0027'
+    | '\u002a'..'\u002f'
     | '\u003a'..'\u0040'
-    | '\u007b'..'\u007e'
     | '\u005e'..'\u0060'
     | '\u00a1'..'\u00FF'
     | '\u0152'..'\u0192'
     | '\u2013'..'\u2122'
     | '\u2190'..'\u21FF'
-    | '\u2200'..'\u22FF'
+    | '\u2200'..'\u22FF'    
     ;
 
 WS
