@@ -63,3 +63,5 @@
 /pgn/.DS_Store
 
 /support/antlr4test-maven-plugin/target/
+
+/support/bnf2antlr/target/
