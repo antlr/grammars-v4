@@ -10,7 +10,6 @@ import org.antlr.abnf.AbnfParser.ConcatenationContext;
 import org.antlr.abnf.AbnfParser.ElementContext;
 import org.antlr.abnf.AbnfParser.ElementsContext;
 import org.antlr.abnf.AbnfParser.GroupContext;
-import org.antlr.abnf.AbnfParser.OneOrMoreContext;
 import org.antlr.abnf.AbnfParser.OptionContext;
 import org.antlr.abnf.AbnfParser.RepeatContext;
 import org.antlr.abnf.AbnfParser.RepetitionContext;
@@ -37,7 +36,7 @@ public class BNFListener implements AbnfListener {
     * ctor
     */
    public BNFListener(OutputStream antlrOutput) {
-      this.antlrPrintWriter = new PrintWriter(antlrOutput);
+      antlrPrintWriter = new PrintWriter(antlrOutput);
    }
 
    @Override
@@ -71,11 +70,6 @@ public class BNFListener implements AbnfListener {
    }
 
    @Override
-   public void enterOneOrMore(OneOrMoreContext ctx) {
-      //
-   }
-
-   @Override
    public void enterOption(OptionContext ctx) {
       //
    }
@@ -92,7 +86,7 @@ public class BNFListener implements AbnfListener {
 
    @Override
    public void enterRule_(Rule_Context ctx) {
-      this.antlrPrintWriter.println(ctx.getText());
+      antlrPrintWriter.println(ctx.getText());
    }
 
    @Override
@@ -111,7 +105,7 @@ public class BNFListener implements AbnfListener {
 
    @Override
    public void exitElement(ElementContext ctx) {
-      this.parseStack.push(ctx.getText());
+      parseStack.push(ctx.getText());
    }
 
    @Override
@@ -129,14 +123,9 @@ public class BNFListener implements AbnfListener {
    }
 
    @Override
-   public void exitOneOrMore(OneOrMoreContext ctx) {
-      System.out.println(ctx.getText());
-   }
-
-   @Override
    public void exitOption(OptionContext ctx) {
-      String optionalElement = this.parseStack.pop();
-      this.parseStack.push(optionalElement + "?");
+      final String optionalElement = parseStack.pop();
+      parseStack.push(optionalElement + "?");
    }
 
    @Override

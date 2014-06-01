@@ -65,3 +65,7 @@
 /support/antlr4test-maven-plugin/target/
 
 /support/bnf2antlr/target/
+
+/support/bnf2antlr/.settings/
+/support/bnf2antlr/.project
+/support/bnf2antlr/.classpath
