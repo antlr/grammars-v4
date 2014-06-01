@@ -12,8 +12,8 @@ public class TestConverter {
    @Test
    public void testConverter() {
       try {
-         final InputStream inputStream = TestBNFLexerParser.class.getResourceAsStream("/pascal.bnf");
-         BNFConverter bnfConverter = new BNFConverter();
+         final InputStream inputStream = TestBNFLexerParser.class.getResourceAsStream("/examples/pascal.bnf");
+         final BNFConverter bnfConverter = new BNFConverter();
          bnfConverter.convert(inputStream, System.out);
       } catch (final Exception e) {
          e.printStackTrace();
