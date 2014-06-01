@@ -25,9 +25,6 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-/*
-* Based on ABNF grammar by Rainer Schuster
-*/
 
 grammar bnf;
 
@@ -36,7 +33,7 @@ rulelist
 ;
 
 rule_
-    : lhs '::=' rhs
+    : (lhs '::=' rhs)? EOL
     ;
 
 lhs
@@ -48,48 +45,74 @@ rhs
     ;
 
 element
-    : id
-    | atom
-    | optional
-    | zeroormore
-    | oneormore
-    | alternative
-    ;
-
-optional
-    : '[' element ']'
-    ;
-
-zeroormore
-    : '{' element '}'
-    | element '*'
-    ;
-
-oneormore
-     : '(' element ')'
-    | element '+'
+    : alternative
     ;
 
 alternative
-    : element '|' element
+    : term ( '|' term)*
     ;
 
-atom
-    : ATOM
+term
+    : optional
+    | zeroormore
+    | oneormore
+    | text
+    | id  
+    ;
+
+optional
+    : '[' alternative+ ']'
+    ;
+
+zeroormore
+    : '{' alternative+ '}'
+    ;
+
+oneormore
+    : '(' alternative+ ')'
+    ;
+
+text
+    : TEXT
     ;
 
 id
-    : '<' ID '>'
-    ;
-
-ATOM
-    : ('a'..'z'|'A'..'Z' | ';' | ',')+
+    : ID 
     ;
 
 ID
-    : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9')+
+    : '<' .*? '>'+
+    ;
+
+TEXT
+    : (LETTER | DIGIT| SYMBOL)+
+    ;
+
+fragment LETTER
+    : 'a'..'z'
+    | 'A'..'Z'
+    ;
+
+fragment DIGIT
+    : '0'..'9'
+    ;
+
+fragment SYMBOL
+    : '\u0021'..'\u002f' 
+    | '\u003a'..'\u0040' 
+    | '\u007b'..'\u007e' 
+    | '\u005e'..'\u0060' 
+    | '\u00a1'..'\u00FF' 
+    | '\u0152'..'\u0192' 
+    | '\u2013'..'\u2122' 
+    | '\u2190'..'\u21FF' 
+    | '\u2200'..'\u22FF'
     ;
 
 WS
-    : [ \t\r\n] -> skip
+    : [ \t] -> skip
+    ;
+
+EOL
+    : '\r'? '\n'
     ;
