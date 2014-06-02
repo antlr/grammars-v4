@@ -33,20 +33,19 @@ rulelist
 ;
 
 rule_
-    : lhs ASSIGN rhs DOT
+    : rulename ASSIGN rhs DOT?
     ;
 
-lhs
+rulename
     : id
     ;
 
-
-rhs 
-    : alternative (BAR alternative)*
+rhs
+    : alternation+
     ;
 
-alternative 
-    : element*
+alternation
+    : element (BAR element?)*
     ;
 
 element
@@ -58,15 +57,15 @@ element
     ;
 
 optional
-    : REND element+ LEND
+    : REND alternation+ LEND
     ;
 
 zeroormore
-    : RBRACE element+ LBRACE
+    : RBRACE alternation+ LBRACE
     ;
 
 oneormore
-    : RPAREN element+ LPAREN
+    : RPAREN alternation+ LPAREN
     ;
 
 stringliteral
@@ -119,6 +118,7 @@ DOT
 
 STRINGLITERAL
     : '"' .*? '"'
+    | '\'' .*? '\''
     ;
 
 fragment LETTER
@@ -132,6 +132,11 @@ fragment DIGIT
 
 fragment SYMBOL
     : '-'
+    | '_'
+    ;
+
+COMMENT
+    : '(*' .*? '*)' -> channel(HIDDEN)
     ;
 
 WS

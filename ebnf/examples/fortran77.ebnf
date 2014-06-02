@@ -1,0 +1,510 @@
+
+(* FORTRAN 77 Types *) 
+letter = 
+   "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" . 
+digit = 
+   "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9". 
+alphanumeric = 
+   letter | digit . 
+special = 
+   " " | "=" | "+" | "-" | "*" | "/" | "(" | ")" | "." | "," | "$" | "'" | ":" . 
+integer = 
+   ["+" | "-"] digit {digit} . 
+basicReal = 
+   ["+" | "-"] (digit {digit} "." {digit} | "." digit {digit} ) . 
+realExponent = 
+   "E" integer . 
+real = 
+   basicReal [realExponent] | integer realExponent  . 
+doublePrecisionExponent = 
+   "D" integer . 
+doublePrecision = 
+   (basicReal | integer) doublePrecisionExponent . 
+number = 
+   integer | real . 
+complex = 
+   "(" number "," number ")" . 
+logical = 
+   true | false . 
+true = 
+   ".TRUE." . 
+false = 
+   ".FALSE." . 
+char = 
+   letter | 
+   digit | 
+   "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" . (* and others to be specified *) 
+character = 
+   "'" {char} "'" . 
+
+(* FORTRAN 77 Statements *) 
+Assign = 
+   "ASSIGN" label "TO" variable . 
+Backspace = 
+   "BACKSPACE" 
+   { 
+      unitspec | 
+      "(" 
+         [ "UNIT" "=" ] unitspec 
+         [ "," "ERR" "=" errlabel] 
+         [ "," "IOSTAT" "=" iocheck ] 
+      ")" 
+   } . 
+Block  = 
+   "BLOCK DATA" [ blockdataname ] . 
+Call = 
+   "CALL" sub [ "(" [ actuals ] ")" ] . 
+Character = 
+   "CHARACTER" [ "*" chars] vname [ "*" length] [ "(" dim ")" ] 
+   [ "," vname [ "*" length] [ "(" dim ")" ] ]. 
+Close = 
+   "CLOSE" 
+   "(" 
+      [ "UNIT" "=" ] unitspec 
+      [ "," "ERR" "=" errlabel] 
+      [ "," "IOSTAT" "=" iocheck] 
+      [ "," "STATUS" "=" status] 
+   ")" . 
+Common = 
+   "COMMON" [ "/" [cname] "/" ] nlist { [ "," ] "/" [cname] "/" nlist } . 
+Complex = 
+   "COMPLEX" vnam [ "(" dim ")" ] { "," vname [ "(" dim ")" ] } . 
+Continue = 
+   "CONTINUE" . 
+Data = 
+   "DATA" nlist "/" clist "/" {[ "," ] nlist "/" clist "/" } . 
+Dimension = 
+   "DIMENSION" array "(" [lower ":" ] upper { "," [lower ":" ] upper } ")" . 
+Do = 
+   "DO" [label [ "," ] ] dovar "=" start "," stop [ "," inc] . 
+Double = 
+   "DOUBLE PRECISION" vname [ "(" dim ")" ] {"," vname [ "(" dim ")" ] } . 
+End = 
+   "END" . 
+EndFile = 
+   "ENDFILE" 
+   { 
+      unitspec | 
+      "(" 
+         [ "UNIT" "=" ] unitspec 
+         [ "," "ERR" "=" errlabel] 
+         [ "," "IOSTAT" "=" iocheck] 
+      ")" 
+   } . 
+Entry = 
+   "ENTRY" ename [ "(" [formal {"," formal }] ")" ] . 
+Equivalence = 
+   "EQUIVALENCE" "(" nlist")" { "," "(" nlist ")" } . 
+External = 
+   "EXTERNAL" name { "," name } . 
+Format = 
+   "FORMAT" [editlist] . 
+Function = 
+   [type] "FUNCTION" func "(" [formal { "," formal }] ")" . 
+GoTo = 
+   "GOTO" ( label | "(" labels")" [ "," ] n | variable [ [ "," ] "(" labels ")" ] ) . 
+If = 
+   "IF" "(" expression ")" 
+   ( 
+       label1 "," label2 "," label3 | 
+      statement | 
+      "THEN" statementblock1 
+      {"ELSE IF" "(" expression ")" "THEN" statementblock2} 
+      [ "ELSE" statementblock3] 
+      "END IF" 
+   ) . 
+Implicit = 
+   "IMPLICIT" type "(" letters ")" {"," type "(" letters ")" } . 
+Inquire = 
+   "INQUIRE" 
+   "(" 
+      {[ "UNIT" "=" ] unitspec | "FILE" "=" file} 
+      [ "," "ACCESS" "=" access] 
+      [ "," "BLANK" "=" blank] 
+      [ "," "DIRECT" "=" direct] 
+      [ "," "ERR" "=" errlabel] 
+      [ "," "EXIST" "="exist] 
+      [ "," "FORM" "=" form] 
+      [ "," "FORMATTED" "=" formatted] 
+      [ "," "IOSTAT" "=" iocheck] 
+      [ "," "NAME" "=" name] 
+      [ "," "NAMED" "=" named] 
+      [ "," "NEXTREC" "=" nextrec] 
+      [ "," "NUMBER" "=" num] 
+      [ "," "OPENED" "=" opened] 
+      [ "," "RECL" "=" recl] 
+      [ "," "SEQUENTIAL" "=" seq] 
+      [ "," "UNFORMATTED" "=" unformatted] 
+   ")" . 
+Integer = 
+   "INTEGER" vname [ "(" dim ")" ] { "," vname [ "(" dim")" ] } . 
+Intrinstic = 
+   "INTRINSIC" names . 
+Logical = 
+   "LOGICAL" vname [ "(" dim ")" ] {"," vname [ "(" dim ")" ] }. 
+Open = 
+   "OPEN" 
+   "(" 
+      [ "UNIT" "=" ] unitspec 
+      [ "," ACCESS "=" access] 
+      [ "," BLANK "=" blanks] 
+      [ "," ERR "=" errlabel] 
+      [ "," FILE "=" file] 
+      [ "," FORM "=" form] 
+      [ "," IOSTAT "=" iocheck] 
+      [ "," RECL "=" recl] 
+      [ "," STATUS "=" status] 
+   ")" . 
+Parameter = 
+   "PARAMETER" "(" name "=" constexpr {"," name "=" constexpr} ")" . 
+Pause = 
+   "PAUSE" [prompt] . 
+Print = 
+   "PRINT" { "*" "," | formatspec | } [ "," iolist] . 
+Program = 
+   "PROGRAM" program_name . 
+Read = 
+   "READ" 
+   { 
+      formatspec "," | 
+      "(" 
+         [ "UNIT" "=" ] unitspec 
+         [ "," [ "FMT" "=" ] formatspec] 
+         [ "," "END"  "=" endlabel] 
+         [ "," "ERR"  "=" errlabel] 
+         [ "," "IOSTAT"  "=" iocheck] 
+         [ "," "REC"  "=" rec] 
+      ")" 
+   } 
+   iolist . 
+Real = 
+   "REAL" vname [ "(" dim ")" ] { ","  vname [ "(" dim ")" ] } . 
+Return = 
+   "RETURN" [ordinal ] . 
+Rewind = 
+   "REWIND" 
+   { 
+      unitspec | 
+      "(" 
+         [ "UNIT" "=" ] unitspec 
+         [ ","  "ERR" "=" errlabel] 
+         [ ","  "IOSTAT" "=" iocheck] 
+      ")" 
+   } . 
+Save = 
+   "SAVE" [names] . 
+Stop = 
+   "STOP" [message] . 
+Subroutine = 
+   "SUBROUTINE" subr [ "(" [ formal { ","  formal }] ")" ] . 
+Write = 
+   "WRITE" 
+   "(" 
+      [ "UNIT" "=" ] unitspec 
+      [ ","  [ "FMT" "=" ] formatspec] 
+      [ ","  "ERR" "=" errlabel] 
+      [ ","  "IOSTAT" "=" iocheck] 
+      [ ","  "REC" "=" rec] 
+   ")" 
+   iolist . 
+
+Statement = 
+   Assign | 
+   Backspace | 
+   Block  | 
+   Call | 
+   Character | 
+   Close | 
+   Common | 
+   Complex | 
+   Continue | 
+   Data | 
+   Dimension | 
+   Do | 
+   Double | 
+   End | 
+   EndFile | 
+   Entry | 
+   Equivalence | 
+   External | 
+   Format | 
+   Function | 
+   GoTo | 
+   If | 
+   Implicit | 
+   Inquire | 
+   Integer | 
+   Intrinstic | 
+   Logical | 
+   Open | 
+   Parameter | 
+   Pause | 
+   Print | 
+   Program | 
+   Read | 
+   Real | 
+   Return | 
+   Rewind | 
+   Save | 
+   Stop | 
+   Subroutine | 
+   Write  . 
+
+(* FORTRAN 77 Intrinsic Functions *) 
+Abs = 
+   "ABS" "(" gen ")" . 
+Acos = 
+   "ACOS" "(" real ")" . 
+Aimag = 
+   "AIMAG" "(" cmp8 ")" . 
+Aint = 
+   "AINT" "(" real ")" . 
+Alog = 
+   "ALOG" "(" real4 ")" . 
+Alog10 = 
+   "ALOG10" "(" real4 ")" . 
+Amax0 = 
+   "AMAX0" "(" integer "," integer { ","  integer } ")" . 
+Amax1 = 
+   "AMAX1" "(" real4 "," real4 { "," real4 } ")" . 
+Amin0 = 
+   "AMIN0" "(" integer "," integer { "," integer} ")" . 
+Amin1 = 
+   "AMIN1" "(" real4 "," real4 { "," real4 } ")" . 
+Amod = 
+   "AMOD" "(" value "," mod ")" . 
+Anint = 
+   "ANINT" "(" value ")" . 
+Asin = 
+   "ASIN" "(" real ")" . 
+Atan = 
+   "ATAN" "(" real ")" . 
+Atan2 = 
+   "ATAN2" "(" real "," real ")" . 
+Cabs = 
+   "CABS" "(" cmp ")" . 
+Ccos = 
+   "CCOS" "(" cmp8 ")" . 
+Char = 
+   "CHAR" "(" integer ")" . 
+Clog = 
+   "CLOG" "(" cmp8 ")" . 
+Cmplx = 
+   "CMPLX" "(" gen { "," gen } ")" . 
+Conjg = 
+   "CONJG" "(" cx8value ")" . 
+Cos = 
+   "COS" "(" gen ")" . 
+Cosh = 
+   "COSH" "(" real ")" . 
+Csin = 
+   "CSIN" "(" cmp8 ")" . 
+Csqrt = 
+   "CSQRT" "(" cx8value ")" . 
+Dabs = 
+   "DABS" "(" r8value ")" . 
+Dacos = 
+   "DACOS" "(" dbl ")" . 
+Dasin = 
+   "DASIN" "(" dbl ")" . 
+Datan = 
+   "DATAN"  "(" dbl ")" . 
+Datan2 = 
+   "DATAN2" "(" dbl "," dbl ")" . 
+Dble = 
+   "DBLE" "(" real ")" . 
+Dcos = 
+   "DCOS" "(" dbl ")" . 
+Dcosh = 
+   "DCOSH" "(" dbl ")" . 
+Ddim = 
+   "DDIM" "(" dbl "," dbl ")" . 
+Dexp = 
+   "DEXP" "(" dbl ")" . 
+Dim = 
+   "DIM" "(" gen "," gen ")" . 
+Dint = 
+   "DINT" "(" real ")" . 
+Dlog = 
+   "DLOG" "(" dbl ")" . 
+Dlog10 = 
+   "DLOG10" "(" dbl ")" . 
+Dmax1 = 
+   "DMAX1" "(" dbl "," dbl { "," dbl } ")" . 
+Dmin1 = 
+   "DMIN1" "(" dbl "," dbl { "," dbl } ")" . 
+Dmod = 
+   "DMOD" "(" value "," mod ")" . 
+Dnint = 
+   "DNINT" "(" dbl ")" . 
+Dprod = 
+   "DPROD" "(" real4 "," real4 ")" . 
+Dreal = 
+   "DREAL" "(" cxvalue ")" . 
+Dsign = 
+   "DSIGN" "(" dbl "," dbl ")" . 
+Dsin = 
+   "DSIN" "(" dbl ")" . 
+Dsinh = 
+   "DSINH" "(" dbl ")" . 
+Dsqrt = 
+   "DSQRT" "(" rvalue ")" . 
+Dtan = 
+   "DTAN" "(" dbl ")" . 
+Dtanh = 
+   "DTANH" "(" dbl ")" . 
+Exp = 
+   "EXP" "(" gen ")" . 
+Float = 
+   "FLOAT" "(" integer ")" . 
+Iabs = 
+   "IABS" "(" integer ")" . 
+Ichar = 
+   "ICHAR" "(" char ")" . 
+Idim = 
+   "IDIM" "(" integer "," integer ")" . 
+Idint = 
+   "IDINT" "(" dbl ")" . 
+Idnint = 
+   "IDNINT" "(" dbl ")" . 
+Ifix = 
+   "IFIX" "(" real4 ")" . 
+Index = 
+   "INDEX" "(" char "," char ")" . 
+Int = 
+   "INT" "(" gen ")" . 
+Isign = 
+   "ISIGN" "(" integer "," integer ")" . 
+Len = 
+   "LEN" "(" char ")" . 
+Lge = 
+   "LGE" "(" char "," char ")" . 
+Lgt = 
+   "LGT" "(" char "," char ")" . 
+Lle = 
+   "LLE" "(" char "," char ")" . 
+Llt = 
+   "LLT" "(" char "," char ")" . 
+Log = 
+   "LOG" "(" gen ")" . 
+Log10 = 
+   "LOG10" "(" real ")" . 
+Max = 
+   "MAX" "(" gen "," gen { "," gen } ")" . 
+Max0 = 
+   "MAX0" "(" integer "," integer { "," integer } ")" . 
+Max1 = 
+   "MAX1" "(" real "," real { "," real } ")" . 
+Min = 
+   "MIN" "(" gen "," gen { "," gen } ")" . 
+Min0 = 
+   "MIN0" "(" integer "," integer { "," integer } ")" . 
+Min1 = 
+   "MIN1" "(" real "," real { "," real } ")" . 
+Mod = 
+   "MOD" "(" gen "," gen ")" . 
+Nint = 
+   "NINT" "(" real ")" . 
+Real = 
+   "REAL" "(" gen ")" . 
+Sign = 
+   "SIGN" "(" gen "," gen ")" . 
+Sin = 
+   "SIN" "(" gen ")" . 
+Sinh = 
+   "SINH" "(" real ")" . 
+Sngl = 
+   "SNGL" "(" dbl ")" . 
+Sqrt = 
+   "SQRT" "(" gen ")" . 
+Tan = 
+   "TAN" "(" real ")" . 
+Tanh = 
+   "TANH" "(" real ")" . 
+
+Intrinsic =    
+   Abs | 
+   Acos | 
+   Aimag | 
+   Aint | 
+   Alog | 
+   Alog10 | 
+   Amax0 | 
+   Amax1 | 
+   Amin0 | 
+   Amin1 | 
+   Amod | 
+   Anint | 
+   Asin | 
+   Atan | 
+   Atan2 | 
+   Cabs | 
+   Ccos | 
+   Char | 
+   Clog | 
+   Cmplx | 
+   Conjg | 
+   Cos | 
+   Cosh | 
+   Csin | 
+   Csqrt | 
+   Dabs | 
+   Dacos | 
+   Dasin | 
+   Datan | 
+   Datan2 | 
+   Dble | 
+   Dcos | 
+   Dcosh | 
+   Ddim | 
+   Dexp | 
+   Dim | 
+   Dint | 
+   Dlog | 
+   Dlog10 | 
+   Dmax1 | 
+   Dmin1 | 
+   Dmod | 
+   Dnint | 
+   Dprod | 
+   Dreal | 
+   Dsign | 
+   Dsin | 
+   Dsinh | 
+   Dsqrt | 
+   Dtan | 
+   Dtanh | 
+   Exp | 
+   Float | 
+   Iabs | 
+   Ichar | 
+   Idim | 
+   Idint | 
+   Idnint | 
+   Ifix | 
+   Index | 
+   Int | 
+   Isign | 
+   Len | 
+   Lge | 
+   Lgt | 
+   Lle | 
+   Llt | 
+   Log | 
+   Log10 | 
+   Max | 
+   Max0 | 
+   Max1 | 
+   Min | 
+   Min0 | 
+   Min1 | 
+   Mod | 
+   Nint | 
+   Real | 
+   Sign | 
+   Sin | 
+   Sinh | 
+   Sngl | 
+   Sqrt | 
+   Tan | 
+   Tanh . 

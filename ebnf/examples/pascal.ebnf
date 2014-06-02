@@ -22,12 +22,8 @@ variable-declaration-part =
 var variable-declaration ";" { variable-declaration ";" } .
 variable-declaration =
 identifier-list ":" type .
-procedure-and-function-declaration-part =
-{ (procedure-declaration | function-declaration) ";" } .
-procedure-declaration =
-procedure-heading ";" procedure-body |
-procedure-heading ";" directive |
-procedure-identification ";" procedure-body .
+procedure-and-function-declaration-part = { (procedure-declaration | function-declaration) ";" } .
+procedure-declaration = procedure-heading ";" procedure-body | procedure-heading ";" directive | procedure-identification ";" procedure-body .
 procedure-body =
 block .
 function-declaration =
@@ -261,7 +257,7 @@ identifier .
 
 
 variable-list =
-variable { "," variable } : .
+variable { "," variable } ":" .
 identifier-list =
 identifier { "," identifier } .
 expression-list =
