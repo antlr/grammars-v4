@@ -33,7 +33,7 @@ rulelist
 ;
 
 rule_
-    : rulename ASSIGN rhs DOT?
+    : rulename ASSIGN rhs endrule?
     ;
 
 rulename
@@ -45,7 +45,7 @@ rhs
     ;
 
 alternation
-    : element (BAR element?)*
+    : BAR? element (BAR element?)*
     ;
 
 element
@@ -76,12 +76,18 @@ id
     : ID
     ;
 
+endrule
+    : DOT
+    | SEMICOLON
+    ;
+
 ID
     : LETTER (LETTER | DIGIT | SYMBOL)*
     ;
 
 ASSIGN
-    : '='
+    : EQ
+    | COLON
     ;
 
 LPAREN
@@ -114,6 +120,18 @@ BAR
 
 DOT
     : '.'
+    ;
+
+COLON
+    : ':'
+    ;
+
+SEMICOLON
+    : ';'
+    ;
+
+EQ
+    : '='
     ;
 
 STRINGLITERAL
