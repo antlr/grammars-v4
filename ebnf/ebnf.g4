@@ -53,6 +53,7 @@ element
     | zeroormore
     | oneormore
     | stringliteral
+    | range
     | id
     ;
 
@@ -66,6 +67,10 @@ zeroormore
 
 oneormore
     : RPAREN alternation+ LPAREN
+    ;
+
+range
+    : stringliteral RANGE stringliteral
     ;
 
 stringliteral
@@ -132,6 +137,10 @@ SEMICOLON
 
 EQ
     : '='
+    ;
+
+RANGE
+    : '..'
     ;
 
 STRINGLITERAL
