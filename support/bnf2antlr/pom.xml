@@ -57,7 +57,7 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
-					<grammars>bnf.g4</grammars>
+					<grammars>bnf.g4 ebnf.g4</grammars>
 					<outputDirectory>src/main/java</outputDirectory>
 				</configuration>
 			</plugin>
