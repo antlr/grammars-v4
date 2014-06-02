@@ -85,7 +85,7 @@
 <actual parameter> ::= <expression> | <variable> | <procedure identifier> | <function identifier>
 <go to statement> ::= goto <label>
 <empty statement> ::= <empty>
-<empty> ::=
+<empty> ::= 
 <structured statement> ::= <compound statement> | <conditional statement> | <repetitive statement> | <with statement>
 <compound statement> ::= begin <statement> {; <statement> } end;
 <conditional statement> ::= <if statement> | <case statement>

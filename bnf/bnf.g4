@@ -33,20 +33,19 @@ rulelist
 ;
 
 rule_
-    : lhs ASSIGN rhs
+    : lhs ASSIGN rhs?
     ;
 
 lhs
     : id
     ;
 
-
-rhs 
-    : alternative (BAR alternative)*
+rhs
+    : alternation+
     ;
 
-alternative 
-    : element*
+alternation
+    : element (BAR element?)*
     ;
 
 element
@@ -58,19 +57,19 @@ element
     ;
 
 optional
-    : REND element+ LEND
+    : REND alternation+ LEND
     ;
 
 zeroormore
-    : RBRACE element+ LBRACE
+    : RBRACE alternation+ LBRACE
     ;
 
 oneormore
-    : RPAREN element+ LPAREN
+    : RPAREN alternation+ LPAREN
     ;
 
 text
-    : TEXT 
+    : TEXT
     | STRINGLITERAL
     ;
 
@@ -143,7 +142,7 @@ fragment SYMBOL
     | '\u0152'..'\u0192'
     | '\u2013'..'\u2122'
     | '\u2190'..'\u21FF'
-    | '\u2200'..'\u22FF'    
+    | '\u2200'..'\u22FF'
     ;
 
 WS
