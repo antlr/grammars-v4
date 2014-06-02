@@ -65,3 +65,5 @@
 /support/antlr4test-maven-plugin/target/
 
 /bnf/target/
+
+/ebnf/target/
