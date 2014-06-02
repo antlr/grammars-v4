@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 /**
  * @author tom
  */
-public class TestConverter {
+public class TestBNFConverter {
    @Test
    public void testConverter() {
       try {
