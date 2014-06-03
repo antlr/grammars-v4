@@ -198,7 +198,10 @@ public class GrammarTestMojo extends AbstractMojo {
       this.verbose = verbose;
    }
 
-   private void testGrammars() throws Exception {
+   /**
+    * test a single grammar
+    */
+   private void testGrammar(File grammarFile) throws Exception {
       /*
        * figure out class names
        */
@@ -226,35 +229,54 @@ public class GrammarTestMojo extends AbstractMojo {
        */
       final Constructor<?> lexerConstructor = lexerClass.getConstructor(CharStream.class);
       final Constructor<?> parserConstructor = parserClass.getConstructor(TokenStream.class);
+      System.out.println("Parsing :" + grammarFile.getAbsolutePath());
+      ANTLRFileStream antlrFileStream = new ANTLRFileStream(grammarFile.getAbsolutePath(), "UTF-8");
+      Lexer lexer = (Lexer) lexerConstructor.newInstance(antlrFileStream);
+      final CommonTokenStream tokens = new CommonTokenStream(lexer);
+      if (verbose) {
+         tokens.fill();
+         for (final Object tok : tokens.getTokens()) {
+            System.out.println(tok);
+         }
+      }
+      /*
+       * get parser
+       */
+      Parser parser = (Parser) parserConstructor.newInstance(tokens);
+      parser.setErrorHandler(new BailErrorStrategy());
+      final Method method = parserClass.getMethod(entryPoint);
+      ParserRuleContext parserRuleContext = (ParserRuleContext) method.invoke(parser);
+      /*
+       * show the tree
+       */
+      if (showTree) {
+         final String lispTree = Trees.toStringTree(parserRuleContext);
+         System.out.println(lispTree);
+      }
+      /*
+       * yup
+       */
+      parser = null;
+      lexer = null;
+      parserRuleContext = null;
+      antlrFileStream = null;
+   }
+
+   private void testGrammars() throws Exception {
       /*
        * iterate examples
        */
       final List<File> exampleFiles = FileUtil.getAllFiles(baseDir + "/" + this.exampleFiles);
       if (null != exampleFiles) {
          for (final File file : exampleFiles) {
-            System.out.println("Parsing :" + file.getAbsolutePath());
-            final Lexer lexer = (Lexer) lexerConstructor.newInstance(new ANTLRFileStream(file.getAbsolutePath(), "UTF-8"));
-            final CommonTokenStream tokens = new CommonTokenStream(lexer);
-            if (verbose) {
-               tokens.fill();
-               for (final Object tok : tokens.getTokens()) {
-                  System.out.println(tok);
-               }
-            }
             /*
-             * get parser
+             * test grammar
              */
-            final Parser parser = (Parser) parserConstructor.newInstance(tokens);
-            parser.setErrorHandler(new BailErrorStrategy());
-            final Method method = parserClass.getMethod(entryPoint);
-            final ParserRuleContext parserRuleContext = (ParserRuleContext) method.invoke(parser);
+            testGrammar(file);
             /*
-             * show the tree
+             * gc
              */
-            if (showTree) {
-               final String lispTree = Trees.toStringTree(parserRuleContext);
-               System.out.println(lispTree);
-            }
+            System.gc();
          }
       }
    }
