@@ -250,7 +250,7 @@ public class GrammarTestMojo extends AbstractMojo {
        * show the tree
        */
       if (showTree) {
-         final String lispTree = Trees.toStringTree(parserRuleContext);
+         final String lispTree = Trees.toStringTree(parserRuleContext, parser);
          System.out.println(lispTree);
       }
       /*
