@@ -4,19 +4,15 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Stack;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.misc.NotNull;
 
-import com.khubla.ebnf.ebnfListener;
-import com.khubla.ebnf.ebnfParser.AlternationContext;
-import com.khubla.ebnf.ebnfParser.RulenameContext;
-import com.khubla.ebnf.ebnfParser.StringliteralContext;
+import com.khubla.ebnf.ebnfBaseListener;
+import com.khubla.ebnf.ebnfParser;
 
 /**
  * @author tom
  */
-public class EBNFListener implements ebnfListener {
+public class EBNFListener extends ebnfBaseListener {
    /**
     * output
     */
@@ -34,132 +30,77 @@ public class EBNFListener implements ebnfListener {
    }
 
    @Override
-   public void enterAlternation(AlternationContext ctx) {
-      // TODO Auto-generated method stub
+   public void exitAlternation(@NotNull ebnfParser.AlternationContext ctx) {
+      if (ctx.getChildCount() > 1) {
+         final int terms = 1 + ((ctx.getChildCount() - 1) / 2);
+         String v = parseStack.pop();
+         for (int i = 0; i < (terms - 1); i++) {
+            v = parseStack.pop() + " | " + v;
+         }
+         parseStack.push(v);
+      }
    }
 
    @Override
-   public void enterElement(com.khubla.ebnf.ebnfParser.ElementContext ctx) {
-      // TODO Auto-generated method stub
+   public void exitId(@NotNull ebnfParser.IdContext ctx) {
+      String id = ctx.getText();
+      id = id.replaceAll("-", "");
+      parseStack.push(id);
    }
 
    @Override
-   public void enterEveryRule(ParserRuleContext ctx) {
-      // TODO Auto-generated method stub
+   public void exitOneormore(@NotNull ebnfParser.OneormoreContext ctx) {
+      String v = parseStack.pop();
+      for (int i = 0; i < (ctx.getChildCount() - 3); i++) {
+         v = parseStack.pop() + " " + v;
+      }
+      parseStack.push("(" + v + ")+");
    }
 
    @Override
-   public void enterId(com.khubla.ebnf.ebnfParser.IdContext ctx) {
-      // TODO Auto-generated method stub
+   public void exitOptional(@NotNull ebnfParser.OptionalContext ctx) {
+      String v = parseStack.pop();
+      for (int i = 0; i < (ctx.getChildCount() - 3); i++) {
+         v = parseStack.pop() + " " + v;
+      }
+      parseStack.push("(" + v + ")?");
    }
 
    @Override
-   public void enterOneormore(com.khubla.ebnf.ebnfParser.OneormoreContext ctx) {
-      // TODO Auto-generated method stub
+   public void exitRhs(@NotNull ebnfParser.RhsContext ctx) {
+      String v = "";
+      for (int i = 0; i < ctx.getChildCount(); i++) {
+         v = parseStack.pop() + " " + v;
+      }
+      parseStack.push(v);
    }
 
    @Override
-   public void enterOptional(com.khubla.ebnf.ebnfParser.OptionalContext ctx) {
-      // TODO Auto-generated method stub
+   public void exitRule_(@NotNull ebnfParser.Rule_Context ctx) {
+      final String ruleRHS = parseStack.pop().trim();
+      final String ruleName = parseStack.pop().trim();
+      parseStack.push(ruleName + " : " + ruleRHS + ";");
    }
 
    @Override
-   public void enterRhs(com.khubla.ebnf.ebnfParser.RhsContext ctx) {
-      // TODO Auto-generated method stub
+   public void exitRulelist(@NotNull ebnfParser.RulelistContext ctx) {
+      for (final String rule : parseStack) {
+         antlrPrintWriter.println(rule);
+      }
+      antlrPrintWriter.flush();
    }
 
    @Override
-   public void enterRule_(com.khubla.ebnf.ebnfParser.Rule_Context ctx) {
-      // TODO Auto-generated method stub
+   public void exitStringliteral(@NotNull ebnfParser.StringliteralContext ctx) {
+      parseStack.push("'" + ctx.getText().substring(1, ctx.getText().length() - 1) + "'");
    }
 
    @Override
-   public void enterRulelist(com.khubla.ebnf.ebnfParser.RulelistContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterRulename(RulenameContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterStringliteral(StringliteralContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterZeroormore(com.khubla.ebnf.ebnfParser.ZeroormoreContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitAlternation(AlternationContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitElement(com.khubla.ebnf.ebnfParser.ElementContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitEveryRule(ParserRuleContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitId(com.khubla.ebnf.ebnfParser.IdContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitOneormore(com.khubla.ebnf.ebnfParser.OneormoreContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitOptional(com.khubla.ebnf.ebnfParser.OptionalContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitRhs(com.khubla.ebnf.ebnfParser.RhsContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitRule_(com.khubla.ebnf.ebnfParser.Rule_Context ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitRulelist(com.khubla.ebnf.ebnfParser.RulelistContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitRulename(RulenameContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitStringliteral(StringliteralContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitZeroormore(com.khubla.ebnf.ebnfParser.ZeroormoreContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void visitErrorNode(ErrorNode node) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void visitTerminal(TerminalNode node) {
-      // TODO Auto-generated method stub
+   public void exitZeroormore(@NotNull ebnfParser.ZeroormoreContext ctx) {
+      String v = parseStack.pop();
+      for (int i = 0; i < (ctx.getChildCount() - 3); i++) {
+         v = parseStack.pop() + " " + v;
+      }
+      parseStack.push("(" + v + ")*");
    }
 }

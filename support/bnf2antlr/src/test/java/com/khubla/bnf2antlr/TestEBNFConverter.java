@@ -1,5 +1,6 @@
 package com.khubla.bnf2antlr;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import org.testng.Assert;
@@ -16,7 +17,11 @@ public class TestEBNFConverter {
       try {
          final InputStream inputStream = TestEBNFLexerParser.class.getResourceAsStream("/examples/pascal.ebnf");
          final EBNFConverter ebnfConverter = new EBNFConverter();
-         ebnfConverter.convert(inputStream, System.out);
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         ebnfConverter.convert(inputStream, baos);
+         String grammar = baos.toString();
+         Assert.assertTrue(grammar.length() > 0);
+         System.out.println(grammar);
       } catch (final Exception e) {
          e.printStackTrace();
          Assert.fail();
