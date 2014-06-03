@@ -1,4 +1,4 @@
-package com.khubla.bnf2antlr;
+package com.khubla.bnf2antlr.bnf;
 
 import java.io.InputStream;
 import java.io.OutputStream;

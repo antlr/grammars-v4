@@ -1,4 +1,4 @@
-package com.khubla.bnf2antlr;
+package com.khubla.bnf2antlr.bnf;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -8,15 +8,23 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import com.khubla.ebnf.ebnfListener;
-import com.khubla.ebnf.ebnfParser.AlternationContext;
-import com.khubla.ebnf.ebnfParser.RulenameContext;
-import com.khubla.ebnf.ebnfParser.StringliteralContext;
+import com.khubla.bnf.bnfListener;
+import com.khubla.bnf.bnfParser.AlternativeContext;
+import com.khubla.bnf.bnfParser.ElementContext;
+import com.khubla.bnf.bnfParser.IdContext;
+import com.khubla.bnf.bnfParser.LhsContext;
+import com.khubla.bnf.bnfParser.OneormoreContext;
+import com.khubla.bnf.bnfParser.OptionalContext;
+import com.khubla.bnf.bnfParser.RhsContext;
+import com.khubla.bnf.bnfParser.Rule_Context;
+import com.khubla.bnf.bnfParser.RulelistContext;
+import com.khubla.bnf.bnfParser.TextContext;
+import com.khubla.bnf.bnfParser.ZeroormoreContext;
 
 /**
  * @author tom
  */
-public class EBNFListener implements ebnfListener {
+public class BNFListener implements bnfListener {
    /**
     * output
     */
@@ -29,17 +37,17 @@ public class EBNFListener implements ebnfListener {
    /**
     * ctor
     */
-   public EBNFListener(OutputStream antlrOutput) {
+   public BNFListener(OutputStream antlrOutput) {
       antlrPrintWriter = new PrintWriter(antlrOutput);
    }
 
    @Override
-   public void visitTerminal(TerminalNode node) {
+   public void enterAlternative(AlternativeContext ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void visitErrorNode(ErrorNode node) {
+   public void enterElement(ElementContext ctx) {
       // TODO Auto-generated method stub
    }
 
@@ -49,117 +57,117 @@ public class EBNFListener implements ebnfListener {
    }
 
    @Override
+   public void enterId(IdContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterLhs(LhsContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterOneormore(OneormoreContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterOptional(OptionalContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterRhs(RhsContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterRule_(Rule_Context ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterRulelist(RulelistContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterText(TextContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterZeroormore(ZeroormoreContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitAlternative(AlternativeContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitElement(ElementContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
    public void exitEveryRule(ParserRuleContext ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void enterId(com.khubla.ebnf.ebnfParser.IdContext ctx) {
+   public void exitId(IdContext ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void exitId(com.khubla.ebnf.ebnfParser.IdContext ctx) {
+   public void exitLhs(LhsContext ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void enterElement(com.khubla.ebnf.ebnfParser.ElementContext ctx) {
+   public void exitOneormore(OneormoreContext ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void exitElement(com.khubla.ebnf.ebnfParser.ElementContext ctx) {
+   public void exitOptional(OptionalContext ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void enterOptional(com.khubla.ebnf.ebnfParser.OptionalContext ctx) {
+   public void exitRhs(RhsContext ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void exitOptional(com.khubla.ebnf.ebnfParser.OptionalContext ctx) {
+   public void exitRule_(Rule_Context ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void enterRulename(RulenameContext ctx) {
+   public void exitRulelist(RulelistContext ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void exitRulename(RulenameContext ctx) {
+   public void exitText(TextContext ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void enterRhs(com.khubla.ebnf.ebnfParser.RhsContext ctx) {
+   public void exitZeroormore(ZeroormoreContext ctx) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void exitRhs(com.khubla.ebnf.ebnfParser.RhsContext ctx) {
+   public void visitErrorNode(ErrorNode node) {
       // TODO Auto-generated method stub
    }
 
    @Override
-   public void enterStringliteral(StringliteralContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitStringliteral(StringliteralContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterRule_(com.khubla.ebnf.ebnfParser.Rule_Context ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitRule_(com.khubla.ebnf.ebnfParser.Rule_Context ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterRulelist(com.khubla.ebnf.ebnfParser.RulelistContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitRulelist(com.khubla.ebnf.ebnfParser.RulelistContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterOneormore(com.khubla.ebnf.ebnfParser.OneormoreContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitOneormore(com.khubla.ebnf.ebnfParser.OneormoreContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterAlternation(AlternationContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitAlternation(AlternationContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void enterZeroormore(com.khubla.ebnf.ebnfParser.ZeroormoreContext ctx) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public void exitZeroormore(com.khubla.ebnf.ebnfParser.ZeroormoreContext ctx) {
+   public void visitTerminal(TerminalNode node) {
       // TODO Auto-generated method stub
    }
 }

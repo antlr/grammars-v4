@@ -6,6 +6,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.khubla.bnf.bnfParser.RulelistContext;
+import com.khubla.bnf2antlr.bnf.BNFDocumentParser;
 
 /**
  * @author tom
