@@ -5,6 +5,8 @@ import java.io.InputStream;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.khubla.bnf2antlr.bnf.BNFConverter;
+
 /**
  * @author tom
  */

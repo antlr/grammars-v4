@@ -9,6 +9,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 
+import com.khubla.bnf2antlr.bnf.BNFConverter;
+
 /**
  * @author tom
  */
