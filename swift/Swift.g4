@@ -342,12 +342,14 @@ associativity : 'left' | 'right' | 'none'  ;
 
 // GRAMMAR OF A PATTERN
 
-pattern : wildcard_pattern type_annotation?
+pattern
+ : wildcard_pattern type_annotation?
  | identifier_pattern type_annotation?
  | value_binding_pattern
  | tuple_pattern type_annotation?
  | enum_case_pattern
- | type_casting_pattern
+ | 'is' type
+ | pattern 'as' type
  | expression_pattern
  ;
 
@@ -365,13 +367,15 @@ value_binding_pattern : 'var' pattern | 'let' pattern  ;
 
 // GRAMMAR OF A TUPLE PATTERN
 
-tuple_pattern : ( tuple_pattern_element_list?)  ;
-tuple_pattern_element_list : tuple_pattern_element | tuple_pattern_element ',' tuple_pattern_element_list  ;
+tuple_pattern : '(' tuple_pattern_element_list? ')'  ;
+tuple_pattern_element_list
+	:	tuple_pattern_element (',' tuple_pattern_element)*
+	;
 tuple_pattern_element : pattern  ;
 
 // GRAMMAR OF AN ENUMERATION CASE PATTERN
 
-enum_case_pattern : type_identifier?. enum_case_name tuple_pattern? ;
+enum_case_pattern : type_identifier? '.' enum_case_name tuple_pattern? ;
 
 // GRAMMAR OF A TYPE CASTING PATTERN
 
@@ -399,21 +403,30 @@ balanced_token : '('  balanced_tokens? ')'
 // | Any punctuation except ( ,  ')' , '[' , ']' , { , or }
  ;
 
-
 // Expressions
-
 
 // GRAMMAR OF AN EXPRESSION
 
 expression_list : expression (',' expression)* ;
 
 expression
-	:	prefix_operator? postfix_expression
+	:	prefix_operator expression
     |	in_out_expression
+    |	primary_expression
     |	expression binary_operator expression
     |	expression assignment_operator expression
     |	expression conditional_operator expression
     |	expression type_casting_operator
+    |	expression postfix_operator
+    |	expression parenthesized_expression trailing_closure?
+	|	expression '.' 'init'
+ 	|	expression '.' Decimal_literal
+	|	expression '.' identifier generic_argument_clause?
+	|	expression '.' 'self'
+	|	expression '.' 'dynamicType'
+	|	expression '[' expression_list ']'
+	|	expression '!'
+	|	expression '?'
 	;
 
 // GRAMMAR OF A PREFIX EXPRESSION
@@ -432,9 +445,30 @@ conditional_operator : '?' expression ':' ;
 
 type_casting_operator : 'is' type | 'as' '?'? type ;
 
+// GRAMMAR OF A POSTFIX EXPRESSION
+
+/*
+postfix_expression : primary_expression
+ | postfix_expression postfix_operator
+ | function_call_expression
+ | initializer_expression
+ | explicit_member_expression
+ | postfix_self_expression
+ | dynamic_type_expression
+ | subscript_expression
+ | forced_value_expression
+ | optional_chaining_expression
+ ;
+*/
+
+// GRAMMAR OF A FUNCTION CALL EXPRESSION
+
+trailing_closure : closure_expression  ;
+
 // GRAMMAR OF A PRIMARY EXPRESSION
 
-primary_expression : identifier generic_argument_clause?
+primary_expression
+ : identifier generic_argument_clause?
  | literal_expression
  | self_expression
  | superclass_expression
@@ -497,57 +531,6 @@ expression_element : expression | identifier ':' expression  ;
 
 wildcard_expression : '_'  ;
 
-// GRAMMAR OF A POSTFIX EXPRESSION
-
-postfix_expression : primary_expression
- | postfix_expression postfix_operator
- | function_call_expression
- | initializer_expression
- | explicit_member_expression
- | postfix_self_expression
- | dynamic_type_expression
- | subscript_expression
- | forced_value_expression
- | optional_chaining_expression
- ;
-
-// GRAMMAR OF A FUNCTION CALL EXPRESSION
-
-function_call_expression : postfix_expression parenthesized_expression
- | postfix_expression parenthesized_expression? trailing_closure
- ;
-trailing_closure : closure_expression  ;
-
-// GRAMMAR OF AN INITIALIZER EXPRESSION
-
-initializer_expression : postfix_expression '.' 'init'  ;
-
-// GRAMMAR OF AN EXPLICIT MEMBER EXPRESSION
-
-explicit_member_expression : postfix_expression '.' Decimal_literal
- | postfix_expression '.' identifier generic_argument_clause?
- ;
-
-// GRAMMAR OF A SELF EXPRESSION
-
-postfix_self_expression : postfix_expression '.' 'self' ;
-
-// GRAMMAR OF A DYNAMIC TYPE EXPRESSION
-
-dynamic_type_expression : postfix_expression '.' 'dynamicType'  ;
-
-// GRAMMAR OF A SUBSCRIPT EXPRESSION
-
-subscript_expression : postfix_expression '[' expression_list ']'  ;
-
-// GRAMMAR OF A FORCED_VALUE EXPRESSION
-
-forced_value_expression : postfix_expression '!'  ;
-
-// GRAMMAR OF AN OPTIONAL_CHAINING EXPRESSION
-
-optional_chaining_expression : postfix_expression '?'  ;
-
 // GRAMMAR OF OPERATORS
 
 Operator : Operator_character+ ;
@@ -558,10 +541,19 @@ postfix_operator : Operator  ;
 
 // Types
 
-
 // GRAMMAR OF A TYPE
 
-type : array_type | function_type | type_identifier | tuple_type | optional_type | implicitly_unwrapped_optional_type | protocol_composition_type | metatype_type  ;
+type
+ : type '[' ']'
+ | type '->' type
+ | type_identifier
+ | tuple_type
+ | type '?'
+ | type '!'
+ | protocol_composition_type
+ | type '.' 'Type'
+ | type '.' 'Protocol'
+ ;
 
 // GRAMMAR OF A TYPE ANNOTATION
 
@@ -569,7 +561,7 @@ type_annotation : ':' attributes? type  ;
 
 // GRAMMAR OF A TYPE IDENTIFIER
 
-type_identifier : type_name generic_argument_clause?  type_name generic_argument_clause?'.' type_identifier  ;
+type_identifier : type_name generic_argument_clause? type_name generic_argument_clause? '.' type_identifier  ;
 type_name : identifier  ;
 
 // GRAMMAR OF A TUPLE TYPE
