@@ -330,7 +330,7 @@ subscript_result : '->' attributes? type  ;
 operator_declaration : prefix_operator_declaration | postfix_operator_declaration | infix_operator_declaration  ;
 prefix_operator_declaration : 'operator' 'prefix' 'operator' '{' '}'  ;
 postfix_operator_declaration : 'operator' 'postfix' 'operator' '{' '}'  ;
-infix_operator_declaration : 'operator' 'infix' 'operator' '{' infix_operator_attributes?'}'  ;
+infix_operator_declaration : 'operator' 'infix' 'operator' '{' infix_operator_attributes '}'  ;
 infix_operator_attributes : precedence_clause? associativity_clause? ;
 precedence_clause : 'precedence' precedence_level  ;
 precedence_level : integer_literal ;
@@ -395,7 +395,7 @@ balanced_tokens : balanced_token balanced_tokens? ;
 balanced_token : '('  balanced_tokens? ')'
  | '[' balanced_tokens?']'
  | '{' balanced_tokens?'}'
- | identifier | binary_expression | context_sensitive_keyword | literal | Operator
+ | identifier | expression | context_sensitive_keyword | literal | Operator
 // | Any punctuation except ( ,  ')' , '[' , ']' , { , or }
  ;
 
@@ -405,25 +405,20 @@ balanced_token : '('  balanced_tokens? ')'
 
 // GRAMMAR OF AN EXPRESSION
 
-expression : prefix_expression binary_expressions? ;
-expression_list : expression | expression ',' expression_list  ;
+expression_list : expression (',' expression)* ;
+
+expression
+	:	prefix_operator? postfix_expression
+    |	in_out_expression
+    |	expression binary_operator expression
+    |	expression assignment_operator expression
+    |	expression conditional_operator expression
+    |	expression type_casting_operator
+	;
 
 // GRAMMAR OF A PREFIX EXPRESSION
 
-prefix_expression : prefix_operator? postfix_expression
- | in_out_expression
- ;
 in_out_expression : '&' identifier ;
-
-// GRAMMAR OF A BINARY EXPRESSION
-
-binary_expression : binary_operator prefix_expression
- | assignment_operator prefix_expression
- | conditional_operator prefix_expression
- | type_casting_operator
- ;
-
-binary_expressions : binary_expression+ ;
 
 // GRAMMAR OF AN ASSIGNMENT OPERATOR
 
@@ -551,7 +546,7 @@ forced_value_expression : postfix_expression '!'  ;
 
 // GRAMMAR OF AN OPTIONAL_CHAINING EXPRESSION
 
-optional_chaining_expression : postfix_expression ?  ;
+optional_chaining_expression : postfix_expression '?'  ;
 
 // GRAMMAR OF OPERATORS
 
@@ -595,7 +590,7 @@ array_type : type '[' ']' | array_type '[' ']'  ;
 
 // GRAMMAR OF AN OPTIONAL TYPE
 
-optional_type : type ?  ;
+optional_type : type '?'  ;
 
 // GRAMMAR OF AN IMPLICITLY UNWRAPPED OPTIONAL TYPE
 
