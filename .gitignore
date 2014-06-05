@@ -73,7 +73,10 @@
 
 /support/bnf2antlr/test-output/
 
-
-
 /bnf/target/
 
+/support/antlr4test-maven-plugin/.settings/
+/support/antlr4test-maven-plugin/.project
+/support/antlr4test-maven-plugin/.classpath
+
+/swift/target/
