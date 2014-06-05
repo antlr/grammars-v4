@@ -58,7 +58,8 @@ loop_statement : for_statement
 
 // GRAMMAR OF A FOR STATEMENT
 
-for_statement : 'for' for_init?';' expression?';' expression? code_block
+for_statement
+ : 'for' for_init? ';' expression? ';' expression? code_block
  | 'for' ( for_init?';' expression?';' expression?) code_block
  ;
 for_init : variable_declaration | expression_list  ;
@@ -185,7 +186,7 @@ import_path_identifier : identifier | Operator  ;
 // GRAMMAR OF A CONSTANT DECLARATION
 
 constant_declaration : attributes? declaration_specifiers? 'let' pattern_initializer_list  ;
-pattern_initializer_list : pattern_initializer | pattern_initializer ',' pattern_initializer_list  ;
+pattern_initializer_list : pattern_initializer (',' pattern_initializer)* ;
 pattern_initializer : pattern initializer? ;
 initializer : '=' expression  ;
 
@@ -533,8 +534,7 @@ wildcard_expression : '_'  ;
 
 // GRAMMAR OF OPERATORS
 
-Operator : Operator_character+ ;
-fragment Operator_character : [/=\-+!*%<>&|^!.] ;
+Operator : [/=\-+!*%<>&|^!.]+ ;
 binary_operator : Operator ;
 prefix_operator : Operator  ;
 postfix_operator : Operator  ;
