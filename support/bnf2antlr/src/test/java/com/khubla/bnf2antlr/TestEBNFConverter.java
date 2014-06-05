@@ -13,13 +13,23 @@ import com.khubla.bnf2antlr.ebnf.EBNFConverter;
  */
 public class TestEBNFConverter {
    @Test
-   public void testConverter() {
+   public void test1() {
+      testConverter("/examples/pascal.ebnf");
+   }
+
+   @Test
+   public void test2() {
+      testConverter("/examples/modelica33.ebnf");
+   }
+
+   @Test
+   private void testConverter(String fn) {
       try {
-         final InputStream inputStream = TestEBNFLexerParser.class.getResourceAsStream("/examples/pascal.ebnf");
+         final InputStream inputStream = TestEBNFLexerParser.class.getResourceAsStream(fn);
          final EBNFConverter ebnfConverter = new EBNFConverter();
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
          ebnfConverter.convert(inputStream, baos);
-         String grammar = baos.toString();
+         final String grammar = baos.toString();
          Assert.assertTrue(grammar.length() > 0);
          System.out.println(grammar);
       } catch (final Exception e) {
