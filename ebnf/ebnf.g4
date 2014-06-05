@@ -26,17 +26,17 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-grammar bnf;
+grammar ebnf;
 
 rulelist
     : rule_* EOF
 ;
 
 rule_
-    : lhs ASSIGN rhs?
+    : rulename ASSIGN rhs endrule?
     ;
 
-lhs
+rulename
     : id
     ;
 
@@ -45,14 +45,15 @@ rhs
     ;
 
 alternation
-    : element (BAR element?)*
+    : BAR? element (BAR element?)*
     ;
 
 element
     : optional
     | zeroormore
     | oneormore
-    | text
+    | stringliteral
+    | range
     | id
     ;
 
@@ -68,21 +69,30 @@ oneormore
     : RPAREN alternation+ LPAREN
     ;
 
-text
-    : TEXT
-    | STRINGLITERAL
+range
+    : stringliteral RANGE stringliteral
+    ;
+
+stringliteral
+    : STRINGLITERAL
     ;
 
 id
     : ID
     ;
 
+endrule
+    : DOT
+    | SEMICOLON
+    ;
+
 ID
-    : '<' .*? '>'
+    : LETTER (LETTER | DIGIT | SYMBOL)*
     ;
 
 ASSIGN
-    : '::='
+    : EQ
+    | COLON
     ;
 
 LPAREN
@@ -113,15 +123,29 @@ BAR
     : '|'
     ;
 
-TEXT
-    : (LETTER | DIGIT| SYMBOL)+
+DOT
+    : '.'
     ;
 
-/*
- * String literals are not part of BNF.  They are used in this grammar for []{}()
- */
+COLON
+    : ':'
+    ;
+
+SEMICOLON
+    : ';'
+    ;
+
+EQ
+    : '='
+    ;
+
+RANGE
+    : '..'
+    ;
+
 STRINGLITERAL
     : '"' .*? '"'
+    | '\'' .*? '\''
     ;
 
 fragment LETTER
@@ -134,15 +158,12 @@ fragment DIGIT
     ;
 
 fragment SYMBOL
-    : '\u0021'..'\u0027'
-    | '\u002a'..'\u002f'
-    | '\u003a'..'\u0040'
-    | '\u005e'..'\u0060'
-    | '\u00a1'..'\u00FF'
-    | '\u0152'..'\u0192'
-    | '\u2013'..'\u2122'
-    | '\u2190'..'\u21FF'
-    | '\u2200'..'\u22FF'
+    : '-'
+    | '_'
+    ;
+
+COMMENT
+    : '(*' .*? '*)' -> channel(HIDDEN)
     ;
 
 WS
