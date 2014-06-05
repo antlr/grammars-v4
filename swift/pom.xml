@@ -34,7 +34,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>true</showTree>
-					<entryPoint>statement</entryPoint>
+					<entryPoint>top_level</entryPoint>
 					<grammarName>Swift</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
