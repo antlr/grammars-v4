@@ -82,6 +82,7 @@ ID
 
 ASSIGN
     : '='
+    | ':'
     ;
 
 LPAREN
