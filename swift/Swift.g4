@@ -29,7 +29,10 @@
  * Converted from Apple's doc, http://tinyurl.com/n8rkoue, to ANTLR's
  * meta-language.
  */
- grammar Swift;
+grammar Swift;
+
+// "The top-level code in a Swift source file consists of zero or more statements, declarations, and expressions."
+top_level : (statement | declaration | expression)* EOF ;
 
 // Statements
 
@@ -166,10 +169,6 @@ declaration : import_declaration
 declarations : declaration declarations? ;
 declaration_specifiers : declaration_specifier declaration_specifiers? ;
 declaration_specifier : 'class' | 'mutating' | 'nonmutating' | 'override' | 'static' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | 'weak' ;
-
-// GRAMMAR OF A TOP_LEVEL DECLARATION
-
-top_level_declaration : statements? ;
 
 // GRAMMAR OF A CODE BLOCK
 
