@@ -31,14 +31,14 @@
  */
 grammar Swift;
 
-// "The top-level code in a Swift source file consists of zero or more statements, declarations, and expressions."
 top_level : (statement | declaration | expression)* EOF ;
 
 // Statements
 
 // GRAMMAR OF A STATEMENT
 
-statement : expression ';'?
+statement
+ : expression ';'?
  | declaration ';'?
  | loop_statement ';'?
  | branch_statement ';'?
@@ -131,7 +131,7 @@ return_statement : 'return' expression? ;
 
 // GRAMMAR OF A GENERIC PARAMETER CLAUSE
 
-generic_parameter_clause : '<' generic_parameter_list requirement_clause?'>'  ;
+generic_parameter_clause : '<' generic_parameter_list requirement_clause? '>'  ;
 generic_parameter_list : generic_parameter | generic_parameter ',' generic_parameter_list  ;
 generic_parameter : type_name | type_name ':' type_identifier | type_name ':' protocol_composition_type  ;
 requirement_clause : 'where' requirement_list  ;
@@ -150,7 +150,8 @@ generic_argument : type  ;
 
 // GRAMMAR OF A DECLARATION
 
-declaration : import_declaration
+declaration
+ : import_declaration
  | constant_declaration
  | variable_declaration
  | typealias_declaration
@@ -178,7 +179,7 @@ code_block : '{' statements? '}'  ;
 
 import_declaration : attributes? 'import' import_kind? import_path  ;
 import_kind : 'typealias' | 'struct' | 'class' | 'enum' | 'protocol' | 'var' | 'func'  ;
-import_path : import_path_identifier | import_path_identifier . import_path  ;
+import_path : import_path_identifier | import_path_identifier '.' import_path  ;
 import_path_identifier : identifier | Operator  ;
 
 // GRAMMAR OF A CONSTANT DECLARATION
@@ -264,8 +265,8 @@ struct_body : '{' declarations?'}'  ;
 // GRAMMAR OF A CLASS DECLARATION
 
 class_declaration : attributes? 'class' class_name generic_parameter_clause? type_inheritance_clause? class_body  ;
-class_name : identifier  ;
-class_body : '{' declarations?'}'  ;
+class_name : identifier ;
+class_body : '{' declarations? '}'  ;
 
 // GRAMMAR OF A PROTOCOL DECLARATION
 
@@ -393,11 +394,11 @@ expression_pattern : expression  ;
 attribute : '@' attribute_name attribute_argument_clause? ;
 attribute_name : identifier  ;
 attribute_argument_clause : '('  balanced_tokens?  ')'  ;
-attributes : attribute attributes? ;
-balanced_tokens : balanced_token balanced_tokens? ;
+attributes : attribute+ ;
+balanced_tokens : balanced_token+ ;
 balanced_token : '('  balanced_tokens? ')'
- | '[' balanced_tokens?']'
- | '{' balanced_tokens?'}'
+ | '[' balanced_tokens? ']'
+ | '{' balanced_tokens? '}'
  | identifier | expression | context_sensitive_keyword | literal | Operator
 // | Any punctuation except ( ,  ')' , '[' , ']' , { , or }
  ;
@@ -483,7 +484,7 @@ literal_expression : literal
  | array_literal | dictionary_literal
  | '__FILE__' | '__LINE__' | '__COLUMN__' | '__FUNCTION__'  ;
 array_literal : '[' array_literal_items? ']'  ;
-array_literal_items : array_literal_item ','?  array_literal_item ',' array_literal_items  ;
+array_literal_items : array_literal_item ','? | array_literal_item ',' array_literal_items  ;
 array_literal_item : expression  ;
 dictionary_literal : '[' dictionary_literal_items ']' | '[' ':' ']'  ;
 dictionary_literal_items : dictionary_literal_item ','?  dictionary_literal_item ',' dictionary_literal_items  ;
@@ -560,7 +561,11 @@ type_annotation : ':' attributes? type  ;
 
 // GRAMMAR OF A TYPE IDENTIFIER
 
-type_identifier : type_name generic_argument_clause? type_name generic_argument_clause? '.' type_identifier  ;
+type_identifier
+ : type_name generic_argument_clause?
+ | type_name generic_argument_clause? '.' type_identifier
+ ;
+
 type_name : identifier  ;
 
 // GRAMMAR OF A TUPLE TYPE
@@ -570,22 +575,6 @@ tuple_type_body : tuple_type_element_list '...'? ;
 tuple_type_element_list : tuple_type_element | tuple_type_element ',' tuple_type_element_list  ;
 tuple_type_element : attributes? 'inout'? type | 'inout'? element_name type_annotation ;
 element_name : identifier  ;
-
-// GRAMMAR OF A FUNCTION TYPE
-
-function_type : type '->' type  ;
-
-// GRAMMAR OF AN ARRAY TYPE
-
-array_type : type '[' ']' | array_type '[' ']'  ;
-
-// GRAMMAR OF AN OPTIONAL TYPE
-
-optional_type : type '?'  ;
-
-// GRAMMAR OF AN IMPLICITLY UNWRAPPED OPTIONAL TYPE
-
-implicitly_unwrapped_optional_type : type '!'  ;
 
 // GRAMMAR OF A PROTOCOL COMPOSITION TYPE
 
@@ -600,7 +589,7 @@ metatype_type : type '.' 'Type' | type '.' 'Protocol';
 // GRAMMAR OF A TYPE INHERITANCE CLAUSE
 
 type_inheritance_clause : ':' type_inheritance_list  ;
-type_inheritance_list : type_identifier | type_identifier ',' type_inheritance_list  ;
+type_inheritance_list : type_identifier (',' type_identifier)* ;
 
 // ---------- Lexical Structure -----------
 
@@ -667,20 +656,21 @@ fragment Binary_literal_characters : Binary_literal_character Binary_literal_cha
 Octal_literal : '0o' Octal_digit Octal_literal_characters? ;
 fragment Octal_digit : [0-7] ;
 fragment Octal_literal_character : Octal_digit | '_'  ;
-fragment Octal_literal_characters : Octal_literal_character Octal_literal_characters? ;
+fragment Octal_literal_characters : Octal_literal_character+ ;
 Decimal_literal : Decimal_digit Decimal_literal_characters? ;
 fragment Decimal_digit : [0-9] ;
-fragment Decimal_digits : Decimal_digit Decimal_digits? ;
+fragment Decimal_digits : Decimal_digit+ ;
 fragment Decimal_literal_character : Decimal_digit | '_'  ;
-fragment Decimal_literal_characters : Decimal_literal_character Decimal_literal_characters? ;
+fragment Decimal_literal_characters : Decimal_literal_character+ ;
 Hexadecimal_literal : '0x' Hexadecimal_digit Hexadecimal_literal_characters? ;
 fragment Hexadecimal_digit : [0-9a-fA-F] ;
 fragment Hexadecimal_literal_character : Hexadecimal_digit | '_'  ;
-fragment Hexadecimal_literal_characters : Hexadecimal_literal_character Hexadecimal_literal_characters? ;
+fragment Hexadecimal_literal_characters : Hexadecimal_literal_character+ ;
 
 // GRAMMAR OF A FLOATING_POINT LITERAL
 
-Floating_point_literal : Decimal_literal Decimal_fraction? Decimal_exponent?
+Floating_point_literal
+ : Decimal_literal Decimal_fraction? Decimal_exponent?
  | Hexadecimal_literal Hexadecimal_fraction? Hexadecimal_exponent
  ;
 fragment Decimal_fraction : '.' Decimal_literal  ;
@@ -694,8 +684,8 @@ fragment Sign : [+\-] ;
 // GRAMMAR OF A STRING LITERAL
 
 String_literal : '"' Quoted_text '"' ;
-Quoted_text : Quoted_text_item Quoted_text? ;
-Quoted_text_item : Escaped_character
+fragment Quoted_text : Quoted_text_item Quoted_text? ;
+fragment Quoted_text_item : Escaped_character
 // | '\\(' expression ')'
  | ~["\\\u000A\u000D]
  ;
@@ -705,3 +695,8 @@ Escaped_character : '\\' [0\\tnr"']
  | '\\U' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit
 ;
 
+WS : [ \n\r\t\u000B\u000C\u0000]+ -> channel(HIDDEN) ;
+
+Block_comment : '/*' (Block_comment|.)*? '*/' -> channel(HIDDEN) ; // nesting allow
+
+Line_comment : '//' .*? '\n' -> channel(HIDDEN) ;
