@@ -31,7 +31,7 @@
  */
 grammar Swift;
 
-top_level : (statement | declaration | expression)* EOF ;
+top_level : (statement | expression)* EOF ;
 
 // Statements
 
@@ -144,7 +144,7 @@ same_type_requirement : type_identifier '==' type_identifier  ;
 // GRAMMAR OF A GENERIC ARGUMENT CLAUSE
 
 generic_argument_clause : '<' generic_argument_list '>'  ;
-generic_argument_list : generic_argument | generic_argument ',' generic_argument_list  ;
+generic_argument_list : generic_argument (',' generic_argument)* ;
 generic_argument : type  ;
 
 // Declarations
@@ -181,7 +181,7 @@ code_block : '{' statements? '}'  ;
 import_declaration : attributes? 'import' import_kind? import_path  ;
 import_kind : 'typealias' | 'struct' | 'class' | 'enum' | 'protocol' | 'var' | 'func'  ;
 import_path : import_path_identifier | import_path_identifier '.' import_path  ;
-import_path_identifier : identifier | Operator  ;
+import_path_identifier : identifier | operator  ;
 
 // GRAMMAR OF A CONSTANT DECLARATION
 
@@ -223,7 +223,7 @@ typealias_assignment : '=' type  ;
 
 function_declaration : function_head function_name generic_parameter_clause? function_signature function_body  ;
 function_head : attributes? declaration_specifiers? 'func'  ;
-function_name : identifier |  Operator  ;
+function_name : identifier |  operator  ;
 function_signature : parameter_clauses function_result? ;
 function_result : '->' attributes? type  ;
 function_body : code_block  ;
@@ -400,7 +400,7 @@ balanced_tokens : balanced_token+ ;
 balanced_token : '('  balanced_tokens? ')'
  | '[' balanced_tokens? ']'
  | '{' balanced_tokens? '}'
- | identifier | expression | context_sensitive_keyword | literal | Operator
+ | identifier | expression | context_sensitive_keyword | literal | operator
 // | Any punctuation except ( ,  ')' , '[' , ']' , { , or }
  ;
 
@@ -534,10 +534,50 @@ wildcard_expression : '_'  ;
 
 // GRAMMAR OF OPERATORS
 
-Operator : [/=\-+!*%<>&|^!.]+ ;
-binary_operator : Operator ;
-prefix_operator : Operator  ;
-postfix_operator : Operator  ;
+// split the operators out into the individual tokens as some of those tokens
+// are also referenced individually. For example, type signatures use
+// <...>.
+operator: '/' | '=' | '\\' | '-' | '+' | '!' | '*' | '%' | '<' | '>' | '&' | '|' | '^' | '!' | '.' ;
+
+// WHITESPACE scariness:
+
+/* http://tinyurl.com/oalzfus
+"If an operator has no whitespace on the left but is followed
+immediately by a dot (.), it is treated as a postfix unary
+operator. As an example, the ++ operator in a++.b is treated as a
+postfix unary operator (a++ . b rather than a ++ .b).  For the
+purposes of these rules, the characters (, [, and { before an
+operator, the characters ), ], and } after an operator, and the
+characters ,, ;, and : are also considered whitespace.
+
+There is one caveat to the rules above. If the ! or ? operator has no
+whitespace on the left, it is treated as a postfix operator,
+regardless of whether it has whitespace on the right. To use the ?
+operator as syntactic sugar for the Optional type, it must not have
+whitespace on the left. To use it in the conditional (? :) operator,
+it must have whitespace around both sides."
+ */
+
+/**
+ "If an operator has whitespace around both sides or around neither side,
+ it is treated as a binary operator. As an example, the + operator in a+b
+  and a + b is treated as a binary operator."
+*/
+binary_operator : operator ;
+
+/**
+ "If an operator has whitespace on the left side only, it is treated as a
+ prefix unary operator. As an example, the ++ operator in a ++b is treated
+ as a prefix unary operator."
+*/
+prefix_operator : operator  ; // only if space on left but not right
+
+/**
+ "If an operator has whitespace on the right side only, it is treated as a
+ postfix unary operator. As an example, the ++ operator in a++ b is treated
+ as a postfix unary operator."
+ */
+postfix_operator : operator  ;
 
 // Types
 
@@ -566,7 +606,7 @@ type_identifier
  | type_name generic_argument_clause? '.' type_identifier
  ;
 
-type_name : identifier  ;
+type_name : identifier ;
 
 // GRAMMAR OF A TUPLE TYPE
 
