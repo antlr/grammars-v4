@@ -69,3 +69,5 @@
 /support/antlr4test-maven-plugin/.settings/
 /support/antlr4test-maven-plugin/.project
 /support/antlr4test-maven-plugin/.classpath
+
+/swift/target/
