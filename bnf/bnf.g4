@@ -41,11 +41,15 @@ lhs
     ;
 
 
-rhs 
+rhs
+    : alternatives
+    ;
+
+alternatives
     : alternative (BAR alternative)*
     ;
 
-alternative 
+alternative
     : element*
     ;
 
@@ -58,19 +62,19 @@ element
     ;
 
 optional
-    : REND element+ LEND
+    : REND alternatives LEND
     ;
 
 zeroormore
-    : RBRACE element+ LBRACE
+    : RBRACE alternatives LBRACE
     ;
 
 oneormore
-    : RPAREN element+ LPAREN
+    : RPAREN alternatives LPAREN
     ;
 
 text
-    : TEXT 
+    : TEXT
     | STRINGLITERAL
     ;
 
@@ -143,7 +147,7 @@ fragment SYMBOL
     | '\u0152'..'\u0192'
     | '\u2013'..'\u2122'
     | '\u2190'..'\u21FF'
-    | '\u2200'..'\u22FF'    
+    | '\u2200'..'\u22FF'
     ;
 
 WS
