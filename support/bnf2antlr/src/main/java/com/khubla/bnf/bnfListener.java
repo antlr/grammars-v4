@@ -53,6 +53,17 @@ public interface bnfListener extends ParseTreeListener {
 	void exitOptional(@NotNull bnfParser.OptionalContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link bnfParser#alternatives}.
+	 * @param ctx the parse tree
+	 */
+	void enterAlternatives(@NotNull bnfParser.AlternativesContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link bnfParser#alternatives}.
+	 * @param ctx the parse tree
+	 */
+	void exitAlternatives(@NotNull bnfParser.AlternativesContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link bnfParser#alternative}.
 	 * @param ctx the parse tree
 	 */
