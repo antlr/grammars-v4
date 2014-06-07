@@ -69,6 +69,19 @@ public class bnfBaseListener implements bnfListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAlternatives(@NotNull bnfParser.AlternativesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAlternatives(@NotNull bnfParser.AlternativesContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAlternative(@NotNull bnfParser.AlternativeContext ctx) { }
 	/**
 	 * {@inheritDoc}
