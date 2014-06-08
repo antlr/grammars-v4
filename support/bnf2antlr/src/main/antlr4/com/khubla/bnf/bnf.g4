@@ -40,7 +40,6 @@ lhs
     : id
     ;
 
-
 rhs
     : alternatives
     ;
