@@ -80,3 +80,5 @@
 /support/antlr4test-maven-plugin/.classpath
 
 /swift/target/
+
+/support/bnf2antlr/plm.g4
