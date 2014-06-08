@@ -122,7 +122,7 @@ public class BNFListener extends bnfBaseListener {
 
    @Override
    public void exitText(TextContext ctx) {
-      parseStack.push("\"" + ctx.getText() + "\"");
+      parseStack.push("'" + ctx.getText() + "'");
    }
 
    @Override
