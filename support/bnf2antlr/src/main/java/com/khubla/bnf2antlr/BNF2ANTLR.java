@@ -36,6 +36,14 @@ public class BNF2ANTLR {
     */
    private static final String NAME = "name";
    /**
+    * author
+    */
+   private static final String AUTHOR = "author";
+   /**
+    * year
+    */
+   private static final String YEAR = "year";
+   /**
     * output
     */
    private static final String OUTPUT_FILE = "output";
@@ -51,7 +59,7 @@ public class BNF2ANTLR {
    /**
     * perform conversion
     */
-   private static void convert(Converter converter, String grammarName, InputStream inputStream, OutputStream outputStream) throws Exception {
+   private static void convert(Converter converter, String grammarName, String author, String year, InputStream inputStream, OutputStream outputStream) throws Exception {
       /*
        * convert into outputstream
        */
@@ -68,6 +76,8 @@ public class BNF2ANTLR {
       st.add("grammar", baos.toString());
       st.add("date", new Date().toString());
       st.add("grammarName", grammarName);
+      st.add("author", author);
+      st.add("year", year);
       /*
        * done
        */
@@ -113,6 +123,24 @@ public class BNF2ANTLR {
          final Option nn = OptionBuilder.create(NAME);
          options.addOption(nn);
          /*
+          * author
+          */
+         OptionBuilder.withArgName(AUTHOR);
+         OptionBuilder.hasArg();
+         OptionBuilder.withDescription("grammar author");
+         OptionBuilder.isRequired(true);
+         final Option au = OptionBuilder.create(AUTHOR);
+         options.addOption(au);
+         /*
+          * year
+          */
+         OptionBuilder.withArgName(YEAR);
+         OptionBuilder.hasArg();
+         OptionBuilder.withDescription("grammar year");
+         OptionBuilder.isRequired(true);
+         final Option ff = OptionBuilder.create(YEAR);
+         options.addOption(ff);
+         /*
           * type
           */
          OptionBuilder.withArgName(GRAMMAR_TYPE);
@@ -130,6 +158,8 @@ public class BNF2ANTLR {
          final String outputFileName = cmd.getOptionValue(OUTPUT_FILE);
          final String grammarType = cmd.getOptionValue(GRAMMAR_TYPE);
          final String grammarName = cmd.getOptionValue(NAME);
+         final String author = cmd.getOptionValue(AUTHOR);
+         final String year = cmd.getOptionValue(YEAR);
          /*
           * get file
           */
@@ -153,7 +183,7 @@ public class BNF2ANTLR {
             /*
              * convert
              */
-            convert(converter, grammarName, fis, os);
+            convert(converter, grammarName, author, year, fis, os);
          } else {
             System.out.println("Could not find file '" + inputFileName + "'");
          }
