@@ -1,0 +1,1 @@
+java -jar target/bnf2antlr-1.0-SNAPSHOT.one-jar.jar --input=src/test/resources/examples/pascal.ebnf --type=ebnf

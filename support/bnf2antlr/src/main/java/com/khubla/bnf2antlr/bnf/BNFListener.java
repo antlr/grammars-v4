@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.khubla.bnf.bnfListener;
 import com.khubla.bnf.bnfParser.AlternativeContext;
+import com.khubla.bnf.bnfParser.AlternativesContext;
 import com.khubla.bnf.bnfParser.ElementContext;
 import com.khubla.bnf.bnfParser.IdContext;
 import com.khubla.bnf.bnfParser.LhsContext;
@@ -43,6 +44,11 @@ public class BNFListener implements bnfListener {
 
    @Override
    public void enterAlternative(AlternativeContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void enterAlternatives(AlternativesContext ctx) {
       // TODO Auto-generated method stub
    }
 
@@ -103,6 +109,11 @@ public class BNFListener implements bnfListener {
 
    @Override
    public void exitAlternative(AlternativeContext ctx) {
+      // TODO Auto-generated method stub
+   }
+
+   @Override
+   public void exitAlternatives(AlternativesContext ctx) {
       // TODO Auto-generated method stub
    }
 

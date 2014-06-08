@@ -51,7 +51,6 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-maven-plugin</artifactId>
@@ -60,6 +59,21 @@
 					<grammars>bnf.g4 ebnf.g4</grammars>
 					<outputDirectory>src/main/java</outputDirectory>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.jolira</groupId>
+				<artifactId>onejar-maven-plugin</artifactId>
+				<version>1.4.4</version>
+				<executions>
+					<execution>
+						<configuration>
+							<mainClass>com.khubla.bnf2antlr.BNF2ANTLR</mainClass>
+						</configuration>
+						<goals>
+							<goal>one-jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
