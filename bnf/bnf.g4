@@ -58,6 +58,7 @@ element
     | zeroormore
     | oneormore
     | text
+    | captext
     | id
     ;
 
@@ -71,6 +72,10 @@ zeroormore
 
 oneormore
     : RPAREN alternatives LPAREN
+    ;
+
+captext
+    : CAPTEXT
     ;
 
 text
@@ -118,8 +123,12 @@ BAR
     : '|'
     ;
 
+CAPTEXT
+    : UPPERCASE_LETTER TEXT
+    ;
+
 TEXT
-    : (LETTER | DIGIT| SYMBOL)+
+    : (UPPERCASE_LETTER | LOWERCASE_LETTER | DIGIT| SYMBOL)+
     ;
 
 /*
@@ -129,9 +138,12 @@ STRINGLITERAL
     : '"' .*? '"'
     ;
 
-fragment LETTER
+fragment UPPERCASE_LETTER
+    : 'A'..'Z'
+    ;
+
+fragment LOWERCASE_LETTER
     : 'a'..'z'
-    | 'A'..'Z'
     ;
 
 fragment DIGIT
