@@ -66,7 +66,7 @@ category_implementation:
 protocol_declaration:
 	'@protocol'(
 	protocol_name ( protocol_reference_list )?
-	( interface_declaration_list )?
+	interface_declaration_list? '@optional'? interface_declaration_list?
 	)'@end';
 
 protocol_declaration_list:
@@ -198,7 +198,7 @@ type_specifier:
 	|	struct_or_union_specifier
 	|	enum_specifier 
 	|	IDENTIFIER
-        |       '(''^' IDENTIFIER ')' block_parameters?;     // block style type name
+        |       '(''^' IDENTIFIER? ')' block_parameters?;     // block style type name
 
 type_qualifier:
 	'const' | 'volatile' | protocol_qualifier;
@@ -477,6 +477,7 @@ IMPLEMENTATION  : '@implementation';
 INTERFACE       : '@interface';
 PACKAGE         : '@package';
 PROTOCOL        : '@protocol';
+OPTIONAL        : '@optional';
 PRIVATE         : '@private';
 PROPERTY        : '@property';
 PROTECTED       : '@protected';
