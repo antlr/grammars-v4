@@ -4,9 +4,8 @@
 /**/.settings/
 /**/target
 
-<<<<<<< daabf56da56ce1a5081e3e5d7c7fce809753c581
 .fetch_time_cache
-=======
+
 /fasta/.project
 
 /fasta/.classpath
@@ -72,41 +71,21 @@
 /support/antlr4test-maven-plugin/target/
 
 /support/bnf2antlr/target/
-<<<<<<< a981dd4f936ef35bf7e9e7f2c9ae52bd46cbeac6
->>>>>>> start of bnf2antlr
-=======
 
 /support/bnf2antlr/.settings/
 /support/bnf2antlr/.project
 /support/bnf2antlr/.classpath
-<<<<<<< cbb3752178efa2e36051b4fbd468b7be98603691
->>>>>>> closer
-=======
 
 /support/bnf2antlr/test-output/
 
-/bnf/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
-/bnf/target/maven-archiver/pom.properties
-/bnf/target/generated-sources/antlr4/bnfParser.java
-/bnf/target/generated-sources/antlr4/bnfListener.java
-/bnf/target/generated-sources/antlr4/bnfLexer.tokens
-/bnf/target/generated-sources/antlr4/bnfLexer.java
-/bnf/target/generated-sources/antlr4/bnfBaseListener.java
-/bnf/target/generated-sources/antlr4/bnf.tokens
-/bnf/target/classes/bnfParser.class
-/bnf/target/classes/bnfParser$ZeroormoreContext.class
-/bnf/target/classes/bnfParser$TextContext.class
-/bnf/target/classes/bnfParser$RulelistContext.class
-/bnf/target/classes/bnfParser$Rule_Context.class
-/bnf/target/classes/bnfParser$RhsContext.class
-/bnf/target/classes/bnfParser$OptionalContext.class
-/bnf/target/classes/bnfParser$OneormoreContext.class
-/bnf/target/classes/bnfParser$LhsContext.class
-/bnf/target/classes/bnfParser$IdContext.class
-/bnf/target/classes/bnfParser$ElementContext.class
-/bnf/target/classes/bnfParser$AlternativeContext.class
-/bnf/target/classes/bnfListener.class
-/bnf/target/classes/bnfLexer.class
-/bnf/target/classes/bnfBaseListener.class
-/bnf/target/bnf-1.0-SNAPSHOT.jar
->>>>>>> BNF
+
+/bnf/target/
+
+/support/antlr4test-maven-plugin/.settings/
+/support/antlr4test-maven-plugin/.project
+/support/antlr4test-maven-plugin/.classpath
+
+/swift/target/
+
+/support/bnf2antlr/plm.g4
+
