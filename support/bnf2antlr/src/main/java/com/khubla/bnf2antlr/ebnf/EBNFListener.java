@@ -5,7 +5,10 @@ import java.io.PrintWriter;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.misc.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.khubla.bnf2antlr.bnf.BNFListener;
 import com.khubla.ebnf.ebnfBaseListener;
 import com.khubla.ebnf.ebnfParser;
 
@@ -13,6 +16,10 @@ import com.khubla.ebnf.ebnfParser;
  * @author tom
  */
 public class EBNFListener extends ebnfBaseListener {
+   /**
+    * logger
+    */
+   private static Logger logger = LoggerFactory.getLogger(BNFListener.class);
    /**
     * output
     */
@@ -79,7 +86,9 @@ public class EBNFListener extends ebnfBaseListener {
    public void exitRule_(@NotNull ebnfParser.Rule_Context ctx) {
       final String ruleRHS = parseStack.pop().trim();
       final String ruleName = parseStack.pop().trim();
-      parseStack.push(ruleName + " : " + ruleRHS + ";");
+      final String antlrRule = ruleName + " : " + ruleRHS + ";";
+      parseStack.push(antlrRule);
+      logger.debug(antlrRule);
    }
 
    @Override
