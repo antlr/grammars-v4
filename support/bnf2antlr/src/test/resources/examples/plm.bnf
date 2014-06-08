@@ -1,15 +1,16 @@
 <character> ::= <apostrophe> | <non-quote character> 
 <apostrophe> ::= '
-<non-quote character>::= <letter> | <decimal digit> | $ |<special character> | blank <letter>::= <uppercase letter> | <lowercase letter>
+<non-quote character>::= <letter> | <decimal digit> | $ |<special character> | blank 
+<letter>::= <uppercase letter> | <lowercase letter>
 <uppercase letter>::=Lexical Elements Character Sets
-<character>::= <apostrophe> | <non-quote character> <apostrophe>::= '
+<character>::= <apostrophe> | <non-quote character> 
+<apostrophe>::= '
 <non-quote character>::= <letter> | <decimal digit> | $ |
 <special character> | blank <letter>::= <uppercase letter> | <lowercase letter>
 <uppercase letter>::=A | B | C | D | E | F | G | H | I | J | K | L | M|N|O|P|Q|R|S|T|U|V|W|X| Y|Z
 <lowercase letter>::=a | b | c | d | e | f | g | h | i | j | k | l | m|n|o|p|q|r|s|t|u|v|w|x| y|z
 <decimal digit>::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 <special character>::= + | - | * | / | < | > | = | : | ; | . | , "|", "("|")"|@|_
-
 <token>::= <delimiter> | <identifier> | <reserved word> |     <numeric constant> | <string>
 <delimiter>::= <simple delimiter> | <compound delimiter>
 <simple delimiter>::= + | - | * | / | < | > | = | : | ; | . | , |  "|" |@
@@ -17,17 +18,12 @@
 <first id character>::= <letter> | _
 <identifier>::= <first id character> [<letter> | <decimal digit> | $ | _ ]...
 <reserved word> (For a list of reserved words, see Appendix A.)
-
-<numeric constant>::= <binary number> | <octal number> |
-                      <decimal number> | <hexadecimal number> |
-                      <floating point number>
+<numeric constant>::= <binary number> | <octal number> | <decimal number> | <hexadecimal number> | <floating point number>
 <binary number>::= <binary digit> [<binary digit> | $]... B | Q
 <octal number>::= <octal digit> [<octal digit> | $]... { O | Q }
 <decimal number>::= <decimal digit> [<decimal digit> | $]... [D]
-<hexadecimal number>::= <decimal digit> [<hexadecimal digit>
-| $]... H
-<floating point number>::= <digit string> <fractional part>
-                           [<exponent part>]
+<hexadecimal number>::= <decimal digit> [<hexadecimal digit>| $]... H
+<floating point number>::= <digit string> <fractional part> [<exponent part>]
 <fractional part>::= [<.digit string>]
 <exponent part>::= E [+ | -] <digit string>
 <digit string>::= <decimal digit> [<decimal digit> | $]...
@@ -35,7 +31,6 @@
 <octal digit>::= <binary digit> | 2 | 3 | 4 | 5 | 6 | 7
 <decimal digit>::= <octal digit> | 8 | 9
 <hexadecimal digit>::= <decimal digit> | A | B | C | D | E | F
-
 <string>::= '<string body element> [<string body element>]... '
 <string body element>::= <non-quote character> |"
 <pl/m text>::= <token> | <separator> [<token> | <separator>]...
@@ -45,7 +40,6 @@
 <module>::= <module name>:<simple do block>
 <module name>::= <identifier>
 <declaration>::= <declare statement> | <procedure definition>
-DECLARE Statement
 <declare statement>::= DECLARE <declare element list>;
 <declare element list>::= <declare element>[,<declare element>]...
 <declare element>::= <factored element> | <unfactored element>
@@ -69,15 +63,11 @@ DECLARE Statement
 <explicit dimension>::= (<numeric constant>)
 <implicit dimension>::= (*)
 <variable type>::= <basic type> | <structure type>
-<basic type>::= Address | BYTE | HWORD | DWORD | QWORD | CHARINT |
-                OFFSET | SHORTINT | INTEGER | REAL | SELECTOR |
-                POINTER | OFFSET
+<basic type>::= Address | BYTE | HWORD | DWORD | QWORD | CHARINT |  OFFSET | SHORTINT | INTEGER | REAL | SELECTOR |  POINTER | OFFSET
 <label element>::= <identifier> LABEL [PUBLIC | EXTERNAL]
 <literal element>::= <identifier> LITERALLY <string>
-<factored variable element>::= ( <variable name specifier> [,<variable name specifier>]...)
-[<explicit dimension>] <variable type> [<variable attributes>]
-<factored label element>::= (<identifier> [,<identifier>]...)
-                            LABEL [PUBLIC | EXTERNAL]
+<factored variable element>::= ( <variable name specifier> [,<variable name specifier>]...)[<explicit dimension>] <variable type> [<variable attributes>]
+<factored label element>::= (<identifier> [,<identifier>]...)  LABEL [PUBLIC | EXTERNAL]
 <structure type>::= STRUCTURE (<member element>
                     [,<member element>]...)
 <member element>::= <unfactored member> | <factored member>
@@ -87,16 +77,13 @@ DECLARE Statement
 <factored member>::= (<member name>(,<member name>)...)
                      [<explicit dimension>] <variable type>
 <procedure definition>::= <procedure statement> [<declaration>...] [<unit>...] <ending>
-<procedure statement>::= <procedure name> : PROCEDURE
-[<formal parameter list>] [<procedure type>]
-[<procedure attributes>]; <procedure name>::= <identifier>
+<procedure statement>::= <procedure name> : PROCEDURE [<formal parameter list>] [<procedure type>] [<procedure attributes>]; <procedure name>::= <identifier>
 <procedure type>::= <basic type>
 <formal parameter list>::= (<formal parameter> [,<formal parameter>]...)
 <formal parameter>::= <identifier>
 <procedure attributes>::= {EXTERNAL | PUBLIC | <interrupt> | REENTRANT}...
 <locator>::= AT (<expression>)
 <interrupt>::= INTERRUPT
-Initialization
 <initialization>::= {INITIAL | DATA} (<initial  value>
                     [,<initial  value>]...)
 <initial value>::= <expression> | <string>
@@ -191,7 +178,6 @@ Initialization
 <secondary>::= [<unary minus> | <unary plus>] <primary>
 <unary minus>::= -
 <unary plus>::= +
-
 <lowercase letter>::=
 A | B | C | D | E | F | G | H | I | J | K | L | M|N|O|P|Q|R|S|T|U|V|W|X| Y|Z
 a | b | c | d | e | f | g | h | i | j | k | l | m|n|o|p|q|r|s|t|u|v|w|x| y|z
