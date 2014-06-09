@@ -198,6 +198,7 @@ type_specifier:
 	|	struct_or_union_specifier
 	|	enum_specifier 
 	|	IDENTIFIER
+        |       IDENTIFIER '*'
         |       '(''^' IDENTIFIER? ')' block_parameters?;     // block style type name
 
 type_qualifier:
