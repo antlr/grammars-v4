@@ -8,6 +8,7 @@
 	<name>ANTLR4 grammars</name>
 	<modules>
 		<module>support</module>		
+		<module>objc</module>		
 		<module>creole</module>
 		<module>bnf</module>
 		<module>pgn</module>
