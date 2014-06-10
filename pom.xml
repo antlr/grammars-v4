@@ -7,8 +7,9 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>ANTLR4 grammars</name>
 	<modules>
-		<module>support</module>		
+		<module>support</module>
 		<module>objc</module>		
+		<module>dot</module>		
 		<module>creole</module>
 		<module>bnf</module>
 		<module>pgn</module>
