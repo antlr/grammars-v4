@@ -71,3 +71,7 @@
 /support/antlr4test-maven-plugin/.classpath
 
 /swift/target/
+
+/objc/target/
+
+/dot/target/
