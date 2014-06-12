@@ -9,10 +9,11 @@
 *
 * It's a Work in progress, most of the .h file can be parsed
 * June 2008 Cedric Cuche
-* Updated June 2014, Carlos Mejia.  Fix try-catch, add support for @( @{ @[
+* Updated June 2014, Carlos Mejia.  Fix try-catch, add support for @( @{ @[ and blocks
 **/
 
 grammar ObjC;
+
 
 translation_unit: external_declaration+ EOF;
 
@@ -53,6 +54,7 @@ class_implementation:
 	'@implementation'
 	(
 	class_name ( ':' superclass_name )?
+	instance_variables?
 	( implementation_definition_list )?
 	)
 	'@end';
@@ -190,6 +192,7 @@ property_synthesize_item
     : IDENTIFIER | IDENTIFIER '=' IDENTIFIER
     ;
 
+block_type:('void'|'id'|IDENTIFIER) '(''^' IDENTIFIER? ')' block_parameters? ;
 
 type_specifier:
 'void' | 'char' | 'short' | 'int' | 'long' | 'float' | 'double' | 'signed' | 'unsigned' 
@@ -198,8 +201,7 @@ type_specifier:
 	|	struct_or_union_specifier
 	|	enum_specifier 
 	|	IDENTIFIER
-        |       IDENTIFIER '*'
-        |       '(''^' IDENTIFIER? ')' block_parameters?;     // block style type name
+    |   IDENTIFIER pointer;
 
 type_qualifier:
 	'const' | 'volatile' | protocol_qualifier;
@@ -235,9 +237,9 @@ array_expression:
 box_expression:
         '@''('postfix_expression')' |
         '@'constant;
-block_parameters: '(' (type_variable_declarator | 'void') (',' type_variable_declarator)* ')';
+block_parameters: '(' (type_variable_declarator | 'void')? (',' type_variable_declarator)* ')';
 
-block_expression:'^' block_parameters? compound_statement;
+block_expression:'^' type_specifier? block_parameters? compound_statement;
 
 message_expression:
 	'[' receiver message_selector ']'
@@ -272,20 +274,20 @@ type_variable_declarator:
 	declaration_specifiers declarator;
 
 try_statement:
-	'@try' statement;
+	'@try' compound_statement;
 
 catch_statement:
-	'@catch' '('type_variable_declarator')' statement;
+	'@catch' '('type_variable_declarator')' compound_statement;
 
 finally_statement:
-	'@finally' statement;
+	'@finally' compound_statement;
 
 throw_statement:
 	'@throw' '('IDENTIFIER')';
 
 try_block: 
         try_statement
-        catch_statement
+        ( catch_statement)*
         ( finally_statement )?;
 
 synchronized_statement:
@@ -328,10 +330,18 @@ enum_specifier : 'enum'
 enumerator_list : enumerator (',' enumerator)* ;
 enumerator : identifier ('=' constant_expression)?;
 
-declarator : '*' type_qualifier* declarator | direct_declarator ;
+pointer
+    :   '*' declaration_specifiers?
+    |   '*' declaration_specifiers? pointer;
+    
+
+
+declarator : pointer ? direct_declarator ;
 
 direct_declarator : identifier declarator_suffix*
-                  | '(' declarator ')' declarator_suffix* ;
+                  | '(' declarator ')' declarator_suffix* 
+                  | '(''^' identifier? ')' block_parameters;
+
 
 declarator_suffix : '[' constant_expression? ']'
 		  | '(' parameter_list? ')';
@@ -342,11 +352,12 @@ parameter_declaration
   : declaration_specifiers (declarator? | abstract_declarator) ;
 
 initializer : assignment_expression
-	    | '{' initializer (',' initializer)* '}' ;
+	    | '{' initializer (',' initializer)* ','? '}' ;
 
-type_name : specifier_qualifier_list abstract_declarator ;
+type_name : specifier_qualifier_list abstract_declarator 
+          | block_type;
 
-abstract_declarator : '*' type_qualifier* abstract_declarator 
+abstract_declarator : pointer abstract_declarator 
   | '(' abstract_declarator ')' abstract_declarator_suffix+
   | ('[' constant_expression? ']')+
   | ;
@@ -383,11 +394,16 @@ selection_statement
   : 'if' '(' expression ')' statement ('else' statement)?
   | 'switch' '(' expression ')' statement ;
 
+for_in_statement : 'for' '(' type_variable_declarator 'in' expression? ')' statement;
+for_statement: 'for' '(' ((declaration_specifiers init_declarator_list) | expression)? ';' expression? ';' expression? ')' statement;
+while_statement: 'while' '(' expression ')' statement;
+do_statement: 'do' statement 'while' '(' expression ')' ';';
+
 iteration_statement
-  : 'while' '(' expression ')' statement
-  | 'do' statement 'while' '(' expression ')' ';'
-  | 'for' '(' ((declaration_specifiers init_declarator_list) | expression)? ';' expression? ';' expression? ')' statement
-  | 'for' '(' type_variable_declarator 'in' expression? ')' statement ;
+  : while_statement
+  | do_statement
+  | for_statement
+  | for_in_statement ;
 
 jump_statement
   : 'goto' identifier ';'
@@ -398,8 +414,11 @@ jump_statement
 
 expression : assignment_expression (',' assignment_expression)* ;
 
-assignment_expression : conditional_expression 
-  ( assignment_operator assignment_expression)? ;
+assignment_expression
+    :   conditional_expression
+    |   unary_expression assignment_operator assignment_expression
+    ;
+
 assignment_operator: 
   '=' | '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|=';
 
