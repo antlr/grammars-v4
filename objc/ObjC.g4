@@ -192,7 +192,7 @@ property_synthesize_item
     : IDENTIFIER | IDENTIFIER '=' IDENTIFIER
     ;
 
-block_type:('void'|IDENTIFIER) '(''^' IDENTIFIER? ')' block_parameters? ;
+block_type:('void'|'id'|IDENTIFIER) '(''^' IDENTIFIER? ')' block_parameters? ;
 
 type_specifier:
 'void' | 'char' | 'short' | 'int' | 'long' | 'float' | 'double' | 'signed' | 'unsigned' 
@@ -201,7 +201,7 @@ type_specifier:
 	|	struct_or_union_specifier
 	|	enum_specifier 
 	|	IDENTIFIER
-        |       IDENTIFIER pointer;
+    |   IDENTIFIER pointer;
 
 type_qualifier:
 	'const' | 'volatile' | protocol_qualifier;
