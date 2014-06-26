@@ -10,6 +10,14 @@
 		<version>1.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
+	
+	 <licenses>
+        <license>
+            <name>The New BSD License</name>
+            <url>http://www.opensource.org/licenses/bsd-license.html</url>
+        </license>
+    </licenses>
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -18,7 +26,6 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>gff3.g4</grammars>
 				</configuration>
 				<executions>
 					<execution>
