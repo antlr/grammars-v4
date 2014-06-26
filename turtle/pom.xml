@@ -34,7 +34,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>true</showTree>
-					<entryPoint>turtledoc</entryPoint>
+					<entryPoint>turtleDoc</entryPoint>
 					<grammarName>TURTLE</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
