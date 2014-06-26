@@ -54,10 +54,10 @@ INTEGER	        :	[+-]? [0-9]+;
 DECIMAL	        :	[+-]? [0-9]* '.' [0-9]+;
 DOUBLE	        :	[+-]? ([0-9]+ '.' [0-9]* EXPONENT | '.' [0-9]+ EXPONENT | [0-9]+ EXPONENT);
 EXPONENT	    :	[eE] [+-]? [0-9]+;
-STRING_LITERAL_LONG_SINGLE_QUOTE	:	'\'\'\'' (('\'' | '\'\'')? ([^'\\] | ECHAR | UCHAR))* '\'\'\''; //Do they need the trick from the other 2 StringLiterals?
-STRING_LITERAL_LONG_QUOTE	:	'"""' (('"' | '""')? (~["\\] | ECHAR | UCHAR))* '"""';
-STRING_LITERAL_QUOTE	:	'"' (~['"''\\''\r''\n']| STRING_LITERAL_SINGLE_QUOTE | '\'' | '\\"')* '"' /* \u22=" \u5C=\ \uA=new line \uD=carriage return ECHAR | UCHAR */;
-STRING_LITERAL_SINGLE_QUOTE	:	'\'' (~['\u0027''\u005C''\u000A''\u000D'] | ECHAR | UCHAR | STRING_LITERAL_QUOTE)* '\'' /* \u27=' \u5C=\ \uA=new line \uD=carriage return */;
+STRING_LITERAL_LONG_SINGLE_QUOTE	:	'\'\'\'' (('\'' | '\'\'')? ([^'\\] | ECHAR | UCHAR | '"'))* '\'\'\'';
+STRING_LITERAL_LONG_QUOTE	:	'"""' (('"' | '""')? (~["\\] | ECHAR | UCHAR|'\''))* '"""';
+STRING_LITERAL_QUOTE	:	'"' (~['"''\\''\r''\n']| '\'' | '\\"')* '"' /* \u22=" \u5C=\ \uA=new line \uD=carriage return ECHAR | UCHAR */;
+STRING_LITERAL_SINGLE_QUOTE	:	'\'' (~['\u0027''\u005C''\u000A''\u000D'] | ECHAR | UCHAR | '"')* '\'' /* \u27=' \u5C=\ \uA=new line \uD=carriage return */;
 UCHAR	 		:	'\\u' HEX HEX HEX HEX | '\\U' HEX HEX HEX HEX HEX HEX HEX HEX;
 ECHAR			:	'\\' [tbnrf"\'\\];
 ANON_WS				:' ' | '\t' | '\r' | '\n';
