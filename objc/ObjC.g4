@@ -192,7 +192,7 @@ property_synthesize_item
     : IDENTIFIER | IDENTIFIER '=' IDENTIFIER
     ;
 
-block_type:('void'|'id'|IDENTIFIER) '(''^' IDENTIFIER? ')' block_parameters? ;
+block_type:type_specifier '(''^' type_specifier? ')' block_parameters? ;
 
 type_specifier:
 'void' | 'char' | 'short' | 'int' | 'long' | 'float' | 'double' | 'signed' | 'unsigned' 
@@ -229,10 +229,10 @@ dictionary_pair:
          postfix_expression':'postfix_expression;
 
 dictionary_expression:
-        '@''{' dictionary_pair? (',' dictionary_pair)* '}';
+        '@''{' dictionary_pair? (',' dictionary_pair)* ','? '}';
 
 array_expression:
-        '@''[' postfix_expression? (',' postfix_expression)* ']';
+        '@''[' postfix_expression? (',' postfix_expression)* ','? ']';
 
 box_expression:
         '@''('postfix_expression')' |
@@ -291,7 +291,7 @@ try_block:
         ( finally_statement )?;
 
 synchronized_statement:
-	'@synchronized' '(' (IDENTIFIER | 'self') ')' compound_statement;
+	'@synchronized' '(' primary_expression ')' compound_statement;
 
 autorelease_statement:
 	'@autoreleasepool'  compound_statement;
@@ -320,14 +320,14 @@ struct_declarator_list : struct_declarator (',' struct_declarator)* ;
 
 struct_declarator : declarator | declarator? ':' constant;
 
-enum_specifier : 'enum' 
+enum_specifier : 'enum' (':' type_name)? 
   ( identifier ('{' enumerator_list '}')? 
   | '{' enumerator_list '}') 
   | 'NS_OPTIONS' '(' type_name ',' identifier ')' '{' enumerator_list '}'
   | 'NS_ENUM' '(' type_name ',' identifier ')' '{' enumerator_list '}' ;
 
 
-enumerator_list : enumerator (',' enumerator)* ;
+enumerator_list : enumerator (',' enumerator)* ','? ;
 enumerator : identifier ('=' constant_expression)?;
 
 pointer
@@ -719,6 +719,7 @@ LINE_COMMENT
 
 HDEFINE : '#define' ~[\r\n]* -> channel(HIDDEN);
 HIF : '#if' ~[\r\n]* -> channel(HIDDEN);
+HELSE : '#else' ~[\r\n]* -> channel(HIDDEN);
 HUNDEF : '#undef' ~[\r\n]* -> channel(HIDDEN);
 HIFNDEF : '#ifndef' ~[\r\n]* -> channel(HIDDEN);
 HENDIF : '#endif' ~[\r\n]* -> channel(HIDDEN);
