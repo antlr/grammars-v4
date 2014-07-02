@@ -25,6 +25,7 @@
 		<module>fasta</module>
 		<module>html</module>
 		<module>turtle</module>
+		<module>brainfuck</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
