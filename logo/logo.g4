@@ -39,7 +39,7 @@ prog
 line
     : cmd+ comment?
     | comment
-    | print
+    | print comment?
     | procedureDeclaration
     ;
      
@@ -107,7 +107,11 @@ make
     ;
 
 print
-    : 'print' value
+    : 'print' (value | quotedstring)
+    ;
+
+quotedstring
+    : '[' (quotedstring | ~']')* ']'
     ;
 
 name
@@ -211,7 +215,7 @@ STRINGLITERAL
 STRING
     : [a-zA-Z] [a-zA-Z0-9_]*
     ;
-
+    
 NUMBER
     : [0-9]+
     ;
