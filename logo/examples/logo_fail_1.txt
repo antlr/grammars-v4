@@ -1,0 +1,3 @@
+print "if
+print "print
+print "repeat
