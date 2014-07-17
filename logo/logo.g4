@@ -39,6 +39,7 @@ prog
 line
     : cmd+ comment?
     | comment
+    | print
     | procedureDeclaration
     ;
      
@@ -57,7 +58,6 @@ cmd
     | label
     | setxy
     | make
-    | print
     | procedureInvocation
     | ife
     | stop
@@ -103,7 +103,7 @@ comparisonOperator
     ;
 
 make
-    : 'make' stringliteral value
+    : 'make' STRINGLITERAL value
     ;
 
 print
@@ -114,12 +114,8 @@ name
     : STRING
     ;
 
-stringliteral
-    : '"' STRING
-    ;
-
 value
-    : stringliteral
+    : STRINGLITERAL
     | expression
     | deref 
     ;
@@ -208,6 +204,10 @@ comment
     : COMMENT
     ;
      
+STRINGLITERAL
+    : '"' STRING
+    ;
+
 STRING
     : [a-zA-Z] [a-zA-Z0-9_]*
     ;
