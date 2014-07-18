@@ -33,12 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar logo;
 
 prog
-    : (line? EOL)+
+    : (line? EOL)+ line?
     ;
 
 line
     : cmd+ comment?
     | comment
+    | print comment?
     | procedureDeclaration
     ;
      
@@ -57,7 +58,6 @@ cmd
     | label
     | setxy
     | make
-    | print
     | procedureInvocation
     | ife
     | stop
@@ -103,23 +103,23 @@ comparisonOperator
     ;
 
 make
-    : 'make' stringliteral value
+    : 'make' STRINGLITERAL value
     ;
 
 print
-    : 'print' value
+    : 'print' (value | quotedstring)
+    ;
+
+quotedstring
+    : '[' (quotedstring | ~']')* ']'
     ;
 
 name
     : STRING
     ;
 
-stringliteral
-    : '"' STRING
-    ;
-
 value
-    : stringliteral
+    : STRINGLITERAL
     | expression
     | deref 
     ;
@@ -208,10 +208,14 @@ comment
     : COMMENT
     ;
      
+STRINGLITERAL
+    : '"' STRING
+    ;
+
 STRING
     : [a-zA-Z] [a-zA-Z0-9_]*
     ;
-
+    
 NUMBER
     : [0-9]+
     ;
