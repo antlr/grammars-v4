@@ -1,0 +1,3 @@
+;In logo, characters in [] after print command should be output as a string,include blank space and unicode and number
+print[hello world]        	;should display "hello world"
+print[hello Эт]			;should display "hello Эт"
