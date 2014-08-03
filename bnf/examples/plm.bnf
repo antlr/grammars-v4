@@ -1,16 +1,12 @@
-<character> ::= <apostrophe> | <non-quote character> 
-<apostrophe> ::= '
-<non-quote character>::= <letter> | <decimal digit> | $ |<special character> | blank <letter>::= <uppercase letter> | <lowercase letter>
-<uppercase letter>::=Lexical Elements Character Sets
-<character>::= <apostrophe> | <non-quote character> <apostrophe>::= '
+<character>::= <apostrophe> | <non-quote character>
+<apostrophe>::= '
 <non-quote character>::= <letter> | <decimal digit> | $ |
 <special character> | blank <letter>::= <uppercase letter> | <lowercase letter>
 <uppercase letter>::=A | B | C | D | E | F | G | H | I | J | K | L | M|N|O|P|Q|R|S|T|U|V|W|X| Y|Z
 <lowercase letter>::=a | b | c | d | e | f | g | h | i | j | k | l | m|n|o|p|q|r|s|t|u|v|w|x| y|z
 <decimal digit>::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 <special character>::= + | - | * | / | < | > | = | : | ; | . | , "|", "("|")"|@|_
-
-<token>::= <delimiter> | <identifier> | <reserved word> |     <numeric constant> | <string>
+<token>::= <delimiter> | <identifier> | <reserved word> | <numeric constant> | <string>
 <delimiter>::= <simple delimiter> | <compound delimiter>
 <simple delimiter>::= + | - | * | / | < | > | = | : | ; | . | , |  "|" |@
 <compound delimiter>::= <> | <= | >= | :=
