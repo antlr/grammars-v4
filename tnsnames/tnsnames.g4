@@ -10,10 +10,9 @@
 // Warning: I'm not a compiler writer, nor do I play one on TV.
 // Warning: This is my first "proper" ANTLR grammar.
 // -------------------------------------------------------------------
-// This grammar assumes, unless I have fixed it, that we are dealing
-// with proper tnsnames entries that locate a database. It does not
-// at least deliberately, cope with entries for listeners and/or scan 
-// listeners etc.
+// This grammar assumes, that we are dealing with tnsnames entries that 
+// locate a database, or, those that describe a listener or scan 
+// listener.
 // -------------------------------------------------------------------
 // MAYBE TODO:
 //
@@ -65,11 +64,25 @@ grammar tnsnames;
 //-----------------------------------------------------------------
 // Top level rule. Start here with a complete tnsnames.ora file.
 //-----------------------------------------------------------------
-tnsnames         : (tns_entry | ifile)* ;
+tnsnames         : (tns_entry | ifile | lsnr_entry)* ;
 
 tns_entry        : alias_list EQUAL (description_list | description) ;
 
 ifile            : IFILE '=' DQ_STRING ;
+
+//-----------------------------------------------------------------
+// Listener only entries can be interesting. Here are a couple of
+// valid examples, there are others:
+//
+// LSNR_FRED =
+//    (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=xebor04)(PORT=1524)))
+//
+// LSNR_WILMA =
+//    (ADDRESS=(PROTOCOL=IPC)(KEY=LISTENER))
+//-----------------------------------------------------------------
+lsnr_entry       : alias EQUAL (lsnr_description | address_list | (address)+) ;
+
+lsnr_description : L_PAREN DESCRIPTION EQUAL (address_list | (address)+) R_PAREN ;
 
 //-----------------------------------------------------------------
 // Stuff related to alias names. These are weird, they can start
@@ -282,11 +295,22 @@ beq_program      : L_PAREN PROGRAM EQUAL ID R_PAREN ;
 
 beq_argv0        : L_PAREN ARGV0 EQUAL ID R_PAREN ;
 
-//-----------------------------------------------------------------
-// At this stage, we simply ignore the ARGS. For now just treat as
-// as single quotes string.
-//-----------------------------------------------------------------
-beq_args         : L_PAREN ARGS EQUAL SQ_STRING R_PAREN ;
+beq_args         : L_PAREN ARGS EQUAL ba_parameter R_PAREN ;
+
+ba_parameter     : S_QUOTE ba_description S_QUOTE ;
+
+ba_description   : L_PAREN DESCRIPTION EQUAL bad_params R_PAREN ;
+
+bad_params       : bad_parameter+ ;
+
+bad_parameter    : bad_local
+                 | bad_address
+                 ;
+
+bad_local        : L_PAREN LOCAL EQUAL YES_NO R_PAREN ;
+
+bad_address      : L_PAREN ADDRESS EQUAL beq_beq R_PAREN ;
+
 
 //-----------------------------------------------------------------
 // Connect data rules. 
@@ -477,13 +501,11 @@ IFILE            : I F I L E ;
 
                  
 // ---------------------------------------------------------------
-// It seems I can't use D_QUOTE or S_QUOTE in the middle of the 
-// following lexer rules. Compiling the grammar gives "rule 
-// reference D_QUOTE is not currently supported in a set".
+// It seems I can't use D_QUOTE in the middle of the following 
+// lexer rule. Compiling the grammar gives "rule reference D_QUOTE 
+// is not currently supported in a set".
 // ---------------------------------------------------------------
 DQ_STRING        : D_QUOTE (~'"')* D_QUOTE ;
-                 
-SQ_STRING        : S_QUOTE (~'\'')* S_QUOTE ;
                  
                  
 //-------------------------------------------------
