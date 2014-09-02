@@ -27,10 +27,11 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** Derived from http://www.scala-lang.org/files/archive/spec/2.11/13-syntax-summary.html.
+/*
+   Derived from http://www.scala-lang.org/files/archive/spec/2.11/13-syntax-summary.html
  */
 
-grammar scala;
+grammar Scala;
 
 literal           : '-'? IntegerLiteral
                   | '-'? FloatingPointLiteral
@@ -44,9 +45,8 @@ qualId            : Id ('.' Id)* ;
 
 ids               : Id (',' Id)* ;
 
-stableId          : Id
-                  | (stableId | (Id '.')? 'this') '.' Id
-                  | (Id '.')? 'super' classQualifier? '.' Id ; 
+stableId          : (Id | (Id '.')? 'this') '.' Id
+                  | (Id '.')? 'super' classQualifier? '.' Id ;
 
 classQualifier    : '[' Id ']' ;
 
@@ -115,14 +115,14 @@ prefixExpr        : ('-' | '+' | '~' | '!')?
                     ('new' (classTemplate | templateBody)| blockExpr | simpleExpr1 '_'?) ;
 
 simpleExpr1       : literal
-                  | (stableId | (Id '.')? 'this')
+                  | stableId 
+                  | (Id '.')? 'this'
                   | '_'
                   | '(' exprs? ')'
-                  | ('new' (classTemplate | templateBody)| blockExpr | simpleExpr1 '_'?) '.' Id 
-                  | ('new' (classTemplate | templateBody)| blockExpr | simpleExpr1 '_'?) typeArgs
-                  | simpleExpr1 argumentExprs
-       //           | xmlExpr 
-       ;
+                  | ('new' (classTemplate | templateBody) | blockExpr ) '.' Id 
+                  | ('new' (classTemplate | templateBody) | blockExpr ) typeArgs
+        //          | simpleExpr1 argumentExprs  
+        ;
                   
 exprs             : expr (',' expr)* ;
 
@@ -167,13 +167,10 @@ pattern3          : simplePattern
                   
 simplePattern     : '_'
                   | Varid
-                  | literal
-                  | stableId
-                  | stableId '(' patterns? ')'
+                  | literal 
+                  | stableId ('(' patterns ')')?
                   | stableId '(' (patterns ',')? (Varid '@')? '_' '*' ')'
-                  | '(' patterns? ')'
-                //  | xmlPattern 
-                  ;
+                  | '(' patterns? ')' ;
 
 patterns          : pattern (',' patterns)*
                   | '_' * ;
@@ -334,64 +331,55 @@ packageObject     : 'package' 'object' objectDef ;
 
 compilationUnit   : ('package' qualId Semi)* topStatSeq ;
 
-//
-
-UnicodeEscape:	'\\' 'u' 'u'? HexDigit HexDigit HexDigit HexDigit ;
-
-WhiteSpace       :  '\u0020' | '\u0009' | '\u000D' | '\u000A';
-// Digit            :  '0' .. '9';
-Paren            :  '(' | ')' | '[' | ']' | '{' | '}';
-Delim            :  '`' | '\'' | '"' | '.' | ';' | ',' ;
-Opchar           : PrintableChar // printableChar not matched by (whiteSpace | upper | lower |
-                     // letter | digit | paren | delim | opchar | Unicode_Sm | Unicode_So)
-                     ;
-                     
-Op               :  Opchar+; 
-Varid            :  Lower Idrest;
-Plainid          :  Upper Idrest
-                 |  Varid
-                 |  Op;
-Id               :  Plainid
-                 |  '`' StringLiteral '`';
-Idrest           :  (Letter | Digit)* ('_' Op)?;
-
+// Lexer
+BooleanLiteral   :  'true' | 'false';
+CharacterLiteral :  '\'' (PrintableChar | CharEscapeSeq) '\'';
+StringLiteral    :  '"' StringElement* '"'
+                 |  '"""' MultiLineChars '"""';
+SymbolLiteral    :  '\'' Plainid;
 IntegerLiteral   :  (DecimalNumeral | HexNumeral) ('L' | 'l');
-
-
 FloatingPointLiteral 
                  :  Digit+ '.' Digit+ ExponentPart? FloatType?
                  |  '.' Digit+ ExponentPart? FloatType?
                  |  Digit ExponentPart FloatType?
                  |  Digit+ ExponentPart? FloatType;
-
-BooleanLiteral   :  'true' | 'false';
-
-CharacterLiteral :  '\'' (PrintableChar | CharEscapeSeq) '\'';
-
-StringLiteral    :  '"' StringElement* '"'
-                 |  '"""' MultiLineChars '"""';
-StringElement    :  '\u0020'| '\u0021'|'\u0023' .. '\u007F'  // (PrintableChar  Except '"')
-                 |  CharEscapeSeq;
-MultiLineChars   :  {'"'? '"'? CharNoDoubleQuote} '"'*;
- 
-SymbolLiteral    :  '\'' Plainid;
-
-Comment          :  '/*' .*  '*/'
-                 |  '//' .*? Nl; //“any sequence of characters up to end of line”
-
-Nl               :  '\r'? '\n';  //“newlinecharacter”
+Id               :  Plainid
+                 |  '`' StringLiteral '`';
+Varid            :  Lower Idrest;
+Nl               :  '\r'? '\n'; 
 Semi             :  ';' |  Nl+;
 
-fragment
-HexDigit :  '0' .. '9'  |  'A' .. 'Z'  |  'a' .. 'z' ;
-FloatType        :  'F' | 'f' | 'D' | 'd';
-Upper            :  'A'  ..  'Z' | '$' | '_';  // and Unicode category Lu
-Lower            :  'a' .. 'z'; // and Unicode category Ll
-Letter           :  Upper | Lower; // and Unicode categories Lo, Lt, Nl
-ExponentPart     :  ('E' | 'e') ('+' | '-')? Digit+;
-PrintableChar    : '\u0020' .. '\u007F' ;
-CharEscapeSeq    : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\');
-DecimalNumeral   :  '0' | NonZeroDigit Digit*;
-HexNumeral       :  '0' 'x' HexDigit HexDigit+;
-Digit            :  '0' | NonZeroDigit;
-NonZeroDigit     :  '1' .. '9';
+Paren            :  '(' | ')' | '[' | ']' | '{' | '}';
+Delim            :  '`' | '\'' | '"' | '.' | ';' | ',' ;
+
+Comment          :  '/*' .*?  '*/'
+                 |  '//' .*? Nl; 
+
+// fragments
+fragment UnicodeEscape    :	'\\' 'u' 'u'? HexDigit HexDigit HexDigit HexDigit ;
+fragment WhiteSpace       :  '\u0020' | '\u0009' | '\u000D' | '\u000A';
+fragment Opchar           : PrintableChar // printableChar not matched by (whiteSpace | upper | lower |
+                          // letter | digit | paren | delim | opchar | Unicode_Sm | Unicode_So)
+                          ;
+fragment Op               :  Opchar+;
+fragment Plainid          :  Upper Idrest
+                          |  Varid
+                          |  Op;
+fragment Idrest           :  (Letter | Digit)* ('_' Op)?;
+
+fragment StringElement    :  '\u0020'| '\u0021'|'\u0023' .. '\u007F'  // (PrintableChar  Except '"')
+                          |  CharEscapeSeq;
+fragment MultiLineChars   :  ('"'? '"'? .*?)* '"'*;
+
+fragment HexDigit         :  '0' .. '9'  |  'A' .. 'Z'  |  'a' .. 'z' ;
+fragment FloatType        :  'F' | 'f' | 'D' | 'd';
+fragment Upper            :  'A'  ..  'Z' | '$' | '_';  // and Unicode category Lu
+fragment Lower            :  'a' .. 'z'; // and Unicode category Ll
+fragment Letter           :  Upper | Lower; // and Unicode categories Lo, Lt, Nl
+fragment ExponentPart     :  ('E' | 'e') ('+' | '-')? Digit+;
+fragment PrintableChar    : '\u0020' .. '\u007F' ;
+fragment CharEscapeSeq    : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\');
+fragment DecimalNumeral   :  '0' | NonZeroDigit Digit*;
+fragment HexNumeral       :  '0' 'x' HexDigit HexDigit+;
+fragment Digit            :  '0' | NonZeroDigit;
+fragment NonZeroDigit     :  '1' .. '9';
