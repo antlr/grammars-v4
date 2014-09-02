@@ -121,7 +121,7 @@ simpleExpr1       : literal
                   | '(' exprs? ')'
                   | ('new' (classTemplate | templateBody) | blockExpr ) '.' Id 
                   | ('new' (classTemplate | templateBody) | blockExpr ) typeArgs
-        //          | simpleExpr1 argumentExprs  
+                  | simpleExpr1 argumentExprs  
         ;
                   
 exprs             : expr (',' expr)* ;
