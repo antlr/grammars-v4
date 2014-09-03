@@ -9,15 +9,17 @@
 *
 * It's a Work in progress, most of the .h file can be parsed
 * June 2008 Cedric Cuche
+* Updated June 2014, Carlos Mejia.  Fix try-catch, add support for @( @{ @[ and blocks
 **/
 
 grammar ObjC;
+
 
 translation_unit: external_declaration+ EOF;
 
 external_declaration:
 COMMENT | LINE_COMMENT | preprocessor_declaration
-|function_definition
+| function_definition
 | declaration 
 | class_interface
 | class_implementation
@@ -29,15 +31,8 @@ COMMENT | LINE_COMMENT | preprocessor_declaration
 
 preprocessor_declaration:
 IMPORT
-| INCLUDE
-| '#define' macro_specification
-| '#ifdef' expression
-| '#if' expression
-| '#undef' expression
-| '#ifndef' expression
-| '#endif';
+| INCLUDE;
 
-macro_specification: '.+';
 
 class_interface:
 	'@interface'
@@ -51,6 +46,7 @@ category_interface:
 	'@interface'
 	class_name '(' category_name? ')'
 	protocol_reference_list?
+	instance_variables?
 	interface_declaration_list?
 	'@end';
 
@@ -58,6 +54,7 @@ class_implementation:
 	'@implementation'
 	(
 	class_name ( ':' superclass_name )?
+	instance_variables?
 	( implementation_definition_list )?
 	)
 	'@end';
@@ -71,7 +68,7 @@ category_implementation:
 protocol_declaration:
 	'@protocol'(
 	protocol_name ( protocol_reference_list )?
-	( interface_declaration_list )?
+	interface_declaration_list? '@optional'? interface_declaration_list?
 	)'@end';
 
 protocol_declaration_list:
@@ -104,9 +101,10 @@ property_attributes_list
     ;
 
 property_attribute
-    : IDENTIFIER
-    | IDENTIFIER '=' IDENTIFIER //  getter 
-    | IDENTIFIER '=' IDENTIFIER ':' // setter
+    : 'nonatomic' | 'assign' | 'weak' | 'strong' | 'retain' | 'readonly' | 'readwrite' |
+    | 'getter' '=' IDENTIFIER //  getter 
+    | 'setter' '=' IDENTIFIER ':' // setter
+    | IDENTIFIER
     ;
 
 class_name:
@@ -163,11 +161,11 @@ class_method_definition:
 	;
 
 instance_method_definition:
-	('-' method_definition)
+	('-' method_definition) 
 	;
 	
 method_definition:
-	(method_type)? method_selector (init_declarator_list)? compound_statement;
+	(method_type)? method_selector (init_declarator_list)? ';'? compound_statement;
 
 method_selector:
 	selector |(keyword_declarator+ (parameter_list)? )
@@ -194,6 +192,7 @@ property_synthesize_item
     : IDENTIFIER | IDENTIFIER '=' IDENTIFIER
     ;
 
+block_type:type_specifier '(''^' type_specifier? ')' block_parameters? ;
 
 type_specifier:
 'void' | 'char' | 'short' | 'int' | 'long' | 'float' | 'double' | 'signed' | 'unsigned' 
@@ -201,7 +200,8 @@ type_specifier:
 	|	(class_name ( protocol_reference_list )?)
 	|	struct_or_union_specifier
 	|	enum_specifier 
-	|	IDENTIFIER;
+	|	IDENTIFIER
+    |   IDENTIFIER pointer;
 
 type_qualifier:
 	'const' | 'volatile' | protocol_qualifier;
@@ -215,10 +215,31 @@ primary_expression:
 	| STRING_LITERAL
 	| ('(' expression ')')
 	| 'self'
+        | 'super'
 	| message_expression
 	| selector_expression
 	| protocol_expression
-	| encode_expression;
+	| encode_expression
+        | dictionary_expression
+        | array_expression
+        | box_expression
+        | block_expression;
+
+dictionary_pair:
+         postfix_expression':'postfix_expression;
+
+dictionary_expression:
+        '@''{' dictionary_pair? (',' dictionary_pair)* ','? '}';
+
+array_expression:
+        '@''[' postfix_expression? (',' postfix_expression)* ','? ']';
+
+box_expression:
+        '@''('postfix_expression')' |
+        '@'constant;
+block_parameters: '(' (type_variable_declarator | 'void')? (',' type_variable_declarator)* ')';
+
+block_expression:'^' type_specifier? block_parameters? compound_statement;
 
 message_expression:
 	'[' receiver message_selector ']'
@@ -249,36 +270,40 @@ protocol_expression:
 encode_expression:
 	'@encode' '(' type_name ')';
 
-exception_declarator:
-	declarator;
+type_variable_declarator:
+	declaration_specifiers declarator;
 
 try_statement:
-	'@trystatement';
+	'@try' compound_statement;
 
 catch_statement:
-	'@catch' '('exception_declarator')'statement;
+	'@catch' '('type_variable_declarator')' compound_statement;
 
 finally_statement:
-	'@finally' statement;
+	'@finally' compound_statement;
 
 throw_statement:
 	'@throw' '('IDENTIFIER')';
 
-try_block:
-	try_statement
-	catch_statement
-	( finally_statement )?;
+try_block: 
+        try_statement
+        ( catch_statement)*
+        ( finally_statement )?;
 
 synchronized_statement:
-	'@synchronized' '(' IDENTIFIER ')' statement;
+	'@synchronized' '(' primary_expression ')' compound_statement;
+
+autorelease_statement:
+	'@autoreleasepool'  compound_statement;
 
 function_definition : declaration_specifiers? declarator compound_statement ;
 
 declaration : declaration_specifiers init_declarator_list? ';';
 
 declaration_specifiers 
-  : (storage_class_specifier | type_specifier | type_qualifier)+ ;
+  : (arc_behaviour_specifier | storage_class_specifier | type_specifier | type_qualifier)+ ;
 
+arc_behaviour_specifier: '__unsafe_unretained' | '__weak';
 storage_class_specifier: 'auto' | 'register' | 'static' | 'extern' | 'typedef';
 
 init_declarator_list :	init_declarator (',' init_declarator)* ;
@@ -289,22 +314,34 @@ struct_or_union_specifier: ('struct' | 'union')
 
 struct_declaration : specifier_qualifier_list struct_declarator_list ';' ;
 
-specifier_qualifier_list : (type_specifier | type_qualifier)+ ;
+specifier_qualifier_list : (arc_behaviour_specifier | type_specifier | type_qualifier)+ ;
 
 struct_declarator_list : struct_declarator (',' struct_declarator)* ;
 
 struct_declarator : declarator | declarator? ':' constant;
 
-enum_specifier : 'enum' 
+enum_specifier : 'enum' (':' type_name)? 
   ( identifier ('{' enumerator_list '}')? 
-  | '{' enumerator_list '}') ;
-enumerator_list : enumerator (',' enumerator)* ;
+  | '{' enumerator_list '}') 
+  | 'NS_OPTIONS' '(' type_name ',' identifier ')' '{' enumerator_list '}'
+  | 'NS_ENUM' '(' type_name ',' identifier ')' '{' enumerator_list '}' ;
+
+
+enumerator_list : enumerator (',' enumerator)* ','? ;
 enumerator : identifier ('=' constant_expression)?;
 
-declarator : '*' type_qualifier* declarator | direct_declarator ;
+pointer
+    :   '*' declaration_specifiers?
+    |   '*' declaration_specifiers? pointer;
+    
+
+
+declarator : pointer ? direct_declarator ;
 
 direct_declarator : identifier declarator_suffix*
-                  | '(' declarator ')' declarator_suffix* ;
+                  | '(' declarator ')' declarator_suffix* 
+                  | '(''^' identifier? ')' block_parameters;
+
 
 declarator_suffix : '[' constant_expression? ']'
 		  | '(' parameter_list? ')';
@@ -315,11 +352,12 @@ parameter_declaration
   : declaration_specifiers (declarator? | abstract_declarator) ;
 
 initializer : assignment_expression
-	    | '{' initializer (',' initializer)* '}' ;
+	    | '{' initializer (',' initializer)* ','? '}' ;
 
-type_name : specifier_qualifier_list abstract_declarator ;
+type_name : specifier_qualifier_list abstract_declarator 
+          | block_type;
 
-abstract_declarator : '*' type_qualifier* abstract_declarator 
+abstract_declarator : pointer abstract_declarator 
   | '(' abstract_declarator ')' abstract_declarator_suffix+
   | ('[' constant_expression? ']')+
   | ;
@@ -340,6 +378,9 @@ statement
   | selection_statement
   | iteration_statement
   | jump_statement
+  | synchronized_statement
+  | autorelease_statement
+  | try_block
   | ';' ;
 
 labeled_statement
@@ -353,10 +394,16 @@ selection_statement
   : 'if' '(' expression ')' statement ('else' statement)?
   | 'switch' '(' expression ')' statement ;
 
+for_in_statement : 'for' '(' type_variable_declarator 'in' expression? ')' statement;
+for_statement: 'for' '(' ((declaration_specifiers init_declarator_list) | expression)? ';' expression? ';' expression? ')' statement;
+while_statement: 'while' '(' expression ')' statement;
+do_statement: 'do' statement 'while' '(' expression ')' ';';
+
 iteration_statement
-  : 'while' '(' expression ')' statement
-  | 'do' statement 'while' '(' expression ')' ';'
-  | 'for' '(' expression? ';' expression? ';' expression? ')' statement ;
+  : while_statement
+  | do_statement
+  | for_statement
+  | for_in_statement ;
 
 jump_statement
   : 'goto' identifier ';'
@@ -367,13 +414,16 @@ jump_statement
 
 expression : assignment_expression (',' assignment_expression)* ;
 
-assignment_expression : conditional_expression 
-  ( assignment_operator assignment_expression)? ;
+assignment_expression
+    :   conditional_expression
+    |   unary_expression assignment_operator assignment_expression
+    ;
+
 assignment_operator: 
   '=' | '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|=';
 
 conditional_expression : logical_or_expression 
-  ('?' logical_or_expression ':' logical_or_expression)? ;
+  ('?' conditional_expression ':' conditional_expression)? ;
 
 constant_expression : conditional_expression ;
 
@@ -430,6 +480,151 @@ argument_expression_list
 identifier : IDENTIFIER;
 
 constant : DECIMAL_LITERAL | HEX_LITERAL | OCTAL_LITERAL | CHARACTER_LITERAL | FLOATING_POINT_LITERAL;
+
+// LEXER
+
+// §3.9 Keywords
+
+
+AUTORELEASEPOOL : '@autoreleasepool';
+CATCH           : '@catch';
+CLASS           : '@class';
+DYNAMIC         : '@dynamic';
+ENCODE          : '@encode';
+END             : '@end';
+FINALLY         : '@finally';
+IMPLEMENTATION  : '@implementation';
+INTERFACE       : '@interface';
+PACKAGE         : '@package';
+PROTOCOL        : '@protocol';
+OPTIONAL        : '@optional';
+PRIVATE         : '@private';
+PROPERTY        : '@property';
+PROTECTED       : '@protected';
+PUBLIC          : '@public';
+SELECTOR        : '@selector';
+SYNCHRONIZED    : '@synchronized';
+SYNTHESIZE      : '@synthesize';
+THROW           : '@throw';
+TRY             : '@try';
+
+SUPER           : 'super';
+SELF            : 'self';
+
+
+ABSTRACT      : 'abstract';
+AUTO          : 'auto';
+BOOLEAN       : 'boolean';
+BREAK         : 'break';
+BYCOPY        : 'bycopy';
+BYREF         : 'byref';
+CASE          : 'case';
+CHAR          : 'char';
+CONST         : 'const';
+CONTINUE      : 'continue';
+DEFAULT       : 'default';
+DO            : 'do';
+DOUBLE        : 'double';
+ELSE          : 'else';
+ENUM          : 'enum';
+EXTERN        : 'extern';
+FLOAT         : 'float';
+FOR           : 'for';
+ID            : 'id';
+IF            : 'if';
+IN            : 'in';
+INOUT         : 'inout';
+GOTO          : 'goto';
+INT           : 'int';
+LONG          : 'long';
+ONEWAY        : 'oneway';
+OUT           : 'out';
+REGISTER      : 'register';
+RETURN        : 'return';
+SHORT         : 'short';
+SIGNED        : 'signed';
+SIZEOF        : 'sizeof';
+STATIC        : 'static';
+STRUCT        : 'struct';
+SWITCH        : 'switch';
+TYPEDEF       : 'typedef';
+UNION         : 'union';
+UNSIGNED      : 'unsigned';
+VOID          : 'void';
+VOLATILE      : 'volatile';
+WHILE         : 'while';
+
+NS_OPTIONS          : 'NS_OPTIONS';
+NS_ENUM             : 'NS_ENUM';
+WWEAK               : '__weak';
+WUNSAFE_UNRETAINED  : '__unsafe_unretained';
+
+// §3.11 Separators
+
+LPAREN          : '(';
+RPAREN          : ')';
+LBRACE          : '{';
+RBRACE          : '}';
+LBRACK          : '[';
+RBRACK          : ']';
+SEMI            : ';';
+COMMA           : ',';
+DOT             : '.';
+STRUCTACCESS    : '->';
+AT              : '@';
+
+// Operators
+
+ASSIGN          : '=';
+GT              : '>';
+LT              : '<';
+BANG            : '!';
+TILDE           : '~';
+QUESTION        : '?';
+COLON           : ':';
+EQUAL           : '==';
+LE              : '<=';
+GE              : '>=';
+NOTEQUAL        : '!=';
+AND             : '&&';
+OR              : '||';
+INC             : '++';
+DEC             : '--';
+ADD             : '+';
+SUB             : '-';
+MUL             : '*';
+DIV             : '/';
+BITAND          : '&';
+BITOR           : '|';
+CARET           : '^';
+MOD             : '%';
+SHIFT_R         : '>>';
+SHIFT_L         : '<<';
+
+// Assignment
+
+ADD_ASSIGN      : '+=';
+SUB_ASSIGN      : '-=';
+MUL_ASSIGN      : '*=';
+DIV_ASSIGN      : '/=';
+AND_ASSIGN      : '&=';
+OR_ASSIGN       : '|=';
+XOR_ASSIGN      : '^=';
+MOD_ASSIGN      : '%=';
+LSHIFT_ASSIGN   : '<<=';
+RSHIFT_ASSIGN   : '>>=';
+ELIPSIS         : '...';
+
+// Property attributes
+ASSIGNPA        : 'assign';
+GETTER          : 'getter';
+NONATOMIC       : 'nonatomic';
+SETTER          : 'setter';
+STRONG          : 'strong';
+RETAIN          : 'retain';
+READONLY        : 'readonly';
+READWRITE       : 'readwrite';
+WEAK            : 'weak';
 
 IDENTIFIER
 	:	LETTER (LETTER|'0'..'9')*
@@ -519,3 +714,13 @@ COMMENT
 LINE_COMMENT
     : '//' ~[\r\n]*  -> channel(HIDDEN)
     ;
+
+// ignore preprocessor defines for now
+
+HDEFINE : '#define' ~[\r\n]* -> channel(HIDDEN);
+HIF : '#if' ~[\r\n]* -> channel(HIDDEN);
+HELSE : '#else' ~[\r\n]* -> channel(HIDDEN);
+HUNDEF : '#undef' ~[\r\n]* -> channel(HIDDEN);
+HIFNDEF : '#ifndef' ~[\r\n]* -> channel(HIDDEN);
+HENDIF : '#endif' ~[\r\n]* -> channel(HIDDEN);
+

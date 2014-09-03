@@ -93,8 +93,19 @@ explist
     ;
 
 exp
-    : 'nil' | 'false' | 'true' | number | string | '...' | functiondef
-    | prefixexp | tableconstructor | exp binop exp | unop exp
+    : 'nil' | 'false' | 'true' | number | string		
+	| '...'											
+	| functiondef								
+    | prefixexp										
+	| tableconstructor								
+	| <assoc=right> exp operatorPower exp			
+	| operatorUnary exp								
+	| exp operatorMulDivMod exp		
+	| exp operatorAddSub exp						
+	| <assoc=right> exp operatorStrcat exp			
+	| exp operatorComparison exp					
+	| exp operatorAnd exp							
+	| exp operatorOr exp	
 	;
 
 var
@@ -167,15 +178,29 @@ fieldsep
     : ',' | ';'
     ;
 
-binop
-    : '+' | '-' | '*' | '/' | '^' | '%' | '..'
-    | '<' | '<=' | '>' | '>=' | '==' | '~='
-    | 'and' | 'or'
-    ;
+operatorOr 
+	: 'or';
 
-unop
-    : '-' | 'not' | '#'
-    ;
+operatorAnd 
+	: 'and';
+
+operatorComparison 
+	: '<' | '>' | '<=' | '>=' | '~=' | '==';
+
+operatorStrcat
+	: '..';
+
+operatorAddSub
+	: '+' | '-';
+
+operatorMulDivMod
+	: '*' | '/' | '%';
+
+operatorUnary
+    : 'not' | '#' | '-';
+
+operatorPower
+    : '^';
 
 number
     : INT | HEX | FLOAT | HEX_FLOAT

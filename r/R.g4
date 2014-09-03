@@ -190,4 +190,4 @@ COMMENT :   '#' .*? '\r'? '\n' -> type(NL) ;
 // Match both UNIX and Windows newlines
 NL      :   '\r'? '\n' ;
 
-WS      :   [ \t\0x000c]+ -> skip ;
+WS      :   [ \t\u000C]+ -> skip ;
