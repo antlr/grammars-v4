@@ -627,29 +627,15 @@ singleExpression
  | '-' singleExpression                                                   # UnaryMinusExpression
  | '~' singleExpression                                                   # BitNotExpression
  | '!' singleExpression                                                   # NotExpression
- | singleExpression '*' singleExpression                                  # MultiplyExpression
- | singleExpression '/' singleExpression                                  # DivideExpression
- | singleExpression '%' singleExpression                                  # ModulusExpression
- | singleExpression '+' singleExpression                                  # AddExpression
- | singleExpression '-' singleExpression                                  # SubtractExpression
- | singleExpression '<<' singleExpression                                 # LeftShiftArithmeticExpression
- | singleExpression '>>' singleExpression                                 # RightShiftArithmeticExpression
- | singleExpression '>>>' singleExpression                                # RightShiftLogicalExpression
- | singleExpression '<' singleExpression                                  # LessThanExpression
- | singleExpression '>' singleExpression                                  # GreaterThanExpression
- | singleExpression '<=' singleExpression                                 # LessThanEqualsExpression
- | singleExpression '>=' singleExpression                                 # GreaterThanEqualsExpression
+ | singleExpression ( '*' | '/' | '%' ) singleExpression                  # MultiplicativeExpression
+ | singleExpression ( '+' | '-' ) singleExpression                        # AdditiveExpression
+ | singleExpression ( '<<' | '>>' | '>>>' ) singleExpression              # BitShiftExpression
+ | singleExpression ( '<' | '>' | '<=' | '>=' ) singleExpression          # RelationalExpression
  | singleExpression Instanceof singleExpression                           # InstanceofExpression
  | singleExpression In singleExpression                                   # InExpression
- | singleExpression '==' singleExpression                                 # EqualsExpression
- | singleExpression '!=' singleExpression                                 # NotEqualsExpression
- | singleExpression '===' singleExpression                                # IdentityEqualsExpression
- | singleExpression '!==' singleExpression                                # IdentityNotEqualsExpression
- | singleExpression '&' singleExpression                                  # BitAndExpression
- | singleExpression '^' singleExpression                                  # BitXOrExpression
- | singleExpression '|' singleExpression                                  # BitOrExpression
- | singleExpression '&&' singleExpression                                 # AndExpression
- | singleExpression '||' singleExpression                                 # OrExpression
+ | singleExpression ( '==' | '!=' | '===' | '!==' ) singleExpression      # EqualityExpression
+ | singleExpression ( '&' | '^' | '|' ) singleExpression                  # BitExpression
+ | singleExpression ( '&&' | '||' ) singleExpression                      # LogicalExpression
  | singleExpression '?' singleExpression ':' singleExpression             # TernaryExpression
  | singleExpression '=' expressionSequence                                # AssignmentExpression
  | singleExpression assignmentOperator expressionSequence                 # AssignmentOperatorExpression
