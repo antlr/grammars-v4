@@ -1,0 +1,44 @@
+LSNR_FRED =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = tcp)(HOST = bedrock)(PORT = 1524))
+  )
+
+LSNR_WILMA =
+  (ADDRESS = (PROTOCOL = IPC)(KEY = LISTENER))
+  
+lsnr_barney =
+  (description =
+    (address_list = 
+        (address = (protocol = tcp)(host = bedrock)(port = 1524))
+        (address = (protocol = tcp)(host = rubble)(port = 1524))
+    )
+  )
+
+  
+
+alias_1,alias_2.world,alias3.dunbar-it.co.uk =
+   (description_list =
+       (description =
+            (load_balance = yes)
+            (connect_timeout = 10)
+            (address_list =
+                (address = (protocol = tcp)(host = abcde32-vip)(port = 1522))
+                (address = (protocol = tcp)(host = hubble.dunbar-it.co.uk)(port = 1522))
+                (address = (protocol = spx)(service = spx_service_name))
+                (address = (protocol = nmp)(server = server_name)(pipe = pipe_name))
+                (address = (protocol = beq)
+                    (program = oracle_exe)
+                    (argv0 = sid_identifier)
+                    (args = '(description=(local = yes)(address = (protocol = beq)))') 
+                )
+            )
+            (sdu = 12345)
+            (retry_count = 3)
+            (connect_data =
+              (server = dedicated)
+              (service_name = momoa61a)
+            )
+            (security = (ssl_server_cert_dn = "cn=finance,cn=oracle,dc=uk,dc=co"))
+            (transport_connect_timeout = 5)
+        )
+    )

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014 by Bart Kiers
+ * Copyright (c) 2014 by Bart Kiers (original author) and Alexandre Vitorelli (contributor -> ported to CSharp)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -11,7 +11,7 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
@@ -28,58 +28,50 @@ grammar ECMAScript;
 
 @parser::members {
   
-    /**
-     * Returns {@code true} iff on the current index of the parser's
-     * token stream a token of the given {@code type} exists on the
-     * {@code HIDDEN} channel.
-     *
-     * @param type
-     *         the type of the token on the {@code HIDDEN} channel
-     *         to check.
-     *
-     * @return {@code true} iff on the current index of the parser's
-     * token stream a token of the given {@code type} exists on the
-     * {@code HIDDEN} channel.
-     */
-    private boolean here(final int type) {
+    ///<summary>Returns <c>true</c> iff on the current index of the parser's
+    ///token stream a token of the given <c>type</c> exists on the
+    ///<c>Hidden</c> channel.</summary>
+    ///<param name="type">the type of the token on the <c>Hidden</c> channel
+    ///to check.</param>
+    ///<returns><c>true</c> iff on the current index of the parser's
+    ///token stream a token of the given <c>type</c> exists on the
+    ///<c>Hidden</c> channel.</returns>
+    private bool here(int type) {
 
         // Get the token ahead of the current index.
-        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
-        Token ahead = _input.get(possibleIndexEosToken);
+        int possibleIndexEosToken = this.CurrentToken.TokenIndex - 1;
+        IToken ahead = _input.Get(possibleIndexEosToken);
 
-        // Check if the token resides on the HIDDEN channel and if it's of the
+        // Check if the token resides on the Hidden channel and if it's of the
         // provided type.
-        return (ahead.getChannel() == Lexer.HIDDEN) && (ahead.getType() == type);
+        return (ahead.Channel == Lexer.Hidden) && (ahead.Type == type);
     }
 
-    /**
-     * Returns {@code true} iff on the current index of the parser's
-     * token stream a token exists on the {@code HIDDEN} channel which
-     * either is a line terminator, or is a multi line comment that
-     * contains a line terminator.
-     *
-     * @return {@code true} iff on the current index of the parser's
-     * token stream a token exists on the {@code HIDDEN} channel which
-     * either is a line terminator, or is a multi line comment that
-     * contains a line terminator.
-     */
-    private boolean lineTerminatorAhead() {
+    ///<summary>Returns <c>true</c> iff on the current index of the parser's
+    ///token stream a token exists on the <c>Hidden</c> channel which
+    ///either is a line terminator, or is a multi line comment that
+    ///contains a line terminator.</summary>
+    ///<returns><c>true</c> iff on the current index of the parser's
+    ///token stream a token exists on the <c>Hidden</c> channel which
+    ///either is a line terminator, or is a multi line comment that
+    ///contains a line terminator.</returns>
+    private bool lineTerminatorAhead() {
 
         // Get the token ahead of the current index.
-        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
-        Token ahead = _input.get(possibleIndexEosToken);
+        int possibleIndexEosToken = this.CurrentToken.TokenIndex - 1;
+        IToken ahead = _input.Get(possibleIndexEosToken);
 
-        if (ahead.getChannel() != Lexer.HIDDEN) {
-            // We're only interested in tokens on the HIDDEN channel.
+        if (ahead.Channel != Lexer.Hidden) {
+            // We're only interested in tokens on the Hidden channel.
             return false;
         }
 
         // Get the token's text and type.
-        String text = ahead.getText();
-        int type = ahead.getType();
+        string text = ahead.Text;
+        int type = ahead.Type;
 
         // Check if the token is, or contains a line terminator.
-        return (type == MultiLineComment && (text.contains("\r") || text.contains("\n"))) ||
+        return (type == MultiLineComment && (text.Contains("\r") || text.Contains("\n"))) ||
                 (type == LineTerminator);
     }                                
 }
@@ -89,45 +81,34 @@ grammar ECMAScript;
     // A flag indicating if the lexer should operate in strict mode.
     // When set to true, FutureReservedWords are tokenized, when false,
     // an octal literal can be tokenized.
-    private boolean strictMode = true;
+    private bool strictMode = true;
 
     // The most recently produced token.
-    private Token lastToken = null;
+    private IToken lastToken = null;
 
-    /**
-     * Returns {@code true} iff the lexer operates in strict mode.
-     *
-     * @return {@code true} iff the lexer operates in strict mode.
-     */
-    public boolean getStrictMode() {
+    ///<summary>Returns <c>true</c> iff the lexer operates in strict mode</summary>
+    /// <returns><c>true</c> iff the lexer operates in strict mode.</returns>
+    public bool GetStrictMode() {
         return this.strictMode;
     }
 
-    /**
-     * Sets whether the lexer operates in strict mode or not.
-     *
-     * @param strictMode
-     *         the flag indicating the lexer operates in strict mode or not.
-     */
-    public void setStrictMode(boolean strictMode) {
+	///<summary>Sets whether the lexer operates in strict mode or not.</summary>
+	///<param name="strictMode">the flag indicating the lexer operates in strict mode or not.</param>
+    public void SetStrictMode(bool strictMode) {
         this.strictMode = strictMode;
     }
 
-    /**
-     * Return the next token from the character stream and records this last
-     * token in case it resides on the default channel. This recorded token
-     * is used to determine when the lexer could possibly match a regex
-     * literal.
-     *
-     * @return the next token from the character stream.
-     */
-    @Override
-    public Token nextToken() {
+    ///<summary>Return the next token from the character stream and records this last
+    ///token in case it resides on the default channel. This recorded token
+    ///is used to determine when the lexer could possibly match a regex
+    ///literal.</summary>
+    ///<returns>the next token from the character stream.</returns>
+    public override IToken NextToken() {
         
         // Get the next token.
-        Token next = super.nextToken();
+        IToken next = base.NextToken();
         
-        if (next.getChannel() == Token.DEFAULT_CHANNEL) {
+        if (next.Channel == Lexer.DefaultTokenChannel) {
             // Keep track of the last token on the default channel.                                              
             this.lastToken = next;
         }
@@ -135,12 +116,9 @@ grammar ECMAScript;
         return next;
     }
 
-    /**
-     * Returns {@code true} iff the lexer can match a regex literal.
-     *
-     * @return {@code true} iff the lexer can match a regex literal.
-     */
-    private boolean isRegexPossible() {
+    ///<summary>Returns <c>true</c> iff the lexer can match a regex literal.</summary>
+    ///<returns><c>true</c> iff the lexer can match a regex literal.</returns>
+    private bool isRegexPossible() {
                                        
         if (this.lastToken == null) {
             // No token has been produced yet: at the start of the input,
@@ -148,7 +126,7 @@ grammar ECMAScript;
             return true;
         }
         
-        switch (this.lastToken.getType()) {
+        switch (this.lastToken.Type) {
             case Identifier:
             case NullLiteral:
             case BooleanLiteral:
@@ -740,18 +718,18 @@ futureReservedWord
  ;
 
 getter
- : {_input.LT(1).getText().startsWith("get")}? Identifier
+ : {_input.Lt(1).Text.StartsWith("get")}? Identifier
  ;
 
 setter
- : {_input.LT(1).getText().startsWith("set")}? Identifier
+ : {_input.Lt(1).Text.StartsWith("set")}? Identifier
  ;
 
 eos
  : SemiColon
  | EOF
  | {lineTerminatorAhead()}?
- | {_input.LT(1).getType() == CloseBrace}?
+ | {_input.Lt(1).Type == CloseBrace}?
  ;
 
 eof
