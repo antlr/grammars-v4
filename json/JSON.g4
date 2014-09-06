@@ -37,9 +37,9 @@ fragment UNICODE : 'u' HEX HEX HEX HEX ;
 fragment HEX : [0-9a-fA-F] ;
 
 NUMBER
-    :   '-'? INT '.' INT EXP?   // 1.35, 1.35E-9, 0.3, -4.5
-    |   '-'? INT EXP            // 1e10 -3e4
-    |   '-'? INT                // -3, 45
+    :   '-'? INT '.' [0-9]+ EXP? // 1.35, 1.35E-9, 0.3, -4.5
+    |   '-'? INT EXP             // 1e10 -3e4
+    |   '-'? INT                 // -3, 45
     ;
 
 fragment INT :   '0' | [1-9] [0-9]* ; // no leading zeros
