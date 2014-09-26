@@ -141,7 +141,9 @@ fragment DIGIT
     : '0'..'9'
 ;
 
-// Note: lowercase letters not allowed in specification!
+// Note: from the RFC errata (http://www.rfc-editor.org/errata_search.php?rfc=5234&eid=4040):
+// > ABNF strings are case insensitive and the character set for these strings is US-ASCII.
+// > So the definition of HEXDIG already allows for both upper and lower case (or a mixture).
 fragment
 HEX_DIGIT
     : ('0'..'9'|'a'..'f'|'A'..'F')
