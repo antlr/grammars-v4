@@ -139,7 +139,7 @@ d_sdu            : L_PAREN SDU EQUAL INT R_PAREN ;
                  
 d_recv_buf       : L_PAREN RECV_BUF EQUAL INT R_PAREN ;
                  
-d_send_buf       : L_PAREN SEND_BUF EQUAL R_PAREN ;
+d_send_buf       : L_PAREN SEND_BUF EQUAL INT R_PAREN ;
                  
 d_service_type   : L_PAREN SERVICE_TYPE EQUAL ID R_PAREN ;
                  
