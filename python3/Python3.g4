@@ -46,6 +46,9 @@ tokens { INDENT, DEDENT }
   // The amount of opened braces, brackets and parenthesis.
   private int opened = 0;
 
+  // The most recently produced token.
+  private Token lastToken = null;
+
   @Override
   public void emit(Token t) {
     super.setToken(t);
@@ -59,19 +62,36 @@ tokens { INDENT, DEDENT }
     if (_input.LA(1) == EOF && !this.indents.isEmpty()) {
 
       // First emit an extra line break that serves as the end of the statement.
-      this.emit(new CommonToken(Python3Parser.NEWLINE, "\n"));
+      this.emit(commonToken(Python3Parser.NEWLINE, "\n"));
 
       // Now emit as much DEDENT tokens as needed.
       while (!indents.isEmpty()) {
-        this.emit(new CommonToken(Python3Parser.DEDENT, "DEDENT"));
+        this.emit(createDedent());
         indents.pop();
       }
     }
 
     Token next = super.nextToken();
 
+    if (next.getChannel() == Token.DEFAULT_CHANNEL) {
+      // Keep track of the last token on the default channel.
+      this.lastToken = next;
+    }
+
     return tokens.isEmpty() ? next : tokens.poll();
-  }  
+  }
+
+  private Token createDedent() {
+    CommonToken dedent = commonToken(Python3Parser.DEDENT, "");
+    dedent.setLine(this.lastToken.getLine());
+    return dedent;
+  }
+
+  private CommonToken commonToken(int type, String text) {
+    int start = this.getCharIndex();
+    int stop = start + text.length();
+    return new CommonToken(this._tokenFactorySourcePair, type, DEFAULT_TOKEN_CHANNEL, start, stop);
+  }
   
   // Calculates the indentation of the provided spaces, taking the 
   // following rules into account:
@@ -700,6 +720,7 @@ BREAK : 'break';
 NEWLINE
  : ( '\r'? '\n' | '\r' ) SPACES?
    {
+     String newLine = getText().replaceAll("[^\r\n]+", "");
      String spaces = getText().replaceAll("[\r\n]+", "");
      int next = _input.LA(1);
 
@@ -709,7 +730,7 @@ NEWLINE
        skip();
      }
      else {
-       emit(new CommonToken(NEWLINE, "\n"));
+       emit(commonToken(NEWLINE, newLine));
 
        int indent = getIndentationCount(spaces);
        int previous = indents.isEmpty() ? 0 : indents.peek();
@@ -720,12 +741,12 @@ NEWLINE
        }
        else if (indent > previous) {
          indents.push(indent);
-         emit(new CommonToken(Python3Parser.INDENT, "INDENT"));
+         emit(commonToken(Python3Parser.INDENT, spaces));
        }
        else {
          // Possibly emit more than 1 DEDENT token.
          while(!indents.isEmpty() && indents.peek() > indent) {
-           emit(new CommonToken(Python3Parser.DEDENT, "DEDENT"));
+           this.emit(createDedent());
            indents.pop();
          }
        }
