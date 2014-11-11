@@ -77,3 +77,6 @@
 /dot/target/
 
 /logo/.DS_Store
+
+.idea/
+*.iml
