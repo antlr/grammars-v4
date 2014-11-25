@@ -243,12 +243,20 @@ ipc_key          : L_PAREN KEY EQUAL ID R_PAREN ;
 
 
 //-----------------------------------------------------------------
-// SPX Protocol rules.
-// (PROTOCOL = SPX)(SERVICE = spx_service_name)
-//-----------------------------------------------------------------
-spx_protocol     : spx_spx spx_service ;
 
-spx_spx          : L_PAREN PROTOCOL EQUAL SPX R_PAREN ;
+// SPX Protocol rules.
+
+// (PROTOCOL = SPX)(SERVICE = spx_service_name)
+
+//-----------------------------------------------------------------
+spx_protocol     : spx_params ; 
+
+spx_params       : spx_parameter+ ; 
+
+spx_parameter    : spx_spx
+                 | spx_service ; 
+
+spx_spx          : L_PAREN PROTOCOL EQUAL SPX R_PAREN ; 
 
 spx_service      : L_PAREN SERVICE EQUAL ID R_PAREN ;
 
