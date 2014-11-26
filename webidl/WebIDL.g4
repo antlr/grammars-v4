@@ -34,7 +34,7 @@ Web IDL grammar derived from:
     http://heycam.github.io/webidl/
 
     Web IDL (Second Edition)
-    W3C Editor’s Draft 13 November 2014
+    W3C Editor's Draft 13 November 2014
  */
 grammar WebIDL;
 
