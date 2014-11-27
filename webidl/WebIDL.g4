@@ -348,7 +348,7 @@ iterable
 ;
 
 optionalType
-	: type
+	: ',' type
 	| /* empty */
 ;
 
