@@ -634,8 +634,11 @@ singleExpression
  | singleExpression Instanceof singleExpression                           # InstanceofExpression
  | singleExpression In singleExpression                                   # InExpression
  | singleExpression ( '==' | '!=' | '===' | '!==' ) singleExpression      # EqualityExpression
- | singleExpression ( '&' | '^' | '|' ) singleExpression                  # BitExpression
- | singleExpression ( '&&' | '||' ) singleExpression                      # LogicalExpression
+ | singleExpression '&' singleExpression                                  # BitAndExpression
+ | singleExpression '^' singleExpression                                  # BitXOrExpression
+ | singleExpression '|' singleExpression                                  # BitOrExpression
+ | singleExpression '&&' singleExpression                                 # LogicalAndExpression
+ | singleExpression '||' singleExpression                                 # LogicalOrExpression
  | singleExpression '?' singleExpression ':' singleExpression             # TernaryExpression
  | singleExpression '=' expressionSequence                                # AssignmentExpression
  | singleExpression assignmentOperator expressionSequence                 # AssignmentOperatorExpression
