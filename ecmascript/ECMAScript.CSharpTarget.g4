@@ -1466,4 +1466,5 @@ fragment RegularExpressionClass
 ///     RegularExpressionBackslashSequence
 fragment RegularExpressionClassChar
  : ~[\r\n\u2028\u2029\]\\]
+ | RegularExpressionBackslashSequence
  ;
