@@ -61,6 +61,9 @@ tokens { INDENT, DEDENT }
     // Check if the end-of-file is ahead and there are still some DEDENTS expected.
     if (_input.LA(1) == EOF && !this.indents.isEmpty()) {
 
+      // Poll the EOF from the token stream so that a linebreak can be placed upon it.
+      tokens.poll();
+
       // First emit an extra line break that serves as the end of the statement.
       this.emit(commonToken(Python3Parser.NEWLINE, "\n"));
 
@@ -69,6 +72,9 @@ tokens { INDENT, DEDENT }
         this.emit(createDedent());
         indents.pop();
       }
+
+      // Put the EOF back on the token stream.
+      this.emit(commonToken(Python3Parser.EOF, "<EOF>"));
     }
 
     Token next = super.nextToken();
