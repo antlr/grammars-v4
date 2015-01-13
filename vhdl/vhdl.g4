@@ -695,16 +695,12 @@ formal_parameter_list
   ;
 
 formal_part
-  : name ( LPAREN  name RPAREN )?
+  : identifier
   ;
 
 free_quantity_declaration
   : QUANTITY identifier_list COLON subtype_indication
     ( VARASGN expression )? SEMI
-  ;
-
-function_call
-  : selected_name ( LPAREN actual_parameter_part? RPAREN )
   ;
 
 generate_statement
@@ -822,6 +818,10 @@ interface_signal_list
   : interface_signal_declaration ( SEMI interface_signal_declaration )*
   ;
 
+interface_port_list 
+  : interface_port_declaration ( SEMI interface_port_declaration )*
+  ;
+
 interface_list
   : interface_element ( SEMI interface_element )*
   ;
@@ -831,8 +831,13 @@ interface_quantity_declaration
     ( VARASGN expression )?
   ;
 
+interface_port_declaration
+  : identifier_list COLON signal_mode subtype_indication
+    ( BUS )?
+  ;
+
 interface_signal_declaration
-  : ( SIGNAL )? identifier_list COLON ( signal_mode )? subtype_indication
+  : SIGNAL identifier_list COLON subtype_indication
     ( BUS )? ( VARASGN expression )?
   ;
 
@@ -859,8 +864,7 @@ library_clause
   ;
 
 library_unit
-  :  secondary_unit
-  | primary_unit
+  : secondary_unit  | primary_unit
   ;
 
 literal
@@ -924,29 +928,24 @@ multiplying_operator
 // slice_name, and attribute_name, respectively)
 // (2.2.2004, e.f.)
 name
-  :
-  ( identifier | function_call )
-  (name_part)*
+  : selected_name  
+  | name_part ( DOT name_part)*
   ;
 
 name_part
-   : (name_suffix_part | name_attribute_part | name_slice_part | name_indexed_part)
+   : selected_name (name_attribute_part | name_function_call_or_indexed_part | name_slice_part)?
    ;
-
-name_suffix_part
-   : DOT suffix
-   ;
-
+   
 name_attribute_part
-   : APOSTROPHE attribute_designator ( LPAREN actual_parameter_part? RPAREN )?
+   : APOSTROPHE attribute_designator ( expression ( COMMA expression )* )?
+   ;
+
+name_function_call_or_indexed_part
+   : LPAREN actual_parameter_part? RPAREN
    ;
 
 name_slice_part
-   : LPAREN discrete_range ( COMMA discrete_range )* RPAREN
-   ;
-
-name_indexed_part
-   : LPAREN expression ( COMMA expression )* RPAREN
+   : LPAREN explicit_range ( COMMA explicit_range )* RPAREN
    ;
 
 selected_name
@@ -1063,7 +1062,7 @@ port_clause
   ;
 
 port_list
-  : interface_signal_list
+  : interface_port_list
   ;
 
 port_map_aspect
@@ -1170,8 +1169,12 @@ quantity_specification
   ;
 
 range
-  : simple_expression direction simple_expression
+  : explicit_range
   | name
+  ;
+
+explicit_range
+  : simple_expression direction simple_expression
   ;
 
 range_constraint
@@ -1439,7 +1442,7 @@ subtype_declaration
 // is made optional to prevent antlr nondeterminism.
 // (9.2.2004, e.f.)
 subtype_indication
-  : name ( name )? ( constraint )? ( tolerance_aspect )?
+  : selected_name ( selected_name )? ( constraint )? ( tolerance_aspect )?
   ;
 
 suffix
@@ -1587,19 +1590,19 @@ COMMENT
   ;
 
 TAB
-  : ( '\t' )+ -> skip //{$setType(ANTLR_USE_NAMESPACE(antlr)Token::SKIP);} ????????
+  : ( '\t' )+ -> skip 
   ;
 
 SPACE
-  : ( ' ' )+ -> skip //{$setType(ANTLR_USE_NAMESPACE(antlr)Token::SKIP);} ????????
+  : ( ' ' )+ -> skip 
   ;
 
 NEWLINE
-  : '\n' -> skip //{$setType(ANTLR_USE_NAMESPACE(antlr)Token::SKIP); newline();} ???????
+  : '\n' -> skip 
   ;
 
 CR
-  : '\r' -> skip //{$setType(ANTLR_USE_NAMESPACE(antlr)Token::SKIP);} ???????????
+  : '\r' -> skip 
   ;
   
 CHARACTER_LITERAL
@@ -1607,7 +1610,7 @@ CHARACTER_LITERAL
    ;
 
 STRING_LITERAL
-  : '\"' .* '\"'
+  : '"' (~('"'|'\n'|'\r') | '""')* '"'
   ;
 
 OTHER_SPECIAL_CHARACTER
