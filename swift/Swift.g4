@@ -347,7 +347,7 @@ associativity : 'left' | 'right' | 'none'  ;
 
 pattern
  : wildcard_pattern type_annotation?
- | identifier_pattern type_annotation?
+ | identifier_pattern type_annotation
  | value_binding_pattern
  | tuple_pattern type_annotation?
  | enum_case_pattern
@@ -478,7 +478,7 @@ primary_expression
  | superclass_expression
  | closure_expression
  | parenthesized_expression
- | implicit_member_expression
+// | implicit_member_expression disallow as ambig with explicit member expr in postfix_expression
  | wildcard_expression
  ;
 
