@@ -486,7 +486,8 @@ primary_expression
 
 literal_expression
  : literal
- | array_literal | dictionary_literal
+ | array_literal
+ | dictionary_literal
  | '__FILE__' | '__LINE__' | '__COLUMN__' | '__FUNCTION__'
  ;
 
@@ -711,7 +712,9 @@ identifier : Identifier | context_sensitive_keyword ;
 keyword : 'convenience' | 'class' | 'deinit' | 'enum' | 'extension' | 'func' | 'import' | 'init' | 'let' | 'protocol' | 'static' | 'struct' | 'subscript' | 'typealias' | 'var' | 'break' | 'case' | 'continue' | 'default' | 'do' | 'else' | 'fallthrough' | 'if' | 'in' | 'for' | 'return' | 'switch' | 'where' | 'while' | 'as' | 'dynamicType' | 'is' | 'new' | 'super' | 'self' | 'Self' | 'Type' ;
 
 context_sensitive_keyword :
- 'associativity' | 'didSet' | 'get' | 'infix' | 'inout' | 'left' | 'mutating' | 'none' | 'nonmutating' | 'operator' | 'override' | 'postfix' | 'precedence' | 'prefix' | 'right' | 'set' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | 'weak' | 'willSet'
+ 'associativity' | 'didSet' | 'get' | 'infix' | 'inout' | 'left' | 'mutating' | 'none' |
+ 'nonmutating' | 'operator' | 'override' | 'postfix' | 'precedence' | 'prefix' | 'right' |
+ 'set' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | 'weak' | 'willSet'
  ;
 
 Operator
