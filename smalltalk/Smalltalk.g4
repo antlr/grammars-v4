@@ -11,9 +11,9 @@ script : sequence EOF;
 sequence : temps? ws statements?;
 ws : (SEPARATOR | COMMENT)*;
 temps : PIPE (ws IDENTIFIER)+ ws PIPE;
-statements : answer # StatementAnswer
+statements : answer ws # StatementAnswer
            | expressions ws PERIOD ws answer # StatementExpressionsAnswer
-           | expressions PERIOD? # StatementExpressions
+           | expressions PERIOD? ws # StatementExpressions
            ;
 answer : CARROT ws expression ws PERIOD?;
 expression : assignment | cascade | keywordSend | binarySend | primitive;
