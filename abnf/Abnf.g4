@@ -36,6 +36,11 @@ ABNF grammar derived from:
     Augmented BNF for Syntax Specifications: ABNF
     January 2008
 
+    http://tools.ietf.org/html/rfc7405
+
+    Case-Sensitive String Support in ABNF
+    December 2014
+
 Terminal rules mainly created by ANTLRWorks 1.5 sample code.
  */
 grammar Abnf;
@@ -130,7 +135,7 @@ WS
 ;
 
 STRING
-    :  '"' (~'"')* '"'
+    :  ('%s'|'%i')? '"' (~'"')* '"'
 ;
 
 fragment BIT
