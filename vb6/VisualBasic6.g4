@@ -16,7 +16,7 @@
 */
 
 /*
-* Visual Basic 6.0 Grammar for ANTLR4, Version 1.0 
+* Visual Basic 6.0 Grammar for ANTLR4
 *
 * This is an approximate grammar for Visual Basic 6.0, derived 
 * from the Visual Basic 6.0 language reference 
@@ -43,6 +43,16 @@
 *
 *
 * Change log:
+*
+* v1.3
+*	- call statement precedence
+*
+* v1.2
+*	- refined call statements
+*
+* v1.1 
+*	- precedence of operators and of ELSE in select statements
+*	- optimized member calls
 *
 * v1.0 Initial revision
 */
@@ -73,8 +83,12 @@ moduleHeader : VERSION WS DOUBLELITERAL WS CLASS;
 
 moduleConfig :
 	BEGIN NEWLINE+ 
-	(ambiguousIdentifier WS? EQ WS? literal NEWLINE)+ 
+	moduleConfigElement+
 	END NEWLINE+
+;
+
+moduleConfigElement :
+	ambiguousIdentifier WS? EQ WS? literal NEWLINE
 ;
 
 moduleAttributes : (attributeStmt NEWLINE+)+;
@@ -82,10 +96,10 @@ moduleAttributes : (attributeStmt NEWLINE+)+;
 moduleOptions : (moduleOption NEWLINE+)+;
 
 moduleOption : 
-	OPTION_BASE WS INTEGERLITERAL # optionBaseStmt
-	| OPTION_COMPARE WS (BINARY | TEXT) # optionCompareStmt
-	| OPTION_EXPLICIT # optionExplicitStmt
-	| OPTION_PRIVATE_MODULE # optionPrivateModuleStmt
+	OPTION_BASE WS INTEGERLITERAL 			# optionBaseStmt
+	| OPTION_COMPARE WS (BINARY | TEXT) 	# optionCompareStmt
+	| OPTION_EXPLICIT 						# optionExplicitStmt
+	| OPTION_PRIVATE_MODULE 				# optionPrivateModuleStmt
 ;
 
 moduleBody : 
@@ -276,8 +290,8 @@ goSubStmt : GOSUB WS valueStmt;
 goToStmt : GOTO WS valueStmt;
 
 ifThenElseStmt : 
-	IF WS ifConditionStmt WS THEN WS blockStmt (WS ELSE WS blockStmt)? # inlineIfThenElse
-	| ifBlockStmt ifElseIfBlockStmt* ifElseBlockStmt? END_IF # blockIfThenElse
+	IF WS ifConditionStmt WS THEN WS blockStmt (WS ELSE WS blockStmt)?	# inlineIfThenElse
+	| ifBlockStmt ifElseIfBlockStmt* ifElseBlockStmt? END_IF			# blockIfThenElse
 ;
 
 ifBlockStmt : 
@@ -408,8 +422,7 @@ seekStmt : SEEK WS valueStmt WS? ',' WS? valueStmt;
 
 selectCaseStmt : 
 	SELECT WS CASE WS valueStmt NEWLINE+ 
-	sC_Case* 
-	sC_CaseElse?
+	sC_Case*
 	WS? END_SELECT
 ;
 
@@ -418,15 +431,12 @@ sC_Case :
 	(block NEWLINE+)?
 ;
 
+// ELSE first, so that it is not interpreted as a variable call
 sC_Cond : 
-	IS WS? comparisonOperator WS? valueStmt # caseCondIs
-	| valueStmt (WS? ',' WS? valueStmt)* # caseCondValue
-	| INTEGERLITERAL WS TO WS valueStmt (WS? ',' WS? valueStmt)* # caseCondTo
-;
-
-sC_CaseElse : 
-	CASE WS ELSE WS? (':'? NEWLINE* | NEWLINE+)  
-	(block NEWLINE+)?
+	ELSE 															# caseCondElse
+	| IS WS? comparisonOperator WS? valueStmt 						# caseCondIs
+	| valueStmt (WS? ',' WS? valueStmt)* 							# caseCondValue
+	| INTEGERLITERAL WS TO WS valueStmt (WS? ',' WS? valueStmt)* 	# caseCondTo
 ;
 
 sendkeysStmt : SENDKEYS WS valueStmt (WS? ',' WS? valueStmt)?;
@@ -459,38 +469,42 @@ unloadStmt : UNLOAD WS valueStmt;
 
 unlockStmt : UNLOCK WS valueStmt (WS? ',' WS? valueStmt (WS TO WS valueStmt)?)?;
 
+// operator precedence is represented by rule order
 valueStmt : 
-	literal # vsLiteral
-	| midStmt # vsMid
-	| NEW WS valueStmt # vsNew
-	| implicitCallStmt_InStmt # vsValueCalls
-	| typeOfStmt # vsTypeOf
-	| LPAREN WS? valueStmt (WS? ',' WS? valueStmt)* RPAREN # vsStruct
-	| implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt # vsAssign
-	| valueStmt WS? PLUS WS? valueStmt # vsAdd
-	| PLUS WS? valueStmt # vsPlus
-	| ADDRESSOF WS valueStmt # vsAddressOf
-	| valueStmt WS AMPERSAND WS valueStmt # vsAmp
-	| valueStmt WS AND WS valueStmt # vsAnd
-	| valueStmt WS? LT WS? valueStmt # vsLt
-	| valueStmt WS? LEQ WS? valueStmt # vsLeq
-	| valueStmt WS? GT WS? valueStmt # vsGt
-	| valueStmt WS? GEQ WS? valueStmt # vsGeq
-	| valueStmt WS? EQ WS? valueStmt # vsEq
-	| valueStmt WS? NEQ WS? valueStmt # vsNeq
-	| valueStmt WS? DIV WS? valueStmt # vsDiv
-	| valueStmt WS EQV WS valueStmt # vsEqv
-	| valueStmt WS IMP WS valueStmt # vsImp
-	| valueStmt WS IS WS valueStmt # vsIs
-	| valueStmt WS LIKE WS valueStmt # vsLike
-	| valueStmt WS? MINUS WS? valueStmt # vsMinus
-	| MINUS WS? valueStmt # vsNegation
-	| valueStmt WS? MOD WS? valueStmt # vsMod
-	| valueStmt WS? MULT WS? valueStmt # vsMult
-	| NOT WS valueStmt # vsNot
-	| valueStmt WS? OR WS? valueStmt # vsOr
-	| valueStmt WS? POW WS? valueStmt # vsPow
-	| valueStmt WS? XOR WS? valueStmt # vsXor
+	literal 												# vsLiteral
+	| implicitCallStmt_InStmt 								# vsICS
+	| LPAREN WS? valueStmt (WS? ',' WS? valueStmt)* RPAREN 	# vsStruct
+	| NEW WS valueStmt 										# vsNew
+	| typeOfStmt 											# vsTypeOf
+	| midStmt 												# vsMid
+	| ADDRESSOF WS valueStmt 								# vsAddressOf
+	| implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt 		# vsAssign
+
+	| valueStmt WS IS WS valueStmt 							# vsIs
+	| valueStmt WS LIKE WS valueStmt 						# vsLike
+	| valueStmt WS? GEQ WS? valueStmt 						# vsGeq
+	| valueStmt WS? LEQ WS? valueStmt 						# vsLeq
+	| valueStmt WS? GT WS? valueStmt 						# vsGt
+	| valueStmt WS? LT WS? valueStmt 						# vsLt
+	| valueStmt WS? NEQ WS? valueStmt 						# vsNeq
+	| valueStmt WS? EQ WS? valueStmt 						# vsEq
+
+	| valueStmt WS AMPERSAND WS valueStmt 					# vsAmp
+	| MINUS WS? valueStmt 									# vsNegation
+	| PLUS WS? valueStmt 									# vsPlus
+	| valueStmt WS? PLUS WS? valueStmt 						# vsAdd
+	| valueStmt WS? MOD WS? valueStmt 						# vsMod
+	| valueStmt WS? DIV WS? valueStmt 						# vsDiv
+	| valueStmt WS? MULT WS? valueStmt 						# vsMult
+	| valueStmt WS? MINUS WS? valueStmt 					# vsMinus
+	| valueStmt WS? POW WS? valueStmt 						# vsPow
+
+	| valueStmt WS IMP WS valueStmt 						# vsImp
+	| valueStmt WS EQV WS valueStmt 						# vsEqv
+	| valueStmt WS? XOR WS? valueStmt 						# vsXor
+	| valueStmt WS? OR WS? valueStmt 						# vsOr
+	| valueStmt WS AND WS valueStmt 						# vsAnd
+	| NOT WS valueStmt 										# vsNot
 ;
 
 variableStmt : (DIM | STATIC | visibility) WS (WITHEVENTS WS)? variableListStmt;
@@ -523,67 +537,52 @@ explicitCallStmt :
 	| eCS_MemberProcedureCall 
 ;
 
-eCS_ProcedureCall : CALL WS ambiguousIdentifier typeHint? (WS? LPAREN WS? (argsCall WS?)? RPAREN)?;
+// parantheses are required in case of args -> empty parantheses are removed
+eCS_ProcedureCall : CALL WS ambiguousIdentifier typeHint? (WS? LPAREN WS? argsCall WS? RPAREN)?;
 
-eCS_MemberProcedureCall : CALL WS variableCallStmt? memberPropertyCallStmt* '.' ambiguousIdentifier typeHint? (WS? LPAREN WS? (argsCall WS?)? RPAREN)?;
+// parantheses are required in case of args -> empty parantheses are removed
+eCS_MemberProcedureCall : CALL WS implicitCallStmt_InStmt? '.' ambiguousIdentifier typeHint? (WS? LPAREN WS? argsCall WS? RPAREN)?;
 
 
 implicitCallStmt_InBlock :
-	iCS_B_SubCall
-	| iCS_B_FunctionCall
-	| iCS_B_MemberSubCall
-	| iCS_B_MemberFunctionCall
+	iCS_B_ProcedureCall
+	| iCS_B_MemberProcedureCall
 ;
 
+// parantheses are forbidden in case of args
+// variables cannot be called in blocks
 // certainIdentifier instead of ambiguousIdentifier for preventing ambiguity with statement keywords 
-iCS_B_SubCall : certainIdentifier (WS argsCall)?;
+iCS_B_ProcedureCall : certainIdentifier (WS argsCall)?;
 
-iCS_B_FunctionCall : functionOrArrayCallStmt dictionaryCallStmt?;
-
-iCS_B_MemberSubCall : implicitCallStmt_InStmt* memberSubCallStmt;
-
-iCS_B_MemberFunctionCall : implicitCallStmt_InStmt* memberFunctionOrArrayCallStmt dictionaryCallStmt?;
+iCS_B_MemberProcedureCall : implicitCallStmt_InStmt? '.' ambiguousIdentifier typeHint? (WS argsCall)? dictionaryCallStmt?;
 
 
+// iCS_S_MembersCall first, so that member calls are not resolved as separate iCS_S_VariableOrProcedureCalls
 implicitCallStmt_InStmt :
-	iCS_S_VariableCall
-	| iCS_S_FunctionOrArrayCall
+	iCS_S_MembersCall
+	| iCS_S_VariableOrProcedureCall
+	| iCS_S_ProcedureOrArrayCall
 	| iCS_S_DictionaryCall
-	| iCS_S_MembersCall
 ;
 
-iCS_S_VariableCall : variableCallStmt dictionaryCallStmt?;
+iCS_S_VariableOrProcedureCall : ambiguousIdentifier typeHint? dictionaryCallStmt?;
 
-iCS_S_FunctionOrArrayCall : functionOrArrayCallStmt dictionaryCallStmt?;
+iCS_S_ProcedureOrArrayCall : (ambiguousIdentifier | baseType) typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN dictionaryCallStmt?;
+
+iCS_S_MembersCall : (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)? iCS_S_MemberCall+ dictionaryCallStmt?;
+
+iCS_S_MemberCall : '.' (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall);
 
 iCS_S_DictionaryCall : dictionaryCallStmt;
-
-iCS_S_MembersCall : (variableCallStmt | functionOrArrayCallStmt)? memberCall_Value+ dictionaryCallStmt?;
-
-
-// member call statements ----------------------------------
-
-memberPropertyCallStmt : '.' ambiguousIdentifier;
-
-memberFunctionOrArrayCallStmt : '.' functionOrArrayCallStmt;
-
-memberSubCallStmt : '.' ambiguousIdentifier (WS argsCall)?;
-
-memberCall_Value : memberPropertyCallStmt | memberFunctionOrArrayCallStmt;
 
 
 // atomic call statements ----------------------------------
 
-variableCallStmt : ambiguousIdentifier typeHint?;
-
-dictionaryCallStmt : '!' ambiguousIdentifier typeHint?;
-
-functionOrArrayCallStmt : (ambiguousIdentifier | baseType) typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN;
-
-
 argsCall : (argCall? WS? (',' | ';') WS?)* argCall (WS? (',' | ';') WS? argCall?)*;
 
 argCall : ((BYVAL | BYREF | PARAMARRAY) WS)? valueStmt;
+
+dictionaryCallStmt : '!' ambiguousIdentifier typeHint?;
 
 
 // atomic rules for statements
