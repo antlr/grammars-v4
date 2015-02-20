@@ -696,6 +696,7 @@ formal_parameter_list
 
 formal_part
   : identifier
+   | identifier LPAREN explicit_range  RPAREN 
   ;
 
 free_quantity_declaration
