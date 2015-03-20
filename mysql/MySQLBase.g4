@@ -1,7 +1,6 @@
 lexer grammar MySQLBase;
 
 @header {
-package    jp.co.future.parser.antlr4.mysql;
 }
 
 SELECT: 'select';
