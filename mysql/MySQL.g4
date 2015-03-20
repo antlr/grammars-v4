@@ -5,6 +5,7 @@ options {
 }
 
 @header {
+package  jp.co.future.parser.antlr4.mysql;
 }
 
 stat:
@@ -110,7 +111,7 @@ simple_expression:
 	;
 
 table_references:
-        table_reference ( COMMA table_reference )*
+        table_reference ( (COMMA table_reference) | join_clause )*
 ;
 
 table_reference:
@@ -118,7 +119,7 @@ table_reference:
 ;
 
 table_factor1:
-	table_factor2 (  (INNER | CROSS)? JOIN table_atom (join_condition)?  )?
+	table_factor2 (  (INNER | CROSS)? JOIN table_atom (join_condition)? )?
 ;
 
 table_factor2:
@@ -139,6 +140,16 @@ table_atom:
 	| ( LPAREN table_references RPAREN )
 	| ( OJ table_reference LEFT OUTER JOIN table_reference ON expression )
 ;
+
+join_clause:
+        (  (INNER | CROSS)? JOIN table_atom (join_condition)? )
+    |
+        (  STRAIGHT_JOIN table_atom (ON expression)?  )
+    |
+        (  (LEFT|RIGHT) (OUTER)? JOIN table_factor4 join_condition  )
+    |
+        (  NATURAL ( (LEFT|RIGHT) (OUTER)? )? JOIN table_atom )
+    ;
 
 join_condition:
 	  (ON expression (expr_op expression)*) | (USING column_list)
