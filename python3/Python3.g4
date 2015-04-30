@@ -98,8 +98,8 @@ tokens { INDENT, DEDENT }
   }
 
   private CommonToken commonToken(int type, String text) {
-    int start = this.getCharIndex();
-    int stop = start + text.length();
+    int stop = this.getCharIndex() - 1;
+    int start = text.isEmpty() ? stop : stop - text.length() + 1;
     return new CommonToken(this._tokenFactorySourcePair, type, DEFAULT_TOKEN_CHANNEL, start, stop);
   }
 
