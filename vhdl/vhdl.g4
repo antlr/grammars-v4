@@ -1532,21 +1532,21 @@ waveform_element
 
 //------------------------------------------Lexer-----------------------------------------
 BASE_LITERAL
-   :  BINANRY_BASED_INTEGER
+   :  BINARY_BASED_INTEGER
    |  OCTAL_BASED_INTEGER
    |  HEXA_BASED_INTEGER
    ;
 
-BINANRY_BASED_INTEGER
-   : '2' '#' ('1' | '0' | '_')+ '#' (INTEGER)?
+BINARY_BASED_INTEGER
+   : '2' '#' ('1' | '0' | '_')+ '#' (PLUS_EXPONENT|NEUTRAL_EXPONENT)?
    ;
    
 OCTAL_BASED_INTEGER
-   : '8' '#' ('7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '#' (INTEGER)?
+   : '8' '#' ('7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '#' (PLUS_EXPONENT|NEUTRAL_EXPONENT)?
    ;
 
 HEXA_BASED_INTEGER
-   : '16' '#' ( 'f' |'e' |'d' |'c' |'b' |'a' | 'F' |'E' |'D' |'C' |'B' |'A' | '9' | '8' | '7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '#' (INTEGER)?
+   : '16' '#' ( 'f' |'e' |'d' |'c' |'b' |'a' | 'F' |'E' |'D' |'C' |'B' |'A' | '9' | '8' | '7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '#' (PLUS_EXPONENT|NEUTRAL_EXPONENT)?
    ;
 
 BIT_STRING_LITERAL
@@ -1661,9 +1661,25 @@ BACKSLASH     : '\\'  ;
   
 
 EXPONENT
-  :  'e' ( '+' | '-' )? INTEGER
+  : MINUS_EXPONENT
+  | PLUS_EXPONENT
+  | NEUTRAL_EXPONENT
   ;
 
+
+MINUS_EXPONENT
+  :  ('E'|'e') '-' INTEGER
+  ;
+
+
+PLUS_EXPONENT
+  :  ('E'|'e') '+' INTEGER
+  ;
+
+
+NEUTRAL_EXPONENT
+  :  ('E'|'e') INTEGER
+  ;
 
 HEXDIGIT
     :	('A'..'F'|'a'..'f')
