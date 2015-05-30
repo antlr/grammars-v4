@@ -1661,7 +1661,7 @@ BACKSLASH     : '\\'  ;
   
 
 EXPONENT
-  :  'e' ( '+' | '-' )? INTEGER
+  :  ('E'|'e') ( '+' | '-' )? INTEGER
   ;
 
 
