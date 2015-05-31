@@ -1561,21 +1561,13 @@ waveform_element
 
 //------------------------------------------Lexer-----------------------------------------
 BASE_LITERAL
-   :  BINANRY_BASED_INTEGER
-   |  OCTAL_BASED_INTEGER
-   |  HEXA_BASED_INTEGER
-   ;
-
-BINANRY_BASED_INTEGER
-   : '2' '#' ('1' | '0' | '_')+ '#' (INTEGER)?
-   ;
-   
-OCTAL_BASED_INTEGER
-   : '8' '#' ('7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '#' (INTEGER)?
-   ;
-
-HEXA_BASED_INTEGER
-   : '16' '#' ( 'f' |'e' |'d' |'c' |'b' |'a' | 'F' |'E' |'D' |'C' |'B' |'A' | '9' | '8' | '7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '#' (INTEGER)?
+// INTEGER must be checked to be between and including 2 and 16 (included) i.e.
+// INTEGER >=2 and INTEGER <=16
+// A Based integer (a number without a . such as 3) should not have a negative exponent
+// A Based fractional number with a . i.e. 3.0 may have a negative exponent
+// These should be checked in the Visitor/Listener whereby an appropriate error message
+// should be given
+   :  INTEGER '#' BASED_INTEGER ('.'BASED_INTEGER)? '#' (EXPONENT)?
    ;
 
 BIT_STRING_LITERAL
@@ -1697,15 +1689,22 @@ EXPONENT
 HEXDIGIT
     :	('A'..'F'|'a'..'f')
     ;
-      
+
 
 INTEGER
   :  DIGIT ( '_' | DIGIT )*
   ;
 
-  
- DIGIT
+DIGIT
   :  '0'..'9'
+  ;
+
+BASED_INTEGER
+  : EXTENDED_DIGIT ('_' | EXTENDED_DIGIT)*
+  ;
+
+EXTENDED_DIGIT
+  : (DIGIT | LETTER)
   ;
 
 APOSTROPHE
