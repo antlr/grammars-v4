@@ -1,0 +1,1 @@
+../../org.github.antlr/src/org/github/antlr/st/parser/STGLexer.g4
