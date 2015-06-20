@@ -32,6 +32,7 @@
  *
  *	Modified 2015.06.16 gbr 
  *	-- update for compatibility with Antlr v4.5
+ *	-- use imported standard fragments
  */
 
 lexer grammar STGLexer;
@@ -47,22 +48,28 @@ channels {
 	package org.github.antlr.st.parser.gen;
 }
 
+// ------------------------------------------------------------------------------
+// mode default
 
 DOC_COMMENT			: DocComment		-> channel(OFF_CHANNEL)	;
 BLOCK_COMMENT		: BlockComment		-> channel(OFF_CHANNEL)	;
 LINE_COMMENT		: LineComment		-> channel(OFF_CHANNEL)	;
 
-TMPL_COMMENT		: TmplComment	-> channel(OFF_CHANNEL)	;
+TMPL_COMMENT		: LBang .? RBang	-> channel(OFF_CHANNEL)	;
 
 HORZ_WS				: Hws+			-> channel(OFF_CHANNEL)	;
 VERT_WS				: Vws+			-> channel(OFF_CHANNEL)	;
 
-ID        			: Id					;
+ID        			: NameStartChar NameChar*			;
 
 STRING				: DQuoteLiteral			;
-BIGSTRING 			: LAngle2 .*? RAngle2	;
+BIGSTRING 			: LDAngle .*? RDAngle	;
 BIGSTRING_NO_NL		: LPct .*?	RPct		;
-ANONYMOUS_TEMPLATE	: LBrace .*? RBrace		;
+ANON_TEMPLATE		: LBrace .*? RBrace		;
+
+
+// -----------------------------------
+// Symbols
 
 TMPL_ASSIGN	: TmplAssign	;
 ASSIGN		: Equal			;
@@ -75,10 +82,12 @@ RPAREN		: RParen		;
 LBRACK		: LBrack		;
 RBRACK		: RBrack		;
 AT			: At			;
-ELLIPSIS	: Ellipsis		;
-
 TRUE		: True			;
 FALSE		: False			;
+ELLIPSIS	: Ellipsis		;
+
+// -----------------------------------
+// Key words
 
 DELIMITERS	: 'delimiters'	;
 IMPORT		: 'import'		;
@@ -102,15 +111,14 @@ ANCHOR		: 'anchor'		;
 SEPARATOR	: 'separator'	;
 
 
-// ------------------------------------------------------------------------------
-// Grammar specific Keywords, Punctuation, etc.
+// -----------------------------------
+// Grammar specific fragments
 
-fragment Id				: NameStartChar NameChar*	;
+fragment TmplAssign	: '::='		;
+fragment LBang		: '<!'		;
+fragment RBang		: '!>'		;
+fragment LPct		: '<%'		;
+fragment RPct		: '%>'		;
+fragment LDAngle	: LShift	;
+fragment RDAngle	: RShift	;
 
-fragment TmplComment	: '<!' .*? '!>'	;
-
-fragment TmplAssign		: '::='		;
-fragment LAngle2		: '<<'		;
-fragment RAngle2		: '>>'		;
-fragment LPct			: '<%'		;
-fragment RPct			: '%>'		;

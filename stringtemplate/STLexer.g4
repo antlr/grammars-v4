@@ -1,5 +1,4 @@
-/*
- * [The "BSD license"]
+/* [The "BSD license"]
  * Copyright (c) 2011-2014 Terence Parr
  * Copyright (c) 2015 Gerald Rosenberg
  * All rights reserved.
@@ -27,11 +26,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** 
- *	A grammar for StringTemplate v4 implemented using Antlr v4 syntax 
+/*	Antlr grammar for StringTemplate v4.
  *
  *	Modified 2015.06.16 gbr 
  *	-- update for compatibility with Antlr v4.5
+ *	-- use imported standard fragments
  */
 
 lexer grammar STLexer;
@@ -53,45 +52,55 @@ channels {
 	import org.github.antlr.st.parser.LexerAdaptor; 
 }
 
-@members {
-	final int Outside = DEFAULT_MODE;		// assign semantic name
-}
+// -----------------------------------
+// default mode = Outside 
 
-
-// ------------------------------------------------------------------------------
-// mode Outside (same as default)
 
 DOC_COMMENT		: DocComment		-> channel(OFF_CHANNEL)	;
 BLOCK_COMMENT	: BlockComment		-> channel(OFF_CHANNEL)	;
 LINE_COMMENT	: LineComment		-> channel(OFF_CHANNEL)	;
 
-TMPL_COMMENT	: TemplateComment	-> channel(OFF_CHANNEL)	;
+TMPL_COMMENT	: TmplComment		-> channel(OFF_CHANNEL)	;
 
 HORZ_WS			: Hws+				-> channel(OFF_CHANNEL)	;
 VERT_WS			: Vws+				-> channel(OFF_CHANNEL)	;
 
 ESCAPE			: . { isLDelim() }? EscSeq . { isRDelim() }?	; // self contained
-LDELIM			: . { isLDelim() }?			-> mode(Inside)		; // switch mode to inside
-
+LDELIM			: . { isLDelim() }?	-> mode(Inside)				; // switch mode to inside
 RBRACE			: RBrace { endsSubTemplate(); }					; // conditional switch to inside
 
-TEXT			: . { adjText(); }								; // to handle weird terminals
+TEXT		: . { adjText(); }	;  // have to handle weird terminals
 
 
-// ------------------------------------------------------------------------------
+// -----------------------------------
 mode Inside ;
 
 INS_HORZ_WS	: Hws+		-> type(HORZ_WS), channel(OFF_CHANNEL)	;
 INS_VERT_WS	: Vws+		-> type(VERT_WS), channel(OFF_CHANNEL)	;
 
 LBRACE		: LBrace { startsSubTemplate() }?	-> mode(SubTemplate)	;
-RDELIM		: . { isRDelim() }?					-> mode(DEFAULT_MODE)		; 
+RDELIM		: . { isRDelim() }?					-> mode(DEFAULT_MODE)	; 
 
+STRING		: DQuoteLiteral	;
+
+IF			: 'if'			;
+ELSEIF		: 'elseif'		;
+ELSE		: 'else'		;
+ENDIF		: 'endif'		;
+SUPER		: 'super'		;
+END			: '@end'		;
+
+TRUE		: True			;
+FALSE		: False			;
+
+AT			: At			;
 ELLIPSIS	: Ellipsis		;
 DOT			: Dot			;
 COMMA		: Comma			;
 COLON		: Colon			;
 SEMI		: Semi			;
+AND			: And			;
+OR			: Or			;
 LPAREN		: LParen		;
 RPAREN		: RParen		;
 LBRACK		: LBrack		;
@@ -99,41 +108,29 @@ RBRACK		: RBrack		;
 EQUALS		: Equal			;
 BANG		: Bang			;
 
-AND			: Amp			;
-OR			: Pipe			;
-AT			: At			;
 
-STRING		: DQuoteLiteral	;
-TRUE		: True			;
-FALSE		: False			;
+// -----------------------------------
+// Unknown content in mode Inside
 
-IF			: 'if'			;
-ELSEIF		: 'elseif'		;
-ELSE		: 'else'		;
-ENDIF		: 'endif'		;
-SUPER		: 'super'		;
-END			: '@end'		; // region end
-
-ERR_CHAR	: .	-> channel(HIDDEN)		;
+ERR_CHAR	: .	-> skip		;
 
 
-// ------------------------------------------------------------------------------
+// -----------------------------------
 mode SubTemplate ;
 
 SUB_HORZ_WS		: Hws+		-> type(HORZ_WS), channel(OFF_CHANNEL)	;
 SUB_VERT_WS		: Vws+		-> type(VERT_WS), channel(OFF_CHANNEL)	;
 
-ID				: Id						;
-SUB_COMMA		: Comma		-> type(COMMA)	;
-PIPE			: Pipe		-> mode(DEFAULT_MODE);
+ID				: NameStartChar NameChar*			;
+SUB_COMMA		: Comma		-> type(COMMA)			;
+PIPE			: Pipe		-> mode(DEFAULT_MODE)	;
 
 
-// ------------------------------------------------------------------------------
-// Grammar specific Keywords, Punctuation, etc.
+// -----------------------------------
+// Grammar specific fragments
 
-fragment Id			: NameStartChar NameChar*	;
+fragment TmplComment	: LTmplMark .*? RTmplMark		;
 
-fragment TemplateComment	: LTmplMark .*? RTmplMark		;
-fragment LTmplMark			: . { isLTmplComment() }? Bang	;
-fragment RTmplMark			: Bang . { isRTmplComment() }?	;
+fragment LTmplMark		: . { isLTmplComment() }? Bang	;
+fragment RTmplMark		: Bang . { isRTmplComment() }?	;
 

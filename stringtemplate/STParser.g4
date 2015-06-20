@@ -1,30 +1,35 @@
-/*
- * [The "BSD license"]
- * Copyright (c) 2011-2014 Terence Parr
- * Copyright (c) 2013-2014 Gerald Rosenberg
- * All rights reserved.
+/*	[The "BSD license"]
+ *	Copyright (c) 2011-2014 Terence Parr
+ *	Copyright (c) 2015 Gerald Rosenberg
+ *	All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- * derived from this software without specific prior written permission.
+ *	Redistribution and use in source and binary forms, with or without
+ *	modification, are permitted provided that the following conditions
+ *	are met:
+ *	1. Redistributions of source code must retain the above copyright
+ *		notice, this list of conditions and the following disclaimer.
+ *	2. Redistributions in binary form must reproduce the above copyright
+ *		notice, this list of conditions and the following disclaimer in the
+ *		documentation and/or other materials provided with the distribution.
+ *	3. The name of the author may not be used to endorse or promote products
+ *		derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *	THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *	IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *	OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *	IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *	INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *	NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *	DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *	THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *	THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
+/*	Antlr grammar for StringTemplate v4.
+ *
+ *	Modified 2015.06.21 gbr
+ *	-- use imported standard fragments
  */
 
 parser grammar STParser;
@@ -39,11 +44,11 @@ options {
 	
 }
 
-templateMain	// was templateAndEOF
-	: template EOF
+template	
+	: elements EOF
 	;
 
-template
+elements
 	: element*
 	;
 
@@ -68,19 +73,19 @@ exprTag
 
 region
 	: LDELIM AT ID RDELIM
-	  template
+	  elements
 	  LDELIM END RDELIM
 	;
 
 subtemplate
-	: LBRACE ( ID ( COMMA  ID )* PIPE )? template RBRACE
+	: LBRACE ( ID ( COMMA  ID )* PIPE )? elements RBRACE
 	;
 
 ifstat
 	: LDELIM IF LPAREN conditional RPAREN RDELIM
-	  template
-	  ( LDELIM ELSEIF LPAREN conditional RPAREN RDELIM template )*
-	  ( LDELIM ELSE RDELIM template )?
+	  elements
+	  ( LDELIM ELSEIF LPAREN conditional RPAREN RDELIM elements )*
+	  ( LDELIM ELSE RDELIM elements )?
 	  LDELIM ENDIF RDELIM
 	;
 
@@ -111,7 +116,7 @@ option
 	: ID ( EQUALS expr )?
 	;
 
-expr	// was exprNoComma
+expr
 	: memberExpr ( COLON mapTemplateRef )?
 	;
 
