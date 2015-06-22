@@ -78,7 +78,7 @@ use_clause : 'use' ( library_identifier '.' )? cell_identifier ( ':config' )? ;
 // 1.3 Module and primitive source text
 
 // START SYMBOL
-source_text : description* EOF ;
+source_text : timing_spec? description* EOF ;
 
 description : module_declaration ;
 
@@ -560,7 +560,7 @@ constant_expression ( ',' constant_expression )* ':' generate_item_or_null
 
 generate_loop_statement :
 'for' '(' genvar_assignment ';' constant_expression ';' genvar_assignment ')'
-'begin' ':' generate_block_identifier ( generate_item )* 'end'
+generate_block
 ;
 
 genvar_assignment : genvar_identifier '=' constant_expression ;
