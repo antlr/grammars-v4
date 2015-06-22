@@ -1327,7 +1327,7 @@ String : '"' ( ~[\n\r] )* '"' ;
 
 // 9 General
 // 9.1 Attributes
-
+timing_spec : '`timescale' Time_Identifier '/' Time_Identifier;
 attribute_instance : '(' '*' attr_spec ( ',' attr_spec )* '*' ')' ;
 attr_spec : attr_name '=' constant_expression
 | attr_name
@@ -1399,6 +1399,7 @@ simple_hierarchical_identifier : simple_hierarchical_branch ( '.' Escaped_identi
 specparam_identifier : identifier ;
 Simple_identifier : [a-zA-Z_] [a-zA-Z0-9_$]* ;
 Dollar_Identifier : '$' [a-zA-Z0-9_$] [a-zA-Z0-9_$]* ;
+Time_Identifier : [0-9]+ [mnpf]'s';
 system_function_identifier : Dollar_Identifier ;
 system_task_identifier : Dollar_Identifier ;
 task_identifier : identifier ;
