@@ -81,3 +81,7 @@
 .idea/
 *.iml
 *.project
+
+*.class
+
+.fetch_time_cache
