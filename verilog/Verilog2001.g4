@@ -1356,7 +1356,7 @@ escaped_hierarchical_branch ( '.' simple_hierarchical_branch | '.' escaped_hiera
 
 Escaped_identifier
 	:	'\\' ~[ \r\t\n]*
-        {_input.LA(1)!=' '&&_input.LA(1)!='\t'&&_input.LA(1)!='\t'&&_input.LA(1)!='\n'}?
+        {_input.LA(0)!=' '&&_input.LA(0)!='\t'&&_input.LA(0)!='\t'&&_input.LA(0)!='\n'}?
     ;
 
 event_identifier : identifier ;
