@@ -105,6 +105,7 @@ directives
 directive
     :   '@' NAME ':' valueOrVariable
     |   '@' NAME
+    |   '@' NAME '(' argument ')'
     ;
 
 typeCondition
