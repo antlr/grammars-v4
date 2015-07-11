@@ -31,6 +31,8 @@
 		<module>C</module>
 		<module>erlang</module>
 		<module>lua</module>
+                <module>arithmetic</module>
+                <module>calculator</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
