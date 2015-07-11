@@ -49,10 +49,14 @@ powExpression
     ;
 
 atom 
-    : number (E number)?
+    : scientific
     | variable
     | LPAREN expression RPAREN
     | func
+    ;
+
+scientific
+    : number (E number)?
     ;
 
 func

@@ -49,9 +49,13 @@ powExpression
     ;
 
 atom 
-    : number (E number)?
+    : scientific
     | variable
     | LPAREN expression RPAREN
+    ;
+
+scientific
+    : number (E number)?
     ;
 
 relop 
