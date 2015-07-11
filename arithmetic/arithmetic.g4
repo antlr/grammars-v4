@@ -45,15 +45,12 @@ multiplyingExpression
     ;
 
 powExpression
-    : expExpression (POW expression)?
+    : atom (POW expression)?
     ;
 
-expExpression
-    : constantExpression (E number)?
-    ;
-
-constantExpression 
+atom 
     : number 
+    | number (E number)?
     | variable
     | LPAREN expression RPAREN
     ;
