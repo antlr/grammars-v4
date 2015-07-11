@@ -72,11 +72,8 @@ relop
     ;
 
 number
-    : MINUS? digits (POINT digits)?
+    : MINUS? DIGIT+ (POINT DIGIT+)?
     ;
-
-digits
-    : DIGIT+;
 
 variable
     : MINUS? LETTER (LETTER | DIGIT)*;
