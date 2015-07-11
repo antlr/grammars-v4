@@ -41,7 +41,11 @@ addingExpression
     ;
 
 multiplyingExpression  
-    : expExpression ((TIMES|DIV) expExpression)*
+    : powExpression ((TIMES|DIV) powExpression)*
+    ;
+
+powExpression
+    : expExpression (POW expExpression)?
     ;
 
 expExpression
@@ -111,6 +115,10 @@ POINT
 E
     : 'e'
     | 'E'
+    ;
+
+POW
+    : '^'
     ;
 
 LETTER
