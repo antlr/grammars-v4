@@ -33,6 +33,7 @@
 		<module>lua</module>
                 <module>arithmetic</module>
                 <module>calculator</module>
+                <module>propcalc</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
