@@ -158,6 +158,7 @@ UrlEnd                 : RPAREN -> popMode;
 Url                    :	STRING | (~(')' | '\n' | '\r' | ';'))+;
 
 mode IDENTIFY;
+BlockStart_ID          : BlockStart -> popMode, type(BlockStart);
 SPACE                  : WS -> popMode, skip;
 DOLLAR_ID              : DOLLAR -> type(DOLLAR);
 
