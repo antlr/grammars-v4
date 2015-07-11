@@ -45,12 +45,13 @@ multiplyingExpression
     ;
 
 expExpression
-    : constantExpression ('e' number)?
+    : constantExpression (E number)?
     ;
 
 constantExpression 
     : number 
     | variable
+    | LPAREN expression RPAREN
     ;
 
 relop 
@@ -58,7 +59,7 @@ relop
     ;
 
 number
-    : MINUS? digits (POINT digits)?    
+    : MINUS? digits (POINT digits)?
     ;
 
 digits
@@ -105,6 +106,11 @@ EQ
 
 POINT
     : '.'
+    ;
+
+E
+    : 'e'
+    | 'E'
     ;
 
 LETTER
