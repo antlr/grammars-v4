@@ -32,11 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar arithmetic;
 
-expression  
-    : addingExpression ((relop) addingExpression)*
+equation  
+    : expression ((relop) expression)
     ;
 
-addingExpression 
+expression 
     : multiplyingExpression ((PLUS|MINUS) multiplyingExpression)*
     ;
 
@@ -45,7 +45,7 @@ multiplyingExpression
     ;
 
 powExpression
-    : expExpression (POW expExpression)?
+    : expExpression (POW expression)?
     ;
 
 expExpression

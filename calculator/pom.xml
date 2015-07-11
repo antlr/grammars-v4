@@ -34,7 +34,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>true</showTree>
-					<entryPoint>expression</entryPoint>
+					<entryPoint>equation</entryPoint>
 					<grammarName>calculator</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
