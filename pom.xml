@@ -29,6 +29,7 @@
 		<module>idl</module>
 		<module>abnf</module>
 		<module>C</module>
+		<module>erlang</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
