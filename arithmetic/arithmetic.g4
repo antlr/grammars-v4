@@ -70,7 +70,7 @@ digits
     : DIGIT+;
 
 variable
-    : LETTER (LETTER | DIGIT)*;
+    : MINUS? LETTER (LETTER | DIGIT)*;
             
 LPAREN 
     : '('
