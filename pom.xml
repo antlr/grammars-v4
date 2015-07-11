@@ -30,6 +30,7 @@
 		<module>abnf</module>
 		<module>C</module>
 		<module>erlang</module>
+		<module>lua</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
