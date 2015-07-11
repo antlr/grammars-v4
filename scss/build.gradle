@@ -54,7 +54,7 @@ dependencies {
 sourceSets {
   main {
     java {
-      srcDir 'src/**'
+      srcDir file(relativePath('src'))
     }
 
   }

@@ -37,6 +37,7 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionMode;
 
 import java.io.File;
+import java.lang.System;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
@@ -48,13 +49,12 @@ import java.util.concurrent.CyclicBarrier;
  * for the current directory:
 
 ~/antlr/code/grammars-v4/java $ java Test .
-/Users/parrt/antlr/code/grammars-v4/java/./JavaBaseListener.java
-/Users/parrt/antlr/code/grammars-v4/java/./Java8Lexer.java
-/Users/parrt/antlr/code/grammars-v4/java/./JavaListener.java
-/Users/parrt/antlr/code/grammars-v4/java/./JavaParser.java
-/Users/parrt/antlr/code/grammars-v4/java/./Test.java
+/Users/parrt/antlr/code/grammars-v4/java8/JavaBaseListener.java
+/Users/parrt/antlr/code/grammars-v4/java8/Java8Lexer.java
+/Users/parrt/antlr/code/grammars-v4/java8/JavaListener.java
+/Users/parrt/antlr/code/grammars-v4/java8/JavaParser.java
+/Users/parrt/antlr/code/grammars-v4/java8/Test.java
 Total lexer+parser time 1867ms.
-
  */
 class Test {
 //	public static long lexerTime = 0;

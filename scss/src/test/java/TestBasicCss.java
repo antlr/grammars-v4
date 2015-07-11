@@ -52,6 +52,15 @@ public class TestBasicCss extends TestBase
   }
 
   @Test
+  public void testBlockWithNoSpacing()
+  {
+    String [] lines = {
+            "#id1{}",
+    };
+    Assert.assertEquals(getSelector(lines).selector(0).element(0).identifier().getText(), "id1");
+  }
+
+  @Test
   public void testClass()
   {
     String [] lines = {
