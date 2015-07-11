@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar arithmetic;
 
 equation  
-    : expression ((relop) expression)
+    : expression relop expression
     ;
 
 expression 
