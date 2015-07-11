@@ -16,3 +16,16 @@ Testing the Grammars
 The directory /support/antlr4test-maven-plugin contains a maven plugin which compiles the grammars and then runs them against examples in the /examples subdirectory to verify that the grammars compile and produce a clean parse for each example.
 
 To use the plugin, you will have to compile and install it.
+
+<pre>
+cd support/
+mvn clean package install
+</pre>
+
+You can then test all grammars:
+
+<pre>
+mvn clean test
+</pre>
+
+
