@@ -49,8 +49,7 @@ powExpression
     ;
 
 atom 
-    : number 
-    | number (E number)?
+    : number (E number)?
     | variable
     | LPAREN expression RPAREN
     ;
