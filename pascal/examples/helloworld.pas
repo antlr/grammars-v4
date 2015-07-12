@@ -1,7 +1,7 @@
 
-Program HelloWorld;   
-Begin    
- Write('Hello World.');
- Readln;   
-End.
+program HelloWorld;   
+begin    
+ write('Hello World.');
+ readln;   
+end.
 

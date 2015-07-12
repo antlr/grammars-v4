@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
-Adapted from pascal.g by  Hakki Dogusan, Piet Schoutteten and Marton Papp 
+Adapted from pascal.g by  Hakki Dogusan, Piet Schoutteten and Marton Papp
 */
 
 grammar pascal;
@@ -45,7 +45,7 @@ program
 programHeading
     : PROGRAM identifier (LPAREN identifierList RPAREN)? SEMI
     | UNIT identifier SEMI
-	;
+    ;
 
 identifier
     : IDENT
@@ -89,9 +89,9 @@ constantChr
 
 constant
     : unsignedNumber
-    | s=sign n=unsignedNumber 
+    | sign unsignedNumber
     | identifier
-    | s2=sign id=identifier  
+    | sign identifier
     | string
     | constantChr
     ;
@@ -122,9 +122,9 @@ typeDefinitionPart
     ;
 
 typeDefinition
-    : identifier e=EQUAL 
+    : identifier EQUAL
       ( type
-      | functionType 
+      | functionType
       | procedureType
       )
     ;
@@ -151,7 +151,7 @@ simpleType
     ;
 
 scalarType
-    : LPAREN identifierList RPAREN 
+    : LPAREN identifierList RPAREN
     ;
 
 subrangeType
@@ -164,12 +164,11 @@ typeIdentifier
     | BOOLEAN
     | INTEGER
     | REAL
-    | STRING ) 
+    | STRING )
     ;
 
 structuredType
-    : PACKED unpackedStructuredType
- 	| unpackedStructuredType
+    : PACKED unpackedStructuredType | unpackedStructuredType
     ;
 
 unpackedStructuredType
@@ -186,11 +185,11 @@ stringtype
 arrayType
     : ARRAY LBRACK typeList RBRACK OF componentType
     | ARRAY LBRACK2 typeList RBRACK2 OF componentType
-	;
+    ;
 
 typeList
-	: indexType ( COMMA indexType )*  
-	;
+    : indexType ( COMMA indexType )*
+    ;
 
 indexType
     : simpleType
@@ -205,9 +204,7 @@ recordType
     ;
 
 fieldList
-    : (	fixedPart ( SEMI variantPart | SEMI )? 
-      | variantPart 
-      )
+    : (	fixedPart ( SEMI variantPart | SEMI )? | variantPart )
     ;
 
 fixedPart
@@ -223,13 +220,12 @@ variantPart
     ;
 
 tag
-    : id=identifier COLON t=typeIdentifier
-    | t2=typeIdentifier
+    : identifier COLON typeIdentifier
+    | typeIdentifier
     ;
 
 variant
-    : constList c=COLON 
-	  LPAREN fieldList RPAREN
+    : constList COLON LPAREN fieldList RPAREN
     ;
 
 setType
@@ -254,7 +250,7 @@ variableDeclarationPart
     ;
 
 variableDeclaration
-    : identifierList c=COLON
+    : identifierList COLON
     ;
 
 procedureAndFunctionDeclarationPart
@@ -267,8 +263,7 @@ procedureOrFunctionDeclaration
     ;
 
 procedureDeclaration
-    : PROCEDURE identifier (formalParameterList)? SEMI
-      block
+    : PROCEDURE identifier (formalParameterList)? SEMI block
     ;
 
 formalParameterList
@@ -283,20 +278,19 @@ formalParameterSection
     ;
 
 parameterGroup
-    : ids=identifierList COLON t=typeIdentifier 
+    : identifierList COLON typeIdentifier
     ;
 
 identifierList
-    : identifier ( COMMA identifier )* 
+    : identifier ( COMMA identifier )*
     ;
 
 constList
-    : constant ( COMMA constant )* 
+    : constant ( COMMA constant )*
     ;
 
 functionDeclaration
-    : FUNCTION identifier (formalParameterList)? COLON resultType SEMI
-      block
+    : FUNCTION identifier (formalParameterList)? COLON resultType SEMI block
     ;
 
 resultType
@@ -324,23 +318,8 @@ assignmentStatement
     : variable ASSIGN expression
     ;
 
-/** A variable is an id with a suffix and can look like:
- *  id
- *  id[expr,...]
- *  id.id
- *  id.id[expr,...]
- *  id^
- *  id^.id
- *  id^.id[expr,...]
- *  ...
- *
- *  LL has a really hard time with this construct as it's naturally
- *  left-recursive.  We have to turn into a simple loop rather than
- *  recursive loop, hence, the suffixes.  I keep in the same rule
- *  for easy tree construction.
- */
 variable
-    : ( AT identifier // AT is root of identifier; then other op becomes root
+    : ( AT identifier
       | identifier
       )
       (	LBRACK expression ( COMMA expression)* RBRACK
@@ -351,8 +330,7 @@ variable
     ;
 
 expression
-    : simpleExpression
-	  ( (EQUAL | NOT_EQUAL | LT | LE | GE | GT | IN) simpleExpression )*
+    : simpleExpression( (EQUAL | NOT_EQUAL | LT | LE | GE | GT | IN) simpleExpression )*
     ;
 
 simpleExpression
@@ -360,7 +338,7 @@ simpleExpression
     ;
 
 term
-	: signedFactor ( (STAR | SLASH | DIV | MOD | AND) signedFactor )*
+    : signedFactor ( (STAR | SLASH | DIV | MOD | AND) signedFactor )*
     ;
 
 signedFactor
@@ -384,16 +362,16 @@ unsignedConstant
     ;
 
 functionDesignator
-    : id=identifier LPAREN args=parameterList RPAREN 
+    : identifier LPAREN parameterList RPAREN
     ;
 
 parameterList
-    : actualParameter ( COMMA actualParameter )* 
+    : actualParameter ( COMMA actualParameter )*
     ;
 
 set
-    : LBRACK elementList RBRACK 
-    | LBRACK2 elementList RBRACK2 
+    : LBRACK elementList RBRACK
+    | LBRACK2 elementList RBRACK2
     ;
 
 elementList
@@ -406,7 +384,7 @@ element
     ;
 
 procedureStatement
-    : id=identifier ( LPAREN args=parameterList RPAREN )? 
+    : identifier ( LPAREN parameterList RPAREN )?
     ;
 
 actualParameter
@@ -433,13 +411,11 @@ structuredStatement
     ;
 
 compoundStatement
-    : BEGIN
-		statements
-      END
+    : BEGIN statements END
     ;
 
 statements
-    : statement ( SEMI statement )* 
+    : statement ( SEMI statement )*
     ;
 
 conditionalStatement
@@ -448,16 +424,7 @@ conditionalStatement
     ;
 
 ifStatement
-    : IF expression THEN statement
-      (
-		// CONFLICT: the old "dangling-else" problem...
-		//           ANTLR generates proper code matching
-		//			 as soon as possible.  Hush warning.
-		/*options {
-			generateAmbigWarnings=false;
-		}*/
-		: ELSE statement
-	  )?
+    : IF expression THEN statement (: ELSE statement)?
     ;
 
 caseStatement //pspsps ???
@@ -508,110 +475,101 @@ withStatement
 recordVariableList
     : variable ( COMMA variable )*
     ;
- 
-  AND              : 'and'             ;
-  ARRAY            : 'array'           ;
-  BEGIN            : 'Begin'           ;
-  BOOLEAN          : 'boolean'         ;
-  CASE             : 'case'            ;
-  CHAR             : 'char'            ;
-  CHR              : 'chr'             ;
-  CONST            : 'const'           ;
-  DIV              : 'div'             ;
-  DO               : 'do'              ;
-  DOWNTO           : 'downto'          ;
-  ELSE             : 'else'            ;
-  END              : 'End'             ;
-  FILE             : 'file'            ;
-  FOR              : 'for'             ;
-  FUNCTION         : 'function'        ;
-  GOTO             : 'goto'            ;
-  IF               : 'if'              ;
-  IN               : 'in'              ;
-  INTEGER          : 'integer'         ;
-  LABEL            : 'label'           ;
-  MOD              : 'mod'             ;
-  NIL              : 'nil'             ;
-  NOT              : 'not'             ;
-  OF               : 'of'              ;
-  OR               : 'or'              ;
-  PACKED           : 'packed'          ;
-  PROCEDURE        : 'procedure'       ;
-  PROGRAM          : 'Program'         ;
-  REAL             : 'real'            ;
-  RECORD           : 'record'          ;
-  REPEAT           : 'repeat'          ;
-  SET              : 'set'             ;
-  THEN             : 'then'            ;
-  TO               : 'to'              ;
-  TYPE             : 'type'            ;
-  UNTIL            : 'until'           ;
-  VAR              : 'var'             ;
-  WHILE            : 'while'           ;
-  WITH             : 'with'            ;
 
-PLUS            : '+'   ;
-MINUS           : '-'   ;
-STAR            : '*'   ;
-SLASH           : '/'   ;
-ASSIGN          : ':='  ;
-COMMA           : ','   ;
-SEMI            : ';'   ;
-COLON           : ':'   ;
-EQUAL           : '='   ;
-NOT_EQUAL       : '<>'  ;
-LT              : '<'   ;
-LE              : '<='  ;
-GE              : '>='  ;
-GT              : '>'   ;
-LPAREN          : '('   ;
-RPAREN          : ')'   ;
-LBRACK          : '['   ; // line_tab[line]
-LBRACK2         : '(.'  ; // line_tab(.line.)
-RBRACK          : ']'   ;
-RBRACK2         : '.)'  ;
-POINTER         : '^'   ;
-AT              : '@'   ;
+AND             : 'and';
+ARRAY           : 'array';
+BEGIN           : 'begin';
+BOOLEAN         : 'boolean';
+CASE            : 'case';
+CHAR            : 'char';
+CHR             : 'chr';
+CONST           : 'const';
+DIV             : 'div';
+DO              : 'do';
+DOWNTO          : 'downto';
+ELSE            : 'else';
+END             : 'end';
+FILE            : 'file';
+FOR             : 'for';
+FUNCTION        : 'function';
+GOTO            : 'goto';
+IF              : 'if';
+IN              : 'in';
+INTEGER         : 'integer';
+LABEL           : 'label';
+MOD             : 'mod';
+NIL             : 'nil';
+NOT             : 'not';
+OF              : 'of';
+OR              : 'or';
+PACKED          : 'packed';
+PROCEDURE       : 'procedure';
+PROGRAM         : 'program';
+REAL            : 'real';
+RECORD          : 'record';
+REPEAT          : 'repeat';
+SET             : 'set';
+THEN            : 'then';
+TO              : 'to';
+TYPE            : 'type';
+UNTIL           : 'until';
+VAR             : 'var';
+WHILE           : 'while';
+WITH            : 'with';
+PLUS            : '+';
+MINUS           : '-';
+STAR            : '*';
+SLASH           : '/';
+ASSIGN          : ':=';
+COMMA           : ',';
+SEMI            : ';';
+COLON           : ':';
+EQUAL           : '=';
+NOT_EQUAL       : '<>';
+LT              : '<';
+LE              : '<=';
+GE              : '>=';
+GT              : '>';
+LPAREN          : '(';
+RPAREN          : ')';
+LBRACK          : '[';
+LBRACK2         : '(.';
+RBRACK          : ']';
+RBRACK2         : '.)';
+POINTER         : '^';
+AT              : '@';
 DOT             : '.' ;
-DOTDOT          
-	:	 '..' ;
+DOTDOT          : '..';
 LCURLY          : '{' ;
 RCURLY          : '}' ;
-UNIT            : 'unit'            ;
-INTERFACE       : 'interface'       ;
-USES            : 'uses'            ;
-STRING          : 'string'          ;
-IMPLEMENTATION  : 'implementation'  ;
+UNIT            : 'unit';
+INTERFACE       : 'interface';
+USES            : 'uses';
+STRING          : 'string';
+IMPLEMENTATION  : 'implementation';
 
 IDENT
-	:	('a'..'z') ('a'..'z'|'0'..'9'|'_')* 
+	: (('a'..'z') | ('A'..'Z')) ('a'..'z'| 'A'..'Z' |'0'..'9'|'_')*
 	;
 
 STRING_LITERAL
-	: '\'' ('\'\'' | ~('\''))* '\'' 
+	: '\'' ('\'\'' | ~('\''))* '\''
 	;
 
-/** a numeric literal.  Form is (from Wirth)
- *  digits
- *  digits . digits
- *  digits . digits exponent
- *  digits exponent
- */
 NUM_INT
 	:	('0'..'9')+ // everything starts with a digit sequence
-		(	(					
-				'.' 
+		(	(
+				'.'
 				('0'..'9')+ (EXPONENT)?
 			)?
 		|	EXPONENT
 		)
 	;
 
-fragment
-EXPONENT
+fragment EXPONENT
 	:	('e') ('+'|'-')? ('0'..'9')+
 	;
 
-WS 
+WS
     : [ \r\n\t]+ -> channel(HIDDEN)
     ;
