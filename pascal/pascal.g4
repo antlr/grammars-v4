@@ -427,7 +427,7 @@ ifStatement
     : IF expression THEN statement (: ELSE statement)?
     ;
 
-caseStatement //pspsps ???
+caseStatement
     : CASE expression OF
         caseListElement ( SEMI caseListElement )*
       ( SEMI ELSE statements )?
@@ -476,314 +476,343 @@ recordVariableList
     : variable ( COMMA variable )*
     ;
 
+
+fragment A:('a'|'A');
+fragment B:('b'|'B');
+fragment C:('c'|'C');
+fragment D:('d'|'D');
+fragment E:('e'|'E');
+fragment F:('f'|'F');
+fragment G:('g'|'G');
+fragment H:('h'|'H');
+fragment I:('i'|'I');
+fragment J:('j'|'J');
+fragment K:('k'|'K');
+fragment L:('l'|'L');
+fragment M:('m'|'M');
+fragment N:('n'|'N');
+fragment O:('o'|'O');
+fragment P:('p'|'P');
+fragment Q:('q'|'Q');
+fragment R:('r'|'R');
+fragment S:('s'|'S');
+fragment T:('t'|'T');
+fragment U:('u'|'U');
+fragment V:('v'|'V');
+fragment W:('w'|'W');
+fragment X:('x'|'X');
+fragment Y:('y'|'Y');
+fragment Z:('z'|'Z');
+
+
 AND
-    : 'and'
+    : A N D
     ;
- 
+
 ARRAY
-    : 'array'
+    : A R R A Y
     ;
- 
+
 BEGIN
-    : 'begin'
+    : B E G I N
     ;
- 
+
 BOOLEAN
-    : 'boolean'
+    : B O O L E A N
     ;
- 
+
 CASE
-    : 'case'
+    : C A S E
     ;
- 
+
 CHAR
-    : 'char'
+    : C H A R
     ;
- 
+
 CHR
-    : 'chr'
+    : C H R
     ;
- 
+
 CONST
-    : 'const'
+    : C O N S T
     ;
- 
+
 DIV
-    : 'div'
+    : D I V
     ;
- 
+
 DO
-    : 'do'
+    : D O
     ;
- 
+
 DOWNTO
-    : 'downto'
+    : D O W N T O
     ;
- 
+
 ELSE
-    : 'else'
+    : E L S E
     ;
- 
+
 END
-    : 'end'
+    : E N D
     ;
- 
+
 FILE
-    : 'file'
+    : F I L E
     ;
- 
+
 FOR
-    : 'for'
+    : F O R
     ;
- 
+
 FUNCTION
-    : 'function'
+    : F U N C T I O N
     ;
- 
+
 GOTO
-    : 'goto'
+    : G O T O
     ;
- 
+
 IF
-    : 'if'
+    : I F
     ;
- 
+
 IN
-    : 'in'
+    : I N
     ;
- 
+
 INTEGER
-    : 'integer'
+    : I N T E G E R
     ;
- 
+
 LABEL
-    : 'label'
+    : L A B E L
     ;
- 
+
 MOD
-    : 'mod'
+    : M O D
     ;
- 
+
 NIL
-    : 'nil'
+    : N I L
     ;
- 
+
 NOT
-    : 'not'
+    : N O T
     ;
- 
+
 OF
-    : 'of'
+    : O F
     ;
- 
+
 OR
-    : 'or'
+    : O R
     ;
- 
+
 PACKED
-    : 'packed'
+    : P A C K E D
     ;
- 
+
 PROCEDURE
-    : 'procedure'
+    : P R O C E D U R E
     ;
- 
+
 PROGRAM
-    : 'program'
+    : P R O G R A M
     ;
- 
+
 REAL
-    : 'real'
+    : R E A L
     ;
- 
+
 RECORD
-    : 'record'
+    : R E C O R D
     ;
- 
+
 REPEAT
-    : 'repeat'
+    : R E P E A T
     ;
- 
+
 SET
-    : 'set'
+    : S E T
     ;
- 
+
 THEN
-    : 'then'
+    : T H E N
     ;
- 
+
 TO
-    : 'to'
+    : T O
     ;
- 
+
 TYPE
-    : 'type'
+    : T Y P E
     ;
- 
+
 UNTIL
-    : 'until'
+    : U N T I L
     ;
- 
+
 VAR
-    : 'var'
+    : V A R
     ;
- 
+
 WHILE
-    : 'while'
+    : W H I L E
     ;
- 
+
 WITH
-    : 'with'
+    : W I T H
     ;
- 
+
 PLUS
     : '+'
     ;
- 
+
 MINUS
     : '-'
     ;
- 
+
 STAR
     : '*'
     ;
- 
+
 SLASH
     : '/'
     ;
- 
+
 ASSIGN
     : ':='
     ;
- 
+
 COMMA
     : ','
     ;
- 
+
 SEMI
     : ';'
     ;
- 
+
 COLON
     : ':'
     ;
- 
+
 EQUAL
     : '='
     ;
- 
+
 NOT_EQUAL
     : '<>'
     ;
- 
+
 LT
     : '<'
     ;
- 
+
 LE
     : '<='
     ;
- 
+
 GE
     : '>='
     ;
- 
+
 GT
     : '>'
     ;
- 
+
 LPAREN
     : '('
     ;
- 
+
 RPAREN
     : ')'
     ;
- 
+
 LBRACK
     : '['
     ;
- 
+
 LBRACK2
     : '(.'
     ;
- 
+
 RBRACK
     : ']'
     ;
- 
+
 RBRACK2
     : '.)'
     ;
- 
+
 POINTER
     : '^'
     ;
- 
+
 AT
     : '@'
     ;
- 
+
 DOT
     : '.'
     ;
- 
+
 DOTDOT
     : '..'
     ;
- 
+
 LCURLY
     : '{'
     ;
- 
+
 RCURLY
     : '}'
     ;
- 
+
 UNIT
-    : 'unit'
+    : U N I T
     ;
- 
+
 INTERFACE
-    : 'interface'
+    : I N T E R F A C E
     ;
- 
+
 USES
-    : 'uses'
+    : U S E S
     ;
- 
+
 STRING
-    : 'string'
+    : S T R I N G
     ;
- 
+
 IMPLEMENTATION
-    : 'implementation'
+    : I M P L E M E N T A T I O N
     ;
 
 WS
     : [ \t\r\n]->skip
     ;
- 
+
 COMMENT_1
     : '(*' .*? '*)'-> skip
     ;
- 
+
 COMMENT_2
     : '{' .*? '}'-> skip
     ;
- 
+
 IDENT
     : ('a'..'z' | 'A'..'Z')  ('a'..'z'|'A'..'Z' | '0'..'9'| '_')*
     ;
- 
+
 STRING_LITERAL
     : '\'' ('\'\'' | ~('\''))* '\''
     ;
- 
+
 NUM_INT
     : ('0'..'9')+ (('.' ('0'..'9')+ (EXPONENT)?)?|EXPONENT)
     ;
- 
+
 fragment
 EXPONENT
     : ('e') ('+'|'-')? ('0'..'9')+

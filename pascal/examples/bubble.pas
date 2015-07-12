@@ -2,15 +2,15 @@
  * A simple bubble sort program.  Reads integers, one per line, and prints   *
  * them out in sorted order.  Blows up if there are more than 49.            *
  *****************************************************************************)
-program Sort(input, output);
-    const
+PROGRAM Sort(input, output);
+    CONST
         (* Max array size. *)
         MaxElts = 50;
-    type
+    TYPE 
         (* Type of the element array. *)
-        IntArrType = array [1..MaxElts] of Integer;
+        IntArrType = ARRAY [1..MaxElts] OF Integer;
 
-    var
+    VAR
         (* Indexes, exchange temp, array size. *)
         i, j, tmp, size: integer;
 
@@ -18,31 +18,31 @@ program Sort(input, output);
         arr: IntArrType;
 
     (* Read in the integers. *)
-    procedure ReadArr(var size: integer; var a: IntArrType);
-        begin
+    PROCEDURE ReadArr(VAR size: Integer; VAR a: IntArrType);
+        BEGIN
             size := 1;
-            while not eof do begin
+            WHILE NOT eof DO BEGIN
                 readln(a[size]);
-                if not eof then 
+                IF NOT eof THEN 
                     size := size + 1
-            end
-        end;
+            END
+        END;
 
-    begin
+    BEGIN
         (* Read *)
         ReadArr(size, arr);
 
         (* Sort using bubble sort. *)
-        for i := size - 1 downto 1 do
-            for j := 1 to i do 
-                if arr[j] > arr[j + 1] then begin
+        FOR i := size - 1 DOWNTO 1 DO
+            FOR j := 1 TO i DO 
+                IF arr[j] > arr[j + 1] THEN BEGIN
                     tmp := arr[j];
                     arr[j] := arr[j + 1];
                     arr[j + 1] := tmp;
-                end;
+                END;
 
         (* Print. *)
-        for i := 1 to size do
+        FOR i := 1 TO size DO
             writeln(arr[i])
-    end.
+    END.
             
