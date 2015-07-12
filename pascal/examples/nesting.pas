@@ -14,28 +14,28 @@ procedure procA;
    procedure procA2;
       var  i: integer;
    begin
-      writeln("in procA2");
+      writeln('in procA2');
       i := 120;
       j := 121;
-      writeln("i=", i, "  j=", j, "  k=", k);
+      writeln('i=', i, '  j=', j, '  k=', k);
    end;
  
    procedure procA3;
       var  i,j: integer;
    begin
-      writeln("in procA3");
+      writeln('in procA3');
       i := 130;
       j := 131;
       k := 132;
-      writeln("i=", i, "  j=", j, "  k=", k);
+      writeln('i=', i, '  j=', j, '  k=', k);
    end;
  
 begin
-   writeln("in procA");
+   writeln('in procA');
    i := 10;
    j := 11;
    k := 12;
-   writeln("i=", i, "  j=", j, "  k=", k);
+   writeln('i=', i, '  j=', j, '  k=', k);
    procA2;
    procA3;
 end;
@@ -47,20 +47,20 @@ procedure procB;
    var  i: integer;
  
 begin
-   writeln("in procB");
+   writeln('in procB');
    i := 20;
    j := 21;
-   writeln("i=", i, "  j=", j, "  k=", k);
+   writeln('i=', i, '  j=', j, '  k=', k);
 end;
  
 (* **************************    main      ********************************** *)
  
 begin
-   writeln("in main");
+   writeln('in main');
    i := 1;
    j := 2;
    k := 3;
-   writeln("i=", i, "  j=", j, "  k=", k);
+   writeln('i=', i, '  j=', j, '  k=', k);
    procA;
    procB;
 end.

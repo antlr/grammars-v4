@@ -23,6 +23,6 @@ end;
  
 begin                (* main program *)
    result := fact(number);
-   writeln("Factorial of ", number, " is ", result);
+   writeln('Factorial of ', number, ' is ', result);
 end.
 

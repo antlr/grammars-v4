@@ -24,14 +24,14 @@ begin
    for i := 5 downto 1 do
       for j := 3 downto 2 do begin
          for k := 0 to 2 do
-            write(a[i,j,k], " ");
+            write(a[i,j,k], ' ');
     writeln;
       end;
    writeln;
  
    for i := 0 to 3 do begin
       for j := 1 to 5 do
-         write(b[i,j], " ");
+         write(b[i,j], ' ');
       writeln;
    end;
 end.

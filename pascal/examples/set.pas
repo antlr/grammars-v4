@@ -25,19 +25,19 @@ begin
    morestuff := stuff1 - stuff2;  (* difference of 2 sets *)
  
    if 3 in stuff1 then
-      writeln("3 in the set")
+      writeln('3 in the set')
    else
-      writeln("3 not in the set");
+      writeln('3 not in the set');
  
    if 4 in stuff2 then
-      writeln("4 in the set")
+      writeln('4 in the set')
    else
-      writeln("4 not in the set");
+      writeln('4 not in the set');
  
    if stuff2 <= stuff1 then
-      writeln("is contained in")
+      writeln('is contained in')
    else
-      writeln("is not contained in");
+      writeln('is not contained in');
  
 end.
 

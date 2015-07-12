@@ -250,7 +250,7 @@ variableDeclarationPart
     ;
 
 variableDeclaration
-    : identifierList COLON
+    : identifierList COLON type
     ;
 
 procedureAndFunctionDeclarationPart

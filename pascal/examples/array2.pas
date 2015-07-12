@@ -16,7 +16,7 @@ begin
    begin
       n := n + 5;
       a[i] := n;                         { cool, huh }
-      write(a[i], " ");
+      write(a[i], '' );
    end;
    writeln;
 end.
