@@ -476,100 +476,315 @@ recordVariableList
     : variable ( COMMA variable )*
     ;
 
-AND             : 'and';
-ARRAY           : 'array';
-BEGIN           : 'begin';
-BOOLEAN         : 'boolean';
-CASE            : 'case';
-CHAR            : 'char';
-CHR             : 'chr';
-CONST           : 'const';
-DIV             : 'div';
-DO              : 'do';
-DOWNTO          : 'downto';
-ELSE            : 'else';
-END             : 'end';
-FILE            : 'file';
-FOR             : 'for';
-FUNCTION        : 'function';
-GOTO            : 'goto';
-IF              : 'if';
-IN              : 'in';
-INTEGER         : 'integer';
-LABEL           : 'label';
-MOD             : 'mod';
-NIL             : 'nil';
-NOT             : 'not';
-OF              : 'of';
-OR              : 'or';
-PACKED          : 'packed';
-PROCEDURE       : 'procedure';
-PROGRAM         : 'program';
-REAL            : 'real';
-RECORD          : 'record';
-REPEAT          : 'repeat';
-SET             : 'set';
-THEN            : 'then';
-TO              : 'to';
-TYPE            : 'type';
-UNTIL           : 'until';
-VAR             : 'var';
-WHILE           : 'while';
-WITH            : 'with';
-PLUS            : '+';
-MINUS           : '-';
-STAR            : '*';
-SLASH           : '/';
-ASSIGN          : ':=';
-COMMA           : ',';
-SEMI            : ';';
-COLON           : ':';
-EQUAL           : '=';
-NOT_EQUAL       : '<>';
-LT              : '<';
-LE              : '<=';
-GE              : '>=';
-GT              : '>';
-LPAREN          : '(';
-RPAREN          : ')';
-LBRACK          : '[';
-LBRACK2         : '(.';
-RBRACK          : ']';
-RBRACK2         : '.)';
-POINTER         : '^';
-AT              : '@';
-DOT             : '.' ;
-DOTDOT          : '..';
-LCURLY          : '{' ;
-RCURLY          : '}' ;
-UNIT            : 'unit';
-INTERFACE       : 'interface';
-USES            : 'uses';
-STRING          : 'string';
-IMPLEMENTATION  : 'implementation';
-
-IDENT
-	: (('a'..'z') | ('A'..'Z')) ('a'..'z'| 'A'..'Z' |'0'..'9'|'_')*
-	;
-
-STRING_LITERAL
-	: '\'' ('\'\'' | ~('\''))* '\''
-	;
-
-NUM_INT
-	:	('0'..'9')+ // everything starts with a digit sequence
-		(	(
-				'.'
-				('0'..'9')+ (EXPONENT)?
-			)?
-		|	EXPONENT
-		)
-	;
-
-fragment EXPONENT
-	:	('e') ('+'|'-')? ('0'..'9')+
-	;
+AND
+    : 'and'
+    ;
+ 
+ARRAY
+    : 'array'
+    ;
+ 
+BEGIN
+    : 'begin'
+    ;
+ 
+BOOLEAN
+    : 'boolean'
+    ;
+ 
+CASE
+    : 'case'
+    ;
+ 
+CHAR
+    : 'char'
+    ;
+ 
+CHR
+    : 'chr'
+    ;
+ 
+CONST
+    : 'const'
+    ;
+ 
+DIV
+    : 'div'
+    ;
+ 
+DO
+    : 'do'
+    ;
+ 
+DOWNTO
+    : 'downto'
+    ;
+ 
+ELSE
+    : 'else'
+    ;
+ 
+END
+    : 'end'
+    ;
+ 
+FILE
+    : 'file'
+    ;
+ 
+FOR
+    : 'for'
+    ;
+ 
+FUNCTION
+    : 'function'
+    ;
+ 
+GOTO
+    : 'goto'
+    ;
+ 
+IF
+    : 'if'
+    ;
+ 
+IN
+    : 'in'
+    ;
+ 
+INTEGER
+    : 'integer'
+    ;
+ 
+LABEL
+    : 'label'
+    ;
+ 
+MOD
+    : 'mod'
+    ;
+ 
+NIL
+    : 'nil'
+    ;
+ 
+NOT
+    : 'not'
+    ;
+ 
+OF
+    : 'of'
+    ;
+ 
+OR
+    : 'or'
+    ;
+ 
+PACKED
+    : 'packed'
+    ;
+ 
+PROCEDURE
+    : 'procedure'
+    ;
+ 
+PROGRAM
+    : 'program'
+    ;
+ 
+REAL
+    : 'real'
+    ;
+ 
+RECORD
+    : 'record'
+    ;
+ 
+REPEAT
+    : 'repeat'
+    ;
+ 
+SET
+    : 'set'
+    ;
+ 
+THEN
+    : 'then'
+    ;
+ 
+TO
+    : 'to'
+    ;
+ 
+TYPE
+    : 'type'
+    ;
+ 
+UNTIL
+    : 'until'
+    ;
+ 
+VAR
+    : 'var'
+    ;
+ 
+WHILE
+    : 'while'
+    ;
+ 
+WITH
+    : 'with'
+    ;
+ 
+PLUS
+    : '+'
+    ;
+ 
+MINUS
+    : '-'
+    ;
+ 
+STAR
+    : '*'
+    ;
+ 
+SLASH
+    : '/'
+    ;
+ 
+ASSIGN
+    : ':='
+    ;
+ 
+COMMA
+    : ','
+    ;
+ 
+SEMI
+    : ';'
+    ;
+ 
+COLON
+    : ':'
+    ;
+ 
+EQUAL
+    : '='
+    ;
+ 
+NOT_EQUAL
+    : '<>'
+    ;
+ 
+LT
+    : '<'
+    ;
+ 
+LE
+    : '<='
+    ;
+ 
+GE
+    : '>='
+    ;
+ 
+GT
+    : '>'
+    ;
+ 
+LPAREN
+    : '('
+    ;
+ 
+RPAREN
+    : ')'
+    ;
+ 
+LBRACK
+    : '['
+    ;
+ 
+LBRACK2
+    : '(.'
+    ;
+ 
+RBRACK
+    : ']'
+    ;
+ 
+RBRACK2
+    : '.)'
+    ;
+ 
+POINTER
+    : '^'
+    ;
+ 
+AT
+    : '@'
+    ;
+ 
+DOT
+    : '.'
+    ;
+ 
+DOTDOT
+    : '..'
+    ;
+ 
+LCURLY
+    : '{'
+    ;
+ 
+RCURLY
+    : '}'
+    ;
+ 
+UNIT
+    : 'unit'
+    ;
+ 
+INTERFACE
+    : 'interface'
+    ;
+ 
+USES
+    : 'uses'
+    ;
+ 
+STRING
+    : 'string'
+    ;
+ 
+IMPLEMENTATION
+    : 'implementation'
+    ;
 
 WS
-    : [ \r\n\t]+ -> channel(HIDDEN)
+    : [ \t\r\n]->skip
+    ;
+ 
+COMMENT_1
+    : '(*' .*? '*)'-> skip
+    ;
+ 
+COMMENT_2
+    : '{' .*? '}'-> skip
+    ;
+ 
+IDENT
+    : ('a'..'z' | 'A'..'Z')  ('a'..'z'|'A'..'Z' | '0'..'9'| '_')*
+    ;
+ 
+STRING_LITERAL
+    : '\'' ('\'\'' | ~('\''))* '\''
+    ;
+ 
+NUM_INT
+    : ('0'..'9')+ (('.' ('0'..'9')+ (EXPONENT)?)?|EXPONENT)
+    ;
+ 
+fragment
+EXPONENT
+    : ('e') ('+'|'-')? ('0'..'9')+
     ;
