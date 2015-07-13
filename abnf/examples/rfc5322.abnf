@@ -1,0 +1,30 @@
+date-time       =   [ day-of-week "," ] date time [CFWS]
+
+   day-of-week     =   ([FWS] day-name) / obs-day-of-week
+
+   day-name        =   "Mon" / "Tue" / "Wed" / "Thu" /
+                       "Fri" / "Sat" / "Sun"
+
+   date            =   day month year
+
+   day             =   ([FWS] 1*2DIGIT FWS) / obs-day
+
+   month           =   "Jan" / "Feb" / "Mar" / "Apr" /
+                       "May" / "Jun" / "Jul" / "Aug" /
+                       "Sep" / "Oct" / "Nov" / "Dec"
+
+   year            =   (FWS 4*DIGIT FWS) / obs-year
+
+   time            =   time-of-day zone
+
+   time-of-day     =   hour ":" minute [ ":" second ]
+
+   hour            =   2DIGIT / obs-hour
+
+   minute          =   2DIGIT / obs-minute
+
+   second          =   2DIGIT / obs-second
+
+   zone            =   (FWS ( "+" / "-" ) 4DIGIT) / obs-zone
+
+

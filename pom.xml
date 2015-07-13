@@ -11,7 +11,7 @@
 		<module>objc</module>		
 		<module>dot</module>		
 		<module>creole</module>
-		<module>bnf</module>
+<!--		<module>bnf</module>-->
 		<module>pgn</module>
 		<module>logo</module>
 		<module>asm6502</module>
@@ -25,10 +25,19 @@
 		<module>fasta</module>
 		<module>html</module>
 		<module>turtle</module>
+		<module>cpp</module>
+		<module>idl</module>
+		<module>abnf</module>
+		<module>C</module>
+		<module>erlang</module>
+		<module>lua</module>
+                <module>arithmetic</module>
+                <module>calculator</module>
+                <module>propcalc</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.2.2</antlr.version>
+		<antlr.version>4.5</antlr.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -41,7 +50,7 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>6.8.5</version>
+			<version>6.9.4</version>
 		</dependency>
 	</dependencies>
 	<build>
