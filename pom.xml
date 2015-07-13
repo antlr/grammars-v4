@@ -35,6 +35,7 @@
         <module>calculator</module>
         <module>propcalc</module>
         <module>pascal</module>
+       	<module>FOL</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
