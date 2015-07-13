@@ -270,7 +270,7 @@ emptyStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : {(_input.LA(1) != OpenBrace) && (_input.LA(1) != Function)}? expressionSequence SemiColon
+ : {(_input.LA(1) != OpenBrace) && (_input.LA(1) != Function)}? expressionSequence eos
  ;
 
 /// IfStatement :

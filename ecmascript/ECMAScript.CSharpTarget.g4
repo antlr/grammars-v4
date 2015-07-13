@@ -248,7 +248,7 @@ emptyStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : {(_input.La(1) != OpenBrace) && (_input.La(1) != Function)}? expressionSequence SemiColon
+ : {(_input.La(1) != OpenBrace) && (_input.La(1) != Function)}? expressionSequence eos
  ;
 
 /// IfStatement :

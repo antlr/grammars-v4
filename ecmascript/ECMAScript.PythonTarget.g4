@@ -256,7 +256,7 @@ emptyStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : {(self._input.LA(1) != ECMAScriptParser.OpenBrace) and (self._input.LA(1) != ECMAScriptParser.Function)}? expressionSequence SemiColon
+ : {(self._input.LA(1) != ECMAScriptParser.OpenBrace) and (self._input.LA(1) != ECMAScriptParser.Function)}? expressionSequence eos
  ;
 
 /// IfStatement :
