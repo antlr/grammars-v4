@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Adapted from pascal.g by  Hakki Dogusan, Piet Schoutteten and Marton Papp
 */
 
-grammar pascal;
+grammar Pascal;
 
 program
     : programHeading (INTERFACE)?

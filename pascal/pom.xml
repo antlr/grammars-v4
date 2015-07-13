@@ -18,7 +18,7 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>pascal.g4</grammars>
+					<grammars>Pascal.g4</grammars>
 				</configuration>
 				<executions>
 					<execution>
@@ -35,7 +35,7 @@
 					<verbose>false</verbose>
 					<showTree>true</showTree>
 					<entryPoint>program</entryPoint>
-					<grammarName>pascal</grammarName>
+					<grammarName>Pascal</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
