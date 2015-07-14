@@ -38,6 +38,7 @@
        	<module>FOL</module>
        	<module>MPS</module>
        	<module>sparql</module>
+       	<module>mumath</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
