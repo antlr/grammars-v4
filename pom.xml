@@ -37,6 +37,7 @@
         <module>pascal</module>
        	<module>FOL</module>
        	<module>MPS</module>
+       	<module>sparql</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
