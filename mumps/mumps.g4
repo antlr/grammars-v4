@@ -49,7 +49,7 @@ paramlist
     ;
 
 param
-    : identifier
+    : variable
     ;
 
 routinebody
@@ -89,9 +89,8 @@ expression
     ;
 
 term
-    : identifier
+    : variable
     | NUMBER
-    | variable
     | LPAREN expression RPAREN
     ;
 
@@ -104,7 +103,7 @@ identifier
     ;
 
 variable
-    : DOLLAR identifier
+    : CARAT? DOLLAR? identifier
     ;
 
 set
