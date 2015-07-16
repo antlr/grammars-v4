@@ -1,4 +1,4 @@
-/*
+    /*
 BSD License
 
 Copyright (c) 2013, Tom Everett
@@ -41,11 +41,11 @@ routine
     ;
 
 routinename
-    : PERCENT? identifier '(' paramlist? ')' (SPACE+ comment)? CR
+    : PERCENT? identifier LPAREN paramlist? RPAREN (SPACE+ comment)? CR
     ;
 
 paramlist
-    : param (',' param)*
+    : param (COMMA param)*
     ;
 
 param
@@ -73,19 +73,19 @@ commandname
     ;
 
 arglist
-    : arg (',' arg)*
+    : arg (COMMA arg)*
     ;
 
 arg
     : identifier
-    | NUM_INT
+    | (NUMBER
     | BANG
-    | STRING_LITERAL
+    | STRING_LITERAL)
     | variable
     ;
 
 comment
-    : ';' ~(CR)*
+    : SEMICOLON ~(CR)*
     ;
 
 identifier
@@ -94,6 +94,14 @@ identifier
 
 variable
     : DOLLAR identifier
+    ;
+
+SEMICOLON
+    : ';'
+    ;
+
+COMMA
+    : ','
     ;
 
 DOLLAR
@@ -112,6 +120,31 @@ BANG
     : '!'
     ;
 
+
+LPAREN
+    : '('
+    ;
+
+RPAREN
+    : ')'
+    ;
+
+ADD
+    : '+'
+    ;
+
+SUBTRACT
+    : '-'
+    ;
+
+MULTIPLY
+    : '*'
+    ;
+
+DIVIDE
+    : '/'
+    ;
+
 IDENTIFIER
     : ('a'..'z' | 'A'..'Z')  ('a'..'z'|'A'..'Z'|'0'..'9')*
     ;
@@ -120,13 +153,8 @@ STRING_LITERAL
     : '\"' ('\"\"' | ~('\"'))* '\"'
     ;
 
-NUM_INT
-    : ('0'..'9')+ (('.' ('0'..'9')+ (EXPONENT)?)?|EXPONENT)
-    ;
-
-fragment
-EXPONENT
-    : ('e') ('+'|'-')? ('0'..'9')+
+NUMBER
+    : ('0'..'9')+ ('.' ('0'..'9')+)?
     ;
 
 SPACE
