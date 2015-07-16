@@ -1,0 +1,33 @@
+AMP2.CIR – CASCADED OPAMPS
+*
+VS	1	0	AC	1	SIN(0 1 10KHZ)
+*
+R1	1	2	5K
+R2	2	3	10K
+XOP1	0 2	3	OPAMP1
+R3	4	0	10K
+R4	4	5	10K
+XOP2	3 4	5	OPAMP1
+*
+* SINGLE-POLE OPERATIONAL AMPLIFIER MACRO-MODEL
+* connections:      non-inverting input
+*                   |   inverting input
+*                   |   |   output
+*                   |   |   |
+.SUBCKT OPAMP1      1   2   6
+* INPUT IMPEDANCE
+RIN     1          2          10MEG
+* DC GAIN (100K) AND POLE 1 (100HZ)
+EP1	3 0	1 2	100K
+RP1	3	4	1K
+CP1	4	0	1.5915UF
+* OUTPUT BUFFER AND RESISTANCE
+EOUT	5 0	4 0	1
+ROUT	5	6	10
+.ENDS
+*
+* ANALYSIS
+.TRAN	0.01MS  0.2MS
+* VIEW RESULTS
+.PLOT TRAN V(1) V(5)
+.END

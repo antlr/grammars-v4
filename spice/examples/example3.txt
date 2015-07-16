@@ -1,0 +1,1 @@
+RC time delay circuit v1 1 0 dc 10 c1 1 2 47u ic=0 c2 1 2 22u ic=0 r1 2 0 3.3k .tran .05 1 uic .print tran v(1,2) .end 
