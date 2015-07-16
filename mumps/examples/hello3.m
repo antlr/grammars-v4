@@ -1,3 +1,3 @@
-  hello(who)
+hello(who)
   write "Hello ",who,!
   quit

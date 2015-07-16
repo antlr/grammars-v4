@@ -1,3 +1,3 @@
- hello()	
+hello()	
   write "Hello, World!",!
   quit

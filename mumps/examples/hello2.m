@@ -1,1 +1,2 @@
+hello()
  w "Hello World!",!
