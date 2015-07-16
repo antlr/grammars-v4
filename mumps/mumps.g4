@@ -103,7 +103,7 @@ identifier
     ;
 
 variable
-    : CARAT? DOLLAR? identifier
+    : (CARAT | DOLLAR)* identifier
     ;
 
 set
