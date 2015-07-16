@@ -108,7 +108,11 @@ variable
     ;
 
 set
-    : SET SPACE+ (LPAREN? arglist RPAREN?)? SPACE* EQUALS SPACE* arg
+    : SET SPACE+ assign (',' assign)*
+    ;
+
+assign
+    : (LPAREN? arglist RPAREN?)? SPACE* EQUALS SPACE* arg
     ;
 
 form
