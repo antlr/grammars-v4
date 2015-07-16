@@ -1,1 +1,2 @@
- set x="hello"
+xxxx()
+  set x="hello"
