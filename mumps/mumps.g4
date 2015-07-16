@@ -103,7 +103,7 @@ identifier
     ;
 
 variable
-    : (CARAT | DOLLAR)* identifier
+    : (CARAT | DOLLAR | AMPERSAND)* identifier
     ;
 
 set
@@ -144,6 +144,10 @@ DOLLAR
 
 PERCENT
     : '%'
+    ;
+
+AMPERSAND
+    : '&'
     ;
 
 CARAT
