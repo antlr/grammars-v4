@@ -108,11 +108,11 @@ variable
     ;
 
 set
-    : SET SPACE+ (LPAREN arglist RPAREN)? SPACE* EQUALS SPACE* arg
+    : SET SPACE+ (LPAREN? arglist RPAREN?)? SPACE* EQUALS SPACE* arg
     ;
 
 form
-    : FOR arg COLON arg command* COLON
+    : FOR SPACE+ term EQUALS term COLON term SPACE* (command SPACE?)* COLON (term (LT | GT) term)
     ;
 
 FOR
