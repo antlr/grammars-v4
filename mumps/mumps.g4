@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar mumps;
 
 program
-    : routine+ eof?
+    : routine+ eof
     ;
 
 eof
-    : SPACE* CR
+    : SPACE* CR?
     ;
 
 routine
