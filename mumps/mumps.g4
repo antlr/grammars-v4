@@ -43,14 +43,23 @@ eof
 line
     : code
     | routinedecl
+    | CR
     ;
 
 code
-    : SPACE* (label SPACE*)? (command+ | if_ | subproc)? SPACE* CR
+    : label (command+ | if_ | subproc)? SPACE* CR
     ;
 
+/*
+* A line may begin with a label. If so, the label must begin in column one.
+* After a label there must be at least one blank or a <tab> character before the
+* first command.
+* If there is no label, column one must be a blank or a <tab> character followed by
+* some number of blanks, possibly zero, before the first command.
+*/
 label
-    : identifier
+    : identifier SPACE+
+    | SPACE+
     ;
 
 routinedecl
@@ -121,7 +130,7 @@ break_
     ;
 
 do_
-    : (DO) postcondition? SPACE* identifier (LPAREN paramlist? RPAREN)?
+    : (DO) postcondition? SPACE+ identifier (LPAREN paramlist? RPAREN)?
     ;
 
 for_
@@ -133,31 +142,31 @@ halt_
     ;
 
 hang_
-    : HANG  postcondition? term
+    : HANG postcondition? SPACE+ term
     ;
 
 if_
-    : IF SPACE* condition SPACE* command
+    : IF SPACE+ condition SPACE* command
     ;
 
 kill_
-    : KILL postcondition? arglist
+    : KILL postcondition? SPACE+ arglist
     ;
 
 merge_
-    : MERGE postcondition? term EQUALS term (',' term EQUALS term)*
+    : MERGE postcondition? SPACE+ term EQUALS term (',' term EQUALS term)*
     ;
 
 new_
-    : (NEW) postcondition? SPACE* arglist
+    : (NEW) postcondition? SPACE+ arglist
     ;
 
 quit_
-    : (QUIT) postcondition? (SPACE* term)?
+    : (QUIT) postcondition? (SPACE+ term)?
     ;
 
 read_
-    : (READ) postcondition? SPACE* arglist
+    : (READ) postcondition? SPACE+ arglist
     ;
 
 set_
@@ -165,15 +174,15 @@ set_
     ;
 
 view_
-    : VIEW postcondition? IDENTIFIER
+    : VIEW postcondition? SPACE+ IDENTIFIER
     ;
 
 write_
-    : (WRITE) postcondition? SPACE* arglist
+    : (WRITE) postcondition? SPACE+ arglist
     ;
 
 xecute_
-    : XECUTE postcondition? STRING_LITERAL
+    : XECUTE postcondition? SPACE+ STRING_LITERAL
     ;
 
 assign
