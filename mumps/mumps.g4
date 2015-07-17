@@ -65,22 +65,17 @@ label
     ;
 
 command
-    : set
-    | form
-    | commandname (SPACE arglist)?
-    ;
-
-commandname
-    : (CLOSE | DO | ELSE | GOTO | HANG | IF | JOB
-      | KILL | LOCK | MERGE | OPEN | READ | TCOMMIT
-      | TRESTART | TROLLBACK | TSTART | USE | VIEW | XECUTE)
-      | set
-      | form
-      | write
-      | quit
-      | halt
-      | neww
-      | breakk
+    : set_
+    | for_
+    | write_
+    | quit_
+    | halt_
+    | new_
+    | break_
+    | do_
+    | (CLOSE | ELSE | GOTO | HANG | IF | JOB
+    | KILL | LOCK | MERGE | OPEN | READ | TCOMMIT
+    | TRESTART | TROLLBACK | TSTART | USE | VIEW | XECUTE)
     ;
 
 arglist
@@ -115,44 +110,44 @@ variable
     : (CARAT | DOLLAR | AMPERSAND)* identifier
     ;
 
-set
-    : (SET1 | SET2) SPACE+ assign (',' assign)*
+set_
+    : (SET | 'S') SPACE+ assign (',' assign)*
     ;
 
 assign
     : (LPAREN? arglist RPAREN?)? SPACE* EQUALS SPACE* arg
     ;
 
-form
+for_
     : FOR SPACE+ term EQUALS term COLON term SPACE* (command SPACE?)* COLON (term (LT | GT) term)
     ;
 
-halt
+halt_
     : (HALT1 | HALT2)
     ;
 
-write
+write_
     : (WRITE1 | WRITE2) SPACE* arglist
     ;
 
-quit
-    : (QUIT1 | QUIT2)
+quit_
+    : (QUIT | 'Q')
     ;
 
-neww
-    : (NEW1 | NEW2) SPACE* arglist
+new_
+    : (NEW | 'N') SPACE* arglist
     ;
 
-breakk
-    : (BREAK1 | BREAK2)
+break_
+    : (BREAK | 'B')
     ;
 
-BREAK1
+do_
+    : (DO | 'D') SPACE* identifier (LPAREN paramlist? RPAREN)?
+    ;
+
+BREAK
     : B R E A K
-    ;
-
-BREAK2
-    : B
     ;
 
 CLOSE
@@ -207,36 +202,24 @@ MERGE
     : M E R G E
     ;
 
-NEW1
+NEW
     : N E W
-    ;
-
-NEW2
-    : N
     ;
 
 OPEN
     : O P E N
     ;
 
-QUIT1
+QUIT
     : Q U I T
-    ;
-
-QUIT2
-    : Q
     ;
 
 READ
     : R E A D
     ;
 
-SET1
+SET
     : S E T
-    ;
-
-SET2
-    : S
     ;
 
 TCOMMIT
