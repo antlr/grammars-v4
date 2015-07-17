@@ -140,7 +140,7 @@ kill_
     ;
 
 write_
-    : (WRITE1 | WRITE2) SPACE* arglist
+    : (WRITE | 'W') SPACE* arglist
     ;
 
 quit_
@@ -269,12 +269,8 @@ VIEW
     : V I E W
     ;
 
-WRITE1
+WRITE
     : W R I T E
-    ;
-
-WRITE2
-    : W
     ;
 
 XECUTE
