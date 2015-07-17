@@ -71,9 +71,13 @@ command
     ;
 
 commandname
-    : (BREAK | CLOSE | DO | ELSE | FOR | GOTO | HALT | HANG | IF | JOB
-      | KILL | LOCK | MERGE | NEW | OPEN | QUIT | READ | SET | TCOMMIT
-      | TRESTART | TROLLBACK | TSTART | USE | VIEW | WRITE1 | WRITE2 | XECUTE)
+    : (BREAK | CLOSE | DO | ELSE | GOTO | HALT | HANG | IF | JOB
+      | KILL | LOCK | MERGE | NEW | OPEN | READ | TCOMMIT
+      | TRESTART | TROLLBACK | TSTART | USE | VIEW| XECUTE)
+      | set 
+      | form
+      | write
+      | quit
     ;
 
 arglist
@@ -109,7 +113,7 @@ variable
     ;
 
 set
-    : SET SPACE+ assign (',' assign)*
+    : (SET1 | SET2) SPACE+ assign (',' assign)*
     ;
 
 assign
@@ -118,6 +122,14 @@ assign
 
 form
     : FOR SPACE+ term EQUALS term COLON term SPACE* (command SPACE?)* COLON (term (LT | GT) term)
+    ;
+
+write
+    : (WRITE1 | WRITE2) SPACE* arglist
+    ;
+
+quit
+    : QUIT
     ;
 
 BREAK
@@ -188,8 +200,12 @@ READ
     : R E A D
     ;
 
-SET
+SET1
     : S E T
+    ;
+
+SET2
+    : S
     ;
 
 TCOMMIT
