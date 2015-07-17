@@ -43,15 +43,10 @@ eof
 line
     : code
     | routinedecl
-    | blankline
-    ;
-
-blankline
-    : SPACE* CR
     ;
 
 code
-    : SPACE+ (label SPACE*)? (command+ | if_ | subproc)? SPACE* CR
+    : SPACE* (label SPACE*)? (command+ | if_ | subproc)? SPACE* CR
     ;
 
 label
