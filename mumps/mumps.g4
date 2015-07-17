@@ -105,7 +105,7 @@ identifier
     ;
 
 variable
-    : (CARAT | DOLLAR | AMPERSAND)* identifier
+    : (CARAT | DOLLAR | AMPERSAND)* identifier (LPAREN arglist RPAREN)?
     ;
 
 if_
