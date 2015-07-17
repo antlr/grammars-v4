@@ -83,9 +83,10 @@ command
     | kill_
     | view_
     | merge_
+    | xecute_  
     | (CLOSE | ELSE | GOTO | JOB
     | LOCK | OPEN | TCOMMIT
-    | TRESTART | TROLLBACK | TSTART | USE | XECUTE)
+    | TRESTART | TROLLBACK | TSTART | USE)
     ;
 
 expression
@@ -161,6 +162,10 @@ do_
 
 view_
     : VIEW IDENTIFIER
+    ;
+
+xecute_
+    : XECUTE STRING_LITERAL
     ;
 
 merge_
