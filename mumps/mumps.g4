@@ -71,7 +71,9 @@ command
     ;
 
 commandname
-    : identifier
+    : (BREAK | CLOSE | DO | ELSE | FOR | GOTO | HALT | HANG | IF | JOB
+      | KILL | LOCK | MERGE | NEW | OPEN | QUIT | READ | SET | TCOMMIT
+      | TRESTART | TROLLBACK | TSTART | USE | VIEW | WRITE1 | WRITE2 | XECUTE)
     ;
 
 arglist
@@ -118,12 +120,112 @@ form
     : FOR SPACE+ term EQUALS term COLON term SPACE* (command SPACE?)* COLON (term (LT | GT) term)
     ;
 
+BREAK
+    : B R E A K
+    ;
+
+CLOSE
+    : C L O S E
+    ;
+
+DO
+    : D O
+    ;
+
+ELSE
+    : E L S E
+    ;
+
 FOR
     : F O R
     ;
 
+GOTO
+    : G O T O
+    ;
+
+HALT
+    : H A L T
+    ;
+
+HANG
+    : H A N G
+    ;
+
+IF
+    : I F
+    ;
+
+JOB
+    : J O B
+    ;
+
+KILL
+    : K I L L
+    ;
+
+LOCK
+    : L O C K
+    ;
+
+MERGE
+    : M E R G E
+    ;
+
+NEW
+    : N E W
+    ;
+
+OPEN
+    : O P E N
+    ;
+
+QUIT
+    : Q U I T
+    ;
+
+READ
+    : R E A D
+    ;
+
 SET
     : S E T
+    ;
+
+TCOMMIT
+    : T C O M M I T
+    ;
+
+TRESTART
+    : T R E S T A R T
+    ;
+
+TROLLBACK
+    : T R O L L B A C K
+    ;
+
+TSTART
+    : T S T A R T
+    ;
+
+USE
+    : U S E
+    ;
+
+VIEW
+    : V I E W
+    ;
+
+WRITE1
+    : W R I T E
+    ;
+
+WRITE2
+    : W
+    ;
+
+XECUTE
+    : X E C U T E
     ;
 
 SEMICOLON
@@ -148,6 +250,10 @@ PERCENT
 
 AMPERSAND
     : '&'
+    ;
+
+INDIRECT
+    : '@'
     ;
 
 CARAT
