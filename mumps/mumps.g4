@@ -37,7 +37,7 @@ program
     ;
 
 eof
-    : SPACE* CR*
+    : SPACE* CR
     ;
 
 routine
@@ -61,7 +61,7 @@ routinebody
     ;
 
 line
-    : SPACE+ (label SPACE)? (command* | if_ | subproc) (SPACE+ comment)? CR
+    : SPACE+ (label SPACE*)? (command* | if_ | subproc) (SPACE+ comment)? CR
     ;
 
 label
