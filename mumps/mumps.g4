@@ -43,6 +43,11 @@ eof
 line
     : code 
     | routinedecl 
+    | linecomment
+    ;
+
+linecomment
+    : comment CR
     ;
 
 code
@@ -310,13 +315,20 @@ BANG
     : '!'
     ;
 
-
 LPAREN
     : '('
     ;
 
 RPAREN
     : ')'
+    ;
+
+LBRACE
+    : '{'
+    ;
+
+RBRACE
+    : '}'
     ;
 
 GT
@@ -347,6 +359,18 @@ EQUALS
     : '='
     ;
 
+QUESTION
+    : '?'
+    ;
+
+DOT
+    : '.'
+    ;
+
+CONCAT
+    :'_'
+    ;
+
 IDENTIFIER
     : ('a'..'z' | 'A'..'Z')  ('a'..'z'|'A'..'Z'|'0'..'9')*
     ;
@@ -361,6 +385,10 @@ NUMBER
 
 SPACE
     : ' '
+    ;
+
+NOT
+    : '\''
     ;
 
 fragment A:('a'|'A');
