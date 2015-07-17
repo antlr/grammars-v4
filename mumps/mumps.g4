@@ -100,6 +100,11 @@ term
     | LPAREN expression RPAREN
     ;
 
+condition
+    : term
+    | (term (LT | GT | EQUALS) term)
+    ;
+
 comment
     : SEMICOLON ~(CR)*
     ;
@@ -113,7 +118,7 @@ variable
     ;
 
 set_
-    : (SET | 'S') SPACE+ assign (',' assign)*
+    : (SET) SPACE+ assign (',' assign)*
     ;
 
 assign
@@ -121,11 +126,11 @@ assign
     ;
 
 for_
-    : FOR SPACE+ term EQUALS term COLON term SPACE* (command SPACE?)* COLON (term (LT | GT) term)
+    : FOR SPACE+ term EQUALS term COLON term SPACE* (command SPACE?)* COLON SPACE* condition
     ;
 
 halt_
-    : (HALT | 'H')
+    : (HALT)
     ;
 
 hang_
@@ -141,19 +146,19 @@ write_
     ;
 
 quit_
-    : (QUIT | 'Q') term
+    : (QUIT) term
     ;
 
 new_
-    : (NEW | 'N') SPACE* arglist
+    : (NEW) SPACE* arglist
     ;
 
 break_
-    : (BREAK | 'B')
+    : (BREAK)
     ;
 
 do_
-    : (DO | 'D') SPACE* identifier (LPAREN paramlist? RPAREN)?
+    : (DO) SPACE* identifier (LPAREN paramlist? RPAREN)?
     ;
 
 BREAK
