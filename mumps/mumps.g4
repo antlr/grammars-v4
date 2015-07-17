@@ -70,11 +70,13 @@ command
     | write_
     | quit_
     | halt_
+    | hang_
     | new_
     | break_
     | do_
-    | (CLOSE | ELSE | GOTO | HANG | IF | JOB
-    | KILL | LOCK | MERGE | OPEN | READ | TCOMMIT
+    | kill_
+    | (CLOSE | ELSE | GOTO | IF | JOB
+    | LOCK | MERGE | OPEN | READ | TCOMMIT
     | TRESTART | TROLLBACK | TSTART | USE | VIEW | XECUTE)
     ;
 
@@ -123,15 +125,23 @@ for_
     ;
 
 halt_
-    : (HALT1 | HALT2)
+    : (HALT | 'H')
     ;
 
+hang_
+    : HANG term
+    ;
+
+kill_
+    : KILL arglist
+    ;
+    
 write_
     : (WRITE1 | WRITE2) SPACE* arglist
     ;
 
 quit_
-    : (QUIT | 'Q')
+    : (QUIT | 'Q') term
     ;
 
 new_
@@ -170,12 +180,8 @@ GOTO
     : G O T O
     ;
 
-HALT1
+HALT
     : H A L T
-    ;
-
-HALT2
-    : H
     ;
 
 HANG
