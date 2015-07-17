@@ -66,7 +66,7 @@ def lineTerminatorAhead(self):
     possibleIndexEosToken = self.getCurrentToken().tokenIndex - 1
     ahead = self._input.get(possibleIndexEosToken)
 
-    if ahead.channel == Lexer.HIDDEN:
+    if ahead.channel != Lexer.HIDDEN:
         # We're only interested in tokens on the HIDDEN channel.
         return False
 
@@ -256,7 +256,7 @@ emptyStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : {(self._input.LA(1) != ECMAScriptParser.OpenBrace) and (self._input.LA(1) != ECMAScriptParser.Function)}? expressionSequence SemiColon
+ : {(self._input.LA(1) != ECMAScriptParser.OpenBrace) and (self._input.LA(1) != ECMAScriptParser.Function)}? expressionSequence eos
  ;
 
 /// IfStatement :
