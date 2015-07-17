@@ -94,7 +94,7 @@ postcondition
     ;
 
 expression
-    : term  (SPACE* (ADD | MULTIPLY | SUBTRACT | DIVIDE) expression)*
+    : term  (SPACE* (ADD | MULTIPLY | SUBTRACT | DIVIDE | INTDIVIDE | MODULO | EXPONENT) expression)*
     ;
 
 term
@@ -105,7 +105,7 @@ term
 
 condition
     : term
-    | (term (LT | GT | EQUALS) term)
+    | (term (NGT | NLT | LT | GT | EQUALS) term)
     ;
 
 identifier
@@ -342,6 +342,14 @@ RBRACE
     : '}'
     ;
 
+NGT
+    : '\'>'
+    ;
+
+NLT
+    : '\'<'
+    ;
+
 GT
     : '>'
     ;
@@ -364,6 +372,18 @@ MULTIPLY
 
 DIVIDE
     : '/'
+    ;
+
+INTDIVIDE
+    : '\\'
+    ;
+
+MODULO
+    : '#'
+    ;
+
+EXPONENT
+    : '**'
     ;
 
 EQUALS
