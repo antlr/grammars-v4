@@ -136,7 +136,7 @@ write
     ;
 
 quit
-    : QUIT
+    : (QUIT1 | QUIT2)
     ;
 
 neww
@@ -219,8 +219,12 @@ OPEN
     : O P E N
     ;
 
-QUIT
+QUIT1
     : Q U I T
+    ;
+
+QUIT2
+    : Q
     ;
 
 READ
