@@ -125,6 +125,16 @@ variable
     : (CARAT | DOLLAR | AMPERSAND)* identifier (LPAREN arglist RPAREN)?
     ;
 
+/*
+* COMMANDS
+*
+* After most command words or abbreviations there may be an optional postconditional.
+* No blanks or <tab> characters are permitted between the command
+* word and the post-conditional.
+* If a command has an argument, there must be at least one blank after the
+* command word and its post-conditional, if present, and the argument.
+*/
+
 break_
     : (BREAK) postcondition?
     ;
@@ -198,6 +208,10 @@ arg
     | (BANG
     | STRING_LITERAL)
     ;
+
+/*
+* Command Tokens
+*/
 
 BREAK
     : B R E A K
