@@ -81,9 +81,11 @@ command
     | break_
     | do_
     | kill_
+    | view_
+    | merge_
     | (CLOSE | ELSE | GOTO | JOB
-    | LOCK | MERGE | OPEN | TCOMMIT
-    | TRESTART | TROLLBACK | TSTART | USE | VIEW | XECUTE)
+    | LOCK | OPEN | TCOMMIT
+    | TRESTART | TROLLBACK | TSTART | USE | XECUTE)
     ;
 
 expression
@@ -155,6 +157,14 @@ break_
 
 do_
     : (DO) SPACE* identifier (LPAREN paramlist? RPAREN)?
+    ;
+
+view_
+    : VIEW IDENTIFIER
+    ;
+
+merge_
+    : MERGE term EQUALS term (',' term EQUALS term)*
     ;
 
 assign
