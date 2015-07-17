@@ -41,17 +41,17 @@ eof
     ;
 
 line
-    : code 
-    | routinedecl 
-    | linecomment
+    : code
+    | routinedecl
+    | blankline
     ;
 
-linecomment
-    : comment CR
+blankline
+    : SPACE* CR
     ;
 
 code
-    : SPACE+ (label SPACE*)? (command+ | if_ | subproc)? SPACE* comment? CR
+    : SPACE+ (label SPACE*)? (command+ | if_ | subproc)? SPACE* CR
     ;
 
 label
@@ -59,7 +59,7 @@ label
     ;
 
 routinedecl
-    : PERCENT? identifier (LPAREN paramlist? RPAREN)? SPACE* comment? CR
+    : PERCENT? identifier (LPAREN paramlist? RPAREN)? SPACE* CR
     ;
 
 paramlist
@@ -73,7 +73,7 @@ param
 subproc
     : identifier (LPAREN paramlist? RPAREN)? (SPACE* command)+
     ;
-        
+
 command
     : set_
     | for_
@@ -103,10 +103,6 @@ term
 condition
     : term
     | (term (LT | GT | EQUALS) term)
-    ;
-
-comment
-    : SEMICOLON ~(CR)*
     ;
 
 identifier
@@ -142,7 +138,7 @@ kill_
     ;
 
 write_
-    : (WRITE | W) SPACE* arglist
+    : (WRITE) SPACE* arglist
     ;
 
 quit_
@@ -279,10 +275,6 @@ XECUTE
     : X E C U T E
     ;
 
-SEMICOLON
-    : ';'
-    ;
-
 COLON
     : ':'
     ;
@@ -417,6 +409,10 @@ fragment W:('w'|'W');
 fragment X:('x'|'X');
 fragment Y:('y'|'Y');
 fragment Z:('z'|'Z');
+
+COMMENT
+    : ';' ~[\r\n]* ->skip
+    ;
 
 CR
     : '\n'
