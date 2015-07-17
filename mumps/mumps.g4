@@ -57,7 +57,7 @@ routinebody
     ;
 
 line
-    : SPACE+ (label SPACE)? command* (SPACE+ comment)? CR
+    : SPACE+ (label SPACE)? (command* | if_) (SPACE+ comment)? CR
     ;
 
 label
@@ -75,19 +75,9 @@ command
     | break_
     | do_
     | kill_
-    | (CLOSE | ELSE | GOTO | IF | JOB
+    | (CLOSE | ELSE | GOTO | JOB
     | LOCK | MERGE | OPEN | READ | TCOMMIT
     | TRESTART | TROLLBACK | TSTART | USE | VIEW | XECUTE)
-    ;
-
-arglist
-    : arg (SPACE* COMMA arg)*
-    ;
-
-arg
-    : expression
-    | (BANG
-    | STRING_LITERAL)
     ;
 
 expression
@@ -117,12 +107,12 @@ variable
     : (CARAT | DOLLAR | AMPERSAND)* identifier
     ;
 
-set_
-    : (SET) SPACE+ assign (',' assign)*
+if_
+    : IF SPACE* condition SPACE* command
     ;
 
-assign
-    : (LPAREN? arglist RPAREN?)? SPACE* EQUALS SPACE* arg
+set_
+    : (SET) SPACE+ assign (',' assign)*
     ;
 
 for_
@@ -140,13 +130,13 @@ hang_
 kill_
     : KILL arglist
     ;
-    
+
 write_
     : (WRITE1 | WRITE2) SPACE* arglist
     ;
 
 quit_
-    : (QUIT) term
+    : (QUIT) (SPACE* term)?
     ;
 
 new_
@@ -159,6 +149,20 @@ break_
 
 do_
     : (DO) SPACE* identifier (LPAREN paramlist? RPAREN)?
+    ;
+
+assign
+    : (LPAREN? arglist RPAREN?)? SPACE* EQUALS SPACE* arg
+    ;
+
+arglist
+    : arg (SPACE* COMMA arg)*
+    ;
+
+arg
+    : expression
+    | (BANG
+    | STRING_LITERAL)
     ;
 
 BREAK
