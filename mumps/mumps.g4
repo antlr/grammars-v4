@@ -33,7 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar mumps;
 
 program
-    : routine+
+    : routine+ eof?
+    ;
+
+eof
+    : SPACE* CR*
     ;
 
 routine
@@ -57,13 +61,17 @@ routinebody
     ;
 
 line
-    : SPACE+ (label SPACE)? (command* | if_) (SPACE+ comment)? CR
+    : SPACE+ (label SPACE)? (command* | if_ | subproc) (SPACE+ comment)? CR
     ;
 
 label
     : identifier
     ;
 
+subproc
+    : identifier (LPAREN paramlist? RPAREN)? (SPACE* command)+
+    ;
+        
 command
     : set_
     | for_

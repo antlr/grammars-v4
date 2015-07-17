@@ -6,3 +6,4 @@ sampleproc(z) ; a sample routine
        if z set c=a+c+z
        quit c
  subproc(y) set a=(a+y)*2 quit
+ 
