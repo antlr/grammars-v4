@@ -73,6 +73,7 @@ command
     : set_
     | for_
     | write_
+    | read_
     | quit_
     | halt_
     | hang_
@@ -81,7 +82,7 @@ command
     | do_
     | kill_
     | (CLOSE | ELSE | GOTO | JOB
-    | LOCK | MERGE | OPEN | READ | TCOMMIT
+    | LOCK | MERGE | OPEN | TCOMMIT
     | TRESTART | TROLLBACK | TSTART | USE | VIEW | XECUTE)
     ;
 
@@ -134,6 +135,10 @@ kill_
 
 write_
     : (WRITE) SPACE* arglist
+    ;
+
+read_
+    : (READ) SPACE* arglist
     ;
 
 quit_
