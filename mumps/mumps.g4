@@ -71,13 +71,16 @@ command
     ;
 
 commandname
-    : (BREAK | CLOSE | DO | ELSE | GOTO | HALT | HANG | IF | JOB
-      | KILL | LOCK | MERGE | NEW | OPEN | READ | TCOMMIT
-      | TRESTART | TROLLBACK | TSTART | USE | VIEW| XECUTE)
-      | set 
+    : (CLOSE | DO | ELSE | GOTO | HANG | IF | JOB
+      | KILL | LOCK | MERGE | OPEN | READ | TCOMMIT
+      | TRESTART | TROLLBACK | TSTART | USE | VIEW | XECUTE)
+      | set
       | form
       | write
       | quit
+      | halt
+      | neww
+      | breakk
     ;
 
 arglist
@@ -124,6 +127,10 @@ form
     : FOR SPACE+ term EQUALS term COLON term SPACE* (command SPACE?)* COLON (term (LT | GT) term)
     ;
 
+halt
+    : (HALT1 | HALT2)
+    ;
+
 write
     : (WRITE1 | WRITE2) SPACE* arglist
     ;
@@ -132,8 +139,20 @@ quit
     : QUIT
     ;
 
-BREAK
+neww
+    : (NEW1 | NEW2) SPACE* arglist
+    ;
+
+breakk
+    : (BREAK1 | BREAK2)
+    ;
+
+BREAK1
     : B R E A K
+    ;
+
+BREAK2
+    : B
     ;
 
 CLOSE
@@ -156,8 +175,12 @@ GOTO
     : G O T O
     ;
 
-HALT
+HALT1
     : H A L T
+    ;
+
+HALT2
+    : H
     ;
 
 HANG
@@ -184,8 +207,12 @@ MERGE
     : M E R G E
     ;
 
-NEW
+NEW1
     : N E W
+    ;
+
+NEW2
+    : N
     ;
 
 OPEN
