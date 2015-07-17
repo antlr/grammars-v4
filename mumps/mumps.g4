@@ -33,19 +33,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar mumps;
 
 program
-    : routine+ eof
+    : line+ eof
     ;
 
 eof
     : SPACE* CR?
     ;
 
-routine
-    : routinename routinebody
+line
+    : code 
+    | routinedecl 
     ;
 
-routinename
-    : PERCENT? identifier (LPAREN paramlist? RPAREN)? (SPACE+ comment)? CR
+code
+    : SPACE+ (label SPACE*)? (command+ | if_ | subproc)? SPACE* comment? CR
+    ;
+
+label
+    : identifier
+    ;
+
+routinedecl
+    : PERCENT? identifier (LPAREN paramlist? RPAREN)? SPACE* comment? CR
     ;
 
 paramlist
@@ -54,18 +63,6 @@ paramlist
 
 param
     : variable
-    ;
-
-routinebody
-    : line+
-    ;
-
-line
-    : SPACE+ (label SPACE*)? (command* | if_ | subproc) (SPACE+ comment)? CR
-    ;
-
-label
-    : identifier
     ;
 
 subproc
@@ -140,7 +137,7 @@ kill_
     ;
 
 write_
-    : (WRITE | 'W') SPACE* arglist
+    : (WRITE | W) SPACE* arglist
     ;
 
 quit_

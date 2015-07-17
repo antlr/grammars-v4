@@ -1,2 +1,2 @@
 hello()
- w "Hello World!",!
+ write "Hello World!",!
