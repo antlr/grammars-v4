@@ -83,10 +83,14 @@ command
     | kill_
     | view_
     | merge_
-    | xecute_  
+    | xecute_
     | (CLOSE | ELSE | GOTO | JOB
     | LOCK | OPEN | TCOMMIT
     | TRESTART | TROLLBACK | TSTART | USE)
+    ;
+
+postcondition
+    : COLON expression
     ;
 
 expression
@@ -112,12 +116,12 @@ variable
     : (CARAT | DOLLAR | AMPERSAND)* identifier (LPAREN arglist RPAREN)?
     ;
 
-if_
-    : IF SPACE* condition SPACE* command
+break_
+    : (BREAK) postcondition?
     ;
 
-set_
-    : (SET) SPACE+ assign (',' assign)*
+do_
+    : (DO) postcondition? SPACE* identifier (LPAREN paramlist? RPAREN)?
     ;
 
 for_
@@ -125,51 +129,51 @@ for_
     ;
 
 halt_
-    : (HALT)
+    : (HALT) postcondition?
     ;
 
 hang_
-    : HANG term
+    : HANG  postcondition? term
+    ;
+
+if_
+    : IF SPACE* condition SPACE* command
     ;
 
 kill_
-    : KILL arglist
-    ;
-
-write_
-    : (WRITE) SPACE* arglist
-    ;
-
-read_
-    : (READ) SPACE* arglist
-    ;
-
-quit_
-    : (QUIT) (SPACE* term)?
-    ;
-
-new_
-    : (NEW) SPACE* arglist
-    ;
-
-break_
-    : (BREAK)
-    ;
-
-do_
-    : (DO) SPACE* identifier (LPAREN paramlist? RPAREN)?
-    ;
-
-view_
-    : VIEW IDENTIFIER
-    ;
-
-xecute_
-    : XECUTE STRING_LITERAL
+    : KILL postcondition? arglist
     ;
 
 merge_
-    : MERGE term EQUALS term (',' term EQUALS term)*
+    : MERGE postcondition? term EQUALS term (',' term EQUALS term)*
+    ;
+
+new_
+    : (NEW) postcondition? SPACE* arglist
+    ;
+
+quit_
+    : (QUIT) postcondition? (SPACE* term)?
+    ;
+
+read_
+    : (READ) postcondition? SPACE* arglist
+    ;
+
+set_
+    : (SET) postcondition? SPACE+ assign (',' assign)*
+    ;
+
+view_
+    : VIEW postcondition? IDENTIFIER
+    ;
+
+write_
+    : (WRITE) postcondition? SPACE* arglist
+    ;
+
+xecute_
+    : XECUTE postcondition? STRING_LITERAL
     ;
 
 assign
