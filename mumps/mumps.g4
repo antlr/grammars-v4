@@ -47,7 +47,7 @@ line
     ;
 
 code
-    : label (command+ | if_ | subproc)? SPACE* CR
+    : (label | (SPACE+ DOT+) | SPACE+) (command+ | if_ | subproc)? SPACE* CR
     ;
 
 /*
@@ -59,7 +59,6 @@ code
 */
 label
     : identifier SPACE+
-    | SPACE+
     ;
 
 routinedecl
