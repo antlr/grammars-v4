@@ -102,7 +102,7 @@ postcondition
     ;
 
 expression
-    : term  (SPACE* (ADD | MULTIPLY | SUBTRACT | DIVIDE | INTDIVIDE | MODULO | EXPONENT) expression)*
+    : term (SPACE* (ADD | MULTIPLY | SUBTRACT | DIVIDE | INTDIVIDE | MODULO | EXPONENT) expression)*
     ;
 
 term
