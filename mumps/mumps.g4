@@ -143,7 +143,7 @@ do_
     ;
 
 for_
-    : FOR SPACE+ term EQUALS term COLON term SPACE* (command SPACE?)* COLON SPACE* condition
+    : FOR SPACE+ term EQUALS term COLON (term COLON)? term SPACE+ (command SPACE?)* COLON SPACE* condition
     ;
 
 halt_
