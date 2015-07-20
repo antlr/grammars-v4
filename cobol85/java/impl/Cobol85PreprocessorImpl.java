@@ -4,16 +4,16 @@ Copyright (C) 2015 u.wol@wwu.de
 This file is part of cobol85grammar.
 
 cobol85grammar is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
 cobol85grammar is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Lesser General Public License for more details.
 
-You should have received a copy of the GNU General Public License
+You should have received a copy of the GNU Lesser General Public License
 along with cobol85grammar. If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -63,8 +63,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	 * ANTLR listener, which collects visible as well as hidden tokens for a
 	 * given parse tree in a string buffer.
 	 */
-	private class Cobol85HiddenTokenCollectorImpl extends
-			Cobol85PreprocessorBaseListener {
+	private class Cobol85HiddenTokenCollectorImpl extends Cobol85PreprocessorBaseListener {
 
 		boolean firstTerminal = true;
 
@@ -100,8 +99,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	 * ANTLR visitor, which preprocesses a given COBOL program by executing COPY
 	 * and REPLACE statemenets.
 	 */
-	private class Cobol85PreprocessingListenerImpl extends
-			Cobol85PreprocessorBaseListener {
+	private class Cobol85PreprocessingListenerImpl extends Cobol85PreprocessorBaseListener {
 
 		/**
 		 * A replacement context that defines, which replaceables should be
@@ -118,12 +116,9 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 				private ReplacementContext replacement;
 
-				private String extractPseudoText(
-						final PseudoTextContext pseudoTextCtx) {
-					final String pseudoText = getTextIncludingHiddenTokens(
-							pseudoTextCtx, tokens).trim();
-					final String content = pseudoText.replaceAll("^==", "")
-							.replaceAll("==$", "").trim();
+				private String extractPseudoText(final PseudoTextContext pseudoTextCtx) {
+					final String pseudoText = getTextIncludingHiddenTokens(pseudoTextCtx, tokens).trim();
+					final String content = pseudoText.replaceAll("^==", "").replaceAll("==$", "").trim();
 					return content;
 				}
 
@@ -200,12 +195,9 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 						final String replaceableRegex = getRegexFromReplaceable(replaceableString);
 
 						// regex for the replacement
-						final String quotedReplacementRegex = Matcher
-								.quoteReplacement(replacementString);
+						final String quotedReplacementRegex = Matcher.quoteReplacement(replacementString);
 
-						result = Pattern.compile(replaceableRegex)
-								.matcher(string)
-								.replaceAll(quotedReplacementRegex);
+						result = Pattern.compile(replaceableRegex).matcher(string).replaceAll(quotedReplacementRegex);
 					} else {
 						result = string;
 					}
@@ -215,8 +207,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 				@Override
 				public String toString() {
-					return replaceable.getText() + " -> "
-							+ replacement.getText();
+					return replaceable.getText() + " -> " + replacement.getText();
 				}
 			}
 
@@ -232,8 +223,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 				if (currentReplaceableReplacements != null) {
 					for (final ReplacementMapping replaceableReplacement : currentReplaceableReplacements) {
 						final String currentOutput = outputBuffer.toString();
-						final String replacedOutput = replaceableReplacement
-								.replace(currentOutput);
+						final String replacedOutput = replaceableReplacement.replace(currentOutput);
 
 						outputBuffer = new StringBuffer();
 						outputBuffer.append(replacedOutput);
@@ -241,8 +231,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 				}
 			}
 
-			private void storeReplaceablesAndReplacements(
-					final List<ReplaceClauseContext> replaceClauses) {
+			private void storeReplaceablesAndReplacements(final List<ReplaceClauseContext> replaceClauses) {
 				if (replaceClauses == null) {
 					currentReplaceableReplacements = null;
 				} else {
@@ -254,10 +243,8 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 					for (final ReplaceClauseContext replaceClause : replaceClauses) {
 						final ReplacementMapping replaceableReplacement = new ReplacementMapping();
 
-						replaceableReplacement.replaceable = replaceClause
-								.replaceable();
-						replaceableReplacement.replacement = replaceClause
-								.replacement();
+						replaceableReplacement.replaceable = replaceClause.replaceable();
+						replaceableReplacement.replacement = replaceClause.replacement();
 
 						currentReplaceableReplacements[i] = replaceableReplacement;
 						i++;
@@ -276,8 +263,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 		private final BufferedTokenStream tokens;
 
-		public Cobol85PreprocessingListenerImpl(final File libDirectory,
-				final BufferedTokenStream tokens) {
+		public Cobol85PreprocessingListenerImpl(final File libDirectory, final BufferedTokenStream tokens) {
 			this.libDirectory = libDirectory;
 			this.tokens = tokens;
 
@@ -289,33 +275,28 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 
 		@Override
-		public void enterCopyStatement(
-				@NotNull final Cobol85PreprocessorParser.CopyStatementContext ctx) {
+		public void enterCopyStatement(@NotNull final Cobol85PreprocessorParser.CopyStatementContext ctx) {
 			// push a new context for COPY terminals
 			push();
 		}
 
 		@Override
-		public void enterReplaceArea(
-				@NotNull final Cobol85PreprocessorParser.ReplaceAreaContext ctx) {
+		public void enterReplaceArea(@NotNull final Cobol85PreprocessorParser.ReplaceAreaContext ctx) {
 			push();
 		}
 
 		@Override
-		public void enterReplaceByStatement(
-				@NotNull final Cobol85PreprocessorParser.ReplaceByStatementContext ctx) {
+		public void enterReplaceByStatement(@NotNull final Cobol85PreprocessorParser.ReplaceByStatementContext ctx) {
 			push();
 		}
 
 		@Override
-		public void enterReplaceOffStatement(
-				@NotNull final Cobol85PreprocessorParser.ReplaceOffStatementContext ctx) {
+		public void enterReplaceOffStatement(@NotNull final Cobol85PreprocessorParser.ReplaceOffStatementContext ctx) {
 			push();
 		}
 
 		@Override
-		public void exitCopyStatement(
-				@NotNull final Cobol85PreprocessorParser.CopyStatementContext ctx) {
+		public void exitCopyStatement(@NotNull final Cobol85PreprocessorParser.CopyStatementContext ctx) {
 			// throw away COPY terminals
 			pop();
 
@@ -325,20 +306,17 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			/*
 			 * replacement phrase
 			 */
-			final ReplacingPhraseContext replacingPhrase = ctx
-					.replacingPhrase();
+			final ReplacingPhraseContext replacingPhrase = ctx.replacingPhrase();
 
 			if (replacingPhrase != null) {
-				context().storeReplaceablesAndReplacements(
-						replacingPhrase.replaceClause());
+				context().storeReplaceablesAndReplacements(replacingPhrase.replaceClause());
 			}
 
 			/*
 			 * copy the copy file
 			 */
 			final String copyFileIdentifier = ctx.copySource().getText();
-			final String fileContent = getCopyFileContent(copyFileIdentifier,
-					libDirectory);
+			final String fileContent = getCopyFileContent(copyFileIdentifier, libDirectory);
 
 			if (fileContent != null) {
 				context().write(fileContent + NEWLINE);
@@ -352,13 +330,11 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 
 		@Override
-		public void exitReplaceArea(
-				@NotNull final Cobol85PreprocessorParser.ReplaceAreaContext ctx) {
+		public void exitReplaceArea(@NotNull final Cobol85PreprocessorParser.ReplaceAreaContext ctx) {
 			/*
 			 * replacement phrase
 			 */
-			final List<ReplaceClauseContext> replaceClauses = ctx
-					.replaceByStatement().replaceClause();
+			final List<ReplaceClauseContext> replaceClauses = ctx.replaceByStatement().replaceClause();
 			context().storeReplaceablesAndReplacements(replaceClauses);
 
 			context().replace();
@@ -369,15 +345,13 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 
 		@Override
-		public void exitReplaceByStatement(
-				@NotNull final Cobol85PreprocessorParser.ReplaceByStatementContext ctx) {
+		public void exitReplaceByStatement(@NotNull final Cobol85PreprocessorParser.ReplaceByStatementContext ctx) {
 			// throw away REPLACE BY terminals
 			pop();
 		}
 
 		@Override
-		public void exitReplaceOffStatement(
-				@NotNull final Cobol85PreprocessorParser.ReplaceOffStatementContext ctx) {
+		public void exitReplaceOffStatement(@NotNull final Cobol85PreprocessorParser.ReplaceOffStatementContext ctx) {
 			// throw away REPLACE OFF terminals
 			pop();
 		}
@@ -405,12 +379,10 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	private class ThrowingErrorListener extends BaseErrorListener {
 
 		@Override
-		public void syntaxError(@NotNull final Recognizer<?, ?> recognizer,
-				@Nullable final Object offendingSymbol, final int line,
-				final int charPositionInLine, @NotNull final String msg,
+		public void syntaxError(@NotNull final Recognizer<?, ?> recognizer, @Nullable final Object offendingSymbol,
+				final int line, final int charPositionInLine, @NotNull final String msg,
 				@Nullable final RecognitionException e) {
-			throw new RuntimeException("syntax error in line " + line + ":"
-					+ charPositionInLine + " " + msg);
+			throw new RuntimeException("syntax error in line " + line + ":" + charPositionInLine + " " + msg);
 		}
 	}
 
@@ -420,13 +392,11 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 	protected final static String LINENUMBER_PLACEHOLDER = "      ";
 
-	private final static Logger LOG = LogManager
-			.getLogger(Cobol85PreprocessorImpl.class);
+	private final static Logger LOG = LogManager.getLogger(Cobol85PreprocessorImpl.class);
 
 	protected final static String NEWLINE = "\n";
 
-	protected final String[] extensions = new String[] { "", "CPY", "COB",
-			"CBL" };
+	protected final String[] extensions = new String[] { "", "CPY", "COB", "CBL" };
 
 	protected Cobol85Format determineFormat(final String line) {
 		Cobol85Format result;
@@ -444,8 +414,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return result;
 	}
 
-	private String getCopyFileContent(final String filename,
-			final File libDirectory) {
+	private String getCopyFileContent(final String filename, final File libDirectory) {
 		final File copyFile = identifyCopyFile(filename, libDirectory);
 		String result;
 
@@ -465,10 +434,8 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return result;
 	}
 
-	private String getHiddenTokensToLeft(final BufferedTokenStream tokens,
-			final int tokPos) {
-		final List<Token> refChannel = tokens.getHiddenTokensToLeft(tokPos,
-				Cobol85PreprocessorLexer.HIDDEN);
+	private String getHiddenTokensToLeft(final BufferedTokenStream tokens, final int tokPos) {
+		final List<Token> refChannel = tokens.getHiddenTokensToLeft(tokPos, Cobol85PreprocessorLexer.HIDDEN);
 		final StringBuffer sb = new StringBuffer();
 
 		if (refChannel != null) {
@@ -481,10 +448,8 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return sb.toString();
 	}
 
-	private String getTextIncludingHiddenTokens(final ParseTree ctx,
-			final BufferedTokenStream tokens) {
-		final Cobol85HiddenTokenCollectorImpl listener = new Cobol85HiddenTokenCollectorImpl(
-				tokens);
+	private String getTextIncludingHiddenTokens(final ParseTree ctx, final BufferedTokenStream tokens) {
+		final Cobol85HiddenTokenCollectorImpl listener = new Cobol85HiddenTokenCollectorImpl(tokens);
 		final ParseTreeWalker walker = new ParseTreeWalker();
 
 		walker.walk(listener, ctx);
@@ -504,8 +469,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 				filenameWithExtension = filename + "." + extension;
 			}
 
-			final String canonicalPath = libDirectory.getAbsolutePath() + "/"
-					+ filenameWithExtension;
+			final String canonicalPath = libDirectory.getAbsolutePath() + "/" + filenameWithExtension;
 			final File copyFileWithExtension = new File(canonicalPath);
 
 			if (copyFileWithExtension.exists()) {
@@ -521,18 +485,15 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return Token.EOF == node.getSymbol().getType();
 	}
 
-	protected String normalizeLine(final String line,
-			final Cobol85Format format, final boolean isFirstLine) {
+	protected String normalizeLine(final String line, final Cobol85Format format, final boolean isFirstLine) {
 		final String strippedLine = stripLineNumber(line, format);
 
 		/*
 		 * determine line prefix
 		 */
 		final String newLine = isFirstLine ? "" : NEWLINE;
-		final String lineNumberPlaceholder = Cobol85Format.TANDEM
-				.equals(format) ? "" : LINENUMBER_PLACEHOLDER;
-		final String linePrefix = newLine + lineNumberPlaceholder
-				+ LINEINDICATOR_PLACEHOLDER;
+		final String lineNumberPlaceholder = Cobol85Format.TANDEM.equals(format) ? "" : LINENUMBER_PLACEHOLDER;
+		final String linePrefix = newLine + lineNumberPlaceholder + LINEINDICATOR_PLACEHOLDER;
 
 		final String result;
 
@@ -552,11 +513,9 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			if (trimmedLineArea.isEmpty()) {
 				cleanLineArea = trimmedLineArea;
 			} else {
-				final char lastCharAtTrimmedLineArea = trimmedLineArea
-						.charAt(trimmedLineArea.length() - 1);
+				final char lastCharAtTrimmedLineArea = trimmedLineArea.charAt(trimmedLineArea.length() - 1);
 
-				if (lastCharAtTrimmedLineArea == ','
-						|| lastCharAtTrimmedLineArea == ';') {
+				if (lastCharAtTrimmedLineArea == ',' || lastCharAtTrimmedLineArea == ';') {
 					cleanLineArea = trimmedLineArea + " ";
 				} else {
 					cleanLineArea = trimmedLineArea;
@@ -631,15 +590,12 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	}
 
 	@Override
-	public String process(final File inputFile, final File libDirectory)
-			throws IOException {
+	public String process(final File inputFile, final File libDirectory) throws IOException {
 		LOG.info("Preprocessing file {}.", inputFile.getName());
 
 		final InputStream inputStream = new FileInputStream(inputFile);
-		final InputStreamReader inputStreamReader = new InputStreamReader(
-				inputStream);
-		final BufferedReader bufferedInputStreamReader = new BufferedReader(
-				inputStreamReader);
+		final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		final BufferedReader bufferedInputStreamReader = new BufferedReader(inputStreamReader);
 		final StringBuffer outputBuffer = new StringBuffer();
 
 		String line = null;
@@ -670,18 +626,15 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return result;
 	}
 
-	protected String processCopyReplace(final String program,
-			final File libDirectory) {
+	protected String processCopyReplace(final String program, final File libDirectory) {
 		// run the lexer
-		final Cobol85PreprocessorLexer lexer = new Cobol85PreprocessorLexer(
-				new ANTLRInputStream(program));
+		final Cobol85PreprocessorLexer lexer = new Cobol85PreprocessorLexer(new ANTLRInputStream(program));
 
 		// get a list of matched tokens
 		final CommonTokenStream tokens = new CommonTokenStream(lexer);
 
 		// pass the tokens to the parser
-		final Cobol85PreprocessorParser parser = new Cobol85PreprocessorParser(
-				tokens);
+		final Cobol85PreprocessorParser parser = new Cobol85PreprocessorParser(tokens);
 
 		// register an error listener, so that preprocessing stops on errors
 		parser.removeErrorListeners();
@@ -691,8 +644,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		final StartRuleContext startRule = parser.startRule();
 
 		// analyze contained copy books
-		final Cobol85PreprocessingListenerImpl listener = new Cobol85PreprocessingListenerImpl(
-				libDirectory, tokens);
+		final Cobol85PreprocessingListenerImpl listener = new Cobol85PreprocessingListenerImpl(libDirectory, tokens);
 		final ParseTreeWalker walker = new ParseTreeWalker();
 
 		walker.walk(listener, startRule);
@@ -720,8 +672,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return result;
 	}
 
-	protected final String stripLineNumber(final String line,
-			final Cobol85Format format) {
+	protected final String stripLineNumber(final String line, final Cobol85Format format) {
 		final String result;
 
 		if (format == null) {
