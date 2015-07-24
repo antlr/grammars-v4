@@ -66,6 +66,17 @@ grammar ECMAScript;
             return false;
         }
 
+        if (ahead.Type == LineTerminator) {
+            // There is definitely a line terminator ahead.
+            return true;
+        }
+
+        if (ahead.Type == WhiteSpaces) {
+            // Get the token ahead of the current whitespaces.
+            possibleIndexEosToken = this.CurrentToken.TokenIndex - 2;
+            ahead = _input.Get(possibleIndexEosToken);
+        }
+
         // Get the token's text and type.
         string text = ahead.Text;
         int type = ahead.Type;

@@ -74,6 +74,17 @@ grammar ECMAScript;
             return false;
         }
 
+        if (ahead.getType() == LineTerminator) {
+            // There is definitely a line terminator ahead.
+            return true;
+        }
+
+        if (ahead.getType() == WhiteSpaces) {
+            // Get the token ahead of the current whitespaces.
+            possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 2;
+            ahead = _input.get(possibleIndexEosToken);
+        }
+
         // Get the token's text and type.
         String text = ahead.getText();
         int type = ahead.getType();

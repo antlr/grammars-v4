@@ -70,13 +70,22 @@ def lineTerminatorAhead(self):
         # We're only interested in tokens on the HIDDEN channel.
         return False
 
+    if ahead.type == ECMAScriptParser.LineTerminator:
+        # There is definitely a line terminator ahead.
+        return True
+
+    if ahead.type == ECMAScriptParser.WhiteSpaces:
+        # Get the token ahead of the current whitespaces.
+        possibleIndexEosToken = self.getCurrentToken().tokenIndex - 2
+        ahead = self._input.get(possibleIndexEosToken)
+
     # Get the token's text and type.
     text = ahead.text
     type = ahead.type
 
     # Check if the token is, or contains a line terminator.
     return (type == ECMAScriptParser.MultiLineComment and \
-        (text.contains('\r') or text.contains('\n'))) or \
+        ('\r' in text or '\n' in text)) or \
         (type == ECMAScriptParser.LineTerminator)
 }
 
