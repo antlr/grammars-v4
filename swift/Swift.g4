@@ -837,7 +837,7 @@ fragment Sign : [+\-] ;
 
 // GRAMMAR OF A STRING LITERAL
 
-String_literal : '"' Quoted_text '"' ;
+String_literal : '"' Quoted_text? '"' ;
 fragment Quoted_text : Quoted_text_item Quoted_text? ;
 fragment Quoted_text_item : Escaped_character
 // | '\\(' expression ')'
