@@ -31,14 +31,15 @@
 		<module>C</module>
 		<module>erlang</module>
 		<module>lua</module>
-        <module>arithmetic</module>
-        <module>calculator</module>
-        <module>propcalc</module>
-        <module>pascal</module>
-       	<module>FOL</module>
-       	<module>MPS</module>
-       	<module>sparql</module>
-       	<module>mumath</module>
+		<module>arithmetic</module>
+		<module>calculator</module>
+		<module>propcalc</module>
+		<module>pascal</module>
+		<module>FOL</module>
+		<module>MPS</module>
+		<module>sparql</module>
+		<module>mumath</module>
+		<module>mumps</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
