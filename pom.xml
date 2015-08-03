@@ -45,7 +45,7 @@
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.5</antlr.version>
+		<antlr.version>4.5.1</antlr.version>
 	</properties>
 	<dependencies>
 		<dependency>
