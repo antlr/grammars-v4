@@ -33,7 +33,7 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>true</showTree>
+					<showTree>false</showTree>
 					<entryPoint>translation_unit</entryPoint>
 					<grammarName>ObjC</grammarName>
 					<packageName></packageName>
