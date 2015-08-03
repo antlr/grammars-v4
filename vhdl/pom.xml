@@ -37,7 +37,7 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>true</showTree>
+					<showTree>false</showTree>
 					<entryPoint>design_file</entryPoint>
 					<grammarName>vhdl</grammarName>
 					<packageName></packageName>
