@@ -41,6 +41,7 @@
 		<module>mumath</module>
 		<module>mumps</module>
 		<module>php</module>
+		<module>smalltalk</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
