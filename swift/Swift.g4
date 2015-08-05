@@ -830,7 +830,7 @@ Floating_point_literal
 fragment Decimal_fraction : '.' Decimal_literal ;
 fragment Decimal_exponent : Floating_point_e Sign? Decimal_literal ;
 fragment Hexadecimal_fraction : '.' Hexadecimal_literal? ;
-fragment Hexadecimal_exponent : Floating_point_p Sign? Hexadecimal_literal ;
+fragment Hexadecimal_exponent : Floating_point_p Sign? Decimal_literal ;
 fragment Floating_point_e : [eE] ;
 fragment Floating_point_p : [pP] ;
 fragment Sign : [+\-] ;
