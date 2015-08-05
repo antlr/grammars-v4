@@ -760,7 +760,7 @@ Identifier : Identifier_head Identifier_characters?
 
 identifier_list : identifier | identifier ',' identifier_list  ;
 
-fragment Identifier_head : [a-zA-Z]
+fragment Identifier_head : [a-zA-Z_]
  | '\u00A8' | '\u00AA' | '\u00AD' | '\u00AF' | [\u00B2-\u00B5] | [\u00B7-\u00BA]
  | [\u00BC-\u00BE] | [\u00C0-\u00D6] | [\u00D8-\u00F6] | [\u00F8-\u00FF]
  | [\u0100-\u02FF] | [\u0370-\u167F] | [\u1681-\u180D] | [\u180F-\u1DBF]
