@@ -25,7 +25,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -63,7 +65,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	 * ANTLR listener, which collects visible as well as hidden tokens for a
 	 * given parse tree in a string buffer.
 	 */
-	private class Cobol85HiddenTokenCollectorImpl extends Cobol85PreprocessorBaseListener {
+	protected class Cobol85HiddenTokenCollectorImpl extends Cobol85PreprocessorBaseListener {
 
 		boolean firstTerminal = true;
 
@@ -99,7 +101,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	 * ANTLR visitor, which preprocesses a given COBOL program by executing COPY
 	 * and REPLACE statemenets.
 	 */
-	private class Cobol85PreprocessingListenerImpl extends Cobol85PreprocessorBaseListener {
+	protected class Cobol85PreprocessingListenerImpl extends Cobol85PreprocessorBaseListener {
 
 		/**
 		 * A replacement context that defines, which replaceables should be
@@ -259,12 +261,16 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 		private final Stack<PreprocessingContext> contexts = new Stack<PreprocessingContext>();
 
+		private final Cobol85Format[] formats;
+
 		private final File libDirectory;
 
 		private final BufferedTokenStream tokens;
 
-		public Cobol85PreprocessingListenerImpl(final File libDirectory, final BufferedTokenStream tokens) {
+		public Cobol85PreprocessingListenerImpl(final File libDirectory, final Cobol85Format[] formats,
+				final BufferedTokenStream tokens) {
 			this.libDirectory = libDirectory;
+			this.formats = formats;
 			this.tokens = tokens;
 
 			contexts.push(new PreprocessingContext());
@@ -277,6 +283,18 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		@Override
 		public void enterCopyStatement(@NotNull final Cobol85PreprocessorParser.CopyStatementContext ctx) {
 			// push a new context for COPY terminals
+			push();
+		};
+
+		@Override
+		public void enterExecCicsStatement(final org.cobol85.Cobol85PreprocessorParser.ExecCicsStatementContext ctx) {
+			// push a new context for SQL terminals
+			push();
+		}
+
+		@Override
+		public void enterExecSqlStatement(final org.cobol85.Cobol85PreprocessorParser.ExecSqlStatementContext ctx) {
+			// push a new context for SQL terminals
 			push();
 		}
 
@@ -316,7 +334,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			 * copy the copy file
 			 */
 			final String copyFileIdentifier = ctx.copySource().getText();
-			final String fileContent = getCopyFileContent(copyFileIdentifier, libDirectory);
+			final String fileContent = getCopyFileContent(copyFileIdentifier, libDirectory, formats);
 
 			if (fileContent != null) {
 				context().write(fileContent + NEWLINE);
@@ -327,6 +345,18 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			pop();
 
 			context().write(content);
+		}
+
+		@Override
+		public void exitExecCicsStatement(final org.cobol85.Cobol85PreprocessorParser.ExecCicsStatementContext ctx) {
+			// throw away EXEC SQL terminals -> FIXME
+			pop();
+		}
+
+		@Override
+		public void exitExecSqlStatement(final org.cobol85.Cobol85PreprocessorParser.ExecSqlStatementContext ctx) {
+			// throw away EXEC SQL terminals -> FIXME
+			pop();
 		}
 
 		@Override
@@ -348,7 +378,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		public void exitReplaceByStatement(@NotNull final Cobol85PreprocessorParser.ReplaceByStatementContext ctx) {
 			// throw away REPLACE BY terminals
 			pop();
-		}
+		};
 
 		@Override
 		public void exitReplaceOffStatement(@NotNull final Cobol85PreprocessorParser.ReplaceOffStatementContext ctx) {
@@ -356,10 +386,16 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			pop();
 		}
 
+		/**
+		 * Pops the current preprocessing context from the stack.
+		 */
 		private PreprocessingContext pop() {
 			return contexts.pop();
 		}
 
+		/**
+		 * Pushes a new preprocessing context onto the stack.
+		 */
 		private PreprocessingContext push() {
 			return contexts.push(new PreprocessingContext());
 		}
@@ -376,7 +412,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 	}
 
-	private class ThrowingErrorListener extends BaseErrorListener {
+	protected class ThrowingErrorListener extends BaseErrorListener {
 
 		@Override
 		public void syntaxError(@NotNull final Recognizer<?, ?> recognizer, @Nullable final Object offendingSymbol,
@@ -388,33 +424,30 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 	protected final static String COMMENT_TAG = ">*";
 
-	protected final static String LINEINDICATOR_PLACEHOLDER = " ";
-
-	protected final static String LINENUMBER_PLACEHOLDER = "      ";
-
 	private final static Logger LOG = LogManager.getLogger(Cobol85PreprocessorImpl.class);
 
 	protected final static String NEWLINE = "\n";
 
+	protected final Cobol85Format[] defaultFormats = new Cobol85Format[] { Cobol85FormatEnum.FIXED,
+			Cobol85FormatEnum.VARIABLE, Cobol85FormatEnum.TANDEM };
+
 	protected final String[] extensions = new String[] { "", "CPY", "COB", "CBL" };
 
-	protected Cobol85Format determineFormat(final String line) {
-		Cobol85Format result;
+	protected final String[] parsingTriggers = new String[] { "copy", "exec sql", "exec cics", "replace" };
 
-		if (line.length() > 72) {
-			result = Cobol85Format.FIXED;
-		} else if (line.length() > 6) {
-			result = Cobol85Format.VARIABLE;
-		} else if (line.length() > 0) {
-			result = Cobol85Format.TANDEM;
-		} else {
-			result = null;
+	protected Map<Cobol85Format, Pattern> patterns = new HashMap<Cobol85Format, Pattern>();
+
+	protected void assurePatternForFormat(final Cobol85Format format) {
+		if (patterns.get(format) == null) {
+			patterns.put(format, Pattern.compile(format.getRegex()));
 		}
-
-		return result;
 	}
 
-	private String getCopyFileContent(final String filename, final File libDirectory) {
+	protected Cobol85Format[] determineFormats(final Cobol85Format[] formats) {
+		return formats != null ? formats : defaultFormats;
+	}
+
+	protected String getCopyFileContent(final String filename, final File libDirectory, final Cobol85Format[] formats) {
 		final File copyFile = identifyCopyFile(filename, libDirectory);
 		String result;
 
@@ -424,7 +457,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			result = null;
 		} else {
 			try {
-				result = process(copyFile, libDirectory);
+				result = process(copyFile, libDirectory, formats);
 			} catch (final IOException e) {
 				result = null;
 				LOG.warn(e.getMessage());
@@ -434,7 +467,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return result;
 	}
 
-	private String getHiddenTokensToLeft(final BufferedTokenStream tokens, final int tokPos) {
+	protected String getHiddenTokensToLeft(final BufferedTokenStream tokens, final int tokPos) {
 		final List<Token> refChannel = tokens.getHiddenTokensToLeft(tokPos, Cobol85PreprocessorLexer.HIDDEN);
 		final StringBuffer sb = new StringBuffer();
 
@@ -448,7 +481,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return sb.toString();
 	}
 
-	private String getTextIncludingHiddenTokens(final ParseTree ctx, final BufferedTokenStream tokens) {
+	protected String getTextIncludingHiddenTokens(final ParseTree ctx, final BufferedTokenStream tokens) {
 		final Cobol85HiddenTokenCollectorImpl listener = new Cobol85HiddenTokenCollectorImpl(tokens);
 		final ParseTreeWalker walker = new ParseTreeWalker();
 
@@ -457,7 +490,31 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return listener.read();
 	}
 
-	private File identifyCopyFile(final String filename, final File libDirectory) {
+	protected String handleTrailingComma(final String contentArea) {
+		final String result;
+
+		/*
+		 * repair trimmed whitespace after comma separator
+		 */
+		if (contentArea.isEmpty()) {
+			result = contentArea;
+		} else {
+			final char lastCharAtTrimmedLineArea = contentArea.charAt(contentArea.length() - 1);
+
+			if (lastCharAtTrimmedLineArea == ',' || lastCharAtTrimmedLineArea == ';') {
+				result = contentArea + " ";
+			} else {
+				result = contentArea;
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Identifies a copy file by its name and directory.
+	 */
+	protected File identifyCopyFile(final String filename, final File libDirectory) {
 		File copyFile = null;
 
 		for (final String extension : extensions) {
@@ -481,102 +538,105 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return copyFile;
 	}
 
-	private boolean isEOF(final TerminalNode node) {
+	protected boolean isEOF(final TerminalNode node) {
 		return Token.EOF == node.getSymbol().getType();
 	}
 
-	protected String normalizeLine(final String line, final Cobol85Format format, final boolean isFirstLine) {
-		final String strippedLine = stripLineNumber(line, format);
-
-		/*
-		 * determine line prefix
-		 */
-		final String newLine = isFirstLine ? "" : NEWLINE;
-		final String lineNumberPlaceholder = Cobol85Format.TANDEM.equals(format) ? "" : LINENUMBER_PLACEHOLDER;
-		final String linePrefix = newLine + lineNumberPlaceholder + LINEINDICATOR_PLACEHOLDER;
-
+	/**
+	 * Normalizes a line by stripping the sequence number and line indicator,
+	 * and interpreting the line indicator.
+	 */
+	@Override
+	public String normalizeLine(final Cobol85Line line, final boolean isFirstLine) {
 		final String result;
 
+		// determine line prefix
+		final String linePrefix = normalizeLineBreakAndSequenceArea(line, isFirstLine);
+
+		// trim trailing whitespace
+		final String trimmedTrailWsContentArea = line.contentArea.replaceAll("\\s+$", "");
+
+		// handle trailing comma
+		final String handledContentArea = handleTrailingComma(trimmedTrailWsContentArea);
+
 		/*
-		 * treat line by line indicator
+		 * switch on line indicator
 		 */
-		if (strippedLine.isEmpty()) {
-			result = strippedLine;
-		} else {
-			final String lineArea = strippedLine.substring(1);
-			final String trimmedLineArea = lineArea.trim();
-			final String cleanLineArea;
+		switch (line.indicatorArea) {
+		// debugging line
+		case 'd':
+		case 'D':
+			result = linePrefix + ' ' + handledContentArea;
+			break;
+		// continuation line
+		case '-':
+			final String trimmedContentArea = handledContentArea.trim();
+			final char firstCharOfContentArea = trimmedContentArea.charAt(0);
 
-			/*
-			 * repair trimmed whitespace after comma separator
-			 */
-			if (trimmedLineArea.isEmpty()) {
-				cleanLineArea = trimmedLineArea;
-			} else {
-				final char lastCharAtTrimmedLineArea = trimmedLineArea.charAt(trimmedLineArea.length() - 1);
-
-				if (lastCharAtTrimmedLineArea == ',' || lastCharAtTrimmedLineArea == ';') {
-					cleanLineArea = trimmedLineArea + " ";
-				} else {
-					cleanLineArea = trimmedLineArea;
-				}
-			}
-
-			/*
-			 * switch on line indicator
-			 */
-			final char lineIndicator = strippedLine.charAt(0);
-
-			switch (lineIndicator) {
-			// debugging line
-			case 'd':
-			case 'D':
-				result = linePrefix + trimmedLineArea;
+			switch (firstCharOfContentArea) {
+			case '\"':
+			case '\'':
+				result = trimmedContentArea.substring(1);
 				break;
-			// continuation line
-			case '-':
-				final char firstCharOfLineArea = cleanLineArea.charAt(0);
-
-				switch (firstCharOfLineArea) {
-				case '\"':
-					result = cleanLineArea.substring(1);
-					break;
-				default:
-					result = cleanLineArea;
-					break;
-				}
-				break;
-			// comment line
-			case '*':
-			case '/':
-				result = linePrefix + COMMENT_TAG + " " + cleanLineArea;
-				break;
-			case ' ':
 			default:
-				result = linePrefix + cleanLineArea;
+				result = trimmedContentArea;
 				break;
 			}
+			break;
+		// comment line
+		case '*':
+		case '/':
+			result = linePrefix + COMMENT_TAG + " " + handledContentArea;
+			break;
+		case ' ':
+		default:
+			result = linePrefix + ' ' + handledContentArea;
+			break;
 		}
 
 		return result;
 	}
 
-	protected String normalizeLines(final String input) {
+	/**
+	 * Normalizes the sequence and indicator area to NEWLINE and whitespace.
+	 */
+	protected String normalizeLineBreakAndSequenceArea(final Cobol85Line line, final boolean isFirstLine) {
+		// newline
+		final String newLine = isFirstLine ? "" : NEWLINE;
+
+		// sequence area
+		final String sequenceAreaPlaceholder = StringUtils.leftPad("", line.sequenceArea.length());
+
+		final String result = newLine + sequenceAreaPlaceholder;
+		return result;
+	}
+
+	protected String normalizeLines(final String input, final Cobol85Format[] formats) {
 		final Scanner scanner = new Scanner(input);
 		final StringBuffer outputBuffer = new StringBuffer();
 
-		Cobol85Format format = null;
 		String line = null;
 		boolean isFirstLine = true;
 
 		while (scanner.hasNextLine()) {
 			line = scanner.nextLine();
 
-			if (format == null) {
-				format = determineFormat(line);
+			// clean line from certain ASCII chars
+			final int substituteChar = 0x1A;
+			final String cleanedLine = line.replace((char) substituteChar, ' ');
+
+			// parse line
+			final Cobol85Line parsedLine = parseCobol85Line(cleanedLine, formats);
+			final String normalizedLine;
+
+			if (parsedLine == null) {
+				LOG.warn("unknown line format: {}", line);
+				normalizedLine = cleanedLine;
+			} else {
+				normalizedLine = normalizeLine(parsedLine, isFirstLine);
 			}
 
-			outputBuffer.append(normalizeLine(line, format, isFirstLine));
+			outputBuffer.append(normalizedLine);
 			isFirstLine = false;
 		}
 
@@ -590,7 +650,39 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	}
 
 	@Override
-	public String process(final File inputFile, final File libDirectory) throws IOException {
+	public Cobol85Line parseCobol85Line(final String line, final Cobol85Format[] formats) {
+		Cobol85Line result = null;
+
+		final Cobol85Format[] effectiveFormats = determineFormats(formats);
+
+		for (final Cobol85Format format : effectiveFormats) {
+			assurePatternForFormat(format);
+
+			final Pattern pattern = patterns.get(format);
+			final Matcher matcher = pattern.matcher(line);
+
+			if (matcher.matches()) {
+				final String sequenceAreaGroup = matcher.group(1);
+				final String indicatorAreaGroup = matcher.group(2);
+				final String contentAreaGroup = matcher.group(3);
+				final String commentAreaGroup = matcher.group(4);
+
+				final String sequenceArea = sequenceAreaGroup != null ? sequenceAreaGroup : "";
+				final char indicatorArea = indicatorAreaGroup != null ? indicatorAreaGroup.charAt(0) : ' ';
+				final String contentArea = contentAreaGroup != null ? contentAreaGroup : "";
+				final String commentArea = commentAreaGroup != null ? commentAreaGroup : "";
+
+				result = new Cobol85Line(sequenceArea, indicatorArea, contentArea, commentArea, format);
+				break;
+			}
+		}
+
+		return result;
+	}
+
+	@Override
+	public String process(final File inputFile, final File libDirectory, final Cobol85Format[] formats)
+			throws IOException {
 		LOG.info("Preprocessing file {}.", inputFile.getName());
 
 		final InputStream inputStream = new FileInputStream(inputFile);
@@ -606,19 +698,19 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 		bufferedInputStreamReader.close();
 
-		final String result = process(outputBuffer.toString(), libDirectory);
+		final String result = process(outputBuffer.toString(), libDirectory, formats);
 		return result;
 	}
 
 	@Override
-	public String process(final String input, final File libDirectory) {
-		final String normalizedInput = normalizeLines(input);
+	public String process(final String input, final File libDirectory, final Cobol85Format[] formats) {
+		final String normalizedInput = normalizeLines(input, formats);
 
-		final boolean requiresCopyReplaceExecution = requiresCopyReplace(normalizedInput);
+		final boolean requiresProcessorExecution = requiresParsing(normalizedInput);
 		final String result;
 
-		if (requiresCopyReplaceExecution) {
-			result = processCopyReplace(normalizedInput, libDirectory);
+		if (requiresProcessorExecution) {
+			result = processWithParser(normalizedInput, libDirectory, formats);
 		} else {
 			result = normalizedInput;
 		}
@@ -626,7 +718,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return result;
 	}
 
-	protected String processCopyReplace(final String program, final File libDirectory) {
+	protected String processWithParser(final String program, final File libDirectory, final Cobol85Format[] formats) {
 		// run the lexer
 		final Cobol85PreprocessorLexer lexer = new Cobol85PreprocessorLexer(new ANTLRInputStream(program));
 
@@ -644,52 +736,30 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		final StartRuleContext startRule = parser.startRule();
 
 		// analyze contained copy books
-		final Cobol85PreprocessingListenerImpl listener = new Cobol85PreprocessingListenerImpl(libDirectory, tokens);
+		final Cobol85Format[] effectiveFormats = determineFormats(formats);
+		final Cobol85PreprocessingListenerImpl listener = new Cobol85PreprocessingListenerImpl(libDirectory,
+				effectiveFormats, tokens);
 		final ParseTreeWalker walker = new ParseTreeWalker();
 
 		walker.walk(listener, startRule);
 
 		final String result = listener.context().read();
 
-		LOG.debug("Copy-replaced input:\n\n{}\n\n", result);
+		LOG.debug("Preprocessed input:\n\n{}\n\n", result);
 
 		return result;
 	}
 
-	private boolean requiresCopyReplace(final String input) {
+	protected boolean requiresParsing(final String input) {
 		final String inputLowerCase = input.toLowerCase();
-		final boolean result;
+		boolean result = false;
 
-		final boolean containsCopy = inputLowerCase.contains("copy");
+		for (final String trigger : parsingTriggers) {
+			final boolean containsTrigger = inputLowerCase.contains(trigger);
 
-		if (containsCopy) {
-			result = true;
-		} else {
-			final boolean containsReplace = inputLowerCase.contains("replace");
-			result = containsReplace;
-		}
-
-		return result;
-	}
-
-	protected final String stripLineNumber(final String line, final Cobol85Format format) {
-		final String result;
-
-		if (format == null) {
-			result = line;
-		} else {
-			switch (format) {
-			case FIXED:
-				result = StringUtils.substring(line, 6, 72);
+			if (containsTrigger) {
+				result = true;
 				break;
-			case VARIABLE:
-				result = StringUtils.substring(line, 6);
-				break;
-			case TANDEM:
-				result = line;
-				break;
-			default:
-				result = line;
 			}
 		}
 

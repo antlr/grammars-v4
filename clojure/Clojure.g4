@@ -96,7 +96,7 @@ lambda
     ;
 
 meta_data
-    : '#^' map form
+    : '#^' (map form | form) 
     ;
 
 var_quote
