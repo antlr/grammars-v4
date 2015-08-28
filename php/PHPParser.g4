@@ -474,7 +474,7 @@ atomOrReference
     ;
 
 arrayDeclaration
-    : Array OpenRoundBracket (arrayEntry (Comma arrayEntry)*)? CloseRoundBracket 
+    : Array OpenRoundBracket (arrayEntry (Comma arrayEntry)* Comma?)? CloseRoundBracket
     ;
 
 arrayEntry
