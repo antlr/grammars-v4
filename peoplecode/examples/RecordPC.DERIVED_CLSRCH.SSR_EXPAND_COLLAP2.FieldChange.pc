@@ -1,0 +1,9 @@
+If %Page = Page.SSR_CLSRCH_RSLT Then
+   If DERIVED_CLSRCH.GROUPBOX1.Visible = True Then
+      DERIVED_CLSRCH.GROUPBOX1.Visible = False;
+      DERIVED_CLSRCH.SSR_EXPAND_COLLAP2.LabelImage = Image.PS_EXPAND_ICN;
+   Else
+      DERIVED_CLSRCH.GROUPBOX1.Visible = True;
+      DERIVED_CLSRCH.SSR_EXPAND_COLLAP2.LabelImage = Image.PS_COLLAPSE_ICN;
+   End-If;
+End-If;
