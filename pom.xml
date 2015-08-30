@@ -42,6 +42,7 @@
 		<module>mumps</module>
 		<module>php</module>
 		<module>smalltalk</module>
+		<module>peoplecode</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
