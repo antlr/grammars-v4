@@ -211,6 +211,7 @@ unaryoperator
 	| '+'
 	| '!'
 	| '~'
+	| '-'
 ;
 
 newexpression
