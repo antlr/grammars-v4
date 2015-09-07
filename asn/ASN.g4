@@ -438,6 +438,7 @@ builtinValue :
 	|	choiceValue
 	|	objectIdentifierValue
 	|	booleanValue
+	|   CSTRING
  ;
 
 objectIdentifierValue : L_BRACE /*(definedValue)?*/ objIdComponentsList R_BRACE
@@ -544,15 +545,6 @@ namedBit      : IDENTIFIER L_PARAN (NUMBER | definedValue) R_PARAN
 booleanValue:  TRUE_LITERAL | FALSE_LITERAL | TRUE_SMALL_LITERAL | FALSE_SMALL_LITERAL
 ;
 
-
-
-
-
-
-
-
-
-
 A_ROND
 	:	'@'
 	;
@@ -576,7 +568,6 @@ TRUE_LITERAL
 FALSE_LITERAL
 	:	'FALSE'
 	;
-
 
 DOT
 	:	'.'
