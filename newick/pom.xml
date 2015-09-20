@@ -32,8 +32,8 @@
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
-					<verbose>false</verbose>
-					<showTree>false</showTree>
+					<verbose>true</verbose>
+					<showTree>true</showTree>
 					<entryPoint>newick</entryPoint>
 					<grammarName>newick</grammarName>
 					<packageName></packageName>

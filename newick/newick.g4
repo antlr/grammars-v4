@@ -49,8 +49,7 @@ internal
     ;
 
 branchset
-    : branch
-    | branch ',' branchset
+    : branch ( ',' branchset)?
     ;
 
 branch
@@ -66,7 +65,7 @@ length
     ;
 
 NAME
-    : [a-zA-Z] [a-zA-Z0-9_]*
+    : [a-zA-Z_] [a-zA-Z0-9_-\']*
     ;
 
 NUMBER
