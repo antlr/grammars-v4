@@ -44,6 +44,7 @@
 		<module>smalltalk</module>
 		<module>peoplecode</module>
 		<module>asn</module>
+		<module>newick</module>
 	</modules>
 	<properties>
 		<target.jvm>1.6</target.jvm>
