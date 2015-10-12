@@ -732,11 +732,11 @@ futureReservedWord
  ;
 
 getter
- : {_input.Lt(1).Text.StartsWith("get")}? Identifier
+ : {_input.Lt(1).Text.Equals("get")}? Identifier propertyName
  ;
 
 setter
- : {_input.Lt(1).Text.StartsWith("set")}? Identifier
+ : {_input.Lt(1).Text.Equals("set")}? Identifier propertyName
  ;
 
 eos
