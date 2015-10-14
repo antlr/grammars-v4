@@ -754,11 +754,11 @@ futureReservedWord
  ;
 
 getter
- : {_input.LT(1).getText().startsWith("get")}? Identifier
+ : {_input.LT(1).getText().equals("get")}? Identifier propertyName
  ;
 
 setter
- : {_input.LT(1).getText().startsWith("set")}? Identifier
+ : {_input.LT(1).getText().equals("set")}? Identifier propertyName
  ;
 
 eos

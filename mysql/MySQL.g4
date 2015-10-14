@@ -4,9 +4,7 @@ options {
 	tokenVocab=MySQLBase;
 }
 
-@header {
-package  jp.co.future.parser.antlr4.mysql;
-}
+
 
 stat:
 		select_clause+
