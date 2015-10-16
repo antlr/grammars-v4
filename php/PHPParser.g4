@@ -1,6 +1,6 @@
 // PHP grammar by Ivan Kochurkin (KvanTTT), 2015.
 // Used Phalanger grammar: https://github.com/DEVSENSE/Phalanger by Jakub Míšek (jakubmisek)
-// and old php grammar: https://github.com/antlr/grammars-v4/tree/master/php by Tom Everett (teverett).
+// and old php grammar by Tom Everett (teverett).
 // Runtime: C#.
 // Licence: MIT.
 
@@ -59,7 +59,7 @@ scriptText
     
 scriptTextPart
     : phpBlock
-    | ScriptText
+    | ScriptText+
     ;
 
 // PHP
@@ -189,7 +189,7 @@ innerStatement
     | classDeclaration
     ;
 
-// Statement
+// Statements
     
 statement
     : nonEmptyStatement
@@ -630,7 +630,6 @@ classConstant
     ;
 
 stringConstant
-    //TCONSTANTENCAPSEDSTRING
     : Label
     ;
     

@@ -1,6 +1,6 @@
 // PHP grammar by Ivan Kochurkin (KvanTTT), 2015.
 // Used Phalanger grammar: https://github.com/DEVSENSE/Phalanger by Jakub Míšek (jakubmisek)
-// and old php grammar: https://github.com/antlr/grammars-v4/tree/master/php by Tom Everett (teverett).
+// and old php grammar by Tom Everett (teverett).
 // Runtime: C#.
 // Licence: MIT.
 
@@ -11,8 +11,7 @@ channels { PhpComments }
 @lexer::header {#pragma warning disable 3021}
 
 @lexer::members
-{int ScriptTextLength;
-bool ScriptTag;
+{bool ScriptTag;
 bool StyleTag;
 string HeredocIdentifier;
 int PrevTokenType;
@@ -25,11 +24,16 @@ public override IToken NextToken()
     {
         if (_mode == SingleLineCommentMode)
         {
-            PopMode(); // exit from comment.
+            // SingleLineCommentMode for such allowed syntax:
+            // <?php echo "Hello world"; // comment ?>
+            PopMode(); // exit from SingleLineComment mode.
         }
-        PopMode(); // exit from PHP
+        PopMode(); // exit from PHP mode.
         
-        if (PrevTokenType == SemiColon || PrevTokenType == Colon || PrevTokenType == OpenCurlyBracket)
+        // Add semicolon to the end of statement if it is absente.
+        // For example: <?php echo "Hello world" ?>
+        if (PrevTokenType == SemiColon || PrevTokenType == Colon
+            || PrevTokenType == OpenCurlyBracket || PrevTokenType == CloseCurlyBracket)
         {
             token = base.NextToken();
         }
@@ -41,6 +45,7 @@ public override IToken NextToken()
     
     if (_mode == HereDoc)
     {
+        // Heredoc and Nowdoc syntax suuport: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
         switch (token.Type)
         {
             case StartHereDoc:
@@ -86,7 +91,9 @@ bool CheckHeredocEnd(string text)
     return result;
 }}
 
-fragment PhpStartEchoFragment: '<' '?' '=';
+// '<?=' will be transformed to 'echo' token.
+// '<?= "Hello world"; ?>' will be transformed to '<?php echo "Hello world"; ?>'
+fragment PhpStartEchoFragment: '<' '?' '='; 
 fragment PhpStartFragment:     '<' '?' (P H P)?;
 fragment Digit:                [0-9];
 fragment HexDigit:             [a-fA-F0-9];
@@ -198,16 +205,16 @@ HtmlEndDoubleQuoteString:      '"' -> popMode;
 HtmlDoubleQuoteString:         ~[<"]+;
 
 // Parse JavaScript with https://github.com/antlr/grammars-v4/tree/master/ecmascript if necessary.
-// Php blocks can exists inside Script blocks too.
+// Php blocks can exist inside Script blocks too.
 mode SCRIPT;
 
-ScriptClose:              '</' 'script'? '>' { ScriptTextLength = 0; } -> popMode;
-PHPStartInsideScriptEcho: PhpStartEchoFragment { ScriptTextLength = 0; } -> type(Echo), pushMode(PHP);
-PHPStartInsideScript:     PhpStartFragment { ScriptTextLength = 0; } -> skip, pushMode(PHP);
-ScriptText
-    : { ScriptTextLength == 0 }? . { ScriptTextLength++; }
-    ;
-ScriptTextChar:           .+? { ScriptTextLength++; } -> more;
+ScriptText:               ~[<]+;
+ScriptClose:              '<' '/' 'script'? '>' -> popMode;
+PHPStartInsideScriptEcho: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
+PHPStartInsideScript:     PhpStartFragment-> skip, pushMode(PHP);
+ScriptText2:              '<' ~[<?/]* -> type(ScriptText);
+ScriptText3:              '?' ~[<]* -> type(ScriptText);
+ScriptText4:              '/' ~[<]* -> type(ScriptText);
 
 mode STYLE;
 
