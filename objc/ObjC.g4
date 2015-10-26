@@ -194,10 +194,12 @@ property_synthesize_item
 
 block_type:type_specifier '(''^' type_specifier? ')' block_parameters? ;
 
+generics_specifier: '<' (type_specifier)? (',' type_specifier)*'>' ;
+
 type_specifier:
 'void' | 'char' | 'short' | 'int' | 'long' | 'float' | 'double' | 'signed' | 'unsigned' 
 	|	('id' ( protocol_reference_list )? )
-	|	(class_name ( protocol_reference_list )?)
+	|	(class_name ( protocol_reference_list | generics_specifier )?)
 	|	struct_or_union_specifier
 	|	enum_specifier 
 	|	IDENTIFIER
@@ -235,7 +237,7 @@ array_expression:
         '@''[' postfix_expression? (',' postfix_expression)* ','? ']';
 
 box_expression:
-        '@''('postfix_expression')' |
+        '@''('conditional_expression')' |
         '@'constant;
 block_parameters: '(' (type_variable_declarator | 'void')? (',' type_variable_declarator)* ')';
 
@@ -724,3 +726,7 @@ HUNDEF : '#undef' ~[\r\n]* -> channel(HIDDEN);
 HIFNDEF : '#ifndef' ~[\r\n]* -> channel(HIDDEN);
 HENDIF : '#endif' ~[\r\n]* -> channel(HIDDEN);
 
+// Custom proprietary macros to ignore
+VISIER_ASSERT : 'VAssert''(' .*? ')'';'  -> channel(HIDDEN) ;
+VISIER_SERIAL1: 'DEFINE_VSERIALIZATION_PROPERTIES' .*? 'END_VSERIALIZATION_PROPERTIES' -> channel(HIDDEN);
+VISIER_SERIAL2: 'DECLARE_VSERIALIZATION_PROPERTIES()' ~[\r\n]* -> channel(HIDDEN);
