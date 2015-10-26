@@ -31,5 +31,5 @@ mvn clean test
 Travis Status
 ---------
 
-<a href="https://travis-ci.org/teverett/grammars-v4"><img src="https://api.travis-ci.org/teverett/grammars-v4.png"></a>
+<a href="https://travis-ci.org/antlr/grammars-v4"><img src="https://api.travis-ci.org/antlr/grammars-v4.png"></a>
 
