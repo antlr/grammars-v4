@@ -1,3 +1,3 @@
 language: java 
-install: true
+install: mvn clean package install -f support/antlr4test-maven-plugin/
 
