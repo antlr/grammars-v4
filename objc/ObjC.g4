@@ -726,7 +726,3 @@ HUNDEF : '#undef' ~[\r\n]* -> channel(HIDDEN);
 HIFNDEF : '#ifndef' ~[\r\n]* -> channel(HIDDEN);
 HENDIF : '#endif' ~[\r\n]* -> channel(HIDDEN);
 
-// Custom proprietary macros to ignore
-VISIER_ASSERT : 'VAssert''(' .*? ')'';'  -> channel(HIDDEN) ;
-VISIER_SERIAL1: 'DEFINE_VSERIALIZATION_PROPERTIES' .*? 'END_VSERIALIZATION_PROPERTIES' -> channel(HIDDEN);
-VISIER_SERIAL2: 'DECLARE_VSERIALIZATION_PROPERTIES()' ~[\r\n]* -> channel(HIDDEN);
