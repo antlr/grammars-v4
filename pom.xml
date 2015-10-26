@@ -28,7 +28,7 @@
 		<module>cpp</module>
 		<module>idl</module>
 		<module>abnf</module>
-		<module>C</module>
+		<module>c</module>
 		<module>erlang</module>
 		<module>lua</module>
 		<module>arithmetic</module>
