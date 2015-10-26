@@ -74,6 +74,17 @@ grammar ECMAScript;
             return false;
         }
 
+        if (ahead.getType() == LineTerminator) {
+            // There is definitely a line terminator ahead.
+            return true;
+        }
+
+        if (ahead.getType() == WhiteSpaces) {
+            // Get the token ahead of the current whitespaces.
+            possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 2;
+            ahead = _input.get(possibleIndexEosToken);
+        }
+
         // Get the token's text and type.
         String text = ahead.getText();
         int type = ahead.getType();
@@ -270,7 +281,7 @@ emptyStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : expressionSequence
+ : {(_input.LA(1) != OpenBrace) && (_input.LA(1) != Function)}? expressionSequence eos
  ;
 
 /// IfStatement :
@@ -627,29 +638,18 @@ singleExpression
  | '-' singleExpression                                                   # UnaryMinusExpression
  | '~' singleExpression                                                   # BitNotExpression
  | '!' singleExpression                                                   # NotExpression
- | singleExpression '*' singleExpression                                  # MultiplyExpression
- | singleExpression '/' singleExpression                                  # DivideExpression
- | singleExpression '%' singleExpression                                  # ModulusExpression
- | singleExpression '+' singleExpression                                  # AddExpression
- | singleExpression '-' singleExpression                                  # SubtractExpression
- | singleExpression '<<' singleExpression                                 # LeftShiftArithmeticExpression
- | singleExpression '>>' singleExpression                                 # RightShiftArithmeticExpression
- | singleExpression '>>>' singleExpression                                # RightShiftLogicalExpression
- | singleExpression '<' singleExpression                                  # LessThanExpression
- | singleExpression '>' singleExpression                                  # GreaterThanExpression
- | singleExpression '<=' singleExpression                                 # LessThanEqualsExpression
- | singleExpression '>=' singleExpression                                 # GreaterThanEqualsExpression
+ | singleExpression ( '*' | '/' | '%' ) singleExpression                  # MultiplicativeExpression
+ | singleExpression ( '+' | '-' ) singleExpression                        # AdditiveExpression
+ | singleExpression ( '<<' | '>>' | '>>>' ) singleExpression              # BitShiftExpression
+ | singleExpression ( '<' | '>' | '<=' | '>=' ) singleExpression          # RelationalExpression
  | singleExpression Instanceof singleExpression                           # InstanceofExpression
  | singleExpression In singleExpression                                   # InExpression
- | singleExpression '==' singleExpression                                 # EqualsExpression
- | singleExpression '!=' singleExpression                                 # NotEqualsExpression
- | singleExpression '===' singleExpression                                # IdentityEqualsExpression
- | singleExpression '!==' singleExpression                                # IdentityNotEqualsExpression
+ | singleExpression ( '==' | '!=' | '===' | '!==' ) singleExpression      # EqualityExpression
  | singleExpression '&' singleExpression                                  # BitAndExpression
  | singleExpression '^' singleExpression                                  # BitXOrExpression
  | singleExpression '|' singleExpression                                  # BitOrExpression
- | singleExpression '&&' singleExpression                                 # AndExpression
- | singleExpression '||' singleExpression                                 # OrExpression
+ | singleExpression '&&' singleExpression                                 # LogicalAndExpression
+ | singleExpression '||' singleExpression                                 # LogicalOrExpression
  | singleExpression '?' singleExpression ':' singleExpression             # TernaryExpression
  | singleExpression '=' expressionSequence                                # AssignmentExpression
  | singleExpression assignmentOperator expressionSequence                 # AssignmentOperatorExpression
@@ -754,11 +754,11 @@ futureReservedWord
  ;
 
 getter
- : {_input.LT(1).getText().startsWith("get")}? Identifier
+ : {_input.LT(1).getText().equals("get")}? Identifier propertyName
  ;
 
 setter
- : {_input.LT(1).getText().startsWith("set")}? Identifier
+ : {_input.LT(1).getText().equals("set")}? Identifier propertyName
  ;
 
 eos
@@ -1499,4 +1499,5 @@ fragment RegularExpressionClass
 ///     RegularExpressionBackslashSequence
 fragment RegularExpressionClassChar
  : ~[\r\n\u2028\u2029\]\\]
+ | RegularExpressionBackslashSequence
  ;

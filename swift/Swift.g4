@@ -60,8 +60,9 @@ loop_statement : for_statement
 
 for_statement
  : 'for' for_init? ';' expression? ';' expression? code_block
- | 'for' ( for_init?';' expression?';' expression?) code_block
+ | 'for' '(' for_init?';' expression? ';' expression? ')' code_block
  ;
+
 for_init : variable_declaration | expression_list  ;
 
 // GRAMMAR OF A FOR_IN STATEMENT
@@ -93,7 +94,7 @@ switch_statement : 'switch' expression '{' switch_cases? '}'  ;
 switch_cases : switch_case switch_cases? ;
 switch_case : case_label statements | default_label statements  | case_label ';' | default_label ';'  ;
 case_label : 'case' case_item_list ':' ;
-case_item_list : pattern guard_clause?  pattern guard_clause?',' case_item_list  ;
+case_item_list : pattern guard_clause? | pattern guard_clause? ',' case_item_list  ;
 default_label : 'default' ':' ;
 guard_clause : 'where' guard_expression ;
 guard_expression : expression  ;
@@ -192,7 +193,8 @@ initializer : '=' expression  ;
 
 // GRAMMAR OF A VARIABLE DECLARATION
 
-variable_declaration : variable_declaration_head pattern_initializer_list
+variable_declaration
+ : variable_declaration_head pattern_initializer_list
  | variable_declaration_head variable_name type_annotation code_block
  | variable_declaration_head variable_name type_annotation getter_setter_block
  | variable_declaration_head variable_name type_annotation getter_setter_keyword_block
@@ -204,7 +206,7 @@ variable_name : identifier  ;
 getter_setter_block : '{' getter_clause setter_clause?'}'  | '{' setter_clause getter_clause '}'  ;
 getter_clause : attributes? 'get' code_block  ;
 setter_clause : attributes? 'set' setter_name? code_block  ;
-setter_name : ( identifier )  ;
+setter_name : '(' identifier ')'  ;
 getter_setter_keyword_block : '{' getter_keyword_clause setter_keyword_clause?'}' | '{' setter_keyword_clause getter_keyword_clause '}'  ;
 getter_keyword_clause : attributes? 'get'  ;
 setter_keyword_clause : attributes? 'set'  ;
@@ -345,7 +347,7 @@ associativity : 'left' | 'right' | 'none'  ;
 
 pattern
  : wildcard_pattern type_annotation?
- | identifier_pattern type_annotation?
+ | identifier_pattern type_annotation
  | value_binding_pattern
  | tuple_pattern type_annotation?
  | enum_case_pattern
@@ -397,7 +399,8 @@ attribute_name : identifier  ;
 attribute_argument_clause : '('  balanced_tokens?  ')'  ;
 attributes : attribute+ ;
 balanced_tokens : balanced_token+ ;
-balanced_token : '('  balanced_tokens? ')'
+balanced_token
+ : '('  balanced_tokens? ')'
  | '[' balanced_tokens? ']'
  | '{' balanced_tokens? '}'
  | identifier | expression | context_sensitive_keyword | literal | operator
@@ -410,6 +413,14 @@ balanced_token : '('  balanced_tokens? ')'
 
 expression_list : expression (',' expression)* ;
 
+expression : prefix_expression binary_expression* ;
+
+prefix_expression
+  : prefix_operator? postfix_expression
+  | in_out_expression
+  ;
+
+/*
 expression
 	:	prefix_operator expression
     |	in_out_expression
@@ -429,10 +440,18 @@ expression
 	|	expression '!'
 	|	expression '?'
 	;
+*/
 
 // GRAMMAR OF A PREFIX EXPRESSION
 
 in_out_expression : '&' identifier ;
+
+binary_expression
+  : binary_operator prefix_expression
+  | assignment_operator prefix_expression
+  | conditional_operator prefix_expression
+  | type_casting_operator
+  ;
 
 // GRAMMAR OF AN ASSIGNMENT OPERATOR
 
@@ -444,27 +463,11 @@ conditional_operator : '?' expression ':' ;
 
 // GRAMMAR OF A TYPE_CASTING OPERATOR
 
-type_casting_operator : 'is' type | 'as' '?'? type ;
-
-// GRAMMAR OF A POSTFIX EXPRESSION
-
-/*
-postfix_expression : primary_expression
- | postfix_expression postfix_operator
- | function_call_expression
- | initializer_expression
- | explicit_member_expression
- | postfix_self_expression
- | dynamic_type_expression
- | subscript_expression
- | forced_value_expression
- | optional_chaining_expression
- ;
-*/
-
-// GRAMMAR OF A FUNCTION CALL EXPRESSION
-
-trailing_closure : closure_expression  ;
+type_casting_operator
+  : 'is' type
+  | 'as' '?' type
+  | 'as' type
+  ;
 
 // GRAMMAR OF A PRIMARY EXPRESSION
 
@@ -475,25 +478,30 @@ primary_expression
  | superclass_expression
  | closure_expression
  | parenthesized_expression
- | implicit_member_expression
+// | implicit_member_expression disallow as ambig with explicit member expr in postfix_expression
  | wildcard_expression
  ;
 
 // GRAMMAR OF A LITERAL EXPRESSION
 
-literal_expression : literal
- | array_literal | dictionary_literal
- | '__FILE__' | '__LINE__' | '__COLUMN__' | '__FUNCTION__'  ;
+literal_expression
+ : literal
+ | array_literal
+ | dictionary_literal
+ | '__FILE__' | '__LINE__' | '__COLUMN__' | '__FUNCTION__'
+ ;
+
 array_literal : '[' array_literal_items? ']'  ;
-array_literal_items : array_literal_item ','? | array_literal_item ',' array_literal_items  ;
-array_literal_item : expression  ;
+array_literal_items : array_literal_item (',' array_literal_item)* ','?  ;
+array_literal_item : expression ;
 dictionary_literal : '[' dictionary_literal_items ']' | '[' ':' ']'  ;
-dictionary_literal_items : dictionary_literal_item ','?  dictionary_literal_item ',' dictionary_literal_items  ;
+dictionary_literal_items : dictionary_literal_item (',' dictionary_literal_item)* ','? ;
 dictionary_literal_item : expression ':' expression  ;
 
 // GRAMMAR OF A SELF EXPRESSION
 
-self_expression : 'self'
+self_expression
+ : 'self'
  | 'self' '.' identifier
  | 'self' '[' expression ']'
  | 'self' '.' 'init'
@@ -501,7 +509,12 @@ self_expression : 'self'
 
 // GRAMMAR OF A SUPERCLASS EXPRESSION
 
-superclass_expression : superclass_method_expression | superclass_subscript_expression  superclass_initializer_expression  ;
+superclass_expression
+  : superclass_method_expression
+  | superclass_subscript_expression
+  | superclass_initializer_expression
+  ;
+
 superclass_method_expression : 'super' '.' identifier  ;
 superclass_subscript_expression : 'super' '[' expression ']'  ;
 superclass_initializer_expression : 'super' '.' 'init'  ;
@@ -509,13 +522,16 @@ superclass_initializer_expression : 'super' '.' 'init'  ;
 // GRAMMAR OF A CLOSURE EXPRESSION
 
 closure_expression : '{' closure_signature? statements '}'  ;
-closure_signature : parameter_clause function_result? 'in'
+closure_signature
+ : parameter_clause function_result? 'in'
  | identifier_list function_result? 'in'
  | capture_list parameter_clause function_result? 'in'
  | capture_list identifier_list function_result? 'in'
  | capture_list 'in'
  ;
+
 capture_list : '[' capture_specifier expression ']'  ;
+
 capture_specifier : 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)'  ;
 
 // GRAMMAR OF A IMPLICIT MEMBER EXPRESSION
@@ -524,20 +540,76 @@ implicit_member_expression : '.' identifier  ;
 
 // GRAMMAR OF A PARENTHESIZED EXPRESSION
 
-parenthesized_expression : '('  expression_element_list? ')'  ;
-expression_element_list : expression_element | expression_element ',' expression_element_list  ;
+parenthesized_expression : '(' expression_element_list? ')'  ;
+expression_element_list : expression_element (',' expression_element_list)*  ;
 expression_element : expression | identifier ':' expression  ;
 
 // GRAMMAR OF A WILDCARD EXPRESSION
 
 wildcard_expression : '_'  ;
 
+// GRAMMAR OF A POSTFIX EXPRESSION
+
+postfix_expression
+ : primary_expression                                             # primary
+ | postfix_expression postfix_operator                            # postfix_operation
+ | postfix_expression parenthesized_expression                    # function_call_expression
+ | postfix_expression parenthesized_expression? closure_expression # function_call_with_closure_expression
+ | postfix_expression '.' 'init'                                  # initializer_expression
+ // TODO: don't allow '_' here in Decimal_literal:
+ | postfix_expression '.' Decimal_literal                         # explicit_member_expression1
+ | postfix_expression '.' identifier generic_argument_clause?     # explicit_member_expression2
+ | postfix_expression '.' 'self'                                  # postfix_self_expression
+ | postfix_expression '.' 'dynamicType'                           # dynamic_type_expression
+ | postfix_expression '[' expression_list ']'                     # subscript_expression
+ | postfix_expression '!'                                         # forced_value_expression
+ | postfix_expression '?'                                         # optional_chaining_expression
+ ;
+
+// GRAMMAR OF A FUNCTION CALL EXPRESSION
+
+/*
+function_call_expression
+  : postfix_expression parenthesized_expression
+  : postfix_expression parenthesized_expression? trailing_closure
+  ;
+  */
+
+//trailing_closure : closure_expression  ;
+
+//initializer_expression : postfix_expression '.' 'init' ;
+
+/*explicit_member_expression
+  : postfix_expression '.' Decimal_literal // TODO: don't allow '_' here in Decimal_literal
+  | postfix_expression '.' identifier generic_argument_clause?
+  ;
+  */
+
+//postfix_self_expression : postfix_expression '.' 'self' ;
+
+// GRAMMAR OF A DYNAMIC TYPE EXPRESSION
+
+//dynamic_type_expression : postfix_expression '.' 'dynamicType' ;
+
+// GRAMMAR OF A SUBSCRIPT EXPRESSION
+
+//subscript_expression : postfix_expression '[' expression_list ']' ;
+
+// GRAMMAR OF A FORCED_VALUE EXPRESSION
+
+//forced_value_expression : postfix_expression '!' ;
+
+// GRAMMAR OF AN OPTIONAL_CHAINING EXPRESSION
+
+//optional_chaining_expression : postfix_expression '?' ;
+
 // GRAMMAR OF OPERATORS
 
 // split the operators out into the individual tokens as some of those tokens
 // are also referenced individually. For example, type signatures use
 // <...>.
-operator: '/' | '=' | '\\' | '-' | '+' | '!' | '*' | '%' | '<' | '>' | '&' | '|' | '^' | '!' | '.' ;
+operator: Operator ;
+
 
 // WHITESPACE scariness:
 
@@ -640,8 +712,46 @@ identifier : Identifier | context_sensitive_keyword ;
 keyword : 'convenience' | 'class' | 'deinit' | 'enum' | 'extension' | 'func' | 'import' | 'init' | 'let' | 'protocol' | 'static' | 'struct' | 'subscript' | 'typealias' | 'var' | 'break' | 'case' | 'continue' | 'default' | 'do' | 'else' | 'fallthrough' | 'if' | 'in' | 'for' | 'return' | 'switch' | 'where' | 'while' | 'as' | 'dynamicType' | 'is' | 'new' | 'super' | 'self' | 'Self' | 'Type' ;
 
 context_sensitive_keyword :
- 'associativity' | 'didSet' | 'get' | 'infix' | 'inout' | 'left' | 'mutating' | 'none' | 'nonmutating' | 'operator' | 'override' | 'postfix' | 'precedence' | 'prefix' | 'right' | 'set' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | 'weak' | 'willSet'
+ 'associativity' | 'didSet' | 'get' | 'infix' | 'inout' | 'left' | 'mutating' | 'none' |
+ 'nonmutating' | 'operator' | 'override' | 'postfix' | 'precedence' | 'prefix' | 'right' |
+ 'set' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | 'weak' | 'willSet'
  ;
+
+Operator
+  : Operator_head Operator_character*
+  | '..' ('.'|Operator_character)*
+  ;
+
+Operator_head
+  : '/' | '=' | '\\' | '-' | '+' | '!' | '*' | '%' | '<' | '>' | '&' | '|' | '^' | '!' | '.'
+  | [\u00A1-\u00A7]
+  | [\u00A9\u00AB\u00AC\u00AE]
+  | [\u00B0-\u00B1\u00B6\u00BB\u00BF\u00D7\u00F7]
+  | [\u2016-\u2017\u2020-\u2027]
+  | [\u2030-\u203E]
+  | [\u2041-\u2053]
+  | [\u2055-\u205E]
+  | [\u2190-\u23FF]
+  | [\u2500-\u2775]
+  | [\u2794-\u2BFF]
+  | [\u2E00-\u2E7F]
+  | [\u3001-\u3003]
+  | [\u3008-\u3030]
+  ;
+
+Operator_character
+  : Operator_head
+  | [\u0300–\u036F]
+  | [\u1DC0–\u1DFF]
+  | [\u20D0–\u20FF]
+  | [\uFE00–\uFE0F]
+  | [\uFE20–\uFE2F]
+  //| [\uE0100–\uE01EF]  ANTLR can't do >16bit char
+  ;
+
+Dot_operator_head
+  : '..'
+  ;
 
 Identifier : Identifier_head Identifier_characters?
  | '`' Identifier_head Identifier_characters? '`'
@@ -650,7 +760,7 @@ Identifier : Identifier_head Identifier_characters?
 
 identifier_list : identifier | identifier ',' identifier_list  ;
 
-fragment Identifier_head : [a-zA-Z]
+fragment Identifier_head : [a-zA-Z_]
  | '\u00A8' | '\u00AA' | '\u00AD' | '\u00AF' | [\u00B2-\u00B5] | [\u00B7-\u00BA]
  | [\u00BC-\u00BE] | [\u00C0-\u00D6] | [\u00D8-\u00F6] | [\u00F8-\u00FF]
  | [\u0100-\u02FF] | [\u0370-\u167F] | [\u1681-\u180D] | [\u180F-\u1DBF]
@@ -676,7 +786,7 @@ fragment Identifier_character : [0-9]
 
 fragment Identifier_characters : Identifier_character+ ;
 
-Implicit_parameter_name : '$' Decimal_digits  ;
+Implicit_parameter_name : '$' Decimal_literal ; // TODO: don't allow '_' here
 
 // GRAMMAR OF A LITERAL
 
@@ -684,19 +794,23 @@ literal : integer_literal | Floating_point_literal | String_literal  ;
 
 // GRAMMAR OF AN INTEGER LITERAL
 
-integer_literal : Binary_literal
+integer_literal
+ : Binary_literal
  | Octal_literal
  | Decimal_literal
  | Hexadecimal_literal
  ;
+
 Binary_literal : '0b' Binary_digit Binary_literal_characters? ;
 fragment Binary_digit : [01] ;
 fragment Binary_literal_character : Binary_digit | '_'  ;
 fragment Binary_literal_characters : Binary_literal_character Binary_literal_characters? ;
+
 Octal_literal : '0o' Octal_digit Octal_literal_characters? ;
 fragment Octal_digit : [0-7] ;
 fragment Octal_literal_character : Octal_digit | '_'  ;
 fragment Octal_literal_characters : Octal_literal_character+ ;
+
 Decimal_literal : Decimal_digit Decimal_literal_characters? ;
 fragment Decimal_digit : [0-9] ;
 fragment Decimal_digits : Decimal_digit+ ;
@@ -713,17 +827,17 @@ Floating_point_literal
  : Decimal_literal Decimal_fraction? Decimal_exponent?
  | Hexadecimal_literal Hexadecimal_fraction? Hexadecimal_exponent
  ;
-fragment Decimal_fraction : '.' Decimal_literal  ;
-fragment Decimal_exponent : Floating_point_e Sign? Decimal_literal  ;
+fragment Decimal_fraction : '.' Decimal_literal ;
+fragment Decimal_exponent : Floating_point_e Sign? Decimal_literal ;
 fragment Hexadecimal_fraction : '.' Hexadecimal_literal? ;
-fragment Hexadecimal_exponent : Floating_point_p Sign? Hexadecimal_literal  ;
+fragment Hexadecimal_exponent : Floating_point_p Sign? Decimal_literal ;
 fragment Floating_point_e : [eE] ;
 fragment Floating_point_p : [pP] ;
 fragment Sign : [+\-] ;
 
 // GRAMMAR OF A STRING LITERAL
 
-String_literal : '"' Quoted_text '"' ;
+String_literal : '"' Quoted_text? '"' ;
 fragment Quoted_text : Quoted_text_item Quoted_text? ;
 fragment Quoted_text_item : Escaped_character
 // | '\\(' expression ')'

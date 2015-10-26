@@ -107,7 +107,7 @@ actionScopeName
 	;
 
 modeSpec
-	:	MODE id SEMI ruleSpec+
+	:	MODE id SEMI lexerRule*
 	;
 
 rules
@@ -207,7 +207,8 @@ lexerAltList
 	;
 
 lexerAlt
-	:	lexerElements? lexerCommands?
+	:	lexerElements lexerCommands?
+	|
 	;
 
 lexerElements
@@ -258,12 +259,7 @@ altList
 	;
 
 alternative
-	:	elements
-	|	// empty alt
-	;
-
-elements
-	:	element+
+	:	elementOptions? element*
 	;
 
 element
@@ -326,8 +322,8 @@ blockSet
 	;
 
 setElement
-	:	TOKEN_REF
-	|	STRING_LITERAL
+	:	TOKEN_REF elementOptions?
+	|	STRING_LITERAL elementOptions?
 	|	range
 	|	LEXER_CHAR_SET
 	;
@@ -340,7 +336,7 @@ block
 	;
 
 ruleref
-	:	RULE_REF ARG_ACTION?
+	:	RULE_REF ARG_ACTION? elementOptions?
 	;
 
 range

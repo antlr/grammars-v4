@@ -1,0 +1,12 @@
+Declare Function LoadStdntTermGrid PeopleCode FUNCLIB_SSTS_PL.SSR_STDNT_TERM_KEY FieldFormula;
+Declare Function LoadStudyList PeopleCode FUNCLIB_SSTS_PL.SSR_STDNT_TERM_KEY FieldFormula;
+
+Component string &KeyDescr;
+
+/*  Populate enrollment terms grid  */
+LoadStdntTermGrid();
+
+&KeyDescr = RTrim(SSR_STDNT_TERMS.STRM.GetRelated(TERM_TBL.DESCR).Value) | " " | Char(124) | " " | RTrim(SSR_STDNT_TERMS.ACAD_CAREER.GetRelated(ACAD_CAR_TBL.DESCR).Value) | " " | Char(124) | " " | RTrim(SSR_STDNT_TERMS.INSTITUTION.GetRelated(INSTITUTION_TBL.DESCR).Value);
+DERIVED_REGFRM1.SSR_STDNTKEY_DESCR = &KeyDescr;
+
+LoadStudyList();

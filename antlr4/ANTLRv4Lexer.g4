@@ -1,7 +1,7 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2014 Terence Parr
+ *  Copyright (c) 2014 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -116,10 +116,6 @@ LINE_COMMENT
 
 BEGIN_ARG_ACTION
 	:	'[' {handleBeginArgAction();}
-	;
-
-BEGIN_ACTION
-	:	'{' -> more, pushMode(Action)
 	;
 
 // OPTIONS and TOKENS must also consume the opening brace that captures
@@ -238,6 +234,41 @@ HEX_DIGIT : [0-9a-fA-F]	;
 
 WS  :	[ \t\r\n\f]+ -> channel(HIDDEN)	;
 
+// Many language targets use {} as block delimiters and so we
+// must recursively match {} delimited blocks to balance the
+// braces. Additionally, we must make some assumptions about
+// literal string representation in the target language. We assume
+// that they are delimited by ' or " and so consume these
+// in their own alts so as not to inadvertantly match {}.
+
+ACTION
+	:	'{'
+		(	ACTION
+		|	ACTION_ESCAPE
+        |	ACTION_STRING_LITERAL
+        |	ACTION_CHAR_LITERAL
+        |	'/*' .*? '*/' // ('*/' | EOF)
+        |	'//' ~[\r\n]*
+        |	.
+		)*?
+		('}'|EOF)
+	;
+
+fragment
+ACTION_ESCAPE
+		:   '\\' .
+		;
+
+fragment
+ACTION_STRING_LITERAL
+        :	'"' (ACTION_ESCAPE | ~["\\])* '"'
+        ;
+
+fragment
+ACTION_CHAR_LITERAL
+        :	'\'' (ACTION_ESCAPE | ~['\\])* '\''
+        ;
+
 // -----------------
 // Illegal Character
 //
@@ -283,56 +314,7 @@ mode ArgAction; // E.g., [int x, List<String> a[]]
         :   .                           -> more
         ;
 
-// ----------------
-// Action structure
-//
-// Many language targets use {} as block delimiters and so we
-// must recursively match {} delimited blocks to balance the
-// braces. Additionally, we must make some assumptions about
-// literal string representation in the target language. We assume
-// that they are delimited by ' or " and so consume these
-// in their own alts so as not to inadvertantly match {}.
-// This mode is recursive on matching a {
-mode Action;
 
-	NESTED_ACTION
-		:	'{'
-            -> more, pushMode(Action)
-		;
-
-	ACTION_ESCAPE
-		:   '\\' .                      -> more
-		;
-
-    ACTION_STRING_LITERAL
-        :	'"' ('\\' . | ~["\\])* '"'  -> more
-        ;
-
-    ACTION_CHAR_LITERAL
-        :	('"' '\\' . | ~["\\] '"')   -> more
-        ;
-
-	ACTION_COMMENT
-		:   (BLOCK_COMMENT
-            |LINE_COMMENT
-            )                           -> more
-        ;
-
-    ACTION
-		:   '}'
-            {
-            popMode();
-        	if ( _modeStack.size()>0 ) more(); // keep scarfing until outermost }
-            }
-		;
-
-	UNTERMINATED_ACTION
-		:	EOF							-> popMode
-		;
-
-    ACTION_CHAR
-        :   .                           -> more
-        ;
 
 mode LexerCharSet;
 
