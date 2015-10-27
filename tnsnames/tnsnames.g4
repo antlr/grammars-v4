@@ -201,7 +201,6 @@ protocol_info    : tcp_protocol       // More to come here.... BEQ, NMP, SPX ...
 //-----------------------------------------------------------------
 // TCP Protocol rules.
 // (PROTOCOL = TCP)(HOST = hostname)(PORT = portnumber)
-
 //-----------------------------------------------------------------
 tcp_protocol     : tcp_params ;
                  
@@ -243,20 +242,17 @@ ipc_key          : L_PAREN KEY EQUAL ID R_PAREN ;
 
 
 //-----------------------------------------------------------------
-
 // SPX Protocol rules.
-
 // (PROTOCOL = SPX)(SERVICE = spx_service_name)
-
 //-----------------------------------------------------------------
-spx_protocol     : spx_params ; 
+spx_protocol     : spx_params ;
 
-spx_params       : spx_parameter+ ; 
+spx_params       : spx_parameter+ ;
 
 spx_parameter    : spx_spx
-                 | spx_service ; 
+                 | spx_service ;
 
-spx_spx          : L_PAREN PROTOCOL EQUAL SPX R_PAREN ; 
+spx_spx          : L_PAREN PROTOCOL EQUAL SPX R_PAREN ;
 
 spx_service      : L_PAREN SERVICE EQUAL ID R_PAREN ;
 
@@ -323,7 +319,7 @@ bad_address      : L_PAREN ADDRESS EQUAL beq_beq R_PAREN ;
 //-----------------------------------------------------------------
 // Connect data rules. 
 //-----------------------------------------------------------------
-connect_data     : L_PAREN CONNECT_DATA EQUAL cd_params+ R_PAREN ;
+connect_data     : L_PAREN CONNECT_DATA EQUAL cd_params R_PAREN ;
 
 cd_params       : cd_parameter+
                 ;
@@ -431,9 +427,11 @@ LOCAL            : L O C A L ;
 
 // ---------------------------------------------------------------
 // Ok, I know this defines an IP version 4 address, but I haven't
-// got my head around the ipv6 format yet!
+// got my head around the IPv6 format yet!
+// It seems that an IPv4 address that begins with a zero is octal.
+// With leading "0x" or "0X" it's hexadecimal. Sigh.
 // ---------------------------------------------------------------
-IP               : (DIGIT)+ DOT (DIGIT)+ DOT (DIGIT)+ DOT (DIGIT)+ ;
+IP               : QUAD DOT QUAD DOT QUAD DOT QUAD+ ;
                  
 YES_NO           : Y E S | N O ;
                  
@@ -444,7 +442,7 @@ TRUE_FALSE       : T R U E | F A L S E ;
 COMMENT          : '#' (.)*? '\n' -> skip ;
                  
 INT              : DIGIT+ ;
-                 
+
 OK               : O K ;
                  
 DEDICATED        : D E D I C A T E D ;
@@ -561,10 +559,20 @@ DELAY            : D E L A Y ;
 
 
 //-------------------------------------------------
+// IPv4 dotted Quads. For host IP addresses.
+//-------------------------------------------------
+QUAD             : '0'[xX] HEX_DIGIT+
+                 | '0' OCT_DIGIT+
+                 | INT 
+                 ;
+
+
+//-------------------------------------------------
 // Other lexer rules, and fragments.
 //-------------------------------------------------
 ID               : [A-Za-z0-9][A-Za-z0-9_-]* ;
 WS               : [ \t\r\n]+ -> skip ;
+
 
 
 // ----------
@@ -651,6 +659,12 @@ Z                : [Zz] ;
 
 fragment
 DIGIT            : [0-9] ;
+
+fragment
+OCT_DIGIT        : [0-8] ;
+
+fragment
+HEX_DIGIT        : [0-9A-Fa-f] ;
                  
 fragment
 LIST             : L I S T ;
