@@ -44,6 +44,7 @@
 		<module>smalltalk</module>
 		<module>peoplecode</module>
 		<module>asn</module>
+		<module>ucb-logo</module>
 <!--		<module>newick</module> -->
 	</modules>
 	<properties>

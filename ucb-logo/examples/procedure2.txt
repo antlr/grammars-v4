@@ -1,0 +1,16 @@
+to square :size
+	repeat 4 [fd :size rt 90] ; where is the turtle when this step completes?
+end
+	
+to floor :size
+	repeat 2 [fd :size rt 90 fd :size * 2 rt 90]
+end
+
+to house
+	floor 60 fd 60 floor 60 ; where is the turtle at this point?
+	pu fd 20 rt 90 fd 20 lt 90 pd
+	square 20
+
+	pu rt 90 fd 60 lt 90 pd
+	square 20
+end
