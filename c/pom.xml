@@ -34,7 +34,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>primaryExpression</entryPoint>
+					<entryPoint>compilationUnit</entryPoint>
 					<grammarName>C</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
