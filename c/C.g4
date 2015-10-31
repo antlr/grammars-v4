@@ -868,7 +868,14 @@ SChar
     ;
 
 LineDirective
-    :   '#' Whitespace? DecimalConstant Whitespace? StringLiteral ~[\r\n]*
+    :   '#' 
+        ('define' | 'include' | 'ifdef' | 'ifndef' |
+        'undef' | 'if' | 'else' | 'endif' | 
+        'eif')
+        Whitespace 
+        (~[\r\n] 
+          | '\\' [\r\n] 
+         )*
         -> skip
     ;
 
