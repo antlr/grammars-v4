@@ -63,7 +63,7 @@
 		<module>smalltalk</module>
 		<module>sparql</module>
 		<module>sqlite</module>
-<!--		<module>stringtemplate</module> -->
+		<module>stringtemplate</module>
 		<module>suokif</module>
 <!-- Grammars-V4 issue 238 -->
 <!--		<module>swift</module>-->
