@@ -46,6 +46,7 @@
 		<module>asn</module>
 		<module>ucb-logo</module>
 		<module>iri</module>
+		<module>icalendar</module>
 <!--		<module>newick</module> -->
 	</modules>
 	<properties>
