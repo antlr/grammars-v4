@@ -38,6 +38,7 @@
 		<module>java</module>
 		<module>java8</module>
 		<module>json</module>
+<!--		<module>less</module>-->
 		<module>logo</module>
 		<module>lua</module>
 		<module>MPS</module>
@@ -54,11 +55,13 @@
 		<module>r</module>
 		<module>redcode</module>
 		<module>scala</module>
+<!--			<module>scss</module> -->
 		<module>smalltalk</module>
 		<module>sparql</module>
 		<module>sqlite</module>
 		<module>suokif</module>
 <!--		<module>swift</module>-->
+<!--		<module>tnsnames</module>-->
 		<module>tnt</module>
 		<module>turtle</module>
 		<module>ucb-logo</module>
