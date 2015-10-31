@@ -26,6 +26,7 @@
 						<argument>-package</argument>
 						<argument>org.antlr.parser.st4</argument>
 					</arguments>
+					<outputDirectory>${project.build.directory}/generated-sources/antlr4/org/antlr/parser/st4</outputDirectory>
 				</configuration>
 				<executions>
 					<execution>
