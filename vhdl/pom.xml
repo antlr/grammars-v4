@@ -21,7 +21,7 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
-					<sourceDirectory>src/test/resources/</sourceDirectory>
+					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>vhdl.g4</grammars>
 				</configuration>
 				<executions>
