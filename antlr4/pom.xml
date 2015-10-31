@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>antlr4</artifactId>
 	<packaging>jar</packaging>
@@ -21,12 +20,13 @@
 					<grammars>ANTLRv4Parser.g4</grammars>
 					<excludes>
 						<exclude>LexBasic.g4</exclude>
-						<exclude>LexUnicode.g4</exclude>
+						<exclude>LexUnicode.g4</exclude>v bbbbb
 					</excludes>
 					<arguments>
 						<argument>-package</argument>
-						<argument>org.antlr.parser.st4</argument>
+						<argument>org.antlr.parser.antlr4</argument>
 					</arguments>
+					<outputDirectory>${project.build.directory}/generated-sources/antlr4/org/antlr/parser/antlr4</outputDirectory>
 				</configuration>
 				<executions>
 					<execution>

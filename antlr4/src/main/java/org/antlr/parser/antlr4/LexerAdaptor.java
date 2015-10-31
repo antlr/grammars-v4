@@ -1,4 +1,4 @@
-package org.antlr.parser.st4;
+package org.antlr.parser.antlr4;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
