@@ -25,7 +25,7 @@
  *	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *	THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
+
 /*	Antlr grammar for StringTemplate v4.
  *
  *	Modified 2015.06.21 gbr
@@ -39,12 +39,7 @@ options {
 	tokenVocab=STLexer;
 }
 
-@header {
-	package org.github.antlr.st.parser.gen;
-	
-}
-
-template	
+template
 	: elements EOF
 	;
 

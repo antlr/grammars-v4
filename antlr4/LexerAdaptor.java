@@ -1,10 +1,9 @@
-package org.github.antlr.parser;
+package org.antlr.parser.antlr4;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
-import org.github.antlr.parser.gen.ANTLRv4Lexer;
 
 public abstract class LexerAdaptor extends Lexer {
 

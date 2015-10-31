@@ -26,26 +26,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
- /** 
- *	A grammar for StringTemplate v4 implemented using Antlr v4 syntax 
+
+ /**
+ *	A grammar for StringTemplate v4 implemented using Antlr v4 syntax
  *
- *	Modified 2015.06.16 gbr 
+ *	Modified 2015.06.16 gbr
  *	-- update for compatibility with Antlr v4.5
  *	-- use imported standard fragments
  */
 
 lexer grammar STGLexer;
 
-import LexBasic;	// Standard set of fragments 
+import LexBasic;	// Standard set of fragments
 
 channels {
 	OFF_CHANNEL		// non-default channel for whitespace and comments
-}
-
-
-@header {
-	package org.github.antlr.st.parser.gen;
 }
 
 // ------------------------------------------------------------------------------

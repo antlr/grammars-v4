@@ -35,18 +35,13 @@
  *	-- update for compatibility with Antlr v4.5
  *	-- add mode for channels
  *	-- moved members to LexerAdaptor
- * 	-- move fragments to imports 
+ * 	-- move fragments to imports
  */
 
 parser grammar ANTLRv4Parser;
 
 options {
 	tokenVocab = ANTLRv4Lexer ;
-}
-
-@header {
-	package org.github.antlr.parser.gen;
-	
 }
 
 // The main entry point for parsing a v4 grammar.
@@ -160,7 +155,7 @@ ruleSpec
 
 parserRuleSpec
 	:	DOC_COMMENT?
-		ruleModifiers? RULE_REF argActionBlock? ruleReturns? throwsSpec? 
+		ruleModifiers? RULE_REF argActionBlock? ruleReturns? throwsSpec?
 		localsSpec?
 		rulePrequel*
 		COLON
