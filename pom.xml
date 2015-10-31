@@ -54,7 +54,9 @@
 		<module>pcre</module>
 		<module>peoplecode</module>
 		<module>pgn</module>
+		<!--
 		<module>php</module>
+	-->
 		<module>propcalc</module>
 		<module>r</module>
 		<module>redcode</module>
