@@ -47,6 +47,8 @@
 		<module>ucb-logo</module>
 		<module>iri</module>
 		<module>icalendar</module>
+		<module>graphql</module>
+		<module>r</module>
 <!--		<module>newick</module> -->
 	</modules>
 	<properties>
