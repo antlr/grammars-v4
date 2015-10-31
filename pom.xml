@@ -58,6 +58,7 @@
 		<module>java8</module>
 		<module>clif</module>
 		<module>cobol85</module>
+		<module>mysql</module>
 <!--		<module>clojure</module> -->
 <!--		<module>atl</module> -->
 
