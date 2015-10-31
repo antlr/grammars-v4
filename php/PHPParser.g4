@@ -6,8 +6,6 @@
 
 parser grammar PHPParser;
 
-@parser::header {#pragma warning disable 3021}
-
 options { tokenVocab=PHPLexer; }
 
 // HTML
@@ -444,7 +442,7 @@ expression
 // Grouped by prioriries: http://php.net/manual/en/language.operators.precedence.php
 // and http://www.phpeveryday.com/articles/PHP-Operators-Operator-Priority-P312.html
     : Clone expression                                         #CloneExpression
-    | new                                                      #NewExpression
+    | newexpr                                                     #NewExpression
     
     | stringConstant '[' expression ']'                        #IndexerExpression
 
@@ -483,7 +481,7 @@ expression
     | expression QuestionMark expression? ':' expression       #ConditionalExpression
     
     | chain assignmentOperator expression                      #AssignmentExpression
-    | chain Eq '&' (chain | new)                               #AssignmentExpression
+    | chain Eq '&' (chain | newexpr)                              #AssignmentExpression
 
     | Print expression                                         #PrintExpression
     
@@ -516,7 +514,7 @@ expression
     | Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? blockStatement  #LambdaFunctionExpression
     ;
 
-new
+newexpr
     : New typeRef arguments?
     ;
 
@@ -645,7 +643,7 @@ chainList
     ;
 
 chain
-    : (chainBase | functionCall | '(' new ')') memberAccess*
+    : (chainBase | functionCall | '(' newexpr ')') memberAccess*
     ;
 
 memberAccess

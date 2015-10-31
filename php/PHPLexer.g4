@@ -8,8 +8,6 @@ lexer grammar PHPLexer;
 
 channels { PhpComments }
 
-@lexer::header {#pragma warning disable 3021}
-
 @lexer::members
 {bool ScriptTag;
 bool StyleTag;
