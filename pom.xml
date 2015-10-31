@@ -59,6 +59,7 @@
 		<module>clif</module>
 		<module>cobol85</module>
 		<module>mysql</module>
+		<module>scala</module>
 <!--		<module>clojure</module> -->
 <!--		<module>atl</module> -->
 
