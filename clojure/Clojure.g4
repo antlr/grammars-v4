@@ -124,24 +124,22 @@ literal
     | number
     | character
     | nil
-    | boolean
+    | BOOLEAN
     | keyword
     | symbol
     | param_name
     ;
 
 string: STRING;
-float: FLOAT;
 hex: HEX;
 bin: BIN;
 bign: BIGN;
-long: LONG;
 number
-    : float
+    : FLOAT
     | hex
     | bin
     | bign
-    | long
+    | LONG
     ;
 
 character
@@ -154,7 +152,6 @@ any_char: CHAR_ANY ;
 u_hex_quad: CHAR_U ;
 
 nil: NIL;
-boolean: BOOLEAN;
 
 keyword: macro_keyword | simple_keyword;
 simple_keyword: ':' symbol;
