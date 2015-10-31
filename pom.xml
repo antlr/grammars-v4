@@ -13,13 +13,17 @@
 		<module>arithmetic</module>
 		<module>asm6502</module>
 		<module>asn</module>
+<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 <!--		<module>aspectj</module> -->
+
+<!-- Grammars-V4 issue 235 -->
 <!--		<module>atl</module> -->
 		<module>basic</module>
 		<module>bnf</module>
 		<module>c</module>
 		<module>calculator</module>
 		<module>clif</module>
+<!-- Grammars-V4 issue 236 -->
 <!--		<module>clojure</module> -->
 		<module>cobol85</module>
 		<module>cpp</module>
@@ -61,6 +65,7 @@
 		<module>sparql</module>
 		<module>sqlite</module>
 		<module>suokif</module>
+<!-- Grammars-V4 issue 238 -->
 <!--		<module>swift</module>-->
 		<module>tnsnames</module>
 		<module>tnt</module>
