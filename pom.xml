@@ -49,6 +49,17 @@
 		<module>icalendar</module>
 		<module>graphql</module>
 		<module>r</module>
+		<module>sqlite</module>
+		<module>suokif</module>
+		<module>vb6</module>
+		<module>webidl</module>
+		<module>verilog</module>
+		<module>java</module>
+		<module>java8</module>
+		<module>clif</module>
+<!--		<module>clojure</module> -->
+<!--		<module>atl</module> -->
+
 <!--		<module>newick</module> -->
 	</modules>
 	<properties>
