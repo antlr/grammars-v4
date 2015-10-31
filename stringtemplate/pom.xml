@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>antlr4</artifactId>
+	<artifactId>stringtemplate</artifactId>
 	<packaging>jar</packaging>
-	<name>ANTLR4 grammar</name>
+	<name>stringtemplate grammar</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -17,16 +17,16 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>ANTLRv4Parser.g4</grammars>
+					<grammars>STGParser.g4</grammars>
 					<excludes>
 						<exclude>LexBasic.g4</exclude>
-						<exclude>LexUnicode.g4</exclude>v bbbbb
+						<exclude>LexUnicode.g4</exclude>
 					</excludes>
 					<arguments>
 						<argument>-package</argument>
-						<argument>org.antlr.parser.antlr4</argument>
+						<argument>org.antlr.parser.st4</argument>
 					</arguments>
-					<outputDirectory>${project.build.directory}/generated-sources/antlr4/org/antlr/parser/antlr4</outputDirectory>
+					<outputDirectory>${project.build.directory}/generated-sources/antlr4/org/antlr/parser/st4</outputDirectory>
 				</configuration>
 				<executions>
 					<execution>
@@ -42,8 +42,8 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>grammarSpec</entryPoint>
-					<grammarName>ANTLRv4</grammarName>
+					<entryPoint>group</entryPoint>
+					<grammarName>STGParser</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

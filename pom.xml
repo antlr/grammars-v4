@@ -9,7 +9,7 @@
 	<modules>
 		<module>support</module>
 		<module>abnf</module>
-		<module>antlr4</module>		
+		<module>antlr4</module>
 		<module>arithmetic</module>
 		<module>asm6502</module>
 		<module>asn</module>
@@ -63,6 +63,7 @@
 		<module>smalltalk</module>
 		<module>sparql</module>
 		<module>sqlite</module>
+		<module>stringtemplate</module>
 		<module>suokif</module>
 <!-- Grammars-V4 issue 238 -->
 <!--		<module>swift</module>-->
