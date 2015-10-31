@@ -61,7 +61,7 @@
 		<module>sqlite</module>
 		<module>suokif</module>
 <!--		<module>swift</module>-->
-<!--		<module>tnsnames</module>-->
+		<module>tnsnames</module>
 		<module>tnt</module>
 		<module>turtle</module>
 		<module>ucb-logo</module>
