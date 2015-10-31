@@ -43,8 +43,8 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>group</entryPoint>
-					<grammarName>STGParser</grammarName>
-					<packageName></packageName>
+					<grammarName>STG</grammarName>
+					<packageName>org.antlr.parser.st4</packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

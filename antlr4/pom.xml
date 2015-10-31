@@ -18,10 +18,10 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>ANTLRv4Parser.g4</grammars>
-					<excludes>
-						<exclude>LexBasic.g4</exclude>
-						<exclude>LexUnicode.g4</exclude>v bbbbb
-					</excludes>
+					<includes>
+						<include>ANTLRv4Lexer.g4</include>
+						<include>ANTLRv4Parser.g4</include>
+					</includes>		
 					<arguments>
 						<argument>-package</argument>
 						<argument>org.antlr.parser.antlr4</argument>
@@ -44,7 +44,7 @@
 					<showTree>false</showTree>
 					<entryPoint>grammarSpec</entryPoint>
 					<grammarName>ANTLRv4</grammarName>
-					<packageName></packageName>
+					<packageName>org.antlr.parser.antlr4</packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
