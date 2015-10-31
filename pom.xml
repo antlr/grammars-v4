@@ -45,9 +45,11 @@
 		<module>peoplecode</module>
 		<module>asn</module>
 		<module>ucb-logo</module>
+		<module>iri</module>
 <!--		<module>newick</module> -->
 	</modules>
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
 		<antlr.version>4.5.1-1</antlr.version>
 	</properties>
