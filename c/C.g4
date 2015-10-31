@@ -868,10 +868,10 @@ SChar
     ;
 
 LineDirective
-    :   '#' 
+    :   '#' Whitespace?
         ('define' | 'include' | 'ifdef' | 'ifndef' |
         'undef' | 'if' | 'else' | 'endif' | 
-        'eif')
+        'eif' | IntegerConstant)
         Whitespace 
         (~[\r\n] 
           | '\\' [\r\n] 
