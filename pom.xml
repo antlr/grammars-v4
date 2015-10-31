@@ -24,6 +24,7 @@
 		<module>cobol85</module>
 		<module>cpp</module>
 		<module>creole</module>
+		<module>csharp</module>
 		<module>csv</module>
 		<module>dot</module>		
 		<module>erlang</module>
