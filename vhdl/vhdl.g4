@@ -693,11 +693,11 @@ exit_statement
 // NOTE that NAND/NOR are in (...)* now (used to be in (...)?).
 // (21.1.2004, e.f.)
 expression
-  : relation ( options{greedy=true;}: logical_operator relation )*
+  : relation ( : logical_operator relation )*
   ;
 
 factor
-  : primary ( options{greedy=true;}: DOUBLESTAR primary )?
+  : primary ( : DOUBLESTAR primary )?
   | ABS primary
   | NOT primary
   ;
@@ -1078,7 +1078,7 @@ parameter_specification
   ;
 
 physical_literal
-  : abstract_literal (options{greedy=true;}: identifier)
+  : abstract_literal (: identifier)
   ;
 
 physical_type_definition
@@ -1223,7 +1223,7 @@ record_type_definition
 
 relation
   : shift_expression
-    ( options{greedy=true;}: relational_operator shift_expression )?
+    ( : relational_operator shift_expression )?
   ;
 
 relational_operator
@@ -1301,7 +1301,7 @@ sequential_statement
 
 shift_expression
   : simple_expression
-    ( options{greedy=true;}: shift_operator simple_expression )?
+    ( : shift_operator simple_expression )?
   ;
 
 shift_operator
@@ -1342,7 +1342,7 @@ signature
 // `a op -b' - use `a op (-b)' instead).
 // (3.2.2004, e.f.)
 simple_expression
-  : ( PLUS | MINUS )? term ( options{greedy=true;}: adding_operator term )*
+  : ( PLUS | MINUS )? term ( : adding_operator term )*
   ;
 
 simple_simultaneous_statement
@@ -1488,7 +1488,7 @@ target
   ;
 
 term
-  : factor ( options{greedy=true;}: multiplying_operator factor )*
+  : factor ( : multiplying_operator factor )*
   ;
 
 terminal_aspect
