@@ -23,8 +23,7 @@
 		<module>c</module>
 		<module>calculator</module>
 		<module>clif</module>
-<!-- Grammars-V4 issue 236 -->
-<!--		<module>clojure</module> -->
+		<module>clojure</module>
 		<module>cobol85</module>
 		<module>cpp</module>
 		<module>creole</module>
