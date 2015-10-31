@@ -19,6 +19,10 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>STGParser.g4</grammars>
+					<excludes>
+						<exclude>LexBasic.g4</exclude>
+						<exclude>LexUnicode.g4</exclude>
+					</excludes>
 				</configuration>
 				<executions>
 					<execution>
