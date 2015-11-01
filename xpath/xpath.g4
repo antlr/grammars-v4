@@ -16,6 +16,10 @@ Version 1.0
 
 Do with this code as you will.
 */
+/*
+    Ported to Antlr4 by Tom Everett <tom@khubla.com>
+*/
+
 
 main  :  expr
   ;
