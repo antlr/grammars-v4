@@ -11,6 +11,7 @@
 		<module>abnf</module>
 		<module>antlr4</module>
 		<module>arithmetic</module>
+		<module>asm</module>
 		<module>asm6502</module>
 		<module>asn</module>
 <!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
@@ -66,6 +67,7 @@
 		<module>smalltalk</module>
 		<module>sparql</module>
 		<module>sqlite</module>
+		<module>stacktrace</module>
 		<module>stringtemplate</module>
 		<module>suokif</module>
 <!-- Grammars-V4 issue 238 -->

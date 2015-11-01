@@ -7,7 +7,10 @@
 
  Please email with any corrections/errors you might find.
 
+/*
+    Ported to Antlr4 by Tom Everett <tom@khubla.com>
 */
+
 grammar memcached_protocol;
 
 command_line
