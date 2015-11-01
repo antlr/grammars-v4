@@ -11,96 +11,170 @@
 
 grammar StackTrace;
 
-
-DOT:'.';
-AT:'at';
-CAUSED_BY:'Caused by:';
-MORE:'more';
-ELLIPSIS:'...';
-COLON:':';
-NATIVE_METHOD:'Native Method';
-UNKNOWN_SOURCE:'Unknown Source';
-INIT:'<init>';
-
 startRule
-    : stackTrace EOF;
-    
+    : 
+    stackTrace EOF
+    ;
     
 stackTrace 
-	:	messageLine+ stackTraceLine* causedByLine? 
+	:	
+	messageLine+ stackTraceLine* causedByLine? 
 	;
 
 stackTraceLine 
-	:	 (atLine|ellipsisLine)
+	:	 
+	(atLine|ellipsisLine)
 	;
 
 atLine
-	:	AT qualifiedMethod '(' classFile (COLON Number)? ')'
+	:	
+	AT qualifiedMethod '(' classFile (COLON Number)? ')'
 	;
 	
 causedByLine
-	:	CAUSED_BY stackTrace
+	:	
+	CAUSED_BY stackTrace
 	;
 
-ellipsisLine	:	ELLIPSIS Number MORE
-                             ;
+ellipsisLine	
+	:	
+	ELLIPSIS Number MORE
+    ;
 
 messageLine 
-	:	(qualifiedClass message?) 
+	:	
+	(qualifiedClass message?) 
  	;
  	
-qualifiedClass: packagePath? className innerClassName*;
+qualifiedClass
+	: 
+	packagePath? className innerClassName*
+	;
 
 innerClassName
-	:	('$' className)
+	:	
+	('$' className)
 	; 	
 
 classFile
-	:	(identifier '.java' | NATIVE_METHOD | UNKNOWN_SOURCE)
+	:	
+	(identifier '.java' | NATIVE_METHOD | UNKNOWN_SOURCE)
 	;
 
-/** method name may be missing, I think in ctors */
 qualifiedMethod 
-	:	qualifiedClass DOT (methodName|constructor)?;
+	:	
+	qualifiedClass DOT (methodName|constructor)?
+	;
 
 constructor
-	:	INIT
+	:	
+	INIT
 	;
 
 methodName
-	:	identifier
+	:	
+	identifier
 	;	
 
-packagePath    : (identifier DOT)+;
-
-className  : JavaWord;
-
-identifier : JavaWord;
-
-message : COLON (options {greedy=false;}: .)*;
-    
-Number	:	Digit+
+packagePath    
+	: 
+	(identifier DOT)+
 	;
 
-JavaWord	:	(JavaCharacter)+;
+className  
+	: 
+	JavaWord
+	;
 
-fragment
-JavaCharacter
-	:	(CapitalLetter
-    |    NonCapitalLetter | Symbol
-    |    Digit)
+identifier 
+	: 
+	JavaWord
+	;
+
+message 
+	: 
+	COLON (: .)*
+	;
+    
+Number	
+	:	
+	Digit+
+	;
+
+JavaWord	
+	:	
+	(JavaCharacter)+
+	;
+
+fragment JavaCharacter
+	:	
+	(CapitalLetter
+	| NonCapitalLetter 
+	| Symbol
+    | Digit)
 	;
 	
-NonCapitalLetter    :    'a'..'z';
-
-CapitalLetter
-    : 'A'..'Z'
-    ;
-
-Symbol	:	'_'
+DOT
+	:'.'
 	;
 
-Digit    :    '0'..'9';
+AT
+	:'at'
+	;
 
-WS  :  (' '|'\r'|'\t'|'\u000C'|'\n') ->skip
+CAUSED_BY
+	:
+	'Caused by:'
+	;
+
+MORE
+	:
+	'more'
+	;
+
+ELLIPSIS
+	:'...'
+	;
+
+COLON
+	:':'
+	;
+
+NATIVE_METHOD
+	:
+	'Native Method'
+	;
+
+UNKNOWN_SOURCE
+	:
+	'Unknown Source'
+	;
+
+INIT
+	:
+	'<init>'
+	;
+
+NonCapitalLetter    
+	:    
+	'a'..'z'
+	;
+
+CapitalLetter
+    : 
+    'A'..'Z'
+    ;
+
+Symbol	
+	:	
+	'_'
+	;
+
+Digit    
+	:    
+	'0'..'9'
+	;
+
+WS  :  
+	(' '|'\r'|'\t'|'\u000C'|'\n') ->skip
     ;
