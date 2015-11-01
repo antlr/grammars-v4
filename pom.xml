@@ -78,6 +78,7 @@
 		<module>vhdl</module>
 		<module>webidl</module>
 		<module>xml</module>
+		<module>xpath</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
