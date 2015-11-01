@@ -45,6 +45,7 @@
 		<module>less</module>
 		<module>logo</module>
 		<module>lua</module>
+		<module>memcached_protocol</module>
 		<module>MPS</module>
 		<module>mumath</module>
 		<module>mumps</module>
@@ -78,6 +79,7 @@
 		<module>vhdl</module>
 		<module>webidl</module>
 		<module>xml</module>
+		<module>xpath</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
