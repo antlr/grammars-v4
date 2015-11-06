@@ -442,7 +442,7 @@ expression
 // Grouped by prioriries: http://php.net/manual/en/language.operators.precedence.php
 // and http://www.phpeveryday.com/articles/PHP-Operators-Operator-Priority-P312.html
     : Clone expression                                         #CloneExpression
-    | newexpr                                                     #NewExpression
+    | newExpr                                                     #NewExpression
     
     | stringConstant '[' expression ']'                        #IndexerExpression
 
@@ -481,7 +481,7 @@ expression
     | expression QuestionMark expression? ':' expression       #ConditionalExpression
     
     | chain assignmentOperator expression                      #AssignmentExpression
-    | chain Eq '&' (chain | newexpr)                              #AssignmentExpression
+    | chain Eq '&' (chain | newExpr)                           #AssignmentExpression
 
     | Print expression                                         #PrintExpression
     
@@ -514,7 +514,7 @@ expression
     | Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? blockStatement  #LambdaFunctionExpression
     ;
 
-newexpr
+newExpr
     : New typeRef arguments?
     ;
 
@@ -643,7 +643,7 @@ chainList
     ;
 
 chain
-    : (chainBase | functionCall | '(' newexpr ')') memberAccess*
+    : (chainBase | functionCall | '(' newExpr ')') memberAccess*
     ;
 
 memberAccess
