@@ -9,10 +9,13 @@ lexer grammar PHPLexer;
 channels { PhpComments }
 
 @lexer::members
-{bool ScriptTag;
+{public bool AspTags = true;
+bool ScriptTag;
 bool StyleTag;
 string HeredocIdentifier;
 int PrevTokenType;
+string HtmlNameText;
+bool PhpScript;
 
 public override IToken NextToken()
 {
@@ -28,20 +31,40 @@ public override IToken NextToken()
         }
         PopMode(); // exit from PHP mode.
         
-        // Add semicolon to the end of statement if it is absente.
-        // For example: <?php echo "Hello world" ?>
-        if (PrevTokenType == SemiColon || PrevTokenType == Colon
-            || PrevTokenType == OpenCurlyBracket || PrevTokenType == CloseCurlyBracket)
+        if (string.Equals(token.Text, "</script>", System.StringComparison.Ordinal))
         {
-            token = base.NextToken();
+            PhpScript = false;
+            token = new CommonToken(ScriptClose);
         }
         else
         {
-            token = new CommonToken(SemiColon);
+            // Add semicolon to the end of statement if it is absente.
+            // For example: <?php echo "Hello world" ?>
+            if (PrevTokenType == SemiColon || PrevTokenType == Colon
+                || PrevTokenType == OpenCurlyBracket || PrevTokenType == CloseCurlyBracket)
+            {
+                token = base.NextToken();
+            }
+            else
+            {
+                token = new CommonToken(SemiColon);
+            }
+        }
+    }
+    else if (token.Type == HtmlName)
+    {
+        HtmlNameText = token.Text;
+    }
+    else if (token.Type == HtmlDoubleQuoteString)
+    {
+        if (string.Equals(token.Text, "php", System.StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(HtmlNameText, "language"))
+        {
+            PhpScript = true;
         }
     }
     
-    if (_mode == HereDoc)
+    else if (_mode == HereDoc)
     {
         // Heredoc and Nowdoc syntax suuport: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
         switch (token.Type)
@@ -91,8 +114,8 @@ bool CheckHeredocEnd(string text)
 
 // '<?=' will be transformed to 'echo' token.
 // '<?= "Hello world"; ?>' will be transformed to '<?php echo "Hello world"; ?>'
-fragment PhpStartEchoFragment: '<' '?' '='; 
-fragment PhpStartFragment:     '<' '?' (P H P)?;
+fragment PhpStartEchoFragment: '<' ('?' '=' | {AspTags}? '%' '=');
+fragment PhpStartFragment:     '<' ('?' (P H P)? | {AspTags}? '%');
 fragment Digit:                [0-9];
 fragment HexDigit:             [a-fA-F0-9];
 fragment NameChar
@@ -168,7 +191,14 @@ HtmlClose: '>' {
 PopMode();
 if (ScriptTag)
 {
-    PushMode(SCRIPT);
+    if (!PhpScript)
+    {
+        PushMode(SCRIPT);
+    }
+    else
+    {
+        PushMode(PHP);
+    }
     ScriptTag = false;
 }
 else if (StyleTag)
@@ -220,7 +250,7 @@ StyleBody: .*? '</' 'style'? '>' -> popMode;
 
 mode PHP;
 
-PHPEnd:             '?>';
+PHPEnd:             (('?' | {AspTags}? '%') '>') | {PhpScript}? '</script>';
 Whitespace:         [ \t\r\n]+ -> skip;
 MultiLineComment:   '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:  '//' -> skip, pushMode(SingleLineCommentMode);
