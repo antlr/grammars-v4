@@ -18,7 +18,7 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>ASM.g4</grammars>
+					<grammars>MASM.g4</grammars>
 				</configuration>
 				<executions>
 					<execution>
