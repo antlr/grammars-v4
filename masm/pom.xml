@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>asm</artifactId>
+	<artifactId>masm</artifactId>
 	<packaging>jar</packaging>
-	<name>ASM grammar</name>
+	<name>MASM grammar</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -35,7 +35,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>compilationUnit</entryPoint>
-					<grammarName>ASM</grammarName>
+					<grammarName>MASM</grammarName>
 					<packageName>com.Ostermiller.Syntax</packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

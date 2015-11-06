@@ -11,12 +11,10 @@
 		<module>abnf</module>
 		<module>antlr4</module>
 		<module>arithmetic</module>
-		<module>asm</module>
 		<module>asm6502</module>
 		<module>asn</module>
 <!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 <!--		<module>aspectj</module> -->
-
 
 		<module>atl</module>
 		<module>basic</module>
@@ -46,6 +44,7 @@
 		<module>less</module>
 		<module>logo</module>
 		<module>lua</module>
+		<module>masm</module>
 		<module>memcached_protocol</module>
 		<module>MPS</module>
 		<module>mumath</module>
