@@ -8,7 +8,7 @@ to provide the necessary tokens for the parser.
     Ported to Antlr4 by Tom Everett <tom@khubla.com>
 */
 
-grammar ASM;
+grammar MASM;
 
 @header
 	{
