@@ -93,7 +93,6 @@ lsnr_description : L_PAREN DESCRIPTION EQUAL (address_list | (address)+) R_PAREN
 alias_list       : alias (COMMA alias)* ;
 
 alias            : ID
-                 | ID (DOT ID)+
                  ;
 
 //-----------------------------------------------------------------
@@ -218,8 +217,7 @@ tcp_port         : L_PAREN PORT EQUAL port R_PAREN ;
 tcp_tcp          : L_PAREN PROTOCOL EQUAL TCP R_PAREN ;
                  
 host             : ID
-                 | ID (DOT ID)+ 
-                 | IP 
+                 | IP
                  ;
 
 port             : INT ;
@@ -335,16 +333,15 @@ cd_parameter     : cd_service_name
                  | cd_ur
                  ;
 
-cd_service_name  : L_PAREN SERVICE_NAME EQUAL ID (DOT ID)* R_PAREN ;
+cd_service_name  : L_PAREN SERVICE_NAME EQUAL ID R_PAREN ;
 
 cd_sid           : L_PAREN SID EQUAL ID R_PAREN ;
 
-cd_instance_name : L_PAREN INSTANCE_NAME EQUAL ID (DOT ID)* R_PAREN ;
-
+cd_instance_name : L_PAREN INSTANCE_NAME EQUAL ID R_PAREN ;
 
 cd_failover_mode : L_PAREN FAILOVER_MODE EQUAL fo_params R_PAREN ;
 
-cd_global_name   : L_PAREN GLOBAL_NAME EQUAL ID (DOT ID)* R_PAREN ;
+cd_global_name   : L_PAREN GLOBAL_NAME EQUAL ID R_PAREN ;
 
 cd_hs            : L_PAREN HS EQUAL OK R_PAREN ;
 
@@ -354,7 +351,7 @@ cd_hs            : L_PAREN HS EQUAL OK R_PAREN ;
 // I'm assuming that the [] bit is optional? I have no idea what
 // any of this means! ;-)
 // ---------------------------------------------------------------
-cd_rdb_database  : L_PAREN RDB_DATABASE EQUAL (L_SQUARE DOT ID R_SQUARE)? ID (DOT ID)* R_PAREN ;
+cd_rdb_database  : L_PAREN RDB_DATABASE EQUAL (L_SQUARE DOT ID R_SQUARE)? ID R_PAREN ;
 
 cd_server        : L_PAREN SERVER EQUAL (DEDICATED | SHARED | POOLED) R_PAREN ;
                  
@@ -371,7 +368,7 @@ fo_parameter     : fo_type
                  
 fo_type          : L_PAREN TYPE EQUAL (SESSION | SELECT | NONE) R_PAREN ;
 
-fo_backup        : L_PAREN BACKUP EQUAL ID (DOT ID)* R_PAREN ;
+fo_backup        : L_PAREN BACKUP EQUAL ID R_PAREN ;
 
 fo_method        : L_PAREN METHOD EQUAL (BASIC | PRECONNECT) R_PAREN ;
 
@@ -570,7 +567,7 @@ QUAD             : '0'[xX] HEX_DIGIT+
 //-------------------------------------------------
 // Other lexer rules, and fragments.
 //-------------------------------------------------
-ID               : [A-Za-z0-9][A-Za-z0-9_-]* ;
+ID               : [A-Za-z0-9][A-Za-z0-9_\-\.]* ;
 WS               : [ \t\r\n]+ -> skip ;
 
 
