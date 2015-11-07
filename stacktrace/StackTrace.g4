@@ -8,173 +8,159 @@
  /*
     Ported to Antlr4 by Tom Everett <tom@khubla.com>
 */
-
 grammar StackTrace;
 
 startRule
-    : 
-    stackTrace EOF
-    ;
-    
-stackTrace 
-	:	
-	messageLine+ stackTraceLine* causedByLine? 
-	;
+   : stackTrace EOF
+   ;
 
-stackTraceLine 
-	:	 
-	(atLine|ellipsisLine)
-	;
+stackTrace
+   : messageLine+ stackTraceLine* causedByLine?
+   ;
+
+stackTraceLine
+   : ( atLine | ellipsisLine )
+   ;
 
 atLine
-	:	
-	AT qualifiedMethod '(' classFile (COLON Number)? ')'
-	;
-	
+   : AT qualifiedMethod '(' classFile ( COLON Number )? ')'
+   ;
+
 causedByLine
-	:	
-	CAUSED_BY stackTrace
-	;
+   : CAUSED_BY stackTrace
+   ;
 
-ellipsisLine	
-	:	
-	ELLIPSIS Number MORE
-    ;
+ellipsisLine
+   : ELLIPSIS Number MORE
+   ;
 
-messageLine 
-	:	
-	(qualifiedClass message?) 
- 	;
- 	
+messageLine
+   : ( qualifiedClass message? )
+   ;
+
 qualifiedClass
-	: 
-	packagePath? className innerClassName*
-	;
+   : packagePath? className innerClassName*
+   ;
 
 innerClassName
-	:	
-	('$' className)
-	; 	
+   : ( '$' className )
+   ;
 
 classFile
-	:	
-	(identifier '.java' | NATIVE_METHOD | UNKNOWN_SOURCE)
-	;
+   : ( identifier '.java' | NATIVE_METHOD | UNKNOWN_SOURCE )
+   ;
 
-qualifiedMethod 
-	:	
-	qualifiedClass DOT (methodName|constructor)?
-	;
+qualifiedMethod
+   : qualifiedClass DOT ( methodName | constructor )?
+   ;
 
 constructor
-	:	
-	INIT
-	;
+   : INIT
+   ;
 
 methodName
-	:	
-	identifier
-	;	
+   : identifier
+   ;
 
-packagePath    
-	: 
-	(identifier DOT)+
-	;
+packagePath
+   : ( identifier DOT )+
+   ;
 
-className  
-	: 
-	JavaWord
-	;
+className
+   : JavaWord
+   ;
 
-identifier 
-	: 
-	JavaWord
-	;
+identifier
+   : JavaWord
+   ;
 
-message 
-	: 
-	COLON (: .)*
-	;
-    
-Number	
-	:	
-	Digit+
-	;
-
-JavaWord	
-	:	
-	(JavaCharacter)+
-	;
-
-fragment JavaCharacter
-	:	
-	(CapitalLetter
-	| NonCapitalLetter 
-	| Symbol
-    | Digit)
-	;
-	
-DOT
-	:'.'
-	;
-
-AT
-	:'at'
-	;
-
-CAUSED_BY
-	:
-	'Caused by:'
-	;
-
-MORE
-	:
-	'more'
-	;
-
-ELLIPSIS
-	:'...'
-	;
-
-COLON
-	:':'
-	;
-
-NATIVE_METHOD
-	:
-	'Native Method'
-	;
-
-UNKNOWN_SOURCE
-	:
-	'Unknown Source'
-	;
-
-INIT
-	:
-	'<init>'
-	;
-
-NonCapitalLetter    
-	:    
-	'a'..'z'
-	;
-
-CapitalLetter
-    : 
-    'A'..'Z'
-    ;
-
-Symbol	
-	:	
-	'_'
-	;
-
-Digit    
-	:    
-	'0'..'9'
-	;
-
-WS  :  
-	(' '|'\r'|'\t'|'\u000C'|'\n') ->skip
-    ;
+message
+   : COLON (
+      : . )*
+      ;
+   
+   
+   Number
+      : Digit+
+      ;
+   
+   
+   JavaWord
+      : ( JavaCharacter )+
+      ;
+   
+   
+   fragment JavaCharacter
+      : ( CapitalLetter | NonCapitalLetter | Symbol | Digit )
+      ;
+   
+   
+   DOT
+      : '.'
+      ;
+   
+   
+   AT
+      : 'at'
+      ;
+   
+   
+   CAUSED_BY
+      : 'Caused by:'
+      ;
+   
+   
+   MORE
+      : 'more'
+      ;
+   
+   
+   ELLIPSIS
+      : '...'
+      ;
+   
+   
+   COLON
+      : ':'
+      ;
+   
+   
+   NATIVE_METHOD
+      : 'Native Method'
+      ;
+   
+   
+   UNKNOWN_SOURCE
+      : 'Unknown Source'
+      ;
+   
+   
+   INIT
+      : '<init>'
+      ;
+   
+   
+   NonCapitalLetter
+      : 'a' .. 'z'
+      ;
+   
+   
+   CapitalLetter
+      : 'A' .. 'Z'
+      ;
+   
+   
+   Symbol
+      : '_'
+      ;
+   
+   
+   Digit
+      : '0' .. '9'
+      ;
+   
+   
+   WS
+      : ( ' ' | '\r' | '\t' | '\u000C' | '\n' ) -> skip
+      ;
+   

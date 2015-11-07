@@ -14,166 +14,182 @@
 grammar memcached_protocol;
 
 command_line
-	:	(storage_command
-	|	 retrieval_command
-	|	 delete_command
-	|	 increment_command
-	|	 decrement_command
-	|	 statistics_command
-	|	 flush_command
-	|	 version_command
-	|	 verbosity_command
-	|	 quit_command
-		)
-	;
+   : ( storage_command | retrieval_command | delete_command | increment_command | decrement_command | statistics_command | flush_command | version_command | verbosity_command | quit_command )
+   ;
 
 storage_command
-	:	((storage_command_name key flags exptime bytes)
-	|	('cas' key flags exptime bytes cas_unique))
-		noreply?
-	;
+   : ( ( storage_command_name key flags exptime bytes ) | ( 'cas' key flags exptime bytes cas_unique ) ) noreply?
+   ;
 
 storage_command_name
-	:	'set'
-	|	'add'
-	|	'replace'
-	|	'append'
-	|	'prepend';
+   : 'set' | 'add' | 'replace' | 'append' | 'prepend'
+   ;
 
 retrieval_command
-	:	('get' | 'gets') key+;
+   : ( 'get' | 'gets' ) key+
+   ;
 
 delete_command
-	:	'delete' key time? noreply?;
+   : 'delete' key time? noreply?
+   ;
 
 increment_command
-	:	'incr' key value noreply?;
+   : 'incr' key value noreply?
+   ;
 
 decrement_command
-	:	'decr' key value noreply?;
+   : 'decr' key value noreply?
+   ;
 
 statistics_command
-	:	'stats' statistics_option?;
+   : 'stats' statistics_option?
+   ;
 
 statistics_option
-	:	'items'
-	|	'slabs'
-	|	'sizes'
-	;
+   : 'items' | 'slabs' | 'sizes'
+   ;
 
 flush_command
-	:	'flush_all' delay? noreply?;
+   : 'flush_all' delay? noreply?
+   ;
 
 version_command
-	:	'version';
+   : 'version'
+   ;
 
 verbosity_command
-	:	'verbosity' verbosity_level;
+   : 'verbosity' verbosity_level
+   ;
 
 quit_command
-	:	'quit';
+   : 'quit'
+   ;
 
 storage_response
-	:	error_response
-	|	'STORED'
-	|	'NOT_STORED'
-	|	'EXISTS'
-	|	'NOT_FOUND'
-	;
+   : error_response | 'STORED' | 'NOT_STORED' | 'EXISTS' | 'NOT_FOUND'
+   ;
 
 retrieval_response
-	:	error_response
-	|	('VALUE' key flags bytes cas_unique?)
-	|	end
-	;
+   : error_response | ( 'VALUE' key flags bytes cas_unique? ) | end
+   ;
 
 deletion_response
-	:	error_response
-	|	'DELETED'
-	|	'NOT_FOUND'
-	;
+   : error_response | 'DELETED' | 'NOT_FOUND'
+   ;
 
 incr_or_decr_response
-	:	error_response
-	|	'NOT_FOUND'
-	|	INTEGER
-	;
+   : error_response | 'NOT_FOUND' | INTEGER
+   ;
 
 statistics_response
-	:	error_response
-	|	general_statistic
-	|	size_statistic
-	|	end
-	;
-
+   : error_response | general_statistic | size_statistic | end
+   ;
 
 error_response
-	:	general_error
-	|	client_error_message
-	|	server_error_message
-	;
+   : general_error | client_error_message | server_error_message
+   ;
 
 general_statistic
-	:	'STAT' statistic_name statistic_value;
+   : 'STAT' statistic_name statistic_value
+   ;
 
 size_statistic
-	:	size count;
+   : size count
+   ;
 
 general_error
-	:	'ERROR';
+   : 'ERROR'
+   ;
 
 client_error_message
-	:	'CLIENT_ERROR' .+;
+   : 'CLIENT_ERROR' .+
+   ;
 
 server_error_message
-	:	'SERVER_ERROR' .+;
+   : 'SERVER_ERROR' .+
+   ;
 
-end	:	'END';
+end
+   : 'END'
+   ;
 
-noreply	:	'noreply';
+noreply
+   : 'noreply'
+   ;
 
-key	:	.;
+key
+   : .
+   ;
 
-flags	:	INTEGER;
+flags
+   : INTEGER
+   ;
 
-exptime	:	INTEGER;
+exptime
+   : INTEGER
+   ;
 
-bytes	:	INTEGER;
+bytes
+   : INTEGER
+   ;
 
 cas_unique
-	:	INTEGER;
+   : INTEGER
+   ;
 
-value	:	INTEGER;
+value
+   : INTEGER
+   ;
 
-time	:	INTEGER;
+time
+   : INTEGER
+   ;
 
-delay	:	INTEGER;
+delay
+   : INTEGER
+   ;
 
 verbosity_level
-	:	INTEGER;
+   : INTEGER
+   ;
 
 statistic_name
-	:	WORD;
+   : WORD
+   ;
 
 statistic_value
-	:	.;
+   : .
+   ;
 
-size	:	INTEGER;
+size
+   : INTEGER
+   ;
 
-count	:	INTEGER;
+count
+   : INTEGER
+   ;
 
-INTEGER	:	DIGIT+;
 
-WORD	:	PRINTABLE_CHAR+;
+INTEGER
+   : DIGIT+
+   ;
+
+
+WORD
+   : PRINTABLE_CHAR+
+   ;
+
 
 fragment DIGIT
-	:	'0'..'9';
+   : '0' .. '9'
+   ;
+
 
 fragment PRINTABLE_CHAR
-	:	'!'..'~';
+   : '!' .. '~'
+   ;
+
 
 WHITESPACE
-	:	(' ' | '\t' | '\r' | '\n' | '\u000C')+ ->skip
-	;
-
-
+   : ( ' ' | '\t' | '\r' | '\n' | '\u000C' )+ -> skip
+   ;
