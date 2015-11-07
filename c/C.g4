@@ -672,7 +672,13 @@ IntegerConstant
     :   DecimalConstant IntegerSuffix?
     |   OctalConstant IntegerSuffix?
     |   HexadecimalConstant IntegerSuffix?
+    |	BinaryConstant
     ;
+
+fragment
+BinaryConstant
+	:	'0' [bB] [0-1]+
+	;
 
 fragment
 DecimalConstant

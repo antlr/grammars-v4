@@ -47,7 +47,7 @@ extern BOOL IPONT_DEBUG_REQUESTS;
     BOOL hasSentProgressForUpload;
     BOOL uploadRequest;
     BOOL backgroundProcessing;
-    NSDictionary *parametersForOAuth;
+    NSDictionary<NSString*,id> *parametersForOAuth;
     OAuthToken *oAuthConsumer;
     OAuthToken *oAuthToken;
     NSMutableURLRequest *urlRequest;
