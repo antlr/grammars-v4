@@ -1,4 +1,4 @@
-    /*
+/*
 BSD License
 
 Copyright (c) 2013, Tom Everett

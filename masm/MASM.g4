@@ -9,1342 +9,1546 @@ to provide the necessary tokens for the parser.
 */
 
 grammar MASM;
-
-@header
-	{
-	package com.Ostermiller.Syntax;
-	}
-
+@ header { 
+ 	 package com.Ostermiller.Syntax;
+ 	 }
 compilationUnit
-	:
-	(segments|directive_exp1) * 'end' Identifier
-	;
+   : ( segments | directive_exp1 )* 'end' Identifier
+   ;
 
 segments
-	:	
-	Identifier 'segments' 'para' 'public' (code|proc)* Identifier 'ends'
-	;
+   : Identifier 'segments' 'para' 'public' ( code | proc )* Identifier 'ends'
+   ;
 
-proc	
-	:
-	Identifier 'proc' ( code )* 'ret' Identifier 'endp'
-	;
-	
-code: 
-      binary_exp1
-	| binary_exp10
-	| binary_exp11
-	| binary_exp12
-	| binary_exp2
-	| binary_exp3
-	| binary_exp4
-	| binary_exp5
-	| binary_exp6
-	| binary_exp7
-	| binary_exp8
-	| binary_exp9
-	| unuary_exp1
-	| unuary_exp2
-	| unuary_exp3
-	| unuary_exp4
-	| unuary_exp5
-	| notarguments
-	| variabledeclaration
-	| directive_exp1	
-	;
-	
+proc
+   : Identifier 'proc' ( code )* 'ret' Identifier 'endp'
+   ;
+
+code
+   : binary_exp1 | binary_exp10 | binary_exp11 | binary_exp12 | binary_exp2 | binary_exp3 | binary_exp4 | binary_exp5 | binary_exp6 | binary_exp7 | binary_exp8 | binary_exp9 | unuary_exp1 | unuary_exp2 | unuary_exp3 | unuary_exp4 | unuary_exp5 | notarguments | variabledeclaration | directive_exp1
+   ;
+
 binary_exp1
-	: 
-	o register Separator (register|Integer|memory)| o memory Separator (register|Integer)
-	;
-	
+   : o register Separator ( register | Integer | memory ) | o memory Separator ( register | Integer )
+   ;
+
 unuary_exp1
-	: op (Integer|register|memory)
-	;
-	
+   : op ( Integer | register | memory )
+   ;
+
 unuary_exp2
-	: ope (register|memory)
-	;
-	
+   : ope ( register | memory )
+   ;
+
 binary_exp2
-	: oper register Separator (register|memory)	| oper memory Separator register
-	;
+   : oper register Separator ( register | memory ) | oper memory Separator register
+   ;
 
 notarguments
-	: opera
-    ;
-	
+   : opera
+   ;
+
 binary_exp3
-	: operat (register|memory) Separator (register|Integer|memory)
-	;
-	
+   : operat ( register | memory ) Separator ( register | Integer | memory )
+   ;
+
 unuary_exp3
-	: operato Identifier
-	;
-	
+   : operato Identifier
+   ;
+
 binary_exp4
-	: operator register Separator (register|memory)
-	;
-	
+   : operator register Separator ( register | memory )
+   ;
+
 binary_exp5
-	: l register Separator memory
-	;
-	
+   : l register Separator memory
+   ;
+
 binary_exp6
-	: x (register|memory) Separator register
-	;
+   : x ( register | memory ) Separator register
+   ;
 
 binary_exp7
-	: s (register|memory) Separator (Integer|register)
-	;
-	
+   : s ( register | memory ) Separator ( Integer | register )
+   ;
+
 binary_exp8
-	: sh (register|memory) Separator register Separator (register|Integer)
-	;
+   : sh ( register | memory ) Separator register Separator ( register | Integer )
+   ;
 
 binary_exp9
-	: b (register|memory) Separator (register|memory)
-	;
-	
+   : b ( register | memory ) Separator ( register | memory )
+   ;
+
 unuary_exp4
-	: call (register|memory|Integer)
-	;
-	
+   : call ( register | memory | Integer )
+   ;
+
 unuary_exp5
-	: interruption Integer	
-	;
-	
+   : interruption Integer
+   ;
+
 binary_exp10
-	: in register Separator (register|Integer)
-	;
-	
+   : in register Separator ( register | Integer )
+   ;
+
 binary_exp11
-	: out (register|Integer) Separator register
-	;
-	
+   : out ( register | Integer ) Separator register
+   ;
+
 binary_exp12
-	: re opera	
-	;
-	
-directive_exp1	
-	: (directives Identifier | directives)
-	;
-	
+   : re opera
+   ;
+
+directive_exp1
+   : ( directives Identifier | directives )
+   ;
+
 variabledeclaration
-	: Identifier ty (question|String|Integer) 	
-	;
-	
-memory	
-	:
-	'[' (register|Identifier) ('+' ((register ('+' (Integer|Hexnum|Octalnum))? )|Integer|Hexnum|Octalnum))? ']'
-	;
-	
+   : Identifier ty ( question | String | Integer )
+   ;
+
+memory
+   : '[' ( register | Identifier ) ( '+' ( ( register ( '+' ( Integer | Hexnum | Octalnum ) )? ) | Integer | Hexnum | Octalnum ) )? ']'
+   ;
+
 segmentos
-	:
-	DS | ES | CS | SS | GS | FS
-	;
+   : DS | ES | CS | SS | GS | FS
+   ;
 
 register
-	:
-	AH|AL|AX|BH|BL|BX|CH|CL|CX|DH|DL|DX|SI|DI|SP|BP|EAX|EBX|ECX|EDX|ESI|EDI|ESP|EBP
-	;
+   : AH | AL | AX | BH | BL | BX | CH | CL | CX | DH | DL | DX | SI | DI | SP | BP | EAX | EBX | ECX | EDX | ESI | EDI | ESP | EBP
+   ;
 
 o
-	:
-	MOV|CMP|TEST
-	;
+   : MOV | CMP | TEST
+   ;
 
 op
-	:
-	PUSH
-	;
+   : PUSH
+   ;
 
 ope
-	:	
-	POP|IDIV|INC|DEC|NEG|MUL|DIV|IMUL|NOT|SETPO|SETAE|SETNLE|SETC|SETNO|SETNB|SETP|SETNGE|SETL|SETGE|SETPE|SETNL|SETNZ|SETNE|SETNC|SETBE|SETNP|SETNS|SETO|SETNA|SETNAE|SETZ|SETLE|SETNBE|SETS|SETE|SETB|SETA|SETG|SETNG
-	;
+   : POP | IDIV | INC | DEC | NEG | MUL | DIV | IMUL | NOT | SETPO | SETAE | SETNLE | SETC | SETNO | SETNB | SETP | SETNGE | SETL | SETGE | SETPE | SETNL | SETNZ | SETNE | SETNC | SETBE | SETNP | SETNS | SETO | SETNA | SETNAE | SETZ | SETLE | SETNBE | SETS | SETE | SETB | SETA | SETG | SETNG
+   ;
 
 oper
-	:	
-	XCHG
-	;
+   : XCHG
+   ;
 
 opera
-	:	
-	POPAD|AAA|POPA|POPFD|CWD|LAHF|PUSHAD|PUSHF|AAS|BSWAP|PUSHFD|CBW|CWDE|XLAT|AAM|AAD|CDQ|DAA|SAHF|DAS|INTO|IRET|CLC|STC|CMC|CLD|STD|CLI|STI|MOVSB|MOVSW|MOVSD|LODS|LODSB|LODSW|LODSD|STOS|STOSB|STOSW|SOTSD|SCAS|SCASB|SCASW|SCASD|CMPS|CMPSB|CMPSW|CMPSD|INSB|INSW|INSD|OUTSB|OUTSW|OUTSD
-	;
+   : POPAD | AAA | POPA | POPFD | CWD | LAHF | PUSHAD | PUSHF | AAS | BSWAP | PUSHFD | CBW | CWDE | XLAT | AAM | AAD | CDQ | DAA | SAHF | DAS | INTO | IRET | CLC | STC | CMC | CLD | STD | CLI | STI | MOVSB | MOVSW | MOVSD | LODS | LODSB | LODSW | LODSD | STOS | STOSB | STOSW | SOTSD | SCAS | SCASB | SCASW | SCASD | CMPS | CMPSB | CMPSW | CMPSD | INSB | INSW | INSD | OUTSB | OUTSW | OUTSD
+   ;
 
 operat
-	: 
-	ADC|ADD|SUB|CBB|XOR|OR
-	;
+   : ADC | ADD | SUB | CBB | XOR | OR
+   ;
 
 operato
-	:
-	JNBE|JNZ|JPO|JZ|JS|LOOPNZ|JGE|JB|JNB|JO|JP|JNO|JNL|JNAE|LOOPZ|JMP|JNP|LOOP|JL|JCXZ|JAE|JNGE|JA|LOOPNE|LOOPE|JG|JNLE|JE|JNC|JC|JNA|JBE|JLE|JPE|JNS|JECXZ|JNG
-	;
+   : JNBE | JNZ | JPO | JZ | JS | LOOPNZ | JGE | JB | JNB | JO | JP | JNO | JNL | JNAE | LOOPZ | JMP | JNP | LOOP | JL | JCXZ | JAE | JNGE | JA | LOOPNE | LOOPE | JG | JNLE | JE | JNC | JC | JNA | JBE | JLE | JPE | JNS | JECXZ | JNG
+   ;
 
 operator
-	:
-	MOVZX|BSF|BSR
-	;
+   : MOVZX | BSF | BSR
+   ;
 
 l
-	:	
-	LES|LEA|LDS|INS|OUTS
-	;
+   : LES | LEA | LDS | INS | OUTS
+   ;
 
 x
-	:	
-	XADD|CMPXCHG
-	;
+   : XADD | CMPXCHG
+   ;
 
 s
-	:	
-	SHL|SHR|ROR|ROL|RCL|SAL|RCR|SAR
-	;
+   : SHL | SHR | ROR | ROL | RCL | SAL | RCR | SAR
+   ;
 
 sh
-	:	
-	SHRD|SHLD
-	;
+   : SHRD | SHLD
+   ;
 
 b
-	:	
-	BTR|BT|BTC
-	;
+   : BTR | BT | BTC
+   ;
 
 call
-	:	
-	CALL
-	;
+   : CALL
+   ;
 
 interruption
-	:	
-	INT|RETN|RET|RETF
-	;
+   : INT | RETN | RET | RETF
+   ;
 
 in
-	:	
-	IN
-	;
+   : IN
+   ;
 
 out
-	:	
-	OUT
-	;
+   : OUT
+   ;
 
 re
-	:	
-	REP|REPE|REPZ|REPNE|REPNZ
-	;
+   : REP | REPE | REPZ | REPNE | REPNZ
+   ;
 
 directives
-	: 
-	ALPHA|CONST|CREF|XCREF|DATA|DATA2|DOSSEG|ERR|ERR1|ERR2|ERRE|ERRNZ|ERRDEF|ERRNDEF|ERRB|ERRNB|ERRIDN|ERRDIF|EVEN|LIST|WIDTH|MASK|SEQ|XLIST|EXIT|MODEL
-	;
+   : ALPHA | CONST | CREF | XCREF | DATA | DATA2 | DOSSEG | ERR | ERR1 | ERR2 | ERRE | ERRNZ | ERRDEF | ERRNDEF | ERRB | ERRNB | ERRIDN | ERRDIF | EVEN | LIST | WIDTH | MASK | SEQ | XLIST | EXIT | MODEL
+   ;
 
 ty
-	:	
-	BYTE|SBYTE|DB|WORD|SWORD|DW|DWORD|SDWORD|DD|FWORD|DF|QWORD|DQ|TBYTE|DT|REAL4|REAL8|REAL|FAR|NEAR|PROC
-	;
+   : BYTE | SBYTE | DB | WORD | SWORD | DW | DWORD | SDWORD | DD | FWORD | DF | QWORD | DQ | TBYTE | DT | REAL4 | REAL8 | REAL | FAR | NEAR | PROC
+   ;
 
 question
-	: 
-	QUESTION
-	;
+   : QUESTION
+   ;
 
 time
-	:	
-	TIMES
-	;
+   : TIMES
+   ;
 
-//So let's start  defining the ASM lexer
-//Groups of reserved words
-Identifier 
-    :   Letter ('_'|Letter|Digit)*
-    ;
+
+Identifier
+   : Letter ( '_' | Letter | Digit )*
+   ;
+
 
 DS
-	:
-	'ds'
-	;
+   : 'ds'
+   ;
+
 
 ES
-	:
-	'es';
+   : 'es'
+   ;
+
+
 CS
-	:
-	'cs'
-	;
+   : 'cs'
+   ;
+
+
 SS
-	:
-	'ss'
-	;
+   : 'ss'
+   ;
+
+
 GS
-	:
-	'gs'
-	;
-FS 
-	:
-	'fs'
-	;
+   : 'gs'
+   ;
+
+
+FS
+   : 'fs'
+   ;
+
+
 AH
-	:
-	'ah'
-	;
+   : 'ah'
+   ;
+
+
 AL
-	:
-	'al'
-	;
+   : 'al'
+   ;
+
+
 AX
-	:
-	'ax'
-	;
+   : 'ax'
+   ;
+
+
 BH
-	:
-	'bh'
-	;
-BL:'bl'
-	;
+   : 'bh'
+   ;
+
+
+BL
+   : 'bl'
+   ;
+
+
 BX
-	:
-	'bx'
-	;
+   : 'bx'
+   ;
+
+
 CH
-	:
-	'ch'
-	;
+   : 'ch'
+   ;
+
+
 CL
-	:
-	'cl'
-	;
+   : 'cl'
+   ;
+
+
 CX
-	:
-	'cx'
-	;
+   : 'cx'
+   ;
+
+
 DH
-	:
-	'dh'
-	;
+   : 'dh'
+   ;
+
+
 DL
-	:
-	'dl'
-	;
+   : 'dl'
+   ;
+
+
 DX
-	:
-	'dx'
-	;
+   : 'dx'
+   ;
+
+
 SI
-	:
-	'si'
-	;
+   : 'si'
+   ;
+
+
 DI
-	:
-	'di'
-	;
+   : 'di'
+   ;
+
+
 SP
-	:
-	'sp'
-	;
+   : 'sp'
+   ;
+
+
 BP
-	:
-	'bp'
-	;
+   : 'bp'
+   ;
+
+
 EAX
-	:
-	'eax'
-	;
+   : 'eax'
+   ;
+
+
 EBX
-	:
-	'ebx'
-	;
+   : 'ebx'
+   ;
+
+
 ECX
-	:
-	'ecx'
-	;
+   : 'ecx'
+   ;
+
+
 EDX
-	:
-	'edx'
-	;
+   : 'edx'
+   ;
+
+
 ESI
-	:
-	'esi'
-	;
+   : 'esi'
+   ;
+
+
 EDI
-	:
-	'edi'
-	;
+   : 'edi'
+   ;
+
+
 ESP
-	:
-	'esp'
-	;
+   : 'esp'
+   ;
+
+
 EBP
-	:
-	'ebp'
-	;
+   : 'ebp'
+   ;
+
+
 MOV
-	:
-	'mov'
-	;
+   : 'mov'
+   ;
+
+
 CMP
-	:
-	'cmp'
-	;
+   : 'cmp'
+   ;
+
+
 TEST
-	:
-	'test'
-	;
+   : 'test'
+   ;
+
+
 PUSH
-	:
-	'push'
-	;
+   : 'push'
+   ;
+
+
 POP
-	:
-	'pop'
-	;
+   : 'pop'
+   ;
+
+
 IDIV
-	:
-	'idiv'
-	;
+   : 'idiv'
+   ;
+
+
 INC
-	:
-	'inc'
-	;
+   : 'inc'
+   ;
+
+
 DEC
-	:
-	'dec'
-	;
+   : 'dec'
+   ;
+
+
 NEG
-	:
-	'neg'
-	;
+   : 'neg'
+   ;
+
+
 MUL
-	:
-	'mul'
-	;
+   : 'mul'
+   ;
+
+
 DIV
-	:
-	'div'
-	;
+   : 'div'
+   ;
+
+
 IMUL
-	:
-	'imul'
-	;
+   : 'imul'
+   ;
+
+
 NOT
-	:
-	'not'
-	;
+   : 'not'
+   ;
+
+
 SETPO
-	:
-	'setpo'
-	;
+   : 'setpo'
+   ;
+
+
 SETAE
-	:
-	'setae'
-	;
+   : 'setae'
+   ;
+
+
 SETNLE
-	:
-	'setnle'
-	;
+   : 'setnle'
+   ;
+
+
 SETC
-	:
-	'setc'
-	;
+   : 'setc'
+   ;
+
+
 SETNO
-	:
-	'setno'
-	;
+   : 'setno'
+   ;
+
+
 SETNB
-	:
-	'setnb'
-	;
+   : 'setnb'
+   ;
+
+
 SETP
-	:
-	'setp'
-	;
+   : 'setp'
+   ;
+
+
 SETNGE
-	:
-	'setnge'
-	;
+   : 'setnge'
+   ;
+
+
 SETL
-	:
-	'setl'
-	;
+   : 'setl'
+   ;
+
+
 SETGE
-	:
-	'setge'
-	;
+   : 'setge'
+   ;
+
+
 SETPE
-	:
-	'setpe'
-	;
+   : 'setpe'
+   ;
+
+
 SETNL
-	:
-	'setnl'
-	;
+   : 'setnl'
+   ;
+
+
 SETNZ
-	:
-	'setnz'
-	;
+   : 'setnz'
+   ;
+
+
 SETNE
-	:
-	'setne'
-	;
+   : 'setne'
+   ;
+
+
 SETNC
-	:
-	'setnc'
-	;
+   : 'setnc'
+   ;
+
+
 SETBE
-	:
-	'setbe'
-	;
+   : 'setbe'
+   ;
+
+
 SETNP
-	:
-	'setnp'
-	;
+   : 'setnp'
+   ;
+
+
 SETNS
-	:
-	'setns'
-	;
+   : 'setns'
+   ;
+
+
 SETO
-	:
-	'seto'
-	;
+   : 'seto'
+   ;
+
+
 SETNA
-	:
-	'setna'
-	;
+   : 'setna'
+   ;
+
+
 SETNAE
-	:
-	'setnae'
-	;
+   : 'setnae'
+   ;
+
+
 SETZ
-	:
-	'setz'
-	;
+   : 'setz'
+   ;
+
+
 SETLE
-	:
-	'setle'
-	;
+   : 'setle'
+   ;
+
+
 SETNBE
-	:
-	'setnbe'
-	;
+   : 'setnbe'
+   ;
+
+
 SETS
-	:
-	'sets'
-	;
+   : 'sets'
+   ;
+
+
 SETE
-	:
-	'sete'
-	;
+   : 'sete'
+   ;
+
+
 SETB
-	:
-	'setb'
-	;
+   : 'setb'
+   ;
+
+
 SETA
-	:
-	'seta'
-	;
+   : 'seta'
+   ;
+
+
 SETG
-	:
-	'setg'
-	;
+   : 'setg'
+   ;
+
+
 SETNG
-	:
-	'setng'
-	;
+   : 'setng'
+   ;
+
+
 XCHG
-	:
-	'xchg'
-	;
+   : 'xchg'
+   ;
+
+
 POPAD
-	:
-	'popad'
-	;
+   : 'popad'
+   ;
+
+
 AAA
-	:
-	'aaa'
-	;
+   : 'aaa'
+   ;
+
+
 POPA
-	:
-	'popa'
-	;
+   : 'popa'
+   ;
+
+
 POPFD
-	:
-	'popfd'
-	;
+   : 'popfd'
+   ;
+
+
 CWD
-	:
-	'cwd'
-	;
+   : 'cwd'
+   ;
+
+
 LAHF
-	:
-	'lahf'
-	;
+   : 'lahf'
+   ;
+
+
 PUSHAD
-	:
-	'pushad'
-	;
+   : 'pushad'
+   ;
+
+
 PUSHF
-	:
-	'pushf'
-	;
+   : 'pushf'
+   ;
+
+
 AAS
-	:
-	'aas'
-	;
+   : 'aas'
+   ;
+
+
 BSWAP
-	:
-	'bswap'
-	;
+   : 'bswap'
+   ;
+
+
 PUSHFD
-	:
-	'pushfd'
-	;
+   : 'pushfd'
+   ;
+
+
 CBW
-	:
-	'cbw'
-	;
+   : 'cbw'
+   ;
+
+
 CWDE
-	:
-	'cwde'
-	;
+   : 'cwde'
+   ;
+
+
 XLAT
-	:
-	'xlat'
-	;
+   : 'xlat'
+   ;
+
+
 AAM
-	:
-	'aam'
-	;
+   : 'aam'
+   ;
+
+
 AAD
-	:
-	'aad'
-	;
+   : 'aad'
+   ;
+
+
 CDQ
-	:
-	'cdq'
-	;
+   : 'cdq'
+   ;
+
+
 DAA
-	:
-	'daa'
-	;
+   : 'daa'
+   ;
+
+
 SAHF
-	:
-	'sahf'
-	;
+   : 'sahf'
+   ;
+
+
 DAS
-	:
-	'das'
-	;
+   : 'das'
+   ;
+
+
 INTO
-	:
-	'into'
-	;
+   : 'into'
+   ;
+
+
 IRET
-	:
-	'iret'
-	;
+   : 'iret'
+   ;
+
+
 CLC
-	:
-	'clc'
-	;
+   : 'clc'
+   ;
+
+
 STC
-	:
-	'stc'
-	;
+   : 'stc'
+   ;
+
+
 CMC
-	:
-	'cmc'
-	;
+   : 'cmc'
+   ;
+
+
 CLD
-	:
-	'cld'
-	;
+   : 'cld'
+   ;
+
+
 STD
-	:
-	'std'
-	;
+   : 'std'
+   ;
+
+
 CLI
-	:
-	'cli'
-	;
+   : 'cli'
+   ;
+
+
 STI
-	:
-	'sti'
-	;
+   : 'sti'
+   ;
+
+
 MOVSB
-	:
-	'movsb'
-	;
+   : 'movsb'
+   ;
+
+
 MOVSW
-	:
-	'movsw'
-	;
+   : 'movsw'
+   ;
+
+
 MOVSD
-	:
-	'movsd'
-	;
+   : 'movsd'
+   ;
+
+
 LODS
-	:
-	'lods'
-	;
+   : 'lods'
+   ;
+
+
 LODSB
-	:
-	'lodsb'
-	;
+   : 'lodsb'
+   ;
+
+
 LODSW
-	:
-	'lodsw'
-	;
+   : 'lodsw'
+   ;
+
+
 LODSD
-	:
-	'lodsd'
-	;
+   : 'lodsd'
+   ;
+
+
 STOS
-	:
-	'stos'
-	;
+   : 'stos'
+   ;
+
+
 STOSB
-	:
-	'stosb'
-	;
+   : 'stosb'
+   ;
+
+
 STOSW
-	:
-	'stosw'
-	;
+   : 'stosw'
+   ;
+
+
 SOTSD
-	:
-	'sotsd'
-	;
+   : 'sotsd'
+   ;
+
+
 SCAS
-	:
-	'scas'
-	;
+   : 'scas'
+   ;
+
+
 SCASB
-	:
-	'scasb'
-	;
+   : 'scasb'
+   ;
+
+
 SCASW
-	:
-	'scasw'
-	;
+   : 'scasw'
+   ;
+
+
 SCASD
-	:
-	'scasd'
-	;
+   : 'scasd'
+   ;
+
+
 CMPS
-	:
-	'cmps'
-	;
+   : 'cmps'
+   ;
+
+
 CMPSB
-	:
-	'cmpsb'
-	;
+   : 'cmpsb'
+   ;
+
+
 CMPSW
-	:
-	'cmpsw'
-	;
+   : 'cmpsw'
+   ;
+
+
 CMPSD
-	:
-	'cmpsd'
-	;
+   : 'cmpsd'
+   ;
+
+
 INSB
-	:
-	'insb'
-	;
+   : 'insb'
+   ;
+
+
 INSW
-	:
-	'insw'
-	;
+   : 'insw'
+   ;
+
+
 INSD
-	:
-	'insd'
-	;
+   : 'insd'
+   ;
+
+
 OUTSB
-	:
-	'outsb'
-	;
+   : 'outsb'
+   ;
+
+
 OUTSW
-	:
-	'outsw'
-	;
+   : 'outsw'
+   ;
+
+
 OUTSD
-	:
-	'outsd'
-	;
+   : 'outsd'
+   ;
+
+
 ADC
-	:
-	'adc'
-	;
+   : 'adc'
+   ;
+
+
 ADD
-	:
-	'add'
-	;
+   : 'add'
+   ;
+
+
 SUB
-	:
-	'sub'
-	;
+   : 'sub'
+   ;
+
+
 CBB
-	:
-	'cbb'
-	;
+   : 'cbb'
+   ;
+
+
 XOR
-	:
-	'xor'
-	;
+   : 'xor'
+   ;
+
+
 OR
-	:
-	'or'
-	;
+   : 'or'
+   ;
+
+
 JNBE
-	:
-	'jnbe'
-	;
+   : 'jnbe'
+   ;
+
+
 JNZ
-	:
-	'jnz'
-	;
+   : 'jnz'
+   ;
+
+
 JPO
-	:
-	'jpo'
-	;
+   : 'jpo'
+   ;
+
+
 JZ
-	:
-	'jz'
-	;
+   : 'jz'
+   ;
+
+
 JS
-	:
-	'js'
-	;
+   : 'js'
+   ;
+
+
 LOOPNZ
-	:
-	'loopnz'
-	;
+   : 'loopnz'
+   ;
+
+
 JGE
-	:
-	'jge'
-	;
+   : 'jge'
+   ;
+
+
 JB
-	:
-	'jb'
-	;
+   : 'jb'
+   ;
+
+
 JNB
-	:
-	'jnb'
-	;
+   : 'jnb'
+   ;
+
+
 JO
-	:
-	'jo'
-	;
+   : 'jo'
+   ;
+
+
 JP
-	:
-	'jp'
-	;
+   : 'jp'
+   ;
+
+
 JNO
-	:
-	'jno'
-	;
+   : 'jno'
+   ;
+
+
 JNL
-	:
-	'jnl'
-	;
+   : 'jnl'
+   ;
+
+
 JNAE
-	:
-	'jnae'
-	;
+   : 'jnae'
+   ;
+
+
 LOOPZ
-	:
-	'loopz'
-	;
+   : 'loopz'
+   ;
+
+
 JMP
-	:
-	'jmp'
-	;
+   : 'jmp'
+   ;
+
+
 JNP
-	:
-	'jnp'
-	;
+   : 'jnp'
+   ;
+
+
 LOOP
-	:
-	'loop'
-	;
+   : 'loop'
+   ;
+
+
 JL
-	:
-	'jl'
-	;
+   : 'jl'
+   ;
+
+
 JCXZ
-	:
-	'jcxz'
-	;
+   : 'jcxz'
+   ;
+
+
 JAE
-	:
-	'jae'
-	;
+   : 'jae'
+   ;
+
+
 JNGE
-	:
-	'jnge'
-	;
+   : 'jnge'
+   ;
+
+
 JA
-	:
-	'ja'
-	;
+   : 'ja'
+   ;
+
+
 LOOPNE
-	:
-	'loopne'
-	;
+   : 'loopne'
+   ;
+
+
 LOOPE
-	:
-	'loope'
-	;
+   : 'loope'
+   ;
+
+
 JG
-	:
-	'jg'
-	;
+   : 'jg'
+   ;
+
+
 JNLE
-	:
-	'jnle'
-	;
+   : 'jnle'
+   ;
+
+
 JE
-	:
-	'je'
-	;
+   : 'je'
+   ;
+
+
 JNC
-	:
-	'jnc'
-	;
+   : 'jnc'
+   ;
+
+
 JC
-	:
-	'jc'
-	;
+   : 'jc'
+   ;
+
+
 JNA
-	:
-	'jna'
-	;
+   : 'jna'
+   ;
+
+
 JBE
-	:
-	'jbe'
-	;
+   : 'jbe'
+   ;
+
+
 JLE
-	:
-	'jle'
-	;
+   : 'jle'
+   ;
+
+
 JPE
-	:
-	'jpe'
-	;
+   : 'jpe'
+   ;
+
+
 JNS
-	:
-	'jns'
-	;
+   : 'jns'
+   ;
+
+
 JECXZ
-	:
-	'jecxz'
-	;
+   : 'jecxz'
+   ;
+
+
 JNG
-	:
-	'jng'
-	;
+   : 'jng'
+   ;
+
+
 MOVZX
-	:
-	'movzx'
-	;
+   : 'movzx'
+   ;
+
+
 BSF
-	:
-	'bsf'
-	;
+   : 'bsf'
+   ;
+
+
 BSR
-	:
-	'bsr'
-	;
+   : 'bsr'
+   ;
+
+
 LES
-	:
-	'les'
-	;
+   : 'les'
+   ;
+
+
 LEA
-	:
-	'lea'
-	;
+   : 'lea'
+   ;
+
+
 LDS
-	:
-	'lds'
-	;
+   : 'lds'
+   ;
+
+
 INS
-	:
-	'ins'
-	;
+   : 'ins'
+   ;
+
+
 OUTS
-	:
-	'outs'
-	;
+   : 'outs'
+   ;
+
+
 XADD
-	:
-	'xadd'
-	;
+   : 'xadd'
+   ;
+
+
 CMPXCHG
-	:
-	'cmpxchg'
-	;
+   : 'cmpxchg'
+   ;
+
+
 SHL
-	:
-	'shl'
-	;
+   : 'shl'
+   ;
+
+
 SHR
-	:
-	'shr'
-	;
+   : 'shr'
+   ;
+
+
 ROR
-	:
-	'ror'
-	;
+   : 'ror'
+   ;
+
+
 ROL
-	:
-	'rol'
-	;
+   : 'rol'
+   ;
+
+
 RCL
-	:
-	'rcl'
-	;
+   : 'rcl'
+   ;
+
+
 SAL
-	:
-	'sal'
-	;
+   : 'sal'
+   ;
+
+
 RCR
-	:
-	'rcr'
-	;
+   : 'rcr'
+   ;
+
+
 SAR
-	:
-	'sar'
-	;
+   : 'sar'
+   ;
+
+
 SHRD
-	:
-	'shrd'
-	;
+   : 'shrd'
+   ;
+
+
 SHLD
-	:
-	'shld'
-	;
+   : 'shld'
+   ;
+
+
 BTR
-	:
-	'btr'
-	;
+   : 'btr'
+   ;
+
+
 BT
-	:
-	'bt'
-	;
+   : 'bt'
+   ;
+
+
 BTC
-	:
-	'btc'
-	;
+   : 'btc'
+   ;
+
+
 CALL
-	:
-	'call'
-	;
+   : 'call'
+   ;
+
+
 INT
-	:
-	'int'
-	;
+   : 'int'
+   ;
+
+
 RETN
-	:
-	'retn'
-	;
+   : 'retn'
+   ;
+
+
 RET
-	:
-	'ret'
-	;
+   : 'ret'
+   ;
+
+
 RETF
-	:
-	'retf'
-	;
+   : 'retf'
+   ;
+
+
 IN
-	:
-	'in'
-	;
+   : 'in'
+   ;
+
+
 OUT
-	:
-	'out'
-	;
+   : 'out'
+   ;
+
+
 REP
-	:
-	'rep'
-	;
+   : 'rep'
+   ;
+
+
 REPE
-	:
-	'repe'
-	;
+   : 'repe'
+   ;
+
+
 REPZ
-	:
-	'repz'
-	;
+   : 'repz'
+   ;
+
+
 REPNE
-	:
-	'repne'
-	;
+   : 'repne'
+   ;
+
+
 REPNZ
-	:
-	'repnz'
-	;
+   : 'repnz'
+   ;
+
+
 ALPHA
-	:
-	'.alpha'
-	;
+   : '.alpha'
+   ;
+
+
 CONST
-	:
-	'.const'
-	;
+   : '.const'
+   ;
+
+
 CREF
-	:
-	'.cref'
-	;
+   : '.cref'
+   ;
+
+
 XCREF
-	:
-	'.xcref'
-	;
+   : '.xcref'
+   ;
+
+
 DATA
-	:
-	'data'
-	;
+   : 'data'
+   ;
+
+
 DATA2
-	:
-	'data?'
-	;
+   : 'data?'
+   ;
+
+
 DOSSEG
-	:
-	'dosseg'
-	;
+   : 'dosseg'
+   ;
+
+
 ERR
-	:
-	'.err'
-	;
+   : '.err'
+   ;
+
+
 ERR1
-	:
-	'.err1'
-	;
+   : '.err1'
+   ;
+
+
 ERR2
-	:
-	'.err2'
-	;
+   : '.err2'
+   ;
+
+
 ERRE
-	:
-	'.erre'
-	;
+   : '.erre'
+   ;
+
+
 ERRNZ
-	:
-	'.errnz'
-	;
+   : '.errnz'
+   ;
+
+
 ERRDEF
-	:
-	'.errdef'
-	;
+   : '.errdef'
+   ;
+
+
 ERRNDEF
-	:
-	'.errndef'
-	;
+   : '.errndef'
+   ;
+
+
 ERRB
-	:
-	'.errb'
-	;
+   : '.errb'
+   ;
+
+
 ERRNB
-	:
-	'.errnb'
-	;
+   : '.errnb'
+   ;
+
+
 ERRIDN
-	:
-	'.erridn[i]'
-	;
+   : '.erridn[i]'
+   ;
+
+
 ERRDIF
-	:
-	'.errdif[i]'
-	;
+   : '.errdif[i]'
+   ;
+
+
 EVEN
-	:
-	'even'
-	;
+   : 'even'
+   ;
+
+
 LIST
-	:
-	'.list'
-	;
+   : '.list'
+   ;
+
+
 WIDTH
-	:
-	'width'
-	;
+   : 'width'
+   ;
+
+
 MASK
-	:
-	'mask'
-	;
+   : 'mask'
+   ;
+
+
 SEQ
-	:
-	'.seq'
-	;
+   : '.seq'
+   ;
+
+
 XLIST
-	:
-	'.xlist'
-	;
+   : '.xlist'
+   ;
+
+
 EXIT
-	:
-	'.exit'
-	;
+   : '.exit'
+   ;
+
+
 MODEL
-	:
-	'.model'
-	;
+   : '.model'
+   ;
+
+
 BYTE
-	:
-	'byte'
-	;
+   : 'byte'
+   ;
+
+
 SBYTE
-	:
-	'sbyte'
-	;
+   : 'sbyte'
+   ;
+
+
 DB
-	:
-	'db'
-	;
+   : 'db'
+   ;
+
+
 WORD
-	:
-	'word'
-	;
+   : 'word'
+   ;
+
+
 SWORD
-	:
-	'sword'
-	;
+   : 'sword'
+   ;
+
+
 DW
-	:
-	'dw'
-	;
+   : 'dw'
+   ;
+
+
 DWORD
-	:
-	'dword'
-	;
+   : 'dword'
+   ;
+
+
 SDWORD
-	:
-	'sdword'
-	;
+   : 'sdword'
+   ;
+
+
 DD
-	:
-	'dd'
-	;
+   : 'dd'
+   ;
+
+
 FWORD
-	:
-	'fword'
-	;
+   : 'fword'
+   ;
+
+
 DF
-	:
-	'df'
-	;
+   : 'df'
+   ;
+
+
 QWORD
-	:
-	'qword'
-	;
+   : 'qword'
+   ;
+
+
 DQ
-	:
-	'dq'
-	;
+   : 'dq'
+   ;
+
+
 TBYTE
-	:
-	'tbyte'
-	;
+   : 'tbyte'
+   ;
+
+
 DT
-	:
-	'dt'
-	;
+   : 'dt'
+   ;
+
+
 REAL4
-	:
-	'real4'
-	;
+   : 'real4'
+   ;
+
+
 REAL8
-	:
-	'real8'
-	;
+   : 'real8'
+   ;
+
+
 REAL
-	:
-	'real'
-	;
+   : 'real'
+   ;
+
+
 FAR
-	:
-	'far'
-	;
+   : 'far'
+   ;
+
+
 NEAR
-	:
-	'near'
-	;
+   : 'near'
+   ;
+
+
 PROC
-	:
-	'proc'
-	;
+   : 'proc'
+   ;
+
+
 QUESTION
-	:
-	'?'
-	;
-TIMES:'times'
-	;
+   : '?'
+   ;
 
-//Special tokens	
-Hexnum 
-	: 
-	HexDigit+ ('h'|'H')
-	;
 
-Integer 
-	: 
-	(Digit+)
-	;
+TIMES
+   : 'times'
+   ;
 
-Octalnum 
-	: 
-	('0'..'7')+ ('o'|'O') 
-	;
 
-fragment HexDigit 
-	: ('0'..'9'|'a'..'f'|'A'..'F') 
-	;
+Hexnum
+   : HexDigit+ ( 'h' | 'H' )
+   ;
+
+
+Integer
+   : ( Digit+ )
+   ;
+
+
+Octalnum
+   : ( '0' .. '7' )+ ( 'o' | 'O' )
+   ;
+
+
+fragment HexDigit
+   : ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
+   ;
+
 
 FloatingPointLiteral
-    :   
-    ('0'..'9')+ '.' ('0'..'9')* Exponent? 
-    |   '.' ('0'..'9')+ Exponent? 
-    |   ('0'..'9')+ Exponent  
-	;
+   : ( '0' .. '9' )+ '.' ( '0' .. '9' )* Exponent? | '.' ( '0' .. '9' )+ Exponent? | ( '0' .. '9' )+ Exponent
+   ;
 
-fragment Exponent 
-	: 
-	('e'|'E') ('+'|'-')? ('0'..'9')+ 
-	;
 
-String	
-	:
-	' \'' ( '\\' . | ~('\\'|'\'') )* '\''
-	;
+fragment Exponent
+   : ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+   ;
+
+
+String
+   : ' \'' ( '\\' . | ~ ( '\\' | '\'' ) )* '\''
+   ;
+
 
 fragment Letter
-	: 
-	('a'..'z' | 'A'..'Z')
-	;
-    
+   : ( 'a' .. 'z' | 'A' .. 'Z' )
+   ;
+
+
 fragment Digit
-	:	
-	'0'..'9'
-	;
+   : '0' .. '9'
+   ;
+
 
 Etiqueta
-	:
-	Identifier (':')
-	;
-		
+   : Identifier ( ':' )
+   ;
+
+
 Separator
-	:	
-	','
-	;
-	
-WS  
-	:  
-	(' '|'\t'|'\n'|'\r') ->skip
-	;
+   : ','
+   ;
+
+
+WS
+   : ( ' ' | '\t' | '\n' | '\r' ) -> skip
+   ;
+
 
 LINE_COMMENT
-    : 
-    ';' ~('\n'|'\r')* '\r'? '\n' ->skip
-    ;
+   : ';' ~ ( '\n' | '\r' )* '\r'? '\n' -> skip
+   ;
