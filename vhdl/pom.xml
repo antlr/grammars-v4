@@ -11,9 +11,6 @@
 	</parent>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<properties>
-		<antlr.version>4.5</antlr.version>
-	</properties>
 	<build>
 		<plugins>
 			<plugin>
