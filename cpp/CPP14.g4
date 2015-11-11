@@ -208,6 +208,7 @@ unaryoperator
 	| '+'
 	| '!'
 	| '~'
+	| '-'
 ;
 
 newexpression
