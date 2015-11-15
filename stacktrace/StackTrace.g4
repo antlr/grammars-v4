@@ -1,3 +1,4 @@
+
 /** A Java stacktrace text grammar for ANTLR v3 
  *  see http://java.sun.com/javase/6/docs/api/java/lang/Throwable.html
  *
@@ -5,10 +6,10 @@
  *
  *  Primary authors: Luca Dall'Olio, Christian Cassano, Gabriele Contini
  */
- /*
+
+/*
     Ported to Antlr4 by Tom Everett <tom@khubla.com>
-*/
-grammar StackTrace;
+*/ grammar StackTrace;
 
 startRule
    : stackTrace EOF
