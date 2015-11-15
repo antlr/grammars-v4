@@ -28,6 +28,7 @@
 		<module>csharp</module>
 		<module>csv</module>
 		<module>dot</module>
+		<module>ecmascript</module>
 		<module>erlang</module>
 		<module>fasta</module>
 		<module>FOL</module>

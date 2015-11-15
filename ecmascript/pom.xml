@@ -19,6 +19,9 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>ECMAScript.g4</grammars>
+					<includes>
+						<include>ECMAScript.g4</include>
+					</includes>	
 				</configuration>
 				<executions>
 					<execution>
