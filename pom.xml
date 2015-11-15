@@ -69,8 +69,7 @@
 		<module>stacktrace</module>
 		<module>stringtemplate</module>
 		<module>suokif</module>
-<!-- Grammars-V4 issue 238 -->
-<!--		<module>swift</module>-->
+		<module>swift</module>
 		<module>tnsnames</module>
 		<module>tnt</module>
 		<module>turtle</module>
