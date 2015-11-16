@@ -167,9 +167,10 @@ platform_name : 'iOS' | 'iOSApplicationExtension'
  | 'watchOS'
  ;
 
-platform_version : Decimal_digits // TODO not sure what to do about this error "Implicit definitionsof token Decimal_digits in parser"
- | Decimal_digits '.' Decimal_digits
- | Decimal_digits '.' Decimal_digits '.' Decimal_digits
+platform_version
+ : Pure_decimal_digits
+ | Pure_decimal_digits '.' Pure_decimal_digits
+ | Pure_decimal_digits '.' Pure_decimal_digits '.' Pure_decimal_digits
  ;
 
 // GRAMMAR OF A THROW STATEMENT
@@ -287,6 +288,11 @@ import_path_identifier : identifier | operator  ;
 
 constant_declaration : attributes? declaration_modifiers? 'let' pattern_initializer_list  ;
 pattern_initializer_list : pattern_initializer (',' pattern_initializer)* ;
+
+/** rule is ambiguous. can match "var x = 1" with x as pattern and 1 as initializer
+ *  OR with x = 1 as pattern where the pattern is a expression_pattern.
+ *  ANTLR resolves in favor or first choice: pattern is x, 1 is initializer.
+ */
 pattern_initializer : pattern initializer? ;
 initializer : '=' expression  ;
 
@@ -556,7 +562,8 @@ expression_list : expression (',' expression)* ;
 // GRAMMAR OF A PREFIX EXPRESSION
 
 prefix_expression
-  : prefix_operator? postfix_expression
+  : prefix_operator postfix_expression
+  | postfix_expression
   | in_out_expression
   ;
 
@@ -604,9 +611,11 @@ primary_expression
  | superclass_expression
  | closure_expression
  | parenthesized_expression
-// | implicit_member_expression disallow as ambig with explicit member expr in postfix_expression
+ | implicit_member_expression
  | wildcard_expression
  ;
+
+implicit_member_expression : '.' identifier ;
 
 // GRAMMAR OF A LITERAL EXPRESSION
 
@@ -676,7 +685,7 @@ expression_element : expression | identifier ':' expression  ;
 
 wildcard_expression : '_'  ;
 
-// GRAMMAR OF A POSTFIX EXPRESSION
+// GRAMMAR OF A POSTFIX EXPRESSION (inlined many rules from spec to avoid indirect left-recursion)
 
 postfix_expression
  : primary_expression                                             # primary
@@ -684,8 +693,7 @@ postfix_expression
  | postfix_expression parenthesized_expression                    # function_call_expression
  | postfix_expression parenthesized_expression? trailing_closure  # function_call_with_closure_expression
  | postfix_expression '.' 'init'                                  # initializer_expression
- // TODO: don't allow '_' here in Decimal_literal:
- | postfix_expression '.' Decimal_literal                         # explicit_member_expression1
+ | postfix_expression '.' Pure_decimal_digits                     # explicit_member_expression1
  | postfix_expression '.' identifier generic_argument_clause?     # explicit_member_expression2
  | postfix_expression '.' 'self'                                  # postfix_self_expression
  | postfix_expression '.' 'dynamicType'                           # dynamic_type_expression
@@ -694,21 +702,7 @@ postfix_expression
  | postfix_expression '?'                                         # optional_chaining_expression
  ;
 
-// GRAMMAR OF A FUNCTION CALL EXPRESSION ** Note - commented out expressions caused recursive issues in postfix_expression
-
-//function_call_expression
-//  : postfix_expression parenthesized_expression
-//  | postfix_expression parenthesized_expression? trailing_closure
-//  ;
-
 trailing_closure : closure_expression ;
-
-//initializer_expression : postfix_expression '.' 'init' ;
-
-//explicit_member_expression
-//  : postfix_expression '.' Decimal_literal // TODO: don't allow '_' here in Decimal_literal
-//  | postfix_expression '.' identifier generic_argument_clause?
-//  ;
 
 //postfix_self_expression : postfix_expression '.' 'self' ;
 
@@ -951,11 +945,11 @@ postfix_operator : operator ;
 
 fragment Identifier_characters : Identifier_character+ ;
 
-Implicit_parameter_name : '$' Decimal_literal ; // TODO: don't allow '_' here
+Implicit_parameter_name : '$' Pure_decimal_digits ;
 
 // GRAMMAR OF A LITERAL
 
-literal : numeric_literal | String_literal | boolean_literal | nil_literal  ;
+literal : numeric_literal | string_literal | boolean_literal | nil_literal  ;
 
 numeric_literal : '-'? integer_literal | '-'? Floating_point_literal ;
 boolean_literal : 'true' | 'false' ;
@@ -967,6 +961,7 @@ integer_literal
  : Binary_literal
  | Octal_literal
  | Decimal_literal
+ | Pure_decimal_digits
  | Hexadecimal_literal
  ;
 
@@ -980,9 +975,9 @@ fragment Octal_digit : [0-7] ;
 fragment Octal_literal_character : Octal_digit | '_'  ;
 fragment Octal_literal_characters : Octal_literal_character+ ;
 
-Decimal_literal : Decimal_digit Decimal_literal_characters? ;
+Decimal_literal		: [0-9] [0-9_]* ;
+Pure_decimal_digits : [0-9]+ ;
 fragment Decimal_digit : [0-9] ;
-fragment Decimal_digits : Decimal_digit+ ;
 fragment Decimal_literal_character : Decimal_digit | '_'  ;
 fragment Decimal_literal_characters : Decimal_literal_character+ ;
 
@@ -1007,7 +1002,7 @@ fragment Sign : [+\-] ;
 
 // GRAMMAR OF A STRING LITERAL
 
-String_literal
+string_literal
   : Static_string_literal
   | Interpolated_string_literal
   ;
@@ -1016,25 +1011,26 @@ fragment Static_string_literal : '"' Quoted_text? '"' ;
 fragment Quoted_text : Quoted_text_item+ ;
 fragment Quoted_text_item
   : Escaped_character
-  | '\\(' expression ')'
   | ~["\n\r\\]
   ;
 
 fragment
-Escaped_character : '\\' [0\\tnr"']
- | '\\x' Hexadecimal_digit Hexadecimal_digit
- | '\\u' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit
- | '\\U' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit
-;
+Escaped_character
+  : '\\' [0\\tnr"']
+  | '\\x' Hexadecimal_digit Hexadecimal_digit
+  | '\\u' '{' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit '}'
+  | '\\u' '{' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit '}'
+  ;
 
-fragment Interpolated_string_literal : '"' Interpolated_text? '"' ;
-fragment Interpolated_text : Interpolated_text_item Interpolated_text? ;
-fragment Interpolated_text_item : '\\(' expression ')' | Quoted_text_item ;
-fragment Interpolated_text_item : interpolated_expression | Quoted_text_item ;
-fragment interpolated_expression : '\\(' expression ')' ;
+Interpolated_string_literal : '"' Interpolated_text_item* '"' ;
+fragment
+Interpolated_text_item
+  : '\\(' (Interpolated_string_literal | Interpolated_text_item)+ ')' // nested strings allowed
+  | Quoted_text_item
+  ;
 
-WS : [ \n\r\t\u000B\u000C\u0000]+ -> channel(HIDDEN) ;
+WS : [ \n\r\t\u000B\u000C\u0000]+				-> channel(HIDDEN) ;
 
-Block_comment : '/*' (Block_comment|.)*? '*/' -> channel(HIDDEN) ; // nesting allowed
+Block_comment : '/*' (Block_comment|.)*? '*/'	-> channel(HIDDEN) ; // nesting comments allowed
 
-Line_comment : '//' .*? '\n' -> channel(HIDDEN) ;
+Line_comment : '//' .*? '\n'					-> channel(HIDDEN) ;
