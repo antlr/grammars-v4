@@ -470,7 +470,7 @@ subscript_result : '->' attributes? type  ;
 operator_declaration : prefix_operator_declaration | postfix_operator_declaration | infix_operator_declaration  ;
 prefix_operator_declaration : 'prefix' 'operator' operator '{' '}'  ;
 postfix_operator_declaration : 'postfix' 'operator' operator '{' '}'  ;
-infix_operator_declaration : 'infix' 'operator' operator '{' infix_operator_attributes '}'  ; // NOTE used to be infix_operator_attributes?
+infix_operator_declaration : 'infix' 'operator' operator '{' infix_operator_attributes '}' ; // Note: infix_operator_attributes is optional by definition so no ? needed
 infix_operator_attributes : precedence_clause? associativity_clause? ;
 precedence_clause : 'precedence' precedence_level ;
 precedence_level : integer_literal ;
@@ -534,11 +534,8 @@ enum_case_pattern : type_identifier? '.' enum_case_name tuple_pattern? ;
 optional_pattern : identifier_pattern '?' ;
 
 // GRAMMAR OF A TYPE CASTING PATTERN
-// ** NOTE ** I tried including these into the above pattern but was getting recursive errors
 
-type_casting_pattern : is_pattern | as_pattern  ;
-is_pattern : 'is' type  ;
-as_pattern : pattern 'as' type  ;
+// integrated directly into pattern to avoid indirect left-recursion
 
 // GRAMMAR OF AN EXPRESSION PATTERN
 
@@ -572,7 +569,7 @@ expression_list : expression (',' expression)* ;
 // GRAMMAR OF A PREFIX EXPRESSION
 
 prefix_expression
-  : prefix_operator postfix_expression
+  : Prefix_operator postfix_expression
   | postfix_expression
   | in_out_expression
   ;
@@ -587,7 +584,7 @@ try_operator : 'try' | 'try' '?' | 'try' '!' ;
 
 
 binary_expression
-  : binary_operator prefix_expression
+  : Binary_operator prefix_expression
 // as far as I can tell, assignment is not a valid operator as it has no return type
 // it is more properly a statement; commenting this next line out and moving to assignment_statement:
 // | assignment_operator try_operator? prefix_expression
@@ -683,14 +680,10 @@ capture_list_item : capture_specifier? expression ;
 
 capture_specifier : 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)'  ;
 
-// GRAMMAR OF A IMPLICIT MEMBER EXPRESSION
-
-//implicit_member_expression : '.' identifier  ; NOTE this was causing recursion issues when included in primary_expression
-
 // GRAMMAR OF A PARENTHESIZED EXPRESSION
 
 parenthesized_expression : '(' expression_element_list? ')'  ;
-expression_element_list : expression_element | expression_element ',' expression_element_list  ;
+expression_element_list : expression_element (',' expression_element_list)* ;
 expression_element : expression | identifier ':' expression  ;
 
 // GRAMMAR OF A WILDCARD EXPRESSION
@@ -701,7 +694,7 @@ wildcard_expression : '_'  ;
 
 postfix_expression
  : primary_expression                                             # primary
- | postfix_expression postfix_operator                            # postfix_operation
+ | postfix_expression Postfix_operator                            # postfix_operation
  | postfix_expression parenthesized_expression                    # function_call_expression
  | postfix_expression parenthesized_expression? trailing_closure  # function_call_with_closure_expression
  | postfix_expression '.' 'init'                                  # initializer_expression
@@ -715,26 +708,6 @@ postfix_expression
  ;
 
 trailing_closure : closure_expression ;
-
-//postfix_self_expression : postfix_expression '.' 'self' ;
-
-// GRAMMAR OF A DYNAMIC TYPE EXPRESSION
-
-//dynamic_type_expression : postfix_expression '.' 'dynamicType' ;
-
-// GRAMMAR OF A SUBSCRIPT EXPRESSION
-
-//subscript_expression : postfix_expression '[' expression_list ']' ;
-
-// GRAMMAR OF A FORCED_VALUE EXPRESSION
-
-//forced_value_expression : postfix_expression '!' ;
-
-// GRAMMAR OF AN OPTIONAL_CHAINING EXPRESSION
-
-//optional_chaining_expression : postfix_expression '?' ;
-
-// Types
 
 // GRAMMAR OF A TYPE
 
@@ -829,7 +802,7 @@ Identifier
  | Implicit_parameter_name
  ;
 
-identifier_list : identifier | identifier ',' identifier_list  ;
+identifier_list : identifier (',' identifier_list)* ;
 
 fragment Identifier_head : [a-zA-Z_]
  | '\u00A8' | '\u00AA' | '\u00AD' | '\u00AF' | [\u00B2-\u00B5] | [\u00B7-\u00BA]
@@ -855,6 +828,7 @@ fragment Identifier_character : [0-9]
  | Identifier_head
  ;
 
+fragment Identifier_characters : Identifier_character+ ;
 
 context_sensitive_keyword :
  'associativity' | 'didSet' | 'get' | 'infix' | 'inout' | 'left' | 'mutating' | 'none' |
@@ -864,25 +838,64 @@ context_sensitive_keyword :
 
 // GRAMMAR OF OPERATORS
 
-// split the operators out into the individual tokens as some of those tokens
-// are also referenced individually. For example, type signatures use
-// <...>.
-//operator
-//  : Operator_head Operator_character*
-//  | '..' ('.'|Operator_character)*
-//  ;
+/*
+From doc on operators:
+ The tokens =, ->, //, /*, *\/ [without the escape on \/], .,
+ the prefix operators <, &, and ?, the infix
+ operator ?, and the postfix operators >, !, and ? are reserved. These tokens
+ can’t be overloaded, nor can they be used as custom operators.
+
+ The whitespace around an operator is used to determine whether an operator
+ is used as a prefix operator, a postfix operator, or a binary operator.
+
+	* If an operator has whitespace around both sides or around neither
+	  side, it is treated as a binary operator. As an example, the +
+	  operator in a+b and a + b is treated as a binary operator.
+
+	* If an operator has whitespace on the left side only, it is treated
+	  as a prefix unary operator. As an example, the ++ operator in a ++b
+	  is treated as a prefix unary operator.
+
+	* If an operator has whitespace on the right side only, it is treated
+	  as a postfix unary operator. As an example, the ++ operator in a++ b
+	  is treated as a postfix unary operator.
+
+	* If an operator has no whitespace on the left but is followed
+	  immediately by a dot (.), it is treated as a postfix unary
+	  operator. As an example, the ++ operator in a++.b is treated as a
+	  postfix unary operator (a++ .b rather than a ++ .b).
+
+ For the purposes of these rules, the characters (, [, and { before an operator,
+ the characters ), ], and } after an operator, and the characters ,, ;, and :
+ are also considered whitespace.
+
+ There is one caveat to the rules above. If the ! or ? predefined operator has
+ no whitespace on the left, it is treated as a postfix operator, regardless of
+ whether it has whitespace on the right. To use the ? as the optional-chaining
+ operator, it must not have whitespace on the left. To use it in the ternary
+ conditional (? :) operator, it must have whitespace around both sides.
+
+ In certain constructs, operators with a leading < or > may be split
+ into two or more tokens. The remainder is treated the same way and may
+ be split again. As a result, there is no need to use whitespace to
+ disambiguate between the closing > characters in constructs like
+ Dictionary<String, Array<Int>>. In this example, the closing >
+ characters are not treated as a single token that may then be
+ misinterpreted as a bit shift >> operator.
+*/
 
 operator : Operator ;
 
 Operator
   : Operator_head Operator_character*
-  | '..' ('.'|Operator_character)*
+  | Dot_operator_head Dot_operator_character*
   ;
 
 Operator_head
-  : '/' | '=' | '\\' | '-' | '+' | '!' | '*' | '%' | '<' | '>' | '&' | '|' | '^' | '!' | '.'
+  : '/' | '=' | '-' | '+' | '!' | '*' | '%' | '<' | '>' | '&' | '|' | '^' | '~' | '?'
   | [\u00A1-\u00A7]
-  | [\u00A9\u00AB\u00AC\u00AE]
+  | [\u00A9\u00AB]
+  | [\u00AC\u00AE]
   | [\u00B0-\u00B1\u00B6\u00BB\u00BF\u00D7\u00F7]
   | [\u2016-\u2017\u2020-\u2027]
   | [\u2030-\u203E]
@@ -906,56 +919,36 @@ Operator_character
   //| [\uE0100–\uE01EF]  ANTLR can't do >16bit char
   ;
 
-Dot_operator_head : '..' ;
-
-Operator_characters : Operator_character Operator_characters? ;
-
-Dot_operator_character : '.' | Operator_character ;
-Dot_operator_characters : Dot_operator_character Dot_operator_characters? ;
-
-
-// WHITESPACE scariness:
-
-/* http://tinyurl.com/oalzfus
-"If an operator has no whitespace on the left but is followed
-immediately by a dot (.), it is treated as a postfix unary
-operator. As an example, the ++ operator in a++.b is treated as a
-postfix unary operator (a++ . b rather than a ++ .b).  For the
-purposes of these rules, the characters (, [, and { before an
-operator, the characters ), ], and } after an operator, and the
-characters ,, ;, and : are also considered whitespace.
-
-There is one caveat to the rules above. If the ! or ? operator has no
-whitespace on the left, it is treated as a postfix operator,
-regardless of whether it has whitespace on the right. To use the ?
-operator as syntactic sugar for the Optional type, it must not have
-whitespace on the left. To use it in the conditional (? :) operator,
-it must have whitespace around both sides."
- */
+fragment
+Dot_operator_head 		: '..' ;
+fragment
+Dot_operator_character  : '.' | Operator_character ;
 
 /**
  "If an operator has whitespace around both sides or around neither side,
  it is treated as a binary operator. As an example, the + operator in a+b
   and a + b is treated as a binary operator."
 */
-binary_operator : operator ;
+Binary_operator : Operator ;
 
 /**
  "If an operator has whitespace on the left side only, it is treated as a
  prefix unary operator. As an example, the ++ operator in a ++b is treated
  as a prefix unary operator."
 */
-prefix_operator : operator ; // only if space on left but not right
+Prefix_operator : Operator ; // only if space on left but not right
 
 /**
  "If an operator has whitespace on the right side only, it is treated as a
  postfix unary operator. As an example, the ++ operator in a++ b is treated
  as a postfix unary operator."
+
+ "If an operator has no whitespace on the left but is followed immediately
+ by a dot (.), it is treated as a postfix unary operator. As an example,
+ the ++ operator in a++.b is treated as a postfix unary operator (a++ .b
+ rather than a ++ .b)."
  */
-postfix_operator : operator ;
-
-
-fragment Identifier_characters : Identifier_character+ ;
+Postfix_operator : Operator ;
 
 Implicit_parameter_name : '$' Pure_decimal_digits ;
 
@@ -1045,4 +1038,4 @@ WS : [ \n\r\t\u000B\u000C\u0000]+				-> channel(HIDDEN) ;
 
 Block_comment : '/*' (Block_comment|.)*? '*/'	-> channel(HIDDEN) ; // nesting comments allowed
 
-Line_comment : '//' .*? '\n'					-> channel(HIDDEN) ;
+Line_comment : '//' .*? ('\n'|EOF)				-> channel(HIDDEN) ;
