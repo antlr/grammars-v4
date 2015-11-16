@@ -28,7 +28,7 @@
 		<module>creole</module>
 		<module>csharp</module>
 		<module>csv</module>
-		<module>dot</module>		
+		<module>dot</module>
 		<module>erlang</module>
 		<module>fasta</module>
 		<module>FOL</module>
@@ -50,7 +50,7 @@
 		<module>mumath</module>
 		<module>mumps</module>
 		<module>mysql</module>
-		<module>objc</module>		
+		<module>objc</module>
 		<module>pascal</module>
 		<module>pcre</module>
 		<module>peoplecode</module>
@@ -70,7 +70,7 @@
 		<module>stringtemplate</module>
 		<module>suokif</module>
 <!-- Grammars-V4 issue 238 -->
-<!--		<module>swift</module>-->
+		<module>swift</module>
 		<module>tnsnames</module>
 		<module>tnt</module>
 		<module>turtle</module>

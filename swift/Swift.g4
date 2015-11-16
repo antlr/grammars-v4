@@ -31,6 +31,56 @@
  */
 grammar Swift; // 2.1
 
+@parser::members {
+	/**
+	 "If an operator has whitespace around both sides or around neither side,
+	 it is treated as a binary operator. As an example, the + operator in a+b
+	  and a + b is treated as a binary operator."
+	*/
+	public boolean isBinaryOp() {
+		return true;
+	}
+
+	/**
+	 "If an operator has whitespace on the left side only, it is treated as a
+	 prefix unary operator. As an example, the ++ operator in a ++b is treated
+	 as a prefix unary operator."
+	*/
+	public boolean isPrefixOp() {
+		return true;
+	}
+
+	/**
+	 "If an operator has whitespace on the right side only, it is treated as a
+	 postfix unary operator. As an example, the ++ operator in a++ b is treated
+	 as a postfix unary operator."
+
+	 "If an operator has no whitespace on the left but is followed immediately
+	 by a dot (.), it is treated as a postfix unary operator. As an example,
+	 the ++ operator in a++.b is treated as a postfix unary operator (a++ .b
+	 rather than a ++ .b)."
+	 */
+	public boolean isPostfixOp() {
+		return true;
+	}
+
+	public boolean isAndAnd() {
+		return true;
+	}
+
+	public boolean isOrOr() {
+		return true;
+	}
+
+	public boolean isArrow() {
+		return true;
+	}
+
+	public boolean isRange() {
+		return true;
+	}
+}
+
 top_level : (statement | expression)* EOF ;
 
 // Statements
@@ -213,8 +263,8 @@ build_configuration : platform_testing_function
  | boolean_literal
  | '(' build_configuration ')'
  | '!' build_configuration
- | build_configuration '&&' build_configuration
- | build_configuration '||' build_configuration
+ | build_configuration Build_AND build_configuration
+ | build_configuration Build_OR build_configuration
  ;
 
 platform_testing_function : 'os' '(' operating_system ')'
@@ -347,7 +397,7 @@ function_name : identifier |  operator  ;
 function_signature : parameter_clauses 'throws'? function_result?
  | parameter_clauses 'rethrows' function_result?
  ;
-function_result : '->' attributes? type  ;
+function_result : Arrow_operator attributes? type  ;
 function_body : code_block  ;
 parameter_clauses : parameter_clause parameter_clauses? ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
@@ -355,7 +405,7 @@ parameter_list : parameter | parameter ',' parameter_list  ;
 parameter : 'let'? external_parameter_name? local_parameter_name type_annotation default_argument_clause?
  | 'var' external_parameter_name? local_parameter_name type_annotation default_argument_clause?
  | 'inout' external_parameter_name? local_parameter_name type_annotation
- | external_parameter_name? local_parameter_name type_annotation '...'
+ | external_parameter_name? local_parameter_name type_annotation Range_operator
  ;
 external_parameter_name : identifier | '_'  ;
 local_parameter_name : identifier | '_'  ;
@@ -463,7 +513,7 @@ subscript_declaration
  ;
 
 subscript_head : attributes? declaration_modifiers? 'subscript' parameter_clause  ;
-subscript_result : '->' attributes? type  ;
+subscript_result : Arrow_operator attributes? type  ;
 
 // GRAMMAR OF AN OPERATOR DECLARATION
 
@@ -714,8 +764,8 @@ trailing_closure : closure_expression ;
 type
  : '[' type ']'
  | '[' type ':' type ']'
- | type 'throws'? '->' type
- | type 'rethrows' '->' type
+ | type 'throws'? Arrow_operator type
+ | type 'rethrows' Arrow_operator type
  | type_identifier
  | tuple_type
  | type '?'
@@ -741,7 +791,7 @@ type_name : identifier ;
 // GRAMMAR OF A TUPLE TYPE
 
 tuple_type : '(' tuple_type_body? ')'  ;
-tuple_type_body : tuple_type_element_list '...'? ;
+tuple_type_body : tuple_type_element_list Range_operator? ;
 tuple_type_element_list : tuple_type_element | tuple_type_element ',' tuple_type_element_list  ;
 tuple_type_element : attributes? 'inout'? type | 'inout'? element_name type_annotation ;
 element_name : identifier  ;
@@ -749,8 +799,8 @@ element_name : identifier  ;
 // GRAMMAR OF A FUNCTION TYPE
 
 //function_type
-// : type 'throws'? '->' type
-// | type 'rethrows' '->' type
+// : type 'throws'? Arrow type
+// | type 'rethrows' Arrow type
 // ;
 
 // GRAMMAR OF AN ARRAY TYPE
@@ -884,8 +934,35 @@ From doc on operators:
  misinterpreted as a bit shift >> operator.
 */
 
-operator : Operator ;
+operator : Binary_operator | Prefix_operator | Postfix_operator ;
 
+/**
+ "If an operator has whitespace around both sides or around neither side,
+ it is treated as a binary operator. As an example, the + operator in a+b
+  and a + b is treated as a binary operator."
+*/
+Binary_operator : Operator {SwiftLexerSupport.isBinaryOp()}? ;
+
+/**
+ "If an operator has whitespace on the left side only, it is treated as a
+ prefix unary operator. As an example, the ++ operator in a ++b is treated
+ as a prefix unary operator."
+*/
+Prefix_operator : Operator {SwiftLexerSupport.isPrefixOp()}? ;
+
+/**
+ "If an operator has whitespace on the right side only, it is treated as a
+ postfix unary operator. As an example, the ++ operator in a++ b is treated
+ as a postfix unary operator."
+
+ "If an operator has no whitespace on the left but is followed immediately
+ by a dot (.), it is treated as a postfix unary operator. As an example,
+ the ++ operator in a++.b is treated as a postfix unary operator (a++ .b
+ rather than a ++ .b)."
+ */
+Postfix_operator : Operator {SwiftLexerSupport.isPostfixOp()}? ;
+
+fragment
 Operator
   : Operator_head Operator_character*
   | Dot_operator_head Dot_operator_character*
@@ -924,31 +1001,10 @@ Dot_operator_head 		: '..' ;
 fragment
 Dot_operator_character  : '.' | Operator_character ;
 
-/**
- "If an operator has whitespace around both sides or around neither side,
- it is treated as a binary operator. As an example, the + operator in a+b
-  and a + b is treated as a binary operator."
-*/
-Binary_operator : Operator ;
-
-/**
- "If an operator has whitespace on the left side only, it is treated as a
- prefix unary operator. As an example, the ++ operator in a ++b is treated
- as a prefix unary operator."
-*/
-Prefix_operator : Operator ; // only if space on left but not right
-
-/**
- "If an operator has whitespace on the right side only, it is treated as a
- postfix unary operator. As an example, the ++ operator in a++ b is treated
- as a postfix unary operator."
-
- "If an operator has no whitespace on the left but is followed immediately
- by a dot (.), it is treated as a postfix unary operator. As an example,
- the ++ operator in a++.b is treated as a postfix unary operator (a++ .b
- rather than a ++ .b)."
- */
-Postfix_operator : Operator ;
+Build_AND 		: '&' '&'     {SwiftLexerSupport.isAndAnd()}? ;
+Build_OR  		: '|' '|' 	  {SwiftLexerSupport.isOrOr()}? ;
+Arrow_operator	: '-' '>' 	  {SwiftLexerSupport.isArrow()}? ;
+Range_operator	: '.' '.' '.' {SwiftLexerSupport.isRange()}? ;
 
 Implicit_parameter_name : '$' Pure_decimal_digits ;
 
@@ -1012,7 +1068,7 @@ string_literal
   | Interpolated_string_literal
   ;
 
-fragment Static_string_literal : '"' Quoted_text? '"' ;
+Static_string_literal : '"' Quoted_text? '"' ;
 fragment Quoted_text : Quoted_text_item+ ;
 fragment Quoted_text_item
   : Escaped_character
