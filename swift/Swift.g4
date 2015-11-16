@@ -39,6 +39,7 @@ top_level : (statement | expression)* EOF ;
 
 statement
  : expression ';'?
+ | assignment_statement ';'?
  | declaration ';'?
  | loop_statement ';'?
  | branch_statement ';'?
@@ -50,6 +51,14 @@ statement
  ;
 
 statements : statement+ ;
+
+/** A naked '=' op is not part of a valid expression so I'm making it a statement;
+ *  see comment on binary_expression.  It also resolves ambiguity between
+ *  rule pattern's expression_pattern alt and pattern_initializer.
+ */
+assignment_statement
+ : try_operator? prefix_expression  assignment_operator try_operator? prefix_expression
+ ;
 
 // GRAMMAR OF A LOOP STATEMENT
 
@@ -63,7 +72,7 @@ loop_statement : for_statement
 
 for_statement
  : 'for' for_init? ';' expression? ';' expression? code_block
- | 'for' '(' for_init?';' expression? ';' expression? ')' code_block
+ | 'for' '(' for_init? ';' expression? ';' expression? ')' code_block
  ;
 
 for_init : variable_declaration | expression_list  ;
@@ -289,8 +298,8 @@ import_path_identifier : identifier | operator  ;
 constant_declaration : attributes? declaration_modifiers? 'let' pattern_initializer_list  ;
 pattern_initializer_list : pattern_initializer (',' pattern_initializer)* ;
 
-/** rule is ambiguous. can match "var x = 1" with x as pattern and 1 as initializer
- *  OR with x = 1 as pattern where the pattern is a expression_pattern.
+/** rule is ambiguous. can match "var x = 1" with x as pattern
+ *  OR with x as expression_pattern.
  *  ANTLR resolves in favor or first choice: pattern is x, 1 is initializer.
  */
 pattern_initializer : pattern initializer? ;
@@ -533,6 +542,7 @@ as_pattern : pattern 'as' type  ;
 
 // GRAMMAR OF AN EXPRESSION PATTERN
 
+/** Doc says "Expression patterns appear only in switch statement case labels." */
 expression_pattern : expression  ;
 
 // Attributes
@@ -578,7 +588,9 @@ try_operator : 'try' | 'try' '?' | 'try' '!' ;
 
 binary_expression
   : binary_operator prefix_expression
-  | assignment_operator try_operator? prefix_expression
+// as far as I can tell, assignment is not a valid operator as it has no return type
+// it is more properly a statement; commenting this next line out and moving to assignment_statement:
+// | assignment_operator try_operator? prefix_expression
   | conditional_operator try_operator? prefix_expression
   | type_casting_operator
   ;
