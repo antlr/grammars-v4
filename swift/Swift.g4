@@ -270,7 +270,7 @@ declarations : declaration declarations? ;
 
 // GRAMMAR OF A TOP-LEVEL DECLARATION
 
-//top_level_declaration : statements? ;
+top_level_declaration : statements? ;
 
 // GRAMMAR OF A CODE BLOCK
 
