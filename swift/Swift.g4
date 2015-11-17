@@ -31,24 +31,6 @@
  */
 grammar Swift; // 2.1
 
-@parser::members {
-	public boolean isAndAnd() {
-		return true;
-	}
-
-	public boolean isOrOr() {
-		return true;
-	}
-
-	public boolean isArrow() {
-		return true;
-	}
-
-	public boolean isRange() {
-		return true;
-	}
-}
-
 top_level : statement* EOF ;
 
 // Statements
@@ -56,8 +38,8 @@ top_level : statement* EOF ;
 // GRAMMAR OF A STATEMENT
 
 statement
- : expression ';'?
- | assignment_statement ';'?
+ : assignment_statement ';'?
+ | expression ';'?
  | declaration ';'?
  | loop_statement ';'?
  | branch_statement ';'?
@@ -106,11 +88,11 @@ while_statement : 'while' condition_clause code_block  ;
 condition_clause : expression
  | expression ',' condition_list
  | condition_list
- | Availability_condition ',' expression
+ | availability_condition ',' expression
  ;
 
 condition_list : condition | condition ',' condition_list ;
-condition : Availability_condition | case_condition | optional_binding_condition ;
+condition : availability_condition | case_condition | optional_binding_condition ;
 case_condition : 'case' pattern initializer where_clause? ;
 optional_binding_condition : optional_binding_head optional_binding_continuation_list? where_clause? ;
 optional_binding_head : 'let' pattern initializer | 'var' pattern initializer ;
@@ -181,19 +163,23 @@ fallthrough_statement : 'fallthrough'  ;
 return_statement : 'return' expression? ;
 
 
-// GRAMMAR OF AN AVAILABILITY CONDITION (match with lexer as single token as we need context for '*')
+// GRAMMAR OF AN AVAILABILITY CONDITION
 
-Availability_condition : '#available' '(' Availability_arguments ')' ;
-fragment
-Availability_arguments : Availability_argument (',' Availability_argument)* ;
-fragment
-Availability_argument : Platform_name Platform_version | '*' ;
+availability_condition : '#available' '(' availability_arguments ')' ;
+
+availability_arguments : availability_argument (',' availability_argument)* ;
+
+availability_argument : Platform | '*' ;
+
+/** Must match as token so Platform_version doesn't look like a float literal */
+Platform : Platform_name WS? Platform_version ;
 
 fragment
 Platform_name
  : 'iOS' | 'iOSApplicationExtension'
  | 'OSX' | 'OSXApplicationExtension'
  | 'watchOS'
+ | 'tvOS' // ?
  ;
 
 fragment
@@ -966,10 +952,10 @@ TILDE 	: '~' ;
  */
 negate_prefix_operator : {SwiftSupport.isPrefixOp(_input)}? '-';
 
-build_AND 		: {isAndAnd()}? '&' '&' ;
-build_OR  		: {isOrOr()}? '|' '|' ;
-arrow_operator	: {isArrow()}? '-' '>' ;
-range_operator	: {isRange()}? '.' '.' '.' ;
+build_AND 		: {SwiftSupport.isOperator(_input,"&&")}?  '&' '&' ;
+build_OR  		: {SwiftSupport.isOperator(_input,"||")}?  '|' '|' ;
+arrow_operator	: {SwiftSupport.isOperator(_input,"->")}?  '-' '>' ;
+range_operator	: {SwiftSupport.isOperator(_input,"...")}? '.' '.' '.' ;
 
 /**
  "If an operator has whitespace around both sides or around neither side,

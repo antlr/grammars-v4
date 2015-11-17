@@ -87,12 +87,6 @@ public class SwiftSupport {
 	}
 
 	/*
-	For the purposes of these rules, the characters (, [, and { before an operator,
-	 the characters ), ], and } after an operator, and the characters ,, ;, and :
-	 are also considered whitespace.
-	*/
-
-	/*
 	Operator_following_character
 	  : Operator_head
 	  | [\u0300–\u036F]
@@ -205,6 +199,15 @@ public class SwiftSupport {
 		String text = tokens.getText(Interval.of(start, stop));
 		System.out.println("isPostfixOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
 		return result;
+	}
+
+	public static boolean isOperator(TokenStream tokens, String op) {
+		int stop = getLastOpTokenIndex(tokens);
+		if ( stop==-1 ) return false;
+
+		int start = tokens.index();
+		String text = tokens.getText(Interval.of(start, stop));
+		return text.equals(op);
 	}
 
 	/** Return two booleans packed into lowest 2 bits for left (high) and right (low)
