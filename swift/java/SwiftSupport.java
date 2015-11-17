@@ -87,6 +87,12 @@ public class SwiftSupport {
 	}
 
 	/*
+	For the purposes of these rules, the characters (, [, and { before an operator,
+	 the characters ), ], and } after an operator, and the characters ,, ;, and :
+	 are also considered whitespace.
+	*/
+
+	/*
 	Operator_following_character
 	  : Operator_head
 	  | [\u0300–\u036F]

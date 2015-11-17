@@ -32,38 +32,6 @@
 grammar Swift; // 2.1
 
 @parser::members {
-	/**
-	 "If an operator has whitespace around both sides or around neither side,
-	 it is treated as a binary operator. As an example, the + operator in a+b
-	  and a + b is treated as a binary operator."
-	*/
-	public boolean isBinaryOp() {
-		return true;
-	}
-
-	/**
-	 "If an operator has whitespace on the left side only, it is treated as a
-	 prefix unary operator. As an example, the ++ operator in a ++b is treated
-	 as a prefix unary operator."
-	*/
-	public boolean isPrefixOp() {
-		return true;
-	}
-
-	/**
-	 "If an operator has whitespace on the right side only, it is treated as a
-	 postfix unary operator. As an example, the ++ operator in a++ b is treated
-	 as a postfix unary operator."
-
-	 "If an operator has no whitespace on the left but is followed immediately
-	 by a dot (.), it is treated as a postfix unary operator. As an example,
-	 the ++ operator in a++.b is treated as a postfix unary operator (a++ .b
-	 rather than a ++ .b)."
-	 */
-	public boolean isPostfixOp() {
-		return true;
-	}
-
 	public boolean isAndAnd() {
 		return true;
 	}
@@ -81,7 +49,7 @@ grammar Swift; // 2.1
 	}
 }
 
-top_level : (statement | expression)* EOF ;
+top_level : statement* EOF ;
 
 // Statements
 
@@ -107,7 +75,7 @@ statements : statement+ ;
  *  rule pattern's expression_pattern alt and pattern_initializer.
  */
 assignment_statement
- : try_operator? prefix_expression  assignment_operator try_operator? prefix_expression
+ : try_operator? prefix_expression assignment_operator try_operator? prefix_expression
  ;
 
 // GRAMMAR OF A LOOP STATEMENT
@@ -138,11 +106,11 @@ while_statement : 'while' condition_clause code_block  ;
 condition_clause : expression
  | expression ',' condition_list
  | condition_list
- | availability_condition ',' expression
+ | Availability_condition ',' expression
  ;
 
 condition_list : condition | condition ',' condition_list ;
-condition : availability_condition | case_condition | optional_binding_condition ;
+condition : Availability_condition | case_condition | optional_binding_condition ;
 case_condition : 'case' pattern initializer where_clause? ;
 optional_binding_condition : optional_binding_head optional_binding_continuation_list? where_clause? ;
 optional_binding_head : 'let' pattern initializer | 'var' pattern initializer ;
@@ -213,20 +181,23 @@ fallthrough_statement : 'fallthrough'  ;
 return_statement : 'return' expression? ;
 
 
-// GRAMMAR OF AN AVAILABILITY CONDITION
+// GRAMMAR OF AN AVAILABILITY CONDITION (match with lexer as single token as we need context for '*')
 
-availability_condition : '#available' '(' availability_arguments ')' ;
-availability_arguments : availability_argument | availability_argument ',' availability_arguments ;
-availability_argument : platform_name platform_version
- | '*'
- ;
+Availability_condition : '#available' '(' Availability_arguments ')' ;
+fragment
+Availability_arguments : Availability_argument (',' Availability_argument)* ;
+fragment
+Availability_argument : Platform_name Platform_version | '*' ;
 
-platform_name : 'iOS' | 'iOSApplicationExtension'
+fragment
+Platform_name
+ : 'iOS' | 'iOSApplicationExtension'
  | 'OSX' | 'OSXApplicationExtension'
  | 'watchOS'
  ;
 
-platform_version
+fragment
+Platform_version
  : Pure_decimal_digits
  | Pure_decimal_digits '.' Pure_decimal_digits
  | Pure_decimal_digits '.' Pure_decimal_digits '.' Pure_decimal_digits
@@ -263,8 +234,8 @@ build_configuration : platform_testing_function
  | boolean_literal
  | '(' build_configuration ')'
  | '!' build_configuration
- | build_configuration Build_AND build_configuration
- | build_configuration Build_OR build_configuration
+ | build_configuration build_AND build_configuration
+ | build_configuration build_OR build_configuration
  ;
 
 platform_testing_function : 'os' '(' operating_system ')'
@@ -288,8 +259,12 @@ file_name : Static_string_literal ;
 // GRAMMAR OF A GENERIC PARAMETER CLAUSE
 
 generic_parameter_clause : '<' generic_parameter_list requirement_clause? '>'  ;
-generic_parameter_list : generic_parameter | generic_parameter ',' generic_parameter_list  ;
-generic_parameter : type_name | type_name ':' type_identifier | type_name ':' protocol_composition_type  ;
+generic_parameter_list : generic_parameter (',' generic_parameter)*  ;
+generic_parameter
+ : type_name
+ | type_name ':' type_identifier
+ | type_name ':' protocol_composition_type
+ ;
 
 requirement_clause : 'where' requirement_list  ;
 requirement_list : requirement | requirement ',' requirement_list  ;
@@ -302,8 +277,11 @@ same_type_requirement : type_identifier '==' type  ;
 
 generic_argument_clause : '<' generic_argument_list '>'  ;
 generic_argument_list : generic_argument (',' generic_argument)* ;
-generic_argument : type  ;
+generic_argument : type ;
 
+// context-sensitive. Allow < as pre, post, or binary op
+//lt : {_input.LT(1).getText().equals("<")}? operator ;
+//gt : {_input.LT(1).getText().equals(">")}? operator ;
 // Declarations
 
 // GRAMMAR OF A DECLARATION
@@ -353,7 +331,7 @@ pattern_initializer_list : pattern_initializer (',' pattern_initializer)* ;
  *  ANTLR resolves in favor or first choice: pattern is x, 1 is initializer.
  */
 pattern_initializer : pattern initializer? ;
-initializer : '=' expression  ;
+initializer : assignment_operator expression  ;
 
 // GRAMMAR OF A VARIABLE DECLARATION
 
@@ -387,7 +365,7 @@ didSet_clause : attributes? 'didSet' setter_name? code_block  ;
 typealias_declaration : typealias_head typealias_assignment  ;
 typealias_head : attributes? access_level_modifier? 'typealias' typealias_name  ;
 typealias_name : identifier  ;
-typealias_assignment : '=' type  ;
+typealias_assignment : assignment_operator type  ;
 
 // GRAMMAR OF A FUNCTION DECLARATION
 // NOTE: Swift Grammar Spec indicates that a function_body is optional
@@ -397,7 +375,7 @@ function_name : identifier |  operator  ;
 function_signature : parameter_clauses 'throws'? function_result?
  | parameter_clauses 'rethrows' function_result?
  ;
-function_result : Arrow_operator attributes? type  ;
+function_result : arrow_operator attributes? type  ;
 function_body : code_block  ;
 parameter_clauses : parameter_clause parameter_clauses? ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
@@ -405,11 +383,11 @@ parameter_list : parameter | parameter ',' parameter_list  ;
 parameter : 'let'? external_parameter_name? local_parameter_name type_annotation default_argument_clause?
  | 'var' external_parameter_name? local_parameter_name type_annotation default_argument_clause?
  | 'inout' external_parameter_name? local_parameter_name type_annotation
- | external_parameter_name? local_parameter_name type_annotation Range_operator
+ | external_parameter_name? local_parameter_name type_annotation range_operator
  ;
 external_parameter_name : identifier | '_'  ;
 local_parameter_name : identifier | '_'  ;
-default_argument_clause : '=' expression  ;
+default_argument_clause : assignment_operator expression  ;
 
 
 // GRAMMAR OF AN ENUMERATION DECLARATION
@@ -429,7 +407,7 @@ raw_value_style_enum_member : declaration | raw_value_style_enum_case_clause  ;
 raw_value_style_enum_case_clause : attributes? 'case' raw_value_style_enum_case_list  ;
 raw_value_style_enum_case_list : raw_value_style_enum_case | raw_value_style_enum_case ',' raw_value_style_enum_case_list  ;
 raw_value_style_enum_case : enum_case_name raw_value_assignment? ;
-raw_value_assignment : '=' raw_value_literal  ;
+raw_value_assignment : assignment_operator raw_value_literal  ;
 raw_value_literal : numeric_literal | Static_string_literal | boolean_literal ;
 
 // GRAMMAR OF A STRUCTURE DECLARATION TODO did not update
@@ -513,7 +491,7 @@ subscript_declaration
  ;
 
 subscript_head : attributes? declaration_modifiers? 'subscript' parameter_clause  ;
-subscript_result : Arrow_operator attributes? type  ;
+subscript_result : arrow_operator attributes? type  ;
 
 // GRAMMAR OF AN OPERATOR DECLARATION
 
@@ -562,7 +540,7 @@ wildcard_pattern : '_'  ;
 
 // GRAMMAR OF AN IDENTIFIER PATTERN
 
-identifier_pattern : identifier  ;
+identifier_pattern : identifier ;
 
 // GRAMMAR OF A VALUE_BINDING PATTERN
 
@@ -619,7 +597,7 @@ expression_list : expression (',' expression)* ;
 // GRAMMAR OF A PREFIX EXPRESSION
 
 prefix_expression
-  : Prefix_operator postfix_expression
+  : prefix_operator postfix_expression
   | postfix_expression
   | in_out_expression
   ;
@@ -634,7 +612,7 @@ try_operator : 'try' | 'try' '?' | 'try' '!' ;
 
 
 binary_expression
-  : Binary_operator prefix_expression
+  : binary_operator prefix_expression
 // as far as I can tell, assignment is not a valid operator as it has no return type
 // it is more properly a statement; commenting this next line out and moving to assignment_statement:
 // | assignment_operator try_operator? prefix_expression
@@ -643,10 +621,6 @@ binary_expression
   ;
 
 binary_expressions : binary_expression+ ;
-
-// GRAMMAR OF AN ASSIGNMENT OPERATOR
-
-assignment_operator : '='  ;
 
 // GRAMMAR OF A CONDITIONAL OPERATOR
 
@@ -742,9 +716,10 @@ wildcard_expression : '_'  ;
 
 // GRAMMAR OF A POSTFIX EXPRESSION (inlined many rules from spec to avoid indirect left-recursion)
 
+/*
 postfix_expression
  : primary_expression                                             # primary
- | postfix_expression Postfix_operator                            # postfix_operation
+ | postfix_expression postfix_operator                            # postfix_operation
  | postfix_expression parenthesized_expression                    # function_call_expression
  | postfix_expression parenthesized_expression? trailing_closure  # function_call_with_closure_expression
  | postfix_expression '.' 'init'                                  # initializer_expression
@@ -756,6 +731,23 @@ postfix_expression
  | postfix_expression '!'                                         # forced_value_expression
  | postfix_expression '?'                                         # optional_chaining_expression
  ;
+*/
+
+postfix_expression
+  :  primary_expression
+	 ( postfix_operator
+	 | parenthesized_expression
+	 | parenthesized_expression? trailing_closure
+	 | '.' 'init'
+	 | '.' Pure_decimal_digits
+	 | '.' identifier generic_argument_clause?
+	 | '.' 'self'
+	 | '.' 'dynamicType'
+	 | '[' expression_list ']'
+	 | '!'
+	 | '?'
+	 )*
+ ;
 
 trailing_closure : closure_expression ;
 
@@ -764,8 +756,8 @@ trailing_closure : closure_expression ;
 type
  : '[' type ']'
  | '[' type ':' type ']'
- | type 'throws'? Arrow_operator type
- | type 'rethrows' Arrow_operator type
+ | type 'throws'? arrow_operator type
+ | type 'rethrows' arrow_operator type
  | type_identifier
  | tuple_type
  | type '?'
@@ -791,10 +783,10 @@ type_name : identifier ;
 // GRAMMAR OF A TUPLE TYPE
 
 tuple_type : '(' tuple_type_body? ')'  ;
-tuple_type_body : tuple_type_element_list Range_operator? ;
+tuple_type_body : tuple_type_element_list range_operator? ;
 tuple_type_element_list : tuple_type_element | tuple_type_element ',' tuple_type_element_list  ;
 tuple_type_element : attributes? 'inout'? type | 'inout'? element_name type_annotation ;
-element_name : identifier  ;
+element_name : identifier ;
 
 // GRAMMAR OF A FUNCTION TYPE
 
@@ -817,7 +809,7 @@ element_name : identifier  ;
 
 // GRAMMAR OF A PROTOCOL COMPOSITION TYPE
 
-protocol_composition_type : 'protocol' '<' protocol_identifier_list?'>'  ;
+protocol_composition_type : 'protocol' '<' protocol_identifier_list? '>'  ;
 protocol_identifier_list : protocol_identifier | (',' protocol_identifier)+ ;
 protocol_identifier : type_identifier  ;
 
@@ -848,13 +840,14 @@ identifier : Identifier | context_sensitive_keyword ;
 
 Identifier
  : Identifier_head Identifier_characters?
- | '`' Identifier_head Identifier_characters? '`'
+ | '_' Identifier_characters // _ MUST be followed by something. _ is not a valid Identifier. it's a pattern
+ | '`' (Identifier_head|'_') Identifier_characters? '`'
  | Implicit_parameter_name
  ;
 
 identifier_list : identifier (',' identifier_list)* ;
 
-fragment Identifier_head : [a-zA-Z_]
+fragment Identifier_head : [a-zA-Z]
  | '\u00A8' | '\u00AA' | '\u00AD' | '\u00AF' | [\u00B2-\u00B5] | [\u00B7-\u00BA]
  | [\u00BC-\u00BE] | [\u00C0-\u00D6] | [\u00D8-\u00F6] | [\u00F8-\u00FF]
  | [\u0100-\u02FF] | [\u0370-\u167F] | [\u1681-\u180D] | [\u180F-\u1DBF]
@@ -876,6 +869,7 @@ fragment Identifier_head : [a-zA-Z_]
 fragment Identifier_character : [0-9]
  | [\u0300-\u036F] | [\u1DC0-\u1DFF] | [\u20D0-\u20FF] | [\uFE20-\uFE2F]
  | Identifier_head
+ | '_'
  ;
 
 fragment Identifier_characters : Identifier_character+ ;
@@ -934,21 +928,62 @@ From doc on operators:
  misinterpreted as a bit shift >> operator.
 */
 
-operator : Binary_operator | Prefix_operator | Postfix_operator ;
+//operator : Binary_operator | Prefix_operator | Postfix_operator ;
+
+/* these following tokens are also a Binary_operator so much come first as special case */
+
+assignment_operator : {SwiftSupport.isBinaryOp(_input)}? '=' ;
+
+DOT    	: '.' ;
+LCURLY 	: '{' ;
+LPAREN 	: '(' ;
+LBRACK 	: '[' ;
+RCURLY 	: '}' ;
+RPAREN 	: ')' ;
+RBRACK 	: ']' ;
+COMMA  	: ',' ;
+COLON  	: ':' ;
+SEMI   	: ';' ;
+LT 		: '<' ;
+GT 		: '>' ;
+UNDERSCORE : '_' ;
+BANG 	: '!' ;
+QUESTION: '?' ;
+AT 		: '@' ;
+AND 	: '&' ;
+SUB 	: '-' ;
+EQUAL 	: '=' ;
+OR 		: '|' ;
+DIV 	: '/' ;
+ADD 	: '+' ;
+MUL 	: '*' ;
+MOD 	: '%' ;
+CARET 	: '^' ;
+TILDE 	: '~' ;
+
+/** Need to separate this out from Prefix_operator as it's referenced in numeric_literal
+ *  as specifically a negation prefix op.
+ */
+negate_prefix_operator : {SwiftSupport.isPrefixOp(_input)}? '-';
+
+build_AND 		: {isAndAnd()}? '&' '&' ;
+build_OR  		: {isOrOr()}? '|' '|' ;
+arrow_operator	: {isArrow()}? '-' '>' ;
+range_operator	: {isRange()}? '.' '.' '.' ;
 
 /**
  "If an operator has whitespace around both sides or around neither side,
  it is treated as a binary operator. As an example, the + operator in a+b
   and a + b is treated as a binary operator."
 */
-Binary_operator : Operator {SwiftLexerSupport.isBinaryOp()}? ;
+binary_operator : {SwiftSupport.isBinaryOp(_input)}? operator ;
 
 /**
  "If an operator has whitespace on the left side only, it is treated as a
  prefix unary operator. As an example, the ++ operator in a ++b is treated
  as a prefix unary operator."
 */
-Prefix_operator : Operator {SwiftLexerSupport.isPrefixOp()}? ;
+prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator ;
 
 /**
  "If an operator has whitespace on the right side only, it is treated as a
@@ -960,17 +995,25 @@ Prefix_operator : Operator {SwiftLexerSupport.isPrefixOp()}? ;
  the ++ operator in a++.b is treated as a postfix unary operator (a++ .b
  rather than a ++ .b)."
  */
-Postfix_operator : Operator {SwiftLexerSupport.isPostfixOp()}? ;
+postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator ;
 
-fragment
-Operator
-  : Operator_head Operator_character*
-  | Dot_operator_head Dot_operator_character*
+operator
+  : operator_head     ({_input.get(_input.index()-1).getType()!=WS}? operator_character)*
+  | dot_operator_head ({_input.get(_input.index()-1).getType()!=WS}? dot_operator_character)*
   ;
 
-Operator_head
-  : '/' | '=' | '-' | '+' | '!' | '*' | '%' | '<' | '>' | '&' | '|' | '^' | '~' | '?'
-  | [\u00A1-\u00A7]
+operator_character
+  : operator_head
+  | Operator_following_character
+  ;
+
+operator_head
+  : ('/' | '=' | '-' | '+' | '!' | '*' | '%' | '&' | '|' | '<' | '>' | '^' | '~' | '?') // wrapping in (..) makes it a fast set comparison
+  | Operator_head_other
+  ;
+
+Operator_head_other // valid operator chars not used by Swift itself
+  : [\u00A1-\u00A7]
   | [\u00A9\u00AB]
   | [\u00AC\u00AE]
   | [\u00B0-\u00B1\u00B6\u00BB\u00BF\u00D7\u00F7]
@@ -986,9 +1029,8 @@ Operator_head
   | [\u3008-\u3030]
   ;
 
-Operator_character
-  : Operator_head
-  | [\u0300–\u036F]
+Operator_following_character
+  : [\u0300–\u036F]
   | [\u1DC0–\u1DFF]
   | [\u20D0–\u20FF]
   | [\uFE00–\uFE0F]
@@ -996,15 +1038,8 @@ Operator_character
   //| [\uE0100–\uE01EF]  ANTLR can't do >16bit char
   ;
 
-fragment
-Dot_operator_head 		: '..' ;
-fragment
-Dot_operator_character  : '.' | Operator_character ;
-
-Build_AND 		: '&' '&'     {SwiftLexerSupport.isAndAnd()}? ;
-Build_OR  		: '|' '|' 	  {SwiftLexerSupport.isOrOr()}? ;
-Arrow_operator	: '-' '>' 	  {SwiftLexerSupport.isArrow()}? ;
-Range_operator	: '.' '.' '.' {SwiftLexerSupport.isRange()}? ;
+dot_operator_head 		: '.' '.' ; // TODO: adjacent cols
+dot_operator_character  : '.' | operator_character ;
 
 Implicit_parameter_name : '$' Pure_decimal_digits ;
 
@@ -1012,8 +1047,13 @@ Implicit_parameter_name : '$' Pure_decimal_digits ;
 
 literal : numeric_literal | string_literal | boolean_literal | nil_literal  ;
 
-numeric_literal : '-'? integer_literal | '-'? Floating_point_literal ;
+numeric_literal
+ : negate_prefix_operator? integer_literal
+ | negate_prefix_operator? Floating_point_literal
+ ;
+
 boolean_literal : 'true' | 'false' ;
+
 nil_literal : 'nil' ;
 
 // GRAMMAR OF AN INTEGER LITERAL
