@@ -6,6 +6,15 @@ import org.antlr.v4.runtime.misc.Interval;
 import java.util.BitSet;
 
 public class SwiftSupport {
+	/* TODO
+	There is one caveat to the rules above. If the ! or ? predefined operator
+	 has no whitespace on the left, it is treated as a postfix operator,
+	 regardless of whether it has whitespace on the right. To use the ? as
+	 the optional-chaining operator, it must not have whitespace on the left.
+	  To use it in the ternary conditional (? :) operator, it must have
+	  whitespace around both sides.
+	*/
+
 	/*
 	operator-head : /  =  -  +  !  *  %  <  >  &  |  ^  ~  ?
       | [\u00A1-\u00A7]
@@ -87,7 +96,7 @@ public class SwiftSupport {
 	}
 
 	/*
-	Operator_following_character
+	Operator_character
 	  : Operator_head
 	  | [\u0300–\u036F]
 	  | [\u1DC0–\u1DFF]
@@ -97,7 +106,7 @@ public class SwiftSupport {
 	  //| [\uE0100–\uE01EF]  ANTLR can't do >16bit char
 	  ;
 	 */
-	public static boolean isOperatorFollowingChar(int ttype) {
+	public static boolean isOperatorChar(int ttype) {
 		return
 			operatorHead.get(ttype) ||
 			ttype>=0x0300 && ttype<=0x036F ||
@@ -121,12 +130,26 @@ public class SwiftSupport {
 	public static int getLastOpTokenIndex(TokenStream tokens) {
 		int i = tokens.index(); // current on-channel lookahead token index
 		Token lt = tokens.get(i);
+		if ( lt.getType()==SwiftParser.DOT && tokens.get(i+1).getType()==SwiftParser.DOT ) {
+			// dot-operator
+			i+=2; // point at token after ".."
+			lt = tokens.get(i);
+			while ( lt.getType()!=Token.EOF &&
+				    (lt.getType()==SwiftParser.DOT || isOperatorChar(lt.getType())) )
+			{
+				i++;
+				lt = tokens.get(i);
+			}
+			int stop = i-1;
+			return stop;
+		}
+		// Is it regular operator?
 		if ( !isOperatorHead(lt.getType()) ) {
 			return -1;
 		}
 		i++;
 		lt = tokens.get(i);
-		while ( lt.getType()!=Token.EOF && isOperatorFollowingChar(lt.getType()) ) {
+		while ( lt.getType()!=Token.EOF && isOperatorChar(lt.getType()) ) {
 			i++;
 			lt = tokens.get(i);
 		}

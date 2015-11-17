@@ -38,8 +38,8 @@ top_level : statement* EOF ;
 // GRAMMAR OF A STATEMENT
 
 statement
- : assignment_statement ';'?
- | expression ';'?
+// : assignment_statement ';'?
+ : expression ';'?
  | declaration ';'?
  | loop_statement ';'?
  | branch_statement ';'?
@@ -55,10 +55,10 @@ statements : statement+ ;
 /** A naked '=' op is not part of a valid expression so I'm making it a statement;
  *  see comment on binary_expression.  It also resolves ambiguity between
  *  rule pattern's expression_pattern alt and pattern_initializer.
- */
 assignment_statement
  : try_operator? prefix_expression assignment_operator try_operator? prefix_expression
  ;
+ */
 
 // GRAMMAR OF A LOOP STATEMENT
 
@@ -257,7 +257,7 @@ requirement_list : requirement | requirement ',' requirement_list  ;
 requirement : conformance_requirement | same_type_requirement  ;
 
 conformance_requirement : type_identifier ':' type_identifier | type_identifier ':' protocol_composition_type  ;
-same_type_requirement : type_identifier '==' type  ;
+same_type_requirement : type_identifier same_type_equals type  ;
 
 // GRAMMAR OF A GENERIC ARGUMENT CLAUSE
 
@@ -703,8 +703,7 @@ wildcard_expression : '_'  ;
 // GRAMMAR OF A POSTFIX EXPRESSION (inlined many rules from spec to avoid indirect left-recursion)
 
 postfix_expression
- : primary_expression                                             # primary
- | postfix_expression postfix_operator                            # postfix_operation
+ : postfix_expression postfix_operator                            # postfix_operation
  | postfix_expression parenthesized_expression                    # function_call_expression
  | postfix_expression parenthesized_expression? trailing_closure  # function_call_with_closure_expression
  | postfix_expression '.' 'init'                                  # initializer_expression
@@ -715,6 +714,7 @@ postfix_expression
  | postfix_expression '[' expression_list ']'                     # subscript_expression
  | postfix_expression '!'                                         # forced_value_expression
  | postfix_expression '?'                                         # optional_chaining_expression
+ | primary_expression                                             # primary
  ;
 
 /* This might be faster than above
@@ -956,6 +956,7 @@ build_AND 		: {SwiftSupport.isOperator(_input,"&&")}?  '&' '&' ;
 build_OR  		: {SwiftSupport.isOperator(_input,"||")}?  '|' '|' ;
 arrow_operator	: {SwiftSupport.isOperator(_input,"->")}?  '-' '>' ;
 range_operator	: {SwiftSupport.isOperator(_input,"...")}? '.' '.' '.' ;
+same_type_equals: {SwiftSupport.isOperator(_input,"==")}? '=' '=' ;
 
 /**
  "If an operator has whitespace around both sides or around neither side,
