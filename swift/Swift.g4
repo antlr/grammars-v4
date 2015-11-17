@@ -702,7 +702,6 @@ wildcard_expression : '_'  ;
 
 // GRAMMAR OF A POSTFIX EXPRESSION (inlined many rules from spec to avoid indirect left-recursion)
 
-/*
 postfix_expression
  : primary_expression                                             # primary
  | postfix_expression postfix_operator                            # postfix_operation
@@ -717,8 +716,8 @@ postfix_expression
  | postfix_expression '!'                                         # forced_value_expression
  | postfix_expression '?'                                         # optional_chaining_expression
  ;
-*/
 
+/* This might be faster than above
 postfix_expression
   :  primary_expression
 	 ( postfix_operator
@@ -734,6 +733,7 @@ postfix_expression
 	 | '?'
 	 )*
  ;
+*/
 
 trailing_closure : closure_expression ;
 
