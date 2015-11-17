@@ -67,7 +67,9 @@
 		<module>stacktrace</module>
 		<module>stringtemplate</module>
 		<module>suokif</module>
+		<!--
 		<module>swift</module>
+	-->
 		<module>tnsnames</module>
 		<module>tnt</module>
 		<module>turtle</module>
