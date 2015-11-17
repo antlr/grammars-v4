@@ -241,7 +241,7 @@ same_type_requirement : type_identifier '==' type  ;
 // GRAMMAR OF A GENERIC ARGUMENT CLAUSE
 
 generic_argument_clause : '<' generic_argument_list '>'  ;
-generic_argument_list : generic_argument | generic_argument ',' generic_argument_list ;
+generic_argument_list : generic_argument (',' generic_argument)* ;
 generic_argument : type  ;
 
 // Declarations
@@ -270,7 +270,7 @@ declarations : declaration declarations? ;
 
 // GRAMMAR OF A TOP-LEVEL DECLARATION
 
-//top_level_declaration : statements? ;
+top_level_declaration : statements? ;
 
 // GRAMMAR OF A CODE BLOCK
 
@@ -286,7 +286,7 @@ import_path_identifier : identifier | operator  ;
 // GRAMMAR OF A CONSTANT DECLARATION
 
 constant_declaration : attributes? declaration_modifiers? 'let' pattern_initializer_list  ;
-pattern_initializer_list : pattern_initializer | pattern_initializer ',' pattern_initializer_list ;
+pattern_initializer_list : pattern_initializer (',' pattern_initializer)* ;
 pattern_initializer : pattern initializer? ;
 initializer : '=' expression  ;
 
@@ -506,7 +506,9 @@ value_binding_pattern : 'var' pattern | 'let' pattern  ;
 // GRAMMAR OF A TUPLE PATTERN
 
 tuple_pattern : '(' tuple_pattern_element_list? ')'  ;
-tuple_pattern_element_list : tuple_pattern_element | tuple_pattern_element ',' tuple_pattern_element_list ;
+tuple_pattern_element_list
+	:	tuple_pattern_element (',' tuple_pattern_element)*
+	;
 tuple_pattern_element : pattern  ;
 
 // GRAMMAR OF AN ENUMERATION CASE PATTERN
@@ -519,9 +521,9 @@ optional_pattern : identifier_pattern '?' ;
 // GRAMMAR OF A TYPE CASTING PATTERN
 // ** NOTE ** I tried including these into the above pattern but was getting recursive errors
 
-//type_casting_pattern : 'is' type | pattern 'as' type  ;
-//is_pattern : 'is' type  ;
-//as_pattern : pattern 'as' type  ;
+type_casting_pattern : is_pattern | as_pattern  ;
+is_pattern : 'is' type  ;
+as_pattern : pattern 'as' type  ;
 
 // GRAMMAR OF AN EXPRESSION PATTERN
 
@@ -534,8 +536,8 @@ expression_pattern : expression  ;
 attribute : '@' attribute_name attribute_argument_clause? ;
 attribute_name : identifier  ;
 attribute_argument_clause : '('  balanced_tokens?  ')'  ;
-attributes : attribute attributes? ;
-balanced_tokens : balanced_token balanced_tokens? ;
+attributes : attribute+ ;
+balanced_tokens : balanced_token+ ;
 balanced_token
  : '('  balanced_tokens? ')'
  | '[' balanced_tokens? ']'
@@ -549,13 +551,7 @@ balanced_token
 // GRAMMAR OF AN EXPRESSION
 expression : try_operator? prefix_expression binary_expressions? ;
 
-//expression
-//: try_operator? prefix_expression
-//| try_operator? postfix_expression
-//| try_operator? binary_expression
-//;
-
-expression_list : expression | expression ',' expression_list ;
+expression_list : expression (',' expression)* ;
 
 // GRAMMAR OF A PREFIX EXPRESSION
 
@@ -580,7 +576,7 @@ binary_expression
   | type_casting_operator
   ;
 
-binary_expressions : binary_expression binary_expressions? ;
+binary_expressions : binary_expression+ ;
 
 // GRAMMAR OF AN ASSIGNMENT OPERATOR
 
@@ -616,16 +612,17 @@ primary_expression
 
 literal_expression
  : literal
- | array_literal | dictionary_literal
+ | array_literal
+ | dictionary_literal
  | '__FILE__' | '__LINE__' | '__COLUMN__' | '__FUNCTION__'
  ;
 
-array_literal : '[' array_literal_items? ']'  ;
-array_literal_items : array_literal_item ','? | array_literal_item ',' array_literal_items  ;
-array_literal_item : expression ;
-dictionary_literal : '[' dictionary_literal_items ']' | '[' ':' ']'  ;
-dictionary_literal_items : dictionary_literal_item ','? | dictionary_literal_item ',' dictionary_literal_items ;
-dictionary_literal_item : expression ':' expression  ;
+array_literal			 : '[' array_literal_items? ']'  ;
+array_literal_items      : array_literal_item (',' array_literal_item)* ','?  ;
+array_literal_item       : expression ;
+dictionary_literal		 : '[' dictionary_literal_items ']' | '[' ':' ']'  ;
+dictionary_literal_items : dictionary_literal_item (',' dictionary_literal_item)* ','? ;
+dictionary_literal_item  : expression ':' expression  ;
 
 // GRAMMAR OF A SELF EXPRESSION
 
@@ -644,8 +641,8 @@ superclass_expression
   | superclass_initializer_expression
   ;
 
-superclass_method_expression : 'super' '.' identifier  ;
-superclass_subscript_expression : 'super' '[' expression ']'  ;
+superclass_method_expression	  : 'super' '.' identifier  ;
+superclass_subscript_expression   : 'super' '[' expression ']'  ;
 superclass_initializer_expression : 'super' '.' 'init'  ;
 
 // GRAMMAR OF A CLOSURE EXPRESSION
@@ -660,7 +657,7 @@ closure_signature
  ;
 
 capture_list : '[' capture_list_items ']'  ;
-capture_list_items : capture_list_item | capture_list_item ',' capture_list_items ;
+capture_list_items : capture_list_item (',' capture_list_items)* ;
 capture_list_item : capture_specifier? expression ;
 
 capture_specifier : 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)'  ;
@@ -682,18 +679,19 @@ wildcard_expression : '_'  ;
 // GRAMMAR OF A POSTFIX EXPRESSION
 
 postfix_expression
- : primary_expression
- | postfix_expression postfix_operator
- | postfix_expression parenthesized_expression
- | postfix_expression parenthesized_expression? trailing_closure
- | postfix_expression '.' 'init'
- | postfix_expression '.' Decimal_digits // TODO: don't allow '_' here in Decimal_literal
- | postfix_expression '.' identifier generic_argument_clause?
- | postfix_expression '.' 'self'
- | postfix_expression '.' 'dynamicType'
- | postfix_expression '[' expression_list ']'
- | postfix_expression '!'
- | postfix_expression '?'
+ : primary_expression                                             # primary
+ | postfix_expression postfix_operator                            # postfix_operation
+ | postfix_expression parenthesized_expression                    # function_call_expression
+ | postfix_expression parenthesized_expression? trailing_closure  # function_call_with_closure_expression
+ | postfix_expression '.' 'init'                                  # initializer_expression
+ // TODO: don't allow '_' here in Decimal_literal:
+ | postfix_expression '.' Decimal_literal                         # explicit_member_expression1
+ | postfix_expression '.' identifier generic_argument_clause?     # explicit_member_expression2
+ | postfix_expression '.' 'self'                                  # postfix_self_expression
+ | postfix_expression '.' 'dynamicType'                           # dynamic_type_expression
+ | postfix_expression '[' expression_list ']'                     # subscript_expression
+ | postfix_expression '!'                                         # forced_value_expression
+ | postfix_expression '?'                                         # optional_chaining_expression
  ;
 
 // GRAMMAR OF A FUNCTION CALL EXPRESSION ** Note - commented out expressions caused recursive issues in postfix_expression
@@ -791,7 +789,7 @@ element_name : identifier  ;
 // GRAMMAR OF A PROTOCOL COMPOSITION TYPE
 
 protocol_composition_type : 'protocol' '<' protocol_identifier_list?'>'  ;
-protocol_identifier_list : protocol_identifier | protocol_identifier ',' protocol_identifier_list  ;
+protocol_identifier_list : protocol_identifier | (',' protocol_identifier)+ ;
 protocol_identifier : type_identifier  ;
 
 // GRAMMAR OF A METATYPE TYPE
@@ -807,9 +805,9 @@ type_inheritance_clause
  ;
 
 type_inheritance_list
-: type_identifier
-| type_identifier ',' type_inheritance_list
-;
+ : type_identifier
+ | type_identifier ',' type_inheritance_list
+ ;
 
 class_requirement : 'class' ;
 
@@ -819,8 +817,8 @@ class_requirement : 'class' ;
 
 identifier : Identifier | context_sensitive_keyword ;
 
-
-Identifier : Identifier_head Identifier_characters?
+Identifier
+ : Identifier_head Identifier_characters?
  | '`' Identifier_head Identifier_characters? '`'
  | Implicit_parameter_name
  ;
@@ -1003,36 +1001,40 @@ fragment Decimal_fraction : '.' Decimal_literal ;
 fragment Decimal_exponent : Floating_point_e Sign? Decimal_literal ;
 fragment Hexadecimal_fraction : '.' Hexadecimal_digit Hexadecimal_literal_characters? ;
 fragment Hexadecimal_exponent : Floating_point_p Sign? Decimal_literal ;
-fragment Floating_point_e : 'e' | 'E' ;
-fragment Floating_point_p : 'p' | 'P' ;
-fragment Sign : '+' | '-' ;
+fragment Floating_point_e : [eE] ;
+fragment Floating_point_p : [pP] ;
+fragment Sign : [+\-] ;
 
 // GRAMMAR OF A STRING LITERAL
 
-String_literal : Static_string_literal /*| Interpolated_string_literal*/ ; // TODO add this in once interpolated strings work
-Static_string_literal : '"' Quoted_text? '"' ;
-fragment Quoted_text : Quoted_text_item Quoted_text? ;
-fragment Quoted_text_item : Escaped_character
-// | '\\(' expression ')'
- | ~["\\\u000A\u000D]
- ;
+String_literal
+  : Static_string_literal
+  | Interpolated_string_literal
+  ;
 
+fragment Static_string_literal : '"' Quoted_text? '"' ;
+fragment Quoted_text : Quoted_text_item+ ;
+fragment Quoted_text_item
+  : Escaped_character
+  | '\\(' expression ')'
+  | ~["\n\r\\]
+  ;
+
+fragment
 Escaped_character : '\\' [0\\tnr"']
  | '\\x' Hexadecimal_digit Hexadecimal_digit
  | '\\u' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit
  | '\\U' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit
 ;
 
-//Interpolated_string_literal : '"' Interpolated_text? '"' ;
-//fragment Interpolated_text : Interpolated_text_item Interpolated_text? ;
-//fragment Interpolated_text_item : '\\(' expression ')' | Quoted_text_item ;
-//fragment Interpolated_text_item : interpolated_expression | Quoted_text_item ;
-//fragment interpolated_expression : '\\(' expression ')' ;
+fragment Interpolated_string_literal : '"' Interpolated_text? '"' ;
+fragment Interpolated_text : Interpolated_text_item Interpolated_text? ;
+fragment Interpolated_text_item : '\\(' expression ')' | Quoted_text_item ;
+fragment Interpolated_text_item : interpolated_expression | Quoted_text_item ;
+fragment interpolated_expression : '\\(' expression ')' ;
 
-fragment SPACE : [ \n\r\t\u000B\u000C\u0000];
+WS : [ \n\r\t\u000B\u000C\u0000]+ -> channel(HIDDEN) ;
 
-WS : SPACE+ -> channel(HIDDEN) ;
-
-Block_comment : '/*' (Block_comment|.)*? '*/' -> channel(HIDDEN) ; // nesting allow
+Block_comment : '/*' (Block_comment|.)*? '*/' -> channel(HIDDEN) ; // nesting allowed
 
 Line_comment : '//' .*? '\n' -> channel(HIDDEN) ;
