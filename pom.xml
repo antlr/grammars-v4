@@ -8,32 +8,84 @@
 	<name>ANTLR4 grammars</name>
 	<modules>
 		<module>support</module>
-		<module>objc</module>		
-		<module>dot</module>		
-		<module>creole</module>
-<!--		<module>bnf</module>-->
-		<module>pgn</module>
-		<module>logo</module>
-		<module>asm6502</module>
-		<module>redcode</module>
-		<module>csv</module>
-		<module>tnt</module>
-		<module>json</module>
-		<module>xml</module>
-		<module>basic</module>
-		<module>gff3</module>
-		<module>fasta</module>
-		<module>html</module>
-		<module>turtle</module>
-		<module>cpp</module>
-		<module>idl</module>
 		<module>abnf</module>
-		<module>C</module>
+		<module>antlr4</module>
+		<module>arithmetic</module>
+		<module>asm6502</module>
+		<module>asn</module>
+<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
+<!--		<module>aspectj</module> -->
+
+		<module>atl</module>
+		<module>basic</module>
+		<module>bnf</module>
+		<module>c</module>
+		<module>calculator</module>
+		<module>clif</module>
+		<module>clojure</module>
+		<module>cobol85</module>
+		<module>cpp</module>
+		<module>creole</module>
+		<module>csharp</module>
+		<module>csv</module>
+		<module>dot</module>
 		<module>erlang</module>
+		<module>fasta</module>
+		<module>FOL</module>
+		<module>gff3</module>
+		<module>graphql</module>
+		<module>html</module>
+		<module>icalendar</module>
+		<module>idl</module>
+		<module>iri</module>
+		<module>java</module>
+		<module>java8</module>
+		<module>json</module>
+		<module>less</module>
+		<module>logo</module>
+		<module>lua</module>
+		<module>masm</module>
+		<module>memcached_protocol</module>
+		<module>MPS</module>
+		<module>mumath</module>
+		<module>mumps</module>
+		<module>mysql</module>
+		<module>objc</module>
+		<module>pascal</module>
+		<module>pcre</module>
+		<module>peoplecode</module>
+		<module>pgn</module>
+		<!--
+		<module>php</module>
+	-->
+		<module>propcalc</module>
+		<module>r</module>
+		<module>redcode</module>
+		<module>scala</module>
+		<module>scss</module>
+		<module>smalltalk</module>
+		<module>sparql</module>
+		<module>sqlite</module>
+		<module>stacktrace</module>
+		<module>stringtemplate</module>
+		<module>suokif</module>
+<!-- Grammars-V4 issue 238 -->
+		<module>swift</module>
+		<module>tnsnames</module>
+		<module>tnt</module>
+		<module>turtle</module>
+		<module>ucb-logo</module>
+		<module>vb6</module>
+		<module>verilog</module>
+		<module>vhdl</module>
+		<module>webidl</module>
+		<module>xml</module>
+		<module>xpath</module>
 	</modules>
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.5</antlr.version>
+		<antlr.version>4.5.1-1</antlr.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -46,7 +98,7 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>6.9.4</version>
+			<version>6.9.9</version>
 		</dependency>
 	</dependencies>
 	<build>

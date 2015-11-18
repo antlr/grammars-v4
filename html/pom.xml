@@ -34,7 +34,7 @@
 				<configuration>
 					<enabled>false</enabled>
 					<verbose>false</verbose>
-					<showTree>true</showTree>
+					<showTree>false</showTree>
 					<entryPoint>htmlDocument</entryPoint>
 					<grammarName>HTML</grammarName>
 					<packageName></packageName>

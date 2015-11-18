@@ -33,8 +33,8 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>true</showTree>
-					<entryPoint>primaryExpression</entryPoint>
+					<showTree>false</showTree>
+					<entryPoint>compilationUnit</entryPoint>
 					<grammarName>C</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
