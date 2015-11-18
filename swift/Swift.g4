@@ -355,10 +355,14 @@ typealias_assignment : assignment_operator type  ;
 
 // GRAMMAR OF A FUNCTION DECLARATION
 // NOTE: Swift Grammar Spec indicates that a function_body is optional
-function_declaration : function_head function_name generic_parameter_clause? function_signature function_body?  ;
+function_declaration
+ : function_head function_name generic_parameter_clause? function_signature
+   function_body?
+ ;
 function_head : attributes? declaration_modifiers? 'func'  ;
 function_name : identifier |  operator  ;
-function_signature : parameter_clauses 'throws'? function_result?
+function_signature
+ : parameter_clauses 'throws'? function_result?
  | parameter_clauses 'rethrows' function_result?
  ;
 function_result : arrow_operator attributes? type  ;
@@ -693,7 +697,7 @@ capture_specifier : 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)'  ;
 // GRAMMAR OF A PARENTHESIZED EXPRESSION
 
 parenthesized_expression : '(' expression_element_list? ')'  ;
-expression_element_list : expression_element (',' expression_element_list)* ;
+expression_element_list : expression_element (',' expression_element)* ;
 expression_element : expression | identifier ':' expression  ;
 
 // GRAMMAR OF A WILDCARD EXPRESSION
@@ -831,7 +835,7 @@ Identifier
  | Implicit_parameter_name
  ;
 
-identifier_list : identifier (',' identifier_list)* ;
+identifier_list : identifier (',' identifier)* ;
 
 fragment Identifier_head : [a-zA-Z]
  | '\u00A8' | '\u00AA' | '\u00AD' | '\u00AF' | [\u00B2-\u00B5] | [\u00B7-\u00BA]
