@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.antlr.grammarsv4</groupId>
 	<artifactId>grammarsv4</artifactId>
@@ -12,8 +13,8 @@
 		<module>arithmetic</module>
 		<module>asm6502</module>
 		<module>asn</module>
-		<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
-		<!-- <module>aspectj</module> -->
+<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
+<!--		<module>aspectj</module> -->
 
 		<module>atl</module>
 		<module>basic</module>
@@ -28,7 +29,6 @@
 		<module>csharp</module>
 		<module>csv</module>
 		<module>dot</module>
-		<module>ecmascript</module>
 		<module>erlang</module>
 		<module>fasta</module>
 		<module>FOL</module>
@@ -55,7 +55,9 @@
 		<module>pcre</module>
 		<module>peoplecode</module>
 		<module>pgn</module>
-		<!-- <module>php</module> -->
+		<!--
+		<module>php</module>
+	-->
 		<module>propcalc</module>
 		<module>r</module>
 		<module>redcode</module>
@@ -67,9 +69,8 @@
 		<module>stacktrace</module>
 		<module>stringtemplate</module>
 		<module>suokif</module>
-		<!--
+<!-- Grammars-V4 issue 238 -->
 		<module>swift</module>
-	-->
 		<module>tnsnames</module>
 		<module>tnt</module>
 		<module>turtle</module>

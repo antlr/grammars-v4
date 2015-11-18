@@ -31,13 +31,14 @@
  */
 grammar Swift; // 2.1
 
-top_level : (statement | expression)* EOF ;
+top_level : statement* EOF ;
 
 // Statements
 
 // GRAMMAR OF A STATEMENT
 
 statement
+// : assignment_statement ';'?
  : expression ';'?
  | declaration ';'?
  | loop_statement ';'?
@@ -51,6 +52,14 @@ statement
 
 statements : statement+ ;
 
+/** A naked '=' op is not part of a valid expression so I'm making it a statement;
+ *  see comment on binary_expression.  It also resolves ambiguity between
+ *  rule pattern's expression_pattern alt and pattern_initializer.
+assignment_statement
+ : try_operator? prefix_expression assignment_operator try_operator? prefix_expression
+ ;
+ */
+
 // GRAMMAR OF A LOOP STATEMENT
 
 loop_statement : for_statement
@@ -63,7 +72,7 @@ loop_statement : for_statement
 
 for_statement
  : 'for' for_init? ';' expression? ';' expression? code_block
- | 'for' '(' for_init?';' expression? ';' expression? ')' code_block
+ | 'for' '(' for_init? ';' expression? ';' expression? ')' code_block
  ;
 
 for_init : variable_declaration | expression_list  ;
@@ -157,19 +166,27 @@ return_statement : 'return' expression? ;
 // GRAMMAR OF AN AVAILABILITY CONDITION
 
 availability_condition : '#available' '(' availability_arguments ')' ;
-availability_arguments : availability_argument | availability_argument ',' availability_arguments ;
-availability_argument : platform_name platform_version
- | '*'
- ;
 
-platform_name : 'iOS' | 'iOSApplicationExtension'
+availability_arguments : availability_argument (',' availability_argument)* ;
+
+availability_argument : Platform | '*' ;
+
+/** Must match as token so Platform_version doesn't look like a float literal */
+Platform : Platform_name WS? Platform_version ;
+
+fragment
+Platform_name
+ : 'iOS' | 'iOSApplicationExtension'
  | 'OSX' | 'OSXApplicationExtension'
  | 'watchOS'
+ | 'tvOS' // ?
  ;
 
-platform_version : Decimal_digits // TODO not sure what to do about this error "Implicit definitionsof token Decimal_digits in parser"
- | Decimal_digits '.' Decimal_digits
- | Decimal_digits '.' Decimal_digits '.' Decimal_digits
+fragment
+Platform_version
+ : Pure_decimal_digits
+ | Pure_decimal_digits '.' Pure_decimal_digits
+ | Pure_decimal_digits '.' Pure_decimal_digits '.' Pure_decimal_digits
  ;
 
 // GRAMMAR OF A THROW STATEMENT
@@ -203,8 +220,8 @@ build_configuration : platform_testing_function
  | boolean_literal
  | '(' build_configuration ')'
  | '!' build_configuration
- | build_configuration '&&' build_configuration
- | build_configuration '||' build_configuration
+ | build_configuration build_AND build_configuration
+ | build_configuration build_OR build_configuration
  ;
 
 platform_testing_function : 'os' '(' operating_system ')'
@@ -228,22 +245,29 @@ file_name : Static_string_literal ;
 // GRAMMAR OF A GENERIC PARAMETER CLAUSE
 
 generic_parameter_clause : '<' generic_parameter_list requirement_clause? '>'  ;
-generic_parameter_list : generic_parameter | generic_parameter ',' generic_parameter_list  ;
-generic_parameter : type_name | type_name ':' type_identifier | type_name ':' protocol_composition_type  ;
+generic_parameter_list : generic_parameter (',' generic_parameter)*  ;
+generic_parameter
+ : type_name
+ | type_name ':' type_identifier
+ | type_name ':' protocol_composition_type
+ ;
 
 requirement_clause : 'where' requirement_list  ;
 requirement_list : requirement | requirement ',' requirement_list  ;
 requirement : conformance_requirement | same_type_requirement  ;
 
 conformance_requirement : type_identifier ':' type_identifier | type_identifier ':' protocol_composition_type  ;
-same_type_requirement : type_identifier '==' type  ;
+same_type_requirement : type_identifier same_type_equals type  ;
 
 // GRAMMAR OF A GENERIC ARGUMENT CLAUSE
 
 generic_argument_clause : '<' generic_argument_list '>'  ;
 generic_argument_list : generic_argument (',' generic_argument)* ;
-generic_argument : type  ;
+generic_argument : type ;
 
+// context-sensitive. Allow < as pre, post, or binary op
+//lt : {_input.LT(1).getText().equals("<")}? operator ;
+//gt : {_input.LT(1).getText().equals(">")}? operator ;
 // Declarations
 
 // GRAMMAR OF A DECLARATION
@@ -287,8 +311,13 @@ import_path_identifier : identifier | operator  ;
 
 constant_declaration : attributes? declaration_modifiers? 'let' pattern_initializer_list  ;
 pattern_initializer_list : pattern_initializer (',' pattern_initializer)* ;
+
+/** rule is ambiguous. can match "var x = 1" with x as pattern
+ *  OR with x as expression_pattern.
+ *  ANTLR resolves in favor or first choice: pattern is x, 1 is initializer.
+ */
 pattern_initializer : pattern initializer? ;
-initializer : '=' expression  ;
+initializer : assignment_operator expression  ;
 
 // GRAMMAR OF A VARIABLE DECLARATION
 
@@ -322,17 +351,21 @@ didSet_clause : attributes? 'didSet' setter_name? code_block  ;
 typealias_declaration : typealias_head typealias_assignment  ;
 typealias_head : attributes? access_level_modifier? 'typealias' typealias_name  ;
 typealias_name : identifier  ;
-typealias_assignment : '=' type  ;
+typealias_assignment : assignment_operator type  ;
 
 // GRAMMAR OF A FUNCTION DECLARATION
 // NOTE: Swift Grammar Spec indicates that a function_body is optional
-function_declaration : function_head function_name generic_parameter_clause? function_signature function_body?  ;
+function_declaration
+ : function_head function_name generic_parameter_clause? function_signature
+   function_body?
+ ;
 function_head : attributes? declaration_modifiers? 'func'  ;
 function_name : identifier |  operator  ;
-function_signature : parameter_clauses 'throws'? function_result?
+function_signature
+ : parameter_clauses 'throws'? function_result?
  | parameter_clauses 'rethrows' function_result?
  ;
-function_result : '->' attributes? type  ;
+function_result : arrow_operator attributes? type  ;
 function_body : code_block  ;
 parameter_clauses : parameter_clause parameter_clauses? ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
@@ -340,11 +373,11 @@ parameter_list : parameter | parameter ',' parameter_list  ;
 parameter : 'let'? external_parameter_name? local_parameter_name type_annotation default_argument_clause?
  | 'var' external_parameter_name? local_parameter_name type_annotation default_argument_clause?
  | 'inout' external_parameter_name? local_parameter_name type_annotation
- | external_parameter_name? local_parameter_name type_annotation '...'
+ | external_parameter_name? local_parameter_name type_annotation range_operator
  ;
 external_parameter_name : identifier | '_'  ;
 local_parameter_name : identifier | '_'  ;
-default_argument_clause : '=' expression  ;
+default_argument_clause : assignment_operator expression  ;
 
 
 // GRAMMAR OF AN ENUMERATION DECLARATION
@@ -364,7 +397,7 @@ raw_value_style_enum_member : declaration | raw_value_style_enum_case_clause  ;
 raw_value_style_enum_case_clause : attributes? 'case' raw_value_style_enum_case_list  ;
 raw_value_style_enum_case_list : raw_value_style_enum_case | raw_value_style_enum_case ',' raw_value_style_enum_case_list  ;
 raw_value_style_enum_case : enum_case_name raw_value_assignment? ;
-raw_value_assignment : '=' raw_value_literal  ;
+raw_value_assignment : assignment_operator raw_value_literal  ;
 raw_value_literal : numeric_literal | Static_string_literal | boolean_literal ;
 
 // GRAMMAR OF A STRUCTURE DECLARATION TODO did not update
@@ -448,14 +481,14 @@ subscript_declaration
  ;
 
 subscript_head : attributes? declaration_modifiers? 'subscript' parameter_clause  ;
-subscript_result : '->' attributes? type  ;
+subscript_result : arrow_operator attributes? type  ;
 
 // GRAMMAR OF AN OPERATOR DECLARATION
 
 operator_declaration : prefix_operator_declaration | postfix_operator_declaration | infix_operator_declaration  ;
 prefix_operator_declaration : 'prefix' 'operator' operator '{' '}'  ;
 postfix_operator_declaration : 'postfix' 'operator' operator '{' '}'  ;
-infix_operator_declaration : 'infix' 'operator' operator '{' infix_operator_attributes '}'  ; // NOTE used to be infix_operator_attributes?
+infix_operator_declaration : 'infix' 'operator' operator '{' infix_operator_attributes '}' ; // Note: infix_operator_attributes is optional by definition so no ? needed
 infix_operator_attributes : precedence_clause? associativity_clause? ;
 precedence_clause : 'precedence' precedence_level ;
 precedence_level : integer_literal ;
@@ -497,7 +530,7 @@ wildcard_pattern : '_'  ;
 
 // GRAMMAR OF AN IDENTIFIER PATTERN
 
-identifier_pattern : identifier  ;
+identifier_pattern : identifier ;
 
 // GRAMMAR OF A VALUE_BINDING PATTERN
 
@@ -519,14 +552,12 @@ enum_case_pattern : type_identifier? '.' enum_case_name tuple_pattern? ;
 optional_pattern : identifier_pattern '?' ;
 
 // GRAMMAR OF A TYPE CASTING PATTERN
-// ** NOTE ** I tried including these into the above pattern but was getting recursive errors
 
-type_casting_pattern : is_pattern | as_pattern  ;
-is_pattern : 'is' type  ;
-as_pattern : pattern 'as' type  ;
+// integrated directly into pattern to avoid indirect left-recursion
 
 // GRAMMAR OF AN EXPRESSION PATTERN
 
+/** Doc says "Expression patterns appear only in switch statement case labels." */
 expression_pattern : expression  ;
 
 // Attributes
@@ -556,7 +587,8 @@ expression_list : expression (',' expression)* ;
 // GRAMMAR OF A PREFIX EXPRESSION
 
 prefix_expression
-  : prefix_operator? postfix_expression
+  : prefix_operator postfix_expression
+  | postfix_expression
   | in_out_expression
   ;
 
@@ -571,16 +603,14 @@ try_operator : 'try' | 'try' '?' | 'try' '!' ;
 
 binary_expression
   : binary_operator prefix_expression
-  | assignment_operator try_operator? prefix_expression
+// as far as I can tell, assignment is not a valid operator as it has no return type
+// it is more properly a statement; commenting this next line out and moving to assignment_statement:
+// | assignment_operator try_operator? prefix_expression
   | conditional_operator try_operator? prefix_expression
   | type_casting_operator
   ;
 
 binary_expressions : binary_expression+ ;
-
-// GRAMMAR OF AN ASSIGNMENT OPERATOR
-
-assignment_operator : '='  ;
 
 // GRAMMAR OF A CONDITIONAL OPERATOR
 
@@ -604,9 +634,11 @@ primary_expression
  | superclass_expression
  | closure_expression
  | parenthesized_expression
-// | implicit_member_expression disallow as ambig with explicit member expr in postfix_expression
+ | implicit_member_expression
  | wildcard_expression
  ;
+
+implicit_member_expression : '.' identifier ;
 
 // GRAMMAR OF A LITERAL EXPRESSION
 
@@ -662,81 +694,60 @@ capture_list_item : capture_specifier? expression ;
 
 capture_specifier : 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)'  ;
 
-// GRAMMAR OF A IMPLICIT MEMBER EXPRESSION
-
-//implicit_member_expression : '.' identifier  ; NOTE this was causing recursion issues when included in primary_expression
-
 // GRAMMAR OF A PARENTHESIZED EXPRESSION
 
 parenthesized_expression : '(' expression_element_list? ')'  ;
-expression_element_list : expression_element | expression_element ',' expression_element_list  ;
+expression_element_list : expression_element (',' expression_element)* ;
 expression_element : expression | identifier ':' expression  ;
 
 // GRAMMAR OF A WILDCARD EXPRESSION
 
 wildcard_expression : '_'  ;
 
-// GRAMMAR OF A POSTFIX EXPRESSION
+// GRAMMAR OF A POSTFIX EXPRESSION (inlined many rules from spec to avoid indirect left-recursion)
 
 postfix_expression
- : primary_expression                                             # primary
- | postfix_expression postfix_operator                            # postfix_operation
+ : postfix_expression postfix_operator                            # postfix_operation
  | postfix_expression parenthesized_expression                    # function_call_expression
  | postfix_expression parenthesized_expression? trailing_closure  # function_call_with_closure_expression
  | postfix_expression '.' 'init'                                  # initializer_expression
- // TODO: don't allow '_' here in Decimal_literal:
- | postfix_expression '.' Decimal_literal                         # explicit_member_expression1
+ | postfix_expression '.' Pure_decimal_digits                     # explicit_member_expression1
  | postfix_expression '.' identifier generic_argument_clause?     # explicit_member_expression2
  | postfix_expression '.' 'self'                                  # postfix_self_expression
  | postfix_expression '.' 'dynamicType'                           # dynamic_type_expression
  | postfix_expression '[' expression_list ']'                     # subscript_expression
  | postfix_expression '!'                                         # forced_value_expression
  | postfix_expression '?'                                         # optional_chaining_expression
+ | primary_expression                                             # primary
  ;
 
-// GRAMMAR OF A FUNCTION CALL EXPRESSION ** Note - commented out expressions caused recursive issues in postfix_expression
-
-//function_call_expression
-//  : postfix_expression parenthesized_expression
-//  | postfix_expression parenthesized_expression? trailing_closure
-//  ;
+/* This might be faster than above
+postfix_expression
+  :  primary_expression
+	 ( postfix_operator
+	 | parenthesized_expression
+	 | parenthesized_expression? trailing_closure
+	 | '.' 'init'
+	 | '.' Pure_decimal_digits
+	 | '.' identifier generic_argument_clause?
+	 | '.' 'self'
+	 | '.' 'dynamicType'
+	 | '[' expression_list ']'
+	 | '!'
+	 | '?'
+	 )*
+ ;
+*/
 
 trailing_closure : closure_expression ;
-
-//initializer_expression : postfix_expression '.' 'init' ;
-
-//explicit_member_expression
-//  : postfix_expression '.' Decimal_literal // TODO: don't allow '_' here in Decimal_literal
-//  | postfix_expression '.' identifier generic_argument_clause?
-//  ;
-
-//postfix_self_expression : postfix_expression '.' 'self' ;
-
-// GRAMMAR OF A DYNAMIC TYPE EXPRESSION
-
-//dynamic_type_expression : postfix_expression '.' 'dynamicType' ;
-
-// GRAMMAR OF A SUBSCRIPT EXPRESSION
-
-//subscript_expression : postfix_expression '[' expression_list ']' ;
-
-// GRAMMAR OF A FORCED_VALUE EXPRESSION
-
-//forced_value_expression : postfix_expression '!' ;
-
-// GRAMMAR OF AN OPTIONAL_CHAINING EXPRESSION
-
-//optional_chaining_expression : postfix_expression '?' ;
-
-// Types
 
 // GRAMMAR OF A TYPE
 
 type
  : '[' type ']'
  | '[' type ':' type ']'
- | type 'throws'? '->' type
- | type 'rethrows' '->' type
+ | type 'throws'? arrow_operator type
+ | type 'rethrows' arrow_operator type
  | type_identifier
  | tuple_type
  | type '?'
@@ -762,16 +773,16 @@ type_name : identifier ;
 // GRAMMAR OF A TUPLE TYPE
 
 tuple_type : '(' tuple_type_body? ')'  ;
-tuple_type_body : tuple_type_element_list '...'? ;
+tuple_type_body : tuple_type_element_list range_operator? ;
 tuple_type_element_list : tuple_type_element | tuple_type_element ',' tuple_type_element_list  ;
 tuple_type_element : attributes? 'inout'? type | 'inout'? element_name type_annotation ;
-element_name : identifier  ;
+element_name : identifier ;
 
 // GRAMMAR OF A FUNCTION TYPE
 
 //function_type
-// : type 'throws'? '->' type
-// | type 'rethrows' '->' type
+// : type 'throws'? Arrow type
+// | type 'rethrows' Arrow type
 // ;
 
 // GRAMMAR OF AN ARRAY TYPE
@@ -788,7 +799,7 @@ element_name : identifier  ;
 
 // GRAMMAR OF A PROTOCOL COMPOSITION TYPE
 
-protocol_composition_type : 'protocol' '<' protocol_identifier_list?'>'  ;
+protocol_composition_type : 'protocol' '<' protocol_identifier_list? '>'  ;
 protocol_identifier_list : protocol_identifier | (',' protocol_identifier)+ ;
 protocol_identifier : type_identifier  ;
 
@@ -819,13 +830,14 @@ identifier : Identifier | context_sensitive_keyword ;
 
 Identifier
  : Identifier_head Identifier_characters?
- | '`' Identifier_head Identifier_characters? '`'
+ | '_' Identifier_characters // _ MUST be followed by something. _ is not a valid Identifier. it's a pattern
+ | '`' (Identifier_head|'_') Identifier_characters? '`'
  | Implicit_parameter_name
  ;
 
-identifier_list : identifier | identifier ',' identifier_list  ;
+identifier_list : identifier (',' identifier)* ;
 
-fragment Identifier_head : [a-zA-Z_]
+fragment Identifier_head : [a-zA-Z]
  | '\u00A8' | '\u00AA' | '\u00AD' | '\u00AF' | [\u00B2-\u00B5] | [\u00B7-\u00BA]
  | [\u00BC-\u00BE] | [\u00C0-\u00D6] | [\u00D8-\u00F6] | [\u00F8-\u00FF]
  | [\u0100-\u02FF] | [\u0370-\u167F] | [\u1681-\u180D] | [\u180F-\u1DBF]
@@ -847,8 +859,10 @@ fragment Identifier_head : [a-zA-Z_]
 fragment Identifier_character : [0-9]
  | [\u0300-\u036F] | [\u1DC0-\u1DFF] | [\u20D0-\u20FF] | [\uFE20-\uFE2F]
  | Identifier_head
+ | '_'
  ;
 
+fragment Identifier_characters : Identifier_character+ ;
 
 context_sensitive_keyword :
  'associativity' | 'didSet' | 'get' | 'infix' | 'inout' | 'left' | 'mutating' | 'none' |
@@ -858,25 +872,141 @@ context_sensitive_keyword :
 
 // GRAMMAR OF OPERATORS
 
-// split the operators out into the individual tokens as some of those tokens
-// are also referenced individually. For example, type signatures use
-// <...>.
-//operator
-//  : Operator_head Operator_character*
-//  | '..' ('.'|Operator_character)*
-//  ;
+/*
+From doc on operators:
+ The tokens =, ->, //, /*, *\/ [without the escape on \/], .,
+ the prefix operators <, &, and ?, the infix
+ operator ?, and the postfix operators >, !, and ? are reserved. These tokens
+ can’t be overloaded, nor can they be used as custom operators.
 
-operator : Operator ;
+ The whitespace around an operator is used to determine whether an operator
+ is used as a prefix operator, a postfix operator, or a binary operator.
 
-Operator
-  : Operator_head Operator_character*
-  | '..' ('.'|Operator_character)*
+	* If an operator has whitespace around both sides or around neither
+	  side, it is treated as a binary operator. As an example, the +
+	  operator in a+b and a + b is treated as a binary operator.
+
+	* If an operator has whitespace on the left side only, it is treated
+	  as a prefix unary operator. As an example, the ++ operator in a ++b
+	  is treated as a prefix unary operator.
+
+	* If an operator has whitespace on the right side only, it is treated
+	  as a postfix unary operator. As an example, the ++ operator in a++ b
+	  is treated as a postfix unary operator.
+
+	* If an operator has no whitespace on the left but is followed
+	  immediately by a dot (.), it is treated as a postfix unary
+	  operator. As an example, the ++ operator in a++.b is treated as a
+	  postfix unary operator (a++ .b rather than a ++ .b).
+
+ For the purposes of these rules, the characters (, [, and { before an operator,
+ the characters ), ], and } after an operator, and the characters ,, ;, and :
+ are also considered whitespace.
+
+ There is one caveat to the rules above. If the ! or ? predefined operator has
+ no whitespace on the left, it is treated as a postfix operator, regardless of
+ whether it has whitespace on the right. To use the ? as the optional-chaining
+ operator, it must not have whitespace on the left. To use it in the ternary
+ conditional (? :) operator, it must have whitespace around both sides.
+
+ In certain constructs, operators with a leading < or > may be split
+ into two or more tokens. The remainder is treated the same way and may
+ be split again. As a result, there is no need to use whitespace to
+ disambiguate between the closing > characters in constructs like
+ Dictionary<String, Array<Int>>. In this example, the closing >
+ characters are not treated as a single token that may then be
+ misinterpreted as a bit shift >> operator.
+*/
+
+//operator : Binary_operator | Prefix_operator | Postfix_operator ;
+
+/* these following tokens are also a Binary_operator so much come first as special case */
+
+assignment_operator : {SwiftSupport.isBinaryOp(_input)}? '=' ;
+
+DOT    	: '.' ;
+LCURLY 	: '{' ;
+LPAREN 	: '(' ;
+LBRACK 	: '[' ;
+RCURLY 	: '}' ;
+RPAREN 	: ')' ;
+RBRACK 	: ']' ;
+COMMA  	: ',' ;
+COLON  	: ':' ;
+SEMI   	: ';' ;
+LT 		: '<' ;
+GT 		: '>' ;
+UNDERSCORE : '_' ;
+BANG 	: '!' ;
+QUESTION: '?' ;
+AT 		: '@' ;
+AND 	: '&' ;
+SUB 	: '-' ;
+EQUAL 	: '=' ;
+OR 		: '|' ;
+DIV 	: '/' ;
+ADD 	: '+' ;
+MUL 	: '*' ;
+MOD 	: '%' ;
+CARET 	: '^' ;
+TILDE 	: '~' ;
+
+/** Need to separate this out from Prefix_operator as it's referenced in numeric_literal
+ *  as specifically a negation prefix op.
+ */
+negate_prefix_operator : {SwiftSupport.isPrefixOp(_input)}? '-';
+
+build_AND 		: {SwiftSupport.isOperator(_input,"&&")}?  '&' '&' ;
+build_OR  		: {SwiftSupport.isOperator(_input,"||")}?  '|' '|' ;
+arrow_operator	: {SwiftSupport.isOperator(_input,"->")}?  '-' '>' ;
+range_operator	: {SwiftSupport.isOperator(_input,"...")}? '.' '.' '.' ;
+same_type_equals: {SwiftSupport.isOperator(_input,"==")}? '=' '=' ;
+
+/**
+ "If an operator has whitespace around both sides or around neither side,
+ it is treated as a binary operator. As an example, the + operator in a+b
+  and a + b is treated as a binary operator."
+*/
+binary_operator : {SwiftSupport.isBinaryOp(_input)}? operator ;
+
+/**
+ "If an operator has whitespace on the left side only, it is treated as a
+ prefix unary operator. As an example, the ++ operator in a ++b is treated
+ as a prefix unary operator."
+*/
+prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator ;
+
+/**
+ "If an operator has whitespace on the right side only, it is treated as a
+ postfix unary operator. As an example, the ++ operator in a++ b is treated
+ as a postfix unary operator."
+
+ "If an operator has no whitespace on the left but is followed immediately
+ by a dot (.), it is treated as a postfix unary operator. As an example,
+ the ++ operator in a++.b is treated as a postfix unary operator (a++ .b
+ rather than a ++ .b)."
+ */
+postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator ;
+
+operator
+  : operator_head     ({_input.get(_input.index()-1).getType()!=WS}? operator_character)*
+  | dot_operator_head ({_input.get(_input.index()-1).getType()!=WS}? dot_operator_character)*
   ;
 
-Operator_head
-  : '/' | '=' | '\\' | '-' | '+' | '!' | '*' | '%' | '<' | '>' | '&' | '|' | '^' | '!' | '.'
-  | [\u00A1-\u00A7]
-  | [\u00A9\u00AB\u00AC\u00AE]
+operator_character
+  : operator_head
+  | Operator_following_character
+  ;
+
+operator_head
+  : ('/' | '=' | '-' | '+' | '!' | '*' | '%' | '&' | '|' | '<' | '>' | '^' | '~' | '?') // wrapping in (..) makes it a fast set comparison
+  | Operator_head_other
+  ;
+
+Operator_head_other // valid operator chars not used by Swift itself
+  : [\u00A1-\u00A7]
+  | [\u00A9\u00AB]
+  | [\u00AC\u00AE]
   | [\u00B0-\u00B1\u00B6\u00BB\u00BF\u00D7\u00F7]
   | [\u2016-\u2017\u2020-\u2027]
   | [\u2030-\u203E]
@@ -890,9 +1020,8 @@ Operator_head
   | [\u3008-\u3030]
   ;
 
-Operator_character
-  : Operator_head
-  | [\u0300–\u036F]
+Operator_following_character
+  : [\u0300–\u036F]
   | [\u1DC0–\u1DFF]
   | [\u20D0–\u20FF]
   | [\uFE00–\uFE0F]
@@ -900,65 +1029,22 @@ Operator_character
   //| [\uE0100–\uE01EF]  ANTLR can't do >16bit char
   ;
 
-Dot_operator_head : '..' ;
+dot_operator_head 		: '.' '.' ; // TODO: adjacent cols
+dot_operator_character  : '.' | operator_character ;
 
-Operator_characters : Operator_character Operator_characters? ;
-
-Dot_operator_character : '.' | Operator_character ;
-Dot_operator_characters : Dot_operator_character Dot_operator_characters? ;
-
-
-// WHITESPACE scariness:
-
-/* http://tinyurl.com/oalzfus
-"If an operator has no whitespace on the left but is followed
-immediately by a dot (.), it is treated as a postfix unary
-operator. As an example, the ++ operator in a++.b is treated as a
-postfix unary operator (a++ . b rather than a ++ .b).  For the
-purposes of these rules, the characters (, [, and { before an
-operator, the characters ), ], and } after an operator, and the
-characters ,, ;, and : are also considered whitespace.
-
-There is one caveat to the rules above. If the ! or ? operator has no
-whitespace on the left, it is treated as a postfix operator,
-regardless of whether it has whitespace on the right. To use the ?
-operator as syntactic sugar for the Optional type, it must not have
-whitespace on the left. To use it in the conditional (? :) operator,
-it must have whitespace around both sides."
- */
-
-/**
- "If an operator has whitespace around both sides or around neither side,
- it is treated as a binary operator. As an example, the + operator in a+b
-  and a + b is treated as a binary operator."
-*/
-binary_operator : operator ;
-
-/**
- "If an operator has whitespace on the left side only, it is treated as a
- prefix unary operator. As an example, the ++ operator in a ++b is treated
- as a prefix unary operator."
-*/
-prefix_operator : operator ; // only if space on left but not right
-
-/**
- "If an operator has whitespace on the right side only, it is treated as a
- postfix unary operator. As an example, the ++ operator in a++ b is treated
- as a postfix unary operator."
- */
-postfix_operator : operator ;
-
-
-fragment Identifier_characters : Identifier_character+ ;
-
-Implicit_parameter_name : '$' Decimal_literal ; // TODO: don't allow '_' here
+Implicit_parameter_name : '$' Pure_decimal_digits ;
 
 // GRAMMAR OF A LITERAL
 
-literal : numeric_literal | String_literal | boolean_literal | nil_literal  ;
+literal : numeric_literal | string_literal | boolean_literal | nil_literal  ;
 
-numeric_literal : '-'? integer_literal | '-'? Floating_point_literal ;
+numeric_literal
+ : negate_prefix_operator? integer_literal
+ | negate_prefix_operator? Floating_point_literal
+ ;
+
 boolean_literal : 'true' | 'false' ;
+
 nil_literal : 'nil' ;
 
 // GRAMMAR OF AN INTEGER LITERAL
@@ -967,6 +1053,7 @@ integer_literal
  : Binary_literal
  | Octal_literal
  | Decimal_literal
+ | Pure_decimal_digits
  | Hexadecimal_literal
  ;
 
@@ -980,9 +1067,9 @@ fragment Octal_digit : [0-7] ;
 fragment Octal_literal_character : Octal_digit | '_'  ;
 fragment Octal_literal_characters : Octal_literal_character+ ;
 
-Decimal_literal : Decimal_digit Decimal_literal_characters? ;
+Decimal_literal		: [0-9] [0-9_]* ;
+Pure_decimal_digits : [0-9]+ ;
 fragment Decimal_digit : [0-9] ;
-fragment Decimal_digits : Decimal_digit+ ;
 fragment Decimal_literal_character : Decimal_digit | '_'  ;
 fragment Decimal_literal_characters : Decimal_literal_character+ ;
 
@@ -1007,34 +1094,35 @@ fragment Sign : [+\-] ;
 
 // GRAMMAR OF A STRING LITERAL
 
-String_literal
+string_literal
   : Static_string_literal
   | Interpolated_string_literal
   ;
 
-fragment Static_string_literal : '"' Quoted_text? '"' ;
+Static_string_literal : '"' Quoted_text? '"' ;
 fragment Quoted_text : Quoted_text_item+ ;
 fragment Quoted_text_item
   : Escaped_character
-  | '\\(' expression ')'
   | ~["\n\r\\]
   ;
 
 fragment
-Escaped_character : '\\' [0\\tnr"']
- | '\\x' Hexadecimal_digit Hexadecimal_digit
- | '\\u' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit
- | '\\U' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit
-;
+Escaped_character
+  : '\\' [0\\tnr"']
+  | '\\x' Hexadecimal_digit Hexadecimal_digit
+  | '\\u' '{' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit '}'
+  | '\\u' '{' Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit Hexadecimal_digit '}'
+  ;
 
-fragment Interpolated_string_literal : '"' Interpolated_text? '"' ;
-fragment Interpolated_text : Interpolated_text_item Interpolated_text? ;
-fragment Interpolated_text_item : '\\(' expression ')' | Quoted_text_item ;
-fragment Interpolated_text_item : interpolated_expression | Quoted_text_item ;
-fragment interpolated_expression : '\\(' expression ')' ;
+Interpolated_string_literal : '"' Interpolated_text_item* '"' ;
+fragment
+Interpolated_text_item
+  : '\\(' (Interpolated_string_literal | Interpolated_text_item)+ ')' // nested strings allowed
+  | Quoted_text_item
+  ;
 
-WS : [ \n\r\t\u000B\u000C\u0000]+ -> channel(HIDDEN) ;
+WS : [ \n\r\t\u000B\u000C\u0000]+				-> channel(HIDDEN) ;
 
-Block_comment : '/*' (Block_comment|.)*? '*/' -> channel(HIDDEN) ; // nesting allowed
+Block_comment : '/*' (Block_comment|.)*? '*/'	-> channel(HIDDEN) ; // nesting comments allowed
 
-Line_comment : '//' .*? '\n' -> channel(HIDDEN) ;
+Line_comment : '//' .*? ('\n'|EOF)				-> channel(HIDDEN) ;
