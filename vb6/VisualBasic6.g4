@@ -2,16 +2,16 @@
 * Copyright (C) 2014 Ulrich Wolffgang <u.wol@wwu.de>
 *
 * This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+* it under the terms of the GNU Lesser General Public License as 
+* published by the Free Software Foundation, either version 3 of the 
+* License, or (at your option) any later version.
 * 
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
+* GNU Lesser General Public License for more details.
 * 
-* You should have received a copy of the GNU General Public License
+* You should have received a copy of the GNU Lesser General Public License
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
@@ -870,7 +870,7 @@ FILENUMBER : '#' LETTERORDIGIT+;
 
 
 // identifier
-IDENTIFIER : LETTER (LETTERORDIGIT)*;
+IDENTIFIER : LETTER LETTERORDIGIT*;
 
 
 // whitespace, line breaks, comments, ...
@@ -881,8 +881,8 @@ WS : [ \t]+;
 
 
 // letters
-fragment LETTER : [a-zA-Z_äöüÄÖÜ];
-fragment LETTERORDIGIT : [a-zA-Z0-9_äöüÄÖÜ];
+fragment LETTER : [a-zA-Z_ŠšŸ€…†];
+fragment LETTERORDIGIT : [a-zA-Z0-9_ŠšŸ€…†];
 
 // case insensitive chars
 fragment A:('a'|'A');
