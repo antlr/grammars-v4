@@ -66,6 +66,17 @@ grammar ECMAScript;
             return false;
         }
 
+        if (ahead.Type == LineTerminator) {
+            // There is definitely a line terminator ahead.
+            return true;
+        }
+
+        if (ahead.Type == WhiteSpaces) {
+            // Get the token ahead of the current whitespaces.
+            possibleIndexEosToken = this.CurrentToken.TokenIndex - 2;
+            ahead = _input.Get(possibleIndexEosToken);
+        }
+
         // Get the token's text and type.
         string text = ahead.Text;
         int type = ahead.Type;
@@ -248,7 +259,7 @@ emptyStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : {(_input.La(1) != OpenBrace) && (_input.La(1) != Function)}? expressionSequence SemiColon
+ : {(_input.La(1) != OpenBrace) && (_input.La(1) != Function)}? expressionSequence eos
  ;
 
 /// IfStatement :
@@ -721,11 +732,11 @@ futureReservedWord
  ;
 
 getter
- : {_input.Lt(1).Text.StartsWith("get")}? Identifier
+ : {_input.Lt(1).Text.Equals("get")}? Identifier propertyName
  ;
 
 setter
- : {_input.Lt(1).Text.StartsWith("set")}? Identifier
+ : {_input.Lt(1).Text.Equals("set")}? Identifier propertyName
  ;
 
 eos

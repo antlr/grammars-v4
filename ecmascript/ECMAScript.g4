@@ -74,6 +74,17 @@ grammar ECMAScript;
             return false;
         }
 
+        if (ahead.getType() == LineTerminator) {
+            // There is definitely a line terminator ahead.
+            return true;
+        }
+
+        if (ahead.getType() == WhiteSpaces) {
+            // Get the token ahead of the current whitespaces.
+            possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 2;
+            ahead = _input.get(possibleIndexEosToken);
+        }
+
         // Get the token's text and type.
         String text = ahead.getText();
         int type = ahead.getType();
@@ -270,7 +281,7 @@ emptyStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : {(_input.LA(1) != OpenBrace) && (_input.LA(1) != Function)}? expressionSequence SemiColon
+ : {(_input.LA(1) != OpenBrace) && (_input.LA(1) != Function)}? expressionSequence eos
  ;
 
 /// IfStatement :
@@ -743,11 +754,11 @@ futureReservedWord
  ;
 
 getter
- : {_input.LT(1).getText().startsWith("get")}? Identifier
+ : {_input.LT(1).getText().equals("get")}? Identifier propertyName
  ;
 
 setter
- : {_input.LT(1).getText().startsWith("set")}? Identifier
+ : {_input.LT(1).getText().equals("set")}? Identifier propertyName
  ;
 
 eos

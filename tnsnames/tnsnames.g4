@@ -93,7 +93,6 @@ lsnr_description : L_PAREN DESCRIPTION EQUAL (address_list | (address)+) R_PAREN
 alias_list       : alias (COMMA alias)* ;
 
 alias            : ID
-                 | ID (DOT ID)+
                  ;
 
 //-----------------------------------------------------------------
@@ -201,7 +200,6 @@ protocol_info    : tcp_protocol       // More to come here.... BEQ, NMP, SPX ...
 //-----------------------------------------------------------------
 // TCP Protocol rules.
 // (PROTOCOL = TCP)(HOST = hostname)(PORT = portnumber)
-
 //-----------------------------------------------------------------
 tcp_protocol     : tcp_params ;
                  
@@ -219,8 +217,7 @@ tcp_port         : L_PAREN PORT EQUAL port R_PAREN ;
 tcp_tcp          : L_PAREN PROTOCOL EQUAL TCP R_PAREN ;
                  
 host             : ID
-                 | ID (DOT ID)+ 
-                 | IP 
+                 | IP
                  ;
 
 port             : INT ;
@@ -243,20 +240,17 @@ ipc_key          : L_PAREN KEY EQUAL ID R_PAREN ;
 
 
 //-----------------------------------------------------------------
-
 // SPX Protocol rules.
-
 // (PROTOCOL = SPX)(SERVICE = spx_service_name)
-
 //-----------------------------------------------------------------
-spx_protocol     : spx_params ; 
+spx_protocol     : spx_params ;
 
-spx_params       : spx_parameter+ ; 
+spx_params       : spx_parameter+ ;
 
 spx_parameter    : spx_spx
-                 | spx_service ; 
+                 | spx_service ;
 
-spx_spx          : L_PAREN PROTOCOL EQUAL SPX R_PAREN ; 
+spx_spx          : L_PAREN PROTOCOL EQUAL SPX R_PAREN ;
 
 spx_service      : L_PAREN SERVICE EQUAL ID R_PAREN ;
 
@@ -323,7 +317,7 @@ bad_address      : L_PAREN ADDRESS EQUAL beq_beq R_PAREN ;
 //-----------------------------------------------------------------
 // Connect data rules. 
 //-----------------------------------------------------------------
-connect_data     : L_PAREN CONNECT_DATA EQUAL cd_params+ R_PAREN ;
+connect_data     : L_PAREN CONNECT_DATA EQUAL cd_params R_PAREN ;
 
 cd_params       : cd_parameter+
                 ;
@@ -339,16 +333,15 @@ cd_parameter     : cd_service_name
                  | cd_ur
                  ;
 
-cd_service_name  : L_PAREN SERVICE_NAME EQUAL ID (DOT ID)* R_PAREN ;
+cd_service_name  : L_PAREN SERVICE_NAME EQUAL ID R_PAREN ;
 
 cd_sid           : L_PAREN SID EQUAL ID R_PAREN ;
 
-cd_instance_name : L_PAREN INSTANCE_NAME EQUAL ID (DOT ID)* R_PAREN ;
-
+cd_instance_name : L_PAREN INSTANCE_NAME EQUAL ID R_PAREN ;
 
 cd_failover_mode : L_PAREN FAILOVER_MODE EQUAL fo_params R_PAREN ;
 
-cd_global_name   : L_PAREN GLOBAL_NAME EQUAL ID (DOT ID)* R_PAREN ;
+cd_global_name   : L_PAREN GLOBAL_NAME EQUAL ID R_PAREN ;
 
 cd_hs            : L_PAREN HS EQUAL OK R_PAREN ;
 
@@ -358,7 +351,7 @@ cd_hs            : L_PAREN HS EQUAL OK R_PAREN ;
 // I'm assuming that the [] bit is optional? I have no idea what
 // any of this means! ;-)
 // ---------------------------------------------------------------
-cd_rdb_database  : L_PAREN RDB_DATABASE EQUAL (L_SQUARE DOT ID R_SQUARE)? ID (DOT ID)* R_PAREN ;
+cd_rdb_database  : L_PAREN RDB_DATABASE EQUAL (L_SQUARE DOT ID R_SQUARE)? ID R_PAREN ;
 
 cd_server        : L_PAREN SERVER EQUAL (DEDICATED | SHARED | POOLED) R_PAREN ;
                  
@@ -375,7 +368,7 @@ fo_parameter     : fo_type
                  
 fo_type          : L_PAREN TYPE EQUAL (SESSION | SELECT | NONE) R_PAREN ;
 
-fo_backup        : L_PAREN BACKUP EQUAL ID (DOT ID)* R_PAREN ;
+fo_backup        : L_PAREN BACKUP EQUAL ID R_PAREN ;
 
 fo_method        : L_PAREN METHOD EQUAL (BASIC | PRECONNECT) R_PAREN ;
 
@@ -431,9 +424,11 @@ LOCAL            : L O C A L ;
 
 // ---------------------------------------------------------------
 // Ok, I know this defines an IP version 4 address, but I haven't
-// got my head around the ipv6 format yet!
+// got my head around the IPv6 format yet!
+// It seems that an IPv4 address that begins with a zero is octal.
+// With leading "0x" or "0X" it's hexadecimal. Sigh.
 // ---------------------------------------------------------------
-IP               : (DIGIT)+ DOT (DIGIT)+ DOT (DIGIT)+ DOT (DIGIT)+ ;
+IP               : QUAD DOT QUAD DOT QUAD DOT QUAD+ ;
                  
 YES_NO           : Y E S | N O ;
                  
@@ -444,7 +439,7 @@ TRUE_FALSE       : T R U E | F A L S E ;
 COMMENT          : '#' (.)*? '\n' -> skip ;
                  
 INT              : DIGIT+ ;
-                 
+
 OK               : O K ;
                  
 DEDICATED        : D E D I C A T E D ;
@@ -561,10 +556,20 @@ DELAY            : D E L A Y ;
 
 
 //-------------------------------------------------
+// IPv4 dotted Quads. For host IP addresses.
+//-------------------------------------------------
+QUAD             : '0'[xX] HEX_DIGIT+
+                 | '0' OCT_DIGIT+
+                 | INT 
+                 ;
+
+
+//-------------------------------------------------
 // Other lexer rules, and fragments.
 //-------------------------------------------------
-ID               : [A-Za-z0-9][A-Za-z0-9_-]* ;
+ID               : [A-Za-z0-9][A-Za-z0-9_\-\.]* ;
 WS               : [ \t\r\n]+ -> skip ;
+
 
 
 // ----------
@@ -651,6 +656,12 @@ Z                : [Zz] ;
 
 fragment
 DIGIT            : [0-9] ;
+
+fragment
+OCT_DIGIT        : [0-8] ;
+
+fragment
+HEX_DIGIT        : [0-9A-Fa-f] ;
                  
 fragment
 LIST             : L I S T ;

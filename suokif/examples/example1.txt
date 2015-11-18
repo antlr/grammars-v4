@@ -1,0 +1,2 @@
+(instance Cat Animal)
+

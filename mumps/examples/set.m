@@ -1,0 +1,2 @@
+xxxx()
+  set x="hello"

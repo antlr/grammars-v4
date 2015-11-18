@@ -45,9 +45,6 @@
  ******************************************************************************/
 grammar CPP14;
 
-@header {
-package grammar;
-}
 
 /*Basic concepts*/
 translationunit
@@ -211,6 +208,7 @@ unaryoperator
 	| '+'
 	| '!'
 	| '~'
+	| '-'
 ;
 
 newexpression

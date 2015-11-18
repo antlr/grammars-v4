@@ -1,0 +1,4 @@
+If %Menu = MenuName.SA_LEARNER_SERVICES Then
+   STDNT_SRCH.EMPLID = %EmployeeId;
+   STDNT_SRCH.EMPLID.Visible = False;
+End-If;

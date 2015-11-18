@@ -25,6 +25,8 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
+					<visitor>true</visitor>
+					<listener>true</listener>
 					<sourceDirectory>${basedir}</sourceDirectory>
 				</configuration>
 				<executions>
@@ -40,7 +42,7 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>true</showTree>
+					<showTree>false</showTree>
 					<entryPoint>turtleDoc</entryPoint>
 					<grammarName>TURTLE</grammarName>
 					<packageName></packageName>

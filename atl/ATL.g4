@@ -40,7 +40,7 @@ query : 'query' (STRING|IDENTIFIER) '=' oclExpression ';' libraryRef* helper*;
 
 libraryRef : 'uses' STRING ';';
 
-moduleElement : helper | rule;
+moduleElement : helper | arule;
 
 helper : 'helper' oclFeatureDefinition ';';
 
@@ -56,7 +56,7 @@ parameter : IDENTIFIER ':' oclType;
 
 attribute : IDENTIFIER ':' oclType '=' oclExpression;
 
-rule : calledRule | matchedRule;
+arule : calledRule | matchedRule;
 
 matchedRule : lazyMatchedRule | matchedRule_abstractContents;
 

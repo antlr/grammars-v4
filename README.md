@@ -28,4 +28,8 @@ You can then test all grammars:
 mvn clean test
 </pre>
 
+Travis Status
+---------
+
+<a href="https://travis-ci.org/antlr/grammars-v4"><img src="https://api.travis-ci.org/antlr/grammars-v4.png"></a>
 

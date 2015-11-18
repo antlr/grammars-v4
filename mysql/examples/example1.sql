@@ -1,0 +1,2 @@
+select a from b;
+

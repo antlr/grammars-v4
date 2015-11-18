@@ -1,0 +1,47 @@
+Component boolean &boo_InvData;
+
+
+If &boo_InvData Then
+   DERIVED_REGFRM1.SS_MESSAGE_LONG = MsgGetText(14690, 2090, "Message not found.");
+Else
+
+   Evaluate %Component
+   When Component.SSR_SSENRL_ADD
+
+   When Component.SSR_SSENRL_DROP
+
+   When Component.SSR_SSENRL_EDIT
+
+   When Component.SSR_SSENRL_SWAP
+
+   When Component.SSR_SSENRL_APPT
+
+   When Component.SSR_SSENRL_CART
+      DERIVED_REGFRM1.SS_MESSAGE_LONG = MsgGetText(14690, 531, "Message not found.");
+
+   When Component.SSR_SSENRL_LIST
+      DERIVED_REGFRM1.SS_MESSAGE_LONG = MsgGetText(14690, 620, "Message not found.");
+
+   When Component.SSR_SSENRL_EXAM_L
+      DERIVED_REGFRM1.SS_MESSAGE_LONG = MsgGetText(14690, 2034, "Message not found.");
+
+   When Component.SAA_SS_DPR_ADB
+
+   When Component.SAA_SS_DPR_AAL
+      DERIVED_REGFRM1.SS_MESSAGE_LONG = MsgGetText(14510, 129, "Message not found.");
+
+   When Component.SSS_MY_PLANNER
+      DERIVED_REGFRM1.SS_MESSAGE_LONG = MsgGetText(14510, 132, "Message not found.");
+
+   When-Other
+      DERIVED_REGFRM1.SS_MESSAGE_LONG = MsgGetText(14690, 265, "Message not found.");
+   End-Evaluate;
+
+End-If;
+
+DERIVED_REGFRM1.STEP1.Visible = False;
+If %Menu = MenuName.SSR_ADVISEE_OVRD Then
+   /*  page title = advisee name  */
+Else
+   DERIVED_REGFRM1.TITLE1.Visible = False;
+End-If;

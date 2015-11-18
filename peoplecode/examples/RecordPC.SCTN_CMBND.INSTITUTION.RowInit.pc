@@ -1,0 +1,18 @@
+If %PanelGroup = PanelGroup.SCTN_CMBND Then
+   DERIVED_CS.CLASS_NBR = SCTN_CMBND.CLASS_NBR;
+   If Not RecordNew(SCTN_CMBND.INSTITUTION) Then
+      DERIVED_CS.CAMPUS_EVENT_NBR = CLASS_TBL_VW.CAMPUS_EVENT_NBR;
+   End-If;
+
+   If Not RecordNew(SCTN_CMBND.CLASS_NBR) Then
+      If CLASS_TBL_VW.ENRL_STAT = "O" Then
+         If DERIVED_SR.AVAILABLE_SEATS <= 0 Then
+            DERIVED_SR.ENRL_STATUS = MsgGetText(14690, 446, "No message found.");
+         Else
+            DERIVED_SR.ENRL_STATUS = MsgGetText(14690, 445, "No message found.");
+         End-If
+      Else
+         DERIVED_SR.ENRL_STATUS = MsgGetText(14690, 446, "No message found.");
+      End-If;
+   End-If;
+End-If;

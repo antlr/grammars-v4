@@ -1,0 +1,2 @@
+make "first_programmer "Ada_Lovelace
+print :first_programmer

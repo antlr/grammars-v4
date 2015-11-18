@@ -66,9 +66,18 @@ def lineTerminatorAhead(self):
     possibleIndexEosToken = self.getCurrentToken().tokenIndex - 1
     ahead = self._input.get(possibleIndexEosToken)
 
-    if ahead.channel == Lexer.HIDDEN:
+    if ahead.channel != Lexer.HIDDEN:
         # We're only interested in tokens on the HIDDEN channel.
         return False
+
+    if ahead.type == ECMAScriptParser.LineTerminator:
+        # There is definitely a line terminator ahead.
+        return True
+
+    if ahead.type == ECMAScriptParser.WhiteSpaces:
+        # Get the token ahead of the current whitespaces.
+        possibleIndexEosToken = self.getCurrentToken().tokenIndex - 2
+        ahead = self._input.get(possibleIndexEosToken)
 
     # Get the token's text and type.
     text = ahead.text
@@ -76,7 +85,7 @@ def lineTerminatorAhead(self):
 
     # Check if the token is, or contains a line terminator.
     return (type == ECMAScriptParser.MultiLineComment and \
-        (text.contains('\r') or text.contains('\n'))) or \
+        ('\r' in text or '\n' in text)) or \
         (type == ECMAScriptParser.LineTerminator)
 }
 
@@ -256,7 +265,7 @@ emptyStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : {(self._input.LA(1) != ECMAScriptParser.OpenBrace) and (self._input.LA(1) != ECMAScriptParser.Function)}? expressionSequence SemiColon
+ : {(self._input.LA(1) != ECMAScriptParser.OpenBrace) and (self._input.LA(1) != ECMAScriptParser.Function)}? expressionSequence eos
  ;
 
 /// IfStatement :
@@ -729,11 +738,11 @@ futureReservedWord
  ;
 
 getter
- : {self._input.LT(1).getText().startsWith("get")}? Identifier
+ : {self._input.LT(1).getText() == "get"}? Identifier propertyName
  ;
 
 setter
- : {self._input.LT(1).getText().startsWith("set")}? Identifier
+ : {self._input.LT(1).getText() == "set"}? Identifier propertyName
  ;
 
 eos
