@@ -85,19 +85,31 @@ for_in_statement : 'for' 'case'? pattern 'in' expression where_clause? code_bloc
 
 while_statement : 'while' condition_clause code_block  ;
 
-condition_clause : expression
+condition_clause
+ : expression
  | expression ',' condition_list
  | condition_list
  | availability_condition ',' expression
  ;
 
-condition_list : condition | condition ',' condition_list ;
-condition : availability_condition | case_condition | optional_binding_condition ;
+condition_list : condition (',' condition)* ;
+condition
+ : availability_condition
+ | case_condition
+ | optional_binding_condition
+ ;
 case_condition : 'case' pattern initializer where_clause? ;
-optional_binding_condition : optional_binding_head optional_binding_continuation_list? where_clause? ;
+optional_binding_condition
+ : optional_binding_head optional_binding_continuation_list? where_clause?
+ ;
 optional_binding_head : 'let' pattern initializer | 'var' pattern initializer ;
-optional_binding_continuation_list : optional_binding_continuation | optional_binding_continuation ',' optional_binding_continuation_list ;
-optional_binding_continuation : pattern initializer | optional_binding_head ;
+optional_binding_continuation_list
+ : ',' optional_binding_continuation (',' optional_binding_continuation)*
+ ;
+optional_binding_continuation
+ : pattern initializer
+ | optional_binding_head
+ ;
 
 
 // GRAMMAR OF A REPEAT-WHILE STATEMENT
