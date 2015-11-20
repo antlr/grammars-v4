@@ -1,10 +1,13 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1347\cocoasubrtf570
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 LucidaGrande;}
-{\colortbl;\red255\green255\blue255;}
-\margl1440\margr1440\vieww23740\viewh23620\viewkind0
+{\rtf1\ansi\ansicpg1252\cocoartf1348\cocoasubrtf170
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 LucidaGrande;\f2\fnil\fcharset0 Menlo-Bold;
+\f3\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red109\green109\blue109;\red255\green255\blue255;\red0\green0\blue0;
+\red14\green115\blue192;\red130\green72\blue146;\red0\green128\blue0;\red128\green128\blue128;\red211\green210\blue231;
+}
+\margl1440\margr1440\vieww31480\viewh29180\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
 
-\f0\fs30 \cf0 Some notes on issues am finding with the official grammar as I developed the executable grammar.\
+\f0\fs36 \cf0 Some notes on issues am finding with the official grammar as I developed the executable grammar.\
 \
 # ambiguities\
 \
@@ -70,15 +73,13 @@ hard to handle since it falls off end of expr. it's ambig to match just b to pre
  Two big trees appear but diff shows just a few nodes!\
 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
-
-\fs24 \cf0 {{\NeXTGraphic Pasted Graphic 1.tiff \width9920 \height8060
-}¬}\
+\cf0 {{\NeXTGraphic Pasted Graphic 1.tiff \width9920 \height8060
+}¬}\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \
 \
 versus\
-
-\fs26 \
-
-\fs24 {{\NeXTGraphic Pasted Graphic 2.tiff \width8600 \height7600
+\
+{{\NeXTGraphic Pasted Graphic 2.tiff \width8600 \height7600
 }¬}\
 \
 first interp (chosen) says b = i is an assignment expr.\
@@ -102,4 +103,149 @@ next, (texture: groundTexture) can match two interps.\
 {{\NeXTGraphic Pasted Graphic 4.tiff \width29500 \height19580
 }¬}\
 \
-it chooses postfix_expr:function_call_expression over postfix_expr:function_call_expression:primary, which is good as the (...) shouldn't be interpreted as another statement. the precedence makes it seem first alt, primary, should be taken but it's not just precedence taken into consideration. it's that f(...) matches the rule by taking the postfix_expr:function_call_expression option.}
+it chooses postfix_expr:function_call_expression over postfix_expr:function_call_expression:primary, which is good as the (...) shouldn't be interpreted as another statement. the precedence makes it seem first alt, primary, should be taken but it's not just precedence taken into consideration. it's that f(...) matches the rule by taking the postfix_expr:function_call_expression option.\
+\
+11/18/15. Error in published grammar; some types are optional here:\
+\
+\pard\pardeftab720\sl406
+
+\i\fs28 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 parameter 
+\f1\i0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \uc0\u8594 
+\f0  
+\f2\b\fs24 \cf4 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 let\'ad
+\f0\i\b0\fs22 \cf2 \expnd0\expndtw0\kerning0
+\sub \outl0\strokewidth0 \strokec2 opt
+\i0\fs28 \cf4 \expnd0\expndtw0\kerning0
+\nosupersub \outl0\strokewidth0 \strokec4 \'ad{\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Declarations.html#//apple_ref/swift/grammar/external-parameter-name"}}{\fldrslt 
+\i \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 external-parameter-name}}
+\i \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \'ad
+\fs22 \cf2 \expnd0\expndtw0\kerning0
+\sub \outl0\strokewidth0 \strokec2 opt
+\i0\fs28 \cf4 \expnd0\expndtw0\kerning0
+\nosupersub \outl0\strokewidth0 \strokec4 \'ad{\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Declarations.html#//apple_ref/swift/grammar/local-parameter-name"}}{\fldrslt 
+\i \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 local-parameter-name}}
+\i \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \'ad {\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Types.html#//apple_ref/swift/grammar/type-annotation"}}{\fldrslt \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 type-annotation}}\cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5  \cf4 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 \'ad{\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Declarations.html#//apple_ref/swift/grammar/default-argument-clause"}}{\fldrslt \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 default-argument-clause}}\'ad
+\fs22 \cf2 \expnd0\expndtw0\kerning0
+\sub \outl0\strokewidth0 \strokec2 opt
+\i0\fs28 \cf4 \expnd0\expndtw0\kerning0
+\nosupersub \outl0\strokewidth0 \strokec4 \'ad\
+\pard\pardeftab720\sl406
+\cf5 \cb1 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 \
+\pard\pardeftab720\sl406
+
+\i \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 parameter 
+\f1\i0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \uc0\u8594 
+\f0  
+\f2\b\fs24 \cf4 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 var\'ad{\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Declarations.html#//apple_ref/swift/grammar/external-parameter-name"}}{\fldrslt 
+\f0\i\b0\fs28 \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 external-parameter-name}}
+\f0\i\b0\fs28 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \'ad
+\fs22 \cf2 \expnd0\expndtw0\kerning0
+\sub \outl0\strokewidth0 \strokec2 opt
+\i0\fs28 \cf4 \expnd0\expndtw0\kerning0
+\nosupersub \outl0\strokewidth0 \strokec4 \'ad{\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Declarations.html#//apple_ref/swift/grammar/local-parameter-name"}}{\fldrslt 
+\i \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 local-parameter-name}}
+\i \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \'ad {\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Types.html#//apple_ref/swift/grammar/type-annotation"}}{\fldrslt \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 type-annotation}}\cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5  \cf4 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 \'ad{\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Declarations.html#//apple_ref/swift/grammar/default-argument-clause"}}{\fldrslt \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 default-argument-clause}}\'ad
+\fs22 \cf2 \expnd0\expndtw0\kerning0
+\sub \outl0\strokewidth0 \strokec2 opt
+\i0\fs28 \cf4 \expnd0\expndtw0\kerning0
+\nosupersub \outl0\strokewidth0 \strokec4 \'ad\
+\pard\pardeftab720\sl406
+\cf5 \cb1 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 \
+\pard\pardeftab720\sl406
+
+\i \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 parameter 
+\f1\i0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \uc0\u8594 
+\f0  
+\f2\b\fs24 \cf4 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 inout\'ad{\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Declarations.html#//apple_ref/swift/grammar/external-parameter-name"}}{\fldrslt 
+\f0\i\b0\fs28 \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 external-parameter-name}}
+\f0\i\b0\fs28 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \'ad
+\fs22 \cf2 \expnd0\expndtw0\kerning0
+\sub \outl0\strokewidth0 \strokec2 opt
+\i0\fs28 \cf4 \expnd0\expndtw0\kerning0
+\nosupersub \outl0\strokewidth0 \strokec4 \'ad{\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Declarations.html#//apple_ref/swift/grammar/local-parameter-name"}}{\fldrslt 
+\i \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 local-parameter-name}}
+\i \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \'ad {\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Types.html#//apple_ref/swift/grammar/type-annotation"}}{\fldrslt \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 type-annotation}}\'ad
+\i0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \
+\pard\pardeftab720\sl406
+\cf5 \cb1 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 \
+\pard\pardeftab720\sl406
+
+\i \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 parameter 
+\f1\i0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \uc0\u8594 
+\f0  {\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Declarations.html#//apple_ref/swift/grammar/external-parameter-name"}}{\fldrslt 
+\i \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 external-parameter-name}}
+\i \cf4 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 \'ad
+\fs22 \cf2 \expnd0\expndtw0\kerning0
+\sub \outl0\strokewidth0 \strokec2 opt
+\i0\fs28 \cf4 \expnd0\expndtw0\kerning0
+\nosupersub \outl0\strokewidth0 \strokec4 \'ad{\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Declarations.html#//apple_ref/swift/grammar/local-parameter-name"}}{\fldrslt 
+\i \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 local-parameter-name}}
+\i \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \'ad {\field{\*\fldinst{HYPERLINK "https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Types.html#//apple_ref/swift/grammar/type-annotation"}}{\fldrslt \cf5 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec5 type-annotation}}\'ad
+\f2\i0\b\fs24 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 ...
+\f0\b0\fs28 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\fs36 \cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+should be:\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f3\fs30 \cf6 parameter\uc0\u8232  \cf0 : \cf7 'let'\cf0 ?  \cf6 external_parameter_name\cf0 ? \cf6 local_parameter_name type_annotation\cf0 ? \cf6 default_argument_clause\cf0 ?\uc0\u8232  | \cf7 'var'   \cf6 external_parameter_name\cf0 ? \cf6 local_parameter_name type_annotation\cf0 ? \cf6 default_argument_clause\cf0 ?\uc0\u8232  | \cf7 'inout' \cf6 external_parameter_name\cf0 ? \cf6 local_parameter_name type_annotation\uc0\u8232  \cf0 |         \cf6 external_parameter_name\cf0 ? \cf6 local_parameter_name type_annotation range_operator\uc0\u8232  \cf0 ;\uc0\u8232 \
+Ambiguity in expression with !?\
+\
+\cf6 postfix_expression\uc0\u8232  \cf0 : \cf6 postfix_expression postfix_operator                            \cf0 # \cf6 postfix_operation\uc0\u8232  \cf0 | \cf6 postfix_expression parenthesized_expression                    \cf0 # \cf6 function_call_expression\uc0\u8232  \cf0 | \cf6 postfix_expression parenthesized_expression\cf0 ? \cf6 trailing_closure  \cf0 # \cf6 function_call_with_closure_expression\uc0\u8232  \cf0 | \cf6 postfix_expression \cf7 '.' 'init'                                  \cf0 # \cf6 initializer_expression\uc0\u8232  \cf0 | \cf6 postfix_expression \cf7 '.' \cf6 Pure_decimal_digits                     \cf0 # \cf6 explicit_member_expression1\uc0\u8232  \cf0 | \cf6 postfix_expression \cf7 '.' \cf6 identifier generic_argument_clause\cf0 ?     # \cf6 explicit_member_expression2\uc0\u8232  \cf0 | \cf6 postfix_expression \cf7 '.' 'self'                                  \cf0 # \cf6 postfix_self_expression\uc0\u8232  \cf0 | \cf6 postfix_expression \cf7 '.' 'dynamicType'                           \cf0 # \cf6 dynamic_type_expression\uc0\u8232  \cf0 | \cf6 postfix_expression \cf7 '[' \cf6 expression_list \cf7 ']'                     \cf0 # \cf6 subscript_expression\uc0\u8232 \cf8 // ! is a postfix operator already\uc0\u8232 // | postfix_expression '!'                                         # forced_value_expression\u8232 // ? is a postfix operator already\u8232 // | postfix_expression '?'                                         # optional_chaining_expression\u8232  \cf0 | \cf6 primary_expression                                             \cf0 # \cf6 primary\uc0\u8232  \cf0 ;\
+\
+missing ',' in apple grammar.  this didn't match "
+\fs28 \cb9 \CocoaLigature0 let dataProvider = dataProvider, lineData = dataProvider.lineData"
+\fs30 \cb1 \CocoaLigature1 \
+\
+\cf6 optional_binding_condition\uc0\u8232  \cf0 : \cf6 optional_binding_head optional_binding_continuation_list\cf0 ? \cf6 where_clause\cf0 ?\uc0\u8232                          ^ whoops! must have comma\
+ ;\
+\
+added comma here:\
+\
+\cf6 optional_binding_continuation_list\uc0\u8232  \cf0 : \cf7 ',' \cf6 optional_binding_continuation \cf0 (\cf7 ',' \cf6 optional_binding_continuation\cf0 )*\uc0\u8232  ;\u8232 \
+}
