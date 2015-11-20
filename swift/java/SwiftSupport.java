@@ -89,6 +89,8 @@ public class SwiftSupport {
 		rightWS.set(SwiftParser.COMMA);
 		rightWS.set(SwiftParser.COLON);
 		rightWS.set(SwiftParser.SEMI);
+		rightWS.set(SwiftParser.Line_comment);
+		rightWS.set(SwiftParser.Block_comment);
 	}
 
 	public static boolean isOperatorHead(int ttype) {
