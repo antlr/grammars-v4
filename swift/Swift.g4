@@ -85,19 +85,31 @@ for_in_statement : 'for' 'case'? pattern 'in' expression where_clause? code_bloc
 
 while_statement : 'while' condition_clause code_block  ;
 
-condition_clause : expression
+condition_clause
+ : expression
  | expression ',' condition_list
  | condition_list
  | availability_condition ',' expression
  ;
 
-condition_list : condition | condition ',' condition_list ;
-condition : availability_condition | case_condition | optional_binding_condition ;
+condition_list : condition (',' condition)* ;
+condition
+ : availability_condition
+ | case_condition
+ | optional_binding_condition
+ ;
 case_condition : 'case' pattern initializer where_clause? ;
-optional_binding_condition : optional_binding_head optional_binding_continuation_list? where_clause? ;
+optional_binding_condition
+ : optional_binding_head optional_binding_continuation_list? where_clause?
+ ;
 optional_binding_head : 'let' pattern initializer | 'var' pattern initializer ;
-optional_binding_continuation_list : optional_binding_continuation | optional_binding_continuation ',' optional_binding_continuation_list ;
-optional_binding_continuation : pattern initializer | optional_binding_head ;
+optional_binding_continuation_list
+ : ',' optional_binding_continuation (',' optional_binding_continuation)*
+ ;
+optional_binding_continuation
+ : pattern initializer
+ | optional_binding_head
+ ;
 
 
 // GRAMMAR OF A REPEAT-WHILE STATEMENT
@@ -289,7 +301,7 @@ declaration
  | operator_declaration
  ;
 
-declarations : declaration declarations? ;
+declarations : declaration+ ;
 
 
 // GRAMMAR OF A TOP-LEVEL DECLARATION
@@ -369,11 +381,12 @@ function_result : arrow_operator attributes? type  ;
 function_body : code_block  ;
 parameter_clauses : parameter_clause parameter_clauses? ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
-parameter_list : parameter | parameter ',' parameter_list  ;
-parameter : 'let'? external_parameter_name? local_parameter_name type_annotation default_argument_clause?
- | 'var' external_parameter_name? local_parameter_name type_annotation default_argument_clause?
+parameter_list : parameter (',' parameter)*  ;
+parameter
+ : 'let'?  external_parameter_name? local_parameter_name type_annotation? default_argument_clause?
+ | 'var'   external_parameter_name? local_parameter_name type_annotation? default_argument_clause?
  | 'inout' external_parameter_name? local_parameter_name type_annotation
- | external_parameter_name? local_parameter_name type_annotation range_operator
+ |         external_parameter_name? local_parameter_name type_annotation range_operator
  ;
 external_parameter_name : identifier | '_'  ;
 local_parameter_name : identifier | '_'  ;
@@ -408,7 +421,10 @@ struct_body : '{' declarations?'}'  ;
 
 // GRAMMAR OF A CLASS DECLARATION
 
-class_declaration : attributes? access_level_modifier? 'class' class_name generic_parameter_clause? type_inheritance_clause? class_body  ;
+class_declaration
+ : attributes? access_level_modifier? 'class' class_name
+   generic_parameter_clause? type_inheritance_clause? class_body
+ ;
 class_name : identifier ;
 class_body : '{' declarations? '}'  ;
 
@@ -416,7 +432,7 @@ class_body : '{' declarations? '}'  ;
 
 protocol_declaration : attributes? access_level_modifier? 'protocol' protocol_name type_inheritance_clause? protocol_body  ;
 protocol_name : identifier  ;
-protocol_body : '{' protocol_member_declarations?'}'  ;
+protocol_body : '{' protocol_member_declarations? '}'  ;
 protocol_member_declaration : protocol_property_declaration
  | protocol_method_declaration
  | protocol_initializer_declaration
@@ -689,7 +705,7 @@ closure_signature
  ;
 
 capture_list : '[' capture_list_items ']'  ;
-capture_list_items : capture_list_item (',' capture_list_items)* ;
+capture_list_items : capture_list_item (',' capture_list_item)* ;
 capture_list_item : capture_specifier? expression ;
 
 capture_specifier : 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)'  ;
@@ -716,8 +732,10 @@ postfix_expression
  | postfix_expression '.' 'self'                                  # postfix_self_expression
  | postfix_expression '.' 'dynamicType'                           # dynamic_type_expression
  | postfix_expression '[' expression_list ']'                     # subscript_expression
- | postfix_expression '!'                                         # forced_value_expression
- | postfix_expression '?'                                         # optional_chaining_expression
+// ! is a postfix operator already
+// | postfix_expression '!'                                         # forced_value_expression
+// ? is a postfix operator already
+// | postfix_expression '?'                                         # optional_chaining_expression
  | primary_expression                                             # primary
  ;
 
@@ -865,9 +883,11 @@ fragment Identifier_character : [0-9]
 fragment Identifier_characters : Identifier_character+ ;
 
 context_sensitive_keyword :
- 'associativity' | 'didSet' | 'get' | 'infix' | 'inout' | 'left' | 'mutating' | 'none' |
- 'nonmutating' | 'operator' | 'override' | 'postfix' | 'precedence' | 'prefix' | 'right' |
- 'set' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | 'weak' | 'willSet'
+ 'associativity' | 'convenience' | 'dynamic' | 'didSet' |
+ 'fina' | 'get' | 'infix' | 'indirect' | 'lazy' | 'left' | 'mutating' | 'none' |
+ 'nonmutating' | 'optional' | 'operator' | 'override' |
+ 'postfix' | 'precedence' | 'prefix' | 'Protocol' | 'required' | 'right' |
+ 'set' | 'Type' | 'unowned' | 'unowned' | 'weak' | 'willSet'
  ;
 
 // GRAMMAR OF OPERATORS
