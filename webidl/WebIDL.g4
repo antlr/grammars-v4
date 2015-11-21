@@ -63,6 +63,7 @@ definition
 callbackOrInterface
 	: 'callback' callbackRestOrInterface
 	| interface_
+	| class_
 ;
 
 callbackRestOrInterface
@@ -72,6 +73,10 @@ callbackRestOrInterface
 
 interface_
 	: 'interface' IDENTIFIER_WEBIDL inheritance '{' interfaceMembers '}' ';'
+;
+
+class_
+    : 'class' IDENTIFIER_WEBIDL extension '{' interfaceMembers '}' ';'
 ;
 
 partial
@@ -141,6 +146,11 @@ defaultValue
 inheritance
 	: ':' IDENTIFIER_WEBIDL
 	| /* empty */
+;
+
+extension
+    : 'extends' IDENTIFIER_WEBIDL
+    | /* empty */
 ;
 
 enum_

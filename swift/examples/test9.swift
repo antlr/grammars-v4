@@ -21,13 +21,13 @@ class TestClass {
     }
 
     // Inferring Type From Context
-    reversed = names.sort( { s1, s2 in return s1 > s2 } )
+    var reversed = names.sort( { s1, s2 in return s1 > s2 } )
 
     // Implicit Returns from Single-Expression Closures
-    reversed = names.sort( { s1, s2 in s1 > s2 } )
+    var reversed = names.sort( { s1, s2 in s1 > s2 } )
 
     // Shorthand Argument Names
-    reversed = names.sort( { $0 > $1 } )
+    var reversed = names.sort( { $0 > $1 } )
 
     let strings = numbers.map {
         (var number) -> String in
@@ -65,12 +65,13 @@ class TestClass {
     // Calling generic functions with parameters
     var someInt = 3
     var anotherInt = 107
-    swapTwoValues(&someInt, &anotherInt)
+
+    func foo() { swapTwoValues(&someInt, &anotherInt) }
+
     // someInt is now 107, and anotherInt is now 3
 
     var someString = "hello"
     var anotherString = "world"
-    swapTwoValues(&someString, &anotherString)
 
     // Type Constraint Syntax
     func someFunction<T: SomeClass, U: SomeProtocol>(someT: T, someU: U) {
@@ -140,23 +141,27 @@ class TestClass {
 
     // Shifting Behavior for Unsigned Integers
     let shiftBits: UInt8 = 4   // 00000100 in binary
-    shiftBits << 1             // 00001000
-    shiftBits << 2             // 00010000
-    shiftBits << 5             // 10000000
-    shiftBits << 6             // 00000000
-    shiftBits >> 2             // 00000001
+    func foo() {
+	    shiftBits << 1             // 00001000
+	    shiftBits << 2             // 00010000
+	    shiftBits << 5             // 10000000
+	    shiftBits << 6             // 00000000
+	    shiftBits >> 2             // 00000001
+    }
 
     // Overflow Operators
     var unsignedOverflow = UInt8.max
     // unsignedOverflow equals 255, which is the maximum value a UInt8 can hold
-    unsignedOverflow = unsignedOverflow &+ 1
+    func foo() {
+    	unsignedOverflow = unsignedOverflow &+ 1
+        // unsignedOverflow equals 0, which is the minimum value a UInt8 can hold
+        unsignedOverflow = unsignedOverflow &- 1
+    }
 
     var unsignedOverflow = UInt8.min
-    // unsignedOverflow equals 0, which is the minimum value a UInt8 can hold
-    unsignedOverflow = unsignedOverflow &- 1
     // unsignedOverflow is now equal to 255
 
-    func precedenceAndAssociativity -> Void {
+    func precedenceAndAssociativity() -> Void {
         2 + 3 % 4 * 5 // equals 17
     }
 

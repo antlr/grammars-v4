@@ -89,6 +89,8 @@ public class SwiftSupport {
 		rightWS.set(SwiftParser.COMMA);
 		rightWS.set(SwiftParser.COLON);
 		rightWS.set(SwiftParser.SEMI);
+		rightWS.set(SwiftParser.Line_comment);
+		rightWS.set(SwiftParser.Block_comment);
 	}
 
 	public static boolean isOperatorHead(int ttype) {
@@ -173,7 +175,7 @@ public class SwiftSupport {
 		boolean nextIsWS = isRightOperatorWS(nextToken);
 		boolean result = prevIsWS && nextIsWS || (!prevIsWS && !nextIsWS);
 		String text = tokens.getText(Interval.of(start, stop));
-		System.out.println("isBinaryOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
+		//System.out.println("isBinaryOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
 		return result;
 	}
 
@@ -193,7 +195,7 @@ public class SwiftSupport {
 		boolean nextIsWS = isRightOperatorWS(nextToken);
 		boolean result = prevIsWS && !nextIsWS;
 		String text = tokens.getText(Interval.of(start, stop));
-		System.out.println("isPrefixOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
+		//System.out.println("isPrefixOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
 		return result;
 	}
 
@@ -220,7 +222,7 @@ public class SwiftSupport {
 			!prevIsWS && nextIsWS ||
 			!prevIsWS && nextToken.getType()==SwiftParser.DOT;
 		String text = tokens.getText(Interval.of(start, stop));
-		System.out.println("isPostfixOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
+		//System.out.println("isPostfixOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
 		return result;
 	}
 
