@@ -52,6 +52,7 @@
 		<module>objc</module>
 		<module>pascal</module>
 		<module>pcre</module>
+		<module>pddl</module>
 		<module>peoplecode</module>
 		<module>pgn</module>
 		<!--
