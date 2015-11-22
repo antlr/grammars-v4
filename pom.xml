@@ -28,6 +28,7 @@
 		<module>creole</module>
 		<module>csharp</module>
 		<module>csv</module>
+		<module>dcm</module>
 		<module>dot</module>
 		<module>erlang</module>
 		<module>fasta</module>
@@ -71,7 +72,6 @@
 		<module>stacktrace</module>
 		<module>stringtemplate</module>
 		<module>suokif</module>
-<!-- Grammars-V4 issue 238 -->
 		<module>swift</module>
 		<module>tinyc</module>
 		<module>tnsnames</module>
@@ -81,6 +81,7 @@
 		<module>vb6</module>
 		<module>verilog</module>
 		<module>vhdl</module>
+		<module>wavefront</module>
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>
