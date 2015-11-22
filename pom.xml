@@ -16,7 +16,6 @@
 		<module>asn</module>
 <!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 <!--		<module>aspectj</module> -->
-
 		<module>atl</module>
 		<module>basic</module>
 		<module>bnf</module>
@@ -54,6 +53,7 @@
 		<module>objc</module>
 		<module>pascal</module>
 		<module>pcre</module>
+		<module>pddl</module>
 		<module>peoplecode</module>
 		<module>pgn</module>
 		<!--
