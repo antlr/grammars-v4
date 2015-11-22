@@ -1,3 +1,4 @@
+
 /*
  [The "BSD licence"]
  Copyright (c) 2013 Tom Everett
@@ -28,52 +29,54 @@
 grammar brainfuck;
 
 file
-    : opcode+;
+   : opcode+
+   ;
 
 opcode
-    : GT
-    | LT
-    | PLUS
-    | MINUS
-    | DOT
-    | COMMA
-    | LPAREN
-    | RPAREN
-    ;
+   : GT | LT | PLUS | MINUS | DOT | COMMA | LPAREN | RPAREN
+   ;
+
 
 GT
-    : '>'
-    ;
+   : '>'
+   ;
+
 
 LT
-    : '<'
-    ;
+   : '<'
+   ;
+
 
 PLUS
-    : '+'
-    ;
+   : '+'
+   ;
+
 
 MINUS
-    : '-'
-    ;
+   : '-'
+   ;
+
 
 DOT
-    : '.'
-    ;
+   : '.'
+   ;
+
 
 COMMA
-    : ','
-    ;
+   : ','
+   ;
+
 
 LPAREN
-    : '['
-    ;
+   : '['
+   ;
+
 
 RPAREN
-    : ']'
-    ;
+   : ']'
+   ;
+
 
 WS
-    : [ \t\r\n]->skip
-    ;
-
+   : [ \t\r\n] -> skip
+   ;
