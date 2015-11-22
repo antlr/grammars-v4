@@ -9,7 +9,7 @@
 	<modules>
 		<module>support</module>
 		<module>abnf</module>
-		<module>agc</module>		
+<!--		<module>agc</module>		-->
 		<module>antlr4</module>
 		<module>arithmetic</module>
 		<module>asm6502</module>
@@ -64,6 +64,7 @@
 		<module>redcode</module>
 		<module>scala</module>
 		<module>scss</module>
+		<module>sharc</module>
 		<module>smalltalk</module>
 		<module>sparql</module>
 		<module>sqlite</module>
