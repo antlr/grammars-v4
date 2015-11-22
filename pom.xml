@@ -81,6 +81,7 @@
 		<module>vb6</module>
 		<module>verilog</module>
 		<module>vhdl</module>
+		<module>wavefront</module>
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>
