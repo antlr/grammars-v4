@@ -71,6 +71,7 @@
 		<module>suokif</module>
 <!-- Grammars-V4 issue 238 -->
 		<module>swift</module>
+		<module>tinyc</module>
 		<module>tnsnames</module>
 		<module>tnt</module>
 		<module>turtle</module>
