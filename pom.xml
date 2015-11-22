@@ -63,6 +63,7 @@
 		<module>redcode</module>
 		<module>scala</module>
 		<module>scss</module>
+		<module>sharc</module>
 		<module>smalltalk</module>
 		<module>sparql</module>
 		<module>sqlite</module>
