@@ -1,3 +1,4 @@
+
 /*
 [The "BSD licence"]
 Copyright (c) 2012 Tom Everett
@@ -23,7 +24,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar modelica;
 
 stored_definition
@@ -348,10 +348,11 @@ Q_IDENT
    : '\'' ( Q_CHAR | S_ESCAPE ) ( Q_CHAR | S_ESCAPE )* '\''
    ;
 
-fragment
-S_CHAR
-    :   ~["\\]
-    ;
+
+fragment S_CHAR
+   : ~ ["\\]
+   ;
+
 
 NONDIGIT
    : '_' | 'a' .. 'z' | 'A' .. 'Z'
@@ -364,7 +365,7 @@ STRING
 
 
 Q_CHAR
-   : NONDIGIT | DIGIT | '!' | '#' | '$' | '%' | '&' | '(' | ')' | '*' | '+' | ',' | '-' | '.' | '/' | ':' | ';' | '<' | '>' | '=' | '?' | '@' | '[' | ']' | '^' | '{' | '}' | '|' | '~' 
+   : NONDIGIT | DIGIT | '!' | '#' | '$' | '%' | '&' | '(' | ')' | '*' | '+' | ',' | '-' | '.' | '/' | ':' | ';' | '<' | '>' | '=' | '?' | '@' | '[' | ']' | '^' | '{' | '}' | '|' | '~'
    ;
 
 
@@ -373,8 +374,8 @@ S_ESCAPE
    ;
 
 
-DIGIT
-   : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+fragment DIGIT
+   : '0' .. '9'
    ;
 
 
@@ -387,5 +388,7 @@ UNSIGNED_NUMBER
    : UNSIGNED_INTEGER ( '.' ( UNSIGNED_INTEGER )? )? ( ( 'e' | 'E' ) ( '+' | '-' )? UNSIGNED_INTEGER )?
    ;
 
-WS : [ \r\n\t]+ -> channel(HIDDEN)
+
+WS
+   : [ \r\n\t]+ -> channel ( HIDDEN )
    ;
