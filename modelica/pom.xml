@@ -37,7 +37,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>stored_definition</entryPoint>
-					<grammarName>Modelica</grammarName>
+					<grammarName>modelica</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
