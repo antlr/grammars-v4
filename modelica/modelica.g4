@@ -343,7 +343,7 @@ IDENT
    : NONDIGIT ( DIGIT | NONDIGIT )* | Q_IDENT
    ;
 
-
+fragment
 Q_IDENT
    : '\'' ( Q_CHAR | S_ESCAPE ) ( Q_CHAR | S_ESCAPE )* '\''
    ;
@@ -354,6 +354,7 @@ fragment S_CHAR
    ;
 
 
+fragment
 NONDIGIT
    : '_' | 'a' .. 'z' | 'A' .. 'Z'
    ;
@@ -363,22 +364,23 @@ STRING
    : '"' S_CHAR* '"'
    ;
 
-
+fragment
 Q_CHAR
    : NONDIGIT | DIGIT | '!' | '#' | '$' | '%' | '&' | '(' | ')' | '*' | '+' | ',' | '-' | '.' | '/' | ':' | ';' | '<' | '>' | '=' | '?' | '@' | '[' | ']' | '^' | '{' | '}' | '|' | '~'
    ;
 
-
+fragment
 S_ESCAPE
    : '’' | '\'' | '?' | '\\' | 'a' | 'b' | 'f' | 'v'
    ;
 
 
 fragment DIGIT
-   : '0' .. '9'
+   : '0'..'9'
    ;
 
 
+fragment
 UNSIGNED_INTEGER
    : DIGIT ( DIGIT )*
    ;
