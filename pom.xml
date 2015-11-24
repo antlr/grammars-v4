@@ -46,6 +46,7 @@
 		<module>lua</module>
 		<module>masm</module>
 		<module>memcached_protocol</module>
+		<module>modelica</module>
 		<module>MPS</module>
 		<module>mumath</module>
 		<module>mumps</module>
