@@ -61,6 +61,7 @@
 		<module>php</module>
 	-->
 		<module>propcalc</module>
+		<module>python3</module>
 		<module>r</module>
 		<module>rcs</module>
 		<module>redcode</module>
