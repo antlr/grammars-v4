@@ -42,76 +42,78 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar agc;
 
 prog
-    : (line? EOL)+
+    : instruction+
     ;
 
-line
-    : (assignment |cmd)? comment?
+instruction
+    : label? comment EOL                                    // comment
+    | label? EOL                                            // blank line
+    | label? opcode expression* comment? EOL                // opcode and operand on same line
+    | label? (opcode expression? (EOL expression)*) comment? EOL        // opcode with operands on new lines
+    | label? (opcode opcode (EOL expression)*) comment? EOL // opcode followed by opcode
+    | assignment comment? EOL                               // assignment
     ;
 
 assignment
     : variable '=' expression
     ;
 
-cmd
-    : (label? opcode '*'? expression*) 
-    | label
-    ;
-
 opcode
     : 'SETLOC'
-    | 'TC'          
-    | 'CCS'           
-    | 'TCF'
-    | 'DAS'
-    | 'LXCH'
-    | 'INCR'
-    | 'ADS'
-    | 'CA'
-    | 'CS'
-    | 'INDEX'
-    | 'DXCH'
-    | 'TS'
-    | 'XCH'
-    | 'AD'
-    | 'MASK'
-    | 'READ'
-    | 'WRITE'
-    | 'RAND'
-    | 'WAND'
-    | 'ROR'
-    | 'WOR'
-    | 'RXOR'
-    | 'EDRUPT'
-    | 'BZF'
-    | 'MSU'
-    | 'QXCH'
-    | 'AUG'
-    | 'DIM'
-    | 'DCA'
-    | 'DCS'
-    | 'SU'
-    | 'BZMF'
-    | 'MP'
-    | 'XXALQ'
-    | 'XLQ'
-    | 'RETURN'
-    | 'RELINT'
-    | 'INHINT'
-    | 'EXTEND'
-    | 'NOOP'
-    | 'DDOUBL'
-    | 'DTCF'
-    | 'COM'
-    | 'ZL'
-    | 'RESUME'
-    | 'DTCB'
-    | 'OVSK'
-    | 'TCAA'
-    | 'DOUBLE'
-    | 'ZQ'
-    | 'DCOM'
-    | 'SQUARE'
+    | 'TC'      // transfer control   
+    | 'TCR'     // transfer control
+    | 'CCS'     // Count, Compare, and Skip      
+    | 'TCF'     // Transfer Control to Fixed
+    | 'DAS'     // Double Add to Storage
+    | 'LXCH'    // Exchange L and K
+    | 'INCR'    // Increment
+    | 'ADS'     // Add to Storage
+    | 'CA'      // Clear and Add
+    | 'CS'      // Clear and Subtract
+    | 'INDEX'   // Index
+    | 'DXCH'    // double exchange
+    | 'TS'      // Transfer to Storage
+    | 'XCH'     // Exchange A and K
+    | 'AD'      // AD
+    | 'MASK'    // Mask A by K
+    | 'MSK'     // Mask A by K
+    | 'READ'    // Read Channel KC
+    | 'WRITE'   // Write Channel KC
+    | 'RAND'    // Read and Mask
+    | 'WAND'    // Write and Mask
+    | 'ROR'     // Read and Superimpose
+    | 'WOR'     // Write and Superimpose
+    | 'RXOR'    // Read and Invert
+    | 'EDRUPT'  // for machine checkout only
+    | 'BZF'     // Branch Zero to Fixed
+    | 'MSU'     // Modular Subtract
+    | 'QXCH'    // Exchange Q and K
+    | 'AUG'     // augment
+    | 'DIM'     // diminish
+    | 'DCA'     // Double Clear and Add
+    | 'DCS'     // Double Clear and Subtract
+    | 'SU'      // subtract
+    | 'BZMF'    // Branch Zero or Minus to Fixed
+    | 'MP'      // Multiply
+    | 'XXALQ'   // Execute Extracode Using A, L, and Q
+    | 'XLQ'     // Execute Using L and Q
+    | 'RETURN'  // Return from Subroutine
+    | 'RELINT'  // Enable Interrupts
+    | 'INHINT'  // Disable Interrupts
+    | 'EXTEND'  // extend
+    | 'NOOP'    // No-operation
+    | 'DDOUBL'  // Double Precision Double
+    | 'DTCF'    // Double Transfer Control, Switching F Bank
+    | 'COM'     // Complement the Contents of A
+    | 'ZL'      // Zero L
+    | 'RESUME'  // Resume Interrupted Program
+    | 'DTCB'    // Double Transfer Control, Switching Both Banks
+    | 'OVSK'    // Overflow Skip
+    | 'TCAA'    // Transfer Control to Address in A
+    | 'DOUBLE'  // Double the Contents of A
+    | 'ZQ'      // Zero Q
+    | 'DCOM'    // Double Complement
+    | 'SQUARE'  // Square the Contents of A
     | 'PINC'
     | 'PCDU'
     | 'MINC'
@@ -124,7 +126,8 @@ opcode
     | 'STORE'
     | 'GOJ'
     | 'TCSAJ'
-    | 'CAF'
+    | 'CAF'     // Clear and Add Fixed
+    | 'CAE'     // Clear and Add Erasable
     | 'OCT'
     | 'CADR'
     | 'BANK'
@@ -158,7 +161,9 @@ opcode
     | 'UNIT'
     | 'OCTAL'
     | 'ADRES'
-    | 'ABVAL'
+    | 'ABVAL'   
+    | 'DV'      // Divide
+    | 'NDX'     // INDEX
     ;
 
 label
@@ -193,7 +198,7 @@ number
     ;
 
 STRING
-    : [a-zA-Z0-9] [a-zA-Z0-9_.+\-/*]*
+    : [-a-zA-Z0-9] [a-zA-Z0-9_.+\-/*]*
     ; 
 
 DECIMAL
