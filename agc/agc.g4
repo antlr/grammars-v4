@@ -114,23 +114,25 @@ opcode
     | 'ZQ'      // Zero Q
     | 'DCOM'    // Double Complement
     | 'SQUARE'  // Square the Contents of A
-    | 'PINC'
-    | 'PCDU'
-    | 'MINC'
-    | 'MCDU'
-    | 'DINC'
-    | 'SHINC'
-    | 'INOTRD'
-    | 'INOTLD'
-    | 'FETCH'
-    | 'STORE'
-    | 'GOJ'
-    | 'TCSAJ'
+    | 'PINC'    // Add +1 in 1's-complement fashion to a counter
+    | 'PCDU'    // Add +1 in 2's-complement fashion to a counter.  
+    | 'MINC'    // Add -1 in 1's-complement fashion to a counter.
+    | 'MCDU'    // Add -1 in 2's-complement fashion to a counter.
+    | 'DINC'    // look at the docs
+    | 'SHINC'   // look at the docs
+    | 'SHANC'   // look at the docs
+    | 'INOTRD'  // look at the docs
+    | 'INOTLD'  // look at the docs
+    | 'FETCH'   // look at the docs
+    | 'STORE'   // look at the docs
+    | 'GOJ'     // Jump to location 04000 octal.
+    | 'TCSAJ'   // look at the docs
     | 'CAF'     // Clear and Add Fixed
     | 'CAE'     // Clear and Add Erasable
-    | 'OCT'
+    | 'OCT'     // embed an octal constant
     | 'CADR'
-    | 'BANK'
+    | 'BANK'    // bank
+    | 'BLOCK'   // block
     | 'DMOVE'
     | 'VMOVE'
     | 'SMOVE'
@@ -143,11 +145,12 @@ opcode
     | 'SIN'
     | 'COS'
     | 'CAD'
-    | 'DEC'
+    | 'DEC'     // embed a single-precision (SP) constan
     | 'TEST'
     | 'VXSC'
     | 'ITC'  
-    | '2DEC'
+    | '2DEC'    // embed a double precision constant
+    | '2FCADR'  // embed a double-word constant
     | 'EQUALS'
     | 'DAD'
     | 'VXV'
@@ -164,6 +167,12 @@ opcode
     | 'ABVAL'   
     | 'DV'      // Divide
     | 'NDX'     // INDEX
+    | 'POUT'    // look at the docs 
+    | 'MOUT'    // look at the docs
+    | 'ZOUT'    // look at the docs
+  
+       
+      
     ;
 
 label
@@ -190,6 +199,7 @@ multiplyingExpression
 atom 
     : number
     | variable
+    | label
     ;
 
 number
@@ -198,7 +208,7 @@ number
     ;
 
 STRING
-    : [-a-zA-Z0-9] [a-zA-Z0-9_.+\-/*]*
+    : [-a-zA-Z0-9] [a-zA-Z0-9_.+\-/*=]*
     ; 
 
 DECIMAL
