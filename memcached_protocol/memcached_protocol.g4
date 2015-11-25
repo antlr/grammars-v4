@@ -9,6 +9,8 @@
 
 /*
     Ported to Antlr4 by Tom Everett <tom@khubla.com>
+
+    The memcached protocol is now described here: https://github.com/memcached/memcached/blob/master/doc/protocol.txt
 */
 
 grammar memcached_protocol;
