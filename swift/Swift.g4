@@ -883,9 +883,11 @@ fragment Identifier_character : [0-9]
 fragment Identifier_characters : Identifier_character+ ;
 
 context_sensitive_keyword :
- 'associativity' | 'didSet' | 'get' | 'infix' | 'inout' | 'left' | 'mutating' | 'none' |
- 'nonmutating' | 'operator' | 'override' | 'postfix' | 'precedence' | 'prefix' | 'right' |
- 'set' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | 'weak' | 'willSet'
+ 'associativity' | 'convenience' | 'dynamic' | 'didSet' |
+ 'fina' | 'get' | 'infix' | 'indirect' | 'lazy' | 'left' | 'mutating' | 'none' |
+ 'nonmutating' | 'optional' | 'operator' | 'override' |
+ 'postfix' | 'precedence' | 'prefix' | 'Protocol' | 'required' | 'right' |
+ 'set' | 'Type' | 'unowned' | 'unowned' | 'weak' | 'willSet'
  ;
 
 // GRAMMAR OF OPERATORS

@@ -27,6 +27,8 @@
 						<argument>org.antlr.parser.st4</argument>
 					</arguments>
 					<outputDirectory>${project.build.directory}/generated-sources/antlr4/org/antlr/parser/st4</outputDirectory>
+					<visitor>true</visitor>
+					<listener>true</listener>
 				</configuration>
 				<executions>
 					<execution>

@@ -15,7 +15,6 @@
 		<module>asn</module>
 <!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 <!--		<module>aspectj</module> -->
-
 		<module>atl</module>
 		<module>basic</module>
 		<module>bnf</module>
@@ -28,6 +27,7 @@
 		<module>creole</module>
 		<module>csharp</module>
 		<module>csv</module>
+		<module>dcm</module>
 		<module>dot</module>
 		<module>erlang</module>
 		<module>fasta</module>
@@ -46,6 +46,7 @@
 		<module>lua</module>
 		<module>masm</module>
 		<module>memcached_protocol</module>
+		<module>modelica</module>
 		<module>MPS</module>
 		<module>mumath</module>
 		<module>mumps</module>
@@ -53,24 +54,28 @@
 		<module>objc</module>
 		<module>pascal</module>
 		<module>pcre</module>
+		<module>pddl</module>
 		<module>peoplecode</module>
 		<module>pgn</module>
 		<!--
 		<module>php</module>
 	-->
 		<module>propcalc</module>
+		<module>python3</module>
 		<module>r</module>
+		<module>rcs</module>
 		<module>redcode</module>
 		<module>scala</module>
 		<module>scss</module>
+		<module>sharc</module>
 		<module>smalltalk</module>
 		<module>sparql</module>
 		<module>sqlite</module>
 		<module>stacktrace</module>
 		<module>stringtemplate</module>
 		<module>suokif</module>
-<!-- Grammars-V4 issue 238 -->
 		<module>swift</module>
+		<module>tinyc</module>
 		<module>tnsnames</module>
 		<module>tnt</module>
 		<module>turtle</module>
@@ -78,6 +83,7 @@
 		<module>vb6</module>
 		<module>verilog</module>
 		<module>vhdl</module>
+		<module>wavefront</module>
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>

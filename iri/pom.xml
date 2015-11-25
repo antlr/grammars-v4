@@ -19,6 +19,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>IRI.g4</grammars>
+					<visitor>true</visitor>
+					<listener>true</listener>v
 				</configuration>
 				<executions>
 					<execution>
