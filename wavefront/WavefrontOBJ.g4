@@ -8,11 +8,7 @@ start
    ;
 
 line
-   : ( comment | vertex | face | mtllib | object | use_material | group ) ( '\r' )? '\n'
-   ;
-
-comment
-   : COMMENT
+   : ( vertex | face | mtllib | object | use_material | group ) ( '\r' )? '\n'
    ;
 
 face
@@ -20,7 +16,8 @@ face
    ;
 
 vertex
-   : GEOMETRIC_VERTEX x = DECIMAL y = DECIMAL z = DECIMAL
+   : ((GEOMETRIC_VERTEX | TEXTURE_VERTEX | VERTEX_NORMAL) DECIMAL DECIMAL DECIMAL)
+     | (PARAMETER_SPACE_VERTEX DECIMAL DECIMAL)
    ;
 
 mtllib
@@ -28,11 +25,11 @@ mtllib
    ;
 
 object
-   : OBJECT_NAME a = NAME
+   : OBJECT_NAME NAME
    ;
 
 use_material
-   : MATERIAL_NAME a = NAME
+   : MATERIAL_NAME NAME
    ;
 
 group
@@ -45,16 +42,13 @@ GEOMETRIC_VERTEX
    : 'v'
    ;
 
-
 TEXTURE_VERTEX
    : 'vt'
    ;
 
-
 VERTEX_NORMAL
    : 'vn'
    ;
-
 
 PARAMETER_SPACE_VERTEX
    : 'vp'
