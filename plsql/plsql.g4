@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-grammar PLSQL;
+grammar plsql;
 
 swallow_to_semi
     : ~( ';' )+
