@@ -61,6 +61,7 @@
 		<!--
 		<module>php</module>
 	-->
+		<module>plsql</module>
 		<module>propcalc</module>
 		<module>python3</module>
 		<module>r</module>
