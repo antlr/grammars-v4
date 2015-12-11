@@ -1,4 +1,4 @@
-    /*
+/*
 BSD License
 
 Copyright (c) 2013, Tom Everett
@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     http://www.ibiblio.org/apollo/
 */
 /*
-    http://www.ibiblio.org/apollo/hrst/archive/1689.pdf
+    thtp://www.ibiblio.org/apollo/hrst/archive/1689.pdf
 */
 /*
     http://www.ibiblio.org/apollo/assembly_language_manual.html
@@ -46,12 +46,12 @@ prog
     ;
 
 instruction
-    : label? comment EOL                                    // comment
-    | label? EOL                                            // blank line
-    | label? opcode expression* comment? EOL                // opcode and operand on same line
-    | label? (opcode expression? (EOL expression)*) comment? EOL        // opcode with operands on new lines
-    | label? (opcode opcode (EOL expression)*) comment? EOL // opcode followed by opcode
-    | assignment comment? EOL                               // assignment
+    : label? comment EOL                                            // comment
+    | label? EOL                                                    // blank line
+    | label? opcode expression* comment? EOL                        // opcode and operand on same line
+    | label? (opcode expression? (EOL expression comment?)*) comment? EOL    // opcode with operands on new lines
+    | label? (opcode opcode (EOL expression)*) comment? EOL         // opcode followed by opcode
+    | assignment comment? EOL                                       // assignment
     ;
 
 assignment
@@ -170,9 +170,6 @@ opcode
     | 'POUT'    // look at the docs 
     | 'MOUT'    // look at the docs
     | 'ZOUT'    // look at the docs
-  
-       
-      
     ;
 
 label
@@ -184,7 +181,7 @@ comment
     ;
 
 variable
-    : STRING (COMMA number)?
+    : STRING (COMMA (inte | decimal))?
     | STRING LPAREN variable RPAREN
     ;
 
@@ -197,27 +194,31 @@ multiplyingExpression
     ;
 
 atom 
-    : number
+    : inte
+    | decimal
     | variable
     | label
     ;
 
-number
-    : FLOAT
-    | DECIMAL
+inte
+    : INTE
+    ;
+
+decimal
+    : ('+' | '-')? DECIMAL
     ;
 
 STRING
-    : [-a-zA-Z0-9] [a-zA-Z0-9_.+\-/*=]*
+    : ([a-zA-Z] [a-zA-Z0-9_.+\-/*=]*)
     ; 
 
-DECIMAL
-    : [0-9]+ 'DEC'
+INTE
+    : [0-9]+ ('DEC' | 'D')
     ;
 
-FLOAT
-    : ('+' | '-')? [0-9]+ ('.' [0-9]*)?
-    | ('+' | '-')? '.' [0-9]+
+DECIMAL
+    : ([0-9]+ ('.' [0-9]+)?)
+    | ('.' [0-9]+)
     ;
 
 COMMENT
