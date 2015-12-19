@@ -173,7 +173,7 @@ opcode
     ;
 
 label
-    : STRING
+    : LABEL
     ;
 
 comment
@@ -181,8 +181,8 @@ comment
     ;
 
 variable
-    : STRING (COMMA (inte | decimal))?
-    | STRING LPAREN variable RPAREN
+    : LABEL (COMMA (inte | decimal))?
+    | LABEL LPAREN variable RPAREN
     ;
 
 expression 
@@ -208,8 +208,11 @@ decimal
     : ('+' | '-')? DECIMAL
     ;
 
-STRING
-    : ([a-zA-Z] [a-zA-Z0-9_.+\-/*=]*)
+//
+// labels can begin with + or -, letters or digits 
+//
+LABEL
+    : [a-zA-Z0-9_.+\-/*=]+
     ; 
 
 INTE
