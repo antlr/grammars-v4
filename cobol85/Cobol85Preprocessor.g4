@@ -22,6 +22,9 @@
 *
 * Change log:
 *
+* v1.1
+*	- fixes
+*
 * v1.0
 *	- EXEC SQL
 *	- EXEC CICS
@@ -46,17 +49,17 @@ startRule : (
 )* EOF;
 
 
-// exec cics statemen
+// exec cics statement
 
 execCicsStatement :
-	EXEC CICS charData END_EXEC
+	EXEC CICS charData END_EXEC DOT?
 ;
 
 
 // exec sql statement
 
 execSqlStatement :
-	EXEC SQL charData END_EXEC
+	EXEC SQL charData END_EXEC DOT?
 ;
 
 

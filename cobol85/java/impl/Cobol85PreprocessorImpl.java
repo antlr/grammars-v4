@@ -428,10 +428,10 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 	protected final static String NEWLINE = "\n";
 
-	protected final Cobol85Format[] defaultFormats = new Cobol85Format[] { Cobol85FormatEnum.FIXED,
-			Cobol85FormatEnum.VARIABLE, Cobol85FormatEnum.TANDEM };
+	protected final String[] copyFileExtensions = new String[] { "", "CPY", "cpy", "COB", "cob", "CBL", "cbl" };
 
-	protected final String[] extensions = new String[] { "", "CPY", "COB", "CBL" };
+	protected final Cobol85Format[] defaultFormats = new Cobol85Format[] { Cobol85FormatEnum.DEFECT,
+			Cobol85FormatEnum.FIXED, Cobol85FormatEnum.VARIABLE, Cobol85FormatEnum.TANDEM };
 
 	protected final String[] parsingTriggers = new String[] { "copy", "exec sql", "exec cics", "replace" };
 
@@ -517,7 +517,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	protected File identifyCopyFile(final String filename, final File libDirectory) {
 		File copyFile = null;
 
-		for (final String extension : extensions) {
+		for (final String extension : copyFileExtensions) {
 			final String filenameWithExtension;
 
 			if (extension.isEmpty()) {
@@ -616,7 +616,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		final StringBuffer outputBuffer = new StringBuffer();
 
 		String line = null;
-		boolean isFirstLine = true;
+		int lineNumber = 0;
 
 		while (scanner.hasNextLine()) {
 			line = scanner.nextLine();
@@ -624,20 +624,27 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			// clean line from certain ASCII chars
 			final int substituteChar = 0x1A;
 			final String cleanedLine = line.replace((char) substituteChar, ' ');
-
-			// parse line
-			final Cobol85Line parsedLine = parseCobol85Line(cleanedLine, formats);
 			final String normalizedLine;
 
-			if (parsedLine == null) {
-				LOG.warn("unknown line format: {}", line);
+			// if line is empty
+			if (cleanedLine.trim().isEmpty()) {
 				normalizedLine = cleanedLine;
 			} else {
-				normalizedLine = normalizeLine(parsedLine, isFirstLine);
+				// parse line
+				final Cobol85Line parsedLine = parseCobol85Line(cleanedLine, formats);
+
+				// if line could not be parsed
+				if (parsedLine == null) {
+					LOG.warn("unknown line format in line {}: {}", lineNumber + 1, line);
+					normalizedLine = cleanedLine;
+				} else {
+					final boolean isFirstLine = lineNumber == 0;
+					normalizedLine = normalizeLine(parsedLine, isFirstLine);
+				}
 			}
 
 			outputBuffer.append(normalizedLine);
-			isFirstLine = false;
+			lineNumber++;
 		}
 
 		scanner.close();
