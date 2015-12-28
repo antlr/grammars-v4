@@ -79,6 +79,7 @@
 		<module>tinyc</module>
 		<module>tnsnames</module>
 		<module>tnt</module>
+		<module>tsql</module>
 		<module>turtle</module>
 		<module>ucb-logo</module>
 		<module>vb6</module>
