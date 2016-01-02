@@ -722,6 +722,7 @@ LINE_COMMENT
 
 HDEFINE : '#define' ~[\r\n]* -> channel(HIDDEN);
 HIF : '#if' ~[\r\n]* -> channel(HIDDEN);
+HELIF : '#elif' ~[\r\n]* -> channel(HIDDEN);
 HELSE : '#else' ~[\r\n]* -> channel(HIDDEN);
 HUNDEF : '#undef' ~[\r\n]* -> channel(HIDDEN);
 HIFNDEF : '#ifndef' ~[\r\n]* -> channel(HIDDEN);
