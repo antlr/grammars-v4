@@ -68,7 +68,7 @@ category_implementation:
 protocol_declaration:
 	'@protocol'(
 	protocol_name ( protocol_reference_list )?
-	interface_declaration_list? '@optional'? interface_declaration_list?
+	'@required'? interface_declaration_list? '@optional'? interface_declaration_list?
 	)'@end';
 
 protocol_declaration_list:
