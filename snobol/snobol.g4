@@ -1,92 +1,233 @@
 
+/*
+[The "BSD licence"]
+Copyright (c) 2012 Tom Everett
+All rights reserved.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+3. The name of the author may not be used to endorse or promote products
+derived from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+
 grammar snobol;
 
-program
-    : formula EOF
+prog
+   : line+
+   ;
+
+line
+   : end EOL
+   | EOL
+   | (label? subject pattern? EQ object (COLON transfer)?) EOL
+   ;
+
+label
+    : STRING
     ;
 
-formula
-    : ((FORALL | EXISTS) VARIABLE)? disjunction
+subject
+    : STRING
     ;
 
-disjunction
-    : conjunction (OR conjunction)*
+pattern
+    : STRINGLITERAL
     ;
 
-conjunction
-    : negation (AND negation)*
+   
+object
+    : STRINGLITERAL
+    | INTEGER
     ;
 
-negation
-    : NOT? (predicate | LPAREN formula RPAREN)
+transfer
+    : STRING
+    ;
+    
+EQ
+    : '='
     ;
 
-predicate
-    : PREPOSITION predicateTuple
-    | PREPOSITION
+COLON
+    : ':'
     ;
 
-predicateTuple
-    : LPAREN term (',' term)* RPAREN
+STRINGLITERAL
+   : '"' ~ ["\r\n]* '"'
+   ;
+
+STRING
+    : ('a'..'z' | 'A'..'Z') ('0'..'9'| 'a'..'z' | 'A'..'Z')*
     ;
 
-term
-    : function | VARIABLE
+INTEGER
+   : ('+' | '-')? ('0' .. '9')+
+   ;
+
+REAL
+   : ('+' | '-')? ('0' .. '9')+ ('.' ('0' .. '9')+)? (('e' | 'E') REAL)*
+   ;
+
+end
+    : END;
+
+END
+    : 'END'
     ;
 
-function
-    : CONSTANT functionTuple
-    | CONSTANT
-    ;
+fragment A
+   : ('a' | 'A')
+   ;
 
-functionTuple
-    : LPAREN (CONSTANT | VARIABLE) (',' (CONSTANT | VARIABLE) )* RPAREN
-    ;
 
-LPAREN
-    : '('
-    ;
+fragment B
+   : ('b' | 'B')
+   ;
 
-RPAREN
-    : ')'
-    ;
 
-AND
-    : '&'
-    ;
+fragment C
+   : ('c' | 'C')
+   ;
 
-OR
-    : '|'
-    ;
 
-NOT
-    : '!'
-    ;
+fragment D
+   : ('d' | 'D')
+   ;
 
-FORALL
-    : 'Forall'
-    ;
 
-EXISTS
-    : 'Exists'
-    ;
+fragment E
+   : ('e' | 'E')
+   ;
 
-VARIABLE
-    : '?' (('a'..'z') | ('0'..'9')) CHARACTER*
-    ;
 
-CONSTANT
-    : (('a'..'z') | ('0'..'9')) CHARACTER*
-    ;
+fragment F
+   : ('f' | 'F')
+   ;
 
-PREPOSITION
-    : ('A'..'Z') CHARACTER*
-    ;
 
-fragment CHARACTER
-    : ('0'..'9' | 'a'..'z' | 'A'..'Z' | '_')
+fragment G
+   : ('g' | 'G')
+   ;
+
+
+fragment H
+   : ('h' | 'H')
+   ;
+
+
+fragment I
+   : ('i' | 'I')
+   ;
+
+
+fragment J
+   : ('j' | 'J')
+   ;
+
+
+fragment K
+   : ('k' | 'K')
+   ;
+
+
+fragment L
+   : ('l' | 'L')
+   ;
+
+
+fragment M
+   : ('m' | 'M')
+   ;
+
+
+fragment N
+   : ('n' | 'N')
+   ;
+
+
+fragment O
+   : ('o' | 'O')
+   ;
+
+
+fragment P
+   : ('p' | 'P')
+   ;
+
+
+fragment Q
+   : ('q' | 'Q')
+   ;
+
+
+fragment R
+   : ('r' | 'R')
+   ;
+
+
+fragment S
+   : ('s' | 'S')
+   ;
+
+
+fragment T
+   : ('t' | 'T')
+   ;
+
+
+fragment U
+   : ('u' | 'U')
+   ;
+
+
+fragment V
+   : ('v' | 'V')
+   ;
+
+
+fragment W
+   : ('w' | 'W')
+   ;
+
+
+fragment X
+   : ('x' | 'X')
+   ;
+
+
+fragment Y
+   : ('y' | 'Y')
+   ;
+
+
+fragment Z
+   : ('z' | 'Z')
+   ;
+
+COMMENT
+   : '*' ~ [\r\n]* -> skip
+   ;
+
+EOL
+    : [\r\n]+
     ;
 
 WS
-    : (' ' | '\t' | '\r' | '\n')+ ->skip
+    : (' ' | '\t')+ ->skip
     ;

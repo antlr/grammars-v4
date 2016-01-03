@@ -1,0 +1,30 @@
+* Program wordlist.spt
+*
+* To run: spitbol wordlist <datafile
+*
+* Trim input, set up constants, create table to hold word counts
+&trim = 1
+wrdpat = break(&lcase) span(&lcase "–’") . word
+tally = table(1000)
+
+* Read a line, convert upper-case letters to lower-case
+read line = replace(input, &ucase, &lcase) :f(sort)
+
+* Get and remove next word from line, place in variable word
+nextwrd line ? wrdpat = ""
+:f(read)
+
+* Increment the count for this word
+tally[word] = tally[word] + 1
+:(nextwrd)
+
+* Convert the table to an array, and sort the words
+sort result = sort(tally)
+
+* Display the results
+output = "Word Counts"
+n =1
+print output = result[n,1] " – " result[n,2] :f(end)
+n =n + 1
+:(print)
+end
