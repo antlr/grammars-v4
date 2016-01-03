@@ -9,7 +9,6 @@
 	<modules>
 		<module>support</module>
 		<module>abnf</module>
-<!--		<module>agc</module>		-->
 		<module>antlr4</module>
 		<module>arithmetic</module>
 		<module>asm6502</module>
