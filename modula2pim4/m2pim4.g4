@@ -554,22 +554,22 @@ fragment LETTER
    ;
 
 
-fragment DIGIT
+DIGIT
    : OCTAL_DIGIT | '8' | '9'
    ;
 
 
-fragment OCTAL_DIGIT
+OCTAL_DIGIT
    : '0' .. '7'
    ;
 
 
-fragment HEX_DIGIT
+HEX_DIGIT
    : DIGIT | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
    ;
 
 
-fragment SCALE_FACTOR
+SCALE_FACTOR
    : 'E' ( '+' | '-' )? DIGIT+
    ;
 
