@@ -1,4 +1,3 @@
-
 /*
 [The "BSD licence"]
 Copyright (c) 2012 Tom Everett
@@ -25,71 +24,287 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 grammar snobol;
 
 prog
-   : line+
+   : line +
    ;
 
 line
-   : end EOL
+   : (end EOL)
    | EOL
-   | (label? subject pattern? EQ object (COLON transfer)?) EOL
+   | ((label? subject pattern? EQ expression+ (COLON transfer)?) EOL)
+   | (COLON transfer EOL)
+   | COMMENT EOL
    ;
 
 label
-    : STRING
-    ;
+   : STRING
+   ;
 
 subject
-    : STRING
-    ;
+   : (AMP? STRING ('[' STRING (',' STRING)* ']')?)
+   ;
 
 pattern
-    : STRINGLITERAL
-    ;
+   : STRINGLITERAL
+   ;
 
-   
-object
-    : STRINGLITERAL
-    | INTEGER
-    ;
+expression
+   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
+   ;
+
+multiplyingExpression
+   : powExpression ((TIMES | DIV) powExpression)*
+   ;
+
+powExpression
+   : atom (POW expression)?
+   ;
+
+atom
+   : STRINGLITERAL
+   | INTEGER
+   | subject
+   | command
+   | '[' expression (',' expression)* ']'
+   | LPAREN expression RPAREN
+   ;
+
+command
+   : ident
+   | differ
+   | eq
+   | ne
+   | ge
+   | le
+   | lt
+   | integer
+   | lgt
+   | atan
+   | chop
+   | cos
+   | exp
+   | ln
+   | remdr
+   | sin
+   | tan
+   | date
+   | dupl
+   | reverse
+   | replace
+   | size
+   | trim
+   | array
+   | sort
+   | table
+   | break_
+   ;
+
+ident
+   : 'ident' LPAREN expression RPAREN
+   ;
+
+differ
+   : 'differ' LPAREN expression RPAREN
+   ;
+
+eq
+   : 'eq' LPAREN expression RPAREN
+   ;
+
+ne
+   : 'ne' LPAREN expression RPAREN
+   ;
+
+ge
+   : 'ge' LPAREN expression RPAREN
+   ;
+
+gt
+   : 'gt' LPAREN expression RPAREN
+   ;
+
+le
+   : 'le' LPAREN expression RPAREN
+   ;
+
+lt
+   : 'lt' LPAREN expression RPAREN
+   ;
+
+integer
+   : 'integer' LPAREN expression RPAREN
+   ;
+
+lgt
+   : 'lgt' LPAREN expression RPAREN
+   ;
+
+atan
+   : 'atan' LPAREN expression RPAREN
+   ;
+
+chop
+   : 'chop' LPAREN expression RPAREN
+   ;
+
+cos
+   : 'cos' LPAREN expression RPAREN
+   ;
+
+exp
+   : 'exp' LPAREN expression RPAREN
+   ;
+
+ln
+   : 'ln' LPAREN expression RPAREN
+   ;
+
+remdr
+   : 'remdr' LPAREN expression RPAREN
+   ;
+
+sin
+   : 'sin' LPAREN expression RPAREN
+   ;
+
+tan
+   : 'tan' LPAREN expression RPAREN
+   ;
+
+dupl
+   : 'dupl' LPAREN expression COMMA expression RPAREN
+   ;
+
+reverse
+   : 'reverse' LPAREN expression RPAREN
+   ;
+
+date
+   : 'date' LPAREN RPAREN
+   ;
+
+replace
+   : 'replace' LPAREN expression COMMA expression COMMA expression RPAREN
+   ;
+
+size
+   : 'size' LPAREN expression RPAREN
+   ;
+
+trim
+   : 'trim' LPAREN expression RPAREN
+   ;
+
+array
+   : 'array' LPAREN expression COMMA expression RPAREN
+   ;
+
+convert
+   : 'convert' LPAREN expression COMMA expression RPAREN
+   ;
+
+table
+   : 'table' LPAREN expression RPAREN
+   ;
+
+sort
+   : 'sort' LPAREN expression RPAREN
+   ;
+
+break_
+   : 'break' LPAREN expression RPAREN
+   ;
 
 transfer
-    : STRING
-    ;
-    
+   : ('f'? LPAREN label RPAREN)? ('s'? LPAREN label RPAREN)?
+   ;
+
+
+COMMA
+   : ','
+   ;
+
+
+LPAREN
+   : '('
+   ;
+
+
+RPAREN
+   : ')'
+   ;
+
+
+AMP
+   : '&'
+   ;
+
+
+PLUS
+   : '+'
+   ;
+
+
+MINUS
+   : '-'
+   ;
+
+
+TIMES
+   : '*'
+   ;
+
+
+DIV
+   : '/'
+   ;
+
+
+POW
+   : '^'
+   ;
+
+
 EQ
-    : '='
-    ;
+   : '='
+   ;
+
 
 COLON
-    : ':'
-    ;
+   : ':'
+   ;
+
 
 STRINGLITERAL
    : '"' ~ ["\r\n]* '"'
    ;
 
-STRING
-    : ('a'..'z' | 'A'..'Z') ('0'..'9'| 'a'..'z' | 'A'..'Z')*
-    ;
 
-INTEGER
-   : ('+' | '-')? ('0' .. '9')+
+STRING
+   : ('a' .. 'z' | 'A' .. 'Z') ('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z')*
    ;
 
+
+INTEGER
+   : ('+' | '-')? ('0' .. '9') +
+   ;
+
+
 REAL
-   : ('+' | '-')? ('0' .. '9')+ ('.' ('0' .. '9')+)? (('e' | 'E') REAL)*
+   : ('+' | '-')? ('0' .. '9') + ('.' ('0' .. '9') +)? (('e' | 'E') REAL)*
    ;
 
 end
-    : END;
+   : END
+   ;
+
 
 END
-    : 'END'
-    ;
+   : 'END'
+   ;
+
 
 fragment A
    : ('a' | 'A')
@@ -220,14 +435,17 @@ fragment Z
    : ('z' | 'Z')
    ;
 
+
 COMMENT
-   : '*' ~ [\r\n]* -> skip
+   : '*' ~[\r\n]*
    ;
 
+
 EOL
-    : [\r\n]+
-    ;
+   : [\r\n] +
+   ;
+
 
 WS
-    : (' ' | '\t')+ ->skip
-    ;
+   : (' ' | '\t') + -> skip
+   ;

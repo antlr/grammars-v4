@@ -1,7 +1,5 @@
-* Program wordlist.spt
-*
+* Program wordlist.sp
 * To run: spitbol wordlist <datafile
-*
 * Trim input, set up constants, create table to hold word counts
 &trim = 1
 wrdpat = break(&lcase) span(&lcase "–’") . word
