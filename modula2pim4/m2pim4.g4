@@ -25,7 +25,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 /*
 Adapted from m2pim4_LL1.g by Benjamin Kowarsch
 */
@@ -37,7 +36,8 @@ ident
    ;
 
 number
-   : INTEGER | REAL
+   : INTEGER
+   | REAL
    ;
 
 integer
@@ -69,7 +69,7 @@ string
    ;
 
 qualident
-   : ident ( '.' ident )*
+   : ident ('.' ident)*
    ;
 
 constantDeclaration
@@ -77,43 +77,62 @@ constantDeclaration
    ;
 
 constExpression
-   : simpleConstExpr ( relation simpleConstExpr )?
+   : simpleConstExpr (relation simpleConstExpr)?
    ;
 
 relation
-   : '=' | '#' | '<>' | '<' | '<=' | '>' | '>=' | 'IN' {   }
+   : '='
+   | '#'
+   | '<>'
+   | '<'
+   | '<='
+   | '>'
+   | '>='
+   | 'IN' {       }
    ;
 
 simpleConstExpr
-   : ( '+' | '-' {   } )? constTerm ( addOperator constTerm )*
+   : ('+' | '-' {       })? constTerm (addOperator constTerm)*
    ;
 
 addOperator
-   : '+' | '-' | OR
+   : '+'
+   | '-'
+   | OR
    ;
 
 constTerm
-   : constFactor ( mulOperator constFactor )*
+   : constFactor (mulOperator constFactor)*
    ;
 
 mulOperator
-   : '*' | '/' | DIV | MOD | AND | '&'
+   : '*'
+   | '/'
+   | DIV
+   | MOD
+   | AND
+   | '&'
    ;
 
 constFactor
-   : number | string | setOrQualident | '(' constExpression ')' | ( NOT | '~' {   } ) constFactor
+   : number
+   | string
+   | setOrQualident
+   | '(' constExpression ')'
+   | (NOT | '~' {       }) constFactor
    ;
 
 setOrQualident
-   : set | qualident set?
+   : set
+   | qualident set?
    ;
 
 set
-   : '{' ( element ( ',' element )* )? '}'
+   : '{' (element (',' element)*)? '}'
    ;
 
 element
-   : constExpression ( '..' constExpression )?
+   : constExpression ('..' constExpression)?
    ;
 
 typeDeclaration
@@ -121,11 +140,18 @@ typeDeclaration
    ;
 
 type
-   : simpleType | arrayType | recordType | setType | pointerType | procedureType
+   : simpleType
+   | arrayType
+   | recordType
+   | setType
+   | pointerType
+   | procedureType
    ;
 
 simpleType
-   : qualident | enumeration | subrangeType
+   : qualident
+   | enumeration
+   | subrangeType
    ;
 
 enumeration
@@ -133,7 +159,7 @@ enumeration
    ;
 
 identList
-   : ident ( ',' ident )*
+   : ident (',' ident)*
    ;
 
 subrangeType
@@ -141,7 +167,7 @@ subrangeType
    ;
 
 arrayType
-   : ARRAY simpleType ( ',' simpleType )* OF type
+   : ARRAY simpleType (',' simpleType)* OF type
    ;
 
 recordType
@@ -149,11 +175,11 @@ recordType
    ;
 
 fieldListSequence
-   : fieldList ( ';' fieldList )*
+   : fieldList (';' fieldList)*
    ;
 
 fieldList
-   : ( identList ':' type | CASE ident ( ( ':' | '.' {   } ) qualident )? OF variant ( '|' variant )* ( ELSE fieldListSequence )? END )?
+   : (identList ':' type | CASE ident ((':' | '.' {       }) qualident)? OF variant ('|' variant)* (ELSE fieldListSequence)? END)?
    ;
 
 variant
@@ -161,11 +187,11 @@ variant
    ;
 
 caseLabelList
-   : caseLabels ( ',' caseLabels )*
+   : caseLabels (',' caseLabels)*
    ;
 
 caseLabels
-   : constExpression ( '..' constExpression )?
+   : constExpression ('..' constExpression)?
    ;
 
 setType
@@ -181,7 +207,7 @@ procedureType
    ;
 
 formalTypeList
-   : '(' ( VAR? formalType ( ',' VAR? formalType )* )? ')' ( ':' qualident )?
+   : '(' (VAR? formalType (',' VAR? formalType)*)? ')' (':' qualident)?
    ;
 
 variableDeclaration
@@ -189,35 +215,40 @@ variableDeclaration
    ;
 
 designator
-   : qualident ( designatorTail )?
+   : qualident (designatorTail)?
    ;
 
 designatorTail
-   : ( ( '[' expList ']' | '^' ) ( '.' ident )* )+
+   : (('[' expList ']' | '^') ('.' ident)*) +
    ;
 
 expList
-   : expression ( ',' expression )*
+   : expression (',' expression)*
    ;
 
 expression
-   : simpleExpression ( relation simpleExpression )?
+   : simpleExpression (relation simpleExpression)?
    ;
 
 simpleExpression
-   : ( '+' | '-' {   } )? term ( addOperator term )*
+   : ('+' | '-' {       })? term (addOperator term)*
    ;
 
 term
-   : factor ( mulOperator factor )*
+   : factor (mulOperator factor)*
    ;
 
 factor
-   : number | string | setOrDesignatorOrProcCall | '(' expression ')' | ( NOT | '~' {   } ) factor
+   : number
+   | string
+   | setOrDesignatorOrProcCall
+   | '(' expression ')'
+   | (NOT | '~' {       }) factor
    ;
 
 setOrDesignatorOrProcCall
-   : set | qualident ( set | designatorTail? actualParameters? )
+   : set
+   | qualident (set | designatorTail? actualParameters?)
    ;
 
 actualParameters
@@ -225,23 +256,23 @@ actualParameters
    ;
 
 statement
-   : ( assignmentOrProcCall | ifStatement | caseStatement | whileStatement | repeatStatement | loopStatement | forStatement | withStatement | EXIT | RETURN expression? )?
+   : (assignmentOrProcCall | ifStatement | caseStatement | whileStatement | repeatStatement | loopStatement | forStatement | withStatement | EXIT | RETURN expression?)?
    ;
 
 assignmentOrProcCall
-   : designator ( ':=' expression | actualParameters? )
+   : designator (':=' expression | actualParameters?)
    ;
 
 statementSequence
-   : statement ( ';' statement )*
+   : statement (';' statement)*
    ;
 
 ifStatement
-   : IF expression THEN statementSequence ( ELSIF expression THEN statementSequence )* ( ELSE statementSequence )? END
+   : IF expression THEN statementSequence (ELSIF expression THEN statementSequence)* (ELSE statementSequence)? END
    ;
 
 caseStatement
-   : CASE expression OF ccase ( '|' ccase )* ( ELSE statementSequence )? END
+   : CASE expression OF ccase ('|' ccase)* (ELSE statementSequence)? END
    ;
 
 ccase
@@ -257,7 +288,7 @@ repeatStatement
    ;
 
 forStatement
-   : FOR ident ':=' expression TO expression ( BY constExpression )? DO statementSequence END
+   : FOR ident ':=' expression TO expression (BY constExpression)? DO statementSequence END
    ;
 
 loopStatement
@@ -277,15 +308,19 @@ procedureHeading
    ;
 
 block
-   : declaration* ( BEGIN statementSequence )? END
+   : declaration* (BEGIN statementSequence)? END
    ;
 
 declaration
-   : CONST ( constantDeclaration ';' )* | TYPE ( typeDeclaration ';' )* | VAR ( variableDeclaration ';' )* | procedureDeclaration ';' | moduleDeclaration ';'
+   : CONST (constantDeclaration ';')*
+   | TYPE (typeDeclaration ';')*
+   | VAR (variableDeclaration ';')*
+   | procedureDeclaration ';'
+   | moduleDeclaration ';'
    ;
 
 formalParameters
-   : '(' ( fpSection ( ';' fpSection )* )? ')' ( ':' qualident )?
+   : '(' (fpSection (';' fpSection)*)? ')' (':' qualident)?
    ;
 
 fpSection
@@ -293,7 +328,7 @@ fpSection
    ;
 
 formalType
-   : ( ARRAY OF )? qualident
+   : (ARRAY OF)? qualident
    ;
 
 moduleDeclaration
@@ -309,7 +344,7 @@ exportList
    ;
 
 importList
-   : ( FROM ident )? IMPORT identList ';'
+   : (FROM ident)? IMPORT identList ';'
    ;
 
 definitionModule
@@ -317,7 +352,10 @@ definitionModule
    ;
 
 definition
-   : CONST ( constantDeclaration ';' )* | TYPE ( ident ( '=' type )? ';' )* | VAR ( variableDeclaration ';' )* | procedureHeading ';'
+   : CONST (constantDeclaration ';')*
+   | TYPE (ident ('=' type)? ';')*
+   | VAR (variableDeclaration ';')*
+   | procedureHeading ';'
    ;
 
 programModule
@@ -325,7 +363,8 @@ programModule
    ;
 
 compilationUnit
-   : definitionModule | IMPLEMENTATION? programModule
+   : definitionModule
+   | IMPLEMENTATION? programModule
    ;
 
 
@@ -530,22 +569,22 @@ WITH
 
 
 IDENT
-   : LETTER ( LETTER | DIGIT )*
+   : LETTER (LETTER | DIGIT)*
    ;
 
 
 INTEGER
-   : DIGIT+ | OCTAL_DIGIT+ ( 'B' | 'C' ) | DIGIT ( HEX_DIGIT )* 'H'
+   : DIGIT + | OCTAL_DIGIT + ('B' | 'C') | DIGIT (HEX_DIGIT)* 'H'
    ;
 
 
 REAL
-   : DIGIT+ '.' DIGIT* SCALE_FACTOR?
+   : DIGIT + '.' DIGIT* SCALE_FACTOR?
    ;
 
 
 STRING
-   : '\'' ( CHARACTER | '\"' )* '\'' | '"' ( CHARACTER | '\'' )* '"'
+   : '\'' (CHARACTER | '\"')* '\'' | '"' (CHARACTER | '\'')* '"'
    ;
 
 
@@ -570,7 +609,7 @@ HEX_DIGIT
 
 
 SCALE_FACTOR
-   : 'E' ( '+' | '-' )? DIGIT+
+   : 'E' ('+' | '-')? DIGIT +
    ;
 
 
