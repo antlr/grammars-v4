@@ -16,19 +16,23 @@
 grammar memcached_protocol;
 
 command_line
-   : ( storage_command | retrieval_command | delete_command | increment_command | decrement_command | statistics_command | flush_command | version_command | verbosity_command | quit_command )
+   : (storage_command | retrieval_command | delete_command | increment_command | decrement_command | statistics_command | flush_command | version_command | verbosity_command | quit_command)
    ;
 
 storage_command
-   : ( ( storage_command_name key flags exptime bytes ) | ( 'cas' key flags exptime bytes cas_unique ) ) noreply?
+   : ((storage_command_name key flags exptime bytes) | ('cas' key flags exptime bytes cas_unique)) noreply?
    ;
 
 storage_command_name
-   : 'set' | 'add' | 'replace' | 'append' | 'prepend'
+   : 'set'
+   | 'add'
+   | 'replace'
+   | 'append'
+   | 'prepend'
    ;
 
 retrieval_command
-   : ( 'get' | 'gets' ) key+
+   : ('get' | 'gets') key +
    ;
 
 delete_command
@@ -48,7 +52,9 @@ statistics_command
    ;
 
 statistics_option
-   : 'items' | 'slabs' | 'sizes'
+   : 'items'
+   | 'slabs'
+   | 'sizes'
    ;
 
 flush_command
@@ -68,27 +74,42 @@ quit_command
    ;
 
 storage_response
-   : error_response | 'STORED' | 'NOT_STORED' | 'EXISTS' | 'NOT_FOUND'
+   : error_response
+   | 'STORED'
+   | 'NOT_STORED'
+   | 'EXISTS'
+   | 'NOT_FOUND'
    ;
 
 retrieval_response
-   : error_response | ( 'VALUE' key flags bytes cas_unique? ) | end
+   : error_response
+   | ('VALUE' key flags bytes cas_unique?)
+   | end
    ;
 
 deletion_response
-   : error_response | 'DELETED' | 'NOT_FOUND'
+   : error_response
+   | 'DELETED'
+   | 'NOT_FOUND'
    ;
 
 incr_or_decr_response
-   : error_response | 'NOT_FOUND' | INTEGER
+   : error_response
+   | 'NOT_FOUND'
+   | INTEGER
    ;
 
 statistics_response
-   : error_response | general_statistic | size_statistic | end
+   : error_response
+   | general_statistic
+   | size_statistic
+   | end
    ;
 
 error_response
-   : general_error | client_error_message | server_error_message
+   : general_error
+   | client_error_message
+   | server_error_message
    ;
 
 general_statistic
@@ -104,11 +125,11 @@ general_error
    ;
 
 client_error_message
-   : 'CLIENT_ERROR' .+
+   : 'CLIENT_ERROR' . +
    ;
 
 server_error_message
-   : 'SERVER_ERROR' .+
+   : 'SERVER_ERROR' . +
    ;
 
 end
@@ -173,12 +194,12 @@ count
 
 
 INTEGER
-   : DIGIT+
+   : DIGIT +
    ;
 
 
 WORD
-   : PRINTABLE_CHAR+
+   : PRINTABLE_CHAR +
    ;
 
 
@@ -193,5 +214,5 @@ fragment PRINTABLE_CHAR
 
 
 WHITESPACE
-   : ( ' ' | '\t' | '\r' | '\n' | '\u000C' )+ -> skip
+   : (' ' | '\t' | '\r' | '\n' | '\u000C') + -> skip
    ;
