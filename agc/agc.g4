@@ -49,6 +49,8 @@ line
     : comment_line
     | blank_line
     | instruction_line
+    | erase_line
+    | assignment_line
     ;
 
 blank_line
@@ -63,6 +65,14 @@ instruction_line
     : label? ws opcodes argument (eol argument)* eol
     ;
 
+erase_line
+    : variable ws 'ERASE' (ws comment)? eol
+    ;
+
+assignment_line
+    : variable ws? '=' ws? expression (ws comment)? eol
+    ;
+
 opcodes
     : opcode (ws opcode)?
     ;
@@ -71,9 +81,6 @@ argument
     : (ws expression)* (ws comment)?
     ;
 
-assignment
-    : variable '=' expression
-    ;
 
 opcode
     : 'SETLOC'
