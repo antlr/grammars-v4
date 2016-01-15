@@ -52,15 +52,15 @@ line
     ;
 
 blank_line
-    : label? ws? EOL
+    : label? eol
     ;
 
 comment_line
-    : comment EOL
+    : comment eol
     ;
 
 instruction_line
-    : label? ws opcodes argument (EOL argument)* EOL
+    : label? ws opcodes argument (eol argument)* eol
     ;
 
 opcodes
@@ -188,6 +188,8 @@ opcode
     | 'POUT'    // look at the docs 
     | 'MOUT'    // look at the docs
     | 'ZOUT'    // look at the docs
+    | 'LODON'   // this is used in a couple places in a "2-opcodes on a line" format
+    | 'TSLT'    // this is used in a couple places in a "2-opcodes on a line" format
     ;
 
 label
@@ -196,6 +198,10 @@ label
 
 ws
     : WS
+    ;
+
+eol
+    : WS? EOL
     ;
 
 comment
