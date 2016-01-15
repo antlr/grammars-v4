@@ -211,8 +211,9 @@ decimal
 //
 // labels can begin with + or -, letters or digits 
 //
+// labels can contain "&"
 LABEL
-    : [a-zA-Z0-9_.+\-/*=]+
+    : [a-zA-Z0-9_.+\-/*=&]+
     ; 
 
 INTE
@@ -257,7 +258,7 @@ RPAREN
     ;
 
 EOL
-    : '\r'? '\n'
+    : ['\r\n']
     ;
 
 WS
