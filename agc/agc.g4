@@ -239,7 +239,7 @@ decimal
 //
 // labels can begin with + or -, letters or digits 
 //
-// labels can contain "&"
+// labels can contain "&" as well as math symbols "+-*/" and "."
 LABEL
     : [a-zA-Z0-9_.+\\-/*=&]+
     ; 
