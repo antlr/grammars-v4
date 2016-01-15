@@ -61,8 +61,9 @@ comment_line
     : ws? comment eol
     ;
 
+// an instruction "line" can span many lines in the file, and can have comment lines in the middle of it
 instruction_line
-    : label? ws opcodes argument (eol argument)* eol
+    : label? ws opcodes (eol comment_line)? argument (eol argument)* eol
     ;
 
 // erase can be specified with no variable
@@ -83,6 +84,103 @@ argument
     : (ws expression)* (ws comment)?
     ;
 
+label
+    : LABEL
+    ;
+
+ws
+    : WS
+    ;
+
+eol
+    : WS? EOL
+    ;
+
+comment
+    : COMMENT
+    ;
+
+variable
+    : LABEL (COMMA (inte | decimal))?
+    | LABEL? LPAREN variable RPAREN
+    ;
+
+expression 
+    : multiplyingExpression ((PLUS|MINUS) multiplyingExpression)*
+    ;
+
+multiplyingExpression  
+    : atom ((TIMES|DIV) atom)*
+    ;
+
+atom 
+    : inte
+    | decimal
+    | variable
+    | label
+    | register
+    ;
+
+inte
+    : INTE
+    ;
+
+decimal
+    : ('+' | '-')? DECIMAL
+    ;
+
+register
+    :'A'
+    | 'L'
+    | 'Q'
+    | 'EB'
+    | 'FB'
+    | 'Z'
+    | 'BB'
+    | 'ARUPT'
+    | 'LRUPT'
+    | 'QRUPT'
+    | 'QRUPT'
+    | 'BBRUPT'
+    | 'BRUPT'
+    | 'CYR'
+    | 'SR'
+    | 'CYL'
+    | 'EDOP'
+    | 'TIME2'
+    | 'TIME1'
+    | 'TIME3'
+    | 'TIME4'
+    | 'TIME5'
+    | 'TIME6'
+    | 'CDUX'
+    | 'CDUY'
+    | 'CDUZ'
+    | 'OPTY'
+    | 'OPTX'
+    | 'PIPAX'
+    | 'PIPAY'
+    | 'PIPAZ'
+    | 'Q-RHCCTR'
+    | 'RHCP'
+    | 'P-RHCCTR'
+    | 'RHCY'
+    | 'R-RHCCTR'
+    | 'RHCR'
+    | 'INLINK'
+    | 'RNRAD'
+    | 'GYROCTR'
+    | 'GYROCMD'
+    | 'CDUXCMD'
+    | 'CDUYCMD'
+    | 'CDUZCMD'
+    | 'OPTYCMD'
+    | 'OPTXCMD'
+    | 'THRUST'
+    | 'LEMONM'
+    | 'OUTLINK'
+    | 'ALTM'
+    ;
 
 opcode
     : 'SETLOC'
@@ -93,6 +191,7 @@ opcode
     | 'DAS'     // Double Add to Storage
     | 'LXCH'    // Exchange L and K
     | 'INCR'    // Increment
+    | 'AD'      // add to accumulator
     | 'ADS'     // Add to Storage
     | 'CA'      // Clear and Add
     | 'CS'      // Clear and Subtract
@@ -193,7 +292,7 @@ opcode
     | 'ABVAL'   
     | 'COMP'
     | 'DV'      // Divide
-    | 'NDX'     // INDEX
+    | 'NDX'     // INDEX (alternative syntax)
     | 'POUT'    // look at the docs 
     | 'MOUT'    // look at the docs
     | 'ZOUT'    // look at the docs
@@ -201,54 +300,11 @@ opcode
     | 'TSLT'    // this is used in a couple places in a "2-opcodes on a line" format
     ;
 
-label
-    : LABEL
-    ;
-
-ws
-    : WS
-    ;
-
-eol
-    : WS? EOL
-    ;
-
-comment
-    : COMMENT
-    ;
-
-variable
-    : LABEL (COMMA (inte | decimal))?
-    | LABEL? LPAREN variable RPAREN
-    ;
-
-expression 
-    : multiplyingExpression ((PLUS|MINUS) multiplyingExpression)*
-    ;
-
-multiplyingExpression  
-    : atom ((TIMES|DIV) atom)*
-    ;
-
-atom 
-    : inte
-    | decimal
-    | variable
-    | label
-    ;
-
-inte
-    : INTE
-    ;
-
-decimal
-    : ('+' | '-')? DECIMAL
-    ;
-
 //
 // labels can begin with + or -, letters or digits 
 //
 // labels can contain "&" as well as math symbols "+-*/" and "."
+//
 LABEL
     : [a-zA-Z0-9_.+\\-/*=&]+
     ; 
