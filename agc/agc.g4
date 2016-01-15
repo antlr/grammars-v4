@@ -58,19 +58,21 @@ blank_line
     ;
 
 comment_line
-    : comment eol
+    : ws? comment eol
     ;
 
 instruction_line
     : label? ws opcodes argument (eol argument)* eol
     ;
 
+// erase can be specified with no variable
 erase_line
-    : variable ws 'ERASE' (ws comment)? eol
+    : variable? ws 'ERASE' (ws? expression)* (ws comment)? eol
     ;
 
+// assignment with no RHS is legal
 assignment_line
-    : variable ws? '=' ws? expression (ws comment)? eol
+    : variable ws? '=' (ws? expression)* (ws comment)? eol
     ;
 
 opcodes
@@ -217,7 +219,7 @@ comment
 
 variable
     : LABEL (COMMA (inte | decimal))?
-    | LABEL LPAREN variable RPAREN
+    | LABEL? LPAREN variable RPAREN
     ;
 
 expression 
