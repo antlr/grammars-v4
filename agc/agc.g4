@@ -101,8 +101,7 @@ comment
     ;
 
 variable
-    : LABEL (COMMA (inte | decimal))?
-    | LABEL? LPAREN variable RPAREN
+    : LABEL? LPAREN variable RPAREN
     ;
 
 expression 
@@ -183,6 +182,11 @@ register
     ;
 
 opcode
+    : standard_opcode
+//    | axt_opcode
+    ;
+
+standard_opcode
     : 'SETLOC'
     | 'TC'      // transfer control   
     | 'TCR'     // transfer control
@@ -299,6 +303,11 @@ opcode
     | 'LODON'   // this is used in a couple places in a "2-opcodes on a line" format
     | 'TSLT'    // this is used in a couple places in a "2-opcodes on a line" format
     ;
+
+// Address to Index
+//axt_opcode
+//    : 'AXT' ws COMMA ('1' | '2')
+ //   ;
 
 //
 // labels can begin with + or -, letters or digits 
