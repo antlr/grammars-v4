@@ -42,16 +42,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar agc;
 
 prog
-    : instruction+
+    : line+
     ;
 
-instruction
-    : label? comment EOL                                            // comment
-    | label? EOL                                                    // blank line
-    | label? opcode expression* comment? EOL                        // opcode and operand on same line
-    | label? (opcode expression? (EOL expression comment?)*) comment? EOL    // opcode with operands on new lines
-    | label? (opcode opcode (EOL expression)*) comment? EOL         // opcode followed by opcode
-    | assignment comment? EOL                                       // assignment
+line
+    : comment_line
+    | blank_line
+    | instruction_line
+    ;
+
+blank_line
+    : label? ws? EOL
+    ;
+
+comment_line
+    : comment EOL
+    ;
+
+instruction_line
+    : label? ws opcodes argument (EOL argument)* EOL
+    ;
+
+opcodes
+    : opcode (ws opcode)?
+    ;
+
+argument
+    : (ws expression)* (ws comment)?
     ;
 
 assignment
@@ -165,6 +182,7 @@ opcode
     | 'OCTAL'
     | 'ADRES'
     | 'ABVAL'   
+    | 'COMP'
     | 'DV'      // Divide
     | 'NDX'     // INDEX
     | 'POUT'    // look at the docs 
@@ -174,6 +192,10 @@ opcode
 
 label
     : LABEL
+    ;
+
+ws
+    : WS
     ;
 
 comment
@@ -213,7 +235,7 @@ decimal
 //
 // labels can contain "&"
 LABEL
-    : [a-zA-Z0-9_.+\-/*=&]+
+    : [a-zA-Z0-9_.+\\-/*=&]+
     ; 
 
 INTE
@@ -258,9 +280,9 @@ RPAREN
     ;
 
 EOL
-    : ['\r\n']
+    : [\r\n]+
     ;
 
 WS
-    : [ \t\r\n]->skip
+    : [ \t]+
     ;
