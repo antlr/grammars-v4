@@ -185,14 +185,14 @@ register
 opcode
     : standard_opcode
     | pseudo_opcode
-//    | axt_opcode
+    | axt_opcode
     ;
 
 // Address to Index
-//axt_opcode
-//    : 'AXT' ws COMMA ('1' | '2')
- //   ;
-
+axt_opcode
+    : 'AXT,1'
+    | 'AXT,2'
+    ;
 
 pseudo_opcode
     : '1DNADR'
