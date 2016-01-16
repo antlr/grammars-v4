@@ -1,1 +1,18 @@
-RC time delay circuit v1 1 0 dc 10 c1 1 2 47u ic=0 c2 1 2 22u ic=0 r1 2 0 3.3k .tran .05 1 uic .print tran v(1,2) .end 
+LPFILTER.CIR - SIMPLE RC LOW-PASS FILTER
+*
+VS	1	0	AC	1	SIN(0VOFF 1VPEAK   2KHZ)
+*
+R1	1	2	1K
+C1	2	0	0.032UF
+*
+* ANALYSIS
+.AC 	DEC 	5 10 10MEG
+.TRAN 	5US  500US
+*
+* VIEW RESULTS
+.PRINT	AC 	VM(2) VP(2)
+.PRINT	TRAN 	V(1) V(2)
+*
+.PROBE
+.END
+

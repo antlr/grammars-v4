@@ -1,1 +1,5 @@
-v1 1 0 dc 24 v2 3 0 dc 15 r1 1 2 10k r2 2 3 8.1k r3 2 0 4.7k .end 
+R1 1 0 2K
+R2 2 1 3K
+V1 2 0 DC
+.DC V1 0 5 .1
+.END

@@ -5,7 +5,7 @@ spicefile
     ;
 
 netlist
-    : node+
+    : (node | simulationcommand)+
     ;    
 
 node
@@ -20,34 +20,45 @@ vertexID
     ;
 
 vnode
-    : vnodeName vertexID vertexID 'dc' expression;
+    : VNODENAME vertexID vertexID VSOURCETYPE expression;
 
-vnodeName
-    : ('V' | 'v') DIGIT+
+VNODENAME
+    : V DIGIT+
+    ;
+
+VSOURCETYPE
+    : (D C) | (A C)
     ;
 
 rnode
-    : rnodeName vertexID vertexID expression;
+    : RNODENAME vertexID vertexID expression;
 
-rnodeName
-    :('R' | 'r') DIGIT+
+RNODENAME
+    : R DIGIT+
     ;
 
 cnode
-    : codeName vertexID vertexID expression ('ic' EQUALS expression)?;
+    : CNODENAME vertexID vertexID expression ('ic' EQUALS expression)?;
 
-codeName
-    :('c' | 'C') DIGIT+
+CNODENAME
+    : C DIGIT+
     ;
 
 lnode
-    : lodeName vertexID vertexID expression;
+    : LNODENAME vertexID vertexID expression;
 
-lodeName
-    :('l' | 'L') DIGIT+
+LNODENAME
+    :L DIGIT+
     ;
 
+simulationcommand
+    : dotdc
+    ;
 
+dotdc
+    : '.DC' VNODENAME expression expression expression
+    ;
+        
 expression
    : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
    ;
@@ -62,11 +73,12 @@ powExpression
 
 atom
    : value
+   | LPAREN expression RPAREN
    ;
 
 // a number with a potential metrix suffix
 value
-    : scientific ('k')?
+    : scientific K?
     ;
    
 scientific
@@ -74,7 +86,7 @@ scientific
    ;
 
 number
-   : MINUS? DIGIT+ (POINT DIGIT+)?
+   : MINUS? DIGIT* (POINT DIGIT+)?
    ;
 
 LPAREN
@@ -109,9 +121,32 @@ POINT
    : '.'
    ;
 
-E
-   : 'e' | 'E'
-   ;
+fragment A:('a'|'A');
+fragment B:('b'|'B');
+fragment C:('c'|'C');
+fragment D:('d'|'D');
+fragment E:('e'|'E');
+fragment F:('f'|'F');
+fragment G:('g'|'G');
+fragment H:('h'|'H');
+fragment I:('i'|'I');
+fragment J:('j'|'J');
+fragment K:('k'|'K');
+fragment L:('l'|'L');
+fragment M:('m'|'M');
+fragment N:('n'|'N');
+fragment O:('o'|'O');
+fragment P:('p'|'P');
+fragment Q:('q'|'Q');
+fragment R:('r'|'R');
+fragment S:('s'|'S');
+fragment T:('t'|'T');
+fragment U:('u'|'U');
+fragment V:('v'|'V');
+fragment W:('w'|'W');
+fragment X:('x'|'X');
+fragment Y:('y'|'Y');
+fragment Z:('z'|'Z');
 
 DIGIT
    : ('0' .. '9')
@@ -122,17 +157,13 @@ END
     ;
 
 COMMENT_1
-    : '*' .*? CR -> skip
+    : '*' ~[\r\n]* -> skip
     ;
 
 COMMENT_2
-    : ';' .*? CR -> skip
-    ;
-
-CR
-    : [\r\n]+
+    : ';' ~[\r\n]* -> skip
     ;
 
 WS
-    : [ \t]->skip
-    ;
+   : [ \r\n\t] + -> channel (HIDDEN)
+   ;
