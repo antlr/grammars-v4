@@ -73,7 +73,7 @@ erase_line
 
 // assignment with no RHS is legal
 assignment_line
-    : variable ws? '=' (ws? expression)* (ws comment)? eol
+    : variable ws? ('=' | 'EQUALS') (ws? expression)* (ws comment)? eol
     ;
 
 opcodes
@@ -82,10 +82,6 @@ opcodes
 
 argument
     : (ws expression)* (ws comment)?
-    ;
-
-label
-    : LABEL
     ;
 
 ws
@@ -100,8 +96,13 @@ comment
     : COMMENT
     ;
 
+label
+    : LABEL
+    ;
+
 variable
-    : LABEL? LPAREN variable RPAREN
+    : LABEL
+    | (LPAREN LABEL RPAREN)
     ;
 
 expression 
@@ -183,12 +184,61 @@ register
 
 opcode
     : standard_opcode
+    | pseudo_opcode
 //    | axt_opcode
     ;
 
+// Address to Index
+//axt_opcode
+//    : 'AXT' ws COMMA ('1' | '2')
+ //   ;
+
+
+pseudo_opcode
+    : '1DNADR'
+    | '2DNADR'  
+    | '3DNADR'  
+    | '4DNADR'  
+    | '5DNADR'  
+    | '6DNADR'         
+    | 'DNCHAN'
+    | 'DNPTR'
+    | '-1DNADR'
+    | '-2DNADR'  
+    | '-3DNADR'  
+    | '-4DNADR'  
+    | '-5DNADR'  
+    | '-6DNADR'         
+    | '-DNCHAN'
+    | '-DNPTR'
+    | '2DEC'
+    | '2DEC*'
+    | '2DNADR'
+    | '-2DNADR'
+    | '2FCADR' // embed a double-word constant
+    | '3DNADR'
+    | '-3DNADR'
+    | '4DNADR'
+    | '-4DNADR'
+    | '5DNADR'
+    | '-5DNADR'
+    | '6DNADR'
+    | '-6DNADR'
+    | 'BANK'
+    | 'BLOCK'
+    | 'BNKSUM'
+    | 'COUNT'
+    | 'COUNT*'
+    | 'DEC'     // embed a single-precision (SP) constant
+    | '2DEC'    // embed a double precision constant
+    | '2FCADR'   // embed a double-word constant, to be used later by the DTCF instruction
+    | 'OCT'     // embed an octal constant
+    | 'SETLOC'
+    | 'SUBRO'
+    ;
+      
 standard_opcode
-    : 'SETLOC'
-    | 'TC'      // transfer control   
+    : 'TC'      // transfer control   
     | 'TCR'     // transfer control
     | 'CCS'     // Count, Compare, and Skip      
     | 'TCF'     // Transfer Control to Fixed
@@ -258,10 +308,7 @@ standard_opcode
     | 'TCSAJ'   // look at the docs
     | 'CAF'     // Clear and Add Fixed
     | 'CAE'     // Clear and Add Erasable
-    | 'OCT'     // embed an octal constant
     | 'CADR'
-    | 'BANK'    // bank
-    | 'BLOCK'   // block
     | 'DMOVE'
     | 'VMOVE'
     | 'SMOVE'
@@ -274,13 +321,9 @@ standard_opcode
     | 'SIN'
     | 'COS'
     | 'CAD'
-    | 'DEC'     // embed a single-precision (SP) constan
     | 'TEST'
     | 'VXSC'
     | 'ITC'  
-    | '2DEC'    // embed a double precision constant
-    | '2FCADR'  // embed a double-word constant
-    | 'EQUALS'
     | 'DAD'
     | 'VXV'
     | 'VAD'
@@ -303,11 +346,6 @@ standard_opcode
     | 'LODON'   // this is used in a couple places in a "2-opcodes on a line" format
     | 'TSLT'    // this is used in a couple places in a "2-opcodes on a line" format
     ;
-
-// Address to Index
-//axt_opcode
-//    : 'AXT' ws COMMA ('1' | '2')
- //   ;
 
 //
 // labels can begin with + or -, letters or digits 
