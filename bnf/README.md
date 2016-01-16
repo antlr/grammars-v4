@@ -1,4 +1,4 @@
-#BFN Grammar
+#BNF Grammar
 
 # Summary
 

@@ -32,140 +32,173 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar calculator;
 
-equation  
-    : expression relop expression
-    ;
+equation
+   : expression relop expression
+   ;
 
-expression 
-    : multiplyingExpression ((PLUS|MINUS) multiplyingExpression)*
-    ;
+expression
+   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
+   ;
 
-multiplyingExpression  
-    : powExpression ((TIMES|DIV) powExpression)*
-    ;
+multiplyingExpression
+   : powExpression ((TIMES | DIV) powExpression)*
+   ;
 
 powExpression
-    : atom (POW expression)?
-    ;
+   : atom (POW expression)?
+   ;
 
-atom 
-    : scientific
-    | variable
-    | LPAREN expression RPAREN
-    | func
-    ;
+atom
+   : scientific
+   | variable
+   | LPAREN expression RPAREN
+   | func
+   ;
 
 scientific
-    : number (E number)?
-    ;
+   : number (E number)?
+   ;
 
 func
-    : funcname LPAREN expression RPAREN
-    ;
+   : funcname LPAREN expression RPAREN
+   ;
 
 funcname
-    : COS | TAN | SIN | ACOS | ATAN | ASIN | LOG | LN
-    ;
+   : COS
+   | TAN
+   | SIN
+   | ACOS
+   | ATAN
+   | ASIN
+   | LOG
+   | LN
+   ;
 
-relop 
-    : EQ | GT | LT
-    ;
+relop
+   : EQ
+   | GT
+   | LT
+   ;
 
 number
-    : MINUS? DIGIT+ (POINT DIGIT+)?
-    ;
+   : MINUS? DIGIT + (POINT DIGIT +)?
+   ;
 
 variable
-    : MINUS? LETTER (LETTER | DIGIT)*;
+   : MINUS? LETTER (LETTER | DIGIT)*
+   ;
+
 
 COS
-    : 'cos'
-    ;
-   
+   : 'cos'
+   ;
+
+
 SIN
-    : 'sin'
-    ;
+   : 'sin'
+   ;
+
 
 TAN
-    : 'tan'
-    ;
+   : 'tan'
+   ;
+
 
 ACOS
-    : 'acos'
-    ;
-   
+   : 'acos'
+   ;
+
+
 ASIN
-    : 'asin'
-    ;
+   : 'asin'
+   ;
+
 
 ATAN
-    : 'atan'
-    ;
+   : 'atan'
+   ;
+
+
 LN
-    : 'ln'
-    ;
+   : 'ln'
+   ;
+
 
 LOG
-    : 'log'
-    ;
+   : 'log'
+   ;
 
-LPAREN 
-    : '('
-    ;
 
-RPAREN 
-    : ')'
-    ;
+LPAREN
+   : '('
+   ;
 
-PLUS 
-    : '+'
-    ;
 
-MINUS 
-    : '-'
-    ;
+RPAREN
+   : ')'
+   ;
 
-TIMES 
-    : '*'
-    ;
 
-DIV 
-    : '/'
-    ;
+PLUS
+   : '+'
+   ;
 
-GT 
-    : '>'
-    ;
 
-LT 
-    : '<'
-    ;
+MINUS
+   : '-'
+   ;
+
+
+TIMES
+   : '*'
+   ;
+
+
+DIV
+   : '/'
+   ;
+
+
+GT
+   : '>'
+   ;
+
+
+LT
+   : '<'
+   ;
+
 
 EQ
-    : '='
-    ;
+   : '='
+   ;
+
 
 POINT
-    : '.'
-    ;
+   : '.'
+   ;
+
 
 E
-    : 'e'
-    | 'E'
-    ;
+   : 'e' | 'E'
+   ;
+
 
 POW
-    : '^'
-    ;
+   : '^'
+   ;
+
 
 LETTER
-    : ('a'..'z') | ('A'..'Z')
-    ;
+   : ('a' .. 'z') | ('A' .. 'Z')
+   ;
+
 
 DIGIT
-    : ('0'..'9')
-    ;
+   : ('0' .. '9')
+   ;
 
-WS 
-    : [ \r\n\t]+ -> channel(HIDDEN)
-    ;
+
+WS
+   : [ \r\n\t] + -> channel (HIDDEN)
+   ;
