@@ -1,39 +1,124 @@
 grammar spice;
 
 spicefile
-    : title elementblock END
+    : netlist END CR?
     ;
 
-title
-    :  ~(CR)* CR
-    ;
-
-elementblock
-    : identifier nodeid+
+netlist
+    : node+
     ;    
 
-identifier
-    : IDENTIFIER
+node
+    : vnode
+    | rnode
+    | cnode
+    | lnode
     ;
 
-IDENTIFIER
-    : ('a'..'z' | 'A'..'Z')  ('a'..'z'|'A'..'Z' | '0'..'9'| '_')*
+vertexID
+    : DIGIT+
     ;
 
-nodeid
-    : INT
+vnode
+    : vnodeName vertexID vertexID 'dc' expression;
+
+vnodeName
+    : ('V' | 'v') DIGIT+
     ;
 
-INT
-    : ('0'..'9')+
+rnode
+    : rnodeName vertexID vertexID expression;
+
+rnodeName
+    :('R' | 'r') DIGIT+
     ;
+
+cnode
+    : codeName vertexID vertexID expression ('ic' EQUALS expression)?;
+
+codeName
+    :('c' | 'C') DIGIT+
+    ;
+
+lnode
+    : lodeName vertexID vertexID expression;
+
+lodeName
+    :('l' | 'L') DIGIT+
+    ;
+
+
+expression
+   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
+   ;
+
+multiplyingExpression
+   : powExpression ((TIMES | DIV) powExpression)*
+   ;
+
+powExpression
+   : atom (POW expression)?
+   ;
+
+atom
+   : value
+   ;
+
+// a number with a potential metrix suffix
+value
+    : scientific ('k')?
+    ;
+   
+scientific
+   : number (E number)?
+   ;
+
+number
+   : MINUS? DIGIT+ (POINT DIGIT+)?
+   ;
+
+LPAREN
+   : '('
+   ;
+
+RPAREN
+   : ')'
+   ;
+
+PLUS
+   : '+'
+   ;
+
+MINUS
+   : '-'
+   ;
+
+TIMES
+   : '*'
+   ;
+
+DIV
+   : '/'
+   ;
+
+EQ
+   : '='
+   ;
+
+POINT
+   : '.'
+   ;
+
+E
+   : 'e' | 'E'
+   ;
+
+DIGIT
+   : ('0' .. '9')
+   ;
 
 END
-    : '.END'
-    ;
-
-LETTER
-    :('a'..'z' |'A'..'Z' )
+    : '.END' | '.end'
     ;
 
 COMMENT_1
@@ -45,7 +130,7 @@ COMMENT_2
     ;
 
 CR
-    : ('\r' | '\n')+
+    : [\r\n]+
     ;
 
 WS
