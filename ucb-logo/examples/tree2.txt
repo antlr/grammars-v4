@@ -1,0 +1,13 @@
+TO tree :size
+   if :size < 5 [forward :size back :size stop]
+   forward :size/3
+   left 30 tree :size*2/3 right 30
+   forward :size/6
+   right 25 tree :size/2 left 25
+   forward :size/3
+   right 25 tree :size/2 left 25
+   forward :size/6
+   back :size
+END
+clearscreen
+tree 150

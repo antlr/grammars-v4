@@ -78,7 +78,7 @@ use_clause : 'use' ( library_identifier '.' )? cell_identifier ( ':config' )? ;
 // 1.3 Module and primitive source text
 
 // START SYMBOL
-source_text : description* EOF ;
+source_text : timing_spec? description* EOF ;
 
 description : module_declaration ;
 
@@ -560,7 +560,7 @@ constant_expression ( ',' constant_expression )* ':' generate_item_or_null
 
 generate_loop_statement :
 'for' '(' genvar_assignment ';' constant_expression ';' genvar_assignment ')'
-'begin' ':' generate_block_identifier ( generate_item )* 'end'
+generate_block
 ;
 
 genvar_assignment : genvar_identifier '=' constant_expression ;
@@ -1327,7 +1327,7 @@ String : '"' ( ~[\n\r] )* '"' ;
 
 // 9 General
 // 9.1 Attributes
-
+timing_spec : '`timescale' Time_Identifier '/' Time_Identifier;
 attribute_instance : '(' '*' attr_spec ( ',' attr_spec )* '*' ')' ;
 attr_spec : attr_name '=' constant_expression
 | attr_name
@@ -1356,7 +1356,6 @@ escaped_hierarchical_branch ( '.' simple_hierarchical_branch | '.' escaped_hiera
 
 Escaped_identifier
 	:	'\\' ~[ \r\t\n]*
-        {_input.LA(1)!=' '&&_input.LA(1)!='\t'&&_input.LA(1)!='\t'&&_input.LA(1)!='\n'}?
     ;
 
 event_identifier : identifier ;
@@ -1399,6 +1398,7 @@ simple_hierarchical_identifier : simple_hierarchical_branch ( '.' Escaped_identi
 specparam_identifier : identifier ;
 Simple_identifier : [a-zA-Z_] [a-zA-Z0-9_$]* ;
 Dollar_Identifier : '$' [a-zA-Z0-9_$] [a-zA-Z0-9_$]* ;
+Time_Identifier : [0-9]+ [mnpf]'s';
 system_function_identifier : Dollar_Identifier ;
 system_task_identifier : Dollar_Identifier ;
 task_identifier : identifier ;

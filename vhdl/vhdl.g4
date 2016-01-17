@@ -17,117 +17,146 @@
 
 grammar vhdl;
 
-	ABS:'abs';
-	ACCESS : 'access';
-	ACROSS : 'across';
-	AFTER : 'after';
-	ALIAS : 'alias';
-	ALL : 'all';
-	AND : 'and';
-	ARCHITECTURE : 'architecture';
-	ARRAY : 'array';
-	ASSERT : 'assert';
-	ATTRIBUTE : 'attribute';
-	BEGIN : 'begin';
-	BLOCK : 'block';
-	BODY : 'body';
-	BREAK : 'break';
-	BUFFER : 'buffer';
-	BUS : 'bus';
-	CASE : 'case';
-	COMPONENT : 'component';
-	CONFIGURATION : 'configuration';
-	CONSTANT : 'constant';
-	DISCONNECT : 'disconnect';
-	DOWNTO : 'downto';
-	END : 'end';
-	ENTITY : 'entity';
-	ELSE : 'else';
-	ELSIF : 'elsif';
-	EXIT : 'exit';
-	FILE : 'file';
-	FOR : 'for';
-	FUNCTION : 'function';
-	GENERATE : 'generate';
-	GENERIC : 'generic';
-	GROUP : 'group';
-	GUARDED : 'guarded';
-	IF : 'if';
-	IMPURE : 'impure';
-	IN : 'in';
-	INERTIAL : 'inertial';
-	INOUT : 'inout';
-	IS : 'is';
-	LABEL : 'label';
-	LIBRARY : 'library';
-	LIMIT : 'limit';
-	LINKAGE : 'linkage';
-	LITERAL : 'literal';
-	LOOP : 'loop';
-	MAP : 'map';
-	MOD : 'mod';
-	NAND : 'nand';
-	NATURE : 'nature';
-	NEW : 'new';
-	NEXT : 'next';
-	NOISE : 'noise';
-	NOR : 'nor';
-	NOT : 'not';
-	NULL : 'null';
-	OF : 'of';
-	ON : 'on';
-	OPEN : 'open';
-	OR : 'or';
-	OTHERS : 'others';
-	OUT : 'out';
-	PACKAGE : 'package';
-	PORT : 'port';
-	POSTPONED : 'postponed';
-	PROCESS : 'process';
-	PROCEDURE : 'procedure';
-	PROCEDURAL : 'procedural';
-	PURE : 'pure';
-	QUANTITY : 'quantity';
-	RANGE : 'range';
-	REVERSE_RANGE : 'reverse_range';
-	REJECT : 'reject';
-	REM : 'rem';
-	RECORD : 'record';
-	REFERENCE : 'reference';
-	REGISTER : 'register';
-	REPORT : 'report';
-	RETURN : 'return';
-	ROL : 'rol';
-	ROR : 'ror';
-	SELECT : 'select';
-	SEVERITY : 'severity';
-	SHARED : 'shared';
-	SIGNAL : 'signal';
-	SLA : 'sla';
-	SLL : 'sll';
-	SPECTRUM : 'spectrum';
-	SRA : 'sra';
-	SRL : 'srl';
-	SUBNATURE : 'subnature';
-	SUBTYPE : 'subtype';
-	TERMINAL : 'terminal';
-	THEN : 'then';
-	THROUGH : 'through';
-	TO : 'to';
-	TOLERANCE : 'tolerance';
-	TRANSPORT : 'transport';
-	TYPE : 'type';
-	UNAFFECTED : 'unaffected';
-	UNITS : 'units';
-	UNTIL : 'until';
-	USE : 'use';
-	VARIABLE : 'variable';
-	WAIT : 'wait';
-	WITH : 'with';
-	WHEN : 'when';
-	WHILE : 'while';
-	XNOR : 'xnor';
-	XOR : 'xor';
+ABS: A B S;
+ACCESS : A C C E S S;
+ACROSS : A C R O S S;
+AFTER : A F T E R;
+ALIAS : A L I A S;
+ALL : A L L;
+AND : A N D;
+ARCHITECTURE : A R C H I T E C T U R E;
+ARRAY : A R R A Y;
+ASSERT : A S S E R T;
+ATTRIBUTE : A T T R I B U T E;
+BEGIN : B E G I N;
+BLOCK : B L O C K;
+BODY : B O D Y;
+BREAK : B R E A K;
+BUFFER : B U F F E R;
+BUS : B U S;
+CASE : C A S E;
+COMPONENT : C O M P O N E N T;
+CONFIGURATION : C O N F I G U R A T I O N;
+CONSTANT : C O N S T A N T;
+DISCONNECT : D I S C O N N E C T;
+DOWNTO : D O W N T O;
+END : E N D;
+ENTITY : E N T I T Y;
+ELSE : E L S E;
+ELSIF : E L S I F;
+EXIT : E X I T;
+FILE : F I L E;
+FOR : F O R;
+FUNCTION : F U N C T I O N;
+GENERATE : G E N E R A T E;
+GENERIC : G E N E R I C;
+GROUP : G R O U P;
+GUARDED : G U A R D E D;
+IF : I F;
+IMPURE : I M P U R E;
+IN : I N;
+INERTIAL : I N E R T I A L;
+INOUT : I N O U T;
+IS : I S;
+LABEL : L A B E L;
+LIBRARY : L I B R A R Y;
+LIMIT : L I M I T;
+LINKAGE : L I N K A G E;
+LITERAL : L I T E R A L;
+LOOP : L O O P;
+MAP : M A P;
+MOD : M O D;
+NAND : N A N D;
+NATURE : N A T U R E;
+NEW : N E W;
+NEXT : N E X T;
+NOISE : N O I S E;
+NOR : N O R;
+NOT : N O T;
+NULL : N U L L;
+OF : O F;
+ON : O N;
+OPEN : O P E N;
+OR : O R;
+OTHERS : O T H E R S;
+OUT : O U T;
+PACKAGE : P A C K A G E;
+PORT : P O R T;
+POSTPONED : P O S T P O N E D;
+PROCESS : P R O C E S S;
+PROCEDURE : P R O C E D  U R E;
+PROCEDURAL : P R O C E D U R A L;
+PURE : P U R E;
+QUANTITY : Q U A N T I T Y;
+RANGE : R A N G E;
+REVERSE_RANGE : R E V E R S E '_' R A N G E;
+REJECT : R E J E C T;
+REM : R E M;
+RECORD : R E C O R D;
+REFERENCE : R E F E R E N C E;
+REGISTER : R E G I S T E R;
+REPORT : R E P O R T;
+RETURN : R E T U R N;
+ROL : R O L;
+ROR : R O R;
+SELECT : S E L E C T;
+SEVERITY : S E V E R I T Y;
+SHARED : S H A R E D;
+SIGNAL : S I G N A L;
+SLA : S L A;
+SLL : S L L;
+SPECTRUM : S P E C T R U M;
+SRA : S R A;
+SRL : S R L;
+SUBNATURE : S U B N A T U R E;
+SUBTYPE : S U B T Y P E;
+TERMINAL : T E R M I N A L;
+THEN : T H E N;
+THROUGH : T H R O U G H;
+TO : T O;
+TOLERANCE : T O L E R A N C E;
+TRANSPORT : T R A N S P O R T;
+TYPE : T Y P E;
+UNAFFECTED : U N A F F E C T E D;
+UNITS : U N I T S;
+UNTIL : U N T I L;
+USE : U S E;
+VARIABLE : V A R I A B L E;
+WAIT : W A I T;
+WITH : W I T H;
+WHEN : W H E N;
+WHILE : W H I L E;
+XNOR : X N O R;
+XOR : X O R;
+
+// case insensitive chars
+fragment A:('a'|'A');
+fragment B:('b'|'B');
+fragment C:('c'|'C');
+fragment D:('d'|'D');
+fragment E:('e'|'E');
+fragment F:('f'|'F');
+fragment G:('g'|'G');
+fragment H:('h'|'H');
+fragment I:('i'|'I');
+fragment J:('j'|'J');
+fragment K:('k'|'K');
+fragment L:('l'|'L');
+fragment M:('m'|'M');
+fragment N:('n'|'N');
+fragment O:('o'|'O');
+fragment P:('p'|'P');
+fragment Q:('q'|'Q');
+fragment R:('r'|'R');
+fragment S:('s'|'S');
+fragment T:('t'|'T');
+fragment U:('u'|'U');
+fragment V:('v'|'V');
+fragment W:('w'|'W');
+fragment X:('x'|'X');
+fragment Y:('y'|'Y');
+fragment Z:('z'|'Z');
+
 
 //------------------------------------------Parser----------------------------------------
 
@@ -664,11 +693,11 @@ exit_statement
 // NOTE that NAND/NOR are in (...)* now (used to be in (...)?).
 // (21.1.2004, e.f.)
 expression
-  : relation ( options{greedy=true;}: logical_operator relation )*
+  : relation ( : logical_operator relation )*
   ;
 
 factor
-  : primary ( options{greedy=true;}: DOUBLESTAR primary )?
+  : primary ( : DOUBLESTAR primary )?
   | ABS primary
   | NOT primary
   ;
@@ -834,7 +863,7 @@ interface_quantity_declaration
 
 interface_port_declaration
   : identifier_list COLON signal_mode subtype_indication
-    ( BUS )?
+    ( BUS )? ( VARASGN expression )?
   ;
 
 interface_signal_declaration
@@ -1049,7 +1078,7 @@ parameter_specification
   ;
 
 physical_literal
-  : abstract_literal (options{greedy=true;}: identifier)
+  : abstract_literal (: identifier)
   ;
 
 physical_type_definition
@@ -1194,7 +1223,7 @@ record_type_definition
 
 relation
   : shift_expression
-    ( options{greedy=true;}: relational_operator shift_expression )?
+    ( : relational_operator shift_expression )?
   ;
 
 relational_operator
@@ -1272,7 +1301,7 @@ sequential_statement
 
 shift_expression
   : simple_expression
-    ( options{greedy=true;}: shift_operator simple_expression )?
+    ( : shift_operator simple_expression )?
   ;
 
 shift_operator
@@ -1313,7 +1342,7 @@ signature
 // `a op -b' - use `a op (-b)' instead).
 // (3.2.2004, e.f.)
 simple_expression
-  : ( PLUS | MINUS )? term ( options{greedy=true;}: adding_operator term )*
+  : ( PLUS | MINUS )? term ( : adding_operator term )*
   ;
 
 simple_simultaneous_statement
@@ -1459,7 +1488,7 @@ target
   ;
 
 term
-  : factor ( options{greedy=true;}: multiplying_operator factor )*
+  : factor ( : multiplying_operator factor )*
   ;
 
 terminal_aspect
@@ -1532,21 +1561,13 @@ waveform_element
 
 //------------------------------------------Lexer-----------------------------------------
 BASE_LITERAL
-   :  BINANRY_BASED_INTEGER
-   |  OCTAL_BASED_INTEGER
-   |  HEXA_BASED_INTEGER
-   ;
-
-BINANRY_BASED_INTEGER
-   : '2' '#' ('1' | '0' | '_')+ '#' (INTEGER)?
-   ;
-   
-OCTAL_BASED_INTEGER
-   : '8' '#' ('7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '#' (INTEGER)?
-   ;
-
-HEXA_BASED_INTEGER
-   : '16' '#' ( 'f' |'e' |'d' |'c' |'b' |'a' | 'F' |'E' |'D' |'C' |'B' |'A' | '9' | '8' | '7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '#' (INTEGER)?
+// INTEGER must be checked to be between and including 2 and 16 (included) i.e.
+// INTEGER >=2 and INTEGER <=16
+// A Based integer (a number without a . such as 3) should not have a negative exponent
+// A Based fractional number with a . i.e. 3.0 may have a negative exponent
+// These should be checked in the Visitor/Listener whereby an appropriate error message
+// should be given
+   :  INTEGER '#' BASED_INTEGER ('.'BASED_INTEGER)? '#' (EXPONENT)?
    ;
 
 BIT_STRING_LITERAL
@@ -1571,7 +1592,7 @@ REAL_LITERAL
    :    INTEGER '.' INTEGER  ( EXPONENT )?;
 
 BASIC_IDENTIFIER
-   :   LETTER ( '_' | LETTER | DIGIT )*
+   :   LETTER ( '_' ( LETTER | DIGIT ) | LETTER | DIGIT )*
    ;
    
 EXTENDED_IDENTIFIER
@@ -1661,22 +1682,29 @@ BACKSLASH     : '\\'  ;
   
 
 EXPONENT
-  :  'e' ( '+' | '-' )? INTEGER
+  :  ('E'|'e') ( '+' | '-' )? INTEGER
   ;
 
 
 HEXDIGIT
     :	('A'..'F'|'a'..'f')
     ;
-      
+
 
 INTEGER
   :  DIGIT ( '_' | DIGIT )*
   ;
 
-  
- DIGIT
+DIGIT
   :  '0'..'9'
+  ;
+
+BASED_INTEGER
+  : EXTENDED_DIGIT ('_' | EXTENDED_DIGIT)*
+  ;
+
+EXTENDED_DIGIT
+  : (DIGIT | LETTER)
   ;
 
 APOSTROPHE

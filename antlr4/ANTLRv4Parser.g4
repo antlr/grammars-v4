@@ -1,7 +1,8 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Sam Harwell
+ *  Copyright (c) 2012-2014 Terence Parr
+ *  Copyright (c) 2012-2014 Sam Harwell
+ *  Copyright (c) 2015 Gerald Rosenberg
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -28,12 +29,19 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** A grammar for ANTLR v4 written in ANTLR v4.
-*/
+/*	A grammar for ANTLR v4 written in ANTLR v4.
+ *
+ *	Modified 2015.06.16 gbr
+ *	-- update for compatibility with Antlr v4.5
+ *	-- add mode for channels
+ *	-- moved members to LexerAdaptor
+ * 	-- move fragments to imports
+ */
+
 parser grammar ANTLRv4Parser;
 
 options {
-	tokenVocab=ANTLRv4Lexer;
+	tokenVocab = ANTLRv4Lexer ;
 }
 
 // The main entry point for parsing a v4 grammar.
@@ -60,12 +68,16 @@ prequelConstruct
 	:	optionsSpec
 	|	delegateGrammars
 	|	tokensSpec
+	|	channelsSpec
 	|	action
 	;
 
-// A list of options that affect analysis and/or code generation
+
+// ------------
+// Options - things that affect analysis and/or code generation
+
 optionsSpec
-	:	OPTIONS (option SEMI)* RBRACE
+	:	OPTIONS LBRACE (option SEMI)* RBRACE
 	;
 
 option
@@ -75,9 +87,12 @@ option
 optionValue
 	:	id (DOT id)*
 	|	STRING_LITERAL
-	|	ACTION
+	|	actionBlock			// TODO: is this valid?
 	|	INT
 	;
+
+// ------------
+// Delegates
 
 delegateGrammars
 	:	IMPORT delegateGrammar (COMMA delegateGrammar)* SEMI
@@ -88,26 +103,45 @@ delegateGrammar
 	|	id
 	;
 
+
+// ------------
+// Tokens & Channels
+
 tokensSpec
-	:	TOKENS id (COMMA id)* COMMA? RBRACE
+	:	TOKENS LBRACE idList? RBRACE
 	;
 
-/** Match stuff like @parser::members {int i;} */
+channelsSpec
+	:	CHANNELS LBRACE idList? RBRACE
+	;
+
+idList
+	: id ( COMMA id )* COMMA?
+	;
+
+
+// Match stuff like @parser::members {int i;}
 action
-	:	AT (actionScopeName COLONCOLON)? id ACTION
+	:	AT (actionScopeName COLONCOLON)? id actionBlock
 	;
 
-/** Sometimes the scope names will collide with keywords; allow them as
- *  ids for action scopes.
- */
+// Scope names could collide with keywords; allow them as ids for action scopes
 actionScopeName
 	:	id
 	|	LEXER
 	|	PARSER
 	;
 
+actionBlock
+	:	BEGIN_ACTION ACTION_CONTENT* END_ACTION
+	;
+
+argActionBlock
+	:	BEGIN_ARGUMENT ARGUMENT_CONTENT* END_ARGUMENT
+	;
+
 modeSpec
-	:	MODE id SEMI lexerRule*
+	:	MODE id SEMI lexerRuleSpec*
 	;
 
 rules
@@ -116,16 +150,16 @@ rules
 
 ruleSpec
 	:	parserRuleSpec
-	|	lexerRule
+	|	lexerRuleSpec
 	;
 
 parserRuleSpec
 	:	DOC_COMMENT?
-        ruleModifiers? RULE_REF ARG_ACTION?
-        ruleReturns? throwsSpec? localsSpec?
+		ruleModifiers? RULE_REF argActionBlock? ruleReturns? throwsSpec?
+		localsSpec?
 		rulePrequel*
 		COLON
-            ruleBlock
+		ruleBlock
 		SEMI
 		exceptionGroup
 	;
@@ -135,11 +169,11 @@ exceptionGroup
 	;
 
 exceptionHandler
-	:	CATCH ARG_ACTION ACTION
+	:	CATCH argActionBlock actionBlock
 	;
 
 finallyClause
-	:	FINALLY ACTION
+	:	FINALLY actionBlock
 	;
 
 rulePrequel
@@ -148,20 +182,23 @@ rulePrequel
 	;
 
 ruleReturns
-	:	RETURNS ARG_ACTION
+	:	RETURNS argActionBlock
 	;
+
+// --------------
+// Exception spec
 
 throwsSpec
 	:	THROWS id (COMMA id)*
 	;
 
 localsSpec
-	:	LOCALS ARG_ACTION
+	:	LOCALS argActionBlock
 	;
 
 /** Match stuff like @init {int i;} */
 ruleAction
-	:	AT id ACTION
+	:	AT id actionBlock
 	;
 
 ruleModifiers
@@ -193,7 +230,10 @@ labeledAlt
 	:	alternative (POUND id)?
 	;
 
-lexerRule
+// --------------------
+// Lexer rules
+
+lexerRuleSpec
 	:	DOC_COMMENT? FRAGMENT?
 		TOKEN_REF COLON lexerRuleBlock SEMI
 	;
@@ -208,7 +248,7 @@ lexerAltList
 
 lexerAlt
 	:	lexerElements lexerCommands?
-	|
+	|									// explicitly allow empty alts
 	;
 
 lexerElements
@@ -219,9 +259,8 @@ lexerElement
 	:	labeledLexerElement ebnfSuffix?
 	|	lexerAtom ebnfSuffix?
 	|	lexerBlock ebnfSuffix?
-	|	ACTION QUESTION? // actions only allowed at end of outer alt actually,
-                         // but preds can be anywhere
-	;
+	|	actionBlock QUESTION?	// actions only allowed at end of outer alt actually,
+	;							// but preds can be anywhere
 
 labeledLexerElement
 	:	id (ASSIGN|PLUS_ASSIGN)
@@ -254,12 +293,16 @@ lexerCommandExpr
 	|	INT
 	;
 
+// --------------------
+// Rule Alts
+
 altList
 	:	alternative (OR alternative)*
 	;
 
 alternative
-	:	elementOptions? element*
+	:	elementOptions? element+
+	|								// explicitly allow empty alts
 	;
 
 element
@@ -272,21 +315,25 @@ element
 		|
 		)
 	|	ebnf
-	|	ACTION QUESTION? // SEMPRED is ACTION followed by QUESTION
+	|	actionBlock QUESTION?		// SEMPRED is actionBlock followed by QUESTION
 	;
 
 labeledElement
-	:	id (ASSIGN|PLUS_ASSIGN)
+	:	id ( ASSIGN | PLUS_ASSIGN )
 		(	atom
 		|	block
 		)
 	;
 
-ebnf:	block blockSuffix?
+// --------------------
+// EBNF and blocks
+
+ebnf
+	:	block blockSuffix?
 	;
 
 blockSuffix
-	:	ebnfSuffix // Standard EBNF
+	:	ebnfSuffix 		// Standard EBNF
 	;
 
 ebnfSuffix
@@ -305,12 +352,15 @@ lexerAtom
 	;
 
 atom
-	:	range // Range x..y - only valid in lexers
+	:	range 				// Range x..y - only valid in lexers
 	|	terminal
 	|	ruleref
 	|	notSet
 	|	DOT elementOptions?
 	;
+
+// --------------------
+// Inverted element set
 
 notSet
 	:	NOT setElement
@@ -328,6 +378,9 @@ setElement
 	|	LEXER_CHAR_SET
 	;
 
+// -------------
+// Grammar Block
+
 block
 	:	LPAREN
 		( optionsSpec? ruleAction* COLON )?
@@ -335,9 +388,15 @@ block
 		RPAREN
 	;
 
+// ----------------
+// Parser rule ref
+
 ruleref
-	:	RULE_REF ARG_ACTION? elementOptions?
+	:	RULE_REF argActionBlock? elementOptions?
 	;
+
+// ---------------
+// Character Range
 
 range
 	: STRING_LITERAL RANGE STRING_LITERAL
@@ -355,10 +414,8 @@ elementOptions
 	;
 
 elementOption
-	:	// This format indicates the default node option
-		id
-	|	// This format indicates option assignment
-		id ASSIGN (id | STRING_LITERAL)
+	:	id 									// default node option
+	|	id ASSIGN (id | STRING_LITERAL)		// option assignment
 	;
 
 id	:	RULE_REF

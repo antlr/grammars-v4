@@ -1,0 +1,7 @@
+ PREFIX dc: <http://purl.org/dc/elements/1.1/>
+ SELECT ?node ?title
+ WHERE{
+   ?node dc:title ?title .
+ }
+ LIMIT 3
+ 
