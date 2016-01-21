@@ -22,10 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-grammar TSQL;
-
-@parser::header {#pragma warning disable 3021}
-@lexer::header {#pragma warning disable 3021}
+grammar tsql;
 
 tsql_file
     : sql_clause* EOF
