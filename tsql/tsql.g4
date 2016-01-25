@@ -689,14 +689,23 @@ with_table_hints
     : WITH? '(' table_hint (',' table_hint)* ')'
     ;
 
-// Id runtime check. Id can be (INDEX, FORCESCAN, FORCESEEK, HOLDLOCK, NOLOCK, NOWAIT, PAGLOCK, READCOMMITTED,
-// READCOMMITTEDLOCK, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, SERIALIZABLE, SNAPSHOT,
+// Id runtime check. Id can be (FORCESCAN, HOLDLOCK, NOLOCK, NOWAIT, PAGLOCK, READCOMMITTED,
+// READCOMMITTEDLOCK, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, TABLOCK, TABLOCKX
+// UPDLOCK, XLOCK)
 
 table_hint
     : NOEXPAND? ( INDEX '(' index_value (',' index_value)* ')'
                 | INDEX '=' index_value
-                | ID)
+                | FORCESEEK ('(' index_value '(' index_column_name  (',' index_column_name)* ')' ')')?
+                | SERIALIZABLE
+                | SNAPSHOT
+                | SPATIAL_WINDOW_MAX_CELLS '=' DECIMAL
+                | ID)?
     ;
+
+index_column_name
+	: ID
+	;
 
 index_value
     : ID | DECIMAL
@@ -1104,6 +1113,7 @@ FETCH:                           F E T C H;
 FILE:                            F I L E;
 FILLFACTOR:                      F I L L F A C T O R;
 FOR:                             F O R;
+FORCESEEK:                       F O R C E S E E K;
 FOREIGN:                         F O R E I G N;
 FREETEXT:                        F R E E T E X T;
 FREETEXTTABLE:                   F R E E T E X T T A B L E;
@@ -1114,7 +1124,6 @@ GOTO:                            G O T O;
 GRANT:                           G R A N T;
 GROUP:                           G R O U P;
 HAVING:                          H A V I N G;
-HOLDLOCK:                        H O L D L O C K;
 IDENTITY:                        I D E N T I T Y;
 IDENTITYCOL:                     I D E N T I T Y C O L;
 IDENTITY_INSERT:                 I D E N T I T Y '_' I N S E R T;
@@ -1308,6 +1317,7 @@ SCROLL_LOCKS:                    S C R O L L '_' L O C K S;
 SELF:                            S E L F;
 SERIALIZABLE:                    S E R I A L I Z A B L E;
 SNAPSHOT:                        S N A P S H O T;
+SPATIAL_WINDOW_MAX_CELLS:        S P A T I A L '_' W I N D O W '_' M A X '_' C E L L S;
 STATIC:                          S T A T I C;
 STATS_STREAM:                    S T A T S '_' S T R E A M;
 STDEV:                           S T D E V;
