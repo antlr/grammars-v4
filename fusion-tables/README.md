@@ -1,6 +1,6 @@
 # Google Fusion Tables Sql
 
-Parses google fusion tables sql as defined in the [Row and Query reference](https://developers.google.com/fusiontables/docs/v2/sql-reference) as of January 2016. 
+Parses google fusion tables sql as defined in the [Row and Query SQL Reference](https://developers.google.com/fusiontables/docs/v2/sql-reference) as of January 2016. 
 
 Augmented by expressions for
 
