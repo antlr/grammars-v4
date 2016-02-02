@@ -22,6 +22,9 @@
 *
 * Change log:
 *
+* v1.2
+*	- fixes
+*
 * v1.1
 *	- fixes
 *

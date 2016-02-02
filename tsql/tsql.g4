@@ -1,12 +1,27 @@
-// T-SQL (Transact-SQL, MSSQL) grammar.
-// The MIT License (MIT)
-// Copyright (c) 2015, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+/*
+T-SQL (Transact-SQL, MSSQL) grammar.
+The MIT License (MIT).
+Copyright (c) 2015-2016, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+Copyright (c) 2016, Scott Ure (scott@redstormsoftware.com).
 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
 
 grammar tsql;
 
@@ -591,11 +606,9 @@ select_list
     ;
 
 select_list_elem
-    : '*'
-    | table_name '.' '*'
-    | full_column_name ((table_name '.')? '$' (IDENTITY | ROWGUID))
-    | expression (AS? column_alias)?
+    : (table_name '.')? ('*' | '$' (IDENTITY | ROWGUID))
     | column_alias '=' expression
+    | expression (AS? column_alias)?
     ;
 
 partition_by_clause
@@ -654,14 +667,42 @@ derived_table
 
 function_call
     : scalar_function_name '(' expression_list? ')'
+    // https://msdn.microsoft.com/en-us/library/ms173784.aspx
+    | BINARY_CHECKSUM '(' '*' ')'
     // https://msdn.microsoft.com/en-us/library/hh231076.aspx
     // https://msdn.microsoft.com/en-us/library/ms187928.aspx
-    | CAST '(' expression AS data_type ('(' DECIMAL ')')? ')'
+    | CAST '(' expression AS data_type ')'
     | CONVERT '(' data_type ',' expression (',' style=expression)? ')'
+    // https://msdn.microsoft.com/en-us/library/ms189788.aspx
+    | CHECKSUM '(' '*' ')'
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
-    | COALESCE '(' expression_list? ')'
+    | COALESCE '(' expression_list ')'
+    // https://msdn.microsoft.com/en-us/library/ms188751.aspx
+    | CURRENT_TIMESTAMP
+    // https://msdn.microsoft.com/en-us/library/ms176050.aspx
+    | CURRENT_USER
+    // https://msdn.microsoft.com/en-us/library/ms186819.aspx
+    | DATEADD '(' datepart ',' expression ',' expression ')'
+    // https://msdn.microsoft.com/en-us/library/ms189794.aspx
+    | DATEDIFF '(' datepart ',' expression ',' expression ')'
+    // https://msdn.microsoft.com/en-us/library/ms174395.aspx
+    | DATENAME '(' datepart ',' expression ')'
+    // https://msdn.microsoft.com/en-us/library/ms174420.aspx
+    | DATEPART '(' datepart ',' expression ')'
+    // https://msdn.microsoft.com/en-us/library/ms189838.aspx
+    | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'
+    // https://msdn.microsoft.com/en-us/library/bb839514.aspx
+    | MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
     | NULLIF '(' expression ',' expression ')'
+    // https://msdn.microsoft.com/en-us/library/ms177587.aspx
+    | SESSION_USER
+    // https://msdn.microsoft.com/en-us/library/ms179930.aspx
+    | SYSTEM_USER
+    ;
+
+datepart
+    : ID
     ;
 
 as_table_alias
@@ -677,14 +718,23 @@ with_table_hints
     : WITH? '(' table_hint (',' table_hint)* ')'
     ;
 
-// Id runtime check. Id can be (INDEX, FORCESCAN, FORCESEEK, HOLDLOCK, NOLOCK, NOWAIT, PAGLOCK, READCOMMITTED,
-// READCOMMITTEDLOCK, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, SERIALIZABLE, SNAPSHOT,
+// Id runtime check. Id can be (FORCESCAN, HOLDLOCK, NOLOCK, NOWAIT, PAGLOCK, READCOMMITTED,
+// READCOMMITTEDLOCK, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, TABLOCK, TABLOCKX
+// UPDLOCK, XLOCK)
 
 table_hint
     : NOEXPAND? ( INDEX '(' index_value (',' index_value)* ')'
                 | INDEX '=' index_value
-                | ID)
+                | FORCESEEK ('(' index_value '(' index_column_name  (',' index_column_name)* ')' ')')?
+                | SERIALIZABLE
+                | SNAPSHOT
+                | SPATIAL_WINDOW_MAX_CELLS '=' DECIMAL
+                | ID)?
     ;
+
+index_column_name
+	: ID
+	;
 
 index_value
     : ID | DECIMAL
@@ -832,6 +882,8 @@ scalar_function_name
     : func_proc_name
     | RIGHT
     | LEFT
+    | BINARY_CHECKSUM
+    | CHECKSUM
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187752.aspx
@@ -929,6 +981,7 @@ simple_id
     | FAST_FORWARD
     | FIRST
     | FOLLOWING
+    | FORCESEEK
     | FORWARD_ONLY
     | FULLSCAN
     | GLOBAL
@@ -989,6 +1042,7 @@ simple_id
     | SELF
     | SERIALIZABLE
     | SNAPSHOT
+    | SPATIAL_WINDOW_MAX_CELLS
     | STATIC
     | STATS_STREAM
     | STDEV
@@ -1092,6 +1146,7 @@ FETCH:                           F E T C H;
 FILE:                            F I L E;
 FILLFACTOR:                      F I L L F A C T O R;
 FOR:                             F O R;
+FORCESEEK:                       F O R C E S E E K;
 FOREIGN:                         F O R E I G N;
 FREETEXT:                        F R E E T E X T;
 FREETEXTTABLE:                   F R E E T E X T T A B L E;
@@ -1102,7 +1157,6 @@ GOTO:                            G O T O;
 GRANT:                           G R A N T;
 GROUP:                           G R O U P;
 HAVING:                          H A V I N G;
-HOLDLOCK:                        H O L D L O C K;
 IDENTITY:                        I D E N T I T Y;
 IDENTITYCOL:                     I D E N T I T Y C O L;
 IDENTITY_INSERT:                 I D E N T I T Y '_' I N S E R T;
@@ -1217,15 +1271,21 @@ APPLY:                           A P P L Y;
 AUTO:                            A U T O;
 AVG:                             A V G;
 BASE64:                          B A S E '64';
+BINARY_CHECKSUM:                 B I N A R Y '_' C H E C K S U M;
 CALLER:                          C A L L E R;
 CAST:                            C A S T;
 CATCH:                           C A T C H;
+CHECKSUM:                        C H E C K S U M;
 CHECKSUM_AGG:                    C H E C K S U M '_' A G G;
 COMMITTED:                       C O M M I T T E D;
 CONCAT:                          C O N C A T;
 COOKIE:                          C O O K I E;
 COUNT:                           C O U N T;
 COUNT_BIG:                       C O U N T '_' B I G;
+DATEADD:                         D A T E A D D;
+DATEDIFF:                        D A T E D I F F;
+DATENAME:                        D A T E N A M E;
+DATEPART:                        D A T E P A R T;
 DELAY:                           D E L A Y;
 DELETED:                         D E L E T E D;
 DENSE_RANK:                      D E N S E '_' R A N K;
@@ -1257,6 +1317,7 @@ LOOP:                            L O O P;
 MARK:                            M A R K;
 MAX:                             M A X;
 MIN:                             M I N;
+MIN_ACTIVE_ROWVERSION:           M I N '_' A C T I V E '_' R O W V E R S I O N;
 MODIFY:                          M O D I F Y;
 NEXT:                            N E X T;
 NAME:                            N A M E;
@@ -1296,6 +1357,7 @@ SCROLL_LOCKS:                    S C R O L L '_' L O C K S;
 SELF:                            S E L F;
 SERIALIZABLE:                    S E R I A L I Z A B L E;
 SNAPSHOT:                        S N A P S H O T;
+SPATIAL_WINDOW_MAX_CELLS:        S P A T I A L '_' W I N D O W '_' M A X '_' C E L L S;
 STATIC:                          S T A T I C;
 STATS_STREAM:                    S T A T S '_' S T R E A M;
 STDEV:                           S T D E V;
