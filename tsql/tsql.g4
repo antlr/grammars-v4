@@ -2,6 +2,7 @@
 T-SQL (Transact-SQL, MSSQL) grammar.
 The MIT License (MIT).
 Copyright (c) 2015-2016, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+Copyright (c) 2016, Scott Ure (scott@redstormsoftware.com).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -666,14 +667,42 @@ derived_table
 
 function_call
     : scalar_function_name '(' expression_list? ')'
+    // https://msdn.microsoft.com/en-us/library/ms173784.aspx
+    | BINARY_CHECKSUM '(' '*' ')'
     // https://msdn.microsoft.com/en-us/library/hh231076.aspx
     // https://msdn.microsoft.com/en-us/library/ms187928.aspx
-    | CAST '(' expression AS data_type ('(' DECIMAL ')')? ')'
+    | CAST '(' expression AS data_type ')'
     | CONVERT '(' data_type ',' expression (',' style=expression)? ')'
+    // https://msdn.microsoft.com/en-us/library/ms189788.aspx
+    | CHECKSUM '(' '*' ')'
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
-    | COALESCE '(' expression_list? ')'
+    | COALESCE '(' expression_list ')'
+    // https://msdn.microsoft.com/en-us/library/ms188751.aspx
+    | CURRENT_TIMESTAMP
+    // https://msdn.microsoft.com/en-us/library/ms176050.aspx
+    | CURRENT_USER
+    // https://msdn.microsoft.com/en-us/library/ms186819.aspx
+    | DATEADD '(' datepart ',' expression ',' expression ')'
+    // https://msdn.microsoft.com/en-us/library/ms189794.aspx
+    | DATEDIFF '(' datepart ',' expression ',' expression ')'
+    // https://msdn.microsoft.com/en-us/library/ms174395.aspx
+    | DATENAME '(' datepart ',' expression ')'
+    // https://msdn.microsoft.com/en-us/library/ms174420.aspx
+    | DATEPART '(' datepart ',' expression ')'
+    // https://msdn.microsoft.com/en-us/library/ms189838.aspx
+    | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'
+    // https://msdn.microsoft.com/en-us/library/bb839514.aspx
+    | MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
     | NULLIF '(' expression ',' expression ')'
+    // https://msdn.microsoft.com/en-us/library/ms177587.aspx
+    | SESSION_USER
+    // https://msdn.microsoft.com/en-us/library/ms179930.aspx
+    | SYSTEM_USER
+    ;
+
+datepart
+    : ID
     ;
 
 as_table_alias
@@ -853,6 +882,8 @@ scalar_function_name
     : func_proc_name
     | RIGHT
     | LEFT
+    | BINARY_CHECKSUM
+    | CHECKSUM
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187752.aspx
@@ -950,6 +981,7 @@ simple_id
     | FAST_FORWARD
     | FIRST
     | FOLLOWING
+    | FORCESEEK
     | FORWARD_ONLY
     | FULLSCAN
     | GLOBAL
@@ -1010,6 +1042,7 @@ simple_id
     | SELF
     | SERIALIZABLE
     | SNAPSHOT
+    | SPATIAL_WINDOW_MAX_CELLS
     | STATIC
     | STATS_STREAM
     | STDEV
@@ -1238,15 +1271,21 @@ APPLY:                           A P P L Y;
 AUTO:                            A U T O;
 AVG:                             A V G;
 BASE64:                          B A S E '64';
+BINARY_CHECKSUM:                 B I N A R Y '_' C H E C K S U M;
 CALLER:                          C A L L E R;
 CAST:                            C A S T;
 CATCH:                           C A T C H;
+CHECKSUM:                        C H E C K S U M;
 CHECKSUM_AGG:                    C H E C K S U M '_' A G G;
 COMMITTED:                       C O M M I T T E D;
 CONCAT:                          C O N C A T;
 COOKIE:                          C O O K I E;
 COUNT:                           C O U N T;
 COUNT_BIG:                       C O U N T '_' B I G;
+DATEADD:                         D A T E A D D;
+DATEDIFF:                        D A T E D I F F;
+DATENAME:                        D A T E N A M E;
+DATEPART:                        D A T E P A R T;
 DELAY:                           D E L A Y;
 DELETED:                         D E L E T E D;
 DENSE_RANK:                      D E N S E '_' R A N K;
@@ -1278,6 +1317,7 @@ LOOP:                            L O O P;
 MARK:                            M A R K;
 MAX:                             M A X;
 MIN:                             M I N;
+MIN_ACTIVE_ROWVERSION:           M I N '_' A C T I V E '_' R O W V E R S I O N;
 MODIFY:                          M O D I F Y;
 NEXT:                            N E X T;
 NAME:                            N A M E;
