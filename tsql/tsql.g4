@@ -3,6 +3,7 @@ T-SQL (Transact-SQL, MSSQL) grammar.
 The MIT License (MIT).
 Copyright (c) 2015-2016, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 Copyright (c) 2016, Scott Ure (scott@redstormsoftware.com).
+Copyright (c) 2016, Rui Zhang (ruizhang.ccs@gmail.com).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -466,10 +467,6 @@ expression
     | op=('+' | '-') expression                                #unary_operator_expression
     | expression op=('+' | '-' | '&' | '^' | '|') expression   #binary_operator_expression
     | expression comparison_operator expression                #binary_operator_expression
-
-    | ranking_windowed_function                                #ranking_windowed_function_expression
-    | aggregate_windowed_function                              #aggregate_windowed_function_expression
-    | over_clause                                              #over_clause_expression
     ;
 
 constant_expression
@@ -666,7 +663,9 @@ derived_table
     ;
 
 function_call
-    : scalar_function_name '(' expression_list? ')'
+    : ranking_windowed_function
+    | aggregate_windowed_function
+    | scalar_function_name '(' expression_list? ')'
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
     | BINARY_CHECKSUM '(' '*' ')'
     // https://msdn.microsoft.com/en-us/library/hh231076.aspx
@@ -752,7 +751,7 @@ column_alias
 table_value_constructor
     : VALUES '(' expression_list ')' (',' '(' expression_list ')')*
     ;
-    
+
 expression_list
     : expression (',' expression)*
     ;
