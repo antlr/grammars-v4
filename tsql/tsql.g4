@@ -188,7 +188,7 @@ create_procedure
     ;
 
 procedure_param
-    : LOCAL_ID (id '.')? data_type VARYING? ('=' default_val=default_value)? (OUT | OUTPUT | READONLY)?
+    : LOCAL_ID (id '.')? AS? data_type VARYING? ('=' default_val=default_value)? (OUT | OUTPUT | READONLY)?
     ;
 
 procedure_option
@@ -206,7 +206,7 @@ create_statistics
 
 // https://msdn.microsoft.com/en-us/library/ms174979.aspx
 create_table
-    : CREATE TABLE table_name '(' column_def_table_constraint (',' column_def_table_constraint)* ','? ')' (ON id | DEFAULT)? ';'?
+    : CREATE TABLE table_name '(' column_def_table_constraint (','? column_def_table_constraint)* ','? ')' (ON id | DEFAULT)? ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
@@ -372,7 +372,7 @@ declare_local
     ;
 
 table_type_definition
-    : TABLE '(' column_def_table_constraint (',' column_def_table_constraint)* ')'
+    : TABLE '(' column_def_table_constraint (','? column_def_table_constraint)* ')'
     ;
 
 column_def_table_constraint
@@ -382,7 +382,7 @@ column_def_table_constraint
 
 // https://msdn.microsoft.com/en-us/library/ms187742.aspx
 column_definition
-    : column_name (data_type | AS expression) null_notnull?
+    : column_name (data_type | AS expression) (COLLATE id)? null_notnull?
       ((CONSTRAINT constraint=id)? DEFAULT constant_expression (WITH VALUES)?
        | IDENTITY ('(' seed=DECIMAL ',' increment=DECIMAL ')')? (NOT FOR REPLICATION)?)?
       ROWGUIDCOL?
@@ -626,10 +626,15 @@ table_source_item
     : table_name_with_hint        as_table_alias?
     | rowset_function             as_table_alias?
     | derived_table              (as_table_alias column_alias_list?)?
+    | change_table                as_table_alias
     | function_call               as_table_alias?
     | LOCAL_ID                    as_table_alias?
     | LOCAL_ID '.' function_call (as_table_alias column_alias_list?)?
     ;
+
+change_table
+	: CHANGETABLE '(' CHANGES table_name ',' (NULL | DECIMAL | LOCAL_ID) ')'
+	;
 
 // https://msdn.microsoft.com/en-us/library/ms191472.aspx
 join_part
@@ -1095,6 +1100,8 @@ BULK:                            B U L K;
 BY:                              B Y;
 CASCADE:                         C A S C A D E;
 CASE:                            C A S E;
+CHANGETABLE:                     C H A N G E T A B L E;
+CHANGES:                         C H A N G E S; 
 CHECK:                           C H E C K;
 CHECKPOINT:                      C H E C K P O I N T;
 CLOSE:                           C L O S E;
