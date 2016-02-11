@@ -63,12 +63,17 @@
 *   - added ON_LOCAL_ERROR token, to support legacy ON LOCAL ERROR statements.
 *   - added additional typeHint? token to declareStmt, to support "Declare Function Foo$".
 *   - modified WS lexer rule to correctly account for line continuations;
-*     modified multi-word lexer rules to use WS lexer token instead of ' '; this makes
+*   - modified multi-word lexer rules to use WS lexer token instead of ' '; this makes
 *     the grammar support "Option _\n Explicit" and other keywords being specified on multiple lines.
 *	- modified moduleOption rules to account for WS token in corresponding lexer rules.
 *   - modified NEWLINE lexer rule to properly support instructions separator (':').
 *   - tightened DATELITERAL lexer rule to the format enforced by the VBE, because "#fn: Close #" 
 *     in "Dim fn: fn = FreeFile: Open "filename" For Output As #fn: Close #fn" was picked up as a date literal.
+*   - redefined IDENTIFIER lexer rule to support non-Latin characters (e.g. Japanese)
+*   - made seekStmt, lockStmt, unlockStmt, getStmt and widthStmt accept a fileNumber (needed to support '#')
+*   - fixed precompiler directives, which can now be nested. they still can't interfere with other blocks though.
+*   - optional parameters can be a valueStmt.
+*   - added support for Octal and Currency literals.
 *
 *======================================================================================
 *
@@ -118,8 +123,8 @@ moduleAttributes : (attributeStmt NEWLINE+)+;
 moduleDeclarations : moduleDeclarationsElement (NEWLINE+ moduleDeclarationsElement)*;
 
 moduleOption : 
-	OPTION_BASE INTEGERLITERAL 			# optionBaseStmt
-	| OPTION_COMPARE (BINARY | TEXT | DATABASE) 	# optionCompareStmt
+	OPTION_BASE WS? SHORTLITERAL 			# optionBaseStmt
+	| OPTION_COMPARE WS? (BINARY | TEXT | DATABASE) 	# optionCompareStmt
 	| OPTION_EXPLICIT 						# optionExplicitStmt
 	| OPTION_PRIVATE_MODULE 				# optionPrivateModuleStmt
 ;
@@ -310,7 +315,7 @@ functionStmt :
 	END_FUNCTION
 ;
 
-getStmt : GET WS valueStmt WS? ',' WS? valueStmt? WS? ',' WS? valueStmt;
+getStmt : GET WS fileNumber WS? ',' WS? valueStmt? WS? ',' WS? valueStmt;
 
 goSubStmt : GOSUB WS valueStmt;
 
@@ -359,18 +364,18 @@ macroConstStmt : MACRO_CONST WS? ambiguousIdentifier WS? EQ WS? valueStmt;
 macroIfThenElseStmt : macroIfBlockStmt macroElseIfBlockStmt* macroElseBlockStmt? MACRO_END_IF;
 
 macroIfBlockStmt : 
-	MACRO_IF WS? ifConditionStmt WS THEN NEWLINE+ 
-	(moduleBody NEWLINE+)?
+	MACRO_IF WS? ifConditionStmt WS THEN NEWLINE*
+	((moduleDeclarationsElement | moduleBody | block) NEWLINE*)*
 ;
 
 macroElseIfBlockStmt : 
-	MACRO_ELSEIF WS? ifConditionStmt WS THEN NEWLINE+ 
-	(moduleBody NEWLINE+)?
+	MACRO_ELSEIF WS? ifConditionStmt WS THEN NEWLINE* 
+	((moduleDeclarationsElement | moduleBody | block) NEWLINE*)*
 ;
 
 macroElseBlockStmt : 
-	MACRO_ELSE NEWLINE+ 
-	(moduleBody NEWLINE+)?
+	MACRO_ELSE NEWLINE* 
+	((moduleDeclarationsElement | moduleBody | block) NEWLINE*)*
 ;
 
 midStmt : MID WS? LPAREN WS? argsCall WS? RPAREN;
@@ -447,7 +452,7 @@ savepictureStmt : SAVEPICTURE WS valueStmt WS? ',' WS? valueStmt;
 
 saveSettingStmt : SAVESETTING WS valueStmt WS? ',' WS? valueStmt WS? ',' WS? valueStmt WS? ',' WS? valueStmt;
 
-seekStmt : SEEK WS valueStmt WS? ',' WS? valueStmt;
+seekStmt : SEEK WS fileNumber WS? ',' WS? valueStmt;
 
 selectCaseStmt : 
 	SELECT WS CASE WS valueStmt NEWLINE+ 
@@ -500,7 +505,7 @@ typeOfStmt : TYPEOF WS valueStmt (WS IS WS type)?;
 
 unloadStmt : UNLOAD WS valueStmt;
 
-unlockStmt : UNLOCK WS valueStmt (WS? ',' WS? valueStmt (WS TO WS valueStmt)?)?;
+unlockStmt : UNLOCK WS fileNumber (WS? ',' WS? valueStmt (WS TO WS valueStmt)?)?;
 
 // operator precedence is represented by rule order
 valueStmt : 
@@ -552,7 +557,7 @@ whileWendStmt :
 	WEND
 ;
 
-widthStmt : WIDTH WS valueStmt WS? ',' WS? valueStmt;
+widthStmt : WIDTH WS fileNumber WS? ',' WS? valueStmt;
 
 withStmt : 
 	WITH WS (implicitCallStmt_InStmt | (NEW WS type)) NEWLINE+ 
@@ -629,7 +634,7 @@ argList : LPAREN (WS? arg (WS? ',' WS? arg)*)? WS? RPAREN;
 
 arg : (OPTIONAL WS)? ((BYVAL | BYREF) WS)? (PARAMARRAY WS)? ambiguousIdentifier (WS? LPAREN WS? RPAREN)? (WS? asTypeClause)? (WS? argDefaultValue)?;
 
-argDefaultValue : EQ WS? (literal | ambiguousIdentifier);
+argDefaultValue : EQ WS? valueStmt;
 
 subscripts : subscript (WS? ',' WS? subscript)*;
 
@@ -661,7 +666,7 @@ letterrange : certainIdentifier (WS? MINUS WS? certainIdentifier)?;
 
 lineLabel : ambiguousIdentifier ':';
 
-literal : COLORLITERAL | DATELITERAL | DOUBLELITERAL | INTEGERLITERAL | STRINGLITERAL | TRUE | FALSE | NOTHING | NULL;
+literal : HEXLITERAL | OCTLITERAL | DATELITERAL | DOUBLELITERAL | INTEGERLITERAL | SHORTLITERAL | STRINGLITERAL | TRUE | FALSE | NOTHING | NULL;
 
 type : (baseType | complexType) (WS? LPAREN WS? RPAREN)?;
 
@@ -797,8 +802,8 @@ LSET : L S E T;
 MACRO_CONST : '#' C O N S T WS;
 MACRO_IF : '#' I F WS;
 MACRO_ELSEIF : '#' E L S E I F WS;
-MACRO_ELSE : '#' E L S E WS;
-MACRO_END_IF : '#' E N D WS I F;
+MACRO_ELSE : '#' E L S E NEWLINE;
+MACRO_END_IF : '#' E N D WS I F NEWLINE;
 ME : M E;
 MID : M I D;
 MKDIR : M K D I R;
@@ -901,24 +906,28 @@ L_SQUARE_BRACKET : '[';
 R_SQUARE_BRACKET : ']';
 
 
-// literals
-STRINGLITERAL : '"' (~["\r\n] | '""')* '"';
-DATELITERAL : '#' [0-9]+ '/' [0-9]+ '/' [0-9]+ '#';
-COLORLITERAL : '&H' [0-9A-F]+ '&'?;
-INTEGERLITERAL : (PLUS|MINUS)? ('0'..'9')+ ( ('e' | 'E') INTEGERLITERAL)* ('#' | '&')?;
-DOUBLELITERAL : (PLUS|MINUS)? ('0'..'9')* '.' ('0'..'9')+ ( ('e' | 'E') (PLUS|MINUS)? ('0'..'9')+)* ('#' | '&')?;
-BYTELITERAL : ('0'..'9')+;
-// identifier
-IDENTIFIER :  LETTER (LETTERORDIGIT)* | L_SQUARE_BRACKET (~[\]\r\n])+ R_SQUARE_BRACKET;
+	// literals
+	STRINGLITERAL : '"' (~["\r\n] | '""')* '"';
+	DATELITERAL : '#' DIGIT+ '/' DIGIT+ '/' DIGIT+ '#';
+	OCTLITERAL : '&O' [0-8]+ '&'?;
+	HEXLITERAL : '&H' [0-9A-F]+ '&'?;
+	SHORTLITERAL : (PLUS|MINUS)? DIGIT+ ('#' | '&' | '@')?;
+	INTEGERLITERAL : SHORTLITERAL (E SHORTLITERAL)?;
+	DOUBLELITERAL : (PLUS|MINUS)? DIGIT* '.' DIGIT+ (E SHORTLITERAL)?;
+
 // whitespace, line breaks, comments, ...
 LINE_CONTINUATION : [ \t]+ '_' '\r'? '\n' -> skip;
-NEWLINE : (':' WS?) | (WS? ('\r'? '\n') WS?); 
+NEWLINE : (':' WS?) | (WS? ('\r'? '\n') WS?);
 COMMENT : WS? ('\'' | ':'? REM WS) (LINE_CONTINUATION | ~('\n' | '\r'))* -> skip;
 WS : ([ \t] | LINE_CONTINUATION)+;
+
+// identifier
+IDENTIFIER :  (~[\[\]\(\)\r\n\t.,'"|!@#$%^&*-+:=; ])+ | L_SQUARE_BRACKET (~[!\]\r\n])+ R_SQUARE_BRACKET;
 
 
 // letters
 fragment LETTER : [a-zA-Z_äöüÄÖÜ];
+fragment DIGIT : [0-9];
 fragment LETTERORDIGIT : [a-zA-Z0-9_äöüÄÖÜ];
 
 // case insensitive chars
