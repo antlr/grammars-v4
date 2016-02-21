@@ -47,7 +47,7 @@ public interface Cobol85Preprocessor {
 		 * Fixed format, standard ANSI / IBM reference. Each line exactly 80
 		 * chars.<br />
 		 * <br />
-		 * 1-6 : sequence area<br />
+		 * 1-6: sequence area<br />
 		 * 7: indicator field<br />
 		 * 8-12: area A<br />
 		 * 13-72: area B<br />
@@ -67,7 +67,7 @@ public interface Cobol85Preprocessor {
 		/**
 		 * Variable format.<br />
 		 * <br />
-		 * 1-6 : sequence area<br />
+		 * 1-6: sequence area<br />
 		 * 7: indicator field<br />
 		 * 8-12: area A<br />
 		 * 13-*: area B<br />
