@@ -8,164 +8,186 @@
 grammar MPS;
 
 modell
-    : firstrow rows columns rhs ranges? bounds? endata EOF;
+   : firstrow rows columns rhs ranges? bounds? endata EOF
+   ;
 
 firstrow
-    : NAMEINDICATORCARD IDENTIFIER? KEYWORDFREE?
-    ;
+   : NAMEINDICATORCARD IDENTIFIER? KEYWORDFREE?
+   ;
 
 rows
-    : ROWINDICATORCARD (rowdatacard)+
-    ;
+   : ROWINDICATORCARD (rowdatacard) +
+   ;
 
 columns
-    : COLUMNINDICATORCARD columndatacards
-    ;
+   : COLUMNINDICATORCARD columndatacards
+   ;
 
 rhs
-    : RHSINDICATORCARD rhsdatacards
-    ;
+   : RHSINDICATORCARD rhsdatacards
+   ;
 
 ranges
-    : RANGESINDICATORCARD rangesdatacards
-    ;
+   : RANGESINDICATORCARD rangesdatacards
+   ;
 
 bounds
-    : BOUNDSINDICATORCARD boundsdatacards
-    ;
+   : BOUNDSINDICATORCARD boundsdatacards
+   ;
 
 endata
-    : ENDATAINDICATORCARD
-    ;
+   : ENDATAINDICATORCARD
+   ;
 
 rowdatacard
-    : ROWTYPE IDENTIFIER
-    ;
+   : ROWTYPE IDENTIFIER
+   ;
 
 columndatacards
-    : (columndatacard | intblock)+
-    ;
+   : (columndatacard | intblock) +
+   ;
 
 rhsdatacards
-    : rhsdatacard+
-    ;
+   : rhsdatacard +
+   ;
 
 rangesdatacards
-    : rangesdatacard+
-    ;
+   : rangesdatacard +
+   ;
 
 boundsdatacards
-    : boundsdatacard+
-    ;
+   : boundsdatacard +
+   ;
 
 columndatacard
-    : IDENTIFIER IDENTIFIER NUMERICALVALUE (IDENTIFIER NUMERICALVALUE)?
-    ;
+   : IDENTIFIER IDENTIFIER NUMERICALVALUE (IDENTIFIER NUMERICALVALUE)?
+   ;
 
 rhsdatacard
-    : (IDENTIFIER | RHSINDICATORCARD) IDENTIFIER NUMERICALVALUE (IDENTIFIER NUMERICALVALUE)?
-    ;
+   : (IDENTIFIER | RHSINDICATORCARD) IDENTIFIER NUMERICALVALUE (IDENTIFIER NUMERICALVALUE)?
+   ;
 
 rangesdatacard
-    : (IDENTIFIER | RANGESINDICATORCARD) IDENTIFIER NUMERICALVALUE (IDENTIFIER NUMERICALVALUE)?
-    ;
+   : (IDENTIFIER | RANGESINDICATORCARD) IDENTIFIER NUMERICALVALUE (IDENTIFIER NUMERICALVALUE)?
+   ;
 
 boundsdatacard
-    : BOUNDKEY (IDENTIFIER | BOUNDSINDICATORCARD) IDENTIFIER NUMERICALVALUE?
-    ;
+   : BOUNDKEY (IDENTIFIER | BOUNDSINDICATORCARD) IDENTIFIER NUMERICALVALUE?
+   ;
 
 intblock
-    : startmarker columndatacard+  endmarker
-    ;
+   : startmarker columndatacard + endmarker
+   ;
 
 startmarker
-    : IDENTIFIER KEYWORDMARKER STARTMARKER
-    ;
+   : IDENTIFIER KEYWORDMARKER STARTMARKER
+   ;
 
 endmarker
-    : IDENTIFIER KEYWORDMARKER ENDMARKER
-    ;
+   : IDENTIFIER KEYWORDMARKER ENDMARKER
+   ;
+
 
 NAMEINDICATORCARD
-    : 'NAME'
-    ;
+   : 'NAME'
+   ;
+
 
 ROWINDICATORCARD
-    : 'ROWS'
-    ;
+   : 'ROWS'
+   ;
+
 
 COLUMNINDICATORCARD
-    : 'COLUMNS'
-    ;
+   : 'COLUMNS'
+   ;
+
 
 RHSINDICATORCARD
-    : 'RHS'
-    ;
+   : 'RHS'
+   ;
+
 
 RANGESINDICATORCARD
-    : 'RANGES'
-    ;
+   : 'RANGES'
+   ;
+
 
 BOUNDSINDICATORCARD
-    : 'BOUNDS'
-    ;
+   : 'BOUNDS'
+   ;
+
 
 ENDATAINDICATORCARD
-    : 'ENDATA'
-    ;
+   : 'ENDATA'
+   ;
+
 
 KEYWORDMARKER
-    : '\'MARKER\''
-    ;
+   : '\'MARKER\''
+   ;
+
 
 STARTMARKER
-    : '\'INTORG\''
-    ;
+   : '\'INTORG\''
+   ;
+
 
 ENDMARKER
-    : '\'INTEND\''
-    ;
+   : '\'INTEND\''
+   ;
+
 
 KEYWORDFREE
-    : 'FREE'
-    ;
+   : 'FREE'
+   ;
+
 
 BOUNDKEY
-    : ('UP' | 'LO' | 'FX' | 'LI' | 'UI' | 'SC'| 'FR' | 'BV' | 'MI' | 'PL')
-    ;
+   : ('UP' | 'LO' | 'FX' | 'LI' | 'UI' | 'SC' | 'FR' | 'BV' | 'MI' | 'PL')
+   ;
+
 
 ROWTYPE
-    : ('E' | 'L' | 'G' | 'N')
-    ;
+   : ('E' | 'L' | 'G' | 'N')
+   ;
+
 
 IDENTIFIER
-    : LETTER CHARACTER*
-    ;
+   : LETTER CHARACTER*
+   ;
+
 
 NUMERICALVALUE
-    : DIGIT DIGITS*
-    ;
+   : DIGIT DIGITS*
+   ;
+
 
 WS
-    : (' ' | '\t' | '\n' | '\r' | '\f')+  ->skip
-    ;
+   : (' ' | '\t' | '\n' | '\r' | '\f') + -> skip
+   ;
+
 
 LINE_COMMENT
-    : ('*' | '$') ~('\n'|'\r')* '\r'? '\n' ->skip
-    ;
+   : ('*' | '$') ~ ('\n' | '\r')* '\r'? '\n' -> skip
+   ;
+
 
 fragment CHARACTER
-    : (LETTER | DIGIT)
-    ;
+   : (LETTER | DIGIT)
+   ;
+
 
 fragment LETTER
-    : ('a'..'z' | 'A'..'Z' | '_' | '/' | '#' | '@' | '(' | ')')
-    ;
+   : ('a' .. 'z' | 'A' .. 'Z' | '_' | '/' | '#' | '@' | '(' | ')')
+   ;
+
 
 fragment DIGIT
-    : '0'..'9' | '-' | '+' | '.' | ','
-    ;
+   : '0' .. '9' | '-' | '+' | '.' | ','
+   ;
+
 
 fragment DIGITS
-    : DIGIT | 'D' | 'E' | 'e' | 'd'
-    ;
+   : DIGIT | 'D' | 'E' | 'e' | 'd'
+   ;

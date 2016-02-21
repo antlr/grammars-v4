@@ -10,93 +10,105 @@ grammar FOL;
 /*------------------------------------------------------------------
  * PARSER RULES
  *------------------------------------------------------------------*/
-
 condition
-    : formula EOF
-    ;
+   : formula EOF
+   ;
 
 formula
-    : ((FORALL | EXISTS) VARIABLE)? disjunction
-    ;
+   : ((FORALL | EXISTS) VARIABLE)? disjunction
+   ;
 
 disjunction
-    : conjunction (OR conjunction)*
-    ;
+   : conjunction (OR conjunction)*
+   ;
 
 conjunction
-    : negation (AND negation)*
-    ;
+   : negation (AND negation)*
+   ;
 
 negation
-    : NOT? (predicate | LPAREN formula RPAREN)
-    ;
+   : NOT? (predicate | LPAREN formula RPAREN)
+   ;
 
 predicate
-    : PREPOSITION predicateTuple
-    | PREPOSITION
-    ;
+   : PREPOSITION predicateTuple
+   | PREPOSITION
+   ;
 
 predicateTuple
-    : LPAREN term (',' term)* RPAREN
-    ;
+   : LPAREN term (',' term)* RPAREN
+   ;
 
 term
-    : function | VARIABLE
-    ;
+   : function
+   | VARIABLE
+   ;
 
 function
-    : CONSTANT functionTuple
-    | CONSTANT
-    ;
+   : CONSTANT functionTuple
+   | CONSTANT
+   ;
 
 functionTuple
-    : LPAREN (CONSTANT | VARIABLE) (',' (CONSTANT | VARIABLE) )* RPAREN
-    ;
+   : LPAREN (CONSTANT | VARIABLE) (',' (CONSTANT | VARIABLE))* RPAREN
+   ;
+
 
 LPAREN
-    : '('
-    ;
+   : '('
+   ;
+
 
 RPAREN
-    : ')'
-    ;
+   : ')'
+   ;
+
 
 AND
-    : '&'
-    ;
+   : '&'
+   ;
+
 
 OR
-    : '|'
-    ;
+   : '|'
+   ;
+
 
 NOT
-    : '!'
-    ;
+   : '!'
+   ;
+
 
 FORALL
-    : 'Forall'
-    ;
+   : 'Forall'
+   ;
+
 
 EXISTS
-    : 'Exists'
-    ;
+   : 'Exists'
+   ;
+
 
 VARIABLE
-    : '?' (('a'..'z') | ('0'..'9')) CHARACTER*
-    ;
+   : '?' (('a' .. 'z') | ('0' .. '9')) CHARACTER*
+   ;
+
 
 CONSTANT
-    : (('a'..'z') | ('0'..'9')) CHARACTER*
-    ;
+   : (('a' .. 'z') | ('0' .. '9')) CHARACTER*
+   ;
+
 
 PREPOSITION
-    : ('A'..'Z') CHARACTER*
-    ;
+   : ('A' .. 'Z') CHARACTER*
+   ;
+
 
 fragment CHARACTER
-    : ('0'..'9' | 'a'..'z' | 'A'..'Z' | '_')
-    ;
+   : ('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '_')
+   ;
+
 
 WS
-    : (' ' | '\t' | '\r' | '\n')+ ->skip
-    ;
+   : (' ' | '\t' | '\r' | '\n') + -> skip
+   ;

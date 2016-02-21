@@ -25,144 +25,141 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
- 
 /*
 * examples here: http://svn.ez.no/svn/ezcomponents/trunk/Document/tests/files/wiki/creole/
 */
+
 grammar creole;
-   
+
 document
-    : (line? CR)*
-    ;
- 
+   : (line? CR)*
+   ;
+
 line
-    : markup+ 
-    ;
- 
+   : markup +
+   ;
+
 markup
-    : bold
-    | italics
-    | href
-    | title
-    | hline
-    | text
-    | listitem
-    | image
-    | tablerow
-    | tableheader
-    | nowiki
-    ;
-    
+   : bold
+   | italics
+   | href
+   | title
+   | hline
+   | text
+   | listitem
+   | image
+   | tablerow
+   | tableheader
+   | nowiki
+   ;
+
 text
-    : (TEXT | RSLASH)+ ('\\\\' text)*
-    ;
- 
+   : (TEXT | RSLASH) + ('\\\\' text)*
+   ;
+
 bold
-    : '**' markup+ '**'?
-    ;
- 
+   : '**' markup + '**'?
+   ;
+
 italics
-    : RSLASH RSLASH markup+ RSLASH RSLASH
-    ;
- 
+   : RSLASH RSLASH markup + RSLASH RSLASH
+   ;
+
 href
-    : LBRACKET text ('|' markup+)? RBRACKET
-    | LBRACE text '|' markup+ RBRACE // Creole 0.2
-    ;
- 
+   : LBRACKET text ('|' markup +)? RBRACKET
+   | LBRACE text '|' markup + RBRACE
+   ;
+
 image
-    : LBRACE text RBRACE
-    ;
- 
+   : LBRACE text RBRACE
+   ;
+
 hline
-    : '----'
-    ;
- 
+   : '----'
+   ;
+
 listitem
-    : ('*'+ markup)
-    | ('#'+ markup)
-    ;
- 
+   : ('*' + markup)
+   | ('#' + markup)
+   ;
+
 tableheader
-    : ('|=' markup+)+ '|' WS*
-    ;
- 
+   : ('|=' markup +) + '|' WS*
+   ;
+
 tablerow
-    : ('|' markup+)+ '|' WS*
-    ;
- 
+   : ('|' markup +) + '|' WS*
+   ;
+
 title
-    : '='+ markup '='*
-    ;
- 
+   : '=' + markup '='*
+   ;
+
 nowiki
-    : NOWIKI
-    ;
- 
+   : NOWIKI
+   ;
+
+
 HASH
-    : '#'
-    ;
- 
+   : '#'
+   ;
+
+
 LBRACKET
-    : '[['
-    ;
- 
+   : '[['
+   ;
+
+
 RBRACKET
-    : ']]'
-    ;
- 
+   : ']]'
+   ;
+
+
 LBRACE
-    : '{{'
-    ;
- 
+   : '{{'
+   ;
+
+
 RBRACE
-    : '}}'
-    ;
- 
+   : '}}'
+   ;
+
+
 TEXT
-    : (LETTERS
-    | DIGITS 
-    | SYMBOL 
-    | WS)+
-    ;
- 
+   : (LETTERS | DIGITS | SYMBOL | WS) +
+   ;
+
+
 WS
-    : [ \t]
-    ;
- 
+   : [ \t]
+   ;
+
+
 CR
-    : '\n'
-    | EOF
-    ;
- 
+   : '\n' | EOF
+   ;
+
+
 NOWIKI
-    : '{{{' .*? '}}}'
-    ;
+   : '{{{' .*? '}}}'
+   ;
+
 
 RSLASH
-    : '/'
-    ;
+   : '/'
+   ;
+
 
 fragment LETTERS
-    : [a-zA-Z]
-    ;
- 
+   : [a-zA-Z]
+   ;
+
+
 fragment DIGITS
-    : [0-9]
-    ;
- 
+   : [0-9]
+   ;
+
+
 fragment SYMBOL
-    : '.'
-    | ';'
-    | ':'
-    | ','
-    | '('
-    | ')'
-    | '-'
-    | '\\'
-    | '\''
-    | '~'
-    | '"'
-    | '+'
-    ;
- 
+   : '.' | ';' | ':' | ',' | '(' | ')' | '-' | '\\' | '\'' | '~' | '"' | '+'
+   ;

@@ -1,4 +1,3 @@
-
 /*
 BSD License
 
@@ -30,6 +29,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 grammar propcalc;
 
 proposition
@@ -37,19 +37,23 @@ proposition
    ;
 
 expression
-   : relExpression ( ( AND | OR ) relExpression )*
+   : relExpression ((AND | OR) relExpression)*
    ;
 
 relExpression
-   : atom | equiv | implies
+   : atom
+   | equiv
+   | implies
    ;
 
 atoms
-   : atom ( ',' atom )*
+   : atom (',' atom)*
    ;
 
 atom
-   : variable | NOT atom | LPAREN expression RPAREN
+   : variable
+   | NOT atom
+   | LPAREN expression RPAREN
    ;
 
 equiv
@@ -111,10 +115,10 @@ RPAREN
 
 
 LETTER
-   : ( 'a' .. 'z' ) | ( 'A' .. 'Z' )
+   : ('a' .. 'z') | ('A' .. 'Z')
    ;
 
 
 WS
-   : [ \r\n\t]+ -> channel ( HIDDEN )
+   : [ \r\n\t] + -> channel (HIDDEN)
    ;

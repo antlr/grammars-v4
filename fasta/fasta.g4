@@ -33,69 +33,63 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar fasta;
 
 sequence
-    : section+
-    ;
+   : section +
+   ;
 
 section
-    : descriptionline 
-    | sequencelines
-    | commentline 
-    ;
+   : descriptionline
+   | sequencelines
+   | commentline
+   ;
 
 sequencelines
-    : SEQUENCELINE+
-    ;
+   : SEQUENCELINE +
+   ;
 
 descriptionline
-    : DESCRIPTIONLINE
-    ;
+   : DESCRIPTIONLINE
+   ;
 
 commentline
-    : COMMENTLINE
-    ;   
+   : COMMENTLINE
+   ;
+
 
 COMMENTLINE
-    : ';' .*? EOL
-    ;
+   : ';' .*? EOL
+   ;
+
 
 DESCRIPTIONLINE
-    : '>' TEXT ('|' TEXT )* EOL
-    ;
+   : '>' TEXT ('|' TEXT)* EOL
+   ;
+
 
 TEXT
-    : (DIGIT | LETTER | SYMBOL)+ 
-    ;
+   : (DIGIT | LETTER | SYMBOL) +
+   ;
+
 
 EOL
-    : '\r'? '\n'
-    ;
+   : '\r'? '\n'
+   ;
+
 
 fragment DIGIT
-    : [0-9]
-    ;
+   : [0-9]
+   ;
+
 
 fragment LETTER
-    : [A-Za-z]
-    ;
+   : [A-Za-z]
+   ;
+
 
 fragment SYMBOL
-    : '.'
-    | '-'
-    | '+'
-    | '_'
-    | '.'
-    | ' '
-    | '['
-    | ']'
-    | '('
-    | ')'
-    | ','
-    | '/'
-    | ':'
-    | '&'
-    | '\''
-    ;
+   : '.' | '-' | '+' | '_' | '.' | ' ' | '[' | ']' | '(' | ')' | ',' | '/' | ':' | '&' | '\''
+   ;
+
 
 SEQUENCELINE
-    : LETTER+ EOL
-    ;
+   : LETTER + EOL
+   ;

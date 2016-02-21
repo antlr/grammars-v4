@@ -29,166 +29,193 @@
 grammar redcode;
 
 file
-    : line+
-    ;
+   : line +
+   ;
 
 line
-    : (comment | instruction) EOL
-    ;
+   : (comment | instruction) EOL
+   ;
 
 instruction
-    : opcode ('.' modifier)? mmode? number (',' mmode? number)? comment?
-    ;
+   : opcode ('.' modifier)? mmode? number (',' mmode? number)? comment?
+   ;
 
 opcode
-    : DAT 
-    | MOV 
-    | ADD 
-    | SUB 
-    | MUL 
-    | DIV 
-    | MOD 
-    | JMP 
-    | JMZ 
-    | JMN 
-    | DJN 
-    | CMP 
-    | SLT 
-    | SPL 
-    | ORG
-    | DJZ
-    ;
-    
-modifier
-    : A 
-    | B 
-    | AB 
-    | BA 
-    | F 
-    | X 
-    | I
-    ;
+   : DAT
+   | MOV
+   | ADD
+   | SUB
+   | MUL
+   | DIV
+   | MOD
+   | JMP
+   | JMZ
+   | JMN
+   | DJN
+   | CMP
+   | SLT
+   | SPL
+   | ORG
+   | DJZ
+   ;
 
- mmode
-    : '#'
-    | '$'
-    | '@'
-    | '<'
-    | '>'
-    ;
- 
- number
-    : ('+' | '-')? NUMBER
-    ;
- 
- comment
-     : COMMENT
-     ;
+modifier
+   : A
+   | B
+   | AB
+   | BA
+   | F
+   | X
+   | I
+   ;
+
+mmode
+   : '#'
+   | '$'
+   | '@'
+   | '<'
+   | '>'
+   ;
+
+number
+   : ('+' | '-')? NUMBER
+   ;
+
+comment
+   : COMMENT
+   ;
+
 
 A
-    : 'A'
-    ;
+   : 'A'
+   ;
+
 
 B
-    : 'B'
-    ;
+   : 'B'
+   ;
+
 
 AB
-    : 'AB'
-    ;
+   : 'AB'
+   ;
+
 
 BA
-    : 'BA'
-    ;
+   : 'BA'
+   ;
+
 
 F
-    : 'F'
-    ;
- 
+   : 'F'
+   ;
+
+
 X
-    : 'X'
-    ;
+   : 'X'
+   ;
+
 
 I
-    : 'I'
-    ;
+   : 'I'
+   ;
+
 
 DAT
-    : 'DAT'
-    ;
+   : 'DAT'
+   ;
+
 
 MOV
-    : 'MOV'
-    ;
+   : 'MOV'
+   ;
+
 
 ADD
-    : 'ADD'
-    ;
+   : 'ADD'
+   ;
+
 
 SUB
-    : 'SUB'
-    ;
+   : 'SUB'
+   ;
+
 
 MUL
-    : 'MUL'
-    ;
+   : 'MUL'
+   ;
+
 
 DIV
-    : 'DIV'
-    ;
+   : 'DIV'
+   ;
+
 
 MOD
-    : 'MOD';
+   : 'MOD'
+   ;
+
 
 JMP
-    : 'JMP'
-    ;
+   : 'JMP'
+   ;
+
 
 JMZ
-    : 'JMZ'
-    ;
+   : 'JMZ'
+   ;
+
 
 JMN
-    : 'JMN'
-    ;
+   : 'JMN'
+   ;
+
 
 DJN
-    : 'DJN'
-    ;
+   : 'DJN'
+   ;
+
 
 CMP
-    : 'CMP'
-    ;
+   : 'CMP'
+   ;
+
 
 SLT
-    : 'SLT'
-    ;
+   : 'SLT'
+   ;
+
 
 DJZ
-    : 'DJZ'
-    ;
+   : 'DJZ'
+   ;
+
 
 SPL
-    : 'SPL'
-    ;
+   : 'SPL'
+   ;
+
 
 ORG
-    : 'ORG'
-    ;
+   : 'ORG'
+   ;
+
 
 NUMBER
-    : [0-9]+
-    ;
+   : [0-9] +
+   ;
+
 
 COMMENT
-    : ';' ~[\r\n]*
-    ;
+   : ';' ~ [\r\n]*
+   ;
+
 
 EOL
-    : [\r\n]+
-    ;
+   : [\r\n] +
+   ;
+
 
 WS
-    : [ \t]->skip
-    ;
-
+   : [ \t] -> skip
+   ;

@@ -16,15 +16,15 @@ startRule
    ;
 
 stackTrace
-   : messageLine+ stackTraceLine* causedByLine?
+   : messageLine + stackTraceLine* causedByLine?
    ;
 
 stackTraceLine
-   : ( atLine | ellipsisLine )
+   : (atLine | ellipsisLine)
    ;
 
 atLine
-   : AT qualifiedMethod '(' classFile ( COLON Number )? ')'
+   : AT qualifiedMethod '(' classFile (COLON Number)? ')'
    ;
 
 causedByLine
@@ -36,7 +36,7 @@ ellipsisLine
    ;
 
 messageLine
-   : ( qualifiedClass message? )
+   : (qualifiedClass message?)
    ;
 
 qualifiedClass
@@ -44,15 +44,15 @@ qualifiedClass
    ;
 
 innerClassName
-   : ( '$' className )
+   : ('$' className)
    ;
 
 classFile
-   : ( identifier '.java' | NATIVE_METHOD | UNKNOWN_SOURCE )
+   : (identifier '.java' | NATIVE_METHOD | UNKNOWN_SOURCE)
    ;
 
 qualifiedMethod
-   : qualifiedClass DOT ( methodName | constructor )?
+   : qualifiedClass DOT (methodName | constructor)?
    ;
 
 constructor
@@ -64,7 +64,7 @@ methodName
    ;
 
 packagePath
-   : ( identifier DOT )+
+   : (identifier DOT) +
    ;
 
 className
@@ -76,92 +76,90 @@ identifier
    ;
 
 message
-   : COLON (
-      : . )*
-      ;
-   
-   
-   Number
-      : Digit+
-      ;
-   
-   
-   JavaWord
-      : ( JavaCharacter )+
-      ;
-   
-   
-   fragment JavaCharacter
-      : ( CapitalLetter | NonCapitalLetter | Symbol | Digit )
-      ;
-   
-   
-   DOT
-      : '.'
-      ;
-   
-   
-   AT
-      : 'at'
-      ;
-   
-   
-   CAUSED_BY
-      : 'Caused by:'
-      ;
-   
-   
-   MORE
-      : 'more'
-      ;
-   
-   
-   ELLIPSIS
-      : '...'
-      ;
-   
-   
-   COLON
-      : ':'
-      ;
-   
-   
-   NATIVE_METHOD
-      : 'Native Method'
-      ;
-   
-   
-   UNKNOWN_SOURCE
-      : 'Unknown Source'
-      ;
-   
-   
-   INIT
-      : '<init>'
-      ;
-   
-   
-   NonCapitalLetter
-      : 'a' .. 'z'
-      ;
-   
-   
-   CapitalLetter
-      : 'A' .. 'Z'
-      ;
-   
-   
-   Symbol
-      : '_'
-      ;
-   
-   
-   Digit
-      : '0' .. '9'
-      ;
-   
-   
-   WS
-      : ( ' ' | '\r' | '\t' | '\u000C' | '\n' ) -> skip
-      ;
-   
+   : COLON (: .)*
+   ;
+
+
+Number
+   : Digit +
+   ;
+
+
+JavaWord
+   : (JavaCharacter) +
+   ;
+
+
+fragment JavaCharacter
+   : (CapitalLetter | NonCapitalLetter | Symbol | Digit)
+   ;
+
+
+DOT
+   : '.'
+   ;
+
+
+AT
+   : 'at'
+   ;
+
+
+CAUSED_BY
+   : 'Caused by:'
+   ;
+
+
+MORE
+   : 'more'
+   ;
+
+
+ELLIPSIS
+   : '...'
+   ;
+
+
+COLON
+   : ':'
+   ;
+
+
+NATIVE_METHOD
+   : 'Native Method'
+   ;
+
+
+UNKNOWN_SOURCE
+   : 'Unknown Source'
+   ;
+
+
+INIT
+   : '<init>'
+   ;
+
+
+NonCapitalLetter
+   : 'a' .. 'z'
+   ;
+
+
+CapitalLetter
+   : 'A' .. 'Z'
+   ;
+
+
+Symbol
+   : '_'
+   ;
+
+
+Digit
+   : '0' .. '9'
+   ;
+
+
+WS
+   : (' ' | '\r' | '\t' | '\u000C' | '\n') -> skip
+   ;

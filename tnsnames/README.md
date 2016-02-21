@@ -2,7 +2,7 @@
 
 ## Summary
 
-An ANTLR4 grammar for Oracle 11g Release 2 [tnsnames.ora](http://docs.oracle.com/cd/E11882_01/network.112/e10835/tnsnames.htm "Oracle's tnsnames.ora specification documnt") files.
+An ANTLR4 grammar for Oracle 11g Release 2 [tnsnames.ora](http://docs.oracle.com/cd/E11882_01/network.112/e10835/tnsnames.htm "Oracle's tnsnames.ora specification document") files.
 
 This grammar is based on the details in the above document plus a few seemingly undocumented bits and pieces that I know are still valid but are not in the above document.
 
@@ -22,6 +22,8 @@ There is an example parser, in the examples directory, which allows you to parse
 It works on normal entries for databases and also those entries for listeners and scan listeners - at least, all the ones I've tried it out on.
 
 There is a valid test file, tnsnames.test.ora, supplied if you want to have a play. You'll need to edit a few problems into this file because at the moment, it is valid.
+
+If you want a full blown tnsnames checker that _does_ do all that parsing and checking and reporting errors etc, you can find one [here](http://qdosmsq.dunbar-it.co.uk/blog/2014/12/tnsnames-checker-utility/ "Tnsnames checker utility on my blog") Source code is also available on [GitHub](https://github.com/NormanDunbar/Tnsnames_checker"Source code for full blown tnsnames parser utility")
 
 
 Norman@dunbar-it.co.uk.

@@ -68,7 +68,7 @@ category_implementation:
 protocol_declaration:
 	'@protocol'(
 	protocol_name ( protocol_reference_list )?
-	interface_declaration_list? '@optional'? interface_declaration_list?
+	'@required'? interface_declaration_list? '@optional'? interface_declaration_list?
 	)'@end';
 
 protocol_declaration_list:
@@ -722,6 +722,7 @@ LINE_COMMENT
 
 HDEFINE : '#define' ~[\r\n]* -> channel(HIDDEN);
 HIF : '#if' ~[\r\n]* -> channel(HIDDEN);
+HELIF : '#elif' ~[\r\n]* -> channel(HIDDEN);
 HELSE : '#else' ~[\r\n]* -> channel(HIDDEN);
 HUNDEF : '#undef' ~[\r\n]* -> channel(HIDDEN);
 HIFNDEF : '#ifndef' ~[\r\n]* -> channel(HIDDEN);

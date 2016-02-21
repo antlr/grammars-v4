@@ -1,47 +1,69 @@
+
 /** 
 This grammar is generated with antlrworks in order to parse an asm source
 code.First of all the lexical rules established here do not replace the ones 
 generated in JFlex we used in EditorASM to color the tokens, instead they are used
 to provide the necessary tokens for the parser.
 **/
+
 /*
     Ported to Antlr4 by Tom Everett <tom@khubla.com>
 */
-
 grammar MASM;
-@ header { 
+@ header{ 
  	 package com.Ostermiller.Syntax;
  	 }
 compilationUnit
-   : ( segments | directive_exp1 )* 'end' Identifier
+   : (segments | directive_exp1)* 'end' Identifier
    ;
 
 segments
-   : Identifier 'segments' 'para' 'public' ( code | proc )* Identifier 'ends'
+   : Identifier 'segments' 'para' 'public' (code | proc)* Identifier 'ends'
    ;
 
 proc
-   : Identifier 'proc' ( code )* 'ret' Identifier 'endp'
+   : Identifier 'proc' (code)* 'ret' Identifier 'endp'
    ;
 
 code
-   : binary_exp1 | binary_exp10 | binary_exp11 | binary_exp12 | binary_exp2 | binary_exp3 | binary_exp4 | binary_exp5 | binary_exp6 | binary_exp7 | binary_exp8 | binary_exp9 | unuary_exp1 | unuary_exp2 | unuary_exp3 | unuary_exp4 | unuary_exp5 | notarguments | variabledeclaration | directive_exp1
+   : binary_exp1
+   | binary_exp10
+   | binary_exp11
+   | binary_exp12
+   | binary_exp2
+   | binary_exp3
+   | binary_exp4
+   | binary_exp5
+   | binary_exp6
+   | binary_exp7
+   | binary_exp8
+   | binary_exp9
+   | unuary_exp1
+   | unuary_exp2
+   | unuary_exp3
+   | unuary_exp4
+   | unuary_exp5
+   | notarguments
+   | variabledeclaration
+   | directive_exp1
    ;
 
 binary_exp1
-   : o register Separator ( register | Integer | memory ) | o memory Separator ( register | Integer )
+   : o register Separator (register | Integer | memory)
+   | o memory Separator (register | Integer)
    ;
 
 unuary_exp1
-   : op ( Integer | register | memory )
+   : op (Integer | register | memory)
    ;
 
 unuary_exp2
-   : ope ( register | memory )
+   : ope (register | memory)
    ;
 
 binary_exp2
-   : oper register Separator ( register | memory ) | oper memory Separator register
+   : oper register Separator (register | memory)
+   | oper memory Separator register
    ;
 
 notarguments
@@ -49,7 +71,7 @@ notarguments
    ;
 
 binary_exp3
-   : operat ( register | memory ) Separator ( register | Integer | memory )
+   : operat (register | memory) Separator (register | Integer | memory)
    ;
 
 unuary_exp3
@@ -57,7 +79,7 @@ unuary_exp3
    ;
 
 binary_exp4
-   : operator register Separator ( register | memory )
+   : operator register Separator (register | memory)
    ;
 
 binary_exp5
@@ -65,23 +87,23 @@ binary_exp5
    ;
 
 binary_exp6
-   : x ( register | memory ) Separator register
+   : x (register | memory) Separator register
    ;
 
 binary_exp7
-   : s ( register | memory ) Separator ( Integer | register )
+   : s (register | memory) Separator (Integer | register)
    ;
 
 binary_exp8
-   : sh ( register | memory ) Separator register Separator ( register | Integer )
+   : sh (register | memory) Separator register Separator (register | Integer)
    ;
 
 binary_exp9
-   : b ( register | memory ) Separator ( register | memory )
+   : b (register | memory) Separator (register | memory)
    ;
 
 unuary_exp4
-   : call ( register | memory | Integer )
+   : call (register | memory | Integer)
    ;
 
 unuary_exp5
@@ -89,11 +111,11 @@ unuary_exp5
    ;
 
 binary_exp10
-   : in register Separator ( register | Integer )
+   : in register Separator (register | Integer)
    ;
 
 binary_exp11
-   : out ( register | Integer ) Separator register
+   : out (register | Integer) Separator register
    ;
 
 binary_exp12
@@ -101,27 +123,57 @@ binary_exp12
    ;
 
 directive_exp1
-   : ( directives Identifier | directives )
+   : (directives Identifier | directives)
    ;
 
 variabledeclaration
-   : Identifier ty ( question | String | Integer )
+   : Identifier ty (question | String | Integer)
    ;
 
 memory
-   : '[' ( register | Identifier ) ( '+' ( ( register ( '+' ( Integer | Hexnum | Octalnum ) )? ) | Integer | Hexnum | Octalnum ) )? ']'
+   : '[' (register | Identifier) ('+' ((register ('+' (Integer | Hexnum | Octalnum))?) | Integer | Hexnum | Octalnum))? ']'
    ;
 
 segmentos
-   : DS | ES | CS | SS | GS | FS
+   : DS
+   | ES
+   | CS
+   | SS
+   | GS
+   | FS
    ;
 
 register
-   : AH | AL | AX | BH | BL | BX | CH | CL | CX | DH | DL | DX | SI | DI | SP | BP | EAX | EBX | ECX | EDX | ESI | EDI | ESP | EBP
+   : AH
+   | AL
+   | AX
+   | BH
+   | BL
+   | BX
+   | CH
+   | CL
+   | CX
+   | DH
+   | DL
+   | DX
+   | SI
+   | DI
+   | SP
+   | BP
+   | EAX
+   | EBX
+   | ECX
+   | EDX
+   | ESI
+   | EDI
+   | ESP
+   | EBP
    ;
 
 o
-   : MOV | CMP | TEST
+   : MOV
+   | CMP
+   | TEST
    ;
 
 op
@@ -129,7 +181,45 @@ op
    ;
 
 ope
-   : POP | IDIV | INC | DEC | NEG | MUL | DIV | IMUL | NOT | SETPO | SETAE | SETNLE | SETC | SETNO | SETNB | SETP | SETNGE | SETL | SETGE | SETPE | SETNL | SETNZ | SETNE | SETNC | SETBE | SETNP | SETNS | SETO | SETNA | SETNAE | SETZ | SETLE | SETNBE | SETS | SETE | SETB | SETA | SETG | SETNG
+   : POP
+   | IDIV
+   | INC
+   | DEC
+   | NEG
+   | MUL
+   | DIV
+   | IMUL
+   | NOT
+   | SETPO
+   | SETAE
+   | SETNLE
+   | SETC
+   | SETNO
+   | SETNB
+   | SETP
+   | SETNGE
+   | SETL
+   | SETGE
+   | SETPE
+   | SETNL
+   | SETNZ
+   | SETNE
+   | SETNC
+   | SETBE
+   | SETNP
+   | SETNS
+   | SETO
+   | SETNA
+   | SETNAE
+   | SETZ
+   | SETLE
+   | SETNBE
+   | SETS
+   | SETE
+   | SETB
+   | SETA
+   | SETG
+   | SETNG
    ;
 
 oper
@@ -137,39 +227,150 @@ oper
    ;
 
 opera
-   : POPAD | AAA | POPA | POPFD | CWD | LAHF | PUSHAD | PUSHF | AAS | BSWAP | PUSHFD | CBW | CWDE | XLAT | AAM | AAD | CDQ | DAA | SAHF | DAS | INTO | IRET | CLC | STC | CMC | CLD | STD | CLI | STI | MOVSB | MOVSW | MOVSD | LODS | LODSB | LODSW | LODSD | STOS | STOSB | STOSW | SOTSD | SCAS | SCASB | SCASW | SCASD | CMPS | CMPSB | CMPSW | CMPSD | INSB | INSW | INSD | OUTSB | OUTSW | OUTSD
+   : POPAD
+   | AAA
+   | POPA
+   | POPFD
+   | CWD
+   | LAHF
+   | PUSHAD
+   | PUSHF
+   | AAS
+   | BSWAP
+   | PUSHFD
+   | CBW
+   | CWDE
+   | XLAT
+   | AAM
+   | AAD
+   | CDQ
+   | DAA
+   | SAHF
+   | DAS
+   | INTO
+   | IRET
+   | CLC
+   | STC
+   | CMC
+   | CLD
+   | STD
+   | CLI
+   | STI
+   | MOVSB
+   | MOVSW
+   | MOVSD
+   | LODS
+   | LODSB
+   | LODSW
+   | LODSD
+   | STOS
+   | STOSB
+   | STOSW
+   | SOTSD
+   | SCAS
+   | SCASB
+   | SCASW
+   | SCASD
+   | CMPS
+   | CMPSB
+   | CMPSW
+   | CMPSD
+   | INSB
+   | INSW
+   | INSD
+   | OUTSB
+   | OUTSW
+   | OUTSD
    ;
 
 operat
-   : ADC | ADD | SUB | CBB | XOR | OR
+   : ADC
+   | ADD
+   | SUB
+   | CBB
+   | XOR
+   | OR
    ;
 
 operato
-   : JNBE | JNZ | JPO | JZ | JS | LOOPNZ | JGE | JB | JNB | JO | JP | JNO | JNL | JNAE | LOOPZ | JMP | JNP | LOOP | JL | JCXZ | JAE | JNGE | JA | LOOPNE | LOOPE | JG | JNLE | JE | JNC | JC | JNA | JBE | JLE | JPE | JNS | JECXZ | JNG
+   : JNBE
+   | JNZ
+   | JPO
+   | JZ
+   | JS
+   | LOOPNZ
+   | JGE
+   | JB
+   | JNB
+   | JO
+   | JP
+   | JNO
+   | JNL
+   | JNAE
+   | LOOPZ
+   | JMP
+   | JNP
+   | LOOP
+   | JL
+   | JCXZ
+   | JAE
+   | JNGE
+   | JA
+   | LOOPNE
+   | LOOPE
+   | JG
+   | JNLE
+   | JE
+   | JNC
+   | JC
+   | JNA
+   | JBE
+   | JLE
+   | JPE
+   | JNS
+   | JECXZ
+   | JNG
    ;
 
 operator
-   : MOVZX | BSF | BSR
+   : MOVZX
+   | BSF
+   | BSR
    ;
 
 l
-   : LES | LEA | LDS | INS | OUTS
+   : LES
+   | LEA
+   | LDS
+   | INS
+   | OUTS
    ;
 
 x
-   : XADD | CMPXCHG
+   : XADD
+   | CMPXCHG
    ;
 
 s
-   : SHL | SHR | ROR | ROL | RCL | SAL | RCR | SAR
+   : SHL
+   | SHR
+   | ROR
+   | ROL
+   | RCL
+   | SAL
+   | RCR
+   | SAR
    ;
 
 sh
-   : SHRD | SHLD
+   : SHRD
+   | SHLD
    ;
 
 b
-   : BTR | BT | BTC
+   : BTR
+   | BT
+   | BTC
    ;
 
 call
@@ -177,7 +378,10 @@ call
    ;
 
 interruption
-   : INT | RETN | RET | RETF
+   : INT
+   | RETN
+   | RET
+   | RETF
    ;
 
 in
@@ -189,15 +393,64 @@ out
    ;
 
 re
-   : REP | REPE | REPZ | REPNE | REPNZ
+   : REP
+   | REPE
+   | REPZ
+   | REPNE
+   | REPNZ
    ;
 
 directives
-   : ALPHA | CONST | CREF | XCREF | DATA | DATA2 | DOSSEG | ERR | ERR1 | ERR2 | ERRE | ERRNZ | ERRDEF | ERRNDEF | ERRB | ERRNB | ERRIDN | ERRDIF | EVEN | LIST | WIDTH | MASK | SEQ | XLIST | EXIT | MODEL
+   : ALPHA
+   | CONST
+   | CREF
+   | XCREF
+   | DATA
+   | DATA2
+   | DOSSEG
+   | ERR
+   | ERR1
+   | ERR2
+   | ERRE
+   | ERRNZ
+   | ERRDEF
+   | ERRNDEF
+   | ERRB
+   | ERRNB
+   | ERRIDN
+   | ERRDIF
+   | EVEN
+   | LIST
+   | WIDTH
+   | MASK
+   | SEQ
+   | XLIST
+   | EXIT
+   | MODEL
    ;
 
 ty
-   : BYTE | SBYTE | DB | WORD | SWORD | DW | DWORD | SDWORD | DD | FWORD | DF | QWORD | DQ | TBYTE | DT | REAL4 | REAL8 | REAL | FAR | NEAR | PROC
+   : BYTE
+   | SBYTE
+   | DB
+   | WORD
+   | SWORD
+   | DW
+   | DWORD
+   | SDWORD
+   | DD
+   | FWORD
+   | DF
+   | QWORD
+   | DQ
+   | TBYTE
+   | DT
+   | REAL4
+   | REAL8
+   | REAL
+   | FAR
+   | NEAR
+   | PROC
    ;
 
 question
@@ -210,7 +463,7 @@ time
 
 
 Identifier
-   : Letter ( '_' | Letter | Digit )*
+   : Letter ('_' | Letter | Digit)*
    ;
 
 
@@ -1490,42 +1743,42 @@ TIMES
 
 
 Hexnum
-   : HexDigit+ ( 'h' | 'H' )
+   : HexDigit + ('h' | 'H')
    ;
 
 
 Integer
-   : ( Digit+ )
+   : (Digit +)
    ;
 
 
 Octalnum
-   : ( '0' .. '7' )+ ( 'o' | 'O' )
+   : ('0' .. '7') + ('o' | 'O')
    ;
 
 
 fragment HexDigit
-   : ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
+   : ('0' .. '9' | 'a' .. 'f' | 'A' .. 'F')
    ;
 
 
 FloatingPointLiteral
-   : ( '0' .. '9' )+ '.' ( '0' .. '9' )* Exponent? | '.' ( '0' .. '9' )+ Exponent? | ( '0' .. '9' )+ Exponent
+   : ('0' .. '9') + '.' ('0' .. '9')* Exponent? | '.' ('0' .. '9') + Exponent? | ('0' .. '9') + Exponent
    ;
 
 
 fragment Exponent
-   : ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+   : ('e' | 'E') ('+' | '-')? ('0' .. '9') +
    ;
 
 
 String
-   : ' \'' ( '\\' . | ~ ( '\\' | '\'' ) )* '\''
+   : ' \'' ('\\' . | ~ ('\\' | '\''))* '\''
    ;
 
 
 fragment Letter
-   : ( 'a' .. 'z' | 'A' .. 'Z' )
+   : ('a' .. 'z' | 'A' .. 'Z')
    ;
 
 
@@ -1535,7 +1788,7 @@ fragment Digit
 
 
 Etiqueta
-   : Identifier ( ':' )
+   : Identifier (':')
    ;
 
 
@@ -1545,10 +1798,10 @@ Separator
 
 
 WS
-   : ( ' ' | '\t' | '\n' | '\r' ) -> skip
+   : (' ' | '\t' | '\n' | '\r') -> skip
    ;
 
 
 LINE_COMMENT
-   : ';' ~ ( '\n' | '\r' )* '\r'? '\n' -> skip
+   : ';' ~ ('\n' | '\r')* '\r'? '\n' -> skip
    ;

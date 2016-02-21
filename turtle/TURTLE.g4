@@ -1,4 +1,3 @@
-
 /*
  [The "BSD licence"]
  Copyright (c) 2014, Alejandro Medrano (@ Universidad Politecnica de Madrid, http://www.upm.es/)
@@ -19,6 +18,7 @@
  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 */
 /* Derived from http://www.w3.org/TR/turtle/#sec-grammar-grammar */
+
 grammar TURTLE;
 
 turtleDoc
@@ -26,11 +26,15 @@ turtleDoc
    ;
 
 statement
-   : directive | triples '.'
+   : directive
+   | triples '.'
    ;
 
 directive
-   : prefixID | base | sparqlPrefix | sparqlBase
+   : prefixID
+   | base
+   | sparqlPrefix
+   | sparqlBase
    ;
 
 prefixID
@@ -50,23 +54,27 @@ sparqlPrefix
    ;
 
 triples
-   : subject predicateObjectList | blankNodePropertyList predicateObjectList?
+   : subject predicateObjectList
+   | blankNodePropertyList predicateObjectList?
    ;
 
 predicateObjectList
-   : verb objectList ( ';' ( verb objectList )? )*
+   : verb objectList (';' (verb objectList)?)*
    ;
 
 objectList
-   : object ( ',' object )*
+   : object (',' object)*
    ;
 
 verb
-   : predicate | 'a'
+   : predicate
+   | 'a'
    ;
 
 subject
-   : iri | BlankNode | collection
+   : iri
+   | BlankNode
+   | collection
    ;
 
 predicate
@@ -74,11 +82,17 @@ predicate
    ;
 
 object
-   : iri | BlankNode | collection | blankNodePropertyList | literal
+   : iri
+   | BlankNode
+   | collection
+   | blankNodePropertyList
+   | literal
    ;
 
 literal
-   : rdfLiteral | NumericLiteral | BooleanLiteral
+   : rdfLiteral
+   | NumericLiteral
+   | BooleanLiteral
    ;
 
 blankNodePropertyList
@@ -95,7 +109,7 @@ NumericLiteral
    ;
 
 rdfLiteral
-   : String ( LANGTAG | '^^' iri )?
+   : String (LANGTAG | '^^' iri)?
    ;
 
 
@@ -109,7 +123,8 @@ String
    ;
 
 iri
-   : IRIREF | PrefixedName
+   : IRIREF
+   | PrefixedName
    ;
 
 
@@ -119,19 +134,19 @@ BlankNode
 
 
 WS
-   : ( [\t\r\n\u000C] | ' ' )+ -> skip
+   : ([\t\r\n\u000C] | ' ') + -> skip
    ;
 
 // LEXER
 
 PN_PREFIX
-   : PN_CHARS_BASE ( ( PN_CHARS | '.' )* PN_CHARS )?
+   : PN_CHARS_BASE ((PN_CHARS | '.')* PN_CHARS)?
    ;
 
 //IRIREF	        :	'<' (~(['\u0000'..'\u0020']|'<'|'>'|'"'|'{'|'}'|'|'|'^'|'`'|'\\') | UCHAR)* '>'; /* \u00=NULL #01-\u1F=control codes \u20=space */
 
 IRIREF
-   : '<' ( PN_CHARS | '.' | ':' | '/' | '\\' | '#' | '@' | '%' | '&' | UCHAR )* '>'
+   : '<' (PN_CHARS | '.' | ':' | '/' | '\\' | '#' | '@' | '%' | '&' | UCHAR)* '>'
    ;
 
 
@@ -151,52 +166,52 @@ PNAME_LN
 
 
 BLANK_NODE_LABEL
-   : '_:' ( PN_CHARS_U | [0-9] ) ( ( PN_CHARS | '.' )* PN_CHARS )?
+   : '_:' (PN_CHARS_U | [0-9]) ((PN_CHARS | '.')* PN_CHARS)?
    ;
 
 
 LANGTAG
-   : '@' [a-zA-Z]+ ( '-' [a-zA-Z0-9]+ )*
+   : '@' [a-zA-Z] + ('-' [a-zA-Z0-9] +)*
    ;
 
 
 INTEGER
-   : [+-]? [0-9]+
+   : [+-]? [0-9] +
    ;
 
 
 DECIMAL
-   : [+-]? [0-9]* '.' [0-9]+
+   : [+-]? [0-9]* '.' [0-9] +
    ;
 
 
 DOUBLE
-   : [+-]? ( [0-9]+ '.' [0-9]* EXPONENT | '.' [0-9]+ EXPONENT | [0-9]+ EXPONENT )
+   : [+-]? ([0-9] + '.' [0-9]* EXPONENT | '.' [0-9] + EXPONENT | [0-9] + EXPONENT)
    ;
 
 
 EXPONENT
-   : [eE] [+-]? [0-9]+
+   : [eE] [+-]? [0-9] +
    ;
 
 
 STRING_LITERAL_LONG_SINGLE_QUOTE
-   : '\'\'\'' ( ( '\'' | '\'\'' )? ( [^'\\] | ECHAR | UCHAR | '"' ) )* '\'\'\''
+   : '\'\'\'' (('\'' | '\'\'')? ([^'\\] | ECHAR | UCHAR | '"'))* '\'\'\''
    ;
 
 
 STRING_LITERAL_LONG_QUOTE
-   : '"""' ( ( '"' | '""' )? ( ~ ["\\] | ECHAR | UCHAR | '\'' ) )* '"""'
+   : '"""' (('"' | '""')? (~ ["\\] | ECHAR | UCHAR | '\''))* '"""'
    ;
 
 
 STRING_LITERAL_QUOTE
-   : '"' ( ~ ['"''\\''\r''\n'] | '\'' | '\\"' )* '"'
+   : '"' (~ ['"''\\''\r''\n'] | '\'' | '\\"')* '"'
    ;
 
 
 STRING_LITERAL_SINGLE_QUOTE
-   : '\'' ( ~ ['\u0027''\u005C''\u000A''\u000D'] | ECHAR | UCHAR | '"' )* '\''
+   : '\'' (~ ['\u0027''\u005C''\u000A''\u000D'] | ECHAR | UCHAR | '"')* '\''
    ;
 
 
@@ -221,7 +236,7 @@ ANON
 
 
 SC
-   : [\W]+
+   : [\W] +
    ;
 
 
@@ -241,7 +256,7 @@ PN_CHARS
 
 
 PN_LOCAL
-   : ( PN_CHARS_U | ':' | [0-9] | PLX ) ( ( PN_CHARS | '.' | ':' | PLX )* ( PN_CHARS | ':' | PLX ) )?
+   : (PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
    ;
 
 
@@ -261,5 +276,5 @@ HEX
 
 
 PN_LOCAL_ESC
-   : '\\' ( '_' | '~' | '.' | '-' | '!' | '$' | '&' | '\'' | '(' | ')' | '*' | '+' | ',' | ';' | '=' | '/' | '?' | '#' | '@' | '%' )
+   : '\\' ('_' | '~' | '.' | '-' | '!' | '$' | '&' | '\'' | '(' | ')' | '*' | '+' | ',' | ';' | '=' | '/' | '?' | '#' | '@' | '%')
    ;

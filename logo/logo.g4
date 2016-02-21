@@ -1,4 +1,3 @@
-
 /*
 BSD License
 
@@ -30,18 +29,39 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 grammar logo;
 
 prog
-   : ( line? EOL )+ line?
+   : (line? EOL) + line?
    ;
 
 line
-   : cmd+ comment? | comment | print comment? | procedureDeclaration
+   : cmd + comment?
+   | comment
+   | print comment?
+   | procedureDeclaration
    ;
 
 cmd
-   : repeat | fd | bk | rt | lt | cs | pu | pd | ht | st | home | label | setxy | make | procedureInvocation | ife | stop | fore
+   : repeat
+   | fd
+   | bk
+   | rt
+   | lt
+   | cs
+   | pu
+   | pd
+   | ht
+   | st
+   | home
+   | label
+   | setxy
+   | make
+   | procedureInvocation
+   | ife
+   | stop
+   | fore
    ;
 
 procedureInvocation
@@ -49,11 +69,11 @@ procedureInvocation
    ;
 
 procedureDeclaration
-   : 'to' name parameterDeclarations* EOL? ( line? EOL )+ 'end'
+   : 'to' name parameterDeclarations* EOL? (line? EOL) + 'end'
    ;
 
 parameterDeclarations
-   : ':' name ( ',' parameterDeclarations )*
+   : ':' name (',' parameterDeclarations)*
    ;
 
 func
@@ -65,7 +85,7 @@ repeat
    ;
 
 block
-   : '[' cmd+ ']'
+   : '[' cmd + ']'
    ;
 
 ife
@@ -77,7 +97,9 @@ comparison
    ;
 
 comparisonOperator
-   : '<' | '>' | '='
+   : '<'
+   | '>'
+   | '='
    ;
 
 make
@@ -85,11 +107,11 @@ make
    ;
 
 print
-   : 'print' ( value | quotedstring )
+   : 'print' (value | quotedstring)
    ;
 
 quotedstring
-   : '[' ( quotedstring | ~ ']' )* ']'
+   : '[' (quotedstring | ~ ']')* ']'
    ;
 
 name
@@ -97,19 +119,21 @@ name
    ;
 
 value
-   : STRINGLITERAL | expression | deref
+   : STRINGLITERAL
+   | expression
+   | deref
    ;
 
 signExpression
-   : ( ( '+' | '-' ) )* ( number | deref | func )
+   : (('+' | '-'))* (number | deref | func)
    ;
 
 multiplyingExpression
-   : signExpression ( ( '*' | '/' ) signExpression )*
+   : signExpression (('*' | '/') signExpression)*
    ;
 
 expression
-   : multiplyingExpression ( ( '+' | '-' ) multiplyingExpression )*
+   : multiplyingExpression (('+' | '-') multiplyingExpression)*
    ;
 
 deref
@@ -117,39 +141,44 @@ deref
    ;
 
 fd
-   : ( 'fd' | 'forward' ) expression
+   : ('fd' | 'forward') expression
    ;
 
 bk
-   : ( 'bk' | 'backward' ) expression
+   : ('bk' | 'backward') expression
    ;
 
 rt
-   : ( 'rt' | 'right' ) expression
+   : ('rt' | 'right') expression
    ;
 
 lt
-   : ( 'lt' | 'left' ) expression
+   : ('lt' | 'left') expression
    ;
 
 cs
-   : 'cs' | 'clearscreen'
+   : 'cs'
+   | 'clearscreen'
    ;
 
 pu
-   : 'pu' | 'penup'
+   : 'pu'
+   | 'penup'
    ;
 
 pd
-   : 'pd' | 'pendown'
+   : 'pd'
+   | 'pendown'
    ;
 
 ht
-   : 'ht' | 'hideturtle'
+   : 'ht'
+   | 'hideturtle'
    ;
 
 st
-   : 'st' | 'showturtle'
+   : 'st'
+   | 'showturtle'
    ;
 
 home
@@ -196,7 +225,7 @@ STRING
 
 
 NUMBER
-   : [0-9]+
+   : [0-9] +
    ;
 
 

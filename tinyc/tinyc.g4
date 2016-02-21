@@ -1,4 +1,3 @@
-
 /*
 BSD License
 
@@ -30,12 +29,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 grammar tinyc;
 
 /*
     http://www.iro.umontreal.ca/~felipe/IFT2030-Automne2002/Complements/tinyc.c
-*/
-/*
+*//*
  *  <program> ::= <statement>
  *  <statement> ::= "if" <paren_expr> <statement> |
  *                  "if" <paren_expr> <statement> "else" <statement> |
@@ -52,9 +51,8 @@ grammar tinyc;
  *  <id> ::= "a" | "b" | "c" | "d" | ... | "z"
  *  <int> ::= <an_unsigned_decimal_integer>
 */
-
 program
-   : statement+
+   : statement +
    ;
 
 statement
@@ -67,12 +65,12 @@ statement
    | ';'
    ;
 
-paren_expr 
+paren_expr
    : '(' expr ')'
    ;
 
 expr
-   : test 
+   : test
    | id '=' expr
    ;
 
@@ -101,14 +99,16 @@ integer
    : INT
    ;
 
+
 STRING
    : [a-zA-Z] [a-zA-Z0-9_]*
    ;
 
 
 INT
-   : [0-9]+
+   : [0-9] +
    ;
+
 
 EOL
    : '\r'? '\n'
