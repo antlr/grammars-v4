@@ -82,7 +82,6 @@
 		<module>tnt</module>
 		<module>tsql</module>
 		<module>turtle</module>
-<<<<<<< daabf56da56ce1a5081e3e5d7c7fce809753c581
 		<module>ucb-logo</module>
 		<module>vb6</module>
 		<module>verilog</module>
@@ -91,9 +90,7 @@
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>
-=======
 		<module>brainfuck</module>
->>>>>>> first commit
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
