@@ -1,4 +1,6 @@
-C# grammar with full support of [C# 6 features](https://github.com/dotnet/roslyn/wiki/New-Language-Features-in-C%23-6) and below. CSharpLexer.g4 and CSharpPreprocessor.g4 are .NET runtime dependent (contains specific actions), because of directive preprocessors and string interpolation (these things make grammar context-sensitive). But CSharpParser.g4 is runtime independent.
+##Summary
+
+C# grammar with full support of [C# 6 features](https://github.com/dotnet/roslyn/wiki/New-Language-Features-in-C%23-6) and below. CSharpLexer.g4 and CSharpPreprocessor.g4 are .NET runtime dependent (contains specific actions), because of directive preprocessors and string interpolation (these things make grammar context-sensitive). But CSharpParser.g4 is runtime independent. This ANTLR 4 C# grammar is based on the C# ANTLR 3 grammar from [ChristianWulf/CSharpGrammar](https://github.com/ChristianWulf/CSharpGrammar)
 
 ##Using
 
@@ -22,8 +24,7 @@ I put into repository **AllInOne.cs** file (from Roslyn) with most common syntax
 
 There are some problems with deep recursion ([TestData.g.cs in CoreFx](https://github.com/dotnet/corefx/blob/master/src/Common/tests/System/Xml/XmlCoreTest/TestData.g.cs)), unicode chars ([sjis.cs in  Roslyn](https://github.com/dotnet/roslyn/blob/master/src/Compilers/Test/Resources/Core/Encoding/sjis.cs)) and preprocessor directives.
 
-This ANTLR 4 C# grammar is based on the C# ANTLR 3 grammar from 
-[ChristianWulf/CSharpGrammar](https://github.com/ChristianWulf/CSharpGrammar)
+ANTLR parser from this grammar approximately ~5-7 slowly than Roslyn parser.
 
 ##License
 Eclipse Public License - v 1.0 (http://www.eclipse.org/legal/epl-v10.html)
