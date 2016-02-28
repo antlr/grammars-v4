@@ -25,7 +25,7 @@
 		<module>cobol85</module>
 		<module>cpp</module>
 		<module>creole</module>
-		<module>csharp</module>
+		<!-- C# runtime is not supported. <module>csharp</module> -->
 		<module>csv</module>
 		<module>dcm</module>
 		<module>dot</module>
@@ -58,9 +58,7 @@
 		<module>pddl</module>
 		<module>peoplecode</module>
 		<module>pgn</module>
-		<!--
-		<module>php</module>
-	-->
+		<!-- C# runtime is not supported. <module>php</module> -->
 		<module>plsql</module>
 		<module>propcalc</module>
 		<module>python3</module>
