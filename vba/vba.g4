@@ -91,7 +91,7 @@
 * v1.0 Initial revision
 */
 
-grammar VBA;
+grammar vba;
 
 // module ----------------------------------
 
