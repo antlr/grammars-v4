@@ -1,6 +1,7 @@
-grammar tsql;
+//derived from the tsql grammar
+grammar sybaseiq;
 
-tsql_file
+sybaseiq_file
     : sql_clause* EOF
     ;
 
@@ -24,8 +25,7 @@ dml_clause
 
 // Data Definition Language: https://msdn.microsoft.com/en-us/library/ff848799.aspx)
 ddl_clause
-    : //create_function
-      create_index
+    : create_index
     | create_procedure
     | create_statistics
     | create_table
@@ -159,15 +159,13 @@ output_column_name
 
 // DDL
 
-// https://msdn.microsoft.com/en-us/library/ms188783.aspx
+// http://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc36272.1572/html/commands/X58868.htm
 create_index
-    : CREATE UNIQUE? clustered? INDEX name=id ON tablenamewithhint=table_name_with_hint '(' column_name_list ')' ';'?
-    | CREATE UNIQUE? index_type? INDEX simplename=simple_id ON tablename=table_name '(' column_name_list ')' ';'?
+    : CREATE UNIQUE? index_type? INDEX simplename=simple_id ON tablename=table_name '(' column_name_list ')' ';'?
     ;
 
 index_type 
-    //Problem with index_type 'wd' because we are using wd as name for a table 
-    : CMP | HG | HNG | LF | /*WD*/ | DATE | TIME | DTTM
+    : CMP | HG | HNG | LF | DATE | TIME | DTTM
     ;
 
 // http://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc00801.1520/html/iqrefso/X315708.htm
@@ -372,8 +370,7 @@ execute_clause
     ;
 
 declare_type
-    : UNSIGNED? unsigned_zusatz
-    //.............
+    : UNSIGNED? unsigned_addition
     | BINARY ('(' expression ')')?
     | BIT
     | BLOB
@@ -417,7 +414,7 @@ declare_type
     | VARCHAR ('(' expression ')')?
     ;
 
-unsigned_zusatz
+unsigned_addition
     : BIGINT | BIGINTN | INT | INTN | SMALLINT | SMALLINTN
     ;
 
@@ -482,6 +479,7 @@ replace_statement
     : REPLACE '(' expression ',' expression ',' expression ')' ';'?
     ;
 
+// ToDo: need to be completed
 comment_on_object
     : COLUMN tablename=table_name '.' columnname=column_name
 //    | DBSPACE
@@ -578,7 +576,7 @@ expression
     | '(' expression ')'                                       #bracket_expression
     | '(' subquery ')'                                         #subquery_expression
     | '~' expression                                           #unary_operator_expression
-    | expression '||' expression                               #string_concatenation
+    | expression '|''|' expression                             #string_concatenation
     | expression op=('*' | '/' | '%') expression               #binary_operator_expression
     | op=('+' | '-') expression                                #unary_operator_expression
     | expression op=('+' | '-' | '&' | '^' | '|') expression   #binary_operator_expression
@@ -1236,7 +1234,7 @@ DATABASE:                        D A T A B A S E;
 DATE:                            D A T E;
 DATETIME:                        D A T E T I M E;
 DATETIME2:                       D A T E T I M E '2';
-DATETIMEN:                       D A T E T I M N;
+DATETIMN:                       D A T E T I M N;
 DATETIMEOFFSET:                  D A T E T I M E O F F S E T;
 DBCC:                            D B C C;
 DEALLOCATE:                      D E A L L O C A T E;
