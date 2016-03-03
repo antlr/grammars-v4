@@ -33,12 +33,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar pdp7;
 
 prog
-   : line +
+   : lineeol+ line? EOF
    ;
 
 line
-   : declarations? comment? eol
+   : declarations? comment?
    ;
+
+lineeol
+    : line eol
+    ;
 
 declarations
    : declaration (';' declaration)*
@@ -259,7 +263,7 @@ DECIMAL_MINUS
 
 
 STRING
-   : '<' [a-zA-Z0-9$*,%/]*
+   : '<' [a-zA-Z0-9$*,%/:]*
    ;
 
 
