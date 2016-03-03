@@ -58,7 +58,7 @@ argument
    ;
 
 assignment
-   : (variable | LOC | RELOC) '=' expression
+   : (opcode | variable | LOC | RELOC) '=' expression
    ;
 
 expression
@@ -77,17 +77,14 @@ atom
    | DECIMAL
    | DECIMAL_MINUS
    | OCTAL
-   | signednumber
+   | NUMERIC_LITERAL
+   | '-' atom
    ;
 
 // string chars, then potentially more than 1 octal constant, then potentially '>'
 string
     : STRING NUMERIC_LITERAL* '>'?
     ;
-
-signednumber
-   : '-'? NUMERIC_LITERAL
-   ;
 
 eol
    : EOL
