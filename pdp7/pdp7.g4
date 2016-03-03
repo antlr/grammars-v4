@@ -33,12 +33,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar pdp7;
 
 prog
-   : line +
+   : lineeol+ line? EOF
    ;
 
 line
-   : declarations? comment? eol
+   : declarations? comment?
    ;
+
+lineeol
+    : line eol
+    ;
 
 declarations
    : declaration (';' declaration)*
@@ -58,7 +62,7 @@ argument
    ;
 
 assignment
-   : (variable | LOC | RELOC) '=' expression
+   : (opcode | variable | LOC | RELOC) '=' expression
    ;
 
 expression
@@ -77,17 +81,14 @@ atom
    | DECIMAL
    | DECIMAL_MINUS
    | OCTAL
-   | signednumber
+   | NUMERIC_LITERAL
+   | '-' atom
    ;
 
 // string chars, then potentially more than 1 octal constant, then potentially '>'
 string
     : STRING NUMERIC_LITERAL* '>'?
     ;
-
-signednumber
-   : '-'? NUMERIC_LITERAL
-   ;
 
 eol
    : EOL
@@ -262,7 +263,7 @@ DECIMAL_MINUS
 
 
 STRING
-   : '<' [a-zA-Z0-9$*,%/]*
+   : '<' [a-zA-Z0-9$*,%/:?]*
    ;
 
 
