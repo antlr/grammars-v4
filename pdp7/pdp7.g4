@@ -82,6 +82,7 @@ multiplyingExpression
 atom
    : variable
    | LOC
+   | CHAR
    | RELOC
    | string
    | DECIMAL
@@ -257,22 +258,22 @@ DECIMAL
    : 'd' [0-9] +
    ;
 
-
 OCTAL
    : 'o' [0-7] +
    ;
-
 
 DECIMAL_MINUS
    : 'dm' [0-9] +
    ;
 
-
 STRING
    : '<' [a-zA-Z0-9$*,%/:?]*
    ;
 
-
+CHAR
+    : [a-zA-Z0-9>.] '>' 
+    ;
+      
 COMMENT
    : '"' ~ [\r\n]*
    ;
