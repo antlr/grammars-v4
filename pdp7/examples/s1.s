@@ -3,22 +3,22 @@
 .. = 0
 t = 0
 orig:
-   hlt
-   jmp pibreak
+   hlt				" overwritten with interrupt return addr
+   jmp pibreak			" dispatch to interrupt processing
 
 . = orig+7
-   -1
+   -1				" only ever set (to -1): never read?!
 
-. = orig+020
-   1f
-   iof
-   dac u.ac
-   lac 020
-   dac 1f
+. = orig+020			" syscall (CAL) processing
+   1f				" addr for "CAL I": store return here on "CAL"
+   iof				" interrupts off
+   dac u.ac			" save user AC
+   lac 020			" save user return addr
+   dac 1f			" save as if "CAL I"
    lac 1f-1
-   dac 020
-   lac u.ac
-   jmp 1f+1
+   dac 020			" restore location 20
+   lac u.ac			" restore user AC
+   jmp 1f+1			" join "CAL I" processing
    1f
 1: 0
    iof				" interrupts off
@@ -49,7 +49,7 @@ orig:
    jmp .. i			" dispatch system call
 
 . = orig+0100
-   jmp coldentry
+   jmp coldentry		" here to start kernel
    jms halt
 
 okexit:
@@ -64,9 +64,9 @@ sysexit:			" common system call exit code
    jms dskio; 07000		" save to disk?
 1:
    dzm .insys			" clear "in system call" flag
-   jms chkint
-      skp
-   jmp .save			" dump core??
+   jms chkint			" pending interrupt?
+      skp			"  no
+   jmp .save			"   yes: dump core
    jms copy; u.rq+2; 10; 6	" restore auto-index locations 10-15
    lac u.rq+1			" restore auto-index location 9
    dac 9
@@ -77,6 +77,7 @@ sysexit:			" common system call exit code
    lac u.ac			" restore AC register
    jmp u.rq+8 i			" return to user
 
+	" scheduler / idle loop
 swap: 0
    ion
 1:
@@ -84,49 +85,49 @@ swap: 0
       jmp 1f
    jms lookfor; 1 " in/ready
       skp
-   jmp 1b
-   dzm maxquant
+   jmp 1b			" loop until a process becomes ready
+   dzm maxquant			" here with in/ready (self?)
    jmp 3f
-1:
-   dac 9f+t
-   jms lookfor; 2 " in/notready
+1:				" here with out/ready process
+   dac 9f+t			" save process pointer (swapped out) in t0
+   jms lookfor; 2 " in/notready	" find a swapped in process to swap out?
       jmp 1f
    jms lookfor; 1 " in/ready
       jmp 1f
    jmp 2f
 1:
    lac swap
-   dac u.swapret
+   dac u.swapret		" return to scheduler when swapped back
    iof
-   lac o200000
+   lac o200000			" change status to swapped out
    tad u.ulistp i
    dac u.ulistp i
    ion
-   jms dskswap; 07000
+   jms dskswap; 07000		" swap process out
    lac u.dspbuf
    sna
    jmp 2f
    law dspbuf
    jms movdsp
 2:
-   iof
-   lac o600000
+   iof				" disable interrupts
+   lac o600000			" change status (1->7?)
    tad 9f+t i
    dac 9f+t i
-   ion
-   jms dskswap; 06000
-   lac u.swapret
-   dac swap
-   lac o20
+   ion				" enable interrupts
+   jms dskswap; 06000		" read process in?
+   lac u.swapret		" set our return addr
+   dac swap			" to saved return addr
+   lac o20			" reset maxquant to 16 ticks
    dac maxquant
    lac u.dspbuf
-   sza
+   sza				" using display?
 "** 01-s1.pdf page 4
-   jms movdsp
+   jms movdsp			"  yes.
 3:
-   dzm uquant
+   dzm uquant			" no. reset process tick count
    iof
-   jmp swap i
+   jmp swap i			" return
 t = t+1
 
 swp:			" system call dispatch table
@@ -138,12 +139,18 @@ swp:			" system call dispatch table
 swn:
    .-swp-1 i		" count of system calls, plus indirect!
 
+	" AC/ new value for intflg (non-zero to ignore interrupt char)
+	"   sys intrp
 .intrp:
    lac u.ac
    dac u.intflg
    jmp okexit
 
-.sysloc:		" "sysloc": syscall to return system addresses
+	" syscall to retrieve system addresses (data & routines!!)
+	" AC/ index (1..17)
+	"   sys sysloc
+	" AC/ address (or -1 on bad index)
+.sysloc:
    lac u.ac
    and o17777
    jms betwen; d1; locn
@@ -154,7 +161,7 @@ swn:
    dac u.ac
    jmp sysexit
 
-locsw:			" table of system data structures for "sysloc" call
+locsw:			" table of system addresses for sysloc
    lac .
    iget; inode; userdata; sysdata; copy; copyz; betwen; dskrd
    dskwr; dskbuf; dpdata; namei; pbsflgs; alloc; free; dspdata
@@ -162,34 +169,41 @@ locsw:			" table of system data structures for "sysloc" call
 locn:
    .-locsw-1
 
+	" check if interrupt for user
+	" checks .int1 and .int2 (contain i-number of interrupt source)
+	" call:
+	" .insys/ 0
+	"   jms chkint
+	"    no: no interrupt, or intflg set (discards interupt)
+	"   yes: PI off, .insys set
 chkint: 0
    lac .insys
-   sza
-   jmp chkint i
-   lac .int1
-   sna
-   jmp 1f
-   sad u.ofiles+2
-   jmp 2f
+   sza				" in system?
+   jmp chkint i			"  yes: return
+   lac .int1			" get inumber of interrupt1 source?
+   sna				" zero?
+   jmp 1f			"  yes: skip stdin check
+   sad u.ofiles+2		" non-zero: compare to stdin inumber
+   jmp 2f			"  same
 1:
-   lac .int2
-   sna
-   jmp chkint i
-   sad u.ofiles+2
-   skp
-   jmp chkint i
-   dzm .int2
+   lac .int2			" get inum of interrupt 2 source?
+   sna				" zero?
+   jmp chkint i			"  yes: return
+   sad u.ofiles+2		" non-zero: compare to stdin inumber
+   skp				"  match!
+   jmp chkint i			"   no match: return
+   dzm .int2			" clear int2 source
    jmp 1f
 2:
-   dzm .int1
+   dzm .int1			" clear int1 source
 1:
 "** 01-s1.pdf page 5
-   lac u.intflg
-   sza
-   jmp chkint i
+   lac u.intflg			" get user intflg
+   sza				" zero?
+   jmp chkint i			"  no: ignore
    -1
-   dac .insys
-   ion
-   isz chkint
+   dac .insys			" set "in system" flag
+   ion				" enable interrupts
+   isz chkint			" give skip return
    jmp chkint i
 

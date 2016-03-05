@@ -62,8 +62,14 @@ argument
    ;
 
 assignment
-   : (opcode | variable | LOC | RELOC) '=' expression
+   :  symbol '=' expression
    ;
+
+// note that opcodes can be symbols.  This is because it is legal to have a 
+// variable name that is an opcode
+symbol
+    : opcode | variable | LOC | RELOC
+    ;
 
 expression
    : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
