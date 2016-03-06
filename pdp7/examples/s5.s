@@ -1,75 +1,86 @@
 "** 01-s1.pdf page 28
 " s5
-
+	" read/write a process from/to swap space
+	" call:
+	" AC/ first word of process table
+	"   jms dskswap; DSLD bits
 dskswap: 0
-   cll; als 3
-   dac 9f+t
-   jms dsktrans; -64; userdata; 9f+t; dskswap
-   lac 9f+t
-   tad o20
-   dac 9f+t
-   jms dsktrans; -4096; 4096; 9f+t; dskswap
-   isz dskswap
-   jmp dskswap i
+   cll; als 3			" get process disk address
+   dac 9f+t			" save in t0
+   jms dsktrans; -64; userdata; 9f+t; dskswap	" read/write user area
+   lac 9f+t			" get swap addr back
+   tad o20			" advance by 16??
+   dac 9f+t			" save
+   jms dsktrans; -4096; 4096; 9f+t; dskswap	" read/write user memory
+   isz dskswap			" skip bits
+   jmp dskswap i		" return
 t = t+1
 
 access: 0
    lac i.flags
-   lmq
-   lac u.uid
-   spa
-   jmp access i
-   sad i.uid
-   lrs 2
-   lacq
-   and mode
-   sza
-   jmp access i
-   jms error
+   lmq				" save in MQ
+   lac u.uid			" get user id
+   spa				" negative?
+   jmp access i			"  yes: super user, return
+   sad i.uid			" compare to file owner
+   lrs 2			"  same: shift flags down two
+   lacq				" get flags back
+   and mode			" mode from system call
+   sza				" access allowed?
+   jmp access i			"  yes: return
+   jms error			" no: return error from system call
 
 fassign: 0
-   -10
-   dac 9f+t
+   -10				" loop count
+   dac 9f+t			" in t0
 1:
-   lac 9f+t
-   tad d10
-   jms fget
+   lac 9f+t			" get count
+   tad d10			" turn into fd
+   jms fget			" fetch open file into "fnode"
       jms halt " will not happen
-   lac f.flags
-   sma
-   jmp 1f
-   isz 9f+t
+   lac f.flags			" get fnode flags
+   sma				" sign bit set (active)?
+   jmp 1f			"  no: free
+   isz 9f+t			" increment loop count & loop until zero
    jmp 1b
    jmp fassign i
 1:
-   lac mode
-   xor o400000
-   dac f.flags
-   lac ii
-   dac f.i
+   lac mode			" get mode from system call
+   xor o400000			" set sign bit
+   dac f.flags			" save in fnode
+   lac ii			" get i-number
+   dac f.i			" save in fnode
    lac 9f+t
-   tad d10
-   dac u.ac
-   dzm f.badd
-   jms fput
-   isz fassign
+   tad d10			" get fd
+   dac u.ac			" return in user AC
+   dzm f.badd			" clear file offset in fnode
+   jms fput			" copy fnode back into u.ofiles
+   isz fassign			" give skip return
    jmp fassign i
 t = t+1
 
+	" load fnode (open file entry) from u.ofiles
+	" AC/ user fd
+	"   jms fget
+	"    bad fd
+	"   return with fnode set
 fget: 0
-   jms betwen; d0; d9
-      jmp fget i
-   cll; mul; 3
+   jms betwen; d0; d9		" fd 0..9?
+      jmp fget i		"  no, return
+   cll; mul; 3			" multiply by three
    lacq
 "** 01-s1.pdf page 29
 
-   tad ofilesp
-   dac 9f+t
-   dac .+2
-   jms copy; ..; fnode; 3
-   isz fget
+   tad ofilesp			" get pointer into u.ofiles
+   dac 9f+t			" save in t0
+   dac .+2			" save as copy source
+   jms copy; ..; fnode; 3	" copy to "fnode"
+   isz fget			" give skip return
    jmp fget i
 
+	" copy fnode back to u.ofiles
+	" uses temp value set by "fget"
+	" (fget and fput calls must be paired)
 fput: 0
    lac 9f+t
    dac .+3
@@ -138,6 +149,8 @@ dslot: 0
    jmp 1b
    jmp dslot i
 
+	" called with:
+	" AC/ mode
 icreat: 0
    dac 9f+t
    jms dslot

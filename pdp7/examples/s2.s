@@ -110,7 +110,7 @@
       skp
    jms error
    lac d1
-   dac mode
+   dac mode			" save mode bits for access
    jms access
    jms dslot
    lac u.base
@@ -131,8 +131,8 @@
 .unlink:
    jms argname
    dac u.base
-   lac d1
-   dac mode
+   lac d1			" mode bit 1 (write?)
+   dac mode			" save for access call
    jms access
    dac d.i
    jms dput
@@ -162,8 +162,8 @@
    lac u.cdir
    jms namei; 0:0
       jms error
-   lac d1
-   dac mode
+   lac d1				" mode bit 1 (write?)
+   dac mode				" save for access call
    jms access
    jms copy; 1:0; d.name; 4
    jmp okexit
@@ -190,36 +190,39 @@
 "** 01-s1.pdf page 10
    jmp okexit
 
+	" open system call
+	"   sys open; filename_ptr; flags (0 for read, 1 for write)
+	" returns w/ "fd" in AC (or -1 if not found)
 .open:
-   jms arg
-   dac 0f
-   jms arg
-   sza
-   lac d1
-   sna
-   lac d2
-   dac mode
-   lac u.cdir
-   jms namei; 0:0
-      jms error
-   jms iget
-   jms access
-   lac i.flags
-   and o20
-   sna
-   jmp open1
-   lac mode
-   and d1
-   sna
-   jmp open1
-   lac u.uid
-   sma
-   jms error
-   jmp open1
+   jms arg			" get filename
+   dac 0f			" save for namei
+   jms arg			" get flags
+   sza				" zero (read)
+   lac d1			"  no: get write mode bit
+   sna				" non-zero (write)?
+   lac d2			"  no: get read mode bot
+   dac mode			" save for access call
+   lac u.cdir			" get current working directory
+   jms namei; 0:0		" search for file
+      jms error			" error: return -1
+   jms iget			" load inode
+   jms access			" check access (may return w/ error to user)
+   lac i.flags			" get file flags
+   and o20			" get directory bit
+   sna				" is directory?
+   jmp open1			"  no, join common code
+   lac mode			" get access mode
+   and d1			" get write bit
+   sna				" write access?
+   jmp open1			"  no, continue
+   lac u.uid			" yes: get uid?
+   sma				" negative? (-1 is superuser)
+   jms error			"  no: return error
+   jmp open1			" yes: join common code
 
 .creat:
-   lac d1
-   dac mode
+   lac d1			" mode bit 1 (write)
+   dac mode			" save for access call
    jms arg
    dac .+2
    jms copy; ..; name; 4
@@ -241,12 +244,12 @@
    jmp open1
 1:
    jms access
-   lac u.ac
-   and o17
+   lac u.ac			" get access bits from user AC (zero for lock!)
+   and o17			" mask to permissions
    jms icreat
-open1:
-   jms fassign
-      jms error
+open1:				" common exit for open/creat
+   jms fassign			" assign fd slot
+      jms error			"  none free, return -1
    jmp sysexit
 
 "** 01-s1.pdf page 11
@@ -275,63 +278,67 @@ open1:
    and d1
    sza
    jms error
-   lac i.flags
-   and o40
-   sna
-   jmp 1f
-   iof
-   lac ii
-   tad swr
+   lac i.flags			" get inode flags
+   and o40			" get special file bit
+   sna				" special?
+   jmp 1f			"  no
+   iof				" yes: disable interrupts
+   lac ii			" get i number
+   tad swr			" get read routine table addr
    dac .+1
-   jmp .. i
+   jmp .. i			" dispatch to read routine
 1:
-   lac u.base
-   dac 1f+1
-   lac u.count
-   dac 1f+2
-   lac f.badd
+   lac u.base			" get user base
+   dac 1f+1			" save as iread base
+   lac u.count			" get user count
+   dac 1f+2			" save as iread count
+   lac f.badd			" get file offset
 1:
    jms iread; ..; ..
    jmp exitrw
 
+	" write system call:
+	" AC/ fd
+	"   sys write; buffer; count
+	" AC/ count or -1 on error
 .write:
-   jms arg
-   and o17777
-   dac u.base
-   jms arg
-   dac u.count
-   tad u.base
-   jms betwen; u.base; o17777
-      jms error
-   dac u.limit
-   jms finac
-   lac f.flags
-   and d1
-   sna
-   jms error
-   lac i.flags
-   and o40
+   jms arg			" pick up buffer
+   and o17777			" mask to addr
+   dac u.base			" save as I/O base
+   jms arg			" pick up count
+   dac u.count			" save as count
+   tad u.base			" add base (get limit)
+   jms betwen; u.base; o17777	" check between base and end of memory
+      jms error			"  no: error
+   dac u.limit			" yes: save as limit
+   jms finac			" get fnode with fd from user AC
+   lac f.flags			" get open file table flags
+   and d1			" open for write?
+   sna				"  yes, skip
+   jms error			"   no: error
+   lac i.flags			" get inode flags
+   and o40			" get special bit?
 "** 01-s1.pdf page 12
-   sna
-   jmp 1f
-   iof
-   lac ii
-   tad sww
+   sna				" special?
+   jmp 1f			"  no
+   iof				" special file (device node)
+   lac ii			" get i number
+   tad sww			" get write routine
    dac .+1
-   jmp .. i
+   jmp .. i			" dispatch to write routine
+1:				" here with regular file
+   lac u.base			" get base
+   dac 1f+1			" save as iwrite arg 1
+   lac u.count			" get count
+   dac 1f+2			" save as iwrite 2
+   lac f.badd			" get fd offset
 1:
-   lac u.base
-   dac 1f+1
-   lac u.count
-   dac 1f+2
-   lac f.badd
-1:
-   jms iwrite; ..; ..
+   jms iwrite; ..; ..		" write to file
 
-exitrw:
-   dac u.ac
+exitrw:				" common exit for read/write system calls
+   dac u.ac			" save return in user AC
    tad f.badd
-   dac f.badd
-   jms iput
-   jms fput
-   jmp sysexit
+   dac f.badd			" update file offset
+   jms iput			" release inode
+   jms fput			" release fnode
+   jmp sysexit			" return to user

@@ -62,8 +62,14 @@ argument
    ;
 
 assignment
-   : (opcode | variable | LOC | RELOC) '=' expression
+   :  symbol '=' expression
    ;
+
+// note that opcodes can be symbols.  This is because it is legal to have a 
+// variable name that is an opcode
+symbol
+    : opcode | variable | LOC | RELOC
+    ;
 
 expression
    : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
@@ -76,6 +82,7 @@ multiplyingExpression
 atom
    : variable
    | LOC
+   | CHAR
    | RELOC
    | string
    | DECIMAL
@@ -251,22 +258,22 @@ DECIMAL
    : 'd' [0-9] +
    ;
 
-
 OCTAL
    : 'o' [0-7] +
    ;
-
 
 DECIMAL_MINUS
    : 'dm' [0-9] +
    ;
 
-
 STRING
    : '<' [a-zA-Z0-9$*,%/:?]*
    ;
 
-
+CHAR
+    : [a-zA-Z0-9>.] '>' 
+    ;
+      
 COMMENT
    : '"' ~ [\r\n]*
    ;
