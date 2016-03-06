@@ -56,6 +56,7 @@
 		<module>pascal</module>
 		<module>pcre</module>
 		<module>pddl</module>
+		<module>pdp7</module>
 		<module>peoplecode</module>
 		<module>pgn</module>
 		<!-- C# runtime is not supported. <module>php</module> -->
