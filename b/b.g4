@@ -33,92 +33,95 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar b;
 
 program
-    : definition
-    ;
+   : definition
+   ;
 
 definition
-    :
-	(name constant? (ival (',' ival)* )* ';')
-    |(name (',' name)* statement)
-    ;
+   : (name constant? (ival (',' ival)*)* ';')
+   | (name (',' name)* statement)
+   ;
 
 ival
-    : constant | name
-    ;
+   : constant
+   | name
+   ;
 
 statement
-    :
-	('auto' name constant* (',' name constant*)* ';'  statement)
-|(	'extrn' name (',' name)* ';' statement)
-|(	name ':' statement)
-|(	'case' constant ':' statement)
-
-|(	'if' '(' rvalue ')' statement ('else' statement)*)
-|(	'while' '(' rvalue ')' statement)
-|(	'switch' rvalue statement)
-|(	'goto' rvalue ';')
-|(	'return' ('(' rvalue ')')? ';')
-|(	rvalue ';')
-;
+   : ('auto' name constant* (',' name constant*)* ';' statement)
+   | ('extrn' name (',' name)* ';' statement)
+   | (name ':' statement)
+   | ('case' constant ':' statement)
+   | ('if' '(' rvalue ')' statement ('else' statement)*)
+   | ('while' '(' rvalue ')' statement)
+   | ('switch' rvalue statement)
+   | ('goto' rvalue ';')
+   | ('return' ('(' rvalue ')')? ';')
+   | (rvalue ';')
+   ;
 
 rvalue
-    :
-	('(' rvalue ')')
-    
-    |	lvalue
-    |	constant
-    |	(lvalue assign rvalue)
-    |(incdec lvalue)
-    | (lvalue incdec)
-    | (unary rvalue)
-    |('&' lvalue)
-    |(rvalue binary rvalue)
-    |(	rvalue '?' rvalue ':' rvalue)
-|(	rvalue '(' rvalue (',' rvalue)* ')')
-;
+   : ('(' rvalue ')')
+   | lvalue
+   | constant
+   | (lvalue assign rvalue)
+   | (incdec lvalue)
+   | (lvalue incdec)
+   | (unary rvalue)
+   | ('&' lvalue)
+   | (rvalue binary rvalue)
+   | (rvalue '?' rvalue ':' rvalue)
+   | (rvalue '(' rvalue (',' rvalue)* ')')
+   ;
 
 assign
-:
-	'=' binary
-;
+   : '=' binary
+   ;
 
 incdec
-        : '++' | '--'
-        ;
-	
-unary
-    : '-' | '!'
-    ;
+   : '++'
+   | '--'
+   ;
 
-binary:
-	'|'|
-	'&'|
-	'=='|
-	'!='|
-	'<'|
-	'<='|
-	'>'|
-	'>='|
-	'<<'|
-	'>>'|
-	'-'|
-	'+'|
-	'%'|
-	'*'|
-	'/'|
-;
+unary
+   : '-'
+   | '!'
+   ;
+
+binary
+   : '|'
+   | '&'
+   | '=='
+   | '!='
+   | '<'
+   | '<='
+   | '>'
+   | '>='
+   | '<<'
+   | '>>'
+   | '-'
+   | '+'
+   | '%'
+   | '*'
+   | '/'
+   |
+   ;
 
 lvalue
-    : name | ('*' rvalue) | (rvalue [ rvalue ])
-    ;
+   : name
+   | ('*' rvalue)
+   | (rvalue [   r v a l u e   ])
+   ;
 
 constant
-: INT | STRING1 | STRING2
-;
+   : INT
+   | STRING1
+   | STRING2
+   ;
 
 name
-    : NAME
-    ;    
+   : NAME
+   ;
+
 
 NAME
    : [a-zA-Z] [a-zA-Z0-9_]*
@@ -129,13 +132,16 @@ INT
    : [0-9] +
    ;
 
+
 STRING1
-    : '"' ~ ["\r\n]* '"'
-    ;
+   : '"' ~ ["\r\n]* '"'
+   ;
+
 
 STRING2
-    : '\'' ~ ["\r\n]* '\''
-    ;
+   : '\'' ~ ["\r\n]* '\''
+   ;
+
 
 EOL
    : '\r'? '\n'
