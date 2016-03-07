@@ -17,26 +17,52 @@ public class ebnfBaseListener implements ebnfListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterId(@NotNull ebnfParser.IdContext ctx) { }
+	@Override public void enterRulelist(@NotNull ebnfParser.RulelistContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitId(@NotNull ebnfParser.IdContext ctx) { }
+	@Override public void exitRulelist(@NotNull ebnfParser.RulelistContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterElement(@NotNull ebnfParser.ElementContext ctx) { }
+	@Override public void enterAlternation(@NotNull ebnfParser.AlternationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitElement(@NotNull ebnfParser.ElementContext ctx) { }
+	@Override public void exitAlternation(@NotNull ebnfParser.AlternationContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOneormore(@NotNull ebnfParser.OneormoreContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOneormore(@NotNull ebnfParser.OneormoreContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRulename(@NotNull ebnfParser.RulenameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRulename(@NotNull ebnfParser.RulenameContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -56,13 +82,13 @@ public class ebnfBaseListener implements ebnfListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRulename(@NotNull ebnfParser.RulenameContext ctx) { }
+	@Override public void enterId(@NotNull ebnfParser.IdContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRulename(@NotNull ebnfParser.RulenameContext ctx) { }
+	@Override public void exitId(@NotNull ebnfParser.IdContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
@@ -95,6 +121,19 @@ public class ebnfBaseListener implements ebnfListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterZeroormore(@NotNull ebnfParser.ZeroormoreContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitZeroormore(@NotNull ebnfParser.ZeroormoreContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterRule_(@NotNull ebnfParser.Rule_Context ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -108,52 +147,13 @@ public class ebnfBaseListener implements ebnfListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRulelist(@NotNull ebnfParser.RulelistContext ctx) { }
+	@Override public void enterElement(@NotNull ebnfParser.ElementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRulelist(@NotNull ebnfParser.RulelistContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterOneormore(@NotNull ebnfParser.OneormoreContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitOneormore(@NotNull ebnfParser.OneormoreContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterAlternation(@NotNull ebnfParser.AlternationContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitAlternation(@NotNull ebnfParser.AlternationContext ctx) { }
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterZeroormore(@NotNull ebnfParser.ZeroormoreContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitZeroormore(@NotNull ebnfParser.ZeroormoreContext ctx) { }
+	@Override public void exitElement(@NotNull ebnfParser.ElementContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

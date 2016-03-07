@@ -50,13 +50,13 @@ public class ebnfParser extends Parser {
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 	public static class RulelistContext extends ParserRuleContext {
-		public TerminalNode EOF() { return getToken(ebnfParser.EOF, 0); }
-		public List<Rule_Context> rule_() {
-			return getRuleContexts(Rule_Context.class);
-		}
 		public Rule_Context rule_(int i) {
 			return getRuleContext(Rule_Context.class,i);
 		}
+		public List<Rule_Context> rule_() {
+			return getRuleContexts(Rule_Context.class);
+		}
+		public TerminalNode EOF() { return getToken(ebnfParser.EOF, 0); }
 		public RulelistContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -106,11 +106,11 @@ public class ebnfParser extends Parser {
 	}
 
 	public static class Rule_Context extends ParserRuleContext {
+		public TerminalNode ASSIGN() { return getToken(ebnfParser.ASSIGN, 0); }
+		public TerminalNode DOT() { return getToken(ebnfParser.DOT, 0); }
 		public RulenameContext rulename() {
 			return getRuleContext(RulenameContext.class,0);
 		}
-		public TerminalNode DOT() { return getToken(ebnfParser.DOT, 0); }
-		public TerminalNode ASSIGN() { return getToken(ebnfParser.ASSIGN, 0); }
 		public RhsContext rhs() {
 			return getRuleContext(RhsContext.class,0);
 		}
@@ -198,11 +198,11 @@ public class ebnfParser extends Parser {
 	}
 
 	public static class RhsContext extends ParserRuleContext {
-		public AlternationContext alternation(int i) {
-			return getRuleContext(AlternationContext.class,i);
-		}
 		public List<AlternationContext> alternation() {
 			return getRuleContexts(AlternationContext.class);
+		}
+		public AlternationContext alternation(int i) {
+			return getRuleContext(AlternationContext.class,i);
 		}
 		public RhsContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -258,16 +258,16 @@ public class ebnfParser extends Parser {
 	}
 
 	public static class AlternationContext extends ParserRuleContext {
+		public List<TerminalNode> BAR() { return getTokens(ebnfParser.BAR); }
 		public List<ElementContext> element() {
 			return getRuleContexts(ElementContext.class);
-		}
-		public ElementContext element(int i) {
-			return getRuleContext(ElementContext.class,i);
 		}
 		public TerminalNode BAR(int i) {
 			return getToken(ebnfParser.BAR, i);
 		}
-		public List<TerminalNode> BAR() { return getTokens(ebnfParser.BAR); }
+		public ElementContext element(int i) {
+			return getRuleContext(ElementContext.class,i);
+		}
 		public AlternationContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -325,20 +325,20 @@ public class ebnfParser extends Parser {
 	}
 
 	public static class ElementContext extends ParserRuleContext {
-		public StringliteralContext stringliteral() {
-			return getRuleContext(StringliteralContext.class,0);
+		public ZeroormoreContext zeroormore() {
+			return getRuleContext(ZeroormoreContext.class,0);
 		}
 		public IdContext id() {
 			return getRuleContext(IdContext.class,0);
+		}
+		public StringliteralContext stringliteral() {
+			return getRuleContext(StringliteralContext.class,0);
 		}
 		public OneormoreContext oneormore() {
 			return getRuleContext(OneormoreContext.class,0);
 		}
 		public OptionalContext optional() {
 			return getRuleContext(OptionalContext.class,0);
-		}
-		public ZeroormoreContext zeroormore() {
-			return getRuleContext(ZeroormoreContext.class,0);
 		}
 		public ElementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -406,14 +406,14 @@ public class ebnfParser extends Parser {
 	}
 
 	public static class OptionalContext extends ParserRuleContext {
-		public AlternationContext alternation(int i) {
-			return getRuleContext(AlternationContext.class,i);
-		}
+		public TerminalNode REND() { return getToken(ebnfParser.REND, 0); }
 		public List<AlternationContext> alternation() {
 			return getRuleContexts(AlternationContext.class);
 		}
-		public TerminalNode REND() { return getToken(ebnfParser.REND, 0); }
 		public TerminalNode LEND() { return getToken(ebnfParser.LEND, 0); }
+		public AlternationContext alternation(int i) {
+			return getRuleContext(AlternationContext.class,i);
+		}
 		public OptionalContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -464,14 +464,14 @@ public class ebnfParser extends Parser {
 	}
 
 	public static class ZeroormoreContext extends ParserRuleContext {
+		public TerminalNode RBRACE() { return getToken(ebnfParser.RBRACE, 0); }
+		public List<AlternationContext> alternation() {
+			return getRuleContexts(AlternationContext.class);
+		}
 		public TerminalNode LBRACE() { return getToken(ebnfParser.LBRACE, 0); }
 		public AlternationContext alternation(int i) {
 			return getRuleContext(AlternationContext.class,i);
 		}
-		public List<AlternationContext> alternation() {
-			return getRuleContexts(AlternationContext.class);
-		}
-		public TerminalNode RBRACE() { return getToken(ebnfParser.RBRACE, 0); }
 		public ZeroormoreContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -522,14 +522,14 @@ public class ebnfParser extends Parser {
 	}
 
 	public static class OneormoreContext extends ParserRuleContext {
-		public AlternationContext alternation(int i) {
-			return getRuleContext(AlternationContext.class,i);
-		}
 		public List<AlternationContext> alternation() {
 			return getRuleContexts(AlternationContext.class);
 		}
-		public TerminalNode RPAREN() { return getToken(ebnfParser.RPAREN, 0); }
 		public TerminalNode LPAREN() { return getToken(ebnfParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ebnfParser.RPAREN, 0); }
+		public AlternationContext alternation(int i) {
+			return getRuleContext(AlternationContext.class,i);
+		}
 		public OneormoreContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}

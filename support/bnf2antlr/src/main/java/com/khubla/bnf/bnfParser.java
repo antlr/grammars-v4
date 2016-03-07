@@ -15,19 +15,19 @@ public class bnfParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		ID=1, ASSIGN=2, LPAREN=3, RPAREN=4, LBRACE=5, RBRACE=6, LEND=7, REND=8, 
-		BAR=9, TEXT=10, STRINGLITERAL=11, WS=12;
+		ASSIGN=1, LPAREN=2, RPAREN=3, LBRACE=4, RBRACE=5, LEND=6, REND=7, BAR=8, 
+		GT=9, LT=10, ID=11, WS=12;
 	public static final String[] tokenNames = {
-		"<INVALID>", "ID", "'::='", "')'", "'('", "'}'", "'{'", "']'", "'['", 
-		"'|'", "TEXT", "STRINGLITERAL", "WS"
+		"<INVALID>", "'::='", "')'", "'('", "'}'", "'{'", "']'", "'['", "'|'", 
+		"'>'", "'<'", "ID", "WS"
 	};
 	public static final int
 		RULE_rulelist = 0, RULE_rule_ = 1, RULE_lhs = 2, RULE_rhs = 3, RULE_alternatives = 4, 
 		RULE_alternative = 5, RULE_element = 6, RULE_optional = 7, RULE_zeroormore = 8, 
-		RULE_oneormore = 9, RULE_text = 10, RULE_id = 11;
+		RULE_oneormore = 9, RULE_text = 10, RULE_id = 11, RULE_ruleid = 12;
 	public static final String[] ruleNames = {
 		"rulelist", "rule_", "lhs", "rhs", "alternatives", "alternative", "element", 
-		"optional", "zeroormore", "oneormore", "text", "id"
+		"optional", "zeroormore", "oneormore", "text", "id", "ruleid"
 	};
 
 	@Override
@@ -50,13 +50,13 @@ public class bnfParser extends Parser {
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 	public static class RulelistContext extends ParserRuleContext {
-		public TerminalNode EOF() { return getToken(bnfParser.EOF, 0); }
-		public List<Rule_Context> rule_() {
-			return getRuleContexts(Rule_Context.class);
-		}
 		public Rule_Context rule_(int i) {
 			return getRuleContext(Rule_Context.class,i);
 		}
+		public List<Rule_Context> rule_() {
+			return getRuleContexts(Rule_Context.class);
+		}
+		public TerminalNode EOF() { return getToken(bnfParser.EOF, 0); }
 		public RulelistContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -78,20 +78,20 @@ public class bnfParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(27);
+			setState(29);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==ID) {
+			while (_la==LT) {
 				{
 				{
-				setState(24); rule_();
+				setState(26); rule_();
 				}
 				}
-				setState(29);
+				setState(31);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(30); match(EOF);
+			setState(32); match(EOF);
 			}
 		}
 		catch (RecognitionException re) {
@@ -133,9 +133,9 @@ public class bnfParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(32); lhs();
-			setState(33); match(ASSIGN);
-			setState(34); rhs();
+			setState(34); lhs();
+			setState(35); match(ASSIGN);
+			setState(36); rhs();
 			}
 		}
 		catch (RecognitionException re) {
@@ -173,7 +173,7 @@ public class bnfParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(36); id();
+			setState(38); id();
 			}
 		}
 		catch (RecognitionException re) {
@@ -211,7 +211,7 @@ public class bnfParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(38); alternatives();
+			setState(40); alternatives();
 			}
 		}
 		catch (RecognitionException re) {
@@ -226,15 +226,15 @@ public class bnfParser extends Parser {
 	}
 
 	public static class AlternativesContext extends ParserRuleContext {
+		public AlternativeContext alternative(int i) {
+			return getRuleContext(AlternativeContext.class,i);
+		}
+		public List<TerminalNode> BAR() { return getTokens(bnfParser.BAR); }
 		public List<AlternativeContext> alternative() {
 			return getRuleContexts(AlternativeContext.class);
 		}
 		public TerminalNode BAR(int i) {
 			return getToken(bnfParser.BAR, i);
-		}
-		public List<TerminalNode> BAR() { return getTokens(bnfParser.BAR); }
-		public AlternativeContext alternative(int i) {
-			return getRuleContext(AlternativeContext.class,i);
 		}
 		public AlternativesContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -257,18 +257,18 @@ public class bnfParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(40); alternative();
-			setState(45);
+			setState(42); alternative();
+			setState(47);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==BAR) {
 				{
 				{
-				setState(41); match(BAR);
-				setState(42); alternative();
+				setState(43); match(BAR);
+				setState(44); alternative();
 				}
 				}
-				setState(47);
+				setState(49);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -313,18 +313,18 @@ public class bnfParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(51);
+			setState(53);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
 			while ( _alt!=2 && _alt!=ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
-					setState(48); element();
+					setState(50); element();
 					}
 					} 
 				}
-				setState(53);
+				setState(55);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
 			}
@@ -342,6 +342,9 @@ public class bnfParser extends Parser {
 	}
 
 	public static class ElementContext extends ParserRuleContext {
+		public ZeroormoreContext zeroormore() {
+			return getRuleContext(ZeroormoreContext.class,0);
+		}
 		public TextContext text() {
 			return getRuleContext(TextContext.class,0);
 		}
@@ -353,9 +356,6 @@ public class bnfParser extends Parser {
 		}
 		public OptionalContext optional() {
 			return getRuleContext(OptionalContext.class,0);
-		}
-		public ZeroormoreContext zeroormore() {
-			return getRuleContext(ZeroormoreContext.class,0);
 		}
 		public ElementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -375,37 +375,36 @@ public class bnfParser extends Parser {
 		ElementContext _localctx = new ElementContext(_ctx, getState());
 		enterRule(_localctx, 12, RULE_element);
 		try {
-			setState(59);
+			setState(61);
 			switch (_input.LA(1)) {
 			case REND:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(54); optional();
+				setState(56); optional();
 				}
 				break;
 			case RBRACE:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(55); zeroormore();
+				setState(57); zeroormore();
 				}
 				break;
 			case RPAREN:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(56); oneormore();
-				}
-				break;
-			case TEXT:
-			case STRINGLITERAL:
-				enterOuterAlt(_localctx, 4);
-				{
-				setState(57); text();
+				setState(58); oneormore();
 				}
 				break;
 			case ID:
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(59); text();
+				}
+				break;
+			case LT:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(58); id();
+				setState(60); id();
 				}
 				break;
 			default:
@@ -424,11 +423,11 @@ public class bnfParser extends Parser {
 	}
 
 	public static class OptionalContext extends ParserRuleContext {
+		public TerminalNode REND() { return getToken(bnfParser.REND, 0); }
+		public TerminalNode LEND() { return getToken(bnfParser.LEND, 0); }
 		public AlternativesContext alternatives() {
 			return getRuleContext(AlternativesContext.class,0);
 		}
-		public TerminalNode REND() { return getToken(bnfParser.REND, 0); }
-		public TerminalNode LEND() { return getToken(bnfParser.LEND, 0); }
 		public OptionalContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -449,9 +448,9 @@ public class bnfParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(61); match(REND);
-			setState(62); alternatives();
-			setState(63); match(LEND);
+			setState(63); match(REND);
+			setState(64); alternatives();
+			setState(65); match(LEND);
 			}
 		}
 		catch (RecognitionException re) {
@@ -466,11 +465,11 @@ public class bnfParser extends Parser {
 	}
 
 	public static class ZeroormoreContext extends ParserRuleContext {
+		public TerminalNode RBRACE() { return getToken(bnfParser.RBRACE, 0); }
 		public TerminalNode LBRACE() { return getToken(bnfParser.LBRACE, 0); }
 		public AlternativesContext alternatives() {
 			return getRuleContext(AlternativesContext.class,0);
 		}
-		public TerminalNode RBRACE() { return getToken(bnfParser.RBRACE, 0); }
 		public ZeroormoreContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -491,9 +490,9 @@ public class bnfParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(65); match(RBRACE);
-			setState(66); alternatives();
-			setState(67); match(LBRACE);
+			setState(67); match(RBRACE);
+			setState(68); alternatives();
+			setState(69); match(LBRACE);
 			}
 		}
 		catch (RecognitionException re) {
@@ -508,11 +507,11 @@ public class bnfParser extends Parser {
 	}
 
 	public static class OneormoreContext extends ParserRuleContext {
+		public TerminalNode LPAREN() { return getToken(bnfParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(bnfParser.RPAREN, 0); }
 		public AlternativesContext alternatives() {
 			return getRuleContext(AlternativesContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(bnfParser.RPAREN, 0); }
-		public TerminalNode LPAREN() { return getToken(bnfParser.LPAREN, 0); }
 		public OneormoreContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -533,9 +532,9 @@ public class bnfParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(69); match(RPAREN);
-			setState(70); alternatives();
-			setState(71); match(LPAREN);
+			setState(71); match(RPAREN);
+			setState(72); alternatives();
+			setState(73); match(LPAREN);
 			}
 		}
 		catch (RecognitionException re) {
@@ -550,8 +549,7 @@ public class bnfParser extends Parser {
 	}
 
 	public static class TextContext extends ParserRuleContext {
-		public TerminalNode TEXT() { return getToken(bnfParser.TEXT, 0); }
-		public TerminalNode STRINGLITERAL() { return getToken(bnfParser.STRINGLITERAL, 0); }
+		public TerminalNode ID() { return getToken(bnfParser.ID, 0); }
 		public TextContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -569,16 +567,10 @@ public class bnfParser extends Parser {
 	public final TextContext text() throws RecognitionException {
 		TextContext _localctx = new TextContext(_ctx, getState());
 		enterRule(_localctx, 20, RULE_text);
-		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(73);
-			_la = _input.LA(1);
-			if ( !(_la==TEXT || _la==STRINGLITERAL) ) {
-			_errHandler.recoverInline(this);
-			}
-			consume();
+			setState(75); match(ID);
 			}
 		}
 		catch (RecognitionException re) {
@@ -593,7 +585,11 @@ public class bnfParser extends Parser {
 	}
 
 	public static class IdContext extends ParserRuleContext {
-		public TerminalNode ID() { return getToken(bnfParser.ID, 0); }
+		public TerminalNode LT() { return getToken(bnfParser.LT, 0); }
+		public TerminalNode GT() { return getToken(bnfParser.GT, 0); }
+		public RuleidContext ruleid() {
+			return getRuleContext(RuleidContext.class,0);
+		}
 		public IdContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -614,7 +610,45 @@ public class bnfParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(75); match(ID);
+			setState(77); match(LT);
+			setState(78); ruleid();
+			setState(79); match(GT);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class RuleidContext extends ParserRuleContext {
+		public TerminalNode ID() { return getToken(bnfParser.ID, 0); }
+		public RuleidContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_ruleid; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof bnfListener ) ((bnfListener)listener).enterRuleid(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof bnfListener ) ((bnfListener)listener).exitRuleid(this);
+		}
+	}
+
+	public final RuleidContext ruleid() throws RecognitionException {
+		RuleidContext _localctx = new RuleidContext(_ctx, getState());
+		enterRule(_localctx, 24, RULE_ruleid);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(81); match(ID);
 			}
 		}
 		catch (RecognitionException re) {
@@ -629,25 +663,26 @@ public class bnfParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\16P\4\2\t\2\4\3\t"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\16V\4\2\t\2\4\3\t"+
 		"\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4"+
-		"\f\t\f\4\r\t\r\3\2\7\2\34\n\2\f\2\16\2\37\13\2\3\2\3\2\3\3\3\3\3\3\3\3"+
-		"\3\4\3\4\3\5\3\5\3\6\3\6\3\6\7\6.\n\6\f\6\16\6\61\13\6\3\7\7\7\64\n\7"+
-		"\f\7\16\7\67\13\7\3\b\3\b\3\b\3\b\3\b\5\b>\n\b\3\t\3\t\3\t\3\t\3\n\3\n"+
-		"\3\n\3\n\3\13\3\13\3\13\3\13\3\f\3\f\3\r\3\r\3\r\2\2\16\2\4\6\b\n\f\16"+
-		"\20\22\24\26\30\2\3\3\2\f\rJ\2\35\3\2\2\2\4\"\3\2\2\2\6&\3\2\2\2\b(\3"+
-		"\2\2\2\n*\3\2\2\2\f\65\3\2\2\2\16=\3\2\2\2\20?\3\2\2\2\22C\3\2\2\2\24"+
-		"G\3\2\2\2\26K\3\2\2\2\30M\3\2\2\2\32\34\5\4\3\2\33\32\3\2\2\2\34\37\3"+
-		"\2\2\2\35\33\3\2\2\2\35\36\3\2\2\2\36 \3\2\2\2\37\35\3\2\2\2 !\7\2\2\3"+
-		"!\3\3\2\2\2\"#\5\6\4\2#$\7\4\2\2$%\5\b\5\2%\5\3\2\2\2&\'\5\30\r\2\'\7"+
-		"\3\2\2\2()\5\n\6\2)\t\3\2\2\2*/\5\f\7\2+,\7\13\2\2,.\5\f\7\2-+\3\2\2\2"+
-		".\61\3\2\2\2/-\3\2\2\2/\60\3\2\2\2\60\13\3\2\2\2\61/\3\2\2\2\62\64\5\16"+
-		"\b\2\63\62\3\2\2\2\64\67\3\2\2\2\65\63\3\2\2\2\65\66\3\2\2\2\66\r\3\2"+
-		"\2\2\67\65\3\2\2\28>\5\20\t\29>\5\22\n\2:>\5\24\13\2;>\5\26\f\2<>\5\30"+
-		"\r\2=8\3\2\2\2=9\3\2\2\2=:\3\2\2\2=;\3\2\2\2=<\3\2\2\2>\17\3\2\2\2?@\7"+
-		"\n\2\2@A\5\n\6\2AB\7\t\2\2B\21\3\2\2\2CD\7\b\2\2DE\5\n\6\2EF\7\7\2\2F"+
-		"\23\3\2\2\2GH\7\6\2\2HI\5\n\6\2IJ\7\5\2\2J\25\3\2\2\2KL\t\2\2\2L\27\3"+
-		"\2\2\2MN\7\3\2\2N\31\3\2\2\2\6\35/\65=";
+		"\f\t\f\4\r\t\r\4\16\t\16\3\2\7\2\36\n\2\f\2\16\2!\13\2\3\2\3\2\3\3\3\3"+
+		"\3\3\3\3\3\4\3\4\3\5\3\5\3\6\3\6\3\6\7\6\60\n\6\f\6\16\6\63\13\6\3\7\7"+
+		"\7\66\n\7\f\7\16\79\13\7\3\b\3\b\3\b\3\b\3\b\5\b@\n\b\3\t\3\t\3\t\3\t"+
+		"\3\n\3\n\3\n\3\n\3\13\3\13\3\13\3\13\3\f\3\f\3\r\3\r\3\r\3\r\3\16\3\16"+
+		"\3\16\2\2\17\2\4\6\b\n\f\16\20\22\24\26\30\32\2\2O\2\37\3\2\2\2\4$\3\2"+
+		"\2\2\6(\3\2\2\2\b*\3\2\2\2\n,\3\2\2\2\f\67\3\2\2\2\16?\3\2\2\2\20A\3\2"+
+		"\2\2\22E\3\2\2\2\24I\3\2\2\2\26M\3\2\2\2\30O\3\2\2\2\32S\3\2\2\2\34\36"+
+		"\5\4\3\2\35\34\3\2\2\2\36!\3\2\2\2\37\35\3\2\2\2\37 \3\2\2\2 \"\3\2\2"+
+		"\2!\37\3\2\2\2\"#\7\2\2\3#\3\3\2\2\2$%\5\6\4\2%&\7\3\2\2&\'\5\b\5\2\'"+
+		"\5\3\2\2\2()\5\30\r\2)\7\3\2\2\2*+\5\n\6\2+\t\3\2\2\2,\61\5\f\7\2-.\7"+
+		"\n\2\2.\60\5\f\7\2/-\3\2\2\2\60\63\3\2\2\2\61/\3\2\2\2\61\62\3\2\2\2\62"+
+		"\13\3\2\2\2\63\61\3\2\2\2\64\66\5\16\b\2\65\64\3\2\2\2\669\3\2\2\2\67"+
+		"\65\3\2\2\2\678\3\2\2\28\r\3\2\2\29\67\3\2\2\2:@\5\20\t\2;@\5\22\n\2<"+
+		"@\5\24\13\2=@\5\26\f\2>@\5\30\r\2?:\3\2\2\2?;\3\2\2\2?<\3\2\2\2?=\3\2"+
+		"\2\2?>\3\2\2\2@\17\3\2\2\2AB\7\t\2\2BC\5\n\6\2CD\7\b\2\2D\21\3\2\2\2E"+
+		"F\7\7\2\2FG\5\n\6\2GH\7\6\2\2H\23\3\2\2\2IJ\7\5\2\2JK\5\n\6\2KL\7\4\2"+
+		"\2L\25\3\2\2\2MN\7\r\2\2N\27\3\2\2\2OP\7\f\2\2PQ\5\32\16\2QR\7\13\2\2"+
+		"R\31\3\2\2\2ST\7\r\2\2T\33\3\2\2\2\6\37\61\67?";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

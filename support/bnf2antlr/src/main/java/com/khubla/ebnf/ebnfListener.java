@@ -9,26 +9,48 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface ebnfListener extends ParseTreeListener {
 	/**
-	 * Enter a parse tree produced by {@link ebnfParser#id}.
+	 * Enter a parse tree produced by {@link ebnfParser#rulelist}.
 	 * @param ctx the parse tree
 	 */
-	void enterId(@NotNull ebnfParser.IdContext ctx);
+	void enterRulelist(@NotNull ebnfParser.RulelistContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ebnfParser#id}.
+	 * Exit a parse tree produced by {@link ebnfParser#rulelist}.
 	 * @param ctx the parse tree
 	 */
-	void exitId(@NotNull ebnfParser.IdContext ctx);
+	void exitRulelist(@NotNull ebnfParser.RulelistContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link ebnfParser#element}.
+	 * Enter a parse tree produced by {@link ebnfParser#alternation}.
 	 * @param ctx the parse tree
 	 */
-	void enterElement(@NotNull ebnfParser.ElementContext ctx);
+	void enterAlternation(@NotNull ebnfParser.AlternationContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ebnfParser#element}.
+	 * Exit a parse tree produced by {@link ebnfParser#alternation}.
 	 * @param ctx the parse tree
 	 */
-	void exitElement(@NotNull ebnfParser.ElementContext ctx);
+	void exitAlternation(@NotNull ebnfParser.AlternationContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link ebnfParser#oneormore}.
+	 * @param ctx the parse tree
+	 */
+	void enterOneormore(@NotNull ebnfParser.OneormoreContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ebnfParser#oneormore}.
+	 * @param ctx the parse tree
+	 */
+	void exitOneormore(@NotNull ebnfParser.OneormoreContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link ebnfParser#rulename}.
+	 * @param ctx the parse tree
+	 */
+	void enterRulename(@NotNull ebnfParser.RulenameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ebnfParser#rulename}.
+	 * @param ctx the parse tree
+	 */
+	void exitRulename(@NotNull ebnfParser.RulenameContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link ebnfParser#optional}.
@@ -42,15 +64,15 @@ public interface ebnfListener extends ParseTreeListener {
 	void exitOptional(@NotNull ebnfParser.OptionalContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link ebnfParser#rulename}.
+	 * Enter a parse tree produced by {@link ebnfParser#id}.
 	 * @param ctx the parse tree
 	 */
-	void enterRulename(@NotNull ebnfParser.RulenameContext ctx);
+	void enterId(@NotNull ebnfParser.IdContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ebnfParser#rulename}.
+	 * Exit a parse tree produced by {@link ebnfParser#id}.
 	 * @param ctx the parse tree
 	 */
-	void exitRulename(@NotNull ebnfParser.RulenameContext ctx);
+	void exitId(@NotNull ebnfParser.IdContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link ebnfParser#rhs}.
@@ -75,6 +97,17 @@ public interface ebnfListener extends ParseTreeListener {
 	void exitStringliteral(@NotNull ebnfParser.StringliteralContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link ebnfParser#zeroormore}.
+	 * @param ctx the parse tree
+	 */
+	void enterZeroormore(@NotNull ebnfParser.ZeroormoreContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ebnfParser#zeroormore}.
+	 * @param ctx the parse tree
+	 */
+	void exitZeroormore(@NotNull ebnfParser.ZeroormoreContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link ebnfParser#rule_}.
 	 * @param ctx the parse tree
 	 */
@@ -86,46 +119,13 @@ public interface ebnfListener extends ParseTreeListener {
 	void exitRule_(@NotNull ebnfParser.Rule_Context ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link ebnfParser#rulelist}.
+	 * Enter a parse tree produced by {@link ebnfParser#element}.
 	 * @param ctx the parse tree
 	 */
-	void enterRulelist(@NotNull ebnfParser.RulelistContext ctx);
+	void enterElement(@NotNull ebnfParser.ElementContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ebnfParser#rulelist}.
+	 * Exit a parse tree produced by {@link ebnfParser#element}.
 	 * @param ctx the parse tree
 	 */
-	void exitRulelist(@NotNull ebnfParser.RulelistContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link ebnfParser#oneormore}.
-	 * @param ctx the parse tree
-	 */
-	void enterOneormore(@NotNull ebnfParser.OneormoreContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ebnfParser#oneormore}.
-	 * @param ctx the parse tree
-	 */
-	void exitOneormore(@NotNull ebnfParser.OneormoreContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link ebnfParser#alternation}.
-	 * @param ctx the parse tree
-	 */
-	void enterAlternation(@NotNull ebnfParser.AlternationContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ebnfParser#alternation}.
-	 * @param ctx the parse tree
-	 */
-	void exitAlternation(@NotNull ebnfParser.AlternationContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link ebnfParser#zeroormore}.
-	 * @param ctx the parse tree
-	 */
-	void enterZeroormore(@NotNull ebnfParser.ZeroormoreContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ebnfParser#zeroormore}.
-	 * @param ctx the parse tree
-	 */
-	void exitZeroormore(@NotNull ebnfParser.ZeroormoreContext ctx);
+	void exitElement(@NotNull ebnfParser.ElementContext ctx);
 }
