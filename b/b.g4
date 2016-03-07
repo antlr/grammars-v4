@@ -61,16 +61,16 @@ statement
 
 rvalue
    : ('(' rvalue ')')
- //  | lvalue
+   | lvalue
    | constant
- //  | (lvalue assign rvalue)
-//   | (incdec lvalue)
- //  | (lvalue incdec)
+   | (lvalue assign rvalue)
+   | (incdec lvalue)
+   | (lvalue incdec)
    | (unary rvalue)
- //  | ('&' lvalue)
-   | (rvalue binary rvalue)
-   | (rvalue '?' rvalue ':' rvalue)
-   | (rvalue '(' rvalue (',' rvalue)* ')')
+   | ('&' lvalue)
+ //  | (rvalue binary rvalue)
+ //  | (rvalue '?' rvalue ':' rvalue)
+  // | (rvalue '(' rvalue (',' rvalue)* ')')
    ;
 
 assign
@@ -109,7 +109,7 @@ binary
 lvalue
    : name
    | ('*' rvalue)
-   | (rvalue '[' rvalue ']')
+   | (name '[' rvalue ']')
    ;
 
 constant
