@@ -38,7 +38,7 @@ program
 
 definition
    : (name constant? (ival (',' ival)*)* ';')
-   | (name (',' name)* statement)
+   | (name '(' (name (',' name)*)* ')' statement) 
    ;
 
 ival
@@ -47,11 +47,12 @@ ival
    ;
 
 statement
-   : ('auto' name constant* (',' name constant*)* ';' statement)
+   : ('auto' name constant (',' name constant)* ';' statement)
    | ('extrn' name (',' name)* ';' statement)
    | (name ':' statement)
    | ('case' constant ':' statement)
-   | ('if' '(' rvalue ')' statement ('else' statement)*)
+   | ( '{' statement* '}')
+   | ('if' '(' rvalue ')' statement ('else' statement))
    | ('while' '(' rvalue ')' statement)
    | ('switch' rvalue statement)
    | ('goto' rvalue ';')
@@ -134,19 +135,13 @@ INT
 
 
 STRING1
-   : '"' ~ ["\r\n]* '"'
+   : '"' ~["\r\n]* '"'
    ;
 
 
 STRING2
-   : '\'' ~ ["\r\n]* '\''
+   : '\'' ~ [\'\r\n]* '\''
    ;
-
-
-EOL
-   : '\r'? '\n'
-   ;
-
 
 WS
    : [ \t\r\n] -> skip
