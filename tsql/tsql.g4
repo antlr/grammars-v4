@@ -131,11 +131,11 @@ insert_statement
     : with_expression?
       INSERT (TOP '(' expression ')' PERCENT?)?
       INTO? (ddl_object | rowset_function_limited)
-      with_table_hints?
+      insert_with_table_hints?
       ('(' column_name_list ')')?
       output_clause?
       (VALUES '(' expression_list ')' (',' '(' expression_list ')')* |
-               derived_table | execute_statement | dml_table_source | DEFAULT VALUES)
+               derived_table | execute_statement | DEFAULT VALUES)
       for_clause? option_clause? ';'?
     ;
 
@@ -480,11 +480,7 @@ constant_expression
     ;
 
 subquery
-    : select_statement
-    ;
-
-dml_table_source
-    : query_specification
+    : query_expression
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms175972.aspx
@@ -665,7 +661,6 @@ bulk_option
 derived_table
     : subquery
     | '(' subquery ')'
-    | table_value_constructor
     ;
 
 function_call
@@ -723,6 +718,11 @@ with_table_hints
     : WITH? '(' table_hint (',' table_hint)* ')'
     ;
 
+// https://msdn.microsoft.com/en-us/library/ms187373.aspx
+insert_with_table_hints
+    : WITH '(' table_hint (',' table_hint)* ')'
+    ;
+
 // Id runtime check. Id can be (FORCESCAN, HOLDLOCK, NOLOCK, NOWAIT, PAGLOCK, READCOMMITTED,
 // READCOMMITTEDLOCK, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, TABLOCK, TABLOCKX
 // UPDLOCK, XLOCK)
@@ -753,10 +753,7 @@ column_alias
     : id
     | STRING
     ;
-
-table_value_constructor
-    : VALUES '(' expression_list ')' (',' '(' expression_list ')')*
-    ;
+    
 
 expression_list
     : expression (',' expression)*
