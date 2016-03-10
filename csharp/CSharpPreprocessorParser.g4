@@ -6,46 +6,46 @@ parser grammar CSharpPreprocessorParser;
 
 options { tokenVocab=CSharpLexer; }
 
-@parser::header { using System.Linq; }
+@parser::header { import java.util.*; }
 
 @parser::members
-{Stack<bool> conditions = new Stack<bool>(new bool[] { true });
-public HashSet<string> ConditionalSymbols = new HashSet<string>() { "DEBUG" };}
+{Stack<Boolean> conditions = new Stack<Boolean>();{conditions.push(true);}
+public HashSet<String> ConditionalSymbols = new HashSet<String>();{ConditionalSymbols.add("DEBUG");}}
 
-preprocessor_directive returns [bool value]
-	: DEFINE CONDITIONAL_SYMBOL directive_new_line_or_sharp{ ConditionalSymbols.Add($CONDITIONAL_SYMBOL.text);
-	   $value = conditions.All(c => c); } #preprocessorDeclaration
+preprocessor_directive returns [boolean value]
+	: DEFINE CONDITIONAL_SYMBOL directive_new_line_or_sharp{ ConditionalSymbols.add($CONDITIONAL_SYMBOL.text);
+	   $value = !conditions.contains(false); } #preprocessorDeclaration
 
-	| UNDEF CONDITIONAL_SYMBOL directive_new_line_or_sharp{ ConditionalSymbols.Remove($CONDITIONAL_SYMBOL.text);
-	   $value = conditions.All(c => c); } #preprocessorDeclaration
+	| UNDEF CONDITIONAL_SYMBOL directive_new_line_or_sharp{ ConditionalSymbols.remove($CONDITIONAL_SYMBOL.text);
+	   $value = !conditions.contains(false); } #preprocessorDeclaration
 
 	| IF expr=preprocessor_expression directive_new_line_or_sharp
-	  { $value = $expr.value == "true" && conditions.All(c => c); conditions.Push($expr.value == "true"); }
+	  { $value = $expr.value == "true" && !conditions.contains(false); conditions.push($expr.value == "true"); }
 	  #preprocessorConditional
 
 	| ELIF expr=preprocessor_expression directive_new_line_or_sharp
-	  { if (!conditions.Peek()) { conditions.Pop(); $value = $expr.value == "true" && conditions.All(c => c);
-	     conditions.Push($expr.value == "true"); } else $value = false; }
+	  { if (!conditions.peek()) { conditions.pop(); $value = $expr.value == "true" && !conditions.contains(false);
+	     conditions.push($expr.value == "true"); } else $value = false; }
 	     #preprocessorConditional
 
 	| ELSE directive_new_line_or_sharp
-	  { if (!conditions.Peek()) { conditions.Pop(); $value = true && conditions.All(c => c); conditions.Push(true); }
+	  { if (!conditions.peek()) { conditions.pop(); $value = true && !conditions.contains(false); conditions.push(true); }
 	    else $value = false; }    #preprocessorConditional
 
-	| ENDIF directive_new_line_or_sharp             { conditions.Pop(); $value = conditions.Peek(); }
+	| ENDIF directive_new_line_or_sharp             { conditions.pop(); $value = conditions.peek(); }
 	   #preprocessorConditional
-	| LINE (DIGITS STRING? | DEFAULT | DIRECTIVE_HIDDEN) directive_new_line_or_sharp { $value = conditions.All(c => c); }
+	| LINE (DIGITS STRING? | DEFAULT | DIRECTIVE_HIDDEN) directive_new_line_or_sharp { $value = !conditions.contains(false); }
 	   #preprocessorLine
 
-	| ERROR TEXT directive_new_line_or_sharp       { $value = conditions.All(c => c); }   #preprocessorDiagnostic
+	| ERROR TEXT directive_new_line_or_sharp       { $value = !conditions.contains(false); }   #preprocessorDiagnostic
 
-	| WARNING TEXT directive_new_line_or_sharp     { $value = conditions.All(c => c); }   #preprocessorDiagnostic
+	| WARNING TEXT directive_new_line_or_sharp     { $value = !conditions.contains(false); }   #preprocessorDiagnostic
 
-	| REGION TEXT? directive_new_line_or_sharp      { $value = conditions.All(c => c); }   #preprocessorRegion
+	| REGION TEXT? directive_new_line_or_sharp      { $value = !conditions.contains(false); }   #preprocessorRegion
 
-	| ENDREGION TEXT? directive_new_line_or_sharp  { $value = conditions.All(c => c); }   #preprocessorRegion
+	| ENDREGION TEXT? directive_new_line_or_sharp  { $value = !conditions.contains(false); }   #preprocessorRegion
 
-	| PRAGMA TEXT directive_new_line_or_sharp      { $value = conditions.All(c => c); }   #preprocessorPragma
+	| PRAGMA TEXT directive_new_line_or_sharp      { $value = !conditions.contains(false); }   #preprocessorPragma
 	;
 
 directive_new_line_or_sharp
@@ -53,10 +53,10 @@ directive_new_line_or_sharp
     | EOF
     ;
 
-preprocessor_expression returns [string value]
+preprocessor_expression returns [String value]
 	: TRUE                                 { $value = "true"; }
 	| FALSE                                { $value = "false"; }
-	| CONDITIONAL_SYMBOL                   { $value = ConditionalSymbols.Contains($CONDITIONAL_SYMBOL.text) ? "true" : "false"; }
+	| CONDITIONAL_SYMBOL                   { $value = ConditionalSymbols.contains($CONDITIONAL_SYMBOL.text) ? "true" : "false"; }
 	| OPEN_PARENS expr=preprocessor_expression CLOSE_PARENS { $value = $expr.value; }
 	| BANG expr=preprocessor_expression     { $value = $expr.value == "true" ? "false" : "true"; }
 	| expr1=preprocessor_expression OP_EQ expr2=preprocessor_expression
