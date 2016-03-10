@@ -480,7 +480,7 @@ constant_expression
     ;
 
 subquery
-    : query_expression
+    : select_statement
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms175972.aspx
