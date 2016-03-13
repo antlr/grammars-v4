@@ -650,9 +650,6 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		scanner.close();
 
 		final String result = outputBuffer.toString();
-
-		LOG.debug("Normalized input:\n\n{}\n\n", result);
-
 		return result;
 	}
 
@@ -722,6 +719,8 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			result = normalizedInput;
 		}
 
+		LOG.debug("Processed input:\n\n{}\n\n", result);
+
 		return result;
 	}
 
@@ -751,9 +750,6 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		walker.walk(listener, startRule);
 
 		final String result = listener.context().read();
-
-		LOG.debug("Preprocessed input:\n\n{}\n\n", result);
-
 		return result;
 	}
 
