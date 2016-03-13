@@ -52,26 +52,30 @@ statement
    | (name ':' statement)
    | ('case' constant ':' statement)
    | ( '{' statement* '}')
-   | ('if' '(' rvalue ')' statement ('else' statement))
-   | ('while' '(' rvalue ')' statement)
-   | ('switch' rvalue statement)
-   | ('goto' rvalue ';')
-   | ('return' ('(' rvalue ')')? ';')
-   | (rvalue ';')
+   | ('if' '(' expression ')' statement ('else' statement))
+   | ('while' '(' expression ')' statement)
+   | ('switch' expression statement)
+   | ('goto' expression ';')
+   | ('return' ('(' expression ')')? ';')
+   | (expression ';')
    ;
 
 rvalue
-   : ('(' rvalue ')')
-   | lvalue
+   : expression
+   | (expression binary expression)
+   | (expression '?' expression ':' expression)
+   | (expression '(' expression (',' expression)* ')')
+   ;
+
+expression
+   : ('(' expression ')')
+   | name
    | constant
-   | (lvalue assign rvalue)
-   | (incdec lvalue)
-   | (lvalue incdec)
-   | (unary rvalue)
-   | ('&' lvalue)
- //  | (rvalue binary rvalue)
- //  | (rvalue '?' rvalue ':' rvalue)
-  // | (rvalue '(' rvalue (',' rvalue)* ')')
+   | (name assign expression)
+   | (incdec name)
+   | (name incdec)
+   | (unary expression)
+   | ('&' name)
    ;
 
 assign
@@ -110,7 +114,7 @@ binary
 lvalue
    : name
    | ('*' rvalue)
-   | (name '[' rvalue ']')
+   | (rvalue '[' rvalue ']')
    ;
 
 constant
