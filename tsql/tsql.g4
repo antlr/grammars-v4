@@ -130,8 +130,7 @@ delete_statement
 insert_statement
     : with_expression?
       INSERT (TOP '(' expression ')' PERCENT?)?
-      INTO? (ddl_object | rowset_function_limited)
-      with_table_hints?
+      INTO? (ddl_object | rowset_function_limited with_table_hints?)
       ('(' column_name_list ')')?
       output_clause?
       (VALUES '(' expression_list ')' (',' '(' expression_list ')')* |
