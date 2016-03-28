@@ -895,7 +895,7 @@ fragment Identifier_characters : Identifier_character+ ;
 
 context_sensitive_keyword :
  'associativity' | 'convenience' | 'dynamic' | 'didSet' |
- 'fina' | 'get' | 'infix' | 'indirect' | 'lazy' | 'left' | 'mutating' | 'none' |
+ 'final' | 'get' | 'infix' | 'indirect' | 'lazy' | 'left' | 'mutating' | 'none' |
  'nonmutating' | 'optional' | 'operator' | 'override' |
  'postfix' | 'precedence' | 'prefix' | 'Protocol' | 'required' | 'right' |
  'set' | 'Type' | 'unowned' | 'unowned' | 'weak' | 'willSet'
