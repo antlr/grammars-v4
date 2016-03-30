@@ -91,6 +91,7 @@
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>
+		<module>swift-fin</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
