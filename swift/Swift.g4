@@ -581,7 +581,7 @@ expression_pattern : expression  ;
 
 // GRAMMAR OF AN ATTRIBUTE
 
-attribute : '@' attribute_name attribute_argument_clause? ;
+attribute : '@'? attribute_name attribute_argument_clause? ;
 attribute_name : identifier  ;
 attribute_argument_clause : '('  balanced_tokens?  ')'  ;
 attributes : attribute+ ;
