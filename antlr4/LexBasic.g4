@@ -37,8 +37,6 @@
   
 lexer grammar LexBasic;
 
-import LexUnicode;	// Formal set of Unicode ranges
-
 
 // ======================================================
 // Lexer fragments
@@ -55,8 +53,7 @@ fragment Vws			: [\r\n\f]	;
 fragment DocComment		: '/**' .*? ('*/' | EOF)	;
 fragment BlockComment	: '/*'  .*? ('*/' | EOF)	;
 
-fragment LineComment	: '//' ~[\r\n]* 							;
-fragment LineCommentExt	: '//' ~'\n'* ( '\n' Hws* '//' ~'\n'* )*	;
+fragment LineComment	: '//' ~[\r\n]*				;
 
 
 // -----------------------------------
@@ -80,46 +77,19 @@ fragment UnicodeEsc
 	:	'u' (HexDigit (HexDigit (HexDigit HexDigit?)?)?)?
 	;
 
-fragment OctalEscape
-	:	OctalDigit
-	|	OctalDigit OctalDigit
-	|	[0-3] OctalDigit OctalDigit
-	;
-
-
 // -----------------------------------
 // Numerals
-
-fragment HexNumeral
-	:	'0' [xX] HexDigits
-	;
-
-fragment OctalNumeral
-	:	'0' '_' OctalDigits
-	;
 
 fragment DecimalNumeral
 	:	'0'
 	|	[1-9] DecDigit*
 	;
 
-fragment BinaryNumeral
-	:	'0' [bB] BinaryDigits
-	;
-
-
 // -----------------------------------
 // Digits
 
-fragment HexDigits		: HexDigit+		;
-fragment DecDigits		: DecDigit+		;
-fragment OctalDigits	: OctalDigit+	;
-fragment BinaryDigits	: BinaryDigit+	;
-
 fragment HexDigit		: [0-9a-fA-F]	;
 fragment DecDigit		: [0-9]			;
-fragment OctalDigit		: [0-7]			;
-fragment BinaryDigit	: [01]			;
 
 
 // -----------------------------------
@@ -131,34 +101,6 @@ fragment CharLiteral	: SQuote ( EscSeq | ~['\r\n\\] )  SQuote	;
 fragment SQuoteLiteral	: SQuote ( EscSeq | ~['\r\n\\] )* SQuote	;
 fragment DQuoteLiteral	: DQuote ( EscSeq | ~["\r\n\\] )* DQuote	;
 fragment USQuoteLiteral	: SQuote ( EscSeq | ~['\r\n\\] )* 			;
-
-fragment DecimalFloatingPointLiteral
-	:   DecDigits DOT DecDigits? ExponentPart? FloatTypeSuffix?
-	|   DOT DecDigits ExponentPart? FloatTypeSuffix?
-	|	DecDigits ExponentPart FloatTypeSuffix?
-	|	DecDigits FloatTypeSuffix
-	;
-
-fragment ExponentPart
-	:	[eE] [+-]? DecDigits
-	;
-
-fragment FloatTypeSuffix
-	:	[fFdD]
-	;
-
-fragment HexadecimalFloatingPointLiteral
-	:	HexSignificand BinaryExponent FloatTypeSuffix?
-	;
-
-fragment HexSignificand
-	:   HexNumeral DOT?
-	|   '0' [xX] HexDigits? DOT HexDigits
-	;
-
-fragment BinaryExponent
-	:	[pP] [+-]? DecDigits
-	;
 
 
 // -----------------------------------
@@ -190,37 +132,12 @@ fragment NameStartChar
 	;	// ignores | ['\u10000-'\uEFFFF] ;
 
 
-fragment JavaLetter
-	:   [a-zA-Z$_] // "java letters" below 0xFF
-	|	JavaUnicodeChars
-	;
-
-fragment JavaLetterOrDigit
-	:   [a-zA-Z0-9$_] // "java letters or digits" below 0xFF
-	|	JavaUnicodeChars
-	;
-
-// covers all characters above 0xFF which are not a surrogate
-// and UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-fragment JavaUnicodeChars
-	: ~[\u0000-\u00FF\uD800-\uDBFF]		{Character.isJavaIdentifierPart(_input.LA(-1))}?
-	|  [\uD800-\uDBFF] [\uDC00-\uDFFF]	{Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
-	;
-
-
 // -----------------------------------
 // Types
 
-fragment Boolean		: 'boolean'	;
-fragment Byte			: 'byte'	;
-fragment Short			: 'short'	;
 fragment Int			: 'int'		;
-fragment Long			: 'long'	;
-fragment Char			: 'char'	;
-fragment Float			: 'float'	;
-fragment Double 		: 'double'	;
 
-fragment True		 	: 'true'	;
+fragment True			: 'true'	;
 fragment False			: 'false'	;
 
 
@@ -232,7 +149,6 @@ fragment Colon			: ':'	;
 fragment DColon			: '::'	;
 fragment SQuote			: '\''	;
 fragment DQuote			: '"'	;
-fragment BQuote			: '`'	;
 fragment LParen			: '('	;
 fragment RParen			: ')'	;
 fragment LBrace			: '{'	;
@@ -242,44 +158,18 @@ fragment RBrack			: ']'	;
 fragment RArrow			: '->'	;
 fragment Lt				: '<'	;
 fragment Gt				: '>'	;
-fragment Lte			: '<='	;
-fragment Gte			: '>='	;
 fragment Equal			: '='	;
-fragment NotEqual		: '!='	;
 fragment Question		: '?'	;
-fragment Bang			: '!'	;
 fragment Star			: '*'	;
-fragment Slash			: '/'	;
-fragment Percent		: '%'	;
-fragment Caret			: '^'	;
 fragment Plus			: '+'	;
-fragment Minus			: '-'	;
 fragment PlusAssign		: '+='	;
-fragment MinusAssign	: '-='	;
-fragment MulAssign		: '*='	;
-fragment DivAssign		: '/='	;
-fragment AndAssign		: '&='	;
-fragment OrAssign		: '|='	;
-fragment XOrAssign		: '^='	;
-fragment ModAssign		: '%='	;
-fragment LShiftAssign	: '<<='	;
-fragment RShiftAssign	: '>>='	;
-fragment URShiftAssign	: '>>>=';
 fragment Underscore		: '_'	;
 fragment Pipe			: '|'	;
-fragment Amp			: '&'	;
-fragment And			: '&&'	;
-fragment Or				: '||'	;
-fragment Inc			: '++'	;
-fragment Dec			: '--'	;
-fragment LShift			: '<<'	;
-fragment RShift			: '>>'	;
 fragment Dollar			: '$'	;
 fragment Comma			: ','	;
 fragment Semi			: ';'	;
 fragment Dot			: '.'	;
 fragment Range			: '..'	;
-fragment Ellipsis		: '...'	;
 fragment At				: '@'	;
 fragment Pound			: '#'	;
 fragment Tilde			: '~'	;
