@@ -95,7 +95,7 @@ fragment DecDigit		: [0-9]			;
 // -----------------------------------
 // Literals
 
-fragment BoolLiteral	: True | False								;
+fragment BoolLiteral	: 'true' | 'false'								;
 
 fragment CharLiteral	: SQuote ( EscSeq | ~['\r\n\\] )  SQuote	;
 fragment SQuoteLiteral	: SQuote ( EscSeq | ~['\r\n\\] )* SQuote	;
@@ -136,9 +136,6 @@ fragment NameStartChar
 // Types
 
 fragment Int			: 'int'		;
-
-fragment True			: 'true'	;
-fragment False			: 'false'	;
 
 
 // -----------------------------------
