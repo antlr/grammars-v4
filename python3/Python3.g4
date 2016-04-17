@@ -867,7 +867,7 @@ RIGHT_SHIFT_ASSIGN : '>>=';
 POWER_ASSIGN : '**=';
 IDIV_ASSIGN : '//=';
 
-SKIP
+SKIPP
  : ( SPACES | COMMENT | LINE_JOINING ) -> skip
  ;
 
