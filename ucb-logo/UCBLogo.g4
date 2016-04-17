@@ -651,7 +651,7 @@ WORD
  | {arrayDepth > 0}? ~[ \t\r\n{};]   ( ~[ \t\r\n};~]  | LINE_CONTINUATION | '\\' ( [ \t{}();~]   | LINE_BREAK ) )*
  ;
 
-SKIP
+SKIPP
  : ( COMMENT | LINE_BREAK | SPACES | LINE_CONTINUATION ) -> skip
  ;
 
