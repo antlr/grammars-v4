@@ -1145,7 +1145,7 @@ for_update_of_part
     ;
 
 for_update_options
-    : SKIP LOCKED
+    : SKIP_ LOCKED
     | NOWAIT
     | WAIT expression
     ;
@@ -2423,7 +2423,7 @@ regular_id
     | SIMPLE_INTEGER
     | SINGLE
     //| SIZE
-    | SKIP
+    | SKIP_
     | SMALLINT
     | SNAPSHOT
     | SOME
@@ -2900,7 +2900,7 @@ SIGNTYPE:                     S I G N T Y P E;
 SIMPLE_INTEGER:               S I M P L E '_' I N T E G E R;
 SINGLE:                       S I N G L E;
 SIZE:                         S I Z E;
-SKIP:                         S K I P;
+SKIP_:                        S K I P;
 SMALLINT:                     S M A L L I N T;
 SNAPSHOT:                     S N A P S H O T;
 SOME:                         S O M E;
