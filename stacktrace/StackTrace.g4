@@ -32,7 +32,7 @@ causedByLine
    ;
 
 ellipsisLine
-   : ELLIPSIS Number MORE
+   : ELLIPSIS Number MOREE
    ;
 
 messageLine
@@ -110,7 +110,7 @@ CAUSED_BY
    ;
 
 
-MORE
+MOREE
    : 'more'
    ;
 
