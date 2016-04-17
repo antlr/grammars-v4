@@ -197,7 +197,7 @@ AxisName:  'ancestor'
        :  '|';
   LESS   
        :  '<';
-  MOREE  
+  MORE_ 
        :  '>';
   LE   
        :  '<=';
