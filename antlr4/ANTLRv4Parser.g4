@@ -345,7 +345,6 @@ ebnfSuffix
 lexerAtom
 	:	characterRange
 	|	terminal
-	|	RULE_REF
 	|	notSet
 	|	LEXER_CHAR_SET
 	|	DOT elementOptions?
