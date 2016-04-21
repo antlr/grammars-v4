@@ -2203,7 +2203,7 @@ regular_id
     | ERRORS
     | ESCAPE
     | EVALNAME
-    | EXCEPTION
+    //| EXCEPTION
     | EXCEPTION_INIT
     | EXCEPTIONS
     | EXCLUDE
