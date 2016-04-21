@@ -582,7 +582,7 @@ exception_declaration
 pragma_declaration
     : PRAGMA (SERIALLY_REUSABLE 
     | AUTONOMOUS_TRANSACTION
-    | EXCEPTION_INIT '(' exception_name ',' numeric ')'
+    | EXCEPTION_INIT '(' exception_name ',' numeric_negative ')'
     | INLINE '(' id1=id ',' expression ')'
     | RESTRICT_REFERENCES '(' (id | DEFAULT) (',' id)+ ')') ';'
     ;
@@ -2030,6 +2030,10 @@ constant
 numeric
     : UNSIGNED_INTEGER
     | APPROXIMATE_NUM_LIT
+    ;
+
+numeric_negative
+    : MINUS_SIGN numeric
     ;
 
 quoted_string
