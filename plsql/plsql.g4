@@ -153,6 +153,8 @@ package_obj_body
     | table_declaration
     | create_procedure_body
     | create_function_body 
+    | procedure_spec
+    | function_spec    
     ;
 
 // $<Procedure DDLs
@@ -2832,8 +2834,8 @@ PARENT:                       P A R E N T;
 PARTITION:                    P A R T I T I O N;
 PASSING:                      P A S S I N G;
 PATH:                         P A T H;
-PERCENT_ROWTYPE:              '%' P E R C E N T '_' R O W T Y P E;
-PERCENT_TYPE:                 '%' P E R C E N T '_' T Y P E;
+PERCENT_ROWTYPE:              '%' R O W T Y P E;
+PERCENT_TYPE:                 '%' T Y P E;
 PIPELINED:                    P I P E L I N E D;
 PIVOT:                        P I V O T;
 PLAN:                         P L A N;
