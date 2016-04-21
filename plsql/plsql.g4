@@ -153,6 +153,8 @@ package_obj_body
     | table_declaration
     | create_procedure_body
     | create_function_body 
+    | procedure_spec
+    | function_spec    
     ;
 
 // $<Procedure DDLs
