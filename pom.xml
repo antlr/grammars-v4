@@ -40,6 +40,7 @@
 		<module>iri</module>
 		<module>java</module>
 		<module>java8</module>
+		<module>javadoc</module>
 		<module>json</module>
 		<module>less</module>
 		<module>logo</module>
