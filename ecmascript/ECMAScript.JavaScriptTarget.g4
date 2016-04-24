@@ -104,8 +104,6 @@ ECMAScriptLexer.prototype.nextToken = function() {
 
 /**
  * @returns {Boolean} Returns true if the lexer can match a regex literal.
- *
- * ...
  */
 ECMAScriptLexer.prototype.isRegexPossible = function() {
 
