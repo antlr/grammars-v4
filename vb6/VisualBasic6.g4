@@ -1,18 +1,9 @@
 /*
-* Copyright (C) 2014 Ulrich Wolffgang <u.wol@wwu.de>
+* Copyright (C) 2016, Ulrich Wolffgang <u.wol@wwu.de>
+* All rights reserved.
 *
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Lesser General Public License as 
-* published by the Free Software Foundation, either version 3 of the 
-* License, or (at your option) any later version.
-* 
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* This software may be modified and distributed under the terms
+* of the BSD 3-clause license. See the LICENSE file for details.
 */
 
 /*
@@ -43,6 +34,10 @@
 *
 *
 * Change log:
+*
+* v1.4
+*	- erase statement fix
+*	- explicit token definition
 *
 * v1.3
 *	- call statement precedence
@@ -125,7 +120,7 @@ moduleBodyElement :
 
 moduleBlock : block;
 
-attributeStmt : ATTRIBUTE WS implicitCallStmt_InStmt WS? EQ WS? literal (WS? ',' WS? literal)*;
+attributeStmt : ATTRIBUTE WS implicitCallStmt_InStmt WS? EQ WS? literal (WS? COMMA WS? literal)*;
 
 block : blockStmt (NEWLINE+ WS? blockStmt)*;
 
@@ -154,7 +149,6 @@ blockStmt :
 	| goToStmt
 	| ifThenElseStmt
 	| implementsStmt
-	| implicitCallStmt_InBlock
 	| inputStmt
 	| killStmt
 	| letStmt
@@ -197,12 +191,13 @@ blockStmt :
 	| widthStmt
 	| withStmt
 	| writeStmt
+	| implicitCallStmt_InBlock
 ;
 
 
 // statements ----------------------------------
 
-appactivateStmt : APPACTIVATE WS valueStmt (WS? ',' WS? valueStmt)?;
+appactivateStmt : APPACTIVATE WS valueStmt (WS? COMMA WS? valueStmt)?;
 
 beepStmt : BEEP;
 
@@ -210,15 +205,15 @@ chdirStmt : CHDIR WS valueStmt;
 
 chdriveStmt : CHDRIVE WS valueStmt;
 
-closeStmt : CLOSE (WS valueStmt (WS? ',' WS? valueStmt)*)?;
+closeStmt : CLOSE (WS valueStmt (WS? COMMA WS? valueStmt)*)?;
 
-constStmt : (visibility WS)? CONST WS constSubStmt (WS? ',' WS? constSubStmt)*;
+constStmt : (visibility WS)? CONST WS constSubStmt (WS? COMMA WS? constSubStmt)*;
 
 constSubStmt : ambiguousIdentifier typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt;
 
 dateStmt : DATE WS? EQ WS? valueStmt;
 
-declareStmt : (visibility WS)? DECLARE WS (FUNCTION | SUB) WS ambiguousIdentifier WS LIB WS STRINGLITERAL (WS ALIAS WS STRINGLITERAL)? (WS? argList)? (WS asTypeClause)?;
+declareStmt : (visibility WS)? DECLARE WS (FUNCTION typeHint? | SUB) WS ambiguousIdentifier typeHint? WS LIB WS STRINGLITERAL (WS ALIAS WS STRINGLITERAL)? (WS? argList)? (WS asTypeClause)?;
 
 deftypeStmt : 
 	(
@@ -226,10 +221,10 @@ deftypeStmt :
 		DEFSNG | DEFDBL | DEFDEC | DEFDATE | 
 		DEFSTR | DEFOBJ | DEFVAR
 	) WS
-	letterrange (WS? ',' WS? letterrange)*
+	letterrange (WS? COMMA WS? letterrange)*
 ;
 
-deleteSettingStmt : DELETESETTING WS valueStmt WS? ',' WS? valueStmt (WS? ',' WS? valueStmt)?;
+deleteSettingStmt : DELETESETTING WS valueStmt WS? COMMA WS? valueStmt (WS? COMMA WS? valueStmt)?;
 
 doLoopStmt :
 	DO NEWLINE+ 
@@ -255,7 +250,7 @@ enumerationStmt:
 
 enumerationStmt_Constant : ambiguousIdentifier (WS? EQ WS? valueStmt)? NEWLINE+;
 
-eraseStmt : ERASE WS valueStmt;
+eraseStmt : ERASE WS valueStmt (WS? COMMA WS? valueStmt)*;
 
 errorStmt : ERROR WS valueStmt;
 
@@ -263,7 +258,7 @@ eventStmt : (visibility WS)? EVENT WS ambiguousIdentifier WS? argList;
 
 exitStmt : EXIT_DO | EXIT_FOR | EXIT_FUNCTION | EXIT_PROPERTY | EXIT_SUB;
 
-filecopyStmt : FILECOPY WS valueStmt WS? ',' WS? valueStmt;
+filecopyStmt : FILECOPY WS valueStmt WS? COMMA WS? valueStmt;
 
 forEachStmt : 
 	FOR WS EACH WS ambiguousIdentifier typeHint? WS IN WS valueStmt NEWLINE+ 
@@ -283,7 +278,7 @@ functionStmt :
 	END_FUNCTION
 ;
 
-getStmt : GET WS valueStmt WS? ',' WS? valueStmt? WS? ',' WS? valueStmt;
+getStmt : GET WS valueStmt WS? COMMA WS? valueStmt? WS? COMMA WS? valueStmt;
 
 goSubStmt : GOSUB WS valueStmt;
 
@@ -313,17 +308,17 @@ ifElseBlockStmt :
 
 implementsStmt : IMPLEMENTS WS ambiguousIdentifier;
 
-inputStmt : INPUT WS valueStmt (WS? ',' WS? valueStmt)+;
+inputStmt : INPUT WS valueStmt (WS? COMMA WS? valueStmt)+;
 
 killStmt : KILL WS valueStmt;
 
 letStmt : (LET WS)? implicitCallStmt_InStmt WS? (EQ | PLUS_EQ | MINUS_EQ) WS? valueStmt;
 
-lineInputStmt : LINE_INPUT WS valueStmt WS? ',' WS? valueStmt;
+lineInputStmt : LINE_INPUT WS valueStmt WS? COMMA WS? valueStmt;
 
 loadStmt : LOAD WS valueStmt;
 
-lockStmt : LOCK WS valueStmt (WS? ',' WS? valueStmt (WS TO WS valueStmt)?)?;
+lockStmt : LOCK WS valueStmt (WS? COMMA WS? valueStmt (WS TO WS valueStmt)?)?;
 
 lsetStmt : LSET WS implicitCallStmt_InStmt WS? EQ WS? valueStmt;
 
@@ -352,9 +347,9 @@ nameStmt : NAME WS valueStmt WS AS WS valueStmt;
 
 onErrorStmt : ON_ERROR WS (GOTO WS valueStmt | RESUME WS NEXT);
 
-onGoToStmt : ON WS valueStmt WS GOTO WS valueStmt (WS? ',' WS? valueStmt)*;
+onGoToStmt : ON WS valueStmt WS GOTO WS valueStmt (WS? COMMA WS? valueStmt)*;
 
-onGoSubStmt : ON WS valueStmt WS GOSUB WS valueStmt (WS? ',' WS? valueStmt)*;
+onGoSubStmt : ON WS valueStmt WS GOSUB WS valueStmt (WS? COMMA WS? valueStmt)*;
 
 openStmt : 
 	OPEN WS valueStmt WS FOR WS (APPEND | BINARY | INPUT | OUTPUT | RANDOM) 
@@ -365,8 +360,8 @@ openStmt :
 ;
 
 outputList :
-	outputList_Expression (WS? (';' | ',') WS? outputList_Expression?)*
-	| outputList_Expression? (WS? (';' | ',') WS? outputList_Expression?)+
+	outputList_Expression (WS? (SEMICOLON | COMMA) WS? outputList_Expression?)*
+	| outputList_Expression? (WS? (SEMICOLON | COMMA) WS? outputList_Expression?)+
 ;
 
 outputList_Expression : 
@@ -374,10 +369,10 @@ outputList_Expression :
 	| (SPC | TAB) (WS? LPAREN WS? argsCall WS? RPAREN)?
 ;
 
-printStmt : PRINT WS valueStmt WS? ',' (WS? outputList)?;
+printStmt : PRINT WS valueStmt WS? COMMA (WS? outputList)?;
 
 propertyGetStmt : 
-	(visibility WS)? (STATIC WS)? PROPERTY_GET WS ambiguousIdentifier (WS? argList)? (WS asTypeClause)? NEWLINE+ 
+	(visibility WS)? (STATIC WS)? PROPERTY_GET WS ambiguousIdentifier typeHint? (WS? argList)? (WS asTypeClause)? NEWLINE+ 
 	(block NEWLINE+)? 
 	END_PROPERTY
 ;
@@ -394,13 +389,13 @@ propertyLetStmt :
 	END_PROPERTY
 ;
 
-putStmt : PUT WS valueStmt WS? ',' WS? valueStmt? WS? ',' WS? valueStmt;
+putStmt : PUT WS valueStmt WS? COMMA WS? valueStmt? WS? COMMA WS? valueStmt;
 
 raiseEventStmt : RAISEEVENT WS ambiguousIdentifier (WS? LPAREN WS? (argsCall WS?)? RPAREN)?;
 
 randomizeStmt : RANDOMIZE (WS valueStmt)?;
 
-redimStmt : REDIM WS (PRESERVE WS)? redimSubStmt (WS?',' WS? redimSubStmt)*;
+redimStmt : REDIM WS (PRESERVE WS)? redimSubStmt (WS? COMMA WS? redimSubStmt)*;
 
 redimSubStmt : implicitCallStmt_InStmt WS? LPAREN WS? subscripts WS? RPAREN (WS asTypeClause)?;
 
@@ -414,11 +409,11 @@ rmdirStmt : RMDIR WS valueStmt;
 
 rsetStmt : RSET WS implicitCallStmt_InStmt WS? EQ WS? valueStmt;
 
-savepictureStmt : SAVEPICTURE WS valueStmt WS? ',' WS? valueStmt;
+savepictureStmt : SAVEPICTURE WS valueStmt WS? COMMA WS? valueStmt;
 
-saveSettingStmt : SAVESETTING WS valueStmt WS? ',' WS? valueStmt WS? ',' WS? valueStmt WS? ',' WS? valueStmt;
+saveSettingStmt : SAVESETTING WS valueStmt WS? COMMA WS? valueStmt WS? COMMA WS? valueStmt WS? COMMA WS? valueStmt;
 
-seekStmt : SEEK WS valueStmt WS? ',' WS? valueStmt;
+seekStmt : SEEK WS valueStmt WS? COMMA WS? valueStmt;
 
 selectCaseStmt : 
 	SELECT WS CASE WS valueStmt NEWLINE+ 
@@ -427,7 +422,7 @@ selectCaseStmt :
 ;
 
 sC_Case : 
-	CASE WS sC_Cond WS? (':'? NEWLINE* | NEWLINE+)  
+	CASE WS sC_Cond WS? (COLON? NEWLINE* | NEWLINE+)  
 	(block NEWLINE+)?
 ;
 
@@ -435,13 +430,13 @@ sC_Case :
 sC_Cond : 
 	ELSE 															# caseCondElse
 	| IS WS? comparisonOperator WS? valueStmt 						# caseCondIs
-	| valueStmt (WS? ',' WS? valueStmt)* 							# caseCondValue
-	| INTEGERLITERAL WS TO WS valueStmt (WS? ',' WS? valueStmt)* 	# caseCondTo
+	| valueStmt (WS? COMMA WS? valueStmt)* 							# caseCondValue
+	| INTEGERLITERAL WS TO WS valueStmt (WS? COMMA WS? valueStmt)* 	# caseCondTo
 ;
 
-sendkeysStmt : SENDKEYS WS valueStmt (WS? ',' WS? valueStmt)?;
+sendkeysStmt : SENDKEYS WS valueStmt (WS? COMMA WS? valueStmt)?;
 
-setattrStmt : SETATTR WS valueStmt WS? ',' WS? valueStmt;
+setattrStmt : SETATTR WS valueStmt WS? COMMA WS? valueStmt;
 
 setStmt : SET WS implicitCallStmt_InStmt WS? EQ WS? valueStmt;
 
@@ -467,13 +462,13 @@ typeOfStmt : TYPEOF WS valueStmt (WS IS WS type)?;
 
 unloadStmt : UNLOAD WS valueStmt;
 
-unlockStmt : UNLOCK WS valueStmt (WS? ',' WS? valueStmt (WS TO WS valueStmt)?)?;
+unlockStmt : UNLOCK WS valueStmt (WS? COMMA WS? valueStmt (WS TO WS valueStmt)?)?;
 
 // operator precedence is represented by rule order
 valueStmt : 
 	literal 												# vsLiteral
 	| implicitCallStmt_InStmt 								# vsICS
-	| LPAREN WS? valueStmt (WS? ',' WS? valueStmt)* RPAREN 	# vsStruct
+	| LPAREN WS? valueStmt (WS? COMMA WS? valueStmt)* RPAREN 	# vsStruct
 	| NEW WS valueStmt 										# vsNew
 	| typeOfStmt 											# vsTypeOf
 	| midStmt 												# vsMid
@@ -509,7 +504,7 @@ valueStmt :
 
 variableStmt : (DIM | STATIC | visibility) WS (WITHEVENTS WS)? variableListStmt;
 
-variableListStmt : variableSubStmt (WS? ',' WS? variableSubStmt)*;
+variableListStmt : variableSubStmt (WS? COMMA WS? variableSubStmt)*;
 
 variableSubStmt : ambiguousIdentifier (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? typeHint? (WS asTypeClause)?;
 
@@ -519,7 +514,7 @@ whileWendStmt :
 	WEND
 ;
 
-widthStmt : WIDTH WS valueStmt WS? ',' WS? valueStmt;
+widthStmt : WIDTH WS valueStmt WS? COMMA WS? valueStmt;
 
 withStmt : 
 	WITH WS implicitCallStmt_InStmt NEWLINE+ 
@@ -527,7 +522,7 @@ withStmt :
 	END_WITH
 ;
 
-writeStmt : WRITE WS valueStmt WS? ',' (WS? outputList)?;
+writeStmt : WRITE WS valueStmt WS? COMMA (WS? outputList)?;
 
 
 // complex call statements ----------------------------------
@@ -541,7 +536,7 @@ explicitCallStmt :
 eCS_ProcedureCall : CALL WS ambiguousIdentifier typeHint? (WS? LPAREN WS? argsCall WS? RPAREN)?;
 
 // parantheses are required in case of args -> empty parantheses are removed
-eCS_MemberProcedureCall : CALL WS implicitCallStmt_InStmt? '.' ambiguousIdentifier typeHint? (WS? LPAREN WS? argsCall WS? RPAREN)?;
+eCS_MemberProcedureCall : CALL WS implicitCallStmt_InStmt? DOT ambiguousIdentifier typeHint? (WS? LPAREN WS? argsCall WS? RPAREN)?;
 
 
 implicitCallStmt_InBlock :
@@ -554,7 +549,7 @@ implicitCallStmt_InBlock :
 // certainIdentifier instead of ambiguousIdentifier for preventing ambiguity with statement keywords 
 iCS_B_ProcedureCall : certainIdentifier (WS argsCall)?;
 
-iCS_B_MemberProcedureCall : implicitCallStmt_InStmt? '.' ambiguousIdentifier typeHint? (WS argsCall)? dictionaryCallStmt?;
+iCS_B_MemberProcedureCall : implicitCallStmt_InStmt? DOT ambiguousIdentifier typeHint? (WS argsCall)? dictionaryCallStmt?;
 
 
 // iCS_S_MembersCall first, so that member calls are not resolved as separate iCS_S_VariableOrProcedureCalls
@@ -571,29 +566,29 @@ iCS_S_ProcedureOrArrayCall : (ambiguousIdentifier | baseType) typeHint? WS? LPAR
 
 iCS_S_MembersCall : (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)? iCS_S_MemberCall+ dictionaryCallStmt?;
 
-iCS_S_MemberCall : '.' (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall);
+iCS_S_MemberCall : DOT (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall);
 
 iCS_S_DictionaryCall : dictionaryCallStmt;
 
 
 // atomic call statements ----------------------------------
 
-argsCall : (argCall? WS? (',' | ';') WS?)* argCall (WS? (',' | ';') WS? argCall?)*;
+argsCall : (argCall? WS? (COMMA | SEMICOLON) WS?)* argCall (WS? (COMMA | SEMICOLON) WS? argCall?)*;
 
 argCall : ((BYVAL | BYREF | PARAMARRAY) WS)? valueStmt;
 
-dictionaryCallStmt : '!' ambiguousIdentifier typeHint?;
+dictionaryCallStmt : EXCLAMATIONMARK ambiguousIdentifier typeHint?;
 
 
 // atomic rules for statements
 
-argList : LPAREN (WS? arg (WS? ',' WS? arg)*)? WS? RPAREN;
+argList : LPAREN (WS? arg (WS? COMMA WS? arg)*)? WS? RPAREN;
 
 arg : (OPTIONAL WS)? ((BYVAL | BYREF) WS)? (PARAMARRAY WS)? ambiguousIdentifier (WS? LPAREN WS? RPAREN)? (WS asTypeClause)? (WS? argDefaultValue)?;
 
 argDefaultValue : EQ WS? (literal | ambiguousIdentifier);
 
-subscripts : subscript (WS? ',' WS? subscript)*;
+subscripts : subscript (WS? COMMA WS? subscript)*;
 
 subscript : (valueStmt WS TO WS)? valueStmt;
 
@@ -616,19 +611,19 @@ certainIdentifier :
 
 comparisonOperator : LT | LEQ | GT | GEQ | EQ | NEQ | IS | LIKE;
 
-complexType : ambiguousIdentifier ('.' ambiguousIdentifier)*;
+complexType : ambiguousIdentifier (DOT ambiguousIdentifier)*;
 
 fieldLength : MULT WS? (INTEGERLITERAL | ambiguousIdentifier);
 
 letterrange : certainIdentifier (WS? MINUS WS? certainIdentifier)?;
 
-lineLabel : ambiguousIdentifier ':';
+lineLabel : ambiguousIdentifier COLON;
 
 literal : COLORLITERAL | DATELITERAL | DOUBLELITERAL | FILENUMBER | INTEGERLITERAL | STRINGLITERAL | TRUE | FALSE | NOTHING | NULL;
 
 type : (baseType | complexType) (WS? LPAREN WS? RPAREN)?;
 
-typeHint : '&' | '%' | '#' | '!' | '@' | '$';
+typeHint : AMPERSAND | AT | DOLLAR | EXCLAMATIONMARK | HASH | PERCENT;
 
 visibility : PRIVATE | PUBLIC | FRIEND | GLOBAL;
 
@@ -756,10 +751,10 @@ LOCK_READ : L O C K ' ' R E A D;
 LOCK_WRITE : L O C K ' ' W R I T E;
 LOCK_READ_WRITE : L O C K ' ' R E A D ' ' W R I T E;
 LSET : L S E T;
-MACRO_IF : '#' I F;
-MACRO_ELSEIF : '#' E L S E I F;
-MACRO_ELSE : '#' E L S E;
-MACRO_END_IF : '#' E N D ' ' I F;
+MACRO_IF : HASH I F;
+MACRO_ELSEIF : HASH E L S E I F;
+MACRO_ELSE : HASH E L S E;
+MACRO_END_IF : HASH E N D ' ' I F;
 ME : M E;
 MID : M I D;
 MKDIR : M K D I R;
@@ -841,10 +836,17 @@ XOR : X O R;
 // symbols
 AMPERSAND : '&';
 ASSIGN : ':=';
+AT : '@';
+COLON : ':';
+COMMA : ',';
 DIV : '\\' | '/';
+DOLLAR : '$';
+DOT : '.';
 EQ : '=';
+EXCLAMATIONMARK : '!';
 GEQ : '>=';
 GT : '>';
+HASH : '#';
 LEQ : '<=';
 LPAREN : '(';
 LT : '<';
@@ -852,21 +854,23 @@ MINUS : '-';
 MINUS_EQ : '-=';
 MULT : '*';
 NEQ : '<>';
+PERCENT : '%';
 PLUS : '+';
 PLUS_EQ : '+=';
 POW : '^';
 RPAREN : ')';
+SEMICOLON : ';';
 L_SQUARE_BRACKET : '[';
 R_SQUARE_BRACKET : ']';
 
 
 // literals
 STRINGLITERAL : '"' (~["\r\n] | '""')* '"';
-DATELITERAL : '#' (~[#\r\n])* '#';
-COLORLITERAL : '&H' [0-9A-F]+ '&'?;
-INTEGERLITERAL : (PLUS|MINUS)? ('0'..'9')+ ( ('e' | 'E') INTEGERLITERAL)* ('#' | '&')?;
-DOUBLELITERAL : (PLUS|MINUS)? ('0'..'9')* '.' ('0'..'9')+ ( ('e' | 'E') (PLUS|MINUS)? ('0'..'9')+)* ('#' | '&')?;
-FILENUMBER : '#' LETTERORDIGIT+;
+DATELITERAL : HASH (~[#\r\n])* HASH;
+COLORLITERAL : '&H' [0-9A-F]+ AMPERSAND?;
+INTEGERLITERAL : (PLUS|MINUS)? ('0'..'9')+ ( ('e' | 'E') INTEGERLITERAL)* (HASH | AMPERSAND)?;
+DOUBLELITERAL : (PLUS|MINUS)? ('0'..'9')* DOT ('0'..'9')+ ( ('e' | 'E') (PLUS|MINUS)? ('0'..'9')+)* (HASH | AMPERSAND)?;
+FILENUMBER : HASH LETTERORDIGIT+;
 
 
 // identifier
@@ -875,8 +879,8 @@ IDENTIFIER : LETTER LETTERORDIGIT*;
 
 // whitespace, line breaks, comments, ...
 LINE_CONTINUATION : ' ' '_' '\r'? '\n' -> skip;
-NEWLINE : WS? ('\r'? '\n' | ':' ' ') WS?;
-COMMENT : WS? ('\'' | ':'? REM ' ') (LINE_CONTINUATION | ~('\n' | '\r'))* -> skip;
+NEWLINE : WS? ('\r'? '\n' | COLON ' ') WS?;
+COMMENT : WS? ('\'' | COLON? REM ' ') (LINE_CONTINUATION | ~('\n' | '\r'))* -> skip;
 WS : [ \t]+;
 
 

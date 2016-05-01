@@ -153,6 +153,8 @@ package_obj_body
     | table_declaration
     | create_procedure_body
     | create_function_body 
+    | procedure_spec
+    | function_spec    
     ;
 
 // $<Procedure DDLs
@@ -580,7 +582,7 @@ exception_declaration
 pragma_declaration
     : PRAGMA (SERIALLY_REUSABLE 
     | AUTONOMOUS_TRANSACTION
-    | EXCEPTION_INIT '(' exception_name ',' numeric ')'
+    | EXCEPTION_INIT '(' exception_name ',' numeric_negative ')'
     | INLINE '(' id1=id ',' expression ')'
     | RESTRICT_REFERENCES '(' (id | DEFAULT) (',' id)+ ')') ';'
     ;
@@ -1145,7 +1147,7 @@ for_update_of_part
     ;
 
 for_update_options
-    : SKIP LOCKED
+    : SKIP_ LOCKED
     | NOWAIT
     | WAIT expression
     ;
@@ -2030,6 +2032,10 @@ numeric
     | APPROXIMATE_NUM_LIT
     ;
 
+numeric_negative
+    : MINUS_SIGN numeric
+    ;
+
 quoted_string
     : CHAR_STRING
     //| CHAR_STRING_PERL
@@ -2197,7 +2203,7 @@ regular_id
     | ERRORS
     | ESCAPE
     | EVALNAME
-    | EXCEPTION
+    //| EXCEPTION
     | EXCEPTION_INIT
     | EXCEPTIONS
     | EXCLUDE
@@ -2423,7 +2429,7 @@ regular_id
     | SIMPLE_INTEGER
     | SINGLE
     //| SIZE
-    | SKIP
+    | SKIP_
     | SMALLINT
     | SNAPSHOT
     | SOME
@@ -2828,8 +2834,8 @@ PARENT:                       P A R E N T;
 PARTITION:                    P A R T I T I O N;
 PASSING:                      P A S S I N G;
 PATH:                         P A T H;
-PERCENT_ROWTYPE:              '%' P E R C E N T '_' R O W T Y P E;
-PERCENT_TYPE:                 '%' P E R C E N T '_' T Y P E;
+PERCENT_ROWTYPE:              '%' R O W T Y P E;
+PERCENT_TYPE:                 '%' T Y P E;
 PIPELINED:                    P I P E L I N E D;
 PIVOT:                        P I V O T;
 PLAN:                         P L A N;
@@ -2900,7 +2906,7 @@ SIGNTYPE:                     S I G N T Y P E;
 SIMPLE_INTEGER:               S I M P L E '_' I N T E G E R;
 SINGLE:                       S I N G L E;
 SIZE:                         S I Z E;
-SKIP:                         S K I P;
+SKIP_:                        S K I P;
 SMALLINT:                     S M A L L I N T;
 SNAPSHOT:                     S N A P S H O T;
 SOME:                         S O M E;

@@ -1,0 +1,14 @@
+{1:F01AA}{2:BBBBB}{3:{C:}{D:E}}{4:
+:A:xx
+:B:yy:yy::y
+a::a:a
+::AA:BB
+:C:SS /-*+.'-()/=’
+AAA}+?@# {!”%AA&*;<>_
+:D:SS{}A'B’C”
+:93B::SETT//FAMT/500000,
+:16R:ADDINFO
+:70E::ADTX//PAYMENT UPON RECEIPT OF FUNDS -
+TIMELY PAYMENT EXPECTED
+:16S:ADDINFO
+-}{5:{F:G}{H:123}}{1:F21}{2:AAA}{3:{C2:}{D2:E2}}{4:{AA:}{BB:CC}}{5:{DD:EE}{FF:456}}

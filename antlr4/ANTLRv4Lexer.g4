@@ -185,7 +185,7 @@ ID	: Id
 // -------------------------
 // Whitespace
 
-WS	:	( Hws | Vws )+		-> channel(OFF_CHANNEL)	;
+WS	:	Ws+		-> channel(OFF_CHANNEL)	;
 
 
 // -------------------------
@@ -278,7 +278,7 @@ mode Options;
 	OPT_STAR			: Star				-> type(STAR)				;
 	OPT_SEMI			: Semi				-> type(SEMI)				;
 
-	OPT_WS				: ( Hws | Vws )+	-> type(WS), channel(OFF_CHANNEL) 	;
+	OPT_WS				: Ws+	-> type(WS), channel(OFF_CHANNEL) 	;
 
 
 // -------------------------
@@ -296,7 +296,7 @@ mode Tokens;
 	TOK_DOT				: Dot				-> type(DOT)				;
 	TOK_COMMA			: Comma				-> type(COMMA)				;
 
-	TOK_WS				: ( Hws | Vws )+	-> type(WS), channel(OFF_CHANNEL) 	;
+	TOK_WS				: Ws+	-> type(WS), channel(OFF_CHANNEL) 	;
 
 
 // -------------------------
@@ -314,7 +314,7 @@ mode Channels;	// currently same as Tokens mode; distinguished by keyword
 	CHN_DOT				: Dot				-> type(DOT)				;
 	CHN_COMMA			: Comma				-> type(COMMA)				;
 
-	CHN_WS				: ( Hws | Vws )+	-> type(WS), channel(OFF_CHANNEL) 	;
+	CHN_WS				: Ws+	-> type(WS), channel(OFF_CHANNEL) 	;
 
 
 // -------------------------
