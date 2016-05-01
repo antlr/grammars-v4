@@ -40,6 +40,7 @@
 		<module>iri</module>
 		<module>java</module>
 		<module>java8</module>
+		<module>javadoc</module>
 		<module>json</module>
 		<module>less</module>
 		<module>logo</module>
@@ -66,6 +67,7 @@
 		<module>r</module>
 		<module>rcs</module>
 		<module>redcode</module>
+		<module>ruby</module>
 		<module>scala</module>
 		<module>scss</module>
 		<module>sharc</module>
@@ -90,12 +92,12 @@
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>
-		<module>brainfuck</module>
+		<module>swift-fin</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.5.1-1</antlr.version>
+		<antlr.version>4.5.3</antlr.version>
 	</properties>
 	<dependencies>
 		<dependency>
