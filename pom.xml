@@ -8,7 +8,9 @@
 	<name>ANTLR4 grammars</name>
 	<modules>
 		<module>support</module>
+		<module>agc</module>
 		<module>abnf</module>
+<!--		<module>antlr3</module>-->
 		<module>antlr4</module>
 		<module>arithmetic</module>
 		<module>asm6502</module>
@@ -29,9 +31,12 @@
 		<module>csv</module>
 		<module>dcm</module>
 		<module>dot</module>
+<!--		<module>ebnf</module>-->
+		<module>ecmascript</module>
 		<module>erlang</module>
 		<module>fasta</module>
 		<module>FOL</module>
+		<module>fusion-tables</module>
 		<module>gff3</module>
 		<module>graphql</module>
 		<module>html</module>
@@ -78,6 +83,7 @@
 		<module>stringtemplate</module>
 		<module>suokif</module>
 		<module>swift</module>
+		<module>swift-fin</module>
 		<module>tinyc</module>
 		<module>tnsnames</module>
 		<module>tnt</module>
@@ -92,7 +98,6 @@
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>
-		<module>swift-fin</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
