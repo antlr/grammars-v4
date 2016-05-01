@@ -371,7 +371,7 @@ fragment StringElement    :  '\u0020'| '\u0021'|'\u0023' .. '\u007F'  // (Printa
                           |  CharEscapeSeq;
 fragment MultiLineChars   :  ('"'? '"'? .*?)* '"'*;
 
-fragment HexDigit         :  '0' .. '9'  |  'A' .. 'Z'  |  'a' .. 'z' ;
+fragment HexDigit         :  '0' .. '9'  |  'A' .. 'F'  |  'a' .. 'f' ;
 fragment FloatType        :  'F' | 'f' | 'D' | 'd';
 fragment Upper            :  'A'  ..  'Z' | '$' | '_';  // and Unicode category Lu
 fragment Lower            :  'a' .. 'z'; // and Unicode category Ll
