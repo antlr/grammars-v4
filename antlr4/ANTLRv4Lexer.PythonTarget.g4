@@ -44,6 +44,10 @@ options {
 
 import LexBasic;	// Standard set of fragments
 
+@header {
+from LexerAdaptor import LexerAdaptor
+}
+
 tokens {
 	TOKEN_REF,
 	RULE_REF,
@@ -108,7 +112,7 @@ UNTERMINATED_STRING_LITERAL
 // are contained within square brackets.
 
 BEGIN_ARGUMENT
-	:	LBrack		{ handleBeginArgument(); }
+	:	LBrack		{ self.handleBeginArgument() }
 	;
 
 
@@ -221,7 +225,7 @@ mode Argument;			// E.g., [int x, List<String> a[]]
 	ARGUMENT_STRING_LITERAL	: DQuoteLiteral	-> type(ARGUMENT_CONTENT)		;
 	ARGUMENT_CHAR_LITERAL	: SQuoteLiteral	-> type(ARGUMENT_CONTENT)		;
 
-	END_ARGUMENT			: RBrack	{ handleEndArgument(); }	;
+	END_ARGUMENT			: RBrack	{ self.handleEndArgument() }	;
 
 	// added this to return non-EOF token type here. EOF does something weird
 	UNTERMINATED_ARGUMENT 	: EOF		-> popMode		;
@@ -252,7 +256,7 @@ mode Action;
 	ACTION_BLOCK_COMMENT	: BlockComment 		-> type(ACTION_CONTENT)		;
 	ACTION_LINE_COMMENT		: LineComment 		-> type(ACTION_CONTENT)		;
 
-	END_ACTION				: RBrace	{ handleEndAction(); }	;
+	END_ACTION				: RBrace	{ self.handleEndAction() }	;
 
 	UNTERMINATED_ACTION		: EOF		-> popMode		;
 
