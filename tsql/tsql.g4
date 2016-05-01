@@ -749,11 +749,11 @@ table_hint
     ;
 
 index_column_name
-	: ID
+	: id
 	;
 
 index_value
-    : ID | DECIMAL
+    : id | DECIMAL
     ;
 
 column_alias_list
