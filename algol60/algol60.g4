@@ -88,7 +88,7 @@ for_list : for_list_element | for_list ',' for_list_element;
 for_list_element : arithmetic_expression |;
 arithmetic_expression: 'step' arithmetic_expression 'until' arithmetic_expression | arithmetic_expression 'while' boolean_expression;
 expression : arithmetic_expression | boolean_expression | designational_expression;
-arithmetic_expression : simple_arithmetic_expression | if_clause simple_arithmetic_expression 'else' arithmetic_expression;
+arithmetic_expression2 : simple_arithmetic_expression | if_clause simple_arithmetic_expression 'else' arithmetic_expression;
 simple_arithmetic_expression : term | adding_operator term | simple_arithmetic_expression adding_operator term;
 adding_operator : '+' |' –';
 term : factor | term multiplying_operator factor;
