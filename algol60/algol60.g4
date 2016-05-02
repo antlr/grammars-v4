@@ -97,7 +97,7 @@ array_list
    ;
 
 array_segment
-   : array_identifier [   b o u n d _ p a i r _ l i s t   ]
+   : array_identifier   bound_pair_list?
    | array_identifier ',' array_segment
    ;
 
@@ -141,7 +141,7 @@ procedure_declaration
    ;
 
 procedure_heading
-   : procedure_identifier formal_parameter_part ';' value_part specification_part
+   : procedure_identifier formal_parameter_part? ';' value_part? specification_part?
    ;
 
 procedure_identifier
@@ -149,8 +149,8 @@ procedure_identifier
    ;
 
 formal_parameter_part
-   : empty
-   | (formal_parameter_list)
+   : 
+   (formal_parameter_list)
    ;
 
 formal_parameter_list
@@ -164,13 +164,12 @@ formal_parameter
 
 value_part
    : 'value' identifier_list ';'
-   | empty
    ;
 
 specification_part
-   : empty
-   | specifier identifier_list ';'
-   | specification_part specifier identifier_list
+   :
+   specifier identifier_list ';'
+   | specification_part? specifier identifier_list
    ;
 
 specifier
@@ -206,7 +205,7 @@ unconditional_statement
    ;
 
 basic_statement
-   : unlabelled_basic_statement
+   : unlabelled_basic_statement?
    | label ':' basic_statement
    ;
 
@@ -218,7 +217,6 @@ label
 unlabelled_basic_statement
    : assignment_statement
    | go_to_statement
-   | dummy_statement
    | procedure_statement
    ;
 
@@ -253,20 +251,15 @@ simple_designational_expression
    ;
 
 switch_designator
-   : switch_identifier [ s u b s c r i p t _ e x p r e s s i o n ]
-   ;
-
-dummy_statement
-   : empty
+   : switch_identifier  subscript_expression?
    ;
 
 procedure_statement
-   : procedure_identifier actual_parameter_part
+   : procedure_identifier actual_parameter_part?
    ;
 
 actual_parameter_part
-   : empty
-   | (actual_parameter_list)
+   : actual_parameter_list
    ;
 
 actual_parameter_list
@@ -489,13 +482,12 @@ STRING
    ;
 
 open_string
-   : proper_string STRING
+   : proper_string? STRING
    | open_string open_string
    ;
 
 proper_string
    : STRING
-   | empty
    ;
 
 letter_string
@@ -615,10 +607,6 @@ specificator
    : 'string'
    | 'label'
    | 'value'
-   ;
-
-empty
-   :
    ;
 
 
