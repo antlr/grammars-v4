@@ -172,6 +172,7 @@ non_capture
  : '(' '?' ':' alternation ')'
  | '(' '?' '|' alternation ')'
  | '(' '?' '>' alternation ')'
+ | '(' '?' option_flags ':' alternation ')'
  ;
 
 // COMMENT
