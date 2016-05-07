@@ -613,7 +613,6 @@ in_out_expression : '&' identifier ;
 
 // GRAMMAR OF A TRY EXPRESSION
 
-try_operator : 'try' | 'try' '?' | 'try' '!' ;
 try_operator : 'try' '?' | 'try' '!' | 'try' ;
 
 // GRAMMAR OF A BINARY EXPRESSION
