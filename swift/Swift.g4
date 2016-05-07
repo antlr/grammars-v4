@@ -383,7 +383,8 @@ parameter_clauses : parameter_clause parameter_clauses? ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
 parameter_list : parameter (',' parameter)*  ;
 parameter
- : 'let'?  external_parameter_name? local_parameter_name type_annotation default_argument_clause?
+ : 'let'?  external_parameter_name? local_parameter_name type_annotation? default_argument_clause?
+ | 'var'   external_parameter_name? local_parameter_name type_annotation? default_argument_clause?
  | 'inout' external_parameter_name? local_parameter_name type_annotation
  |         external_parameter_name? local_parameter_name type_annotation range_operator
  ;
