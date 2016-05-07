@@ -29,7 +29,7 @@
  * Converted from Apple's doc, http://tinyurl.com/n8rkoue, to ANTLR's
  * meta-language.
  */
-grammar Swift; // 2.1
+grammar Swift; // 2.2
 
 top_level : statement* EOF ;
 
@@ -614,6 +614,7 @@ in_out_expression : '&' identifier ;
 // GRAMMAR OF A TRY EXPRESSION
 
 try_operator : 'try' | 'try' '?' | 'try' '!' ;
+try_operator : 'try' '?' | 'try' '!' | 'try' ;
 
 // GRAMMAR OF A BINARY EXPRESSION
 
@@ -738,6 +739,9 @@ postfix_expression
  | postfix_expression '.' Pure_decimal_digits                     # explicit_member_expression1
  | postfix_expression '.' identifier generic_argument_clause?     # explicit_member_expression2
  | postfix_expression '.' identifier '(' argument_names ')'       # explicit_member_expression3
+// This does't exist in the swift grammar, but this valid swift statement fails without it
+// self.addTarget(self, action: #selector(nameOfAction(_:)))
+ | postfix_expression '(' argument_names ')'                      # explicit_member_expression4
  | postfix_expression '.' 'self'                                  # postfix_self_expression
  | postfix_expression '.' 'dynamicType'                           # dynamic_type_expression
  | postfix_expression '[' expression_list ']'                     # subscript_expression
