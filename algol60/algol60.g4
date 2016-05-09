@@ -1,4 +1,3 @@
-
 grammar algol60;
 
 /*
@@ -611,5 +610,5 @@ specificator
 
 
 WS
-   : [ \r\n\t] + -> channel (HIDDEN)
+   : [ \r\n\t] + -> skip
    ;
