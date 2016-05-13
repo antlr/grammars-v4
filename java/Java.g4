@@ -671,7 +671,7 @@ IntegerLiteral
 
 fragment
 DecimalIntegerLiteral
-    :   DecimalNumeral IntegerTypeSuffix?
+    :   Sign? DecimalNumeral IntegerTypeSuffix?
     ;
 
 fragment
@@ -799,10 +799,10 @@ FloatingPointLiteral
 
 fragment
 DecimalFloatingPointLiteral
-    :   Digits '.' Digits? ExponentPart? FloatTypeSuffix?
-    |   '.' Digits ExponentPart? FloatTypeSuffix?
-    |   Digits ExponentPart FloatTypeSuffix?
-    |   Digits FloatTypeSuffix
+    :   Sign? Digits '.' Digits? ExponentPart? FloatTypeSuffix?
+    |   Sign? '.' Digits ExponentPart? FloatTypeSuffix?
+    |   Sign? Digits ExponentPart FloatTypeSuffix?
+    |   Sign? Digits FloatTypeSuffix
     ;
 
 fragment
