@@ -1041,15 +1041,7 @@ formatReport
    ;
 
 eol
-   :
-   /*
-	(
-	options {
-			warnWhenFollowAmbig = false;
-		}
-		:
-		EOL!
-	)+ */
+   : EOL
    ;
 
 unsignedNumber
@@ -1108,78 +1100,208 @@ constantIdentifier
    ;
 
 
+fragment A
+   : ('a' | 'A')
+   ;
+
+
+fragment B
+   : ('b' | 'B')
+   ;
+
+
+fragment C
+   : ('c' | 'C')
+   ;
+
+
+fragment D
+   : ('d' | 'D')
+   ;
+
+
+fragment E
+   : ('e' | 'E')
+   ;
+
+
+fragment F
+   : ('f' | 'F')
+   ;
+
+
+fragment G
+   : ('g' | 'G')
+   ;
+
+
+fragment H
+   : ('h' | 'H')
+   ;
+
+
+fragment I
+   : ('i' | 'I')
+   ;
+
+
+fragment J
+   : ('j' | 'J')
+   ;
+
+
+fragment K
+   : ('k' | 'K')
+   ;
+
+
+fragment L
+   : ('l' | 'L')
+   ;
+
+
+fragment M
+   : ('m' | 'M')
+   ;
+
+
+fragment N
+   : ('n' | 'N')
+   ;
+
+
+fragment O
+   : ('o' | 'O')
+   ;
+
+
+fragment P
+   : ('p' | 'P')
+   ;
+
+
+fragment Q
+   : ('q' | 'Q')
+   ;
+
+
+fragment R
+   : ('r' | 'R')
+   ;
+
+
+fragment S
+   : ('s' | 'S')
+   ;
+
+
+fragment T
+   : ('t' | 'T')
+   ;
+
+
+fragment U
+   : ('u' | 'U')
+   ;
+
+
+fragment V
+   : ('v' | 'V')
+   ;
+
+
+fragment W
+   : ('w' | 'W')
+   ;
+
+
+fragment X
+   : ('x' | 'X')
+   ;
+
+
+fragment Y
+   : ('y' | 'Y')
+   ;
+
+
+fragment Z
+   : ('z' | 'Z')
+   ;
+
+
 ABSOLUTE
-   : 'absolute'
+   :A B S O L U T E
    ;
 
 
 AFTER
-   : 'after'
+   : A F T E R
    ;
 
 
 ACCEPT
-   : 'accept'
+   : A C C E P T
    ;
 
 
-AGGREAGATE
-   : 'aggregate'
+AGGREGATE
+   : A G G R E G A T E
    ;
 
 
 ALLOCATE
-   : 'allocate'
+   : A L L O C A T E
    ;
 
 
 ALL
-   : 'all'
+   : A L L
    ;
 
 
 ALL_ROWS
-   : 'all_rows'
+   :A L L '_' R O W S 
    ;
 
 
 AND
-   : 'and'
+   :  A N D
    ;
 
 
 ANY
-   : 'any'
+   : A N Y
    ;
 
 
 AS
-   : 'as'
+   : A S
    ;
 
 
 ASC
-   : 'asc'
+   : A S C
    ;
 
 
 ASCII
-   : 'ascii'
+   : A S C I I
    ;
 
 
 AT
-   : 'at'
+   :A T
    ;
 
 
 ATTRIBUTE
-   : 'attribute'
+   : A T  T R I B U T E
    ;
 
 
 ATTRIBUTES
-   : 'attributes'
+   : A T T R I B U T E S
    ;
 
 
@@ -1270,7 +1392,7 @@ CACHE
 
 
 CALL
-   : 'call'
+   : C  A L L
    ;
 
 
@@ -2144,544 +2266,545 @@ OR
 
 
 ORD
-   : 'ord'
+   : O R D
    ;
 
 
 ORDER
-   : 'order'
+   : O R D E R
    ;
 
 //SQL
 
 OUTPUT
-   : 'output'
+   : O U T P U T
    ;
 
 
 OUTER
-   : 'outer'
+   : O U T E R
    ;
 
 //SQL
 
 OTHERWISE
-   : 'otherwise'
+   : O  T  H E R W I  S E
    ;
 
 
 PAGE
-   : 'page'
+   : P A G E
    ;
 
 
 PAGENO
-   : 'pageno'
+   : P A G E N O
    ;
 
 
 PAUSE
-   : 'pause'
+   : P A U S E
    ;
 
 
 PERCENT
-   : 'percent'
+   : P E R C E N  T
    ;
 
 
 PIPE
-   : 'pipe'
+   : P I P E
    ;
 
 
 PRECISION
-   : 'precision'
+   : P R E C I S I O N
    ;
 
 
 PREPARE
-   : 'prepare'
+   : P R E P A R E
    ;
 
 
 PREVIOUS
-   : 'previous'
+   : P R E V I O U S
    ;
 
 
 PRINT
-   : 'print'
+   : P  R I N T
    ;
 
 
 PRINTER
-   : 'printer'
+   : P R I N T E R
    ;
 
 
 PROGRAM
-   : 'program'
+   : P R O G R A M
    ;
 
 
 PROMPT
-   : 'prompt'
+   : P R O M P T
    ;
 
 
 PUT
-   : 'put'
+   : P U T
    ;
 
 
 QUIT
-   : 'quit'
+   : Q U I T
    ;
 
 
 QUIT_FLAG
-   : 'quit_flag'
+   : Q U I T '_' F L A G
    ;
 
 
 RECORD
-   : 'record'
+   : R E C O R D
    ;
 
 
 REAL
-   : 'real'
+   : R E A L
    ;
 
 
 READ
-   : 'read'
+   : R E A D
    ;
 
 
 RED
-   : 'red'
+   : R E D
    ;
 
 
 RELATIVE
-   : 'relative'
+   : R E L A T I V E
    ;
 
 
 REMOVE
-   : 'remove'
+   : R E M O V E
    ;
 
 
 REOPTIMIZATION
-   : 'reoptimization'
+   : R E O P T I M I Z A T I O N
    ;
 
 
 REPEATABLE
-   : 'repeatable'
+   : R E P E A T A B L E
    ;
 
 
 REPEAT
-   : 'repeat'
+   : R E P E A T
    ;
 
 
 REPORT
-   : 'report'
+   : R E P O R T
    ;
 
 
 RESIZE
-   : 'resize'
+   : R E S I Z E
    ;
 
 
 RETURN
-   : 'return'
+   : R E T U R N
    ;
 
 
 RETURNING
-   : 'returning'
+   : R E T U R N I N G
    ;
 
 
 REVERSE
-   : 'reverse'
+   : R E V E R S E
    ;
 
 
 RIGHT
-   : 'right'
+   : R I G H T
    ;
 
 
 ROLLBACK
-   : 'rollback'
+   : R O L L B A C K
    ;
 
 
 ROW
-   : 'row'
+   : R O W
    ;
 
 
 ROWS
-   : 'rows'
+   : R O W S
    ;
 
 
 RUN
-   : 'run'
+   : R U N
    ;
 
 
 SCREEN
-   : 'screen'
+   : S C R E E N
    ;
 
 
 SCROLL
-   : 'scroll'
+   : S C R  O L L
    ;
 
 
 SECOND
-   : 'second'
+   : S E C O N D
    ;
 
 
 SKIP2
-   : 'skip'
+   : S K I P
    ;
 
 
 SELECT
-   : 'select'
+   : S E L E C T
    ;
 
 
 SET
-   : 'set'
+   : S E T
    ;
 
 
 SHARE
-   : 'share'
+   : S H A R E
    ;
 
 
 SHOW
-   : 'show'
+   : S H O W
    ;
 
 
 SIZE
-   : 'size'
+   : S I Z E
    ;
 
 
 SLEEP
-   : 'sleep'
+   : S L E E P
    ;
 
 
 SMALLFLOAT
-   : 'smalfloat'
+   : S M A L L F L O  A T 
    ;
 
 
 SMALLINT
-   : 'smallint'
+   : S M A L L I N T
    ;
 
 
 SPACE
-   : 'space'
+   : S P A C E
    ;
 
 
 SPACES
-   : 'spaces'
+   : S P A C E S
    ;
 
 
 SQL
-   : 'sql'
+   : S Q L
    ;
 
 
 SQLERROR
-   : 'sqlerror'
+   : S Q L E R R O R
    ;
 
 
 SQLWARNING
-   : 'sqlwarning'
+   : S Q L W A R N I N G
    ;
 
 
 START
-   : 'start'
+   : S T A R T
    ;
 
 
 STABILITY
-   : 'stability'
+   : S T A B I L I T Y
    ;
 
 
 STATISTICS
-   : 'statitics'
+   : S T A T I S T I C S
    ;
 
 
 STATUS
-   : 'status'
+   : S T A T U S
    ;
 
 
 STOP
-   : 'stop'
+   : S T O P
    ;
 
 
 SUM
-   : 'sum'
+   : S U M
    ;
 
 
 TABLE
-   : 'table'
+   : T A B L E
    ;
 
 
 TABLES
-   : 'tables'
+   : T A  B L E S
    ;
 
 
 TERMINATE
-   : 'terminate'
+   : T E R M I N A T E
    ;
 
 
 TEMP
-   : 'temp'
+   : T E M P
    ;
 
 
 TEXT
-   : 'text'
+   : T E X T
    ;
 
 
 THEN
-   : 'then'
+   : T H E N
    ;
 
 
 THROUGH
-   : 'through'
+   : T H R O U G H
    ;
 
 
 THRU
-   : 'thru'
+   : T H R U
    ;
 
 
 TIME
-   : 'time'
+   : T I M E
    ;
 
 
 TO
-   : 'to'
+   : T O
    ;
 
 
 TODAY
-   : 'today'
+   : T O D A Y
    ;
 
 
 TOP
-   : 'top'
+   : T O P
    ;
 
 
 TRAILER
-   : 'trailer'
+   :T  R A I L E R
    ;
 
 
 TRUE
-   : 'true'
+   :T  R U E
    ;
 
 
 TYPE
-   : 'type'
+   :T Y P E
    ;
 
 
 UNCONSTRAINED
-   : 'unconstrained'
+   : U N C O N S T R A I N E D
    ;
 
 
 UNDERLINE
-   : 'underline'
+   : U N D E R L I  N E
    ;
 
 
 UNION
-   : 'union'
+   : U N I O N
    ;
 
 
 UNIQUE
-   : 'unique'
+   : U N I Q U E
    ;
 
 
 UNITS
-   : 'units'
+   : U N I T S
    ;
 
 
 UNLOAD
-   : 'unload'
+   : U N L O A D
    ;
 
 
 UP
-   : 'up'
+   : U P
    ;
 
 
 UPDATE
-   : 'update'
+   : U P D A T E
    ;
 
 //SQL
 
 USER
-   : 'user'
+   : U S E R
    ;
 
 
 USING
-   : 'using'
+   : U S I N G
    ;
 
 
 VALIDATE
-   : 'validate'
+   : V A L I D A T E
    ;
 
 
 VALUES
-   : 'values'
+   : V A L U E S
    ;
 
 //SQL
 
 VARCHAR
-   : 'varchar'
+   : V A R C H A R
    ;
 
 //SQL
 
 WEEKDAY
-   : 'weekday'
+   : W E E K D A Y
    ;
 
 
 VIEW
-   : 'view'
+   : V I E W
    ;
 
 //SQL
 
 WAIT
-   : 'wait'
+   : W A I T
    ;
 
 
 WAITING
-   : 'waiting'
+   : W A I T I N G
    ;
 
 
 WARNING
-   : 'warning'
+   : W A R N I N G
    ;
 
 
 WHEN
-   : 'when'
+   : W H E N
    ;
 
 
 WHENEVER
-   : 'whenever'
+   : W H E N E V E R
    ;
 
 
 WHERE
-   : 'where'
+   : W H E R E
    ;
 
 //SQL
 
 WHILE
-   : 'while'
+   : W H I L E
    ;
 
 
 WHITE
-   : 'white'
+   : W H I T E
+
    ;
 
 
 WITH
-   : 'with'
+   : W I T H
    ;
 
 
 WITHOUT
-   : 'without'
+   : W I T H O U T
    ;
 
 
 WINDOW
-   : 'window'
+   : W I N D O W
    ;
 
 
 WORDWRAP
-   : 'wordwrap'
+   : W O R D W R A P
    ;
 
 
 WORK
-   : 'work'
+   : W O R K
    ;
 
 
 YEAR
-   : 'year'
+   : Y E A R
    ;
 
 
 YELLOW
-   : 'yellow'
+   : Y E L L O W
    ;
 
 //----------------------------------------------------------------------------
@@ -2776,27 +2899,6 @@ DOUBLEVERTBAR
    : '||'
    ;
 
-// Whitespace -- ignored
-
-WS
-   : (' ' | '\t' | '\f') +
-   ;
-
-
-EOL
-   : ('\r\n' | '\r' | '\n')
-   ;
-
-// Single-line comments
-
-SL_COMMENT
-   : '#' (~ ('\n' | '\r'))* ('\n' | '\r' ('\n')?)
-   ;
-
-
-SL_COMMENT_2
-   : '--' (~ ('\n' | '\r'))* ('\n' | '\r' ('\n')?)
-   ;
 
 //COMMENT_1
 //      :  '{'
@@ -2885,3 +2987,22 @@ ESC
 HEX_DIGIT
    : ('0' .. '9' | 'a' .. 'f')
    ;
+
+
+// Single-line comments
+SL_COMMENT
+   : '#' ~[\r\n]* ->skip
+   ;
+
+
+SL_COMMENT_2
+   : '--' ~[\r\n]* ->skip
+   ;
+
+EOL
+    : [\r\n]+
+    ;
+
+WS
+    : [ \t]+ ->skip
+    ;
