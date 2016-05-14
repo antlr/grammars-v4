@@ -27,15 +27,17 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar snobol;
 
 prog
-   : line +
+   : lin +
    ;
 
+lin
+    : line? EOL;
+
 line
-   : (end EOL)
-   | EOL
-   | ((label? subject pattern? EQ expression+ (COLON transfer)?) EOL)
-   | (COLON transfer EOL)
-   | COMMENT EOL
+   : (label? subject pattern? EQ expression+ (COLON transfer)?)
+   | (COLON transfer)
+   | COMMENT 
+   | END
    ;
 
 label
@@ -295,11 +297,6 @@ INTEGER
 REAL
    : ('+' | '-')? ('0' .. '9') + ('.' ('0' .. '9') +)? (('e' | 'E') REAL)*
    ;
-
-end
-   : END
-   ;
-
 
 END
    : 'END'
