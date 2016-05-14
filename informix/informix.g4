@@ -2049,8 +2049,8 @@ CHAR_LITERAL
 
 // string literals
 STRING_LITERAL
-	:	('"') (ESC|~('"'|'\\'))* ('"')
-	|	('\'') (ESC|~('\\'|'\''))* ('\'')
+	:	('"') (/*ESC*|*/~('"'|'\\'))* ('"')
+	|	('\'') (/*ESC|~*/('\\'|'\''))* ('\'')
 	;
 
 
@@ -2088,6 +2088,7 @@ EXPONENT
 // right thing by matching immediately; hence, it's ok to shut off
 // the FOLLOW ambig warnings.
 
+/*
 ESC
 	:	'\\'
 		(	'n'
@@ -2101,27 +2102,21 @@ ESC
 		|	('u')+ HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
 		|	'0'..'3'
 			(
-				options {
-					warnWhenFollowAmbig = false;
-				}
+				
 			:	'0'..'7'
 				(
-					options {
-						warnWhenFollowAmbig = false;
-					}
+					
 				:	'0'..'7'
 				)?
 			)?
 		|	'4'..'7'
 			(
-				options {
-					warnWhenFollowAmbig = false;
-				}
+				
 			:	'0'..'7'
 			)?
 		)
 	;
-
+*/
 // hexadecimal digit (again, note it's protected!)
 
 HEX_DIGIT
