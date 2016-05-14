@@ -1986,7 +1986,7 @@ WS	:	(	' '
 		|	'\t'
 		|	'\f'
 		)+
-		{ _ttype = Token.SKIP; }
+		
 	;
 
 EOL
@@ -2063,7 +2063,7 @@ NUM_INT
 		 ('0'..'9') ('0'..'9')* 		// non-zero decimal
 		)
 		// only check to see if it's a float if looks like decimal so far
-		(	{ LA(2)!='.' && LA(3)!='.' && isDecimal}?
+		(	
 			(	'.' ('0'..'9')* 
 			)
 			
