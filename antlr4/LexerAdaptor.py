@@ -36,12 +36,12 @@ class LexerAdaptor(Lexer):
 
     def handleEndArgument(self):
         self.popMode()
-        if self._modeStack.size() > 0:
+        if len(self._modeStack) > 0:
             self.setType(self.ARGUMENT_CONTENT)
 
     def handleEndAction(self):
         self.popMode()
-        if self._modeStack.size() > 0:
+        if len(self._modeStack) > 0:
             self.setType(self.ACTION_CONTENT)
 
     def emit(self):
