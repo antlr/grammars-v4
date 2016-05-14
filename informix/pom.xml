@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>informix</artifactId>
 	<packaging>jar</packaging>
-	<name>ANTLR Informix grammar</name>
+	<name>informix grammar</name>
 	<parent>
-		<groupId>com.antlr.grammarsv3</groupId>
-		<artifactId>grammarsv3</artifactId>
+		<groupId>com.antlr.grammarsv4</groupId>
+		<artifactId>grammarsv4</artifactId>
 		<version>1.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
@@ -14,31 +14,30 @@
 		<plugins>
 			<plugin>
 				<groupId>org.antlr</groupId>
-				<artifactId>antlr3-maven-plugin</artifactId>
+				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>fgl.g</grammars>
+					<grammars>informix.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
 				<executions>
 					<execution>
 						<goals>
-							<goal>antlr</goal>
+							<goal>antlr4</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
-			<!--
 			<plugin>
 				<groupId>org.antlr</groupId>
-				<artifactId>antlr3test-maven-plugin</artifactId>
+				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>file</entryPoint>
-					<grammarName>csv</grammarName>
+					<entryPoint>compilation_unit</entryPoint>
+					<grammarName>informix</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
@@ -50,7 +49,6 @@
 					</execution>
 				</executions>
 			</plugin>
-		-->
 		</plugins>
 	</build>
 </project>

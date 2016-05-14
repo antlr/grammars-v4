@@ -640,7 +640,7 @@ reportStatement
    | PAUSE (string)?
    | NEED expression LINES
    | PRINT ((printExpressionList)? (SEMI)? | FILE string)?
-   | SKIP (expression (LINE | LINES) | TO TOP OF PAGE)
+   | SKIP2 (expression (LINE | LINES) | TO TOP OF PAGE)
    | OUTPUT TO REPORT constantIdentifier LPAREN (expression (COMMA expression)*)? RPAREN
    ;
 
@@ -2355,7 +2355,7 @@ SECOND
    ;
 
 
-SKIP
+SKIP2
    : 'skip'
    ;
 
@@ -2884,11 +2884,4 @@ ESC
 
 HEX_DIGIT
    : ('0' .. '9' | 'a' .. 'f')
-   ;
-
-// a dummy rule to force vocabulary to be all characters (except special
-//   ones that ANTLR uses internally (0 to 2)
-
-VOCAB
-   : '\1' .. '\377'
    ;
