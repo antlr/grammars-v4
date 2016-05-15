@@ -2,19 +2,19 @@
 grammar informix;
 
 compilation_unit
-   : (databaseDeclaration)? (globalDeclaration)? typeDeclarations (mainBlock)? functionOrReportDefinitions EOF
+   : databaseDeclaration? globalDeclaration? typeDeclarations? mainBlock functionOrReportDefinitions EOF
    ;
 
 identifier
    : IDENT
    ;
 
-mainStatements
-   : (deferStatement | codeBlock)*
+mainBlock
+   : eol? MAIN eol typeDeclarations? mainStatements END MAIN eol
    ;
 
-mainBlock
-   : MAIN eol typeDeclarations mainStatements END MAIN eol
+mainStatements
+   : (deferStatement | codeBlock | eol)*
    ;
 
 deferStatement
@@ -47,7 +47,7 @@ globalDeclaration
    ;
 
 typeDeclarations
-   : (typeDeclaration)*
+   : typeDeclaration +
    ;
 
 typeDeclaration
@@ -192,7 +192,7 @@ statement
    ;
 
 codeBlock
-   : (: statement | databaseDeclaration) +
+   : (statement | databaseDeclaration) +
    ;
 
 label
