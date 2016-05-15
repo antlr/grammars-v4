@@ -1,3 +1,9 @@
+/*
+* Originally written by Gregorio Momm Mon Jan 5, 2004 18:17
+*
+* Ported to Antlr4 by Tom Everett
+*
+*/
 
 grammar informix;
 
