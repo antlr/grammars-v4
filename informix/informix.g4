@@ -1306,88 +1306,88 @@ ATTRIBUTES
 
 
 AVERAGE
-   : 'average'
+   : A V E R A G E
    ;
 
 
 AVG
-   : 'avg'
+   : A V G
    ;
 
 
 ARRAY
-   : 'array'
+   : A R R A Y
    ;
 
 
 BEFORE
-   : 'before'
+   : B  E F O R E
    ;
 
 
 BEGIN
-   : 'begin'
+   : B E G I N
    ;
 
 //TRANSACTION CONTROL
 
 BETWEEN
-   : 'between'
+   : B E T W E E N
    ;
 
 
 BIGINT
-   : 'bigint'
+   : B I G I N T
    ;
 
 
 BLACK
-   : 'black'
+   : B  L A C K 
    ;
 
 
 BLINK
-   : 'blink'
+   : B L  I N K 
    ;
 
 
 BLUE
-   : 'blue'
+   : B L U E
    ;
 
 
 BOLD
-   : 'bold'
+   : B O L D
    ;
 
 
 BORDER
-   : 'border'
+   : B O R D E R
    ;
 
 
 BOTTOM
-   : 'bottom'
+   : B O T T O M
    ;
 
 
 BUFFERED
-   : 'buffered'
+   : B U F F E R E D
    ;
 
 
 BY
-   : 'by'
+   : B Y
    ;
 
 
 BYTE
-   : 'byte'
+   : B Y T E
    ;
 
 
 CACHE
-   : 'cache'
+   : C A C H E
    ;
 
 
@@ -1397,871 +1397,871 @@ CALL
 
 
 CASE
-   : 'case'
+   : C  A S E 
    ;
 
 
 CHAR
-   : 'char'
+   : C H A R
    ;
 
 
 CHARARACTER
-   : 'character'
+   :  C H A R A R A C T E R
    ;
 
 
 CHAR_LENGTH
-   : 'char_length'
+   : C H A R '_' L E N G T H
    ;
 
 
 CHECK
-   : 'check'
+   : C H E  C K
    ;
 
 
 CLEAR
-   : 'clear'
+   : C L E A R
    ;
 
 
 CLIPPED
-   : 'clipped'
+   : C L I P P E D
    ;
 
 
 CLOSE
-   : 'close'
+   : C L O S E
    ;
 
 
 CLUSTER
-   : 'cluster'
+   : C L U S T E R
    ;
 
 
 COLUMN
-   : 'column'
+   : C O L U M N
    ;
 
 
 COLUMNS
-   : 'columns'
+   : C O L U M N S
    ;
 
 
 COMMAND
-   : 'command'
+   : C O M M A N D
    ;
 
 
 COMMENT
-   : 'comment'
+   : C O M M E N T
    ;
 
 
 COMMIT
-   : 'commit'
+   : C O M M I T
    ;
 
 
 COMMITED
-   : 'commited'
+   : C O M M I T E D
    ;
 
 
 CONSTANT
-   : 'constant'
+   : C O N S T A N T
    ;
 
 
 CONSTRAINED
-   : 'constrained'
+   : C O N S T R A I N E D
    ;
 
 
 CONSTRAINT
-   : 'constraint'
+   : C O N S T R A I N T
    ;
 
 
 CONSTRUCT
-   : 'construct'
+   : C O N S T R U C T
    ;
 
 
 CONTINUE
-   : 'continue'
+   : C O N T I N U E
    ;
 
 
 COUNT
-   : 'count'
+   : C O U N T
    ;
 
 
 COPY
-   : 'copy'
+   : C O P Y
    ;
 
 
 CRCOLS
-   : 'crcols'
+   : C R C O L S 
    ;
 
 
 CREATE
-   : 'create'
+   : C R E A T E
    ;
 
 
 CURRENT
-   : 'current'
+   : C U R R E N T
    ;
 
 
 CURSOR
-   : 'cursor'
+   : C U R S O R
    ;
 
 
 CYAN
-   : 'cyan'
+   : C Y A N
    ;
 
 
 DATABASE
-   : 'database'
+   : D A T A B A S E
    ;
 
 
 DATE
-   : 'date'
+   : D A T E
    ;
 
 
 DATETIME
-   : 'datetime'
+   : D A  T E T I M E
    ;
 
 
 DAY
-   : 'day'
+   : D A Y
    ;
 
 
 DEALLOCATE
-   : 'deallocate'
+   : D E A L L O C A T E
    ;
 
 
 DEC
-   : 'dec'
+   : D E C
    ;
 
 
 DECIMAL
-   : 'decimal'
+   : D E C I M A L
    ;
 
 
 DECODE
-   : 'decode'
+   : D E C O D E
    ;
 
 
 DECLARE
-   : 'declare'
+   : D E C L A R E
    ;
 
 
 DEFAULT
-   : 'default'
+   :D E F A U L T
    ;
 
 
 DEFAULTS
-   : 'defaults'
+   : D E F A U L T S
    ;
 
 
 DEFER
-   : 'defer'
+   : D E F E R
    ;
 
 
 DEFINE
-   : 'define'
+   : D E F I N E
    ;
 
 
 DELETE
-   : 'delete'
+   : D E L E T E
    ;
 
 //SQL
 
 DELIMITER
-   : 'delimiter'
+   : D E L I M I T E R
    ;
 
 //SQL
 
 DESC
-   : 'desc'
+   : D E S C
    ;
 
 
 DIM
-   : 'dim'
+   : D I M
    ;
 
 
 DIMENSIONS
-   : 'dimensions'
+   :  D I M E N S I O N S
    ;
 
 
 DIRTY
-   : 'dirty'
+   : D I R T Y
    ;
 
 
 DISPLAY
-   : 'display'
+   : D I S P L A Y
    ;
 
 
 DISTINCT
-   : 'distinct'
+   : D I S T I N C  T
    ;
 
 
 DO
-   : 'do'
+   : D O
    ;
 
 
 DOUBLE
-   : 'double'
+   : D O U B L E
    ;
 
 
 DOWN
-   : 'down'
+   : D O W N
    ;
 
 
 DROP
-   : 'drop'
+   : D R O P
    ;
 
 
 DYNAMIC
-   : 'dymanic'
+   : D Y N A M I C
    ;
 
 
 ELSE
-   : 'else'
+   : E L S E
    ;
 
 
 END
-   : 'end'
+   :  E N D
    ;
 
 
 ERROR
-   : 'error'
+   : E R R O R
    ;
 
 
 ESCAPE
-   : 'escape'
+   : E S C A P E
    ;
 
 
 EVERY
-   : 'every'
+   : E V E R Y
    ;
 
 
 EXCLUSIVE
-   : 'exclusive'
+   : E X C L U S I V E
    ;
 
 
 EXEC
-   : 'exec'
+   : E X E C
    ;
 
 
 EXECUTE
-   : 'execute'
+   : E X E C U T E 
    ;
 
 
 EXIT
-   : 'exit'
+   : E X I T
    ;
 
 
 EXISTS
-   : 'exists'
+   : E X I S T S
    ;
 
 
 EXPLAIN
-   : 'explain'
+   : E X P L A I N
    ;
 
 
 EXTEND
-   : 'extend'
+   : E X T E N D
    ;
 
 
 EXTENT
-   : 'extent'
+   : E X T E N T
    ;
 
 
 EXTERNAL
-   : 'external'
+   : E X T E R N A L
    ;
 
 
 FALSE
-   : 'false'
+   : F A L S E
    ;
 
 
 FETCH
-   : 'fetch'
+   : F E T C H
    ;
 
 
 FIELD
-   : 'field'
+   : F I E L D
    ;
 
 
 FIELD_TOUCHED
-   : 'field_touched'
+   : F I E L D '_' T O U C H E D
    ;
 
 
 FILE
-   : 'file'
+   :F I L E
    ;
 
 
 FINISH
-   : 'finish'
+   : F I N I S H
    ;
 
 
 FIRST
-   : 'first'
+   : F I R S T
    ;
 
 
 FIRST_ROWS
-   : 'first_rows'
+   : F I R S T '_' R O W S 
    ;
 
 
 FLOAT
-   : 'float'
+   : F L O A T
    ;
 
 
 FLUSH
-   : 'flush'
+   : F L U S H
    ;
 
 
 FOR
-   : 'for'
+   : F O R
    ;
 
 
 FORM
-   : 'form'
+   : F O R M
    ;
 
 
 FORMAT
-   : 'format'
+   : F O R M A T
    ;
 
 
 FORMONLY
-   : 'formonly'
+   : F O R M O N L  Y
    ;
 
 
 FOREACH
-   : 'foreach'
+   : F O R E A C H
    ;
 
 
 FOUND
-   : 'found'
+   : F O U N D
    ;
 
 
 FRACTION
-   : 'fraction'
+   : F R A C  T I  O N
    ;
 
 
 FREE
-   : 'free'
+   : F R E E
    ;
 
 
 FROM
-   : 'from'
+   : F R O M
    ;
 
 //SQL & PREPARE
 
 FUNCTION
-   : 'function'
+   : F U N C T I O N
    ;
 
 
 GET_FLDBUF
-   : 'getfldbuf'
+   : G E T F L D B U F
    ;
 
 
 GLOBALS
-   : 'globals'
+   : G L O B  A L  S
    ;
 
 
 GO
-   : 'go'
+   : G O
    ;
 
 
 GOTO
-   : 'goto'
+   : G O T O
    ;
 
 
 GREEN
-   : 'green'
+   : G R E E N
    ;
 
 
 GROUP
-   : 'group'
+   : G R O U P
    ;
 
 //SQL
 
 HAVING
-   : 'having'
+   : H A V I N G
    ;
 
 //SQL
 
 HEADER
-   : 'header'
+   : H E A D E R
    ;
 
 
 HELP
-   : 'help'
+   : H E L P
    ;
 
 
 HIDE
-   : 'hide'
+   : H I D E
    ;
 
 
 HOLD
-   : 'hold'
+   : H O L D
    ;
 
 //CURSOR
 
 HOUR
-   : 'hour'
+   : H O U R
    ;
 
 //CURSOR
 
 IF
-   : 'if'
+   : I F
    ;
 
 
 IN
-   : 'in'
+   : I N
    ;
 
 //SQL
 
 INNER
-   : 'inner'
+   : I N N E R
    ;
 
 //SQL
 
 INDEX
-   : 'index'
+   : I N D E X
    ;
 
 //SQL
 
 INDICATOR
-   : 'indicator'
+   : I N D I C A T O R
    ;
 
 //SQL
 
 INFIELD
-   : 'infield'
+   : I N F I E L D
    ;
 
 
 INITIALIZE
-   : 'initialize'
+   : I N I T I A L I Z E 
    ;
 
 
 INPUT
-   : 'input'
+   : I N P U T
    ;
 
 
 INSERT
-   : 'insert'
+   : I N S E R T
    ;
 
 //SQL
 
 INSTRUCTIONS
-   : 'instructions'
+   : I N S T R U C T I O N  S
    ;
 
 
 INTO
-   : 'into'
+   : I N T O
    ;
 
 //SQL & CURSOR 
 
 INT
-   : 'int'
+   : I N T
    ;
 
 
 INT_FLAG
-   : 'int_flag'
+   : I N T '_' F L A G
    ;
 
 
 INTEGER
-   : 'integer'
+   : I N T E G E R
    ;
 
 
 INTERRUPT
-   : 'interrupt'
+   : I N T E R R U P T
    ;
 
 
 INTERVAL
-   : 'interval'
+   : I N T E R V A L
    ;
 
 
 INVISIBLE
-   : 'invisible'
+   : I N V I S I B L E
    ;
 
 
 IS
-   : 'is'
+   : I S
    ;
 
 
 ISNULL
-   : 'isnull'
+   : I S N U L L
    ;
 
 
 ISOLATION
-   : 'isolation'
+   : I S O L A T I O N
    ;
 
 
 JOIN
-   : 'join'
+   : J O I N
    ;
 
 
 KEY
-   : 'key'
+   : K E Y
    ;
 
 
 LABEL
-   : 'label'
+   : L A B E L
    ;
 
 
 LAST
-   : 'last'
+   : L A S T
    ;
 
 
 LEFT
-   : 'left'
+   : L E F T
    ;
 
 
 LENGTH
-   : 'length'
+   : L E N G T H
    ;
 
 
 LET
-   : 'let'
+   : L E T
    ;
 
 
 LIKE
-   : 'like'
+   : L I K E
    ;
 
 
 LINE
-   : 'line'
+   :L I N E
    ;
 
 
 LINENO
-   : 'lineno'
+   : L I N E N O
    ;
 
 
 LINES
-   : 'lines'
+   : L I N E S
    ;
 
 
 LOAD
-   : 'load'
+   : L O A D
    ;
 
 
 LOCATE
-   : 'locate'
+   : L O C A T E
    ;
 
 
 LOCK
-   : 'lock'
+   : L O C K
    ;
 
 
 LOG
-   : 'log'
+   : L O G
    ;
 
 
 LONG
-   : 'long'
+   : L O N G
    ;
 
 
 MAGENTA
-   : 'magenta'
+   : M A G E N T A
    ;
 
 
 MATCHES
-   : 'matches'
+   : M A T C H E S 
    ;
 
 
 MENU
-   : 'menu'
+   : M E N U
    ;
 
 
 MESSAGE
-   : 'message'
+   : M E S S A G  E
    ;
 
 
 MAIN
-   : 'main'
+   : M A I N
    ;
 
 
 MARGIN
-   : 'margin'
+   : M A R G I N
    ;
 
 
 MAX
-   : 'max'
+   : M A X
    ;
 
 
 MDY
-   : 'mdy'
+   : M D Y
    ;
 
 
 MIN
-   : 'min'
+   : M I N
    ;
 
 
 MINUTE
-   : 'minute'
+   : M I N U T E
    ;
 
 
 MOD
-   : 'mod'
+   : M O D
    ;
 
 
 MODE
-   : 'mode'
+   : M O D E
    ;
 
 
 MODULE
-   : 'module'
+   : M O D U L E
    ;
 
 
 MONTH
-   : 'month'
+   : M O N T H
    ;
 
 
 MONEY
-   : 'money'
+   : M O N E Y
    ;
 
 
 NCHAR
-   : 'nchar'
+   : N C H A R
    ;
 
 
 NAME
-   : 'name'
+   : N A M E
    ;
 
 
 NEED
-   : 'need'
+   : N E E D
    ;
 
 
 NEXT
-   : 'next'
+   : N E X T
    ;
 
 
 NEW
-   : 'new'
+   : N E W
    ;
 
 
 NORMAL
-   : 'normal'
+   : N  O R M A L
    ;
 
 
 NO
-   : 'no'
+   : N O
    ;
 
 
 NOT
-   : 'not'
+   : N O T
    ;
 
 
 NOTFOUND
-   : 'notfound'
+   : N O T F O U N D
    ;
 
 
 NOW
-   : 'now'
+   : N O W
    ;
 
 
 NUMERIC
-   : 'numeric'
+   : N U M E R I C
    ;
 
 
 NULL
-   : 'null'
+   : N U L L
    ;
 
 
 NVARCHAR
-   : 'nvarchar'
+   : N V A R C H A R
    ;
 
 //SQL
 
 NVL
-   : 'nvl'
+   : N V L
    ;
 
 
 OF
-   : 'of'
+   : O F
    ;
 
 
 OFF
-   : 'off'
+   : O F F
    ;
 
 
 ON
-   : 'on'
+   : O N
    ;
 
 
 OPEN
-   : 'open'
+   : O P E N
    ;
 
 
 OPTION
-   : 'option'
+   : O P T I O N
    ;
 
 
 OPTIONS
-   : 'options'
+   : O P T I O N S
    ;
 
 
 OR
-   : 'or'
+   : O R
    ;
 
 
