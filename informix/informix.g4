@@ -1231,7 +1231,7 @@ fragment Z
 
 
 ABSOLUTE
-   :A B S O L U T E
+   : A B S O L U T E
    ;
 
 
@@ -1261,12 +1261,12 @@ ALL
 
 
 ALL_ROWS
-   :A L L '_' R O W S 
+   : A L L '_' R O W S
    ;
 
 
 AND
-   :  A N D
+   : A N D
    ;
 
 
@@ -1291,12 +1291,12 @@ ASCII
 
 
 AT
-   :A T
+   : A T
    ;
 
 
 ATTRIBUTE
-   : A T  T R I B U T E
+   : A T T R I B U T E
    ;
 
 
@@ -1321,7 +1321,7 @@ ARRAY
 
 
 BEFORE
-   : B  E F O R E
+   : B E F O R E
    ;
 
 
@@ -1342,12 +1342,12 @@ BIGINT
 
 
 BLACK
-   : B  L A C K 
+   : B L A C K
    ;
 
 
 BLINK
-   : B L  I N K 
+   : B L I N K
    ;
 
 
@@ -1392,12 +1392,12 @@ CACHE
 
 
 CALL
-   : C  A L L
+   : C A L L
    ;
 
 
 CASE
-   : C  A S E 
+   : C A S E
    ;
 
 
@@ -1407,7 +1407,7 @@ CHAR
 
 
 CHARARACTER
-   :  C H A R A R A C T E R
+   : C H A R A R A C T E R
    ;
 
 
@@ -1417,7 +1417,7 @@ CHAR_LENGTH
 
 
 CHECK
-   : C H E  C K
+   : C H E C K
    ;
 
 
@@ -1507,7 +1507,7 @@ COPY
 
 
 CRCOLS
-   : C R C O L S 
+   : C R C O L S
    ;
 
 
@@ -1542,7 +1542,7 @@ DATE
 
 
 DATETIME
-   : D A  T E T I M E
+   : D A T E T I M E
    ;
 
 
@@ -1577,7 +1577,7 @@ DECLARE
 
 
 DEFAULT
-   :D E F A U L T
+   : D E F A U L T
    ;
 
 
@@ -1619,7 +1619,7 @@ DIM
 
 
 DIMENSIONS
-   :  D I M E N S I O N S
+   : D I M E N S I O N S
    ;
 
 
@@ -1634,7 +1634,7 @@ DISPLAY
 
 
 DISTINCT
-   : D I S T I N C  T
+   : D I S T I N C T
    ;
 
 
@@ -1669,7 +1669,7 @@ ELSE
 
 
 END
-   :  E N D
+   : E N D
    ;
 
 
@@ -1699,7 +1699,7 @@ EXEC
 
 
 EXECUTE
-   : E X E C U T E 
+   : E X E C U T E
    ;
 
 
@@ -1754,7 +1754,7 @@ FIELD_TOUCHED
 
 
 FILE
-   :F I L E
+   : F I L E
    ;
 
 
@@ -1769,7 +1769,7 @@ FIRST
 
 
 FIRST_ROWS
-   : F I R S T '_' R O W S 
+   : F I R S T '_' R O W S
    ;
 
 
@@ -1799,7 +1799,7 @@ FORMAT
 
 
 FORMONLY
-   : F O R M O N L  Y
+   : F O R M O N L Y
    ;
 
 
@@ -1814,7 +1814,7 @@ FOUND
 
 
 FRACTION
-   : F R A C  T I  O N
+   : F R A C T I O N
    ;
 
 
@@ -1840,7 +1840,7 @@ GET_FLDBUF
 
 
 GLOBALS
-   : G L O B  A L  S
+   : G L O B A L S
    ;
 
 
@@ -1933,7 +1933,7 @@ INFIELD
 
 
 INITIALIZE
-   : I N I T I A L I Z E 
+   : I N I T I A L I Z E
    ;
 
 
@@ -1949,7 +1949,7 @@ INSERT
 //SQL
 
 INSTRUCTIONS
-   : I N S T R U C T I O N  S
+   : I N S T R U C T I O N S
    ;
 
 
@@ -2045,7 +2045,7 @@ LIKE
 
 
 LINE
-   :L I N E
+   : L I N E
    ;
 
 
@@ -2090,7 +2090,7 @@ MAGENTA
 
 
 MATCHES
-   : M A T C H E S 
+   : M A T C H E S
    ;
 
 
@@ -2100,7 +2100,7 @@ MENU
 
 
 MESSAGE
-   : M E S S A G  E
+   : M E S S A G E
    ;
 
 
@@ -2185,7 +2185,7 @@ NEW
 
 
 NORMAL
-   : N  O R M A L
+   : N O R M A L
    ;
 
 
@@ -2288,7 +2288,7 @@ OUTER
 //SQL
 
 OTHERWISE
-   : O  T  H E R W I  S E
+   : O T H E R W I S E
    ;
 
 
@@ -2308,7 +2308,7 @@ PAUSE
 
 
 PERCENT
-   : P E R C E N  T
+   : P E R C E N T
    ;
 
 
@@ -2333,7 +2333,7 @@ PREVIOUS
 
 
 PRINT
-   : P  R I N T
+   : P R I N T
    ;
 
 
@@ -2468,7 +2468,7 @@ SCREEN
 
 
 SCROLL
-   : S C R  O L L
+   : S C R O L L
    ;
 
 
@@ -2513,7 +2513,7 @@ SLEEP
 
 
 SMALLFLOAT
-   : S M A L L F L O  A T 
+   : S M A L L F L O A T
    ;
 
 
@@ -2583,7 +2583,7 @@ TABLE
 
 
 TABLES
-   : T A  B L E S
+   : T A B L E S
    ;
 
 
@@ -2638,17 +2638,17 @@ TOP
 
 
 TRAILER
-   :T  R A I L E R
+   : T R A I L E R
    ;
 
 
 TRUE
-   :T  R U E
+   : T R U E
    ;
 
 
 TYPE
-   :T Y P E
+   : T Y P E
    ;
 
 
@@ -2658,7 +2658,7 @@ UNCONSTRAINED
 
 
 UNDERLINE
-   : U N D E R L I  N E
+   : U N D E R L I N E
    ;
 
 
@@ -2769,7 +2769,6 @@ WHILE
 
 WHITE
    : W H I T E
-
    ;
 
 
@@ -2899,7 +2898,6 @@ DOUBLEVERTBAR
    : '||'
    ;
 
-
 //COMMENT_1
 //      :  '{'
 //	    ( 
@@ -2936,7 +2934,6 @@ STRING_LITERAL
 
 NUM_INT
    : '.' (('0' .. '9') +)? | (('0' .. '9') ('0' .. '9')*)
-   // only check to see if it's a float if looks like decimal so far (('.' ('0' .. '9')*))?
    ;
 
 // a couple protected methods to assist in matching floating point numbers
@@ -2988,21 +2985,23 @@ HEX_DIGIT
    : ('0' .. '9' | 'a' .. 'f')
    ;
 
-
 // Single-line comments
+
 SL_COMMENT
-   : '#' ~[\r\n]* ->skip
+   : '#' ~ [\r\n]* -> skip
    ;
 
 
 SL_COMMENT_2
-   : '--' ~[\r\n]* ->skip
+   : '--' ~ [\r\n]* -> skip
    ;
 
+
 EOL
-    : [\r\n]+
-    ;
+   : [\r\n] +
+   ;
+
 
 WS
-    : [ \t]+ ->skip
-    ;
+   : [ \t] + -> skip
+   ;
