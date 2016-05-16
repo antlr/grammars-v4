@@ -36,12 +36,11 @@ returnStatement
    ;
 
 functionDefinition
-   : FUNCTION functionIdentifier parameterList eol typeDeclarations (codeBlock)? END FUNCTION eol
+   : FUNCTION functionIdentifier parameterList? eol typeDeclarations (codeBlock)? END FUNCTION eol
    ;
 
 parameterList
-   : empty
-   | LPAREN (parameterGroup)* RPAREN
+   : LPAREN (parameterGroup)* RPAREN
    ;
 
 parameterGroup
@@ -88,12 +87,7 @@ largeType
    ;
 
 numberType
-   : BIGINT
-   | INTEGER
-   | INT
-   | SMALLINT
-   | REAL
-   | SMALLFLOAT
+   : (BIGINT | INTEGER | INT | SMALLINT | REAL | SMALLFLOAT)
    | (DECIMAL | DEC | NUMERIC | MONEY) (LPAREN numericConstant (COMMA numericConstant)? RPAREN |)
    | (FLOAT | DOUBLE) (LPAREN numericConstant RPAREN |)
    ;
@@ -230,7 +224,7 @@ assignmentStatement
    ;
 
 procedureStatement
-   : CALL procedureIdentifier (LPAREN (actualParameter (COMMA actualParameter)*)? RPAREN | empty) (RETURNING variable (COMMA variable)*)?
+   : CALL procedureIdentifier (LPAREN (actualParameter (COMMA actualParameter)*)? RPAREN)? (RETURNING variable (COMMA variable)*)?
    ;
 
 procedureIdentifier
@@ -246,19 +240,8 @@ gotoStatement
    : GOTO (COLON)? label eol
    ;
 
-/*
-emptyStatement
-    : empty eol!
-    ;
-*/
-empty
-   :
-   /* empty */
-   ;
-
 condition
-   : TRUE
-   | FALSE
+   : (TRUE | FALSE)
    | logicalTerm (OR logicalTerm)*
    ;
 
@@ -329,7 +312,7 @@ sqlExpressionList
    ;
 
 sqlLiteral
-   : (unsignedConstant | string | NULL | FALSE | TRUE)
+   : (unsignedConstant | string | (NULL | FALSE | TRUE))
    ;
 
 sqlVariable
@@ -367,8 +350,7 @@ groupFunction
    ;
 
 otherFunction
-   : DECODE
-   | NVL
+   : (DECODE | NVL)
    | constantIdentifier
    ;
 
@@ -378,19 +360,12 @@ sqlPseudoColumn
    ;
 
 relationalOperator
-   : EQUAL
-   | NOT_EQUAL
-   | LE
-   | LT
-   | GE
-   | GT
+   : (EQUAL | NOT_EQUAL | LE | LT | GE | GT | LIKE)
    | (NOT)? MATCHES
-   | LIKE
    ;
 
 ifCondition
-   : TRUE
-   | FALSE
+   : (TRUE | FALSE)
    | ifCondition2 (relationalOperator ifCondition2)*
    ;
 
@@ -444,23 +419,7 @@ functionDesignator
    ;
 
 functionIdentifier
-   : DAY
-   | YEAR
-   | MONTH
-   | TODAY
-   | WEEKDAY
-   | MDY
-   | COLUMN
-   | SUM
-   | COUNT
-   | AVG
-   | MIN
-   | MAX
-   | EXTEND
-   | DATE
-   | TIME
-   | INFIELD
-   | PREPARE
+   : (DAY | YEAR | MONTH | TODAY | WEEKDAY | MDY | COLUMN | SUM | COUNT | AVG | MIN | MAX | EXTEND | DATE | TIME | INFIELD | PREPARE)
    | constantIdentifier
    ;
 
@@ -628,8 +587,7 @@ otherStorageStatement
 
 printExpressionItem
    : COLUMN expression
-   | PAGENO
-   | LINENO
+   | (PAGENO | LINENO)
    | BYTE variable
    | TEXT variable
    | expression (SPACE | SPACES)? (WORDWRAP (RIGHT MARGIN numericConstant)?)?
@@ -740,9 +698,8 @@ inputEvents
    ;
 
 inputInsideStatement
-   : NEXT FIELD (fieldName | NEXT | PREVIOUS)
-   | CONTINUE INPUT
-   | EXIT INPUT
+   : NEXT FIELD (fieldName | (NEXT | PREVIOUS))
+   | (CONTINUE INPUT | EXIT INPUT)
    ;
 
 inputGroupStatement
@@ -889,11 +846,6 @@ sqlSelectStatement
    : mainSelectStatement
    ;
 
-/*
-columnsTableId 
-    : (tableIdentifier DOT)? (STAR | identifier (LBRACK expression ( COMMA expression)* RBRACK)?)
-    ;
-  */
 columnsTableId
    : STAR
    | (tableIdentifier (indexingVariable)?) (DOT STAR | DOT columnsTableId)?
@@ -1028,14 +980,13 @@ wheneverType
    ;
 
 wheneverFlow
-   : CONTINUE
-   | STOP
+   : (CONTINUE | STOP)
    | CALL identifier
    | (GO TO | GOTO) (COLON)? identifier
    ;
 
 reportDefinition
-   : REPORT identifier parameterList (typeDeclarations)? (outputReport)? (ORDER (EXTERNAL)? BY variableList)? (formatReport)? END REPORT
+   : REPORT identifier parameterList? (typeDeclarations)? (outputReport)? (ORDER (EXTERNAL)? BY variableList)? (formatReport)? END REPORT
    ;
 
 outputReport
@@ -1069,39 +1020,7 @@ sign
    ;
 
 constantIdentifier
-   : ACCEPT
-   | ASCII
-   | COUNT
-   | CURRENT
-   | FALSE
-   | FIRST
-   | FOUND
-   | GROUP
-   | HIDE
-   | INDEX
-   | INT_FLAG
-   | INTERRUPT
-   | LAST
-   | LENGTH
-   | LINENO
-   | MDY
-   | NO
-   | NOT
-   | NOTFOUND
-   | NULL
-   | PAGENO
-   | REAL
-   | SIZE
-   | SQL
-   | STATUS
-   | TEMP
-   | TIME
-   | TODAY
-   | TRUE
-   | USER
-   | WAIT
-   | WEEKDAY
-   | WORK
+   : (ACCEPT | ASCII | COUNT | CURRENT | FALSE | FIRST | FOUND | GROUP | HIDE | INDEX | INT_FLAG | INTERRUPT | LAST | LENGTH | LINENO | MDY | NO | NOT | NOTFOUND | NULL | PAGENO | REAL | SIZE | SQL | STATUS | TEMP | TIME | TODAY | TRUE | USER | WAIT | WEEKDAY | WORK)
    | identifier
    ;
 
@@ -1472,8 +1391,8 @@ COMMIT
    ;
 
 
-COMMITED
-   : C O M M I T E D
+COMMITTED
+   : C O M M I T T E D
    ;
 
 
@@ -2862,17 +2781,29 @@ NOT_EQUAL
    : '<' (('>') | ('='))? | '!=' | '^='
    ;
 
-/*
-LT              : '<'   ;
-LE              : "<="  ;
-GE              : ">="  ;
-GT              : '>'   ;
-*/
 
-GT
-   : '>' ('=')?
+LT
+   : '<'
    ;
 
+
+LE
+   : '<='
+   ;
+
+
+GE
+   : '>='
+   ;
+
+
+GT
+   : '>'
+   ;
+
+//GT
+//   : '>' ('=')?
+//   ;
 
 LPAREN
    : '('
@@ -2893,7 +2824,11 @@ RBRACK
    : ']'
    ;
 
-//DOT             : '.'   ;
+
+DOT
+   : '.'
+   ;
+
 
 ATSYMBOL
    : '@'
@@ -2942,10 +2877,14 @@ NUM_INT
    : '.' (('0' .. '9') +)? | (('0' .. '9') ('0' .. '9')*)
    ;
 
-// a couple protected methods to assist in matching floating point numbers
 
-EXPONENT
-   : ('e') ('+' | '-')? ('0' .. '9') +
+NUM_REAL
+   : ('0' .. '9') + '.' ('0' .. '9')* EXPONENT? | '.' ('0' .. '9') + EXPONENT? | ('0' .. '9') + EXPONENT
+   ;
+
+
+fragment EXPONENT
+   : ('e' | 'E') ('+' | '-')? ('0' .. '9') +
    ;
 
 // escape sequence -- note that this is protected; it can only be called
