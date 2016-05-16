@@ -45,6 +45,7 @@
 		<module>javadoc</module>
 		<module>jpa</module>
 		<module>json</module>
+		<module>kuka</module>
 		<module>less</module>
 		<module>logo</module>
 		<module>lua</module>
