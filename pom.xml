@@ -45,10 +45,12 @@
 		<module>javadoc</module>
 		<module>jpa</module>
 		<module>json</module>
+		<module>kuka</module>
 		<module>less</module>
 		<module>logo</module>
 		<module>lua</module>
 		<module>masm</module>
+		<module>mdx</module>
 		<module>memcached_protocol</module>
 		<module>modelica</module>
 		<module>modula2pim4</module>
