@@ -72,6 +72,7 @@
 		<module>r</module>
 		<module>rcs</module>
 		<module>redcode</module>
+		<module>rfc822</module>
 		<module>ruby</module>
 		<module>scala</module>
 		<module>scss</module>
