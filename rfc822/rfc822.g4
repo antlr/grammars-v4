@@ -43,7 +43,7 @@ day
    ;
 
 date
-   : TWO_DIGIT + month TWO_DIGIT
+   : two_digit + month two_digit
    ;
 
 month
@@ -66,7 +66,7 @@ time
    ;
 
 hour
-   : TWO_DIGIT ':' TWO_DIGIT (':' TWO_DIGIT)?
+   : two_digit ':' two_digit (':' two_digit)?
    ;
 
 zone
@@ -80,33 +80,36 @@ zone
    | 'MDT'
    | 'PST'
    | 'PDT'
-   | ONE_ALPHA
-   | (('+' | '-') FOUR_DIGIT)
+   | ALPHA
+   | (('+' | '-') four_digit)
+   ;
+
+two_digit
+   : alphanumeric alphanumeric
+   ;
+
+four_digit
+   : alphanumeric alphanumeric alphanumeric alphanumeric
+   ;
+
+alphanumeric
+   : ALPHA
+   | DIGIT
    ;
 
 
-ONE_ALPHA
-   : 'A' .. 'Z'
-   ;
-
-
-TWO_DIGIT
-   : ALPHANUMERIC ALPHANUMERIC
-   ;
-
-
-FOUR_DIGIT
-   : ALPHANUMERIC ALPHANUMERIC ALPHANUMERIC ALPHANUMERIC
-   ;
-
-
-fragment ASCII
+fragment CHAR
    : [\u0000-\u007F]
    ;
 
 
-fragment ALPHANUMERIC
-   : [a-zA-Z0-9]
+ALPHA
+   : [a-zA-Z]
+   ;
+
+
+DIGIT
+   : [0-9]
    ;
 
 
