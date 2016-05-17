@@ -37,7 +37,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>date_time</entryPoint>
-					<grammarName>rfc822_datetime</grammarName>
+					<grammarName>rfc822</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
