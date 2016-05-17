@@ -75,6 +75,7 @@
 		<module>ruby</module>
 		<module>scala</module>
 		<module>scss</module>
+		<module>sexpression</module>
 		<module>sharc</module>
 		<module>smalltalk</module>
 		<module>sparql</module>
