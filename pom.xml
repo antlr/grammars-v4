@@ -28,6 +28,7 @@
 		<module>creole</module>
 		<!-- C# runtime is not supported. <module>csharp</module> -->
 		<module>csv</module>
+		<module>datetime</module>
 		<module>dcm</module>
 		<module>dot</module>
 		<module>erlang</module>
@@ -72,7 +73,6 @@
 		<module>r</module>
 		<module>rcs</module>
 		<module>redcode</module>
-		<module>rfc822</module>
 		<module>ruby</module>
 		<module>scala</module>
 		<module>scss</module>
