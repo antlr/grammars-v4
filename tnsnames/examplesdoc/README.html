@@ -1,0 +1,39 @@
+<h2 id="tnsnames-grammar---examples">Tnsnames Grammar - Examples</h2>
+<h3 id="tnanames-parser">Tnanames Parser</h3>
+<p>The file <code>tnsnames_checker.java</code>, which can be found in the <code>examples</code> directory, can be compiled to produce a parser that will read a <code>tnsnames.ora</code> file on standard input and write any syntax error messages to standard error to allow you to correct the <code>tnsnames.ora</code> file.</p>
+<p>A (valid) test file, <code>tnsnames.test.ora</code>, has been provided. Play with this as you desire to see how well the parser works. You might like to edit this file to create some errors to test the parser.</p>
+<h3 id="build-the-parser">Build the Parser</h3>
+<p>To build the parser, you need to have downloaded a copy of the ANTLR 4.x Jar file from the <a href="http://www.antlr.org/download.html">ANTLR4 web site</a>. Pick the Java target's &quot;Complete ANTLR 4.x.x Java binaries jar&quot; option. This code was first developed using ANTLR 4.4 but later versions will/should work.</p>
+<p>Follow the instructions on the <a href="https://github.com/antlr/antlr4/blob/master/doc/getting-started.md">Getting Started page</a> paying particular attention to setting up <code>CLASSPATH</code> and the <code>grun</code> and <code>antlr4</code> aliases. Basically it is as follows, but the getting started page is a good read anyway!</p>
+<pre><code>export ANTLR4=&quot;/where/downloaded/to/antlr-4.x.x-complete.jar&quot;
+export CLASSPATH=&quot;.:${CLASSPATH}:${ANTLR4}&quot;
+alias antlr4=&#39;java org.antlr.v4.Tool&#39;
+alias grun=&#39;java org.antlr.v4.runtime.misc.TestRig&#39;
+alias jar=&#39;${JAVA_HOME}/bin/jar&#39;
+alias java=&#39;${JAVA_HOME}/bin/java&#39;
+alias javac=&#39;${JAVA_HOME}/bin/javac&#39;
+</code></pre>
+<p>ANTLR 4 needs Java version 6, aka 1.6, or higher to compile and run. I have tested my parser using Java 6 and Java 7 with no trouble.</p>
+<ul>
+<li>Copy the <code>*.g4</code> grammar files and the <code>tnsnames_checker.java</code> files into a working directory somewhere.</li>
+<li>In the working directory, compile the grammar with the command <code>antlr4 tnsnames.g4</code>. This will generate a <em>lot</em> of Java files.</li>
+<li>Compile the generated source code with <code>javac *.java</code>. This generates a <em>lot</em> of class files.</li>
+<li>To avoid confusion and litter, build a jar. <code>jar -cvf tnsnames.jar *.class</code></li>
+<li>You can delete the class files now <del>if you wish</del>. <code>rm *.class</code></li>
+</ul>
+<p>You should now have a file named <code>tnsnames.jar</code>.</p>
+<h3 id="run-the-parser">Run the Parser</h3>
+<p>Run it as follows:</p>
+<pre><code>java -cp &quot;./tnsnames.jar:$CLASSPATH&quot; tnsnames_checker &lt; tnsnames.test.ora </code></pre>
+<p>This will parse the <code>tnsnames.test.ora</code> file and report any errors it finds. If you wish to redirect the errors to a file, try the following:</p>
+<pre><code>java -cp &quot;./tnsnames.jar:$CLASSPATH&quot; tnsnames_checker &lt; tnsnames.test.ora 2&gt; error.log</code></pre>
+<p>The file <code>error.log</code> now contains the list of errors for the test file.</p>
+<h3 id="enhancements">Enhancements</h3>
+<p>The parser only validates that the structure of your <code>tnsnames.ora</code> file fits the defined grammar. It cannot check that port numbers are above 1024 and below 65536 for example, or that a particular host name exists and can be pinged etc etc.</p>
+<p>If you want to build this sort of validating tool then you appear to have two options:</p>
+<ol style="list-style-type: decimal">
+<li>Be my guest, go for it! All you will need to do is follow the instructions for ANTLR 4 on creating a listener and a parse tree walker and sub class the proper methods of the generated base listener, and you can do whetver you want to do with a <code>tnsnames.ora</code> file.</li>
+<li>Alternatively, <a href="http://qdosmsq.dunbar-it.co.uk/blog/2014/12/tnsnames-checker-utility/" title="Full blown tnsnames parser">I already did it for you!</a>.</li>
+</ol>
+<p>Have fun.</p>
+<p>Norman@dunbar-it.co.uk.</p>

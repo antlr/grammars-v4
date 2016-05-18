@@ -28,7 +28,7 @@
 
 /*	Antlr grammar for StringTemplate v4.
  *
- *	Modified 2015.06.16 gbr 
+ *	Modified 2015.06.16 gbr
  *	-- update for compatibility with Antlr v4.5
  *	-- use imported standard fragments
  */
@@ -39,21 +39,14 @@ options {
 	superClass = LexerAdaptor ;
 }
 
-import LexBasic;	// Standard set of fragments 
+import LexBasic;	// Standard set of fragments
 
 channels {
 	OFF_CHANNEL		// non-default channel for whitespace and comments
 }
 
-
-@header {
-	package org.github.antlr.st.parser.gen;
-	
-	import org.github.antlr.st.parser.LexerAdaptor; 
-}
-
 // -----------------------------------
-// default mode = Outside 
+// default mode = Outside
 
 
 DOC_COMMENT		: DocComment		-> channel(OFF_CHANNEL)	;
@@ -79,7 +72,7 @@ INS_HORZ_WS	: Hws+		-> type(HORZ_WS), channel(OFF_CHANNEL)	;
 INS_VERT_WS	: Vws+		-> type(VERT_WS), channel(OFF_CHANNEL)	;
 
 LBRACE		: LBrace { startsSubTemplate() }?	-> mode(SubTemplate)	;
-RDELIM		: . { isRDelim() }?					-> mode(DEFAULT_MODE)	; 
+RDELIM		: . { isRDelim() }?					-> mode(DEFAULT_MODE)	;
 
 STRING		: DQuoteLiteral	;
 

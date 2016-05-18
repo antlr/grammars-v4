@@ -8,27 +8,102 @@
 	<name>ANTLR4 grammars</name>
 	<modules>
 		<module>support</module>
-		<module>objc</module>		
-		<module>dot</module>		
-		<module>creole</module>
-		<module>bnf</module>
-		<module>pgn</module>
-		<module>logo</module>
+		<module>abnf</module>
+		<module>agc</module>
+		<module>antlr4</module>
+		<module>arithmetic</module>
 		<module>asm6502</module>
-		<module>redcode</module>
-		<module>csv</module>
-		<module>tnt</module>
-		<module>json</module>
-		<module>xml</module>
+		<module>asn</module>
+<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
+<!--		<module>aspectj</module> -->
+		<module>atl</module>
 		<module>basic</module>
-		<module>gff3</module>
+		<module>bnf</module>
+		<module>c</module>
+		<module>calculator</module>
+		<module>clif</module>
+		<module>clojure</module>
+		<module>cobol85</module>
+		<module>cpp</module>
+		<module>creole</module>
+		<!-- C# runtime is not supported. <module>csharp</module> -->
+		<module>csv</module>
+		<module>dcm</module>
+		<module>dot</module>
+		<module>erlang</module>
 		<module>fasta</module>
+		<module>FOL</module>
+		<module>gff3</module>
+		<module>graphql</module>
 		<module>html</module>
+		<module>icalendar</module>
+		<module>idl</module>
+		<module>informix</module>
+		<module>iri</module>
+		<module>java</module>
+		<module>java8</module>
+		<module>javadoc</module>
+		<module>jpa</module>
+		<module>json</module>
+		<module>kuka</module>
+		<module>less</module>
+		<module>logo</module>
+		<module>lua</module>
+		<module>masm</module>
+		<module>mdx</module>
+		<module>memcached_protocol</module>
+		<module>modelica</module>
+		<module>modula2pim4</module>
+		<module>MPS</module>
+		<module>mumath</module>
+		<module>mumps</module>
+		<module>mysql</module>
+		<module>objc</module>
+		<module>pascal</module>
+		<module>pcre</module>
+		<module>pddl</module>
+		<module>pdp7</module>
+		<module>peoplecode</module>
+		<module>pgn</module>
+		<!-- C# runtime is not supported. <module>php</module> -->
+		<module>plsql</module>
+		<module>propcalc</module>
+		<module>python3</module>
+		<module>r</module>
+		<module>rcs</module>
+		<module>redcode</module>
+		<module>ruby</module>
+		<module>scala</module>
+		<module>scss</module>
+		<module>sexpression</module>
+		<module>sharc</module>
+		<module>smalltalk</module>
+		<module>sparql</module>
+		<module>sqlite</module>
+		<module>stacktrace</module>
+		<module>stringtemplate</module>
+		<module>suokif</module>
+		<module>swift</module>
+		<module>tinyc</module>
+		<module>tnsnames</module>
+		<module>tnt</module>
+		<module>tsql</module>
 		<module>turtle</module>
+		<module>ucb-logo</module>
+		<module>vb6</module>
+		<module>vba</module>
+		<module>verilog</module>
+		<module>vhdl</module>
+		<module>wavefront</module>
+		<module>webidl</module>
+		<module>xml</module>
+		<module>xpath</module>
+		<module>swift-fin</module>
 	</modules>
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.2.2</antlr.version>
+		<antlr.version>4.5.3</antlr.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -41,7 +116,7 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>6.8.5</version>
+			<version>6.9.9</version>
 		</dependency>
 	</dependencies>
 	<build>

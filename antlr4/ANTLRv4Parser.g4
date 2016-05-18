@@ -35,7 +35,7 @@
  *	-- update for compatibility with Antlr v4.5
  *	-- add mode for channels
  *	-- moved members to LexerAdaptor
- * 	-- move fragments to imports 
+ * 	-- move fragments to imports
  */
 
 parser grammar ANTLRv4Parser;
@@ -44,15 +44,10 @@ options {
 	tokenVocab = ANTLRv4Lexer ;
 }
 
-@header {
-	package org.github.antlr.parser.gen;
-	
-}
-
 // The main entry point for parsing a v4 grammar.
 grammarSpec
 	:	DOC_COMMENT?
-		grammarType id SEMI
+		grammarType identifier SEMI
 		prequelConstruct*
 		rules
 		modeSpec*
@@ -86,11 +81,11 @@ optionsSpec
 	;
 
 option
-	:	id ASSIGN optionValue
+	:	identifier ASSIGN optionValue
 	;
 
 optionValue
-	:	id (DOT id)*
+	:	identifier (DOT identifier)*
 	|	STRING_LITERAL
 	|	actionBlock			// TODO: is this valid?
 	|	INT
@@ -104,8 +99,8 @@ delegateGrammars
 	;
 
 delegateGrammar
-	:	id ASSIGN id
-	|	id
+	:	identifier ASSIGN identifier
+	|	identifier
 	;
 
 
@@ -121,18 +116,18 @@ channelsSpec
 	;
 
 idList
-	: id ( COMMA id )* COMMA?
+	: identifier ( COMMA identifier )* COMMA?
 	;
 
 
 // Match stuff like @parser::members {int i;}
 action
-	:	AT (actionScopeName COLONCOLON)? id actionBlock
+	:	AT (actionScopeName COLONCOLON)? identifier actionBlock
 	;
 
 // Scope names could collide with keywords; allow them as ids for action scopes
 actionScopeName
-	:	id
+	:	identifier
 	|	LEXER
 	|	PARSER
 	;
@@ -146,7 +141,7 @@ argActionBlock
 	;
 
 modeSpec
-	:	MODE id SEMI lexerRuleSpec*
+	:	MODE identifier SEMI lexerRuleSpec*
 	;
 
 rules
@@ -160,7 +155,7 @@ ruleSpec
 
 parserRuleSpec
 	:	DOC_COMMENT?
-		ruleModifiers? RULE_REF argActionBlock? ruleReturns? throwsSpec? 
+		ruleModifiers? RULE_REF argActionBlock? ruleReturns? throwsSpec?
 		localsSpec?
 		rulePrequel*
 		COLON
@@ -194,7 +189,7 @@ ruleReturns
 // Exception spec
 
 throwsSpec
-	:	THROWS id (COMMA id)*
+	:	THROWS identifier (COMMA identifier)*
 	;
 
 localsSpec
@@ -203,7 +198,7 @@ localsSpec
 
 /** Match stuff like @init {int i;} */
 ruleAction
-	:	AT id actionBlock
+	:	AT identifier actionBlock
 	;
 
 ruleModifiers
@@ -232,7 +227,7 @@ ruleAltList
 	;
 
 labeledAlt
-	:	alternative (POUND id)?
+	:	alternative (POUND identifier)?
 	;
 
 // --------------------
@@ -268,7 +263,7 @@ lexerElement
 	;							// but preds can be anywhere
 
 labeledLexerElement
-	:	id (ASSIGN|PLUS_ASSIGN)
+	:	identifier (ASSIGN|PLUS_ASSIGN)
 		(	lexerAtom
 		|	block
 		)
@@ -289,12 +284,12 @@ lexerCommand
 	;
 
 lexerCommandName
-	:	id
+	:	identifier
 	|	MODE
 	;
 
 lexerCommandExpr
-	:	id
+	:	identifier
 	|	INT
 	;
 
@@ -324,7 +319,7 @@ element
 	;
 
 labeledElement
-	:	id ( ASSIGN | PLUS_ASSIGN )
+	:	identifier ( ASSIGN | PLUS_ASSIGN )
 		(	atom
 		|	block
 		)
@@ -348,16 +343,15 @@ ebnfSuffix
 	;
 
 lexerAtom
-	:	range
+	:	characterRange
 	|	terminal
-	|	RULE_REF
 	|	notSet
 	|	LEXER_CHAR_SET
 	|	DOT elementOptions?
 	;
 
 atom
-	:	range 				// Range x..y - only valid in lexers
+	:	characterRange 				// Range x..y - only valid in lexers
 	|	terminal
 	|	ruleref
 	|	notSet
@@ -379,7 +373,7 @@ blockSet
 setElement
 	:	TOKEN_REF elementOptions?
 	|	STRING_LITERAL elementOptions?
-	|	range
+	|	characterRange
 	|	LEXER_CHAR_SET
 	;
 
@@ -403,7 +397,7 @@ ruleref
 // ---------------
 // Character Range
 
-range
+characterRange
 	: STRING_LITERAL RANGE STRING_LITERAL
 	;
 
@@ -419,10 +413,11 @@ elementOptions
 	;
 
 elementOption
-	:	id 									// default node option
-	|	id ASSIGN (id | STRING_LITERAL)		// option assignment
+	:	identifier 									// default node option
+	|	identifier ASSIGN (identifier | STRING_LITERAL)		// option assignment
 	;
 
-id	:	RULE_REF
+identifier
+	:	RULE_REF
 	|	TOKEN_REF
 	;

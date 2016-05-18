@@ -1,0 +1,129 @@
+Component boolean &fl_Error;
+Component Rowset &rs_msg;
+Component integer &msg_cnt;
+Component integer &msgset, &msgnbr;
+Component string &msgsev;
+Local integer &pos1, &pos2, &newline;
+Local string &msgparm1, &msgparm2, &msgparm3;
+
+Function SetupMsgArea
+
+   &rs_msg = GetLevel0()(1).GetRowset(Scroll.SSR_DUMMY_REC);
+   &rs_msg.Flush();
+   &msg_cnt = 0;
+   &fl_Error = False;
+   GetLevel0()(1).DERIVED_SASSMSG.GROUP1.Visible = False;
+
+End-Function;
+
+
+Function InsertMsg(&msgsev, &msgset, &msgnbr, &msgparms, &msgdisptype);
+   /*	message parm can be a concatenation of 5 values delimited by a semi-colon. 
+		(arrays not valid type for function parms	*/
+
+   Local string &parm_string, &temp_parm;
+   Local integer &parm_len, &next_idx, &pos;
+
+   Local string &parm1, &parm2, &parm3, &parm4, &parm5;
+   Local boolean &parm_found;
+
+   &parm1 = "";
+   &parm2 = "";
+   &parm3 = "";
+   &parm4 = "";
+   &parm5 = "";
+
+   If All(&msgparms) Then
+      &parm_string = &msgparms;
+      &parm_len = Len(&msgparms);
+      &next_idx = 0;
+      &parm_found = True;
+      While &parm_found = True ;
+         &next_idx = &next_idx + 1;
+         &temp_parm = "";
+         &pos = Find(";", &parm_string);
+         If &pos > 0 Then
+            &temp_parm = Substring(&parm_string, 1, &pos - 1);
+            &parm_string = Substring(&parm_string, &pos + 1, &parm_len - &pos);
+         Else
+            &parm_found = False;
+            &temp_parm = &parm_string;
+         End-If;
+         Evaluate &next_idx
+         When 1
+            &parm1 = &temp_parm;
+         When 2
+            &parm2 = &temp_parm;
+         When 3
+            &parm3 = &temp_parm;
+         When 4
+            &parm4 = &temp_parm;
+         When 5
+            &parm5 = &temp_parm;
+         End-Evaluate;
+      End-While;
+   End-If;
+
+
+   &rs_msg = GetLevel0()(1).GetRowset(Scroll.SSR_DUMMY_REC);
+   &msg_cnt = &rs_msg.ActiveRowCount;
+
+   &rs_msg.InsertRow(&msg_cnt);
+   &newline = &msg_cnt + 1;
+
+   Evaluate &msgdisptype
+   When "T" /* message text only	*/
+      &rs_msg(&newline).DERIVED_SASSMSG.ERROR_TEXT.Value = MsgGetText(&msgset, &msgnbr, "Message not found.", &parm1, &parm2, &parm3, &parm4, &parm5);
+
+   When "E" /* message explain text only	*/
+      &rs_msg(&newline).DERIVED_SASSMSG.ERROR_TEXT.Value = MsgGetExplainText(&msgset, &msgnbr, "Message not found.");
+
+   When "B" /*	both text and explain	*/
+      &rs_msg(&newline).DERIVED_SASSMSG.ERROR_TEXT.Value = MsgGetText(&msgset, &msgnbr, "Message not found.", &parm1, &parm2, &parm3, &parm4, &parm5) | " " | MsgGetExplainText(&msgset, &msgnbr, "Message not found.");
+   End-Evaluate;
+
+   Evaluate &msgsev
+   When "C"
+      GetLevel0()(1).DERIVED_SASSMSG.GROUP1.Style = "SSSMSGSUCCESSFRAME";
+      GetLevel0()(1).DERIVED_SASSMSG.SSR_MSG_PB.LabelImage = Image.PS_CS_MESSAGE_CONFIRM_ICN;
+      &rs_msg(&newline).DERIVED_SASSMSG.ERROR_TEXT.Style = "SSSMSGSUCCESSTEXT";
+      Break;
+   When "I"
+      GetLevel0()(1).DERIVED_SASSMSG.GROUP1.Style = "SSSMSGINFOFRAME";
+      GetLevel0()(1).DERIVED_SASSMSG.SSR_MSG_PB.LabelImage = Image.PS_CS_MESSAGE_INFO_ICN;
+      &rs_msg(&newline).DERIVED_SASSMSG.ERROR_TEXT.Style = "SSSMSGINFOTEXT";
+      Break;
+   When "E"
+      &fl_Error = True;
+      GetLevel0()(1).DERIVED_SASSMSG.GROUP1.Style = "SSSMSGWARNINGFRAME";
+      GetLevel0()(1).DERIVED_SASSMSG.SSR_MSG_PB.LabelImage = Image.PS_CS_MESSAGE_WARNING_ICN;
+      &rs_msg(&newline).DERIVED_SASSMSG.ERROR_TEXT.Style = "SSSMSGWARNINGTEXT";
+      Break;
+   When "S"
+      &fl_Error = True;
+      GetLevel0()(1).DERIVED_SASSMSG.GROUP1.Style = "SSSMSGALERTFRAME";
+      GetLevel0()(1).DERIVED_SASSMSG.SSR_MSG_PB.LabelImage = Image.PS_CS_MESSAGE_ALERT_ICN;
+      &rs_msg(&newline).DERIVED_SASSMSG.ERROR_TEXT.Style = "SSSMSGALERTTEXT";
+   End-Evaluate;
+
+   /*	hide html area used for cart confirmation	*/
+   GetLevel0()(1).DERIVED_SASSMSG.HTMLAREA.Visible = False;
+
+End-Function;
+
+
+Function WriteMsg
+
+   &rs_msg = GetLevel0()(1).GetRowset(Scroll.SSR_DUMMY_REC);
+
+   If &fl_Error Then
+      &rs_msg.DeleteRow(1);
+      &rs_msg.ShowAllRows();
+      GetLevel0()(1).DERIVED_SASSMSG.GROUP1.Visible = True;
+      GetLevel0()(1).DERIVED_SASSMSG.SSR_MSG_PB.SetCursorPos(%Page);
+   Else
+      &rs_msg.HideAllRows();
+      GetLevel0()(1).DERIVED_SASSMSG.GROUP1.Visible = False;
+   End-If;
+
+End-Function;

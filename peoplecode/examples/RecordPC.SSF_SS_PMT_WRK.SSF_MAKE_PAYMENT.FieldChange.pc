@@ -1,0 +1,1 @@
+Transfer( False, MenuName.SA_LEARNER_SERVICES, BarName.FINANCES, ItemName.SF_PAYMENT, Panel.SSF_SS_PMT_METHOD, "A");

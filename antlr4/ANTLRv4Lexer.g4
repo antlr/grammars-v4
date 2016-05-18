@@ -29,10 +29,10 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** 
- *	A grammar for ANTLR v4 implemented using v4 syntax 
+/**
+ *	A grammar for ANTLR v4 implemented using v4 syntax
  *
- *	Modified 2015.06.16 gbr 
+ *	Modified 2015.06.16 gbr
  *	-- update for compatibility with Antlr v4.5
  */
 
@@ -42,7 +42,7 @@ options {
 	superClass = LexerAdaptor ;
 }
 
-import LexBasic;	// Standard set of fragments 
+import LexBasic;	// Standard set of fragments
 
 tokens {
 	TOKEN_REF,
@@ -52,13 +52,6 @@ tokens {
 
 channels {
 	OFF_CHANNEL		// non-default channel for whitespace and comments
-}
-
-
-@header {
-	package org.github.antlr.parser.gen;
-	
-	import org.github.antlr.parser.LexerAdaptor; 
 }
 
 
@@ -130,9 +123,9 @@ BEGIN_ACTION
 // -------------------------
 // Keywords
 //
-// Keywords may not be used as labels for rules or in any other context where 
-// they would be ambiguous with the keyword vs some other identifier.  OPTIONS, 
-// TOKENS, & CHANNELS blocks are handled idiomatically in dedicated lexical modes. 
+// Keywords may not be used as labels for rules or in any other context where
+// they would be ambiguous with the keyword vs some other identifier.  OPTIONS,
+// TOKENS, & CHANNELS blocks are handled idiomatically in dedicated lexical modes.
 
 OPTIONS		: 'options'		-> pushMode(Options)	;
 TOKENS		: 'tokens'		-> pushMode(Tokens)		;
@@ -192,7 +185,7 @@ ID	: Id
 // -------------------------
 // Whitespace
 
-WS	:	( Hws | Vws )+		-> channel(OFF_CHANNEL)	;
+WS	:	Ws+		-> channel(OFF_CHANNEL)	;
 
 
 // -------------------------
@@ -217,7 +210,7 @@ ERRCHAR
 // Lexer modes
 
 // -------------------------
-// Arguments 
+// Arguments
 
 mode Argument;			// E.g., [int x, List<String> a[]]
 
@@ -249,16 +242,16 @@ mode Argument;			// E.g., [int x, List<String> a[]]
 mode Action;
 
 	NESTED_ACTION			: LBrace			-> type(ACTION_CONTENT), pushMode(Action)	;
-	
+
 	ACTION_ESCAPE			: EscAny			-> type(ACTION_CONTENT)		;
-	
+
 	ACTION_STRING_LITERAL	: DQuoteLiteral		-> type(ACTION_CONTENT)		;
 	ACTION_CHAR_LITERAL		: SQuoteLiteral		-> type(ACTION_CONTENT)		;
-	
+
 	ACTION_DOC_COMMENT		: DocComment		-> type(ACTION_CONTENT)		;
 	ACTION_BLOCK_COMMENT	: BlockComment 		-> type(ACTION_CONTENT)		;
 	ACTION_LINE_COMMENT		: LineComment 		-> type(ACTION_CONTENT)		;
-	
+
 	END_ACTION				: RBrace	{ handleEndAction(); }	;
 
 	UNTERMINATED_ACTION		: EOF		-> popMode		;
@@ -285,7 +278,7 @@ mode Options;
 	OPT_STAR			: Star				-> type(STAR)				;
 	OPT_SEMI			: Semi				-> type(SEMI)				;
 
-	OPT_WS				: ( Hws | Vws )+	-> type(WS), channel(OFF_CHANNEL) 	;
+	OPT_WS				: Ws+	-> type(WS), channel(OFF_CHANNEL) 	;
 
 
 // -------------------------
@@ -303,7 +296,7 @@ mode Tokens;
 	TOK_DOT				: Dot				-> type(DOT)				;
 	TOK_COMMA			: Comma				-> type(COMMA)				;
 
-	TOK_WS				: ( Hws | Vws )+	-> type(WS), channel(OFF_CHANNEL) 	;
+	TOK_WS				: Ws+	-> type(WS), channel(OFF_CHANNEL) 	;
 
 
 // -------------------------
@@ -321,7 +314,7 @@ mode Channels;	// currently same as Tokens mode; distinguished by keyword
 	CHN_DOT				: Dot				-> type(DOT)				;
 	CHN_COMMA			: Comma				-> type(COMMA)				;
 
-	CHN_WS				: ( Hws | Vws )+	-> type(WS), channel(OFF_CHANNEL) 	;
+	CHN_WS				: Ws+	-> type(WS), channel(OFF_CHANNEL) 	;
 
 
 // -------------------------

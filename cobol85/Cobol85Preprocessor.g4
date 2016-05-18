@@ -1,18 +1,9 @@
 /*
-* Copyright (C) 2015 Ulrich Wolffgang <u.wol@wwu.de>
+* Copyright (C) 2016, Ulrich Wolffgang <u.wol@wwu.de>
+* All rights reserved.
 *
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* This software may be modified and distributed under the terms
+* of the BSD 3-clause license. See the LICENSE file for details.
 */
 
 /*
@@ -21,6 +12,16 @@
 * This is a preprocessor grammar for Cobol 85.
 *
 * Change log:
+*
+* v1.2
+*	- fixes
+*
+* v1.1
+*	- fixes
+*
+* v1.0
+*	- EXEC SQL
+*	- EXEC CICS
 *
 * v0.9 Initial revision
 */
@@ -33,11 +34,27 @@ options
 }
 
 startRule : (
-	copyStatement 
+	copyStatement
+	| execCicsStatement
+	| execSqlStatement
 	| replaceOffStatement
 	| replaceArea 
 	| charData
 )* EOF;
+
+
+// exec cics statement
+
+execCicsStatement :
+	EXEC CICS charData END_EXEC DOT?
+;
+
+
+// exec sql statement
+
+execSqlStatement :
+	EXEC SQL charData END_EXEC DOT?
+;
 
 
 // copy statement
@@ -133,13 +150,17 @@ charDataKeyword :
 
 // keywords
 BY : B Y;
+CICS : C I C S;
 COPY : C O P Y;
+END_EXEC : E N D '-' E X E C; 
+EXEC : E X E C;
 IN : I N;
 OF : O F;
 OFF : O F F;
 ON : O N;
 REPLACE : R E P L A C E;
 REPLACING : R E P L A C I N G;
+SQL : S Q L;
 
 
 // symbols
