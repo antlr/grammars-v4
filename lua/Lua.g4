@@ -2,6 +2,7 @@
 BSD License
 
 Copyright (c) 2013, Kazunori Sakamoto
+Copyright (c) 2016, Alexander Alexeev
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 This grammar file derived from:
 
+    Lua 5.3 Reference Manual
+    http://www.lua.org/manual/5.3/manual.html
+
     Lua 5.2 Reference Manual
     http://www.lua.org/manual/5.2/manual.html
 
@@ -38,6 +42,8 @@ This grammar file derived from:
     http://www.antlr3.org/grammar/1178608849736/Lua.g
 
 I tested my grammar with Test suite for Lua 5.2 (http://www.lua.org/tests/5.2/)
+
+Also tested with Test suite for Lua 5.3 http://www.lua.org/tests/lua-5.3.2-tests.tar.gz 
 */
 
 grammar Lua;
