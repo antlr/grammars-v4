@@ -93,23 +93,22 @@ explist
     ;
 
 exp
-    : 'nil' | 'false' | 'true' | number | string		
-	| '...'											
-	| functiondef								
-    | prefixexp										
-	| tableconstructor								
-	| <assoc=right> exp operatorPower exp			
-	| operatorUnary exp								
-	| exp operatorMulDivMod exp		
-	| exp operatorAddSub exp						
-	| <assoc=right> exp operatorStrcat exp			
-	| exp operatorComparison exp					
-	| exp operatorAnd exp							
-	| exp operatorOr exp	
-	;
-
-var
-    : (NAME | '(' exp ')' varSuffix) varSuffix*
+    : 'nil' | 'false' | 'true'
+    | number
+    | string
+    | '...'
+    | functiondef
+    | prefixexp
+    | tableconstructor
+    | <assoc=right> exp operatorPower exp
+    | operatorUnary exp
+    | exp operatorMulDivMod exp
+    | exp operatorAddSub exp
+    | <assoc=right> exp operatorStrcat exp
+    | exp operatorComparison exp
+    | exp operatorAnd exp
+    | exp operatorOr exp
+    | exp operatorBitwise exp
     ;
 
 prefixexp
@@ -124,12 +123,16 @@ varOrExp
     : var | '(' exp ')'
     ;
 
-nameAndArgs
-    : (':' NAME)? args
+var
+    : (NAME | '(' exp ')' varSuffix) varSuffix*
     ;
 
 varSuffix
     : nameAndArgs* ('[' exp ']' | '.' NAME)
+    ;
+
+nameAndArgs
+    : (':' NAME)? args
     ;
 
 /*
@@ -194,10 +197,13 @@ operatorAddSub
 	: '+' | '-';
 
 operatorMulDivMod
-	: '*' | '/' | '%';
+	: '*' | '/' | '%' | '//';
+
+operatorBitwise
+	: '&' | '|' | '~' | '<<' | '>>';
 
 operatorUnary
-    : 'not' | '#' | '-';
+    : 'not' | '#' | '-' | '~';
 
 operatorPower
     : '^';
@@ -270,6 +276,7 @@ EscapeSequence
     | '\\' '\r'? '\n'
     | DecimalEscape
     | HexEscape
+    | UtfEscape
     ;
     
 fragment
@@ -282,6 +289,11 @@ DecimalEscape
 fragment
 HexEscape
     : '\\' 'x' HexDigit HexDigit
+    ;
+
+fragment
+UtfEscape
+    : '\\' 'u{' HexDigit+ '}'
     ;
 
 fragment
