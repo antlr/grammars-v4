@@ -34,6 +34,7 @@
 		<module>erlang</module>
 		<module>fasta</module>
 		<module>FOL</module>
+		<module>fortran77</module>
 		<module>gff3</module>
 		<module>graphql</module>
 		<module>html</module>
