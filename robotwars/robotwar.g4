@@ -57,7 +57,24 @@ gotostatement
    ;
 
 tostatement
-   : expression 'TO' register
+   : expression? ('TO' register) +
+   ;
+
+endsubstatement
+   : 'ENDSUB'
+   ;
+
+ifstatement
+   : 'IF' condition (EOL | COMMA | DOT)? statement
+   ;
+
+condition
+   : argument comparison argument
+   ;
+
+expression
+   : (argument (operation argument)*)
+   | argument
    ;
 
 operation
@@ -74,25 +91,10 @@ comparison
    | '#'
    ;
 
-expression
-   : argument (operation argument)?
-   ;
-
 argument
    : number
    | register
-   ;
-
-endsubstatement
-   : 'ENDSUB'
-   ;
-
-ifstatement
-   : 'IF' condition ','? statement
-   ;
-
-condition
-   : argument comparison argument
+   | DATA
    ;
 
 register
@@ -129,6 +131,8 @@ register
    | SPEEDY
    | RANDOM
    | INDEX
+   | DATA
+   | DAMAGE
    ;
 
 
@@ -302,8 +306,23 @@ INDEX
    ;
 
 
+DATA
+   : 'DATA'
+   ;
+
+
+DOT
+   : '.'
+   ;
+
+
+COMMA
+   : ','
+   ;
+
+
 ID
-   : ('a' .. 'z' | 'A' .. 'Z') ('a' .. 'z' | 'A' .. 'Z') +
+   : ('a' .. 'z' | 'A' .. 'Z') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9') +
    ;
 
 number
