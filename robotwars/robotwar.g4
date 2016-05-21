@@ -65,15 +65,16 @@ endsubstatement
    ;
 
 ifstatement
-   : 'IF' condition (EOL | COMMA | DOT)? statement
+   : 'IF'? condition (EOL | COMMA | DOT)? statement
    ;
 
 condition
-   : argument comparison argument
+   : expression comparison expression
    ;
 
 expression
    : (argument (operation argument)*)
+   | (operation argument)
    | argument
    ;
 
