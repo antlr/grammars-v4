@@ -28,15 +28,58 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar tiny;
 
-program        : 'BEGIN' stmt_list 'END';
-stmt_list      : stmt_list stmt | stmt;
-stmt: assign_stmt |read_stmt|write_stmt;
-assign_stmt           : ident ':=' expr;
-read_stmt           : 'READ' ( id_list ) ;
-write_stmt           : 'WRITE' ( expr_list ) ;
-id_list        : id_list ',' ident | ident;
-expr_list      : expr_list ',' expr | expr; 
-expr           : expr op factor | factor;
-factor         : expr  | ident | 'INT';
-op             : '+' | '-'; 
-ident          : 'ID';
+program
+   : 'BEGIN' stmt_list 'END'
+   ;
+
+stmt_list
+   : stmt_list stmt
+   | stmt
+   ;
+
+stmt
+   : assign_stmt
+   | read_stmt
+   | write_stmt
+   ;
+
+assign_stmt
+   : ident ':=' expr
+   ;
+
+read_stmt
+   : 'READ' (id_list)
+   ;
+
+write_stmt
+   : 'WRITE' (expr_list)
+   ;
+
+id_list
+   : id_list ',' ident
+   | ident
+   ;
+
+expr_list
+   : expr_list ',' expr
+   | expr
+   ;
+
+expr
+   : expr op factor
+   | factor
+   ;
+
+factor
+   : ident
+   | 'INT'
+   ;
+
+op
+   : '+'
+   | '-'
+   ;
+
+ident
+   : 'ID'
+   ;
