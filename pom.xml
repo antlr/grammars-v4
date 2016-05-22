@@ -69,6 +69,7 @@
 		<module>pgn</module>
 		<!-- C# runtime is not supported. <module>php</module> -->
 		<module>plsql</module>
+		<module>postalcode</module>
 		<module>propcalc</module>
 		<module>python3</module>
 		<module>r</module>
