@@ -29,50 +29,164 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Adapted from https://github.com/jynnantonix/lolcode/blob/master/BNFGrammar.txt
 */
 
-
 grammar lolcode;
 
-program		: 'HAI' NLC code_block NLC 'KTHXBAI';
-code_block		: statement | statement NLC code_block;
-statement		: loop | declaration | comment | print_block |
-		    	    if_block | input_block | func_decl |
-                    	    assignment | expression;
-loop			: 'IM IN YR' LABEL 'WILE' expression NLC code_block  NLC 'IM OUTTA YR' LABEL;
-declaration		: 'I HAS A' LABEL | 'I HAS A' LABEL 'ITZ' <value>;
-comment		: 'BTW' STRING | 'OBTW' STRING 'TLDR';
-print_block		: 'VISIBLE' expression* 'MKAY?';
-if_block		: 'O RLY?' NLC 'YA RLY' NLC code_block NLC 'OIC' |
-		    	    'O RLY?' NLC 'YA RLY' NLC code_block NLC
-		       	    else_if_block NLC 'OIC';
-else_if_block		: 'MEBBE' expression NLC code_block NLC
-		    	    else_if_block | 'NO WAI' NLC code_block |
-		            'MEBBE' expression NLC code_block;
-input_block		: 'GIMMEH' LABEL;
-func_decl		: 'HOW DUZ I' LABEL (('YR' LABEL) ('AN YR' LABEL)*)? NLC
-		    	    code_block NLC 'IF U SAY SO';
-assignment		: LABEL 'R' expression;
-expression		: equals | both | not_equals | greater | less |
-		    	    add | sub | mul | div | mod | cast |
-		    	    either | all | any | not | func | LABEL | 
-		    	    ATOM;
-equals		: 'BOTH SAEM' expression 'AN' expression;
-not_equals		: 'DIFFRINT' expression 'AN' expression;
-both			: 'BOTH OF' expression 'AN' expression;
-either		: 'EITHER OF' expression 'AN' expression;
-greater		: 'BIGGR OF' expression 'AN' expression;
-less			: 'SMALLR OF' expression 'AN' expression;
-add			: 'SUM OF' expression 'AN' expression;
-sub			: 'DIFF OF' expression 'AN' expression;
-mul			: 'PRODUKT OF' expression 'AN' expression;
-div			: 'QUOSHUNT OF' expression 'AN' expression;
-mod			: 'MOD OF' expression 'AN' expression;
-cast			: 'MAEK' expression 'A' <type>;
-all			: 'ALL OF' expression ('AN' expression)* 'MKAY?';
-any			: 'ANY OF' expression ('AN' expression)* 'MKAY?';
-not			: 'NOT' expression;
-func			: LABEL expression+  'MKAY?';
-LABEL			:  ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')*;
-ATOM			: 'WIN' | 'FAIL' | 'NOOB' | ('0'..'9')* | ('0'..'9')* '.' ('0'..'9')* | STRING;
+program
+   : 'HAI' NLC code_block NLC 'KTHXBAI'
+   ;
+
+code_block
+   : statement
+   | statement NLC code_block
+   ;
+
+statement
+   : loop
+   | declaration
+   | comment
+   | print_block
+   | if_block
+   | input_block
+   | func_decl
+   | assignment
+   | expression
+   ;
+
+loop
+   : 'IM IN YR' LABEL 'WILE' expression NLC code_block NLC 'IM OUTTA YR' LABEL
+   ;
+
+declaration
+   : 'I HAS A' LABEL
+   | 'I HAS A' LABEL 'ITZ' < value >
+   ;
+
+comment
+   : 'BTW' STRING
+   | 'OBTW' STRING 'TLDR'
+   ;
+
+print_block
+   : 'VISIBLE' expression* 'MKAY?'
+   ;
+
+if_block
+   : 'O RLY?' NLC 'YA RLY' NLC code_block NLC 'OIC'
+   | 'O RLY?' NLC 'YA RLY' NLC code_block NLC else_if_block NLC 'OIC'
+   ;
+
+else_if_block
+   : 'MEBBE' expression NLC code_block NLC else_if_block
+   | 'NO WAI' NLC code_block
+   | 'MEBBE' expression NLC code_block
+   ;
+
+input_block
+   : 'GIMMEH' LABEL
+   ;
+
+func_decl
+   : 'HOW DUZ I' LABEL (('YR' LABEL) ('AN YR' LABEL)*)? NLC code_block NLC 'IF U SAY SO'
+   ;
+
+assignment
+   : LABEL 'R' expression
+   ;
+
+expression
+   : equals
+   | both
+   | not_equals
+   | greater
+   | less
+   | add
+   | sub
+   | mul
+   | div
+   | mod
+   | cast
+   | either
+   | all
+   | any
+   | not
+   | func
+   | LABEL
+   | ATOM
+   ;
+
+equals
+   : 'BOTH SAEM' expression 'AN' expression
+   ;
+
+not_equals
+   : 'DIFFRINT' expression 'AN' expression
+   ;
+
+both
+   : 'BOTH OF' expression 'AN' expression
+   ;
+
+either
+   : 'EITHER OF' expression 'AN' expression
+   ;
+
+greater
+   : 'BIGGR OF' expression 'AN' expression
+   ;
+
+less
+   : 'SMALLR OF' expression 'AN' expression
+   ;
+
+add
+   : 'SUM OF' expression 'AN' expression
+   ;
+
+sub
+   : 'DIFF OF' expression 'AN' expression
+   ;
+
+mul
+   : 'PRODUKT OF' expression 'AN' expression
+   ;
+
+div
+   : 'QUOSHUNT OF' expression 'AN' expression
+   ;
+
+mod
+   : 'MOD OF' expression 'AN' expression
+   ;
+
+cast
+   : 'MAEK' expression 'A' < type >
+   ;
+
+all
+   : 'ALL OF' expression ('AN' expression)* 'MKAY?'
+   ;
+
+any
+   : 'ANY OF' expression ('AN' expression)* 'MKAY?'
+   ;
+
+not
+   : 'NOT' expression
+   ;
+
+func
+   : LABEL expression + 'MKAY?'
+   ;
+
+
+LABEL
+   : ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')*
+   ;
+
+
+ATOM
+   : 'WIN' | 'FAIL' | 'NOOB' | ('0' .. '9')* | ('0' .. '9')* '.' ('0' .. '9')* | STRING
+   ;
 
 
 STRING
@@ -80,4 +194,6 @@ STRING
    ;
 
 
-NLC			: [\r\n] | ',';
+NLC
+   : [\r\n] | ','
+   ;
