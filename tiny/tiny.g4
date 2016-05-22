@@ -48,11 +48,11 @@ assign_stmt
    ;
 
 read_stmt
-   : 'READ' (id_list)
+   : 'READ' id_list
    ;
 
 write_stmt
-   : 'WRITE' (expr_list)
+   : 'WRITE' expr_list
    ;
 
 id_list
@@ -81,5 +81,15 @@ op
    ;
 
 ident
-   : 'ID'
+   : ID
+   ;
+
+
+ID
+   : ('a' .. 'z' | 'A' .. 'Z')*
+   ;
+
+
+WS
+   : [ \r\n] -> skip
    ;
