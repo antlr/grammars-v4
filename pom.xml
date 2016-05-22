@@ -50,6 +50,7 @@
 		<module>kuka</module>
 		<module>less</module>
 		<module>logo</module>
+		<module>lolcode</module>
 		<module>lua</module>
 		<module>masm</module>
 		<module>mdx</module>
