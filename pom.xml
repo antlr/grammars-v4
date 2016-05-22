@@ -86,6 +86,7 @@
 		<module>stringtemplate</module>
 		<module>suokif</module>
 		<module>swift</module>
+		<module>tiny</module>
 		<module>tinyc</module>
 		<module>tnsnames</module>
 		<module>tnt</module>
