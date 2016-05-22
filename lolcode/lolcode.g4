@@ -1,6 +1,6 @@
 /*
 BSD License
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2016, Tom Everett
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -32,12 +32,11 @@ Adapted from https://github.com/jynnantonix/lolcode/blob/master/BNFGrammar.txt
 grammar lolcode;
 
 program
-   : 'HAI' NLC code_block NLC 'KTHXBAI'
+   : 'HAI' code_block 'KTHXBYE'?
    ;
 
 code_block
-   : statement
-   | statement NLC code_block
+   : statement +
    ;
 
 statement
@@ -53,7 +52,7 @@ statement
    ;
 
 loop
-   : 'IM IN YR' LABEL 'WILE' expression NLC code_block NLC 'IM OUTTA YR' LABEL
+   : 'IM IN YR' LABEL 'WILE' expression code_block 'IM OUTTA YR' LABEL
    ;
 
 declaration
@@ -67,18 +66,18 @@ comment
    ;
 
 print_block
-   : 'VISIBLE' expression* 'MKAY?'
+   : 'VISIBLE' expression* 'MKAY?'?
    ;
 
 if_block
-   : 'O RLY?' NLC 'YA RLY' NLC code_block NLC 'OIC'
-   | 'O RLY?' NLC 'YA RLY' NLC code_block NLC else_if_block NLC 'OIC'
+   : 'O RLY?' 'YA RLY' code_block 'OIC'
+   | 'O RLY?' 'YA RLY' code_block else_if_block 'OIC'
    ;
 
 else_if_block
-   : 'MEBBE' expression NLC code_block NLC else_if_block
-   | 'NO WAI' NLC code_block
-   | 'MEBBE' expression NLC code_block
+   : 'MEBBE' expression code_block else_if_block
+   | 'NO WAI' code_block
+   | 'MEBBE' expression code_block
    ;
 
 input_block
@@ -86,7 +85,7 @@ input_block
    ;
 
 func_decl
-   : 'HOW DUZ I' LABEL (('YR' LABEL) ('AN YR' LABEL)*)? NLC code_block NLC 'IF U SAY SO'
+   : 'HOW DUZ I' LABEL (('YR' LABEL) ('AN YR' LABEL)*)? code_block 'IF U SAY SO'
    ;
 
 assignment
@@ -194,6 +193,6 @@ STRING
    ;
 
 
-NLC
-   : [\r\n] | ','
+WS
+   : [ \r\n] -> skip
    ;
