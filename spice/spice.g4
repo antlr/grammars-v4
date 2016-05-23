@@ -1,64 +1,74 @@
+
 grammar spice;
 
 spicefile
-    : netlist END CR?
-    ;
+   : netlist END CR?
+   ;
 
 netlist
-    : (node | simulationcommand)+
-    ;    
+   : (node | simulationcommand) +
+   ;
 
 node
-    : vnode
-    | rnode
-    | cnode
-    | lnode
-    ;
+   : vnode
+   | rnode
+   | cnode
+   | lnode
+   ;
 
 vertexID
-    : DIGIT+
-    ;
+   : DIGIT +
+   ;
 
 vnode
-    : VNODENAME vertexID vertexID VSOURCETYPE expression;
+   : VNODENAME vertexID vertexID VSOURCETYPE expression
+   ;
+
 
 VNODENAME
-    : V DIGIT+
-    ;
+   : V DIGIT +
+   ;
+
 
 VSOURCETYPE
-    : (D C) | (A C)
-    ;
+   : (D C) | (A C)
+   ;
 
 rnode
-    : RNODENAME vertexID vertexID expression;
+   : RNODENAME vertexID vertexID expression
+   ;
+
 
 RNODENAME
-    : R DIGIT+
-    ;
+   : R DIGIT +
+   ;
 
 cnode
-    : CNODENAME vertexID vertexID expression ('ic' EQUALS expression)?;
+   : CNODENAME vertexID vertexID expression ('ic' EQUALS expression)?
+   ;
+
 
 CNODENAME
-    : C DIGIT+
-    ;
+   : C DIGIT +
+   ;
 
 lnode
-    : LNODENAME vertexID vertexID expression;
+   : LNODENAME vertexID vertexID expression
+   ;
+
 
 LNODENAME
-    :L DIGIT+
-    ;
+   : L DIGIT +
+   ;
 
 simulationcommand
-    : dotdc
-    ;
+   : dotdc
+   ;
 
 dotdc
-    : '.DC' VNODENAME expression expression expression
-    ;
-        
+   : '.DC' VNODENAME expression expression expression
+   ;
+
 expression
    : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
    ;
@@ -78,91 +88,207 @@ atom
 
 // a number with a potential metrix suffix
 value
-    : scientific K?
-    ;
-   
+   : scientific K?
+   ;
+
 scientific
    : number (E number)?
    ;
 
 number
-   : MINUS? DIGIT* (POINT DIGIT+)?
+   : MINUS? DIGIT* (POINT DIGIT +)?
    ;
+
 
 LPAREN
    : '('
    ;
 
+
 RPAREN
    : ')'
    ;
+
 
 PLUS
    : '+'
    ;
 
+
 MINUS
    : '-'
    ;
+
 
 TIMES
    : '*'
    ;
 
+
 DIV
    : '/'
    ;
+
 
 EQ
    : '='
    ;
 
+
 POINT
    : '.'
    ;
 
-fragment A:('a'|'A');
-fragment B:('b'|'B');
-fragment C:('c'|'C');
-fragment D:('d'|'D');
-fragment E:('e'|'E');
-fragment F:('f'|'F');
-fragment G:('g'|'G');
-fragment H:('h'|'H');
-fragment I:('i'|'I');
-fragment J:('j'|'J');
-fragment K:('k'|'K');
-fragment L:('l'|'L');
-fragment M:('m'|'M');
-fragment N:('n'|'N');
-fragment O:('o'|'O');
-fragment P:('p'|'P');
-fragment Q:('q'|'Q');
-fragment R:('r'|'R');
-fragment S:('s'|'S');
-fragment T:('t'|'T');
-fragment U:('u'|'U');
-fragment V:('v'|'V');
-fragment W:('w'|'W');
-fragment X:('x'|'X');
-fragment Y:('y'|'Y');
-fragment Z:('z'|'Z');
+
+fragment A
+   : ('a' | 'A')
+   ;
+
+
+fragment B
+   : ('b' | 'B')
+   ;
+
+
+fragment C
+   : ('c' | 'C')
+   ;
+
+
+fragment D
+   : ('d' | 'D')
+   ;
+
+
+fragment E
+   : ('e' | 'E')
+   ;
+
+
+fragment F
+   : ('f' | 'F')
+   ;
+
+
+fragment G
+   : ('g' | 'G')
+   ;
+
+
+fragment H
+   : ('h' | 'H')
+   ;
+
+
+fragment I
+   : ('i' | 'I')
+   ;
+
+
+fragment J
+   : ('j' | 'J')
+   ;
+
+
+fragment K
+   : ('k' | 'K')
+   ;
+
+
+fragment L
+   : ('l' | 'L')
+   ;
+
+
+fragment M
+   : ('m' | 'M')
+   ;
+
+
+fragment N
+   : ('n' | 'N')
+   ;
+
+
+fragment O
+   : ('o' | 'O')
+   ;
+
+
+fragment P
+   : ('p' | 'P')
+   ;
+
+
+fragment Q
+   : ('q' | 'Q')
+   ;
+
+
+fragment R
+   : ('r' | 'R')
+   ;
+
+
+fragment S
+   : ('s' | 'S')
+   ;
+
+
+fragment T
+   : ('t' | 'T')
+   ;
+
+
+fragment U
+   : ('u' | 'U')
+   ;
+
+
+fragment V
+   : ('v' | 'V')
+   ;
+
+
+fragment W
+   : ('w' | 'W')
+   ;
+
+
+fragment X
+   : ('x' | 'X')
+   ;
+
+
+fragment Y
+   : ('y' | 'Y')
+   ;
+
+
+fragment Z
+   : ('z' | 'Z')
+   ;
+
 
 DIGIT
    : ('0' .. '9')
    ;
 
+
 END
-    : '.END' | '.end'
-    ;
+   : '.END' | '.end'
+   ;
+
 
 COMMENT_1
-    : '*' ~[\r\n]* -> skip
-    ;
+   : '*' ~ [\r\n]* -> skip
+   ;
+
 
 COMMENT_2
-    : ';' ~[\r\n]* -> skip
-    ;
+   : ';' ~ [\r\n]* -> skip
+   ;
+
 
 WS
    : [ \r\n\t] + -> channel (HIDDEN)
