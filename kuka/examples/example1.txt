@@ -1,0 +1,15 @@
+DEF example()
+DECL INT i
+DECL POS cpos
+DECL AXIS jpos
+FOR i=1 TO 6
+$VEL_AXIS[i]=60
+ENDFOR
+jpos = {AXIS: A1 0,A2 -90,A3 90,A4 0,A5 0,A6 0}
+PTP jpos
+IF $IN[1] == TRUE THEN
+cpos = {POS: X 300,Y -100,Z 1500,A 0,B 90,C 0}
+ELSE
+cpos = {POS: X 250,Y -200,Z 1300,A 0,B 90,C 0}
+ENDIF
+END

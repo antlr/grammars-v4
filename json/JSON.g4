@@ -5,8 +5,7 @@
 grammar JSON;
 
 json
-   : object
-   | array
+   : value
    ;
 
 object

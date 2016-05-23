@@ -1,0 +1,2 @@
+SELECT f FROM Country
+

@@ -1,0 +1,97 @@
+ 
+;ROBOT "NORDEN+"
+
+;BY RICHARD A. FOWELL
+
+;WINNER OF COMPUTER
+;GAMING WORLD'S
+;ROBOTWAR TOURNAMENT
+
+
+
+; ADROIT MOD
+1 TO SPEEDY
+256 TO U TO V
+ 315 TO Q
+ 100 TO D
+  81 TO K
+ Y > 128 -256 TO V
+   >  -1  135 TO Q
+  90 TO L
+  99 TO M
+  X > 128 -256 TO U
+  U / V TO H < 0 90 + Q TO Q
+  85 TO N
+  95 TO O
+  11 TO INDEX
+  29 / 2 TO J
+  1014 * 4 TO E
+SCAN
+  Q + T + B TO A TO AIM
+  -58 TO B T + 13 TO T
+  IF DAMAGE # D GOTO START
+  A TO RADAR
+  3 - RADAR TO R < 0 GOTO SCAN
+                 TO SHOT
+SIMPLE
+  -2 TO F
+  850 / R TO C
+INAMIN
+  A - C - C TO A
+MORE
+  DAMAGE # D GOTO START
+  A + C TO A TO AIM TO RADAR
+  1 + F TO F > 10 GOTO SCAN
+  3 - RADAR TO R < 0 GOTO MORE
+               F < 0 GOTO INAMIN
+               R TO SHOT
+  GOTO SIMPLE
+START
+  -500 TO F
+  U TO SPEEDX
+  V TO SPEEDY
+  Q TO RADAR
+  RADAR > 0 GOTO MAINP
+TURN
+  IF H > 0 - U TO SPEEDX
+  IF H < 0 - V TO V
+  V TO SPEEDY
+  INDEX + 1 TO INDEX
+  0 - H TO H
+  90 + Q TO Q TO RADAR
+  IF H < 0 - U TO U
+  IF INDEX > 15 11 TO INDEX
+  3 - RADAR TO F > 12 621 + 621 
+                      / F + Q TO AIM
+                 > 12 F TO SHOT 
+                 > -137 GOTO TURN
+MAINP
+ -600 TO B
+  TRACK TO C
+  U TO SPEEDX
+  F > -145 TURN TO C
+ -500 TO F TO T TO D
+  Q + DATA TO I
+MAINQ
+  T + 29 TO T > -77 GOTO TURN
+  D > DAMAGE GOTO TURN
+  T - 29 > B I TO A
+  A TO RADAR
+  T > -99 GOTO TURN < -450 766 TO Z
+  3 - RADAR TO F
+            < 3 + T > -296 GOTO TURN
+            < 3 GOTO C
+          T < B GOTO C
+  Z / F + A TO AIM
+  IF A = I E / F + A TO A
+  F TO SHOT
+  J + T TO T > -84 GOTO TURN + 50 TO B
+  IF C < TRACK GOTO C
+TRACK
+  Q TO RADAR
+  0 - RADAR > 0 GOTO TURN
+                TO T
+  MAINQ TO C
+  621 + 621 TO Z
+  DAMAGE TO D
+  GOTO MAINQ
