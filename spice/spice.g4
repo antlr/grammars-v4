@@ -86,17 +86,17 @@ atom
    | LPAREN expression RPAREN
    ;
 
-// a number with a potential metrix suffix
 value
-   : scientific K?
+   : scientific
    ;
 
+// a number with a potential metrix suffix and a potential exponent
 scientific
    : number (E number)?
    ;
 
 number
-   : MINUS? DIGIT* (POINT DIGIT +)?
+   : MINUS? DIGIT* METRIC_PREFIX? (POINT DIGIT + METRIC_PREFIX?)?
    ;
 
 
@@ -137,6 +137,11 @@ EQ
 
 POINT
    : '.'
+   ;
+
+
+METRIC_PREFIX
+   : E | P | T | G | M | K | H | D | C | M | U | N | F | A
    ;
 
 
