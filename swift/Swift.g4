@@ -29,7 +29,7 @@
  * Converted from Apple's doc, http://tinyurl.com/n8rkoue, to ANTLR's
  * meta-language.
  */
-grammar Swift; // 2.1
+grammar Swift; // 2.2
 
 top_level : statement* EOF ;
 
@@ -433,6 +433,7 @@ class_body : '{' declarations? '}'  ;
 protocol_declaration : attributes? access_level_modifier? 'protocol' protocol_name type_inheritance_clause? protocol_body  ;
 protocol_name : identifier  ;
 protocol_body : '{' protocol_member_declarations? '}'  ;
+
 protocol_member_declaration : protocol_property_declaration
  | protocol_method_declaration
  | protocol_initializer_declaration
@@ -462,7 +463,7 @@ protocol_subscript_declaration : subscript_head subscript_result getter_setter_k
 
 // GRAMMAR OF A PROTOCOL ASSOCIATED TYPE DECLARATION
 
-protocol_associated_type_declaration : typealias_head type_inheritance_clause? typealias_assignment? ;
+protocol_associated_type_declaration : attributes? access_level_modifier? 'associatedtype' typealias_name type_inheritance_clause? typealias_assignment? ;
 
 // GRAMMAR OF AN INITIALIZER DECLARATION
 
@@ -580,7 +581,7 @@ expression_pattern : expression  ;
 
 // GRAMMAR OF AN ATTRIBUTE
 
-attribute : '@' attribute_name attribute_argument_clause? ;
+attribute : '@'? attribute_name attribute_argument_clause? ;
 attribute_name : identifier  ;
 attribute_argument_clause : '('  balanced_tokens?  ')'  ;
 attributes : attribute+ ;
@@ -612,7 +613,7 @@ in_out_expression : '&' identifier ;
 
 // GRAMMAR OF A TRY EXPRESSION
 
-try_operator : 'try' | 'try' '?' | 'try' '!' ;
+try_operator : 'try' '?' | 'try' '!' | 'try' ;
 
 // GRAMMAR OF A BINARY EXPRESSION
 
@@ -652,6 +653,7 @@ primary_expression
  | parenthesized_expression
  | implicit_member_expression
  | wildcard_expression
+ | selector_expression
  ;
 
 implicit_member_expression : '.' identifier ;
@@ -695,7 +697,7 @@ superclass_initializer_expression : 'super' '.' 'init'  ;
 
 // GRAMMAR OF A CLOSURE EXPRESSION
 
-closure_expression : '{' closure_signature? statements '}'  ;
+closure_expression : '{' closure_signature? statements? '}'  ;
 closure_signature
  : parameter_clause function_result? 'in'
  | identifier_list function_result? 'in'
@@ -720,15 +722,25 @@ expression_element : expression | identifier ':' expression  ;
 
 wildcard_expression : '_'  ;
 
+// GRAMMAR OF A SELECTOR EXPRESSION
+
+selector_expression : '#selector' '(' expression ')' ;
+
 // GRAMMAR OF A POSTFIX EXPRESSION (inlined many rules from spec to avoid indirect left-recursion)
 
 postfix_expression
- : postfix_expression postfix_operator                            # postfix_operation
+ : primary_expression                                             # primary
+ | postfix_expression postfix_operator                            # postfix_operation
  | postfix_expression parenthesized_expression                    # function_call_expression
  | postfix_expression parenthesized_expression? trailing_closure  # function_call_with_closure_expression
  | postfix_expression '.' 'init'                                  # initializer_expression
+ | postfix_expression '.' 'init' '(' argument_names ')'           # initializer_expression_with_args
  | postfix_expression '.' Pure_decimal_digits                     # explicit_member_expression1
  | postfix_expression '.' identifier generic_argument_clause?     # explicit_member_expression2
+ | postfix_expression '.' identifier '(' argument_names ')'       # explicit_member_expression3
+// This does't exist in the swift grammar, but this valid swift statement fails without it
+// self.addTarget(self, action: #selector(nameOfAction(_:)))
+ | postfix_expression '(' argument_names ')'                      # explicit_member_expression4
  | postfix_expression '.' 'self'                                  # postfix_self_expression
  | postfix_expression '.' 'dynamicType'                           # dynamic_type_expression
  | postfix_expression '[' expression_list ']'                     # subscript_expression
@@ -736,7 +748,6 @@ postfix_expression
 // | postfix_expression '!'                                         # forced_value_expression
 // ? is a postfix operator already
 // | postfix_expression '?'                                         # optional_chaining_expression
- | primary_expression                                             # primary
  ;
 
 /* This might be faster than above
@@ -756,6 +767,10 @@ postfix_expression
 	 )*
  ;
 */
+
+argument_names : argument_name argument_names? ;
+
+argument_name : identifier ':' ;
 
 trailing_closure : closure_expression ;
 
@@ -848,14 +863,14 @@ identifier : Identifier | context_sensitive_keyword ;
 
 Identifier
  : Identifier_head Identifier_characters?
- | '_' Identifier_characters // _ MUST be followed by something. _ is not a valid Identifier. it's a pattern
- | '`' (Identifier_head|'_') Identifier_characters? '`'
+ | '`' Identifier_head Identifier_characters? '`'
  | Implicit_parameter_name
  ;
 
 identifier_list : identifier (',' identifier)* ;
 
 fragment Identifier_head : [a-zA-Z]
+ | '_'
  | '\u00A8' | '\u00AA' | '\u00AD' | '\u00AF' | [\u00B2-\u00B5] | [\u00B7-\u00BA]
  | [\u00BC-\u00BE] | [\u00C0-\u00D6] | [\u00D8-\u00F6] | [\u00F8-\u00FF]
  | [\u0100-\u02FF] | [\u0370-\u167F] | [\u1681-\u180D] | [\u180F-\u1DBF]
@@ -877,14 +892,13 @@ fragment Identifier_head : [a-zA-Z]
 fragment Identifier_character : [0-9]
  | [\u0300-\u036F] | [\u1DC0-\u1DFF] | [\u20D0-\u20FF] | [\uFE20-\uFE2F]
  | Identifier_head
- | '_'
  ;
 
 fragment Identifier_characters : Identifier_character+ ;
 
 context_sensitive_keyword :
  'associativity' | 'convenience' | 'dynamic' | 'didSet' |
- 'fina' | 'get' | 'infix' | 'indirect' | 'lazy' | 'left' | 'mutating' | 'none' |
+ 'final' | 'get' | 'infix' | 'indirect' | 'lazy' | 'left' | 'mutating' | 'none' |
  'nonmutating' | 'optional' | 'operator' | 'override' |
  'postfix' | 'precedence' | 'prefix' | 'Protocol' | 'required' | 'right' |
  'set' | 'Type' | 'unowned' | 'unowned' | 'weak' | 'willSet'

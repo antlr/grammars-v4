@@ -9,6 +9,7 @@
 	<modules>
 		<module>support</module>
 		<module>abnf</module>
+		<module>agc</module>
 		<module>antlr4</module>
 		<module>arithmetic</module>
 		<module>asm6502</module>
@@ -27,24 +28,32 @@
 		<module>creole</module>
 		<!-- C# runtime is not supported. <module>csharp</module> -->
 		<module>csv</module>
+		<module>datetime</module>
 		<module>dcm</module>
 		<module>dot</module>
 		<module>erlang</module>
 		<module>fasta</module>
 		<module>FOL</module>
+		<module>fortran77</module>
 		<module>gff3</module>
 		<module>graphql</module>
 		<module>html</module>
 		<module>icalendar</module>
 		<module>idl</module>
+		<module>informix</module>
 		<module>iri</module>
 		<module>java</module>
 		<module>java8</module>
+		<module>javadoc</module>
+		<module>jpa</module>
 		<module>json</module>
+		<module>kuka</module>
 		<module>less</module>
 		<module>logo</module>
+		<module>lolcode</module>
 		<module>lua</module>
 		<module>masm</module>
+		<module>mdx</module>
 		<module>memcached_protocol</module>
 		<module>modelica</module>
 		<module>modula2pim4</module>
@@ -61,14 +70,17 @@
 		<module>pgn</module>
 		<!-- C# runtime is not supported. <module>php</module> -->
 		<module>plsql</module>
+		<module>postalcode</module>
 		<module>propcalc</module>
 		<module>python3</module>
 		<module>r</module>
 		<module>rcs</module>
 		<module>redcode</module>
+		<module>robotwars</module>
 		<module>ruby</module>
 		<module>scala</module>
 		<module>scss</module>
+		<module>sexpression</module>
 		<module>sharc</module>
 		<module>smalltalk</module>
 		<module>sparql</module>
@@ -77,6 +89,7 @@
 		<module>stringtemplate</module>
 		<module>suokif</module>
 		<module>swift</module>
+		<module>tiny</module>
 		<module>tinyc</module>
 		<module>tnsnames</module>
 		<module>tnt</module>
@@ -91,11 +104,12 @@
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>
+		<module>swift-fin</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.5.1-1</antlr.version>
+		<antlr.version>4.5.3</antlr.version>
 	</properties>
 	<dependencies>
 		<dependency>
