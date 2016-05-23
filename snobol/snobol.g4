@@ -35,7 +35,7 @@ lin
    ;
 
 line
-   : (label? subject pattern? EQ expression + (COLON transfer)?)
+   : (label? subject pattern? (EQ expression +)? (COLON transfer)?)
    | (COLON transfer)
    | (COMMENT | END)
    ;
@@ -220,7 +220,11 @@ break_
    ;
 
 transfer
-   : ('f'? LPAREN label RPAREN)? ('s'? LPAREN label RPAREN)?
+   : (transferpre? LPAREN (label | END) RPAREN)?
+   ;
+
+transferpre
+   : ('f' | 'F' | 's' | 'S')
    ;
 
 
