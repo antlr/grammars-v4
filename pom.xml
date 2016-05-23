@@ -34,6 +34,7 @@
 		<module>erlang</module>
 		<module>fasta</module>
 		<module>FOL</module>
+		<module>fortran77</module>
 		<module>gff3</module>
 		<module>graphql</module>
 		<module>html</module>
@@ -49,6 +50,7 @@
 		<module>kuka</module>
 		<module>less</module>
 		<module>logo</module>
+		<module>lolcode</module>
 		<module>lua</module>
 		<module>masm</module>
 		<module>mdx</module>
@@ -68,11 +70,13 @@
 		<module>pgn</module>
 		<!-- C# runtime is not supported. <module>php</module> -->
 		<module>plsql</module>
+		<module>postalcode</module>
 		<module>propcalc</module>
 		<module>python3</module>
 		<module>r</module>
 		<module>rcs</module>
 		<module>redcode</module>
+		<module>robotwars</module>
 		<module>ruby</module>
 		<module>scala</module>
 		<module>scss</module>
@@ -85,6 +89,7 @@
 		<module>stringtemplate</module>
 		<module>suokif</module>
 		<module>swift</module>
+		<module>tiny</module>
 		<module>tinyc</module>
 		<module>tnsnames</module>
 		<module>tnt</module>
