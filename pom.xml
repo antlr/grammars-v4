@@ -83,6 +83,7 @@
 		<module>sexpression</module>
 		<module>sharc</module>
 		<module>smalltalk</module>
+		<module>snobol</module>
 		<module>sparql</module>
 		<module>sqlite</module>
 		<module>stacktrace</module>
