@@ -1,0 +1,9 @@
+           OUTPUT = "What is your name?"
+           Username = INPUT
+           Username "J"                                             :S(LOVE)
+           Username "K"                                             :S(HATE)
+ MEH       OUTPUT = "Hi, " Username                                 :(END)
+ LOVE      OUTPUT = "How nice to meet you, " Username               :(END)
+ HATE      OUTPUT = "Oh. It's you, " Username
+ END
+ 
