@@ -31,13 +31,13 @@ prog
    ;
 
 lin
-    : line? EOL;
+   : line? EOL
+   ;
 
 line
-   : (label? subject pattern? EQ expression+ (COLON transfer)?)
+   : (label? subject pattern? EQ expression + (COLON transfer)?)
    | (COLON transfer)
-   | COMMENT 
-   | END
+   | (COMMENT | END)
    ;
 
 label
@@ -49,7 +49,8 @@ subject
    ;
 
 pattern
-   : STRINGLITERAL
+   : STRINGLITERAL1
+   | STRINGLITERAL2
    ;
 
 expression
@@ -65,8 +66,7 @@ powExpression
    ;
 
 atom
-   : STRINGLITERAL
-   | INTEGER
+   : (STRINGLITERAL1 | STRINGLITERAL2 | INTEGER)
    | subject
    | command
    | '[' expression (',' expression)* ']'
@@ -278,14 +278,19 @@ COLON
    : ':'
    ;
 
+
 END
    : 'END'
    ;
 
 
-
-STRINGLITERAL
+STRINGLITERAL1
    : '"' ~ ["\r\n]* '"'
+   ;
+
+
+STRINGLITERAL2
+   : '\'' ~ [\'\r\n]* '\''
    ;
 
 
@@ -435,7 +440,7 @@ fragment Z
 
 
 COMMENT
-   : '*' ~[\r\n]*
+   : '*' ~ [\r\n]*
    ;
 
 
