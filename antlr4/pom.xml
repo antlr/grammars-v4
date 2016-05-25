@@ -42,6 +42,31 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>${basedir}</directory>
+									<includes>
+										<include>LexerAdaptor.java</include>
+									</includes>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+							<outputDirectory>${basedir}/target/generated-sources/antlr4/org/antlr/parser/antlr4</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
