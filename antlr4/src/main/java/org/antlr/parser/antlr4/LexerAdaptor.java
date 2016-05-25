@@ -64,15 +64,15 @@ public abstract class LexerAdaptor extends Lexer {
 	@Override
 	public Token emit() {
 		switch (_type) {
-			case AntlrDT4Lexer.AT:
+			case ANTLRv4Lexer.AT:
 				_atType = true; // beginning action
 				break;
-			case AntlrDT4Lexer.ID:
+			case ANTLRv4Lexer.ID:
 				String firstChar = _input.getText(Interval.of(_tokenStartCharIndex, _tokenStartCharIndex));
 				if (Character.isUpperCase(firstChar.charAt(0))) {
-					_type = AntlrDT4Lexer.TOKEN_REF;
+					_type = ANTLRv4Lexer.TOKEN_REF;
 				} else {
-					_type = AntlrDT4Lexer.RULE_REF;
+					_type = ANTLRv4Lexer.RULE_REF;
 				}
 
 				// if outside of rule def and not the ID in '@header' or '@member'
@@ -81,7 +81,7 @@ public abstract class LexerAdaptor extends Lexer {
 				}
 				_atType = false;
 				break;
-			case AntlrDT4Lexer.SEMI:                // exit rule def
+			case ANTLRv4Lexer.SEMI:                // exit rule def
 				_currentRuleType = Token.INVALID_TYPE;
 				_atType = false;
 				break;
