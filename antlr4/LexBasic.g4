@@ -57,15 +57,14 @@ fragment Vws
    ;
 
 
-fragment DocComment
-   : '/**' .*? ('*/' | EOF)
-   ;
-
-
 fragment BlockComment
    : '/*' .*? ('*/' | EOF)
    ;
 
+
+fragment DocComment
+   : '/**' .*? ('*/' | EOF)
+   ;
 
 fragment LineComment
    : '//' ~ [\r\n]*
