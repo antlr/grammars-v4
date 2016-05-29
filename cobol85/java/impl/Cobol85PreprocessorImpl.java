@@ -1,20 +1,9 @@
 /*
-Copyright (C) 2015 u.wol@wwu.de
-
-This file is part of cobol85grammar.
-
-cobol85grammar is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-cobol85grammar is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with cobol85grammar. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016, Ulrich Wolffgang <u.wol@wwu.de>
+ * All rights reserved.
+ *
+ * This software may be modified and distributed under the terms
+ * of the BSD 3-clause license. See the LICENSE file for details.
  */
 
 package org.cobol85.preprocessor.impl;
@@ -428,10 +417,10 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 	protected final static String NEWLINE = "\n";
 
-	protected final Cobol85Format[] defaultFormats = new Cobol85Format[] { Cobol85FormatEnum.FIXED,
-			Cobol85FormatEnum.VARIABLE, Cobol85FormatEnum.TANDEM };
+	protected final String[] copyFileExtensions = new String[] { "", "CPY", "cpy", "COB", "cob", "CBL", "cbl" };
 
-	protected final String[] extensions = new String[] { "", "CPY", "COB", "CBL" };
+	protected final Cobol85Format[] defaultFormats = new Cobol85Format[] { Cobol85FormatEnum.DEFECT,
+			Cobol85FormatEnum.FIXED, Cobol85FormatEnum.VARIABLE, Cobol85FormatEnum.TANDEM };
 
 	protected final String[] parsingTriggers = new String[] { "copy", "exec sql", "exec cics", "replace" };
 
@@ -517,7 +506,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	protected File identifyCopyFile(final String filename, final File libDirectory) {
 		File copyFile = null;
 
-		for (final String extension : extensions) {
+		for (final String extension : copyFileExtensions) {
 			final String filenameWithExtension;
 
 			if (extension.isEmpty()) {
@@ -616,7 +605,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		final StringBuffer outputBuffer = new StringBuffer();
 
 		String line = null;
-		boolean isFirstLine = true;
+		int lineNumber = 0;
 
 		while (scanner.hasNextLine()) {
 			line = scanner.nextLine();
@@ -624,28 +613,32 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			// clean line from certain ASCII chars
 			final int substituteChar = 0x1A;
 			final String cleanedLine = line.replace((char) substituteChar, ' ');
-
-			// parse line
-			final Cobol85Line parsedLine = parseCobol85Line(cleanedLine, formats);
 			final String normalizedLine;
 
-			if (parsedLine == null) {
-				LOG.warn("unknown line format: {}", line);
+			// if line is empty
+			if (cleanedLine.trim().isEmpty()) {
 				normalizedLine = cleanedLine;
 			} else {
-				normalizedLine = normalizeLine(parsedLine, isFirstLine);
+				// parse line
+				final Cobol85Line parsedLine = parseCobol85Line(cleanedLine, formats);
+
+				// if line could not be parsed
+				if (parsedLine == null) {
+					LOG.warn("unknown line format in line {}: {}", lineNumber + 1, line);
+					normalizedLine = cleanedLine;
+				} else {
+					final boolean isFirstLine = lineNumber == 0;
+					normalizedLine = normalizeLine(parsedLine, isFirstLine);
+				}
 			}
 
 			outputBuffer.append(normalizedLine);
-			isFirstLine = false;
+			lineNumber++;
 		}
 
 		scanner.close();
 
 		final String result = outputBuffer.toString();
-
-		LOG.debug("Normalized input:\n\n{}\n\n", result);
-
 		return result;
 	}
 
@@ -715,6 +708,8 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			result = normalizedInput;
 		}
 
+		LOG.debug("Processed input:\n\n{}\n\n", result);
+
 		return result;
 	}
 
@@ -744,9 +739,6 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		walker.walk(listener, startRule);
 
 		final String result = listener.context().read();
-
-		LOG.debug("Preprocessed input:\n\n{}\n\n", result);
-
 		return result;
 	}
 

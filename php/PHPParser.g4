@@ -1,529 +1,809 @@
-/*
- [The "BSD licence"]
- Copyright (c) 2013 Tom Everett
- All rights reserved.
+// PHP grammar by Ivan Kochurkin (KvanTTT), 2015.
+// Used Phalanger grammar: https://github.com/DEVSENSE/Phalanger by Jakub Míšek (jakubmisek)
+// and old php grammar by Tom Everett (teverett).
+// Runtime: C#.
+// Licence: MIT.
 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
- 1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
-//
-//
-// HTML Grammar based on the ANTLR4 XML Grammar by Terence Parr
-//
-//
 parser grammar PHPParser;
 
 options { tokenVocab=PHPLexer; }
 
-htmlDocument    
-    : htmlDTD? htmlElements*
+// HTML
+// Also see here: https://github.com/antlr/grammars-v4/tree/master/html
+
+htmlDocument
+    : Shebang? HtmlComment* htmlElementOrPhpBlock* EOF
     ;
 
-htmlDTD
-    : HTML_DTD
+htmlElementOrPhpBlock
+    : (HtmlDtd | htmlElement | phpBlock) HtmlComment*
     ;
 
-htmlElements
-    : htmlMisc* (htmlElement | phpBlock) htmlMisc*
+htmlElement
+    : HtmlScriptOpen htmlAttribute* HtmlClose scriptText ScriptClose
+    | HtmlStyleOpen htmlAttribute* HtmlClose StyleBody
+    | HtmlOpen HtmlName htmlAttribute* HtmlClose (htmlContent HtmlOpen HtmlSlash HtmlName HtmlClose)?
+    | HtmlOpen HtmlName htmlAttribute* '/>'
     ;
 
-htmlElement     
-    : '<' HTML_Name htmlAttribute* '>' htmlContent '<' HTML_SLASH HTML_Name '>'
-    | '<' HTML_Name htmlAttribute* '/>'
-    | '<' HTML_Name htmlAttribute* '>'
+htmlContent
+    : HtmlText? ((htmlElement | HtmlComment | phpBlock) HtmlText?)*
     ;
 
-htmlContent     
-    : htmlChardata? ((htmlElement | htmlReference | htmlComment | phpBlock) htmlChardata?)*
+htmlAttribute
+    : phpBlock
+    | HtmlName HtmlEquals HtmlStartQuoteString htmlQuotePhpBlockOrString* HtmlEndQuoteString
+    | HtmlName HtmlEquals HtmlStartDoubleQuoteString htmlDoubleQuotePhpBlockOrString* HtmlEndDoubleQuoteString
+    | HtmlName HtmlEquals (HtmlHex | HtmlDecimal)
+    | HtmlName
     ;
 
-htmlReference   
-    : HTML_EntityRef 
-    | HTML_CharRef
+htmlQuotePhpBlockOrString
+    : phpBlock
+    | HtmlQuoteString
     ;
 
-htmlAttribute   
-    : HTML_Name HTML_EQUALS htmlLiteral
+htmlDoubleQuotePhpBlockOrString
+    : phpBlock
+    | HtmlDoubleQuoteString
+    ;
+    
+// Script
+// Parse JavaScript with https://github.com/antlr/grammars-v4/tree/master/ecmascript if necessary.
+
+scriptText
+    : scriptTextPart*
+    ;
+    
+scriptTextPart
+    : phpBlock
+    | ScriptText+
     ;
 
-htmlLiteral
-    : HTML_QUOTED_STRING 
-//    | HTML_UNQUOTED_STRING
-    | HTML_HEX
+// PHP
+    
+phpBlock
+    : importStatement* topStatement+
     ;
 
-htmlChardata    
-    : HTML_TEXT 
-    | SEA_WS
+importStatement
+    : Import Namespace namespaceNameList ';'
     ;
 
-htmlMisc        
-    : htmlComment 
-    | SEA_WS
+topStatement
+    : emptyStatement
+    | nonEmptyStatement
+    | useDeclaration
+    | namespaceDeclaration
+    | functionDeclaration
+    | classDeclaration
+    | globalConstantDeclaration
+    ;
+    
+useDeclaration
+    : Use (Function | Const)? useDeclarationContentList ';'
     ;
 
-htmlComment
-    : HTML_COMMENT
+useDeclarationContentList
+    : '\\'? useDeclarationContent (',' '\\'? useDeclarationContent)*
+    ;
+    
+useDeclarationContent
+    : namespaceNameList (As identifier)?
     ;
 
-//
-//
-// PHP Grammar
-//
-//
-
-phpBlock 
-    : prolog statement* epilog?
+namespaceDeclaration
+    : Namespace (namespaceNameList? '{' namespaceStatement* '}' | namespaceNameList ';')
     ;
 
-prolog
-    : PHP_Start
+namespaceStatement
+    : nonEmptyStatement
+    | useDeclaration
+    | functionDeclaration
+    | classDeclaration
+    | globalConstantDeclaration
     ;
 
-epilog
-    : PHP_END
+functionDeclaration
+    : attributes Function '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' blockStatement
     ;
 
-//
-//
-// statement
-//
-//
+classDeclaration
+    : attributes Private? modifier? Partial? (
+      classEntryType identifier typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)? 
+    | Interface identifier typeParameterListInBrackets? (Extends interfaceList)? )
+      '{' classStatement* '}'
+    ;
+    
+classEntryType
+    : Class
+    | Trait
+    ;
 
+interfaceList
+    : qualifiedStaticTypeRef (',' qualifiedStaticTypeRef)*
+    ;
+
+typeParameterListInBrackets
+    : '<:' typeParameterList ':>'
+    | '<:' typeParameterWithDefaultsList ':>'
+    | '<:' typeParameterList ',' typeParameterWithDefaultsList ':>'
+    ;
+
+typeParameterList
+    : typeParameterDecl (',' typeParameterDecl)*
+    ;
+
+typeParameterWithDefaultsList
+    : typeParameterWithDefaultDecl (',' typeParameterWithDefaultDecl)*
+    ;
+
+typeParameterDecl
+    : attributes identifier
+    ;
+
+typeParameterWithDefaultDecl
+    : attributes identifier Eq (qualifiedStaticTypeRef | primitiveType)
+    ;
+
+genericDynamicArgs
+    : '<:' typeRef (',' typeRef)* ':>'
+    ;
+
+attributes
+    : attributesGroup*
+    ;
+
+attributesGroup
+    : '[' (identifier ':')? attribute (',' attribute)* ']'
+    ;
+
+attribute
+    : qualifiedNamespaceName
+    | qualifiedNamespaceName '(' attributeArgList ')'
+    | qualifiedNamespaceName '(' attributeNamedArgList ')'
+    | qualifiedNamespaceName '(' attributeArgList ',' attributeNamedArgList ')'
+    ;
+
+attributeArgList
+    : expression (',' expression)*
+    ;
+
+attributeNamedArgList
+    : attributeNamedArg (',' attributeNamedArg)*
+    ;
+
+attributeNamedArg
+    : VarName '=>' expression
+    ;
+
+innerStatementList
+    : innerStatement*
+    ;
+
+innerStatement
+    : statement
+    | functionDeclaration
+    | classDeclaration
+    ;
+
+// Statements
+    
 statement
-    : '{' statement '}'
-    | bracketedBlock
-    | classDefinition
-    | interfaceDefinition
-    | complexStatement
-    | simpleStatement ';'
+    : nonEmptyStatement
+    | emptyStatement
     ;
 
-complexStatement
-    : ifstatement
-    | forstatement 
-    | foreachstatement
-    | whilestatement
-    | dostatement
-    | switchstatement 
-    | functionDefinition
+emptyStatement
+    : ';'
     ;
 
-
-forstatement
-    : For '(' expression ';' expression ';'  expression ')' statement 
-    ;
-
-ifstatement
-    : If '(' expression ')' statement (ElseIf '(' expression ')' statement)* (Else statement)?
-    ;
-
-foreachstatement
-    : Foreach '(' variable 'as' arrayEntry ')' statement 
-    ;
-
-whilestatement
-    : While '(' expression? ')' statement
-    ;
-
-dostatement
-    : Do statement While '(' expression ')' ';' 
-    ;
-
-switchstatement
-    : Switch '(' expression ')' '{'cases'}' 
-    ;
-
-simpleStatement
-    : globalStatement
-    | staticVariableAssignmentStatement
+nonEmptyStatement
+    : identifier ':'
+    | blockStatement
+    | ifStatement
+    | whileStatement
+    | doWhileStatement
+    | forStatement
+    | switchStatement
     | breakStatement
     | continueStatement
     | returnStatement
-    | requireStatement
-    | expression
+    | yieldExpression ';'
+    | globalStatement
+    | staticVariableStatement
+    | echoStatement
+    | expressionStatement
+    | unsetStatement
+    | foreachStatement
+    | tryCatchFinally
+    | throwStatement
+    | gotoStatement
+    | declareStatement
+    | inlineHtml
+    ;
+
+blockStatement
+    : '{' innerStatementList '}'
+    ;
+    
+ifStatement
+    : If parenthesis statement elseIfStatement* elseStatement?
+    | If parenthesis ':' innerStatementList elseIfColonStatement* elseColonStatement? EndIf ';'
+    ;
+
+elseIfStatement
+    : ElseIf parenthesis statement
+    ;
+
+elseIfColonStatement
+    : ElseIf parenthesis ':' innerStatementList
+    ;
+
+elseStatement
+    : Else statement
+    ;
+
+elseColonStatement
+    : Else ':' innerStatementList
+    ;
+
+whileStatement
+    : While parenthesis (statement | ':' innerStatementList EndWhile ';')
+    ;
+
+doWhileStatement
+    : Do statement While parenthesis ';'
+    ;
+    
+forStatement
+    : For '(' forInit? ';' expressionList? ';' forUpdate? ')' (statement | ':' innerStatementList EndFor ';' )
+    ;
+
+forInit
+    : expressionList
+    ;
+    
+forUpdate
+    : expressionList
+    ;
+    
+switchStatement
+    : Switch parenthesis ('{' ';'? switchBlock* '}' | ':' ';'? switchBlock* EndSwitch ';')
+    ;
+
+switchBlock
+    : ((Case expression | Default) ( ':' | ';' ))+ innerStatementList
+    ;
+    
+breakStatement
+    : Break expression? ';'
+    ;
+    
+continueStatement
+    : Continue expression? ';'
+    ;
+    
+returnStatement
+    : Return expression? ';'
+    ;
+
+expressionStatement
+    : expression ';'
+    ;
+
+unsetStatement
+    : Unset '(' chainList ')' ';'
+    ;
+    
+foreachStatement
+    : Foreach 
+        ( '(' chain As '&'? chain ('=>' '&'? chain)? ')'
+        | '(' expression As chain ('=>' '&'? chain)? ')'
+        | '(' chain As List '(' assignmentList ')' ')' )
+      (statement | ':' innerStatementList EndForeach ';')
+    ;
+    
+tryCatchFinally
+    : Try blockStatement (catchClause+ finallyStatement? | catchClause* finallyStatement)
+    ;
+
+catchClause
+    : Catch '(' qualifiedStaticTypeRef VarName ')' blockStatement
+    ;
+
+finallyStatement
+    : Finally blockStatement
+    ;
+    
+throwStatement
+    : Throw expression ';'
+    ;
+    
+gotoStatement
+    : Goto identifier ';'
+    ;
+
+declareStatement
+    : Declare '(' declareList ')' (statement | ':' innerStatementList EndDeclare ';')
+    ;
+
+inlineHtml
+    : HtmlComment* ((HtmlDtd | htmlElement) HtmlComment*)+
+    ;
+
+declareList
+    : identifierInititalizer (',' identifierInititalizer)*
+    ;
+
+formalParameterList
+    : formalParameter? (',' formalParameter)*
+    ;
+
+formalParameter
+    : attributes typeHint? '&'? '...'? variableInitializer
+    ;
+
+typeHint
+    : qualifiedStaticTypeRef
+    | Callable
+    | primitiveType
     ;
 
 globalStatement
-    : Global name (Comma name)*
+    : Global globalVar (',' globalVar)* ';'
     ;
 
-staticVariableAssignmentStatement
-    : Static? variable Equals expression
+globalVar
+    : VarName
+    | '$' chain
+    | '$' '{' expression '}'
     ;
 
-breakStatement
-    : Break DecimalNumber?
-    ;    
-
-continueStatement
-    : Continue DecimalNumber?
+echoStatement
+    : Echo expressionList ';'
     ;
 
-returnStatement
-    : Return expression?
+staticVariableStatement
+    : Static variableInitializer (',' variableInitializer)* ';'
     ;
 
-requireStatement
-    : RequireOperator expression
+classStatement
+    : attributes propertyModifiers variableInitializer (',' variableInitializer)* ';'
+    | attributes Const identifierInititalizer (',' identifierInititalizer)* ';'
+    | attributes memberModifiers? Function '&'? identifier
+          typeParameterListInBrackets? '(' formalParameterList ')' baseCtorCall? methodBody
+    | Use qualifiedNamespaceNameList traitAdaptations
     ;
 
-cases 
-    : casestatement*  defaultcase
+traitAdaptations
+    : ';'
+    | '{' traitAdaptationStatement* '}'
     ;
 
-casestatement
-    : Case expression Colon statement*
+traitAdaptationStatement
+    : traitPrecedence
+    | traitAlias
     ;
 
-defaultcase 
-    : (Default Colon statement*)
-    ;
-
-//
-//
-// variable
-//
-//
-
-variable
-    : Dollar variablename
-    | Dollar variablename InstanceMember variablename
-    ;
-
-variablename
-    : Identifier
-    ;
-
-//
-//
-// name
-//
-//
-
-name: staticMemberAccess
-    | memberAccess
-    | variable
+traitPrecedence
+    : qualifiedNamespaceName '::' identifier InsteadOf qualifiedNamespaceNameList ';'
     ;
     
-staticMemberAccess
-    : Identifier ClassMember variable
-    ;
-
-memberAccess
-    : variable ( OpenSquareBracket expression CloseSquareBracket)*
-    ;
-
-//
-//
-// block
-//
-//
-
-bracketedBlock
-    : '{' statement* '}'
-    ;
-
-//
-//
-// interface
-//
-//
-
-interfaceDefinition
-    : Interface interfaceName interfaceExtends?
-        OpenCurlyBracket
-        interfaceMember*
-        CloseCurlyBracket
-    ;
-
-interfaceName
-    : Identifier
-    ;
-
-interfaceExtends
-    : Extends interfaceName (Comma interfaceName)*
-    ;
-interfaceMember
-    : Const Identifier (Equals atom)? ';' 
-    | fieldModifier* Function functionName parametersDefinition ';'
-    ;
-
-//
-//
-// class
-//
-//
-
-className
-    : Identifier
-    ;
-
-classDefinition
-    :   classModifier? 
-        Class className 
-        (Extends className)? 
-        classImplements?
-        OpenCurlyBracket
-        classMember*
-        CloseCurlyBracket 
+traitAlias
+    : traitMethodReference As (memberModifier | memberModifier? identifier) ';'
     ;
     
-classImplements
-    :  Implements (interfaceName (Comma interfaceName)*)
+traitMethodReference
+    : (qualifiedNamespaceName '::')? identifier
     ;
 
-classMember
-    : fieldModifier* Function functionName parametersDefinition (bracketedBlock | ';')
-    | constDefinition ';' 
-    | Var? fieldModifier* fieldDefinition ';'      
+baseCtorCall
+    : ':' identifier arguments
     ;
 
-classModifier
-    : Abstract;
-
-//
-//
-// const
-//
-//
-constDefinition
-    : Const variablename Equals atom;
-
-//
-//
-// field
-//
-//
-
-fieldDefinition
-    : fieldName (Equals atom)? 
-    ;
-    
-fieldModifier
-    : AccessModifier | Abstract | Static 
+methodBody
+    : ';'
+    | blockStatement
     ;
 
-fieldName
-    : Dollar variablename
+propertyModifiers
+    : memberModifiers
+    | Var
     ;
 
-//
-//
-// functions
-//
-//
-
-functionDefinition
-    : Function functionName parametersDefinition bracketedBlock 
+memberModifiers
+    : memberModifier+
     ;
 
-parametersDefinition
-    : OpenRoundBracket (paramDef (Comma paramDef)*)? CloseRoundBracket 
+variableInitializer
+    : VarName (Eq constantInititalizer)?
     ;
 
-functionInvocation
-    : functionName functionInvocationParameters
+identifierInititalizer
+    : identifier Eq constantInititalizer
     ;
 
-functionName
-    : Identifier
+globalConstantDeclaration
+    : attributes Const identifierInititalizer (',' identifierInititalizer)* ';'
     ;
 
-functionInvocationParameters
-    : OpenRoundBracket? (commaList)? CloseRoundBracket? 
+expressionList
+    : expression (',' expression)*
     ;
 
-paramDef
-    : paramName (Equals atom)?
+parenthesis
+    : '(' (expression | yieldExpression) ')'
     ;
 
-paramName
-    : Dollar Identifier
-    | Ampersand Dollar Identifier 
-    ;
-
-commaList
-    : expression (',' expression)* 
-    ;
-    
-//
-//
-// expression
-//
-//
+// Expressions
 
 expression
-    : weakLogicalOr 
+// Grouped by prioriries: http://php.net/manual/en/language.operators.precedence.php
+// and http://www.phpeveryday.com/articles/PHP-Operators-Operator-Priority-P312.html
+    : Clone expression                                         #CloneExpression
+    | newExpr                                                     #NewExpression
+    
+    | stringConstant '[' expression ']'                        #IndexerExpression
+
+    | <assoc=right> expression '**' expression                 #BinaryOperatorExpression
+
+    | ('++' | '--') chain                                      #PrefixIncDecExpression
+    | chain ('++' | '--')                                      #PostfixIncDecExpression
+    
+    | '(' castOperation ')' expression                         #CastExpression
+    | ('~' | '@') expression                                   #UnaryOperatorExpression
+
+    | expression InstanceOf typeRef                            #InstanceOfExpression
+    
+    | ('!' | '+' | '-') expression                             #UnaryOperatorExpression
+    
+    | expression ('*' | Divide | '%') expression               #BinaryOperatorExpression
+
+    | expression ('+' | '-' | '.') expression                  #BinaryOperatorExpression
+
+    | expression ('<<' | '>>') expression                      #BinaryOperatorExpression
+
+    | expression (Less | '<=' | Greater | '>=') expression     #BinaryOperatorExpression
+
+    | expression ('===' | '!==' | '==' | IsNotEq) expression   #BinaryOperatorExpression
+
+    | expression '&' expression                                #BinaryOperatorExpression
+
+    | expression '^' expression                                #BinaryOperatorExpression
+
+    | expression '|' expression                                #BinaryOperatorExpression
+
+    | expression '&&' expression                               #BinaryOperatorExpression
+
+    | expression '||' expression                               #BinaryOperatorExpression
+
+    | expression QuestionMark expression? ':' expression       #ConditionalExpression
+    
+    | chain assignmentOperator expression                      #AssignmentExpression
+    | chain Eq '&' (chain | newExpr)                           #AssignmentExpression
+
+    | Print expression                                         #PrintExpression
+    
+    | expression LogicalAnd  expression                        #BinaryOperatorExpression
+    
+    | expression LogicalXor expression                         #BinaryOperatorExpression
+    
+    | expression LogicalOr  expression                         #BinaryOperatorExpression
+
+    | chain                                                    #ChainExpression
+    | constant                                                 #ScalarExpression
+    | string                                                   #ScalarExpression
+    | Label                                                    #ScalarExpression
+
+    | BackQuoteString                                          #BackQuoteStringExpression
+    | parenthesis                                              #ParenthesisExpression
+    | (Array '(' arrayItemList? ')' | '[' arrayItemList? ']') ('[' expression ']')?            #ArrayCreationExpression
+
+    | Yield                                                    #SpecialWordExpression
+    | List '(' assignmentList ')' Eq expression                #SpecialWordExpression
+    | IsSet '(' chainList ')'                                  #SpecialWordExpression
+    | Empty '(' chain ')'                                      #SpecialWordExpression
+    | Eval '(' expression ')'                                  #SpecialWordExpression
+    | Exit ( '(' ')' | parenthesis )?                          #SpecialWordExpression
+    | Include expression                                       #SpecialWordExpression
+    | IncludeOnce expression                                   #SpecialWordExpression
+    | Require expression                                       #SpecialWordExpression
+    | RequireOnce expression                                   #SpecialWordExpression
+
+    | Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? blockStatement  #LambdaFunctionExpression
     ;
 
-weakLogicalOr
-    : weakLogicalXor (Or weakLogicalXor)*
+newExpr
+    : New typeRef arguments?
     ;
 
-weakLogicalXor
-    : weakLogicalAnd (Xor weakLogicalAnd)*
+assignmentOperator
+    : Eq
+    | '+='
+    | '-='
+    | '*='
+    | '**='
+    | '/='
+    | '.='
+    | '%='
+    | '&='
+    | '|='
+    | '^='
+    | '<<='
+    | '>>='
+    ;
+
+yieldExpression
+    : Yield expression ('=>' expression)?
+    ;
+
+arrayItemList
+    : arrayItem (',' arrayItem)* ','?
+    ;
+
+arrayItem
+    : expression ('=>' expression)?
+    | (expression '=>')? '&' chain
+    ;
+
+lambdaFunctionUseVars
+    : Use '(' lambdaFunctionUseVar (',' lambdaFunctionUseVar)* ')'
+    ;
+
+lambdaFunctionUseVar
+    : '&'? VarName
+    ;
+
+qualifiedStaticTypeRef
+    : qualifiedNamespaceName genericDynamicArgs?
+    | Static
+    ;
+
+typeRef
+    : (qualifiedNamespaceName | indirectTypeRef) genericDynamicArgs?
+    | primitiveType
+    | Static
+    ;
+
+indirectTypeRef
+    : chainBase ('->' keyedFieldName)*
+    ;
+
+qualifiedNamespaceName
+    : Namespace? '\\'? namespaceNameList
+    ;
+
+namespaceNameList
+    : identifier ('\\' identifier)*
+    ;
+
+qualifiedNamespaceNameList
+    : qualifiedNamespaceName (',' qualifiedNamespaceName)*
+    ;
+
+arguments
+    : '(' ( actualArgument (',' actualArgument)* | yieldExpression)? ')'
     ;
     
-weakLogicalAnd
-    : assignment (And assignment)*
+actualArgument
+    : '...'? expression
+    | '&' chain
     ;
 
-assignment
-    : listVariables ((Equals | AssignmentOperator) assignment) 
-    | ternary
-    ;
-
-listVariables
-    : List OpenRoundBracket name (',' name)* CloseRoundBracket 
-    | name
-    ;
-
-ternary
-    : logicalOr QuestionMark expression Colon expression 
-    | logicalOr
+constantInititalizer
+    : constant
+    | string
+    | Array '(' (constantArrayItemList ','?)? ')'
+    | '[' (constantArrayItemList ','?)? ']'
+    | ('+'|'-') constantInititalizer
     ;
     
-logicalOr
-    : logicalAnd (LogicalOr logicalAnd)*
+constantArrayItemList
+    : constantArrayItem (',' constantArrayItem)*
     ;
 
-logicalAnd
-    : bitwiseOr (LogicalAnd bitwiseOr)*
+constantArrayItem
+    : constantInititalizer ('=>' constantInititalizer)?
     ;
     
-bitwiseOr
-    : bitWiseAnd (Pipe bitWiseAnd)*
-    ;
-
-bitWiseAnd
-    : equalityCheck (Ampersand equalityCheck)*
-    ;
-
-equalityCheck
-    : comparisionCheck (EqualityOperator comparisionCheck)?
+constant
+    : literalConstant
+    | magicConstant
+    | classConstant
+    | qualifiedNamespaceName
+    | Null
     ;
     
-comparisionCheck
-    : bitWiseShift (ComparisionOperator bitWiseShift)?
-    ;
-
-bitWiseShift
-    : addition (ShiftOperator addition)*
+literalConstant
+    : Numeric
+    | Real
+    | BooleanConstant
+    | stringConstant
     ;
     
-addition
-    : multiplication ((Plus | Minus | Dot) multiplication)*
+classConstant
+    : (Class | Parent_) '::' (identifier | Constructor | Get | Set)
+    | (qualifiedStaticTypeRef | keyedVariable) '::' identifier
     ;
 
-multiplication
-    : logicalNot ((Asterisk | Forwardslash | Percent) logicalNot)*
-    ;
-
-logicalNot
-    : Bang logicalNot
-    | instanceOf
-    ;
-
-instanceOf
-    : negateOrCast (Instanceof negateOrCast)?
-    ;
-
-negateOrCast
-    : (Tilde | Minus | SuppressWarnings) increment
-    | OpenRoundBracket PrimitiveType CloseRoundBracket increment 
-    | OpenRoundBracket weakLogicalAnd CloseRoundBracket
-    | increment
-    ;
-
-increment
-    : IncrementOperator name 
-    | name IncrementOperator
-    | newOrClone
-    ;
-
-newOrClone
-    : New name
-    | Clone name
-    | atomOrReference
-    ;
-
-atomOrReference
-    : atom
-    | reference
-    ;
-
-arrayDeclaration
-    : Array OpenRoundBracket (arrayEntry (Comma arrayEntry)* Comma?)? CloseRoundBracket
-    ;
-
-arrayEntry
-    : (keyValuePair | expression)
-    ;
-
-keyValuePair
-    : (expression ArrayAssign expression) 
-    ;
-
-atom: number
-    | string 
-    | bool
-    | arrayDeclaration 
-    | functionInvocation
-    ;
-
-reference
-    : Ampersand name
-    | name
-    ;
-
-bool
-    : Boolean
-    ;
-
-number
-    : integer  
-    | real
-    ; 
-
-integer 
-    : DecimalNumber
-    | HexNumber
-    | OctalNumber
-    ;
-
-real: Float ( RealE (Float | DecimalNumber))*
+stringConstant
+    : Label
     ;
     
 string
-    : SingleQuotedString
-    | doubleQuotedString
+    : StartHereDoc HereDocText+
+    | StartNowDoc HereDocText+
+    | DoubleQuoteString
+    | SingleQuoteString
     ;
 
-doubleQuotedString
-    : DoubleQuotedString_Start doubleQuotedStringBody? DoubleQuotedString_End
+chainList
+    : chain (',' chain)*
     ;
 
-doubleQuotedStringBody
-    : (DoubleQuotedStringBody | VarName)*
+chain
+    : (chainBase | functionCall | '(' newExpr ')') memberAccess*
+    ;
+
+memberAccess
+    : '->' keyedFieldName actualArguments?
+    ;
+
+functionCall
+    : functionCallName actualArguments
+    ;
+
+functionCallName
+    : qualifiedNamespaceName
+    | classConstant
+    | chainBase
+    ;
+    
+actualArguments
+    : genericDynamicArgs? arguments squareCurlyExpression*
+    ;
+
+chainBase
+    : keyedVariable ('::' keyedVariable)?
+    | qualifiedStaticTypeRef '::' keyedVariable
+    ;
+
+keyedFieldName
+    : keyedSimpleFieldName
+    | keyedVariable
+    ;
+
+keyedSimpleFieldName
+    : (identifier | '{' expression '}') squareCurlyExpression*
+    ;
+
+keyedVariable
+    : '$'* (VarName | '$' '{' expression '}') squareCurlyExpression*
+    ;
+    
+squareCurlyExpression
+    : '[' expression? ']'
+    | '{' expression '}'
+    ;
+
+assignmentList
+    : assignmentListElement? (',' assignmentListElement?)*
+    ;
+
+assignmentListElement
+    : chain
+    | List '('  assignmentList ')'
+    ;
+
+modifier
+    : Abstract
+    | Final
+    ;
+    
+identifier
+    : magicConstant
+    | magicMethod
+    | castOperation
+    | memberModifier
+    | Label
+    | Class
+    | Interface
+    | Namespace
+    | Case
+    | Default
+    | Return
+    | Import
+    | Parent_
+    | List
+    | Function
+    | Null
+    | Partial
+    | Echo
+    | New
+    | Empty
+    | Callable
+    | Var
+    | IsSet
+    | Break
+    | Continue
+    | Use
+    | LogicalAnd
+    | LogicalXor
+    | LogicalOr
+    | Clone
+    | Global
+    | Eval
+    ;
+    
+memberModifier
+    : Public
+    | Protected
+    | Private
+    | Static
+    | Abstract
+    | Final
+    ;
+    
+magicConstant
+    : Namespace__
+    | Class__
+    | Traic__
+    | Function__
+    | Method__
+    | Line__
+    | File__
+    | Dir__
+    ;
+
+magicMethod
+    : Get
+    | Set
+    | Call
+    | CallStatic
+    | Constructor
+    | Destruct
+    | Wakeup
+    | Sleep
+    | Autoload
+    | IsSet__
+    | Unset__
+    | ToString__
+    | Invoke
+    | SetState
+    | Clone__
+    | DebugInfo
+    ;
+
+primitiveType
+    : BoolType
+    | IntType
+    | Int64Type
+    | DoubleType
+    | StringType
+    | Resource
+    | ObjectType
+    | Array
+    ;
+    
+castOperation
+    : BoolType
+    | Int8Cast
+    | Int16Cast
+    | IntType
+    | Int64Type
+    | Uint8Cast
+    | Uint16Cast
+    | Uint32Cast
+    | Uint64Cast
+    | DoubleCast
+    | DoubleType
+    | FloatCast
+    | StringType
+    | BinaryCast
+    | UnicodeCast
+    | Array
+    | ObjectType
+    | Resource
+    | Unset
     ;

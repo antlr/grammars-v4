@@ -1,4 +1,4 @@
-	
+
 /*
  [The "BSD licence"]
  Copyright (c) 2014 Adam Taylor
@@ -26,136 +26,158 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 /*
    Derived from http://sigmakee.cvs.sourceforge.net/viewvc/sigmakee/sigma/suo-kif.pdf
  */
-
 grammar SUOKIF;
 
 top_level
-	:	sentence*
-	;
-	
+   : sentence*
+   ;
+
 term
- 	:	VARIABLE
-	|	WORD
-	|	STRING
-	|	funterm
-	|	NUMBER
-	|	sentence
-	;
- 	
+   : VARIABLE | WORD | STRING | funterm | NUMBER | sentence
+   ;
+
 argument
-	:	sentence
-	|	term
-	;
- 	
+   : sentence | term
+   ;
+
 funterm
-	:	'(' WORD argument+ ')'
-	;
- 	
- sentence
-	:	WORD
-	|	equation
-	|	relsent
-	|	logsent
-	|	quantsent
-	|	VARIABLE
-	;
- 
+   : '(' WORD argument+ ')'
+   ;
+
+sentence
+   : WORD | equation | relsent | logsent | quantsent | VARIABLE
+   ;
+
 equation
-	:	'(' '=' term term ')'
-	;
- 
+   : '(' '=' term term ')'
+   ;
+
 relsent
-	:	'(' (WORD | VARIABLE) argument+ ')'
-	;
- 
+   : '(' ( WORD | VARIABLE ) argument+ ')'
+   ;
+
 logsent
-	:	'(' NOT sentence ')'
-	|	'(' AND sentence+ ')'
-	|	'(' OR sentence+ ')'
-	|	'(' '=' '>' sentence sentence ')'
-	|	'(' '<' '=' '>' sentence sentence ')'
-	;
- 	
+   : '(' NOT sentence ')' | '(' AND sentence+ ')' | '(' OR sentence+ ')' | '(' '=' '>' sentence sentence ')' | '(' '<' '=' '>' sentence sentence ')'
+   ;
+
 quantsent
-	:	'(' FORALL '(' VARIABLE+ ')' sentence ')' 
-	|	'(' EXISTS '(' VARIABLE+ ')' sentence ')'
-	;
- 	
-NOT		: 'not';
-AND		: 'and';
-OR			: 'or';
-FORALL	: 'forall';
-EXISTS		: 'exists';
+   : '(' FORALL '(' VARIABLE+ ')' sentence ')' | '(' EXISTS '(' VARIABLE+ ')' sentence ')'
+   ;
 
-fragment
-UPPER
-	:	[A-Z]
-	;
 
-fragment
-LOWER
-	:	[a-z]
-	;
+NOT
+   : 'not'
+   ;
 
-fragment
-DIGIT
-	:	[0-9]
-	;	
 
-fragment
-INITIALCHAR
-	:	UPPER
-	|	LOWER
-	;
- 
-fragment
-WORDCHAR
-	:	UPPER
-	|	LOWER
-	|	DIGIT
-	|	'-'
-	|	'_' 
-	;
-		
+AND
+   : 'and'
+   ;
+
+
+OR
+   : 'or'
+   ;
+
+
+FORALL
+   : 'forall'
+   ;
+
+
+EXISTS
+   : 'exists'
+   ;
+
+
+fragment UPPER
+   : [A-Z]
+   ;
+
+
+fragment LOWER
+   : [a-z]
+   ;
+
+
+fragment DIGIT
+   : [0-9]
+   ;
+
+
+fragment INITIALCHAR
+   : UPPER | LOWER
+   ;
+
+
+fragment WORDCHAR
+   : UPPER | LOWER | DIGIT | '-' | '_'
+   ;
+
+
 WORD
-	:	INITIALCHAR WORDCHAR*
-	;
- 	
+   : INITIALCHAR WORDCHAR*
+   ;
+
+
 STRING
-	:	'"' ~["\\]* '"'
-	;
- 	
+   : '"' ~ ["\\]* '"'
+   ;
+
+
 VARIABLE
-	:	'?' WORD 
-	|	'@' WORD
-	;
- 	
- 	
+   : '?' WORD | '@' WORD
+   ;
+
+
 NUMBER
-	:	'-'? DIGIT+ ('.' DIGIT+)? EXPONENT?
-	;
- 
-fragment
-EXPONENT
-	:	'e' '-'? DIGIT+
-	;
+   : '-'? DIGIT+ ( '.' DIGIT+ )? EXPONENT?
+   ;
 
-WHITE		
-	:	[ \t\n\r\v]		-> skip
-	;
-	
+
+fragment EXPONENT
+   : 'e' '-'? DIGIT+
+   ;
+
+
+WHITE
+   : [ \t\n\r\v] -> skip
+   ;
+
+
 COMMENT
-	:   ';' ~[\r\n]* 	-> skip
-	;
- 	
-LPAREN	: '(';
-RPAREN	: ')';
+   : ';' ~ [\r\n]* -> skip
+   ;
 
-ASSIGN		: '=';
-GT			: '>';
-LT			: '<';
-QUESTION	: '?';
+
+LPAREN
+   : '('
+   ;
+
+
+RPAREN
+   : ')'
+   ;
+
+
+ASSIGN
+   : '='
+   ;
+
+
+GT
+   : '>'
+   ;
+
+
+LT
+   : '<'
+   ;
+
+
+QUESTION
+   : '?'
+   ;
