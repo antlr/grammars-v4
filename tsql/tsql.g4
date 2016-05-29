@@ -194,7 +194,10 @@ output_column_name
 
 // https://msdn.microsoft.com/en-us/library/ms188783.aspx
 create_index
-    : CREATE UNIQUE? clustered? INDEX id ON table_name_with_hint '(' column_name_list ')' ';'?
+    : CREATE UNIQUE? clustered? INDEX id ON table_name_with_hint '(' column_name_list (ASC | DESC)? ')'
+	(index_options)?
+	(ON id)?
+	';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
@@ -224,7 +227,7 @@ create_statistics
 
 // https://msdn.microsoft.com/en-us/library/ms174979.aspx
 create_table
-    : CREATE TABLE table_name '(' column_def_table_constraints ','? ')' (ON id | DEFAULT)? ';'?
+    : CREATE TABLE table_name '(' column_def_table_constraints ','? ')' (ON id | DEFAULT)? (TEXTIMAGE_ON id | DEFAULT)?';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
@@ -241,7 +244,12 @@ view_attribute
 // https://msdn.microsoft.com/en-us/library/ms190273.aspx
 alter_table
     : ALTER TABLE table_name (SET '(' LOCK_ESCALATION '=' (AUTO | TABLE | DISABLE) ')'
-                             | ADD column_def_table_constraint) ';'?
+                             | ADD column_def_table_constraint
+                             | DROP CONSTRAINT constraint=id
+							 | WITH CHECK ADD CONSTRAINT constraint=id FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
+							 | CHECK CONSTRAINT constraint=id
+							 ) 
+							 ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174269.aspx
@@ -258,7 +266,7 @@ database_option
 
 // https://msdn.microsoft.com/en-us/library/ms176118.aspx
 drop_index
-    : DROP INDEX (IF EXISTS)? name=id ';'?
+    : DROP INDEX (IF EXISTS)? name=id (ON table_name)? ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174969.aspx
@@ -437,7 +445,7 @@ column_constraint
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
 table_constraint
     : (CONSTRAINT id)?
-       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list ')' index_options? (ON id)?
+       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list (ASC | DESC)? ')' index_options? (ON id)?
        | CHECK (NOT FOR REPLICATION)? '(' search_condition ')')
     ;
 
@@ -1100,6 +1108,7 @@ simple_id
     | STDEV
     | STDEVP
     | SUM
+	| TEXTIMAGE_ON
     | THROW
     | TIES
     | TIME
@@ -1432,6 +1441,7 @@ STDEV:                                 S T D E V;
 STDEVP:                                S T D E V P;
 SUM:                                   S U M;
 TAKE:                                  T A K E;
+TEXTIMAGE_ON:                          T E X T I M A G E '_' O N;
 THROW:                                 T H R O W;
 TIES:                                  T I E S;
 TIME:                                  T I M E;
