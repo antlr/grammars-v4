@@ -28,7 +28,11 @@ THE SOFTWARE.
 grammar tsql;
 
 tsql_file
-    : sql_clause* EOF
+    : sql_clauses? EOF
+    ;
+
+sql_clauses
+    : sql_clause+
     ;
 
 sql_clause
@@ -72,7 +76,7 @@ ddl_clause
 // Labels for better AST traverse.
 cfl_statement
     // https://msdn.microsoft.com/en-us/library/ms190487.aspx
-    : BEGIN ';'? sql_clause* END ';'?                #begin_statement
+    : BEGIN ';'? sql_clauses? END ';'?               #block_statement
     // https://msdn.microsoft.com/en-us/library/ms181271.aspx
     | BREAK ';'?                                     #break_statement
     // https://msdn.microsoft.com/en-us/library/ms174366.aspx
@@ -86,10 +90,11 @@ cfl_statement
     | RETURN expression? ';'?                        #return_statement
     // https://msdn.microsoft.com/en-us/library/ee677615.aspx
     | THROW (
-      (DECIMAL | LOCAL_ID) ',' (STRING | LOCAL_ID) ',' (DECIMAL | LOCAL_ID))? ';'?  #throw_statement
+      error_number=(DECIMAL | LOCAL_ID) ',' message=(STRING | LOCAL_ID) ','
+      state=(DECIMAL | LOCAL_ID))? ';'?              #throw_statement
     // https://msdn.microsoft.com/en-us/library/ms175976.aspx
-    | BEGIN TRY ';'? sql_clause* END TRY ';'?
-      BEGIN CATCH ';'? sql_clause* END CATCH ';'?                                   #try_catch_statement
+    | BEGIN TRY ';'? try_clauses=sql_clauses? END TRY ';'?
+      BEGIN CATCH ';'? catch_clauses=sql_clauses? END CATCH ';'?                    #try_catch_statement
     // https://msdn.microsoft.com/en-us/library/ms187331.aspx
     | WAITFOR (DELAY | TIME)  expression ';'?                                       #waitfor_statement
     // https://msdn.microsoft.com/en-us/library/ms178642.aspx
@@ -97,8 +102,8 @@ cfl_statement
     // https://msdn.microsoft.com/en-us/library/ms176047.aspx.
     | PRINT expression ';'?                                                         #print_statement
     // https://msdn.microsoft.com/en-us/library/ms178592.aspx
-    | RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' (number | LOCAL_ID) ','
-       (number | LOCAL_ID) (',' (constant | LOCAL_ID))* ')' ';'?                    #raiseerror_statement
+    | RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' severity=constant_LOCAL_ID ','
+        state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' ';'?                   #raiseerror_statement
     ;
 
 another_statement
@@ -106,7 +111,7 @@ another_statement
     | cursor_statement
     | execute_statement
     | security_statement
-    | set_statment
+    | set_statement
     | transaction_statement
     | go_statement
     | use_statement
@@ -118,12 +123,19 @@ another_statement
 delete_statement
     : with_expression?
       DELETE (TOP '(' expression ')' PERCENT?)?
-      FROM? (table_alias | ddl_object | rowset_function_limited)
-      with_table_hints?
+      FROM? delete_statement_from
+      insert_with_table_hints?
       output_clause?
-      (FROM table_source (',' table_source)*)?
+      (FROM table_sources)?
       (WHERE (search_condition | CURRENT OF (GLOBAL? cursor_name | cursor_var=LOCAL_ID)))?
       for_clause? option_clause? ';'?
+    ;
+
+delete_statement_from
+    : table_alias
+    | ddl_object
+    | rowset_function_limited
+    | table_var=LOCAL_ID
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174335.aspx
@@ -134,9 +146,15 @@ insert_statement
       insert_with_table_hints?
       ('(' column_name_list ')')?
       output_clause?
-      (VALUES '(' expression_list ')' (',' '(' expression_list ')')* |
-               derived_table | execute_statement | DEFAULT VALUES)
+      insert_statement_value
       for_clause? option_clause? ';'?
+    ;
+
+insert_statement_value
+    : table_value_constructor
+    | derived_table
+    | execute_statement
+    | DEFAULT VALUES
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms189499.aspx
@@ -152,7 +170,7 @@ update_statement
       with_table_hints?
       SET update_elem (',' update_elem)*
       output_clause?
-      (FROM table_source (',' table_source)*)?
+      (FROM table_sources)?
       (WHERE (search_condition_list | CURRENT OF (GLOBAL? cursor_name | cursor_var=LOCAL_ID)))?
       for_clause? option_clause? ';'?
     ;
@@ -160,7 +178,7 @@ update_statement
 // https://msdn.microsoft.com/en-us/library/ms177564.aspx
 output_clause
     : OUTPUT output_dml_list_elem (',' output_dml_list_elem)*
-            (INTO (LOCAL_ID | table_name) ('(' column_name_list ')')? )?
+      (INTO (LOCAL_ID | table_name) ('(' column_name_list ')')? )?
     ;
 
 output_dml_list_elem
@@ -168,7 +186,7 @@ output_dml_list_elem
     ;
 
 output_column_name
-    : (DELETED | INSERTED | table_name) '.' ('*' | column_name)
+    : (DELETED | INSERTED | table_name) '.' ('*' | id)
     | DOLLAR_ACTION
     ;
 
@@ -176,16 +194,15 @@ output_column_name
 
 // https://msdn.microsoft.com/en-us/library/ms188783.aspx
 create_index
-    : CREATE UNIQUE? clustered? INDEX name=id ON table_name_with_hint '(' column_name_list ')' ';'?
+    : CREATE UNIQUE? clustered? INDEX id ON table_name_with_hint '(' column_name_list ')' ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
 create_procedure
-    : CREATE (PROC | PROCEDURE) func_proc_name (';' DECIMAL)?
+    : CREATE proc=(PROC | PROCEDURE) func_proc_name (';' DECIMAL)?
       ('('? procedure_param (',' procedure_param)* ')'?)?
       (WITH procedure_option (',' procedure_option)*)?
-      (FOR REPLICATION)? AS
-      sql_clause+
+      (FOR REPLICATION)? AS sql_clauses
     ;
 
 procedure_param
@@ -207,12 +224,12 @@ create_statistics
 
 // https://msdn.microsoft.com/en-us/library/ms174979.aspx
 create_table
-    : CREATE TABLE table_name '(' column_def_table_constraint (','? column_def_table_constraint)* ','? ')' (ON id | DEFAULT)? ';'?
+    : CREATE TABLE table_name '(' column_def_table_constraints ','? ')' (ON id | DEFAULT)? ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
 create_view
-    : CREATE VIEW view_name ('(' column_name (',' column_name)* ')')?
+    : CREATE VIEW view_name ('(' column_name_list ')')?
       (WITH view_attribute (',' view_attribute)*)?
       AS select_statement (WITH CHECK OPTION)? ';'?
     ;
@@ -223,8 +240,8 @@ view_attribute
 
 // https://msdn.microsoft.com/en-us/library/ms190273.aspx
 alter_table
-    : ALTER TABLE table_name SET '(' LOCK_ESCALATION '=' (AUTO | TABLE | DISABLE) ')' ';'?
-    | ALTER TABLE table_name ADD column_def_table_constraint ';'?
+    : ALTER TABLE table_name (SET '(' LOCK_ESCALATION '=' (AUTO | TABLE | DISABLE) ')'
+                             | ADD column_def_table_constraint) ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174269.aspx
@@ -284,8 +301,8 @@ opendatasource
 
 // https://msdn.microsoft.com/en-us/library/ms188927.aspx
 declare_statement
-    : DECLARE declare_local (',' declare_local)* ';'?
-    | DECLARE LOCAL_ID AS? table_type_definition ';'?
+    : DECLARE LOCAL_ID AS? table_type_definition ';'?
+    | DECLARE declare_local (',' declare_local)* ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms181441(v=sql.120).aspx
@@ -304,12 +321,12 @@ cursor_statement
 
 // https://msdn.microsoft.com/en-us/library/ms188332.aspx
 execute_statement
-    : (EXEC | EXECUTE) (return_status=LOCAL_ID '=')? func_proc_name (execute_statement_arg (',' execute_statement_arg)*)? ';'?
-    | (EXEC | EXECUTE) '(' execute_var_string ('+' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? ';'?
+    : EXECUTE (return_status=LOCAL_ID '=')? func_proc_name (execute_statement_arg (',' execute_statement_arg)*)? ';'?
+    | EXECUTE '(' execute_var_string ('+' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? ';'?
     ;
 
 execute_statement_arg
-    : (parameter=LOCAL_ID '=')? (constant | LOCAL_ID (OUTPUT | OUT)? | DEFAULT | NULL)
+    : (parameter=LOCAL_ID '=')? ((constant_LOCAL_ID | id) (OUTPUT | OUT)? | DEFAULT | NULL)
     ;
 
 execute_var_string
@@ -321,13 +338,29 @@ execute_var_string
 security_statement
     // https://msdn.microsoft.com/en-us/library/ms188354.aspx
     : execute_clause ';'?
+    // https://msdn.microsoft.com/en-us/library/ms187965.aspx
+    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO (to_principal=id) (WITH GRANT OPTION)? (AS as_principal=id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
     ;
 
+grant_permission
+    : EXECUTE
+    | VIEW id // DEFINITION
+    | TAKE id // OWNERSHIP
+    | CONTROL id? // SERVER
+    | CREATE (TABLE | VIEW)
+    | SHOWPLAN
+    | IMPERSONATE
+    | SELECT
+    | REFERENCES
+    | INSERT
+    | ALTER (ANY? (id | DATABASE))?
+    ;
+
 // https://msdn.microsoft.com/en-us/library/ms190356.aspx
 // https://msdn.microsoft.com/en-us/library/ms189484.aspx
-set_statment
+set_statement
     : SET LOCAL_ID ('.' member_name=id)? '=' expression ';'?
     | SET LOCAL_ID assignment_operator expression ';'?
     | SET LOCAL_ID '='
@@ -365,7 +398,7 @@ use_statement
     ;
 
 execute_clause
-    : (EXEC | EXECUTE) AS clause=(CALLER | SELF | OWNER | STRING)
+    : EXECUTE AS clause=(CALLER | SELF | OWNER | STRING)
     ;
 
 declare_local
@@ -373,7 +406,11 @@ declare_local
     ;
 
 table_type_definition
-    : TABLE '(' column_def_table_constraint (','? column_def_table_constraint)* ')'
+    : TABLE '(' column_def_table_constraints ')'
+    ;
+
+column_def_table_constraints
+    : column_def_table_constraint (','? column_def_table_constraint)*
     ;
 
 column_def_table_constraint
@@ -383,7 +420,7 @@ column_def_table_constraint
 
 // https://msdn.microsoft.com/en-us/library/ms187742.aspx
 column_definition
-    : column_name (data_type | AS expression) (COLLATE id)? null_notnull?
+    : id (data_type | AS expression) (COLLATE id)? null_notnull?
       ((CONSTRAINT constraint=id)? DEFAULT constant_expression (WITH VALUES)?
        | IDENTITY ('(' seed=DECIMAL ',' increment=DECIMAL ')')? (NOT FOR REPLICATION)?)?
       ROWGUIDCOL?
@@ -417,11 +454,10 @@ index_option
 
 // https://msdn.microsoft.com/en-us/library/ms180169.aspx
 declare_cursor
-    : DECLARE cursor_name CURSOR ';'?
-    | DECLARE cursor_name INSENSITIVE? SCROLL? CURSOR FOR select_statement
-      (FOR (READ ONLY | UPDATE | (OF column_name_list)))? ';'?
-    | DECLARE cursor_name
-      CURSOR  declare_set_cursor_common (FOR UPDATE (OF column_name_list)?)? ';'?
+    : DECLARE cursor_name
+      (CURSOR (declare_set_cursor_common (FOR UPDATE (OF column_name_list)?)?)?
+      | INSENSITIVE? SCROLL? CURSOR FOR select_statement (FOR (READ ONLY | UPDATE | (OF column_name_list)))?
+      ) ';'?
     ;
 
 declare_set_cursor_common
@@ -432,19 +468,24 @@ declare_set_cursor_common
     ;
 
 fetch_cursor
-    : FETCH ((NEXT | PRIOR | FIRST | LAST | ABSOLUTE expression | RELATIVE expression)? FROM)?
+    : FETCH ((NEXT | PRIOR | FIRST | LAST | (ABSOLUTE | RELATIVE) expression)? FROM)?
       GLOBAL? cursor_name (INTO LOCAL_ID (',' LOCAL_ID)*)? ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms190356.aspx
 // Runtime check.
 set_special
-    : SET id (id | constant | LOCAL_ID | on_off) ';'?
+    : SET id (id | constant_LOCAL_ID | on_off) ';'?
     // https://msdn.microsoft.com/en-us/library/ms173763.aspx
     | SET TRANSACTION ISOLATION LEVEL
       (READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SNAPSHOT | SERIALIZABLE) ';'?
     // https://msdn.microsoft.com/en-us/library/ms188059.aspx
     | SET IDENTITY_INSERT table_name on_off ';'?
+    ;
+
+constant_LOCAL_ID
+    : constant
+    | LOCAL_ID
     ;
 
 // Expression.
@@ -458,7 +499,10 @@ expression
     | constant                                                 #primitive_expression
     | function_call                                            #function_call_expression
     | expression COLLATE id                                    #function_call_expression
-    | case_expr                                                #case_expression
+    // https://msdn.microsoft.com/en-us/library/ms181765.aspx
+    | CASE caseExpr=expression switch_section+ (ELSE elseExpr=expression)? END   #case_expression
+    | CASE switch_search_condition_section+ (ELSE elseExpr=expression)? END      #case_expression
+
     | full_column_name                                         #column_ref_expression
     | '(' expression ')'                                       #bracket_expression
     | '(' subquery ')'                                         #subquery_expression
@@ -468,6 +512,8 @@ expression
     | op=('+' | '-') expression                                #unary_operator_expression
     | expression op=('+' | '-' | '&' | '^' | '|') expression   #binary_operator_expression
     | expression comparison_operator expression                #binary_operator_expression
+
+    | over_clause                                              #over_clause_expression
     ;
 
 constant_expression
@@ -539,8 +585,8 @@ query_specification
     : SELECT (ALL | DISTINCT)? (TOP expression PERCENT? (WITH TIES)?)?
       select_list
       // https://msdn.microsoft.com/en-us/library/ms188029.aspx
-      (INTO into_table=table_name)?
-      (FROM table_source (',' table_source)*)?
+      (INTO table_name)?
+      (FROM table_sources)?
       (WHERE where=search_condition)?
       // https://msdn.microsoft.com/en-us/library/ms177673.aspx
       (GROUP BY group_by_item (',' group_by_item)*)?
@@ -616,8 +662,8 @@ select_list_elem
     | expression (AS? column_alias)?
     ;
 
-partition_by_clause
-    : PARTITION BY expression_list
+table_sources
+    : table_source (',' table_source)*
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms177634.aspx
@@ -641,8 +687,8 @@ table_source_item
     ;
 
 change_table
-	: CHANGETABLE '(' CHANGES table_name ',' (NULL | DECIMAL | LOCAL_ID) ')'
-	;
+    : CHANGETABLE '(' CHANGES table_name ',' (NULL | DECIMAL | LOCAL_ID) ')'
+    ;
 
 // https://msdn.microsoft.com/en-us/library/ms191472.aspx
 join_part
@@ -666,7 +712,7 @@ rowset_function
 
 // runtime check.
 bulk_option
-    : id '=' (DECIMAL | STRING)
+    : id '=' bulk_option_value=(DECIMAL | STRING)
     ;
 
 derived_table
@@ -693,13 +739,13 @@ function_call
     // https://msdn.microsoft.com/en-us/library/ms176050.aspx
     | CURRENT_USER
     // https://msdn.microsoft.com/en-us/library/ms186819.aspx
-    | DATEADD '(' datepart ',' expression ',' expression ')'
+    | DATEADD '(' ID ',' expression ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms189794.aspx
-    | DATEDIFF '(' datepart ',' expression ',' expression ')'
+    | DATEDIFF '(' ID ',' expression ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms174395.aspx
-    | DATENAME '(' datepart ',' expression ')'
+    | DATENAME '(' ID ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms174420.aspx
-    | DATEPART '(' datepart ',' expression ')'
+    | DATEPART '(' ID ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms189838.aspx
     | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'
     // https://msdn.microsoft.com/en-us/library/bb839514.aspx
@@ -712,8 +758,12 @@ function_call
     | SYSTEM_USER
     ;
 
-datepart
-    : ID
+switch_section
+    : WHEN expression THEN expression
+    ;
+
+switch_search_condition_section
+    : WHEN search_condition THEN expression
     ;
 
 as_table_alias
@@ -737,20 +787,15 @@ insert_with_table_hints
 // Id runtime check. Id can be (FORCESCAN, HOLDLOCK, NOLOCK, NOWAIT, PAGLOCK, READCOMMITTED,
 // READCOMMITTEDLOCK, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, TABLOCK, TABLOCKX
 // UPDLOCK, XLOCK)
-
 table_hint
     : NOEXPAND? ( INDEX '(' index_value (',' index_value)* ')'
                 | INDEX '=' index_value
-                | FORCESEEK ('(' index_value '(' index_column_name  (',' index_column_name)* ')' ')')?
+                | FORCESEEK ('(' index_value '(' ID  (',' ID)* ')' ')')?
                 | SERIALIZABLE
                 | SNAPSHOT
                 | SPATIAL_WINDOW_MAX_CELLS '=' DECIMAL
                 | ID)?
     ;
-
-index_column_name
-	: id
-	;
 
 index_value
     : id | DECIMAL
@@ -764,41 +809,30 @@ column_alias
     : id
     | STRING
     ;
-    
 
+table_value_constructor
+    : VALUES '(' expression_list ')' (',' '(' expression_list ')')*
+    ;
+    
 expression_list
     : expression (',' expression)*
     ;
 
-// https://msdn.microsoft.com/en-us/library/ms181765.aspx
-case_expr
-    : CASE expression (WHEN expression THEN expression)+ (ELSE expression)? END
-    | CASE (WHEN search_condition THEN expression)+ (ELSE expression)? END
-    ;
-
 // https://msdn.microsoft.com/en-us/library/ms189798.aspx
 ranking_windowed_function
-    : RANK '(' ')' over_clause
-    | DENSE_RANK '(' ')' over_clause
+    : (RANK | DENSE_RANK | ROW_NUMBER) '(' ')' over_clause
     | NTILE '(' expression ')' over_clause
-    | ROW_NUMBER '(' ')' over_clause
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms173454.aspx
 aggregate_windowed_function
-    : AVG '(' all_distinct_expression ')' over_clause?
+    : (AVG | MAX | MIN | SUM | STDEV | STDEVP | VAR | VARP)
+      '(' all_distinct_expression ')' over_clause?
+    | (COUNT | COUNT_BIG)
+      '(' ('*' | all_distinct_expression) ')' over_clause?
     | CHECKSUM_AGG '(' all_distinct_expression ')'
     | GROUPING '(' expression ')'
     | GROUPING_ID '(' expression_list ')'
-    | MAX '(' all_distinct_expression ')' over_clause?
-    | MIN '(' all_distinct_expression ')' over_clause?
-    | SUM '(' all_distinct_expression ')' over_clause?
-    | STDEV '(' all_distinct_expression ')' over_clause?
-    | STDEVP '(' all_distinct_expression ')' over_clause?
-    | VAR '(' all_distinct_expression ')' over_clause?
-    | VARP '(' all_distinct_expression ')' over_clause?
-    | COUNT '(' ('*' | all_distinct_expression) ')' over_clause?
-    | COUNT_BIG '(' ('*' | all_distinct_expression) ')' over_clause?
     ;
 
 all_distinct_expression
@@ -807,7 +841,7 @@ all_distinct_expression
 
 // https://msdn.microsoft.com/en-us/library/ms189461.aspx
 over_clause
-    : OVER '(' partition_by_clause? order_by_clause? row_or_range_clause? ')'
+    : OVER '(' (PARTITION BY expression_list)? order_by_clause? row_or_range_clause? ')'
     ;
 
 row_or_range_clause
@@ -861,15 +895,11 @@ ddl_object
     ;
 
 full_column_name
-    : (table_name '.')? column_name
+    : (table_name '.')? id
     ;
 
 column_name_list
-    : column_name (',' column_name)*
-    ;
-
-column_name
-    : id
+    : id (',' id)*
     ;
 
 cursor_name
@@ -947,18 +977,14 @@ default_value
 constant
     : STRING // string, datetime or uniqueidentifier
     | BINARY
-    | number
+    | sign? DECIMAL
     | sign? (REAL | FLOAT)  // float or decimal
-    | sign? '$' (DECIMAL | FLOAT)       // money
-    ;
-
-number
-    : sign? DECIMAL
+    | sign? dollar='$' (DECIMAL | FLOAT)       // money
     ;
 
 sign
-    : PLUS
-    | MINUS
+    : '+'
+    | '-'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms175874.aspx
@@ -981,6 +1007,7 @@ simple_id
     | CHECKSUM_AGG
     | COMMITTED
     | CONCAT
+    | CONTROL
     | COOKIE
     | COUNT
     | COUNT_BIG
@@ -1004,6 +1031,7 @@ simple_id
     | GROUPING
     | GROUPING_ID
     | HASH
+    | IMPERSONATE
     | INSENSITIVE
     | INSERTED
     | ISOLATION
@@ -1043,6 +1071,7 @@ simple_id
     | PATH
     | PRECEDING
     | PRIOR
+    | PRIVILEGES
     | RANGE
     | RANK
     | READONLY
@@ -1163,8 +1192,7 @@ END:                                   E N D;
 ERRLVL:                                E R R L V L;
 ESCAPE:                                E S C A P E;
 EXCEPT:                                E X C E P T;
-EXEC:                                  E X E C;
-EXECUTE:                               E X E C U T E;
+EXECUTE:                               E X E C (U T E)?;
 EXISTS:                                E X I S T S;
 EXIT:                                  E X I T;
 EXTERNAL:                              E X T E R N A L;
@@ -1305,6 +1333,7 @@ CHECKSUM:                              C H E C K S U M;
 CHECKSUM_AGG:                          C H E C K S U M '_' A G G;
 COMMITTED:                             C O M M I T T E D;
 CONCAT:                                C O N C A T;
+CONTROL:                               C O N T R O L;
 COOKIE:                                C O O K I E;
 COUNT:                                 C O U N T;
 COUNT_BIG:                             C O U N T '_' B I G;
@@ -1332,6 +1361,7 @@ GO:                                    G O;
 GROUPING:                              G R O U P I N G;
 GROUPING_ID:                           G R O U P I N G '_' I D;
 HASH:                                  H A S H;
+IMPERSONATE:                           I M P E R S O N A T E;
 INSENSITIVE:                           I N S E N S I T I V E;
 INSERTED:                              I N S E R T E D;
 ISOLATION:                             I S O L A T I O N;
@@ -1371,6 +1401,7 @@ PARTITION:                             P A R T I T I O N;
 PATH:                                  P A T H;
 PRECEDING:                             P R E C E D I N G;
 PRIOR:                                 P R I O R;
+PRIVILEGES:                            P R I V I L E G E S;
 RANGE:                                 R A N G E;
 RANK:                                  R A N K;
 READONLY:                              R E A D O N L Y;
@@ -1391,6 +1422,7 @@ SCROLL:                                S C R O L L;
 SCROLL_LOCKS:                          S C R O L L '_' L O C K S;
 SELF:                                  S E L F;
 SERIALIZABLE:                          S E R I A L I Z A B L E;
+SHOWPLAN:                              S H O W P L A N;
 SIMPLE:                                S I M P L E;
 SNAPSHOT:                              S N A P S H O T;
 SPATIAL_WINDOW_MAX_CELLS:              S P A T I A L '_' W I N D O W '_' M A X '_' C E L L S;
@@ -1399,6 +1431,7 @@ STATS_STREAM:                          S T A T S '_' S T R E A M;
 STDEV:                                 S T D E V;
 STDEVP:                                S T D E V P;
 SUM:                                   S U M;
+TAKE:                                  T A K E;
 THROW:                                 T H R O W;
 TIES:                                  T I E S;
 TIME:                                  T I M E;

@@ -46,7 +46,7 @@ options {
 
 // The main entry point for parsing a v4 grammar.
 grammarSpec
-	:	DOC_COMMENT?
+	:	DOC_COMMENT*
 		grammarType identifier SEMI
 		prequelConstruct*
 		rules
@@ -154,7 +154,7 @@ ruleSpec
 	;
 
 parserRuleSpec
-	:	DOC_COMMENT?
+	:	DOC_COMMENT*
 		ruleModifiers? RULE_REF argActionBlock? ruleReturns? throwsSpec?
 		localsSpec?
 		rulePrequel*
@@ -234,7 +234,7 @@ labeledAlt
 // Lexer rules
 
 lexerRuleSpec
-	:	DOC_COMMENT? FRAGMENT?
+	:	DOC_COMMENT* FRAGMENT?
 		TOKEN_REF COLON lexerRuleBlock SEMI
 	;
 
