@@ -1,0 +1,5 @@
+module top (a);
+    input a;
+    wire ello   ; 
+    NOT u1 (ello, a); 
+endmodule
