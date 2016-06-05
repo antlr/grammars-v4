@@ -1355,7 +1355,7 @@ escaped_hierarchical_branch ( '.' simple_hierarchical_branch | '.' escaped_hiera
 ;
 
 Escaped_identifier
-	:	'\\' ~[ \r\t\n]*
+    : '\\' ('\u0021'..'\u007E')+ ~ [ \r\t\n]*
     ;
 
 event_identifier : identifier ;
