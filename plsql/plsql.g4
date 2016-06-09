@@ -1547,7 +1547,7 @@ standard_function
     | XMLQUERY
       '(' concatenation_wrapper xml_passing_clause? RETURNING CONTENT (NULL ON EMPTY)? ')' ('.' general_element_part)?
     | XMLROOT
-      '(' concatenation_wrapper xmlroot_param_version_part (',' xmlroot_param_standalone_part)? ')' ('.' general_element_part)?
+      '(' concatenation_wrapper (',' xmlroot_param_version_part)? (',' xmlroot_param_standalone_part)? ')' ('.' general_element_part)?
     | XMLSERIALIZE
       '(' (DOCUMENT | CONTENT) concatenation_wrapper (AS type_spec)?
       xmlserialize_param_enconding_part? xmlserialize_param_version_part? xmlserialize_param_ident_part? ((HIDE | SHOW) DEFAULTS)? ')'
