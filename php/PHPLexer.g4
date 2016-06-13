@@ -36,11 +36,6 @@ string _htmlNameText;
 bool _phpScript;
 bool _insideString;
 
-public override void Reset()
-{
-    base.Reset();
-}
-
 public override IToken NextToken()
 {
     CommonToken token = (CommonToken)base.NextToken();
