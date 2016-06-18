@@ -1,4 +1,3 @@
-
 /*
  [The "BSD licence"]
  Copyright (c) 2005-2007 Terence Parr
@@ -26,18 +25,19 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 grammar ANTLRv3;
 
 grammarDef
-   : DOC_COMMENT? ( 'lexer' | 'parser' | 'tree' )
+   : DOC_COMMENT? ('lexer' | 'parser' | 'tree')
    ;
 
 tokensSpec
-   : TOKENS tokenSpec+ '}'
+   : TOKENS tokenSpec + '}'
    ;
 
 tokenSpec
-   : TOKEN_REF ( '=' ( STRING_LITERAL | CHAR_LITERAL ) | ) ';'
+   : TOKEN_REF ('=' (STRING_LITERAL | CHAR_LITERAL) |) ';'
    ;
 
 attrScope
@@ -45,15 +45,17 @@ attrScope
    ;
 
 action
-   : '@' ( actionScopeName '::' )? id ACTION
+   : '@' (actionScopeName '::')? id ACTION
    ;
 
 actionScopeName
-   : id | 'lexer' | 'parser'
+   : id
+   | 'lexer'
+   | 'parser'
    ;
 
 optionsSpec
-   : OPTIONS ( option ';' )+ '}'
+   : OPTIONS (option ';') + '}'
    ;
 
 option
@@ -61,11 +63,15 @@ option
    ;
 
 optionValue
-   : id | STRING_LITERAL | CHAR_LITERAL | INT | s = '*'
+   : id
+   | STRING_LITERAL
+   | CHAR_LITERAL
+   | INT
+   | s = '*'
    ;
 
 rule_
-   : DOC_COMMENT? ( ( 'protected' | 'public' | 'private' | 'fragment' ) )? id '!'? ( ARG_ACTION )? ( 'returns' ARG_ACTION )? throwsSpec? optionsSpec? ruleScopeSpec? ruleAction* ':' altList ';' exceptionGroup?
+   : DOC_COMMENT? (('protected' | 'public' | 'private' | 'fragment'))? id '!'? (ARG_ACTION)? ('returns' ARG_ACTION)? throwsSpec? optionsSpec? ruleScopeSpec? ruleAction* ':' altList ';' exceptionGroup?
    ;
 
 ruleAction
@@ -73,27 +79,30 @@ ruleAction
    ;
 
 throwsSpec
-   : 'throws' id ( ',' id )*
+   : 'throws' id (',' id)*
    ;
 
 ruleScopeSpec
-   : 'scope' ACTION | 'scope' id ( ',' id )* ';' | 'scope' ACTION 'scope' id ( ',' id )* ';'
+   : 'scope' ACTION
+   | 'scope' id (',' id)* ';'
+   | 'scope' ACTION 'scope' id (',' id)* ';'
    ;
 
 block
-   : '(' ( ( optionsSpec )? ':' )? alternative rewrite ( '|' alternative rewrite )* ')'
+   : '(' ((optionsSpec)? ':')? alternative rewrite ('|' alternative rewrite)* ')'
    ;
 
 altList
-   : alternative rewrite ( '|' alternative rewrite )*
+   : alternative rewrite ('|' alternative rewrite)*
    ;
 
 alternative
-   : element+
+   : element +
    ;
 
 exceptionGroup
-   : ( exceptionHandler )+ ( finallyClause )? | finallyClause
+   : (exceptionHandler) + (finallyClause)?
+   | finallyClause
    ;
 
 exceptionHandler
@@ -109,23 +118,32 @@ element
    ;
 
 elementNoOptionSpec
-   : id ( '=' | '+=' ) atom ( ebnfSuffix ) | id ( '=' | '+=' ) block ( ebnfSuffix ) | atom ( ebnfSuffix ) | ebnf | ACTION | SEMPRED ( '=>' ) | treeSpec ( ebnfSuffix )
+   : id ('=' | '+=') atom (ebnfSuffix)
+   | id ('=' | '+=') block (ebnfSuffix)
+   | atom (ebnfSuffix)
+   | ebnf
+   | ACTION
+   | SEMPRED ('=>')
+   | treeSpec (ebnfSuffix)
    ;
 
 atom
-   : range ( ( '^' | '!' ) ) | terminal_ | notSet ( ( '^' | '!' ) ) | RULE_REF ( ARG_ACTION )? ( ( '^' | '!' ) )?
+   : range (('^' | '!'))
+   | terminal_
+   | notSet (('^' | '!'))
+   | RULE_REF (ARG_ACTION)? (('^' | '!'))?
    ;
 
 notSet
-   : '~' ( notTerminal | block )
+   : '~' (notTerminal | block)
    ;
 
 treeSpec
-   : '^(' element ( element )+ ')'
+   : '^(' element (element) + ')'
    ;
 
 ebnf
-   : block ( '?' | '*' | '+' | '=>' )
+   : block ('?' | '*' | '+' | '=>')
    ;
 
 range
@@ -133,23 +151,28 @@ range
    ;
 
 terminal_
-   : ( CHAR_LITERAL | TOKEN_REF ( ARG_ACTION ) | STRING_LITERAL | '.' ) ( '^' | '!' )?
+   : (CHAR_LITERAL | TOKEN_REF (ARG_ACTION) | STRING_LITERAL | '.') ('^' | '!')?
    ;
 
 notTerminal
-   : CHAR_LITERAL | TOKEN_REF | STRING_LITERAL
+   : CHAR_LITERAL
+   | TOKEN_REF
+   | STRING_LITERAL
    ;
 
 ebnfSuffix
-   : '?' | '*' | '+'
+   : '?'
+   | '*'
+   | '+'
    ;
 
 rewrite
-   : ( '->' SEMPREDrewrite_alternative )* '->' rewrite_alternative
+   : ('->' SEMPREDrewrite_alternative)* '->' rewrite_alternative
    ;
 
 rewrite_alternative
-   : rewrite_template | rewrite_tree_alternative
+   : rewrite_template
+   | rewrite_tree_alternative
    ;
 
 rewrite_tree_block
@@ -157,15 +180,23 @@ rewrite_tree_block
    ;
 
 rewrite_tree_alternative
-   : rewrite_tree_element+
+   : rewrite_tree_element +
    ;
 
 rewrite_tree_element
-   : rewrite_tree_atom | rewrite_tree_atom ebnfSuffix | rewrite_tree ( ebnfSuffix ) | rewrite_tree_ebnf
+   : rewrite_tree_atom
+   | rewrite_tree_atom ebnfSuffix
+   | rewrite_tree (ebnfSuffix)
+   | rewrite_tree_ebnf
    ;
 
 rewrite_tree_atom
-   : CHAR_LITERAL | TOKEN_REF ARG_ACTION? | RULE_REF | STRING_LITERAL | '$' id | ACTION
+   : CHAR_LITERAL
+   | TOKEN_REF ARG_ACTION?
+   | RULE_REF
+   | STRING_LITERAL
+   | '$' id
+   | ACTION
    ;
 
 rewrite_tree_ebnf
@@ -189,7 +220,7 @@ rewrite_indirect_template_head
    ;
 
 rewrite_template_args
-   : rewrite_template_arg ( ',' rewrite_template_arg )*
+   : rewrite_template_arg (',' rewrite_template_arg)*
    ;
 
 rewrite_template_arg
@@ -197,12 +228,13 @@ rewrite_template_arg
    ;
 
 id
-   : TOKEN_REF | RULE_REF
+   : TOKEN_REF
+   | RULE_REF
    ;
 
 
 SL_COMMENT
-   : '//' ( ' $ANTLR ' SRC | ~ ( '\r' | '\n' )* ) '\r'? '\n' -> skip
+   : '//' (' $ANTLR ' SRC | ~ ('\r' | '\n')*) '\r'? '\n' -> skip
    ;
 
 
@@ -222,12 +254,12 @@ STRING_LITERAL
 
 
 fragment LITERAL_CHAR
-   : ESC | ~ ( '\'' | '\\' )
+   : ESC | ~ ('\'' | '\\')
    ;
 
 
 DOUBLE_QUOTE_STRING_LITERAL
-   : '"' ( ESC | ~ ( '\\' | '"' ) )* '"'
+   : '"' (ESC | ~ ('\\' | '"'))* '"'
    ;
 
 
@@ -237,7 +269,7 @@ DOUBLE_ANGLE_STRING_LITERAL
 
 
 fragment ESC
-   : '\\' ( 'n' | 'r' | 't' | 'b' | 'f' | '"' | '\'' | '\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | . )
+   : '\\' ('n' | 'r' | 't' | 'b' | 'f' | '"' | '\'' | '\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | .)
    ;
 
 
@@ -247,7 +279,7 @@ fragment XDIGIT
 
 
 INT
-   : '0' .. '9'+
+   : '0' .. '9' +
    ;
 
 
@@ -257,42 +289,42 @@ ARG_ACTION
 
 
 fragment NESTED_ARG_ACTION
-   : '[' ( NESTED_ARG_ACTION | ACTION_STRING_LITERAL | ACTION_CHAR_LITERAL | . )* ']'
+   : '[' (NESTED_ARG_ACTION | ACTION_STRING_LITERAL | ACTION_CHAR_LITERAL | .)* ']'
    ;
 
 
 ACTION
-   : NESTED_ACTION ( '?' )?
+   : NESTED_ACTION ('?')?
    ;
 
 
 fragment NESTED_ACTION
-   : '{' ( NESTED_ACTION | SL_COMMENT | ML_COMMENT | ACTION_STRING_LITERAL | ACTION_CHAR_LITERAL | . )* '}'
+   : '{' (NESTED_ACTION | SL_COMMENT | ML_COMMENT | ACTION_STRING_LITERAL | ACTION_CHAR_LITERAL | .)* '}'
    ;
 
 
 fragment ACTION_CHAR_LITERAL
-   : '\'' ( ACTION_ESC | ~ ( '\\' | '\'' ) ) '\''
+   : '\'' (ACTION_ESC | ~ ('\\' | '\'')) '\''
    ;
 
 
 fragment ACTION_STRING_LITERAL
-   : '"' ( ACTION_ESC | ~ ( '\\' | '"' ) )* '"'
+   : '"' (ACTION_ESC | ~ ('\\' | '"'))* '"'
    ;
 
 
 fragment ACTION_ESC
-   : '\\\'' | '\\' '"' | '\\' ~ ( '\'' | '"' )
+   : '\\\'' | '\\' '"' | '\\' ~ ('\'' | '"')
    ;
 
 
 TOKEN_REF
-   : 'A' .. 'Z' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
+   : 'A' .. 'Z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
    ;
 
 
 RULE_REF
-   : 'a' .. 'z' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
+   : 'a' .. 'z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
    ;
 
 
@@ -312,12 +344,12 @@ fragment SRC
 
 
 WS
-   : ( ' ' | '\t' | '\r'? '\n' )+ -> skip
+   : (' ' | '\t' | '\r'? '\n') + -> skip
    ;
 
 
 fragment WS_LOOP
-   : ( WS | SL_COMMENT | ML_COMMENT )*
+   : (WS | SL_COMMENT | ML_COMMENT)*
    ;
 
 
