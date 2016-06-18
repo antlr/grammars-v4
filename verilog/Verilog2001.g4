@@ -1831,7 +1831,7 @@ escaped_hierarchical_identifier
 
 
 Escaped_identifier
-   : '\\' ~ [ \r\t\n]*
+   : '\\' ('\u0021'..'\u007E')+ ~ [ \r\t\n]*
    ;
 
 event_identifier
