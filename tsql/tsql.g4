@@ -32,7 +32,7 @@ tsql_file
     ;
 
 sql_clauses
-    : sql_clause+
+    : (sql_clause SEMI?)+
     ;
 
 sql_clause
@@ -70,6 +70,7 @@ ddl_clause
     | drop_statistics
     | drop_table
     | drop_view
+	| create_database
     ;
 
 // Control-of-Flow Language: https://msdn.microsoft.com/en-us/library/ms174290.aspx
@@ -191,6 +192,16 @@ output_column_name
     ;
 
 // DDL
+
+// https://msdn.microsoft.com/en-ie/library/ms176061.aspx
+create_database
+    : CREATE DATABASE (database=id)
+	( CONTAINMENT '=' ( NONE | PARTIAL ) )?
+	( ON PRIMARY? database_file_spec ( ',' database_file_spec )* )?
+	( LOG ON database_file_spec ( ',' database_file_spec )* )?
+	( COLLATE collation_name = id )?
+	( WITH  create_database_option ( ',' create_database_option )* )?
+    ;
 
 // https://msdn.microsoft.com/en-us/library/ms188783.aspx
 create_index
@@ -877,6 +888,43 @@ window_frame_following
     | DECIMAL FOLLOWING
     ;
 
+create_database_option:
+    FILESTREAM ( database_filestream_option (',' database_filestream_option)* )  
+    | DEFAULT_FULLTEXT_LANGUAGE = id
+    | DEFAULT_LANGUAGE = id
+    | NESTED_TRIGGERS = ( OFF | ON )
+    | TRANSFORM_NOISE_WORDS = ( OFF | ON )
+    | TWO_DIGIT_YEAR_CUTOFF = DECIMAL
+    | DB_CHAINING ( OFF | ON )
+    | TRUSTWORTHY ( OFF | ON ) 
+    ;
+
+database_filestream_option:
+     (NON_TRANSACTED_ACCESS EQUAL OFF | READ_ONLY | FULL )
+	 |
+	 ( DIRECTORY_NAME EQUAL STRING )
+    ;
+
+database_file_spec:
+	file_group | file_spec;
+
+file_group:
+     FILEGROUP id
+	 ( CONTAINS FILESTREAM )?
+	 ( DEFAULT )?
+	 ( CONTAINS MEMORY_OPTIMIZED_DATA )?
+	 file_spec ( ',' file_spec )*
+    ;
+file_spec
+    : LR_BRACKET
+	  NAME EQUAL (name = id) ','?
+	  FILENAME EQUAL file=STRING ','?
+	  ( SIZE EQUAL file_size ','? )?
+	  ( MAXSIZE EQUAL file_size ','? )?
+	  ( FILEGROWTH EQUAL file_size ','? )?
+	  RR_BRACKET
+    ;
+
 // Primitive.
 
 full_table_name
@@ -1138,6 +1186,10 @@ assignment_operator
     : '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '^=' | '|='
     ;
 
+file_size:
+    DECIMAL( KB | MB | GB | TB | '%' )?
+    ;
+
 // Lexer
 
 // Basic keywords (from https://msdn.microsoft.com/en-us/library/ms189822.aspx)
@@ -1170,6 +1222,7 @@ COLUMN:                                C O L U M N;
 COMMIT:                                C O M M I T;
 COMPUTE:                               C O M P U T E;
 CONSTRAINT:                            C O N S T R A I N T;
+CONTAINMENT:                           C O N T A I N M E N T;
 CONTAINS:                              C O N T A I N S;
 CONTAINSTABLE:                         C O N T A I N S T A B L E;
 CONTINUE:                              C O N T I N U E;
@@ -1207,6 +1260,7 @@ EXIT:                                  E X I T;
 EXTERNAL:                              E X T E R N A L;
 FETCH:                                 F E T C H;
 FILE:                                  F I L E;
+FILENAME:                              F I L E N A M E;
 FILLFACTOR:                            F I L L F A C T O R;
 FOR:                                   F O R;
 FORCESEEK:                             F O R C E S E E K;
@@ -1238,10 +1292,12 @@ LEFT:                                  L E F T;
 LIKE:                                  L I K E;
 LINENO:                                L I N E N O;
 LOAD:                                  L O A D;
+LOG:                                   L O G;
 MERGE:                                 M E R G E;
 NATIONAL:                              N A T I O N A L;
 NOCHECK:                               N O C H E C K;
 NONCLUSTERED:                          N O N C L U S T E R E D;
+NONE:                                  N O N E;
 NOT:                                   N O T;
 NULL:                                  N U L L;
 NULLIF:                                N U L L I F;
@@ -1259,6 +1315,7 @@ OR:                                    O R;
 ORDER:                                 O R D E R;
 OUTER:                                 O U T E R;
 OVER:                                  O V E R;
+PARTIAL:                               P A R T I A L;
 PERCENT:                               P E R C E N T;
 PIVOT:                                 P I V O T;
 PLAN:                                  P L A N;
@@ -1350,21 +1407,26 @@ DATEADD:                               D A T E A D D;
 DATEDIFF:                              D A T E D I F F;
 DATENAME:                              D A T E N A M E;
 DATEPART:                              D A T E P A R T;
+DB_CHAINING:                           D B '_' C H A I N I N G;
 DELAY:                                 D E L A Y;
 DELETED:                               D E L E T E D;
 DENSE_RANK:                            D E N S E '_' R A N K;
+DIRECTORY_NAME:                        D I R E C T O R Y '_' N A M E;
 DISABLE:                               D I S A B L E;
 DYNAMIC:                               D Y N A M I C;
 ENCRYPTION:                            E N C R Y P T I O N;
 EXPAND:                                E X P A N D;
 FAST:                                  F A S T;
 FAST_FORWARD:                          F A S T '_' F O R W A R D;
+FILEGROUP:                             F I L E G R O U P;
+FILESTREAM:                            F I L E S T R E A M;
 FIRST:                                 F I R S T;
 FORCE:                                 F O R C E;
 FORCED:                                F O R C E D;
 FOLLOWING:                             F O L L O W I N G;
 FORWARD_ONLY:                          F O R W A R D '_' O N L Y;
 FULLSCAN:                              F U L L S C A N;
+GB:                                    G B;
 GLOBAL:                                G L O B A L;
 GO:                                    G O;
 GROUPING:                              G R O U P I N G;
@@ -1374,6 +1436,7 @@ IMPERSONATE:                           I M P E R S O N A T E;
 INSENSITIVE:                           I N S E N S I T I V E;
 INSERTED:                              I N S E R T E D;
 ISOLATION:                             I S O L A T I O N;
+KB:                                    K B;
 KEEP:                                  K E E P;
 KEEPFIXED:                             K E E P F I X E D;
 IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX: I G N O R E '_' N O N C L U S T E R E D '_' C O L U M N S T O R E '_' I N D E X;
@@ -1388,6 +1451,8 @@ MARK:                                  M A R K;
 MAX:                                   M A X;
 MAXDOP:                                M A X D O P;
 MAXRECURSION:                          M A X R E C U R S I O N;
+MB:                                    M B;
+MEMORY_OPTIMIZED_DATA:                 M E M O R Y '_' O P T I M I Z E D '_' D A T A;
 MIN:                                   M I N;
 MIN_ACTIVE_ROWVERSION:                 M I N '_' A C T I V E '_' R O W V E R S I O N;
 MODIFY:                                M O D I F Y;
@@ -1395,6 +1460,7 @@ NEXT:                                  N E X T;
 NAME:                                  N A M E;
 NOCOUNT:                               N O C O U N T;
 NOEXPAND:                              N O E X P A N D;
+NON_TRANSACTED_ACCESS:                 N O N '_' T R A N S A C T E D '_' A C C E S S;
 NORECOMPUTE:                           N O R E C O M P U T E;
 NTILE:                                 N T I L E;
 NUMBER:                                N U M B E R;
@@ -1433,6 +1499,9 @@ SELF:                                  S E L F;
 SERIALIZABLE:                          S E R I A L I Z A B L E;
 SHOWPLAN:                              S H O W P L A N;
 SIMPLE:                                S I M P L E;
+SIZE:                                  S I Z E;
+MAXSIZE:                               M A X S I Z E;
+FILEGROWTH:                            F I L E G R O W T H;
 SNAPSHOT:                              S N A P S H O T;
 SPATIAL_WINDOW_MAX_CELLS:              S P A T I A L '_' W I N D O W '_' M A X '_' C E L L S;
 STATIC:                                S T A T I C;
@@ -1441,10 +1510,12 @@ STDEV:                                 S T D E V;
 STDEVP:                                S T D E V P;
 SUM:                                   S U M;
 TAKE:                                  T A K E;
+TB:                                    T B;
 TEXTIMAGE_ON:                          T E X T I M A G E '_' O N;
 THROW:                                 T H R O W;
 TIES:                                  T I E S;
 TIME:                                  T I M E;
+TRUSTWORTHY:                           T R U S T W O R T H Y;
 TRY:                                   T R Y;
 TYPE:                                  T Y P E;
 TYPE_WARNING:                          T Y P E '_' W A R N I N G;
