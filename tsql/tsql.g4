@@ -32,7 +32,7 @@ tsql_file
     ;
 
 sql_clauses
-    : sql_clause+
+    : (sql_clause SEMI?)+
     ;
 
 sql_clause
@@ -70,6 +70,7 @@ ddl_clause
     | drop_statistics
     | drop_table
     | drop_view
+    | create_database
     ;
 
 // Control-of-Flow Language: https://msdn.microsoft.com/en-us/library/ms174290.aspx
@@ -192,12 +193,22 @@ output_column_name
 
 // DDL
 
+// https://msdn.microsoft.com/en-ie/library/ms176061.aspx
+create_database
+    : CREATE DATABASE (database=id)
+    ( CONTAINMENT '=' ( NONE | PARTIAL ) )?
+    ( ON PRIMARY? database_file_spec ( ',' database_file_spec )* )?
+    ( LOG ON database_file_spec ( ',' database_file_spec )* )?
+    ( COLLATE collation_name = id )?
+    ( WITH  create_database_option ( ',' create_database_option )* )?
+    ;
+
 // https://msdn.microsoft.com/en-us/library/ms188783.aspx
 create_index
     : CREATE UNIQUE? clustered? INDEX id ON table_name_with_hint '(' column_name_list (ASC | DESC)? ')'
-	(index_options)?
-	(ON id)?
-	';'?
+    (index_options)?
+    (ON id)?
+    ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
@@ -222,7 +233,7 @@ procedure_option
 create_statistics
     : CREATE STATISTICS id ON table_name_with_hint '(' column_name_list ')'
       (WITH (FULLSCAN | SAMPLE DECIMAL (PERCENT | ROWS) | STATS_STREAM)
-            (',' NORECOMPUTE)? (',' INCREMENTAL = on_off)? )? ';'?
+            (',' NORECOMPUTE)? (',' INCREMENTAL EQUAL on_off)? )? ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174979.aspx
@@ -246,22 +257,173 @@ alter_table
     : ALTER TABLE table_name (SET '(' LOCK_ESCALATION '=' (AUTO | TABLE | DISABLE) ')'
                              | ADD column_def_table_constraint
                              | DROP CONSTRAINT constraint=id
-							 | WITH CHECK ADD CONSTRAINT constraint=id FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
-							 | CHECK CONSTRAINT constraint=id
-							 ) 
-							 ';'?
+                             | WITH CHECK ADD CONSTRAINT constraint=id FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
+                             | CHECK CONSTRAINT constraint=id
+                             )
+                             ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174269.aspx
 alter_database
     : ALTER DATABASE (database=id | CURRENT)
-      (MODIFY NAME '=' new_name=id | COLLATE collation=id | SET database_option) ';'?
+      (MODIFY NAME '=' new_name=id | COLLATE collation=id | SET database_optionspec (WITH termination)? ) ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/bb522682.aspx
 // Runtime check.
-database_option
-    : id (id | FULL)?
+database_optionspec
+    :  auto_option
+      | change_tracking_option
+      | containment_option
+      | cursor_option
+//      | database_mirroring_option
+      | date_correlation_optimization_option
+      | db_encryption_option
+      | db_state_option
+      | db_update_option
+      | db_user_access_option
+      | delayed_durability_option
+      | external_access_option
+      | FILESTREAM database_filestream_option
+      | HADR_options
+      | mixed_page_allocation_option
+      | parameterization_option
+//      | query_store_options
+      | recovery_option
+//      | remote_data_archive_option
+      | service_broker_option
+      | snapshot_option
+      | sql_option
+      | target_recovery_time_option
+      | termination
+    ;
+
+auto_option:
+     AUTO_CLOSE on_off
+      | AUTO_CREATE_STATISTICS  OFF | ON ( INCREMENTAL EQUAL  ON | OFF  )
+      | AUTO_SHRINK  on_off
+      | AUTO_UPDATE_STATISTICS on_off
+      | AUTO_UPDATE_STATISTICS_ASYNC  (ON | OFF )
+    ;
+
+change_tracking_option:
+    CHANGE_TRACKING  EQUAL ( OFF | ON (change_tracking_option_list (',' change_tracking_option_list)*)*  )    
+    ;
+
+change_tracking_option_list:
+     AUTO_CLEANUP EQUAL on_off
+     | CHANGE_RETENTION EQUAL ( DAYS | HOURS | MINUTES )
+    ;
+
+containment_option:
+     CONTAINMENT EQUAL ( NONE | PARTIAL )
+    ;
+
+cursor_option:
+    CURSOR_CLOSE_ON_COMMIT on_off
+    | CURSOR_DEFAULT ( LOCAL | GLOBAL )
+  ;
+
+/* Will visit later
+database_mirroring_option:
+     ALTER DATABASE Database Mirroring
+    ;
+*/
+
+date_correlation_optimization_option:
+    DATE_CORRELATION_OPTIMIZATION on_off
+    ;
+
+db_encryption_option:
+     ENCRYPTION on_off
+    ;
+db_state_option:
+     ( ONLINE | OFFLINE | EMERGENCY )
+    ;
+
+db_update_option:
+    READ_ONLY | READ_WRITE
+    ;
+
+db_user_access_option:
+    ( SINGLE_USER | RESTRICTED_USER | MULTI_USER )
+    ;
+delayed_durability_option:
+     DELAYED_DURABILITY EQUAL ( DISABLED | ALLOWED | FORCED )
+    ;
+
+external_access_option:
+   DB_CHAINING on_off  
+  | TRUSTWORTHY on_off  
+  | DEFAULT_LANGUAGE EQUAL ( id | STRING )  
+  | DEFAULT_FULLTEXT_LANGUAGE EQUAL ( id | STRING )  
+  | NESTED_TRIGGERS EQUAL ( OFF | ON )  
+  | TRANSFORM_NOISE_WORDS EQUAL ( OFF | ON )  
+  | TWO_DIGIT_YEAR_CUTOFF EQUAL DECIMAL
+  ;
+
+HADR_options:
+    ALTER DATABASE SET HADR
+    ;
+
+mixed_page_allocation_option:
+     MIXED_PAGE_ALLOCATION ( OFF | ON )
+    ;
+
+parameterization_option:
+     PARAMETERIZATION ( SIMPLE | FORCED )
+    ;
+
+/* Will visit later
+query_store_options:
+    ;
+*/
+
+recovery_option:
+     RECOVERY ( FULL | BULK_LOGGED | SIMPLE )
+     | TORN_PAGE_DETECTION on_off
+     | PAGE_VERIFY ( CHECKSUM | TORN_PAGE_DETECTION | NONE )
+    ;
+
+/*Will visit later
+remote_data_archive_option:
+    ;
+*/
+
+service_broker_option:
+    ENABLE_BROKER  
+    | DISABLE_BROKER  
+    | NEW_BROKER  
+    | ERROR_BROKER_CONVERSATIONS  
+    | HONOR_BROKER_PRIORITY on_off
+  ;
+snapshot_option:
+   ALLOW_SNAPSHOT_ISOLATION on_off  
+  | READ_COMMITTED_SNAPSHOT (ON | OFF )  
+  | MEMORY_OPTIMIZED_ELEVATE_TO_SNAPSHOT = (ON | OFF )
+  ;
+
+sql_option:
+  ANSI_NULL_DEFAULT on_off   
+  | ANSI_NULLS on_off   
+  | ANSI_PADDING on_off   
+  | ANSI_WARNINGS on_off   
+  | ARITHABORT on_off   
+  | COMPATIBILITY_LEVEL EQUAL ( '90' | '100' | '110' | '120' )  
+  | CONCAT_NULL_YIELDS_NULL on_off   
+  | NUMERIC_ROUNDABORT on_off   
+  | QUOTED_IDENTIFIER on_off   
+  | RECURSIVE_TRIGGERS on_off   
+  ;
+
+target_recovery_time_option:
+     TARGET_RECOVERY_TIME EQUAL DECIMAL ( SECONDS | MINUTES )
+    ;
+
+termination:
+    ROLLBACK AFTER seconds = DECIMAL
+    | ROLLBACK IMMEDIATE   
+    | NO_WAIT  
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms176118.aspx
@@ -384,7 +546,7 @@ transaction_statement
     // https://msdn.microsoft.com/en-us/library/ms188929.aspx
     | BEGIN (TRAN | TRANSACTION) ((id | LOCAL_ID) (WITH MARK STRING)?)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms190295.aspx
-    | COMMIT (TRAN | TRANSACTION) ((id | LOCAL_ID) (WITH '(' DELAYED_DURABILITY = (OFF | ON) ')')?)? ';'?
+    | COMMIT (TRAN | TRANSACTION) ((id | LOCAL_ID) (WITH '(' DELAYED_DURABILITY EQUAL (OFF | ON) ')')?)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178628.aspx
     | COMMIT WORK? ';'?
     // https://msdn.microsoft.com/en-us/library/ms181299.aspx
@@ -489,6 +651,9 @@ set_special
       (READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SNAPSHOT | SERIALIZABLE) ';'?
     // https://msdn.microsoft.com/en-us/library/ms188059.aspx
     | SET IDENTITY_INSERT table_name on_off ';'?
+    | SET ANSI_NULLS on_off
+    | SET QUOTED_IDENTIFIER on_off
+    | SET ANSI_PADDING on_off
     ;
 
 constant_LOCAL_ID
@@ -821,7 +986,7 @@ column_alias
 table_value_constructor
     : VALUES '(' expression_list ')' (',' '(' expression_list ')')*
     ;
-    
+
 expression_list
     : expression (',' expression)*
     ;
@@ -875,6 +1040,47 @@ window_frame_preceding
 window_frame_following
     : UNBOUNDED FOLLOWING
     | DECIMAL FOLLOWING
+    ;
+
+create_database_option:
+    FILESTREAM ( database_filestream_option (',' database_filestream_option)* )
+    | DEFAULT_LANGUAGE EQUAL ( id | STRING )
+    | DEFAULT_FULLTEXT_LANGUAGE EQUAL ( id | STRING )
+    | NESTED_TRIGGERS EQUAL ( OFF | ON )
+    | TRANSFORM_NOISE_WORDS EQUAL ( OFF | ON )
+    | TWO_DIGIT_YEAR_CUTOFF EQUAL DECIMAL
+    | DB_CHAINING ( OFF | ON )
+    | TRUSTWORTHY ( OFF | ON )
+    ;
+
+database_filestream_option:
+     LR_BRACKET
+     (
+         ( NON_TRANSACTED_ACCESS EQUAL ( OFF | READ_ONLY | FULL ) )
+         |
+         ( DIRECTORY_NAME EQUAL STRING )
+     )
+     RR_BRACKET
+    ;
+
+database_file_spec:
+    file_group | file_spec;
+
+file_group:
+     FILEGROUP id
+     ( CONTAINS FILESTREAM )?
+     ( DEFAULT )?
+     ( CONTAINS MEMORY_OPTIMIZED_DATA )?
+     file_spec ( ',' file_spec )*
+    ;
+file_spec
+    : LR_BRACKET
+      NAME EQUAL ( id | STRING ) ','?
+      FILENAME EQUAL file = STRING ','?
+      ( SIZE EQUAL file_size ','? )?
+      ( MAXSIZE EQUAL (file_size | UNLIMITED )','? )?
+      ( FILEGROWTH EQUAL file_size ','? )?
+      RR_BRACKET
     ;
 
 // Primitive.
@@ -1068,6 +1274,7 @@ simple_id
     | NTILE
     | NUMBER
     | OFFSET
+    | ONLINE
     | ONLY
     | OPTIMISTIC
     | OPTIMIZE
@@ -1108,7 +1315,7 @@ simple_id
     | STDEV
     | STDEVP
     | SUM
-	| TEXTIMAGE_ON
+    | TEXTIMAGE_ON
     | THROW
     | TIES
     | TIME
@@ -1138,6 +1345,10 @@ assignment_operator
     : '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '^=' | '|='
     ;
 
+file_size:
+    DECIMAL( KB | MB | GB | TB | '%' )?
+    ;
+
 // Lexer
 
 // Basic keywords (from https://msdn.microsoft.com/en-us/library/ms189822.aspx)
@@ -1159,7 +1370,7 @@ BY:                                    B Y;
 CASCADE:                               C A S C A D E;
 CASE:                                  C A S E;
 CHANGETABLE:                           C H A N G E T A B L E;
-CHANGES:                               C H A N G E S; 
+CHANGES:                               C H A N G E S;
 CHECK:                                 C H E C K;
 CHECKPOINT:                            C H E C K P O I N T;
 CLOSE:                                 C L O S E;
@@ -1170,6 +1381,7 @@ COLUMN:                                C O L U M N;
 COMMIT:                                C O M M I T;
 COMPUTE:                               C O M P U T E;
 CONSTRAINT:                            C O N S T R A I N T;
+CONTAINMENT:                           C O N T A I N M E N T;
 CONTAINS:                              C O N T A I N S;
 CONTAINSTABLE:                         C O N T A I N S T A B L E;
 CONTINUE:                              C O N T I N U E;
@@ -1207,6 +1419,7 @@ EXIT:                                  E X I T;
 EXTERNAL:                              E X T E R N A L;
 FETCH:                                 F E T C H;
 FILE:                                  F I L E;
+FILENAME:                              F I L E N A M E;
 FILLFACTOR:                            F I L L F A C T O R;
 FOR:                                   F O R;
 FORCESEEK:                             F O R C E S E E K;
@@ -1238,10 +1451,12 @@ LEFT:                                  L E F T;
 LIKE:                                  L I K E;
 LINENO:                                L I N E N O;
 LOAD:                                  L O A D;
+LOG:                                   L O G;
 MERGE:                                 M E R G E;
 NATIONAL:                              N A T I O N A L;
 NOCHECK:                               N O C H E C K;
 NONCLUSTERED:                          N O N C L U S T E R E D;
+NONE:                                  N O N E;
 NOT:                                   N O T;
 NULL:                                  N U L L;
 NULLIF:                                N U L L I F;
@@ -1259,6 +1474,7 @@ OR:                                    O R;
 ORDER:                                 O R D E R;
 OUTER:                                 O U T E R;
 OVER:                                  O V E R;
+PARTIAL:                               P A R T I A L;
 PERCENT:                               P E R C E N T;
 PIVOT:                                 P I V O T;
 PLAN:                                  P L A N;
@@ -1330,53 +1546,96 @@ WRITETEXT:                             W R I T E T E X T;
 
 // Additional keywords (they can be id).
 ABSOLUTE:                              A B S O L U T E;
+AFTER:                                 A F T E R;
+ALLOWED:                               A L L O W E D; 
+ALLOW_SNAPSHOT_ISOLATION:              A L L O W '_' S N A P S H O T '_' I S O L A T I O N;
+ANSI_NULLS:                            A N S I '_' N U L L S;
+ANSI_NULL_DEFAULT:                     A N S I '_' N U L L '_' D E F A U L T;
+ANSI_PADDING:                          A N S I '_' P A D D I N G;
+ANSI_WARNINGS:                         A N S I '_' W A R N I N G S;
 APPLY:                                 A P P L Y;
+ARITHABORT:                            A R I T H A B O R T;
 AUTO:                                  A U T O;
+AUTO_CLEANUP:                          A U T O '_' C L E A N U P; 
+AUTO_CLOSE:                            A U T O '_' C L O S E;
+AUTO_CREATE_STATISTICS:                A U T O '_' C R E A T E '_' S T A T I S T I C S;
+AUTO_SHRINK:                           A U T O '_' S H R I N K;
+AUTO_UPDATE_STATISTICS:                A U T O '_' U P D A T E '_' S T A T I S T I C S;
+AUTO_UPDATE_STATISTICS_ASYNC:          A U T O '_' U P D A T E '_' S T A T I S T I C S '_' A S Y N C;
 AVG:                                   A V G;
 BASE64:                                B A S E '64';
 BINARY_CHECKSUM:                       B I N A R Y '_' C H E C K S U M;
+BULK_LOGGED:                           B U L K '_' L O G G E D; 
 CALLER:                                C A L L E R;
 CAST:                                  C A S T;
 CATCH:                                 C A T C H;
+CHANGE_RETENTION:                      C H A N G E '_' R E T E N T I O N; 
+CHANGE_TRACKING:                       C H A N G E '_' T R A C K I N G; 
 CHECKSUM:                              C H E C K S U M;
 CHECKSUM_AGG:                          C H E C K S U M '_' A G G;
 COMMITTED:                             C O M M I T T E D;
+COMPATIBILITY_LEVEL:                   C O M P A T I B I L I T Y '_' L E V E L;                           
 CONCAT:                                C O N C A T;
+CONCAT_NULL_YIELDS_NULL:               C O N C A T '_' N U L L '_' Y I E L D S '_' N U L L;
 CONTROL:                               C O N T R O L;
 COOKIE:                                C O O K I E;
 COUNT:                                 C O U N T;
 COUNT_BIG:                             C O U N T '_' B I G;
+CURSOR_CLOSE_ON_COMMIT:                C U R S O R '_' C L O S E '_' O N '_' C O M M I T;
+CURSOR_DEFAULT:                        C U R S O R '_' D E F A U L T;
 DATEADD:                               D A T E A D D;
 DATEDIFF:                              D A T E D I F F;
 DATENAME:                              D A T E N A M E;
 DATEPART:                              D A T E P A R T;
+DATE_CORRELATION_OPTIMIZATION:         D A T E '_' C O R R E L A T I O N '_' O P T I M I Z A T I O N;
+DAYS:                                  D A Y S; 
+DB_CHAINING:                           D B '_' C H A I N I N G;
+DEFAULT_FULLTEXT_LANGUAGE:             D E F A U L T '_' F U L L T E X T '_' L A N G U A G E;
+DEFAULT_LANGUAGE:                      D E F A U L T '_' L A N G U A G E;
 DELAY:                                 D E L A Y;
+DELAYED_DURABILITY:                    D E L A Y E D '_' D U R A B I L I T Y;
 DELETED:                               D E L E T E D;
 DENSE_RANK:                            D E N S E '_' R A N K;
+DIRECTORY_NAME:                        D I R E C T O R Y '_' N A M E;
 DISABLE:                               D I S A B L E;
+DISABLED:                              D I S A B L E D; 
+DISABLE_BROKER:                        D I S A B L E '_' B R O K E R;  
 DYNAMIC:                               D Y N A M I C;
+EMERGENCY:                             E M E R G E N C Y; 
+ENABLE_BROKER:                         E N A B L E '_' B R O K E R;
 ENCRYPTION:                            E N C R Y P T I O N;
+ERROR_BROKER_CONVERSATIONS:            E R R O R '_' B R O K E R '_' C O N V E R S A T I O N S; 
 EXPAND:                                E X P A N D;
 FAST:                                  F A S T;
 FAST_FORWARD:                          F A S T '_' F O R W A R D;
+FILEGROUP:                             F I L E G R O U P;
+FILEGROWTH:                            F I L E G R O W T H;
+FILESTREAM:                            F I L E S T R E A M;
 FIRST:                                 F I R S T;
+FOLLOWING:                             F O L L O W I N G;
 FORCE:                                 F O R C E;
 FORCED:                                F O R C E D;
-FOLLOWING:                             F O L L O W I N G;
 FORWARD_ONLY:                          F O R W A R D '_' O N L Y;
 FULLSCAN:                              F U L L S C A N;
+GB:                                    G B;
 GLOBAL:                                G L O B A L;
 GO:                                    G O;
 GROUPING:                              G R O U P I N G;
 GROUPING_ID:                           G R O U P I N G '_' I D;
+HADR:                                  H A D R;
 HASH:                                  H A S H;
+HONOR_BROKER_PRIORITY:                 H O N O R '_' B R O K E R '_' P R I O R I T Y;
+HOURS:                                 H O U R S; 
+IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX: I G N O R E '_' N O N C L U S T E R E D '_' C O L U M N S T O R E '_' I N D E X;
+IMMEDIATE:                             I M M E D I A T E;
 IMPERSONATE:                           I M P E R S O N A T E;
+INCREMENTAL:                           I N C R E M E N T A L; 
 INSENSITIVE:                           I N S E N S I T I V E;
 INSERTED:                              I N S E R T E D;
 ISOLATION:                             I S O L A T I O N;
+KB:                                    K B;
 KEEP:                                  K E E P;
 KEEPFIXED:                             K E E P F I X E D;
-IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX: I G N O R E '_' N O N C L U S T E R E D '_' C O L U M N S T O R E '_' I N D E X;
 KEYSET:                                K E Y S E T;
 LAST:                                  L A S T;
 LEVEL:                                 L E V E L;
@@ -1388,37 +1647,57 @@ MARK:                                  M A R K;
 MAX:                                   M A X;
 MAXDOP:                                M A X D O P;
 MAXRECURSION:                          M A X R E C U R S I O N;
+MAXSIZE:                               M A X S I Z E;
+MB:                                    M B;
+MEMORY_OPTIMIZED_DATA:                 M E M O R Y '_' O P T I M I Z E D '_' D A T A;
 MIN:                                   M I N;
+MINUTES:                               M I N U T E S; 
 MIN_ACTIVE_ROWVERSION:                 M I N '_' A C T I V E '_' R O W V E R S I O N;
+MIXED_PAGE_ALLOCATION:                 M I X E D '_' P A G E '_' A L L O C A T I O N; 
 MODIFY:                                M O D I F Y;
-NEXT:                                  N E X T;
+MULTI_USER:                            M U L T I '_' U S E R;
 NAME:                                  N A M E;
+NESTED_TRIGGERS:                       N E S T E D '_' T R I G G E R S;
+NEW_BROKER:                            N E W '_' B R O K E R;  
+NEXT:                                  N E X T;
 NOCOUNT:                               N O C O U N T;
 NOEXPAND:                              N O E X P A N D;
+NON_TRANSACTED_ACCESS:                 N O N '_' T R A N S A C T E D '_' A C C E S S;
 NORECOMPUTE:                           N O R E C O M P U T E;
+NO_WAIT:                               N O '_' W A I T;
 NTILE:                                 N T I L E;
 NUMBER:                                N U M B E R;
+NUMERIC_ROUNDABORT:                    N U M E R I C '_' R O U N D A B O R T;
+OFFLINE:                               O F F L I N E; 
 OFFSET:                                O F F S E T;
+ONLINE:                                O N L I N E; 
 ONLY:                                  O N L Y;
 OPTIMISTIC:                            O P T I M I S T I C;
 OPTIMIZE:                              O P T I M I Z E;
 OUT:                                   O U T;
 OUTPUT:                                O U T P U T;
 OWNER:                                 O W N E R;
+PAGE_VERIFY:                           P A G E '_' V E R I F Y;
 PARAMETERIZATION:                      P A R A M E T E R I Z A T I O N;
 PARTITION:                             P A R T I T I O N;
 PATH:                                  P A T H;
 PRECEDING:                             P R E C E D I N G;
 PRIOR:                                 P R I O R;
 PRIVILEGES:                            P R I V I L E G E S;
+QUOTED_IDENTIFIER:                     Q U O T E D '_' I D E N T I F I E R;
 RANGE:                                 R A N G E;
 RANK:                                  R A N K;
 READONLY:                              R E A D O N L Y;
+READ_COMMITTED_SNAPSHOT:               R E A D '_' C O M M I T T E D '_' S N A P S H O T;
 READ_ONLY:                             R E A D '_' O N L Y;
+READ_WRITE:                            R E A D '_' W R I T E;
 RECOMPILE:                             R E C O M P I L E;
+RECOVERY:                              R E C O V E R Y;
+RECURSIVE_TRIGGERS:                    R E C U R S I V E '_' T R I G G E R S;
 RELATIVE:                              R E L A T I V E;
 REMOTE:                                R E M O T E;
 REPEATABLE:                            R E P E A T A B L E;
+RESTRICTED_USER:                       R E S T R I C T E D '_' U S E R; 
 ROBUST:                                R O B U S T;
 ROOT:                                  R O O T;
 ROW:                                   R O W;
@@ -1429,10 +1708,13 @@ SAMPLE:                                S A M P L E;
 SCHEMABINDING:                         S C H E M A B I N D I N G;
 SCROLL:                                S C R O L L;
 SCROLL_LOCKS:                          S C R O L L '_' L O C K S;
+SECONDS:                               S E C O N D S;
 SELF:                                  S E L F;
 SERIALIZABLE:                          S E R I A L I Z A B L E;
 SHOWPLAN:                              S H O W P L A N;
 SIMPLE:                                S I M P L E;
+SINGLE_USER:                           S I N G L E '_' U S E R; 
+SIZE:                                  S I Z E;
 SNAPSHOT:                              S N A P S H O T;
 SPATIAL_WINDOW_MAX_CELLS:              S P A T I A L '_' W I N D O W '_' M A X '_' C E L L S;
 STATIC:                                S T A T I C;
@@ -1441,21 +1723,28 @@ STDEV:                                 S T D E V;
 STDEVP:                                S T D E V P;
 SUM:                                   S U M;
 TAKE:                                  T A K E;
+TARGET_RECOVERY_TIME:                  T A R G E T '_' R E C O V E R Y '_' T I M E;
+TB:                                    T B;
 TEXTIMAGE_ON:                          T E X T I M A G E '_' O N;
 THROW:                                 T H R O W;
 TIES:                                  T I E S;
 TIME:                                  T I M E;
+TORN_PAGE_DETECTION:                   T O R N '_' P A G E '_' D E T E C T I O N; 
+TRANSFORM_NOISE_WORDS:                 T R A N S F O R M '_' N O I S E '_' W O R D S;
+TRUSTWORTHY:                           T R U S T W O R T H Y;
 TRY:                                   T R Y;
+TWO_DIGIT_YEAR_CUTOFF:                 T W O '_' D I G I T '_' Y E A R '_' C U T O F F;
 TYPE:                                  T Y P E;
 TYPE_WARNING:                          T Y P E '_' W A R N I N G;
 UNBOUNDED:                             U N B O U N D E D;
 UNCOMMITTED:                           U N C O M M I T T E D;
 UNKNOWN:                               U N K N O W N;
+UNLIMITED:                             U N L I M I T E D;
 USING:                                 U S I N G;
 VAR:                                   V A R;
 VARP:                                  V A R P;
-VIEW_METADATA:                         V I E W '_' M E T A D A T A;
 VIEWS:                                 V I E W S;
+VIEW_METADATA:                         V I E W '_' M E T A D A T A;
 WORK:                                  W O R K;
 XML:                                   X M L;
 XMLNAMESPACES:                         X M L N A M E S P A C E S;
