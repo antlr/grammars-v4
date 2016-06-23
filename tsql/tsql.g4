@@ -409,7 +409,7 @@ sql_option:
   | ANSI_PADDING on_off   
   | ANSI_WARNINGS on_off   
   | ARITHABORT on_off   
-  | COMPATIBILITY_LEVEL EQUAL ( '90' | '100' | '110' | '120' )  
+  | COMPATIBILITY_LEVEL EQUAL DECIMAL
   | CONCAT_NULL_YIELDS_NULL on_off   
   | NUMERIC_ROUNDABORT on_off   
   | QUOTED_IDENTIFIER on_off   
@@ -743,6 +743,7 @@ predicate
     | expression NOT? LIKE expression (ESCAPE expression)?
     | expression IS null_notnull
     | '(' search_condition ')'
+	| DECIMAL
     ;
 
 query_expression
