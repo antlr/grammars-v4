@@ -891,7 +891,10 @@ table_name_with_hint
 
 // https://msdn.microsoft.com/en-us/library/ms190312.aspx
 rowset_function
-    : OPENROWSET '(' BULK data_file=STRING ',' (bulk_option (',' bulk_option)* | id)')'
+    :  (
+	      OPENROWSET LR_BRACKET provider_name = STRING COMMA connectionString = STRING COMMA sql = STRING RR_BRACKET 
+	   )
+	   | ( OPENROWSET '(' BULK data_file=STRING ',' (bulk_option (',' bulk_option)* | id)')' )
     ;
 
 // runtime check.
