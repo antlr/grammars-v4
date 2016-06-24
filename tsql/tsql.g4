@@ -56,10 +56,12 @@ dml_clause
 // Data Definition Language: https://msdn.microsoft.com/en-us/library/ff848799.aspx)
 ddl_clause
     : //create_function
-      create_index
+    create_database
+    | create_index
     | create_procedure
     | create_statistics
     | create_table
+    | create_type
     | create_view
 
     | alter_table
@@ -69,8 +71,8 @@ ddl_clause
     | drop_procedure
     | drop_statistics
     | drop_table
+	| drop_type
     | drop_view
-    | create_database
     ;
 
 // Control-of-Flow Language: https://msdn.microsoft.com/en-us/library/ms174290.aspx
@@ -243,7 +245,7 @@ create_table
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
 create_view
-    : CREATE VIEW view_name ('(' column_name_list ')')?
+    : CREATE VIEW simple_name ('(' column_name_list ')')?
       (WITH view_attribute (',' view_attribute)*)?
       AS select_statement (WITH CHECK OPTION)? ';'?
     ;
@@ -448,7 +450,15 @@ drop_table
 
 // https://msdn.microsoft.com/en-us/library/ms173492.aspx
 drop_view
-    : DROP VIEW (IF EXISTS)? view_name (',' view_name)* ';'?
+    : DROP VIEW (IF EXISTS)? simple_name (',' simple_name)* ';'?
+    ;
+
+create_type:
+    CREATE TYPE name = simple_name FROM data_type default_value
+    ;
+
+drop_type:
+    DROP TYPE ( IF EXISTS )? name = simple_name
     ;
 
 rowset_function_limited
@@ -1096,8 +1106,8 @@ table_name
     : (database=id '.' (schema=id)? '.' | schema=id '.')? table=id
     ;
 
-view_name
-    : (schema=id '.')? view=id
+simple_name
+    : (schema=id '.')? name=id
     ;
 
 func_proc_name
