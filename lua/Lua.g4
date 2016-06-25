@@ -2,6 +2,7 @@
 BSD License
 
 Copyright (c) 2013, Kazunori Sakamoto
+Copyright (c) 2016, Alexander Alexeev
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,13 +32,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 This grammar file derived from:
 
+    Lua 5.3 Reference Manual
+    http://www.lua.org/manual/5.3/manual.html
+
     Lua 5.2 Reference Manual
     http://www.lua.org/manual/5.2/manual.html
 
     Lua 5.1 grammar written by Nicolai Mainiero
     http://www.antlr3.org/grammar/1178608849736/Lua.g
 
-I tested my grammar with Test suite for Lua 5.2 (http://www.lua.org/tests/5.2/)
+Tested by Kazunori Sakamoto with Test suite for Lua 5.2 (http://www.lua.org/tests/5.2/)
+
+Tested by Alexander Alexeev with Test suite for Lua 5.3 http://www.lua.org/tests/lua-5.3.2-tests.tar.gz 
 */
 
 grammar Lua;
@@ -93,23 +99,22 @@ explist
     ;
 
 exp
-    : 'nil' | 'false' | 'true' | number | string		
-	| '...'											
-	| functiondef								
-    | prefixexp										
-	| tableconstructor								
-	| <assoc=right> exp operatorPower exp			
-	| operatorUnary exp								
-	| exp operatorMulDivMod exp		
-	| exp operatorAddSub exp						
-	| <assoc=right> exp operatorStrcat exp			
-	| exp operatorComparison exp					
-	| exp operatorAnd exp							
-	| exp operatorOr exp	
-	;
-
-var
-    : (NAME | '(' exp ')' varSuffix) varSuffix*
+    : 'nil' | 'false' | 'true'
+    | number
+    | string
+    | '...'
+    | functiondef
+    | prefixexp
+    | tableconstructor
+    | <assoc=right> exp operatorPower exp
+    | operatorUnary exp
+    | exp operatorMulDivMod exp
+    | exp operatorAddSub exp
+    | <assoc=right> exp operatorStrcat exp
+    | exp operatorComparison exp
+    | exp operatorAnd exp
+    | exp operatorOr exp
+    | exp operatorBitwise exp
     ;
 
 prefixexp
@@ -124,12 +129,16 @@ varOrExp
     : var | '(' exp ')'
     ;
 
-nameAndArgs
-    : (':' NAME)? args
+var
+    : (NAME | '(' exp ')' varSuffix) varSuffix*
     ;
 
 varSuffix
     : nameAndArgs* ('[' exp ']' | '.' NAME)
+    ;
+
+nameAndArgs
+    : (':' NAME)? args
     ;
 
 /*
@@ -194,10 +203,13 @@ operatorAddSub
 	: '+' | '-';
 
 operatorMulDivMod
-	: '*' | '/' | '%';
+	: '*' | '/' | '%' | '//';
+
+operatorBitwise
+	: '&' | '|' | '~' | '<<' | '>>';
 
 operatorUnary
-    : 'not' | '#' | '-';
+    : 'not' | '#' | '-' | '~';
 
 operatorPower
     : '^';
@@ -270,6 +282,7 @@ EscapeSequence
     | '\\' '\r'? '\n'
     | DecimalEscape
     | HexEscape
+    | UtfEscape
     ;
     
 fragment
@@ -282,6 +295,11 @@ DecimalEscape
 fragment
 HexEscape
     : '\\' 'x' HexDigit HexDigit
+    ;
+
+fragment
+UtfEscape
+    : '\\' 'u{' HexDigit+ '}'
     ;
 
 fragment
