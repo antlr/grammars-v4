@@ -733,11 +733,11 @@ search_condition_list
     ;
 
 search_condition
-    : search_condition_or (AND search_condition_or)*
+    : search_condition_and (OR search_condition_and)*
     ;
 
-search_condition_or
-    : search_condition_not (OR search_condition_not)*
+search_condition_and
+    : search_condition_not (AND search_condition_not)*
     ;
 
 search_condition_not
