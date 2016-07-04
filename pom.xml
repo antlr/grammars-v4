@@ -10,6 +10,7 @@
 		<module>support</module>
 		<module>abnf</module>
 		<module>agc</module>
+<!--		<module>antlr3</module>-->
 		<module>antlr4</module>
 		<module>arithmetic</module>
 		<module>asm6502</module>
@@ -31,10 +32,12 @@
 		<module>datetime</module>
 		<module>dcm</module>
 		<module>dot</module>
+		<module>ecmascript</module>
 		<module>erlang</module>
 		<module>fasta</module>
 		<module>FOL</module>
 		<module>fortran77</module>
+		<module>fusion-tables</module>
 		<module>gff3</module>
 		<module>graphql</module>
 		<module>html</module>
@@ -90,6 +93,7 @@
 		<module>stringtemplate</module>
 		<module>suokif</module>
 		<module>swift</module>
+		<module>swift-fin</module>
 		<module>tiny</module>
 		<module>tinyc</module>
 		<module>tnsnames</module>
@@ -105,7 +109,6 @@
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>
-		<module>swift-fin</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

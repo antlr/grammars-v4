@@ -10,27 +10,57 @@ package org.cobol85.preprocessor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 public interface Cobol85Preprocessor {
 
-	public interface Cobol85Format {
+	public enum Cobol85Dialect {
+		ANSI85, MF, OSVS
+	}
+
+	/**
+	 * Representation of a Cobol 85 line.
+	 */
+	public class Cobol85Line {
+
+		public String comment;
+
+		public String contentAreaA;
+
+		public String contentAreaB;
+
+		public char indicatorArea;
+
+		public Cobol85SourceFormat lineFormat;
+
+		public String sequenceArea;
+
+		public Cobol85Line(final String sequenceArea, final char indicatorArea, final String contentAreaA,
+				final String contentAreaB, final String comment, final Cobol85SourceFormat lineFormat) {
+			this.sequenceArea = sequenceArea;
+			this.indicatorArea = indicatorArea;
+			this.contentAreaA = contentAreaA;
+			this.contentAreaB = contentAreaB;
+			this.comment = comment;
+			this.lineFormat = lineFormat;
+		}
+
+		@Override
+		public String toString() {
+			return sequenceArea + indicatorArea + contentAreaA + contentAreaB + comment + " [" + lineFormat + "]";
+		}
+	}
+
+	public interface Cobol85SourceFormat {
 
 		String indicatorField = "([ABCdD\\-/* ])";
+
+		Pattern getPattern();
 
 		String getRegex();
 	}
 
-	public enum Cobol85FormatEnum implements Cobol85Format {
-
-		/**
-		 * Custom layout 1.
-		 */
-		CUSTOM_1("(\\s*[0-9]+)(?:.{7}" + indicatorField + "(.{0,65})(.*)?)?"),
-
-		/**
-		 * Format for handling irregular/defect lines.
-		 */
-		DEFECT("(\\s{7,})" + indicatorField + "([\\*]+)()"),
+	public enum Cobol85SourceFormatEnum implements Cobol85SourceFormat {
 
 		/**
 		 * Fixed format, standard ANSI / IBM reference. Each line exactly 80
@@ -42,7 +72,7 @@ public interface Cobol85Preprocessor {
 		 * 13-72: area B<br />
 		 * 73-80: comments<br />
 		 */
-		FIXED("(.{6})" + indicatorField + "(.{65})(.{8})"),
+		FIXED("(.{6})" + indicatorField + "(.{4})(.{61})(.{8,})"),
 
 		/**
 		 * HP Tandem format.<br />
@@ -51,7 +81,7 @@ public interface Cobol85Preprocessor {
 		 * 2-5: area A<br />
 		 * 6-132: area B<br />
 		 */
-		TANDEM("()" + indicatorField + "(.*)()"),
+		TANDEM("()" + indicatorField + "(.{0,4})(.*)()"),
 
 		/**
 		 * Variable format.<br />
@@ -61,12 +91,20 @@ public interface Cobol85Preprocessor {
 		 * 8-12: area A<br />
 		 * 13-*: area B<br />
 		 */
-		VARIABLE("(.{6})(?:" + indicatorField + "(.*)())?");
+		VARIABLE("(.{6})(?:" + indicatorField + "(.{0,4})(.*)())?");
+
+		private final Pattern pattern;
 
 		private final String regex;
 
-		Cobol85FormatEnum(final String regex) {
+		Cobol85SourceFormatEnum(final String regex) {
 			this.regex = regex;
+			pattern = Pattern.compile(regex);
+		}
+
+		@Override
+		public Pattern getPattern() {
+			return pattern;
 		}
 
 		@Override
@@ -75,41 +113,8 @@ public interface Cobol85Preprocessor {
 		}
 	}
 
-	/**
-	 * Representation of a Cobol 85 line.
-	 */
-	public class Cobol85Line {
+	String process(File cobolFile, File libDirectory, Cobol85Dialect dialect, Cobol85SourceFormat format)
+			throws IOException;
 
-		public String comment;
-
-		public String contentArea;
-
-		public char indicatorArea;
-
-		public Cobol85Format lineFormat;
-
-		public String sequenceArea;
-
-		public Cobol85Line(final String sequenceArea, final char indicatorArea, final String contentArea,
-				final String comment, final Cobol85Format lineFormat) {
-			this.sequenceArea = sequenceArea;
-			this.indicatorArea = indicatorArea;
-			this.contentArea = contentArea;
-			this.comment = comment;
-			this.lineFormat = lineFormat;
-		}
-
-		@Override
-		public String toString() {
-			return sequenceArea + indicatorArea + contentArea + comment + " [" + lineFormat + "]";
-		}
-	}
-
-	String normalizeLine(Cobol85Line line, boolean isFirstLine);
-
-	Cobol85Line parseCobol85Line(String line, Cobol85Format[] formats);
-
-	String process(File inputFile, File libDirectory, Cobol85Format[] formats) throws IOException;
-
-	String process(String input, File libDirectory, Cobol85Format[] formats);
+	String process(String cobolSourceCode, File libDirectory, Cobol85Dialect dialect, Cobol85SourceFormat format);
 }
