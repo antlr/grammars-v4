@@ -33,13 +33,22 @@
  * Possible Issues:
  * 
  * Input must avoid conditional compilation blocks (this grammar ignores any preprocessor directive)
- * GCC extensions not yet supported (not try parse preprocessor output)
- * Lexer issue with pure-specifier rule ('0' token) - Solution in embedded java
+ * GCC extensions not yet supported (do not try to parse the preprocessor output)
  * Right angle bracket (C++11) - Solution '>>' and '>>=' are not tokens, only '>'
- * 
+ * Lexer issue with pure-specifier rule ('0' token) - Solution in embedded code
+ *   Change it to match the target language you want in line 1097 or verify inside your listeners/visitors
+ *   Java:
+if($val.text.compareTo("0")!=0) throw new InputMismatchException(this);
+ *   JavaScript:
+
+ *   Python2:
+
+ *   Python3:
+
+ *   C#:
+
  ******************************************************************************/
 grammar CPP14;
-
 
 /*Basic concepts*/
 translationunit
