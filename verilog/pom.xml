@@ -36,7 +36,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>library_text</entryPoint>
+					<entryPoint>source_text</entryPoint>
 					<grammarName>Verilog2001</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

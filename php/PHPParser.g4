@@ -1,8 +1,26 @@
-// PHP grammar by Ivan Kochurkin (KvanTTT), 2015.
-// Used Phalanger grammar: https://github.com/DEVSENSE/Phalanger by Jakub Míšek (jakubmisek)
-// and old php grammar by Tom Everett (teverett).
-// Runtime: C#.
-// Licence: MIT.
+/*
+PHP grammar.
+The MIT License (MIT).
+Copyright (c) 2015-2016, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
 
 parser grammar PHPParser;
 
@@ -12,52 +30,26 @@ options { tokenVocab=PHPLexer; }
 // Also see here: https://github.com/antlr/grammars-v4/tree/master/html
 
 htmlDocument
-    : Shebang? HtmlComment* htmlElementOrPhpBlock* EOF
+    : Shebang? htmlElementOrPhpBlock* EOF
     ;
 
 htmlElementOrPhpBlock
-    : (HtmlDtd | htmlElement | phpBlock) HtmlComment*
+    : htmlElement
+    | phpBlock
+    | scriptTextPart
     ;
 
 htmlElement
-    : HtmlScriptOpen htmlAttribute* HtmlClose scriptText ScriptClose
-    | HtmlStyleOpen htmlAttribute* HtmlClose StyleBody
-    | HtmlOpen HtmlName htmlAttribute* HtmlClose (htmlContent HtmlOpen HtmlSlash HtmlName HtmlClose)?
-    | HtmlOpen HtmlName htmlAttribute* '/>'
+    : HtmlDtd | HtmlScriptOpen | HtmlClose | HtmlStyleOpen | ScriptClose | HtmlStyleOpen | StyleBody | HtmlOpen | HtmlName | '/>' | HtmlSlash | HtmlText 
+    | HtmlEquals | HtmlStartQuoteString | HtmlEndQuoteString | HtmlStartDoubleQuoteString | HtmlEndDoubleQuoteString | HtmlHex | HtmlDecimal
+    | HtmlQuoteString | HtmlDoubleQuoteString
     ;
 
-htmlContent
-    : HtmlText? ((htmlElement | HtmlComment | phpBlock) HtmlText?)*
-    ;
-
-htmlAttribute
-    : phpBlock
-    | HtmlName HtmlEquals HtmlStartQuoteString htmlQuotePhpBlockOrString* HtmlEndQuoteString
-    | HtmlName HtmlEquals HtmlStartDoubleQuoteString htmlDoubleQuotePhpBlockOrString* HtmlEndDoubleQuoteString
-    | HtmlName HtmlEquals (HtmlHex | HtmlDecimal)
-    | HtmlName
-    ;
-
-htmlQuotePhpBlockOrString
-    : phpBlock
-    | HtmlQuoteString
-    ;
-
-htmlDoubleQuotePhpBlockOrString
-    : phpBlock
-    | HtmlDoubleQuoteString
-    ;
-    
 // Script
 // Parse JavaScript with https://github.com/antlr/grammars-v4/tree/master/ecmascript if necessary.
-
-scriptText
-    : scriptTextPart*
-    ;
     
 scriptTextPart
-    : phpBlock
-    | ScriptText+
+    : ScriptText+
     ;
 
 // PHP
@@ -93,7 +85,7 @@ useDeclarationContent
     ;
 
 namespaceDeclaration
-    : Namespace (namespaceNameList? '{' namespaceStatement* '}' | namespaceNameList ';')
+    : Namespace (namespaceNameList? OpenCurlyBracket namespaceStatement* '}' | namespaceNameList ';')
     ;
 
 namespaceStatement
@@ -112,7 +104,7 @@ classDeclaration
     : attributes Private? modifier? Partial? (
       classEntryType identifier typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)? 
     | Interface identifier typeParameterListInBrackets? (Extends interfaceList)? )
-      '{' classStatement* '}'
+      OpenCurlyBracket classStatement* '}'
     ;
     
 classEntryType
@@ -224,7 +216,7 @@ nonEmptyStatement
     ;
 
 blockStatement
-    : '{' innerStatementList '}'
+    : OpenCurlyBracket innerStatementList '}'
     ;
     
 ifStatement
@@ -269,7 +261,7 @@ forUpdate
     ;
     
 switchStatement
-    : Switch parenthesis ('{' ';'? switchBlock* '}' | ':' ';'? switchBlock* EndSwitch ';')
+    : Switch parenthesis (OpenCurlyBracket ';'? switchBlock* '}' | ':' ';'? switchBlock* EndSwitch ';')
     ;
 
 switchBlock
@@ -329,7 +321,7 @@ declareStatement
     ;
 
 inlineHtml
-    : HtmlComment* ((HtmlDtd | htmlElement) HtmlComment*)+
+    : (htmlElement | scriptTextPart)+ //htmlElementOrPhpBlock*
     ;
 
 declareList
@@ -356,8 +348,8 @@ globalStatement
 
 globalVar
     : VarName
-    | '$' chain
-    | '$' '{' expression '}'
+    | Dollar chain
+    | Dollar OpenCurlyBracket expression '}'
     ;
 
 echoStatement
@@ -378,7 +370,7 @@ classStatement
 
 traitAdaptations
     : ';'
-    | '{' traitAdaptationStatement* '}'
+    | OpenCurlyBracket traitAdaptationStatement* '}'
     ;
 
 traitAdaptationStatement
@@ -437,59 +429,62 @@ parenthesis
     ;
 
 // Expressions
-
-expression
 // Grouped by prioriries: http://php.net/manual/en/language.operators.precedence.php
 // and http://www.phpeveryday.com/articles/PHP-Operators-Operator-Priority-P312.html
+expression
+    : andOrExpression
+    | expression QuestionMark expression? ':' andOrExpression
+    | expression LogicalAnd andOrExpression
+    | expression LogicalXor andOrExpression
+    | expression LogicalOr andOrExpression
+    ;
+
+andOrExpression
+    : comparisonExpression
+    | andOrExpression '&' comparisonExpression
+    | andOrExpression '^' comparisonExpression
+    | andOrExpression '|' comparisonExpression
+    | andOrExpression '&&' comparisonExpression
+    | andOrExpression '||' comparisonExpression
+    ;
+    
+comparisonExpression
+    : additionExpression
+    | comparisonExpression ('<<' | '>>') additionExpression
+    | comparisonExpression (Less | '<=' | Greater | '>=') additionExpression
+    | comparisonExpression ('===' | '!==' | '==' | IsNotEq) additionExpression
+    ;
+
+additionExpression
+    : multiplicationExpression
+    | additionExpression ('+' | '-' | '.') multiplicationExpression
+    ;
+
+multiplicationExpression
+    : notLeftRecursionExpression
+    | notLeftRecursionExpression '**' multiplicationExpression
+    | multiplicationExpression InstanceOf typeRef
+    | multiplicationExpression ('*' | Divide | '%') notLeftRecursionExpression
+    ;
+
+notLeftRecursionExpression
     : Clone expression                                         #CloneExpression
-    | newExpr                                                     #NewExpression
+    | newExpr                                                  #NewExpression
     
     | stringConstant '[' expression ']'                        #IndexerExpression
 
-    | <assoc=right> expression '**' expression                 #BinaryOperatorExpression
-
-    | ('++' | '--') chain                                      #PrefixIncDecExpression
-    | chain ('++' | '--')                                      #PostfixIncDecExpression
-    
     | '(' castOperation ')' expression                         #CastExpression
     | ('~' | '@') expression                                   #UnaryOperatorExpression
 
-    | expression InstanceOf typeRef                            #InstanceOfExpression
-    
     | ('!' | '+' | '-') expression                             #UnaryOperatorExpression
-    
-    | expression ('*' | Divide | '%') expression               #BinaryOperatorExpression
 
-    | expression ('+' | '-' | '.') expression                  #BinaryOperatorExpression
+    | ('++' | '--') chain                                      #PrefixIncDecExpression
+    | chain ('++' | '--')                                      #PostfixIncDecExpression
 
-    | expression ('<<' | '>>') expression                      #BinaryOperatorExpression
-
-    | expression (Less | '<=' | Greater | '>=') expression     #BinaryOperatorExpression
-
-    | expression ('===' | '!==' | '==' | IsNotEq) expression   #BinaryOperatorExpression
-
-    | expression '&' expression                                #BinaryOperatorExpression
-
-    | expression '^' expression                                #BinaryOperatorExpression
-
-    | expression '|' expression                                #BinaryOperatorExpression
-
-    | expression '&&' expression                               #BinaryOperatorExpression
-
-    | expression '||' expression                               #BinaryOperatorExpression
-
-    | expression QuestionMark expression? ':' expression       #ConditionalExpression
-    
     | chain assignmentOperator expression                      #AssignmentExpression
     | chain Eq '&' (chain | newExpr)                           #AssignmentExpression
 
     | Print expression                                         #PrintExpression
-    
-    | expression LogicalAnd  expression                        #BinaryOperatorExpression
-    
-    | expression LogicalXor expression                         #BinaryOperatorExpression
-    
-    | expression LogicalOr  expression                         #BinaryOperatorExpression
 
     | chain                                                    #ChainExpression
     | constant                                                 #ScalarExpression
@@ -506,10 +501,8 @@ expression
     | Empty '(' chain ')'                                      #SpecialWordExpression
     | Eval '(' expression ')'                                  #SpecialWordExpression
     | Exit ( '(' ')' | parenthesis )?                          #SpecialWordExpression
-    | Include expression                                       #SpecialWordExpression
-    | IncludeOnce expression                                   #SpecialWordExpression
-    | Require expression                                       #SpecialWordExpression
-    | RequireOnce expression                                   #SpecialWordExpression
+    | (Include | IncludeOnce) expression                       #SpecialWordExpression
+    | (Require | RequireOnce) expression                       #SpecialWordExpression
 
     | Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? blockStatement  #LambdaFunctionExpression
     ;
@@ -608,20 +601,27 @@ constantArrayItem
     ;
     
 constant
-    : literalConstant
+    : Null
+    | literalConstant
     | magicConstant
     | classConstant
     | qualifiedNamespaceName
-    | Null
     ;
     
 literalConstant
-    : Numeric
-    | Real
+    : Real
     | BooleanConstant
+    | numericConstant
     | stringConstant
     ;
-    
+
+numericConstant
+    : Octal
+    | Decimal
+    | Hex
+    | Binary
+    ;
+
 classConstant
     : (Class | Parent_) '::' (identifier | Constructor | Get | Set)
     | (qualifiedStaticTypeRef | keyedVariable) '::' identifier
@@ -634,8 +634,13 @@ stringConstant
 string
     : StartHereDoc HereDocText+
     | StartNowDoc HereDocText+
-    | DoubleQuoteString
     | SingleQuoteString
+    | DoubleQuote interpolatedStringPart* DoubleQuote
+    ;
+
+interpolatedStringPart
+    : StringPart
+    | chain
     ;
 
 chainList
@@ -675,16 +680,16 @@ keyedFieldName
     ;
 
 keyedSimpleFieldName
-    : (identifier | '{' expression '}') squareCurlyExpression*
+    : (identifier | OpenCurlyBracket expression '}') squareCurlyExpression*
     ;
 
 keyedVariable
-    : '$'* (VarName | '$' '{' expression '}') squareCurlyExpression*
+    : Dollar* (VarName | Dollar OpenCurlyBracket expression '}') squareCurlyExpression*
     ;
-    
+
 squareCurlyExpression
     : '[' expression? ']'
-    | '{' expression '}'
+    | OpenCurlyBracket expression '}'
     ;
 
 assignmentList
@@ -702,40 +707,120 @@ modifier
     ;
     
 identifier
-    : magicConstant
-    | magicMethod
-    | castOperation
-    | memberModifier
-    | Label
-    | Class
-    | Interface
-    | Namespace
-    | Case
-    | Default
-    | Return
-    | Import
-    | Parent_
-    | List
-    | Function
-    | Null
-    | Partial
-    | Echo
-    | New
-    | Empty
-    | Callable
-    | Var
-    | IsSet
+    : Label
+
+    | Abstract
+    | Array
+    | As
+    | BinaryCast
+    | BoolType
+    | BooleanConstant
     | Break
-    | Continue
-    | Use
-    | LogicalAnd
-    | LogicalXor
-    | LogicalOr
+    | Callable
+    | Case
+    | Catch
+    | Class
     | Clone
-    | Global
+    | Const
+    | Continue
+    | Declare
+    | Default
+    | Do
+    | DoubleCast
+    | DoubleType
+    | Echo
+    | Else
+    | ElseIf
+    | Empty
+    | EndDeclare
+    | EndFor
+    | EndForeach
+    | EndIf
+    | EndSwitch
+    | EndWhile
     | Eval
+    | Exit
+    | Extends
+    | Final
+    | Finally
+    | FloatCast
+    | For
+    | Foreach
+    | Function
+    | Global
+    | Goto
+    | If
+    | Implements
+    | Import
+    | Include
+    | IncludeOnce
+    | InstanceOf
+    | InsteadOf
+    | Int16Cast
+    | Int64Type
+    | Int8Cast
+    | Interface
+    | IntType
+    | IsSet
+    | List
+    | LogicalAnd
+    | LogicalOr
+    | LogicalXor
+    | Namespace
+    | New
+    | Null
+    | ObjectType
+    | Parent_
+    | Partial
+    | Print
+    | Private
+    | Protected
+    | Public
+    | Require
+    | RequireOnce
+    | Resource
+    | Return
+    | Static
+    | StringType
+    | Switch
+    | Throw
+    | Trait
+    | Try
+    | Typeof
+    | UintCast
+    | UnicodeCast
+    | Unset
+    | Use
+    | Var
+    | While
+    | Yield
+
+    | Get
+    | Set
+    | Call
+    | CallStatic
+    | Constructor
+    | Destruct
+    | Wakeup
+    | Sleep
+    | Autoload
+    | IsSet__
+    | Unset__
+    | ToString__
+    | Invoke
+    | SetState
+    | Clone__
+    | DebugInfo
+    | Namespace__
+    | Class__
+    | Traic__
+    | Function__
+    | Method__
+    | Line__
+    | File__
+    | Dir__
     ;
-    
+
 memberModifier
     : Public
     | Protected
@@ -792,10 +877,7 @@ castOperation
     | Int16Cast
     | IntType
     | Int64Type
-    | Uint8Cast
-    | Uint16Cast
-    | Uint32Cast
-    | Uint64Cast
+    | UintCast
     | DoubleCast
     | DoubleType
     | FloatCast

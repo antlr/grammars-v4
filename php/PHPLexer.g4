@@ -1,25 +1,44 @@
-// PHP grammar by Ivan Kochurkin (KvanTTT), 2015.
-// Used Phalanger grammar: https://github.com/DEVSENSE/Phalanger by Jakub Míšek (jakubmisek)
-// and old php grammar by Tom Everett (teverett).
-// Runtime: C#.
-// Licence: MIT.
+/*
+PHP grammar.
+The MIT License (MIT).
+Copyright (c) 2015-2016, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
 
 lexer grammar PHPLexer;
 
-channels { PhpComments }
+channels { PhpComments, ErrorLexem }
 
 @lexer::members
 {public bool AspTags = true;
-bool ScriptTag;
-bool StyleTag;
-string HeredocIdentifier;
-int PrevTokenType;
-string HtmlNameText;
-bool PhpScript;
+bool _scriptTag;
+bool _styleTag;
+string _heredocIdentifier;
+int _prevTokenType;
+string _htmlNameText;
+bool _phpScript;
+bool _insideString;
 
 public override IToken NextToken()
 {
-    IToken token = base.NextToken();
+    CommonToken token = (CommonToken)base.NextToken();
 
     if (token.Type == PHPEnd || token.Type == PHPEndSingleLineComment)
     {
@@ -33,17 +52,17 @@ public override IToken NextToken()
         
         if (string.Equals(token.Text, "</script>", System.StringComparison.Ordinal))
         {
-            PhpScript = false;
+            _phpScript = false;
             token = new CommonToken(ScriptClose);
         }
         else
         {
             // Add semicolon to the end of statement if it is absente.
             // For example: <?php echo "Hello world" ?>
-            if (PrevTokenType == SemiColon || PrevTokenType == Colon
-                || PrevTokenType == OpenCurlyBracket || PrevTokenType == CloseCurlyBracket)
+            if (_prevTokenType == SemiColon || _prevTokenType == Colon
+                || _prevTokenType == OpenCurlyBracket || _prevTokenType == CloseCurlyBracket)
             {
-                token = base.NextToken();
+                token = (CommonToken)base.NextToken();
             }
             else
             {
@@ -53,27 +72,24 @@ public override IToken NextToken()
     }
     else if (token.Type == HtmlName)
     {
-        HtmlNameText = token.Text;
+        _htmlNameText = token.Text;
     }
     else if (token.Type == HtmlDoubleQuoteString)
     {
         if (string.Equals(token.Text, "php", System.StringComparison.OrdinalIgnoreCase) &&
-            string.Equals(HtmlNameText, "language"))
+            string.Equals(_htmlNameText, "language"))
         {
-            PhpScript = true;
+            _phpScript = true;
         }
     }
-    
     else if (_mode == HereDoc)
     {
-        // Heredoc and Nowdoc syntax suuport: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
+        // Heredoc and Nowdoc syntax support: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
         switch (token.Type)
         {
             case StartHereDoc:
             case StartNowDoc:
-                HeredocIdentifier = token.Text.Substring(3).Trim().Trim('\'');
-                while (_input.La(1) == '\r' || _input.La(1) == '\n')
-                    _input.Consume();
+                _heredocIdentifier = token.Text.Substring(3).Trim().Trim('\'');
                 break;
 
             case HereDocText:
@@ -86,7 +102,7 @@ public override IToken NextToken()
                     }
                     else
                     {
-                        token = base.NextToken();
+                        token = (CommonToken)base.NextToken();
                     }
                 }
                 break;
@@ -96,7 +112,7 @@ public override IToken NextToken()
     {
         if (_channel != Hidden)
         {
-            PrevTokenType = token.Type;
+            _prevTokenType = token.Type;
         }
     }
 
@@ -108,80 +124,24 @@ bool CheckHeredocEnd(string text)
     text = text.Trim();
     bool semi = text.Length > 0 ? text[text.Length - 1] == ';' : false;
     string identifier = semi ? text.Substring(0, text.Length - 1) : text;
-    var result = string.Equals(identifier, HeredocIdentifier, System.StringComparison.Ordinal);
+    var result = string.Equals(identifier, _heredocIdentifier, System.StringComparison.Ordinal);
     return result;
 }}
 
-// '<?=' will be transformed to 'echo' token.
-// '<?= "Hello world"; ?>' will be transformed to '<?php echo "Hello world"; ?>'
-fragment PhpStartEchoFragment: '<' ('?' '=' | {AspTags}? '%' '=');
-fragment PhpStartFragment:     '<' ('?' (P H P)? | {AspTags}? '%');
-fragment Digit:                [0-9];
-fragment HexDigit:             [a-fA-F0-9];
-fragment NameChar
-    : NameStartChar
-    | '-'
-    | '_'
-    | '.'
-    | Digit
-    | '\u00B7'
-    | '\u0300'..'\u036F'
-    | '\u203F'..'\u2040'
-    ;
-fragment NameStartChar
-    : [:a-zA-Z]
-    | '\u2070'..'\u218F'
-    | '\u2C00'..'\u2FEF'
-    | '\u3001'..'\uD7FF'
-    | '\uF900'..'\uFDCF'
-    | '\uFDF0'..'\uFFFD'
-    ;
-fragment Decimal:                   Digit+;
-fragment Hex:                       '0' ('x'|'X') HexDigit+;
-fragment Float:                     Digit* '.'? Digit+;
-fragment SingleQuoteStringFragment: (~('\'' | '\\') | '\\' . )* ;
-fragment DoubleQuoteStringFragment: (~('\\' | '"') | '\\' . )* ;
-fragment String:                    ( '\\' EscapeCharacter | ~('\\'| '"') )*;
-fragment A: [aA];
-fragment B: [bB];
-fragment C: [cC];
-fragment D: [dD];
-fragment E: [eE];
-fragment F: [fF];
-fragment G: [gG];
-fragment H: [hH];
-fragment I: [iI];
-fragment J: [jJ];
-fragment K: [kK];
-fragment L: [lL];
-fragment M: [mM];
-fragment N: [nN];
-fragment O: [oO];
-fragment P: [pP];
-fragment Q: [qQ];
-fragment R: [rR];
-fragment S: [sS];
-fragment T: [tT];
-fragment U: [uU];
-fragment V: [vV];
-fragment W: [wW];
-fragment X: [xX];
-fragment Y: [yY];
-fragment Z: [zZ];
-
-SeaWhitespace:  (' ' | '\t' | '\r'? '\n')+ -> channel(HIDDEN);
+SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);
 HtmlText:       ~[<#]+;
 PHPStartEcho:   PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStart:       PhpStartFragment -> skip, pushMode(PHP);
-HtmlScriptOpen: '<' 'script' { ScriptTag = true; } -> pushMode(INSIDE);
-HtmlStyleOpen:  '<' 'style' { StyleTag = true; } -> pushMode(INSIDE);
-HtmlComment:    '<' '!' '--' .*? '-->';
+HtmlScriptOpen: '<' 'script' { _scriptTag = true; } -> pushMode(INSIDE);
+HtmlStyleOpen:  '<' 'style' { _styleTag = true; } -> pushMode(INSIDE);
+HtmlComment:    '<' '!' '--' .*? '-->' -> channel(HIDDEN);
 HtmlDtd:        '<' '!' .*? '>';
 HtmlOpen:       '<' -> pushMode(INSIDE);
 Shebang
     : { _input.La(-1) <= 0 || _input.La(-1) == '\r' || _input.La(-1) == '\n' }? '#' '!' ~[\r\n]*
     ;
 NumberSign:     '#' ~[<]* -> more;
+Error:          .         -> channel(ErrorLexem);
 
 mode INSIDE;
 
@@ -189,9 +149,9 @@ PHPStartEchoInside: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartInside:     PhpStartFragment -> skip, pushMode(PHP);
 HtmlClose: '>' {
 PopMode();
-if (ScriptTag)
+if (_scriptTag)
 {
-    if (!PhpScript)
+    if (!_phpScript)
     {
         PushMode(SCRIPT);
     }
@@ -199,38 +159,41 @@ if (ScriptTag)
     {
         PushMode(PHP);
     }
-    ScriptTag = false;
+    _scriptTag = false;
 }
-else if (StyleTag)
+else if (_styleTag)
 {
     PushMode(STYLE);
-    StyleTag = false;
+    _styleTag = false;
 }
 };
 HtmlSlashClose: '/>' -> popMode;
 HtmlSlash:      '/';
 HtmlEquals:     '=';
 
-HtmlStartQuoteString:       '\'' -> pushMode(HtmlQuoteStringMode);
-HtmlStartDoubleQuoteString: '"' -> pushMode(HtmlDoubleQuoteStringMode);
+HtmlStartQuoteString:       '\\'? '\'' -> pushMode(HtmlQuoteStringMode);
+HtmlStartDoubleQuoteString: '\\'? '"'  -> pushMode(HtmlDoubleQuoteStringMode);
 HtmlHex:                    '#' HexDigit+ ;
 HtmlDecimal:                Digit+;
 HtmlSpace:                  [ \t\r\n]+ -> channel(HIDDEN);
 HtmlName:                   NameStartChar NameChar*;
+ErrorInside:                .          -> channel(ErrorLexem);
 
 mode HtmlQuoteStringMode;
 
 PHPStartEchoInsideQuoteString: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartInsideQuoteString:     PhpStartFragment -> skip, pushMode(PHP);
-HtmlEndQuoteString:            '\'' -> popMode;
+HtmlEndQuoteString:            '\'' '\''? -> popMode;
 HtmlQuoteString:               ~[<']+;
+ErrorHtmlQuote:                .          -> channel(ErrorLexem);
 
 mode HtmlDoubleQuoteStringMode;
 
 PHPStartEchoDoubleQuoteString: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartDoubleQuoteString:     PhpStartFragment -> skip, pushMode(PHP);
-HtmlEndDoubleQuoteString:      '"' -> popMode;
+HtmlEndDoubleQuoteString:      '"' '"'? -> popMode;
 HtmlDoubleQuoteString:         ~[<"]+;
+ErrorHtmlDoubleQuote:          .          -> channel(ErrorLexem);
 
 // Parse JavaScript with https://github.com/antlr/grammars-v4/tree/master/ecmascript if necessary.
 // Php blocks can exist inside Script blocks too.
@@ -250,127 +213,124 @@ StyleBody: .*? '</' 'style'? '>' -> popMode;
 
 mode PHP;
 
-PHPEnd:             (('?' | {AspTags}? '%') '>') | {PhpScript}? '</script>';
+PHPEnd:             (('?' | {AspTags}? '%') '>') | {_phpScript}? '</script>';
 Whitespace:         [ \t\r\n]+ -> skip;
 MultiLineComment:   '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:  '//' -> skip, pushMode(SingleLineCommentMode);
 ShellStyleComment:  '#' -> skip, pushMode(SingleLineCommentMode);
 
-Abstract:           A B S T R A C T;
-Array:              A R R A Y;
-As:                 A S;
-BinaryCast:         B I N A R Y;
-BoolType:           B O O L E A N | B O O L;
-BooleanConstant:    T R U E | F A L S E;
-Break:              B R E A K;
-Callable:           C A L L A B L E;
-Case:               C A S E;
-Catch:              C A T C H;
-Class:              C L A S S;
-Clone:              C L O N E;
-Const:              C O N S T;
-Continue:           C O N T I N U E;
-Declare:            D E C L A R E;
-Default:            D E F A U L T;
-Do:                 D O;
-DoubleCast:         R E A L;
-DoubleType:         D O U B L E;
-Echo:               E C H O;
-Else:               E L S E;
-ElseIf:             E L S E I F;
-Empty:              E M P T Y;
-
-EndDeclare:         E N D D E C L A R E;
-EndFor:             E N D F O R;
-EndForeach:         E N D F O R E A C H;
-EndIf:              E N D I F;
-EndSwitch:          E N D S W I T C H;
-EndWhile:           E N D W H I L E;
-
-Eval:               E V A L;
-Exit:               D I E;
-Extends:            E X T E N D S;
-Final:              F I N A L;
-Finally:            F I N A L L Y;
-FloatCast:          F L O A T;
-For:                F O R;
-Foreach:            F O R E A C H;
-Function:           F U N C T I O N;
-Global:             G L O B A L;
-Goto:               G O T O;
-If:                 I F;
-Implements:         I M P L E M E N T S;
-Import:             I M P O R T;
-Include:            I N C L U D E;
-IncludeOnce:        I N C L U D E '_' O N C E;
-InstanceOf:         I N S T A N C E O F;
-InsteadOf:          I N S T E A D O F;
-Int16Cast:          I N T '16';
-Int64Type:          I N T '64';
-Int8Cast:           I N T '8';
-Interface:          I N T E R F A C E;
-IntType:            I N T E G E R | I N T;
-IsSet:              I S S E T;
-List:               L I S T;
-LogicalAnd:         A N D;
-LogicalOr:          O R;
-LogicalXor:         X O R;
-Namespace:          N A M E S P A C E;
-New:                N E W;
-Null:               N U L L;
-ObjectType:         O B J E C T;
-Parent_:            P A R E N T;
-Partial:            P A R T I A L;
-Print:              P R I N T;
-Private:            P R I V A T E;
-Protected:          P R O T E C T E D;
-Public:             P U B L I C;
-Require:            R E Q U I R E;
-RequireOnce:        R E Q U I R E '_' O N C E;
-Resource:           R E S O U R C E;
-Return:             R E T U R N;
-Static:             S T A T I C;
-StringType:         S T R I N G;
-Switch:             S W I T C H;
-Throw:              T H R O W;
-Trait:              T R A I T;
-Try:                T R Y;
-Typeof:             C L R T Y P E O F;
-Uint16Cast:         U I N T '16';
-Uint32Cast:         U I N T;
-Uint64Cast:         U I N T '64';
-Uint8Cast:          U I N T '8';
-UnicodeCast:        U N I C O D E;
-Unset:              U N S E T;
-Use:                U S E;
-Var:                V A R;
-While:              W H I L E;
-Yield:              Y I E L D;
-
-Get:                '__' G E T;
-Set:                '__' S E T;
-Call:               '__' C A L L;
-CallStatic:         '__' C A L L S T A T I C;
-Constructor:        '__' C O N S T R U C T;
-Destruct:           '__' D E S T R U C T;
-Wakeup:             '__' W A K E U P;
-Sleep:              '__' S L E E P;
-Autoload:           '__' A U T O L O A D;
-IsSet__:            '__' I S S E T;
-Unset__:            '__' U N S E T;
-ToString__:         '__' T O S T R I N G;
-Invoke:             '__' I N V O K E;
-SetState:           '__' S E T '_' S T A T E;
-Clone__:            '__' C L O N E;
-DebugInfo:          '__' D E B U G I N F O;
-Namespace__:        '__' N A M E S P A C E '__';
-Class__:            '__' C L A S S '__';
-Traic__:            '__' T R A I T '__';
-Function__:         '__' F U N C T I O N '__';
-Method__:           '__' M E T H O D '__';
-Line__:             '__' L I N E '__';
-File__:             '__' F I L E '__';
-Dir__:              '__' D I R '__';
+Abstract:           'abstract';
+Array:              'array';
+As:                 'as';
+BinaryCast:         'binary';
+BoolType:           'boolean' | 'bool';
+BooleanConstant:    'true' | 'false';
+Break:              'break';
+Callable:           'callable';
+Case:               'case';
+Catch:              'catch';
+Class:              'class';
+Clone:              'clone';
+Const:              'const';
+Continue:           'continue';
+Declare:            'declare';
+Default:            'default';
+Do:                 'do';
+DoubleCast:         'real';
+DoubleType:         'double';
+Echo:               'echo';
+Else:               'else';
+ElseIf:             'elseif';
+Empty:              'empty';
+                    
+EndDeclare:         'enddeclare';
+EndFor:             'endfor';
+EndForeach:         'endforeach';
+EndIf:              'endif';
+EndSwitch:          'endswitch';
+EndWhile:           'endwhile';
+                    
+Eval:               'eval';
+Exit:               'die';
+Extends:            'extends';
+Final:              'final';
+Finally:            'finally';
+FloatCast:          'float';
+For:                'for';
+Foreach:            'foreach';
+Function:           'function';
+Global:             'global';
+Goto:               'goto';
+If:                 'if';
+Implements:         'implements';
+Import:             'import';
+Include:            'include';
+IncludeOnce:        'include_once';
+InstanceOf:         'instanceof';
+InsteadOf:          'insteadof';
+Int8Cast:           'int8';
+Int16Cast:          'int16';
+Int64Type:          'int64';
+IntType:            'int' 'eger'?;
+Interface:          'interface';
+IsSet:              'isset';
+List:               'list';
+LogicalAnd:         'and';
+LogicalOr:          'or';
+LogicalXor:         'xor';
+Namespace:          'namespace';
+New:                'new';
+Null:               'null';
+ObjectType:         'object';
+Parent_:            'parent';
+Partial:            'partial';
+Print:              'print';
+Private:            'private';
+Protected:          'protected';
+Public:             'public';
+Require:            'require';
+RequireOnce:        'require_once';
+Resource:           'resource';
+Return:             'return';
+Static:             'static';
+StringType:         'string';
+Switch:             'switch';
+Throw:              'throw';
+Trait:              'trait';
+Try:                'try';
+Typeof:             'clrtypeof';
+UintCast:           'uint' ('8' | '16' | '64')?;
+UnicodeCast:        'unicode';
+Unset:              'unset';
+Use:                'use';
+Var:                'var';
+While:              'while';
+Yield:              'yield';
+                    
+Get:                '__get';
+Set:                '__set';
+Call:               '__call';
+CallStatic:         '__callstatic';
+Constructor:        '__construct';
+Destruct:           '__destruct';
+Wakeup:             '__wakeup';
+Sleep:              '__sleep';
+Autoload:           '__autoload';
+IsSet__:            '__isset';
+Unset__:            '__unset';
+ToString__:         '__tostring';
+Invoke:             '__invoke';
+SetState:           '__set_state';
+Clone__:            '__clone';
+DebugInfo:          '__debuginfo';
+Namespace__:        '__namespace__';
+Class__:            '__class__';
+Traic__:            '__trait__';
+Function__:         '__function__';
+Method__:           '__method__';
+Line__:             '__line__';
+File__:             '__file__';
+Dir__:              '__dir__';
 
 Lgeneric:           '<:';
 Rgeneric:           ':>';
@@ -425,47 +385,86 @@ CloseRoundBracket:  ')';
 OpenSquareBracket:  '[';
 CloseSquareBracket: ']';
 OpenCurlyBracket:   '{';
-CloseCurlyBracket:  '}';
+CloseCurlyBracket:  '}'
+{
+if (_insideString)
+{
+    _insideString = false;
+    Skip();
+    PopMode();
+}
+};
 Comma:              ',';
 Colon:              ':';
 SemiColon:          ';';
 Eq:                 '=';
-DoubleQuote:        '"';
 Quote:              '\'';
 BackQuote:          '`';
 
-Label:              ('a'..'z' | 'A'..'Z' | '_')  ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')*;
-VarName:            '$' Label;
-Numeric:            Decimal | Hex;
+VarName:            '$' [a-zA-Z_][a-zA-Z_0-9]*;
+Label:              [a-zA-Z_][a-zA-Z_0-9]*;
+Octal:              '0' [0-7]+;
+Decimal:            Digit+;
+Real:               (Digit+ '.' Digit* | '.' Digit+) ExponentPart? | Digit+ ExponentPart;
+Hex:                '0x' HexDigit+;
+Binary:             '0b' [01]+;
 
-Real: Float (('e'|'E') ('+'|'-')? (Float | Decimal))?;
-
-EscapeCharacter:
-    'n' | 'r' | 't' | 'v' | 'e' | 'f' | '\\' | '$' | '"' |
-    'd' | 's' | '(' | ')' | 'w' |
-    'E' |
-    '0'..'7'+ |
-    'x' HexDigit+ |
-    'u' ('0'..'9'|'a'..'f')+;
-
-BackQuoteString:   '`' String '`';
-SingleQuoteString: '\'' SingleQuoteStringFragment '\'';
-DoubleQuoteString: '"' DoubleQuoteStringFragment '"';
+BackQuoteString:   '`' ~'`'* '`';
+SingleQuoteString: '\'' (~('\'' | '\\') | '\\' . )* '\'';
+DoubleQuote:       '"' -> pushMode(InterpolationString);
 
 StartNowDoc
-    : '<<<' [ \t]* '\''  Label '\''  { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc)
     ;
 StartHereDoc
-    : '<<<' [ \t]* Label { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc)
     ;
+ErrorPhp:                   .          -> channel(ErrorLexem);
+
+mode InterpolationString;
+
+VarNameInInterpolation:     '$' [a-zA-Z_][a-zA-Z_0-9]*                          -> type(VarName); // TODO: fix such cases: "$people->john"
+DollarString:               '$'                                                 -> type(StringPart);
+CurlyDollar:                '{' {_input.La(1) == '$'}? {_insideString = true;}  -> skip, pushMode(PHP);
+CurlyString:                '{'                                                 -> type(StringPart);
+EscapedChar:                '\\' .                                              -> type(StringPart);
+DoubleQuoteInInterpolation: '"'                                                 -> type(DoubleQuote), popMode;
+StringPart:                 ~[${\\"]+;
 
 mode SingleLineCommentMode;
 
-Comment: ~[\r\n?]+ -> channel(PhpComments);
+Comment:                 ~[\r\n?]+ -> channel(PhpComments);
 PHPEndSingleLineComment: '?' '>';
 CommentQuestionMark:     '?' -> type(Comment), channel(PhpComments);
-CommentEnd: [\r\n] -> skip, popMode; // exit from comment.
+CommentEnd:              [\r\n] -> skip, popMode; // exit from comment.
 
-mode HereDoc;
+mode HereDoc;  // TODO: interpolation for heredoc strings.
 
-HereDocText: ~[\r\n]*? '\r'? '\n';
+HereDocText: ~[\r\n]*? ('\r'? '\n' | '\r');
+
+// fragments.
+// '<?=' will be transformed to 'echo' token.
+// '<?= "Hello world"; ?>' will be transformed to '<?php echo "Hello world"; ?>'
+fragment PhpStartEchoFragment: '<' ('?' '=' | {AspTags}? '%' '=');
+fragment PhpStartFragment:     '<' ('?' 'php'? | {AspTags}? '%');
+fragment NameChar
+    : NameStartChar
+    | '-'
+    | '_'
+    | '.'
+    | Digit
+    | '\u00B7'
+    | '\u0300'..'\u036F'
+    | '\u203F'..'\u2040'
+    ;
+fragment NameStartChar
+    : [:a-zA-Z]
+    | '\u2070'..'\u218F'
+    | '\u2C00'..'\u2FEF'
+    | '\u3001'..'\uD7FF'
+    | '\uF900'..'\uFDCF'
+    | '\uFDF0'..'\uFFFD'
+    ;
+fragment ExponentPart:         'e' [+-]? Digit+;
+fragment Digit:                [0-9];
+fragment HexDigit:             [a-fA-F0-9];

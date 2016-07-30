@@ -35,53 +35,45 @@
  *	Modified 2015.06.16 gbr
  *	-- update for compatibility with Antlr v4.5
  */
-
 lexer grammar ANTLRv4Lexer;
 
-options {
-	superClass = LexerAdaptor ;
-}
+options
+   { superClass = LexerAdaptor; }
+import LexBasic;
+// Standard set of fragments
+tokens
+   { TOKEN_REF , RULE_REF , LEXER_CHAR_SET }
 
-import LexBasic;	// Standard set of fragments
-
-tokens {
-	TOKEN_REF,
-	RULE_REF,
-	LEXER_CHAR_SET
-}
-
-channels {
-	OFF_CHANNEL		// non-default channel for whitespace and comments
-}
-
+channels
+   { OFF_CHANNEL }
 
 // ======================================================
 // Lexer specification
 //
-
 // -------------------------
 // Comments
 
 DOC_COMMENT
-	:	DocComment
-	;
+   : DocComment
+   ;
+
 
 BLOCK_COMMENT
-	:	BlockComment	-> channel(OFF_CHANNEL)
-	;
+   : BlockComment -> channel (OFF_CHANNEL)
+   ;
+
 
 LINE_COMMENT
-	:	LineComment		-> channel(OFF_CHANNEL)
-	;
-
+   : LineComment -> channel (OFF_CHANNEL)
+   ;
 
 // -------------------------
 // Integer
 //
 
-INT	: DecimalNumeral
-	;
-
+INT
+   : DecimalNumeral
+   ;
 
 // -------------------------
 // Literal string
@@ -92,13 +84,13 @@ INT	: DecimalNumeral
 // is a valid hexadecimal number (per Unicode standard).
 
 STRING_LITERAL
-	: SQuoteLiteral
-	;
+   : SQuoteLiteral
+   ;
+
 
 UNTERMINATED_STRING_LITERAL
-	: USQuoteLiteral
-	;
-
+   : USQuoteLiteral
+   ;
 
 // -------------------------
 // Arguments
@@ -108,17 +100,14 @@ UNTERMINATED_STRING_LITERAL
 // are contained within square brackets.
 
 BEGIN_ARGUMENT
-	:	LBrack		{ handleBeginArgument(); }
-	;
-
-
+   : LBrack{ handleBeginArgument(); };
+   
 // -------------------------
 // Actions
 
 BEGIN_ACTION
-	:	LBrace		-> pushMode(Action)
-	;
-
+   : LBrace -> pushMode (Action)
+   ;
 
 // -------------------------
 // Keywords
@@ -127,66 +116,220 @@ BEGIN_ACTION
 // they would be ambiguous with the keyword vs some other identifier.  OPTIONS,
 // TOKENS, & CHANNELS blocks are handled idiomatically in dedicated lexical modes.
 
-OPTIONS		: 'options'		-> pushMode(Options)	;
-TOKENS		: 'tokens'		-> pushMode(Tokens)		;
-CHANNELS	: 'channels'	-> pushMode(Channels)	;
+OPTIONS
+   : 'options' -> pushMode (Options)
+   ;
 
-IMPORT		: 'import'		;
-FRAGMENT	: 'fragment'	;
-LEXER		: 'lexer'		;
-PARSER		: 'parser'		;
-GRAMMAR		: 'grammar'		;
-PROTECTED	: 'protected'	;
-PUBLIC		: 'public'		;
-PRIVATE		: 'private'		;
-RETURNS		: 'returns'		;
-LOCALS		: 'locals'		;
-THROWS		: 'throws'		;
-CATCH		: 'catch'		;
-FINALLY		: 'finally'		;
-MODE		: 'mode'		;
 
+TOKENS
+   : 'tokens' -> pushMode (Tokens)
+   ;
+
+
+CHANNELS
+   : 'channels' -> pushMode (Channels)
+   ;
+
+
+IMPORT
+   : 'import'
+   ;
+
+
+FRAGMENT
+   : 'fragment'
+   ;
+
+
+LEXER
+   : 'lexer'
+   ;
+
+
+PARSER
+   : 'parser'
+   ;
+
+
+GRAMMAR
+   : 'grammar'
+   ;
+
+
+PROTECTED
+   : 'protected'
+   ;
+
+
+PUBLIC
+   : 'public'
+   ;
+
+
+PRIVATE
+   : 'private'
+   ;
+
+
+RETURNS
+   : 'returns'
+   ;
+
+
+LOCALS
+   : 'locals'
+   ;
+
+
+THROWS
+   : 'throws'
+   ;
+
+
+CATCH
+   : 'catch'
+   ;
+
+
+FINALLY
+   : 'finally'
+   ;
+
+
+MODE
+   : 'mode'
+   ;
 
 // -------------------------
 // Punctuation
 
-COLON		: Colon			;
-COLONCOLON	: DColon		;
-COMMA		: Comma			;
-SEMI		: Semi			;
-LPAREN		: LParen		;
-RPAREN		: RParen		;
-LBRACE		: LBrace		;
-RBRACE		: RBrace		;
-RARROW		: RArrow		;
-LT			: Lt			;
-GT			: Gt			;
-ASSIGN		: Equal			;
-QUESTION	: Question		;
-STAR		: Star			;
-PLUS_ASSIGN	: PlusAssign	;
-PLUS		: Plus			;
-OR			: Pipe			;
-DOLLAR		: Dollar		;
-RANGE		: Range			;
-DOT			: Dot			;
-AT			: At			;
-POUND		: Pound			;
-NOT			: Tilde			;
+COLON
+   : Colon
+   ;
 
+
+COLONCOLON
+   : DColon
+   ;
+
+
+COMMA
+   : Comma
+   ;
+
+
+SEMI
+   : Semi
+   ;
+
+
+LPAREN
+   : LParen
+   ;
+
+
+RPAREN
+   : RParen
+   ;
+
+
+LBRACE
+   : LBrace
+   ;
+
+
+RBRACE
+   : RBrace
+   ;
+
+
+RARROW
+   : RArrow
+   ;
+
+
+LT
+   : Lt
+   ;
+
+
+GT
+   : Gt
+   ;
+
+
+ASSIGN
+   : Equal
+   ;
+
+
+QUESTION
+   : Question
+   ;
+
+
+STAR
+   : Star
+   ;
+
+
+PLUS_ASSIGN
+   : PlusAssign
+   ;
+
+
+PLUS
+   : Plus
+   ;
+
+
+OR
+   : Pipe
+   ;
+
+
+DOLLAR
+   : Dollar
+   ;
+
+
+RANGE
+   : Range
+   ;
+
+
+DOT
+   : Dot
+   ;
+
+
+AT
+   : At
+   ;
+
+
+POUND
+   : Pound
+   ;
+
+
+NOT
+   : Tilde
+   ;
 
 // -------------------------
 // Identifiers - allows unicode rule/token names
 
-ID	: Id
-	;
-
+ID
+   : Id
+   ;
 
 // -------------------------
 // Whitespace
 
-WS	:	Ws+		-> channel(OFF_CHANNEL)	;
-
+WS
+   : Ws + -> channel (OFF_CHANNEL)
+   ;
 
 // -------------------------
 // Illegal Characters
@@ -202,32 +345,42 @@ WS	:	Ws+		-> channel(OFF_CHANNEL)	;
 // Comment this rule out to allow the error to be propagated to the parser
 
 ERRCHAR
-	:	.	-> channel(HIDDEN)
-	;
-
+   : . -> channel (HIDDEN)
+   ;
 
 // ======================================================
 // Lexer modes
-
 // -------------------------
 // Arguments
+mode Argument;
+// E.g., [int x, List<String> a[]]
+NESTED_ARGUMENT
+   : LBrack -> type (ARGUMENT_CONTENT) , pushMode (Argument)
+   ;
 
-mode Argument;			// E.g., [int x, List<String> a[]]
+ARGUMENT_ESCAPE
+   : EscAny -> type (ARGUMENT_CONTENT)
+   ;
 
-	NESTED_ARGUMENT			: LBrack			-> type(ARGUMENT_CONTENT), pushMode(Argument)	;
+ARGUMENT_STRING_LITERAL
+   : DQuoteLiteral -> type (ARGUMENT_CONTENT)
+   ;
 
-	ARGUMENT_ESCAPE			: EscAny			-> type(ARGUMENT_CONTENT)		;
+ARGUMENT_CHAR_LITERAL
+   : SQuoteLiteral -> type (ARGUMENT_CONTENT)
+   ;
 
-	ARGUMENT_STRING_LITERAL	: DQuoteLiteral	-> type(ARGUMENT_CONTENT)		;
-	ARGUMENT_CHAR_LITERAL	: SQuoteLiteral	-> type(ARGUMENT_CONTENT)		;
+END_ARGUMENT
+   : RBrack{ handleEndArgument(); };
+      
+// added this to return non-EOF token type here. EOF does something weird
+UNTERMINATED_ARGUMENT
+   : EOF -> popMode
+   ;
 
-	END_ARGUMENT			: RBrack	{ handleEndArgument(); }	;
-
-	// added this to return non-EOF token type here. EOF does something weird
-	UNTERMINATED_ARGUMENT 	: EOF		-> popMode		;
-
-	ARGUMENT_CONTENT		: .							;
-
+ARGUMENT_CONTENT
+   : .
+   ;
 
 // -------------------------
 // Actions
@@ -238,106 +391,193 @@ mode Argument;			// E.g., [int x, List<String> a[]]
 // literal string representation in the target language. We assume
 // that they are delimited by ' or " and so consume these
 // in their own alts so as not to inadvertantly match {}.
-
 mode Action;
+NESTED_ACTION
+   : LBrace -> type (ACTION_CONTENT) , pushMode (Action)
+   ;
 
-	NESTED_ACTION			: LBrace			-> type(ACTION_CONTENT), pushMode(Action)	;
+ACTION_ESCAPE
+   : EscAny -> type (ACTION_CONTENT)
+   ;
 
-	ACTION_ESCAPE			: EscAny			-> type(ACTION_CONTENT)		;
+ACTION_STRING_LITERAL
+   : DQuoteLiteral -> type (ACTION_CONTENT)
+   ;
 
-	ACTION_STRING_LITERAL	: DQuoteLiteral		-> type(ACTION_CONTENT)		;
-	ACTION_CHAR_LITERAL		: SQuoteLiteral		-> type(ACTION_CONTENT)		;
+ACTION_CHAR_LITERAL
+   : SQuoteLiteral -> type (ACTION_CONTENT)
+   ;
 
-	ACTION_DOC_COMMENT		: DocComment		-> type(ACTION_CONTENT)		;
-	ACTION_BLOCK_COMMENT	: BlockComment 		-> type(ACTION_CONTENT)		;
-	ACTION_LINE_COMMENT		: LineComment 		-> type(ACTION_CONTENT)		;
+ACTION_DOC_COMMENT
+   : DocComment -> type (ACTION_CONTENT)
+   ;
 
-	END_ACTION				: RBrace	{ handleEndAction(); }	;
+ACTION_BLOCK_COMMENT
+   : BlockComment -> type (ACTION_CONTENT)
+   ;
 
-	UNTERMINATED_ACTION		: EOF		-> popMode		;
+ACTION_LINE_COMMENT
+   : LineComment -> type (ACTION_CONTENT)
+   ;
 
-	ACTION_CONTENT			: .							;
+END_ACTION
+   : RBrace{ handleEndAction(); };
 
+UNTERMINATED_ACTION
+   : EOF -> popMode
+   ;
+
+ACTION_CONTENT
+   : .
+   ;
 
 // -------------------------
-
 mode Options;
+OPT_DOC_COMMENT
+   : DocComment -> type (DOC_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-	OPT_DOC_COMMENT		: DocComment		-> type(DOC_COMMENT), channel(OFF_CHANNEL)		;
-	OPT_BLOCK_COMMENT	: BlockComment 		-> type(BLOCK_COMMENT), channel(OFF_CHANNEL)	;
-	OPT_LINE_COMMENT	: LineComment 		-> type(LINE_COMMENT), channel(OFF_CHANNEL)		;
+OPT_BLOCK_COMMENT
+   : BlockComment -> type (BLOCK_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-	OPT_LBRACE			: LBrace			-> type(LBRACE)				;
-	OPT_RBRACE			: RBrace			-> type(RBRACE), popMode	;
+OPT_LINE_COMMENT
+   : LineComment -> type (LINE_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-	OPT_ID				: Id				-> type(ID)					;
-	OPT_DOT				: Dot				-> type(DOT)				;
-	OPT_ASSIGN			: Equal				-> type(ASSIGN)				;
-	OPT_STRING_LITERAL	: SQuoteLiteral		-> type(STRING_LITERAL)		;
-	OPT_INT				: Int				-> type(INT)				;
-	OPT_STAR			: Star				-> type(STAR)				;
-	OPT_SEMI			: Semi				-> type(SEMI)				;
+OPT_LBRACE
+   : LBrace -> type (LBRACE)
+   ;
 
-	OPT_WS				: Ws+	-> type(WS), channel(OFF_CHANNEL) 	;
+OPT_RBRACE
+   : RBrace -> type (RBRACE) , popMode
+   ;
 
+OPT_ID
+   : Id -> type (ID)
+   ;
+
+OPT_DOT
+   : Dot -> type (DOT)
+   ;
+
+OPT_ASSIGN
+   : Equal -> type (ASSIGN)
+   ;
+
+OPT_STRING_LITERAL
+   : SQuoteLiteral -> type (STRING_LITERAL)
+   ;
+
+OPT_INT
+   : Int -> type (INT)
+   ;
+
+OPT_STAR
+   : Star -> type (STAR)
+   ;
+
+OPT_SEMI
+   : Semi -> type (SEMI)
+   ;
+
+OPT_WS
+   : Ws + -> type (WS) , channel (OFF_CHANNEL)
+   ;
 
 // -------------------------
-
 mode Tokens;
+TOK_DOC_COMMENT
+   : DocComment -> type (DOC_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-	TOK_DOC_COMMENT		: DocComment		-> type(DOC_COMMENT), channel(OFF_CHANNEL)		;
-	TOK_BLOCK_COMMENT	: BlockComment 		-> type(BLOCK_COMMENT), channel(OFF_CHANNEL)	;
-	TOK_LINE_COMMENT	: LineComment 		-> type(LINE_COMMENT), channel(OFF_CHANNEL)		;
+TOK_BLOCK_COMMENT
+   : BlockComment -> type (BLOCK_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-	TOK_LBRACE			: LBrace			-> type(LBRACE)				;
-	TOK_RBRACE			: RBrace			-> type(RBRACE), popMode	;
+TOK_LINE_COMMENT
+   : LineComment -> type (LINE_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-	TOK_ID				: Id				-> type(ID)					;
-	TOK_DOT				: Dot				-> type(DOT)				;
-	TOK_COMMA			: Comma				-> type(COMMA)				;
+TOK_LBRACE
+   : LBrace -> type (LBRACE)
+   ;
 
-	TOK_WS				: Ws+	-> type(WS), channel(OFF_CHANNEL) 	;
+TOK_RBRACE
+   : RBrace -> type (RBRACE) , popMode
+   ;
 
+TOK_ID
+   : Id -> type (ID)
+   ;
+
+TOK_DOT
+   : Dot -> type (DOT)
+   ;
+
+TOK_COMMA
+   : Comma -> type (COMMA)
+   ;
+
+TOK_WS
+   : Ws + -> type (WS) , channel (OFF_CHANNEL)
+   ;
 
 // -------------------------
+mode Channels;
+// currently same as Tokens mode; distinguished by keyword
+CHN_DOC_COMMENT
+   : DocComment -> type (DOC_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-mode Channels;	// currently same as Tokens mode; distinguished by keyword
+CHN_BLOCK_COMMENT
+   : BlockComment -> type (BLOCK_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-	CHN_DOC_COMMENT		: DocComment		-> type(DOC_COMMENT), channel(OFF_CHANNEL)		;
-	CHN_BLOCK_COMMENT	: BlockComment 		-> type(BLOCK_COMMENT), channel(OFF_CHANNEL)	;
-	CHN_LINE_COMMENT	: LineComment 		-> type(LINE_COMMENT), channel(OFF_CHANNEL)		;
+CHN_LINE_COMMENT
+   : LineComment -> type (LINE_COMMENT) , channel (OFF_CHANNEL)
+   ;
 
-	CHN_LBRACE			: LBrace			-> type(LBRACE)				;
-	CHN_RBRACE			: RBrace			-> type(RBRACE), popMode	;
+CHN_LBRACE
+   : LBrace -> type (LBRACE)
+   ;
 
-	CHN_ID				: Id				-> type(ID)					;
-	CHN_DOT				: Dot				-> type(DOT)				;
-	CHN_COMMA			: Comma				-> type(COMMA)				;
+CHN_RBRACE
+   : RBrace -> type (RBRACE) , popMode
+   ;
 
-	CHN_WS				: Ws+	-> type(WS), channel(OFF_CHANNEL) 	;
+CHN_ID
+   : Id -> type (ID)
+   ;
 
+CHN_DOT
+   : Dot -> type (DOT)
+   ;
+
+CHN_COMMA
+   : Comma -> type (COMMA)
+   ;
+
+CHN_WS
+   : Ws + -> type (WS) , channel (OFF_CHANNEL)
+   ;
 
 // -------------------------
-
 mode LexerCharSet;
+LEXER_CHAR_SET_BODY
+   : (~ [\]\\] | EscAny) + -> more
+   ;
 
-	LEXER_CHAR_SET_BODY
-		:	(	~[\]\\]
-			|	EscAny
-			)+				-> more
-		;
+LEXER_CHAR_SET
+   : RBrack -> popMode
+   ;
 
-	LEXER_CHAR_SET
-		:	RBrack			-> popMode
-		;
-
-	UNTERMINATED_CHAR_SET
-		:	EOF				-> popMode
-		;
-
+UNTERMINATED_CHAR_SET
+   : EOF -> popMode
+   ;
 
 // ------------------------------------------------------------------------------
 // Grammar specific Keywords, Punctuation, etc.
-
-fragment Id	: NameStartChar NameChar*	;
-
+fragment Id
+   : NameStartChar NameChar*
+   ;

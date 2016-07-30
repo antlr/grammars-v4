@@ -822,7 +822,7 @@ interface_accessors
 
 //B.2.11 Enums
 enum_base
-	: ':' integral_type
+	: ':' type
 	;
 
 enum_body
