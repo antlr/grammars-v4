@@ -865,6 +865,8 @@ fragment
 SChar
     :   ~["\\\r\n]
     |   EscapeSequence
+    |   '\\\n'   // Added line
+    |   '\\\r\n' // Added line
     ;
 
 ComplexDefine
