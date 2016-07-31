@@ -41,7 +41,7 @@ uri
    ;
 
 url
-   : authority '://' host (':' port)? ('/' path)? ('?' search)?
+   : authority '://' login? host (':' port)? ('/' path)? ('?' search)?
    ;
 
 authority
@@ -84,6 +84,10 @@ user
    : STRING
    ;
 
+login
+    : user ':' password '@'
+    ;
+
 password
    : STRING
    ;
@@ -93,7 +97,7 @@ fragmentid
    ;
 
 STRING
-   : [a-zA-Z~] [a-zA-Z0-9.]*
+   : [a-zA-Z~] [a-zA-Z0-9.-]*
    ;
 
 
