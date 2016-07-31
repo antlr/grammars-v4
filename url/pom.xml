@@ -36,7 +36,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>prog</entryPoint>
+					<entryPoint>fragmentaddress</entryPoint>
 					<grammarName>url</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
