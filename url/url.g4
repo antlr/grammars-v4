@@ -74,8 +74,11 @@ path
    ;
 
 search
-   : STRING ('+' search)?
+   : searchparameter ('&' searchparameter)*
    ;
+
+searchparameter
+    : STRING ('=' STRING)?;
 
 user
    : STRING
@@ -90,7 +93,7 @@ fragmentid
    ;
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9.]*
+   : [a-zA-Z~] [a-zA-Z0-9.]*
    ;
 
 
