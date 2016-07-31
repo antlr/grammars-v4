@@ -36,6 +36,7 @@ log
    : (line? EOL) + line?
    ;
 
+// combined log format has the referer and useragent fields
 line
    : host logname username datetimetz request statuscode bytes (referer useragent)?
    ;
@@ -47,28 +48,29 @@ host
 
 logname
    : STRING
-   | '-'
    ;
 
 username
    : STRING
-   | '-'
    ;
 
 datetimetz
-   : '[' date ':' time tz ']'
+   : '[' DATE ':' TIME TZ ']'
    ;
 
-date
-   : NUMBER '/' STRING '/' NUMBER
+
+DATE
+   : [0-9] + '/' STRING '/' [0-9] +
    ;
 
-time
-   : NUMBER ':' NUMBER ':' NUMBER
+
+TIME
+   : [0-9] + ':' [0-9] + ':' [0-9] +
    ;
 
-tz
-   : '-' NUMBER
+
+TZ
+   : '-' [0-9] +
    ;
 
 referer
@@ -83,13 +85,12 @@ useragent
    : LITERAL
    ;
 
-
 statuscode
-   : NUMBER
+   : STRING
    ;
 
 bytes
-   : NUMBER
+   : STRING
    ;
 
 
@@ -97,18 +98,14 @@ LITERAL
    : '"' ~ '"'* '"'
    ;
 
+
 IP
-   : NUMBER '.' NUMBER '.' NUMBER '.' NUMBER
+   : [0-9] + '.' [0-9] + '.' [0-9] + '.' [0-9] +
    ;
 
 
 STRING
-   : [a-zA-Z();._] [a-zA-Z0-9_();._-]*
-   ;
-
-
-NUMBER
-   : [0-9] +
+   : [a-zA-Z0-9();._-] +
    ;
 
 
