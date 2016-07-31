@@ -37,7 +37,7 @@ log
    ;
 
 line
-   : host logname username datetime request statuscode bytes
+   : host logname username datetime request statuscode bytes (referer useragent)?
    ;
 
 host
@@ -56,11 +56,22 @@ username
    ;
 
 datetime
-   : '[' ~ ']'* ']'
+   : '[' .*  ']'
    ;
 
+referer
+    : literal
+    ;
+
 request
-   : '"' ~ '"'* '"'
+    : literal
+    ;
+
+useragent
+    : literal;
+
+literal
+   : '"' .* '"'
    ;
 
 statuscode
@@ -77,7 +88,7 @@ ip
 
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9_]*
+   : [a-zA-Z:/();] [a-zA-Z0-9_:/();]*
    ;
 
 
