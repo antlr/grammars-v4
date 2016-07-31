@@ -29,6 +29,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/**
+* scheme:[//[user:password@]host[:port]][/]path[?query][#fragment]
+*/
 
 grammar url;
 
@@ -78,7 +81,7 @@ search
    ;
 
 searchparameter
-    : STRING ('=' STRING)?;
+    : STRING ('=' (STRING |DIGITS | HEX))?;
 
 user
    : STRING
@@ -96,10 +99,13 @@ fragmentid
    : STRING
    ;
 
-STRING
-   : [a-zA-Z~] [a-zA-Z0-9.-]*
-   ;
+HEX
+    : ('%' [a-fA-F0-9] [a-fA-F0-9])+
+    ;
 
+STRING
+   : ([a-zA-Z~] |HEX) ([a-zA-Z0-9.-] | HEX)*
+   ;
 
 DIGITS
    : [0-9] +

@@ -1,0 +1,1 @@
+file://hostname/path/to/the%20file.txt
