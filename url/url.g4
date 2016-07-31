@@ -69,10 +69,6 @@ port
    : DIGITS
    ;
 
-selector
-   : path
-   ;
-
 path
    : STRING ('/' STRING)*
    ;
@@ -92,7 +88,6 @@ password
 fragmentid
    : STRING
    ;
-
 
 STRING
    : [a-zA-Z] [a-zA-Z0-9.]*
