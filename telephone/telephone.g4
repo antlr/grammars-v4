@@ -33,19 +33,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar telephone;
 
 number
-   : countrycode? nanp local
+   : countrycode? nanp
    ;
 
 countrycode
    : '+' DIGIT DIGIT DIGIT
    ;
 
+// North American Numbering Plan
 nanp
+   : npa exchange subscriber
+   ;
+
+// Numbering Plan Area Code (https://en.wikipedia.org/wiki/North_American_Numbering_Plan#Modern_plan)
+npa
+   : '+1'? DIGIT DIGIT DIGIT
+   ;
+
+// Exhange
+exchange
    : DIGIT DIGIT DIGIT
    ;
 
-local
-   : DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT
+// Subscriber
+subscriber
+   : DIGIT DIGIT DIGIT DIGIT
    ;
 
 
