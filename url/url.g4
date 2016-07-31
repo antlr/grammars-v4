@@ -74,7 +74,7 @@ selector
    ;
 
 path
-   : STRING ('/' path)?
+   : STRING ('/' STRING)*
    ;
 
 search
@@ -95,7 +95,7 @@ fragmentid
 
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9]*
+   : [a-zA-Z] [a-zA-Z0-9.]*
    ;
 
 
