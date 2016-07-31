@@ -35,7 +35,7 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>false</showTree>
+					<showTree>true</showTree>
 					<entryPoint>fragmentaddress</entryPoint>
 					<grammarName>url</grammarName>
 					<packageName></packageName>
