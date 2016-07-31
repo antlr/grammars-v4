@@ -33,11 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar telephone;
 
 number
-   : countrycode? nanp
+   : countrycode? plan
    ;
 
 countrycode
    : '+' DIGIT DIGIT DIGIT
+   ;
+
+plan
+   : nanp
    ;
 
 // North American Numbering Plan
