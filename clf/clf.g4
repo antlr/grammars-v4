@@ -37,12 +37,12 @@ log
    ;
 
 line
-   : host logname username datetime request statuscode bytes (referer useragent)?
+   : host logname username datetimetz request statuscode bytes (referer useragent)?
    ;
 
 host
    : STRING
-   | ip
+   | IP
    ;
 
 logname
@@ -55,23 +55,36 @@ username
    | '-'
    ;
 
-datetime
-   : '[' .*  ']'
+datetimetz
+   : '[' date ':' time tz ']'
+   ;
+
+date
+   : NUMBER '/' STRING '/' NUMBER
+   ;
+
+time
+   : NUMBER ':' NUMBER ':' NUMBER
+   ;
+
+tz
+   : '-' NUMBER
    ;
 
 referer
-    : literal
-    ;
+   : literal
+   ;
 
 request
-    : literal
-    ;
+   : literal
+   ;
 
 useragent
-    : literal;
+   : literal
+   ;
 
 literal
-   : '"' .* '"'
+   : '"' ~ '"'* '"'
    ;
 
 statuscode
@@ -82,13 +95,14 @@ bytes
    : NUMBER
    ;
 
-ip
+
+IP
    : NUMBER '.' NUMBER '.' NUMBER '.' NUMBER
    ;
 
 
 STRING
-   : [a-zA-Z:/();] [a-zA-Z0-9_:/();]*
+   : [a-zA-Z();.] [a-zA-Z0-9_();.]*
    ;
 
 
