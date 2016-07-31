@@ -22,6 +22,7 @@
 		<module>bnf</module>
 		<module>c</module>
 		<module>calculator</module>
+		<module>clf</module>
 		<module>clif</module>
 		<module>clojure</module>
 		<module>cobol85</module>
