@@ -33,25 +33,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar telephone;
 
 number
-   : countrycode? plan
+   : '+1'? '+'? variation
    ;
 
-countrycode
-   : '+' DIGIT DIGIT DIGIT
-   ;
-
-plan
+variation
    : nanp
+   | japan
+   | australia
+   | itu
    ;
 
 // North American Numbering Plan
 nanp
-   : npa exchange subscriber
+   : '011' areacode exchange subscriber
    ;
 
-// Numbering Plan Area Code (https://en.wikipedia.org/wiki/North_American_Numbering_Plan#Modern_plan)
-npa
-   : '+1'? DIGIT DIGIT DIGIT
+areacode
+   : DIGIT DIGIT DIGIT
    ;
 
 // Exhange
@@ -64,11 +62,25 @@ subscriber
    : DIGIT DIGIT DIGIT DIGIT
    ;
 
+// Japan
+japan
+   : '010' areacode exchange subscriber
+   ;
+
+// ITU
+itu
+   : '00' areacode exchange subscriber
+   ;
+
+// Australia
+australia
+   : '0011' areacode exchange subscriber
+   ;
+
 
 DIGIT
    : [0-9]
    ;
-
 
 WS
    : [ \r\n] + -> skip
