@@ -72,20 +72,17 @@ tz
    ;
 
 referer
-   : literal
+   : LITERAL
    ;
 
 request
-   : literal
+   : LITERAL
    ;
 
 useragent
-   : literal
+   : LITERAL
    ;
 
-literal
-   : '"' ~ '"'* '"'
-   ;
 
 statuscode
    : NUMBER
@@ -95,6 +92,10 @@ bytes
    : NUMBER
    ;
 
+
+LITERAL
+   : '"' ~ '"'* '"'
+   ;
 
 IP
    : NUMBER '.' NUMBER '.' NUMBER '.' NUMBER
