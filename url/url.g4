@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar url;
 
 fragmentaddress
-   : uri ('#' fragmentid)?
+   : uri ('#' fragmentid)? WS?
    ;
 
 uri
@@ -41,99 +41,11 @@ uri
    ;
 
 url
-   : generic
-   | httpaddress
-   | ftpaddress
-   | newsaddress
-   | telnetaddress
-   | waisaddress
+   : authority '://' host (':' port)? ('/' path)? ('?' search)?
    ;
 
-generic
-   : scheme ':' path ('?' search)?
-   ;
-
-scheme
-   : IALPHA
-   ;
-
-httpaddress
-   : 'http://' hostport ('/' path)? ('?' search)?
-   ;
-
-ftpaddress
-   : 'ftp://' login path
-   ;
-
-afsaddress
-   : 'afs://' cellname path
-   ;
-
-newsaddress
-   : 'news:' groupart
-   ;
-
-waisaddress
-   : waisindex
-   | waisdoc
-   ;
-
-waisindex
-   : 'wais://' hostport database ('?' search)?
-   ;
-
-waisdoc
-   : 'wais://' hostport database wtype DIGITS path
-   ;
-
-groupart
-   : '*'
-   | group
-   | article
-   ;
-
-group
-   : IALPHA ('.' group)?
-   ;
-
-article
-   : XALPHAS '@' host
-   ;
-
-database
-   : XALPHAS
-   ;
-
-wtype
-   : XALPHAS
-   ;
-
-hsoname
-   : path
-   ;
-
-version
-   : DIGITS
-   ;
-
-attributes
-   : attribute +
-   ;
-
-attribute
-   : ALPHANUMS
-   ;
-
-telnetaddress
-   : 'telnet://' login
-   ;
-
-login
-   : (user (':' password)? '@')? hostport
-   ;
-
-hostport
-   : host (':' port)?
+authority
+   : STRING
    ;
 
 host
@@ -146,7 +58,7 @@ cellname
    ;
 
 hostname
-   : IALPHA ('.' hostname)?
+   : STRING ('.' STRING)*
    ;
 
 hostnumber
@@ -162,104 +74,36 @@ selector
    ;
 
 path
-   : XALPHAS ('/' path)?
+   : STRING ('/' path)?
    ;
 
 search
-   : XALPHAS ('+' search)?
+   : STRING ('+' search)?
    ;
 
 user
-   : XALPHAS
+   : STRING
    ;
 
 password
-   : XALPHAS
+   : STRING
    ;
 
 fragmentid
-   : XALPHAS
-   ;
-
-gtype
-   : XALPHA
+   : STRING
    ;
 
 
-XALPHA
-   : ALPHA | DIGIT | SAFE | EXTRA | ESCAPE
-   ;
-
-
-XALPHAS
-   : XALPHA +
-   ;
-
-xpalpha
-   : XALPHA
-   | '+'
-   ;
-
-xpalphas
-   : XALPHA (XALPHAS)?
-   ;
-
-
-IALPHA
-   : ALPHA XALPHAS +
-   ;
-
-
-ALPHA
-   : [a-zA-Z]
-   ;
-
-
-DIGIT
-   : [0-9]
-   ;
-
-
-SAFE
-   : '$' | '-' | '_' | '@' | '.' | '&'
-   ;
-
-
-EXTRA
-   : '!' | '*' | '"' | '\'' | '(' | ')' | ':' | ';' | ',' | ' '
-   ;
-
-
-ESCAPE
-   : '%' HEX HEX
-   ;
-
-
-HEX
-   : DIGIT | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
-   ;
-
-
-NATIONAL
-   : '{' | '}' | '|' | '[' | ']' | '\\' | '^' | '~'
-   ;
-
-
-PUNCTUATION
-   : '<' | '>'
+STRING
+   : [a-zA-Z] [a-zA-Z0-9]*
    ;
 
 
 DIGITS
-   : DIGIT +
+   : [0-9] +
    ;
 
 
-ALPHANUM
-   : ALPHA | DIGIT
-   ;
-
-
-ALPHANUMS
-   : ALPHANUM +
+WS
+   : [\r\n] +
    ;
