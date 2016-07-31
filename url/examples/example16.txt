@@ -1,0 +1,1 @@
+vnc://mini?name=MacMini&port=5909&vncPassword=secret123&computerType=0

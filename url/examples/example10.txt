@@ -1,0 +1,1 @@
+ftps://user:password@example.com/pub/file.txt
