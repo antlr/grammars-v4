@@ -36,7 +36,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>literal</entryPoint>
+					<entryPoint>compilationUnit</entryPoint>
 					<grammarName>Scala</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
