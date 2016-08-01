@@ -1,0 +1,21 @@
+19:26:25.386018 IP cornfed.khubla.local.ssh > oscar.khubla.local.56636: Flags [P.], seq 944243325:944243441, ack 1053485507, win 1040, options [nop,nop,TS val 3361846985 ecr 949459797], length 116
+19:26:25.386090 IP cornfed.khubla.local.ssh > oscar.khubla.local.56636: Flags [P.], seq 116:224, ack 1, win 1040, options [nop,nop,TS val 3361846985 ecr 949459797], length 108
+19:26:25.390012 IP oscar.khubla.local.56636 > cornfed.khubla.local.ssh: Flags [.], ack 116, win 4092, options [nop,nop,TS val 949459908 ecr 3361846985], length 0
+19:26:25.390945 IP oscar.khubla.local.56636 > cornfed.khubla.local.ssh: Flags [.], ack 224, win 4092, options [nop,nop,TS val 949459910 ecr 3361846985], length 0
+19:26:26.413158 IP cornfed.khubla.local.12758 > pfsense.khubla.local.domain: 9783+ PTR? 188.77.168.192.in-addr.arpa. (45)
+19:26:26.414275 IP pfsense.khubla.local.domain > cornfed.khubla.local.12758: 9783* 1/0/0 PTR cornfed.khubla.local. (79)
+19:26:26.414456 IP cornfed.khubla.local.55036 > pfsense.khubla.local.domain: 31968+ PTR? 199.77.168.192.in-addr.arpa. (45)
+19:26:26.415255 IP pfsense.khubla.local.domain > cornfed.khubla.local.55036: 31968* 1/0/0 PTR oscar.khubla.local. (77)
+19:26:26.416334 IP cornfed.khubla.local.ssh > oscar.khubla.local.56636: Flags [P.], seq 224:964, ack 1, win 1040, options [nop,nop,TS val 3361848015 ecr 949459910], length 740
+19:26:26.506536 IP oscar.khubla.local.56636 > cornfed.khubla.local.ssh: Flags [.], ack 964, win 4072, options [nop,nop,TS val 949461022 ecr 3361848015], length 0
+19:26:27.448128 IP cornfed.khubla.local.29179 > pfsense.khubla.local.domain: 57926+ PTR? 1.77.168.192.in-addr.arpa. (43)
+19:26:27.449243 IP pfsense.khubla.local.domain > cornfed.khubla.local.29179: 57926* 1/0/0 PTR pfsense.khubla.local. (77)
+19:26:27.449514 IP cornfed.khubla.local.ssh > oscar.khubla.local.56636: Flags [P.], seq 964:1832, ack 1, win 1040, options [nop,nop,TS val 3361849049 ecr 949461022], length 868
+19:26:27.529575 IP oscar.khubla.local.56636 > cornfed.khubla.local.ssh: Flags [.], ack 1832, win 4068, options [nop,nop,TS val 949462043 ecr 3361849049], length 0
+19:26:28.202259 ARP, Request who-has pfsense.khubla.local (Broadcast) tell 192.168.77.126, length 46
+19:26:28.477221 IP cornfed.khubla.local.10430 > pfsense.khubla.local.domain: 12039+ PTR? 126.77.168.192.in-addr.arpa. (45)
+19:26:28.477358 IP cornfed.khubla.local.ssh > oscar.khubla.local.56636: Flags [P.], seq 1832:2452, ack 1, win 1040, options [nop,nop,TS val 3361850076 ecr 949462043], length 620
+19:26:28.479257 IP pfsense.khubla.local.domain > cornfed.khubla.local.10430: 12039 NXDomain 0/0/0 (45)
+19:26:28.479366 IP cornfed.khubla.local.ssh > oscar.khubla.local.56636: Flags [P.], seq 2452:2592, ack 1, win 1040, options [nop,nop,TS val 3361850079 ecr 949462043], length 140
+19:26:28.552403 IP oscar.khubla.local.56636 > cornfed.khubla.local.ssh: Flags [.], ack 2452, win 4076, options [nop,nop,TS val 949463065 ecr 3361850076], length 0
+19:26:28.553645 IP oscar.khubla.local.56636 > cornfed.khubla.local.ssh: Flags [.], ack 2592, win 4091, options [nop,nop,TS val 949463066 ecr 3361850079], length 0
