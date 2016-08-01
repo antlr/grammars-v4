@@ -40,6 +40,7 @@
 		<module>fortran77</module>
 		<module>fusion-tables</module>
 		<module>gff3</module>
+		<module>gml</module>
 		<module>graphql</module>
 		<module>html</module>
 		<module>icalendar</module>
