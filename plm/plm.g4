@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2018, Tom Everett
+Copyright (c) 2013, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,232 +33,250 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar plm;
 
 
-character : apostrophe | nonquotecharacter;
-apostrophe: '\'';
-nonquotecharacter: letter | decimaldigit | '$' | specialcharacter | blank;
-
-letter : uppercaseletter | lowercaseletter;
-uppercaseletter : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' |
-'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' |
-'Y' | 'Z';
-lowercaseletter: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' |
-'m' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' |
-'y' | 'z';
-decimaldigit: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
-specialcharacter:  '+' | '-' | '*' | '/' | '<' | '>' | '=' | ':' | ';' | '.' | ',' |'(' | ')' | '@' | '_';
-
-token: delimiter | identifier | reservedword | numericconstant | string;
-
-delimiter: simpledelimiter | compounddelimiter;
-simpledelimiter: '+' | '-' | '*' | '/' | '<' | '>' | '=' | ':' | ';' | '.' | ',' | '(' |
-')' | '@';
-compounddelimiter: '<>' | '<=' | '>=' | ':=';
-
-firstidcharacter: letter | '_';
-identifier: firstidcharacter (letter | decimaldigit | '$' | '_' )*;
-
-
-numericconstant: binarynumber | octalnumber |decimalnumber | hexadecimalnumber |
-floatingpointnumber;
-binarynumber: binarydigit (binarydigit | '$')* 'B' | 'Q';
-octalnumber: octaldigit (octaldigit | '$')* ( 'O' | 'Q' );
-decimalnumber: decimaldigit (decimaldigit | '$')* ('D')?;
-hexadecimalnumber: decimaldigit (hexadecimaldigit| '$')* 'H';
-floatingpointnumber: digitstring fractionalpart (exponentpart)?;
-fractionalpart: ('.' digitstring)?;
-exponentpart: 'E' ('+' | '-')? digitstring;
-digitstring: decimaldigit (decimaldigit | '$')*;
-binarydigit: '0' | '1';
-octaldigit: binarydigit | '2' | '3' | '4' | '5' | '6' | '7';
-decimaldigit: octaldigit| '8' | '9';
-hexadecimaldigit: decimaldigit| 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
-
-string: '<string body element> [<string body element>]... ';
-
-stringbodyelement: nonquotecharacter | '"';
-plmtext: token | separator (token | separator)*;
-
-separator: blank | comment;
-comment: '/*' character* '*/';
-
-compilation: module [EOF];
-module: module name ':' simpledoblock;
-modulename : identifier;
-
-declaration: declarestatement | proceduredefinition;
-
-declarestatement: 'DECLARE' declareelementlist;
-declareelementlist: declareelement (',' declareelement)*;
-declareelement: factoredelement | unfactoredelement;
-unfactoredelement: variableelement | literalelement |labelelement;
-factoredelement: factoredvariableelement |factoredlabelelement;
-
-variableelement: variablenamespecifier (arrayspecifier)? variabletype | (variableattributes)?;
-variablenamespecifier: nonbasedname | basedname 'BASED' basespecifier;
-nonbasedname: variablename;
-basedname: variablename;
-variablename: identifier;
-basespecifier: identifier ('.' identifier)?;
-variableattributes: 'PUBLIC'? locator? initialization? | 'EXTERNAL'? constantattribute?;
-locator: 'AT' (expression);
-constantattribute: 'DATA';
-arrayspecifier: explicitdimension | implicitdimension;
-explicitdimension: numericconstant;
-implicitdimension: '*';
-
-variabletype: basictype | structuretype;
-basictype: 'Address' | 'BYTE' | 'HWORD' | 'DWORD' | 'QWORD' | 'CHARINT' |
-'OFFSET' | 'SHORTINT' | 'INTEGER' | 'REAL' | 'SELECTOR' |
-'POINTER' | 'OFFSET';
-
-labelelement: identifier 'LABEL' ('PUBLIC' | 'EXTERNAL')?;
-
-literalelement: identifier 'LITERALLY' string;
-
-factoredvariableelement: ( variablenamespecifier (',' variablenamespecifier)*) explicitdimension? variabletype variableattributes?;
-
-factoredlabelelement: (identifier (','<identifier>)*) 'LABEL' ('PUBLIC' | 'EXTERNAL')?;
-
-structuretype: 'STRUCTURE' (memberelement (',' memberelement)*);
-memberelement: unfactoredmember | factoredmember;
-unfactoredmember: membername (explicitdimension)? variabletype;
-membername: identifier;
-factoredmember: (membername(',' membername)*) explicitdimension? variabletype;
-
-proceduredefinition:procedurestatement (declaration)? (unit*)? ending;
-procedurestatement: procedurename ':' 'PROCEDURE' formalparameterlist? proceduretype? procedureattributes?;
-procedurename: identifier;
-proceduretype: basictype;
-formalparameterlist: formalparameter (',' formalparameter)*;
-formalparameter: identifier;
-procedureattributes: ('EXTERNAL' | 'PUBLIC' | interrupt | 'REENTRANT')+;
-
-locator: 'AT' expression;
-
-interrupt: 'INTERRUPT';
-
-initialization: ('INITIAL' | 'DATA') (initialvalue (',' initialvalue)*);
-initialvalue: expression | string;
-
-unit : conditionalclause | doblock | basicstatement | labeldefinition unit;
-basicstatement : assignmentstatement | callstatement | gotostatement | nullstatement | returnstatement | microprocessordependentstatement;
-
-scopingstatement : simpledostatement | docasestatement | dowhilestatement | iterativedostatement | endstatement | procedurestatement;
-
-labeldefinition: identifier;
-
-assignmentstatement: leftpart '=' expression;
-
-leftpart : variablereference (',' variablereference)*;
-
-callstatement: 'CALL'  simplevariable parameterlist?;
-
-parameterlist: expression (',' expression)*;
-
-simplevariable:  identifier | identifier '.' identifier;
-
-gotostatement: ('GOTO' | 'GO TO') identifier;
-
-nullstatement: ;
-
-returnstatement: typedreturn | untypedreturn;
-
-typedreturn: 'RETURN' expression;
-
-untypedreturn: 'RETURN';
-
-microprocessordependentstatement: disablestatement | enablestatement | haltstatement | causeinterruptstatement;
-
-disablestatement: 'DISABLE';
-enablestatement: 'ENABLE';
-haltstatement: 'HALT';
-
-causeinterruptstatement: 'CAUSE$INTERRUPT' numericconstant;
-
-simpledostatement: 'DO';
-
-docasestatement: 'DO CASE' expression;
-
-dowhilestatement: 'DO WHILE' expression;
-
-iterativedostatement: 'DO' indexpart topart bypart?;
-
-indexpart: indexvariable '=' startexpression;
-
-topart: 'TO' boundexpression;
-
-bypart: 'BY' stepexpression;
-
-indexvariable: simplevariable;
-
-startexpression :expression;
-
-boundexpression:expression;
-
-stepexpression:expression;
-
-endstatement: 'END' identifier?;
-
-procedurestatement: procedurename ':' 'PROCEDURE' formalparameterlist? proceduretype? procedureattributes?;
-
-conditionalclause: ifcondition trueunit | ifcondition trueelement 'ELSE' falseelement;
-ifcondition: 'IF' expression 'THEN' trueunit;
-
-trueelement: (labeldefinition*)? doblock | (labeldefinition*)? basicstatement;
-
-falseelement: unit;
-trueunit: unit;
-
-doblock: simpledoblock | docaseblock | dowhileblock | iterativedoblock;
-
-simpledoblock: simpledostatement (declaration*)? (unit*)? ending;
-
-ending: (labeldefinition*)? endstatement;
-
-docaseblock: docasestatement (unit*)? ending;
-
-dowhileblock: dowhilestatement (unit*)? ending;
-
-iterativedoblock: iterativedostatement (unit*)?ending;
-
-primary: constant | variablereference | locationreference | subexpression;
-
-subexpression: expression;
-
-constant: numericconstant | string;
-
-variablereference: datareference | functionreference;
-datareference: name subscript? memberspecifier?;
-subscript:expression;
-memberspecifier: '.' membername subscript?;
-functionreference: name actualparameters?;
-actualparameters: expression (',' expression)*;
-membername: identifier;
-name: identifier;
-locationreference: '@' constantlist | '@' variablereference;
-constantlist: constant (',' constant)*;
-operator: logicaloperator | relationaloperator | arithmeticoperator;
-logicaloperator: 'AND' | 'OR' | 'NOT' | 'XOR';
-relationaloperator: '<' | '>' | '<=' | '>=' | '<>' | '=';
-arithmeticoperator: '+' | '-' | 'PLUS' | 'MINUS' | '*' | '/' | 'MOD';
-
-expression: logicalexpression | embeddedassignment;
-embeddedassignment: variablereference ':=' logicalexpression;
-logicalexpression: logicalfactor | logicalexpression oroperator logicalfactor;
-oroperator: 'OR' | 'XOR';
-logicalfactor: logicalsecondary | logicalfactor andoperator logicalsecondary;
-andoperator: 'AND';
-logicalsecondary: notoperator? logicalprimary;
-notoperator: 'NOT';
-logicalprimary: arithmeticexpression (relationaloperator arithmeticexpression)?;
-relationaloperator: '<' | '>' | '<=' | '>=' | '<>' | '=';
-arithmeticexpression: term | arithmeticexpression addingoperator term;
-addingoperator: '+' | '-' | 'PLUS' | 'MINUS';
-term: secondary | term multiplyingoperator secondary;
-multiplyingoperator: '*' | '/' | 'MOD';
-secondary: (unaryminus | unaryplus)? primary;
-unaryminus: '-';
-unaryplus: '+';
+<character>::= <apostrophe> | <non-quote character>;
+<apostrophe>::= '\'';
+<non-quote character>::= <letter> | <decimal digit> | $ | <special character> | blank;
+<letter>::= <uppercase letter> | <lowercase letter>;
+<uppercase letter>::= A | B | C | D | E | F | G | H | I | J | K | L |
+M | N | O | P | Q | R | S | T | U | V | W | X |
+Y | Z;
+<lowercase letter>::= a | b | c | d | e | f | g | h | i | j | k | l |
+m | n | o | p | q | r | s | t | u | v | w | x |
+y | z;
+<decimal digit>::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+<special character>::= + | - | * | / | < | > | = | : | ; | . | , |( | ) | @ | _;
+
+<token>::= <delimiter> | <identifier> | <reserved word> | <numeric constant> | <string>;
+
+<delimiter>::= <simple delimiter> | <compound delimiter>;
+<simple delimiter>::= + | - | * | / | < | > | = | : | ; | . | , | ( |
+) | @;
+<compound delimiter>::= <> | <= | >= | :=;
+
+<first id character>::= <letter> | _;
+<identifier>::= <first id character> [<letter> |c<decimal digit> | $ | _ ]...
+
+
+<numeric constant>::= <binary number> | <octal number> |<decimal number> | <hexadecimal number> |
+<floating point number>;
+<binary number>::= <binary digit> [<binary digit> | $]... B | Q;
+<octal number>::= <octal digit> [<octal digit> | $]... { O | Q };
+<decimal number>::= <decimal digit> [<decimal digit> | $]... [D];
+<hexadecimal number>::= <decimal digit> [<hexadecimal digit>
+| $]... H;
+<floating point number>::= <digit string> <fractional part>
+[<exponent part>];
+<fractional part>::= [<.digit string>];
+<exponent part>::= E [+ | -] <digit string>;
+<digit string>::= <decimal digit> [<decimal digit> | $]...;
+<binary digit>::= 0 | 1;
+<octal digit>::= <binary digit> | 2 | 3 | 4 | 5 | 6 | 7;
+<decimal digit>::= <octal digit> | 8 | 9;
+<hexadecimal digit>::= <decimal digit> | A | B | C | D | E | F;
+
+<string>::= '<string body element> [<string body element>]... ';
+<string body element>::= <non-quote character> |";
+<pl/m text>::= <token> | <separator> [<token> | <separator>]...;
+<separator>::= blank | <comment>;
+<comment>::= /* [<character>]... */;
+
+<compilation>::= <module> [EOF];
+<module>::= <module name>:<simple do block>;
+<module name>::= <identifier>;
+
+<declaration>::= <declare statement> | <procedure definition>;
+
+<declare statement>::= DECLARE <declare element list>;
+<declare element list>::= <declare element>[,<declare element>]...;
+<declare element>::= <factored element> | <unfactored element>;
+<unfactored element>::= <variable element> | <literal element> |
+<label element>;
+<factored element>::= <factored variable element> |;
+<factored label element>
+
+<variable element>::= <variable name specifier> [<array specifier>]
+<variable type> | [<variable attributes>];
+<variable name specifier>::= <non-based name> |
+<based name> BASED <base specifier>;
+<non-based name>::= <variable name>;
+<based name>::= <variable name>;
+<variable name>::= <identifier>;
+<base specifier>::= <identifier>[.<identifier>];
+<variable attributes>::= [PUBLIC] [<locator>][<initialization>] |
+[EXTERNAL] [<constant attribute>];
+<locator>::= AT(<expression>);
+<constant attribute>::= DATA;
+<array specifier>::= <explicit dimension> | <implicit dimension>;
+<explicit dimension>::= (<numeric constant>);
+<implicit dimension>::= (*);
+
+<variable type>::= <basic type> | <structure type>;
+<basic type>::= Address | BYTE | HWORD | DWORD | QWORD | CHARINT |
+OFFSET | SHORTINT | INTEGER | REAL | SELECTOR |
+POINTER | OFFSET;
+
+<label element>::= <identifier> LABEL [PUBLIC | EXTERNAL];
+
+<literal element>::= <identifier> LITERALLY <string>;
+
+<factored variable element>::= ( <variable name specifier>
+[,<variable name specifier>]...)
+[<explicit dimension>] <variable type>
+[<variable attributes>];
+
+<factored label element>::= (<identifier> [,<identifier>]...)
+LABEL [PUBLIC | EXTERNAL];
+
+<structure type>::= STRUCTURE (<member element>
+[,<member element>]...);
+<member element>::= <unfactored member> | <factored member>;
+<unfactored member>::= <member name> [<explicit dimension>]
+<variable type>;
+<member name>::= <identifier>;
+<factored member>::= (<member name>(,<member name>)...)
+[<explicit dimension>] <variable type>;
+
+<procedure definition>::= <procedure statement> [<declaration>...]
+[<unit>...] <ending>;
+<procedure statement>::= <procedure name> : PROCEDURE;
+[<formal parameter list>] [<procedure type>]
+[<procedure attributes>];
+<procedure name>::= <identifier>;
+<procedure type>::= <basic type>;
+<formal parameter list>::= (<formal parameter>
+[,<formal parameter>]...);
+<formal parameter>::= <identifier>;
+<procedure attributes>::= {EXTERNAL | PUBLIC;
+
+<locator>::= AT (<expression>);
+
+<interrupt>::= INTERRUPT;
+
+<initialization>::= {INITIAL | DATA} (<initial value>
+[,<initial value>]...);
+<initial value>::= <expression> | <string>;
+
+<unit>::= <conditional clause> | <do block> | <basic statement> |
+<label definition><unit>
+<basic statement>::= <assignment statement> | <call statement> |
+<goto statement> | <null statement> |
+<return statement> |
+<microprocessor dependent statement>
+<scoping statement>::= <simple do statement> | <do-case statement> |
+<do-while statement> |
+<iterative do statement> | <end statement> |
+<procedure statement>
+<label definition>::= <identifier>:
+
+<assignment statement>::= <left part >=<expression>;
+<left part>::= <variable reference> [,<variable reference>]...
+
+<call statement>::= CALL <simple variable>[<parameter list>];
+<parameter list>::= (<expression>[,<expression>]...)
+<simple variable>::= <identifier> | <identifier>.<identifier>
+
+<goto statement>::= {GOTO | GO TO} <identifier>
+
+<null statement>::= ;
+
+<return statement>::= <typed return> | <untyped return>
+<typed return>::= RETURN <expression>;
+<untyped return>::= RETURN;
+
+<microprocessor dependent statement>::= <disable statement> |
+<enable statement> |
+<halt statement> |
+<cause interrupt statement>
+<disable statement>::= DISABLE;
+<enable statement>::= ENABLE;
+<halt statement>::= HALT;
+<cause interrupt statement>::= CAUSE$INTERRUPT (numeric constant);
+
+<simple do statement>::= DO;
+
+<do-case statement>::= DO CASE <expression>;
+
+<do-while statement>::= DO WHILE <expression>;
+
+<iterative do statement>::= DO <index part> <to part> [<by part>];
+<index part>::= <index variable>=<start expression>
+<to part>::= TO <bound expression>
+<by part>::= BY <step expression>
+<index variable>::= <simple variable>
+<start expression>::= <expression>
+<bound expression>::= <expression>
+<step expression>::= <expression>
+
+<end statement>::= END [<identifier>];
+
+<procedure statement>::= <procedure name> : PROCEDURE
+[<formal parameter list>] [<procedure type>]
+[<procedure attributes>];
+
+<conditional clause>::= <if condition><true unit> |
+<if condition><true element> ELSE
+<false element>
+<if condition>::= IF <expression> THEN <true unit>
+<true element>::= [<label definition>...] <do block> |
+[<label definition>...] <basic statement>
+<false element>::= <unit>
+<true unit>::= <unit>
+
+<do block>::= <simple do block> | <do-case block> | <do-while block> |
+<iterative do block>
+
+<simple do block>::= <simple do statement>[<declaration>...]
+[<unit>...]<ending>
+<ending>::= [<label definition>...]<end statement>
+
+<do-case block>::= <do-case statement> [<unit>...] <ending>
+
+<do-while block>::= <do-while statement> [<unit>...] <ending>
+
+<iterative do block>::= <iterative do statement> [<unit>...] <ending>
+<primary>::= <constant> | <variable reference> | <location reference>
+| <subexpression>
+<subexpression>::= (<expression>)
+
+<constant>::= <numeric constant> | <string>
+
+<variable reference>::= <data reference> | <function reference>
+<data reference>::= <name>[<subscript>] [<member specifier>]
+<subscript>::= (<expression>)
+<member specifier>::= .<member name>[<subscript>]
+<function reference>::= <name>[<actual parameters>]
+<actual parameters>::= (<expression>[,<expression>]...)
+<member name>::= <identifier>
+<name>::= <identifier>
+<location reference>::= @<constant list> | @<variable reference>
+<constant list>::= (<constant>[,<constant>]...)
+<operator>::= <logical operator> | <relational operator> |
+<arithmetic operator>
+<logical operator>::= AND | OR | NOT | XOR
+<relational operator>::= < | > | <= | >= | <> | =
+<arithmetic operator>::= + | - | PLUS | MINUS | * | / | MOD
+
+<expression>::= <logical expression> | <embedded assignment>
+<embedded assignment>::= <variable reference> := <logical expression>
+<logical expression>::= <logical factor> | <logical expression>
+<or operator> <logical factor>
+<or operator>::= OR | XOR
+<logical factor>::= <logical secondary> | <logical factor>
+<and operator> <logical secondary>
+<and operator>::= AND
+<logical secondary>::= [<not operator>] <logical primary>
+<not operator>::= NOT
+<logical primary>::= <arithmetic expression> [<relational operator>
+<arithmetic expression>]
+<relational operator>::= < | > | <= | >= | <> | =
+<arithmetic expression>::= <term> | <arithmetic expression>
+<adding operator> <term>
+<adding operator>::= + | - | PLUS | MINUS
+<term>::= <secondary> | <term> <multiplying operator> <secondary>
+<multiplying operator>::= * | / | MOD
+<secondary>::= [<unary minus> | <unary plus>] <primary>
+<unary minus>::= -
+<unary plus>::= +
 
 
 WS
