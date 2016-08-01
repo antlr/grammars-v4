@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2016, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar gml;
 
 graph
-   : list
+   : kv +
    ;
 
 list
-   : kv +
+   : '[' kv + ']'
    ;
 
 kv
@@ -47,6 +47,7 @@ kv
 value
    : integer
    | real
+   | stringliteral
    | str
    | list
    ;
@@ -60,16 +61,25 @@ integer
    ;
 
 real
-   : SIGN? DIGIT* '.' DIGIT* mantissa
+   : REAL
    ;
 
 str
+   : VALUE
+   ;
+
+stringliteral
    : STRINGLITERAL
    ;
 
 
 STRINGLITERAL
    : '"' ~ '"'* '"'
+   ;
+
+
+REAL
+   : SIGN? DIGIT* '.' DIGIT + MANTISSA?
    ;
 
 
@@ -82,7 +92,8 @@ DIGIT
    : [0-9]
    ;
 
-mantissa
+
+MANTISSA
    : 'E' SIGN DIGIT
    ;
 
