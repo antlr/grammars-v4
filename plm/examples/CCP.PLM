@@ -1,0 +1,423 @@
+$Q=1
+2900H: DECLARE BDOS LITERALLY '3206H', TRAN LITERALLY '100H';
+ /*  C O N S O L E   C O M M A N D   P R O C E S S O R (C C P)
+
+                           COPYRIGHT (C) GARY A. KILDALL
+                                    JUNE, 1975
+                                                        */
+
+ /* **************** LIBRARY PROCEDURES FOR DISKIO ************* */
+
+MON1: PROCEDURE(F,A);
+    DECLARE F BYTE,
+    A ADDRESS;
+    GO TO BDOS;
+    END MON1;
+
+MON2: PROCEDURE(F,A) BYTE;
+    DECLARE F BYTE,
+    A ADDRESS;
+    GO TO BDOS;
+    END MON2;
+
+READRDR: PROCEDURE BYTE;
+    /* READ FROM CURRENTLY ASSIGNED READER DEVICE */
+    RETURN MON2(3,0);
+    END READRDR;
+
+READCHAR: PROCEDURE BYTE;
+    RETURN MON2(1,0);
+    END READCHAR;
+
+DECLARE
+    TRUE LITERALLY '1',
+    FALSE LITERALLY '0',
+    FOREVER LITERALLY 'WHILE TRUE',
+    CR LITERALLY '13',
+    LF LITERALLY '10',
+    WHAT LITERALLY '63';
+
+PRINTCHAR: PROCEDURE(CHAR);
+    DECLARE CHAR BYTE;
+    CALL MON1(2,CHAR);
+    END PRINTCHAR;
+
+CRLF: PROCEDURE;
+    CALL PRINTCHAR(CR);
+    CALL PRINTCHAR(LF);
+    END CRLF;
+
+PRINT: PROCEDURE(A);
+    DECLARE A ADDRESS;
+    /* PRINT THE STRING STARTING AT ADDRESS A UNTIL THE
+    NEXT DOLLAR SIGN IS ENCOUNTERED */
+    CALL CRLF;
+    CALL MON1(9,A);
+    END PRINT;
+
+READ: PROCEDURE(A);
+    DECLARE A ADDRESS;
+    /* READ INTO BUFFER AT A+2 */
+    CALL MON1(10,A);
+    END READ;
+
+
+DECLARE DCNT BYTE;
+
+INITIALIZE: PROCEDURE;
+    CALL MON1(13,0);
+    END INITIALIZE;
+
+SELECT: PROCEDURE(D);
+    DECLARE D BYTE;
+    CALL MON1(14,D);
+    END SELECT;
+
+OPEN: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    DCNT = MON2(15,FCB);
+    END OPEN;
+
+CLOSE: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    DCNT = MON2(16,FCB);
+    END CLOSE;
+
+SEARCH: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    DCNT = MON2(17,FCB);
+    END SEARCH;
+
+SEARCHN: PROCEDURE;
+    DCNT = MON2(18,0);
+    END SEARCHN;
+
+DELETE: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    CALL MON1(19,FCB);
+    END DELETE;
+
+DISKREAD: PROCEDURE(FCB) BYTE;
+    DECLARE FCB ADDRESS;
+    RETURN MON2(20,FCB);
+    END DISKREAD;
+
+DISKWRITE: PROCEDURE(FCB) BYTE;
+    DECLARE FCB ADDRESS;
+    RETURN MON2(21,FCB);
+    END DISKWRITE;
+
+MAKE: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    DCNT = MON2(22,FCB);
+    END MAKE;
+
+RENAME: PROCEDURE(FCB);
+    DECLARE FCB ADDRESS;
+    CALL MON1(23,FCB);
+    END RENAME;
+
+DECLARE (MAXLEN,COMLEN) BYTE, /* MAXIMUM AND CURRENT LENGTH */
+    COMBUFF(128) BYTE,                /* COMMAND BUFFER */
+    (TCBP,CBP) BYTE;                  /* BUFFER POINTERS */
+
+READCOM: PROCEDURE;
+    /* READ INTO COMMAND BUFFER */
+    MAXLEN = 128;
+    CALL READ(.MAXLEN);
+    END READCOM;
+
+
+
+ /* **************** END OF LIBRARY PROCEDURES ***************** */
+
+
+BREAK$KEY: PROCEDURE BYTE;
+    RETURN MON2(11,0);
+    END BREAK$KEY;
+
+LIFTHEAD: PROCEDURE;
+    /* EXPLICIT LIFT IF SHUGART 3900 DRIVE */
+    CALL MON1(12,0);
+    END LIFTHEAD;
+
+CSELECT: PROCEDURE BYTE;
+    /* GET CURRENTLY SELECTED DRIVE NUMBER */
+    RETURN MON2(25,0);
+    END CSELECT;
+
+MOVE: PROCEDURE(A,B,L);
+    /* MOVE FROM A TO B FOR L BYTES (L <= 255) */
+    DECLARE (A, B) ADDRESS,
+    (S BASED A, D BASED B, L) BYTE;
+        DO WHILE (L := L - 1) <> 255;
+        D = S; B = B + 1; A = A + 1;
+        END;
+    END MOVE;
+
+ERROR: PROCEDURE;
+    CALL CRLF;
+    CALL PRINT(.'FILE ERROR$');
+    CALL CRLF;
+    END ERROR;
+
+DECLARE BUFFA ADDRESS INITIAL(80H),
+    (BUFF BASED BUFFA) (128) BYTE;
+
+GETBUFF: PROCEDURE(I) BYTE;
+    DECLARE I BYTE;
+    RETURN BUFF(I);
+    END GETBUFF;
+
+    /* DISK I/O BUFFER */
+
+DECLARE COMFCB(32) BYTE, COMREC BYTE; /* COMMAND FILE CONTROL BLK */
+
+GETCOM: PROCEDURE(I) BYTE;
+    DECLARE I BYTE;
+    RETURN COMBUFF(I);
+    END GETCOM;
+
+
+COMERR: PROCEDURE(I);
+    /* ERROR IN COMMAND STRING STARTING AT POSITION I */
+    DECLARE (I,J) BYTE;
+    CALL CRLF;
+        DO WHILE (J := GETCOM(I)) <> ' ' AND I < COMLEN;
+        I = I + 1;
+        CALL PRINTCHAR(J);
+        END;
+    CALL PRINTCHAR(WHAT);
+    CALL CRLF;
+    END COMERR;
+
+DECLARE INTVEC DATA /* INTRINSIC FUNCTIONS */
+    (7,3,'DIRECT',0FFH,         /* LIST DIRECTORY ENTRIES */
+     6,3,'ERASE',0FFH,         /* DELETE FILES */
+     5,2,'TYPE',0FFH,           /* TYPE FILE CONTENTS */
+     5,3,'SAVE',0FFH,           /* SAVE MEMORY */
+    3,2,'A:',0FFH,              /* DISK A */
+    3,2,'B:',0FFH,              /* DISK B */
+     7,2,'ASSIGN',0FFH,         /* ASSIGN DEVICES */
+    7,3,'RENAME',0FFH,          /* RENAME A FILE */
+      0);
+
+
+DECLARE INT BYTE; /* INTRINSIC FUNCTION NUMBER SET BELOW */
+
+INTRINSIC: PROCEDURE;
+    /* THIS PROCEDURE SEARCHES THE INTVEC FOR A BUILT-IN
+    COMMAND.  THE INTRINSIC NUMBER IS STORED IN 'INT' UPON EXIT (255
+    INDICATES NOT FOUND) */
+    DECLARE (I,MAX,MIN,Q,C,NXT) BYTE;
+
+    NEXTINT: PROCEDURE BYTE;
+        RETURN INTVEC(I:=I+1);
+        END NEXTINT;
+
+    INT, I = 255;
+        DO WHILE (MAX := NEXTINT) > 0;
+        MIN = NEXTINT; NXT = I + MAX;
+        INT = INT + 1; C = 0;
+            DO WHILE C < COMLEN AND (Q := GETCOM (C)) = NEXTINT;
+            C = C + 1;
+            END;
+        IF (Q = ' ' OR C >= COMLEN) AND C >= MIN THEN
+            DO; CBP = C; RETURN;
+            END;
+        I = NXT;
+        END;
+    /* OTHERWISE NOT FOUND */
+    INT = 255;
+    END INTRINSIC;
+
+DEBLANK: PROCEDURE;
+    /* DEBLANK THE COMMAND BUFFER */
+        DO WHILE GETCOM(CBP) = ' ' AND CBP < COMLEN;
+        CBP = CBP + 1;
+        END;
+    END DEBLANK;
+
+FILLFCB: PROCEDURE;
+    /* READ THE FILENAME AND EXT FIELDS.  PLACE INTO 'COMFCB' */
+    DECLARE (I, J, CHAR) BYTE;
+
+    PUTFCB: PROCEDURE(I);
+        DECLARE I BYTE;
+        COMFCB(J:=J+1) = I;
+        END PUTFCB;
+
+    SCANC: PROCEDURE(C,L);
+        /* SCAN FOR THE CHARACTER C AND FILL FCB THRU POSITION L */
+        DECLARE (C,L) BYTE;
+            DO WHILE J < L AND (TCBP:=TCBP+1) < COMLEN AND
+            (CHAR := GETCOM(TCBP)) <> C AND CHAR <> ' ';
+            IF CHAR = '*' THEN
+                DO; CHAR = 63; /* QUESTION MARK */
+                TCBP = TCBP - 1;
+                END;
+            CALL PUTFCB(CHAR);
+            END;
+        IF CHAR = '*' THEN CHAR = GETCOM(TCBP:=TCBP+1);
+        END SCANC;
+
+    /* DEBLANK BUFFER */
+    CALL DEBLANK;
+    TCBP = CBP - 1;
+
+    COMFCB,COMREC,J = 0;
+    CHAR = ' ';
+        DO WHILE J <= 12;
+        IF J = 11 THEN CHAR = 0;
+        CALL PUTFCB(CHAR);
+        END;
+
+    J = 0;
+    CALL SCANC('.',8);
+    J = 8;
+    IF CHAR = '.' THEN
+        CALL SCANC('=',11);
+    END FILLFCB;
+
+
+SEARCHF: PROCEDURE;
+    /* SEARCH FOR COMFCB */
+        CALL SEARCH(.COMFCB);
+        END SEARCHF;
+
+
+TRANSIENT: PROCEDURE(A);
+    DECLARE A ADDRESS;
+    /* BRANCH TO TRANSIENT ROUTINE WITH THE ADDRESS OF COMFCB */
+    GO TO TRAN;
+    END TRANSIENT;
+
+CALL INITIALIZE;
+    /* ENABLE THE INTERRUPT SYSTEM */
+    ENABLE;
+
+BREAK:
+    CALL CRLF;
+    /* ARRIVE HERE ON BREAK KEY OR BACKSPACE TO BEGINNING OF LINE */
+  DO;  /* MONITOR COMMAND PROCESSOR */
+  DECLARE (I,J) BYTE;
+  DECLARE LA ADDRESS;
+
+    INCLA: PROCEDURE;
+        /* UTILITY PROCEDURE TO INCREMENT THE LOAD ADDRESS */
+        LA = LA + 80H;
+        END INCLA;
+
+    DO FOREVER;
+    /* SET THE DMA ADDRESS AT 80H */
+    CALL MON1(26,80H);
+    CALL LIFTHEAD;
+    CALL PRINTCHAR('A' + CSELECT);
+    CALL PRINTCHAR ('>');
+    CALL READCOM;
+    CALL CRLF;
+    IF COMLEN > 0 THEN
+        DO;
+        CBP = 0;
+        CALL INTRINSIC;
+        /* MAY BE A SAVE OR ASSIGN COMMAND */
+        IF INT = 3 OR INT = 6 THEN /* SCAN NUMBER */
+        DO;
+        I = 0;
+            DO WHILE (J := GETCOM(CBP:=CBP+1)) <> ' ' AND CBP<COMLEN;
+            I = SHL(I,3) + SHL(I,1) + (J - '0');
+            END;
+        END;
+        CALL FILLFCB;
+        IF INT = 0 THEN /* DIRECTORY */
+            DO;
+            CALL SEARCHF;
+                DO WHILE DCNT <> 255;
+                    DO I=1 TO 12;
+                    IF I = 9 THEN CALL PRINTCHAR(' ');
+                    CALL PRINTCHAR
+                      (GETBUFF((ROR(DCNT,3) AND 110$0000B)+I));
+                     IF BREAK$KEY THEN GO TO BREAK;
+                    END;
+                CALL CRLF;
+                CALL SEARCHN;
+                END;
+            END; ELSE
+        IF INT = 1 THEN /* DELETE COMMAND */
+            DO;
+            CALL DELETE(.COMFCB);
+            END; ELSE
+        IF INT = 2 THEN /* TYPE COMMAND */
+            DO;
+            CALL SEARCHF;
+            IF DCNT = 255 THEN CALL COMERR(CBP); ELSE
+              DO; CALL OPEN(.COMFCB);
+                DO WHILE DISKREAD(.COMFCB) = 0;
+                I = 0;
+                  DO WHILE I < 128 AND (J := GETBUFF(I)) <> 1AH;
+                  CALL PRINTCHAR(J); I = I + 1;
+                    IF BREAK$KEY THEN GO TO BREAK;
+                  END;
+                END; /* DISKREAD */
+              END; /* OF FILE PRESENT */
+            END; ELSE
+        IF INT = 3 THEN /* SAVE */
+            DO;
+            CALL DELETE(.COMFCB);
+            CALL MAKE(.COMFCB);
+            CALL OPEN(.COMFCB);
+            IF DCNT = 255 THEN /* ERROR */ CALL ERROR; ELSE
+                DO; /* SAVE I PAGES */
+                LA = TRAN;
+                /* CHANGE I TO NUMBER OF BLOCKS OF 128 */
+                I = SHL(I,1);
+                    DO WHILE (I:=I-1) <> 255;
+                    CALL MOVE(LA,80H,128); CALL INCLA;
+                    IF DISKWRITE(.COMFCB) <> 0 THEN
+                        DO; CALL ERROR; I = 0;
+                        END;
+                    END;
+                END;
+            CALL CLOSE(.COMFCB);
+            IF DCNT = 255 THEN CALL ERROR;
+            END; ELSE
+        IF INT = 6 THEN /* ASSIGN COMMAND */
+            CALL MON1(8,I);
+        ELSE
+    IF INT = 7 THEN /* RENAME FILE */
+        DO; CALL MOVE(.COMFCB,.COMFCB+16,16);
+        CBP = TCBP+1; CALL FILLFCB;
+        CALL RENAME(.COMFCB);
+        END; ELSE
+        /* LOOK FOR THE COMMAND ON DISK */
+            DO; /* MAY BE A DISK PREFIX */
+            IF INT <= 5 THEN /* A: = 4, B: = 5 */
+                CALL SELECT(INT - 4);
+            IF COMLEN > CBP THEN
+            DO; CALL FILLFCB;
+            CALL MOVE(.'COM',.COMFCB+9,3);
+            CALL OPEN(.COMFCB);
+            IF DCNT = 255 THEN CALL COMERR(0); ELSE
+                DO;
+                LA = TRAN;
+                    DO WHILE (I := DISKREAD(.COMFCB)) = 0;
+                    CALL MOVE(80H,LA,128); CALL INCLA;
+                    END;
+                IF I = 1 THEN
+                    DO; /* LOAD OK */
+                    CBP = TCBP;
+                    CALL FILLFCB;
+                    /* SET-UP FCB DIRECTLY AHEAD OF BUFF */
+                    CALL MOVE(.COMFCB,5CH,33);
+                    CALL LIFTHEAD;
+                    CALL TRANSIENT(5CH);
+                    END; ELSE CALL ERROR;
+                END;
+            END;
+            END;
+        END;
+    END; /* OF DO FOREVER */
+  END; /* OF MONITOR COMMAND PROCESSOR */
+
+EOF
+4=	ë!©=Ny *4=	ë!¨=NyÉ!U=~··.ªw#6 Íj4É!U=4>?–Òþ56ÿÉ~æ
