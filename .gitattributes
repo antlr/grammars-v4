@@ -1,2 +1,2 @@
-(^|/)examples/ linguist-vendored
-_support/ linguist-vendored
+**/examples/* linguist-vendored
+_support/* linguist-vendored
