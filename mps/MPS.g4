@@ -5,7 +5,7 @@
 *
 */
 
-grammar MPS;
+grammar mps;
 
 modell
    : firstrow rows columns rhs ranges? bounds? endata EOF
