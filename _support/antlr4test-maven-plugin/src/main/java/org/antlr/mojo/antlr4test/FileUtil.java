@@ -27,7 +27,10 @@
  */
 package org.antlr.mojo.antlr4test;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,6 +73,26 @@ public class FileUtil {
          return ret;
       } else {
          return null;
+      }
+   }
+
+   public static List<String> getNonEmptyLines(File file) throws IOException {
+      List<String> nonEmptyLines = new ArrayList<String>();
+      BufferedReader br = null;
+      try {
+         br = new BufferedReader(new FileReader(file));
+         String line = br.readLine();
+         while (line != null) {
+            if (!"".equals(line.trim())) {
+               nonEmptyLines.add(line);
+            }
+            line = br.readLine();
+         }
+         return nonEmptyLines;
+      } finally {
+         if (br != null) {
+            br.close();
+         }
       }
    }
 }
