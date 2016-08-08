@@ -28,6 +28,7 @@
 package test.org.antlr.mojo.antlr4test;
 
 import java.io.File;
+import java.net.URL;
 
 import org.antlr.mojo.antlr4test.GrammarTestMojo;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
@@ -61,23 +62,19 @@ public class TestGrammarTestMojo extends AbstractMojoTestCase {
     * Basic test of execution
     */
    public void testExecution() throws Exception {
-      try {
          final File pom = getTestFile(POMFILE);
          assertNotNull(pom);
          assertTrue(pom.exists());
          final GrammarTestMojo grammarTestMojo = (GrammarTestMojo) lookupMojo(GOAL, pom);
          assertNotNull(grammarTestMojo);
-         // grammarTestMojo.execute();
-      } catch (final Exception e) {
-         e.printStackTrace();
-      }
+         grammarTestMojo.setBaseDir(new File(getAbsolutePath("../..")).getCanonicalFile());
+         grammarTestMojo.execute();
    }
 
    /**
     * Basic test of instantiation
     */
    public void testInstatiation() throws Exception {
-      try {
          final File pom = getTestFile(POMFILE);
          assertNotNull(pom);
          assertTrue(pom.exists());
@@ -86,8 +83,13 @@ public class TestGrammarTestMojo extends AbstractMojoTestCase {
          assertTrue(grammarTestMojo.isVerbose() == true);
          assertTrue(grammarTestMojo.getExampleFiles().compareTo("src/test/resources/examples/") == 0);
          assertTrue(grammarTestMojo.getEntryPoint().compareTo("equation") == 0);
-      } catch (final Exception e) {
-         e.printStackTrace();
-      }
    }
+
+   protected String getAbsolutePath(String relativePath) {
+      final ClassLoader classLoader = getClass().getClassLoader();
+      final URL resource = classLoader.getResource(".");
+      final File file = new File(resource.getFile(), relativePath);
+      return file.getAbsolutePath();
+   }
+
 }
