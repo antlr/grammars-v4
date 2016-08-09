@@ -1,1 +1,0 @@
-line 1:29 extraneous input 'literal-backslash-n' expecting {<EOF>, 'if', 'while', 'do', ';', '{', '(', STRING, INT}
