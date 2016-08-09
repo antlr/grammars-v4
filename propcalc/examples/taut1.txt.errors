@@ -1,2 +1,0 @@
-line 1:2 extraneous input '|-' expecting {<EOF>, '^', 'v', LETTER}
-line 1:11 extraneous input ')' expecting {<EOF>, '^', 'v', LETTER}
