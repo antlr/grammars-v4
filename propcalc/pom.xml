@@ -36,7 +36,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>expression</entryPoint>
+					<entryPoint>proposition</entryPoint>
 					<grammarName>propcalc</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
