@@ -36,7 +36,6 @@ import java.net.URLClassLoader;
 import java.util.List;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
@@ -56,6 +55,7 @@ import org.apache.maven.plugins.annotations.Parameter;
  */
 @Mojo(name = "test", defaultPhase = LifecyclePhase.TEST, requiresProject = true, threadSafe = false)
 public class GrammarTestMojo extends AbstractMojo {
+   protected static final String ERRORS_SUFFIX = ".errors";
    /**
     * grammar Name
     */
@@ -230,8 +230,10 @@ public class GrammarTestMojo extends AbstractMojo {
       final Constructor<?> lexerConstructor = lexerClass.getConstructor(CharStream.class);
       final Constructor<?> parserConstructor = parserClass.getConstructor(TokenStream.class);
       System.out.println("Parsing :" + grammarFile.getAbsolutePath());
-      ANTLRFileStream antlrFileStream = new ANTLRFileStream(grammarFile.getAbsolutePath(), "UTF-8");
+      ANTLRFileStream antlrFileStream = new ANTLRFileStream(grammarFile.getAbsolutePath());
+      final AssertErrorsErrorListener assertErrorsErrorListener = new AssertErrorsErrorListener();
       Lexer lexer = (Lexer) lexerConstructor.newInstance(antlrFileStream);
+      lexer.addErrorListener(assertErrorsErrorListener);
       final CommonTokenStream tokens = new CommonTokenStream(lexer);
       if (verbose) {
          tokens.fill();
@@ -243,9 +245,10 @@ public class GrammarTestMojo extends AbstractMojo {
        * get parser
        */
       Parser parser = (Parser) parserConstructor.newInstance(tokens);
-      parser.setErrorHandler(new BailErrorStrategy());
+      parser.addErrorListener(assertErrorsErrorListener);
       final Method method = parserClass.getMethod(entryPoint);
       ParserRuleContext parserRuleContext = (ParserRuleContext) method.invoke(parser);
+      assertErrorsErrorListener.assertErrors(new File(grammarFile.getAbsolutePath() + ERRORS_SUFFIX));
       /*
        * show the tree
        */
@@ -272,7 +275,9 @@ public class GrammarTestMojo extends AbstractMojo {
             /*
              * test grammar
              */
-            testGrammar(file);
+            if (!file.getName().endsWith(ERRORS_SUFFIX)) {
+               testGrammar(file);
+            }
             /*
              * gc
              */

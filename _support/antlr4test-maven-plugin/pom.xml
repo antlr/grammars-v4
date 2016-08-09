@@ -99,6 +99,52 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-maven-plugin</artifactId>
+				<version>${antlr.version}</version>
+				<configuration>
+					<!-- directory generated-test-sources not possible with GrammarTestMojo using ClassLoader focused on /target/classes
+					<outputDirectory>${project.build.directory}/generated-test-sources/antlr4</outputDirectory>
+					-->
+					<sourceDirectory>src/test/resources/</sourceDirectory>
+					<grammars>tnt.g4</grammars>
+				</configuration>
+				<executions>
+					<execution>
+						<id>antlr4-test-resources</id>
+						<!-- phase generate-test-sources not possible with GrammarTestMojo using ClassLoader focused on /target/classes
+						<phase>generate-test-sources</phase>
+						-->
+						<goals>
+							<goal>antlr4</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<!-- delete from classes in phase prepare-package because test-classes could not be used with GrammarTestMojo using ClassLoader focused on /target/classes -->
+						<id>delete-test-resources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<delete>
+									<fileset dir="${project.build.outputDirectory}">
+										<include name="tnt*" />
+									</fileset>
+								</delete>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<finalName>${project.artifactId}-${project.version}</finalName>
 	</build>
