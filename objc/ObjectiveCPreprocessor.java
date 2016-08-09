@@ -1,4 +1,4 @@
-package co.codebeat.objc;
+package objc;
 
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ListTokenSource;

@@ -204,7 +204,7 @@ methodSelector
     ;
 
 keywordDeclarator
-    : selector? ':' methodType* identifier
+    : selector? ':' methodType* arcBehaviourSpecifier? identifier
     ;
 
 selector
@@ -314,7 +314,7 @@ receiver
 messageSelector
     : selector
     | keywordArgument+
-    ; 
+    ;
 
 // initializer_list?
 keywordArgument
@@ -411,7 +411,10 @@ specifierQualifierList
     ;
 
 arcBehaviourSpecifier
-    : '__unsafe_unretained'
+    : '__autoreleasing'
+    | '__deprecated'
+    | '__unsafe_unretained'
+    | '__unused'
     | '__weak'
     ;
 
@@ -487,7 +490,7 @@ declarator
 
 directDeclarator
     : identifier declaratorSuffix*
-    | '(' declarator ')' declaratorSuffix* 
+    | '(' declarator ')' declaratorSuffix*
     | '(''^' identifier? ')' blockParameters
     ;
 
