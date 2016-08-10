@@ -33,13 +33,24 @@ program
    ;
 
 line
-   : (label | comment | statement)? EOL
+   : (label | comment | stmt)? EOL
    ;
 
 label
    : ID
    ;
 
+stmt
+    : stmtprefix? statement
+    ;
+
+stmtprefix
+    : '='
+    | '#'
+    | ('<' expression)
+    | ('>' expression)
+    ;
+   
 statement
    : ifstatement
    | tostatement
