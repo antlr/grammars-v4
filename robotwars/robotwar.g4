@@ -33,23 +33,12 @@ program
    ;
 
 line
-   : (label | comment | stmt)? EOL
+   : (label | comment | statement)? EOL
    ;
 
 label
    : ID
    ;
-
-stmt
-    : stmtprefix? statement
-    ;
-
-stmtprefix
-    : '='
-    | '#'
-    | ('<' expression)
-    | ('>' expression)
-    ;
    
 statement
    : ifstatement
@@ -57,7 +46,18 @@ statement
    | gosubstatement
    | gotostatement
    | endsubstatement
+   | accumstatement
    ;
+
+accumstatement
+    : accumexpression;
+
+accumexpression
+    : ('='
+    | '#'
+    | ('<' expression)
+    | ('>' expression)) statement
+    ;
 
 gosubstatement
    : 'GOSUB' label
