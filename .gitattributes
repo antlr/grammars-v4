@@ -1,2 +1,5 @@
+# given the grammars context, avoid that git converts line endings
+* -crlf
+
 **/examples/* linguist-vendored
 _support/* linguist-vendored
