@@ -738,11 +738,11 @@ futureReservedWord
  ;
 
 getter
- : {self._input.LT(1).getText() == "get"}? Identifier propertyName
+ : {self._input.LT(1).text == "get"}? Identifier propertyName
  ;
 
 setter
- : {self._input.LT(1).getText() == "set"}? Identifier propertyName
+ : {self._input.LT(1).text == "set"}? Identifier propertyName
  ;
 
 eos
