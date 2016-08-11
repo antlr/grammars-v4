@@ -141,7 +141,7 @@ procedure_spec
     ;
 
 function_spec
-    : FUNCTION function_name ('(' parameter ( ',' parameter)* ')')? RETURN type_spec ';' 
+    : FUNCTION function_name ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (DETERMINISTIC)? ';' 
     ;
 
 package_obj_body
