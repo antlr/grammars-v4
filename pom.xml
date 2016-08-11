@@ -96,6 +96,7 @@
 		<module>suokif</module>
 		<module>swift</module>
 		<module>swift-fin</module>
+		<module>telephone</module>
 		<module>tiny</module>
 		<module>tinyc</module>
 		<module>tnsnames</module>
