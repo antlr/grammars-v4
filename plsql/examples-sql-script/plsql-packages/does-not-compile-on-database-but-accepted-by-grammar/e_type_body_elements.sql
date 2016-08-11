@@ -29,4 +29,4 @@ is
 end;
 /
 
--- show errors
+show errors

@@ -1,3 +1,3 @@
 line 5:24 no viable alternative at input 'pragmaexception_init('
 line 5:25 no viable alternative at input 'some_exception'
-line 5:48 mismatched input ';' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, FOR, FUNCTION, INSERT, INTERSECT, LOCK, MERGE, MINUS, ORDER, PROCEDURE, SELECT, SET, UNION, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}
+line 5:48 mismatched input ';' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, FOR, FUNCTION, INSERT, INTERSECT, LOCK, MERGE, MINUS, ORDER, PROCEDURE, SELECT, SET, SHOW, UNION, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}
