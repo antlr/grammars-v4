@@ -39,8 +39,6 @@ number
 variation
    : nanp
    | japan
-   | australia
-   | itu
    ;
 
 // North American Numbering Plan
@@ -66,17 +64,6 @@ subscriber
 japan
    : '010' areacode exchange subscriber
    ;
-
-// ITU
-itu
-   : '00' areacode exchange subscriber
-   ;
-
-// Australia
-australia
-   : '0011' areacode exchange subscriber
-   ;
-
 
 DIGIT
    : [0-9]
