@@ -374,7 +374,7 @@ sqlj_object_type
     ;
 
 type_body
-    : BODY type_name (IS | AS) type_body_elements (',' type_body_elements)* END
+    : BODY type_name (IS | AS) (type_body_elements)+ END
     ;
 
 type_body_elements
