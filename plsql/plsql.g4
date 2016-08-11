@@ -130,6 +130,7 @@ package_obj_spec
     | subtype_declaration
     | cursor_declaration
     | exception_declaration
+    | pragma_declaration
     | record_declaration
     | table_declaration
     | procedure_spec
