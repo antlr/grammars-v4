@@ -39,14 +39,25 @@ line
 label
    : ID
    ;
-
+   
 statement
    : ifstatement
    | tostatement
    | gosubstatement
    | gotostatement
    | endsubstatement
+   | accumstatement
    ;
+
+accumstatement
+    : accumexpression;
+
+accumexpression
+    : ('='
+    | '#'
+    | ('<' expression)
+    | ('>' expression)) statement
+    ;
 
 gosubstatement
    : 'GOSUB' label

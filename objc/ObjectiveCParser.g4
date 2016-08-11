@@ -701,4 +701,5 @@ identifier
     | TYPEOF | TYPEOF__ | TYPEOF____ | KINDOF__
     | ASSIGNPA | GETTER | NONATOMIC | SETTER | STRONG | RETAIN | READONLY | READWRITE | WEAK
     | SELF
+    | ID
     ;
