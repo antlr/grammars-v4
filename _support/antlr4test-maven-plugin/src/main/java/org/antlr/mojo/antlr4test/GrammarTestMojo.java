@@ -49,13 +49,21 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * @author Tom Everett
  */
 @Mojo(name = "test", defaultPhase = LifecyclePhase.TEST, requiresProject = true, threadSafe = false)
 public class GrammarTestMojo extends AbstractMojo {
+   /**
+    * errors file
+    */
    protected static final String ERRORS_SUFFIX = ".errors";
+   /**
+    * tree file
+    */
+   protected static final String TREE_SUFFIX = ".tree";
    /**
     * grammar Name
     */
@@ -257,6 +265,23 @@ public class GrammarTestMojo extends AbstractMojo {
          System.out.println(lispTree);
       }
       /*
+       * check syntax
+       */
+      File treeFile = new File(grammarFile.getAbsolutePath() + TREE_SUFFIX);
+      if (treeFile.exists()) {
+         final String lispTree = Trees.toStringTree(parserRuleContext, parser);
+         if (null != lispTree) {
+            final String treeFileData = FileUtils.fileRead(treeFile);
+            if (null != treeFileData) {
+               if (0 != treeFileData.compareTo(lispTree)) {
+                  throw new Exception("Parse tree does not match '" + treeFile.getName() + "'");
+               } else {
+                  System.out.println("Parse tree for '" + grammarFile.getName() + "' matches '" + treeFile.getName() + "'");
+               }
+            }
+         }
+      }
+      /*
        * yup
        */
       parser = null;
@@ -275,7 +300,7 @@ public class GrammarTestMojo extends AbstractMojo {
             /*
              * test grammar
              */
-            if (!file.getName().endsWith(ERRORS_SUFFIX)) {
+            if ((!file.getName().endsWith(ERRORS_SUFFIX)) && (!file.getName().endsWith(TREE_SUFFIX))) {
                testGrammar(file);
             }
             /*

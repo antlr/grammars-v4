@@ -1,2 +1,0 @@
-line 22:2 mismatched input 'member' expecting {END, ','}
-line 29:0 extraneous input 'end' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, FUNCTION, INSERT, LOCK, MERGE, PROCEDURE, SELECT, SET, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}
