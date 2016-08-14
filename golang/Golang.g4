@@ -32,11 +32,6 @@
  */
 grammar Golang;
 
-@lexer::members {
-    public static final int COMMENTS = 2;
-    public static final int HIDDEN = 1;
-}
-
 //SourceFile       = PackageClause ";" { ImportDecl ";" } { TopLevelDecl ";" } .
 sourceFile
     : packageClause ';'? ( importDecl ';'? )* ( topLevelDecl ';'?)*
