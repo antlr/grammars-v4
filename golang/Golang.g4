@@ -1,6 +1,6 @@
 /*
  [The "BSD licence"]
- Copyright (c) 2013 Terence Parr, Sam Harwell
+ Copyright (c) 2016 Sasa Coh
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
