@@ -61,6 +61,7 @@ preprocessor_expression
     : TRUE                                                                   #preprocessorConstant
     | FALSE                                                                  #preprocessorConstant
     | DECIMAL_LITERAL                                                        #preprocessorConstant
+    | DIRECTIVE_STRING                                                       #preprocessorConstant
     | CONDITIONAL_SYMBOL (LPAREN preprocessor_expression RPAREN)?            #preprocessorConditionalSymbol
     | LPAREN preprocessor_expression RPAREN                                  #preprocessorParenthesis
     | BANG preprocessor_expression                                           #preprocessorNot
