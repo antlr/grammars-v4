@@ -29,7 +29,7 @@ lexer grammar ObjectiveCLexer;
 
 channels { COMMENTS_CHANNEL }
 
-// §3.9 Keywords
+// ยง3.9 Keywords
 
 AUTORELEASEPOOL : '@autoreleasepool';
 CATCH           : '@catch';
@@ -113,12 +113,14 @@ TYPEOF              : 'typeof';
 TYPEOF__            : '__typeof';
 TYPEOF____          : '__typeof__';
 KINDOF__            : '__kindof';
+COVARIANT           : '__covariant';
+CONTRAVARIANT       : '__contravariant';
 
 NULLABLE            : 'nullable';
 
 L_STR               : 'L';
 
-// §3.11 Separators
+// ยง3.11 Separators
 
 LPAREN          : '(';
 RPAREN          : ')';

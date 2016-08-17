@@ -45,6 +45,9 @@ externalDeclaration
     | protocolDeclarationList
     | classDeclarationList
     | macros
+    // TODO: improve with preprocessing.
+    // See: https://github.com/ReactiveCocoa/ReactiveCocoa/blob/7877f99bdfb4be1c82c4804082e99c35d0a93a91/ReactiveCocoaTests/Objective-C/RACPropertySignalExamples.m
+    | implementationDefinitionList
     ;
 
 topLevelFunctionDefinition
@@ -134,7 +137,7 @@ categoryName
 
 protocolName
     : protocolReferenceList
-    | identifier
+    | ('__covariant' | '__contravariant')?  identifier
     ;
 
 instanceVariables
@@ -209,6 +212,7 @@ keywordDeclarator
 
 selector
     : identifier
+    | 'return'
     ;
 
 methodType
@@ -281,11 +285,11 @@ dictionaryExpression
     ;
 
 dictionaryPair
-    : castExpression ':' castExpression
+    : castExpression ':' conditionalExpression
     ;
 
 arrayExpression
-    : '@' '[' castExpression? (',' castExpression)* ','? ']'
+    : '@' '[' conditionalExpression? (',' conditionalExpression)* ','? ']'
     ;
 
 boxExpression
@@ -407,7 +411,7 @@ structDeclaration
     ;
 
 specifierQualifierList
-    : (arcBehaviourSpecifier | typeofTypeSpecifier | typeQualifier)+
+    : (arcBehaviourSpecifier '*'? | typeofTypeSpecifier | typeQualifier)+
     ;
 
 arcBehaviourSpecifier
@@ -427,8 +431,8 @@ storageClassSpecifier
     ;
 
 typeofTypeSpecifier
-    : ('typeof' | '__typeof' | '__typeof__') '(' (className | 'self') ')'
-    | '__kindof'? typeSpecifier
+    : ('typeof' | '__typeof' | '__typeof__') '(' className ')'
+    | '__kindof'? typeSpecifier '*'?
     ;
 
 typeSpecifier
@@ -477,15 +481,7 @@ enumeratorList
     ;
 
 enumerator
-    : identifier ('=' binaryExpression)?
-    ;
-
-pointer
-    : '*' declarationSpecifier* pointer?
-    ;
-
-declarator
-    : pointer? directDeclarator
+    : unaryExpression ('=' binaryExpression)?
     ;
 
 directDeclarator
@@ -497,6 +493,14 @@ directDeclarator
 declaratorSuffix
     : '[' constantExpression? ']'
     | '(' (parameterDeclarationList (',' '...')?)? ')'
+    ;
+
+declarator
+    : pointer? directDeclarator
+    ;
+
+pointer
+    : '*' declarationSpecifier* pointer?
     ;
 
 macros
@@ -560,11 +564,12 @@ statement
     | throwStatement ';'?
     | tryBlock ';'?
     | expression ';'?
+    | ';'
     ;
 
 labeledStatement
     : identifier ':' statement
-    | 'case' constantExpression ':' statement
+    | 'case' (constantExpression | '(' constantExpression ')') ':' statement
     | 'default' ':' statement
     ;
 
@@ -655,6 +660,7 @@ unaryExpression
     | '--' unaryExpression
     | unaryOperator castExpression
     | 'sizeof' ('(' typeName ')' | unaryExpression)
+    | '{' enumeratorList '}'
     ;
 
 unaryOperator
@@ -688,8 +694,7 @@ constant
     ;
 
 stringLiteral
-    : (L_STR | '@') STRING+
-    | STRING+
+    : ((L_STR | '@')? STRING)+
     | QUOTE_STRING+
     ;
 
@@ -702,4 +707,6 @@ identifier
     | ASSIGNPA | GETTER | NONATOMIC | SETTER | STRONG | RETAIN | READONLY | READWRITE | WEAK
     | SELF
     | ID
+    | COVARIANT | CONTRAVARIANT
+    | WUNUSED
     ;

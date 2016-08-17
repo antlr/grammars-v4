@@ -41,6 +41,7 @@
 		<module>fusion-tables</module>
 		<module>gff3</module>
 		<module>gml</module>
+		<module>golang</module>
 		<module>graphql</module>
 		<module>html</module>
 		<module>icalendar</module>
