@@ -70,6 +70,11 @@ public class GrammarTestMojo extends AbstractMojo {
    @Parameter
    private String grammarName;
    /**
+    * grammar Name
+    */
+   @Parameter
+   private boolean caseInsensitive = false; 
+   /**
     * entry point method on the parser
     */
    @Parameter
@@ -237,8 +242,13 @@ public class GrammarTestMojo extends AbstractMojo {
        */
       final Constructor<?> lexerConstructor = lexerClass.getConstructor(CharStream.class);
       final Constructor<?> parserConstructor = parserClass.getConstructor(TokenStream.class);
-      System.out.println("Parsing :" + grammarFile.getAbsolutePath());
-      ANTLRFileStream antlrFileStream = new ANTLRFileStream(grammarFile.getAbsolutePath());
+      System.out.println("Parsing :" + grammarFile.getAbsolutePath());      
+      ANTLRFileStream antlrFileStream;
+      if (caseInsensitive) {
+          antlrFileStream = new AntlrCaseInsensitiveFileStream(grammarFile.getAbsolutePath());
+      } else {
+          antlrFileStream = new ANTLRFileStream(grammarFile.getAbsolutePath());
+      }      
       final AssertErrorsErrorListener assertErrorsErrorListener = new AssertErrorsErrorListener();
       Lexer lexer = (Lexer) lexerConstructor.newInstance(antlrFileStream);
       lexer.addErrorListener(assertErrorsErrorListener);
