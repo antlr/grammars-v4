@@ -75,6 +75,7 @@
 		<module>peoplecode</module>
 		<module>pgn</module>
 		<!-- C# runtime is not supported. <module>php</module> -->
+                <module>php-with-java-runtime</module> 
 		<module>plsql</module>
 		<module>postalcode</module>
 		<module>propcalc</module>
