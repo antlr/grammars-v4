@@ -533,15 +533,15 @@ valueStmt :
 	| valueStmt WS? NEQ WS? valueStmt 						# vsNeq
 	| valueStmt WS? EQ WS? valueStmt 						# vsEq
 
-	| valueStmt WS? AMPERSAND WS? valueStmt 					# vsAmp
+	| valueStmt WS? POW WS? valueStmt 						# vsPow
 	| MINUS WS? valueStmt 									# vsNegation
 	| PLUS WS? valueStmt 									# vsPlus
-	| valueStmt WS? PLUS WS? valueStmt 						# vsAdd
-	| valueStmt WS? MOD WS? valueStmt 						# vsMod
 	| valueStmt WS? DIV WS? valueStmt 						# vsDiv
 	| valueStmt WS? MULT WS? valueStmt 						# vsMult
+	| valueStmt WS? MOD WS? valueStmt 						# vsMod
+	| valueStmt WS? PLUS WS? valueStmt 						# vsAdd
 	| valueStmt WS? MINUS WS? valueStmt 					# vsMinus
-	| valueStmt WS? POW WS? valueStmt 						# vsPow
+	| valueStmt WS? AMPERSAND WS? valueStmt 					# vsAmp
 
 	| valueStmt WS? IMP WS? valueStmt 						# vsImp
 	| valueStmt WS? EQV WS? valueStmt 						# vsEqv
