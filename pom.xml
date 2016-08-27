@@ -74,7 +74,7 @@
 		<module>pdp7</module>
 		<module>peoplecode</module>
 		<module>pgn</module>
-		<!-- C# runtime is not supported. <module>php</module> -->
+		<module>php</module>
 		<module>plsql</module>
 		<module>postalcode</module>
 		<module>propcalc</module>
