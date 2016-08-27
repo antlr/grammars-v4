@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar gff3;
 
 document
-   : '##gff-version 3\n' line +
-   ;
+   : HEADER line+
+   ; 
 
 line
-   : commentline
+   : commentline 
    | dataline
    ;
 
@@ -89,31 +89,29 @@ commentline
    : COMMENTLINE
    ;
 
+HEADER
+   : '##gff-version 3' EOL
+   ;
 
 COMMENTLINE
    : '#' .*? EOL
    ;
 
-
 EOL
    : '\r'? '\n'
    ;
 
-
 TEXT
-   : (CHAR | SYMBOL | DIGIT) +
+   : (CHAR | SYMBOL | DIGIT)+
    ;
-
 
 fragment CHAR
    : [a-zA-Z]
    ;
 
-
 fragment DIGIT
    : [0-9]
    ;
-
 
 fragment SYMBOL
    : '.' | ':' | '^' | '*' | '$' | '@' | '%' | '!' | '+' | '_' | '?' | '-' | '|' | ',' | ' '

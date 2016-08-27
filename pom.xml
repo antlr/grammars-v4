@@ -41,6 +41,7 @@
 		<module>fusion-tables</module>
 		<module>gff3</module>
 		<module>gml</module>
+		<module>golang</module>
 		<module>graphql</module>
 		<module>html</module>
 		<module>icalendar</module>
@@ -73,7 +74,7 @@
 		<module>pdp7</module>
 		<module>peoplecode</module>
 		<module>pgn</module>
-		<!-- C# runtime is not supported. <module>php</module> -->
+		<module>php</module>
 		<module>plsql</module>
 		<module>postalcode</module>
 		<module>propcalc</module>
