@@ -68,6 +68,7 @@
 		<module>mumps</module>
 		<module>mysql</module>
 		<module>objc</module>
+		<module>oncrpc</module>
 		<module>pascal</module>
 		<module>pcre</module>
 		<module>pddl</module>
