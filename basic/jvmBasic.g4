@@ -332,7 +332,7 @@ restorestmt
 
 // expressions and such
 number
-   : '-'? (NUMBER | FLOAT)
+   :  NUMBER | FLOAT
    ;
 
 func
@@ -1126,12 +1126,12 @@ LETTERS
 
 
 NUMBER
-   : ('0' .. '9') + (('e' | 'E') NUMBER)*
+   : ('+' | '-')? ('0' .. '9') + (('e' | 'E') NUMBER)*
    ;
 
 
 FLOAT
-   : ('0' .. '9')* '.' ('0' .. '9') + (('e' | 'E') ('0' .. '9') +)*
+   : ('+' | '-')?  ('0' .. '9')* '.' ('0' .. '9') + (('e' | 'E') ('0' .. '9') +)*
    ;
 
 
