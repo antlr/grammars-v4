@@ -89,7 +89,7 @@ variableModifier
 
 classDeclaration
     :   'class' Identifier typeParameters?
-        ('extends' type)?
+        ('extends' typeType)?
         ('implements' typeList)?
         classBody
     ;
@@ -103,7 +103,7 @@ typeParameter
     ;
 
 typeBound
-    :   type ('&' type)*
+    :   typeType ('&' typeType)*
     ;
 
 enumDeclaration
@@ -128,7 +128,7 @@ interfaceDeclaration
     ;
 
 typeList
-    :   type (',' type)*
+    :   typeType (',' typeType)*
     ;
 
 classBody
@@ -163,7 +163,7 @@ memberDeclaration
    for invalid return type after parsing.
  */
 methodDeclaration
-    :   (type|'void') Identifier formalParameters ('[' ']')*
+    :   (typeType|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
         (   methodBody
         |   ';'
@@ -184,7 +184,7 @@ genericConstructorDeclaration
     ;
 
 fieldDeclaration
-    :   type variableDeclarators ';'
+    :   typeType variableDeclarators ';'
     ;
 
 interfaceBodyDeclaration
@@ -203,7 +203,7 @@ interfaceMemberDeclaration
     ;
 
 constDeclaration
-    :   type constantDeclarator (',' constantDeclarator)* ';'
+    :   typeType constantDeclarator (',' constantDeclarator)* ';'
     ;
 
 constantDeclarator
@@ -212,7 +212,7 @@ constantDeclarator
 
 // see matching of [] comment in methodDeclaratorRest
 interfaceMethodDeclaration
-    :   (type|'void') Identifier formalParameters ('[' ']')*
+    :   (typeType|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
         ';'
     ;
@@ -246,7 +246,7 @@ enumConstantName
     :   Identifier
     ;
 
-type
+typeType
     :   classOrInterfaceType ('[' ']')*
     |   primitiveType ('[' ']')*
     ;
@@ -271,8 +271,8 @@ typeArguments
     ;
 
 typeArgument
-    :   type
-    |   '?' (('extends' | 'super') type)?
+    :   typeType
+    |   '?' (('extends' | 'super') typeType)?
     ;
 
 qualifiedNameList
@@ -289,11 +289,11 @@ formalParameterList
     ;
 
 formalParameter
-    :   variableModifier* type variableDeclaratorId
+    :   variableModifier* typeType variableDeclaratorId
     ;
 
 lastFormalParameter
-    :   variableModifier* type '...' variableDeclaratorId
+    :   variableModifier* typeType '...' variableDeclaratorId
     ;
 
 methodBody
@@ -357,7 +357,7 @@ annotationTypeElementDeclaration
     ;
 
 annotationTypeElementRest
-    :   type annotationMethodOrConstantRest ';'
+    :   typeType annotationMethodOrConstantRest ';'
     |   classDeclaration ';'?
     |   interfaceDeclaration ';'?
     |   enumDeclaration ';'?
@@ -398,7 +398,7 @@ localVariableDeclarationStatement
     ;
 
 localVariableDeclaration
-    :   variableModifier* type variableDeclarators
+    :   variableModifier* typeType variableDeclarators
     ;
 
 statement
@@ -469,7 +469,7 @@ forInit
     ;
 
 enhancedForControl
-    :   variableModifier* type variableDeclaratorId ':' expression
+    :   variableModifier* typeType variableDeclaratorId ':' expression
     ;
 
 forUpdate
@@ -504,7 +504,7 @@ expression
     |   expression '[' expression ']'
     |   expression '(' expressionList? ')'
     |   'new' creator
-    |   '(' type ')' expression
+    |   '(' typeType ')' expression
     |   expression ('++' | '--')
     |   ('+'|'-'|'++'|'--') expression
     |   ('~'|'!') expression
@@ -512,7 +512,7 @@ expression
     |   expression ('+'|'-') expression
     |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression
     |   expression ('<=' | '>=' | '>' | '<') expression
-    |   expression 'instanceof' type
+    |   expression 'instanceof' typeType
     |   expression ('==' | '!=') expression
     |   expression '&' expression
     |   expression '^' expression
@@ -543,7 +543,7 @@ primary
     |   'super'
     |   literal
     |   Identifier
-    |   type '.' 'class'
+    |   typeType '.' 'class'
     |   'void' '.' 'class'
     |   nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
     ;

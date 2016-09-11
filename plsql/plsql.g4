@@ -130,6 +130,7 @@ package_obj_spec
     | subtype_declaration
     | cursor_declaration
     | exception_declaration
+    | pragma_declaration
     | record_declaration
     | table_declaration
     | procedure_spec
@@ -141,7 +142,7 @@ procedure_spec
     ;
 
 function_spec
-    : FUNCTION function_name ('(' parameter ( ',' parameter)* ')')? RETURN type_spec ';' 
+    : FUNCTION function_name ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';' 
     ;
 
 package_obj_body
@@ -374,7 +375,7 @@ sqlj_object_type
     ;
 
 type_body
-    : BODY type_name (IS | AS) type_body_elements (',' type_body_elements)* END
+    : BODY type_name (IS | AS) (type_body_elements)+ END
     ;
 
 type_body_elements
@@ -1694,7 +1695,7 @@ xmlserialize_param_ident_part
 // SqlPlus
 
 sql_plus_command 
-    : ('/' | whenever_command | exit_command | prompt_command | set_command) ';'?
+    : ('/' | whenever_command | exit_command | prompt_command | set_command | show_errors_command) ';'?
     ;
 
 whenever_command
@@ -1712,6 +1713,11 @@ exit_command
 
 prompt_command
     : PROMPT
+    ;
+
+show_errors_command
+    : SHOW ERR
+    | SHOW ERRORS
     ;
 
 // Common
@@ -2200,6 +2206,7 @@ regular_id
     | ENCODING
     //| END
     | ENTITYESCAPING
+    | ERR
     | ERRORS
     | ESCAPE
     | EVALNAME
@@ -2677,6 +2684,7 @@ ENABLE:                       E N A B L E;
 ENCODING:                     E N C O D I N G;
 END:                          E N D;
 ENTITYESCAPING:               E N T I T Y E S C A P I N G;
+ERR:                          E R R;
 ERRORS:                       E R R O R S;
 ESCAPE:                       E S C A P E;
 EVALNAME:                     E V A L N A M E;

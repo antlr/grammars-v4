@@ -31,11 +31,12 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.antlr</groupId>
+				<groupId>com.khubla.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
+				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>false</showTree>
+					<showTree>true</showTree>
 					<entryPoint>equation</entryPoint>
 					<grammarName>calculator</grammarName>
 					<packageName></packageName>

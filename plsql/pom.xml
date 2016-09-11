@@ -31,8 +31,9 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.antlr</groupId>
+				<groupId>com.khubla.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
+				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
@@ -46,6 +47,20 @@
 						<goals>
 							<goal>test</goal>
 						</goals>
+					</execution>
+					<execution>
+						<id>test-examples-sql-script</id>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<verbose>false</verbose>
+							<showTree>false</showTree>
+							<entryPoint>sql_script</entryPoint>
+							<grammarName>plsql</grammarName>
+							<packageName></packageName>
+							<exampleFiles>examples-sql-script/</exampleFiles>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

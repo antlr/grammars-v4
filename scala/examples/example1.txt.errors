@@ -1,0 +1,1 @@
+line 2:0 mismatched input 'object HelloWorld {' expecting {<EOF>, 'implicit', 'lazy', 'case', '@', 'override', 'abstract', 'final', 'sealed', 'private', 'protected', 'import', 'class', 'trait', 'package', ';'}
