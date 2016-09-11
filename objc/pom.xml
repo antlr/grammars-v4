@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>objc</artifactId>
 	<packaging>jar</packaging>
-	<name>ANTLR Objective C grammar</name>
+	<name>Objective C grammar</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -18,7 +18,11 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>tnt.g4</grammars>
+					<grammars>ObjectiveCParser.g4</grammars>
+					<includes>
+						<include>ObjectiveCLexer.g4</include>
+						<include>ObjectiveCParser.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -31,15 +35,16 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.antlr</groupId>
+				<groupId>com.khubla.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
+				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>translation_unit</entryPoint>
-					<grammarName>ObjC</grammarName>
+					<entryPoint>translationUnit</entryPoint>
+					<grammarName>ObjectiveC</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
+					<exampleFiles>examples_todo/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>
