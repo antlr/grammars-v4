@@ -28,7 +28,11 @@ THE SOFTWARE.
 grammar tsql;
 
 tsql_file
-    : sql_clauses? EOF
+    : batch* EOF
+    ;
+
+batch
+    : sql_clauses go_statement?
     ;
 
 sql_clauses
@@ -116,7 +120,6 @@ another_statement
     | security_statement
     | set_statement
     | transaction_statement
-    | go_statement
     | use_statement
     ;
 
