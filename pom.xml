@@ -7,7 +7,6 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>ANTLR4 grammars</name>
 	<modules>
-		<module>_support</module>
 		<module>abnf</module>
 		<module>agc</module>
 <!--		<module>antlr3</module>-->
@@ -68,6 +67,7 @@
 		<module>mumps</module>
 		<module>mysql</module>
 		<module>objc</module>
+		<module>oncrpc</module>
 		<module>pascal</module>
 		<module>pcre</module>
 		<module>pddl</module>
@@ -120,6 +120,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
 		<antlr.version>4.5.3</antlr.version>
+		<antlr4test-maven-plugin.version>1.6</antlr4test-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
