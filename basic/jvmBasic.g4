@@ -371,7 +371,7 @@ func
    ;
 
 signExpression
-   : NOT? ((PLUS | MINUS))* func
+   : NOT? (PLUS | MINUS)? func
    ;
 
 exponentExpression
