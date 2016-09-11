@@ -33,16 +33,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar emailaddress;
 
 emailaddress     : mailbox                     
-            /  group ;                      
+                 |  group ;                      
 
-group       :  phrase ':' [#mailbox] ';';
+group       :  phrase ':' mailbox* ';';
 
 mailbox     :  addrspec                   
-            /  phrase routeaddr            ;
+            |  (phrase routeaddr )           ;
 
-routeaddr  :  '<' [route] addrspec '>';
+routeaddr  :  '<' route* addrspec '>';
 
-route       :  1#('@' domain) ':';          
+route       :  '@' domain ':';          
 
 aaddrspec   :  localpart '@' domain       ;
 
@@ -51,14 +51,17 @@ localpart  :  word *('.' word)  ;
 
 domain      :  subdomain *('.' subdomain);
 
-subdomain :  domainref / domain-literal
+subdomain :  domainref | domain-literal
 
 domainref  : atom                       ;
 
-phrase      =  1*word                      ;
+phrase      :  word+                      ;
 
-word        =  atom / quotedstring;
+word        :  atom | quotedstring;
 
+
+
+    
 
 WS
    : [ \t\r\n] -> skip
