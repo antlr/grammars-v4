@@ -27,30 +27,31 @@ lexer grammar PHPLexer;
 channels { PhpComments, ErrorLexem }
 
 @lexer::members
-{public bool AspTags = true;
-bool _scriptTag;
-bool _styleTag;
-string _heredocIdentifier;
+{public boolean AspTags = true;
+boolean _scriptTag;
+boolean _styleTag;
+String _heredocIdentifier;
 int _prevTokenType;
-string _htmlNameText;
-bool _phpScript;
-bool _insideString;
+String _htmlNameText;
+boolean _phpScript;
+boolean _insideString;
 
-public override IToken NextToken()
+@Override
+public Token nextToken()
 {
-    CommonToken token = (CommonToken)base.NextToken();
+    CommonToken token = (CommonToken)super.nextToken();
 
-    if (token.Type == PHPEnd || token.Type == PHPEndSingleLineComment)
+    if (token.getType() == PHPEnd || token.getType() == PHPEndSingleLineComment)
     {
         if (_mode == SingleLineCommentMode)
         {
             // SingleLineCommentMode for such allowed syntax:
             // <?php echo "Hello world"; // comment ?>
-            PopMode(); // exit from SingleLineComment mode.
+            popMode(); // exit from SingleLineComment mode.
         }
-        PopMode(); // exit from PHP mode.
+        popMode(); // exit from PHP mode.
         
-        if (string.Equals(token.Text, "</script>", System.StringComparison.Ordinal))
+        if (token.getText().equals("</script>"))
         {
             _phpScript = false;
             token = new CommonToken(ScriptClose);
@@ -62,7 +63,7 @@ public override IToken NextToken()
             if (_prevTokenType == SemiColon || _prevTokenType == Colon
                 || _prevTokenType == OpenCurlyBracket || _prevTokenType == CloseCurlyBracket)
             {
-                token = (CommonToken)base.NextToken();
+                token = (CommonToken)super.nextToken();
             }
             else
             {
@@ -70,14 +71,13 @@ public override IToken NextToken()
             }
         }
     }
-    else if (token.Type == HtmlName)
+    else if (token.getType() == HtmlName)
     {
-        _htmlNameText = token.Text;
+        _htmlNameText = token.getText();
     }
-    else if (token.Type == HtmlDoubleQuoteString)
+    else if (token.getType() == HtmlDoubleQuoteString)
     {
-        if (string.Equals(token.Text, "php", System.StringComparison.OrdinalIgnoreCase) &&
-            string.Equals(_htmlNameText, "language"))
+        if (token.getText().equals("php") && _htmlNameText.equals("language"))
         {
             _phpScript = true;
         }
@@ -85,24 +85,24 @@ public override IToken NextToken()
     else if (_mode == HereDoc)
     {
         // Heredoc and Nowdoc syntax support: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
-        switch (token.Type)
+        switch (token.getType())
         {
             case StartHereDoc:
             case StartNowDoc:
-                _heredocIdentifier = token.Text.Substring(3).Trim().Trim('\'');
+                _heredocIdentifier = token.getText().substring(3).trim().replace("\'","");
                 break;
 
             case HereDocText:
-                if (CheckHeredocEnd(token.Text))
+                if (CheckHeredocEnd(token.getText()))
                 {
-                    PopMode();
-                    if (token.Text.Trim().EndsWith(";"))
+                    popMode();
+                    if (token.getText().trim().endsWith(";"))
                     {
                         token = new CommonToken(SemiColon);
                     }
                     else
                     {
-                        token = (CommonToken)base.NextToken();
+                        token = (CommonToken)super.nextToken();
                     }
                 }
                 break;
@@ -110,21 +110,21 @@ public override IToken NextToken()
     }
     else if (_mode == PHP)
     {
-        if (_channel != Hidden)
+        if (_channel != HIDDEN)
         {
-            _prevTokenType = token.Type;
+            _prevTokenType = token.getType();
         }
     }
 
     return token;
 }
 
-bool CheckHeredocEnd(string text)
+boolean CheckHeredocEnd(String text)
 {
-    text = text.Trim();
-    bool semi = text.Length > 0 ? text[text.Length - 1] == ';' : false;
-    string identifier = semi ? text.Substring(0, text.Length - 1) : text;
-    var result = string.Equals(identifier, _heredocIdentifier, System.StringComparison.Ordinal);
+    text = text.trim();
+    boolean semi = (text.length() > 0) ? (text.charAt(text.length() - 1) == ';') : false;
+    String identifier = semi ? text.substring(0, text.length() - 1) : text;
+    boolean result = identifier.equals(_heredocIdentifier);
     return result;
 }}
 
@@ -138,7 +138,7 @@ HtmlComment:    '<' '!' '--' .*? '-->' -> channel(HIDDEN);
 HtmlDtd:        '<' '!' .*? '>';
 HtmlOpen:       '<' -> pushMode(INSIDE);
 Shebang
-    : { _input.La(-1) <= 0 || _input.La(-1) == '\r' || _input.La(-1) == '\n' }? '#' '!' ~[\r\n]*
+    : { _input.LA(-1) <= 0 || _input.LA(-1) == '\r' || _input.LA(-1) == '\n' }? '#' '!' ~[\r\n]*
     ;
 NumberSign:     '#' ~[<]* -> more;
 Error:          .         -> channel(ErrorLexem);
@@ -148,22 +148,22 @@ mode INSIDE;
 PHPStartEchoInside: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartInside:     PhpStartFragment -> skip, pushMode(PHP);
 HtmlClose: '>' {
-PopMode();
+popMode();
 if (_scriptTag)
 {
     if (!_phpScript)
     {
-        PushMode(SCRIPT);
+        pushMode(SCRIPT);
     }
     else
     {
-        PushMode(PHP);
+        pushMode(PHP);
     }
     _scriptTag = false;
 }
 else if (_styleTag)
 {
-    PushMode(STYLE);
+    pushMode(STYLE);
     _styleTag = false;
 }
 };
@@ -390,8 +390,8 @@ CloseCurlyBracket:  '}'
 if (_insideString)
 {
     _insideString = false;
-    Skip();
-    PopMode();
+    skip();
+    popMode();
 }
 };
 Comma:              ',';
@@ -414,10 +414,10 @@ SingleQuoteString: '\'' (~('\'' | '\\') | '\\' . )* '\'';
 DoubleQuote:       '"' -> pushMode(InterpolationString);
 
 StartNowDoc
-    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { _input.LA(1) == '\r' || _input.LA(1) == '\n' }? -> pushMode(HereDoc)
     ;
 StartHereDoc
-    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { _input.LA(1) == '\r' || _input.LA(1) == '\n' }? -> pushMode(HereDoc)
     ;
 ErrorPhp:                   .          -> channel(ErrorLexem);
 
@@ -425,7 +425,7 @@ mode InterpolationString;
 
 VarNameInInterpolation:     '$' [a-zA-Z_][a-zA-Z_0-9]*                          -> type(VarName); // TODO: fix such cases: "$people->john"
 DollarString:               '$'                                                 -> type(StringPart);
-CurlyDollar:                '{' {_input.La(1) == '$'}? {_insideString = true;}  -> skip, pushMode(PHP);
+CurlyDollar:                '{' {_input.LA(1) == '$'}? {_insideString = true;}  -> skip, pushMode(PHP);
 CurlyString:                '{'                                                 -> type(StringPart);
 EscapedChar:                '\\' .                                              -> type(StringPart);
 DoubleQuoteInInterpolation: '"'                                                 -> type(DoubleQuote), popMode;

@@ -343,7 +343,7 @@ LITERAL : '"' ( ESCAPED_QUOTE | ~('\n'|'\r') )*? '"'
 
 COMMA : ',';
 SEMICOLON : ';';
-CRLF : '\n';
+CRLF : '\r'? '\n';
 
 REQUIRE : 'require';
 END : 'end';
@@ -403,8 +403,8 @@ RIGHT_SBRACKET : ']';
 
 NIL : 'nil';
 
-SL_COMMENT : ('#' ~('\r' | '\n')* '\n') -> skip;
-ML_COMMENT : ('=begin' .*? '=end\n') -> skip;
+SL_COMMENT : ('#' ~('\r' | '\n')* '\r'? '\n') -> skip;
+ML_COMMENT : ('=begin' .*? '=end' '\r'? '\n') -> skip;
 WS : (' '|'\t')+ -> skip;
 
 INT : [0-9]+;

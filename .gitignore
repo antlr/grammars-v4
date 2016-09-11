@@ -5,3 +5,7 @@
 /**/target
 
 .fetch_time_cache
+
+#IntelliJ Idea project files
+.idea/
+*.iml

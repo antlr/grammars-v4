@@ -1,0 +1,4 @@
+SELECT Measures.MEMBERS ON COLUMNS,
+{[Store].[Store State].[CA].CHILDREN,
+ [Store].[Store State].[WA].CHILDREN} ON ROWS
+FROM [Sales] 

@@ -7,7 +7,6 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>ANTLR4 grammars</name>
 	<modules>
-		<module>support</module>
 		<module>abnf</module>
 		<module>agc</module>
 <!--		<module>antlr3</module>-->
@@ -36,11 +35,12 @@
 		<module>ecmascript</module>
 		<module>erlang</module>
 		<module>fasta</module>
-		<module>FOL</module>
+		<module>fol</module>
 		<module>fortran77</module>
 		<module>fusion-tables</module>
 		<module>gff3</module>
 		<module>gml</module>
+		<module>golang</module>
 		<module>graphql</module>
 		<module>html</module>
 		<module>icalendar</module>
@@ -62,18 +62,19 @@
 		<module>memcached_protocol</module>
 		<module>modelica</module>
 		<module>modula2pim4</module>
-		<module>MPS</module>
+		<module>mps</module>
 		<module>mumath</module>
 		<module>mumps</module>
 		<module>mysql</module>
 		<module>objc</module>
+		<module>oncrpc</module>
 		<module>pascal</module>
 		<module>pcre</module>
 		<module>pddl</module>
 		<module>pdp7</module>
 		<module>peoplecode</module>
 		<module>pgn</module>
-		<!-- C# runtime is not supported. <module>php</module> -->
+		<module>php</module>
 		<module>plsql</module>
 		<module>postalcode</module>
 		<module>propcalc</module>
@@ -96,6 +97,7 @@
 		<module>suokif</module>
 		<module>swift</module>
 		<module>swift-fin</module>
+		<module>telephone</module>
 		<module>tiny</module>
 		<module>tinyc</module>
 		<module>tnsnames</module>
@@ -118,6 +120,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
 		<antlr.version>4.5.3</antlr.version>
+		<antlr4test-maven-plugin.version>1.6</antlr4test-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
