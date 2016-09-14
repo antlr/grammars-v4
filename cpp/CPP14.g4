@@ -1320,7 +1320,7 @@ noexceptspecification
 
 MultiLineMacro
 :
-    '#' (.*? '\\' [\r\n]+)+ (.*? ~[\r\n]*) -> skip
+    '#' (.*? '\\' [\r\n]+)+ ~[\r\n]+ -> skip
 ;
 
 Directive
