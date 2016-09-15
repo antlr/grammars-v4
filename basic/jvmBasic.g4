@@ -111,7 +111,7 @@ printstmt1
    ;
 
 printlist
-   : expression (COMMA | SEMICOLON)? printlist*
+   : expression ((COMMA | SEMICOLON) expression?)*
    ;
 
 getstmt
@@ -158,7 +158,7 @@ forstmt2
    ;
 
 nextstmt
-   : NEXT vardecl? (',' vardecl)*
+   : NEXT (vardecl (',' vardecl)*)?
    ;
 
 inputstmt
@@ -332,7 +332,7 @@ restorestmt
 
 // expressions and such
 number
-   : '-'? (NUMBER | FLOAT)
+   :  ('+' | '-')? (NUMBER | FLOAT)
    ;
 
 func
@@ -371,7 +371,7 @@ func
    ;
 
 signExpression
-   : NOT? ((PLUS | MINUS))* func
+   : NOT? (PLUS | MINUS)? func
    ;
 
 exponentExpression
@@ -387,7 +387,7 @@ addingExpression
    ;
 
 relationalExpression
-   : addingExpression ((relop) addingExpression)*
+   : addingExpression ((relop) addingExpression)?
    ;
 
 expression
