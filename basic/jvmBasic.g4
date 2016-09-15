@@ -111,7 +111,7 @@ printstmt1
    ;
 
 printlist
-   : expression ((COMMA | SEMICOLON) printlist)*
+   : expression ((COMMA | SEMICOLON) expression?)*
    ;
 
 getstmt
@@ -158,7 +158,7 @@ forstmt2
    ;
 
 nextstmt
-   : NEXT vardecl? (',' vardecl)*
+   : NEXT (vardecl (',' vardecl)*)?
    ;
 
 inputstmt
