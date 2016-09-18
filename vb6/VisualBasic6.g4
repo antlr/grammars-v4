@@ -509,7 +509,7 @@ stopStmt
    ;
 
 subStmt
-   : (visibility)? (STATIC)? SUB ambiguousIdentifier (argList)? (block)? END_SUB
+   : (visibility)? (STATIC)? SUB ambiguousIdentifier (argList)? (HANDLES type)? (block)? END_SUB
    ;
 
 timeStmt
@@ -1293,6 +1293,11 @@ GOTO
 
 IF
    : I F
+   ;
+
+
+HANDLES
+   : H A N D L E S
    ;
 
 
