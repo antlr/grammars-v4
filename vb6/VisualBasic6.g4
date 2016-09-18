@@ -59,7 +59,7 @@ startRule
    ;
 
 module
-   : NEWLINE* (moduleHeader NEWLINE +)? moduleConfig? NEWLINE* moduleAttributes? NEWLINE* moduleOptions? NEWLINE* moduleBody? NEWLINE*
+   : (moduleHeader)? moduleConfig? moduleAttributes? moduleOptions? moduleBody?
    ;
 
 moduleHeader
@@ -67,19 +67,19 @@ moduleHeader
    ;
 
 moduleConfig
-   : BEGIN NEWLINE + moduleConfigElement + END NEWLINE +
+   : BEGIN moduleConfigElement + END
    ;
 
 moduleConfigElement
-   : ambiguousIdentifier EQ literal NEWLINE
+   : ambiguousIdentifier EQ literal
    ;
 
 moduleAttributes
-   : (attributeStmt NEWLINE +) +
+   : (attributeStmt) +
    ;
 
 moduleOptions
-   : (moduleOption NEWLINE +) +
+   : (moduleOption) +
    ;
 
 moduleOption
@@ -90,7 +90,7 @@ moduleOption
    ;
 
 moduleBody
-   : moduleBodyElement (NEWLINE + moduleBodyElement)*
+   : moduleBodyElement (moduleBodyElement)*
    ;
 
 moduleBodyElement
@@ -117,7 +117,7 @@ attributeStmt
    ;
 
 block
-   : blockStmt (NEWLINE + blockStmt)*
+   : blockStmt (blockStmt)*
    ;
 
 blockStmt
@@ -236,9 +236,9 @@ deleteSettingStmt
    ;
 
 doLoopStmt
-   : DO NEWLINE + (block NEWLINE +)? LOOP
-   | DO (WHILE | UNTIL) valueStmt NEWLINE + (block NEWLINE +)? LOOP
-   | DO NEWLINE + (block NEWLINE +) LOOP (WHILE | UNTIL) valueStmt
+   : DO (block)? LOOP
+   | DO (WHILE | UNTIL) valueStmt (block)? LOOP
+   | DO (block) LOOP (WHILE | UNTIL) valueStmt
    ;
 
 endStmt
@@ -246,11 +246,11 @@ endStmt
    ;
 
 enumerationStmt
-   : (visibility)? ENUM ambiguousIdentifier NEWLINE + (enumerationStmt_Constant)* END_ENUM
+   : (visibility)? ENUM ambiguousIdentifier (enumerationStmt_Constant)* END_ENUM
    ;
 
 enumerationStmt_Constant
-   : ambiguousIdentifier (EQ valueStmt)? NEWLINE +
+   : ambiguousIdentifier (EQ valueStmt)?
    ;
 
 eraseStmt
@@ -278,15 +278,15 @@ filecopyStmt
    ;
 
 forEachStmt
-   : FOR EACH ambiguousIdentifier typeHint? IN valueStmt NEWLINE + (block NEWLINE +)? NEXT (ambiguousIdentifier)?
+   : FOR EACH ambiguousIdentifier typeHint? IN valueStmt (block)? NEXT (ambiguousIdentifier)?
    ;
 
 forNextStmt
-   : FOR ambiguousIdentifier typeHint? (asTypeClause)? EQ valueStmt TO valueStmt (STEP valueStmt)? NEWLINE + (block NEWLINE +)? NEXT (ambiguousIdentifier)?
+   : FOR ambiguousIdentifier typeHint? (asTypeClause)? EQ valueStmt TO valueStmt (STEP valueStmt)? (block)? NEXT (ambiguousIdentifier)?
    ;
 
 functionStmt
-   : (visibility)? (STATIC)? FUNCTION ambiguousIdentifier (argList)? (asTypeClause)? NEWLINE + (block NEWLINE +)? END_FUNCTION
+   : (visibility)? (STATIC)? FUNCTION ambiguousIdentifier (argList)? (asTypeClause)? (block)? END_FUNCTION
    ;
 
 getStmt
@@ -307,7 +307,7 @@ ifThenElseStmt
    ;
 
 ifBlockStmt
-   : IF ifConditionStmt THEN NEWLINE + (block NEWLINE +)?
+   : IF ifConditionStmt THEN (block)?
    ;
 
 ifConditionStmt
@@ -315,11 +315,11 @@ ifConditionStmt
    ;
 
 ifElseIfBlockStmt
-   : ELSEIF ifConditionStmt THEN NEWLINE + (block NEWLINE +)?
+   : ELSEIF ifConditionStmt THEN (block)?
    ;
 
 ifElseBlockStmt
-   : ELSE NEWLINE + (block NEWLINE +)?
+   : ELSE (block)?
    ;
 
 implementsStmt
@@ -359,15 +359,15 @@ macroIfThenElseStmt
    ;
 
 macroIfBlockStmt
-   : MACRO_IF ifConditionStmt THEN NEWLINE + (moduleBody NEWLINE +)?
+   : MACRO_IF ifConditionStmt THEN (moduleBody)?
    ;
 
 macroElseIfBlockStmt
-   : MACRO_ELSEIF ifConditionStmt THEN NEWLINE + (moduleBody NEWLINE +)?
+   : MACRO_ELSEIF ifConditionStmt THEN (moduleBody)?
    ;
 
 macroElseBlockStmt
-   : MACRO_ELSE NEWLINE + (moduleBody NEWLINE +)?
+   : MACRO_ELSE (moduleBody)?
    ;
 
 midStmt
@@ -413,15 +413,15 @@ printStmt
    ;
 
 propertyGetStmt
-   : (visibility)? (STATIC)? PROPERTY_GET ambiguousIdentifier typeHint? (argList)? (asTypeClause)? NEWLINE + (block NEWLINE +)? END_PROPERTY
+   : (visibility)? (STATIC)? PROPERTY_GET ambiguousIdentifier typeHint? (argList)? (asTypeClause)? (block)? END_PROPERTY
    ;
 
 propertySetStmt
-   : (visibility)? (STATIC)? PROPERTY_SET ambiguousIdentifier (argList)? NEWLINE + (block NEWLINE +)? END_PROPERTY
+   : (visibility)? (STATIC)? PROPERTY_SET ambiguousIdentifier (argList)? (block)? END_PROPERTY
    ;
 
 propertyLetStmt
-   : (visibility)? (STATIC)? PROPERTY_LET ambiguousIdentifier (argList)? NEWLINE + (block NEWLINE +)? END_PROPERTY
+   : (visibility)? (STATIC)? PROPERTY_LET ambiguousIdentifier (argList)? (block)? END_PROPERTY
    ;
 
 putStmt
@@ -477,11 +477,11 @@ seekStmt
    ;
 
 selectCaseStmt
-   : SELECT CASE valueStmt NEWLINE + sC_Case* END_SELECT
+   : SELECT CASE valueStmt sC_Case* END_SELECT
    ;
 
 sC_Case
-   : CASE sC_Cond (COLON? NEWLINE* | NEWLINE +) (block NEWLINE +)?
+   : CASE sC_Cond (COLON? |) (block)?
    ;
 
 // ELSE first, so that it is not interpreted as a variable call
@@ -509,7 +509,7 @@ stopStmt
    ;
 
 subStmt
-   : (visibility)? (STATIC)? SUB ambiguousIdentifier (argList)? NEWLINE + (block NEWLINE +)? END_SUB
+   : (visibility)? (STATIC)? SUB ambiguousIdentifier (argList)? (block)? END_SUB
    ;
 
 timeStmt
@@ -517,11 +517,11 @@ timeStmt
    ;
 
 typeStmt
-   : (visibility)? TYPE ambiguousIdentifier NEWLINE + (typeStmt_Element)* END_TYPE
+   : (visibility)? TYPE ambiguousIdentifier (typeStmt_Element)* END_TYPE
    ;
 
 typeStmt_Element
-   : ambiguousIdentifier (LPAREN (subscripts)? RPAREN)? (asTypeClause)? NEWLINE +
+   : ambiguousIdentifier (LPAREN (subscripts)? RPAREN)? (asTypeClause)?
    ;
 
 typeOfStmt
@@ -584,7 +584,7 @@ variableSubStmt
    ;
 
 whileWendStmt
-   : WHILE valueStmt NEWLINE + (block NEWLINE)* WEND
+   : WHILE valueStmt block* WEND
    ;
 
 widthStmt
@@ -592,7 +592,7 @@ widthStmt
    ;
 
 withStmt
-   : WITH implicitCallStmt_InStmt NEWLINE + (block NEWLINE +)? END_WITH
+   : WITH implicitCallStmt_InStmt (block)? END_WITH
    ;
 
 writeStmt
@@ -1981,7 +1981,7 @@ LINE_CONTINUATION
 
 
 NEWLINE
-   : ('\r'? '\n' | COLON ' ')
+   : ('\r'? '\n' | COLON ' ') -> skip
    ;
 
 
