@@ -23,7 +23,7 @@ SINGLE_LINE_COMMENT:     '//'  InputCharacter*    -> channel(COMMENTS_CHANNEL);
 DELIMITED_COMMENT:       '/*'  .*? '*/'           -> channel(COMMENTS_CHANNEL);
 
 WHITESPACES:   (Whitespace | NewLine)+            -> channel(HIDDEN);
-SHARP:         '#'                                -> mode(DIRECTIVE_MODE);
+SHARP:         '#'                                -> channel(DIRECTIVE),mode(DIRECTIVE_MODE);
 
 ABSTRACT:      'abstract';
 ADD:           'add';
@@ -281,7 +281,7 @@ DIRECTIVE_OP_OR:               '||'                             -> channel(DIREC
 DIRECTIVE_STRING:              '"' ~('"' | [\r\n\u0085\u2028\u2029])* '"' -> channel(DIRECTIVE), type(STRING);
 CONDITIONAL_SYMBOL:            IdentifierOrKeyword              -> channel(DIRECTIVE);
 DIRECTIVE_SINGLE_LINE_COMMENT: '//' ~[\r\n\u0085\u2028\u2029]*  -> channel(COMMENTS_CHANNEL), type(SINGLE_LINE_COMMENT);
-DIRECTIVE_NEW_LINE:            NewLine                          -> channel(DIRECTIVE), mode(DEFAULT_MODE);
+DIRECTIVE_NEW_LINE:            NewLine                          -> channel(HIDDEN), mode(DEFAULT_MODE);
 
 mode DIRECTIVE_TEXT;
 

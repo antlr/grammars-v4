@@ -149,14 +149,14 @@ multiplicative_expression
 
 // https://msdn.microsoft.com/library/6a71f45d(v=vs.110).aspx
 unary_expression
-	: primary_expression
+	:  OPEN_PARENS type CLOSE_PARENS unary_expression
+	| primary_expression
 	| '+' unary_expression
 	| '-' unary_expression
 	| BANG unary_expression
 	| '~' unary_expression
 	| '++' unary_expression
 	| '--' unary_expression
-	| OPEN_PARENS type CLOSE_PARENS unary_expression
 	| AWAIT unary_expression // C# 5
 	| '&' unary_expression
 	| '*' unary_expression
