@@ -695,6 +695,7 @@ expression
     | '~' expression                                           #unary_operator_expression
 
     | expression op=('*' | '/' | '%') expression               #binary_operator_expression
+    | expression op='||' expression                            #string_connection_expression
     | op=('+' | '-') expression                                #unary_operator_expression
     | expression op=('+' | '-' | '&' | '^' | '|') expression   #binary_operator_expression
     | expression comparison_operator expression                #binary_operator_expression
@@ -1227,130 +1228,406 @@ id
 
 simple_id
     : ID
-    | ABSOLUTE
+    | key_words
+    ;
+    
+key_words
+    : ABSOLUTE
+    | ADD
+    | AFTER
+    | ALL
+    | ALLOW_SNAPSHOT_ISOLATION
+    | ALLOWED
+    | ALTER
+    | AND
+    | ANSI_NULL_DEFAULT
+    | ANSI_NULLS
+    | ANSI_PADDING
+    | ANSI_WARNINGS
+    | ANY
     | APPLY
+    | ARITHABORT
+    | AS
+    | ASC
+    | AUTHORIZATION
     | AUTO
+    | AUTO_CLEANUP
+    | AUTO_CLOSE
+    | AUTO_CREATE_STATISTICS
+    | AUTO_SHRINK
+    | AUTO_UPDATE_STATISTICS
+    | AUTO_UPDATE_STATISTICS_ASYNC
     | AVG
+    | BACKUP
     | BASE64
+    | BEGIN
+    | BETWEEN
+    | BINARY_CHECKSUM
+    | BREAK
+    | BROWSE
+    | BULK
+    | BULK_LOGGED
+    | BY
     | CALLER
+    | CASCADE
+    | CASE
     | CAST
     | CATCH
+    | CHANGE_RETENTION
+    | CHANGE_TRACKING
+    | CHANGES
+    | CHANGETABLE
+    | CHECK
+    | CHECKPOINT
+    | CHECKSUM
     | CHECKSUM_AGG
+    | CLOSE
+    | CLUSTERED
+    | COALESCE
+    | COLLATE
+    | COLUMN
+    | COMMIT
     | COMMITTED
+    | COMPATIBILITY_LEVEL
+    | COMPUTE
     | CONCAT
+    | CONCAT_NULL_YIELDS_NULL
+    | CONSTRAINT
+    | CONTAINMENT
+    | CONTAINS
+    | CONTAINSTABLE
+    | CONTINUE
     | CONTROL
+    | CONVERT
     | COOKIE
     | COUNT
     | COUNT_BIG
+    | CREATE
+    | CROSS
+    | CURRENT
+    | CURRENT_DATE
+    | CURRENT_TIME
+    | CURRENT_TIMESTAMP
+    | CURRENT_USER
+    | CURSOR
+    | CURSOR_CLOSE_ON_COMMIT
+    | CURSOR_DEFAULT
+    | DATABASE
+    | DATE_CORRELATION_OPTIMIZATION
+    | DATEADD
+    | DATEDIFF
+    | DATENAME
+    | DATEPART
+    | DAYS
+    | DB_CHAINING
+    | DBCC
+    | DEALLOCATE
+    | DECLARE
+    | DEFAULT
+    | DEFAULT_FULLTEXT_LANGUAGE
+    | DEFAULT_LANGUAGE
     | DELAY
+    | DELAYED_DURABILITY
+    | DELETE
     | DELETED
     | DENSE_RANK
+    | DENY
+    | DESC
+    | DIRECTORY_NAME
     | DISABLE
+    | DISABLE_BROKER
+    | DISABLED
+    | DISK
+    | DISTINCT
+    | DISTRIBUTED
+    | DOUBLE
+    | DROP
+    | DUMP
     | DYNAMIC
+    | ELSE
+    | EMERGENCY
+    | ENABLE_BROKER
     | ENCRYPTION
+    | END
+    | ERRLVL
+    | ERROR_BROKER_CONVERSATIONS
+    | ESCAPE
+    | EXCEPT
+    | EXECUTE
+    | EXISTS
+    | EXIT
     | EXPAND
+    | EXTERNAL
     | FAST
     | FAST_FORWARD
+    | FETCH
+    | FILE
+    | FILEGROUP
+    | FILEGROWTH
+    | FILENAME
+    | FILESTREAM
+    | FILLFACTOR
     | FIRST
     | FOLLOWING
+    | FOR
     | FORCE
+    | FORCED
     | FORCESEEK
+    | FOREIGN
     | FORWARD_ONLY
+    | FREETEXT
+    | FREETEXTTABLE
+    | FROM
+    | FULL
     | FULLSCAN
+    | FUNCTION
+    | GB
     | GLOBAL
     | GO
+    | GOTO
+    | GRANT
+    | GROUP
     | GROUPING
     | GROUPING_ID
+    | HADR
     | HASH
+    | HAVING
+    | HONOR_BROKER_PRIORITY
+    | HOURS
+    | IDENTITY
+    | IDENTITY_INSERT
+    | IDENTITYCOL
+    | IF
+    | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
+    | IMMEDIATE
     | IMPERSONATE
+    | IN
+    | INCREMENTAL
+    | INDEX
+    | INNER
     | INSENSITIVE
+    | INSERT
     | INSERTED
+    | INTERSECT
+    | INTO
+    | IS
     | ISOLATION
+    | JOIN
+    | KB
     | KEEP
     | KEEPFIXED
-    | FORCED
+    | KEY
     | KEYSET
-    | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
+    | KILL
     | LAST
+    | LEFT
     | LEVEL
+    | LIKE
+    | LINENO
+    | LOAD
     | LOCAL
     | LOCK_ESCALATION
+    | LOG
     | LOGIN
     | LOOP
     | MARK
     | MAX
     | MAXDOP
     | MAXRECURSION
+    | MAXSIZE
+    | MB
+    | MEMORY_OPTIMIZED_DATA
+    | MERGE
     | MIN
+    | MIN_ACTIVE_ROWVERSION
+    | MINUTES
+    | MIXED_PAGE_ALLOCATION
     | MODIFY
+    | MULTI_USER
     | NAME
+    | NATIONAL
+    | NESTED_TRIGGERS
+    | NEW_BROKER
     | NEXT
+    | NO_WAIT
+    | NOCHECK
     | NOCOUNT
     | NOEXPAND
+    | NON_TRANSACTED_ACCESS
+    | NONCLUSTERED
+    | NONE
     | NORECOMPUTE
+    | NOT
     | NTILE
+    | NULL
+    | NULLIF
     | NUMBER
+    | NUMERIC_ROUNDABORT
+    | OF
+    | OFF
+    | OFFLINE
     | OFFSET
+    | OFFSETS
+    | ON
     | ONLINE
     | ONLY
+    | OPEN
+    | OPENDATASOURCE
+    | OPENQUERY
+    | OPENROWSET
+    | OPENXML
     | OPTIMISTIC
     | OPTIMIZE
+    | OPTION
+    | OR
+    | ORDER
     | OUT
+    | OUTER
     | OUTPUT
+    | OVER
     | OWNER
+    | PAGE_VERIFY
     | PARAMETERIZATION
+    | PARTIAL
     | PARTITION
     | PATH
+    | PERCENT
+    | PIVOT
+    | PLAN
     | PRECEDING
+    | PRECISION
+    | PRIMARY
+    | PRINT
     | PRIOR
     | PRIVILEGES
+    | PROC
+    | PROCEDURE
+    | PUBLIC
+    | QUOTED_IDENTIFIER
+    | RAISERROR
     | RANGE
     | RANK
-    | READONLY
+    | READ
+    | READ_COMMITTED_SNAPSHOT
     | READ_ONLY
+    | READ_WRITE
+    | READONLY
+    | READTEXT
     | RECOMPILE
+    | RECONFIGURE
+    | RECOVERY
+    | RECURSIVE_TRIGGERS
+    | REFERENCES
     | RELATIVE
     | REMOTE
     | REPEATABLE
+    | REPLICATION
+    | RESTORE
+    | RESTRICT
+    | RESTRICTED_USER
+    | RETURN
+    | REVERT
+    | REVOKE
+    | RIGHT
     | ROBUST
+    | ROLLBACK
     | ROOT
     | ROW
-    | ROWGUID
-    | ROWS
     | ROW_NUMBER
+    | ROWCOUNT
+    | ROWGUID
+    | ROWGUIDCOL
+    | ROWS
+    | RULE
     | SAMPLE
+    | SAVE
+    | SCHEMA
     | SCHEMABINDING
     | SCROLL
     | SCROLL_LOCKS
+    | SECONDS
+    | SECURITYAUDIT
+    | SELECT
     | SELF
+    | SEMANTICKEYPHRASETABLE
+    | SEMANTICSIMILARITYDETAILSTABLE
+    | SEMANTICSIMILARITYTABLE
     | SERIALIZABLE
+    | SESSION_USER
+    | SET
+    | SETUSER
+    | SHOWPLAN
+    | SHUTDOWN
     | SIMPLE
+    | SINGLE_USER
+    | SIZE
     | SNAPSHOT
+    | SOME
     | SPATIAL_WINDOW_MAX_CELLS
     | STATIC
+    | STATISTICS
     | STATS_STREAM
     | STDEV
     | STDEVP
     | SUM
+    | SYSTEM_USER
+    | TABLE
+    | TABLESAMPLE
+    | TAKE
+    | TARGET_RECOVERY_TIME
+    | TB
     | TEXTIMAGE_ON
+    | TEXTSIZE
+    | THEN
     | THROW
     | TIES
     | TIME
+    | TO
+    | TOP
+    | TORN_PAGE_DETECTION
+    | TRAN
+    | TRANSACTION
+    | TRANSFORM_NOISE_WORDS
+    | TRIGGER
+    | TRUNCATE
+    | TRUSTWORTHY
     | TRY
+    | TRY_CONVERT
+    | TSEQUAL
+    | TWO_DIGIT_YEAR_CUTOFF
     | TYPE
     | TYPE_WARNING
     | UNBOUNDED
     | UNCOMMITTED
+    | UNION
+    | UNIQUE
     | UNKNOWN
+    | UNLIMITED
+    | UNPIVOT
+    | UPDATE
+    | UPDATETEXT
+    | USE
+    | USER
     | USING
+    | VALUES
     | VAR
     | VARP
+    | VARYING
+    | VIEW
     | VIEW_METADATA
     | VIEWS
+    | WAITFOR
+    | WHEN
+    | WHERE
+    | WHILE
+    | WITH
+    | WITHIN
     | WORK
+    | WRITETEXT
     | XML
     | XMLNAMESPACES
     ;
+
 
 // https://msdn.microsoft.com/en-us/library/ms188074.aspx
 // Spaces are allowed for comparison operators.
@@ -1775,9 +2052,9 @@ LINE_COMMENT:       '--' ~[\r\n]* -> channel(HIDDEN);
 // TODO: ID can be not only Latin.
 DOUBLE_QUOTE_ID:    '"' ~'"'+ '"';
 SQUARE_BRACKET_ID:  '[' ~']'+ ']';
-LOCAL_ID:           '@' [a-zA-Z_$@#0-9]+;
+LOCAL_ID:           '@' ([a-zA-Z_$@#0-9] | FullWidthLetter)+;
 DECIMAL:             DEC_DIGIT+;
-ID:                  [a-zA-Z_#][a-zA-Z_#$@0-9]*;
+ID:                  ( [a-zA-Z_#] | FullWidthLetter) ( [a-zA-Z_#$@0-9] | FullWidthLetter )*;
 STRING:              N? '\'' (~'\'' | '\'\'')* '\'';
 BINARY:              '0' X HEX_DIGIT*;
 FLOAT:               DEC_DOT_DEC;
@@ -1788,6 +2065,8 @@ EQUAL:               '=';
 GREATER:             '>';
 LESS:                '<';
 EXCLAMATION:         '!';
+
+CONNECT:             '||';
 
 PLUS_ASSIGN:         '+=';
 MINUS_ASSIGN:        '-=';
@@ -1849,4 +2128,15 @@ fragment W: [wW];
 fragment X: [xX];
 fragment Y: [yY];
 fragment Z: [zZ];
-
+fragment FullWidthLetter
+    : '\u00c0'..'\u00d6' 
+    | '\u00d8'..'\u00f6' 
+    | '\u00f8'..'\u00ff' 
+    | '\u0100'..'\u1fff' 
+    | '\u3040'..'\u318f' 
+    | '\u3300'..'\u337f' 
+    | '\u3400'..'\u3d2d' 
+    | '\u4e00'..'\u9fff' 
+    | '\uf900'..'\ufaff' 
+    | '\uff00'..'\ufff0'
+    ;
