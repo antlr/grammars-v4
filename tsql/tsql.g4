@@ -1775,9 +1775,9 @@ LINE_COMMENT:       '--' ~[\r\n]* -> channel(HIDDEN);
 // TODO: ID can be not only Latin.
 DOUBLE_QUOTE_ID:    '"' ~'"'+ '"';
 SQUARE_BRACKET_ID:  '[' ~']'+ ']';
-LOCAL_ID:           '@' [a-zA-Z_$@#0-9]+;
+LOCAL_ID:           '@' ([a-zA-Z_$@#0-9] | FullWidthLetter)+;
 DECIMAL:             DEC_DIGIT+;
-ID:                  [a-zA-Z_#][a-zA-Z_#$@0-9]*;
+ID:                  ( [a-zA-Z_#] | FullWidthLetter) ( [a-zA-Z_#$@0-9] | FullWidthLetter )*;
 STRING:              N? '\'' (~'\'' | '\'\'')* '\'';
 BINARY:              '0' X HEX_DIGIT*;
 FLOAT:               DEC_DOT_DEC;
@@ -1849,4 +1849,19 @@ fragment W: [wW];
 fragment X: [xX];
 fragment Y: [yY];
 fragment Z: [zZ];
-
+fragment FullWidthLetter
+    : '\u00c0'..'\u00d6' 
+    | '\u00d8'..'\u00f6' 
+    | '\u00f8'..'\u00ff' 
+    | '\u0100'..'\u1fff' 
+    | '\u2c00'..'\u2fff' 
+    | '\u3040'..'\u318f' 
+    | '\u3300'..'\u337f' 
+    | '\u3400'..'\u3fff' 
+    | '\u4e00'..'\u9fff' 
+    | '\ua000'..'\ud7ff' 
+    | '\uf900'..'\ufaff' 
+    | '\uff00'..'\ufff0'
+    // | '\u10000'..'\u1F9FF'  //not support four bytes chars
+    // | '\u20000'..'\u2FA1F'
+    ;

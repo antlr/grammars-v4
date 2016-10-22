@@ -93,7 +93,7 @@ element
    ;
 
 import_clause
-   : 'import' (IDENT '=' name | name ('.' ('*' | '{' import_list '}'))?) comment
+   : 'import' (IDENT '=' name | name '.*' | name '.{' import_list '}' | name ) comment
    ;
 
 import_list
@@ -200,11 +200,11 @@ statement
    ;
 
 if_equation
-   : 'if' expression 'then' (equation ';')* ('elseif' expression 'then')* (equation ';')* ('else' (equation ';')*)? 'end' 'if'
+   : 'if' expression 'then' (equation ';')* ('elseif' expression 'then' (equation ';')*)* ('else' (equation ';')*)? 'end' 'if'
    ;
 
 if_statement
-   : 'if' expression 'then' (statement ';')* ('elseif' expression 'then')* (statement ';')* ('else')? (statement ';')* 'end' 'if'
+   : 'if' expression 'then' (statement ';')* ('elseif' expression 'then' (statement ';')*)* ('else' (statement ';')*)? 'end' 'if'
    ;
 
 for_equation
@@ -351,7 +351,7 @@ expression_list
    ;
 
 array_subscripts
-   : '(' subscript (',' subscript)* ']'
+   : '[' subscript (',' subscript)* ']'
    ;
 
 subscript
@@ -393,7 +393,7 @@ fragment NONDIGIT
 
 
 STRING
-   : '"' S_CHAR* '"'
+   : '"' ( S_CHAR | S_ESCAPE )* '"'
    ;
 
 
@@ -403,7 +403,7 @@ fragment Q_CHAR
 
 
 fragment S_ESCAPE
-   : '’' | '\'' | '?' | '\\' | 'a' | 'b' | 'f' | 'v'
+   : '\\' ('’' | '\'' | '"' | '?' | '\\' | 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v')
    ;
 
 
@@ -425,3 +425,11 @@ UNSIGNED_NUMBER
 WS
    : [ \r\n\t] + -> channel (HIDDEN)
    ;
+
+COMMENT
+    :   '/*' .*? '*/' -> channel (HIDDEN)
+    ;
+
+LINE_COMMENT
+    :   '//' ~[\r\n]* -> channel (HIDDEN)
+    ;

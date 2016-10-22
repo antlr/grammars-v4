@@ -1317,6 +1317,12 @@ noexceptspecification
 ;
 
 /*Preprocessing directives*/
+
+MultiLineMacro
+:
+    '#' (.*? '\\' [\r\n]+)+ ~[\r\n]+ -> skip
+;
+
 Directive
 :
 	'#' ~[\r\n]* -> skip

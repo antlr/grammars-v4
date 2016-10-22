@@ -1,0 +1,1 @@
+(startRule (module (moduleBody (moduleBodyElement (eventStmt (visibility Public)   Event   (ambiguousIdentifier SomeEvent) (argList ( )))) \n \n (moduleBodyElement (eventStmt (visibility Public)   Event   (ambiguousIdentifier SomeOtherEvent) (argList ( (arg ByVal   (ambiguousIdentifier Message)   (asTypeClause As   (type (baseType String)))) )))))) <EOF>)

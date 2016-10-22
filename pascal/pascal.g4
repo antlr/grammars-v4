@@ -65,7 +65,7 @@ label
    ;
 
 constantDefinitionPart
-   : CONST constantDefinition (SEMI constantDefinition)* SEMI
+   : CONST (constantDefinition SEMI)+
    ;
 
 constantDefinition
@@ -108,7 +108,7 @@ string
    ;
 
 typeDefinitionPart
-   : TYPE typeDefinition (SEMI typeDefinition)* SEMI
+   : TYPE (typeDefinition SEMI)+
    ;
 
 typeDefinition
@@ -187,7 +187,8 @@ recordType
    ;
 
 fieldList
-   : (fixedPart (SEMI variantPart | SEMI)? | variantPart)
+   : fixedPart (SEMI variantPart)? 
+   | variantPart
    ;
 
 fixedPart
@@ -199,7 +200,7 @@ recordSection
    ;
 
 variantPart
-   : CASE tag OF variant (SEMI variant | SEMI)*
+   : CASE tag OF variant (SEMI variant)*
    ;
 
 tag
