@@ -53,7 +53,7 @@ public override IToken NextToken()
         if (string.Equals(token.Text, "</script>", System.StringComparison.Ordinal))
         {
             _phpScript = false;
-            token = new CommonToken(ScriptClose);
+            token.Type = ScriptClose;
         }
         else
         {
