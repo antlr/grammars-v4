@@ -72,7 +72,11 @@ expr
 
 factor
    : ident
-   | 'INT'
+   | integer
+   ;
+
+integer
+   : '-'? NUMBER
    ;
 
 op
@@ -86,9 +90,12 @@ ident
 
 
 ID
-   : ('a' .. 'z' | 'A' .. 'Z')*
+   : ('a' .. 'z' | 'A' .. 'Z')+
    ;
 
+NUMBER
+   : ('0' .. '9')+
+   ;
 
 WS
    : [ \r\n] -> skip
