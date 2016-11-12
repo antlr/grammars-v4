@@ -1239,8 +1239,8 @@ templateargumentlist
 
 templateargument
 :
-	constantexpression
-	| typeid
+	typeid
+	| constantexpression
 	| idexpression
 ;
 
