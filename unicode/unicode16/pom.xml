@@ -45,7 +45,7 @@
 				<executions>
 					<execution>
 						<goals>
-							<goal>test</goal>
+					<!--		<goal>test</goal>-->
 						</goals>
 					</execution>
 				</executions>
