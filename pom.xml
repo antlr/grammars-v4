@@ -105,6 +105,7 @@
 		<module>tsql</module>
 		<module>turtle</module>
 		<module>ucb-logo</module>
+		<module>unicode</module>
 		<module>url</module>
 		<module>useragent</module>
 		<module>vb6</module>
