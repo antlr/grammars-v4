@@ -33,96 +33,86 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar gff3;
 
 document
-    : '##gff-version 3\n' line+
-    ;
+   : HEADER line+
+   ; 
 
 line
-    : commentline
-    | dataline
-    ;
+   : commentline 
+   | dataline
+   ;
 
 dataline
-    : seqid '\t' source '\t' type '\t' start '\t' end '\t' score '\t' strand '\t' phase '\t' attributes? EOL
-    ;
+   : seqid '\t' source '\t' type '\t' start '\t' end '\t' score '\t' strand '\t' phase '\t' attributes? EOL
+   ;
 
 attributes
-    : attribute (';' attribute)*
-    ;
+   : attribute (';' attribute)*
+   ;
 
 attribute
-    : TEXT '=' TEXT
-    ;
+   : TEXT '=' TEXT
+   ;
 
 seqid
-    : TEXT
-    ;
-         
+   : TEXT
+   ;
+
 source
-    : TEXT
-    ;
+   : TEXT
+   ;
 
 type
-    : TEXT
-    ;
+   : TEXT
+   ;
 
 start
-    : TEXT
-    ;
+   : TEXT
+   ;
 
 end
-    : TEXT
-    ;
+   : TEXT
+   ;
 
 strand
-    : TEXT
-    ;
+   : TEXT
+   ;
 
 score
-    : TEXT
-    ;
+   : TEXT
+   ;
 
 phase
-    : TEXT
-    ;
+   : TEXT
+   ;
 
 commentline
-    : COMMENTLINE
-    ;   
+   : COMMENTLINE
+   ;
+
+HEADER
+   : '##gff-version 3' EOL
+   ;
 
 COMMENTLINE
-    : '#' .*? EOL
-    ;
+   : '#' .*? EOL
+   ;
 
 EOL
-    : '\r'? '\n'
-    ;
+   : '\r'? '\n'
+   ;
 
 TEXT
-    : (CHAR | SYMBOL | DIGIT)+
-    ;
+   : (CHAR | SYMBOL | DIGIT)+
+   ;
 
 fragment CHAR
-    : [a-zA-Z]
-    ;
+   : [a-zA-Z]
+   ;
 
 fragment DIGIT
-    : [0-9]
-    ;
+   : [0-9]
+   ;
 
 fragment SYMBOL
-    : '.'
-    | ':'
-    | '^'
-    | '*'
-    | '$'
-    | '@'
-    | '%'
-    | '!'
-    | '+'
-    | '_'
-    | '?'
-    | '-'
-    | '|'
-    | ','
-    | ' '
-    ;
+   : '.' | ':' | '^' | '*' | '$' | '@' | '%' | '!' | '+' | '_' | '?' | '-' | '|' | ',' | ' '
+   ;

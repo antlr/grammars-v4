@@ -1,0 +1,291 @@
+program = program-heading block "." .
+program-heading = program identifier "(" identifier-list ")" ";" .
+block =
+declaration-part statement-part .
+declaration-part =
+[ label-declaration-part ]
+[ constant-definition-part ]
+[ type-definition-part ]
+[ variable-declaration-part ]
+procedure-and-function-declaration-part .
+label-declaration-part =
+label label { "," label } ";" .
+constant-definition-part =
+const constant-definition ";" { constant-definition ";" } .
+constant-definition =
+identifier "=" constant .
+type-definition-part =
+type type-definition ";" { type-definition ";" } .
+type-definition =
+identifier "=" type .
+variable-declaration-part =
+var variable-declaration ";" { variable-declaration ";" } .
+variable-declaration =
+identifier-list ":" type .
+procedure-and-function-declaration-part = { (procedure-declaration | function-declaration) ";" } .
+procedure-declaration = procedure-heading ";" procedure-body | procedure-heading ";" directive | procedure-identification ";" procedure-body .
+procedure-body =
+block .
+function-declaration =
+function-heading ";" function-body |
+function-heading ";" directive |
+function-identification ";" function-body .
+function-body =
+block .
+directive =
+forward | compiler-defined-directives .
+statement-part =
+begin statement-sequence end .
+
+
+procedure-heading =
+procedure identifier [ formal-parameter-list ] .
+function-heading =
+function identifier [ formal-parameter-list ] ":" result-type .
+result-type =
+type-identifier .
+procedure-identification =
+procedure procedure-identifier .
+function-identification =
+function function-identifier .
+formal-parameter-list =
+"(" formal-parameter-section { ";" formal-parameter-section } ")" .
+formal-parameter-section =
+value-parameter-section |
+variable-parameter-section |
+procedure-parameter-section |
+function-parameter-section .
+value-parameter-section =
+identifier-list ":" parameter-type .
+variable-parameter-section =
+var identifier-list ":" parameter-type .
+procedure-parameter-section =
+procedure-heading .
+function-parameter-section =
+function-heading .
+parameter-type =
+type-identifier | conformant-array-schema .
+conformant-array-schema =
+packed-conformant-array-schema |
+unpacked-conformant-array-schema .
+packed-conformant-array-schema =
+packed array "[ " bound-specification " ]" of type-identifier .
+unpacked-conformant-array-schema =
+array "[ " bound-specification { ";" bound-specification } " ]"
+of (type-identifier | conformant-array-schema) .
+bound-specification =
+identifier ".." identifier ":" ordinal-type-identifier .
+ordinal-type-identifier =
+type-identifier .
+
+
+statement-sequence =
+statement { ";" statement } .
+statement =
+[ label ":" ] (simple-statement | structured-statement) .
+simple-statement =
+[ assignment-statement | procedure-statement | goto-statement ] .
+assignment-statement =
+(variable | function-identifier) ":=" expression .
+procedure-statement =
+procedure-identifier [ actual-parameter-list ] .
+goto-statement =
+goto label .
+structured-statement =
+compound-statement | repetitive-statement | conditional-statement | with-statement .
+compound-statement =
+begin statement-sequence end .
+repetitive-statement =
+while-statement | repeat-statement | for-statement .
+while-statement =
+while expression do statement .
+repeat-statement =
+repeat statement-sequence until expression .
+for-statement =
+for variable-identifier ":=" initial-expression (to | downto) final-expression do statement .
+initial-expression =
+expression .
+final-expression =
+expression .
+conditional-statement =
+if-statement | case-statement .
+if-statement =
+if expression then statement [ else statement ] .
+case-statement =
+case expression of
+case-limb { ";" case-limb } [ ";" ]
+end .
+case-limb =
+case-label-list ":" statement .
+case-label-list =
+constant { "," constant } .
+with-statement =
+with record-variable { "," record-variable } do statement .
+actual-parameter-list =
+"(" actual-parameter { "," actual-parameter } ")" .
+actual-parameter =
+actual-value | actual-variable | actual-procedure | actual-function .
+actual-value =
+expression .
+actual-procedure =
+procedure-identifier .
+actual-function =
+function-identifier .
+
+
+expression =
+simple-expression [ relational-operator simple-expression ] .
+simple-expression =
+[ sign ] term { addition-operator term } .
+term =
+factor { multiplication-operator factor } .
+factor =
+variable | number | string | set | nil | constant-identifier | bound-identifier | function-designator | "(" expression ")" | not factor .
+relational-operator =
+"=" | "<>" | "<" | "<=" | ">" | ">=" | "in" .
+addition-operator =
+"+" | "-" | or .
+multiplication-operator =
+"*" | "/" | div | mod | and .
+variable =
+entire-variable | component-variable | referenced-variable .
+entire-variable =
+variable-identifier | field-identifier .
+component-variable =
+indexed-variable | field-designator | file-buffer .
+indexed-variable =
+array-variable "[ " expression-list " ]" .
+field-designator =
+record-variable "." field-identifier .
+set =
+"[ " element-list " ]" .
+element-list =
+[ expression { "," expression } ] .
+function-designator =
+function-identifier [ actual-parameter-list ] .
+file-buffer =
+file-variable "^" .
+
+
+type =
+simple-type | structured-type | pointer-type | type-identifier .
+simple-type =
+subrange-type | enumerated-type .
+enumerated-type =
+"(" identifier-list ")" .
+subrange-type =
+lower-bound ".." upper-bound .
+lower-bound =
+constant .
+upper-bound =
+constant .
+structured-type =
+[ packed ] unpacked-structured-type .
+unpacked-structured-type =
+array-type | record-type | set-type | file-type .
+array-type =
+array "[ " index-type { "," index-type } " ]" of element-type .
+index-type =
+simple-type .
+element-type =
+type .
+record-type =
+record field-list end .
+set-type =
+set of base-type .
+base-type =
+type .
+file-type =
+file of file-component-type .
+file-component-type =
+type .
+pointer-type =
+"^" type-identifier .
+
+field-list =
+[ (fixed-part [ ";" variant-part ] | variant-part) [ ";" ] ] .
+fixed-part =
+record-section { ";" record-section } .
+record-section =
+identifier-list ":" type .
+variant-part =
+case tag-field type-identifier of variant { ";" variant } .
+tag-field =
+[ identifier ":" ] .
+variant =
+case-label-list ":" "(" field-list ")" .
+
+
+output-list =
+output-value { "," output-value } .
+output-value =
+expression [ ";" field-width [ ":" fraction-length ] ] .
+field-width =
+expression .
+fraction-length =
+expression .
+
+
+identifier =
+letter { letter | digit } .
+file-variable =
+variable .
+referenced-variable =
+pointer-variable "^" .
+record-variable =
+variable .
+pointer-variable =
+variable .
+actual-variable =
+variable .
+array-variable =
+variable .
+field-identifier =
+identifier .
+constant-identifier =
+identifier .
+variable-identifier =
+identifier .
+type-identifier =
+identifier .
+procedure-identifier =
+identifier .
+function-identifier =
+identifier .
+bound-identifier =
+identifier .
+
+
+variable-list =
+variable { "," variable } ":" .
+identifier-list =
+identifier { "," identifier } .
+expression-list =
+expression { "," expression } .
+number =
+integer-number | real-number .
+integer-number =
+digit-sequence .
+real-number =
+digit-sequence "." [ unsigned-digit-sequence ] [ scale-factor ] |
+digit-sequence scale-factor .
+scale-factor =
+("E" | "e")digit-sequence .
+unsigned-digit-sequence =
+digit { digit } .
+digit-sequence =
+[ sign ] unsigned-digit-sequence .
+sign =
+"+" | "-" .
+letter =
+"A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" .
+digit =
+"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" .
+string =
+"'" string-character { string-character } "'" .
+string-character =
+any-character-except-quote | "''" .
+label =
+integer-number .
+constant =
+[ sign ] (constant-identifier | number) | string .

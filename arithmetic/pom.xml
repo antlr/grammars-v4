@@ -19,6 +19,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>arithmetic.g4</grammars>
+					<visitor>true</visitor>
+					<listener>true</listener>
 				</configuration>
 				<executions>
 					<execution>
@@ -29,11 +31,12 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.antlr</groupId>
+				<groupId>com.khubla.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
+				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>false</showTree>
+					<showTree>true</showTree>
 					<entryPoint>equation</entryPoint>
 					<grammarName>arithmetic</grammarName>
 					<packageName></packageName>

@@ -32,100 +32,117 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar arithmetic;
 
-equation  
-    : expression relop expression
-    ;
+equation
+   : expression relop expression
+   ;
 
-expression 
-    : multiplyingExpression ((PLUS|MINUS) multiplyingExpression)*
-    ;
+expression
+   : term ((PLUS | MINUS) term)*
+   ;
 
-multiplyingExpression  
-    : powExpression ((TIMES|DIV) powExpression)*
-    ;
+term
+   : factor ((TIMES | DIV) factor)*
+   ;
 
-powExpression
-    : atom (POW expression)?
-    ;
+factor
+   : atom (POW atom)*
+   ;
 
-atom 
-    : scientific
-    | variable
-    | LPAREN expression RPAREN
-    ;
+atom
+   : scientific
+   | variable
+   | LPAREN expression RPAREN
+   ;
 
 scientific
-    : number (E number)?
-    ;
+   : number (E number)?
+   ;
 
-relop 
-    : EQ | GT | LT
-    ;
+relop
+   : EQ
+   | GT
+   | LT
+   ;
 
 number
-    : MINUS? DIGIT+ (POINT DIGIT+)?
-    ;
+   : MINUS? DIGIT + (POINT DIGIT +)?
+   ;
 
 variable
-    : MINUS? LETTER (LETTER | DIGIT)*;
-            
-LPAREN 
-    : '('
-    ;
+   : MINUS? LETTER (LETTER | DIGIT)*
+   ;
 
-RPAREN 
-    : ')'
-    ;
 
-PLUS 
-    : '+'
-    ;
+LPAREN
+   : '('
+   ;
 
-MINUS 
-    : '-'
-    ;
 
-TIMES 
-    : '*'
-    ;
+RPAREN
+   : ')'
+   ;
 
-DIV 
-    : '/'
-    ;
 
-GT 
-    : '>'
-    ;
+PLUS
+   : '+'
+   ;
 
-LT 
-    : '<'
-    ;
+
+MINUS
+   : '-'
+   ;
+
+
+TIMES
+   : '*'
+   ;
+
+
+DIV
+   : '/'
+   ;
+
+
+GT
+   : '>'
+   ;
+
+
+LT
+   : '<'
+   ;
+
 
 EQ
-    : '='
-    ;
+   : '='
+   ;
+
 
 POINT
-    : '.'
-    ;
+   : '.'
+   ;
+
 
 E
-    : 'e'
-    | 'E'
-    ;
+   : 'e' | 'E'
+   ;
+
 
 POW
-    : '^'
-    ;
+   : '^'
+   ;
+
 
 LETTER
-    : ('a'..'z') | ('A'..'Z')
-    ;
+   : ('a' .. 'z') | ('A' .. 'Z')
+   ;
+
 
 DIGIT
-    : ('0'..'9')
-    ;
+   : ('0' .. '9')
+   ;
 
-WS 
-    : [ \r\n\t]+ -> channel(HIDDEN)
-    ;
+
+WS
+   : [ \r\n\t] + -> channel (HIDDEN)
+   ;

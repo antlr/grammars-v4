@@ -1,4 +1,3 @@
-
 /*
 * MuMath originally written for Antlr3 by Dan Stanger
 *
@@ -9,170 +8,260 @@
 grammar mumath;
 
 program
-    : ((functionDefinition|assignment|functionDesignator) (SEMI|DOLLAR) )* EOF
-    ;
+   : ((functionDefinition | assignment | functionDesignator) (SEMI | DOLLAR))* EOF
+   ;
 
 assignment
-    : (ID COLON)+ expression
-    ;
+   : (ID COLON) + expression
+   ;
 
 list
-    : LPAREN (RPAREN |ID (COMMA ID )* RPAREN  )
-    ;
+   : LPAREN (RPAREN | ID (COMMA ID)* RPAREN)
+   ;
 
 functionDefinition
-    : FUNCTION ID list COMMA statments (COMMA)? ENDFUN
-    ;
+   : FUNCTION ID list COMMA statments (COMMA)? ENDFUN
+   ;
 
 actualParameter
-    : expression|assignment
-    ;
+   : expression
+   | assignment
+   ;
 
 statments
-    : (loop|when|block|assignment|expression|functionDesignator) (COMMA statments)*
-    ;
+   : (loop | when | block | assignment | expression | functionDesignator) (COMMA statments)*
+   ;
 
 block
-    : BLOCK statments COMMA ENDBLOCK
-    ;
+   : BLOCK statments COMMA ENDBLOCK
+   ;
 
 loop
-    : LOOP statments (COMMA)? ENDLOOP
-    ;
+   : LOOP statments (COMMA)? ENDLOOP
+   ;
 
 when
-    : WHEN expression ((COMMA)? EXIT COMMA statments (COMMA )? EXIT )
-    ;
+   : WHEN expression ((COMMA)? EXIT COMMA statments (COMMA)? EXIT)
+   ;
 
 expression
-    : simpleExpression ( relationalOperator simpleExpression)*
-    ;
+   : simpleExpression (relationalOperator simpleExpression)*
+   ;
 
 relationalOperator
-    : equal | (NOT_EQUAL  | LT  | LE | GE  | GT  | EQUATION)
-    ;
+   : equal
+   | (NOT_EQUAL | LT | LE | GE | GT | EQUATION)
+   ;
 
 simpleExpression
-    : (MINUS)?
-      term ( addingOperator term )*
-    ;
+   : (MINUS)? term (addingOperator term)*
+   ;
 
 addingOperator
-    : PLUS | MINUS | OR
-    ;
+   : PLUS
+   | MINUS
+   | OR
+   ;
 
 term
-    : factor ( multiplyingOperator factor )*
-    ;
+   : factor (multiplyingOperator factor)*
+   ;
 
 multiplyingOperator
-    : (STAR | SLASH | MOD | AND | POWER)
-    ;
+   : (STAR | SLASH | MOD | AND | POWER)
+   ;
 
 factor
-    : ID
-    | constant
-    | LPAREN  expression RPAREN
-    | functionDesignator
-    | NOT factor
-    ;
+   : ID
+   | constant
+   | LPAREN expression RPAREN
+   | functionDesignator
+   | NOT factor
+   ;
 
 constant
-    : (NUMBER
-    | STRING
-    | QUOTE ID
-    | QUOTE STRING )
-    ;
+   : (NUMBER | STRING | QUOTE ID | QUOTE STRING)
+   ;
 
 functionDesignator
-    : ID LPAREN ((actualParameter ( COMMA  actualParameter) *)|) RPAREN
-    ;
+   : ID LPAREN ((actualParameter (COMMA actualParameter)*) |) RPAREN
+   ;
 
 equal
-    : (EQF|EQC)
-    ;
+   : (EQF | EQC)
+   ;
+
 
 BLOCK
-    : 'BLOCK'
-    ;
+   : 'BLOCK'
+   ;
+
 
 ENDBLOCK
-    : 'ENDBLOCK'
-    ;
+   : 'ENDBLOCK'
+   ;
+
 
 FUNCTION
-    : 'FUNCTION'
-    ;
+   : 'FUNCTION'
+   ;
+
 
 ENDFUN
-    : 'ENDFUN'
-    ;
+   : 'ENDFUN'
+   ;
+
 
 EQF
-    : 'EQ'
-    ;
+   : 'EQ'
+   ;
+
 
 LOOP
-    : 'LOOP'
-    ;
+   : 'LOOP'
+   ;
+
 
 ENDLOOP
-    : 'ENDLOOP'
-    ;
+   : 'ENDLOOP'
+   ;
+
 
 WHEN
-    : 'WHEN'
-    ;
+   : 'WHEN'
+   ;
+
 
 EXIT
-    : 'EXIT'
-    ;
+   : 'EXIT'
+   ;
+
 
 OR
-    : 'OR'
-    ;
+   : 'OR'
+   ;
+
 
 WS
-    : (' ' | '\t' | '\n' | '\r') ->skip
-    ;
+   : (' ' | '\t' | '\n' | '\r') -> skip
+   ;
+
 
 COMMENT
-    : '%' ('\n' | ~('%'|'\n'))* '%' ->skip
-    ;
+   : '%' ('\n' | ~ ('%' | '\n'))* '%' -> skip
+   ;
 
 
-EQUATION	: '=='	;
-QUOTE		: '\''	;
-PLUS		: '+'	;
-MINUS		: '-'	;
-STAR		: '*'	;
-SLASH		: '/'	;
-COMMA		: ','	;
-SEMI		: ';'	;
-DOLLAR		: '$'	;
-COLON		: ':'	;
-EQC		: '='	;
-NOT_EQUAL	: '<>'	;
-LT		: '<'	;
-LE		: '<='	;
-GE		: '>='	;
-GT		: '>'	;
-LPAREN		: '('	;
-RPAREN		: ')'	;
-POWER		: '^'	;
+EQUATION
+   : '=='
+   ;
+
+
+QUOTE
+   : '\''
+   ;
+
+
+PLUS
+   : '+'
+   ;
+
+
+MINUS
+   : '-'
+   ;
+
+
+STAR
+   : '*'
+   ;
+
+
+SLASH
+   : '/'
+   ;
+
+
+COMMA
+   : ','
+   ;
+
+
+SEMI
+   : ';'
+   ;
+
+
+DOLLAR
+   : '$'
+   ;
+
+
+COLON
+   : ':'
+   ;
+
+
+EQC
+   : '='
+   ;
+
+
+NOT_EQUAL
+   : '<>'
+   ;
+
+
+LT
+   : '<'
+   ;
+
+
+LE
+   : '<='
+   ;
+
+
+GE
+   : '>='
+   ;
+
+
+GT
+   : '>'
+   ;
+
+
+LPAREN
+   : '('
+   ;
+
+
+RPAREN
+   : ')'
+   ;
+
+
+POWER
+   : '^'
+   ;
+
 
 ID
-    : ('A'..'Z' | '@' | '{' | '#') ('A'..'Z'|'0'..'9'|'#'|'}')* (ARR)?
-    ;
+   : ('A' .. 'Z' | '@' | '{' | '#') ('A' .. 'Z' | '0' .. '9' | '#' | '}')* (ARR)?
+   ;
+
 
 ARR
-    : '[' NUMBER ']'
-    ;
+   : '[' NUMBER ']'
+   ;
+
 
 STRING
-    : '"' (~'"')* '"'
-    ;
+   : '"' (~ '"')* '"'
+   ;
+
 
 NUMBER
-    : ('0'..'9')+
-    ;
+   : ('0' .. '9') +
+   ;

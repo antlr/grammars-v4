@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Rainer Schuster
+Copyright (c) 2013,2015 Rainer Schuster
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@ Web IDL grammar derived from:
     http://heycam.github.io/webidl/
 
     Web IDL (Second Edition)
-    W3C Editor's Draft 13 November 2014
+    W3C Editor's Draft 17 November 2015
  */
 grammar WebIDL;
 
@@ -63,6 +63,7 @@ definition
 callbackOrInterface
 	: 'callback' callbackRestOrInterface
 	| interface_
+	| class_
 ;
 
 callbackRestOrInterface
@@ -72,6 +73,10 @@ callbackRestOrInterface
 
 interface_
 	: 'interface' IDENTIFIER_WEBIDL inheritance '{' interfaceMembers '}' ';'
+;
+
+class_
+    : 'class' IDENTIFIER_WEBIDL extension '{' interfaceMembers '}' ';'
 ;
 
 partial
@@ -143,6 +148,11 @@ inheritance
 	| /* empty */
 ;
 
+extension
+    : 'extends' IDENTIFIER_WEBIDL
+    | /* empty */
+;
+
 enum_
 	: 'enum' IDENTIFIER_WEBIDL '{' enumValueList '}' ';'
 ;
@@ -202,8 +212,8 @@ serializer
 
 serializerRest
 	: operationRest
-	| '=' serializationPattern
-	| /* empty */
+	| '=' serializationPattern ';'
+	| ';'
 ;
 
 serializationPattern
@@ -250,8 +260,8 @@ readonlyMember
 
 readonlyMemberRest
 	: attributeRest
-	| maplikeRest
-	| setlikeRest
+	| readWriteMaplike
+	| readWriteSetlike
 ;
 
 readWriteAttribute
@@ -260,7 +270,7 @@ readWriteAttribute
 ;
 
 attributeRest
-	: 'attribute' type IDENTIFIER_WEBIDL ';'
+	: 'attribute' type attributeName ';'
 ;
 
 attributeName
@@ -299,7 +309,6 @@ specials
 special
 	: 'getter'
 	| 'setter'
-	| 'creator'
 	| 'deleter'
 	| 'legacycaller'
 ;
@@ -344,7 +353,6 @@ ellipsis
 
 iterable
 	: 'iterable' '<' type optionalType '>' ';'
-	| 'legacyiterable' '<' type '>' ';'
 ;
 
 optionalType
@@ -415,8 +423,8 @@ other
 	| '>'
 	| '?'
 	| 'ByteString'
-	| 'Date'
 	| 'DOMString'
+	| 'FrozenArray'
 	| 'Infinity'
 	| 'NaN'
 	| 'RegExp'
@@ -446,7 +454,6 @@ argumentNameKeyword
 	: 'attribute'
 	| 'callback'
 	| 'const'
-	| 'creator'
 	| 'deleter'
 	| 'dictionary'
 	| 'enum'
@@ -456,7 +463,6 @@ argumentNameKeyword
 	| 'interface'
 	| 'iterable'
 	| 'legacycaller'
-	| 'legacyiterable'
 	| 'maplike'
 	| 'partial'
 	| 'required'
@@ -476,12 +482,12 @@ otherOrComma
 
 type
 	: singleType
-	| unionType typeSuffix
+	| unionType null_
 ;
 
 singleType
 	: nonAnyType
-	| 'any' typeSuffixStartingWithArray
+	| 'any'
 ;
 
 unionType
@@ -490,8 +496,7 @@ unionType
 
 unionMemberType
 	: nonAnyType
-	| unionType typeSuffix
-	| 'any' '[' ']' typeSuffix
+	| unionType null_
 ;
 
 unionMemberTypes
@@ -500,18 +505,18 @@ unionMemberTypes
 ;
 
 nonAnyType
-	: primitiveType typeSuffix
+	: primitiveType  null_
 	| promiseType null_
-	| 'ByteString' typeSuffix
-	| 'DOMString' typeSuffix
-	| 'USVString' typeSuffix
-	| IDENTIFIER_WEBIDL typeSuffix
+	| 'ByteString'  null_
+	| 'DOMString'  null_
+	| 'USVString'  null_
+	| IDENTIFIER_WEBIDL  null_
 	| 'sequence' '<' type '>' null_
-	| 'object' typeSuffix
-	| 'Date' typeSuffix
-	| 'RegExp' typeSuffix
-	| 'DOMException' typeSuffix
-	| bufferRelatedType typeSuffix
+	| 'object'  null_
+	| 'RegExp'  null_
+	| 'DOMException'  null_
+	| bufferRelatedType  null_
+	| 'FrozenArray' '<' type '>' null_
 ;
 
 bufferRelatedType
@@ -568,17 +573,6 @@ optionalLong
 
 promiseType
 	: 'Promise' '<' returnType '>'
-;
-
-typeSuffix
-	: '[' ']' typeSuffix
-	| '?' typeSuffixStartingWithArray
-	| /* empty */
-;
-
-typeSuffixStartingWithArray
-	: '[' ']' typeSuffix
-	| /* empty */
 ;
 
 null_

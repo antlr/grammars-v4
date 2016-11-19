@@ -635,8 +635,8 @@ singleExpression
  | singleExpression '&&' singleExpression                                 # LogicalAndExpression
  | singleExpression '||' singleExpression                                 # LogicalOrExpression
  | singleExpression '?' singleExpression ':' singleExpression             # TernaryExpression
- | singleExpression '=' expressionSequence                                # AssignmentExpression
- | singleExpression assignmentOperator expressionSequence                 # AssignmentOperatorExpression
+ | singleExpression '=' singleExpression                                  # AssignmentExpression
+ | singleExpression assignmentOperator singleExpression                   # AssignmentOperatorExpression
  | This                                                                   # ThisExpression
  | Identifier                                                             # IdentifierExpression
  | literal                                                                # LiteralExpression
@@ -738,11 +738,11 @@ futureReservedWord
  ;
 
 getter
- : {self._input.LT(1).getText() == "get"}? Identifier propertyName
+ : {self._input.LT(1).text == "get"}? Identifier propertyName
  ;
 
 setter
- : {self._input.LT(1).getText() == "set"}? Identifier propertyName
+ : {self._input.LT(1).text == "set"}? Identifier propertyName
  ;
 
 eos

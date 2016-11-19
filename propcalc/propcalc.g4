@@ -33,80 +33,92 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar propcalc;
 
 proposition
-    : expression THEREFORE expression
-    ;
+   : expression THEREFORE expression
+   ;
 
 expression
-    : relExpression ((AND | OR) relExpression)*;
+   : relExpression ((AND | OR) relExpression)*
+   ;
 
 relExpression
-    : atom
-    | equiv
-    | implies
-    ;
+   : atom
+   | equiv
+   | implies
+   ;
 
 atoms
-    : atom (',' atom)*
-    ;
+   : atom (',' atom)*
+   ;
 
 atom
-    : variable
-    | NOT atom 
-    | LPAREN expression RPAREN
-    ;
+   : variable
+   | NOT atom
+   | LPAREN expression RPAREN
+   ;
 
 equiv
-    : atom EQUIV atom
-    ;
+   : atom EQUIV atom
+   ;
 
 implies
-    : atom IMPLIES atom
-    ;
+   : atom IMPLIES atom
+   ;
 
 variable
-    : LETTER*;
+   : LETTER*
+   ;
+
 
 AND
-    : '^'
-    ;
+   : '^'
+   ;
+
 
 OR
-    : 'v'
-    ;
+   : 'v'
+   ;
+
 
 NOT
-    : '!'
-    ;
+   : '!'
+   ;
+
 
 EQ
-    : '='
-    ;
+   : '='
+   ;
+
 
 IMPLIES
-    : '->'
-    ;
+   : '->'
+   ;
+
 
 THEREFORE
-    : '|-'
-    ;
+   : '|-'
+   ;
+
 
 EQUIV
-    : '<->'
-    ;
+   : '<->'
+   ;
+
 
 LPAREN
-    : '('
-    ;
+   : '('
+   ;
+
 
 RPAREN
-    : ')'
-    ;
+   : ')'
+   ;
 
 
 LETTER
-    : ('a'..'z') | ('A'..'Z')
-    ;
+   : ('a' .. 'z') | ('A' .. 'Z')
+   ;
 
-WS 
-    : [ \r\n\t]+ -> channel(HIDDEN)
-    ;
+
+WS
+   : [ \r\n\t] + -> channel (HIDDEN)
+   ;
