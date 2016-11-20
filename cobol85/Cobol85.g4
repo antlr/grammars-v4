@@ -26,40 +26,10 @@
 * 1. Picture strings are parsed as (groups of) terminal symbols.
 *
 * 2. Comments are skipped.
-*
-*
-* Change log:
-*
-* v1.4
-*	- improved handling of comment entries
-*   - stronger specification conformance
-*
-* v1.3
-*	- data description fixes
-*	- picture string fixes
-*
-* v1.2
-*	- fixes
-*
-* v1.1
-*	- DFHRESP and DFHVALUE
-*	- CALL BY VALUE
-*	- REMARKS paragraph
-*
-* v1.0
-*	- fixes
-*	- compiler options
-*
-* v0.9
-*   - initial revision
 */
 
 grammar Cobol85;
 
-options
-{
-	language = Java;
-}
 
 startRule : compilationUnit EOF;
 
@@ -224,8 +194,16 @@ diskSizeClause :
 collatingSequenceClause :
 	PROGRAM? COLLATING? SEQUENCE 
 	(IS? alphabetName+)
-	(FOR? ALPHANUMERIC IS? alphabetName)?
-	(FOR? NATIONAL IS? alphabetName)?
+	collatingSequenceClauseAlphanumeric?
+	collatingSequenceClauseNational?
+;
+
+collatingSequenceClauseAlphanumeric :
+	FOR? ALPHANUMERIC IS? alphabetName
+;
+
+collatingSequenceClauseNational :
+	FOR? NATIONAL IS? alphabetName
 ;
 
 segmentLimitClause :
@@ -271,13 +249,20 @@ alphabetClauseFormat1 :
 		| STANDARD_2
 		| NATIVE
 		| cobolWord
-		| (literal
-			(
-				(THROUGH | THRU) literal 
-				| (ALSO literal+)+
-			)?
-		)+
+		| alphabetLiterals+
 	)
+;
+
+alphabetLiterals :
+	literal (alphabetThrough | alphabetAlso+)?
+;
+
+alphabetThrough :
+	(THROUGH | THRU) literal 
+;
+
+alphabetAlso :
+	ALSO literal+
 ;
 
 alphabetClauseFormat2 :
@@ -295,9 +280,19 @@ classClause :
 		FOR? (ALPHANUMERIC | NATIONAL)
 	)?
 	IS?
-	(
-		(identifier | literal) ((THROUGH | THRU) (identifier | literal))?
-	)+
+	classClauseThrough+
+;
+
+classClauseThrough : 
+	classClauseFrom ((THROUGH | THRU) classClauseTo)?
+;
+
+classClauseFrom :
+	identifier | literal
+;
+
+classClauseTo :
+	identifier | literal
 ;
 
 currencySignClause :
@@ -340,10 +335,12 @@ symbolicCharactersClause :
 	(FOR? 
 		(ALPHANUMERIC | NATIONAL)
 	)? 
-	(
-		symbolicCharacter+ (IS | ARE)? integerLiteral+
-	)+
+	symbolicCharacters+
 	(IN alphabetName)?
+;
+
+symbolicCharacters :
+	symbolicCharacter+ (IS | ARE)? integerLiteral+
 ;
 
 // -- input output section ----------------------------------
@@ -412,13 +409,7 @@ recordDelimiterClause :
 ;
 
 accessModeClause :
-	ACCESS MODE? IS?
-	(
-		SEQUENTIAL
-		| RANDOM
-		| DYNAMIC
-		| EXCLUSIVE
-	)
+	ACCESS MODE? IS? (SEQUENTIAL | RANDOM | DYNAMIC | EXCLUSIVE)
 ;
 
 recordKeyClause :
@@ -446,12 +437,12 @@ relativeKeyClause :
 ioControlParagraph :
 	I_O_CONTROL DOT_FS
 	(fileName DOT_FS)?
-	(ioControlClause (DOT_FS? ioControlClause)* DOT_FS)?
+	(ioControlClause* DOT_FS)?
 ;
 
 ioControlClause :
 	rerunClause
-	| sameAreaClause
+	| sameClause
 	| multipleFileClause
 	| commitmentControlClause
 ;
@@ -476,12 +467,16 @@ rerunEveryClock :
 	integerLiteral CLOCK_UNITS?
 ;
 
-sameAreaClause :
+sameClause :
 	SAME (RECORD | SORT | SORT_MERGE)? AREA? FOR? fileName+
 ;
 
 multipleFileClause :
-	MULTIPLE FILE TAPE? CONTAINS? (fileName POSITION? integerLiteral?)+
+	MULTIPLE FILE TAPE? CONTAINS? multipleFilePosition+
+;
+
+multipleFilePosition : 
+	fileName (POSITION integerLiteral)?
 ;
 
 commitmentControlClause :
@@ -511,21 +506,23 @@ dataDivisionBody :
 
 fileSection :
 	FILE SECTION DOT_FS
-	(fileAndSortDescriptionEntry dataDescriptionEntry*)*
+	fileDescriptionEntry*
 ;
 
-fileAndSortDescriptionEntry :
-	(FD | SD) fileName (DOT_FS? fileAndSortDescriptionEntryClause)* DOT_FS
+fileDescriptionEntry :
+	(FD | SD) fileName
+	(DOT_FS? fileDescriptionEntryClause)* DOT_FS
+	dataDescriptionEntry*
 ;
 
-fileAndSortDescriptionEntryClause :
+fileDescriptionEntryClause :
 	externalClause
 	| globalClause
 	| blockContainsClause
 	| recordContainsClause
 	| labelRecordsClause
 	| valueOfClause
-	| dataRecordClause
+	| dataRecordsClause
 	| linageClause
 	| codeSetClause
 	| reportClause
@@ -541,7 +538,11 @@ globalClause :
 ;
 
 blockContainsClause :
-	BLOCK CONTAINS? (integerLiteral TO)? integerLiteral (RECORDS | CHARACTERS?)
+	BLOCK CONTAINS? integerLiteral blockContainsTo? (RECORDS | CHARACTERS)?
+;
+
+blockContainsTo :
+	TO integerLiteral 
 ;
 
 recordContainsClause :
@@ -553,11 +554,15 @@ recordContainsClauseFormat1 :
 ;
 
 recordContainsClauseFormat2 :
-	IS? VARYING IN? SIZE? (FROM? integerLiteral (TO integerLiteral)? CHARACTERS?)? (DEPENDING ON? qualifiedDataName)?
+	IS? VARYING IN? SIZE? (FROM? integerLiteral recordContainsTo? CHARACTERS?)? (DEPENDING ON? qualifiedDataName)?
 ;
 
 recordContainsClauseFormat3 :
-	CONTAINS? integerLiteral TO integerLiteral CHARACTERS?
+	CONTAINS? integerLiteral recordContainsTo CHARACTERS?
+;
+
+recordContainsTo :
+	TO integerLiteral
 ;
 
 labelRecordsClause :
@@ -565,20 +570,35 @@ labelRecordsClause :
 ;
 
 valueOfClause :
-	VALUE OF (systemName IS? (qualifiedDataName | literal))+
+	VALUE OF valuePair+
 ;
 
-dataRecordClause :
+valuePair :
+	systemName IS? (qualifiedDataName | literal)
+;
+
+dataRecordsClause :
 	DATA (RECORD IS? | RECORDS ARE?) dataName+
 ;
 
 linageClause :
-	LINAGE IS? (dataName | integerLiteral) LINES?
-	(
-		WITH? FOOTING AT? (dataName | integerLiteral)
-		| LINES? AT? TOP (dataName | integerLiteral)
-		| LINES? AT? BOTTOM (dataName | integerLiteral)
-	)*
+	LINAGE IS? (dataName | integerLiteral) LINES? linageAt*
+;
+
+linageAt :
+	linageFootingAt | linageLinesAtTop | linageLinesAtBottom
+;
+
+linageFootingAt :
+	WITH? FOOTING AT? (dataName | integerLiteral)
+;
+
+linageLinesAtTop :
+	LINES? AT? TOP (dataName | integerLiteral)
+;
+
+linageLinesAtBottom :
+	LINES? AT? BOTTOM (dataName | integerLiteral)
 ;
 
 recordingModeClause :
@@ -639,17 +659,15 @@ communicationDescriptionEntryFormat1 :
 	CD cdName FOR? INITIAL? INPUT
 	(
 		(
-			SYMBOLIC? QUEUE IS? dataDescName
-			| SYMBOLIC? SUB_QUEUE_1 IS? dataDescName
-			| SYMBOLIC? SUB_QUEUE_2 IS? dataDescName
-			| SYMBOLIC? SUB_QUEUE_3 IS? dataDescName
-			| MESSAGE DATE IS? dataDescName
-			| MESSAGE TIME IS? dataDescName
-			| SYMBOLIC? SOURCE IS? dataDescName
-			| TEXT LENGTH IS? dataDescName
-			| END KEY IS? dataDescName
-			| STATUS KEY IS? dataDescName
-			| MESSAGE? COUNT IS? dataDescName
+			symbolicQueueClause
+			| symbolicSubQueueClause
+			| messageDateClause
+			| messageTimeClause
+			| symbolicSourceClause
+			| textLengthClause
+			| endKeyClause
+			| statusKeyClause
+			| messageCountClause
 		)
 		| dataDescName
 	)*
@@ -659,12 +677,12 @@ communicationDescriptionEntryFormat1 :
 communicationDescriptionEntryFormat2 :
 	CD cdName FOR? OUTPUT
 	(
-		DESTINATION COUNT IS? dataDescName
-		| TEXT LENGTH IS? dataDescName
-		| STATUS KEY IS? dataDescName
-		| DESTINATION TABLE OCCURS integerLiteral TIMES (INDEXED BY indexName+)?
-		| ERROR KEY IS? dataDescName
-		| SYMBOLIC? DESTINATION IS? dataDescName
+		destinationCountClause
+		| textLengthClause
+		| statusKeyClause
+		| destinationTableClause
+		| errorKeyClause
+		| symbolicDestinationClause
 	)*
 	DOT_FS
 ;
@@ -673,16 +691,73 @@ communicationDescriptionEntryFormat3 :
 	CD cdName FOR? INITIAL I_O
 	( 	
 		(
-			MESSAGE DATE IS? dataDescName
-			| MESSAGE TIME IS? dataDescName
-			| SYMBOLIC? TERMINAL IS? dataDescName
-			| TEXT LENGTH IS? dataDescName
-			| END KEY IS? dataDescName
-			| STATUS KEY IS? dataDescName
+			messageDateClause
+			| messageTimeClause
+			| symbolicTerminalClause
+			| textLengthClause
+			| endKeyClause
+			| statusKeyClause
 		)
-		| dataDescName+
+		| dataDescName
 	)*
 	DOT_FS
+;
+
+destinationCountClause :
+	DESTINATION COUNT IS? dataDescName
+;
+
+destinationTableClause :
+	DESTINATION TABLE OCCURS integerLiteral TIMES (INDEXED BY indexName+)?
+;
+
+endKeyClause :
+	END KEY IS? dataDescName
+;
+
+errorKeyClause :
+	ERROR KEY IS? dataDescName
+;
+
+messageCountClause :
+	MESSAGE? COUNT IS? dataDescName
+;
+
+messageDateClause :
+	MESSAGE DATE IS? dataDescName
+;
+
+messageTimeClause :
+	MESSAGE TIME IS? dataDescName
+;
+
+statusKeyClause :
+	STATUS KEY IS? dataDescName
+;
+
+symbolicDestinationClause :
+	SYMBOLIC? DESTINATION IS? dataDescName
+;
+
+symbolicQueueClause :
+	SYMBOLIC? QUEUE IS? dataDescName
+;
+
+symbolicSourceClause :
+	SYMBOLIC? SOURCE IS? dataDescName
+;
+
+symbolicTerminalClause :
+	SYMBOLIC? TERMINAL IS? dataDescName
+;
+
+symbolicSubQueueClause :
+	SYMBOLIC? (SUB_QUEUE_1 | SUB_QUEUE_2 | SUB_QUEUE_3) 
+	IS? dataDescName
+;
+
+textLengthClause :
+	TEXT LENGTH IS? dataDescName
 ;
 
 // -- local storage section ----------------------------------
@@ -703,22 +778,49 @@ screenSection :
 
 reportSection :
 	REPORT SECTION DOT_FS
-	(
-		reportDescriptionEntry reportGroupDescriptionEntry+
-	)*
+	report*
+;
+
+report :
+	reportDescriptionEntry 
+	reportGroupDescriptionEntry+
 ;
 
 reportDescriptionEntry :
 	RD reportName
-	(IS? GLOBAL)?
+	reportDescriptionGlobalClause?
 	(
-		PAGE (LIMIT IS? | LIMITS ARE?)? integerLiteral (LINE | LINES)?
-		(HEADING integerLiteral)?
-		(FIRST DETAIL integerLiteral)?
-		(LAST DETAIL integerLiteral)?
-		(FOOTING integerLiteral)?
+		reportDescriptionPageLimitClause
+		reportDescriptionHeadingClause?
+		reportDescriptionFirstDetailClause?
+		reportDescriptionLastDetailClause?
+		reportDescriptionFootingClause?
 	)?
 	DOT_FS
+;
+
+reportDescriptionGlobalClause :
+	IS? GLOBAL
+;
+
+reportDescriptionPageLimitClause :
+	PAGE (LIMIT IS? | LIMITS ARE?)? integerLiteral (LINE | LINES)?
+;
+
+reportDescriptionHeadingClause :
+	HEADING integerLiteral
+;
+
+reportDescriptionFirstDetailClause :
+	FIRST DETAIL integerLiteral
+;
+
+reportDescriptionLastDetailClause :
+	LAST DETAIL integerLiteral
+;
+
+reportDescriptionFootingClause :
+	FOOTING integerLiteral
 ;
 
 reportGroupDescriptionEntry :
@@ -729,81 +831,157 @@ reportGroupDescriptionEntry :
 
 reportGroupDescriptionEntryFormat1 :
 	integerLiteral dataName
-	(
-		LINE NUMBER? IS?
-		(
-			integerLiteral (ON? NEXT PAGE)?
-			| PLUS integerLiteral
-			| NEXT PAGE
-		)
-	)?
-	
-	(
-		NEXT GROUP IS?
-		(
-			integerLiteral | PLUS integerLiteral | NEXT PAGE
-		)
-	)?
-	
-	TYPE IS? (
-		(REPORT HEADING | RH)
-		| (PAGE HEADING | PH)
-		| (CONTROL HEADING | CH) (dataName | FINAL)
-		| (DETAIL | DE)
-		| (CONTROL FOOTING | CF) (dataName | FINAL)
-		| (PAGE FOOTING | PF)
-		| (REPORT FOOTING | RF)
-	)
-	
-	(
-		USAGE IS? (DISPLAY | DISPLAY_1)
-	)?
+	reportGroupLineNumberClause?
+	reportGroupNextGroupClause?
+	reportGroupTypeClause
+	reportGroupUsageClause?
 	DOT_FS
 ;
 
 reportGroupDescriptionEntryFormat2 :
 	integerLiteral dataName?
-	(
-		LINE NUMBER? IS?
-		(
-			integerLiteral (ON? NEXT PAGE)?
-			| PLUS integerLiteral
-			| NEXT PAGE
-		)
-	)?
-	(
-		USAGE IS? (DISPLAY | DISPLAY_1)	
-	)
+	reportGroupLineNumberClause?
+	reportGroupUsageClause
 	DOT_FS
 ;
 
 reportGroupDescriptionEntryFormat3 :
 	integerLiteral dataName?
 	(
-		dataPictureClause
-		| (USAGE IS? (DISPLAY | DISPLAY_1))
-		| (SIGN IS? (LEADING | TRAILING) SEPARATE CHARACTER?)
-		| ((JUSTIFIED | JUST) RIGHT?)
-		| (BLANK WHEN? ZERO)
+		reportGroupPictureClause
+		| reportGroupUsageClause
+		| reportGroupSignClause
+		| reportGroupJustifiedClause
+		| reportGroupBlankWhenZeroClause
+		| reportGroupLineNumberClause
+		| reportGroupColumnNumberClause
 		| (
-			LINE? NUMBER? IS? (
-		 		integerLiteral (ON? NEXT PAGE)?
-				| PLUS integerLiteral
-			)
+			reportGroupSourceClause
+			| reportGroupValueClause 
+			| reportGroupSumClause
+			| reportGroupResetClause
 		)
-		| (COLUMN NUMBER? IS? integerLiteral)
-		| (
-			SOURCE IS? identifier
-			| VALUE IS? literal
-			| (
-				SUM identifier (COMMACHAR identifier)+
-				(UPON dataName (COMMACHAR dataName)+)?
-			)
-			| (RESET ON? (FINAL | dataName))
-		)
-		| (GROUP INDICATE?)
+		| reportGroupIndicateClause
 	)*
 	DOT_FS
+;
+
+reportGroupBlankWhenZeroClause :
+	BLANK WHEN? ZERO
+;
+
+reportGroupColumnNumberClause :
+	COLUMN NUMBER? IS? integerLiteral
+;
+
+reportGroupIndicateClause :
+	GROUP INDICATE?
+;
+
+reportGroupJustifiedClause :
+	(JUSTIFIED | JUST) RIGHT?
+;
+
+reportGroupLineNumberClause :
+	LINE? NUMBER? IS?
+	(
+ 		reportGroupLineNumberNextPage
+		| reportGroupLineNumberPlus
+	)
+;
+
+reportGroupLineNumberNextPage :
+	integerLiteral (ON? NEXT PAGE)?
+;
+
+reportGroupLineNumberPlus :
+	PLUS integerLiteral
+;
+
+reportGroupNextGroupClause :
+	NEXT GROUP IS?
+	(
+		integerLiteral
+		| reportGroupNextGroupNextPage
+		| reportGroupNextGroupPlus
+	)
+;
+
+reportGroupNextGroupPlus :
+	PLUS integerLiteral
+;
+
+reportGroupNextGroupNextPage :
+	NEXT PAGE
+;
+
+reportGroupPictureClause :
+	(PICTURE | PIC) IS? pictureString
+;
+
+reportGroupResetClause :
+	RESET ON? (FINAL | dataName)
+;
+
+reportGroupSignClause :
+	SIGN IS? (LEADING | TRAILING) SEPARATE CHARACTER?
+;
+
+reportGroupSourceClause :
+	SOURCE IS? identifier
+;
+
+reportGroupSumClause :
+	SUM identifier (COMMACHAR? identifier)*
+	(UPON dataName (COMMACHAR? dataName)*)?
+;
+
+reportGroupTypeClause :
+	TYPE IS? (
+		reportGroupTypeReportHeading
+		| reportGroupTypePageHeading
+		| reportGroupTypeControlHeading
+		| reportGroupTypeDetail
+		| reportGroupTypeControlFooting
+		| reportGroupTypePageFooting
+		| reportGroupTypeReportFooting
+	)
+;
+
+reportGroupTypeReportHeading :
+	REPORT HEADING | RH
+;
+
+reportGroupTypePageHeading :
+	PAGE HEADING | PH
+;
+
+reportGroupTypeControlHeading :
+	(CONTROL HEADING | CH) (dataName | FINAL)
+;
+
+reportGroupTypeDetail :
+	DETAIL | DE
+;
+
+reportGroupTypeControlFooting :
+	(CONTROL FOOTING | CF) (dataName | FINAL)
+;
+
+reportGroupUsageClause :
+	USAGE IS? (DISPLAY | DISPLAY_1)	
+;
+
+reportGroupTypePageFooting :
+	PAGE FOOTING | PF
+;
+
+reportGroupTypeReportFooting :
+	REPORT FOOTING | RF
+;
+
+reportGroupValueClause :
+	VALUE IS? literal
 ;
 
 // -- program library section ----------------------------------
@@ -837,16 +1015,36 @@ libraryDescriptionEntryFormat2 :
 libraryAttributeClauseFormat1 :
 	ATTRIBUTE
 	(
-		SHARING IS? (DONTCARE | PRIVATE | SHAREDBYRUNUNIT | SHAREDBYALL)
+		SHARING IS? 
+		(
+			DONTCARE | 
+			PRIVATE | 
+			SHAREDBYRUNUNIT | 
+			SHAREDBYALL
+		)
 	)?
 ;
 
 libraryAttributeClauseFormat2 :
 	ATTRIBUTE
-	(FUNCTIONNAME IS literal)?
-	(LIBACCESS IS? (BYFUNCTION | BYTITLE))?
-	(LIBPARAMETER IS? literal)?
-	(TITLE IS? literal)?
+	libraryAttributeFunction?
+	(LIBACCESS IS? 
+		(BYFUNCTION | BYTITLE)
+	)?
+	libraryAttributeParameter?
+	libraryAttributeTitle?
+;
+
+libraryAttributeFunction :
+	FUNCTIONNAME IS literal
+;
+
+libraryAttributeParameter :
+	LIBPARAMETER IS? literal
+;
+
+libraryAttributeTitle :
+	TITLE IS? literal
 ;
 
 libraryEntryProcedureClauseFormat1 :
@@ -871,11 +1069,19 @@ libraryEntryProcedureGivingClause :
 ;
 
 libraryEntryProcedureUsingClause :
-	WITH (dataName | fileName)+
+	USING libraryEntryProcedureUsingName+
+;
+
+libraryEntryProcedureUsingName :
+	dataName | fileName
 ;
 
 libraryEntryProcedureWithClause :
-	WITH (localName | fileName)+
+	WITH libraryEntryProcedureWithName+
+;
+
+libraryEntryProcedureWithName :
+	localName | fileName
 ;
 
 libraryIsCommonClause :
@@ -960,12 +1166,18 @@ dataJustifiedClause :
 ;
 
 dataOccursClause :
-	OCCURS (integerLiteral TO)? integerLiteral TIMES?
+	OCCURS integerLiteral dataOccursTo? TIMES?
 	(DEPENDING ON? qualifiedDataName)?
-	(
-		(ASCENDING | DESCENDING) KEY? IS? qualifiedDataName+
-	)*
+	dataOccursSort*
 	(INDEXED BY? LOCAL? indexName+)?
+;
+
+dataOccursTo :
+	TO integerLiteral
+;
+
+dataOccursSort :
+	(ASCENDING | DESCENDING) KEY? IS? qualifiedDataName+
 ;
 
 dataPictureClause :
@@ -1080,21 +1292,25 @@ dataUsageClause :
 ;
 
 dataUsingClause :
-	USING
-	(
-		CONVENTION OF? (cobolWord | dataName)
-		| LANGUAGE OF? (cobolWord | dataName)
-	)
+	USING (LANGUAGE | CONVENTION)
+	OF? (cobolWord | dataName)
 ;
 
 dataValueClause :
 	(VALUE IS? | VALUES ARE?)?
-	(
-		(literal | cobolWord)
-		(
-			(THROUGH | THRU) literal
-		)?
-	)+
+	dataValueInterval+
+;
+
+dataValueInterval :
+	dataValueIntervalFrom dataValueIntervalTo?
+;
+
+dataValueIntervalFrom :
+	literal | cobolWord
+;
+
+dataValueIntervalTo :
+	(THROUGH | THRU) literal
 ;
 
 dataWithLowerBoundsClause :
@@ -1599,7 +1815,11 @@ moveStatement :
 ;
 
 moveToStatement :
-	(identifier | literal | otherKeyword) TO identifier+
+	moveToStatementSendingArea TO identifier+
+;
+
+moveToStatementSendingArea :
+	identifier | literal | otherKeyword
 ;
 
 moveCorrespondingToStatement :

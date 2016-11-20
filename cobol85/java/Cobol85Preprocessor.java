@@ -6,22 +6,22 @@
  * of the BSD 3-clause license. See the LICENSE file for details.
  */
 
-package org.cobol85.preprocessor;
+package io.proleap.cobol.preprocessor;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-public interface Cobol85Preprocessor {
+public interface CobolPreprocessor {
 
-	public enum Cobol85Dialect {
+	public enum CobolDialect {
 		ANSI85, MF, OSVS
 	}
 
 	/**
-	 * Representation of a Cobol 85 line.
+	 * Representation of a Cobol line.
 	 */
-	public class Cobol85Line {
+	public class CobolLine {
 
 		public String comment;
 
@@ -31,12 +31,12 @@ public interface Cobol85Preprocessor {
 
 		public char indicatorArea;
 
-		public Cobol85SourceFormat lineFormat;
+		public CobolSourceFormat lineFormat;
 
 		public String sequenceArea;
 
-		public Cobol85Line(final String sequenceArea, final char indicatorArea, final String contentAreaA,
-				final String contentAreaB, final String comment, final Cobol85SourceFormat lineFormat) {
+		public CobolLine(final String sequenceArea, final char indicatorArea, final String contentAreaA,
+				final String contentAreaB, final String comment, final CobolSourceFormat lineFormat) {
 			this.sequenceArea = sequenceArea;
 			this.indicatorArea = indicatorArea;
 			this.contentAreaA = contentAreaA;
@@ -51,7 +51,7 @@ public interface Cobol85Preprocessor {
 		}
 	}
 
-	public interface Cobol85SourceFormat {
+	public interface CobolSourceFormat {
 
 		String indicatorField = "([ABCdD\\-/* ])";
 
@@ -60,7 +60,7 @@ public interface Cobol85Preprocessor {
 		String getRegex();
 	}
 
-	public enum Cobol85SourceFormatEnum implements Cobol85SourceFormat {
+	public enum CobolSourceFormatEnum implements CobolSourceFormat {
 
 		/**
 		 * Fixed format, standard ANSI / IBM reference. Each line exactly 80
@@ -97,7 +97,7 @@ public interface Cobol85Preprocessor {
 
 		private final String regex;
 
-		Cobol85SourceFormatEnum(final String regex) {
+		CobolSourceFormatEnum(final String regex) {
 			this.regex = regex;
 			pattern = Pattern.compile(regex);
 		}
@@ -113,8 +113,8 @@ public interface Cobol85Preprocessor {
 		}
 	}
 
-	String process(File cobolFile, File libDirectory, Cobol85Dialect dialect, Cobol85SourceFormat format)
+	String process(File cobolFile, File libDirectory, CobolDialect dialect, CobolSourceFormat format)
 			throws IOException;
 
-	String process(String cobolSourceCode, File libDirectory, Cobol85Dialect dialect, Cobol85SourceFormat format);
+	String process(String cobolSourceCode, File libDirectory, CobolDialect dialect, CobolSourceFormat format);
 }
