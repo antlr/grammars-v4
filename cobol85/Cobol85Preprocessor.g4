@@ -10,31 +10,10 @@
 * Cobol 85 Preprocessor Grammar for ANTLR4
 *
 * This is a preprocessor grammar for Cobol 85.
-*
-* Change log:
-*
-* v1.4
-*   - control spacing statements
-*
-* v1.2
-*	- fixes
-*
-* v1.1
-*	- fixes
-*
-* v1.0
-*	- EXEC SQL
-*	- EXEC CICS
-*
-* v0.9 Initial revision
 */
 
 grammar Cobol85Preprocessor;
 
-options
-{
-	language = Java;
-}
 
 startRule : (
 	copyStatement
