@@ -19,13 +19,6 @@
 *
 * 2. To be used in conjunction with the provided preprocessor, which executes
 *    COPY and REPLACE statements.
-*
-*
-* Known limitations (work under progress):
-*
-* 1. Picture strings are parsed as (groups of) terminal symbols.
-*
-* 2. Comments are skipped.
 */
 
 grammar Cobol85;
@@ -1335,12 +1328,14 @@ procedureDivisionGivingClause :
 
 procedureDeclaratives :
 	DECLARATIVES DOT_FS
-	(
-		procedureSectionHeader DOT_FS
-		useStatement DOT_FS
-		paragraphs
-	)+
+	procedureDeclarative+
 	END DECLARATIVES DOT_FS
+;
+
+procedureDeclarative :
+	procedureSectionHeader DOT_FS
+	useStatement DOT_FS
+	paragraphs
 ;
 
 procedureSectionHeader :
@@ -1430,10 +1425,15 @@ statement :
 // accept statement
 
 acceptStatement :
-	ACCEPT identifier (acceptFromDate | acceptFromMnemonic | acceptMessageCount)?
+	ACCEPT identifier 
+	(
+		acceptFromDateStatement 
+		| acceptFromMnemonicStatement
+		| acceptMessageCountStatement
+	)?
 ;
 
-acceptFromDate :
+acceptFromDateStatement :
 	FROM
 	(
 		DATE YYYYMMDD?
@@ -1449,11 +1449,11 @@ acceptFromDate :
 	)
 ;
 
-acceptFromMnemonic :
+acceptFromMnemonicStatement :
 	FROM mnemonicName
 ;
 
-acceptMessageCount :
+acceptMessageCountStatement :
 	MESSAGE? COUNT
 ;
 
@@ -1466,21 +1466,33 @@ addStatement :
 		| addToGivingStatement
 		| addCorrespondingStatement
 	)
-	(ON? SIZE ERROR statements)?
-	(NOT ON? SIZE ERROR statements)?
+	onSizeErrorPhrase?
+	notOnSizeErrorPhrase?
 	END_ADD?
 ;
 
 addToStatement :
-	(identifier | literal)+ TO (identifier ROUNDED?)+
+	addFrom+ TO addTo+
 ;
 
 addToGivingStatement :
-	(identifier | literal)+ (TO identifier+)? GIVING (identifier ROUNDED?)+
+	addFrom+ (TO addTo+)? GIVING addGiving+
 ;
 
 addCorrespondingStatement :
-	(CORRESPONDING | CORR) identifier TO identifier ROUNDED?
+	(CORRESPONDING | CORR) identifier TO addTo
+;
+
+addFrom :
+	identifier | literal
+;
+
+addTo :
+	identifier ROUNDED?
+;
+
+addGiving :
+	identifier ROUNDED?
 ;
 
 // altered go to statement
@@ -1492,7 +1504,11 @@ alteredGoTo :
 // alter statement
 
 alterStatement :
-	ALTER (procedureName TO (PROCEED TO)? procedureName)+
+	ALTER alterProceedTo+
+;
+
+alterProceedTo :
+	procedureName TO (PROCEED TO)? procedureName
 ;
 
 // call statement
@@ -1502,44 +1518,65 @@ callStatement :
 	(
 		USING (callByReferenceStatement | callByValueStatement | callByContentStatement)+
 	)?
-	(GIVING identifier)?
-	(ON? OVERFLOW statements)?
+	callGivingPhrase?
+	onOverflowPhrase?
 	onExceptionClause?
 	notOnExceptionClause?
 	END_CALL?
 ;
 
 callByReferenceStatement :
-	(BY? REFERENCE)? (identifier | ADDRESS OF identifier | fileName | INTEGER identifier | STRING identifier)+
+	(BY? REFERENCE)? callByReference+
+;
+
+callByReference :
+	(ADDRESS OF | INTEGER | STRING)? identifier 
+	| fileName
 ;
 
 callByValueStatement :
-	BY? VALUE (identifier | literal)+
+	BY? VALUE callByValue+
+;
+
+callByValue :
+	identifier | literal
 ;
 
 callByContentStatement :
-	BY? CONTENT ((LENGTH OF)? identifier | ADDRESS OF identifier | literal)+
+	BY? CONTENT callByContent+
+;
+
+callByContent :
+	(ADDRESS OF | LENGTH OF)? identifier 
+	| literal
+;
+
+callGivingPhrase :
+	GIVING identifier
 ;
 
 // cancel statement
 
 cancelStatement :
-	CANCEL (identifier | literal | libraryName (BYTITLE | BYFUNCTION))+
+	CANCEL cancelCall+
+;
+
+cancelCall :
+	identifier | literal | libraryName (BYTITLE | BYFUNCTION)
 ;
 
 // close statement
 
 closeStatement :
-	CLOSE
-	(
-		fileName (closeReelUnitStatement | closeRelativeStatement | closePortFileIOStatement)?
-	)+
+	CLOSE closeFile+
+;
+
+closeFile :
+	fileName (closeReelUnitStatement | closeRelativeStatement | closePortFileIOStatement)?
 ;
 
 closeReelUnitStatement :
-	(REEL | UNIT)
-	(FOR? REMOVAL)?
-	(WITH? (NO REWIND | LOCK))?
+	(REEL | UNIT) (FOR? REMOVAL)? (WITH? (NO REWIND | LOCK))?
 ;
 
 closeRelativeStatement :
@@ -1547,25 +1584,39 @@ closeRelativeStatement :
 ;
 
 closePortFileIOStatement :
-	(WITH? NO WAIT | WITH WAIT)
-	(
-		USING
-		(
-			CLOSE_DISPOSITION OF? (ABORT | ORDERLY)
-			| ASSOCIATED_DATA_LENGTH OF? (identifier | integerLiteral)
-			| ASSOCIATED_DATA (identifier | integerLiteral)
-		)*
-	)?
+	(WITH? NO WAIT | WITH WAIT) (USING closePortFileIOUsing*)?
+;
+
+closePortFileIOUsing :
+	closePortFileIOUsingCloseDisposition 
+	| closePortFileIOUsingAssociatedData 
+	| closePortFileIOUsingAssociatedDataLength
+;
+
+closePortFileIOUsingCloseDisposition :
+	CLOSE_DISPOSITION OF? (ABORT | ORDERLY)
+;
+
+closePortFileIOUsingAssociatedData :
+	ASSOCIATED_DATA (identifier | integerLiteral)
+;
+
+closePortFileIOUsingAssociatedDataLength :
+	ASSOCIATED_DATA_LENGTH OF? (identifier | integerLiteral)
 ;
 
 // compute statement
 
 computeStatement :
-	COMPUTE (identifier ROUNDED?)+
+	COMPUTE computeStore+
 	(EQUALCHAR | EQUAL) arithmeticExpression
-	(ON SIZE ERROR statements)?
-	(NOT ON? SIZE ERROR statements)?
+	onSizeErrorPhrase?
+	notOnSizeErrorPhrase?
 	END_COMPUTE?
+;
+
+computeStore :
+	identifier ROUNDED?
 ;
 
 // continue statement
@@ -1578,25 +1629,33 @@ continueStatement :
 
 deleteStatement :
 	DELETE fileName RECORD?
-	(INVALID KEY? statements)?
-	(NOT INVALID KEY? statements)?
+	invalidKeyPhrase?
+	notInvalidKeyPhrase?
 	END_DELETE?
 ;
 
 // disable statement
 
 disableStatement :
-	DISABLE
-	(INPUT TERMINAL? | I_O TERMINAL | OUTPUT)
-	cdName WITH? KEY (identifier | literal)
+	DISABLE	(INPUT TERMINAL? | I_O TERMINAL | OUTPUT) cdName WITH? KEY (identifier | literal)
 ;
 
 // display statement
 
 displayStatement :
-	DISPLAY (identifier | literal | otherKeyword)+
-	(UPON (mnemonicName | environmentName))?
-	(WITH? NO ADVANCING)?
+	DISPLAY displayOperand+	displayUpon? displayWith?
+;
+
+displayOperand :
+	identifier | literal | otherKeyword
+;
+
+displayUpon :
+	UPON (mnemonicName | environmentName)
+;
+
+displayWith :
+	WITH? NO ADVANCING
 ;
 
 // divide statement
@@ -1608,29 +1667,40 @@ divideStatement :
 		| divideIntoGivingStatement
 		| divideIntoByGivingStatement
 	)
-	(REMAINDER identifier)?
-	(ON? SIZE ERROR statements)?
-	(NOT ON? SIZE ERROR statements)?
+	divideRemainder?
+	onSizeErrorPhrase?
+	notOnSizeErrorPhrase?
 	END_DIVIDE?
 ;
 
 divideIntoStatement :
-	INTO (identifier | literal) (GIVING (identifier ROUNDED?)+)?
+	INTO (identifier | literal) divideGivingPhrase?
 ;
 
 divideIntoGivingStatement :
-	INTO (identifier ROUNDED?)+
+	INTO divideGiving+
 ;
 
 divideIntoByGivingStatement :
-	BY (identifier | literal) (GIVING (identifier ROUNDED?)+)?
+	BY (identifier | literal) divideGivingPhrase?
+;
+
+divideGivingPhrase :
+	GIVING divideGiving+
+;
+
+divideGiving :
+	identifier ROUNDED?
+;
+
+divideRemainder :
+	REMAINDER identifier
 ;
 
 // enable statement
 
 enableStatement :
-	ENABLE (INPUT TERMINAL? | I_O TERMINAL | OUTPUT)
-	cdName WITH? KEY (literal | identifier)
+	ENABLE (INPUT TERMINAL? | I_O TERMINAL | OUTPUT) cdName WITH? KEY (literal | identifier)
 ;
 
 // entry statement
@@ -1642,30 +1712,43 @@ entryStatement :
 // evaluate statement
 
 evaluateStatement :
-	EVALUATE evaluateValue
-	(ALSO evaluateValue)*
-	(
-		(WHEN evaluatePhrase (ALSO evaluatePhrase)*)+
-		statements
-	)+
-	(WHEN OTHER statements)?
-	END_EVALUATE?
+	EVALUATE evaluateSelect evaluateAlsoSelect* evaluateWhenPhrase+ evaluateWhenOther? END_EVALUATE?
+;
+
+evaluateSelect :
+	identifier | literal | arithmeticExpression | condition
+;
+
+evaluateAlsoSelect :
+	ALSO evaluateSelect
+;
+
+evaluateWhenPhrase :
+	evaluateWhen+ statements
+;
+
+evaluateWhen :
+	WHEN evaluateCondition evaluateAlsoCondition*
+;
+
+evaluateCondition :
+	ANY | condition | booleanLiteral | NOT? evaluateValue evaluateThrough?
+;
+
+evaluateThrough :
+	(THROUGH | THRU) evaluateValue
+;
+
+evaluateAlsoCondition :
+	ALSO evaluateCondition
+;
+
+evaluateWhenOther :
+	WHEN OTHER statements
 ;
 
 evaluateValue :
-	arithmeticExpression
-	| identifier
-	| literal
-	| condition
-;
-
-evaluatePhrase :
-	ANY
-	| condition
-	| booleanLiteral
-	| NOT? (identifier | literal | arithmeticExpression) (
-		(THROUGH | THRU) (identifier | literal | arithmeticExpression)
-	)?
+	identifier | literal | arithmeticExpression
 ;
 
 // exit statement
@@ -1677,7 +1760,7 @@ exitStatement :
 // generate statement
 
 generateStatement :
-	GENERATE (dataName | reportName)
+	GENERATE reportName
 ;
 
 // goback statement
@@ -1703,33 +1786,29 @@ goToDependingOnStatement :
 // if statement
 
 ifStatement :
-	IF condition THEN? (statement* | NEXT SENTENCE)
-	(
-		ELSE (statement* | NEXT SENTENCE)
-	)?
-	END_IF?
+	IF condition ifThen ifElse? END_IF?
+;
+
+ifThen :
+	THEN? (statement* | NEXT SENTENCE)
+;
+
+ifElse :
+	ELSE (statement* | NEXT SENTENCE)
 ;
 
 // initialize statement
 
 initializeStatement :
-	INITIALIZE identifier+
-	(
-		REPLACING
-		(
-			(
-				ALPHABETIC
-				| ALPHANUMERIC
-				| NATIONAL
-				| NUMERIC
-				| ALPHANUMERIC_EDITED
-				| NUMERIC_EDITED
-				| DBCS
-				| EGCS
-			)
-			DATA? BY (identifier | literal)
-		)+
-	)?
+	INITIALIZE identifier+ initializeReplacingPhrase?
+;
+
+initializeReplacingPhrase :
+	REPLACING initializeReplacingBy+
+;
+
+initializeReplacingBy :
+	(ALPHABETIC | ALPHANUMERIC | NATIONAL | NUMERIC | ALPHANUMERIC_EDITED | NUMERIC_EDITED | DBCS | EGCS) DATA? BY (identifier | literal)
 ;
 
 // initiate statement
@@ -1741,67 +1820,115 @@ initiateStatement :
 // inspect statement
 
 inspectStatement :
-	INSPECT identifier
+	INSPECT identifier 
 	(
 		inspectTallyingPhrase
-		| inspectConvertingPhrase
 		| inspectReplacingPhrase
+		| inspectTallyingReplacingPhrase 
+		| inspectConvertingPhrase 
 	)
 ;
 
 inspectTallyingPhrase :
-	TALLYING
-	(
-		identifier FOR
-		(
-			CHARACTERS inspectBeforeAfterPhrase*
-			|
-			(ALL | LEADING)
-			(
-				(identifier | literal) inspectBeforeAfterPhrase*
-			)+
-		)+
-	)+
-	inspectReplacingPhrase?
+	TALLYING inspectFor+
+;
+
+inspectReplacingPhrase :
+	REPLACING (inspectReplacingCharacters | inspectReplacingAllLeadings)+
+;
+
+inspectTallyingReplacingPhrase :
+	TALLYING inspectFor+ inspectReplacingPhrase+
 ;
 
 inspectConvertingPhrase :
 	CONVERTING (identifier | literal)
-	TO (identifier | literal) inspectBeforeAfterPhrase*
+	inspectTo inspectBeforeAfter*
 ;
 
-inspectReplacingPhrase :
-	REPLACING
-	(
-		CHARACTERS BY (identifier | literal) inspectBeforeAfterPhrase*
-		| (ALL | LEADING | FIRST)
-		(
-			(identifier | literal) BY (identifier | literal)
-			inspectBeforeAfterPhrase*
-		)+
-	)+
+
+inspectFor :
+	identifier FOR (inspectCharacters | inspectAllLeadings)+
 ;
 
-inspectBeforeAfterPhrase :
+inspectCharacters :
+	CHARACTERS inspectBeforeAfter*
+;
+
+inspectReplacingCharacters :
+	CHARACTERS inspectBy inspectBeforeAfter*
+;
+
+inspectAllLeadings :
+	(ALL | LEADING)	inspectAllLeading+
+;
+
+inspectReplacingAllLeadings :
+	(ALL | LEADING | FIRST) inspectReplacingAllLeading+
+;
+
+inspectAllLeading :
+	(identifier | literal) inspectBeforeAfter*
+;
+
+inspectReplacingAllLeading :
+	(identifier | literal) inspectBy inspectBeforeAfter*
+;
+
+inspectBy :
+	BY (identifier | literal)
+;
+
+inspectTo :
+	TO (identifier | literal)
+;
+
+inspectBeforeAfter :
 	(BEFORE | AFTER) INITIAL? (identifier | literal)
 ;
 
 // merge statement
 
 mergeStatement :
-	MERGE fileName
-	(ON? (ASCENDING | DESCENDING) KEY? qualifiedDataName+)+
-	(
-		COLLATING? SEQUENCE IS? alphabetName+
-		(FOR? ALPHANUMERIC IS alphabetName)?
-		(FOR? NATIONAL IS? alphabetName)? 
-	)? 
+	MERGE fileName mergeOnKeyClause+ mergeCollatingSequencePhrase? mergeUsing* mergeOutputProcedurePhrase? mergeGivingPhrase*
+;
+
+mergeOnKeyClause :
+	ON? (ASCENDING | DESCENDING) KEY? qualifiedDataName+
+;
+
+mergeCollatingSequencePhrase :
+	COLLATING? SEQUENCE IS? alphabetName+
+	mergeCollatingAlphanumeric?
+	mergeCollatingNational?
+;
+
+mergeCollatingAlphanumeric :
+	FOR? ALPHANUMERIC IS alphabetName
+;
+
+mergeCollatingNational :
+	FOR? NATIONAL IS? alphabetName
+;
+
+mergeUsing :
 	USING fileName+
-	(OUTPUT PROCEDURE IS? procedureName)?
-	((THROUGH | THRU) procedureName)?
-	(GIVING 
-		(fileName (LOCK | SAVE | NO REWIND | CRUNCH | RELEASE | WITH REMOVE CRUNCH)?)+
-	)?
+;
+
+mergeOutputProcedurePhrase :
+	OUTPUT PROCEDURE IS? procedureName mergeOutputThrough?
+;
+
+mergeOutputThrough :
+	(THROUGH | THRU) procedureName
+;
+
+mergeGivingPhrase :
+	GIVING mergeGiving+
+;
+
+mergeGiving :
+	fileName (LOCK | SAVE | NO REWIND | CRUNCH | RELEASE | WITH REMOVE CRUNCH)?
 ;
 
 // move statement
@@ -1829,23 +1956,31 @@ moveCorrespondingToStatement :
 // multiply statement
 
 multiplyStatement :
-	MULTIPLY (identifier | literal) BY
-	(
-		multiplyRegular
-		| multiplyGiving
-	)
-	(ON? SIZE ERROR statements)?
-	(NOT ON? SIZE ERROR statements)?
+	MULTIPLY (identifier | literal) BY 
+	(multiplyRegular | multiplyGiving)
+	onSizeErrorPhrase?
+	notOnSizeErrorPhrase?
 	END_MULTIPLY?
 ;
 
 multiplyRegular :
-	(identifier ROUNDED?)+
+	multiplyRegularOperand+
+;
+
+multiplyRegularOperand :
+	identifier ROUNDED?
 ;
 
 multiplyGiving :
-	(identifier | literal)
-	GIVING (identifier ROUNDED?)+
+	multiplyGivingOperand GIVING multiplyGivingResult+
+;
+
+multiplyGivingOperand :
+	identifier | literal
+;
+
+multiplyGivingResult :
+	identifier ROUNDED?
 ;
 
 // open statement
@@ -1861,11 +1996,19 @@ openStatement :
 ;
 
 openInputStatement :
-	INPUT (fileName (REVERSED | WITH? NO REWIND)?)+
+	INPUT openInput+
+;
+
+openInput :
+	fileName (REVERSED | WITH? NO REWIND)?
 ;
 
 openOutputStatement :
-	OUTPUT (fileName (WITH? NO REWIND)?)+
+	OUTPUT openOutput+
+;
+
+openOutput :
+	fileName (WITH? NO REWIND)?
 ;
 
 openIOStatement :
@@ -1936,40 +2079,75 @@ purgeStatement :
 readStatement :
 	READ fileName
 	NEXT? RECORD?
-	(INTO identifier)?
-	(
-		WITH?
-		(
-			(KEPT | NO) LOCK
-			| WAIT
-		)
-	)?
-	(KEY IS? qualifiedDataName)?
-	(INVALID KEY? statements)?
-	(NOT INVALID KEY? statements)?
-	(AT? END statements)?
-	(NOT AT? END statements)?
+	readInto?
+	readWith?
+	readKey?
+	invalidKeyPhrase?
+	notInvalidKeyPhrase?
+	atEndPhrase?
+	notAtEndPhrase?
 	END_READ?
+;
+
+readInto :
+	INTO identifier
+;
+
+readWith :
+	WITH? ((KEPT | NO) LOCK | WAIT)
+;
+
+readKey :
+	KEY IS? qualifiedDataName
 ;
 
 // receive statement
 
 receiveStatement :
-	RECEIVE
-	(
-		dataName FROM (THREAD dataName | LAST THREAD | ANY THREAD)
-		(
-			BEFORE TIME? (numericLiteral | identifier)
-			| WITH? NO WAIT
-			| THREAD IN? dataName
-			| SIZE IN? (numericLiteral | identifier)
-			| STATUS IN? (identifier)
-			| onExceptionClause
-			| notOnExceptionClause
-		)
-		| cdName (MESSAGE | SEGMENT) INTO? identifier (NO DATA statements)? (WITH DATA statements)?
-	)
+	RECEIVE	(receiveFromStatement | receiveIntoStatement)
+	onExceptionClause?
+	notOnExceptionClause?
 	END_RECEIVE?
+;
+
+receiveFromStatement :
+	dataName FROM receiveFrom (receiveBefore | receiveWith | receiveThread | receiveSize | receiveStatus)*
+;
+
+receiveFrom :
+	THREAD dataName | LAST THREAD | ANY THREAD
+;
+
+receiveIntoStatement :
+	cdName (MESSAGE | SEGMENT) INTO? identifier receiveNoData? receiveWithData?
+;
+
+receiveNoData :
+	NO DATA statements
+;
+
+receiveWithData :
+	WITH DATA statements
+;
+
+receiveBefore :
+	BEFORE TIME? (numericLiteral | identifier)
+;
+
+receiveWith :
+	WITH? NO WAIT
+;
+
+receiveThread :
+	THREAD IN? dataName
+;
+
+receiveSize :
+	SIZE IN? (numericLiteral | identifier)
+;
+
+receiveStatus :
+	STATUS IN? (identifier)
 ;
 
 // release statement
@@ -1981,103 +2159,189 @@ releaseStatement :
 // return statement
 
 returnStatement :
-	RETURN fileName RECORD? (INTO qualifiedDataName)?
-	AT? END statements
-	(NOT AT END statements)?
+	RETURN fileName RECORD?
+	returnInto?
+	atEndPhrase
+	notAtEndPhrase?
 	END_RETURN?
+;
+
+returnInto :
+	INTO qualifiedDataName
 ;
 
 // rewrite statement
 
 rewriteStatement :
-	REWRITE recordName (FROM identifier)?
-	(INVALID KEY? statements)?
-	(NOT INVALID KEY? statements)?
+	REWRITE recordName 
+	rewriteFrom?
+	invalidKeyPhrase?
+	notInvalidKeyPhrase?
 	END_REWRITE?
+;
+
+rewriteFrom :
+	FROM identifier
 ;
 
 // search statement
 
 searchStatement :
 	SEARCH ALL? qualifiedDataName
-	(VARYING qualifiedDataName)?
-	(AT? END statements)?
-	(WHEN condition (statements | NEXT SENTENCE))+
+	searchVarying?
+	atEndPhrase?
+	searchWhen+
 	END_SEARCH?
+;
+
+searchVarying :
+	VARYING qualifiedDataName
+;
+
+searchWhen :
+	WHEN condition (statements | NEXT SENTENCE)
 ;
 
 // send statement
 
 sendStatement :
 	SEND (sendStatementSync | sendStatementAsync)
+	onExceptionClause?
+	notOnExceptionClause?
 ;
 
 sendStatementSync :
-	(identifier | literal) (FROM identifier)?
-	(
-		WITH (identifier | EGI | EMI | ESI)
-	)?
-	(REPLACING LINE?)?
-	sendAdvancingPhrase?
-	onExceptionClause?
-	notOnExceptionClause?
+	(identifier | literal) sendFromPhrase? sendWithPhrase? sendReplacingPhrase? sendAdvancingPhrase?
 ;
 
 sendStatementAsync :
 	TO (TOP | BOTTOM) identifier
-	onExceptionClause?
-	notOnExceptionClause?
+;
+
+sendFromPhrase :
+	FROM identifier
+;
+
+sendWithPhrase :
+	WITH (identifier | EGI | EMI | ESI)
+;
+
+sendReplacingPhrase :
+	REPLACING LINE?
 ;
 
 sendAdvancingPhrase :
 	(BEFORE | AFTER) ADVANCING?
-	(
-		PAGE
-		| (identifier | literal) (LINE | LINES)?
-		| mnemonicName
-	)
+	(sendAdvancingPage | sendAdvancingLines | sendAdvancingMnemonic)
+;
+
+sendAdvancingPage :
+	PAGE
+;
+
+sendAdvancingLines :
+	(identifier | literal) (LINE | LINES)?
+;
+
+sendAdvancingMnemonic :
+	mnemonicName
 ;
 
 // set statement
 
 setStatement :
-	SET (setToStatement	| setUpDownByStatement)
+	SET (setToStatement+ | setUpDownByStatement)
 ;
 
 setToStatement :
-	(identifier+ TO (identifier | ON | OFF | literal))+
+	setTo+ TO setToValue+
 ;
 
 setUpDownByStatement :
-	identifier+ (UP BY | DOWN BY) (identifier | literal)
+	setTo+ (UP BY | DOWN BY) setByValue
+;
+
+setTo :
+	identifier
+;
+
+setToValue :
+	identifier | ON | OFF | literal
+;
+
+setByValue :
+	identifier | literal
 ;
 
 // sort statement
 
 sortStatement :
-	SORT fileName
-	(ON? (ASCENDING | DESCENDING) KEY? qualifiedDataName+)+
-	(WITH? DUPLICATES IN? ORDER?)?
-	(
-		COLLATING? SEQUENCE IS? alphabetName+
-		(FOR? ALPHANUMERIC IS? alphabetName)?
-		(FOR? NATIONAL IS? alphabetName)?
-	)?
-	(
-		USING fileName+ 
-		| INPUT PROCEDURE IS? procedureName ((THROUGH | THRU) procedureName)?
-	)
-	(
-		GIVING (fileName (LOCK | SAVE | NO REWIND | CRUNCH | RELEASE | WITH REMOVE CRUNCH)?)+
-		| OUTPUT PROCEDURE IS? procedureName ((THROUGH | THRU) procedureName)?
-	)
+	SORT fileName sortOnKeyClause+ sortDuplicatesPhrase? sortCollatingSequencePhrase? sortInputProcedurePhrase? sortUsing* sortOutputProcedurePhrase? sortGivingPhrase*
+;
+
+sortOnKeyClause :
+	ON? (ASCENDING | DESCENDING) KEY? qualifiedDataName+
+;
+
+sortDuplicatesPhrase :
+	WITH? DUPLICATES IN? ORDER?
+;
+
+sortCollatingSequencePhrase :
+	COLLATING? SEQUENCE IS? alphabetName+
+	sortCollatingAlphanumeric?
+	sortCollatingNational?
+;
+
+sortCollatingAlphanumeric :
+	FOR? ALPHANUMERIC IS alphabetName
+;
+
+sortCollatingNational :
+	FOR? NATIONAL IS? alphabetName
+;
+
+sortInputProcedurePhrase :
+	INPUT PROCEDURE IS? procedureName sortInputThrough?
+;
+
+sortInputThrough :
+	(THROUGH | THRU) procedureName
+;
+
+sortUsing :
+	USING fileName+
+;
+
+sortOutputProcedurePhrase :
+	OUTPUT PROCEDURE IS? procedureName sortOutputThrough?
+;
+
+sortOutputThrough :
+	(THROUGH | THRU) procedureName
+;
+
+sortGivingPhrase :
+	GIVING sortGiving+
+;
+
+sortGiving :
+	fileName (LOCK | SAVE | NO REWIND | CRUNCH | RELEASE | WITH REMOVE CRUNCH)?
 ;
 
 // start statement
 
 startStatement :
 	START fileName
-	(KEY IS? (
+	startKey?
+	invalidKeyPhrase?
+	notInvalidKeyPhrase?
+	END_START?
+;
+
+startKey : 
+	KEY IS?
+	(
 		EQUAL TO?
 		| EQUALCHAR
 		| GREATER THAN?
@@ -2086,10 +2350,8 @@ startStatement :
 		| NOT LESSTHANCHAR
 		| GREATER THAN? OR EQUAL TO?
 		| MORETHANOREQUAL
-	) qualifiedDataName)?
-	(INVALID KEY? statements)?
-	(NOT INVALID KEY? statements)?
-	END_START?
+	)
+	qualifiedDataName
 ;
 
 // stop statement
@@ -2101,16 +2363,34 @@ stopStatement :
 // string statement
 
 stringStatement :
-	STRING
-	(
-		(tableCall | literal)+
-		DELIMITED BY? (identifier | literal | SIZE)
-	)+
-	INTO identifier
-	(WITH? POINTER qualifiedDataName)?
-	(ON? OVERFLOW statements)?
-	(NOT ON? OVERFLOW statements)?
+	STRING stringSendingPhrase+ stringIntoPhrase stringWithPointerPhrase?
+	onOverflowPhrase?
+	notOnOverflowPhrase?
 	END_STRING?
+;
+
+stringSendingPhrase :
+	stringSending+ (stringDelimitedByPhrase | stringForPhrase)
+;
+
+stringSending :
+	tableCall | literal
+;
+
+stringDelimitedByPhrase :
+	DELIMITED BY? (identifier | literal | SIZE)
+;
+
+stringForPhrase :
+	FOR (identifier | literal)
+;
+
+stringIntoPhrase :
+	INTO identifier
+;
+
+stringWithPointerPhrase :
+	WITH? POINTER qualifiedDataName
 ;
 
 // subtract statement
@@ -2122,21 +2402,41 @@ subtractStatement :
 		| subtractFromGivingStatement
 		| subtractCorrespondingStatement
  	)
-	(ON? SIZE ERROR statements)?
-	(NOT ON? SIZE ERROR statements)?
+	onSizeErrorPhrase?
+	notOnSizeErrorPhrase?
 	END_SUBTRACT?
 ;
 
 subtractFromStatement :
-	(identifier | literal)+ FROM (identifier ROUNDED?)+
+	subtractSubtrahend+ FROM subtractMinuend+
 ;
 
 subtractFromGivingStatement :
-	(identifier | literal)+ FROM (identifier | literal) GIVING (identifier ROUNDED?)+
+	subtractSubtrahend+ FROM subtractMinuendGiving GIVING subtractGiving+
 ;
 
 subtractCorrespondingStatement :
-	(CORRESPONDING | CORR) qualifiedDataName FROM qualifiedDataName ROUNDED?
+	(CORRESPONDING | CORR) qualifiedDataName FROM subtractMinuendCorresponding
+;
+
+subtractSubtrahend :
+	identifier | literal
+;
+
+subtractMinuend :
+	identifier ROUNDED?
+;
+
+subtractMinuendGiving :
+	identifier | literal
+;
+
+subtractGiving :
+	identifier ROUNDED?
+;
+
+subtractMinuendCorresponding :
+	qualifiedDataName ROUNDED?
 ;
 
 // terminate statement
@@ -2148,69 +2448,144 @@ terminateStatement :
 // unstring statement
 
 unstringStatement :
-	UNSTRING qualifiedDataName
-	(
-		DELIMITED BY? ALL? (identifier | literal)
-		(OR ALL? (identifier | literal))*
-	)?
-	INTO
-	(
-		identifier
-		(DELIMITER IN? identifier)?
-		(COUNT IN? identifier)?
-	)+
-	(WITH? POINTER qualifiedDataName)?
-	(TALLYING IN? qualifiedDataName)?
-	(ON? OVERFLOW statements)?
-	(NOT ON? OVERFLOW statements)?
+	UNSTRING unstringSendingPhrase unstringIntoPhrase unstringWithPointerPhrase? unstringTallyingPhrase?
+	onOverflowPhrase?
+	notOnOverflowPhrase?
 	END_UNSTRING?
+;
+
+unstringSendingPhrase :
+	qualifiedDataName (unstringDelimitedByPhrase unstringOrAllPhrase*)?
+;
+
+unstringDelimitedByPhrase :
+	DELIMITED BY? ALL? (identifier | literal)
+;
+
+unstringOrAllPhrase :
+	OR ALL? (identifier | literal)
+;
+
+unstringIntoPhrase :
+	INTO unstringInto+
+;
+
+unstringInto :
+	identifier unstringDelimiterIn? unstringCountIn?
+;
+
+unstringDelimiterIn :
+	DELIMITER IN? identifier
+;
+
+unstringCountIn :
+	COUNT IN? identifier
+;
+
+unstringWithPointerPhrase :
+	WITH? POINTER qualifiedDataName
+;
+
+unstringTallyingPhrase :
+	TALLYING IN? qualifiedDataName
 ;
 
 // use statement
 
 useStatement :
-	USE (useProcedureClause	| useProcedureDebugClause)
+	USE (useAfterClause | useDebugClause)
 ;
 
-useProcedureClause :
-	GLOBAL? AFTER STANDARD?
-	(
-		(EXCEPTION | ERROR)
-		| (BEGINNING | ENDING)? (FILE | REEL | UNIT)? LABEL
-	)
-	PROCEDURE ON? (fileName+ | INPUT | OUTPUT | I_O | EXTEND)
-	(GIVING dataName+)?
+useAfterClause :
+	GLOBAL? AFTER STANDARD? (EXCEPTION | ERROR) PROCEDURE ON? useAfterOn
 ;
 
-useProcedureDebugClause :
-	FOR? DEBUGGING ON?
-	(
-		ALL PROCEDURES
-		| ALL REFERENCES? OF? identifier
-		| procedureName
-		| fileName
-	)+
+useAfterOn :
+	fileName+ | INPUT | OUTPUT | I_O | EXTEND
+;
+
+useDebugClause :
+	FOR? DEBUGGING ON? useDebugOn+
+;
+
+useDebugOn :
+	ALL PROCEDURES | ALL REFERENCES? OF? identifier	| procedureName	| fileName
 ;
 
 // write statement
 
 writeStatement :
-	WRITE recordName (FROM (identifier | literal))?
+	WRITE recordName
+	writeFromPhrase?
 	writeAdvancingPhrase?
-	(AT? (END_OF_PAGE | EOP) statements)?
-	(NOT AT? (END_OF_PAGE | EOP) statements)?
-	(INVALID KEY? statements)?
-	(NOT INVALID KEY? statements)?
+	writeAtEndOfPagePhrase?
+	writeNotAtEndOfPagePhrase?
+	invalidKeyPhrase?
+	notInvalidKeyPhrase?
 	END_WRITE?
+;
+
+writeFromPhrase :
+	FROM (identifier | literal)
 ;
 
 writeAdvancingPhrase :
 	(BEFORE | AFTER) ADVANCING?
-	(
-		PAGE
-		| (identifier | literal) (LINE | LINES)?
-		| mnemonicName
-	)
+	(writeAdvancingPage | writeAdvancingLines | writeAdvancingMnemonic)
+;
+
+writeAdvancingPage :
+	PAGE
+;
+
+writeAdvancingLines :
+	(identifier | literal) (LINE | LINES)?
+;
+
+writeAdvancingMnemonic :
+	mnemonicName
+;
+
+writeAtEndOfPagePhrase :
+	AT? (END_OF_PAGE | EOP) statements
+;
+
+writeNotAtEndOfPagePhrase :
+	NOT AT? (END_OF_PAGE | EOP) statements
+;
+
+// statement phrases ----------------------------------
+
+atEndPhrase :
+	AT? END statements
+;
+
+notAtEndPhrase :
+	NOT AT? END statements
+;
+
+invalidKeyPhrase :
+	INVALID KEY? statements
+;
+
+notInvalidKeyPhrase :
+	NOT INVALID KEY? statements
+;
+
+onOverflowPhrase :
+	ON? OVERFLOW statements
+;
+
+notOnOverflowPhrase :
+	NOT ON? OVERFLOW statements
+;
+
+onSizeErrorPhrase :
+	ON? SIZE ERROR statements
+;
+
+notOnSizeErrorPhrase :
+	NOT ON? SIZE ERROR statements
 ;
 
 // statement clauses ----------------------------------
@@ -2609,11 +2984,11 @@ sectionKeyword :
 ;
 
 otherKeyword :
-	ABORT | ACCEPT | ACCESS | ADD | ADDRESS | ADVANCING | AFTER | ALIGNED | ALL | ALPHABET | ALPHABETIC | ALPHABETIC_LOWER | ALPHABETIC_UPPER | ALPHANUMERIC | ALPHANUMERIC_EDITED | ALSO | ALTER | ALTERNATE | ANY | APOST | APPROXIMATE | ARE | AREA | AREAS | ARITH | AS | ASCENDING | ASCII | ASSIGN | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | AT | ATTRIBUTE
+	ABORT | ACCEPT | ACCESS | ADD | ADDRESS | ADVANCING | AFTER | ALIGNED | ALL | ALPHABET | ALPHABETIC | ALPHABETIC_LOWER | ALPHABETIC_UPPER | ALPHANUMERIC | ALPHANUMERIC_EDITED | ALSO | ALTER | ALTERNATE | ANY | APOST | APPROXIMATE | ARE | AREA | AREAS | ARITH | AS | ASCENDING | ASCII | ASSIGN | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTRIBUTE
 	| BEFORE | BEGINNING | BINARY | BIT | BLANK | BLOCK | BOTTOM | BOUNDS | BY | BYFUNCTION | BYTITLE
 	| CALL | CANCEL | CAPABLE | CCSVERSION | CD | CF | CH | CHANNEL | CHARACTER | CHARACTERS | CLASS | CLOCK_UNITS | CLOSE | CLOSE_DISPOSITION | COBOL | CODE | CODEPAGE | CODE_SET | COLLATING | COLUMN | COMMA | COMMITMENT | COMMON | COMP | COMP_1 | COMP_2 | COMP_3 | COMP_4 | COMP_5 | COMPUTATIONAL | COMPUTATIONAL_1 | COMPUTATIONAL_2 | COMPUTATIONAL_3 | COMPUTATIONAL_4 | COMPUTATIONAL_5 | COMPUTE | CONTAINS | CONTENT | CONTINUE | CONTROL | CONTROL_POINT | CONTROLS | CONVENTION | CONVERTING | COPY | CORR | CORRESPONDING | COUNT | CRUNCH | CURRENCY | CURSOR
 	| DBCS | DE | DEBUG_CONTENTS | DEBUG_LINE | DEBUG_NAME | DEBUG_SUB_1 | DEBUG_SUB_2 | DEBUG_SUB_3 | DEBUGGING | DECIMAL_POINT | DECLARATIVES | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DELETE | DELIMITED | DELIMITER | DEPENDING | DESCENDING | DESTINATION | DETAIL | DFHRESP | DFHVALUE | DISABLE | DISK | DISPLAY | DISPLAY_1 | DIVIDE | DIVISION | DONTCARE | DOUBLE | DOWN | DUPLICATES | DYNAMIC
-	| EBCDIC | EGCS | EGI | ELSE | EMI | ENABLE | END | END_ADD | END_CALL | END_COMPUTE | END_DELETE | END_DIVIDE | END_EVALUATE | END_IF | END_MULTIPLY | END_OF_PAGE | END_PERFORM | END_READ | END_RECEIVE | END_RETURN | END_REWRITE | END_SEARCH | END_START | END_STRING | END_SUBTRACT | END_UNSTRING | END_WRITE | ENDING | ENTER | ENTRY | ENTRY_PROCEDURE | EOP | EQUAL | ERROR | ESI | EVALUATE | EVENT | EVERY | EXCEPTION | EXCLUSIVE | EXIT | EXPORT | EXTEND | EXTENDED | EXTERNAL
+	| EBCDIC | EGCS | EGI | EMI | ENABLE | END | END_ADD | END_CALL | END_COMPUTE | END_DELETE | END_DIVIDE | END_EVALUATE | END_MULTIPLY | END_OF_PAGE | END_PERFORM | END_READ | END_RECEIVE | END_RETURN | END_REWRITE | END_SEARCH | END_START | END_STRING | END_SUBTRACT | END_UNSTRING | END_WRITE | ENDING | ENTER | ENTRY | ENTRY_PROCEDURE | EOP | EQUAL | ERROR | ESI | EVALUATE | EVENT | EVERY | EXCEPTION | EXCLUSIVE | EXIT | EXPORT | EXTEND | EXTENDED | EXTERNAL
 	| FALSE | FD | FILLER | FINAL | FIRST | FOOTING | FOR | FROM | FULL | FUNCTION | FUNCTIONNAME | FUNCTION_POINTER
 	| GENERATE | GOBACK | GENERIC | GIVING | GLOBAL | GO | GREATER | GROUP
 	| HEADING
@@ -2622,16 +2997,16 @@ otherKeyword :
 	| KANJI | KEPT | KEY
 	| LABEL | LANGUAGE | LAST | LB | LD | LEADING | LEFT | LENGTH | LESS | LIB | LIBACCESS | LIBPARAMETER | LIBRARY | LIMIT | LIMITS | LINAGE | LINE | LINES | LIST | LOCAL | LOCK | LOCKFILE | LONG_DATE | LONG_TIME | LOWER
 	| MEMORY | MERGE | MESSAGE | MMDDYYYY | MODE | MODULES | MORE_LABELS | MOVE | MULTIPLE | MULTIPLY
-	| NATIONAL | NATIVE | NEGATIVE | NETWORK | NEXT | NO | NOSEQ | NOT | NUMBER | NUMERIC | NUMERIC_DATE | NUMERIC_EDITED | NUMERIC_TIME
-	| OCCURS | ODT | OFF | OMITTED | ON | OPEN | OPTIMIZE | OPTIONAL | ORDER | ORDERLY | ORGANIZATION | OTHER | OUTPUT | OVERFLOW | OWN
+	| NATIONAL | NATIVE | NEGATIVE | NETWORK | NEXT | NO | NOSEQ | NUMBER | NUMERIC | NUMERIC_DATE | NUMERIC_EDITED | NUMERIC_TIME
+	| OCCURS | ODT | OFF | OMITTED | ON | OPEN | OPTIMIZE | OPTIONAL | ORDER | ORDERLY | ORGANIZATION | OUTPUT | OVERFLOW | OWN
 	| PACKED_DECIMAL | PADDING | PAGE | PASSWORD | PERFORM | PF | PH | PIC | PICTURE | PLUS | POINTER | POSITION | POSITIVE | PRINTING | PRIVATE | PROCEDURE_POINTER| PROCEDURES | PROCEED | PROCESS | PROGRAM | PROGRAM_STATUS | PROMPT | PROTECTED | PURGE
 	| QUEUE
 	| RANDOM | RD | READ | REAL | RECEIVE | RECEIVE_CONTROL | RECEIVED | RECORD | RECORDING | RECORDS | REDEFINES | REEL | REF | REFERENCE | REFERENCES | RELATIVE | RELEASE | REMAINDER | REMOVE | REMOVAL | RENAMES | REPLACE | REPLACING | REPLY | REPORTING | REPORTS | RERUN | RESERVE | RESET | RETURN | RETURNED | REVERSED | REWIND | REWRITE | RF | RH | RIGHT | ROUNDED | RUN
 	| SAME | SAVE | SD | SEARCH | SECTION | SEGMENT | SEGMENT_LIMIT | SELECT | SEND | SENTENCE | SEPARATE | SEQUENCE | SEQUENTIAL | SET | SHARED | SHAREDBYALL | SHAREDBYRUNUNIT | SHARING | SHORT_DATE | SIGN | SIZE | SORT | SORT_MERGE | SOURCE | SP | STANDARD | STANDARD_1 | STANDARD_2 | START | STATUS | STOP | STRING | SUB_QUEUE_1 | SUB_QUEUE_2 | SUB_QUEUE_3 | SUBTRACT | SUM | SUPPRESS | SYMBOL | SYMBOLIC | SYNC | SYNCHRONIZED
 	| TABLE | TALLYING | TASK | TAPE | TERMINAL | TERMINATE | TEST | TEXT | THAN | THEN | THREAD | THREAD_LOCAL | THROUGH | THRU | TIMER | TIMES | TITLE | TO | TODAYS_DATE | TODAYS_NAME | TOP | TRAILING | TRUE | TRUNCATED | TYPE | TYPEDEF
-	| UNIT | UNLOCK | UNLOCKFILE | UNLOCKRECORD | UNSTRING | UNTIL | UP | UPON | USAGE | USE | USING
+	| UNIT | UNLOCK | UNLOCKFILE | UNLOCKRECORD | UNSTRING | UNTIL | UP | USAGE | USE | USING
 	| VALUE | VALUES | VARYING
-	| WAIT | WHEN | WITH | WORDS | WRITE
+	| WAIT | WITH | WORDS | WRITE
 	| XOPTS
 	| YEAR | YYYYMMDD | YYYYDDD
 ;
