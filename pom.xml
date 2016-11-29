@@ -78,6 +78,7 @@
 		<module>plsql</module>
 		<module>postalcode</module>
 		<module>propcalc</module>
+                <module>protobuf3</module>
 		<module>python3</module>
 		<module>r</module>
 		<module>rcs</module>
