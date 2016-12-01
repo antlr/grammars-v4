@@ -5,13 +5,15 @@
 * This software may be modified and distributed under the terms
 * of the BSD 3-clause license. See the LICENSE file for details.
 */
+
 /*
 * Visual Basic 6.0 Grammar for ANTLR4
 *
-* This is an approximate grammar for Visual Basic 6.0, derived 
-* from the Visual Basic 6.0 language reference 
+* This is an approximate grammar for Visual Basic 6.0 and the parser at
+* https://github.com/uwol/vb6parser. The grammar is derived from the 
+* Visual Basic 6.0 language reference 
 * http://msdn.microsoft.com/en-us/library/aa338033%28v=vs.60%29.aspx 
-* and tested against MSDN VB6 statement examples as well as several Visual 
+* and tested against MSDN VB6 statements as well as several Visual 
 * Basic 6.0 code repositories.
 *
 * Characteristics:
@@ -22,33 +24,6 @@
 *
 * 2. Keywords can be used as identifiers depending on the context, enabling
 *    e.g. "A.Type", but not "Type.B".
-*
-*
-* Known limitations:
-*
-* 1. Preprocessor statements (#if, #else, ...) must not interfere with regular
-*    statements.
-*
-* 2. Comments are skipped.
-*
-*
-* Change log:
-*
-* v1.4
-*  - erase statement fix
-*  - explicit token definition
-*
-* v1.3
-*  - call statement precedence
-*
-* v1.2
-*  - refined call statements
-*
-* v1.1 
-*  - precedence of operators and of ELSE in select statements
-*  - optimized member calls
-*
-* v1.0 Initial revision
 */
 
 grammar VisualBasic6;
@@ -489,7 +464,11 @@ sC_Cond
    : ELSE # caseCondElse
    | IS WS? comparisonOperator WS? valueStmt # caseCondIs
    | valueStmt (WS? COMMA WS? valueStmt)* # caseCondValue
-   | INTEGERLITERAL WS TO WS valueStmt (WS? COMMA WS? valueStmt)* # caseCondTo
+   | sC_To (WS? COMMA WS? (valueStmt | sC_To))* # caseCondTo
+   ;
+
+sC_To
+   : INTEGERLITERAL WS TO WS valueStmt
    ;
 
 sendkeysStmt
@@ -1997,12 +1976,12 @@ WS
 // letters
 
 fragment LETTER
-   : [a-zA-Z_������]
+   : [a-zA-Z_äöüÄÖÜ]
    ;
 
 
 fragment LETTERORDIGIT
-   : [a-zA-Z0-9_������]
+   : [a-zA-Z0-9_äöüÄÖÜ]
    ;
 
 // case insensitive chars
