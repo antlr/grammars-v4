@@ -278,11 +278,15 @@ inputOutputSectionParagraph
 // - file control paragraph ----------------------------------
 
 fileControlParagraph
-   : FILE_CONTROL (DOT_FS? fileControlEntry)+ DOT_FS
+   : FILE_CONTROL (DOT_FS? fileControlEntry)* DOT_FS
    ;
 
 fileControlEntry
    : selectClause fileControlClause*
+   ;
+
+selectClause
+   : SELECT OPTIONAL? fileName
    ;
 
 fileControlClause
@@ -290,15 +294,11 @@ fileControlClause
    ;
 
 assignClause
-   : ASSIGN TO? (assignmentName | literal)
-   ;
-
-selectClause
-   : SELECT OPTIONAL? fileName
+   : ASSIGN TO? (DISK | PORT | PRINTER | READER | REMOTE | TAPE | VIRTUAL | assignmentName | literal)
    ;
 
 reserveClause
-   : RESERVE (integerLiteral | NO) ALTERNATE? (AREA | AREAS)?
+   : RESERVE (NO | integerLiteral) ALTERNATE? (AREA | AREAS)?
    ;
 
 organizationClause
@@ -606,10 +606,10 @@ screenSection
 // -- report section ----------------------------------
 
 reportSection
-   : REPORT SECTION DOT_FS report*
+   : REPORT SECTION DOT_FS reportDescription*
    ;
 
-report
+reportDescription
    : reportDescriptionEntry reportGroupDescriptionEntry+
    ;
 
@@ -730,7 +730,7 @@ reportGroupTypePageHeading
    ;
 
 reportGroupTypeControlHeading
-   : (CONTROL HEADING | CH) (dataName | FINAL)
+   : (CONTROL HEADING | CH) (FINAL | dataName)
    ;
 
 reportGroupTypeDetail
@@ -738,7 +738,7 @@ reportGroupTypeDetail
    ;
 
 reportGroupTypeControlFooting
-   : (CONTROL FOOTING | CF) (dataName | FINAL)
+   : (CONTROL FOOTING | CF) (FINAL | dataName)
    ;
 
 reportGroupUsageClause
@@ -842,7 +842,7 @@ dataDescriptionEntry
    ;
 
 dataDescriptionEntryFormat1
-   : (INTEGERLITERAL | LEVEL_NUMBER_77) (dataName | FILLER)? dataRedefinesClause? dataIntegerStringClause? dataExternalClause? dataGlobalClause? dataTypeDefClause? dataThreadLocalClause? (dataPictureClause | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataValueClause | dataUsageClause | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause)* dataWithLowerBoundsClause? dataAlignedClause? dataRecordAreaClause? DOT_FS
+   : (INTEGERLITERAL | LEVEL_NUMBER_77) (FILLER | dataName)? dataRedefinesClause? dataIntegerStringClause? dataExternalClause? dataGlobalClause? dataTypeDefClause? dataThreadLocalClause? (dataPictureClause | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataValueClause | dataUsageClause | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause)* dataWithLowerBoundsClause? dataAlignedClause? dataRecordAreaClause? DOT_FS
    ;
 
 dataDescriptionEntryFormat2
@@ -902,7 +902,7 @@ pictureString
    ;
 
 pictureChars
-   : DOLLARCHAR | IDENTIFIER | integerLiteral | pictureCharsKeyword | NUMERICLITERAL | SLASHCHAR | COMMACHAR | DOT | COLONCHAR | ASTERISKCHAR | DOUBLEASTERISKCHAR | LPARENCHAR | RPARENCHAR | PLUSCHAR | MINUSCHAR | LESSTHANCHAR | MORETHANCHAR
+   : DOLLARCHAR | IDENTIFIER | NUMERICLITERAL | SLASHCHAR | COMMACHAR | DOT | COLONCHAR | ASTERISKCHAR | DOUBLEASTERISKCHAR | LPARENCHAR | RPARENCHAR | PLUSCHAR | MINUSCHAR | LESSTHANCHAR | MORETHANCHAR | integerLiteral | pictureCharsKeyword
    ;
 
 pictureCharsKeyword
@@ -984,7 +984,7 @@ procedureDivision
    ;
 
 procedureDivisionUsingClause
-   : USING (dataName | fileName | STRING dataName | INTEGER dataName)+
+   : USING (STRING dataName | INTEGER dataName | dataName | fileName)+
    ;
 
 procedureDivisionGivingClause
@@ -1018,7 +1018,7 @@ paragraphs
    ;
 
 paragraph
-   : paragraphName DOT_FS (exitStatement | alteredGoTo | sentence*)
+   : paragraphName DOT_FS (alteredGoTo | sentence*)
    ;
 
 sentence
@@ -1134,7 +1134,7 @@ cancelStatement
    ;
 
 cancelCall
-   : identifier | literal | libraryName (BYTITLE | BYFUNCTION)
+   : libraryName (BYTITLE | BYFUNCTION) | identifier | literal
    ;
 
 // close statement
@@ -1156,7 +1156,7 @@ closeRelativeStatement
    ;
 
 closePortFileIOStatement
-   : (WITH? NO WAIT | WITH WAIT) (USING closePortFileIOUsing*)?
+   : (WITH? NO WAIT | WITH WAIT) (USING closePortFileIOUsing+)?
    ;
 
 closePortFileIOUsing
@@ -1206,11 +1206,15 @@ disableStatement
 // display statement
 
 displayStatement
-   : DISPLAY displayOperand+ displayUpon? displayWith?
+   : DISPLAY displayOperand+ displayAt? displayUpon? displayWith?
    ;
 
 displayOperand
-   : identifier | literal | otherKeyword
+   : identifier | literal
+   ;
+
+displayAt
+   : AT (identifier | literal)
    ;
 
 displayUpon
@@ -1286,7 +1290,7 @@ evaluateWhen
    ;
 
 evaluateCondition
-   : ANY | condition | booleanLiteral | NOT? evaluateValue evaluateThrough?
+   : ANY | NOT? evaluateValue evaluateThrough? | condition | booleanLiteral
    ;
 
 evaluateThrough
@@ -1334,7 +1338,7 @@ goToStatementSimple
    ;
 
 goToDependingOnStatement
-   : procedureName+ (DEPENDING ON? identifier)? | MORE_LABELS
+   : MORE_LABELS | procedureName+ (DEPENDING ON? identifier)?
    ;
 
 // if statement
@@ -1344,11 +1348,11 @@ ifStatement
    ;
 
 ifThen
-   : THEN? (statement* | NEXT SENTENCE)
+   : THEN? (NEXT SENTENCE | statement*)
    ;
 
 ifElse
-   : ELSE (statement* | NEXT SENTENCE)
+   : ELSE (NEXT SENTENCE | statement*)
    ;
 
 // initialize statement
@@ -1482,11 +1486,11 @@ moveStatement
    ;
 
 moveToStatement
-   : moveToStatementSendingArea TO identifier+
+   : moveToSendingArea TO identifier+
    ;
 
-moveToStatementSendingArea
-   : identifier | literal | otherKeyword
+moveToSendingArea
+   : identifier | literal
    ;
 
 moveCorrespondingToStatement
@@ -1694,7 +1698,7 @@ searchVarying
    ;
 
 searchWhen
-   : WHEN condition (statement* | NEXT SENTENCE)
+   : WHEN condition (NEXT SENTENCE | statement*)
    ;
 
 // send statement
@@ -1716,7 +1720,7 @@ sendFromPhrase
    ;
 
 sendWithPhrase
-   : WITH (identifier | EGI | EMI | ESI)
+   : WITH (EGI | EMI | ESI | identifier)
    ;
 
 sendReplacingPhrase
@@ -1758,7 +1762,7 @@ setTo
    ;
 
 setToValue
-   : identifier | ON | OFF | literal
+   : ON | OFF | identifier | literal
    ;
 
 setByValue
@@ -1826,7 +1830,7 @@ startStatement
    ;
 
 startKey
-   :  KEY IS?(EQUAL TO? | EQUALCHAR | GREATER THAN? | MORETHANCHAR | NOT LESS THAN? | NOT LESSTHANCHAR | GREATER THAN? OR EQUAL TO? | MORETHANOREQUAL) qualifiedDataName
+   :  KEY IS? (EQUAL TO? | EQUALCHAR | GREATER THAN? | MORETHANCHAR | NOT LESS THAN? | NOT LESSTHANCHAR | GREATER THAN? OR EQUAL TO? | MORETHANOREQUAL) qualifiedDataName
    ;
 
 // stop statement
@@ -1850,7 +1854,7 @@ stringSending
    ;
 
 stringDelimitedByPhrase
-   : DELIMITED BY? (identifier | literal | SIZE)
+   : DELIMITED BY? (SIZE | identifier | literal)
    ;
 
 stringForPhrase
@@ -1962,7 +1966,7 @@ useAfterClause
    ;
 
 useAfterOn
-   : fileName+ | INPUT | OUTPUT | I_O | EXTEND
+   : INPUT | OUTPUT | I_O | EXTEND | fileName+
    ;
 
 useDebugClause
@@ -1970,7 +1974,7 @@ useDebugClause
    ;
 
 useDebugOn
-   : ALL PROCEDURES | ALL REFERENCES? OF? identifier	| procedureName	| fileName
+   : ALL PROCEDURES | ALL REFERENCES? OF? identifier | procedureName | fileName
    ;
 
 // write statement
@@ -2078,7 +2082,7 @@ power
    ;
 
 basis
-   : identifier | literal | otherKeyword | LPARENCHAR arithmeticExpression RPARENCHAR
+   : LPARENCHAR arithmeticExpression RPARENCHAR | identifier | literal
    ;
 
 // condition ----------------------------------
@@ -2100,7 +2104,7 @@ simpleCondition
    ;
 
 classCondition
-   : identifier IS? NOT? (NUMERIC | ALPHABETIC | ALPHABETIC_LOWER | ALPHABETIC_UPPER | className | DBCS | KANJI)
+   : identifier IS? NOT? (NUMERIC | ALPHABETIC | ALPHABETIC_LOWER | ALPHABETIC_UPPER | DBCS | KANJI | className)
    ;
 
 conditionNameReference
@@ -2173,7 +2177,7 @@ length
    ;
 
 subscript
-   : integerLiteral | qualifiedDataName integerLiteral? | indexName integerLiteral? | arithmeticExpression | ALL
+   : ALL | integerLiteral | qualifiedDataName integerLiteral? | indexName integerLiteral? | arithmeticExpression
    ;
 
 argument
@@ -2267,7 +2271,7 @@ dataName
    ;
 
 dataDescName
-   : FILLER | CURSOR | dataName
+   : FILLER | CURSOR | dataName 
    ;
 
 environmentName
@@ -2279,7 +2283,7 @@ fileName
    ;
 
 functionName
-   : cobolWord | INTEGER | LENGTH | RANDOM | SUM | WHEN_COMPILED
+   : INTEGER | LENGTH | RANDOM | SUM | WHEN_COMPILED | cobolWord
    ;
 
 indexName
@@ -2311,7 +2315,7 @@ procedureName
    ;
 
 programName
-   : cobolWord | NONNUMERICLITERAL
+   : NONNUMERICLITERAL | cobolWord
    ;
 
 recordName
@@ -2346,6 +2350,27 @@ textName
 
 cobolWord
    : IDENTIFIER
+   | COBOL | PROGRAM
+   | ABORT | APOST | ARITH | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTRIBUTE
+   | BIT | BOUNDS
+   | CAPABLE | CCSVERSION | CHANNEL | CLOSE_DISPOSITION | CODEPAGE | COMMITMENT | CONTROL_POINT | CONVENTION | CRUNCH | CURSOR
+   | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DFHRESP | DFHVALUE | DISK | DONTCARE | DOUBLE
+   | EBCDIC | ENTER | ENTRY_PROCEDURE | EVENT | EXCLUSIVE | EXPORT | EXTENDED
+   | FULL | FUNCTIONNAME | FUNCTION_POINTER
+   | IMPLICIT | IMPORT | INTEGER
+   | KEPT
+   | LANGUAGE | LB | LD | LIB | LIBACCESS | LIBPARAMETER | LIBRARY | LIST | LOCAL | LONG_DATE | LONG_TIME | LOWER
+   | MMDDYYYY
+   | NATIONAL | NETWORK | NOSEQ | NUMERIC_DATE | NUMERIC_TIME
+   | ODT | OPTIMIZE | ORDERLY | OWN
+   | PASSWORD | PORT | PRINTER | PRIVATE | PROCESS
+   | READER | REAL | RECEIVED | REF | REMOTE | REMOVE
+   | SAVE | SHARED | SHAREDBYALL | SHAREDBYRUNUNIT | SHARING | SHORT_DATE | SP | SYMBOL
+   | TASK | THREAD | THREAD_LOCAL | TIMER | TODAYS_DATE | TODAYS_NAME | TRUNCATED | TYPEDEF
+   | VIRTUAL
+   | WAIT
+   | XOPTS
+   | YEAR | YYYYMMDD | YYYYDDD
    ;
 
 literal
@@ -2357,7 +2382,7 @@ booleanLiteral
    ;
 
 numericLiteral
-   : NUMERICLITERAL | integerLiteral | ZERO
+   : NUMERICLITERAL | ZERO | integerLiteral
    ;
 
 integerLiteral
@@ -2365,65 +2390,28 @@ integerLiteral
    ;
 
 cicsDfhRespLiteral
-   : DFHRESP LPARENCHAR (cobolWord | literal | otherKeyword) RPARENCHAR
+   : DFHRESP LPARENCHAR (cobolWord | literal) RPARENCHAR
    ;
 
 cicsDfhValueLiteral
-   : DFHVALUE LPARENCHAR (cobolWord | literal | otherKeyword) RPARENCHAR
+   : DFHVALUE LPARENCHAR (cobolWord | literal) RPARENCHAR
    ;
 
 // keywords ----------------------------------
-
-connective
-   : AND | IN | OF | OR
-   ;
 
 figurativeConstant
    : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZERO | ZEROS | ZEROES
    ;
 
 specialRegister
-   : ADDRESS OF identifier | DATE | DAY | DAY_OF_WEEK | DEBUG_ITEM | LENGTH OF identifier | LINAGE_COUNTER | LINE_COUNTER | PAGE_COUNTER | RETURN_CODE | SHIFT_OUT | SHIFT_IN | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN | TALLY | TIME | WHEN_COMPILED
-   ;
-
-divisionKeyword
-   : DATA | ENVIRONMENT | IDENTIFICATION | PROCEDURE
-   ;
-
-paragraphKeyword
-   : AUTHOR | DATE_COMPILED | DATE_WRITTEN | | FILE_CONTROL | INSTALLATION | I_O_CONTROL | OBJECT_COMPUTER | PROGRAM_ID | REMARKS | SECURITY | SOURCE_COMPUTER | SPECIAL_NAMES
-   ;
-
-sectionKeyword
-   : COMMUNICATION |	CONFIGURATION | DATA_BASE | FILE | INPUT_OUTPUT | LINKAGE | LOCAL_STORAGE | PROGRAM_LIBRARY | REPORT | SCREEN | WORKING_STORAGE
-   ;
-
-otherKeyword
-   : ABORT | ACCEPT | ACCESS | ADD | ADDRESS | ADVANCING | AFTER | ALIGNED | ALL | ALPHABET | ALPHABETIC | ALPHABETIC_LOWER | ALPHABETIC_UPPER | ALPHANUMERIC | ALPHANUMERIC_EDITED | ALSO | ALTER | ALTERNATE | ANY | APOST | APPROXIMATE | ARE | AREA | AREAS | ARITH | AS | ASCENDING | ASCII | ASSIGN | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTRIBUTE
-   | BEFORE | BEGINNING | BINARY | BIT | BLANK | BLOCK | BOTTOM | BOUNDS | BY | BYFUNCTION | BYTITLE
-   | CALL | CANCEL | CAPABLE | CCSVERSION | CD | CF | CH | CHANNEL | CHARACTER | CHARACTERS | CLASS | CLOCK_UNITS | CLOSE | CLOSE_DISPOSITION | COBOL | CODE | CODEPAGE | CODE_SET | COLLATING | COLUMN | COMMA | COMMITMENT | COMMON | COMP | COMP_1 | COMP_2 | COMP_3 | COMP_4 | COMP_5 | COMPUTATIONAL | COMPUTATIONAL_1 | COMPUTATIONAL_2 | COMPUTATIONAL_3 | COMPUTATIONAL_4 | COMPUTATIONAL_5 | COMPUTE | CONTAINS | CONTENT | CONTINUE | CONTROL | CONTROL_POINT | CONTROLS | CONVENTION | CONVERTING | COPY | CORR | CORRESPONDING | COUNT | CRUNCH | CURRENCY | CURSOR
-   | DBCS | DE | DEBUG_CONTENTS | DEBUG_LINE | DEBUG_NAME | DEBUG_SUB_1 | DEBUG_SUB_2 | DEBUG_SUB_3 | DEBUGGING | DECIMAL_POINT | DECLARATIVES | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DELETE | DELIMITED | DELIMITER | DEPENDING | DESCENDING | DESTINATION | DETAIL | DFHRESP | DFHVALUE | DISABLE | DISK | DISPLAY | DISPLAY_1 | DIVIDE | DIVISION | DONTCARE | DOUBLE | DOWN | DUPLICATES | DYNAMIC
-   | EBCDIC | EGCS | EGI | EMI | ENABLE | END | END_ADD | END_CALL | END_COMPUTE | END_DELETE | END_DIVIDE | END_EVALUATE | END_MULTIPLY | END_OF_PAGE | END_PERFORM | END_READ | END_RECEIVE | END_RETURN | END_REWRITE | END_SEARCH | END_START | END_STRING | END_SUBTRACT | END_UNSTRING | END_WRITE | ENDING | ENTER | ENTRY | ENTRY_PROCEDURE | EOP | EQUAL | ERROR | ESI | EVALUATE | EVENT | EVERY | EXCEPTION | EXCLUSIVE | EXIT | EXPORT | EXTEND | EXTENDED | EXTERNAL
-   | FALSE | FD | FILLER | FINAL | FIRST | FOOTING | FOR | FROM | FULL | FUNCTION | FUNCTIONNAME | FUNCTION_POINTER
-   | GENERATE | GOBACK | GENERIC | GIVING | GLOBAL | GO | GREATER | GROUP
-   | HEADING
-   | I_O | ID | IF | IMPLICIT | IMPORT | INDEX | INDEXED | INDICATE | INITIAL | INITIALIZE | INITIATE | INPUT | INSPECT | INTEGER | INTO | INVALID | INVOKE | IS
-   | JUST | JUSTIFIED | JUSTIFY
-   | KANJI | KEPT | KEY
-   | LABEL | LANGUAGE | LAST | LB | LD | LEADING | LEFT | LENGTH | LESS | LIB | LIBACCESS | LIBPARAMETER | LIBRARY | LIMIT | LIMITS | LINAGE | LINE | LINES | LIST | LOCAL | LOCK | LOCKFILE | LONG_DATE | LONG_TIME | LOWER
-   | MEMORY | MERGE | MESSAGE | MMDDYYYY | MODE | MODULES | MORE_LABELS | MOVE | MULTIPLE | MULTIPLY
-   | NATIONAL | NATIVE | NEGATIVE | NETWORK | NEXT | NO | NOSEQ | NUMBER | NUMERIC | NUMERIC_DATE | NUMERIC_EDITED | NUMERIC_TIME
-   | OCCURS | ODT | OFF | OMITTED | ON | OPEN | OPTIMIZE | OPTIONAL | ORDER | ORDERLY | ORGANIZATION | OUTPUT | OVERFLOW | OWN
-   | PACKED_DECIMAL | PADDING | PAGE | PASSWORD | PERFORM | PF | PH | PIC | PICTURE | PLUS | POINTER | POSITION | POSITIVE | PRINTING | PRIVATE | PROCEDURE_POINTER| PROCEDURES | PROCEED | PROCESS | PROGRAM | PROGRAM_STATUS | PROMPT | PROTECTED | PURGE
-   | QUEUE
-   | RANDOM | RD | READ | REAL | RECEIVE | RECEIVE_CONTROL | RECEIVED | RECORD | RECORDING | RECORDS | REDEFINES | REEL | REF | REFERENCE | REFERENCES | RELATIVE | RELEASE | REMAINDER | REMOVE | REMOVAL | RENAMES | REPLACE | REPLACING | REPLY | REPORTING | REPORTS | RERUN | RESERVE | RESET | RETURN | RETURNED | REVERSED | REWIND | REWRITE | RF | RH | RIGHT | ROUNDED | RUN
-   | SAME | SAVE | SD | SEARCH | SECTION | SEGMENT | SEGMENT_LIMIT | SELECT | SEND | SENTENCE | SEPARATE | SEQUENCE | SEQUENTIAL | SET | SHARED | SHAREDBYALL | SHAREDBYRUNUNIT | SHARING | SHORT_DATE | SIGN | SIZE | SORT | SORT_MERGE | SOURCE | SP | STANDARD | STANDARD_1 | STANDARD_2 | START | STATUS | STOP | STRING | SUB_QUEUE_1 | SUB_QUEUE_2 | SUB_QUEUE_3 | SUBTRACT | SUM | SUPPRESS | SYMBOL | SYMBOLIC | SYNC | SYNCHRONIZED
-   | TABLE | TALLYING | TASK | TAPE | TERMINAL | TERMINATE | TEST | TEXT | THAN | THEN | THREAD | THREAD_LOCAL | THROUGH | THRU | TIMER | TIMES | TITLE | TO | TODAYS_DATE | TODAYS_NAME | TOP | TRAILING | TRUE | TRUNCATED | TYPE | TYPEDEF
-   | UNIT | UNLOCK | UNLOCKFILE | UNLOCKRECORD | UNSTRING | UNTIL | UP | USAGE | USE | USING
-   | VALUE | VALUES | VARYING
-   | WAIT | WITH | WORDS | WRITE
-   | XOPTS
-   | YEAR | YYYYMMDD | YYYYDDD
+   : ADDRESS OF identifier 
+   | DATE | DAY | DAY_OF_WEEK | DEBUG_CONTENTS | DEBUG_ITEM | DEBUG_LINE | DEBUG_NAME | DEBUG_SUB_1 | DEBUG_SUB_2 | DEBUG_SUB_3
+   | LENGTH OF identifier | LINAGE_COUNTER | LINE_COUNTER 
+   | PAGE_COUNTER 
+   | RETURN_CODE 
+   | SHIFT_OUT | SHIFT_IN | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN 
+   | TALLY | TIME 
+   | WHEN_COMPILED
    ;
 
 // lexer rules --------------------------------------------------------------------------------
@@ -2450,7 +2438,6 @@ ALTERNATE : A L T E R N A T E;
 AND : A N D;
 ANY : A N Y;
 APOST : A P O S T;
-APPROXIMATE : A P P R O X I M A T E;
 ARE : A R E;
 AREA : A R E A;
 AREAS : A R E A S;
@@ -2464,6 +2451,7 @@ ASSOCIATED_DATA_LENGTH : A S S O C I A T E D MINUSCHAR D A T A MINUSCHAR L E N G
 AT : A T;
 ATTRIBUTE : A T T R I B U T E;
 AUTHOR : A U T H O R;
+BASIS : B A S I S;
 BEFORE : B E F O R E;
 BEGINNING : B E G I N N I N G;
 BINARY : B I N A R Y;
@@ -2478,6 +2466,7 @@ BYTITLE : B Y T I T L E;
 CALL : C A L L;
 CANCEL : C A N C E L;
 CAPABLE : C A P A B L E;
+CBL : C B L;
 CCSVERSION : C C S V E R S I O N;
 CD : C D;
 CF : C F;
@@ -2486,6 +2475,7 @@ CHANNEL : C H A N N E L;
 CHARACTER : C H A R A C T E R;
 CHARACTERS : C H A R A C T E R S;
 CLASS : C L A S S;
+CLASS_ID : C L A S S MINUSCHAR I D;
 CLOCK_UNITS : C L O C K MINUSCHAR U N I T S;
 CLOSE : C L O S E;
 CLOSE_DISPOSITION : C L O S E MINUSCHAR D I S P O S I T I O N;
@@ -2495,6 +2485,7 @@ CODEPAGE : C O D E P A G E;
 CODE_SET : C O D E MINUSCHAR S E T;
 COLLATING : C O L L A T I N G;
 COLUMN : C O L U M N;
+COM_REG : C O M MINUSCHAR R E G;
 COMMA : C O M M A;
 COMMITMENT : C O M M I T M E N T;
 COMMON : C O M M O N;
@@ -2573,6 +2564,7 @@ DYNAMIC : D Y N A M I C;
 EBCDIC : E B C D I C;
 EGCS : E G C S; // E X T E N S I O N
 EGI : E G I;
+EJECT : E J E C T;
 ELSE : E L S E;
 EMI : E M I;
 ENABLE : E N A B L E;
@@ -2632,7 +2624,6 @@ FUNCTIONNAME : F U N C T I O N N A M E;
 FUNCTION_POINTER : F U N C T I O N MINUSCHAR P O I N T E R;
 GENERATE : G E N E R A T E;
 GOBACK : G O B A C K;
-GENERIC : G E N E R I C;
 GIVING : G I V I N G;
 GLOBAL : G L O B A L;
 GO : G O;
@@ -2666,7 +2657,6 @@ INVOKE : I N V O K E;
 IS : I S;
 JUST : J U S T;
 JUSTIFIED : J U S T I F I E D;
-JUSTIFY : J U S T I F Y;
 KANJI : K A N J I;
 KEPT : K E P T;
 KEY : K E Y;
@@ -2695,7 +2685,6 @@ LIST : L I S T;
 LOCAL : L O C A L;
 LOCAL_STORAGE : L O C A L MINUSCHAR S T O R A G E;
 LOCK : L O C K;
-LOCKFILE : L O C K F I L E;
 LONG_DATE : L O N G MINUSCHAR D A T E;
 LONG_TIME : L O N G MINUSCHAR T I M E;
 LOWER : L O W E R;
@@ -2759,6 +2748,8 @@ PLUS : P L U S;
 POINTER : P O I N T E R;
 POSITION : P O S I T I O N;
 POSITIVE : P O S I T I V E;
+PORT : P O R T;
+PRINTER : P R I N T E R;
 PRINTING : P R I N T I N G;
 PRIVATE : P R I V A T E;
 PROCEDURE : P R O C E D U R E;
@@ -2769,19 +2760,17 @@ PROCESS : P R O C E S S;
 PROGRAM : P R O G R A M;
 PROGRAM_ID : P R O G R A M MINUSCHAR I D;
 PROGRAM_LIBRARY : P R O G R A M MINUSCHAR L I B R A R Y;
-PROGRAM_STATUS : P R O G R A M MINUSCHAR S T A T U S;
-PROMPT : P R O M P T;
-PROTECTED : P R O T E C T E D;
 PURGE : P U R G E;
 QUEUE : Q U E U E;
 QUOTE : Q U O T E;
 QUOTES : Q U O T E S;
 RANDOM : R A N D O M;
+READER : R E A D E R;
+REMOTE : R E M O T E;
 RD : R D;
 REAL : R E A L;
 READ : R E A D;
 RECEIVE : R E C E I V E;
-RECEIVE_CONTROL : R E C E I V E MINUSCHAR C O N T R O L;
 RECEIVED : R E C E I V E D;
 RECORD : R E C O R D;
 RECORDING : R E C O R D I N G;
@@ -2800,7 +2789,6 @@ REMOVE : R E M O V E;
 RENAMES : R E N A M E S;
 REPLACE : R E P L A C E;
 REPLACING : R E P L A C I N G;
-REPLY : R E P L Y; // TANDEM EXTENSION
 REPORT : R E P O R T;
 REPORTING : R E P O R T I N G;
 REPORTS : R E P O R T S;
@@ -2809,7 +2797,6 @@ RESERVE : R E S E R V E;
 RESET : R E S E T;
 RETURN : R E T U R N;
 RETURN_CODE : R E T U R N MINUSCHAR C O D E;
-RETURNED : R E T U R N E D;
 REVERSED : R E V E R S E D;
 REWIND : R E W I N D;
 REWRITE : R E W R I T E;
@@ -2903,9 +2890,6 @@ TRUNCATED : T R U N C A T E D;
 TYPE : T Y P E;
 TYPEDEF : T Y P E D E F;
 UNIT : U N I T;
-UNLOCK : U N L O C K;
-UNLOCKFILE : U N L O C K F I L E;
-UNLOCKRECORD : U N L O C K R E C O R D;
 UNSTRING : U N S T R I N G;
 UNTIL : U N T I L;
 UP : U P;
@@ -2916,6 +2900,7 @@ USING : U S I N G;
 VALUE : V A L U E;
 VALUES : V A L U E S;
 VARYING : V A R Y I N G;
+VIRTUAL : V I R T U A L;
 WAIT : W A I T;
 WHEN : W H E N;
 WHEN_COMPILED : W H E N MINUSCHAR C O M P I L E D;
