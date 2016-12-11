@@ -220,7 +220,7 @@ non_dml_trigger
 
 trigger_body
     : COMPOUND TRIGGER
-    | CALL id
+    | CALL idOracle
     | trigger_block
     ;
 
@@ -416,7 +416,7 @@ modifier_clause
     ;
 
 object_member_spec
-    : id type_spec sqlj_object_type_attr?
+    : idOracle type_spec sqlj_object_type_attr?
     | element_spec
     ;
 
@@ -460,7 +460,7 @@ pragma_clause
     ;
 
 pragma_elements
-    : id
+    : idOracle
     | DEFAULT
     ;
 
@@ -509,7 +509,7 @@ invoker_rights_clause
     ;
 
 compiler_parameters_clause
-    : id '=' expression
+    : idOracle '=' expression
     ;
 
 call_spec
@@ -523,7 +523,7 @@ java_spec
     ;
 
 c_spec
-    : C_LETTER (NAME CHAR_STRING)? LIBRARY id c_agent_in_clause? (WITH CONTEXT)? c_parameters_clause?
+    : C_LETTER (NAME CHAR_STRING)? LIBRARY idOracle c_agent_in_clause? (WITH CONTEXT)? c_parameters_clause?
     ;
 
 c_agent_in_clause
@@ -584,8 +584,8 @@ pragma_declaration
     : PRAGMA (SERIALLY_REUSABLE 
     | AUTONOMOUS_TRANSACTION
     | EXCEPTION_INIT '(' exception_name ',' numeric_negative ')'
-    | INLINE '(' id1=id ',' expression ')'
-    | RESTRICT_REFERENCES '(' (id | DEFAULT) (',' id)+ ')') ';'
+    | INLINE '(' id1=idOracle ',' expression ')'
+    | RESTRICT_REFERENCES '(' (idOracle | DEFAULT) (',' idOracle)+ ')') ';'
     ;
 
 record_declaration
@@ -960,11 +960,13 @@ table_ref
     ;
 
 table_ref_aux
-    : (dml_table_expression_clause (pivot_clause | unpivot_clause)?
-      | '(' table_ref subquery_operation_part* ')' (pivot_clause | unpivot_clause)?
-      | ONLY '(' dml_table_expression_clause ')'
-      | dml_table_expression_clause (pivot_clause | unpivot_clause)?)
-    flashback_query_clause* (/*{isTableAlias()}?*/ table_alias)?
+    : table_ref_aux_internal flashback_query_clause* (/*{isTableAlias()}?*/ table_alias)?
+    ;
+    
+table_ref_aux_internal
+	:  dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
+    | '(' table_ref subquery_operation_part* ')' (pivot_clause | unpivot_clause)?  # table_ref_aux_internal_two
+    | ONLY '(' dml_table_expression_clause ')'                                     # table_ref_aux_internal_three
     ;
 
 join_clause
@@ -1103,12 +1105,14 @@ model_column_list
     : '(' model_column (',' model_column)*  ')'
     ;
 
+// Robert - 5th July 2016
 model_column
-    : expression table_alias?
+    : (expression|query_block) column_alias?
     ;
 
+// Robert - 5th July 2016
 model_rules_clause
-    : model_rules_part? '(' model_rules_element (',' model_rules_element)* ')'
+    : model_rules_part? '(' ( model_rules_element (',' model_rules_element)*)? ')'
     ;
 
 model_rules_part
@@ -1162,7 +1166,7 @@ update_statement
 // $<Update - Specific Clauses
 update_set_clause
     : SET
-      (column_based_update_set_clause (',' column_based_update_set_clause)* | VALUE '(' id ')' '=' expression)
+      (column_based_update_set_clause (',' column_based_update_set_clause)* | VALUE '(' idOracle ')' '=' expression)
     ;
 
 column_based_update_set_clause
@@ -1518,12 +1522,43 @@ quantified_expression
     : (SOME | EXISTS | ALL | ANY) ('(' subquery ')' | '(' expression_wrapper ')')
     ;
 
+// Robert - 18-June-2016
 standard_function
+	:	string_function
+	|   numeric_function_wrapper
+	| 	other_function
+	;
+
+// Robert - 18-June-2016
+string_function
+	:	 SUBSTR '(' table_element COMMA numeric (COMMA numeric)? ')'
+	|    TO_CHAR '(' (table_element|standard_function)  ( COMMA quoted_string)? ')' 
+	|    DECODE '(' expression_wrapper ( COMMA expression_wrapper )*  ')'
+	|    CHR '(' concatenation_wrapper USING NCHAR_CS ')'
+	|    NVL '(' expression_wrapper COMMA expression_wrapper ')'
+	|    TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation_wrapper ')'
+	;
+
+
+numeric_function_wrapper
+	:	numeric_function ( single_column_for_loop | multi_column_for_loop )?
+	;
+	 
+// Robert - 18-June-2016
+numeric_function
+	:	SUM '(' (DISTINCT|ALL)? expression ')'
+	|   COUNT '(' ( '*' | ((DISTINCT | UNIQUE | ALL)? concatenation_wrapper)? ) ')' over_clause?
+	|   ROUND '(' expression_wrapper (COMMA UNSIGNED_INTEGER)?  ')'
+	|   AVG '(' (DISTINCT | ALL)? expression_wrapper ')'
+	|	MAX '(' (DISTINCT | ALL)? expression_wrapper ')'
+	;
+
+// Robert - 18-June-2016- add COALESCE
+other_function
     : over_clause_keyword function_argument_analytic over_clause?
     | /*TODO stantard_function_enabling_using*/ regular_id function_argument_modeling using_clause?
-    | COUNT '(' ( '*' | (DISTINCT | UNIQUE | ALL)? concatenation_wrapper) ')' over_clause?
     | (CAST | XMLCAST) '(' (MULTISET '(' subquery ')' | concatenation_wrapper) AS type_spec ')'
-    | CHR '(' concatenation_wrapper USING NCHAR_CS ')'
+    | COALESCE '(' table_element (COMMA (numeric|quoted_string))? ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation_wrapper collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
     | DECOMPOSE '(' concatenation_wrapper (CANONICAL | COMPATIBILITY)? ')'
@@ -1533,7 +1568,6 @@ standard_function
       '(' expression_wrapper (',' expression_wrapper)* cost_matrix_clause? using_clause? ')'
     | TRANSLATE '(' expression_wrapper (USING (CHAR_CS | NCHAR_CS))? (',' expression_wrapper)* ')'
     | TREAT '(' expression_wrapper AS REF? type_spec ')'
-    | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation_wrapper ')'
     | XMLAGG '(' expression_wrapper order_by_clause? ')' ('.' general_element_part)?
     | (XMLCOLATTVAL|XMLFOREST)
       '(' xml_multiuse_expression_element (',' xml_multiuse_expression_element)* ')' ('.' general_element_part)?
@@ -1544,7 +1578,7 @@ standard_function
     | XMLEXISTS '(' expression_wrapper xml_passing_clause? ')'
     | XMLPARSE '(' (DOCUMENT | CONTENT) concatenation_wrapper WELLFORMED? ')' ('.' general_element_part)?
     | XMLPI
-      '(' (NAME id | EVALNAME concatenation_wrapper) (',' concatenation_wrapper)? ')' ('.' general_element_part)?
+      '(' (NAME idOracle | EVALNAME concatenation_wrapper) (',' concatenation_wrapper)? ')' ('.' general_element_part)?
     | XMLQUERY
       '(' concatenation_wrapper xml_passing_clause? RETURNING CONTENT (NULL ON EMPTY)? ')' ('.' general_element_part)?
     | XMLROOT
@@ -1727,12 +1761,12 @@ partition_extension_clause
     ;
 
 column_alias
-    : AS? (id | alias_quoted_string)
+    : AS? (idOracle | alias_quoted_string)
     | AS
     ;
 
 table_alias
-    : (id | alias_quoted_string)
+    : (idOracle | alias_quoted_string)
     ;
 
 alias_quoted_string
@@ -1757,68 +1791,68 @@ into_clause
 // $<Common PL/SQL Named Elements
 
 xml_column_name
-    : id
+    : idOracle
     | quoted_string
     ;
 
 cost_class_name
-    : id
+    : idOracle
     ;
 
 attribute_name
-    : id
+    : idOracle
     ;
 
 savepoint_name
-    : id
+    : idOracle
     ;
 
 rollback_segment_name
-    : id
+    : idOracle
     ;
 
 table_var_name
-    : id
+    : idOracle
     ;
 
 schema_name
-    : id
+    : idOracle
     ;
 
 routine_name
-    : id ('.' id_expression)* ('@' link_name)?
+    : idOracle ('.' id_expression)* ('@' link_name)?
     ;
 
 package_name
-    : id
+    : idOracle
     ;
 
 implementation_type_name
-    : id ('.' id_expression)?
+    : idOracle ('.' id_expression)?
     ;
 
 parameter_name
-    : id
+    : idOracle
     ;
 
 reference_model_name
-    : id
+    : idOracle
     ;
 
 main_model_name
-    : id
+    : idOracle
     ;
 
 aggregate_function_name
-    : id ('.' id_expression)*
+    : idOracle ('.' id_expression)*
     ;
 
 query_name
-    : id
+    : idOracle
     ;
 
 constraint_name
-    : id ('.' id_expression)* ('@' link_name)?
+    : idOracle ('.' id_expression)* ('@' link_name)?
     ;
 
 label_name
@@ -1834,19 +1868,19 @@ sequence_name
     ;
 
 exception_name
-    : id ('.' id_expression)* 
+    : idOracle ('.' id_expression)*
     ;
 
 function_name
-    : id ('.' id_expression)?
+    : idOracle ('.' id_expression)?
     ;
 
 procedure_name
-    : id ('.' id_expression)?
+    : idOracle ('.' id_expression)?
     ;
 
 trigger_name
-    : id ('.' id_expression)?
+    : idOracle ('.' id_expression)?
     ;
 
 variable_name
@@ -1855,33 +1889,33 @@ variable_name
     ;
 
 index_name
-    : id
+    : idOracle
     ;
 
 cursor_name
-    : id
+    : idOracle
     | bind_variable
     ;
 
 record_name
-    : id
+    : idOracle
     | bind_variable
     ;
 
 collection_name
-    : id ('.' id_expression)?
+    : idOracle ('.' id_expression)?
     ;
 
 link_name
-    : id
+    : idOracle
     ;
 
 column_name
-    : id ('.' id_expression)*
+    : idOracle ('.' id_expression)*
     ;
 
 tableview_name
-    : id ('.' id_expression)? 
+    : idOracle ('.' id_expression)?
       ('@' link_name | /*TODO{!(input.LA(2) == SQL92_RESERVED_BY)}?*/ partition_extension_clause)?
     ;
 
@@ -1917,7 +1951,7 @@ respect_or_ignore_nulls
     ;
 
 argument
-    : (id '=' '>')? expression_wrapper
+    : (idOracle '=' '>')? expression_wrapper
     ;
 
 type_spec
@@ -2048,7 +2082,7 @@ quoted_string
     | NATIONAL_CHAR_STRING_LIT
     ;
 
-id
+idOracle
     : (INTRODUCER char_set_name)? id_expression
     ;
 
@@ -2134,7 +2168,6 @@ regular_id
     | CHAR_CS
     | CHARACTER
     //| CHECK
-    | CHR
     | CLOB
     | CLOSE
     | CLUSTER
@@ -2159,7 +2192,6 @@ regular_id
     | CORRUPT_XID
     | CORRUPT_XID_ALL
     | COST
-    | COUNT
     //| CREATE
     | CROSS
     | CUBE
@@ -2475,7 +2507,6 @@ regular_id
     | TRANSLATE
     | TREAT
     | TRIGGER
-    | TRIM
     //| TRUE
     | TRUNCATE
     | TYPE
@@ -2545,7 +2576,6 @@ regular_id
     | PERCENTILE_CONT
     | PERCENTILE_DISC
     | RANK
-    | AVG
     | CORR
     | LAG
     | LEAD
@@ -2555,13 +2585,28 @@ regular_id
     | NTILE
     | RATIO_TO_REPORT
     | ROW_NUMBER
-    | SUM
     | VARIANCE
     | REGR_
     | STDDEV
     | VAR_
     | COVAR_
     ;
+
+string_function_name
+	:	CHR
+	|	DECODE
+    |   SUBSTR
+    |   TO_CHAR
+	|	TRIM
+	;
+	
+numeric_function_name
+	:	AVG
+	|	COUNT
+	|	NVL
+	|	ROUND
+	|	SUM
+	;
 
 A_LETTER:                     A;
 ADD:                          A D D;
@@ -2616,6 +2661,7 @@ CHR:                          C H R;
 CLOB:                         C L O B;
 CLOSE:                        C L O S E;
 CLUSTER:                      C L U S T E R;
+COALESCE:                     C O A L E S C E;
 COLLECT:                      C O L L E C T;
 COLUMNS:                      C O L U M N S;
 COMMENT:                      C O M M E N T;
@@ -2953,7 +2999,6 @@ TRANSACTION:                  T R A N S A C T I O N;
 TRANSLATE:                    T R A N S L A T E;
 TREAT:                        T R E A T;
 TRIGGER:                      T R I G G E R;
-TRIM:                         T R I M;
 TRUE:                         T R U E;
 TRUNCATE:                     T R U N C A T E;
 TYPE:                         T Y P E;
@@ -3017,7 +3062,7 @@ PREDICTION_COST:              P R E D I C T I O N '_' C O S T;
 PREDICTION_DETAILS:           P R E D I C T I O N '_' D E T A I L S;
 PREDICTION_PROBABILITY:       P R E D I C T I O N '_' P R O B A B I L I T Y;
 PREDICTION_SET:               P R E D I C T I O N '_' S E T;
-                              
+
 CUME_DIST:                    C U M E '_' D I S T;
 DENSE_RANK:                   D E N S E '_' R A N K;
 LISTAGG:                      L I S T A G G;
@@ -3025,23 +3070,29 @@ PERCENT_RANK:                 P E R C E N T '_' R A N K;
 PERCENTILE_CONT:              P E R C E N T I L E '_' C O N T;
 PERCENTILE_DISC:              P E R C E N T I L E '_' D I S C;
 RANK:                         R A N K;
-                              
+
 AVG:                          A V G;
 CORR:                         C O R R;
+COVAR_:                       C O V A R '_';
+DECODE:                       D E C O D E;
 LAG:                          L A G;
 LEAD:                         L E A D;
 MAX:                          M A X;
 MEDIAN:                       M E D I A N;
 MIN:                          M I N;
 NTILE:                        N T I L E;
+NVL:                          N V L;
 RATIO_TO_REPORT:              R A T I O '_' T O '_' R  E P O R T;
+REGR_:                        R E G R '_';
+ROUND:                        R O U N D;
 ROW_NUMBER:                   R O W '_' N U M B E R;
 SUM:                          S U M;
-VARIANCE:                     V A R I A N C E;
-REGR_:                        R E G R '_';
 STDDEV:                       S T D D E V;
+SUBSTR:                       S U B S T R;
+TO_CHAR:                      T O '_' C H A R;
+TRIM:                         T R I M;
 VAR_:                         V A R '_';
-COVAR_:                       C O V A R '_';
+VARIANCE:                     V A R I A N C E;
 
 fragment A: [aA];
 fragment B: [bB];
@@ -3080,6 +3131,7 @@ fragment Z: [zZ];
     ;
 */
 
+
 //{ Rule #358 <NATIONAL_CHAR_STRING_LIT> - subtoken typecast in <REGULAR_ID>, it also incorporates <character_representation>
 //  Lowercase 'n' is a usual addition to the standard
 NATIONAL_CHAR_STRING_LIT
@@ -3098,7 +3150,7 @@ BIT_STRING_LIT
 //{ Rule #284 <HEX_STRING_LIT> - subtoken typecast in <REGULAR_ID>
 //  Lowercase 'x' is a usual addition to the standard
 HEX_STRING_LIT
-    : X ('\'' ('a'..'f' | 'A'..'F' | '0'..'9')* '\'' /*SEPARATOR?*/ )+ 
+    : X ('\'' ('a'..'f' | 'A'..'F' | '0'..'9')* '\'' /*SEPARATOR?*/ )+
     ;
 //}
 
@@ -3110,9 +3162,9 @@ PERIOD
     : '.'
     ;
 
-//{ Rule #238 <EXACT_NUM_LIT> 
-//  This rule is a bit tricky - it resolves the ambiguity with <PERIOD> 
-//  It als44o incorporates <mantisa> and <exponent> for the <APPROXIMATE_NUM_LIT>
+//{ Rule #238 <EXACT_NUM_LIT>
+//  This rule is a bit tricky - it resolves the ambiguity with <PERIOD>
+//  It also incorporates <mantisa> and <exponent> for the <APPROXIMATE_NUM_LIT>
 //  Rule #501 <signed_integer> was incorporated directly in the token <APPROXIMATE_NUM_LIT>
 //  See also the rule #617 <unsigned_num_lit>
 /*
@@ -3161,14 +3213,14 @@ fragment QS_OTHER_CH: ~('<' | '{' | '[' | '(' | ' ' | '\t' | '\n' | '\r');
 //		}
 		:
 		QUOTE delimiter=QS_OTHER_CH
-// JAVA Syntax 
+// JAVA Syntax
     ( { input.LT(1) != $delimiter.text.charAt(0) || ( input.LT(1) == $delimiter.text.charAt(0) && input.LT(2) != '\'') }? => . )*
     ( { input.LT(1) == $delimiter.text.charAt(0) && input.LT(2) == '\'' }? => . ) QUOTE
 		;*/
 
 //{ Rule #163 <DELIMITED_ID>
 DELIMITED_ID
-    : '"' (~('"' | '\r' | '\n') | '"' '"')+ '"' 
+    : '"' (~('"' | '\r' | '\n') | '"' '"')+ '"'
     ;
 //}
 
@@ -3200,7 +3252,7 @@ ASTERISK
 PLUS_SIGN
     : '+'
     ;
-    
+
 MINUS_SIGN
     : '-'
     ;
@@ -3211,7 +3263,7 @@ COMMA
 
 SOLIDUS
     : '/'
-    ; 
+    ;
 
 AT_SIGN
     : '@'
@@ -3220,7 +3272,7 @@ AT_SIGN
 ASSIGN_OP
     : ':='
     ;
-    
+
 // See OCI reference for more information about this
 BINDVAR
     : ':' SIMPLE_LETTER  (SIMPLE_LETTER | '0' .. '9' | '_')*
@@ -3255,7 +3307,7 @@ NOT_EQUAL_OP
     | '^='
     | '~='
     ;
-    
+
 CARRET_OPERATOR_PART
     : '^'
     ;
@@ -3307,7 +3359,7 @@ INTRODUCER
     ;
 
 //{ Rule #479 <SEPARATOR>
-//  It was originally a protected rule set to be filtered out but the <COMMENT> and <'-'> clashed. 
+//  It was originally a protected rule set to be filtered out but the <COMMENT> and <'-'> clashed.
 /*SEPARATOR
     : '-' -> type('-')
     | COMMENT -> channel(HIDDEN)
@@ -3318,7 +3370,7 @@ INTRODUCER
 SPACES
     : [ \t\r\n]+ -> skip
     ;
-    
+
 //{ Rule #504 <SIMPLE_LETTER> - simple_latin _letter was generalised into SIMPLE_LETTER
 //  Unicode is yet to be implemented - see NSF0
 fragment
@@ -3328,17 +3380,18 @@ SIMPLE_LETTER
     ;
 //}
 
-//  Rule #176 <DIGIT> was incorporated by <UNSIGNED_INTEGER> 
-//{ Rule #615 <UNSIGNED_INTEGER> - subtoken typecast in <EXACT_NUM_LIT> 
+//  Rule #176 <DIGIT> was incorporated by <UNSIGNED_INTEGER>
+//{ Rule #615 <UNSIGNED_INTEGER> - subtoken typecast in <EXACT_NUM_LIT>
 fragment
 UNSIGNED_INTEGER_FRAGMENT
-    : ('0'..'9')+ 
+    : ('0'..'9')+
     ;
 //}
 
 fragment
 FLOAT_FRAGMENT
     : UNSIGNED_INTEGER* '.'? UNSIGNED_INTEGER+
+//	: UNSIGNED_INTEGER* UNSIGNED_INTEGER '.'? UNSIGNED_INTEGER*
     ;
 
 //{ Rule #097 <COMMENT>
@@ -3354,7 +3407,7 @@ PROMPT
 //{ Rule #360 <NEWLINE>
 fragment
 NEWLINE: '\r'? '\n';
-    
+
 fragment
 SPACE: [ \t];
 

@@ -1,0 +1,1 @@
+SELECT coalesce(h1.Severity,'NS') as "Severity" FROM MYTABLE h1
