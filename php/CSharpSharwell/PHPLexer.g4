@@ -66,7 +66,7 @@ public override IToken NextToken()
             }
             else
             {
-                token = new CommonToken(SemiColon);
+                token.Type = SemiColon;
             }
         }
     }
@@ -98,7 +98,7 @@ public override IToken NextToken()
                     PopMode();
                     if (token.Text.Trim().EndsWith(";"))
                     {
-                        token = new CommonToken(SemiColon);
+                        token.Type = SemiColon;
                     }
                     else
                     {
