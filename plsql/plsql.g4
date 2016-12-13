@@ -537,7 +537,7 @@ c_parameters_clause
 // $>
 
 parameter
-    : parameter_name ( IN | OUT | INOUT | NOCOPY)* type_spec? default_value_part?
+    : parameter_name (IN | OUT | INOUT | NOCOPY)* type_spec? default_value_part?
     ;
 
 default_value_part
@@ -1348,7 +1348,6 @@ equality_expression
       (NULL | NAN | PRESENT | INFINITE | A_LETTER SET | EMPTY | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')'))*
     ;
 
-
 multiset_expression
     : relational_expression (multiset_type OF? concatenation)?
     ;
@@ -1370,7 +1369,6 @@ compound_expression
 relational_operator
     : '=' | not_equal_op | '<' | '>' | less_than_or_equals_op | greater_than_or_equals_op
     ;
-
 like_type
     : LIKE
     | LIKEC
@@ -1384,7 +1382,7 @@ like_escape_part
 
 in_elements
     : '(' subquery ')'
-    | '(' concatenation_wrapper (',' concatenation_wrapper)* ')'
+    | '(' concatenation (',' concatenation)* ')'
     | constant
     | bind_variable
     | general_element
@@ -1398,10 +1396,6 @@ concatenation
     : additive_expression (concatenation_op additive_expression)*
     ;
 
-concatenation_wrapper
-    : concatenation
-    ;
-
 additive_expression
     : multiply_expression (op+=('+' | '-') multiply_expression)*
     ;
@@ -1412,12 +1406,12 @@ multiply_expression
 
 datetime_expression
     : model_expression
-      (AT (LOCAL | TIME ZONE concatenation_wrapper) | interval_expression)?
+      (AT (LOCAL | TIME ZONE concatenation) | interval_expression)?
     ;
 
 interval_expression
-    : DAY ('(' concatenation_wrapper ')')? TO SECOND ('(' concatenation_wrapper ')')?
-    | YEAR ('(' concatenation_wrapper ')')? TO MONTH
+    : DAY ('(' concatenation ')')? TO SECOND ('(' concatenation ')')?
+    | YEAR ('(' concatenation ')')? TO MONTH
     ;
 
 model_expression
@@ -1450,14 +1444,13 @@ multi_column_for_loop
     ;
 
 unary_expression
-    : '-' unary_expression
-    | '+' unary_expression
+    : ('-' | '+') unary_expression
     | PRIOR unary_expression
     | CONNECT_BY_ROOT unary_expression
     | /*TODO {input.LT(1).getText().equalsIgnoreCase("new") && !input.LT(2).getText().equals(".")}?*/ NEW unary_expression
     |  DISTINCT unary_expression
     |  ALL unary_expression
-    |  /*TODO{(input.LA(1) == SQL92_RESERVED_CASE || input.LA(2) == SQL92_RESERVED_CASE)}?*/ case_statement/*[false]*/
+    |  /*TODO{(input.LA(1) == CASE || input.LA(2) == CASE)}?*/ case_statement/*[false]*/
     |  quantified_expression
     |  standard_function
     |  atom
@@ -1518,19 +1511,19 @@ quantified_expression
 standard_function
     : over_clause_keyword function_argument_analytic over_clause?
     | /*TODO stantard_function_enabling_using*/ regular_id function_argument_modeling using_clause?
-    | COUNT '(' ( '*' | (DISTINCT | UNIQUE | ALL)? concatenation_wrapper) ')' over_clause?
-    | (CAST | XMLCAST) '(' (MULTISET '(' subquery ')' | concatenation_wrapper) AS type_spec ')'
-    | CHR '(' concatenation_wrapper USING NCHAR_CS ')'
-    | COLLECT '(' (DISTINCT | UNIQUE)? concatenation_wrapper collect_order_by_part? ')'
+    | COUNT '(' ( '*' | (DISTINCT | UNIQUE | ALL)? concatenation) ')' over_clause?
+    | (CAST | XMLCAST) '(' (MULTISET '(' subquery ')' | concatenation) AS type_spec ')'
+    | CHR '(' concatenation USING NCHAR_CS ')'
+    | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
-    | DECOMPOSE '(' concatenation_wrapper (CANONICAL | COMPATIBILITY)? ')'
-    | EXTRACT '(' regular_id FROM concatenation_wrapper ')'
+    | DECOMPOSE '(' concatenation (CANONICAL | COMPATIBILITY)? ')'
+    | EXTRACT '(' regular_id FROM concatenation ')'
     | (FIRST_VALUE | LAST_VALUE) function_argument_analytic respect_or_ignore_nulls? over_clause
     | standard_prediction_function_keyword 
       '(' expression (',' expression)* cost_matrix_clause? using_clause? ')'
     | TRANSLATE '(' expression (USING (CHAR_CS | NCHAR_CS))? (',' expression)* ')'
     | TREAT '(' expression AS REF? type_spec ')'
-    | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation_wrapper ')'
+    | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
     | XMLAGG '(' expression order_by_clause? ')' ('.' general_element_part)?
     | (XMLCOLATTVAL|XMLFOREST)
       '(' xml_multiuse_expression_element (',' xml_multiuse_expression_element)* ')' ('.' general_element_part)?
@@ -1539,19 +1532,19 @@ standard_function
        (/*TODO{input.LT(2).getText().equalsIgnoreCase("xmlattributes")}?*/ ',' xml_attributes_clause)?
        (',' expression column_alias?)* ')' ('.' general_element_part)?
     | XMLEXISTS '(' expression xml_passing_clause? ')'
-    | XMLPARSE '(' (DOCUMENT | CONTENT) concatenation_wrapper WELLFORMED? ')' ('.' general_element_part)?
+    | XMLPARSE '(' (DOCUMENT | CONTENT) concatenation WELLFORMED? ')' ('.' general_element_part)?
     | XMLPI
-      '(' (NAME id | EVALNAME concatenation_wrapper) (',' concatenation_wrapper)? ')' ('.' general_element_part)?
+      '(' (NAME id | EVALNAME concatenation) (',' concatenation)? ')' ('.' general_element_part)?
     | XMLQUERY
-      '(' concatenation_wrapper xml_passing_clause? RETURNING CONTENT (NULL ON EMPTY)? ')' ('.' general_element_part)?
+      '(' concatenation xml_passing_clause? RETURNING CONTENT (NULL ON EMPTY)? ')' ('.' general_element_part)?
     | XMLROOT
-      '(' concatenation_wrapper (',' xmlroot_param_version_part)? (',' xmlroot_param_standalone_part)? ')' ('.' general_element_part)?
+      '(' concatenation (',' xmlroot_param_version_part)? (',' xmlroot_param_standalone_part)? ')' ('.' general_element_part)?
     | XMLSERIALIZE
-      '(' (DOCUMENT | CONTENT) concatenation_wrapper (AS type_spec)?
+      '(' (DOCUMENT | CONTENT) concatenation (AS type_spec)?
       xmlserialize_param_enconding_part? xmlserialize_param_version_part? xmlserialize_param_ident_part? ((HIDE | SHOW) DEFAULTS)? ')'
       ('.' general_element_part)?
     | XMLTABLE
-      '(' xml_namespaces_clause? concatenation_wrapper xml_passing_clause? (COLUMNS xml_table_column (',' xml_table_column))? ')' ('.' general_element_part)?
+      '(' xml_namespaces_clause? concatenation xml_passing_clause? (COLUMNS xml_table_column (',' xml_table_column))? ')' ('.' general_element_part)?
     ;
 
 over_clause_keyword
@@ -1615,7 +1608,7 @@ windowing_type
 windowing_elements
     : UNBOUNDED PRECEDING
     | CURRENT ROW
-    | concatenation_wrapper (PRECEDING|FOLLOWING)
+    | concatenation (PRECEDING|FOLLOWING)
     ;
 
 using_clause
@@ -1627,7 +1620,7 @@ using_element
     ;
 
 collect_order_by_part
-    : ORDER BY concatenation_wrapper
+    : ORDER BY concatenation
     ;
 
 within_or_over_part
@@ -1651,17 +1644,17 @@ xml_attributes_clause
 
 xml_namespaces_clause
     : XMLNAMESPACES
-      '(' (concatenation_wrapper column_alias)? (',' concatenation_wrapper column_alias)*
+      '(' (concatenation column_alias)? (',' concatenation column_alias)*
       xml_general_default_part? ')'
     ;
 
 xml_table_column
     : xml_column_name
-      (FOR ORDINALITY | type_spec (PATH concatenation_wrapper)? xml_general_default_part?)
+      (FOR ORDINALITY | type_spec (PATH concatenation)? xml_general_default_part?)
     ;
 
 xml_general_default_part
-    : DEFAULT concatenation_wrapper
+    : DEFAULT concatenation
     ;
 
 xml_multiuse_expression_element
@@ -1677,16 +1670,16 @@ xmlroot_param_standalone_part
     ;
 
 xmlserialize_param_enconding_part
-    : ENCODING concatenation_wrapper
+    : ENCODING concatenation
     ;
 
 xmlserialize_param_version_part
-    : VERSION concatenation_wrapper
+    : VERSION concatenation
     ;
 
 xmlserialize_param_ident_part
     : NO INDENT
-    | INDENT (SIZE '=' concatenation_wrapper)?
+    | INDENT (SIZE '=' concatenation)?
     ;
     
 // SqlPlus
@@ -1879,7 +1872,7 @@ column_name
 
 tableview_name
     : id ('.' id_expression)? 
-      ('@' link_name | /*TODO{!(input.LA(2) == SQL92_RESERVED_BY)}?*/ partition_extension_clause)?
+      ('@' link_name | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
     ;
 
 char_set_name
@@ -3039,6 +3032,256 @@ STDDEV:                       S T D D E V;
 VAR_:                         V A R '_';
 COVAR_:                       C O V A R '_';
 
+// Rule #358 <NATIONAL_CHAR_STRING_LIT> - subtoken typecast in <REGULAR_ID>, it also incorporates <character_representation>
+//  Lowercase 'n' is a usual addition to the standard
+NATIONAL_CHAR_STRING_LIT: N '\'' (~('\'' | '\r' | '\n' ) | '\'' '\'' | NEWLINE)* '\'';
+
+//  Rule #040 <BIT_STRING_LIT> - subtoken typecast in <REGULAR_ID>
+//  Lowercase 'b' is a usual addition to the standard
+BIT_STRING_LIT: B ('\'' ('0' | '1')* '\'' /*SEPARATOR?*/ )+;
+
+//  Rule #284 <HEX_STRING_LIT> - subtoken typecast in <REGULAR_ID>
+//  Lowercase 'x' is a usual addition to the standard
+HEX_STRING_LIT: X ('\'' ('a'..'f' | 'A'..'F' | '0'..'9')* '\'' /*SEPARATOR?*/ )+;
+DOUBLE_PERIOD: '.' '.';
+PERIOD:        '.';
+
+//{ Rule #238 <EXACT_NUM_LIT>
+//  This rule is a bit tricky - it resolves the ambiguity with <PERIOD> 
+//  It als44o incorporates <mantisa> and <exponent> for the <APPROXIMATE_NUM_LIT>
+//  Rule #501 <signed_integer> was incorporated directly in the token <APPROXIMATE_NUM_LIT>
+//  See also the rule #617 <unsigned_num_lit>
+/*
+    : (
+            UNSIGNED_INTEGER
+            ( '.' UNSIGNED_INTEGER
+            | {$type = UNSIGNED_INTEGER;}
+            ) ( E ('+' | '-')? UNSIGNED_INTEGER {$type = APPROXIMATE_NUM_LIT;} )?
+    | '.' UNSIGNED_INTEGER ( E ('+' | '-')? UNSIGNED_INTEGER {$type = APPROXIMATE_NUM_LIT;} )?
+    )
+    (D | F)?
+    ;*/
+
+UNSIGNED_INTEGER: UNSIGNED_INTEGER_FRAGMENT;
+APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT (('e'|'E') ('+'|'-')? (FLOAT_FRAGMENT | UNSIGNED_INTEGER_FRAGMENT))? (D | F)?;
+
+// Rule #--- <CHAR_STRING> is a base for Rule #065 <char_string_lit> , it incorporates <character_representation>
+// and a superfluous subtoken typecasting of the "QUOTE"
+CHAR_STRING: '\'' (~('\'' | '\r' | '\n') | '\'' '\'' | NEWLINE)* '\'';
+
+// Perl-style quoted string, see Oracle SQL reference, chapter String Literals
+CHAR_STRING_PERL    : Q ( QS_ANGLE | QS_BRACE | QS_BRACK | QS_PAREN) -> type(CHAR_STRING);
+fragment QUOTE      : '\'' ;
+fragment QS_ANGLE   : QUOTE '<' .*? '>' QUOTE ;
+fragment QS_BRACE   : QUOTE '{' .*? '}' QUOTE ;
+fragment QS_BRACK   : QUOTE '[' .*? ']' QUOTE ;
+fragment QS_PAREN   : QUOTE '(' .*? ')' QUOTE ;
+fragment QS_OTHER_CH: ~('<' | '{' | '[' | '(' | ' ' | '\t' | '\n' | '\r');
+
+// Rule #163 <DELIMITED_ID>
+DELIMITED_ID: '"' (~('"' | '\r' | '\n') | '"' '"')+ '"' ;
+
+// Rule #546 <SQL_SPECIAL_CHAR> was split into single rules
+PERCENT: '%';
+AMPERSAND: '&';
+LEFT_PAREN: '(';
+RIGHT_PAREN: ')';
+DOUBLE_ASTERISK: '**';
+ASTERISK: '*';
+PLUS_SIGN: '+';
+MINUS_SIGN: '-';
+COMMA: ',';
+SOLIDUS: '/';
+AT_SIGN: '@';
+ASSIGN_OP: ':=';
+    
+// See OCI reference for more information about this
+BINDVAR
+    : ':' SIMPLE_LETTER  (SIMPLE_LETTER | '0' .. '9' | '_')*
+    | ':' DELIMITED_ID  // not used in SQL but spotted in v$sqltext when using cursor_sharing
+    | ':' UNSIGNED_INTEGER
+    | QUESTION_MARK // not in SQL, not in Oracle, not in OCI, use this for JDBC
+    ;
+
+COLON: ':';
+SEMICOLON: ';';
+LESS_THAN_OR_EQUALS_OP: '<=';
+LESS_THAN_OP: '<';
+GREATER_THAN_OR_EQUALS_OP: '>=';
+NOT_EQUAL_OP: '!='| '<>'| '^='| '~=';
+CARRET_OPERATOR_PART: '^';
+TILDE_OPERATOR_PART: '~';
+EXCLAMATION_OPERATOR_PART: '!';
+GREATER_THAN_OP: '>';
+
+fragment
+QUESTION_MARK: '?';
+
+// protected UNDERSCORE : '_' SEPARATOR ; // subtoken typecast within <INTRODUCER>
+CONCATENATION_OP: '||';
+VERTICAL_BAR: '|';
+EQUALS_OP: '=';
+
+// Rule #532 <SQL_EMBDD_LANGUAGE_CHAR> was split into single rules:
+LEFT_BRACKET: '[';
+RIGHT_BRACKET: ']';
+
+//{ Rule #319 <INTRODUCER>
+INTRODUCER
+    : '_' //(SEPARATOR {$type = UNDERSCORE;})?
+    ;
+
+//{ Rule #479 <SEPARATOR>
+//  It was originally a protected rule set to be filtered out but the <COMMENT> and <'-'> clashed. 
+/*SEPARATOR
+    : '-' -> type('-')
+    | COMMENT -> channel(HIDDEN)
+    | (SPACE | NEWLINE)+ -> channel(HIDDEN)
+    ;*/
+//}
+
+SPACES: [ \t\r\n]+ -> skip;
+    
+//{ Rule #504 <SIMPLE_LETTER> - simple_latin _letter was generalised into SIMPLE_LETTER
+//  Unicode is yet to be implemented - see NSF0
+fragment
+SIMPLE_LETTER
+    : 'a'..'z'
+    | 'A'..'Z'
+    ;
+//}
+
+//  Rule #176 <DIGIT> was incorporated by <UNSIGNED_INTEGER> 
+//{ Rule #615 <UNSIGNED_INTEGER> - subtoken typecast in <EXACT_NUM_LIT> 
+fragment
+UNSIGNED_INTEGER_FRAGMENT: ('0'..'9')+ ;
+
+fragment
+FLOAT_FRAGMENT
+    : UNSIGNED_INTEGER* '.'? UNSIGNED_INTEGER+
+    ;
+
+//{ Rule #097 <COMMENT>
+SINGLE_LINE_COMMENT: '--' ( ~('\r' | '\n') )* (NEWLINE|EOF) -> channel(HIDDEN);
+MULTI_LINE_COMMENT: '/*' .*? '*/'                           -> channel(HIDDEN);
+
+// SQL*Plus prompt
+// TODO should be grammar rule, but tricky to implement
+PROMPT
+	: 'prompt' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
+	;
+
+//{ Rule #360 <NEWLINE>
+fragment
+NEWLINE: '\r'? '\n';
+    
+fragment
+SPACE: [ \t];
+
+//{ Rule #442 <REGULAR_ID> additionally encapsulates a few STRING_LITs.
+//  Within testLiterals all reserved and non-reserved words are being resolved
+
+// PLSQL keywords:
+
+/*PLSQL_NON_RESERVED_COLUMNS: 'columns';
+CLUSTERS: 'clusters';
+COLAUTH: 'colauth';
+COMPRESS: 'compress';
+PLSQL_NON_RESERVED_CONNECT_BY_ROOT: 'connect_by_root';
+CRASH: 'crash';
+EXCLUSIVE: 'exclusive';
+IDENTIFIED: 'identified';
+INDEX: 'index';
+INDEXES: 'indexes';
+LOCK: 'lock';
+MINUS: 'minus';
+MODE: 'mode';
+NOCOMPRESS: 'nocompress';
+NOWAIT: 'nowait';
+RESOURCE: 'resource';
+SHARE: 'share';*/
+
+// SQL92 keywords:
+
+/*ALL: 'all';
+ALTER: 'alter';
+AND: 'and';
+
+ANY: 'any';
+AS: 'as';
+ASC: 'asc';
+BEGIN: 'begin';
+BETWEEN: 'between';
+BY: 'by';
+CASE: 'case';
+CHECK: 'check';
+CONNECT: 'connect';
+CREATE: 'create';
+CURRENT: 'current';
+CURSOR: 'cursor';
+DATE: 'date';
+DECLARE: 'declare';
+DEFAULT: 'default';
+DELETE: 'delete';
+DESC: 'desc';
+DISTINCT: 'distinct';
+DROP: 'drop';
+ELSE: 'else';
+END: 'end';
+//TODO "exception" is a keyword only withing the contex of the PL/SQL language
+//while it can be an identifier(column name, table name) in SQL
+//"exception" is a keyword if and only it is followed by "when"
+EXCEPTION: 'exception';
+EXISTS: 'exists';
+FALSE: 'false';
+FETCH: 'fetch';
+FOR: 'for';
+FROM: 'from';
+GOTO: 'goto';
+GRANT: 'grant';
+GROUP: 'group';
+HAVING: 'having';
+IN: 'in';
+INSERT: 'insert';
+INTERSECT: 'intersect';
+INTO: 'into';
+IS: 'is';
+LIKE: 'like';
+NOT: 'not';
+NULL: 'null';
+OF: 'of';
+ON: 'on';
+OPTION: 'option';
+OR: 'or';
+ORDER: 'order';
+OVERLAPS: 'overlaps';
+PRIOR: 'prior';
+PROCEDURE: 'procedure';
+PUBLIC: 'public';
+REVOKE: 'revoke';
+SELECT: 'select';
+SIZE: 'size';
+START: 'start';
+TABAUTH: 'tabauth';
+TABLE: 'table';
+THE: 'the';
+THEN: 'then';
+TO: 'to';
+TRUE: 'true';
+UNION: 'union';
+UNIQUE: 'unique';
+UPDATE: 'update';
+VALUES: 'values';
+VIEW: 'view';
+VIEWS: 'views';
+WHEN: 'when';
+WHERE: 'where';
+WITH: 'with';
+USING: 'using';*/
+
+REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | '0'..'9')*;
+ZV: '@!' -> channel(HIDDEN);
+
 fragment A: [aA];
 fragment B: [bB];
 fragment C: [cC];
@@ -3065,778 +3308,3 @@ fragment W: [wW];
 fragment X: [xX];
 fragment Y: [yY];
 fragment Z: [zZ];
-
-/*FOR_NOTATION
-    :    UNSIGNED_INTEGER
-        {state.type = UNSIGNED_INTEGER; emit(); advanceInput();}
-        '..'
-        {state.type = DOUBLE_PERIOD; emit(); advanceInput();}
-        UNSIGNED_INTEGER
-        {state.type = UNSIGNED_INTEGER; emit(); advanceInput(); $channel=HIDDEN;}
-    ;
-*/
-
-//{ Rule #358 <NATIONAL_CHAR_STRING_LIT> - subtoken typecast in <REGULAR_ID>, it also incorporates <character_representation>
-//  Lowercase 'n' is a usual addition to the standard
-NATIONAL_CHAR_STRING_LIT
-    : N '\'' (~('\'' | '\r' | '\n' ) | '\'' '\'' | NEWLINE)* '\''
-    ;
-//}
-
-//{ Rule #040 <BIT_STRING_LIT> - subtoken typecast in <REGULAR_ID>
-//  Lowercase 'b' is a usual addition to the standard
-BIT_STRING_LIT
-    : B ('\'' ('0' | '1')* '\'' /*SEPARATOR?*/ )+
-    ;
-//}
-
-
-//{ Rule #284 <HEX_STRING_LIT> - subtoken typecast in <REGULAR_ID>
-//  Lowercase 'x' is a usual addition to the standard
-HEX_STRING_LIT
-    : X ('\'' ('a'..'f' | 'A'..'F' | '0'..'9')* '\'' /*SEPARATOR?*/ )+ 
-    ;
-//}
-
-DOUBLE_PERIOD
-    : '.' '.'
-    ;
-
-PERIOD
-    : '.'
-    ;
-
-//{ Rule #238 <EXACT_NUM_LIT> 
-//  This rule is a bit tricky - it resolves the ambiguity with <PERIOD> 
-//  It als44o incorporates <mantisa> and <exponent> for the <APPROXIMATE_NUM_LIT>
-//  Rule #501 <signed_integer> was incorporated directly in the token <APPROXIMATE_NUM_LIT>
-//  See also the rule #617 <unsigned_num_lit>
-/*
-    : (
-            UNSIGNED_INTEGER
-            ( '.' UNSIGNED_INTEGER
-            | {$type = UNSIGNED_INTEGER;}
-            ) ( E ('+' | '-')? UNSIGNED_INTEGER {$type = APPROXIMATE_NUM_LIT;} )?
-    | '.' UNSIGNED_INTEGER ( E ('+' | '-')? UNSIGNED_INTEGER {$type = APPROXIMATE_NUM_LIT;} )?
-    )
-    (D | F)?
-    ;*/
-//}
-
-UNSIGNED_INTEGER: UNSIGNED_INTEGER_FRAGMENT;
-APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT (('e'|'E') ('+'|'-')? (FLOAT_FRAGMENT | UNSIGNED_INTEGER_FRAGMENT))? (D | F)?;
-
-
-//{ Rule #--- <CHAR_STRING> is a base for Rule #065 <char_string_lit> , it incorporates <character_representation>
-//  and a superfluous subtoken typecasting of the "QUOTE"
-CHAR_STRING
-    : '\'' (~('\'' | '\r' | '\n') | '\'' '\'' | NEWLINE)* '\''
-    ;
-//}
-
-// Perl-style quoted string, see Oracle SQL reference, chapter String Literals
-CHAR_STRING_PERL    : Q ( QS_ANGLE | QS_BRACE | QS_BRACK | QS_PAREN /*| QS_OTHER*/) -> type(CHAR_STRING);
-fragment QUOTE      : '\'' ;
-fragment QS_ANGLE   : QUOTE '<' .*? '>' QUOTE ;
-fragment QS_BRACE   : QUOTE '{' .*? '}' QUOTE ;
-fragment QS_BRACK   : QUOTE '[' .*? ']' QUOTE ;
-fragment QS_PAREN   : QUOTE '(' .*? ')' QUOTE ;
-
-fragment QS_OTHER_CH: ~('<' | '{' | '[' | '(' | ' ' | '\t' | '\n' | '\r');
-/*fragment QS_OTHER:
-    QUOTE QS_OTHER_CH { delimeter = _input.La(-1); }
-    (. { _input.La(-1) != delimeter }? )* QS_OTHER_CH QUOTE;*/
-/*fragment QS_OTHER
-//    For C target we have to preserve case sensitivity.
-//		@declarations {
-//    		ANTLR3_UINT32 (*oldLA)(struct ANTLR3_INT_STREAM_struct *, ANTLR3_INT32);
-//		}
-//		@init {
-//			oldLA = INPUT->istream->_LA;
-//            INPUT->setUcaseLA(INPUT, ANTLR3_FALSE);
-//		}
-		:
-		QUOTE delimiter=QS_OTHER_CH
-// JAVA Syntax 
-    ( { input.LT(1) != $delimiter.text.charAt(0) || ( input.LT(1) == $delimiter.text.charAt(0) && input.LT(2) != '\'') }? => . )*
-    ( { input.LT(1) == $delimiter.text.charAt(0) && input.LT(2) == '\'' }? => . ) QUOTE
-		;*/
-
-//{ Rule #163 <DELIMITED_ID>
-DELIMITED_ID
-    : '"' (~('"' | '\r' | '\n') | '"' '"')+ '"' 
-    ;
-//}
-
-//{ Rule #546 <SQL_SPECIAL_CHAR> was split into single rules
-PERCENT
-    : '%'
-    ;
-
-AMPERSAND
-    : '&'
-    ;
-
-LEFT_PAREN
-    : '('
-    ;
-
-RIGHT_PAREN
-    : ')'
-    ;
-
-DOUBLE_ASTERISK
-    : '**'
-    ;
-
-ASTERISK
-    : '*'
-    ;
-
-PLUS_SIGN
-    : '+'
-    ;
-    
-MINUS_SIGN
-    : '-'
-    ;
-
-COMMA
-    : ','
-    ;
-
-SOLIDUS
-    : '/'
-    ; 
-
-AT_SIGN
-    : '@'
-    ;
-
-ASSIGN_OP
-    : ':='
-    ;
-    
-// See OCI reference for more information about this
-BINDVAR
-    : ':' SIMPLE_LETTER  (SIMPLE_LETTER | '0' .. '9' | '_')*
-    | ':' DELIMITED_ID  // not used in SQL but spotted in v$sqltext when using cursor_sharing
-    | ':' UNSIGNED_INTEGER
-    | QUESTION_MARK // not in SQL, not in Oracle, not in OCI, use this for JDBC
-    ;
-
-COLON
-    : ':'
-    ;
-
-SEMICOLON
-    : ';'
-    ;
-
-LESS_THAN_OR_EQUALS_OP
-    : '<='
-    ;
-
-LESS_THAN_OP
-    : '<'
-    ;
-
-GREATER_THAN_OR_EQUALS_OP
-    : '>='
-    ;
-
-NOT_EQUAL_OP
-    : '!='
-    | '<>'
-    | '^='
-    | '~='
-    ;
-    
-CARRET_OPERATOR_PART
-    : '^'
-    ;
-
-TILDE_OPERATOR_PART
-    : '~'
-    ;
-
-EXCLAMATION_OPERATOR_PART
-    : '!'
-    ;
-
-GREATER_THAN_OP
-    : '>'
-    ;
-
-fragment
-QUESTION_MARK
-    : '?'
-    ;
-
-// protected UNDERSCORE : '_' SEPARATOR ; // subtoken typecast within <INTRODUCER>
-CONCATENATION_OP
-    : '||'
-    ;
-
-VERTICAL_BAR
-    : '|'
-    ;
-
-EQUALS_OP
-    : '='
-    ;
-
-//{ Rule #532 <SQL_EMBDD_LANGUAGE_CHAR> was split into single rules:
-LEFT_BRACKET
-    : '['
-    ;
-
-RIGHT_BRACKET
-    : ']'
-    ;
-
-//}
-
-//{ Rule #319 <INTRODUCER>
-INTRODUCER
-    : '_' //(SEPARATOR {$type = UNDERSCORE;})?
-    ;
-
-//{ Rule #479 <SEPARATOR>
-//  It was originally a protected rule set to be filtered out but the <COMMENT> and <'-'> clashed. 
-/*SEPARATOR
-    : '-' -> type('-')
-    | COMMENT -> channel(HIDDEN)
-    | (SPACE | NEWLINE)+ -> channel(HIDDEN)
-    ;*/
-//}
-
-SPACES
-    : [ \t\r\n]+ -> skip
-    ;
-    
-//{ Rule #504 <SIMPLE_LETTER> - simple_latin _letter was generalised into SIMPLE_LETTER
-//  Unicode is yet to be implemented - see NSF0
-fragment
-SIMPLE_LETTER
-    : 'a'..'z'
-    | 'A'..'Z'
-    ;
-//}
-
-//  Rule #176 <DIGIT> was incorporated by <UNSIGNED_INTEGER> 
-//{ Rule #615 <UNSIGNED_INTEGER> - subtoken typecast in <EXACT_NUM_LIT> 
-fragment
-UNSIGNED_INTEGER_FRAGMENT
-    : ('0'..'9')+ 
-    ;
-//}
-
-fragment
-FLOAT_FRAGMENT
-    : UNSIGNED_INTEGER* '.'? UNSIGNED_INTEGER+
-    ;
-
-//{ Rule #097 <COMMENT>
-SINGLE_LINE_COMMENT: '--' ( ~('\r' | '\n') )* (NEWLINE|EOF) -> channel(HIDDEN);
-MULTI_LINE_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
-
-// SQL*Plus prompt
-// TODO should be grammar rule, but tricky to implement
-PROMPT
-	: 'prompt' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
-	;
-
-//{ Rule #360 <NEWLINE>
-fragment
-NEWLINE: '\r'? '\n';
-    
-fragment
-SPACE: [ \t];
-
-//{ Rule #442 <REGULAR_ID> additionally encapsulates a few STRING_LITs.
-//  Within testLiterals all reserved and non-reserved words are being resolved
-
-SQL92_RESERVED_ALL
-    : 'all'
-    ;
-
-SQL92_RESERVED_ALTER
-    : 'alter'
-    ;
-
-SQL92_RESERVED_AND
-    : 'and'
-    ;
-
-SQL92_RESERVED_ANY
-    : 'any'
-    ;
-
-SQL92_RESERVED_AS
-    : 'as'
-    ;
-
-SQL92_RESERVED_ASC
-    : 'asc'
-    ;
-
-//SQL92_RESERVED_AT
-//    : 'at'
-//    ;
-
-SQL92_RESERVED_BEGIN
-    : 'begin'
-    ;
-
-SQL92_RESERVED_BETWEEN
-    : 'between'
-    ;
-
-SQL92_RESERVED_BY
-    : 'by'
-    ;
-
-SQL92_RESERVED_CASE
-    : 'case'
-    ;
-
-SQL92_RESERVED_CHECK
-    : 'check'
-    ;
-
-PLSQL_RESERVED_CLUSTERS
-    : 'clusters'
-    ;
-
-PLSQL_RESERVED_COLAUTH
-    : 'colauth'
-    ;
-
-PLSQL_RESERVED_COMPRESS
-    : 'compress'
-    ;
-
-SQL92_RESERVED_CONNECT
-    : 'connect'
-    ;
-
-//PLSQL_NON_RESERVED_COLUMNS
-//    : 'columns'
-//    ;
-
-PLSQL_NON_RESERVED_CONNECT_BY_ROOT
-    : 'connect_by_root'
-    ;
-
-PLSQL_RESERVED_CRASH
-    : 'crash'
-    ;
-
-SQL92_RESERVED_CREATE
-    : 'create'
-    ;
-
-SQL92_RESERVED_CURRENT
-    : 'current'
-    ;
-
-SQL92_RESERVED_CURSOR
-    : 'cursor'
-    ;
-
-SQL92_RESERVED_DATE
-    : 'date'
-    ;
-
-SQL92_RESERVED_DECLARE
-    : 'declare'
-    ;
-
-SQL92_RESERVED_DEFAULT
-    : 'default'
-    ;
-
-SQL92_RESERVED_DELETE
-    : 'delete'
-    ;
-
-SQL92_RESERVED_DESC
-    : 'desc'
-    ;
-
-SQL92_RESERVED_DISTINCT
-    : 'distinct'
-    ;
-
-SQL92_RESERVED_DROP
-    : 'drop'
-    ;
-
-SQL92_RESERVED_ELSE
-    : 'else'
-    ;
-
-SQL92_RESERVED_END
-    : 'end'
-    ;
-
-SQL92_RESERVED_EXCEPTION
-    : 'exception'
-/* TODO    // "exception" is a keyword only withing the contex of the PL/SQL language
-    // while it can be an identifier(column name, table name) in SQL
-    // "exception" is a keyword if and only it is followed by "when"
-    {
-    $e.setType(SQL92_RESERVED_EXCEPTION);
-    emit($e);
-    advanceInput();
-
-    $type = Token.INVALID_TOKEN_TYPE;
-    int markModel = input.mark();
-
-    // Now loop over next Tokens in the input and eventually set Token's type to REGULAR_ID
-
-    // Subclassed version will return NULL unless EOF is reached.
-    // nextToken either returns NULL => then the next token is put into the queue tokenBuffer
-    // or it returns Token.EOF, then nothing is put into the queue
-    Token t1 = super.nextToken();
-    {    // This "if" handles the situation when the "model" is the last text in the input.
-        if( t1 != null && t1.getType() == Token.EOF)
-        {
-             $e.setType(REGULAR_ID);
-        } else {
-             t1 = tokenBuffer.pollLast(); // "withdraw" the next token from the queue
-             while(true)
-             {
-                 if(t1.getType() == EOF)   // is it EOF?
-                 {
-                     $e.setType(REGULAR_ID);
-                     break;
-                 }
-
-                 if(t1.getChannel() == HIDDEN) // is it a white space? then advance to the next token
-                 {
-                     t1 = super.nextToken(); if( t1 == null) { t1 = tokenBuffer.pollLast(); };
-                     continue;
-                 }
-
-                 if( t1.getType() != SQL92_RESERVED_WHEN && t1.getType() != SEMICOLON) // is something other than "when"
-                 {
-                     $e.setType(REGULAR_ID);
-                     break;
-                 }
-
-                 break; // we are in the model_clase do not rewrite anything
-              } // while true
-         } // else if( t1 != null && t1.getType() == Token.EOF)
-    }
-    input.rewind(markModel);
-    }*/
-    ;
-
-PLSQL_RESERVED_EXCLUSIVE
-    : 'exclusive'
-    ;
-
-SQL92_RESERVED_EXISTS
-    : 'exists'
-    ;
-
-SQL92_RESERVED_FALSE
-    : 'false'
-    ;
-
-SQL92_RESERVED_FETCH
-    : 'fetch'
-    ;
-
-SQL92_RESERVED_FOR
-    : 'for'
-    ;
-
-SQL92_RESERVED_FROM
-    : 'from'
-    ;
-
-SQL92_RESERVED_GOTO
-    : 'goto'
-    ;
-
-SQL92_RESERVED_GRANT
-    : 'grant'
-    ;
-
-SQL92_RESERVED_GROUP
-    : 'group'
-    ;
-
-SQL92_RESERVED_HAVING
-    : 'having'
-    ;
-
-PLSQL_RESERVED_IDENTIFIED
-    : 'identified'
-    ;
-
-PLSQL_RESERVED_IF
-    : 'if'
-    ;
-
-SQL92_RESERVED_IN
-    : 'in'
-    ;
-
-PLSQL_RESERVED_INDEX
-    : 'index'
-    ;
-
-PLSQL_RESERVED_INDEXES
-    : 'indexes'
-    ;
-
-SQL92_RESERVED_INSERT
-    : 'insert'
-    ;
-
-SQL92_RESERVED_INTERSECT
-    : 'intersect'
-    ;
-
-SQL92_RESERVED_INTO
-    : 'into'
-    ;
-
-SQL92_RESERVED_IS
-    : 'is'
-    ;
-
-SQL92_RESERVED_LIKE
-    : 'like'
-    ;
-
-PLSQL_RESERVED_LOCK
-    : 'lock'
-    ;
-
-PLSQL_RESERVED_MINUS
-    : 'minus'
-    ;
-
-PLSQL_RESERVED_MODE
-    : 'mode'
-    ;
-
-PLSQL_RESERVED_NOCOMPRESS
-    : 'nocompress'
-    ;
-
-SQL92_RESERVED_NOT
-    : 'not'
-    ;
-
-PLSQL_RESERVED_NOWAIT
-    : 'nowait'
-    ;
-
-SQL92_RESERVED_NULL
-    : 'null'
-    ;
-
-SQL92_RESERVED_OF
-    : 'of'
-    ;
-
-SQL92_RESERVED_ON
-    : 'on'
-    ;
-
-SQL92_RESERVED_OPTION
-    : 'option'
-    ;
-
-SQL92_RESERVED_OR
-    : 'or'
-    ;
-
-SQL92_RESERVED_ORDER
-    : 'order'
-    ;
-
-SQL92_RESERVED_OVERLAPS
-    : 'overlaps'
-    ;
-
-SQL92_RESERVED_PRIOR
-    : 'prior'
-    ;
-
-SQL92_RESERVED_PROCEDURE
-    : 'procedure'
-    ;
-
-SQL92_RESERVED_PUBLIC
-    : 'public'
-    ;
-
-PLSQL_RESERVED_RESOURCE
-    : 'resource'
-    ;
-
-SQL92_RESERVED_REVOKE
-    : 'revoke'
-    ;
-
-SQL92_RESERVED_SELECT
-    : 'select'
-    ;
-
-PLSQL_RESERVED_SHARE
-    : 'share'
-    ;
-
-SQL92_RESERVED_SIZE
-    : 'size'
-    ;
-
-// SQL92_RESERVED_SQL
-//     : 'sql'
-//     ;
-
-PLSQL_RESERVED_START
-    : 'start'
-    ;
-
-PLSQL_RESERVED_TABAUTH
-    : 'tabauth'
-    ;
-
-SQL92_RESERVED_TABLE
-    : 'table'
-    ;
-
-SQL92_RESERVED_THE
-    : 'the'
-    ;
-
-SQL92_RESERVED_THEN
-    : 'then'
-    ;
-
-SQL92_RESERVED_TO
-    : 'to'
-    ;
-
-SQL92_RESERVED_TRUE
-    : 'true'
-    ;
-
-SQL92_RESERVED_UNION
-    : 'union'
-    ;
-
-SQL92_RESERVED_UNIQUE
-    : 'unique'
-    ;
-
-SQL92_RESERVED_UPDATE
-    : 'update'
-    ;
-
-SQL92_RESERVED_VALUES
-    : 'values'
-    ;
-
-SQL92_RESERVED_VIEW
-    : 'view'
-    ;
-
-PLSQL_RESERVED_VIEWS
-    : 'views'
-    ;
-
-SQL92_RESERVED_WHEN
-    : 'when'
-    ;
-
-SQL92_RESERVED_WHERE
-    : 'where'
-    ;
-
-SQL92_RESERVED_WITH
-    : 'with'
-    ;
-
-PLSQL_NON_RESERVED_USING
-    : 'using'
-    ;
-
-PLSQL_NON_RESERVED_MODEL
-    : 'model'
-    /* TODO {
-         // "model" is a keyword if and only if it is followed by ("main"|"partition"|"dimension")
-         // otherwise it is a identifier(REGULAR_ID).
-         // This wodoo implements something like context sensitive lexer.
-         // Here we've matched the word "model". Then the Token is created and en-queued in tokenBuffer
-         // We still remember the reference($m) onto this Token
-         $m.setType(PLSQL_NON_RESERVED_MODEL);
-         emit($m);
-         advanceInput();
-
-         $type = Token.INVALID_TOKEN_TYPE;
-         int markModel = input.mark();
-
-         // Now loop over next Tokens in the input and eventually set Token's type to REGULAR_ID
-
-         // Subclassed version will return NULL unless EOF is reached.
-         // nextToken either returns NULL => then the next token is put into the queue tokenBuffer
-         // or it returns Token.EOF, then nothing is put into the queue
-         Token t1 = super.nextToken();
-         {    // This "if" handles the situation when the "model" is the last text in the input.
-              if( t1 != null && t1.getType() == Token.EOF)
-              {
-                  $m.setType(REGULAR_ID);
-              } else {
-                  t1 = tokenBuffer.pollLast(); // "withdraw" the next token from the queue
-                  while(true)
-                  {
-                     if(t1.getType() == EOF)   // is it EOF?
-                     {
-                         $m.setType(REGULAR_ID);
-                         break;
-                     }
-
-                     if(t1.getChannel() == HIDDEN) // is it a white space? then advance to the next token
-                     {
-                         t1 = super.nextToken(); if( t1 == null) { t1 = tokenBuffer.pollLast(); };
-                         continue;
-                     }
-
-                     if( t1.getType() != REGULAR_ID || // is something other than ("main"|"partition"|"dimension")
-                        ( !t1.getText().equalsIgnoreCase("main") &&
-                          !t1.getText().equalsIgnoreCase("partition") &&
-                          !t1.getText().equalsIgnoreCase("dimension")
-                       ))
-                     {
-                         $m.setType(REGULAR_ID);
-                         break;
-                     }
-
-                     break; // we are in the model_clase do not rewrite anything
-                  } // while true
-              } // else if( t1 != null && t1.getType() == Token.EOF)
-         }
-         input.rewind(markModel);
-    }*/
-    ;
-
-PLSQL_NON_RESERVED_ELSIF: 'elsif';
-PLSQL_NON_RESERVED_PIVOT: 'pivot';
-PLSQL_NON_RESERVED_UNPIVOT: 'unpivot';
-
-REGULAR_ID
-    : (SIMPLE_LETTER) (SIMPLE_LETTER | '$' | '_' | '#' | '0'..'9')*
-    ;
-
-ZV
-    : '@!' -> channel(HIDDEN)
-    ;
