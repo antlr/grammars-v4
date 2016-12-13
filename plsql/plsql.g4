@@ -19,7 +19,7 @@
 grammar plsql;
 
 swallow_to_semi
-    : ~( ';' )+
+    : ~';'+
     ;
 
 compilation_unit
@@ -645,7 +645,7 @@ label_declaration
 statement
     : CREATE swallow_to_semi
     | ALTER swallow_to_semi
-    | GRANT swallow_to_semi
+    | GRANT ALL? swallow_to_semi
     | TRUNCATE swallow_to_semi
     | body
     | block
@@ -699,8 +699,8 @@ loop_statement
 // $<Loop - Specific Clause
 
 cursor_loop_param
-    : index_name IN REVERSE? lower_bound '..' upper_bound
-    | record_name IN ( cursor_name expression_list? | '(' select_statement ')')
+    : index_name IN REVERSE? lower_bound range='..' upper_bound
+    | record_name IN (cursor_name expression_list? | '(' select_statement ')')
     ;
 // $>
 
@@ -735,7 +735,7 @@ raise_statement
     ;
 
 return_statement
-    : RETURN cn1=condition?
+    : RETURN condition?
     ;
 
 function_call
@@ -743,14 +743,10 @@ function_call
     ;
 
 body
-    : BEGIN seq_of_statements exception_clause? END label_name?
+    : BEGIN seq_of_statements (EXCEPTION exception_handler+)? END label_name?
     ;
 
 // $<Body - Specific Clause
-
-exception_clause
-    : EXCEPTION exception_handler+
-    ;
 
 exception_handler
     : WHEN exception_name (OR exception_name)* THEN seq_of_statements
@@ -1279,7 +1275,7 @@ static_returning_clause
     ;
 
 error_logging_clause
-    : LOG ERRORS error_logging_into_part? expression_wrapper? error_logging_reject_part?
+    : LOG ERRORS error_logging_into_part? expression? error_logging_reject_part?
     ;
 
 error_logging_into_part
@@ -1287,7 +1283,7 @@ error_logging_into_part
     ;
 
 error_logging_reject_part
-    : REJECT LIMIT (UNLIMITED | expression_wrapper)
+    : REJECT LIMIT (UNLIMITED | expression)
     ;
 
 dml_table_expression_clause
@@ -1327,21 +1323,19 @@ condition
     : expression
     ;
 
-condition_wrapper
-    : expression
-    ;
-
 expression
     : cursor_expression
-    | logical_and_expression ( OR logical_and_expression )*
+    | logical_or_expression
     ;
 
-expression_wrapper
-    : expression
+logical_or_expression
+    : logical_and_expression
+    | logical_or_expression OR logical_and_expression
     ;
 
 logical_and_expression
-    : negated_expression ( AND negated_expression )*
+    : negated_expression
+    | logical_and_expression AND negated_expression
     ;
 
 negated_expression
@@ -1365,13 +1359,16 @@ multiset_type
     ;
 
 relational_expression
-    : compound_expression
-      (( '=' | not_equal_op | '<' | '>' | less_than_or_equals_op | greater_than_or_equals_op ) compound_expression)*
+    : relational_expression relational_operator relational_expression
+    | compound_expression
     ;
 
 compound_expression
     : concatenation
       (NOT? (IN in_elements | BETWEEN between_elements | like_type concatenation like_escape_part?))?
+    ;
+relational_operator
+    : '=' | not_equal_op | '<' | '>' | less_than_or_equals_op | greater_than_or_equals_op
     ;
 
 like_type
@@ -1406,11 +1403,11 @@ concatenation_wrapper
     ;
 
 additive_expression
-    : multiply_expression (('+' | '-') multiply_expression)*
+    : multiply_expression (op+=('+' | '-') multiply_expression)*
     ;
 
 multiply_expression
-    : datetime_expression (('*' | '/') datetime_expression)*
+    : datetime_expression (op+=('*' | '/') datetime_expression)*
     ;
 
 datetime_expression
@@ -1428,7 +1425,7 @@ model_expression
     ;
 
 model_expression_element
-    : (ANY | condition_wrapper) (',' (ANY | condition_wrapper))*
+    : (ANY | expression) (',' (ANY | expression))*
     | single_column_for_loop (',' single_column_for_loop)*
     | multi_column_for_loop
     ;
@@ -1482,7 +1479,7 @@ simple_case_statement
     ;
 
 simple_case_when_part
-    : WHEN expression_wrapper THEN (/*TODO{$case_statement::isStatement}?*/ seq_of_statements | expression_wrapper)
+    : WHEN expression THEN (/*TODO{$case_statement::isStatement}?*/ seq_of_statements | expression)
     ;
 
 searched_case_statement
@@ -1490,11 +1487,11 @@ searched_case_statement
     ;
 
 searched_case_when_part
-    : WHEN condition_wrapper THEN (/*TODO{$case_statement::isStatement}?*/ seq_of_statements | expression_wrapper)
+    : WHEN expression THEN (/*TODO{$case_statement::isStatement}?*/ seq_of_statements | expression)
     ;
 
 case_else_part
-    : ELSE (/*{$case_statement::isStatement}?*/ seq_of_statements | expression_wrapper)
+    : ELSE (/*{$case_statement::isStatement}?*/ seq_of_statements | expression)
     ;
 // $>
 
@@ -1515,7 +1512,7 @@ vector_expr
     ;
 
 quantified_expression
-    : (SOME | EXISTS | ALL | ANY) ('(' subquery ')' | '(' expression_wrapper ')')
+    : (SOME | EXISTS | ALL | ANY) ('(' subquery ')' | '(' expression ')')
     ;
 
 standard_function
@@ -1530,18 +1527,18 @@ standard_function
     | EXTRACT '(' regular_id FROM concatenation_wrapper ')'
     | (FIRST_VALUE | LAST_VALUE) function_argument_analytic respect_or_ignore_nulls? over_clause
     | standard_prediction_function_keyword 
-      '(' expression_wrapper (',' expression_wrapper)* cost_matrix_clause? using_clause? ')'
-    | TRANSLATE '(' expression_wrapper (USING (CHAR_CS | NCHAR_CS))? (',' expression_wrapper)* ')'
-    | TREAT '(' expression_wrapper AS REF? type_spec ')'
+      '(' expression (',' expression)* cost_matrix_clause? using_clause? ')'
+    | TRANSLATE '(' expression (USING (CHAR_CS | NCHAR_CS))? (',' expression)* ')'
+    | TREAT '(' expression AS REF? type_spec ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation_wrapper ')'
-    | XMLAGG '(' expression_wrapper order_by_clause? ')' ('.' general_element_part)?
+    | XMLAGG '(' expression order_by_clause? ')' ('.' general_element_part)?
     | (XMLCOLATTVAL|XMLFOREST)
       '(' xml_multiuse_expression_element (',' xml_multiuse_expression_element)* ')' ('.' general_element_part)?
     | XMLELEMENT 
-      '(' (ENTITYESCAPING | NOENTITYESCAPING)? (NAME | EVALNAME)? expression_wrapper
+      '(' (ENTITYESCAPING | NOENTITYESCAPING)? (NAME | EVALNAME)? expression
        (/*TODO{input.LT(2).getText().equalsIgnoreCase("xmlattributes")}?*/ ',' xml_attributes_clause)?
-       (',' expression_wrapper column_alias?)* ')' ('.' general_element_part)?
-    | XMLEXISTS '(' expression_wrapper xml_passing_clause? ')'
+       (',' expression column_alias?)* ')' ('.' general_element_part)?
+    | XMLEXISTS '(' expression xml_passing_clause? ')'
     | XMLPARSE '(' (DOCUMENT | CONTENT) concatenation_wrapper WELLFORMED? ')' ('.' general_element_part)?
     | XMLPI
       '(' (NAME id | EVALNAME concatenation_wrapper) (',' concatenation_wrapper)? ')' ('.' general_element_part)?
@@ -1643,7 +1640,7 @@ cost_matrix_clause
     ;
 
 xml_passing_clause
-    : PASSING (BY VALUE)? expression_wrapper column_alias? (',' expression_wrapper column_alias?)
+    : PASSING (BY VALUE)? expression column_alias? (',' expression column_alias?)
     ;
 
 xml_attributes_clause
@@ -1672,7 +1669,7 @@ xml_multiuse_expression_element
     ;
 
 xmlroot_param_version_part
-    : VERSION (NO VALUE | expression_wrapper)
+    : VERSION (NO VALUE | expression)
     ;
 
 xmlroot_param_standalone_part
@@ -1740,7 +1737,7 @@ alias_quoted_string
     ;
 
 where_clause
-    : WHERE (current_of_clause | condition_wrapper)
+    : WHERE (current_of_clause | expression)
     ;
 
 current_of_clause
@@ -1917,7 +1914,7 @@ respect_or_ignore_nulls
     ;
 
 argument
-    : (id '=' '>')? expression_wrapper
+    : (id '=' '>')? expression
     ;
 
 type_spec
@@ -1927,7 +1924,7 @@ type_spec
 
 datatype
     : native_datatype_element precision_part? (WITH LOCAL? TIME ZONE)?
-    | INTERVAL (YEAR | DAY) ('(' expression_wrapper ')')? TO (MONTH | SECOND) ('(' expression_wrapper ')')?
+    | INTERVAL (YEAR | DAY) ('(' expression ')')? TO (MONTH | SECOND) ('(' expression ')')?
     ;
 
 precision_part
@@ -2002,8 +1999,7 @@ general_element
     ;
 
 general_element_part
-    : (INTRODUCER char_set_name)? id_expression
-      ('.' id_expression)* function_argument?
+    : (INTRODUCER char_set_name)? id_expression ('.' id_expression)* function_argument?
     ;
 
 table_element
@@ -2210,7 +2206,7 @@ regular_id
     | ERRORS
     | ESCAPE
     | EVALNAME
-    //| EXCEPTION
+    | EXCEPTION
     | EXCEPTION_INIT
     | EXCEPTIONS
     | EXCLUDE
