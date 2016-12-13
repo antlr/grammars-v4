@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-lexer grammar PHPLexer_CSharpSharwell;
+lexer grammar PHPLexer;
 
 channels { PhpComments, ErrorLexem }
 

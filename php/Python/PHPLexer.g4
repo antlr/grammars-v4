@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-lexer grammar PHPLexer_Python;
+lexer grammar PHPLexer;
 
 @header {
 from antlr4.Token import CommonToken
