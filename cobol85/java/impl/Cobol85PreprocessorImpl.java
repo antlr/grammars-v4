@@ -176,8 +176,8 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 				final CobolSourceFormat format) {
 			final String result;
 
-			if (CobolSourceFormatEnum.FIXED.equals(format)) {
-				result = processSourceFormatFixed(line, lineNumber, dialect, format);
+			if (format.isCommentEntryMultiLine()) {
+				result = processSourceFormat(line, lineNumber, dialect, format);
 			} else {
 				result = line + NEWLINE;
 			}
@@ -191,7 +191,7 @@ public class CobolPreprocessorImpl implements CobolPreprocessor {
 		 * is restricted to area B of those lines; the next line commencing in
 		 * area A begins the next non-comment entry.
 		 */
-		public String processSourceFormatFixed(final String line, final int lineNumber, final CobolDialect dialect,
+		protected String processSourceFormat(final String line, final int lineNumber, final CobolDialect dialect,
 				final CobolSourceFormat format) {
 			final CobolLine parsedLine = parseCobolLine(line, format);
 

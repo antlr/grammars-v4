@@ -600,7 +600,131 @@ localStorageSection
 // -- screen section ----------------------------------
 
 screenSection
-   : SCREEN SECTION DOT_FS
+   : SCREEN SECTION DOT_FS screenDescriptionEntry*
+   ;
+
+screenDescriptionEntry
+   : INTEGERLITERAL (FILLER | screenName)? (screenDescriptionBlankClause | screenDescriptionBellClause | screenDescriptionBlinkClause | screenDescriptionEraseClause | screenDescriptionLightClause | screenDescriptionGridClause | screenDescriptionReverseVideoClause | screenDescriptionUnderlineClause | screenDescriptionSizeClause | screenDescriptionLineClause | screenDescriptionColumnClause | screenDescriptionForegroundColorClause | screenDescriptionBackgroundColorClause | screenDescriptionControlClause | screenDescriptionValueClause | screenDescriptionPictureClause | (screenDescriptionFromClause | screenDescriptionUsingClause) | screenDescriptionUsageClause | screenDescriptionBlankWhenZeroClause | screenDescriptionJustifiedClause | screenDescriptionSignClause | screenDescriptionAutoClause | screenDescriptionSecureClause | screenDescriptionRequiredClause | screenDescriptionPromptClause | screenDescriptionFullClause | screenDescriptionZeroFillClause)* DOT_FS
+   ;
+
+screenDescriptionBlankClause
+   : BLANK (SCREEN | LINE)
+   ;
+
+screenDescriptionBellClause
+   : BELL | BEEP
+   ;
+
+screenDescriptionBlinkClause
+   : BLINK
+   ;
+
+screenDescriptionEraseClause
+   : ERASE (EOL | EOS)
+   ;
+
+screenDescriptionLightClause
+   : HIGHLIGHT | LOWLIGHT
+   ;
+
+screenDescriptionGridClause
+   : GRID | LEFTLINE | OVERLINE
+   ;
+
+screenDescriptionReverseVideoClause
+   : REVERSE_VIDEO
+   ;
+
+screenDescriptionUnderlineClause
+   : UNDERLINE
+   ;
+
+screenDescriptionSizeClause
+   : SIZE IS? (identifier | integerLiteral)
+   ;
+
+screenDescriptionLineClause
+   : LINE (NUMBER? IS? (PLUS | PLUSCHAR | MINUSCHAR))? (identifier | integerLiteral)
+   ;
+
+screenDescriptionColumnClause
+   : (COLUMN | COL) (NUMBER? IS? (PLUS | PLUSCHAR | MINUSCHAR))? (identifier | integerLiteral)
+   ;
+
+screenDescriptionForegroundColorClause
+   : (FOREGROUND_COLOR | FOREGROUND_COLOUR) IS? (identifier | integerLiteral)
+   ;
+
+screenDescriptionBackgroundColorClause
+   : (BACKGROUND_COLOR | BACKGROUND_COLOUR) IS? (identifier | integerLiteral)
+   ;
+
+screenDescriptionControlClause
+   : CONTROL IS? identifier
+   ;
+
+screenDescriptionValueClause
+   : (VALUE IS?) literal
+   ;
+
+screenDescriptionPictureClause
+   : (PICTURE | PIC) IS? pictureString
+   ;
+
+screenDescriptionFromClause
+   : FROM (identifier | literal) screenDescriptionToClause?
+   ;
+
+screenDescriptionToClause
+   : TO identifier
+   ;
+
+screenDescriptionUsingClause
+   : USING identifier
+   ;
+
+screenDescriptionUsageClause
+   : (USAGE IS?) (DISPLAY | DISPLAY_1)
+   ;
+
+screenDescriptionBlankWhenZeroClause
+   : BLANK WHEN? ZERO
+   ;
+
+screenDescriptionJustifiedClause
+   : (JUSTIFIED | JUST) RIGHT?
+   ;
+
+screenDescriptionSignClause
+   : (SIGN IS?)? (LEADING | TRAILING) (SEPARATE CHARACTER?)?
+   ;
+
+screenDescriptionAutoClause
+   : AUTO | AUTO_SKIP
+   ;
+
+screenDescriptionSecureClause
+   : SECURE | NO_ECHO
+   ;
+
+screenDescriptionRequiredClause
+   : REQUIRED | EMPTY_CHECK
+   ;
+
+screenDescriptionPromptClause
+   : PROMPT CHARACTER? IS? (identifier | literal) screenDescriptionPromptOccursClause?
+   ;
+
+screenDescriptionPromptOccursClause
+   : OCCURS integerLiteral TIMES?
+   ;
+
+screenDescriptionFullClause
+   : FULL | LENGTH_CHECK
+   ;
+
+screenDescriptionZeroFillClause
+   : ZERO_FILL
    ;
 
 // -- report section ----------------------------------
@@ -742,7 +866,7 @@ reportGroupTypeControlFooting
    ;
 
 reportGroupUsageClause
-   : USAGE IS? (DISPLAY | DISPLAY_1)	
+   : (USAGE IS?)? (DISPLAY | DISPLAY_1)	
    ;
 
 reportGroupTypePageFooting
@@ -1026,13 +1150,13 @@ sentence
    ;
 
 statement
-   : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement | disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement | unstringStatement | writeStatement
+   : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement | disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement | unstringStatement | writeStatement
    ;
 
 // accept statement
 
 acceptStatement
-   : ACCEPT identifier (acceptFromDateStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)?
+   : ACCEPT identifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)?
    ;
 
 acceptFromDateStatement
@@ -1041,6 +1165,10 @@ acceptFromDateStatement
 
 acceptFromMnemonicStatement
    : FROM mnemonicName
+   ;
+
+acceptFromEscapeKeyStatement
+   : FROM ESCAPE KEY
    ;
 
 acceptMessageCountStatement
@@ -1307,6 +1435,16 @@ evaluateWhenOther
 
 evaluateValue
    : identifier | literal | arithmeticExpression
+   ;
+
+// exhibit statement
+
+exhibitStatement
+   : EXHIBIT NAMED? CHANGED? exhibitOperand+
+   ;
+
+exhibitOperand
+   : identifier | literal
    ;
 
 // exit statement
@@ -2330,6 +2468,10 @@ routineName
    : cobolWord
    ;
 
+screenName
+   : cobolWord
+   ;
+
 sectionName
    : cobolWord | integerLiteral
    ;
@@ -2351,26 +2493,30 @@ textName
 cobolWord
    : IDENTIFIER
    | COBOL | PROGRAM
-   | ABORT | APOST | ARITH | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTRIBUTE
-   | BIT | BOUNDS
-   | CAPABLE | CCSVERSION | CHANNEL | CLOSE_DISPOSITION | CODEPAGE | COMMITMENT | CONTROL_POINT | CONVENTION | CRUNCH | CURSOR
+   | ABORT | APOST | ARITH | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTRIBUTE | AUTO | AUTO_SKIP
+   | BACKGROUND_COLOR | BACKGROUND_COLOUR | BEEP | BELL | BIT | BLINK | BOUNDS
+   | CAPABLE | CCSVERSION | CHANGED | CHANNEL | CLOSE_DISPOSITION | CODEPAGE | COMMITMENT | CONTROL_POINT | CONVENTION | CRUNCH | CURSOR
    | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DFHRESP | DFHVALUE | DISK | DONTCARE | DOUBLE
-   | EBCDIC | ENTER | ENTRY_PROCEDURE | EVENT | EXCLUSIVE | EXPORT | EXTENDED
-   | FULL | FUNCTIONNAME | FUNCTION_POINTER
+   | EBCDIC | EMPTY_CHECK | ENTER | ENTRY_PROCEDURE | EOL | EOS | ERASE | ESCAPE | EVENT | EXCLUSIVE | EXPORT | EXTENDED
+   | FOREGROUND_COLOR | FOREGROUND_COLOUR | FULL | FUNCTIONNAME | FUNCTION_POINTER
+   | GRID
+   | HIGHLIGHT
    | IMPLICIT | IMPORT | INTEGER
    | KEPT
-   | LANGUAGE | LB | LD | LIB | LIBACCESS | LIBPARAMETER | LIBRARY | LIST | LOCAL | LONG_DATE | LONG_TIME | LOWER
+   | LANGUAGE | LB | LD | LEFTLINE | LENGTH_CHECK | LIB | LIBACCESS | LIBPARAMETER | LIBRARY | LIST | LOCAL | LONG_DATE | LONG_TIME | LOWER | LOWLIGHT
    | MMDDYYYY
-   | NATIONAL | NETWORK | NOSEQ | NUMERIC_DATE | NUMERIC_TIME
-   | ODT | OPTIMIZE | ORDERLY | OWN
-   | PASSWORD | PORT | PRINTER | PRIVATE | PROCESS
-   | READER | REAL | RECEIVED | REF | REMOTE | REMOVE
-   | SAVE | SHARED | SHAREDBYALL | SHAREDBYRUNUNIT | SHARING | SHORT_DATE | SP | SYMBOL
+   | NAMED | NATIONAL | NETWORK | NO_ECHO | NOSEQ | NUMERIC_DATE | NUMERIC_TIME
+   | ODT | OPTIMIZE | ORDERLY | OVERLINE | OWN
+   | PASSWORD | PORT | PRINTER | PRIVATE | PROCESS | PROMPT
+   | READER | REAL | RECEIVED | REF | REMOTE | REMOVE | REQUIRED | REVERSE_VIDEO
+   | SAVE | SECURE | SHARED | SHAREDBYALL | SHAREDBYRUNUNIT | SHARING | SHORT_DATE | SP | SYMBOL
    | TASK | THREAD | THREAD_LOCAL | TIMER | TODAYS_DATE | TODAYS_NAME | TRUNCATED | TYPEDEF
+   | UNDERLINE
    | VIRTUAL
    | WAIT
    | XOPTS
    | YEAR | YYYYMMDD | YYYYDDD
+   | ZERO_FILL
    ;
 
 literal
@@ -2451,12 +2597,19 @@ ASSOCIATED_DATA_LENGTH : A S S O C I A T E D MINUSCHAR D A T A MINUSCHAR L E N G
 AT : A T;
 ATTRIBUTE : A T T R I B U T E;
 AUTHOR : A U T H O R;
+AUTO : A U T O;
+AUTO_SKIP : A U T O MINUSCHAR S K I P;
+BACKGROUND_COLOR : B A C K G R O U N D MINUSCHAR C O L O R;
+BACKGROUND_COLOUR : B A C K G R O U N D MINUSCHAR C O L O U R;
 BASIS : B A S I S;
+BEEP : B E E P;
 BEFORE : B E F O R E;
 BEGINNING : B E G I N N I N G;
+BELL : B E L L;
 BINARY : B I N A R Y;
 BIT : B I T;
 BLANK : B L A N K;
+BLINK : B L I N K;
 BLOCK : B L O C K;
 BOUNDS : B O U N D S;
 BOTTOM : B O T T O M;
@@ -2471,6 +2624,7 @@ CCSVERSION : C C S V E R S I O N;
 CD : C D;
 CF : C F;
 CH : C H;
+CHANGED : C H A N G E D;
 CHANNEL : C H A N N E L;
 CHARACTER : C H A R A C T E R;
 CHARACTERS : C H A R A C T E R S;
@@ -2484,6 +2638,7 @@ CODE : C O D E;
 CODEPAGE : C O D E P A G E;
 CODE_SET : C O D E MINUSCHAR S E T;
 COLLATING : C O L L A T I N G;
+COL : C O L;
 COLUMN : C O L U M N;
 COM_REG : C O M MINUSCHAR R E G;
 COMMA : C O M M A;
@@ -2567,6 +2722,7 @@ EGI : E G I;
 EJECT : E J E C T;
 ELSE : E L S E;
 EMI : E M I;
+EMPTY_CHECK : E M P T Y MINUSCHAR C H E C K;
 ENABLE : E N A B L E;
 END : E N D;
 END_ADD : E N D MINUSCHAR A D D;
@@ -2596,13 +2752,18 @@ ENTRY_PROCEDURE : E N T R Y MINUSCHAR P R O C E D U R E;
 ENVIRONMENT : E N V I R O N M E N T;
 EOP : E O P;
 EQUAL : E Q U A L;
+ERASE : E R A S E;
 ERROR : E R R O R;
+EOL : E O L;
+EOS : E O S;
+ESCAPE : E S C A P E;
 ESI : E S I;
 EVALUATE : E V A L U A T E;
 EVENT : E V E N T;
 EVERY : E V E R Y;
 EXCEPTION : E X C E P T I O N;
 EXCLUSIVE : E X C L U S I V E;
+EXHIBIT : E X H I B I T;
 EXIT : E X I T;
 EXPORT : E X P O R T;
 EXTEND : E X T E N D;
@@ -2617,6 +2778,8 @@ FINAL : F I N A L;
 FIRST : F I R S T;
 FOOTING : F O O T I N G;
 FOR : F O R;
+FOREGROUND_COLOR : F O R E G R O U N D MINUSCHAR C O L O R;
+FOREGROUND_COLOUR : F O R E G R O U N D MINUSCHAR C O L O U R;
 FROM : F R O M;
 FULL : F U L L;
 FUNCTION : F U N C T I O N;
@@ -2628,8 +2791,10 @@ GIVING : G I V I N G;
 GLOBAL : G L O B A L;
 GO : G O;
 GREATER : G R E A T E R;
+GRID : G R I D;
 GROUP : G R O U P;
 HEADING : H E A D I N G;
+HIGHLIGHT : H I G H L I G H T;
 HIGH_VALUE : H I G H MINUSCHAR V A L U E;
 HIGH_VALUES : H I G H MINUSCHAR V A L U E S;
 I_O : I MINUSCHAR O;
@@ -2667,7 +2832,9 @@ LB : L B;
 LD : L D;
 LEADING : L E A D I N G;
 LEFT : L E F T;
+LEFTLINE : L E F T L I N E;
 LENGTH : L E N G T H;
+LENGTH_CHECK : L E N G T H MINUSCHAR C H E C K;
 LESS : L E S S;
 LIB : L I B;
 LIBACCESS : L I B A C C E S S;
@@ -2688,6 +2855,7 @@ LOCK : L O C K;
 LONG_DATE : L O N G MINUSCHAR D A T E;
 LONG_TIME : L O N G MINUSCHAR T I M E;
 LOWER : L O W E R;
+LOWLIGHT : L O W L I G H T;
 LOW_VALUE : L O W MINUSCHAR V A L U E;
 LOW_VALUES : L O W MINUSCHAR V A L U E S;
 MEMORY : M E M O R Y;
@@ -2700,12 +2868,14 @@ MORE_LABELS : M O R E MINUSCHAR L A B E L S;
 MOVE : M O V E;
 MULTIPLE : M U L T I P L E;
 MULTIPLY : M U L T I P L Y;
+NAMED : N A M E D;
 NATIONAL : N A T I O N A L;
 NATIVE : N A T I V E;
 NEGATIVE : N E G A T I V E;
 NETWORK : N E T W O R K;
 NEXT : N E X T;
 NO : N O;
+NO_ECHO : N O MINUSCHAR E C H O;
 NOSEQ : N O S E Q;
 NOSTDTRUNC : N O S T D T R U N C;
 NOT : N O T;
@@ -2733,6 +2903,7 @@ ORGANIZATION : O R G A N I Z A T I O N;
 OTHER : O T H E R;
 OUTPUT : O U T P U T;
 OVERFLOW : O V E R F L O W;
+OVERLINE : O V E R L I N E;
 OWN : O W N;
 PACKED_DECIMAL : P A C K E D MINUSCHAR D E C I M A L;
 PADDING : P A D D I N G;
@@ -2760,6 +2931,7 @@ PROCESS : P R O C E S S;
 PROGRAM : P R O G R A M;
 PROGRAM_ID : P R O G R A M MINUSCHAR I D;
 PROGRAM_LIBRARY : P R O G R A M MINUSCHAR L I B R A R Y;
+PROMPT : P R O M P T;
 PURGE : P U R G E;
 QUEUE : Q U E U E;
 QUOTE : Q U O T E;
@@ -2792,8 +2964,10 @@ REPLACING : R E P L A C I N G;
 REPORT : R E P O R T;
 REPORTING : R E P O R T I N G;
 REPORTS : R E P O R T S;
+REQUIRED : R E Q U I R E D;
 RERUN : R E R U N;
 RESERVE : R E S E R V E;
+REVERSE_VIDEO : R E S E R V E MINUSCHAR V I D E O;
 RESET : R E S E T;
 RETURN : R E T U R N;
 RETURN_CODE : R E T U R N MINUSCHAR C O D E;
@@ -2811,6 +2985,7 @@ SCREEN : S C R E E N;
 SD : S D;
 SEARCH : S E A R C H;
 SECTION : S E C T I O N;
+SECURE : S E C U R E;
 SECURITY : S E C U R I T Y;
 SEGMENT : S E G M E N T;
 SEGMENT_LIMIT : S E G M E N T MINUSCHAR L I M I T;
@@ -2889,6 +3064,7 @@ TRUE : T R U E;
 TRUNCATED : T R U N C A T E D;
 TYPE : T Y P E;
 TYPEDEF : T Y P E D E F;
+UNDERLINE : U N D E R L I N E;
 UNIT : U N I T;
 UNSTRING : U N S T R I N G;
 UNTIL : U N T I L;
@@ -2913,6 +3089,7 @@ YEAR : Y E A R;
 YYYYMMDD : Y Y Y Y M M D D;
 YYYYDDD : Y Y Y Y D D D;
 ZERO : Z E R O;
+ZERO_FILL : Z E R O MINUSCHAR F I L L;
 ZEROS : Z E R O S;
 ZEROES : Z E R O E S;
 

@@ -53,11 +53,13 @@ public interface CobolPreprocessor {
 
 	public interface CobolSourceFormat {
 
-		String indicatorField = "([ABCdD\\-/* ])";
+		String indicatorField = "([ABCdD\\t\\-/* ])";
 
 		Pattern getPattern();
 
 		String getRegex();
+
+		boolean isCommentEntryMultiLine();
 	}
 
 	public enum CobolSourceFormatEnum implements CobolSourceFormat {
@@ -72,7 +74,7 @@ public interface CobolPreprocessor {
 		 * 13-72: area B<br />
 		 * 73-80: comments<br />
 		 */
-		FIXED("(.{6})" + indicatorField + "(.{4})(.{61})(.{8,})"),
+		FIXED("(.{6})" + indicatorField + "(.{4})(.{61})(.{8,})", true),
 
 		/**
 		 * Flexible fixed format. Each line up to 80 chars.<br />
@@ -83,7 +85,7 @@ public interface CobolPreprocessor {
 		 * 13-72: optional area B<br />
 		 * 73-80: optional comments<br />
 		 */
-		FIXED_FLEX("(.{6})" + indicatorField + "(.{0,4})(.{0,61})(.*)"),
+		FIXED_FLEX("(.{6})" + indicatorField + "(.{0,4})(.{0,61})(.*)", true),
 
 		/**
 		 * HP Tandem format.<br />
@@ -92,7 +94,7 @@ public interface CobolPreprocessor {
 		 * 2-5: optional area A<br />
 		 * 6-132: optional area B<br />
 		 */
-		TANDEM("()" + indicatorField + "(.{0,4})(.*)()"),
+		TANDEM("()" + indicatorField + "(.{0,4})(.*)()", false),
 
 		/**
 		 * Variable format.<br />
@@ -102,15 +104,18 @@ public interface CobolPreprocessor {
 		 * 8-12: optional area A<br />
 		 * 13-*: optional area B<br />
 		 */
-		VARIABLE("(.{6})(?:" + indicatorField + "(.{0,4})(.*)())?");
+		VARIABLE("(.{6})(?:" + indicatorField + "(.{0,4})(.*)())?", true);
+
+		private final boolean commentEntryMultiLine;
 
 		private final Pattern pattern;
 
 		private final String regex;
 
-		CobolSourceFormatEnum(final String regex) {
+		CobolSourceFormatEnum(final String regex, final boolean commentEntryMultiLine) {
 			this.regex = regex;
 			pattern = Pattern.compile(regex);
+			this.commentEntryMultiLine = commentEntryMultiLine;
 		}
 
 		@Override
@@ -121,6 +126,11 @@ public interface CobolPreprocessor {
 		@Override
 		public String getRegex() {
 			return regex;
+		}
+
+		@Override
+		public boolean isCommentEntryMultiLine() {
+			return commentEntryMultiLine;
 		}
 	}
 
