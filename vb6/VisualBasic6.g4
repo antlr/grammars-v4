@@ -462,13 +462,13 @@ sC_Case
 // ELSE first, so that it is not interpreted as a variable call
 sC_Cond
    : ELSE # caseCondElse
-   | IS WS? comparisonOperator WS? valueStmt # caseCondIs
-   | valueStmt (WS? COMMA WS? valueStmt)* # caseCondValue
-   | sC_To (WS? COMMA WS? (valueStmt | sC_To))* # caseCondTo
+   | sC_CondExpr (WS? COMMA WS? sC_CondExpr)* #caseCondExpr
    ;
 
-sC_To
-   : INTEGERLITERAL WS TO WS valueStmt
+sC_CondExpr
+   : IS WS? comparisonOperator WS? valueStmt # caseCondExprIs
+   | valueStmt # caseCondExprValue
+   | valueStmt WS TO WS valueStmt # caseCondExprTo
    ;
 
 sendkeysStmt
