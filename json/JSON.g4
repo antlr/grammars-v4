@@ -8,7 +8,7 @@ json
    : value
    ;
 
-object
+obj
    : '{' pair (',' pair)* '}'
    | '{' '}'
    ;
@@ -25,7 +25,7 @@ array
 value
    : STRING
    | NUMBER
-   | object
+   | obj
    | array
    | 'true'
    | 'false'
