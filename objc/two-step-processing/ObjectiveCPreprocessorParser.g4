@@ -40,7 +40,7 @@ code
     ;
 
 directive
-    : (IMPORT | INCLUDE) directive_text+    #preprocessorImport
+    : (IMPORT | INCLUDE) directive_text     #preprocessorImport
     | IF preprocessor_expression            #preprocessorConditional
     | ELIF preprocessor_expression          #preprocessorConditional
     | ELSE                                  #preprocessorConditional
@@ -48,13 +48,13 @@ directive
     | IFDEF CONDITIONAL_SYMBOL              #preprocessorDef
     | IFNDEF CONDITIONAL_SYMBOL             #preprocessorDef
     | UNDEF CONDITIONAL_SYMBOL              #preprocessorDef
-    | PRAGMA directive_text+                          #preprocessorPragma
-    | ERROR directive_text+                           #preprocessorError
-    | DEFINE CONDITIONAL_SYMBOL directive_text*       #preprocessorDefine
+    | PRAGMA directive_text                           #preprocessorPragma
+    | ERROR directive_text                            #preprocessorError
+    | DEFINE CONDITIONAL_SYMBOL directive_text?       #preprocessorDefine
     ;
 
 directive_text
-    : TEXT
+    : TEXT+
     ;
 
 preprocessor_expression
@@ -69,5 +69,5 @@ preprocessor_expression
     | preprocessor_expression op=AND preprocessor_expression                 #preprocessorBinary
     | preprocessor_expression op=OR preprocessor_expression                  #preprocessorBinary
     | preprocessor_expression op=(LT | GT | LE | GE) preprocessor_expression #preprocessorBinary
-    | DEFINED LPAREN CONDITIONAL_SYMBOL RPAREN                               #preprocessorDefined
+    | DEFINED (CONDITIONAL_SYMBOL | LPAREN CONDITIONAL_SYMBOL RPAREN)         #preprocessorDefined
     ;
