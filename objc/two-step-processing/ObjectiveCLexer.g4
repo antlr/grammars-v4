@@ -27,9 +27,9 @@ THE SOFTWARE.
 
 lexer grammar ObjectiveCLexer;
 
-channels { COMMENTS_CHANNEL }
+channels { COMMENTS_CHANNEL, IGNORED_MACROS }
 
-// ยง3.9 Keywords
+// 3.9 Keywords
 
 AUTORELEASEPOOL : '@autoreleasepool';
 CATCH           : '@catch';
@@ -54,9 +54,6 @@ SYNCHRONIZED    : '@synchronized';
 SYNTHESIZE      : '@synthesize';
 THROW           : '@throw';
 TRY             : '@try';
-
-SUPER           : 'super';
-SELF            : 'self';
 
 ABSTRACT      : 'abstract';
 AUTO          : 'auto';
@@ -97,7 +94,6 @@ SWITCH        : 'switch';
 TYPEDEF       : 'typedef';
 UNION         : 'union';
 UNSIGNED      : 'unsigned';
-VA_ARG        : 'va_arg';
 VOID          : 'void';
 VOLATILE      : 'volatile';
 WHILE         : 'while';
@@ -115,15 +111,23 @@ TYPEOF____          : '__typeof__';
 KINDOF__            : '__kindof';
 COVARIANT           : '__covariant';
 CONTRAVARIANT       : '__contravariant';
+ATTRIBUTE           : '__attribute__';
 
 NULLABLE            : 'nullable';
+NONNULL             : 'nonnull';
 
-L_STR               : 'L';
+// Ignored macros.
+NS_ASSUME_NONNULL_BEGIN : 'NS_ASSUME_NONNULL_BEGIN' ~[\r\n]*  -> channel(IGNORED_MACROS);
+NS_ASSUME_NONNULL_END   : 'NS_ASSUME_NONNULL_END' ~[\r\n]*    -> channel(IGNORED_MACROS);
+EXTERN_SUFFIX           : [_A-Z]+ '_EXTERN'                   -> channel(IGNORED_MACROS);
+IOS_SUFFIX              : [_A-Z]+ '_IOS(' ~')'+ ')'           -> channel(IGNORED_MACROS);
+MAC_SUFFIX              : [_A-Z]+ '_MAC(' ~')'+ ')'           -> channel(IGNORED_MACROS);
+TVOS_PROHIBITED         : '__TVOS_PROHIBITED'                 -> channel(IGNORED_MACROS);
 
-// ยง3.11 Separators
+// 3.11 Separators
 
-LPAREN          : '(';
-RPAREN          : ')';
+LP              : '(';
+RP              : ')';
 LBRACE          : '{';
 RBRACE          : '}';
 LBRACK          : '[';
@@ -185,22 +189,23 @@ READONLY        : 'readonly';
 READWRITE       : 'readwrite';
 WEAK            : 'weak';
 
-IDENTIFIER
-  : LETTER (LETTER | [0-9])*
-  ;
+IB_OUTLET               : 'IBOutlet';
+IB_OUTLET_COLLECTION    : 'IBOutletCollection';
 
-CHARACTER_LITERAL:        '\'' (EscapeSequence | ~('\''|'\\')) '\'';
-STRING: StringFragment;
-QUOTE_STRING:             '\'' (EscapeSequence | ~('\''|'\\'))* '\'';
+IDENTIFIER: Letter LetterOrDec*;
 
-HEX_LITERAL : '0' [xX] HexDigit+ IntegerTypeSuffix? ;
+CHARACTER_LITERAL:         '\'' (EscapeSequence | ~('\''|'\\')) '\'';
+QUOTE_STRING:              '\'' (EscapeSequence | ~('\''|'\\'))* '\'';
+STRING:       ('L' | '@')? '"' (EscapeSequence | '\\' ('\r'? '\n' | '\r') | ~('\\'|'"') )* ('"' | '\\');
 
-DECIMAL_LITERAL : ('0' | '1'..'9' '0'..'9'*) IntegerTypeSuffix? ;
-
-OCTAL_LITERAL : '0' ('0'..'7')+ IntegerTypeSuffix? ;
+HEX_LITERAL:     '0' [xX] HexDigit+ IntegerTypeSuffix?;
+OCTAL_LITERAL:   '0' [0-7]+ IntegerTypeSuffix?;
+BINARY_LITERAL:  '0' [bB] [01]+ IntegerTypeSuffix?;
+DECIMAL_LITERAL: [0-9]+ IntegerTypeSuffix?;
 
 FLOATING_POINT_LITERAL
-  : ([0-9]+ '.' [0-9]* | '.' [0-9]+) Exponent? FloatTypeSuffix? | [0-9]+ (Exponent FloatTypeSuffix? | FloatTypeSuffix)
+  : (Dec+ '.' Dec* | '.' Dec+) Exponent? FloatTypeSuffix?
+  | Dec+ (Exponent FloatTypeSuffix? | FloatTypeSuffix)
   ;
 
 WS:           [ \r\n\t\u000C]+ -> channel(HIDDEN);
@@ -208,7 +213,12 @@ COMMENT:      '/*' .*? '*/'    -> channel(COMMENTS_CHANNEL);
 LINE_COMMENT: '//' ~[\r\n]*    -> channel(COMMENTS_CHANNEL);
 BACKSLASH:    '\\'             -> channel(HIDDEN);
 
-fragment LETTER
+fragment LetterOrDec
+    : Letter
+    | Dec
+    ;
+
+fragment Letter
     : [$A-Za-z_]
     | ~[\u0000-\u00FF\uD800-\uDBFF]
     | [\uD800-\uDBFF] [\uDC00-\uDFFF]
@@ -216,37 +226,26 @@ fragment LETTER
     ;
 
 fragment IntegerTypeSuffix: [uUlL] [uUlL]?;
-fragment Exponent:          [eE] [+\-]? [0-9]+;
+fragment Exponent:          [eE] [+\-]? Dec+;
+fragment Dec:               [0-9];
+fragment FloatTypeSuffix:   [fFdD];
 
-fragment
-FloatTypeSuffix: [fFdD];
-
-fragment
-EscapeSequence
+fragment EscapeSequence
     : '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
     | OctalEscape
     | UnicodeEscape
     ;
 
-fragment
-OctalEscape
+fragment OctalEscape
     :   '\\' [0-3] [0-7] [0-7]
     |   '\\' [0-7] [0-7]
     |   '\\' [0-7]
     ;
 
-fragment
-UnicodeEscape
-    :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
-    ;
-
+fragment UnicodeEscape:   '\\' 'u' HexDigit HexDigit HexDigit HexDigit;
 fragment HexDigit:          [0-9a-fA-F];
 
-fragment
-StringFragment: '"' (~('\\' | '"') | '\\' .)* '"';
-
-fragment
-ANGLE_STRING:   '<' .*? '>';
+fragment StringFragment: '"' (~('\\' | '"') | '\\' .)* '"';
 
 fragment A: [aA];
 fragment B: [bB];
