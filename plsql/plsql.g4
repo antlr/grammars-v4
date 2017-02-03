@@ -1516,6 +1516,7 @@ standard_function
     | CHR '(' concatenation USING NCHAR_CS ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
+    | cursor_name ( PERCENT_ISOPEN | PERCENT_FOUND | PERCENT_NOTFOUND | PERCENT_ROWCOUNT )
     | DECOMPOSE '(' concatenation (CANONICAL | COMPATIBILITY)? ')'
     | EXTRACT '(' regular_id FROM concatenation ')'
     | (FIRST_VALUE | LAST_VALUE) function_argument_analytic respect_or_ignore_nulls? over_clause
@@ -2831,6 +2832,10 @@ PARENT:                       P A R E N T;
 PARTITION:                    P A R T I T I O N;
 PASSING:                      P A S S I N G;
 PATH:                         P A T H;
+PERCENT_ISOPEN:               '%' I S O P E N;
+PERCENT_FOUND:                '%' F O U N D;
+PERCENT_NOTFOUND:             '%' N O T F O U N D;
+PERCENT_ROWCOUNT:             '%' R O W C O U N T;
 PERCENT_ROWTYPE:              '%' R O W T Y P E;
 PERCENT_TYPE:                 '%' T Y P E;
 PIPELINED:                    P I P E L I N E D;
