@@ -1,4 +1,5 @@
 # Description
+# Description
 
 This is a community supported grammar file for t-sql, it is cool, yet not very complete so far because a grammar reference of T-SQL is hard to find. MS website has grammar reference for different statements, but it's not a complete file, so we try hard to stick to the references we could find, and bit by bit make it a more complete grammar.
 
@@ -79,9 +80,11 @@ Ref: https://msdn.microsoft.com/en-us/library/ms176057.aspx
 Test SQL:
 
 ```sql
-DBCC DROPCLEANBUFFERS
-DBCC FREEPROCCACHE
-DBCC CHECKIDENT (TableA, reseed, 1)  
+DBCC SHRINKLOG ( SIZE = DEFAULT );
+DBCC SHRINKLOG;
+DBCC PDW_SHOWSPACEUSED ( "AdventureWorksPDW2012..FactInternetSales" );
+DBCC PROCCACHE  WITH NO_INFOMSGS
+DBCC SHOWCONTIG (@id, @indid);
 ```
 
 
@@ -109,4 +112,51 @@ ALTER TABLE dbo.TableA
 	REFERENCES TableB (Col1,Col2)
 
 ```
+
+
+
+## PROC as alias of PROCEDURE
+
+Ref: https://msdn.microsoft.com/en-us/library/ms174969.aspx
+
+
+
+Our grammar now is aware of PROC-PROCEDURE interchangeability somewhere (create_procedure), while ignoring it somewhere else(drop_procedure). 
+
+```sql
+Drop PROC Pro1;
+```
+
+
+
+
+
+## Create Type (more complete)
+
+We have create_type, but should be more complete as https://msdn.microsoft.com/en-us/library/ms175007.aspx
+
+Now it does not support the **AS** keyword
+
+Test SQL:
+
+```sql
+create type dbo.NumberList as table (number int)
+
+```
+
+
+
+## Grant_permission support more verbs
+
+Ref: https://msdn.microsoft.com/en-us/library/mt204026.aspx
+
+The current one does not support DELETE / UPDATE as in the ref.
+
+
+
+```sql
+GRANT UPDATE ON [dbo].[Table1] TO [ID2]
+```
+
+
 
