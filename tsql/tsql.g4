@@ -769,7 +769,7 @@ union
 
 // https://msdn.microsoft.com/en-us/library/ms176104.aspx
 query_specification
-    : SELECT (ALL | DISTINCT)? (TOP expression PERCENT? (WITH TIES)?)?
+    : SELECT (ALL | DISTINCT)? top_clause?
       select_list
       // https://msdn.microsoft.com/en-us/library/ms188029.aspx
       (INTO table_name)?
@@ -778,6 +778,21 @@ query_specification
       // https://msdn.microsoft.com/en-us/library/ms177673.aspx
       (GROUP BY group_by_item (',' group_by_item)*)?
       (HAVING having=search_condition)?
+    ;
+
+// https://msdn.microsoft.com/en-us/library/ms189463.aspx
+top_clause
+    : TOP (top_percent | top_count) (WITH TIES)?
+    ;
+
+top_percent
+    : (REAL | FLOAT) PERCENT
+    | '(' (REAL | FLOAT | LOCAL_ID) ')' PERCENT?
+    ;
+
+top_count
+    : DECIMAL
+    | '(' (DECIMAL | LOCAL_ID) ')'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188385.aspx
