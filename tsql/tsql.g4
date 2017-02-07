@@ -787,12 +787,12 @@ top_clause
 
 top_percent
     : (REAL | FLOAT) PERCENT
-    | '(' (REAL | FLOAT | LOCAL_ID) ')' PERCENT?
+    | '(' expression ')' PERCENT
     ;
 
 top_count
     : DECIMAL
-    | '(' (DECIMAL | LOCAL_ID) ')'
+    | '(' expression ')'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188385.aspx
