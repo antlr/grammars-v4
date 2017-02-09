@@ -231,3 +231,7 @@ GO
 -- USE AdventureWorks2012;
 -- GRANT EXECUTE ON XML SCHEMA COLLECTION::Sales.Invoices4 TO Wanida;
 -- GO
+
+
+--Test empty statements
+;;;

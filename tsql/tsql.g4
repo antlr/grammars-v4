@@ -46,6 +46,8 @@ sql_clause
 
     | cfl_statement
 
+    | empty_statement
+
     | another_statement
     ;
 
@@ -111,6 +113,10 @@ cfl_statement
     // https://msdn.microsoft.com/en-us/library/ms178592.aspx
     | RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' severity=constant_LOCAL_ID ','
         state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' ';'?                   #raiseerror_statement
+    ;
+
+empty_statement
+    : ';'
     ;
 
 another_statement
