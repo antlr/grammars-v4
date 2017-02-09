@@ -116,8 +116,7 @@ cfl_statement
     ;
 
 empty_statement
-    :
-        ';'
+    : ';'
     ;
 
 another_statement
