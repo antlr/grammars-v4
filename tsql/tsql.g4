@@ -762,7 +762,6 @@ predicate
     | expression NOT? LIKE expression (ESCAPE expression)?
     | expression IS null_notnull
     | '(' search_condition ')'
-	| DECIMAL
     ;
 
 query_expression
