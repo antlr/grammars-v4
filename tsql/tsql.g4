@@ -230,31 +230,37 @@ create_alter_procedure
 create_alter_function
     : (CREATE | ALTER) FUNCTION func_proc_name
         (('(' procedure_param (',' procedure_param)* ')') | '(' ')') //must have (), but can be empty
-        (function_type1 | function_type2 | function_type3) ';'?
+        (funcBody_returns_select | funcBody_returns_table | funcBody_returns_scalar) ';'?
 
     ;
 
-function_type1:RETURNS TABLE
-               (WITH function_option (',' function_option)*)?
-               AS?
-               RETURN select_statement ;
+funcBody_returns_select
+	:RETURNS TABLE
+	(WITH function_option (',' function_option)*)?
+	AS?
+	RETURN select_statement 
+	;
 
-function_type2: RETURNS LOCAL_ID table_type_definition
-                (WITH function_option (',' function_option)*)?
-                AS?
-                BEGIN
-                   sql_clause*
-                   RETURN
-                END ;
+funcBody_returns_table
+	: RETURNS LOCAL_ID table_type_definition
+        (WITH function_option (',' function_option)*)?
+        AS?
+        BEGIN
+           sql_clause*
+           RETURN
+        END 
+	;
 
 
-function_type3:RETURNS data_type
-               (WITH function_option (',' function_option)*)?
-               AS?
-               BEGIN
-                   sql_clause*
-                   RETURN ret=expression ';'?
-               END ;
+funcBody_returns_scalar
+	:RETURNS data_type
+       (WITH function_option (',' function_option)*)?
+       AS?
+       BEGIN
+           sql_clause*
+           RETURN ret=expression ';'?
+       END 
+       ;
 
 procedure_param
     : LOCAL_ID (id '.')? AS? data_type VARYING? ('=' default_val=default_value)? (OUT | OUTPUT | READONLY)?
