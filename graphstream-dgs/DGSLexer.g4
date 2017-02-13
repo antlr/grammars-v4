@@ -82,8 +82,6 @@ START_COMMENT : '#' -> pushMode(CMT), skip;
 
 WS : [ \t]+ -> skip;
 
-// identifier : STRING | INT | WORD ( '.' WORD )* ;
-
 mode CMT;
 
 COMMENT: .*? EOL -> popMode;
