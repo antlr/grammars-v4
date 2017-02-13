@@ -28,8 +28,6 @@ attributes : attribute*;
 attribute : (PLUS|MINUS)? identifier ( assign value ( COMMA value )* )? ;
 
 value : STRING | INT| REAL | COLOR | array | a_map | identifier;
-// 'string' and #334455 colors
-// identifier
 
 array : LBRACE ( value ( COMMA value )* )? RBRACE;
 a_map : LBRACK ( mapping ( COMMA mapping )* )? RBRACK;
