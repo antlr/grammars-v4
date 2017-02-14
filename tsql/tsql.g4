@@ -46,6 +46,8 @@ sql_clause
 
     | cfl_statement
 
+    | dbcc_clause
+    
     | empty_statement
 
     | another_statement
@@ -584,6 +586,14 @@ go_statement
 // https://msdn.microsoft.com/en-us/library/ms188366.aspx
 use_statement
     : USE database=id ';'?
+    ;
+
+dbcc_clause
+    : DBCC name=simple_id ('(' expression_list ')')? (WITH dbcc_options)? ';'?
+    ;
+
+dbcc_options
+    :  simple_id (',' simple_id)?
     ;
 
 execute_clause
@@ -1339,6 +1349,7 @@ simple_id
     | ROWS
     | ROW_NUMBER
     | SAMPLE
+    | SIZE
     | SCHEMABINDING
     | SCROLL
     | SCROLL_LOCKS
