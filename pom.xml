@@ -43,6 +43,7 @@
 		<module>gml</module>
 		<module>golang</module>
 		<module>graphql</module>
+		<module>graphstream-dgs</module>
 		<module>html</module>
 		<module>icalendar</module>
 		<module>idl</module>
