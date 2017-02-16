@@ -62,8 +62,8 @@ ddl_clause
     :
     create_database
     | create_index
-    | create_alter_procedure
-    | create_alter_function
+    | create_or_alter_procedure
+    | create_or_alter_function
     | create_statistics
     | create_table
     | create_type
@@ -219,7 +219,7 @@ create_index
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
-create_alter_procedure
+create_or_alter_procedure
     : (CREATE | ALTER) proc=(PROC | PROCEDURE) func_proc_name (';' DECIMAL)?
       ('('? procedure_param (',' procedure_param)* ')'?)?
       (WITH procedure_option (',' procedure_option)*)?
@@ -227,7 +227,7 @@ create_alter_procedure
     ;
     
 //https://msdn.microsoft.com/en-us/library/ms186755.aspx
-create_alter_function
+create_or_alter_function
     : (CREATE | ALTER) FUNCTION func_proc_name
         (('(' procedure_param (',' procedure_param)* ')') | '(' ')') //must have (), but can be empty
         (funcBody_returns_select | funcBody_returns_table | funcBody_returns_scalar) ';'?
