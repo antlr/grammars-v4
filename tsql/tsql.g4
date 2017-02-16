@@ -530,7 +530,7 @@ security_statement
     // https://msdn.microsoft.com/en-us/library/ms188354.aspx
     : execute_clause ';'?
     // https://msdn.microsoft.com/en-us/library/ms187965.aspx
-    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO (to_principal=id) (',' to_principal+=id)* (WITH GRANT OPTION)? (AS as_principal=id)? ';'?
+    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO (to_principal+=id) (',' to_principal+=id)* (WITH GRANT OPTION)? (AS as_principal=id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
     ;
