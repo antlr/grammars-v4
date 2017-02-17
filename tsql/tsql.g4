@@ -230,18 +230,18 @@ create_or_alter_procedure
 create_or_alter_function
     : (CREATE | ALTER) FUNCTION func_proc_name
         (('(' procedure_param (',' procedure_param)* ')') | '(' ')') //must have (), but can be empty
-        (funcBody_returns_select | funcBody_returns_table | funcBody_returns_scalar) ';'?
+        (func_body_returns_select | func_body_returns_table | func_body_returns_scalar) ';'?
 
     ;
 
-funcBody_returns_select
+func_body_returns_select
 	:RETURNS TABLE
 	(WITH function_option (',' function_option)*)?
 	AS?
 	RETURN select_statement 
 	;
 
-funcBody_returns_table
+func_body_returns_table
 	: RETURNS LOCAL_ID table_type_definition
         (WITH function_option (',' function_option)*)?
         AS?
@@ -252,7 +252,7 @@ funcBody_returns_table
 	;
 
 
-funcBody_returns_scalar
+func_body_returns_scalar
 	:RETURNS data_type
        (WITH function_option (',' function_option)*)?
        AS?
