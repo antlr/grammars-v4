@@ -40,25 +40,32 @@ tokens { INDENT, DEDENT }
   let CommonToken = require('antlr4/Token').CommonToken;
   let Python3Parser = require('./Python3Parser').Python3Parser;
 
-  // A queue where extra tokens are pushed on (see the NEWLINE lexer rule).
-  Python3Lexer.prototype.tokens = [];
+  let old_lexer = Python3Lexer;
+  Python3Lexer = function() {
+    old_lexer.apply(this, arguments);
+    this.reset.call(this);
+  }
 
-  // The stack that keeps track of the indentation level.
-  Python3Lexer.prototype.indents = [];
+  Python3Lexer.prototype = Object.create(old_lexer.prototype);
+  Python3Lexer.prototype.constructor = Python3Lexer;
 
-  // The amount of opened braces, brackets and parenthesis.
-  Python3Lexer.prototype.opened = 0;
 
-  // The most recently produced token.
-  Python3Lexer.prototype.lastToken = null;
+  Python3Lexer.prototype.reset = function() {
+    // A queue where extra tokens are pushed on (see the NEWLINE lexer rule).
+    this.token_queue = [];
 
-  Python3Lexer.prototype.emit = function(t) {
-    if (typeof t === 'undefined') {
-      return antlr4.Lexer.prototype.emit.call(this);
-    }
+    // The stack that keeps track of the indentation level.
+    this.indents = [];
 
-    this._token = t;
-    this.tokens.push(t);
+    // The amount of opened braces, brackets and parenthesis.
+    this.opened = 0;
+
+    antlr4.Lexer.prototype.reset.call(this);
+  };
+
+  Python3Lexer.prototype.emitToken = function(token) {
+    this._token = token;
+    this.token_queue.push(token);
   };
 
   /**
@@ -70,39 +77,32 @@ tokens { INDENT, DEDENT }
    */
   Python3Lexer.prototype.nextToken = function() {
     // Check if the end-of-file is ahead and there are still some DEDENTS expected.
-    if (this._input.LA(1) === Python3Lexer.EOF && this.indents.length) {
+    if (this._input.LA(1) === Python3Parser.EOF && this.indents.length) {
 
       // Remove any trailing EOF tokens from our buffer.
-      this.tokens = this.tokens.filter(function(val) {
-        return val.type === Python3Lexer.EOF;
+      this.token_queue = this.token_queue.filter(function(val) {
+        return val.type !== Python3Parser.EOF;
       });
 
       // First emit an extra line break that serves as the end of the statement.
-      this.emit(this.commonToken(Python3Lexer.NEWLINE, "\n"));
+      this.emitToken(this.commonToken(Python3Parser.NEWLINE, "\n"));
 
       // Now emit as much DEDENT tokens as needed.
       while (this.indents.length) {
-        this.emit(this.createDedent());
+        this.emitToken(this.createDedent());
         this.indents.pop();
       }
 
       // Put the EOF back on the token stream.
-      this.emit(this.commonToken(Python3Lexer.EOF, "<EOF>"));
+      this.emitToken(this.commonToken(Python3Parser.EOF, "<EOF>"));
     }
 
     let next = antlr4.Lexer.prototype.nextToken.call(this);
-
-    if (next.channel === antlr4.Token.DEFAULT_CHANNEL) {
-      this.lastToken = next;
-    }
-
-    return this.tokens.length ? this.tokens.shift() : next;
+    return this.token_queue.length ? this.token_queue.shift() : next;
   };
 
   Python3Lexer.prototype.createDedent = function() {
-    let dedent = this.commonToken(Python3Parser.DEDENT, "");
-    dedent.line = this.lastToken.line;
-    return dedent;
+    return this.commonToken(Python3Parser.DEDENT, "");
   }
 
   Python3Lexer.prototype.commonToken = function(type, text) {
@@ -132,7 +132,7 @@ tokens { INDENT, DEDENT }
   }
 
   Python3Lexer.prototype.atStartOfInput = function() {
-    return false;
+    return this.getCharIndex() === 0;
   }
 }
 
@@ -741,19 +741,17 @@ BREAK : 'break';
 NEWLINE
  : ( {this.atStartOfInput()}?   SPACES
    | ( '\r'? '\n' | '\r' ) SPACES?
-   )
-   {
+   ) {
      let newLine = this.text.replace(/[^\r\n]+/g, '');
      let spaces = this.text.replace(/[\r\n]+/g, '');
      let next = this._input.LA(1);
 
-     if (this.opened > 0 || next === '\r' || next === '\n' || next === '#') {
+     if (this.opened > 0 || next === 13 /* '\r' */ || next === 10 /* '\n' */ || next === 35 /* '#' */) {
        // If we're inside a list or on a blank line, ignore all indents,
        // dedents and line breaks.
        this.skip();
-     }
-     else {
-       this.emit(this.commonToken(Python3Lexer.NEWLINE, newLine));
+     } else {
+       this.emitToken(this.commonToken(Python3Parser.NEWLINE, newLine));
 
        let indent = this.getIndentationCount(spaces);
        let previous = this.indents.length ? this.indents[this.indents.length - 1] : 0;
@@ -761,15 +759,13 @@ NEWLINE
        if (indent === previous) {
          // skip indents of the same size as the present indent-size
          this.skip();
-       }
-       else if (indent > previous) {
+       } else if (indent > previous) {
          this.indents.push(indent);
-         this.emit(this.commonToken(Python3Parser.INDENT, spaces));
-       }
-       else {
+         this.emitToken(this.commonToken(Python3Parser.INDENT, spaces));
+       } else {
          // Possibly emit more than 1 DEDENT token.
-         while(this.indents.length && this.indents[this.indents.length - 1] > indent) {
-           this.emit(this.createDedent());
+         while (this.indents.length && this.indents[this.indents.length - 1] > indent) {
+           this.emitToken(this.createDedent());
            this.indents.pop();
          }
        }
