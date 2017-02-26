@@ -584,7 +584,7 @@ REAL
 
 
 STRING
-   : '\'' (CHARACTER | '\"')* '\'' | '"' (CHARACTER | '\'')* '"'
+   : '\'' (CHARACTER | '"')* '\'' | '"' (CHARACTER | '\'')* '"'
    ;
 
 

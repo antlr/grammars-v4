@@ -210,7 +210,7 @@ AxisName:  'ancestor'
   APOS   
        :  '\'';
   QUOT   
-       :  '\"';
+       :  '"';
   
 Literal  :  '"' ~'"'* '"'
   |  '\'' ~'\''* '\''
