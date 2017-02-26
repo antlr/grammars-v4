@@ -44,7 +44,7 @@ prog
  ;
 
 expr
- : expr POW<assoc=right> expr                   # powExpr
+ : <assoc=right> expr POW expr                  # powExpr
  | SUB expr                                     # unaryMinusExpr
  | expr op=(MUL | DIV) expr                     # mulDivExpr
  | expr op=(ADD | SUB) expr                     # addSubExpr
