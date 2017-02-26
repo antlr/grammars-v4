@@ -144,7 +144,7 @@ fragment EXPONENT
 
 
 WHITE
-   : [ \t\n\r\v] -> skip
+   : [ \t\n\r\u000B] -> skip
    ;
 
 
