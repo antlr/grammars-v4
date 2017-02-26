@@ -103,12 +103,12 @@ public final class SwiftSupport {
     /*
     Operator_character
       : Operator_head
-      | [\u0300–\u036F]
-      | [\u1DC0–\u1DFF]
-      | [\u20D0–\u20FF]
-      | [\uFE00–\uFE0F]
-      | [\uFE20–\uFE2F]
-      //| [\uE0100–\uE01EF]  ANTLR can't do >16bit char
+      | [\u0300-\u036F]
+      | [\u1DC0-\u1DFF]
+      | [\u20D0-\u20FF]
+      | [\uFE00-\uFE0F]
+      | [\uFE20-\uFE2F]
+      //| [\uE0100-\uE01EF]  ANTLR can't do >16bit char
       
      */
     private static func isOperatorChar(_ ttype: Int) -> Bool {
