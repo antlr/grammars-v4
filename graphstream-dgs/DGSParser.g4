@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2017, Tim Hemel
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -13,7 +13,7 @@ are met:
 2. Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-3. Neither the name of Tom Everett nor the names of its contributors
+3. Neither the name of Tim Hemel nor the names of its contributors
    may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
@@ -30,66 +30,41 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-grammar fasta;
+/*
+ * Graphstream DGS grammar.
+ *
+ * Adapted from http://graphstream-project.org/doc/Advanced-Concepts/The-DGS-File-Format/
+ *
+ */
 
-sequence
-   : section +
-   ;
+parser grammar DGSParser;
 
-section
-   : descriptionline
-   | sequencelines
-   | commentline
-   ;
+options { tokenVocab=DGSLexer; }
 
-sequencelines
-   : SEQUENCELINE +
-   ;
+dgs : header ( event | COMMENT | EOL )* ;
+header : MAGIC EOL identifier INT INT EOL;
+event : ( an | cn | dn | ae | ce | de | cg | st | cl ) ( COMMENT | EOL ) ;
 
-descriptionline
-   : DESCRIPTIONLINE
-   ;
-
-commentline
-   : COMMENTLINE
-   ;
-
-
-COMMENTLINE
-   : ';' .*? EOL
-   ;
+an : AN identifier attributes;
+cn : CN identifier attributes;
+dn : DN identifier;
+ae : AE identifier identifier direction? identifier attributes;
+ce : CE identifier attributes;
+de : DE identifier;
+cg : CG attributes;
+st : ST REAL;
+cl : CL;
 
 
-DESCRIPTIONLINE
-   : '>' TEXT ('|' TEXT)* EOL
-   ;
+attributes : attribute*;
+attribute : (PLUS|MINUS)? identifier ( assign value ( COMMA value )* )? ;
 
+value : STRING | INT| REAL | COLOR | array | a_map | identifier;
 
-TEXT
-   : (DIGIT | LETTER | SYMBOL) +
-   ;
+array : LBRACE ( value ( COMMA value )* )? RBRACE;
+a_map : LBRACK ( mapping ( COMMA mapping )* )? RBRACK;
+mapping : identifier assign value;
+direction : LANGLE | RANGLE ;
+assign : EQUALS | COLON ;
+identifier : STRING | INT | WORD ( DOT WORD )* ;
 
-
-EOL
-   : '\r'? '\n'
-   ;
-
-
-fragment DIGIT
-   : [0-9]
-   ;
-
-
-fragment LETTER
-   : [A-Za-z]
-   ;
-
-
-fragment SYMBOL
-   : '.' | '-' | '+' | '_' | ' ' | '[' | ']' | '(' | ')' | ',' | '/' | ':' | '&' | '\''
-   ;
-
-
-SEQUENCELINE
-   : LETTER + EOL
-   ;

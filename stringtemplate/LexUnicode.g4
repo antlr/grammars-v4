@@ -51,7 +51,7 @@ fragment UnicodeLetter
 
 fragment UnicodeClass_LU
 	: '\u0041'..'\u005a'
-	| '\u00c0'..'\u00de'
+	| '\u00c0'..'\u00d6'
 	| '\u00d8'..'\u00de'
 	| '\u0100'..'\u0136'
 	| '\u0139'..'\u0147'

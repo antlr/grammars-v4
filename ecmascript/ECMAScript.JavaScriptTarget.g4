@@ -269,21 +269,21 @@ iterationStatement
 ///     continue ;
 ///     continue [no LineTerminator here] Identifier ;
 continueStatement
- : Continue Identifier? eos
+ : Continue ({!this.here(LineTerminator)}? Identifier)? eos
  ;
 
 /// BreakStatement :
 ///     break ;
 ///     break [no LineTerminator here] Identifier ;
 breakStatement
- : Break Identifier? eos
+ : Break ({!this.here(LineTerminator)}? Identifier)? eos
  ;
 
 /// ReturnStatement :
 ///     return ;
 ///     return [no LineTerminator here] Expression ;
 returnStatement
- : Return expressionSequence? eos
+ : Return ({!this.here(LineTerminator)}? expressionSequence)? eos
  ;
 
 /// WithStatement :
@@ -333,7 +333,7 @@ labelledStatement
 /// ThrowStatement :
 ///     throw [no LineTerminator here] Expression ;
 throwStatement
- : Throw expressionSequence eos
+ : Throw {!this.here(LineTerminator)}? expressionSequence eos
  ;
 
 /// TryStatement :
@@ -1415,7 +1415,7 @@ fragment RegularExpressionFlags
 ///     RegularExpressionBackslashSequence
 ///     RegularExpressionClass
 fragment RegularExpressionFirstChar
- : ~[\r\n\u2028\u2029*\\/\[]
+ : ~[\r\n\u2028\u2029*\\/[]
  | RegularExpressionBackslashSequence
  | RegularExpressionClass
  ;
@@ -1425,7 +1425,7 @@ fragment RegularExpressionFirstChar
 ///     RegularExpressionBackslashSequence
 ///     RegularExpressionClass
 fragment RegularExpressionChar
- : ~[\r\n\u2028\u2029\\/\[]
+ : ~[\r\n\u2028\u2029\\/[]
  | RegularExpressionBackslashSequence
  | RegularExpressionClass
  ;

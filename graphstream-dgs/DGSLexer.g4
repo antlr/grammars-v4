@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2017, Tim Hemel
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -13,7 +13,7 @@ are met:
 2. Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-3. Neither the name of Tom Everett nor the names of its contributors
+3. Neither the name of Tim Hemel nor the names of its contributors
    may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
@@ -30,66 +30,59 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-grammar fasta;
+/*
+ * Graphstream DGS grammar.
+ *
+ * Adapted from http://graphstream-project.org/doc/Advanced-Concepts/The-DGS-File-Format/
+ *
+ */
 
-sequence
-   : section +
-   ;
+lexer grammar DGSLexer;
 
-section
-   : descriptionline
-   | sequencelines
-   | commentline
-   ;
+MAGIC : 'DGS004' | 'DGS003';
 
-sequencelines
-   : SEQUENCELINE +
-   ;
+AN : 'an';
+CN : 'cn';
+DN : 'dn';
+AE : 'ae';
+CE : 'ce';
+DE : 'de';
+CG : 'cg';
+ST : 'st';
+CL : 'cl';
 
-descriptionline
-   : DESCRIPTIONLINE
-   ;
+INT : ('+'|'-')? ( '0' | ( [1-9] ([0-9])* ) );
+REAL : INT ( '.' [0-9]*)? ( [Ee] ('+'|'-')? [0-9]*[1-9] )?;
 
-commentline
-   : COMMENTLINE
-   ;
+PLUS : '+';
+MINUS : '-';
+COMMA : ',';
+LBRACE : '{';
+RBRACE : '}';
+LBRACK : '[';
+RBRACK : ']';
+DOT : '.';
+LANGLE : '<';
+RANGLE : '>';
+EQUALS : '=';
+COLON : ':';
 
+EOL : '\r'|'\n'|'\r\n';
+WORD : ( 'a'..'z' | 'A'..'Z' ) ( 'a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_' )* ;
+STRING : SQSTRING | DQSTRING;
+fragment DQSTRING : '"' (DQESC|.)*? '"';
+fragment DQESC : '\\"' | '\\\\' ;
+fragment SQSTRING : '\'' (SQESC|.)*? '\'';
+fragment SQESC : '\\\'' | '\\\\' ;
 
-COMMENTLINE
-   : ';' .*? EOL
-   ;
+fragment HEXBYTE : ([0-9a-fA-F]) ([0-9a-fA-F]) ;
+COLOR : '#' HEXBYTE HEXBYTE HEXBYTE HEXBYTE? ;
 
+START_COMMENT : '#' -> pushMode(CMT), skip;
 
-DESCRIPTIONLINE
-   : '>' TEXT ('|' TEXT)* EOL
-   ;
+WS : [ \t]+ -> skip;
 
+mode CMT;
 
-TEXT
-   : (DIGIT | LETTER | SYMBOL) +
-   ;
+COMMENT: .*? EOL -> popMode;
 
-
-EOL
-   : '\r'? '\n'
-   ;
-
-
-fragment DIGIT
-   : [0-9]
-   ;
-
-
-fragment LETTER
-   : [A-Za-z]
-   ;
-
-
-fragment SYMBOL
-   : '.' | '-' | '+' | '_' | ' ' | '[' | ']' | '(' | ')' | ',' | '/' | ':' | '&' | '\''
-   ;
-
-
-SEQUENCELINE
-   : LETTER + EOL
-   ;
