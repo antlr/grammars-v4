@@ -123,8 +123,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.5.3</antlr.version>
-		<antlr4test-maven-plugin.version>1.6</antlr4test-maven-plugin.version>
+		<antlr.version>4.7-SNAPSHOT</antlr.version>
+		<antlr4test-maven-plugin.version>1.8-SNAPSHOT</antlr4test-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
