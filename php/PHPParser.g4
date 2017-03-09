@@ -34,9 +34,13 @@ htmlDocument
     ;
 
 htmlElementOrPhpBlock
-    : htmlElement
+    : htmlElements
     | phpBlock
     | scriptTextPart
+    ;
+
+htmlElements
+    : htmlElement+
     ;
 
 htmlElement
@@ -321,7 +325,7 @@ declareStatement
     ;
 
 inlineHtml
-    : (htmlElement | scriptTextPart)+ //htmlElementOrPhpBlock*
+    : (htmlElements | scriptTextPart)+
     ;
 
 declareList
