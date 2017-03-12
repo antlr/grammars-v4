@@ -8,7 +8,9 @@ source files from Python 3's
 [standard library](http://hg.python.org/cpython/file/default/Lib/), 
 see [this GitHub repository](https://github.com/bkiers/python3-parser).
 
-Note that this grammar contains embedded Java code that handles
+Note that there are two grammars here, one for Java and other for Python3
+target. Target of grammars are mentioned at the top of the grammar.
+This grammar contains embedded code that handles
 the insertion of `INDENT` and `DEDENT` tokens. The embedded code,
 located inside the `NEWLINE` lexer rule as well as the `@lexer::members`
 section is well documented, so people trying to port this grammar to
