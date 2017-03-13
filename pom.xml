@@ -98,7 +98,8 @@
 		<module>stacktrace</module>
 		<module>stringtemplate</module>
 		<module>suokif</module>
-		<module>swift</module>
+		<module>swift2</module>
+		<module>swift3</module>
 		<module>swift-fin</module>
 		<module>telephone</module>
 		<module>tiny</module>
