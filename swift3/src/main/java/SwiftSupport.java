@@ -146,29 +146,28 @@ public class SwiftSupport {
         rightWS.set(Swift3Parser.Line_comment);
         rightWS.set(Swift3Parser.Block_comment);
     }
-
-    public static boolean isOperatorHead(Token token) {
+    
+    private static boolean isCharacterFromSet(Token token, BitSet bitSet) {
         if (token.getType() == Token.EOF) {
             return false;
         } else {
             String text = token.getText();
-            int unicodeChar = text.codePointAt(0);
-            boolean isOperatorHead = operatorHead.get(unicodeChar);
-            // System.out.println("isOperatorHead: '"+isOperatorHead+"', text: '"+text+"', unicodeChar: '"+unicodeChar+"', token: '"+token+"'");
-            return isOperatorHead;
+            int codepoint = text.codePointAt(0);
+            if (Character.charCount(codepoint) != text.length()) {
+                // not a single character
+                return false;
+            } else {
+                return operatorCharacter.get(codepoint);
+            }
         }
+    }
+
+    public static boolean isOperatorHead(Token token) {
+        return isCharacterFromSet(token, operatorHead);
     }
     
     public static boolean isOperatorCharacter(Token token) {
-        if (token.getType() == Token.EOF) {
-            return false;
-        } else {
-            String text = token.getText();
-            int unicodeChar = text.codePointAt(0);
-            boolean isOperatorCharacter = operatorCharacter.get(unicodeChar);
-            // System.out.println("isOperatorCharacter: '"+isOperatorCharacter+"', text: '"+text+"', unicodeChar: '"+unicodeChar+"', token: '"+token+"'");
-            return isOperatorCharacter;
-        }
+        return isCharacterFromSet(token, operatorCharacter);
     }
 
     public static boolean isOpNext(TokenStream tokens) {
@@ -186,32 +185,44 @@ public class SwiftSupport {
         int currentTokenIndex = tokens.index(); // current on-channel lookahead token index
         Token currentToken = tokens.get(currentTokenIndex);
         
+        //System.out.println("getLastOpTokenIndex: "+currentToken.getText());
+        
+        
         // operator → dot-operator-head­ dot-operator-characters
         if (currentToken.getType() == Swift3Parser.DOT && tokens.get(currentTokenIndex + 1).getType() == Swift3Parser.DOT) {
+            //System.out.println("DOT");
+                
             // dot-operator
             currentTokenIndex += 2; // point at token after ".."
             currentToken = tokens.get(currentTokenIndex);
             
             // dot-operator-character → .­ | operator-character­
             while (currentToken.getType() == Swift3Parser.DOT || isOperatorCharacter(currentToken)) {
+                //System.out.println("DOT");
                 currentTokenIndex++;
                 currentToken = tokens.get(currentTokenIndex);
             }
-            
+
+            //System.out.println("result: "+(currentTokenIndex - 1));
             return currentTokenIndex - 1;
         }
         
         // operator → operator-head­ operator-characters­?
         
         if (isOperatorHead(currentToken)) {
-            currentTokenIndex++;
+            //System.out.println("isOperatorHead");
+                
+            tokens.getText(); // TODO. This line strangely fixes crash at mvn test, however, mvn compile gives me perfect working binary.
             currentToken = tokens.get(currentTokenIndex);
             while (isOperatorCharacter(currentToken)) {
+                //System.out.println("isOperatorCharacter");
                 currentTokenIndex++;
                 currentToken = tokens.get(currentTokenIndex);
             }
+            //System.out.println("result: "+(currentTokenIndex - 1));
             return currentTokenIndex - 1;
         } else {
+            //System.out.println("result: "+(-1));
             return -1;
         }
     }
@@ -232,7 +243,7 @@ public class SwiftSupport {
         boolean nextIsWS = isRightOperatorWS(nextToken);
         boolean result = prevIsWS && nextIsWS || (!prevIsWS && !nextIsWS);
         String text = tokens.getText(Interval.of(start, stop));
-        // System.out.println("isBinaryOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
+        //System.out.println("isBinaryOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
         return result;
     }
 
@@ -304,5 +315,36 @@ public class SwiftSupport {
 
     public static boolean isRightOperatorWS(Token t) {
         return rightWS.get(t.getType()) || t.getType()==Token.EOF;
+    }
+
+    public static boolean isSeparatedStatement(TokenStream tokens, int indexOfPreviousStatement) {
+        //System.out.println("------");
+        //System.out.println("indexOfPreviousStatement: " + indexOfPreviousStatement);
+
+        int indexFrom = indexOfPreviousStatement - 1;
+        int indexTo = tokens.index() - 1;
+        
+        // Stupid check for new line and semicolon, can be optimized
+        if (indexFrom >= 0) {
+            while (indexFrom >= 0 && tokens.get(indexFrom).getChannel() == Token.HIDDEN_CHANNEL) {
+                indexFrom--;
+            }
+
+            //System.out.println("from: '" + tokens.getText(Interval.of(indexFrom, indexFrom))+"', "+tokens.get(indexFrom));
+            //System.out.println("to: '" + tokens.getText(Interval.of(indexTo, indexTo))+"', "+tokens.get(indexTo));
+            //System.out.println("in_between: '" + tokens.getText(Interval.of(indexFrom, indexTo)));
+            
+            if (tokens.getText(Interval.of(indexFrom, indexTo)).indexOf("\n") >= 0
+                || tokens.getText(Interval.of(indexFrom, indexTo)).indexOf(";") >= 0)
+            {
+                return true;
+            } else {
+                //for (int i = previousIndex; i < currentIndex; i++)
+                
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
 }

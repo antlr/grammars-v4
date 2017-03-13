@@ -31,7 +31,7 @@
  */
 grammar Swift3;
 
-top_level : statement* EOF ;
+top_level : statements? EOF;
 
 // Statements
 
@@ -46,10 +46,28 @@ statement
  | control_transfer_statement ';'?
  | defer_statement ';'?
  | do_statement ';'?
- | compiler_control_statement
+ | compiler_control_statement ';'? // proper logic with semicolons is not supported yet. compiler_control_statement should be separated with a newline, but not with a semicolon
  ;
 
-statements : statement+ ;
+// Quote: https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Statements.html#//apple_ref/swift/grammar/statements 
+// A semicolon (;) can optionally appear after any statement and is used to separate multiple statements if they appear on the same line.
+//
+// Commentary:
+// Swift requires statements to be separated with semicolon or new line.
+// But official grammar has only optional semicolon.
+// It is improtant to break ambiguities in grammar.    
+//
+// This logic is implemented in swift in ParseStmt.cpp (Parser::parseBraceItems)
+statements
+    : statements_impl[-1]
+    ;
+    
+statements_impl[int indexBefore]
+locals [
+   int indexAfter = -1
+]
+    : {SwiftSupport.isSeparatedStatement(_input, $indexBefore)}? statement {$indexAfter = _input.index();} statements_impl[$indexAfter]?
+    ;
 
 // GRAMMAR OF A LOOP STATEMENT
 
@@ -133,7 +151,7 @@ labeled_statement
  ;
  
 statement_label : label_name ':' ;
-label_name : identifier  ;
+label_name : declaration_identifier ;
 
 // GRAMMAR OF A CONTROL TRANSFER STATEMENT
 
@@ -197,7 +215,7 @@ endif_directive : '#endif' ;
 
 compilation_condition
  : platform_condition
- | identifier
+ | label_identifier
  | boolean_literal
  | '(' compilation_condition ')'
  | '!' compilation_condition
@@ -212,14 +230,39 @@ platform_condition
  ;
  
 swift_version : Pure_decimal_digits '.' Pure_decimal_digits ;
- 
-operating_system : 'macOS' | 'iOS' | 'watchOS' | 'tvOS' ;
-architecture : 'i386' | 'x86_64' | 'arm' | 'arm64' ;
+
+// Rule from docs:
+// operating-system → macOS­ | iOS­ | watchOS­ | tvOS
+//
+// Code from apple/swift:­ 
+// #if (!os(Windows) || CYGWIN) && (arch(i386) || arch(x86_64))
+//
+// "#if os(Any)" gives error that Any is not an identifier.
+// So I decided to use declaration_identifier
+
+operating_system : declaration_identifier ;
+architecture : declaration_identifier ;
+
+// These rules don't work:
+// operating_system : 'macOS' | 'iOS' | 'watchOS' | 'tvOS' ;
+// architecture : 'i386' | 'x86_64' | 'arm' | 'arm64' ;
 
 // GRAMMAR OF A LINE CONTROL STATEMENT
 
+// NOTE: The rule is changed.
+// Original rule:
+//
+// line_control_statement
+//  : '#sourceLocation' '(' 'file:' file_name ',' 'line:' line_number ')'
+//  | '#sourceLocation' '(' ')'
+//  ;
+// 
+// This defines a token "file:", but this is valid for swift compiler:
+// '#sourceLocation(file : "", line : 1)' (notice spaces between "file" and ":")
+//
+// Modified rule:
 line_control_statement
- : '#sourceLocation' '(' 'file:' file_name ',' 'line:' line_number ')'
+ : '#sourceLocation' '(' 'file' ':' file_name ',' 'line' ':' line_number ')'
  | '#sourceLocation' '(' ')'
  ;
 
@@ -232,15 +275,14 @@ availability_condition : '#available' '(' availability_arguments ')' ;
 
 availability_arguments : availability_argument (',' availability_argument)* ;
 
-availability_argument : Platform | '*' ;
+availability_argument: Platform_name_platform_version | '*' ;
 
-/** Must match as token so Platform_version doesn't look like a float literal */
-Platform : Platform_name WS? Platform_version ;
+Platform_name_platform_version : Platform_name WS Platform_version ;
 
 fragment
 Platform_name
  : 'iOS' | 'iOSApplicationExtension'
- | 'OSX' | 'macOSApplicationExtension'
+ | 'macOS' | 'macOSApplicationExtension'
  | 'watchOS'
  | 'tvOS'
  ;
@@ -318,8 +360,8 @@ code_block : '{' statements? '}' ;
 
 import_declaration : attributes? 'import' import_kind? import_path  ;
 import_kind : 'typealias' | 'struct' | 'class' | 'enum' | 'protocol' | 'var' | 'func'  ;
-import_path : import_path_identifier | import_path_identifier '.' import_path  ;
-import_path_identifier : identifier | operator  ;
+import_path : import_path_identifier ('.' import_path_identifier)*  ;
+import_path_identifier : declaration_identifier | operator  ;
 
 // GRAMMAR OF A CONSTANT DECLARATION
 
@@ -336,21 +378,21 @@ initializer : assignment_operator expression  ;
 // GRAMMAR OF A VARIABLE DECLARATION
 
 variable_declaration
- : variable_declaration_head pattern_initializer_list
- | variable_declaration_head variable_name type_annotation code_block
+ : variable_declaration_head variable_name type_annotation code_block
  | variable_declaration_head variable_name type_annotation getter_setter_block
  | variable_declaration_head variable_name type_annotation getter_setter_keyword_block
  | variable_declaration_head variable_name type_annotation initializer? willSet_didSet_block
  | variable_declaration_head variable_name type_annotation type_annotation initializer? willSet_didSet_block
+ | variable_declaration_head pattern_initializer_list
  ;
 
 variable_declaration_head : attributes? declaration_modifiers? 'var'  ;
-variable_name : identifier  ;
+variable_name : declaration_identifier  ;
 
 getter_setter_block : '{' getter_clause setter_clause?'}'  | '{' setter_clause getter_clause '}'  ;
 getter_clause : attributes? mutation_modifier? 'get' code_block  ;
 setter_clause : attributes? mutation_modifier? 'set' setter_name? code_block  ;
-setter_name : '(' identifier ')'  ;
+setter_name : '(' declaration_identifier ')'  ;
 
 getter_setter_keyword_block : '{' getter_keyword_clause setter_keyword_clause?'}' | '{' setter_keyword_clause getter_keyword_clause '}'  ;
 getter_keyword_clause : attributes? mutation_modifier? 'get'  ;
@@ -363,7 +405,7 @@ didSet_clause : attributes? 'didSet' setter_name? code_block  ;
 // GRAMMAR OF A TYPE ALIAS DECLARATION
 
 typealias_declaration : attributes? access_level_modifier? 'typealias' typealias_name generic_parameter_clause? typealias_assignment ;
-typealias_name : identifier ;
+typealias_name : declaration_identifier ;
 typealias_assignment : assignment_operator type ;
 
 // GRAMMAR OF A FUNCTION DECLARATION
@@ -371,7 +413,7 @@ function_declaration : function_head function_name generic_parameter_clause? fun
  
 function_head : attributes? declaration_modifiers? 'func' ;
 
-function_name : identifier | operator ;
+function_name : declaration_identifier | operator ;
 
 function_signature
  : parameter_clause 'throws'? function_result?
@@ -390,8 +432,8 @@ parameter
  | external_parameter_name? local_parameter_name type_annotation
  | external_parameter_name? local_parameter_name type_annotation range_operator
  ;
-external_parameter_name : identifier ; // TODO: Check that deleting " | '_'" doesn't break anything
-local_parameter_name : identifier ; // TODO: Check that deleting " | '_'" doesn't break anything
+external_parameter_name : label_identifier ; // TODO: Check that deleting " | '_'" doesn't break anything
+local_parameter_name : label_identifier ; // TODO: Check that deleting " | '_'" doesn't break anything
 default_argument_clause : assignment_operator expression ;
 
 // GRAMMAR OF AN ENUMERATION DECLARATION
@@ -414,9 +456,9 @@ union_style_enum_case_list : union_style_enum_case | union_style_enum_case ',' u
 
 union_style_enum_case : enum_case_name tuple_type? ;
 
-enum_name : identifier  ;
+enum_name : declaration_identifier  ;
 
-enum_case_name : identifier  ;
+enum_case_name : declaration_identifier  ;
 
 raw_value_style_enum : 'enum' enum_name generic_parameter_clause? type_inheritance_clause generic_where_clause? '{' raw_value_style_enum_members '}' ;
 
@@ -441,7 +483,7 @@ raw_value_literal : numeric_literal | Static_string_literal | boolean_literal ;
 // GRAMMAR OF A STRUCTURE DECLARATION TODO did not update
 
 struct_declaration : attributes? access_level_modifier? 'struct' struct_name generic_parameter_clause? type_inheritance_clause? generic_where_clause? struct_body  ;
-struct_name : identifier  ;
+struct_name : declaration_identifier  ;
 struct_body : '{' struct_member* '}'  ;
 
 struct_member : declaration | compiler_control_statement ;
@@ -452,7 +494,7 @@ class_declaration
  : attributes? access_level_modifier? 'final'? 'class' class_name generic_parameter_clause? type_inheritance_clause? generic_where_clause? class_body
  | attributes? access_level_modifier? 'final' access_level_modifier? 'class' class_name generic_parameter_clause? type_inheritance_clause? generic_where_clause? class_body
  ;
-class_name : identifier ;
+class_name : declaration_identifier ;
 class_body : '{' class_member* '}' ;
 
 class_member : declaration | compiler_control_statement ;
@@ -460,7 +502,7 @@ class_member : declaration | compiler_control_statement ;
 // GRAMMAR OF A PROTOCOL DECLARATION
 
 protocol_declaration : attributes? access_level_modifier? 'protocol' protocol_name type_inheritance_clause? protocol_body ;
-protocol_name : identifier ;
+protocol_name : declaration_identifier ;
 protocol_body : '{' protocol_member* '}' ;
 
 protocol_member
@@ -548,7 +590,7 @@ prefix_operator_declaration : 'prefix' 'operator' operator ;
 postfix_operator_declaration : 'postfix' 'operator' operator ;
 infix_operator_declaration : 'infix' 'operator' operator infix_operator_group? ;
 
-infix_operator_group : precedence_group_name ;
+infix_operator_group : ':' precedence_group_name ;
 
 // GRAMMAR OF A PRECEDENCE GROUP DECLARATION
 
@@ -571,7 +613,7 @@ precedence_group_associativity : 'associativity' ':' associativity ;
 associativity : 'left' | 'right' | 'none' ;
 
 precedence_group_names : precedence_group_name (',' precedence_group_name)* ;
-precedence_group_name : identifier ;
+precedence_group_name : declaration_identifier ;
 
 // GRAMMAR OF A DECLARATION MODIFIER
 declaration_modifier
@@ -629,7 +671,7 @@ wildcard_pattern : '_'  ;
 
 // GRAMMAR OF AN IDENTIFIER PATTERN
 
-identifier_pattern : identifier ;
+identifier_pattern : declaration_identifier ;
 
 // GRAMMAR OF A VALUE_BINDING PATTERN
 
@@ -663,18 +705,43 @@ expression_pattern : expression  ;
 
 // GRAMMAR OF AN ATTRIBUTE
 
-attribute : '@'? attribute_name attribute_argument_clause? ;
-attribute_name : identifier  ;
-attribute_argument_clause : '('  balanced_tokens?  ')'  ;
+attribute : '@' attribute_name attribute_argument_clause? ;
+attribute_name : declaration_identifier  ;
+attribute_argument_clause : '('  balanced_tokens  ')'  ;
 attributes : attribute+ ;
-balanced_tokens : balanced_token+ ;
+balanced_tokens : balanced_token* ;
+
+// https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Attributes.html#//apple_ref/swift/grammar/attributes
+//
+// Quote:
+// balanced-token → (­balanced-tokens­opt­)­
+// balanced-token → [­balanced-tokens­opt­]­
+// balanced-token → {­balanced-tokens­opt­}­
+// balanced-token → Any identifier, keyword, literal, or operator
+// balanced-token → Any punctuation except (­, )­, [­, ]­, {­, or }­
+//
+// Example: @available(*, deprecated, message: "it will be removed in Swift 4.0.  Please use 'Collection' instead")
+// Apple doesn't provide proper grammar for attributes. It says "Any punctuation except (­, )­, [­, ]­, {­, or }­".
 balanced_token
- : '('  balanced_tokens? ')'
- | '[' balanced_tokens? ']'
- | '{' balanced_tokens? '}'
- | identifier | expression | context_sensitive_keyword | literal | operator
-// | Any punctuation except ( ,  ')' , '[' , ']' , { , or } TODO add?
+ : '('  balanced_tokens ')'
+ | '[' balanced_tokens ']'
+ | '{' balanced_tokens '}'
+ | label_identifier
+ | literal 
+ | operator
+ | Platform_name_platform_version // there is a kludge, see Platform_name_platform_version; it is a token
+ | any_punctuation_for_balanced_token
  ;
+
+// https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/LexicalStructure.html#//apple_ref/swift/grammar/identifier
+// Quote:
+// The following tokens are reserved as punctuation and can’t be used as custom operators: (, ), {, }, [, ], ., ,, :, ;, =, @, #, & (as a prefix operator), ->, `, ?, and ! (as a postfix operator).
+any_punctuation_for_balanced_token :
+    ( '.' | ',' | ':' | ';' | '=' | '@' | '#' | '`' | '?' )
+    | arrow_operator
+    | {SwiftSupport.isPrefixOp(_input)}? '&'
+    | {SwiftSupport.isPostfixOp(_input)}? '!'
+    ;
 
 // Expressions
 
@@ -691,7 +758,7 @@ prefix_expression
   | in_out_expression
   ;
 
-in_out_expression : '&' identifier ;
+in_out_expression : '&' declaration_identifier ;
 
 // GRAMMAR OF A TRY EXPRESSION
 
@@ -725,7 +792,7 @@ type_casting_operator
 // GRAMMAR OF A PRIMARY EXPRESSION
 
 primary_expression
- : identifier generic_argument_clause?
+ : declaration_identifier generic_argument_clause?
  | literal_expression
  | self_expression
  | superclass_expression
@@ -745,6 +812,7 @@ literal_expression
  | array_literal
  | dictionary_literal
  | '#file' | '#line' | '#column' | '#function'
+ | '#dsohandle' // Private Apple stuff. Not in docs, but in compiler and in sources of swift.
  ;
 
 array_literal : '[' array_literal_items? ']' ;
@@ -781,9 +849,33 @@ playground_literal
 
 self_expression
  : 'self'
- | 'self' '.' identifier
+ | 'self' '.' declaration_identifier
  | 'self' '[' expression_list ']'
  | 'self' '.' 'init'
+ 
+ // From ParseExpr.cpp. self and Self parsed with same code:
+ //
+ //  case tok::kw_self:     // self
+ //  case tok::kw_Self:     // Self
+ //    Result = makeParserResult(parseExprIdentifier());
+ //
+ // However, later something happens and Self[1], Self
+ //
+ // Example code from SetAlgebra.swift:
+ //
+ // public var isEmpty: Bool {
+ //   return self == Self()
+ // }
+ //
+ // Also a valid code:
+ //
+ // return self == Self() && self == Self.init() && Self.Other() == Self.Other()
+ //
+ // So this is undocumented:
+ //
+ | 'Self' // Self()
+ | 'Self' '.' declaration_identifier // Self.This()
+ | 'Self' '.' 'init' // Self.init()
  ;
 
 // GRAMMAR OF A SUPERCLASS EXPRESSION
@@ -794,7 +886,7 @@ superclass_expression
   | superclass_initializer_expression
   ;
 
-superclass_method_expression	  : 'super' '.' identifier  ;
+superclass_method_expression	  : 'super' '.' declaration_identifier  ;
 superclass_subscript_expression   : 'super' '[' expression ']'  ;
 superclass_initializer_expression : 'super' '.' 'init'  ;
 
@@ -810,8 +902,11 @@ closure_signature
 closure_parameter_clause
  : '(' ')'
  | '(' closure_parameter_list ')'
- | identifier_list
+ | closure_parameter_clause_identifier_list
  ;
+
+// Renamed rule "identifier_list"
+closure_parameter_clause_identifier_list : declaration_identifier (',' declaration_identifier)* ;
 
 closure_parameter_list : closure_parameter (',' closure_parameter)* ;
 
@@ -820,7 +915,7 @@ closure_parameter
  | closure_parameter_name type_annotation range_operator
  ;
 
-closure_parameter_name : identifier ;
+closure_parameter_name : label_identifier ;
 
 capture_list : '[' capture_list_items ']' ;
 
@@ -832,7 +927,7 @@ capture_specifier : 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)'  ;
 
 // GRAMMAR OF A IMPLICIT MEMBER EXPRESSION
 
-implicit_member_expression : '.' identifier ;
+implicit_member_expression : '.' label_identifier ; // let a: MyType = .default; static let `default` = MyType()
 
 // GRAMMAR OF A PARENTHESIZED EXPRESSION
 
@@ -847,7 +942,7 @@ tuple_expression
  
 tuple_element
  : expression
- | identifier ':' expression
+ | label_identifier ':' expression
  ;
 
 // GRAMMAR OF A WILDCARD EXPRESSION
@@ -876,8 +971,8 @@ postfix_expression
  | postfix_expression '.' 'init'                                       # initializer_expression
  | postfix_expression '.' 'init' '(' argument_names ')'                # initializer_expression_with_args
  | postfix_expression '.' Pure_decimal_digits                          # explicit_member_expression1
- | postfix_expression '.' identifier generic_argument_clause?          # explicit_member_expression2
- | postfix_expression '.' identifier '(' argument_names ')'            # explicit_member_expression3
+ | postfix_expression '.' declaration_identifier generic_argument_clause?          # explicit_member_expression2
+ | postfix_expression '.' declaration_identifier '(' argument_names ')'            # explicit_member_expression3
 // This does't exist in the swift grammar, but this valid swift statement fails without it
 // self.addTarget(self, action: #selector(nameOfAction(_:)))
  | postfix_expression '(' argument_names ')'                           # explicit_member_expression4
@@ -892,8 +987,10 @@ postfix_expression
 
 // GRAMMAR OF A FUNCTION CALL EXPRESSION
 
-// See the optimization in postfix_expression
-// function_call_expression
+// See the optimization in postfix_expression. It should be doing exactly this:
+//
+// function-call-expression → postfix-expression­ function-call-argument-clause­
+// function-call-expression → postfix-expression­ function-call-argument-clause­?­ trailing-closure
 
 function_call_argument_clause
  : '(' ')'
@@ -904,9 +1001,9 @@ function_call_argument_list : function_call_argument ( ',' function_call_argumen
 
 function_call_argument
  : expression
- | identifier ':' expression
+ | label_identifier ':' expression
  | operator
- | identifier ':' operator
+ | label_identifier ':' operator
  ;
 
 trailing_closure : closure_expression ;
@@ -914,7 +1011,7 @@ trailing_closure : closure_expression ;
 // GRAMMAR OF AN EXPLICIT MEMBER EXPRESSION
 
 argument_names : argument_name (argument_name)* ;
-argument_name : identifier ':' ;
+argument_name : label_identifier ':' ;
 
 // GRAMMAR OF A DYNAMIC TYPE EXPRESSION
 
@@ -943,19 +1040,16 @@ type_annotation : ':' attributes? 'inout'? type  ;
 
 // GRAMMAR OF A TYPE IDENTIFIER
 
-type_identifier
- : type_name generic_argument_clause?
- | type_name generic_argument_clause? '.' type_identifier
- ;
+type_identifier : type_name generic_argument_clause? ('.' type_identifier)? ;
 
-type_name : identifier ;
+type_name : declaration_identifier ;
 
 // GRAMMAR OF A TUPLE TYPE
 
 tuple_type : '(' tuple_type_element_list? ')' ;
 tuple_type_element_list : tuple_type_element | tuple_type_element ',' tuple_type_element_list  ;
 tuple_type_element : element_name type_annotation | type ;
-element_name : identifier ;
+element_name : label_identifier ;
 
 // GRAMMAR OF A FUNCTION TYPE
 
@@ -979,7 +1073,7 @@ function_type_argument
  | argument_label type_annotation
  ;
 
-argument_label : identifier ;
+argument_label : label_identifier ;
 
 // GRAMMAR OF AN ARRAY TYPE
 
@@ -1031,7 +1125,21 @@ class_requirement : 'class' ;
 
 // GRAMMAR OF AN IDENTIFIER
 
-identifier : Identifier | context_sensitive_keyword ;
+// identifier : Identifier | context_sensitive_keyword ;
+//
+// identifier is context sensitive
+
+// var x = 1; funx x() {}; class x {}
+declaration_identifier
+     : Identifier
+     | keyword_as_identifier_in_declarations
+     ;
+
+// external, internal argument name
+label_identifier
+     : Identifier
+     | keyword_as_identifier_in_labels
+     ;
 
 Identifier
  : Identifier_head Identifier_characters?
@@ -1039,7 +1147,10 @@ Identifier
  | Implicit_parameter_name
  ;
 
-identifier_list : identifier (',' identifier)* ;
+// identifier_list : identifier (',' identifier)* ;
+// 
+// identifier is context sensitive
+// See: closure_parameter_clause_identifier_list
 
 fragment Identifier_head : [a-zA-Z]
  | '_'
@@ -1069,14 +1180,188 @@ fragment Identifier_character : [0-9]
 fragment Identifier_characters : Identifier_character+ ;
 
 // Keywords reserved in particular contexts: associativity, convenience, dynamic, didSet, final, get, infix, indirect, lazy, left, mutating, none, nonmutating, optional, override, postfix, precedence, prefix, Protocol, required, right, set, Type, unowned, weak, and willSet. Outside the context in which they appear in the grammar, they can be used as identifiers.
-context_sensitive_keyword :
- 'associativity' | 'convenience' | 'dynamic' | 'didSet'
- | 'final' | 'get' | 'infix' | 'indirect'
- | 'lazy' | 'left' | 'mutating' | 'none'
- | 'nonmutating' | 'optional' | 'override' | 'postfix'
- | 'precedence' | 'prefix' | 'Protocol' | 'required'
- | 'right' | 'set' | 'Type' | 'unowned'
- | 'weak' | 'willSet'
+// context_sensitive_keyword :
+//  'associativity' | 'convenience' | 'dynamic' | 'didSet'
+//  | 'final' | 'get' | 'infix' | 'indirect'
+//  | 'lazy' | 'left' | 'mutating' | 'none'
+//  | 'nonmutating' | 'optional' | 'override' | 'postfix'
+//  | 'precedence' | 'prefix' | 'Protocol' | 'required'
+//  | 'right' | 'set' | 'Type' | 'unowned'
+//  | 'weak' | 'willSet'
+//
+// ^- this does not work. "[10].index(of: 10)". "of" is a keyword. "type(of: self)"
+ 
+ // Added by myself.
+ // Tested all alphanumeric tokens in playground.
+ // E.g. "let mutating = 1".
+ // E.g. "func mutating() {}".
+ //
+ // In source code of swift there are multiple cases of error diag::keyword_cant_be_identifier.
+ // Maybe it is not even a single error when keyword can't be identifier.
+ //
+keyword_as_identifier_in_declarations
+: 'Protocol'
+| 'Type'
+| 'alpha'
+| 'arch'
+| 'arm'
+| 'arm64'
+| 'assignment'
+| 'associativity'
+| 'blue'
+| 'convenience'
+| 'didSet'
+| 'dynamic'
+| 'file'
+| 'final'
+| 'get'
+| 'green'
+| 'higherThan'
+| 'i386'
+| 'iOS'
+| 'iOSApplicationExtension'
+| 'indirect'
+| 'infix'
+| 'lazy'
+| 'left'
+| 'line'
+| 'lowerThan'
+| 'macOS'
+| 'macOSApplicationExtension'
+| 'mutating'
+| 'none'
+| 'nonmutating'
+| 'of'
+| 'open'
+| 'optional'
+| 'os'
+| 'override'
+| 'postfix'
+| 'precedence'
+| 'prefix'
+| 'red'
+| 'required'
+| 'resourceName'
+| 'right'
+| 'safe'
+| 'set'
+| 'swift'
+| 'tvOS'
+| 'type'
+| 'unowned'
+| 'unsafe'
+| 'watchOS'
+| 'weak'
+| 'willSet'
+| 'x86_64'
+;
+
+// func x(Any: Any)
+keyword_as_identifier_in_labels
+: 'Any'
+| 'Protocol'
+| 'Self'
+| 'Type'
+| 'alpha'
+| 'arch'
+| 'arm'
+| 'arm64'
+| 'as'
+| 'assignment'
+| 'associatedtype'
+| 'associativity'
+| 'blue'
+| 'break'
+| 'case'
+| 'catch'
+| 'class'
+| 'continue'
+| 'convenience'
+| 'default'
+| 'defer'
+| 'deinit'
+| 'didSet'
+| 'do'
+| 'dynamic'
+| 'else'
+| 'enum'
+| 'extension'
+| 'fallthrough'
+| 'false'
+| 'file'
+| 'fileprivate'
+| 'final'
+| 'for'
+| 'func'
+| 'get'
+| 'green'
+| 'guard'
+| 'higherThan'
+| 'i386'
+| 'iOS'
+| 'iOSApplicationExtension'
+| 'if'
+| 'import'
+| 'in'
+| 'indirect'
+| 'infix'
+| 'init'
+| 'internal'
+| 'is'
+| 'lazy'
+| 'left'
+| 'line'
+| 'lowerThan'
+| 'macOS'
+| 'macOSApplicationExtension'
+| 'mutating'
+| 'nil'
+| 'none'
+| 'nonmutating'
+| 'of'
+| 'open'
+| 'operator'
+| 'optional'
+| 'os'
+| 'override'
+| 'postfix'
+| 'precedence'
+| 'precedencegroup'
+| 'prefix'
+| 'private'
+| 'protocol'
+| 'public'
+| 'red'
+| 'repeat'
+| 'required'
+| 'resourceName'
+| 'rethrows'
+| 'return'
+| 'right'
+| 'safe'
+| 'self'
+| 'set'
+| 'static'
+| 'struct'
+| 'subscript'
+| 'super'
+| 'swift'
+| 'switch'
+| 'throw'
+| 'throws'
+| 'true'
+| 'try'
+| 'tvOS'
+| 'type'
+| 'typealias'
+| 'unowned'
+| 'unsafe'
+| 'watchOS'
+| 'weak'
+| 'where'
+| 'while'
+| 'willSet'
+| 'x86_64'
  ;
 
 // GRAMMAR OF OPERATORS

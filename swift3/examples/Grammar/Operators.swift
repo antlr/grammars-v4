@@ -1,6 +1,9 @@
 import UIKit
 
-prefix operator +
+prefix operator ^
+postfix operator ^
+infix operator ^
+prefix operator √
 
 public class OperatorTest {
     let testString: String = "hey"
