@@ -56,10 +56,6 @@ host
    | hostnumber
    ;
 
-cellname
-   : hostname
-   ;
-
 hostname
    : STRING ('.' STRING)*
    ;
