@@ -234,6 +234,7 @@ build_configuration : platform_testing_function
  | '!' build_configuration
  | build_configuration build_AND build_configuration
  | build_configuration build_OR build_configuration
+ | language_version_testing_function
  ;
 
 platform_testing_function : 'os' '(' operating_system ')'
@@ -242,6 +243,9 @@ platform_testing_function : 'os' '(' operating_system ')'
 
 operating_system : 'OSX' | 'iOS' | 'watchOS' | 'tvOS' ;
 architecture : 'i386' | 'x86_64' | 'arm' | 'arm64' ;
+
+language_version_testing_function : 'swift' '(' '>=' swift_version ')' ;
+swift_version : Pure_decimal_digits '.' Pure_decimal_digits ;
 
 // GRAMMAR OF A LINE CONTROL STATEMENT
 
@@ -559,7 +563,7 @@ tuple_pattern : '(' tuple_pattern_element_list? ')'  ;
 tuple_pattern_element_list
 	:	tuple_pattern_element (',' tuple_pattern_element)*
 	;
-tuple_pattern_element : pattern  ;
+tuple_pattern_element : pattern | identifier ':' pattern ;
 
 // GRAMMAR OF AN ENUMERATION CASE PATTERN
 
@@ -665,6 +669,7 @@ literal_expression
  | array_literal
  | dictionary_literal
  | '__FILE__' | '__LINE__' | '__COLUMN__' | '__FUNCTION__'
+ | '#file' | '#line' | '#column' | '#function'
  ;
 
 array_literal			 : '[' array_literal_items? ']'  ;
