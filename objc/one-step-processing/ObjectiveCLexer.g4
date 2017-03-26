@@ -290,7 +290,7 @@ fragment Dec:               [0-9];
 fragment FloatTypeSuffix:   [fFdD];
 
 fragment EscapeSequence
-    : '\\' ('b'|'t'|'n'|'f'|'r'|'"'|'\''|'\\')
+    : '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
     | OctalEscape
     | UnicodeEscape
     ;

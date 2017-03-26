@@ -396,7 +396,7 @@ CharValue
     :   HexEscape
     |   OctEscape
     |   CharEscape
-    |   ~[\u0000\n\\]
+    |   ~[\0\n\\]
     ;
 
 fragment
