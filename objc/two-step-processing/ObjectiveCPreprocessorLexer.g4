@@ -92,7 +92,7 @@ TEXT:                            ~[\r\n\\/]+;
 
 fragment
 EscapeSequence
-    : '\\' ('b'|'t'|'n'|'f'|'r'|'"'|'\''|'\\')
+    : '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
     | OctalEscape
     | UnicodeEscape
     ;

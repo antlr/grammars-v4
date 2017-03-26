@@ -882,10 +882,10 @@ fragment Identifier_head : [a-zA-Z]
  | [\uF900-\uFD3D] | [\uFD40-\uFDCF] | [\uFDF0-\uFE1F] | [\uFE30-\uFE44]
  | [\uFE47-\uFFFD]
 /*
- | U+10000-U+1FFFD | U+20000-U+2FFFD | U+30000-U+3FFFD | U+40000-U+4FFFD
- | U+50000-U+5FFFD | U+60000-U+6FFFD | U+70000-U+7FFFD | U+80000-U+8FFFD
- | U+90000-U+9FFFD | U+A0000-U+AFFFD | U+B0000-U+BFFFD | U+C0000-U+CFFFD
- | U+D0000-U+DFFFD or U+E0000-U+EFFFD
+ | U+10000–U+1FFFD | U+20000–U+2FFFD | U+30000–U+3FFFD | U+40000–U+4FFFD
+ | U+50000–U+5FFFD | U+60000–U+6FFFD | U+70000–U+7FFFD | U+80000–U+8FFFD
+ | U+90000–U+9FFFD | U+A0000–U+AFFFD | U+B0000–U+BFFFD | U+C0000–U+CFFFD
+ | U+D0000–U+DFFFD or U+E0000–U+EFFFD
 */
  ;
 
@@ -1055,12 +1055,12 @@ Operator_head_other // valid operator chars not used by Swift itself
   ;
 
 Operator_following_character
-  : [\u0300-\u036F]
-  | [\u1DC0-\u1DFF]
-  | [\u20D0-\u20FF]
-  | [\uFE00-\uFE0F]
-  | [\uFE20-\uFE2F]
-  //| [\uE0100-\uE01EF]  ANTLR can't do >16bit char
+  : [\u0300–\u036F]
+  | [\u1DC0–\u1DFF]
+  | [\u20D0–\u20FF]
+  | [\uFE00–\uFE0F]
+  | [\uFE20–\uFE2F]
+  //| [\uE0100–\uE01EF]  ANTLR can't do >16bit char
   ;
 
 dot_operator_head 		: '.' '.' ; // TODO: adjacent cols
