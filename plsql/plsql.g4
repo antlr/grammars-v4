@@ -41,6 +41,7 @@ unit_statement
     | create_function_body
     | create_procedure_body
     | create_package
+    | begin_block
 
 //  | create_index //TODO
 //  | create_table //TODO
@@ -119,6 +120,10 @@ create_package
 
 package_body
     : BODY package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?)
+    ;
+
+begin_block
+    : BEGIN seq_of_statements END
     ;
 
 package_spec
