@@ -1,6 +1,6 @@
 /*
  [The "BSD licence"]
- Copyright (c) 2016 Sasa Coh
+ Copyright (c) 2017 Sasa Coh, Michał Błotniak
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -638,107 +638,13 @@ eos
 // LEXER
 
 
-// Operators
-//
-//binary_op  = "||" | "&&" | rel_op | add_op | mul_op .
-//rel_op     = "==" | "!=" | "<" | "<=" | ">" | ">=" .
-//add_op     = "+" | "-" | "|" | "^" .
-//mul_op     = "*" | "/" | "%" | "<<" | ">>" | "&" | "&^" .
-//
-//unary_op   = "+" | "-" | "!" | "^" | "*" | "&" | "<-" .
-fragment
-BINARY_OP
-//    : '||' | '&&' | REL_OP | ADD_OP | MUL_OP
-    : '||' | '&&' | '==' | '!=' | '<' | '<=' | '>' | '>=' | '+' | '-' | '|' | '^' | '*' | '/' | '%' | '<<' | '>>' | '&' | '&^'
+// Identifiers
+//identifier = letter { letter | unicode_digit } .
+IDENTIFIER
+    : LETTER ( LETTER | UNICODE_DIGIT )*
     ;
 
-fragment
-REL_OP
-    : '=='
-    | '!='
-    | '<'
-    | '<='
-    | '>'
-    | '>='
-    ;
-
-fragment
-ADD_OP
-    : '+'
-    | '-'
-    | '|'
-    | '^'
-    ;
-
-fragment
-MUL_OP
-    : '*'
-    | '/'
-    | '%'
-    | '<<'
-    | '>>'
-    | '&'
-    | '&^'
-    ;
-
-fragment
-UNARY_OP
-    : ('+'|'-'|'!'|'^'|'*'|'&'|'<-')
-    ;
-
-// Literals
-
-//int_lit     = decimal_lit | octal_lit | hex_lit .
-//decimal_lit = ( "1" … "9" ) { decimal_digit } .
-//octal_lit   = "0" { octal_digit } .
-//hex_lit     = "0" ( "x" | "X" ) hex_digit { hex_digit } .
-
-INT_LIT
-    : DECIMAL_LIT
-    | OCTAL_LIT
-    | HEX_LIT
-    ;
-
-fragment DECIMAL_LIT
-    : [1-9] DECIMAL_DIGIT*
-    ;
-
-fragment OCTAL_LIT
-    : '0' OCTAL_DIGIT*
-    ;
-
-fragment HEX_LIT
-    : '0' ( 'x' | 'X' ) HEX_DIGIT+
-    ;
-
-
-//float_lit = decimals "." [ decimals ] [ exponent ] |
-//            decimals exponent |
-//            "." decimals [ exponent ] .
-//decimals  = decimal_digit { decimal_digit } .
-//exponent  = ( "e" | "E" ) [ "+" | "-" ] decimals .
-FLOAT_LIT
-    : DECIMALS '.' DECIMALS? EXPONENT?
-    | DECIMALS EXPONENT
-    | '.' DECIMALS EXPONENT?
-    ;
-
-fragment
-DECIMALS
-    : DECIMAL_DIGIT+
-    ;
-
-fragment
-EXPONENT
-    : ( 'e' | 'E' ) ( '+' | '-' )? DECIMALS
-    ;
-
-//imaginary_lit = (decimals | float_lit) "i" .
-IMAGINARY_LIT
-    : (DECIMALS | FLOAT_LIT) 'i'
-    ;
-
-
+// Keywords
 KEYWORD
     : 'break'
     | 'default'
@@ -767,47 +673,113 @@ KEYWORD
     | 'var'
     ;
 
-IDENTIFIER
-    : LETTER ( LETTER | UNICODE_DIGIT )*
+
+// Operators
+
+//binary_op  = "||" | "&&" | rel_op | add_op | mul_op .
+BINARY_OP
+    : '||' | '&&' | REL_OP | ADD_OP | MUL_OP
     ;
 
+//rel_op     = "==" | "!=" | "<" | "<=" | ">" | ">=" .
+fragment REL_OP
+    : '=='
+    | '!='
+    | '<'
+    | '<='
+    | '>'
+    | '>='
+    ;
+
+//add_op     = "+" | "-" | "|" | "^" .
+fragment ADD_OP
+    : '+'
+    | '-'
+    | '|'
+    | '^'
+    ;
+
+//mul_op     = "*" | "/" | "%" | "<<" | ">>" | "&" | "&^" .
+fragment MUL_OP
+    : '*'
+    | '/'
+    | '%'
+    | '<<'
+    | '>>'
+    | '&'
+    | '&^'
+    ;
+
+//unary_op   = "+" | "-" | "!" | "^" | "*" | "&" | "<-" .
+fragment UNARY_OP
+    : '+'
+    | '-'
+    | '!'
+    | '^'
+    | '*'
+    | '&'
+    | '<-'
+    ;
+
+
+// Integer literals
+
+//int_lit     = decimal_lit | octal_lit | hex_lit .
+INT_LIT
+    : DECIMAL_LIT
+    | OCTAL_LIT
+    | HEX_LIT
+    ;
+
+//decimal_lit = ( "1" … "9" ) { decimal_digit } .
+fragment DECIMAL_LIT
+    : [1-9] DECIMAL_DIGIT*
+    ;
+
+//octal_lit   = "0" { octal_digit } .
+fragment OCTAL_LIT
+    : '0' OCTAL_DIGIT*
+    ;
+
+//hex_lit     = "0" ( "x" | "X" ) hex_digit { hex_digit } .
+fragment HEX_LIT
+    : '0' ( 'x' | 'X' ) HEX_DIGIT+
+    ;
+
+
+// Floating-point literals
+
+//float_lit = decimals "." [ decimals ] [ exponent ] |
+//            decimals exponent |
+//            "." decimals [ exponent ] .
+FLOAT_LIT
+    : DECIMALS '.' DECIMALS? EXPONENT?
+    | DECIMALS EXPONENT
+    | '.' DECIMALS EXPONENT?
+    ;
+
+//decimals  = decimal_digit { decimal_digit } .
+fragment DECIMALS
+    : DECIMAL_DIGIT+
+    ;
+
+//exponent  = ( "e" | "E" ) [ "+" | "-" ] decimals .
+fragment EXPONENT
+    : ( 'e' | 'E' ) ( '+' | '-' )? DECIMALS
+    ;
+
+// Imaginary literals
+//imaginary_lit = (decimals | float_lit) "i" .
+IMAGINARY_LIT
+    : (DECIMALS | FLOAT_LIT) 'i'
+    ;
+
+
+// Rune literals
 
 //rune_lit         = "'" ( unicode_value | byte_value ) "'" .
 RUNE_LIT
     : '\'' ( UNICODE_VALUE | BYTE_VALUE ) '\''
-    ;
-
-
-//string_lit             = raw_string_lit | interpreted_string_lit .
-//raw_string_lit         = "`" { unicode_char | newline } "`" .
-//interpreted_string_lit = `"` { unicode_value | byte_value } `"` .
-STRING_LIT
-    : RAW_STRING_LIT
-    | INTERPRETED_STRING_LIT
-    ;
-
-fragment RAW_STRING_LIT
-//    : '`' ( UNICODE_CHAR | NEWLINE )* '`'
-    : '`' ( RAW_STRING_CHAR | NEWLINE )* '`'
-    ;
-
-fragment INTERPRETED_STRING_LIT
-//    : '"' ( UNICODE_VALUE | BYTE_VALUE )* '"'
-    : '"' ( STRING_CHAR | BYTE_VALUE )* '"'
-    ;
-
-fragment STRING_CHAR
-    : ~["\\]
-    | LITTLE_U_VALUE
-    | BIG_U_VALUE
-    | ESCAPED_CHAR
-    ;
-
-fragment RAW_STRING_CHAR
-    : ~[`]
-    | LITTLE_U_VALUE
-    | BIG_U_VALUE
-    | ESCAPED_CHAR
     ;
 
 //unicode_value    = unicode_char | little_u_value | big_u_value | escaped_char .
@@ -816,17 +788,6 @@ fragment UNICODE_VALUE
     | LITTLE_U_VALUE
     | BIG_U_VALUE
     | ESCAPED_CHAR
-    ;
-
-//
-//little_u_value   = `\` "u" hex_digit hex_digit hex_digit hex_digit .
-//big_u_value      = `\` "U" hex_digit hex_digit hex_digit hex_digit
-//                           hex_digit hex_digit hex_digit hex_digit .
-LITTLE_U_VALUE
-    : '\\u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-    ;
-BIG_U_VALUE
-    : '\\U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     ;
 
 //byte_value       = octal_byte_value | hex_byte_value .
@@ -844,29 +805,76 @@ fragment HEX_BYTE_VALUE
     : '\\' 'x' HEX_DIGIT HEX_DIGIT
     ;
 
+//little_u_value   = `\` "u" hex_digit hex_digit hex_digit hex_digit .
+//                           hex_digit hex_digit hex_digit hex_digit .
+LITTLE_U_VALUE
+    : '\\u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+    ;
+
+//big_u_value      = `\` "U" hex_digit hex_digit hex_digit hex_digit
+BIG_U_VALUE
+    : '\\U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+    ;
+
 //escaped_char     = `\` ( "a" | "b" | "f" | "n" | "r" | "t" | "v" | `\` | "'" | `"` ) .
 fragment ESCAPED_CHAR
     : '\\' ( 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' | '\\' | '\'' | '"' )
     ;
 
 
-fragment LETTER : UNICODE_LETTER | '_'
+// String literals
+
+//string_lit             = raw_string_lit | interpreted_string_lit .
+STRING_LIT
+    : RAW_STRING_LIT
+    | INTERPRETED_STRING_LIT
     ;
 
-fragment DECIMAL_DIGIT : [0-9]
+//raw_string_lit         = "`" { unicode_char | newline } "`" .
+fragment RAW_STRING_LIT
+    : '`' ( UNICODE_CHAR | NEWLINE )* '`'
     ;
 
-fragment OCTAL_DIGIT   : [0-7]
+//interpreted_string_lit = `"` { unicode_value | byte_value } `"` .
+fragment INTERPRETED_STRING_LIT
+    : '"' ( UNICODE_VALUE | BYTE_VALUE )* '"'
     ;
 
-fragment HEX_DIGIT     : [0-9a-fA-F]
+
+//
+// Source code representation
+//
+
+//letter        = unicode_letter | "_" .
+fragment LETTER
+    : UNICODE_LETTER
+    | '_'
     ;
 
-fragment NEWLINE        : [\u000A] ; /* the Unicode code point U+000A */
-fragment UNICODE_CHAR   : ~[\u000A] ; /* an arbitrary Unicode code point except newline */
-//UNICODE_LETTER : ; /* a Unicode code point classified as "Letter" */ .
-//UNICODE_DIGIT  : ; /* a Unicode code point classified as "Number, decimal digit" */ .
+//decimal_digit = "0" … "9" .
+fragment DECIMAL_DIGIT
+    : [0-9]
+    ;
 
+//octal_digit   = "0" … "7" .
+fragment OCTAL_DIGIT
+    : [0-7]
+    ;
+
+//hex_digit     = "0" … "9" | "A" … "F" | "a" … "f" .
+fragment HEX_DIGIT
+    : [0-9a-fA-F]
+    ;
+
+//newline = /* the Unicode code point U+000A */ .
+fragment NEWLINE
+    : [\u000A]
+    ;
+
+//unicode_char = /* an arbitrary Unicode code point except newline */ .
+fragment UNICODE_CHAR   : ~[\u000A] ;
+
+//unicode_digit = /* a Unicode code point classified as "Number, decimal digit" */ .
 fragment UNICODE_DIGIT
  : [\u0030-\u0039]
  | [\u0660-\u0669]
@@ -890,6 +898,7 @@ fragment UNICODE_DIGIT
  | [\uFF10-\uFF19]
  ;
 
+//unicode_letter = /* a Unicode code point classified as "Letter" */ .
 fragment UNICODE_LETTER
  : [\u0041-\u005A]
  | [\u0061-\u007A]
