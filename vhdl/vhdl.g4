@@ -975,7 +975,7 @@ name_function_call_or_indexed_part
    ;
 
 name_slice_part
-   : LPAREN explicit_range ( COMMA explicit_range )* RPAREN
+   : ( LPAREN explicit_range ( COMMA explicit_range )* RPAREN )+
    ;
 
 selected_name
