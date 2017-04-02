@@ -45,12 +45,16 @@ lineeol
     ;
 
 declarations
-   : declaration (';' declaration)*
+   : declaration (';' declaration?)*
    ;
 
 //  multiple labels can occur on the same line
 declaration
-   : label+ (instruction | assignment | expression)*
+   : label+ declarationRight* | declarationRight+
+   ;
+
+declarationRight
+   : instruction | assignment | expression
    ;
 
 instruction
