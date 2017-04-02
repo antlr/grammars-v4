@@ -9,7 +9,7 @@
 	<modules>
 		<module>abnf</module>
 		<module>agc</module>
-		<module>antlr3</module>
+<!--		<module>antlr3</module>-->
 		<module>antlr4</module>
 		<module>apex</module>		
 		<module>arithmetic</module>
