@@ -1204,7 +1204,7 @@ range_decl
   ;
 
 explicit_range
-  : simple_expression direction simple_expression
+  : simple_expression ( direction simple_expression )?
   ;
 
 range_constraint
