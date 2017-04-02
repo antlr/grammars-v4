@@ -37,7 +37,7 @@ prog
    ;
 
 line
-   : declarations? comment?
+   : declarations comment? | comment
    ;
 
 lineeol
@@ -50,7 +50,7 @@ declarations
 
 //  multiple labels can occur on the same line
 declaration
-   : label* (instruction | assignment | expression)*
+   : label+ (instruction | assignment | expression)*
    ;
 
 instruction
