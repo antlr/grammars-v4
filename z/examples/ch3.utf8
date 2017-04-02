@@ -1,0 +1,465 @@
+\chapter{\Abs\ model:~security policy}\label{ch3}
+
+─ section ch3 parents fuzz_toolkit └ 
+
+A positive side-effect for being faithful to the
+original source is that we do not need to worry
+much about understanding the protocol. As it happens,
+we learned it by osmosis!
+
+\section{The abstract state}\label{ch3.abstractState}
+
+\begin{LSDef}[Abstract purse]
+─ AbPurse == [ balance , lost : ℕ ] └ ~\end{LSDef}
+
+\subsection{A theory for purse names}\label{ch3.pursenames}
+
+In the definition of the various structures that follows in Mondex,
+a unique purse $NAME$ often appears. Another situation that often appears
+is that sets involving names must be finite. Nevertheless, nothing about the
+structure of $NAME$ is given. Thus, such assumed finiteness properties
+cannot be proved (see $AuxWorld$ in Chapter~\ref{ch5}, $BetwFinState$ in Chapter~\ref{ch6},
+and many others throughout the PRG).
+\begin{LGSet}[Unique purse name]
+─ [ NAME ] └ ~\end{LGSet}
+For instance, one of those finiteness assumptions comes from expressions such as
+\begin{gzed}
+   PayDetails ~~\defs~~ [~ from, to: NAME; \cdots | from \neq to ~]
+   \\
+   name: NAME \shows \{~ pd: PayDetails | pd.from = name ~\} \in \finset~PayDetails
+\end{gzed}
+Because this set comprehension expression represents a set of bindings, even
+if the $from$ purse is fixed to a $name$, we could have an infinite number of
+$to$ purses this $from$ purse is associated with. Therefore, we must introduce
+further structuring for the unique purse names in order for the hidden finiteness
+assumptions used throughout the PRG to hold. Luckily, they are fairly obvious and
+abstract. We call it $NAMES$ and it could be defined as
+\begin{gzed}
+   NAMES \in \finset~NAME
+\end{gzed}
+Nevertheless, names are mostly use for characterising payment details between two
+distinct (unique) purses. In fact, in Section~\ref{ch10.retrieve-value-mig-quant},
+the existentially quantified equivalence of the retrieve relation partition is
+provable only if there exists at least two different names.
+
+Taking this into account, let us define at least two different known names.
+This is also useful in order to prove the definition of $NAMES$ is consistent.
+\begin{LNewADef}[Existence of distinct names]
+╷ name1 , name2 : NAME |
+ ¬ name1 = name2 └ ~\end{LNewADef}
+Next, we ensure that the definition of $NAMES$ we are about to introduce is
+consistent.
+\begin{LConsistency}[$NAMES$ definition existential consistency]
+\begin{zeves-theorem}{tNamesExistentialConsistency}
+    \exists NAMES: \finset_1~NAME @ \exists n1, n2: NAMES @ \lnot  n1 = n2
+\end{theorem}~\end{LConsistency}
+\begin{LConsistency}[$NAMES$ definition universal consistency]
+\begin{zeves-theorem}{tNamesUniversalConsistency}
+    \exists NAMES: \finset_1~NAME @ \forall n1: NAMES @ \exists n2: NAMES @ \lnot  n1 = n2
+\end{theorem}~\end{LConsistency}
+After proving those two theorems, we can then safely axiomatically define $NAMES$.
+\begin{LNewADef}[Properties of unique purse names]
+╷ NAMES : 𝔽↘1↖ NAME |
+ ∃ n1 , n2 : NAMES ⦁ ¬ n1 = n2 
+∀ n1 : NAMES ⦁ ∃ n2 : NAMES ⦁ ¬ n1 = n2 └ ~\end{LNewADef}
+With this structure model of names, we represent the finiteness assumptions
+made throughout the PRG, as well as guarantee that payment transaction are
+total.
+
+\subsection*{Automation}
+
+\begin{LRRT}[Every structured name belongs to the original $NAME$]
+\begin{zeves-theorem}{rule rInNames}
+    n \in NAMES \implies n \in NAME
+\end{theorem}~\end{LRRT}
+
+\begin{LToolkit}[Finite set weakening]
+\begin{zeves-theorem}{rule rFiniteMember}[X]
+    A \in \finset~X \implies A \in \power~X
+\end{theorem}~\end{LToolkit}
+
+The next theorem is an obvious conclusion from the declaration of $NAMES$ using $\finset_1$.
+\begin{LNewLemma}[There exists at least one structured name]
+\begin{zeves-theorem}{lExistsName}
+    \exists name: NAMES @ true
+\end{theorem}~\end{LNewLemma}
+
+The next theorem is important to prove the finiteness (and existence)
+of $PayDetails$, as at least two different names are required. That is,
+we must have at least one distinct originator and receptor for any
+authentic payment transaction to take place.
+\begin{LNewLemma}[There exists two different names]
+\begin{zeves-theorem}{lExistsDifferentNames}
+    \exists n1, n2: NAMES @ \lnot n1 = n2
+\end{theorem}~\end{LNewLemma}
+Thus, structured names make payment transactions total, hence
+always allows a payment to take place. Similarly, we sometimes know
+one of the names and only assert the existence of the next one.
+
+\begin{LNewLemma}[Given a name, there exists another distinct name]
+\begin{zeves-theorem}{lExistsDifferentNameFromGivenName}
+    \forall n1: NAMES @ \exists n2: NAMES @ \lnot n1 = n2
+\end{theorem}~\end{LNewLemma}
+
+\subsection{Finite space of numbers}\label{ch3.NAT}
+
+Similarly, in order to make schemas finite as required,
+we must also add a finite space of numbers by defining a
+non-empty range over $\nat$, which is bounded by a $MAX\_NAT$
+value defined as
+\begin{LConsistency}[$NAT$ boundary consistency]
+\begin{zeves-theorem}{tNATBoundaryConsistency}
+   \exists MAX\_NAT: \nat @ true
+\end{theorem}~\end{LConsistency}
+\begin{LConsistency}[$NAT$ definition consistency]
+\begin{zeves-theorem}{tNATDefinitionConsistency}
+   \exists NAT: \power~(0 \upto MAX\_NAT) @ true
+\end{theorem}~\end{LConsistency}
+
+\begin{LNewADef}[Upper bound for $\nat$]
+╷ MAX_NAT : ℕ └ ~\end{LNewADef}
+\begin{LNewADef}[Bounded $\nat$]
+─ NAT == 0 .. MAX_NAT └ ~\end{LNewADef}
+
+\subsection*{Automation}
+
+Next, we add some trivial automation rules about these data types
+in order to improve automation levels.
+\begin{LGRT}[$MAX\_NAT$ maximal type]
+\begin{zeves-theorem}{grule gMaxNatMaxType}
+    MAX\_NAT \in  \num
+\end{theorem}~\end{LGRT}
+\begin{LGRT}[$MAX\_NAT$ type]
+\begin{zeves-theorem}{grule gMaxNatNatType}
+    MAX\_NAT \in  \nat
+\end{theorem}~\end{LGRT}
+\begin{LRRT}[$MAX\_NAT$ is a natural number (LHS)]
+\begin{zeves-theorem}{rule rMaxNatType}
+    MAX\_NAT \geq  0
+\end{theorem}~\end{LRRT}
+\begin{LRRT}[$MAX\_NAT$ is a natural number (RHS)]
+\begin{zeves-theorem}{rule rMaxNatType2}
+    0 \leq  MAX\_NAT
+\end{theorem}~\end{LRRT}
+This last rule is given just for the sake of
+pattern matching on different scenarios, hence
+making rules application smoother.
+
+After that, we do the same for $NAT$.
+\begin{LNewThm}[$NAT$ definition is consistent]
+\begin{zeves-theorem}{tNATConsistency}
+    \exists  n: NAT @ true
+\end{theorem}~\end{LNewThm}
+
+\begin{LRRT}[$NAT$ equivalence]
+\begin{zeves-theorem}{rule rInNAT}
+    x \in NAT \iff x \in \num \land x \geq 0 \land x \leq MAX\_NAT
+\end{theorem}~\end{LRRT}
+
+\subsection{Transfer details}\label{ch3.transferdetails}
+
+Now, with the definition of the finite elements, we redefine
+$TransferDetails$ to be finite. Note that because we leave
+$AbPurse$ components unbound (as $\nat$), no additional proof
+obligations when values are added to the $balance$ or $lost$ fields
+are generated. We do not change $AbPurse$ to be bounded because
+there is no requirement that it should be finite.
+\begin{LSDef}[Purse transference details]
+┌ TransferDetails 
+from , to : NAMES 
+value : NAT └ ~\end{LSDef}
+
+\subsection*{Automation}
+
+\begin{LFRT}[$TransferDetails$ $value$ type]
+\begin{zeves-theorem}{frule fTransferDetailsValueType}
+    \forall TransferDetails @ value \in NAT
+\end{theorem}~\end{LFRT}
+
+\begin{LFRT}[$TransferDetails$ binding maximal type]
+\begin{zeves-theorem}{frule fTransferDetailsMemberMaxType}
+    x \in  TransferDetails \implies  x \in  \lblot from: NAME; to: NAME; value: \num \rblot
+\end{theorem}~\end{LFRT}
+
+\begin{LFRT}[$TransferDetails$ binding type]
+\begin{zeves-theorem}{frule fTransferDetailsMember}
+    x \in  TransferDetails \implies  x \in  \lblot from: NAME; to: NAME; value: \nat \rblot
+\end{theorem}~\end{LFRT}
+
+\begin{LFRT}[$TransferDetails$ binding bembership]
+\begin{zeves-theorem}{frule fTransferDetailsInSetMember}
+    x \in  \lblot from: NAMES; to: NAMES; value: NAT \rblot \implies  x \in  TransferDetails
+\end{theorem}~\end{LFRT}
+
+\subsection{Abstract world}
+
+\begin{LSDef}[Abstract world of purses]
+┌ AbWorld 
+abAuthPurse : NAMES ⇸ AbPurse |
+ abAuthPurse ∈ NAMES ⇻ AbPurse └ ~\end{LSDef}
+
+\section{Security properties}\label{ch3.security}
+
+\subsection{Authentic purses}
+
+This is the same as subsection $2.2.3$ (p.$12$) from PRG-$126$.
+\begin{LSDef}[Authentic purses]
+┌ Authentic 
+AbWorld 
+name? : NAMES |
+ name? ∈ dom abAuthPurse └ ~\end{LSDef}
+
+\subsection*{Automation}
+
+\begin{LFRT}[Authentic $name$ type]
+\begin{zeves-theorem}{frule fAuthenticNameType}
+  \forall  Authentic @ name? \in  \dom~abAuthPurse
+\end{theorem}~\end{LFRT}
+
+\subsection{Sufficient funds}
+
+This is the same as subsection $2.2.4$ (p.$12$) from PRG-$126$.
+\begin{LSDef}[Abstract purses have sufficient funds]
+┌ SufficientFundsProperty 
+AbWorld 
+TransferDetails ? |
+ Authentic [ from? / name? ] 
+value? ≤ ( abAuthPurse from? ) . balance └ ~\end{LSDef}
+
+\section{Secure operations}\label{ch3.secure.op}
+
+\subsection{Abstract inputs and outputs}
+
+\begin{LFType}[Abstract input]
+─ AIN ::= aNullIn | transfer ⟪ TransferDetails ⟫ └ ~\end{LFType}
+
+\begin{LFType}[Abstract output]
+─ AOUT ::= aNullOut └ ~\end{LFType}
+
+\begin{LSDef}[Abstract operation signature]
+┌ AbOp 
+ΔAbWorld 
+a? : AIN 
+a! : AOUT |
+ a! = aNullOut └ ~\end{LSDef}
+
+\subsection*{Automation}
+
+\begin{LGRT}[Abstract input transfer constructor $\pfun$ maximal type]
+\begin{zeves-theorem}{grule gAINTrasferPFunMaxType}
+    transfer \in  \lblot from: NAME; to: NAME; value: \num \rblot  \pfun  AIN
+\end{theorem}~\end{LGRT}
+
+\begin{LGRT}[Abstract input transfer constructor relational type]
+\begin{zeves-theorem}{grule gAINTrasferRelType}
+    transfer \in  \lblot from: NAME; to: NAME; value: \nat \rblot  \rel  AIN
+\end{theorem}~\end{LGRT}
+
+\begin{LGRT}[Abstract input transfer constructor partial function type]
+\begin{zeves-theorem}{grule gAINTrasferPFunType}
+    transfer \in  \lblot from: NAME; to: NAME; value: \nat \rblot  \pfun  AIN
+\end{theorem}~\end{LGRT}
+
+\begin{LGRT}[Abstract input transfer constructor partial injection type]
+\begin{zeves-theorem}{grule gAINTransferType}
+    transfer \in  \lblot from: NAME; to: NAME; value: \nat \rblot  \pinj  AIN
+\end{theorem}~\end{LGRT}
+
+\begin{LRRT}[Abstract input transfer constructor result type]
+\begin{zeves-theorem}{rule rAINTransferResult}
+    \forall  TransferDetails @ transfer \theta  TransferDetails \in  AIN
+\end{theorem}~\end{LRRT}
+
+\begin{LRRT}[Abstract input transfer constructor is a total function]
+\begin{zeves-theorem}{rule rAINTransferIsTotal}
+    \forall  TransferDetails @ \theta  TransferDetails \in  \dom~transfer
+\end{theorem}~\end{LRRT}
+
+\begin{LRRT}[Abstract input transfer constructor inverse type]
+\begin{zeves-theorem}{rule rAINTransferDomRanRel}
+    \forall  in: AIN | in \in  \ran~transfer @ in \in  \dom~(transfer~\inv)
+\end{theorem}~\end{LRRT}
+
+\subsection{Abstract ignore}
+
+\begin{LSDef}[Abstract ignore operation]
+┌ AbIgnore 
+AbOp |
+ abAuthPurse′ = abAuthPurse └ ~\end{LSDef}
+
+\subsection{Transfer}
+
+\begin{LSDef}[Abstract purse transference operation]
+─ AbPurseTransfer == AbPurse ⧹ ( balance , lost ) └ ~\end{LSDef}
+
+\begin{LSDef}[Abstract purse secure operations signature]
+┌ AbWorldSecureOp 
+AbOp 
+TransferDetails ? |
+ a? ∈ ran transfer 
+θ TransferDetails ? = ( transfer ∼ ) a? 
+{ from? , to? } ⩤ abAuthPurse′ = { from? , to? } ⩤ abAuthPurse └ ~\end{LSDef}
+
+\subsection*{Automation for Transfer okay TD domain check}
+
+
+\begin{LRRT}[Expanded abstract purse $balance$ type]
+\begin{zeves-theorem}{rule rAbPurseBalanceTypeOpen}
+    \forall  purse: NAMES \ffun AbPurse; name: NAMES | name \in \dom~purse @ \\
+        \t1 (purse~name).balance \in \nat
+\end{theorem}~\end{LRRT}
+
+\begin{LRRT}[Expanded abstract purse $lost$ type]
+\begin{zeves-theorem}{rule rAbPurseLostTypeOpen}
+   \forall purse: NAMES \ffun AbPurse; name: NAMES | \\
+      \t1 name \in \dom~purse @ (purse~name).lost \in \nat
+\end{theorem}~\end{LRRT}
+
+\begin{LRRT}[Theta instantiation idiom for abstract purses]
+\begin{zeves-theorem}{rule rThetaPurseInstantiated}
+  \forall purse: NAMES \ffun AbPurse; name: NAMES | name \in  \dom~purse @ \\
+      \t1 \theta AbPurse[balance := (purse name).balance, \\
+            \t3 lost := (purse~name).lost] = purse~name
+\end{theorem}~\end{LRRT}
+
+\begin{LRRT}[Authentic $from?$ purse $TransferOkay$ mu equivalence]
+\begin{zeves-theorem}{rule lAbAuthPurseFromTransferOkayMuEquivalence}
+    \forall  AbWorldSecureOp | Authentic[from?/name?] \land  SufficientFundsProperty \\
+        \t1 \land from? \neq to? @ \\
+        \t1\ (~\mu \Delta AbPurse | \\
+            \t2 \theta  AbPurse = abAuthPurse~from? \land  \\
+            \t2 balance' = balance - value? \land  \\
+            \t2 lost' = lost \land  \\
+            \t2 \Xi AbPurseTransfer @ \theta  AbPurse'~) = \\
+        \t1 \theta AbPurse'[balance' := (abAuthPurse~from?).balance - value?, \\
+            \t2 lost' := (abAuthPurse~from?).lost]
+\end{theorem}~\end{LRRT}
+
+\begin{LRRT}[Authentic $to?$ purse $TransferOkay$ mu equivalence]
+\begin{zeves-theorem}{rule lAbAuthPurseToTransferOkayMuEquivalence}
+    \forall  AbWorldSecureOp | Authentic[to?/name?] \land SufficientFundsProperty \\
+        \t1 \land from? \neq  to? @ \\
+        \t1\ (~\mu  \Delta AbPurse | \\
+            \t2 \theta  AbPurse = abAuthPurse~to? \land \\
+            \t2 balance' = balance + value? \land  \\
+            \t2 lost' = lost \land  \\
+            \t2 \Xi AbPurseTransfer @ \theta  AbPurse'~) = \\
+        \t1 \theta AbPurse'[balance' := (abAuthPurse~to?).balance + value?, \\
+            \t2 lost' := (abAuthPurse~to?).lost]
+\end{theorem}~\end{LRRT}
+
+\begin{LRRT}[Authentic $from?$ purse $TransferLost$ mu equivalence]
+\begin{zeves-theorem}{rule lAbAuthPurseFromTransferLostMuEquivalence}
+    \forall  AbWorldSecureOp | Authentic[from?/name?] \land  SufficientFundsProperty \\
+        \t1 \land from? \neq  to? @ \\
+        \t1\ (~\mu  \Delta AbPurse | \\
+            \t2 \theta AbPurse = abAuthPurse~from? \\
+            \t2 \land balance' = balance - value? \\
+            \t2 \land lost' = lost + value? \\
+            \t2 \land \Xi AbPurseTransfer @ \theta AbPurse'~) = \\
+        \t1 \theta AbPurse'[balance' := (abAuthPurse~from?).balance - value?, \\
+            \t2 lost' := (abAuthPurse~from?).lost + value?]
+\end{theorem}~\end{LRRT}
+
+
+
+\subsubsection{Transfer okay TD}
+
+The component $abAuhPurse$ is never directly initialised (as far as we could see).
+Nevertheless, the retrieve relation from Chapter~\ref{ch10} establishes that
+\begin{gzed}
+ \dom~abAuthPurse = \dom~conAuthPurse
+\end{gzed}
+and in Chapter~\ref{ch6}, the range of $conAuthPurse$, but nothing is said about
+its domain. In these circumstances, as $AbWorldSecureOp$ allows, some operation could
+certainly remove $from?$ purse from the domain of $abAuthPurse'$, hence we need the
+$\Delta Authentic$ below.
+
+\begin{LSDef}[Successful secure transfer operation on abstract purses]
+┌ AbTransferOkayTD 
+AbWorldSecureOp |
+ ΔAuthentic [ from? / name? , from? / name?′ ] 
+ΔAuthentic [ to? / name? , to? / name?′ ] 
+SufficientFundsProperty 
+from? ≠ to? 
+abAuthPurse′ from? = ( μ ΔAbPurse | θ AbPurse = abAuthPurse from? ∧ balance′ = balance − value? ∧ lost′ = lost ∧ ΞAbPurseTransfer ⦁ θ AbPurse ′ ) 
+abAuthPurse′ to? = ( μ ΔAbPurse | θ AbPurse = abAuthPurse to? ∧ balance′ = balance + value? ∧ lost′ = lost ∧ ΞAbPurseTransfer ⦁ θ AbPurse ′ ) └ ~\end{LSDef}
+
+\begin{LSDef}[Successful secure transfer operation with hidden details]
+─ AbTransferOkay == AbTransferOkayTD ⧹ ( to? , from? , value? ) └ ~\end{LSDef}
+
+\subsubsection{Transfer lost TD}
+
+We need the $\Delta Authentic$ here for $abAuthPurse' to?$,
+because although no changes take place, it assumes $to?$ belongs
+to the domain of $abAuthPurse'$.
+\begin{LSDef}[Lost secure transfer operation on abstract purses]
+┌ AbTransferLostTD 
+AbWorldSecureOp |
+ ΔAuthentic [ from? / name? , from? / name?′ ] 
+ΔAuthentic [ to? / name? , to? / name?′ ] 
+SufficientFundsProperty 
+from? ≠ to? 
+abAuthPurse′ from? ∈ { ΔAbPurse | θ AbPurse = abAuthPurse from? ∧ balance′ = balance − value? ∧ lost′ = lost + value? ∧ ΞAbPurseTransfer ⦁ θ AbPurse ′ } 
+abAuthPurse′ to? = abAuthPurse to? └ ~\end{LSDef}
+
+\begin{LSDef}[Lost secure transfer operation with hidden details]
+─ AbTransferLost == AbTransferLostTD ⧹ ( to? , from? , value? ) └ ~\end{LSDef}
+
+\subsubsection{Full transfer}
+
+\begin{LSDef}[Total transfer operation for abstract purses]
+─ AbTransfer == AbTransferOkay ∨ AbTransferLost ∨ AbIgnore └ ~\end{LSDef}
+
+\section{Abstract initial state}
+
+\begin{LSDef}[Abstract world initialisation state]
+─ AbInitState == AbWorld ′ └ ~\end{LSDef}
+
+\begin{LSDef}[Abstract and global initialisation input relationship]
+─ AbInitIn == [ a? , g? : AIN | a? = g? ] └ ~\end{LSDef}
+
+\section{Abstract instantiation}
+
+Changed to use renaming to avoid duplicating the
+factoring of partial finiteness of the $abAuthPurse$
+function.
+\begin{LSDef}[Global world of purses]
+─ GlobalWorld == AbWorld [ gAuthPurse / abAuthPurse ] └ ~\end{LSDef}
+
+\begin{LSDef}[Abstract finalisation state]
+┌ AbFinState 
+AbWorld 
+GlobalWorld |
+ gAuthPurse = abAuthPurse └ ~\end{LSDef}
+
+\begin{LSDef}[Abstract and global finalisation output relationship]
+─ AbFinOut == [ a! , g! : AOUT | a! = g! ] └ ~\end{LSDef}
+
+
+\section{Summary}\label{ch3.summary}
+
+We have substituted $NAME$ for $NAMES$ and $\nat$ for $NAT$ at various places
+for the forementioned reasons. In here we provide the list where those changes
+in declarations took place:
+\begin{itemize}
+   \item Chapter~3: $TransferDetails$, $AbWorld$, $Authentic$
+   \item Chapter~4: $CounterPartyDetails$, $PayDetails$, $MESSAGE$, $ConPurse$
+   \item Chapter~5: $Logbook$, $AuxWorld$, $PhiBOp$, $Ignore$, $AuthoriseExLogClearOkay$, $Archive$
+   \item Chapter~6: $BetwInitIn$
+   \item Chapter~7: $PhiCOp$, $CIgnore$, $CArchive$
+   \item Chapter~8: $BetweenOpSig$, $ConOpSig$
+\end{itemize}
+Obviously, the theorems involved in these definitions are somewhat affected, but we
+tried to keep to the minimum possible. Moreover, because of the limit on the maximal
+values, we need added preconditions for the concrete world operations, precisely:
+\begin{itemize}
+   \item Chapter~4: $StartFromPurseEafromOkay$, $StartToPurseEafromOkay$.
+   \item Chapter~8: corresponding (4) theorems for the added change in Chapter~4.
+\end{itemize}
+Maybe $AbWorld.abAuthPurse$ do no need $NAMES$.
+$ConWorld.conAuthPurse$, $PhiBOp.names?$, $Ignore.names?$, $AuthoriseExLogClearOkay.names?$
+need $NAMES$ due to the relationship with $Logbook$ and the $archive$.
+
+\ldefsummary \lthmsummary \lthmaddeddefsummary \lthmaddedthmsummary \lzevessummary 
+

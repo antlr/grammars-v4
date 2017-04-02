@@ -1,0 +1,82 @@
+─ section posix parents standard_toolkit └ 
+
+The abstract specification is a simple function from file
+identifiers to a sequence of bytes.  Initialisation sets this
+function to the empty set.
+
+For animation purposes, we set BYTE and FID to small integer ranges.
+
+─ BYTE == 0 .. 3 └ ─ FID == 100 .. 102 └ ─ FILE == seq BYTE └ ─ FSTORE == FID ⇸ FILE └ ─ FS == [ fs : FSTORE ] └ ─ InitFS == [ FS ′ | fs′ = ∅ ] └ 
+
+
+Two system-wide operations modify the state by creating
+an empty file with a given file identifier, which overrides
+any previous files,
+
+┌ Create 
+ΔFS 
+fid? : FID |
+ fs′ = fs ⊕ { fid? ↦ ⟨ ⟩ } └ 
+
+or by removing from the file store a known file identifier
+(which implicitly requirews the file store to be non-empty.
+
+┌ Destroy 
+ΔFS 
+fid? : FID |
+ fid? ∈ dom fs ∧ fs′ = { fid? } ⩤ fs └ 
+
+
+Two local operations are promoted into the file strore
+stating how an old file from a known file identifier is
+modified and updated.  The following schema includes
+a copy of the global and local states, ensuring that the
+file store is only modified at the given file identifier.
+
+┌ XFS 
+ΔFS 
+f , f′ : FILE 
+fid? : FID 
+offs? : ℕ |
+ fid? ∈ dom fs 
+f = fs fid? 
+fs′ = fs ⊕ { fid? ↦ f′ } └ 
+
+
+
+Auxiliary functions:
+The zero function returns a FILE of size n with zero bytes.
+
+╷ zero : ℕ → FILE |
+ ∀ n : ℕ ⦁ zero n = ( λ i : 1 .. n ⦁ 0 ) └ 
+
+
+
+After returns the subfile after the given offset.
+Shift returns a shifted file by the given offset.
+
+─ function 42 leftassoc ( _ shift _ ) └ 
+─ function 42 leftassoc ( _ after _ ) └ 
+
+
+─ _ shift _ == ( λ f : FILE ; offs : ℕ ⦁ ( 1 .. offs ) ⩤ ( zero offs ⁀ f ) ) └ ─ _ after _ == ( λ f : FILE ; offs : ℕ ⦁ ( offs + 1 .. # f ) ↿ f ) └ 
+
+
+To read from a file, nothing changes and the resulting
+file is extracted from the given offset up to the required
+length, where the after operator returns the offset subfile
+for f.
+
+┌ Read 
+XFS 
+len? : ℕ 
+result! : FILE |
+ f′ = f 
+result! = ( 1 .. len? ) ◁ ( f after offs? ) └ 
+
+┌ Write 
+XFS 
+file? : FILE |
+ f′ = ( zero offs? ⊕ f ) ⊕ ( file? shift offs? ) └ 
+
+
