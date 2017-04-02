@@ -33,16 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar pdp7;
 
 prog
-   : lineeol+ line? EOF
+   : (line? eol)+ line? EOF
    ;
 
 line
    : declarations comment? | comment
    ;
-
-lineeol
-    : line eol
-    ;
 
 declarations
    : declaration (';' declaration?)*
