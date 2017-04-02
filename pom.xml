@@ -41,7 +41,7 @@
 		<module>fusion-tables</module>
 		<module>gff3</module>
 		<module>gml</module>
-		<module>golang</module>
+<!--		<module>golang</module>-->
 		<module>graphql</module>
 		<module>graphstream-dgs</module>
 		<module>html</module>
@@ -69,7 +69,7 @@
 		<module>mumps</module>
 		<module>mysql</module>
 		<!-- <module>objc</module> -->
-		<module>oncrpc</module>
+	<!--	<module>oncrpc</module>-->
 		<module>pascal</module>
 		<module>pcre</module>
 		<module>pddl</module>
@@ -123,8 +123,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.5.3</antlr.version>
-		<antlr4test-maven-plugin.version>1.6</antlr4test-maven-plugin.version>
+		<antlr.version>4.7</antlr.version>
+		<antlr4test-maven-plugin.version>1.8</antlr4test-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
