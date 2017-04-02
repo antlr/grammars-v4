@@ -125,11 +125,11 @@ general_error
    ;
 
 client_error_message
-   : 'CLIENT_ERROR' . +
+   : 'CLIENT_ERROR' .+?
    ;
 
 server_error_message
-   : 'SERVER_ERROR' . +
+   : 'SERVER_ERROR' .+?
    ;
 
 end
