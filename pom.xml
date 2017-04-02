@@ -119,6 +119,7 @@
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>
+		<module>z</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
