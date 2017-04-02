@@ -81,6 +81,7 @@
 		<module>postalcode</module>
 		<module>propcalc</module>
 		<module>protobuf3</module>
+		<module>properties</module>
 		<module>python3</module>
 		<module>r</module>
 		<module>rcs</module>
