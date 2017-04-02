@@ -232,6 +232,12 @@ GO
 -- GRANT EXECUTE ON XML SCHEMA COLLECTION::Sales.Invoices4 TO Wanida;
 -- GO
 
+--Test if the security_statement can accept Public as target
+--Also tests if it can accepts multiple targets
+--ref: https://msdn.microsoft.com/en-us/library/ms187965.aspx
+GRANT EXECUTE ON [dbo].[closeLead] to Public,XYZPublic
+
+
 
 --Test empty statements
 ;;;
