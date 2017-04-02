@@ -41,7 +41,7 @@
 		<module>fusion-tables</module>
 		<module>gff3</module>
 		<module>gml</module>
-<!--		<module>golang</module>-->
+		<module>golang</module>
 		<module>graphql</module>
 		<module>graphstream-dgs</module>
 		<module>html</module>
@@ -69,7 +69,7 @@
 		<module>mumps</module>
 		<module>mysql</module>
 		<!-- <module>objc</module> -->
-	<!--	<module>oncrpc</module>-->
+		<module>oncrpc</module>
 		<module>pascal</module>
 		<module>pcre</module>
 		<module>pddl</module>
@@ -120,6 +120,7 @@
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>
+		<module>z</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
