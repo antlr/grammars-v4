@@ -29,7 +29,7 @@
  * Converted from Apple's doc, http://tinyurl.com/n8rkoue, to ANTLR's
  * meta-language.
  */
-grammar Swift; // 2.2
+grammar Swift2; // 2.2
 
 top_level : statement* EOF ;
 

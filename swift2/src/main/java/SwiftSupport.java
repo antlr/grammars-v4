@@ -39,20 +39,20 @@ public class SwiftSupport {
 	public static final BitSet rightWS = new BitSet(255);
 
 	static {
-		operatorHead.set(SwiftParser.BANG);
-		operatorHead.set(SwiftParser.LT);
-		operatorHead.set(SwiftParser.GT);
-		operatorHead.set(SwiftParser.AND);
-		operatorHead.set(SwiftParser.OR);
-		operatorHead.set(SwiftParser.SUB);
-		operatorHead.set(SwiftParser.ADD);
-		operatorHead.set(SwiftParser.MUL);
-		operatorHead.set(SwiftParser.DIV);
-		operatorHead.set(SwiftParser.MOD);
-		operatorHead.set(SwiftParser.EQUAL);
-		operatorHead.set(SwiftParser.CARET);
-		operatorHead.set(SwiftParser.TILDE);
-		operatorHead.set(SwiftParser.QUESTION);
+		operatorHead.set(Swift2Parser.BANG);
+		operatorHead.set(Swift2Parser.LT);
+		operatorHead.set(Swift2Parser.GT);
+		operatorHead.set(Swift2Parser.AND);
+		operatorHead.set(Swift2Parser.OR);
+		operatorHead.set(Swift2Parser.SUB);
+		operatorHead.set(Swift2Parser.ADD);
+		operatorHead.set(Swift2Parser.MUL);
+		operatorHead.set(Swift2Parser.DIV);
+		operatorHead.set(Swift2Parser.MOD);
+		operatorHead.set(Swift2Parser.EQUAL);
+		operatorHead.set(Swift2Parser.CARET);
+		operatorHead.set(Swift2Parser.TILDE);
+		operatorHead.set(Swift2Parser.QUESTION);
 		operatorHead.set(0xA1,0xA7+1);
 		operatorHead.set(0xA9,0xAB+1);
 		operatorHead.set(0xAC,0xAE+1);
@@ -74,23 +74,23 @@ public class SwiftSupport {
 		operatorHead.set(0x3001,0x3003+1);
 		operatorHead.set(0x3008,0x3030+1);
 
-		leftWS.set(SwiftParser.WS);
-		leftWS.set(SwiftParser.LPAREN);
-		leftWS.set(SwiftParser.LBRACK);
-		leftWS.set(SwiftParser.LCURLY);
-		leftWS.set(SwiftParser.COMMA);
-		leftWS.set(SwiftParser.COLON);
-		leftWS.set(SwiftParser.SEMI);
+		leftWS.set(Swift2Parser.WS);
+		leftWS.set(Swift2Parser.LPAREN);
+		leftWS.set(Swift2Parser.LBRACK);
+		leftWS.set(Swift2Parser.LCURLY);
+		leftWS.set(Swift2Parser.COMMA);
+		leftWS.set(Swift2Parser.COLON);
+		leftWS.set(Swift2Parser.SEMI);
 
-		rightWS.set(SwiftParser.WS);
-		rightWS.set(SwiftParser.RPAREN);
-		rightWS.set(SwiftParser.RBRACK);
-		rightWS.set(SwiftParser.RCURLY);
-		rightWS.set(SwiftParser.COMMA);
-		rightWS.set(SwiftParser.COLON);
-		rightWS.set(SwiftParser.SEMI);
-		rightWS.set(SwiftParser.Line_comment);
-		rightWS.set(SwiftParser.Block_comment);
+		rightWS.set(Swift2Parser.WS);
+		rightWS.set(Swift2Parser.RPAREN);
+		rightWS.set(Swift2Parser.RBRACK);
+		rightWS.set(Swift2Parser.RCURLY);
+		rightWS.set(Swift2Parser.COMMA);
+		rightWS.set(Swift2Parser.COLON);
+		rightWS.set(Swift2Parser.SEMI);
+		rightWS.set(Swift2Parser.Line_comment);
+		rightWS.set(Swift2Parser.Block_comment);
 	}
 
 	public static boolean isOperatorHead(int ttype) {
@@ -132,12 +132,12 @@ public class SwiftSupport {
 	public static int getLastOpTokenIndex(TokenStream tokens) {
 		int i = tokens.index(); // current on-channel lookahead token index
 		Token lt = tokens.get(i);
-		if ( lt.getType()==SwiftParser.DOT && tokens.get(i+1).getType()==SwiftParser.DOT ) {
+		if ( lt.getType()==Swift2Parser.DOT && tokens.get(i+1).getType()==Swift2Parser.DOT ) {
 			// dot-operator
 			i+=2; // point at token after ".."
 			lt = tokens.get(i);
 			while ( lt.getType()!=Token.EOF &&
-				    (lt.getType()==SwiftParser.DOT || isOperatorChar(lt.getType())) )
+				    (lt.getType()==Swift2Parser.DOT || isOperatorChar(lt.getType())) )
 			{
 				i++;
 				lt = tokens.get(i);
@@ -220,7 +220,7 @@ public class SwiftSupport {
 		boolean nextIsWS = isRightOperatorWS(nextToken);
 		boolean result =
 			!prevIsWS && nextIsWS ||
-			!prevIsWS && nextToken.getType()==SwiftParser.DOT;
+			!prevIsWS && nextToken.getType()==Swift2Parser.DOT;
 		String text = tokens.getText(Interval.of(start, stop));
 		//System.out.println("isPostfixOp: '"+prevToken+"','"+text+"','"+nextToken+"' is "+result);
 		return result;
