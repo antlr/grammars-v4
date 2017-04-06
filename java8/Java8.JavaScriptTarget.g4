@@ -54,9 +54,9 @@ Total lexer+parser time 30844ms.
 grammar Java8;
 
 @lexer::members {
-    let Character_toCodePoint = require('app/java_functions/Character_toCodePoint.js');
-    let Character_isJavaIdentifierStart = require('app/java_functions/Character_isJavaIdentifierStart.js');
-    let Character_isJavaIdentifierPart = require('app/java_functions/Character_isJavaIdentifierPart.js');
+    let Character_toCodePoint = require('App/java_functions/Character_toCodePoint.js');
+    let Character_isJavaIdentifierStart = require('App/java_functions/Character_isJavaIdentifierStart.js');
+    let Character_isJavaIdentifierPart = require('App/java_functions/Character_isJavaIdentifierPart.js');
 }
 
 
