@@ -1025,6 +1025,8 @@ function_call
     | SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
     | SYSTEM_USER
+	// https://msdn.microsoft.com/fr-fr/library/ms184325.aspx
+	| ISNULL '(' expression ',' expression ')'	
     ;
 
 switch_section
@@ -1547,6 +1549,7 @@ INSERT:                                I N S E R T;
 INTERSECT:                             I N T E R S E C T;
 INTO:                                  I N T O;
 IS:                                    I S;
+ISNULL:								   I S N U L L;
 JOIN:                                  J O I N;
 KEY:                                   K E Y;
 KILL:                                  K I L L;

@@ -448,3 +448,12 @@ SELECT BusinessEntityID, TerritoryID
                                              ROWS UNBOUNDED PRECEDING),1) AS CumulativeTotal
 FROM Sales.SalesPerson
 WHERE TerritoryID IS NULL OR TerritoryID < 5;
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Specifying the ISNULL function
+
+USE AdventureWorks2012;  
+GO  
+SELECT AVG(ISNULL(Weight, 50))  
+FROM Production.Product;  
+GO  
