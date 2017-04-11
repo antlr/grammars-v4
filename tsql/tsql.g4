@@ -1228,12 +1228,15 @@ ddl_object
     ;
 
 full_column_name
-    : (table_name '.')? id
+	: (
+		tableName=table_name '.' columnName=id
+	|	columnName=id
+	)
     ;
 
-column_name_list
-    : id (',' id)*
-    ;
+full_column_name_list
+	: full_column_name (',' full_column_name)*
+	;
 
 cursor_name
     : id
