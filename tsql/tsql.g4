@@ -1235,9 +1235,24 @@ table_source_item
     | function_call               as_table_alias?
     | LOCAL_ID                    as_table_alias?
     | LOCAL_ID '.' function_call (as_table_alias column_alias_list?)?
+	| open_xml
     | ':' ':' function_call       as_table_alias? // Build-in function (old syntax)
     ;
 
+//https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
+open_xml
+	: OPENXML '(' expression ',' expression (',' expression)? ')' 
+	(WITH '(' schema_declaration ')' )?
+	;
+
+schema_declaration
+	: column_declaration (',' column_declaration)*
+	;
+
+column_declaration
+	: ID data_type (STRING)?
+	;
+	
 change_table
     : CHANGETABLE '(' CHANGES table_name ',' (NULL | DECIMAL | LOCAL_ID) ')'
     ;
