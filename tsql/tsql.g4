@@ -1323,6 +1323,8 @@ function_call
     | MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
     | NULLIF '(' expression ',' expression ')'
+	// https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
+	| STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms177587.aspx
     | SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
@@ -2289,6 +2291,7 @@ STATUS:                                S T A T U S;
 STDEV:                                 S T D E V;
 STDEVP:                                S T D E V P;
 SUBJECT:                               S U B J E C T;
+STUFF:                                 S T U F F;
 SUM:                                   S U M;
 SYMMETRIC:                             S Y M M E T R I C;
 TAKE:                                  T A K E;

@@ -475,3 +475,8 @@ GO
 SELECT AVG(ISNULL(Weight, 50))
 FROM Production.Product;
 GO
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Specifying the STUFF function
+SELECT STUFF('abcdef', 2, 3, 'ijklmn');
+GO
