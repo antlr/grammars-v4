@@ -1670,6 +1670,7 @@ data_type
 
 default_value
     : NULL
+	| DEFAULT
     | constant
     ;
 
