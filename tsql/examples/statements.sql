@@ -240,6 +240,10 @@ GRANT EXECUTE ON [dbo].[closeLead] to Public,XYZPublic
 --Test empty statements
 ;;;
 
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Declare XML Schema (https://docs.microsoft.com/en-us/sql/relational-databases/xml/create-xml-data-type-variables-and-columns)
+DECLARE @x xml (Sales.StoreSurveySchemaCollection)
+
 -- Decrypts a symmetric key and makes it available for use
 OPEN SYMMETRIC KEY SomeKeyName DECRYPTION
 BY CERTIFICATE SomeCertificateName;
