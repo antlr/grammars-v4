@@ -544,6 +544,7 @@ opendatasource
 declare_statement
     : DECLARE LOCAL_ID AS? table_type_definition ';'?
     | DECLARE declare_local (',' declare_local)* ';'?
+	| DECLARE LOCAL_ID AS? xml_type_definition ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms181441(v=sql.120).aspx
@@ -657,6 +658,14 @@ declare_local
 table_type_definition
     : TABLE '(' column_def_table_constraints ')'
     ;
+	
+xml_type_definition
+	: XML '(' ( CONTENT | DOCUMENT )? xml_schema_collection ')'
+	;
+	
+xml_schema_collection
+	: ID '.' ID
+	;
 
 column_def_table_constraints
     : column_def_table_constraint (','? column_def_table_constraint)*
