@@ -1,0 +1,47 @@
+─ section ds parents standard_toolkit └ 
+
+This section specifies the data system (ds) of the filing system.
+
+─ BYTE == 0 .. 255 └ ─ ZERO == 0 └ ─ FILE == seq BYTE └ ─ DS == [ file : FILE ] └ ─ InitDS == [ DS ′ | file′ = ⟨ ⟩ ] └ 
+
+The $after$ operator returns the subfile that starts after a given offset.
+We write this as an explicit definition (==) rather than axiomatically,
+because it is clearer, avoids possible inconsistency, and is easier
+to evaluate.
+
+─ function 42 leftassoc ( _ after _ ) └ 
+\vskip -2ex
+─ _ after _ == ( λ f : FILE ; offset : ℕ ⦁ ( λ i : 1 .. ( # f − offset ) ⦁ f ( i + offset ) ) ) └ 
+
+The $readFile$ operation is defined similar to the one in Morgan and
+Sufrin's specification but we use the usual $\Xi$ notation for convenience
+here.
+
+┌ readFILE 
+ΞDS 
+offset? , length? : ℕ 
+data! : FILE |
+ data! = ( 1 .. length? ) ◁ ( file after offset? ) └ 
+
+The auxiliary function $zero$ returns a $FILE$ containing a given number
+of $ZERO$ bytes.
+The infix operator $shift$ takes a $FILE$ and an offset and shifts the
+content of the file by the offset.  Once again, we give an explicit
+rather than an axiomatic definition.
+
+─ zero == ( λ n : ℕ ⦁ ( λ k : 1 .. n ⦁ ZERO ) ) └ 
+─ function 42 leftassoc ( _ shift _ ) └ 
+\vskip -2ex
+─ _ shift _ == ( λ f : FILE ; offset : ℕ ⦁ ( 1 .. offset ) ⩤ ( zero offset ⁀ f ) ) └ 
+
+While the $readFILE$ operation does not change the file, the
+$writeFile$ operation given next changes the file.  It is defined
+similar to the $writeFile$ operation given in Morgan and Sufrin's
+specification but we use the usual $\Delta$ notation for convenience
+here.
+
+┌ writeFILE 
+ΔDS 
+offset? : ℕ 
+data? : FILE |
+ file′ = ( zero offset? ⊕ file ) ⊕ ( data? shift offset? ) └ 

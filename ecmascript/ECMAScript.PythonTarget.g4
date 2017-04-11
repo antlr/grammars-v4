@@ -295,21 +295,21 @@ iterationStatement
 ///     continue ;
 ///     continue [no LineTerminator here] Identifier ;
 continueStatement
- : Continue Identifier? eos
+ : Continue ({not self.here(ECMAScriptParser.LineTerminator)}? Identifier)? eos
  ;
 
 /// BreakStatement :
 ///     break ;
 ///     break [no LineTerminator here] Identifier ;
 breakStatement
- : Break Identifier? eos
+ : Break ({not self.here(ECMAScriptParser.LineTerminator)}? Identifier)? eos
  ;
 
 /// ReturnStatement :
 ///     return ;
 ///     return [no LineTerminator here] Expression ;
 returnStatement
- : Return expressionSequence? eos
+ : Return ({not self.here(ECMAScriptParser.LineTerminator)}? expressionSequence)? eos
  ;
 
 /// WithStatement :
@@ -359,7 +359,7 @@ labelledStatement
 /// ThrowStatement :
 ///     throw [no LineTerminator here] Expression ;
 throwStatement
- : Throw expressionSequence eos
+ : Throw {not self.here(ECMAScriptParser.LineTerminator)}? expressionSequence eos
  ;
 
 /// TryStatement :
@@ -635,8 +635,8 @@ singleExpression
  | singleExpression '&&' singleExpression                                 # LogicalAndExpression
  | singleExpression '||' singleExpression                                 # LogicalOrExpression
  | singleExpression '?' singleExpression ':' singleExpression             # TernaryExpression
- | singleExpression '=' expressionSequence                                # AssignmentExpression
- | singleExpression assignmentOperator expressionSequence                 # AssignmentOperatorExpression
+ | singleExpression '=' singleExpression                                  # AssignmentExpression
+ | singleExpression assignmentOperator singleExpression                   # AssignmentOperatorExpression
  | This                                                                   # ThisExpression
  | Identifier                                                             # IdentifierExpression
  | literal                                                                # LiteralExpression
@@ -738,11 +738,11 @@ futureReservedWord
  ;
 
 getter
- : {self._input.LT(1).getText() == "get"}? Identifier propertyName
+ : {self._input.LT(1).text == "get"}? Identifier propertyName
  ;
 
 setter
- : {self._input.LT(1).getText() == "set"}? Identifier propertyName
+ : {self._input.LT(1).text == "set"}? Identifier propertyName
  ;
 
 eos
@@ -1441,7 +1441,7 @@ fragment RegularExpressionFlags
 ///     RegularExpressionBackslashSequence
 ///     RegularExpressionClass
 fragment RegularExpressionFirstChar
- : ~[\r\n\u2028\u2029*\\/\[]
+ : ~[\r\n\u2028\u2029*\\/[]
  | RegularExpressionBackslashSequence
  | RegularExpressionClass
  ;
@@ -1451,7 +1451,7 @@ fragment RegularExpressionFirstChar
 ///     RegularExpressionBackslashSequence
 ///     RegularExpressionClass
 fragment RegularExpressionChar
- : ~[\r\n\u2028\u2029\\/\[]
+ : ~[\r\n\u2028\u2029\\/[]
  | RegularExpressionBackslashSequence
  | RegularExpressionClass
  ;
