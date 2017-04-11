@@ -584,3 +584,7 @@ GO
 SELECT TOP (1+@localvar) PERCENT *
 FROM Production.Product
 ORDER BY Name ASC;
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Using SELECT from build in function
+SELECT * FROM ::fn_helpcollations()
