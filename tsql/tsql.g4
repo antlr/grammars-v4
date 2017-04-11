@@ -1008,6 +1008,8 @@ bulk_option
 derived_table
     : subquery
     | '(' subquery ')'
+	| table_value_constructor
+	| '(' table_value_constructor ')'	
     ;
 
 function_call
