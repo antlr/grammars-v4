@@ -651,3 +651,13 @@ UNPIVOT
       (Emp1, Emp2, Emp3, Emp4, Emp5)
 )AS unpvt;
 GO
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Using table value constructor
+
+SELECT a, b FROM (VALUES (1, 2), (3, 4), (5, 6), (7, 8), (9, 10) ) AS MyTable(a, b);  
+GO  
+-- Used in an inner join to specify values to return.  
+SELECT ProductID, a.Name, Color  
+FROM Production.Product AS a  
+INNER JOIN (VALUES ('Blade'), ('Crown Race'), ('AWC Logo Cap')) AS b(Name)   
+ON a.Name = b.Name;  
