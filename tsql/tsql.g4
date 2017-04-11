@@ -1306,6 +1306,8 @@ function_call
     | SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
     | SYSTEM_USER
+    // https://msdn.microsoft.com/en-us/library/ms184325.aspx
+    | ISNULL '(' expression ',' expression ')'
     // https://docs.microsoft.com/en-us/sql/t-sql/xml/xml-data-type-methods
     | xml_data_type_methods
     ;
@@ -1936,6 +1938,7 @@ INSTEAD:                               I N S T E A D;
 INTERSECT:                             I N T E R S E C T;
 INTO:                                  I N T O;
 IS:                                    I S;
+ISNULL:								   I S N U L L;
 JOIN:                                  J O I N;
 KEY:                                   K E Y;
 KILL:                                  K I L L;
