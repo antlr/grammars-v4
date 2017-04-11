@@ -1537,16 +1537,12 @@ ddl_object
     | LOCAL_ID
     ;
 
-full_column_name
+full_column_name (
     : (table_name '.')? id
     ;
 
 column_name_list_with_order
     : id (ASC | DESC)? (',' id (ASC | DESC)?)*
-    ;
-
-column_name_list
-    : id (',' id)*
     ;
 
 cursor_name
