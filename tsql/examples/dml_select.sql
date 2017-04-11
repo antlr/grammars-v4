@@ -610,3 +610,7 @@ GO
 
 -- Select with full table name
 SELECT * FROM ServerName.DBName.do.TestTable TestTable
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Using SELECT from build in function
+SELECT * FROM ::fn_helpcollations()

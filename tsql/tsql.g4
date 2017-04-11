@@ -1235,7 +1235,7 @@ table_source_item
     | function_call               as_table_alias?
     | LOCAL_ID                    as_table_alias?
     | LOCAL_ID '.' function_call (as_table_alias column_alias_list?)?
-
+    | ':' ':' function_call       as_table_alias? // Build-in function (old syntax)
     ;
 
 change_table
