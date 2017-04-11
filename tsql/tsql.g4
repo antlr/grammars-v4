@@ -1251,8 +1251,18 @@ join_part
     | CROSS JOIN table_source
     | CROSS APPLY table_source
     | OUTER APPLY table_source
+    | PIVOT pivot_clause as_table_alias
+    | UNPIVOT unpivot_clause as_table_alias	
     ;
 
+pivot_clause
+	:	'(' aggregate_windowed_function FOR full_column_name IN column_alias_list ')'
+	;
+
+unpivot_clause
+	:	'(' expression FOR full_column_name IN '(' full_column_name_list ')' ')'
+	; 
+	
 table_name_with_hint
     : table_name with_table_hints?
     ;
