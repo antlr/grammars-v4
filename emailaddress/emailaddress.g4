@@ -44,24 +44,20 @@ routeaddr  :  '<' route* addrspec '>';
 
 route       :  '@' domain ':';          
 
-aaddrspec   :  localpart '@' domain       ;
+addrspec   :  localpart '@' domain       ;
 
 localpart  :  word *('.' word)  ;          
                                            
 
 domain      :  subdomain *('.' subdomain);
 
-subdomain :  domainref | domain-literal
+subdomain :  domainref | domainliteral
 
 domainref  : atom                       ;
 
 phrase      :  word+                      ;
 
 word        :  atom | quotedstring;
-
-
-
-    
 
 WS
    : [ \t\r\n] -> skip
