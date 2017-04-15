@@ -1,0 +1,14 @@
+DGS004
+null 0 0
+
+#
+# A first well-written line
+# 
+an A int:123 double:123.321 string:"a string" word:"aWord" array:{1,2,3} map:[a=1,b=2,c=3] color:#FF0000 big_sci:1.27E+07 small_sci:1.27E-07 neg_sci:-1.27E-07
+cn A aoa:{{1,2},{3},{4,5}}
+
+#
+# A second bad-written line but that has to be read
+#
+an B int=123   double: 123.321 string:"a string" word:"aWord" array:{ 1,  2,3  } map:[ a = 1, b=2, c=  3 ] color:#FF0000 big_sci: 1.27e7 small_sci: 1.27e-7 neg_sci: -1.27e-7
+cn B aoa:{{1,2},{3},{4,5}}

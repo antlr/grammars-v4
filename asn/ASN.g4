@@ -391,7 +391,7 @@ IDENTIFIER (DOT IDENTIFIER)? actualParameterList?
 ;
 
 
-constraint :L_PARAN constraintSpec  exceptionSpec R_PARAN
+constraint :L_PARAN constraintSpec  exceptionSpec? R_PARAN
 //L_PARAN value DOT_DOT value R_PARAN
 ;
 
@@ -485,7 +485,7 @@ namedType : IDENTIFIER   type
 ;
 enumeratedType : ENUMERATED_LITERAL L_BRACE enumerations R_BRACE
 ;
-enumerations :rootEnumeration (COMMA   ELLIPSIS exceptionSpec (COMMA   additionalEnumeration )?)?
+enumerations :rootEnumeration (COMMA   ELLIPSIS exceptionSpec? (COMMA   additionalEnumeration )?)?
 	;
 rootEnumeration : enumeration
 ;
@@ -509,7 +509,7 @@ actualParameterList : L_BRACE actualParameter (COMMA actualParameter)* R_BRACE
 ;
 actualParameter : type | value /*| valueSet | definedObjectClass | object | objectSet*/
 ;
-exceptionSpec : (EXCLAM  exceptionIdentification)?
+exceptionSpec : EXCLAM  exceptionIdentification
 ;
 exceptionIdentification : signedNumber
  |     definedValue
@@ -981,7 +981,7 @@ CSTRING
 
 fragment
 EscapeSequence
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|APOSTROPHE|'\\')
+    :   '\\' ('b'|'t'|'n'|'f'|'r'|'"'|APOSTROPHE|'\\')
     ;
 
 

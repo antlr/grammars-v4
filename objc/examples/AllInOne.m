@@ -180,12 +180,39 @@ typedef enum SRStatusCode : NSInteger {
     SRStatusCodeNormal = 1000,
 } SRStatusCode;
 
+@implementation MJSingleViewController
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    __unsafe_unretained typeof(self) weakSelf = self;
+    __unsafe_unretained __typeof(self) weakSelf = self;
+}
+@end
+
+@implementation SRDelegateController
+- (void)performDelegateBlock:(SRDelegateBlock)block
+{
+    // Source:https://github.com/facebook/SocketRocket/blob/master/SocketRocket/Internal/Delegate/SRDelegateController.m
+    __block __strong id<SRWebSocketDelegate> delegate = nil;
+    __block SRDelegateAvailableMethods availableMethods = {};
+    
+    // Source: https://github.com/facebook/SocketRocket/blob/master/Tests/SRAutobahnTests.m
+    IMP implementation = imp_implementationWithBlock(^(SRAutobahnTests *self) {
+        [self performTestWithCaseNumber:caseNumber identifier:identifier];
+    });
+}
+@end
+
 // MBProgressHUD
 // Source:  https://github.com/jdg/MBProgressHUD/blob/master/MBProgressHUD.m#L784
 // https://github.com/dzenbot/DZNEmptyDataSet/blob/master/Examples/WebBrowser/Pods/DZNWebViewController/Source/Classes/DZNWebViewController.m#L460
 @implementation MBBarProgressView
 - (id)init {
-	return [self initWithFrame:CGRectMake(.0f, .0f, 120.0f, 20.0f, 0ul)];
+    return [self initWithFrame:CGRectMake(.0f, .0f, 120.0f, 20.0f, 0ul)];
+}
+
+- (void)testGraceTime {
+    // https://github.com/jdg/MBProgressHUD/blob/master/Demo/HudTests/HudTests.m
+    XCTAssertEqualObjects(hud.superview, rootView, @"The hud should be added to the view."); \
 }
 @end
 
@@ -220,3 +247,14 @@ REGULAREXPRESSION(URLRegularExpression,@"((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]
 // Source: https://github.com/SVProgressHUD/SVProgressHUD/blob/master/SVProgressHUD/SVProgressHUD.m#L839
 #pragma mark - Master show/dismiss methods
 
+// Source: https://github.com/ReactiveCocoa/ReactiveCocoa/blob/7877f99bdfb4be1c82c4804082e99c35d0a93a91/ReactiveCocoa/Objective-C/RACEagerSequence.m#L17
+@implementation RACEagerSequence
++ (instancetype)return:(id)value {
+	return [[self sequenceWithArray:@[ value ] offset:0] setNameWithFormat:@"+return: %@", RACDescription(value)];
+}
+@end
+
+// Source: https://github.com/facebook/AsyncDisplayKit/blob/05dba2263cf86f7fce42f1918aa513385232f34c/AsyncDisplayKit/Details/ASWeakSet.m#L15
+@interface ASWeakSet<__covariant ObjectType> ()
+@property (nonatomic, strong, readonly) NSMapTable<ObjectType, NSNull *> *mapTable;
+@end

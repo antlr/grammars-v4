@@ -1,0 +1,81 @@
+─ section fs parents ns └ 
+
+┌ FS 
+SS 
+CS 
+NS 
+usedfids : ℙ FID |
+ usedfids = ran nstore ∪ { fid : FID | ( ∃ posn : ℕ ⦁ θ CHAN ∈ ran cstore ) } 
+usedfids ⊆ dom fstore └ 
+
+┌ InitFS 
+InitSS 
+InitCS 
+InitNS 
+usedfids′ : ℙ FID |
+ usedfids′ = ∅ └ 
+
+┌ createFS0 
+ΔFS 
+createSS 
+openCS 
+createNS |
+ name? ∈ dom nstore ⇒ fid = nstore ( name? ) 
+name? ∉ dom nstore ⇒ fid ∉ usedfids └ 
+
+┌ direncode 
+ΔFS 
+ΞCS 
+ΞNS 
+dirstored ′ |
+ ∃ dfids : ℙ FID ⦁ dfids = nstore ⦇ dnames ⦈ ∧ dfids ⩤ fstore′ = dfids ⩤ fstore └ 
+
+─ createFS == createFS0 ⨟ direncode └ 
+
+┌ openFS 
+ΔFS 
+ΞSS 
+openCS 
+lookupNS |
+ fid = fid′ └ 
+
+┌ readFS 
+ΔFS 
+ReadAS 
+ΞNS └ 
+
+┌ writeFS 
+ΔFS 
+WriteAS 
+ΞNS └ 
+
+┌ closeFS 
+ΔFS 
+ΞSS 
+closeCS 
+ΞNS └ 
+
+┌ unlinkFS0 
+ΔFS 
+ΞSS 
+ΞCS 
+destroyNS └ 
+
+┌ destroyFS 
+ΔFS 
+destroySS 
+ΞCS 
+ΞNS └ 
+
+┌ linkNS 
+ΔNS 
+oldname? , newname? : NAME |
+ oldname? ∈ dom nstore 
+nstore′ = nstore ⊕ { newname? ↦ nstore ( oldname? ) } └ 
+
+┌ moveNS 
+ΔNS 
+oldname? , newname? : NAME |
+ oldname? ∈ dom nstore 
+nstore′ = ( { oldname? } ⩤ nstore ) ⊕ { newname? ↦ nstore ( oldname? ) } └ 
+

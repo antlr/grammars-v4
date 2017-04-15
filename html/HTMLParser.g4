@@ -30,7 +30,7 @@ parser grammar HTMLParser;
 
 options { tokenVocab=HTMLLexer; }
 
-htmlDocument    
+htmlDocument
     : (scriptlet | SEA_WS)* xml? (scriptlet | SEA_WS)* dtd? (scriptlet | SEA_WS)* htmlElements*
     ;
 
@@ -38,7 +38,7 @@ htmlElements
     : htmlMisc* htmlElement htmlMisc*
     ;
 
-htmlElement     
+htmlElement
     : TAG_OPEN htmlTagName htmlAttribute* TAG_CLOSE htmlContent TAG_OPEN TAG_SLASH htmlTagName TAG_CLOSE
     | TAG_OPEN htmlTagName htmlAttribute* TAG_SLASH_CLOSE
     | TAG_OPEN htmlTagName htmlAttribute* TAG_CLOSE
@@ -47,11 +47,11 @@ htmlElement
     | style
     ;
 
-htmlContent     
+htmlContent
     : htmlChardata? ((htmlElement | xhtmlCDATA | htmlComment) htmlChardata?)*
     ;
 
-htmlAttribute   
+htmlAttribute
     : htmlAttributeName TAG_EQUALS htmlAttributeValue
     | htmlAttributeName
     ;
@@ -68,13 +68,13 @@ htmlTagName
     : TAG_NAME
     ;
 
-htmlChardata    
-    : HTML_TEXT 
+htmlChardata
+    : HTML_TEXT
     | SEA_WS
     ;
 
-htmlMisc        
-    : htmlComment 
+htmlMisc
+    : htmlComment
     | SEA_WS
     ;
 

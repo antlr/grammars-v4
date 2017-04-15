@@ -46,6 +46,10 @@ sql_clause
 
     | cfl_statement
 
+    | dbcc_clause
+    
+    | empty_statement
+
     | another_statement
     ;
 
@@ -59,10 +63,11 @@ dml_clause
 
 // Data Definition Language: https://msdn.microsoft.com/en-us/library/ff848799.aspx)
 ddl_clause
-    : //create_function
+    :
     create_database
     | create_index
-    | create_procedure
+    | create_or_alter_procedure
+    | create_or_alter_function
     | create_statistics
     | create_table
     | create_type
@@ -73,6 +78,7 @@ ddl_clause
 
     | drop_index
     | drop_procedure
+    | drop_function
     | drop_statistics
     | drop_table
 	| drop_type
@@ -111,6 +117,10 @@ cfl_statement
     // https://msdn.microsoft.com/en-us/library/ms178592.aspx
     | RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' severity=constant_LOCAL_ID ','
         state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' ';'?                   #raiseerror_statement
+    ;
+
+empty_statement
+    : ';'
     ;
 
 another_statement
@@ -217,12 +227,48 @@ create_index
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
-create_procedure
-    : CREATE proc=(PROC | PROCEDURE) func_proc_name (';' DECIMAL)?
+create_or_alter_procedure
+    : (CREATE | ALTER) proc=(PROC | PROCEDURE) func_proc_name (';' DECIMAL)?
       ('('? procedure_param (',' procedure_param)* ')'?)?
       (WITH procedure_option (',' procedure_option)*)?
       (FOR REPLICATION)? AS sql_clauses
     ;
+    
+//https://msdn.microsoft.com/en-us/library/ms186755.aspx
+create_or_alter_function
+    : (CREATE | ALTER) FUNCTION func_proc_name
+        (('(' procedure_param (',' procedure_param)* ')') | '(' ')') //must have (), but can be empty
+        (func_body_returns_select | func_body_returns_table | func_body_returns_scalar) ';'?
+
+    ;
+
+func_body_returns_select
+	:RETURNS TABLE
+	(WITH function_option (',' function_option)*)?
+	AS?
+	RETURN select_statement 
+	;
+
+func_body_returns_table
+	: RETURNS LOCAL_ID table_type_definition
+        (WITH function_option (',' function_option)*)?
+        AS?
+        BEGIN
+           sql_clause*
+           RETURN
+        END 
+	;
+
+
+func_body_returns_scalar
+	:RETURNS data_type
+       (WITH function_option (',' function_option)*)?
+       AS?
+       BEGIN
+           sql_clause*
+           RETURN ret=expression ';'?
+       END 
+       ;
 
 procedure_param
     : LOCAL_ID (id '.')? AS? data_type VARYING? ('=' default_val=default_value)? (OUT | OUTPUT | READONLY)?
@@ -231,6 +277,12 @@ procedure_param
 procedure_option
     : ENCRYPTION
     | RECOMPILE
+    | execute_clause
+    ;
+
+function_option
+    : RETURNS NULL ON NULL INPUT
+    | CALLED ON NULL INPUT
     | execute_clause
     ;
 
@@ -438,7 +490,12 @@ drop_index
 
 // https://msdn.microsoft.com/en-us/library/ms174969.aspx
 drop_procedure
-    : DROP PROCEDURE (IF EXISTS)? func_proc_name ';'?
+    : DROP proc=(PROC | PROCEDURE) (IF EXISTS)? func_proc_name (',' func_proc_name)* ';'?
+    ;
+
+//https://msdn.microsoft.com/en-us/library/ms190290.aspx
+drop_function
+    : DROP FUNCTION (IF EXISTS)? func_proc_name (',' func_proc_name)* ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms175075.aspx
@@ -522,7 +579,7 @@ security_statement
     // https://msdn.microsoft.com/en-us/library/ms188354.aspx
     : execute_clause ';'?
     // https://msdn.microsoft.com/en-us/library/ms187965.aspx
-    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO (to_principal=id) (WITH GRANT OPTION)? (AS as_principal=id)? ';'?
+    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO (to_principal+=id) (',' to_principal+=id)* (WITH GRANT OPTION)? (AS as_principal=id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
     ;
@@ -578,6 +635,14 @@ go_statement
 // https://msdn.microsoft.com/en-us/library/ms188366.aspx
 use_statement
     : USE database=id ';'?
+    ;
+
+dbcc_clause
+    : DBCC name=simple_id ('(' expression_list ')')? (WITH dbcc_options)? ';'?
+    ;
+
+dbcc_options
+    :  simple_id (',' simple_id)?
     ;
 
 execute_clause
@@ -756,7 +821,6 @@ predicate
     | expression NOT? LIKE expression (ESCAPE expression)?
     | expression IS null_notnull
     | '(' search_condition ')'
-	| DECIMAL
     ;
 
 query_expression
@@ -764,12 +828,12 @@ query_expression
     ;
 
 union
-    : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')')+)
+    : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms176104.aspx
 query_specification
-    : SELECT (ALL | DISTINCT)? (TOP expression PERCENT? (WITH TIES)?)?
+    : SELECT (ALL | DISTINCT)? top_clause?
       select_list
       // https://msdn.microsoft.com/en-us/library/ms188029.aspx
       (INTO table_name)?
@@ -778,6 +842,21 @@ query_specification
       // https://msdn.microsoft.com/en-us/library/ms177673.aspx
       (GROUP BY group_by_item (',' group_by_item)*)?
       (HAVING having=search_condition)?
+    ;
+
+// https://msdn.microsoft.com/en-us/library/ms189463.aspx
+top_clause
+    : TOP (top_percent | top_count) (WITH TIES)?
+    ;
+
+top_percent
+    : (REAL | FLOAT) PERCENT
+    | '(' expression ')' PERCENT
+    ;
+
+top_count
+    : DECIMAL
+    | '(' expression ')'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188385.aspx
@@ -1232,6 +1311,7 @@ simple_id
     | AUTO
     | AVG
     | BASE64
+    | CALLED
     | CALLER
     | CAST
     | CATCH
@@ -1271,6 +1351,7 @@ simple_id
     | FORCED
     | KEYSET
     | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
+    | INPUT
     | LAST
     | LEVEL
     | LOCAL
@@ -1304,6 +1385,7 @@ simple_id
     | PRECEDING
     | PRIOR
     | PRIVILEGES
+    | PUBLIC
     | RANGE
     | RANK
     | READONLY
@@ -1312,6 +1394,8 @@ simple_id
     | RELATIVE
     | REMOTE
     | REPEATABLE
+    | RETURN
+    | RETURNS
     | ROBUST
     | ROOT
     | ROW
@@ -1319,6 +1403,7 @@ simple_id
     | ROWS
     | ROW_NUMBER
     | SAMPLE
+    | SIZE
     | SCHEMABINDING
     | SCROLL
     | SCROLL_LOCKS
@@ -1384,6 +1469,7 @@ BREAK:                                 B R E A K;
 BROWSE:                                B R O W S E;
 BULK:                                  B U L K;
 BY:                                    B Y;
+CALLED:                                C A L L E D;
 CASCADE:                               C A S C A D E;
 CASE:                                  C A S E;
 CHANGETABLE:                           C H A N G E T A B L E;
@@ -1510,6 +1596,7 @@ REPLICATION:                           R E P L I C A T I O N;
 RESTORE:                               R E S T O R E;
 RESTRICT:                              R E S T R I C T;
 RETURN:                                R E T U R N;
+RETURNS:                               R E T U R N S;
 REVERT:                                R E V E R T;
 REVOKE:                                R E V O K E;
 RIGHT:                                 R I G H T;
@@ -1646,7 +1733,8 @@ HOURS:                                 H O U R S;
 IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX: I G N O R E '_' N O N C L U S T E R E D '_' C O L U M N S T O R E '_' I N D E X;
 IMMEDIATE:                             I M M E D I A T E;
 IMPERSONATE:                           I M P E R S O N A T E;
-INCREMENTAL:                           I N C R E M E N T A L; 
+INCREMENTAL:                           I N C R E M E N T A L;
+INPUT:                                 I N P U T;
 INSENSITIVE:                           I N S E N S I T I V E;
 INSERTED:                              I N S E R T E D;
 ISOLATION:                             I S O L A T I O N;

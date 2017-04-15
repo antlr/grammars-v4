@@ -1,4 +1,4 @@
-<?php echo "asdf"; //comment? > ?>
+<?php EcHo "asdf"; //comment? > ?>
 <?= "qwer"; // echo ?>
 <?= "zxcv" // missing semicolon ?>
 
