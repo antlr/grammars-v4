@@ -584,3 +584,113 @@ GO
 SELECT TOP (1+@localvar) PERCENT *
 FROM Production.Product
 ORDER BY Name ASC;
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Using SELECT from build in function
+SELECT * FROM ::fn_helpcollations()
+
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Using PIVOT and UNPIVOT statements
+
+-- Pivot table with one row and five columns
+SELECT 'AverageCost' AS Cost_Sorted_By_Production_Days, 
+[0], [1], [2], [3], [4]
+FROM
+(SELECT DaysToManufacture, StandardCost 
+    FROM Production.Product) AS SourceTable
+PIVOT
+(
+AVG(StandardCost)
+FOR DaysToManufacture IN ([0], [1], [2], [3], [4])
+) AS PivotTable;
+
+--Create the table and insert values as portrayed in the previous example.
+CREATE TABLE pvt (VendorID int, Emp1 int, Emp2 int,
+    Emp3 int, Emp4 int, Emp5 int);
+GO
+INSERT INTO pvt VALUES (1,4,3,5,4,4);
+INSERT INTO pvt VALUES (2,4,1,5,5,5);
+INSERT INTO pvt VALUES (3,4,3,5,4,4);
+INSERT INTO pvt VALUES (4,4,2,5,5,4);
+INSERT INTO pvt VALUES (5,5,1,5,5,5);
+GO
+--Unpivot the table.
+SELECT VendorID, Employee, Orders
+FROM 
+   (SELECT VendorID, Emp1, Emp2, Emp3, Emp4, Emp5
+   FROM pvt) p
+UNPIVOT
+   (Orders FOR Employee IN 
+      (Emp1, Emp2, Emp3, Emp4, Emp5)
+)AS unpvt;
+GO
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Using table value constructor
+
+SELECT a, b FROM (VALUES (1, 2), (3, 4), (5, 6), (7, 8), (9, 10) ) AS MyTable(a, b);  
+GO  
+-- Used in an inner join to specify values to return.  
+SELECT ProductID, a.Name, Color  
+FROM Production.Product AS a  
+INNER JOIN (VALUES ('Blade'), ('Crown Race'), ('AWC Logo Cap')) AS b(Name)   
+ON a.Name = b.Name;  
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Open XML Statement
+
+
+DECLARE @idoc int, @doc varchar(1000);  
+SET @doc ='  
+<ROOT>  
+<Customer CustomerID="VINET" ContactName="Paul Henriot">  
+   <Order CustomerID="VINET" EmployeeID="5" OrderDate="1996-07-04T00:00:00">  
+      <OrderDetail OrderID="10248" ProductID="11" Quantity="12"/>  
+      <OrderDetail OrderID="10248" ProductID="42" Quantity="10"/>  
+   </Order>  
+</Customer>  
+<Customer CustomerID="LILAS" ContactName="Carlos Gonzlez">  
+   <Order CustomerID="LILAS" EmployeeID="3" OrderDate="1996-08-16T00:00:00">  
+      <OrderDetail OrderID="10283" ProductID="72" Quantity="3"/>  
+   </Order>  
+</Customer>  
+</ROOT>';  
+--Create an internal representation of the XML document.  
+EXEC sp_xml_preparedocument @idoc OUTPUT, @doc;  
+-- Execute a SELECT statement that uses the OPENXML rowset provider.  
+SELECT    *  
+FROM       OPENXML (@idoc, '/ROOT/Customer',1)  
+            WITH (CustomerID  varchar(10),  
+                  ContactName varchar(20));  
+				  
+
+				  DECLARE @idoc int, @doc varchar(1000);   
+SET @doc ='  
+<ROOT>  
+<Customer CustomerID="VINET" ContactName="Paul Henriot">  
+   <Order OrderID="10248" CustomerID="VINET" EmployeeID="5"   
+           OrderDate="1996-07-04T00:00:00">  
+      <OrderDetail ProductID="11" Quantity="12"/>  
+      <OrderDetail ProductID="42" Quantity="10"/>  
+   </Order>  
+</Customer>  
+<Customer CustomerID="LILAS" ContactName="Carlos Gonzlez">v  
+   <Order OrderID="10283" CustomerID="LILAS" EmployeeID="3"   
+           OrderDate="1996-08-16T00:00:00">  
+      <OrderDetail ProductID="72" Quantity="3"/>  
+   </Order>  
+</Customer>  
+</ROOT>';   
+  
+--Create an internal representation of the XML document.  
+EXEC sp_xml_preparedocument @idoc OUTPUT, @doc;   
+  
+-- SELECT stmt using OPENXML rowset provider  
+SELECT *  
+FROM   OPENXML (@idoc, '/ROOT/Customer/Order/OrderDetail',2)   
+         WITH (OrderID       int         '../@OrderID',   
+               CustomerID  varchar(10) '../@CustomerID',   
+               OrderDate   datetime    '../@OrderDate',   
+               ProdID      int         '@ProductID',   
+               Qty         int         '@Quantity');  

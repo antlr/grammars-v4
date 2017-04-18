@@ -221,6 +221,7 @@ create_database
 // https://msdn.microsoft.com/en-us/library/ms188783.aspx
 create_index
     : CREATE UNIQUE? clustered? INDEX id ON table_name_with_hint '(' column_name_list (ASC | DESC)? ')'
+	(INCLUDE '(' column_name_list ')') ?
     (index_options)?
     (ON id)?
     ';'?
@@ -543,6 +544,7 @@ opendatasource
 declare_statement
     : DECLARE LOCAL_ID AS? table_type_definition ';'?
     | DECLARE declare_local (',' declare_local)* ';'?
+	| DECLARE LOCAL_ID AS? xml_type_definition ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms181441(v=sql.120).aspx
@@ -656,6 +658,14 @@ declare_local
 table_type_definition
     : TABLE '(' column_def_table_constraints ')'
     ;
+	
+xml_type_definition
+	: XML '(' ( CONTENT | DOCUMENT )? xml_schema_collection ')'
+	;
+	
+xml_schema_collection
+	: ID '.' ID
+	;
 
 column_def_table_constraints
     : column_def_table_constraint (','? column_def_table_constraint)*
@@ -950,8 +960,24 @@ table_source_item
     | function_call               as_table_alias?
     | LOCAL_ID                    as_table_alias?
     | LOCAL_ID '.' function_call (as_table_alias column_alias_list?)?
+	| open_xml
+	| ':' ':' function_call       as_table_alias?						// Build-in function (old syntax)
     ;
 
+//https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
+open_xml
+	: OPENXML '(' expression ',' expression (',' expression)? ')' 
+	(WITH '(' schema_declaration ')' )?
+	;
+
+schema_declaration
+	: column_declaration (',' column_declaration)*
+	;
+
+column_declaration
+	: ID data_type (STRING)?
+	;
+	
 change_table
     : CHANGETABLE '(' CHANGES table_name ',' (NULL | DECIMAL | LOCAL_ID) ')'
     ;
@@ -965,8 +991,18 @@ join_part
     | CROSS JOIN table_source
     | CROSS APPLY table_source
     | OUTER APPLY table_source
+    | PIVOT pivot_clause as_table_alias
+    | UNPIVOT unpivot_clause as_table_alias	
     ;
 
+pivot_clause
+	:	'(' aggregate_windowed_function FOR full_column_name IN column_alias_list ')'
+	;
+
+unpivot_clause
+	:	'(' expression FOR full_column_name IN '(' full_column_name_list ')' ')'
+	; 
+	
 table_name_with_hint
     : table_name with_table_hints?
     ;
@@ -987,6 +1023,8 @@ bulk_option
 derived_table
     : subquery
     | '(' subquery ')'
+	| table_value_constructor
+	| '(' table_value_constructor ')'	
     ;
 
 function_call
@@ -1021,10 +1059,14 @@ function_call
     | MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
     | NULLIF '(' expression ',' expression ')'
+	// https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
+	| STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms177587.aspx
     | SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
     | SYSTEM_USER
+	// https://msdn.microsoft.com/fr-fr/library/ms184325.aspx
+	| ISNULL '(' expression ',' expression ')'	
     ;
 
 switch_section
@@ -1205,12 +1247,15 @@ ddl_object
     ;
 
 full_column_name
-    : (table_name '.')? id
+	: (
+		tableName=table_name '.' columnName=id
+	|	columnName=id
+	)
     ;
 
-column_name_list
-    : id (',' id)*
-    ;
+full_column_name_list
+	: full_column_name (',' full_column_name)*
+	;
 
 cursor_name
     : id
@@ -1280,6 +1325,7 @@ data_type
 
 default_value
     : NULL
+	| DEFAULT
     | constant
     ;
 
@@ -1541,12 +1587,14 @@ IDENTITYCOL:                           I D E N T I T Y C O L;
 IDENTITY_INSERT:                       I D E N T I T Y '_' I N S E R T;
 IF:                                    I F;
 IN:                                    I N;
+INCLUDE:							   I N C L U D E;
 INDEX:                                 I N D E X;
 INNER:                                 I N N E R;
 INSERT:                                I N S E R T;
 INTERSECT:                             I N T E R S E C T;
 INTO:                                  I N T O;
 IS:                                    I S;
+ISNULL:								   I S N U L L;
 JOIN:                                  J O I N;
 KEY:                                   K E Y;
 KILL:                                  K I L L;
@@ -1826,6 +1874,7 @@ STATIC:                                S T A T I C;
 STATS_STREAM:                          S T A T S '_' S T R E A M;
 STDEV:                                 S T D E V;
 STDEVP:                                S T D E V P;
+STUFF:								   S T U F F;
 SUM:                                   S U M;
 TAKE:                                  T A K E;
 TARGET_RECOVERY_TIME:                  T A R G E T '_' R E C O V E R Y '_' T I M E;
