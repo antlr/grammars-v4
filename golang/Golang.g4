@@ -238,12 +238,12 @@ statement
 
 //SimpleStmt = EmptyStmt | ExpressionStmt | SendStmt | IncDecStmt | Assignment | ShortVarDecl .
 simpleStmt
-//    : emptyStmt
     : sendStmt
     | expressionStmt
     | incDecStmt
     | assignment
     | shortVarDecl
+    | emptyStmt
     ;
 
 //ExpressionStmt = Expression .
@@ -278,9 +278,9 @@ shortVarDecl
     : identifierList ':=' expressionList
     ;
 
-//emptyStmt
-//    :
-//    ;
+emptyStmt
+    : ';'
+    ;
 
 //LabeledStmt = Label ":" Statement .
 //Label       = identifier .
