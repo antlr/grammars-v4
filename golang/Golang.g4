@@ -32,9 +32,80 @@
  */
 grammar Golang;
 
+@parser::members {
+
+    /**
+     * Returns {@code true} iff on the current index of the parser's
+     * token stream a token exists on the {@code HIDDEN} channel which
+     * either is a line terminator, or is a multi line comment that
+     * contains a line terminator.
+     *
+     * @return {@code true} iff on the current index of the parser's
+     * token stream a token exists on the {@code HIDDEN} channel which
+     * either is a line terminator, or is a multi line comment that
+     * contains a line terminator.
+     */
+    private boolean lineTerminatorAhead() {
+        // Get the token ahead of the current index.
+        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
+        Token ahead = _input.get(possibleIndexEosToken);
+        if (ahead.getChannel() != Lexer.HIDDEN) {
+            // We're only interested in tokens on the HIDDEN channel.
+            return false;
+        }
+
+        if (ahead.getType() == TERMINATOR) {
+            // There is definitely a line terminator ahead.
+            return true;
+        }
+
+        if (ahead.getType() == WS) {
+            // Get the token ahead of the current whitespaces.
+            possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 2;
+            ahead = _input.get(possibleIndexEosToken);
+        }
+
+        // Get the token's text and type.
+        String text = ahead.getText();
+        int type = ahead.getType();
+
+        // Check if the token is, or contains a line terminator.
+        return (type == COMMENT && (text.contains("\r") || text.contains("\n"))) ||
+                (type == TERMINATOR);
+    }
+}
+
+@lexer::members {
+
+    // The most recently produced token.
+    private Token lastToken = null;
+
+    /**
+     * Return the next token from the character stream and records this last
+     * token in case it resides on the default channel. This recorded token
+     * is used to determine when the lexer could possibly match a regex
+     * literal.
+     *
+     * @return the next token from the character stream.
+     */
+    @Override
+    public Token nextToken() {
+
+        // Get the next token.
+        Token next = super.nextToken();
+
+        if (next.getChannel() == Token.DEFAULT_CHANNEL) {
+            // Keep track of the last token on the default channel.
+            this.lastToken = next;
+        }
+
+        return next;
+    }
+}
+
 //SourceFile       = PackageClause ";" { ImportDecl ";" } { TopLevelDecl ";" } .
 sourceFile
-    : packageClause ';'? ( importDecl ';'? )* ( topLevelDecl ';'?)*
+    : packageClause eos ( importDecl eos )* ( topLevelDecl eos)*
     ;
 
 //PackageClause  = "package" PackageName .
@@ -44,7 +115,7 @@ packageClause
     ;
 
 importDecl
-    : 'import' ( importSpec | '(' ( importSpec ';'? )* ')' )
+    : 'import' ( importSpec | '(' ( importSpec eos )* ')' )
     ;
 
 importSpec
@@ -72,7 +143,7 @@ declaration
 
 //ConstDecl      = "const" ( ConstSpec | "(" { ConstSpec ";" } ")" ) .
 constDecl
-    : 'const' ( constSpec | '(' ( constSpec ';'? )* ')' )   // TODO EOS optional?
+    : 'const' ( constSpec | '(' ( constSpec eos )* ')' )
     ;
 
 //ConstSpec      = IdentifierList [ [ Type ] "=" ExpressionList ] .
@@ -128,9 +199,8 @@ receiver
 
 //VarDecl     = "var" ( VarSpec | "(" { VarSpec ";" } ")" ) .
 //VarSpec     = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
-// TODO EOS optional?
 varDecl
-    : 'var' ( varSpec | '(' ( varSpec ';'? )* ')' )
+    : 'var' ( varSpec | '(' ( varSpec eos )* ')' )
     ;
 
 varSpec
@@ -145,7 +215,7 @@ block
 
 //StatementList = { Statement ";" } .
 statementList
-    : ( statement eos? )*  // TODO EOS optional?
+    : ( statement eos )*
     ;
 
 statement
@@ -169,8 +239,8 @@ statement
 //SimpleStmt = EmptyStmt | ExpressionStmt | SendStmt | IncDecStmt | Assignment | ShortVarDecl .
 simpleStmt
 //    : emptyStmt
-    : expressionStmt
-    | sendStmt
+    : sendStmt
+    | expressionStmt
     | incDecStmt
     | assignment
     | shortVarDecl
@@ -387,7 +457,7 @@ pointerType
 //MethodName         = identifier .
 //InterfaceTypeName  = TypeName .
 interfaceType
-    : 'interface' '{' ( methodSpec ';'? )* '}'
+    : 'interface' '{' ( methodSpec eos )* '}'
     ;
 
 //SliceType = "[" "]" ElementType .
@@ -533,7 +603,7 @@ element
 //AnonymousField = [ "*" ] TypeName .
 //Tag            = string_lit .
 structType
-    : 'struct' '{' ( fieldDecl ';'? )* '}'   // TODO EOS optional?
+    : 'struct' '{' ( fieldDecl eos )* '}'
     ;
 
 fieldDecl
@@ -630,6 +700,8 @@ conversion
 eos
     : ';'
     | EOF
+    | {lineTerminatorAhead()}?
+    | {_input.LT(1).getText().equals("}") }?
     ;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1167,12 +1239,17 @@ fragment UNICODE_LETTER
 // Whitespace and comments
 //
 
-WS  :  [ \t\r\n\u000C]+ -> skip
+WS  :  [ \t]+ -> channel(HIDDEN)
     ;
 
 COMMENT
-    :   '/*' .*? '*/' -> skip
+    :   '/*' .*? '*/' -> channel(HIDDEN)
     ;
+
+TERMINATOR
+	: [\r\n]+ -> channel(HIDDEN)
+	;
+
 
 LINE_COMMENT
     :   '//' ~[\r\n]* -> skip
