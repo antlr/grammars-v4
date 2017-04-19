@@ -221,6 +221,8 @@ create_database
 // https://msdn.microsoft.com/en-us/library/ms188783.aspx
 create_index
     : CREATE UNIQUE? clustered? INDEX id ON table_name_with_hint '(' column_name_list (ASC | DESC)? ')'
+    (INCLUDE '(' column_name_list ')' )?
+    (WHERE where=search_condition)?
     (index_options)?
     (ON id)?
     ';'?
