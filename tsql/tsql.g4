@@ -677,16 +677,18 @@ column_definition
 
 // https://msdn.microsoft.com/en-us/library/ms186712.aspx
 column_constraint
-    :(CONSTRAINT id)? null_notnull?
+    :(CONSTRAINT id_)? null_notnull?
       ((PRIMARY KEY | UNIQUE) clustered? index_options?
-      | CHECK (NOT FOR REPLICATION)? '(' search_condition ')')
+      | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
+      | (FOREIGN KEY)? REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
 table_constraint
-    : (CONSTRAINT id)?
-       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list (ASC | DESC)? ')' index_options? (ON id)?
-       | CHECK (NOT FOR REPLICATION)? '(' search_condition ')')
+    : (CONSTRAINT id_)?
+       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list (ASC | DESC)? ')' index_options? (ON id_)?
+       | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
+       | FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
     ;
 
 index_options
