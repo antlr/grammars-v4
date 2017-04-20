@@ -220,7 +220,9 @@ create_database
 
 // https://msdn.microsoft.com/en-us/library/ms188783.aspx
 create_index
-    : CREATE UNIQUE? clustered? INDEX id ON table_name_with_hint '(' column_name_list (ASC | DESC)? ')'
+    : CREATE UNIQUE? clustered? INDEX id ON table_name_with_hint '(' column_name_list_with_order ')'
+    (INCLUDE '(' column_name_list ')' )?
+    (WHERE where=search_condition)?
     (index_options)?
     (ON id)?
     ';'?
@@ -1208,6 +1210,10 @@ full_column_name
     : (table_name '.')? id
     ;
 
+column_name_list_with_order
+    : id (ASC | DESC)? (',' id (ASC | DESC)?)*
+    ;
+
 column_name_list
     : id (',' id)*
     ;
@@ -1541,6 +1547,7 @@ IDENTITYCOL:                           I D E N T I T Y C O L;
 IDENTITY_INSERT:                       I D E N T I T Y '_' I N S E R T;
 IF:                                    I F;
 IN:                                    I N;
+INCLUDE:                               I N C L U D E;
 INDEX:                                 I N D E X;
 INNER:                                 I N N E R;
 INSERT:                                I N S E R T;
