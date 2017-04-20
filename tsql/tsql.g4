@@ -691,6 +691,14 @@ table_constraint
        | FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
     ;
 
+on_delete
+    : ON DELETE (NO ACTION | CASCADE | SET NULL | SET DEFAULT)
+    ;
+
+on_update
+    : ON UPDATE (NO ACTION | CASCADE | SET NULL | SET DEFAULT)
+    ;
+
 index_options
     : WITH '(' index_option (',' index_option)* ')'
     ;
