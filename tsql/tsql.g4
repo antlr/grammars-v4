@@ -1547,6 +1547,7 @@ IDENTITYCOL:                           I D E N T I T Y C O L;
 IDENTITY_INSERT:                       I D E N T I T Y '_' I N S E R T;
 IF:                                    I F;
 IN:                                    I N;
+INCLUDE:                               I N C L U D E;
 INDEX:                                 I N D E X;
 INNER:                                 I N N E R;
 INSERT:                                I N S E R T;
