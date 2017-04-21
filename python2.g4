@@ -388,8 +388,7 @@ if self._tokenStartColumn == 0 and self._openBRCount == 0:
 
     
 COMMENT:        '#' ~[\r\n]* -> skip;
-    
-// TODO - Use a stack to ensure bracket types are matched correctly.
+
 OPEN_PAREN:     '(' {self._openBRCount  += 1};
 CLOSE_PAREN:    ')' {self._openBRCount  -= 1};
 OPEN_BRACE:     '{' {self._openBRCount  += 1};
