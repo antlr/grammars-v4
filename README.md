@@ -10,15 +10,12 @@ Beware of the licenses on the individual grammars. **THERE IS NO COMMON
 LICENSE!** When in doubt or you don't know what you're doing, please use
 the BSD or MIT license.
 
-Testing the Grammars
-------------
+## Testing the Grammars
 
-<pre>
+```
 mvn clean test
-</pre>
+```
 
-Travis Status
----------
+## Travis Status
 
-<a href="https://travis-ci.org/antlr/grammars-v4"><img src="https://api.travis-ci.org/antlr/grammars-v4.png"></a>
-
+[![Travis Status](https://api.travis-ci.org/antlr/grammars-v4.png)](https://travis-ci.org/antlr/grammars-v4)

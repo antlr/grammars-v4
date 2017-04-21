@@ -374,7 +374,7 @@ fragment USER_VAR_SUBFIX2
 
 
 fragment USER_VAR_SUBFIX3
-   : ( '\"' ( ~ '\"' )+ '\"' )
+   : ( '"' ~'"'+ '"' )
    ;
 
 

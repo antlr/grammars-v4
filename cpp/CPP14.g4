@@ -1239,8 +1239,8 @@ templateargumentlist
 
 templateargument
 :
-	constantexpression
-	| typeid
+	typeid
+	| constantexpression
 	| idexpression
 ;
 
@@ -1320,12 +1320,12 @@ noexceptspecification
 
 MultiLineMacro
 :
-    '#' (.*? '\\' [\r\n]+)+ ~[\r\n]+ -> skip
+    '#' (~[\n]*? '\\' '\r'? '\n')+ ~[\n]+ -> channel(HIDDEN)
 ;
 
 Directive
 :
-	'#' ~[\r\n]* -> skip
+    '#' ~[\n]* -> channel(HIDDEN)
 ;
 
 /*Lexer*/

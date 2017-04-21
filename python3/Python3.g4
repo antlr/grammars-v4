@@ -566,7 +566,7 @@ atom
  | '{' dictorsetmaker? '}' 
  | NAME 
  | number 
- | string+ 
+ | str+ 
  | '...' 
  | NONE
  | TRUE
@@ -674,7 +674,7 @@ yield_arg
  | testlist
  ;
 
-string
+str
  : STRING_LITERAL
  | BYTES_LITERAL
  ;
@@ -733,14 +733,14 @@ BREAK : 'break';
 
 NEWLINE
  : ( {atStartOfInput()}?   SPACES
-   | ( '\r'? '\n' | '\r' ) SPACES?
+   | ( '\r'? '\n' | '\r' | '\f' ) SPACES?
    )
    {
-     String newLine = getText().replaceAll("[^\r\n]+", "");
-     String spaces = getText().replaceAll("[\r\n]+", "");
+     String newLine = getText().replaceAll("[^\r\n\f]+", "");
+     String spaces = getText().replaceAll("[\r\n\f]+", "");
      int next = _input.LA(1);
 
-     if (opened > 0 || next == '\r' || next == '\n' || next == '#') {
+     if (opened > 0 || next == '\r' || next == '\n' || next == '\f' || next == '#') {
        // If we're inside a list or on a blank line, ignore all indents, 
        // dedents and line breaks.
        skip();
@@ -883,8 +883,8 @@ UNKNOWN_CHAR
 /// shortstringitem ::=  shortstringchar | stringescapeseq
 /// shortstringchar ::=  <any source character except "\" or newline or the quote>
 fragment SHORT_STRING
- : '\'' ( STRING_ESCAPE_SEQ | ~[\\\r\n'] )* '\''
- | '"' ( STRING_ESCAPE_SEQ | ~[\\\r\n"] )* '"'
+ : '\'' ( STRING_ESCAPE_SEQ | ~[\\\r\n\f'] )* '\''
+ | '"' ( STRING_ESCAPE_SEQ | ~[\\\r\n\f"] )* '"'
  ;
 
 /// longstring      ::=  "'''" longstringitem* "'''" | '"""' longstringitem* '"""'
@@ -1012,11 +1012,11 @@ fragment SPACES
  ;
 
 fragment COMMENT
- : '#' ~[\r\n]*
+ : '#' ~[\r\n\f]*
  ;
 
 fragment LINE_JOINING
- : '\\' SPACES? ( '\r'? '\n' | '\r' )
+ : '\\' SPACES? ( '\r'? '\n' | '\r' | '\f' )
  ;
 
 /// id_start     ::=  <all characters in general categories Lu, Ll, Lt, Lm, Lo, Nl, the underscore, and characters with the Other_ID_Start property>

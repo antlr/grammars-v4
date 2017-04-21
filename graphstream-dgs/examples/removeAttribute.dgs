@@ -1,0 +1,12 @@
+DGS004
+null 0 0
+
+st 0.0
+an "A"
+cn "A" +"attribute":"content"
+
+st 1.0
+cn "A" "attribute":"content 2"
+
+st 2.0
+cn "A" -"attribute"

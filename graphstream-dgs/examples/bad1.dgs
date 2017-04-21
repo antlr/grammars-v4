@@ -1,0 +1,7 @@
+DGS004  
+bad 0 0
+
+#
+# This is a bad example because first line
+# contains some spaces after "DGS004".
+#
