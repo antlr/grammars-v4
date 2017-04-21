@@ -82,7 +82,7 @@ ddl_clause
     | drop_function
     | drop_statistics
     | drop_table
-  | drop_type
+    | drop_type
     | drop_view
     ;
 
