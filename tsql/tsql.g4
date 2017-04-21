@@ -326,7 +326,15 @@ create_statistics
 
 // https://msdn.microsoft.com/en-us/library/ms174979.aspx
 create_table
-    : CREATE TABLE table_name '(' column_def_table_constraints ','? ')' (ON id | DEFAULT)? (TEXTIMAGE_ON id | DEFAULT)?';'?
+    : CREATE TABLE table_name '(' column_def_table_constraints ','? ')' table_options* (ON id | DEFAULT)? (TEXTIMAGE_ON id | DEFAULT)?';'?
+    ;
+
+table_options
+    : WITH '(' index_option (',' index_option)* ')'
+    ;
+
+table_option
+    : simple_id '=' (simple_id | on_off | DECIMAL)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
@@ -1357,6 +1365,7 @@ simple_id
     | COOKIE
     | COUNT
     | COUNT_BIG
+    | DATA_COMPRESSION
     | DELAY
     | DELETED
     | DENSE_RANK
@@ -1414,6 +1423,7 @@ simple_id
     | OUT
     | OUTPUT
     | OWNER
+    | PAGE
     | PARAMETERIZATION
     | PARTITION
     | PATH
@@ -1423,6 +1433,7 @@ simple_id
     | PUBLIC
     | RANGE
     | RANK
+    | RAW
     | READONLY
     | READ_ONLY
     | RECOMPILE
@@ -1534,6 +1545,7 @@ CURRENT_TIME:                          C U R R E N T '_' T I M E;
 CURRENT_TIMESTAMP:                     C U R R E N T '_' T I M E S T A M P;
 CURRENT_USER:                          C U R R E N T '_' U S E R;
 CURSOR:                                C U R S O R;
+DATA_COMPRESSION:                      D A T A '_' C O M P R E S S I O N;
 DATABASE:                              D A T A B A S E;
 DBCC:                                  D B C C;
 DEALLOCATE:                            D E A L L O C A T E;
@@ -1616,6 +1628,7 @@ OR:                                    O R;
 ORDER:                                 O R D E R;
 OUTER:                                 O U T E R;
 OVER:                                  O V E R;
+PAGE:                                  P A G E;
 PARTIAL:                               P A R T I A L;
 PERCENT:                               P E R C E N T;
 PIVOT:                                 P I V O T;
@@ -1627,6 +1640,7 @@ PROC:                                  P R O C;
 PROCEDURE:                             P R O C E D U R E;
 PUBLIC:                                P U B L I C;
 RAISERROR:                             R A I S E R R O R;
+RAW:                                   R A W;
 READ:                                  R E A D;
 READTEXT:                              R E A D T E X T;
 RECONFIGURE:                           R E C O N F I G U R E;
