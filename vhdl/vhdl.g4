@@ -550,7 +550,7 @@ disconnection_specification
   ;
 
 discrete_range
-  : range
+  : range_decl
   | subtype_indication
   ;
 
@@ -975,7 +975,7 @@ name_function_call_or_indexed_part
    ;
 
 name_slice_part
-   : LPAREN explicit_range ( COMMA explicit_range )* RPAREN
+   : ( LPAREN explicit_range ( COMMA explicit_range )* RPAREN )+
    ;
 
 selected_name
@@ -1198,17 +1198,17 @@ quantity_specification
   : quantity_list COLON name
   ;
 
-range
+range_decl
   : explicit_range
   | name
   ;
 
 explicit_range
-  : simple_expression direction simple_expression
+  : simple_expression ( direction simple_expression )?
   ;
 
 range_constraint
-  : RANGE range
+  : RANGE range_decl
   ;
 
 record_nature_definition
@@ -1577,15 +1577,15 @@ BIT_STRING_LITERAL
   ;
 
 BIT_STRING_LITERAL_BINARY
-    :   ('b'|'B') '\"' ('1' | '0' | '_')+ '\"'
+    :   ('b'|'B') '"' ('1' | '0' | '_')+ '"'
     ;
 
 BIT_STRING_LITERAL_OCTAL
-    :   ('o'|'O') '\"' ('7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '\"'
+    :   ('o'|'O') '"' ('7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '"'
     ;
 
 BIT_STRING_LITERAL_HEX
-    :   ('x'|'X') '\"' ( 'f' |'e' |'d' |'c' |'b' |'a' | 'F' |'E' |'D' |'C' |'B' |'A' | '9' | '8' | '7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '\"'
+    :   ('x'|'X') '"' ( 'f' |'e' |'d' |'c' |'b' |'a' | 'F' |'E' |'D' |'C' |'B' |'A' | '9' | '8' | '7' |'6' |'5' |'4' |'3' |'2' |'1' | '0' | '_')+ '"'
     ;
 
 REAL_LITERAL
@@ -1660,7 +1660,7 @@ ARROW         : '=>'  ;
 NEQ           : '/='  ;
 VARASGN       : ':='  ;
 BOX           : '<>'  ;
-DBLQUOTE      : '\"'  ;
+DBLQUOTE      : '"'   ;
 SEMI          : ';'   ;
 COMMA         : ','   ;
 AMPERSAND     : '&'   ;

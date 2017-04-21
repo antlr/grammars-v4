@@ -1,0 +1,1 @@
+(equation (expression (term (factor (atom (variable z)) ^ (atom (scientific (number 2)))))) (relop =) (expression (term (factor (atom (variable a)) ^ (atom (scientific (number 2))))) + (term (factor (atom (variable b)) ^ (atom (scientific (number 2)))))))
