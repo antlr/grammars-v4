@@ -23,6 +23,7 @@ from antlr4.Token  import CommonToken
     # Indented to append code to the constructor.
     self._openBRCount       = 0
     self._suppressNewlines  = False
+    self._lineContinuation              = False
     self._tokens            = self.TokenQueue()
     self._indents           = self.IndentStack()
 
@@ -346,13 +347,14 @@ NAME: [a-zA-Z_] [a-zA-Z0-9_]*
 NUMBER
     :     '0' ([xX] [0-9a-fA-F]+
     |          [oO] [0-7]+
-    |          [bB] [01]+ )
-    | ([0-9]* '.')? [0-9]+ [jJ]?
+    |          [bB] [01]+ )[lL]?
+    | ([0-9]* '.')? [0-9]+ [jJ]? [lL]?
     ;
  
-NEWLINES: ('\r'? '\n')+
+LINENDING:             (('\r'? '\n')+ {self._lineContinuation=False}
+    |      '\\'  [ \t]* ('\r'? '\n')  {self._lineContinuation=True}) 
 {
-if self._openBRCount == 0:
+if self._openBRCount == 0 and not self._lineContinuation:
     if not self._suppressNewlines:
         self.emitNewline()
         self._suppressNewlines = True
@@ -365,7 +367,9 @@ if self._openBRCount == 0:
    
 WHITESPACE: ('\t' | ' ')+
 {        
-if self._tokenStartColumn == 0 and self._openBRCount == 0:
+if (self._tokenStartColumn == 0 and self._openBRCount == 0 
+    and not self._lineContinuation):
+    
     la = self._input.LA(1)
     if la not in [ord('\r'), ord('\n'), ord('#')]:
         self._suppressNewlines = False
