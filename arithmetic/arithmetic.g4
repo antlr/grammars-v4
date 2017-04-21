@@ -37,15 +37,15 @@ equation
    ;
 
 expression
-   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
+   : term ((PLUS | MINUS) term)*
    ;
 
-multiplyingExpression
-   : powExpression ((TIMES | DIV) powExpression)*
+term
+   : factor ((TIMES | DIV) factor)*
    ;
 
-powExpression
-   : atom (POW expression)?
+factor
+   : atom (POW atom)*
    ;
 
 atom

@@ -8,7 +8,7 @@
 grammar informix;
 
 compilation_unit
-   : databaseDeclaration? globalDeclaration? typeDeclarations? mainBlock functionOrReportDefinitions EOF
+   : databaseDeclaration? globalDeclaration? typeDeclarations? mainBlock functionOrReportDefinitions? EOF
    ;
 
 identifier
@@ -16,11 +16,11 @@ identifier
    ;
 
 mainBlock
-   : eol? MAIN eol typeDeclarations? mainStatements END MAIN eol
+   : eol? MAIN eol typeDeclarations? mainStatements? END MAIN eol
    ;
 
 mainStatements
-   : (deferStatement | codeBlock | eol)*
+   : (deferStatement | codeBlock | eol)+
    ;
 
 deferStatement
@@ -28,19 +28,19 @@ deferStatement
    ;
 
 functionOrReportDefinitions
-   : (reportDefinition | functionDefinition)*
+   : (reportDefinition | functionDefinition)+
    ;
 
 returnStatement
-   : RETURN (variableOrConstantList)?
+   : RETURN variableOrConstantList?
    ;
 
 functionDefinition
-   : FUNCTION functionIdentifier parameterList? eol typeDeclarations (codeBlock)? END FUNCTION eol
+   : FUNCTION functionIdentifier parameterList? eol typeDeclarations codeBlock? END FUNCTION eol
    ;
 
 parameterList
-   : LPAREN (parameterGroup)* RPAREN
+   : LPAREN parameterGroup* RPAREN
    ;
 
 parameterGroup
@@ -52,7 +52,7 @@ globalDeclaration
    ;
 
 typeDeclarations
-   : typeDeclaration +
+   : typeDeclaration+
    ;
 
 typeDeclaration
@@ -88,13 +88,13 @@ largeType
 
 numberType
    : (BIGINT | INTEGER | INT | SMALLINT | REAL | SMALLFLOAT)
-   | (DECIMAL | DEC | NUMERIC | MONEY) (LPAREN numericConstant (COMMA numericConstant)? RPAREN |)
-   | (FLOAT | DOUBLE) (LPAREN numericConstant RPAREN |)
+   | (DECIMAL | DEC | NUMERIC | MONEY) (LPAREN numericConstant (COMMA numericConstant)? RPAREN)?
+   | (FLOAT | DOUBLE) (LPAREN numericConstant RPAREN)?
    ;
 
 charType
    : (VARCHAR | NVARCHAR) LPAREN numericConstant (COMMA numericConstant)? RPAREN
-   | (CHAR | NCHAR | CHARACTER) (LPAREN numericConstant RPAREN |)
+   | (CHAR | NCHAR | CHARACTER) (LPAREN numericConstant RPAREN)?
    ;
 
 timeType
@@ -192,7 +192,7 @@ statement
    ;
 
 codeBlock
-   : (statement | databaseDeclaration) +
+   : (statement | databaseDeclaration)+
    ;
 
 label
@@ -207,7 +207,7 @@ unlabelledStatement
 simpleStatement
    : assignmentStatement
    | procedureStatement
-   | sqlStatements (SEMI)?
+   | sqlStatements SEMI?
    | otherFGLStatement
    | menuInsideStatement
    | constructInsideStatement
@@ -237,7 +237,7 @@ actualParameter
    ;
 
 gotoStatement
-   : GOTO (COLON)? label eol
+   : GOTO COLON? label eol
    ;
 
 condition
@@ -252,24 +252,24 @@ logicalTerm
 logicalFactor
    :
    // Added "prior" to a comparison expression to support use of a
-   // condition in a connect_clause. (sqlExpression (NOT)? IN) sqlExpression (NOT)? IN expressionSet
-   | (sqlExpression (NOT)? LIKE) sqlExpression (NOT)? LIKE sqlExpression (ESC QUOTED_STRING)?
-   | (sqlExpression (NOT)? BETWEEN) sqlExpression (NOT)? BETWEEN sqlExpression AND sqlExpression
-   | (sqlExpression IS (NOT)? NULL) sqlExpression IS (NOT)? NULL
-   | (quantifiedFactor) quantifiedFactor
+   // condition in a connect_clause. (sqlExpression NOT? IN) sqlExpression NOT? IN expressionSet
+   | (sqlExpression NOT? LIKE) sqlExpression NOT? LIKE sqlExpression (ESC QUOTED_STRING)?
+   | (sqlExpression NOT? BETWEEN) sqlExpression NOT? BETWEEN sqlExpression AND sqlExpression
+   | (sqlExpression IS NOT? NULL) sqlExpression IS NOT? NULL
+   | quantifiedFactor quantifiedFactor
    | (NOT condition) NOT condition
-   | (LPAREN condition RPAREN)
+   | LPAREN condition RPAREN
    | sqlExpression relationalOperator sqlExpression
    ;
 
 quantifiedFactor
    : (sqlExpression relationalOperator (ALL | ANY)? subquery) sqlExpression relationalOperator (ALL | ANY)? subquery
-   | ((NOT)? EXISTS subquery) (NOT)? EXISTS subquery
+   | (NOT? EXISTS subquery) NOT? EXISTS subquery
    | subquery
    ;
 
 expressionSet
-   : (sqlExpression) sqlExpression
+   : sqlExpression sqlExpression
    | subquery
    ;
 
@@ -282,7 +282,7 @@ sqlExpression
    ;
 
 sqlAlias
-   : (AS)? identifier
+   : AS? identifier
    ;
 
 sqlTerm
@@ -308,15 +308,15 @@ sqlFactor2
    ;
 
 sqlExpressionList
-   : LPAREN sqlExpression (COMMA sqlExpression) + RPAREN
+   : LPAREN sqlExpression (COMMA sqlExpression)+ RPAREN
    ;
 
 sqlLiteral
-   : (unsignedConstant | string | (NULL | FALSE | TRUE))
+   : unsignedConstant | string | NULL | FALSE | TRUE
    ;
 
 sqlVariable
-   : (columnsTableId) columnsTableId
+   : columnsTableId columnsTableId
    ;
 
 sqlFunction
@@ -360,12 +360,12 @@ sqlPseudoColumn
    ;
 
 relationalOperator
-   : (EQUAL | NOT_EQUAL | LE | LT | GE | GT | LIKE)
-   | (NOT)? MATCHES
+   : EQUAL | NOT_EQUAL | LE | LT | GE | GT | LIKE
+   | NOT? MATCHES
    ;
 
 ifCondition
-   : (TRUE | FALSE)
+   : TRUE | FALSE
    | ifCondition2 (relationalOperator ifCondition2)*
    ;
 
@@ -384,14 +384,14 @@ expression
 ifLogicalFactor
    :
    // Added "prior" to a comparison expression to support use of a
-   // condition in a connect_clause. (simpleExpression IS (NOT)? NULL) simpleExpression IS (NOT)? NULL
+   // condition in a connect_clause. (simpleExpression IS NOT? NULL) simpleExpression IS NOT? NULL
    | (NOT ifCondition) NOT ifCondition
    | LPAREN ifCondition RPAREN
-   | (simpleExpression) simpleExpression
+   | simpleExpression simpleExpression
    ;
 
 simpleExpression
-   : (sign)? term (addingOperator term)*
+   : sign? term (addingOperator term)*
    ;
 
 addingOperator
@@ -411,7 +411,7 @@ multiplyingOperator
    ;
 
 factor
-   : ((GROUP)? functionDesignator | variable | constant | LPAREN expression RPAREN | NOT factor) (UNITS unitType)?
+   : (GROUP? functionDesignator | variable | constant | LPAREN expression RPAREN | NOT factor) (UNITS unitType)?
    ;
 
 functionDesignator
@@ -466,7 +466,7 @@ thruNotation
     ;
 */
 componentVariable
-   : (recordVariable (indexingVariable)?) ((DOT STAR) | (DOT componentVariable ((THROUGH | THRU) componentVariable)?))?
+   : (recordVariable indexingVariable?) ((DOT STAR) | (DOT componentVariable ((THROUGH | THRU) componentVariable)?))?
    ;
 
 recordVariable
@@ -488,7 +488,7 @@ conditionalStatement
    ;
 
 ifStatement
-   : IF ifCondition THEN (codeBlock)? (ELSE (codeBlock)?)? END IF
+   : IF ifCondition THEN codeBlock? (ELSE codeBlock?)? END IF
    ;
 
 repetetiveStatement
@@ -498,11 +498,11 @@ repetetiveStatement
    ;
 
 whileStatement
-   : WHILE ifCondition (codeBlock)? END WHILE
+   : WHILE ifCondition codeBlock? END WHILE
    ;
 
 forStatement
-   : FOR controlVariable EQUAL forList (STEP numericConstant)? eol (codeBlock)? END FOR eol
+   : FOR controlVariable EQUAL forList (STEP numericConstant)? eol codeBlock? END FOR eol
    ;
 
 forList
@@ -522,7 +522,7 @@ finalValue
    ;
 
 forEachStatement
-   : FOREACH identifier (USING variableList)? (INTO variableList)? (WITH REOPTIMIZATION)? eol (codeBlock)? END FOREACH eol
+   : FOREACH identifier (USING variableList)? (INTO variableList)? (WITH REOPTIMIZATION)? eol codeBlock? END FOREACH eol
    ;
 
 variableList
@@ -530,11 +530,11 @@ variableList
    ;
 
 variableOrConstantList
-   : (expression) (COMMA (expression))*
+   : expression (COMMA expression)*
    ;
 
 caseStatement
-   : CASE expression (WHEN expression (codeBlock)?)* (OTHERWISE (codeBlock)?)? END CASE
+   : CASE expression (WHEN expression codeBlock?)* (OTHERWISE codeBlock?)? END CASE
    | CASE (WHEN ifCondition codeBlock)* (OTHERWISE codeBlock)? END CASE
    ;
 
@@ -601,20 +601,20 @@ reportStatement
    : START REPORT constantIdentifier (TO (expression | PIPE expression | PRINTER))? (WITH ((LEFT MARGIN numericConstant) | (RIGHT MARGIN numericConstant) | (TOP MARGIN numericConstant) | (BOTTOM MARGIN numericConstant) | (PAGE LENGTH numericConstant) | (TOP OF PAGE string))*)?
    | TERMINATE REPORT constantIdentifier
    | FINISH REPORT constantIdentifier
-   | PAUSE (string)?
+   | PAUSE string?
    | NEED expression LINES
-   | PRINT ((printExpressionList)? (SEMI)? | FILE string)?
+   | PRINT (printExpressionList? SEMI? | FILE string)?
    | SKIP2 (expression (LINE | LINES) | TO TOP OF PAGE)
    | OUTPUT TO REPORT constantIdentifier LPAREN (expression (COMMA expression)*)? RPAREN
    ;
 
-thruNotation
-   : ((THROUGH | THRU) (SAME DOT)? identifier)?
-   ;
-
 fieldName
    : ((identifier (LBRACK numericConstant RBRACK)?) DOT)? identifier
-   | (identifier (LBRACK numericConstant RBRACK)?) DOT (STAR | identifier thruNotation)
+   | (identifier (LBRACK numericConstant RBRACK)?) DOT (STAR | identifier thruNotation?)
+   ;
+
+thruNotation
+   : (THROUGH | THRU) (SAME DOT)? identifier
    ;
 
 fieldList
@@ -630,7 +630,7 @@ constructEvents
    | AFTER CONSTRUCT
    | BEFORE FIELD fieldList
    | AFTER FIELD fieldList
-   | ON KEY LPAREN (keyList) RPAREN
+   | ON KEY LPAREN keyList RPAREN
    ;
 
 constructInsideStatement
@@ -654,15 +654,15 @@ attributeList
    ;
 
 constructGroupStatement
-   : constructEvents (codeBlock) +
+   : constructEvents codeBlock+
    ;
 
 constructStatement
-   : CONSTRUCT (BY NAME variable ON columnsList | variable ON columnsList FROM fieldList) (attributeList)? (HELP numericConstant)? ((constructGroupStatement) + END CONSTRUCT)?
+   : CONSTRUCT (BY NAME variable ON columnsList | variable ON columnsList FROM fieldList) attributeList? (HELP numericConstant)? (constructGroupStatement+ END CONSTRUCT)?
    ;
 
 displayArrayStatement
-   : DISPLAY ARRAY expression TO expression (attributeList)? (displayEvents)* (END DISPLAY)?
+   : DISPLAY ARRAY expression TO expression attributeList? displayEvents* (END DISPLAY)?
    ;
 
 displayInsideStatement
@@ -671,23 +671,23 @@ displayInsideStatement
    ;
 
 displayEvents
-   : ON KEY LPAREN keyList RPAREN ((codeBlock) +)
+   : ON KEY LPAREN keyList RPAREN codeBlock+
    ;
 
 displayStatement
-   : DISPLAY (BY NAME (expression (COMMA expression)*) | (expression (COMMA expression)*) (TO fieldList | AT expression COMMA expression)?) (attributeList)? eol
+   : DISPLAY (BY NAME (expression (COMMA expression)*) | (expression (COMMA expression)*) (TO fieldList | AT expression COMMA expression)?) attributeList? eol
    ;
 
 errorStatement
-   : ERROR expression (COMMA expression)* (attributeList)?
+   : ERROR expression (COMMA expression)* attributeList?
    ;
 
 messageStatement
-   : MESSAGE expression (COMMA expression)* (attributeList)?
+   : MESSAGE expression (COMMA expression)* attributeList?
    ;
 
 promptStatement
-   : PROMPT expression (COMMA expression)* (attributeList)? FOR (CHAR)? variable (HELP numericConstant)? (attributeList)? ((ON KEY LPAREN (keyList) RPAREN (codeBlock)?)* END PROMPT)?
+   : PROMPT expression (COMMA expression)* attributeList? FOR CHAR? variable (HELP numericConstant)? attributeList? ((ON KEY LPAREN keyList RPAREN codeBlock?)* END PROMPT)?
    ;
 
 inputEvents
@@ -703,20 +703,20 @@ inputInsideStatement
    ;
 
 inputGroupStatement
-   : inputEvents (codeBlock)*
+   : inputEvents codeBlock*
    ;
 
 inputStatement
-   : INPUT (BY NAME expression (COMMA expression)* (WITHOUT DEFAULTS)? | expression (COMMA expression)* (WITHOUT DEFAULTS)? FROM fieldList) (attributeList)? (HELP numericConstant)? ((inputGroupStatement) + END INPUT)?
+   : INPUT (BY NAME expression (COMMA expression)* (WITHOUT DEFAULTS)? | expression (COMMA expression)* (WITHOUT DEFAULTS)? FROM fieldList) attributeList? (HELP numericConstant)? (inputGroupStatement+ END INPUT)?
    ;
 
 inputArrayStatement
-   : INPUT ARRAY expression (WITHOUT DEFAULTS)? FROM expression (COMMA expression)* (HELP numericConstant)? (attributeList)? ((inputGroupStatement) + END INPUT)?
+   : INPUT ARRAY expression (WITHOUT DEFAULTS)? FROM expression (COMMA expression)* (HELP numericConstant)? attributeList? (inputGroupStatement+ END INPUT)?
    ;
 
 menuEvents
    : BEFORE MENU
-   | COMMAND ((KEY LPAREN keyList RPAREN)? expression (expression)? (HELP numericConstant)?)
+   | COMMAND ((KEY LPAREN keyList RPAREN)? expression expression? (HELP numericConstant)?)
    ;
 
 menuInsideStatement
@@ -728,11 +728,11 @@ menuInsideStatement
    ;
 
 menuGroupStatement
-   : menuEvents (codeBlock)?
+   : menuEvents codeBlock?
    ;
 
 menuStatement
-   : MENU expression (menuGroupStatement)* END MENU
+   : MENU expression menuGroupStatement* END MENU
    ;
 
 reservedLinePosition
@@ -745,7 +745,7 @@ specialWindowAttribute
    : (BLACK | BLUE | CYAN | GREEN | MAGENTA | RED | WHITE | YELLOW | BOLD | DIM | NORMAL | INVISIBLE)
    | REVERSE
    | BORDER
-   | (PROMPT | FORM | MENU | MESSAGE) LINE (reservedLinePosition)
+   | (PROMPT | FORM | MENU | MESSAGE) LINE reservedLinePosition
    | COMMENT LINE (reservedLinePosition | OFF)
    ;
 
@@ -766,14 +766,14 @@ optionsStatement
    ;
 
 screenStatement
-   : CLEAR (FORM | WINDOW identifier | (WINDOW)? SCREEN | fieldList)
+   : CLEAR (FORM | WINDOW identifier | WINDOW? SCREEN | fieldList)
    | CLOSE WINDOW identifier eol
    | CLOSE FORM identifier eol
    | constructStatement
    | CURRENT WINDOW IS (SCREEN | identifier) eol
    | displayStatement
    | displayArrayStatement
-   | DISPLAY FORM identifier (attributeList)? eol
+   | DISPLAY FORM identifier attributeList? eol
    | errorStatement
    | messageStatement
    | promptStatement
@@ -781,7 +781,7 @@ screenStatement
    | inputArrayStatement
    | menuStatement
    | OPEN FORM expression FROM expression
-   | OPEN WINDOW expression AT expression COMMA expression (WITH FORM expression | WITH expression ROWS COMMA expression COLUMNS) (windowAttributeList)?
+   | OPEN WINDOW expression AT expression COMMA expression (WITH FORM expression | WITH expression ROWS COMMA expression COLUMNS) windowAttributeList?
    | optionsStatement
    | SCROLL fieldList (COMMA fieldList)* (UP | DOWN) (BY numericConstant)?
    ;
@@ -828,8 +828,8 @@ columnItem
 
 dataDefinitionStatement
    : DROP TABLE constantIdentifier
-   | CREATE (TEMP)? TABLE constantIdentifier LPAREN columnItem (COMMA columnItem)* RPAREN (WITH NO LOG)? (IN constantIdentifier)? (EXTENT SIZE numericConstant)? (NEXT SIZE numericConstant)? (LOCK MODE LPAREN (PAGE | ROW) RPAREN)?
-   | CREATE (UNIQUE)? (CLUSTER)? INDEX constantIdentifier ON constantIdentifier LPAREN constantIdentifier (ASC | DESC)? (COMMA constantIdentifier (ASC | DESC)?)* RPAREN
+   | CREATE TEMP? TABLE constantIdentifier LPAREN columnItem (COMMA columnItem)* RPAREN (WITH NO LOG)? (IN constantIdentifier)? (EXTENT SIZE numericConstant)? (NEXT SIZE numericConstant)? (LOCK MODE LPAREN (PAGE | ROW) RPAREN)?
+   | CREATE UNIQUE? CLUSTER? INDEX constantIdentifier ON constantIdentifier LPAREN constantIdentifier (ASC | DESC)? (COMMA constantIdentifier (ASC | DESC)?)* RPAREN
    | DROP INDEX constantIdentifier
    ;
 
@@ -848,11 +848,11 @@ sqlSelectStatement
 
 columnsTableId
    : STAR
-   | (tableIdentifier (indexingVariable)?) (DOT STAR | DOT columnsTableId)?
+   | (tableIdentifier indexingVariable?) (DOT STAR | DOT columnsTableId)?
    ;
 
 selectList
-   : ((sqlExpression) (sqlAlias)? (COMMA (sqlExpression) (sqlAlias)?)*)
+   : (sqlExpression sqlAlias? (COMMA sqlExpression sqlAlias?)*)
    ;
 
 headSelectStatement
@@ -860,15 +860,17 @@ headSelectStatement
    ;
 
 tableQualifier
-   : ((constantIdentifier COLON | constantIdentifier ATSYMBOL constantIdentifier COLON)? | (string)?)?
+   : constantIdentifier COLON
+   | constantIdentifier ATSYMBOL constantIdentifier COLON
+   | string
    ;
 
 tableIdentifier
-   : tableQualifier constantIdentifier
+   : tableQualifier? constantIdentifier
    ;
 
 fromTable
-   : (OUTER)? tableIdentifier (sqlAlias)?
+   : OUTER? tableIdentifier sqlAlias?
    ;
 
 tableExpression
@@ -876,7 +878,7 @@ tableExpression
    ;
 
 fromSelectStatement
-   : FROM (fromTable | LPAREN tableExpression RPAREN (sqlAlias)?) (COMMA (fromTable | LPAREN tableExpression RPAREN (sqlAlias)?))*
+   : FROM (fromTable | LPAREN tableExpression RPAREN sqlAlias?) (COMMA (fromTable | LPAREN tableExpression RPAREN sqlAlias?))*
    ;
 
 aliasName
@@ -884,15 +886,15 @@ aliasName
    ;
 
 mainSelectStatement
-   : headSelectStatement (INTO variableList)? fromSelectStatement (whereStatement)? (groupByStatement)? (havingStatement)? (unionSelectStatement)? (orderbyStatement)? (INTO TEMP identifier)? (WITH NO LOG)?
+   : headSelectStatement (INTO variableList)? fromSelectStatement whereStatement? groupByStatement? havingStatement? unionSelectStatement? orderbyStatement? (INTO TEMP identifier)? (WITH NO LOG)?
    ;
 
 unionSelectStatement
-   : (UNION (ALL)? simpleSelectStatement)
+   : (UNION ALL? simpleSelectStatement)
    ;
 
 simpleSelectStatement
-   : headSelectStatement fromSelectStatement (whereStatement)? (groupByStatement)? (havingStatement)? (unionSelectStatement)?
+   : headSelectStatement fromSelectStatement whereStatement? groupByStatement? havingStatement? unionSelectStatement?
    ;
 
 whereStatement
@@ -948,14 +950,14 @@ dynamicManagementStatement
 
 queryOptimizationStatement
    : UPDATE STATISTICS (FOR TABLE tableIdentifier)?
-   | SET LOCK MODE TO (WAIT (SECONDS)? | NOT WAIT)
+   | SET LOCK MODE TO (WAIT SECONDS? | NOT WAIT)
    | SET EXPLAIN (ON | OFF)
    | SET ISOLATION TO (CURSOR STABILITY | (DIRTY | COMMITTED | REPEATABLE) READ)
-   | SET (BUFFERED)? LOG
+   | SET BUFFERED? LOG
    ;
 
 databaseDeclaration
-   : DATABASE (constantIdentifier (ATSYMBOL constantIdentifier)?) (EXCLUSIVE)? (SEMI)?
+   : DATABASE (constantIdentifier (ATSYMBOL constantIdentifier)?) EXCLUSIVE? SEMI?
    ;
 
 clientServerStatement
@@ -975,18 +977,18 @@ wheneverStatement
 
 wheneverType
    : NOT FOUND
-   | (ANY)? (SQLERROR | ERROR)
+   | ANY? (SQLERROR | ERROR)
    | (SQLWARNING | WARNING)
    ;
 
 wheneverFlow
    : (CONTINUE | STOP)
    | CALL identifier
-   | (GO TO | GOTO) (COLON)? identifier
+   | (GO TO | GOTO) COLON? identifier
    ;
 
 reportDefinition
-   : REPORT identifier parameterList? (typeDeclarations)? (outputReport)? (ORDER (EXTERNAL)? BY variableList)? (formatReport)? END REPORT
+   : REPORT identifier parameterList? typeDeclarations? outputReport? (ORDER EXTERNAL? BY variableList)? formatReport? END REPORT
    ;
 
 outputReport
@@ -994,7 +996,7 @@ outputReport
    ;
 
 formatReport
-   : FORMAT (EVERY ROW | (((FIRST)? PAGE HEADER | PAGE TRAILER | ON (EVERY ROW | LAST ROW) | (BEFORE | AFTER) GROUP OF variable) codeBlock) +)
+   : FORMAT (EVERY ROW | ((FIRST? PAGE HEADER | PAGE TRAILER | ON (EVERY ROW | LAST ROW) | (BEFORE | AFTER) GROUP OF variable) codeBlock)+)
    ;
 
 eol
@@ -2874,17 +2876,17 @@ STRING_LITERAL
 // a numeric literal
 
 NUM_INT
-   : '.' (('0' .. '9') +)? | (('0' .. '9') ('0' .. '9')*)
+   : '.' (('0' .. '9')+)? | (('0' .. '9') ('0' .. '9')*)
    ;
 
 
 NUM_REAL
-   : ('0' .. '9') + '.' ('0' .. '9')* EXPONENT? | '.' ('0' .. '9') + EXPONENT? | ('0' .. '9') + EXPONENT
+   : ('0' .. '9')+ '.' ('0' .. '9')* EXPONENT? | '.' ('0' .. '9')+ EXPONENT? | ('0' .. '9')+ EXPONENT
    ;
 
 
 fragment EXPONENT
-   : ('e' | 'E') ('+' | '-')? ('0' .. '9') +
+   : ('e' | 'E') ('+' | '-')? ('0' .. '9')+
    ;
 
 // escape sequence -- note that this is protected; it can only be called

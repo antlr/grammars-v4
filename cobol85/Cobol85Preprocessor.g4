@@ -10,150 +10,105 @@
 * Cobol 85 Preprocessor Grammar for ANTLR4
 *
 * This is a preprocessor grammar for Cobol 85.
-*
-* Change log:
-*
-* v1.4
-*   - control spacing statements
-*
-* v1.2
-*	- fixes
-*
-* v1.1
-*	- fixes
-*
-* v1.0
-*	- EXEC SQL
-*	- EXEC CICS
-*
-* v0.9 Initial revision
 */
 
 grammar Cobol85Preprocessor;
 
-options
-{
-	language = Java;
-}
-
-startRule : (
-	copyStatement
-	| execCicsStatement
-	| execSqlStatement
-	| replaceOffStatement
-	| replaceArea 
-	| charData
-	| controlSpacingStatement
-)* EOF;
-
+startRule
+   : (copyStatement | execCicsStatement | execSqlStatement | replaceOffStatement | replaceArea | charData | controlSpacingStatement)* EOF
+   ;
 
 // exec cics statement
 
-execCicsStatement :
-	EXEC CICS charData END_EXEC DOT?
-;
-
+execCicsStatement
+   : EXEC CICS charData END_EXEC DOT?
+   ;
 
 // exec sql statement
 
-execSqlStatement :
-	EXEC SQL charData END_EXEC DOT?
-;
-
+execSqlStatement
+   : EXEC SQL charData END_EXEC DOT?
+   ;
 
 // copy statement
 
-copyStatement :
-	COPY copySource
-	(NEWLINE* directoryPhrase)?
-	(NEWLINE* familyPhrase)?
-	(NEWLINE* replacingPhrase)?
-	SUPPRESS?
-	DOT
-;
+copyStatement
+   : COPY copySource (NEWLINE* directoryPhrase)? (NEWLINE* familyPhrase)? (NEWLINE* replacingPhrase)? SUPPRESS? DOT
+   ;
 
-copySource : literal | cobolWord;
+copySource
+   : literal | cobolWord
+   ;
 
-replacingPhrase :
-	REPLACING NEWLINE* replaceClause (NEWLINE+ replaceClause)*
-;
-
+replacingPhrase
+   : REPLACING NEWLINE* replaceClause (NEWLINE+ replaceClause)*
+   ;
 
 // replace statement
 
-replaceArea : 
-	replaceByStatement
-	(copyStatement | charData)*
-	replaceOffStatement?
-;
+replaceArea
+   : replaceByStatement (copyStatement | charData)* replaceOffStatement?
+   ;
 
-replaceByStatement :
-	REPLACE (NEWLINE* replaceClause)+ DOT
-;
+replaceByStatement
+   : REPLACE (NEWLINE* replaceClause)+ DOT
+   ;
 
-replaceOffStatement :
-	REPLACE OFF DOT
-;
+replaceOffStatement
+   : REPLACE OFF DOT
+   ;
 
+replaceClause
+   : replaceable NEWLINE* BY NEWLINE* replacement (NEWLINE* directoryPhrase)? (NEWLINE* familyPhrase)?
+   ;
 
-replaceClause : 
-	replaceable NEWLINE* BY NEWLINE* replacement
-	(NEWLINE* directoryPhrase)? 
-	(NEWLINE* familyPhrase)? 
-;
+directoryPhrase
+   : (OF | IN) NEWLINE* (literal | cobolWord)
+   ;
 
-directoryPhrase :
-	(OF | IN) NEWLINE* (literal | cobolWord)
-;
+familyPhrase
+   : ON NEWLINE* (literal | cobolWord)
+   ;
 
-familyPhrase : 
-	ON NEWLINE* (literal | cobolWord)
-;
+replaceable
+   : literal | cobolWord | pseudoText | charDataLine
+   ;
 
-replaceable : literal | cobolWord | pseudoText | charDataLine;
+replacement
+   : literal | cobolWord | pseudoText | charDataLine
+   ;
 
-replacement : literal | cobolWord | pseudoText | charDataLine;
-
-
-controlSpacingStatement :
-	SKIP1 | SKIP2 | SKIP3 | EJECT
-;
+controlSpacingStatement
+   : SKIP1 | SKIP2 | SKIP3 | EJECT
+   ;
 
 // literal ----------------------------------
 
-cobolWord : IDENTIFIER;
+cobolWord
+   : IDENTIFIER
+   ;
 
-literal : NONNUMERICLITERAL;
+literal
+   : NONNUMERICLITERAL
+   ;
 
-pseudoText : DOUBLEEQUALCHAR charData? DOUBLEEQUALCHAR;
+pseudoText
+   : DOUBLEEQUALCHAR charData? DOUBLEEQUALCHAR
+   ;
 
-charData : 
-	(
-		charDataLine
-		| NEWLINE
-	)+
-;
+charData
+   : (charDataLine | NEWLINE)+
+   ;
 
-charDataLine : 
-	(
-		charDataKeyword
-		| cobolWord
-		| literal
-		| TEXT
-		| DOT
-	)+
-;
-
+charDataLine
+   : (charDataKeyword | cobolWord | literal | TEXT | DOT)+
+   ;
 
 // keywords ----------------------------------
 
-charDataKeyword : 
-	BY
-	| IN
-	| OF | OFF | ON
-	| REPLACING
-;
-
+charDataKeyword
+   : BY | IN | OF | OFF | ON | REPLACING
+   ;
 
 // lexer rules --------------------------------------------------------------------------------
 
@@ -162,7 +117,7 @@ BY : B Y;
 CICS : C I C S;
 COPY : C O P Y;
 EJECT : E J E C T;
-END_EXEC : E N D '-' E X E C; 
+END_EXEC : E N D '-' E X E C;
 EXEC : E X E C;
 IN : I N;
 OF : O F;
@@ -176,36 +131,31 @@ SKIP2 : S K I P '2';
 SKIP3 : S K I P '3';
 SUPPRESS : S U P P R E S S;
 
-
 // symbols
 COMMENTTAG : '>*';
 DOT : '.';
 DOUBLEEQUALCHAR : '==';
 
-
 // literals
 NONNUMERICLITERAL : STRINGLITERAL | HEXNUMBER;
 
-fragment HEXNUMBER : 
-	X '"' [0-9A-F]+ '"' 
+fragment HEXNUMBER :
+	X '"' [0-9A-F]+ '"'
 	| X '\'' [0-9A-F]+ '\''
 ;
 
-fragment STRINGLITERAL : 
-	'"' (~["\n\r] | '""' | '\'')* '"' 
+fragment STRINGLITERAL :
+	'"' (~["\n\r] | '""' | '\'')* '"'
 	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
 ;
 
 IDENTIFIER : [a-zA-Z0-9]+ ([-_]+ [a-zA-Z0-9]+)*;
-
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n';
 COMMENTLINE : COMMENTTAG ~('\n' | '\r')* -> channel(HIDDEN);
 WS : [ \t\f;]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
-
-
 
 // case insensitive chars
 fragment A:('a'|'A');

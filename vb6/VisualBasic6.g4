@@ -5,13 +5,15 @@
 * This software may be modified and distributed under the terms
 * of the BSD 3-clause license. See the LICENSE file for details.
 */
+
 /*
 * Visual Basic 6.0 Grammar for ANTLR4
 *
-* This is an approximate grammar for Visual Basic 6.0, derived 
-* from the Visual Basic 6.0 language reference 
+* This is an approximate grammar for Visual Basic 6.0 and the parser at
+* https://github.com/uwol/vb6parser. The grammar is derived from the 
+* Visual Basic 6.0 language reference 
 * http://msdn.microsoft.com/en-us/library/aa338033%28v=vs.60%29.aspx 
-* and tested against MSDN VB6 statement examples as well as several Visual 
+* and tested against MSDN VB6 statements as well as several Visual 
 * Basic 6.0 code repositories.
 *
 * Characteristics:
@@ -22,33 +24,6 @@
 *
 * 2. Keywords can be used as identifiers depending on the context, enabling
 *    e.g. "A.Type", but not "Type.B".
-*
-*
-* Known limitations:
-*
-* 1. Preprocessor statements (#if, #else, ...) must not interfere with regular
-*    statements.
-*
-* 2. Comments are skipped.
-*
-*
-* Change log:
-*
-* v1.4
-*	- erase statement fix
-*	- explicit token definition
-*
-* v1.3
-*	- call statement precedence
-*
-* v1.2
-*	- refined call statements
-*
-* v1.1 
-*	- precedence of operators and of ELSE in select statements
-*	- optimized member calls
-*
-* v1.0 Initial revision
 */
 
 grammar VisualBasic6;
@@ -59,38 +34,38 @@ startRule
    ;
 
 module
-   : (moduleHeader)? moduleConfig? moduleAttributes? moduleOptions? moduleBody?
+   : WS? NEWLINE* (moduleHeader NEWLINE +)? moduleConfig? NEWLINE* moduleAttributes? NEWLINE* moduleOptions? NEWLINE* moduleBody? NEWLINE* WS?
    ;
 
 moduleHeader
-   : VERSION DOUBLELITERAL CLASS
+   : VERSION WS DOUBLELITERAL WS CLASS
    ;
 
 moduleConfig
-   : BEGIN moduleConfigElement + END
+   : BEGIN NEWLINE + moduleConfigElement + END NEWLINE +
    ;
 
 moduleConfigElement
-   : ambiguousIdentifier EQ literal
+   : ambiguousIdentifier WS? EQ WS? literal NEWLINE
    ;
 
 moduleAttributes
-   : (attributeStmt) +
+   : (attributeStmt NEWLINE +) +
    ;
 
 moduleOptions
-   : (moduleOption) +
+   : (moduleOption NEWLINE +) +
    ;
 
 moduleOption
-   : OPTION_BASE INTEGERLITERAL # optionBaseStmt
-   | OPTION_COMPARE (BINARY | TEXT) # optionCompareStmt
+   : OPTION_BASE WS INTEGERLITERAL # optionBaseStmt
+   | OPTION_COMPARE WS (BINARY | TEXT) # optionCompareStmt
    | OPTION_EXPLICIT # optionExplicitStmt
    | OPTION_PRIVATE_MODULE # optionPrivateModuleStmt
    ;
 
 moduleBody
-   : moduleBodyElement (moduleBodyElement)*
+   : moduleBodyElement (NEWLINE + moduleBodyElement)*
    ;
 
 moduleBodyElement
@@ -113,11 +88,11 @@ moduleBlock
    ;
 
 attributeStmt
-   : ATTRIBUTE implicitCallStmt_InStmt EQ literal (COMMA literal)*
+   : ATTRIBUTE WS implicitCallStmt_InStmt WS? EQ WS? literal (WS? COMMA WS? literal)*
    ;
 
 block
-   : blockStmt (blockStmt)*
+   : blockStmt (NEWLINE + WS? blockStmt)*
    ;
 
 blockStmt
@@ -192,7 +167,7 @@ blockStmt
 
 // statements ----------------------------------
 appactivateStmt
-   : APPACTIVATE valueStmt (COMMA valueStmt)?
+   : APPACTIVATE WS valueStmt (WS? COMMA WS? valueStmt)?
    ;
 
 beepStmt
@@ -200,45 +175,45 @@ beepStmt
    ;
 
 chdirStmt
-   : CHDIR valueStmt
+   : CHDIR WS valueStmt
    ;
 
 chdriveStmt
-   : CHDRIVE valueStmt
+   : CHDRIVE WS valueStmt
    ;
 
 closeStmt
-   : CLOSE (valueStmt (COMMA valueStmt)*)?
+   : CLOSE (WS valueStmt (WS? COMMA WS? valueStmt)*)?
    ;
 
 constStmt
-   : (visibility)? CONST constSubStmt (COMMA constSubStmt)*
+   : (visibility WS)? CONST WS constSubStmt (WS? COMMA WS? constSubStmt)*
    ;
 
 constSubStmt
-   : ambiguousIdentifier typeHint? (asTypeClause)? EQ valueStmt
+   : ambiguousIdentifier typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt
    ;
 
 dateStmt
-   : DATE EQ valueStmt
+   : DATE WS? EQ WS? valueStmt
    ;
 
 declareStmt
-   : (visibility)? DECLARE (FUNCTION typeHint? | SUB) ambiguousIdentifier typeHint? LIB STRINGLITERAL (ALIAS STRINGLITERAL)? (argList)? (asTypeClause)?
+   : (visibility WS)? DECLARE WS (FUNCTION typeHint? | SUB) WS ambiguousIdentifier typeHint? WS LIB WS STRINGLITERAL (WS ALIAS WS STRINGLITERAL)? (WS? argList)? (WS asTypeClause)?
    ;
 
 deftypeStmt
-   : (DEFBOOL | DEFBYTE | DEFINT | DEFLNG | DEFCUR | DEFSNG | DEFDBL | DEFDEC | DEFDATE | DEFSTR | DEFOBJ | DEFVAR) letterrange (COMMA letterrange)*
+   : (DEFBOOL | DEFBYTE | DEFINT | DEFLNG | DEFCUR | DEFSNG | DEFDBL | DEFDEC | DEFDATE | DEFSTR | DEFOBJ | DEFVAR) WS letterrange (WS? COMMA WS? letterrange)*
    ;
 
 deleteSettingStmt
-   : DELETESETTING valueStmt COMMA valueStmt (COMMA valueStmt)?
+   : DELETESETTING WS valueStmt WS? COMMA WS? valueStmt (WS? COMMA WS? valueStmt)?
    ;
 
 doLoopStmt
-   : DO (block)? LOOP
-   | DO (WHILE | UNTIL) valueStmt (block)? LOOP
-   | DO (block) LOOP (WHILE | UNTIL) valueStmt
+   : DO NEWLINE + (block NEWLINE +)? LOOP
+   | DO WS (WHILE | UNTIL) WS valueStmt NEWLINE + (block NEWLINE +)? LOOP
+   | DO NEWLINE + (block NEWLINE +) LOOP WS (WHILE | UNTIL) WS valueStmt
    ;
 
 endStmt
@@ -246,23 +221,23 @@ endStmt
    ;
 
 enumerationStmt
-   : (visibility)? ENUM ambiguousIdentifier (enumerationStmt_Constant)* END_ENUM
+   : (visibility WS)? ENUM WS ambiguousIdentifier NEWLINE + (enumerationStmt_Constant)* END_ENUM
    ;
 
 enumerationStmt_Constant
-   : ambiguousIdentifier (EQ valueStmt)?
+   : ambiguousIdentifier (WS? EQ WS? valueStmt)? NEWLINE +
    ;
 
 eraseStmt
-   : ERASE valueStmt (COMMA valueStmt)*
+   : ERASE WS valueStmt (WS? COMMA WS? valueStmt)*
    ;
 
 errorStmt
-   : ERROR valueStmt
+   : ERROR WS valueStmt
    ;
 
 eventStmt
-   : (visibility)? EVENT ambiguousIdentifier argList
+   : (visibility WS)? EVENT WS ambiguousIdentifier WS? argList
    ;
 
 exitStmt
@@ -274,40 +249,40 @@ exitStmt
    ;
 
 filecopyStmt
-   : FILECOPY valueStmt COMMA valueStmt
+   : FILECOPY WS valueStmt WS? COMMA WS? valueStmt
    ;
 
 forEachStmt
-   : FOR EACH ambiguousIdentifier typeHint? IN valueStmt (block)? NEXT (ambiguousIdentifier)?
+   : FOR WS EACH WS ambiguousIdentifier typeHint? WS IN WS valueStmt NEWLINE + (block NEWLINE +)? NEXT (WS ambiguousIdentifier)?
    ;
 
 forNextStmt
-   : FOR ambiguousIdentifier typeHint? (asTypeClause)? EQ valueStmt TO valueStmt (STEP valueStmt)? (block)? NEXT (ambiguousIdentifier)?
+   : FOR WS ambiguousIdentifier typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt WS TO WS valueStmt (WS STEP WS valueStmt)? NEWLINE + (block NEWLINE +)? NEXT (WS ambiguousIdentifier)?
    ;
 
 functionStmt
-   : (visibility)? (STATIC)? FUNCTION ambiguousIdentifier (argList)? (asTypeClause)? (block)? END_FUNCTION
+   : (visibility WS)? (STATIC WS)? FUNCTION WS ambiguousIdentifier (WS? argList)? (WS asTypeClause)? NEWLINE + (block NEWLINE +)? END_FUNCTION
    ;
 
 getStmt
-   : GET valueStmt COMMA valueStmt? COMMA valueStmt
+   : GET WS valueStmt WS? COMMA WS? valueStmt? WS? COMMA WS? valueStmt
    ;
 
 goSubStmt
-   : GOSUB valueStmt
+   : GOSUB WS valueStmt
    ;
 
 goToStmt
-   : GOTO valueStmt
+   : GOTO WS valueStmt
    ;
 
 ifThenElseStmt
-   : IF ifConditionStmt THEN blockStmt (ELSE blockStmt)? # inlineIfThenElse
+   : IF WS ifConditionStmt WS THEN WS blockStmt (WS ELSE WS blockStmt)? # inlineIfThenElse
    | ifBlockStmt ifElseIfBlockStmt* ifElseBlockStmt? END_IF # blockIfThenElse
    ;
 
 ifBlockStmt
-   : IF ifConditionStmt THEN (block)?
+   : IF WS ifConditionStmt WS THEN NEWLINE + (block NEWLINE +)?
    ;
 
 ifConditionStmt
@@ -315,43 +290,43 @@ ifConditionStmt
    ;
 
 ifElseIfBlockStmt
-   : ELSEIF ifConditionStmt THEN (block)?
+   : ELSEIF WS ifConditionStmt WS THEN NEWLINE + (block NEWLINE +)?
    ;
 
 ifElseBlockStmt
-   : ELSE (block)?
+   : ELSE NEWLINE + (block NEWLINE +)?
    ;
 
 implementsStmt
-   : IMPLEMENTS ambiguousIdentifier
+   : IMPLEMENTS WS ambiguousIdentifier
    ;
 
 inputStmt
-   : INPUT valueStmt (COMMA valueStmt) +
+   : INPUT WS valueStmt (WS? COMMA WS? valueStmt) +
    ;
 
 killStmt
-   : KILL valueStmt
+   : KILL WS valueStmt
    ;
 
 letStmt
-   : (LET)? implicitCallStmt_InStmt (EQ | PLUS_EQ | MINUS_EQ) valueStmt
+   : (LET WS)? implicitCallStmt_InStmt WS? (EQ | PLUS_EQ | MINUS_EQ) WS? valueStmt
    ;
 
 lineInputStmt
-   : LINE_INPUT valueStmt COMMA valueStmt
+   : LINE_INPUT WS valueStmt WS? COMMA WS? valueStmt
    ;
 
 loadStmt
-   : LOAD valueStmt
+   : LOAD WS valueStmt
    ;
 
 lockStmt
-   : LOCK valueStmt (COMMA valueStmt (TO valueStmt)?)?
+   : LOCK WS valueStmt (WS? COMMA WS? valueStmt (WS TO WS valueStmt)?)?
    ;
 
 lsetStmt
-   : LSET implicitCallStmt_InStmt EQ valueStmt
+   : LSET WS implicitCallStmt_InStmt WS? EQ WS? valueStmt
    ;
 
 macroIfThenElseStmt
@@ -359,89 +334,89 @@ macroIfThenElseStmt
    ;
 
 macroIfBlockStmt
-   : MACRO_IF ifConditionStmt THEN (moduleBody)?
+   : MACRO_IF WS ifConditionStmt WS THEN NEWLINE + (moduleBody NEWLINE +)?
    ;
 
 macroElseIfBlockStmt
-   : MACRO_ELSEIF ifConditionStmt THEN (moduleBody)?
+   : MACRO_ELSEIF WS ifConditionStmt WS THEN NEWLINE + (moduleBody NEWLINE +)?
    ;
 
 macroElseBlockStmt
-   : MACRO_ELSE (moduleBody)?
+   : MACRO_ELSE NEWLINE + (moduleBody NEWLINE +)?
    ;
 
 midStmt
-   : MID LPAREN argsCall RPAREN
+   : MID WS? LPAREN WS? argsCall WS? RPAREN
    ;
 
 mkdirStmt
-   : MKDIR valueStmt
+   : MKDIR WS valueStmt
    ;
 
 nameStmt
-   : NAME valueStmt AS valueStmt
+   : NAME WS valueStmt WS AS WS valueStmt
    ;
 
 onErrorStmt
-   : ON_ERROR (GOTO valueStmt | RESUME NEXT)
+   : ON_ERROR WS (GOTO WS valueStmt | RESUME WS NEXT)
    ;
 
 onGoToStmt
-   : ON valueStmt GOTO valueStmt (COMMA valueStmt)*
+   : ON WS valueStmt WS GOTO WS valueStmt (WS? COMMA WS? valueStmt)*
    ;
 
 onGoSubStmt
-   : ON valueStmt GOSUB valueStmt (COMMA valueStmt)*
+   : ON WS valueStmt WS GOSUB WS valueStmt (WS? COMMA WS? valueStmt)*
    ;
 
 openStmt
-   : OPEN valueStmt FOR (APPEND | BINARY | INPUT | OUTPUT | RANDOM) (ACCESS (READ | WRITE | READ_WRITE))? ((SHARED | LOCK_READ | LOCK_WRITE | LOCK_READ_WRITE))? AS valueStmt (LEN EQ valueStmt)?
+   : OPEN WS valueStmt WS FOR WS (APPEND | BINARY | INPUT | OUTPUT | RANDOM) (WS ACCESS WS (READ | WRITE | READ_WRITE))? (WS (SHARED | LOCK_READ | LOCK_WRITE | LOCK_READ_WRITE))? WS AS WS valueStmt (WS LEN WS? EQ WS? valueStmt)?
    ;
 
 outputList
-   : outputList_Expression ((SEMICOLON | COMMA) outputList_Expression?)*
-   | outputList_Expression? ((SEMICOLON | COMMA) outputList_Expression?) +
+   : outputList_Expression (WS? (SEMICOLON | COMMA) WS? outputList_Expression?)*
+   | outputList_Expression? (WS? (SEMICOLON | COMMA) WS? outputList_Expression?) +
    ;
 
 outputList_Expression
    : valueStmt
-   | (SPC | TAB) (LPAREN argsCall RPAREN)?
+   | (SPC | TAB) (WS? LPAREN WS? argsCall WS? RPAREN)?
    ;
 
 printStmt
-   : PRINT valueStmt COMMA (outputList)?
+   : PRINT WS valueStmt WS? COMMA (WS? outputList)?
    ;
 
 propertyGetStmt
-   : (visibility)? (STATIC)? PROPERTY_GET ambiguousIdentifier typeHint? (argList)? (asTypeClause)? (block)? END_PROPERTY
+   : (visibility WS)? (STATIC WS)? PROPERTY_GET WS ambiguousIdentifier typeHint? (WS? argList)? (WS asTypeClause)? NEWLINE + (block NEWLINE +)? END_PROPERTY
    ;
 
 propertySetStmt
-   : (visibility)? (STATIC)? PROPERTY_SET ambiguousIdentifier (argList)? (block)? END_PROPERTY
+   : (visibility WS)? (STATIC WS)? PROPERTY_SET WS ambiguousIdentifier (WS? argList)? NEWLINE + (block NEWLINE +)? END_PROPERTY
    ;
 
 propertyLetStmt
-   : (visibility)? (STATIC)? PROPERTY_LET ambiguousIdentifier (argList)? (block)? END_PROPERTY
+   : (visibility WS)? (STATIC WS)? PROPERTY_LET WS ambiguousIdentifier (WS? argList)? NEWLINE + (block NEWLINE +)? END_PROPERTY
    ;
 
 putStmt
-   : PUT valueStmt COMMA valueStmt? COMMA valueStmt
+   : PUT WS valueStmt WS? COMMA WS? valueStmt? WS? COMMA WS? valueStmt
    ;
 
 raiseEventStmt
-   : RAISEEVENT ambiguousIdentifier (LPAREN (argsCall)? RPAREN)?
+   : RAISEEVENT WS ambiguousIdentifier (WS? LPAREN WS? (argsCall WS?)? RPAREN)?
    ;
 
 randomizeStmt
-   : RANDOMIZE (valueStmt)?
+   : RANDOMIZE (WS valueStmt)?
    ;
 
 redimStmt
-   : REDIM (PRESERVE)? redimSubStmt (COMMA redimSubStmt)*
+   : REDIM WS (PRESERVE WS)? redimSubStmt (WS? COMMA WS? redimSubStmt)*
    ;
 
 redimSubStmt
-   : implicitCallStmt_InStmt LPAREN subscripts RPAREN (asTypeClause)?
+   : implicitCallStmt_InStmt WS? LPAREN WS? subscripts WS? RPAREN (WS asTypeClause)?
    ;
 
 resetStmt
@@ -449,7 +424,7 @@ resetStmt
    ;
 
 resumeStmt
-   : RESUME ((NEXT | ambiguousIdentifier))?
+   : RESUME (WS (NEXT | ambiguousIdentifier))?
    ;
 
 returnStmt
@@ -457,51 +432,55 @@ returnStmt
    ;
 
 rmdirStmt
-   : RMDIR valueStmt
+   : RMDIR WS valueStmt
    ;
 
 rsetStmt
-   : RSET implicitCallStmt_InStmt EQ valueStmt
+   : RSET WS implicitCallStmt_InStmt WS? EQ WS? valueStmt
    ;
 
 savepictureStmt
-   : SAVEPICTURE valueStmt COMMA valueStmt
+   : SAVEPICTURE WS valueStmt WS? COMMA WS? valueStmt
    ;
 
 saveSettingStmt
-   : SAVESETTING valueStmt COMMA valueStmt COMMA valueStmt COMMA valueStmt
+   : SAVESETTING WS valueStmt WS? COMMA WS? valueStmt WS? COMMA WS? valueStmt WS? COMMA WS? valueStmt
    ;
 
 seekStmt
-   : SEEK valueStmt COMMA valueStmt
+   : SEEK WS valueStmt WS? COMMA WS? valueStmt
    ;
 
 selectCaseStmt
-   : SELECT CASE valueStmt sC_Case* END_SELECT
+   : SELECT WS CASE WS valueStmt NEWLINE + sC_Case* WS? END_SELECT
    ;
 
 sC_Case
-   : CASE sC_Cond (COLON? |) (block)?
+   : CASE WS sC_Cond WS? (COLON? NEWLINE* | NEWLINE +) (block NEWLINE +)?
    ;
 
 // ELSE first, so that it is not interpreted as a variable call
 sC_Cond
    : ELSE # caseCondElse
-   | IS comparisonOperator valueStmt # caseCondIs
-   | valueStmt (COMMA valueStmt)* # caseCondValue
-   | INTEGERLITERAL TO valueStmt (COMMA valueStmt)* # caseCondTo
+   | sC_CondExpr (WS? COMMA WS? sC_CondExpr)* #caseCondExpr
+   ;
+
+sC_CondExpr
+   : IS WS? comparisonOperator WS? valueStmt # caseCondExprIs
+   | valueStmt # caseCondExprValue
+   | valueStmt WS TO WS valueStmt # caseCondExprTo
    ;
 
 sendkeysStmt
-   : SENDKEYS valueStmt (COMMA valueStmt)?
+   : SENDKEYS WS valueStmt (WS? COMMA WS? valueStmt)?
    ;
 
 setattrStmt
-   : SETATTR valueStmt COMMA valueStmt
+   : SETATTR WS valueStmt WS? COMMA WS? valueStmt
    ;
 
 setStmt
-   : SET implicitCallStmt_InStmt EQ valueStmt
+   : SET WS implicitCallStmt_InStmt WS? EQ WS? valueStmt
    ;
 
 stopStmt
@@ -509,94 +488,94 @@ stopStmt
    ;
 
 subStmt
-   : (visibility)? (STATIC)? SUB ambiguousIdentifier (argList)? (HANDLES type)? (block)? END_SUB
+   : (visibility WS)? (STATIC WS)? SUB WS ambiguousIdentifier (WS? argList)? NEWLINE + (block NEWLINE +)? END_SUB
    ;
 
 timeStmt
-   : TIME EQ valueStmt
+   : TIME WS? EQ WS? valueStmt
    ;
 
 typeStmt
-   : (visibility)? TYPE ambiguousIdentifier (typeStmt_Element)* END_TYPE
+   : (visibility WS)? TYPE WS ambiguousIdentifier NEWLINE + (typeStmt_Element)* END_TYPE
    ;
 
 typeStmt_Element
-   : ambiguousIdentifier (LPAREN (subscripts)? RPAREN)? (asTypeClause)?
+   : ambiguousIdentifier (WS? LPAREN (WS? subscripts)? WS? RPAREN)? (WS asTypeClause)? NEWLINE +
    ;
 
 typeOfStmt
-   : TYPEOF valueStmt (IS type)?
+   : TYPEOF WS valueStmt (WS IS WS type)?
    ;
 
 unloadStmt
-   : UNLOAD valueStmt
+   : UNLOAD WS valueStmt
    ;
 
 unlockStmt
-   : UNLOCK valueStmt (COMMA valueStmt (TO valueStmt)?)?
+   : UNLOCK WS valueStmt (WS? COMMA WS? valueStmt (WS TO WS valueStmt)?)?
    ;
 
 // operator precedence is represented by rule order
 valueStmt
    : literal # vsLiteral
    | implicitCallStmt_InStmt # vsICS
-   | LPAREN valueStmt (COMMA valueStmt)* RPAREN # vsStruct
-   | NEW valueStmt # vsNew
+   | LPAREN WS? valueStmt (WS? COMMA WS? valueStmt)* RPAREN # vsStruct
+   | NEW WS valueStmt # vsNew
    | typeOfStmt # vsTypeOf
    | midStmt # vsMid
-   | ADDRESSOF valueStmt # vsAddressOf
-   | implicitCallStmt_InStmt ASSIGN valueStmt # vsAssign
-   | valueStmt IS valueStmt # vsIs
-   | valueStmt LIKE valueStmt # vsLike
-   | valueStmt GEQ valueStmt # vsGeq
-   | valueStmt LEQ valueStmt # vsLeq
-   | valueStmt GT valueStmt # vsGt
-   | valueStmt LT valueStmt # vsLt
-   | valueStmt NEQ valueStmt # vsNeq
-   | valueStmt EQ valueStmt # vsEq
-   | valueStmt AMPERSAND valueStmt # vsAmp
-   | MINUS valueStmt # vsNegation
-   | PLUS valueStmt # vsPlus
-   | valueStmt PLUS valueStmt # vsAdd
-   | valueStmt MOD valueStmt # vsMod
-   | valueStmt DIV valueStmt # vsDiv
-   | valueStmt MULT valueStmt # vsMult
-   | valueStmt MINUS valueStmt # vsMinus
-   | valueStmt POW valueStmt # vsPow
-   | valueStmt IMP valueStmt # vsImp
-   | valueStmt EQV valueStmt # vsEqv
-   | valueStmt XOR valueStmt # vsXor
-   | valueStmt OR valueStmt # vsOr
-   | valueStmt AND valueStmt # vsAnd
-   | NOT valueStmt # vsNot
+   | ADDRESSOF WS valueStmt # vsAddressOf
+   | implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt # vsAssign
+   | valueStmt WS IS WS valueStmt # vsIs
+   | valueStmt WS LIKE WS valueStmt # vsLike
+   | valueStmt WS? GEQ WS? valueStmt # vsGeq
+   | valueStmt WS? LEQ WS? valueStmt # vsLeq
+   | valueStmt WS? GT WS? valueStmt # vsGt
+   | valueStmt WS? LT WS? valueStmt # vsLt
+   | valueStmt WS? NEQ WS? valueStmt # vsNeq
+   | valueStmt WS? EQ WS? valueStmt # vsEq
+   | valueStmt WS AMPERSAND WS valueStmt # vsAmp
+   | MINUS WS? valueStmt # vsNegation
+   | PLUS WS? valueStmt # vsPlus
+   | valueStmt WS? PLUS WS? valueStmt # vsAdd
+   | valueStmt WS? MOD WS? valueStmt # vsMod
+   | valueStmt WS? DIV WS? valueStmt # vsDiv
+   | valueStmt WS? MULT WS? valueStmt # vsMult
+   | valueStmt WS? MINUS WS? valueStmt # vsMinus
+   | valueStmt WS? POW WS? valueStmt # vsPow
+   | valueStmt WS IMP WS valueStmt # vsImp
+   | valueStmt WS EQV WS valueStmt # vsEqv
+   | valueStmt WS? XOR WS? valueStmt # vsXor
+   | valueStmt WS? OR WS? valueStmt # vsOr
+   | valueStmt WS AND WS valueStmt # vsAnd
+   | NOT WS valueStmt # vsNot
    ;
 
 variableStmt
-   : (DIM | STATIC | visibility) (WITHEVENTS)? variableListStmt
+   : (DIM | STATIC | visibility) WS (WITHEVENTS WS)? variableListStmt
    ;
 
 variableListStmt
-   : variableSubStmt (COMMA variableSubStmt)*
+   : variableSubStmt (WS? COMMA WS? variableSubStmt)*
    ;
 
 variableSubStmt
-   : ambiguousIdentifier (LPAREN (subscripts)? RPAREN)? typeHint? (asTypeClause)?
+   : ambiguousIdentifier (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? typeHint? (WS asTypeClause)?
    ;
 
 whileWendStmt
-   : WHILE valueStmt block* WEND
+   : WHILE WS valueStmt NEWLINE + (block NEWLINE)* WEND
    ;
 
 widthStmt
-   : WIDTH valueStmt COMMA valueStmt
+   : WIDTH WS valueStmt WS? COMMA WS? valueStmt
    ;
 
 withStmt
-   : WITH implicitCallStmt_InStmt (block)? END_WITH
+   : WITH WS implicitCallStmt_InStmt NEWLINE + (block NEWLINE +)? END_WITH
    ;
 
 writeStmt
-   : WRITE valueStmt COMMA (outputList)?
+   : WRITE WS valueStmt WS? COMMA (WS? outputList)?
    ;
 
 // complex call statements ----------------------------------
@@ -607,12 +586,12 @@ explicitCallStmt
 
 // parantheses are required in case of args -> empty parantheses are removed
 eCS_ProcedureCall
-   : CALL ambiguousIdentifier typeHint? (LPAREN argsCall RPAREN)?
+   : CALL WS ambiguousIdentifier typeHint? (WS? LPAREN WS? argsCall WS? RPAREN)?
    ;
 
 // parantheses are required in case of args -> empty parantheses are removed
 eCS_MemberProcedureCall
-   : CALL implicitCallStmt_InStmt? DOT ambiguousIdentifier typeHint? (LPAREN argsCall RPAREN)?
+   : CALL WS implicitCallStmt_InStmt? DOT ambiguousIdentifier typeHint? (WS? LPAREN WS? argsCall WS? RPAREN)?
    ;
 
 implicitCallStmt_InBlock
@@ -624,11 +603,11 @@ implicitCallStmt_InBlock
 // variables cannot be called in blocks
 // certainIdentifier instead of ambiguousIdentifier for preventing ambiguity with statement keywords 
 iCS_B_ProcedureCall
-   : certainIdentifier (argsCall)?
+   : certainIdentifier (WS argsCall)?
    ;
 
 iCS_B_MemberProcedureCall
-   : implicitCallStmt_InStmt? DOT ambiguousIdentifier typeHint? (argsCall)? dictionaryCallStmt?
+   : implicitCallStmt_InStmt? DOT ambiguousIdentifier typeHint? (WS argsCall)? dictionaryCallStmt?
    ;
 
 // iCS_S_MembersCall first, so that member calls are not resolved as separate iCS_S_VariableOrProcedureCalls
@@ -644,7 +623,7 @@ iCS_S_VariableOrProcedureCall
    ;
 
 iCS_S_ProcedureOrArrayCall
-   : (ambiguousIdentifier | baseType) typeHint? LPAREN (argsCall)? RPAREN dictionaryCallStmt?
+   : (ambiguousIdentifier | baseType) typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN dictionaryCallStmt?
    ;
 
 iCS_S_MembersCall
@@ -661,11 +640,11 @@ iCS_S_DictionaryCall
 
 // atomic call statements ----------------------------------
 argsCall
-   : (argCall? (COMMA | SEMICOLON))* argCall ((COMMA | SEMICOLON) argCall?)*
+   : (argCall? WS? (COMMA | SEMICOLON) WS?)* argCall (WS? (COMMA | SEMICOLON) WS? argCall?)*
    ;
 
 argCall
-   : ((BYVAL | BYREF | PARAMARRAY))? valueStmt
+   : ((BYVAL | BYREF | PARAMARRAY) WS)? valueStmt
    ;
 
 dictionaryCallStmt
@@ -674,23 +653,23 @@ dictionaryCallStmt
 
 // atomic rules for statements
 argList
-   : LPAREN (arg (COMMA arg)*)? RPAREN
+   : LPAREN (WS? arg (WS? COMMA WS? arg)*)? WS? RPAREN
    ;
 
 arg
-   : (OPTIONAL)? ((BYVAL | BYREF))? (PARAMARRAY)? ambiguousIdentifier (LPAREN RPAREN)? (asTypeClause)? (argDefaultValue)?
+   : (OPTIONAL WS)? ((BYVAL | BYREF) WS)? (PARAMARRAY WS)? ambiguousIdentifier (WS? LPAREN WS? RPAREN)? (WS asTypeClause)? (WS? argDefaultValue)?
    ;
 
 argDefaultValue
-   : EQ (literal | ambiguousIdentifier)
+   : EQ WS? (literal | ambiguousIdentifier)
    ;
 
 subscripts
-   : subscript (COMMA subscript)*
+   : subscript (WS? COMMA WS? subscript)*
    ;
 
 subscript
-   : (valueStmt TO)? valueStmt
+   : (valueStmt WS TO WS)? valueStmt
    ;
 
 // atomic rules ----------------------------------
@@ -700,7 +679,7 @@ ambiguousIdentifier
    ;
 
 asTypeClause
-   : AS (NEW)? type (fieldLength)?
+   : AS WS (NEW WS)? type (WS fieldLength)?
    ;
 
 baseType
@@ -737,11 +716,11 @@ complexType
    ;
 
 fieldLength
-   : MULT (INTEGERLITERAL | ambiguousIdentifier)
+   : MULT WS? (INTEGERLITERAL | ambiguousIdentifier)
    ;
 
 letterrange
-   : certainIdentifier (MINUS certainIdentifier)?
+   : certainIdentifier (WS? MINUS WS? certainIdentifier)?
    ;
 
 lineLabel
@@ -762,7 +741,7 @@ literal
    ;
 
 type
-   : (baseType | complexType) (LPAREN RPAREN)?
+   : (baseType | complexType) (WS? LPAREN WS? RPAREN)?
    ;
 
 typeHint
@@ -1293,11 +1272,6 @@ GOTO
 
 IF
    : I F
-   ;
-
-
-HANDLES
-   : H A N D L E S
    ;
 
 
@@ -1986,28 +1960,28 @@ LINE_CONTINUATION
 
 
 NEWLINE
-   : ('\r'? '\n' | COLON ' ') -> skip
+   : WS? ('\r'? '\n' | COLON ' ') WS?
    ;
 
 
 COMMENT
-   : ('\'' | COLON? REM ' ') (LINE_CONTINUATION | ~ ('\n' | '\r'))* -> skip
+   : WS? ('\'' | COLON? REM ' ') (LINE_CONTINUATION | ~ ('\n' | '\r'))* -> skip
    ;
 
 
 WS
-   : [ \t] + -> skip
+   : [ \t] +
    ;
 
 // letters
 
 fragment LETTER
-   : [a-zA-Z_ŠšŸ€…†]
+   : [a-zA-Z_äöüÄÖÜ]
    ;
 
 
 fragment LETTERORDIGIT
-   : [a-zA-Z0-9_ŠšŸ€…†]
+   : [a-zA-Z0-9_äöüÄÖÜ]
    ;
 
 // case insensitive chars
