@@ -55,7 +55,8 @@ sql_clause
 
 // Data Manipulation Language: https://msdn.microsoft.com/en-us/library/ff848766(v=sql.120).aspx
 dml_clause
-    : delete_statement
+    : merge_statement
+    | delete_statement
     | insert_statement
     | select_statement
     | update_statement
@@ -81,7 +82,7 @@ ddl_clause
     | drop_function
     | drop_statistics
     | drop_table
-	| drop_type
+    | drop_type
     | drop_view
     ;
 
@@ -134,6 +135,34 @@ another_statement
     ;
 
 // DML
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql
+merge_statement
+    : with_expression?
+      MERGE (TOP '(' expression ')' PERCENT?)?
+      INTO? ddl_object insert_with_table_hints? (AS? ID)?
+      USING table_sources
+      ON search_condition
+      (WHEN MATCHED (AND search_condition)?
+          THEN merge_matched)*
+      (WHEN NOT MATCHED (BY TARGET)? (AND search_condition)?
+          THEN merge_not_matched)?
+      (WHEN NOT MATCHED BY SOURCE (AND search_condition)?
+          THEN merge_matched)*
+      output_clause?
+      option_clause? ';'
+    ;
+
+
+merge_matched
+    : UPDATE SET update_elem (',' update_elem)*
+    | DELETE
+    ;
+
+merge_not_matched
+    : INSERT ('(' column_name_list ')')?
+      (table_value_constructor | DEFAULT VALUES)
+    ;
 
 // https://msdn.microsoft.com/en-us/library/ms189835.aspx
 delete_statement
@@ -245,25 +274,25 @@ create_or_alter_function
     ;
 
 func_body_returns_select
-	:RETURNS TABLE
-	(WITH function_option (',' function_option)*)?
-	AS?
-	RETURN select_statement 
-	;
+  :RETURNS TABLE
+  (WITH function_option (',' function_option)*)?
+  AS?
+  RETURN select_statement 
+  ;
 
 func_body_returns_table
-	: RETURNS LOCAL_ID table_type_definition
+  : RETURNS LOCAL_ID table_type_definition
         (WITH function_option (',' function_option)*)?
         AS?
         BEGIN
            sql_clause*
            RETURN
         END 
-	;
+  ;
 
 
 func_body_returns_scalar
-	:RETURNS data_type
+  :RETURNS data_type
        (WITH function_option (',' function_option)*)?
        AS?
        BEGIN
@@ -976,9 +1005,9 @@ table_name_with_hint
 // https://msdn.microsoft.com/en-us/library/ms190312.aspx
 rowset_function
     :  (
-	      OPENROWSET LR_BRACKET provider_name = STRING COMMA connectionString = STRING COMMA sql = STRING RR_BRACKET 
-	   )
-	   | ( OPENROWSET '(' BULK data_file=STRING ',' (bulk_option (',' bulk_option)* | id)')' )
+        OPENROWSET LR_BRACKET provider_name = STRING COMMA connectionString = STRING COMMA sql = STRING RR_BRACKET 
+     )
+     | ( OPENROWSET '(' BULK data_file=STRING ',' (bulk_option (',' bulk_option)* | id)')' )
     ;
 
 // runtime check.
@@ -1417,12 +1446,14 @@ simple_id
     | SERIALIZABLE
     | SIMPLE
     | SNAPSHOT
+    | SOURCE
     | SPATIAL_WINDOW_MAX_CELLS
     | STATIC
     | STATS_STREAM
     | STDEV
     | STDEVP
     | SUM
+    | TARGET
     | TEXTIMAGE_ON
     | THROW
     | TIES
@@ -1562,6 +1593,7 @@ LIKE:                                  L I K E;
 LINENO:                                L I N E N O;
 LOAD:                                  L O A D;
 LOG:                                   L O G;
+MATCHED:                               M A T C H E D;
 MERGE:                                 M E R G E;
 NATIONAL:                              N A T I O N A L;
 NOCHECK:                               N O C H E C K;
@@ -1623,10 +1655,12 @@ SET:                                   S E T;
 SETUSER:                               S E T U S E R;
 SHUTDOWN:                              S H U T D O W N;
 SOME:                                  S O M E;
+SOURCE:                                S O U R C E;
 STATISTICS:                            S T A T I S T I C S;
 SYSTEM_USER:                           S Y S T E M '_' U S E R;
 TABLE:                                 T A B L E;
 TABLESAMPLE:                           T A B L E S A M P L E;
+TARGET:                                T A R G E T;
 TEXTSIZE:                              T E X T S I Z E;
 THEN:                                  T H E N;
 TO:                                    T O;
