@@ -23,7 +23,7 @@ from antlr4.Token  import CommonToken
     # Indented to append code to the constructor.
     self._openBRCount       = 0
     self._suppressNewlines  = False
-    self._lineContinuation              = False
+    self._lineContinuation  = False
     self._tokens            = self.TokenQueue()
     self._indents           = self.IndentStack()
 
@@ -347,8 +347,9 @@ NAME: [a-zA-Z_] [a-zA-Z0-9_]*
 NUMBER
     :     '0' ([xX] [0-9a-fA-F]+
     |          [oO] [0-7]+
-    |          [bB] [01]+ )[lL]?
-    | ([0-9]* '.')? [0-9]+ [jJ]? [lL]?
+    |          [bB] [01]+ ) [lL]?
+    |    [0-9]+ '.' [0-9]* ([jJ] | [eE] [-+]?  [0-9]+)?
+    |               [0-9]+ ([jJ] | [eE] [-+]? [0-9]+ | [lL])?
     ;
  
 LINENDING:             (('\r'? '\n')+ {self._lineContinuation=False}
@@ -389,7 +390,6 @@ if (self._tokenStartColumn == 0 and self._openBRCount == 0
                 raise Exception()
 }  -> channel(HIDDEN)
     ;
-
     
 COMMENT:        '#' ~[\r\n]* -> skip;
 
@@ -399,3 +399,6 @@ OPEN_BRACE:     '{' {self._openBRCount  += 1};
 CLOSE_BRACE:    '}' {self._openBRCount  -= 1};
 OPEN_BRACKET:   '[' {self._openBRCount  += 1};
 CLOSE_BRACKET:  ']' {self._openBRCount  -= 1};
+
+UNKNOWN: . -> skip;
+
