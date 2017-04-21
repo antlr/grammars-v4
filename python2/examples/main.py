@@ -16,7 +16,7 @@ def main(argv):
     parser = Python2Parser(tokens);
     tree   = parser.file_input(); 
 
-    listener = Python2Listener(parser);
+    listener = Python2Listener();
     ParseTreeWalker.DEFAULT.walk(listener, tree); 
     
 
