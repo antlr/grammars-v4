@@ -46,12 +46,17 @@ sql_clause
 
     | cfl_statement
 
+    | dbcc_clause
+    
+    | empty_statement
+
     | another_statement
     ;
 
 // Data Manipulation Language: https://msdn.microsoft.com/en-us/library/ff848766(v=sql.120).aspx
 dml_clause
-    : delete_statement
+    : merge_statement
+    | delete_statement
     | insert_statement
     | select_statement
     | update_statement
@@ -59,10 +64,11 @@ dml_clause
 
 // Data Definition Language: https://msdn.microsoft.com/en-us/library/ff848799.aspx)
 ddl_clause
-    : //create_function
+    :
     create_database
     | create_index
-    | create_procedure
+    | create_or_alter_procedure
+    | create_or_alter_function
     | create_statistics
     | create_table
     | create_type
@@ -73,9 +79,10 @@ ddl_clause
 
     | drop_index
     | drop_procedure
+    | drop_function
     | drop_statistics
     | drop_table
-	| drop_type
+    | drop_type
     | drop_view
     ;
 
@@ -113,6 +120,10 @@ cfl_statement
         state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' ';'?                   #raiseerror_statement
     ;
 
+empty_statement
+    : ';'
+    ;
+
 another_statement
     : declare_statement
     | cursor_statement
@@ -124,6 +135,34 @@ another_statement
     ;
 
 // DML
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql
+merge_statement
+    : with_expression?
+      MERGE (TOP '(' expression ')' PERCENT?)?
+      INTO? ddl_object insert_with_table_hints? (AS? ID)?
+      USING table_sources
+      ON search_condition
+      (WHEN MATCHED (AND search_condition)?
+          THEN merge_matched)*
+      (WHEN NOT MATCHED (BY TARGET)? (AND search_condition)?
+          THEN merge_not_matched)?
+      (WHEN NOT MATCHED BY SOURCE (AND search_condition)?
+          THEN merge_matched)*
+      output_clause?
+      option_clause? ';'
+    ;
+
+
+merge_matched
+    : UPDATE SET update_elem (',' update_elem)*
+    | DELETE
+    ;
+
+merge_not_matched
+    : INSERT ('(' column_name_list ')')?
+      (table_value_constructor | DEFAULT VALUES)
+    ;
 
 // https://msdn.microsoft.com/en-us/library/ms189835.aspx
 delete_statement
@@ -210,19 +249,57 @@ create_database
 
 // https://msdn.microsoft.com/en-us/library/ms188783.aspx
 create_index
-    : CREATE UNIQUE? clustered? INDEX id ON table_name_with_hint '(' column_name_list (ASC | DESC)? ')'
+    : CREATE UNIQUE? clustered? INDEX id ON table_name_with_hint '(' column_name_list_with_order ')'
+    (INCLUDE '(' column_name_list ')' )?
+    (WHERE where=search_condition)?
     (index_options)?
     (ON id)?
     ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
-create_procedure
-    : CREATE proc=(PROC | PROCEDURE) func_proc_name (';' DECIMAL)?
+create_or_alter_procedure
+    : (CREATE | ALTER) proc=(PROC | PROCEDURE) func_proc_name (';' DECIMAL)?
       ('('? procedure_param (',' procedure_param)* ')'?)?
       (WITH procedure_option (',' procedure_option)*)?
       (FOR REPLICATION)? AS sql_clauses
     ;
+    
+//https://msdn.microsoft.com/en-us/library/ms186755.aspx
+create_or_alter_function
+    : (CREATE | ALTER) FUNCTION func_proc_name
+        (('(' procedure_param (',' procedure_param)* ')') | '(' ')') //must have (), but can be empty
+        (func_body_returns_select | func_body_returns_table | func_body_returns_scalar) ';'?
+
+    ;
+
+func_body_returns_select
+  :RETURNS TABLE
+  (WITH function_option (',' function_option)*)?
+  AS?
+  RETURN select_statement 
+  ;
+
+func_body_returns_table
+  : RETURNS LOCAL_ID table_type_definition
+        (WITH function_option (',' function_option)*)?
+        AS?
+        BEGIN
+           sql_clause*
+           RETURN
+        END 
+  ;
+
+
+func_body_returns_scalar
+  :RETURNS data_type
+       (WITH function_option (',' function_option)*)?
+       AS?
+       BEGIN
+           sql_clause*
+           RETURN ret=expression ';'?
+       END 
+       ;
 
 procedure_param
     : LOCAL_ID (id '.')? AS? data_type VARYING? ('=' default_val=default_value)? (OUT | OUTPUT | READONLY)?
@@ -231,6 +308,12 @@ procedure_param
 procedure_option
     : ENCRYPTION
     | RECOMPILE
+    | execute_clause
+    ;
+
+function_option
+    : RETURNS NULL ON NULL INPUT
+    | CALLED ON NULL INPUT
     | execute_clause
     ;
 
@@ -243,7 +326,15 @@ create_statistics
 
 // https://msdn.microsoft.com/en-us/library/ms174979.aspx
 create_table
-    : CREATE TABLE table_name '(' column_def_table_constraints ','? ')' (ON id | DEFAULT)? (TEXTIMAGE_ON id | DEFAULT)?';'?
+    : CREATE TABLE table_name '(' column_def_table_constraints ','? ')' table_options* (ON id | DEFAULT)? (TEXTIMAGE_ON id | DEFAULT)?';'?
+    ;
+
+table_options
+    : WITH '(' index_option (',' index_option)* ')'
+    ;
+
+table_option
+    : simple_id '=' (simple_id | on_off | DECIMAL)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
@@ -438,7 +529,12 @@ drop_index
 
 // https://msdn.microsoft.com/en-us/library/ms174969.aspx
 drop_procedure
-    : DROP PROCEDURE (IF EXISTS)? func_proc_name ';'?
+    : DROP proc=(PROC | PROCEDURE) (IF EXISTS)? func_proc_name (',' func_proc_name)* ';'?
+    ;
+
+//https://msdn.microsoft.com/en-us/library/ms190290.aspx
+drop_function
+    : DROP FUNCTION (IF EXISTS)? func_proc_name (',' func_proc_name)* ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms175075.aspx
@@ -522,7 +618,7 @@ security_statement
     // https://msdn.microsoft.com/en-us/library/ms188354.aspx
     : execute_clause ';'?
     // https://msdn.microsoft.com/en-us/library/ms187965.aspx
-    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO (to_principal=id) (WITH GRANT OPTION)? (AS as_principal=id)? ';'?
+    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO (to_principal+=id) (',' to_principal+=id)* (WITH GRANT OPTION)? (AS as_principal=id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
     ;
@@ -578,6 +674,14 @@ go_statement
 // https://msdn.microsoft.com/en-us/library/ms188366.aspx
 use_statement
     : USE database=id ';'?
+    ;
+
+dbcc_clause
+    : DBCC name=simple_id ('(' expression_list ')')? (WITH dbcc_options)? ';'?
+    ;
+
+dbcc_options
+    :  simple_id (',' simple_id)?
     ;
 
 execute_clause
@@ -756,7 +860,6 @@ predicate
     | expression NOT? LIKE expression (ESCAPE expression)?
     | expression IS null_notnull
     | '(' search_condition ')'
-	| DECIMAL
     ;
 
 query_expression
@@ -764,12 +867,12 @@ query_expression
     ;
 
 union
-    : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')')+)
+    : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms176104.aspx
 query_specification
-    : SELECT (ALL | DISTINCT)? (TOP expression PERCENT? (WITH TIES)?)?
+    : SELECT (ALL | DISTINCT)? top_clause?
       select_list
       // https://msdn.microsoft.com/en-us/library/ms188029.aspx
       (INTO table_name)?
@@ -778,6 +881,21 @@ query_specification
       // https://msdn.microsoft.com/en-us/library/ms177673.aspx
       (GROUP BY group_by_item (',' group_by_item)*)?
       (HAVING having=search_condition)?
+    ;
+
+// https://msdn.microsoft.com/en-us/library/ms189463.aspx
+top_clause
+    : TOP (top_percent | top_count) (WITH TIES)?
+    ;
+
+top_percent
+    : (REAL | FLOAT) PERCENT
+    | '(' expression ')' PERCENT
+    ;
+
+top_count
+    : DECIMAL
+    | '(' expression ')'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188385.aspx
@@ -895,9 +1013,9 @@ table_name_with_hint
 // https://msdn.microsoft.com/en-us/library/ms190312.aspx
 rowset_function
     :  (
-	      OPENROWSET LR_BRACKET provider_name = STRING COMMA connectionString = STRING COMMA sql = STRING RR_BRACKET 
-	   )
-	   | ( OPENROWSET '(' BULK data_file=STRING ',' (bulk_option (',' bulk_option)* | id)')' )
+        OPENROWSET LR_BRACKET provider_name = STRING COMMA connectionString = STRING COMMA sql = STRING RR_BRACKET 
+     )
+     | ( OPENROWSET '(' BULK data_file=STRING ',' (bulk_option (',' bulk_option)* | id)')' )
     ;
 
 // runtime check.
@@ -1129,6 +1247,10 @@ full_column_name
     : (table_name '.')? id
     ;
 
+column_name_list_with_order
+    : id (ASC | DESC)? (',' id (ASC | DESC)?)*
+    ;
+
 column_name_list
     : id (',' id)*
     ;
@@ -1232,6 +1354,7 @@ simple_id
     | AUTO
     | AVG
     | BASE64
+    | CALLED
     | CALLER
     | CAST
     | CATCH
@@ -1242,6 +1365,7 @@ simple_id
     | COOKIE
     | COUNT
     | COUNT_BIG
+    | DATA_COMPRESSION
     | DELAY
     | DELETED
     | DENSE_RANK
@@ -1271,6 +1395,7 @@ simple_id
     | FORCED
     | KEYSET
     | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
+    | INPUT
     | LAST
     | LEVEL
     | LOCAL
@@ -1298,20 +1423,25 @@ simple_id
     | OUT
     | OUTPUT
     | OWNER
+    | PAGE
     | PARAMETERIZATION
     | PARTITION
     | PATH
     | PRECEDING
     | PRIOR
     | PRIVILEGES
+    | PUBLIC
     | RANGE
     | RANK
+    | RAW
     | READONLY
     | READ_ONLY
     | RECOMPILE
     | RELATIVE
     | REMOTE
     | REPEATABLE
+    | RETURN
+    | RETURNS
     | ROBUST
     | ROOT
     | ROW
@@ -1319,6 +1449,7 @@ simple_id
     | ROWS
     | ROW_NUMBER
     | SAMPLE
+    | SIZE
     | SCHEMABINDING
     | SCROLL
     | SCROLL_LOCKS
@@ -1326,12 +1457,14 @@ simple_id
     | SERIALIZABLE
     | SIMPLE
     | SNAPSHOT
+    | SOURCE
     | SPATIAL_WINDOW_MAX_CELLS
     | STATIC
     | STATS_STREAM
     | STDEV
     | STDEVP
     | SUM
+    | TARGET
     | TEXTIMAGE_ON
     | THROW
     | TIES
@@ -1384,6 +1517,7 @@ BREAK:                                 B R E A K;
 BROWSE:                                B R O W S E;
 BULK:                                  B U L K;
 BY:                                    B Y;
+CALLED:                                C A L L E D;
 CASCADE:                               C A S C A D E;
 CASE:                                  C A S E;
 CHANGETABLE:                           C H A N G E T A B L E;
@@ -1411,6 +1545,7 @@ CURRENT_TIME:                          C U R R E N T '_' T I M E;
 CURRENT_TIMESTAMP:                     C U R R E N T '_' T I M E S T A M P;
 CURRENT_USER:                          C U R R E N T '_' U S E R;
 CURSOR:                                C U R S O R;
+DATA_COMPRESSION:                      D A T A '_' C O M P R E S S I O N;
 DATABASE:                              D A T A B A S E;
 DBCC:                                  D B C C;
 DEALLOCATE:                            D E A L L O C A T E;
@@ -1455,6 +1590,7 @@ IDENTITYCOL:                           I D E N T I T Y C O L;
 IDENTITY_INSERT:                       I D E N T I T Y '_' I N S E R T;
 IF:                                    I F;
 IN:                                    I N;
+INCLUDE:                               I N C L U D E;
 INDEX:                                 I N D E X;
 INNER:                                 I N N E R;
 INSERT:                                I N S E R T;
@@ -1469,6 +1605,7 @@ LIKE:                                  L I K E;
 LINENO:                                L I N E N O;
 LOAD:                                  L O A D;
 LOG:                                   L O G;
+MATCHED:                               M A T C H E D;
 MERGE:                                 M E R G E;
 NATIONAL:                              N A T I O N A L;
 NOCHECK:                               N O C H E C K;
@@ -1491,6 +1628,7 @@ OR:                                    O R;
 ORDER:                                 O R D E R;
 OUTER:                                 O U T E R;
 OVER:                                  O V E R;
+PAGE:                                  P A G E;
 PARTIAL:                               P A R T I A L;
 PERCENT:                               P E R C E N T;
 PIVOT:                                 P I V O T;
@@ -1502,6 +1640,7 @@ PROC:                                  P R O C;
 PROCEDURE:                             P R O C E D U R E;
 PUBLIC:                                P U B L I C;
 RAISERROR:                             R A I S E R R O R;
+RAW:                                   R A W;
 READ:                                  R E A D;
 READTEXT:                              R E A D T E X T;
 RECONFIGURE:                           R E C O N F I G U R E;
@@ -1510,6 +1649,7 @@ REPLICATION:                           R E P L I C A T I O N;
 RESTORE:                               R E S T O R E;
 RESTRICT:                              R E S T R I C T;
 RETURN:                                R E T U R N;
+RETURNS:                               R E T U R N S;
 REVERT:                                R E V E R T;
 REVOKE:                                R E V O K E;
 RIGHT:                                 R I G H T;
@@ -1529,10 +1669,12 @@ SET:                                   S E T;
 SETUSER:                               S E T U S E R;
 SHUTDOWN:                              S H U T D O W N;
 SOME:                                  S O M E;
+SOURCE:                                S O U R C E;
 STATISTICS:                            S T A T I S T I C S;
 SYSTEM_USER:                           S Y S T E M '_' U S E R;
 TABLE:                                 T A B L E;
 TABLESAMPLE:                           T A B L E S A M P L E;
+TARGET:                                T A R G E T;
 TEXTSIZE:                              T E X T S I Z E;
 THEN:                                  T H E N;
 TO:                                    T O;
@@ -1646,7 +1788,8 @@ HOURS:                                 H O U R S;
 IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX: I G N O R E '_' N O N C L U S T E R E D '_' C O L U M N S T O R E '_' I N D E X;
 IMMEDIATE:                             I M M E D I A T E;
 IMPERSONATE:                           I M P E R S O N A T E;
-INCREMENTAL:                           I N C R E M E N T A L; 
+INCREMENTAL:                           I N C R E M E N T A L;
+INPUT:                                 I N P U T;
 INSENSITIVE:                           I N S E N S I T I V E;
 INSERTED:                              I N S E R T E D;
 ISOLATION:                             I S O L A T I O N;
@@ -1775,9 +1918,9 @@ LINE_COMMENT:       '--' ~[\r\n]* -> channel(HIDDEN);
 // TODO: ID can be not only Latin.
 DOUBLE_QUOTE_ID:    '"' ~'"'+ '"';
 SQUARE_BRACKET_ID:  '[' ~']'+ ']';
-LOCAL_ID:           '@' [a-zA-Z_$@#0-9]+;
+LOCAL_ID:           '@' ([a-zA-Z_$@#0-9] | FullWidthLetter)+;
 DECIMAL:             DEC_DIGIT+;
-ID:                  [a-zA-Z_#][a-zA-Z_#$@0-9]*;
+ID:                  ( [a-zA-Z_#] | FullWidthLetter) ( [a-zA-Z_#$@0-9] | FullWidthLetter )*;
 STRING:              N? '\'' (~'\'' | '\'\'')* '\'';
 BINARY:              '0' X HEX_DIGIT*;
 FLOAT:               DEC_DOT_DEC;
@@ -1849,4 +1992,19 @@ fragment W: [wW];
 fragment X: [xX];
 fragment Y: [yY];
 fragment Z: [zZ];
-
+fragment FullWidthLetter
+    : '\u00c0'..'\u00d6' 
+    | '\u00d8'..'\u00f6' 
+    | '\u00f8'..'\u00ff' 
+    | '\u0100'..'\u1fff' 
+    | '\u2c00'..'\u2fff' 
+    | '\u3040'..'\u318f' 
+    | '\u3300'..'\u337f' 
+    | '\u3400'..'\u3fff' 
+    | '\u4e00'..'\u9fff' 
+    | '\ua000'..'\ud7ff' 
+    | '\uf900'..'\ufaff' 
+    | '\uff00'..'\ufff0'
+    // | '\u10000'..'\u1F9FF'  //not support four bytes chars
+    // | '\u20000'..'\u2FA1F'
+    ;

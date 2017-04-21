@@ -480,3 +480,107 @@ SELECT LastName, FirstName, JobTitle
 FROM dbo.EmployeeThree
 );
 GO
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Using SELECT with TOP clause
+
+USE AdventureWorks2012;
+GO
+SELECT TOP 10 *
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP (10) *
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP (@localvar) *
+FROM Production.Product
+ORDER BY Name ASC;
+
+-- TOP with percentage.
+USE AdventureWorks2012;
+GO
+SELECT TOP 10.5 PERCENT *
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP (10.5) PERCENT *
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP (@localvar) PERCENT *
+FROM Production.Product
+ORDER BY Name ASC;
+
+-- TOP with ties.
+USE AdventureWorks2012;
+GO
+SELECT TOP 10 WITH TIES *
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP 10.5 PERCENT WITH TIES *
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP (@localvar) WITH TIES *
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP (@localvar) PERCENT WITH TIES *
+FROM Production.Product
+ORDER BY Name ASC;
+
+-- Can apply any expression WITH parentheses.
+--  If without parentheses, expression trails may be misunderstanding select_list.
+--  ex: "SELECT TOP 1 + 2 * FROM HOGE" --> "+ 2" are matching in select_list.
+USE AdventureWorks2012;
+GO
+SELECT TOP (NULL) *     -- (But cause runtime error by SQL Server)
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP (1+2) *
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP (1+@localvar) *
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP (NULL) PERCENT *     -- (But cause runtime error by SQL Server)
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP (1+2) PERCENT *
+FROM Production.Product
+ORDER BY Name ASC;
+-- Alternate way.
+USE AdventureWorks2012;
+GO
+SELECT TOP (1+@localvar) PERCENT *
+FROM Production.Product
+ORDER BY Name ASC;

@@ -11,6 +11,7 @@
 		<module>agc</module>
 <!--		<module>antlr3</module>-->
 		<module>antlr4</module>
+		<module>apex</module>		
 		<module>arithmetic</module>
 		<module>asm6502</module>
 		<module>asn</module>
@@ -28,6 +29,7 @@
 		<module>cpp</module>
 		<module>creole</module>
 		<!-- C# runtime is not supported. <module>csharp</module> -->
+		<module>css3</module>
 		<module>csv</module>
 		<module>datetime</module>
 		<module>dcm</module>
@@ -42,6 +44,7 @@
 		<module>gml</module>
 		<module>golang</module>
 		<module>graphql</module>
+		<module>graphstream-dgs</module>
 		<module>html</module>
 		<module>icalendar</module>
 		<module>idl</module>
@@ -53,6 +56,7 @@
 		<module>jpa</module>
 		<module>json</module>
 		<module>kuka</module>
+		<module>lambda</module>
 		<module>less</module>
 		<module>logo</module>
 		<module>lolcode</module>
@@ -66,7 +70,7 @@
 		<module>mumath</module>
 		<module>mumps</module>
 		<module>mysql</module>
-		<module>objc</module>
+		<!-- <module>objc</module> -->
 		<module>oncrpc</module>
 		<module>pascal</module>
 		<module>pcre</module>
@@ -78,6 +82,8 @@
 		<module>plsql</module>
 		<module>postalcode</module>
 		<module>propcalc</module>
+		<module>protobuf3</module>
+		<module>properties</module>
 		<module>python3</module>
 		<module>r</module>
 		<module>rcs</module>
@@ -95,7 +101,8 @@
 		<module>stacktrace</module>
 		<module>stringtemplate</module>
 		<module>suokif</module>
-		<module>swift</module>
+		<module>swift2</module>
+		<module>swift3</module>
 		<module>swift-fin</module>
 		<module>telephone</module>
 		<module>tiny</module>
@@ -105,6 +112,7 @@
 		<module>tsql</module>
 		<module>turtle</module>
 		<module>ucb-logo</module>
+		<module>unicode</module>
 		<module>url</module>
 		<module>useragent</module>
 		<module>vb6</module>
@@ -115,12 +123,13 @@
 		<module>webidl</module>
 		<module>xml</module>
 		<module>xpath</module>
+		<module>z</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.5.3</antlr.version>
-		<antlr4test-maven-plugin.version>1.6</antlr4test-maven-plugin.version>
+		<antlr.version>4.7</antlr.version>
+		<antlr4test-maven-plugin.version>1.8</antlr4test-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>

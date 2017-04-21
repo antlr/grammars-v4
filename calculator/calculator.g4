@@ -45,7 +45,7 @@ multiplyingExpression
    ;
 
 powExpression
-   : atom (POW multiplyingExpression)?
+   : atom (POW atom)*
    ;
 
 atom

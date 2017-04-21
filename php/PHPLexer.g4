@@ -54,7 +54,7 @@ public Token nextToken()
         if (token.getText().equals("</script>"))
         {
             _phpScript = false;
-            token = new CommonToken(ScriptClose);
+            token.setType(ScriptClose);
         }
         else
         {

@@ -6,7 +6,7 @@
  * of the BSD 3-clause license. See the LICENSE file for details.
  */
 
-package org.cobol85.preprocessor.impl;
+package io.proleap.cobol.preprocessor.impl;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,27 +35,28 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cobol85.Cobol85PreprocessorBaseListener;
-import org.cobol85.Cobol85PreprocessorLexer;
-import org.cobol85.Cobol85PreprocessorParser;
-import org.cobol85.Cobol85PreprocessorParser.PseudoTextContext;
-import org.cobol85.Cobol85PreprocessorParser.ReplaceClauseContext;
-import org.cobol85.Cobol85PreprocessorParser.ReplaceableContext;
-import org.cobol85.Cobol85PreprocessorParser.ReplacementContext;
-import org.cobol85.Cobol85PreprocessorParser.ReplacingPhraseContext;
-import org.cobol85.Cobol85PreprocessorParser.StartRuleContext;
-import org.cobol85.preprocessor.Cobol85Preprocessor;
 import org.codehaus.plexus.util.StringUtils;
 
-public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
+import io.proleap.cobol.Cobol85PreprocessorBaseListener;
+import io.proleap.cobol.Cobol85PreprocessorLexer;
+import io.proleap.cobol.Cobol85PreprocessorParser;
+import io.proleap.cobol.Cobol85PreprocessorParser.PseudoTextContext;
+import io.proleap.cobol.Cobol85PreprocessorParser.ReplaceClauseContext;
+import io.proleap.cobol.Cobol85PreprocessorParser.ReplaceableContext;
+import io.proleap.cobol.Cobol85PreprocessorParser.ReplacementContext;
+import io.proleap.cobol.Cobol85PreprocessorParser.ReplacingPhraseContext;
+import io.proleap.cobol.Cobol85PreprocessorParser.StartRuleContext;
+import io.proleap.cobol.preprocessor.CobolPreprocessor;
 
-	protected abstract class AbstractCobol85LinesSubPreprocessor implements Cobol85SubPreprocessor {
+public class CobolPreprocessorImpl implements CobolPreprocessor {
 
-		public abstract String processLine(final String line, int lineNumber, final Cobol85Dialect dialect,
-				final Cobol85SourceFormat format);
+	protected abstract class AbstractCobolLinesSubPreprocessor implements CobolSubPreprocessor {
+
+		public abstract String processLine(final String line, int lineNumber, final CobolDialect dialect,
+				final CobolSourceFormat format);
 
 		@Override
-		public String processLines(final String line, final Cobol85Dialect dialect, final Cobol85SourceFormat format) {
+		public String processLines(final String line, final CobolDialect dialect, final CobolSourceFormat format) {
 			final Scanner scanner = new Scanner(line);
 			final StringBuffer outputBuffer = new StringBuffer();
 
@@ -76,11 +77,11 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 	}
 
-	protected class Cobol85CleanLinesSubPreprocessorImpl extends AbstractCobol85LinesSubPreprocessor {
+	protected class CobolCleanLinesSubPreprocessorImpl extends AbstractCobolLinesSubPreprocessor {
 
 		@Override
-		public String processLine(final String line, final int lineNumber, final Cobol85Dialect dialect,
-				final Cobol85SourceFormat format) {
+		public String processLine(final String line, final int lineNumber, final CobolDialect dialect,
+				final CobolSourceFormat format) {
 			// clean line from certain ASCII chars
 			final int substituteChar = 0x1A;
 			final String cleanedLine = line.replace((char) substituteChar, ' ');
@@ -101,7 +102,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	 * ANTLR listener, which collects visible as well as hidden tokens for a
 	 * given parse tree in a string buffer.
 	 */
-	protected class Cobol85HiddenTokenCollectorListenerImpl extends Cobol85PreprocessorBaseListener {
+	protected class CobolHiddenTokenCollectorListenerImpl extends Cobol85PreprocessorBaseListener {
 
 		boolean firstTerminal = true;
 
@@ -109,7 +110,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 		private final BufferedTokenStream tokens;
 
-		public Cobol85HiddenTokenCollectorListenerImpl(final BufferedTokenStream tokens) {
+		public CobolHiddenTokenCollectorListenerImpl(final BufferedTokenStream tokens) {
 			this.tokens = tokens;
 		}
 
@@ -133,7 +134,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 	}
 
-	protected class Cobol85MarkCommentEntriesSubPreprocessorImpl extends AbstractCobol85LinesSubPreprocessor {
+	protected class CobolMarkCommentEntriesSubPreprocessorImpl extends AbstractCobolLinesSubPreprocessor {
 
 		protected final Pattern commentEntryTriggerLinePattern;
 
@@ -147,12 +148,12 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		protected final String[] triggersStart = new String[] { "AUTHOR.", "INSTALLATION.", "DATE-WRITTEN.",
 				"DATE-COMPILED.", "SECURITY.", "REMARKS." };
 
-		public Cobol85MarkCommentEntriesSubPreprocessorImpl() {
+		public CobolMarkCommentEntriesSubPreprocessorImpl() {
 			final String commentEntryTriggerLineFormat = new String("(" + String.join("|", triggersStart) + ")(.+)");
 			commentEntryTriggerLinePattern = Pattern.compile(commentEntryTriggerLineFormat, Pattern.CASE_INSENSITIVE);
 		}
 
-		protected boolean beginsWithTrigger(final Cobol85Line parsedLine, final String[] triggers) {
+		protected boolean beginsWithTrigger(final CobolLine parsedLine, final String[] triggers) {
 			final String contentAreaUpperCase = new String(parsedLine.contentAreaA + parsedLine.contentAreaB)
 					.toUpperCase();
 
@@ -171,12 +172,12 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 
 		@Override
-		public String processLine(final String line, final int lineNumber, final Cobol85Dialect dialect,
-				final Cobol85SourceFormat format) {
+		public String processLine(final String line, final int lineNumber, final CobolDialect dialect,
+				final CobolSourceFormat format) {
 			final String result;
 
-			if (Cobol85SourceFormatEnum.FIXED.equals(format)) {
-				result = processSourceFormatFixed(line, dialect, format);
+			if (format.isCommentEntryMultiLine()) {
+				result = processSourceFormat(line, lineNumber, dialect, format);
 			} else {
 				result = line + NEWLINE;
 			}
@@ -190,9 +191,14 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		 * is restricted to area B of those lines; the next line commencing in
 		 * area A begins the next non-comment entry.
 		 */
-		public String processSourceFormatFixed(final String line, final Cobol85Dialect dialect,
-				final Cobol85SourceFormat format) {
-			final Cobol85Line parsedLine = parseCobol85Line(line, format);
+		protected String processSourceFormat(final String line, final int lineNumber, final CobolDialect dialect,
+				final CobolSourceFormat format) {
+			final CobolLine parsedLine = parseCobolLine(line, format);
+
+			if (parsedLine == null) {
+				throwCobolLineParseException(line, lineNumber, format);
+			}
+
 			final boolean foundCommentEntryTriggerInCurrentLine = beginsWithTrigger(parsedLine, triggersStart);
 
 			final String result;
@@ -209,7 +215,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 				 * or phrases terminates the comment-entry and begin the next
 				 * paragraph or division.
 				 */
-				final boolean inOsvsCommentEntry = Cobol85Dialect.OSVS.equals(dialect)
+				final boolean inOsvsCommentEntry = CobolDialect.OSVS.equals(dialect)
 						&& !beginsWithTrigger(parsedLine, triggersEnd);
 
 				inCommentEntry = parsedLine.indicatorArea == charAsterisk || parsedLine.indicatorArea == charSlash
@@ -230,7 +236,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			return result;
 		}
 
-		protected String removeCommentEntry(final String line, final Cobol85Line parsedLine) {
+		protected String removeCommentEntry(final String line, final CobolLine parsedLine) {
 			final String result;
 
 			final Matcher matcher = commentEntryTriggerLinePattern
@@ -251,7 +257,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 	}
 
-	protected class Cobol85NormalizeLinesSubPreprocessorImpl extends AbstractCobol85LinesSubPreprocessor {
+	protected class CobolNormalizeLinesSubPreprocessorImpl extends AbstractCobolLinesSubPreprocessor {
 
 		protected final static String COMMENT_TAG = ">*";
 
@@ -279,7 +285,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		/**
 		 * Normalizes the sequence and indicator area to NEWLINE and whitespace.
 		 */
-		protected String normalizeLineBreakAndSequenceArea(final Cobol85Line line, final boolean isFirstLine) {
+		protected String normalizeLineBreakAndSequenceArea(final CobolLine line, final boolean isFirstLine) {
 			// newline
 			final String newLine = isFirstLine ? "" : NEWLINE;
 
@@ -294,7 +300,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		 * Normalizes a line by stripping the sequence number and line
 		 * indicator, and interpreting the line indicator.
 		 */
-		protected String processLine(final Cobol85Line line, final boolean isFirstLine) {
+		protected String processLine(final CobolLine line, final boolean isFirstLine) {
 			final String result;
 
 			// determine line prefix
@@ -348,22 +354,27 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 
 		@Override
-		public String processLine(final String line, final int lineNumber, final Cobol85Dialect dialect,
-				final Cobol85SourceFormat format) {
-			final Cobol85Line parsedLine = parseCobol85Line(line, format);
+		public String processLine(final String line, final int lineNumber, final CobolDialect dialect,
+				final CobolSourceFormat format) {
+			final CobolLine parsedLine = parseCobolLine(line, format);
+
+			if (parsedLine == null) {
+				throwCobolLineParseException(line, lineNumber, format);
+			}
+
 			final boolean isFirstLine = lineNumber == 0;
 			final String result = processLine(parsedLine, isFirstLine);
 			return result;
 		}
 	}
 
-	protected class Cobol85ParseLinesSubPreprocessorImpl implements Cobol85SubPreprocessor {
+	protected class CobolParseLinesSubPreprocessorImpl implements CobolSubPreprocessor {
 
 		protected final File libDirectory;
 
 		protected final String[] triggers = new String[] { "copy", "exec sql", "exec cics", "replace" };
 
-		public Cobol85ParseLinesSubPreprocessorImpl(final File libDirectory) {
+		public CobolParseLinesSubPreprocessorImpl(final File libDirectory) {
 			this.libDirectory = libDirectory;
 		}
 
@@ -384,7 +395,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 
 		@Override
-		public String processLines(final String line, final Cobol85Dialect dialect, final Cobol85SourceFormat formats) {
+		public String processLines(final String line, final CobolDialect dialect, final CobolSourceFormat formats) {
 			final boolean requiresProcessorExecution = containsTrigger(line, triggers);
 			final String result;
 
@@ -397,8 +408,8 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			return result;
 		}
 
-		protected String processWithParser(final String program, final File libDirectory, final Cobol85Dialect dialect,
-				final Cobol85SourceFormat formats) {
+		protected String processWithParser(final String program, final File libDirectory, final CobolDialect dialect,
+				final CobolSourceFormat formats) {
 			// run the lexer
 			final Cobol85PreprocessorLexer lexer = new Cobol85PreprocessorLexer(new ANTLRInputStream(program));
 
@@ -416,8 +427,8 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			final StartRuleContext startRule = parser.startRule();
 
 			// analyze contained copy books
-			final Cobol85ParserPreprocessorListenerImpl listener = new Cobol85ParserPreprocessorListenerImpl(
-					libDirectory, dialect, formats, tokens);
+			final CobolParserPreprocessorListenerImpl listener = new CobolParserPreprocessorListenerImpl(libDirectory,
+					dialect, formats, tokens);
 			final ParseTreeWalker walker = new ParseTreeWalker();
 
 			walker.walk(listener, startRule);
@@ -431,7 +442,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	 * ANTLR visitor, which preprocesses a given COBOL program by executing COPY
 	 * and REPLACE statemenets.
 	 */
-	protected class Cobol85ParserPreprocessorListenerImpl extends Cobol85PreprocessorBaseListener {
+	protected class CobolParserPreprocessorListenerImpl extends Cobol85PreprocessorBaseListener {
 
 		/**
 		 * A replacement context that defines, which replaceables should be
@@ -598,16 +609,16 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 		private final Stack<PreprocessingContext> contexts = new Stack<PreprocessingContext>();
 
-		private final Cobol85Dialect dialect;
+		private final CobolDialect dialect;
 
-		private final Cobol85SourceFormat formats;
+		private final CobolSourceFormat formats;
 
 		private final File libDirectory;
 
 		private final BufferedTokenStream tokens;
 
-		public Cobol85ParserPreprocessorListenerImpl(final File libDirectory, final Cobol85Dialect dialect,
-				final Cobol85SourceFormat formats, final BufferedTokenStream tokens) {
+		public CobolParserPreprocessorListenerImpl(final File libDirectory, final CobolDialect dialect,
+				final CobolSourceFormat formats, final BufferedTokenStream tokens) {
 			this.libDirectory = libDirectory;
 			this.dialect = dialect;
 			this.tokens = tokens;
@@ -633,13 +644,13 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 
 		@Override
-		public void enterExecCicsStatement(final org.cobol85.Cobol85PreprocessorParser.ExecCicsStatementContext ctx) {
+		public void enterExecCicsStatement(final Cobol85PreprocessorParser.ExecCicsStatementContext ctx) {
 			// push a new context for SQL terminals
 			push();
 		}
 
 		@Override
-		public void enterExecSqlStatement(final org.cobol85.Cobol85PreprocessorParser.ExecSqlStatementContext ctx) {
+		public void enterExecSqlStatement(final Cobol85PreprocessorParser.ExecSqlStatementContext ctx) {
 			// push a new context for SQL terminals
 			push();
 		}
@@ -701,14 +712,14 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		};
 
 		@Override
-		public void exitExecCicsStatement(final org.cobol85.Cobol85PreprocessorParser.ExecCicsStatementContext ctx) {
-			// throw away EXEC SQL terminals -> FIXME
+		public void exitExecCicsStatement(final Cobol85PreprocessorParser.ExecCicsStatementContext ctx) {
+			// throw away EXEC SQL terminals -> TODO
 			pop();
 		}
 
 		@Override
-		public void exitExecSqlStatement(final org.cobol85.Cobol85PreprocessorParser.ExecSqlStatementContext ctx) {
-			// throw away EXEC SQL terminals -> FIXME
+		public void exitExecSqlStatement(final Cobol85PreprocessorParser.ExecSqlStatementContext ctx) {
+			// throw away EXEC SQL terminals -> TODO
 			pop();
 		}
 
@@ -765,9 +776,9 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 	}
 
-	protected interface Cobol85SubPreprocessor {
+	protected interface CobolSubPreprocessor {
 
-		public String processLines(String line, final Cobol85Dialect dialect, final Cobol85SourceFormat formats);
+		public String processLines(String line, final CobolDialect dialect, final CobolSourceFormat formats);
 	}
 
 	protected class ThrowingErrorListener extends BaseErrorListener {
@@ -780,7 +791,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		}
 	}
 
-	private final static Logger LOG = LogManager.getLogger(Cobol85PreprocessorImpl.class);
+	private final static Logger LOG = LogManager.getLogger(CobolPreprocessorImpl.class);
 
 	protected final static String NEWLINE = "\n";
 
@@ -796,8 +807,8 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 	protected final String[] copyFileExtensions = new String[] { "", "CPY", "cpy", "COB", "cob", "CBL", "cbl" };
 
-	protected String getCopyFileContent(final String filename, final File libDirectory, final Cobol85Dialect dialect,
-			final Cobol85SourceFormat format) {
+	protected String getCopyFileContent(final String filename, final File libDirectory, final CobolDialect dialect,
+			final CobolSourceFormat format) {
 		final File copyFile = identifyCopyFile(filename, libDirectory);
 		String result;
 
@@ -807,7 +818,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			result = null;
 		} else {
 			try {
-				result = process(copyFile, libDirectory, dialect, format);
+				result = process(copyFile, libDirectory, format, dialect);
 			} catch (final IOException e) {
 				result = null;
 				LOG.warn(e.getMessage());
@@ -832,7 +843,7 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 	}
 
 	protected String getTextIncludingHiddenTokens(final ParseTree ctx, final BufferedTokenStream tokens) {
-		final Cobol85HiddenTokenCollectorListenerImpl listener = new Cobol85HiddenTokenCollectorListenerImpl(tokens);
+		final CobolHiddenTokenCollectorListenerImpl listener = new CobolHiddenTokenCollectorListenerImpl(tokens);
 		final ParseTreeWalker walker = new ParseTreeWalker();
 
 		walker.walk(listener, ctx);
@@ -871,8 +882,8 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		return Token.EOF == node.getSymbol().getType();
 	}
 
-	protected Cobol85Line parseCobol85Line(final String line, final Cobol85SourceFormat format) {
-		Cobol85Line result = null;
+	protected CobolLine parseCobolLine(final String line, final CobolSourceFormat format) {
+		CobolLine result = null;
 
 		final Pattern pattern = format.getPattern();
 		final Matcher matcher = pattern.matcher(line);
@@ -890,15 +901,21 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 			final String contentAreaB = contentAreaBGroup != null ? contentAreaBGroup : "";
 			final String commentArea = commentAreaGroup != null ? commentAreaGroup : "";
 
-			result = new Cobol85Line(sequenceArea, indicatorArea, contentAreaA, contentAreaB, commentArea, format);
+			result = new CobolLine(sequenceArea, indicatorArea, contentAreaA, contentAreaB, commentArea, format);
 		}
 
 		return result;
 	}
 
 	@Override
-	public String process(final File cobolFile, final File libDirectory, final Cobol85Dialect dialect,
-			final Cobol85SourceFormat format) throws IOException {
+	public String process(final File cobolFile, final File libDirectory, final CobolSourceFormat format)
+			throws IOException {
+		return process(cobolFile, libDirectory, format, null);
+	}
+
+	@Override
+	public String process(final File cobolFile, final File libDirectory, final CobolSourceFormat format,
+			final CobolDialect dialect) throws IOException {
 		LOG.info("Preprocessing file {}.", cobolFile.getName());
 
 		final InputStream inputStream = new FileInputStream(cobolFile);
@@ -914,17 +931,22 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 
 		bufferedInputStreamReader.close();
 
-		final String result = process(outputBuffer.toString(), libDirectory, dialect, format);
+		final String result = process(outputBuffer.toString(), libDirectory, format, dialect);
 		return result;
 	}
 
 	@Override
-	public String process(final String cobolSourceCode, final File libDirectory, final Cobol85Dialect dialect,
-			final Cobol85SourceFormat format) {
-		final Cobol85SubPreprocessor cleanLinesPreprocessor = new Cobol85CleanLinesSubPreprocessorImpl();
-		final Cobol85SubPreprocessor markCommentEntriesPreprocessor = new Cobol85MarkCommentEntriesSubPreprocessorImpl();
-		final Cobol85SubPreprocessor normalizeLinesPreprocessor = new Cobol85NormalizeLinesSubPreprocessorImpl();
-		final Cobol85SubPreprocessor parseLinesPreprocessor = new Cobol85ParseLinesSubPreprocessorImpl(libDirectory);
+	public String process(final String cobolSourceCode, final File libDirectory, final CobolSourceFormat format) {
+		return process(cobolSourceCode, libDirectory, format, null);
+	}
+
+	@Override
+	public String process(final String cobolSourceCode, final File libDirectory, final CobolSourceFormat format,
+			final CobolDialect dialect) {
+		final CobolSubPreprocessor cleanLinesPreprocessor = new CobolCleanLinesSubPreprocessorImpl();
+		final CobolSubPreprocessor markCommentEntriesPreprocessor = new CobolMarkCommentEntriesSubPreprocessorImpl();
+		final CobolSubPreprocessor normalizeLinesPreprocessor = new CobolNormalizeLinesSubPreprocessorImpl();
+		final CobolSubPreprocessor parseLinesPreprocessor = new CobolParseLinesSubPreprocessorImpl(libDirectory);
 
 		final String cleanedCode = cleanLinesPreprocessor.processLines(cobolSourceCode, dialect, format);
 		final String markedCode = markCommentEntriesPreprocessor.processLines(cleanedCode, dialect, format);
@@ -934,6 +956,11 @@ public class Cobol85PreprocessorImpl implements Cobol85Preprocessor {
 		LOG.debug("Processed input:\n\n{}\n\n", result);
 
 		return result;
+	}
+
+	protected void throwCobolLineParseException(final String line, final int lineNumber,
+			final CobolSourceFormat format) {
+		throw new RuntimeException("could not parse line " + (lineNumber + 1) + " with format " + format + ": " + line);
 	}
 
 }

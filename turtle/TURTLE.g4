@@ -206,12 +206,12 @@ STRING_LITERAL_LONG_QUOTE
 
 
 STRING_LITERAL_QUOTE
-   : '"' (~ ['"''\\''\r''\n'] | '\'' | '\\"')* '"'
+   : '"' (~ ["\\\r\n] | '\'' | '\\"')* '"'
    ;
 
 
 STRING_LITERAL_SINGLE_QUOTE
-   : '\'' (~ ['\u0027''\u005C''\u000A''\u000D'] | ECHAR | UCHAR | '"')* '\''
+   : '\'' (~ [\u0027\u005C\u000A\u000D] | ECHAR | UCHAR | '"')* '\''
    ;
 
 
@@ -221,7 +221,7 @@ UCHAR
 
 
 ECHAR
-   : '\\' [tbnrf"\'\\]
+   : '\\' [tbnrf"'\\]
    ;
 
 
@@ -232,11 +232,6 @@ ANON_WS
 
 ANON
    : '[' ANON_WS* ']'
-   ;
-
-
-SC
-   : [\W] +
    ;
 
 

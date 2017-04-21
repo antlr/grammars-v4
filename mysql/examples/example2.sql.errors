@@ -1,1 +1,0 @@
-line 1:19 mismatched input '.' expecting {<EOF>, 'select', 'where', ',', 'inner', 'join', 'cross', 'straight_join', 'natural', 'left', 'right'}

@@ -29,7 +29,7 @@
 grammar ANTLRv3;
 
 grammarDef
-   : DOC_COMMENT? ('lexer' | 'parser' | 'tree')
+   : DOC_COMMENT? ('lexer' | 'parser' | 'tree')? 'grammar' id ';' optionsSpec? tokensSpec? attrScope* action* rule_+
    ;
 
 tokensSpec
@@ -67,7 +67,7 @@ optionValue
    | STRING_LITERAL
    | CHAR_LITERAL
    | INT
-   | s = '*'
+   | '*'
    ;
 
 rule_
@@ -93,7 +93,7 @@ block
    ;
 
 altList
-   : alternative rewrite ('|' alternative rewrite)*
+   : alternative rewrite? ('|' alternative rewrite?)*
    ;
 
 alternative
@@ -232,17 +232,6 @@ id
    | RULE_REF
    ;
 
-
-SL_COMMENT
-   : '//' (' $ANTLR ' SRC | ~ ('\r' | '\n')*) '\r'? '\n' -> skip
-   ;
-
-
-ML_COMMENT
-   : '/*' ()*? '*/'
-   ;
-
-
 CHAR_LITERAL
    : '\'' LITERAL_CHAR '\''
    ;
@@ -289,7 +278,7 @@ ARG_ACTION
 
 
 fragment NESTED_ARG_ACTION
-   : '[' (NESTED_ARG_ACTION | ACTION_STRING_LITERAL | ACTION_CHAR_LITERAL | .)* ']'
+   : '[' (NESTED_ARG_ACTION | ACTION_STRING_LITERAL | ACTION_CHAR_LITERAL | .)*? ']'
    ;
 
 
@@ -299,7 +288,7 @@ ACTION
 
 
 fragment NESTED_ACTION
-   : '{' (NESTED_ACTION | SL_COMMENT | ML_COMMENT | ACTION_STRING_LITERAL | ACTION_CHAR_LITERAL | .)* '}'
+   : '{' (NESTED_ACTION | SL_COMMENT | ML_COMMENT | ACTION_STRING_LITERAL | ACTION_CHAR_LITERAL | .)*? '}'
    ;
 
 
@@ -341,12 +330,6 @@ TOKENS
 fragment SRC
    : 'src' ' ' ACTION_STRING_LITERAL ' ' INT
    ;
-
-
-WS
-   : (' ' | '\t' | '\r'? '\n') + -> skip
-   ;
-
 
 fragment WS_LOOP
    : (WS | SL_COMMENT | ML_COMMENT)*
@@ -542,3 +525,18 @@ RANGE2
 REWRITE
    : '->'
    ;
+
+
+SL_COMMENT
+   : '//' ~[\r\n]* -> skip
+   ;
+
+
+ML_COMMENT
+   : '/*' .*? '*/' -> skip
+   ;
+
+WS
+   : (' ' | '\t' | '\r'? '\n') + -> skip
+   ;
+

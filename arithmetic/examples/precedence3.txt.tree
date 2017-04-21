@@ -1,0 +1,1 @@
+(equation (expression (term (factor (atom (variable a))))) (relop =) (expression (term (factor (atom (scientific (number 2 3 4))) ^ (atom ( (expression (term (factor (atom (scientific (number 4 . 2 3)))) / (factor (atom (scientific (number 3 4 5)))))) ))))))

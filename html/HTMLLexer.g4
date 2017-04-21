@@ -28,11 +28,11 @@
 
 lexer grammar  HTMLLexer;
 
-HTML_COMMENT    
+HTML_COMMENT
     : '<!--' .*? '-->'
     ;
 
-HTML_CONDITIONAL_COMMENT    
+HTML_CONDITIONAL_COMMENT
     : '<![' .*? ']>'
     ;
 
@@ -40,21 +40,21 @@ XML_DECLARATION
     : '<?xml' .*? '>'
     ;
 
-CDATA       
-    : '<![CDATA[' .*? ']]>' 
+CDATA
+    : '<![CDATA[' .*? ']]>'
     ;
 
-DTD 
+DTD
     : '<!' .*? '>'
     ;
 
-SCRIPTLET 
+SCRIPTLET
     : '<?' .*? '?>'
     | '<%' .*? '%>'
     ;
 
 SEA_WS
-    :  (' '|'\t'|'\r'? '\n')+ 
+    :  (' '|'\t'|'\r'? '\n')+
     ;
 
 SCRIPT_OPEN
@@ -68,60 +68,60 @@ STYLE_OPEN
 TAG_OPEN
     : '<' -> pushMode(TAG)
     ;
-            
+
 HTML_TEXT
     : ~'<'+
-    ;   
-       
+    ;
+
 //
 // tag declarations
 //
 mode TAG;
 
-TAG_CLOSE      
+TAG_CLOSE
     : '>' -> popMode
     ;
 
-TAG_SLASH_CLOSE     
+TAG_SLASH_CLOSE
     : '/>' -> popMode
     ;
 
-TAG_SLASH      
-    : '/' 
+TAG_SLASH
+    : '/'
     ;
 
 //
 // lexing mode for attribute values
 //
-TAG_EQUALS     
+TAG_EQUALS
     : '=' -> pushMode(ATTVALUE)
     ;
 
-TAG_NAME      
-    : TAG_NameStartChar TAG_NameChar* 
+TAG_NAME
+    : TAG_NameStartChar TAG_NameChar*
     ;
 
 TAG_WHITESPACE
-    : [ \t\r\n] -> skip 
+    : [ \t\r\n] -> skip
     ;
 
 fragment
-HEXDIGIT        
+HEXDIGIT
     : [a-fA-F0-9]
     ;
 
 fragment
-DIGIT           
+DIGIT
     : [0-9]
     ;
 
 fragment
-TAG_NameChar        
+TAG_NameChar
     : TAG_NameStartChar
-    | '-' 
-    | '_' 
-    | '.' 
-    | DIGIT 
+    | '-'
+    | '_'
+    | '.'
+    | DIGIT
     |   '\u00B7'
     |   '\u0300'..'\u036F'
     |   '\u203F'..'\u2040'
@@ -130,10 +130,10 @@ TAG_NameChar
 fragment
 TAG_NameStartChar
     :   [:a-zA-Z]
-    |   '\u2070'..'\u218F' 
-    |   '\u2C00'..'\u2FEF' 
-    |   '\u3001'..'\uD7FF' 
-    |   '\uF900'..'\uFDCF' 
+    |   '\u2070'..'\u218F'
+    |   '\u2C00'..'\u2FEF'
+    |   '\u3001'..'\uD7FF'
+    |   '\uF900'..'\uFDCF'
     |   '\uFDF0'..'\uFFFD'
     ;
 
@@ -170,13 +170,13 @@ mode ATTVALUE;
 
 // an attribute value may have spaces b/t the '=' and the value
 ATTVALUE_VALUE
-    : [ ]* ATTRIBUTE -> popMode 
+    : [ ]* ATTRIBUTE -> popMode
     ;
 
 ATTRIBUTE
     : DOUBLE_QUOTE_STRING
     | SINGLE_QUOTE_STRING
-    | ATTCHARS 
+    | ATTCHARS
     | HEXCHARS
     | DECCHARS
     ;

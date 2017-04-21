@@ -46,7 +46,7 @@ kv
 
 value
    : integer
-   | real
+   | realnum
    | stringliteral
    | str
    | list
@@ -60,7 +60,7 @@ integer
    : SIGN? DIGIT +
    ;
 
-real
+realnum
    : REAL
    ;
 
@@ -99,7 +99,7 @@ MANTISSA
 
 
 VALUE
-   : [a-zA-z0-9] +
+   : [a-zA-Z0-9] +
    ;
 
 
