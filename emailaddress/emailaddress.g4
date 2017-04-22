@@ -53,10 +53,10 @@ addrspec
     :  localpart '@' domain;
 
 localpart  
-    :  word *('.' word)  ;          
+    :  word ('.' word)*;          
                                            
 domain      
-    :  subdomain *('.' subdomain);
+    :  subdomain ('.' subdomain)*;
 
 subdomain 
     :  domainref | domainliteral;
@@ -81,8 +81,8 @@ delimeters
     | lwsp
     | comment;
 
-text        
-    : CHAR+;
+//text        
+ //   : CHAR+;
 
 atom        
     : CHAR+;
