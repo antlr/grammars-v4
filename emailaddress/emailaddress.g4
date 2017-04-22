@@ -18,7 +18,7 @@ are met:
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
 HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -32,33 +32,112 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar emailaddress;
 
-emailaddress     : mailbox                     
-                 |  group ;                      
+emailaddress
+    : mailbox                     
+    |  group ;                      
 
-group       :  phrase ':' mailbox* ';';
+group       
+    :  phrase ':' mailbox* ';';
 
-mailbox     :  addrspec                   
-            |  (phrase routeaddr )           ;
+mailbox     
+    :  addrspec                   
+    |  (phrase routeaddr );
 
-routeaddr  :  '<' route* addrspec '>';
+routeaddr  
+    :  '<' route* addrspec '>';
 
-route       :  '@' domain ':';          
+route       
+    :  '@' domain ':';          
 
-addrspec   :  localpart '@' domain       ;
+addrspec   
+    :  localpart '@' domain;
 
-localpart  :  word *('.' word)  ;          
+localpart  
+    :  word *('.' word)  ;          
                                            
+domain      
+    :  subdomain *('.' subdomain);
 
-domain      :  subdomain *('.' subdomain);
+subdomain 
+    :  domainref | domainliteral;
 
-subdomain :  domainref | domainliteral
+domainref  
+    : atom;
 
-domainref  : atom                       ;
+phrase      
+    :  word+;
 
-phrase      :  word+                      ;
+word        
+    :  atom | quotedstring;
 
-word        :  atom | quotedstring;
+lwspchar
+    : SPACE | TAB;
 
-WS
-   : [ \t\r\n] -> skip
-   ;
+lwsp
+    : (CRLF? lwspchar)+;
+
+delimeters
+    : SPECIALS 
+    | lwsp
+    | comment;
+
+text        
+    : CHAR+;
+
+atom        
+    : CHAR+;
+
+quotedpair 
+    :  '\\' CHAR; 
+
+domainliteral
+    : '[' (DTEXT | quotedpair)* ']';
+
+quotedstring 
+    : '\'' (QTEXT | quotedpair)* '\'';
+
+comment     
+    : '(' (CTEXT | quotedpair | comment)* ')';
+
+CHAR
+    : [\u0000-\u0127];
+   
+ALPHA
+    : [\u0065-\u0090]; 
+
+DIGIT
+    : [\u0048-\u0057];
+
+CTL
+    : [\u0000-\u0031]; 
+
+CR
+    : '\n';
+
+LF
+    : '\r';
+
+SPACE
+    : ' ';
+
+HTAB
+    : '\t';
+
+CRLF
+    : '\r\n'; 
+
+SPECIALS
+    : '(' | ')' | '<' | '>' | '@'  |  ',' | ';' | ':' | '\\' | '\''|  '.' | '[' | ']' ;             
+
+QUOTE
+    : '"';
+
+QTEXT
+    : ~[\r\n];
+
+DTEXT
+    : ~[[\]\n\\];
+
+CTEXT
+    : ~[()\n\\];
+    
