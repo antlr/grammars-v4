@@ -16,7 +16,7 @@ CREATE TABLE dbo.TestTable (
   WITH (DATA_COMPRESSION = PAGE)
 GO
 
--- alter table drop constraint in transaction
+-- Alter table drop constraint in transaction
 IF NOT EXISTS (SELECT * FROM sys.columns cols
   JOIN sys.types AS types ON cols.user_type_id = types.user_type_id
 WHERE object_id = OBJECT_ID('dbo.TestTable') 
@@ -29,7 +29,7 @@ BEGIN
 END
 GO
 
--- alter table drop multiple constraints in transaction
+-- Alter table drop multiple constraints in transaction
 IF NOT EXISTS (SELECT * FROM sys.columns cols
   JOIN sys.types AS types ON cols.user_type_id = types.user_type_id
 WHERE object_id = OBJECT_ID('dbo.TestTable') 
@@ -48,3 +48,6 @@ ALTER TABLE dbo.TestTable ADD CONSTRAINT DF_ModifiedDateUTC DEFAULT(GETUTCDATE()
 
 -- Alter table Alter Column
 ALTER TABLE dbo.TestTable ALTER COLUMN ModifiedDateUTC DATETIME
+
+-- Alter table Rebuild with Table Options
+ALTER TABLE TestTable REBUILD WITH (DATA_COMPRESSION = PAGE, ONLINE=ON);
