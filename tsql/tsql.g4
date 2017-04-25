@@ -68,6 +68,7 @@ ddl_clause
     create_database
     | create_index
     | create_or_alter_procedure
+    | create_or_alter_trigger
     | create_or_alter_function
     | create_statistics
     | create_table
@@ -79,6 +80,7 @@ ddl_clause
 
     | drop_index
     | drop_procedure
+    | drop_trigger
     | drop_function
     | drop_statistics
     | drop_table
@@ -264,7 +266,45 @@ create_or_alter_procedure
       (WITH procedure_option (',' procedure_option)*)?
       (FOR REPLICATION)? AS sql_clauses
     ;
-    
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql
+create_or_alter_trigger
+    : dml_trigger
+    | ddl_trigger
+    ;
+
+dml_trigger
+    : (CREATE | ALTER) TRIGGER simple_name
+      ON table_name
+      (WITH dml_trigger_option (',' dml_trigger_option)* )?
+      (FOR | AFTER | INSTEAD OF)
+      dml_trigger_operation (',' dml_trigger_operation)*
+      (WITH APPEND)?
+      (NOT FOR REPLICATION)?
+      AS sql_clauses
+    ;
+
+dml_trigger_option
+    : ENCRYPTION
+    | execute_clause
+    ;
+
+dml_trigger_operation
+    : (INSERT | UPDATE | DELETE)
+    ;
+
+ddl_trigger
+    : (CREATE | ALTER) TRIGGER simple_name
+      ON (ALL SERVER | DATABASE)
+      (WITH dml_trigger_option (',' dml_trigger_option)* )?
+      (FOR | AFTER) ddl_trigger_operation (',' dml_trigger_operation)*
+      AS sql_clauses
+    ;
+
+ddl_trigger_operation
+    : simple_id
+    ;
+
 //https://msdn.microsoft.com/en-us/library/ms186755.aspx
 create_or_alter_function
     : (CREATE | ALTER) FUNCTION func_proc_name
@@ -530,6 +570,21 @@ drop_index
 // https://msdn.microsoft.com/en-us/library/ms174969.aspx
 drop_procedure
     : DROP proc=(PROC | PROCEDURE) (IF EXISTS)? func_proc_name (',' func_proc_name)* ';'?
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-trigger-transact-sql
+drop_trigger
+    : drop_dml_trigger
+    | drop_ddl_trigger
+    ;
+
+drop_dml_trigger
+    : DROP TRIGGER (IF EXISTS)? simple_name (',' simple_name)* ';'?
+    ;
+
+drop_ddl_trigger
+    : DROP TRIGGER (IF EXISTS)? simple_name (',' simple_name)*
+    ON (DATABASE | ALL SERVER) ';'?
     ;
 
 //https://msdn.microsoft.com/en-us/library/ms190290.aspx
@@ -1372,9 +1427,11 @@ simple_id
     | DISABLE
     | DYNAMIC
     | ENCRYPTION
+    | EVENTDATA
     | EXPAND
     | FAST
     | FAST_FORWARD
+    | FILLFACTOR
     | FIRST
     | FOLLOWING
     | FORCE
@@ -1455,6 +1512,7 @@ simple_id
     | SCROLL_LOCKS
     | SELF
     | SERIALIZABLE
+    | SERVER
     | SIMPLE
     | SNAPSHOT
     | SOURCE
@@ -1507,6 +1565,7 @@ ALL:                                   A L L;
 ALTER:                                 A L T E R;
 AND:                                   A N D;
 ANY:                                   A N Y;
+APPEND:                                A P P E N D;
 AS:                                    A S;
 ASC:                                   A S C;
 AUTHORIZATION:                         A U T H O R I Z A T I O N;
@@ -1564,6 +1623,7 @@ ELSE:                                  E L S E;
 END:                                   E N D;
 ERRLVL:                                E R R L V L;
 ESCAPE:                                E S C A P E;
+EVENTDATA:                             E V E N T D A T A '(' ')';
 EXCEPT:                                E X C E P T;
 EXECUTE:                               E X E C (U T E)?;
 EXISTS:                                E X I S T S;
@@ -1594,6 +1654,7 @@ INCLUDE:                               I N C L U D E;
 INDEX:                                 I N D E X;
 INNER:                                 I N N E R;
 INSERT:                                I N S E R T;
+INSTEAD:                               I N S T E A D;
 INTERSECT:                             I N T E R S E C T;
 INTO:                                  I N T O;
 IS:                                    I S;
@@ -1664,6 +1725,7 @@ SELECT:                                S E L E C T;
 SEMANTICKEYPHRASETABLE:                S E M A N T I C K E Y P H R A S E T A B L E;
 SEMANTICSIMILARITYDETAILSTABLE:        S E M A N T I C S I M I L A R I T Y D E T A I L S T A B L E;
 SEMANTICSIMILARITYTABLE:               S E M A N T I C S I M I L A R I T Y T A B L E;
+SERVER:                                S E R V E R;
 SESSION_USER:                          S E S S I O N '_' U S E R;
 SET:                                   S E T;
 SETUSER:                               S E T U S E R;
