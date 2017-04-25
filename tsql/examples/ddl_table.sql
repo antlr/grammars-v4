@@ -45,3 +45,6 @@ GO
 
 -- Alter table Add Constraint with Default
 ALTER TABLE dbo.TestTable ADD CONSTRAINT DF_ModifiedDateUTC DEFAULT(GETUTCDATE()) FOR ModifiedDateUTC;
+
+-- Alter table Alter Column
+ALTER TABLE dbo.TestTable ALTER COLUMN ModifiedDateUTC DATETIME
