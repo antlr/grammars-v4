@@ -779,8 +779,9 @@ column_constraint
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
 table_constraint
     : (CONSTRAINT id)?
-       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list (ASC | DESC)? ')' index_options? (ON id)?
-       | CHECK (NOT FOR REPLICATION)? '(' search_condition ')')
+       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list (ASC | DESC)? ')' index_options? (ON id)? 
+         | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
+         | DEFAULT '('?  function_call ')'? FOR id)
     ;
 
 index_options
@@ -1109,6 +1110,10 @@ function_call
     | DATENAME '(' ID ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms174420.aspx
     | DATEPART '(' ID ',' expression ')'
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
+    | GETDATE '(' ')'
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
+    | GETUTCDATE '(' ')'
     // https://msdn.microsoft.com/en-us/library/ms189838.aspx
     | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'
     // https://msdn.microsoft.com/en-us/library/bb839514.aspx
@@ -1808,8 +1813,10 @@ DATEADD:                               D A T E A D D;
 DATEDIFF:                              D A T E D I F F;
 DATENAME:                              D A T E N A M E;
 DATEPART:                              D A T E P A R T;
+GETDATE:                               G E T D A T E;
+GETUTCDATE:                            G E T U T C D A T E;
 DATE_CORRELATION_OPTIMIZATION:         D A T E '_' C O R R E L A T I O N '_' O P T I M I Z A T I O N;
-DAYS:                                  D A Y S; 
+DAYS:                                  D A Y S;
 DB_CHAINING:                           D B '_' C H A I N I N G;
 DEFAULT_FULLTEXT_LANGUAGE:             D E F A U L T '_' F U L L T E X T '_' L A N G U A G E;
 DEFAULT_LANGUAGE:                      D E F A U L T '_' L A N G U A G E;
