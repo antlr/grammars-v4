@@ -780,7 +780,7 @@ column_constraint
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
 table_constraint
     : (CONSTRAINT id)?
-       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list (ASC | DESC)? ')' index_options? (ON id)? 
+       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list_with_order ')' index_options? (ON id)? 
          | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
          | DEFAULT '('?  function_call ')'? FOR id)
     ;

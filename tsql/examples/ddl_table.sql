@@ -45,9 +45,22 @@ GO
 
 -- Alter table Add Constraint with Default
 ALTER TABLE dbo.TestTable ADD CONSTRAINT DF_ModifiedDateUTC DEFAULT(GETUTCDATE()) FOR ModifiedDateUTC;
+GO
 
 -- Alter table Alter Column
 ALTER TABLE dbo.TestTable ALTER COLUMN ModifiedDateUTC DATETIME
+GO
 
 -- Alter table Rebuild with Table Options
 ALTER TABLE TestTable REBUILD WITH (DATA_COMPRESSION = PAGE, ONLINE=ON);
+GO
+
+-- Create Table with Specified Order in Constraint
+CREATE TABLE [dbo].[TestTable] (
+  TableID UNIQUEIDENTIFIER NOT NULL,
+  Value NVARCHAR(64) NOT NULL,
+  Name NVARCHAR(64) NOT NULL,
+  CONSTRAINT [PK_TestTable_Value] PRIMARY KEY CLUSTERED (
+    [TableID] ASC,
+    [Value] ASC))
+GO
