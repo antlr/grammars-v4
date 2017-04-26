@@ -396,7 +396,7 @@ alter_table
                              | DROP CONSTRAINT constraint=id
                              | WITH CHECK ADD CONSTRAINT constraint=id FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
                              | CHECK CONSTRAINT constraint=id
-                             )
+                             | REBUILD table_options)
                              ';'?
     ;
 
@@ -780,7 +780,7 @@ column_constraint
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
 table_constraint
     : (CONSTRAINT id)?
-       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list (ASC | DESC)? ')' index_options? (ON id)? 
+       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list_with_order ')' index_options? (ON id)? 
          | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
          | DEFAULT '('?  function_call ')'? FOR id)
     ;
@@ -1921,6 +1921,7 @@ READONLY:                              R E A D O N L Y;
 READ_COMMITTED_SNAPSHOT:               R E A D '_' C O M M I T T E D '_' S N A P S H O T;
 READ_ONLY:                             R E A D '_' O N L Y;
 READ_WRITE:                            R E A D '_' W R I T E;
+REBUILD:                               R E B U I L D;
 RECOMPILE:                             R E C O M P I L E;
 RECOVERY:                              R E C O V E R Y;
 RECURSIVE_TRIGGERS:                    R E C U R S I V E '_' T R I G G E R S;
