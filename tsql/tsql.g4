@@ -774,7 +774,8 @@ column_definition
 column_constraint
     :(CONSTRAINT id)? null_notnull?
       ((PRIMARY KEY | UNIQUE) clustered? index_options?
-      | CHECK (NOT FOR REPLICATION)? '(' search_condition ')')
+      | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
+      | (FOREIGN KEY)? REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
@@ -782,7 +783,16 @@ table_constraint
     : (CONSTRAINT id)?
        ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list (ASC | DESC)? ')' index_options? (ON id)? 
          | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
-         | DEFAULT '('?  function_call ')'? FOR id)
+         | DEFAULT '('?  function_call ')'? FOR id
+         | FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
+    ;
+
+on_delete
+    : ON DELETE (NO ACTION | CASCADE | SET NULL | SET DEFAULT)
+    ;
+
+on_update
+    : ON UPDATE (NO ACTION | CASCADE | SET NULL | SET DEFAULT)
     ;
 
 index_options
@@ -1773,6 +1783,7 @@ WRITETEXT:                             W R I T E T E X T;
 
 // Additional keywords (they can be id).
 ABSOLUTE:                              A B S O L U T E;
+ACTION:                                A C T I O N;
 AFTER:                                 A F T E R;
 ALLOWED:                               A L L O W E D; 
 ALLOW_SNAPSHOT_ISOLATION:              A L L O W '_' S N A P S H O T '_' I S O L A T I O N;
@@ -1894,6 +1905,7 @@ NOCOUNT:                               N O C O U N T;
 NOEXPAND:                              N O E X P A N D;
 NON_TRANSACTED_ACCESS:                 N O N '_' T R A N S A C T E D '_' A C C E S S;
 NORECOMPUTE:                           N O R E C O M P U T E;
+NO:                                    N O;
 NO_WAIT:                               N O '_' W A I T;
 NTILE:                                 N T I L E;
 NUMBER:                                N U M B E R;
