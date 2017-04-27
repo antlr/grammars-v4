@@ -64,3 +64,19 @@ CREATE TABLE [dbo].[TestTable] (
     [TableID] ASC,
     [Value] ASC))
 GO
+
+-- Create Table with NOT NULL and DEFAULT Constraint
+CREATE TABLE [dbo].[TestTable] (
+  TableID UNIQUEIDENTIFIER NOT NULL,
+  Name NVARCHAR(64) NOT NULL,
+  Value BIT CONSTRAINT DF_TestTable_Value NOT NULL DEFAULT (0))
+  WITH (DATA_COMPRESSION = PAGE)
+GO
+
+
+-- Drop Column
+IF EXISTS(SELECT * FROM sys.columns WHERE NAME = N'Name' AND Object_ID = Object_ID(N'dbo.TestTable'))
+BEGIN
+  ALTER TABLE dbo.TestTable
+  DROP COLUMN Name
+END
