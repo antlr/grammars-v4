@@ -764,7 +764,7 @@ column_def_table_constraint
 // https://msdn.microsoft.com/en-us/library/ms187742.aspx
 column_definition
     : id (data_type | AS expression) (COLLATE id)? null_notnull?
-      ((CONSTRAINT constraint=id)? DEFAULT constant_expression (WITH VALUES)?
+      ((CONSTRAINT constraint=id)? (NULL | NOT NULL)? DEFAULT constant_expression (WITH VALUES)?
        | IDENTITY ('(' seed=DECIMAL ',' increment=DECIMAL ')')? (NOT FOR REPLICATION)?)?
       ROWGUIDCOL?
       column_constraint*
