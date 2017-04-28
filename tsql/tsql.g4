@@ -423,7 +423,7 @@ database_optionspec
       | delayed_durability_option
       | external_access_option
       | FILESTREAM database_filestream_option
-      | HADR_options
+      | hadr_options
       | mixed_page_allocation_option
       | parameterization_option
 //      | query_store_options
@@ -500,7 +500,7 @@ external_access_option:
   | TWO_DIGIT_YEAR_CUTOFF EQUAL DECIMAL
   ;
 
-HADR_options:
+hadr_options:
     ALTER DATABASE SET HADR
     ;
 
@@ -566,7 +566,7 @@ termination:
 
 // https://msdn.microsoft.com/en-us/library/ms176118.aspx
 drop_index
-    : DROP INDEX (IF EXISTS)? name=id (ON table_name)? ';'?
+    : DROP INDEX (IF EXISTS)? name=simple_name (ON table_name)? ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174969.aspx
@@ -765,7 +765,7 @@ column_def_table_constraint
 // https://msdn.microsoft.com/en-us/library/ms187742.aspx
 column_definition
     : id (data_type | AS expression) (COLLATE id)? null_notnull?
-      ((CONSTRAINT constraint=id)? (NULL | NOT NULL)? DEFAULT constant_expression (WITH VALUES)?
+      ((CONSTRAINT constraint=id)? null_notnull? DEFAULT constant_expression (WITH VALUES)?
        | IDENTITY ('(' seed=DECIMAL ',' increment=DECIMAL ')')? (NOT FOR REPLICATION)?)?
       ROWGUIDCOL?
       column_constraint*
@@ -773,7 +773,7 @@ column_definition
 
 // https://msdn.microsoft.com/en-us/library/ms186712.aspx
 column_constraint
-    :(CONSTRAINT id)? null_notnull?
+    :(CONSTRAINT constraint=id)? null_notnull?
       ((PRIMARY KEY | UNIQUE) clustered? index_options?
       | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
       | (FOREIGN KEY)? REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
@@ -781,7 +781,7 @@ column_constraint
 
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
 table_constraint
-    : (CONSTRAINT id)?
+    : (CONSTRAINT constraint=id)?
        ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list_with_order ')' index_options? (ON id)? 
          | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
          | DEFAULT '('?  function_call ')'? FOR id
@@ -816,10 +816,16 @@ declare_cursor
     ;
 
 declare_set_cursor_common
-    : (LOCAL | GLOBAL)?
-      (FORWARD_ONLY | SCROLL)? (STATIC | KEYSET | DYNAMIC | FAST_FORWARD)?
-      (READ_ONLY | SCROLL_LOCKS | OPTIMISTIC)? TYPE_WARNING?
+    : declare_set_cursor_common_partial*
       FOR select_statement
+    ;
+
+declare_set_cursor_common_partial
+    : (LOCAL | GLOBAL) 
+    | (FORWARD_ONLY | SCROLL) 
+    | (STATIC | KEYSET | DYNAMIC | FAST_FORWARD)
+    | (READ_ONLY | SCROLL_LOCKS | OPTIMISTIC)
+    | TYPE_WARNING
     ;
 
 fetch_cursor
@@ -947,7 +953,7 @@ query_specification
       (FROM table_sources)?
       (WHERE where=search_condition)?
       // https://msdn.microsoft.com/en-us/library/ms177673.aspx
-      (GROUP BY group_by_item (',' group_by_item)*)?
+      (GROUP BY (ALL)? group_by_item (',' group_by_item)*)?
       (HAVING having=search_condition)?
     ;
 
@@ -1156,12 +1162,12 @@ table_alias
 
 // https://msdn.microsoft.com/en-us/library/ms187373.aspx
 with_table_hints
-    : WITH? '(' table_hint (',' table_hint)* ')'
+    : WITH? '(' table_hint (','? table_hint)* ')'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187373.aspx
 insert_with_table_hints
-    : WITH '(' table_hint (',' table_hint)* ')'
+    : WITH '(' table_hint (','? table_hint)* ')'
     ;
 
 // Id runtime check. Id can be (FORCESCAN, HOLDLOCK, NOLOCK, NOWAIT, PAGLOCK, READCOMMITTED,
@@ -1174,7 +1180,7 @@ table_hint
                 | SERIALIZABLE
                 | SNAPSHOT
                 | SPATIAL_WINDOW_MAX_CELLS '=' DECIMAL
-                | ID)?
+                | ID)
     ;
 
 index_value
@@ -1433,6 +1439,7 @@ simple_id
     | CHECKSUM_AGG
     | COMMITTED
     | CONCAT
+    | CONCAT_NULL_YIELDS_NULL
     | CONTROL
     | COOKIE
     | COUNT
@@ -1489,6 +1496,7 @@ simple_id
     | NTILE
     | NUMBER
     | OFFSET
+    | OFFSETS
     | ONLINE
     | ONLY
     | OPTIMISTIC
@@ -1518,6 +1526,7 @@ simple_id
     | ROBUST
     | ROOT
     | ROW
+    | ROWCOUNT
     | ROWGUID
     | ROWS
     | ROW_NUMBER
@@ -1611,7 +1620,7 @@ CONTAINMENT:                           C O N T A I N M E N T;
 CONTAINS:                              C O N T A I N S;
 CONTAINSTABLE:                         C O N T A I N S T A B L E;
 CONTINUE:                              C O N T I N U E;
-CONVERT:                               C O N V E R T;
+CONVERT:                               (T R Y '_')? C O N V E R T;
 CREATE:                                C R E A T E;
 CROSS:                                 C R O S S;
 CURRENT:                               C U R R E N T;
@@ -1761,7 +1770,6 @@ TRAN:                                  T R A N;
 TRANSACTION:                           T R A N S A C T I O N;
 TRIGGER:                               T R I G G E R;
 TRUNCATE:                              T R U N C A T E;
-TRY_CONVERT:                           T R Y '_' C O N V E R T;
 TSEQUAL:                               T S E Q U A L;
 UNION:                                 U N I O N;
 UNIQUE:                                U N I Q U E;
@@ -1805,7 +1813,7 @@ BASE64:                                B A S E '64';
 BINARY_CHECKSUM:                       B I N A R Y '_' C H E C K S U M;
 BULK_LOGGED:                           B U L K '_' L O G G E D; 
 CALLER:                                C A L L E R;
-CAST:                                  C A S T;
+CAST:                                  (T R Y '_')? C A S T;
 CATCH:                                 C A T C H;
 CHANGE_RETENTION:                      C H A N G E '_' R E T E N T I O N; 
 CHANGE_TRACKING:                       C H A N G E '_' T R A C K I N G; 
@@ -1825,8 +1833,6 @@ DATEADD:                               D A T E A D D;
 DATEDIFF:                              D A T E D I F F;
 DATENAME:                              D A T E N A M E;
 DATEPART:                              D A T E P A R T;
-GETDATE:                               G E T D A T E;
-GETUTCDATE:                            G E T U T C D A T E;
 DATE_CORRELATION_OPTIMIZATION:         D A T E '_' C O R R E L A T I O N '_' O P T I M I Z A T I O N;
 DAYS:                                  D A Y S;
 DB_CHAINING:                           D B '_' C H A I N I N G;
@@ -1858,6 +1864,8 @@ FORCED:                                F O R C E D;
 FORWARD_ONLY:                          F O R W A R D '_' O N L Y;
 FULLSCAN:                              F U L L S C A N;
 GB:                                    G B;
+GETDATE:                               G E T D A T E;
+GETUTCDATE:                            G E T U T C D A T E;
 GLOBAL:                                G L O B A L;
 GO:                                    G O;
 GROUPING:                              G R O U P I N G;
