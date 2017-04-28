@@ -1456,7 +1456,6 @@ simple_id
     | FORWARD_ONLY
     | FULLSCAN
     | GLOBAL
-    | GO
     | GROUPING
     | GROUPING_ID
     | HASH
