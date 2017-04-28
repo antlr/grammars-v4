@@ -44,9 +44,28 @@ htmlElements
     ;
 
 htmlElement
-    : HtmlDtd | HtmlScriptOpen | HtmlClose | HtmlStyleOpen | ScriptClose | HtmlStyleOpen | StyleBody | HtmlOpen | HtmlName | '/>' | HtmlSlash | HtmlText 
-    | HtmlEquals | HtmlStartQuoteString | HtmlEndQuoteString | HtmlStartDoubleQuoteString | HtmlEndDoubleQuoteString | HtmlHex | HtmlDecimal
-    | HtmlQuoteString | HtmlDoubleQuoteString
+    : HtmlDtd
+    | HtmlScriptOpen
+    | HtmlClose
+    | HtmlStyleOpen
+    | HtmlOpen
+    | HtmlName
+    | HtmlSlashClose
+    | HtmlSlash
+    | HtmlText
+    | HtmlEquals
+    | HtmlStartQuoteString
+    | HtmlEndQuoteString
+    | HtmlStartDoubleQuoteString
+    | HtmlEndDoubleQuoteString
+    | HtmlHex
+    | HtmlDecimal
+    | HtmlQuoteString
+    | HtmlDoubleQuoteString
+
+    | StyleBody
+    
+    | ScriptClose
     ;
 
 // Script
