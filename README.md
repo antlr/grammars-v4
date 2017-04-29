@@ -1,3 +1,5 @@
+[![Travis Status](https://api.travis-ci.org/antlr/grammars-v4.png)](https://travis-ci.org/antlr/grammars-v4)
+
 # grammars-v4
 
 Grammars written for [ANTLR v4](https://github.com/antlr/antlr4)
@@ -15,7 +17,3 @@ the BSD or MIT license.
 ```
 mvn clean test
 ```
-
-## Travis Status
-
-[![Travis Status](https://api.travis-ci.org/antlr/grammars-v4.png)](https://travis-ci.org/antlr/grammars-v4)

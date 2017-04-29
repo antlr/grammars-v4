@@ -68,6 +68,7 @@ ddl_clause
     create_database
     | create_index
     | create_or_alter_procedure
+    | create_or_alter_trigger
     | create_or_alter_function
     | create_statistics
     | create_table
@@ -79,6 +80,7 @@ ddl_clause
 
     | drop_index
     | drop_procedure
+    | drop_trigger
     | drop_function
     | drop_statistics
     | drop_table
@@ -264,7 +266,45 @@ create_or_alter_procedure
       (WITH procedure_option (',' procedure_option)*)?
       (FOR REPLICATION)? AS sql_clauses
     ;
-    
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql
+create_or_alter_trigger
+    : dml_trigger
+    | ddl_trigger
+    ;
+
+dml_trigger
+    : (CREATE | ALTER) TRIGGER simple_name
+      ON table_name
+      (WITH dml_trigger_option (',' dml_trigger_option)* )?
+      (FOR | AFTER | INSTEAD OF)
+      dml_trigger_operation (',' dml_trigger_operation)*
+      (WITH APPEND)?
+      (NOT FOR REPLICATION)?
+      AS sql_clauses
+    ;
+
+dml_trigger_option
+    : ENCRYPTION
+    | execute_clause
+    ;
+
+dml_trigger_operation
+    : (INSERT | UPDATE | DELETE)
+    ;
+
+ddl_trigger
+    : (CREATE | ALTER) TRIGGER simple_name
+      ON (ALL SERVER | DATABASE)
+      (WITH dml_trigger_option (',' dml_trigger_option)* )?
+      (FOR | AFTER) ddl_trigger_operation (',' dml_trigger_operation)*
+      AS sql_clauses
+    ;
+
+ddl_trigger_operation
+    : simple_id
+    ;
+
 //https://msdn.microsoft.com/en-us/library/ms186755.aspx
 create_or_alter_function
     : (CREATE | ALTER) FUNCTION func_proc_name
@@ -352,10 +392,12 @@ view_attribute
 alter_table
     : ALTER TABLE table_name (SET '(' LOCK_ESCALATION '=' (AUTO | TABLE | DISABLE) ')'
                              | ADD column_def_table_constraint
+                             | ALTER COLUMN column_definition
+                             | DROP COLUMN id
                              | DROP CONSTRAINT constraint=id
                              | WITH CHECK ADD CONSTRAINT constraint=id FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
                              | CHECK CONSTRAINT constraint=id
-                             )
+                             | REBUILD table_options)
                              ';'?
     ;
 
@@ -381,7 +423,7 @@ database_optionspec
       | delayed_durability_option
       | external_access_option
       | FILESTREAM database_filestream_option
-      | HADR_options
+      | hadr_options
       | mixed_page_allocation_option
       | parameterization_option
 //      | query_store_options
@@ -458,7 +500,7 @@ external_access_option:
   | TWO_DIGIT_YEAR_CUTOFF EQUAL DECIMAL
   ;
 
-HADR_options:
+hadr_options:
     ALTER DATABASE SET HADR
     ;
 
@@ -524,12 +566,27 @@ termination:
 
 // https://msdn.microsoft.com/en-us/library/ms176118.aspx
 drop_index
-    : DROP INDEX (IF EXISTS)? name=id (ON table_name)? ';'?
+    : DROP INDEX (IF EXISTS)? ((((schema=id) '.')? (table=id) '.' (index_name=id)) | (id ON table_name)) ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174969.aspx
 drop_procedure
     : DROP proc=(PROC | PROCEDURE) (IF EXISTS)? func_proc_name (',' func_proc_name)* ';'?
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-trigger-transact-sql
+drop_trigger
+    : drop_dml_trigger
+    | drop_ddl_trigger
+    ;
+
+drop_dml_trigger
+    : DROP TRIGGER (IF EXISTS)? simple_name (',' simple_name)* ';'?
+    ;
+
+drop_ddl_trigger
+    : DROP TRIGGER (IF EXISTS)? simple_name (',' simple_name)*
+    ON (DATABASE | ALL SERVER) ';'?
     ;
 
 //https://msdn.microsoft.com/en-us/library/ms190290.aspx
@@ -708,7 +765,7 @@ column_def_table_constraint
 // https://msdn.microsoft.com/en-us/library/ms187742.aspx
 column_definition
     : id (data_type | AS expression) (COLLATE id)? null_notnull?
-      ((CONSTRAINT constraint=id)? DEFAULT constant_expression (WITH VALUES)?
+      ((CONSTRAINT constraint=id)? null_notnull? DEFAULT constant_expression (WITH VALUES)?
        | IDENTITY ('(' seed=DECIMAL ',' increment=DECIMAL ')')? (NOT FOR REPLICATION)?)?
       ROWGUIDCOL?
       column_constraint*
@@ -716,16 +773,27 @@ column_definition
 
 // https://msdn.microsoft.com/en-us/library/ms186712.aspx
 column_constraint
-    :(CONSTRAINT id)? null_notnull?
+    :(CONSTRAINT constraint=id)? null_notnull?
       ((PRIMARY KEY | UNIQUE) clustered? index_options?
-      | CHECK (NOT FOR REPLICATION)? '(' search_condition ')')
+      | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
+      | (FOREIGN KEY)? REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
 table_constraint
-    : (CONSTRAINT id)?
-       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list (ASC | DESC)? ')' index_options? (ON id)?
-       | CHECK (NOT FOR REPLICATION)? '(' search_condition ')')
+    : (CONSTRAINT constraint=id)?
+       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list_with_order ')' index_options? (ON id)? 
+         | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
+         | DEFAULT '('?  function_call ')'? FOR id
+         | FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
+    ;
+
+on_delete
+    : ON DELETE (NO ACTION | CASCADE | SET NULL | SET DEFAULT)
+    ;
+
+on_update
+    : ON UPDATE (NO ACTION | CASCADE | SET NULL | SET DEFAULT)
     ;
 
 index_options
@@ -748,10 +816,16 @@ declare_cursor
     ;
 
 declare_set_cursor_common
-    : (LOCAL | GLOBAL)?
-      (FORWARD_ONLY | SCROLL)? (STATIC | KEYSET | DYNAMIC | FAST_FORWARD)?
-      (READ_ONLY | SCROLL_LOCKS | OPTIMISTIC)? TYPE_WARNING?
+    : declare_set_cursor_common_partial*
       FOR select_statement
+    ;
+
+declare_set_cursor_common_partial
+    : (LOCAL | GLOBAL) 
+    | (FORWARD_ONLY | SCROLL) 
+    | (STATIC | KEYSET | DYNAMIC | FAST_FORWARD)
+    | (READ_ONLY | SCROLL_LOCKS | OPTIMISTIC)
+    | TYPE_WARNING
     ;
 
 fetch_cursor
@@ -879,7 +953,7 @@ query_specification
       (FROM table_sources)?
       (WHERE where=search_condition)?
       // https://msdn.microsoft.com/en-us/library/ms177673.aspx
-      (GROUP BY group_by_item (',' group_by_item)*)?
+      (GROUP BY (ALL)? group_by_item (',' group_by_item)*)?
       (HAVING having=search_condition)?
     ;
 
@@ -1054,6 +1128,10 @@ function_call
     | DATENAME '(' ID ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms174420.aspx
     | DATEPART '(' ID ',' expression ')'
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
+    | GETDATE '(' ')'
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
+    | GETUTCDATE '(' ')'
     // https://msdn.microsoft.com/en-us/library/ms189838.aspx
     | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'
     // https://msdn.microsoft.com/en-us/library/bb839514.aspx
@@ -1084,12 +1162,12 @@ table_alias
 
 // https://msdn.microsoft.com/en-us/library/ms187373.aspx
 with_table_hints
-    : WITH? '(' table_hint (',' table_hint)* ')'
+    : WITH? '(' table_hint (','? table_hint)* ')'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187373.aspx
 insert_with_table_hints
-    : WITH '(' table_hint (',' table_hint)* ')'
+    : WITH '(' table_hint (','? table_hint)* ')'
     ;
 
 // Id runtime check. Id can be (FORCESCAN, HOLDLOCK, NOLOCK, NOWAIT, PAGLOCK, READCOMMITTED,
@@ -1102,7 +1180,7 @@ table_hint
                 | SERIALIZABLE
                 | SNAPSHOT
                 | SPATIAL_WINDOW_MAX_CELLS '=' DECIMAL
-                | ID)?
+                | ID)
     ;
 
 index_value
@@ -1361,6 +1439,7 @@ simple_id
     | CHECKSUM_AGG
     | COMMITTED
     | CONCAT
+    | CONCAT_NULL_YIELDS_NULL
     | CONTROL
     | COOKIE
     | COUNT
@@ -1372,9 +1451,11 @@ simple_id
     | DISABLE
     | DYNAMIC
     | ENCRYPTION
+    | EVENTDATA
     | EXPAND
     | FAST
     | FAST_FORWARD
+    | FILLFACTOR
     | FIRST
     | FOLLOWING
     | FORCE
@@ -1382,7 +1463,6 @@ simple_id
     | FORWARD_ONLY
     | FULLSCAN
     | GLOBAL
-    | GO
     | GROUPING
     | GROUPING_ID
     | HASH
@@ -1416,6 +1496,7 @@ simple_id
     | NTILE
     | NUMBER
     | OFFSET
+    | OFFSETS
     | ONLINE
     | ONLY
     | OPTIMISTIC
@@ -1445,6 +1526,7 @@ simple_id
     | ROBUST
     | ROOT
     | ROW
+    | ROWCOUNT
     | ROWGUID
     | ROWS
     | ROW_NUMBER
@@ -1455,6 +1537,7 @@ simple_id
     | SCROLL_LOCKS
     | SELF
     | SERIALIZABLE
+    | SERVER
     | SIMPLE
     | SNAPSHOT
     | SOURCE
@@ -1507,6 +1590,7 @@ ALL:                                   A L L;
 ALTER:                                 A L T E R;
 AND:                                   A N D;
 ANY:                                   A N Y;
+APPEND:                                A P P E N D;
 AS:                                    A S;
 ASC:                                   A S C;
 AUTHORIZATION:                         A U T H O R I Z A T I O N;
@@ -1536,7 +1620,7 @@ CONTAINMENT:                           C O N T A I N M E N T;
 CONTAINS:                              C O N T A I N S;
 CONTAINSTABLE:                         C O N T A I N S T A B L E;
 CONTINUE:                              C O N T I N U E;
-CONVERT:                               C O N V E R T;
+CONVERT:                               (T R Y '_')? C O N V E R T;
 CREATE:                                C R E A T E;
 CROSS:                                 C R O S S;
 CURRENT:                               C U R R E N T;
@@ -1564,6 +1648,7 @@ ELSE:                                  E L S E;
 END:                                   E N D;
 ERRLVL:                                E R R L V L;
 ESCAPE:                                E S C A P E;
+EVENTDATA:                             E V E N T D A T A '(' ')';
 EXCEPT:                                E X C E P T;
 EXECUTE:                               E X E C (U T E)?;
 EXISTS:                                E X I S T S;
@@ -1594,6 +1679,7 @@ INCLUDE:                               I N C L U D E;
 INDEX:                                 I N D E X;
 INNER:                                 I N N E R;
 INSERT:                                I N S E R T;
+INSTEAD:                               I N S T E A D;
 INTERSECT:                             I N T E R S E C T;
 INTO:                                  I N T O;
 IS:                                    I S;
@@ -1664,6 +1750,7 @@ SELECT:                                S E L E C T;
 SEMANTICKEYPHRASETABLE:                S E M A N T I C K E Y P H R A S E T A B L E;
 SEMANTICSIMILARITYDETAILSTABLE:        S E M A N T I C S I M I L A R I T Y D E T A I L S T A B L E;
 SEMANTICSIMILARITYTABLE:               S E M A N T I C S I M I L A R I T Y T A B L E;
+SERVER:                                S E R V E R;
 SESSION_USER:                          S E S S I O N '_' U S E R;
 SET:                                   S E T;
 SETUSER:                               S E T U S E R;
@@ -1683,7 +1770,6 @@ TRAN:                                  T R A N;
 TRANSACTION:                           T R A N S A C T I O N;
 TRIGGER:                               T R I G G E R;
 TRUNCATE:                              T R U N C A T E;
-TRY_CONVERT:                           T R Y '_' C O N V E R T;
 TSEQUAL:                               T S E Q U A L;
 UNION:                                 U N I O N;
 UNIQUE:                                U N I Q U E;
@@ -1705,6 +1791,7 @@ WRITETEXT:                             W R I T E T E X T;
 
 // Additional keywords (they can be id).
 ABSOLUTE:                              A B S O L U T E;
+ACTION:                                A C T I O N;
 AFTER:                                 A F T E R;
 ALLOWED:                               A L L O W E D; 
 ALLOW_SNAPSHOT_ISOLATION:              A L L O W '_' S N A P S H O T '_' I S O L A T I O N;
@@ -1726,7 +1813,7 @@ BASE64:                                B A S E '64';
 BINARY_CHECKSUM:                       B I N A R Y '_' C H E C K S U M;
 BULK_LOGGED:                           B U L K '_' L O G G E D; 
 CALLER:                                C A L L E R;
-CAST:                                  C A S T;
+CAST:                                  (T R Y '_')? C A S T;
 CATCH:                                 C A T C H;
 CHANGE_RETENTION:                      C H A N G E '_' R E T E N T I O N; 
 CHANGE_TRACKING:                       C H A N G E '_' T R A C K I N G; 
@@ -1747,7 +1834,7 @@ DATEDIFF:                              D A T E D I F F;
 DATENAME:                              D A T E N A M E;
 DATEPART:                              D A T E P A R T;
 DATE_CORRELATION_OPTIMIZATION:         D A T E '_' C O R R E L A T I O N '_' O P T I M I Z A T I O N;
-DAYS:                                  D A Y S; 
+DAYS:                                  D A Y S;
 DB_CHAINING:                           D B '_' C H A I N I N G;
 DEFAULT_FULLTEXT_LANGUAGE:             D E F A U L T '_' F U L L T E X T '_' L A N G U A G E;
 DEFAULT_LANGUAGE:                      D E F A U L T '_' L A N G U A G E;
@@ -1777,6 +1864,8 @@ FORCED:                                F O R C E D;
 FORWARD_ONLY:                          F O R W A R D '_' O N L Y;
 FULLSCAN:                              F U L L S C A N;
 GB:                                    G B;
+GETDATE:                               G E T D A T E;
+GETUTCDATE:                            G E T U T C D A T E;
 GLOBAL:                                G L O B A L;
 GO:                                    G O;
 GROUPING:                              G R O U P I N G;
@@ -1824,6 +1913,7 @@ NOCOUNT:                               N O C O U N T;
 NOEXPAND:                              N O E X P A N D;
 NON_TRANSACTED_ACCESS:                 N O N '_' T R A N S A C T E D '_' A C C E S S;
 NORECOMPUTE:                           N O R E C O M P U T E;
+NO:                                    N O;
 NO_WAIT:                               N O '_' W A I T;
 NTILE:                                 N T I L E;
 NUMBER:                                N U M B E R;
@@ -1851,6 +1941,7 @@ READONLY:                              R E A D O N L Y;
 READ_COMMITTED_SNAPSHOT:               R E A D '_' C O M M I T T E D '_' S N A P S H O T;
 READ_ONLY:                             R E A D '_' O N L Y;
 READ_WRITE:                            R E A D '_' W R I T E;
+REBUILD:                               R E B U I L D;
 RECOMPILE:                             R E C O M P I L E;
 RECOVERY:                              R E C O V E R Y;
 RECURSIVE_TRIGGERS:                    R E C U R S I V E '_' T R I G G E R S;
