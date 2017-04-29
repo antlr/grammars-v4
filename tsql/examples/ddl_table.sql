@@ -73,10 +73,12 @@ CREATE TABLE [dbo].[TestTable] (
   WITH (DATA_COMPRESSION = PAGE)
 GO
 
-
 -- Drop Column
 IF EXISTS(SELECT * FROM sys.columns WHERE NAME = N'Name' AND Object_ID = Object_ID(N'dbo.TestTable'))
 BEGIN
   ALTER TABLE dbo.TestTable
   DROP COLUMN Name
 END
+
+-- Drop Index Using Fully Qualified Name
+DROP INDEX dbo.TestTable.UIX_TestTable_Name_Value
