@@ -584,3 +584,14 @@ GO
 SELECT TOP (1+@localvar) PERCENT *
 FROM Production.Product
 ORDER BY Name ASC;
+
+-- TRY_CAST & TRY_CONVERT
+use AdventureWorks2012;
+GO
+SELECT TRY_CAST(SalesOrderID AS INT),
+    TRY_CONVERT(INT, SalesOrderID)
+FROM Sales.SalesOrderDetail
+WHERE SalesOrderDetailID = 1;
+
+
+

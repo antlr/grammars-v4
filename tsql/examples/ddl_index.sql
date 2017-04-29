@@ -17,4 +17,12 @@ CREATE NONCLUSTERED INDEX IX_Address_PostalCode
 -- filtered index
 CREATE NONCLUSTERED INDEX IX_BillOfMaterials_ComponentID
     ON Production.BillOfMaterials (ComponentID, StartDate)
-    WHERE EndDate IS NOT NULL ; 
+    WHERE EndDate IS NOT NULL ;
+
+-- this feature will be deprecated in future version of tsql 
+-- but need to support in case someone want to capture this and throw a warning
+DROP INDEX tbl.idx_tbl_col;
+
+DROP INDEX IX_ProductVendor_BusinessEntityID
+    ON Purchasing.ProductVendor;
+GO
