@@ -566,7 +566,7 @@ termination:
 
 // https://msdn.microsoft.com/en-us/library/ms176118.aspx
 drop_index
-    : DROP INDEX (IF EXISTS)? name=simple_name (ON table_name)? ';'?
+    : DROP INDEX (IF EXISTS)? ((((schema=id) '.')? (table=id) '.' (index_name=id)) | (id ON table_name)) ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174969.aspx
