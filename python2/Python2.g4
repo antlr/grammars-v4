@@ -1,20 +1,19 @@
-
-/* 
+/*
  * Parser grammar taken directly from official Python 2.7.13 grammar
- * with only minor syntactical changes (instances of [X] changed to (X)?, and 
+ * with only minor syntactical changes (instances of [X] changed to (X)?, and
  * semicolons added to ends of rules).:
  * https://docs.python.org/2/reference/grammar.html
  *
- * Added lexer rules, and code to handle INDENT's, DEDENT's, 
+ * Added lexer rules, and code to handle INDENT's, DEDENT's,
  * line continuations, etc.
- * 
+ *
  * Compiles with ANTLR 4.7, generated lexer/parser for Python 2 target.
  */
  
  grammar Python2;
- 
+
  tokens { INDENT, DEDENT, NEWLINE, ENDMARKER }
- 
+
 @lexer::header {
 from Python2Parser import Python2Parser
 from antlr4.Token  import CommonToken
@@ -23,16 +22,16 @@ class IndentStack:
     def __init__(self)    : self._s = []
     def empty(self)       : return len(self._s) == 0
     def push(self, wsval) : self._s.append(wsval)
-    def pop(self)         : self._s.pop()   
-    def wsval(self)       : return self._s[-1] if len(self._s) > 0 else 0 
-        
+    def pop(self)         : self._s.pop()
+    def wsval(self)       : return self._s[-1] if len(self._s) > 0 else 0
+
 class TokenQueue:
     def __init__(self)  : self._q = []
     def empty(self)     : return len(self._q) == 0
     def enq(self, t)    : self._q.append(t)
     def deq(self)       : return self._q.pop(0)
 }
- 
+
 @lexer::members {
     # Indented to append code to the constructor.
     self._openBRCount       = 0
@@ -40,7 +39,7 @@ class TokenQueue:
     self._lineContinuation  = False
     self._tokens            = TokenQueue()
     self._indents           = IndentStack()
-    
+
 def nextToken(self):
     if not self._tokens.empty():
         return self._tokens.deq()
@@ -49,40 +48,42 @@ def nextToken(self):
         if t.type != Token.EOF:
             return t
         else:
+            if not self._suppressNewlines:
+                self.emitNewline()
             self.emitFullDedent()
             self.emitEndmarker()
-            self.emitEndToken(t)  
+            self.emitEndToken(t)
             return self._tokens.deq()
             
 def emitEndToken(self, token):
     self._tokens.enq(token)
-    
+
 def emitIndent(self, length=0, text='INDENT'):
     t = self.createToken(Python2Parser.INDENT, text, length)
     self._tokens.enq(t)
-    
+
 def emitDedent(self):
     t = self.createToken(Python2Parser.DEDENT, 'DEDENT')
     self._tokens.enq(t)
-    
+
 def emitFullDedent(self):
     while not self._indents.empty():
         self._indents.pop()
         self.emitDedent()
-    
+
 def emitEndmarker(self):
     t = self.createToken(Python2Parser.ENDMARKER, 'ENDMARKER')
     self._tokens.enq(t)
-    
+
 def emitNewline(self):
     t = self.createToken(Python2Parser.NEWLINE, 'NEWLINE')
     self._tokens.enq(t)
-  
+
 def createToken(self, type_, text="", length=0):
     start = self._tokenStartCharIndex
     stop = start + length
-    t = CommonToken(self._tokenFactorySourcePair, 
-                    type_, self.DEFAULT_TOKEN_CHANNEL, 
+    t = CommonToken(self._tokenFactorySourcePair,
+                    type_, self.DEFAULT_TOKEN_CHANNEL,
                     start, stop)
     t.text = text
     return t
@@ -151,8 +152,14 @@ augassign: ('+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' |
             '<<=' | '>>=' | '**=' | '//=')
 // For normal assignments, additional restrictions enforced by the interpreter
     ;
-print_stmt: 'print' ( ( test (',' test)* (',')? )? |
-                      '>>' test ( (',' test)+ (',')? )? )
+//print_stmt: 'print' ( ( test (',' test)* (',')? )? |
+//                      '>>' test ( (',' test)+ (',')? )? )
+//    ;
+print_stmt: {self._input.LT(1).text=='print'}? 
+            // tt: this change allows print to be treated as a NAME
+            //     while preserving the print statement syntax.
+            NAME ( ( test (',' test)* (',')? )? |
+                 '>>' test ( (',' test)+ (',')? )? )
     ;
 del_stmt: 'del' exprlist
     ;
@@ -262,7 +269,7 @@ power: atom trailer* ('**' factor)?
 atom:  ('(' (yield_expr|testlist_comp)? ')' |
         '[' (listmaker)? ']' |
         '{' (dictorsetmaker)? '}' |
-        '`' testlist1 '`' |
+        '`' testlist1 '`' | '.' '.' '.' | // tt: added elipses.
         NAME | NUMBER | STRING+)
     ;
 listmaker: test ( list_for | (',' test)* (',')? )
@@ -293,7 +300,7 @@ classdef: 'class' NAME ('(' (testlist)? ')')? ':' suite
 
 
 arglist: (argument ',')* (argument (',')?
-                         |'*' test (',' argument)* (',' '**' test)? 
+                         |'*' test (',' argument)* (',' '**' test)?
                          |'**' test)
 // The reason that keywords are test nodes instead of NAME is that using NAME
 // results in an ambiguity. ast.c makes sure it's a NAME.
@@ -320,41 +327,40 @@ comp_if: 'if' old_test (comp_iter)?
 
 testlist1: test (',' test)*
     ;
-    
+
 // not used in grammar, but may appear in "node" passed from Parser to Compiler
 encoding_decl: NAME
     ;
-    
-yield_expr: 'yield' (testlist)?
-    ;
 
+yield_expr: 'yield' 'from'? (testlist)?
+    ;
+    
 /*****************************************************************************
  *                               Lexer rules
  *****************************************************************************/
- 
- 
+
 NAME: [a-zA-Z_] [a-zA-Z0-9_]*
     ;
-    
+
 NUMBER
-    :   '0' ([xX] [0-9a-fA-F]+         ([lL]        | [eE] [+-]? [0-9]+)?
+    :   '0' ([xX] [0-9a-fA-F]+         ([lL]  | [eE] [+-]? [0-9]+)?
     |        [oO] [0-7]+                [lL]?
     |        [bB] [01]+                 [lL]?)
-    | ([0-9]+ '.' [0-9]* | '.' [0-9]+)        ([jJ] | [eE] [+-]? [0-9]+)?
-    |  [0-9]+                          ([lL] | [jJ] | [eE] [+-]? [0-9]+)?
+    | ([0-9]+ '.' [0-9]* | '.' [0-9]+)         ([eE] [+-]? [0-9]+)?       [jJ]?
+    |  [0-9]+                          ([lL]  | [eE] [+-]? [0-9]+ [jJ]? | [jJ])?
     ;
- 
+
 STRING
-    : [uUbB]? [rR]? 
+    : ([uUbB]? [rR]? | [rR]? [uUbB]?)
     ( '\''     ('\\' (([ \t]+ ('\r'? '\n')?)|.) | ~[\\\r\n'])*  '\''
     | '"'      ('\\' (([ \t]+ ('\r'? '\n')?)|.) | ~[\\\r\n"])*  '"'
     | '"""'    ('\\' .                          | ~'\\'     )*? '"""'
     | '\'\'\'' ('\\' .                          | ~'\\'     )*? '\'\'\''
     )
     ;
- 
+
 LINENDING:             (('\r'? '\n')+ {self._lineContinuation=False}
-    |      '\\'  [ \t]* ('\r'? '\n')  {self._lineContinuation=True}) 
+    |      '\\'  [ \t]* ('\r'? '\n')  {self._lineContinuation=True})
 {
 if self._openBRCount == 0 and not self._lineContinuation:
     if not self._suppressNewlines:
@@ -366,18 +372,18 @@ if self._openBRCount == 0 and not self._lineContinuation:
         self.emitFullDedent()
 } -> channel(HIDDEN)
    ;
-   
+
 WHITESPACE: ('\t' | ' ')+
-{        
-if (self._tokenStartColumn == 0 and self._openBRCount == 0 
+{
+if (self._tokenStartColumn == 0 and self._openBRCount == 0
     and not self._lineContinuation):
-    
+
     la = self._input.LA(1)
-    if la not in [ord('\r'), ord('\n'), ord('#')]:   
+    if la not in [ord('\r'), ord('\n'), ord('#'), -1]:
         self._suppressNewlines = False
         wsCount = 0
         for ch in self.text:
-            if   ch == ' ' :  wsCount += 1
+            if   ch == ' ' : wsCount += 1
             elif ch == '\t': wsCount += 8
 
         if wsCount > self._indents.wsval():
@@ -391,7 +397,7 @@ if (self._tokenStartColumn == 0 and self._openBRCount == 0
                 raise Exception()
 }  -> channel(HIDDEN)
     ;
-    
+
 COMMENT:        '#' ~[\r\n]* -> skip;
 
 OPEN_PAREN:     '(' {self._openBRCount  += 1};

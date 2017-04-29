@@ -519,7 +519,7 @@ unlockStmt
 valueStmt
    : literal # vsLiteral
    | implicitCallStmt_InStmt # vsICS
-   | LPAREN WS? valueStmt (WS? COMMA WS? valueStmt)* RPAREN # vsStruct
+   | LPAREN WS? valueStmt (WS? COMMA WS? valueStmt)* WS? RPAREN # vsStruct
    | NEW WS valueStmt # vsNew
    | typeOfStmt # vsTypeOf
    | midStmt # vsMid
