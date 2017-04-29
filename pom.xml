@@ -35,6 +35,7 @@
 		<module>dcm</module>
 		<module>dot</module>
 		<module>ecmascript</module>
+		<module>emailaddress</module>
 		<module>erlang</module>
 		<module>fasta</module>
 		<module>fol</module>

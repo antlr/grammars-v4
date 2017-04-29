@@ -70,37 +70,37 @@ programIdParagraph
 // - author paragraph ----------------------------------
 
 authorParagraph
-   : AUTHOR DOT_FS
+   : AUTHOR DOT_FS commentEntry?
    ;
 
 // - installation paragraph ----------------------------------
 
 installationParagraph
-   : INSTALLATION DOT_FS
+   : INSTALLATION DOT_FS commentEntry?
    ;
 
 // - date written paragraph ----------------------------------
 
 dateWrittenParagraph
-   : DATE_WRITTEN DOT_FS
+   : DATE_WRITTEN DOT_FS commentEntry?
    ;
 
 // - date compiled paragraph ----------------------------------
 
 dateCompiledParagraph
-   : DATE_COMPILED DOT_FS
+   : DATE_COMPILED DOT_FS commentEntry?
    ;
 
 // - security paragraph ----------------------------------
 
 securityParagraph
-   : SECURITY DOT_FS
+   : SECURITY DOT_FS commentEntry?
    ;
 
 // - remarks paragraph ----------------------------------
 
 remarksParagraph
-   : REMARKS DOT_FS
+   : REMARKS DOT_FS commentEntry?
    ;
 
 // --- environment division --------------------------------------------------------------------
@@ -594,7 +594,7 @@ textLengthClause
 // -- local storage section ----------------------------------
 
 localStorageSection
-   : LOCAL_STORAGE SECTION DOT_FS LD localName DOT_FS dataDescriptionEntry*
+   : LOCAL_STORAGE SECTION DOT_FS (LD localName DOT_FS)? dataDescriptionEntry*
    ;
 
 // -- screen section ----------------------------------
@@ -962,7 +962,7 @@ libraryIsGlobalClause
 // data description entry ----------------------------------
 
 dataDescriptionEntry
-   : dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3
+   : dataDescriptionEntryFormat1 | dataDescriptionEntryFormat2 | dataDescriptionEntryFormat3 | dataDescriptionEntryExecSql
    ;
 
 dataDescriptionEntryFormat1
@@ -975,6 +975,10 @@ dataDescriptionEntryFormat2
 
 dataDescriptionEntryFormat3
    : LEVEL_NUMBER_88 conditionName dataValueClause DOT_FS
+   ;
+
+dataDescriptionEntryExecSql
+   : EXECSQLLINE+ DOT_FS
    ;
 
 dataAlignedClause
@@ -1150,7 +1154,7 @@ sentence
    ;
 
 statement
-   : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement | disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement | unstringStatement | writeStatement
+   : acceptStatement | addStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement | disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement | execCicsStatement | execSqlStatement | execSqlImsStatement | exitStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement | initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement | readStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement | terminateStatement | unstringStatement | writeStatement
    ;
 
 // accept statement
@@ -1435,6 +1439,24 @@ evaluateWhenOther
 
 evaluateValue
    : identifier | literal | arithmeticExpression
+   ;
+
+// exec cics statement
+
+execCicsStatement
+   : EXECCICSLINE+
+   ;
+
+// exec sql statement
+
+execSqlStatement
+   : EXECSQLLINE+
+   ;
+
+// exec sql ims statement
+
+execSqlImsStatement
+   : EXECSQLIMSLINE+
    ;
 
 // exhibit statement
@@ -2230,7 +2252,7 @@ condition
    ;
 
 andOrCondition
-   : (AND | OR) (combinableCondition | abbreviationRest)
+   : (AND | OR) (combinableCondition | abbreviation+)
    ;
 
 combinableCondition
@@ -2279,12 +2301,8 @@ relationalOperator
    : (IS | ARE)? (NOT? (GREATER THAN? | MORETHANCHAR | LESS THAN? | LESSTHANCHAR | EQUAL TO? | EQUALCHAR) | GREATER THAN? OR EQUAL TO? | MORETHANOREQUAL | LESS THAN? OR EQUAL TO? | LESSTHANOREQUAL)
    ;
 
-abbreviationRest
-   : (NOT? relationalOperator? abbreviationLeaf)+
-   ;
-
-abbreviationLeaf
-   : arithmeticExpression | LPARENCHAR arithmeticExpression abbreviationRest RPARENCHAR
+abbreviation
+   : NOT? relationalOperator? (arithmeticExpression | LPARENCHAR arithmeticExpression abbreviation RPARENCHAR)
    ;
 
 // identifier ----------------------------------
@@ -2558,6 +2576,12 @@ specialRegister
    | SHIFT_OUT | SHIFT_IN | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN 
    | TALLY | TIME 
    | WHEN_COMPILED
+   ;
+
+// comment entry
+
+commentEntry
+   : COMMENTENTRYLINE+
    ;
 
 // lexer rules --------------------------------------------------------------------------------
@@ -3099,6 +3123,7 @@ ASTERISKCHAR : '*';
 DOUBLEASTERISKCHAR : '**';
 COLONCHAR : ':';
 COMMACHAR : ',';
+COMMENTENTRYTAG : '>*CE';
 COMMENTTAG : '>*';
 DOLLARCHAR : '$';
 DOUBLEQUOTE : '"';
@@ -3106,6 +3131,9 @@ DOUBLEQUOTE : '"';
 DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
 DOT : '.';
 EQUALCHAR : '=';
+EXECCICSTAG : '>*EXECCICS';
+EXECSQLTAG : '>*EXECSQL';
+EXECSQLIMSTAG : '>*EXECSQLIMS';
 LESSTHANCHAR : '<';
 LESSTHANOREQUAL : '<=';
 LPARENCHAR : '(';
@@ -3147,7 +3175,11 @@ IDENTIFIER : [a-zA-Z0-9]+ ([-_]+ [a-zA-Z0-9]+)*;
 
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> skip;
-COMMENTLINE : COMMENTTAG ~('\n' | '\r')* -> skip;
+EXECCICSLINE : EXECCICSTAG WS ~('\n' | '\r' | '.')+;
+EXECSQLIMSLINE : EXECSQLIMSTAG WS ~('\n' | '\r' | '.')+;
+EXECSQLLINE : EXECSQLTAG WS ~('\n' | '\r' | '.')+;
+COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
+COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> skip;
 WS : [ \t\f;]+ -> skip;
 SEPARATOR : ', ' -> skip;
 
