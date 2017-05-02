@@ -555,12 +555,7 @@ factor
 
 /// power: atom trailer* ['**' factor]
 power
- : trailed_atom ( '**' factor )?
- ;
-
-
-trailed_atom
- : atom trailer*
+ : atom trailer* ( '**' factor )?
  ;
 
 /// atom: ('(' [yield_expr|testlist_comp] ')' |
