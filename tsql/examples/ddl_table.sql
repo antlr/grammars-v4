@@ -96,3 +96,9 @@ ALTER TABLE TestTable
   ADD Value BIT
   CONSTRAINT DF_TestTable_Value NOT NULL DEFAULT(0)
 GO
+
+-- Alter Table Add Constraint To Column
+ALTER TABLE dbo.TestTable 
+  ADD CONSTRAINT DF_TestTable_Value DEFAULT(0) 
+  FOR Value
+GO
