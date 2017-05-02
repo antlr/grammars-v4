@@ -103,7 +103,7 @@ ALTER TABLE dbo.TestTable
   FOR Value
 GO
 
--- new test
+-- Alter Table Add Constraint With String Concatenation
 ALTER TABLE dbo.TestTable
   ADD CONSTRAINT DF_Name
   DEFAULT('NONE_' + CONVERT(NVARCHAR(40),NEWID())) 

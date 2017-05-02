@@ -33,6 +33,15 @@ AND DaysToManufacture < 4
 ORDER BY Name ASC;
 GO
 
+-- Select with Multiple Batch Separators
+USE AdventureWorks2012;
+GO
+SELECT *
+FROM Production.Product
+ORDER BY Name ASC;
+GO
+GO
+
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Using SELECT with column headings and calculations
 
@@ -592,6 +601,3 @@ SELECT TRY_CAST(SalesOrderID AS INT),
     TRY_CONVERT(INT, SalesOrderID)
 FROM Sales.SalesOrderDetail
 WHERE SalesOrderDetailID = 1;
-
-
-

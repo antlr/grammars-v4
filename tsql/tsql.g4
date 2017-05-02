@@ -32,7 +32,7 @@ tsql_file
     ;
 
 batch
-    : sql_clauses go_statement?
+    : sql_clauses go_statement*
     ;
 
 sql_clauses
