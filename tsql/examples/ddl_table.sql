@@ -102,3 +102,10 @@ ALTER TABLE dbo.TestTable
   ADD CONSTRAINT DF_TestTable_Value DEFAULT(0) 
   FOR Value
 GO
+
+-- new test
+ALTER TABLE dbo.TestTable
+  ADD CONSTRAINT DF_Name
+  DEFAULT('NONE_' + CONVERT(NVARCHAR(40),NEWID())) 
+  FOR Name
+GO
