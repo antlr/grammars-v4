@@ -142,7 +142,7 @@ another_statement
 merge_statement
     : with_expression?
       MERGE (TOP '(' expression ')' PERCENT?)?
-      INTO? ddl_object insert_with_table_hints? (AS? ID)?
+      INTO? ddl_object insert_with_table_hints? as_table_alias?
       USING table_sources
       ON search_condition
       (WHEN MATCHED (AND search_condition)?
