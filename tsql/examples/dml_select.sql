@@ -601,3 +601,9 @@ SELECT TRY_CAST(SalesOrderID AS INT),
     TRY_CONVERT(INT, SalesOrderID)
 FROM Sales.SalesOrderDetail
 WHERE SalesOrderDetailID = 1;
+GO
+
+-- SET statement
+SET ANSI_WARNINGS OFF;
+SELECT id FROM tbl;
+GO

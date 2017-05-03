@@ -845,6 +845,7 @@ set_special
     | SET ANSI_NULLS on_off
     | SET QUOTED_IDENTIFIER on_off
     | SET ANSI_PADDING on_off
+    | SET ANSI_WARNINGS on_off
     ;
 
 constant_LOCAL_ID
