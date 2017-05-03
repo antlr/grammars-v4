@@ -4,9 +4,9 @@ stylesheet
 	: importRule* (nested | ruleset)+
 	;
 
-importRule
-	: ('@import' | '@include')  STRING 
-	;
+import_css
+  	: ('@import' | '@include')  (STRING|URI) ';'?
+  	;
 
 nested
  	: '@' nest '{' properties? nested* '}' 
@@ -117,4 +117,6 @@ COMMENT
 
 WS	: ( ' ' | '\t' | '\r' | '\n' | '\f' )+ ->skip
 	;
-
+	
+URI 	: 'url(' (~('\n'|'\r'))* ')'? 
+	;
