@@ -142,7 +142,7 @@ another_statement
 merge_statement
     : with_expression?
       MERGE (TOP '(' expression ')' PERCENT?)?
-      INTO? ddl_object insert_with_table_hints? (AS? ID)?
+      INTO? ddl_object insert_with_table_hints? as_table_alias?
       USING table_sources
       ON search_condition
       (WHEN MATCHED (AND search_condition)?
@@ -678,6 +678,14 @@ security_statement
     | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO (to_principal+=id) (',' to_principal+=id)* (WITH GRANT OPTION)? (AS as_principal=id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
+    | OPEN SYMMETRIC KEY key_name=id DECRYPTION BY decryption_mechanism
+    ;
+
+decryption_mechanism:
+    CERTIFICATE certificate_name=id (WITH PASSWORD '=' STRING)?
+    | ASYMMETRIC KEY asym_key_name=id (WITH PASSWORD '=' STRING)?
+    | SYMMETRIC KEY decrypting_Key_name=id
+    | PASSWORD '=' STRING
     ;
 
 grant_permission
@@ -1598,6 +1606,7 @@ ANY:                                   A N Y;
 APPEND:                                A P P E N D;
 AS:                                    A S;
 ASC:                                   A S C;
+ASYMMETRIC:                            A S Y M M E T R I C;
 AUTHORIZATION:                         A U T H O R I Z A T I O N;
 BACKUP:                                B A C K U P;
 BEGIN:                                 B E G I N;
@@ -1609,6 +1618,7 @@ BY:                                    B Y;
 CALLED:                                C A L L E D;
 CASCADE:                               C A S C A D E;
 CASE:                                  C A S E;
+CERTIFICATE:                           C E R T I F I C A T E;
 CHANGETABLE:                           C H A N G E T A B L E;
 CHANGES:                               C H A N G E S;
 CHECK:                                 C H E C K;
@@ -1721,6 +1731,7 @@ OUTER:                                 O U T E R;
 OVER:                                  O V E R;
 PAGE:                                  P A G E;
 PARTIAL:                               P A R T I A L;
+PASSWORD:                              P A S S W O R D;
 PERCENT:                               P E R C E N T;
 PIVOT:                                 P I V O T;
 PLAN:                                  P L A N;
@@ -1841,6 +1852,7 @@ DATEPART:                              D A T E P A R T;
 DATE_CORRELATION_OPTIMIZATION:         D A T E '_' C O R R E L A T I O N '_' O P T I M I Z A T I O N;
 DAYS:                                  D A Y S;
 DB_CHAINING:                           D B '_' C H A I N I N G;
+DECRYPTION:                            D E C R Y P T I O N;
 DEFAULT_FULLTEXT_LANGUAGE:             D E F A U L T '_' F U L L T E X T '_' L A N G U A G E;
 DEFAULT_LANGUAGE:                      D E F A U L T '_' L A N G U A G E;
 DELAY:                                 D E L A Y;
@@ -1978,6 +1990,7 @@ STATS_STREAM:                          S T A T S '_' S T R E A M;
 STDEV:                                 S T D E V;
 STDEVP:                                S T D E V P;
 SUM:                                   S U M;
+SYMMETRIC:                             S Y M M E T R I C;
 TAKE:                                  T A K E;
 TARGET_RECOVERY_TIME:                  T A R G E T '_' R E C O V E R Y '_' T I M E;
 TB:                                    T B;
