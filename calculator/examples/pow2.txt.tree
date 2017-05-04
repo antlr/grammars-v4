@@ -1,0 +1,1 @@
+(equation (expression (multiplyingExpression (powExpression (atom (variable y))))) (relop =) (expression (multiplyingExpression (powExpression (atom (variable x)) ^ (atom ( (expression (multiplyingExpression (powExpression (atom (scientific (number 1))))) + (multiplyingExpression (powExpression (atom (scientific (number 2)))))) ))))))

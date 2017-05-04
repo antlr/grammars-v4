@@ -19,6 +19,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>Verilog2001.g4</grammars>
+					<visitor>true</visitor>
+					<listener>true</listener>
 				</configuration>
 				<executions>
 					<execution>
@@ -29,12 +31,13 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.antlr</groupId>
+				<groupId>com.khubla.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
+				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>library_text</entryPoint>
+					<entryPoint>source_text</entryPoint>
 					<grammarName>Verilog2001</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

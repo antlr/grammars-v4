@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>antlr4</artifactId>
 	<packaging>jar</packaging>
@@ -19,6 +18,17 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>ANTLRv4Parser.g4</grammars>
+					<includes>
+						<include>ANTLRv4Lexer.g4</include>
+						<include>ANTLRv4Parser.g4</include>
+					</includes>		
+					<arguments>
+						<argument>-package</argument>
+						<argument>org.antlr.parser.antlr4</argument>
+					</arguments>
+					<outputDirectory>${project.build.directory}/generated-sources/antlr4/org/antlr/parser/antlr4</outputDirectory>
+					<visitor>true</visitor>
+					<listener>true</listener>
 				</configuration>
 				<executions>
 					<execution>
@@ -29,14 +39,15 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.antlr</groupId>
+				<groupId>com.khubla.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
+				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<verbose>false</verbose>
-					<showTree>false</showTree>
+					<verbose>true</verbose>
+					<showTree>true</showTree>
 					<entryPoint>grammarSpec</entryPoint>
 					<grammarName>ANTLRv4</grammarName>
-					<packageName></packageName>
+					<packageName>org.antlr.parser.antlr4</packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

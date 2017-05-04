@@ -11,9 +11,6 @@
 	</parent>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<properties>
-		<antlr.version>4.5</antlr.version>
-	</properties>
 	<build>
 		<plugins>
 			<plugin>
@@ -23,6 +20,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>vhdl.g4</grammars>
+					<visitor>true</visitor>
+					<listener>true</listener>
 				</configuration>
 				<executions>
 					<execution>
@@ -33,8 +32,9 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.antlr</groupId>
+				<groupId>com.khubla.antlr</groupId>
 				<artifactId>antlr4test-maven-plugin</artifactId>
+				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
