@@ -4,7 +4,7 @@ stylesheet
 	: importRule* (nested | ruleset)+
 	;
 
-import_css
+importRule
   	: ('@import' | '@include')  (STRING|URI) ';'?
   	;
 
