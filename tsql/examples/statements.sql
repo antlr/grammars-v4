@@ -237,7 +237,9 @@ GO
 --ref: https://msdn.microsoft.com/en-us/library/ms187965.aspx
 GRANT EXECUTE ON [dbo].[closeLead] to Public,XYZPublic
 
-
-
 --Test empty statements
 ;;;
+
+-- Decrypts a symmetric key and makes it available for use
+OPEN SYMMETRIC KEY SomeKeyName DECRYPTION
+BY CERTIFICATE SomeCertificateName;
