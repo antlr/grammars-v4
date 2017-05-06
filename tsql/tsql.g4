@@ -110,16 +110,16 @@ cfl_statement
       state=(DECIMAL | LOCAL_ID))? ';'?              #throw_statement
     // https://msdn.microsoft.com/en-us/library/ms175976.aspx
     | BEGIN TRY ';'? try_clauses=sql_clauses? END TRY ';'?
-      BEGIN CATCH ';'? catch_clauses=sql_clauses? END CATCH ';'?                    #try_catch_statement
+      BEGIN CATCH ';'? catch_clauses=sql_clauses? END CATCH ';'?                              #try_catch_statement
     // https://msdn.microsoft.com/en-us/library/ms187331.aspx
-    | WAITFOR (DELAY | TIME)  expression ';'?                                       #waitfor_statement
+    | WAITFOR receive_statement? ','? ((DELAY | TIME | TIMEOUT) time)?  expression? ';'?      #waitfor_statement
     // https://msdn.microsoft.com/en-us/library/ms178642.aspx
-    | WHILE search_condition (sql_clause | BREAK ';'? | CONTINUE ';'?)              #while_statement
+    | WHILE search_condition (sql_clause | BREAK ';'? | CONTINUE ';'?)                        #while_statement
     // https://msdn.microsoft.com/en-us/library/ms176047.aspx.
-    | PRINT expression ';'?                                                         #print_statement
+    | PRINT expression ';'?                                                                   #print_statement
     // https://msdn.microsoft.com/en-us/library/ms178592.aspx
     | RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' severity=constant_LOCAL_ID ','
-        state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' ';'?                   #raiseerror_statement
+        state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' ';'?                             #raiseerror_statement
     ;
 
 empty_statement
@@ -204,9 +204,17 @@ insert_statement_value
     | DEFAULT VALUES
     ;
 
+receive_statement
+    : '('? RECEIVE (ALL | DISTINCT | top_clause | '*') (LOCAL_ID '=' column=id)* FROM full_table_name (INTO table_variable=id (WHERE where=search_condition))? ')'?
+    ;
+
 // https://msdn.microsoft.com/en-us/library/ms189499.aspx
 select_statement
     : with_expression? query_expression order_by_clause? for_clause? option_clause? ';'?
+    ;
+
+time
+    : (LOCAL_ID | constant)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms177523.aspx
@@ -1960,6 +1968,7 @@ READ_ONLY:                             R E A D '_' O N L Y;
 READ_WRITE:                            R E A D '_' W R I T E;
 REBUILD:                               R E B U I L D;
 RECOMPILE:                             R E C O M P I L E;
+RECEIVE:                               R E C E I V E;
 RECOVERY:                              R E C O V E R Y;
 RECURSIVE_TRIGGERS:                    R E C U R S I V E '_' T R I G G E R S;
 RELATIVE:                              R E L A T I V E;
@@ -1998,6 +2007,7 @@ TEXTIMAGE_ON:                          T E X T I M A G E '_' O N;
 THROW:                                 T H R O W;
 TIES:                                  T I E S;
 TIME:                                  T I M E;
+TIMEOUT:                               T I M E O U T;
 TORN_PAGE_DETECTION:                   T O R N '_' P A G E '_' D E T E C T I O N; 
 TRANSFORM_NOISE_WORDS:                 T R A N S F O R M '_' N O I S E '_' W O R D S;
 TRUSTWORTHY:                           T R U S T W O R T H Y;
