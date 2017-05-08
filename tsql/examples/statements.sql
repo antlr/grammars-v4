@@ -243,3 +243,7 @@ GRANT EXECUTE ON [dbo].[closeLead] to Public,XYZPublic
 -- Decrypts a symmetric key and makes it available for use
 OPEN SYMMETRIC KEY SomeKeyName DECRYPTION
 BY CERTIFICATE SomeCertificateName;
+
+-- Conversation timer
+BEGIN CONVERSATION TIMER (@dialog_handle)
+TIMEOUT = 120;
