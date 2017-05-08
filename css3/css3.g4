@@ -1,12 +1,20 @@
 grammar css3;
 
 stylesheet
-	: importRule* (nested | ruleset)+
+	: (namespace | charset | importRule | nested | ruleset)+ 
 	;
-
+	
+namespace
+	: '@namespace' IDENT* STRING 
+	;
+	
+charset
+	:'@charset' STRING 
+	;
+	
 importRule
-  	: ('@import' | '@include')  (STRING|URI) ';'?
-  	;
+	: ('@import' | '@include')  (STRING|URI) (IDENT|',' IDENT)* 
+	;
 
 nested
  	: '@' nest '{' properties? nested* '}' 
@@ -120,3 +128,4 @@ WS	: ( ' ' | '\t' | '\r' | '\n' | '\f' )+ ->skip
 	
 URI 	: 'url(' (~('\n'|'\r'))* ')'? 
 	;
+SEMICOLON : ';' -> skip;
