@@ -128,6 +128,7 @@ empty_statement
 
 conversation_statement
     : begin_conversation_timer
+    | begin_conversation_dialog
     ;
 
 another_statement
@@ -1388,6 +1389,10 @@ scalar_function_name
 
 begin_conversation_timer
     : BEGIN CONVERSATION TIMER '(' LOCAL_ID ')' TIMEOUT '=' time ';'?
+    ;
+
+begin_conversation_dialog
+    : BEGIN DIALOG CONVERSATION dialog_handle=LOCAL_ID FROM SERVICE initiator_service_name=id TO SERVICE target_service_name=STRING ON CONTRACT contract_name=id ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187752.aspx
