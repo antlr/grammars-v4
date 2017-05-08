@@ -1392,7 +1392,15 @@ begin_conversation_timer
     ;
 
 begin_conversation_dialog
-    : BEGIN DIALOG CONVERSATION dialog_handle=LOCAL_ID FROM SERVICE initiator_service_name=id TO SERVICE target_service_name=STRING ON CONTRACT contract_name=id ';'?
+    : BEGIN DIALOG CONVERSATION dialog_handle=LOCAL_ID
+      FROM SERVICE initiator_service_name=id
+      TO SERVICE target_service_name=STRING (',' service_broker_guid=STRING)?
+      ON CONTRACT contract_name=id
+      (WITH
+        ((RELATED_CONVERSATION | RELATED_CONVERSATION_GROUP) '=' LOCAL_ID ','?)?
+        (LIFETIME '=' (DECIMAL | LOCAL_ID) ','?)?
+        (ENCRYPTION '=' (ON | OFF))? )?
+      ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187752.aspx
@@ -1726,6 +1734,7 @@ JOIN:                                  J O I N;
 KEY:                                   K E Y;
 KILL:                                  K I L L;
 LEFT:                                  L E F T;
+LIFETIME:                              L I F E T I M E;
 LIKE:                                  L I K E;
 LINENO:                                L I N E N O;
 LOAD:                                  L O A D;
@@ -1771,6 +1780,8 @@ READ:                                  R E A D;
 READTEXT:                              R E A D T E X T;
 RECONFIGURE:                           R E C O N F I G U R E;
 REFERENCES:                            R E F E R E N C E S;
+RELATED_CONVERSATION:                  R E L A T E D '_' C O N V E R S A T I O N;
+RELATED_CONVERSATION_GROUP:            R E L A T E D '_' C O N V E R S A T I O N '_' G R O U P;
 REPLICATION:                           R E P L I C A T I O N;
 RESTORE:                               R E S T O R E;
 RESTRICT:                              R E S T R I C T;

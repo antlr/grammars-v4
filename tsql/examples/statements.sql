@@ -247,11 +247,60 @@ BY CERTIFICATE SomeCertificateName;
 -- Conversation timer
 BEGIN CONVERSATION TIMER (@dialog_handle)
 TIMEOUT = 120;
+GO
 
 -- Beginning a conversation dialog
-DECLARE @dialog_handle UNIQUEIDENTIFIER ;
-
+DECLARE @dialog_handle UNIQUEIDENTIFIER;
 BEGIN DIALOG CONVERSATION @dialog_handle
    FROM SERVICE [//Adventure-Works.com/ExpenseClient]
    TO SERVICE '//Adventure-Works.com/Expenses'
-   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission] ;
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission];
+GO
+
+-- Begin a dialog with an explicit lifetime
+DECLARE @dialog_handle UNIQUEIDENTIFIER;
+BEGIN DIALOG CONVERSATION @dialog_handle
+   FROM SERVICE [//Adventure-Works.com/ExpenseClient]
+   TO SERVICE '//Adventure-Works.com/Expenses'
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission]
+   WITH LIFETIME = 60;
+GO
+
+-- Begin a dialog with a specific broker instance
+DECLARE @dialog_handle UNIQUEIDENTIFIER;
+BEGIN DIALOG CONVERSATION @dialog_handle
+   FROM SERVICE [//Adventure-Works.com/ExpenseClient]
+   TO SERVICE '//Adventure-Works.com/Expenses',
+              'a326e034-d4cf-4e8b-8d98-4d7e1926c904'
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission];
+GO
+
+-- Begin a dialog, and relating it to an existing conversation group
+DECLARE @dialog_handle UNIQUEIDENTIFIER;
+DECLARE @conversation_group_id UNIQUEIDENTIFIER;
+BEGIN DIALOG CONVERSATION @dialog_handle
+   FROM SERVICE [//Adventure-Works.com/ExpenseClient]
+   TO SERVICE '//Adventure-Works.com/Expenses'
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission]
+   WITH RELATED_CONVERSATION_GROUP = @conversation_group_id;
+GO
+
+-- Begin a dialog with an explicit lifetime, and relating the dialog to an existing conversation
+DECLARE @dialog_handle UNIQUEIDENTIFIER
+DECLARE @existing_conversation_handle UNIQUEIDENTIFIER
+BEGIN DIALOG CONVERSATION @dialog_handle
+   FROM SERVICE [//Adventure-Works.com/ExpenseClient]
+   TO SERVICE '//Adventure-Works.com/Expenses'
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission]
+   WITH RELATED_CONVERSATION = @existing_conversation_handle
+   LIFETIME = 600;
+GO
+
+-- Begin a dialog with optional encryption
+DECLARE @dialog_handle UNIQUEIDENTIFIER
+BEGIN DIALOG CONVERSATION @dialog_handle
+   FROM SERVICE [//Adventure-Works.com/ExpenseClient]
+   TO SERVICE '//Adventure-Works.com/Expenses'
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission]
+   WITH ENCRYPTION = OFF;
+GO
