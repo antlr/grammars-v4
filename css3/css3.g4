@@ -25,7 +25,7 @@ nest
 	;
 	
 ruleset
- 	: selectors '{' properties? '}'
+ 	: selectors '{' properties* '}'
 	;
 	
 selectors
@@ -50,9 +50,17 @@ properties
 	;
 	
 elem
-	:     IDENT 
-	| '#' IDENT 
-	| '.' IDENT 
+	:(IDENT)+ 
+	|(idSelector)+ 
+	|(classSelector)+ 
+	;
+
+idSelector
+	:'#' IDENT
+	;
+	
+classSelector
+	:'.' IDENT
 	;
 
 pseudo
@@ -116,7 +124,7 @@ COLOR
 	;
 
 SL_COMMENT
-	: '//' (~('\n'|'\r'))* ('\n'|'\r'('\n')?) ->skip
+	: '//' ~[\r\n]* -> skip
 	;
 	
 COMMENT
