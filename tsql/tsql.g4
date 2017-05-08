@@ -126,9 +126,14 @@ empty_statement
     : ';'
     ;
 
+conversation_statement
+    : begin_conversation_timer
+    ;
+
 another_statement
     : declare_statement
     | cursor_statement
+    | conversation_statement
     | execute_statement
     | security_statement
     | set_statement
@@ -1381,6 +1386,10 @@ scalar_function_name
     | CHECKSUM
     ;
 
+begin_conversation_timer
+    : BEGIN CONVERSATION TIMER '(' LOCAL_ID ')' TIMEOUT '=' time ';'?
+    ;
+
 // https://msdn.microsoft.com/en-us/library/ms187752.aspx
 // TODO: implement runtime check or add new tokens.
 data_type
@@ -1643,6 +1652,8 @@ CONTAINMENT:                           C O N T A I N M E N T;
 CONTAINS:                              C O N T A I N S;
 CONTAINSTABLE:                         C O N T A I N S T A B L E;
 CONTINUE:                              C O N T I N U E;
+CONTRACT:                              C O N T R A C T;
+CONVERSATION:                          C O N V E R S A T I O N;
 CONVERT:                               (T R Y '_')? C O N V E R T;
 CREATE:                                C R E A T E;
 CROSS:                                 C R O S S;
@@ -1775,6 +1786,7 @@ SEMANTICKEYPHRASETABLE:                S E M A N T I C K E Y P H R A S E T A B L
 SEMANTICSIMILARITYDETAILSTABLE:        S E M A N T I C S I M I L A R I T Y D E T A I L S T A B L E;
 SEMANTICSIMILARITYTABLE:               S E M A N T I C S I M I L A R I T Y T A B L E;
 SERVER:                                S E R V E R;
+SERVICE:                               S E R V I C E;
 SESSION_USER:                          S E S S I O N '_' U S E R;
 SET:                                   S E T;
 SETUSER:                               S E T U S E R;
@@ -1867,6 +1879,7 @@ DELAY:                                 D E L A Y;
 DELAYED_DURABILITY:                    D E L A Y E D '_' D U R A B I L I T Y;
 DELETED:                               D E L E T E D;
 DENSE_RANK:                            D E N S E '_' R A N K;
+DIALOG:                                D I A L O G;
 DIRECTORY_NAME:                        D I R E C T O R Y '_' N A M E;
 DISABLE:                               D I S A B L E;
 DISABLED:                              D I S A B L E D; 
@@ -2007,6 +2020,7 @@ TEXTIMAGE_ON:                          T E X T I M A G E '_' O N;
 THROW:                                 T H R O W;
 TIES:                                  T I E S;
 TIME:                                  T I M E;
+TIMER:                                 T I M E R;
 TIMEOUT:                               T I M E O U T;
 TORN_PAGE_DETECTION:                   T O R N '_' P A G E '_' D E T E C T I O N; 
 TRANSFORM_NOISE_WORDS:                 T R A N S F O R M '_' N O I S E '_' W O R D S;
