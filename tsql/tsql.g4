@@ -1174,10 +1174,15 @@ function_call
 
 xml_method_call
     : value_method
+    | query_method
     ;
 
 value_method
     : (LOCAL_ID | EVENTDATA) '.value(' xquery=STRING ',' sqltype=STRING ')'
+    ;
+
+query_method
+    : (LOCAL_ID | ID) '.query(' xquery=STRING ')'
     ;
 
 switch_section
