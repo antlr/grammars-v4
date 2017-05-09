@@ -353,3 +353,19 @@ DECLARE @conversation_group_id UNIQUEIDENTIFIER;
 GET CONVERSATION GROUP @conversation_group_id
 FROM AdventureWorks.dbo.ExpenseQueue;
 GO;
+
+-- Starts a dialog and sends an XML message on the dialog
+DECLARE @dialog_handle UNIQUEIDENTIFIER,
+        @ExpenseReport XML;
+
+SET @ExpenseReport = '<document/>';
+
+BEGIN DIALOG @dialog_handle
+FROM SERVICE [//Adventure-Works.com/Expenses/ExpenseClient]
+TO SERVICE '//Adventure-Works.com/Expenses'
+ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseProcessing] ;
+
+SEND ON CONVERSATION @dialog_handle
+    MESSAGE TYPE [//Adventure-Works.com/Expenses/SubmitExpense]
+    (@ExpenseReport) ;
+GO;

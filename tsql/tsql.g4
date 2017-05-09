@@ -131,6 +131,7 @@ conversation_statement
     | begin_conversation_dialog
     | end_conversation
     | get_conversation
+    | send_conversation
     | waitfor_conversation
     ;
 
@@ -214,7 +215,7 @@ insert_statement_value
     ;
 
 receive_statement
-    : '('? RECEIVE (ALL | DISTINCT | top_clause | '*') (LOCAL_ID '=' column=id)* FROM full_table_name (INTO table_variable=id (WHERE where=search_condition))? ')'?
+    : '('? RECEIVE (ALL | DISTINCT | top_clause | '*') (LOCAL_ID '=' expression ','?)* FROM full_table_name (INTO table_variable=id (WHERE where=search_condition))? ')'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms189499.aspx
@@ -1395,7 +1396,7 @@ begin_conversation_timer
     ;
 
 begin_conversation_dialog
-    : BEGIN DIALOG CONVERSATION dialog_handle=LOCAL_ID
+    : BEGIN DIALOG (CONVERSATION)? dialog_handle=LOCAL_ID
       FROM SERVICE initiator_service_name=id
       TO SERVICE target_service_name=STRING (',' service_broker_guid=STRING)?
       ON CONTRACT contract_name=id
@@ -1422,6 +1423,13 @@ get_conversation
 queue_id
     : (database_name=id '.' schema_name=id '.' name=id)
     | id
+    ;
+
+send_conversation
+    : SEND ON CONVERSATION conversation_handle=(STRING | LOCAL_ID)
+      MESSAGE TYPE message_type_name=SQUARE_BRACKET_ID
+      '(' message_body_expression=(STRING | LOCAL_ID) ')'
+      ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187752.aspx
@@ -1976,6 +1984,7 @@ MAX:                                   M A X;
 MAXDOP:                                M A X D O P;
 MAXRECURSION:                          M A X R E C U R S I O N;
 MAXSIZE:                               M A X S I Z E;
+MESSAGE:                               M E S S A G E;
 MB:                                    M B;
 MEMORY_OPTIMIZED_DATA:                 M E M O R Y '_' O P T I M I Z E D '_' D A T A;
 MIN:                                   M I N;
@@ -2041,6 +2050,7 @@ SCROLL:                                S C R O L L;
 SCROLL_LOCKS:                          S C R O L L '_' L O C K S;
 SECONDS:                               S E C O N D S;
 SELF:                                  S E L F;
+SEND:                                  S E N D;
 SERIALIZABLE:                          S E R I A L I Z A B L E;
 SHOWPLAN:                              S H O W P L A N;
 SIMPLE:                                S I M P L E;
