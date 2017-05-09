@@ -28,7 +28,7 @@
 		<module>cobol85</module>
 		<module>cpp</module>
 		<module>creole</module>
-		<!-- C# runtime is not supported. <module>csharp</module> -->
+		<module>csharp</module>
 		<module>css3</module>
 		<module>csv</module>
 		<module>datetime</module>
