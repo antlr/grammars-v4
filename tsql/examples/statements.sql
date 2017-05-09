@@ -247,11 +247,125 @@ BY CERTIFICATE SomeCertificateName;
 -- Conversation timer
 BEGIN CONVERSATION TIMER (@dialog_handle)
 TIMEOUT = 120;
+GO;
 
 -- Beginning a conversation dialog
-DECLARE @dialog_handle UNIQUEIDENTIFIER ;
-
+DECLARE @dialog_handle UNIQUEIDENTIFIER;
 BEGIN DIALOG CONVERSATION @dialog_handle
    FROM SERVICE [//Adventure-Works.com/ExpenseClient]
    TO SERVICE '//Adventure-Works.com/Expenses'
-   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission] ;
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission];
+GO;
+
+-- Begin a dialog with an explicit lifetime
+DECLARE @dialog_handle UNIQUEIDENTIFIER;
+BEGIN DIALOG CONVERSATION @dialog_handle
+   FROM SERVICE [//Adventure-Works.com/ExpenseClient]
+   TO SERVICE '//Adventure-Works.com/Expenses'
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission]
+   WITH LIFETIME = 60;
+GO;
+
+-- Begin a dialog with a specific broker instance
+DECLARE @dialog_handle UNIQUEIDENTIFIER;
+BEGIN DIALOG CONVERSATION @dialog_handle
+   FROM SERVICE [//Adventure-Works.com/ExpenseClient]
+   TO SERVICE '//Adventure-Works.com/Expenses',
+              'a326e034-d4cf-4e8b-8d98-4d7e1926c904'
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission];
+GO;
+
+-- Begin a dialog, and relating it to an existing conversation group
+DECLARE @dialog_handle UNIQUEIDENTIFIER;
+DECLARE @conversation_group_id UNIQUEIDENTIFIER;
+BEGIN DIALOG CONVERSATION @dialog_handle
+   FROM SERVICE [//Adventure-Works.com/ExpenseClient]
+   TO SERVICE '//Adventure-Works.com/Expenses'
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission]
+   WITH RELATED_CONVERSATION_GROUP = @conversation_group_id;
+GO;
+
+-- Begin a dialog with an explicit lifetime, and relating the dialog to an existing conversation
+DECLARE @dialog_handle UNIQUEIDENTIFIER
+DECLARE @existing_conversation_handle UNIQUEIDENTIFIER
+BEGIN DIALOG CONVERSATION @dialog_handle
+   FROM SERVICE [//Adventure-Works.com/ExpenseClient]
+   TO SERVICE '//Adventure-Works.com/Expenses'
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission]
+   WITH RELATED_CONVERSATION = @existing_conversation_handle
+   LIFETIME = 600;
+GO;
+
+-- Begin a dialog with optional encryption
+DECLARE @dialog_handle UNIQUEIDENTIFIER
+BEGIN DIALOG CONVERSATION @dialog_handle
+   FROM SERVICE [//Adventure-Works.com/ExpenseClient]
+   TO SERVICE '//Adventure-Works.com/Expenses'
+   ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission]
+   WITH ENCRYPTION = OFF;
+GO;
+
+-- Ending a conversation
+END CONVERSATION @dialog_handle;
+GO;
+
+-- Ending a conversation with an error
+DECLARE @dialog_handle UNIQUEIDENTIFIER,
+        @ErrorSave INT,
+        @ErrorDesc NVARCHAR(100) ;
+BEGIN TRANSACTION ;
+SET @ErrorSave = @@ERROR ;
+
+IF (@ErrorSave <> 0)
+  BEGIN
+      ROLLBACK TRANSACTION ;
+      SET @ErrorDesc = N'An error has occurred.' ;
+      END CONVERSATION @dialog_handle
+      WITH ERROR = @ErrorSave DESCRIPTION = @ErrorDesc ;
+  END
+ELSE
+
+COMMIT TRANSACTION ;
+GO;
+
+-- Cleaning up a conversation that cannot complete normally
+END CONVERSATION @dialog_handle WITH CLEANUP;
+GO;
+
+-- Getting a conversation group, waiting indefinitely
+DECLARE @conversation_group_id UNIQUEIDENTIFIER ;
+WAITFOR (
+ GET CONVERSATION GROUP @conversation_group_id
+     FROM ExpenseQueue
+);
+GO;
+
+-- Getting a conversation group, waiting one minute
+DECLARE @conversation_group_id UNIQUEIDENTIFIER
+WAITFOR (
+    GET CONVERSATION GROUP @conversation_group_id
+    FROM ExpenseQueue ),
+TIMEOUT 60000 ;
+GO;
+
+-- Getting a conversation group, returning immediately
+DECLARE @conversation_group_id UNIQUEIDENTIFIER;
+GET CONVERSATION GROUP @conversation_group_id
+FROM AdventureWorks.dbo.ExpenseQueue;
+GO;
+
+-- Starts a dialog and sends an XML message on the dialog
+DECLARE @dialog_handle UNIQUEIDENTIFIER,
+        @ExpenseReport XML;
+
+SET @ExpenseReport = '<document/>';
+
+BEGIN DIALOG @dialog_handle
+FROM SERVICE [//Adventure-Works.com/Expenses/ExpenseClient]
+TO SERVICE '//Adventure-Works.com/Expenses'
+ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseProcessing] ;
+
+SEND ON CONVERSATION @dialog_handle
+    MESSAGE TYPE [//Adventure-Works.com/Expenses/SubmitExpense]
+    (@ExpenseReport) ;
+GO;

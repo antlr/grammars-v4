@@ -129,6 +129,10 @@ empty_statement
 conversation_statement
     : begin_conversation_timer
     | begin_conversation_dialog
+    | end_conversation
+    | get_conversation
+    | send_conversation
+    | waitfor_conversation
     ;
 
 another_statement
@@ -211,7 +215,7 @@ insert_statement_value
     ;
 
 receive_statement
-    : '('? RECEIVE (ALL | DISTINCT | top_clause | '*') (LOCAL_ID '=' column=id)* FROM full_table_name (INTO table_variable=id (WHERE where=search_condition))? ')'?
+    : '('? RECEIVE (ALL | DISTINCT | top_clause | '*') (LOCAL_ID '=' expression ','?)* FROM full_table_name (INTO table_variable=id (WHERE where=search_condition))? ')'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms189499.aspx
@@ -1392,7 +1396,40 @@ begin_conversation_timer
     ;
 
 begin_conversation_dialog
-    : BEGIN DIALOG CONVERSATION dialog_handle=LOCAL_ID FROM SERVICE initiator_service_name=id TO SERVICE target_service_name=STRING ON CONTRACT contract_name=id ';'?
+    : BEGIN DIALOG (CONVERSATION)? dialog_handle=LOCAL_ID
+      FROM SERVICE initiator_service_name=id
+      TO SERVICE target_service_name=STRING (',' service_broker_guid=STRING)?
+      ON CONTRACT contract_name=id
+      (WITH
+        ((RELATED_CONVERSATION | RELATED_CONVERSATION_GROUP) '=' LOCAL_ID ','?)?
+        (LIFETIME '=' (DECIMAL | LOCAL_ID) ','?)?
+        (ENCRYPTION '=' (ON | OFF))? )?
+      ';'?
+    ;
+
+end_conversation
+    : END CONVERSATION conversation_handle=LOCAL_ID ';'?
+      (WITH (ERROR '=' faliure_code=(LOCAL_ID | STRING) DESCRIPTION '=' failure_text=(LOCAL_ID | STRING))? CLEANUP? )?
+    ;
+
+waitfor_conversation
+    : WAITFOR? '(' get_conversation ')' (','? TIMEOUT timeout=time)? ';'?
+    ;
+
+get_conversation
+    :GET CONVERSATION GROUP conversation_group_id=(STRING | LOCAL_ID) FROM queue=queue_id ';'?
+    ;
+
+queue_id
+    : (database_name=id '.' schema_name=id '.' name=id)
+    | id
+    ;
+
+send_conversation
+    : SEND ON CONVERSATION conversation_handle=(STRING | LOCAL_ID)
+      MESSAGE TYPE message_type_name=SQUARE_BRACKET_ID
+      '(' message_body_expression=(STRING | LOCAL_ID) ')'
+      ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187752.aspx
@@ -1677,6 +1714,7 @@ DEFAULT:                               D E F A U L T;
 DELETE:                                D E L E T E;
 DENY:                                  D E N Y;
 DESC:                                  D E S C;
+DESCRIPTION:                           D E S C R I P T I O N;
 DISK:                                  D I S K;
 DISTINCT:                              D I S T I N C T;
 DISTRIBUTED:                           D I S T R I B U T E D;
@@ -1687,6 +1725,7 @@ ELSE:                                  E L S E;
 END:                                   E N D;
 ERRLVL:                                E R R L V L;
 ESCAPE:                                E S C A P E;
+ERROR:                                 E R R O R;
 EVENTDATA:                             E V E N T D A T A '(' ')';
 EXCEPT:                                E X C E P T;
 EXECUTE:                               E X E C (U T E)?;
@@ -1705,6 +1744,7 @@ FREETEXTTABLE:                         F R E E T E X T T A B L E;
 FROM:                                  F R O M;
 FULL:                                  F U L L;
 FUNCTION:                              F U N C T I O N;
+GET:                                   G E T;
 GOTO:                                  G O T O;
 GRANT:                                 G R A N T;
 GROUP:                                 G R O U P;
@@ -1726,6 +1766,7 @@ JOIN:                                  J O I N;
 KEY:                                   K E Y;
 KILL:                                  K I L L;
 LEFT:                                  L E F T;
+LIFETIME:                              L I F E T I M E;
 LIKE:                                  L I K E;
 LINENO:                                L I N E N O;
 LOAD:                                  L O A D;
@@ -1771,6 +1812,8 @@ READ:                                  R E A D;
 READTEXT:                              R E A D T E X T;
 RECONFIGURE:                           R E C O N F I G U R E;
 REFERENCES:                            R E F E R E N C E S;
+RELATED_CONVERSATION:                  R E L A T E D '_' C O N V E R S A T I O N;
+RELATED_CONVERSATION_GROUP:            R E L A T E D '_' C O N V E R S A T I O N '_' G R O U P;
 REPLICATION:                           R E P L I C A T I O N;
 RESTORE:                               R E S T O R E;
 RESTRICT:                              R E S T R I C T;
@@ -1860,6 +1903,7 @@ CHANGE_RETENTION:                      C H A N G E '_' R E T E N T I O N;
 CHANGE_TRACKING:                       C H A N G E '_' T R A C K I N G; 
 CHECKSUM:                              C H E C K S U M;
 CHECKSUM_AGG:                          C H E C K S U M '_' A G G;
+CLEANUP:                               C L E A N U P;
 COMMITTED:                             C O M M I T T E D;
 COMPATIBILITY_LEVEL:                   C O M P A T I B I L I T Y '_' L E V E L;                           
 CONCAT:                                C O N C A T;
@@ -1940,6 +1984,7 @@ MAX:                                   M A X;
 MAXDOP:                                M A X D O P;
 MAXRECURSION:                          M A X R E C U R S I O N;
 MAXSIZE:                               M A X S I Z E;
+MESSAGE:                               M E S S A G E;
 MB:                                    M B;
 MEMORY_OPTIMIZED_DATA:                 M E M O R Y '_' O P T I M I Z E D '_' D A T A;
 MIN:                                   M I N;
@@ -2005,6 +2050,7 @@ SCROLL:                                S C R O L L;
 SCROLL_LOCKS:                          S C R O L L '_' L O C K S;
 SECONDS:                               S E C O N D S;
 SELF:                                  S E L F;
+SEND:                                  S E N D;
 SERIALIZABLE:                          S E R I A L I Z A B L E;
 SHOWPLAN:                              S H O W P L A N;
 SIMPLE:                                S I M P L E;
