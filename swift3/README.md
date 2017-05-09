@@ -21,7 +21,8 @@ Known issues and limitations:
 * It is not well tested yet
 * It can contain ambiguities or just wrong rules
 
-About ambiguities, official documentation and aforementioned `statements_impl`. There's Swift2 grammar here in this repo - it can not tell the difference between this:
+About ambiguities, official documentation and aforementioned `statements_impl`.
+There's Swift2 grammar here in this repo - it can not tell the difference between this:
 
 ```Swift
 func x() -> Int { return 1 }
@@ -47,7 +48,8 @@ operating_system : 'macOS' | 'iOS' | 'watchOS' | 'tvOS' ;
 
 Source code of swift's stdlib contains code with "Android" and "Windows" as operating system.
 
-If you want to contribute, please test the grammar carefully on the source code of Swift itself. See below.
+If you want to contribute, please test the grammar carefully on the source 
+code of Swift itself. See below.
 
 ## Contributing
 
@@ -73,22 +75,17 @@ Use one of the following commands (requires grun):
 * `grun Swift3 the_rule_you_are_working_on -gui -tree path/to/file.swift`
 * `grun Swift3 start -tokens path/to/file.swift`
 
-I hope it will help. Anyway, it's fairly simple to figure out how it works even if you are new to antlr.
+I hope it will help. Anyway, it's fairly simple to figure out how it works 
+even if you are new to antlr.
 
 ### Adding more tests
 
-Beware of adding too much tests, swift parser is slow. It can fail on Travis after you make a pull request due to current 10min timeout per grammar and travis works very slow in comparison to your computer.
-
-## Plans and TODOs
-
-* Test more careful and fix bugs
-* Add SwiftSupport.swift for ANTLR Swift target
-* Use the parser in other project (and face with bugs)
-* Add tests that will not affect testing the whole repo
-* Improve performance
+Beware of adding too much tests, swift parser is slow.
+It can fail on Travis after you make a pull request due to current 
+10min timeout per grammar and travis works very slow in comparison to your computer.
 
 ## Links
 
 Permanent links for language reference:
 [Swift 2.2](http://web.archive.org/web/20160423125921/https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/zzSummaryOfTheGrammar.html)
-[Swift 3.0.1](http://web.archive.org/web/20170221054114/https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/zzSummaryOfTheGrammar.html)
+[Swift 3.0.1](http://web.archive.org/web/20170221054114/https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/zzSummaryOfTheGrammar.html).
