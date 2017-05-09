@@ -129,6 +129,7 @@ empty_statement
 conversation_statement
     : begin_conversation_timer
     | begin_conversation_dialog
+    | end_conversation
     ;
 
 another_statement
@@ -1403,6 +1404,11 @@ begin_conversation_dialog
       ';'?
     ;
 
+end_conversation
+    : END CONVERSATION conversation_handle=LOCAL_ID ';'?
+      (WITH (ERROR '=' faliure_code=(LOCAL_ID | STRING) DESCRIPTION '=' failure_text=(LOCAL_ID | STRING))? CLEANUP? )?
+    ;
+
 // https://msdn.microsoft.com/en-us/library/ms187752.aspx
 // TODO: implement runtime check or add new tokens.
 data_type
@@ -1685,6 +1691,7 @@ DEFAULT:                               D E F A U L T;
 DELETE:                                D E L E T E;
 DENY:                                  D E N Y;
 DESC:                                  D E S C;
+DESCRIPTION:                           D E S C R I P T I O N;
 DISK:                                  D I S K;
 DISTINCT:                              D I S T I N C T;
 DISTRIBUTED:                           D I S T R I B U T E D;
@@ -1695,6 +1702,7 @@ ELSE:                                  E L S E;
 END:                                   E N D;
 ERRLVL:                                E R R L V L;
 ESCAPE:                                E S C A P E;
+ERROR:                                 E R R O R;
 EVENTDATA:                             E V E N T D A T A '(' ')';
 EXCEPT:                                E X C E P T;
 EXECUTE:                               E X E C (U T E)?;
@@ -1871,6 +1879,7 @@ CHANGE_RETENTION:                      C H A N G E '_' R E T E N T I O N;
 CHANGE_TRACKING:                       C H A N G E '_' T R A C K I N G; 
 CHECKSUM:                              C H E C K S U M;
 CHECKSUM_AGG:                          C H E C K S U M '_' A G G;
+CLEANUP:                               C L E A N U P;
 COMMITTED:                             C O M M I T T E D;
 COMPATIBILITY_LEVEL:                   C O M P A T I B I L I T Y '_' L E V E L;                           
 CONCAT:                                C O N C A T;
