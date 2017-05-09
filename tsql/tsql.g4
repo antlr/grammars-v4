@@ -889,6 +889,7 @@ expression
     | LOCAL_ID                                                 #primitive_expression
     | constant                                                 #primitive_expression
     | function_call                                            #function_call_expression
+    | xml_method_call                                          #xml_method_call_expression
     | expression COLLATE id                                    #function_call_expression
     // https://msdn.microsoft.com/en-us/library/ms181765.aspx
     | CASE caseExpr=expression switch_section+ (ELSE elseExpr=expression)? END   #case_expression
@@ -1169,6 +1170,14 @@ function_call
     | SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
     | SYSTEM_USER
+    ;
+
+xml_method_call
+    : value_method
+    ;
+
+value_method
+    : (LOCAL_ID | EVENTDATA) '.value(' xquery=STRING ',' sqltype=STRING ')'
     ;
 
 switch_section
