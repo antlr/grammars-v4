@@ -331,3 +331,25 @@ GO;
 -- Cleaning up a conversation that cannot complete normally
 END CONVERSATION @dialog_handle WITH CLEANUP;
 GO;
+
+-- Getting a conversation group, waiting indefinitely
+DECLARE @conversation_group_id UNIQUEIDENTIFIER ;
+WAITFOR (
+ GET CONVERSATION GROUP @conversation_group_id
+     FROM ExpenseQueue
+);
+GO;
+
+-- Getting a conversation group, waiting one minute
+DECLARE @conversation_group_id UNIQUEIDENTIFIER
+WAITFOR (
+    GET CONVERSATION GROUP @conversation_group_id
+    FROM ExpenseQueue ),
+TIMEOUT 60000 ;
+GO;
+
+-- Getting a conversation group, returning immediately
+DECLARE @conversation_group_id UNIQUEIDENTIFIER;
+GET CONVERSATION GROUP @conversation_group_id
+FROM AdventureWorks.dbo.ExpenseQueue;
+GO;

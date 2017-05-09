@@ -130,6 +130,8 @@ conversation_statement
     : begin_conversation_timer
     | begin_conversation_dialog
     | end_conversation
+    | get_conversation
+    | waitfor_conversation
     ;
 
 another_statement
@@ -1409,6 +1411,19 @@ end_conversation
       (WITH (ERROR '=' faliure_code=(LOCAL_ID | STRING) DESCRIPTION '=' failure_text=(LOCAL_ID | STRING))? CLEANUP? )?
     ;
 
+waitfor_conversation
+    : WAITFOR? '(' get_conversation ')' (','? TIMEOUT timeout=time)? ';'?
+    ;
+
+get_conversation
+    :GET CONVERSATION GROUP conversation_group_id=(STRING | LOCAL_ID) FROM queue=queue_id ';'?
+    ;
+
+queue_id
+    : (database_name=id '.' schema_name=id '.' name=id)
+    | id
+    ;
+
 // https://msdn.microsoft.com/en-us/library/ms187752.aspx
 // TODO: implement runtime check or add new tokens.
 data_type
@@ -1721,6 +1736,7 @@ FREETEXTTABLE:                         F R E E T E X T T A B L E;
 FROM:                                  F R O M;
 FULL:                                  F U L L;
 FUNCTION:                              F U N C T I O N;
+GET:                                   G E T;
 GOTO:                                  G O T O;
 GRANT:                                 G R A N T;
 GROUP:                                 G R O U P;
