@@ -1,6 +1,6 @@
 Some notes on issues am finding with the official grammar as I developed the executable grammar.
 
-# ambiguities
+## Ambiguities
 
 primary-expression → implicit-member-expression­
 implicit-member-expression → .­ identifier­
@@ -21,21 +21,22 @@ pattern → expression-pattern­
 
 Couldn't figure out why 2.0 after '<' was an error token:
 
-```
+```Swift
 class T {
-	func foo() {
-		for var i:CGFloat = 0; i < 2.0 + self.frame.size.width / ( groundTexture.size().width * 2.0 ); ++i {
-			var sprite = SKSpriteNode(texture: groundTexture)
-		}
-	}
+    func foo() {
+        for var i:CGFloat = 0; i < 2.0 + self.frame.size.width / ( groundTexture.size().width * 2.0 ); ++i {
+            var sprite = SKSpriteNode(texture: groundTexture)
+        }
+    }
 }
 ```
 
 parse tree shows primary_expression:1 
 
-```
+```ANTLR
 primary_expression
- : identifier generic_argument_clause?
+   : identifier generic_argument_clause?
+   ;
 ```
 
 that ain't right. 
@@ -48,8 +49,9 @@ ok, now for ambiguity upon "= i class" in above snippet. ambig for ()* decision.
 
 expression : prefix_expression binary_expression* ;
 
-hard to handle since it falls off end of expr. it's ambig to match just b to prefix_expression and fall out or match all of b=i.
- Two big trees appear but diff shows just a few nodes!
+hard to handle since it falls off end of expr.
+It's ambig to match just b to prefix_expression and fall out or match all of b=i.
+Two big trees appear but diff shows just a few nodes!
 
 ![Figure 1](doc/images/readme1.png)
 
@@ -61,7 +63,7 @@ first interp (chosen) says b = i is an assignment expr.
 
 Another ambig shows I should reorder
 
-```
+```ANTLR
 self_expression
  : 'self'
  | 'self' '.' identifier
@@ -78,7 +80,11 @@ next, (texture: groundTexture) can match two interps.
 
 ![Figure 4](doc/images/readme4.png)
 
-it chooses postfix_expr:function_call_expression over postfix_expr:function_call_expression:primary, which is good as the (...) shouldn't be interpreted as another statement. the precedence makes it seem first alt, primary, should be taken but it's not just precedence taken into consideration. it's that f(...) matches the rule by taking the postfix_expr:function_call_expression option.
+It chooses postfix_expr:function_call_expression over postfix_expr:function_call_expression:primary,
+which is good as the (...) shouldn't be interpreted as another statement.
+The precedence makes it seem first alt, primary, should be taken but it's not just 
+precedence taken into consideration.
+It's that f(...) matches the rule by taking the postfix_expr:function_call_expression option.
 
 11/18/15. Error in published grammar; some types are optional here:
 
@@ -102,7 +108,7 @@ parameter
 
 Ambiguity in expression with !?
 
-```
+```ANTLR
 postfix_expression
  : postfix_expression postfix_operator                            # postfix_operation
  | postfix_expression parenthesized_expression                    # function_call_expression
@@ -114,16 +120,17 @@ postfix_expression
  | postfix_expression '.' 'dynamicType'                           # dynamic_type_expression
  | postfix_expression '[' expression_list ']'                     # subscript_expression
 // ! is a postfix operator already
-//| postfix_expression '!'                                         # forced_value_expression
+//| postfix_expression '!'                                        # forced_value_expression
 // ? is a postfix operator already
-// | postfix_expression '?'                                         # optional_chaining_expression
+// | postfix_expression '?'                                       # optional_chaining_expression
  | primary_expression                                             # primary
  ;
 ```
 
-missing ',' in apple grammar.  this didn't match "let dataProvider = dataProvider, lineData = dataProvider.lineData"
+missing ',' in apple grammar.
+This didn't match `let dataProvider = dataProvider, lineData = dataProvider.lineData`
 
-```
+```ANTLR
 optional_binding_condition
  : optional_binding_head optional_binding_continuation_list? where_clause?
                          ^ whoops! must have comma
@@ -132,7 +139,7 @@ optional_binding_condition
 
 added comma here:
 
-```
+```ANTLR
 optional_binding_continuation_list
  : ',' optional_binding_continuation (',' optional_binding_continuation)*
  ;
