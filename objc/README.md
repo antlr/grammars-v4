@@ -2,8 +2,12 @@
 
 Objective-C 2.0 grammars with preprocessor support can be used in 2 different modes:
 
-* One-step processing. Includes a lexer which is used for both directives and ordinary Objective-C code. Used in [Swiftify](https://objectivec2swift.com/) Objective-C to Swift converter.
-* Two-step processing. Includes separate lexers for directives and Objective-C code. Used in [Codebeat](https://codebeat.co/), the web service for automated code review for different programming languages (including Objective-C).
+* One-step processing. Includes a lexer which is used for 
+both directives and ordinary Objective-C code.
+Used in [Swiftify](https://objectivec2swift.com/) Objective-C to Swift converter.
+* Two-step processing. Includes separate lexers for directives and Objective-C code.
+Used in [Codebeat](https://codebeat.co/), the web service for automated code review
+for different programming languages (including Objective-C).
 
 ## One-step processing
 
@@ -18,15 +22,18 @@ Objective-C 2.0 grammars with preprocessor support can be used in 2 different mo
 4. Lexer (ObjectiveCLexer.g4).
 5. Parser (ObjectiveCParser.g4).
 
-`ObjectiveCPreprocessor` processes preprocessor directives and replaces code that does not compile with spaces. 
-Spaces are kept for correct detection of error line and column numbers during parsing of the ordinary Objective-C code. 
+`ObjectiveCPreprocessor` processes preprocessor directives and replaces code
+that does not compile with spaces. 
+Spaces are kept for correct detection of error line and column numbers
+during parsing of the ordinary Objective-C code. 
 `ObjectiveCParser` is shared by both one-step and two-step processing.
 
 # Testing
 
 ## One-step processing
 
-Successful parsing and conversion of complete projects, ex. [Popovers demo](https://objectivec2swift.com/#/home/faq#how-do-i-convert-an-entire-project-from-objective-c-to-swift).
+Successful parsing and conversion of complete projects,
+ex. [Popovers demo](https://objectivec2swift.com/#/home/faq#how-do-i-convert-an-entire-project-from-objective-c-to-swift).
 
 ## Two-step processing
 
