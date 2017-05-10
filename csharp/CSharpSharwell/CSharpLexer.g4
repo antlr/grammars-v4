@@ -4,16 +4,15 @@
 
 lexer grammar CSharpLexer;
 
-@lexer::header
-{import java.util.Stack;}
+@lexer::header { using System.Collections.Generic; }
 
 channels { COMMENTS_CHANNEL, DIRECTIVE }
 
 @lexer::members
 {private int interpolatedStringLevel;
-private Stack<Boolean> interpolatedVerbatiums = new Stack<Boolean>();
-private Stack<Integer> curlyLevels = new Stack<Integer>();
-private boolean verbatium;
+private Stack<bool> interpolatedVerbatiums = new Stack<bool>();
+private Stack<int> curlyLevels = new Stack<int>();
+private bool verbatium;
 }
 
 BYTE_ORDER_MARK: '\u00EF\u00BB\u00BF';
@@ -146,27 +145,27 @@ CHARACTER_LITERAL:                   '\'' (~['\\\r\n\u0085\u2028\u2029] | Common
 REGULAR_STRING:                      '"'  (~["\\\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';
 VERBATIUM_STRING:                    '@"' (~'"' | '""')* '"';
 INTERPOLATED_REGULAR_STRING_START:   '$"'
-    { interpolatedStringLevel++; interpolatedVerbatiums.push(false); verbatium = false; } -> pushMode(INTERPOLATION_STRING);
+    { interpolatedStringLevel++; interpolatedVerbatiums.Push(false); verbatium = false; } -> pushMode(INTERPOLATION_STRING);
 INTERPOLATED_VERBATIUM_STRING_START: '$@"'
-    { interpolatedStringLevel++; interpolatedVerbatiums.push(true); verbatium = true; }  -> pushMode(INTERPOLATION_STRING);
+    { interpolatedStringLevel++; interpolatedVerbatiums.Push(true); verbatium = true; }  -> pushMode(INTERPOLATION_STRING);
 
 //B.1.9 Operators And Punctuators
 OPEN_BRACE:               '{'
 {
 if (interpolatedStringLevel > 0)
 {
-    curlyLevels.push(curlyLevels.pop() + 1);
+    curlyLevels.Push(curlyLevels.Pop() + 1);
 }};
 CLOSE_BRACE:              '}'
 {
 if (interpolatedStringLevel > 0)
 {
-    curlyLevels.push(curlyLevels.pop() - 1);
-    if (curlyLevels.peek() == 0)
+    curlyLevels.Push(curlyLevels.Pop() - 1);
+    if (curlyLevels.Peek() == 0)
     {
-        curlyLevels.pop();
-        skip();
-        popMode();
+        curlyLevels.Pop();
+        Skip();
+        PopMode();
     }
 }
 };
@@ -181,10 +180,10 @@ COLON:                    ':'
 if (interpolatedStringLevel > 0)
 {
     int ind = 1;
-    boolean switchToFormatString = true;
-    while ((char)_input.LA(ind) != '}')
+    bool switchToFormatString = true;
+    while ((char)_input.La(ind) != '}')
     {
-        if (_input.LA(ind) == ':' || _input.LA(ind) == ')')
+        if (_input.La(ind) == ':' || _input.La(ind) == ')')
         {
             switchToFormatString = false;
             break;
@@ -193,7 +192,7 @@ if (interpolatedStringLevel > 0)
     }
     if (switchToFormatString)
     {
-        mode(INTERPOLATION_FORMAT);
+        Mode(INTERPOLATION_FORMAT);
     }
 }
 };
@@ -238,18 +237,18 @@ OP_LEFT_SHIFT_ASSIGNMENT: '<<=';
 mode INTERPOLATION_STRING;
 
 DOUBLE_CURLY_INSIDE:           '{{';
-OPEN_BRACE_INSIDE:             '{' { curlyLevels.push(1); } -> skip, pushMode(DEFAULT_MODE);
+OPEN_BRACE_INSIDE:             '{' { curlyLevels.Push(1); } -> skip, pushMode(DEFAULT_MODE);
 REGULAR_CHAR_INSIDE:           { !verbatium }? SimpleEscapeSequence;
 VERBATIUM_DOUBLE_QUOTE_INSIDE: {  verbatium }? '""';
-DOUBLE_QUOTE_INSIDE:           '"' { interpolatedStringLevel--; interpolatedVerbatiums.pop();
-    verbatium = (interpolatedVerbatiums.size() > 0 ? interpolatedVerbatiums.peek() : false); } -> popMode;
+DOUBLE_QUOTE_INSIDE:           '"' { interpolatedStringLevel--; interpolatedVerbatiums.Pop();
+    verbatium = (interpolatedVerbatiums.Count > 0 ? interpolatedVerbatiums.Peek() : false); } -> popMode;
 REGULAR_STRING_INSIDE:         { !verbatium }? ~('{' | '\\' | '"')+;
 VERBATIUM_INSIDE_STRING:       {  verbatium }? ~('{' | '"')+;
 
 mode INTERPOLATION_FORMAT;
 
 DOUBLE_CURLY_CLOSE_INSIDE:      '}}' -> type(FORMAT_STRING);
-CLOSE_BRACE_INSIDE:             '}' { curlyLevels.pop(); }   -> skip, popMode;
+CLOSE_BRACE_INSIDE:             '}' { curlyLevels.Pop(); }   -> skip, popMode;
 FORMAT_STRING:                  ~'}'+;
 
 mode DIRECTIVE_MODE;

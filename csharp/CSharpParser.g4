@@ -1,6 +1,6 @@
 // Eclipse Public License - v 1.0, http://www.eclipse.org/legal/epl-v10.html
 // Copyright (c) 2013, Christian Wulf (chwchw@gmx.de)
-// Copyright (c) 2016, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+// Copyright (c) 2016-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 
 parser grammar CSharpParser;
 
