@@ -657,6 +657,7 @@ opendatasource
 declare_statement
     : DECLARE LOCAL_ID AS? table_type_definition ';'?
     | DECLARE declare_local (',' declare_local)* ';'?
+    | WITH XMLNAMESPACES '(' xml_namespace_uri=STRING ','? AS id ')' ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms181441(v=sql.120).aspx
@@ -772,7 +773,7 @@ execute_clause
     ;
 
 declare_local
-    : LOCAL_ID AS? data_type ('=' expression)?
+    : LOCAL_ID AS? data_type ('=' expression)? expression?
     ;
 
 table_type_definition
@@ -872,6 +873,7 @@ set_special
     | SET QUOTED_IDENTIFIER on_off
     | SET ANSI_PADDING on_off
     | SET ANSI_WARNINGS on_off
+    | SET modify_method
     ;
 
 constant_LOCAL_ID
@@ -889,7 +891,6 @@ expression
     | LOCAL_ID                                                 #primitive_expression
     | constant                                                 #primitive_expression
     | function_call                                            #function_call_expression
-    | xml_method_call                                          #xml_method_call_expression
     | expression COLLATE id                                    #function_call_expression
     // https://msdn.microsoft.com/en-us/library/ms181765.aspx
     | CASE caseExpr=expression switch_section+ (ELSE elseExpr=expression)? END   #case_expression
@@ -904,7 +905,6 @@ expression
     | op=('+' | '-') expression                                #unary_operator_expression
     | expression op=('+' | '-' | '&' | '^' | '|') expression   #binary_operator_expression
     | expression comparison_operator expression                #binary_operator_expression
-
     | over_clause                                              #over_clause_expression
     ;
 
@@ -1170,15 +1170,38 @@ function_call
     | SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
     | SYSTEM_USER
+    // https://docs.microsoft.com/en-us/sql/t-sql/xml/xml-data-type-methods
+    | xml_data_type_methods
     ;
 
-xml_method_call
+xml_data_type_methods
     : value_method
+    | query_method
+    | exist_method
+    | modify_method
+    | nodes_method
     ;
 
 value_method
     : (LOCAL_ID | EVENTDATA) '.value(' xquery=STRING ',' sqltype=STRING ')'
     ;
+
+query_method
+    : (LOCAL_ID | ID | full_table_name) '.query(' xquery=STRING ')'
+    ;
+
+exist_method
+    : (LOCAL_ID | ID) '.exist(' xquery=STRING ')'
+    ;
+
+modify_method
+    : (LOCAL_ID | ID) '.modify(' xml_dml=STRING ')'
+    ;
+
+nodes_method
+    : (LOCAL_ID | ID) '.nodes(' xquery=STRING ')'
+    ;
+
 
 switch_section
     : WHEN expression THEN expression
