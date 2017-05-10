@@ -1183,7 +1183,7 @@ xml_data_type_methods
     ;
 
 value_method
-    : (LOCAL_ID | EVENTDATA) '.value(' xquery=STRING ',' sqltype=STRING ')'
+    : (LOCAL_ID | EVENTDATA | query_method) '.value(' xquery=STRING ',' sqltype=STRING ')'
     ;
 
 query_method
@@ -1441,7 +1441,7 @@ begin_conversation_dialog
 
 end_conversation
     : END CONVERSATION conversation_handle=LOCAL_ID ';'?
-      (WITH (ERROR '=' faliure_code=(LOCAL_ID | STRING) DESCRIPTION '=' failure_text=(LOCAL_ID | STRING))? CLEANUP? )?
+      (WITH (ERROR '=' faliure_code=(LOCAL_ID | STRING) 'DESCRIPTION' '=' failure_text=(LOCAL_ID | STRING))? CLEANUP? )?
     ;
 
 waitfor_conversation
@@ -1746,7 +1746,6 @@ DEFAULT:                               D E F A U L T;
 DELETE:                                D E L E T E;
 DENY:                                  D E N Y;
 DESC:                                  D E S C;
-DESCRIPTION:                           D E S C R I P T I O N;
 DISK:                                  D I S K;
 DISTINCT:                              D I S T I N C T;
 DISTRIBUTED:                           D I S T R I B U T E D;
