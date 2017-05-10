@@ -1009,12 +1009,12 @@ order_by_clause
 // https://msdn.microsoft.com/en-us/library/ms173812.aspx
 for_clause
     : FOR BROWSE
-    | FOR XML AUTO xml_common_directives?
-    | FOR XML PATH ('(' STRING ')')? xml_common_directives?
+    | FOR XML xml_common_directives?
+    | FOR XML (AUTO | RAW | PATH | EXPLICIT) ','? ('(' STRING ')')? xml_common_directives*
     ;
 
 xml_common_directives
-    : ',' (BINARY BASE64 | TYPE | ROOT)
+    : ',' (BINARY_BASE64 | TYPE | ROOT)
     ;
 
 order_by_expression
@@ -1535,7 +1535,7 @@ simple_id
     | APPLY
     | AUTO
     | AVG
-    | BASE64
+
     | CALLED
     | CALLER
     | CAST
@@ -1924,7 +1924,7 @@ AUTO_SHRINK:                           A U T O '_' S H R I N K;
 AUTO_UPDATE_STATISTICS:                A U T O '_' U P D A T E '_' S T A T I S T I C S;
 AUTO_UPDATE_STATISTICS_ASYNC:          A U T O '_' U P D A T E '_' S T A T I S T I C S '_' A S Y N C;
 AVG:                                   A V G;
-BASE64:                                B A S E '64';
+BINARY_BASE64:                         B I N A R Y ' ' B A S E '6' '4';
 BINARY_CHECKSUM:                       B I N A R Y '_' C H E C K S U M;
 BULK_LOGGED:                           B U L K '_' L O G G E D; 
 CALLER:                                C A L L E R;
@@ -1970,6 +1970,7 @@ ENABLE_BROKER:                         E N A B L E '_' B R O K E R;
 ENCRYPTION:                            E N C R Y P T I O N;
 ERROR_BROKER_CONVERSATIONS:            E R R O R '_' B R O K E R '_' C O N V E R S A T I O N S; 
 EXPAND:                                E X P A N D;
+EXPLICIT:                              E X P L I C I T;
 FAST:                                  F A S T;
 FAST_FORWARD:                          F A S T '_' F O R W A R D;
 FILEGROUP:                             F I L E G R O U P;

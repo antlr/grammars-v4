@@ -1,3 +1,34 @@
+-- Use Explicit Mode with FOR XML
+SELECT 1 as tag
+  ,NULL as Parent
+  ,3 as [Baz!1!Qux!CDATA]
+FOR XML EXPLICIT,
+BINARY BASE64, TYPE
+GO;
+
+-- Selecting into xml @local_variable with nested subquery
+DECLARE @xml xml
+SELECT @xml = (
+  SELECT
+    'foo' AS 'foo',
+    (SELECT 1 as tag
+       ,NULL as Parent
+       ,3 as [Baz!1!Qux!CDATA]
+     FOR XML EXPLICIT,
+     BINARY BASE64, TYPE)
+  FOR XML PATH ('Test'));
+GO;
+
+-- XML With Binary Base64
+CREATE TABLE MyTable (Col1 int PRIMARY KEY, Col2 binary)
+INSERT INTO MyTable VALUES (1, 0x7);
+
+SELECT Col1,
+  CAST(Col2 as image) as Col2
+  FROM MyTable
+FOR XML AUTO, BINARY BASE64;
+GO;
+
 -- Create a typed xml variable by specifying an XML schema collection
 DECLARE @x xml (Sales.StoreSurveySchemaCollection)
 GO;
@@ -118,9 +149,9 @@ SELECT @myDoc;
 GO;
 
 -- Using nodes() to extract the subtree of the context item for each generated row:
-SELECT T2.Loc.query('.')  
-FROM   T  
-CROSS APPLY Instructions.nodes('/root/Location') as T2(Loc) 
+SELECT T2.Loc.query('.')
+FROM   T
+CROSS APPLY Instructions.nodes('/root/Location') as T2(Loc)
 
 -- Using nodes() method against a variable of xml type
 DECLARE @x xml
