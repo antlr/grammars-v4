@@ -911,6 +911,7 @@ expression
     | op=('+' | '-') expression                                #unary_operator_expression
     | expression op=('+' | '-' | '&' | '^' | '|') expression   #binary_operator_expression
     | expression comparison_operator expression                #binary_operator_expression
+    | expression assignment_operator expression                #asssignment_operator_expression
     | over_clause                                              #over_clause_expression
     ;
 
