@@ -448,3 +448,21 @@ SELECT BusinessEntityID, TerritoryID
                                              ROWS UNBOUNDED PRECEDING),1) AS CumulativeTotal
 FROM Sales.SalesPerson
 WHERE TerritoryID IS NULL OR TerritoryID < 5;
+
+-- addition assignment operator
+DECLARE @count int = 0;
+SELECT @count += 1;
+SELECT @count;
+GO;
+
+-- subtraction assignment operator
+DECLARE @count int = 0;
+SELECT @count -= 1;
+SELECT @count;
+GO;
+
+-- division assignment operator
+DECLARE @count int = 1;
+SELECT @count /= 1;
+SELECT @count;
+GO;

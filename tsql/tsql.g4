@@ -697,8 +697,18 @@ security_statement
     | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO (to_principal+=id) (',' to_principal+=id)* (WITH GRANT OPTION)? (AS as_principal=id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
-    | OPEN SYMMETRIC KEY key_name=id DECRYPTION BY decryption_mechanism
+    | open_key
+    | close_key
     | create_key
+    ;
+
+open_key
+    : OPEN SYMMETRIC KEY key_name=id DECRYPTION BY decryption_mechanism
+    ;
+
+close_key
+    : CLOSE SYMMETRIC KEY key_name=id
+    | CLOSE ALL SYMMETRIC 'KEYS'
     ;
 
 create_key
@@ -805,10 +815,11 @@ column_definition
 
 // https://msdn.microsoft.com/en-us/library/ms186712.aspx
 column_constraint
-    :(CONSTRAINT constraint=id)? null_notnull?
+    :(CONSTRAINT constraint=id)?
       ((PRIMARY KEY | UNIQUE) clustered? index_options?
       | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
-      | (FOREIGN KEY)? REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
+      | (FOREIGN KEY)? REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?
+      | null_notnull)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
@@ -910,6 +921,7 @@ expression
     | op=('+' | '-') expression                                #unary_operator_expression
     | expression op=('+' | '-' | '&' | '^' | '|') expression   #binary_operator_expression
     | expression comparison_operator expression                #binary_operator_expression
+    | expression assignment_operator expression                #asssignment_operator_expression
     | over_clause                                              #over_clause_expression
     ;
 
@@ -1090,12 +1102,14 @@ table_source_item_joined
 
 table_source_item
     : table_name_with_hint        as_table_alias?
+    | full_table_name             as_table_alias?
     | rowset_function             as_table_alias?
     | derived_table              (as_table_alias column_alias_list?)?
     | change_table                as_table_alias
     | function_call               as_table_alias?
     | LOCAL_ID                    as_table_alias?
     | LOCAL_ID '.' function_call (as_table_alias column_alias_list?)?
+
     ;
 
 change_table
