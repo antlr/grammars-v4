@@ -130,12 +130,21 @@ another_statement
     : declare_statement
     | cursor_statement
     | conversation_statement
+    | create_contract
     | execute_statement
     | message_statement
     | security_statement
     | set_statement
     | transaction_statement
     | use_statement
+    ;
+
+create_contract
+    : CREATE CONTRACT contract_name
+      (AUTHORIZATION owner_name=id)?
+      '(' ((message_type_name=id | DEFAULT)
+          'SENT' BY ('INITIATOR' | 'TARGET' | ANY ) ','?)+
+      ')'
     ;
 
 conversation_statement
