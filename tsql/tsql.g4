@@ -740,10 +740,42 @@ close_key
 
 create_key
     : CREATE MASTER_KEY ENCRYPTION BY PASSWORD '=' password=STRING
+    | CREATE SYMMETRIC KEY key_name=id
+      (AUTHORIZATION user_name=id)?
+      (FROM 'PROVIDER' provider_name=id)?
+      WITH ((key_options | ENCRYPTION BY encryption_mechanism)','?)+
     ;
 
-decryption_mechanism:
-    CERTIFICATE certificate_name=id (WITH PASSWORD '=' STRING)?
+key_options
+    : 'KEY_SOURCE' '=' pass_phrase=STRING
+    | 'ALGORITHM' '=' algorithm
+    | 'IDENTITY_VALUE' '=' identity_phrase=STRING
+    | 'PROVIDER_KEY_NAME' '=' key_name_in_provider=STRING
+    | 'CREATION_DISPOSITION' '=' ('CREATE_NEW' | 'OPEN_EXISTING')
+    ;
+
+algorithm
+    : 'DES'
+    | 'TRIPLE_DES'
+    | 'TRIPLE_DES_3KEY'
+    | 'RC2'
+    | 'RC4'
+    | 'RC4_128'
+    | 'DESX'
+    | 'AES_128'
+    | 'AES_192'
+    | 'AES_256'
+    ;
+
+encryption_mechanism
+    : CERTIFICATE certificate_name=id
+    | ASYMMETRIC KEY asym_key_name=id
+    | SYMMETRIC KEY decrypting_Key_name=id
+    | PASSWORD '=' STRING
+    ;
+
+decryption_mechanism
+    : CERTIFICATE certificate_name=id (WITH PASSWORD '=' STRING)?
     | ASYMMETRIC KEY asym_key_name=id (WITH PASSWORD '=' STRING)?
     | SYMMETRIC KEY decrypting_Key_name=id
     | PASSWORD '=' STRING

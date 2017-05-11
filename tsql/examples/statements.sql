@@ -427,3 +427,27 @@ USE AdventureWorks2012;
 CREATE CERTIFICATE Shipping19
     FROM EXECUTABLE FILE = 'c:\Shipping\Certs\Shipping19.dll';
 GO;
+
+-- Creating a symmetric key
+CREATE SYMMETRIC KEY JanainaKey09
+WITH ALGORITHM = AES_256
+ENCRYPTION BY CERTIFICATE Shipping04;
+GO;
+
+-- Creating a temporary symmetric key
+CREATE SYMMETRIC KEY #MarketingXXV
+WITH ALGORITHM = AES_128,
+KEY_SOURCE
+     = 'The square of the hypotenuse is equal to the sum of the squares of the sides',
+IDENTITY_VALUE = 'Pythagoras'
+ENCRYPTION BY CERTIFICATE Marketing25;
+GO;
+
+-- Creating a symmetric key using an Extensible Key Management (EKM) device
+CREATE SYMMETRIC KEY MySymKey
+AUTHORIZATION User1
+FROM PROVIDER EKMProvider
+WITH
+PROVIDER_KEY_NAME='KeyForSensitiveData',
+CREATION_DISPOSITION=OPEN_EXISTING;
+GO;
