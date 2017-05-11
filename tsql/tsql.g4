@@ -704,15 +704,17 @@ security_statement
 
 open_key
     : OPEN SYMMETRIC KEY key_name=id DECRYPTION BY decryption_mechanism
+    | OPEN MASTER_KEY DECRYPTION BY PASSWORD '=' password=STRING
     ;
 
 close_key
     : CLOSE SYMMETRIC KEY key_name=id
     | CLOSE ALL SYMMETRIC 'KEYS'
+    | CLOSE MASTER_KEY
     ;
 
 create_key
-    : CREATE MASTER_KEY ENCRYPTION BY PASSWORD '=' password=STRING ';'?
+    : CREATE MASTER_KEY ENCRYPTION BY PASSWORD '=' password=STRING
     ;
 
 decryption_mechanism:

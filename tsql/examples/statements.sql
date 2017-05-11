@@ -397,3 +397,11 @@ GO;
 -- Create Master Key
 CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'password';
 GO;
+
+-- Open Master Key
+OPEN MASTER KEY DECRYPTION BY PASSWORD = 'password';
+GO;
+
+-- Close Master Key
+CLOSE MASTER KEY;
+GO;
