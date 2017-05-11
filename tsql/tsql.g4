@@ -110,16 +110,16 @@ cfl_statement
       state=(DECIMAL | LOCAL_ID))? ';'?              #throw_statement
     // https://msdn.microsoft.com/en-us/library/ms175976.aspx
     | BEGIN TRY ';'? try_clauses=sql_clauses? END TRY ';'?
-      BEGIN CATCH ';'? catch_clauses=sql_clauses? END CATCH ';'?                              #try_catch_statement
+      BEGIN CATCH ';'? catch_clauses=sql_clauses? END CATCH ';'?                                          #try_catch_statement
     // https://msdn.microsoft.com/en-us/library/ms187331.aspx
-    | WAITFOR receive_statement? ','? ((DELAY | TIME | TIMEOUT) time)?  expression? ';'?      #waitfor_statement
+    | WAITFOR receive_statement? ','? ((DELAY | TIME | TIMEOUT) time)?  expression? ';'?                  #waitfor_statement
     // https://msdn.microsoft.com/en-us/library/ms178642.aspx
-    | WHILE search_condition (sql_clause | BREAK ';'? | CONTINUE ';'?)                        #while_statement
+    | WHILE search_condition (sql_clause | BREAK ';'? | CONTINUE ';'?)                                    #while_statement
     // https://msdn.microsoft.com/en-us/library/ms176047.aspx.
-    | PRINT expression ';'?                                                                   #print_statement
+    | PRINT expression ';'?                                                                               #print_statement
     // https://msdn.microsoft.com/en-us/library/ms178592.aspx
     | RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' severity=constant_LOCAL_ID ','
-        state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' ';'?                             #raiseerror_statement
+        state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' (WITH (LOG | SETERROR))? ';'?       #raiseerror_statementb
     ;
 
 empty_statement
@@ -698,6 +698,11 @@ security_statement
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
     | OPEN SYMMETRIC KEY key_name=id DECRYPTION BY decryption_mechanism
+    | create_key
+    ;
+
+create_key
+    : CREATE MASTER_KEY ENCRYPTION BY PASSWORD '=' password=STRING ';'?
     ;
 
 decryption_mechanism:
@@ -1055,7 +1060,7 @@ option
     ;
 
 optimize_for_arg
-    : LOCAL_ID (UNKNOWN | '=' constant)
+    : LOCAL_ID (UNKNOWN | '=' (constant | NULL))
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms176104.aspx
@@ -1183,7 +1188,7 @@ xml_data_type_methods
     ;
 
 value_method
-    : (LOCAL_ID | EVENTDATA | query_method) '.value(' xquery=STRING ',' sqltype=STRING ')'
+    : (LOCAL_ID | ID | EVENTDATA | query_method) '.value(' xquery=STRING ',' sqltype=STRING ')'
     ;
 
 query_method
@@ -1429,14 +1434,22 @@ begin_conversation_timer
 
 begin_conversation_dialog
     : BEGIN DIALOG (CONVERSATION)? dialog_handle=LOCAL_ID
-      FROM SERVICE initiator_service_name=id
-      TO SERVICE target_service_name=STRING (',' service_broker_guid=STRING)?
-      ON CONTRACT contract_name=id
+      FROM SERVICE initiator_service_name=service_name
+      TO SERVICE target_service_name=service_name (',' service_broker_guid=STRING)?
+      ON CONTRACT contract_name
       (WITH
         ((RELATED_CONVERSATION | RELATED_CONVERSATION_GROUP) '=' LOCAL_ID ','?)?
         (LIFETIME '=' (DECIMAL | LOCAL_ID) ','?)?
         (ENCRYPTION '=' (ON | OFF))? )?
       ';'?
+    ;
+
+contract_name
+    : (id | expression)
+    ;
+
+service_name
+    : (id | expression)
     ;
 
 end_conversation
@@ -1459,8 +1472,8 @@ queue_id
 
 send_conversation
     : SEND ON CONVERSATION conversation_handle=(STRING | LOCAL_ID)
-      MESSAGE TYPE message_type_name=SQUARE_BRACKET_ID
-      '(' message_body_expression=(STRING | LOCAL_ID) ')'
+      MESSAGE TYPE message_type_name=expression
+      ('(' message_body_expression=(STRING | LOCAL_ID) ')' )?
       ';'?
     ;
 
@@ -2012,6 +2025,7 @@ LOCK_ESCALATION:                       L O C K '_' E S C A L A T I O N;
 LOGIN:                                 L O G I N;
 LOOP:                                  L O O P;
 MARK:                                  M A R K;
+MASTER_KEY:                            M A S T E R ' '  K E Y;
 MAX:                                   M A X;
 MAXDOP:                                M A X D O P;
 MAXRECURSION:                          M A X R E C U R S I O N;
@@ -2084,6 +2098,7 @@ SECONDS:                               S E C O N D S;
 SELF:                                  S E L F;
 SEND:                                  S E N D;
 SERIALIZABLE:                          S E R I A L I Z A B L E;
+SETERROR:                              S E T E R R O R;
 SHOWPLAN:                              S H O W P L A N;
 SIMPLE:                                S I M P L E;
 SINGLE_USER:                           S I N G L E '_' U S E R; 

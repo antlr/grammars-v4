@@ -161,7 +161,7 @@ SET @x='<Root>
     <row id="3" />
 </Root>'
 SELECT T.c.query('.') AS result
-FROM   @x.nodes('/Root/row') T(c)
+FROM @x.nodes('/Root/row') T(c) OPTION (OPTIMIZE FOR (@xml = NULL));
 GO;
 
 -- Specifying the nodes() method against a column of xml type
