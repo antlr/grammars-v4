@@ -697,8 +697,18 @@ security_statement
     | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO (to_principal+=id) (',' to_principal+=id)* (WITH GRANT OPTION)? (AS as_principal=id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
-    | OPEN SYMMETRIC KEY key_name=id DECRYPTION BY decryption_mechanism
+    | open_key
+    | close_key
     | create_key
+    ;
+
+open_key
+    : OPEN SYMMETRIC KEY key_name=id DECRYPTION BY decryption_mechanism
+    ;
+
+close_key
+    : CLOSE SYMMETRIC KEY key_name=id
+    | CLOSE ALL SYMMETRIC 'KEYS'
     ;
 
 create_key
