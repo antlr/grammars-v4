@@ -405,3 +405,25 @@ GO;
 -- Close Master Key
 CLOSE MASTER KEY;
 GO;
+
+-- Creating a self-signed certificate
+USE AdventureWorks2012;
+CREATE CERTIFICATE Shipping04
+   ENCRYPTION BY PASSWORD = 'pGFD4bb925DGvbd2439587y'
+   WITH SUBJECT = 'Sammamish Shipping Records',
+   EXPIRY_DATE = '20201031';
+GO;
+
+-- Creating a certificate from a file
+USE AdventureWorks2012;
+CREATE CERTIFICATE Shipping11
+    FROM FILE = 'c:\Shipping\Certs\Shipping11.cer'
+    WITH PRIVATE KEY (FILE = 'c:\Shipping\Certs\Shipping11.pvk',
+    DECRYPTION BY PASSWORD = 'sldkflk34et6gs%53#v00');
+GO;
+
+-- Creating a certificate from a signed executable file
+USE AdventureWorks2012;
+CREATE CERTIFICATE Shipping19
+    FROM EXECUTABLE FILE = 'c:\Shipping\Certs\Shipping19.dll';
+GO;

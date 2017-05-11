@@ -700,6 +700,31 @@ security_statement
     | open_key
     | close_key
     | create_key
+    | create_certificate
+    ;
+
+create_certificate
+    : CREATE CERTIFICATE certificate_name=id (AUTHORIZATION user_name=id)?
+      (FROM existing_keys | generate_new_keys)
+      ('ACTIVE' FOR BEGIN DIALOG '=' (ON | OFF))?
+    ;
+
+existing_keys
+    : 'ASSEMBLY' assembly_name=id
+    | 'EXECUTABLE'? FILE '=' path_to_file=STRING (WITH 'PRIVATE' KEY '(' private_key_options ')')?
+    ;
+
+private_key_options
+    : (FILE | BINARY) '=' path=STRING (',' (DECRYPTION | ENCRYPTION) BY PASSWORD '=' password=STRING)?
+    ;
+
+generate_new_keys
+    : (ENCRYPTION BY PASSWORD '=' password=STRING)?
+      WITH 'SUBJECT' '=' certificate_subject_name=STRING (',' date_options)*
+    ;
+
+date_options
+    : ('START_DATE' | 'EXPIRY_DATE') '=' STRING
     ;
 
 open_key
@@ -1937,7 +1962,7 @@ WRITETEXT:                             W R I T E T E X T;
 ABSOLUTE:                              A B S O L U T E;
 ACTION:                                A C T I O N;
 AFTER:                                 A F T E R;
-ALLOWED:                               A L L O W E D; 
+ALLOWED:                               A L L O W E D;
 ALLOW_SNAPSHOT_ISOLATION:              A L L O W '_' S N A P S H O T '_' I S O L A T I O N;
 ANSI_NULLS:                            A N S I '_' N U L L S;
 ANSI_NULL_DEFAULT:                     A N S I '_' N U L L '_' D E F A U L T;
@@ -1965,7 +1990,7 @@ CHECKSUM:                              C H E C K S U M;
 CHECKSUM_AGG:                          C H E C K S U M '_' A G G;
 CLEANUP:                               C L E A N U P;
 COMMITTED:                             C O M M I T T E D;
-COMPATIBILITY_LEVEL:                   C O M P A T I B I L I T Y '_' L E V E L;                           
+COMPATIBILITY_LEVEL:                   C O M P A T I B I L I T Y '_' L E V E L;
 CONCAT:                                C O N C A T;
 CONCAT_NULL_YIELDS_NULL:               C O N C A T '_' N U L L '_' Y I E L D S '_' N U L L;
 CONTROL:                               C O N T R O L;
