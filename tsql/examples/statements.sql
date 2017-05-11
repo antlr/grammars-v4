@@ -369,3 +369,22 @@ SEND ON CONVERSATION @dialog_handle
     MESSAGE TYPE [//Adventure-Works.com/Expenses/SubmitExpense]
     (@ExpenseReport) ;
 GO;
+
+-- Starts a dialog and sends an XML message on the dialog using local vars without message body
+DECLARE @dialog_handle UNIQUEIDENTIFIER,
+        @ExpenseReport XML;
+
+SET @ExpenseReport = '<document/>';
+
+BEGIN DIALOG @dialog_handle
+FROM SERVICE @from_service
+TO SERVICE @to_service
+ON CONTRACT @contract;
+
+SEND ON CONVERSATION @dialog_handle
+    MESSAGE TYPE @MessageType
+GO;
+
+-- Create Master Key
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'password';
+GO;
