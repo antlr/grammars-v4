@@ -126,6 +126,18 @@ empty_statement
     : ';'
     ;
 
+another_statement
+    : declare_statement
+    | cursor_statement
+    | conversation_statement
+    | execute_statement
+    | message_statement
+    | security_statement
+    | set_statement
+    | transaction_statement
+    | use_statement
+    ;
+
 conversation_statement
     : begin_conversation_timer
     | begin_conversation_dialog
@@ -135,15 +147,13 @@ conversation_statement
     | waitfor_conversation
     ;
 
-another_statement
-    : declare_statement
-    | cursor_statement
-    | conversation_statement
-    | execute_statement
-    | security_statement
-    | set_statement
-    | transaction_statement
-    | use_statement
+message_statement
+    : CREATE MESSAGE TYPE message_type_name=id
+      (AUTHORIZATION owner_name=id)?
+      ('VALIDATION' '=' (NONE
+      | 'EMPTY'
+      | 'WELL_FORMED_XML'
+      | 'VALID_XML WITH SCHEMA COLLECTION' schema_collection_name=id))
     ;
 
 // DML

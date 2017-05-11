@@ -451,3 +451,15 @@ WITH
 PROVIDER_KEY_NAME='KeyForSensitiveData',
 CREATION_DISPOSITION=OPEN_EXISTING;
 GO;
+
+-- Creating a message type for an empty message
+CREATE MESSAGE TYPE
+    [//Adventure-Works.com/Expenses/SubmitExpense]
+    VALIDATION = EMPTY;
+GO;
+
+-- Creating a message type containing binary data
+CREATE MESSAGE TYPE
+    [//Adventure-Works.com/Expenses/ReceiptImage]
+    VALIDATION = NONE;
+GO;
