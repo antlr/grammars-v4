@@ -4,3 +4,9 @@ go
 
 CREATE TYPE [dbo].[udt_pk] FROM [uniqueidentifier] NULL
 go
+
+-- Creating a user-defined table type
+CREATE TYPE LocationTableType AS TABLE
+    ( LocationName VARCHAR(50)
+    , CostRate INT );
+GO

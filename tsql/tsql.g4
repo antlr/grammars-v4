@@ -681,8 +681,10 @@ drop_view
     : DROP VIEW (IF EXISTS)? simple_name (',' simple_name)* ';'?
     ;
 
-create_type:
-    CREATE TYPE name = simple_name FROM data_type default_value
+create_type
+    : CREATE TYPE name = simple_name
+      (FROM data_type default_value)?
+      (AS TABLE LR_BRACKET column_def_table_constraints RR_BRACKET)?
     ;
 
 drop_type:
