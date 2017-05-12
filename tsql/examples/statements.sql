@@ -520,3 +520,45 @@ CREATE QUEUE ExpenseQueue
           EXECUTE AS SELF )
     ON [DEFAULT] ;
 GO;
+
+-- Making a queue unavailable
+ALTER QUEUE ExpenseQueue WITH STATUS = OFF ;
+GO;
+
+-- Changing the activation stored procedure
+ALTER QUEUE ExpenseQueue
+    WITH ACTIVATION (
+        PROCEDURE_NAME = new_stored_proc,
+        EXECUTE AS SELF) ;
+GO;
+
+-- Changing the number of queue readers
+ALTER QUEUE ExpenseQueue WITH ACTIVATION (MAX_QUEUE_READERS = 7) ;
+GO;
+
+-- Changing the activation stored procedure and the EXECUTE AS account
+ALTER QUEUE ExpenseQueue
+    WITH ACTIVATION (
+        PROCEDURE_NAME = AdventureWorks2012.dbo.new_stored_proc ,
+        EXECUTE AS 'SecurityAccount') ;
+GO;
+
+-- Setting the queue to retain messages
+ALTER QUEUE ExpenseQueue WITH RETENTION = ON ;
+GO;
+
+-- Removing activation from a queue
+ALTER QUEUE ExpenseQueue WITH ACTIVATION (DROP) ;
+GO;
+
+-- Rebuilding queue indexes
+ALTER QUEUE ExpenseQueue REBUILD WITH (MAXDOP = 2)
+GO;
+
+-- Reorganizing queue indexes
+ALTER QUEUE ExpenseQueue REORGANIZE
+GO;
+
+-- Moving queue internal table to another filegroup
+ALTER QUEUE ExpenseQueue MOVE TO [NewFilegroup]
+GO;

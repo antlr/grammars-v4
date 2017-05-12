@@ -74,10 +74,8 @@ ddl_clause
     | create_table
     | create_type
     | create_view
-
     | alter_table
     | alter_database
-
     | drop_index
     | drop_procedure
     | drop_trigger
@@ -132,6 +130,7 @@ another_statement
     | conversation_statement
     | create_contract
     | create_queue
+    | alter_queue
     | execute_statement
     | message_statement
     | security_statement
@@ -142,25 +141,44 @@ another_statement
 
 create_queue
     : CREATE QUEUE (full_table_name | queue_name=id)
-        (WITH
-          (STATUS EQUAL (ON | OFF) COMMA?)?
-          (RETENTION EQUAL (ON | OFF) COMMA?)?
-          (ACTIVATION
-            LR_BRACKET
-              (STATUS EQUAL (ON | OFF) COMMA?)?
-              (PROCEDURE_NAME EQUAL func_proc_name COMMA?)?
-              (MAX_QUEUE_READERS EQUAL max_readers=DECIMAL COMMA?)?
-              (EXECUTE AS (SELF | user_name=STRING | OWNER) COMMA?)?
-            RR_BRACKET)?
-        )?
-        (ON filegroup=id | DEFAULT)?
+      queue_settings?
+      (ON filegroup=id | DEFAULT)?
+    ;
+
+queue_settings
+    :WITH
+       (STATUS EQUAL (ON | OFF) COMMA?)?
+       (RETENTION EQUAL (ON | OFF) COMMA?)?
+       (ACTIVATION
+         LR_BRACKET
+           (COMMA? STATUS EQUAL (ON | OFF))?
+           (COMMA? PROCEDURE_NAME EQUAL func_proc_name)?
+           (COMMA? MAX_QUEUE_READERS EQUAL max_readers=DECIMAL)?
+           (COMMA? EXECUTE AS (SELF | user_name=STRING | OWNER))?
+           (COMMA? POISON_MESSAGE_HANDLING STATUS EQUAL (ON | OFF))?
+           (COMMA? DROP)?
+         RR_BRACKET)?
+    ;
+
+alter_queue
+    : ALTER QUEUE (full_table_name | queue_name=id)
+      (queue_settings | queue_action)
+    ;
+
+queue_action
+    : REBUILD ( WITH LR_BRACKET queue_rebuild_options RR_BRACKET)?
+    | REORGANIZE (WITH LOB_COMPACTION EQUAL (ON | OFF))?
+    | MOVE TO (id | DEFAULT)
+    ;
+queue_rebuild_options
+    : MAXDOP EQUAL DECIMAL
     ;
 
 create_contract
     : CREATE CONTRACT contract_name
       (AUTHORIZATION owner_name=id)?
       LR_BRACKET ((message_type_name=id | DEFAULT)
-          SENT BY (INITIATOR | TARGET | ANY ) ','?)+
+          SENT BY (INITIATOR | TARGET | ANY ) COMMA?)+
       RR_BRACKET
     ;
 
@@ -251,7 +269,9 @@ insert_statement_value
     ;
 
 receive_statement
-    : '('? RECEIVE (ALL | DISTINCT | top_clause | '*') (LOCAL_ID '=' expression ','?)* FROM full_table_name (INTO table_variable=id (WHERE where=search_condition))? ')'?
+    : '('? RECEIVE (ALL | DISTINCT | top_clause | '*') 
+      (LOCAL_ID '=' expression ','?)* FROM full_table_name
+      (INTO table_variable=id (WHERE where=search_condition))? ')'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms189499.aspx
@@ -364,7 +384,6 @@ create_or_alter_function
     : (CREATE | ALTER) FUNCTION func_proc_name
         (('(' procedure_param (',' procedure_param)* ')') | '(' ')') //must have (), but can be empty
         (func_body_returns_select | func_body_returns_table | func_body_returns_scalar) ';'?
-
     ;
 
 func_body_returns_select
@@ -383,7 +402,6 @@ func_body_returns_table
            RETURN
         END 
   ;
-
 
 func_body_returns_scalar
   :RETURNS data_type
@@ -742,12 +760,12 @@ security_statement
 create_certificate
     : CREATE CERTIFICATE certificate_name=id (AUTHORIZATION user_name=id)?
       (FROM existing_keys | generate_new_keys)
-      ('ACTIVE' FOR BEGIN DIALOG '=' (ON | OFF))?
+      (ACTIVE FOR BEGIN DIALOG '=' (ON | OFF))?
     ;
 
 existing_keys
-    : 'ASSEMBLY' assembly_name=id
-    | 'EXECUTABLE'? FILE '=' path_to_file=STRING (WITH 'PRIVATE' KEY '(' private_key_options ')')?
+    : ASSEMBLY assembly_name=id
+    | EXECUTABLE? FILE EQUAL path_to_file=STRING (WITH PRIVATE KEY '(' private_key_options ')')?
     ;
 
 private_key_options
@@ -756,11 +774,11 @@ private_key_options
 
 generate_new_keys
     : (ENCRYPTION BY PASSWORD '=' password=STRING)?
-      WITH 'SUBJECT' '=' certificate_subject_name=STRING (',' date_options)*
+      WITH SUBJECT EQUAL certificate_subject_name=STRING (',' date_options)*
     ;
 
 date_options
-    : ('START_DATE' | 'EXPIRY_DATE') '=' STRING
+    : (START_DATE | EXPIRY_DATE) EQUAL STRING
     ;
 
 open_key
@@ -770,7 +788,7 @@ open_key
 
 close_key
     : CLOSE SYMMETRIC KEY key_name=id
-    | CLOSE ALL SYMMETRIC 'KEYS'
+    | CLOSE ALL SYMMETRIC KEYS
     | CLOSE MASTER_KEY
     ;
 
@@ -778,16 +796,16 @@ create_key
     : CREATE MASTER_KEY ENCRYPTION BY PASSWORD '=' password=STRING
     | CREATE SYMMETRIC KEY key_name=id
       (AUTHORIZATION user_name=id)?
-      (FROM 'PROVIDER' provider_name=id)?
+      (FROM PROVIDER provider_name=id)?
       WITH ((key_options | ENCRYPTION BY encryption_mechanism)','?)+
     ;
 
 key_options
-    : 'KEY_SOURCE' '=' pass_phrase=STRING
-    | 'ALGORITHM' '=' algorithm
-    | 'IDENTITY_VALUE' '=' identity_phrase=STRING
-    | 'PROVIDER_KEY_NAME' '=' key_name_in_provider=STRING
-    | 'CREATION_DISPOSITION' '=' ('CREATE_NEW' | 'OPEN_EXISTING')
+    : KEY_SOURCE EQUAL pass_phrase=STRING
+    | ALGORITHM EQUAL algorithm
+    | IDENTITY_VALUE EQUAL identity_phrase=STRING
+    | PROVIDER_KEY_NAME EQUAL key_name_in_provider=STRING
+    | CREATION_DISPOSITION EQUAL (CREATE_NEW | OPEN_EXISTING)
     ;
 
 algorithm
@@ -811,10 +829,10 @@ encryption_mechanism
     ;
 
 decryption_mechanism
-    : CERTIFICATE certificate_name=id (WITH PASSWORD '=' STRING)?
-    | ASYMMETRIC KEY asym_key_name=id (WITH PASSWORD '=' STRING)?
+    : CERTIFICATE certificate_name=id (WITH PASSWORD EQUAL STRING)?
+    | ASYMMETRIC KEY asym_key_name=id (WITH PASSWORD EQUAL STRING)?
     | SYMMETRIC KEY decrypting_Key_name=id
-    | PASSWORD '=' STRING
+    | PASSWORD EQUAL STRING
     ;
 
 grant_permission
@@ -2028,8 +2046,10 @@ WRITETEXT:                             W R I T E T E X T;
 // Additional keywords (they can be id).
 ABSOLUTE:                              A B S O L U T E;
 ACTION:                                A C T I O N;
+ACTIVE:                                A C T I V E;
 ACTIVATION:                            A C T I V A T I O N;
 AFTER:                                 A F T E R;
+ALGORITHM:                             A L G O R I T H M;
 ALLOWED:                               A L L O W E D;
 ALLOW_SNAPSHOT_ISOLATION:              A L L O W '_' S N A P S H O T '_' I S O L A T I O N;
 ANSI_NULLS:                            A N S I '_' N U L L S;
@@ -2038,6 +2058,7 @@ ANSI_PADDING:                          A N S I '_' P A D D I N G;
 ANSI_WARNINGS:                         A N S I '_' W A R N I N G S;
 APPLY:                                 A P P L Y;
 ARITHABORT:                            A R I T H A B O R T;
+ASSEMBLY:                              A S S E M B L Y;
 AUTO:                                  A U T O;
 AUTO_CLEANUP:                          A U T O '_' C L E A N U P; 
 AUTO_CLOSE:                            A U T O '_' C L O S E;
@@ -2066,6 +2087,8 @@ CONTROL:                               C O N T R O L;
 COOKIE:                                C O O K I E;
 COUNT:                                 C O U N T;
 COUNT_BIG:                             C O U N T '_' B I G;
+CREATE_NEW:                            C R E A T E '_' N E W;
+CREATION_DISPOSITION:                  C R E A T I O N '_' D I S P O S I T I O N;
 CURSOR_CLOSE_ON_COMMIT:                C U R S O R '_' C L O S E '_' O N '_' C O M M I T;
 CURSOR_DEFAULT:                        C U R S O R '_' D E F A U L T;
 DATEADD:                               D A T E A D D;
@@ -2093,7 +2116,9 @@ EMPTY:                                 E M P T Y;
 ENABLE_BROKER:                         E N A B L E '_' B R O K E R;
 ENCRYPTION:                            E N C R Y P T I O N;
 ERROR_BROKER_CONVERSATIONS:            E R R O R '_' B R O K E R '_' C O N V E R S A T I O N S; 
+EXECUTABLE:                            E X E C U T A B L E;
 EXPAND:                                E X P A N D;
+EXPIRY_DATE:                           E X P I R Y '_' D A T E;
 EXPLICIT:                              E X P L I C I T;
 FAST:                                  F A S T;
 FAST_FORWARD:                          F A S T '_' F O R W A R D;
@@ -2117,6 +2142,7 @@ HADR:                                  H A D R;
 HASH:                                  H A S H;
 HONOR_BROKER_PRIORITY:                 H O N O R '_' B R O K E R '_' P R I O R I T Y;
 HOURS:                                 H O U R S; 
+IDENTITY_VALUE:                        I D E N T I T Y '_' V A L U E;
 IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX: I G N O R E '_' N O N C L U S T E R E D '_' C O L U M N S T O R E '_' I N D E X;
 IMMEDIATE:                             I M M E D I A T E;
 IMPERSONATE:                           I M P E R S O N A T E;
@@ -2130,8 +2156,11 @@ KB:                                    K B;
 KEEP:                                  K E E P;
 KEEPFIXED:                             K E E P F I X E D;
 KEYSET:                                K E Y S E T;
+KEYS:                                  K E Y S;
+KEY_SOURCE:                            K E Y '_' S O U R C E;
 LAST:                                  L A S T;
 LEVEL:                                 L E V E L;
+LOB_COMPACTION:                        L O B '_' C O M P A C T I O N;
 LOCAL:                                 L O C A L;
 LOCK_ESCALATION:                       L O C K '_' E S C A L A T I O N;
 LOGIN:                                 L O G I N;
@@ -2151,6 +2180,7 @@ MINUTES:                               M I N U T E S;
 MIN_ACTIVE_ROWVERSION:                 M I N '_' A C T I V E '_' R O W V E R S I O N;
 MIXED_PAGE_ALLOCATION:                 M I X E D '_' P A G E '_' A L L O C A T I O N; 
 MODIFY:                                M O D I F Y;
+MOVE:                                  M O V E;
 MULTI_USER:                            M U L T I '_' U S E R;
 NAME:                                  N A M E;
 NESTED_TRIGGERS:                       N E S T E D '_' T R I G G E R S;
@@ -2169,6 +2199,7 @@ OFFLINE:                               O F F L I N E;
 OFFSET:                                O F F S E T;
 ONLINE:                                O N L I N E; 
 ONLY:                                  O N L Y;
+OPEN_EXISTING:                         O P E N '_' E X I S T I N G;
 OPTIMISTIC:                            O P T I M I S T I C;
 OPTIMIZE:                              O P T I M I Z E;
 OUT:                                   O U T;
@@ -2178,10 +2209,14 @@ PAGE_VERIFY:                           P A G E '_' V E R I F Y;
 PARAMETERIZATION:                      P A R A M E T E R I Z A T I O N;
 PARTITION:                             P A R T I T I O N;
 PATH:                                  P A T H;
+POISON_MESSAGE_HANDLING:               P O I S O N '_' M E S S A G E '_' H A N D L I N G;
 PRECEDING:                             P R E C E D I N G;
 PRIOR:                                 P R I O R;
+PRIVATE:                               P R I V A T E;
 PRIVILEGES:                            P R I V I L E G E S;
 PROCEDURE_NAME:                        P R O C E D U R E '_' N A M E;
+PROVIDER:                              P R O V I D E R;
+PROVIDER_KEY_NAME:                     P R O V I D E R '_' K E Y '_' N A M E;
 QUEUE:                                 Q U E U E;
 QUOTED_IDENTIFIER:                     Q U O T E D '_' I D E N T I F I E R;
 RANGE:                                 R A N G E;
@@ -2196,6 +2231,7 @@ RECEIVE:                               R E C E I V E;
 RECOVERY:                              R E C O V E R Y;
 RECURSIVE_TRIGGERS:                    R E C U R S I V E '_' T R I G G E R S;
 RELATIVE:                              R E L A T I V E;
+REORGANIZE:                            R E O R G A N I Z E;
 REMOTE:                                R E M O T E;
 REPEATABLE:                            R E P E A T A B L E;
 RESTRICTED_USER:                       R E S T R I C T E D '_' U S E R; 
@@ -2222,11 +2258,13 @@ SINGLE_USER:                           S I N G L E '_' U S E R;
 SIZE:                                  S I Z E;
 SNAPSHOT:                              S N A P S H O T;
 SPATIAL_WINDOW_MAX_CELLS:              S P A T I A L '_' W I N D O W '_' M A X '_' C E L L S;
+START_DATE:                            S T A R T '_' D A T E;
 STATIC:                                S T A T I C;
 STATS_STREAM:                          S T A T S '_' S T R E A M;
 STATUS:                                S T A T U S;
 STDEV:                                 S T D E V;
 STDEVP:                                S T D E V P;
+SUBJECT:                               S U B J E C T;
 SUM:                                   S U M;
 SYMMETRIC:                             S Y M M E T R I C;
 TAKE:                                  T A K E;
