@@ -487,3 +487,36 @@ CREATE CONTRACT
           SENT BY TARGET
     ) ;
 GO;
+
+-- Creating a queue with no parameters
+CREATE QUEUE ExpenseQueue ;
+GO;
+
+-- Creating an unavailable queue
+CREATE QUEUE ExpenseQueue WITH STATUS=OFF ;
+GO;
+
+-- Creating a queue and specify internal activation information
+CREATE QUEUE ExpenseQueue
+    WITH STATUS=ON,
+    ACTIVATION (
+        PROCEDURE_NAME = expense_procedure,
+        MAX_QUEUE_READERS = 5,
+        EXECUTE AS 'ExpenseUser' ) ;
+GO;
+
+-- Creating a queue on a specific filegroup
+CREATE QUEUE ExpenseQueue
+    ON ExpenseWorkFileGroup ;
+GO;
+
+-- Creating a queue with multiple parameters
+CREATE QUEUE ExpenseQueue
+    WITH STATUS = OFF,
+      RETENTION = ON,
+      ACTIVATION (
+          PROCEDURE_NAME = AdventureWorks2012.dbo.expense_procedure,
+          MAX_QUEUE_READERS = 10,
+          EXECUTE AS SELF )
+    ON [DEFAULT] ;
+GO;
