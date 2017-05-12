@@ -424,7 +424,9 @@ procedure_option
     ;
 
 function_option
-    : RETURNS NULL ON NULL INPUT
+    : ENCRYPTION
+    | SCHEMABINDING
+    | RETURNS NULL ON NULL INPUT
     | CALLED ON NULL INPUT
     | execute_clause
     ;
