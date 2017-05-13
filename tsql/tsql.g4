@@ -1,7 +1,7 @@
 /*
 T-SQL (Transact-SQL, MSSQL) grammar.
 The MIT License (MIT).
-Copyright (c) 2015-2016, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+Copyright (c) 2015-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 Copyright (c) 2016, Scott Ure (scott@redstormsoftware.com).
 Copyright (c) 2016, Rui Zhang (ruizhang.ccs@gmail.com).
 Copyright (c) 2016, Marcus Henriksson (kuseman80@gmail.com).
@@ -912,14 +912,14 @@ declare_local
 table_type_definition
     : TABLE '(' column_def_table_constraints ')'
     ;
-	
+    
 xml_type_definition
-	: XML '(' ( CONTENT | DOCUMENT )? xml_schema_collection ')'
-	;
-	
+    : XML '(' ( CONTENT | DOCUMENT )? xml_schema_collection ')'
+    ;
+    
 xml_schema_collection
-	: ID '.' ID
-	;
+    : ID '.' ID
+    ;
 
 column_def_table_constraints
     : column_def_table_constraint (','? column_def_table_constraint)*
@@ -1235,24 +1235,24 @@ table_source_item
     | function_call               as_table_alias?
     | LOCAL_ID                    as_table_alias?
     | LOCAL_ID '.' function_call (as_table_alias column_alias_list?)?
-	| open_xml
+    | open_xml
     | ':' ':' function_call       as_table_alias? // Build-in function (old syntax)
     ;
 
 //https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
 open_xml
-	: OPENXML '(' expression ',' expression (',' expression)? ')' 
-	(WITH '(' schema_declaration ')' )?
-	;
+    : OPENXML '(' expression ',' expression (',' expression)? ')' 
+    (WITH '(' schema_declaration ')' )?
+    ;
 
 schema_declaration
-	: column_declaration (',' column_declaration)*
-	;
+    : column_declaration (',' column_declaration)*
+    ;
 
 column_declaration
-	: ID data_type (STRING)?
-	;
-	
+    : ID data_type (STRING)?
+    ;
+    
 change_table
     : CHANGETABLE '(' CHANGES table_name ',' (NULL | DECIMAL | LOCAL_ID) ')'
     ;
@@ -1267,17 +1267,21 @@ join_part
     | CROSS APPLY table_source
     | OUTER APPLY table_source
     | PIVOT pivot_clause as_table_alias
-    | UNPIVOT unpivot_clause as_table_alias	
+    | UNPIVOT unpivot_clause as_table_alias    
     ;
 
 pivot_clause
-	:	'(' aggregate_windowed_function FOR full_column_name IN column_alias_list ')'
-	;
+    : '(' aggregate_windowed_function FOR full_column_name IN column_alias_list ')'
+    ;
 
 unpivot_clause
-	:	'(' expression FOR full_column_name IN '(' full_column_name_list ')' ')'
-	; 
-	
+    : '(' expression FOR full_column_name IN '(' full_column_name_list ')' ')'
+    ; 
+
+full_column_name_list
+    : full_column_name (',' full_column_name)*
+    ;
+
 table_name_with_hint
     : table_name with_table_hints?
     ;
@@ -1298,8 +1302,8 @@ bulk_option
 derived_table
     : subquery
     | '(' subquery ')'
-	| table_value_constructor
-	| '(' table_value_constructor ')'	
+    | table_value_constructor
+    | '(' table_value_constructor ')'    
     ;
 
 function_call
@@ -1338,8 +1342,8 @@ function_call
     | MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
     | NULLIF '(' expression ',' expression ')'
-	// https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
-	| STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'
+    // https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
+    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms177587.aspx
     | SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
@@ -1556,12 +1560,16 @@ ddl_object
     | LOCAL_ID
     ;
 
-full_column_name (
+full_column_name
     : (table_name '.')? id
     ;
 
 column_name_list_with_order
     : id (ASC | DESC)? (',' id (ASC | DESC)?)*
+    ;
+
+column_name_list
+    : id (',' id)*
     ;
 
 cursor_name
@@ -1685,7 +1693,7 @@ data_type
 
 default_value
     : NULL
-	| DEFAULT
+    | DEFAULT
     | constant
     ;
 
@@ -2125,6 +2133,7 @@ COMMITTED:                             C O M M I T T E D;
 COMPATIBILITY_LEVEL:                   C O M P A T I B I L I T Y '_' L E V E L;
 CONCAT:                                C O N C A T;
 CONCAT_NULL_YIELDS_NULL:               C O N C A T '_' N U L L '_' Y I E L D S '_' N U L L;
+CONTENT:                               C O N T E N T;
 CONTROL:                               C O N T R O L;
 COOKIE:                                C O O K I E;
 COUNT:                                 C O U N T;
@@ -2151,7 +2160,8 @@ DIALOG:                                D I A L O G;
 DIRECTORY_NAME:                        D I R E C T O R Y '_' N A M E;
 DISABLE:                               D I S A B L E;
 DISABLED:                              D I S A B L E D; 
-DISABLE_BROKER:                        D I S A B L E '_' B R O K E R;  
+DISABLE_BROKER:                        D I S A B L E '_' B R O K E R;
+DOCUMENT:                              D O C U M E N T;
 DYNAMIC:                               D Y N A M I C;
 EMERGENCY:                             E M E R G E N C Y; 
 EMPTY:                                 E M P T Y;
