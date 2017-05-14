@@ -7,4 +7,4 @@ line 7:0 extraneous input ')' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXI
 line 10:35 extraneous input ';' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, FUNCTION, INSERT, LOCK, MERGE, PROCEDURE, SELECT, SET, SHOW, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}
 line 12:35 extraneous input ';' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, FUNCTION, INSERT, LOCK, MERGE, PROCEDURE, SELECT, SET, SHOW, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}
 line 14:35 extraneous input ';' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, FUNCTION, INSERT, LOCK, MERGE, PROCEDURE, SELECT, SET, SHOW, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}
-line 17:16 no viable alternative at input 'green_table;'
+line 17:16 extraneous input ';' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, FUNCTION, INSERT, LOCK, MERGE, PROCEDURE, SELECT, SET, SHOW, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}

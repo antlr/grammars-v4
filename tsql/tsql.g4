@@ -1,7 +1,7 @@
 /*
 T-SQL (Transact-SQL, MSSQL) grammar.
 The MIT License (MIT).
-Copyright (c) 2015-2016, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+Copyright (c) 2015-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 Copyright (c) 2016, Scott Ure (scott@redstormsoftware.com).
 Copyright (c) 2016, Rui Zhang (ruizhang.ccs@gmail.com).
 Copyright (c) 2016, Marcus Henriksson (kuseman80@gmail.com).
@@ -32,7 +32,7 @@ tsql_file
     ;
 
 batch
-    : sql_clauses go_statement?
+    : sql_clauses go_statement*
     ;
 
 sql_clauses
@@ -74,10 +74,8 @@ ddl_clause
     | create_table
     | create_type
     | create_view
-
     | alter_table
     | alter_database
-
     | drop_index
     | drop_procedure
     | drop_trigger
@@ -110,16 +108,16 @@ cfl_statement
       state=(DECIMAL | LOCAL_ID))? ';'?              #throw_statement
     // https://msdn.microsoft.com/en-us/library/ms175976.aspx
     | BEGIN TRY ';'? try_clauses=sql_clauses? END TRY ';'?
-      BEGIN CATCH ';'? catch_clauses=sql_clauses? END CATCH ';'?                    #try_catch_statement
+      BEGIN CATCH ';'? catch_clauses=sql_clauses? END CATCH ';'?                                          #try_catch_statement
     // https://msdn.microsoft.com/en-us/library/ms187331.aspx
-    | WAITFOR (DELAY | TIME)  expression ';'?                                       #waitfor_statement
+    | WAITFOR receive_statement? ','? ((DELAY | TIME | TIMEOUT) time)?  expression? ';'?                  #waitfor_statement
     // https://msdn.microsoft.com/en-us/library/ms178642.aspx
-    | WHILE search_condition (sql_clause | BREAK ';'? | CONTINUE ';'?)              #while_statement
+    | WHILE search_condition (sql_clause | BREAK ';'? | CONTINUE ';'?)                                    #while_statement
     // https://msdn.microsoft.com/en-us/library/ms176047.aspx.
-    | PRINT expression ';'?                                                         #print_statement
+    | PRINT expression ';'?                                                                               #print_statement
     // https://msdn.microsoft.com/en-us/library/ms178592.aspx
     | RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' severity=constant_LOCAL_ID ','
-        state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' ';'?                   #raiseerror_statement
+        state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' (WITH (LOG | SETERROR))? ';'?       #raiseerror_statementb
     ;
 
 empty_statement
@@ -129,11 +127,77 @@ empty_statement
 another_statement
     : declare_statement
     | cursor_statement
+    | conversation_statement
+    | create_contract
+    | create_queue
+    | alter_queue
     | execute_statement
+    | message_statement
     | security_statement
     | set_statement
     | transaction_statement
     | use_statement
+    ;
+
+create_queue
+    : CREATE QUEUE (full_table_name | queue_name=id)
+      queue_settings?
+      (ON filegroup=id | DEFAULT)?
+    ;
+
+queue_settings
+    :WITH
+       (STATUS EQUAL (ON | OFF) COMMA?)?
+       (RETENTION EQUAL (ON | OFF) COMMA?)?
+       (ACTIVATION
+         LR_BRACKET
+           (COMMA? STATUS EQUAL (ON | OFF))?
+           (COMMA? PROCEDURE_NAME EQUAL func_proc_name)?
+           (COMMA? MAX_QUEUE_READERS EQUAL max_readers=DECIMAL)?
+           (COMMA? EXECUTE AS (SELF | user_name=STRING | OWNER))?
+           (COMMA? POISON_MESSAGE_HANDLING STATUS EQUAL (ON | OFF))?
+           (COMMA? DROP)?
+         RR_BRACKET)?
+    ;
+
+alter_queue
+    : ALTER QUEUE (full_table_name | queue_name=id)
+      (queue_settings | queue_action)
+    ;
+
+queue_action
+    : REBUILD ( WITH LR_BRACKET queue_rebuild_options RR_BRACKET)?
+    | REORGANIZE (WITH LOB_COMPACTION EQUAL (ON | OFF))?
+    | MOVE TO (id | DEFAULT)
+    ;
+queue_rebuild_options
+    : MAXDOP EQUAL DECIMAL
+    ;
+
+create_contract
+    : CREATE CONTRACT contract_name
+      (AUTHORIZATION owner_name=id)?
+      LR_BRACKET ((message_type_name=id | DEFAULT)
+          SENT BY (INITIATOR | TARGET | ANY ) COMMA?)+
+      RR_BRACKET
+    ;
+
+conversation_statement
+    : begin_conversation_timer
+    | begin_conversation_dialog
+    | end_conversation
+    | get_conversation
+    | send_conversation
+    | waitfor_conversation
+    ;
+
+message_statement
+    : CREATE MESSAGE TYPE message_type_name=id
+      (AUTHORIZATION owner_name=id)?
+      (VALIDATION EQUAL (NONE
+      | EMPTY
+      | WELL_FORMED_XML
+      | VALID_XML WITH SCHEMA COLLECTION schema_collection_name=id))
     ;
 
 // DML
@@ -142,7 +206,7 @@ another_statement
 merge_statement
     : with_expression?
       MERGE (TOP '(' expression ')' PERCENT?)?
-      INTO? ddl_object insert_with_table_hints? (AS? ID)?
+      INTO? ddl_object insert_with_table_hints? as_table_alias?
       USING table_sources
       ON search_condition
       (WHEN MATCHED (AND search_condition)?
@@ -204,9 +268,19 @@ insert_statement_value
     | DEFAULT VALUES
     ;
 
+receive_statement
+    : '('? RECEIVE (ALL | DISTINCT | top_clause | '*') 
+      (LOCAL_ID '=' expression ','?)* FROM full_table_name
+      (INTO table_variable=id (WHERE where=search_condition))? ')'?
+    ;
+
 // https://msdn.microsoft.com/en-us/library/ms189499.aspx
 select_statement
     : with_expression? query_expression order_by_clause? for_clause? option_clause? ';'?
+    ;
+
+time
+    : (LOCAL_ID | constant)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms177523.aspx
@@ -310,7 +384,6 @@ create_or_alter_function
     : (CREATE | ALTER) FUNCTION func_proc_name
         (('(' procedure_param (',' procedure_param)* ')') | '(' ')') //must have (), but can be empty
         (func_body_returns_select | func_body_returns_table | func_body_returns_scalar) ';'?
-
     ;
 
 func_body_returns_select
@@ -329,7 +402,6 @@ func_body_returns_table
            RETURN
         END 
   ;
-
 
 func_body_returns_scalar
   :RETURNS data_type
@@ -352,7 +424,9 @@ procedure_option
     ;
 
 function_option
-    : RETURNS NULL ON NULL INPUT
+    : ENCRYPTION
+    | SCHEMABINDING
+    | RETURNS NULL ON NULL INPUT
     | CALLED ON NULL INPUT
     | execute_clause
     ;
@@ -609,8 +683,10 @@ drop_view
     : DROP VIEW (IF EXISTS)? simple_name (',' simple_name)* ';'?
     ;
 
-create_type:
-    CREATE TYPE name = simple_name FROM data_type default_value
+create_type
+    : CREATE TYPE name = simple_name
+      (FROM data_type default_value)?
+      (AS TABLE LR_BRACKET column_def_table_constraints RR_BRACKET)?
     ;
 
 drop_type:
@@ -639,6 +715,8 @@ opendatasource
 declare_statement
     : DECLARE LOCAL_ID AS? table_type_definition ';'?
     | DECLARE declare_local (',' declare_local)* ';'?
+    | DECLARE LOCAL_ID AS? xml_type_definition ';'?
+    | WITH XMLNAMESPACES '(' xml_namespace_uri=STRING ','? AS id ')' ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms181441(v=sql.120).aspx
@@ -657,7 +735,7 @@ cursor_statement
 
 // https://msdn.microsoft.com/en-us/library/ms188332.aspx
 execute_statement
-    : EXECUTE (return_status=LOCAL_ID '=')? func_proc_name (execute_statement_arg (',' execute_statement_arg)*)? ';'?
+    : EXECUTE (return_status=LOCAL_ID '=')? (func_proc_name | expression) (execute_statement_arg (',' execute_statement_arg)*)? ';'?
     | EXECUTE '(' execute_var_string ('+' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? ';'?
     ;
 
@@ -678,6 +756,88 @@ security_statement
     | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO (to_principal+=id) (',' to_principal+=id)* (WITH GRANT OPTION)? (AS as_principal=id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
+    | open_key
+    | close_key
+    | create_key
+    | create_certificate
+    ;
+
+create_certificate
+    : CREATE CERTIFICATE certificate_name=id (AUTHORIZATION user_name=id)?
+      (FROM existing_keys | generate_new_keys)
+      (ACTIVE FOR BEGIN DIALOG '=' (ON | OFF))?
+    ;
+
+existing_keys
+    : ASSEMBLY assembly_name=id
+    | EXECUTABLE? FILE EQUAL path_to_file=STRING (WITH PRIVATE KEY '(' private_key_options ')')?
+    ;
+
+private_key_options
+    : (FILE | BINARY) '=' path=STRING (',' (DECRYPTION | ENCRYPTION) BY PASSWORD '=' password=STRING)?
+    ;
+
+generate_new_keys
+    : (ENCRYPTION BY PASSWORD '=' password=STRING)?
+      WITH SUBJECT EQUAL certificate_subject_name=STRING (',' date_options)*
+    ;
+
+date_options
+    : (START_DATE | EXPIRY_DATE) EQUAL STRING
+    ;
+
+open_key
+    : OPEN SYMMETRIC KEY key_name=id DECRYPTION BY decryption_mechanism
+    | OPEN MASTER_KEY DECRYPTION BY PASSWORD '=' password=STRING
+    ;
+
+close_key
+    : CLOSE SYMMETRIC KEY key_name=id
+    | CLOSE ALL SYMMETRIC KEYS
+    | CLOSE MASTER_KEY
+    ;
+
+create_key
+    : CREATE MASTER_KEY ENCRYPTION BY PASSWORD '=' password=STRING
+    | CREATE SYMMETRIC KEY key_name=id
+      (AUTHORIZATION user_name=id)?
+      (FROM PROVIDER provider_name=id)?
+      WITH ((key_options | ENCRYPTION BY encryption_mechanism)','?)+
+    ;
+
+key_options
+    : KEY_SOURCE EQUAL pass_phrase=STRING
+    | ALGORITHM EQUAL algorithm
+    | IDENTITY_VALUE EQUAL identity_phrase=STRING
+    | PROVIDER_KEY_NAME EQUAL key_name_in_provider=STRING
+    | CREATION_DISPOSITION EQUAL (CREATE_NEW | OPEN_EXISTING)
+    ;
+
+algorithm
+    : 'DES'
+    | 'TRIPLE_DES'
+    | 'TRIPLE_DES_3KEY'
+    | 'RC2'
+    | 'RC4'
+    | 'RC4_128'
+    | 'DESX'
+    | 'AES_128'
+    | 'AES_192'
+    | 'AES_256'
+    ;
+
+encryption_mechanism
+    : CERTIFICATE certificate_name=id
+    | ASYMMETRIC KEY asym_key_name=id
+    | SYMMETRIC KEY decrypting_Key_name=id
+    | PASSWORD '=' STRING
+    ;
+
+decryption_mechanism
+    : CERTIFICATE certificate_name=id (WITH PASSWORD EQUAL STRING)?
+    | ASYMMETRIC KEY asym_key_name=id (WITH PASSWORD EQUAL STRING)?
+    | SYMMETRIC KEY decrypting_Key_name=id
+    | PASSWORD EQUAL STRING
     ;
 
 grant_permission
@@ -746,11 +906,19 @@ execute_clause
     ;
 
 declare_local
-    : LOCAL_ID AS? data_type ('=' expression)?
+    : LOCAL_ID AS? data_type ('=' expression)? expression?
     ;
 
 table_type_definition
     : TABLE '(' column_def_table_constraints ')'
+    ;
+    
+xml_type_definition
+    : XML '(' ( CONTENT | DOCUMENT )? xml_schema_collection ')'
+    ;
+    
+xml_schema_collection
+    : ID '.' ID
     ;
 
 column_def_table_constraints
@@ -765,7 +933,7 @@ column_def_table_constraint
 // https://msdn.microsoft.com/en-us/library/ms187742.aspx
 column_definition
     : id (data_type | AS expression) (COLLATE id)? null_notnull?
-      ((CONSTRAINT constraint=id)? null_notnull? DEFAULT constant_expression (WITH VALUES)?
+      ((CONSTRAINT constraint=id)? null_or_default null_or_default?
        | IDENTITY ('(' seed=DECIMAL ',' increment=DECIMAL ')')? (NOT FOR REPLICATION)?)?
       ROWGUIDCOL?
       column_constraint*
@@ -773,10 +941,11 @@ column_definition
 
 // https://msdn.microsoft.com/en-us/library/ms186712.aspx
 column_constraint
-    :(CONSTRAINT constraint=id)? null_notnull?
+    :(CONSTRAINT constraint=id)?
       ((PRIMARY KEY | UNIQUE) clustered? index_options?
       | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
-      | (FOREIGN KEY)? REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
+      | (FOREIGN KEY)? REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?
+      | null_notnull)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
@@ -784,7 +953,7 @@ table_constraint
     : (CONSTRAINT constraint=id)?
        ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list_with_order ')' index_options? (ON id)? 
          | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
-         | DEFAULT '('?  function_call ')'? FOR id
+         | DEFAULT '('?  (STRING | PLUS | function_call | DECIMAL)+ ')'? FOR id
          | FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
     ;
 
@@ -845,6 +1014,8 @@ set_special
     | SET ANSI_NULLS on_off
     | SET QUOTED_IDENTIFIER on_off
     | SET ANSI_PADDING on_off
+    | SET ANSI_WARNINGS on_off
+    | SET modify_method
     ;
 
 constant_LOCAL_ID
@@ -876,7 +1047,7 @@ expression
     | op=('+' | '-') expression                                #unary_operator_expression
     | expression op=('+' | '-' | '&' | '^' | '|') expression   #binary_operator_expression
     | expression comparison_operator expression                #binary_operator_expression
-
+    | expression assignment_operator expression                #asssignment_operator_expression
     | over_clause                                              #over_clause_expression
     ;
 
@@ -981,12 +1152,12 @@ order_by_clause
 // https://msdn.microsoft.com/en-us/library/ms173812.aspx
 for_clause
     : FOR BROWSE
-    | FOR XML AUTO xml_common_directives?
-    | FOR XML PATH ('(' STRING ')')? xml_common_directives?
+    | FOR XML xml_common_directives?
+    | FOR XML (AUTO | RAW | PATH | EXPLICIT) ','? ('(' STRING ')')? xml_common_directives*
     ;
 
 xml_common_directives
-    : ',' (BINARY BASE64 | TYPE | ROOT)
+    : ',' (BINARY_BASE64 | TYPE | ROOT)
     ;
 
 order_by_expression
@@ -1027,7 +1198,7 @@ option
     ;
 
 optimize_for_arg
-    : LOCAL_ID (UNKNOWN | '=' constant)
+    : LOCAL_ID (UNKNOWN | '=' (constant | NULL))
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms176104.aspx
@@ -1057,14 +1228,31 @@ table_source_item_joined
 
 table_source_item
     : table_name_with_hint        as_table_alias?
+    | full_table_name             as_table_alias?
     | rowset_function             as_table_alias?
     | derived_table              (as_table_alias column_alias_list?)?
     | change_table                as_table_alias
     | function_call               as_table_alias?
     | LOCAL_ID                    as_table_alias?
     | LOCAL_ID '.' function_call (as_table_alias column_alias_list?)?
+    | open_xml
+    | ':' ':' function_call       as_table_alias? // Build-in function (old syntax)
     ;
 
+//https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
+open_xml
+    : OPENXML '(' expression ',' expression (',' expression)? ')' 
+    (WITH '(' schema_declaration ')' )?
+    ;
+
+schema_declaration
+    : column_declaration (',' column_declaration)*
+    ;
+
+column_declaration
+    : ID data_type (STRING)?
+    ;
+    
 change_table
     : CHANGETABLE '(' CHANGES table_name ',' (NULL | DECIMAL | LOCAL_ID) ')'
     ;
@@ -1078,6 +1266,20 @@ join_part
     | CROSS JOIN table_source
     | CROSS APPLY table_source
     | OUTER APPLY table_source
+    | PIVOT pivot_clause as_table_alias
+    | UNPIVOT unpivot_clause as_table_alias    
+    ;
+
+pivot_clause
+    : '(' aggregate_windowed_function FOR full_column_name IN column_alias_list ')'
+    ;
+
+unpivot_clause
+    : '(' expression FOR full_column_name IN '(' full_column_name_list ')' ')'
+    ; 
+
+full_column_name_list
+    : full_column_name (',' full_column_name)*
     ;
 
 table_name_with_hint
@@ -1100,6 +1302,8 @@ bulk_option
 derived_table
     : subquery
     | '(' subquery ')'
+    | table_value_constructor
+    | '(' table_value_constructor ')'    
     ;
 
 function_call
@@ -1138,11 +1342,46 @@ function_call
     | MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
     | NULLIF '(' expression ',' expression ')'
+    // https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
+    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms177587.aspx
     | SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
     | SYSTEM_USER
+    // https://msdn.microsoft.com/en-us/library/ms184325.aspx
+    | ISNULL '(' expression ',' expression ')'
+    // https://docs.microsoft.com/en-us/sql/t-sql/xml/xml-data-type-methods
+    | xml_data_type_methods
     ;
+
+xml_data_type_methods
+    : value_method
+    | query_method
+    | exist_method
+    | modify_method
+    | nodes_method
+    ;
+
+value_method
+    : (LOCAL_ID | ID | EVENTDATA | query_method) '.value(' xquery=STRING ',' sqltype=STRING ')'
+    ;
+
+query_method
+    : (LOCAL_ID | ID | full_table_name) '.query(' xquery=STRING ')'
+    ;
+
+exist_method
+    : (LOCAL_ID | ID) '.exist(' xquery=STRING ')'
+    ;
+
+modify_method
+    : (LOCAL_ID | ID) '.modify(' xml_dml=STRING ')'
+    ;
+
+nodes_method
+    : (LOCAL_ID | ID) '.nodes(' xquery=STRING ')'
+    ;
+
 
 switch_section
     : WHEN expression THEN expression
@@ -1352,12 +1591,65 @@ null_notnull
     : NOT? NULL
     ;
 
+null_or_default
+    :(null_notnull | DEFAULT constant_expression (WITH VALUES)?)
+    ;
+
 scalar_function_name
     : func_proc_name
     | RIGHT
     | LEFT
     | BINARY_CHECKSUM
     | CHECKSUM
+    ;
+
+begin_conversation_timer
+    : BEGIN CONVERSATION TIMER '(' LOCAL_ID ')' TIMEOUT '=' time ';'?
+    ;
+
+begin_conversation_dialog
+    : BEGIN DIALOG (CONVERSATION)? dialog_handle=LOCAL_ID
+      FROM SERVICE initiator_service_name=service_name
+      TO SERVICE target_service_name=service_name (',' service_broker_guid=STRING)?
+      ON CONTRACT contract_name
+      (WITH
+        ((RELATED_CONVERSATION | RELATED_CONVERSATION_GROUP) '=' LOCAL_ID ','?)?
+        (LIFETIME '=' (DECIMAL | LOCAL_ID) ','?)?
+        (ENCRYPTION '=' (ON | OFF))? )?
+      ';'?
+    ;
+
+contract_name
+    : (id | expression)
+    ;
+
+service_name
+    : (id | expression)
+    ;
+
+end_conversation
+    : END CONVERSATION conversation_handle=LOCAL_ID ';'?
+      (WITH (ERROR '=' faliure_code=(LOCAL_ID | STRING) 'DESCRIPTION' '=' failure_text=(LOCAL_ID | STRING))? CLEANUP? )?
+    ;
+
+waitfor_conversation
+    : WAITFOR? '(' get_conversation ')' (','? TIMEOUT timeout=time)? ';'?
+    ;
+
+get_conversation
+    :GET CONVERSATION GROUP conversation_group_id=(STRING | LOCAL_ID) FROM queue=queue_id ';'?
+    ;
+
+queue_id
+    : (database_name=id '.' schema_name=id '.' name=id)
+    | id
+    ;
+
+send_conversation
+    : SEND ON CONVERSATION conversation_handle=(STRING | LOCAL_ID)
+      MESSAGE TYPE message_type_name=expression
+      ('(' message_body_expression=(STRING | LOCAL_ID) ')' )?
+      ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187752.aspx
@@ -1401,6 +1693,7 @@ data_type
 
 default_value
     : NULL
+    | DEFAULT
     | constant
     ;
 
@@ -1431,7 +1724,6 @@ simple_id
     | APPLY
     | AUTO
     | AVG
-    | BASE64
     | CALLED
     | CALLER
     | CAST
@@ -1593,6 +1885,7 @@ ANY:                                   A N Y;
 APPEND:                                A P P E N D;
 AS:                                    A S;
 ASC:                                   A S C;
+ASYMMETRIC:                            A S Y M M E T R I C;
 AUTHORIZATION:                         A U T H O R I Z A T I O N;
 BACKUP:                                B A C K U P;
 BEGIN:                                 B E G I N;
@@ -1604,6 +1897,7 @@ BY:                                    B Y;
 CALLED:                                C A L L E D;
 CASCADE:                               C A S C A D E;
 CASE:                                  C A S E;
+CERTIFICATE:                           C E R T I F I C A T E;
 CHANGETABLE:                           C H A N G E T A B L E;
 CHANGES:                               C H A N G E S;
 CHECK:                                 C H E C K;
@@ -1620,6 +1914,8 @@ CONTAINMENT:                           C O N T A I N M E N T;
 CONTAINS:                              C O N T A I N S;
 CONTAINSTABLE:                         C O N T A I N S T A B L E;
 CONTINUE:                              C O N T I N U E;
+CONTRACT:                              C O N T R A C T;
+CONVERSATION:                          C O N V E R S A T I O N;
 CONVERT:                               (T R Y '_')? C O N V E R T;
 CREATE:                                C R E A T E;
 CROSS:                                 C R O S S;
@@ -1648,6 +1944,7 @@ ELSE:                                  E L S E;
 END:                                   E N D;
 ERRLVL:                                E R R L V L;
 ESCAPE:                                E S C A P E;
+ERROR:                                 E R R O R;
 EVENTDATA:                             E V E N T D A T A '(' ')';
 EXCEPT:                                E X C E P T;
 EXECUTE:                               E X E C (U T E)?;
@@ -1666,6 +1963,7 @@ FREETEXTTABLE:                         F R E E T E X T T A B L E;
 FROM:                                  F R O M;
 FULL:                                  F U L L;
 FUNCTION:                              F U N C T I O N;
+GET:                                   G E T;
 GOTO:                                  G O T O;
 GRANT:                                 G R A N T;
 GROUP:                                 G R O U P;
@@ -1683,10 +1981,12 @@ INSTEAD:                               I N S T E A D;
 INTERSECT:                             I N T E R S E C T;
 INTO:                                  I N T O;
 IS:                                    I S;
+ISNULL:                                I S N U L L;
 JOIN:                                  J O I N;
 KEY:                                   K E Y;
 KILL:                                  K I L L;
 LEFT:                                  L E F T;
+LIFETIME:                              L I F E T I M E;
 LIKE:                                  L I K E;
 LINENO:                                L I N E N O;
 LOAD:                                  L O A D;
@@ -1716,6 +2016,7 @@ OUTER:                                 O U T E R;
 OVER:                                  O V E R;
 PAGE:                                  P A G E;
 PARTIAL:                               P A R T I A L;
+PASSWORD:                              P A S S W O R D;
 PERCENT:                               P E R C E N T;
 PIVOT:                                 P I V O T;
 PLAN:                                  P L A N;
@@ -1731,6 +2032,8 @@ READ:                                  R E A D;
 READTEXT:                              R E A D T E X T;
 RECONFIGURE:                           R E C O N F I G U R E;
 REFERENCES:                            R E F E R E N C E S;
+RELATED_CONVERSATION:                  R E L A T E D '_' C O N V E R S A T I O N;
+RELATED_CONVERSATION_GROUP:            R E L A T E D '_' C O N V E R S A T I O N '_' G R O U P;
 REPLICATION:                           R E P L I C A T I O N;
 RESTORE:                               R E S T O R E;
 RESTRICT:                              R E S T R I C T;
@@ -1751,6 +2054,7 @@ SEMANTICKEYPHRASETABLE:                S E M A N T I C K E Y P H R A S E T A B L
 SEMANTICSIMILARITYDETAILSTABLE:        S E M A N T I C S I M I L A R I T Y D E T A I L S T A B L E;
 SEMANTICSIMILARITYTABLE:               S E M A N T I C S I M I L A R I T Y T A B L E;
 SERVER:                                S E R V E R;
+SERVICE:                               S E R V I C E;
 SESSION_USER:                          S E S S I O N '_' U S E R;
 SET:                                   S E T;
 SETUSER:                               S E T U S E R;
@@ -1792,8 +2096,11 @@ WRITETEXT:                             W R I T E T E X T;
 // Additional keywords (they can be id).
 ABSOLUTE:                              A B S O L U T E;
 ACTION:                                A C T I O N;
+ACTIVE:                                A C T I V E;
+ACTIVATION:                            A C T I V A T I O N;
 AFTER:                                 A F T E R;
-ALLOWED:                               A L L O W E D; 
+ALGORITHM:                             A L G O R I T H M;
+ALLOWED:                               A L L O W E D;
 ALLOW_SNAPSHOT_ISOLATION:              A L L O W '_' S N A P S H O T '_' I S O L A T I O N;
 ANSI_NULLS:                            A N S I '_' N U L L S;
 ANSI_NULL_DEFAULT:                     A N S I '_' N U L L '_' D E F A U L T;
@@ -1801,6 +2108,7 @@ ANSI_PADDING:                          A N S I '_' P A D D I N G;
 ANSI_WARNINGS:                         A N S I '_' W A R N I N G S;
 APPLY:                                 A P P L Y;
 ARITHABORT:                            A R I T H A B O R T;
+ASSEMBLY:                              A S S E M B L Y;
 AUTO:                                  A U T O;
 AUTO_CLEANUP:                          A U T O '_' C L E A N U P; 
 AUTO_CLOSE:                            A U T O '_' C L O S E;
@@ -1809,7 +2117,7 @@ AUTO_SHRINK:                           A U T O '_' S H R I N K;
 AUTO_UPDATE_STATISTICS:                A U T O '_' U P D A T E '_' S T A T I S T I C S;
 AUTO_UPDATE_STATISTICS_ASYNC:          A U T O '_' U P D A T E '_' S T A T I S T I C S '_' A S Y N C;
 AVG:                                   A V G;
-BASE64:                                B A S E '64';
+BINARY_BASE64:                         B I N A R Y ' ' B A S E '6' '4';
 BINARY_CHECKSUM:                       B I N A R Y '_' C H E C K S U M;
 BULK_LOGGED:                           B U L K '_' L O G G E D; 
 CALLER:                                C A L L E R;
@@ -1819,14 +2127,19 @@ CHANGE_RETENTION:                      C H A N G E '_' R E T E N T I O N;
 CHANGE_TRACKING:                       C H A N G E '_' T R A C K I N G; 
 CHECKSUM:                              C H E C K S U M;
 CHECKSUM_AGG:                          C H E C K S U M '_' A G G;
+CLEANUP:                               C L E A N U P;
+COLLECTION:                            C O L L E C T I O N;
 COMMITTED:                             C O M M I T T E D;
-COMPATIBILITY_LEVEL:                   C O M P A T I B I L I T Y '_' L E V E L;                           
+COMPATIBILITY_LEVEL:                   C O M P A T I B I L I T Y '_' L E V E L;
 CONCAT:                                C O N C A T;
 CONCAT_NULL_YIELDS_NULL:               C O N C A T '_' N U L L '_' Y I E L D S '_' N U L L;
+CONTENT:                               C O N T E N T;
 CONTROL:                               C O N T R O L;
 COOKIE:                                C O O K I E;
 COUNT:                                 C O U N T;
 COUNT_BIG:                             C O U N T '_' B I G;
+CREATE_NEW:                            C R E A T E '_' N E W;
+CREATION_DISPOSITION:                  C R E A T I O N '_' D I S P O S I T I O N;
 CURSOR_CLOSE_ON_COMMIT:                C U R S O R '_' C L O S E '_' O N '_' C O M M I T;
 CURSOR_DEFAULT:                        C U R S O R '_' D E F A U L T;
 DATEADD:                               D A T E A D D;
@@ -1836,22 +2149,29 @@ DATEPART:                              D A T E P A R T;
 DATE_CORRELATION_OPTIMIZATION:         D A T E '_' C O R R E L A T I O N '_' O P T I M I Z A T I O N;
 DAYS:                                  D A Y S;
 DB_CHAINING:                           D B '_' C H A I N I N G;
+DECRYPTION:                            D E C R Y P T I O N;
 DEFAULT_FULLTEXT_LANGUAGE:             D E F A U L T '_' F U L L T E X T '_' L A N G U A G E;
 DEFAULT_LANGUAGE:                      D E F A U L T '_' L A N G U A G E;
 DELAY:                                 D E L A Y;
 DELAYED_DURABILITY:                    D E L A Y E D '_' D U R A B I L I T Y;
 DELETED:                               D E L E T E D;
 DENSE_RANK:                            D E N S E '_' R A N K;
+DIALOG:                                D I A L O G;
 DIRECTORY_NAME:                        D I R E C T O R Y '_' N A M E;
 DISABLE:                               D I S A B L E;
 DISABLED:                              D I S A B L E D; 
-DISABLE_BROKER:                        D I S A B L E '_' B R O K E R;  
+DISABLE_BROKER:                        D I S A B L E '_' B R O K E R;
+DOCUMENT:                              D O C U M E N T;
 DYNAMIC:                               D Y N A M I C;
 EMERGENCY:                             E M E R G E N C Y; 
+EMPTY:                                 E M P T Y;
 ENABLE_BROKER:                         E N A B L E '_' B R O K E R;
 ENCRYPTION:                            E N C R Y P T I O N;
 ERROR_BROKER_CONVERSATIONS:            E R R O R '_' B R O K E R '_' C O N V E R S A T I O N S; 
+EXECUTABLE:                            E X E C U T A B L E;
 EXPAND:                                E X P A N D;
+EXPIRY_DATE:                           E X P I R Y '_' D A T E;
+EXPLICIT:                              E X P L I C I T;
 FAST:                                  F A S T;
 FAST_FORWARD:                          F A S T '_' F O R W A R D;
 FILEGROUP:                             F I L E G R O U P;
@@ -1874,10 +2194,12 @@ HADR:                                  H A D R;
 HASH:                                  H A S H;
 HONOR_BROKER_PRIORITY:                 H O N O R '_' B R O K E R '_' P R I O R I T Y;
 HOURS:                                 H O U R S; 
+IDENTITY_VALUE:                        I D E N T I T Y '_' V A L U E;
 IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX: I G N O R E '_' N O N C L U S T E R E D '_' C O L U M N S T O R E '_' I N D E X;
 IMMEDIATE:                             I M M E D I A T E;
 IMPERSONATE:                           I M P E R S O N A T E;
 INCREMENTAL:                           I N C R E M E N T A L;
+INITIATOR:                             I N I T I A T O R;
 INPUT:                                 I N P U T;
 INSENSITIVE:                           I N S E N S I T I V E;
 INSERTED:                              I N S E R T E D;
@@ -1886,17 +2208,23 @@ KB:                                    K B;
 KEEP:                                  K E E P;
 KEEPFIXED:                             K E E P F I X E D;
 KEYSET:                                K E Y S E T;
+KEYS:                                  K E Y S;
+KEY_SOURCE:                            K E Y '_' S O U R C E;
 LAST:                                  L A S T;
 LEVEL:                                 L E V E L;
+LOB_COMPACTION:                        L O B '_' C O M P A C T I O N;
 LOCAL:                                 L O C A L;
 LOCK_ESCALATION:                       L O C K '_' E S C A L A T I O N;
 LOGIN:                                 L O G I N;
 LOOP:                                  L O O P;
 MARK:                                  M A R K;
+MASTER_KEY:                            M A S T E R ' '  K E Y;
 MAX:                                   M A X;
+MAX_QUEUE_READERS:                     M A X '_' Q U E U E '_' R E A D E R S;
 MAXDOP:                                M A X D O P;
 MAXRECURSION:                          M A X R E C U R S I O N;
 MAXSIZE:                               M A X S I Z E;
+MESSAGE:                               M E S S A G E;
 MB:                                    M B;
 MEMORY_OPTIMIZED_DATA:                 M E M O R Y '_' O P T I M I Z E D '_' D A T A;
 MIN:                                   M I N;
@@ -1904,6 +2232,7 @@ MINUTES:                               M I N U T E S;
 MIN_ACTIVE_ROWVERSION:                 M I N '_' A C T I V E '_' R O W V E R S I O N;
 MIXED_PAGE_ALLOCATION:                 M I X E D '_' P A G E '_' A L L O C A T I O N; 
 MODIFY:                                M O D I F Y;
+MOVE:                                  M O V E;
 MULTI_USER:                            M U L T I '_' U S E R;
 NAME:                                  N A M E;
 NESTED_TRIGGERS:                       N E S T E D '_' T R I G G E R S;
@@ -1922,6 +2251,7 @@ OFFLINE:                               O F F L I N E;
 OFFSET:                                O F F S E T;
 ONLINE:                                O N L I N E; 
 ONLY:                                  O N L Y;
+OPEN_EXISTING:                         O P E N '_' E X I S T I N G;
 OPTIMISTIC:                            O P T I M I S T I C;
 OPTIMIZE:                              O P T I M I Z E;
 OUT:                                   O U T;
@@ -1931,9 +2261,15 @@ PAGE_VERIFY:                           P A G E '_' V E R I F Y;
 PARAMETERIZATION:                      P A R A M E T E R I Z A T I O N;
 PARTITION:                             P A R T I T I O N;
 PATH:                                  P A T H;
+POISON_MESSAGE_HANDLING:               P O I S O N '_' M E S S A G E '_' H A N D L I N G;
 PRECEDING:                             P R E C E D I N G;
 PRIOR:                                 P R I O R;
+PRIVATE:                               P R I V A T E;
 PRIVILEGES:                            P R I V I L E G E S;
+PROCEDURE_NAME:                        P R O C E D U R E '_' N A M E;
+PROVIDER:                              P R O V I D E R;
+PROVIDER_KEY_NAME:                     P R O V I D E R '_' K E Y '_' N A M E;
+QUEUE:                                 Q U E U E;
 QUOTED_IDENTIFIER:                     Q U O T E D '_' I D E N T I F I E R;
 RANGE:                                 R A N G E;
 RANK:                                  R A N K;
@@ -1943,12 +2279,15 @@ READ_ONLY:                             R E A D '_' O N L Y;
 READ_WRITE:                            R E A D '_' W R I T E;
 REBUILD:                               R E B U I L D;
 RECOMPILE:                             R E C O M P I L E;
+RECEIVE:                               R E C E I V E;
 RECOVERY:                              R E C O V E R Y;
 RECURSIVE_TRIGGERS:                    R E C U R S I V E '_' T R I G G E R S;
 RELATIVE:                              R E L A T I V E;
+REORGANIZE:                            R E O R G A N I Z E;
 REMOTE:                                R E M O T E;
 REPEATABLE:                            R E P E A T A B L E;
 RESTRICTED_USER:                       R E S T R I C T E D '_' U S E R; 
+RETENTION:                             R E T E N T I O N;
 ROBUST:                                R O B U S T;
 ROOT:                                  R O O T;
 ROW:                                   R O W;
@@ -1961,18 +2300,26 @@ SCROLL:                                S C R O L L;
 SCROLL_LOCKS:                          S C R O L L '_' L O C K S;
 SECONDS:                               S E C O N D S;
 SELF:                                  S E L F;
+SEND:                                  S E N D;
+SENT:                                  S E N T;
 SERIALIZABLE:                          S E R I A L I Z A B L E;
+SETERROR:                              S E T E R R O R;
 SHOWPLAN:                              S H O W P L A N;
 SIMPLE:                                S I M P L E;
 SINGLE_USER:                           S I N G L E '_' U S E R; 
 SIZE:                                  S I Z E;
 SNAPSHOT:                              S N A P S H O T;
 SPATIAL_WINDOW_MAX_CELLS:              S P A T I A L '_' W I N D O W '_' M A X '_' C E L L S;
+START_DATE:                            S T A R T '_' D A T E;
 STATIC:                                S T A T I C;
 STATS_STREAM:                          S T A T S '_' S T R E A M;
+STATUS:                                S T A T U S;
 STDEV:                                 S T D E V;
 STDEVP:                                S T D E V P;
+SUBJECT:                               S U B J E C T;
+STUFF:                                 S T U F F;
 SUM:                                   S U M;
+SYMMETRIC:                             S Y M M E T R I C;
 TAKE:                                  T A K E;
 TARGET_RECOVERY_TIME:                  T A R G E T '_' R E C O V E R Y '_' T I M E;
 TB:                                    T B;
@@ -1980,6 +2327,8 @@ TEXTIMAGE_ON:                          T E X T I M A G E '_' O N;
 THROW:                                 T H R O W;
 TIES:                                  T I E S;
 TIME:                                  T I M E;
+TIMER:                                 T I M E R;
+TIMEOUT:                               T I M E O U T;
 TORN_PAGE_DETECTION:                   T O R N '_' P A G E '_' D E T E C T I O N; 
 TRANSFORM_NOISE_WORDS:                 T R A N S F O R M '_' N O I S E '_' W O R D S;
 TRUSTWORTHY:                           T R U S T W O R T H Y;
@@ -1992,10 +2341,13 @@ UNCOMMITTED:                           U N C O M M I T T E D;
 UNKNOWN:                               U N K N O W N;
 UNLIMITED:                             U N L I M I T E D;
 USING:                                 U S I N G;
+VALIDATION:                            V A L I D A T I O N;
+VALID_XML:                             V A L I D '_' X M L;
 VAR:                                   V A R;
 VARP:                                  V A R P;
 VIEWS:                                 V I E W S;
 VIEW_METADATA:                         V I E W '_' M E T A D A T A;
+WELL_FORMED_XML:                       W E L L '_' F O R M E D '_' X M L;
 WORK:                                  W O R K;
 XML:                                   X M L;
 XMLNAMESPACES:                         X M L N A M E S P A C E S;

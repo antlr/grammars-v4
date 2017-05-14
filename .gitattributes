@@ -1,5 +1,5 @@
-# given the grammars context, avoid that git converts line endings
-* -crlf
+# Use \n line break for *.g4 and pom.xml files
+*.g4 eol=lf
+pom.xml eol=lf
 
 **/examples/* linguist-vendored
-
