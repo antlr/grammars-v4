@@ -12,14 +12,14 @@ CREATE TABLE dbo.TestTable (
   Name nvarchar(64) NOT NULL,
   ModifiedDateUTC SMALLDATETIME,
   CONSTRAINT UQ_TestTable_ID  UNIQUE (Value) WITH (DATA_COMPRESSION = PAGE),
-  CONSTRAINT PK_TestTable_ID PRIMARY KEY (TableID, Name)) 
+  CONSTRAINT PK_TestTable_ID PRIMARY KEY (TableID, Name))
   WITH (DATA_COMPRESSION = PAGE)
 GO
 
 -- Alter table drop constraint in transaction
 IF NOT EXISTS (SELECT * FROM sys.columns cols
   JOIN sys.types AS types ON cols.user_type_id = types.user_type_id
-WHERE object_id = OBJECT_ID('dbo.TestTable') 
+WHERE object_id = OBJECT_ID('dbo.TestTable')
   AND cols.name = 'ModifiedDateUTC'
   AND types.name = 'datetime')
 BEGIN
@@ -32,7 +32,7 @@ GO
 -- Alter table drop multiple constraints in transaction
 IF NOT EXISTS (SELECT * FROM sys.columns cols
   JOIN sys.types AS types ON cols.user_type_id = types.user_type_id
-WHERE object_id = OBJECT_ID('dbo.TestTable') 
+WHERE object_id = OBJECT_ID('dbo.TestTable')
   AND cols.name = 'ModifiedDateUTC'
   AND types.name = 'datetime')
 BEGIN
@@ -79,6 +79,33 @@ BEGIN
   ALTER TABLE dbo.TestTable
   DROP COLUMN Name
 END
+GO
 
 -- Drop Index Using Fully Qualified Name
 DROP INDEX dbo.TestTable.UIX_TestTable_Name_Value
+GO
+
+-- Alter Table Add Column With Default Constraint First
+ALTER TABLE TestTable
+  ADD Value BIT
+  CONSTRAINT DF_TestTable_Value DEFAULT(0) NOT NULL
+GO
+
+-- Alter Table Add Column With Null Constraint First
+ALTER TABLE TestTable
+  ADD Value BIT
+  CONSTRAINT DF_TestTable_Value NOT NULL DEFAULT(0)
+GO
+
+-- Alter Table Add Constraint To Column
+ALTER TABLE dbo.TestTable 
+  ADD CONSTRAINT DF_TestTable_Value DEFAULT(0) 
+  FOR Value
+GO
+
+-- Alter Table Add Constraint With String Concatenation
+ALTER TABLE dbo.TestTable
+  ADD CONSTRAINT DF_Name
+  DEFAULT('NONE_' + CONVERT(NVARCHAR(40),NEWID())) 
+  FOR Name
+GO

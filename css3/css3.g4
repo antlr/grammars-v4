@@ -1,11 +1,19 @@
 grammar css3;
 
 stylesheet
-	: importRule* (nested | ruleset)+
+	: (namespace | charset | importRule | nested | ruleset)+ 
 	;
-
+	
+namespace
+	: '@namespace' IDENT* STRING 
+	;
+	
+charset
+	:'@charset' STRING 
+	;
+	
 importRule
-	: ('@import' | '@include')  STRING 
+	: ('@import' | '@include')  (STRING|URI) (IDENT|',' IDENT)* 
 	;
 
 nested
@@ -17,7 +25,7 @@ nest
 	;
 	
 ruleset
- 	: selectors '{' properties? '}'
+ 	: selectors '{' properties* '}'
 	;
 	
 selectors
@@ -42,9 +50,17 @@ properties
 	;
 	
 elem
-	:     IDENT 
-	| '#' IDENT 
-	| '.' IDENT 
+	:(IDENT)+ 
+	|(idSelector)+ 
+	|(classSelector)+ 
+	;
+
+idSelector
+	:'#' IDENT
+	;
+	
+classSelector
+	:'.' IDENT
 	;
 
 pseudo
@@ -108,7 +124,7 @@ COLOR
 	;
 
 SL_COMMENT
-	: '//' (~('\n'|'\r'))* ('\n'|'\r'('\n')?) ->skip
+	: '//' ~[\r\n]* -> skip
 	;
 	
 COMMENT
@@ -117,4 +133,7 @@ COMMENT
 
 WS	: ( ' ' | '\t' | '\r' | '\n' | '\f' )+ ->skip
 	;
-
+	
+URI 	: 'url(' (~('\n'|'\r'))* ')'? 
+	;
+SEMICOLON : ';' -> skip;
