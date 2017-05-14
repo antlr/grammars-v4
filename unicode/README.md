@@ -1,19 +1,12 @@
-Unicode-9.0.0
-=============
+# Unicode-9.0.0
 
-0: Highlights
-=============
-ANTLR4:
-```
-| ----------------- | --------------------------------------------------- |
+## Highlights
+
 | FILE              | CONTENTS                                            |
 | ----------------- | --------------------------------------------------- |
 | classify16.g4     | ANTLR4 import grammar for codepoint classification  |
 | classify21.g4     | 21 bit import grammar for codepoint classification  |
-| ----------------- | --------------------------------------------------- |
 | README.grammar.md | This file                                           |
-| ----------------- | --------------------------------------------------- |
-```
 
 Unicode.org maintains authoritative/normative sources for all unicode data.
 These data are stored in rigorously maintained files with rules for changes.
@@ -43,6 +36,7 @@ For instance Ll(Letter lowercase) and Lu(Letter uppercase) are combined into
 L(Letter) in lexers, but do not appear as direct classifications.
 UnicodeData.txt column 3 and the gc list in PropertyValueAliases.txt
 contain and use these classifications.
+
 ```
 gc ; C  ; Other                  # Cc | Cf | Cn | Co | Cs
 gc ; Cc ; Control                ; cntrl

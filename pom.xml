@@ -28,7 +28,7 @@
 		<module>cobol85</module>
 		<module>cpp</module>
 		<module>creole</module>
-		<!-- C# runtime is not supported. <module>csharp</module> -->
+		<module>csharp</module>
 		<module>css3</module>
 		<module>csv</module>
 		<module>datetime</module>
@@ -56,6 +56,7 @@
 		<module>javadoc</module>
 		<module>jpa</module>
 		<module>json</module>
+		<module>kotlin</module>
 		<module>kuka</module>
 		<module>lambda</module>
 		<module>less</module>
