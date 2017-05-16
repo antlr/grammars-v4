@@ -37,7 +37,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>document</entryPoint>
+					<entryPoint>program</entryPoint>
 					<grammarName>COOL</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
