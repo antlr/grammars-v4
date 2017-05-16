@@ -20,6 +20,7 @@
 		<module>atl</module>
 		<module>basic</module>
 		<module>bnf</module>
+		<module>brainfuck</module>
 		<module>c</module>
 		<module>calculator</module>
 		<module>clf</module>
