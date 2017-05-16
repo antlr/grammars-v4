@@ -430,7 +430,8 @@ elision
 ///     { PropertyNameAndValueList }
 ///     { PropertyNameAndValueList , }
 objectLiteral
- : '{' propertyNameAndValueList? ','? '}'
+ : '{' '}'
+ | '{' propertyNameAndValueList ','? '}'
  ;
 
 /// PropertyNameAndValueList :
