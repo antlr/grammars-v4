@@ -75,6 +75,7 @@
 		<module>mysql</module>
 		<!-- <module>objc</module> -->
 		<module>oncrpc</module>
+		<module>p</module>
 		<module>pascal</module>
 		<module>pcre</module>
 		<module>pddl</module>
