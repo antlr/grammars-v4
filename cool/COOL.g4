@@ -49,12 +49,12 @@ expression
   | LET OBJECTID ':' TYPEID (ASSIGNMENT expression)? (',' OBJECTID ':' TYPEID (ASSIGNMENT expression)?)* IN expression /* let num : Int <- num_cells() in */ #letIn
   | CASE expression OF (OBJECTID ':' TYPEID CASE_ARROW expression ';')+ ESAC #case
   | NEW TYPEID #new
+  | INTEGER_NEGATIVE expression #negative
   | ISVOID expression #isvoid
-  | expression ADD expression #add
-  | expression MINUS expression #minus
   | expression MULTIPLY expression #multiply
   | expression DIVISION expression #division
-  | INTEGER_NEGATIVE expression #negative
+  | expression ADD expression #add
+  | expression MINUS expression #minus
   | expression LESS_THAN expression #lessThan
   | expression LESS_EQUAL expression #lessEqual
   | expression EQUAL expression #equal
