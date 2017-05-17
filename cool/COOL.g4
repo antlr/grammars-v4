@@ -48,13 +48,13 @@ expression
   | '{' (expression ';')+ '}' #multipleExpression
   | LET OBJECTID ':' TYPEID (ASSIGNMENT expression)? (',' OBJECTID ':' TYPEID (ASSIGNMENT expression)?)* IN expression /* let num : Int <- num_cells() in */ #letIn
   | CASE expression OF (OBJECTID ':' TYPEID CASE_ARROW expression ';')+ ESAC #case
-  | NEW TYPEID #newType
+  | NEW TYPEID #new
   | ISVOID expression #isvoid
   | expression ADD expression #add
   | expression MINUS expression #minus
   | expression MULTIPLY expression #multiply
   | expression DIVISION expression #division
-  | INTEGER_COMPLEMENT expression #integerComplement
+  | INTEGER_NEGATIVE expression #negative
   | expression LESS_THAN expression #lessThan
   | expression LESS_EQUAL expression #lessEqual
   | expression EQUAL expression #equal
@@ -112,7 +112,7 @@ DIVISION: '/';
 LESS_THAN: '<';
 LESS_EQUAL: '<=';
 EQUAL: '=';
-INTEGER_COMPLEMENT: '~';
+INTEGER_NEGATIVE: '~';
 
 fragment A: [aA];
 fragment C: [cC];
