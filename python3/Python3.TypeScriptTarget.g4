@@ -45,6 +45,7 @@ tokens { INDENT, DEDENT }
   private token_queue: Token[] = [];
   private indents: number[] = [];
   private opened: number = 0;
+  private last_token: Token|undefined = undefined;
 
   @Override
   public reset(): void {
@@ -60,10 +61,15 @@ tokens { INDENT, DEDENT }
     super.reset();
   };
 
-
-  private emitToken(token: Token): void {
-    this.token = token;
+  @Override
+  public emit(token?: Token): Token {
+    if (token) {
+      token = super.emit(token);
+    } else {
+      token = super.emit();
+    }
     this.token_queue.push(token);
+    return token;
   };
 
   /**
@@ -73,9 +79,10 @@ tokens { INDENT, DEDENT }
    * literal.
    *
    */
+  @Override
   public nextToken(): Token {
     // Check if the end-of-file is ahead and there are still some DEDENTS expected.
-    if (this._input.LA(1) === Python3Parser.EOF && this.indents.length) {
+    if (this.inputStream.LA(1) === Python3Parser.EOF && this.indents.length) {
 
       // Remove any trailing EOF tokens from our buffer.
       this.token_queue = this.token_queue.filter(function(val) {
@@ -83,24 +90,34 @@ tokens { INDENT, DEDENT }
       });
 
       // First emit an extra line break that serves as the end of the statement.
-      this.emitToken(this.commonToken(Python3Parser.NEWLINE, "\n"));
+      this.emit(this.commonToken(Python3Parser.NEWLINE, "\n"));
 
       // Now emit as much DEDENT tokens as needed.
       while (this.indents.length) {
-        this.emitToken(this.createDedent());
+        this.emit(this.createDedent());
         this.indents.pop();
       }
 
       // Put the EOF back on the token stream.
-      this.emitToken(this.commonToken(Python3Parser.EOF, "<EOF>"));
+      this.emit(this.commonToken(Python3Parser.EOF, "<EOF>"));
     }
 
-    let next = Lexer.prototype.nextToken.call(this);
-    return this.token_queue.length ? this.token_queue.shift() : next;
+    let next = super.nextToken();
+
+    if (next.channel == Token.DEFAULT_CHANNEL) {
+      // Keep track of the last token on the default channel.
+      this.last_token = next;
+    }
+
+    return this.token_queue.shift() || next;
   }
 
   private createDedent(): Token {
-    return this.commonToken(Python3Parser.DEDENT, "");
+    let dedent = this.commonToken(Python3Parser.DEDENT, "");
+    if (this.last_token) {
+      dedent.line = this.last_token.line;
+    }
+    return dedent;
   }
 
   private commonToken(type: number, text: string): CommonToken {
@@ -737,14 +754,14 @@ NEWLINE
    ) {
      let newLine = this.text.replace(/[^\r\n]+/g, '');
      let spaces = this.text.replace(/[\r\n]+/g, '');
-     let next = this._input.LA(1);
+     let next = this.inputStream.LA(1);
 
      if (this.opened > 0 || next === 13 /* '\r' */ || next === 10 /* '\n' */ || next === 35 /* '#' */) {
        // If we're inside a list or on a blank line, ignore all indents,
        // dedents and line breaks.
        this.skip();
      } else {
-       this.emitToken(this.commonToken(Python3Parser.NEWLINE, newLine));
+       this.emit(this.commonToken(Python3Parser.NEWLINE, newLine));
 
        let indent = this.getIndentationCount(spaces);
        let previous = this.indents.length ? this.indents[this.indents.length - 1] : 0;
@@ -754,11 +771,11 @@ NEWLINE
          this.skip();
        } else if (indent > previous) {
          this.indents.push(indent);
-         this.emitToken(this.commonToken(Python3Parser.INDENT, spaces));
+         this.emit(this.commonToken(Python3Parser.INDENT, spaces));
        } else {
          // Possibly emit more than 1 DEDENT token.
          while (this.indents.length && this.indents[this.indents.length - 1] > indent) {
-           this.emitToken(this.createDedent());
+           this.emit(this.createDedent());
            this.indents.pop();
          }
        }
