@@ -596,10 +596,6 @@ field_spec
     : column_name type_spec? (NOT NULL)? default_value_part?
     ;
 
-record_var_dec
-    : record_name type_name (PERCENT_ROWTYPE | PERCENT_TYPE) ';'
-    ;
-
 ref_cursor_type_def
     : REF CURSOR (RETURN type_spec)?
     ;
