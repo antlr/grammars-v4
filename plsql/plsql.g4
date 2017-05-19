@@ -131,8 +131,7 @@ package_obj_spec
     | cursor_declaration
     | exception_declaration
     | pragma_declaration
-    | record_declaration
-    | table_declaration
+    | type_declaration
     | procedure_spec
     | function_spec
     ;
@@ -150,8 +149,7 @@ package_obj_body
     | subtype_declaration 
     | cursor_declaration 
     | exception_declaration 
-    | record_declaration
-    | table_declaration
+    | type_declaration
     | create_procedure_body
     | create_function_body 
     | procedure_spec
@@ -552,8 +550,7 @@ declare_spec
     | cursor_declaration
     | exception_declaration
     | pragma_declaration
-    | record_declaration
-    | table_declaration
+    | type_declaration
     | create_procedure_body
     | create_function_body
     ;
@@ -588,16 +585,11 @@ pragma_declaration
     | RESTRICT_REFERENCES '(' (identifier | DEFAULT) (',' identifier)+ ')') ';'
     ;
 
-record_declaration
-    : record_type_dec
-    | record_var_dec
-    ;
-
 // $<Record Declaration - Specific Clauses
 
 //incorporates ref_cursor_type_definition
-record_type_dec
-    : TYPE type_name IS (RECORD '(' field_spec (',' field_spec)* ')' | REF CURSOR (RETURN type_spec)?) ';'
+record_type_def
+    : RECORD '(' field_spec (',' field_spec)* ')' 
     ;
 
 field_spec
@@ -608,14 +600,18 @@ record_var_dec
     : record_name type_name (PERCENT_ROWTYPE | PERCENT_TYPE) ';'
     ;
 
-// $>
-
-table_declaration
-    : (table_type_dec | table_var_dec) ';'
+ref_cursor_type_def
+    : REF CURSOR (RETURN type_spec)?
     ;
 
-table_type_dec
-    : TYPE type_name IS (TABLE OF type_spec table_indexed_by_part? (NOT NULL)? | varray_type_def)
+// $>
+
+type_declaration
+    :  TYPE type_name IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
+    ;
+
+table_type_def
+    : TABLE OF type_spec table_indexed_by_part? (NOT NULL)?
     ;
 
 table_indexed_by_part
@@ -624,10 +620,6 @@ table_indexed_by_part
 
 varray_type_def
     : (VARRAY | VARYING ARRAY) '(' expression ')' OF type_spec (NOT NULL)?
-    ;
-
-table_var_dec
-    : table_var_name type_spec
     ;
 
 // $>
