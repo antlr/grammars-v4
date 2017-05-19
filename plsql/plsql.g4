@@ -41,6 +41,7 @@ unit_statement
     | create_function_body
     | create_procedure_body
     | create_package
+	| create_package_body
 
 //  | create_index //TODO
 //  | create_table //TODO
@@ -112,18 +113,14 @@ alter_package
     ;
 
 create_package
-    : CREATE (OR REPLACE)? PACKAGE (package_spec | package_body)? ';'
+    : CREATE (OR REPLACE)? PACKAGE package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name? ';'
+    ;
+
+create_package_body
+    : CREATE (OR REPLACE)? PACKAGE BODY package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?) ';'
     ;
 
 // $<Create Package - Specific Clauses
-
-package_body
-    : BODY package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?)
-    ;
-
-package_spec
-    : package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name?
-    ;
 
 package_obj_spec
     : variable_declaration
@@ -137,11 +134,11 @@ package_obj_spec
     ;
 
 procedure_spec
-    : PROCEDURE procedure_name ('(' parameter ( ',' parameter )* ')')? ';' 
+    : PROCEDURE identifier ('(' parameter ( ',' parameter )* ')')? ';' 
     ;
 
 function_spec
-    : FUNCTION function_name ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';' 
+    : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';' 
     ;
 
 package_obj_body
@@ -167,13 +164,13 @@ alter_procedure
     ;
 
 function_body
-    : FUNCTION function_name ('(' parameter (',' parameter)* ')')?
+    : FUNCTION identifier ('(' parameter (',' parameter)* ')')?
       RETURN type_spec (invoker_rights_clause|parallel_enable_clause|result_cache_clause|DETERMINISTIC)*
       ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
 
 procedure_body
-    : PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? 
+    : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? 
       (IS | AS)
       (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
     ;
@@ -571,7 +568,7 @@ declare_spec
 
 //incorporates constant_declaration
 variable_declaration
-    : variable_name CONSTANT? type_spec (NOT NULL)? default_value_part? ';'
+    : identifier CONSTANT? type_spec (NOT NULL)? default_value_part? ';'
     ;
 
 subtype_declaration
@@ -588,7 +585,7 @@ parameter_spec
     ;
 
 exception_declaration 
-    : exception_name EXCEPTION ';'
+    : identifier EXCEPTION ';'
     ;
 
 pragma_declaration
@@ -737,7 +734,7 @@ raise_statement
     ;
 
 return_statement
-    : RETURN condition?
+    : RETURN expression?
     ;
 
 function_call
