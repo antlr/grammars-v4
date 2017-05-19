@@ -74,7 +74,7 @@ alter_function
     ;
 
 create_function_body
-    : (CREATE (OR REPLACE)?)? FUNCTION function_name ('(' parameter (',' parameter)* ')')?
+    : CREATE (OR REPLACE)? FUNCTION function_name ('(' parameter (',' parameter)* ')')?
       RETURN type_spec (invoker_rights_clause|parallel_enable_clause|result_cache_clause|DETERMINISTIC)*
       ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
@@ -150,8 +150,8 @@ package_obj_body
     | cursor_declaration 
     | exception_declaration 
     | type_declaration
-    | create_procedure_body
-    | create_function_body 
+    | procedure_body
+    | function_body 
     | procedure_spec
     | function_spec    
     ;
@@ -166,8 +166,20 @@ alter_procedure
     : ALTER PROCEDURE procedure_name COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)? ';'
     ;
 
+function_body
+    : FUNCTION function_name ('(' parameter (',' parameter)* ')')?
+      RETURN type_spec (invoker_rights_clause|parallel_enable_clause|result_cache_clause|DETERMINISTIC)*
+      ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
+    ;
+
+procedure_body
+    : PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? 
+      (IS | AS)
+      (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
+    ;
+
 create_procedure_body
-    : (CREATE (OR REPLACE)?)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? 
+    : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? 
       invoker_rights_clause? (IS | AS)
       (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
     ;
