@@ -10,32 +10,41 @@ fragment TextPresentationCharacter: [\p{EmojiPresentation=TextDefault}];
 fragment EmojiPresentationCharacter: [\p{EmojiPresentation=EmojiDefault}];
 fragment TextPresentationSequence: EmojiPresentationCharacter VS15;
 fragment EmojiPresentationSequence: TextPresentationCharacter VS16;
+fragment EmojiCharacter: [\p{Emoji}];
 fragment EmojiModifierSequence:
     [\p{Grapheme_Cluster_Break=E_Base}\p{Grapheme_Cluster_Break=E_Base_GAZ}] [\p{Grapheme_Cluster_Break=E_Modifier}];
 fragment EmojiFlagSequence:
     [\p{Grapheme_Cluster_Break=Regional_Indicator}] [\p{Grapheme_Cluster_Break=Regional_Indicator}];
 fragment ExtendedPictographic: [\p{Extended_Pictographic}];
-fragment EmojiNRK: [\p{EmojiNRK}];
+fragment EnclosingMark: [\p{General_Category=Enclosing_Mark}];
 fragment EmojiCombiningSequence:
   (   EmojiPresentationSequence
     | TextPresentationSequence
     | EmojiPresentationCharacter )
-  NonspacingMark*;
+  EnclosingMark*;
 EmojiCoreSequence:
     EmojiModifierSequence
   | EmojiCombiningSequence
   | EmojiFlagSequence;
 fragment EmojiZWJElement:
-    EmojiModifierSequence
+    EmojiCharacter
   | EmojiPresentationSequence
-  | EmojiPresentationCharacter
-  | ExtendedPictographic
-  | EmojiNRK;
+  | EmojiModifierSequence;
 EmojiZWJSequence:
     EmojiZWJElement (ZWJ EmojiZWJElement)+;
+fragment TagBase:
+    EmojiCharacter
+  | EmojiModifierSequence
+  | EmojiPresentationSequence;
+fragment TagSpec:
+    [\u{E0020}-\u{E007E}]+;
+fragment TagTerm: '\u{E007F}';
+fragment EmojiTagSequence:
+    TagBase TagSpec TagTerm;
 emoji_sequence:
   (   EmojiZWJSequence
-    | EmojiCoreSequence )
+    | EmojiCoreSequence
+    | EmojiTagSequence )
   ( Extend | ZWJ | SpacingMark )*;
 
 Prepend: [\p{Grapheme_Cluster_Break=Prepend}];
