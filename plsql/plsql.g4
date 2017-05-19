@@ -575,12 +575,12 @@ variable_declaration
     ;
 
 subtype_declaration
-    : SUBTYPE type_name IS type_spec (RANGE expression '..' expression)? (NOT NULL)? ';'
+    : SUBTYPE identifier IS type_spec (RANGE expression '..' expression)? (NOT NULL)? ';'
     ;
 
 //cursor_declaration incorportates curscursor_body and cursor_spec
 cursor_declaration
-    : CURSOR cursor_name ('(' parameter_spec (',' parameter_spec)* ')' )? (RETURN type_spec)? (IS select_statement)? ';'
+    : CURSOR identifier ('(' parameter_spec (',' parameter_spec)* ')' )? (RETURN type_spec)? (IS select_statement)? ';'
     ;
 
 parameter_spec
@@ -617,7 +617,7 @@ ref_cursor_type_def
 // $>
 
 type_declaration
-    :  TYPE type_name IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
+    :  TYPE identifier IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
     ;
 
 table_type_def
