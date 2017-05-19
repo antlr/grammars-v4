@@ -563,8 +563,10 @@ declare_spec
     | exception_declaration
     | pragma_declaration
     | type_declaration
-    | create_procedure_body
-    | create_function_body
+	| procedure_spec
+    | function_spec
+    | procedure_body
+    | function_body
     ;
 
 //incorporates constant_declaration
