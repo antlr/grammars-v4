@@ -41,7 +41,7 @@ unit_statement
     | create_function_body
     | create_procedure_body
     | create_package
-	| create_package_body
+    | create_package_body
 
 //  | create_index //TODO
 //  | create_table //TODO
@@ -560,7 +560,7 @@ declare_spec
     | exception_declaration
     | pragma_declaration
     | type_declaration
-	| procedure_spec
+    | procedure_spec
     | function_spec
     | procedure_body
     | function_body
