@@ -1939,7 +1939,7 @@ type_spec
     ;
 
 datatype
-    : native_datatype_element precision_part? (WITH LOCAL? TIME ZONE)?
+    : native_datatype_element precision_part? (WITH LOCAL? TIME ZONE | CHARACTER SET char_set_name)?
     | INTERVAL (YEAR | DAY) ('(' expression ')')? TO (MONTH | SECOND) ('(' expression ')')?
     ;
 
