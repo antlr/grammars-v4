@@ -30,31 +30,30 @@ grammar COOL;
 
 program: programBlocks;
 programBlocks
-  : classDefine ';' programBlocks #class
+  : classDefine ';' programBlocks #classes
   | EOF #eof
   ;
 classDefine: CLASS TYPEID (INHERITS TYPEID)? '{' (feature ';')* '}';
 feature
   : OBJECTID '(' (formal (',' formal)*)* ')' ':' TYPEID '{' expression '}' #method
-  | OBJECTID ':' TYPEID (ASSIGNMENT expression)? /* class member variable */ #classProperty
+  | OBJECTID ':' TYPEID (ASSIGNMENT expression)? /* class member property */ #property
   ;
 formal: OBJECTID ':' TYPEID; /* method argument */
 expression
-  : OBJECTID ASSIGNMENT expression #assignment
-  | expression ('@' TYPEID)? '.' OBJECTID '(' (expression (',' expression)*)* ')' /* call super class method */ #superClassMethod
-  | OBJECTID '(' (expression (',' expression)*)* ')' /* call function that refered by variable */ #functionCall
+  : expression ('@' TYPEID)? '.' OBJECTID '(' (expression (',' expression)*)* ')' /* call super class method */ #methodCall
+  | OBJECTID '(' (expression (',' expression)*)* ')' /* shorthand for self.OBJECTID() */ #ownMethodCall
   | IF expression THEN expression ELSE expression FI #if
-  | WHILE expression LOOP expression POOL #whild
-  | '{' (expression ';')+ '}' #multipleExpression
+  | WHILE expression LOOP expression POOL #while
+  | '{' (expression ';')+ '}' #block
   | LET OBJECTID ':' TYPEID (ASSIGNMENT expression)? (',' OBJECTID ':' TYPEID (ASSIGNMENT expression)?)* IN expression /* let num : Int <- num_cells() in */ #letIn
   | CASE expression OF (OBJECTID ':' TYPEID CASE_ARROW expression ';')+ ESAC #case
-  | NEW TYPEID #newType
+  | NEW TYPEID #new
+  | INTEGER_NEGATIVE expression #negative
   | ISVOID expression #isvoid
-  | expression ADD expression #add
-  | expression MINUS expression #minus
   | expression MULTIPLY expression #multiply
   | expression DIVISION expression #division
-  | INTEGER_COMPLEMENT expression #integerComplement
+  | expression ADD expression #add
+  | expression MINUS expression #minus
   | expression LESS_THAN expression #lessThan
   | expression LESS_EQUAL expression #lessEqual
   | expression EQUAL expression #equal
@@ -65,6 +64,7 @@ expression
   | STRING #string
   | TRUE #true
   | FALSE #false
+  | OBJECTID ASSIGNMENT expression #assignment
   ;
 
 
@@ -78,28 +78,28 @@ COMMENT: OPEN_COMMENT (COMMENT|.)*? CLOSE_COMMENT -> channel(HIDDEN);
 ONE_LINE_COMMENT: '--' .*? '\n' -> channel(HIDDEN);
 
 // key words
-CLASS: ('C'|'c')('L'|'l')('A'|'a')('S'|'s')('S'|'s');
-ELSE: ('E'|'e')('L'|'l')('S'|'s')('E'|'e');
-FALSE: 'f'('A'|'a')('L'|'l')('S'|'s')('E'|'e');
-FI: ('F'|'f')('I'|'i');
-IF: ('I'|'i')('F'|'f');
-IN: ('I'|'i')('N'|'n');
-INHERITS: ('I'|'i')('N'|'n')('H'|'h')('E'|'e')('R'|'r')('I'|'i')('T'|'t')('S'|'s');
-ISVOID: ('I'|'i')('S'|'s')('V'|'v')('O'|'o')('I'|'i')('D'|'d');
-LET: ('L'|'l')('E'|'e')('T'|'t');
-LOOP: ('L'|'l')('O'|'o')('O'|'o')('P'|'p');
-POOL: ('P'|'p')('O'|'o')('O'|'o')('L'|'l');
-THEN: ('T'|'t')('H'|'h')('E'|'e')('N'|'n');
-WHILE: ('W'|'w')('H'|'h')('I'|'i')('L'|'l')('E'|'e');
-CASE: ('C'|'c')('A'|'a')('S'|'s')('E'|'e');
-ESAC: ('E'|'e')('S'|'s')('A'|'a')('C'|'c');
-NEW: ('N'|'n')('E'|'e')('W'|'w');
-OF: ('O'|'o')('F'|'f');
-NOT: ('N'|'n')('O'|'o')('T'|'t');
-TRUE: 't'('R'|'r')('U'|'u')('E'|'e');
+CLASS: C L A S S;
+ELSE: E L S E ;
+FALSE: 'f' A L S E ;
+FI: F I ;
+IF: I F;
+IN: I N;
+INHERITS: I N H E R I T S;
+ISVOID: I S V O I D;
+LET: L E T;
+LOOP: L O O P;
+POOL: P O O L ;
+THEN: T H E N;
+WHILE: W H I L E ;
+CASE: C A S E ;
+ESAC: E S A C;
+NEW: N E W;
+OF: O F;
+NOT: N O T;
+TRUE: 't' R U E ;
 
 // premitives
-STRING: '"' (ESC | ~ ["\\])* '"'; // non-greedy matching one line string
+STRING: '"' (ESC | ~ ["\\])* '"';
 INT: [0-9]+;
 TYPEID: [A-Z][_0-9A-Za-z]*;
 OBJECTID: [a-z][_0-9A-Za-z]*;
@@ -112,7 +112,25 @@ DIVISION: '/';
 LESS_THAN: '<';
 LESS_EQUAL: '<=';
 EQUAL: '=';
-INTEGER_COMPLEMENT: '~';
+INTEGER_NEGATIVE: '~';
+
+fragment A: [aA];
+fragment C: [cC];
+fragment D: [dD];
+fragment E: [eE];
+fragment F: [fF];
+fragment H: [hH];
+fragment I: [iI];
+fragment L: [lL];
+fragment N: [nN];
+fragment O: [oO];
+fragment P: [pP];
+fragment R: [rR];
+fragment S: [sS];
+fragment T: [tT];
+fragment U: [uU];
+fragment V: [vV];
+fragment W: [wW];
 
 fragment ESC: '\\' (["\\/bfnrt] | UNICODE);
 fragment UNICODE: 'u' HEX HEX HEX HEX;
