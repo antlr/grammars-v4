@@ -30,7 +30,7 @@ grammar COOL;
 
 program: programBlocks;
 programBlocks
-  : classDefine ';' programBlocks #class
+  : classDefine ';' programBlocks #classes
   | EOF #eof
   ;
 classDefine: CLASS TYPEID (INHERITS TYPEID)? '{' (feature ';')* '}';
@@ -40,8 +40,7 @@ feature
   ;
 formal: OBJECTID ':' TYPEID; /* method argument */
 expression
-  : OBJECTID ASSIGNMENT expression #assignment
-  | expression ('@' TYPEID)? '.' OBJECTID '(' (expression (',' expression)*)* ')' /* call super class method */ #methodCall
+  : expression ('@' TYPEID)? '.' OBJECTID '(' (expression (',' expression)*)* ')' /* call super class method */ #methodCall
   | OBJECTID '(' (expression (',' expression)*)* ')' /* shorthand for self.OBJECTID() */ #ownMethodCall
   | IF expression THEN expression ELSE expression FI #if
   | WHILE expression LOOP expression POOL #while
@@ -65,6 +64,7 @@ expression
   | STRING #string
   | TRUE #true
   | FALSE #false
+  | OBJECTID ASSIGNMENT expression #assignment
   ;
 
 
