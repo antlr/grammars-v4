@@ -20,12 +20,14 @@
 		<module>atl</module>
 		<module>basic</module>
 		<module>bnf</module>
+		<module>brainfuck</module>
 		<module>c</module>
 		<module>calculator</module>
 		<module>clf</module>
 		<module>clif</module>
 		<module>clojure</module>
 		<module>cobol85</module>
+		<module>cool</module>
 		<module>cpp</module>
 		<module>creole</module>
 		<module>csharp</module>
@@ -74,6 +76,7 @@
 		<module>mysql</module>
 		<!-- <module>objc</module> -->
 		<module>oncrpc</module>
+		<module>p</module>
 		<module>pascal</module>
 		<module>pcre</module>
 		<module>pddl</module>

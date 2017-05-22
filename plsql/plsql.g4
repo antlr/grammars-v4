@@ -41,6 +41,7 @@ unit_statement
     | create_function_body
     | create_procedure_body
     | create_package
+    | create_package_body
 
 //  | create_index //TODO
 //  | create_table //TODO
@@ -74,7 +75,7 @@ alter_function
     ;
 
 create_function_body
-    : (CREATE (OR REPLACE)?)? FUNCTION function_name ('(' parameter (',' parameter)* ')')?
+    : CREATE (OR REPLACE)? FUNCTION function_name ('(' parameter (',' parameter)* ')')?
       RETURN type_spec (invoker_rights_clause|parallel_enable_clause|result_cache_clause|DETERMINISTIC)*
       ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
@@ -112,18 +113,14 @@ alter_package
     ;
 
 create_package
-    : CREATE (OR REPLACE)? PACKAGE (package_spec | package_body)? ';'
+    : CREATE (OR REPLACE)? PACKAGE package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name? ';'
+    ;
+
+create_package_body
+    : CREATE (OR REPLACE)? PACKAGE BODY package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?) ';'
     ;
 
 // $<Create Package - Specific Clauses
-
-package_body
-    : BODY package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?)
-    ;
-
-package_spec
-    : package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name?
-    ;
 
 package_obj_spec
     : variable_declaration
@@ -131,18 +128,17 @@ package_obj_spec
     | cursor_declaration
     | exception_declaration
     | pragma_declaration
-    | record_declaration
-    | table_declaration
+    | type_declaration
     | procedure_spec
     | function_spec
     ;
 
 procedure_spec
-    : PROCEDURE procedure_name ('(' parameter ( ',' parameter )* ')')? ';' 
+    : PROCEDURE identifier ('(' parameter ( ',' parameter )* ')')? ';' 
     ;
 
 function_spec
-    : FUNCTION function_name ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';' 
+    : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';' 
     ;
 
 package_obj_body
@@ -150,10 +146,9 @@ package_obj_body
     | subtype_declaration 
     | cursor_declaration 
     | exception_declaration 
-    | record_declaration
-    | table_declaration
-    | create_procedure_body
-    | create_function_body 
+    | type_declaration
+    | procedure_body
+    | function_body 
     | procedure_spec
     | function_spec    
     ;
@@ -168,8 +163,20 @@ alter_procedure
     : ALTER PROCEDURE procedure_name COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)? ';'
     ;
 
+function_body
+    : FUNCTION identifier ('(' parameter (',' parameter)* ')')?
+      RETURN type_spec (invoker_rights_clause|parallel_enable_clause|result_cache_clause|DETERMINISTIC)*
+      ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
+    ;
+
+procedure_body
+    : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? 
+      (IS | AS)
+      (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
+    ;
+
 create_procedure_body
-    : (CREATE (OR REPLACE)?)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? 
+    : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? 
       invoker_rights_clause? (IS | AS)
       (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
     ;
@@ -552,24 +559,25 @@ declare_spec
     | cursor_declaration
     | exception_declaration
     | pragma_declaration
-    | record_declaration
-    | table_declaration
-    | create_procedure_body
-    | create_function_body
+    | type_declaration
+    | procedure_spec
+    | function_spec
+    | procedure_body
+    | function_body
     ;
 
 //incorporates constant_declaration
 variable_declaration
-    : variable_name CONSTANT? type_spec (NOT NULL)? default_value_part? ';'
+    : identifier CONSTANT? type_spec (NOT NULL)? default_value_part? ';'
     ;
 
 subtype_declaration
-    : SUBTYPE type_name IS type_spec (RANGE expression '..' expression)? (NOT NULL)? ';'
+    : SUBTYPE identifier IS type_spec (RANGE expression '..' expression)? (NOT NULL)? ';'
     ;
 
 //cursor_declaration incorportates curscursor_body and cursor_spec
 cursor_declaration
-    : CURSOR cursor_name ('(' parameter_spec (',' parameter_spec)* ')' )? (RETURN type_spec)? (IS select_statement)? ';'
+    : CURSOR identifier ('(' parameter_spec (',' parameter_spec)* ')' )? (RETURN type_spec)? (IS select_statement)? ';'
     ;
 
 parameter_spec
@@ -577,7 +585,7 @@ parameter_spec
     ;
 
 exception_declaration 
-    : exception_name EXCEPTION ';'
+    : identifier EXCEPTION ';'
     ;
 
 pragma_declaration
@@ -588,34 +596,29 @@ pragma_declaration
     | RESTRICT_REFERENCES '(' (identifier | DEFAULT) (',' identifier)+ ')') ';'
     ;
 
-record_declaration
-    : record_type_dec
-    | record_var_dec
-    ;
-
 // $<Record Declaration - Specific Clauses
 
 //incorporates ref_cursor_type_definition
-record_type_dec
-    : TYPE type_name IS (RECORD '(' field_spec (',' field_spec)* ')' | REF CURSOR (RETURN type_spec)?) ';'
+record_type_def
+    : RECORD '(' field_spec (',' field_spec)* ')' 
     ;
 
 field_spec
     : column_name type_spec? (NOT NULL)? default_value_part?
     ;
 
-record_var_dec
-    : record_name type_name (PERCENT_ROWTYPE | PERCENT_TYPE) ';'
+ref_cursor_type_def
+    : REF CURSOR (RETURN type_spec)?
     ;
 
 // $>
 
-table_declaration
-    : (table_type_dec | table_var_dec) ';'
+type_declaration
+    :  TYPE identifier IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
     ;
 
-table_type_dec
-    : TYPE type_name IS (TABLE OF type_spec table_indexed_by_part? (NOT NULL)? | varray_type_def)
+table_type_def
+    : TABLE OF type_spec table_indexed_by_part? (NOT NULL)?
     ;
 
 table_indexed_by_part
@@ -624,10 +627,6 @@ table_indexed_by_part
 
 varray_type_def
     : (VARRAY | VARYING ARRAY) '(' expression ')' OF type_spec (NOT NULL)?
-    ;
-
-table_var_dec
-    : table_var_name type_spec
     ;
 
 // $>
@@ -735,7 +734,7 @@ raise_statement
     ;
 
 return_statement
-    : RETURN condition?
+    : RETURN expression?
     ;
 
 function_call
@@ -1940,7 +1939,7 @@ type_spec
     ;
 
 datatype
-    : native_datatype_element precision_part? (WITH LOCAL? TIME ZONE)?
+    : native_datatype_element precision_part? (WITH LOCAL? TIME ZONE | CHARACTER SET char_set_name)?
     | INTERVAL (YEAR | DAY) ('(' expression ')')? TO (MONTH | SECOND) ('(' expression ')')?
     ;
 
