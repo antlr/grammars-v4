@@ -96,11 +96,11 @@ block
    ;
 
 blockStmt
-   : appactivateStmt
+   : appActivateStmt
    | attributeStmt
    | beepStmt
-   | chdirStmt
-   | chdriveStmt
+   | chDirStmt
+   | chDriveStmt
    | closeStmt
    | constStmt
    | dateStmt
@@ -166,7 +166,7 @@ blockStmt
    ;
 
 // statements ----------------------------------
-appactivateStmt
+appActivateStmt
    : APPACTIVATE WS valueStmt (WS? COMMA WS? valueStmt)?
    ;
 
@@ -174,11 +174,11 @@ beepStmt
    : BEEP
    ;
 
-chdirStmt
+chDirStmt
    : CHDIR WS valueStmt
    ;
 
-chdriveStmt
+chDriveStmt
    : CHDRIVE WS valueStmt
    ;
 
@@ -358,7 +358,7 @@ nameStmt
    ;
 
 onErrorStmt
-   : ON_ERROR WS (GOTO WS valueStmt | RESUME WS NEXT)
+   : (ON_ERROR | ON_LOCAL_ERROR) WS (GOTO WS valueStmt | RESUME WS NEXT)
    ;
 
 onGoToStmt
@@ -1452,6 +1452,11 @@ ON
 
 ON_ERROR
    : O N ' ' E R R O R
+   ;
+
+
+ON_LOCAL_ERROR
+   : O N ' ' L O C A L ' ' E R R O R
    ;
 
 
