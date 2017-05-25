@@ -1228,10 +1228,18 @@ alterProceedTo
 // call statement
 
 callStatement
-   : CALL (identifier | literal) (USING (callByReferenceStatement | callByValueStatement | callByContentStatement)+)? callGivingPhrase? onOverflowPhrase? onExceptionClause? notOnExceptionClause? END_CALL?
+   : CALL (identifier | literal) callUsingPhrase? callGivingPhrase? onOverflowPhrase? onExceptionClause? notOnExceptionClause? END_CALL?
    ;
 
-callByReferenceStatement
+callUsingPhrase
+   : USING callUsingParameter+
+   ;
+
+callUsingParameter
+   : callByReferencePhrase | callByValuePhrase | callByContentPhrase
+   ;
+
+callByReferencePhrase
    : (BY? REFERENCE)? callByReference+
    ;
 
@@ -1239,7 +1247,7 @@ callByReference
    : (ADDRESS OF | INTEGER | STRING)? identifier | fileName
    ;
 
-callByValueStatement
+callByValuePhrase
    : BY? VALUE callByValue+
    ;
 
@@ -1247,7 +1255,7 @@ callByValue
    : identifier | literal
    ;
 
-callByContentStatement
+callByContentPhrase
    : BY? CONTENT callByContent+
    ;
 
@@ -1360,7 +1368,7 @@ displayWith
 // divide statement
 
 divideStatement
-   : DIVIDE (identifier | literal) (divideIntoStatement | divideIntoGivingStatement | divideIntoByGivingStatement) divideRemainder? onSizeErrorPhrase? notOnSizeErrorPhrase? END_DIVIDE?
+   : DIVIDE (identifier | literal) (divideIntoStatement | divideIntoGivingStatement | divideByGivingStatement) divideRemainder? onSizeErrorPhrase? notOnSizeErrorPhrase? END_DIVIDE?
    ;
 
 divideIntoStatement
@@ -1371,7 +1379,7 @@ divideIntoGivingStatement
    : INTO divideGiving+
    ;
 
-divideIntoByGivingStatement
+divideByGivingStatement
    : BY (identifier | literal) divideGivingPhrase?
    ;
 
@@ -1744,7 +1752,23 @@ performVarying
    ;
 
 performVaryingClause
-   : VARYING (identifier | literal) FROM (identifier | literal | arithmeticExpression) BY (identifier | literal | arithmeticExpression) performUntil (AFTER (identifier) FROM (identifier | literal | arithmeticExpression) BY (identifier | literal | arithmeticExpression) performUntil)* (statement+ END_PERFORM)?
+   : VARYING performVaryingPhrase performAfter*
+   ;
+
+performVaryingPhrase
+   : (identifier | literal) performFrom performBy performUntil
+   ;
+
+performAfter
+   : AFTER performVaryingPhrase
+   ;
+
+performFrom
+   : FROM (identifier | literal | arithmeticExpression)
+   ;
+
+performBy
+   : BY (identifier | literal | arithmeticExpression)
    ;
 
 performTestClause
@@ -2311,13 +2335,12 @@ identifier
    : qualifiedDataName | tableCall | functionCall | specialRegister
    ;
 
-// array access
 tableCall
-   : qualifiedDataName (LPARENCHAR subscript+ RPARENCHAR)* referenceModifier?
+   : qualifiedDataName (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
    ;
 
 functionCall
-   : FUNCTION functionName (LPARENCHAR argument+ RPARENCHAR)* referenceModifier?
+   : FUNCTION functionName (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)* referenceModifier?
    ;
 
 referenceModifier
@@ -2538,7 +2561,7 @@ cobolWord
    ;
 
 literal
-   : NONNUMERICLITERAL | numericLiteral | booleanLiteral | figurativeConstant | cicsDfhRespLiteral | cicsDfhValueLiteral
+   : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | cicsDfhRespLiteral | cicsDfhValueLiteral
    ;
 
 booleanLiteral
@@ -2573,7 +2596,7 @@ specialRegister
    | LENGTH OF identifier | LINAGE_COUNTER | LINE_COUNTER 
    | PAGE_COUNTER 
    | RETURN_CODE 
-   | SHIFT_OUT | SHIFT_IN | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN 
+   | SHIFT_IN | SHIFT_OUT | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN 
    | TALLY | TIME 
    | WHEN_COMPILED
    ;
@@ -2867,7 +2890,7 @@ LIBRARY : L I B R A R Y;
 LIMIT : L I M I T;
 LIMITS : L I M I T S;
 LINAGE : L I N A G E;
-LINAGE_COUNTER : L I N A G E '_' C O U N T E R;
+LINAGE_COUNTER : L I N A G E MINUSCHAR C O U N T E R;
 LINE : L I N E;
 LINES : L I N E S;
 LINE_COUNTER : L I N E MINUSCHAR C O U N T E R;

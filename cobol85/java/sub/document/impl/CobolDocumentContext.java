@@ -6,7 +6,7 @@
  * of the BSD 3-clause license. See the LICENSE file for details.
  */
 
-package io.proleap.cobol.preprocessor.sub.parser.impl;
+package io.proleap.cobol.preprocessor.sub.document.impl;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +19,7 @@ import io.proleap.cobol.Cobol85PreprocessorParser.ReplaceClauseContext;
  * A replacement context that defines, which replaceables should be replaced by
  * which replacements.
  */
-public class CobolPreprocessingContext {
+public class CobolDocumentContext {
 
 	private CobolReplacementMapping[] currentReplaceableReplacements;
 

@@ -17,7 +17,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import io.proleap.cobol.Cobol85PreprocessorLexer;
-import io.proleap.cobol.preprocessor.sub.tree.impl.CobolHiddenTokenCollectorListenerImpl;
+import io.proleap.cobol.preprocessor.sub.document.impl.CobolHiddenTokenCollectorListenerImpl;
 
 public class TokenUtils {
 
