@@ -895,7 +895,14 @@ LineAfterPreprocessing
     ;  
 
 LineDirective
-    :   '#' Whitespace? DecimalConstant Whitespace? StringLiteral ~[\r\n]*
+    :   '#' Whitespace?
+        ('define' | 'include' | 'ifdef' | 'ifndef' |
+        'undef' | 'if' | 'else' | 'endif' | 
+        'eif' | IntegerConstant)
+        Whitespace 
+        (~[\r\n] 
+          | '\\' [\r\n] 
+         )*
         -> skip
     ;
 
