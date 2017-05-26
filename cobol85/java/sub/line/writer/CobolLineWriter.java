@@ -6,10 +6,13 @@
  * of the BSD 3-clause license. See the LICENSE file for details.
  */
 
-package io.proleap.cobol.preprocessor.sub.parser;
+package io.proleap.cobol.preprocessor.sub.line.writer;
 
-import io.proleap.cobol.preprocessor.sub.CobolSubPreprocessor;
+import java.util.List;
 
-public interface CobolParserPreprocessor extends CobolSubPreprocessor {
+import io.proleap.cobol.preprocessor.sub.CobolLine;
 
+public interface CobolLineWriter {
+
+	String serialize(List<CobolLine> lines);
 }

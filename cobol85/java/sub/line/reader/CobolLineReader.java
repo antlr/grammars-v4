@@ -6,19 +6,21 @@
  * of the BSD 3-clause license. See the LICENSE file for details.
  */
 
-package io.proleap.cobol.preprocessor.sub.normalizer;
+package io.proleap.cobol.preprocessor.sub.line.reader;
+
+import java.util.List;
 
 import io.proleap.cobol.preprocessor.CobolPreprocessor.CobolDialect;
 import io.proleap.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
-import io.proleap.cobol.preprocessor.sub.CobolSubPreprocessor;
-import io.proleap.cobol.preprocessor.sub.impl.CobolLine;
+import io.proleap.cobol.preprocessor.sub.CobolLine;
 
 /**
  * Preprocessor, which analyzes and processes line indicators.
  */
-public interface CobolNormalizeLinesSubPreprocessor extends CobolSubPreprocessor {
+public interface CobolLineReader {
 
-	CobolLine parseCobolLine(String line, CobolSourceFormatEnum format);
+	CobolLine parseLine(String line, int lineNumber, CobolSourceFormatEnum format, CobolDialect dialect);
 
-	String processLine(String line, int lineNumber, CobolSourceFormatEnum format, CobolDialect dialect);
+	List<CobolLine> processLines(String lines, CobolSourceFormatEnum format, CobolDialect dialect);
+
 }

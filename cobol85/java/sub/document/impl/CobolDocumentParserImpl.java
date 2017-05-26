@@ -6,9 +6,10 @@
  * of the BSD 3-clause license. See the LICENSE file for details.
  */
 
-package io.proleap.cobol.preprocessor.sub.parser.impl;
+package io.proleap.cobol.preprocessor.sub.document.impl;
 
 import java.io.File;
+import java.util.List;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -19,29 +20,28 @@ import io.proleap.cobol.Cobol85PreprocessorParser;
 import io.proleap.cobol.Cobol85PreprocessorParser.StartRuleContext;
 import io.proleap.cobol.preprocessor.CobolPreprocessor.CobolDialect;
 import io.proleap.cobol.preprocessor.CobolPreprocessor.CobolSourceFormatEnum;
-import io.proleap.cobol.preprocessor.sub.impl.ThrowingErrorListener;
-import io.proleap.cobol.preprocessor.sub.parser.CobolParserPreprocessor;
+import io.proleap.cobol.preprocessor.sub.document.CobolDocumentParser;
 
 /**
  * Preprocessor, which parses and processes COPY REPLACE and EXEC SQL
  * statements.
  */
-public class CobolParserPreprocessorImpl implements CobolParserPreprocessor {
+public class CobolDocumentParserImpl implements CobolDocumentParser {
 
-	protected final File libDirectory;
+	protected final List<File> copyFiles;
 
 	protected final String[] triggers = new String[] { "copy", "exec sql", "exec sqlims", "exec cics", "replace" };
 
-	public CobolParserPreprocessorImpl(final File libDirectory) {
-		this.libDirectory = libDirectory;
+	public CobolDocumentParserImpl(final List<File> copyFiles) {
+		this.copyFiles = copyFiles;
 	}
 
-	protected boolean containsTrigger(final String line, final String[] triggers) {
-		final String lineLowerCase = line.toLowerCase();
+	protected boolean containsTrigger(final String code, final String[] triggers) {
+		final String codeLowerCase = code.toLowerCase();
 		boolean result = false;
 
 		for (final String trigger : triggers) {
-			final boolean containsTrigger = lineLowerCase.contains(trigger);
+			final boolean containsTrigger = codeLowerCase.contains(trigger);
 
 			if (containsTrigger) {
 				result = true;
@@ -53,23 +53,23 @@ public class CobolParserPreprocessorImpl implements CobolParserPreprocessor {
 	}
 
 	@Override
-	public String processLines(final String lines, final CobolSourceFormatEnum format, final CobolDialect dialect) {
-		final boolean requiresProcessorExecution = containsTrigger(lines, triggers);
+	public String processLines(final String code, final CobolSourceFormatEnum format, final CobolDialect dialect) {
+		final boolean requiresProcessorExecution = containsTrigger(code, triggers);
 		final String result;
 
 		if (requiresProcessorExecution) {
-			result = processWithParser(lines, libDirectory, format, dialect);
+			result = processWithParser(code, copyFiles, format, dialect);
 		} else {
-			result = lines;
+			result = code;
 		}
 
 		return result;
 	}
 
-	protected String processWithParser(final String program, final File libDirectory,
+	protected String processWithParser(final String code, final List<File> copyFiles,
 			final CobolSourceFormatEnum format, final CobolDialect dialect) {
 		// run the lexer
-		final Cobol85PreprocessorLexer lexer = new Cobol85PreprocessorLexer(CharStreams.fromString(program));
+		final Cobol85PreprocessorLexer lexer = new Cobol85PreprocessorLexer(CharStreams.fromString(code));
 
 		// get a list of matched tokens
 		final CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -85,8 +85,8 @@ public class CobolParserPreprocessorImpl implements CobolParserPreprocessor {
 		final StartRuleContext startRule = parser.startRule();
 
 		// analyze contained copy books
-		final CobolParserPreprocessorListenerImpl listener = new CobolParserPreprocessorListenerImpl(libDirectory,
-				format, dialect, tokens);
+		final CobolDocumentParserListenerImpl listener = new CobolDocumentParserListenerImpl(copyFiles, format, dialect,
+				tokens);
 		final ParseTreeWalker walker = new ParseTreeWalker();
 
 		walker.walk(listener, startRule);
