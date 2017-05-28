@@ -5,10 +5,6 @@ grammar css3;
 // CSS3 modifications are then applied
 // IE and vendor specific rules are added for real world usage
 
-// TODO :
-//   @font-feature-values
-//   @document
-
 stylesheet
     : ws ( charset ( Comment | Space | Cdo | Cdc )* )* ( imports ( Comment | Space | Cdo | Cdc )* )* ( namespace ( Comment | Space | Cdo | Cdc )* )* ( nestedStatement ( Comment | Space | Cdo | Cdc )* )*
     ;
@@ -285,6 +281,7 @@ nestedStatement
     | supportsRule
     | viewport
     | counterStyle
+    | fontFeatureValuesRule
     | atRule
     ;
 
@@ -392,6 +389,33 @@ viewport
 // https://www.w3.org/TR/css-counter-styles-3/
 counterStyle
     : CounterStyle ws ident ws '{' ws declarationList? '}' ws
+    ;
+
+// Font feature values
+// https://www.w3.org/TR/css-fonts-3/
+fontFeatureValuesRule
+    : FontFeatureValues ws fontFamilyNameList ws '{' ws featureValueBlock* '}' ws
+    ;
+
+fontFamilyNameList
+    : fontFamilyName ( ws Comma ws fontFamilyName )*
+    ;
+
+fontFamilyName
+    : String
+    | ident ( ws ident )*
+    ;
+
+featureValueBlock
+    : featureType ws '{' ws featureValueDefinition? ( ws ';' ws featureValueDefinition? )* '}' ws
+    ;
+
+featureType
+    : atKeyword
+    ;
+
+featureValueDefinition
+    : ident ws ':' ws number ( ws number )*
     ;
 
 // The specific words can be identifiers too
@@ -916,6 +940,11 @@ Viewport
 // https://www.w3.org/TR/css-counter-styles-3/
 CounterStyle
     : '@' C O U N T E R DashChar S T Y L E
+    ;
+
+// https://www.w3.org/TR/css-fonts-3/
+FontFeatureValues
+    : '@' F O N T DashChar F E A T U R E DashChar V A L U E S
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms532847.aspx
