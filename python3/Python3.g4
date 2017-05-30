@@ -31,24 +31,19 @@
 grammar Python3;
 
 // All comments that start with "///" are copy-pasted from
-// The Python Language Reference: https://docs.python.org/3.3/reference/grammar.html
+// The Python Language Reference
 
 tokens { INDENT, DEDENT }
 
 @lexer::members {
-
   // A queue where extra tokens are pushed on (see the NEWLINE lexer rule).
   private java.util.LinkedList<Token> tokens = new java.util.LinkedList<>();
-
   // The stack that keeps track of the indentation level.
   private java.util.Stack<Integer> indents = new java.util.Stack<>();
-
   // The amount of opened braces, brackets and parenthesis.
   private int opened = 0;
-
   // The most recently produced token.
   private Token lastToken = null;
-
   @Override
   public void emit(Token t) {
     super.setToken(t);
@@ -57,10 +52,8 @@ tokens { INDENT, DEDENT }
 
   @Override
   public Token nextToken() {
-
     // Check if the end-of-file is ahead and there are still some DEDENTS expected.
     if (_input.LA(1) == EOF && !this.indents.isEmpty()) {
-
       // Remove any trailing EOF tokens from our buffer.
       for (int i = tokens.size() - 1; i >= 0; i--) {
         if (tokens.get(i).getType() == EOF) {
@@ -112,9 +105,7 @@ tokens { INDENT, DEDENT }
   //
   //  -- https://docs.python.org/3.1/reference/lexical_analysis.html#indentation
   static int getIndentationCount(String spaces) {
-
     int count = 0;
-
     for (char ch : spaces.toCharArray()) {
       switch (ch) {
         case '\t':
@@ -138,564 +129,167 @@ tokens { INDENT, DEDENT }
  * parser rules
  */
 
-/// single_input: NEWLINE | simple_stmt | compound_stmt NEWLINE
-single_input
- : NEWLINE
- | simple_stmt
- | compound_stmt NEWLINE
- ;
-
-/// file_input: (NEWLINE | stmt)* ENDMARKER
-file_input
- : ( NEWLINE | stmt )* EOF
- ;
-
-/// eval_input: testlist NEWLINE* ENDMARKER
-eval_input
- : testlist NEWLINE* EOF
- ;
-
-/// decorator: '@' dotted_name [ '(' [arglist] ')' ] NEWLINE
-decorator
- : '@' dotted_name ( '(' arglist? ')' )? NEWLINE
- ;
-
-/// decorators: decorator+
-decorators
- : decorator+
- ;
-
-/// decorated: decorators (classdef | funcdef)
-decorated
- : decorators ( classdef | funcdef )
- ;
-
-/// funcdef: 'def' NAME parameters ['->' test] ':' suite
-funcdef
- : DEF NAME parameters ( '->' test )? ':' suite
- ;
-
-/// parameters: '(' [typedargslist] ')'
-parameters
- : '(' typedargslist? ')'
- ;
-
-/// typedargslist: (tfpdef ['=' test] (',' tfpdef ['=' test])* [','
-///                ['*' [tfpdef] (',' tfpdef ['=' test])* [',' '**' tfpdef] | '**' tfpdef]]
-///              |  '*' [tfpdef] (',' tfpdef ['=' test])* [',' '**' tfpdef] | '**' tfpdef)
-typedargslist
- : tfpdef ( '=' test )? ( ',' tfpdef ( '=' test )? )* ( ',' ( '*' tfpdef? ( ',' tfpdef ( '=' test )? )* ( ',' '**' tfpdef )? 
-                                                            | '**' tfpdef 
-                                                            )? 
-                                                      )?
- | '*' tfpdef? ( ',' tfpdef ( '=' test )? )* ( ',' '**' tfpdef )? 
- | '**' tfpdef
- ;
-
-/// tfpdef: NAME [':' test]
-tfpdef
- : NAME ( ':' test )?
- ;
-
-/// varargslist: (vfpdef ['=' test] (',' vfpdef ['=' test])* [','
-///       ['*' [vfpdef] (',' vfpdef ['=' test])* [',' '**' vfpdef] | '**' vfpdef]]
-///     |  '*' [vfpdef] (',' vfpdef ['=' test])* [',' '**' vfpdef] | '**' vfpdef)
-varargslist
- : vfpdef ( '=' test )? ( ',' vfpdef ( '=' test )? )* ( ',' ( '*' vfpdef? ( ',' vfpdef ( '=' test )? )* ( ',' '**' vfpdef )? 
-                                                            | '**' vfpdef 
-                                                            )? 
-                                                      )?
- | '*' vfpdef? ( ',' vfpdef ( '=' test )? )* ( ',' '**' vfpdef )?
- | '**' vfpdef
- ;
-
-/// vfpdef: NAME
-vfpdef
- : NAME
- ;
-
-/// stmt: simple_stmt | compound_stmt
-stmt
- : simple_stmt 
- | compound_stmt
- ;
-
-/// simple_stmt: small_stmt (';' small_stmt)* [';'] NEWLINE
-simple_stmt
- : small_stmt ( ';' small_stmt )* ';'? NEWLINE
- ;
-
-/// small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
-///              import_stmt | global_stmt | nonlocal_stmt | assert_stmt)
-small_stmt
- : expr_stmt 
- | del_stmt 
- | pass_stmt 
- | flow_stmt 
- | import_stmt 
- | global_stmt 
- | nonlocal_stmt 
- | assert_stmt
- ;
-
-/// expr_stmt: testlist_star_expr (augassign (yield_expr|testlist) |
-///                      ('=' (yield_expr|testlist_star_expr))*)
-expr_stmt
- : testlist_star_expr ( augassign ( yield_expr | testlist) 
-                      | ( '=' ( yield_expr| testlist_star_expr ) )*
-                      )
- ;           
-
-/// testlist_star_expr: (test|star_expr) (',' (test|star_expr))* [',']
-testlist_star_expr
- : ( test | star_expr ) ( ',' ( test |  star_expr ) )* ','?
- ;
-
-/// augassign: ('+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' |
-///             '<<=' | '>>=' | '**=' | '//=')
-augassign
- : '+=' 
- | '-=' 
- | '*=' 
- | '@=' // PEP 465
- | '/=' 
- | '%=' 
- | '&=' 
- | '|=' 
- | '^=' 
- | '<<=' 
- | '>>=' 
- | '**=' 
- | '//='
- ;
-
-/// del_stmt: 'del' exprlist
-del_stmt
- : DEL exprlist
- ;
-
-/// pass_stmt: 'pass'
-pass_stmt
- : PASS
- ;
-
-/// flow_stmt: break_stmt | continue_stmt | return_stmt | raise_stmt | yield_stmt
-flow_stmt
- : break_stmt 
- | continue_stmt 
- | return_stmt 
- | raise_stmt 
- | yield_stmt
- ;
-
-/// break_stmt: 'break'
-break_stmt
- : BREAK
- ;
-
-/// continue_stmt: 'continue'
-continue_stmt
- : CONTINUE
- ;
-
-/// return_stmt: 'return' [testlist]
-return_stmt
- : RETURN testlist?
- ;
-
-/// yield_stmt: yield_expr
-yield_stmt
- : yield_expr
- ;
-
-/// raise_stmt: 'raise' [test ['from' test]]
-raise_stmt
- : RAISE ( test ( FROM test )? )?
- ;
-
-/// import_stmt: import_name | import_from
-import_stmt
- : import_name 
- | import_from
- ;
-
-/// import_name: 'import' dotted_as_names
-import_name
- : IMPORT dotted_as_names
- ;
-
-/// # note below: the ('.' | '...') is necessary because '...' is tokenized as ELLIPSIS
-/// import_from: ('from' (('.' | '...')* dotted_name | ('.' | '...')+)
-///               'import' ('*' | '(' import_as_names ')' | import_as_names))
-import_from
- : FROM ( ( '.' | '...' )* dotted_name 
-        | ('.' | '...')+ 
-        )
-   IMPORT ( '*' 
-          | '(' import_as_names ')' 
-          | import_as_names
-          )         
- ;
-
-/// import_as_name: NAME ['as' NAME]
-import_as_name
- : NAME ( AS NAME )?
- ;
-
-/// dotted_as_name: dotted_name ['as' NAME]
-dotted_as_name
- : dotted_name ( AS NAME )?
- ;
-
-/// import_as_names: import_as_name (',' import_as_name)* [',']
-import_as_names
- : import_as_name ( ',' import_as_name )* ','?
- ;
-
-/// dotted_as_names: dotted_as_name (',' dotted_as_name)*
-dotted_as_names
- : dotted_as_name ( ',' dotted_as_name )*
- ;
-
-/// dotted_name: NAME ('.' NAME)*
-dotted_name
- : NAME ( '.' NAME )*
- ;
-
-/// global_stmt: 'global' NAME (',' NAME)*
-global_stmt
- : GLOBAL NAME ( ',' NAME )*
- ;
-
-/// nonlocal_stmt: 'nonlocal' NAME (',' NAME)*
-nonlocal_stmt
- : NONLOCAL NAME ( ',' NAME )*
- ;
-
-/// assert_stmt: 'assert' test [',' test]
-assert_stmt
- : ASSERT test ( ',' test )?
- ;
-
-/// compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated
-compound_stmt
- : if_stmt 
- | while_stmt 
- | for_stmt 
- | try_stmt 
- | with_stmt 
- | funcdef 
- | classdef 
- | decorated
- ;
-
-/// if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ['else' ':' suite]
-if_stmt
- : IF test ':' suite ( ELIF test ':' suite )* ( ELSE ':' suite )?
- ;
-
-/// while_stmt: 'while' test ':' suite ['else' ':' suite]
-while_stmt
- : WHILE test ':' suite ( ELSE ':' suite )?
- ;
-
-/// for_stmt: 'for' exprlist 'in' testlist ':' suite ['else' ':' suite]
-for_stmt
- : FOR exprlist IN testlist ':' suite ( ELSE ':' suite )?
- ;
-
-/// try_stmt: ('try' ':' suite
-///            ((except_clause ':' suite)+
-///       ['else' ':' suite]
-///       ['finally' ':' suite] |
-///      'finally' ':' suite))
-try_stmt
- : TRY ':' suite ( ( except_clause ':' suite )+ 
-                   ( ELSE ':' suite )? 
-                   ( FINALLY ':' suite )?
-                 | FINALLY ':' suite
-                 )
- ;
-
-/// with_stmt: 'with' with_item (',' with_item)*  ':' suite
-with_stmt
- : WITH with_item ( ',' with_item )* ':' suite
- ;
-
-/// with_item: test ['as' expr]
-with_item
- : test ( AS expr )?
- ;
-
-/// # NB compile.c makes sure that the default except clause is last
-/// except_clause: 'except' [test ['as' NAME]]
-except_clause
- : EXCEPT ( test ( AS NAME )? )?
- ;
-
-/// suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
-suite
- : simple_stmt 
- | NEWLINE INDENT stmt+ DEDENT
- ;
-
-/// test: or_test ['if' or_test 'else' test] | lambdef
-test
- : or_test ( IF or_test ELSE test )?
- | lambdef
- ;
-
-/// test_nocond: or_test | lambdef_nocond
-test_nocond
- : or_test 
- | lambdef_nocond
- ;
-
-/// lambdef: 'lambda' [varargslist] ':' test
-lambdef
- : LAMBDA varargslist? ':' test
- ;
-
-/// lambdef_nocond: 'lambda' [varargslist] ':' test_nocond
-lambdef_nocond
- : LAMBDA varargslist? ':' test_nocond
- ;
-
-/// or_test: and_test ('or' and_test)*
-or_test
- : and_test ( OR and_test )*
- ;
-
-/// and_test: not_test ('and' not_test)*
-and_test
- : not_test ( AND not_test )*
- ;
-
-/// not_test: 'not' not_test | comparison
-not_test
- : NOT not_test 
- | comparison
- ;
-
-/// comparison: star_expr (comp_op star_expr)*
-comparison
- : star_expr ( comp_op star_expr )*
- ;
-
-/// # <> isn't actually a valid comparison operator in Python. It's here for the
-/// # sake of a __future__ import described in PEP 401
-/// comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
-comp_op
- : '<'
- | '>'
- | '=='
- | '>='
- | '<='
- | '<>'
- | '!='
- | IN
- | NOT IN
- | IS
- | IS NOT
- ;
-
-/// star_expr: ['*'] expr
-star_expr
- : '*'? expr
- ;
-
-/// expr: xor_expr ('|' xor_expr)*
-expr
- : xor_expr ( '|' xor_expr )*
- ;
-
-/// xor_expr: and_expr ('^' and_expr)*
-xor_expr
- : and_expr ( '^' and_expr )*
- ;
-
-/// and_expr: shift_expr ('&' shift_expr)*
-and_expr
- : shift_expr ( '&' shift_expr )*
- ;
-
-/// shift_expr: arith_expr (('<<'|'>>') arith_expr)*
-shift_expr
- : arith_expr ( '<<' arith_expr 
-              | '>>' arith_expr 
-              )*
- ;
-
-/// arith_expr: term (('+'|'-') term)*
-arith_expr
- : term ( '+' term
-        | '-' term 
-        )*
- ;
-
-/// term: factor (('*'|'/'|'%'|'//') factor)*
-term
- : factor ( '*' factor
-          | '/' factor
-          | '%' factor 
-          | '//' factor 
-          | '@' factor // PEP 465
-          )*
- ;
-
-/// factor: ('+'|'-'|'~') factor | power
-factor
- : '+' factor 
- | '-' factor 
- | '~' factor 
- | power
- ;
-
-/// power: atom trailer* ['**' factor]
-power
- : atom trailer* ( '**' factor )?
- ;
-
-/// atom: ('(' [yield_expr|testlist_comp] ')' |
-///        '[' [testlist_comp] ']' |
-///        '{' [dictorsetmaker] '}' |
-///        NAME | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False')
-atom
- : '(' ( yield_expr | testlist_comp )? ')' 
- | '[' testlist_comp? ']'  
- | '{' dictorsetmaker? '}' 
- | NAME 
- | number 
- | str+ 
- | '...' 
- | NONE
- | TRUE
- | FALSE
- ;
-
-/// testlist_comp: test ( comp_for | (',' test)* [','] )
-testlist_comp
- : test ( comp_for 
-        | ( ',' test )* ','? 
-        )
- ;
-
-/// trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
-trailer
- : '(' arglist? ')' 
- | '[' subscriptlist ']' 
- | '.' NAME
- ;
-
-/// subscriptlist: subscript (',' subscript)* [',']
-subscriptlist
- : subscript ( ',' subscript )* ','?
- ;
-
-/// subscript: test | [test] ':' [test] [sliceop]
-subscript
- : test 
- | test? ':' test? sliceop?
- ;
-
-/// sliceop: ':' [test]
-sliceop
- : ':' test?
- ;
-
-/// exprlist: star_expr (',' star_expr)* [',']
-exprlist
- : star_expr ( ',' star_expr )* ','?
- ;
-
-/// testlist: test (',' test)* [',']
-testlist
- : test ( ',' test )* ','?
- ;
-
-/// dictorsetmaker: ( (test ':' test (comp_for | (',' test ':' test)* [','])) |
-///                   (test (comp_for | (',' test)* [','])) )
-dictorsetmaker
- : test ':' test ( comp_for 
-                 | ( ',' test ':' test )* ','? 
-                 ) 
- | test ( comp_for 
-        | ( ',' test )* ','? 
-        )
- ;
-
-/// classdef: 'class' NAME ['(' [arglist] ')'] ':' suite
-classdef
- : CLASS NAME ( '(' arglist? ')' )? ':' suite
- ;
-
-/// arglist: (argument ',')* (argument [',']
-///                          |'*' test (',' argument)* [',' '**' test]
-///                          |'**' test)
-arglist
- : ( argument ',' )* ( argument ','?
-                     | '*' test ( ',' argument )* ( ',' '**' test )?
-                     | '**' test
-                     )
- ;
-
-/// # The reason that keywords are test nodes instead of NAME is that using NAME
-/// # results in an ambiguity. ast.c makes sure it's a NAME.
-/// argument: test [comp_for] | test '=' test  # Really [keyword '='] test
-argument
- : test comp_for? 
- | test '=' test
- ;
-
-/// comp_iter: comp_for | comp_if
-comp_iter
- : comp_for 
- | comp_if
- ;
-
-/// comp_for: 'for' exprlist 'in' or_test [comp_iter]
-comp_for
- : FOR exprlist IN or_test comp_iter?
- ;
-
-/// comp_if: 'if' test_nocond [comp_iter]
-comp_if
- : IF test_nocond comp_iter?
- ;
-
-/// yield_expr: 'yield' [testlist]
-yield_expr
- : YIELD yield_arg?
- ;
-
-/// yield_arg: 'from' test | testlist
-yield_arg
- : FROM test 
- | testlist
- ;
-
-str
+single_input: NEWLINE | simple_stmt | compound_stmt NEWLINE;
+file_input: (NEWLINE | stmt)* EOF;
+eval_input: testlist NEWLINE* EOF;
+
+decorator: '@' dotted_name ( '(' (arglist)? ')' )? NEWLINE;
+decorators: decorator+;
+decorated: decorators (classdef | funcdef | async_funcdef);
+
+async_funcdef: ASYNC funcdef;
+funcdef: 'def' NAME parameters ('->' test)? ':' suite;
+
+parameters: '(' (typedargslist)? ')';
+typedargslist: (tfpdef ('=' test)? (',' tfpdef ('=' test)?)* (',' (
+        '*' (tfpdef)? (',' tfpdef ('=' test)?)* (',' ('**' tfpdef (',')?)?)?
+      | '**' tfpdef (',')?)?)?
+  | '*' (tfpdef)? (',' tfpdef ('=' test)?)* (',' ('**' tfpdef (',')?)?)?
+  | '**' tfpdef (',')?);
+tfpdef: NAME (':' test)?;
+varargslist: (vfpdef ('=' test)? (',' vfpdef ('=' test)?)* (',' (
+        '*' (vfpdef)? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef (',')?)?)?
+      | '**' vfpdef (',')?)?)?
+  | '*' (vfpdef)? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef (',')?)?)?
+  | '**' vfpdef (',')?
+);
+vfpdef: NAME;
+
+stmt: simple_stmt | compound_stmt;
+simple_stmt: small_stmt (';' small_stmt)* (';')? NEWLINE;
+small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
+             import_stmt | global_stmt | nonlocal_stmt | assert_stmt);
+expr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
+                     ('=' (yield_expr|testlist_star_expr))*);
+annassign: ':' test ('=' test)?;
+testlist_star_expr: (test|star_expr) (',' (test|star_expr))* (',')?;
+augassign: ('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' |
+            '<<=' | '>>=' | '**=' | '//=');
+// For normal and annotated assignments, additional restrictions enforced by the interpreter
+del_stmt: 'del' exprlist;
+pass_stmt: 'pass';
+flow_stmt: break_stmt | continue_stmt | return_stmt | raise_stmt | yield_stmt;
+break_stmt: 'break';
+continue_stmt: 'continue';
+return_stmt: 'return' (testlist)?;
+yield_stmt: yield_expr;
+raise_stmt: 'raise' (test ('from' test)?)?;
+import_stmt: import_name | import_from;
+import_name: 'import' dotted_as_names;
+// note below: the ('.' | '...') is necessary because '...' is tokenized as ELLIPSIS
+import_from: ('from' (('.' | '...')* dotted_name | ('.' | '...')+)
+              'import' ('*' | '(' import_as_names ')' | import_as_names));
+import_as_name: NAME ('as' NAME)?;
+dotted_as_name: dotted_name ('as' NAME)?;
+import_as_names: import_as_name (',' import_as_name)* (',')?;
+dotted_as_names: dotted_as_name (',' dotted_as_name)*;
+dotted_name: NAME ('.' NAME)*;
+global_stmt: 'global' NAME (',' NAME)*;
+nonlocal_stmt: 'nonlocal' NAME (',' NAME)*;
+assert_stmt: 'assert' test (',' test)?;
+
+compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated | async_stmt;
+async_stmt: ASYNC (funcdef | with_stmt | for_stmt);
+if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ('else' ':' suite)?;
+while_stmt: 'while' test ':' suite ('else' ':' suite)?;
+for_stmt: 'for' exprlist 'in' testlist ':' suite ('else' ':' suite)?;
+try_stmt: ('try' ':' suite
+           ((except_clause ':' suite)+
+            ('else' ':' suite)?
+            ('finally' ':' suite)? |
+           'finally' ':' suite));
+with_stmt: 'with' with_item (',' with_item)*  ':' suite;
+with_item: test ('as' expr)?;
+// NB compile.c makes sure that the default except clause is last
+except_clause: 'except' (test ('as' NAME)?)?;
+suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT;
+
+test: or_test ('if' or_test 'else' test)? | lambdef;
+test_nocond: or_test | lambdef_nocond;
+lambdef: 'lambda' (varargslist)? ':' test;
+lambdef_nocond: 'lambda' (varargslist)? ':' test_nocond;
+or_test: and_test ('or' and_test)*;
+and_test: not_test ('and' not_test)*;
+not_test: 'not' not_test | comparison;
+comparison: expr (comp_op expr)*;
+// <> isn't actually a valid comparison operator in Python. It's here for the
+// sake of a __future__ import described in PEP 401 (which really works :-)
+comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not';
+star_expr: '*' expr;
+expr: xor_expr ('|' xor_expr)*;
+xor_expr: and_expr ('^' and_expr)*;
+and_expr: shift_expr ('&' shift_expr)*;
+shift_expr: arith_expr (('<<'|'>>') arith_expr)*;
+arith_expr: term (('+'|'-') term)*;
+term: factor (('*'|'@'|'/'|'%'|'//') factor)*;
+factor: ('+'|'-'|'~') factor | power;
+power: atom_expr ('**' factor)?;
+atom_expr: (AWAIT)? atom trailer*;
+atom: ('(' (yield_expr|testlist_comp)? ')' |
+       '[' (testlist_comp)? ']' |
+       '{' (dictorsetmaker)? '}' |
+       NAME | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False');
+testlist_comp: (test|star_expr) ( comp_for | (',' (test|star_expr))* (',')? );
+trailer: '(' (arglist)? ')' | '[' subscriptlist ']' | '.' NAME;
+subscriptlist: subscript (',' subscript)* (',')?;
+subscript: test | (test)? ':' (test)? (sliceop)?;
+sliceop: ':' (test)?;
+exprlist: (expr|star_expr) (',' (expr|star_expr))* (',')?;
+testlist: test (',' test)* (',')?;
+dictorsetmaker: ( ((test ':' test | '**' expr)
+                   (comp_for | (',' (test ':' test | '**' expr))* (',')?)) |
+                  ((test | star_expr)
+                   (comp_for | (',' (test | star_expr))* (',')?)) );
+
+classdef: 'class' NAME ('(' (arglist)? ')')? ':' suite;
+
+arglist: argument (',' argument)*  (',')?;
+
+// The reason that keywords are test nodes instead of NAME is that using NAME
+// results in an ambiguity. ast.c makes sure it's a NAME.
+// "test '=' test" is really "keyword '=' test", but we have no such token.
+// These need to be in a single rule to avoid grammar that is ambiguous
+// to our LL(1) parser. Even though 'test' includes '*expr' in star_expr,
+// we explicitly match '*' here, too, to give it proper precedence.
+// Illegal combinations and orderings are blocked in ast.c:
+// multiple (test comp_for) arguments are blocked; keyword unpackings
+// that precede iterable unpackings are blocked; etc.
+argument: ( test (comp_for)? |
+            test '=' test |
+            '**' test |
+            '*' test );
+
+comp_iter: comp_for | comp_if;
+comp_for: (ASYNC)? 'for' exprlist 'in' or_test (comp_iter)?;
+comp_if: 'if' test_nocond (comp_iter)?;
+
+// not used in grammar, but may appear in "node" passed from Parser to Compiler
+encoding_decl: NAME;
+
+yield_expr: 'yield' (yield_arg)?;
+yield_arg: 'from' test | testlist;
+
+/*
+ * lexer rules
+ */
+
+STRING
  : STRING_LITERAL
  | BYTES_LITERAL
  ;
 
-number
- : integer
+NUMBER
+ : INTEGER
  | FLOAT_NUMBER
  | IMAG_NUMBER
  ;
 
-/// integer        ::=  decimalinteger | octinteger | hexinteger | bininteger
-integer
+INTEGER
  : DECIMAL_INTEGER
  | OCT_INTEGER
  | HEX_INTEGER
  | BIN_INTEGER
  ;
-
-/*
- * lexer rules
- */
 
 DEF : 'def';
 RETURN : 'return';
@@ -730,6 +324,8 @@ DEL : 'del';
 PASS : 'pass';
 CONTINUE : 'continue';
 BREAK : 'break';
+ASYNC : 'async';
+AWAIT : 'await';
 
 NEWLINE
  : ( {atStartOfInput()}?   SPACES
@@ -739,7 +335,6 @@ NEWLINE
      String newLine = getText().replaceAll("[^\r\n\f]+", "");
      String spaces = getText().replaceAll("[\r\n\f]+", "");
      int next = _input.LA(1);
-
      if (opened > 0 || next == '\r' || next == '\n' || next == '\f' || next == '#') {
        // If we're inside a list or on a blank line, ignore all indents, 
        // dedents and line breaks.
@@ -747,10 +342,8 @@ NEWLINE
      }
      else {
        emit(commonToken(NEWLINE, newLine));
-
        int indent = getIndentationCount(spaces);
        int previous = indents.isEmpty() ? 0 : indents.peek();
-
        if (indent == previous) {
          // skip indents of the same size as the present indent-size
          skip();
@@ -776,15 +369,16 @@ NAME
  ;
 
 /// stringliteral   ::=  [stringprefix](shortstring | longstring)
-/// stringprefix    ::=  "r" | "R"
+/// stringprefix    ::=  "r" | "u" | "R" | "U" | "f" | "F"
+///                      | "fr" | "Fr" | "fR" | "FR" | "rf" | "rF" | "Rf" | "RF"
 STRING_LITERAL
- : [uU]? [rR]? ( SHORT_STRING | LONG_STRING )
+ : ( [rR] | [uU] | [fF] | ( [fF] [rR] ) | ( [rR] [fF] ) )? ( SHORT_STRING | LONG_STRING )
  ;
 
 /// bytesliteral   ::=  bytesprefix(shortbytes | longbytes)
-/// bytesprefix    ::=  "b" | "B" | "br" | "Br" | "bR" | "BR"
+/// bytesprefix    ::=  "b" | "B" | "br" | "Br" | "bR" | "BR" | "rb" | "rB" | "Rb" | "RB"
 BYTES_LITERAL
- : [bB] [rR]? ( SHORT_BYTES | LONG_BYTES )
+ : ( [bB] | ( [bB] [rR] ) | ( [rR] [bB] ) ) ( SHORT_BYTES | LONG_BYTES )
  ;
 
 /// decimalinteger ::=  nonzerodigit digit* | "0"+
@@ -886,7 +480,6 @@ fragment SHORT_STRING
  : '\'' ( STRING_ESCAPE_SEQ | ~[\\\r\n\f'] )* '\''
  | '"' ( STRING_ESCAPE_SEQ | ~[\\\r\n\f"] )* '"'
  ;
-
 /// longstring      ::=  "'''" longstringitem* "'''" | '"""' longstringitem* '"""'
 fragment LONG_STRING
  : '\'\'\'' LONG_STRING_ITEM*? '\'\'\''
@@ -907,6 +500,7 @@ fragment LONG_STRING_CHAR
 /// stringescapeseq ::=  "\" <any source character>
 fragment STRING_ESCAPE_SEQ
  : '\\' .
+ | '\\' NEWLINE
  ;
 
 /// nonzerodigit   ::=  "1"..."9"
@@ -1016,7 +610,7 @@ fragment COMMENT
  ;
 
 fragment LINE_JOINING
- : '\\' SPACES? ( '\r'? '\n' | '\r' | '\f' )
+ : '\\' SPACES? ( '\r'? '\n' | '\r' | '\f')
  ;
 
 /// id_start     ::=  <all characters in general categories Lu, Ll, Lt, Lm, Lo, Nl, the underscore, and characters with the Other_ID_Start property>
