@@ -303,7 +303,7 @@ output_clause
     ;
 
 output_dml_list_elem
-    : (output_column_name | expression) (AS? column_alias)?  // TODO: scalar_expression
+    : (output_column_name | expression) as_column_alias?  // TODO: scalar_expression
     ;
 
 output_column_name
@@ -1206,10 +1206,35 @@ select_list
     : select_list_elem (',' select_list_elem)*
     ;
 
+udt_method_arguments
+    : '(' execute_var_string (',' execute_var_string)* ')'
+    ;
+
+// https://docs.microsoft.com/ru-ru/sql/t-sql/queries/select-clause-transact-sql
+asterisk
+    : '*'
+    | table_name '.' asterisk
+    ;
+
+column_elem
+    : (table_name '.')? (column_name=id | '$' IDENTITY | '$' ROWGUID) as_column_alias?
+    ;
+
+udt_elem
+    : udt_column_name=id '.' non_static_attr=id udt_method_arguments as_column_alias?
+    | udt_column_name=id ':' ':' static_attr=id udt_method_arguments? as_column_alias?
+    ;
+
+expression_elem
+    : expression as_column_alias?
+    | column_alias eq='=' expression
+    ;
+
 select_list_elem
-    : (table_name '.')? ('*' | '$' (IDENTITY | ROWGUID))
-    | column_alias '=' expression
-    | expression (AS? column_alias)?
+    : asterisk
+    | column_elem
+    | udt_elem
+    | expression_elem
     ;
 
 table_sources
@@ -1389,6 +1414,10 @@ switch_section
 
 switch_search_condition_section
     : WHEN search_condition THEN expression
+    ;
+
+as_column_alias
+    : AS? column_alias
     ;
 
 as_table_alias
