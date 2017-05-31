@@ -5,6 +5,7 @@ An ANTLR4 grammar for Python 3 based on version 3.6 of
 
 This grammar has been tested against the Python 3's 
 [standard library](https://hg.python.org/cpython/file/3.6/Lib), 
+the contents of the asyncio folder there is included in the examples section.
 
 Note that this grammar contains embedded Java code that handles
 the insertion of `INDENT` and `DEDENT` tokens. The embedded code,
