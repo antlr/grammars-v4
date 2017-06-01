@@ -906,7 +906,7 @@ execute_clause
     ;
 
 declare_local
-    : LOCAL_ID AS? data_type ('=' expression)? expression?
+    : LOCAL_ID AS? data_type ('=' expression)?
     ;
 
 table_type_definition
