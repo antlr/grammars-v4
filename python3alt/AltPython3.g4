@@ -109,7 +109,7 @@ tokens { INDENT, DEDENT }
       }
 
       // First emit an extra line break that serves as the end of the statement.
-      this.emit(commonToken(Python3Parser.NEWLINE, "\n"));
+      this.emit(commonToken(AltPython3Parser.NEWLINE, "\n"));
 
       // Now emit as much DEDENT tokens as needed.
       while (!indents.isEmpty()) {
@@ -118,7 +118,7 @@ tokens { INDENT, DEDENT }
       }
 
       // Put the EOF back on the token stream.
-      this.emit(commonToken(Python3Parser.EOF, "<EOF>"));
+      this.emit(commonToken(AltPython3Parser.EOF, "<EOF>"));
     }
 
     Token next = super.nextToken();
@@ -132,7 +132,7 @@ tokens { INDENT, DEDENT }
   }
 
   private Token createDedent() {
-    CommonToken dedent = commonToken(Python3Parser.DEDENT, "");
+    CommonToken dedent = commonToken(AltPython3Parser.DEDENT, "");
     dedent.setLine(this.lastToken.getLine());
     return dedent;
   }
@@ -659,7 +659,7 @@ atom
 	if (this._ctx.start instanceof org.antlr.v4.runtime.CommonToken) {
 		token = (org.antlr.v4.runtime.CommonToken)this._ctx.start;
 
-		if (token.getType() != Python3Parser.ALREADY_THROWN_TOKEN_TYPE) {
+		if (token.getType() != AltPython3Parser.ALREADY_THROWN_TOKEN_TYPE) {
 			tokenName = token.getText();
 		}
 	}
@@ -667,7 +667,7 @@ atom
 	if ("xrange".equals(tokenName)) {
 		if (this.getStrictPython3Parsing()) {
 			// This throws twice - the second time on parenthesis close.
-			token.setType(Python3Parser.ALREADY_THROWN_TOKEN_TYPE);
+			token.setType(AltPython3Parser.ALREADY_THROWN_TOKEN_TYPE);
 
 			throw new NoViableAltException(this);
 		}
@@ -885,7 +885,7 @@ NEWLINE
        }
        else if (indent > previous) {
          indents.push(indent);
-         emit(commonToken(Python3Parser.INDENT, spaces));
+         emit(commonToken(AltPython3Parser.INDENT, spaces));
        }
        else {
          // Possibly emit more than 1 DEDENT token.
