@@ -3,8 +3,9 @@
 #  Copyright (C) 2005   Gregory P. Smith (greg@krypto.org)
 #  Licensed to PSF under a Contributor Agreement.
 #
-# This is Python's sha.py co-opted to include a mish-mash of Python2-3 cases.
-#
+# This is Python's sha.py co-opted to include a mish-mash of Python2-3 cases. Many
+#   of the mish-mash-items stem from this write-up:
+#		http://sebastianraschka.com/Articles/2014_python_2_3_key_diff.html
 
 import warnings
 

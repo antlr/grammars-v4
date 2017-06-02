@@ -664,7 +664,7 @@ atom
 		}
 	}
 
-	if ("xrange".equals(tokenName)) {
+	if ("xrange".equals(tokenName) || "raw_input".equals(tokenName)) {
 		if (this.getStrictPython3Parsing()) {
 			// This throws twice - the second time on parenthesis close.
 			token.setType(AltPython3Parser.ALREADY_THROWN_TOKEN_TYPE);
