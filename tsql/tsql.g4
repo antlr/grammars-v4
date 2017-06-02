@@ -2396,7 +2396,7 @@ ID:                  ( [a-zA-Z_#] | FullWidthLetter) ( [a-zA-Z_#$@0-9] | FullWid
 STRING:              N? '\'' (~'\'' | '\'\'')* '\'';
 BINARY:              '0' X HEX_DIGIT*;
 FLOAT:               DEC_DOT_DEC;
-REAL:                DEC_DOT_DEC (E [+-]? DEC_DIGIT+)?;
+REAL:                (DECIMAL | DEC_DOT_DEC) (E [+-]? DEC_DIGIT+);
 
 EQUAL:               '=';
 
