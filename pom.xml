@@ -90,6 +90,7 @@
 		<module>protobuf3</module>
 		<module>properties</module>
 		<module>python3</module>
+		<module>python3alt</module>
 		<module>r</module>
 		<module>rcs</module>
 		<module>redcode</module>
