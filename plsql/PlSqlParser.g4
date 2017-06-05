@@ -17,9 +17,9 @@
  * limitations under the License.
  */
 
-parser grammar plsqlParser;
+parser grammar PlSqlParser;
 
-options { tokenVocab=plsqlLexer; }
+options { tokenVocab=PlSqlLexer; }
 
 swallow_to_semi
     : ~';'+

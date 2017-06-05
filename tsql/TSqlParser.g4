@@ -25,9 +25,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-parser grammar tsqlParser;
+parser grammar TSqlParser;
 
-options { tokenVocab=tsqlLexer; }
+options { tokenVocab=TSqlLexer; }
 
 tsql_file
     : batch* EOF
@@ -1884,6 +1884,7 @@ simple_id
     | USING
     | VAR
     | VARP
+    | VALUE
     | VIEW_METADATA
     | VIEWS
     | WORK

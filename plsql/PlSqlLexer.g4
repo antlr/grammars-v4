@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-lexer grammar plsqlLexer;
+lexer grammar PlSqlLexer;
 
 A_LETTER:                     A;
 ADD:                          A D D;

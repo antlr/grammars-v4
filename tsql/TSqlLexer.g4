@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-lexer grammar tsqlLexer;
+lexer grammar TSqlLexer;
 
 // Basic keywords (from https://msdn.microsoft.com/en-us/library/ms189822.aspx)
 ADD:                                   A D D;
