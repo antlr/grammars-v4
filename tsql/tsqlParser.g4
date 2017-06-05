@@ -119,7 +119,7 @@ cfl_statement
     | PRINT expression ';'?                                                                               #print_statement
     // https://msdn.microsoft.com/en-us/library/ms178592.aspx
     | RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' severity=constant_LOCAL_ID ','
-        state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' (WITH (LOG | SETERROR))? ';'?       #raiseerror_statementb
+        state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' (WITH (LOG | SETERROR))? ';'?       #raiseerror_statement
     ;
 
 empty_statement
@@ -819,13 +819,13 @@ algorithm
     : DES
     | TRIPLE_DES
     | TRIPLE_DES_3KEY
-    | 'RC2'
-    | 'RC4'
-    | 'RC4_128'
-    | 'DESX'
-    | 'AES_128'
-    | 'AES_192'
-    | 'AES_256'
+    | RC2
+    | RC4
+    | RC4_128
+    | DESX
+    | AES_128
+    | AES_192
+    | AES_256
     ;
 
 encryption_mechanism
@@ -1390,23 +1390,23 @@ xml_data_type_methods
     ;
 
 value_method
-    : (LOCAL_ID | ID | EVENTDATA | query_method) '.value(' xquery=STRING ',' sqltype=STRING ')'
+    : (LOCAL_ID | ID | EVENTDATA | query_method) '.' VALUE '(' xquery=STRING ',' sqltype=STRING ')'
     ;
 
 query_method
-    : (LOCAL_ID | ID | full_table_name) '.query(' xquery=STRING ')'
+    : (LOCAL_ID | ID | full_table_name) '.' QUERY '(' xquery=STRING ')'
     ;
 
 exist_method
-    : (LOCAL_ID | ID) '.exist(' xquery=STRING ')'
+    : (LOCAL_ID | ID) '.' EXIST '(' xquery=STRING ')'
     ;
 
 modify_method
-    : (LOCAL_ID | ID) '.modify(' xml_dml=STRING ')'
+    : (LOCAL_ID | ID) '.' MODIFY '(' xml_dml=STRING ')'
     ;
 
 nodes_method
-    : (LOCAL_ID | ID) '.nodes(' xquery=STRING ')'
+    : (LOCAL_ID | ID) '.' NODES '(' xquery=STRING ')'
     ;
 
 
@@ -1660,7 +1660,7 @@ service_name
 
 end_conversation
     : END CONVERSATION conversation_handle=LOCAL_ID ';'?
-      (WITH (ERROR '=' faliure_code=(LOCAL_ID | STRING) 'DESCRIPTION' '=' failure_text=(LOCAL_ID | STRING))? CLEANUP? )?
+      (WITH (ERROR '=' faliure_code=(LOCAL_ID | STRING) DESCRIPTION '=' failure_text=(LOCAL_ID | STRING))? CLEANUP? )?
     ;
 
 waitfor_conversation
