@@ -515,11 +515,11 @@ NATIONAL_CHAR_STRING_LIT: 'N' '\'' (~('\'' | '\r' | '\n' ) | '\'' '\'' | NEWLINE
 
 //  Rule #040 <BIT_STRING_LIT> - subtoken typecast in <REGULAR_ID>
 //  Lowercase 'b' is a usual addition to the standard
-BIT_STRING_LIT: 'B' ('\'' ('0' | '1')* '\'' /*SEPARATOR?*/ )+;
+BIT_STRING_LIT: 'B' ('\'' [01]* '\'')+;
 
 //  Rule #284 <HEX_STRING_LIT> - subtoken typecast in <REGULAR_ID>
 //  Lowercase 'x' is a usual addition to the standard
-HEX_STRING_LIT: 'X' ('\'' ('A'..'F' | '0'..'9')* '\'' /*SEPARATOR?*/ )+;
+HEX_STRING_LIT: 'X' ('\'' [A-F0-9]* '\'')+;
 DOUBLE_PERIOD: '..';
 PERIOD:        '.';
 
@@ -574,7 +574,7 @@ ASSIGN_OP: ':=';
     
 // See OCI reference for more information about this
 BINDVAR
-    : ':' SIMPLE_LETTER  (SIMPLE_LETTER | '0' .. '9' | '_')*
+    : ':' SIMPLE_LETTER  (SIMPLE_LETTER | [0-9] | '_')*
     | ':' DELIMITED_ID  // not used in SQL but spotted in v$sqltext when using cursor_sharing
     | ':' UNSIGNED_INTEGER
     | QUESTION_MARK // not in SQL, not in Oracle, not in OCI, use this for JDBC
@@ -623,15 +623,14 @@ SPACES: [ \t\r\n]+ -> skip;
 //  Unicode is yet to be implemented - see NSF0
 fragment
 SIMPLE_LETTER
-    : 'a'..'z'
-    | 'A'..'Z'
+    : [A-Z]
     ;
 //}
 
 //  Rule #176 <DIGIT> was incorporated by <UNSIGNED_INTEGER> 
 //{ Rule #615 <UNSIGNED_INTEGER> - subtoken typecast in <EXACT_NUM_LIT> 
 fragment
-UNSIGNED_INTEGER_FRAGMENT: ('0'..'9')+ ;
+UNSIGNED_INTEGER_FRAGMENT: [0-9]+ ;
 
 fragment
 FLOAT_FRAGMENT
@@ -639,7 +638,7 @@ FLOAT_FRAGMENT
     ;
 
 //{ Rule #097 <COMMENT>
-SINGLE_LINE_COMMENT: '--' ( ~('\r' | '\n') )* (NEWLINE|EOF) -> channel(HIDDEN);
+SINGLE_LINE_COMMENT: '--' ~('\r' | '\n')* (NEWLINE | EOF)   -> channel(HIDDEN);
 MULTI_LINE_COMMENT: '/*' .*? '*/'                           -> channel(HIDDEN);
 
 // SQL*Plus prompt
@@ -658,103 +657,5 @@ SPACE: [ \t];
 //{ Rule #442 <REGULAR_ID> additionally encapsulates a few STRING_LITs.
 //  Within testLiterals all reserved and non-reserved words are being resolved
 
-// PLSQL keywords:
-
-/*PLSQL_NON_RESERVED_COLUMNS: 'columns';
-CLUSTERS: 'clusters';
-COLAUTH: 'colauth';
-COMPRESS: 'compress';
-PLSQL_NON_RESERVED_CONNECT_BY_ROOT: 'connect_by_root';
-CRASH: 'crash';
-EXCLUSIVE: 'exclusive';
-IDENTIFIED: 'identified';
-INDEX: 'index';
-INDEXES: 'indexes';
-LOCK: 'lock';
-MINUS: 'minus';
-MODE: 'mode';
-NOCOMPRESS: 'nocompress';
-NOWAIT: 'nowait';
-RESOURCE: 'resource';
-SHARE: 'share';*/
-
-// SQL92 keywords:
-
-/*ALL: 'all';
-ALTER: 'alter';
-AND: 'and';
-
-ANY: 'any';
-AS: 'as';
-ASC: 'asc';
-BEGIN: 'begin';
-BETWEEN: 'between';
-BY: 'by';
-CASE: 'case';
-CHECK: 'check';
-CONNECT: 'connect';
-CREATE: 'create';
-CURRENT: 'current';
-CURSOR: 'cursor';
-DATE: 'date';
-DECLARE: 'declare';
-DEFAULT: 'default';
-DELETE: 'delete';
-DESC: 'desc';
-DISTINCT: 'distinct';
-DROP: 'drop';
-ELSE: 'else';
-END: 'end';
-//TODO "exception" is a keyword only withing the contex of the PL/SQL language
-//while it can be an identifier(column name, table name) in SQL
-//"exception" is a keyword if and only it is followed by "when"
-EXCEPTION: 'exception';
-EXISTS: 'exists';
-FALSE: 'false';
-FETCH: 'fetch';
-FOR: 'for';
-FROM: 'from';
-GOTO: 'goto';
-GRANT: 'grant';
-GROUP: 'group';
-HAVING: 'having';
-IN: 'in';
-INSERT: 'insert';
-INTERSECT: 'intersect';
-INTO: 'into';
-IS: 'is';
-LIKE: 'like';
-NOT: 'not';
-NULL: 'null';
-OF: 'of';
-ON: 'on';
-OPTION: 'option';
-OR: 'or';
-ORDER: 'order';
-OVERLAPS: 'overlaps';
-PRIOR: 'prior';
-PROCEDURE: 'procedure';
-PUBLIC: 'public';
-REVOKE: 'revoke';
-SELECT: 'select';
-SIZE: 'size';
-START: 'start';
-TABAUTH: 'tabauth';
-TABLE: 'table';
-THE: 'the';
-THEN: 'then';
-TO: 'to';
-TRUE: 'true';
-UNION: 'union';
-UNIQUE: 'unique';
-UPDATE: 'update';
-VALUES: 'values';
-VIEW: 'view';
-VIEWS: 'views';
-WHEN: 'when';
-WHERE: 'where';
-WITH: 'with';
-USING: 'using';*/
-
-REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | '0'..'9')*;
+REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
 ZV: '@!' -> channel(HIDDEN);
