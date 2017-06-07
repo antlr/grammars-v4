@@ -925,3 +925,8 @@ LineComment
     :   '//' ~[\r\n]*
         -> skip
     ;
+
+IncludeStatement
+    :   '#include' ~[\r\n]*
+        -> skip
+    ;
