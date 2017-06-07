@@ -910,6 +910,10 @@ SingleLineComment
  : '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN)
  ;
 
+HtmlComment
+ : '<!--' .*? '-->' -> channel(HIDDEN)
+ ;
+
 UnexpectedCharacter
  : .
  ;
