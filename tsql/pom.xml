@@ -22,8 +22,6 @@
 						<include>TSqlLexer.g4</include>
 						<include>TSqlParser.g4</include>
 					</includes>
-					<visitor>true</visitor>
-					<listener>true</listener>
 				</configuration>
 				<executions>
 					<execution>
@@ -42,6 +40,7 @@
 					<showTree>false</showTree>
 					<entryPoint>tsql_file</entryPoint>
 					<grammarName>TSql</grammarName>
+					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
