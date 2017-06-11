@@ -130,7 +130,9 @@
 		<module>xml</module>
 		<module>xpath</module>
 		<module>z</module>
-	</modules>
+		<!-- testing repository -->
+        <module>grammar-test</module>
+    </modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
@@ -146,9 +148,9 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>6.9.9</version>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
 		</dependency>
 	</dependencies>
 	<build>
