@@ -6,7 +6,7 @@ import java.io.FileFilter;
 
 public class TestC {
 
-    private static File gfile = new File("../c/c.g4");
+    private static File gfile = new File("../c/C.g4");
     private static File [] ok = new File("../c/examples").listFiles(new FileFilter() {
         @Override
         public boolean accept(File pathname) {

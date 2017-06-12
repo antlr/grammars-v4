@@ -13,7 +13,7 @@ public class TestIri {
         }
     });
 
-    private static File gfile =  new File("../iri/iri.g4");
+    private static File gfile =  new File("../iri/IRI.g4");
 
     @Test
     public void test(){
