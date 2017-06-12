@@ -640,7 +640,19 @@ termination:
 
 // https://msdn.microsoft.com/en-us/library/ms176118.aspx
 drop_index
-    : DROP INDEX (IF EXISTS)? ((((schema=id) '.')? (table=id) '.' (index_name=id)) | (id ON table_name)) ';'?
+    : DROP INDEX (IF EXISTS)?
+    ( drop_relational_or_xml_or_spatial_index (',' drop_relational_or_xml_or_spatial_index)*
+    | drop_backward_compatible_index (',' drop_backward_compatible_index)*
+    )
+    ';'?
+    ;
+
+drop_relational_or_xml_or_spatial_index
+    : index_name=id ON full_table_name
+    ;
+
+drop_backward_compatible_index
+    : (owner_name=id '.')? table_or_view_name=id '.' index_name=id
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174969.aspx

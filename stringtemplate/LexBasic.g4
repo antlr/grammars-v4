@@ -133,8 +133,8 @@ fragment DQuoteLiteral	: DQuote ( EscSeq | ~["\r\n\\] )* DQuote	;
 fragment USQuoteLiteral	: SQuote ( EscSeq | ~['\r\n\\] )* 			;
 
 fragment DecimalFloatingPointLiteral
-	:   DecDigits DOT DecDigits? ExponentPart? FloatTypeSuffix?
-	|   DOT DecDigits ExponentPart? FloatTypeSuffix?
+	:   DecDigits Dot DecDigits? ExponentPart? FloatTypeSuffix?
+	|   Dot DecDigits ExponentPart? FloatTypeSuffix?
 	|	DecDigits ExponentPart FloatTypeSuffix?
 	|	DecDigits FloatTypeSuffix
 	;
@@ -152,8 +152,8 @@ fragment HexadecimalFloatingPointLiteral
 	;
 
 fragment HexSignificand
-	:   HexNumeral DOT?
-	|   '0' [xX] HexDigits? DOT HexDigits
+	:   HexNumeral Dot?
+	|   '0' [xX] HexDigits? Dot HexDigits
 	;
 
 fragment BinaryExponent
