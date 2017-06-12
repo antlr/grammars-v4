@@ -2,5 +2,5 @@ language: java
 jdk:
   - oraclejdk8
 sudo: false
-script: mvn test -pl grammar-test
+install: mvn test -pl grammar-test
 
