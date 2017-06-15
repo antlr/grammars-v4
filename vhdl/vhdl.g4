@@ -867,7 +867,7 @@ interface_port_declaration
   ;
 
 interface_signal_declaration
-  : SIGNAL identifier_list COLON subtype_indication
+  : SIGNAL identifier_list COLON ( signal_mode )? subtype_indication
     ( BUS )? ( VARASGN expression )?
   ;
 
