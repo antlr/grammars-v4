@@ -1740,18 +1740,16 @@ Identifier
 // and dollar sign ($, or \u0024). The $ sign should be used only in mechanically generated source
 // code or, rarely, to access pre-existing names on legacy systems. 
 
-The "Java digits" include the ASCII digits 0-9 (\u0030-\u0039). 
-
 fragment
 JavaLetter
-	:	[a-zA-Z$_] // these are the "java letters" below 0x7F
-		;
+	:	[a-zA-Z$_] // these are the "java letters" 
+	;
 
 // The "Java digits" include the ASCII digits 0-9 (\u0030-\u0039). 
 
 fragment
 JavaLetterOrDigit
-	:	[a-zA-Z0-9$_] // these are the "java letters or digits" below 0x7F
+	:	[a-zA-Z0-9$_] // these are the "java letters or digits" 
 	;
 
 //
