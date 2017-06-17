@@ -135,7 +135,19 @@ if_statement
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/throw-transact-sql
 throw_statement
-    : THROW (error_number=(DECIMAL | LOCAL_ID) ',' message=(STRING | LOCAL_ID) ',' state=(DECIMAL | LOCAL_ID))? ';'?
+    : THROW (throw_error_number ',' throw_message ',' throw_state)? ';'?
+    ;
+
+throw_error_number
+    : DECIMAL | LOCAL_ID
+    ;
+
+throw_message
+    : STRING | LOCAL_ID
+    ;
+
+throw_state
+    : DECIMAL | LOCAL_ID
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/try-catch-transact-sql
