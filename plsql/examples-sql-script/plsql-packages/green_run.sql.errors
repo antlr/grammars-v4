@@ -1,1 +1,1 @@
-line 1:0 mismatched input '@' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, INSERT, LOCK, MERGE, SELECT, SET, SHOW, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}
+line 1:0 mismatched input '@' expecting {<EOF>, 'ALTER', 'CREATE', 'DELETE', 'DROP', 'EXIT', 'EXPLAIN', 'INSERT', 'LOCK', 'MERGE', 'SELECT', 'SET', 'SHOW', 'UPDATE', 'WHENEVER', 'WITH', '(', '/', PROMPT}
