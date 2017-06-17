@@ -34,7 +34,7 @@ startRule
    ;
 
 module
-   : WS? NEWLINE* (moduleHeader NEWLINE +)? moduleReferences? NEWLINE* moduleConfig? NEWLINE* moduleAttributes? NEWLINE* moduleOptions? NEWLINE* moduleBody? NEWLINE* WS?
+   : WS? NEWLINE* (moduleHeader NEWLINE +)? moduleReferences? NEWLINE* controlProperties? NEWLINE* moduleConfig? NEWLINE* moduleAttributes? NEWLINE* moduleOptions? NEWLINE* moduleBody? NEWLINE* WS?
    ;
 
  moduleReferences
@@ -98,6 +98,37 @@ moduleBodyElement
    | subStmt
    | typeStmt
    ;
+
+// Controls ----------------------------------
+
+controlProperties 
+	: WS? BEGIN WS cp_ControlType WS cp_ControlIdentifier WS? NEWLINE+ cp_Properties+ END NEWLINE*
+	;
+
+cp_Properties 
+	: cp_SingleProperty
+	| cp_NestedProperty
+	| controlProperties;
+
+cp_SingleProperty 
+	: WS? cp_PropertyName WS? EQ WS? '$'? literal FRX_OFFSET? NEWLINE+
+	;
+
+cp_PropertyName 
+	: (OBJECT '.')? complexType
+	;
+
+cp_NestedProperty 
+	: WS? BEGINPROPERTY WS ambiguousIdentifier (LPAREN INTEGERLITERAL RPAREN)? (WS GUID)? NEWLINE+ (cp_Properties+)? ENDPROPERTY NEWLINE+
+	;
+
+cp_ControlType 
+	: complexType
+	;
+
+cp_ControlIdentifier
+	: ambiguousIdentifier
+	;
 
 // block ----------------------------------
 moduleBlock
@@ -984,6 +1015,11 @@ BEGIN
    ;
 
 
+BEGINPROPERTY
+	: B E G I N P R O P E R T Y
+	;
+
+
 BEEP
    : B E E P
    ;
@@ -1202,6 +1238,11 @@ END_WITH
 END
    : E N D
    ;
+
+
+ENDPROPERTY
+	: E N D P R O P E R T Y
+	;
 
 
 ENUM
@@ -1882,6 +1923,10 @@ LEQ
    : '<='
    ;
 
+LBRACE 
+	: '{'
+	;
+
 
 LPAREN
    : '('
@@ -1933,6 +1978,11 @@ POW
    ;
 
 
+RBRACE
+	: '}'
+	;
+
+
 RPAREN
    : ')'
    ;
@@ -1982,6 +2032,15 @@ DOUBLELITERAL
 FILENUMBER
    : HASH LETTERORDIGIT +
    ;
+
+// misc
+FRX_OFFSET
+	: COLON [0-9A-F]+
+	;
+
+GUID
+	: LBRACE [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ RBRACE
+	;
 
 // identifier
 
