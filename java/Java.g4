@@ -975,26 +975,22 @@ Identifier
     :   JavaLetter JavaLetterOrDigit*
     ;
 
+
+// The "Java letters" include uppercase and lowercase ASCII Latin letters A-Z (\u0041-\u005a), 
+// and a-z (\u0061-\u007a), and, for historical reasons, the ASCII underscore (_, or \u005f) 
+// and dollar sign ($, or \u0024). The $ sign should be used only in mechanically generated source
+// code or, rarely, to access pre-existing names on legacy systems. 
+
 fragment
 JavaLetter
     :   [a-zA-Z$_] // these are the "java letters" below 0x7F
-    |   // covers all characters above 0x7F which are not a surrogate
-        ~[\u0000-\u007F\uD800-\uDBFF]
-        {Character.isJavaIdentifierStart(_input.LA(-1))}?
-    |   // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-        [\uD800-\uDBFF] [\uDC00-\uDFFF]
-        {Character.isJavaIdentifierStart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
     ;
+
+// The "Java digits" include the ASCII digits 0-9 (\u0030-\u0039). 
 
 fragment
 JavaLetterOrDigit
     :   [a-zA-Z0-9$_] // these are the "java letters or digits" below 0x7F
-    |   // covers all characters above 0x7F which are not a surrogate
-        ~[\u0000-\u007F\uD800-\uDBFF]
-        {Character.isJavaIdentifierPart(_input.LA(-1))}?
-    |   // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-        [\uD800-\uDBFF] [\uDC00-\uDFFF]
-        {Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
     ;
 
 //
