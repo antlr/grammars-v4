@@ -34,11 +34,27 @@ startRule
    ;
 
 module
-   : WS? NEWLINE* (moduleHeader NEWLINE +)? moduleConfig? NEWLINE* moduleAttributes? NEWLINE* moduleOptions? NEWLINE* moduleBody? NEWLINE* WS?
+   : WS? NEWLINE* (moduleHeader NEWLINE +)? moduleReferences? NEWLINE* moduleConfig? NEWLINE* moduleAttributes? NEWLINE* moduleOptions? NEWLINE* moduleBody? NEWLINE* WS?
    ;
 
+ moduleReferences
+	: moduleReference+
+	;
+	
+moduleReference 
+	: OBJECT WS? EQ WS? moduleReferenceGUID SEMICOLON WS? moduleReferenceComponent NEWLINE*
+	;
+	 
+moduleReferenceGUID
+	: STRINGLITERAL
+	;
+
+moduleReferenceComponent
+	: STRINGLITERAL
+	;
+
 moduleHeader
-   : VERSION WS DOUBLELITERAL WS CLASS
+   : VERSION WS DOUBLELITERAL (WS CLASS)?
    ;
 
 moduleConfig
@@ -690,6 +706,7 @@ baseType
    | DOUBLE
    | INTEGER
    | LONG
+   | OBJECT
    | SINGLE
    | STRING
    | VARIANT
@@ -1444,6 +1461,9 @@ NULL
    : N U L L
    ;
 
+OBJECT 
+	: O B J E C T
+	;
 
 ON
    : O N
