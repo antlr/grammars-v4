@@ -78,5 +78,5 @@ RPAREN
 
 
 WS
-   : [ \t\r\n] -> skip
+   : . -> skip
    ;

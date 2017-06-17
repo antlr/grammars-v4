@@ -21,3 +21,9 @@ Next
 
 
 For i = 1 To 32000: Next i
+
+Dim i%
+  
+For i% = 1 To 10 Step -1
+	DoEvents
+Next i%

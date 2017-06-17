@@ -42,6 +42,29 @@ ORDER BY Name ASC;
 GO
 GO
 
+USE AdventureWorks2012;
+GO
+SELECT
+    [Production].[Product].[ProductID],
+    [Production].[Product].[Name]
+FROM [Production].[Product]
+GO
+
+USE AdventureWorks2012;
+GO
+SELECT *, *, * -- yes, syntax is valid
+FROM [Production].[Product]
+GO
+
+USE AdventureWorks2012;
+GO
+SELECT
+    some_type::static_method (@arg1, @arg2, @arg3),
+    another_type::method ('some value'),
+    still_one_type.non_static_method (@but, @with, @params)
+FROM [Production].[Product]
+GO
+
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Using SELECT with column headings and calculations
 

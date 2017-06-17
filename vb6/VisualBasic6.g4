@@ -34,11 +34,27 @@ startRule
    ;
 
 module
-   : WS? NEWLINE* (moduleHeader NEWLINE +)? moduleConfig? NEWLINE* moduleAttributes? NEWLINE* moduleOptions? NEWLINE* moduleBody? NEWLINE* WS?
+   : WS? NEWLINE* (moduleHeader NEWLINE +)? moduleReferences? NEWLINE* controlProperties? NEWLINE* moduleConfig? NEWLINE* moduleAttributes? NEWLINE* moduleOptions? NEWLINE* moduleBody? NEWLINE* WS?
    ;
 
+ moduleReferences
+	: moduleReference+
+	;
+	
+moduleReference 
+	: OBJECT WS? EQ WS? moduleReferenceGUID SEMICOLON WS? moduleReferenceComponent NEWLINE*
+	;
+	 
+moduleReferenceGUID
+	: STRINGLITERAL
+	;
+
+moduleReferenceComponent
+	: STRINGLITERAL
+	;
+
 moduleHeader
-   : VERSION WS DOUBLELITERAL WS CLASS
+   : VERSION WS DOUBLELITERAL (WS CLASS)?
    ;
 
 moduleConfig
@@ -70,6 +86,7 @@ moduleBody
 
 moduleBodyElement
    : moduleBlock
+   | moduleOption
    | declareStmt
    | enumerationStmt
    | eventStmt
@@ -81,6 +98,37 @@ moduleBodyElement
    | subStmt
    | typeStmt
    ;
+
+// Controls ----------------------------------
+
+controlProperties 
+	: WS? BEGIN WS cp_ControlType WS cp_ControlIdentifier WS? NEWLINE+ cp_Properties+ END NEWLINE*
+	;
+
+cp_Properties 
+	: cp_SingleProperty
+	| cp_NestedProperty
+	| controlProperties;
+
+cp_SingleProperty 
+	: WS? cp_PropertyName WS? EQ WS? '$'? literal FRX_OFFSET? NEWLINE+
+	;
+
+cp_PropertyName 
+	: (OBJECT '.')? complexType
+	;
+
+cp_NestedProperty 
+	: WS? BEGINPROPERTY WS ambiguousIdentifier (LPAREN INTEGERLITERAL RPAREN)? (WS GUID)? NEWLINE+ (cp_Properties+)? ENDPROPERTY NEWLINE+
+	;
+
+cp_ControlType 
+	: complexType
+	;
+
+cp_ControlIdentifier
+	: ambiguousIdentifier
+	;
 
 // block ----------------------------------
 moduleBlock
@@ -96,11 +144,11 @@ block
    ;
 
 blockStmt
-   : appactivateStmt
+   : appActivateStmt
    | attributeStmt
    | beepStmt
-   | chdirStmt
-   | chdriveStmt
+   | chDirStmt
+   | chDriveStmt
    | closeStmt
    | constStmt
    | dateStmt
@@ -166,7 +214,7 @@ blockStmt
    ;
 
 // statements ----------------------------------
-appactivateStmt
+appActivateStmt
    : APPACTIVATE WS valueStmt (WS? COMMA WS? valueStmt)?
    ;
 
@@ -174,11 +222,11 @@ beepStmt
    : BEEP
    ;
 
-chdirStmt
+chDirStmt
    : CHDIR WS valueStmt
    ;
 
-chdriveStmt
+chDriveStmt
    : CHDRIVE WS valueStmt
    ;
 
@@ -187,7 +235,7 @@ closeStmt
    ;
 
 constStmt
-   : (visibility WS)? CONST WS constSubStmt (WS? COMMA WS? constSubStmt)*
+   : (publicPrivateGlobalVisibility WS)? CONST WS constSubStmt (WS? COMMA WS? constSubStmt)*
    ;
 
 constSubStmt
@@ -221,7 +269,7 @@ endStmt
    ;
 
 enumerationStmt
-   : (visibility WS)? ENUM WS ambiguousIdentifier NEWLINE + (enumerationStmt_Constant)* END_ENUM
+   : (publicPrivateVisibility WS)? ENUM WS ambiguousIdentifier NEWLINE + (enumerationStmt_Constant)* END_ENUM
    ;
 
 enumerationStmt_Constant
@@ -257,7 +305,7 @@ forEachStmt
    ;
 
 forNextStmt
-   : FOR WS ambiguousIdentifier typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt WS TO WS valueStmt (WS STEP WS valueStmt)? NEWLINE + (block NEWLINE +)? NEXT (WS ambiguousIdentifier)?
+   : FOR WS ambiguousIdentifier typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt WS TO WS valueStmt (WS STEP WS valueStmt)? NEWLINE + (block NEWLINE +)? NEXT (WS ambiguousIdentifier typeHint?)?
    ;
 
 functionStmt
@@ -358,7 +406,7 @@ nameStmt
    ;
 
 onErrorStmt
-   : ON_ERROR WS (GOTO WS valueStmt | RESUME WS NEXT)
+   : (ON_ERROR | ON_LOCAL_ERROR) WS (GOTO WS valueStmt | RESUME WS NEXT)
    ;
 
 onGoToStmt
@@ -563,7 +611,7 @@ variableSubStmt
    ;
 
 whileWendStmt
-   : WHILE WS valueStmt NEWLINE + (block NEWLINE)* WEND
+   : WHILE WS valueStmt NEWLINE + block* NEWLINE* WEND
    ;
 
 widthStmt
@@ -657,7 +705,7 @@ argList
    ;
 
 arg
-   : (OPTIONAL WS)? ((BYVAL | BYREF) WS)? (PARAMARRAY WS)? ambiguousIdentifier (WS? LPAREN WS? RPAREN)? (WS asTypeClause)? (WS? argDefaultValue)?
+   : (OPTIONAL WS)? ((BYVAL | BYREF) WS)? (PARAMARRAY WS)? ambiguousIdentifier typeHint? (WS? LPAREN WS? RPAREN)? (WS asTypeClause)? (WS? argDefaultValue)?
    ;
 
 argDefaultValue
@@ -690,6 +738,7 @@ baseType
    | DOUBLE
    | INTEGER
    | LONG
+   | OBJECT
    | SINGLE
    | STRING
    | VARIANT
@@ -739,6 +788,17 @@ literal
    | NOTHING
    | NULL
    ;
+
+publicPrivateVisibility 
+	: PRIVATE 
+	| PUBLIC
+	;
+
+publicPrivateGlobalVisibility 
+	: PRIVATE 
+	| PUBLIC
+	| GLOBAL
+	;
 
 type
    : (baseType | complexType) (WS? LPAREN WS? RPAREN)?
@@ -953,6 +1013,11 @@ AS
 BEGIN
    : B E G I N
    ;
+
+
+BEGINPROPERTY
+	: B E G I N P R O P E R T Y
+	;
 
 
 BEEP
@@ -1173,6 +1238,11 @@ END_WITH
 END
    : E N D
    ;
+
+
+ENDPROPERTY
+	: E N D P R O P E R T Y
+	;
 
 
 ENUM
@@ -1444,6 +1514,9 @@ NULL
    : N U L L
    ;
 
+OBJECT 
+	: O B J E C T
+	;
 
 ON
    : O N
@@ -1452,6 +1525,11 @@ ON
 
 ON_ERROR
    : O N ' ' E R R O R
+   ;
+
+
+ON_LOCAL_ERROR
+   : O N ' ' L O C A L ' ' E R R O R
    ;
 
 
@@ -1845,6 +1923,10 @@ LEQ
    : '<='
    ;
 
+LBRACE 
+	: '{'
+	;
+
 
 LPAREN
    : '('
@@ -1896,6 +1978,11 @@ POW
    ;
 
 
+RBRACE
+	: '}'
+	;
+
+
 RPAREN
    : ')'
    ;
@@ -1933,18 +2020,27 @@ COLORLITERAL
 
 
 INTEGERLITERAL
-   : (PLUS | MINUS)? ('0' .. '9') + (('e' | 'E') INTEGERLITERAL)* (HASH | AMPERSAND)?
+   : (PLUS | MINUS)? ('0' .. '9') + (('e' | 'E') INTEGERLITERAL)* (HASH | AMPERSAND | EXCLAMATIONMARK | AT)?
    ;
 
 
 DOUBLELITERAL
-   : (PLUS | MINUS)? ('0' .. '9')* DOT ('0' .. '9') + (('e' | 'E') (PLUS | MINUS)? ('0' .. '9') +)* (HASH | AMPERSAND)?
+   : (PLUS | MINUS)? ('0' .. '9')* DOT ('0' .. '9') + (('e' | 'E') (PLUS | MINUS)? ('0' .. '9') +)* (HASH | AMPERSAND | EXCLAMATIONMARK | AT)?
    ;
 
 
 FILENUMBER
    : HASH LETTERORDIGIT +
    ;
+
+// misc
+FRX_OFFSET
+	: COLON [0-9A-F]+
+	;
+
+GUID
+	: LBRACE [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ MINUS [0-9A-F]+ RBRACE
+	;
 
 // identifier
 
