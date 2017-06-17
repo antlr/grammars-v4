@@ -135,7 +135,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
 		<antlr.version>4.7</antlr.version>
-		<antlr4test-maven-plugin.version>1.8</antlr4test-maven-plugin.version>
+		<antlr4test-maven-plugin.version>1.9</antlr4test-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
