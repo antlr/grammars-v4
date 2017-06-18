@@ -2,5 +2,8 @@ language: java
 jdk:
   - oraclejdk8
 sudo: false
-install: mvn test -pl grammar-test
 
+# use traditional maven plugin for travis
+install: mvn clean package
+
+#install: mvn test -pl grammar-test
