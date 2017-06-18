@@ -18,8 +18,8 @@ class LexerAdaptor(Lexer):
 
     _currentRuleType = Token.INVALID_TYPE
 
-    def __init__(self, inp):
-        Lexer.__init__(self, inp)
+    def __init__(self, inp, output):
+        Lexer.__init__(self, inp, output)
 
     def getCurrentRuleType(self):
         return self._currentRuleType
