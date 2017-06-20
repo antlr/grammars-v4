@@ -111,11 +111,11 @@ cp_Properties
 	| controlProperties;
 
 cp_SingleProperty 
-	: WS? cp_PropertyName WS? EQ WS? '$'? literal FRX_OFFSET? NEWLINE+
+	: WS? cp_PropertyName WS? EQ WS? DOLLAR? literal FRX_OFFSET? NEWLINE+
 	;
 
 cp_PropertyName 
-	: (OBJECT '.')? complexType
+	: (OBJECT DOT)? complexType
 	;
 
 cp_NestedProperty 
