@@ -6,7 +6,7 @@ import java.io.FileFilter;
 
 public class TestPostalcode {
 
-    private static File [] ok = new File("../postlcode/examples").listFiles(new FileFilter() {
+    private static File [] ok = new File("../postalcode/examples").listFiles(new FileFilter() {
         @Override
         public boolean accept(File pathname) {
             return pathname.isFile();
@@ -17,7 +17,7 @@ public class TestPostalcode {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(gfile));
+        Assert.assertTrue(GrammarTester.run(ok,gfile));
     }
 
 }
