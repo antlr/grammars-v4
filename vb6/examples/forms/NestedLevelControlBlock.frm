@@ -13,6 +13,7 @@ Begin VB.Form SomeForm
       TabIndex        =   8
       Top             =   120
       Width           =   10755
+      Shortcut        =   {F1}
       Begin VB.CommandButton SomeButton
          Caption         =   "Button"
          ItemData        =   "SomeForm.frx":0000
