@@ -679,7 +679,7 @@ iCS_S_MembersCall
    ;
 
 iCS_S_MemberCall
-   : DOT (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)
+   : WS? DOT (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)
    ;
 
 iCS_S_DictionaryCall
