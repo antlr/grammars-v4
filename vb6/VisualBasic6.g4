@@ -671,8 +671,12 @@ iCS_S_VariableOrProcedureCall
    ;
 
 iCS_S_ProcedureOrArrayCall
-   : (ambiguousIdentifier | baseType) typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN dictionaryCallStmt?
+   : (ambiguousIdentifier | baseType | iCS_S_NestedProcedureCall) typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN dictionaryCallStmt?
    ;
+
+iCS_S_NestedProcedureCall
+	: ambiguousIdentifier typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN
+	;
 
 iCS_S_MembersCall
    : (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)? iCS_S_MemberCall + dictionaryCallStmt?
