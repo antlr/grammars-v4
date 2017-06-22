@@ -585,7 +585,7 @@ valueStmt
    | valueStmt WS? LT WS? valueStmt # vsLt
    | valueStmt WS? NEQ WS? valueStmt # vsNeq
    | valueStmt WS? EQ WS? valueStmt # vsEq
-   | valueStmt WS AMPERSAND WS valueStmt # vsAmp
+   | valueStmt WS? AMPERSAND WS? valueStmt # vsAmp
    | MINUS WS? valueStmt # vsNegation
    | PLUS WS? valueStmt # vsPlus
    | valueStmt WS? PLUS WS? valueStmt # vsAdd
