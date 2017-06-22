@@ -406,7 +406,7 @@ nameStmt
    ;
 
 onErrorStmt
-   : (ON_ERROR | ON_LOCAL_ERROR) WS (GOTO WS valueStmt | RESUME WS NEXT)
+   : (ON_ERROR | ON_LOCAL_ERROR) WS (GOTO WS valueStmt COLON? | RESUME WS NEXT)
    ;
 
 onGoToStmt
