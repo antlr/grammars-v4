@@ -42,10 +42,10 @@ module
 	;
 	
 moduleReference 
-	: OBJECT WS? EQ WS? moduleReferenceGUID SEMICOLON WS? moduleReferenceComponent NEWLINE*
+	: OBJECT WS? EQ WS? moduleReferenceValue (SEMICOLON WS? moduleReferenceComponent)? NEWLINE*
 	;
 	 
-moduleReferenceGUID
+moduleReferenceValue
 	: STRINGLITERAL
 	;
 
