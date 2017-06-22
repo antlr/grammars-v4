@@ -233,7 +233,7 @@ compilationUnit
 	;
 
 packageDeclaration
-	:	packageModifier* 'package' Identifier ('.' Identifier)* ';'
+	:	packageModifier* 'package' packageName ';'
 	;
 
 packageModifier
