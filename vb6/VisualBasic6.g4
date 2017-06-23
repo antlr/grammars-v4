@@ -717,7 +717,7 @@ arg
    ;
 
 argDefaultValue
-   : EQ WS? (literal | ambiguousIdentifier)
+   : EQ WS? valueStmt
    ;
 
 subscripts
