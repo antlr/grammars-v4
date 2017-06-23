@@ -115,7 +115,7 @@ cp_SingleProperty
 	;
 
 cp_PropertyName 
-	: (OBJECT DOT)? complexType
+	: (OBJECT DOT)? ambiguousIdentifier (LPAREN literal RPAREN)? (DOT ambiguousIdentifier (LPAREN literal RPAREN)?)*
 	;
 
 cp_PropertyValue
