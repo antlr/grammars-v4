@@ -623,7 +623,7 @@ widthStmt
    ;
 
 withStmt
-   : WITH WS implicitCallStmt_InStmt NEWLINE + (block NEWLINE +)? END_WITH
+   : WITH WS (NEW WS)? implicitCallStmt_InStmt NEWLINE + (block NEWLINE +)? END_WITH
    ;
 
 writeStmt
