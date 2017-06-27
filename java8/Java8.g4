@@ -348,8 +348,7 @@ fieldModifier
 	;
 
 variableDeclaratorList
-	:	variableDeclarator
-	|	variableDeclaratorList ',' variableDeclarator
+	:	variableDeclarator (',' variableDeclarator)*
 	;
 
 variableDeclarator
