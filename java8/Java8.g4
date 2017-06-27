@@ -348,7 +348,8 @@ fieldModifier
 	;
 
 variableDeclaratorList
-	:	variableDeclarator (',' variableDeclarator)*
+	:	variableDeclarator
+	|	variableDeclaratorList ',' variableDeclarator
 	;
 
 variableDeclarator
@@ -705,7 +706,8 @@ arrayInitializer
 	;
 
 variableInitializerList
-	:	variableInitializer (',' variableInitializer)*
+	:	variableInitializer 
+	|	variableInitializerList ',' variableInitializer
 	;
 
 /*
@@ -717,7 +719,7 @@ block
 	;
 
 blockStatements
-	:	blockStatement blockStatement*
+	:	blockStatement+
 	;
 
 blockStatement
