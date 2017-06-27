@@ -705,8 +705,7 @@ arrayInitializer
 	;
 
 variableInitializerList
-	:	variableInitializer 
-	|	variableInitializerList ',' variableInitializer
+	:	variableInitializer (',' variableInitializer)*
 	;
 
 /*
