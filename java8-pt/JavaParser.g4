@@ -146,7 +146,12 @@ memberDeclaration
 methodDeclaration
     : typeTypeOrVoid Identifier formalParameters ('[' ']')*
       (THROWS qualifiedNameList)?
-      (methodBody=block | ';')
+      methodBody
+    ;
+
+methodBody
+    : block
+    | ';'
     ;
 
 typeTypeOrVoid
@@ -193,8 +198,19 @@ constantDeclarator
     ;
 
 // see matching of [] comment in methodDeclaratorRest
+// methodBody from Java 8
 interfaceMethodDeclaration
-    : typeTypeOrVoid Identifier formalParameters ('[' ']')* (THROWS qualifiedNameList)? ';'
+    : interfaceMethodModifier* typeTypeOrVoid Identifier formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
+    ;
+
+// Java8
+interfaceMethodModifier
+    : annotation
+    | PUBLIC
+    | ABSTRACT
+    | DEFAULT
+    | STATIC
+    | STRICTFP
     ;
 
 genericInterfaceMethodDeclaration
@@ -268,10 +284,8 @@ literal
 // ANNOTATIONS
 
 annotation
-    : '@' annotationName ( '(' ( elementValuePairs | elementValue )? ')' )?
+    : '@' qualifiedName ('(' ( elementValuePairs | elementValue )? ')')?
     ;
-
-annotationName : qualifiedName ;
 
 elementValuePairs
     : elementValuePair (',' elementValuePair)*
@@ -456,19 +470,22 @@ expression
     | <assoc=right> expression
       bop=('=' | '+=' | '-=' | '*=' | '/=' | '&=' | '|=' | '^=' | '>>=' | '>>>=' | '<<=' | '%=')
       expression
-    | lambdaExpression
+    | lambdaExpression // Java8
     ;
 
+// Java8
 lambdaExpression
     : lambdaParameters '->' lambdaBody
     ;
 
+// Java8
 lambdaParameters
     : Identifier
     | '(' formalParameterList? ')'
     | '(' Identifier (',' Identifier)* ')'
     ;
 
+// Java8
 lambdaBody
     : expression
     | block
