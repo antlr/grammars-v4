@@ -85,7 +85,7 @@ typeParameters
     ;
 
 typeParameter
-    : Identifier (EXTENDS typeBound)?
+    : annotation* Identifier (EXTENDS typeBound)?
     ;
 
 typeBound
@@ -499,6 +499,17 @@ primary
     | Identifier
     | typeTypeOrVoid '.' CLASS
     | nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
+    | methodReference // Java 8
+    ;
+
+methodReference
+    : (qualifiedName | typeType | (qualifiedName '.')? SUPER ) '::' typeArguments? Identifier
+    | classType '::' typeArguments? NEW
+    | typeType '::' NEW
+    ;
+
+classType
+    : (classOrInterfaceType '.')? annotation* Identifier typeArguments?
     ;
 
 creator

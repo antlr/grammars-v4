@@ -391,7 +391,10 @@ LSHIFT_ASSIGN:    '<<=';
 RSHIFT_ASSIGN:    '>>=';
 URSHIFT_ASSIGN:   '>>>=';
 
+// Java 8
+
 ARROW:            '->';
+COLONCOLON:       '::';
 
 // Identifiers (must appear after all keywords in the grammar)
 
