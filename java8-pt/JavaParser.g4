@@ -526,6 +526,22 @@ expression
         |   '%='
         )
         expression
+    | lambdaExpression
+    ;
+
+lambdaExpression
+    : lambdaParameters '->' lambdaBody
+    ;
+
+lambdaParameters
+    : Identifier
+    | '(' formalParameterList? ')'
+    | '(' Identifier (',' Identifier)* ')'
+    ;
+
+lambdaBody
+    : expression
+    | block
     ;
 
 primary
