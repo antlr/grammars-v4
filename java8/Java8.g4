@@ -717,7 +717,7 @@ block
 	;
 
 blockStatements
-	:	blockStatement blockStatement*
+	:	blockStatement+
 	;
 
 blockStatement
