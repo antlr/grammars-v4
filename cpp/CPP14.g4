@@ -1,18 +1,18 @@
 /*******************************************************************************
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Camilo Sanchez (Camiloasc1)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,9 +29,9 @@
  * https://github.com/cplusplus/draft/blob/master/papers/n4140.pdf
  * and
  * http://www.nongnu.org/hcb/
- * 
+ *
  * Possible Issues:
- * 
+ *
  * Input must avoid conditional compilation blocks (this grammar ignores any preprocessor directive)
  * GCC extensions not yet supported (do not try to parse the preprocessor output)
  * Right angle bracket (C++11) - Solution '>>' and '>>=' are not tokens, only '>'
@@ -91,7 +91,7 @@ qualifiedid
 nestednamespecifier
 :
 	'::'
-	| typename '::'
+	| thetypename '::'
 	| namespacename '::'
 	| decltypespecifier '::'
 	| nestednamespecifier Identifier '::'
@@ -168,12 +168,12 @@ postfixexpression
 	| postfixexpression '->' pseudodestructorname
 	| postfixexpression '++'
 	| postfixexpression '--'
-	| Dynamic_cast '<' typeid '>' '(' expression ')'
-	| Static_cast '<' typeid '>' '(' expression ')'
-	| Reinterpret_cast '<' typeid '>' '(' expression ')'
-	| Const_cast '<' typeid '>' '(' expression ')'
+	| Dynamic_cast '<' thetypeid '>' '(' expression ')'
+	| Static_cast '<' thetypeid '>' '(' expression ')'
+	| Reinterpret_cast '<' thetypeid '>' '(' expression ')'
+	| Const_cast '<' thetypeid '>' '(' expression ')'
 	| Typeid '(' expression ')'
-	| Typeid '(' typeid ')'
+	| Typeid '(' thetypeid ')'
 ;
 
 expressionlist
@@ -183,9 +183,9 @@ expressionlist
 
 pseudodestructorname
 :
-	nestednamespecifier? typename '::' '~' typename
-	| nestednamespecifier Template simpletemplateid '::' '~' typename
-	| nestednamespecifier? '~' typename
+	nestednamespecifier? thetypename '::' '~' thetypename
+	| nestednamespecifier Template simpletemplateid '::' '~' thetypename
+	| nestednamespecifier? '~' thetypename
 	| '~' decltypespecifier
 ;
 
@@ -196,9 +196,9 @@ unaryexpression
 	| '--' castexpression
 	| unaryoperator castexpression
 	| Sizeof unaryexpression
-	| Sizeof '(' typeid ')'
+	| Sizeof '(' thetypeid ')'
 	| Sizeof '...' '(' Identifier ')'
-	| Alignof '(' typeid ')'
+	| Alignof '(' thetypeid ')'
 	| noexceptexpression
 	| newexpression
 	| deleteexpression
@@ -218,7 +218,7 @@ unaryoperator
 newexpression
 :
 	'::'? New newplacement? newtypeid newinitializer?
-	| '::'? New newplacement? '(' typeid ')' newinitializer?
+	| '::'? New newplacement? '(' thetypeid ')' newinitializer?
 ;
 
 newplacement
@@ -263,7 +263,7 @@ noexceptexpression
 castexpression
 :
 	unaryexpression
-	| '(' typeid ')' castexpression
+	| '(' thetypeid ')' castexpression
 ;
 
 pmexpression
@@ -502,7 +502,7 @@ blockdeclaration
 
 aliasdeclaration
 :
-	Using Identifier attributespecifierseq? '=' typeid ';'
+	Using Identifier attributespecifierseq? '=' thetypeid ';'
 ;
 
 simpledeclaration
@@ -592,7 +592,7 @@ trailingtypespecifierseq
 
 simpletypespecifier
 :
-	nestednamespecifier? typename
+	nestednamespecifier? thetypename
 	| nestednamespecifier Template simpletemplateid
 	| Char
 	| Char16
@@ -611,7 +611,7 @@ simpletypespecifier
 	| decltypespecifier
 ;
 
-typename
+thetypename
 :
 	classname
 	| enumname
@@ -778,7 +778,7 @@ attributespecifier
 
 alignmentspecifier
 :
-	Alignas '(' typeid '...'? ')'
+	Alignas '(' thetypeid '...'? ')'
 	| Alignas '(' constantexpression '...'? ')'
 ;
 
@@ -903,7 +903,7 @@ declaratorid
 	'...'? idexpression
 ;
 
-typeid
+thetypeid
 :
 	typespecifierseq abstractdeclarator?
 ;
@@ -1177,7 +1177,7 @@ meminitializerid
 /*Overloading*/
 operatorfunctionid
 :
-	Operator operator
+	Operator theoperator
 ;
 
 literaloperatorid
@@ -1207,9 +1207,9 @@ templateparameter
 typeparameter
 :
 	Class '...'? Identifier?
-	| Class Identifier? '=' typeid
+	| Class Identifier? '=' thetypeid
 	| Typename '...'? Identifier?
-	| Typename Identifier? '=' typeid
+	| Typename Identifier? '=' thetypeid
 	| Template '<' templateparameterlist '>' Class '...'? Identifier?
 	| Template '<' templateparameterlist '>' Class Identifier? '=' idexpression
 ;
@@ -1239,7 +1239,7 @@ templateargumentlist
 
 templateargument
 :
-	typeid
+	thetypeid
 	| constantexpression
 	| idexpression
 ;
@@ -1306,8 +1306,8 @@ dynamicexceptionspecification
 
 typeidlist
 :
-	typeid '...'?
-	| typeidlist ',' typeid '...'?
+	thetypeid '...'?
+	| typeidlist ',' thetypeid '...'?
 ;
 
 noexceptspecification
@@ -1954,7 +1954,7 @@ Ellipsis
 	'...'
 ;
 
-operator
+theoperator
 :
 	New
 	| Delete
