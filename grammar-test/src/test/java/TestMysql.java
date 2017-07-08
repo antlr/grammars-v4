@@ -21,7 +21,7 @@ public class TestMysql {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(gfiles));
+        Assert.assertTrue(GrammarTester.run(ok,gfiles));
     }
 
 

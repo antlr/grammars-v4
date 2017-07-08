@@ -37,7 +37,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>stat</entryPoint>
+					<entryPoint>root</entryPoint>
 					<grammarName>MySQL</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
