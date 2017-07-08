@@ -1,7 +1,7 @@
 /*
 PHP grammar.
 The MIT License (MIT).
-Copyright (c) 2015-2016, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+Copyright (c) 2015-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,15 +34,38 @@ htmlDocument
     ;
 
 htmlElementOrPhpBlock
-    : htmlElement
+    : htmlElements
     | phpBlock
     | scriptTextPart
     ;
 
+htmlElements
+    : htmlElement+
+    ;
+
 htmlElement
-    : HtmlDtd | HtmlScriptOpen | HtmlClose | HtmlStyleOpen | ScriptClose | HtmlStyleOpen | StyleBody | HtmlOpen | HtmlName | '/>' | HtmlSlash | HtmlText 
-    | HtmlEquals | HtmlStartQuoteString | HtmlEndQuoteString | HtmlStartDoubleQuoteString | HtmlEndDoubleQuoteString | HtmlHex | HtmlDecimal
-    | HtmlQuoteString | HtmlDoubleQuoteString
+    : HtmlDtd
+    | HtmlScriptOpen
+    | HtmlClose
+    | HtmlStyleOpen
+    | HtmlOpen
+    | HtmlName
+    | HtmlSlashClose
+    | HtmlSlash
+    | HtmlText
+    | HtmlEquals
+    | HtmlStartQuoteString
+    | HtmlEndQuoteString
+    | HtmlStartDoubleQuoteString
+    | HtmlEndDoubleQuoteString
+    | HtmlHex
+    | HtmlDecimal
+    | HtmlQuoteString
+    | HtmlDoubleQuoteString
+
+    | StyleBody
+    
+    | ScriptClose
     ;
 
 // Script
@@ -321,7 +344,7 @@ declareStatement
     ;
 
 inlineHtml
-    : (htmlElement | scriptTextPart)+ //htmlElementOrPhpBlock*
+    : (htmlElements | scriptTextPart)+
     ;
 
 declareList
@@ -432,42 +455,6 @@ parenthesis
 // Grouped by prioriries: http://php.net/manual/en/language.operators.precedence.php
 // and http://www.phpeveryday.com/articles/PHP-Operators-Operator-Priority-P312.html
 expression
-    : andOrExpression
-    | expression QuestionMark expression? ':' andOrExpression
-    | expression LogicalAnd andOrExpression
-    | expression LogicalXor andOrExpression
-    | expression LogicalOr andOrExpression
-    ;
-
-andOrExpression
-    : comparisonExpression
-    | andOrExpression '&' comparisonExpression
-    | andOrExpression '^' comparisonExpression
-    | andOrExpression '|' comparisonExpression
-    | andOrExpression '&&' comparisonExpression
-    | andOrExpression '||' comparisonExpression
-    ;
-    
-comparisonExpression
-    : additionExpression
-    | comparisonExpression ('<<' | '>>') additionExpression
-    | comparisonExpression (Less | '<=' | Greater | '>=') additionExpression
-    | comparisonExpression ('===' | '!==' | '==' | IsNotEq) additionExpression
-    ;
-
-additionExpression
-    : multiplicationExpression
-    | additionExpression ('+' | '-' | '.') multiplicationExpression
-    ;
-
-multiplicationExpression
-    : notLeftRecursionExpression
-    | notLeftRecursionExpression '**' multiplicationExpression
-    | multiplicationExpression InstanceOf typeRef
-    | multiplicationExpression ('*' | Divide | '%') notLeftRecursionExpression
-    ;
-
-notLeftRecursionExpression
     : Clone expression                                         #CloneExpression
     | newExpr                                                  #NewExpression
     
@@ -505,6 +492,27 @@ notLeftRecursionExpression
     | (Require | RequireOnce) expression                       #SpecialWordExpression
 
     | Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? blockStatement  #LambdaFunctionExpression
+
+    | <assoc=right> expression '**' expression                    #ArithmeticExpression
+    | expression InstanceOf typeRef                               #InstanceOfExpression
+    | expression op=('*' | Divide | '%') expression               #ArithmeticExpression
+
+    | expression op=('+' | '-' | '.') expression                  #ArithmeticExpression
+
+    | expression op=('<<' | '>>') expression                      #ComparisonExpression
+    | expression op=(Less | '<=' | Greater | '>=') expression     #ComparisonExpression
+    | expression op=('===' | '!==' | '==' | IsNotEq) expression   #ComparisonExpression
+
+    | expression op='&' expression                                #BitwiseExpression
+    | expression op='^' expression                                #BitwiseExpression
+    | expression op='|' expression                                #BitwiseExpression
+    | expression op='&&' expression                               #BitwiseExpression
+    | expression op='||' expression                               #BitwiseExpression
+
+    | expression op=QuestionMark expression? ':' expression       #ConditionalExpression
+    | expression op=LogicalAnd expression                         #LogicalExpression
+    | expression op=LogicalXor expression                         #LogicalExpression
+    | expression op=LogicalOr expression                          #LogicalExpression
     ;
 
 newExpr

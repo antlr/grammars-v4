@@ -1,6 +1,0 @@
-line 4:9 extraneous input ';' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, INSERT, LOCK, MERGE, SELECT, SET, SHOW, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}
-line 7:32 mismatched input 'p_with_brackets' expecting {SELECT, '('}
-line 7:58 extraneous input ';' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, INSERT, LOCK, MERGE, SELECT, SET, SHOW, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}
-line 11:0 extraneous input 'begin' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, INSERT, LOCK, MERGE, SELECT, SET, SHOW, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}
-line 12:32 mismatched input 'p_with_brackets' expecting {SELECT, '('}
-line 12:57 extraneous input ';' expecting {<EOF>, ALTER, CREATE, DELETE, DROP, EXIT, EXPLAIN, INSERT, LOCK, MERGE, SELECT, SET, SHOW, UPDATE, WHENEVER, WITH, '(', '/', PROMPT}
