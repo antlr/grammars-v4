@@ -18,7 +18,6 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>PHPParser.g4</grammars>
 					<includes>
 						<include>PHPLexer.g4</include>
 						<include>PHPParser.g4</include>

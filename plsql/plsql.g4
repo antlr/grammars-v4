@@ -41,6 +41,7 @@ unit_statement
     | create_function_body
     | create_procedure_body
     | create_package
+    | create_package_body
 
 //  | create_index //TODO
 //  | create_table //TODO
@@ -74,7 +75,7 @@ alter_function
     ;
 
 create_function_body
-    : (CREATE (OR REPLACE)?)? FUNCTION function_name ('(' parameter (',' parameter)* ')')?
+    : CREATE (OR REPLACE)? FUNCTION function_name ('(' parameter (',' parameter)* ')')?
       RETURN type_spec (invoker_rights_clause|parallel_enable_clause|result_cache_clause|DETERMINISTIC)*
       ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
@@ -112,18 +113,14 @@ alter_package
     ;
 
 create_package
-    : CREATE (OR REPLACE)? PACKAGE (package_spec | package_body)? ';'
+    : CREATE (OR REPLACE)? PACKAGE package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name? ';'
+    ;
+
+create_package_body
+    : CREATE (OR REPLACE)? PACKAGE BODY package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?) ';'
     ;
 
 // $<Create Package - Specific Clauses
-
-package_body
-    : BODY package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?)
-    ;
-
-package_spec
-    : package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name?
-    ;
 
 package_obj_spec
     : variable_declaration
@@ -131,18 +128,17 @@ package_obj_spec
     | cursor_declaration
     | exception_declaration
     | pragma_declaration
-    | record_declaration
-    | table_declaration
+    | type_declaration
     | procedure_spec
     | function_spec
     ;
 
 procedure_spec
-    : PROCEDURE procedure_name ('(' parameter ( ',' parameter )* ')')? ';' 
+    : PROCEDURE identifier ('(' parameter ( ',' parameter )* ')')? ';' 
     ;
 
 function_spec
-    : FUNCTION function_name ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';' 
+    : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';' 
     ;
 
 package_obj_body
@@ -150,10 +146,9 @@ package_obj_body
     | subtype_declaration 
     | cursor_declaration 
     | exception_declaration 
-    | record_declaration
-    | table_declaration
-    | create_procedure_body
-    | create_function_body 
+    | type_declaration
+    | procedure_body
+    | function_body 
     | procedure_spec
     | function_spec    
     ;
@@ -168,8 +163,20 @@ alter_procedure
     : ALTER PROCEDURE procedure_name COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)? ';'
     ;
 
+function_body
+    : FUNCTION identifier ('(' parameter (',' parameter)* ')')?
+      RETURN type_spec (invoker_rights_clause|parallel_enable_clause|result_cache_clause|DETERMINISTIC)*
+      ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
+    ;
+
+procedure_body
+    : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? 
+      (IS | AS)
+      (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
+    ;
+
 create_procedure_body
-    : (CREATE (OR REPLACE)?)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? 
+    : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? 
       invoker_rights_clause? (IS | AS)
       (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
     ;
@@ -220,7 +227,7 @@ non_dml_trigger
 
 trigger_body
     : COMPOUND TRIGGER
-    | CALL id
+    | CALL identifier
     | trigger_block
     ;
 
@@ -416,7 +423,7 @@ modifier_clause
     ;
 
 object_member_spec
-    : id type_spec sqlj_object_type_attr?
+    : identifier type_spec sqlj_object_type_attr?
     | element_spec
     ;
 
@@ -460,7 +467,7 @@ pragma_clause
     ;
 
 pragma_elements
-    : id
+    : identifier
     | DEFAULT
     ;
 
@@ -509,7 +516,7 @@ invoker_rights_clause
     ;
 
 compiler_parameters_clause
-    : id '=' expression
+    : identifier '=' expression
     ;
 
 call_spec
@@ -523,7 +530,7 @@ java_spec
     ;
 
 c_spec
-    : C_LETTER (NAME CHAR_STRING)? LIBRARY id c_agent_in_clause? (WITH CONTEXT)? c_parameters_clause?
+    : C_LETTER (NAME CHAR_STRING)? LIBRARY identifier c_agent_in_clause? (WITH CONTEXT)? c_parameters_clause?
     ;
 
 c_agent_in_clause
@@ -552,24 +559,25 @@ declare_spec
     | cursor_declaration
     | exception_declaration
     | pragma_declaration
-    | record_declaration
-    | table_declaration
-    | create_procedure_body
-    | create_function_body
+    | type_declaration
+    | procedure_spec
+    | function_spec
+    | procedure_body
+    | function_body
     ;
 
 //incorporates constant_declaration
 variable_declaration
-    : variable_name CONSTANT? type_spec (NOT NULL)? default_value_part? ';'
+    : identifier CONSTANT? type_spec (NOT NULL)? default_value_part? ';'
     ;
 
 subtype_declaration
-    : SUBTYPE type_name IS type_spec (RANGE expression '..' expression)? (NOT NULL)? ';'
+    : SUBTYPE identifier IS type_spec (RANGE expression '..' expression)? (NOT NULL)? ';'
     ;
 
 //cursor_declaration incorportates curscursor_body and cursor_spec
 cursor_declaration
-    : CURSOR cursor_name ('(' parameter_spec (',' parameter_spec)* ')' )? (RETURN type_spec)? (IS select_statement)? ';'
+    : CURSOR identifier ('(' parameter_spec (',' parameter_spec)* ')' )? (RETURN type_spec)? (IS select_statement)? ';'
     ;
 
 parameter_spec
@@ -577,45 +585,40 @@ parameter_spec
     ;
 
 exception_declaration 
-    : exception_name EXCEPTION ';'
+    : identifier EXCEPTION ';'
     ;
 
 pragma_declaration
     : PRAGMA (SERIALLY_REUSABLE 
     | AUTONOMOUS_TRANSACTION
     | EXCEPTION_INIT '(' exception_name ',' numeric_negative ')'
-    | INLINE '(' id1=id ',' expression ')'
-    | RESTRICT_REFERENCES '(' (id | DEFAULT) (',' id)+ ')') ';'
-    ;
-
-record_declaration
-    : record_type_dec
-    | record_var_dec
+    | INLINE '(' id1=identifier ',' expression ')'
+    | RESTRICT_REFERENCES '(' (identifier | DEFAULT) (',' identifier)+ ')') ';'
     ;
 
 // $<Record Declaration - Specific Clauses
 
 //incorporates ref_cursor_type_definition
-record_type_dec
-    : TYPE type_name IS (RECORD '(' field_spec (',' field_spec)* ')' | REF CURSOR (RETURN type_spec)?) ';'
+record_type_def
+    : RECORD '(' field_spec (',' field_spec)* ')' 
     ;
 
 field_spec
     : column_name type_spec? (NOT NULL)? default_value_part?
     ;
 
-record_var_dec
-    : record_name type_name (PERCENT_ROWTYPE | PERCENT_TYPE) ';'
+ref_cursor_type_def
+    : REF CURSOR (RETURN type_spec)?
     ;
 
 // $>
 
-table_declaration
-    : (table_type_dec | table_var_dec) ';'
+type_declaration
+    :  TYPE identifier IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
     ;
 
-table_type_dec
-    : TYPE type_name IS (TABLE OF type_spec table_indexed_by_part? (NOT NULL)? | varray_type_def)
+table_type_def
+    : TABLE OF type_spec table_indexed_by_part? (NOT NULL)?
     ;
 
 table_indexed_by_part
@@ -624,10 +627,6 @@ table_indexed_by_part
 
 varray_type_def
     : (VARRAY | VARYING ARRAY) '(' expression ')' OF type_spec (NOT NULL)?
-    ;
-
-table_var_dec
-    : table_var_name type_spec
     ;
 
 // $>
@@ -735,7 +734,7 @@ raise_statement
     ;
 
 return_statement
-    : RETURN condition?
+    : RETURN expression?
     ;
 
 function_call
@@ -956,11 +955,13 @@ table_ref
     ;
 
 table_ref_aux
-    : (dml_table_expression_clause (pivot_clause | unpivot_clause)?
-      | '(' table_ref subquery_operation_part* ')' (pivot_clause | unpivot_clause)?
-      | ONLY '(' dml_table_expression_clause ')'
-      | dml_table_expression_clause (pivot_clause | unpivot_clause)?)
-    flashback_query_clause* (/*{isTableAlias()}?*/ table_alias)?
+    : table_ref_aux_internal flashback_query_clause* (/*{isTableAlias()}?*/ table_alias)?
+    ;
+
+table_ref_aux_internal
+    :  dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
+    | '(' table_ref subquery_operation_part* ')' (pivot_clause | unpivot_clause)?  # table_ref_aux_internal_two
+    | ONLY '(' dml_table_expression_clause ')'                                     # table_ref_aux_internal_three
     ;
 
 join_clause
@@ -1100,11 +1101,11 @@ model_column_list
     ;
 
 model_column
-    : expression table_alias?
+    : (expression | query_block) column_alias?
     ;
 
 model_rules_clause
-    : model_rules_part? '(' model_rules_element (',' model_rules_element)* ')'
+    : model_rules_part? '(' (model_rules_element (',' model_rules_element)*)? ')'
     ;
 
 model_rules_part
@@ -1158,7 +1159,7 @@ update_statement
 // $<Update - Specific Clauses
 update_set_clause
     : SET
-      (column_based_update_set_clause (',' column_based_update_set_clause)* | VALUE '(' id ')' '=' expression)
+      (column_based_update_set_clause (',' column_based_update_set_clause)* | VALUE '(' identifier ')' '=' expression)
     ;
 
 column_based_update_set_clause
@@ -1508,12 +1509,39 @@ quantified_expression
     : (SOME | EXISTS | ALL | ANY) ('(' subquery ')' | '(' expression ')')
     ;
 
+string_function
+    : SUBSTR '(' expression COMMA expression (COMMA expression)? ')'
+    | TO_CHAR '(' (table_element|standard_function) (COMMA quoted_string)? ')' 
+    | DECODE '(' expression (COMMA expression)*  ')'
+    | CHR '(' concatenation USING NCHAR_CS ')'
+    | NVL '(' expression COMMA expression ')'
+    | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
+    ;
+
 standard_function
+    : string_function
+    | numeric_function_wrapper
+    | other_function
+    ;
+    
+numeric_function_wrapper
+    : numeric_function (single_column_for_loop | multi_column_for_loop)?
+    ;
+
+numeric_function
+   : SUM '(' (DISTINCT|ALL)? expression ')'
+   | COUNT '(' ( '*' | ((DISTINCT | UNIQUE | ALL)? concatenation)? ) ')' over_clause?
+   | ROUND '(' expression (COMMA UNSIGNED_INTEGER)?  ')'
+   | AVG '(' (DISTINCT | ALL)? expression ')'
+   | MAX '(' (DISTINCT | ALL)? expression ')'
+   ;
+
+other_function
     : over_clause_keyword function_argument_analytic over_clause?
     | /*TODO stantard_function_enabling_using*/ regular_id function_argument_modeling using_clause?
     | COUNT '(' ( '*' | (DISTINCT | UNIQUE | ALL)? concatenation) ')' over_clause?
     | (CAST | XMLCAST) '(' (MULTISET '(' subquery ')' | concatenation) AS type_spec ')'
-    | CHR '(' concatenation USING NCHAR_CS ')'
+    | COALESCE '(' table_element (COMMA (numeric|quoted_string))? ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
     | cursor_name ( PERCENT_ISOPEN | PERCENT_FOUND | PERCENT_NOTFOUND | PERCENT_ROWCOUNT )
@@ -1535,7 +1563,7 @@ standard_function
     | XMLEXISTS '(' expression xml_passing_clause? ')'
     | XMLPARSE '(' (DOCUMENT | CONTENT) concatenation WELLFORMED? ')' ('.' general_element_part)?
     | XMLPI
-      '(' (NAME id | EVALNAME concatenation) (',' concatenation)? ')' ('.' general_element_part)?
+      '(' (NAME identifier | EVALNAME concatenation) (',' concatenation)? ')' ('.' general_element_part)?
     | XMLQUERY
       '(' concatenation xml_passing_clause? RETURNING CONTENT (NULL ON EMPTY)? ')' ('.' general_element_part)?
     | XMLROOT
@@ -1566,12 +1594,6 @@ over_clause_keyword
     | VAR_
     | COVAR_
     ;
-    
-/*TODO
-stantard_function_enabling_using
-    : {enablesUsingClause(input.LT(1).getText())}? REGULAR_ID
-    ;
-*/
 
 within_or_over_clause_keyword
     : CUME_DIST
@@ -1718,12 +1740,12 @@ partition_extension_clause
     ;
 
 column_alias
-    : AS? (id | alias_quoted_string)
+    : AS? (identifier | alias_quoted_string)
     | AS
     ;
 
 table_alias
-    : (id | alias_quoted_string)
+    : (identifier | alias_quoted_string)
     ;
 
 alias_quoted_string
@@ -1748,68 +1770,68 @@ into_clause
 // $<Common PL/SQL Named Elements
 
 xml_column_name
-    : id
+    : identifier
     | quoted_string
     ;
 
 cost_class_name
-    : id
+    : identifier
     ;
 
 attribute_name
-    : id
+    : identifier
     ;
 
 savepoint_name
-    : id
+    : identifier
     ;
 
 rollback_segment_name
-    : id
+    : identifier
     ;
 
 table_var_name
-    : id
+    : identifier
     ;
 
 schema_name
-    : id
+    : identifier
     ;
 
 routine_name
-    : id ('.' id_expression)* ('@' link_name)?
+    : identifier ('.' id_expression)* ('@' link_name)?
     ;
 
 package_name
-    : id
+    : identifier
     ;
 
 implementation_type_name
-    : id ('.' id_expression)?
+    : identifier ('.' id_expression)?
     ;
 
 parameter_name
-    : id
+    : identifier
     ;
 
 reference_model_name
-    : id
+    : identifier
     ;
 
 main_model_name
-    : id
+    : identifier
     ;
 
 aggregate_function_name
-    : id ('.' id_expression)*
+    : identifier ('.' id_expression)*
     ;
 
 query_name
-    : id
+    : identifier
     ;
 
 constraint_name
-    : id ('.' id_expression)* ('@' link_name)?
+    : identifier ('.' id_expression)* ('@' link_name)?
     ;
 
 label_name
@@ -1825,19 +1847,19 @@ sequence_name
     ;
 
 exception_name
-    : id ('.' id_expression)* 
+    : identifier ('.' id_expression)* 
     ;
 
 function_name
-    : id ('.' id_expression)?
+    : identifier ('.' id_expression)?
     ;
 
 procedure_name
-    : id ('.' id_expression)?
+    : identifier ('.' id_expression)?
     ;
 
 trigger_name
-    : id ('.' id_expression)?
+    : identifier ('.' id_expression)?
     ;
 
 variable_name
@@ -1846,33 +1868,33 @@ variable_name
     ;
 
 index_name
-    : id
+    : identifier
     ;
 
 cursor_name
-    : id
+    : identifier
     | bind_variable
     ;
 
 record_name
-    : id
+    : identifier
     | bind_variable
     ;
 
 collection_name
-    : id ('.' id_expression)?
+    : identifier ('.' id_expression)?
     ;
 
 link_name
-    : id
+    : identifier
     ;
 
 column_name
-    : id ('.' id_expression)*
+    : identifier ('.' id_expression)*
     ;
 
 tableview_name
-    : id ('.' id_expression)? 
+    : identifier ('.' id_expression)? 
       ('@' link_name | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
     ;
 
@@ -1908,7 +1930,7 @@ respect_or_ignore_nulls
     ;
 
 argument
-    : (id '=' '>')? expression
+    : (identifier '=' '>')? expression
     ;
 
 type_spec
@@ -1917,7 +1939,7 @@ type_spec
     ;
 
 datatype
-    : native_datatype_element precision_part? (WITH LOCAL? TIME ZONE)?
+    : native_datatype_element precision_part? (WITH LOCAL? TIME ZONE | CHARACTER SET char_set_name)?
     | INTERVAL (YEAR | DAY) ('(' expression ')')? TO (MONTH | SECOND) ('(' expression ')')?
     ;
 
@@ -2038,7 +2060,7 @@ quoted_string
     | NATIONAL_CHAR_STRING_LIT
     ;
 
-id
+identifier
     : (INTRODUCER char_set_name)? id_expression
     ;
 
@@ -2553,6 +2575,22 @@ regular_id
     | COVAR_
     ;
 
+string_function_name
+    : CHR
+    | DECODE
+    | SUBSTR
+    | TO_CHAR
+    | TRIM
+    ;
+
+numeric_function_name
+    : AVG
+    | COUNT
+    | NVL
+    | ROUND
+    | SUM
+    ;
+ 
 A_LETTER:                     A;
 ADD:                          A D D;
 AFTER:                        A F T E R;
@@ -2606,6 +2644,7 @@ CHR:                          C H R;
 CLOB:                         C L O B;
 CLOSE:                        C L O S E;
 CLUSTER:                      C L U S T E R;
+COALESCE:                     C O A L E S C E;
 COLLECT:                      C O L L E C T;
 COLUMNS:                      C O L U M N S;
 COMMENT:                      C O M M E N T;
@@ -2947,7 +2986,6 @@ TRANSACTION:                  T R A N S A C T I O N;
 TRANSLATE:                    T R A N S L A T E;
 TREAT:                        T R E A T;
 TRIGGER:                      T R I G G E R;
-TRIM:                         T R I M;
 TRUE:                         T R U E;
 TRUNCATE:                     T R U N C A T E;
 TYPE:                         T Y P E;
@@ -3022,20 +3060,26 @@ RANK:                         R A N K;
                               
 AVG:                          A V G;
 CORR:                         C O R R;
+COVAR_:                       C O V A R '_';
+DECODE:                       D E C O D E;
 LAG:                          L A G;
 LEAD:                         L E A D;
 MAX:                          M A X;
 MEDIAN:                       M E D I A N;
 MIN:                          M I N;
 NTILE:                        N T I L E;
+NVL:                          N V L;
 RATIO_TO_REPORT:              R A T I O '_' T O '_' R  E P O R T;
-ROW_NUMBER:                   R O W '_' N U M B E R;
-SUM:                          S U M;
-VARIANCE:                     V A R I A N C E;
 REGR_:                        R E G R '_';
+ROUND:                        R O U N D;
+ROW_NUMBER:                   R O W '_' N U M B E R;
+SUBSTR:                       S U B S T R;
+TO_CHAR:                      T O '_' C H A R;
+TRIM:                         T R I M;
+SUM:                          S U M;
 STDDEV:                       S T D D E V;
 VAR_:                         V A R '_';
-COVAR_:                       C O V A R '_';
+VARIANCE:                     V A R I A N C E;
 
 // Rule #358 <NATIONAL_CHAR_STRING_LIT> - subtoken typecast in <REGULAR_ID>, it also incorporates <character_representation>
 //  Lowercase 'n' is a usual addition to the standard
@@ -3053,7 +3097,7 @@ PERIOD:        '.';
 
 //{ Rule #238 <EXACT_NUM_LIT>
 //  This rule is a bit tricky - it resolves the ambiguity with <PERIOD> 
-//  It als44o incorporates <mantisa> and <exponent> for the <APPROXIMATE_NUM_LIT>
+//  It also incorporates <mantisa> and <exponent> for the <APPROXIMATE_NUM_LIT>
 //  Rule #501 <signed_integer> was incorporated directly in the token <APPROXIMATE_NUM_LIT>
 //  See also the rule #617 <unsigned_num_lit>
 /*
@@ -3173,8 +3217,8 @@ MULTI_LINE_COMMENT: '/*' .*? '*/'                           -> channel(HIDDEN);
 // SQL*Plus prompt
 // TODO should be grammar rule, but tricky to implement
 PROMPT
-	: 'prompt' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
-	;
+    : 'prompt' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
+    ;
 
 //{ Rule #360 <NEWLINE>
 fragment

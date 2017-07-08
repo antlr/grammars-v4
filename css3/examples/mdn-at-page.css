@@ -1,0 +1,16 @@
+@page :first {
+  margin-left: 50%;
+  margin-top: 50%;
+}
+
+p {
+  page-break-after: always;
+}
+
+@page :left {
+  margin: 2in 3in;
+}
+
+@page :right {
+  margin: 2in 3in;
+}
