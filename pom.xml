@@ -9,16 +9,16 @@
 	<profiles>
 		<profile>
 			<id>test</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+				<activation>
+					<activeByDefault>false</activeByDefault>
+				</activation>
 			<modules>
 				<module>grammar-test</module>
 			</modules>
 		</profile>
 		<profile>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<id>grammarv4</id>
 			<modules>
@@ -150,7 +150,6 @@
 			</modules>
 		</profile>
 	</profiles>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>

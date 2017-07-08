@@ -17,7 +17,7 @@ public class TestIdl {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(gfile));
+        Assert.assertTrue(GrammarTester.run(ok,gfile));
     }
 
 

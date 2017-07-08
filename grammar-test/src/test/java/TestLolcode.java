@@ -16,7 +16,7 @@ public class TestLolcode {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(gfile));
+        Assert.assertTrue(GrammarTester.run(ok,gfile));
     }
 
 
