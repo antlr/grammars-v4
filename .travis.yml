@@ -4,6 +4,7 @@ jdk:
 sudo: false
 
 # use traditional maven plugin for travis
-#install: mvn clean package
+install: 
+	-
 
 #install: mvn test -pl grammar-test
