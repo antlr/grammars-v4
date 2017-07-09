@@ -71,7 +71,7 @@ word
     :  atom | quotedstring;
 
 lwspchar
-    : SPACE | TAB;
+    : SPACE | HTAB;
 
 lwsp
     : (CRLF? lwspchar)+;

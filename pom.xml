@@ -146,7 +146,7 @@
 			<module>xpath</module>
 			<module>z</module>
 			<!-- testing repository -->
-			<module>grammar-test</module>
+			<!--<module>grammar-test</module>-->
 			</modules>
 		</profile>
 	</profiles>
