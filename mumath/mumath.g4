@@ -141,6 +141,17 @@ OR
    : 'OR'
    ;
 
+AND
+   : 'AND'
+   ;
+
+NOT
+   : 'NOT'
+   ;
+
+MOD
+   : 'mod'
+   ;
 
 WS
    : (' ' | '\t' | '\n' | '\r') -> skip
