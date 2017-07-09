@@ -3,4 +3,4 @@ jdk:
   - oraclejdk8
 sudo: false
 
-install: 
+install: true
