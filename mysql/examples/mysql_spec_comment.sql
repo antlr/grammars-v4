@@ -12,3 +12,9 @@ select * from t /* where col = somefunc(col2) order by sortcol */; insert into m
 insert into tbl values ('a', 1, 'b'), ('c', 2, 'd'), ('e', 3, 'f') /* on duplicate key update notsecret_col = secret_col */;
 select clientname, email from users where clientname='Petrov'/* UNION SELECT 1,load_file('/etc/passwd')*/;#
 #end
+
+#begin
+-- Empty line comment
+--
+--
+#end
