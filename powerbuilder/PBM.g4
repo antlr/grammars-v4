@@ -52,7 +52,7 @@ release_information
    ;
 
 window_property_line
-   : window_property + 
+   : window_property +
    ;
 
 window_property
@@ -94,20 +94,20 @@ attribute_value
 
 // Forward declaration
 forward_decl
-   : 'FORWARD'  (datatype_decl | variable_decl) + 'END' 'FORWARD' 
+   : 'FORWARD' (datatype_decl | variable_decl) + 'END' 'FORWARD'
    ;
 
 // Type declaration
 datatype_decl
-   : scope_modif? 'TYPE' identifier_name 'FROM' (identifier_name '`')? data_type_name ('WITHIN' identifier_name)? ('AUTOINSTANTIATE')? ('DESCRIPTOR' DQUOTED_STRING '=' DQUOTED_STRING)?  (variable_decl | event_forward_decl)* 'END' 'TYPE' 
+   : scope_modif? 'TYPE' identifier_name 'FROM' (identifier_name '`')? data_type_name ('WITHIN' identifier_name)? ('AUTOINSTANTIATE')? ('DESCRIPTOR' DQUOTED_STRING '=' DQUOTED_STRING)? (variable_decl | event_forward_decl)* 'END' 'TYPE'
    ;
 
 type_variables_decl
-   : 'TYPE' 'VARIABLES'  (access_modif | variable_decl | constant_decl)* 'END' 'VARIABLES' 
+   : 'TYPE' 'VARIABLES' (access_modif | variable_decl | constant_decl)* 'END' 'VARIABLES'
    ;
 
 global_variables_decl
-   : ('GLOBAL' | 'SHARED') 'VARIABLES'  (variable_decl | constant_decl)* 'END' 'VARIABLES' 
+   : ('GLOBAL' | 'SHARED') 'VARIABLES' (variable_decl | constant_decl)* 'END' 'VARIABLES'
    ;
 
 // Variable declaration
@@ -116,7 +116,7 @@ variable_decl_sub
    ;
 
 variable_decl
-   : variable_decl_sub (SEMI )
+   : variable_decl_sub (SEMI)
    ;
 
 decimal_decl_sub
@@ -134,11 +134,11 @@ constant_decl_sub
    ;
 
 constant_decl
-   : constant_decl_sub (SEMI )
+   : constant_decl_sub (SEMI)
    ;
 
 function_forward_decl
-   : access_modif_part? scope_modif? ('FUNCTION' data_type_name | 'SUBROUTINE') identifier_name LPAREN parameters_list_sub? RPAREN ('LIBRARY' (DQUOTED_STRING | QUOTED_STRING) ('ALIAS' 'FOR' (DQUOTED_STRING | QUOTED_STRING))?)? ('RPCFUNC' 'ALIAS' 'FOR' (DQUOTED_STRING | QUOTED_STRING))? ('THROWS' identifier_name)? 
+   : access_modif_part? scope_modif? ('FUNCTION' data_type_name | 'SUBROUTINE') identifier_name LPAREN parameters_list_sub? RPAREN ('LIBRARY' (DQUOTED_STRING | QUOTED_STRING) ('ALIAS' 'FOR' (DQUOTED_STRING | QUOTED_STRING))?)? ('RPCFUNC' 'ALIAS' 'FOR' (DQUOTED_STRING | QUOTED_STRING))? ('THROWS' identifier_name)?
    ;
 
 parameter_sub
@@ -150,11 +150,11 @@ parameters_list_sub
    ;
 
 functions_forward_decl
-   : ('FORWARD' | 'TYPE') 'PROTOTYPES'  function_forward_decl + 'END' 'PROTOTYPES' 
+   : ('FORWARD' | 'TYPE') 'PROTOTYPES' function_forward_decl + 'END' 'PROTOTYPES'
    ;
 
 function_body
-   : ('PUBLIC' | 'PRIVATE' | 'PROTECTED')? scope_modif? ('FUNCTION' data_type_name | 'SUBROUTINE') identifier_name LPAREN parameters_list_sub? RPAREN ('THROWS' identifier_name)? (SEMI statement)* 'END' ('FUNCTION' | 'SUBROUTINE') 
+   : ('PUBLIC' | 'PRIVATE' | 'PROTECTED')? scope_modif? ('FUNCTION' data_type_name | 'SUBROUTINE') identifier_name LPAREN parameters_list_sub? RPAREN ('THROWS' identifier_name)? (SEMI statement)* 'END' ('FUNCTION' | 'SUBROUTINE')
    ;
 
 on_body
@@ -167,16 +167,16 @@ event_forward_decl_sub
    ;
 
 event_forward_decl
-   : event_forward_decl_sub 
+   : event_forward_decl_sub
    ;
 
 event_body
-   : 'EVENT' ('TYPE' data_type_name)? (identifier_name '::')? (identifier_name | 'OPEN' | 'CLOSE') (LPAREN parameters_list_sub? RPAREN)? (SEMI statement)* 'END' 'EVENT' 
+   : 'EVENT' ('TYPE' data_type_name)? (identifier_name '::')? (identifier_name | 'OPEN' | 'CLOSE') (LPAREN parameters_list_sub? RPAREN)? (SEMI statement)* 'END' 'EVENT'
    ;
 
 // Member access modifiers
 access_modif
-   : ('PUBLIC:' | 'PUBLIC' ':' | 'PRIVATE:' | 'PRIVATE' ':' | 'PROTECTED:' | 'PROTECTED' ':') 
+   : ('PUBLIC:' | 'PUBLIC' ':' | 'PRIVATE:' | 'PRIVATE' ':' | 'PROTECTED:' | 'PROTECTED' ':')
    ;
 
 access_modif_part
@@ -259,7 +259,7 @@ statement
    | (create_call_statement)
    | (destroy_call_statement)
    | (label_stat)
-   | (identifier )
+   | (identifier)
    | throw_stat
    | goto_stat
    | choose_statement
@@ -267,7 +267,7 @@ statement
    | for_loop_statement
    | continue_statement
    | exit_statement
-   | atom 
+   | atom
    ;
 
 statement_sub
@@ -290,7 +290,7 @@ assignment_sub
    ;
 
 assignment_statement
-   : assignment_sub SEMI? 
+   : assignment_sub SEMI?
    ;
 
 lvalue_sub
@@ -306,7 +306,7 @@ return_sub
    ;
 
 return_statement
-   : return_sub 
+   : return_sub
    ;
 
 function_call_expression_sub
@@ -329,7 +329,7 @@ close_call_sub
    ;
 
 function_call_statement
-   : (function_call_expression_sub | function_virtual_call_expression_sub | open_call_sub | close_call_sub) 
+   : (function_call_expression_sub | function_virtual_call_expression_sub | open_call_sub | close_call_sub)
    ;
 
 super_call_sub
@@ -337,7 +337,7 @@ super_call_sub
    ;
 
 super_call_statement
-   : super_call_sub 
+   : super_call_sub
    ;
 
 event_call_statement_sub
@@ -345,7 +345,7 @@ event_call_statement_sub
    ;
 
 event_call_statement
-   : event_call_statement_sub 
+   : event_call_statement_sub
    ;
 
 create_call_sub
@@ -353,7 +353,7 @@ create_call_sub
    ;
 
 create_call_statement
-   : create_call_sub 
+   : create_call_sub
    ;
 
 destroy_call_sub
@@ -361,23 +361,23 @@ destroy_call_sub
    ;
 
 destroy_call_statement
-   : destroy_call_sub 
+   : destroy_call_sub
    ;
 
 for_loop_statement
-   : 'FOR' lvalue_sub '=' expression 'TO' expression ('STEP' expression)?  statement 'NEXT' 
+   : 'FOR' lvalue_sub '=' expression 'TO' expression ('STEP' expression)? statement 'NEXT'
    ;
 
 do_while_loop_statement
-   : 'DO' ('WHILE' | 'UNTIL') boolean_expression  statement* 'LOOP' 
+   : 'DO' ('WHILE' | 'UNTIL') boolean_expression statement* 'LOOP'
    ;
 
 do_loop_while_statement
-   : 'DO'  statement* 'LOOP' ('WHILE' | 'UNTIL') boolean_expression 
+   : 'DO' statement* 'LOOP' ('WHILE' | 'UNTIL') boolean_expression
    ;
 
 if_statement
-   : 'IF' boolean_expression 'THEN'  statement* ('ELSEIF' boolean_expression 'THEN'  statement*)* ('ELSE'  statement*)? 'END' 'IF' (SEMI | )
+   : 'IF' boolean_expression 'THEN' statement* ('ELSEIF' boolean_expression 'THEN' statement*)* ('ELSE' statement*)? 'END' 'IF' (SEMI |)
    ;
 
 if_simple_statement
@@ -389,7 +389,7 @@ continue_sub
    ;
 
 continue_statement
-   : continue_sub 
+   : continue_sub
    ;
 
 // ldir.Post Event SelectionChanged(1)		
@@ -398,7 +398,7 @@ post_event_sub
    ;
 
 post_event
-   : post_event_sub 
+   : post_event_sub
    ;
 
 exit_statement_sub
@@ -406,27 +406,27 @@ exit_statement_sub
    ;
 
 exit_statement
-   : exit_statement_sub 
+   : exit_statement_sub
    ;
 
 choose_statement
-   : 'CHOOSE' 'CASE' expression  ((choose_case_range_sub) | (choose_case_cond_sub) | (choose_case_else_sub) | choose_case_value_sub) + 'END' 'CHOOSE'
+   : 'CHOOSE' 'CASE' expression ((choose_case_range_sub) | (choose_case_cond_sub) | (choose_case_else_sub) | choose_case_value_sub) + 'END' 'CHOOSE'
    ;
 
 choose_case_value_sub
-   : 'CASE' expression (COMMA expression)*  statement*
+   : 'CASE' expression (COMMA expression)* statement*
    ;
 
 choose_case_cond_sub
-   : 'CASE' 'IS' ('=' | '>' | '<' | '<>' | '>=' | '<=') expression  statement*
+   : 'CASE' 'IS' ('=' | '>' | '<' | '<>' | '>=' | '<=') expression statement*
    ;
 
 choose_case_range_sub
-   : 'CASE' atom 'TO' atom  statement*
+   : 'CASE' atom 'TO' atom statement*
    ;
 
 choose_case_else_sub
-   : 'CASE' 'ELSE'  statement*
+   : 'CASE' 'ELSE' statement*
    ;
 
 goto_stat_sub
@@ -434,15 +434,15 @@ goto_stat_sub
    ;
 
 goto_stat
-   : goto_stat_sub 
+   : goto_stat_sub
    ;
 
 label_stat
-   : identifier_name COLON 
+   : identifier_name COLON
    ;
 
 try_catch_block
-   : 'TRY'  statement* ('CATCH' LPAREN variable_decl_sub RPAREN  statement*)* ('FINALLY'  statement*)? 'END' 'TRY' 
+   : 'TRY' statement* ('CATCH' LPAREN variable_decl_sub RPAREN statement*)* ('FINALLY' statement*)? 'END' 'TRY'
    ;
 
 throw_stat_sub
@@ -450,9 +450,8 @@ throw_stat_sub
    ;
 
 throw_stat
-   : throw_stat_sub 
+   : throw_stat_sub
    ;
-
 
 identifier
    : identifier_name
@@ -743,6 +742,7 @@ TQ
 DOUBLE_PIPE
    : '||'
    ;
+
 
 ASTROOT
    : 'astroot'
