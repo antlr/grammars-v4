@@ -647,6 +647,15 @@ PROMPT
     : 'prompt' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
     ;
 
+START_CMD
+    // TODO When using full word START there is a conflict with START WITH in sequences and CONNECT BY queries
+    // 'start' SPACE ( ~( '\r' | '\n') )* (NEWLINE|EOF)
+    : 'sta' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
+    // TODO Single @ conflicts with a database link name, like employees@remote
+    // | '@' ( ~('\r' | '\n') )* (NEWLINE|EOF)
+    | '@@' ( ~('\r' | '\n') )* (NEWLINE|EOF)
+    ;
+
 //{ Rule #360 <NEWLINE>
 fragment
 NEWLINE: '\r'? '\n';
