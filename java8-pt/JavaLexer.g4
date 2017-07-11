@@ -93,123 +93,22 @@ IntegerLiteral
 
 fragment
 DecimalIntegerLiteral
-    : DecimalNumeral IntegerTypeSuffix?
+    : '0' | [1-9] (Digits? | '_'+ Digits) [lL]?
     ;
 
 fragment
 HexIntegerLiteral
-    : HexNumeral IntegerTypeSuffix?
+    : '0' [xX] [0-9a-fA-F] ([0-9a-fA-F_]* [0-9a-fA-F])? [lL]?
     ;
 
 fragment
 OctalIntegerLiteral
-    : OctalNumeral IntegerTypeSuffix?
+    : '0' '_'* [0-7] ([0-7_]* [0-7])? [lL]?
     ;
 
 fragment
 BinaryIntegerLiteral
-    : BinaryNumeral IntegerTypeSuffix?
-    ;
-
-fragment
-IntegerTypeSuffix
-    : [lL]
-    ;
-
-fragment
-DecimalNumeral
-    : '0'
-    | NonZeroDigit (Digits? | Underscores Digits)
-    ;
-
-fragment
-Digits
-    : Digit (DigitOrUnderscore* Digit)?
-    ;
-
-fragment
-Digit
-    : '0'
-    | NonZeroDigit
-    ;
-
-fragment
-NonZeroDigit
-    : [1-9]
-    ;
-
-fragment
-DigitOrUnderscore
-    : Digit
-    | '_'
-    ;
-
-fragment
-Underscores
-    : '_'+
-    ;
-
-fragment
-HexNumeral
-    : '0' [xX] HexDigits
-    ;
-
-fragment
-HexDigits
-    : HexDigit (HexDigitOrUnderscore* HexDigit)?
-    ;
-
-fragment
-HexDigit
-    : [0-9a-fA-F]
-    ;
-
-fragment
-HexDigitOrUnderscore
-    : HexDigit
-    | '_'
-    ;
-
-fragment
-OctalNumeral
-    : '0' Underscores? OctalDigits
-    ;
-
-fragment
-OctalDigits
-    : OctalDigit (OctalDigitOrUnderscore* OctalDigit)?
-    ;
-
-fragment
-OctalDigit
-    : [0-7]
-    ;
-
-fragment
-OctalDigitOrUnderscore
-    : OctalDigit
-    | '_'
-    ;
-
-fragment
-BinaryNumeral
-    : '0' [bB] BinaryDigits
-    ;
-
-fragment
-BinaryDigits
-    : BinaryDigit (BinaryDigitOrUnderscore* BinaryDigit)?
-    ;
-
-fragment
-BinaryDigit
-    : [01]
-    ;
-
-fragment
-BinaryDigitOrUnderscore
-    : BinaryDigit
-    | '_'
+    : '0' [bB] [01] ([01_]* [01])? [lL]?
     ;
 
 // §3.10.2 Floating-Point Literals
@@ -221,30 +120,18 @@ FloatingPointLiteral
 
 fragment
 DecimalFloatingPointLiteral
-    : Digits '.' Digits? ExponentPart? FloatTypeSuffix?
-    | '.' Digits ExponentPart? FloatTypeSuffix?
-    | Digits ExponentPart FloatTypeSuffix?
-    | Digits FloatTypeSuffix
+    : (Digits '.' Digits? | '.' Digits) ExponentPart? FloatTypeSuffix?
+    | Digits (ExponentPart FloatTypeSuffix? | FloatTypeSuffix)
     ;
 
 fragment
 ExponentPart
-    : ExponentIndicator SignedInteger
+    : [eE] [+-]? Digits
     ;
 
 fragment
-ExponentIndicator
-    : [eE]
-    ;
-
-fragment
-SignedInteger
-    : Sign? Digits
-    ;
-
-fragment
-Sign
-    : [+-]
+HexadecimalFloatingPointLiteral
+    : HexSignificand [pP] [+-]? Digits FloatTypeSuffix?
     ;
 
 fragment
@@ -253,24 +140,8 @@ FloatTypeSuffix
     ;
 
 fragment
-HexadecimalFloatingPointLiteral
-    : HexSignificand BinaryExponent FloatTypeSuffix?
-    ;
-
-fragment
 HexSignificand
-    : HexNumeral '.'?
-    | '0' [xX] HexDigits? '.' HexDigits
-    ;
-
-fragment
-BinaryExponent
-    : BinaryExponentIndicator SignedInteger
-    ;
-
-fragment
-BinaryExponentIndicator
-    : [pP]
+    : '0' [xX] (HexDigits '.'? | HexDigits? '.' HexDigits)
     ;
 
 // Boolean Literals
@@ -283,24 +154,14 @@ BooleanLiteral
 // Character Literals
 
 CharacterLiteral
-    : '\'' SingleCharacter '\''
+    : '\'' ~['\\] '\''
     | '\'' EscapeSequence '\''
-    ;
-
-fragment
-SingleCharacter
-    : ~['\\]
     ;
 
 // String Literals
 
 StringLiteral
-    : '"' StringCharacters? '"'
-    ;
-
-fragment
-StringCharacters
-    : StringCharacter+
+    : '"' StringCharacter* '"'
     ;
 
 fragment
@@ -320,9 +181,9 @@ EscapeSequence
 
 fragment
 OctalEscape
-    : '\\' OctalDigit
-    | '\\' OctalDigit OctalDigit
-    | '\\' ZeroToThree OctalDigit OctalDigit
+    : '\\' [0-7]
+    | '\\' [0-7] [0-7]
+    | '\\' [0-3] [0-7] [0-7]
     ;
 
 fragment
@@ -331,8 +192,18 @@ UnicodeEscape
     ;
 
 fragment
-ZeroToThree
-    : [0-3]
+HexDigits
+    : HexDigit ((HexDigit | '_') * HexDigit)?
+    ;
+
+fragment
+HexDigit
+    : [0-9a-fA-F]
+    ;
+
+fragment
+Digits
+    : [0-9] ([0-9_]* [0-9])?
     ;
 
 // The Null Literal
@@ -422,7 +293,7 @@ JavaLetterOrDigit
 
 // Additional symbols not defined in the lexical specification
 
-AT: '@';
+AT:       '@';
 ELLIPSIS: '...';
 
 // Whitespace and comments
