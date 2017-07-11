@@ -2,16 +2,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileFilter;
 
 public class TestMysql {
 
-    private static File [] ok = new File("../mysql/examples").listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-            return pathname.isFile();
-        }
-    });
+    private static File [] ok = new File("../mysql/examples").listFiles(pathname -> pathname.isFile());
 
 
     private static File [] gfiles = new File [] {
@@ -21,7 +15,7 @@ public class TestMysql {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(ok,gfiles));
+        Assert.assertTrue(GrammarTester.run(ok, "root", gfiles));
     }
 
 

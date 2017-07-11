@@ -2,16 +2,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileFilter;
 
 public class TestLess {
 
-    private static File [] ok = new File("../less/testsrc").listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-            return pathname.isFile();
-        }
-    });
+    private static File [] ok = new File("../less/testsrc").listFiles(pathname -> pathname.isFile());
 
 
     private static File [] gfiles = new File [] {
@@ -21,7 +15,7 @@ public class TestLess {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(ok,gfiles));
+        Assert.assertTrue(GrammarTester.run(ok, "stylesheet", gfiles));
     }
 
 
