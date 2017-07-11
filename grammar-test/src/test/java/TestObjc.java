@@ -2,16 +2,20 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileFilter;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TestObjc {
 
-    private static File [] ok = new File("../objc/examples").listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-            return pathname.isFile();
-        }
-    });
+    private static Set<String> blist = new HashSet<>();
+
+    static {
+        blist.add("AllInOne.m");
+    }
+
+    private static File [] ok = new File("../objc/examples").listFiles
+            (pathname -> pathname.isFile() && !blist.contains(pathname
+                    .getName()));
 
     private static File [] gfiles = new File [] {
             new File("../objc/ObjectiveCParser.g4"),
@@ -22,7 +26,6 @@ public class TestObjc {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(ok,gfiles));
+        Assert.assertTrue(GrammarTester.run(ok, "translationUnit", gfiles));
     }
-
 }

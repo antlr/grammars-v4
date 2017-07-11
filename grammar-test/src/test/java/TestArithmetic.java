@@ -11,6 +11,6 @@ public class TestArithmetic {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(ok, gfile));
+        Assert.assertTrue(GrammarTester.run(ok, "equation", gfile));
     }
 }

@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.snt.inmemantlr.GenericParser;
 import org.snt.inmemantlr.exceptions.CompilationException;
 import org.snt.inmemantlr.exceptions.IllegalWorkflowException;
+import org.snt.inmemantlr.exceptions.ParsingException;
 import org.snt.inmemantlr.listener.DefaultTreeListener;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 
 import static org.junit.Assert.assertFalse;
@@ -19,12 +19,7 @@ public class TestZ {
     private static final Logger LOGGER = LoggerFactory.getLogger
             (TestZ.class);
 
-    private static File [] ok = new File("../z/examples").listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-            return pathname.isFile();
-        }
-    });
+    private static File [] ok = new File("../z/examples").listFiles(pathname -> pathname.isFile());
 
 
     private static File [] gfiles = new File [] {
@@ -72,12 +67,10 @@ public class TestZ {
         for(File f : ok) {
             LOGGER.info("parse {}", f.getAbsoluteFile());
             try {
-                try {
-                    gp.parse(f);
-                } catch (FileNotFoundException e) {
-                    Assert.assertTrue(false);
-                }
-            } catch (IllegalWorkflowException e) {
+                gp.parse(f, "specification", GenericParser.CaseSensitiveType.NONE);
+            } catch (IllegalWorkflowException |
+                    FileNotFoundException |
+                    ParsingException e) {
                 Assert.assertTrue(false);
             }
         }

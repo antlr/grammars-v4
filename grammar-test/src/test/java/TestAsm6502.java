@@ -10,6 +10,6 @@ public class TestAsm6502 {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(ok, gfile));
+        Assert.assertTrue(GrammarTester.run(ok, "prog", gfile));
     }
 }

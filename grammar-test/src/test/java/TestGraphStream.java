@@ -15,8 +15,6 @@ public class TestGraphStream {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(ok,gfiles));
+        Assert.assertTrue(GrammarTester.run(ok, "dgs", gfiles));
     }
-
-
 }

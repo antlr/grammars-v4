@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.snt.inmemantlr.GenericParser;
 import org.snt.inmemantlr.exceptions.CompilationException;
 import org.snt.inmemantlr.exceptions.IllegalWorkflowException;
+import org.snt.inmemantlr.exceptions.ParsingException;
 import org.snt.inmemantlr.listener.DefaultTreeListener;
 
 import java.io.File;
@@ -19,14 +20,14 @@ public class TestSwift3 {
     private static final Logger LOGGER = LoggerFactory.getLogger
             (TestSwift3.class);
 
-    private static File [] ok = new File("../swift3/examples").listFiles(new FileFilter() {
+    private static File[] ok = new File("../swift3/examples").listFiles(new FileFilter() {
         @Override
         public boolean accept(File pathname) {
             return pathname.isFile();
         }
     });
 
-    private static File gfile =  new File("../swift3/Swift3.g4");
+    private static File gfile = new File("../swift3/Swift3.g4");
 
     @Test
     public void test() {
@@ -60,15 +61,13 @@ public class TestSwift3 {
 
         assertTrue(compile);
 
-        for(File f : ok) {
+        for (File f : ok) {
             LOGGER.info("parse {}", f.getAbsoluteFile());
             try {
-                try {
-                    gp.parse(f);
-                } catch (FileNotFoundException e) {
-                    Assert.assertTrue(false);
-                }
-            } catch (IllegalWorkflowException e) {
+                gp.parse(f, "top_level", GenericParser.CaseSensitiveType.NONE);
+            } catch (IllegalWorkflowException |
+                    FileNotFoundException |
+                    ParsingException e) {
                 Assert.assertTrue(false);
             }
         }
