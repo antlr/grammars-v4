@@ -23,9 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-parser grammar MySQLParser;
+parser grammar MySqlParser;
 
-options { tokenVocab=MySQLLexer; }
+options { tokenVocab=MySqlLexer; }
 
 
 // Top Level Description
