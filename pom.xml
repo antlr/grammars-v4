@@ -101,6 +101,7 @@
 			<module>php</module>
 			<module>plsql</module>
 			<module>postalcode</module>
+			<module>powerbuilder</module>
 			<module>propcalc</module>
 			<module>protobuf3</module>
 			<module>properties</module>

@@ -1,22 +1,5 @@
 
-/*******************************************************************************
-DESCRIPTION:
-		Grammar for Sybase's PowerBuilder PowerScript						
-		see: http://manuals.sybase.com/onlinebooks/group-pb/pbg0900e/psref/@Generic__BookTextView/222
-				
-AUTHOR:
-		Ivan.Brezina (ibre5041@ibrezina.net)
-DATE:
-		DEC 2011
-NOTES:
-		target language Java
-		antlr version 3.4
-*******************************************************************************/
-
-/*
-* ported to Antlr4 by Tom Everett
-*/
-grammar PBM;
+grammar powerbuilder;
 
 start_rule
    : header_rule body_rule* EOF
