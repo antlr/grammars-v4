@@ -314,8 +314,7 @@ lexerAtom
    ;
 
 atom
-   : characterRange
-   | terminal
+   : terminal
    | ruleref
    | notSet
    | DOT elementOptions?
