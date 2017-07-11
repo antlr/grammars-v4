@@ -2,16 +2,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileFilter;
 
 public class TestXml {
 
-    private static File [] ok = new File("../xml/examples").listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-            return pathname.isFile();
-        }
-    });
+    private static File [] ok = new File("../xml/examples").listFiles(pathname -> pathname.isFile());
 
 
     private static File [] gfiles = new File [] {
@@ -21,6 +15,6 @@ public class TestXml {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(ok,gfiles));
+        Assert.assertTrue(GrammarTester.run(ok, "document", gfiles));
     }
 }

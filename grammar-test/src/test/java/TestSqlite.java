@@ -2,22 +2,16 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileFilter;
 
 public class TestSqlite {
 
-    private static File [] ok = new File("../sqlite/examples").listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-            return pathname.isFile();
-        }
-    });
+    private static File [] ok = new File("../sqlite/examples").listFiles(pathname -> pathname.isFile());
 
-    private static File gfile =  new File("../sqlite/SQLite.g4");
+    private static File gfiles =  new File("../sqlite/SQLite.g4");
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(ok,gfile));
+        Assert.assertTrue(GrammarTester.run(ok, "parse", gfiles));
     }
 
 }

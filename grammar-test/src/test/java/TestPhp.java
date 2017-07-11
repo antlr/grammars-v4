@@ -2,17 +2,20 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileFilter;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TestPhp {
 
-    private static File [] ok = new File("../php/examples").listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-            return pathname.isFile();
-        }
-    });
+    private static Set<String> blist = new HashSet<String> ();
 
+    static {
+        blist.add("alternativeSyntax.php");
+    }
+
+    private static File [] ok = new File("../php/examples").listFiles(
+            pathname -> pathname.isFile() && !blist.contains(pathname.getName())
+    );
 
     private static File [] gfiles = new File [] {
             new File("../php/PHPLexer.g4"),
@@ -21,7 +24,7 @@ public class TestPhp {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(ok,gfiles));
+        Assert.assertTrue(GrammarTester.run(ok, "htmlDocument", gfiles));
     }
 
 

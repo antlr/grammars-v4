@@ -1,9 +1,13 @@
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snt.inmemantlr.GenericParser;
 import org.snt.inmemantlr.exceptions.CompilationException;
 import org.snt.inmemantlr.exceptions.IllegalWorkflowException;
+import org.snt.inmemantlr.exceptions.ParsingException;
 import org.snt.inmemantlr.listener.DefaultTreeListener;
+import org.snt.inmemantlr.stream.CasedStreamProvider;
 import org.snt.inmemantlr.tree.Ast;
 
 import java.io.File;
@@ -39,22 +43,58 @@ public class GrammarTester {
         return gp;
     }
 
-    public static boolean run(File[] ok, File... gfile) {
+    private static boolean excludeFile(File f) {
+
+        if(FilenameUtils.getExtension(f.getName()).equals("errors") ||
+                FilenameUtils.getExtension(f.getName()).equals("tree")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean run(File[] ok,
+                              String ept, File... gfile) {
+        return run(GenericParser.CaseSensitiveType.NONE, ok, ept, gfile);
+    }
+
+
+    public static boolean run(GenericParser.CaseSensitiveType t, File[] ok,
+                              String ept, File... gfile) {
         GenericParser gp = create(gfile);
 
         if (gp == null)
             return false;
 
+        DefaultTreeListener dt = new DefaultTreeListener();
+
+        gp.setListener(dt);
+
+        switch (t) {
+            case UPPER:
+                gp.setStreamProvider(new CasedStreamProvider(GenericParser
+                        .CaseSensitiveType.UPPER));
+                break;
+            case LOWER:
+                gp.setStreamProvider(new CasedStreamProvider(GenericParser
+                        .CaseSensitiveType.LOWER));
+                break;
+            case NONE:
+                break;
+
+        }
+
         for (File f : ok) {
+
+            if(excludeFile(f)) {
+                LOGGER.info("skip {}", f.getAbsoluteFile());
+                continue;
+            }
+
             LOGGER.info("parse {}", f.getAbsoluteFile());
             try {
-                try {
-                    gp.parse(f);
-                } catch (FileNotFoundException e) {
-                    LOGGER.error(e.getMessage());
-                    return false;
-                }
-            } catch (IllegalWorkflowException e) {
+                gp.parse(f,ept, GenericParser.CaseSensitiveType.NONE);
+            } catch (FileNotFoundException | IllegalWorkflowException |
+                    ParsingException e) {
                 LOGGER.error(e.getMessage());
                 return false;
             }
@@ -65,25 +105,29 @@ public class GrammarTester {
     public static Map<String, Ast> runAndGetAsts(File[] ok, File... gfile) {
         GenericParser gp = create(gfile);
 
-        Map<String,Ast> ret = new HashMap<String, Ast>();
+        Map<String, Ast> ret = new HashMap<String, Ast>();
 
         for (File f : ok) {
+
+
+            if(excludeFile(f)) {
+                LOGGER.info("skip {}", f.getAbsoluteFile());
+                continue;
+            }
+
             LOGGER.info("parse {}", f.getAbsoluteFile());
+
             try {
-                try {
-                    gp.parse(f);
-                } catch (FileNotFoundException e) {
-                    LOGGER.error(e.getMessage());
-                    return null;
-                }
-            } catch (IllegalWorkflowException e) {
+                ParserRuleContext ctx = gp.parse(f);
+            } catch (FileNotFoundException | IllegalWorkflowException |
+                    ParsingException e) {
                 LOGGER.error(e.getMessage());
                 return null;
             }
 
             Path p = Paths.get(f.toURI());
 
-            DefaultTreeListener l = (DefaultTreeListener)gp.getListener();
+            DefaultTreeListener l = (DefaultTreeListener) gp.getListener();
 
             ret.put(p.getFileName().toString(), l.getAst());
         }
@@ -93,8 +137,9 @@ public class GrammarTester {
 
     public static boolean run(File... gfile) {
         GenericParser gp = create(gfile);
-        if (gp == null)
+        if (gp == null) {
             return false;
+        }
         return true;
     }
 
