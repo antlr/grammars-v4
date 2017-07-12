@@ -34,6 +34,7 @@ public class LexerTest {
         long maxLong = 0x7fff_ffff_ffff_ffffL;
         byte nybbles = 0b0010_0101;
         long bytes = 0b11010010_01101001_10010100_10010010;
+        long lastReceivedMessageId = 0L;
 
         int x1 = _52;              // This is an identifier, not a numeric literal
         int x2 = 5_2;              // OK (decimal literal)
