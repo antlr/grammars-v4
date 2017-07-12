@@ -100,7 +100,7 @@ cfl_statement
     | waitfor_statement
     | while_statement
     | print_statement
-    | raiseerror_statementb
+    | raiseerror_statement
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/begin-end-transact-sql
@@ -172,7 +172,7 @@ print_statement
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/raiserror-transact-sql
-raiseerror_statementb
+raiseerror_statement
     : RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' severity=constant_LOCAL_ID ','
     state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' (WITH (LOG | SETERROR))? ';'?
     ;
@@ -1098,12 +1098,15 @@ constant_LOCAL_ID
 // Operator precendence: https://docs.microsoft.com/en-us/sql/t-sql/language-elements/operator-precedence-transact-sql
 expression
     : primitive_expression
-    | function_call | expression COLLATE id
+    | function_call
+    | expression COLLATE id
     | case_expression
     | full_column_name
     | bracket_expression
     | unary_operator_expression
-    | expression binary_operator_expression
+    | expression op=('*' | '/' | '%') expression
+    | expression op=('+' | '-' | '&' | '^' | '|') expression
+    | expression comparison_operator expression
     | expression assignment_operator expression
     | over_clause
     ;
@@ -1121,12 +1124,6 @@ case_expression
 unary_operator_expression
     : '~' expression
     | op=('+' | '-') expression
-    ;
-
-binary_operator_expression
-    : op=('*' | '/' | '%') expression
-    | op=('+' | '-' | '&' | '^' | '|') expression
-    | comparison_operator expression
     ;
 
 bracket_expression
