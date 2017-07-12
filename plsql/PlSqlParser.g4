@@ -30,7 +30,7 @@ compilation_unit
     ;
 
 sql_script
-    : (unit_statement | sql_plus_command)* EOF
+    : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
     ;
 
 unit_statement
@@ -47,7 +47,7 @@ unit_statement
     | create_package_body
 
 //  | create_index //TODO
-//  | create_table //TODO
+    | create_table
 //  | create_view //TODO
 //  | create_directory //TODO
 //  | create_materialized_view //TODO
@@ -63,6 +63,9 @@ unit_statement
     | drop_trigger
     | drop_type
     | data_manipulation_language_statements
+    | drop_table
+
+    | anonymous_block
     ;
 
 // $<DDL -> SQL Statements for Stored PL/SQL Units
@@ -510,6 +513,22 @@ sequence_spec
 
 sequence_start_clause
     : START WITH UNSIGNED_INTEGER
+    ;
+
+// $<Table DDL Clauses
+
+create_table
+    : CREATE TABLE tableview_name LEFT_PAREN column_name datatype (COMMA column_name datatype)* RIGHT_PAREN
+    ;
+
+drop_table
+    : DROP TABLE tableview_name
+    ;
+
+// $<Anonymous PL/SQL code block
+
+anonymous_block
+    : BEGIN seq_of_statements END SEMICOLON
     ;
 
 // $<Common DDL Clauses
@@ -1711,7 +1730,7 @@ xmlserialize_param_ident_part
 // SqlPlus
 
 sql_plus_command 
-    : ('/' | whenever_command | exit_command | prompt_command | set_command | show_errors_command) ';'?
+    : ('/' | whenever_command | exit_command | prompt_command | set_command | show_errors_command | start_command) ';'?
     ;
 
 whenever_command
@@ -1734,6 +1753,10 @@ prompt_command
 show_errors_command
     : SHOW ERR
     | SHOW ERRORS
+    ;
+
+start_command
+    : START_CMD
     ;
 
 // Common
