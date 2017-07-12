@@ -70,6 +70,7 @@
 			<module>iri</module>
 			<module>java</module>
 			<module>java8</module>
+			<module>java8-pt</module>
 			<module>javadoc</module>
 			<module>jpa</module>
 			<module>json</module>
