@@ -13,7 +13,7 @@
 					<activeByDefault>false</activeByDefault>
 				</activation>
 			<modules>
-				<module>grammar-test</module>
+				<module>_grammar-test</module>
 			</modules>
 		</profile>
 		<profile>
