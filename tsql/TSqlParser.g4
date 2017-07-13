@@ -593,6 +593,72 @@ cursor_option:
     | CURSOR_DEFAULT ( LOCAL | GLOBAL )
   ;
 
+https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
+create_endpoint:
+    CREATE ENDPOINT endpointname endpoint_authorization endpoint_state endpoint_as_clause endpoint_for_clause RR_BRACKET
+     ;
+
+endpointname:
+     endpointname=id 
+     ;
+
+endpoint_authorization:
+     AUTHORIZATION login=id
+     |
+;
+
+endpoint_state:
+     STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED )
+     |
+;
+
+endpoint_as_clause:
+AS TCP LR_BRACKET endpoint_tcp_protocol_specific_arguments
+;
+
+endpoint_tcp_protocol_specific_arguments:
+   LISTENER_PORT port=DEC_DIGIT endpoint_listener_ip
+   ;
+
+endpoint_listener_ip:
+    LISTENER_IP EQUAL (ALL | ipv4_address | ipv6_address )
+    ;
+
+ipv4_address:
+   DECIMAL DOT DECIMAL DOT DECIMAL DOT DECIMAL
+   ;
+
+ipv6_octect:
+   HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+;
+
+ivp6_address:
+        ipv6_octect COLON ipv6_octect COLON ipv6_octect COLON ipv6_octect COLON ipv6_octect COLON ipv6_octect COLON ipv6_octect COLON ipv6_octect 
+	;
+
+endpoint_for_clause:
+     FOR SERVICE_BROKER LL_BRACKET endpoint_server_broker_clause
+;
+
+endpoint_server_broker_clause:
+	endpoint_server_broker_clause COMMA
+	| endpoint_authentication_clause
+        | endpoint_encryption_clause
+	| endpoint_message_forwarding_clause
+ 	| endpoint_message_forward_size
+	;
+
+endpoint_authentication_clause:
+        AUTHENTICATION EQUAL WINDOWS windows_auth_methods
+        | CERTIFICATE cert_name=id 
+        | CERTIFICATE cert_name=id WINDOWS windows_auth_methods
+	;
+
+windows_auth_methods:
+	( NTLM |KERBEROS | NEGOTIATE )
+        ;
+
+
 /* Will visit later
 database_mirroring_option:
      ALTER DATABASE Database Mirroring
@@ -615,7 +681,7 @@ db_update_option:
     ;
 
 db_user_access_option:
-    ( SINGLE_USER | RESTRICTED_USER | MULTI_USER )
+    ( SINGLE_USER      AUTHORIZATION | RESTRICTED_USER | MULTI_USER )
     ;
 delayed_durability_option:
      DELAYED_DURABILITY EQUAL ( DISABLED | ALLOWED | FORCED )
@@ -1146,6 +1212,7 @@ subquery
 // https://msdn.microsoft.com/en-us/library/ms175972.aspx
 with_expression
     : WITH (XMLNAMESPACES ',')? common_table_expression (',' common_table_expression)*
+    | WITH BLOCKING_HIERARCHY ('(' full_column_name_list ')')? AS '(' select_statement ')'
     ;
 
 common_table_expression
@@ -1468,10 +1535,13 @@ xml_data_type_methods
 
 value_method
     : (LOCAL_ID | ID | EVENTDATA | query_method) '.' VALUE '(' xquery=STRING ',' sqltype=STRING ')'
+    | (LOCAL_ID | ID | EVENTDATA | query_method) '.' ROW '.' VALUE '(' xquery=STRING ',' sqltype=STRING ')'
+    | (LOCAL_ID | ID | EVENTDATA | query_method) '.' PARAM_NODE '.' VALUE '(' xquery=STRING ',' sqltype=STRING ')'
     ;
 
 query_method
     : (LOCAL_ID | ID | full_table_name) '.' QUERY '(' xquery=STRING ')'
+    | (LOCAL_ID | ID | full_table_name) '.' ROW '.' QUERY '(' xquery=STRING ')'
     ;
 
 exist_method
@@ -1653,6 +1723,7 @@ full_table_name
 
 table_name
     : (database=id '.' (schema=id)? '.' | schema=id '.')? table=id
+    | (database=id '.' (schema=id)? '.' | schema=id '.')? BLOCKING_HIERARCHY
     ;
 
 simple_name
@@ -1667,9 +1738,17 @@ ddl_object
     : full_table_name
     | LOCAL_ID
     ;
-
+/*  There are some RESERVED WORDS that can be column names */
 full_column_name
     : (table_name '.')? id
+    | (table_name '.')? COMPATIBILITY_LEVEL
+    | (table_name '.')? STATUS
+    | (table_name '.')? QUOTED_IDENTIFIER
+    | (table_name '.')? ARITHABORT
+    | (table_name '.')? ANSI_WARNINGS
+    | (table_name '.')? ANSI_PADDING
+    | (table_name '.')? ANSI_NULLS
+
     ;
 
 column_name_list_with_order
