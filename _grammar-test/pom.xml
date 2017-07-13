@@ -21,7 +21,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>grammar-test</artifactId>
+    <artifactId>_grammar-test</artifactId>
 
     <dependencies>
         <dependency>
