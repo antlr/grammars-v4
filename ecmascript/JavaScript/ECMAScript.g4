@@ -131,6 +131,10 @@ ECMAScriptLexer.prototype.isRegexPossible = function() {
             return false;
         case ECMAScriptLexer.StringLiteral:
             return false;
+        case ECMAScriptLexer.PlusPlus:
+            return false;
+        case ECMAScriptLexer.MinusMinus:
+            return false;
         default:
             return true;
     }
