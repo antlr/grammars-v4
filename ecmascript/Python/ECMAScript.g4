@@ -155,7 +155,9 @@ def isRegexPossible(self):
             self._lastToken.type == ECMAScriptLexer.OctalIntegerLiteral or \
             self._lastToken.type == ECMAScriptLexer.DecimalLiteral or \
             self._lastToken.type == ECMAScriptLexer.HexIntegerLiteral or \
-            self._lastToken.type == ECMAScriptLexer.StringLiteral:
+            self._lastToken.type == ECMAScriptLexer.StringLiteral or \
+            self._lastToken.type == ECMAScriptLexer.PlusPlus or \
+            self._lastToken.type == ECMAScriptLexer.MinusMinus:
         # After any of the tokens above, no regex literal can follow.
         return False
     else:
