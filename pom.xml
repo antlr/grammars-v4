@@ -13,7 +13,7 @@
 					<activeByDefault>false</activeByDefault>
 				</activation>
 			<modules>
-				<module>grammar-test</module>
+				<module>_grammar-test</module>
 			</modules>
 		</profile>
 		<profile>
@@ -70,6 +70,7 @@
 			<module>iri</module>
 			<module>java</module>
 			<module>java8</module>
+			<module>java8-pt</module>
 			<module>javadoc</module>
 			<module>jpa</module>
 			<module>json</module>
@@ -101,6 +102,7 @@
 			<module>php</module>
 			<module>plsql</module>
 			<module>postalcode</module>
+			<module>powerbuilder</module>
 			<module>propcalc</module>
 			<module>protobuf3</module>
 			<module>properties</module>
