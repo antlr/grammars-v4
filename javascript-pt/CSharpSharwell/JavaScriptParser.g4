@@ -89,345 +89,339 @@ options { tokenVocab=JavaScriptLexer; }
 }
 
 program
- : sourceElement* EOF
- ;
+    : sourceElement* EOF
+    ;
 
 sourceElement
- : statement
- | functionDeclaration
- ;
+    : statement
+    | functionDeclaration
+    ;
 
 statement
- : block
- | variableStatement
- | emptyStatement
- | expressionStatement
- | ifStatement
- | iterationStatement
- | continueStatement
- | breakStatement
- | returnStatement
- | withStatement
- | labelledStatement
- | switchStatement
- | throwStatement
- | tryStatement
- | debuggerStatement
- ;
+    : block
+    | variableStatement
+    | emptyStatement
+    | expressionStatement
+    | ifStatement
+    | iterationStatement
+    | continueStatement
+    | breakStatement
+    | returnStatement
+    | withStatement
+    | labelledStatement
+    | switchStatement
+    | throwStatement
+    | tryStatement
+    | debuggerStatement
+    ;
 
 block
- : '{' statementList? '}'
- ;
+    : '{' statementList? '}'
+    ;
 
 statementList
- : statement+
- ;
+    : statement+
+    ;
 
 variableStatement
- : Var variableDeclarationList eos
- ;
+    : Var variableDeclarationList eos
+    ;
 
 variableDeclarationList
- : variableDeclaration ( ',' variableDeclaration )*
- ;
+    : variableDeclaration ( ',' variableDeclaration )*
+    ;
 
 variableDeclaration
- : Identifier initialiser?
- ;
+    : Identifier initialiser?
+    ;
 
 initialiser
- : '=' singleExpression
- ;
+    : '=' singleExpression
+    ;
 
 emptyStatement
- : SemiColon
- ;
+    : SemiColon
+    ;
 
 expressionStatement
- : {(_input.La(1) != OpenBrace) && (_input.La(1) != Function)}? expressionSequence eos
- ;
+    : {(_input.La(1) != OpenBrace) && (_input.La(1) != Function)}? expressionSequence eos
+    ;
 
 ifStatement
- : If '(' expressionSequence ')' statement ( Else statement )?
- ;
+    : If '(' expressionSequence ')' statement ( Else statement )?
+    ;
 
 
 iterationStatement
- : Do statement While '(' expressionSequence ')' eos                                                 # DoStatement
- | While '(' expressionSequence ')' statement                                                        # WhileStatement
- | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement         # ForStatement
- | For '(' Var variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')' statement # ForVarStatement
- | For '(' singleExpression In expressionSequence ')' statement                                      # ForInStatement
- | For '(' Var variableDeclaration In expressionSequence ')' statement                               # ForVarInStatement
- ;
+    : Do statement While '(' expressionSequence ')' eos                                                 # DoStatement
+    | While '(' expressionSequence ')' statement                                                        # WhileStatement
+    | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement         # ForStatement
+    | For '(' Var variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')' statement # ForVarStatement
+    | For '(' singleExpression In expressionSequence ')' statement                                      # ForInStatement
+    | For '(' Var variableDeclaration In expressionSequence ')' statement                               # ForVarInStatement
+    ;
 
 continueStatement
- : Continue ({!here(LineTerminator)}? Identifier)? eos
- ;
+    : Continue ({!here(LineTerminator)}? Identifier)? eos
+    ;
 
 breakStatement
- : Break ({!here(LineTerminator)}? Identifier)? eos
- ;
+    : Break ({!here(LineTerminator)}? Identifier)? eos
+    ;
 
 returnStatement
- : Return ({!here(LineTerminator)}? expressionSequence)? eos
- ;
+    : Return ({!here(LineTerminator)}? expressionSequence)? eos
+    ;
 
 withStatement
- : With '(' expressionSequence ')' statement
- ;
+    : With '(' expressionSequence ')' statement
+    ;
 
 switchStatement
- : Switch '(' expressionSequence ')' caseBlock
- ;
+    : Switch '(' expressionSequence ')' caseBlock
+    ;
 
 caseBlock
- : '{' caseClauses? ( defaultClause caseClauses? )? '}'
- ;
+    : '{' caseClauses? ( defaultClause caseClauses? )? '}'
+    ;
 
 caseClauses
- : caseClause+
- ;
+    : caseClause+
+    ;
 
 caseClause
- : Case expressionSequence ':' statementList?
- ;
+    : Case expressionSequence ':' statementList?
+    ;
 
 defaultClause
- : Default ':' statementList?
- ;
+    : Default ':' statementList?
+    ;
 
 labelledStatement
- : Identifier ':' statement
- ;
+    : Identifier ':' statement
+    ;
 
 throwStatement
- : Throw {!here(LineTerminator)}? expressionSequence eos
- ;
+    : Throw {!here(LineTerminator)}? expressionSequence eos
+    ;
 
 tryStatement
- : Try block catchProduction
- | Try block finallyProduction
- | Try block catchProduction finallyProduction
- ;
+    : Try block catchProduction
+    | Try block finallyProduction
+    | Try block catchProduction finallyProduction
+    ;
 
 catchProduction
- : Catch '(' Identifier ')' block
- ;
+    : Catch '(' Identifier ')' block
+    ;
 
 finallyProduction
- : Finally block
- ;
+    : Finally block
+    ;
 
 debuggerStatement
- : Debugger eos
- ;
+    : Debugger eos
+    ;
 
 functionDeclaration
- : Function Identifier '(' formalParameterList? ')' '{' functionBody '}'
- ;
+    : Function Identifier '(' formalParameterList? ')' '{' functionBody '}'
+    ;
 
 formalParameterList
- : Identifier ( ',' Identifier )*
- ;
+    : Identifier ( ',' Identifier )*
+    ;
 
 functionBody
- : sourceElement*
- ;
+    : sourceElement*
+    ;
 
 arrayLiteral
- : '[' elementList? ','? elision? ']'
- ;
+    : '[' elementList? ','? elision? ']'
+    ;
 
 elementList
- : elision? singleExpression ( ',' elision? singleExpression )*
- ;
+    : elision? singleExpression ( ',' elision? singleExpression )*
+    ;
 
 elision
- : ','+
- ;
+    : ','+
+    ;
 
 objectLiteral
- : '{' propertyNameAndValueList? ','? '}'
- ;
+    : '{' propertyNameAndValueList? ','? '}'
+    ;
 
 propertyNameAndValueList
- : propertyAssignment ( ',' propertyAssignment )*
- ;
+    : propertyAssignment ( ',' propertyAssignment )*
+    ;
 
 propertyAssignment
- : propertyName ':' singleExpression                            # PropertyExpressionAssignment
- | getter '(' ')' '{' functionBody '}'                          # PropertyGetter
- | setter '(' propertySetParameterList ')' '{' functionBody '}' # PropertySetter
- ;           
+    : propertyName ':' singleExpression                            # PropertyExpressionAssignment
+    | getter '(' ')' '{' functionBody '}'                          # PropertyGetter
+    | setter '(' propertySetParameterList ')' '{' functionBody '}' # PropertySetter
+    ;           
 
 propertyName
- : identifierName
- | StringLiteral
- | numericLiteral
- ;
+    : identifierName
+    | StringLiteral
+    | numericLiteral
+    ;
 
 propertySetParameterList
- : Identifier
- ;
+    : Identifier
+    ;
 
 arguments
- : '(' argumentList? ')'
- ;
+    : '(' argumentList? ')'
+    ;
 
 argumentList
- : singleExpression ( ',' singleExpression )*
- ;
+    : singleExpression ( ',' singleExpression )*
+    ;
 
 expressionSequence
- : singleExpression ( ',' singleExpression )*
- ;
+    : singleExpression ( ',' singleExpression )*
+    ;
 
 singleExpression
- : Function Identifier? '(' formalParameterList? ')' '{' functionBody '}' # FunctionExpression
- | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
- | singleExpression '.' identifierName                                    # MemberDotExpression
- | singleExpression arguments                                             # ArgumentsExpression
- | New singleExpression arguments?                                        # NewExpression
- | singleExpression {!here(LineTerminator)}? '++'                         # PostIncrementExpression
- | singleExpression {!here(LineTerminator)}? '--'                         # PostDecreaseExpression
- | Delete singleExpression                                                # DeleteExpression
- | Void singleExpression                                                  # VoidExpression
- | Typeof singleExpression                                                # TypeofExpression
- | '++' singleExpression                                                  # PreIncrementExpression
- | '--' singleExpression                                                  # PreDecreaseExpression
- | '+' singleExpression                                                   # UnaryPlusExpression
- | '-' singleExpression                                                   # UnaryMinusExpression
- | '~' singleExpression                                                   # BitNotExpression
- | '!' singleExpression                                                   # NotExpression
- | singleExpression ( '*' | '/' | '%' ) singleExpression                  # MultiplicativeExpression
- | singleExpression ( '+' | '-' ) singleExpression                        # AdditiveExpression
- | singleExpression ( '<<' | '>>' | '>>>' ) singleExpression              # BitShiftExpression
- | singleExpression ( '<' | '>' | '<=' | '>=' ) singleExpression          # RelationalExpression
- | singleExpression Instanceof singleExpression                           # InstanceofExpression
- | singleExpression In singleExpression                                   # InExpression
- | singleExpression ( '==' | '!=' | '===' | '!==' ) singleExpression      # EqualityExpression
- | singleExpression '&' singleExpression                                  # BitAndExpression
- | singleExpression '^' singleExpression                                  # BitXOrExpression
- | singleExpression '|' singleExpression                                  # BitOrExpression
- | singleExpression '&&' singleExpression                                 # LogicalAndExpression
- | singleExpression '||' singleExpression                                 # LogicalOrExpression
- | singleExpression '?' singleExpression ':' singleExpression             # TernaryExpression
- | singleExpression '=' singleExpression                                  # AssignmentExpression
- | singleExpression assignmentOperator singleExpression                   # AssignmentOperatorExpression
- | This                                                                   # ThisExpression
- | Identifier                                                             # IdentifierExpression
- | literal                                                                # LiteralExpression
- | arrayLiteral                                                           # ArrayLiteralExpression
- | objectLiteral                                                          # ObjectLiteralExpression
- | '(' expressionSequence ')'                                             # ParenthesizedExpression
- ;
+    : Function Identifier? '(' formalParameterList? ')' '{' functionBody '}' # FunctionExpression
+    | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
+    | singleExpression '.' identifierName                                    # MemberDotExpression
+    | singleExpression arguments                                             # ArgumentsExpression
+    | New singleExpression arguments?                                        # NewExpression
+    | singleExpression {!here(LineTerminator)}? '++'                         # PostIncrementExpression
+    | singleExpression {!here(LineTerminator)}? '--'                         # PostDecreaseExpression
+    | Delete singleExpression                                                # DeleteExpression
+    | Void singleExpression                                                  # VoidExpression
+    | Typeof singleExpression                                                # TypeofExpression
+    | '++' singleExpression                                                  # PreIncrementExpression
+    | '--' singleExpression                                                  # PreDecreaseExpression
+    | '+' singleExpression                                                   # UnaryPlusExpression
+    | '-' singleExpression                                                   # UnaryMinusExpression
+    | '~' singleExpression                                                   # BitNotExpression
+    | '!' singleExpression                                                   # NotExpression
+    | singleExpression ( '*'    | '/'    | '%' ) singleExpression                  # MultiplicativeExpression
+    | singleExpression ( '+'    | '-' ) singleExpression                        # AdditiveExpression
+    | singleExpression ( '<<'    | '>>'    | '>>>' ) singleExpression              # BitShiftExpression
+    | singleExpression ( '<'    | '>'    | '<='    | '>=' ) singleExpression          # RelationalExpression
+    | singleExpression Instanceof singleExpression                           # InstanceofExpression
+    | singleExpression In singleExpression                                   # InExpression
+    | singleExpression ( '=='    | '!='    | '==='    | '!==' ) singleExpression      # EqualityExpression
+    | singleExpression '&' singleExpression                                  # BitAndExpression
+    | singleExpression '^' singleExpression                                  # BitXOrExpression
+    | singleExpression '|' singleExpression                                  # BitOrExpression
+    | singleExpression '&&' singleExpression                                 # LogicalAndExpression
+    | singleExpression '||' singleExpression                                 # LogicalOrExpression
+    | singleExpression '?' singleExpression ':' singleExpression             # TernaryExpression
+    | singleExpression '=' singleExpression                                  # AssignmentExpression
+    | singleExpression assignmentOperator singleExpression                   # AssignmentOperatorExpression
+    | This                                                                   # ThisExpression
+    | Identifier                                                             # IdentifierExpression
+    | literal                                                                # LiteralExpression
+    | arrayLiteral                                                           # ArrayLiteralExpression
+    | objectLiteral                                                          # ObjectLiteralExpression
+    | '(' expressionSequence ')'                                             # ParenthesizedExpression
+    ;
 
 assignmentOperator
- : '*=' 
- | '/=' 
- | '%=' 
- | '+=' 
- | '-=' 
- | '<<=' 
- | '>>=' 
- | '>>>=' 
- | '&=' 
- | '^=' 
- | '|='
- ;
+    : '*=' 
+    | '/=' 
+    | '%=' 
+    | '+=' 
+    | '-=' 
+    | '<<=' 
+    | '>>=' 
+    | '>>>=' 
+    | '&=' 
+    | '^=' 
+    | '|='
+    ;
 
 literal
- : ( NullLiteral 
-   | BooleanLiteral
-   | StringLiteral
-   | RegularExpressionLiteral
-   )
- | numericLiteral
- ;
+    : NullLiteral
+    | BooleanLiteral
+    | StringLiteral
+    | RegularExpressionLiteral
+    | numericLiteral
+    ;
 
 numericLiteral
- : DecimalLiteral
- | HexIntegerLiteral
- | OctalIntegerLiteral
- ;
+    : DecimalLiteral
+    | HexIntegerLiteral
+    | OctalIntegerLiteral
+    ;
 
 identifierName
- : Identifier
- | reservedWord
- ;
+    : Identifier
+    | reservedWord
+    ;
 
 reservedWord
- : keyword
- | futureReservedWord
- | ( NullLiteral
-   | BooleanLiteral
-   )
- ;
+    : keyword
+    | futureReservedWord
+    | NullLiteral
+    | BooleanLiteral
+    ;
 
 keyword
- : Break
- | Do
- | Instanceof
- | Typeof
- | Case
- | Else
- | New
- | Var
- | Catch
- | Finally
- | Return
- | Void
- | Continue
- | For
- | Switch
- | While
- | Debugger
- | Function
- | This
- | With
- | Default
- | If
- | Throw
- | Delete
- | In
- | Try
- ;
+    : Break
+    | Do
+    | Instanceof
+    | Typeof
+    | Case
+    | Else
+    | New
+    | Var
+    | Catch
+    | Finally
+    | Return
+    | Void
+    | Continue
+    | For
+    | Switch
+    | While
+    | Debugger
+    | Function
+    | This
+    | With
+    | Default
+    | If
+    | Throw
+    | Delete
+    | In
+    | Try
+    ;
 
 futureReservedWord
- : Class
- | Enum
- | Extends
- | Super
- | Const
- | Export
- | Import
- | Implements
- | Let
- | Private
- | Public
- | Interface
- | Package
- | Protected
- | Static
- | Yield
- ;
+    : Class
+    | Enum
+    | Extends
+    | Super
+    | Const
+    | Export
+    | Import
+    | Implements
+    | Let
+    | Private
+    | Public
+    | Interface
+    | Package
+    | Protected
+    | Static
+    | Yield
+    ;
 
 getter
- : {_input.Lt(1).Text.Equals("get")}? Identifier propertyName
- ;
+    : {_input.Lt(1).Text.Equals("get")}? Identifier propertyName
+    ;
 
 setter
- : {_input.Lt(1).Text.Equals("set")}? Identifier propertyName
- ;
+    : {_input.Lt(1).Text.Equals("set")}? Identifier propertyName
+    ;
 
 eos
- : SemiColon
- | EOF
- | {lineTerminatorAhead()}?
- | {_input.Lt(1).Type == CloseBrace}?
- ;
-
-eof
- : EOF
- ;
+    : SemiColon
+    | EOF
+    | {lineTerminatorAhead()}?
+    | {_input.Lt(1).Type == CloseBrace}?
+    ;
