@@ -26,7 +26,11 @@
  */
 lexer grammar JavaScriptLexer;
 
-RegularExpressionLiteral:       {IsRegexPossible()}? '/' RegularExpressionBody '/' RegularExpressionFlags;
+options {
+    superClass=JavaScriptRuntimeLexer;
+}
+
+RegularExpressionLiteral:       {isRegexPossible()}? '/' RegularExpressionBody '/' RegularExpressionFlags;
 
 /// Line Terminators
 LineTerminator:                 [\r\n\u2028\u2029] -> channel(HIDDEN);
@@ -99,7 +103,7 @@ DecimalLiteral:                 DecimalIntegerLiteral '.' DecimalDigit* Exponent
 /// Numeric Literals
 
 HexIntegerLiteral:              '0' [xX] HexDigit+;
-OctalIntegerLiteral:            {!StrictMode}? '0' OctalDigit+;
+OctalIntegerLiteral:            {!strictMode}? '0' OctalDigit+;
 
 /// Keywords
 
@@ -143,15 +147,15 @@ Import:                         'import';
 /// The following tokens are also considered to be FutureReservedWords 
 /// when parsing strict mode
 
-Implements:                     {StrictMode}? 'implements';
-Let:                            {StrictMode}? 'let';
-Private:                        {StrictMode}? 'private';
-Public:                         {StrictMode}? 'public';
-Interface:                      {StrictMode}? 'interface';
-Package:                        {StrictMode}? 'package';
-Protected:                      {StrictMode}? 'protected';
-Static:                         {StrictMode}? 'static';
-Yield:                          {StrictMode}? 'yield';
+Implements:                     {strictMode}? 'implements';
+Let:                            {strictMode}? 'let';
+Private:                        {strictMode}? 'private';
+Public:                         {strictMode}? 'public';
+Interface:                      {strictMode}? 'interface';
+Package:                        {strictMode}? 'package';
+Protected:                      {strictMode}? 'protected';
+Static:                         {strictMode}? 'static';
+Yield:                          {strictMode}? 'yield';
 
 /// Identifier Names and Identifiers
 

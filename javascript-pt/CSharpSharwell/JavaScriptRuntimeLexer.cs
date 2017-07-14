@@ -1,12 +1,12 @@
 using Antlr4.Runtime;
 using static PT.PM.JavaScriptParseTreeUst.Parser.JavaScriptParser;
 
-public abstract class JavaScriptLexerCSharpSharwell : Lexer
+public abstract class JavaScriptRuntimeLexer : Lexer
 {
     // The most recently produced token.
     private IToken _lastToken = null;
 
-    public JavaScriptLexerCSharpSharwell(ICharStream input)
+    public JavaScriptRuntimeLexer(ICharStream input)
         : base(input)
     {
     }
@@ -14,7 +14,7 @@ public abstract class JavaScriptLexerCSharpSharwell : Lexer
     // A property indicating if the lexer should operate in strict mode.
     // When set to true, FutureReservedWords are tokenized, when false,
     // an octal literal can be tokenized.
-    public bool StrictMode { get; set; } = true;
+    public bool strictMode { get; set; } = true;
 
     ///<summary>Return the next token from the character stream and records this last
     ///token in case it resides on the default channel. This recorded token
@@ -37,7 +37,7 @@ public abstract class JavaScriptLexerCSharpSharwell : Lexer
 
     ///<summary>Returns <c>true</c> iff the lexer can match a regex literal.</summary>
     ///<returns><c>true</c> iff the lexer can match a regex literal.</returns>
-    protected bool IsRegexPossible()
+    protected bool isRegexPossible()
     {
         if (_lastToken == null)
         {

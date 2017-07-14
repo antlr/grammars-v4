@@ -26,7 +26,10 @@
  */
 parser grammar JavaScriptParser;
 
-options { tokenVocab=JavaScriptLexer; }
+options {
+    tokenVocab=JavaScriptLexer;
+    superClass=JavaScriptRuntimeParser;
+}
 
 program
     : sourceElements? EOF
@@ -102,15 +105,15 @@ iterationStatement
     ;
 
 continueStatement
-    : Continue ({!Here(LineTerminator)}? Identifier)? eos
+    : Continue ({!here(LineTerminator)}? Identifier)? eos
     ;
 
 breakStatement
-    : Break ({!Here(LineTerminator)}? Identifier)? eos
+    : Break ({!here(LineTerminator)}? Identifier)? eos
     ;
 
 returnStatement
-    : Return ({!Here(LineTerminator)}? expressionSequence)? eos
+    : Return ({!here(LineTerminator)}? expressionSequence)? eos
     ;
 
 withStatement
@@ -142,7 +145,7 @@ labelledStatement
     ;
 
 throwStatement
-    : Throw {!Here(LineTerminator)}? expressionSequence eos
+    : Throw {!here(LineTerminator)}? expressionSequence eos
     ;
 
 tryStatement
@@ -219,8 +222,8 @@ singleExpression
     | singleExpression '.' identifierName                                    # MemberDotExpression
     | singleExpression arguments                                             # ArgumentsExpression
     | New singleExpression arguments?                                        # NewExpression
-    | singleExpression {!Here(LineTerminator)}? '++'                         # PostIncrementExpression
-    | singleExpression {!Here(LineTerminator)}? '--'                         # PostDecreaseExpression
+    | singleExpression {!here(LineTerminator)}? '++'                         # PostIncrementExpression
+    | singleExpression {!here(LineTerminator)}? '--'                         # PostDecreaseExpression
     | Delete singleExpression                                                # DeleteExpression
     | Void singleExpression                                                  # VoidExpression
     | Typeof singleExpression                                                # TypeofExpression
@@ -352,6 +355,6 @@ setter
 eos
     : SemiColon
     | EOF
-    | {LineTerminatorAhead()}?
+    | {lineTerminatorAhead()}?
     | {_input.Lt(1).Type == CloseBrace}?
     ;

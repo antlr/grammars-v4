@@ -1,9 +1,9 @@
 using Antlr4.Runtime;
 using static PT.PM.JavaScriptParseTreeUst.Parser.JavaScriptParser;
 
-public abstract class JavaScriptParserCSharpSharwell : Parser
+public abstract class JavaScriptRuntimeParser : Parser
 {
-    public JavaScriptParserCSharpSharwell(ITokenStream input)
+    public JavaScriptRuntimeParser(ITokenStream input)
         : base(input)
     {
     }
@@ -16,7 +16,7 @@ public abstract class JavaScriptParserCSharpSharwell : Parser
     ///<returns><c>true</c> iff on the current index of the parser's
     ///token stream a token of the given <c>type</c> exists on the
     ///<c>Hidden</c> channel.</returns>
-    protected bool Here(int type)
+    protected bool here(int type)
     {
         // Get the token ahead of the current index.
         int possibleIndexEosToken = CurrentToken.TokenIndex - 1;
@@ -35,7 +35,7 @@ public abstract class JavaScriptParserCSharpSharwell : Parser
     ///token stream a token exists on the <c>Hidden</c> channel which
     ///either is a line terminator, or is a multi line comment that
     ///contains a line terminator.</returns>
-    protected bool LineTerminatorAhead()
+    protected bool lineTerminatorAhead()
     {
         // Get the token ahead of the current index.
         int possibleIndexEosToken = CurrentToken.TokenIndex - 1;
@@ -68,4 +68,6 @@ public abstract class JavaScriptParserCSharpSharwell : Parser
         return (type == MultiLineComment && (text.Contains("\r") || text.Contains("\n"))) ||
                 (type == LineTerminator);
     }
+
+
 }
