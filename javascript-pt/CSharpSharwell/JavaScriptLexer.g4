@@ -2,6 +2,7 @@
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 by Bart Kiers (original author) and Alexandre Vitorelli (contributor -> ported to CSharp)
+ * Copyright (c) 2017 by Ivan Kochurkin: cleared and transformed to the universal grammar.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -30,7 +31,7 @@ options {
     superClass=JavaScriptRuntimeLexer;
 }
 
-RegularExpressionLiteral:       {isRegexPossible()}? '/' RegularExpressionBody '/' RegularExpressionFlags;
+RegularExpressionLiteral:       {RegexPossible()}? '/' RegularExpressionBody '/' RegularExpressionFlags;
 
 /// Line Terminators
 LineTerminator:                 [\r\n\u2028\u2029] -> channel(HIDDEN);
@@ -73,15 +74,15 @@ BitOr:                          '|';
 And:                            '&&';
 Or:                             '||';
 MultiplyAssign:                 '*=';
-DivideAssign:                   '/='; 
-ModulusAssign:                  '%='; 
-PlusAssign:                     '+='; 
-MinusAssign:                    '-='; 
-LeftShiftArithmeticAssign:      '<<='; 
-RightShiftArithmeticAssign:     '>>='; 
-RightShiftLogicalAssign:        '>>>='; 
-BitAndAssign:                   '&='; 
-BitXorAssign:                   '^='; 
+DivideAssign:                   '/=';
+ModulusAssign:                  '%=';
+PlusAssign:                     '+=';
+MinusAssign:                    '-=';
+LeftShiftArithmeticAssign:      '<<=';
+RightShiftArithmeticAssign:     '>>=';
+RightShiftLogicalAssign:        '>>>=';
+BitAndAssign:                   '&=';
+BitXorAssign:                   '^=';
 BitOrAssign:                    '|=';
 
 /// Null Literals
@@ -103,7 +104,7 @@ DecimalLiteral:                 DecimalIntegerLiteral '.' DecimalDigit* Exponent
 /// Numeric Literals
 
 HexIntegerLiteral:              '0' [xX] HexDigit+;
-OctalIntegerLiteral:            {!strictMode}? '0' OctalDigit+;
+OctalIntegerLiteral:            {!IsSrictMode()}? '0' OctalDigit+;
 
 /// Keywords
 
@@ -147,15 +148,15 @@ Import:                         'import';
 /// The following tokens are also considered to be FutureReservedWords 
 /// when parsing strict mode
 
-Implements:                     {strictMode}? 'implements';
-Let:                            {strictMode}? 'let';
-Private:                        {strictMode}? 'private';
-Public:                         {strictMode}? 'public';
-Interface:                      {strictMode}? 'interface';
-Package:                        {strictMode}? 'package';
-Protected:                      {strictMode}? 'protected';
-Static:                         {strictMode}? 'static';
-Yield:                          {strictMode}? 'yield';
+Implements:                     {IsSrictMode()}? 'implements';
+Let:                            {IsSrictMode()}? 'let';
+Private:                        {IsSrictMode()}? 'private';
+Public:                         {IsSrictMode()}? 'public';
+Interface:                      {IsSrictMode()}? 'interface';
+Package:                        {IsSrictMode()}? 'package';
+Protected:                      {IsSrictMode()}? 'protected';
+Static:                         {IsSrictMode()}? 'static';
+Yield:                          {IsSrictMode()}? 'yield';
 
 /// Identifier Names and Identifiers
 

@@ -14,7 +14,9 @@ public abstract class JavaScriptRuntimeLexer : Lexer
     // A property indicating if the lexer should operate in strict mode.
     // When set to true, FutureReservedWords are tokenized, when false,
     // an octal literal can be tokenized.
-    public bool strictMode { get; set; } = true;
+    public bool StrictMode { get; set; } = true;
+
+    public bool IsSrictMode() => StrictMode;
 
     ///<summary>Return the next token from the character stream and records this last
     ///token in case it resides on the default channel. This recorded token
@@ -37,7 +39,7 @@ public abstract class JavaScriptRuntimeLexer : Lexer
 
     ///<summary>Returns <c>true</c> iff the lexer can match a regex literal.</summary>
     ///<returns><c>true</c> iff the lexer can match a regex literal.</returns>
-    protected bool isRegexPossible()
+    protected bool RegexPossible()
     {
         if (_lastToken == null)
         {

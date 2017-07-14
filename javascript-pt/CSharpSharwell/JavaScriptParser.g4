@@ -2,6 +2,7 @@
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 by Bart Kiers (original author) and Alexandre Vitorelli (contributor -> ported to CSharp)
+ * Copyright (c) 2017 by Ivan Kochurkin: cleared and transformed to the universal grammar.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -87,7 +88,7 @@ emptyStatement
     ;
 
 expressionStatement
-    : {_input.La(1) != OpenBrace && _input.La(1) != Function}? expressionSequence eos
+    : {notOpenBraceAndNotFunction()}? expressionSequence eos
     ;
 
 ifStatement
@@ -105,15 +106,15 @@ iterationStatement
     ;
 
 continueStatement
-    : Continue ({!here(LineTerminator)}? Identifier)? eos
+    : Continue ({notLineTerminator()}? Identifier)? eos
     ;
 
 breakStatement
-    : Break ({!here(LineTerminator)}? Identifier)? eos
+    : Break ({notLineTerminator()}? Identifier)? eos
     ;
 
 returnStatement
-    : Return ({!here(LineTerminator)}? expressionSequence)? eos
+    : Return ({notLineTerminator()}? expressionSequence)? eos
     ;
 
 withStatement
@@ -145,7 +146,7 @@ labelledStatement
     ;
 
 throwStatement
-    : Throw {!here(LineTerminator)}? expressionSequence eos
+    : Throw {notLineTerminator()}? expressionSequence eos
     ;
 
 tryStatement
@@ -222,8 +223,8 @@ singleExpression
     | singleExpression '.' identifierName                                    # MemberDotExpression
     | singleExpression arguments                                             # ArgumentsExpression
     | New singleExpression arguments?                                        # NewExpression
-    | singleExpression {!here(LineTerminator)}? '++'                         # PostIncrementExpression
-    | singleExpression {!here(LineTerminator)}? '--'                         # PostDecreaseExpression
+    | singleExpression {notLineTerminator()}? '++'                           # PostIncrementExpression
+    | singleExpression {notLineTerminator()}? '--'                           # PostDecreaseExpression
     | Delete singleExpression                                                # DeleteExpression
     | Void singleExpression                                                  # VoidExpression
     | Typeof singleExpression                                                # TypeofExpression
@@ -345,16 +346,16 @@ futureReservedWord
     ;
 
 getter
-    : {_input.Lt(1).Text.Equals("get")}? Identifier propertyName
+    : {match("get")}? Identifier propertyName
     ;
 
 setter
-    : {_input.Lt(1).Text.Equals("set")}? Identifier propertyName
+    : {match("set")}? Identifier propertyName
     ;
 
 eos
     : SemiColon
     | EOF
     | {lineTerminatorAhead()}?
-    | {_input.Lt(1).Type == CloseBrace}?
+    | {closeBrace()}?
     ;

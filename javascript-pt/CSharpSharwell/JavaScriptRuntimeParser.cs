@@ -8,6 +8,18 @@ public abstract class JavaScriptRuntimeParser : Parser
     {
     }
 
+    protected bool notLineTerminator() =>
+        !here(LineTerminator);
+
+    protected bool notOpenBraceAndNotFunction() =>
+        _input.Lt(1).Type != OpenBrace && _input.Lt(1).Type != Function;
+
+    protected bool closeBrace() =>
+        _input.Lt(1).Type == CloseBrace;
+
+    protected bool match(string str) =>
+        _input.Lt(1).Text.Equals(str);
+
     ///<summary>Returns <c>true</c> iff on the current index of the parser's
     ///token stream a token of the given <c>type</c> exists on the
     ///<c>Hidden</c> channel.</summary>
@@ -68,6 +80,4 @@ public abstract class JavaScriptRuntimeParser : Parser
         return (type == MultiLineComment && (text.Contains("\r") || text.Contains("\n"))) ||
                 (type == LineTerminator);
     }
-
-
 }
