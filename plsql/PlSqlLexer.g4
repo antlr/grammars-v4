@@ -74,6 +74,7 @@ CLOSE:                        'CLOSE';
 CLUSTER:                      'CLUSTER';
 COALESCE:                     'COALESCE';
 COLLECT:                      'COLLECT';
+COLUMN:                       'COLUMN';
 COLUMNS:                      'COLUMNS';
 COMMENT:                      'COMMENT';
 COMMIT:                       'COMMIT';
