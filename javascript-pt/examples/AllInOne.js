@@ -26,3 +26,25 @@ var func = (...args) => args[0]
 var url = buildURL`http://msdn.microsoft.com/${lang}/${a}/${b}`;
 var greeting = `\`Yo\` World!`;
 console.log(html`<b>${username} says</b>: "${tag}"`);
+
+// var, let, const
+
+var c = 10;
+{
+    const c = 2; // At this point, c = 2.
+} // At this point, c = 10.
+
+const name = "Thomas Jefferson";
+const answer = 42, numpages = 10;
+const myarray = new Array();
+
+function foo () {
+    typeof bar;
+    let bar = 'baz';
+}
+foo();
+
+if (x) {
+  let foo;
+}
+

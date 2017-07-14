@@ -68,7 +68,7 @@ statementList
     ;
 
 variableStatement
-    : Var variableDeclarationList eos
+    : varModifier variableDeclarationList eos
     ;
 
 variableDeclarationList
@@ -100,9 +100,15 @@ iterationStatement
     : Do statement While '(' expressionSequence ')' eos                                                 # DoStatement
     | While '(' expressionSequence ')' statement                                                        # WhileStatement
     | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement         # ForStatement
-    | For '(' Var variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')' statement # ForVarStatement
+    | For '(' varModifier variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')' statement # ForVarStatement
     | For '(' singleExpression In expressionSequence ')' statement                                      # ForInStatement
-    | For '(' Var variableDeclaration In expressionSequence ')' statement                               # ForVarInStatement
+    | For '(' varModifier variableDeclaration In expressionSequence ')' statement                       # ForVarInStatement
+    ;
+
+varModifier
+    : Var
+    | Let
+    | Const
     ;
 
 continueStatement
