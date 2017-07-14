@@ -27,25 +27,13 @@
 lexer grammar JavaScriptLexer;
 
 @lexer::members {
-    // A flag indicating if the lexer should operate in strict mode.
+    // The most recently produced token.
+    private IToken _lastToken = null;
+
+    // A property indicating if the lexer should operate in strict mode.
     // When set to true, FutureReservedWords are tokenized, when false,
     // an octal literal can be tokenized.
-    private bool strictMode = true;
-
-    // The most recently produced token.
-    private IToken lastToken = null;
-
-    ///<summary>Returns <c>true</c> iff the lexer operates in strict mode</summary>
-    /// <returns><c>true</c> iff the lexer operates in strict mode.</returns>
-    public bool GetStrictMode() {
-        return this.strictMode;
-    }
-
-    ///<summary>Sets whether the lexer operates in strict mode or not.</summary>
-    ///<param name="strictMode">the flag indicating the lexer operates in strict mode or not.</param>
-    public void SetStrictMode(bool strictMode) {
-        this.strictMode = strictMode;
-    }
+    public bool StrictMode { get;set; } = true;
 
     ///<summary>Return the next token from the character stream and records this last
     ///token in case it resides on the default channel. This recorded token
@@ -58,8 +46,8 @@ lexer grammar JavaScriptLexer;
         IToken next = base.NextToken();
         
         if (next.Channel == Lexer.DefaultTokenChannel) {
-            // Keep track of the last token on the default channel.                                              
-            this.lastToken = next;
+            // Keep track of the last token on the default channel.
+            _lastToken = next;
         }
         
         return next;
@@ -67,15 +55,14 @@ lexer grammar JavaScriptLexer;
 
     ///<summary>Returns <c>true</c> iff the lexer can match a regex literal.</summary>
     ///<returns><c>true</c> iff the lexer can match a regex literal.</returns>
-    private bool isRegexPossible() {
-                                       
-        if (this.lastToken == null) {
+    private bool IsRegexPossible() {
+        if (_lastToken == null) {
             // No token has been produced yet: at the start of the input,
             // no division is possible, so a regex literal _is_ possible.
             return true;
         }
         
-        switch (this.lastToken.Type) {
+        switch (_lastToken.Type) {
             case Identifier:
             case NullLiteral:
             case BooleanLiteral:
@@ -97,7 +84,7 @@ lexer grammar JavaScriptLexer;
     }
 }
 
-RegularExpressionLiteral:       {isRegexPossible()}? '/' RegularExpressionBody '/' RegularExpressionFlags;
+RegularExpressionLiteral:       {IsRegexPossible()}? '/' RegularExpressionBody '/' RegularExpressionFlags;
 
 /// Line Terminators
 LineTerminator:                 [\r\n\u2028\u2029] -> channel(HIDDEN);
@@ -170,7 +157,7 @@ DecimalLiteral:                 DecimalIntegerLiteral '.' DecimalDigit* Exponent
 /// Numeric Literals
 
 HexIntegerLiteral:              '0' [xX] HexDigit+;
-OctalIntegerLiteral:            {!strictMode}? '0' OctalDigit+;
+OctalIntegerLiteral:            {!StrictMode}? '0' OctalDigit+;
 
 /// Keywords
 
@@ -214,15 +201,15 @@ Import:                         'import';
 /// The following tokens are also considered to be FutureReservedWords 
 /// when parsing strict mode
 
-Implements:                     {strictMode}? 'implements';
-Let:                            {strictMode}? 'let';
-Private:                        {strictMode}? 'private';
-Public:                         {strictMode}? 'public';
-Interface:                      {strictMode}? 'interface';
-Package:                        {strictMode}? 'package';
-Protected:                      {strictMode}? 'protected';
-Static:                         {strictMode}? 'static';
-Yield:                          {strictMode}? 'yield';
+Implements:                     {StrictMode}? 'implements';
+Let:                            {StrictMode}? 'let';
+Private:                        {StrictMode}? 'private';
+Public:                         {StrictMode}? 'public';
+Interface:                      {StrictMode}? 'interface';
+Package:                        {StrictMode}? 'package';
+Protected:                      {StrictMode}? 'protected';
+Static:                         {StrictMode}? 'static';
+Yield:                          {StrictMode}? 'yield';
 
 /// Identifier Names and Identifiers
 

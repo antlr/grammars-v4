@@ -37,15 +37,15 @@ options { tokenVocab=JavaScriptLexer; }
     ///<returns><c>true</c> iff on the current index of the parser's
     ///token stream a token of the given <c>type</c> exists on the
     ///<c>Hidden</c> channel.</returns>
-    private bool here(int type) {
+    private bool Here(int type) {
 
         // Get the token ahead of the current index.
-        int possibleIndexEosToken = this.CurrentToken.TokenIndex - 1;
+        int possibleIndexEosToken = CurrentToken.TokenIndex - 1;
         IToken ahead = _input.Get(possibleIndexEosToken);
 
         // Check if the token resides on the Hidden channel and if it's of the
         // provided type.
-        return (ahead.Channel == Lexer.Hidden) && (ahead.Type == type);
+        return ahead.Channel == Lexer.Hidden && ahead.Type == type;
     }
 
     ///<summary>Returns <c>true</c> iff on the current index of the parser's
@@ -56,8 +56,7 @@ options { tokenVocab=JavaScriptLexer; }
     ///token stream a token exists on the <c>Hidden</c> channel which
     ///either is a line terminator, or is a multi line comment that
     ///contains a line terminator.</returns>
-    private bool lineTerminatorAhead() {
-
+    private bool LineTerminatorAhead() {
         // Get the token ahead of the current index.
         int possibleIndexEosToken = this.CurrentToken.TokenIndex - 1;
         IToken ahead = _input.Get(possibleIndexEosToken);
@@ -85,11 +84,11 @@ options { tokenVocab=JavaScriptLexer; }
         // Check if the token is, or contains a line terminator.
         return (type == MultiLineComment && (text.Contains("\r") || text.Contains("\n"))) ||
                 (type == LineTerminator);
-    }                                
+    }
 }
 
 program
-    : sourceElement* EOF
+    : sourceElements? EOF
     ;
 
 sourceElement
@@ -128,7 +127,7 @@ variableStatement
     ;
 
 variableDeclarationList
-    : variableDeclaration ( ',' variableDeclaration )*
+    : variableDeclaration (',' variableDeclaration)*
     ;
 
 variableDeclaration
@@ -144,11 +143,11 @@ emptyStatement
     ;
 
 expressionStatement
-    : {(_input.La(1) != OpenBrace) && (_input.La(1) != Function)}? expressionSequence eos
+    : {_input.La(1) != OpenBrace && _input.La(1) != Function}? expressionSequence eos
     ;
 
 ifStatement
-    : If '(' expressionSequence ')' statement ( Else statement )?
+    : If '(' expressionSequence ')' statement (Else statement)?
     ;
 
 
@@ -162,15 +161,15 @@ iterationStatement
     ;
 
 continueStatement
-    : Continue ({!here(LineTerminator)}? Identifier)? eos
+    : Continue ({!Here(LineTerminator)}? Identifier)? eos
     ;
 
 breakStatement
-    : Break ({!here(LineTerminator)}? Identifier)? eos
+    : Break ({!Here(LineTerminator)}? Identifier)? eos
     ;
 
 returnStatement
-    : Return ({!here(LineTerminator)}? expressionSequence)? eos
+    : Return ({!Here(LineTerminator)}? expressionSequence)? eos
     ;
 
 withStatement
@@ -182,7 +181,7 @@ switchStatement
     ;
 
 caseBlock
-    : '{' caseClauses? ( defaultClause caseClauses? )? '}'
+    : '{' caseClauses? (defaultClause caseClauses?)? '}'
     ;
 
 caseClauses
@@ -202,13 +201,11 @@ labelledStatement
     ;
 
 throwStatement
-    : Throw {!here(LineTerminator)}? expressionSequence eos
+    : Throw {!Here(LineTerminator)}? expressionSequence eos
     ;
 
 tryStatement
-    : Try block catchProduction
-    | Try block finallyProduction
-    | Try block catchProduction finallyProduction
+    : Try block (catchProduction finallyProduction? | finallyProduction)
     ;
 
 catchProduction
@@ -228,11 +225,15 @@ functionDeclaration
     ;
 
 formalParameterList
-    : Identifier ( ',' Identifier )*
+    : Identifier (',' Identifier)*
     ;
 
 functionBody
-    : sourceElement*
+    : sourceElements?
+    ;
+
+sourceElements
+    : sourceElement+
     ;
 
 arrayLiteral
@@ -240,7 +241,7 @@ arrayLiteral
     ;
 
 elementList
-    : elision? singleExpression ( ',' elision? singleExpression )*
+    : elision? singleExpression (',' elision? singleExpression)*
     ;
 
 elision
@@ -248,18 +249,14 @@ elision
     ;
 
 objectLiteral
-    : '{' propertyNameAndValueList? ','? '}'
-    ;
-
-propertyNameAndValueList
-    : propertyAssignment ( ',' propertyAssignment )*
+    : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
     ;
 
 propertyAssignment
-    : propertyName ':' singleExpression                            # PropertyExpressionAssignment
-    | getter '(' ')' '{' functionBody '}'                          # PropertyGetter
-    | setter '(' propertySetParameterList ')' '{' functionBody '}' # PropertySetter
-    ;           
+    : propertyName ':' singleExpression              # PropertyExpressionAssignment
+    | getter '(' ')' '{' functionBody '}'            # PropertyGetter
+    | setter '(' Identifier ')' '{' functionBody '}' # PropertySetter
+    ;
 
 propertyName
     : identifierName
@@ -267,20 +264,12 @@ propertyName
     | numericLiteral
     ;
 
-propertySetParameterList
-    : Identifier
-    ;
-
 arguments
-    : '(' argumentList? ')'
-    ;
-
-argumentList
-    : singleExpression ( ',' singleExpression )*
+    : '(' (singleExpression (',' singleExpression)*)? ')'
     ;
 
 expressionSequence
-    : singleExpression ( ',' singleExpression )*
+    : singleExpression (',' singleExpression)*
     ;
 
 singleExpression
@@ -289,8 +278,8 @@ singleExpression
     | singleExpression '.' identifierName                                    # MemberDotExpression
     | singleExpression arguments                                             # ArgumentsExpression
     | New singleExpression arguments?                                        # NewExpression
-    | singleExpression {!here(LineTerminator)}? '++'                         # PostIncrementExpression
-    | singleExpression {!here(LineTerminator)}? '--'                         # PostDecreaseExpression
+    | singleExpression {!Here(LineTerminator)}? '++'                         # PostIncrementExpression
+    | singleExpression {!Here(LineTerminator)}? '--'                         # PostDecreaseExpression
     | Delete singleExpression                                                # DeleteExpression
     | Void singleExpression                                                  # VoidExpression
     | Typeof singleExpression                                                # TypeofExpression
@@ -300,13 +289,13 @@ singleExpression
     | '-' singleExpression                                                   # UnaryMinusExpression
     | '~' singleExpression                                                   # BitNotExpression
     | '!' singleExpression                                                   # NotExpression
-    | singleExpression ( '*'    | '/'    | '%' ) singleExpression                  # MultiplicativeExpression
-    | singleExpression ( '+'    | '-' ) singleExpression                        # AdditiveExpression
-    | singleExpression ( '<<'    | '>>'    | '>>>' ) singleExpression              # BitShiftExpression
-    | singleExpression ( '<'    | '>'    | '<='    | '>=' ) singleExpression          # RelationalExpression
+    | singleExpression ('*' | '/' | '%') singleExpression                    # MultiplicativeExpression
+    | singleExpression ('+' | '-') singleExpression                          # AdditiveExpression
+    | singleExpression ('<<' | '>>' | '>>>') singleExpression                # BitShiftExpression
+    | singleExpression ('<' | '>' | '<=' | '>=') singleExpression            # RelationalExpression
     | singleExpression Instanceof singleExpression                           # InstanceofExpression
     | singleExpression In singleExpression                                   # InExpression
-    | singleExpression ( '=='    | '!='    | '==='    | '!==' ) singleExpression      # EqualityExpression
+    | singleExpression ('==' | '!=' | '===' | '!==') singleExpression        # EqualityExpression
     | singleExpression '&' singleExpression                                  # BitAndExpression
     | singleExpression '^' singleExpression                                  # BitXOrExpression
     | singleExpression '|' singleExpression                                  # BitOrExpression
@@ -422,6 +411,6 @@ setter
 eos
     : SemiColon
     | EOF
-    | {lineTerminatorAhead()}?
+    | {LineTerminatorAhead()}?
     | {_input.Lt(1).Type == CloseBrace}?
     ;
