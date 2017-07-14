@@ -148,6 +148,8 @@ grammar ECMAScript;
             case DecimalLiteral:
             case HexIntegerLiteral:
             case StringLiteral:
+            case PlusPlus:
+            case MinusMinus:
                 // After any of the tokens above, no regex literal can follow.
                 return false;
             default:

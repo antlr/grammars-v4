@@ -36,7 +36,7 @@
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>true</showTree>
+					<showTree>false</showTree>
 					<entryPoint>equation</entryPoint>
 					<grammarName>calculator</grammarName>
 					<packageName></packageName>

@@ -140,7 +140,9 @@ func (l *ECMAScriptLexer) isRegexPossible() bool {
             tokenType == ECMAScriptLexerOctalIntegerLiteral ||
             tokenType == ECMAScriptLexerDecimalLiteral ||
             tokenType == ECMAScriptLexerHexIntegerLiteral ||
-            tokenType == ECMAScriptLexerStringLiteral {
+            tokenType == ECMAScriptLexerStringLiteral ||
+            tokenType == ECMAScriptLexerPlusPlus ||
+            tokenType == ECMAScriptLexerMinusMinus {
         // After any of the tokens above, no regex literal can follow.
         return false
     }

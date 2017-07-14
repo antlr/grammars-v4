@@ -74,6 +74,7 @@ CLOSE:                        'CLOSE';
 CLUSTER:                      'CLUSTER';
 COALESCE:                     'COALESCE';
 COLLECT:                      'COLLECT';
+COLUMN:                       'COLUMN';
 COLUMNS:                      'COLUMNS';
 COMMENT:                      'COMMENT';
 COMMIT:                       'COMMIT';
@@ -645,6 +646,15 @@ MULTI_LINE_COMMENT: '/*' .*? '*/'                           -> channel(HIDDEN);
 // TODO should be grammar rule, but tricky to implement
 PROMPT
     : 'prompt' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
+    ;
+
+START_CMD
+    // TODO When using full word START there is a conflict with START WITH in sequences and CONNECT BY queries
+    // 'start' SPACE ( ~( '\r' | '\n') )* (NEWLINE|EOF)
+    : 'sta' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
+    // TODO Single @ conflicts with a database link name, like employees@remote
+    // | '@' ( ~('\r' | '\n') )* (NEWLINE|EOF)
+    | '@@' ( ~('\r' | '\n') )* (NEWLINE|EOF)
     ;
 
 //{ Rule #360 <NEWLINE>
