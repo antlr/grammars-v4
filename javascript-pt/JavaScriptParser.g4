@@ -250,6 +250,7 @@ singleExpression
     | singleExpression '=' singleExpression                                  # AssignmentExpression
     | singleExpression assignmentOperator singleExpression                   # AssignmentOperatorExpression
     | This                                                                   # ThisExpression
+    | Identifier TemplateStringLiteral                                       # TemplateStringExpression
     | Identifier                                                             # IdentifierExpression
     | literal                                                                # LiteralExpression
     | arrayLiteral                                                           # ArrayLiteralExpression
@@ -286,6 +287,7 @@ literal
     : NullLiteral
     | BooleanLiteral
     | StringLiteral
+    | TemplateStringLiteral
     | RegularExpressionLiteral
     | numericLiteral
     ;

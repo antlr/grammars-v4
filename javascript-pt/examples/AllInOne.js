@@ -20,3 +20,9 @@ var func = (a, b) => a * b
 
 var func = function () { return arguments[0]; }
 var func = (...args) => args[0]
+
+// Template strings
+
+var url = buildURL`http://msdn.microsoft.com/${lang}/${a}/${b}`;
+var greeting = `\`Yo\` World!`;
+console.log(html`<b>${username} says</b>: "${tag}"`);
