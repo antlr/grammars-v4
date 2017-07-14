@@ -1,21 +1,19 @@
 /*
 T-SQL (Transact-SQL, MSSQL) grammar.
 The MIT License (MIT).
+Copyright (c) 2017, Mark Adams (madams51703@gmail.com)
 Copyright (c) 2015-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 Copyright (c) 2016, Scott Ure (scott@redstormsoftware.com).
 Copyright (c) 2016, Rui Zhang (ruizhang.ccs@gmail.com).
 Copyright (c) 2016, Marcus Henriksson (kuseman80@gmail.com).
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -67,6 +65,7 @@ dml_clause
 // Data Definition Language: https://msdn.microsoft.com/en-us/library/ff848799.aspx)
 ddl_clause
     : create_database
+    | create_endpoint
     | create_index
     | create_or_alter_procedure
     | create_or_alter_trigger
@@ -593,13 +592,15 @@ cursor_option:
     | CURSOR_DEFAULT ( LOCAL | GLOBAL )
   ;
 
-https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
+
 create_endpoint:
-    CREATE ENDPOINT endpointname endpoint_authorization endpoint_state endpoint_as_clause endpoint_for_clause RR_BRACKET
+    CREATE ENDPOINT endpointname endpoint_authorization endpoint_state endpoint_as_clause endpoint_for_clause 
      ;
 
 endpointname:
-     endpointname=id 
+     endpoint_name=id 
      ;
 
 endpoint_authorization:
@@ -613,44 +614,56 @@ endpoint_state:
 ;
 
 endpoint_as_clause:
-AS TCP LR_BRACKET endpoint_tcp_protocol_specific_arguments
+AS TCP LR_BRACKET endpoint_tcp_protocol_specific_arguments RR_BRACKET
 ;
 
 endpoint_tcp_protocol_specific_arguments:
-   LISTENER_PORT port=DEC_DIGIT endpoint_listener_ip
+   LISTENER_PORT EQUAL port=DECIMAL endpoint_listener_ip
    ;
 
 endpoint_listener_ip:
-    LISTENER_IP EQUAL (ALL | ipv4_address | ipv6_address )
+     COMMA LISTENER_IP EQUAL (ALL | ipv4_address | ipv6_address )
+    |
     ;
 
+// GOTTA FIGURE OUT IPV4 and IPV6 that do not clash with DECIMAL and FLOAT
 ipv4_address:
-   DECIMAL DOT DECIMAL DOT DECIMAL DOT DECIMAL
+   IPV4_ADDR  
    ;
 
-ipv6_octect:
-   HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-;
 
-ivp6_address:
-        ipv6_octect COLON ipv6_octect COLON ipv6_octect COLON ipv6_octect COLON ipv6_octect COLON ipv6_octect COLON ipv6_octect COLON ipv6_octect 
+ipv6_address:
+        IPV6_ADDR
 	;
 
 endpoint_for_clause:
-     FOR SERVICE_BROKER LL_BRACKET endpoint_server_broker_clause
+     FOR SERVICE_BROKER LR_BRACKET endpoint_server_broker_clause RR_BRACKET
+     |FOR DATABASE_MIRRORING LR_BRACKET endpoint_database_mirroring_clause RR_BRACKET
+     |
 ;
 
+endpoint_database_mirroring_clause:
+	 endpoint_authentication_clause endpoint_encryption_clause endpoint_role_clause ;
+
+endpoint_role_clause:
+        endpoint_role_clause COMMA
+	|ROLE EQUAL ( WITNESS | PARTNER | ALL )
+        ;
+
+
 endpoint_server_broker_clause:
-	endpoint_server_broker_clause COMMA
-	| endpoint_authentication_clause
-        | endpoint_encryption_clause
-	| endpoint_message_forwarding_clause
- 	| endpoint_message_forward_size
+         endpoint_authentication_clause endpoint_encryption_clause endpoint_message_forwarding_clause endpoint_message_forward_size
 	;
 
 endpoint_authentication_clause:
-        AUTHENTICATION EQUAL WINDOWS windows_auth_methods
+        endpoint_authentication_clause COMMA
+        |AUTHENTICATION EQUAL endpoint_authentication_clause_methods
+	|
+	;
+endpoint_authentication_clause_methods:
+	 WINDOWS windows_auth_methods
         | CERTIFICATE cert_name=id 
+	| WINDOWS windows_auth_methods
         | CERTIFICATE cert_name=id WINDOWS windows_auth_methods
 	;
 
@@ -658,6 +671,27 @@ windows_auth_methods:
 	( NTLM |KERBEROS | NEGOTIATE )
         ;
 
+endpoint_encryption_clause:
+	endpoint_encryption_clause COMMA
+	|ENCRYPTION EQUAL DISABLED
+	|ENCRYPTION EQUAL ( SUPPORTED | REQUIRED )  endpoint_encryption_algorithm
+	|
+	;
+
+endpoint_encryption_algorithm:
+	ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES )
+	; 
+	
+endpoint_message_forwarding_clause:
+	endpoint_message_forwarding_clause COMMA
+	|MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED )
+	|
+	;
+
+endpoint_message_forward_size:
+	MESSAGE_FORWARD_SIZE EQUAL DECIMAL
+	|
+	;
 
 /* Will visit later
 database_mirroring_option:
