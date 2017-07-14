@@ -255,19 +255,30 @@ singleExpression
     | arrayLiteral                                                           # ArrayLiteralExpression
     | objectLiteral                                                          # ObjectLiteralExpression
     | '(' expressionSequence ')'                                             # ParenthesizedExpression
+    | arrowFunctionParameters '=>' arrowFunctionBody                         # ArrowFunctionExpression
+    ;
+
+arrowFunctionParameters
+    : Identifier
+    | '(' Ellipsis? formalParameterList? ')'
+    ;
+
+arrowFunctionBody
+    : singleExpression
+    | '{' functionBody '}'
     ;
 
 assignmentOperator
-    : '*=' 
-    | '/=' 
-    | '%=' 
-    | '+=' 
-    | '-=' 
-    | '<<=' 
-    | '>>=' 
-    | '>>>=' 
-    | '&=' 
-    | '^=' 
+    : '*='
+    | '/='
+    | '%='
+    | '+='
+    | '-='
+    | '<<='
+    | '>>='
+    | '>>>='
+    | '&='
+    | '^='
     | '|='
     ;
 

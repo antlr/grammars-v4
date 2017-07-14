@@ -47,6 +47,7 @@ Comma:                          ',';
 Assign:                         '=';
 QuestionMark:                   '?';
 Colon:                          ':';
+Ellipsis:                       '...';
 Dot:                            '.';
 PlusPlus:                       '++';
 MinusMinus:                     '--';
@@ -84,6 +85,7 @@ RightShiftLogicalAssign:        '>>>=';
 BitAndAssign:                   '&=';
 BitXorAssign:                   '^=';
 BitOrAssign:                    '|=';
+ARROW:                          '=>';
 
 /// Null Literals
 
