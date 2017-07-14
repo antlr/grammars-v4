@@ -65,7 +65,11 @@ unit_statement
     | data_manipulation_language_statements
     | drop_table
 
+    | comment_on_column
+
     | anonymous_block
+
+
     ;
 
 // $<DDL -> SQL Statements for Stored PL/SQL Units
@@ -523,6 +527,10 @@ create_table
 
 drop_table
     : DROP TABLE tableview_name
+    ;
+
+comment_on_column
+    : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string
     ;
 
 // $<Anonymous PL/SQL code block
@@ -2032,6 +2040,7 @@ native_datatype_element
 
 bind_variable
     : (BINDVAR | ':' UNSIGNED_INTEGER)
+      // Pro*C/C++ indicator variables
       (INDICATOR? (BINDVAR | ':' UNSIGNED_INTEGER))?
       ('.' general_element_part)*
     ;
