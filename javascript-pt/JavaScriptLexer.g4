@@ -174,6 +174,7 @@ WhiteSpaces:                    [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN)
 MultiLineComment:               '/*' .*? '*/' -> channel(HIDDEN);
 SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
 HtmlComment:                    '<!--' .*? '-->' -> channel(HIDDEN);
+CDataComment:                   '<![CDATA[' .*? ']]>' -> channel(HIDDEN);
 UnexpectedCharacter:            . ;
 
 // Fragment rules
