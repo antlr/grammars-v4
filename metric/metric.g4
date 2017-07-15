@@ -57,7 +57,7 @@ baseunit
     ;
 
 derivedunit
-    : 'N'
+    : 'rad' | 'Hz' | 'sr'| 'rad' | 'N' | 'Pa'| 'J'| 'W'| 'C' | 'V' | 'F'| 'Ω' | 'S' | 'Wb'| 'rad' | 'T' | 'H' | '˚C' | 'lm' | 'lx' | 'Bq' | 'Gy'| 'Sv'| 'kat'        
     ;
 
 INTE
