@@ -66,6 +66,7 @@ unit_statement
     | drop_table
 
     | comment_on_column
+    | comment_on_table
 
     | anonymous_block
 
@@ -531,6 +532,10 @@ drop_table
 
 comment_on_column
     : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string
+    ;
+
+comment_on_table
+    : COMMENT ON TABLE tableview_name IS quoted_string
     ;
 
 // $<Anonymous PL/SQL code block
