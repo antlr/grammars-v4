@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2017, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar metric;
 
 uom
-   : measure (('*' | '/')  measure)*
+   : measure (('*' | '/') measure)*
    ;
 
 measure
@@ -41,28 +41,75 @@ measure
    ;
 
 exponent
-    :  ('^' INTE)
-    ;
+   : ('^' INTE)
+   ;
 
 prefix
-   : 'E' | 'P' | 'T' | 'G' | 'M'| 'k' | 'h' | 'da' | 'd'| 'c'| 'm' | 'µ' | 'n' | 'p' | 'f' | 'a'
+   : 'E'
+   | 'P'
+   | 'T'
+   | 'G'
+   | 'M'
+   | 'k'
+   | 'h'
+   | 'da'
+   | 'd'
+   | 'c'
+   | 'm'
+   | 'µ'
+   | 'n'
+   | 'p'
+   | 'f'
+   | 'a'
    ;
 
 unit
-    : baseunit | derivedunit
-    ;
+   : baseunit
+   | derivedunit
+   ;
 
 baseunit
-    : 'm' | 'g' | 's' | 'A' | 'K' | 'mol' | 'cd'
-    ;
+   : 'm'
+   | 'g'
+   | 's'
+   | 'A'
+   | 'K'
+   | 'mol'
+   | 'cd'
+   ;
 
 derivedunit
-    : 'rad' | 'Hz' | 'sr'| 'rad' | 'N' | 'Pa'| 'J'| 'W'| 'C' | 'V' | 'F'| 'Ω' | 'S' | 'Wb'| 'rad' | 'T' | 'H' | '˚C' | 'lm' | 'lx' | 'Bq' | 'Gy'| 'Sv'| 'kat'        
-    ;
+   : 'rad'
+   | 'Hz'
+   | 'sr'
+   | 'rad'
+   | 'N'
+   | 'Pa'
+   | 'J'
+   | 'W'
+   | 'C'
+   | 'V'
+   | 'F'
+   | 'Ω'
+   | 'S'
+   | 'Wb'
+   | 'rad'
+   | 'T'
+   | 'H'
+   | '˚C'
+   | 'lm'
+   | 'lx'
+   | 'Bq'
+   | 'Gy'
+   | 'Sv'
+   | 'kat'
+   ;
+
 
 INTE
-    : [0-9]+ 
-    ;
+   : [0-9] +
+   ;
+
 
 WS
    : [ \t\r\n] -> skip
