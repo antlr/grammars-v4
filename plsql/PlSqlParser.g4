@@ -67,6 +67,7 @@ unit_statement
     | drop_table
 
     | comment_on_column
+    | comment_on_table
 
     | anonymous_block
 
@@ -540,6 +541,9 @@ create_synonym
     // Synonym's schema cannot be specified for public synonyms
     : CREATE (OR REPLACE)? PUBLIC SYNONYM synonym_name FOR (schema_name PERIOD)? schema_object_name (AT_SIGN link_name)?
     | CREATE (OR REPLACE)? SYNONYM (schema_name PERIOD)? synonym_name FOR (schema_name PERIOD)? schema_object_name (AT_SIGN link_name)?
+
+comment_on_table
+    : COMMENT ON TABLE tableview_name IS quoted_string
     ;
 
 // $<Anonymous PL/SQL code block
