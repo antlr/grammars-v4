@@ -544,7 +544,7 @@ database_optionspec
       | change_tracking_option
       | containment_option
       | cursor_option
-//      | database_mirroring_option
+      | database_mirroring_option
       | date_correlation_optimization_option
       | db_encryption_option
       | db_state_option
@@ -626,7 +626,6 @@ endpoint_listener_ip:
     |
     ;
 
-// GOTTA FIGURE OUT IPV4 and IPV6 that do not clash with DECIMAL and FLOAT
 ipv4_address:
    IPV4_ADDR  
    ;
@@ -694,10 +693,48 @@ endpoint_message_forward_size:
 	;
 
 /* Will visit later
-database_mirroring_option:
-     ALTER DATABASE Database Mirroring
-    ;
 */
+database_mirroring_option:
+         mirroring_set_option
+	;
+
+mirroring_set_option:
+	 PARTNER  partner_option 
+	| WITNESS witness_option 
+	;
+
+partner_option:
+	EQUAL partner_server
+	| FAILOVER
+	| FORCE_SERVICE_ALLOW_DATA_LOSS
+	| OFF
+	| RESUME
+	| SAFETY (FULL | OFF )
+	| SUSPEND
+	| TIMEOUT DECIMAL
+	;
+
+witness_option:
+	EQUAL witness_server
+	| OFF
+	;
+
+witness_server:
+	partner_server
+	;
+
+partner_server:
+	TCP COLON DOUBLE_FORWARD_SLASH host COLON port_number
+	;
+
+port_number:
+	port=DECIMAL
+	;
+
+host:
+	id DOT host
+	|(id DOT |id)
+	;
 
 date_correlation_optimization_option:
     DATE_CORRELATION_OPTIMIZATION on_off
