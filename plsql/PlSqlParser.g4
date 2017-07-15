@@ -55,6 +55,7 @@ unit_statement
     | create_sequence
     | create_trigger
     | create_type
+    | create_synonym
 
     | drop_function
     | drop_package
@@ -531,6 +532,14 @@ drop_table
 
 comment_on_column
     : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string
+    ;
+
+// $<Synonym DDL Clauses
+
+create_synonym
+    // Synonym's schema cannot be specified for public synonyms
+    : CREATE (OR REPLACE)? PUBLIC SYNONYM synonym_name FOR (schema_name PERIOD)? schema_object_name (AT_SIGN link_name)?
+    | CREATE (OR REPLACE)? SYNONYM (schema_name PERIOD)? synonym_name FOR (schema_name PERIOD)? schema_object_name (AT_SIGN link_name)?
     ;
 
 // $<Anonymous PL/SQL code block
@@ -1934,6 +1943,17 @@ tableview_name
 
 char_set_name
     : id_expression ('.' id_expression)*
+    ;
+
+synonym_name
+    : identifier
+    ;
+
+// Represents a valid DB object name in DDL commands which are valid for several DB (or schema) objects.
+// For instance, create synonym ... for <DB object name>, or rename <old DB object name> to <new DB object name>.
+// Both are valid for seuqences, tables, views etc.
+schema_object_name
+    : id_expression
     ;
 
 // $>
