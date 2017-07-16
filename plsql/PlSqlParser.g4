@@ -540,17 +540,24 @@ alter_table
     ;
 
 add_constraint
-    : ADD (CONSTRAINT constraint_name)? (add_foreign_key)
-    // TODO | add_primary_key
-    // TODO | add_unique_key
-    // For check constraint need separate rule boolean_expression
-    // TODO | add_check_constraint
+    : ADD (CONSTRAINT constraint_name)? (add_foreign_key | add_unique_key | add_primary_key)
+    // TODO | implement add_check_constraint, but need separate rule boolean_expression
     ;
 
 add_foreign_key
     : FOREIGN KEY LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
       REFERENCES tableview_name LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
       (ON DELETE (CASCADE | SET NULL))?
+    ;
+
+add_unique_key
+    : UNIQUE LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+      // TODO implement  USING INDEX clause
+    ;
+
+add_primary_key
+    : PRIMARY KEY LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+      // TODO implement  USING INDEX clause
     ;
 
 // $<Anonymous PL/SQL code block
