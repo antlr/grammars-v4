@@ -540,22 +540,28 @@ alter_table
     ;
 
 add_constraint
-    : ADD (CONSTRAINT constraint_name)? (add_foreign_key | add_unique_key | add_primary_key)
+    : ADD (CONSTRAINT constraint_name)? (primary_key_clause | foreign_key_clause | unique_key_clause)
     // TODO | implement add_check_constraint, but need separate rule boolean_expression
     ;
 
-add_foreign_key
-    : FOREIGN KEY LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
-      REFERENCES tableview_name LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
-      (ON DELETE (CASCADE | SET NULL))?
+foreign_key_clause
+    : FOREIGN KEY LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN references_clause on_delete_clause?
     ;
 
-add_unique_key
+references_clause
+    : REFERENCES tableview_name LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+    ;
+
+on_delete_clause
+    : ON DELETE (CASCADE | SET NULL)
+    ;
+
+unique_key_clause
     : UNIQUE LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
       // TODO implement  USING INDEX clause
     ;
 
-add_primary_key
+primary_key_clause
     : PRIMARY KEY LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
       // TODO implement  USING INDEX clause
     ;

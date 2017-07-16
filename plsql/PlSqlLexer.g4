@@ -318,6 +318,7 @@ PRAGMA:                       'PRAGMA';
 PRECEDING:                    'PRECEDING';
 PRECISION:                    'PRECISION';
 PRESENT:                      'PRESENT';
+PRIMARY:                      'PRIMARY';
 PRIOR:                        'PRIOR';
 PROCEDURE:                    'PROCEDURE';
 RAISE:                        'RAISE';
