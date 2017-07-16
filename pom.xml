@@ -84,6 +84,7 @@
 			<module>masm</module>
 			<module>mdx</module>
 			<module>memcached_protocol</module>
+			<module>metric</module>
 			<module>modelica</module>
 			<module>modula2pim4</module>
 			<module>mps</module>

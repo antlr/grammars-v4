@@ -67,6 +67,7 @@ unit_statement
     | drop_table
 
     | comment_on_column
+    | comment_on_table
 
     | anonymous_block
 
@@ -564,6 +565,10 @@ unique_key_clause
 primary_key_clause
     : PRIMARY KEY LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
       // TODO implement  USING INDEX clause
+    ;
+
+comment_on_table
+    : COMMENT ON TABLE tableview_name IS quoted_string
     ;
 
 // $<Anonymous PL/SQL code block
