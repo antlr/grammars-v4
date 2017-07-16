@@ -40,6 +40,7 @@ unit_statement
     | alter_sequence
     | alter_trigger
     | alter_type
+    | alter_table
 
     | create_function_body
     | create_procedure_body
@@ -531,6 +532,25 @@ drop_table
 
 comment_on_column
     : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string
+    ;
+
+alter_table
+    : ALTER TABLE tableview_name add_constraint
+    // TODO | drop_constraint
+    ;
+
+add_constraint
+    : ADD (CONSTRAINT constraint_name)? (add_foreign_key)
+    // TODO | add_primary_key
+    // TODO | add_unique_key
+    // For check constraint need separate rule boolean_expression
+    // TODO | add_check_constraint
+    ;
+
+add_foreign_key
+    : FOREIGN KEY LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+      REFERENCES tableview_name LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+      (ON DELETE (CASCADE | SET NULL))?
     ;
 
 // $<Anonymous PL/SQL code block
