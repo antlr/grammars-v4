@@ -18,9 +18,12 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>ScssParser.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
+					<includes>
+						<include>ScssParser.g4</include>
+						<include>ScssLexer.g4</include>
+					</includes>
 				</configuration>
 				<executions>
 					<execution>
@@ -38,7 +41,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>stylesheet</entryPoint>
-					<grammarName>ScssParser</grammarName>
+					<grammarName>Scss</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
