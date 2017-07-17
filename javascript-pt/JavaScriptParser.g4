@@ -216,6 +216,7 @@ objectLiteral
 
 propertyAssignment
     : propertyName ':' singleExpression              # PropertyExpressionAssignment
+    | '[' singleExpression ']' ':' singleExpression  # ComputedPropertyExpressionAssignment
     | getter '(' ')' '{' functionBody '}'            # PropertyGetter
     | setter '(' Identifier ')' '{' functionBody '}' # PropertySetter
     | Identifier                                     # PropertyShorthand

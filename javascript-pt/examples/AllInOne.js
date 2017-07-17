@@ -117,3 +117,15 @@ var chars = [ ...str ] // [ "f", "o", "o" ]
 
 obj = { x, y }
 
+// Computed Property Names
+// http://es6-features.org/#ComputedPropertyNames
+
+let obj = {
+    foo: "bar",
+    [ "baz" + quux() ]: 42
+}
+
+var obj = {
+    foo: "bar"
+};
+obj[ "baz" + quux() ] = 42;
