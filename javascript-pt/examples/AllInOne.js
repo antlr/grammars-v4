@@ -62,7 +62,10 @@ foo() === 1
     foo() === 2
 }
 
+// Default Parameter Values
+// http://es6-features.org/#DefaultParameterValues
 
-
-
+function f (x, y = 7) {
+    return x + y
+}
 

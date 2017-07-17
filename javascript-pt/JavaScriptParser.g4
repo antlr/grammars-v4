@@ -177,7 +177,11 @@ functionDeclaration
     ;
 
 formalParameterList
-    : Identifier (',' Identifier)*
+    : formalParameterArg (',' formalParameterArg)*
+    ;
+
+formalParameterArg
+    : Identifier ('=' singleExpression)?      // Initialization: ECMAScript 6
     ;
 
 functionBody
