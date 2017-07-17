@@ -37,8 +37,7 @@ program
     ;
 
 sourceElement
-    : statement
-    | functionDeclaration
+    : Export? statement
     ;
 
 statement
@@ -57,7 +56,7 @@ statement
     | throwStatement
     | tryStatement
     | debuggerStatement
-    | functionDeclaration // ECMAScript 6
+    | functionDeclaration
     ;
 
 block

@@ -214,3 +214,33 @@ function h ({ name, val }) {
 f([ "bar", 42 ])
 g({ name: "foo", val:  7 })
 h({ name: "bar", val: 42 })
+
+// Fail-Soft Destructuring
+// http://es6-features.org/#FailSoftDestructuring
+
+var list = [ 7, 42 ]
+var [ a = 1, b = 2, c = 3, d ] = list
+a === 7
+b === 42
+c === 3
+d === undefined
+
+//--------------------------
+// Modules
+//--------------------------
+
+// Value Export/Import
+// http://es6-features.org/#ValueExportImport
+
+//  lib/math.js
+export function sum (x, y) { return x + y }
+export var pi = 3.141593
+
+//  someApp.js
+// TODO: import * as math from "lib/math"
+console.log("2π = " + math.sum(math.pi, math.pi))
+
+//  otherApp.js
+// TODO: import { sum, pi } from "lib/math"
+console.log("2π = " + sum(pi, pi))
+
