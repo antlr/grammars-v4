@@ -177,11 +177,16 @@ functionDeclaration
     ;
 
 formalParameterList
-    : formalParameterArg (',' formalParameterArg)*
+    : formalParameterArg (',' formalParameterArg)* (',' lastFormalParameterArg)?
+    | lastFormalParameterArg
     ;
 
 formalParameterArg
     : Identifier ('=' singleExpression)?      // Initialization: ECMAScript 6
+    ;
+
+lastFormalParameterArg                        // Rest Parameter: ECMAScript 6
+    : Ellipsis Identifier
     ;
 
 functionBody
@@ -272,7 +277,7 @@ singleExpression
 
 arrowFunctionParameters
     : Identifier
-    | '(' Ellipsis? formalParameterList? ')'
+    | '(' formalParameterList? ')'
     ;
 
 arrowFunctionBody
