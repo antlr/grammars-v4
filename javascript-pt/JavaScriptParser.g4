@@ -77,11 +77,8 @@ variableDeclarationList
     ;
 
 variableDeclaration
-    : Identifier initialiser?
-    ;
-
-initialiser
-    : '=' singleExpression
+    : Identifier ('=' singleExpression)?
+    | arrayLiteral '=' singleExpression    // ECMASCript 6: Array Matching
     ;
 
 emptyStatement
