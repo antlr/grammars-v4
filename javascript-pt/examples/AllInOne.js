@@ -54,6 +54,28 @@ if (x) {
   let foo;
 }
 
+//--------------------------
+// Scoping
+//--------------------------
+
+// Block-scoped variables (and constants) without hoisting.
+// http://es6-features.org/#BlockScopedVariables
+
+for (let i = 0; i < a.length; i++) {
+    let x = a[i]
+}
+for (let i = 0; i < b.length; i++) {
+    let y = b[i]
+}
+
+let callbacks = []
+for (let i = 0; i <= 2; i++) {
+    callbacks[i] = function () { return i * 2 }
+}
+callbacks[0]() === 0
+callbacks[1]() === 2
+callbacks[2]() === 4
+
 // Block-Scoped Functions
 // http://es6-features.org/#BlockScopedFunctions
 
@@ -102,6 +124,10 @@ var chars = [ ...str ] // [ "f", "o", "o" ]
 0b111110111 === 503
 0o767 === 503
 
+//--------------------------
+// Enchanced Regular Expression
+//--------------------------
+
 // Unicode String & RegExp Literal
 // http://es6-features.org/#UnicodeStringRegExpLiteral
 
@@ -111,6 +137,10 @@ var chars = [ ...str ] // [ "f", "o", "o" ]
 "𠮷" === "\u{20BB7}"
 "𠮷".codePointAt(0) == 0x20BB7
 // for (let codepoint of "𠮷") console.log(codepoint) TODO: fix
+
+//--------------------------
+// Enchanced Object Properties
+//--------------------------
 
 // Property Shorthand
 // http://es6-features.org/#PropertyShorthand
@@ -140,6 +170,10 @@ obj = {
     }
 }
 
+//--------------------------
+// Destructuring Assignment
+//--------------------------
+
 // Array Matching
 // http://es6-features.org/#ArrayMatching
 
@@ -152,3 +186,15 @@ var [ a, , b ] = list
 
 var { op, lhs, rhs } = getASTNode()
 
+// Object Matching, Deep Matching
+// http://es6-features.org/#ObjectMatchingDeepMatching
+
+var { op: a, lhs: { op: b }, rhs: c } = getASTNode()
+
+// Object And Array Matching, Default Values
+// http://es6-features.org/#ObjectAndArrayMatchingDefaultValues
+
+var obj = { a: 1 }
+var list = [ 1 ]
+var { a, b = 2 } = obj
+var [ x, y = 2 ] = list

@@ -213,7 +213,7 @@ objectLiteral
     ;
 
 propertyAssignment
-    : propertyName ':' singleExpression              # PropertyExpressionAssignment
+    : propertyName (':' |'=') singleExpression       # PropertyExpressionAssignment
     | '[' singleExpression ']' ':' singleExpression  # ComputedPropertyExpressionAssignment
     | getter '(' ')' '{' functionBody '}'            # PropertyGetter
     | setter '(' Identifier ')' '{' functionBody '}' # PropertySetter
