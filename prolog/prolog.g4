@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar prolog;
 
 program 
-    : clauselist? query
+    : clauselist query?
     ;
 
 clauselist 
