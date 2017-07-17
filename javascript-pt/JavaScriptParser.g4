@@ -177,6 +177,8 @@ functionDeclaration
 formalParameterList
     : formalParameterArg (',' formalParameterArg)* (',' lastFormalParameterArg)?
     | lastFormalParameterArg
+    | arrayLiteral                            // ECMAScript 6: Parameter Context Matching
+    | objectLiteral                           // ECMAScript 6: Parameter Context Matching
     ;
 
 formalParameterArg
