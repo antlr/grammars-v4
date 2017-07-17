@@ -98,15 +98,15 @@ BooleanLiteral:                 'true'
 
 /// Numeric Literals
 
-DecimalLiteral:                 DecimalIntegerLiteral '.' DecimalDigit* ExponentPart?
-              |                 '.' DecimalDigit+ ExponentPart?
+DecimalLiteral:                 DecimalIntegerLiteral '.' [0-9]* ExponentPart?
+              |                 '.' [0-9]+ ExponentPart?
               |                 DecimalIntegerLiteral ExponentPart?
               ;
 
 /// Numeric Literals
 
 HexIntegerLiteral:              '0' [xX] HexDigit+;
-OctalIntegerLiteral:            {!IsSrictMode()}? '0' OctalDigit+;
+OctalIntegerLiteral:            {!IsSrictMode()}? '0' [0-7]+;
 OctalIntegerLiteral2:           '0' [oO] [0-7]+;
 BinaryIntegerLiteral:           '0' [bB] [01]+;
 
@@ -227,7 +227,7 @@ fragment NonEscapeCharacter
 
 fragment EscapeCharacter
     : SingleEscapeCharacter
-    | DecimalDigit
+    | [0-9]
     | [xu]
     ;
 
@@ -240,25 +240,17 @@ fragment LineTerminatorSequence
     | LineTerminator
     ;
 
-fragment DecimalDigit
-    : [0-9]
-    ;
-
 fragment HexDigit
     : [0-9a-fA-F]
     ;
 
-fragment OctalDigit
-    : [0-7]
-    ;
-
 fragment DecimalIntegerLiteral
     : '0'
-    | [1-9] DecimalDigit*
+    | [1-9] [0-9]*
     ;
 
 fragment ExponentPart
-    : [eE] [+-]? DecimalDigit+
+    : [eE] [+-]? [0-9]+
     ;
 
 fragment IdentifierStart
