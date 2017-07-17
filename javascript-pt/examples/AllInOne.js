@@ -24,7 +24,9 @@ var func = function () { return arguments[0]; }
 var func = (...args) => args[0]
 
 // Template strings
+// TODO: implement interpolation expressions parsing.
 // https://docs.microsoft.com/en-us/scripting/javascript/advanced/template-strings-javascript
+// http://es6-features.org/#StringInterpolation
 
 var url = buildURL`http://msdn.microsoft.com/${lang}/${a}/${b}`;
 var greeting = `\`Yo\` World!`;
@@ -91,3 +93,8 @@ f(1, 2, ...params) === 9
 var str = "foo"
 var chars = [ ...str ] // [ "f", "o", "o" ]
 
+// Binary & Octal Literal
+// http://es6-features.org/#BinaryOctalLiteral
+
+0b111110111 === 503
+0o767 === 503

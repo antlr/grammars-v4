@@ -320,6 +320,8 @@ numericLiteral
     : DecimalLiteral
     | HexIntegerLiteral
     | OctalIntegerLiteral
+    | OctalIntegerLiteral2
+    | BinaryIntegerLiteral
     ;
 
 identifierName

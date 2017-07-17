@@ -107,6 +107,8 @@ DecimalLiteral:                 DecimalIntegerLiteral '.' DecimalDigit* Exponent
 
 HexIntegerLiteral:              '0' [xX] HexDigit+;
 OctalIntegerLiteral:            {!IsSrictMode()}? '0' OctalDigit+;
+OctalIntegerLiteral2:           '0' [oO] [0-7]+;
+BinaryIntegerLiteral:           '0' [bB] [01]+;
 
 /// Keywords
 
