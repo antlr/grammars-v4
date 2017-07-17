@@ -182,10 +182,10 @@ formalParameterList
     ;
 
 formalParameterArg
-    : Identifier ('=' singleExpression)?      // Initialization: ECMAScript 6
+    : Identifier ('=' singleExpression)?      // ECMAScript 6: Initialization
     ;
 
-lastFormalParameterArg                        // Rest Parameter: ECMAScript 6
+lastFormalParameterArg                        // ECMAScript 6: Rest Parameter
     : Ellipsis Identifier
     ;
 
@@ -198,15 +198,16 @@ sourceElements
     ;
 
 arrayLiteral
-    : '[' elementList? ','? elision? ']'
+    : '[' ','* elementList? ','* ']'
     ;
 
 elementList
-    : elision? singleExpression (',' elision? singleExpression)*
+    : singleExpression (','+ singleExpression)* (','+ lastElement)?
+    | lastElement
     ;
 
-elision
-    : ','+
+lastElement                      // ECMAScript 6: Spread Operator
+    : Ellipsis Identifier
     ;
 
 objectLiteral
@@ -226,7 +227,14 @@ propertyName
     ;
 
 arguments
-    : '(' (singleExpression (',' singleExpression)*)? ')'
+    : '('(
+          singleExpression (',' singleExpression)* (',' lastArgument)? |
+          lastArgument
+       )?')'
+    ;
+
+lastArgument                                  // ECMAScript 6: Spread Operator
+    : Ellipsis Identifier
     ;
 
 expressionSequence
