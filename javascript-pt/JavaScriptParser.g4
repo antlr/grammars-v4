@@ -78,7 +78,8 @@ variableDeclarationList
 
 variableDeclaration
     : Identifier ('=' singleExpression)?
-    | arrayLiteral '=' singleExpression    // ECMASCript 6: Array Matching
+    | arrayLiteral '=' singleExpression    // ECMAScript 6: Array Matching
+    | objectLiteral '=' singleExpression   // ECMAScript 6: Object Matching
     ;
 
 emptyStatement

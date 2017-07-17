@@ -147,3 +147,8 @@ var list = [ 1, 2, 3 ]
 var [ a, , b ] = list
 [ b, a ] = [ a, b ]
 
+// Object Matching, Shorthand Notation
+// http://es6-features.org/#ObjectMatchingShorthandNotation
+
+var { op, lhs, rhs } = getASTNode()
+
