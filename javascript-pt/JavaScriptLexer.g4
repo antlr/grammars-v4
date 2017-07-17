@@ -202,6 +202,7 @@ fragment EscapeSequence
     | '0' // no digit ahead! TODO
     | HexEscapeSequence
     | UnicodeEscapeSequence
+    | ExtendedUnicodeEscapeSequence
     ;
 
 fragment CharacterEscapeSequence
@@ -215,6 +216,10 @@ fragment HexEscapeSequence
 
 fragment UnicodeEscapeSequence
     : 'u' HexDigit HexDigit HexDigit HexDigit
+    ;
+
+fragment ExtendedUnicodeEscapeSequence
+    : 'u' '{' HexDigit+ '}'
     ;
 
 fragment SingleEscapeCharacter
