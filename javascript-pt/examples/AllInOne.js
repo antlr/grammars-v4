@@ -112,4 +112,8 @@ var chars = [ ...str ] // [ "f", "o", "o" ]
 "𠮷".codePointAt(0) == 0x20BB7
 // for (let codepoint of "𠮷") console.log(codepoint) TODO: fix
 
+// Property Shorthand
+// http://es6-features.org/#PropertyShorthand
+
+obj = { x, y }
 

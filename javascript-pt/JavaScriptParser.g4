@@ -218,6 +218,7 @@ propertyAssignment
     : propertyName ':' singleExpression              # PropertyExpressionAssignment
     | getter '(' ')' '{' functionBody '}'            # PropertyGetter
     | setter '(' Identifier ')' '{' functionBody '}' # PropertySetter
+    | Identifier                                     # PropertyShorthand
     ;
 
 propertyName
