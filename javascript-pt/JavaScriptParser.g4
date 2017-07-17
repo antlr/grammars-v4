@@ -57,6 +57,7 @@ statement
     | throwStatement
     | tryStatement
     | debuggerStatement
+    | functionDeclaration // ECMAScript 6
     ;
 
 block
@@ -105,7 +106,7 @@ iterationStatement
     | For '(' varModifier variableDeclaration In expressionSequence ')' statement                       # ForVarInStatement
     ;
 
-varModifier
+varModifier  // let, const - ECMAScript 6
     : Var
     | Let
     | Const
@@ -256,13 +257,13 @@ singleExpression
     | singleExpression '=' singleExpression                                  # AssignmentExpression
     | singleExpression assignmentOperator singleExpression                   # AssignmentOperatorExpression
     | This                                                                   # ThisExpression
-    | Identifier TemplateStringLiteral                                       # TemplateStringExpression
+    | Identifier TemplateStringLiteral                                       # TemplateStringExpression  // ECMAScript 6
     | Identifier                                                             # IdentifierExpression
     | literal                                                                # LiteralExpression
     | arrayLiteral                                                           # ArrayLiteralExpression
     | objectLiteral                                                          # ObjectLiteralExpression
     | '(' expressionSequence ')'                                             # ParenthesizedExpression
-    | arrowFunctionParameters '=>' arrowFunctionBody                         # ArrowFunctionExpression
+    | arrowFunctionParameters '=>' arrowFunctionBody                         # ArrowFunctionExpression   // ECMAScript 6
     ;
 
 arrowFunctionParameters

@@ -1,9 +1,11 @@
+"use strict";
 // CData sample
 
 <!--//--><![CDATA[//><!--
 //--><!]]>
 
-// Arrow functions, https://strongloop.com/strongblog/an-introduction-to-javascript-es6-arrow-functions/
+// Arrow functions
+// https://strongloop.com/strongblog/an-introduction-to-javascript-es6-arrow-functions/
 
 var func = function (parameters) { return expression; }
 var func = () => { return 1; }
@@ -22,12 +24,14 @@ var func = function () { return arguments[0]; }
 var func = (...args) => args[0]
 
 // Template strings
+// https://docs.microsoft.com/en-us/scripting/javascript/advanced/template-strings-javascript
 
 var url = buildURL`http://msdn.microsoft.com/${lang}/${a}/${b}`;
 var greeting = `\`Yo\` World!`;
 console.log(html`<b>${username} says</b>: "${tag}"`);
 
 // var, let, const
+// http://es6-features.org/#Constants
 
 var c = 10;
 {
@@ -47,4 +51,18 @@ foo();
 if (x) {
   let foo;
 }
+
+// Block-Scoped Functions
+// http://es6-features.org/#BlockScopedFunctions
+
+function foo () { return 1 }
+foo() === 1
+{
+    function foo () { return 2 }
+    foo() === 2
+}
+
+
+
+
 
