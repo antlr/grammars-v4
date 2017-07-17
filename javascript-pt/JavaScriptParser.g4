@@ -219,6 +219,7 @@ propertyAssignment
     | '[' singleExpression ']' ':' singleExpression  # ComputedPropertyExpressionAssignment
     | getter '(' ')' '{' functionBody '}'            # PropertyGetter
     | setter '(' Identifier ')' '{' functionBody '}' # PropertySetter
+    | '*'? Identifier '(' formalParameterList? ')' '{' functionBody '}'      # MethodProperty
     | Identifier                                     # PropertyShorthand
     ;
 

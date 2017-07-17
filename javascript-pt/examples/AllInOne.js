@@ -129,3 +129,14 @@ var obj = {
     foo: "bar"
 };
 obj[ "baz" + quux() ] = 42;
+
+// Method Properties
+// http://es6-features.org/#MethodProperties
+
+obj = {
+    foo (a, b) {
+    },
+    *quux (x, y) {
+    }
+}
+
