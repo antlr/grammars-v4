@@ -1413,6 +1413,7 @@ derived_table
 function_call
     : ranking_windowed_function
     | aggregate_windowed_function
+    | analytic_windowed_function
     | scalar_function_name '(' expression_list? ')'
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
     | BINARY_CHECKSUM '(' '*' ')'
