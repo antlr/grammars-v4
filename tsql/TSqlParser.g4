@@ -1568,6 +1568,12 @@ aggregate_windowed_function
     | GROUPING_ID '(' expression_list ')'
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/functions/analytic-functions-transact-sql
+analytic_windowed_function
+	: (FIRST_VALUE | LAST_VALUE) '(' expression ')' over_clause
+	| (LAG | LEAD) '(' expression  (',' expression (',' expression)? )? ')' over_clause
+	;
+
 all_distinct_expression
     : (ALL | DISTINCT)? expression
     ;
