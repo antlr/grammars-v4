@@ -1836,6 +1836,7 @@ id
 simple_id
     : ID
     | ABSOLUTE
+    | ACTIVE
     | APPLY
     | AUTO
     | AVG
@@ -1879,6 +1880,7 @@ simple_id
     | ISOLATION
     | KEEP
     | KEEPFIXED
+    | KEY
     | FORCED
     | KEYSET
     | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
