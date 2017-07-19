@@ -1549,51 +1549,51 @@ derived_table
     ;
 
 function_call
-    : ranking_windowed_function
-    | aggregate_windowed_function
-    | scalar_function_name '(' expression_list? ')'
+    : ranking_windowed_function                                         #RANKING_WINDOWED
+    | aggregate_windowed_function                                       #AGGREGATE_WINDOW
+    | scalar_function_name '(' expression_list? ')'                     #SCALAR_FUNCTION
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
-    | BINARY_CHECKSUM '(' '*' ')'
+    | BINARY_CHECKSUM '(' '*' ')'					#BINARY_CHECKSUM
     // https://msdn.microsoft.com/en-us/library/hh231076.aspx
     // https://msdn.microsoft.com/en-us/library/ms187928.aspx
-    | CAST '(' expression AS data_type ')'
-    | CONVERT '(' data_type ',' expression (',' style=expression)? ')'
+    | CAST '(' expression AS data_type ')'                              #CAST
+    | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'  #CONVERT
     // https://msdn.microsoft.com/en-us/library/ms189788.aspx
-    | CHECKSUM '(' '*' ')'
-    // https://msdn.microsoft.com/en-us/library/ms190349.aspx
-    | COALESCE '(' expression_list ')'
+    | CHECKSUM '(' '*' ')'						#CHECKSUM
+    // https://msdn.microsoft.com/en-us/library/ms190349.aspx         
+    | COALESCE '(' expression_list ')'                                  #COALESCE
     // https://msdn.microsoft.com/en-us/library/ms188751.aspx
-    | CURRENT_TIMESTAMP
+    | CURRENT_TIMESTAMP							#CURRENT_TIMESTAMP
     // https://msdn.microsoft.com/en-us/library/ms176050.aspx
-    | CURRENT_USER
+    | CURRENT_USER                                                      #CURRENT_USER
     // https://msdn.microsoft.com/en-us/library/ms186819.aspx
-    | DATEADD '(' ID ',' expression ',' expression ')'
+    | DATEADD '(' ID ',' expression ',' expression ')'                  #DATEADD
     // https://msdn.microsoft.com/en-us/library/ms189794.aspx
-    | DATEDIFF '(' ID ',' expression ',' expression ')'
+    | DATEDIFF '(' ID ',' expression ',' expression ')'                 #DATEDIFF
     // https://msdn.microsoft.com/en-us/library/ms174395.aspx
-    | DATENAME '(' ID ',' expression ')'
+    | DATENAME '(' ID ',' expression ')'				#DATENAME
     // https://msdn.microsoft.com/en-us/library/ms174420.aspx
-    | DATEPART '(' ID ',' expression ')'
+    | DATEPART '(' ID ',' expression ')'				#DATEPART
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
-    | GETDATE '(' ')'
+    | GETDATE '(' ')'							#GETDATE
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
-    | GETUTCDATE '(' ')'
+    | GETUTCDATE '(' ')'						#GETUTCDATE
     // https://msdn.microsoft.com/en-us/library/ms189838.aspx
-    | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'
+    | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')' #IDENTITY
     // https://msdn.microsoft.com/en-us/library/bb839514.aspx
-    | MIN_ACTIVE_ROWVERSION
+    | MIN_ACTIVE_ROWVERSION						#MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
-    | NULLIF '(' expression ',' expression ')'
+    | NULLIF '(' expression ',' expression ')'				#NULLIF
     // https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
-    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'
+    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'   #STUFF
     // https://msdn.microsoft.com/en-us/library/ms177587.aspx
-    | SESSION_USER
+    | SESSION_USER							#SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
-    | SYSTEM_USER
+    | SYSTEM_USER							#SYSTEM_USER
     // https://msdn.microsoft.com/en-us/library/ms184325.aspx
-    | ISNULL '(' expression ',' expression ')'
+    | ISNULL '(' expression ',' expression ')'				#ISNULL
     // https://docs.microsoft.com/en-us/sql/t-sql/xml/xml-data-type-methods
-    | xml_data_type_methods
+    | xml_data_type_methods						#XML_DATATA_TYPE_METHODS
     ;
 
 xml_data_type_methods
