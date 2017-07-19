@@ -77,9 +77,7 @@ variableDeclarationList
     ;
 
 variableDeclaration
-    : Identifier ('=' singleExpression)?
-    | arrayLiteral '=' singleExpression    // ECMAScript 6: Array Matching
-    | objectLiteral '=' singleExpression   // ECMAScript 6: Object Matching
+    : (Identifier | arrayLiteral | objectLiteral) ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
 emptyStatement
@@ -102,7 +100,7 @@ iterationStatement
     | For '(' varModifier variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')'
           statement                                                                                     # ForVarStatement
     | For '(' singleExpression (In | Identifier{p("of")}?) expressionSequence ')' statement             # ForInStatement
-    | For '(' varModifier variableDeclaration (In | Identifier{prev("of")}?) expressionSequence ')' statement      # ForVarInStatement
+    | For '(' varModifier variableDeclaration (In | Identifier{p("of")}?) expressionSequence ')' statement      # ForVarInStatement
     ;
 
 varModifier  // let, const - ECMAScript 6

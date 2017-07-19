@@ -602,3 +602,15 @@ s.size === 2
 s.has("hello") === true
 for (let key of s.values()) // insertion order
     console.log(key)
+
+// Map Data-Structure
+// http://es6-features.org/#MapDataStructure
+
+let m = new Map()
+let s = Symbol()
+m.set("hello", 42)
+m.set(s, 34)
+m.get(s) === 34
+m.size === 2
+for (let [ key, val ] of m.entries())
+    console.log(key + " = " + val)
