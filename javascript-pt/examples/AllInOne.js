@@ -408,3 +408,23 @@ class Rectangle {
 }
 var r = new Rectangle(50, 20)
 r.area === 1000
+
+//--------------------------
+// Symbol Type
+//--------------------------
+
+// Symbol Type
+// http://es6-features.org/#SymbolType
+
+Symbol("foo") !== Symbol("foo")
+const foo = Symbol()
+const bar = Symbol()
+typeof foo === "symbol"
+typeof bar === "symbol"
+let obj = {}
+obj[foo] = "foo"
+obj[bar] = "bar"
+JSON.stringify(obj) // {}
+Object.keys(obj) // []
+Object.getOwnPropertyNames(obj) // []
+Object.getOwnPropertySymbols(obj) // [ foo, bar ]
