@@ -345,3 +345,28 @@ var rect = new Rectangle(7, 42)
 rect.z     = 1000
 rect.color = "red"
 console.log(rect.x, rect.y, rect.z, rect.color)
+
+// Base Class Access
+// http://es6-features.org/#BaseClassAccess
+
+class Shape {
+    toString () {
+        return `Shape(${this.id})`
+    }
+}
+class Rectangle extends Shape {
+    constructor (id, x, y, width, height) {
+        super(id, x, y)
+    }
+    toString () {
+        return "Rectangle > " + super.toString()
+    }
+}
+class Circle extends Shape {
+    constructor (id, x, y, radius) {
+        super(id, x, y)
+    }
+    toString () {
+        return "Circle > " + super.toString()
+    }
+}

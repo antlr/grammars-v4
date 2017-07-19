@@ -273,7 +273,6 @@ singleExpression
     | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
     | singleExpression '.' identifierName                                    # MemberDotExpression
     | singleExpression arguments                                             # ArgumentsExpression
-    | Super arguments                                                        # SuperCallExpression
     | New singleExpression arguments?                                        # NewExpression
     | singleExpression {notLineTerminator()}? '++'                           # PostIncrementExpression
     | singleExpression {notLineTerminator()}? '--'                           # PostDecreaseExpression
@@ -304,6 +303,7 @@ singleExpression
     | This                                                                   # ThisExpression
     | Identifier TemplateStringLiteral                                       # TemplateStringExpression  // ECMAScript 6
     | Identifier                                                             # IdentifierExpression
+    | Super                                                                  # SuperExpression
     | literal                                                                # LiteralExpression
     | arrayLiteral                                                           # ArrayLiteralExpression
     | objectLiteral                                                          # ObjectLiteralExpression
