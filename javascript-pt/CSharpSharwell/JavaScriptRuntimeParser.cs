@@ -8,17 +8,27 @@ public abstract class JavaScriptRuntimeParser : Parser
     {
     }
 
-    protected bool notLineTerminator() =>
-        !here(LineTerminator);
+    protected bool p(string str) => prev(str);
 
-    protected bool notOpenBraceAndNotFunction() =>
-        _input.Lt(1).Type != OpenBrace && _input.Lt(1).Type != Function;
+    protected bool prev(string str)
+    {
+        return _input.Lt(-1).Text.Equals(str);
+    }
 
-    protected bool closeBrace() =>
-        _input.Lt(1).Type == CloseBrace;
+    protected bool notLineTerminator()
+    {
+        return !here(LineTerminator);
+    }
 
-    protected bool match(string str) =>
-        _input.Lt(1).Text.Equals(str);
+    protected bool notOpenBraceAndNotFunction()
+    {
+        return _input.Lt(1).Type != OpenBrace && _input.Lt(1).Type != Function;
+    }
+
+    protected bool closeBrace()
+    {
+        return _input.Lt(1).Type == CloseBrace;
+    }
 
     ///<summary>Returns <c>true</c> iff on the current index of the parser's
     ///token stream a token of the given <c>type</c> exists on the

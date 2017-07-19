@@ -99,9 +99,10 @@ iterationStatement
     : Do statement While '(' expressionSequence ')' eos                                                 # DoStatement
     | While '(' expressionSequence ')' statement                                                        # WhileStatement
     | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement         # ForStatement
-    | For '(' varModifier variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')' statement # ForVarStatement
-    | For '(' singleExpression In expressionSequence ')' statement                                      # ForInStatement
-    | For '(' varModifier variableDeclaration In expressionSequence ')' statement                       # ForVarInStatement
+    | For '(' varModifier variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')'
+          statement                                                                                     # ForVarStatement
+    | For '(' singleExpression (In | Identifier{p("of")}?) expressionSequence ')' statement             # ForInStatement
+    | For '(' varModifier variableDeclaration (In | Identifier{prev("of")}?) expressionSequence ')' statement      # ForVarInStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
@@ -413,11 +414,11 @@ futureReservedWord
     ;
 
 getter
-    : {match("get")}? Identifier propertyName
+    : Identifier{p("get")}? propertyName
     ;
 
 setter
-    : {match("set")}? Identifier propertyName
+    : Identifier{p("set")}? propertyName
     ;
 
 eos
