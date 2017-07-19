@@ -676,3 +676,19 @@ let example = new Example()
 example.id = 7
 example.username = "John Doe"
 example.amountDue = 42.0
+
+//--------------------------
+// New Built-In Methods
+//--------------------------
+
+// Object Property Assignment
+// http://es6-features.org/#ObjectPropertyAssignment
+
+var dest = { quux: 0 }
+var src1 = { foo: 1, bar: 2 }
+var src2 = { foo: 3, baz: 4 }
+Object.assign(dest, src1, src2)
+dest.quux === 0
+dest.foo  === 3
+dest.bar  === 2
+dest.baz  === 4
