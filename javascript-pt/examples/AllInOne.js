@@ -273,3 +273,21 @@ class Shape {
         this.y = y
     }
 }
+
+// Class Inheritance
+// http://es6-features.org/#ClassInheritance
+
+class Rectangle extends Shape {
+    constructor (id, x, y, width, height) {
+        super(id, x, y)
+        this.width  = width
+        this.height = height
+    }
+}
+class Circle extends Shape {
+    constructor (id, x, y, radius) {
+        super(id, x, y)
+        this.radius = radius
+    }
+}
+

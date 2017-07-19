@@ -273,6 +273,7 @@ singleExpression
     | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
     | singleExpression '.' identifierName                                    # MemberDotExpression
     | singleExpression arguments                                             # ArgumentsExpression
+    | Super arguments                                                        # SuperCallExpression
     | New singleExpression arguments?                                        # NewExpression
     | singleExpression {notLineTerminator()}? '++'                           # PostIncrementExpression
     | singleExpression {notLineTerminator()}? '--'                           # PostDecreaseExpression
