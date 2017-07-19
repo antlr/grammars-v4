@@ -55,6 +55,7 @@ unit_statement
     | create_sequence
     | create_trigger
     | create_type
+    | create_synonym
 
     | drop_function
     | drop_package
@@ -65,7 +66,12 @@ unit_statement
     | data_manipulation_language_statements
     | drop_table
 
+    | comment_on_column
+    | comment_on_table
+
     | anonymous_block
+
+
     ;
 
 // $<DDL -> SQL Statements for Stored PL/SQL Units
@@ -523,6 +529,22 @@ create_table
 
 drop_table
     : DROP TABLE tableview_name
+    ;
+
+comment_on_column
+    : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string
+    ;
+
+// $<Synonym DDL Clauses
+
+create_synonym
+    // Synonym's schema cannot be specified for public synonyms
+    : CREATE (OR REPLACE)? PUBLIC SYNONYM synonym_name FOR (schema_name PERIOD)? schema_object_name (AT_SIGN link_name)?
+    | CREATE (OR REPLACE)? SYNONYM (schema_name PERIOD)? synonym_name FOR (schema_name PERIOD)? schema_object_name (AT_SIGN link_name)?
+    ;
+
+comment_on_table
+    : COMMENT ON TABLE tableview_name IS quoted_string
     ;
 
 // $<Anonymous PL/SQL code block
@@ -1928,6 +1950,17 @@ char_set_name
     : id_expression ('.' id_expression)*
     ;
 
+synonym_name
+    : identifier
+    ;
+
+// Represents a valid DB object name in DDL commands which are valid for several DB (or schema) objects.
+// For instance, create synonym ... for <DB object name>, or rename <old DB object name> to <new DB object name>.
+// Both are valid for seuqences, tables, views etc.
+schema_object_name
+    : id_expression
+    ;
+
 // $>
 
 // $<Common PL/SQL Specs
@@ -2032,6 +2065,7 @@ native_datatype_element
 
 bind_variable
     : (BINDVAR | ':' UNSIGNED_INTEGER)
+      // Pro*C/C++ indicator variables
       (INDICATOR? (BINDVAR | ':' UNSIGNED_INTEGER))?
       ('.' general_element_part)*
     ;
