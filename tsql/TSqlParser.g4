@@ -1551,6 +1551,7 @@ derived_table
 function_call
     : ranking_windowed_function                                         #RANKING_WINDOWED
     | aggregate_windowed_function                                       #AGGREGATE_WINDOW
+    | analytic_windowed_function                                        #ANALYTIC_WINDOW
     | scalar_function_name '(' expression_list? ')'                     #SCALAR_FUNCTION
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
     | BINARY_CHECKSUM '(' '*' ')'					#BINARY_CHECKSUM
