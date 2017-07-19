@@ -57,6 +57,7 @@ statement
     | tryStatement
     | debuggerStatement
     | functionDeclaration
+    | classDeclaration
     ;
 
 block
@@ -173,6 +174,29 @@ functionDeclaration
     : Function Identifier '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
+classDeclaration
+    : Class Identifier classTail
+    ;
+
+classTail
+    : (Extends singleExpression)? '{' classElement* '}'
+    ;
+
+classElement
+    : Static? methodDefinition
+    ;
+
+methodDefinition
+    : propertyName '(' formalParameterList? ')' '{' functionBody '}'
+    | getter '(' ')' '{' functionBody '}'
+    | setter '(' formalParameterList? ')' '{' functionBody '}'
+    | generatorMethod
+    ;
+
+generatorMethod
+    : '*'? Identifier '(' formalParameterList? ')' '{' functionBody '}'
+    ;
+
 formalParameterList
     : formalParameterArg (',' formalParameterArg)* (',' lastFormalParameterArg)?
     | lastFormalParameterArg
@@ -218,7 +242,7 @@ propertyAssignment
     | '[' singleExpression ']' ':' singleExpression  # ComputedPropertyExpressionAssignment
     | getter '(' ')' '{' functionBody '}'            # PropertyGetter
     | setter '(' Identifier ')' '{' functionBody '}' # PropertySetter
-    | '*'? Identifier '(' formalParameterList? ')' '{' functionBody '}'      # MethodProperty
+    | generatorMethod                                # MethodProperty
     | Identifier                                     # PropertyShorthand
     ;
 
@@ -245,6 +269,7 @@ expressionSequence
 
 singleExpression
     : Function Identifier? '(' formalParameterList? ')' '{' functionBody '}' # FunctionExpression
+    | Class Identifier? classTail                                            # ClassExpression
     | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
     | singleExpression '.' identifierName                                    # MemberDotExpression
     | singleExpression arguments                                             # ArgumentsExpression

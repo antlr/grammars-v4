@@ -244,3 +244,32 @@ console.log("2π = " + math.sum(math.pi, math.pi))
 // TODO: import { sum, pi } from "lib/math"
 console.log("2π = " + sum(pi, pi))
 
+// Default & Wildcard
+// http://es6-features.org/#DefaultWildcard
+
+//  lib/mathplusplus.js
+// TODO: export * from "lib/math"
+export var e = 2.71828182846
+// TODO: export default (x) => Math.exp(x)
+
+//  someApp.js
+// TODO: import exp, { pi, e } from "lib/mathplusplus"
+console.log("e^{π} = " + exp(pi))
+
+//--------------------------
+// Classes
+//--------------------------
+
+// Class Definition
+// http://es6-features.org/#ClassDefinition
+
+class Shape {
+    constructor (id, x, y) {
+        this.id = id
+        this.move(x, y)
+    }
+    move (x, y) {
+        this.x = x
+        this.y = y
+    }
+}
