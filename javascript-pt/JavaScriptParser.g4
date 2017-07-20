@@ -299,8 +299,8 @@ singleExpression
     | singleExpression '?' singleExpression ':' singleExpression             # TernaryExpression
     | singleExpression '=' singleExpression                                  # AssignmentExpression
     | singleExpression assignmentOperator singleExpression                   # AssignmentOperatorExpression
+    | singleExpression TemplateStringLiteral                                 # TemplateStringExpression  // ECMAScript 6
     | This                                                                   # ThisExpression
-    | Identifier TemplateStringLiteral                                       # TemplateStringExpression  // ECMAScript 6
     | Identifier                                                             # IdentifierExpression
     | Super                                                                  # SuperExpression
     | literal                                                                # LiteralExpression
