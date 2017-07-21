@@ -28,7 +28,7 @@
 lexer grammar JavaScriptLexer;
 
 options {
-    superClass=JavaScriptRuntimeLexer;
+    superClass=JavaScriptBaseLexer;
 }
 
 RegularExpressionLiteral:       {RegexPossible()}? '/' RegularExpressionBody '/' RegularExpressionFlags;

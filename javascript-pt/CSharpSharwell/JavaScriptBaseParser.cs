@@ -1,9 +1,9 @@
 using Antlr4.Runtime;
 using static PT.PM.JavaScriptParseTreeUst.Parser.JavaScriptParser;
 
-public abstract class JavaScriptRuntimeParser : Parser
+public abstract class JavaScriptBaseParser : Parser
 {
-    public JavaScriptRuntimeParser(ITokenStream input)
+    public JavaScriptBaseParser(ITokenStream input)
         : base(input)
     {
     }

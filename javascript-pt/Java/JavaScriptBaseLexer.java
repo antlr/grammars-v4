@@ -1,6 +1,6 @@
 import org.antlr.v4.runtime.*;
 
-public abstract class JavaScriptRuntimeLexer extends Lexer
+public abstract class JavaScriptBaseLexer extends Lexer
 {
     // A flag indicating if the lexer should operate in strict mode.
     // When set to true, FutureReservedWords are tokenized, when false,
@@ -10,7 +10,7 @@ public abstract class JavaScriptRuntimeLexer extends Lexer
     // The most recently produced token.
     private Token lastToken = null;
 
-    public JavaScriptRuntimeLexer(CharStream input) {
+    public JavaScriptBaseLexer(CharStream input) {
         super(input);
     }
 

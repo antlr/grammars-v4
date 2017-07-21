@@ -1,12 +1,12 @@
 using Antlr4.Runtime;
 using static PT.PM.JavaScriptParseTreeUst.Parser.JavaScriptParser;
 
-public abstract class JavaScriptRuntimeLexer : Lexer
+public abstract class JavaScriptBaseLexer : Lexer
 {
     // The most recently produced token.
     private IToken _lastToken = null;
 
-    public JavaScriptRuntimeLexer(ICharStream input)
+    public JavaScriptBaseLexer(ICharStream input)
         : base(input)
     {
     }

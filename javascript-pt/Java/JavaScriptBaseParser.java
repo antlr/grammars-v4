@@ -1,8 +1,8 @@
 import org.antlr.v4.runtime.*;
 
-public abstract class JavaScriptRuntimeParser extends Parser
+public abstract class JavaScriptBaseParser extends Parser
 {
-    public JavaScriptRuntimeParser(TokenStream input) {
+    public JavaScriptBaseParser(TokenStream input) {
         super(input);
     }
 
