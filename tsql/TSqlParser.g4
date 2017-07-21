@@ -1562,7 +1562,7 @@ function_call
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'
     // https://msdn.microsoft.com/en-us/library/ms189788.aspx
     | CHECKSUM '(' '*' ')'
-    // https://msdn.microsoft.com/en-us/library/ms190349.aspx         
+    // https://msdn.microsoft.com/en-us/library/ms190349.aspx
     | COALESCE '(' expression_list ')'
     // https://msdn.microsoft.com/en-us/library/ms188751.aspx
     | CURRENT_TIMESTAMP
@@ -1581,17 +1581,17 @@ function_call
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
     | GETUTCDATE '(' ')'
     // https://msdn.microsoft.com/en-us/library/ms189838.aspx
-    | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')' 
+    | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'
     // https://msdn.microsoft.com/en-us/library/bb839514.aspx
     | MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
     | NULLIF '(' expression ',' expression ')'
     // https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
-    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')' 
+    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms177587.aspx
-    | SESSION_USER						
+    | SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
-    | SYSTEM_USER							
+    | SYSTEM_USER
     // https://msdn.microsoft.com/en-us/library/ms184325.aspx
     | ISNULL '(' expression ',' expression ')'
     // https://docs.microsoft.com/en-us/sql/t-sql/xml/xml-data-type-methods
