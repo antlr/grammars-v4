@@ -752,7 +752,7 @@ db_update_option:
     ;
 
 db_user_access_option:
-    ( SINGLE_USER      AUTHORIZATION | RESTRICTED_USER | MULTI_USER )
+    ( SINGLE_USER | RESTRICTED_USER | MULTI_USER )
     ;
 delayed_durability_option:
      DELAYED_DURABILITY EQUAL ( DISABLED | ALLOWED | FORCED )
@@ -1980,6 +1980,7 @@ id
 simple_id
     : ID
     | ABSOLUTE
+    | ACTIVE
     | APPLY
     | AUTO
     | AVG
@@ -2023,6 +2024,7 @@ simple_id
     | ISOLATION
     | KEEP
     | KEEPFIXED
+    | KEY
     | FORCED
     | KEYSET
     | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
