@@ -645,7 +645,7 @@ endpoint_database_mirroring_clause:
 	 endpoint_authentication_clause endpoint_encryption_clause endpoint_role_clause ;
 
 endpoint_role_clause:
-        endpoint_role_clause COMMA
+        endpoint_role_clause  COMMA
 	|ROLE EQUAL ( WITNESS | PARTNER | ALL )
         ;
 
@@ -679,6 +679,7 @@ endpoint_encryption_clause:
 
 endpoint_encryption_algorithm:
 	ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES )
+ 	|
 	; 
 	
 endpoint_message_forwarding_clause:
@@ -1554,47 +1555,47 @@ function_call
     | analytic_windowed_function
     | scalar_function_name '(' expression_list? ')'
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
-    | BINARY_CHECKSUM '(' '*' ')'					
+    | BINARY_CHECKSUM '(' '*' ')'
     // https://msdn.microsoft.com/en-us/library/hh231076.aspx
     // https://msdn.microsoft.com/en-us/library/ms187928.aspx
-    | CAST '(' expression AS data_type ')'                              
-    | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'  #CONVERT
+    | CAST '(' expression AS data_type ')'
+    | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'
     // https://msdn.microsoft.com/en-us/library/ms189788.aspx
-    | CHECKSUM '(' '*' ')'						
+    | CHECKSUM '(' '*' ')'
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx         
-    | COALESCE '(' expression_list ')'                                  
+    | COALESCE '(' expression_list ')'
     // https://msdn.microsoft.com/en-us/library/ms188751.aspx
-    | CURRENT_TIMESTAMP						
+    | CURRENT_TIMESTAMP
     // https://msdn.microsoft.com/en-us/library/ms176050.aspx
-    | CURRENT_USER                                                     
+    | CURRENT_USER
     // https://msdn.microsoft.com/en-us/library/ms186819.aspx
-    | DATEADD '(' ID ',' expression ',' expression ')'                
+    | DATEADD '(' ID ',' expression ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms189794.aspx
-    | DATEDIFF '(' ID ',' expression ',' expression ')'              
+    | DATEDIFF '(' ID ',' expression ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms174395.aspx
-    | DATENAME '(' ID ',' expression ')'			
+    | DATENAME '(' ID ',' expression ')'
     // https://msdn.microsoft.com/en-us/library/ms174420.aspx
-    | DATEPART '(' ID ',' expression ')'		
+    | DATEPART '(' ID ',' expression ')'
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
-    | GETDATE '(' ')'							
+    | GETDATE '(' ')'
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
-    | GETUTCDATE '(' ')'					
+    | GETUTCDATE '(' ')'
     // https://msdn.microsoft.com/en-us/library/ms189838.aspx
     | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')' 
     // https://msdn.microsoft.com/en-us/library/bb839514.aspx
-    | MIN_ACTIVE_ROWVERSION						
+    | MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
-    | NULLIF '(' expression ',' expression ')'			
+    | NULLIF '(' expression ',' expression ')'
     // https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
-    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'  
+    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')' 
     // https://msdn.microsoft.com/en-us/library/ms177587.aspx
     | SESSION_USER						
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
     | SYSTEM_USER							
     // https://msdn.microsoft.com/en-us/library/ms184325.aspx
-    | 	#ISNULL
+    | ISNULL '(' expression ',' expression ')'
     // https://docs.microsoft.com/en-us/sql/t-sql/xml/xml-data-type-methods
-    | xml_data_type_methods						
+    | xml_data_type_methods
     ;
 
 xml_data_type_methods
