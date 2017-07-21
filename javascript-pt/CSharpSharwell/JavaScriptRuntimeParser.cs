@@ -8,7 +8,10 @@ public abstract class JavaScriptRuntimeParser : Parser
     {
     }
 
-    protected bool p(string str) => prev(str);
+    protected bool p(string str)
+    {
+        return prev(str);
+    }
 
     protected bool prev(string str)
     {

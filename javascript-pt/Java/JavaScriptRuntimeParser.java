@@ -18,7 +18,11 @@ public abstract class JavaScriptRuntimeParser extends Parser
         return _input.LT(1).getType() == JavaScriptParser.CloseBrace;
     }
 
-    protected boolean match(String str) {
+    protected boolean p(String str) {
+        return prev(str);
+    }
+
+    protected boolean prev(String str) {
         return _input.LT(1).getText().equals(str);
     }
 

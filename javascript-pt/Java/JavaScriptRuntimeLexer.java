@@ -32,8 +32,6 @@ public abstract class JavaScriptRuntimeLexer extends Lexer
      */
     @Override
     public Token nextToken() {
-        
-        // Get the next token.
         Token next = super.nextToken();
         
         if (next.getChannel() == Token.DEFAULT_CHANNEL) {
