@@ -358,7 +358,6 @@ identifierName
 
 reservedWord
     : keyword
-    | futureReservedWord
     | NullLiteral
     | BooleanLiteral
     ;
@@ -390,10 +389,8 @@ keyword
     | Delete
     | In
     | Try
-    ;
 
-futureReservedWord
-    : Class
+    | Class
     | Enum
     | Extends
     | Super
