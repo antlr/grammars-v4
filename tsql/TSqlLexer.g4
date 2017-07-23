@@ -1,21 +1,19 @@
 /*
 T-SQL (Transact-SQL, MSSQL) grammar.
 The MIT License (MIT).
+Copyright (c) 2017, Mark Adams (madams51703@gmail.com)
 Copyright (c) 2015-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 Copyright (c) 2016, Scott Ure (scott@redstormsoftware.com).
 Copyright (c) 2016, Rui Zhang (ruizhang.ccs@gmail.com).
 Copyright (c) 2016, Marcus Henriksson (kuseman80@gmail.com).
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,6 +27,7 @@ lexer grammar TSqlLexer;
 
 // Basic keywords (from https://msdn.microsoft.com/en-us/library/ms189822.aspx)
 ADD:                                   'ADD';
+AES:                                   'AES';
 ALL:                                   'ALL';
 ALTER:                                 'ALTER';
 AND:                                   'AND';
@@ -38,9 +37,11 @@ AS:                                    'AS';
 ASC:                                   'ASC';
 ASYMMETRIC:                            'ASYMMETRIC';
 AUTHORIZATION:                         'AUTHORIZATION';
+AUTHENTICATION:                         'AUTHENTICATION';
 BACKUP:                                'BACKUP';
 BEGIN:                                 'BEGIN';
 BETWEEN:                               'BETWEEN';
+BLOCKING_HIERARCHY:                    'BLOCKING_HIERARCHY';
 BREAK:                                 'BREAK';
 BROWSE:                                'BROWSE';
 BULK:                                  'BULK';
@@ -78,6 +79,7 @@ CURRENT_USER:                          'CURRENT_USER';
 CURSOR:                                'CURSOR';
 DATA_COMPRESSION:                      'DATA_COMPRESSION';
 DATABASE:                              'DATABASE';
+DATABASE_MIRRORING:                    'DATABASE_MIRRORING';
 DBCC:                                  'DBCC';
 DEALLOCATE:                            'DEALLOCATE';
 DECLARE:                               'DECLARE';
@@ -89,10 +91,13 @@ DISK:                                  'DISK';
 DISTINCT:                              'DISTINCT';
 DISTRIBUTED:                           'DISTRIBUTED';
 DOUBLE:                                'DOUBLE';
+DOUBLE_FORWARD_SLASH:                  '//';
 DROP:                                  'DROP';
 DUMP:                                  'DUMP';
 ELSE:                                  'ELSE';
+ENABLED:                               'ENABLED';
 END:                                   'END';
+ENDPOINT:                              'ENDPOINT';
 ERRLVL:                                'ERRLVL';
 ESCAPE:                                'ESCAPE';
 ERROR:                                 'ERROR';
@@ -102,12 +107,14 @@ EXECUTE:                               'EXEC' 'UTE'?;
 EXISTS:                                'EXISTS';
 EXIT:                                  'EXIT';
 EXTERNAL:                              'EXTERNAL';
+FAILOVER:                              'FAILOVER';
 FETCH:                                 'FETCH';
 FILE:                                  'FILE';
 FILENAME:                              'FILENAME';
 FILLFACTOR:                            'FILLFACTOR';
 FOR:                                   'FOR';
 FORCESEEK:                             'FORCESEEK';
+FORCE_SERVICE_ALLOW_DATA_LOSS:         'FORCE_SERVICE_ALLOW_DATA_LOSS';
 FOREIGN:                               'FOREIGN';
 FREETEXT:                              'FREETEXT';
 FREETEXTTABLE:                         'FREETEXTTABLE';
@@ -131,20 +138,29 @@ INSERT:                                'INSERT';
 INSTEAD:                               'INSTEAD';
 INTERSECT:                             'INTERSECT';
 INTO:                                  'INTO';
+IPV4_ADDR:                              IPV4_OCTECT DOT IPV4_OCTECT DOT IPV4_OCTECT DOT IPV4_OCTECT;
+IPV6_ADDR:                          [0-9A-F][0-9A-F][0-9A-F][0-9A-F][:][0-9A-F][0-9A-F][0-9A-F][0-9A-F][:][0-9A-F][0-9A-F][0-9A-F][0-9A-F][:][0-9A-F][0-9A-F][0-9A-F][0-9A-F][:][0-9A-F][0-9A-F][0-9A-F][0-9A-F][:][0-9A-F][0-9A-F][0-9A-F][0-9A-F][:][0-9A-F][0-9A-F][0-9A-F][0-9A-F][:][0-9A-F][0-9A-F][0-9A-F][0-9A-F];
 IS:                                    'IS';
 ISNULL:                                'ISNULL';
 JOIN:                                  'JOIN';
+KERBEROS:                              'KERBEROS';
 KEY:                                   'KEY';
 KILL:                                  'KILL';
 LEFT:                                  'LEFT';
 LIFETIME:                              'LIFETIME';
 LIKE:                                  'LIKE';
 LINENO:                                'LINENO';
+LISTENER_IP:                           'LISTENER_IP';
+LISTENER_PORT:                         'LISTENER_PORT';
 LOAD:                                  'LOAD';
 LOG:                                   'LOG';
 MATCHED:                               'MATCHED';
 MERGE:                                 'MERGE';
+MESSAGE_FORWARDING:                    'MESSAGE_FORWARDING';
+MESSAGE_FORWARD_SIZE:                  'MESSAGE_FORWARD_SIZE';
 NATIONAL:                              'NATIONAL';
+NEGOTIATE:                             'NEGOTIATE';
+NTLM:                                  'NTLM';
 NOCHECK:                               'NOCHECK';
 NONCLUSTERED:                          'NONCLUSTERED';
 NONE:                                  'NONE';
@@ -166,6 +182,7 @@ ORDER:                                 'ORDER';
 OUTER:                                 'OUTER';
 OVER:                                  'OVER';
 PAGE:                                  'PAGE';
+PARAM_NODE:                            'PARAM_NODE';
 PARTIAL:                               'PARTIAL';
 PASSWORD:                              'PASSWORD';
 PERCENT:                               'PERCENT';
@@ -186,16 +203,20 @@ REFERENCES:                            'REFERENCES';
 RELATED_CONVERSATION:                  'RELATED_CONVERSATION';
 RELATED_CONVERSATION_GROUP:            'RELATED_CONVERSATION_GROUP';
 REPLICATION:                           'REPLICATION';
+REQUIRED:                              'REQUIRED';
 RESTORE:                               'RESTORE';
 RESTRICT:                              'RESTRICT';
+RESUME:                                'RESUME';
 RETURN:                                'RETURN';
 RETURNS:                               'RETURNS';
 REVERT:                                'REVERT';
 REVOKE:                                'REVOKE';
 RIGHT:                                 'RIGHT';
 ROLLBACK:                              'ROLLBACK';
+ROLE:                                  'ROLE';
 ROWCOUNT:                              'ROWCOUNT';
 ROWGUIDCOL:                            'ROWGUIDCOL';
+SAFETY:                                'SAFETY';
 RULE:                                  'RULE';
 SAVE:                                  'SAVE';
 SCHEMA:                                'SCHEMA';
@@ -206,6 +227,7 @@ SEMANTICSIMILARITYDETAILSTABLE:        'SEMANTICSIMILARITYDETAILSTABLE';
 SEMANTICSIMILARITYTABLE:               'SEMANTICSIMILARITYTABLE';
 SERVER:                                'SERVER';
 SERVICE:                               'SERVICE';
+SERVICE_BROKER:                        'SERVICE_BROKER';
 SESSION_USER:                          'SESSION_USER';
 SET:                                   'SET';
 SETUSER:                               'SETUSER';
@@ -213,10 +235,15 @@ SHUTDOWN:                              'SHUTDOWN';
 SOME:                                  'SOME';
 SOURCE:                                'SOURCE';
 STATISTICS:                            'STATISTICS';
+STATE:                                 'STATE';
+STARTED:                               'STARTED';
+STOPPED:                               'STOPPED';
+SUPPORTED:                             'SUPPORTED';
 SYSTEM_USER:                           'SYSTEM_USER';
 TABLE:                                 'TABLE';
 TABLESAMPLE:                           'TABLESAMPLE';
 TARGET:                                'TARGET';
+TCP:                                   'TCP';
 TEXTSIZE:                              'TEXTSIZE';
 THEN:                                  'THEN';
 TO:                                    'TO';
@@ -240,8 +267,10 @@ WAITFOR:                               'WAITFOR';
 WHEN:                                  'WHEN';
 WHERE:                                 'WHERE';
 WHILE:                                 'WHILE';
+WINDOWS:                               'WINDOWS';
 WITH:                                  'WITH';
 WITHIN:                                'WITHIN';
+WITNESS:                               'WITNESS';
 WRITETEXT:                             'WRITETEXT';
 
 // Additional keywords (they can be id).
@@ -423,6 +452,7 @@ OWNER:                                 'OWNER';
 PAGE_VERIFY:                           'PAGE_VERIFY';
 PARAMETERIZATION:                      'PARAMETERIZATION';
 PARTITION:                             'PARTITION';
+PARTNER:                               'PARTNER';
 PATH:                                  'PATH';
 POISON_MESSAGE_HANDLING:               'POISON_MESSAGE_HANDLING';
 PRECEDING:                             'PRECEDING';
@@ -484,6 +514,7 @@ STATUS:                                'STATUS';
 STDEV:                                 'STDEV';
 STDEVP:                                'STDEVP';
 SUBJECT:                               'SUBJECT';
+SUSPEND:                               'SUSPEND';
 STUFF:                                 'STUFF';
 SUM:                                   'SUM';
 SYMMETRIC:                             'SYMMETRIC';
@@ -575,6 +606,8 @@ BIT_AND:             '&';
 BIT_XOR:             '^';
 
 fragment LETTER:       [A-Z_];
+fragment IPV6_OCTECT:  [0-9A-F][0-9A-F][0-9A-F][0-9A-F];
+IPV4_OCTECT:           [0-9]?[0-9]?[0-9];
 fragment DEC_DOT_DEC:  (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DIGIT+);
 fragment HEX_DIGIT:    [0-9A-F];
 fragment DEC_DIGIT:    [0-9];

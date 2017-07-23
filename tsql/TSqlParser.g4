@@ -1,21 +1,19 @@
 /*
 T-SQL (Transact-SQL, MSSQL) grammar.
 The MIT License (MIT).
+Copyright (c) 2017, Mark Adams (madams51703@gmail.com)
 Copyright (c) 2015-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 Copyright (c) 2016, Scott Ure (scott@redstormsoftware.com).
 Copyright (c) 2016, Rui Zhang (ruizhang.ccs@gmail.com).
 Copyright (c) 2016, Marcus Henriksson (kuseman80@gmail.com).
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -67,6 +65,7 @@ dml_clause
 // Data Definition Language: https://msdn.microsoft.com/en-us/library/ff848799.aspx)
 ddl_clause
     : create_database
+    | create_endpoint
     | create_index
     | create_or_alter_procedure
     | create_or_alter_trigger
@@ -545,7 +544,7 @@ database_optionspec
       | change_tracking_option
       | containment_option
       | cursor_option
-//      | database_mirroring_option
+      | database_mirroring_option
       | date_correlation_optimization_option
       | db_encryption_option
       | db_state_option
@@ -593,11 +592,150 @@ cursor_option:
     | CURSOR_DEFAULT ( LOCAL | GLOBAL )
   ;
 
-/* Will visit later
-database_mirroring_option:
-     ALTER DATABASE Database Mirroring
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
+
+create_endpoint:
+    CREATE ENDPOINT endpointname endpoint_authorization endpoint_state endpoint_as_clause endpoint_for_clause 
+     ;
+
+endpointname:
+     endpoint_name=id 
+     ;
+
+endpoint_authorization:
+     AUTHORIZATION login=id
+     |
+;
+
+endpoint_state:
+     STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED )
+     |
+;
+
+endpoint_as_clause:
+AS TCP LR_BRACKET endpoint_tcp_protocol_specific_arguments RR_BRACKET
+;
+
+endpoint_tcp_protocol_specific_arguments:
+   LISTENER_PORT EQUAL port=DECIMAL endpoint_listener_ip
+   ;
+
+endpoint_listener_ip:
+     COMMA LISTENER_IP EQUAL (ALL | ipv4_address | ipv6_address )
+    |
     ;
+
+ipv4_address:
+   IPV4_ADDR  
+   ;
+
+
+ipv6_address:
+        IPV6_ADDR
+	;
+
+endpoint_for_clause:
+     FOR SERVICE_BROKER LR_BRACKET endpoint_server_broker_clause RR_BRACKET
+     |FOR DATABASE_MIRRORING LR_BRACKET endpoint_database_mirroring_clause RR_BRACKET
+     |
+;
+
+endpoint_database_mirroring_clause:
+	 endpoint_authentication_clause endpoint_encryption_clause endpoint_role_clause ;
+
+endpoint_role_clause:
+        endpoint_role_clause  COMMA
+	|ROLE EQUAL ( WITNESS | PARTNER | ALL )
+        ;
+
+
+endpoint_server_broker_clause:
+         endpoint_authentication_clause endpoint_encryption_clause endpoint_message_forwarding_clause endpoint_message_forward_size
+	;
+
+endpoint_authentication_clause:
+        endpoint_authentication_clause COMMA
+        |AUTHENTICATION EQUAL endpoint_authentication_clause_methods
+	|
+	;
+endpoint_authentication_clause_methods:
+	 WINDOWS windows_auth_methods
+        | CERTIFICATE cert_name=id 
+	| WINDOWS windows_auth_methods
+        | CERTIFICATE cert_name=id WINDOWS windows_auth_methods
+	;
+
+windows_auth_methods:
+	( NTLM |KERBEROS | NEGOTIATE )
+        ;
+
+endpoint_encryption_clause:
+	endpoint_encryption_clause COMMA
+	|ENCRYPTION EQUAL DISABLED
+	|ENCRYPTION EQUAL ( SUPPORTED | REQUIRED )  endpoint_encryption_algorithm
+	|
+	;
+
+endpoint_encryption_algorithm:
+	ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES )
+ 	|
+	; 
+	
+endpoint_message_forwarding_clause:
+	endpoint_message_forwarding_clause COMMA
+	|MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED )
+	|
+	;
+
+endpoint_message_forward_size:
+	MESSAGE_FORWARD_SIZE EQUAL DECIMAL
+	|
+	;
+
+/* Will visit later
 */
+database_mirroring_option:
+         mirroring_set_option
+	;
+
+mirroring_set_option:
+	 PARTNER  partner_option 
+	| WITNESS witness_option 
+	;
+
+partner_option:
+	EQUAL partner_server
+	| FAILOVER
+	| FORCE_SERVICE_ALLOW_DATA_LOSS
+	| OFF
+	| RESUME
+	| SAFETY (FULL | OFF )
+	| SUSPEND
+	| TIMEOUT DECIMAL
+	;
+
+witness_option:
+	EQUAL witness_server
+	| OFF
+	;
+
+witness_server:
+	partner_server
+	;
+
+partner_server:
+	TCP COLON DOUBLE_FORWARD_SLASH host COLON port_number
+	;
+
+port_number:
+	port=DECIMAL
+	;
+
+host:
+	id DOT host
+	|(id DOT |id)
+	;
 
 date_correlation_optimization_option:
     DATE_CORRELATION_OPTIMIZATION on_off
@@ -1146,6 +1284,7 @@ subquery
 // https://msdn.microsoft.com/en-us/library/ms175972.aspx
 with_expression
     : WITH (XMLNAMESPACES ',')? common_table_expression (',' common_table_expression)*
+    | WITH BLOCKING_HIERARCHY ('(' full_column_name_list ')')? AS '(' select_statement ')'
     ;
 
 common_table_expression
@@ -1411,52 +1550,52 @@ derived_table
     ;
 
 function_call
-    : ranking_windowed_function
-    | aggregate_windowed_function
-    | analytic_windowed_function
-    | scalar_function_name '(' expression_list? ')'
+    : ranking_windowed_function				#RANKING_WINDOWED_FUNCTION
+    | aggregate_windowed_function			#AGGREGATE_WINDOWED_FUNCTION
+    | analytic_windowed_function			#ANALYTIC_WINDOWED_FUNCTION
+    | scalar_function_name '(' expression_list? ')' 	#SCALAR_FUNCTION
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
-    | BINARY_CHECKSUM '(' '*' ')'
+    | BINARY_CHECKSUM '(' '*' ')'			#BINARY_CHECKSUM
     // https://msdn.microsoft.com/en-us/library/hh231076.aspx
     // https://msdn.microsoft.com/en-us/library/ms187928.aspx
-    | CAST '(' expression AS data_type ')'
-    | CONVERT '(' data_type ',' expression (',' style=expression)? ')'
+    | CAST '(' expression AS data_type ')'		#CAST
+    | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'				#CONVERT
     // https://msdn.microsoft.com/en-us/library/ms189788.aspx
-    | CHECKSUM '(' '*' ')'
+    | CHECKSUM '(' '*' ')'				#CHECKSUM
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
-    | COALESCE '(' expression_list ')'
+    | COALESCE '(' expression_list ')'			#COALESCE
     // https://msdn.microsoft.com/en-us/library/ms188751.aspx
-    | CURRENT_TIMESTAMP
+    | CURRENT_TIMESTAMP					#CURRENT_TIMESTAMP
     // https://msdn.microsoft.com/en-us/library/ms176050.aspx
-    | CURRENT_USER
+    | CURRENT_USER					#CURRENT_USER
     // https://msdn.microsoft.com/en-us/library/ms186819.aspx
-    | DATEADD '(' ID ',' expression ',' expression ')'
+    | DATEADD '(' ID ',' expression ',' expression ')'	#DATEADD
     // https://msdn.microsoft.com/en-us/library/ms189794.aspx
-    | DATEDIFF '(' ID ',' expression ',' expression ')'
+    | DATEDIFF '(' ID ',' expression ',' expression ')'	#DATEDIFF
     // https://msdn.microsoft.com/en-us/library/ms174395.aspx
-    | DATENAME '(' ID ',' expression ')'
+    | DATENAME '(' ID ',' expression ')'		#DATENAME
     // https://msdn.microsoft.com/en-us/library/ms174420.aspx
-    | DATEPART '(' ID ',' expression ')'
+    | DATEPART '(' ID ',' expression ')'		#DATEPART
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
-    | GETDATE '(' ')'
+    | GETDATE '(' ')'					#GETDATE
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
-    | GETUTCDATE '(' ')'
+    | GETUTCDATE '(' ')'				#GETUTCDATE
     // https://msdn.microsoft.com/en-us/library/ms189838.aspx
-    | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'
+    | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'								#IDENTITY
     // https://msdn.microsoft.com/en-us/library/bb839514.aspx
-    | MIN_ACTIVE_ROWVERSION
+    | MIN_ACTIVE_ROWVERSION				#MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
-    | NULLIF '(' expression ',' expression ')'
+    | NULLIF '(' expression ',' expression ')'		#NULLIF
     // https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
-    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'
+    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'									#STUFF
     // https://msdn.microsoft.com/en-us/library/ms177587.aspx
-    | SESSION_USER
+    | SESSION_USER					#SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
-    | SYSTEM_USER
+    | SYSTEM_USER					#SYSTEM_USER
     // https://msdn.microsoft.com/en-us/library/ms184325.aspx
-    | ISNULL '(' expression ',' expression ')'
+    | ISNULL '(' expression ',' expression ')'		#ISNULL
     // https://docs.microsoft.com/en-us/sql/t-sql/xml/xml-data-type-methods
-    | xml_data_type_methods
+    | xml_data_type_methods				#XML_DATA_TYPE_METHODS
     ;
 
 xml_data_type_methods
@@ -1469,10 +1608,13 @@ xml_data_type_methods
 
 value_method
     : (LOCAL_ID | ID | EVENTDATA | query_method) '.' VALUE '(' xquery=STRING ',' sqltype=STRING ')'
+    | (LOCAL_ID | ID | EVENTDATA | query_method) '.' ROW '.' VALUE '(' xquery=STRING ',' sqltype=STRING ')'
+    | (LOCAL_ID | ID | EVENTDATA | query_method) '.' PARAM_NODE '.' VALUE '(' xquery=STRING ',' sqltype=STRING ')'
     ;
 
 query_method
     : (LOCAL_ID | ID | full_table_name) '.' QUERY '(' xquery=STRING ')'
+    | (LOCAL_ID | ID | full_table_name) '.' ROW '.' QUERY '(' xquery=STRING ')'
     ;
 
 exist_method
@@ -1660,6 +1802,7 @@ full_table_name
 
 table_name
     : (database=id '.' (schema=id)? '.' | schema=id '.')? table=id
+    | (database=id '.' (schema=id)? '.' | schema=id '.')? BLOCKING_HIERARCHY
     ;
 
 simple_name
@@ -1674,9 +1817,17 @@ ddl_object
     : full_table_name
     | LOCAL_ID
     ;
-
+/*  There are some RESERVED WORDS that can be column names */
 full_column_name
     : (table_name '.')? id
+    | (table_name '.')? COMPATIBILITY_LEVEL
+    | (table_name '.')? STATUS
+    | (table_name '.')? QUOTED_IDENTIFIER
+    | (table_name '.')? ARITHABORT
+    | (table_name '.')? ANSI_WARNINGS
+    | (table_name '.')? ANSI_PADDING
+    | (table_name '.')? ANSI_NULLS
+
     ;
 
 column_name_list_with_order
@@ -1939,6 +2090,7 @@ simple_id
     | ROWGUID
     | ROWS
     | ROW_NUMBER
+    | SAFETY
     | SAMPLE
     | SIZE
     | SCHEMABINDING
@@ -1951,6 +2103,7 @@ simple_id
     | SNAPSHOT
     | SOURCE
     | SPATIAL_WINDOW_MAX_CELLS
+    | STATE
     | STATIC
     | STATS_STREAM
     | STDEV
