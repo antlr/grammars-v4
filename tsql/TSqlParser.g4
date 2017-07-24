@@ -75,6 +75,14 @@ ddl_clause
     | create_type
     | create_view
     | alter_table
+    | alter_application_role
+    | alter_assembly
+    | alter_asymmetric_key
+    | alter_authorization
+    | alter_authorization
+    | alter_authorization_for_sql_database
+    | alter_authorization_for_azure_dw
+    | alter_authorization_for_parallel_dw
     | alter_database
     | drop_index
     | drop_procedure
@@ -193,6 +201,183 @@ another_statement
     | set_statement
     | transaction_statement
     | use_statement
+    ;
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
+
+alter_application_role
+    : ALTER APPLICATION ROLE application_role=id  alter_application_role_with_clause
+    ;
+
+alter_application_role_with_clause
+    :WITH
+       (NAME EQUAL new_application_role_name=id COMMA?)
+       (PASSWORD EQUAL  application_role_password=STRING COMMA?)?
+       (DEFAULT_SCHEMA  EQUAL app_role_default_schema=id COMMA?)?
+    ;
+
+alter_assembly
+    : ALTER ASSEMBLY assembly_name=id alter_assembly_clause 
+    ;
+
+alter_assembly_clause
+    : alter_assembly_from_clause? alter_assembly_with_clause? alter_assembly_drop_clause? alter_assembly_add_clause?
+    ;
+
+alter_assembly_from_clause
+    : FROM (client_assembly_specifier | assembly_bits )
+    ;
+
+alter_assembly_drop_clause
+    : DROP ( multiple_local_files| ALL )
+    ;
+
+alter_assembly_add_clause
+    : ADD FILE FROM client_file_clause 
+    ;
+
+alter_assembly_add_files
+    : client_file_clause (AS id)? 
+    | file_bits AS id
+    | COMMA alter_assembly_add_files 
+    ;
+
+// need to implement
+client_file_clause
+    : STRING
+    ;
+
+//need to implement
+file_bits
+    :
+    ;
+
+alter_assembly_with_clause
+    : WITH assembly_option
+    ;
+
+client_assembly_specifier
+    : network_file_share
+    | local_file
+    | STRING
+    ;
+
+//Need to implement assembly_bits still
+assembly_bits:
+    ;
+
+assembly_option
+    : PERMISSION_SET EQUAL (SAFE|EXTERNAL_ACCESS|UNSAFE)
+    | VISIBILITY EQUAL (ON | OFF)
+    | UNCHECKED DATA
+    | COMMA assembly_option
+    ;    
+
+network_file_share
+    : DOUBLE_BACK_SLASH computer_name=id file_path
+    ;
+
+file_path
+    : '\\' file_path
+    | id
+    ;
+
+local_file
+    : DISK_DRIVE file_path
+    ;
+
+multiple_local_files
+    :
+    COMMA SINGLE_QUOTE local_file SINGLE_QUOTE
+    | local_file
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-asymmetric-key-transact-sql
+
+alter_asymmetric_key
+    :
+    ALTER ASYMMETRIC KEY Asym_Key_Name=id alter_asymmetric_key_option
+    ;
+
+alter_asymmetric_key_option
+    : asymmetric_key_option 
+    | REMOVE PRIVATE KEY ;
+
+asymmetric_key_option
+    : WITH PRIVATE KEY LR_BRACKET asymmetric_key_password_change_option ( COMMA asymmetric_key_password_change_option)? RR_BRACKET
+    ;
+
+asymmetric_key_password_change_option
+    : DECRYPTION BY PASSWORD EQUAL STRING
+    | ENCRYPTION BY PASSWORD EQUAL STRING
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-authorization-transact-sql
+
+alter_authorization
+    : ALTER AUTHORIZATION ON (class_type COLON COLON)? entity=entity_name TO ( principal_name=id | SCHEMA OWNER)
+    ; 
+
+alter_authorization_for_sql_database
+    : ALTER AUTHORIZATION ON (class_type_for_sql_database COLON COLON)? entity=entity_name TO ( principal_name=id | SCHEMA OWNER)
+    ; 
+
+alter_authorization_for_azure_dw
+    : ALTER AUTHORIZATION ON (class_type_for_sql_database COLON COLON)? entity=entity_name_for_azure_dw TO ( principal_name=id | SCHEMA OWNER)
+    ; 
+
+alter_authorization_for_parallel_dw
+    : ALTER AUTHORIZATION ON (class_type_for_sql_database COLON COLON)? entity=entity_name_for_parallel_dw TO ( principal_name=id | SCHEMA OWNER)
+    ; 
+
+class_type
+    : OBJECT 
+    | ASSEMBLY 
+    | ASYMMETRIC KEY 
+    | AVAILABILITY GROUP 
+    | CERTIFICATE     
+    | CONTRACT 
+    | TYPE 
+    | DATABASE 
+    | ENDPOINT 
+    | FULLTEXT CATALOG     
+    | FULLTEXT STOPLIST 
+    | MESSAGE TYPE 
+    | REMOTE SERVICE BINDING    
+    | ROLE 
+    | ROUTE 
+    | SCHEMA 
+    | SEARCH PROPERTY LIST 
+    | SERVER ROLE     
+    | SERVICE 
+    | SYMMETRIC KEY 
+    | XML SCHEMA COLLECTION
+    ;
+
+class_type_for_sql_database
+    :  OBJECT 
+    | ASSEMBLY 
+    | ASYMMETRIC KEY 
+    | CERTIFICATE     
+    | TYPE 
+    | DATABASE 
+    | FULLTEXT CATALOG     
+    | FULLTEXT STOPLIST     
+    | ROLE 
+    | SCHEMA 
+    | SEARCH PROPERTY LIST     
+    | SYMMETRIC KEY 
+    | XML SCHEMA COLLECTION
+    ;
+
+class_type_for_azure_dw
+    : SCHEMA
+    | OBJECT
+    ;
+  
+class_type_for_parallel_dw
+    : DATABASE
+    | SCHEMA
+    | OBJECT
     ;
 
 create_queue
@@ -323,6 +508,7 @@ insert_statement_value
     | execute_statement
     | DEFAULT VALUES
     ;
+
 
 receive_statement
     : '('? RECEIVE (ALL | DISTINCT | top_clause | '*')
@@ -596,21 +782,15 @@ cursor_option:
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
 
 create_endpoint:
-    CREATE ENDPOINT endpointname endpoint_authorization endpoint_state endpoint_as_clause endpoint_for_clause 
-     ;
-
-endpointname:
-     endpoint_name=id 
-     ;
+    CREATE ENDPOINT endpoint_name=id endpoint_authorization? endpoint_state? endpoint_as_clause endpoint_for_clause?  
+;
 
 endpoint_authorization:
      AUTHORIZATION login=id
-     |
 ;
 
 endpoint_state:
      STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED )
-     |
 ;
 
 endpoint_as_clause:
@@ -618,12 +798,11 @@ AS TCP LR_BRACKET endpoint_tcp_protocol_specific_arguments RR_BRACKET
 ;
 
 endpoint_tcp_protocol_specific_arguments:
-   LISTENER_PORT EQUAL port=DECIMAL endpoint_listener_ip
+   LISTENER_PORT EQUAL port=DECIMAL endpoint_listener_ip?
    ;
 
 endpoint_listener_ip:
      COMMA LISTENER_IP EQUAL (ALL | ipv4_address | ipv6_address )
-    |
     ;
 
 ipv4_address:
@@ -638,11 +817,10 @@ ipv6_address:
 endpoint_for_clause:
      FOR SERVICE_BROKER LR_BRACKET endpoint_server_broker_clause RR_BRACKET
      |FOR DATABASE_MIRRORING LR_BRACKET endpoint_database_mirroring_clause RR_BRACKET
-     |
 ;
 
 endpoint_database_mirroring_clause:
-	 endpoint_authentication_clause endpoint_encryption_clause endpoint_role_clause ;
+	 endpoint_authentication_clause? endpoint_encryption_clause endpoint_role_clause ;
 
 endpoint_role_clause:
         endpoint_role_clause  COMMA
@@ -651,14 +829,14 @@ endpoint_role_clause:
 
 
 endpoint_server_broker_clause:
-         endpoint_authentication_clause endpoint_encryption_clause endpoint_message_forwarding_clause endpoint_message_forward_size
+         endpoint_authentication_clause endpoint_encryption_clause? endpoint_message_forwarding_clause? endpoint_message_forward_size?
 	;
 
 endpoint_authentication_clause:
         endpoint_authentication_clause COMMA
         |AUTHENTICATION EQUAL endpoint_authentication_clause_methods
-	|
 	;
+
 endpoint_authentication_clause_methods:
 	 WINDOWS windows_auth_methods
         | CERTIFICATE cert_name=id 
@@ -673,24 +851,19 @@ windows_auth_methods:
 endpoint_encryption_clause:
 	endpoint_encryption_clause COMMA
 	|ENCRYPTION EQUAL DISABLED
-	|ENCRYPTION EQUAL ( SUPPORTED | REQUIRED )  endpoint_encryption_algorithm
-	|
+	|ENCRYPTION EQUAL ( SUPPORTED | REQUIRED )  endpoint_encryption_algorithm?
 	;
 
-endpoint_encryption_algorithm:
-	ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES )
- 	|
+endpoint_encryption_algorithm: ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES )
 	; 
 	
 endpoint_message_forwarding_clause:
 	endpoint_message_forwarding_clause COMMA
 	|MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED )
-	|
 	;
 
 endpoint_message_forward_size:
 	MESSAGE_FORWARD_SIZE EQUAL DECIMAL
-	|
 	;
 
 /* Will visit later
@@ -1793,6 +1966,22 @@ file_spec
     ;
 
 // Primitive.
+entity_name
+      : (server=id '.' database=id '.'  schema=id   '.'
+      |              database=id '.' (schema=id)? '.'
+      |                               schema=id   '.')? table=id
+    ;
+
+
+entity_name_for_azure_dw
+      : schema=id
+      | schema=id '.' object_name=id
+      ;
+
+entity_name_for_parallel_dw
+      : schema_database=id
+      | schema=id '.' object_name=id
+      ;
 
 full_table_name
     : (server=id '.' database=id '.'  schema=id   '.'
@@ -1990,6 +2179,7 @@ simple_id
     | ACTIVE
     | APPLY
     | AUTO
+    | AVAILABILITY
     | AVG
     | CALLED
     | CALLER
