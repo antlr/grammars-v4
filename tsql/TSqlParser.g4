@@ -220,22 +220,19 @@ alter_assembly
     ;
 
 alter_assembly_clause
-    : alter_assembly_from_clause alter_assembly_with_clause alter_assembly_drop_clause alter_assembly_add_clause
+    : alter_assembly_from_clause? alter_assembly_with_clause? alter_assembly_drop_clause? alter_assembly_add_clause?
     ;
 
 alter_assembly_from_clause
     : FROM (client_assembly_specifier | assembly_bits )
-    |
     ;
 
 alter_assembly_drop_clause
     : DROP ( multiple_local_files| ALL )
-    |
     ;
 
 alter_assembly_add_clause
     : ADD FILE FROM client_file_clause 
-    |
     ;
 
 alter_assembly_add_files
@@ -256,7 +253,6 @@ file_bits
 
 alter_assembly_with_clause
     : WITH assembly_option
-    |
     ;
 
 client_assembly_specifier
@@ -786,21 +782,15 @@ cursor_option:
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
 
 create_endpoint:
-    CREATE ENDPOINT endpointname endpoint_authorization endpoint_state endpoint_as_clause endpoint_for_clause 
-     ;
-
-endpointname:
-     endpoint_name=id 
-     ;
+    CREATE ENDPOINT endpoint_name=id endpoint_authorization? endpoint_state? endpoint_as_clause endpoint_for_clause?  
+;
 
 endpoint_authorization:
      AUTHORIZATION login=id
-     |
 ;
 
 endpoint_state:
      STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED )
-     |
 ;
 
 endpoint_as_clause:
@@ -808,12 +798,11 @@ AS TCP LR_BRACKET endpoint_tcp_protocol_specific_arguments RR_BRACKET
 ;
 
 endpoint_tcp_protocol_specific_arguments:
-   LISTENER_PORT EQUAL port=DECIMAL endpoint_listener_ip
+   LISTENER_PORT EQUAL port=DECIMAL endpoint_listener_ip?
    ;
 
 endpoint_listener_ip:
      COMMA LISTENER_IP EQUAL (ALL | ipv4_address | ipv6_address )
-    |
     ;
 
 ipv4_address:
@@ -828,11 +817,10 @@ ipv6_address:
 endpoint_for_clause:
      FOR SERVICE_BROKER LR_BRACKET endpoint_server_broker_clause RR_BRACKET
      |FOR DATABASE_MIRRORING LR_BRACKET endpoint_database_mirroring_clause RR_BRACKET
-     |
 ;
 
 endpoint_database_mirroring_clause:
-	 endpoint_authentication_clause endpoint_encryption_clause endpoint_role_clause ;
+	 endpoint_authentication_clause? endpoint_encryption_clause endpoint_role_clause ;
 
 endpoint_role_clause:
         endpoint_role_clause  COMMA
@@ -841,14 +829,14 @@ endpoint_role_clause:
 
 
 endpoint_server_broker_clause:
-         endpoint_authentication_clause endpoint_encryption_clause endpoint_message_forwarding_clause endpoint_message_forward_size
+         endpoint_authentication_clause endpoint_encryption_clause? endpoint_message_forwarding_clause? endpoint_message_forward_size?
 	;
 
 endpoint_authentication_clause:
         endpoint_authentication_clause COMMA
         |AUTHENTICATION EQUAL endpoint_authentication_clause_methods
-	|
 	;
+
 endpoint_authentication_clause_methods:
 	 WINDOWS windows_auth_methods
         | CERTIFICATE cert_name=id 
@@ -863,24 +851,19 @@ windows_auth_methods:
 endpoint_encryption_clause:
 	endpoint_encryption_clause COMMA
 	|ENCRYPTION EQUAL DISABLED
-	|ENCRYPTION EQUAL ( SUPPORTED | REQUIRED )  endpoint_encryption_algorithm
-	|
+	|ENCRYPTION EQUAL ( SUPPORTED | REQUIRED )  endpoint_encryption_algorithm?
 	;
 
-endpoint_encryption_algorithm:
-	ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES )
- 	|
+endpoint_encryption_algorithm: ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES )
 	; 
 	
 endpoint_message_forwarding_clause:
 	endpoint_message_forwarding_clause COMMA
 	|MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED )
-	|
 	;
 
 endpoint_message_forward_size:
 	MESSAGE_FORWARD_SIZE EQUAL DECIMAL
-	|
 	;
 
 /* Will visit later
