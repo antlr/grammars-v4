@@ -64,13 +64,20 @@ relop
    | LT
    ;
 
+   
 number
-   : MINUS? DIGIT + (POINT DIGIT +)?
+   : MINUS? NUMBER
    ;
 
 variable
-   : MINUS? LETTER (LETTER | DIGIT)*
+   : MINUS? VARIABLE
    ;
+
+VARIABLE:
+   (('a'..'z')|('A'..'Z')|'_')(('a'..'z')|('A'..'Z')|('0'..'9')|'_')*;
+
+NUMBER:
+  ('0'..'9')+ ('.' ('0'..'9')*)?;
 
 
 LPAREN
@@ -130,16 +137,6 @@ E
 
 POW
    : '^'
-   ;
-
-
-LETTER
-   : ('a' .. 'z') | ('A' .. 'Z')
-   ;
-
-
-DIGIT
-   : ('0' .. '9')
    ;
 
 
