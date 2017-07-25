@@ -130,6 +130,7 @@ bool CheckHeredocEnd(string text)
 
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);
 HtmlText:       ~[<#]+;
+XmlStart:       '<' '?' 'xml' -> pushMode(XML);
 PHPStartEcho:   PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStart:       PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
 HtmlScriptOpen: '<' 'script' { _scriptTag = true; } -> pushMode(INSIDE);
@@ -195,6 +196,13 @@ HtmlEndDoubleQuoteString:      '"' '"'? -> popMode;
 HtmlDoubleQuoteString:         ~[<"]+;
 ErrorHtmlDoubleQuote:          .          -> channel(ErrorLexem);
 
+// TODO: parse xml attributes.
+mode XML;
+
+XmlText:                  ~[?]+;
+XmlClose:                 '?' '>' -> popMode;
+XmlText2:                 '?' -> type(XmlText);
+
 // Parse JavaScript with https://github.com/antlr/grammars-v4/tree/master/ecmascript if necessary.
 // Php blocks can exist inside Script blocks too.
 mode SCRIPT;
@@ -203,9 +211,7 @@ ScriptText:               ~[<]+;
 ScriptClose:              '<' '/' 'script'? '>' -> popMode;
 PHPStartInsideScriptEcho: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartInsideScript:     PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
-ScriptText2:              '<' ~[<?/]* -> type(ScriptText);
-ScriptText3:              '?' ~[<]* -> type(ScriptText);
-ScriptText4:              '/' ~[<]* -> type(ScriptText);
+ScriptText2:              '<' -> type(ScriptText);
 
 mode STYLE;
 

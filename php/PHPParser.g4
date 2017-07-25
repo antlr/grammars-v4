@@ -66,6 +66,8 @@ htmlElement
     | StyleBody
     
     | ScriptClose
+
+    | XmlStart XmlText* XmlClose
     ;
 
 // Script
