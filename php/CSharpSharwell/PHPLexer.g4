@@ -62,7 +62,7 @@ public override IToken NextToken()
             if (_prevTokenType == SemiColon || _prevTokenType == Colon
                 || _prevTokenType == OpenCurlyBracket || _prevTokenType == CloseCurlyBracket)
             {
-                token = (CommonToken)base.NextToken();
+                token.Channel = SkipChannel;
             }
             else
             {
@@ -102,7 +102,7 @@ public override IToken NextToken()
                     }
                     else
                     {
-                        token = (CommonToken)base.NextToken();
+                        token.Channel = SkipChannel;
                     }
                 }
                 break;
@@ -202,7 +202,7 @@ mode SCRIPT;
 ScriptText:               ~[<]+;
 ScriptClose:              '<' '/' 'script'? '>' -> popMode;
 PHPStartInsideScriptEcho: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
-PHPStartInsideScript:     PhpStartFragment-> channel(SkipChannel), pushMode(PHP);
+PHPStartInsideScript:     PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
 ScriptText2:              '<' ~[<?/]* -> type(ScriptText);
 ScriptText3:              '?' ~[<]* -> type(ScriptText);
 ScriptText4:              '/' ~[<]* -> type(ScriptText);
@@ -213,7 +213,8 @@ StyleBody: .*? '</' 'style'? '>' -> popMode;
 
 mode PHP;
 
-PHPEnd:             (('?' | {AspTags}? '%') '>') | {_phpScript}? '</script>';
+PHPEnd:             (('?' | {AspTags}? '%') '>')
+      |              {_phpScript}? '</script>';
 Whitespace:         [ \t\r\n]+ -> channel(SkipChannel);
 MultiLineComment:   '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:  '//' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
@@ -223,8 +224,9 @@ Abstract:           'abstract';
 Array:              'array';
 As:                 'as';
 BinaryCast:         'binary';
-BoolType:           'boolean' | 'bool';
-BooleanConstant:    'true' | 'false';
+BoolType:           'bool' 'ean'?;
+BooleanConstant:    'true'
+               |    'false';
 Break:              'break';
 Callable:           'callable';
 Case:               'case';
@@ -242,14 +244,14 @@ Echo:               'echo';
 Else:               'else';
 ElseIf:             'elseif';
 Empty:              'empty';
-                    
+
 EndDeclare:         'enddeclare';
 EndFor:             'endfor';
 EndForeach:         'endforeach';
 EndIf:              'endif';
 EndSwitch:          'endswitch';
 EndWhile:           'endwhile';
-                    
+
 Eval:               'eval';
 Exit:               'die';
 Extends:            'extends';
@@ -306,7 +308,7 @@ Use:                'use';
 Var:                'var';
 While:              'while';
 Yield:              'yield';
-                    
+
 Get:                '__get';
 Set:                '__set';
 Call:               '__call';
@@ -340,7 +342,8 @@ Dec:                '--';
 IsIdentical:        '===';
 IsNoidentical:      '!==';
 IsEqual:            '==';
-IsNotEq:            '<>' | '!=';
+IsNotEq:            '<>'
+       |            '!=';
 IsSmallerOrEqual:   '<=';
 IsGreaterOrEqual:   '>=';
 PlusEqual:          '+=';
@@ -409,17 +412,13 @@ Real:               (Digit+ '.' Digit* | '.' Digit+) ExponentPart? | Digit+ Expo
 Hex:                '0x' HexDigit+;
 Binary:             '0b' [01]+;
 
-BackQuoteString:   '`' ~'`'* '`';
-SingleQuoteString: '\'' (~('\'' | '\\') | '\\' . )* '\'';
-DoubleQuote:       '"' -> pushMode(InterpolationString);
+BackQuoteString:    '`' ~'`'* '`';
+SingleQuoteString:  '\'' (~('\'' | '\\') | '\\' . )* '\'';
+DoubleQuote:        '"' -> pushMode(InterpolationString);
 
-StartNowDoc
-    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc)
-    ;
-StartHereDoc
-    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc)
-    ;
-ErrorPhp:                   .          -> channel(ErrorLexem);
+StartNowDoc:        '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc);
+StartHereDoc:       '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc);
+ErrorPhp:           .          -> channel(ErrorLexem);
 
 mode InterpolationString;
 

@@ -86,8 +86,7 @@ importStatement
     ;
 
 topStatement
-    : emptyStatement
-    | nonEmptyStatement
+    : statement
     | useDeclaration
     | namespaceDeclaration
     | functionDeclaration
@@ -112,7 +111,7 @@ namespaceDeclaration
     ;
 
 namespaceStatement
-    : nonEmptyStatement
+    : statement
     | useDeclaration
     | functionDeclaration
     | classDeclaration
@@ -203,17 +202,8 @@ innerStatement
     ;
 
 // Statements
-    
+
 statement
-    : nonEmptyStatement
-    | emptyStatement
-    ;
-
-emptyStatement
-    : ';'
-    ;
-
-nonEmptyStatement
     : identifier ':'
     | blockStatement
     | ifStatement
@@ -235,7 +225,12 @@ nonEmptyStatement
     | throwStatement
     | gotoStatement
     | declareStatement
-    | inlineHtml
+    | emptyStatement
+    | inlineHtmlStatement
+    ;
+
+emptyStatement
+    : ';'
     ;
 
 blockStatement
@@ -288,7 +283,7 @@ switchStatement
     ;
 
 switchBlock
-    : ((Case expression | Default) ( ':' | ';' ))+ innerStatementList
+    : ((Case expression | Default) (':' | ';'))+ innerStatementList
     ;
     
 breakStatement
@@ -343,8 +338,13 @@ declareStatement
     : Declare '(' declareList ')' (statement | ':' innerStatementList EndDeclare ';')
     ;
 
+inlineHtmlStatement
+    : inlineHtml+
+    ;
+
 inlineHtml
-    : (htmlElements | scriptTextPart)+
+    : htmlElements
+    | scriptTextPart
     ;
 
 declareList
