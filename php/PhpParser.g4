@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-parser grammar PHPParser;
+parser grammar PhpParser;
 
-options { tokenVocab=PHPLexer; }
+options { tokenVocab=PhpLexer; }
 
 // HTML
 // Also see here: https://github.com/antlr/grammars-v4/tree/master/html

@@ -2,7 +2,6 @@
 PHP grammar.
 The MIT License (MIT).
 Copyright (c) 2015-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
-Copyright (c) 2016, Jorrit Kronjee (Python port)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,91 +22,123 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-lexer grammar PHPLexer;
-
-@header {
-from antlr4.Token import CommonToken
-}
+lexer grammar PhpLexer;
 
 channels { PhpComments, ErrorLexem, SkipChannel }
 
-
 @lexer::members
+{public boolean AspTags = true;
+boolean _scriptTag;
+boolean _styleTag;
+String _heredocIdentifier;
+int _prevTokenType;
+String _htmlNameText;
+boolean _phpScript;
+boolean _insideString;
+
+@Override
+public Token nextToken()
 {
+    CommonToken token = (CommonToken)super.nextToken();
 
-AspTags = True
-_scriptTag = False
-_styleTag = False
-_heredocIdentifier = None
-_prevTokenType = 0
-_htmlNameText = None
-_phpScript = False
-_insideString = False
+    if (token.getType() == PHPEnd || token.getType() == PHPEndSingleLineComment)
+    {
+        if (_mode == SingleLineCommentMode)
+        {
+            // SingleLineCommentMode for such allowed syntax:
+            // <?php echo "Hello world"; // comment ?>
+            popMode(); // exit from SingleLineComment mode.
+        }
+        popMode(); // exit from PHP mode.
+        
+        if (token.getText().equals("</script>"))
+        {
+            _phpScript = false;
+            token.setType(ScriptClose);
+        }
+        else
+        {
+            // Add semicolon to the end of statement if it is absente.
+            // For example: <?php echo "Hello world" ?>
+            if (_prevTokenType == SemiColon || _prevTokenType == Colon
+                || _prevTokenType == OpenCurlyBracket || _prevTokenType == CloseCurlyBracket)
+            {
+                token = (CommonToken)super.nextToken();
+            }
+            else
+            {
+                token = new CommonToken(SemiColon);
+            }
+        }
+    }
+    else if (token.getType() == HtmlName)
+    {
+        _htmlNameText = token.getText();
+    }
+    else if (token.getType() == HtmlDoubleQuoteString)
+    {
+        if (token.getText().equals("php") && _htmlNameText.equals("language"))
+        {
+            _phpScript = true;
+        }
+    }
+    else if (_mode == HereDoc)
+    {
+        // Heredoc and Nowdoc syntax support: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
+        switch (token.getType())
+        {
+            case StartHereDoc:
+            case StartNowDoc:
+                _heredocIdentifier = token.getText().substring(3).trim().replace("\'","");
+                break;
 
-def nextToken(self):
-    token = super(PHPLexer_Python, self).nextToken()
+            case HereDocText:
+                if (CheckHeredocEnd(token.getText()))
+                {
+                    popMode();
+                    if (token.getText().trim().endsWith(";"))
+                    {
+                        token = new CommonToken(SemiColon);
+                    }
+                    else
+                    {
+                        token = (CommonToken)super.nextToken();
+                    }
+                }
+                break;
+        }
+    }
+    else if (_mode == PHP)
+    {
+        if (_channel != HIDDEN)
+        {
+            _prevTokenType = token.getType();
+        }
+    }
 
-    if token.type == self.PHPEnd or token.type == self.PHPEndSingleLineComment:
-        if self._mode == self.SingleLineCommentMode:
-            # SingleLineCommentMode for such allowed syntax:
-            # // <?php echo "Hello world"; // comment ?>
-            self.popMode()
-        self.popMode()
-
-        if token.text == "</script>":
-            self._phpScript = False
-            token.type = self.ScriptClose
-        else:
-            # Add semicolon to the end of statement if it is absent.
-            # For example: <?php echo "Hello world" ?>
-            if self._prevTokenType == self.SemiColon or \
-                self._prevTokenType == self.Colon or \
-                self._prevTokenType == self.OpenCurlyBracket or \
-                self._prevTokenType == self.CloseCurlyBracket:
-                token = super(PHPLexer_Python, self).nextToken()
-            else:
-                token = CommonToken(type=self.SemiColon)
-                token.text = ';'
-    elif token.type == self.HtmlName:
-        self._htmlNameText = token.text
-    elif token.type == self.HtmlDoubleQuoteString:
-        if token.text == "php" and self._htmlNameText == "language":
-            self._phpScript = True
-    elif self._mode == self.HereDoc:
-        # Heredoc and Nowdoc syntax support: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
-        if token.type == self.StartHereDoc or token.type == self.StartNowDoc:
-            self._heredocIdentifier = token.text[3:].strip().replace("'", "")
-        if token.type == self.HereDocText:
-            if self.CheckHeredocEnd(token.text):
-                self.popMode()
-                if token.text.strip().endswith(';'):
-                    token = CommonToken(type=self.SemiColon)
-                    token.text = ';'
-                else:
-                    token = super(PHPLexer_Python, self).nextToken()
-    elif self._mode == self.PHP:
-        if self._channel == self.HIDDEN:
-            self._prevTokenType = token.type
-
-    return token
-
-def CheckHeredocEnd(self, text):
-    identifier = text.strip().rstrip(';')
-    return identifier == self._heredocIdentifier
-
+    return token;
 }
+
+boolean CheckHeredocEnd(String text)
+{
+    text = text.trim();
+    boolean semi = (text.length() > 0) ? (text.charAt(text.length() - 1) == ';') : false;
+    String identifier = semi ? text.substring(0, text.length() - 1) : text;
+    boolean result = identifier.equals(_heredocIdentifier);
+    return result;
+}}
 
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);
 HtmlText:       ~[<#]+;
 PHPStartEcho:   PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStart:       PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
-HtmlScriptOpen: '<' 'script' { self._scriptTag = True } -> pushMode(INSIDE);
-HtmlStyleOpen:  '<' 'style' { self._styleTag = True } -> pushMode(INSIDE);
+HtmlScriptOpen: '<' 'script' { _scriptTag = true; } -> pushMode(INSIDE);
+HtmlStyleOpen:  '<' 'style' { _styleTag = true; } -> pushMode(INSIDE);
 HtmlComment:    '<' '!' '--' .*? '-->' -> channel(HIDDEN);
 HtmlDtd:        '<' '!' .*? '>';
 HtmlOpen:       '<' -> pushMode(INSIDE);
 Shebang
-    : { self._input.LA(-1) <= 0 or self._input.LA(-1) == ord('\r') or self._input.LA(-1) == ord('\n') }? '#' '!' ~[\r\n]*
+    : { _input.LA(-1) <= 0 || _input.LA(-1) == '\r' || _input.LA(-1) == '\n' }? '#' '!' ~[\r\n]*
     ;
 NumberSign:     '#' ~[<]* -> more;
 Error:          .         -> channel(ErrorLexem);
@@ -117,16 +148,24 @@ mode INSIDE;
 PHPStartEchoInside: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartInside:     PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
 HtmlClose: '>' {
-self.popMode()
-if self._scriptTag:
-    if not self._phpScript:
-        self.pushMode(self.SCRIPT)
-    else:
-        self.pushMode(self.PHP)
-    self._scriptTag = False
-elif self._styleTag:
-    self.pushMode(self.STYLE)
-    self._styleTag = False
+popMode();
+if (_scriptTag)
+{
+    if (!_phpScript)
+    {
+        pushMode(SCRIPT);
+    }
+    else
+    {
+        pushMode(PHP);
+    }
+    _scriptTag = false;
+}
+else if (_styleTag)
+{
+    pushMode(STYLE);
+    _styleTag = false;
+}
 };
 HtmlSlashClose: '/>' -> popMode;
 HtmlSlash:      '/';
@@ -174,7 +213,7 @@ StyleBody: .*? '</' 'style'? '>' -> popMode;
 
 mode PHP;
 
-PHPEnd:             (('?' | {self.AspTags}? '%') '>') | {self._phpScript}? '</script>';
+PHPEnd:             (('?' | {AspTags}? '%') '>') | {_phpScript}? '</script>';
 Whitespace:         [ \t\r\n]+ -> channel(SkipChannel);
 MultiLineComment:   '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:  '//' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
@@ -348,10 +387,12 @@ CloseSquareBracket: ']';
 OpenCurlyBracket:   '{';
 CloseCurlyBracket:  '}'
 {
-if self._insideString:
-    self._insideString = False
-    self.channel(SkipChannel)
-    self.popMode()
+if (_insideString)
+{
+    _insideString = false;
+    setChannel(SkipChannel);
+    popMode();
+}
 };
 Comma:              ',';
 Colon:              ':';
@@ -373,10 +414,10 @@ SingleQuoteString: '\'' (~('\'' | '\\') | '\\' . )* '\'';
 DoubleQuote:       '"' -> pushMode(InterpolationString);
 
 StartNowDoc
-    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { self._input.LA(1) == ord('\r') or self._input.LA(1) == ord('\n') }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { _input.LA(1) == '\r' || _input.LA(1) == '\n' }? -> pushMode(HereDoc)
     ;
 StartHereDoc
-    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { self._input.LA(1) == ord('\r') or self._input.LA(1) == ord('\n') }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { _input.LA(1) == '\r' || _input.LA(1) == '\n' }? -> pushMode(HereDoc)
     ;
 ErrorPhp:                   .          -> channel(ErrorLexem);
 
@@ -384,7 +425,7 @@ mode InterpolationString;
 
 VarNameInInterpolation:     '$' [a-zA-Z_][a-zA-Z_0-9]*                          -> type(VarName); // TODO: fix such cases: "$people->john"
 DollarString:               '$'                                                 -> type(StringPart);
-CurlyDollar:                '{' {self._input.LA(1) == ord('$')}? {self._insideString = True}  -> channel(SkipChannel), pushMode(PHP);
+CurlyDollar:                '{' {_input.LA(1) == '$'}? {_insideString = true;}  -> channel(SkipChannel), pushMode(PHP);
 CurlyString:                '{'                                                 -> type(StringPart);
 EscapedChar:                '\\' .                                              -> type(StringPart);
 DoubleQuoteInInterpolation: '"'                                                 -> type(DoubleQuote), popMode;
@@ -404,8 +445,8 @@ HereDocText: ~[\r\n]*? ('\r'? '\n' | '\r');
 // fragments.
 // '<?=' will be transformed to 'echo' token.
 // '<?= "Hello world"; ?>' will be transformed to '<?php echo "Hello world"; ?>'
-fragment PhpStartEchoFragment: '<' ('?' '=' | {self.AspTags}? '%' '=');
-fragment PhpStartFragment:     '<' ('?' 'php'? | {self.AspTags}? '%');
+fragment PhpStartEchoFragment: '<' ('?' '=' | {AspTags}? '%' '=');
+fragment PhpStartFragment:     '<' ('?' 'php'? | {AspTags}? '%');
 fragment NameChar
     : NameStartChar
     | '-'
