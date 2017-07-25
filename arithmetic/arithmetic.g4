@@ -49,7 +49,9 @@ factor
    ;
 
 signedAtom //allows for expressions like --++--1
-   : (MINUS | PLUS)? atom
+   : PLUS signedAtom
+   | MINUS signedAtom
+   | atom
    ;
 
 atom
