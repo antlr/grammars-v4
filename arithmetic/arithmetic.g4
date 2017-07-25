@@ -53,9 +53,17 @@ signedAtom //allows for expressions like --++--1
    ;
 
 atom
-   : SCIENTIFIC_NUMBER
-   | VARIABLE
+   : scientific
+   | variable
    | LPAREN expression RPAREN
+   ;
+
+scientific
+   : SCIENTIFIC_NUMBER
+   ;
+
+variable
+   : VARIABLE
    ;
 
 relop
