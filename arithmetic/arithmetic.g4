@@ -45,17 +45,17 @@ term
    ;
 
 factor
-   : atom (POW atom)*
+   : signedAtom (POW signedAtom)*
+   ;
+
+signedAtom //allows for expressions like --++--1
+   : (MINUS | PLUS)? atom
    ;
 
 atom
-   : scientific
-   | variable
+   : SCIENTIFIC_NUMBER
+   | VARIABLE
    | LPAREN expression RPAREN
-   ;
-
-scientific
-   : number (E number)?
    ;
 
 relop
@@ -64,21 +64,42 @@ relop
    | LT
    ;
 
-   
-number
-   : MINUS? NUMBER
+VARIABLE
+   : VALID_ID_START VALID_ID_CHAR*
    ;
 
-variable
-   : MINUS? VARIABLE
+fragment
+VALID_ID_START
+   : ('a'..'z')
+   | ('A'..'Z')
+   | '_'
    ;
 
-VARIABLE:
-   (('a'..'z')|('A'..'Z')|'_')(('a'..'z')|('A'..'Z')|('0'..'9')|'_')*;
+fragment
+VALID_ID_CHAR
+   : VALID_ID_START
+   | ('0'..'9')
+   ;
 
-NUMBER:
-  ('0'..'9')+ ('.' ('0'..'9')*)?;
+SCIENTIFIC_NUMBER
+   : NUMBER(E SIGN? NUMBER)?
+   ; //The integer part gets its potential sign from the signedAtom rule
 
+fragment
+NUMBER
+   : ('0'..'9')+ ('.' ('0'..'9')+)?
+   ;
+
+fragment
+E
+   : 'E'
+   | 'e'
+   ;
+
+fragment
+SIGN
+   : ('+' | '-')
+   ;
 
 LPAREN
    : '('
@@ -129,16 +150,9 @@ POINT
    : '.'
    ;
 
-
-E
-   : 'e' | 'E'
-   ;
-
-
 POW
    : '^'
    ;
-
 
 WS
    : [ \r\n\t] + -> channel (HIDDEN)
