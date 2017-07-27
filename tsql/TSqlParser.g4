@@ -205,18 +205,43 @@ another_statement
 //https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
 
 alter_application_role
-    : ALTER APPLICATION ROLE application_role=id  alter_application_role_with_clause
+    : alter_application_role_start application_role=id  alter_application_role_with_clause
+    ;
+
+alter_application_role_start
+    : ALTER APPLICATION ROLE
     ;
 
 alter_application_role_with_clause
-    :WITH
-       (NAME EQUAL new_application_role_name=id COMMA?)
-       (PASSWORD EQUAL  application_role_password=STRING COMMA?)?
-       (DEFAULT_SCHEMA  EQUAL app_role_default_schema=id COMMA?)?
+    : alter_application_role_with
+       (alter_application_role_with_name new_application_role_name=id COMMA?)
+       (alter_application_role_with_password  application_role_password=STRING COMMA?)?
+       (alter_application_role_with_default app_role_default_schema=id COMMA?)?
+    ;
+
+alter_application_role_with
+    : WITH
+    ;
+
+alter_application_role_with_password
+    : PASSWORD EQUAL
+    ;
+
+alter_application_role_with_default
+    : DEFAULT_SCHEMA EQUAL
+    ;
+  
+
+alter_application_role_with_name
+    : NAME EQUAL
     ;
 
 alter_assembly
-    : ALTER ASSEMBLY assembly_name=id alter_assembly_clause 
+    : alter_assembly_start assembly_name=id alter_assembly_clause 
+    ;
+
+alter_assembly_start
+    :  ALTER ASSEMBLY
     ;
 
 alter_assembly_clause
@@ -224,35 +249,64 @@ alter_assembly_clause
     ;
 
 alter_assembly_from_clause
-    : FROM (client_assembly_specifier | assembly_bits )
+    : alter_assembly_from_clause_start (client_assembly_specifier | alter_assembly_file_bits )
+    ;
+
+alter_assembly_from_clause_start
+    : FROM
     ;
 
 alter_assembly_drop_clause
-    : DROP ( multiple_local_files| ALL )
+    : alter_assembly_drop alter_assembly_drop_multiple_files
+    ;
+
+alter_assembly_drop_multiple_files
+    : ALL
+    | multiple_local_files
+    ;
+
+alter_assembly_drop
+    : DROP
     ;
 
 alter_assembly_add_clause
-    : ADD FILE FROM client_file_clause 
+    : alter_asssembly_add_clause_start alter_assembly_client_file_clause 
     ;
 
+alter_asssembly_add_clause_start
+    : ADD FILE FROM
+    ;
+   
+
 alter_assembly_add_files
-    : client_file_clause (AS id)? 
-    | file_bits AS id
-    | COMMA alter_assembly_add_files 
+    : alter_assembly_client_file_clause 
+    | alter_assembly_add_files COMMA
     ;
 
 // need to implement
-client_file_clause
+alter_assembly_client_file_clause
+    :  alter_assembly_file_name (alter_assembly_as id)?
+    ;
+
+alter_assembly_file_name
     : STRING
     ;
 
 //need to implement
-file_bits
-    :
+alter_assembly_file_bits
+    : alter_assembly_as id
+    ;
+
+alter_assembly_as
+    : AS
     ;
 
 alter_assembly_with_clause
-    : WITH assembly_option
+    : alter_assembly_with assembly_option
+    ;
+
+alter_assembly_with
+    : WITH
     ;
 
 client_assembly_specifier
@@ -261,49 +315,69 @@ client_assembly_specifier
     | STRING
     ;
 
-//Need to implement assembly_bits still
-assembly_bits:
-    ;
-
 assembly_option
     : PERMISSION_SET EQUAL (SAFE|EXTERNAL_ACCESS|UNSAFE)
     | VISIBILITY EQUAL (ON | OFF)
     | UNCHECKED DATA
-    | COMMA assembly_option
+    | assembly_option COMMA
     ;    
 
 network_file_share
-    : DOUBLE_BACK_SLASH computer_name=id file_path
+    : network_file_start network_computer file_path
+    ;
+ 
+network_computer
+    : computer_name=id
+    ;
+
+network_file_start
+    : DOUBLE_BACK_SLASH
     ;
 
 file_path
-    : '\\' file_path
+    : file_directory_path_separator file_path
     | id
     ;
 
-local_file
-    : DISK_DRIVE file_path
+file_directory_path_separator
+    : '\\'
     ;
 
+local_file
+    : local_drive file_path
+    ;
+
+local_drive
+    :
+    DISK_DRIVE
+    ;
 multiple_local_files
     :
-    COMMA SINGLE_QUOTE local_file SINGLE_QUOTE
+    multiple_local_file_start local_file SINGLE_QUOTE COMMA
     | local_file
+    ;
+
+multiple_local_file_start
+    : SINGLE_QUOTE 
     ;
 
 //https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-asymmetric-key-transact-sql
 
 alter_asymmetric_key
     :
-    ALTER ASYMMETRIC KEY Asym_Key_Name=id alter_asymmetric_key_option
+    alter_asymmetric_key_start Asym_Key_Name=id (asymmetric_key_option | REMOVE PRIVATE KEY )
     ;
 
-alter_asymmetric_key_option
-    : asymmetric_key_option 
-    | REMOVE PRIVATE KEY ;
+alter_asymmetric_key_start
+    : ALTER ASYMMETRIC KEY
+    ;
 
 asymmetric_key_option
-    : WITH PRIVATE KEY LR_BRACKET asymmetric_key_password_change_option ( COMMA asymmetric_key_password_change_option)? RR_BRACKET
+    : asymmetric_key_option_start asymmetric_key_password_change_option ( COMMA asymmetric_key_password_change_option)? RR_BRACKET
+    ;
+
+asymmetric_key_option_start
+    : WITH PRIVATE KEY LR_BRACKET
     ;
 
 asymmetric_key_password_change_option
@@ -314,20 +388,38 @@ asymmetric_key_password_change_option
 //https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-authorization-transact-sql
 
 alter_authorization
-    : ALTER AUTHORIZATION ON (class_type COLON COLON)? entity=entity_name TO ( principal_name=id | SCHEMA OWNER)
+    : alter_authorization_start (class_type colon_colon)? entity=entity_name entity_to authorization_grantee
     ; 
 
+authorization_grantee
+    : principal_name=id
+    | SCHEMA OWNER
+    ;
+
+entity_to
+    : TO
+    ;
+
+colon_colon
+    : COLON COLON
+    ;
+
+alter_authorization_start
+    : ALTER AUTHORIZATION ON 
+    ;
+
 alter_authorization_for_sql_database
-    : ALTER AUTHORIZATION ON (class_type_for_sql_database COLON COLON)? entity=entity_name TO ( principal_name=id | SCHEMA OWNER)
+    : alter_authorization_start (class_type_for_sql_database colon_colon)? entity=entity_name entity_to authorization_grantee
     ; 
 
 alter_authorization_for_azure_dw
-    : ALTER AUTHORIZATION ON (class_type_for_sql_database COLON COLON)? entity=entity_name_for_azure_dw TO ( principal_name=id | SCHEMA OWNER)
+    : alter_authorization_start (class_type_for_azure_dw colon_colon)? entity=entity_name_for_azure_dw entity_to authorization_grantee
     ; 
 
 alter_authorization_for_parallel_dw
-    : ALTER AUTHORIZATION ON (class_type_for_sql_database COLON COLON)? entity=entity_name_for_parallel_dw TO ( principal_name=id | SCHEMA OWNER)
+    : alter_authorization_start (class_type_for_parallel_dw colon_colon)? entity=entity_name_for_parallel_dw entity_to authorization_grantee
     ; 
+
 
 class_type
     : OBJECT 
@@ -781,29 +873,61 @@ cursor_option:
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
 
-create_endpoint:
-    CREATE ENDPOINT endpoint_name=id endpoint_authorization? endpoint_state? endpoint_as_clause endpoint_for_clause?  
-;
-
-endpoint_authorization:
-     AUTHORIZATION login=id
-;
-
-endpoint_state:
-     STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED )
-;
-
-endpoint_as_clause:
-AS TCP LR_BRACKET endpoint_tcp_protocol_specific_arguments RR_BRACKET
-;
-
-endpoint_tcp_protocol_specific_arguments:
-   LISTENER_PORT EQUAL port=DECIMAL endpoint_listener_ip?
+create_endpoint
+   :
+   create_endpoint_start endpoint_name=id endpoint_authorization? endpoint_state? endpoint_as_clause endpoint_for_clause?  
    ;
 
-endpoint_listener_ip:
-     COMMA LISTENER_IP EQUAL (ALL | ipv4_address | ipv6_address )
-    ;
+create_endpoint_start
+   : CREATE ENDPOINT
+   ;
+
+endpoint_authorization
+   :
+   AUTHORIZATION login=id
+   ;
+
+endpoint_state
+   :
+   STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED )
+   ;
+
+endpoint_as_clause
+   :
+   endpoint_as_clause_start endpoint_tcp_protocol_specific_arguments RR_BRACKET
+   ;
+
+endpoint_as_clause_start
+   :
+   AS TCP LR_BRACKET
+   ;
+
+endpoint_tcp_protocol_specific_arguments
+   :
+   endpoint_listener_port endpoint_listener_ip?
+   ;
+
+endpoint_listener_port
+   :
+   LISTENER_PORT EQUAL port=DECIMAL
+   ;
+
+endpoint_listener_ip
+   :
+   endpoint_listener_ip_start endpoint_listener_ip_style
+   ;
+
+endpoint_listener_ip_style
+   : ALL
+   | ipv4_address
+   | ipv6_address
+   ;
+
+
+endpoint_listener_ip_start
+   :
+   COMMA LISTENER_IP EQUAL
+   ;
 
 ipv4_address:
    IPV4_ADDR  
@@ -811,104 +935,142 @@ ipv4_address:
 
 
 ipv6_address:
-        IPV6_ADDR
-	;
+   IPV6_ADDR
+   ;
 
-endpoint_for_clause:
-     FOR SERVICE_BROKER LR_BRACKET endpoint_server_broker_clause RR_BRACKET
-     |FOR DATABASE_MIRRORING LR_BRACKET endpoint_database_mirroring_clause RR_BRACKET
+endpoint_for_clause
+   : endpoint_for_service_broker_clause_start endpoint_server_broker_clause RR_BRACKET
+   | endpoint_for_database_mirroring_start endpoint_database_mirroring_clause RR_BRACKET
 ;
 
-endpoint_database_mirroring_clause:
-	 endpoint_authentication_clause? endpoint_encryption_clause endpoint_role_clause ;
+endpoint_for_service_broker_clause_start
+   : FOR SERVICE_BROKER LR_BRACKET 
+   ;
 
-endpoint_role_clause:
-        endpoint_role_clause  COMMA
-	|ROLE EQUAL ( WITNESS | PARTNER | ALL )
-        ;
+endpoint_for_database_mirroring_start
+   : FOR DATABASE_MIRRORING LR_BRACKET
+   ;
+
+endpoint_database_mirroring_clause
+   : endpoint_authentication_clause? endpoint_encryption_clause endpoint_role_clause 
+   ;
+
+endpoint_role_clause
+   :
+   endpoint_role_clause  COMMA
+   |ROLE EQUAL ( WITNESS | PARTNER | ALL )
+   ;
 
 
-endpoint_server_broker_clause:
-         endpoint_authentication_clause endpoint_encryption_clause? endpoint_message_forwarding_clause? endpoint_message_forward_size?
-	;
+endpoint_server_broker_clause
+   : endpoint_authentication_clause endpoint_encryption_clause? endpoint_message_forwarding_clause? endpoint_message_forward_size?
+   ;
 
-endpoint_authentication_clause:
-        endpoint_authentication_clause COMMA
-        |AUTHENTICATION EQUAL endpoint_authentication_clause_methods
-	;
+endpoint_authentication_clause
+   : endpoint_authentication_clause COMMA
+   | endpoint_authentication_clause_start endpoint_authentication_clause_methods
+   ;
 
-endpoint_authentication_clause_methods:
-	 WINDOWS windows_auth_methods
-        | CERTIFICATE cert_name=id 
-	| WINDOWS windows_auth_methods
-        | CERTIFICATE cert_name=id WINDOWS windows_auth_methods
-	;
+endpoint_authentication_clause_start
+   : AUTHENTICATION EQUAL
+   ;
 
-windows_auth_methods:
-	( NTLM |KERBEROS | NEGOTIATE )
-        ;
+endpoint_authentication_clause_methods
+   :
+    WINDOWS windows_auth_methods
+   | CERTIFICATE cert_name=id 
+   | WINDOWS windows_auth_methods
+   | CERTIFICATE cert_name=id WINDOWS windows_auth_methods
+   ;
 
-endpoint_encryption_clause:
-	endpoint_encryption_clause COMMA
-	|ENCRYPTION EQUAL DISABLED
-	|ENCRYPTION EQUAL ( SUPPORTED | REQUIRED )  endpoint_encryption_algorithm?
-	;
+windows_auth_methods
+   : ( NTLM |KERBEROS | NEGOTIATE )
+   ;
 
-endpoint_encryption_algorithm: ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES )
-	; 
+endpoint_encryption_clause
+   : endpoint_encryption_clause COMMA
+   | endpoint_encryption_equal 
+   ;
+
+endpoint_encryption_equal
+   : ENCRYPTION EQUAL DISABLED
+   | ENCRYPTION EQUAL ( SUPPORTED | REQUIRED )
+   ;
+
 	
-endpoint_message_forwarding_clause:
-	endpoint_message_forwarding_clause COMMA
-	|MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED )
-	;
+endpoint_message_forwarding_clause
+   : endpoint_message_forwarding_clause COMMA
+   | MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED )
+   ;
 
-endpoint_message_forward_size:
-	MESSAGE_FORWARD_SIZE EQUAL DECIMAL
-	;
+endpoint_message_forward_size
+   : MESSAGE_FORWARD_SIZE EQUAL DECIMAL
+   ;
 
 /* Will visit later
 */
-database_mirroring_option:
-         mirroring_set_option
-	;
+database_mirroring_option
+   : mirroring_set_option
+   ;
 
-mirroring_set_option:
-	 PARTNER  partner_option 
-	| WITNESS witness_option 
-	;
+mirroring_set_option
+   : mirroring_partner  partner_option 
+   | mirroring_witness  witness_option 
+   ;
+mirroring_partner
+   : PARTNER
+   ;
 
-partner_option:
-	EQUAL partner_server
-	| FAILOVER
-	| FORCE_SERVICE_ALLOW_DATA_LOSS
-	| OFF
-	| RESUME
-	| SAFETY (FULL | OFF )
-	| SUSPEND
-	| TIMEOUT DECIMAL
-	;
+mirroring_witness
+   : WITNESS
+   ;
 
-witness_option:
-	EQUAL witness_server
-	| OFF
-	;
+witness_partner_equal
+   : EQUAL
+   ;
 
-witness_server:
-	partner_server
-	;
 
-partner_server:
-	TCP COLON DOUBLE_FORWARD_SLASH host COLON port_number
-	;
+partner_option
+   : witness_partner_equal partner_server
+   | FAILOVER
+   | FORCE_SERVICE_ALLOW_DATA_LOSS
+   | OFF
+   | RESUME
+   | SAFETY (FULL | OFF )
+   | SUSPEND
+   | TIMEOUT DECIMAL
+;
 
-port_number:
-	port=DECIMAL
-	;
+witness_option
+   : witness_partner_equal witness_server
+   | OFF
+;
 
-host:
-	id DOT host
-	|(id DOT |id)
-	;
+witness_server
+   : partner_server
+   ;
+
+partner_server
+   :
+   partner_server_tcp_prefix host mirroring_host_port_seperator port_number
+   ;
+
+mirroring_host_port_seperator
+   : COLON
+   ;
+
+partner_server_tcp_prefix
+   : TCP COLON DOUBLE_FORWARD_SLASH
+   ;
+port_number
+   :
+   port=DECIMAL
+   ;
+
+host
+   : id DOT host
+   | (id DOT |id)
+   ;
 
 date_correlation_optimization_option:
     DATE_CORRELATION_OPTIMIZATION on_off
