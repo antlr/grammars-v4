@@ -546,7 +546,7 @@ alter_table
 
 add_constraint
     : ADD (CONSTRAINT constraint_name)? (primary_key_clause | foreign_key_clause | unique_key_clause)
-    // TODO | implement add_check_constraint, but need separate rule boolean_expression
+    // TODO | implement check_constraint_clause, but need separate rule boolean_expression
     ;
 
 foreign_key_clause
