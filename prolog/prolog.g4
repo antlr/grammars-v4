@@ -30,140 +30,81 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-grammar arithmetic;
+grammar prolog;
 
-equation
-   : expression relop expression
-   ;
+program 
+    : clauselist query?
+    ;
 
-expression
-   : term ((PLUS | MINUS) term)*
-   ;
+clauselist 
+    :  clause*
+    ;
 
-term
-   : factor ((TIMES | DIV) factor)*
-   ;
+clause 
+    : (predicate '.') | (predicate ':-') (predicatelist '.')
+    ;
 
-factor
-   : signedAtom (POW signedAtom)*
-   ;
+predicatelist 
+    :  predicate (',' predicate)*
+    ;
 
-signedAtom //allows for expressions like --++--1
-   : PLUS signedAtom
-   | MINUS signedAtom
-   | atom
-   ;
+predicate 
+    : atom | atom '(' termlist ')'
+    ;
 
-atom
-   : scientific
-   | variable
-   | LPAREN expression RPAREN
-   ;
+termlist 
+    : term | termlist ',' term
+    ;
 
-scientific
-   : SCIENTIFIC_NUMBER
-   ;
+term 
+    : numeral | atom | variable | structure
+    ;
 
-variable
-   : VARIABLE
-   ;
+structure 
+    : atom '(' termlist ')'
+    ;
 
-relop
-   : EQ
-   | GT
-   | LT
-   ;
+query 
+    : '?-' predicatelist '.'
+    ;
 
-VARIABLE
-   : VALID_ID_START VALID_ID_CHAR*
-   ;
+atom 
+    : smallatom | '\'' string '\''
+    ;
 
-fragment
-VALID_ID_START
-   : ('a'..'z')
-   | ('A'..'Z')
-   | '_'
-   ;
+smallatom 
+    : LCLETTER | smallatom character
+    ;
 
-fragment
-VALID_ID_CHAR
-   : VALID_ID_START
-   | ('0'..'9')
-   ;
+variable 
+    : UCLETTER | variable character
+    ;
 
-SCIENTIFIC_NUMBER
-   : NUMBER(E SIGN? NUMBER)?
-   ; //The integer part gets its potential sign from the signedAtom rule
+numeral 
+    : DIGIT | numeral DIGIT
+    ;
 
-fragment
-NUMBER
-   : ('0'..'9')+ ('.' ('0'..'9')+)?
-   ;
+character 
+    : LCLETTER | UCLETTER | DIGIT | special
+    ;
 
-fragment
-E
-   : 'E'
-   | 'e'
-   ;
+special 
+    : '+' | '-' | '*' | '/' | '\\' | '^' | '~' | ':' | '.' | '?' | '#'| '$' | '&'
+    ;
 
-fragment
-SIGN
-   : ('+' | '-')
-   ;
+string 
+    : character | string character
+    ;
 
-LPAREN
-   : '('
-   ;
+LCLETTER
+    : [a-z_];
 
+UCLETTER
+    : [A-Z];
 
-RPAREN
-   : ')'
-   ;
-
-
-PLUS
-   : '+'
-   ;
-
-
-MINUS
-   : '-'
-   ;
-
-
-TIMES
-   : '*'
-   ;
-
-
-DIV
-   : '/'
-   ;
-
-
-GT
-   : '>'
-   ;
-
-
-LT
-   : '<'
-   ;
-
-
-EQ
-   : '='
-   ;
-
-
-POINT
-   : '.'
-   ;
-
-POW
-   : '^'
-   ;
+DIGIT
+    : [0-9];
 
 WS
-   : [ \r\n\t] + -> channel (HIDDEN)
+   : [ \t\r\n] -> skip
    ;
