@@ -40,6 +40,7 @@ unit_statement
     | alter_sequence
     | alter_trigger
     | alter_type
+    | alter_table
 
     | create_function_body
     | create_procedure_body
@@ -545,6 +546,38 @@ create_synonym
 
 comment_on_table
     : COMMENT ON TABLE tableview_name IS quoted_string
+    ;
+
+alter_table
+    : ALTER TABLE tableview_name add_constraint
+    // TODO | drop_constraint
+    ;
+
+add_constraint
+    : ADD (CONSTRAINT constraint_name)? (primary_key_clause | foreign_key_clause | unique_key_clause)
+    // TODO | implement check_constraint_clause, but need separate rule boolean_expression
+    ;
+
+foreign_key_clause
+    : FOREIGN KEY LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN references_clause on_delete_clause?
+    ;
+
+references_clause
+    : REFERENCES tableview_name LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+    ;
+
+on_delete_clause
+    : ON DELETE (CASCADE | SET NULL)
+    ;
+
+unique_key_clause
+    : UNIQUE LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+      // TODO implement  USING INDEX clause
+    ;
+
+primary_key_clause
+    : PRIMARY KEY LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+      // TODO implement  USING INDEX clause
     ;
 
 // $<Anonymous PL/SQL code block

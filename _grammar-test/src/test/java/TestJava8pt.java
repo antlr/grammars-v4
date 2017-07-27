@@ -3,13 +3,10 @@ import org.junit.Test;
 
 import java.io.File;
 
-public class TestJava8pt {
+public class TestJava8PT {
+    private static File [] ok = new File("../java8-pt/examples").listFiles(pathname -> pathname.isFile());
 
-    private static File [] ok = new File("../java8-pt/examples").listFiles
-            (pathname -> pathname.isFile());
-
-
-    private static File [] gfiles = new File [] {
+    private static File[] gfiles = new File[]{
             new File("../java8-pt/JavaLexer.g4"),
             new File("../java8-pt/JavaParser.g4")
     };
