@@ -1014,12 +1014,24 @@ database_mirroring_option
    ;
 
 mirroring_set_option
-   : PARTNER  partner_option 
-   | WITNESS  witness_option 
+   : mirroring_partner  partner_option 
+   | mirroring_witness  witness_option 
+   ;
+mirroring_partner
+   : PARTNER
    ;
 
+mirroring_witness
+   : WITNESS
+   ;
+
+witness_partner_equal
+   : EQUAL
+   ;
+
+
 partner_option
-   : EQUAL partner_server
+   : witness_partner_equal partner_server
    | FAILOVER
    | FORCE_SERVICE_ALLOW_DATA_LOSS
    | OFF
@@ -1030,7 +1042,7 @@ partner_option
 ;
 
 witness_option
-   : EQUAL witness_server
+   : witness_partner_equal witness_server
    | OFF
 ;
 
@@ -1040,9 +1052,16 @@ witness_server
 
 partner_server
    :
-   TCP COLON DOUBLE_FORWARD_SLASH host COLON port_number
+   partner_server_tcp_prefix host mirroring_host_port_seperator port_number
    ;
 
+mirroring_host_port_seperator
+   : COLON
+   ;
+
+partner_server_tcp_prefix
+   : TCP COLON DOUBLE_FORWARD_SLASH
+   ;
 port_number
    :
    port=DECIMAL
