@@ -83,6 +83,11 @@ ddl_clause
     | alter_authorization_for_sql_database
     | alter_authorization_for_azure_dw
     | alter_authorization_for_parallel_dw
+    | alter_broker_priority
+    | alter_certificate
+    | alter_column_encryption_key
+    | alter_credential
+    | alter_cryptographic_provider
     | alter_database
     | drop_index
     | drop_procedure
@@ -472,9 +477,44 @@ class_type_for_parallel_dw
     | OBJECT
     ;
 
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-broker-priority-transact-sql
+
+alter_broker_priority
+    : ALTER BROKER PRIORITY ConversationPriorityName=id FOR CONVERSATION
+      SET LR_BRACKET 
+     ( CONTRACT_NAME EQUAL (ContractName=id | ANY )  COMMA?  )?
+     ( LOCAL_SERVICE_NAME EQUAL (LocalServiceName=id | ANY ) COMMA? )?
+     ( REMOTE_SERVICE_NAME  EQUAL (RemoteServiceName=STRING | ANY ) COMMA? )?   
+     ( PRIORITY_LEVEL EQUAL ( PriorityValue=DECIMAL | DEFAULT ) ) ?
+     RR_BRACKET
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-certificate-transact-sql
+
+alter_certificate
+    : ALTER CERTIFICATE certificate_name=id (REMOVE PRIVATE_KEY | WITH PRIVATE KEY LR_BRACKET ( FILE EQUAL STRING COMMA? | DECRYPTION BY PASSWORD EQUAL STRING COMMA?| ENCRYPTION BY PASSWORD EQUAL STRING  COMMA?)+ RR_BRACKET | WITH ACTIVE FOR BEGIN_DIALOG EQUAL ( ON | OFF ) )
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-column-encryption-key-transact-sql
+
+alter_column_encryption_key
+    : ALTER COLUMN ENCRYPTION KEY column_encryption_key=id (ADD | DROP) VALUE LR_BRACKET COLUMN_MASTER_KEY EQUAL column_master_key_name=id ( COMMA ALGORITHM EQUAL algorithm_name=STRING  COMMA ENCRYPTED_VALUE EQUAL BINARY)? RR_BRACKET
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-credential-transact-sql
+
+alter_credential
+    : ALTER CREDENTIAL credential_name=id WITH IDENTITY EQUAL identity_name=STRING ( COMMA SECRET EQUAL secret=STRING )?
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-cryptographic-provider-transact-sql
+
+alter_cryptographic_provider
+    : ALTER CRYPTOGRAPHIC PROVIDER provider_name=id (FROM FILE EQUAL crypto_provider_ddl_file=STRING)? (ENABLE | DISABLE)?
+    ;
+
 create_queue
-    : CREATE QUEUE (full_table_name | queue_name=id)
-      queue_settings?
+    : CREATE QUEUE (full_table_name | queue_name=id) queue_settings?
       (ON filegroup=id | DEFAULT)?
     ;
 
@@ -2126,6 +2166,7 @@ file_spec
       ( FILEGROWTH EQUAL file_size ','? )?
       RR_BRACKET
     ;
+
 
 // Primitive.
 entity_name
