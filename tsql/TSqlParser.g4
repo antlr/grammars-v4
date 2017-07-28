@@ -83,6 +83,11 @@ ddl_clause
     | alter_authorization_for_sql_database
     | alter_authorization_for_azure_dw
     | alter_authorization_for_parallel_dw
+    | alter_broker_priority
+    | alter_certificate
+    | alter_column_encryption_key
+    | alter_credential
+    | alter_cryptographic_provider
     | alter_database
     | drop_index
     | drop_procedure
@@ -472,9 +477,44 @@ class_type_for_parallel_dw
     | OBJECT
     ;
 
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-broker-priority-transact-sql
+
+alter_broker_priority
+    : ALTER BROKER PRIORITY ConversationPriorityName=id FOR CONVERSATION
+      SET LR_BRACKET 
+     ( CONTRACT_NAME EQUAL (ContractName=id | ANY )  COMMA?  )?
+     ( LOCAL_SERVICE_NAME EQUAL (LocalServiceName=id | ANY ) COMMA? )?
+     ( REMOTE_SERVICE_NAME  EQUAL (RemoteServiceName=STRING | ANY ) COMMA? )?   
+     ( PRIORITY_LEVEL EQUAL ( PriorityValue=DECIMAL | DEFAULT ) ) ?
+     RR_BRACKET
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-certificate-transact-sql
+
+alter_certificate
+    : ALTER CERTIFICATE certificate_name=id (REMOVE PRIVATE_KEY | WITH PRIVATE KEY LR_BRACKET ( FILE EQUAL STRING COMMA? | DECRYPTION BY PASSWORD EQUAL STRING COMMA?| ENCRYPTION BY PASSWORD EQUAL STRING  COMMA?)+ RR_BRACKET | WITH ACTIVE FOR BEGIN_DIALOG EQUAL ( ON | OFF ) )
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-column-encryption-key-transact-sql
+
+alter_column_encryption_key
+    : ALTER COLUMN ENCRYPTION KEY column_encryption_key=id (ADD | DROP) VALUE LR_BRACKET COLUMN_MASTER_KEY EQUAL column_master_key_name=id ( COMMA ALGORITHM EQUAL algorithm_name=STRING  COMMA ENCRYPTED_VALUE EQUAL BINARY)? RR_BRACKET
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-credential-transact-sql
+
+alter_credential
+    : ALTER CREDENTIAL credential_name=id WITH IDENTITY EQUAL identity_name=STRING ( COMMA SECRET EQUAL secret=STRING )?
+    ;
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-cryptographic-provider-transact-sql
+
+alter_cryptographic_provider
+    : ALTER CRYPTOGRAPHIC PROVIDER provider_name=id (FROM FILE EQUAL crypto_provider_ddl_file=STRING)? (ENABLE | DISABLE)?
+    ;
+
 create_queue
-    : CREATE QUEUE (full_table_name | queue_name=id)
-      queue_settings?
+    : CREATE QUEUE (full_table_name | queue_name=id) queue_settings?
       (ON filegroup=id | DEFAULT)?
     ;
 
@@ -997,7 +1037,6 @@ endpoint_encryption_equal
    | ENCRYPTION EQUAL ( SUPPORTED | REQUIRED )
    ;
 
-	
 endpoint_message_forwarding_clause
    : endpoint_message_forwarding_clause COMMA
    | MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED )
@@ -1885,52 +1924,52 @@ derived_table
     ;
 
 function_call
-    : ranking_windowed_function				#RANKING_WINDOWED_FUNCTION
-    | aggregate_windowed_function			#AGGREGATE_WINDOWED_FUNCTION
-    | analytic_windowed_function			#ANALYTIC_WINDOWED_FUNCTION
-    | scalar_function_name '(' expression_list? ')' 	#SCALAR_FUNCTION
+    : ranking_windowed_function                         #RANKING_WINDOWED_FUNCTION
+    | aggregate_windowed_function                       #AGGREGATE_WINDOWED_FUNCTION
+    | analytic_windowed_function                        #ANALYTIC_WINDOWED_FUNCTION
+    | scalar_function_name '(' expression_list? ')'     #SCALAR_FUNCTION
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
-    | BINARY_CHECKSUM '(' '*' ')'			#BINARY_CHECKSUM
+    | BINARY_CHECKSUM '(' '*' ')'                       #BINARY_CHECKSUM
     // https://msdn.microsoft.com/en-us/library/hh231076.aspx
     // https://msdn.microsoft.com/en-us/library/ms187928.aspx
-    | CAST '(' expression AS data_type ')'		#CAST
-    | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'				#CONVERT
+    | CAST '(' expression AS data_type ')'              #CAST
+    | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
     // https://msdn.microsoft.com/en-us/library/ms189788.aspx
-    | CHECKSUM '(' '*' ')'				#CHECKSUM
+    | CHECKSUM '(' '*' ')'                              #CHECKSUM
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
-    | COALESCE '(' expression_list ')'			#COALESCE
+    | COALESCE '(' expression_list ')'                  #COALESCE
     // https://msdn.microsoft.com/en-us/library/ms188751.aspx
-    | CURRENT_TIMESTAMP					#CURRENT_TIMESTAMP
+    | CURRENT_TIMESTAMP                                 #CURRENT_TIMESTAMP
     // https://msdn.microsoft.com/en-us/library/ms176050.aspx
-    | CURRENT_USER					#CURRENT_USER
+    | CURRENT_USER                                      #CURRENT_USER
     // https://msdn.microsoft.com/en-us/library/ms186819.aspx
-    | DATEADD '(' ID ',' expression ',' expression ')'	#DATEADD
+    | DATEADD '(' ID ',' expression ',' expression ')'  #DATEADD
     // https://msdn.microsoft.com/en-us/library/ms189794.aspx
-    | DATEDIFF '(' ID ',' expression ',' expression ')'	#DATEDIFF
+    | DATEDIFF '(' ID ',' expression ',' expression ')' #DATEDIFF
     // https://msdn.microsoft.com/en-us/library/ms174395.aspx
-    | DATENAME '(' ID ',' expression ')'		#DATENAME
+    | DATENAME '(' ID ',' expression ')'                #DATENAME
     // https://msdn.microsoft.com/en-us/library/ms174420.aspx
-    | DATEPART '(' ID ',' expression ')'		#DATEPART
+    | DATEPART '(' ID ',' expression ')'                #DATEPART
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
-    | GETDATE '(' ')'					#GETDATE
+    | GETDATE '(' ')'                                   #GETDATE
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/getdate-transact-sql
-    | GETUTCDATE '(' ')'				#GETUTCDATE
+    | GETUTCDATE '(' ')'                                #GETUTCDATE
     // https://msdn.microsoft.com/en-us/library/ms189838.aspx
-    | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'								#IDENTITY
+    | IDENTITY '(' data_type (',' seed=DECIMAL)? (',' increment=DECIMAL)? ')'                                                           #IDENTITY
     // https://msdn.microsoft.com/en-us/library/bb839514.aspx
-    | MIN_ACTIVE_ROWVERSION				#MIN_ACTIVE_ROWVERSION
+    | MIN_ACTIVE_ROWVERSION                             #MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
-    | NULLIF '(' expression ',' expression ')'		#NULLIF
+    | NULLIF '(' expression ',' expression ')'          #NULLIF
     // https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
-    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'									#STUFF
+    | STUFF '(' expression ',' DECIMAL ',' DECIMAL ',' expression ')'                                                                   #STUFF
     // https://msdn.microsoft.com/en-us/library/ms177587.aspx
-    | SESSION_USER					#SESSION_USER
+    | SESSION_USER                                      #SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
-    | SYSTEM_USER					#SYSTEM_USER
+    | SYSTEM_USER                                       #SYSTEM_USER
     // https://msdn.microsoft.com/en-us/library/ms184325.aspx
-    | ISNULL '(' expression ',' expression ')'		#ISNULL
+    | ISNULL '(' expression ',' expression ')'          #ISNULL
     // https://docs.microsoft.com/en-us/sql/t-sql/xml/xml-data-type-methods
-    | xml_data_type_methods				#XML_DATA_TYPE_METHODS
+    | xml_data_type_methods                             #XML_DATA_TYPE_METHODS
     ;
 
 xml_data_type_methods
@@ -2048,9 +2087,9 @@ aggregate_windowed_function
 
 // https://docs.microsoft.com/en-us/sql/t-sql/functions/analytic-functions-transact-sql
 analytic_windowed_function
-	: (FIRST_VALUE | LAST_VALUE) '(' expression ')' over_clause
-	| (LAG | LEAD) '(' expression  (',' expression (',' expression)? )? ')' over_clause
-	;
+    : (FIRST_VALUE | LAST_VALUE) '(' expression ')' over_clause
+    | (LAG | LEAD) '(' expression  (',' expression (',' expression)? )? ')' over_clause
+    ;
 
 all_distinct_expression
     : (ALL | DISTINCT)? expression
@@ -2126,6 +2165,7 @@ file_spec
       ( FILEGROWTH EQUAL file_size ','? )?
       RR_BRACKET
     ;
+
 
 // Primitive.
 entity_name
