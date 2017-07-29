@@ -10,7 +10,7 @@ Sergey Mashkov @cy6erGn0m.
 
 ## Origin Source
 
-[https://github.com/cy6erGn0m/kotlin-antlr4-grammar](https://github.com/cy6erGn0m/kotlin-antlr4-grammar)
+<https://github.com/cy6erGn0m/kotlin-antlr4-grammar>
 
 ## License
 
