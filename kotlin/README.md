@@ -19,4 +19,4 @@ Apache 2.0.
 ## Tests
 
 Code fragments copied to a single file AllInOne.kt from 
-[https://gist.github.com/dodyg/5823184](https://gist.github.com/dodyg/5823184).
+<https://gist.github.com/dodyg/5823184>.
