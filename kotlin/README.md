@@ -12,6 +12,10 @@ Sergey Mashkov @cy6erGn0m.
 
 [https://github.com/cy6erGn0m/kotlin-antlr4-grammar](https://github.com/cy6erGn0m/kotlin-antlr4-grammar)
 
+## License
+
+Apache 2.0.
+
 ## Tests
 
 Code fragments copied to a single file AllInOne.kt from 
