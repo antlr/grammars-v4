@@ -29,8 +29,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-
 /*
 * Essentials of the grammar from here: https://compilers.iecc.com/comparch/article/07-03-118
 */
@@ -42,102 +40,166 @@ expression
    ;
 
 thousands
-    :thous_part hundreds | thous_part | hundreds
-    ;
-
+   : thous_part hundreds
+   | thous_part
+   | hundreds
+   ;
 
 thous_part
-    : thous_part M | M
-    ;
-
+   : thous_part M
+   | M
+   ;
 
 hundreds
-    : hun_part tens | hun_part | tens
-    ;
+   : hun_part tens
+   | hun_part
+   | tens
+   ;
 
 hun_part
-    :hun_rep | CD | D | D hun_rep | CM
-    ;
+   : hun_rep
+   | CD
+   | D
+   | D hun_rep
+   | CM
+   ;
 
 hun_rep
-    :C | CC | CCC
-    ;
+   : C
+   | CC
+   | CCC
+   ;
 
 tens
-    :tens_part ones | tens_part | ones
-    ;
+   : tens_part ones
+   | tens_part
+   | ones
+   ;
 
 tens_part
-    :tens_rep | XL | L | L tens_rep | XC
-    ;
+   : tens_rep
+   | XL
+   | L
+   | L tens_rep
+   | XC
+   ;
 
 tens_rep
-    : X | XX | XXX
-    ;
+   : X
+   | XX
+   | XXX
+   ;
+
+ones
+   : ones_rep
+   | IV
+   | V
+   | V ones_rep
+   | IX
+   ;
+
+ones_rep
+   : I
+   | II
+   | III
+   ;
 
 
- ones
-     : ones_rep | IV | V | V ones_rep | IX
-     ;
- 
- ones_rep
-     :  I | II | III
-     ;
-      
- M
-     : 'M'
-     ;
- 
- CD :
-    'CD';
- 
- D
-     : 'D';
- 
- CM:
-       'CM';
- 
- C:
-      'C';
- CC:
-     'CC';
- 
- CCC:
-        'CCC';
- 
- XL
-     : 'XL';
- 
- L:
-      'L';
- 
- XC:
-   'XC';
- 
- X:
-      'X';
- XX: 
-       'XX';
- 
- XXX:
-        'XXX';
- 
- 
- IV:
-       'IV';
- 
- V:
- 'V';
- 
- IX:
-       'IX';
- 
- I:'I';
- 
- II: 'II';
- 
- III : 'III';
- 
+M
+   : 'M'
+   ;
+
+
+CD
+   : 'CD'
+   ;
+
+
+D
+   : 'D'
+   ;
+
+
+CM
+   : 'CM'
+   ;
+
+
+C
+   : 'C'
+   ;
+
+
+CC
+   : 'CC'
+   ;
+
+
+CCC
+   : 'CCC'
+   ;
+
+
+XL
+   : 'XL'
+   ;
+
+
+L
+   : 'L'
+   ;
+
+
+XC
+   : 'XC'
+   ;
+
+
+X
+   : 'X'
+   ;
+
+
+XX
+   : 'XX'
+   ;
+
+
+XXX
+   : 'XXX'
+   ;
+
+
+IV
+   : 'IV'
+   ;
+
+
+V
+   : 'V'
+   ;
+
+
+IX
+   : 'IX'
+   ;
+
+
+I
+   : 'I'
+   ;
+
+
+II
+   : 'II'
+   ;
+
+
+III
+   : 'III'
+   ;
+
+
 WS
    : [ \r\n\t] + -> skip
    ;
