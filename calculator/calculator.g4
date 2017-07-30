@@ -68,6 +68,8 @@ scientific
 
 constant
    : PI
+   | EULER
+   | I
    ;
 
 variable
@@ -204,6 +206,16 @@ POW
 
 PI
    : 'pi'
+   ;
+
+
+EULER
+   : E2
+   ;
+
+
+I
+   : 'i'
    ;
 
 
