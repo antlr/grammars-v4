@@ -65,7 +65,7 @@ dml_clause
 // Data Definition Language: https://msdn.microsoft.com/en-us/library/ff848799.aspx)
 ddl_clause
     : create_database
-    | create_endpoint
+    | create_or_alter_endpoint
     | create_index
     | create_or_alter_procedure
     | create_or_alter_trigger
@@ -89,6 +89,9 @@ ddl_clause
     | alter_credential
     | alter_cryptographic_provider
     | alter_database
+    | alter_external_data_source
+    | alter_external_resource_pool
+    | alter_fulltext_catalog
     | drop_index
     | drop_procedure
     | drop_trigger
@@ -207,7 +210,7 @@ another_statement
     | transaction_statement
     | use_statement
     ;
-//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
 
 alter_application_role
     : alter_application_role_start application_role=id  alter_application_role_with_clause
@@ -366,7 +369,7 @@ multiple_local_file_start
     : SINGLE_QUOTE 
     ;
 
-//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-asymmetric-key-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-asymmetric-key-transact-sql
 
 alter_asymmetric_key
     :
@@ -390,7 +393,7 @@ asymmetric_key_password_change_option
     | ENCRYPTION BY PASSWORD EQUAL STRING
     ;
 
-//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-authorization-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-authorization-transact-sql
 
 alter_authorization
     : alter_authorization_start (class_type colon_colon)? entity=entity_name entity_to authorization_grantee
@@ -477,7 +480,7 @@ class_type_for_parallel_dw
     | OBJECT
     ;
 
-//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-broker-priority-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-broker-priority-transact-sql
 
 alter_broker_priority
     : ALTER BROKER PRIORITY ConversationPriorityName=id FOR CONVERSATION
@@ -489,34 +492,51 @@ alter_broker_priority
      RR_BRACKET
     ;
 
-//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-certificate-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-certificate-transact-sql
 
 alter_certificate
     : ALTER CERTIFICATE certificate_name=id (REMOVE PRIVATE_KEY | WITH PRIVATE KEY LR_BRACKET ( FILE EQUAL STRING COMMA? | DECRYPTION BY PASSWORD EQUAL STRING COMMA?| ENCRYPTION BY PASSWORD EQUAL STRING  COMMA?)+ RR_BRACKET | WITH ACTIVE FOR BEGIN_DIALOG EQUAL ( ON | OFF ) )
     ;
 
-//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-column-encryption-key-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-column-encryption-key-transact-sql
 
 alter_column_encryption_key
     : ALTER COLUMN ENCRYPTION KEY column_encryption_key=id (ADD | DROP) VALUE LR_BRACKET COLUMN_MASTER_KEY EQUAL column_master_key_name=id ( COMMA ALGORITHM EQUAL algorithm_name=STRING  COMMA ENCRYPTED_VALUE EQUAL BINARY)? RR_BRACKET
     ;
 
-//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-credential-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-credential-transact-sql
 
 alter_credential
     : ALTER CREDENTIAL credential_name=id WITH IDENTITY EQUAL identity_name=STRING ( COMMA SECRET EQUAL secret=STRING )?
     ;
 
-//https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-cryptographic-provider-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-cryptographic-provider-transact-sql
 
 alter_cryptographic_provider
     : ALTER CRYPTOGRAPHIC PROVIDER provider_name=id (FROM FILE EQUAL crypto_provider_ddl_file=STRING)? (ENABLE | DISABLE)?
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-data-source-transact-sql
+
+alter_external_data_source
+    : ALTER EXTERNAL DATA SOURCE data_source_name=id  SET  
+    ( LOCATION EQUAL location=(QUOTED_URL|QUOTED_HOST_AND_PORT) COMMA? |  RESOURCE_MANAGER_LOCATION EQUAL resource_manager_location=(QUOTED_URL|QUOTED_HOST_AND_PORT) COMMA? |  CREDENTIAL EQUAL credential_name=id )+
+    | ALTER EXTERNAL DATA SOURCE data_source_name=id WITH LR_BRACKET TYPE EQUAL BLOB_STORAGE COMMA LOCATION EQUAL location=STRING (COMMA CREDENTIAL EQUAL credential_name=id )? RR_BRACKET
+    ;
+
+alter_external_resource_pool
+    : ALTER EXTERNAL RESOURCE POOL (pool_name=id | DEFAULT_DOUBLE_QUOTE) WITH LR_BRACKET MAX_CPU_PERCENT EQUAL max_cpu_percent=DECIMAL ( COMMA? AFFINITY CPU EQUAL (AUTO|(DECIMAL TO DECIMAL) | NUMAMODE EQUAL DECIMAL )? (COMMA? MAX_MEMORY_PERCENT EQUAL max_memory_percent=DECIMAL)? (MAX_PROCESSES EQUAL max_processes=DECIMAL)? ) RR_BRACKET 
+    ;
+
+alter_fulltext_catalog
+    : ALTER FULLTEXT CATALOG catalog_name=id (REBUILD (WITH ACCENT_SENSITIVITY EQUAL (ON|OFF) )? | REORGANIZE | AS DEFAULT )
     ;
 
 create_queue
     : CREATE QUEUE (full_table_name | queue_name=id) queue_settings?
       (ON filegroup=id | DEFAULT)?
     ;
+
 
 queue_settings
     :WITH
@@ -753,7 +773,7 @@ ddl_trigger_operation
     : simple_id
     ;
 
-//https://msdn.microsoft.com/en-us/library/ms186755.aspx
+// https://msdn.microsoft.com/en-us/library/ms186755.aspx
 create_or_alter_function
     : (CREATE | ALTER) FUNCTION func_proc_name
         (('(' procedure_param (',' procedure_param)* ')') | '(' ')') //must have (), but can be empty
@@ -913,13 +933,13 @@ cursor_option:
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
 
-create_endpoint
+create_or_alter_endpoint
    :
-   create_endpoint_start endpoint_name=id endpoint_authorization? endpoint_state? endpoint_as_clause endpoint_for_clause?  
+   endpoint_start endpoint_name=id endpoint_authorization? endpoint_state? endpoint_as_clause endpoint_for_clause?  
    ;
 
-create_endpoint_start
-   : CREATE ENDPOINT
+endpoint_start
+   : (CREATE | ALTER)  ENDPOINT
    ;
 
 endpoint_authorization
@@ -1229,7 +1249,7 @@ drop_procedure
     : DROP proc=(PROC | PROCEDURE) (IF EXISTS)? func_proc_name (',' func_proc_name)* ';'?
     ;
 
-//https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-trigger-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-trigger-transact-sql
 drop_trigger
     : drop_dml_trigger
     | drop_ddl_trigger
@@ -1244,7 +1264,7 @@ drop_ddl_trigger
     ON (DATABASE | ALL SERVER) ';'?
     ;
 
-//https://msdn.microsoft.com/en-us/library/ms190290.aspx
+// https://msdn.microsoft.com/en-us/library/ms190290.aspx
 drop_function
     : DROP FUNCTION (IF EXISTS)? func_proc_name (',' func_proc_name)* ';'?
     ;
@@ -1856,7 +1876,7 @@ table_source_item
     | ':' ':' function_call       as_table_alias? // Build-in function (old syntax)
     ;
 
-//https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
 open_xml
     : OPENXML '(' expression ',' expression (',' expression)? ')' 
     (WITH '(' schema_declaration ')' )?
@@ -2431,6 +2451,7 @@ simple_id
     | LAST
     | LEVEL
     | LOCAL
+    | LOCATION
     | LOCK_ESCALATION
     | LOGIN
     | LOOP
