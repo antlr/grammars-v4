@@ -223,7 +223,7 @@ fragment VALID_ID_CHAR
 
 
 SCIENTIFIC_NUMBER
-   : NUMBER (E SIGN? NUMBER)?
+   : NUMBER ((E1 | E2) SIGN? NUMBER)?
    ;
 
 
@@ -232,8 +232,13 @@ fragment NUMBER
    ;
 
 
-fragment E
-   : 'E' | 'e'
+fragment E1
+   : 'E'
+   ;
+
+
+fragment E2
+   : 'e'
    ;
 
 
