@@ -33,10 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar rpn;
 
 expression
-   : signedAtom (signedAtom oper)+
+   : signedAtom term*
    ;
 
-signedAtom //allows for expressions like --++--1
+term
+   : signedAtom
+   | oper
+   ;
+
+signedAtom
    : PLUS signedAtom
    | MINUS signedAtom
    | scientific
@@ -48,32 +53,38 @@ scientific
 
 
 SCIENTIFIC_NUMBER
-   : NUMBER(E SIGN? NUMBER)?
-   ; //The integer part gets its potential sign from the signedAtom rule
-
-fragment
-NUMBER
-   : ('0'..'9')+ ('.' ('0'..'9')+)?
+   : NUMBER (E SIGN? NUMBER)?
    ;
 
-fragment
-E
-   : 'E'
-   | 'e'
+//The integer part gets its potential sign from the signedAtom rule
+
+fragment NUMBER
+   : ('0' .. '9') + ('.' ('0' .. '9') +)?
    ;
 
-fragment
-SIGN
+
+fragment E
+   : 'E' | 'e'
+   ;
+
+
+fragment SIGN
    : ('+' | '-')
    ;
 
 oper
-    : POW | PLUS | MINUS | TIMES | DIV
-    ;
+   : POW
+   | PLUS
+   | MINUS
+   | TIMES
+   | DIV
+   ;
+
 
 POW
-    : '^'
-    ;
+   : '^'
+   ;
+
 
 PLUS
    : '+'
@@ -98,6 +109,7 @@ DIV
 POINT
    : '.'
    ;
+
 
 WS
    : [ \r\n\t] + -> skip

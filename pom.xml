@@ -115,6 +115,7 @@
 			<module>rcs</module>
 			<module>redcode</module>
 			<module>robotwars</module>
+			<module>rpn</module>
 			<module>ruby</module>
 			<module>scala</module>
 			<module>scss</module>
