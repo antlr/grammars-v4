@@ -1623,7 +1623,7 @@ CharacterLiteral
 
 fragment
 SingleCharacter
-	:	~['\\]
+	:	~['\\\r\n]
 	;
 
 // §3.10.5 String Literals
