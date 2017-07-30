@@ -41,10 +41,31 @@ term
    | oper
    ;
 
+oper
+   : POW
+   | PLUS
+   | MINUS
+   | TIMES
+   | DIV
+   | COS
+   | TAN
+   | SIN
+   | ACOS
+   | ATAN
+   | ASIN
+   | LOG
+   | LN
+   ;
+
 signedAtom
    : PLUS signedAtom
    | MINUS signedAtom
    | scientific
+   | variable
+   ;
+
+variable
+   : VARIABLE
    ;
 
 scientific
@@ -72,12 +93,19 @@ fragment SIGN
    : ('+' | '-')
    ;
 
-oper
-   : POW
-   | PLUS
-   | MINUS
-   | TIMES
-   | DIV
+
+VARIABLE
+   : VALID_ID_START VALID_ID_CHAR*
+   ;
+
+
+fragment VALID_ID_START
+   : ('a' .. 'z') | ('A' .. 'Z') | '_'
+   ;
+
+
+fragment VALID_ID_CHAR
+   : VALID_ID_START | ('0' .. '9')
    ;
 
 
@@ -103,6 +131,46 @@ TIMES
 
 DIV
    : '/'
+   ;
+
+
+COS
+   : 'cos'
+   ;
+
+
+SIN
+   : 'sin'
+   ;
+
+
+TAN
+   : 'tan'
+   ;
+
+
+ACOS
+   : 'acos'
+   ;
+
+
+ASIN
+   : 'asin'
+   ;
+
+
+ATAN
+   : 'atan'
+   ;
+
+
+LN
+   : 'ln'
+   ;
+
+
+LOG
+   : 'log'
    ;
 
 
