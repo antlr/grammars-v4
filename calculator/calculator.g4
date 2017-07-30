@@ -58,6 +58,7 @@ signedAtom
 atom
    : scientific
    | variable
+   | constant
    | LPAREN expression RPAREN
    ;
 
@@ -65,12 +66,16 @@ scientific
    : SCIENTIFIC_NUMBER
    ;
 
+constant
+   : PI
+   ;
+
 variable
    : VARIABLE
    ;
 
 func
-   : funcname LPAREN expression (',' expression)* RPAREN
+   : funcname LPAREN expression (COMMA expression)* RPAREN
    ;
 
 funcname
@@ -182,6 +187,11 @@ EQ
    ;
 
 
+COMMA
+   : ','
+   ;
+
+
 POINT
    : '.'
    ;
@@ -189,6 +199,11 @@ POINT
 
 POW
    : '^'
+   ;
+
+
+PI
+   : 'pi'
    ;
 
 
