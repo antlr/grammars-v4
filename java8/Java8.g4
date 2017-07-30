@@ -1639,7 +1639,7 @@ StringCharacters
 
 fragment
 StringCharacter
-	:	~["\\]
+	:	~["\\\r\n]
 	|	EscapeSequence
 	;
 
