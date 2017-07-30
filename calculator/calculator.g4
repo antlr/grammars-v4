@@ -51,6 +51,7 @@ powExpression
 signedAtom
    : PLUS signedAtom
    | MINUS signedAtom
+   | func
    | atom
    ;
 
@@ -58,7 +59,6 @@ atom
    : scientific
    | variable
    | LPAREN expression RPAREN
-   | func
    ;
 
 scientific
@@ -82,48 +82,13 @@ funcname
    | ASIN
    | LOG
    | LN
+   | SQRT
    ;
 
 relop
    : EQ
    | GT
    | LT
-   ;
-
-
-VARIABLE
-   : VALID_ID_START VALID_ID_CHAR*
-   ;
-
-
-fragment VALID_ID_START
-   : ('a' .. 'z') | ('A' .. 'Z') | '_'
-   ;
-
-
-fragment VALID_ID_CHAR
-   : VALID_ID_START | ('0' .. '9')
-   ;
-
-
-SCIENTIFIC_NUMBER
-   : NUMBER (E SIGN? NUMBER)?
-   ;
-
-//The integer part gets its potential sign from the signedAtom rule
-
-fragment NUMBER
-   : ('0' .. '9') + ('.' ('0' .. '9') +)?
-   ;
-
-
-fragment E
-   : 'E' | 'e'
-   ;
-
-
-fragment SIGN
-   : ('+' | '-')
    ;
 
 
@@ -164,6 +129,11 @@ LN
 
 LOG
    : 'log'
+   ;
+
+
+SQRT
+   : 'sqrt'
    ;
 
 
@@ -219,6 +189,41 @@ POINT
 
 POW
    : '^'
+   ;
+
+
+VARIABLE
+   : VALID_ID_START VALID_ID_CHAR*
+   ;
+
+
+fragment VALID_ID_START
+   : ('a' .. 'z') | ('A' .. 'Z') | '_'
+   ;
+
+
+fragment VALID_ID_CHAR
+   : VALID_ID_START | ('0' .. '9')
+   ;
+
+
+SCIENTIFIC_NUMBER
+   : NUMBER (E SIGN? NUMBER)?
+   ;
+
+
+fragment NUMBER
+   : ('0' .. '9') + ('.' ('0' .. '9') +)?
+   ;
+
+
+fragment E
+   : 'E' | 'e'
+   ;
+
+
+fragment SIGN
+   : ('+' | '-')
    ;
 
 
