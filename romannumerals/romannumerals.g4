@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2017, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,233 +29,174 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/*
+* Essentials of the grammar from here: https://compilers.iecc.com/comparch/article/07-03-118
+*/
 
-grammar calculator;
-
-equation
-   : expression relop expression
-   ;
+grammar romannumerals;
 
 expression
-   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
+   : thousands
    ;
 
-multiplyingExpression
-   : powExpression ((TIMES | DIV) powExpression)*
+thousands
+   : thous_part hundreds
+   | thous_part
+   | hundreds
    ;
 
-powExpression
-   : signedAtom (POW signedAtom)*
+thous_part
+   : thous_part M
+   | M
    ;
 
-signedAtom
-   : PLUS signedAtom
-   | MINUS signedAtom
-   | func
-   | atom
+hundreds
+   : hun_part tens
+   | hun_part
+   | tens
    ;
 
-atom
-   : scientific
-   | variable
-   | constant
-   | LPAREN expression RPAREN
+hun_part
+   : hun_rep
+   | CD
+   | D
+   | D hun_rep
+   | CM
    ;
 
-scientific
-   : SCIENTIFIC_NUMBER
+hun_rep
+   : C
+   | CC
+   | CCC
    ;
 
-constant
-   : PI
-   | EULER
-   | I
+tens
+   : tens_part ones
+   | tens_part
+   | ones
    ;
 
-variable
-   : VARIABLE
+tens_part
+   : tens_rep
+   | XL
+   | L
+   | L tens_rep
+   | XC
    ;
 
-func
-   : funcname LPAREN expression (COMMA expression)* RPAREN
+tens_rep
+   : X
+   | XX
+   | XXX
    ;
 
-funcname
-   : COS
-   | TAN
-   | SIN
-   | ACOS
-   | ATAN
-   | ASIN
-   | LOG
-   | LN
-   | SQRT
+ones
+   : ones_rep
+   | IV
+   | V
+   | V ones_rep
+   | IX
    ;
 
-relop
-   : EQ
-   | GT
-   | LT
-   ;
-
-
-COS
-   : 'cos'
-   ;
-
-
-SIN
-   : 'sin'
+ones_rep
+   : I
+   | II
+   | III
    ;
 
 
-TAN
-   : 'tan'
+M
+   : 'M'
    ;
 
 
-ACOS
-   : 'acos'
+CD
+   : 'CD'
    ;
 
 
-ASIN
-   : 'asin'
+D
+   : 'D'
    ;
 
 
-ATAN
-   : 'atan'
+CM
+   : 'CM'
    ;
 
 
-LN
-   : 'ln'
+C
+   : 'C'
    ;
 
 
-LOG
-   : 'log'
+CC
+   : 'CC'
    ;
 
 
-SQRT
-   : 'sqrt'
+CCC
+   : 'CCC'
    ;
 
 
-LPAREN
-   : '('
+XL
+   : 'XL'
    ;
 
 
-RPAREN
-   : ')'
+L
+   : 'L'
    ;
 
 
-PLUS
-   : '+'
+XC
+   : 'XC'
    ;
 
 
-MINUS
-   : '-'
+X
+   : 'X'
    ;
 
 
-TIMES
-   : '*'
+XX
+   : 'XX'
    ;
 
 
-DIV
-   : '/'
+XXX
+   : 'XXX'
    ;
 
 
-GT
-   : '>'
+IV
+   : 'IV'
    ;
 
 
-LT
-   : '<'
+V
+   : 'V'
    ;
 
 
-EQ
-   : '='
-   ;
-
-
-COMMA
-   : ','
-   ;
-
-
-POINT
-   : '.'
-   ;
-
-
-POW
-   : '^'
-   ;
-
-
-PI
-   : 'pi'
-   ;
-
-
-EULER
-   : E2
+IX
+   : 'IX'
    ;
 
 
 I
-   : 'i'
+   : 'I'
    ;
 
 
-VARIABLE
-   : VALID_ID_START VALID_ID_CHAR*
+II
+   : 'II'
    ;
 
 
-fragment VALID_ID_START
-   : ('a' .. 'z') | ('A' .. 'Z') | '_'
-   ;
-
-
-fragment VALID_ID_CHAR
-   : VALID_ID_START | ('0' .. '9')
-   ;
-
-
-SCIENTIFIC_NUMBER
-   : NUMBER ((E1 | E2) SIGN? NUMBER)?
-   ;
-
-
-fragment NUMBER
-   : ('0' .. '9') + ('.' ('0' .. '9') +)?
-   ;
-
-
-fragment E1
-   : 'E'
-   ;
-
-
-fragment E2
-   : 'e'
-   ;
-
-
-fragment SIGN
-   : ('+' | '-')
+III
+   : 'III'
    ;
 
 

@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2017, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,58 +30,24 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-grammar calculator;
-
-equation
-   : expression relop expression
-   ;
+grammar rpn;
 
 expression
-   : multiplyingExpression ((PLUS | MINUS) multiplyingExpression)*
+   : signedAtom term*
    ;
 
-multiplyingExpression
-   : powExpression ((TIMES | DIV) powExpression)*
+term
+   : signedAtom
+   | oper
    ;
 
-powExpression
-   : signedAtom (POW signedAtom)*
-   ;
-
-signedAtom
-   : PLUS signedAtom
-   | MINUS signedAtom
-   | func
-   | atom
-   ;
-
-atom
-   : scientific
-   | variable
-   | constant
-   | LPAREN expression RPAREN
-   ;
-
-scientific
-   : SCIENTIFIC_NUMBER
-   ;
-
-constant
-   : PI
-   | EULER
-   | I
-   ;
-
-variable
-   : VARIABLE
-   ;
-
-func
-   : funcname LPAREN expression (COMMA expression)* RPAREN
-   ;
-
-funcname
-   : COS
+oper
+   : POW
+   | PLUS
+   | MINUS
+   | TIMES
+   | DIV
+   | COS
    | TAN
    | SIN
    | ACOS
@@ -89,13 +55,82 @@ funcname
    | ASIN
    | LOG
    | LN
-   | SQRT
    ;
 
-relop
-   : EQ
-   | GT
-   | LT
+signedAtom
+   : PLUS signedAtom
+   | MINUS signedAtom
+   | scientific
+   | variable
+   ;
+
+variable
+   : VARIABLE
+   ;
+
+scientific
+   : SCIENTIFIC_NUMBER
+   ;
+
+
+SCIENTIFIC_NUMBER
+   : NUMBER (E SIGN? NUMBER)?
+   ;
+
+//The integer part gets its potential sign from the signedAtom rule
+
+fragment NUMBER
+   : ('0' .. '9') + ('.' ('0' .. '9') +)?
+   ;
+
+
+fragment E
+   : 'E' | 'e'
+   ;
+
+
+fragment SIGN
+   : ('+' | '-')
+   ;
+
+
+VARIABLE
+   : VALID_ID_START VALID_ID_CHAR*
+   ;
+
+
+fragment VALID_ID_START
+   : ('a' .. 'z') | ('A' .. 'Z') | '_'
+   ;
+
+
+fragment VALID_ID_CHAR
+   : VALID_ID_START | ('0' .. '9')
+   ;
+
+
+POW
+   : '^'
+   ;
+
+
+PLUS
+   : '+'
+   ;
+
+
+MINUS
+   : '-'
+   ;
+
+
+TIMES
+   : '*'
+   ;
+
+
+DIV
+   : '/'
    ;
 
 
@@ -139,123 +174,8 @@ LOG
    ;
 
 
-SQRT
-   : 'sqrt'
-   ;
-
-
-LPAREN
-   : '('
-   ;
-
-
-RPAREN
-   : ')'
-   ;
-
-
-PLUS
-   : '+'
-   ;
-
-
-MINUS
-   : '-'
-   ;
-
-
-TIMES
-   : '*'
-   ;
-
-
-DIV
-   : '/'
-   ;
-
-
-GT
-   : '>'
-   ;
-
-
-LT
-   : '<'
-   ;
-
-
-EQ
-   : '='
-   ;
-
-
-COMMA
-   : ','
-   ;
-
-
 POINT
    : '.'
-   ;
-
-
-POW
-   : '^'
-   ;
-
-
-PI
-   : 'pi'
-   ;
-
-
-EULER
-   : E2
-   ;
-
-
-I
-   : 'i'
-   ;
-
-
-VARIABLE
-   : VALID_ID_START VALID_ID_CHAR*
-   ;
-
-
-fragment VALID_ID_START
-   : ('a' .. 'z') | ('A' .. 'Z') | '_'
-   ;
-
-
-fragment VALID_ID_CHAR
-   : VALID_ID_START | ('0' .. '9')
-   ;
-
-
-SCIENTIFIC_NUMBER
-   : NUMBER ((E1 | E2) SIGN? NUMBER)?
-   ;
-
-
-fragment NUMBER
-   : ('0' .. '9') + ('.' ('0' .. '9') +)?
-   ;
-
-
-fragment E1
-   : 'E'
-   ;
-
-
-fragment E2
-   : 'e'
-   ;
-
-
-fragment SIGN
-   : ('+' | '-')
    ;
 
 
