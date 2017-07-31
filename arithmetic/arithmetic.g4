@@ -48,7 +48,7 @@ factor
    : signedAtom (POW signedAtom)*
    ;
 
-signedAtom //allows for expressions like --++--1
+signedAtom
    : PLUS signedAtom
    | MINUS signedAtom
    | atom
@@ -74,42 +74,42 @@ relop
    | LT
    ;
 
+
 VARIABLE
    : VALID_ID_START VALID_ID_CHAR*
    ;
 
-fragment
-VALID_ID_START
-   : ('a'..'z')
-   | ('A'..'Z')
-   | '_'
+
+fragment VALID_ID_START
+   : ('a' .. 'z') | ('A' .. 'Z') | '_'
    ;
 
-fragment
-VALID_ID_CHAR
-   : VALID_ID_START
-   | ('0'..'9')
+
+fragment VALID_ID_CHAR
+   : VALID_ID_START | ('0' .. '9')
    ;
+
 
 SCIENTIFIC_NUMBER
-   : NUMBER(E SIGN? NUMBER)?
-   ; //The integer part gets its potential sign from the signedAtom rule
-
-fragment
-NUMBER
-   : ('0'..'9')+ ('.' ('0'..'9')+)?
+   : NUMBER (E SIGN? NUMBER)?
    ;
 
-fragment
-E
-   : 'E'
-   | 'e'
+//The integer part gets its potential sign from the signedAtom rule
+
+fragment NUMBER
+   : ('0' .. '9') + ('.' ('0' .. '9') +)?
    ;
 
-fragment
-SIGN
+
+fragment E
+   : 'E' | 'e'
+   ;
+
+
+fragment SIGN
    : ('+' | '-')
    ;
+
 
 LPAREN
    : '('
@@ -160,10 +160,12 @@ POINT
    : '.'
    ;
 
+
 POW
    : '^'
    ;
 
+
 WS
-   : [ \r\n\t] + -> channel (HIDDEN)
+   : [ \r\n\t] + -> skip
    ;
