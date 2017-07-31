@@ -1,0 +1,2 @@
+ALTER REMOTE SERVICE BINDING APBinding  
+    WITH USER = SecurityAccount 

@@ -1,0 +1,3 @@
+ALTER ROLE buyers WITH NAME = purchasing;  
+ALTER ROLE Sales ADD MEMBER Barry;
+ALTER ROLE Sales DROP MEMBER Barry;
