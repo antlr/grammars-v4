@@ -92,6 +92,9 @@ ddl_clause
     | alter_external_data_source
     | alter_external_resource_pool
     | alter_fulltext_catalog
+    | alter_login_sql_server
+    | alter_login_azure_sql
+    | alter_login_azure_sql_dw_and_pdw
     | drop_index
     | drop_procedure
     | drop_trigger
@@ -524,12 +527,27 @@ alter_external_data_source
     | ALTER EXTERNAL DATA SOURCE data_source_name=id WITH LR_BRACKET TYPE EQUAL BLOB_STORAGE COMMA LOCATION EQUAL location=STRING (COMMA CREDENTIAL EQUAL credential_name=id )? RR_BRACKET
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-resource-pool-transact-sql
 alter_external_resource_pool
     : ALTER EXTERNAL RESOURCE POOL (pool_name=id | DEFAULT_DOUBLE_QUOTE) WITH LR_BRACKET MAX_CPU_PERCENT EQUAL max_cpu_percent=DECIMAL ( COMMA? AFFINITY CPU EQUAL (AUTO|(DECIMAL TO DECIMAL) | NUMAMODE EQUAL DECIMAL )? (COMMA? MAX_MEMORY_PERCENT EQUAL max_memory_percent=DECIMAL)? (MAX_PROCESSES EQUAL max_processes=DECIMAL)? ) RR_BRACKET 
     ;
-
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-fulltext-catalog-transact-sql
 alter_fulltext_catalog
     : ALTER FULLTEXT CATALOG catalog_name=id (REBUILD (WITH ACCENT_SENSITIVITY EQUAL (ON|OFF) )? | REORGANIZE | AS DEFAULT )
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-login-transact-sql
+alter_login_sql_server
+    : ALTER LOGIN login_name=id
+       ( (ENABLE|DISABLE)?  | WITH ( (PASSWORD EQUAL ( password=STRING | password_hash=BINARY HASHED ) ) (MUST_CHANGE|UNLOCK)* )? (OLD_PASSWORD EQUAL old_password=STRING (MUST_CHANGE|UNLOCK)* )? (DEFAULT_DATABASE EQUAL default_database=id)? (DEFAULT_LANGUAGE EQUAL default_laguage=id)?  (NAME EQUAL login_name=id)? (CHECK_POLICY EQUAL (ON|OFF) )? (CHECK_EXPIRATION EQUAL (ON|OFF) )? (CREDENTIAL EQUAL credential_name=id)? (NO CREDENTIAL)? | (ADD|DROP) CREDENTIAL credential_name=id )
+    ;
+
+alter_login_azure_sql
+    : ALTER LOGIN login_name=id ( (ENABLE|DISABLE)? | WITH (PASSWORD EQUAL password=STRING (OLD_PASSWORD EQUAL old_password=STRING)? | NAME EQUAL login_name=id ) )
+    ;
+
+alter_login_azure_sql_dw_and_pdw
+    : ALTER LOGIN login_name=id ( (ENABLE|DISABLE)? | WITH (PASSWORD EQUAL password=STRING (OLD_PASSWORD EQUAL old_password=STRING (MUST_CHANGE|UNLOCK)* )? | NAME EQUAL login_name=id ) )
     ;
 
 create_queue
