@@ -42,6 +42,7 @@
 			<module>clif</module>
 			<module>clojure</module>
 			<module>cobol85</module>
+			<module>cookie</module>			
 			<module>cool</module>
 			<module>cpp</module>
 			<module>creole</module>
@@ -114,6 +115,7 @@
 			<module>rcs</module>
 			<module>redcode</module>
 			<module>robotwars</module>
+			<module>rpn</module>
 			<module>ruby</module>
 			<module>scala</module>
 			<module>scss</module>
