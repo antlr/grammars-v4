@@ -105,6 +105,9 @@ ddl_clause
     | alter_schema_sql
     | alter_schema_azure_sql_dw_and_pdw
     | alter_sequence
+    | alter_server_audit
+    | alter_server_audit_specification
+    | alter_server_configuration
     | drop_index
     | drop_procedure
     | drop_trigger
@@ -539,7 +542,7 @@ alter_external_data_source
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-resource-pool-transact-sql
 alter_external_resource_pool
-    : ALTER EXTERNAL RESOURCE POOL (pool_name=id | DEFAULT_DOUBLE_QUOTE) WITH LR_BRACKET MAX_CPU_PERCENT EQUAL max_cpu_percent=DECIMAL ( COMMA? AFFINITY CPU EQUAL (AUTO|(DECIMAL TO DECIMAL) | NUMAMODE EQUAL DECIMAL )? (COMMA? MAX_MEMORY_PERCENT EQUAL max_memory_percent=DECIMAL)? (MAX_PROCESSES EQUAL max_processes=DECIMAL)? ) RR_BRACKET 
+    : ALTER EXTERNAL RESOURCE POOL (pool_name=id | DEFAULT_DOUBLE_QUOTE) WITH LR_BRACKET MAX_CPU_PERCENT EQUAL max_cpu_percent=DECIMAL ( COMMA? AFFINITY CPU EQUAL (AUTO|(COMMA? DECIMAL TO DECIMAL |COMMA DECIMAL )+ ) | NUMANODE EQUAL (COMMA? DECIMAL TO DECIMAL| COMMA? DECIMAL )+  ) (COMMA? MAX_MEMORY_PERCENT EQUAL max_memory_percent=DECIMAL)? (COMMA? MAX_PROCESSES EQUAL max_processes=DECIMAL)?  RR_BRACKET 
     ;
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-fulltext-catalog-transact-sql
 alter_fulltext_catalog
@@ -607,8 +610,28 @@ alter_schema_azure_sql_dw_and_pdw
     : ALTER SCHEMA schema_name=id TRANSFER (OBJECT COLON COLON )? id (DOT ID)?
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-sequence-transact-sql
 alter_sequence
     : ALTER SEQUENCE (schema_name=id DOT)? sequence_name=id ( RESTART (WITH DECIMAL)? )? (INCREMENT BY sequnce_increment=DECIMAL )? ( MINVALUE DECIMAL| NO MINVALUE)? (MAXVALUE DECIMAL| NO MAXVALUE)? (CYCLE|NO CYCLE)? (CACHE DECIMAL | NO CACHE)?
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-server-audit-transact-sql
+alter_server_audit
+    : ALTER SERVER AUDIT audit_name=id  ( ( TO (FILE  ( LR_BRACKET ( COMMA? FILEPATH EQUAL filepath=STRING | COMMA? MAXSIZE EQUAL ( DECIMAL (MB|GB|TB) |  UNLIMITED ) | COMMA? MAX_ROLLOVER_FILES EQUAL max_rollover_files=(DECIMAL|UNLIMITED) | COMMA? MAX_FILES EQUAL max_files=DECIMAL | COMMA? RESERVE_DISK_SPACE EQUAL (ON|OFF)  )* RR_BRACKET ) | APPLICATION_LOG | SECURITY_LOG ) )? ( WITH LR_BRACKET (COMMA? QUEUE_DELAY EQUAL queue_delay=DECIMAL | COMMA? ON_FAILURE EQUAL (CONTINUE | SHUTDOWN|FAIL_OPERATION) |COMMA?  STATE EQUAL (ON|OFF) )* RR_BRACKET )? ( WHERE ( COMMA? (NOT?) event_field_name=id (EQUAL |(LESS GREATER) | (EXCLAMATION EQUAL) | GREATER  | (GREATER EQUAL)| LESS | LESS EQUAL) (DECIMAL | STRING)  | COMMA? (AND|OR) NOT? (EQUAL |(LESS GREATER) | (EXCLAMATION EQUAL) | GREATER  | (GREATER EQUAL)| LESS | LESS EQUAL) (DECIMAL | STRING) ) )? | REMOVE WHERE | MODIFY NAME EQUAL new_audit_name=id  )
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-server-audit-specification-transact-sql
+
+alter_server_audit_specification
+    : ALTER SERVER AUDIT SPECIFICATION audit_specification_name=id
+      (FOR SERVER AUDIT audit_name=id)? (  (ADD|DROP) LR_BRACKET  audit_action_group_name=id RR_BRACKET )* (WITH LR_BRACKET STATE EQUAL (ON|OFF) RR_BRACKET )?
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-server-configuration-transact-sql
+
+alter_server_configuration
+    : ALTER SERVER CONFIGURATION 
+      SET  ( (PROCESS AFFINITY (CPU EQUAL (AUTO | (COMMA? DECIMAL | COMMA? DECIMAL TO DECIMAL)+ ) | NUMANODE EQUAL ( COMMA? DECIMAL |COMMA?  DECIMAL TO DECIMAL)+ ) | DIAGNOSTICS LOG (ON|OFF|PATH EQUAL (STRING | DEFAULT) |MAX_SIZE EQUAL (DECIMAL MB |DEFAULT)|MAX_FILES EQUAL (DECIMAL|DEFAULT) ) | FAILOVER CLUSTER PROPERTY (VERBOSELOGGING EQUAL (STRING|DEFAULT) |SQLDUMPERFLAGS EQUAL (STRING|DEFAULT) | SQLDUMPERPATH EQUAL (STRING|DEFAULT) | SQLDUMPERTIMEOUT (STRING|DEFAULT) | FAILURECONDITIONLEVEL EQUAL (STRING|DEFAULT) | HEALTHCHECKTIMEOUT EQUAL (DECIMAL|DEFAULT) ) | HADR CLUSTER CONTEXT EQUAL (STRING|LOCAL) | BUFFER POOL EXTENSION (ON LR_BRACKET FILENAME EQUAL STRING COMMA SIZE EQUAL DECIMAL (KB|MB|GB)  RR_BRACKET | OFF ) | SET SOFTNUMA (ON|OFF) ) )
     ;
 
 create_queue
@@ -1798,11 +1821,12 @@ predicate
     | '(' search_condition ')'
     ;
 
+// Changed union rule to sql_union to avoid union class with C++ target.  Issue found by Lahsen Baali
 query_expression
-    : (query_specification | '(' query_expression ')') union*
+    : (query_specification | '(' query_expression ')') sql_union*
     ;
 
-union
+sql_union
     : (UNION ALL? | EXCEPT | INTERSECT) (query_specification | ('(' query_expression ')'))
     ;
 
