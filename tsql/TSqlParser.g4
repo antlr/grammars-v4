@@ -95,6 +95,16 @@ ddl_clause
     | alter_login_sql_server
     | alter_login_azure_sql
     | alter_login_azure_sql_dw_and_pdw
+    | alter_master_key_sql_server
+    | alter_master_key_azure_sql
+    | alter_message_type
+    | alter_partition_scheme
+    | alter_remote_service_binding
+    | alter_resource_governor
+    | alter_db_role
+    | alter_schema_sql
+    | alter_schema_azure_sql_dw_and_pdw
+    | alter_sequence
     | drop_index
     | drop_procedure
     | drop_trigger
@@ -548,6 +558,57 @@ alter_login_azure_sql
 
 alter_login_azure_sql_dw_and_pdw
     : ALTER LOGIN login_name=id ( (ENABLE|DISABLE)? | WITH (PASSWORD EQUAL password=STRING (OLD_PASSWORD EQUAL old_password=STRING (MUST_CHANGE|UNLOCK)* )? | NAME EQUAL login_name=id ) )
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-master-key-transact-sql
+alter_master_key_sql_server
+    : ALTER MASTER KEY ( (FORCE)? REGENERATE WITH ENCRYPTION BY PASSWORD EQUAL password=STRING |(ADD|DROP) ENCRYPTION BY (SERVICE MASTER KEY | PASSWORD EQUAL encryption_password=STRING) )
+    ;
+
+alter_master_key_azure_sql
+    : ALTER MASTER KEY ( (FORCE)? REGENERATE WITH ENCRYPTION BY PASSWORD EQUAL password=STRING |ADD ENCRYPTION BY (SERVICE MASTER KEY | PASSWORD EQUAL encryption_password=STRING) | DROP ENCRYPTION BY  PASSWORD EQUAL encryption_password=STRING )
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-message-type-transact-sql
+alter_message_type
+    : ALTER MESSAGE TYPE message_type_name=id VALIDATION EQUAL (NONE | EMPTY | WELL_FORMED_XML | VALID_XML WITH SCHEMA COLLECTION schema_collection_name=id)
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-partition-scheme-transact-sql
+alter_partition_scheme
+    : ALTER PARTITION SCHEME partition_scheme_name=id NEXT USED (file_group_name=id)?
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-remote-service-binding-transact-sql
+alter_remote_service_binding
+    : ALTER REMOTE SERVICE BINDING binding_name=id WITH (USER EQUAL user_name=id)? (COMMA ANONYMOUS EQUAL (ON|OFF) )?
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-resource-governor-transact-sql
+alter_resource_governor
+    : ALTER RESOURCE GOVERNOR ( (DISABLE | RECONFIGURE) | WITH LR_BRACKET CLASSIFIER_FUNCTION EQUAL ( schema_name=id DOT function_name=id | NULL ) RR_BRACKET | RESET STATISTICS | WITH LR_BRACKET MAX_OUTSTANDING_IO_PER_VOLUME EQUAL max_outstanding_io_per_volume=DECIMAL RR_BRACKET )
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-role-transact-sql
+alter_db_role
+    : ALTER ROLE role_name=id ( (ADD|DROP) MEMBER database_principal=id | WITH NAME EQUAL new_role_name=id )
+    ; 
+
+alter_db_role_2008
+    : ALTER ROLE role_name=id (  WITH NAME EQUAL new_role_name=id )
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-schema-transact-sql
+alter_schema_sql
+    : ALTER SCHEMA schema_name=id TRANSFER ((OBJECT|TYPE|XML SCHEMA COLLECTION) COLON COLON )? id (DOT ID)?
+    ;
+
+alter_schema_azure_sql_dw_and_pdw
+    : ALTER SCHEMA schema_name=id TRANSFER (OBJECT COLON COLON )? id (DOT ID)?
+    ;
+
+alter_sequence
+    : ALTER SEQUENCE (schema_name=id DOT)? sequence_name=id ( RESTART (WITH DECIMAL)? )? (INCREMENT BY sequnce_increment=DECIMAL )? ( MINVALUE DECIMAL| NO MINVALUE)? (MAXVALUE DECIMAL| NO MAXVALUE)? (CYCLE|NO CYCLE)? (CACHE DECIMAL | NO CACHE)?
     ;
 
 create_queue
@@ -1407,17 +1468,17 @@ date_options
 
 open_key
     : OPEN SYMMETRIC KEY key_name=id DECRYPTION BY decryption_mechanism
-    | OPEN MASTER_KEY DECRYPTION BY PASSWORD '=' password=STRING
+    | OPEN MASTER KEY DECRYPTION BY PASSWORD '=' password=STRING
     ;
 
 close_key
     : CLOSE SYMMETRIC KEY key_name=id
     | CLOSE ALL SYMMETRIC KEYS
-    | CLOSE MASTER_KEY
+    | CLOSE MASTER KEY
     ;
 
 create_key
-    : CREATE MASTER_KEY ENCRYPTION BY PASSWORD '=' password=STRING
+    : CREATE MASTER KEY ENCRYPTION BY PASSWORD '=' password=STRING
     | CREATE SYMMETRIC KEY key_name=id
       (AUTHORIZATION user_name=id)?
       (FROM PROVIDER provider_name=id)?
@@ -2473,6 +2534,7 @@ simple_id
     | LOCK_ESCALATION
     | LOGIN
     | LOOP
+    | MASTER
     | MARK
     | MAX
     | MAXDOP
