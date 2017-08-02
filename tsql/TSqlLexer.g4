@@ -315,7 +315,7 @@ USED:                                  'USED';
 USER:                                  'USER';
 VALUES:                                'VALUES';
 VARYING:                               'VARYING';
-VERBOSELOGGING:                         'VERBOSELOGGING';
+VERBOSELOGGING:                        'VERBOSELOGGING';
 VIEW:                                  'VIEW';
 VISIBILITY:                            'VISIBILITY';
 WAITFOR:                               'WAITFOR';
