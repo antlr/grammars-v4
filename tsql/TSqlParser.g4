@@ -108,6 +108,14 @@ ddl_clause
     | alter_server_audit
     | alter_server_audit_specification
     | alter_server_configuration
+    | alter_server_role
+    | alter_server_role_pdw 
+    | alter_service
+    | alter_service_master_key
+    | alter_symmetric_key
+    | alter_user
+    | alter_user_azure_sql
+    | alter_workload_group
     | drop_index
     | drop_procedure
     | drop_trigger
@@ -632,6 +640,50 @@ alter_server_audit_specification
 alter_server_configuration
     : ALTER SERVER CONFIGURATION 
       SET  ( (PROCESS AFFINITY (CPU EQUAL (AUTO | (COMMA? DECIMAL | COMMA? DECIMAL TO DECIMAL)+ ) | NUMANODE EQUAL ( COMMA? DECIMAL |COMMA?  DECIMAL TO DECIMAL)+ ) | DIAGNOSTICS LOG (ON|OFF|PATH EQUAL (STRING | DEFAULT) |MAX_SIZE EQUAL (DECIMAL MB |DEFAULT)|MAX_FILES EQUAL (DECIMAL|DEFAULT) ) | FAILOVER CLUSTER PROPERTY (VERBOSELOGGING EQUAL (STRING|DEFAULT) |SQLDUMPERFLAGS EQUAL (STRING|DEFAULT) | SQLDUMPERPATH EQUAL (STRING|DEFAULT) | SQLDUMPERTIMEOUT (STRING|DEFAULT) | FAILURECONDITIONLEVEL EQUAL (STRING|DEFAULT) | HEALTHCHECKTIMEOUT EQUAL (DECIMAL|DEFAULT) ) | HADR CLUSTER CONTEXT EQUAL (STRING|LOCAL) | BUFFER POOL EXTENSION (ON LR_BRACKET FILENAME EQUAL STRING COMMA SIZE EQUAL DECIMAL (KB|MB|GB)  RR_BRACKET | OFF ) | SET SOFTNUMA (ON|OFF) ) )
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-server-role-transact-sql
+alter_server_role
+    : ALTER SERVER ROLE server_role_name=id
+      ( (ADD|DROP) MEMBER server_principal=id | WITH NAME EQUAL new_server_role_name=id )
+    ;
+
+alter_server_role_pdw
+    : ALTER SERVER ROLE server_role_name=id (ADD|DROP) MEMBER login=id
+    ; 
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-service-transact-sql
+
+alter_service
+    : ALTER SERVICE modified_service_name=id (ON QUEUE (schema_name=id DOT) queue_name=id)? (COMMA? (ADD|DROP) modified_contract_name=id)*
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-service-master-key-transact-sql
+
+alter_service_master_key
+    : ALTER SERVICE MASTER KEY ( FORCE? REGENERATE | (WITH (OLD_ACCOUNT EQUAL acold_account_name=STRING COMMA OLD_PASSWORD EQUAL old_password=STRING | NEW_ACCOUNT EQUAL new_account_name=STRING COMMA NEW_PASSWORD EQUAL new_password=STRING)?  ) )
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-symmetric-key-transact-sql
+
+alter_symmetric_key
+    : ALTER SYMMETRIC KEY key_name=id ( (ADD|DROP) ENCRYPTION BY (CERTIFICATE certificate_name=id | PASSWORD EQUAL password=STRING | SYMMETRIC KEY symmetric_key_name=id | ASYMMETRIC KEY Asym_key_name=id  ) )
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-user-transact-sql
+alter_user
+    : ALTER USER username=id WITH (COMMA? NAME EQUAL newusername=id | COMMA? DEFAULT_SCHEMA EQUAL ( schema_name=id |NULL ) | COMMA? LOGIN EQUAL loginame=id | COMMA? PASSWORD EQUAL STRING (OLD_PASSWORD EQUAL STRING)+ | COMMA? DEFAULT_LANGUAGE EQUAL (NONE| lcid=DECIMAL| language_name_or_alias=id) | COMMA? ALLOW_ENCRYPTED_VALUE_MODIFICATIONS EQUAL (ON|OFF) )+
+    ;
+
+alter_user_azure_sql
+    : ALTER USER username=id WITH (COMMA? NAME EQUAL newusername=id | COMMA? DEFAULT_SCHEMA EQUAL  schema_name=id | COMMA? LOGIN EQUAL loginame=id  | COMMA? ALLOW_ENCRYPTED_VALUE_MODIFICATIONS EQUAL (ON|OFF) )+
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-workload-group-transact-sql
+
+alter_workload_group
+    : ALTER WORKLOAD GROUP (workload_group_group_name=id |DEFAULT_DOUBLE_QUOTE) (WITH LR_BRACKET (IMPORTANCE EQUAL (LOW|MEDIUM|HIGH) | COMMA? REQUEST_MAX_MEMORY_GRANT_PERCENT EQUAL request_max_memory_grant=DECIMAL | COMMA? REQUEST_MAX_CPU_TIME_SEC EQUAL request_max_cpu_time_sec=DECIMAL | REQUEST_MEMORY_GRANT_TIMEOUT_SEC EQUAL request_memory_grant_timeout_sec=DECIMAL | MAX_DOP EQUAL max_dop=DECIMAL | GROUP_MAX_REQUESTS EQUAL group_max_requests=DECIMAL)+ RR_BRACKET )?
+     (USING (workload_group_pool_name=id | DEFAULT_DOUBLE_QUOTE) )?
     ;
 
 create_queue
@@ -1821,7 +1873,8 @@ predicate
     | '(' search_condition ')'
     ;
 
-// Changed union rule to sql_union to avoid union class with C++ target.  Issue found by Lahsen Baali
+// Changed union rule to sql_union to avoid union construct with C++ target.  Issue reported by person who generates into C++.  This individual reports change causes generated code to work
+
 query_expression
     : (query_specification | '(' query_expression ')') sql_union*
     ;
