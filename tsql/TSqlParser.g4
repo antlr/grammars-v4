@@ -83,6 +83,7 @@ ddl_clause
     | alter_authorization_for_sql_database
     | alter_authorization_for_azure_dw
     | alter_authorization_for_parallel_dw
+    | alter_availability_group
     | alter_broker_priority
     | alter_certificate
     | alter_column_encryption_key
@@ -531,7 +532,7 @@ alter_availability_group
      | FAILOVER  
      | FORCE_FAILOVER_ALLOW_DATA_LOSS 
      | ADD LISTENER listener_name=id LR_BRACKET ( WITH DHCP (ON LR_BRACKET (IPV4_ADDR IPV4_ADDR ) RR_BRACKET ) | WITH IP LR_BRACKET ( COMMA? LR_BRACKET (IPV4_ADDR IPV4_ADDR | IPV6_ADDR)+ RR_BRACKET (COMMA? PORT EQUAL DECIMAL)? ) )
-     | MODIFY LISTENER (ADD IP LR_BRACKET (IP4_ADDR IPV4_ADDR | IPV6_ADDR) RR_BRACKET | PORT EQUAL DECIMAL )
+     | MODIFY LISTENER (ADD IP LR_BRACKET (IPV4_ADDR IPV4_ADDR | IPV6_ADDR) RR_BRACKET | PORT EQUAL DECIMAL )
      |RESTART LISTENER STRING
      |REMOVE LISTENER STRING
      |OFFLINE
