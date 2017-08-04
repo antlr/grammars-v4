@@ -143,6 +143,7 @@
 			<module>unicode</module>
 			<module>url</module>
 			<module>useragent</module>
+			<module>uuencoding</module>
 			<module>vb6</module>
 			<module>vba</module>
 			<module>verilog</module>
