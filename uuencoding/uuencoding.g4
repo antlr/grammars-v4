@@ -33,21 +33,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar uuencoding;
 
 uuencoding
-   : header? uu trailer
+   : header? uu trailer?
    ;
 
 header
-    : 'begin' NUM FN CR;
+    : 'begin' ASCII+ ASCII+ CR;
 
 
 trailer
-    : 'end' CR
+    : '`' CR 'end' CR
     ;
 
+uu
+    : ASCII+ 
+    ;
+
+ASCII
+    :  [\u0020-\u005F]
+    ;
+    
 CR
-    : '\n'
+    : ['\r\n']+
     ;
 
-NUM
-   : ('0' .. '9') + ('.' ('0' .. '9') +)?
-   ;
