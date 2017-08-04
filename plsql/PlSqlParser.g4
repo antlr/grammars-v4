@@ -118,7 +118,7 @@ streaming_clause
 // $<Package DDLs
 
 drop_package
-    : DROP PACKAGE BODY? package_name ';'
+    : DROP PACKAGE BODY? (schema_object_name '.')? package_name ';'
     ;
 
 alter_package
@@ -126,11 +126,11 @@ alter_package
     ;
 
 create_package
-    : CREATE (OR REPLACE)? PACKAGE package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name? ';'
+    : CREATE (OR REPLACE)? PACKAGE (schema_object_name '.')? package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name? ';'
     ;
 
 create_package_body
-    : CREATE (OR REPLACE)? PACKAGE BODY package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?) ';'
+    : CREATE (OR REPLACE)? PACKAGE BODY (schema_object_name '.')? package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?) ';'
     ;
 
 // $<Create Package - Specific Clauses
