@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar uuencoding;
 
 uuencoding
-   : header? uu trailer?
+   : header? uu trailer? CR*
    ;
 
 header
@@ -45,7 +45,7 @@ trailer
     ;
 
 uu
-    : ASCII+ 
+    : ASCII+ '`'? CR?
     ;
 
 ASCII
