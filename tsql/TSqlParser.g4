@@ -90,6 +90,7 @@ ddl_clause
     | alter_credential
     | alter_cryptographic_provider
     | alter_database
+    | create_or_alter_event_session
     | alter_external_data_source
     | alter_external_resource_pool
     | alter_fulltext_catalog
@@ -583,6 +584,56 @@ alter_cryptographic_provider
     : ALTER CRYPTOGRAPHIC PROVIDER provider_name=id (FROM FILE EQUAL crypto_provider_ddl_file=STRING)? (ENABLE | DISABLE)?
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-event-session-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-event-session-transact-sql
+create_or_alter_event_session
+    : (ALTER|CREATE) EVENT SESSION event_session_name=id ON SERVER 
+       (COMMA? ADD EVENT ( (event_module_guid=id DOT)? event_package_name=id DOT event_name=id)
+        (LR_BRACKET
+          (SET ( COMMA? event_customizable_attributue=id EQUAL (DECIMAL|STRING) )* )?
+          ( ACTION LR_BRACKET (COMMA? (event_module_guid=id DOT)? event_package_name=id DOT action_name=id)+  RR_BRACKET)+
+          (WHERE event_session_predicate_expression)?
+         RR_BRACKET )* 
+      )*
+      (COMMA? DROP EVENT (event_module_guid=id DOT)? event_package_name=id DOT event_name=id )*
+     
+      ( (ADD TARGET (event_module_guid=id DOT)? event_package_name=id DOT target_name=id ) ( LR_BRACKET SET (COMMA? target_parameter_name=id EQUAL (LR_BRACKET? DECIMAL RR_BRACKET? |STRING) )+ RR_BRACKET )* )*
+       (DROP TARGET (event_module_guid=id DOT)? event_package_name=id DOT target_name=id )*
+       
+
+     (WITH 
+           LR_BRACKET
+           (COMMA? MAX_MEMORY EQUAL max_memory=DECIMAL (KB|MB) )?
+           (COMMA? EVENT_RETENTION_MODE EQUAL (ALLOW_SINGLE_EVENT_LOSS | ALLOW_MULTIPLE_EVENT_LOSS | NO_EVENT_LOSS ) )?
+           (COMMA? MAX_DISPATCH_LATENCY EQUAL (max_dispatch_latency_seconds=DECIMAL SECONDS | INFINITE) )?
+           (COMMA?  MAX_EVENT_SIZE EQUAL max_event_size=DECIMAL (KB|MB) )?
+           (COMMA? MEMORY_PARTITION_MODE EQUAL (NONE | PER_NODE | PER_CPU) )?
+           (COMMA? TRACK_CAUSALITY EQUAL (ON|OFF) )?
+           (COMMA? STARTUP_STATE EQUAL (ON|OFF) )?
+           RR_BRACKET
+     )?  
+     (STATE EQUAL (START|STOP) )?
+        
+    ;
+
+event_session_predicate_expression
+     : ( COMMA? (AND|OR)? NOT? ( event_session_predicate_factor | LR_BRACKET event_session_predicate_expression RR_BRACKET) )+
+     ;
+
+event_session_predicate_factor
+     : event_session_predicate_leaf
+     | LR_BRACKET event_session_predicate_expression RR_BRACKET
+     ;
+
+event_session_predicate_leaf
+     : (event_field_name=id | (event_field_name=id |( (event_module_guid=id DOT)?  event_package_name=id DOT predicate_source_name=id ) ) (EQUAL |(LESS GREATER) | (EXCLAMATION EQUAL) | GREATER  | (GREATER EQUAL)| LESS | LESS EQUAL) (DECIMAL | STRING) )
+     | (event_module_guid=id DOT)?  event_package_name=id DOT predicate_compare_name=id LR_BRACKET (event_field_name=id |( (event_module_guid=id DOT)?  event_package_name=id DOT predicate_source_name=id ) COMMA  (DECIMAL | STRING) ) RR_BRACKET
+     ; 
+
+
+
+
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-data-source-transact-sql
 
 alter_external_data_source
@@ -590,6 +641,7 @@ alter_external_data_source
     ( LOCATION EQUAL location=(QUOTED_URL|QUOTED_HOST_AND_PORT) COMMA? |  RESOURCE_MANAGER_LOCATION EQUAL resource_manager_location=(QUOTED_URL|QUOTED_HOST_AND_PORT) COMMA? |  CREDENTIAL EQUAL credential_name=id )+
     | ALTER EXTERNAL DATA SOURCE data_source_name=id WITH LR_BRACKET TYPE EQUAL BLOB_STORAGE COMMA LOCATION EQUAL location=STRING (COMMA CREDENTIAL EQUAL credential_name=id )? RR_BRACKET
     ;
+
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-resource-pool-transact-sql
 alter_external_resource_pool
@@ -2625,6 +2677,7 @@ simple_id
     | EXPAND
     | FAST
     | FAST_FORWARD
+    | FILENAME
     | FILLFACTOR
     | FIRST
     | FOLLOWING
@@ -2659,6 +2712,8 @@ simple_id
     | MAX
     | MAXDOP
     | MAXRECURSION
+    | MAX_ROLLOVER_FILES
+    | MAX_MEMORY
     | MIN
     | MODIFY
     | NAME
