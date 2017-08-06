@@ -129,7 +129,7 @@ ESCAPE:                                'ESCAPE';
 ERROR:                                 'ERROR';
 EVENT:                                 'EVENT';
 EVENTDATA:                             'EVENTDATA' '(' ')';
-EVENT_RETENTION_MODE:                       'EVENT_RETENTION_MODE';
+EVENT_RETENTION_MODE:                  'EVENT_RETENTION_MODE';
 EXCEPT:                                'EXCEPT';
 EXECUTE:                               'EXEC' 'UTE'?;
 EXISTS:                                'EXISTS';
