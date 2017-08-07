@@ -567,22 +567,21 @@ alter_certificate
     : ALTER CERTIFICATE certificate_name=id (REMOVE PRIVATE_KEY | WITH PRIVATE KEY LR_BRACKET ( FILE EQUAL STRING COMMA? | DECRYPTION BY PASSWORD EQUAL STRING COMMA?| ENCRYPTION BY PASSWORD EQUAL STRING  COMMA?)+ RR_BRACKET | WITH ACTIVE FOR BEGIN_DIALOG EQUAL ( ON | OFF ) )
     ;
 
-// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-certificate-transact-sql
-create_certificate
-    : CREATE CERTIFICATE certificate_name=id (AUTHORIZATION user_name=id)?
-       ( FROM ASSEMBLY assembly_name=id 
-        ( (EXECUTABLE)? FILE EQUAL assembly_file=STRING 
-           (WITH PRIVATE KEY LR_BRACKET 
-             (FILE EQUAL private_key=STRING 
-               (COMMA? DECRYPTION BY PASSWORD decryption_password=STRING)?
-               (COMMA? ENCRYPTION BY PASSWORD encryption_password=STRING)? 
-             | BINARY_KEYWORD EQUAL
-
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-column-encryption-key-transact-sql
 
 alter_column_encryption_key
     : ALTER COLUMN ENCRYPTION KEY column_encryption_key=id (ADD | DROP) VALUE LR_BRACKET COLUMN_MASTER_KEY EQUAL column_master_key_name=id ( COMMA ALGORITHM EQUAL algorithm_name=STRING  COMMA ENCRYPTED_VALUE EQUAL BINARY)? RR_BRACKET
     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-column-encryption-key-transact-sql
+create_column_encryption_key
+    :   CREATE COLUMN ENCRYPTION KEY column_encryption_key=id 
+         WITH VALUES LR_BRACKET 
+          (COMMA? COLUMN_MASTER_KEY EQUAL column_master_key_name=id COMMA
+          ALGORITHM EQUAL algorithm_name=STRING  COMMA
+          ENCRYPTED_VALUE EQUAL encrypted_value=BINARY)+
+     ;
+
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-credential-transact-sql
 
