@@ -76,15 +76,18 @@ ddl_clause
     | create_view
     | alter_table
     | alter_application_role
+    | create_application_role
     | alter_assembly
+    | create_assembly
     | alter_asymmetric_key
+    | create_asymmetric_key
     | alter_authorization
     | alter_authorization
     | alter_authorization_for_sql_database
     | alter_authorization_for_azure_dw
     | alter_authorization_for_parallel_dw
     | alter_availability_group
-    | alter_broker_priority
+    | create_or_alter_broker_priority
     | alter_certificate
     | alter_column_encryption_key
     | alter_credential
@@ -94,6 +97,7 @@ ddl_clause
     | alter_external_data_source
     | alter_external_resource_pool
     | alter_fulltext_catalog
+    | alter_fulltext_stoplist
     | alter_login_sql_server
     | alter_login_azure_sql
     | alter_login_azure_sql_dw_and_pdw
@@ -101,6 +105,7 @@ ddl_clause
     | alter_master_key_azure_sql
     | alter_message_type
     | alter_partition_scheme
+    | alter_partition_function
     | alter_remote_service_binding
     | alter_resource_governor
     | alter_db_role
@@ -239,35 +244,11 @@ another_statement
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
 
 alter_application_role
-    : alter_application_role_start application_role=id  alter_application_role_with_clause
+    : ALTER APPLICATION ROLE appliction_role=id WITH  (COMMA? NAME EQUAL new_application_role_name=id)? (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id)? 
     ;
 
-alter_application_role_start
-    : ALTER APPLICATION ROLE
-    ;
-
-alter_application_role_with_clause
-    : alter_application_role_with
-       (alter_application_role_with_name new_application_role_name=id COMMA?)
-       (alter_application_role_with_password  application_role_password=STRING COMMA?)?
-       (alter_application_role_with_default app_role_default_schema=id COMMA?)?
-    ;
-
-alter_application_role_with
-    : WITH
-    ;
-
-alter_application_role_with_password
-    : PASSWORD EQUAL
-    ;
-
-alter_application_role_with_default
-    : DEFAULT_SCHEMA EQUAL
-    ;
-  
-
-alter_application_role_with_name
-    : NAME EQUAL
+create_application_role
+    : CREATE APPLICATION ROLE appliction_role=id WITH   (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id)? 
     ;
 
 alter_assembly
@@ -395,6 +376,14 @@ multiple_local_file_start
     : SINGLE_QUOTE 
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-assembly-transact-sql
+create_assembly
+    : CREATE ASSEMBLY assembly_name=id (AUTHORIZATION owner_name=id)? 
+       FROM (COMMA? (STRING|BINARY) )+
+       (WITH PERMISSION_SET EQUAL (SAFE|EXTERNAL_ACCESS|UNSAFE) )? 
+
+    ;
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-asymmetric-key-transact-sql
 
 alter_asymmetric_key
@@ -418,6 +407,17 @@ asymmetric_key_password_change_option
     : DECRYPTION BY PASSWORD EQUAL STRING
     | ENCRYPTION BY PASSWORD EQUAL STRING
     ;
+
+
+//https://docs.microsoft.com/en-us/sql/t-sql/statements/create-asymmetric-key-transact-sql
+
+create_asymmetric_key
+    : CREATE ASYMMETRIC KEY Asym_Key_Nam=id 
+       (AUTHORIZATION database_principal_name=id)?
+       ( FROM (FILE EQUAL STRING |EXECUTABLE_FILE EQUAL STRING|ASSEMBLY Assembly_Name=id | PROVIDER Provider_Name=id) )?
+       (WITH (ALGORITHM EQUAL ( RSA_4096 | RSA_3072 | RSA_2048 | RSA_1024 | RSA_512)  |PROVIDER_KEY_NAME EQUAL provider_key_name=STRING | CREATION_DISPOSITION EQUAL (CREATE_NEW|OPEN_EXISTING)  )   )?
+       (ENCRYPTION BY PASSWORD EQUAL asymmetric_key_password=STRING )?
+     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-authorization-transact-sql
 
@@ -549,12 +549,13 @@ alter_availability_group_options
     ; 
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-broker-priority-transact-sql
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-broker-priority-transact-sql
 
-alter_broker_priority
-    : ALTER BROKER PRIORITY ConversationPriorityName=id FOR CONVERSATION
+create_or_alter_broker_priority
+    : (ALTER|CREATE) BROKER PRIORITY ConversationPriorityName=id FOR CONVERSATION
       SET LR_BRACKET 
-     ( CONTRACT_NAME EQUAL (ContractName=id | ANY )  COMMA?  )?
-     ( LOCAL_SERVICE_NAME EQUAL (LocalServiceName=id | ANY ) COMMA? )?
+     ( CONTRACT_NAME EQUAL ( ( id) | ANY )  COMMA?  )?
+     ( LOCAL_SERVICE_NAME EQUAL (DOUBLE_FORWARD_SLASH? id | ANY ) COMMA? )?
      ( REMOTE_SERVICE_NAME  EQUAL (RemoteServiceName=STRING | ANY ) COMMA? )?   
      ( PRIORITY_LEVEL EQUAL ( PriorityValue=DECIMAL | DEFAULT ) ) ?
      RR_BRACKET
@@ -565,6 +566,17 @@ alter_broker_priority
 alter_certificate
     : ALTER CERTIFICATE certificate_name=id (REMOVE PRIVATE_KEY | WITH PRIVATE KEY LR_BRACKET ( FILE EQUAL STRING COMMA? | DECRYPTION BY PASSWORD EQUAL STRING COMMA?| ENCRYPTION BY PASSWORD EQUAL STRING  COMMA?)+ RR_BRACKET | WITH ACTIVE FOR BEGIN_DIALOG EQUAL ( ON | OFF ) )
     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-certificate-transact-sql
+create_certificate
+    : CREATE CERTIFICATE certificate_name=id (AUTHORIZATION user_name=id)?
+       ( FROM ASSEMBLY assembly_name=id 
+        ( (EXECUTABLE)? FILE EQUAL assembly_file=STRING 
+           (WITH PRIVATE KEY LR_BRACKET 
+             (FILE EQUAL private_key=STRING 
+               (COMMA? DECRYPTION BY PASSWORD decryption_password=STRING)?
+               (COMMA? ENCRYPTION BY PASSWORD encryption_password=STRING)? 
+             | BINARY_KEYWORD EQUAL
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-column-encryption-key-transact-sql
 
@@ -643,6 +655,12 @@ alter_external_data_source
     ;
 
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-library-transact-sql
+alter_external_library
+    : ALTER EXTERNAL LIBRARY library_name=id (AUTHORIZATION owner_name=id)? 
+       (SET|ADD) ( LR_BRACKET CONTENT EQUAL (client_library=STRING | BINARY | NONE) (COMMA PLATFORM EQUAL (WINDOWS|LINUX)? RR_BRACKET) WITH (COMMA? LANGUAGE EQUAL (R|PYTHON) | DATA_SOURCE EQUAL external_data_source_name=id )+ RR_BRACKET )
+   ;
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-resource-pool-transact-sql
 alter_external_resource_pool
     : ALTER EXTERNAL RESOURCE POOL (pool_name=id | DEFAULT_DOUBLE_QUOTE) WITH LR_BRACKET MAX_CPU_PERCENT EQUAL max_cpu_percent=DECIMAL ( COMMA? AFFINITY CPU EQUAL (AUTO|(COMMA? DECIMAL TO DECIMAL |COMMA DECIMAL )+ ) | NUMANODE EQUAL (COMMA? DECIMAL TO DECIMAL| COMMA? DECIMAL )+  ) (COMMA? MAX_MEMORY_PERCENT EQUAL max_memory_percent=DECIMAL)? (COMMA? MAX_PROCESSES EQUAL max_processes=DECIMAL)?  RR_BRACKET 
@@ -651,6 +669,13 @@ alter_external_resource_pool
 alter_fulltext_catalog
     : ALTER FULLTEXT CATALOG catalog_name=id (REBUILD (WITH ACCENT_SENSITIVITY EQUAL (ON|OFF) )? | REORGANIZE | AS DEFAULT )
     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-fulltext-stoplist-transact-sql
+
+alter_fulltext_stoplist
+    : ALTER FULLTEXT STOPLIST stoplist_name=id (ADD stopword=STRING LANGUAGE (STRING|DECIMAL|BINARY) | DROP ( stopword=STRING LANGUAGE (STRING|DECIMAL|BINARY) |ALL (STRING|DECIMAL|BINARY) | ALL ) )
+    ;
+
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-login-transact-sql
 alter_login_sql_server
@@ -678,6 +703,11 @@ alter_master_key_azure_sql
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-message-type-transact-sql
 alter_message_type
     : ALTER MESSAGE TYPE message_type_name=id VALIDATION EQUAL (NONE | EMPTY | WELL_FORMED_XML | VALID_XML WITH SCHEMA COLLECTION schema_collection_name=id)
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-partition-function-transact-sql
+alter_partition_function
+    : ALTER PARTITION FUNCTION partition_function_name=id LR_BRACKET RR_BRACKET        (SPLIT|MERGE) RANGE LR_BRACKET DECIMAL RR_BRACKET
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-partition-scheme-transact-sql
@@ -1412,8 +1442,9 @@ external_access_option:
   | TWO_DIGIT_YEAR_CUTOFF EQUAL DECIMAL
   ;
 
-hadr_options:
-    ALTER DATABASE SET HADR
+hadr_options
+   : HADR 
+      ( ( AVAILABILITY GROUP EQUAL availability_group_name=id | OFF ) |(SUSPEND|RESUME) )
     ;
 
 mixed_page_allocation_option:
