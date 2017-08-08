@@ -121,7 +121,6 @@ ddl_clause
     | alter_message_type
     | alter_partition_scheme
     | alter_partition_function
-    | create_partition_function
     | alter_remote_service_binding
     | alter_resource_governor
     | alter_db_role
