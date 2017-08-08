@@ -4,3 +4,10 @@ GO
 
 ALTER CREDENTIAL Frames WITH IDENTITY = 'Aboulrus8';
 GO
+CREATE CREDENTIAL AlterEgo WITH IDENTITY = 'Mary5',
+    SECRET = '<EnterStrongPasswordHere>';
+GO
+CREATE CREDENTIAL CredentialForEKM
+    WITH IDENTITY='User1OnEKM', SECRET='<EnterStrongPasswordHere>'
+    FOR CRYPTOGRAPHIC PROVIDER MyEKMProvider;
+GO

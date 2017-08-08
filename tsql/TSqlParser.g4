@@ -90,22 +90,38 @@ ddl_clause
     | create_or_alter_broker_priority
     | alter_certificate
     | alter_column_encryption_key
+    | create_column_encryption_key
+    | create_column_master_key
     | alter_credential
+    | create_credential
     | alter_cryptographic_provider
+    | create_cryptographic_provider
+    | create_event_notification
     | alter_database
     | create_or_alter_event_session
     | alter_external_data_source
+    | alter_external_library
+    | create_external_library
     | alter_external_resource_pool
+    | create_external_resource_pool
     | alter_fulltext_catalog
+    | create_fulltext_catalog
     | alter_fulltext_stoplist
+    | create_fulltext_stoplist
     | alter_login_sql_server
+    | create_login_sql_server
     | alter_login_azure_sql
+    | create_login_azure_sql
     | alter_login_azure_sql_dw_and_pdw
+    | create_login_pdw
     | alter_master_key_sql_server
+    | create_master_key_sql_server
     | alter_master_key_azure_sql
+    | create_master_key_azure_sql
     | alter_message_type
     | alter_partition_scheme
     | alter_partition_function
+    | create_partition_function
     | alter_remote_service_binding
     | alter_resource_governor
     | alter_db_role
@@ -576,24 +592,61 @@ alter_column_encryption_key
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-column-encryption-key-transact-sql
 create_column_encryption_key
     :   CREATE COLUMN ENCRYPTION KEY column_encryption_key=id 
-         WITH VALUES LR_BRACKET 
-          (COMMA? COLUMN_MASTER_KEY EQUAL column_master_key_name=id COMMA
-          ALGORITHM EQUAL algorithm_name=STRING  COMMA
-          ENCRYPTED_VALUE EQUAL encrypted_value=BINARY)+
+         WITH VALUES 
+           (LR_BRACKET COMMA? COLUMN_MASTER_KEY EQUAL column_master_key_name=id COMMA
+           ALGORITHM EQUAL algorithm_name=STRING  COMMA
+           ENCRYPTED_VALUE EQUAL encrypted_value=BINARY RR_BRACKET COMMA?)+
      ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-column-master-key-transact-sql
+create_column_master_key
+     : CREATE COLUMN MASTER KEY key_name=id
+         WITH LR_BRACKET
+            KEY_STORE_PROVIDER_NAME EQUAL  key_store_provider_name=STRING COMMA
+            KEY_PATH EQUAL key_path=STRING
+           RR_BRACKET
+      ;
 
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-credential-transact-sql
 
 alter_credential
-    : ALTER CREDENTIAL credential_name=id WITH IDENTITY EQUAL identity_name=STRING ( COMMA SECRET EQUAL secret=STRING )?
+    : ALTER CREDENTIAL credential_name=id 
+        WITH IDENTITY EQUAL identity_name=STRING 
+         ( COMMA SECRET EQUAL secret=STRING )?
     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-credential-transact-sql
+create_credential
+    : CREATE CREDENTIAL credential_name=id 
+        WITH IDENTITY EQUAL identity_name=STRING 
+         ( COMMA SECRET EQUAL secret=STRING )?
+         (  FOR CRYPTOGRAPHIC PROVIDER cryptographic_provider_name=id )?
+    ;
+
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-cryptographic-provider-transact-sql
 
 alter_cryptographic_provider
     : ALTER CRYPTOGRAPHIC PROVIDER provider_name=id (FROM FILE EQUAL crypto_provider_ddl_file=STRING)? (ENABLE | DISABLE)?
     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-cryptographic-provider-transact-sql
+create_cryptographic_provider
+    : CREATE CRYPTOGRAPHIC PROVIDER provider_name=id 
+      FROM FILE EQUAL path_of_DLL=STRING
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-event-notification-transact-sql
+create_event_notification
+    : CREATE EVENT NOTIFICATION event_notification_name=id
+      ON (SERVER|DATABASE|QUEUE queue_name=id)
+        (WITH FAN_IN)?
+        FOR (COMMA? event_type_or_group=id)+
+          TO SERVICE  broker_service=STRING  COMMA
+             broker_service_specifier_or_current_database=STRING
+    ;
+
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-event-session-transact-sql
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-event-session-transact-sql
@@ -660,19 +713,51 @@ alter_external_library
        (SET|ADD) ( LR_BRACKET CONTENT EQUAL (client_library=STRING | BINARY | NONE) (COMMA PLATFORM EQUAL (WINDOWS|LINUX)? RR_BRACKET) WITH (COMMA? LANGUAGE EQUAL (R|PYTHON) | DATA_SOURCE EQUAL external_data_source_name=id )+ RR_BRACKET )
    ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-external-library-transact-sql
+create_external_library
+    : CREATE EXTERNAL LIBRARY library_name=id (AUTHORIZATION owner_name=id)? 
+       FROM (COMMA? LR_BRACKET?  (CONTENT EQUAL)? (client_library=STRING | BINARY | NONE) (COMMA PLATFORM EQUAL (WINDOWS|LINUX)? RR_BRACKET)? ) ( WITH (COMMA? LANGUAGE EQUAL (R|PYTHON) | DATA_SOURCE EQUAL external_data_source_name=id )+ RR_BRACKET  )?
+   ;
+
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-resource-pool-transact-sql
 alter_external_resource_pool
     : ALTER EXTERNAL RESOURCE POOL (pool_name=id | DEFAULT_DOUBLE_QUOTE) WITH LR_BRACKET MAX_CPU_PERCENT EQUAL max_cpu_percent=DECIMAL ( COMMA? AFFINITY CPU EQUAL (AUTO|(COMMA? DECIMAL TO DECIMAL |COMMA DECIMAL )+ ) | NUMANODE EQUAL (COMMA? DECIMAL TO DECIMAL| COMMA? DECIMAL )+  ) (COMMA? MAX_MEMORY_PERCENT EQUAL max_memory_percent=DECIMAL)? (COMMA? MAX_PROCESSES EQUAL max_processes=DECIMAL)?  RR_BRACKET 
     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-external-resource-pool-transact-sql
+create_external_resource_pool
+    : CREATE EXTERNAL RESOURCE POOL pool_name=id  WITH LR_BRACKET MAX_CPU_PERCENT EQUAL max_cpu_percent=DECIMAL ( COMMA? AFFINITY CPU EQUAL (AUTO|(COMMA? DECIMAL TO DECIMAL |COMMA DECIMAL )+ ) | NUMANODE EQUAL (COMMA? DECIMAL TO DECIMAL| COMMA? DECIMAL )+  ) (COMMA? MAX_MEMORY_PERCENT EQUAL max_memory_percent=DECIMAL)? (COMMA? MAX_PROCESSES EQUAL max_processes=DECIMAL)?  RR_BRACKET 
+    ;
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-fulltext-catalog-transact-sql
 alter_fulltext_catalog
     : ALTER FULLTEXT CATALOG catalog_name=id (REBUILD (WITH ACCENT_SENSITIVITY EQUAL (ON|OFF) )? | REORGANIZE | AS DEFAULT )
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-fulltext-catalog-transact-sql
+create_fulltext_catalog
+    : CREATE FULLTEXT CATALOG catalog_name=id
+        (ON FILEGROUP filegroup=id)?
+        (IN PATH rootpath=STRING)?
+        (WITH ACCENT_SENSITIVITY EQUAL (ON|OFF) )?
+        (AS DEFAULT)?
+        (AUTHORIZATION owner_name=id)?
+    ;
+
+
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-fulltext-stoplist-transact-sql
 
 alter_fulltext_stoplist
     : ALTER FULLTEXT STOPLIST stoplist_name=id (ADD stopword=STRING LANGUAGE (STRING|DECIMAL|BINARY) | DROP ( stopword=STRING LANGUAGE (STRING|DECIMAL|BINARY) |ALL (STRING|DECIMAL|BINARY) | ALL ) )
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-fulltext-stoplist-transact-sql
+create_fulltext_stoplist
+    :   CREATE FULLTEXT STOPLIST stoplist_name=id 
+          (FROM ( (database_name=id DOT)? source_stoplist_name=id |SYSTEM STOPLIST ) )?
+          (AUTHORIZATION owner_name=id)?
     ;
 
 
@@ -682,32 +767,79 @@ alter_login_sql_server
        ( (ENABLE|DISABLE)?  | WITH ( (PASSWORD EQUAL ( password=STRING | password_hash=BINARY HASHED ) ) (MUST_CHANGE|UNLOCK)* )? (OLD_PASSWORD EQUAL old_password=STRING (MUST_CHANGE|UNLOCK)* )? (DEFAULT_DATABASE EQUAL default_database=id)? (DEFAULT_LANGUAGE EQUAL default_laguage=id)?  (NAME EQUAL login_name=id)? (CHECK_POLICY EQUAL (ON|OFF) )? (CHECK_EXPIRATION EQUAL (ON|OFF) )? (CREDENTIAL EQUAL credential_name=id)? (NO CREDENTIAL)? | (ADD|DROP) CREDENTIAL credential_name=id )
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-login-transact-sql
+create_login_sql_server
+    : CREATE LOGIN login_name=id
+       ( WITH ( (PASSWORD EQUAL ( password=STRING | password_hash=BINARY HASHED ) ) (MUST_CHANGE|UNLOCK)* )? 
+       (COMMA? SID EQUAL sid=BINARY)?
+       (COMMA? DEFAULT_DATABASE EQUAL default_database=id)? 
+       (COMMA? DEFAULT_LANGUAGE EQUAL default_laguage=id)?  
+       (COMMA? CHECK_EXPIRATION EQUAL (ON|OFF) )? 
+       (COMMA? CHECK_POLICY EQUAL (ON|OFF) )? 
+       (COMMA? CREDENTIAL EQUAL credential_name=id)? 
+      |(FROM  
+	(WINDOWS 
+          (WITH (COMMA? DEFAULT_DATABASE EQUAL default_database=id)? (COMMA?  DEFAULT_LANGUAGE EQUAL default_language=STRING)? )
+        | CERTIFICATE certname=id 
+        | ASYMMETRIC KEY asym_key_name=id
+                )
+        )
+      )
+    ;
+
 alter_login_azure_sql
     : ALTER LOGIN login_name=id ( (ENABLE|DISABLE)? | WITH (PASSWORD EQUAL password=STRING (OLD_PASSWORD EQUAL old_password=STRING)? | NAME EQUAL login_name=id ) )
     ;
 
+create_login_azure_sql
+    : CREATE LOGIN login_name=id 
+       WITH PASSWORD EQUAL STRING (SID EQUAL sid=BINARY)?
+    ;  
+
 alter_login_azure_sql_dw_and_pdw
     : ALTER LOGIN login_name=id ( (ENABLE|DISABLE)? | WITH (PASSWORD EQUAL password=STRING (OLD_PASSWORD EQUAL old_password=STRING (MUST_CHANGE|UNLOCK)* )? | NAME EQUAL login_name=id ) )
     ;
+
+create_login_pdw
+    : CREATE LOGIN loginName=id
+        (WITH 
+          ( PASSWORD EQUAL password=STRING (MUST_CHANGE)?
+              (CHECK_POLICY EQUAL (ON|OFF)? )?
+          ) 
+        | FROM WINDOWS
+        )
+     ; 
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-master-key-transact-sql
 alter_master_key_sql_server
     : ALTER MASTER KEY ( (FORCE)? REGENERATE WITH ENCRYPTION BY PASSWORD EQUAL password=STRING |(ADD|DROP) ENCRYPTION BY (SERVICE MASTER KEY | PASSWORD EQUAL encryption_password=STRING) )
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-master-key-transact-sql
+create_master_key_sql_server
+    : CREATE MASTER KEY ENCRYPTION BY PASSWORD EQUAL password=STRING
+    ;
+
 alter_master_key_azure_sql
     : ALTER MASTER KEY ( (FORCE)? REGENERATE WITH ENCRYPTION BY PASSWORD EQUAL password=STRING |ADD ENCRYPTION BY (SERVICE MASTER KEY | PASSWORD EQUAL encryption_password=STRING) | DROP ENCRYPTION BY  PASSWORD EQUAL encryption_password=STRING )
     ;
+
+create_master_key_azure_sql
+    : CREATE MASTER KEY (ENCRYPTION BY PASSWORD EQUAL password=STRING)?
+    ;
+
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-message-type-transact-sql
 alter_message_type
     : ALTER MESSAGE TYPE message_type_name=id VALIDATION EQUAL (NONE | EMPTY | WELL_FORMED_XML | VALID_XML WITH SCHEMA COLLECTION schema_collection_name=id)
     ;
 
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-partition-function-transact-sql
 alter_partition_function
     : ALTER PARTITION FUNCTION partition_function_name=id LR_BRACKET RR_BRACKET        (SPLIT|MERGE) RANGE LR_BRACKET DECIMAL RR_BRACKET
     ;
+
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-partition-scheme-transact-sql
 alter_partition_scheme
@@ -2790,6 +2922,7 @@ simple_id
     | ROW_NUMBER
     | SAFETY
     | SAMPLE
+    | SID
     | SIZE
     | SCHEMABINDING
     | SCROLL
