@@ -7,3 +7,6 @@ GO
 ALTER CRYPTOGRAPHIC PROVIDER SecurityProvider
 ENABLE;
 GO  
+
+CREATE CRYPTOGRAPHIC PROVIDER SecurityProvider
+    FROM FILE = 'C:\SecurityProvider\SecurityProvider_v1.dll';
