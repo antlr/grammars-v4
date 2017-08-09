@@ -1593,6 +1593,8 @@ string_function
     | CHR '(' concatenation USING NCHAR_CS ')'
     | NVL '(' expression COMMA expression ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
+    | TO_DATE '(' expression (COMMA quoted_string)? ')'
+
     ;
 
 standard_function
@@ -1611,6 +1613,8 @@ numeric_function
    | ROUND '(' expression (COMMA UNSIGNED_INTEGER)?  ')'
    | AVG '(' (DISTINCT | ALL)? expression ')'
    | MAX '(' (DISTINCT | ALL)? expression ')'
+   | LEAST '(' expression (COMMA expression)* ')'
+   | GREATEST '(' expression (COMMA expression)* ')'
    ;
 
 other_function
