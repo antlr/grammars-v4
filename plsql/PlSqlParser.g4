@@ -1588,7 +1588,7 @@ quantified_expression
 
 string_function
     : SUBSTR '(' expression COMMA expression (COMMA expression)? ')'
-    | TO_CHAR '(' (table_element|standard_function) (COMMA quoted_string)? ')' 
+    | TO_CHAR '(' (table_element|standard_function|expression) (COMMA quoted_string)? (COMMA quoted_string)? ')'
     | DECODE '(' expression (COMMA expression)*  ')'
     | CHR '(' concatenation USING NCHAR_CS ')'
     | NVL '(' expression COMMA expression ')'
