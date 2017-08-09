@@ -45,3 +45,13 @@ MODIFY NAME = AuditDataAccess;
 GO  
 ALTER SERVER AUDIT [AuditDataAccess] WITH (STATE = ON);  
 GO  
+CREATE SERVER AUDIT HIPAA_Audit
+    TO FILE ( FILEPATH ='\\SQLPROD_1\Audit\' );
+CREATE SERVER AUDIT HIPAA_Audit
+    TO APPLICATION_LOG
+    WITH ( QUEUE_DELAY = 1000,  ON_FAILURE = SHUTDOWN);
+CREATE SERVER AUDIT AuditDataAccess
+    TO FILE ( FILEPATH ='C:\SQLAudit\' )
+    WHERE object_name = 'SensitiveData' ;
+GO
+

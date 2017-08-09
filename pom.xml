@@ -51,6 +51,7 @@
 			<module>csv</module>
 			<module>datetime</module>
 			<module>dcm</module>
+         <module>dice</module>
 			<module>dot</module>
 			<module>ecmascript</module>
 			<module>emailaddress</module>
