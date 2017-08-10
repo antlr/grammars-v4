@@ -1546,7 +1546,7 @@ TODO scope    {
 // $<CASE - Specific Clauses
 
 simple_case_statement
-    : label_name? ck1=CASE atom simple_case_when_part+  case_else_part? END CASE? label_name?
+    : label_name? ck1=CASE expression simple_case_when_part+  case_else_part? END CASE? label_name?
     ;
 
 simple_case_when_part
@@ -1588,11 +1588,13 @@ quantified_expression
 
 string_function
     : SUBSTR '(' expression COMMA expression (COMMA expression)? ')'
-    | TO_CHAR '(' (table_element|standard_function) (COMMA quoted_string)? ')' 
+    | TO_CHAR '(' (table_element|standard_function|expression) (COMMA quoted_string)? (COMMA quoted_string)? ')'
     | DECODE '(' expression (COMMA expression)*  ')'
     | CHR '(' concatenation USING NCHAR_CS ')'
     | NVL '(' expression COMMA expression ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
+    | TO_DATE '(' expression (COMMA quoted_string)? ')'
+
     ;
 
 standard_function
@@ -1611,6 +1613,8 @@ numeric_function
    | ROUND '(' expression (COMMA UNSIGNED_INTEGER)?  ')'
    | AVG '(' (DISTINCT | ALL)? expression ')'
    | MAX '(' (DISTINCT | ALL)? expression ')'
+   | LEAST '(' expression (COMMA expression)* ')'
+   | GREATEST '(' expression (COMMA expression)* ')'
    ;
 
 other_function
