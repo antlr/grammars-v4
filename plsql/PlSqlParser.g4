@@ -1016,7 +1016,7 @@ from_clause
 
 select_list_elements
     : tableview_name '.' '*'
-    | expression
+    | (regular_id '.')? expression
     ;
 
 table_ref_list
