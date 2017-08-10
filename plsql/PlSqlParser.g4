@@ -2388,6 +2388,7 @@ regular_id
     | JAVA
     | JOIN
     | KEEP
+    | KEY
     | LANGUAGE
     | LAST
     | LAST_VALUE
