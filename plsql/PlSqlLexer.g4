@@ -308,6 +308,7 @@ PERCENT_NOTFOUND:             '%NOTFOUND';
 PERCENT_ROWCOUNT:             '%ROWCOUNT';
 PERCENT_ROWTYPE:              '%ROWTYPE';
 PERCENT_TYPE:                 '%TYPE';
+PIPE:                         'PIPE';
 PIPELINED:                    'PIPELINED';
 PIVOT:                        'PIVOT';
 PLAN:                         'PLAN';

@@ -738,6 +738,7 @@ statement
     | case_statement/*[true]*/
     | sql_statement
     | function_call
+    | pipe_row_statement
     ;
 
 assignment_statement
@@ -817,6 +818,9 @@ return_statement
 function_call
     : CALL? routine_name function_argument?
     ;
+
+pipe_row_statement
+    : PIPE ROW '(' expression ')';
 
 body
     : BEGIN seq_of_statements (EXCEPTION exception_handler+)? END label_name?
