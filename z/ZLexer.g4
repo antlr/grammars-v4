@@ -64,7 +64,8 @@ lexer grammar ZLexer;
 // 6.4.4.4 Box characters
 ZED: '\u2500' -> mode(Z); // In line 6, replace "| 0000 2028 LINE SEPARATOR" by "— 0000 2500 BOX DRAWINGS LIGHT HORIZONTAL".
 SCH: '\u250C' -> mode(Z); // ┌
-TEXT: ~[\u2500\u250C]+ -> channel(HIDDEN);
+AX: '\u2577'  -> mode(Z); // ╷
+TEXT: ~[\u2500\u250C\u2577]+ -> channel(HIDDEN);
 
 mode Z;
 
@@ -85,7 +86,6 @@ LEFT_DOUBLE_ANGLE_BRACKET: '\u27EA'; //《 In line 10, replace "0000 300A LEFT D
 RIGHT_DOUBLE_ANGLE_BRACKET: '\u27EB'; // 》In line 11, replace "0000 300B RIGHT DOUBLE ANGLE BRACKET" by "0000 27EB MATHEMATICAL RIGHT DOUBLE ANGLE BRACKET".
 
 // 6.4.4.4 Box characters
-AX: '\u2577'; // ╷
 GEN: '\u2550'; // ═ 
 END: '\u2514' -> mode(DEFAULT_MODE); // In line 10, replace "(new line) 0000 2029 PARAGRAPH SEPARATOR" by "| 0000 2514 BOX DRAWINGS LIGHT UP AND RIGHT".
 
