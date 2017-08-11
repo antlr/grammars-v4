@@ -2565,6 +2565,7 @@ regular_id
     | STATIC
     | STATISTICS
     | STRING
+    | SUBSTR
     | SUBMULTISET
     | SUBPARTITION
     | SUBSTITUTABLE
