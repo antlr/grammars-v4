@@ -2298,7 +2298,7 @@ regular_id
     | DEFAULTS
     | DEFERRED
     | DEFINER
-    // | DELETE
+    | DELETE
     // | DEPTH
     //| DESC
     | DETERMINISTIC
