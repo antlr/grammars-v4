@@ -64,106 +64,197 @@ dml_clause
 
 // Data Definition Language: https://msdn.microsoft.com/en-us/library/ff848799.aspx)
 ddl_clause
-    : create_database
-    | create_or_alter_endpoint
-    | create_index
-    | create_or_alter_procedure
-    | create_or_alter_trigger
-    | create_or_alter_function
-    | create_statistics
-    | create_table
-    | create_type
-    | create_view
-    | alter_table
-    | alter_application_role
-    | create_application_role
+    : alter_something
+    | create_something
+    | drop_something
+    ;
+
+alter_something
+    : alter_application_role
     | alter_assembly
-    | create_assembly
     | alter_asymmetric_key
-    | create_asymmetric_key
     | alter_authorization
     | alter_authorization
-    | alter_authorization_for_sql_database
     | alter_authorization_for_azure_dw
     | alter_authorization_for_parallel_dw
+    | alter_authorization_for_sql_database
     | alter_availability_group
-    | create_or_alter_broker_priority
+    | alter_broker_priority
     | alter_certificate
     | alter_column_encryption_key
-    | create_column_encryption_key
-    | create_column_master_key
     | alter_credential
-    | create_credential
     | alter_cryptographic_provider
-    | create_cryptographic_provider
-    | create_event_notification
     | alter_database
-    | create_or_alter_event_session
+    | alter_db_role
+    | alter_ddl_trigger
+    | alter_dml_trigger
+    | alter_endpoint
+    | alter_event_session
     | alter_external_data_source
     | alter_external_library
-    | create_external_library
     | alter_external_resource_pool
-    | create_external_resource_pool
     | alter_fulltext_catalog
-    | create_fulltext_catalog
     | alter_fulltext_stoplist
-    | create_fulltext_stoplist
-    | alter_login_sql_server
-    | create_login_sql_server
+    | alter_function
     | alter_login_azure_sql
-    | create_login_azure_sql
     | alter_login_azure_sql_dw_and_pdw
-    | create_login_pdw
-    | alter_master_key_sql_server
-    | create_master_key_sql_server
+    | alter_login_sql_server
     | alter_master_key_azure_sql
-    | create_master_key_azure_sql
+    | alter_master_key_sql_server
     | alter_message_type
-    | alter_partition_scheme
     | alter_partition_function
+    | alter_partition_scheme
+    | alter_procedure
     | alter_remote_service_binding
-    | create_remote_service_binding
     | alter_resource_governor
-    | create_resource_pool
-    | alter_db_role
+    | alter_schema_azure_sql_dw_and_pdw
+    | alter_schema_sql
+    | alter_sequence
+    | alter_server_audit
+    | alter_server_audit_specification
+    | alter_server_configuration
+    | alter_server_role
+    | alter_server_role_pdw 
+    | alter_service
+    | alter_service_master_key
+    | alter_symmetric_key
+    | alter_table
+    | alter_user
+    | alter_user_azure_sql
+    | alter_workload_group
+    ;
+create_something
+    : create_application_role
+    | create_assembly
+    | create_asymmetric_key
+    | create_broker_priority
+    | create_column_encryption_key
+    | create_column_master_key
+    | create_credential
+    | create_cryptographic_provider
+    | create_database
     | create_db_role
+    | create_ddl_trigger
+    | create_dml_trigger
+    | create_endpoint
+    | create_event_notification
+    | create_event_session
+    | create_external_library
+    | create_external_resource_pool
+    | create_fulltext_catalog
+    | create_fulltext_stoplist
+    | create_function
+    | create_index
+    | create_login_azure_sql
+    | create_login_pdw
+    | create_login_sql_server
+    | create_master_key_azure_sql
+    | create_master_key_sql_server
+    | create_procedure
+    | create_remote_service_binding
+    | create_resource_pool
     | create_route
     | create_rule
-    | alter_schema_sql
-    | alter_schema_azure_sql_dw_and_pdw
     | create_schema
     | create_schema_azure_sql_dw_and_pdw
     | create_search_property_list
     | create_security_policy
-    | alter_sequence
     | create_sequence
-    | alter_server_audit
     | create_server_audit
-    | alter_server_audit_specification
     | create_server_audit_specification
-    | alter_server_configuration
-    | alter_server_role
     | create_server_role
-    | alter_server_role_pdw 
-    | alter_service
     | create_service
-    | alter_service_master_key
-    | alter_symmetric_key
+    | create_statistics
     | create_symmetric_key
     | create_synonym
-    | alter_user
-    | alter_user_azure_sql
-    | alter_workload_group
-    | drop_index
-    | drop_procedure
-    | drop_trigger
-    | drop_function
-    | drop_statistics
-    | drop_table
-    | drop_type
-    | drop_view
+    | create_table
+    | create_type
+    | create_user
+    | create_user_azure_sql_dw
+    | create_view
+    | create_workload_group
+    | create_xml_schema_collection
     ;
-
+drop_something
+    : drop_aggregate
+    | drop_application_role
+    | drop_application_role
+    | drop_assembly
+    | drop_assembly
+    | drop_asymmetric_key
+    | drop_asymmetric_key
+    | drop_availability_group
+    | drop_availability_group
+    | drop_backward_compatible_index
+    | drop_broker_priority
+    | drop_certificate
+    | drop_column_encryption_key
+    | drop_column_master_key
+    | drop_contract
+    | drop_credential
+    | drop_cryptograhic_provider
+    | drop_database
+    | drop_database_audit_specification
+    | drop_database_scoped_credential
+    | drop_db_role
+    | drop_ddl_trigger
+    | drop_default
+    | drop_dml_trigger
+    | drop_endpoint
+    | drop_event_notifications
+    | drop_event_session
+    | drop_external_data_source
+    | drop_external_file_format
+    | drop_external_library
+    | drop_external_resource_pool
+    | drop_external_table
+    | drop_fulltext_catalog
+    | drop_fulltext_index
+    | drop_fulltext_stoplist
+    | drop_function
+    | drop_function
+    | drop_index
+    | drop_index
+    | drop_login
+    | drop_master_key
+    | drop_message_type
+    | drop_partition_function
+    | drop_partition_scheme
+    | drop_procedure
+    | drop_procedure
+    | drop_queue
+    | drop_relational_or_xml_or_spatial_index
+    | drop_remote_service_binding
+    | drop_resource_pool
+    | drop_route
+    | drop_rule
+    | drop_schema
+    | drop_search_property_list
+    | drop_security_policy
+    | drop_sequence
+    | drop_server_audit
+    | drop_server_audit_specification
+    | drop_server_role
+    | drop_service
+    | drop_signature
+    | drop_statistics
+    | drop_statistics
+    | drop_statistics_name_azure_dw_and_pdw
+    | drop_symmetric_key
+    | drop_synonym
+    | drop_table
+    | drop_table
+    | drop_trigger
+    | drop_trigger
+    | drop_type
+    | drop_type
+    | drop_user
+    | drop_view
+    | drop_view
+    | drop_workload_group
+    | drop_xml_schema_collection
+;
+    
 // Control-of-Flow Language: https://docs.microsoft.com/en-us/sql/t-sql/language-elements/control-of-flow
 cfl_statement
     : block_statement
@@ -280,6 +371,17 @@ alter_application_role
 
 create_application_role
     : CREATE APPLICATION ROLE appliction_role=id WITH   (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id)? 
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-aggregate-transact-sql
+
+drop_aggregate
+   : DROP AGGREGATE ( IF EXISTS )? ( schema_name=id DOT )? aggregate_name=id
+   ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-application-role-transact-sql
+drop_application_role
+    : DROP APPLICATION ROLE rolename=id
     ;
 
 alter_assembly
@@ -415,6 +517,11 @@ create_assembly
 
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-assembly-transact-sql
+drop_assembly
+    : DROP ASSEMBLY ( IF EXISTS )? (COMMA? assembly_name=id)+
+       ( WITH NO DEPENDENTS )?
+    ;
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-asymmetric-key-transact-sql
 
 alter_asymmetric_key
@@ -448,6 +555,11 @@ create_asymmetric_key
        ( FROM (FILE EQUAL STRING |EXECUTABLE_FILE EQUAL STRING|ASSEMBLY Assembly_Name=id | PROVIDER Provider_Name=id) )?
        (WITH (ALGORITHM EQUAL ( RSA_4096 | RSA_3072 | RSA_2048 | RSA_1024 | RSA_512)  |PROVIDER_KEY_NAME EQUAL provider_key_name=STRING | CREATION_DISPOSITION EQUAL (CREATE_NEW|OPEN_EXISTING)  )   )?
        (ENCRYPTION BY PASSWORD EQUAL asymmetric_key_password=STRING )?
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-asymmetric-key-transact-sql
+drop_asymmetric_key
+     : DROP ASYMMETRIC KEY key_name=id ( REMOVE PROVIDER KEY )?
      ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-authorization-transact-sql
@@ -538,6 +650,11 @@ class_type_for_parallel_dw
     ;
 
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-availability-group-transact-sql
+drop_availability_group
+    :  DROP AVAILABILITY GROUP group_name=id
+    ;
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-availability-group-transact-sql
 
 alter_availability_group
@@ -582,8 +699,8 @@ alter_availability_group_options
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-broker-priority-transact-sql
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-broker-priority-transact-sql
 
-create_or_alter_broker_priority
-    : (ALTER|CREATE) BROKER PRIORITY ConversationPriorityName=id FOR CONVERSATION
+alter_broker_priority
+    : ALTER BROKER PRIORITY ConversationPriorityName=id FOR CONVERSATION
       SET LR_BRACKET 
      ( CONTRACT_NAME EQUAL ( ( id) | ANY )  COMMA?  )?
      ( LOCAL_SERVICE_NAME EQUAL (DOUBLE_FORWARD_SLASH? id | ANY ) COMMA? )?
@@ -591,6 +708,22 @@ create_or_alter_broker_priority
      ( PRIORITY_LEVEL EQUAL ( PriorityValue=DECIMAL | DEFAULT ) ) ?
      RR_BRACKET
     ;
+
+create_broker_priority
+    : CREATE BROKER PRIORITY ConversationPriorityName=id FOR CONVERSATION
+      SET LR_BRACKET 
+     ( CONTRACT_NAME EQUAL ( ( id) | ANY )  COMMA?  )?
+     ( LOCAL_SERVICE_NAME EQUAL (DOUBLE_FORWARD_SLASH? id | ANY ) COMMA? )?
+     ( REMOTE_SERVICE_NAME  EQUAL (RemoteServiceName=STRING | ANY ) COMMA? )?   
+     ( PRIORITY_LEVEL EQUAL ( PriorityValue=DECIMAL | DEFAULT ) ) ?
+     RR_BRACKET
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-broker-priority-transact-sql
+drop_broker_priority
+    : DROP BROKER PRIORITY ConversationPriorityName=id
+    ;
+    
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-certificate-transact-sql
 
@@ -611,6 +744,249 @@ create_column_encryption_key
            (LR_BRACKET COMMA? COLUMN_MASTER_KEY EQUAL column_master_key_name=id COMMA
            ALGORITHM EQUAL algorithm_name=STRING  COMMA
            ENCRYPTED_VALUE EQUAL encrypted_value=BINARY RR_BRACKET COMMA?)+
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-certificate-transact-sql
+drop_certificate
+     : DROP CERTIFICATE certificate_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-column-encryption-key-transact-sql
+drop_column_encryption_key
+    : DROP COLUMN ENCRYPTION KEY key_name=id
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-column-master-key-transact-sql
+drop_column_master_key
+    : DROP COLUMN MASTER KEY key_name=id
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-contract-transact-sql
+drop_contract
+    : DROP CONTRACT dropped_contract_name=id
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-credential-transact-sql
+drop_credential
+    : DROP CREDENTIAL credential_name=id
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-cryptographic-provider-transact-sql
+drop_cryptograhic_provider
+    : DROP CRYPTOGRAPHIC PROVIDER provider_name=id
+    ;
+
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-database-transact-sql
+drop_database
+    : DROP DATABASE ( IF EXISTS )? (COMMA? database_name_or_database_snapshot_name=id)+ 
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-database-audit-specification-transact-sql
+drop_database_audit_specification
+    : DROP DATABASE AUDIT SPECIFICATION audit_specification_name=id
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-database-scoped-credential-transact-sql
+drop_database_scoped_credential
+   : DROP DATABASE SCOPED CREDENTIAL credential_name=id
+   ;
+ 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-default-transact-sql
+drop_default
+    : DROP DEFAULT ( IF EXISTS )? (COMMA? (schema_name=id DOT)? default_name=id)
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-endpoint-transact-sql
+drop_endpoint
+    : DROP ENDPOINT endPointName=id
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-external-data-source-transact-sql
+drop_external_data_source
+    : DROP EXTERNAL DATA SOURCE external_data_source_name=id
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-external-file-format-transact-sql
+drop_external_file_format
+    : DROP EXTERNAL FILE FORMAT external_file_format_name=id
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-external-library-transact-sql
+drop_external_library
+    : DROP EXTERNAL LIBRARY library_name=id
+( AUTHORIZATION owner_name=id )?
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-external-resource-pool-transact-sql
+drop_external_resource_pool
+    : DROP EXTERNAL RESOURCE POOL pool_name=id
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-external-table-transact-sql
+drop_external_table
+    : DROP EXTERNAL TABLE (database_name=id DOT)? (schema_name=id DOT)? table=id
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-event-notification-transact-sql
+drop_event_notifications
+    : DROP EVENT NOTIFICATION (COMMA? notification_name=id)+
+        ON (SERVER|DATABASE|QUEUE queue_name=id)
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-event-session-transact-sql
+drop_event_session
+    : DROP EVENT SESSION event_session_name=id
+        ON SERVER 
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-fulltext-catalog-transact-sql
+drop_fulltext_catalog
+   : DROP FULLTEXT CATALOG catalog_name=id
+   ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-fulltext-index-transact-sql
+drop_fulltext_index
+   : DROP FULLTEXT INDEX ON (schema=id DOT)? table=id
+   ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-fulltext-stoplist-transact-sql
+drop_fulltext_stoplist
+   : DROP FULLTEXT STOPLIST stoplist_name=id
+   ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-login-transact-sql
+drop_login
+     : DROP LOGIN login_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-master-key-transact-sql
+drop_master_key
+     : DROP MASTER KEY
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-message-type-transact-sql
+drop_message_type
+     : DROP MESSAGE TYPE message_type_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-partition-function-transact-sql
+drop_partition_function
+     : DROP PARTITION FUNCTION partition_function_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-partition-scheme-transact-sql
+drop_partition_scheme
+     : DROP PARTITION SCHEME partition_scheme_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-queue-transact-sql
+drop_queue
+     : DROP QUEUE (database_name=id DOT)? (schema_name=id DOT)? queue_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-remote-service-binding-transact-sql
+drop_remote_service_binding
+     : DROP REMOTE SERVICE BINDING binding_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-resource-pool-transact-sql
+drop_resource_pool
+     : DROP RESOURCE POOL pool_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-role-transact-sql
+drop_db_role
+     : DROP ROLE ( IF EXISTS )? role_name=id 
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-route-transact-sql
+drop_route
+     : DROP ROUTE route_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-rule-transact-sql
+drop_rule
+     : DROP RULE ( IF EXISTS )? (COMMA? (schema_name=id DOT)? rule_name=id)?
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-schema-transact-sql
+drop_schema
+     :  DROP SCHEMA  ( IF EXISTS )? schema_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-search-property-list-transact-sql
+drop_search_property_list
+     : DROP SEARCH PROPERTY LIST property_list_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-security-policy-transact-sql
+drop_security_policy
+     : DROP SECURITY POLICY ( IF EXISTS )? (schema_name=id DOT )? security_policy_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-sequence-transact-sql
+drop_sequence
+     : DROP SEQUENCE ( IF EXISTS )? ( COMMA? (database_name=id DOT)? (schema_name=id DOT)?          sequence_name=id )? 
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-server-audit-transact-sql
+drop_server_audit
+     : DROP SERVER AUDIT audit_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-server-audit-specification-transact-sql
+drop_server_audit_specification
+     : DROP SERVER AUDIT SPECIFICATION audit_specification_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-server-role-transact-sql
+drop_server_role
+     : DROP SERVER ROLE role_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-service-transact-sql
+drop_service
+     : DROP SERVICE dropped_service_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-signature-transact-sql
+drop_signature
+     : DROP ( COUNTER )? SIGNATURE FROM (schema_name=id DOT)? module_name=id
+         BY (COMMA?  CERTIFICATE cert_name=id
+            | COMMA? ASYMMETRIC KEY Asym_key_name=id
+            )+
+     ;
+
+
+drop_statistics_name_azure_dw_and_pdw
+     :  DROP STATISTICS  (schema_name=id DOT)? object_name=id DOT statistics_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-symmetric-key-transact-sql
+drop_symmetric_key
+     : DROP SYMMETRIC KEY symmetric_key_name=id (REMOVE PROVIDER KEY)?
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-synonym-transact-sql
+drop_synonym
+     : DROP SYNONYM ( IF EXISTS )? ( schema=id DOT )? synonym_name=id
+     ;
+
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-user-transact-sql
+drop_user
+     : DROP USER ( IF EXISTS )? user_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-workload-group-transact-sql
+drop_workload_group
+     : DROP WORKLOAD GROUP group_name=id
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-xml-schema-collection-transact-sql
+drop_xml_schema_collection
+     : DROP XML SCHEMA COLLECTION ( relational_schema=id DOT )?  sql_identifier=id 
      ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-column-master-key-transact-sql
@@ -665,8 +1041,38 @@ create_event_notification
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-event-session-transact-sql
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-event-session-transact-sql
-create_or_alter_event_session
-    : (ALTER|CREATE) EVENT SESSION event_session_name=id ON SERVER 
+alter_event_session
+    : ALTER EVENT SESSION event_session_name=id ON SERVER 
+       (COMMA? ADD EVENT ( (event_module_guid=id DOT)? event_package_name=id DOT event_name=id)
+        (LR_BRACKET
+          (SET ( COMMA? event_customizable_attributue=id EQUAL (DECIMAL|STRING) )* )?
+          ( ACTION LR_BRACKET (COMMA? (event_module_guid=id DOT)? event_package_name=id DOT action_name=id)+  RR_BRACKET)+
+          (WHERE event_session_predicate_expression)?
+         RR_BRACKET )* 
+      )*
+      (COMMA? DROP EVENT (event_module_guid=id DOT)? event_package_name=id DOT event_name=id )*
+     
+      ( (ADD TARGET (event_module_guid=id DOT)? event_package_name=id DOT target_name=id ) ( LR_BRACKET SET (COMMA? target_parameter_name=id EQUAL (LR_BRACKET? DECIMAL RR_BRACKET? |STRING) )+ RR_BRACKET )* )*
+       (DROP TARGET (event_module_guid=id DOT)? event_package_name=id DOT target_name=id )*
+       
+
+     (WITH 
+           LR_BRACKET
+           (COMMA? MAX_MEMORY EQUAL max_memory=DECIMAL (KB|MB) )?
+           (COMMA? EVENT_RETENTION_MODE EQUAL (ALLOW_SINGLE_EVENT_LOSS | ALLOW_MULTIPLE_EVENT_LOSS | NO_EVENT_LOSS ) )?
+           (COMMA? MAX_DISPATCH_LATENCY EQUAL (max_dispatch_latency_seconds=DECIMAL SECONDS | INFINITE) )?
+           (COMMA?  MAX_EVENT_SIZE EQUAL max_event_size=DECIMAL (KB|MB) )?
+           (COMMA? MEMORY_PARTITION_MODE EQUAL (NONE | PER_NODE | PER_CPU) )?
+           (COMMA? TRACK_CAUSALITY EQUAL (ON|OFF) )?
+           (COMMA? STARTUP_STATE EQUAL (ON|OFF) )?
+           RR_BRACKET
+     )?  
+     (STATE EQUAL (START|STOP) )?
+        
+    ;
+
+create_event_session
+    : CREATE EVENT SESSION event_session_name=id ON SERVER 
        (COMMA? ADD EVENT ( (event_module_guid=id DOT)? event_package_name=id DOT event_name=id)
         (LR_BRACKET
           (SET ( COMMA? event_customizable_attributue=id EQUAL (DECIMAL|STRING) )* )?
@@ -1206,6 +1612,67 @@ alter_user
     : ALTER USER username=id WITH (COMMA? NAME EQUAL newusername=id | COMMA? DEFAULT_SCHEMA EQUAL ( schema_name=id |NULL ) | COMMA? LOGIN EQUAL loginame=id | COMMA? PASSWORD EQUAL STRING (OLD_PASSWORD EQUAL STRING)+ | COMMA? DEFAULT_LANGUAGE EQUAL (NONE| lcid=DECIMAL| language_name_or_alias=id) | COMMA? ALLOW_ENCRYPTED_VALUE_MODIFICATIONS EQUAL (ON|OFF) )+
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-user-transact-sql
+create_user
+    : CREATE USER user_name=id
+         (  (FOR|FROM) LOGIN login_name=id )?
+         ( WITH (COMMA? DEFAULT_SCHEMA EQUAL schema_name=id
+                |COMMA? ALLOW_ENCRYPTED_VALUE_MODIFICATIONS EQUAL (ON|OFF)
+                )*
+         )?
+    | CREATE USER   ( windows_principal=id
+                      (WITH
+                        (COMMA? DEFAULT_SCHEMA EQUAL schema_name=id
+                        |COMMA? DEFAULT_LANGUAGE EQUAL (NONE
+                                                |DECIMAL
+                                                |language_name_or_alias=id                                                      )
+                        |COMMA? SID EQUAL BINARY
+                        |COMMA? ALLOW_ENCRYPTED_VALUE_MODIFICATIONS EQUAL (ON|OFF)
+                        )*
+                      )?
+                   | user_name=id WITH PASSWORD EQUAL password=STRING
+                            (COMMA? DEFAULT_SCHEMA EQUAL schema_name=id
+                            |COMMA? DEFAULT_LANGUAGE EQUAL (NONE
+                                                |DECIMAL
+                                                |language_name_or_alias=id                                                      )
+                            |COMMA? SID EQUAL BINARY
+                           |COMMA? ALLOW_ENCRYPTED_VALUE_MODIFICATIONS EQUAL (ON|OFF)
+                          )*
+                   | Azure_Active_Directory_principal=id FROM EXTERNAL PROVIDER
+                   )
+     | CREATE USER user_name=id
+                 ( WITHOUT LOGIN
+                   (COMMA? DEFAULT_SCHEMA EQUAL schema_name=id
+                   |COMMA? ALLOW_ENCRYPTED_VALUE_MODIFICATIONS EQUAL (ON|OFF)
+                   )*
+                 | (FOR|FROM) CERTIFICATE cert_name=id
+                 | (FOR|FROM) ASYMMETRIC KEY asym_key_name=id
+                 )
+     | CREATE USER user_name=id
+     ;
+
+create_user_azure_sql_dw
+    : CREATE USER user_name=id
+        ( (FOR|FROM) LOGIN login_name=id
+        | WITHOUT LOGIN
+        )?
+        
+        ( WITH DEFAULT_SCHEMA EQUAL schema_name=id)?
+    | CREATE USER Azure_Active_Directory_principal=id
+        FROM EXTERNAL PROVIDER 
+        ( WITH DEFAULT_SCHEMA EQUAL schema_name=id)?
+    ;
+
+create_user_pdw
+    : CREATE USER user_name=id
+        ( (FOR|FROM) LOGIN login_name=id
+        | WITHOUT LOGIN
+        )?
+
+        ( WITH DEFAULT_SCHEMA EQUAL schema_name=id)?
+    ;
+
+
 alter_user_azure_sql
     : ALTER USER username=id WITH (COMMA? NAME EQUAL newusername=id | COMMA? DEFAULT_SCHEMA EQUAL  schema_name=id | COMMA? LOGIN EQUAL loginame=id  | COMMA? ALLOW_ENCRYPTED_VALUE_MODIFICATIONS EQUAL (ON|OFF) )+
     ;
@@ -1213,10 +1680,42 @@ alter_user_azure_sql
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-workload-group-transact-sql
 
 alter_workload_group
-    : ALTER WORKLOAD GROUP (workload_group_group_name=id |DEFAULT_DOUBLE_QUOTE) (WITH LR_BRACKET (IMPORTANCE EQUAL (LOW|MEDIUM|HIGH) | COMMA? REQUEST_MAX_MEMORY_GRANT_PERCENT EQUAL request_max_memory_grant=DECIMAL | COMMA? REQUEST_MAX_CPU_TIME_SEC EQUAL request_max_cpu_time_sec=DECIMAL | REQUEST_MEMORY_GRANT_TIMEOUT_SEC EQUAL request_memory_grant_timeout_sec=DECIMAL | MAX_DOP EQUAL max_dop=DECIMAL | GROUP_MAX_REQUESTS EQUAL group_max_requests=DECIMAL)+ RR_BRACKET )?
+    : ALTER WORKLOAD GROUP 
+         (workload_group_group_name=id 
+         |DEFAULT_DOUBLE_QUOTE
+         )
+         (WITH LR_BRACKET 
+           (IMPORTANCE EQUAL (LOW|MEDIUM|HIGH) 
+           | COMMA? REQUEST_MAX_MEMORY_GRANT_PERCENT EQUAL request_max_memory_grant=DECIMAL 
+           | COMMA? REQUEST_MAX_CPU_TIME_SEC EQUAL request_max_cpu_time_sec=DECIMAL 
+           | REQUEST_MEMORY_GRANT_TIMEOUT_SEC EQUAL request_memory_grant_timeout_sec=DECIMAL 
+           | MAX_DOP EQUAL max_dop=DECIMAL 
+           | GROUP_MAX_REQUESTS EQUAL group_max_requests=DECIMAL)+
+          RR_BRACKET )?
      (USING (workload_group_pool_name=id | DEFAULT_DOUBLE_QUOTE) )?
     ;
-               
+         
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-workload-group-transact-sql      
+create_workload_group
+    : CREATE WORKLOAD GROUP workload_group_group_name=id 
+         (WITH LR_BRACKET 
+           (IMPORTANCE EQUAL (LOW|MEDIUM|HIGH) 
+           | COMMA? REQUEST_MAX_MEMORY_GRANT_PERCENT EQUAL request_max_memory_grant=DECIMAL 
+           | COMMA? REQUEST_MAX_CPU_TIME_SEC EQUAL request_max_cpu_time_sec=DECIMAL 
+           | REQUEST_MEMORY_GRANT_TIMEOUT_SEC EQUAL request_memory_grant_timeout_sec=DECIMAL 
+           | MAX_DOP EQUAL max_dop=DECIMAL 
+           | GROUP_MAX_REQUESTS EQUAL group_max_requests=DECIMAL)+
+          RR_BRACKET )?
+     (USING (workload_group_pool_name=id | DEFAULT_DOUBLE_QUOTE)? 
+            (COMMA? EXTERNAL external_pool_name=id | DEFAULT_DOUBLE_QUOTE)?
+      )? 
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-xml-schema-collection-transact-sql
+create_xml_schema_collection
+    : CREATE XML SCHEMA COLLECTION (relational_schema=id DOT)? sql_identifier=id AS  (STRING|id|LOCAL_ID)
+    ;
+ 
 create_queue
     : CREATE QUEUE (full_table_name | queue_name=id) queue_settings?
       (ON filegroup=id | DEFAULT)?
@@ -1413,8 +1912,15 @@ create_index
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
-create_or_alter_procedure
-    : (CREATE | ALTER) proc=(PROC | PROCEDURE) func_proc_name (';' DECIMAL)?
+alter_procedure
+    : ALTER proc=(PROC | PROCEDURE) func_proc_name (';' DECIMAL)?
+      ('('? procedure_param (',' procedure_param)* ')'?)?
+      (WITH procedure_option (',' procedure_option)*)?
+      (FOR REPLICATION)? AS sql_clauses
+    ;
+
+create_procedure
+    : CREATE proc=(PROC | PROCEDURE) func_proc_name (';' DECIMAL)?
       ('('? procedure_param (',' procedure_param)* ')'?)?
       (WITH procedure_option (',' procedure_option)*)?
       (FOR REPLICATION)? AS sql_clauses
@@ -1422,12 +1928,25 @@ create_or_alter_procedure
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql
 create_or_alter_trigger
-    : dml_trigger
-    | ddl_trigger
+    : alter_dml_trigger
+    | create_dml_trigger
+    | alter_ddl_trigger
+    | create_ddl_trigger
     ;
 
-dml_trigger
-    : (CREATE | ALTER) TRIGGER simple_name
+alter_dml_trigger
+    : ALTER TRIGGER simple_name
+      ON table_name
+      (WITH dml_trigger_option (',' dml_trigger_option)* )?
+      (FOR | AFTER | INSTEAD OF)
+      dml_trigger_operation (',' dml_trigger_operation)*
+      (WITH APPEND)?
+      (NOT FOR REPLICATION)?
+      AS sql_clauses
+    ;
+
+create_dml_trigger
+    : CREATE  TRIGGER simple_name
       ON table_name
       (WITH dml_trigger_option (',' dml_trigger_option)* )?
       (FOR | AFTER | INSTEAD OF)
@@ -1446,8 +1965,16 @@ dml_trigger_operation
     : (INSERT | UPDATE | DELETE)
     ;
 
-ddl_trigger
-    : (CREATE | ALTER) TRIGGER simple_name
+alter_ddl_trigger
+    :  ALTER TRIGGER simple_name
+      ON (ALL SERVER | DATABASE)
+      (WITH dml_trigger_option (',' dml_trigger_option)* )?
+      (FOR | AFTER) ddl_trigger_operation (',' dml_trigger_operation)*
+      AS sql_clauses
+    ;
+
+create_ddl_trigger
+    :  CREATE TRIGGER simple_name
       ON (ALL SERVER | DATABASE)
       (WITH dml_trigger_option (',' dml_trigger_option)* )?
       (FOR | AFTER) ddl_trigger_operation (',' dml_trigger_operation)*
@@ -1459,8 +1986,14 @@ ddl_trigger_operation
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms186755.aspx
-create_or_alter_function
-    : (CREATE | ALTER) FUNCTION func_proc_name
+alter_function
+    :  ALTER FUNCTION func_proc_name
+        (('(' procedure_param (',' procedure_param)* ')') | '(' ')') //must have (), but can be empty
+        (func_body_returns_select | func_body_returns_table | func_body_returns_scalar) ';'?
+    ;
+
+create_function
+    : CREATE FUNCTION func_proc_name
         (('(' procedure_param (',' procedure_param)* ')') | '(' ')') //must have (), but can be empty
         (func_body_returns_select | func_body_returns_table | func_body_returns_scalar) ';'?
     ;
@@ -1618,13 +2151,20 @@ cursor_option:
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
 
-create_or_alter_endpoint
+create_endpoint
+   : endpoint_start_create  endpoint_name=id endpoint_authorization? endpoint_state? endpoint_as_clause endpoint_for_clause?  
+   ;
+alter_endpoint
    :
-   endpoint_start endpoint_name=id endpoint_authorization? endpoint_state? endpoint_as_clause endpoint_for_clause?  
+   endpoint_start_alter endpoint_name=id endpoint_authorization? endpoint_state? endpoint_as_clause endpoint_for_clause?  
    ;
 
-endpoint_start
-   : (CREATE | ALTER)  ENDPOINT
+endpoint_start_alter
+   : ALTER  ENDPOINT
+   ;
+
+endpoint_start_create
+   : CREATE  ENDPOINT
    ;
 
 endpoint_authorization
@@ -1957,7 +2497,7 @@ drop_function
 
 // https://msdn.microsoft.com/en-us/library/ms175075.aspx
 drop_statistics
-    : DROP STATISTICS (table_name '.')? name=id ';'
+    : DROP STATISTICS (COMMA? (table_name '.')? name=id)+ ';'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms173790.aspx
@@ -2632,9 +3172,9 @@ derived_table
     ;
 
 function_call
-    : ranking_windowed_function                         #RANKING_WINDOWED_FUNCTION
-    | aggregate_windowed_function                       #AGGREGATE_WINDOWED_FUNCTION
-    | analytic_windowed_function                        #ANALYTIC_WINDOWED_FUNCTION
+    : ranking_windowed_function                         #RANKING_WINDOWED_FUNC
+    | aggregate_windowed_function                       #AGGREGATE_WINDOWED_FUNC
+    | analytic_windowed_function                        #ANALYTIC_WINDOWED_FUNC
     | scalar_function_name '(' expression_list? ')'     #SCALAR_FUNCTION
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
     | BINARY_CHECKSUM '(' '*' ')'                       #BINARY_CHECKSUM
@@ -2677,7 +3217,7 @@ function_call
     // https://msdn.microsoft.com/en-us/library/ms184325.aspx
     | ISNULL '(' expression ',' expression ')'          #ISNULL
     // https://docs.microsoft.com/en-us/sql/t-sql/xml/xml-data-type-methods
-    | xml_data_type_methods                             #XML_DATA_TYPE_METHODS
+    | xml_data_type_methods                             #XML_DATA_TYPE_FUNC
     ;
 
 xml_data_type_methods
@@ -3107,6 +3647,7 @@ simple_id
     | CONTROL
     | COOKIE
     | COUNT
+    | COUNTER
     | COUNT_BIG
     | DATA_COMPRESSION
     | DELAY
