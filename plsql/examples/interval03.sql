@@ -14,4 +14,8 @@ select
 ,interval '120' hour(3)
 ,interval '30.12345' second(2,4)
 ,interval :a day
+
+,interval '1' year
+,interval '1' month
+    
 from dual

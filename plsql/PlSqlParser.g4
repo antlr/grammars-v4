@@ -738,6 +738,7 @@ statement
     | case_statement/*[true]*/
     | sql_statement
     | function_call
+    | pipe_row_statement
     ;
 
 assignment_statement
@@ -817,6 +818,9 @@ return_statement
 function_call
     : CALL? routine_name function_argument?
     ;
+
+pipe_row_statement
+    : PIPE ROW '(' expression ')';
 
 body
     : BEGIN seq_of_statements (EXCEPTION exception_handler+)? END label_name?
@@ -1016,7 +1020,7 @@ from_clause
 
 select_list_elements
     : tableview_name '.' '*'
-    | expression
+    | (regular_id '.')? expression
     ;
 
 table_ref_list
@@ -2112,7 +2116,7 @@ general_element
     ;
 
 general_element_part
-    : (INTRODUCER char_set_name)? id_expression ('.' id_expression)* function_argument?
+    : (INTRODUCER char_set_name)? id_expression ('.' id_expression)* ('@' link_name)? function_argument?
     ;
 
 table_element
@@ -2126,7 +2130,7 @@ table_element
 constant
     : TIMESTAMP (quoted_string | bind_variable) (AT TIME ZONE quoted_string)?
     | INTERVAL (quoted_string | bind_variable | general_element_part)
-      (DAY | HOUR | MINUTE | SECOND)
+      (YEAR | MONTH | DAY | HOUR | MINUTE | SECOND)
       ('(' (UNSIGNED_INTEGER | bind_variable) (',' (UNSIGNED_INTEGER | bind_variable) )? ')')?
       (TO ( DAY | HOUR | MINUTE | SECOND ('(' (UNSIGNED_INTEGER | bind_variable) ')')?))?
     | numeric
@@ -2294,7 +2298,7 @@ regular_id
     | DEFAULTS
     | DEFERRED
     | DEFINER
-    // | DELETE
+    | DELETE
     // | DEPTH
     //| DESC
     | DETERMINISTIC
@@ -2384,6 +2388,7 @@ regular_id
     | JAVA
     | JOIN
     | KEEP
+    | KEY
     | LANGUAGE
     | LAST
     | LAST_VALUE
@@ -2560,6 +2565,7 @@ regular_id
     | STATIC
     | STATISTICS
     | STRING
+    | SUBSTR
     | SUBMULTISET
     | SUBPARTITION
     | SUBSTITUTABLE
