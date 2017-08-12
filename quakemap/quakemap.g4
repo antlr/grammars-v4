@@ -53,7 +53,7 @@ brushline
    ;
 
 coord
-   : '(' num num num ')'
+   : '(' num* ')'
    ;
 
 num
