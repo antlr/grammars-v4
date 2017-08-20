@@ -67,6 +67,9 @@ ddl_clause
     : alter_something
     | create_something
     | drop_something
+    | disable_trigger
+    | enable_trigger
+    | truncate_table
     ;
 
 alter_something
@@ -987,6 +990,29 @@ drop_workload_group
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-xml-schema-collection-transact-sql
 drop_xml_schema_collection
      : DROP XML SCHEMA COLLECTION ( relational_schema=id DOT )?  sql_identifier=id 
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/disable-trigger-transact-sql
+disable_trigger
+     : DISABLE TRIGGER ( ( COMMA? (schema_name=id DOT)? trigger_name=id )+ | ALL)         ON ((schema_id=id DOT)? object_name=id|DATABASE|ALL SERVER)
+     ;
+
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/enable-trigger-transact-sql
+enable_trigger
+     : ENABLE TRIGGER ( ( COMMA? (schema_name=id DOT)? trigger_name=id )+ | ALL)         ON ( (schema_id=id DOT)? object_name=id|DATABASE|ALL SERVER)
+     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/truncate-table-transact-sql
+truncate_table
+     : TRUNCATE TABLE  (database_name=id DOT)? (schema_name=id DOT)? table=id
+          ( WITH LR_BRACKET
+              PARTITIONS LR_BRACKET
+                                (COMMA? (DECIMAL|DECIMAL TO DECIMAL) )+
+                         RR_BRACKET
+
+                 RR_BRACKET
+          )?
      ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-column-master-key-transact-sql
@@ -2152,143 +2178,79 @@ cursor_option:
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
 
 create_endpoint
-   : endpoint_start_create  endpoint_name=id endpoint_authorization? endpoint_state? endpoint_as_clause endpoint_for_clause?  
+   : CREATE ENDPOINT endpointname=id (AUTHORIZATION login=id)?
+       ( STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED ) )?
+            AS TCP LR_BRACKET
+               LISTENER_PORT EQUAL port=DECIMAL
+                 ( COMMA LISTENER_IP EQUAL
+                   (ALL | IPV4_ADDR | IPV6_ADDR) )?
+                RR_BRACKET
+               (TSQL
+               |
+                FOR SERVICE_BROKER LR_BRACKET 
+                   AUTHENTICATION EQUAL
+                           ( WINDOWS ( NTLM |KERBEROS | NEGOTIATE )?  (CERTIFICATE cert_name=id)?
+                           | CERTIFICATE cert_name=id  WINDOWS? ( NTLM |KERBEROS | NEGOTIATE )?
+                           )
+                   ( (COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED ) )?
+                      ( ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES ) )
+                   )?
+
+                   ( COMMA? MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED ) )?
+                   ( COMMA? MESSAGE_FORWARD_SIZE EQUAL DECIMAL)?
+                   RR_BRACKET
+              |
+               FOR DATABASE_MIRRORING LR_BRACKET
+                   AUTHENTICATION EQUAL
+                           ( WINDOWS ( NTLM |KERBEROS | NEGOTIATE )?  (CERTIFICATE cert_name=id)?
+                           | CERTIFICATE cert_name=id  WINDOWS? ( NTLM |KERBEROS | NEGOTIATE )?
+                           )
+
+                   ( COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED ) 
+                      ( ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES ) )?
+                   )?
+
+                   COMMA? ROLE EQUAL ( WITNESS | PARTNER | ALL )
+                   RR_BRACKET
+             )
    ;
+
 alter_endpoint
-   :
-   endpoint_start_alter endpoint_name=id endpoint_authorization? endpoint_state? endpoint_as_clause endpoint_for_clause?  
-   ;
+   : ALTER ENDPOINT endpointname=id (AUTHORIZATION login=id)?
+       ( STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED ) )?
+            AS TCP LR_BRACKET
+               LISTENER_PORT EQUAL port=DECIMAL
+                 ( COMMA LISTENER_IP EQUAL
+                   (ALL | IPV4_ADDR | IPV6_ADDR) )?
+                RR_BRACKET
+               (TSQL
+               |
+                FOR SERVICE_BROKER LR_BRACKET 
+                   AUTHENTICATION EQUAL
+                           ( WINDOWS ( NTLM |KERBEROS | NEGOTIATE )?  (CERTIFICATE cert_name=id)?
+                           | CERTIFICATE cert_name=id  WINDOWS? ( NTLM |KERBEROS | NEGOTIATE )?
+                           )
+                   ( COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED ) 
+                      ( ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES ) )?
+                   )?
 
-endpoint_start_alter
-   : ALTER  ENDPOINT
-   ;
+                   ( COMMA? MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED ) )?
+                   ( COMMA? MESSAGE_FORWARD_SIZE EQUAL DECIMAL)?
+                   RR_BRACKET
+              |
+               FOR DATABASE_MIRRORING LR_BRACKET
+                   AUTHENTICATION EQUAL
+                           ( WINDOWS ( NTLM |KERBEROS | NEGOTIATE )?  (CERTIFICATE cert_name=id)?
+                           | CERTIFICATE cert_name=id  WINDOWS? ( NTLM |KERBEROS | NEGOTIATE )?
+                           )
 
-endpoint_start_create
-   : CREATE  ENDPOINT
-   ;
+                   ( COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED ) 
+                      ( ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES ) )?
+                   )?
 
-endpoint_authorization
-   :
-   AUTHORIZATION login=id
-   ;
-
-endpoint_state
-   :
-   STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED )
-   ;
-
-endpoint_as_clause
-   :
-   endpoint_as_clause_start endpoint_tcp_protocol_specific_arguments RR_BRACKET
-   ;
-
-endpoint_as_clause_start
-   :
-   AS TCP LR_BRACKET
-   ;
-
-endpoint_tcp_protocol_specific_arguments
-   :
-   endpoint_listener_port endpoint_listener_ip?
-   ;
-
-endpoint_listener_port
-   :
-   LISTENER_PORT EQUAL port=DECIMAL
-   ;
-
-endpoint_listener_ip
-   :
-   endpoint_listener_ip_start endpoint_listener_ip_style
-   ;
-
-endpoint_listener_ip_style
-   : ALL
-   | ipv4_address
-   | ipv6_address
-   ;
-
-
-endpoint_listener_ip_start
-   :
-   COMMA LISTENER_IP EQUAL
-   ;
-
-ipv4_address:
-   IPV4_ADDR  
-   ;
-
-
-ipv6_address:
-   IPV6_ADDR
-   ;
-
-endpoint_for_clause
-   : endpoint_for_service_broker_clause_start endpoint_server_broker_clause RR_BRACKET
-   | endpoint_for_database_mirroring_start endpoint_database_mirroring_clause RR_BRACKET
-;
-
-endpoint_for_service_broker_clause_start
-   : FOR SERVICE_BROKER LR_BRACKET 
-   ;
-
-endpoint_for_database_mirroring_start
-   : FOR DATABASE_MIRRORING LR_BRACKET
-   ;
-
-endpoint_database_mirroring_clause
-   : endpoint_authentication_clause? endpoint_encryption_clause endpoint_role_clause 
-   ;
-
-endpoint_role_clause
-   :
-   endpoint_role_clause  COMMA
-   |ROLE EQUAL ( WITNESS | PARTNER | ALL )
-   ;
-
-
-endpoint_server_broker_clause
-   : endpoint_authentication_clause endpoint_encryption_clause? endpoint_message_forwarding_clause? endpoint_message_forward_size?
-   ;
-
-endpoint_authentication_clause
-   : endpoint_authentication_clause COMMA
-   | endpoint_authentication_clause_start endpoint_authentication_clause_methods
-   ;
-
-endpoint_authentication_clause_start
-   : AUTHENTICATION EQUAL
-   ;
-
-endpoint_authentication_clause_methods
-   :
-    WINDOWS windows_auth_methods
-   | CERTIFICATE cert_name=id 
-   | WINDOWS windows_auth_methods
-   | CERTIFICATE cert_name=id WINDOWS windows_auth_methods
-   ;
-
-windows_auth_methods
-   : ( NTLM |KERBEROS | NEGOTIATE )
-   ;
-
-endpoint_encryption_clause
-   : endpoint_encryption_clause COMMA
-   | endpoint_encryption_equal 
-   ;
-
-endpoint_encryption_equal
-   : ENCRYPTION EQUAL DISABLED
-   | ENCRYPTION EQUAL ( SUPPORTED | REQUIRED )
-   ;
-
-endpoint_message_forwarding_clause
-   : endpoint_message_forwarding_clause COMMA
-   | MESSAGE_FORWARDING EQUAL ( ENABLED | DISABLED )
-   ;
-
-endpoint_message_forward_size
-   : MESSAGE_FORWARD_SIZE EQUAL DECIMAL
+                   COMMA? ROLE EQUAL ( WITNESS | PARTNER | ALL )
+                   RR_BRACKET
+             )
    ;
 
 /* Will visit later

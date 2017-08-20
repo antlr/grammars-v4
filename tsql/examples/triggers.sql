@@ -55,3 +55,17 @@ GO
 DROP TRIGGER ddl_trig_database  
 ON ALL SERVER;  
 GO  
+DISABLE TRIGGER Person.uAddress ON Person.Address;
+GO
+ENABLE Trigger Person.uAddress ON Person.Address;
+DISABLE TRIGGER safety ON DATABASE;
+GO
+ENABLE TRIGGER safety ON DATABASE;
+ENABLE Trigger ALL ON ALL SERVER;
+GO
+DISABLE TRIGGER Person.uAddress ON Person.Address;
+GO
+DISABLE TRIGGER safety ON DATABASE;
+GO
+DISABLE Trigger ALL ON ALL SERVER;
+GO
