@@ -1855,8 +1855,8 @@ delete_statement
     ;
 
 delete_statement_from
-    : table_alias
-    | ddl_object
+    : ddl_object
+    | table_alias
     | rowset_function_limited
     | table_var=LOCAL_ID
     ;
