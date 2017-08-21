@@ -51,6 +51,8 @@ sql_clause
     | empty_statement
 
     | another_statement
+
+    | backup_statement
     ;
 
 // Data Manipulation Language: https://msdn.microsoft.com/en-us/library/ff848766(v=sql.120).aspx
@@ -70,6 +72,13 @@ ddl_clause
     | disable_trigger
     | enable_trigger
     | truncate_table
+    ;
+backup_statement
+    : backup_database
+    | backup_log
+    | backup_certificate
+    | backup_master_key
+    | backup_service_master_key
     ;
 
 alter_something
@@ -2521,6 +2530,134 @@ cursor_statement
     // https://msdn.microsoft.com/en-us/library/ms190500(v=sql.120).aspx
     | OPEN GLOBAL? cursor_name ';'?
     ;
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/backup-transact-sql
+backup_database
+    : BACKUP DATABASE ( database_name=id )
+          (READ_WRITE_FILEGROUPS (COMMA? (FILE|FILEGROUP) EQUAL file_or_filegroup=STRING)* )?
+          (COMMA? (FILE|FILEGROUP) EQUAL file_or_filegroup=STRING)* 
+           ( TO ( COMMA? logical_device_name=id)+
+           | TO ( COMMA? (DISK|TAPE|URL) EQUAL (STRING|id) )+
+           )
+
+           ( (MIRROR TO ( COMMA? logical_device_name=id)+ )+
+           | ( MIRROR TO ( COMMA? (DISK|TAPE|URL) EQUAL (STRING|id) )+ )+
+           )?
+        
+             (WITH ( COMMA? DIFFERENTIAL
+                   | COMMA? COPY_ONLY
+                   | COMMA? (COMPRESSION|NO_COMPRESSION)
+                   | COMMA? DESCRIPTION EQUAL (STRING|id)
+                   | COMMA? NAME EQUAL backup_set_name=id
+                   | COMMA? CREDENTIAL
+                   | COMMA? FILE_SNAPSHOT
+                   | COMMA? (EXPIREDATE EQUAL (STRING|id) | RETAINDAYS EQUAL (DECIMAL|id) )
+                   | COMMA? (NOINIT|INIT)
+                   | COMMA? (NOSKIP|SKIP_KEYWORD)
+                   | COMMA? (NOFORMAT|FORMAT)
+                   | COMMA? MEDIADESCRIPTION EQUAL (STRING|id)
+                   | COMMA? MEDIANAME EQUAL (medianame=STRING)
+                   | COMMA? BLOCKSIZE EQUAL (DECIMAL|id)
+                   | COMMA? BUFFERCOUNT EQUAL (DECIMAL|id)
+                   | COMMA? MAXTRANSFER EQUAL (DECIMAL|id)
+                   | COMMA? (NO_CHECKSUM|CHECKSUM)
+                   | COMMA? (STOP_ON_ERROR|CONTINUE_AFTER_ERROR)
+                   | COMMA? RESTART
+                   | COMMA? STATS (EQUAL stats_percent=DECIMAL)?
+                   | COMMA? (REWIND|NOREWIND)
+                   | COMMA? (LOAD|NOUNLOAD)
+                   | COMMA? ENCRYPTION LR_BRACKET
+                                         ALGORITHM EQUAL
+                                         (AES_128 
+                                         | AES_192 
+                                         | AES_256 
+                                         | TRIPLE_DES_3KEY 
+                                         )
+                                         COMMA
+                                         SERVER CERTIFICATE EQUAL
+                                           (encryptor_name=id
+                                           | SERVER ASYMMETRIC KEY EQUAL encryptor_name=id
+                                           )
+                  )*
+              )?                            
+
+    ;
+
+backup_log
+    : BACKUP LOG ( database_name=id )
+           ( TO ( COMMA? logical_device_name=id)+
+           | TO ( COMMA? (DISK|TAPE|URL) EQUAL (STRING|id) )+
+           )
+
+           ( (MIRROR TO ( COMMA? logical_device_name=id)+ )+
+           | ( MIRROR TO ( COMMA? (DISK|TAPE|URL) EQUAL (STRING|id) )+ )+
+           )?
+        
+             (WITH ( COMMA? DIFFERENTIAL
+                   | COMMA? COPY_ONLY
+                   | COMMA? (COMPRESSION|NO_COMPRESSION)
+                   | COMMA? DESCRIPTION EQUAL (STRING|id)
+                   | COMMA? NAME EQUAL backup_set_name=id
+                   | COMMA? CREDENTIAL
+                   | COMMA? FILE_SNAPSHOT
+                   | COMMA? (EXPIREDATE EQUAL (STRING|id) | RETAINDAYS EQUAL (DECIMAL|id) )
+                   | COMMA? (NOINIT|INIT)
+                   | COMMA? (NOSKIP|SKIP_KEYWORD)
+                   | COMMA? (NOFORMAT|FORMAT)
+                   | COMMA? MEDIADESCRIPTION EQUAL (STRING|id)
+                   | COMMA? MEDIANAME EQUAL (medianame=STRING)
+                   | COMMA? BLOCKSIZE EQUAL (DECIMAL|id)
+                   | COMMA? BUFFERCOUNT EQUAL (DECIMAL|id)
+                   | COMMA? MAXTRANSFER EQUAL (DECIMAL|id)
+                   | COMMA? (NO_CHECKSUM|CHECKSUM)
+                   | COMMA? (STOP_ON_ERROR|CONTINUE_AFTER_ERROR)
+                   | COMMA? RESTART
+                   | COMMA? STATS (EQUAL stats_percent=DECIMAL)?
+                   | COMMA? (REWIND|NOREWIND)
+                   | COMMA? (LOAD|NOUNLOAD)
+                   | COMMA? (NORECOVERY| STANDBY EQUAL undo_file_name=STRING)
+                   | COMMA? NO_TRUNCATE
+                   | COMMA? ENCRYPTION LR_BRACKET
+                                         ALGORITHM EQUAL
+                                         (AES_128 
+                                         | AES_192 
+                                         | AES_256 
+                                         | TRIPLE_DES_3KEY 
+                                         )
+                                         COMMA
+                                         SERVER CERTIFICATE EQUAL
+                                           (encryptor_name=id
+                                           | SERVER ASYMMETRIC KEY EQUAL encryptor_name=id
+                                           )
+                  )*
+              )?                            
+
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/backup-certificate-transact-sql
+backup_certificate
+    : BACKUP CERTIFICATE certname=id TO FILE EQUAL cert_file=STRING
+       ( WITH PRIVATE KEY
+           LR_BRACKET
+             (COMMA? FILE EQUAL private_key_file=STRING 
+             |COMMA? ENCRYPTION BY PASSWORD EQUAL encryption_password=STRING
+             |COMMA? DECRYPTION BY PASSWORD EQUAL decryption_pasword=STRING
+             )+
+           RR_BRACKET
+       )?
+    ;
+       
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/backup-master-key-transact-sql
+backup_master_key
+    : BACKUP MASTER KEY TO FILE EQUAL master_key_backup_file=STRING
+         ENCRYPTION BY PASSWORD EQUAL encryption_password=STRING
+    ;                  
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/backup-service-master-key-transact-sql
+backup_service_master_key
+    : BACKUP SERVICE MASTER KEY TO FILE EQUAL service_master_key_backup_file=STRING
+         ENCRYPTION BY PASSWORD EQUAL encryption_password=STRING
+    ;                  
+
 
 // https://msdn.microsoft.com/en-us/library/ms188332.aspx
 execute_statement
