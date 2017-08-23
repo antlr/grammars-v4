@@ -3557,7 +3557,7 @@ ddl_object
     ;
 /*  There are some RESERVED WORDS that can be column names */
 full_column_name
-    : (table_name '.')? id
+    : (table_name '.')? column_name=id
     | (table_name '.')? COMPATIBILITY_LEVEL
     | (table_name '.')? STATUS
     | (table_name '.')? QUOTED_IDENTIFIER
