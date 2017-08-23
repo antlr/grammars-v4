@@ -118,7 +118,7 @@ streaming_clause
 // $<Package DDLs
 
 drop_package
-    : DROP PACKAGE BODY? package_name ';'
+    : DROP PACKAGE BODY? (schema_object_name '.')? package_name ';'
     ;
 
 alter_package
@@ -126,11 +126,11 @@ alter_package
     ;
 
 create_package
-    : CREATE (OR REPLACE)? PACKAGE package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name? ';'
+    : CREATE (OR REPLACE)? PACKAGE (schema_object_name '.')? package_name invoker_rights_clause? (IS | AS) package_obj_spec* END package_name? ';'
     ;
 
 create_package_body
-    : CREATE (OR REPLACE)? PACKAGE BODY package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?) ';'
+    : CREATE (OR REPLACE)? PACKAGE BODY (schema_object_name '.')? package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?) ';'
     ;
 
 // $<Create Package - Specific Clauses
@@ -738,6 +738,7 @@ statement
     | case_statement/*[true]*/
     | sql_statement
     | function_call
+    | pipe_row_statement
     ;
 
 assignment_statement
@@ -817,6 +818,9 @@ return_statement
 function_call
     : CALL? routine_name function_argument?
     ;
+
+pipe_row_statement
+    : PIPE ROW '(' expression ')';
 
 body
     : BEGIN seq_of_statements (EXCEPTION exception_handler+)? END label_name?
@@ -1016,7 +1020,7 @@ from_clause
 
 select_list_elements
     : tableview_name '.' '*'
-    | expression
+    | (regular_id '.')? expression
     ;
 
 table_ref_list
@@ -1546,7 +1550,7 @@ TODO scope    {
 // $<CASE - Specific Clauses
 
 simple_case_statement
-    : label_name? ck1=CASE atom simple_case_when_part+  case_else_part? END CASE? label_name?
+    : label_name? ck1=CASE expression simple_case_when_part+  case_else_part? END CASE? label_name?
     ;
 
 simple_case_when_part
@@ -1588,11 +1592,13 @@ quantified_expression
 
 string_function
     : SUBSTR '(' expression COMMA expression (COMMA expression)? ')'
-    | TO_CHAR '(' (table_element|standard_function) (COMMA quoted_string)? ')' 
+    | TO_CHAR '(' (table_element|standard_function|expression) (COMMA quoted_string)? (COMMA quoted_string)? ')'
     | DECODE '(' expression (COMMA expression)*  ')'
     | CHR '(' concatenation USING NCHAR_CS ')'
     | NVL '(' expression COMMA expression ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
+    | TO_DATE '(' expression (COMMA quoted_string)? ')'
+
     ;
 
 standard_function
@@ -1611,6 +1617,8 @@ numeric_function
    | ROUND '(' expression (COMMA UNSIGNED_INTEGER)?  ')'
    | AVG '(' (DISTINCT | ALL)? expression ')'
    | MAX '(' (DISTINCT | ALL)? expression ')'
+   | LEAST '(' expression (COMMA expression)* ')'
+   | GREATEST '(' expression (COMMA expression)* ')'
    ;
 
 other_function
@@ -2108,7 +2116,7 @@ general_element
     ;
 
 general_element_part
-    : (INTRODUCER char_set_name)? id_expression ('.' id_expression)* function_argument?
+    : (INTRODUCER char_set_name)? id_expression ('.' id_expression)* ('@' link_name)? function_argument?
     ;
 
 table_element
@@ -2122,7 +2130,7 @@ table_element
 constant
     : TIMESTAMP (quoted_string | bind_variable) (AT TIME ZONE quoted_string)?
     | INTERVAL (quoted_string | bind_variable | general_element_part)
-      (DAY | HOUR | MINUTE | SECOND)
+      (YEAR | MONTH | DAY | HOUR | MINUTE | SECOND)
       ('(' (UNSIGNED_INTEGER | bind_variable) (',' (UNSIGNED_INTEGER | bind_variable) )? ')')?
       (TO ( DAY | HOUR | MINUTE | SECOND ('(' (UNSIGNED_INTEGER | bind_variable) ')')?))?
     | numeric
@@ -2290,7 +2298,7 @@ regular_id
     | DEFAULTS
     | DEFERRED
     | DEFINER
-    // | DELETE
+    | DELETE
     // | DEPTH
     //| DESC
     | DETERMINISTIC
@@ -2380,6 +2388,7 @@ regular_id
     | JAVA
     | JOIN
     | KEEP
+    | KEY
     | LANGUAGE
     | LAST
     | LAST_VALUE
@@ -2556,6 +2565,7 @@ regular_id
     | STATIC
     | STATISTICS
     | STRING
+    | SUBSTR
     | SUBMULTISET
     | SUBPARTITION
     | SUBSTITUTABLE
