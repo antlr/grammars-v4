@@ -4,7 +4,7 @@ AFTER INSERT, UPDATE
 AS RAISERROR ('Notify Customer Relations', 16, 10);  
 GO
 
-CREATE TRIGGER reminder2  
+CREATE OR ALTER TRIGGER reminder2
 ON Sales.Customer  
 AFTER INSERT, UPDATE, DELETE   
 AS  

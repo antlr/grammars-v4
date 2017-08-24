@@ -21,3 +21,8 @@ DECLARE @Result nvarchar(64)
 EXEC @Result = @SprocName @Name = @TestName;
 SELECT @Result
 GO
+
+
+CREATE OR ALTER PROC What_DB_is_this
+AS
+SELECT DB_NAME() AS ThisDB;
