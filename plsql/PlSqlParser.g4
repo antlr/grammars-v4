@@ -1598,7 +1598,6 @@ string_function
     | NVL '(' expression COMMA expression ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
     | TO_DATE '(' expression (COMMA quoted_string)? ')'
-
     ;
 
 standard_function
