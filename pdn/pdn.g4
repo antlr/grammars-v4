@@ -53,7 +53,7 @@ move
     ;
       
 movespec
-    : number ('-' | 'x') number result?
+    : (MOVE1 | MOVE2) result?
     ;
       
 movenum
@@ -77,6 +77,15 @@ string
 
 number
     : NUMBER
+    ;
+
+
+MOVE1
+    : ('0' .. '9')+ 'x' ('0' .. '9')+
+    ;
+
+MOVE2
+    : ('0' .. '9')+ '-' ('0' .. '9')+
     ;
 
 NUMBER
