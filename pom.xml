@@ -99,6 +99,7 @@
 			<module>pascal</module>
 			<module>pcre</module>
 			<module>pddl</module>
+			<module>pdn</module>
 			<module>pdp7</module>
 			<module>peoplecode</module>
 			<module>pgn</module>
