@@ -794,7 +794,6 @@ Sign
     :   '+' | '-'
     ;
 
-fragment
 DigitSequence
     :   Digit+
     ;
