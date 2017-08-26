@@ -37,72 +37,78 @@ game
    ;
 
 tags
-    : tag*
-    ;
+   : tag*
+   ;
 
 tag
    : '[' text string ']'
    ;
 
 moves
-    : move+ result
-    ;
+   : move + result
+   ;
 
 move
-    : movenum movespec+
-    ;
-      
+   : movenum movespec +
+   ;
+
 movespec
-    : (MOVE1 | MOVE2) result?
-    ;
-      
+   : (MOVE1 | MOVE2) result?
+   ;
+
 movenum
-    : number '.'
-    ;
+   : number '.'
+   ;
 
 result
-    : '1/2-1/2' 
-    | '1-0' 
-    | '0-1' 
-    | '*'?
-    ;
-        
+   : '1/2-1/2'
+   | '1-0'
+   | '0-1'
+   | '*'?
+   ;
+
 text
-    : TEXT
-    ;
+   : TEXT
+   ;
 
 string
    : STRING
    ;
 
 number
-    : NUMBER
-    ;
+   : NUMBER
+   ;
 
 
 MOVE1
-    : ('0' .. '9')+ 'x' ('0' .. '9')+
-    ;
+   : ('0' .. '9') + 'x' ('0' .. '9') +
+   ;
+
 
 MOVE2
-    : ('0' .. '9')+ '-' ('0' .. '9')+
-    ;
+   : ('0' .. '9') + '-' ('0' .. '9') +
+   ;
+
 
 NUMBER
-   : ('0' .. '9')+
+   : ('0' .. '9') +
    ;
+
 
 TEXT
    : [a-zA-Z] [a-zA-Z0-9_] +
    ;
 
+
 STRING
    : '"' ('""' | ~ '"')* '"'
    ;
 
+
 COMMENT
-    : '{' .*? '}' -> skip
-    ;
+   : '{' .*? '}' -> skip
+   ;
+
 
 WS
    : [ \t\r\n] + -> skip
