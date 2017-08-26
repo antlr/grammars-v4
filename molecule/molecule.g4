@@ -33,12 +33,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar molecule;
 
 molecule
-   : symbol +
+   : part ('·' part)*
    ;
 
+part
+    : (count? structure)+;
+
+structure
+    :  symbol count?
+    ; 
+
 symbol
-   : element count?
+   : 
+   element 
+   | group
+   | ion
    ;
+     
+group
+    : '(' structure+ ')'
+    ;
+
+ion
+    : '[' structure+ ']'
+    ;
 
 element
    : ELEMENT
