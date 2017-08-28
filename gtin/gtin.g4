@@ -29,13 +29,39 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/*
 
-grammar upc;
+http://www.gtin.info/
+
+*/
+grammar gtin;
+
+gtin
+    : (gtin8 | gtin12 | gtin13) EOF
+    ;
+
+gtin8
+    : ean8
+    ;
+
+ean8
+    : DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT
+    ;
+
+gtin12
+    : upc
+    ;
+
+gtin13
+    : /*('0' upc)  
+    | */ ean13
+    ;
 
 upc
-   : (upc_a | upc_e) EOF?
+   : (upc_a | upc_e) 
    ;
 
+// 12 digits (1+5+5+1)
 upc_a
    : num_system upc_a_manufacturer upc_a_product check_code supplemental_code?
    ;
@@ -76,6 +102,21 @@ supplemental_code_5
 supplemental_code_2
    : DIGIT DIGIT
    ;
+
+// 13 digits (3+9+1)
+ean13
+    : gs1_prefix ean_13_manprod check_code supplemental_code?
+    ;
+
+// 9 digits in two groups of variable length
+ean_13_manprod
+    : DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT
+    ;
+
+gs1_prefix
+    : DIGIT DIGIT DIGIT
+    ;
+
 
 DIGIT
    : ('0' .. '9')

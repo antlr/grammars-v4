@@ -51,7 +51,7 @@
 			<module>csv</module>
 			<module>datetime</module>
 			<module>dcm</module>
-         <module>dice</module>
+         	<module>dice</module>
 			<module>dot</module>
 			<module>ecmascript</module>
 			<module>emailaddress</module>
@@ -65,6 +65,7 @@
 			<module>golang</module>
 			<module>graphql</module>
 			<module>graphstream-dgs</module>
+			<module>gtin</module>			
 			<module>html</module>
 			<module>icalendar</module>
 			<module>idl</module>
@@ -145,7 +146,6 @@
 			<module>turtle</module>
 			<module>ucb-logo</module>
 			<module>unicode</module>
-			<module>upc</module>
 			<module>url</module>
 			<module>useragent</module>
 			<module>vb6</module>
