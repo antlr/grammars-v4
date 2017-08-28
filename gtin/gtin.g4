@@ -104,7 +104,37 @@ supplemental_code_2
 
 // 13 digits (3+9+1)
 ean13
-    : gs1_prefix ean_13_manprod check_code supplemental_code?
+    : (ean13_bookland | ean13_generic) supplemental_code?
+    ;
+
+ean13_generic
+    : gs1_prefix ean_13_manprod check_code
+    ;
+
+ean13_ismn
+    : gs1_prefix_ismn ismn_number 
+    ;
+
+gs1_prefix_ismn
+    : '9' '7' '9' '0'
+    ;
+
+// 9 digits
+ismn_number
+    : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit
+    ;
+
+ean13_bookland
+    : gs1_prefix_bookland bookland_isbn 
+    ;
+
+// 9 digits that form the ISBN
+bookland_isbn
+    : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit 
+    ;
+
+gs1_prefix_bookland
+    : '9' '7' ('8' | '9') ('1' |'2' |'3' |'4' |'5' |'6' |'7' |'8'|'9')
     ;
 
 // 9 digits in two groups of variable length

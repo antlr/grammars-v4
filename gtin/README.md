@@ -1,4 +1,4 @@
-# UPC Grammar
+# GTIN Grammar
 
-An ANTLR4 grammar for [UPC codes](https://en.wikipedia.org/wiki/Universal_Product_Code).
+An ANTLR4 grammar for [GTIN codes](https://en.wikipedia.org/wiki/Global_Trade_Item_Number).
 
