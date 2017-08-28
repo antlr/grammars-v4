@@ -153,6 +153,7 @@ gs1_prefix_issn
     : '9' '7' '7'
     ;
 
+// (3+9+1)
 ean13_issn
     : gs1_prefix_issn issn check_code
     ;
