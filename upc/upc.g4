@@ -33,47 +33,56 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar upc;
 
 upc
-   : upc_a
+   : (upc_a | upc_e) EOF?
    ;
 
 upc_a
-    : num_system upc_a_manufacturer upc_a_product check_code supplemental_code?
-    ;
+   : num_system upc_a_manufacturer upc_a_product check_code supplemental_code?
+   ;
 
 upc_a_manufacturer
-    : upc_a_5
-    ;
+   : upc_a_5
+   ;
 
 upc_a_product
-    : upc_a_5
-    ;
+   : upc_a_5
+   ;
 
 upc_a_5
-    : DIGIT DIGIT DIGIT DIGIT DIGIT
-    ;
-      
+   : DIGIT DIGIT DIGIT DIGIT DIGIT
+   ;
+
+upc_e
+   : DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT
+   ;
+
 num_system
-    : DIGIT
-    ;
+   : DIGIT
+   ;
 
 check_code
-    : DIGIT
-    ;
+   : DIGIT
+   ;
 
 supplemental_code
-    : supplemental_code_5 | supplemental_code_2
-    ;
+   : supplemental_code_5
+   | supplemental_code_2
+   ;
 
 supplemental_code_5
-    : DIGIT DIGIT DIGIT DIGIT DIGIT
-    ;
+   : DIGIT DIGIT DIGIT DIGIT DIGIT
+   ;
 
 supplemental_code_2
-    : DIGIT DIGIT 
-    ;
+   : DIGIT DIGIT
+   ;
 
 DIGIT
-   : ('0' .. '9') 
+   : ('0' .. '9')
+   ;
+
+HYPHEN
+   : '-' -> skip
    ;
 
 WS
