@@ -45,7 +45,7 @@ gtin8
     ;
 
 ean8
-    : DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT
+    : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit
     ;
 
 gtin12
@@ -53,8 +53,7 @@ gtin12
     ;
 
 gtin13
-    : /*('0' upc)  
-    | */ ean13
+    : ean13
     ;
 
 upc
@@ -75,19 +74,19 @@ upc_a_product
    ;
 
 upc_a_5
-   : DIGIT DIGIT DIGIT DIGIT DIGIT
+   : any_digit any_digit any_digit any_digit any_digit
    ;
 
 upc_e
-   : DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT
+   : any_digit any_digit any_digit any_digit any_digit any_digit
    ;
 
 num_system
-   : DIGIT
+   : any_digit
    ;
 
 check_code
-   : DIGIT
+   : any_digit
    ;
 
 supplemental_code
@@ -96,11 +95,11 @@ supplemental_code
    ;
 
 supplemental_code_5
-   : DIGIT DIGIT DIGIT DIGIT DIGIT
+   : any_digit any_digit any_digit any_digit any_digit
    ;
 
 supplemental_code_2
-   : DIGIT DIGIT
+   : any_digit any_digit
    ;
 
 // 13 digits (3+9+1)
@@ -110,17 +109,64 @@ ean13
 
 // 9 digits in two groups of variable length
 ean_13_manprod
-    : DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT
+    : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit
     ;
 
 gs1_prefix
-    : DIGIT DIGIT DIGIT
+    : any_digit any_digit any_digit
     ;
 
+any_digit
+    :DIGIT_0
+    | DIGIT_1
+    | DIGIT_2
+    | DIGIT_3
+    | DIGIT_4
+    | DIGIT_5 
+    | DIGIT_6
+    | DIGIT_7
+    | DIGIT_8
+    | DIGIT_9
+    ;
 
-DIGIT
-   : ('0' .. '9')
-   ;
+DIGIT_0
+    : '0'
+    ;
+      
+DIGIT_1
+    : '1'
+    ;
+
+DIGIT_2
+    : '2'
+    ;
+
+DIGIT_3
+    : '3'
+    ;
+
+DIGIT_4
+    : '4'
+    ;
+
+DIGIT_5
+    : '5'
+    ;
+DIGIT_6
+    : '6'
+    ;
+
+DIGIT_7
+    : '7'
+    ;
+
+DIGIT_8
+    : '8'
+    ;
+
+DIGIT_9
+    : '9'
+    ;
 
 HYPHEN
    : '-' -> skip
