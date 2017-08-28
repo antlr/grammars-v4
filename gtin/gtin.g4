@@ -113,7 +113,7 @@ ean13_generic
 
 // (4+9)
 ean13_ismn
-    : gs1_prefix_ismn ismn_number
+    : gs1_prefix_ismn ismn_publisher_number ismn_item_number check_code
     ;
 
 // 4 digits
@@ -121,9 +121,14 @@ gs1_prefix_ismn
     : '9' '7' '9' '0'
     ;
 
-// 9 digits
-ismn_number
-    : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit 
+// 4 digits
+ismn_publisher_number
+    : any_digit any_digit any_digit any_digit 
+    ;
+            
+// 4 digits
+ismn_item_number
+    : any_digit any_digit any_digit any_digit
     ;
 
 ean13_bookland
