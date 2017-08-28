@@ -37,18 +37,19 @@ upc
    ;
 
 upc_a
-    : num_system upc_a_manufacturer upc_a_product check_code;
+    : num_system upc_a_manufacturer upc_a_product check_code supplemental_code?
+    ;
 
 upc_a_manufacturer
-    : upc_a_6
+    : upc_a_5
     ;
 
 upc_a_product
-    : upc_a_6
+    : upc_a_5
     ;
 
-upc_a_6
-    : DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT
+upc_a_5
+    : DIGIT DIGIT DIGIT DIGIT DIGIT
     ;
       
 num_system
@@ -57,6 +58,18 @@ num_system
 
 check_code
     : DIGIT
+    ;
+
+supplemental_code
+    : supplemental_code_5 | supplemental_code_2
+    ;
+
+supplemental_code_5
+    : DIGIT DIGIT DIGIT DIGIT DIGIT
+    ;
+
+supplemental_code_2
+    : DIGIT DIGIT 
     ;
 
 DIGIT
