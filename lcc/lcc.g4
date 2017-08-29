@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar lcc;
 
 lcc
-   : topic subtopic subclass '.' cutter date EOF
+   : topic ' '? subtopic? ' '? subclasses ' '? ('.' cutters)? (' ' date)? EOF
    ;
 
 topic
@@ -45,12 +45,20 @@ subtopic
     : LETTER
     ;
 
+subclasses
+    : subclass ('.' subclass)*
+    ;
+
 subclass
     : DIGIT+
     ;
 
+cutters
+    : cutter (' ' cutter)*
+    ;
+
 cutter
-    : LETTER DIGIT DIGIT DIGIT
+    : LETTER DIGIT+
     ;
 
 date
@@ -66,5 +74,5 @@ LETTER
     ;
 
 WS
-   : [ \t\r\n] + -> skip
+   : [\t\r\n] + -> skip
    ;
