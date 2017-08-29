@@ -34,30 +34,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 http://www.gtin.info/
 
 */
+
 grammar gtin;
 
 gtin
-    : (gtin8 | gtin12 | gtin13 | supplemental_code) EOF
-    ;
+   : (gtin8 | gtin12 | gtin13 | gtin14 | supplemental_code) EOF
+   ;
 
 gtin8
-    : ean8
-    ;
+   : ean8
+   ;
 
 ean8
-    : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit
-    ;
+   : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit
+   ;
 
 gtin12
-    : upc
-    ;
+   : upc
+   ;
 
 gtin13
-    : ean13
-    ;
+   : ean13
+   ;
+
+gtin14
+   : ean14
+   ;
 
 upc
-   : (upc_a | upc_e) 
+   : (upc_a | upc_e)
    ;
 
 // 12 digits (1+5+5+1)
@@ -104,129 +109,161 @@ supplemental_code_2
 
 // 13 digits (3+9+1)
 ean13
-    : (ean13_ismn | ean13_issn | ean13_bookland | ean13_generic)
-    ;
+   : (ean13_ismn | ean13_issn | ean13_bookland | ean13_generic)
+   ;
 
 ean13_generic
-    : gs1_prefix ean_13_manprod check_code
-    ;
+   : gs1_prefix ean_13_manprod check_code
+   ;
 
 // (4+9)
 ean13_ismn
-    : gs1_prefix_ismn ismn_publisher_number ismn_item_number check_code
-    ;
+   : gs1_prefix_ismn ismn_publisher_number ismn_item_number check_code
+   ;
 
 // 4 digits
 gs1_prefix_ismn
-    : '9' '7' '9' '0'
-    ;
+   : '9' '7' '9' '0'
+   ;
 
 // 4 digits
 ismn_publisher_number
-    : any_digit any_digit any_digit any_digit 
-    ;
-            
+   : any_digit any_digit any_digit any_digit
+   ;
+
 // 4 digits
 ismn_item_number
-    : any_digit any_digit any_digit any_digit
-    ;
+   : any_digit any_digit any_digit any_digit
+   ;
 
 ean13_bookland
-    : (gs1_prefix_bookland_1 | gs1_prefix_bookland_2) bookland_isbn 
-    ;
+   : (gs1_prefix_bookland_1 | gs1_prefix_bookland_2) bookland_isbn
+   ;
 
 // 9 digits that form the ISBN
 bookland_isbn
-    : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit 
-    ;
+   : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit
+   ;
 
 // 4 digits
 gs1_prefix_bookland_1
-    : '9' '7' '9' ('1' |'2' |'3' |'4' |'5' |'6' |'7' |'8'|'9')
-    ;
+   : '9' '7' '9' ('1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9')
+   ;
 
 gs1_prefix_bookland_2
-    : '9' '7' '8' any_digit
-    ;
+   : '9' '7' '8' any_digit
+   ;
 
 gs1_prefix_issn
-    : '9' '7' '7'
-    ;
+   : '9' '7' '7'
+   ;
 
 // (3+9+1)
 ean13_issn
-    : gs1_prefix_issn issn check_code
-    ;
+   : gs1_prefix_issn issn check_code
+   ;
 
 // 9 digits that form the ISSN
 issn
-    : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit  
-    ;
+   : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit
+   ;
 
 // 9 digits in two groups of variable length
 ean_13_manprod
-    : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit
-    ;
+   : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit
+   ;
 
 gs1_prefix
-    : any_digit any_digit any_digit
-    ;
+   : any_digit any_digit any_digit
+   ;
+
+ean14
+   : ean14_packaging ean14_product check_code
+   ;
+
+// 2 digits
+ean14_appid
+   : any_digit any_digit
+   ;
+
+// 1 digit
+ean14_packaging
+   : ('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8')
+   ;
+
+// 12 digits
+ean14_product
+   : any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit any_digit
+   ;
 
 any_digit
-    :DIGIT_0
-    | DIGIT_1
-    | DIGIT_2
-    | DIGIT_3
-    | DIGIT_4
-    | DIGIT_5 
-    | DIGIT_6
-    | DIGIT_7
-    | DIGIT_8
-    | DIGIT_9
-    ;
+   : DIGIT_0
+   | DIGIT_1
+   | DIGIT_2
+   | DIGIT_3
+   | DIGIT_4
+   | DIGIT_5
+   | DIGIT_6
+   | DIGIT_7
+   | DIGIT_8
+   | DIGIT_9
+   ;
+
 
 DIGIT_0
-    : '0'
-    ;
-      
+   : '0'
+   ;
+
+
 DIGIT_1
-    : '1'
-    ;
+   : '1'
+   ;
+
 
 DIGIT_2
-    : '2'
-    ;
+   : '2'
+   ;
+
 
 DIGIT_3
-    : '3'
-    ;
+   : '3'
+   ;
+
 
 DIGIT_4
-    : '4'
-    ;
+   : '4'
+   ;
+
 
 DIGIT_5
-    : '5'
-    ;
+   : '5'
+   ;
+
+
 DIGIT_6
-    : '6'
-    ;
+   : '6'
+   ;
+
 
 DIGIT_7
-    : '7'
-    ;
+   : '7'
+   ;
+
 
 DIGIT_8
-    : '8'
-    ;
+   : '8'
+   ;
+
 
 DIGIT_9
-    : '9'
-    ;
+   : '9'
+   ;
+
 
 HYPHEN
    : '-' -> skip
    ;
+
 
 WS
    : [ \t\r\n] + -> skip
