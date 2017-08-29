@@ -37,7 +37,7 @@ http://www.gtin.info/
 grammar gtin;
 
 gtin
-    : (gtin8 | gtin12 | gtin13) EOF
+    : (gtin8 | gtin12 | gtin13 | supplemental_code) EOF
     ;
 
 gtin8
@@ -62,7 +62,7 @@ upc
 
 // 12 digits (1+5+5+1)
 upc_a
-   : num_system upc_a_manufacturer upc_a_product check_code supplemental_code?
+   : num_system upc_a_manufacturer upc_a_product check_code
    ;
 
 upc_a_manufacturer
@@ -104,7 +104,7 @@ supplemental_code_2
 
 // 13 digits (3+9+1)
 ean13
-    : (ean13_ismn | ean13_issn | ean13_bookland | ean13_generic) supplemental_code?
+    : (ean13_ismn | ean13_issn | ean13_bookland | ean13_generic)
     ;
 
 ean13_generic
