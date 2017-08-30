@@ -71,6 +71,7 @@
 			<module>idl</module>
 			<module>informix</module>
 			<module>iri</module>
+			<module>istc</module>
 			<module>java</module>
 			<module>java8</module>
 			<module>java8-pt</module>
