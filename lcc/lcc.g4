@@ -30,61 +30,49 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-grammar upc;
 
-upc
-   : (upc_a | upc_e) EOF?
+grammar lcc;
+
+lcc
+   : topic ' '? subtopic? ' '? subclasses ' '? ('.' cutters)? (' ' date)? EOF
    ;
 
-upc_a
-   : num_system upc_a_manufacturer upc_a_product check_code supplemental_code?
-   ;
+topic
+    : LETTER
+    ;
 
-upc_a_manufacturer
-   : upc_a_5
-   ;
+subtopic
+    : LETTER
+    ;
 
-upc_a_product
-   : upc_a_5
-   ;
+subclasses
+    : subclass ('.' subclass)*
+    ;
 
-upc_a_5
-   : DIGIT DIGIT DIGIT DIGIT DIGIT
-   ;
+subclass
+    : DIGIT+
+    ;
 
-upc_e
-   : DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT
-   ;
+cutters
+    : cutter (' ' cutter)*
+    ;
 
-num_system
-   : DIGIT
-   ;
+cutter
+    : LETTER DIGIT+
+    ;
 
-check_code
-   : DIGIT
-   ;
-
-supplemental_code
-   : supplemental_code_5
-   | supplemental_code_2
-   ;
-
-supplemental_code_5
-   : DIGIT DIGIT DIGIT DIGIT DIGIT
-   ;
-
-supplemental_code_2
-   : DIGIT DIGIT
-   ;
+date
+    : DIGIT DIGIT DIGIT DIGIT
+    ;
 
 DIGIT
-   : ('0' .. '9')
-   ;
+    : ('0'..'9')
+    ;
 
-HYPHEN
-   : '-' -> skip
-   ;
+LETTER
+    : ('A'..'Z')
+    ;
 
 WS
-   : [ \t\r\n] + -> skip
+   : [\t\r\n] + -> skip
    ;
