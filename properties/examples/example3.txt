@@ -1,0 +1,21 @@
+# Root logger option
+log4j.rootLogger=TRACE, stdout
+
+log4j.category.io.netty=INFO, stdout
+log4j.category.io.netty.handler.codec.http.websocketx.WebSocket08FrameEncoder=INFO, stdout
+log4j.category.net.openhft.chronicle.queue.impl.single.SingleChronicleQueueExcerpts=INFO, stdout
+
+log4j.appender.fileinfo=org.apache.log4j.RollingFileAppender
+log4j.appender.fileinfo.file=./log.log
+log4j.appender.fileinfo.MaxFileSize=20MB
+log4j.appender.fileinfo.MaxBackupIndex=100
+log4j.appender.fileinfo.layout=org.apache.log4j.PatternLayout
+log4j.appender.fileinfo.layout.ConversionPattern=%d{ISO8601} - %-5p- %c - %m%n
+log4j.appender.fileinfo.Threshold = INFO
+
+# Direct log messages to stdout
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.Target=System.out
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d{ISO8601} - %-5p- %c - %m%n
+log4j.appender.stdout.Threshold = DEBUG
