@@ -129,7 +129,8 @@
 			<module>scss</module>
 			<module>sexpression</module>
 			<module>sharc</module>
-			<module>smalltalk</module>
+            <module>smalltalk</module>
+            <module>smtlibv2</module>
 			<module>snobol</module>
 			<module>sparql</module>
 			<module>sqlite</module>
