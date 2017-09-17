@@ -15,7 +15,7 @@
 grammar Cobol85Preprocessor;
 
 startRule
-   : (copyStatement | execCicsStatement | execSqlStatement | replaceOffStatement | replaceArea | charData | controlSpacingStatement)* EOF
+   : (copyStatement | execCicsStatement | execSqlStatement | execSqlImsStatement | replaceOffStatement | replaceArea | charData | controlSpacingStatement)* EOF
    ;
 
 // exec cics statement
@@ -28,6 +28,12 @@ execCicsStatement
 
 execSqlStatement
    : EXEC SQL charData END_EXEC DOT?
+   ;
+
+// exec sql ims statement
+
+execSqlImsStatement
+   : EXEC SQLIMS charData END_EXEC DOT?
    ;
 
 // copy statement
@@ -126,6 +132,7 @@ ON : O N;
 REPLACE : R E P L A C E;
 REPLACING : R E P L A C I N G;
 SQL : S Q L;
+SQLIMS : S Q L I M S;
 SKIP1 : S K I P '1';
 SKIP2 : S K I P '2';
 SKIP3 : S K I P '3';

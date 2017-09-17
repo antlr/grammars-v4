@@ -18,13 +18,10 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>PHPParser.g4</grammars>
 					<includes>
 						<include>PHPLexer.g4</include>
 						<include>PHPParser.g4</include>
 					</includes>
-					<visitor>true</visitor>
-					<listener>true</listener>
 				</configuration>
 				<executions>
 					<execution>
@@ -43,7 +40,7 @@
 					<showTree>false</showTree>
 					<entryPoint>htmlDocument</entryPoint>
 					<grammarName>PHP</grammarName>
-					<caseInsensitive>true</caseInsensitive>
+					<caseInsensitiveType>lower</caseInsensitiveType>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

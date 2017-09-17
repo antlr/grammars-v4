@@ -14,5 +14,6 @@
 	</parent>
 	<modules>
 		<module>unicode16</module>
+		<module>graphemes</module>
 	</modules>
 </project>

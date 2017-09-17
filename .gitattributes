@@ -1,5 +1,5 @@
-# given the grammars context, avoid that git converts line endings
-* -crlf
+*.g4 eol=lf
+*.errors eol=lf
+pom.xml eol=lf
 
 **/examples/* linguist-vendored
-

@@ -76,7 +76,7 @@ identifier
    ;
 
 message
-   : COLON (: .)*
+   : COLON (: .)*?
    ;
 
 

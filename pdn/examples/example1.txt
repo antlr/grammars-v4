@@ -1,0 +1,15 @@
+[Event "itsyourturn.com USA vs. World 8/04"]
+[Site ""]
+[Date "2004.08.23"]
+[Round "1"]
+[Black "Lindus Edwards"]
+[White "Anthony Perez"]
+[Result "1/2-1/2"]
+
+1. 11-15 23-18 2. 8-11 26-23 {Crescent Cross} 3. 10-14 30-26 4. 6-10 24-19 5.
+15-24 27-20* {28-19 loses PP} 6. 4-8 {the popular book line is 12-16 28-24 4-8
+22-17* 8-12 32-28* = same} 32-27 {Perez' cook; 28-24 apparently goes to the
+previous note} 7. 12-16 {seems to be the only move with any strength} 27-24 8.
+8-12 22-17 {returning to the book line mentioned earlier} 9. 10-15 17-10 10.
+7-14 26-22* 1/2-1/2 {a very popular position} 1/2-1/2
+

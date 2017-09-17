@@ -18,7 +18,6 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>html.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -41,7 +40,7 @@
 					<entryPoint>htmlDocument</entryPoint>
 					<grammarName>HTML</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
+					<exampleFiles>examples</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>

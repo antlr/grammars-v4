@@ -1,6 +1,4 @@
-#Logo Grammar
-
-# Summary
+# Logo Grammar
 
 An ANTLR4 grammar for [SHARC](https://en.wikipedia.org/wiki/Super_Harvard_Architecture_Single-Chip_Computer) files.
 
