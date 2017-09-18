@@ -35,10 +35,10 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<verbose>false</verbose>
-					<showTree>false</showTree>
-					<entryPoint>prog</entryPoint>
-					<grammarName>upnp</grammarName>
+					<verbose>true</verbose>
+					<showTree>true</showTree>
+					<entryPoint>searchCrit</entryPoint>
+					<grammarName>Upnp</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

@@ -42,7 +42,7 @@ relExp : PROPERTY WCHAR+ BINOP WCHAR+ QUOTEDVAL | PROPERTY WCHAR+ EXISTSOP WCHAR
  
 NUMBER     : [0-9]+ ;
  
-WHITESPACE : [ \r\t\n] -> skip ;
+WHITESPACE : [\r\t\n] -> skip ;
 
 LOGOP : 'and' | 'or' ;
 BINOP : RELOP | STRINGOP ;
@@ -50,7 +50,7 @@ RELOP : '=' | '!=' | '<' | '<=' | '>' | '>=' ;
 STRINGOP : 'contains' | 'doesnotcontain' | 'derivedfrom' ;
 EXISTSOP : 'exists' ;
 BOOLVAL : 'true' | 'false' ;
-QUOTEDVAL : DQUOTE ESCAPEDQUOTE DQUOTE ;
+QUOTEDVAL : DQUOTE STRING_LITERAL DQUOTE ;
 WCHAR : SPACE | HTAB ;
 PROPERTY	: 'res@resolution'
 				| 'res@duration'
@@ -78,8 +78,9 @@ PROPERTY	: 'res@resolution'
 				| 'upnp:longDescription'
 				| 'pv:capturedate'
 				| 'pv:custom' ;
-ESCAPEDQUOTE :   '\"' ;
+//	ESCAPEDQUOTE :   '\"' ;
 HTAB 		 :	 '\t' ;
 SPACE        :   ' '  ;      
 DQUOTE       :   '"'  ;    
-ASTERISK     :   '*'  ;  
+ASTERISK     :   '*'  ;
+STRING_LITERAL : [a-zA-Z.]+ ;  
