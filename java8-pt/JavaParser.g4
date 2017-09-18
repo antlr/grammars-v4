@@ -49,6 +49,11 @@ typeDeclaration
     | ';'
     ;
 
+innerTypeDeclaration
+	: classOrInterfaceModifier* (classDeclaration | interfaceDeclaration)
+	| ';'
+	;
+
 modifier
     : classOrInterfaceModifier
     | NATIVE
@@ -359,7 +364,7 @@ block
 blockStatement
     : localVariableDeclaration ';'
     | statement
-    | typeDeclaration
+    | innerTypeDeclaration
     ;
 
 localVariableDeclaration
