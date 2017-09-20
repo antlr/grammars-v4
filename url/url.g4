@@ -29,35 +29,30 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 /**
 * scheme:[//[user:password@]host[:port]][/]path[?query][#fragment]
 */
-
 grammar url;
 
-fragmentaddress
-   : uri ('#' fragmentid)? WS?
+url
+   : uri
    ;
 
 uri
-   : url
+   : scheme '://' login? host (':' port)? ('/' path)? query? frag? WS?
    ;
 
-url
-   : authority '://' login? host (':' port)? ('/' path)? ('?' search)?
-   ;
-
-authority
-   : STRING
+scheme
+   : string
    ;
 
 host
-   : hostname
-   | hostnumber
+   : '/'? (hostname | hostnumber)
    ;
 
 hostname
-   : STRING ('.' STRING)*
+   : string ('.' string)*
    ;
 
 hostnumber
@@ -69,7 +64,27 @@ port
    ;
 
 path
-   : STRING ('/' STRING)*
+   : string ('/' string)*
+   ;
+
+user
+   : string
+   ;
+
+login
+   : user ':' password '@'
+   ;
+
+password
+   : string
+   ;
+
+frag
+   : ('#' string)
+   ;
+
+query
+   : ('?' search)
    ;
 
 search
@@ -77,34 +92,26 @@ search
    ;
 
 searchparameter
-    : STRING ('=' (STRING |DIGITS | HEX))?;
+   : string ('=' (string | DIGITS | HEX))?
+   ;
 
-user
+string
    : STRING
    ;
 
-login
-    : user ':' password '@'
-    ;
-
-password
-   : STRING
-   ;
-
-fragmentid
-   : STRING
-   ;
-
-HEX
-    : ('%' [a-fA-F0-9] [a-fA-F0-9])+
-    ;
-
-STRING
-   : ([a-zA-Z~] |HEX) ([a-zA-Z0-9.-] | HEX)*
-   ;
 
 DIGITS
    : [0-9] +
+   ;
+
+
+HEX
+   : ('%' [a-fA-F0-9] [a-fA-F0-9]) +
+   ;
+
+
+STRING
+   : ([a-zA-Z~0-9] | HEX) ([a-zA-Z0-9.-] | HEX)*
    ;
 
 

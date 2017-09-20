@@ -2,40 +2,42 @@
 grammar properties;
 
 propertiesFile
-    : 
+    :
     row+ ;
 
-row 
-    : 
-    (comment | decl)? EOL;
+row
+    :
+    (comment | decl)
+    ;
 
 decl
     : key '=' value?
     ;
 
-key 
-    : 
+key
+    :
     TEXT;
 
 value
-    : 
+    :
     TEXT | STRING;
 
 comment
     :
     COMMENT;
 
-TEXT   
-    : 
-    [a-zA-Z0-9 @:._/,-]+;
+TEXT
+    :
+    [a-zA-Z0-9 @:._/,%{}-]+;
 
-STRING 
-    : 
+STRING
+    :
     '"' ('""'|~'"')* '"' ; // quote-quote is an escaped quote
-EOL 
-    : 
-    '\r'? '\n' ;
 
 COMMENT
     : '#' ~ [\r\n]*
+    ;
+
+TERMINATOR
+    : [\r\n]+ -> channel(HIDDEN)
     ;

@@ -51,7 +51,7 @@
 			<module>csv</module>
 			<module>datetime</module>
 			<module>dcm</module>
-         <module>dice</module>
+         	<module>dice</module>
 			<module>dot</module>
 			<module>ecmascript</module>
 			<module>emailaddress</module>
@@ -65,11 +65,13 @@
 			<module>golang</module>
 			<module>graphql</module>
 			<module>graphstream-dgs</module>
+			<module>gtin</module>			
 			<module>html</module>
 			<module>icalendar</module>
 			<module>idl</module>
 			<module>informix</module>
 			<module>iri</module>
+			<module>istc</module>
 			<module>java</module>
 			<module>java8</module>
 			<module>java8-pt</module>
@@ -79,6 +81,7 @@
 			<module>kotlin</module>
 			<module>kuka</module>
 			<module>lambda</module>
+			<module>lcc</module>
 			<module>less</module>
 			<module>logo</module>
 			<module>lolcode</module>
@@ -113,6 +116,9 @@
 			<module>protobuf3</module>
 			<module>properties</module>
 			<module>python3</module>
+			<module>python3-js</module>
+			<module>python3-py</module>
+			<module>python3-ts</module>
 			<module>python3alt</module>
 			<module>quakemap</module>			
 			<module>r</module>
@@ -126,7 +132,8 @@
 			<module>scss</module>
 			<module>sexpression</module>
 			<module>sharc</module>
-			<module>smalltalk</module>
+            <module>smalltalk</module>
+            <module>smtlibv2</module>
 			<module>snobol</module>
 			<module>sparql</module>
 			<module>sqlite</module>
@@ -147,7 +154,6 @@
 			<module>unicode</module>
 			<module>url</module>
 			<module>useragent</module>
-			<module>uuencoding</module>
 			<module>vb6</module>
 			<module>vba</module>
 			<module>verilog</module>

@@ -25,7 +25,7 @@
 
 grammar Clojure;
 
-file: form *;
+file: form * EOF;
 
 form: literal
     | list
@@ -96,7 +96,7 @@ lambda
     ;
 
 meta_data
-    : '#^' (map form | form) 
+    : '#^' (map form | form)
     ;
 
 var_quote
