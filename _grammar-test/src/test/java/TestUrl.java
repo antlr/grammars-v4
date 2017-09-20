@@ -11,7 +11,7 @@ public class TestUrl {
 
     @Test
     public void test(){
-        Assert.assertTrue(GrammarTester.run(ok, "fragmentaddress", gfiles));
+        Assert.assertTrue(GrammarTester.run(ok, "url", gfiles));
     }
 
 
