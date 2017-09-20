@@ -1,4 +1,5 @@
 // Source: https://en.wikipedia.org/wiki/Java_syntax
+// Source: http://docs.oracle.com/javase/specs/jls/se7/html/jls-8.html#jls-8.1.3
 
 /* This is a multi-line comment.
 It may occupy more than one line. */
@@ -462,6 +463,14 @@ class Dummy {
                                            represented as RequestListener...*/
         listener.requestReceived(); /*...and thus is known to implement
                                     requestReceived() method*/
+    }
+}
+
+class Dummy {
+    public void dummy() {
+        interface AnotherInterface extends Runnable { // local interface
+            void work();
+        }
     }
 }
 
