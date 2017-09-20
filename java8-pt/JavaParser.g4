@@ -359,11 +359,17 @@ block
 blockStatement
     : localVariableDeclaration ';'
     | statement
-    | typeDeclaration
+    | localTypeDeclaration
     ;
 
 localVariableDeclaration
     : variableModifier* typeType variableDeclarators
+    ;
+
+localTypeDeclaration
+    : classOrInterfaceModifier*
+      (classDeclaration | interfaceDeclaration)
+    | ';'
     ;
 
 statement

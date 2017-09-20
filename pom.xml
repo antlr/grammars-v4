@@ -71,6 +71,7 @@
 			<module>idl</module>
 			<module>informix</module>
 			<module>iri</module>
+			<module>istc</module>
 			<module>java</module>
 			<module>java8</module>
 			<module>java8-pt</module>
@@ -115,6 +116,9 @@
 			<module>protobuf3</module>
 			<module>properties</module>
 			<module>python3</module>
+			<module>python3-js</module>
+			<module>python3-py</module>
+			<module>python3-ts</module>
 			<module>python3alt</module>
 			<module>quakemap</module>			
 			<module>r</module>
@@ -128,7 +132,8 @@
 			<module>scss</module>
 			<module>sexpression</module>
 			<module>sharc</module>
-			<module>smalltalk</module>
+            <module>smalltalk</module>
+            <module>smtlibv2</module>
 			<module>snobol</module>
 			<module>sparql</module>
 			<module>sqlite</module>
