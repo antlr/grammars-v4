@@ -92,7 +92,8 @@
 			<module>metric</module>
 			<module>modelica</module>
 			<module>modula2pim4</module>
-			<module>molecule</module>			
+			<module>molecule</module>	
+			<module>morsecode</module>	
 			<module>mps</module>
 			<module>mumath</module>
 			<module>mumps</module>
