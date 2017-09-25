@@ -113,8 +113,9 @@
 			<module>powerbuilder</module>
 			<module>prolog</module>
 			<module>propcalc</module>
-			<module>protobuf3</module>
 			<module>properties</module>
+			<module>protobuf3</module>
+			<module>python2</module>
 			<module>python3</module>
 			<module>python3-js</module>
 			<module>python3-py</module>
