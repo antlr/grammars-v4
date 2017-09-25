@@ -8,9 +8,10 @@ This repository is a collection of Antlr4 grammars.
 
 The root directory name is the all-lowercase name of the language parsed by the grammar. For example, java, cpp, csharp, c, etc...
 
-## Using the grammars
+## Examples
 
-There is a simple example of using a grammar [here](https://github.com/teverett/antlr4example)
+* [Java Example](https://github.com/teverett/antlr4example)
+* [C++ Example](https://github.com/teverett/antlr4-cpp-example)
 
 ## Contributing
 
