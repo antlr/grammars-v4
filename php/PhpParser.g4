@@ -455,7 +455,6 @@ parenthesis
 
 // Expressions
 // Grouped by prioriries: http://php.net/manual/en/language.operators.precedence.php
-// and http://www.phpeveryday.com/articles/PHP-Operators-Operator-Priority-P312.html
 expression
     : Clone expression                                         #CloneExpression
     | newExpr                                                  #NewExpression
@@ -469,9 +468,6 @@ expression
 
     | ('++' | '--') chain                                      #PrefixIncDecExpression
     | chain ('++' | '--')                                      #PostfixIncDecExpression
-
-    | chain assignmentOperator expression                      #AssignmentExpression
-    | chain Eq '&' (chain | newExpr)                           #AssignmentExpression
 
     | Print expression                                         #PrintExpression
 
@@ -512,6 +508,10 @@ expression
     | expression op='||' expression                               #BitwiseExpression
 
     | expression op=QuestionMark expression? ':' expression       #ConditionalExpression
+
+    | chain assignmentOperator expression                         #AssignmentExpression
+    | chain Eq '&' (chain | newExpr)                              #AssignmentExpression
+
     | expression op=LogicalAnd expression                         #LogicalExpression
     | expression op=LogicalXor expression                         #LogicalExpression
     | expression op=LogicalOr expression                          #LogicalExpression
