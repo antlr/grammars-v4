@@ -50,7 +50,7 @@ string
    ;
 
 line
-   : string '=' string EOL
+   : string ('=' string)? EOL
    ;
 
 
