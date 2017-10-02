@@ -100,7 +100,7 @@ parallel_enable_clause
     ;
 
 partition_by_clause
-    : '(' PARTITION expression BY (ANY | (HASH | RANGE) '(' column_name (',' column_name)* ')')streaming_clause? ')'
+    : '(' PARTITION expression BY (ANY | (HASH | RANGE| LIST) '(' column_name (',' column_name)* ')')streaming_clause? ')'
     ;
 
 result_cache_clause
@@ -525,12 +525,52 @@ sequence_start_clause
 // $<Table DDL Clauses
 
 create_table
-    : CREATE TABLE tableview_name LEFT_PAREN column_name datatype (COMMA column_name datatype)* RIGHT_PAREN
+    : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
+        LEFT_PAREN column_name datatype (COMMA column_name datatype)*
+        RIGHT_PAREN
+        ( ON COMMIT (DELETE|PRESERVE) ROWS)?
+        ( SEGMENT CREATION (IMMEDIATE|DEFERRED) )?
+        (PCTFREE pctfree=UNSIGNED_INTEGER 
+        | PCTUSED pctused=UNSIGNED_INTEGER 
+        | INITRANS inittrans=UNSIGNED_INTEGER
+        )*
+        ( STORAGE LEFT_PAREN
+          ( INITIAL initial=size_clause
+          | NEXT next=size_clause
+          | MINEXTENTS minextents=(UNSIGNED_INTEGER|UNLIMITED)
+          | PCTINCREASE pctincrease=UNSIGNED_INTEGER
+          | FREELISTS freelists=UNSIGNED_INTEGER
+          | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
+          | OPTIMAL (size_clause | NULL )
+          | BUFFER_POOL (KEEP|RECYCLE|DEFAULT)
+          | FLASH_CACHE (KEEP|NONE|DEFAULT)
+          | ENCRYPT
+          )+
+         RIGHT_PAREN
+        )?
+        (TABLESPACE tablespace_name=REGULAR_ID)?
+        (LOGGING|NOLOGGING|FILESYSTEM_LIKE_LOGGING)?
+        ( COMPRESS
+           (BASIC
+           | FOR (OLTP
+                 | (QUERY|ARCHIVE) (LOW|HIGH)?
+                 )
+           )?
+        | NOCOMPRESS
+        )?
+// Column_properties clause goes here
+// Partition clause goes here
+// Many more varations to capture
+      SEMICOLON
+    ;
+size_clause
+    :UNSIGNED_INTEGER REGULAR_ID
     ;
 
 drop_table
-    : DROP TABLE tableview_name
+    : DROP TABLE tableview_name SEMICOLON
     ;
+
 
 comment_on_column
     : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string
@@ -688,7 +728,7 @@ ref_cursor_type_def
     : REF CURSOR (RETURN type_spec)?
     ;
 
-// $>
+ // $>
 
 type_declaration
     :  TYPE identifier IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
@@ -2571,6 +2611,7 @@ regular_id
     | SUBTYPE
     | SUCCESS
     | SUSPEND
+    | TEMPORARY
     //| TABLE
     //| THE
     //| THEN
