@@ -71,8 +71,6 @@ unit_statement
     | comment_on_table
 
     | anonymous_block
-
-
     ;
 
 // $<DDL -> SQL Statements for Stored PL/SQL Units
@@ -575,7 +573,7 @@ drop_table
 
 
 comment_on_column
-    : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string
+    : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string ';'
     ;
 
 // $<Synonym DDL Clauses
@@ -587,7 +585,7 @@ create_synonym
     ;
 
 comment_on_table
-    : COMMENT ON TABLE tableview_name IS quoted_string
+    : COMMENT ON TABLE tableview_name IS quoted_string ';'
     ;
 
 alter_table
