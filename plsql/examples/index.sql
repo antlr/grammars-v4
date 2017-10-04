@@ -1,0 +1,1 @@
+create index IDX on OBJ (CODE, DOCUMENT);

@@ -47,7 +47,7 @@ unit_statement
     | create_package
     | create_package_body
 
-//  | create_index //TODO
+    | create_index
     | create_table
 //  | create_view //TODO
 //  | create_directory //TODO
@@ -522,7 +522,9 @@ sequence_start_clause
     : START WITH UNSIGNED_INTEGER
     ;
 
-// $<Table DDL Clauses
+create_index
+    : CREATE UNIQUE? INDEX index_name ON tableview_name '(' column_name (',' column_name)* ')' (COMPUTE STATISTICS)? ';'
+    ;
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
@@ -589,13 +591,37 @@ comment_on_table
     ;
 
 alter_table
-    : ALTER TABLE tableview_name add_constraint
-    // TODO | drop_constraint
+    : ALTER TABLE tableview_name
+      ( add_constraint
+      | drop_constraint
+      | enable_constraint
+      | disable_constraint
+      ) ';'
     ;
 
 add_constraint
-    : ADD (CONSTRAINT constraint_name)? (primary_key_clause | foreign_key_clause | unique_key_clause)
-    // TODO | implement check_constraint_clause, but need separate rule boolean_expression
+    : ADD (CONSTRAINT constraint_name)?
+     ( primary_key_clause
+     | foreign_key_clause
+     | unique_key_clause
+     | check_constraint
+     )
+    ;
+
+check_constraint
+    : CHECK '(' condition ')' DISABLE?
+    ;
+
+drop_constraint
+    : DROP CONSTRAINT constraint_name
+    ;
+
+enable_constraint
+    : ENABLE CONSTRAINT constraint_name
+    ;
+
+disable_constraint
+    : DISABLE CONSTRAINT constraint_name
     ;
 
 foreign_key_clause
@@ -1488,9 +1514,11 @@ compound_expression
     : concatenation
       (NOT? (IN in_elements | BETWEEN between_elements | like_type concatenation like_escape_part?))?
     ;
+
 relational_operator
     : '=' | not_equal_op | '<' | '>' | less_than_or_equals_op | greater_than_or_equals_op
     ;
+
 like_type
     : LIKE
     | LIKEC

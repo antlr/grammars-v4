@@ -251,7 +251,7 @@ COMPILE:                      'COMPILE';
 // COMPOSITE_LIMIT:              'COMPOSITE_LIMIT';
 COMPOUND:                     'COMPOUND';
 COMPRESS:                     'COMPRESS';
-// COMPUTE:                      'COMPUTE';
+COMPUTE:                      'COMPUTE';
 // CONCAT:                       'CONCAT';
 // CON_DBID_TO_ID:               'CON_DBID_TO_ID';
 // CONDITIONAL:                  'CONDITIONAL';
