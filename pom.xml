@@ -79,7 +79,7 @@
 			<module>javadoc</module>
 			<module>jpa</module>
 			<module>json</module>
-			<module>kotlin-alt</module>
+			<module>kotlin</module>
 			<module>kuka</module>
 			<module>lambda</module>
 			<module>lcc</module>

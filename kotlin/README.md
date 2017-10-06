@@ -1,4 +1,4 @@
-# Alternative Kotlin ANTLR4 grammar
+# Kotlin ANTLR4 grammar
 
 ANTLR4 grammar for Kotlin written only in ANTLR's special syntax.
 
