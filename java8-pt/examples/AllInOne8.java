@@ -584,7 +584,7 @@ interface Formula {
 }
 
 // Double colon
-public class For  {
+public class For {
     public void bar() {
         Function<Computer, Integer> getAge = Computer::getAge;
         Integer computerAge = getAge.apply(c1);
