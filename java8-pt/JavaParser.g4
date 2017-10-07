@@ -516,7 +516,7 @@ primary
     ;
 
 methodReference
-    : (qualifiedName | typeType | (qualifiedName '.')? SUPER ) '::' typeArguments? IDENTIFIER
+    : (qualifiedName | typeType | (qualifiedName '.')? SUPER | THIS) '::' typeArguments? IDENTIFIER
     | classType '::' typeArguments? NEW
     | typeType '::' NEW
     ;

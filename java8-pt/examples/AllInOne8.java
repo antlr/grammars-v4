@@ -584,10 +584,12 @@ interface Formula {
 }
 
 // Double colon
-public class For  {
+public class For {
     public void bar() {
         Function<Computer, Integer> getAge = Computer::getAge;
         Integer computerAge = getAge.apply(c1);
+
+        Function<Computer, Integer> getAgeAlt = this::getAge;
 
         TriFunction <Integer, String, Integer, Computer> c6Function = Computer::new;
         Computer c3 = c6Function.apply(2008, "black", 90);
