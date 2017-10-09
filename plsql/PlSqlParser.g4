@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2009-2011 Alexandre Porcelli <alexandre.porcelli@gmail.com>
  * Copyright (c) 2015-2017 Ivan Kochurkin (KvanTTT, kvanttt@gmail.com, Positive Technologies).
+ * Copyright (c) 2017 Mark Adams (madams51703@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +101,7 @@ parallel_enable_clause
     ;
 
 partition_by_clause
-    : '(' PARTITION expression BY (ANY | (HASH | RANGE| LIST) '(' column_name (',' column_name)* ')')streaming_clause? ')'
+    : '(' PARTITION expression BY (ANY | (HASH | RANGE ) '(' column_name (',' column_name)* ')')streaming_clause? ')'
     ;
 
 result_cache_clause
@@ -523,10 +524,14 @@ sequence_start_clause
     ;
 
 // $<Table DDL Clauses
+// https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_7002.htm#SQLRF01402
 
 create_table
-    : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        LEFT_PAREN column_name datatype (COMMA column_name datatype)*
+    : CREATE (GLOBAL TEMPORARY)? TABLE table_name=tableview_name 
+        LEFT_PAREN
+           ( (COMMA? column_names=column_name column_datatypes=datatype (SORT)?  (DEFAULT expression)? (ENCRYPT (USING STRING)? (IDENTIFIED BY REGULAR_ID)? (integrity_algorithm=STRING)? ( (NO)? SALT )? )? )+
+           )
+
         RIGHT_PAREN
         ( ON COMMIT (DELETE|PRESERVE) ROWS)?
         ( SEGMENT CREATION (IMMEDIATE|DEFERRED) )?
@@ -565,6 +570,28 @@ create_table
     ;
 size_clause
     :UNSIGNED_INTEGER REGULAR_ID
+    ;
+
+table_range_partition_by_clause
+    : PARTITION  BY  RANGE  
+        LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+          (INTERVAL LEFT_PAREN expression RIGHT_PAREN
+              (STORE IN LEFT_PAREN
+                        (COMMA? tablespace_name=REGULAR_ID )+
+                      RIGHT_PAREN
+              )?
+          )?
+        LEFT_PAREN 
+            (COMMA? PARTITION partition_name=REGULAR_ID    
+                 VALUES LESS THAN
+// Supposed to be literl in here, will need to refine this                          
+			(COMMA? STRING
+                        | COMMA? string_function
+                        | COMMA? numeric
+                          COMMA? MAXVALUE
+                        )+
+            )+ 
+        RIGHT_PAREN
     ;
 
 drop_table
@@ -2603,6 +2630,7 @@ regular_id
     | STATEMENT_ID
     | STATIC
     | STATISTICS
+    | STORE
     | STRING
     | SUBSTR
     | SUBMULTISET
