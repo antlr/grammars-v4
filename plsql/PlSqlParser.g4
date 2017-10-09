@@ -21,10 +21,6 @@ parser grammar PlSqlParser;
 
 options { tokenVocab=PlSqlLexer; }
 
-compilation_unit
-    : unit_statement* EOF
-    ;
-
 sql_script
     : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
     ;

@@ -40,7 +40,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>compilation_unit</entryPoint>
+					<entryPoint>sql_script</entryPoint>
 					<grammarName>PlSql</grammarName>
 					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<packageName></packageName>
