@@ -37,6 +37,7 @@ unit_statement
     | alter_trigger
     | alter_type
     | alter_table
+    | alter_index
 
     | create_function_body
     | create_procedure_body
@@ -62,6 +63,7 @@ unit_statement
     | drop_type
     | data_manipulation_language_statements
     | drop_table
+    | drop_index
 
     | comment_on_column
     | comment_on_table
@@ -83,7 +85,7 @@ alter_function
 
 create_function_body
     : CREATE (OR REPLACE)? FUNCTION function_name ('(' parameter (',' parameter)* ')')?
-      RETURN type_spec (invoker_rights_clause|parallel_enable_clause|result_cache_clause|DETERMINISTIC)*
+      RETURN type_spec (invoker_rights_clause | parallel_enable_clause | result_cache_clause | DETERMINISTIC)*
       ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
 
@@ -141,12 +143,12 @@ package_obj_spec
     ;
 
 procedure_spec
-    : PROCEDURE identifier ('(' parameter ( ',' parameter )* ')')? ';' 
+    : PROCEDURE identifier ('(' parameter ( ',' parameter )* ')')? ';'
     ;
 
 function_spec
     : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')?
-      RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';' 
+      RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';'
     ;
 
 package_obj_body
@@ -178,8 +180,7 @@ function_body
     ;
 
 procedure_body
-    : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? 
-      (IS | AS)
+    : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? (IS | AS)
       (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
     ;
 
@@ -202,8 +203,8 @@ alter_trigger
 
 create_trigger
     : CREATE ( OR REPLACE )? TRIGGER trigger_name
-    (simple_dml_trigger | compound_dml_trigger | non_dml_trigger)
-    trigger_follows_clause? (ENABLE | DISABLE)? trigger_when_clause? trigger_body ';'
+      (simple_dml_trigger | compound_dml_trigger | non_dml_trigger)
+      trigger_follows_clause? (ENABLE | DISABLE)? trigger_when_clause? trigger_body ';'
     ;
 
 trigger_follows_clause
@@ -332,7 +333,7 @@ alter_method_spec
     ;
 
 alter_method_element
-    : (ADD|DROP) (map_order_function_spec | subprogram_spec)
+    : (ADD | DROP) (map_order_function_spec | subprogram_spec)
     ;
 
 alter_attribute_definition
@@ -367,7 +368,7 @@ type_definition
     ;
 
 object_type_def
-    : invoker_rights_clause? (object_as_part | object_under_part) sqlj_object_type? 
+    : invoker_rights_clause? (object_as_part | object_under_part) sqlj_object_type?
       ('(' object_member_spec (',' object_member_spec)* ')')? modifier_clause*
     ;
 
@@ -405,12 +406,12 @@ subprog_decl_in_type
     ;
 
 proc_decl_in_type
-    : PROCEDURE procedure_name '(' type_elements_parameter (',' type_elements_parameter)* ')' 
+    : PROCEDURE procedure_name '(' type_elements_parameter (',' type_elements_parameter)* ')'
       (IS | AS) (call_spec | DECLARE? declare_spec* body ';')
     ;
 
 func_decl_in_type
-    : FUNCTION function_name ('(' type_elements_parameter (',' type_elements_parameter)* ')')? 
+    : FUNCTION function_name ('(' type_elements_parameter (',' type_elements_parameter)* ')')?
       RETURN type_spec (IS | AS) (call_spec | DECLARE? declare_spec* body ';')
     ;
 
@@ -459,7 +460,9 @@ type_function_spec
     ;
 
 constructor_spec
-    : FINAL? INSTANTIABLE? CONSTRUCTOR FUNCTION type_spec ('(' (SELF IN OUT type_spec ',') type_elements_parameter (',' type_elements_parameter)*  ')')?  RETURN SELF AS RESULT ((IS | AS) call_spec)?
+    : FINAL? INSTANTIABLE? CONSTRUCTOR FUNCTION
+      type_spec ('(' (SELF IN OUT type_spec ',') type_elements_parameter (',' type_elements_parameter)*  ')')?
+      RETURN SELF AS RESULT ((IS | AS) call_spec)?
     ;
 
 map_order_function_spec
@@ -517,36 +520,44 @@ create_index
     : CREATE UNIQUE? INDEX index_name ON tableview_name '(' column_name (',' column_name)* ')' (COMPUTE STATISTICS)? ';'
     ;
 
+alter_index
+    : ALTER INDEX old_index_name=index_name RENAME TO new_index_name=index_name ';'
+    ;
+
+drop_index
+    : DROP INDEX index_name ';'
+    ;
+
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
         LEFT_PAREN column_name datatype (',' column_name datatype)*
         RIGHT_PAREN
-        ( ON COMMIT (DELETE | PRESERVE) ROWS)?
-        ( SEGMENT CREATION (IMMEDIATE | DEFERRED) )?
-        (PCTFREE pctfree=UNSIGNED_INTEGER 
-        | PCTUSED pctused=UNSIGNED_INTEGER 
+        (ON COMMIT (DELETE | PRESERVE) ROWS)?
+        (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
+        (PCTFREE pctfree=UNSIGNED_INTEGER
+        | PCTUSED pctused=UNSIGNED_INTEGER
         | INITRANS inittrans=UNSIGNED_INTEGER
         )*
         ( STORAGE LEFT_PAREN
           ( INITIAL initial=size_clause
           | NEXT next=size_clause
-          | MINEXTENTS minextents=(UNSIGNED_INTEGER|UNLIMITED)
+          | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
           | PCTINCREASE pctincrease=UNSIGNED_INTEGER
           | FREELISTS freelists=UNSIGNED_INTEGER
           | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
           | OPTIMAL (size_clause | NULL )
-          | BUFFER_POOL (KEEP|RECYCLE|DEFAULT)
-          | FLASH_CACHE (KEEP|NONE|DEFAULT)
+          | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
+          | FLASH_CACHE (KEEP | NONE | DEFAULT)
           | ENCRYPT
           )+
          RIGHT_PAREN
         )?
         (TABLESPACE tablespace_name=REGULAR_ID)?
-        (LOGGING|NOLOGGING|FILESYSTEM_LIKE_LOGGING)?
+        (LOGGING | NOLOGGING | FILESYSTEM_LIKE_LOGGING)?
         ( COMPRESS
            (BASIC
            | FOR (OLTP
-                 | (QUERY|ARCHIVE) (LOW|HIGH)?
+                 | (QUERY | ARCHIVE) (LOW | HIGH)?
                  )
            )?
         | NOCOMPRESS
@@ -567,7 +578,7 @@ drop_table
 
 
 comment_on_column
-    : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string ';'
+    : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string
     ;
 
 // Synonym DDL Clauses
@@ -579,7 +590,7 @@ create_synonym
     ;
 
 comment_on_table
-    : COMMENT ON TABLE tableview_name IS quoted_string ';'
+    : COMMENT ON TABLE tableview_name IS quoted_string
     ;
 
 alter_table
@@ -588,7 +599,7 @@ alter_table
       | drop_constraint
       | enable_constraint
       | disable_constraint
-      ) ';'
+      )
     ;
 
 add_constraint
@@ -647,7 +658,7 @@ anonymous_block
 // Common DDL Clauses
 
 invoker_rights_clause
-    : AUTHID (CURRENT_USER|DEFINER)
+    : AUTHID (CURRENT_USER | DEFINER)
     ;
 
 compiler_parameters_clause
@@ -964,7 +975,7 @@ transaction_control_statements
     ;
 
 set_transaction_command
-    : SET TRANSACTION 
+    : SET TRANSACTION
       (READ (ONLY | WRITE) | ISOLATION LEVEL (SERIALIZABLE | READ COMMITTED) | USE ROLLBACK SEGMENT rollback_segment_name)?
       (NAME quoted_string)?
     ;
@@ -975,12 +986,12 @@ set_constraint_command
 
 commit_statement
     : COMMIT WORK? 
-      (COMMENT expression | FORCE (CORRUPT_XID expression| CORRUPT_XID_ALL | expression (',' expression)?))?
+      (COMMENT expression | FORCE (CORRUPT_XID expression | CORRUPT_XID_ALL | expression (',' expression)?))?
       write_clause?
     ;
 
 write_clause
-    : WRITE (WAIT|NOWAIT)? (IMMEDIATE|BATCH)?
+    : WRITE (WAIT | NOWAIT)? (IMMEDIATE | BATCH)?
     ;
 
 rollback_statement
@@ -1625,7 +1636,7 @@ other_function
     | /*TODO stantard_function_enabling_using*/ regular_id function_argument_modeling using_clause?
     | COUNT '(' ( '*' | (DISTINCT | UNIQUE | ALL)? concatenation) ')' over_clause?
     | (CAST | XMLCAST) '(' (MULTISET '(' subquery ')' | concatenation) AS type_spec ')'
-    | COALESCE '(' table_element (',' (numeric|quoted_string))? ')'
+    | COALESCE '(' table_element (',' (numeric | quoted_string))? ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
     | cursor_name ( PERCENT_ISOPEN | PERCENT_FOUND | PERCENT_NOTFOUND | PERCENT_ROWCOUNT )
@@ -1638,7 +1649,7 @@ other_function
     | TREAT '(' expression AS REF? type_spec ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
     | XMLAGG '(' expression order_by_clause? ')' ('.' general_element_part)?
-    | (XMLCOLATTVAL|XMLFOREST)
+    | (XMLCOLATTVAL | XMLFOREST)
       '(' xml_multiuse_expression_element (',' xml_multiuse_expression_element)* ')' ('.' general_element_part)?
     | XMLELEMENT 
       '(' (ENTITYESCAPING | NOENTITYESCAPING)? (NAME | EVALNAME)? expression
@@ -1715,7 +1726,7 @@ windowing_type
 windowing_elements
     : UNBOUNDED PRECEDING
     | CURRENT ROW
-    | concatenation (PRECEDING|FOLLOWING)
+    | concatenation (PRECEDING | FOLLOWING)
     ;
 
 using_clause
