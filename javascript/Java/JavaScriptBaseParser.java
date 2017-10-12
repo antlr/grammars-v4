@@ -1,9 +1,27 @@
 import org.antlr.v4.runtime.*;
 
+/**
+ * All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
+ * should start with lower case char similar to parser rules.
+ */
 public abstract class JavaScriptBaseParser extends Parser
 {
     public JavaScriptBaseParser(TokenStream input) {
         super(input);
+    }
+
+    /**
+     * Short form for prev(String str)
+     */
+    protected boolean p(String str) {
+        return prev(str);
+    }
+
+    /**
+     * Whether the previous token value equals to @param str
+     */
+    protected boolean prev(String str) {
+        return _input.LT(-1).getText().equals(str);
     }
 
     protected boolean notLineTerminator() {
@@ -11,21 +29,38 @@ public abstract class JavaScriptBaseParser extends Parser
     }
 
     protected boolean notOpenBraceAndNotFunction() {
-        return _input.LT(1).getType() != JavaScriptParser.OpenBrace && _input.LT(1).getType() != JavaScriptParser.Function;
+        int nextTokenType = _input.LT(1).getType();
+        return nextTokenType != JavaScriptParser.OpenBrace && nextTokenType != JavaScriptParser.Function;
     }
 
     protected boolean closeBrace() {
         return _input.LT(1).getType() == JavaScriptParser.CloseBrace;
     }
+    
+    /**
+     * Returns {@code true} iff on the current index of the parser's
+     * token stream a token of the given {@code type} exists on the
+     * {@code HIDDEN} channel.
+     *
+     * @param type
+     *         the type of the token on the {@code HIDDEN} channel
+     *         to check.
+     *
+     * @return {@code true} iff on the current index of the parser's
+     * token stream a token of the given {@code type} exists on the
+     * {@code HIDDEN} channel.
+     */
+    private boolean here(final int type) {
 
-    protected boolean p(String str) {
-        return prev(str);
+        // Get the token ahead of the current index.
+        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
+        Token ahead = _input.get(possibleIndexEosToken);
+
+        // Check if the token resides on the HIDDEN channel and if it's of the
+        // provided type.
+        return (ahead.getChannel() == Lexer.HIDDEN) && (ahead.getType() == type);
     }
-
-    protected boolean prev(String str) {
-        return _input.LT(1).getText().equals(str);
-    }
-
+    
     /**
      * Returns {@code true} iff on the current index of the parser's
      * token stream a token exists on the {@code HIDDEN} channel which
@@ -66,29 +101,5 @@ public abstract class JavaScriptBaseParser extends Parser
         // Check if the token is, or contains a line terminator.
         return (type == JavaScriptParser.MultiLineComment && (text.contains("\r") || text.contains("\n"))) ||
                 (type == JavaScriptParser.LineTerminator);
-    }
-
-    /**
-     * Returns {@code true} iff on the current index of the parser's
-     * token stream a token of the given {@code type} exists on the
-     * {@code HIDDEN} channel.
-     *
-     * @param type
-     *         the type of the token on the {@code HIDDEN} channel
-     *         to check.
-     *
-     * @return {@code true} iff on the current index of the parser's
-     * token stream a token of the given {@code type} exists on the
-     * {@code HIDDEN} channel.
-     */
-    private boolean here(final int type) {
-
-        // Get the token ahead of the current index.
-        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
-        Token ahead = _input.get(possibleIndexEosToken);
-
-        // Check if the token resides on the HIDDEN channel and if it's of the
-        // provided type.
-        return (ahead.getChannel() == Lexer.HIDDEN) && (ahead.getType() == type);
     }
 }
