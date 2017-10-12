@@ -2,12 +2,30 @@ using Antlr4.Runtime;
 using System.Collections.Generic;
 using static PT.PM.JavaScriptParseTreeUst.Parser.JavaScriptParser;
 
+/// <summary>
+/// All lexer methods that used in grammar (IsStrictMode)
+/// should start with Upper Case Char similar to Lexer rules.
+/// </summary>
 public abstract class JavaScriptBaseLexer : Lexer
 {
+    /// <summary>
+    /// Stores values of nested modes. By default mode is strict or
+    /// defined externally(useStrictDefault)
+    /// </summary>
     private Stack<bool> scopeStrictModes = new Stack<bool>();
-    // The most recently produced token.
+
     private IToken _lastToken = null;
+
+    /// <summary>
+    /// Default value of strict mode
+    /// Can be defined externally by changing UseStrictDefault
+    /// </summary>
     private bool _useStrictDefault = false;
+
+    /// <summary>
+    /// Current value of strict mode
+    /// Can be defined during parsing, see StringFunctions.js and StringGlobal.js samples
+    /// </summary>
     private bool _useStrictCurrent = false;
 
     public JavaScriptBaseLexer(ICharStream input)
@@ -15,10 +33,7 @@ public abstract class JavaScriptBaseLexer : Lexer
     {
     }
 
-    // A property indicating if the lexer should operate in strict mode.
-    // When set to true, FutureReservedWords are tokenized, when false,
-    // an octal literal can be tokenized.
-    public bool UseStrictDefalult
+    public bool UseStrictDefault
     {
         get
         {
@@ -36,11 +51,15 @@ public abstract class JavaScriptBaseLexer : Lexer
         return _useStrictCurrent;
     }
 
-    ///<summary>Return the next token from the character stream and records this last
-    ///token in case it resides on the default channel. This recorded token
-    ///is used to determine when the lexer could possibly match a regex
-    ///literal.</summary>
-    ///<returns>the next token from the character stream.</returns>
+    /// <summary>
+    /// Return the next token from the character stream and records this last
+    /// token in case it resides on the default channel. This recorded token
+    /// is used to determine when the lexer could possibly match a regex
+    /// literal.
+    /// </summary>
+    /// <returns>
+    /// The next token from the character stream.
+    /// </returns>
     public override IToken NextToken()
     {
         // Get the next token.
@@ -48,12 +67,12 @@ public abstract class JavaScriptBaseLexer : Lexer
 
         if (next.Type == OpenBrace)
         {
-            _useStrictCurrent = scopeStrictModes.Count > 0 && scopeStrictModes.Peek() ? true : UseStrictDefalult;
+            _useStrictCurrent = scopeStrictModes.Count > 0 && scopeStrictModes.Peek() ? true : UseStrictDefault;
             scopeStrictModes.Push(_useStrictCurrent);
         }
         else if (next.Type == CloseBrace)
         {
-            _useStrictCurrent = scopeStrictModes.Count > 0 ? scopeStrictModes.Pop() : UseStrictDefalult;
+            _useStrictCurrent = scopeStrictModes.Count > 0 ? scopeStrictModes.Pop() : UseStrictDefault;
         }
         else if (next.Type == StringLiteral &&
             (_lastToken == null || _lastToken.Type == OpenBrace) &&
@@ -74,8 +93,9 @@ public abstract class JavaScriptBaseLexer : Lexer
         return next;
     }
 
-    ///<summary>Returns <c>true</c> iff the lexer can match a regex literal.</summary>
-    ///<returns><c>true</c> iff the lexer can match a regex literal.</returns>
+    /// <summary>
+    /// Returns true if the lexer can match a regex literal.
+    /// </summary>
     protected bool RegexPossible()
     {
         if (_lastToken == null)

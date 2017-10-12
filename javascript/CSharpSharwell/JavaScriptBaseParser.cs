@@ -1,6 +1,10 @@
 using Antlr4.Runtime;
 using static PT.PM.JavaScriptParseTreeUst.Parser.JavaScriptParser;
 
+/// <summary>
+/// All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
+/// should start with lower case char similar to parser rules.
+/// </summary>
 public abstract class JavaScriptBaseParser : Parser
 {
     public JavaScriptBaseParser(ITokenStream input)
@@ -8,11 +12,17 @@ public abstract class JavaScriptBaseParser : Parser
     {
     }
 
+    /// <summary>
+    /// hort form for prev(String str)
+    /// </summary>
     protected bool p(string str)
     {
         return prev(str);
     }
 
+    /// <summary>
+    /// Whether the previous token value equals to str
+    /// </summary>
     protected bool prev(string str)
     {
         return _input.Lt(-1).Text.Equals(str);
@@ -25,7 +35,8 @@ public abstract class JavaScriptBaseParser : Parser
 
     protected bool notOpenBraceAndNotFunction()
     {
-        return _input.Lt(1).Type != OpenBrace && _input.Lt(1).Type != Function;
+        int nextTokenType = _input.Lt(1).Type;
+        return nextTokenType != OpenBrace && nextTokenType != Function;
     }
 
     protected bool closeBrace()
@@ -33,14 +44,13 @@ public abstract class JavaScriptBaseParser : Parser
         return _input.Lt(1).Type == CloseBrace;
     }
 
-    ///<summary>Returns <c>true</c> iff on the current index of the parser's
-    ///token stream a token of the given <c>type</c> exists on the
-    ///<c>Hidden</c> channel.</summary>
-    ///<param name="type">the type of the token on the <c>Hidden</c> channel
-    ///to check.</param>
-    ///<returns><c>true</c> iff on the current index of the parser's
-    ///token stream a token of the given <c>type</c> exists on the
-    ///<c>Hidden</c> channel.</returns>
+    /// <summary>Returns true if on the current index of the parser's
+    /// token stream a token of the given type exists on the
+    /// Hidden channel.
+    /// </summary>
+    /// <param name="type">
+    /// The type of the token on the Hidden channel to check.
+    /// </param>
     protected bool here(int type)
     {
         // Get the token ahead of the current index.
@@ -52,14 +62,12 @@ public abstract class JavaScriptBaseParser : Parser
         return ahead.Channel == Lexer.Hidden && ahead.Type == type;
     }
 
-    ///<summary>Returns <c>true</c> iff on the current index of the parser's
-    ///token stream a token exists on the <c>Hidden</c> channel which
-    ///either is a line terminator, or is a multi line comment that
-    ///contains a line terminator.</summary>
-    ///<returns><c>true</c> iff on the current index of the parser's
-    ///token stream a token exists on the <c>Hidden</c> channel which
-    ///either is a line terminator, or is a multi line comment that
-    ///contains a line terminator.</returns>
+    /// <summary>
+    /// Returns true if on the current index of the parser's
+    /// token stream a token exists on the Hidden channel which
+    /// either is a line terminator, or is a multi line comment that
+    /// contains a line terminator.
+    /// </summary>
     protected bool lineTerminatorAhead()
     {
         // Get the token ahead of the current index.
