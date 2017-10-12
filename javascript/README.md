@@ -29,7 +29,7 @@ getter
 Instruction `p("get")` stands for *get the previous token value and return a boolean
 value after comparison to "get" string*.
 
-For **Java** runtime it described by the following code (`Java/JavaBaseParser.java`)
+For **Java** runtime it described by the following code in [Java/JavaScriptBaseLexer.java](Java/JavaScriptBaseParser.java)
 
 ```Java
 protected boolean prev(String str) {
@@ -37,7 +37,8 @@ protected boolean prev(String str) {
 }
 ```
 
-For **C#** runtime by Sam Harwell it described by (`CSharpSharwell/JavaScriptBaseParser.cs`)
+For **C#** runtime by Sam Harwell it described by 
+[CSharpSharwell/JavaScriptBaseParser.cs](CSharpSharwell/JavaScriptBaseParser.cs)
 
 ```CSharp
 protected bool prev(string str)
