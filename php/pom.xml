@@ -19,8 +19,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-						<include>PHPLexer.g4</include>
-						<include>PHPParser.g4</include>
+						<include>PhpLexer.g4</include>
+						<include>PhpParser.g4</include>
 					</includes>
 				</configuration>
 				<executions>
