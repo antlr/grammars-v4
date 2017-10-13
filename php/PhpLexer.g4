@@ -250,14 +250,14 @@ Echo:               'echo';
 Else:               'else';
 ElseIf:             'elseif';
 Empty:              'empty';
-                    
+
 EndDeclare:         'enddeclare';
 EndFor:             'endfor';
 EndForeach:         'endforeach';
 EndIf:              'endif';
 EndSwitch:          'endswitch';
 EndWhile:           'endwhile';
-                    
+
 Eval:               'eval';
 Exit:               'die';
 Extends:            'extends';
@@ -314,7 +314,7 @@ Use:                'use';
 Var:                'var';
 While:              'while';
 Yield:              'yield';
-                    
+
 Get:                '__get';
 Set:                '__set';
 Call:               '__call';
