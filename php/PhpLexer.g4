@@ -63,7 +63,7 @@ public Token nextToken()
             if (_prevTokenType == SemiColon || _prevTokenType == Colon
                 || _prevTokenType == OpenCurlyBracket || _prevTokenType == CloseCurlyBracket)
             {
-                token = (CommonToken)super.nextToken();
+                token.setChannel(SkipChannel);
             }
             else
             {
@@ -102,7 +102,7 @@ public Token nextToken()
                     }
                     else
                     {
-                        token = (CommonToken)super.nextToken();
+                        token.setChannel(SkipChannel);
                     }
                 }
                 break;
@@ -130,6 +130,7 @@ boolean CheckHeredocEnd(String text)
 
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);
 HtmlText:       ~[<#]+;
+XmlStart:       '<' '?' 'xml' -> pushMode(XML);
 PHPStartEcho:   PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStart:       PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
 HtmlScriptOpen: '<' 'script' { _scriptTag = true; } -> pushMode(INSIDE);
@@ -142,6 +143,13 @@ Shebang
     ;
 NumberSign:     '#' ~[<]* -> more;
 Error:          .         -> channel(ErrorLexem);
+
+// TODO: parse xml attributes.
+mode XML;
+
+XmlText:                  ~[?]+;
+XmlClose:                 '?' '>' -> popMode;
+XmlText2:                 '?' -> type(XmlText);
 
 mode INSIDE;
 
@@ -200,12 +208,10 @@ ErrorHtmlDoubleQuote:          .          -> channel(ErrorLexem);
 mode SCRIPT;
 
 ScriptText:               ~[<]+;
-ScriptClose:              '<' '/' 'script'? '>' -> popMode;
+ScriptClose:             '<' '/' 'script'? '>' -> popMode;
 PHPStartInsideScriptEcho: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
-PHPStartInsideScript:     PhpStartFragment-> channel(SkipChannel), pushMode(PHP);
-ScriptText2:              '<' ~[<?/]* -> type(ScriptText);
-ScriptText3:              '?' ~[<]* -> type(ScriptText);
-ScriptText4:              '/' ~[<]* -> type(ScriptText);
+PHPStartInsideScript:     PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
+ScriptText2:              '<' -> type(ScriptText);
 
 mode STYLE;
 
@@ -213,7 +219,8 @@ StyleBody: .*? '</' 'style'? '>' -> popMode;
 
 mode PHP;
 
-PHPEnd:             (('?' | {AspTags}? '%') '>') | {_phpScript}? '</script>';
+PHPEnd:             (('?' | {AspTags}? '%') '>') | {_phpScript}? '</script>'
+      |             {_phpScript}? '</script>';
 Whitespace:         [ \t\r\n]+ -> channel(SkipChannel);
 MultiLineComment:   '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:  '//' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
@@ -223,8 +230,9 @@ Abstract:           'abstract';
 Array:              'array';
 As:                 'as';
 BinaryCast:         'binary';
-BoolType:           'boolean' | 'bool';
-BooleanConstant:    'true' | 'false';
+BoolType:           'bool' 'ean'?;
+BooleanConstant:    'true'
+               |    'false';
 Break:              'break';
 Callable:           'callable';
 Case:               'case';
@@ -340,7 +348,8 @@ Dec:                '--';
 IsIdentical:        '===';
 IsNoidentical:      '!==';
 IsEqual:            '==';
-IsNotEq:            '<>' | '!=';
+IsNotEq:            '<>'
+       |            '!=';
 IsSmallerOrEqual:   '<=';
 IsGreaterOrEqual:   '>=';
 PlusEqual:          '+=';
