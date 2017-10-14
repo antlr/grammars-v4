@@ -19,9 +19,6 @@
 
 lexer grammar PlSqlLexer;
 
-
-
-
 // ABORT:                        'ABORT';
 // ABS:                          'ABS';
 // ACCESS:                       'ACCESS';
@@ -78,7 +75,7 @@ ANY:                          'ANY';
 // APPLY:                        'APPLY';
 // APPROX_COUNT_DISTINCT:        'APPROX_COUNT_DISTINCT';
 // ARCHIVAL:                     'ARCHIVAL';
-// ARCHIVE:                      'ARCHIVE';
+ARCHIVE:                      'ARCHIVE';
 // ARCHIVED:                     'ARCHIVED';
 // ARCHIVELOG:                   'ARCHIVELOG';
 ARRAY:                        'ARRAY';
@@ -114,7 +111,7 @@ AUTONOMOUS_TRANSACTION:       'AUTONOMOUS_TRANSACTION';
 // AVRO:                         'AVRO';
 // BACKGROUND:                   'BACKGROUND';
 // BACKUP:                       'BACKUP';
-// BASIC:                        'BASIC';
+BASIC:                        'BASIC';
 // BASICFILE:                    'BASICFILE';
 BATCH:                        'BATCH';
 // BATCHSIZE:                    'BATCHSIZE';
@@ -162,7 +159,7 @@ BREADTH:                      'BREADTH';
 // BSON:                         'BSON';
 // BUFFER:                       'BUFFER';
 // BUFFER_CACHE:                 'BUFFER_CACHE';
-// BUFFER_POOL:                  'BUFFER_POOL';
+BUFFER_POOL:                  'BUFFER_POOL';
 // BUILD:                        'BUILD';
 BULK:                         'BULK';
 BY:                           'BY';
@@ -250,8 +247,8 @@ COMPILE:                      'COMPILE';
 // COMPOSITE:                    'COMPOSITE';
 // COMPOSITE_LIMIT:              'COMPOSITE_LIMIT';
 COMPOUND:                     'COMPOUND';
-// COMPRESS:                     'COMPRESS';
-// COMPUTE:                      'COMPUTE';
+COMPRESS:                     'COMPRESS';
+COMPUTE:                      'COMPUTE';
 // CONCAT:                       'CONCAT';
 // CON_DBID_TO_ID:               'CON_DBID_TO_ID';
 // CONDITIONAL:                  'CONDITIONAL';
@@ -309,7 +306,7 @@ COUNT:                        'COUNT';
 CREATE:                       'CREATE';
 // CREATE_FILE_DEST:             'CREATE_FILE_DEST';
 // CREATE_STORED_OUTLINES:       'CREATE_STORED_OUTLINES';
-// CREATION:                     'CREATION';
+CREATION:                     'CREATION';
 // CREDENTIAL:                   'CREDENTIAL';
 // CRITICAL:                     'CRITICAL';
 CROSS:                        'CROSS';
@@ -458,7 +455,7 @@ ENABLE:                       'ENABLE';
 // ENABLE_PARALLEL_DML:          'ENABLE_PARALLEL_DML';
 // ENABLE_PRESET:                'ENABLE_PRESET';
 ENCODING:                     'ENCODING';
-// ENCRYPT:                      'ENCRYPT';
+ENCRYPT:                      'ENCRYPT';
 // ENCRYPTION:                   'ENCRYPTION';
 END:                          'END';
 // END_OUTLINE_DATA:             'END_OUTLINE_DATA';
@@ -536,7 +533,7 @@ FALSE:                        'FALSE';
 FETCH:                        'FETCH';
 // FILE:                         'FILE';
 // FILE_NAME_CONVERT:            'FILE_NAME_CONVERT';
-// FILESYSTEM_LIKE_LOGGING:      'FILESYSTEM_LIKE_LOGGING';
+FILESYSTEM_LIKE_LOGGING:      'FILESYSTEM_LIKE_LOGGING';
 // FILTER:                       'FILTER';
 FINAL:                        'FINAL';
 // FINE:                         'FINE';
@@ -548,7 +545,7 @@ FIRST_VALUE:                  'FIRST_VALUE';
 // FIXED_VIEW_DATA:              'FIXED_VIEW_DATA';
 // FLAGGER:                      'FLAGGER';
 // FLASHBACK:                    'FLASHBACK';
-// FLASH_CACHE:                  'FLASH_CACHE';
+FLASH_CACHE:                  'FLASH_CACHE';
 FLOAT:                        'FLOAT';
 // FLOB:                         'FLOB';
 // FLOOR:                        'FLOOR';
@@ -565,8 +562,8 @@ FOR:                          'FOR';
 // FORMAT:                       'FORMAT';
 // FORWARD:                      'FORWARD';
 // FRAGMENT_NUMBER:              'FRAGMENT_NUMBER';
-// FREELIST:                     'FREELIST';
-// FREELISTS:                    'FREELISTS';
+FREELIST:                     'FREELIST';
+FREELISTS:                    'FREELISTS';
 // FREEPOOLS:                    'FREEPOOLS';
 // FRESH:                        'FRESH';
 FROM:                         'FROM';
@@ -581,7 +578,7 @@ FUNCTION:                     'FUNCTION';
 // GBY_PUSHDOWN:                 'GBY_PUSHDOWN';
 // GENERATED:                    'GENERATED';
 // GET:                          'GET';
-// GLOBAL:                       'GLOBAL';
+GLOBAL:                       'GLOBAL';
 // GLOBALLY:                     'GLOBALLY';
 // GLOBAL_NAME:                  'GLOBAL_NAME';
 // GLOBAL_TOPIC_ENABLED:         'GLOBAL_TOPIC_ENABLED';
@@ -592,7 +589,7 @@ GROUP:                        'GROUP';
 // GROUP_ID:                     'GROUP_ID';
 GROUPING:                     'GROUPING';
 // GROUPING_ID:                  'GROUPING_ID';
-// GROUPS:                       'GROUPS';
+GROUPS:                       'GROUPS';
 // GUARANTEED:                   'GUARANTEED';
 // GUARANTEE:                    'GUARANTEE';
 // GUARD:                        'GUARD';
@@ -609,7 +606,7 @@ HAVING:                       'HAVING';
 // HIDDEN_KEYWORD:               'HIDDEN';
 HIDE:                         'HIDE';
 // HIERARCHY:                    'HIERARCHY';
-// HIGH:                         'HIGH';
+HIGH:                         'HIGH';
 // HINTSET_BEGIN:                'HINTSET_BEGIN';
 // HINTSET_END:                  'HINTSET_END';
 // HOT:                          'HOT';
@@ -669,10 +666,10 @@ INFINITE:                     'INFINITE';
 // INHERIT:                      'INHERIT';
 IN:                           'IN';
 // INITCAP:                      'INITCAP';
-// INITIAL:                      'INITIAL';
+INITIAL:                      'INITIAL';
 // INITIALIZED:                  'INITIALIZED';
 // INITIALLY:                    'INITIALLY';
-// INITRANS:                     'INITRANS';
+INITRANS:                     'INITRANS';
 INLINE:                       'INLINE';
 // INLINE_XMLTYPE_NT:            'INLINE_XMLTYPE_NT';
 // INMEMORY:                     'INMEMORY';
@@ -776,7 +773,7 @@ LIKE:                         'LIKE';
 LIMIT:                        'LIMIT';
 // LINEAR:                       'LINEAR';
 // LINK:                         'LINK';
-// LIST:                         'LIST';
+LIST:                         'LIST';
 // LN:                           'LN';
 // LNNVL:                        'LNNVL';
 // LOAD:                         'LOAD';
@@ -794,7 +791,7 @@ LOCKED:                       'LOCKED';
 LOCK:                         'LOCK';
 // LOGFILE:                      'LOGFILE';
 // LOGFILES:                     'LOGFILES';
-// LOGGING:                      'LOGGING';
+LOGGING:                      'LOGGING';
 // LOGICAL:                      'LOGICAL';
 // LOGICAL_READS_PER_CALL:       'LOGICAL_READS_PER_CALL';
 // LOGICAL_READS_PER_SESSION:    'LOGICAL_READS_PER_SESSION';
@@ -806,7 +803,7 @@ LOGON:                        'LOGON';
 LONG:                         'LONG';
 LOOP:                         'LOOP';
 // LOWER:                        'LOWER';
-// LOW:                          'LOW';
+LOW:                          'LOW';
 // LPAD:                         'LPAD';
 // LTRIM:                        'LTRIM';
 MAIN:                         'MAIN';
@@ -853,7 +850,7 @@ MERGE:                        'MERGE';
 // METHOD:                       'METHOD';
 // MIGRATE:                      'MIGRATE';
 // MIGRATION:                    'MIGRATION';
-// MINEXTENTS:                   'MINEXTENTS';
+MINEXTENTS:                   'MINEXTENTS';
 // MINIMIZE:                     'MINIMIZE';
 // MINIMUM:                      'MINIMUM';
 // MINING:                       'MINING';
@@ -921,7 +918,7 @@ NESTED:                       'NESTED';
 NEW:                          'NEW';
 // NEW_TIME:                     'NEW_TIME';
 // NEXT_DAY:                     'NEXT_DAY';
-// NEXT:                         'NEXT';
+NEXT:                         'NEXT';
 // NL_AJ:                        'NL_AJ';
 // NLJ_BATCHING:                 'NLJ_BATCHING';
 // NLJ_INDEX_FILTER:             'NLJ_INDEX_FILTER';
@@ -968,7 +965,7 @@ NOCACHE:                      'NOCACHE';
 // NO_CLUSTERING:                'NO_CLUSTERING';
 // NO_COALESCE_SQ:               'NO_COALESCE_SQ';
 // NO_COMMON_DATA:               'NO_COMMON_DATA';
-// NOCOMPRESS:                   'NOCOMPRESS';
+NOCOMPRESS:                   'NOCOMPRESS';
 // NO_CONNECT_BY_CB_WHR_ONLY:    'NO_CONNECT_BY_CB_WHR_ONLY';
 // NO_CONNECT_BY_COMBINE_SW:     'NO_CONNECT_BY_COMBINE_SW';
 // NO_CONNECT_BY_COST_BASED:     'NO_CONNECT_BY_COST_BASED';
@@ -1008,7 +1005,7 @@ NOENTITYESCAPING:             'NOENTITYESCAPING';
 // NOKEEP:                       'NOKEEP';
 // NO_LOAD:                      'NO_LOAD';
 // NOLOCAL:                      'NOLOCAL';
-// NOLOGGING:                    'NOLOGGING';
+NOLOGGING:                    'NOLOGGING';
 // NOMAPPING:                    'NOMAPPING';
 NOMAXVALUE:                   'NOMAXVALUE';
 // NO_MERGE:                     'NO_MERGE';
@@ -1137,7 +1134,7 @@ OID:                          'OID';
 OLD:                          'OLD';
 // OLD_PUSH_PRED:                'OLD_PUSH_PRED';
 // OLS:                          'OLS';
-// OLTP:                         'OLTP';
+OLTP:                         'OLTP';
 // OMIT:                         'OMIT';
 // ONE:                          'ONE';
 // ONLINE:                       'ONLINE';
@@ -1151,7 +1148,7 @@ OPEN:                         'OPEN';
 // OPERATIONS:                   'OPERATIONS';
 // OPERATOR:                     'OPERATOR';
 // OPT_ESTIMATE:                 'OPT_ESTIMATE';
-// OPTIMAL:                      'OPTIMAL';
+OPTIMAL:                      'OPTIMAL';
 // OPTIMIZE:                     'OPTIMIZE';
 // OPTIMIZER_FEATURES_ENABLE:    'OPTIMIZER_FEATURES_ENABLE';
 // OPTIMIZER_GOAL:               'OPTIMIZER_GOAL';
@@ -1240,10 +1237,10 @@ PATH:                         'PATH';
 // PATTERN:                      'PATTERN';
 // PBL_HS_BEGIN:                 'PBL_HS_BEGIN';
 // PBL_HS_END:                   'PBL_HS_END';
-// PCTFREE:                      'PCTFREE';
-// PCTINCREASE:                  'PCTINCREASE';
+PCTFREE:                      'PCTFREE';
+PCTINCREASE:                  'PCTINCREASE';
 // PCTTHRESHOLD:                 'PCTTHRESHOLD';
-// PCTUSED:                      'PCTUSED';
+PCTUSED:                      'PCTUSED';
 // PCTVERSION:                   'PCTVERSION';
 // PENDING:                      'PENDING';
 PERCENT_FOUND:                '%FOUND';
@@ -1313,7 +1310,7 @@ PRECISION:                    'PRECISION';
 PRESENT:                      'PRESENT';
 // PRESENTV:                     'PRESENTV';
 // PRESERVE_OID:                 'PRESERVE_OID';
-// PRESERVE:                     'PRESERVE';
+PRESERVE:                     'PRESERVE';
 // PRETTY:                       'PRETTY';
 // PREVIOUS:                     'PREVIOUS';
 // PREV:                         'PREV';
@@ -1347,7 +1344,7 @@ PUBLIC:                       'PUBLIC';
 // PX_JOIN_FILTER:               'PX_JOIN_FILTER';
 // QB_NAME:                      'QB_NAME';
 // QUERY_BLOCK:                  'QUERY_BLOCK';
-// QUERY:                        'QUERY';
+QUERY:                        'QUERY';
 // QUEUE_CURR:                   'QUEUE_CURR';
 // QUEUE:                        'QUEUE';
 // QUEUE_ROWP:                   'QUEUE_ROWP';
@@ -1378,7 +1375,7 @@ RECORD:                       'RECORD';
 // RECOVER:                      'RECOVER';
 // RECOVERY:                     'RECOVERY';
 // RECYCLEBIN:                   'RECYCLEBIN';
-// RECYCLE:                      'RECYCLE';
+RECYCLE:                      'RECYCLE';
 // REDACTION:                    'REDACTION';
 // REDEFINE:                     'REDEFINE';
 // REDO:                         'REDO';
@@ -1605,7 +1602,7 @@ STATISTICS:                   'STATISTICS';
 // STDDEV_POP:                   'STDDEV_POP';
 // STDDEV_SAMP:                  'STDDEV_SAMP';
 // STOP:                         'STOP';
-// STORAGE:                      'STORAGE';
+STORAGE:                      'STORAGE';
 // STORE:                        'STORE';
 // STREAMS:                      'STREAMS';
 // STREAM:                       'STREAM';
@@ -1921,7 +1918,7 @@ SYNONYM:                      'SYNONYM';
 // SYS_ZMAP_REFRESH:             'SYS_ZMAP_REFRESH';
 // TABLE_LOOKUP_BY_NL:           'TABLE_LOOKUP_BY_NL';
 // TABLESPACE_NO:                'TABLESPACE_NO';
-// TABLESPACE:                   'TABLESPACE';
+TABLESPACE:                   'TABLESPACE';
 // TABLES:                       'TABLES';
 // TABLE_STATS:                  'TABLE_STATS';
 TABLE:                        'TABLE';
@@ -1932,7 +1929,7 @@ TABLE:                        'TABLE';
 // TBLORIDXPARTNUM:              'TBL$OR$IDX$PART$NUM';
 // TEMPFILE:                     'TEMPFILE';
 // TEMPLATE:                     'TEMPLATE';
-// TEMPORARY:                    'TEMPORARY';
+TEMPORARY:                    'TEMPORARY';
 // TEMP_TABLE:                   'TEMP_TABLE';
 // TEST:                         'TEST';
 // TEXT:                         'TEXT';
@@ -2225,17 +2222,20 @@ TO_DATE:                      'TO_DATE';
 
 // Rule #358 <NATIONAL_CHAR_STRING_LIT> - subtoken typecast in <REGULAR_ID>, it also incorporates <character_representation>
 //  Lowercase 'n' is a usual addition to the standard
+
 NATIONAL_CHAR_STRING_LIT: 'N' '\'' (~('\'' | '\r' | '\n' ) | '\'' '\'' | NEWLINE)* '\'';
 
 //  Rule #040 <BIT_STRING_LIT> - subtoken typecast in <REGULAR_ID>
 //  Lowercase 'b' is a usual addition to the standard
+
 BIT_STRING_LIT: 'B' ('\'' [01]* '\'')+;
 
 //  Rule #284 <HEX_STRING_LIT> - subtoken typecast in <REGULAR_ID>
 //  Lowercase 'x' is a usual addition to the standard
+
 HEX_STRING_LIT: 'X' ('\'' [A-F0-9]* '\'')+;
-DOUBLE_PERIOD: '..';
-PERIOD:        '.';
+DOUBLE_PERIOD:  '..';
+PERIOD:         '.';
 
 //{ Rule #238 <EXACT_NUM_LIT>
 //  This rule is a bit tricky - it resolves the ambiguity with <PERIOD> 
@@ -2253,8 +2253,8 @@ PERIOD:        '.';
     (D | F)?
     ;*/
 
-UNSIGNED_INTEGER: UNSIGNED_INTEGER_FRAGMENT;
-APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT ('E' ('+'|'-')? (FLOAT_FRAGMENT | UNSIGNED_INTEGER_FRAGMENT))? ('D' | 'F')?;
+UNSIGNED_INTEGER:    [0-9]+;
+APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT ('E' ('+'|'-')? (FLOAT_FRAGMENT | [0-9]+))? ('D' | 'F')?;
 
 // Rule #--- <CHAR_STRING> is a base for Rule #065 <char_string_lit> , it incorporates <character_representation>
 // and a superfluous subtoken typecasting of the "QUOTE"
@@ -2269,24 +2269,25 @@ fragment QS_BRACK   : QUOTE '[' .*? ']' QUOTE ;
 fragment QS_PAREN   : QUOTE '(' .*? ')' QUOTE ;
 fragment QS_OTHER_CH: ~('<' | '{' | '[' | '(' | ' ' | '\t' | '\n' | '\r');
 
-// Rule #163 <DELIMITED_ID>
 DELIMITED_ID: '"' (~('"' | '\r' | '\n') | '"' '"')+ '"' ;
 
-// Rule #546 <SQL_SPECIAL_CHAR> was split into single rules
-PERCENT: '%';
-AMPERSAND: '&';
-LEFT_PAREN: '(';
-RIGHT_PAREN: ')';
-DOUBLE_ASTERISK: '**';
-ASTERISK: '*';
-PLUS_SIGN: '+';
-MINUS_SIGN: '-';
-COMMA: ',';
-SOLIDUS: '/';
-AT_SIGN: '@';
-ASSIGN_OP: ':=';
-    
+// SQL_SPECIAL_CHAR was split into single rules
+
+PERCENT:                   '%';
+AMPERSAND:                 '&';
+LEFT_PAREN:                '(';
+RIGHT_PAREN:               ')';
+DOUBLE_ASTERISK:           '**';
+ASTERISK:                  '*';
+PLUS_SIGN:                 '+';
+MINUS_SIGN:                '-';
+COMMA:                     ',';
+SOLIDUS:                   '/';
+AT_SIGN:                   '@';
+ASSIGN_OP:                 ':=';
+
 // See OCI reference for more information about this
+
 BINDVAR
     : ':' SIMPLE_LETTER  (SIMPLE_LETTER | [0-9] | '_')*
     | ':' DELIMITED_ID  // not used in SQL but spotted in v$sqltext when using cursor_sharing
@@ -2294,23 +2295,24 @@ BINDVAR
     | QUESTION_MARK // not in SQL, not in Oracle, not in OCI, use this for JDBC
     ;
 
-COLON: ':';
-SEMICOLON: ';';
-LESS_THAN_OR_EQUALS_OP: '<=';
-LESS_THAN_OP: '<';
-GREATER_THAN_OR_EQUALS_OP: '>=';
-NOT_EQUAL_OP: '!='| '<>'| '^='| '~=';
-CARRET_OPERATOR_PART: '^';
-TILDE_OPERATOR_PART: '~';
+NOT_EQUAL_OP:              '!='
+            |              '<>'
+            |              '^='
+            |              '~='
+            ;
+CARRET_OPERATOR_PART:      '^';
+TILDE_OPERATOR_PART:       '~';
 EXCLAMATION_OPERATOR_PART: '!';
-GREATER_THAN_OP: '>';
+GREATER_THAN_OP:           '>';
+LESS_THAN_OP:              '<';
+COLON:                     ':';
+SEMICOLON:                 ';';
 
 fragment
 QUESTION_MARK: '?';
 
 // protected UNDERSCORE : '_' SEPARATOR ; // subtoken typecast within <INTRODUCER>
-CONCATENATION_OP: '||';
-VERTICAL_BAR: '|';
+BAR: '|';
 EQUALS_OP: '=';
 
 // Rule #532 <SQL_EMBDD_LANGUAGE_CHAR> was split into single rules:
@@ -2332,31 +2334,28 @@ INTRODUCER
 //}
 
 SPACES: [ \t\r\n]+ -> skip;
+
     
-//{ Rule #504 <SIMPLE_LETTER> - simple_latin _letter was generalised into SIMPLE_LETTER
+// Rule #504 <SIMPLE_LETTER> - simple_latin _letter was generalised into SIMPLE_LETTER
 //  Unicode is yet to be implemented - see NSF0
 fragment
 SIMPLE_LETTER
     : [A-Z]
     ;
-//}
-
-//  Rule #176 <DIGIT> was incorporated by <UNSIGNED_INTEGER> 
-//{ Rule #615 <UNSIGNED_INTEGER> - subtoken typecast in <EXACT_NUM_LIT> 
-fragment
-UNSIGNED_INTEGER_FRAGMENT: [0-9]+ ;
 
 fragment
 FLOAT_FRAGMENT
     : UNSIGNED_INTEGER* '.'? UNSIGNED_INTEGER+
     ;
 
-//{ Rule #097 <COMMENT>
+// Rule #097 <COMMENT>
+
 SINGLE_LINE_COMMENT: '--' ~('\r' | '\n')* (NEWLINE | EOF)   -> channel(HIDDEN);
-MULTI_LINE_COMMENT: '/*' .*? '*/'                           -> channel(HIDDEN);
+MULTI_LINE_COMMENT:  '/*' .*? '*/'                          -> channel(HIDDEN);
 
 // SQL*Plus prompt
 // TODO should be grammar rule, but tricky to implement
+
 PROMPT
     : 'prompt' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
     ;
@@ -2370,7 +2369,6 @@ START_CMD
     | '@@' ( ~('\r' | '\n') )* (NEWLINE|EOF)
     ;
 
-//{ Rule #360 <NEWLINE>
 fragment
 NEWLINE: '\r'? '\n';
     
@@ -2381,4 +2379,5 @@ SPACE: [ \t];
 //  Within testLiterals all reserved and non-reserved words are being resolved
 
 REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
+
 ZV: '@!' -> channel(HIDDEN);
