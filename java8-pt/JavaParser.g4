@@ -516,9 +516,15 @@ primary
     ;
 
 methodReference
-    : (qualifiedName | typeType | (qualifiedName '.')? SUPER ) '::' typeArguments? IDENTIFIER
+    : (typeType | qualifiedName ('.' accessorOrMethodRefCall)? | accessorOrMethodRefCall) '::' typeArguments? IDENTIFIER
     | classType '::' typeArguments? NEW
     | typeType '::' NEW
+    ;
+
+accessorOrMethodRefCall
+    : SUPER
+    | THIS
+    | IDENTIFIER LPAREN expressionList? RPAREN (DOT IDENTIFIER LPAREN expressionList? RPAREN)*
     ;
 
 classType

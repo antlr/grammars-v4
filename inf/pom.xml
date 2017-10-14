@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>kotlin</artifactId>
+	<artifactId>inf</artifactId>
 	<packaging>jar</packaging>
-	<name>Kotlin grammar</name>
+	<name>khubla.com inf grammar</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -18,11 +18,7 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<includes>
-						<include>UnicodeClasses.g4</include>
-						<include>KotlinLexer.g4</include>
-						<include>KotlinParser.g4</include>
-					</includes>
+					<grammars>inf.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -40,10 +36,9 @@
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>false</showTree>
-					<entryPoint>kotlinFile</entryPoint>
-					<grammarName>Kotlin</grammarName>
-					<caseInsensitive>true</caseInsensitive>
+					<showTree>true</showTree>
+					<entryPoint>inf</entryPoint>
+					<grammarName>inf</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

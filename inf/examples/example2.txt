@@ -1,0 +1,3 @@
+[autorun]
+open=example.bat
+icon=cd.ico
