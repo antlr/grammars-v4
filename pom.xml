@@ -69,6 +69,7 @@
 			<module>html</module>
 			<module>icalendar</module>
 			<module>idl</module>
+			<module>inf</module>
 			<module>informix</module>
 			<module>iri</module>
 			<module>istc</module>

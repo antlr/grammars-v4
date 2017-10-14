@@ -1,5 +1,5 @@
 /**
- * Oracle(c) PL/SQL 11g Parser  
+ * Oracle(c) PL/SQL 11g Parser
  *
  * Copyright (c) 2009-2011 Alexandre Porcelli <alexandre.porcelli@gmail.com>
  * Copyright (c) 2015-2017 Ivan Kochurkin (KvanTTT, kvanttt@gmail.com, Positive Technologies).
@@ -21,14 +21,6 @@ parser grammar PlSqlParser;
 
 options { tokenVocab=PlSqlLexer; }
 
-swallow_to_semi
-    : ~';'+
-    ;
-
-compilation_unit
-    : unit_statement* EOF
-    ;
-
 sql_script
     : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
     ;
@@ -41,13 +33,14 @@ unit_statement
     | alter_trigger
     | alter_type
     | alter_table
+    | alter_index
 
     | create_function_body
     | create_procedure_body
     | create_package
     | create_package_body
 
-//  | create_index //TODO
+    | create_index
     | create_table
 //  | create_view //TODO
 //  | create_directory //TODO
@@ -66,18 +59,17 @@ unit_statement
     | drop_type
     | data_manipulation_language_statements
     | drop_table
+    | drop_index
 
     | comment_on_column
     | comment_on_table
 
     | anonymous_block
-
-
     ;
 
-// $<DDL -> SQL Statements for Stored PL/SQL Units
+// DDL -> SQL Statements for Stored PL/SQL Units
 
-// $<Function DDLs
+// Function DDLs
 
 drop_function
     : DROP FUNCTION function_name ';'
@@ -89,18 +81,18 @@ alter_function
 
 create_function_body
     : CREATE (OR REPLACE)? FUNCTION function_name ('(' parameter (',' parameter)* ')')?
-      RETURN type_spec (invoker_rights_clause|parallel_enable_clause|result_cache_clause|DETERMINISTIC)*
+      RETURN type_spec (invoker_rights_clause | parallel_enable_clause | result_cache_clause | DETERMINISTIC)*
       ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
 
-// $<Creation Function - Specific Clauses
+// Creation Function - Specific Clauses
 
 parallel_enable_clause
     : PARALLEL_ENABLE partition_by_clause?
     ;
 
 partition_by_clause
-    : '(' PARTITION expression BY (ANY | (HASH | RANGE) '(' column_name (',' column_name)* ')')streaming_clause? ')'
+    : '(' PARTITION expression BY (ANY | (HASH | RANGE| LIST) '(' column_name (',' column_name)* ')')streaming_clause? ')'
     ;
 
 result_cache_clause
@@ -115,7 +107,7 @@ streaming_clause
     : (ORDER | CLUSTER) expression BY '(' column_name (',' column_name)* ')'
     ;
 
-// $<Package DDLs
+// Package DDLs
 
 drop_package
     : DROP PACKAGE BODY? (schema_object_name '.')? package_name ';'
@@ -133,7 +125,7 @@ create_package_body
     : CREATE (OR REPLACE)? PACKAGE BODY (schema_object_name '.')? package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?) ';'
     ;
 
-// $<Create Package - Specific Clauses
+// Create Package Specific Clauses
 
 package_obj_spec
     : variable_declaration
@@ -147,26 +139,27 @@ package_obj_spec
     ;
 
 procedure_spec
-    : PROCEDURE identifier ('(' parameter ( ',' parameter )* ')')? ';' 
+    : PROCEDURE identifier ('(' parameter ( ',' parameter )* ')')? ';'
     ;
 
 function_spec
-    : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')? RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';' 
+    : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')?
+      RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';'
     ;
 
 package_obj_body
-    : variable_declaration 
-    | subtype_declaration 
-    | cursor_declaration 
-    | exception_declaration 
+    : variable_declaration
+    | subtype_declaration
+    | cursor_declaration
+    | exception_declaration
     | type_declaration
     | procedure_body
-    | function_body 
+    | function_body
     | procedure_spec
-    | function_spec    
+    | function_spec
     ;
 
-// $<Procedure DDLs
+// Procedure DDLs
 
 drop_procedure
     : DROP PROCEDURE procedure_name ';'
@@ -178,13 +171,12 @@ alter_procedure
 
 function_body
     : FUNCTION identifier ('(' parameter (',' parameter)* ')')?
-      RETURN type_spec (invoker_rights_clause|parallel_enable_clause|result_cache_clause|DETERMINISTIC)*
+      RETURN type_spec (invoker_rights_clause | parallel_enable_clause | result_cache_clause | DETERMINISTIC)*
       ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
 
 procedure_body
-    : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? 
-      (IS | AS)
+    : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? (IS | AS)
       (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
     ;
 
@@ -194,23 +186,21 @@ create_procedure_body
       (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
     ;
 
-// $>
-
-// $<Trigger DDLs
+// Trigger DDLs
 
 drop_trigger
     : DROP TRIGGER trigger_name ';'
     ;
 
 alter_trigger
-    : ALTER TRIGGER tn1=trigger_name
-      ((ENABLE | DISABLE) | RENAME TO tn2=trigger_name | COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)?) ';'
+    : ALTER TRIGGER alter_trigger_name=trigger_name
+      ((ENABLE | DISABLE) | RENAME TO rename_trigger_name=trigger_name | COMPILE DEBUG? compiler_parameters_clause* (REUSE SETTINGS)?) ';'
     ;
 
 create_trigger
     : CREATE ( OR REPLACE )? TRIGGER trigger_name
-    (simple_dml_trigger | compound_dml_trigger | non_dml_trigger)
-    trigger_follows_clause? (ENABLE | DISABLE)? trigger_when_clause? trigger_body ';'
+      (simple_dml_trigger | compound_dml_trigger | non_dml_trigger)
+      trigger_follows_clause? (ENABLE | DISABLE)? trigger_when_clause? trigger_body ';'
     ;
 
 trigger_follows_clause
@@ -221,7 +211,8 @@ trigger_when_clause
     : WHEN '(' condition ')'
     ;
 
-// $<Create Trigger- Specific Clauses
+// Create Trigger Specific Clauses
+
 simple_dml_trigger
     : (BEFORE | AFTER | INSTEAD OF) dml_event_clause referencing_clause? for_each_row?
     ;
@@ -291,7 +282,7 @@ dml_event_clause
     ;
 
 dml_event_element
-    : (DELETE|INSERT|UPDATE) (OF column_name (',' column_name)*)?
+    : (DELETE | INSERT | UPDATE) (OF column_name (',' column_name)*)?
     ;
 
 dml_event_nested_clause
@@ -306,10 +297,7 @@ referencing_element
     : (NEW | OLD | PARENT) column_alias
     ;
 
-// $>
-// $>
-
-// $<Type DDLs
+// DDLs
 
 drop_type
     : DROP TYPE BODY? type_name (FORCE | VALIDATE)? ';'
@@ -326,7 +314,8 @@ alter_type
     ) dependent_handling_clause? ';'
     ;
 
-// $<Alter Type - Specific Clauses
+// Alter Type Specific Clauses
+
 compile_type_clause
     : COMPILE DEBUG? (SPECIFICATION | BODY)? compiler_parameters_clause* (REUSE SETTINGS)?
     ;
@@ -340,7 +329,7 @@ alter_method_spec
     ;
 
 alter_method_element
-    : (ADD|DROP) (map_order_function_spec | subprogram_spec)
+    : (ADD | DROP) (map_order_function_spec | subprogram_spec)
     ;
 
 alter_attribute_definition
@@ -368,13 +357,14 @@ create_type
     : CREATE (OR REPLACE)? TYPE (type_definition | type_body) ';'
     ;
 
-// $<Create Type - Specific Clauses
+// Create Type Specific Clauses
+
 type_definition
     : type_name (OID CHAR_STRING)? object_type_def?
     ;
 
 object_type_def
-    : invoker_rights_clause? (object_as_part | object_under_part) sqlj_object_type? 
+    : invoker_rights_clause? (object_as_part | object_under_part) sqlj_object_type?
       ('(' object_member_spec (',' object_member_spec)* ')')? modifier_clause*
     ;
 
@@ -391,7 +381,7 @@ nested_table_type_def
     ;
 
 sqlj_object_type
-    : EXTERNAL NAME expression LANGUAGE JAVA USING (SQLDATA|CUSTOMDATUM|ORADATA)
+    : EXTERNAL NAME expression LANGUAGE JAVA USING (SQLDATA | CUSTOMDATUM | ORADATA)
     ;
 
 type_body
@@ -412,12 +402,12 @@ subprog_decl_in_type
     ;
 
 proc_decl_in_type
-    : PROCEDURE procedure_name '(' type_elements_parameter (',' type_elements_parameter)* ')' 
+    : PROCEDURE procedure_name '(' type_elements_parameter (',' type_elements_parameter)* ')'
       (IS | AS) (call_spec | DECLARE? declare_spec* body ';')
     ;
 
 func_decl_in_type
-    : FUNCTION function_name ('(' type_elements_parameter (',' type_elements_parameter)* ')')? 
+    : FUNCTION function_name ('(' type_elements_parameter (',' type_elements_parameter)* ')')?
       RETURN type_spec (IS | AS) (call_spec | DECLARE? declare_spec* body ';')
     ;
 
@@ -427,9 +417,7 @@ constructor_declaration
       RETURN SELF AS RESULT (IS | AS) (call_spec | DECLARE? declare_spec* body ';')
     ;
 
-// $>
-
-// $<Common Type Clauses
+// Common Type Clauses
 
 modifier_clause
     : NOT? (INSTANTIABLE | FINAL | OVERRIDING)
@@ -455,7 +443,7 @@ element_spec_options
     ;
 
 subprogram_spec
-    : (MEMBER|STATIC) (type_procedure_spec|type_function_spec)
+    : (MEMBER | STATIC) (type_procedure_spec | type_function_spec)
     ;
 
 type_procedure_spec
@@ -468,7 +456,9 @@ type_function_spec
     ;
 
 constructor_spec
-    : FINAL? INSTANTIABLE? CONSTRUCTOR FUNCTION type_spec ('(' (SELF IN OUT type_spec ',') type_elements_parameter (',' type_elements_parameter)*  ')')?  RETURN SELF AS RESULT ((IS | AS) call_spec)?
+    : FINAL? INSTANTIABLE? CONSTRUCTOR FUNCTION
+      type_spec ('(' (SELF IN OUT type_spec ',') type_elements_parameter (',' type_elements_parameter)*  ')')?
+      RETURN SELF AS RESULT ((IS | AS) call_spec)?
     ;
 
 map_order_function_spec
@@ -488,7 +478,7 @@ type_elements_parameter
     : parameter_name type_spec
     ;
 
-// $<Sequence DDLs
+// Sequence DDLs
 
 drop_sequence
     : DROP SEQUENCE sequence_name ';'
@@ -502,7 +492,7 @@ create_sequence
     : CREATE SEQUENCE sequence_name (sequence_start_clause | sequence_spec)* ';'
     ;
 
-// $<Common Sequence
+// Common Sequence
 
 sequence_spec
     : INCREMENT BY UNSIGNED_INTEGER
@@ -522,21 +512,72 @@ sequence_start_clause
     : START WITH UNSIGNED_INTEGER
     ;
 
-// $<Table DDL Clauses
+create_index
+    : CREATE UNIQUE? INDEX index_name ON tableview_name '(' column_name (',' column_name)* ')' (COMPUTE STATISTICS)? ';'
+    ;
+
+alter_index
+    : ALTER INDEX old_index_name=index_name RENAME TO new_index_name=index_name ';'
+    ;
+
+drop_index
+    : DROP INDEX index_name ';'
+    ;
 
 create_table
-    : CREATE TABLE tableview_name LEFT_PAREN column_name datatype (COMMA column_name datatype)* RIGHT_PAREN
+    : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
+        LEFT_PAREN column_name datatype (',' column_name datatype)*
+        RIGHT_PAREN
+        (ON COMMIT (DELETE | PRESERVE) ROWS)?
+        (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
+        (PCTFREE pctfree=UNSIGNED_INTEGER
+        | PCTUSED pctused=UNSIGNED_INTEGER
+        | INITRANS inittrans=UNSIGNED_INTEGER
+        )*
+        ( STORAGE LEFT_PAREN
+          ( INITIAL initial=size_clause
+          | NEXT next=size_clause
+          | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
+          | PCTINCREASE pctincrease=UNSIGNED_INTEGER
+          | FREELISTS freelists=UNSIGNED_INTEGER
+          | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
+          | OPTIMAL (size_clause | NULL )
+          | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
+          | FLASH_CACHE (KEEP | NONE | DEFAULT)
+          | ENCRYPT
+          )+
+         RIGHT_PAREN
+        )?
+        (TABLESPACE tablespace_name=REGULAR_ID)?
+        (LOGGING | NOLOGGING | FILESYSTEM_LIKE_LOGGING)?
+        ( COMPRESS
+           (BASIC
+           | FOR (OLTP
+                 | (QUERY | ARCHIVE) (LOW | HIGH)?
+                 )
+           )?
+        | NOCOMPRESS
+        )?
+// Column_properties clause goes here
+// Partition clause goes here
+// Many more varations to capture
+      SEMICOLON
+    ;
+
+size_clause
+    : UNSIGNED_INTEGER REGULAR_ID
     ;
 
 drop_table
-    : DROP TABLE tableview_name
+    : DROP TABLE tableview_name SEMICOLON
     ;
+
 
 comment_on_column
     : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string
     ;
 
-// $<Synonym DDL Clauses
+// Synonym DDL Clauses
 
 create_synonym
     // Synonym's schema cannot be specified for public synonyms
@@ -549,21 +590,45 @@ comment_on_table
     ;
 
 alter_table
-    : ALTER TABLE tableview_name add_constraint
-    // TODO | drop_constraint
+    : ALTER TABLE tableview_name
+      ( add_constraint
+      | drop_constraint
+      | enable_constraint
+      | disable_constraint
+      )
     ;
 
 add_constraint
-    : ADD (CONSTRAINT constraint_name)? (primary_key_clause | foreign_key_clause | unique_key_clause)
-    // TODO | implement check_constraint_clause, but need separate rule boolean_expression
+    : ADD (CONSTRAINT constraint_name)?
+     ( primary_key_clause
+     | foreign_key_clause
+     | unique_key_clause
+     | check_constraint
+     )
+    ;
+
+check_constraint
+    : CHECK '(' condition ')' DISABLE?
+    ;
+
+drop_constraint
+    : DROP CONSTRAINT constraint_name
+    ;
+
+enable_constraint
+    : ENABLE CONSTRAINT constraint_name
+    ;
+
+disable_constraint
+    : DISABLE CONSTRAINT constraint_name
     ;
 
 foreign_key_clause
-    : FOREIGN KEY LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN references_clause on_delete_clause?
+    : FOREIGN KEY LEFT_PAREN column_name (',' column_name)* RIGHT_PAREN references_clause on_delete_clause?
     ;
 
 references_clause
-    : REFERENCES tableview_name LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+    : REFERENCES tableview_name LEFT_PAREN column_name (',' column_name)* RIGHT_PAREN
     ;
 
 on_delete_clause
@@ -571,25 +636,25 @@ on_delete_clause
     ;
 
 unique_key_clause
-    : UNIQUE LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+    : UNIQUE LEFT_PAREN column_name (',' column_name)* RIGHT_PAREN
       // TODO implement  USING INDEX clause
     ;
 
 primary_key_clause
-    : PRIMARY KEY LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
+    : PRIMARY KEY LEFT_PAREN column_name (',' column_name)* RIGHT_PAREN
       // TODO implement  USING INDEX clause
     ;
 
-// $<Anonymous PL/SQL code block
+// Anonymous PL/SQL code block
 
 anonymous_block
     : BEGIN seq_of_statements END SEMICOLON
     ;
 
-// $<Common DDL Clauses
+// Common DDL Clauses
 
 invoker_rights_clause
-    : AUTHID (CURRENT_USER|DEFINER)
+    : AUTHID (CURRENT_USER | DEFINER)
     ;
 
 compiler_parameters_clause
@@ -600,7 +665,7 @@ call_spec
     : LANGUAGE (java_spec | c_spec)
     ;
 
-// $<Call Spec - Specific Clauses
+// Call Spec Specific Clauses
 
 java_spec
     : JAVA NAME CHAR_STRING
@@ -611,14 +676,12 @@ c_spec
     ;
 
 c_agent_in_clause
-    : AGENT IN '(' expression (',' expression)* ')'
+    : AGENT IN '(' expressions ')'
     ;
 
 c_parameters_clause
-    : PARAMETERS '(' (expression (',' expression)* | '.' '.' '.') ')'
+    : PARAMETERS '(' (expressions | '.' '.' '.') ')'
     ;
-
-// $>
 
 parameter
     : parameter_name (IN | OUT | INOUT | NOCOPY)* type_spec? default_value_part?
@@ -628,7 +691,7 @@ default_value_part
     : (ASSIGN_OP | DEFAULT) expression
     ;
 
-// $<PL/SQL Elements Declarations
+// Elements Declarations
 
 declare_spec
     : variable_declaration
@@ -643,7 +706,7 @@ declare_spec
     | function_body
     ;
 
-//incorporates constant_declaration
+// incorporates constant_declaration
 variable_declaration
     : identifier CONSTANT? type_spec (NOT NULL)? default_value_part? ';'
     ;
@@ -652,7 +715,8 @@ subtype_declaration
     : SUBTYPE identifier IS type_spec (RANGE expression '..' expression)? (NOT NULL)? ';'
     ;
 
-//cursor_declaration incorportates curscursor_body and cursor_spec
+// cursor_declaration incorportates curscursor_body and cursor_spec
+
 cursor_declaration
     : CURSOR identifier ('(' parameter_spec (',' parameter_spec)* ')' )? (RETURN type_spec)? (IS select_statement)? ';'
     ;
@@ -673,9 +737,10 @@ pragma_declaration
     | RESTRICT_REFERENCES '(' (identifier | DEFAULT) (',' identifier)+ ')') ';'
     ;
 
-// $<Record Declaration - Specific Clauses
+// Record Declaration Specific Clauses
 
-//incorporates ref_cursor_type_definition
+// incorporates ref_cursor_type_definition
+
 record_type_def
     : RECORD '(' field_spec (',' field_spec)* ')' 
     ;
@@ -687,8 +752,6 @@ field_spec
 ref_cursor_type_def
     : REF CURSOR (RETURN type_spec)?
     ;
-
-// $>
 
 type_declaration
     :  TYPE identifier IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
@@ -706,9 +769,7 @@ varray_type_def
     : (VARRAY | VARYING ARRAY) '(' expression ')' OF type_spec (NOT NULL)?
     ;
 
-// $>
-
-// $<PL/SQL Statements
+// Statements
 
 seq_of_statements
     : (statement (';' | EOF) | label_declaration)+
@@ -739,6 +800,10 @@ statement
     | sql_statement
     | function_call
     | pipe_row_statement
+    ;
+
+swallow_to_semi
+    : ~';'+
     ;
 
 assignment_statement
@@ -773,13 +838,12 @@ loop_statement
     : label_name? (WHILE condition | FOR cursor_loop_param)? LOOP seq_of_statements END LOOP label_name?
     ;
 
-// $<Loop - Specific Clause
+// Loop Specific Clause
 
 cursor_loop_param
     : index_name IN REVERSE? lower_bound range='..' upper_bound
-    | record_name IN (cursor_name expression_list? | '(' select_statement ')')
+    | record_name IN (cursor_name ('(' expressions? ')')? | '(' select_statement ')')
     ;
-// $>
 
 forall_statement
     : FORALL index_name IN bounds_clause sql_statement (SAVE EXCEPTIONS)?
@@ -826,13 +890,11 @@ body
     : BEGIN seq_of_statements (EXCEPTION exception_handler+)? END label_name?
     ;
 
-// $<Body - Specific Clause
+// Body Specific Clause
 
 exception_handler
     : WHEN exception_name (OR exception_name)* THEN seq_of_statements
     ;
-
-// $>
 
 trigger_block
     : (DECLARE? declare_spec+)? body
@@ -842,9 +904,7 @@ block
     : DECLARE? declare_spec+ body
     ;
 
-// $>
-
-// $<SQL PL/SQL Statements
+// SQL Statements
 
 sql_statement
     : execute_immediate
@@ -857,14 +917,13 @@ execute_immediate
     : EXECUTE IMMEDIATE expression (into_clause using_clause? | using_clause dynamic_returning_clause? | dynamic_returning_clause)?
     ;
 
-// $<Execute Immediate - Specific Clause
+// Execute Immediate Specific Clause
+
 dynamic_returning_clause
     : (RETURNING | RETURN) into_clause
     ;
-// $>
 
-
-// $<DML SQL PL/SQL Statements
+// DML Statements
 
 data_manipulation_language_statements
     : merge_statement
@@ -876,9 +935,7 @@ data_manipulation_language_statements
     | explain_statement
     ;
 
-// $>
-
-// $<Cursor Manipulation SQL PL/SQL Statements
+// Cursor Manipulation Statements
 
 cursor_manipulation_statements
     : close_statement
@@ -892,7 +949,7 @@ close_statement
     ;
 
 open_statement
-    : OPEN cursor_name expression_list?
+    : OPEN cursor_name ('(' expressions? ')')?
     ;
 
 fetch_statement
@@ -903,9 +960,7 @@ open_for_statement
     : OPEN variable_name FOR (select_statement | expression) using_clause?
     ;
 
-// $>
-
-// $<Transaction Control SQL PL/SQL Statements
+// Transaction Control SQL Statements
 
 transaction_control_statements
     : set_transaction_command
@@ -916,7 +971,7 @@ transaction_control_statements
     ;
 
 set_transaction_command
-    : SET TRANSACTION 
+    : SET TRANSACTION
       (READ (ONLY | WRITE) | ISOLATION LEVEL (SERIALIZABLE | READ COMMITTED) | USE ROLLBACK SEGMENT rollback_segment_name)?
       (NAME quoted_string)?
     ;
@@ -927,12 +982,12 @@ set_constraint_command
 
 commit_statement
     : COMMIT WORK? 
-      (COMMENT expression | FORCE (CORRUPT_XID expression| CORRUPT_XID_ALL | expression (',' expression)?))?
+      (COMMENT expression | FORCE (CORRUPT_XID expression | CORRUPT_XID_ALL | expression (',' expression)?))?
       write_clause?
     ;
 
 write_clause
-    : WRITE (WAIT|NOWAIT)? (IMMEDIATE|BATCH)?
+    : WRITE (WAIT | NOWAIT)? (IMMEDIATE | BATCH)?
     ;
 
 rollback_statement
@@ -973,7 +1028,8 @@ select_statement
     : subquery_factoring_clause? subquery (for_update_clause | order_by_clause)*
     ;
 
-// $<Select - Specific Clauses
+// Select Specific Clauses
+
 subquery_factoring_clause
     : WITH factoring_element (',' factoring_element)*
     ;
@@ -996,13 +1052,13 @@ subquery
     : subquery_basic_elements subquery_operation_part*
     ;
 
-subquery_operation_part
-    : (UNION ALL? | INTERSECT | MINUS) subquery_basic_elements
-    ;
-
 subquery_basic_elements
     : query_block
     | '(' subquery ')'
+    ;
+
+subquery_operation_part
+    : (UNION ALL? | INTERSECT | MINUS) subquery_basic_elements
     ;
 
 query_block
@@ -1031,6 +1087,7 @@ table_ref_list
 // according the SQL reference this should not be possible
 // according to he reality it is. Here we probably apply pivot/unpivot onto whole join clause
 // eventhough it is not enclosed in parenthesis. See pivot examples 09,10,11
+
 table_ref
     : table_ref_aux join_clause* (pivot_clause | unpivot_clause)?
     ;
@@ -1063,7 +1120,7 @@ outer_join_type
     ;
 
 query_partition_clause
-    : PARTITION BY ('(' subquery ')' | expression_list | expression (',' expression)*)
+    : PARTITION BY (('(' (subquery | expressions)? ')') | expressions)
     ;
 
 flashback_query_clause
@@ -1093,7 +1150,7 @@ pivot_in_clause_element
 
 pivot_in_clause_elements
     : expression
-    | expression_list
+    | '(' expressions? ')'
     ;
 
 unpivot_clause
@@ -1126,12 +1183,12 @@ group_by_clause
 
 group_by_elements
     : grouping_sets_clause
-    | rollup_cube_clause 
+    | rollup_cube_clause
     | expression
     ;
 
 rollup_cube_clause
-    : (ROLLUP|CUBE) '(' grouping_sets_elements (',' grouping_sets_elements)* ')'
+    : (ROLLUP | CUBE) '(' grouping_sets_elements (',' grouping_sets_elements)* ')'
     ;
 
 grouping_sets_clause
@@ -1140,7 +1197,7 @@ grouping_sets_clause
 
 grouping_sets_elements
     : rollup_cube_clause
-    | expression_list
+    | '(' expressions? ')'
     | expression
     ;
 
@@ -1231,13 +1288,12 @@ for_update_options
     | WAIT expression
     ;
 
-// $>
-
 update_statement
     : UPDATE general_table_ref update_set_clause where_clause? static_returning_clause? error_logging_clause?
     ;
 
-// $<Update - Specific Clauses
+// Update Specific Clauses
+
 update_set_clause
     : SET
       (column_based_update_set_clause (',' column_based_update_set_clause)* | VALUE '(' identifier ')' '=' expression)
@@ -1248,8 +1304,6 @@ column_based_update_set_clause
     | '(' column_name (',' column_name)* ')' '=' subquery
     ;
 
-// $>
-
 delete_statement
     : DELETE FROM? general_table_ref where_clause? static_returning_clause? error_logging_clause?
     ;
@@ -1258,7 +1312,7 @@ insert_statement
     : INSERT (single_table_insert | multi_table_insert)
     ;
 
-// $<Insert - Specific Clauses
+// Insert Specific Clauses
 
 single_table_insert
     : insert_into_clause (values_clause static_returning_clause? | select_statement) error_logging_clause?
@@ -1289,17 +1343,16 @@ insert_into_clause
     ;
 
 values_clause
-    : VALUES expression_list
+    : VALUES '(' expressions? ')'
     ;
 
-// $>
 merge_statement
     : MERGE INTO tableview_name table_alias? USING selected_tableview ON '(' condition ')'
       (merge_update_clause merge_insert_clause? | merge_insert_clause merge_update_clause?)?
       error_logging_clause?
     ;
 
-// $<Merge - Specific Clauses
+// Merge Specific Clauses
 
 merge_update_clause
     : WHEN MATCHED THEN UPDATE SET merge_element (',' merge_element)* where_clause? merge_update_delete_part?
@@ -1314,14 +1367,13 @@ merge_update_delete_part
     ;
 
 merge_insert_clause
-    : WHEN NOT MATCHED THEN INSERT ('(' column_name (',' column_name)* ')')? VALUES expression_list where_clause?
+    : WHEN NOT MATCHED THEN INSERT ('(' column_name (',' column_name)* ')')?
+      VALUES '(' expressions? ')' where_clause?
     ;
 
 selected_tableview
     : (tableview_name | '(' select_statement ')') table_alias?
     ;
-
-// $>
 
 lock_table_statement
     : LOCK TABLE lock_table_element (',' lock_table_element)* IN lock_mode MODE wait_nowait_part?
@@ -1332,7 +1384,7 @@ wait_nowait_part
     | NOWAIT
     ;
 
-// $<Lock - Specific Clauses
+// Lock Specific Clauses
 
 lock_table_element
     : tableview_name partition_extension_clause?
@@ -1346,14 +1398,14 @@ lock_mode
     | EXCLUSIVE
     ;
 
-// $<Common DDL Clauses
+// Common DDL Clauses
 
 general_table_ref
     : (dml_table_expression_clause | ONLY '(' dml_table_expression_clause ')') table_alias?
     ;
 
 static_returning_clause
-    : (RETURNING | RETURN) expression (',' expression)* into_clause
+    : (RETURNING | RETURN) expressions into_clause
     ;
 
 error_logging_clause
@@ -1390,53 +1442,36 @@ seed_part
     : SEED '(' expression ')'
     ;
 
-// $>
-
-// $<Expression & Condition
-cursor_expression
-    : CURSOR '(' subquery ')'
-    ;
-
-expression_list
-    : '(' expression? (',' expression)* ')'
-    ;
+// Expression & Condition
 
 condition
     : expression
     ;
 
+expressions
+    : expression (',' expression)*
+    ;
+
 expression
     : cursor_expression
-    | logical_or_expression
+    | logical_expression
     ;
 
-logical_or_expression
-    : logical_and_expression
-    | logical_or_expression OR logical_and_expression
+cursor_expression
+    : CURSOR '(' subquery ')'
     ;
 
-logical_and_expression
-    : negated_expression
-    | logical_and_expression AND negated_expression
-    ;
-
-negated_expression
-    : NOT negated_expression
-    | equality_expression
-    ;
-
-equality_expression
+logical_expression
     : multiset_expression (IS NOT?
-      (NULL | NAN | PRESENT | INFINITE | A_LETTER SET | EMPTY | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')'))*
+        (NULL | NAN | PRESENT | INFINITE | A_LETTER SET | EMPTY | OF TYPE?
+        '(' ONLY? type_spec (',' type_spec)* ')'))*
+    | NOT logical_expression
+    | logical_expression AND logical_expression
+    | logical_expression OR logical_expression
     ;
 
 multiset_expression
-    : relational_expression (multiset_type OF? concatenation)?
-    ;
-
-multiset_type
-    : MEMBER
-    | SUBMULTISET
+    : relational_expression (multiset_type=(MEMBER | SUBMULTISET) OF? concatenation)?
     ;
 
 relational_expression
@@ -1446,20 +1481,15 @@ relational_expression
 
 compound_expression
     : concatenation
-      (NOT? (IN in_elements | BETWEEN between_elements | like_type concatenation like_escape_part?))?
-    ;
-relational_operator
-    : '=' | not_equal_op | '<' | '>' | less_than_or_equals_op | greater_than_or_equals_op
-    ;
-like_type
-    : LIKE
-    | LIKEC
-    | LIKE2
-    | LIKE4
+      (NOT? ( IN in_elements
+            | BETWEEN between_elements
+            | like_type=(LIKE | LIKEC | LIKE2 | LIKE4) concatenation (ESCAPE concatenation)?))?
     ;
 
-like_escape_part
-    : ESCAPE concatenation
+relational_operator
+    : '='
+    | (NOT_EQUAL_OP | '<' '>' | '!' '=' | '^' '=')
+    | ('<' | '>') '='?
     ;
 
 in_elements
@@ -1475,20 +1505,11 @@ between_elements
     ;
 
 concatenation
-    : additive_expression (concatenation_op additive_expression)*
-    ;
-
-additive_expression
-    : multiply_expression (op+=('+' | '-') multiply_expression)*
-    ;
-
-multiply_expression
-    : datetime_expression (op+=('*' | '/') datetime_expression)*
-    ;
-
-datetime_expression
     : model_expression
-      (AT (LOCAL | TIME ZONE concatenation) | interval_expression)?
+        (AT (LOCAL | TIME ZONE concatenation) | interval_expression)?
+    | concatenation op=(ASTERISK | SOLIDUS) concatenation
+    | concatenation op=(PLUS_SIGN | MINUS_SIGN) concatenation
+    | concatenation BAR BAR concatenation
     ;
 
 interval_expression
@@ -1508,21 +1529,14 @@ model_expression_element
 
 single_column_for_loop
     : FOR column_name
-      (IN expression_list | for_like_part? FROM ex1=expression TO ex2=expression for_increment_decrement_type ex3=expression)
-    ;
-
-for_like_part
-    : LIKE expression
-    ;
-
-for_increment_decrement_type
-    : INCREMENT
-    | DECREMENT
+       ( IN '(' expressions? ')'
+       | (LIKE expression)? FROM fromExpr=expression TO toExpr=expression
+         action_type=(INCREMENT | DECREMENT) action_expr=expression)
     ;
 
 multi_column_for_loop
-    : FOR 
-      '(' column_name (',' column_name)* ')' IN '(' (subquery | '(' expression_list (',' expression_list)* ')') ')'
+    : FOR '(' column_name (',' column_name)* ')'
+      IN  '(' (subquery | '(' expressions? ')') ')'
     ;
 
 unary_expression
@@ -1547,7 +1561,7 @@ TODO scope    {
     | simple_case_statement
     ;
 
-// $<CASE - Specific Clauses
+// CASE
 
 simple_case_statement
     : label_name? ck1=CASE expression simple_case_when_part+  case_else_part? END CASE? label_name?
@@ -1568,22 +1582,14 @@ searched_case_when_part
 case_else_part
     : ELSE (/*{$case_statement::isStatement}?*/ seq_of_statements | expression)
     ;
-// $>
 
 atom
     : table_element outer_join_sign
     | bind_variable
     | constant
     | general_element
-    | '(' (subquery ')' subquery_operation_part* | expression_or_vector ')')
-    ;
-
-expression_or_vector
-    : expression (vector_expr)?
-    ;
-
-vector_expr
-    : ',' expression (',' expression)*
+    | '(' subquery ')' subquery_operation_part*
+    | '(' expressions ')'
     ;
 
 quantified_expression
@@ -1591,13 +1597,14 @@ quantified_expression
     ;
 
 string_function
-    : SUBSTR '(' expression COMMA expression (COMMA expression)? ')'
-    | TO_CHAR '(' (table_element|standard_function|expression) (COMMA quoted_string)? (COMMA quoted_string)? ')'
-    | DECODE '(' expression (COMMA expression)*  ')'
+    : SUBSTR '(' expression ',' expression (',' expression)? ')'
+    | TO_CHAR '(' (table_element | standard_function | expression)
+                  (',' quoted_string)? (',' quoted_string)? ')'
+    | DECODE '(' expressions  ')'
     | CHR '(' concatenation USING NCHAR_CS ')'
-    | NVL '(' expression COMMA expression ')'
+    | NVL '(' expression ',' expression ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
-    | TO_DATE '(' expression (COMMA quoted_string)? ')'
+    | TO_DATE '(' expression (',' quoted_string)? ')'
     ;
 
 standard_function
@@ -1611,13 +1618,13 @@ numeric_function_wrapper
     ;
 
 numeric_function
-   : SUM '(' (DISTINCT|ALL)? expression ')'
+   : SUM '(' (DISTINCT | ALL)? expression ')'
    | COUNT '(' ( '*' | ((DISTINCT | UNIQUE | ALL)? concatenation)? ) ')' over_clause?
-   | ROUND '(' expression (COMMA UNSIGNED_INTEGER)?  ')'
+   | ROUND '(' expression (',' UNSIGNED_INTEGER)?  ')'
    | AVG '(' (DISTINCT | ALL)? expression ')'
    | MAX '(' (DISTINCT | ALL)? expression ')'
-   | LEAST '(' expression (COMMA expression)* ')'
-   | GREATEST '(' expression (COMMA expression)* ')'
+   | LEAST '(' expressions ')'
+   | GREATEST '(' expressions ')'
    ;
 
 other_function
@@ -1625,7 +1632,7 @@ other_function
     | /*TODO stantard_function_enabling_using*/ regular_id function_argument_modeling using_clause?
     | COUNT '(' ( '*' | (DISTINCT | UNIQUE | ALL)? concatenation) ')' over_clause?
     | (CAST | XMLCAST) '(' (MULTISET '(' subquery ')' | concatenation) AS type_spec ')'
-    | COALESCE '(' table_element (COMMA (numeric|quoted_string))? ')'
+    | COALESCE '(' table_element (',' (numeric | quoted_string))? ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
     | cursor_name ( PERCENT_ISOPEN | PERCENT_FOUND | PERCENT_NOTFOUND | PERCENT_ROWCOUNT )
@@ -1633,12 +1640,12 @@ other_function
     | EXTRACT '(' regular_id FROM concatenation ')'
     | (FIRST_VALUE | LAST_VALUE) function_argument_analytic respect_or_ignore_nulls? over_clause
     | standard_prediction_function_keyword 
-      '(' expression (',' expression)* cost_matrix_clause? using_clause? ')'
+      '(' expressions cost_matrix_clause? using_clause? ')'
     | TRANSLATE '(' expression (USING (CHAR_CS | NCHAR_CS))? (',' expression)* ')'
     | TREAT '(' expression AS REF? type_spec ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
     | XMLAGG '(' expression order_by_clause? ')' ('.' general_element_part)?
-    | (XMLCOLATTVAL|XMLFOREST)
+    | (XMLCOLATTVAL | XMLFOREST)
       '(' xml_multiuse_expression_element (',' xml_multiuse_expression_element)* ')' ('.' general_element_part)?
     | XMLELEMENT 
       '(' (ENTITYESCAPING | NOENTITYESCAPING)? (NAME | EVALNAME)? expression
@@ -1715,7 +1722,7 @@ windowing_type
 windowing_elements
     : UNBOUNDED PRECEDING
     | CURRENT ROW
-    | concatenation (PRECEDING|FOLLOWING)
+    | concatenation (PRECEDING | FOLLOWING)
     ;
 
 using_clause
@@ -1736,7 +1743,7 @@ within_or_over_part
     ;
 
 cost_matrix_clause
-    : COST (MODEL AUTO? | '(' cost_class_name (',' cost_class_name)* ')' VALUES expression_list)
+    : COST (MODEL AUTO? | '(' cost_class_name (',' cost_class_name)* ')' VALUES '(' expressions? ')')
     ;
 
 xml_passing_clause
@@ -1788,74 +1795,54 @@ xmlserialize_param_ident_part
     : NO INDENT
     | INDENT (SIZE '=' concatenation)?
     ;
-    
+
 // SqlPlus
 
-sql_plus_command 
-    : ('/' | whenever_command | exit_command | prompt_command | set_command | show_errors_command | start_command) ';'?
+sql_plus_command
+    : '/'
+    | EXIT
+    | PROMPT
+    | SHOW (ERR | ERRORS)
+    | START_CMD
+    | whenever_command
+    | set_command
     ;
 
 whenever_command
     : WHENEVER (SQLERROR | OSERROR)
-      (EXIT (SUCCESS | FAILURE | WARNING) (COMMIT | ROLLBACK) | CONTINUE (COMMIT|ROLLBACK|NONE))
+         ( EXIT (SUCCESS | FAILURE | WARNING) (COMMIT | ROLLBACK)
+         | CONTINUE (COMMIT | ROLLBACK | NONE))
     ;
 
 set_command
-    : SET regular_id (CHAR_STRING | ON | OFF | /*EXACT_NUM_LIT*/numeric | regular_id) // TODO
-    ;
-
-exit_command
-    : EXIT 
-    ;
-
-prompt_command
-    : PROMPT
-    ;
-
-show_errors_command
-    : SHOW ERR
-    | SHOW ERRORS
-    ;
-
-start_command
-    : START_CMD
+    : SET regular_id (CHAR_STRING | ON | OFF | /*EXACT_NUM_LIT*/numeric | regular_id)
     ;
 
 // Common
 
 partition_extension_clause
-    : (SUBPARTITION | PARTITION) FOR? expression_list
+    : (SUBPARTITION | PARTITION) FOR? '(' expressions? ')'
     ;
 
 column_alias
-    : AS? (identifier | alias_quoted_string)
+    : AS? (identifier | quoted_string)
     | AS
     ;
 
 table_alias
-    : (identifier | alias_quoted_string)
-    ;
-
-alias_quoted_string
-    : quoted_string
+    : identifier
+    | quoted_string
     ;
 
 where_clause
-    : WHERE (current_of_clause | expression)
-    ;
-
-current_of_clause
-    : CURRENT OF cursor_name
+    : WHERE (CURRENT OF cursor_name | expression)
     ;
 
 into_clause
-    : INTO variable_name (',' variable_name)* 
-    | BULK COLLECT INTO variable_name (',' variable_name)* 
+    : (BULK COLLECT)? INTO variable_name (',' variable_name)*
     ;
 
-// $>
-
-// $<Common PL/SQL Named Elements
+// Common Named Elements
 
 xml_column_name
     : identifier
@@ -2001,9 +1988,7 @@ schema_object_name
     : id_expression
     ;
 
-// $>
-
-// $<Common PL/SQL Specs
+// PL/SQL Specs
 
 // NOTE: In reality this applies to aggregate functions only
 keep_clause
@@ -2167,28 +2152,6 @@ identifier
 id_expression
     : regular_id
     | DELIMITED_ID
-    ;
-
-not_equal_op
-    : NOT_EQUAL_OP
-    | '<' '>'
-    | '!' '='
-    | '^' '='
-    ;
-
-greater_than_or_equals_op
-    : '>='
-    | '>' '='
-    ;
-
-less_than_or_equals_op
-    : '<='
-    | '<' '='
-    ;
-
-concatenation_op
-    : '||'
-    | '|' '|'
     ;
 
 outer_join_sign
@@ -2571,6 +2534,7 @@ regular_id
     | SUBTYPE
     | SUCCESS
     | SUSPEND
+    | TEMPORARY
     //| TABLE
     //| THE
     //| THEN

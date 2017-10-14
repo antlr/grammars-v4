@@ -1,22 +1,19 @@
-# Kotlin Grammar
+# Kotlin ANTLR4 grammar
 
-Antlr4 grammar for [Kotlin](http://kotlinlang.org) language.
+ANTLR4 grammar for Kotlin written only in ANTLR's special syntax.
 
-Based on the original [Kotlin Grammar](https://kotlinlang.org/docs/reference/grammar.html)
-
-## Author
-
-Sergey Mashkov @cy6erGn0m.
-
-## Origin Source
-
-<https://github.com/cy6erGn0m/kotlin-antlr4-grammar>
+## Links
+* [EBNF Kotlin grammar](http://kotlinlang.org/docs/reference/grammar.html)
+* [Kotlin specification](http://jetbrains.github.io/kotlin-spec/)
 
 ## License
+Licensed under the Apache 2.0
 
-Apache 2.0.
+## Testing
+Test.kt includes the test data from the [JetBrains's repository](https://github.com/JetBrains/kotlin/tree/master/compiler/testData/psi).
 
-## Tests
+## Contacts
+Anastasiya Shadrina a.shadrina5@mail.ru
 
-Code fragments copied to a single file AllInOne.kt from 
-<https://gist.github.com/dodyg/5823184>.
+## Origin source
+<https://github.com/shadrina/kotlin-grammar-antlr4>
