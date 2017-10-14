@@ -22,38 +22,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-lexer grammar PHPLexer;
+lexer grammar PhpLexer;
 
 channels { PhpComments, ErrorLexem, SkipChannel }
 
 @lexer::members
-{public bool AspTags = true;
-bool _scriptTag;
-bool _styleTag;
-string _heredocIdentifier;
+{public boolean AspTags = true;
+boolean _scriptTag;
+boolean _styleTag;
+String _heredocIdentifier;
 int _prevTokenType;
-string _htmlNameText;
-bool _phpScript;
-bool _insideString;
+String _htmlNameText;
+boolean _phpScript;
+boolean _insideString;
 
-public override IToken NextToken()
+@Override
+public Token nextToken()
 {
-    CommonToken token = (CommonToken)base.NextToken();
+    CommonToken token = (CommonToken)super.nextToken();
 
-    if (token.Type == PHPEnd || token.Type == PHPEndSingleLineComment)
+    if (token.getType() == PHPEnd || token.getType() == PHPEndSingleLineComment)
     {
         if (_mode == SingleLineCommentMode)
         {
             // SingleLineCommentMode for such allowed syntax:
             // <?php echo "Hello world"; // comment ?>
-            PopMode(); // exit from SingleLineComment mode.
+            popMode(); // exit from SingleLineComment mode.
         }
-        PopMode(); // exit from PHP mode.
+        popMode(); // exit from PHP mode.
         
-        if (string.Equals(token.Text, "</script>", System.StringComparison.Ordinal))
+        if (token.getText().equals("</script>"))
         {
             _phpScript = false;
-            token.Type = ScriptClose;
+            token.setType(ScriptClose);
         }
         else
         {
@@ -62,22 +63,21 @@ public override IToken NextToken()
             if (_prevTokenType == SemiColon || _prevTokenType == Colon
                 || _prevTokenType == OpenCurlyBracket || _prevTokenType == CloseCurlyBracket)
             {
-                token = (CommonToken)base.NextToken();
+                token.setChannel(SkipChannel);
             }
             else
             {
-                token.Type = SemiColon;
+                token = new CommonToken(SemiColon);
             }
         }
     }
-    else if (token.Type == HtmlName)
+    else if (token.getType() == HtmlName)
     {
-        _htmlNameText = token.Text;
+        _htmlNameText = token.getText();
     }
-    else if (token.Type == HtmlDoubleQuoteString)
+    else if (token.getType() == HtmlDoubleQuoteString)
     {
-        if (string.Equals(token.Text, "php", System.StringComparison.OrdinalIgnoreCase) &&
-            string.Equals(_htmlNameText, "language"))
+        if (token.getText().equals("php") && _htmlNameText.equals("language"))
         {
             _phpScript = true;
         }
@@ -85,24 +85,24 @@ public override IToken NextToken()
     else if (_mode == HereDoc)
     {
         // Heredoc and Nowdoc syntax support: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
-        switch (token.Type)
+        switch (token.getType())
         {
             case StartHereDoc:
             case StartNowDoc:
-                _heredocIdentifier = token.Text.Substring(3).Trim().Trim('\'');
+                _heredocIdentifier = token.getText().substring(3).trim().replace("\'","");
                 break;
 
             case HereDocText:
-                if (CheckHeredocEnd(token.Text))
+                if (CheckHeredocEnd(token.getText()))
                 {
-                    PopMode();
-                    if (token.Text.Trim().EndsWith(";"))
+                    popMode();
+                    if (token.getText().trim().endsWith(";"))
                     {
-                        token.Type = SemiColon;
+                        token = new CommonToken(SemiColon);
                     }
                     else
                     {
-                        token = (CommonToken)base.NextToken();
+                        token.setChannel(SkipChannel);
                     }
                 }
                 break;
@@ -110,26 +110,27 @@ public override IToken NextToken()
     }
     else if (_mode == PHP)
     {
-        if (_channel != Hidden)
+        if (_channel != HIDDEN)
         {
-            _prevTokenType = token.Type;
+            _prevTokenType = token.getType();
         }
     }
 
     return token;
 }
 
-bool CheckHeredocEnd(string text)
+boolean CheckHeredocEnd(String text)
 {
-    text = text.Trim();
-    bool semi = text.Length > 0 ? text[text.Length - 1] == ';' : false;
-    string identifier = semi ? text.Substring(0, text.Length - 1) : text;
-    var result = string.Equals(identifier, _heredocIdentifier, System.StringComparison.Ordinal);
+    text = text.trim();
+    boolean semi = (text.length() > 0) ? (text.charAt(text.length() - 1) == ';') : false;
+    String identifier = semi ? text.substring(0, text.length() - 1) : text;
+    boolean result = identifier.equals(_heredocIdentifier);
     return result;
 }}
 
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);
 HtmlText:       ~[<#]+;
+XmlStart:       '<' '?' 'xml' -> pushMode(XML);
 PHPStartEcho:   PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStart:       PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
 HtmlScriptOpen: '<' 'script' { _scriptTag = true; } -> pushMode(INSIDE);
@@ -138,32 +139,39 @@ HtmlComment:    '<' '!' '--' .*? '-->' -> channel(HIDDEN);
 HtmlDtd:        '<' '!' .*? '>';
 HtmlOpen:       '<' -> pushMode(INSIDE);
 Shebang
-    : { _input.La(-1) <= 0 || _input.La(-1) == '\r' || _input.La(-1) == '\n' }? '#' '!' ~[\r\n]*
+    : { _input.LA(-1) <= 0 || _input.LA(-1) == '\r' || _input.LA(-1) == '\n' }? '#' '!' ~[\r\n]*
     ;
 NumberSign:     '#' ~[<]* -> more;
 Error:          .         -> channel(ErrorLexem);
+
+// TODO: parse xml attributes.
+mode XML;
+
+XmlText:                  ~[?]+;
+XmlClose:                 '?' '>' -> popMode;
+XmlText2:                 '?' -> type(XmlText);
 
 mode INSIDE;
 
 PHPStartEchoInside: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartInside:     PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
 HtmlClose: '>' {
-PopMode();
+popMode();
 if (_scriptTag)
 {
     if (!_phpScript)
     {
-        PushMode(SCRIPT);
+        pushMode(SCRIPT);
     }
     else
     {
-        PushMode(PHP);
+        pushMode(PHP);
     }
     _scriptTag = false;
 }
 else if (_styleTag)
 {
-    PushMode(STYLE);
+    pushMode(STYLE);
     _styleTag = false;
 }
 };
@@ -200,12 +208,10 @@ ErrorHtmlDoubleQuote:          .          -> channel(ErrorLexem);
 mode SCRIPT;
 
 ScriptText:               ~[<]+;
-ScriptClose:              '<' '/' 'script'? '>' -> popMode;
+ScriptClose:             '<' '/' 'script'? '>' -> popMode;
 PHPStartInsideScriptEcho: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
-PHPStartInsideScript:     PhpStartFragment-> channel(SkipChannel), pushMode(PHP);
-ScriptText2:              '<' ~[<?/]* -> type(ScriptText);
-ScriptText3:              '?' ~[<]* -> type(ScriptText);
-ScriptText4:              '/' ~[<]* -> type(ScriptText);
+PHPStartInsideScript:     PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
+ScriptText2:              '<' -> type(ScriptText);
 
 mode STYLE;
 
@@ -213,7 +219,8 @@ StyleBody: .*? '</' 'style'? '>' -> popMode;
 
 mode PHP;
 
-PHPEnd:             (('?' | {AspTags}? '%') '>') | {_phpScript}? '</script>';
+PHPEnd:             (('?' | {AspTags}? '%') '>') | {_phpScript}? '</script>'
+      |             {_phpScript}? '</script>';
 Whitespace:         [ \t\r\n]+ -> channel(SkipChannel);
 MultiLineComment:   '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:  '//' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
@@ -223,8 +230,9 @@ Abstract:           'abstract';
 Array:              'array';
 As:                 'as';
 BinaryCast:         'binary';
-BoolType:           'boolean' | 'bool';
-BooleanConstant:    'true' | 'false';
+BoolType:           'bool' 'ean'?;
+BooleanConstant:    'true'
+               |    'false';
 Break:              'break';
 Callable:           'callable';
 Case:               'case';
@@ -242,14 +250,14 @@ Echo:               'echo';
 Else:               'else';
 ElseIf:             'elseif';
 Empty:              'empty';
-                    
+
 EndDeclare:         'enddeclare';
 EndFor:             'endfor';
 EndForeach:         'endforeach';
 EndIf:              'endif';
 EndSwitch:          'endswitch';
 EndWhile:           'endwhile';
-                    
+
 Eval:               'eval';
 Exit:               'die';
 Extends:            'extends';
@@ -306,7 +314,7 @@ Use:                'use';
 Var:                'var';
 While:              'while';
 Yield:              'yield';
-                    
+
 Get:                '__get';
 Set:                '__set';
 Call:               '__call';
@@ -340,7 +348,8 @@ Dec:                '--';
 IsIdentical:        '===';
 IsNoidentical:      '!==';
 IsEqual:            '==';
-IsNotEq:            '<>' | '!=';
+IsNotEq:            '<>'
+       |            '!=';
 IsSmallerOrEqual:   '<=';
 IsGreaterOrEqual:   '>=';
 PlusEqual:          '+=';
@@ -390,8 +399,8 @@ CloseCurlyBracket:  '}'
 if (_insideString)
 {
     _insideString = false;
-    Channel = SkipChannel;
-    PopMode();
+    setChannel(SkipChannel);
+    popMode();
 }
 };
 Comma:              ',';
@@ -414,10 +423,10 @@ SingleQuoteString: '\'' (~('\'' | '\\') | '\\' . )* '\'';
 DoubleQuote:       '"' -> pushMode(InterpolationString);
 
 StartNowDoc
-    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { _input.LA(1) == '\r' || _input.LA(1) == '\n' }? -> pushMode(HereDoc)
     ;
 StartHereDoc
-    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { _input.La(1) == '\r' || _input.La(1) == '\n' }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { _input.LA(1) == '\r' || _input.LA(1) == '\n' }? -> pushMode(HereDoc)
     ;
 ErrorPhp:                   .          -> channel(ErrorLexem);
 
@@ -425,7 +434,7 @@ mode InterpolationString;
 
 VarNameInInterpolation:     '$' [a-zA-Z_][a-zA-Z_0-9]*                          -> type(VarName); // TODO: fix such cases: "$people->john"
 DollarString:               '$'                                                 -> type(StringPart);
-CurlyDollar:                '{' {_input.La(1) == '$'}? {_insideString = true;}  -> channel(SkipChannel), pushMode(PHP);
+CurlyDollar:                '{' {_input.LA(1) == '$'}? {_insideString = true;}  -> channel(SkipChannel), pushMode(PHP);
 CurlyString:                '{'                                                 -> type(StringPart);
 EscapedChar:                '\\' .                                              -> type(StringPart);
 DoubleQuoteInInterpolation: '"'                                                 -> type(DoubleQuote), popMode;

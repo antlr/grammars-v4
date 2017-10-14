@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-parser grammar PHPParser;
+parser grammar PhpParser;
 
-options { tokenVocab=PHPLexer; }
+options { tokenVocab=PhpLexer; }
 
 // HTML
 // Also see here: https://github.com/antlr/grammars-v4/tree/master/html
@@ -66,6 +66,8 @@ htmlElement
     | StyleBody
     
     | ScriptClose
+
+    | XmlStart XmlText* XmlClose
     ;
 
 // Script
@@ -86,8 +88,7 @@ importStatement
     ;
 
 topStatement
-    : emptyStatement
-    | nonEmptyStatement
+    : statement
     | useDeclaration
     | namespaceDeclaration
     | functionDeclaration
@@ -112,7 +113,7 @@ namespaceDeclaration
     ;
 
 namespaceStatement
-    : nonEmptyStatement
+    : statement
     | useDeclaration
     | functionDeclaration
     | classDeclaration
@@ -203,17 +204,8 @@ innerStatement
     ;
 
 // Statements
-    
+
 statement
-    : nonEmptyStatement
-    | emptyStatement
-    ;
-
-emptyStatement
-    : ';'
-    ;
-
-nonEmptyStatement
     : identifier ':'
     | blockStatement
     | ifStatement
@@ -235,7 +227,12 @@ nonEmptyStatement
     | throwStatement
     | gotoStatement
     | declareStatement
-    | inlineHtml
+    | emptyStatement
+    | inlineHtmlStatement
+    ;
+
+emptyStatement
+    : ';'
     ;
 
 blockStatement
@@ -288,7 +285,7 @@ switchStatement
     ;
 
 switchBlock
-    : ((Case expression | Default) ( ':' | ';' ))+ innerStatementList
+    : ((Case expression | Default) (':' | ';'))+ innerStatementList
     ;
     
 breakStatement
@@ -343,8 +340,13 @@ declareStatement
     : Declare '(' declareList ')' (statement | ':' innerStatementList EndDeclare ';')
     ;
 
+inlineHtmlStatement
+    : inlineHtml+
+    ;
+
 inlineHtml
-    : (htmlElements | scriptTextPart)+
+    : htmlElements
+    | scriptTextPart
     ;
 
 declareList
@@ -453,7 +455,6 @@ parenthesis
 
 // Expressions
 // Grouped by prioriries: http://php.net/manual/en/language.operators.precedence.php
-// and http://www.phpeveryday.com/articles/PHP-Operators-Operator-Priority-P312.html
 expression
     : Clone expression                                         #CloneExpression
     | newExpr                                                  #NewExpression
@@ -467,9 +468,6 @@ expression
 
     | ('++' | '--') chain                                      #PrefixIncDecExpression
     | chain ('++' | '--')                                      #PostfixIncDecExpression
-
-    | chain assignmentOperator expression                      #AssignmentExpression
-    | chain Eq '&' (chain | newExpr)                           #AssignmentExpression
 
     | Print expression                                         #PrintExpression
 
@@ -510,6 +508,10 @@ expression
     | expression op='||' expression                               #BitwiseExpression
 
     | expression op=QuestionMark expression? ':' expression       #ConditionalExpression
+
+    | chain assignmentOperator expression                         #AssignmentExpression
+    | chain Eq '&' (chain | newExpr)                              #AssignmentExpression
+
     | expression op=LogicalAnd expression                         #LogicalExpression
     | expression op=LogicalXor expression                         #LogicalExpression
     | expression op=LogicalOr expression                          #LogicalExpression
