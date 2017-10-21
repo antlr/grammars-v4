@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar inf;
 
 inf
-   : section*
+   : (section | EOL)*
    ;
 
 section
@@ -50,12 +50,16 @@ string
    ;
 
 line
-   : string ('=' string)? EOL
+   : stringlist ('=' stringlist)? EOL
+   ;
+
+stringlist
+   : string (',' string?)*
    ;
 
 
 CHARS
-   : ('A' .. 'Z' | '0' .. '9' | 'a' .. 'z' | '.' | '%' | '"' | '\\') +
+   : ('A' .. 'Z' | '0' .. '9' | 'a' .. 'z' | '.' | '%' | '"' | '\\' | '/' | '*' | '@' | '&' | '_' | '{' | '}' | '<' | '>' | '-') +
    ;
 
 
