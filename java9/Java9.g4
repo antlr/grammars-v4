@@ -51,6 +51,16 @@
 /Users/parrt/antlr/code/grammars-v4/java9/./Java9Parser.java
 /Users/parrt/antlr/code/grammars-v4/java9/./Test.java
 Total lexer+parser time 30844ms.
+~/antlr/code/grammars-v4/java9 $ java Test examples/module-info.java
+/home/kwong/projects/grammars-v4/java9/examples/module-info.java
+Total lexer+parser time 914ms.
+~/antlr/code/grammars-v4/java9 $ java Test examples/TryWithResourceDemo.java
+/home/kwong/projects/grammars-v4/java9/examples/TryWithResourceDemo.java
+Total lexer+parser time 3634ms.
+~/antlr/code/grammars-v4/java9 $ java Test examples/helloworld.java 
+/home/kwong/projects/grammars-v4/java9/examples/helloworld.java
+Total lexer+parser time 2497ms.
+
  */
 grammar Java9;
 
@@ -290,7 +300,7 @@ typeDeclaration
 	;
 
 moduleDeclaration
-	:	annotation* 'open'? 'module' moduleName '{' moduleDirective '}'
+	:	annotation* 'open'? 'module' moduleName '{' moduleDirective* '}'
 	;
 
 moduleDirective
