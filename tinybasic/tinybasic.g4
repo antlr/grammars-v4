@@ -28,6 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar tinybasic;
 
+program
+    : line*
+    ;
+
 line
    : number statement CR
    | statement CR
@@ -52,7 +56,7 @@ exprlist
    ;
 
 varlist
-   : VAR (',' VAR)*
+   : vara (',' vara)*
    ;
 
 expression
@@ -64,10 +68,15 @@ term
    ;
 
 factor
-   : VAR
+   : vara
    | number
    | (expression)
    ;
+
+vara
+    : VAR
+    | STRING
+    ;
 
 number
    : DIGIT +
@@ -96,7 +105,7 @@ VAR
 
 
 CR
-   : [ \r\n]
+   : [\r\n]+
    ;
 
 
