@@ -39,10 +39,10 @@ line
 
 statement
    : 'PRINT' exprlist
-   | 'IF' expression relop expression 'THEN' statement
-   | 'GOTO' expression
+   | 'IF' expression relop expression 'THEN'? statement
+   | 'GOTO' number
    | 'INPUT' varlist
-   | 'LET' var = expression
+   | 'LET'? vara '=' expression
    | 'GOSUB' expression
    | 'RETURN'
    | 'CLEAR'
@@ -60,7 +60,7 @@ varlist
    ;
 
 expression
-   : ('+' | '-' | 'ε') term (('+' | '-') term)*
+   : vara ('+' | '-' | 'ε') term (('+' | '-') term)*
    ;
 
 term
@@ -83,9 +83,11 @@ number
    ;
 
 relop
-   : '<' ('>' | '=' | 'ε')
-   | '>' ('<' | '=' | 'ε')
+   : '<' ('>' | '=' | 'ε')?
+   | '>' ('<' | '=' | 'ε')?
    | '='
+   | '+'
+   | '-'
    ;
 
 
