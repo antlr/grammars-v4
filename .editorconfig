@@ -1,0 +1,9 @@
+root=true
+
+[*]
+tab_width = 4
+
+[*.g4]
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
