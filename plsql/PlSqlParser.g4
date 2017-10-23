@@ -26,10 +26,6 @@ swallow_to_semi
     : ~';'+
     ;
 
-compilation_unit
-    : unit_statement* EOF
-    ;
-
 sql_script
     : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
     ;
