@@ -565,6 +565,18 @@ create_table
         )?
 // Column_properties clause goes here
 // Partition clause goes here
+       (
+         table_range_partition_by_clause
+       )?
+
+       ( (ENABLE|DISABLE)? ROW MOVEMENT )?
+
+       ( FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
+       | NO FLASHBACK ARCHIVE
+       )?
+
+      ( AS subquery )?
+
 // Many more varations to capture
       SEMICOLON
     ;
@@ -584,15 +596,42 @@ table_range_partition_by_clause
         LEFT_PAREN 
             (COMMA? PARTITION partition_name=REGULAR_ID    
                  VALUES LESS THAN
-// Supposed to be literl in here, will need to refine this                          
+// Supposed to be literal in here, will need to refine this                          
+                        LEFT_PAREN
 			(COMMA? STRING
                         | COMMA? string_function
                         | COMMA? numeric
                           COMMA? MAXVALUE
                         )+
+                        RIGHT_PAREN
+		( TABLESPACE partition_tablespace=REGULAR_ID )?
+
+                ( ON COMMIT (DELETE|PRESERVE) ROWS)?
+                ( SEGMENT CREATION (IMMEDIATE|DEFERRED) )?
+                 (PCTFREE pctfree=UNSIGNED_INTEGER 
+                 | PCTUSED pctused=UNSIGNED_INTEGER 
+                 | INITRANS inittrans=UNSIGNED_INTEGER
+                 )*
+                 ( STORAGE LEFT_PAREN
+                   ( INITIAL initial=size_clause
+                   | NEXT next=size_clause
+                   | MINEXTENTS minextents=(UNSIGNED_INTEGER|UNLIMITED)
+                   | PCTINCREASE pctincrease=UNSIGNED_INTEGER
+                   | FREELISTS freelists=UNSIGNED_INTEGER
+                   | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
+                   | OPTIMAL (size_clause | NULL )
+                   | BUFFER_POOL (KEEP|RECYCLE|DEFAULT)
+                   | FLASH_CACHE (KEEP|NONE|DEFAULT)
+                   | ENCRYPT
+                   )+
+                  RIGHT_PAREN
+                 )?
+
+
             )+ 
         RIGHT_PAREN
     ;
+
 
 drop_table
     : DROP TABLE tableview_name SEMICOLON
