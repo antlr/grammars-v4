@@ -1,5 +1,6 @@
 *.g4 eol=lf
 *.errors eol=lf
+*.md eol=lf
 pom.xml eol=lf
 
 **/examples/* linguist-vendored
