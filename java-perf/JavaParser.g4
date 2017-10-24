@@ -1,7 +1,7 @@
 /*
  [The "BSD licence"]
  Copyright (c) 2013 Terence Parr, Sam Harwell
- Copyright (c) 2017 Ivan Kochurkin
+ Copyright (c) 2017 Ivan Kochurkin (Positive Technologies)
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without

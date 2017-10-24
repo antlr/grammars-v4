@@ -42,7 +42,7 @@
 			<module>clif</module>
 			<module>clojure</module>
 			<module>cobol85</module>
-			<module>cookie</module>			
+			<module>cookie</module>
 			<module>cool</module>
 			<module>cpp</module>
 			<module>creole</module>
@@ -65,7 +65,7 @@
 			<module>golang</module>
 			<module>graphql</module>
 			<module>graphstream-dgs</module>
-			<module>gtin</module>			
+			<module>gtin</module>
 			<module>html</module>
 			<module>icalendar</module>
 			<module>idl</module>
@@ -75,7 +75,7 @@
 			<module>istc</module>
 			<module>java</module>
 			<module>java8</module>
-			<module>java8-pt</module>
+			<module>java-perf</module>
 			<module>java9</module>
 			<module>javadoc</module>
 			<module>jpa</module>
@@ -94,8 +94,8 @@
 			<module>metric</module>
 			<module>modelica</module>
 			<module>modula2pim4</module>
-			<module>molecule</module>	
-			<module>morsecode</module>	
+			<module>molecule</module>
+			<module>morsecode</module>
 			<module>mps</module>
 			<module>mumath</module>
 			<module>mumps</module>
@@ -124,7 +124,7 @@
 			<module>python3-py</module>
 			<module>python3-ts</module>
 			<module>python3alt</module>
-			<module>quakemap</module>			
+			<module>quakemap</module>
 			<module>r</module>
 			<module>rcs</module>
 			<module>redcode</module>
