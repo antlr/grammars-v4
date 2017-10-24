@@ -1,8 +1,6 @@
-# Positive Technologies JavaScript Grammar
+# JavaScript grammar by [Positive Technologies](https://github.com/PositiveTechnologies)
 
-## Description
-
-This JavaScript grammar does not exactly corresponds to any ECMAScript standard.
+This JavaScript grammar does not exactly corresponds to ECMAScript standard.
 The main goal during developing was practical usage, performance and clarity
 (getting rid of duplicates).
 
@@ -11,7 +9,7 @@ The main goal during developing was practical usage, performance and clarity
 Some modern JavaScript syntax can not be handled with standard context-free
 grammars, for example detection of `get` keyword in getters and `get` identifiers
 in other cases. Moreover, some parser options can be defined externally (`use strict`)
-and should be considered during parse process.
+and should be considered during parsing process.
 
 For such complex syntax [actions](https://github.com/antlr/antlr4/blob/master/doc/actions.md) and
 [predicates](https://github.com/antlr/antlr4/blob/master/doc/predicates.md) are
@@ -27,7 +25,7 @@ getter
 ```
 
 Instruction `p("get")` stands for *get the previous token value and return a boolean
-value after comparison to "get" string*.
+value as a result of comparison to "get" string*.
 
 For **Java** runtime it described by the following code in [Java/JavaScriptBaseLexer.java](Java/JavaScriptBaseParser.java)
 
@@ -75,7 +73,7 @@ Grammar supports the following list of ECMAScript 6 features taken from
 * Enhanced Regular Expression
 * Extended Literals
 * Extended Parameter Handling
-* Generators
+* ~~Generators~~
 * Internationalization & Localization
 * ~~Iterators~~ (not supported for now)
 * Map/Set& WeakMap/WeakSet
@@ -101,7 +99,7 @@ Also this grammar supports outdated syntax such as
 
 ## Main contributors
 
-* Bart Kiers (2014) - initial version by Bart Kiers
+* Bart Kiers (2014) - initial version
 * Ivan Kochurkin (2017):
   * Updated for EcmaScript 6 support
   * Cleared & optimized
