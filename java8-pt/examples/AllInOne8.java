@@ -47,6 +47,69 @@ public class LexerTest {
 
         int x9 = 0_52;             // OK (octal literal)
         int x10 = 05_2;            // OK (octal literal)
+
+        int x, y, result;
+        
+        // Arithmetic operators
+        result = x + y;
+        result = x - y;
+        result = x * y;
+        result = y / x;
+        result = x % 3;
+
+        // Unary operators
+        result = +x;
+        result = -y;
+        result = ++x;
+        result = --y;
+        boolean ok = false;
+        boolean not_ok = !ok; 
+
+        // Prefix & postfix
+        ++x;
+        x++;
+        --y;
+        y--;
+
+        // Relational operators
+        result = x == y;
+        result = x != y;
+        result = x > y;
+        result = x >= y;
+        result = x < y;
+        result = x <= y;
+
+        // Conditional operators
+        if ((x > 8) && (y > 8)) {
+        }
+ 
+        if ((x > 10) || (y > 10)) {
+        }
+
+        result = (x > 10) ? x : y;
+        
+        // Bitwise and Bit shift operators
+        result = ~x;
+        result = x << 1;
+        result = x >> 2;
+        result = x >>> 3;
+        result = x & 4;
+        result = x ^ 5;
+        result = x | 6;
+        
+        // Assignment operators
+        result = x;
+        result += x;
+        result -= x;
+        result *= x;
+        result /= x;
+        result %= x;
+        result &= x;
+        result ^= x;
+        result |= x;
+        result <<= x;
+        result >>= x;
+        result >>>= x;
     }
 }
 
@@ -576,7 +639,7 @@ public class Lambdas {
      }
 }
 
-// Default
+// Default interface method
 interface Formula {
     double calculate(int a);
     
