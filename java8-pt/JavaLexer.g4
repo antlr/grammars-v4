@@ -199,7 +199,7 @@ UnicodeEscape
 
 fragment
 HexDigits
-    : HexDigit ((HexDigit | '_') * HexDigit)?
+    : HexDigit ((HexDigit | '_')* HexDigit)?
     ;
 
 fragment

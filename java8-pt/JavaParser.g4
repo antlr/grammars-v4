@@ -274,7 +274,7 @@ qualifiedName
 
 literal
     : integerLiteral
-    | FLOAT_LITERAL
+    | floatLiteral
     | CHAR_LITERAL
     | STRING_LITERAL
     | BOOL_LITERAL
@@ -286,6 +286,11 @@ integerLiteral
     | HEX_LITERAL
     | OCT_LITERAL
     | BINARY_LITERAL
+    ;
+
+floatLiteral
+    : FLOAT_LITERAL
+    | HEX_FLOAT_LITERAL
     ;
 
 // ANNOTATIONS

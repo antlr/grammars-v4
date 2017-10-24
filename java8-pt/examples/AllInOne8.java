@@ -36,6 +36,8 @@ public class LexerTest {
         byte nybbles = 0b0010_0101;
         long bytes = 0b11010010_01101001_10010100_10010010;
         long lastReceivedMessageId = 0L;
+        double hexDouble1 = 0x1.0p0;
+        double hexDouble2 = 0x1.956ad0aae33a4p117;
 
         int x1 = _52;              // This is an identifier, not a numeric literal
         int x2 = 5_2;              // OK (decimal literal)
