@@ -19,9 +19,6 @@
 
 lexer grammar PlSqlLexer;
 
-
-
-
 // ABORT:                        'ABORT';
 // ABS:                          'ABS';
 // ACCESS:                       'ACCESS';
@@ -251,7 +248,7 @@ COMPILE:                      'COMPILE';
 // COMPOSITE_LIMIT:              'COMPOSITE_LIMIT';
 COMPOUND:                     'COMPOUND';
 COMPRESS:                     'COMPRESS';
-// COMPUTE:                      'COMPUTE';
+COMPUTE:                      'COMPUTE';
 // CONCAT:                       'CONCAT';
 // CON_DBID_TO_ID:               'CON_DBID_TO_ID';
 // CONDITIONAL:                  'CONDITIONAL';
@@ -2225,17 +2222,20 @@ TO_DATE:                      'TO_DATE';
 
 // Rule #358 <NATIONAL_CHAR_STRING_LIT> - subtoken typecast in <REGULAR_ID>, it also incorporates <character_representation>
 //  Lowercase 'n' is a usual addition to the standard
+
 NATIONAL_CHAR_STRING_LIT: 'N' '\'' (~('\'' | '\r' | '\n' ) | '\'' '\'' | NEWLINE)* '\'';
 
 //  Rule #040 <BIT_STRING_LIT> - subtoken typecast in <REGULAR_ID>
 //  Lowercase 'b' is a usual addition to the standard
+
 BIT_STRING_LIT: 'B' ('\'' [01]* '\'')+;
 
 //  Rule #284 <HEX_STRING_LIT> - subtoken typecast in <REGULAR_ID>
 //  Lowercase 'x' is a usual addition to the standard
+
 HEX_STRING_LIT: 'X' ('\'' [A-F0-9]* '\'')+;
-DOUBLE_PERIOD: '..';
-PERIOD:        '.';
+DOUBLE_PERIOD:  '..';
+PERIOD:         '.';
 
 //{ Rule #238 <EXACT_NUM_LIT>
 //  This rule is a bit tricky - it resolves the ambiguity with <PERIOD> 
@@ -2253,8 +2253,8 @@ PERIOD:        '.';
     (D | F)?
     ;*/
 
-UNSIGNED_INTEGER: UNSIGNED_INTEGER_FRAGMENT;
-APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT ('E' ('+'|'-')? (FLOAT_FRAGMENT | UNSIGNED_INTEGER_FRAGMENT))? ('D' | 'F')?;
+UNSIGNED_INTEGER:    [0-9]+;
+APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT ('E' ('+'|'-')? (FLOAT_FRAGMENT | [0-9]+))? ('D' | 'F')?;
 
 // Rule #--- <CHAR_STRING> is a base for Rule #065 <char_string_lit> , it incorporates <character_representation>
 // and a superfluous subtoken typecasting of the "QUOTE"
@@ -2269,24 +2269,25 @@ fragment QS_BRACK   : QUOTE '[' .*? ']' QUOTE ;
 fragment QS_PAREN   : QUOTE '(' .*? ')' QUOTE ;
 fragment QS_OTHER_CH: ~('<' | '{' | '[' | '(' | ' ' | '\t' | '\n' | '\r');
 
-// Rule #163 <DELIMITED_ID>
 DELIMITED_ID: '"' (~('"' | '\r' | '\n') | '"' '"')+ '"' ;
 
-// Rule #546 <SQL_SPECIAL_CHAR> was split into single rules
-PERCENT: '%';
-AMPERSAND: '&';
-LEFT_PAREN: '(';
-RIGHT_PAREN: ')';
-DOUBLE_ASTERISK: '**';
-ASTERISK: '*';
-PLUS_SIGN: '+';
-MINUS_SIGN: '-';
-COMMA: ',';
-SOLIDUS: '/';
-AT_SIGN: '@';
-ASSIGN_OP: ':=';
-    
+// SQL_SPECIAL_CHAR was split into single rules
+
+PERCENT:                   '%';
+AMPERSAND:                 '&';
+LEFT_PAREN:                '(';
+RIGHT_PAREN:               ')';
+DOUBLE_ASTERISK:           '**';
+ASTERISK:                  '*';
+PLUS_SIGN:                 '+';
+MINUS_SIGN:                '-';
+COMMA:                     ',';
+SOLIDUS:                   '/';
+AT_SIGN:                   '@';
+ASSIGN_OP:                 ':=';
+
 // See OCI reference for more information about this
+
 BINDVAR
     : ':' SIMPLE_LETTER  (SIMPLE_LETTER | [0-9] | '_')*
     | ':' DELIMITED_ID  // not used in SQL but spotted in v$sqltext when using cursor_sharing
@@ -2294,23 +2295,24 @@ BINDVAR
     | QUESTION_MARK // not in SQL, not in Oracle, not in OCI, use this for JDBC
     ;
 
-COLON: ':';
-SEMICOLON: ';';
-LESS_THAN_OR_EQUALS_OP: '<=';
-LESS_THAN_OP: '<';
-GREATER_THAN_OR_EQUALS_OP: '>=';
-NOT_EQUAL_OP: '!='| '<>'| '^='| '~=';
-CARRET_OPERATOR_PART: '^';
-TILDE_OPERATOR_PART: '~';
+NOT_EQUAL_OP:              '!='
+            |              '<>'
+            |              '^='
+            |              '~='
+            ;
+CARRET_OPERATOR_PART:      '^';
+TILDE_OPERATOR_PART:       '~';
 EXCLAMATION_OPERATOR_PART: '!';
-GREATER_THAN_OP: '>';
+GREATER_THAN_OP:           '>';
+LESS_THAN_OP:              '<';
+COLON:                     ':';
+SEMICOLON:                 ';';
 
 fragment
 QUESTION_MARK: '?';
 
 // protected UNDERSCORE : '_' SEPARATOR ; // subtoken typecast within <INTRODUCER>
-CONCATENATION_OP: '||';
-VERTICAL_BAR: '|';
+BAR: '|';
 EQUALS_OP: '=';
 
 // Rule #532 <SQL_EMBDD_LANGUAGE_CHAR> was split into single rules:
@@ -2334,31 +2336,26 @@ INTRODUCER
 SPACES: [ \t\r\n]+ -> skip;
 
     
-//{ Rule #504 <SIMPLE_LETTER> - simple_latin _letter was generalised into SIMPLE_LETTER
+// Rule #504 <SIMPLE_LETTER> - simple_latin _letter was generalised into SIMPLE_LETTER
 //  Unicode is yet to be implemented - see NSF0
 fragment
 SIMPLE_LETTER
     : [A-Z]
     ;
-//}
-
-
-//  Rule #176 <DIGIT> was incorporated by <UNSIGNED_INTEGER> 
-//{ Rule #615 <UNSIGNED_INTEGER> - subtoken typecast in <EXACT_NUM_LIT> 
-fragment
-UNSIGNED_INTEGER_FRAGMENT: [0-9]+ ;
 
 fragment
 FLOAT_FRAGMENT
     : UNSIGNED_INTEGER* '.'? UNSIGNED_INTEGER+
     ;
 
-//{ Rule #097 <COMMENT>
+// Rule #097 <COMMENT>
+
 SINGLE_LINE_COMMENT: '--' ~('\r' | '\n')* (NEWLINE | EOF)   -> channel(HIDDEN);
-MULTI_LINE_COMMENT: '/*' .*? '*/'                           -> channel(HIDDEN);
+MULTI_LINE_COMMENT:  '/*' .*? '*/'                          -> channel(HIDDEN);
 
 // SQL*Plus prompt
 // TODO should be grammar rule, but tricky to implement
+
 PROMPT
     : 'prompt' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
     ;
@@ -2372,7 +2369,6 @@ START_CMD
     | '@@' ( ~('\r' | '\n') )* (NEWLINE|EOF)
     ;
 
-//{ Rule #360 <NEWLINE>
 fragment
 NEWLINE: '\r'? '\n';
     
