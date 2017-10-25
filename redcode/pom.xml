@@ -18,7 +18,7 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>tnt.g4</grammars>
+					<grammars>redcode.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
