@@ -524,7 +524,6 @@ drop_index
     : DROP INDEX index_name ';'
     ;
 
-
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE table_name=tableview_name 
         LEFT_PAREN
