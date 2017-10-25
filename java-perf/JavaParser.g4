@@ -521,15 +521,20 @@ primary
     ;
 
 methodReference
-    : (typeType | qualifiedName ('.' accessorOrMethodRefCall)? | accessorOrMethodRefCall) '::' typeArguments? IDENTIFIER
+    : (typeType | (superOrThis '.')? qualifiedName ('.' accessorOrMethodRefCall)? | accessorOrMethodRefCall)
+      '::' typeArguments? IDENTIFIER
     | classType '::' typeArguments? NEW
     | typeType '::' NEW
     ;
 
 accessorOrMethodRefCall
+    : superOrThis
+    | IDENTIFIER '(' expressionList? ')' ('.' IDENTIFIER '(' expressionList? ')')*
+    ;
+
+superOrThis
     : SUPER
     | THIS
-    | IDENTIFIER LPAREN expressionList? RPAREN (DOT IDENTIFIER LPAREN expressionList? RPAREN)*
     ;
 
 classType
