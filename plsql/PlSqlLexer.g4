@@ -1603,7 +1603,7 @@ STATISTICS:                   'STATISTICS';
 // STDDEV_SAMP:                  'STDDEV_SAMP';
 // STOP:                         'STOP';
 STORAGE:                      'STORAGE';
-STORE:                        'STORE';
+// STORE:                        'STORE';
 // STREAMS:                      'STREAMS';
 // STREAM:                       'STREAM';
 // STRICT:                       'STRICT';
