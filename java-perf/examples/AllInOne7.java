@@ -612,3 +612,8 @@ class IntegerArray implements Expandable<Integer> {
     void addItem(Integer item) {
     }
 }
+
+// Annotation type definition
+public @interface Bean {
+    public static final String ASDF = "ASDF";
+}
