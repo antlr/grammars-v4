@@ -489,6 +489,11 @@ expression
       bop=('=' | '+=' | '-=' | '*=' | '/=' | '&=' | '|=' | '^=' | '>>=' | '>>>=' | '<<=' | '%=')
       expression
     | lambdaExpression // Java8
+
+    // Java 8 methodReference
+    | expression '::' typeArguments? IDENTIFIER
+    | typeType '::' (typeArguments? IDENTIFIER | NEW)
+    | classType '::' typeArguments? NEW
     ;
 
 // Java8
@@ -517,24 +522,6 @@ primary
     | IDENTIFIER
     | typeTypeOrVoid '.' CLASS
     | nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
-    | methodReference // Java 8
-    ;
-
-methodReference
-    : (typeType | (superOrThis '.')? qualifiedName ('.' accessorOrMethodRefCall)? | accessorOrMethodRefCall)
-      '::' typeArguments? IDENTIFIER
-    | classType '::' typeArguments? NEW
-    | typeType '::' NEW
-    ;
-
-accessorOrMethodRefCall
-    : superOrThis
-    | IDENTIFIER '(' expressionList? ')' ('.' IDENTIFIER '(' expressionList? ')')*
-    ;
-
-superOrThis
-    : SUPER
-    | THIS
     ;
 
 classType

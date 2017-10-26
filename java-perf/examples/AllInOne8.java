@@ -49,6 +49,8 @@ public class For {
         Function<Computer, Integer> getAgeAlt6 = twice().nested()::getAge;
         Function<Computer, Integer> getAgeAlt7 = this.singletonInstanceMethod::get;
 
+        autodetect(this.beans, ((AutodetectCapableMBeanInfoAssembler) this.assembler)::includeBean);
+
         TriFunction <Integer, String, Integer, Computer> c6Function = Computer::new;
         Computer c3 = c6Function.apply(2008, "black", 90);
 
