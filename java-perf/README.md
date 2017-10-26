@@ -1,9 +1,9 @@
-# Java performant grammar by [Positive Technologies](https://github.com/PositiveTechnologies)
+# Java grammar by [Positive Technologies](https://github.com/PositiveTechnologies)
 
 Based on the previous optimized [Java7](../java) grammar by Terence Parr and Sam Harwell
 with the same BSD license. This grammar does not exactly corresponds to the formal
 Java specification unlike usual [Java8](../java8) grammar, but passes tests such as
-[AllInOne7.Java](examples/AllInOne7.Java) and [AllInOne8.java](examples/AllInOne8.Java).
+[AllInOne7.Java](examples/AllInOne7.java) and [AllInOne8.java](examples/AllInOne8.java).
 Performance, practical usage and clarity in priority.
 
 This grammar parses the file [ManyStringsConcat.java](examples/ManyStringsConcat.java)
@@ -69,4 +69,5 @@ modifier
 
 ## Tests
 
-The grammar contains [AllInOne7.Java](examples/AllInOne7.Java) and [AllInOne8.java](examples/AllInOne8.Java) files that almost fully covered Java syntax.
+The grammar contains [AllInOne7.java](examples/AllInOne7.java) and
+[AllInOne8.java](examples/AllInOne8.java) files that almost fully covered Java syntax.
