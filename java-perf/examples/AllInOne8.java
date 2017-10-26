@@ -58,3 +58,9 @@ public class For {
         Computer[] computerArray = computerCreator.apply(5);
     }
 }
+
+// Type Annotations
+public class Annotations {
+    @Valid
+    private List<@NotNull String> property;
+}

@@ -155,7 +155,8 @@ methodBody
     ;
 
 typeTypeOrVoid
-    : typeType | VOID
+    : typeType
+    | VOID
     ;
 
 genericMethodDeclaration
@@ -573,7 +574,7 @@ typeList
     ;
 
 typeType
-    : (classOrInterfaceType | primitiveType) ('[' ']')*
+    : annotation? (classOrInterfaceType | primitiveType) ('[' ']')*
     ;
 
 primitiveType
