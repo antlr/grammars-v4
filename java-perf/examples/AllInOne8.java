@@ -64,3 +64,15 @@ public class Annotations {
     @Valid
     private List<@NotNull String> property;
 }
+
+public interface CallableProcessingInterceptor {
+    default <T> void beforeConcurrentHandling(NativeWebRequest request, Callable<T> task) throws Exception {
+    }
+}
+
+@FunctionalInterface
+public interface RouterFunction<T extends ServerResponse> {
+    default <S extends ServerResponse> RouterFunction<S> filter(HandlerFilterFunction<T, S> filterFunction) {
+        return new RouterFunctions.FilteredRouterFunction<>(this, filterFunction);
+    }
+}

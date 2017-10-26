@@ -199,9 +199,10 @@ constantDeclarator
     ;
 
 // see matching of [] comment in methodDeclaratorRest
-// methodBody from Java 8
+// methodBody from Java8
 interfaceMethodDeclaration
-    : interfaceMethodModifier* typeTypeOrVoid IDENTIFIER formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
+    : interfaceMethodModifier* (typeTypeOrVoid | typeParameters annotation* typeTypeOrVoid)
+      IDENTIFIER formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
     ;
 
 // Java8
