@@ -1,7 +1,7 @@
 /*
  [The "BSD licence"]
  Copyright (c) 2013 Terence Parr, Sam Harwell
- Copyright (c) 2017 Ivan Kochurkin (Positive Technologies)
+ Copyright (c) 2017 Ivan Kochurkin (upgrade to Java 8)
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -95,7 +95,9 @@ FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?
 
 HEX_FLOAT_LITERAL:  '0' [xX] (HexDigits '.'? | HexDigits? '.' HexDigits) [pP] [+-]? Digits [fFdD]?;
 
-BOOL_LITERAL:       'true' | 'false';
+BOOL_LITERAL:       'true'
+            |       'false'
+            ;
 
 CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
 
@@ -171,61 +173,39 @@ LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
 
 // Identifiers
 
-IDENTIFIER:         JavaLetter JavaLetterOrDigit*;
+IDENTIFIER:         Letter LetterOrDigit*;
 
-// Fragments rules
+// Fragment rules
 
-fragment
-ExponentPart
+fragment ExponentPart
     : [eE] [+-]? Digits
     ;
 
-// Escape Sequences for Character and String Literals
-
-fragment
-EscapeSequence
+fragment EscapeSequence
     : '\\' [btnfr"'\\]
-    | OctalEscape
-    | UnicodeEscape
+    | '\\' ([0-3]? [0-7])? [0-7]
+    | '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
 
-fragment
-OctalEscape: '\\' ([0-3]? [0-7])? [0-7];
-
-fragment
-UnicodeEscape
-    : '\\' 'u' HexDigit HexDigit HexDigit HexDigit
-    ;
-
-fragment
-HexDigits
+fragment HexDigits
     : HexDigit ((HexDigit | '_')* HexDigit)?
     ;
 
-fragment
-HexDigit
+fragment HexDigit
     : [0-9a-fA-F]
     ;
 
-fragment
-Digits
+fragment Digits
     : [0-9] ([0-9_]* [0-9])?
     ;
 
-fragment
-JavaLetter
-    : [a-zA-Z$_] // these are the "java letters" below 0x7F
-    | // covers all characters above 0x7F which are not a surrogate
-        ~[\u0000-\u007F\uD800-\uDBFF]
-    | // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-        [\uD800-\uDBFF] [\uDC00-\uDFFF]
+fragment LetterOrDigit
+    : Letter
+    | [0-9]
     ;
 
-fragment
-JavaLetterOrDigit
-    : [a-zA-Z0-9$_] // these are the "java letters or digits" below 0x7F
-    | // covers all characters above 0x7F which are not a surrogate
-        ~[\u0000-\u007F\uD800-\uDBFF]
-    | // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-        [\uD800-\uDBFF] [\uDC00-\uDFFF]
+fragment Letter
+    : [a-zA-Z$_] // these are the "java letters" below 0x7F
+    | ~[\u0000-\u007F\uD800-\uDBFF] // covers all characters above 0x7F which are not a surrogate
+    | [\uD800-\uDBFF] [\uDC00-\uDFFF] // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
     ;
