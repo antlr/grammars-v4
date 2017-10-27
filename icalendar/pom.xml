@@ -18,7 +18,7 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>iCalendar.g4</grammars>
+					<grammars>ICalendar.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

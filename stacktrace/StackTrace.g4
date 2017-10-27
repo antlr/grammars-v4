@@ -9,7 +9,8 @@
 
 /*
     Ported to Antlr4 by Tom Everett <tom@khubla.com>
-*/ grammar StackTrace;
+*/
+grammar StackTrace;
 
 startRule
    : stackTrace EOF

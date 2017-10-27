@@ -491,7 +491,7 @@ expression
 
     | Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? blockStatement  #LambdaFunctionExpression
 
-    | <assoc=right> expression '**' expression                    #ArithmeticExpression
+    | <assoc=right> expression op='**' expression                 #ArithmeticExpression
     | expression InstanceOf typeRef                               #InstanceOfExpression
     | expression op=('*' | Divide | '%') expression               #ArithmeticExpression
 

@@ -18,6 +18,10 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
+					<includes>
+						<include>HTMLLexer.g4</include>
+						<include>HTMLParser.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
