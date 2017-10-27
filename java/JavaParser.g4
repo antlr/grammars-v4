@@ -1,7 +1,7 @@
 /*
  [The "BSD licence"]
  Copyright (c) 2013 Terence Parr, Sam Harwell
- Copyright (c) 2017 Ivan Kochurkin
+ Copyright (c) 2017 Ivan Kochurkin (upgrade to Java 8)
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -155,7 +155,8 @@ methodBody
     ;
 
 typeTypeOrVoid
-    : typeType | VOID
+    : typeType
+    | VOID
     ;
 
 genericMethodDeclaration
@@ -198,9 +199,10 @@ constantDeclarator
     ;
 
 // see matching of [] comment in methodDeclaratorRest
-// methodBody from Java 8
+// methodBody from Java8
 interfaceMethodDeclaration
-    : interfaceMethodModifier* typeTypeOrVoid IDENTIFIER formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
+    : interfaceMethodModifier* (typeTypeOrVoid | typeParameters annotation* typeTypeOrVoid)
+      IDENTIFIER formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
     ;
 
 // Java8
@@ -274,7 +276,7 @@ qualifiedName
 
 literal
     : integerLiteral
-    | FLOAT_LITERAL
+    | floatLiteral
     | CHAR_LITERAL
     | STRING_LITERAL
     | BOOL_LITERAL
@@ -286,6 +288,11 @@ integerLiteral
     | HEX_LITERAL
     | OCT_LITERAL
     | BINARY_LITERAL
+    ;
+
+floatLiteral
+    : FLOAT_LITERAL
+    | HEX_FLOAT_LITERAL
     ;
 
 // ANNOTATIONS
@@ -484,6 +491,11 @@ expression
       bop=('=' | '+=' | '-=' | '*=' | '/=' | '&=' | '|=' | '^=' | '>>=' | '>>>=' | '<<=' | '%=')
       expression
     | lambdaExpression // Java8
+
+    // Java 8 methodReference
+    | expression '::' typeArguments? IDENTIFIER
+    | typeType '::' (typeArguments? IDENTIFIER | NEW)
+    | classType '::' typeArguments? NEW
     ;
 
 // Java8
@@ -512,19 +524,6 @@ primary
     | IDENTIFIER
     | typeTypeOrVoid '.' CLASS
     | nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
-    | methodReference // Java 8
-    ;
-
-methodReference
-    : (typeType | qualifiedName ('.' accessorOrMethodRefCall)? | accessorOrMethodRefCall) '::' typeArguments? IDENTIFIER
-    | classType '::' typeArguments? NEW
-    | typeType '::' NEW
-    ;
-
-accessorOrMethodRefCall
-    : SUPER
-    | THIS
-    | IDENTIFIER LPAREN expressionList? RPAREN (DOT IDENTIFIER LPAREN expressionList? RPAREN)*
     ;
 
 classType
@@ -576,7 +575,7 @@ typeList
     ;
 
 typeType
-    : (classOrInterfaceType | primitiveType) ('[' ']')*
+    : annotation? (classOrInterfaceType | primitiveType) ('[' ']')*
     ;
 
 primitiveType

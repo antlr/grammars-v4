@@ -18,7 +18,7 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>fasta.g4</grammars>
+					<grammars>properties.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

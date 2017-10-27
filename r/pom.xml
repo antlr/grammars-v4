@@ -19,6 +19,10 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>R.g4</grammars>
+					<includes>
+						<include>R.g4</include>
+						<include>RFilter.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>v
 				</configuration>

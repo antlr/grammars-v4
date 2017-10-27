@@ -1,5 +1,3 @@
-*.g4 eol=lf
-*.errors eol=lf
-pom.xml eol=lf
+*.* eol=lf
 
 **/examples/* linguist-vendored
