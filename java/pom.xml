@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>java</artifactId>
 	<packaging>jar</packaging>
-	<name>Java grammar</name>
+	<name>Java</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -18,9 +18,10 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>Java.g4</grammars>
-					<visitor>true</visitor>
-					<listener>true</listener>
+					<includes>
+						<include>JavaLexer.g4</include>
+						<include>JavaParser.g4</include>
+					</includes>
 				</configuration>
 				<executions>
 					<execution>
