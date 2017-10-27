@@ -75,7 +75,6 @@
 			<module>istc</module>
 			<module>java</module>
 			<module>java8</module>
-			<module>java-perf</module>
 			<module>java9</module>
 			<module>javadoc</module>
 			<module>jpa</module>

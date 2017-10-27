@@ -1,4 +1,4 @@
-# Java grammar by [Positive Technologies](https://github.com/PositiveTechnologies)
+# Java Antlr Grammar
 
 Based on the previous optimized [Java7](../java) grammar by Terence Parr and Sam Harwell
 with the same BSD license. This grammar does not exactly corresponds to the formal
@@ -13,6 +13,31 @@ much more faster than original grammar without left recursion expressions.
 
 * Java 7
 * Java 8
+
+## Main contributors
+
+* Terence Parr, 2013
+* Sam Harwell, 2013
+* Ivan Kochurkin ([Positive Technologies](https://github.com/PositiveTechnologies)), 2017
+
+## Tests
+
+The grammar contains [AllInOne7.java](examples/AllInOne7.java) and
+[AllInOne8.java](examples/AllInOne8.java) files that almost fully covered Java syntax.
+
+## Benchmarks
+
+Grammar performance has been tested on the following projects:
+
+* jdk8
+* Spring Framework
+* Elasticsearch
+* RxJava
+* JUnit4
+* Guava
+* Log4j
+
+See [Benchmarks](Benchmarks.md) page for details.
 
 ## Grammar style
 
@@ -66,8 +91,3 @@ modifier
     | 'volatile'
     ;
 ```
-
-## Tests
-
-The grammar contains [AllInOne7.java](examples/AllInOne7.java) and
-[AllInOne8.java](examples/AllInOne8.java) files that almost fully covered Java syntax.
