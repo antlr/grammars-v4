@@ -1894,7 +1894,7 @@ func_body_returns_select
   :RETURNS TABLE
   (WITH function_option (',' function_option)*)?
   AS?
-  RETURN select_statement
+  RETURN '('? select_statement ')'?
   ;
 
 func_body_returns_table
