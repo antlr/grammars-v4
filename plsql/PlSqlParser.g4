@@ -525,7 +525,7 @@ drop_index
     ;
 
 create_table
-    : CREATE (GLOBAL TEMPORARY)? TABLE table_name=tableview_name 
+    : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
         LEFT_PAREN column_name datatype (',' column_name datatype)*
         RIGHT_PAREN
         (ON COMMIT (DELETE | PRESERVE) ROWS)?
