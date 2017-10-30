@@ -526,10 +526,8 @@ drop_index
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE table_name=tableview_name 
-        ( LEFT_PAREN ( (COMMA? column_names=column_name column_datatypes=datatype (SORT)?  (DEFAULT expression)? (ENCRYPT (USING STRING)? (IDENTIFIED BY REGULAR_ID)? (integrity_algorithm=STRING)? ( (NO)? SALT )? )? )*
-                   )
+        LEFT_PAREN column_name datatype (',' column_name datatype)*
         RIGHT_PAREN
-        )?
         (ON COMMIT (DELETE | PRESERVE) ROWS)?
         (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
         (PCTFREE pctfree=UNSIGNED_INTEGER

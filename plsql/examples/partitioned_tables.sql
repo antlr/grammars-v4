@@ -59,4 +59,3 @@ CREATE TABLE interval_sales
       PARTITION p2 VALUES LESS THAN (TO_DATE('1-7-2009', 'DD-MM-YYYY')),
       PARTITION p3 VALUES LESS THAN (TO_DATE('1-1-2010', 'DD-MM-YYYY')) );
 
-create table t as select sysdate from dual;
