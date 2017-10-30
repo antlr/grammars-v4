@@ -231,7 +231,7 @@ backup_statement
     | backup_master_key
     | backup_service_master_key
     ;
-    
+
 // Control-of-Flow Language: https://docs.microsoft.com/en-us/sql/t-sql/language-elements/control-of-flow
 cfl_statement
     : block_statement
@@ -343,11 +343,11 @@ another_statement
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
 
 alter_application_role
-    : ALTER APPLICATION ROLE appliction_role=id WITH  (COMMA? NAME EQUAL new_application_role_name=id)? (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id)? 
+    : ALTER APPLICATION ROLE appliction_role=id WITH  (COMMA? NAME EQUAL new_application_role_name=id)? (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id)?
     ;
 
 create_application_role
-    : CREATE APPLICATION ROLE appliction_role=id WITH   (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id)? 
+    : CREATE APPLICATION ROLE appliction_role=id WITH   (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id)?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-aggregate-transact-sql
@@ -362,7 +362,7 @@ drop_application_role
     ;
 
 alter_assembly
-    : alter_assembly_start assembly_name=id alter_assembly_clause 
+    : alter_assembly_start assembly_name=id alter_assembly_clause
     ;
 
 alter_assembly_start
@@ -395,7 +395,7 @@ alter_assembly_drop
     ;
 
 alter_assembly_add_clause
-    : alter_asssembly_add_clause_start alter_assembly_client_file_clause 
+    : alter_asssembly_add_clause_start alter_assembly_client_file_clause
     ;
 
 alter_asssembly_add_clause_start
@@ -439,12 +439,12 @@ assembly_option
     | VISIBILITY EQUAL (ON | OFF)
     | UNCHECKED DATA
     | assembly_option COMMA
-    ;    
+    ;
 
 network_file_share
     : network_file_start network_computer file_path
     ;
- 
+
 network_computer
     : computer_name=id
     ;
@@ -477,14 +477,14 @@ multiple_local_files
     ;
 
 multiple_local_file_start
-    : SINGLE_QUOTE 
+    : SINGLE_QUOTE
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-assembly-transact-sql
 create_assembly
-    : CREATE ASSEMBLY assembly_name=id (AUTHORIZATION owner_name=id)? 
+    : CREATE ASSEMBLY assembly_name=id (AUTHORIZATION owner_name=id)?
        FROM (COMMA? (STRING|BINARY) )+
-       (WITH PERMISSION_SET EQUAL (SAFE|EXTERNAL_ACCESS|UNSAFE) )? 
+       (WITH PERMISSION_SET EQUAL (SAFE|EXTERNAL_ACCESS|UNSAFE) )?
 
     ;
 
@@ -521,7 +521,7 @@ asymmetric_key_password_change_option
 //https://docs.microsoft.com/en-us/sql/t-sql/statements/create-asymmetric-key-transact-sql
 
 create_asymmetric_key
-    : CREATE ASYMMETRIC KEY Asym_Key_Nam=id 
+    : CREATE ASYMMETRIC KEY Asym_Key_Nam=id
        (AUTHORIZATION database_principal_name=id)?
        ( FROM (FILE EQUAL STRING |EXECUTABLE_FILE EQUAL STRING|ASSEMBLY Assembly_Name=id | PROVIDER Provider_Name=id) )?
        (WITH (ALGORITHM EQUAL ( RSA_4096 | RSA_3072 | RSA_2048 | RSA_1024 | RSA_512)  |PROVIDER_KEY_NAME EQUAL provider_key_name=STRING | CREATION_DISPOSITION EQUAL (CREATE_NEW|OPEN_EXISTING)  )   )?
@@ -537,7 +537,7 @@ drop_asymmetric_key
 
 alter_authorization
     : alter_authorization_start (class_type colon_colon)? entity=entity_name entity_to authorization_grantee
-    ; 
+    ;
 
 authorization_grantee
     : principal_name=id
@@ -553,59 +553,59 @@ colon_colon
     ;
 
 alter_authorization_start
-    : ALTER AUTHORIZATION ON 
+    : ALTER AUTHORIZATION ON
     ;
 
 alter_authorization_for_sql_database
     : alter_authorization_start (class_type_for_sql_database colon_colon)? entity=entity_name entity_to authorization_grantee
-    ; 
+    ;
 
 alter_authorization_for_azure_dw
     : alter_authorization_start (class_type_for_azure_dw colon_colon)? entity=entity_name_for_azure_dw entity_to authorization_grantee
-    ; 
+    ;
 
 alter_authorization_for_parallel_dw
     : alter_authorization_start (class_type_for_parallel_dw colon_colon)? entity=entity_name_for_parallel_dw entity_to authorization_grantee
-    ; 
+    ;
 
 
 class_type
-    : OBJECT 
-    | ASSEMBLY 
-    | ASYMMETRIC KEY 
-    | AVAILABILITY GROUP 
-    | CERTIFICATE     
-    | CONTRACT 
-    | TYPE 
-    | DATABASE 
-    | ENDPOINT 
-    | FULLTEXT CATALOG     
-    | FULLTEXT STOPLIST 
-    | MESSAGE TYPE 
-    | REMOTE SERVICE BINDING    
-    | ROLE 
-    | ROUTE 
-    | SCHEMA 
-    | SEARCH PROPERTY LIST 
-    | SERVER ROLE     
-    | SERVICE 
-    | SYMMETRIC KEY 
+    : OBJECT
+    | ASSEMBLY
+    | ASYMMETRIC KEY
+    | AVAILABILITY GROUP
+    | CERTIFICATE
+    | CONTRACT
+    | TYPE
+    | DATABASE
+    | ENDPOINT
+    | FULLTEXT CATALOG
+    | FULLTEXT STOPLIST
+    | MESSAGE TYPE
+    | REMOTE SERVICE BINDING
+    | ROLE
+    | ROUTE
+    | SCHEMA
+    | SEARCH PROPERTY LIST
+    | SERVER ROLE
+    | SERVICE
+    | SYMMETRIC KEY
     | XML SCHEMA COLLECTION
     ;
 
 class_type_for_sql_database
-    :  OBJECT 
-    | ASSEMBLY 
-    | ASYMMETRIC KEY 
-    | CERTIFICATE     
-    | TYPE 
-    | DATABASE 
-    | FULLTEXT CATALOG     
-    | FULLTEXT STOPLIST     
-    | ROLE 
-    | SCHEMA 
-    | SEARCH PROPERTY LIST     
-    | SYMMETRIC KEY 
+    :  OBJECT
+    | ASSEMBLY
+    | ASYMMETRIC KEY
+    | CERTIFICATE
+    | TYPE
+    | DATABASE
+    | FULLTEXT CATALOG
+    | FULLTEXT STOPLIST
+    | ROLE
+    | SCHEMA
+    | SEARCH PROPERTY LIST
+    | SYMMETRIC KEY
     | XML SCHEMA COLLECTION
     ;
 
@@ -613,7 +613,7 @@ class_type_for_azure_dw
     : SCHEMA
     | OBJECT
     ;
-  
+
 class_type_for_parallel_dw
     : DATABASE
     | SCHEMA
@@ -637,43 +637,43 @@ alter_availability_group_start
 
 alter_availability_group_options
     : SET LR_BRACKET ( ( AUTOMATED_BACKUP_PREFERENCE EQUAL ( PRIMARY | SECONDARY_ONLY| SECONDARY | NONE )  | FAILURE_CONDITION_LEVEL  EQUAL DECIMAL   | HEALTH_CHECK_TIMEOUT EQUAL milliseconds=DECIMAL  | DB_FAILOVER  EQUAL ( ON | OFF )   | REQUIRED_SYNCHRONIZED_SECONDARIES_TO_COMMIT EQUAL DECIMAL ) RR_BRACKET  )
-    | ADD DATABASE database_name=id   
-    | REMOVE DATABASE database_name=id   
-    | ADD REPLICA ON server_instance=STRING (WITH LR_BRACKET ( (ENDPOINT_URL EQUAL STRING)?   (COMMA? AVAILABILITY_MODE EQUAL (SYNCHRONOUS_COMMIT| ASYNCHRONOUS_COMMIT))?    (COMMA? FAILOVER_MODE EQUAL (AUTOMATIC|MANUAL) )?  (COMMA?   SEEDING_MODE EQUAL (AUTOMATIC|MANUAL) )?  (COMMA?  BACKUP_PRIORITY EQUAL DECIMAL)?  ( COMMA? PRIMARY_ROLE  LR_BRACKET ALLOW_CONNECTIONS EQUAL ( READ_WRITE | ALL ) RR_BRACKET)?   ( COMMA? SECONDARY_ROLE  LR_BRACKET ALLOW_CONNECTIONS EQUAL ( READ_ONLY  ) RR_BRACKET )? ) 
+    | ADD DATABASE database_name=id
+    | REMOVE DATABASE database_name=id
+    | ADD REPLICA ON server_instance=STRING (WITH LR_BRACKET ( (ENDPOINT_URL EQUAL STRING)?   (COMMA? AVAILABILITY_MODE EQUAL (SYNCHRONOUS_COMMIT| ASYNCHRONOUS_COMMIT))?    (COMMA? FAILOVER_MODE EQUAL (AUTOMATIC|MANUAL) )?  (COMMA?   SEEDING_MODE EQUAL (AUTOMATIC|MANUAL) )?  (COMMA?  BACKUP_PRIORITY EQUAL DECIMAL)?  ( COMMA? PRIMARY_ROLE  LR_BRACKET ALLOW_CONNECTIONS EQUAL ( READ_WRITE | ALL ) RR_BRACKET)?   ( COMMA? SECONDARY_ROLE  LR_BRACKET ALLOW_CONNECTIONS EQUAL ( READ_ONLY  ) RR_BRACKET )? )
 )    RR_BRACKET
         |SECONDARY_ROLE LR_BRACKET (ALLOW_CONNECTIONS EQUAL (NO|READ_ONLY|ALL) | READ_ONLY_ROUTING_LIST EQUAL ( LR_BRACKET ( ( STRING) ) RR_BRACKET ) )
         |PRIMARY_ROLE LR_BRACKET (ALLOW_CONNECTIONS EQUAL (NO|READ_ONLY|ALL) | READ_ONLY_ROUTING_LIST EQUAL ( LR_BRACKET ( (COMMA? STRING)*|NONE ) RR_BRACKET )
         | SESSION_TIMEOUT EQUAL session_timeout=DECIMAL
-)  
+)
     | MODIFY REPLICA ON server_instance=STRING (WITH LR_BRACKET (ENDPOINT_URL EQUAL STRING|  AVAILABILITY_MODE EQUAL (SYNCHRONOUS_COMMIT| ASYNCHRONOUS_COMMIT)  | FAILOVER_MODE EQUAL (AUTOMATIC|MANUAL) |   SEEDING_MODE EQUAL (AUTOMATIC|MANUAL)  |  BACKUP_PRIORITY EQUAL DECIMAL  )
         |SECONDARY_ROLE LR_BRACKET (ALLOW_CONNECTIONS EQUAL (NO|READ_ONLY|ALL) | READ_ONLY_ROUTING_LIST EQUAL ( LR_BRACKET ( ( STRING) ) RR_BRACKET ) )
         |PRIMARY_ROLE LR_BRACKET (ALLOW_CONNECTIONS EQUAL (NO|READ_ONLY|ALL) | READ_ONLY_ROUTING_LIST EQUAL ( LR_BRACKET ( (COMMA? STRING)*|NONE ) RR_BRACKET )
          | SESSION_TIMEOUT EQUAL session_timeout=DECIMAL
 )   ) RR_BRACKET
     | REMOVE REPLICA ON STRING
-    | JOIN 
+    | JOIN
     | JOIN AVAILABILITY GROUP ON (COMMA? ag_name=STRING WITH LR_BRACKET ( LISTENER_URL EQUAL STRING COMMA AVAILABILITY_MODE EQUAL (SYNCHRONOUS_COMMIT|ASYNCHRONOUS_COMMIT) COMMA FAILOVER_MODE EQUAL MANUAL COMMA SEEDING_MODE EQUAL (AUTOMATIC|MANUAL) RR_BRACKET ) )+
      | MODIFY AVAILABILITY GROUP ON (COMMA? ag_name_modified=STRING WITH LR_BRACKET (LISTENER_URL EQUAL STRING  (COMMA? AVAILABILITY_MODE EQUAL (SYNCHRONOUS_COMMIT|ASYNCHRONOUS_COMMIT) )? (COMMA? FAILOVER_MODE EQUAL MANUAL )? (COMMA? SEEDING_MODE EQUAL (AUTOMATIC|MANUAL))? RR_BRACKET ) )+
-    |GRANT CREATE ANY DATABASE  
-    | DENY CREATE ANY DATABASE  
-    | FAILOVER  
-    | FORCE_FAILOVER_ALLOW_DATA_LOSS 
+    |GRANT CREATE ANY DATABASE
+    | DENY CREATE ANY DATABASE
+    | FAILOVER
+    | FORCE_FAILOVER_ALLOW_DATA_LOSS
     | ADD LISTENER listener_name=STRING  LR_BRACKET ( WITH DHCP (ON LR_BRACKET (IPV4_ADDR IPV4_ADDR ) RR_BRACKET ) | WITH IP LR_BRACKET (    (COMMA? LR_BRACKET ( IPV4_ADDR  COMMA  IPV4_ADDR  | IPV6_ADDR  ) RR_BRACKET)+ RR_BRACKET  (COMMA PORT EQUAL DECIMAL)? ) ) RR_BRACKET
-    | MODIFY LISTENER (ADD IP LR_BRACKET (IPV4_ADDR IPV4_ADDR | IPV6_ADDR) RR_BRACKET | PORT EQUAL DECIMAL ) 
+    | MODIFY LISTENER (ADD IP LR_BRACKET (IPV4_ADDR IPV4_ADDR | IPV6_ADDR) RR_BRACKET | PORT EQUAL DECIMAL )
     |RESTART LISTENER STRING
     |REMOVE LISTENER STRING
     |OFFLINE
     | WITH LR_BRACKET DTC_SUPPORT EQUAL PER_DB RR_BRACKET
-    ; 
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-broker-priority-transact-sql
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-broker-priority-transact-sql
 create_or_alter_broker_priority
     : (CREATE | ALTER) BROKER PRIORITY ConversationPriorityName=id FOR CONVERSATION
-      SET LR_BRACKET 
+      SET LR_BRACKET
      ( CONTRACT_NAME EQUAL ( ( id) | ANY )  COMMA?  )?
      ( LOCAL_SERVICE_NAME EQUAL (DOUBLE_FORWARD_SLASH? id | ANY ) COMMA? )?
-     ( REMOTE_SERVICE_NAME  EQUAL (RemoteServiceName=STRING | ANY ) COMMA? )?   
+     ( REMOTE_SERVICE_NAME  EQUAL (RemoteServiceName=STRING | ANY ) COMMA? )?
      ( PRIORITY_LEVEL EQUAL ( PriorityValue=DECIMAL | DEFAULT ) ) ?
      RR_BRACKET
     ;
@@ -695,8 +695,8 @@ alter_column_encryption_key
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-column-encryption-key-transact-sql
 create_column_encryption_key
-    :   CREATE COLUMN ENCRYPTION KEY column_encryption_key=id 
-         WITH VALUES 
+    :   CREATE COLUMN ENCRYPTION KEY column_encryption_key=id
+         WITH VALUES
            (LR_BRACKET COMMA? COLUMN_MASTER_KEY EQUAL column_master_key_name=id COMMA
            ALGORITHM EQUAL algorithm_name=STRING  COMMA
            ENCRYPTED_VALUE EQUAL encrypted_value=BINARY RR_BRACKET COMMA?)+
@@ -735,7 +735,7 @@ drop_cryptograhic_provider
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-database-transact-sql
 drop_database
-    : DROP DATABASE ( IF EXISTS )? (COMMA? database_name_or_database_snapshot_name=id)+ 
+    : DROP DATABASE ( IF EXISTS )? (COMMA? database_name_or_database_snapshot_name=id)+
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-database-audit-specification-transact-sql
@@ -747,7 +747,7 @@ drop_database_audit_specification
 drop_database_scoped_credential
    : DROP DATABASE SCOPED CREDENTIAL credential_name=id
    ;
- 
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-default-transact-sql
 drop_default
     : DROP DEFAULT ( IF EXISTS )? (COMMA? (schema_name=id DOT)? default_name=id)
@@ -793,7 +793,7 @@ drop_event_notifications
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-event-session-transact-sql
 drop_event_session
     : DROP EVENT SESSION event_session_name=id
-        ON SERVER 
+        ON SERVER
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-fulltext-catalog-transact-sql
@@ -853,7 +853,7 @@ drop_resource_pool
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-role-transact-sql
 drop_db_role
-     : DROP ROLE ( IF EXISTS )? role_name=id 
+     : DROP ROLE ( IF EXISTS )? role_name=id
      ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-route-transact-sql
@@ -883,7 +883,7 @@ drop_security_policy
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-sequence-transact-sql
 drop_sequence
-     : DROP SEQUENCE ( IF EXISTS )? ( COMMA? (database_name=id DOT)? (schema_name=id DOT)?          sequence_name=id )? 
+     : DROP SEQUENCE ( IF EXISTS )? ( COMMA? (database_name=id DOT)? (schema_name=id DOT)?          sequence_name=id )?
      ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-server-audit-transact-sql
@@ -942,7 +942,7 @@ drop_workload_group
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-xml-schema-collection-transact-sql
 drop_xml_schema_collection
-     : DROP XML SCHEMA COLLECTION ( relational_schema=id DOT )?  sql_identifier=id 
+     : DROP XML SCHEMA COLLECTION ( relational_schema=id DOT )?  sql_identifier=id
      ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/disable-trigger-transact-sql
@@ -979,15 +979,15 @@ create_column_master_key
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-credential-transact-sql
 alter_credential
-    : ALTER CREDENTIAL credential_name=id 
-        WITH IDENTITY EQUAL identity_name=STRING 
+    : ALTER CREDENTIAL credential_name=id
+        WITH IDENTITY EQUAL identity_name=STRING
          ( COMMA SECRET EQUAL secret=STRING )?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-credential-transact-sql
 create_credential
-    : CREATE CREDENTIAL credential_name=id 
-        WITH IDENTITY EQUAL identity_name=STRING 
+    : CREATE CREDENTIAL credential_name=id
+        WITH IDENTITY EQUAL identity_name=STRING
          ( COMMA SECRET EQUAL secret=STRING )?
          (  FOR CRYPTOGRAPHIC PROVIDER cryptographic_provider_name=id )?
     ;
@@ -999,7 +999,7 @@ alter_cryptographic_provider
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-cryptographic-provider-transact-sql
 create_cryptographic_provider
-    : CREATE CRYPTOGRAPHIC PROVIDER provider_name=id 
+    : CREATE CRYPTOGRAPHIC PROVIDER provider_name=id
       FROM FILE EQUAL path_of_DLL=STRING
     ;
 
@@ -1024,15 +1024,15 @@ create_or_alter_event_session
           (SET ( COMMA? event_customizable_attributue=id EQUAL (DECIMAL|STRING) )* )?
           ( ACTION LR_BRACKET (COMMA? (event_module_guid=id DOT)? event_package_name=id DOT action_name=id)+  RR_BRACKET)+
           (WHERE event_session_predicate_expression)?
-         RR_BRACKET )* 
+         RR_BRACKET )*
       )*
       (COMMA? DROP EVENT (event_module_guid=id DOT)? event_package_name=id DOT event_name=id )*
-     
+
       ( (ADD TARGET (event_module_guid=id DOT)? event_package_name=id DOT target_name=id ) ( LR_BRACKET SET (COMMA? target_parameter_name=id EQUAL (LR_BRACKET? DECIMAL RR_BRACKET? |STRING) )+ RR_BRACKET )* )*
        (DROP TARGET (event_module_guid=id DOT)? event_package_name=id DOT target_name=id )*
-       
 
-     (WITH 
+
+     (WITH
            LR_BRACKET
            (COMMA? MAX_MEMORY EQUAL max_memory=DECIMAL (KB|MB) )?
            (COMMA? EVENT_RETENTION_MODE EQUAL (ALLOW_SINGLE_EVENT_LOSS | ALLOW_MULTIPLE_EVENT_LOSS | NO_EVENT_LOSS ) )?
@@ -1042,9 +1042,9 @@ create_or_alter_event_session
            (COMMA? TRACK_CAUSALITY EQUAL (ON|OFF) )?
            (COMMA? STARTUP_STATE EQUAL (ON|OFF) )?
            RR_BRACKET
-     )?  
+     )?
      (STATE EQUAL (START|STOP) )?
-        
+
     ;
 
 event_session_predicate_expression
@@ -1059,11 +1059,11 @@ event_session_predicate_factor
 event_session_predicate_leaf
      : (event_field_name=id | (event_field_name=id |( (event_module_guid=id DOT)?  event_package_name=id DOT predicate_source_name=id ) ) (EQUAL |(LESS GREATER) | (EXCLAMATION EQUAL) | GREATER  | (GREATER EQUAL)| LESS | LESS EQUAL) (DECIMAL | STRING) )
      | (event_module_guid=id DOT)?  event_package_name=id DOT predicate_compare_name=id LR_BRACKET (event_field_name=id |( (event_module_guid=id DOT)?  event_package_name=id DOT predicate_source_name=id ) COMMA  (DECIMAL | STRING) ) RR_BRACKET
-     ; 
+     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-data-source-transact-sql
 alter_external_data_source
-    : ALTER EXTERNAL DATA SOURCE data_source_name=id  SET  
+    : ALTER EXTERNAL DATA SOURCE data_source_name=id  SET
     ( LOCATION EQUAL location=(QUOTED_URL|QUOTED_HOST_AND_PORT) COMMA? |  RESOURCE_MANAGER_LOCATION EQUAL resource_manager_location=(QUOTED_URL|QUOTED_HOST_AND_PORT) COMMA? |  CREDENTIAL EQUAL credential_name=id )+
     | ALTER EXTERNAL DATA SOURCE data_source_name=id WITH LR_BRACKET TYPE EQUAL BLOB_STORAGE COMMA LOCATION EQUAL location=STRING (COMMA CREDENTIAL EQUAL credential_name=id )? RR_BRACKET
     ;
@@ -1071,25 +1071,25 @@ alter_external_data_source
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-library-transact-sql
 alter_external_library
-    : ALTER EXTERNAL LIBRARY library_name=id (AUTHORIZATION owner_name=id)? 
+    : ALTER EXTERNAL LIBRARY library_name=id (AUTHORIZATION owner_name=id)?
        (SET|ADD) ( LR_BRACKET CONTENT EQUAL (client_library=STRING | BINARY | NONE) (COMMA PLATFORM EQUAL (WINDOWS|LINUX)? RR_BRACKET) WITH (COMMA? LANGUAGE EQUAL (R|PYTHON) | DATA_SOURCE EQUAL external_data_source_name=id )+ RR_BRACKET )
    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-external-library-transact-sql
 create_external_library
-    : CREATE EXTERNAL LIBRARY library_name=id (AUTHORIZATION owner_name=id)? 
+    : CREATE EXTERNAL LIBRARY library_name=id (AUTHORIZATION owner_name=id)?
        FROM (COMMA? LR_BRACKET?  (CONTENT EQUAL)? (client_library=STRING | BINARY | NONE) (COMMA PLATFORM EQUAL (WINDOWS|LINUX)? RR_BRACKET)? ) ( WITH (COMMA? LANGUAGE EQUAL (R|PYTHON) | DATA_SOURCE EQUAL external_data_source_name=id )+ RR_BRACKET  )?
    ;
 
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-resource-pool-transact-sql
 alter_external_resource_pool
-    : ALTER EXTERNAL RESOURCE POOL (pool_name=id | DEFAULT_DOUBLE_QUOTE) WITH LR_BRACKET MAX_CPU_PERCENT EQUAL max_cpu_percent=DECIMAL ( COMMA? AFFINITY CPU EQUAL (AUTO|(COMMA? DECIMAL TO DECIMAL |COMMA DECIMAL )+ ) | NUMANODE EQUAL (COMMA? DECIMAL TO DECIMAL| COMMA? DECIMAL )+  ) (COMMA? MAX_MEMORY_PERCENT EQUAL max_memory_percent=DECIMAL)? (COMMA? MAX_PROCESSES EQUAL max_processes=DECIMAL)?  RR_BRACKET 
+    : ALTER EXTERNAL RESOURCE POOL (pool_name=id | DEFAULT_DOUBLE_QUOTE) WITH LR_BRACKET MAX_CPU_PERCENT EQUAL max_cpu_percent=DECIMAL ( COMMA? AFFINITY CPU EQUAL (AUTO|(COMMA? DECIMAL TO DECIMAL |COMMA DECIMAL )+ ) | NUMANODE EQUAL (COMMA? DECIMAL TO DECIMAL| COMMA? DECIMAL )+  ) (COMMA? MAX_MEMORY_PERCENT EQUAL max_memory_percent=DECIMAL)? (COMMA? MAX_PROCESSES EQUAL max_processes=DECIMAL)?  RR_BRACKET
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-external-resource-pool-transact-sql
 create_external_resource_pool
-    : CREATE EXTERNAL RESOURCE POOL pool_name=id  WITH LR_BRACKET MAX_CPU_PERCENT EQUAL max_cpu_percent=DECIMAL ( COMMA? AFFINITY CPU EQUAL (AUTO|(COMMA? DECIMAL TO DECIMAL |COMMA DECIMAL )+ ) | NUMANODE EQUAL (COMMA? DECIMAL TO DECIMAL| COMMA? DECIMAL )+  ) (COMMA? MAX_MEMORY_PERCENT EQUAL max_memory_percent=DECIMAL)? (COMMA? MAX_PROCESSES EQUAL max_processes=DECIMAL)?  RR_BRACKET 
+    : CREATE EXTERNAL RESOURCE POOL pool_name=id  WITH LR_BRACKET MAX_CPU_PERCENT EQUAL max_cpu_percent=DECIMAL ( COMMA? AFFINITY CPU EQUAL (AUTO|(COMMA? DECIMAL TO DECIMAL |COMMA DECIMAL )+ ) | NUMANODE EQUAL (COMMA? DECIMAL TO DECIMAL| COMMA? DECIMAL )+  ) (COMMA? MAX_MEMORY_PERCENT EQUAL max_memory_percent=DECIMAL)? (COMMA? MAX_PROCESSES EQUAL max_processes=DECIMAL)?  RR_BRACKET
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-fulltext-catalog-transact-sql
@@ -1116,7 +1116,7 @@ alter_fulltext_stoplist
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-fulltext-stoplist-transact-sql
 create_fulltext_stoplist
-    :   CREATE FULLTEXT STOPLIST stoplist_name=id 
+    :   CREATE FULLTEXT STOPLIST stoplist_name=id
           (FROM ( (database_name=id DOT)? source_stoplist_name=id |SYSTEM STOPLIST ) )?
           (AUTHORIZATION owner_name=id)?
     ;
@@ -1131,17 +1131,17 @@ alter_login_sql_server
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-login-transact-sql
 create_login_sql_server
     : CREATE LOGIN login_name=id
-       ( WITH ( (PASSWORD EQUAL ( password=STRING | password_hash=BINARY HASHED ) ) (MUST_CHANGE|UNLOCK)* )? 
+       ( WITH ( (PASSWORD EQUAL ( password=STRING | password_hash=BINARY HASHED ) ) (MUST_CHANGE|UNLOCK)* )?
        (COMMA? SID EQUAL sid=BINARY)?
-       (COMMA? DEFAULT_DATABASE EQUAL default_database=id)? 
-       (COMMA? DEFAULT_LANGUAGE EQUAL default_laguage=id)?  
-       (COMMA? CHECK_EXPIRATION EQUAL (ON|OFF) )? 
-       (COMMA? CHECK_POLICY EQUAL (ON|OFF) )? 
-       (COMMA? CREDENTIAL EQUAL credential_name=id)? 
-      |(FROM  
-	(WINDOWS 
+       (COMMA? DEFAULT_DATABASE EQUAL default_database=id)?
+       (COMMA? DEFAULT_LANGUAGE EQUAL default_laguage=id)?
+       (COMMA? CHECK_EXPIRATION EQUAL (ON|OFF) )?
+       (COMMA? CHECK_POLICY EQUAL (ON|OFF) )?
+       (COMMA? CREDENTIAL EQUAL credential_name=id)?
+      |(FROM
+	(WINDOWS
           (WITH (COMMA? DEFAULT_DATABASE EQUAL default_database=id)? (COMMA?  DEFAULT_LANGUAGE EQUAL default_language=STRING)? )
-        | CERTIFICATE certname=id 
+        | CERTIFICATE certname=id
         | ASYMMETRIC KEY asym_key_name=id
                 )
         )
@@ -1153,9 +1153,9 @@ alter_login_azure_sql
     ;
 
 create_login_azure_sql
-    : CREATE LOGIN login_name=id 
+    : CREATE LOGIN login_name=id
        WITH PASSWORD EQUAL STRING (SID EQUAL sid=BINARY)?
-    ;  
+    ;
 
 alter_login_azure_sql_dw_and_pdw
     : ALTER LOGIN login_name=id ( (ENABLE|DISABLE)? | WITH (PASSWORD EQUAL password=STRING (OLD_PASSWORD EQUAL old_password=STRING (MUST_CHANGE|UNLOCK)* )? | NAME EQUAL login_name=id ) )
@@ -1163,13 +1163,13 @@ alter_login_azure_sql_dw_and_pdw
 
 create_login_pdw
     : CREATE LOGIN loginName=id
-        (WITH 
+        (WITH
           ( PASSWORD EQUAL password=STRING (MUST_CHANGE)?
               (CHECK_POLICY EQUAL (ON|OFF)? )?
-          ) 
+          )
         | FROM WINDOWS
         )
-     ; 
+     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-master-key-transact-sql
 alter_master_key_sql_server
@@ -1209,17 +1209,17 @@ alter_partition_scheme
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-remote-service-binding-transact-sql
 alter_remote_service_binding
-    : ALTER REMOTE SERVICE BINDING binding_name=id 
-        WITH (USER EQUAL user_name=id)? 
+    : ALTER REMOTE SERVICE BINDING binding_name=id
+        WITH (USER EQUAL user_name=id)?
              (COMMA ANONYMOUS EQUAL (ON|OFF) )?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-remote-service-binding-transact-sql
 create_remote_service_binding
-    : CREATE REMOTE SERVICE BINDING binding_name=id 
+    : CREATE REMOTE SERVICE BINDING binding_name=id
          (AUTHORIZATION owner_name=id)?
          TO SERVICE remote_service_name=STRING
-         WITH (USER EQUAL user_name=id)? 
+         WITH (USER EQUAL user_name=id)?
               (COMMA ANONYMOUS EQUAL (ON|OFF) )?
     ;
 
@@ -1252,10 +1252,10 @@ alter_resource_governor
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-role-transact-sql
 alter_db_role
-    : ALTER ROLE role_name=id 
-        ( (ADD|DROP) MEMBER database_principal=id 
+    : ALTER ROLE role_name=id
+        ( (ADD|DROP) MEMBER database_principal=id
         | WITH NAME EQUAL new_role_name=id )
-    ; 
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-role-transact-sql
 create_db_role
@@ -1287,22 +1287,22 @@ alter_schema_sql
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-schema-transact-sql
 create_schema
-    : CREATE SCHEMA 
-	(schema_name=id 
+    : CREATE SCHEMA
+	(schema_name=id
         |AUTHORIZATION owner_name=id
         | schema_name=id AUTHORIZATION owner_name=id
         )
         (create_table
          |create_view
-         | (GRANT|DENY) (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA COLON COLON)? object_name=id TO owner_name=id 
-         | REVOKE (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA COLON COLON)? object_name=id FROM owner_name=id 
+         | (GRANT|DENY) (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA COLON COLON)? object_name=id TO owner_name=id
+         | REVOKE (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA COLON COLON)? object_name=id FROM owner_name=id
         )*
     ;
 
 create_schema_azure_sql_dw_and_pdw
-    : 
+    :
 CREATE SCHEMA schema_name=id (AUTHORIZATION owner_name=id )?
-    ; 
+    ;
 
 alter_schema_azure_sql_dw_and_pdw
     : ALTER SCHEMA schema_name=id TRANSFER (OBJECT COLON COLON )? id (DOT ID)?
@@ -1325,7 +1325,7 @@ create_security_policy
                 | COMMA? BEFORE (UPDATE|DELETE)
                 )*
          )+
-            (WITH LR_BRACKET 
+            (WITH LR_BRACKET
                      STATE EQUAL (ON|OFF)
 		     (SCHEMABINDING (ON|OFF) )?
                   RR_BRACKET
@@ -1352,96 +1352,96 @@ create_sequence
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-server-audit-transact-sql
 alter_server_audit
-    : ALTER SERVER AUDIT audit_name=id  
-        ( ( TO 
-              (FILE  
-                ( LR_BRACKET 
-                   ( COMMA? FILEPATH EQUAL filepath=STRING 
-                    | COMMA? MAXSIZE EQUAL ( DECIMAL (MB|GB|TB) 
-                    |  UNLIMITED 
-                   ) 
-                   | COMMA? MAX_ROLLOVER_FILES EQUAL max_rollover_files=(DECIMAL|UNLIMITED) 
-                   | COMMA? MAX_FILES EQUAL max_files=DECIMAL 
-                   | COMMA? RESERVE_DISK_SPACE EQUAL (ON|OFF)  )* 
-                 RR_BRACKET ) 
-                | APPLICATION_LOG 
-                | SECURITY_LOG 
-            ) )? 
-            ( WITH LR_BRACKET 
-              (COMMA? QUEUE_DELAY EQUAL queue_delay=DECIMAL 
-              | COMMA? ON_FAILURE EQUAL (CONTINUE | SHUTDOWN|FAIL_OPERATION) 
-              |COMMA?  STATE EQUAL (ON|OFF) )* 
-              RR_BRACKET 
-            )? 
-            ( WHERE ( COMMA? (NOT?) event_field_name=id 
-                                    (EQUAL 
-                                    |(LESS GREATER) 
-                                    | (EXCLAMATION EQUAL) 
-                                    | GREATER  
+    : ALTER SERVER AUDIT audit_name=id
+        ( ( TO
+              (FILE
+                ( LR_BRACKET
+                   ( COMMA? FILEPATH EQUAL filepath=STRING
+                    | COMMA? MAXSIZE EQUAL ( DECIMAL (MB|GB|TB)
+                    |  UNLIMITED
+                   )
+                   | COMMA? MAX_ROLLOVER_FILES EQUAL max_rollover_files=(DECIMAL|UNLIMITED)
+                   | COMMA? MAX_FILES EQUAL max_files=DECIMAL
+                   | COMMA? RESERVE_DISK_SPACE EQUAL (ON|OFF)  )*
+                 RR_BRACKET )
+                | APPLICATION_LOG
+                | SECURITY_LOG
+            ) )?
+            ( WITH LR_BRACKET
+              (COMMA? QUEUE_DELAY EQUAL queue_delay=DECIMAL
+              | COMMA? ON_FAILURE EQUAL (CONTINUE | SHUTDOWN|FAIL_OPERATION)
+              |COMMA?  STATE EQUAL (ON|OFF) )*
+              RR_BRACKET
+            )?
+            ( WHERE ( COMMA? (NOT?) event_field_name=id
+                                    (EQUAL
+                                    |(LESS GREATER)
+                                    | (EXCLAMATION EQUAL)
+                                    | GREATER
                                     | (GREATER EQUAL)
-                                    | LESS 
+                                    | LESS
                                     | LESS EQUAL
                                     )
-                                      (DECIMAL | STRING)  
-                    | COMMA? (AND|OR) NOT? (EQUAL 
-                                           |(LESS GREATER) 
-                                           | (EXCLAMATION EQUAL) 
-                                           | GREATER  
+                                      (DECIMAL | STRING)
+                    | COMMA? (AND|OR) NOT? (EQUAL
+                                           |(LESS GREATER)
+                                           | (EXCLAMATION EQUAL)
+                                           | GREATER
                                            | (GREATER EQUAL)
-                                           | LESS 
+                                           | LESS
                                            | LESS EQUAL)
-                                             (DECIMAL | STRING) ) )? 
-        |REMOVE WHERE 
-        | MODIFY NAME EQUAL new_audit_name=id  
+                                             (DECIMAL | STRING) ) )?
+        |REMOVE WHERE
+        | MODIFY NAME EQUAL new_audit_name=id
        )
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-server-audit-transact-sql
 create_server_audit
-    : CREATE SERVER AUDIT audit_name=id  
-        ( ( TO 
-              (FILE  
-                ( LR_BRACKET 
-                   ( COMMA? FILEPATH EQUAL filepath=STRING 
-                    | COMMA? MAXSIZE EQUAL ( DECIMAL (MB|GB|TB) 
-                    |  UNLIMITED 
-                   ) 
-                   | COMMA? MAX_ROLLOVER_FILES EQUAL max_rollover_files=(DECIMAL|UNLIMITED) 
-                   | COMMA? MAX_FILES EQUAL max_files=DECIMAL 
-                   | COMMA? RESERVE_DISK_SPACE EQUAL (ON|OFF)  )* 
-                 RR_BRACKET ) 
-                | APPLICATION_LOG 
-                | SECURITY_LOG 
-            ) )? 
-            ( WITH LR_BRACKET 
-              (COMMA? QUEUE_DELAY EQUAL queue_delay=DECIMAL 
-              | COMMA? ON_FAILURE EQUAL (CONTINUE | SHUTDOWN|FAIL_OPERATION) 
-              |COMMA?  STATE EQUAL (ON|OFF) 
+    : CREATE SERVER AUDIT audit_name=id
+        ( ( TO
+              (FILE
+                ( LR_BRACKET
+                   ( COMMA? FILEPATH EQUAL filepath=STRING
+                    | COMMA? MAXSIZE EQUAL ( DECIMAL (MB|GB|TB)
+                    |  UNLIMITED
+                   )
+                   | COMMA? MAX_ROLLOVER_FILES EQUAL max_rollover_files=(DECIMAL|UNLIMITED)
+                   | COMMA? MAX_FILES EQUAL max_files=DECIMAL
+                   | COMMA? RESERVE_DISK_SPACE EQUAL (ON|OFF)  )*
+                 RR_BRACKET )
+                | APPLICATION_LOG
+                | SECURITY_LOG
+            ) )?
+            ( WITH LR_BRACKET
+              (COMMA? QUEUE_DELAY EQUAL queue_delay=DECIMAL
+              | COMMA? ON_FAILURE EQUAL (CONTINUE | SHUTDOWN|FAIL_OPERATION)
+              |COMMA?  STATE EQUAL (ON|OFF)
               |COMMA? AUDIT_GUID EQUAL audit_guid=id
-            )* 
-              
-              RR_BRACKET 
-            )? 
-            ( WHERE ( COMMA? (NOT?) event_field_name=id 
-                                    (EQUAL 
-                                    |(LESS GREATER) 
-                                    | (EXCLAMATION EQUAL) 
-                                    | GREATER  
+            )*
+
+              RR_BRACKET
+            )?
+            ( WHERE ( COMMA? (NOT?) event_field_name=id
+                                    (EQUAL
+                                    |(LESS GREATER)
+                                    | (EXCLAMATION EQUAL)
+                                    | GREATER
                                     | (GREATER EQUAL)
-                                    | LESS 
+                                    | LESS
                                     | LESS EQUAL
                                     )
-                                      (DECIMAL | STRING)  
-                    | COMMA? (AND|OR) NOT? (EQUAL 
-                                           |(LESS GREATER) 
-                                           | (EXCLAMATION EQUAL) 
-                                           | GREATER  
+                                      (DECIMAL | STRING)
+                    | COMMA? (AND|OR) NOT? (EQUAL
+                                           |(LESS GREATER)
+                                           | (EXCLAMATION EQUAL)
+                                           | GREATER
                                            | (GREATER EQUAL)
-                                           | LESS 
+                                           | LESS
                                            | LESS EQUAL)
-                                             (DECIMAL | STRING) ) )? 
-        |REMOVE WHERE 
-        | MODIFY NAME EQUAL new_audit_name=id  
+                                             (DECIMAL | STRING) ) )?
+        |REMOVE WHERE
+        | MODIFY NAME EQUAL new_audit_name=id
        )
     ;
 
@@ -1449,16 +1449,16 @@ create_server_audit
 
 alter_server_audit_specification
     : ALTER SERVER AUDIT SPECIFICATION audit_specification_name=id
-       (FOR SERVER AUDIT audit_name=id)? 
-       ( (ADD|DROP) LR_BRACKET  audit_action_group_name=id RR_BRACKET )* 
+       (FOR SERVER AUDIT audit_name=id)?
+       ( (ADD|DROP) LR_BRACKET  audit_action_group_name=id RR_BRACKET )*
          (WITH LR_BRACKET STATE EQUAL (ON|OFF) RR_BRACKET )?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-server-audit-specification-transact-sql
 create_server_audit_specification
     : CREATE SERVER AUDIT SPECIFICATION audit_specification_name=id
-       (FOR SERVER AUDIT audit_name=id)? 
-       ( ADD LR_BRACKET  audit_action_group_name=id RR_BRACKET )* 
+       (FOR SERVER AUDIT audit_name=id)?
+       ( ADD LR_BRACKET  audit_action_group_name=id RR_BRACKET )*
          (WITH LR_BRACKET STATE EQUAL (ON|OFF) RR_BRACKET )?
     ;
 
@@ -1466,15 +1466,15 @@ create_server_audit_specification
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-server-configuration-transact-sql
 
 alter_server_configuration
-    : ALTER SERVER CONFIGURATION 
+    : ALTER SERVER CONFIGURATION
       SET  ( (PROCESS AFFINITY (CPU EQUAL (AUTO | (COMMA? DECIMAL | COMMA? DECIMAL TO DECIMAL)+ ) | NUMANODE EQUAL ( COMMA? DECIMAL |COMMA?  DECIMAL TO DECIMAL)+ ) | DIAGNOSTICS LOG (ON|OFF|PATH EQUAL (STRING | DEFAULT) |MAX_SIZE EQUAL (DECIMAL MB |DEFAULT)|MAX_FILES EQUAL (DECIMAL|DEFAULT) ) | FAILOVER CLUSTER PROPERTY (VERBOSELOGGING EQUAL (STRING|DEFAULT) |SQLDUMPERFLAGS EQUAL (STRING|DEFAULT) | SQLDUMPERPATH EQUAL (STRING|DEFAULT) | SQLDUMPERTIMEOUT (STRING|DEFAULT) | FAILURECONDITIONLEVEL EQUAL (STRING|DEFAULT) | HEALTHCHECKTIMEOUT EQUAL (DECIMAL|DEFAULT) ) | HADR CLUSTER CONTEXT EQUAL (STRING|LOCAL) | BUFFER POOL EXTENSION (ON LR_BRACKET FILENAME EQUAL STRING COMMA SIZE EQUAL DECIMAL (KB|MB|GB)  RR_BRACKET | OFF ) | SET SOFTNUMA (ON|OFF) ) )
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-server-role-transact-sql
 alter_server_role
     : ALTER SERVER ROLE server_role_name=id
-      ( (ADD|DROP) MEMBER server_principal=id 
-      | WITH NAME EQUAL new_server_role_name=id 
+      ( (ADD|DROP) MEMBER server_principal=id
+      | WITH NAME EQUAL new_server_role_name=id
       )
     ;
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-server-role-transact-sql
@@ -1484,7 +1484,7 @@ create_server_role
 
 alter_server_role_pdw
     : ALTER SERVER ROLE server_role_name=id (ADD|DROP) MEMBER login=id
-    ; 
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-service-transact-sql
 alter_service
@@ -1493,7 +1493,7 @@ alter_service
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-service-transact-sql
 create_service
-    : CREATE SERVICE create_service_name=id 
+    : CREATE SERVICE create_service_name=id
         (AUTHORIZATION owner_name=id)?
         ON QUEUE (schema_name=id DOT)? queue_name=id
           ( LR_BRACKET (COMMA? (id|DEFAULT) )+ RR_BRACKET )?
@@ -1523,19 +1523,19 @@ create_symmetric_key
                    | PROVIDER_KEY_NAME EQUAL provider_key_name=STRING
                    | CREATION_DISPOSITION EQUAL (CREATE_NEW|OPEN_EXISTING)
                    )
-                 | ENCRYPTION BY 
+                 | ENCRYPTION BY
                      ( CERTIFICATE certificate_name=id
                      | PASSWORD EQUAL password=STRING
                      | SYMMETRIC KEY symmetric_key_name=id
                      | ASYMMETRIC KEY asym_key_name=id
                      )
                  )
-            ) 
+            )
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-synonym-transact-sql
 create_synonym
-    : CREATE SYNONYM (schema_name_1=id DOT )? synonym_name=id 
+    : CREATE SYNONYM (schema_name_1=id DOT )? synonym_name=id
         FOR ( (server_name=id DOT )? (database_name=id DOT)? (schema_name_2=id DOT)? object_name=id
             | (database_or_schema2=id DOT)? (schema_id_2_or_object_name=id DOT)?
             )
@@ -1591,10 +1591,10 @@ create_user_azure_sql_dw
         ( (FOR|FROM) LOGIN login_name=id
         | WITHOUT LOGIN
         )?
-        
+
         ( WITH DEFAULT_SCHEMA EQUAL schema_name=id)?
     | CREATE USER Azure_Active_Directory_principal=id
-        FROM EXTERNAL PROVIDER 
+        FROM EXTERNAL PROVIDER
         ( WITH DEFAULT_SCHEMA EQUAL schema_name=id)?
     ;
 
@@ -1606,42 +1606,42 @@ alter_user_azure_sql
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-workload-group-transact-sql
 
 alter_workload_group
-    : ALTER WORKLOAD GROUP 
-         (workload_group_group_name=id 
+    : ALTER WORKLOAD GROUP
+         (workload_group_group_name=id
          |DEFAULT_DOUBLE_QUOTE
          )
-         (WITH LR_BRACKET 
-           (IMPORTANCE EQUAL (LOW|MEDIUM|HIGH) 
-           | COMMA? REQUEST_MAX_MEMORY_GRANT_PERCENT EQUAL request_max_memory_grant=DECIMAL 
-           | COMMA? REQUEST_MAX_CPU_TIME_SEC EQUAL request_max_cpu_time_sec=DECIMAL 
-           | REQUEST_MEMORY_GRANT_TIMEOUT_SEC EQUAL request_memory_grant_timeout_sec=DECIMAL 
-           | MAX_DOP EQUAL max_dop=DECIMAL 
+         (WITH LR_BRACKET
+           (IMPORTANCE EQUAL (LOW|MEDIUM|HIGH)
+           | COMMA? REQUEST_MAX_MEMORY_GRANT_PERCENT EQUAL request_max_memory_grant=DECIMAL
+           | COMMA? REQUEST_MAX_CPU_TIME_SEC EQUAL request_max_cpu_time_sec=DECIMAL
+           | REQUEST_MEMORY_GRANT_TIMEOUT_SEC EQUAL request_memory_grant_timeout_sec=DECIMAL
+           | MAX_DOP EQUAL max_dop=DECIMAL
            | GROUP_MAX_REQUESTS EQUAL group_max_requests=DECIMAL)+
           RR_BRACKET )?
      (USING (workload_group_pool_name=id | DEFAULT_DOUBLE_QUOTE) )?
     ;
-         
-// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-workload-group-transact-sql      
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-workload-group-transact-sql
 create_workload_group
-    : CREATE WORKLOAD GROUP workload_group_group_name=id 
-         (WITH LR_BRACKET 
-           (IMPORTANCE EQUAL (LOW|MEDIUM|HIGH) 
-           | COMMA? REQUEST_MAX_MEMORY_GRANT_PERCENT EQUAL request_max_memory_grant=DECIMAL 
-           | COMMA? REQUEST_MAX_CPU_TIME_SEC EQUAL request_max_cpu_time_sec=DECIMAL 
-           | REQUEST_MEMORY_GRANT_TIMEOUT_SEC EQUAL request_memory_grant_timeout_sec=DECIMAL 
-           | MAX_DOP EQUAL max_dop=DECIMAL 
+    : CREATE WORKLOAD GROUP workload_group_group_name=id
+         (WITH LR_BRACKET
+           (IMPORTANCE EQUAL (LOW|MEDIUM|HIGH)
+           | COMMA? REQUEST_MAX_MEMORY_GRANT_PERCENT EQUAL request_max_memory_grant=DECIMAL
+           | COMMA? REQUEST_MAX_CPU_TIME_SEC EQUAL request_max_cpu_time_sec=DECIMAL
+           | REQUEST_MEMORY_GRANT_TIMEOUT_SEC EQUAL request_memory_grant_timeout_sec=DECIMAL
+           | MAX_DOP EQUAL max_dop=DECIMAL
            | GROUP_MAX_REQUESTS EQUAL group_max_requests=DECIMAL)+
           RR_BRACKET )?
-     (USING (workload_group_pool_name=id | DEFAULT_DOUBLE_QUOTE)? 
+     (USING (workload_group_pool_name=id | DEFAULT_DOUBLE_QUOTE)?
             (COMMA? EXTERNAL external_pool_name=id | DEFAULT_DOUBLE_QUOTE)?
-      )? 
+      )?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-xml-schema-collection-transact-sql
 create_xml_schema_collection
     : CREATE XML SCHEMA COLLECTION (relational_schema=id DOT)? sql_identifier=id AS  (STRING|id|LOCAL_ID)
     ;
- 
+
 create_queue
     : CREATE QUEUE (full_table_name | queue_name=id) queue_settings?
       (ON filegroup=id | DEFAULT)?
@@ -1894,7 +1894,7 @@ func_body_returns_select
   :RETURNS TABLE
   (WITH function_option (',' function_option)*)?
   AS?
-  RETURN '('? select_statement ')'?
+  RETURN ('(' select_statement ')' | select_statement)
   ;
 
 func_body_returns_table
@@ -2049,12 +2049,12 @@ alter_endpoint
                 RR_BRACKET
                (TSQL
                |
-                FOR SERVICE_BROKER LR_BRACKET 
+                FOR SERVICE_BROKER LR_BRACKET
                    AUTHENTICATION EQUAL
                            ( WINDOWS ( NTLM |KERBEROS | NEGOTIATE )?  (CERTIFICATE cert_name=id)?
                            | CERTIFICATE cert_name=id  WINDOWS? ( NTLM |KERBEROS | NEGOTIATE )?
                            )
-                   ( COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED ) 
+                   ( COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED )
                       ( ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES ) )?
                    )?
 
@@ -2068,7 +2068,7 @@ alter_endpoint
                            | CERTIFICATE cert_name=id  WINDOWS? ( NTLM |KERBEROS | NEGOTIATE )?
                            )
 
-                   ( COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED ) 
+                   ( COMMA? ENCRYPTION EQUAL ( DISABLED |SUPPORTED | REQUIRED )
                       ( ALGORITHM ( AES | RC4 | AES RC4 | RC4 AES ) )?
                    )?
 
@@ -2087,8 +2087,8 @@ database_mirroring_option
    ;
 
 mirroring_set_option
-   : mirroring_partner  partner_option 
-   | mirroring_witness  witness_option 
+   : mirroring_partner  partner_option
+   | mirroring_witness  witness_option
    ;
 mirroring_partner
    : PARTNER
@@ -2178,7 +2178,7 @@ external_access_option:
   ;
 
 hadr_options
-   : HADR 
+   : HADR
       ( ( AVAILABILITY GROUP EQUAL availability_group_name=id | OFF ) |(SUSPEND|RESUME) )
     ;
 
@@ -2342,7 +2342,7 @@ cursor_statement
 backup_database
     : BACKUP DATABASE ( database_name=id )
           (READ_WRITE_FILEGROUPS (COMMA? (FILE|FILEGROUP) EQUAL file_or_filegroup=STRING)* )?
-          (COMMA? (FILE|FILEGROUP) EQUAL file_or_filegroup=STRING)* 
+          (COMMA? (FILE|FILEGROUP) EQUAL file_or_filegroup=STRING)*
            ( TO ( COMMA? logical_device_name=id)+
            | TO ( COMMA? (DISK|TAPE|URL) EQUAL (STRING|id) )+
            )
@@ -2350,7 +2350,7 @@ backup_database
            ( (MIRROR TO ( COMMA? logical_device_name=id)+ )+
            | ( MIRROR TO ( COMMA? (DISK|TAPE|URL) EQUAL (STRING|id) )+ )+
            )?
-        
+
              (WITH ( COMMA? DIFFERENTIAL
                    | COMMA? COPY_ONLY
                    | COMMA? (COMPRESSION|NO_COMPRESSION)
@@ -2375,10 +2375,10 @@ backup_database
                    | COMMA? (LOAD|NOUNLOAD)
                    | COMMA? ENCRYPTION LR_BRACKET
                                          ALGORITHM EQUAL
-                                         (AES_128 
-                                         | AES_192 
-                                         | AES_256 
-                                         | TRIPLE_DES_3KEY 
+                                         (AES_128
+                                         | AES_192
+                                         | AES_256
+                                         | TRIPLE_DES_3KEY
                                          )
                                          COMMA
                                          SERVER CERTIFICATE EQUAL
@@ -2386,7 +2386,7 @@ backup_database
                                            | SERVER ASYMMETRIC KEY EQUAL encryptor_name=id
                                            )
                   )*
-              )?                            
+              )?
 
     ;
 
@@ -2399,7 +2399,7 @@ backup_log
            ( (MIRROR TO ( COMMA? logical_device_name=id)+ )+
            | ( MIRROR TO ( COMMA? (DISK|TAPE|URL) EQUAL (STRING|id) )+ )+
            )?
-        
+
              (WITH ( COMMA? DIFFERENTIAL
                    | COMMA? COPY_ONLY
                    | COMMA? (COMPRESSION|NO_COMPRESSION)
@@ -2426,10 +2426,10 @@ backup_log
                    | COMMA? NO_TRUNCATE
                    | COMMA? ENCRYPTION LR_BRACKET
                                          ALGORITHM EQUAL
-                                         (AES_128 
-                                         | AES_192 
-                                         | AES_256 
-                                         | TRIPLE_DES_3KEY 
+                                         (AES_128
+                                         | AES_192
+                                         | AES_256
+                                         | TRIPLE_DES_3KEY
                                          )
                                          COMMA
                                          SERVER CERTIFICATE EQUAL
@@ -2437,7 +2437,7 @@ backup_log
                                            | SERVER ASYMMETRIC KEY EQUAL encryptor_name=id
                                            )
                   )*
-              )?                            
+              )?
 
     ;
 
@@ -2446,25 +2446,25 @@ backup_certificate
     : BACKUP CERTIFICATE certname=id TO FILE EQUAL cert_file=STRING
        ( WITH PRIVATE KEY
            LR_BRACKET
-             (COMMA? FILE EQUAL private_key_file=STRING 
+             (COMMA? FILE EQUAL private_key_file=STRING
              |COMMA? ENCRYPTION BY PASSWORD EQUAL encryption_password=STRING
              |COMMA? DECRYPTION BY PASSWORD EQUAL decryption_pasword=STRING
              )+
            RR_BRACKET
        )?
     ;
-       
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/backup-master-key-transact-sql
 backup_master_key
     : BACKUP MASTER KEY TO FILE EQUAL master_key_backup_file=STRING
          ENCRYPTION BY PASSWORD EQUAL encryption_password=STRING
-    ;                  
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/backup-service-master-key-transact-sql
 backup_service_master_key
     : BACKUP SERVICE MASTER KEY TO FILE EQUAL service_master_key_backup_file=STRING
          ENCRYPTION BY PASSWORD EQUAL encryption_password=STRING
-    ;                  
+    ;
 
 
 // https://msdn.microsoft.com/en-us/library/ms188332.aspx
@@ -3013,7 +3013,7 @@ table_source_item
 
 // https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
 open_xml
-    : OPENXML '(' expression ',' expression (',' expression)? ')' 
+    : OPENXML '(' expression ',' expression (',' expression)? ')'
     (WITH '(' schema_declaration ')' )?
     ;
 
@@ -3024,7 +3024,7 @@ schema_declaration
 column_declaration
     : ID data_type (STRING)?
     ;
-    
+
 change_table
     : CHANGETABLE '(' CHANGES table_name ',' (NULL | DECIMAL | LOCAL_ID) ')'
     ;
@@ -3039,7 +3039,7 @@ join_part
     | CROSS APPLY table_source
     | OUTER APPLY table_source
     | PIVOT pivot_clause as_table_alias
-    | UNPIVOT unpivot_clause as_table_alias    
+    | UNPIVOT unpivot_clause as_table_alias
     ;
 
 pivot_clause
@@ -3048,7 +3048,7 @@ pivot_clause
 
 unpivot_clause
     : '(' expression FOR full_column_name IN '(' full_column_name_list ')' ')'
-    ; 
+    ;
 
 full_column_name_list
     : full_column_name (',' full_column_name)*
@@ -3061,7 +3061,7 @@ table_name_with_hint
 // https://msdn.microsoft.com/en-us/library/ms190312.aspx
 rowset_function
     :  (
-        OPENROWSET LR_BRACKET provider_name = STRING COMMA connectionString = STRING COMMA sql = STRING RR_BRACKET 
+        OPENROWSET LR_BRACKET provider_name = STRING COMMA connectionString = STRING COMMA sql = STRING RR_BRACKET
      )
      | ( OPENROWSET '(' BULK data_file=STRING ',' (bulk_option (',' bulk_option)* | id)')' )
     ;
@@ -3075,7 +3075,7 @@ derived_table
     : subquery
     | '(' subquery ')'
     | table_value_constructor
-    | '(' table_value_constructor ')'    
+    | '(' table_value_constructor ')'
     ;
 
 function_call
@@ -3502,7 +3502,7 @@ data_type
     | XML*/
     : id IDENTITY? ('(' (DECIMAL | MAX) (',' DECIMAL)? ')')?
     | INT
-    | TINYINT 
+    | TINYINT
     | SMALLINT
     | BIGINT
     ;
