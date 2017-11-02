@@ -560,6 +560,15 @@ create_table
         )?
 // Column_properties clause goes here
 // Partition clause goes here
+
+       ( (ENABLE | DISABLE)? ROW MOVEMENT )?
+
+       ( FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
+       | NO FLASHBACK ARCHIVE
+       )?
+
+      ( AS subquery )?
+
 // Many more varations to capture
       SEMICOLON
     ;
@@ -2526,6 +2535,7 @@ regular_id
     | STATEMENT_ID
     | STATIC
     | STATISTICS
+    | STORE
     | STRING
     | SUBSTR
     | SUBMULTISET
