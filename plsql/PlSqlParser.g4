@@ -526,16 +526,15 @@ drop_index
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        LEFT_PAREN column_name datatype (',' column_name datatype)*
-        RIGHT_PAREN
+        '(' column_name datatype (',' column_name datatype)* ')'
         (ON COMMIT (DELETE | PRESERVE) ROWS)?
         (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
         (PCTFREE pctfree=UNSIGNED_INTEGER
         | PCTUSED pctused=UNSIGNED_INTEGER
         | INITRANS inittrans=UNSIGNED_INTEGER
         )*
-        ( STORAGE LEFT_PAREN
-          ( INITIAL initial=size_clause
+        (STORAGE '('
+          (INITIAL initial=size_clause
           | NEXT next=size_clause
           | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
           | PCTINCREASE pctincrease=UNSIGNED_INTEGER
@@ -546,11 +545,11 @@ create_table
           | FLASH_CACHE (KEEP | NONE | DEFAULT)
           | ENCRYPT
           )+
-         RIGHT_PAREN
+         ')'
         )?
         (TABLESPACE tablespace_name=REGULAR_ID)?
         (LOGGING | NOLOGGING | FILESYSTEM_LIKE_LOGGING)?
-        ( COMPRESS
+        (COMPRESS
            (BASIC
            | FOR (OLTP
                  | (QUERY | ARCHIVE) (LOW | HIGH)?
@@ -560,43 +559,41 @@ create_table
         )?
 // Column_properties clause goes here
 // Partition clause goes here
+         table_range_partition_by_clause?
 // Many more varations to capture
-       (
-         table_range_partition_by_clause
-       )?
 
-       ( (ENABLE | DISABLE)? ROW MOVEMENT )?
+       ((ENABLE | DISABLE)? ROW MOVEMENT)?
 
-       ( FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
+       (FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
        | NO FLASHBACK ARCHIVE
        )?
 
-      ( AS subquery )?
+      (AS subquery)?
 
-      SEMICOLON
+      ';'
     ;
 
 table_range_partition_by_clause
-    : PARTITION  BY  RANGE
-        LEFT_PAREN column_name (COMMA column_name)* RIGHT_PAREN
-          (INTERVAL LEFT_PAREN expression RIGHT_PAREN
-              (STORE IN LEFT_PAREN
-                        (COMMA? tablespace_name=REGULAR_ID )+
-                      RIGHT_PAREN
+    : PARTITION BY RANGE
+        '(' column_name (',' column_name)* ')'
+          (INTERVAL '(' expression ')'
+              (STORE IN '('
+                        (','? tablespace_name=REGULAR_ID )+
+                        ')'
               )?
           )?
-        LEFT_PAREN
+        '('
             (COMMA? PARTITION partition_name=REGULAR_ID
                  VALUES LESS THAN
 // Supposed to be literal in here, will need to refine this                      
-                        LEFT_PAREN
-                        (COMMA? STRING
-                        | COMMA? string_function
-                        | COMMA? numeric
-                          COMMA? MAXVALUE
+                     '('
+                        (','? STRING
+                        | ','? string_function
+                        | ','? numeric
+                        | ','? MAXVALUE
                         )+
-                        RIGHT_PAREN
-                ( TABLESPACE partition_tablespace=REGULAR_ID )?
+                     ')'
+                (TABLESPACE partition_tablespace=REGULAR_ID)?
 
                 (ON COMMIT (DELETE | PRESERVE) ROWS)?
                 (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
@@ -604,23 +601,22 @@ table_range_partition_by_clause
                  | PCTUSED pctused=UNSIGNED_INTEGER
                  | INITRANS inittrans=UNSIGNED_INTEGER
                  )*
-                 ( STORAGE LEFT_PAREN
-                   ( INITIAL initial=size_clause
+                 (STORAGE '('
+                   (INITIAL initial=size_clause
                    | NEXT next=size_clause
                    | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
                    | PCTINCREASE pctincrease=UNSIGNED_INTEGER
                    | FREELISTS freelists=UNSIGNED_INTEGER
                    | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
-                   | OPTIMAL (size_clause | NULL )
+                   | OPTIMAL (size_clause | NULL)
                    | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
                    | FLASH_CACHE (KEEP | NONE | DEFAULT)
                    | ENCRYPT
                    )+
-                  RIGHT_PAREN
+                  ')'
                  )?
-
             )+
-        RIGHT_PAREN
+        ')'
     ;
 
 size_clause
