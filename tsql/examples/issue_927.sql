@@ -1,15 +1,12 @@
-CREATE FUNCTION [Report].[Abc]
+CREATE FUNCTION heiko.[Abc]
 	(
 		 @Stichtag_Version_DM_SID					INT
-		,@Vergleichsstichtag1_Version_DM_SID		INT
-		,@Vergleichsstichtag2_Version_DM_SID		INT
-		,@Vergleichsstichtag3_Version_DM_SID		INT
 	)
 	RETURNS TABLE AS RETURN
 	(
 	WITH Cde AS
 	(
-		SELECT 1
+		SELECT 1 B
 	)
-		SELECT 2
-	)
+		SELECT 2 A
+ 	)
