@@ -1903,8 +1903,8 @@ func_body_returns_table
         AS?
         BEGIN
            sql_clause*
-           RETURN
-        END
+           RETURN ';'?
+        END ';'?
   ;
 
 func_body_returns_scalar
