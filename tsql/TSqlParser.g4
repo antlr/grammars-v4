@@ -1903,8 +1903,8 @@ func_body_returns_table
         AS?
         BEGIN
            sql_clause*
-           RETURN
-        END
+           RETURN ';'?
+        END ';'?
   ;
 
 func_body_returns_scalar
@@ -2973,8 +2973,8 @@ udt_elem
     ;
 
 expression_elem
-    : expression as_column_alias?
-    | column_alias eq='=' expression
+    : column_alias eq='=' expression
+    | expression as_column_alias?
     ;
 
 select_list_elem
