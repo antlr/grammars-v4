@@ -526,7 +526,14 @@ drop_index
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        LEFT_PAREN column_name datatype (',' column_name datatype)*
+        LEFT_PAREN datatype_null_enable? (',' datatype_null_enable?)*
+        (',' CONSTRAINT constraint_name
+          ( primary_key_clause
+          | foreign_key_clause
+          | unique_key_clause
+          | check_constraint
+          )
+        )*
         RIGHT_PAREN
         (ON COMMIT (DELETE | PRESERVE) ROWS)?
         (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
@@ -548,7 +555,7 @@ create_table
           )+
          RIGHT_PAREN
         )?
-        (TABLESPACE tablespace_name=REGULAR_ID)?
+        (TABLESPACE tablespace_name=(REGULAR_ID | DELIMITED_ID))?
         (LOGGING | NOLOGGING | FILESYSTEM_LIKE_LOGGING)?
         ( COMPRESS
            (BASIC
@@ -563,6 +570,10 @@ create_table
 // Many more varations to capture
       SEMICOLON
     ;
+
+datatype_null_enable
+   :  column_name datatype (NOT NULL)? (ENABLE | DISABLE)?
+   ;
 
 size_clause
     : UNSIGNED_INTEGER REGULAR_ID
