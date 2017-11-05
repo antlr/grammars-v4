@@ -76,6 +76,7 @@
 *.x text
 *.xml text
 *.yml text
+access_log text
 
 # Declare files that will always have CRLF line endings on checkout.
 # (currently none)
