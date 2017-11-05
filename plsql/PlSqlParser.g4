@@ -541,8 +541,8 @@ create_table
         | PCTUSED pctused=UNSIGNED_INTEGER
         | INITRANS inittrans=UNSIGNED_INTEGER
         )*
-        ( STORAGE LEFT_PAREN
-          ( INITIAL initial=size_clause
+        (STORAGE '('
+          (INITIAL initial=size_clause
           | NEXT next=size_clause
           | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
           | PCTINCREASE pctincrease=UNSIGNED_INTEGER
@@ -553,11 +553,11 @@ create_table
           | FLASH_CACHE (KEEP | NONE | DEFAULT)
           | ENCRYPT
           )+
-         RIGHT_PAREN
+         ')'
         )?
         (TABLESPACE tablespace_name=(REGULAR_ID | DELIMITED_ID))?
         (LOGGING | NOLOGGING | FILESYSTEM_LIKE_LOGGING)?
-        ( COMPRESS
+        (COMPRESS
            (BASIC
            | FOR (OLTP
                  | (QUERY | ARCHIVE) (LOW | HIGH)?
@@ -567,8 +567,64 @@ create_table
         )?
 // Column_properties clause goes here
 // Partition clause goes here
+         table_range_partition_by_clause?
 // Many more varations to capture
-      SEMICOLON
+
+       ((ENABLE | DISABLE)? ROW MOVEMENT)?
+
+       (FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
+       | NO FLASHBACK ARCHIVE
+       )?
+
+      (AS subquery)?
+
+      ';'
+    ;
+
+table_range_partition_by_clause
+    : PARTITION BY RANGE
+        '(' column_name (',' column_name)* ')'
+          (INTERVAL '(' expression ')'
+              (STORE IN '('
+                        (','? tablespace_name=REGULAR_ID )+
+                        ')'
+              )?
+          )?
+        '('
+            (COMMA? PARTITION partition_name=REGULAR_ID
+                 VALUES LESS THAN
+// Supposed to be literal in here, will need to refine this                      
+                     '('
+                        (','? STRING
+                        | ','? string_function
+                        | ','? numeric
+                        | ','? MAXVALUE
+                        )+
+                     ')'
+                (TABLESPACE partition_tablespace=REGULAR_ID)?
+
+                (ON COMMIT (DELETE | PRESERVE) ROWS)?
+                (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
+                 (PCTFREE pctfree=UNSIGNED_INTEGER
+                 | PCTUSED pctused=UNSIGNED_INTEGER
+                 | INITRANS inittrans=UNSIGNED_INTEGER
+                 )*
+                 (STORAGE '('
+                   (INITIAL initial=size_clause
+                   | NEXT next=size_clause
+                   | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
+                   | PCTINCREASE pctincrease=UNSIGNED_INTEGER
+                   | FREELISTS freelists=UNSIGNED_INTEGER
+                   | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
+                   | OPTIMAL (size_clause | NULL)
+                   | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
+                   | FLASH_CACHE (KEEP | NONE | DEFAULT)
+                   | ENCRYPT
+                   )+
+                  ')'
+                 )?
+            )+
+        ')'
     ;
 
 datatype_null_enable
@@ -2538,6 +2594,7 @@ regular_id
     | STATIC
     | STATISTICS
     | STRING
+    | STORE
     | SUBSTR
     | SUBMULTISET
     | SUBPARTITION
