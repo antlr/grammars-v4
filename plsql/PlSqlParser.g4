@@ -526,7 +526,15 @@ drop_index
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        '(' column_name datatype (',' column_name datatype)* ')'
+        LEFT_PAREN datatype_null_enable? (',' datatype_null_enable?)*
+        (',' CONSTRAINT constraint_name
+          ( primary_key_clause
+          | foreign_key_clause
+          | unique_key_clause
+          | check_constraint
+          )
+        )*
+        RIGHT_PAREN
         (ON COMMIT (DELETE | PRESERVE) ROWS)?
         (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
         (PCTFREE pctfree=UNSIGNED_INTEGER
