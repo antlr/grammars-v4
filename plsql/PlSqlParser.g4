@@ -34,6 +34,7 @@ unit_statement
     | alter_type
     | alter_table
     | alter_index
+    | alter_user
 
     | create_function_body
     | create_procedure_body
@@ -45,6 +46,7 @@ unit_statement
 //  | create_view //TODO
 //  | create_directory //TODO
 //  | create_materialized_view //TODO
+    | create_user
 
     | create_sequence
     | create_trigger
@@ -65,6 +67,8 @@ unit_statement
     | comment_on_table
 
     | anonymous_block
+
+    | grant_statement
     ;
 
 // DDL -> SQL Statements for Stored PL/SQL Units
@@ -520,8 +524,147 @@ alter_index
     : ALTER INDEX old_index_name=index_name RENAME TO new_index_name=index_name ';'
     ;
 
+create_user
+    : CREATE USER
+      user_object_name
+        ( identified_by
+          | identified_other_clause
+          | user_tablespace_clause
+          | quota_clause
+          | profile_clause
+          | password_expire_clause
+          | user_lock_clause
+          | user_editions_clause
+          | container_clause
+        )+ ';'
+    ;
+
+// The standard clauses only permit one user per statement.
+// The proxy clause allows multiple users for a proxy designation.
+alter_user
+    : ALTER USER
+      ( ( user_object_name
+          ( alter_identified_by
+          | identified_other_clause
+          | user_tablespace_clause
+          | quota_clause
+          | profile_clause
+          | user_default_role_clause
+          | password_expire_clause
+          | user_lock_clause
+          | alter_user_editions_clause
+          | container_clause
+          | container_data_clause
+          )+
+        )
+      | ( user_object_name (',' user_object_name)*
+          proxy_clause
+        )
+      ) ';'
+    ;
+
+alter_identified_by
+    : identified_by (REPLACE id_expression)?
+    ;
+
+identified_by
+    : IDENTIFIED BY id_expression
+    ;
+
+identified_other_clause
+    : IDENTIFIED (EXTERNALLY | GLOBALLY) (AS quoted_string)?
+    ;
+
+user_tablespace_clause
+    : (DEFAULT | TEMPORARY) TABLESPACE id_expression
+    ;
+
+quota_clause
+    : QUOTA (size_clause | UNLIMITED) ON id_expression
+    ;
+
+profile_clause
+    : PROFILE id_expression
+    ;
+
+role_clause
+    : role_name (',' role_name)*
+    | ALL (EXCEPT role_name (',' role_name)*)*
+    ;
+
+user_default_role_clause
+    : DEFAULT ROLE ( NONE | role_clause )
+    ;
+
+password_expire_clause
+    : PASSWORD EXPIRE
+    ;
+
+user_lock_clause
+    : ACCOUNT (LOCK | UNLOCK)
+    ;
+
+user_editions_clause
+    : ENABLE EDITIONS
+    ;
+
+alter_user_editions_clause
+    : user_editions_clause (FOR regular_id (',' regular_id)* )? FORCE?
+    ;
+
+proxy_clause
+    : REVOKE CONNECT THROUGH ( (ENTERPRISE USERS) | user_object_name)
+    | GRANT CONNECT THROUGH
+        ( ENTERPRISE USERS
+        | user_object_name
+            ( WITH ((NO ROLES) | (ROLE role_clause)) )?
+            ( AUTHENTICATION REQUIRED )?
+            ( AUTHENTICATED USING (PASSWORD | CERTIFICATE | (DISTINGUISHED NAME)) )?
+       )
+    ;
+
+container_names
+    : LEFT_PAREN id_expression (',' id_expression)* RIGHT_PAREN
+    ;
+
+set_container_data
+    : SET CONTAINER_DATA EQUALS_OP (ALL | DEFAULT | container_names)
+    ;
+
+add_rem_container_data
+    : (ADD | REMOVE) CONTAINER_DATA EQUALS_OP container_names
+    ;
+
+container_data_clause
+    : set_container_data | add_rem_container_data (FOR container_tableview_name)?
+    ;
+
 drop_index
     : DROP INDEX index_name ';'
+    ;
+
+grant_statement
+    : GRANT
+        ( role_name
+        | system_privilege
+        | object_privilege ( '(' column_name (',' column_name)* ')' )?
+        )
+        ( ','
+          (role_name
+          | system_privilege
+          | object_privilege ( '(' column_name (',' column_name)* ')' )?
+          )
+        )*
+      (ON grant_object_name)?
+      TO (grantee_name | PUBLIC) (',' grantee_name | PUBLIC)*
+      (WITH (ADMIN | DELEGATE) OPTION)?
+      (WITH HIERARCHY OPTION)?
+      (WITH GRANT OPTION)?
+      container_clause? ';'
+    ;
+
+container_clause
+    : CONTAINER EQUALS_OP (CURRENT | ALL)
     ;
 
 create_table
@@ -555,7 +698,7 @@ create_table
           )+
          ')'
         )?
-        (TABLESPACE tablespace_name=(REGULAR_ID | DELIMITED_ID))?
+        (TABLESPACE tablespace_name=id_expression)?
         (LOGGING | NOLOGGING | FILESYSTEM_LIKE_LOGGING)?
         (COMPRESS
            (BASIC
@@ -631,14 +774,15 @@ datatype_null_enable
    :  column_name datatype (NOT NULL)? (ENABLE | DISABLE)?
    ;
 
+//Technically, this should only allow 'K' | 'M' | 'G' | 'T' | 'P' | 'E'
+// but having issues with examples/numbers01.sql line 11 "sysdate -1m"
 size_clause
-    : UNSIGNED_INTEGER REGULAR_ID
+    : UNSIGNED_INTEGER REGULAR_ID?
     ;
 
 drop_table
     : DROP TABLE tableview_name SEMICOLON
     ;
-
 
 comment_on_column
     : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string
@@ -1964,12 +2108,25 @@ main_model_name
     : identifier
     ;
 
+container_tableview_name
+    : identifier ('.' id_expression)?
+    ;
+
 aggregate_function_name
     : identifier ('.' id_expression)*
     ;
 
 query_name
     : identifier
+    ;
+
+grantee_name
+    : id_expression identified_by?
+    ;
+
+role_name
+    : id_expression
+    | CONNECT
     ;
 
 constraint_name
@@ -2050,9 +2207,27 @@ synonym_name
 
 // Represents a valid DB object name in DDL commands which are valid for several DB (or schema) objects.
 // For instance, create synonym ... for <DB object name>, or rename <old DB object name> to <new DB object name>.
-// Both are valid for seuqences, tables, views etc.
+// Both are valid for sequences, tables, views, etc.
 schema_object_name
     : id_expression
+    ;
+
+dir_object_name
+    : id_expression
+    ;
+
+user_object_name
+    : id_expression
+    ;
+
+grant_object_name
+    : tableview_name
+    | USER user_object_name (',' user_object_name)*
+    | DIRECTORY dir_object_name
+    | EDITION schema_object_name
+    | MINING MODEL schema_object_name
+    | JAVA (SOURCE | RESOURCE) schema_object_name
+    | SQL TRANSLATION PROFILE schema_object_name
     ;
 
 // PL/SQL Specs
@@ -2172,6 +2347,226 @@ general_element_part
 
 table_element
     : (INTRODUCER char_set_name)? id_expression ('.' id_expression)*
+    ;
+
+object_privilege
+    : ALL PRIVILEGES?
+    | READ
+    | WRITE
+    | EXECUTE
+    | USE
+    | FLASHBACK ARCHIVE
+    | ON COMMIT REFRESH
+    | QUERY REWRITE
+    | SELECT
+    | ALTER
+    | DEBUG
+    | DELETE
+    | UNDER
+    | INSERT
+    | UPDATE
+    | KEEP SEQUENCE
+    | INDEX
+    | REFERENCES
+    | INHERIT PRIVILEGES
+    | TRANSLATE SQL
+    | MERGE VIEW
+    ;
+
+system_privilege
+    : ALL PRIVILEGES
+    | ADVISOR
+    | ADMINISTER SQL TUNING SET
+    | ADMINISTER ANY SQL TUNING SET
+    | CREATE ANY SQL PROFILE
+    | ALTER ANY SQL PROFILE
+    | DROP ANY SQL PROFILE
+    | ADMINISTER SQL MANAGEMENT OBJECT
+    | CREATE CLUSTER
+    | CREATE ANY CLUSTER
+    | ALTER ANY CLUSTER
+    | DROP ANY CLUSTER
+    | CREATE ANY CONTEXT
+    | DROP ANY CONTEXT
+    | EXEMPT REDACTION POLICY
+    | ALTER DATABASE
+    | CREATE DATABASE LINK
+    | CREATE PUBLIC DATABASE LINK
+    | ALTER DATABASE LINK
+    | ALTER PUBLIC DATABASE LINK
+    | DROP PUBLIC DATABASE LINK
+    | DEBUG CONNECT SESSION
+    | DEBUG ANY PROCEDURE
+    | ANALYZE ANY DICTIONARY
+    | CREATE DIMENSION
+    | CREATE ANY DIMENSION
+    | ALTER ANY DIMENSION
+    | DROP ANY DIMENSION
+    | CREATE ANY DIRECTORY
+    | DROP ANY DIRECTORY
+    | CREATE ANY EDITION
+    | DROP ANY EDITION
+    | FLASHBACK ARCHIVE ADMINISTER
+    | CREATE ANY INDEX
+    | ALTER ANY INDEX
+    | DROP ANY INDEX
+    | CREATE INDEXTYPE
+    | CREATE ANY INDEXTYPE
+    | ALTER ANY INDEXTYPE
+    | DROP ANY INDEXTYPE
+    | EXECUTE ANY INDEXTYPE
+    | CREATE JOB
+    | CREATE ANY JOB
+    | CREATE EXTERNAL JOB
+    | EXECUTE ANY CLASS
+    | EXECUTE ANY PROGRAM
+    | MANAGE SCHEDULER
+    | ADMINISTER KEY MANAGEMENT
+    | CREATE LIBRARY
+    | CREATE ANY LIBRARY
+    | ALTER ANY LIBRARY
+    | DROP ANY LIBRARY
+    | EXECUTE ANY LIBRARY
+    | LOGMINING
+    | CREATE MATERIALIZED VIEW
+    | CREATE ANY MATERIALIZED VIEW
+    | ALTER ANY MATERIALIZED VIEW
+    | DROP ANY MATERIALIZED VIEW
+    | QUERY REWRITE
+    | GLOBAL QUERY REWRITE
+    | ON COMMIT REFRESH
+    | FLASHBACK ANY TABLE
+    | CREATE MINING MODEL
+    | CREATE ANY MINING MODEL
+    | ALTER ANY MINING MODEL
+    | DROP ANY MINING MODEL
+    | SELECT ANY MINING MODEL
+    | COMMENT ANY MINING MODEL
+    | CREATE CUBE
+    | CREATE ANY CUBE
+    | ALTER ANY CUBE
+    | DROP ANY CUBE
+    | SELECT ANY CUBE
+    | UPDATE ANY CUBE
+    | CREATE MEASURE FOLDER
+    | CREATE ANY MEASURE FOLDER
+    | DELETE ANY MEASURE FOLDER
+    | DROP ANY MEASURE FOLDER
+    | INSERT ANY MEASURE FOLDER
+    | CREATE CUBE DIMENSION
+    | CREATE ANY CUBE DIMENSION
+    | ALTER ANY CUBE DIMENSION
+    | DELETE ANY CUBE DIMENSION
+    | DROP ANY CUBE DIMENSION
+    | INSERT ANY CUBE DIMENSION
+    | SELECT ANY CUBE DIMENSION
+    | UPDATE ANY CUBE DIMENSION
+    | CREATE CUBE BUILD PROCESS
+    | CREATE ANY CUBE BUILD PROCESS
+    | DROP ANY CUBE BUILD PROCESS
+    | UPDATE ANY CUBE BUILD PROCESS
+    | CREATE OPERATOR
+    | CREATE ANY OPERATOR
+    | ALTER ANY OPERATOR
+    | DROP ANY OPERATOR
+    | EXECUTE ANY OPERATOR
+    | CREATE ANY OUTLINE
+    | ALTER ANY OUTLINE
+    | DROP ANY OUTLINE
+    | CREATE PLUGGABLE DATABASE
+    | SET CONTAINER
+    | CREATE PROCEDURE
+    | CREATE ANY PROCEDURE
+    | ALTER ANY PROCEDURE
+    | DROP ANY PROCEDURE
+    | EXECUTE ANY PROCEDURE
+    | CREATE PROFILE
+    | ALTER PROFILE
+    | DROP PROFILE
+    | CREATE ROLE
+    | ALTER ANY ROLE
+    | DROP ANY ROLE
+    | GRANT ANY ROLE
+    | CREATE ROLLBACK SEGMENT
+    | ALTER ROLLBACK SEGMENT
+    | DROP ROLLBACK SEGMENT
+    | CREATE SEQUENCE
+    | CREATE ANY SEQUENCE
+    | ALTER ANY SEQUENCE
+    | DROP ANY SEQUENCE
+    | SELECT ANY SEQUENCE
+    | CREATE SESSION
+    | ALTER RESOURCE COST
+    | ALTER SESSION
+    | RESTRICTED SESSION
+    | CREATE SQL TRANSLATION PROFILE
+    | CREATE ANY SQL TRANSLATION PROFILE
+    | ALTER ANY SQL TRANSLATION PROFILE
+    | USE ANY SQL TRANSLATION PROFILE
+    | DROP ANY SQL TRANSLATION PROFILE
+    | TRANSLATE ANY SQL
+    | CREATE SYNONYM
+    | CREATE ANY SYNONYM
+    | CREATE PUBLIC SYNONYM
+    | DROP ANY SYNONYM
+    | DROP PUBLIC SYNONYM
+    | CREATE TABLE
+    | CREATE ANY TABLE
+    | ALTER ANY TABLE
+    | BACKUP ANY TABLE
+    | DELETE ANY TABLE
+    | DROP ANY TABLE
+    | INSERT ANY TABLE
+    | LOCK ANY TABLE
+    | READ ANY TABLE
+    | SELECT ANY TABLE
+    | UPDATE ANY TABLE
+    | CREATE TABLESPACE
+    | ALTER TABLESPACE
+    | DROP TABLESPACE
+    | MANAGE TABLESPACE
+    | UNLIMITED TABLESPACE
+    | CREATE TRIGGER
+    | CREATE ANY TRIGGER
+    | ALTER ANY TRIGGER
+    | DROP ANY TRIGGER
+    | ADMINISTER DATABASE TRIGGER
+    | CREATE TYPE
+    | CREATE ANY TYPE
+    | ALTER ANY TYPE
+    | DROP ANY TYPE
+    | EXECUTE ANY TYPE
+    | UNDER ANY TYPE
+    | CREATE USER
+    | ALTER USER
+    | DROP USER
+    | CREATE VIEW
+    | CREATE ANY VIEW
+    | DROP ANY VIEW
+    | UNDER ANY VIEW
+    | MERGE ANY VIEW
+    | ANALYZE ANY
+    | AUDIT ANY
+    | BECOME USER
+    | CHANGE NOTIFICATION
+    | COMMENT ANY TABLE
+    | EXEMPT ACCESS POLICY
+    | FORCE ANY TRANSACTION
+    | FORCE TRANSACTION
+    | GRANT ANY OBJECT PRIVILEGE
+    | GRANT ANY PRIVILEGE
+    | INHERIT ANY PRIVILEGES
+    | KEEP DATE TIME
+    | KEEP SYSGUID
+    | PURGE DBA_RECYCLEBIN
+    | RESUMABLE
+    | SELECT ANY DICTIONARY
+    | SELECT ANY TRANSACTION
+    | SYSBACKUP
+    | SYSDBA
+    | SYSDG
+    | SYSKM
+    | SYSOPER
     ;
 
 // $>
@@ -2430,6 +2825,7 @@ regular_id
     | LIKE4
     | LIKEC
     | LIMIT
+    | LINK
     | LOCAL
     //| LOCK
     | LOCKED
@@ -2490,6 +2886,7 @@ regular_id
     //| ON
     | ONLY
     | OPEN
+    | OPERATOR
     //| OPTION
     //| OR
     | ORADATA
@@ -2521,6 +2918,7 @@ regular_id
     | PRESENT
     //| PRIOR
     //| PROCEDURE
+    | PROGRAM
     | RAISE
     | RANGE
     | RAW
@@ -2602,6 +3000,7 @@ regular_id
     | SUBTYPE
     | SUCCESS
     | SUSPEND
+    | SYSDATE
     | TEMPORARY
     //| TABLE
     //| THE
@@ -2637,6 +3036,8 @@ regular_id
     | UPSERT
     | UROWID
     | USE
+    | USER
+    | USERS
     //| USING
     | VALIDATE
     | VALUE
