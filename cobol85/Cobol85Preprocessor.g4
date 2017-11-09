@@ -139,7 +139,7 @@ SKIP3 : S K I P '3';
 SUPPRESS : S U P P R E S S;
 
 // symbols
-COMMENTTAG : '>*';
+COMMENTTAG : '*>';
 DOT : '.';
 DOUBLEEQUALCHAR : '==';
 
