@@ -24,6 +24,7 @@
 *.faa text
 *.ffn text
 *.fna text
+*.frm text
 *.g text
 *.g4 text
 *.g42 text
@@ -69,6 +70,7 @@
 *.ttl text
 *.txt text
 *.upnp text
+*.vb text
 *.vhd text
 *.x text
 *.xml text
@@ -76,14 +78,12 @@
 access_log text
 
 # Declare files that will always have LF line endings on checkout.
-*.cls text eol=lf
-*.frm text eol=lf
-*.frm.tree text eol=lf
-*.vb text eol=lf
+# (currently none)
+#*.xyz text eol=lf
 
 # Declare files that will always have CRLF line endings on checkout.
-# (currently none)
-#*.sln text eol=crlf
+# Currently the /vb6/**/*.cls file need this, otherwise the grammar fails. 
+*.cls text eol=crlf
 
 # Denote all files that are truly binary and should not be modified.
 *.pdf binary
