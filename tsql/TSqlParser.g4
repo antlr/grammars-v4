@@ -1654,13 +1654,22 @@ queue_settings
        (RETENTION EQUAL (ON | OFF) COMMA?)?
        (ACTIVATION
          LR_BRACKET
-           (COMMA? STATUS EQUAL (ON | OFF))?
-           (COMMA? PROCEDURE_NAME EQUAL func_proc_name)?
-           (COMMA? MAX_QUEUE_READERS EQUAL max_readers=DECIMAL)?
-           (COMMA? EXECUTE AS (SELF | user_name=STRING | OWNER))?
-           (COMMA? POISON_MESSAGE_HANDLING STATUS EQUAL (ON | OFF))?
-           (COMMA? DROP)?
-         RR_BRACKET)?
+           (
+             (
+              (STATUS EQUAL (ON | OFF) COMMA? )?
+              (PROCEDURE_NAME EQUAL func_proc_name COMMA?)?
+              (MAX_QUEUE_READERS EQUAL max_readers=DECIMAL COMMA?)?
+              (EXECUTE AS (SELF | user_name=STRING | OWNER) COMMA?)?
+             )
+             | DROP
+           )
+         RR_BRACKET COMMA?
+       )?
+       (POISON_MESSAGE_HANDLING
+         LR_BRACKET
+           (STATUS EQUAL (ON | OFF))
+         RR_BRACKET
+       )?
     ;
 
 alter_queue
