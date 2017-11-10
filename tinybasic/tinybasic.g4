@@ -60,7 +60,7 @@ varlist
    ;
 
 expression
-   : vara ('+' | '-' | 'ε') term (('+' | '-') term)*
+   : ('+' | '-' | 'ε')? term (('+' | '-') term)*
    ;
 
 term
@@ -68,9 +68,9 @@ term
    ;
 
 factor
-   : vara
+   : 
+   vara
    | number
-   | (expression)
    ;
 
 vara
@@ -83,8 +83,8 @@ number
    ;
 
 relop
-   : '<' ('>' | '=' | 'ε')?
-   | '>' ('<' | '=' | 'ε')?
+   : ('<' ('>' | '=' | 'ε')?)
+   | ('>' ('<' | '=' | 'ε')?)
    | '='
    | '+'
    | '-'
