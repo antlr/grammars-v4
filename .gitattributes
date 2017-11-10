@@ -77,8 +77,8 @@
 access_log text
 
 # Declare files that will always have LF line endings on checkout.
-# (currently none)
-#*.xyz text eol=lf
+# Unicode input files end with *.txt, but should not be converted on Windows
+/unicode/graphemes/examples/*.txt eol=lf
 
 # Declare files that will always have CRLF line endings on checkout.
 # Currently the /vb6/**/*.cls and *.frm file need this, otherwise the grammar fails. 
