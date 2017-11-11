@@ -148,6 +148,7 @@
 			<module>swift-fin</module>
 			<module>telephone</module>
 			<module>tiny</module>
+			<module>tinybasic</module>
 			<module>tinyc</module>
 			<module>tnsnames</module>
 			<module>tnt</module>
