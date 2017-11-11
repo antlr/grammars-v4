@@ -57,6 +57,7 @@
 			<module>emailaddress</module>
 			<module>erlang</module>
 			<module>fasta</module>
+			<module>fen</module>
 			<module>fol</module>
 			<module>fortran77</module>
 			<module>fusion-tables</module>
