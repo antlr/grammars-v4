@@ -134,6 +134,7 @@
 			<module>scala</module>
 			<module>scss</module>
 			<module>sexpression</module>
+			<module>sgf</module>
 			<module>sharc</module>
             <module>smalltalk</module>
             <module>smiles</module>
