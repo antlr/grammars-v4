@@ -3567,6 +3567,7 @@ id
 simple_id
     : ID
     | ABSOLUTE
+    | ACTION
     | ACTIVE
     | ADDRESS
     | APPLY
@@ -3609,6 +3610,7 @@ simple_id
     | GROUPING
     | GROUPING_ID
     | HASH
+    | INIT
     | IMPERSONATE
     | INSENSITIVE
     | INSERTED
@@ -3660,6 +3662,7 @@ simple_id
     | PRIOR
     | PRIVILEGES
     | PUBLIC
+    | R
     | RANGE
     | RANK
     | RAW
