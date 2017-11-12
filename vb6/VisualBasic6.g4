@@ -29,6 +29,7 @@
 grammar VisualBasic6;
 
 // module ----------------------------------
+
 startRule
    : module EOF
    ;
@@ -37,21 +38,21 @@ module
    : WS? NEWLINE* (moduleHeader NEWLINE +)? moduleReferences? NEWLINE* controlProperties? NEWLINE* moduleConfig? NEWLINE* moduleAttributes? NEWLINE* moduleOptions? NEWLINE* moduleBody? NEWLINE* WS?
    ;
 
- moduleReferences
-	: moduleReference+
-	;
+moduleReferences
+   : moduleReference+
+   ;
 	
 moduleReference 
-	: OBJECT WS? EQ WS? moduleReferenceGUID SEMICOLON WS? moduleReferenceComponent NEWLINE*
-	;
+   : OBJECT WS? EQ WS? moduleReferenceGUID SEMICOLON WS? moduleReferenceComponent NEWLINE*
+   ;
 	 
 moduleReferenceGUID
-	: STRINGLITERAL
-	;
+   : STRINGLITERAL
+   ;
 
 moduleReferenceComponent
-	: STRINGLITERAL
-	;
+   : STRINGLITERAL
+   ;
 
 moduleHeader
    : VERSION WS DOUBLELITERAL (WS CLASS)?
@@ -99,7 +100,7 @@ moduleBodyElement
    | typeStmt
    ;
 
-// Controls ----------------------------------
+// controls ----------------------------------
 
 controlProperties 
 	: WS? BEGIN WS cp_ControlType WS cp_ControlIdentifier WS? NEWLINE+ cp_Properties+ END NEWLINE*
@@ -111,7 +112,7 @@ cp_Properties
 	| controlProperties;
 
 cp_SingleProperty 
-	: WS? cp_PropertyName WS? EQ WS? '$'? literal FRX_OFFSET? NEWLINE+
+	: WS? implicitCallStmt_InStmt WS? EQ WS? '$'? literal FRX_OFFSET? NEWLINE+
 	;
 
 cp_PropertyName 
@@ -131,6 +132,7 @@ cp_ControlIdentifier
 	;
 
 // block ----------------------------------
+
 moduleBlock
    : block
    ;
@@ -214,6 +216,7 @@ blockStmt
    ;
 
 // statements ----------------------------------
+
 appActivateStmt
    : APPACTIVATE WS valueStmt (WS? COMMA WS? valueStmt)?
    ;
@@ -305,7 +308,7 @@ forEachStmt
    ;
 
 forNextStmt
-   : FOR WS ambiguousIdentifier typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt WS TO WS valueStmt (WS STEP WS valueStmt)? NEWLINE + (block NEWLINE +)? NEXT (WS ambiguousIdentifier typeHint?)?
+   : FOR WS iCS_S_VariableOrProcedureCall typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt WS TO WS valueStmt (WS STEP WS valueStmt)? NEWLINE + (block NEWLINE +)? NEXT (WS ambiguousIdentifier typeHint?)?
    ;
 
 functionStmt
@@ -427,8 +430,8 @@ outputList
    ;
 
 outputList_Expression
-   : valueStmt
-   | (SPC | TAB) (WS? LPAREN WS? argsCall WS? RPAREN)?
+   : (SPC | TAB) (WS? LPAREN WS? argsCall WS? RPAREN)?
+   | valueStmt
    ;
 
 printStmt
@@ -565,37 +568,37 @@ unlockStmt
 
 // operator precedence is represented by rule order
 valueStmt
-   : literal # vsLiteral
-   | implicitCallStmt_InStmt # vsICS
-   | LPAREN WS? valueStmt (WS? COMMA WS? valueStmt)* WS? RPAREN # vsStruct
-   | NEW WS valueStmt # vsNew
-   | typeOfStmt # vsTypeOf
-   | midStmt # vsMid
-   | ADDRESSOF WS valueStmt # vsAddressOf
-   | implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt # vsAssign
-   | valueStmt WS IS WS valueStmt # vsIs
-   | valueStmt WS LIKE WS valueStmt # vsLike
-   | valueStmt WS? GEQ WS? valueStmt # vsGeq
-   | valueStmt WS? LEQ WS? valueStmt # vsLeq
-   | valueStmt WS? GT WS? valueStmt # vsGt
-   | valueStmt WS? LT WS? valueStmt # vsLt
-   | valueStmt WS? NEQ WS? valueStmt # vsNeq
-   | valueStmt WS? EQ WS? valueStmt # vsEq
-   | valueStmt WS AMPERSAND WS valueStmt # vsAmp
-   | MINUS WS? valueStmt # vsNegation
-   | PLUS WS? valueStmt # vsPlus
-   | valueStmt WS? PLUS WS? valueStmt # vsAdd
-   | valueStmt WS? MOD WS? valueStmt # vsMod
-   | valueStmt WS? DIV WS? valueStmt # vsDiv
-   | valueStmt WS? MULT WS? valueStmt # vsMult
-   | valueStmt WS? MINUS WS? valueStmt # vsMinus
-   | valueStmt WS? POW WS? valueStmt # vsPow
-   | valueStmt WS IMP WS valueStmt # vsImp
-   | valueStmt WS EQV WS valueStmt # vsEqv
-   | valueStmt WS? XOR WS? valueStmt # vsXor
-   | valueStmt WS? OR WS? valueStmt # vsOr
-   | valueStmt WS AND WS valueStmt # vsAnd
-   | NOT WS valueStmt # vsNot
+   : literal                                                         # vsLiteral
+   | LPAREN WS? valueStmt (WS? COMMA WS? valueStmt)* WS? RPAREN      # vsStruct
+   | NEW WS valueStmt                                                # vsNew
+   | typeOfStmt                                                      # vsTypeOf
+   | ADDRESSOF WS valueStmt                                          # vsAddressOf
+   | implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt                # vsAssign
+   | valueStmt WS? POW WS? valueStmt                                 # vsPow
+   | MINUS WS? valueStmt                                             # vsNegation
+   | PLUS WS? valueStmt                                              # vsPlus
+   | valueStmt WS? DIV WS? valueStmt                                 # vsDiv
+   | valueStmt WS? MULT WS? valueStmt                                # vsMult
+   | valueStmt WS? MOD WS? valueStmt                                 # vsMod
+   | valueStmt WS? PLUS WS? valueStmt                                # vsAdd
+   | valueStmt WS? MINUS WS? valueStmt                               # vsMinus
+   | valueStmt WS AMPERSAND WS valueStmt                             # vsAmp
+   | valueStmt WS? EQ WS? valueStmt                                  # vsEq
+   | valueStmt WS? NEQ WS? valueStmt                                 # vsNeq
+   | valueStmt WS? LT WS? valueStmt                                  # vsLt
+   | valueStmt WS? GT WS? valueStmt                                  # vsGt
+   | valueStmt WS? LEQ WS? valueStmt                                 # vsLeq
+   | valueStmt WS? GEQ WS? valueStmt                                 # vsGeq
+   | valueStmt WS LIKE WS valueStmt                                  # vsLike
+   | valueStmt WS IS WS valueStmt                                    # vsIs
+   | NOT (WS valueStmt | LPAREN WS? valueStmt WS? RPAREN)            # vsNot
+   | valueStmt WS? AND WS? valueStmt                                 # vsAnd
+   | valueStmt WS? OR WS? valueStmt                                  # vsOr
+   | valueStmt WS? XOR WS? valueStmt                                 # vsXor
+   | valueStmt WS? EQV WS? valueStmt                                 # vsEqv
+   | valueStmt WS? IMP WS? valueStmt                                 # vsImp
+   | implicitCallStmt_InStmt                                         # vsICS
+   | midStmt                                                         # vsMid
    ;
 
 variableStmt
@@ -627,6 +630,7 @@ writeStmt
    ;
 
 // complex call statements ----------------------------------
+
 explicitCallStmt
    : eCS_ProcedureCall
    | eCS_MemberProcedureCall
@@ -671,7 +675,7 @@ iCS_S_VariableOrProcedureCall
    ;
 
 iCS_S_ProcedureOrArrayCall
-   : (ambiguousIdentifier | baseType) typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN dictionaryCallStmt?
+   : (ambiguousIdentifier | baseType) typeHint? WS? (LPAREN WS? (argsCall WS?)? RPAREN)+ dictionaryCallStmt?
    ;
 
 iCS_S_MembersCall
@@ -687,6 +691,7 @@ iCS_S_DictionaryCall
    ;
 
 // atomic call statements ----------------------------------
+
 argsCall
    : (argCall? WS? (COMMA | SEMICOLON) WS?)* argCall (WS? (COMMA | SEMICOLON) WS? argCall?)*
    ;
@@ -709,7 +714,7 @@ arg
    ;
 
 argDefaultValue
-   : EQ WS? (literal | ambiguousIdentifier)
+   : EQ WS? valueStmt
    ;
 
 subscripts
@@ -721,6 +726,7 @@ subscript
    ;
 
 // atomic rules ----------------------------------
+
 ambiguousIdentifier
    : (IDENTIFIER | ambiguousKeyword) +
    | L_SQUARE_BRACKET (IDENTIFIER | ambiguousKeyword) + R_SQUARE_BRACKET
@@ -969,6 +975,7 @@ ambiguousKeyword
    ;
 
 // lexer rules --------------------------------------------------------------------------------
+
 // keywords
 
 ACCESS
@@ -2052,7 +2059,7 @@ IDENTIFIER
 // whitespace, line breaks, comments, ...
 
 LINE_CONTINUATION
-   : ' ' '_' '\r'? '\n' -> skip
+   : ' ' '_' '\r'? '\n' -> channel(HIDDEN)
    ;
 
 
@@ -2062,7 +2069,7 @@ NEWLINE
 
 
 COMMENT
-   : WS? ('\'' | COLON? REM ' ') (LINE_CONTINUATION | ~ ('\n' | '\r'))* -> skip
+   : WS? ('\'' | COLON? REM ' ') (LINE_CONTINUATION | ~ ('\n' | '\r'))* -> channel(HIDDEN)
    ;
 
 
@@ -2073,12 +2080,12 @@ WS
 // letters
 
 fragment LETTER
-   : [a-zA-Z_äöüÄÖÜ]
+   : [a-zA-Z_äöüÄÖÜáéíóúÁÉÍÓÚâêîôûÂÊÎÔÛàèìòùÀÈÌÒÙãẽĩõũÃẼĨÕŨçÇ]
    ;
 
 
 fragment LETTERORDIGIT
-   : [a-zA-Z0-9_äöüÄÖÜ]
+   : [a-zA-Z0-9_äöüÄÖÜáéíóúÁÉÍÓÚâêîôûÂÊÎÔÛàèìòùÀÈÌÒÙãẽĩõũÃẼĨÕŨçÇ]
    ;
 
 // case insensitive chars
