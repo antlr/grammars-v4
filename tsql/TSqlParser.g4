@@ -1987,6 +1987,7 @@ alter_table
                              | DROP CONSTRAINT constraint=id
                              | WITH CHECK ADD CONSTRAINT constraint=id FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
                              | CHECK CONSTRAINT constraint=id
+                             | (ENABLE | DISABLE) TRIGGER id?
                              | REBUILD table_options)
                              ';'?
     ;
