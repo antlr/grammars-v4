@@ -3494,6 +3494,7 @@ data_type
     | DATETIME2
     | DATETIMEOFFSET '(' DECIMAL ')'
     | DECIMAL '(' DECIMAL ',' DECIMAL ')'
+    | DOUBLE PRECISION?
     | FLOAT
     | GEOGRAPHY
     | GEOMETRY
@@ -3519,6 +3520,7 @@ data_type
     | VARCHAR '(' DECIMAL | MAX ')'
     | XML*/
     : id IDENTITY? ('(' (DECIMAL | MAX) (',' DECIMAL)? ')')?
+    | DOUBLE PRECISION?
     | INT
     | TINYINT
     | SMALLINT
