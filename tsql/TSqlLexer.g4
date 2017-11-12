@@ -739,6 +739,7 @@ SECRET:                                'SECRET';
 SECURITY_LOG:                          'SECURITY_LOG';
 SEEDING_MODE:                          'SEEDING_MODE';
 SELF:                                  'SELF';
+SEMI_SENSITIVE:                        'SEMI_SENSITIVE';
 SEND:                                  'SEND';
 SENT:                                  'SENT';
 SERIALIZABLE:                          'SERIALIZABLE';

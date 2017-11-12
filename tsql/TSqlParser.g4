@@ -2745,7 +2745,7 @@ index_option
 declare_cursor
     : DECLARE cursor_name
       (CURSOR (declare_set_cursor_common (FOR UPDATE (OF column_name_list)?)?)?
-      | INSENSITIVE? SCROLL? CURSOR FOR select_statement (FOR (READ ONLY | UPDATE | (OF column_name_list)))?
+      | (SEMI_SENSITIVE | INSENSITIVE)? SCROLL? CURSOR FOR select_statement (FOR (READ ONLY | UPDATE | (OF column_name_list)))?
       ) ';'?
     ;
 
@@ -3703,6 +3703,7 @@ simple_id
     | SCROLL
     | SCROLL_LOCKS
     | SELF
+    | SEMI_SENSITIVE
     | SERIALIZABLE
     | SERVER
     | SHARE
