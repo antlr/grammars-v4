@@ -339,6 +339,7 @@ another_statement
     | set_statement
     | transaction_statement
     | use_statement
+    | setuser_statement
     ;
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
 
@@ -2634,6 +2635,9 @@ go_statement
 // https://msdn.microsoft.com/en-us/library/ms188366.aspx
 use_statement
     : USE database=id ';'?
+    ;
+setuser_statement
+    : SETUSER user=STRING
     ;
 
 dbcc_clause
