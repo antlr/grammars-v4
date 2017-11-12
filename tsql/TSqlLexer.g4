@@ -815,7 +815,7 @@ XSINIL:                                'XSINIL';
 DOLLAR_ACTION:                         '$ACTION';
 
 SPACE:              [ \t\r\n]+    -> skip;
-COMMENT:            '/*' .*? '*/' -> channel(HIDDEN);
+COMMENT:            '/*' (COMMENT|.)*? '*/' -> channel(HIDDEN);
 LINE_COMMENT:       '--' ~[\r\n]* -> channel(HIDDEN);
 
 // TODO: ID can be not only Latin.
