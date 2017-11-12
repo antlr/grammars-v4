@@ -409,7 +409,7 @@ WITHOUT:                               'WITHOUT';
 WITNESS:                               'WITNESS';
 WRITETEXT:                             'WRITETEXT';
 
-// Additional keywords (they can be id).
+// Additional keywords. They can be id, please keep them in sync with the parser.
 ABSOLUTE:                              'ABSOLUTE';
 ACCENT_SENSITIVITY:                    'ACCENT_SENSITIVITY';
 ACTION:                                'ACTION';
