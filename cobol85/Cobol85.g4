@@ -64,7 +64,7 @@ identificationDivisionBody
 // - program id paragraph ----------------------------------
 
 programIdParagraph
-   : PROGRAM_ID DOT_FS programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION) PROGRAM?)? DOT_FS
+   : PROGRAM_ID DOT_FS programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION) PROGRAM?)? DOT_FS? commentEntry?
    ;
 
 // - author paragraph ----------------------------------
@@ -122,7 +122,8 @@ configurationSection
 // - configuration section paragraph ----------------------------------
 
 configurationSectionParagraph
-   : sourceComputerParagraph | objectComputerParagraph
+   : sourceComputerParagraph | objectComputerParagraph | specialNamesParagraph
+   // strictly, specialNamesParagraph does not belong into configurationSectionParagraph, but ibm-cobol allows this
    ;
 
 // - source computer paragraph ----------------------------------
@@ -966,7 +967,7 @@ dataDescriptionEntry
    ;
 
 dataDescriptionEntryFormat1
-   : (INTEGERLITERAL | LEVEL_NUMBER_77) (FILLER | dataName)? dataRedefinesClause? dataIntegerStringClause? dataExternalClause? dataGlobalClause? dataTypeDefClause? dataThreadLocalClause? (dataPictureClause | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataValueClause | dataUsageClause | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause)* dataWithLowerBoundsClause? dataAlignedClause? dataRecordAreaClause? DOT_FS
+   : (INTEGERLITERAL | LEVEL_NUMBER_77) (FILLER | dataName)? (dataRedefinesClause | dataIntegerStringClause | dataExternalClause | dataGlobalClause | dataTypeDefClause | dataThreadLocalClause | dataPictureClause | dataCommonOwnLocalClause | dataTypeClause | dataUsingClause | dataUsageClause | dataValueClause | dataReceivedByClause | dataOccursClause | dataSignClause | dataSynchronizedClause | dataJustifiedClause | dataBlankWhenZeroClause | dataWithLowerBoundsClause | dataAlignedClause | dataRecordAreaClause)* DOT_FS
    ;
 
 dataDescriptionEntryFormat2
@@ -1086,7 +1087,7 @@ dataUsingClause
    ;
 
 dataValueClause
-   : (VALUE IS? | VALUES ARE?)? dataValueInterval+
+   : (VALUE IS? | VALUES ARE?)? dataValueInterval (COMMACHAR? dataValueInterval)*
    ;
 
 dataValueInterval
@@ -2535,7 +2536,7 @@ cobolWord
    : IDENTIFIER
    | COBOL | PROGRAM
    | ABORT | APOST | ARITH | AS | ASCII | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | ATTRIBUTE | AUTO | AUTO_SKIP
-   | BACKGROUND_COLOR | BACKGROUND_COLOUR | BEEP | BELL | BIT | BLINK | BOUNDS
+   | BACKGROUND_COLOR | BACKGROUND_COLOUR | BEEP | BELL | BINARY | BIT | BLINK | BOUNDS
    | CAPABLE | CCSVERSION | CHANGED | CHANNEL | CLOSE_DISPOSITION | CODEPAGE | COMMITMENT | CONTROL_POINT | CONVENTION | CRUNCH | CURSOR
    | DEFAULT | DEFAULT_DISPLAY | DEFINITION | DFHRESP | DFHVALUE | DISK | DONTCARE | DOUBLE
    | EBCDIC | EMPTY_CHECK | ENTER | ENTRY_PROCEDURE | EOL | EOS | ERASE | ESCAPE | EVENT | EXCLUSIVE | EXPORT | EXTENDED
@@ -3146,17 +3147,17 @@ ASTERISKCHAR : '*';
 DOUBLEASTERISKCHAR : '**';
 COLONCHAR : ':';
 COMMACHAR : ',';
-COMMENTENTRYTAG : '>*CE';
-COMMENTTAG : '>*';
+COMMENTENTRYTAG : '*>CE';
+COMMENTTAG : '*>';
 DOLLARCHAR : '$';
 DOUBLEQUOTE : '"';
 // period full stop
 DOT_FS : '.' ('\r' | '\n' | '\f' | '\t' | ' ')+ | '.' EOF;
 DOT : '.';
 EQUALCHAR : '=';
-EXECCICSTAG : '>*EXECCICS';
-EXECSQLTAG : '>*EXECSQL';
-EXECSQLIMSTAG : '>*EXECSQLIMS';
+EXECCICSTAG : '*>EXECCICS';
+EXECSQLTAG : '*>EXECSQL';
+EXECSQLIMSTAG : '*>EXECSQLIMS';
 LESSTHANCHAR : '<';
 LESSTHANOREQUAL : '<=';
 LPARENCHAR : '(';
@@ -3197,14 +3198,14 @@ NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? [0-9]* (DOT | COMMACHAR) [0-9]+ (('e' |
 IDENTIFIER : [a-zA-Z0-9]+ ([-_]+ [a-zA-Z0-9]+)*;
 
 // whitespace, line breaks, comments, ...
-NEWLINE : '\r'? '\n' -> skip;
-EXECCICSLINE : EXECCICSTAG WS ~('\n' | '\r' | '.')+;
-EXECSQLIMSLINE : EXECSQLIMSTAG WS ~('\n' | '\r' | '.')+;
-EXECSQLLINE : EXECSQLTAG WS ~('\n' | '\r' | '.')+;
+NEWLINE : '\r'? '\n' -> channel(HIDDEN);
+EXECCICSLINE : EXECCICSTAG WS ~('\n' | '\r' | '^')+ ('\n' | '\r' | '^');
+EXECSQLIMSLINE : EXECSQLIMSTAG WS ~('\n' | '\r' | '^')+ ('\n' | '\r' | '^');
+EXECSQLLINE : EXECSQLTAG WS ~('\n' | '\r' | '^')+ ('\n' | '\r' | '^');
 COMMENTENTRYLINE : COMMENTENTRYTAG WS ~('\n' | '\r')*;
-COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> skip;
-WS : [ \t\f;]+ -> skip;
-SEPARATOR : ', ' -> skip;
+COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(HIDDEN);
+WS : [ \t\f;]+ -> channel(HIDDEN);
+SEPARATOR : ', ' -> channel(HIDDEN);
 
 // case insensitive chars
 fragment A:('a'|'A');

@@ -1,0 +1,113 @@
+(;FF[4]GM[1]SZ[19]ST[2]CA[UTF-8]AP[SGFC:1.17]
+
+PB[chensicha]
+BR[14k]
+HA[2]
+PW[creedfoxx]
+WR[13k]
+KM[0.5]
+DT[2012-02-24]
+PC[IGS-PandaNet]
+RE[W+Resign]
+TM[0]
+OT[25/600 Canadian]
+RU[Japanese]
+
+AB[pd][dp]C[James: Hello, and thank you for reviewing my game. Please feel free to offer any insight into my style or any mistakes you see.
+
+Jon:  Hi!  I'm Jon, your reviewer for this game.];W[dd];B[pp]
+;W[nc];B[pj]LB[pf:B][jp:A]TR[pd]C[Jon:  This is a bit odd, given that it doesn't help the marked stone much, but it will work well with an extension to black A.  He can always move out of the corner later too (B).]
+;W[qf]LB[jd:A][cn:B][nq:C]C[James: Do you feel that this move was too deep? I have been trying to test new ways to attack corners. Perhaps I should have played a different way?
+
+Jon:  Locally speaking, double approaching isn't unreasonable, but it's a good idea to also consider extending back calmly (e.g. A), since you're engaging inside black's side, and it'll be a bit more difficult.  If you extend back first, double approaching as a follow-up will be a little easier because of the O-17 stone gaining some support.
+
+Overall, this is relatively small, since there's so much open space and a good selection of big points available.  Black could choose to ignore this and expand aggressively along the bottom or left sides, putting pressure on white to keep up with his speed of development.  I'd prefer to be proactive and start working on these areas myself, such as approaching at B or C.]
+;B[pf]
+(;W[qe]LB[qc:A]C[Jon:  It's best to avoid trying to save this stone directly, as it won't be as easy to settle with black harassing the group, and the rewards for successfully defending will be marginal.  Invading at the 3-3 will be a more comfortable way to establish yourself here.]
+;B[pe];W[ri]LB[qc:A]TR[qf]C[Jon:  I'd prefer to defend in the other direction (A), as you can settle more quickly/easily in the corner.  This should be your goal, as you don't want to waste too much time defending this group.]
+;B[qh];W[rh];B[qg];W[rg];B[qi];W[pb]LB[rc:A][rd:B]TR[qe][qf]
+[rg][rh][ri]C[James: I believe that the move I made was too small. Agree?
+
+Jon:  Yeah, but I'm also concerned about the safety of the marked white group.  I'd like to extend to A instead to complete the base.  If you don't do this, then black could be annoying by poking at B and forcing you out the other side, where you're pressed very low.]
+;B[rj];W[qd];B[qn]LB[jp:A]TR[pd][pe][pf][qg][qh][qi][pj][rj]
+C[Jon:  Trying to defend this area directly isn't productive for black.  His stones would be much better distributed if he extended out along the bottom side (A) and started building a framework in this area.  It also makes the aftereffects of the top right battle more clear, as the marked black group is helping with this objective and setting up good center control.]
+;W[fq]LB[jq:A]C[Jon:  Disrupting the bottom side is a good decision, but I'm hesitant to make this approach because it plays into a favorable pincer for black.  He can attack white's approach stone while expanding the bottom right area, so I recommend breaking the side in the middle (A) to play around this.]
+;B[fp]C[Jon:  Following my thoughts from the previous comment, I feel black misses a key opportunity here.]
+;W[gp]
+(;B[fo]TR[pd][pe][pf][qg][qh][qi][pj][qn][pp][gq]C[James: Do you feel that a cut at the triangle would have been more interesting? I see it happen often.
+
+Jon:  I'm not intimately familiar with the joseki that result from it, but I would be hesitant to use it here.  The idea is to overconcentrate white in positions where he has stones nearby (in this case, to the right).  What worries me about using it here is that, by forcing white to strengthen like this, it negatively impacts black's ability to expand along the bottom side and make further use of the marked black stones.  I included a variation for a basic example of how it could play out.]
+;W[iq]LB[eq:A][kq:B]C[Jon:  I'd like to push in at A first to make sure black can't play there himself and claim a large corner.  Also, I recommend planning on making a longer extension (B), since you don't want to have a small group that black can pressure while expanding his bottom right area.]
+;B[kq];W[eq];B[dq];W[cj]LB[cn:A][io:B]MA[ch][ci]C[James: Was this extension too large? Should I have moved at one of the Xs?
+
+Jon:  This extension's fine, and I'd actually want to push all the way here (A) if the bottom left white group wasn't under pressure.  Because it is, you'll want to consider  reinforcing it with a jump to B soon.  It would be pretty annoying if black got there first and capped it from above, but you're threatening to build a large framework on the top left, so black can't afford to waste too much time on it.]
+;B[cm];W[dl];B[dn];W[ne];B[nq]LB[ic:B][jo:A]TR[gp][eq][fq][iq]
+C[Jon:  There's no need for black to be so passive in defending this area.  If he'd like to continue working on it, he can build more productively by leaning on white's marked group (A).  This will begin expanding into the bottom right part of the center while attacking.  I'm also looking at disrupting the top side at B, which I'd prefer to get first.  From black's perspective, it's not a huge deal if white reinforces the marked group, since black can just jump out himself.]
+;W[fc]LB[jd:A]TR[ne]C[Jon:  Defending here is reasonable, but I recommend trying to build this area in a different fashion to simplify the game a little.  You've got the marked stone, so I'd prefer to expand further down the side (A).  Besides covering more of the side, it also acts as a bit of a hedged play against an invasion by black.  If he wants to invade, he'll have to do it in one of the smaller sections, and not a larger, more open area (the current position).]
+;B[jo];W[ng];B[dh];W[ei];B[ce]LB[fg:A]TR[ei][cj][dl]C[Jon:  I don't like trying to live directly here.  Besides the difficulty of doing it, the left side isn't as big as the top, so black should be trying to get out into the center without getting too bogged down in the local stuff.  A keima (small knight's move, A) will maintain pressure on white's marked group, but also set himself up for pressing on the top side.]
+;W[cd]TR[ei][cj][dl]C[James: I knew I wasn't going to kill, but did I build enough points to compensate?
+
+Jon:  Yeah, definitely!  His decision to try and live directly in this area is also a big gain for you, since you can try to expand the top area while you're attacking him.  Just be careful with your control of the marked white group, as you don't want to have it get hit with a counterattack once black settles.]
+;B[de]LB[fg:A]C[Jon:  I still prefer the keima (A) here.];W[ee]
+;B[ef];W[fe];B[bi]LB[ff:A][fg:B]C[Jon:  Black can't afford to play defensively like this, given that it would be huge if white covered up the opening around A, so he needs to continue pushing out and fighting back (I'd suggest B).  It's not fun, but he has to do what he can to resist.]
+;W[ci]LB[fh:A]TR[ei][cj][dl]C[Jon:  I'm still worried about black being able to set up a counterattack on white's marked group, so I wouldn't worry about trying to block off the B-10 hole.  It's funky, but I like the kosumi at A instead.  It reinforces the group while indirectly closing off the opening above.]
+;B[ch];W[bj];B[bh]LB[fg:A]TR[mi]C[James: My opponent worried too much about single stones for a few moves, in my opinion.  If I were him, I would have played at the triangle. I feel that it builds his territory while threatening mine. Do you agree?
+
+Jon:  Absolutely - I don't agree with his decisionmaking in the top left (defend immediately instead of moving out) either.  The triangle would be a good point to get, though I'd kosumi at A first to make sure the left side group doesn't get completely shut in.]
+;W[ff];B[eg];W[be]LB[fg:A]C[Jon:  I'd like to cover at A instead - you don't mind if black is forced to waste time defending on the inside.  It'll just give you more time to expand into the center.]
+;B[bf];W[bd]C[James: I should not have given up sente here.
+
+Jon:  Agreed.];B[di];W[dj];B[ej];W[ek]LB[fi:A]TR[ei]C[Jon:  You really don't want to force black to strengthen, as it'll make it harder to keep your marked stone alive, along with the attack on black's group.  I recommend extending out with A instead.]
+;B[fj];W[fk];B[fi];W[cl]LB[gk:B][hk:A]C[Jon:  There's no need to worry about making eyes yet.  It's more important to get out into the center (A) and increase your ability to move around, since black is threatening the hane at B.]
+;B[bl];W[bk];B[bn];W[em];B[en];W[fm];B[go];W[hp];B[ho];W[gh]
+LB[jr:A]TR[gp][hp][eq][fq][iq]C[Jon:  This is a nice play to build up the top framework.  Be aware that the marked bottom group is in danger though, as black can try to kill it by pressing in with A and reducing the eye space.]
+;B[fh];W[gg];B[nh]LB[kh:A]C[Jon:  I don't really like this attachment, as it just forces white to strengthen and reduce the size of the opening to the top territory.  If black wants to reduce it, I would suggest poking gently at A.]
+;W[mh];B[ni];W[mi]C[Jon:  Following my previous comment, white is definitely happy with the result of this exchange.]
+;B[mj];W[lj];B[mg];W[mf];B[lg];W[li];B[og];W[nf];B[kf];W[hj]
+;B[jc]LB[lk:A]C[James: Could I have killed him more efficiently here?
+
+Jon:  Your control was pretty good, so there isn't much I would change.  The main thing to worry about in these situations is to be *very* careful with your control (micromanagement) - play tight, and don't allow the opponent to create any kind of complications.  As for black, I'd recommend getting the double hane (A) next.]
+;W[lc];B[kd];W[id];B[ic];W[hc];B[hd];W[ie];B[gd];W[gc];B[if]
+;W[he];B[jd];W[mk]C[Jon:  Nice!  This helps a lot in setting up reduction pressure on black's bottom right area.]
+;B[nj];W[ll]C[James: Was this a good move?
+
+Jon:  Yeah, I like it!  It defends while reaching farther into the bottom right, so you won't have much trouble reducing the area now.
+
+The next comment is at move 134.];B[je];W[jg];B[hg];W[ge];B[kh]
+;W[ih];B[hh];W[hi];B[ig];W[jh];B[jf];W[le];B[ki];W[ii];B[kj]
+;W[kk];B[jj];W[jk];B[gk];W[gl];B[hk];W[ik];B[il];W[hl];B[gj]
+;W[im];B[ij];W[gi];B[nl];W[ln]LB[jr:A]C[Jon:  This would be a good time to defend the bottom group, so I recommend playing at A instead.  You'll still be able to poke around the bottom right area, even if he tries to cover it up.]
+;B[mm]LB[lm:A]C[James: Should he have played at A instead?
+
+Jon:  Unless I'm missing something, it doesn't work, so his kosumi is okay.]
+;W[lm];B[mn];W[lo];B[lp]LB[mp:A]C[Jon:  This bump is pretty thin, as evidenced by how the game continues.  Playing it at A would be a bit more solid.
+
+The next comment is at move 157.];W[mo];B[no];W[mp];B[mq];W[np]
+;B[op];W[nk];B[ok];W[nn];B[nm];W[oo];B[on];W[no];B[pn];W[po]
+;B[qo];W[jr];B[kr];W[pc]LB[hr:A]C[Jon:  This is a good move, but black can still be annoying on your bottom group (e.g. black A).  I'd suggest adding another move at the same point to completely settle it.]
+;B[md];W[nd];B[ld];W[mc];B[km];W[kn];B[jn];W[jm]LB[af:B][sj:A]
+TR[kp]C[James: Would L4 have been more solid of a move?
+
+Jon:  No, I like your original move.  Besides reinforcing the bottom group, there's bigger plays available, such as A and B.]
+;B[ko];W[fg]C[chensicha has resigned the game.
+
+James: At this point he resigned. According to GNU I commanded a significant lead. Could he have at any point turned the game around?
+
+Jon:  Trying to kill white's bottom group would've helped, but once you got the huge top area, there wasn't much he could do.  There were some important missed opportunities in the opening, such as move 20, but the deciding factor was definitely how black handled the top left.
+
+Some brief notes:
+
+Moves 45-47, 51:  Once you've got your opponent under enough pressure, you often reach a point of diminishing returns if you try to block off every escape route or place where he can expand his eye space.  It's fine to work on something bigger and let him waste time taking those points if he wants or needs to.
+
+Move 61:  In most cases, it's a lot better to move out into the center than to try and defend directly.  You don't want to defend in this fashion unless it's necessary.
+
+Moves 89-131:  Clean, tight play is absolutely essential for these situations.  Try to keep it simple and avoid giving the opponent any chances to create complications.
+
+
+I really enjoyed working on this game, and hope you found my comments helpful!  If you have any questions or feedback, please feel free to contact me.]
+)
+(;B[gq];W[er];B[eq];W[fr];B[dr];W[cq];B[dq];W[fo];B[ep];W[hq]
+;B[go];W[hp];B[fn];W[ho];B[gn];W[mq]))
+(;W[pg]C[Jon:  This is a basic example of a continuation, to give you a rough idea of how it might play out.]
+;B[of];W[qc];B[qe];W[pc]LB[rf:A][og:B]TR[qf][pg]C[Jon:  White is able to settle without much hassle from the opponent.  In positions where black feels he needs to lock down the two marked white stones, he can do so by playing A or B.]
+))
