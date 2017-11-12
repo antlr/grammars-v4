@@ -223,6 +223,7 @@ ddl_clause
     | drop_xml_schema_collection
     | disable_trigger
     | enable_trigger
+    | lock_table
     | truncate_table
     | update_statistics
     ;
@@ -958,6 +959,10 @@ disable_trigger
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/enable-trigger-transact-sql
 enable_trigger
      : ENABLE TRIGGER ( ( COMMA? (schema_name=id DOT)? trigger_name=id )+ | ALL)         ON ( (schema_id=id DOT)? object_name=id|DATABASE|ALL SERVER)
+     ;
+
+lock_table
+     : LOCK TABLE table_name IN (SHARE | EXCLUSIVE) MODE (WAIT seconds=DECIMAL | NOWAIT)? ';'? 
      ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/truncate-table-transact-sql
@@ -3592,8 +3597,8 @@ simple_id
     | CONTROL
     | COOKIE
     | COUNT
-    | COUNTER
     | COUNT_BIG
+    | COUNTER
     | DATA_COMPRESSION
     | DELAY
     | DELETED
@@ -3602,6 +3607,7 @@ simple_id
     | DYNAMIC
     | ENCRYPTION
     | EVENTDATA
+    | EXCLUSIVE
     | EXPAND
     | FAST
     | FAST_FORWARD
@@ -3610,6 +3616,7 @@ simple_id
     | FIRST
     | FOLLOWING
     | FORCE
+    | FORCED
     | FORCESEEK
     | FORWARD_ONLY
     | FULLSCAN
@@ -3617,39 +3624,41 @@ simple_id
     | GROUPING
     | GROUPING_ID
     | HASH
-    | INIT
+    | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
     | IMPERSONATE
+    | INIT
+    | INPUT
     | INSENSITIVE
     | INSERTED
     | ISOLATION
     | KEEP
     | KEEPFIXED
     | KEY
-    | FORCED
     | KEYSET
-    | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
-    | INPUT
     | LAST
     | LEVEL
     | LOCAL
     | LOCATION
+    | LOCK
     | LOCK_ESCALATION
     | LOGIN
     | LOOP
-    | MASTER
     | MARK
+    | MASTER
     | MAX
+    | MAX_MEMORY
+    | MAX_ROLLOVER_FILES
     | MAXDOP
     | MAXRECURSION
-    | MAX_ROLLOVER_FILES
-    | MAX_MEMORY
     | MIN
+    | MODE
     | MODIFY
     | NAME
     | NEXT
     | NOCOUNT
     | NOEXPAND
     | NORECOMPUTE
+    | NOWAIT
     | NTILE
     | NUMBER
     | OFFSET
@@ -3673,8 +3682,8 @@ simple_id
     | RANGE
     | RANK
     | RAW
-    | READONLY
     | READ_ONLY
+    | READONLY
     | RECOMPILE
     | RELATIVE
     | REMOTE
@@ -3684,21 +3693,22 @@ simple_id
     | ROBUST
     | ROOT
     | ROW
+    | ROW_NUMBER
     | ROWCOUNT
     | ROWGUID
     | ROWS
-    | ROW_NUMBER
     | SAFETY
     | SAMPLE
-    | SID
-    | SIZE
     | SCHEMABINDING
     | SCROLL
     | SCROLL_LOCKS
     | SELF
     | SERIALIZABLE
     | SERVER
+    | SHARE
+    | SID
     | SIMPLE
+    | SIZE
     | SNAPSHOT
     | SOURCE
     | SPATIAL_WINDOW_MAX_CELLS
@@ -3720,11 +3730,12 @@ simple_id
     | UNCOMMITTED
     | UNKNOWN
     | USING
+    | VALUE
     | VAR
     | VARP
-    | VALUE
     | VIEW_METADATA
     | VIEWS
+    | WAIT
     | WORK
     | XML
     | XMLNAMESPACES
