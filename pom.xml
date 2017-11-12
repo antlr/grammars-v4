@@ -57,6 +57,7 @@
 			<module>emailaddress</module>
 			<module>erlang</module>
 			<module>fasta</module>
+			<module>fen</module>
 			<module>fol</module>
 			<module>fortran77</module>
 			<module>fusion-tables</module>
@@ -134,8 +135,10 @@
 			<module>scala</module>
 			<module>scss</module>
 			<module>sexpression</module>
+			<module>sgf</module>
 			<module>sharc</module>
             <module>smalltalk</module>
+            <module>smiles</module>
             <module>smtlibv2</module>
 			<module>snobol</module>
 			<module>sparql</module>
@@ -148,6 +151,7 @@
 			<module>swift-fin</module>
 			<module>telephone</module>
 			<module>tiny</module>
+			<module>tinybasic</module>
 			<module>tinyc</module>
 			<module>tnsnames</module>
 			<module>tnt</module>
@@ -155,6 +159,7 @@
 			<module>turtle</module>
 			<module>ucb-logo</module>
 			<module>unicode</module>
+			<module>upnp</module>
 			<module>url</module>
 			<module>useragent</module>
 			<module>vb6</module>
