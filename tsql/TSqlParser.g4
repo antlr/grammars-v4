@@ -224,6 +224,7 @@ ddl_clause
     | disable_trigger
     | enable_trigger
     | truncate_table
+    | update_statistics
     ;
 backup_statement
     : backup_database
@@ -1952,6 +1953,9 @@ create_statistics
     : CREATE STATISTICS id ON table_name_with_hint '(' column_name_list ')'
       (WITH (FULLSCAN | SAMPLE DECIMAL (PERCENT | ROWS) | STATS_STREAM)
             (',' NORECOMPUTE)? (',' INCREMENTAL EQUAL on_off)? )? ';'?
+    ;
+update_statistics
+    : UPDATE (INDEX|ALL)? STATISTICS full_table_name id?  (USING DECIMAL VALUES)?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174979.aspx
