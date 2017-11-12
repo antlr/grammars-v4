@@ -316,7 +316,7 @@ while_statement
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/print-transact-sql
 print_statement
-    : PRINT expression (',' LOCAL_ID)* ';'?
+    : PRINT (expression | DOUBLE_QUOTE_ID) (',' LOCAL_ID)* ';'?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/raiserror-transact-sql
