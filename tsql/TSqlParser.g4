@@ -2629,6 +2629,8 @@ transaction_statement
     | COMMIT (TRAN | TRANSACTION) ((id | LOCAL_ID) (WITH '(' DELAYED_DURABILITY EQUAL (OFF | ON) ')')?)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178628.aspx
     | COMMIT WORK? ';'?
+    | COMMIT id
+    | ROLLBACK id
     // https://msdn.microsoft.com/en-us/library/ms181299.aspx
     | ROLLBACK (TRAN | TRANSACTION) (id | LOCAL_ID)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms174973.aspx
