@@ -32,7 +32,8 @@ tsql_file
     ;
 
 batch
-    : sql_clauses go_statement*
+    : execute_body go_statement*
+    | execute_body? sql_clauses go_statement*
     ;
 
 sql_clauses
@@ -2479,8 +2480,12 @@ backup_service_master_key
 
 // https://msdn.microsoft.com/en-us/library/ms188332.aspx
 execute_statement
-    : EXECUTE (return_status=LOCAL_ID '=')? (func_proc_name | expression) (execute_statement_arg (',' execute_statement_arg)*)? ';'?
-    | EXECUTE '(' execute_var_string ('+' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? ';'?
+    : EXECUTE execute_body
+    ;
+
+execute_body
+    : (return_status=LOCAL_ID '=')? (func_proc_name | expression) (execute_statement_arg (',' execute_statement_arg)*)? ';'?
+    | '(' execute_var_string ('+' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? ';'?
     ;
 
 execute_statement_arg
@@ -2637,7 +2642,7 @@ use_statement
     : USE database=id ';'?
     ;
 setuser_statement
-    : SETUSER user=STRING
+    : SETUSER user=STRING?
     ;
 
 dbcc_clause
