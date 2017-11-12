@@ -2342,7 +2342,7 @@ cursor_statement
     // https://msdn.microsoft.com/en-us/library/ms175035(v=sql.120).aspx
     : CLOSE GLOBAL? cursor_name ';'?
     // https://msdn.microsoft.com/en-us/library/ms188782(v=sql.120).aspx
-    | DEALLOCATE GLOBAL? cursor_name ';'?
+    | DEALLOCATE GLOBAL? CURSOR? cursor_name ';'?
     // https://msdn.microsoft.com/en-us/library/ms180169(v=sql.120).aspx
     | declare_cursor
     // https://msdn.microsoft.com/en-us/library/ms180152(v=sql.120).aspx
