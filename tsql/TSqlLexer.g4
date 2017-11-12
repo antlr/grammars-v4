@@ -840,6 +840,7 @@ AND_ASSIGN:          '&=';
 XOR_ASSIGN:          '^=';
 OR_ASSIGN:           '|=';
 
+DOUBLE_BAR:          '||';
 DOT:                 '.';
 UNDERLINE:           '_';
 AT:                  '@';
