@@ -1754,7 +1754,7 @@ merge_not_matched
 // https://msdn.microsoft.com/en-us/library/ms189835.aspx
 delete_statement
     : with_expression?
-      DELETE (TOP '(' expression ')' PERCENT?)?
+      DELETE (TOP '(' expression ')' PERCENT? | TOP DECIMAL)?
       FROM? delete_statement_from
       insert_with_table_hints?
       output_clause?
@@ -3233,7 +3233,7 @@ insert_with_table_hints
 // READCOMMITTEDLOCK, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, TABLOCK, TABLOCKX
 // UPDLOCK, XLOCK)
 table_hint
-    : NOEXPAND? ( INDEX '(' index_value (',' index_value)* ')'
+    : NOEXPAND? ( INDEX '('? index_value (',' index_value)* ')'?
                 | INDEX '=' index_value
                 | FORCESEEK ('(' index_value '(' ID  (',' ID)* ')' ')')?
                 | SERIALIZABLE
