@@ -31,7 +31,6 @@ grammar Upnp;
  * Parser Rules
  */
  
-operation  : NUMBER '+' NUMBER ;
 searchCrit : searchExp | ASTERISK ;
 searchExp : relExp | searchExp WCHAR+ LOGOP WCHAR+ searchExp | '(' WCHAR* searchExp WCHAR* ')'  ;
 relExp : PROPERTY WCHAR+ BINOP WCHAR+ QUOTEDVAL | PROPERTY WCHAR+ EXISTSOP WCHAR+ BOOLVAL ;
@@ -50,7 +49,7 @@ RELOP : '=' | '!=' | '<' | '<=' | '>' | '>=' ;
 STRINGOP : 'contains' | 'doesnotcontain' | 'derivedfrom' ;
 EXISTSOP : 'exists' ;
 BOOLVAL : 'true' | 'false' ;
-QUOTEDVAL : DQUOTE STRING_LITERAL DQUOTE ;
+QUOTEDVAL : DQUOTE ESCAPEDQUOTE DQUOTE ;
 WCHAR : SPACE | HTAB ;
 PROPERTY	: 'res@resolution'
 				| 'res@duration'
@@ -78,7 +77,7 @@ PROPERTY	: 'res@resolution'
 				| 'upnp:longDescription'
 				| 'pv:capturedate'
 				| 'pv:custom' ;
-//	ESCAPEDQUOTE :   '\"' ;
+ESCAPEDQUOTE :   STRING_LITERAL SPACE* STRING_LITERAL;
 HTAB 		 :	 '\t' ;
 SPACE        :   ' '  ;      
 DQUOTE       :   '"'  ;    
