@@ -1,1 +1,1 @@
-(startRule (module \n (moduleOptions (moduleOption Option explicit) \n)) <EOF>)
+(startRule (module \r\n \r\n (moduleOptions (moduleOption Option explicit) \r\n)) <EOF>)
