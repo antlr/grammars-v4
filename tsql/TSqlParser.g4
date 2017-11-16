@@ -2692,6 +2692,7 @@ column_def_table_constraints
 
 column_def_table_constraint
     : column_definition
+    | materialized_column_definition
     | table_constraint
     ;
 
@@ -2702,6 +2703,9 @@ column_definition
        | IDENTITY ('(' seed=DECIMAL ',' increment=DECIMAL ')')? (NOT FOR REPLICATION)?)?
       ROWGUIDCOL?
       column_constraint*
+    ;
+materialized_column_definition
+    : id (COMPUTE | AS) expression (MATERIALIZED | NOT MATERIALIZED)?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms186712.aspx
@@ -3777,6 +3781,7 @@ simple_id
     | MANUAL
     | MARK
     | MASTER
+    | MATERIALIZED
     | MAX
     | MAX_CPU_PERCENT
     | MAX_DOP

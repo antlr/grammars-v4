@@ -602,6 +602,7 @@ LOOP:                                  'LOOP';
 LOW:                                   'LOW';
 MANUAL:                                'MANUAL';
 MARK:                                  'MARK';
+MATERIALIZED:                          'MATERIALIZED';
 MAX:                                   'MAX';
 MAX_CPU_PERCENT:                       'MAX_CPU_PERCENT';
 MAX_DOP:                               'MAX_DOP';
