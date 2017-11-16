@@ -1969,7 +1969,7 @@ create_table
     ;
 
 table_options
-    : WITH '(' index_option (',' index_option)* ')'
+    : WITH '('? index_option (',' index_option)* ')'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
