@@ -1,3 +1,4 @@
+
 ' binary string comparison
 Option Compare Binary
 
