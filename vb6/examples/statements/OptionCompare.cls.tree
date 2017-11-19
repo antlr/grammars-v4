@@ -1,1 +1,1 @@
-(startRule (module \n (moduleOptions (moduleOption Option Compare   Binary) \n \n \n (moduleOption Option Compare   Text)  \n)) <EOF>)
+(startRule (module \r\n \r\n (moduleOptions (moduleOption Option Compare   Binary) \r\n \r\n \r\n (moduleOption Option Compare   Text)  \r\n)) <EOF>)

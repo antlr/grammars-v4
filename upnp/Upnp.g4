@@ -31,10 +31,11 @@ grammar Upnp;
  * Parser Rules
  */
  
-operation  : NUMBER '+' NUMBER ;
 searchCrit : searchExp | ASTERISK ;
 searchExp : relExp | searchExp WCHAR+ LOGOP WCHAR+ searchExp | '(' WCHAR* searchExp WCHAR* ')'  ;
-relExp : PROPERTY WCHAR+ BINOP WCHAR+ QUOTEDVAL | PROPERTY WCHAR+ EXISTSOP WCHAR+ BOOLVAL ;
+relExp : PROPERTY WCHAR+ BINOP WCHAR+ quotedVal | PROPERTY WCHAR+ EXISTSOP WCHAR+ BOOLVAL ;
+quotedVal : DQUOTE escapedQuote DQUOTE ;
+escapedQuote :   STRING_LITERAL* WCHAR* STRING_LITERAL*;
  
 /*
  * Lexer Rules
@@ -50,7 +51,6 @@ RELOP : '=' | '!=' | '<' | '<=' | '>' | '>=' ;
 STRINGOP : 'contains' | 'doesnotcontain' | 'derivedfrom' ;
 EXISTSOP : 'exists' ;
 BOOLVAL : 'true' | 'false' ;
-QUOTEDVAL : DQUOTE STRING_LITERAL DQUOTE ;
 WCHAR : SPACE | HTAB ;
 PROPERTY	: 'res@resolution'
 				| 'res@duration'
@@ -78,9 +78,8 @@ PROPERTY	: 'res@resolution'
 				| 'upnp:longDescription'
 				| 'pv:capturedate'
 				| 'pv:custom' ;
-//	ESCAPEDQUOTE :   '\"' ;
 HTAB 		 :	 '\t' ;
 SPACE        :   ' '  ;      
-DQUOTE       :   '"'  ;    
+DQUOTE       :   '"' ;    
 ASTERISK     :   '*'  ;
-STRING_LITERAL : [a-zA-Z.]+ ;  
+STRING_LITERAL : [a-zA-Z.] | '\\"';  

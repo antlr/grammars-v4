@@ -1,4 +1,3 @@
-
 AppActivate "Microsoft Word"
 
 Shell "C:\WINDOWS\NOTEPAD.EXE", 1
