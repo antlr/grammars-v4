@@ -183,7 +183,7 @@ componentType
    ;
 
 recordType
-   : RECORD fieldList END
+   : RECORD fieldList? END
    ;
 
 fieldList
