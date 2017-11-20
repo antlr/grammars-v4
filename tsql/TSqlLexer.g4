@@ -507,7 +507,6 @@ DESX:                                  'DESX';
 DHCP:                                  'DHCP';
 DIALOG:                                'DIALOG';
 DIRECTORY_NAME:                        'DIRECTORY_NAME';
-DISABLE:                               'DISABLE';
 DISABLE_BROKER:                        'DISABLE_BROKER';
 DISABLED:                              'DISABLED'; 
 DISK_DRIVE:                            [A-Z][:];
