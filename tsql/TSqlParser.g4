@@ -2905,11 +2905,20 @@ order_by_clause
       (OFFSET expression (ROW | ROWS) (FETCH (FIRST | NEXT) expression (ROW | ROWS) ONLY)?)?
     ;
 
-// https://msdn.microsoft.com/en-us/library/ms173812.aspx
+// https://docs.microsoft.com/en-us/sql/t-sql/queries/select-for-clause-transact-sql
 for_clause
     : FOR BROWSE
-    | FOR XML xml_common_directives?
-    | FOR XML (AUTO | RAW | PATH | EXPLICIT) ','? ('(' STRING ')')? xml_common_directives*
+    | FOR XML (RAW ('(' STRING ')')? | AUTO) xml_common_directives*
+      (COMMA (XMLDATA | XMLSCHEMA ('(' STRING ')')?))?
+      (COMMA ELEMENTS (XSINIL | ABSENT))?
+    | FOR XML EXPLICIT xml_common_directives*
+      (COMMA XMLDATA)?
+    | FOR XML PATH ('(' STRING ')')? xml_common_directives*
+      (COMMA ELEMENTS (XSINIL | ABSENT))?
+    | FOR JSON (AUTO | PATH)
+      (COMMA ROOT ('(' STRING ')')?)?
+      (COMMA INCLUDE_NULL_VALUES)?
+      (COMMA WITHOUT_ARRAY_WRAPPER)?
     ;
 
 xml_common_directives
