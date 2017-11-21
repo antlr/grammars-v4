@@ -853,7 +853,7 @@ primary_key_clause
 // Anonymous PL/SQL code block
 
 anonymous_block
-    : BEGIN seq_of_statements END SEMICOLON
+    : (DECLARE seq_of_declare_specs)? BEGIN seq_of_statements END SEMICOLON
     ;
 
 // Common DDL Clauses
