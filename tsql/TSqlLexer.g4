@@ -26,6 +26,7 @@ THE SOFTWARE.
 lexer grammar TSqlLexer;
 
 // Basic keywords (from https://msdn.microsoft.com/en-us/library/ms189822.aspx)
+ABSENT:                                'ABSENT';
 ADD:                                   'ADD';
 AES:                                   'AES';
 ALL:                                   'ALL';
@@ -507,11 +508,12 @@ DHCP:                                  'DHCP';
 DIALOG:                                'DIALOG';
 DIRECTORY_NAME:                        'DIRECTORY_NAME';
 DISABLE:                               'DISABLE';
-DISABLED:                              'DISABLED'; 
+DISABLED:                              'DISABLED';
 DISABLE_BROKER:                        'DISABLE_BROKER';
 DISK_DRIVE:                            [A-Z][:];
 DOCUMENT:                              'DOCUMENT';
 DYNAMIC:                               'DYNAMIC';
+ELEMENTS:                              'ELEMENTS';
 EMERGENCY:                             'EMERGENCY';
 EMPTY:                                 'EMPTY';
 ENABLE:                                'ENABLE';
@@ -559,12 +561,13 @@ HASH:                                  'HASH';
 HEALTH_CHECK_TIMEOUT:                  'HEALTH_CHECK_TIMEOUT';
 HIGH:                                  'HIGH';
 HONOR_BROKER_PRIORITY:                 'HONOR_BROKER_PRIORITY';
-HOURS:                                 'HOURS'; 
+HOURS:                                 'HOURS';
 IDENTITY_VALUE:                        'IDENTITY_VALUE';
 IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX: 'IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX';
 IMMEDIATE:                             'IMMEDIATE';
 IMPERSONATE:                           'IMPERSONATE';
 IMPORTANCE:                            'IMPORTANCE';
+INCLUDE_NULL_VALUES:                   'INCLUDE_NULL_VALUES';
 INCREMENTAL:                           'INCREMENTAL';
 INITIATOR:                             'INITIATOR';
 INPUT:                                 'INPUT';
@@ -573,6 +576,7 @@ INSERTED:                              'INSERTED';
 INT:                                   'INT';
 IP:                                    'IP';
 ISOLATION:                             'ISOLATION';
+JSON:                                  'JSON';
 KB:                                    'KB';
 KEEP:                                  'KEEP';
 KEEPFIXED:                             'KEEPFIXED';
@@ -708,7 +712,7 @@ REQUEST_MEMORY_GRANT_TIMEOUT_SEC:      'REQUEST_MEMORY_GRANT_TIMEOUT_SEC';
 RESERVE_DISK_SPACE:                    'RESERVE_DISK_SPACE';
 RESOURCE:                              'RESOURCE';
 RESOURCE_MANAGER_LOCATION:             'RESOURCE_MANAGER_LOCATION';
-RESTRICTED_USER:                       'RESTRICTED_USER'; 
+RESTRICTED_USER:                       'RESTRICTED_USER';
 RETENTION:                             'RETENTION';
 ROBUST:                                'ROBUST';
 ROOT:                                  'ROOT';
@@ -739,7 +743,7 @@ SETERROR:                              'SETERROR';
 SHOWPLAN:                              'SHOWPLAN';
 SIGNATURE:                             'SIGNATURE';
 SIMPLE:                                'SIMPLE';
-SINGLE_USER:                           'SINGLE_USER'; 
+SINGLE_USER:                           'SINGLE_USER';
 SIZE:                                  'SIZE';
 SMALLINT:                              'SMALLINT';
 SNAPSHOT:                              'SNAPSHOT';
@@ -792,10 +796,14 @@ VARP:                                  'VARP';
 VIEWS:                                 'VIEWS';
 VIEW_METADATA:                         'VIEW_METADATA';
 WELL_FORMED_XML:                       'WELL_FORMED_XML';
+WITHOUT_ARRAY_WRAPPER:                 'WITHOUT_ARRAY_WRAPPER';
 WORK:                                  'WORK';
 WORKLOAD:                              'WORKLOAD';
 XML:                                   'XML';
+XMLDATA:                               'XMLDATA';
 XMLNAMESPACES:                         'XMLNAMESPACES';
+XMLSCHEMA:                             'XMLSCHEMA';
+XSINIL:                                'XSINIL';
 
 DOLLAR_ACTION:                         '$ACTION';
 
@@ -860,17 +868,17 @@ fragment HEX_DIGIT:    [0-9A-F];
 fragment DEC_DIGIT:    [0-9];
 
 fragment FullWidthLetter
-    : '\u00c0'..'\u00d6' 
-    | '\u00d8'..'\u00f6' 
-    | '\u00f8'..'\u00ff' 
-    | '\u0100'..'\u1fff' 
-    | '\u2c00'..'\u2fff' 
-    | '\u3040'..'\u318f' 
-    | '\u3300'..'\u337f' 
-    | '\u3400'..'\u3fff' 
-    | '\u4e00'..'\u9fff' 
-    | '\ua000'..'\ud7ff' 
-    | '\uf900'..'\ufaff' 
+    : '\u00c0'..'\u00d6'
+    | '\u00d8'..'\u00f6'
+    | '\u00f8'..'\u00ff'
+    | '\u0100'..'\u1fff'
+    | '\u2c00'..'\u2fff'
+    | '\u3040'..'\u318f'
+    | '\u3300'..'\u337f'
+    | '\u3400'..'\u3fff'
+    | '\u4e00'..'\u9fff'
+    | '\ua000'..'\ud7ff'
+    | '\uf900'..'\ufaff'
     | '\uff00'..'\ufff0'
     // | '\u10000'..'\u1F9FF'  //not support four bytes chars
     // | '\u20000'..'\u2FA1F'
