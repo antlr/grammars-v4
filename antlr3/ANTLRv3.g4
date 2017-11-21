@@ -128,7 +128,7 @@ elementNoOptionSpec
    ;
 
 atom
-   : range (('^' | '!'))
+   : range
    | terminal_
    | notSet (('^' | '!'))
    | RULE_REF (ARG_ACTION)? (('^' | '!'))?
@@ -372,11 +372,6 @@ SYNPRED
    ;
 
 
-RANGE
-   : 'RANGE'
-   ;
-
-
 CHAR_RANGE
    : 'CHAR_RANGE'
    ;
@@ -507,7 +502,7 @@ BANG
    ;
 
 
-RANGE2
+RANGE
    : '..'
    ;
 
