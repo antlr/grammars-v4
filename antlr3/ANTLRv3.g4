@@ -71,7 +71,7 @@ optionValue
    ;
 
 rule_
-   : DOC_COMMENT? (('protected' | 'public' | 'private' | 'fragment'))? id '!'? (ARG_ACTION)? ('returns' ARG_ACTION)? throwsSpec? optionsSpec? ruleScopeSpec? ruleAction* ':' altList ';' exceptionGroup?
+   : DOC_COMMENT? (('protected' | 'public' | 'private' | 'fragment'))? id '!'? (ARG_ACTION)? ('returns' ARG_ACTION)? throwsSpec? optionsSpec? ruleScopeSpec? ruleAction* ':' altList? ';' exceptionGroup?
    ;
 
 ruleAction
@@ -89,7 +89,7 @@ ruleScopeSpec
    ;
 
 block
-   : '(' ((optionsSpec)? ':')? alternative rewrite ('|' alternative rewrite)* ')'
+   : '(' ((optionsSpec)? ':')? alternative rewrite? ('|' alternative rewrite?)* ')'
    ;
 
 altList
@@ -118,9 +118,9 @@ element
    ;
 
 elementNoOptionSpec
-   : id ('=' | '+=') atom (ebnfSuffix)
-   | id ('=' | '+=') block (ebnfSuffix)
-   | atom (ebnfSuffix)
+   : id ('=' | '+=') atom (ebnfSuffix?)
+   | id ('=' | '+=') block (ebnfSuffix?)
+   | atom (ebnfSuffix?)
    | ebnf
    | ACTION
    | SEMPRED ('=>')
@@ -143,7 +143,7 @@ treeSpec
    ;
 
 ebnf
-   : block ('?' | '*' | '+' | '=>')
+   : block ('?' | '*' | '+' | '=>')?
    ;
 
 range
@@ -151,7 +151,7 @@ range
    ;
 
 terminal_
-   : (CHAR_LITERAL | TOKEN_REF (ARG_ACTION) | STRING_LITERAL | '.') ('^' | '!')?
+   : (CHAR_LITERAL | TOKEN_REF (ARG_ACTION?) | STRING_LITERAL | '.') ('^' | '!')?
    ;
 
 notTerminal
@@ -306,15 +306,6 @@ fragment ACTION_ESC
    : '\\\'' | '\\' '"' | '\\' ~ ('\'' | '"')
    ;
 
-
-TOKEN_REF
-   : 'A' .. 'Z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
-   ;
-
-
-RULE_REF
-   : 'a' .. 'z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
-   ;
 
 
 OPTIONS
@@ -476,7 +467,6 @@ SCOPE
    : 'scope'
    ;
 
-
 SEMPRED
    : 'SEMPRED'
    ;
@@ -540,3 +530,10 @@ WS
    : (' ' | '\t' | '\r'? '\n') + -> skip
    ;
 
+TOKEN_REF
+   : 'A' .. 'Z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
+   ;
+
+RULE_REF
+   : 'a' .. 'z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
+   ;
