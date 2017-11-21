@@ -89,7 +89,7 @@ ruleScopeSpec
    ;
 
 block
-   : '(' ((optionsSpec)? ':')? alternative rewrite? ('|' (alternative rewrite?)?)* ')'
+   : '(' ((optionsSpec)? ':')? alternative? rewrite? ('|' (alternative rewrite?)?)* ')'
    ;
 
 altList
