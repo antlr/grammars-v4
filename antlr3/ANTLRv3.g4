@@ -130,7 +130,7 @@ elementNoOptionSpec
 atom
    : range
    | terminal_
-   | notSet (('^' | '!'))
+   | notSet
    | RULE_REF (ARG_ACTION)? (('^' | '!'))?
    ;
 
