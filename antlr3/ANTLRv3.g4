@@ -131,7 +131,7 @@ atom
    : range
    | terminal_
    | notSet
-   | RULE_REF (ARG_ACTION)? (('^' | '!'))?
+   | RULE_REF (ARG_ACTION)?
    ;
 
 notSet
