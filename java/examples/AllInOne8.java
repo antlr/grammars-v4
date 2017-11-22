@@ -76,3 +76,11 @@ public interface RouterFunction<T extends ServerResponse> {
         return new RouterFunctions.FilteredRouterFunction<>(this, filterFunction);
     }
 }
+
+// Unicode
+class Unicode {
+    public static void main(String[] args) {
+        System.out.println("A = \uuu0041");
+    }
+}
+
