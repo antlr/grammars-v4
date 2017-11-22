@@ -679,8 +679,8 @@ create_table
         | INITRANS inittrans=UNSIGNED_INTEGER
         )*
         (STORAGE '('
-          (INITIAL initial=size_clause
-          | NEXT next=size_clause
+          (INITIAL initial_size=size_clause
+          | NEXT next_size=size_clause
           | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
           | PCTINCREASE pctincrease=UNSIGNED_INTEGER
           | FREELISTS freelists=UNSIGNED_INTEGER
@@ -747,8 +747,8 @@ table_range_partition_by_clause
                  | INITRANS inittrans=UNSIGNED_INTEGER
                  )*
                  (STORAGE '('
-                   (INITIAL initial=size_clause
-                   | NEXT next=size_clause
+                   (INITIAL initial_size=size_clause
+                   | NEXT next_size=size_clause
                    | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
                    | PCTINCREASE pctincrease=UNSIGNED_INTEGER
                    | FREELISTS freelists=UNSIGNED_INTEGER
@@ -1048,7 +1048,7 @@ loop_statement
 // Loop Specific Clause
 
 cursor_loop_param
-    : index_name IN REVERSE? lower_bound range='..' upper_bound
+    : index_name IN REVERSE? lower_bound range_separator='..' upper_bound
     | record_name IN (cursor_name ('(' expressions? ')')? | '(' select_statement ')')
     ;
 
