@@ -337,7 +337,7 @@ column_def_table_constraint
    ;
 
 column_definition
-    : (TIMESTAMP | DATETIME) (timestamp_datetime_column_constraint)*    #timestampColDef
+    : (TIMESTAMP | DATETIME) (timestamp_column_constraint)*    #timestampColDef
    | data_type separate_column_constraint*                              #datatypeColDef
    ;
 
