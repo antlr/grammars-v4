@@ -343,7 +343,16 @@ column_definition
 
 timestamp_column_constraint
     : separate_column_constraint
-   | DEFAULT CURRENT_TIMESTAMP
+   | timestamp_auto_init
+   | timestamp_auto_update
+   ;
+
+timestamp_auto_init
+    : DEFAULT current_datetime_function_name ('(' decimal_literal ')')?
+   ;
+
+timestamp_auto_update
+    : ON UPDATE current_datetime_function_name ('(' decimal_literal ')')?
    ;
 
 separate_column_constraint
@@ -2043,11 +2052,15 @@ aggregate_windowed_function
 
 scalar_function_name
     : function_name_base
-   | ASCII | CURDATE | CURRENT_DATE | CURRENT_TIME 
-   | CURRENT_TIMESTAMP | CURTIME | DATE_ADD | DATE_SUB 
-   | IF | LOCALTIME | LOCALTIMESTAMP | MID | NOW | REPLACE 
-   | SUBSTR | SUBSTRING | SYSDATE | TRIM 
+   | current_datetime_function_name
+   | ASCII | CURDATE | CURRENT_DATE | CURRENT_TIME
+   | CURTIME | DATE_ADD | DATE_SUB| IF | MID | REPLACE
+   | SUBSTR | SUBSTRING | SYSDATE | TRIM
    | UTC_DATE | UTC_TIME | UTC_TIMESTAMP
+   ;
+
+current_datetime_function_name
+    : NOW | CURRENT_TIMESTAMP | LOCALTIME | LOCALTIMESTAMP
    ;
 
 function_args
