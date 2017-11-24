@@ -2167,7 +2167,7 @@ index_name
     ;
 
 cursor_name
-    : identifier
+    : general_element
     | bind_variable
     ;
 
