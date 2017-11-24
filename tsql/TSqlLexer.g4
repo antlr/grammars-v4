@@ -816,7 +816,8 @@ XSINIL:                                'XSINIL';
 DOLLAR_ACTION:                         '$ACTION';
 
 SPACE:              [ \t\r\n]+    -> skip;
-COMMENT:            '/*' (COMMENT|.)*? '*/' -> channel(HIDDEN);
+// https://docs.microsoft.com/en-us/sql/t-sql/language-elements/slash-star-comment-transact-sql
+COMMENT:            '/*' (COMMENT | .)*? '*/' -> channel(HIDDEN);
 LINE_COMMENT:       '--' ~[\r\n]* -> channel(HIDDEN);
 
 // TODO: ID can be not only Latin.
