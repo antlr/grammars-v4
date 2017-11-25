@@ -1885,7 +1885,7 @@ data_type
    | (DECIMAL | NUMERIC) 
      length_two_optional_dimension? UNSIGNED? ZEROFILL?        #dimensionDatatype
    | (DATE | YEAR | TINYBLOB | BLOB | MEDIUMBLOB | LONGBLOB)      #simpleDatatype
-   | (BIT | TIME | TIMESTAMP | DATETIME | BINARY | VARBINARY) 
+   | (BIT | TIME | TIMESTAMP | DATETIME | YEAR | BINARY | VARBINARY) 
      length_one_dimension?                               #dimensionDatatype
    | (ENUM | SET) 
      '(' STRING_LITERAL (',' STRING_LITERAL)* ')' BINARY? 
