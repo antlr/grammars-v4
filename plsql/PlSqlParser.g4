@@ -663,7 +663,7 @@ container_clause
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        LEFT_PAREN (','? datatype_null_enable)+
+        ( '(' (','? datatype_null_enable)+
         (',' CONSTRAINT constraint_name
           ( primary_key_clause
           | foreign_key_clause
@@ -671,7 +671,7 @@ create_table
           | check_constraint
           )
         )*
-        RIGHT_PAREN
+        ')' )?
         (ON COMMIT (DELETE | PRESERVE) ROWS)?
         (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
         (PCTFREE pctfree=UNSIGNED_INTEGER

@@ -707,6 +707,7 @@ SERIALIZABLE:                        'SERIALIZABLE';
 
 // Spatial data types
 
+GEOMETRY:                            'GEOMETRY';
 GEOMETRYCOLLECTION:                  'GEOMETRYCOLLECTION';
 LINESTRING:                          'LINESTRING';
 MULTILINESTRING:                     'MULTILINESTRING';
