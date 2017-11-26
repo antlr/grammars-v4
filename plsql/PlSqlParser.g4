@@ -86,7 +86,7 @@ alter_function
 create_function_body
     : CREATE (OR REPLACE)? FUNCTION function_name ('(' (','? parameter)+ ')')?
       RETURN type_spec (invoker_rights_clause | parallel_enable_clause | result_cache_clause | DETERMINISTIC)*
-      ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
+      ((PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
 
 // Creation Function - Specific Clauses
@@ -126,7 +126,7 @@ create_package
     ;
 
 create_package_body
-    : CREATE (OR REPLACE)? PACKAGE BODY (schema_object_name '.')? package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?) ';'
+    : CREATE (OR REPLACE)? PACKAGE BODY (schema_object_name '.')? package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements)? END package_name? ';'
     ;
 
 // Create Package Specific Clauses
@@ -176,18 +176,18 @@ alter_procedure
 function_body
     : FUNCTION identifier ('(' parameter (',' parameter)* ')')?
       RETURN type_spec (invoker_rights_clause | parallel_enable_clause | result_cache_clause | DETERMINISTIC)*
-      ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
+      ((PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
 
 procedure_body
     : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? (IS | AS)
-      (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
+      (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL) ';'
     ;
 
 create_procedure_body
     : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? 
       invoker_rights_clause? (IS | AS)
-      (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
+      (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL) ';'
     ;
 
 // Trigger DDLs
@@ -244,7 +244,7 @@ routine_clause
     ;
 
 compound_trigger_block
-    : COMPOUND TRIGGER declare_spec* timing_point_section+ END trigger_name
+    : COMPOUND TRIGGER seq_of_declare_specs? timing_point_section+ END trigger_name
     ;
 
 timing_point_section
@@ -407,18 +407,18 @@ subprog_decl_in_type
 
 proc_decl_in_type
     : PROCEDURE procedure_name '(' type_elements_parameter (',' type_elements_parameter)* ')'
-      (IS | AS) (call_spec | DECLARE? declare_spec* body ';')
+      (IS | AS) (call_spec | DECLARE? seq_of_declare_specs? body ';')
     ;
 
 func_decl_in_type
     : FUNCTION function_name ('(' type_elements_parameter (',' type_elements_parameter)* ')')?
-      RETURN type_spec (IS | AS) (call_spec | DECLARE? declare_spec* body ';')
+      RETURN type_spec (IS | AS) (call_spec | DECLARE? seq_of_declare_specs? body ';')
     ;
 
 constructor_declaration
     : FINAL? INSTANTIABLE? CONSTRUCTOR FUNCTION type_spec
       ('(' (SELF IN OUT type_spec ',') type_elements_parameter (',' type_elements_parameter)*  ')')?
-      RETURN SELF AS RESULT (IS | AS) (call_spec | DECLARE? declare_spec* body ';')
+      RETURN SELF AS RESULT (IS | AS) (call_spec | DECLARE? seq_of_declare_specs? body ';')
     ;
 
 // Common Type Clauses
@@ -663,7 +663,7 @@ container_clause
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        LEFT_PAREN (','? datatype_null_enable)+
+        ( '(' (','? datatype_null_enable)+
         (',' CONSTRAINT constraint_name
           ( primary_key_clause
           | foreign_key_clause
@@ -671,7 +671,7 @@ create_table
           | check_constraint
           )
         )*
-        RIGHT_PAREN
+        ')' )?
         (ON COMMIT (DELETE | PRESERVE) ROWS)?
         (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
         (PCTFREE pctfree=UNSIGNED_INTEGER
@@ -853,7 +853,7 @@ primary_key_clause
 // Anonymous PL/SQL code block
 
 anonymous_block
-    : BEGIN seq_of_statements END SEMICOLON
+    : (DECLARE seq_of_declare_specs)? BEGIN seq_of_statements END SEMICOLON
     ;
 
 // Common DDL Clauses
@@ -897,6 +897,10 @@ default_value_part
     ;
 
 // Elements Declarations
+
+seq_of_declare_specs
+    : declare_spec+
+    ;
 
 declare_spec
     : variable_declaration
@@ -2163,7 +2167,7 @@ index_name
     ;
 
 cursor_name
-    : identifier
+    : general_element
     | bind_variable
     ;
 
