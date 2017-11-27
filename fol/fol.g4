@@ -10,7 +10,7 @@ grammar fol;
  *------------------------------------------------------------------*/
 
  condition
-   :formula (ENDLINE formula)* EOF
+   :formula (ENDLINE formula)* ENDLINE* EOF
    ;
  formula
    : formula bin_connective formula 
