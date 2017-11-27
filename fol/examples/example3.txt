@@ -1,2 +1,4 @@
-Exists ?a B | C
+_isHuman(#Sokrates)
+Forall(?x) _isHuman(?x)->_isMortal(?x)
+_isMortal(#Sokrates)
 
