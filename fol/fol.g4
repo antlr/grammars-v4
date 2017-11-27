@@ -91,5 +91,5 @@ ENDLINE
    :('\r'|'\n')+
    ;
 WHITESPACE
-   :(' '|'\t')+
+   :(' '|'\t')+->skip
    ;
