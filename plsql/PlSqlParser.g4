@@ -1042,7 +1042,7 @@ else_part
     ;
 
 loop_statement
-    : label_name? (WHILE condition | FOR cursor_loop_param)? LOOP seq_of_statements END LOOP label_name?
+    : label_declaration? (WHILE condition | FOR cursor_loop_param)? LOOP seq_of_statements END LOOP label_name?
     ;
 
 // Loop Specific Clause
