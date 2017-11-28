@@ -1959,8 +1959,9 @@ create_statistics
       (WITH (FULLSCAN | SAMPLE DECIMAL (PERCENT | ROWS) | STATS_STREAM)
             (',' NORECOMPUTE)? (',' INCREMENTAL EQUAL on_off)? )? ';'?
     ;
+
 update_statistics
-    : UPDATE (INDEX|ALL)? STATISTICS full_table_name id?  (USING DECIMAL VALUES)?
+    : UPDATE (INDEX | ALL)? STATISTICS full_table_name id?  (USING DECIMAL VALUES)?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174979.aspx
@@ -1969,7 +1970,7 @@ create_table
     ;
 
 table_options
-    : WITH '('? index_option (',' index_option)* ')'?
+    : WITH ('(' index_option (',' index_option)* ')' | index_option (',' index_option)*)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
@@ -2654,6 +2655,7 @@ go_statement
 use_statement
     : USE database=id ';'?
     ;
+
 setuser_statement
     : SETUSER user=STRING?
     ;
@@ -2704,6 +2706,7 @@ column_definition
       ROWGUIDCOL?
       column_constraint*
     ;
+
 materialized_column_definition
     : id (COMPUTE | AS) expression (MATERIALIZED | NOT MATERIALIZED)?
     ;
@@ -3237,7 +3240,7 @@ insert_with_table_hints
 // READCOMMITTEDLOCK, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, TABLOCK, TABLOCKX
 // UPDLOCK, XLOCK)
 table_hint
-    : NOEXPAND? ( INDEX '('? index_value (',' index_value)* ')'?
+    : NOEXPAND? ( INDEX ('(' index_value (',' index_value)* ')' | index_value (',' index_value)*)
                 | INDEX '=' index_value
                 | FORCESEEK ('(' index_value '(' ID  (',' ID)* ')' ')')?
                 | SERIALIZABLE
