@@ -665,7 +665,7 @@ container_clause
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
         ( '(' (','? datatype_null_enable)+
-        (',' CONSTRAINT create_table_constraint_name=constraint_name
+        (',' CONSTRAINT constraint_name
           ( primary_key_clause
           | foreign_key_clause
           | unique_key_clause
@@ -807,7 +807,7 @@ alter_table
     ;
 
 add_constraint
-    : ADD (CONSTRAINT add_constraint_name=constraint_name)?
+    : ADD (CONSTRAINT constraint_name)?
      ( primary_key_clause
      | foreign_key_clause
      | unique_key_clause
@@ -836,7 +836,7 @@ foreign_key_clause
     ;
 
 references_clause
-    : REFERENCES table_referenced=tableview_name paren_column_list
+    : REFERENCES tableview_name paren_column_list
     ;
 
 on_delete_clause
