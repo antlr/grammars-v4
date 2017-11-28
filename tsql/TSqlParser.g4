@@ -323,7 +323,7 @@ print_statement
 raiseerror_statement
     : RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' severity=constant_LOCAL_ID ','
     state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' (WITH (LOG | SETERROR))? ';'?
-    | RAISERROR DECIMAL (STRING | LOCAL_ID | DOUBLE_QUOTE_ID)? (',' (DECIMAL | STRING | LOCAL_ID))*
+    | RAISERROR DECIMAL formatstring=(STRING | LOCAL_ID | DOUBLE_QUOTE_ID) (',' argument=(DECIMAL | STRING | LOCAL_ID))*
     ;
 
 empty_statement
