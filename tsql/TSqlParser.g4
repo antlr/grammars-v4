@@ -2808,7 +2808,7 @@ expression
     | bracket_expression
     | unary_operator_expression
     | expression op=('*' | '/' | '%') expression
-    | expression op=('+' | '-' | '&' | '^' | '|' | DOUBLE_BAR) expression
+    | expression op=('+' | '-' | '&' | '^' | '|' | '||') expression
     | expression comparison_operator expression
     | expression assignment_operator expression
     | over_clause
