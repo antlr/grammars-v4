@@ -665,7 +665,7 @@ container_clause
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
         ( '(' (','? datatype_null_enable)+
-        (',' CONSTRAINT constraint_name
+        (',' (CONSTRAINT constraint_name)?
           ( primary_key_clause
           | foreign_key_clause
           | unique_key_clause
@@ -2166,7 +2166,7 @@ variable_name
     ;
 
 index_name
-    : identifier
+    : identifier ('.' id_expression)?
     ;
 
 cursor_name
