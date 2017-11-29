@@ -856,7 +856,7 @@ primary_key_clause
 // Anonymous PL/SQL code block
 
 anonymous_block
-    : (DECLARE seq_of_declare_specs)? BEGIN seq_of_statements END SEMICOLON
+    : (DECLARE seq_of_declare_specs)? BEGIN seq_of_statements (EXCEPTION exception_handler+)? END SEMICOLON
     ;
 
 // Common DDL Clauses
@@ -1045,7 +1045,7 @@ else_part
     ;
 
 loop_statement
-    : label_name? (WHILE condition | FOR cursor_loop_param)? LOOP seq_of_statements END LOOP label_name?
+    : label_declaration? (WHILE condition | FOR cursor_loop_param)? LOOP seq_of_statements END LOOP label_name?
     ;
 
 // Loop Specific Clause
