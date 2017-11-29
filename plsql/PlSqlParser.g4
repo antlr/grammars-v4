@@ -26,7 +26,8 @@ sql_script
     ;
 
 unit_statement
-    : alter_function
+    : transaction_control_statements 
+    | alter_function
     | alter_package
     | alter_procedure
     | alter_sequence
@@ -86,7 +87,7 @@ alter_function
 create_function_body
     : CREATE (OR REPLACE)? FUNCTION function_name ('(' (','? parameter)+ ')')?
       RETURN type_spec (invoker_rights_clause | parallel_enable_clause | result_cache_clause | DETERMINISTIC)*
-      ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
+      ((PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
 
 // Creation Function - Specific Clauses
@@ -126,7 +127,7 @@ create_package
     ;
 
 create_package_body
-    : CREATE (OR REPLACE)? PACKAGE BODY (schema_object_name '.')? package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements | END package_name?) ';'
+    : CREATE (OR REPLACE)? PACKAGE BODY (schema_object_name '.')? package_name (IS | AS) package_obj_body* (BEGIN seq_of_statements)? END package_name? ';'
     ;
 
 // Create Package Specific Clauses
@@ -176,18 +177,18 @@ alter_procedure
 function_body
     : FUNCTION identifier ('(' parameter (',' parameter)* ')')?
       RETURN type_spec (invoker_rights_clause | parallel_enable_clause | result_cache_clause | DETERMINISTIC)*
-      ((PIPELINED? (IS | AS) (DECLARE? declare_spec* body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
+      ((PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
 
 procedure_body
     : PROCEDURE identifier ('(' parameter (',' parameter)* ')')? (IS | AS)
-      (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
+      (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL) ';'
     ;
 
 create_procedure_body
     : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')? 
       invoker_rights_clause? (IS | AS)
-      (DECLARE? declare_spec* body | call_spec | EXTERNAL) ';'
+      (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL) ';'
     ;
 
 // Trigger DDLs
@@ -244,7 +245,7 @@ routine_clause
     ;
 
 compound_trigger_block
-    : COMPOUND TRIGGER declare_spec* timing_point_section+ END trigger_name
+    : COMPOUND TRIGGER seq_of_declare_specs? timing_point_section+ END trigger_name
     ;
 
 timing_point_section
@@ -407,18 +408,18 @@ subprog_decl_in_type
 
 proc_decl_in_type
     : PROCEDURE procedure_name '(' type_elements_parameter (',' type_elements_parameter)* ')'
-      (IS | AS) (call_spec | DECLARE? declare_spec* body ';')
+      (IS | AS) (call_spec | DECLARE? seq_of_declare_specs? body ';')
     ;
 
 func_decl_in_type
     : FUNCTION function_name ('(' type_elements_parameter (',' type_elements_parameter)* ')')?
-      RETURN type_spec (IS | AS) (call_spec | DECLARE? declare_spec* body ';')
+      RETURN type_spec (IS | AS) (call_spec | DECLARE? seq_of_declare_specs? body ';')
     ;
 
 constructor_declaration
     : FINAL? INSTANTIABLE? CONSTRUCTOR FUNCTION type_spec
       ('(' (SELF IN OUT type_spec ',') type_elements_parameter (',' type_elements_parameter)*  ')')?
-      RETURN SELF AS RESULT (IS | AS) (call_spec | DECLARE? declare_spec* body ';')
+      RETURN SELF AS RESULT (IS | AS) (call_spec | DECLARE? seq_of_declare_specs? body ';')
     ;
 
 // Common Type Clauses
@@ -663,7 +664,7 @@ container_clause
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        LEFT_PAREN (','? datatype_null_enable)+
+        ( '(' (','? datatype_null_enable)+
         (',' CONSTRAINT constraint_name
           ( primary_key_clause
           | foreign_key_clause
@@ -671,7 +672,7 @@ create_table
           | check_constraint
           )
         )*
-        RIGHT_PAREN
+        ')' )?
         (ON COMMIT (DELETE | PRESERVE) ROWS)?
         (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
         (PCTFREE pctfree=UNSIGNED_INTEGER
@@ -679,8 +680,8 @@ create_table
         | INITRANS inittrans=UNSIGNED_INTEGER
         )*
         (STORAGE '('
-          (INITIAL initial=size_clause
-          | NEXT next=size_clause
+          (INITIAL initial_size=size_clause
+          | NEXT next_size=size_clause
           | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
           | PCTINCREASE pctincrease=UNSIGNED_INTEGER
           | FREELISTS freelists=UNSIGNED_INTEGER
@@ -732,7 +733,7 @@ table_range_partition_by_clause
                  VALUES LESS THAN
 // Supposed to be literal in here, will need to refine this                      
                      '('
-                        (','? STRING
+                        (','? CHAR_STRING
                         | ','? string_function
                         | ','? numeric
                         | ','? MAXVALUE
@@ -747,8 +748,8 @@ table_range_partition_by_clause
                  | INITRANS inittrans=UNSIGNED_INTEGER
                  )*
                  (STORAGE '('
-                   (INITIAL initial=size_clause
-                   | NEXT next=size_clause
+                   (INITIAL initial_size=size_clause
+                   | NEXT next_size=size_clause
                    | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
                    | PCTINCREASE pctincrease=UNSIGNED_INTEGER
                    | FREELISTS freelists=UNSIGNED_INTEGER
@@ -765,7 +766,9 @@ table_range_partition_by_clause
     ;
 
 datatype_null_enable
-   :  column_name datatype (NOT NULL)? (ENABLE | DISABLE)?
+   :  column_name datatype
+         SORT?  (DEFAULT expression)? (ENCRYPT ( USING  CHAR_STRING )? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? ( NO? SALT )? )?  
+         (NOT NULL)? (ENABLE | DISABLE)?
    ;
 
 //Technically, this should only allow 'K' | 'M' | 'G' | 'T' | 'P' | 'E'
@@ -853,7 +856,7 @@ primary_key_clause
 // Anonymous PL/SQL code block
 
 anonymous_block
-    : BEGIN seq_of_statements END SEMICOLON
+    : (DECLARE seq_of_declare_specs)? BEGIN seq_of_statements END SEMICOLON
     ;
 
 // Common DDL Clauses
@@ -897,6 +900,10 @@ default_value_part
     ;
 
 // Elements Declarations
+
+seq_of_declare_specs
+    : declare_spec+
+    ;
 
 declare_spec
     : variable_declaration
@@ -1044,7 +1051,7 @@ loop_statement
 // Loop Specific Clause
 
 cursor_loop_param
-    : index_name IN REVERSE? lower_bound range='..' upper_bound
+    : index_name IN REVERSE? lower_bound range_separator='..' upper_bound
     | record_name IN (cursor_name ('(' expressions? ')')? | '(' select_statement ')')
     ;
 
@@ -2163,7 +2170,7 @@ index_name
     ;
 
 cursor_name
-    : identifier
+    : general_element
     | bind_variable
     ;
 

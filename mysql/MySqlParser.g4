@@ -337,7 +337,22 @@ column_def_table_constraint
    ;
 
 column_definition
-    : data_type separate_column_constraint*
+    : (TIMESTAMP | DATETIME) (timestamp_column_constraint)*    #timestampColDef
+   | data_type separate_column_constraint*                              #datatypeColDef
+   ;
+
+timestamp_column_constraint
+    : separate_column_constraint
+   | timestamp_auto_init
+   | timestamp_auto_update
+   ;
+
+timestamp_auto_init
+    : DEFAULT current_datetime_function_name ('(' decimal_literal ')')?
+   ;
+
+timestamp_auto_update
+    : ON UPDATE current_datetime_function_name ('(' decimal_literal ')')?
    ;
 
 separate_column_constraint
@@ -1870,7 +1885,7 @@ data_type
    | (DECIMAL | NUMERIC) 
      length_two_optional_dimension? UNSIGNED? ZEROFILL?        #dimensionDatatype
    | (DATE | YEAR | TINYBLOB | BLOB | MEDIUMBLOB | LONGBLOB)      #simpleDatatype
-   | (BIT | TIME | TIMESTAMP | DATETIME | BINARY | VARBINARY) 
+   | (BIT | TIME | TIMESTAMP | DATETIME | YEAR | BINARY | VARBINARY) 
      length_one_dimension?                               #dimensionDatatype
    | (ENUM | SET) 
      '(' STRING_LITERAL (',' STRING_LITERAL)* ')' BINARY? 
@@ -1887,7 +1902,7 @@ data_type_to_convert
    ;
 
 spatial_data_type
-    : GEOMETRYCOLLECTION | LINESTRING | MULTILINESTRING 
+    : GEOMETRY | GEOMETRYCOLLECTION | LINESTRING | MULTILINESTRING 
    | MULTIPOINT | MULTIPOLYGON | POINT | POLYGON
    ;
 
@@ -2037,11 +2052,15 @@ aggregate_windowed_function
 
 scalar_function_name
     : function_name_base
-   | ASCII | CURDATE | CURRENT_DATE | CURRENT_TIME 
-   | CURRENT_TIMESTAMP | CURTIME | DATE_ADD | DATE_SUB 
-   | IF | LOCALTIME | LOCALTIMESTAMP | MID | NOW | REPLACE 
-   | SUBSTR | SUBSTRING | SYSDATE | TRIM 
+   | current_datetime_function_name
+   | ASCII | CURDATE | CURRENT_DATE | CURRENT_TIME
+   | CURTIME | DATE_ADD | DATE_SUB| IF | MID | REPLACE
+   | SUBSTR | SUBSTRING | SYSDATE | TRIM
    | UTC_DATE | UTC_TIME | UTC_TIMESTAMP
+   ;
+
+current_datetime_function_name
+    : NOW | CURRENT_TIMESTAMP | LOCALTIME | LOCALTIMESTAMP
    ;
 
 function_args
