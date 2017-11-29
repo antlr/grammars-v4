@@ -1821,7 +1821,6 @@ simple_id
    | engine_name
    | privileges_base
    | interval_type_base
-   | data_type_base
    | keywords_can_be_id
    | function_name_base
    | spatial_data_type
@@ -1884,7 +1883,7 @@ data_type
      length_two_dimension? UNSIGNED? ZEROFILL?                 #dimensionDatatype
    | (DECIMAL | NUMERIC) 
      length_two_optional_dimension? UNSIGNED? ZEROFILL?        #dimensionDatatype
-   | (DATE | YEAR | TINYBLOB | BLOB | MEDIUMBLOB | LONGBLOB)      #simpleDatatype
+   | (DATE | TINYBLOB | BLOB | MEDIUMBLOB | LONGBLOB)      #simpleDatatype
    | (BIT | TIME | TIMESTAMP | DATETIME | YEAR | BINARY | VARBINARY) 
      length_one_dimension?                               #dimensionDatatype
    | (ENUM | SET) 
@@ -2163,10 +2162,6 @@ interval_type_base
     : QUARTER | MONTH | DAY | HOUR 
    | MINUTE | WEEK | SECOND | MICROSECOND
    ;
-
-data_type_base
-    : DATE | TIME | TIMESTAMP | DATETIME | YEAR | ENUM | TEXT
-   ;
  
 keywords_can_be_id
     : ACTION | AFTER | ALGORITHM | ANY | AT | AUTHORS | AUTOCOMMIT
@@ -2175,10 +2170,10 @@ keywords_can_be_id
    | CIPHER | CLIENT | COALESCE | CODE | COLUMNS 
    | COLUMN_FORMAT | COMMENT | COMMIT | COMPACT | COMPLETION 
    | COMPRESSED | CONCURRENT | CONNECTION | CONSISTENT 
-   | CONTAINS | CONTRIBUTORS | COPY | DATA | DATAFILE 
+   | CONTAINS | CONTRIBUTORS | COPY | DATA | DATAFILE | DATE | DATETIME
    | DEFINER | DELAY_KEY_WRITE | DIRECTORY | DISABLE | DISCARD 
    | DISK | DO | DUMPFILE| DUPLICATE | DYNAMIC | ENABLE | ENDS 
-   | ENGINE | ENGINES | ERRORS | ESCAPE | EVEN | EVENT | EVENTS 
+   | ENGINE | ENGINES | ENUM | ERRORS | ESCAPE | EVEN | EVENT | EVENTS 
    | EVERY | EXCHANGE | EXCLUSIVE | EXPIRE | EXTENT_SIZE 
    | FIELDS | FIRST | FIXED | FULL | FUNCTION | GLOBAL | GRANTS 
    | HASH | HOST | IDENTIFIED | IMPORT | INITIAL_SIZE | INPLACE 
@@ -2202,10 +2197,11 @@ keywords_can_be_id
    | STARTS | STATS_AUTO_RECALC | STATS_PERSISTENT 
    | STATS_SAMPLE_PAGES | STATUS | STORAGE | SUBJECT 
    | SUBPARTITION | SUBPARTITIONS | TABLESPACE | TEMPORARY 
-   | TEMPTABLE | THAN | TRANSACTION | TRUNCATE | UNDEFINED 
+   | TEMPTABLE | TEXT | THAN | TIME | TIMESTAMP 
+   | TRANSACTION | TRUNCATE | UNDEFINED 
    | UNDOFILE | UNDO_BUFFER_SIZE | UNKNOWN | UPGRADE | USER 
    | VALUE | VARIABLES | VIEW | WAIT | WARNINGS | WORK 
-   | WRAPPER | X509 | XML
+   | WRAPPER | X509 | XML | YEAR
    ;
 
 function_name_base
