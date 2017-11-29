@@ -26,7 +26,8 @@ sql_script
     ;
 
 unit_statement
-    : alter_function
+    : transaction_control_statements 
+    | alter_function
     | alter_package
     | alter_procedure
     | alter_sequence
@@ -732,7 +733,7 @@ table_range_partition_by_clause
                  VALUES LESS THAN
 // Supposed to be literal in here, will need to refine this                      
                      '('
-                        (','? STRING
+                        (','? CHAR_STRING
                         | ','? string_function
                         | ','? numeric
                         | ','? MAXVALUE
@@ -765,7 +766,9 @@ table_range_partition_by_clause
     ;
 
 datatype_null_enable
-   :  column_name datatype (NOT NULL)? (ENABLE | DISABLE)?
+   :  column_name datatype
+         SORT?  (DEFAULT expression)? (ENCRYPT ( USING  CHAR_STRING )? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? ( NO? SALT )? )?  
+         (NOT NULL)? (ENABLE | DISABLE)?
    ;
 
 //Technically, this should only allow 'K' | 'M' | 'G' | 'T' | 'P' | 'E'
