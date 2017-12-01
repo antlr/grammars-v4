@@ -318,6 +318,8 @@ BEGIN:                               'BEGIN';
 BINLOG:                              'BINLOG';
 BIT:                                 'BIT';
 BLOCK:                               'BLOCK';
+BOOL:                                'BOOL';
+BOOLEAN:                             'BOOLEAN';
 BTREE:                               'BTREE';
 CACHE:                               'CACHE';
 CASCADED:                            'CASCADED';
