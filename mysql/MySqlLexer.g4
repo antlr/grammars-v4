@@ -133,7 +133,6 @@ MATCH:                               'MATCH';
 MAXVALUE:                            'MAXVALUE';
 MODIFIES:                            'MODIFIES';
 NATURAL:                             'NATURAL';
-NOTNULL:                             'NOT' SPACE+ ('NULL' | '\\N');
 NOT:                                 'NOT';
 NO_WRITE_TO_BINLOG:                  'NO_WRITE_TO_BINLOG';
 NULL_LITERAL:                        'NULL';
@@ -707,7 +706,6 @@ SERIALIZABLE:                        'SERIALIZABLE';
 
 // Spatial data types
 
-GEOMETRY:                            'GEOMETRY';
 GEOMETRYCOLLECTION:                  'GEOMETRYCOLLECTION';
 LINESTRING:                          'LINESTRING';
 MULTILINESTRING:                     'MULTILINESTRING';
@@ -1032,6 +1030,7 @@ STAR:                                '*';
 DIVIDE:                              '/';
 MODULE:                              '%';
 PLUS:                                '+';
+MINUSMINUS:                          '--';
 MINUS:                               '-';
 DIV:                                 'DIV';
 MOD:                                 'MOD';
