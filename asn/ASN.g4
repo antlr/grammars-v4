@@ -141,7 +141,7 @@ componentTypeList  : (componentType) (COMMA componentType)*
 ;
 componentType  :
   namedType (OPTIONAL_LITERAL | DEFAULT_LITERAL value )?
- |  COMPONENTS_LITERAL OF_LITERAL  type
+ |  COMPONENTS_LITERAL OF_LITERAL  asnType
 ;
 
 extensionAdditions  :  (COMMA  extensionAdditionList)?
@@ -155,7 +155,7 @@ extensionAdditionGroup  :  DOUBLE_L_BRACKET  versionNumber  componentTypeList  D
 versionNumber  :  (NUMBER  COLON )?
 ;
 
-sequenceOfType  : SEQUENCE_LITERAL (L_PARAN (constraint | sizeConstraint) R_PARAN)? OF_LITERAL (type | namedType )
+sequenceOfType  : SEQUENCE_LITERAL (L_PARAN (constraint | sizeConstraint) R_PARAN)? OF_LITERAL (asnType | namedType )
 ;
 sizeConstraint : SIZE_LITERAL constraint
 	;
@@ -163,7 +163,7 @@ sizeConstraint : SIZE_LITERAL constraint
 parameterizedAssignment :
  parameterList
 (ASSIGN_OP
-	(type
+	(asnType
 		|	value
 		|	valueSet
 	)
@@ -191,7 +191,7 @@ paramGovernor : governor | IDENTIFIER
 //dummyGovernor : dummyReference
 //;
 
-governor : type | definedObjectClass
+governor : asnType | definedObjectClass
 ;
 
 
@@ -238,7 +238,7 @@ fieldSpec :
 	AMPERSAND IDENTIFIER
 	(
 	  typeOptionalitySpec?
-  	| type (valueSetOptionalitySpec?  | UNIQUE_LITERAL? valueOptionalitySpec? )
+  	| asnType (valueSetOptionalitySpec?  | UNIQUE_LITERAL? valueOptionalitySpec? )
 	| fieldName (OPTIONAL_LITERAL | (DEFAULT_LITERAL (valueSet | value)))?
 	| definedObjectClass (OPTIONAL_LITERAL | (DEFAULT_LITERAL (objectSet | object)))?
 
@@ -255,9 +255,9 @@ fieldSpec :
 
 typeFieldSpec : AMPERSAND IDENTIFIER typeOptionalitySpec?
 ;
-typeOptionalitySpec : OPTIONAL_LITERAL | (DEFAULT_LITERAL type)
+typeOptionalitySpec : OPTIONAL_LITERAL | (DEFAULT_LITERAL asnType)
 ;
-fixedTypeValueFieldSpec : AMPERSAND IDENTIFIER type UNIQUE_LITERAL? valueOptionalitySpec ?
+fixedTypeValueFieldSpec : AMPERSAND IDENTIFIER asnType UNIQUE_LITERAL? valueOptionalitySpec ?
 ;
 valueOptionalitySpec : OPTIONAL_LITERAL | (DEFAULT_LITERAL value)
 ;
@@ -265,7 +265,7 @@ valueOptionalitySpec : OPTIONAL_LITERAL | (DEFAULT_LITERAL value)
 variableTypeValueFieldSpec : AMPERSAND IDENTIFIER  fieldName valueOptionalitySpec ?
 ;
 
-fixedTypeValueSetFieldSpec : AMPERSAND IDENTIFIER   type valueSetOptionalitySpec ?
+fixedTypeValueSetFieldSpec : AMPERSAND IDENTIFIER   asnType valueSetOptionalitySpec ?
 ;
 
 valueSetOptionalitySpec : OPTIONAL_LITERAL | DEFAULT_LITERAL valueSet
@@ -345,15 +345,15 @@ objectSetOptionalitySpec : OPTIONAL_LITERAL | DEFAULT_LITERAL objectSet
 
 typeAssignment :
       ASSIGN_OP
-      type
+      asnType
 ;
 
 valueAssignment :
-      type
+      asnType
 	  ASSIGN_OP
        value
 ;
-type : (builtinType | referencedType) (constraint)*
+asnType : (builtinType | referencedType) (constraint)*
 ;
 builtinType :
    octetStringType
@@ -377,7 +377,7 @@ objectClassFieldType : definedObjectClass DOT fieldName
 setType :  SET_LITERAL  L_BRACE  (extensionAndException  optionalExtensionMarker  | componentTypeLists)? R_BRACE
 	;
 
-setOfType    : SET_LITERAL (constraint | sizeConstraint)? OF_LITERAL (type | namedType)
+setOfType    : SET_LITERAL (constraint | sizeConstraint)? OF_LITERAL (asnType | namedType)
 ;
 
 referencedType :
@@ -418,9 +418,9 @@ simpleTableConstraint : objectSet
 
 
 contentsConstraint :
-   CONTAINING_LITERAL type
+   CONTAINING_LITERAL asnType
  |  ENCODED_LITERAL BY_LITERAL value
- |  CONTAINING_LITERAL type ENCODED_LITERAL BY_LITERAL value
+ |  CONTAINING_LITERAL asnType ENCODED_LITERAL BY_LITERAL value
 ;
 
 
@@ -481,7 +481,7 @@ rootAlternativeTypeList  : alternativeTypeList
 ;
 alternativeTypeList : (namedType) (COMMA namedType)*
 ;
-namedType : IDENTIFIER   type
+namedType : IDENTIFIER   asnType
 ;
 enumeratedType : ENUMERATED_LITERAL L_BRACE enumerations R_BRACE
 ;
@@ -507,13 +507,13 @@ simpleDefinedValue : IDENTIFIER (DOT IDENTIFIER)?
 
 actualParameterList : L_BRACE actualParameter (COMMA actualParameter)* R_BRACE
 ;
-actualParameter : type | value /*| valueSet | definedObjectClass | object | objectSet*/
+actualParameter : asnType | value /*| valueSet | definedObjectClass | object | objectSet*/
 ;
 exceptionSpec : EXCLAM  exceptionIdentification
 ;
 exceptionIdentification : signedNumber
  |     definedValue
- |     type COLON value
+ |     asnType COLON value
 ;
 additionalEnumeration : enumeration
 ;
