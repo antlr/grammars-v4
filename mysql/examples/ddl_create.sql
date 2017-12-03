@@ -11,6 +11,7 @@ create table `parent_table`(id int primary key, column1 varchar(30), index paren
 create table child_table(id int unsigned auto_increment primary key, id_parent int references parent_table(id) match full on update cascade on delete set null) engine=InnoDB;
 create table `another some table $$` like `some table $$`;
 create table `actor` (`last_update` timestamp default CURRENT_TIMESTAMP, `birthday` datetime default CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP);
+create table boolean_table(c1 bool, c2 boolean default true);
 #end
 #begin
 -- Rename table
