@@ -687,7 +687,6 @@ object_view_clause
        ( '(' ( ','? (out_of_line_constraint | REGULAR_ID inline_constraint ) )+ ')' )*
     ;
 
-
 inline_constraint
     : (CONSTRAINT constraint_name)?
         ( NOT? NULL
@@ -709,7 +708,6 @@ out_of_line_constraint
        )+
       constraint_state? 
     ;     
-
 
 constraint_state
     : ( NOT? DEFERRABLE
