@@ -44,7 +44,7 @@ unit_statement
 
     | create_index
     | create_table
-//  | create_view //TODO
+    | create_view //TODO
 //  | create_directory //TODO
 //  | create_materialized_view //TODO
     | create_user
@@ -660,6 +660,62 @@ grant_statement
 
 container_clause
     : CONTAINER EQUALS_OP (CURRENT | ALL)
+    ;
+
+create_view
+    : CREATE (OR REPLACE)? (OR? FORCE)? EDITIONING? VIEW
+      tableview_name view_options?
+      AS subquery subquery_restriction_clause?
+    ;
+
+view_options
+    : ( view_alias_constraint 
+      | object_view_clause
+//      | xmltype_view_clause //TODO
+      )
+    ;
+
+view_alias_constraint
+    : '(' ( ','? (table_alias inline_constraint* | out_of_line_constraint) )+ ')'
+    ;
+
+object_view_clause
+    : OF type_name 
+       ( WITH OBJECT (IDENTIFIER|ID|OID) ( DEFAULT | '(' (','? REGULAR_ID)+ ')' )
+       | UNDER tableview_name
+       )
+       ( '(' ( ','? (out_of_line_constraint | REGULAR_ID inline_constraint ) )+ ')' )*
+    ;
+
+inline_constraint
+    : (CONSTRAINT constraint_name)?
+        ( NOT? NULL
+        | UNIQUE
+        | PRIMARY KEY
+        | references_clause
+        | check_constraint
+        )
+      constraint_state?
+    ;
+
+out_of_line_constraint
+    : ( (CONSTRAINT constraint_name)?
+          ( primary_key_clause
+          | foreign_key_clause
+          | unique_key_clause
+          | check_constraint
+          )
+       )+
+      constraint_state? 
+    ;     
+
+constraint_state
+    : ( NOT? DEFERRABLE
+      | INITIALLY (IMMEDIATE|DEFERRED)
+      | (RELY|NORELY)
+      | (ENABLE|DISABLE)
+      | (VALIDATE|NOVALIDATE)
+      )+
     ;
 
 create_table
@@ -2689,6 +2745,7 @@ regular_id
     //| HAVING
     | HIDE
     | HOUR
+    | ID
     //| IF
     | IGNORE
     | IMMEDIATE
