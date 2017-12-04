@@ -44,6 +44,7 @@ unit_statement
 
     | create_index
     | create_table
+    | create_tablespace
     | create_view //TODO
 //  | create_directory //TODO
 //  | create_materialized_view //TODO
@@ -716,6 +717,108 @@ constraint_state
       | (ENABLE|DISABLE)
       | (VALIDATE|NOVALIDATE)
       )+
+    ;
+
+create_tablespace
+    : CREATE (BIGFILE|SMALLFILE)? 
+        ( permanent_tablespace_clause
+        | temporary_tablespace_clause
+        | undo_tablespace_clause
+        )
+      ';'
+    ;
+
+permanent_tablespace_clause
+    : TABLESPACE REGULAR_ID datafile_specification? 
+        ( MINIMUM EXTENT size_clause
+        | BLOCKSIZE size_clause
+        | logging_clause
+        | FORCE LOGGING
+        | (ONLINE|OFFLINE)
+        | ENCRYPTION tablespace_encryption_spec
+        | DEFAULT //TODO table_compression? storage_clause?
+        | extent_management_clause
+        | segment_management_clause
+        | flashback_mode_clause
+        )*
+    ;      
+
+tablespace_encryption_spec
+    : USING encrypt_algorithm=CHAR_STRING
+    ;
+
+
+logging_clause
+    : ( LOGGING
+      | NOLOGGING
+      | FILESYSTEM_LIKE_LOGGING
+      )
+    ;
+
+extent_management_clause
+    : EXTENT MANAGEMENT LOCAL 
+        ( AUTOALLOCATE
+        | UNIFORM (SIZE size_clause)?
+        )?
+    ;
+
+segment_management_clause
+    : SEGMENT SPACE_KEYWORD MANAGEMENT (AUTO|MANUAL)
+    ;
+
+flashback_mode_clause
+    : FLASHBACK (ON|OFF)
+    ;
+
+temporary_tablespace_clause
+    : TEMPORARY TABLESPACE tablespace_name=REGULAR_ID
+        tempfile_specification?
+        tablespace_group_clause? extent_management_clause?
+    ;
+
+tablespace_group_clause
+    : TABLESPACE GROUP (REGULAR_ID|CHAR_STRING)
+    ;
+
+undo_tablespace_clause
+    : UNDO TABLESPACE tablespace_name=REGULAR_ID
+        datafile_specification? 
+        extent_management_clause? tablespace_retention_clause?
+    ;
+
+tablespace_retention_clause
+    : RETENTION (GUARANTEE|NOGUARANTEE)
+    ;
+
+datafile_specification
+    : DATAFILE
+	  (','? datafile_tempfile_spec) 
+    ;
+
+tempfile_specification
+    : TEMPFILE
+	  (','? datafile_tempfile_spec) 
+    ;
+
+datafile_tempfile_spec
+    : CHAR_STRING? (SIZE size_clause)? REUSE? autoextend_clause?
+    ;
+
+redo_log_file_spec
+    : DATAFILE ( CHAR_STRING
+      | '(' ( ','? CHAR_STRING )+ ')'
+      )?
+        (SIZE size_clause)?
+        (BLOCKSIZE size_clause)?
+        REUSE?
+    ;
+
+autoextend_clause
+    : AUTOEXTEND (OFF| ON (NEXT size_clause)? maxsize_clause? )
+    ;
+
+maxsize_clause
+    : MAXSIZE (UNLIMITED|size_clause)
     ;
 
 create_table
@@ -2807,6 +2910,7 @@ regular_id
     | MEMBER
     | MERGE
     //| MINUS
+    | MINIMUM
     | MINUTE
     | MINVALUE
     | MLSLABEL
