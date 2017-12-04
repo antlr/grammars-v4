@@ -720,7 +720,7 @@ constraint_state
     ;
 
 create_tablespace
-    : CREATE (BIGFILE|SMALLFILE)? 
+    : CREATE (BIGFILE | SMALLFILE)? 
         ( permanent_tablespace_clause
         | temporary_tablespace_clause
         | undo_tablespace_clause
@@ -734,7 +734,7 @@ permanent_tablespace_clause
         | BLOCKSIZE size_clause
         | logging_clause
         | FORCE LOGGING
-        | (ONLINE|OFFLINE)
+        | (ONLINE | OFFLINE)
         | ENCRYPTION tablespace_encryption_spec
         | DEFAULT //TODO table_compression? storage_clause?
         | extent_management_clause
@@ -762,11 +762,11 @@ extent_management_clause
     ;
 
 segment_management_clause
-    : SEGMENT SPACE_KEYWORD MANAGEMENT (AUTO|MANUAL)
+    : SEGMENT SPACE_KEYWORD MANAGEMENT (AUTO | MANUAL)
     ;
 
 flashback_mode_clause
-    : FLASHBACK (ON|OFF)
+    : FLASHBACK (ON | OFF)
     ;
 
 temporary_tablespace_clause
@@ -776,7 +776,7 @@ temporary_tablespace_clause
     ;
 
 tablespace_group_clause
-    : TABLESPACE GROUP (REGULAR_ID|CHAR_STRING)
+    : TABLESPACE GROUP (REGULAR_ID | CHAR_STRING)
     ;
 
 undo_tablespace_clause
@@ -786,7 +786,7 @@ undo_tablespace_clause
     ;
 
 tablespace_retention_clause
-    : RETENTION (GUARANTEE|NOGUARANTEE)
+    : RETENTION (GUARANTEE | NOGUARANTEE)
     ;
 
 datafile_specification
@@ -813,11 +813,11 @@ redo_log_file_spec
     ;
 
 autoextend_clause
-    : AUTOEXTEND (OFF| ON (NEXT size_clause)? maxsize_clause? )
+    : AUTOEXTEND (OFF | ON (NEXT size_clause)? maxsize_clause? )
     ;
 
 maxsize_clause
-    : MAXSIZE (UNLIMITED|size_clause)
+    : MAXSIZE (UNLIMITED | size_clause)
     ;
 
 create_table
