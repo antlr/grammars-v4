@@ -747,7 +747,6 @@ tablespace_encryption_spec
     : USING encrypt_algorithm=CHAR_STRING
     ;
 
-
 logging_clause
     : ( LOGGING
       | NOLOGGING
