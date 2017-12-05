@@ -1,49 +1,68 @@
-grammar flatbuffers;
+
+grammar Flatbuffers ;
 
 schema : include* ( namespace_decl | type_decl | enum_decl | root_decl | file_extension_decl | file_identifier_decl | attribute_decl | rpc_decl | object )* ;
 
-include : include string_constant ;
+include : 'include' string_constant ';' ;
 
-namespace_decl : namespace ident ( . ident )* ;
+namespace_decl : 'namespace' IDENT ( '.' IDENT )* ';' ;
 
-attribute_decl : attribute string_constant ;
+attribute_decl : 'attribute' string_constant ';' ;
 
-type_decl : ( table | struct ) ident metadata { field_decl+ }
+type_decl : ( 'table' | 'struct' ) IDENT metadata { field_decl+ } ;
 
-enum_decl : ( enum ident [ : type ] | union ident ) metadata { commasep( enumval_decl ) }
+enum_decl : ( 'enum' IDENT ( ':' type )? | 'union' IDENT ) metadata '{' commasep_enumval_decl '}' ;
 
-root_decl : root_type ident ;
+root_decl : 'root_type' IDENT ';' ;
 
-field_decl : ident ":" type [ "=" scalar ] metadata ;
+field_decl : IDENT ':' type ( '=' scalar )? metadata ';' ;
 
-rpc_decl : rpc_service ident { rpc_method+ } ;
+rpc_decl : 'rpc_service' IDENT '{' rpc_method+ '}' ;
 
-rpc_method : ident ( ident ) ":" ident metadata ;
+rpc_method : IDENT '(' IDENT ')' ':' IDENT metadata ';' ;
 
-type : bool | byte | ubyte | short | ushort | int | uint | float | long | ulong | double | int8 | uint8 | int16 | uint16 | int32 | uint32| int64 | uint64 | float32 | float64 | string | [ type ] | ident ;
+type : '[' type ']' | BASE_TYPE_NAME | IDENT ;
 
-enumval_decl : ident [ = integer_constant ] ;
+BASE_TYPE_NAME : 'bool' | 'byte' | 'ubyte' | 'short' | 'ushort' | 'int' | 'uint' | 'float' | 'long' | 'ulong' | 'double' | 'int8' | 'uint8' | 'int16' | 'uint16' | 'int32' | 'uint32' | 'int64' | 'uint64' | 'float32' | 'float64' | 'string' ;
 
-metadata : [ ( commasep( ident [ : single_value ] ) ) ] ;
+enumval_decl : IDENT ( '=' integer_constant )? ;
+
+commasep_enumval_decl : enumval_decl ( ',' enumval_decl )* ;
+
+ident_with_opt_single_value : IDENT ( ':' single_value )? ;
+
+commasep_ident_with_opt_single_value : ident_with_opt_single_value ( ',' ident_with_opt_single_value )* ;
+
+metadata : ( '(' commasep_ident_with_opt_single_value ')' )? ;
 
 scalar : integer_constant | float_constant ;
 
-object : { commasep( ident ":" value ) } ;
+object : '{' commasep_ident_with_value '}' ;
+
+ident_with_value : IDENT ':' value ;
+
+commasep_ident_with_value : ident_with_value ( ',' ident_with_value )* ;
 
 single_value : scalar | string_constant ;
 
-value : single_value | object | [ commasep( value ) ] ;
+value : single_value | object | '[' commasep_value ']' ;
 
-commasep(x) : [ x ( , x )* ] ;
+commasep_value : value( ',' value )* ;
 
-file_extension_decl : file_extension string_constant ;
+file_extension_decl : 'file_extension' string_constant ;
 
-file_identifier_decl : file_identifier string_constant ;
+file_identifier_decl : 'file_identifier' string_constant ;
 
-integer_constant : -?[0-9]+ | true | false ;
+fragment DIGIT : [0-9] ;
 
-float_constant : -?[0-9]+.[0-9]+((e|E)(+|-)?[0-9]+)? ;
+fragment LETTER_INCL_DIGITS : [a-zA-Z0-9_] ;
 
-string_constant : \".*?\\" ;
+fragment LETTER_EXCL_DIGITS : [a-zA-Z_] ;
 
-ident : [a-zA-Z_][a-zA-Z0-9_]* ;
+integer_constant : ( '-' )? (DIGIT)+ | 'true' | 'false' ;
+
+float_constant : ('-')? (DIGIT)+ '.' (DIGIT)+ (('e'|'E') ('+'|'-')? (DIGIT)+)? ;
+
+string_constant : '"' .*? '"' ;
+
+IDENT : LETTER_EXCL_DIGITS ( LETTER_INCL_DIGITS )* ;
