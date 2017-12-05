@@ -521,7 +521,7 @@ sequence_start_clause
     ;
 
 create_index
-    : CREATE UNIQUE? INDEX index_name ON tableview_name paren_column_list (TABLESPACE REGULAR_ID)? (COMPUTE STATISTICS)? ';'
+    : CREATE UNIQUE? INDEX index_name ON tableview_name paren_column_list (TABLESPACE id_expression)? (COMPUTE STATISTICS)? ';'
     ;
 
 alter_index
@@ -731,7 +731,7 @@ create_tablespace
     ;
 
 permanent_tablespace_clause
-    : TABLESPACE REGULAR_ID datafile_specification? 
+    : TABLESPACE id_expression datafile_specification? 
         ( MINIMUM EXTENT size_clause
         | BLOCKSIZE size_clause
         | logging_clause
@@ -772,7 +772,7 @@ flashback_mode_clause
     ;
 
 temporary_tablespace_clause
-    : TEMPORARY TABLESPACE tablespace_name=REGULAR_ID
+    : TEMPORARY TABLESPACE tablespace_name=id_expression
         tempfile_specification?
         tablespace_group_clause? extent_management_clause?
     ;
@@ -782,7 +782,7 @@ tablespace_group_clause
     ;
 
 undo_tablespace_clause
-    : UNDO TABLESPACE tablespace_name=REGULAR_ID
+    : UNDO TABLESPACE tablespace_name=id_expression
         datafile_specification? 
         extent_management_clause? tablespace_retention_clause?
     ;
@@ -835,7 +835,7 @@ parallel_clause
 create_materialized_view_log
     : CREATE MATERIALIZED VIEW LOG ON tableview_name
         ( ( physical_attributes_clause
-          | TABLESPACE tablespace_name=REGULAR_ID
+          | TABLESPACE tablespace_name=id_expression
           | logging_clause
           | (CACHE | NOCACHE)
           )+
@@ -874,7 +874,7 @@ create_materialized_view
         ( ON PREBUILT TABLE ( (WITH | WITHOUT) REDUCED PRECISION)?
         | physical_properties?  (CACHE | NOCACHE)? parallel_clause? build_clause?
         )
-        ( USING INDEX ( (physical_attributes_clause | TABLESPACE mv_tablespace=REGULAR_ID)+ )*
+        ( USING INDEX ( (physical_attributes_clause | TABLESPACE mv_tablespace=id_expression)+ )*
         | USING NO INDEX
         )?
         create_mv_refresh?
@@ -946,7 +946,7 @@ table_range_partition_by_clause
                         | ','? MAXVALUE
                         )+
                      ')'
-                (TABLESPACE partition_tablespace=REGULAR_ID)?
+                (TABLESPACE partition_tablespace=id_expression)?
 
                 (ON COMMIT (DELETE | PRESERVE) ROWS)?
                 deferred_segment_creation? 
@@ -1009,7 +1009,7 @@ deferred_segment_creation
 
 segment_attributes_clause
     : ( physical_attributes_clause
-      | TABLESPACE tablespace_name=REGULAR_ID 
+      | TABLESPACE tablespace_name=id_expression
       | logging_clause
       )+
     ;
