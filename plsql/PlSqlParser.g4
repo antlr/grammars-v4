@@ -907,7 +907,7 @@ create_table
           | foreign_key_clause
           | unique_key_clause
           | check_constraint
-          )
+          ) constraint_state?
         )*
         ')' )?
         (ON COMMIT (DELETE | PRESERVE) ROWS)?
