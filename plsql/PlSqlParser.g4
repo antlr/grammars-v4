@@ -44,7 +44,8 @@ unit_statement
 
     | create_index
     | create_table
-//  | create_view //TODO
+    | create_tablespace
+    | create_view //TODO
 //  | create_directory //TODO
 //  | create_materialized_view //TODO
     | create_user
@@ -518,7 +519,7 @@ sequence_start_clause
     ;
 
 create_index
-    : CREATE UNIQUE? INDEX index_name ON tableview_name paren_column_list (COMPUTE STATISTICS)? ';'
+    : CREATE UNIQUE? INDEX index_name ON tableview_name paren_column_list (TABLESPACE REGULAR_ID)? (COMPUTE STATISTICS)? ';'
     ;
 
 alter_index
@@ -662,10 +663,167 @@ container_clause
     : CONTAINER EQUALS_OP (CURRENT | ALL)
     ;
 
+create_view
+    : CREATE (OR REPLACE)? (OR? FORCE)? EDITIONING? VIEW
+      tableview_name view_options?
+      AS subquery subquery_restriction_clause?
+    ;
+
+view_options
+    : ( view_alias_constraint 
+      | object_view_clause
+//      | xmltype_view_clause //TODO
+      )
+    ;
+
+view_alias_constraint
+    : '(' ( ','? (table_alias inline_constraint* | out_of_line_constraint) )+ ')'
+    ;
+
+object_view_clause
+    : OF type_name 
+       ( WITH OBJECT (IDENTIFIER|ID|OID) ( DEFAULT | '(' (','? REGULAR_ID)+ ')' )
+       | UNDER tableview_name
+       )
+       ( '(' ( ','? (out_of_line_constraint | REGULAR_ID inline_constraint ) )+ ')' )*
+    ;
+
+inline_constraint
+    : (CONSTRAINT constraint_name)?
+        ( NOT? NULL
+        | UNIQUE
+        | PRIMARY KEY
+        | references_clause
+        | check_constraint
+        )
+      constraint_state?
+    ;
+
+out_of_line_constraint
+    : ( (CONSTRAINT constraint_name)?
+          ( primary_key_clause
+          | foreign_key_clause
+          | unique_key_clause
+          | check_constraint
+          )
+       )+
+      constraint_state? 
+    ;     
+
+constraint_state
+    : ( NOT? DEFERRABLE
+      | INITIALLY (IMMEDIATE|DEFERRED)
+      | (RELY|NORELY)
+      | (ENABLE|DISABLE)
+      | (VALIDATE|NOVALIDATE)
+      )+
+    ;
+
+create_tablespace
+    : CREATE (BIGFILE | SMALLFILE)? 
+        ( permanent_tablespace_clause
+        | temporary_tablespace_clause
+        | undo_tablespace_clause
+        )
+      ';'
+    ;
+
+permanent_tablespace_clause
+    : TABLESPACE REGULAR_ID datafile_specification? 
+        ( MINIMUM EXTENT size_clause
+        | BLOCKSIZE size_clause
+        | logging_clause
+        | FORCE LOGGING
+        | (ONLINE | OFFLINE)
+        | ENCRYPTION tablespace_encryption_spec
+        | DEFAULT //TODO table_compression? storage_clause?
+        | extent_management_clause
+        | segment_management_clause
+        | flashback_mode_clause
+        )*
+    ;      
+
+tablespace_encryption_spec
+    : USING encrypt_algorithm=CHAR_STRING
+    ;
+
+logging_clause
+    : ( LOGGING
+      | NOLOGGING
+      | FILESYSTEM_LIKE_LOGGING
+      )
+    ;
+
+extent_management_clause
+    : EXTENT MANAGEMENT LOCAL 
+        ( AUTOALLOCATE
+        | UNIFORM (SIZE size_clause)?
+        )?
+    ;
+
+segment_management_clause
+    : SEGMENT SPACE_KEYWORD MANAGEMENT (AUTO | MANUAL)
+    ;
+
+flashback_mode_clause
+    : FLASHBACK (ON | OFF)
+    ;
+
+temporary_tablespace_clause
+    : TEMPORARY TABLESPACE tablespace_name=REGULAR_ID
+        tempfile_specification?
+        tablespace_group_clause? extent_management_clause?
+    ;
+
+tablespace_group_clause
+    : TABLESPACE GROUP (REGULAR_ID | CHAR_STRING)
+    ;
+
+undo_tablespace_clause
+    : UNDO TABLESPACE tablespace_name=REGULAR_ID
+        datafile_specification? 
+        extent_management_clause? tablespace_retention_clause?
+    ;
+
+tablespace_retention_clause
+    : RETENTION (GUARANTEE | NOGUARANTEE)
+    ;
+
+datafile_specification
+    : DATAFILE
+	  (','? datafile_tempfile_spec) 
+    ;
+
+tempfile_specification
+    : TEMPFILE
+	  (','? datafile_tempfile_spec) 
+    ;
+
+datafile_tempfile_spec
+    : CHAR_STRING? (SIZE size_clause)? REUSE? autoextend_clause?
+    ;
+
+redo_log_file_spec
+    : DATAFILE ( CHAR_STRING
+      | '(' ( ','? CHAR_STRING )+ ')'
+      )?
+        (SIZE size_clause)?
+        (BLOCKSIZE size_clause)?
+        REUSE?
+    ;
+
+autoextend_clause
+    : AUTOEXTEND (OFF | ON (NEXT size_clause)? maxsize_clause? )
+    ;
+
+maxsize_clause
+    : MAXSIZE (UNLIMITED | size_clause)
+    ;
+
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
         ( '(' (','? datatype_null_enable)+
-        (',' CONSTRAINT constraint_name
+        (',' (CONSTRAINT constraint_name)?
           ( primary_key_clause
           | foreign_key_clause
           | unique_key_clause
@@ -2166,7 +2324,7 @@ variable_name
     ;
 
 index_name
-    : identifier
+    : identifier ('.' id_expression)?
     ;
 
 cursor_name
@@ -2689,6 +2847,7 @@ regular_id
     //| HAVING
     | HIDE
     | HOUR
+    | ID
     //| IF
     | IGNORE
     | IMMEDIATE
@@ -2750,6 +2909,7 @@ regular_id
     | MEMBER
     | MERGE
     //| MINUS
+    | MINIMUM
     | MINUTE
     | MINVALUE
     | MLSLABEL
