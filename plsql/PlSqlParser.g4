@@ -2840,6 +2840,7 @@ regular_id
     | COMMIT
     | COMMITTED
     | COMPATIBILITY
+    | COMPLETE
     | COMPILE
     | COMPOUND
     //| CONNECT
