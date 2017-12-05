@@ -750,10 +750,9 @@ tablespace_encryption_spec
     ;
 
 logging_clause
-    : ( LOGGING
-      | NOLOGGING
-      | FILESYSTEM_LIKE_LOGGING
-      )
+    : LOGGING
+     | NOLOGGING
+     | FILESYSTEM_LIKE_LOGGING
     ;
 
 extent_management_clause
@@ -827,9 +826,9 @@ build_clause
     ;
 
 parallel_clause
-    : ( NOPARALLEL
-      | PARALLEL parallel_count=UNSIGNED_INTEGER
-      )
+    : NOPARALLEL
+    | PARALLEL parallel_count=UNSIGNED_INTEGER
+      
     ;
 
 create_materialized_view_log
@@ -956,7 +955,7 @@ table_range_partition_by_clause
     ;
 
 datatype_null_enable
-   :  column_name datatype
+   : column_name datatype
          SORT?  (DEFAULT expression)? (ENCRYPT ( USING  CHAR_STRING )? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? ( NO? SALT )? )?  
          (NOT NULL)? (ENABLE | DISABLE)?
    ;
@@ -969,18 +968,17 @@ size_clause
 
 
 table_compression
-    : (COMPRESS
+    : COMPRESS
         ( BASIC
         | FOR ( OLTP
               | (QUERY | ARCHIVE) (LOW | HIGH)?
               )
         )?
       | NOCOMPRESS
-      )
     ;
 
 physical_attributes_clause
-    :   (PCTFREE pctfree=UNSIGNED_INTEGER
+    : (PCTFREE pctfree=UNSIGNED_INTEGER
         | PCTUSED pctused=UNSIGNED_INTEGER
         | INITRANS inittrans=UNSIGNED_INTEGER
         | storage_clause
@@ -988,7 +986,7 @@ physical_attributes_clause
     ;
 
 storage_clause
-    :  STORAGE '('
+    : STORAGE '('
          (INITIAL initial_size=size_clause
          | NEXT next_size=size_clause
          | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
@@ -1217,7 +1215,7 @@ ref_cursor_type_def
     ;
 
 type_declaration
-    :  TYPE identifier IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
+    : TYPE identifier IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
     ;
 
 table_type_def
@@ -1464,7 +1462,7 @@ savepoint_statement
 /* TODO
 //SHOULD BE OVERRIDEN!
 compilation_unit
-    :  seq_of_statements* EOF
+    : seq_of_statements* EOF
     ;
 
 //SHOULD BE OVERRIDEN!
@@ -1558,7 +1556,7 @@ table_ref_aux
     ;
 
 table_ref_aux_internal
-    :  dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
+    : dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
     | '(' table_ref subquery_operation_part* ')' (pivot_clause | unpivot_clause)?  # table_ref_aux_internal_two
     | ONLY '(' dml_table_expression_clause ')'                                     # table_ref_aux_internal_three
     ;
