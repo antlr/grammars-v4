@@ -2003,7 +2003,7 @@ other_function
     | COALESCE '(' table_element (',' (numeric | quoted_string))? ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
-    | ( cursor_name | SQL ) ( PERCENT_ISOPEN | PERCENT_FOUND | PERCENT_NOTFOUND | PERCENT_ROWCOUNT )
+    | cursor_name ( PERCENT_ISOPEN | PERCENT_FOUND | PERCENT_NOTFOUND | PERCENT_ROWCOUNT )
     | DECOMPOSE '(' concatenation (CANONICAL | COMPATIBILITY)? ')'
     | EXTRACT '(' regular_id FROM concatenation ')'
     | (FIRST_VALUE | LAST_VALUE) function_argument_analytic respect_or_ignore_nulls? over_clause
@@ -2928,6 +2928,7 @@ regular_id
     | NCLOB
     | NESTED
     | NEW
+    | NEXT
     | NO
     | NOAUDIT
     // | NOCACHE
@@ -3050,6 +3051,7 @@ regular_id
     | SNAPSHOT
     | SOME
     | SPECIFICATION
+    | SQL
     | SQLDATA
     | SQLERROR
     | STANDALONE
