@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2009-2011 Alexandre Porcelli <alexandre.porcelli@gmail.com>
  * Copyright (c) 2015-2017 Ivan Kochurkin (KvanTTT, kvanttt@gmail.com, Positive Technologies).
+ * Copyright (c) 2017      Mark Adams <madams51703@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +48,8 @@ unit_statement
     | create_tablespace
     | create_view //TODO
 //  | create_directory //TODO
-//  | create_materialized_view //TODO
+    | create_materialized_view 
+    | create_materialized_view_log
     | create_user
 
     | create_sequence
@@ -519,7 +521,7 @@ sequence_start_clause
     ;
 
 create_index
-    : CREATE UNIQUE? INDEX index_name ON tableview_name paren_column_list (TABLESPACE REGULAR_ID)? (COMPUTE STATISTICS)? ';'
+    : CREATE UNIQUE? INDEX index_name ON tableview_name paren_column_list (TABLESPACE id_expression)? (COMPUTE STATISTICS)? ';'
     ;
 
 alter_index
@@ -729,7 +731,7 @@ create_tablespace
     ;
 
 permanent_tablespace_clause
-    : TABLESPACE REGULAR_ID datafile_specification? 
+    : TABLESPACE id_expression datafile_specification? 
         ( MINIMUM EXTENT size_clause
         | BLOCKSIZE size_clause
         | logging_clause
@@ -748,10 +750,9 @@ tablespace_encryption_spec
     ;
 
 logging_clause
-    : ( LOGGING
-      | NOLOGGING
-      | FILESYSTEM_LIKE_LOGGING
-      )
+    : LOGGING
+     | NOLOGGING
+     | FILESYSTEM_LIKE_LOGGING
     ;
 
 extent_management_clause
@@ -770,7 +771,7 @@ flashback_mode_clause
     ;
 
 temporary_tablespace_clause
-    : TEMPORARY TABLESPACE tablespace_name=REGULAR_ID
+    : TEMPORARY TABLESPACE tablespace_name=id_expression
         tempfile_specification?
         tablespace_group_clause? extent_management_clause?
     ;
@@ -780,7 +781,7 @@ tablespace_group_clause
     ;
 
 undo_tablespace_clause
-    : UNDO TABLESPACE tablespace_name=REGULAR_ID
+    : UNDO TABLESPACE tablespace_name=id_expression
         datafile_specification? 
         extent_management_clause? tablespace_retention_clause?
     ;
@@ -820,6 +821,84 @@ maxsize_clause
     : MAXSIZE (UNLIMITED | size_clause)
     ;
 
+build_clause
+    : BUILD (IMMEDIATE | DEFERRED)
+    ;
+
+parallel_clause
+    : NOPARALLEL
+    | PARALLEL parallel_count=UNSIGNED_INTEGER
+      
+    ;
+
+create_materialized_view_log
+    : CREATE MATERIALIZED VIEW LOG ON tableview_name
+        ( ( physical_attributes_clause
+          | TABLESPACE tablespace_name=id_expression
+          | logging_clause
+          | (CACHE | NOCACHE)
+          )+
+         )?
+        parallel_clause?
+        // table_partitioning_clauses TODO
+        ( WITH
+           ( ','?
+             ( OBJECT ID
+             | PRIMARY KEY
+             | ROWID
+             | SEQUENCE
+             | COMMIT SCN
+             )
+           )*
+           ('(' ( ','? regular_id )+ ')' new_values_clause? )?
+           mv_log_purge_clause?
+        )*
+    ;
+
+new_values_clause
+    : (INCLUDING | EXCLUDING ) NEW VALUES
+    ;
+
+mv_log_purge_clause
+    : PURGE
+         ( IMMEDIATE (SYNCHRONOUS | ASYNCHRONOUS)? 
+      // |START WITH CLAUSES TODO
+         ) 
+    ;
+
+create_materialized_view
+    : CREATE MATERIALIZED VIEW tableview_name
+      (OF type_name )?
+//scoped_table_ref and column alias goes here  TODO
+        ( ON PREBUILT TABLE ( (WITH | WITHOUT) REDUCED PRECISION)?
+        | physical_properties?  (CACHE | NOCACHE)? parallel_clause? build_clause?
+        )
+        ( USING INDEX ( (physical_attributes_clause | TABLESPACE mv_tablespace=id_expression)+ )*
+        | USING NO INDEX
+        )?
+        create_mv_refresh?
+        (FOR UPDATE)?
+        ( (DISABLE | ENABLE) QUERY REWRITE )?
+        AS subquery
+        ';'
+    ;
+
+create_mv_refresh
+    : ( NEVER REFRESH
+      | REFRESH
+         ( (FAST | COMPLETE | FORCE)
+         | ON (DEMAND | COMMIT)
+         | (START WITH | NEXT) //date goes here TODO
+         | WITH (PRIMARY KEY | ROWID)
+         | USING
+             ( DEFAULT (MASTER | LOCAL)? ROLLBACK SEGMENT
+             | (MASTER | LOCAL)? ROLLBACK SEGMENT rb_segment=REGULAR_ID
+             )
+         | USING (ENFORCED | TRUSTED) CONSTRAINTS
+         )+
+      )
+    ;
+
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
         ( '(' (','? datatype_null_enable)+
@@ -832,45 +911,14 @@ create_table
         )*
         ')' )?
         (ON COMMIT (DELETE | PRESERVE) ROWS)?
-        (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
-        (PCTFREE pctfree=UNSIGNED_INTEGER
-        | PCTUSED pctused=UNSIGNED_INTEGER
-        | INITRANS inittrans=UNSIGNED_INTEGER
-        )*
-        (STORAGE '('
-          (INITIAL initial_size=size_clause
-          | NEXT next_size=size_clause
-          | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
-          | PCTINCREASE pctincrease=UNSIGNED_INTEGER
-          | FREELISTS freelists=UNSIGNED_INTEGER
-          | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
-          | OPTIMAL (size_clause | NULL )
-          | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
-          | FLASH_CACHE (KEEP | NONE | DEFAULT)
-          | ENCRYPT
-          )+
-         ')'
-        )?
-        (TABLESPACE tablespace_name=id_expression)?
-        (LOGGING | NOLOGGING | FILESYSTEM_LIKE_LOGGING)?
-        (COMPRESS
-           (BASIC
-           | FOR (OLTP
-                 | (QUERY | ARCHIVE) (LOW | HIGH)?
-                 )
-           )?
-        | NOCOMPRESS
-        )?
+        physical_properties?
+        table_compression?
 // Column_properties clause goes here
 // Partition clause goes here
          table_range_partition_by_clause?
 // Many more varations to capture
-
-       ((ENABLE | DISABLE)? ROW MOVEMENT)?
-
-       (FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
-       | NO FLASHBACK ARCHIVE
-       )?
+       row_movement_clause?
+       flashback_archive_clause?
 
       (AS subquery)?
 
@@ -897,34 +945,17 @@ table_range_partition_by_clause
                         | ','? MAXVALUE
                         )+
                      ')'
-                (TABLESPACE partition_tablespace=REGULAR_ID)?
+                (TABLESPACE partition_tablespace=id_expression)?
 
                 (ON COMMIT (DELETE | PRESERVE) ROWS)?
-                (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
-                 (PCTFREE pctfree=UNSIGNED_INTEGER
-                 | PCTUSED pctused=UNSIGNED_INTEGER
-                 | INITRANS inittrans=UNSIGNED_INTEGER
-                 )*
-                 (STORAGE '('
-                   (INITIAL initial_size=size_clause
-                   | NEXT next_size=size_clause
-                   | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
-                   | PCTINCREASE pctincrease=UNSIGNED_INTEGER
-                   | FREELISTS freelists=UNSIGNED_INTEGER
-                   | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
-                   | OPTIMAL (size_clause | NULL)
-                   | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
-                   | FLASH_CACHE (KEEP | NONE | DEFAULT)
-                   | ENCRYPT
-                   )+
-                  ')'
-                 )?
+                deferred_segment_creation? 
+                physical_attributes_clause?
             )+
         ')'
     ;
 
 datatype_null_enable
-   :  column_name datatype
+   : column_name datatype
          SORT?  (DEFAULT expression)? (ENCRYPT ( USING  CHAR_STRING )? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? ( NO? SALT )? )?  
          (NOT NULL)? (ENABLE | DISABLE)?
    ;
@@ -933,6 +964,66 @@ datatype_null_enable
 // but having issues with examples/numbers01.sql line 11 "sysdate -1m"
 size_clause
     : UNSIGNED_INTEGER REGULAR_ID?
+    ;
+
+
+table_compression
+    : COMPRESS
+        ( BASIC
+        | FOR ( OLTP
+              | (QUERY | ARCHIVE) (LOW | HIGH)?
+              )
+        )?
+      | NOCOMPRESS
+    ;
+
+physical_attributes_clause
+    : (PCTFREE pctfree=UNSIGNED_INTEGER
+        | PCTUSED pctused=UNSIGNED_INTEGER
+        | INITRANS inittrans=UNSIGNED_INTEGER
+        | storage_clause
+        )+
+    ;
+
+storage_clause
+    : STORAGE '('
+         (INITIAL initial_size=size_clause
+         | NEXT next_size=size_clause
+         | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
+         | PCTINCREASE pctincrease=UNSIGNED_INTEGER
+         | FREELISTS freelists=UNSIGNED_INTEGER
+         | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
+         | OPTIMAL (size_clause | NULL )
+         | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
+         | FLASH_CACHE (KEEP | NONE | DEFAULT)
+         | ENCRYPT
+         )+
+       ')'
+    ;
+
+deferred_segment_creation
+    : SEGMENT CREATION (IMMEDIATE | DEFERRED)
+    ;
+
+segment_attributes_clause
+    : ( physical_attributes_clause
+      | TABLESPACE tablespace_name=id_expression
+      | logging_clause
+      )+
+    ;
+
+physical_properties
+    : deferred_segment_creation?  segment_attributes_clause table_compression?
+    ;
+
+row_movement_clause
+    : (ENABLE | DISABLE)? ROW MOVEMENT
+    ;
+
+flashback_archive_clause
+    : ( FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
+      | NO FLASHBACK ARCHIVE
+      )
     ;
 
 drop_table
@@ -1124,7 +1215,7 @@ ref_cursor_type_def
     ;
 
 type_declaration
-    :  TYPE identifier IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
+    : TYPE identifier IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
     ;
 
 table_type_def
@@ -1371,7 +1462,7 @@ savepoint_statement
 /* TODO
 //SHOULD BE OVERRIDEN!
 compilation_unit
-    :  seq_of_statements* EOF
+    : seq_of_statements* EOF
     ;
 
 //SHOULD BE OVERRIDEN!
@@ -1465,7 +1556,7 @@ table_ref_aux
     ;
 
 table_ref_aux_internal
-    :  dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
+    : dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
     | '(' table_ref subquery_operation_part* ')' (pivot_clause | unpivot_clause)?  # table_ref_aux_internal_two
     | ONLY '(' dml_table_expression_clause ')'                                     # table_ref_aux_internal_three
     ;
@@ -2747,6 +2838,7 @@ regular_id
     | COMMIT
     | COMMITTED
     | COMPATIBILITY
+    | COMPLETE
     | COMPILE
     | COMPOUND
     //| CONNECT
