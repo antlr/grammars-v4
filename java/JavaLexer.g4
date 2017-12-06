@@ -142,6 +142,9 @@ BITAND:             '&';
 BITOR:              '|';
 CARET:              '^';
 MOD:                '%';
+LSHIFT:             '<<';
+RSHIFT:             '>>';
+URSHIFT:            '>>>';
 
 ADD_ASSIGN:         '+=';
 SUB_ASSIGN:         '-=';

@@ -1270,9 +1270,9 @@ relationalExpression
 
 shiftExpression
 	:	additiveExpression
-	|	shiftExpression '<' '<' additiveExpression
-	|	shiftExpression '>' '>' additiveExpression
-	|	shiftExpression '>' '>' '>' additiveExpression
+	|	shiftExpression '<<' additiveExpression
+	|	shiftExpression '>>' additiveExpression
+	|	shiftExpression '>>>' additiveExpression
 	;
 
 additiveExpression
@@ -1716,6 +1716,9 @@ CARET : '^';
 MOD : '%';
 ARROW : '->';
 COLONCOLON : '::';
+LSHIFT : '<<';
+RSHIFT : '>>';
+URSHIFT : '>>>';
 
 ADD_ASSIGN : '+=';
 SUB_ASSIGN : '-=';
