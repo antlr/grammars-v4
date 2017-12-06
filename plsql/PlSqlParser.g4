@@ -827,7 +827,7 @@ build_clause
 
 parallel_clause
     : NOPARALLEL
-    | PARALLEL parallel_count=UNSIGNED_INTEGER
+    | PARALLEL (parallel_count=UNSIGNED_INTEGER)?
       
     ;
 
@@ -1026,6 +1026,53 @@ flashback_archive_clause
       )
     ;
 
+supplemental_table_logging
+    : ADD  
+       ( ','? SUPPLEMENTAL LOG  (supplemental_log_grp_clause | supplemental_id_key_clause ) )*
+     |DROP ( ','? SUPPLEMENTAL LOG (supplemental_id_key_clause | GROUP log_group=UNSIGNED_INTEGER ) )*
+    ;  
+
+supplemental_log_grp_clause
+    : GROUP log_group=UNSIGNED_INTEGER '(' ( ','? regular_id (NO LOG)? )+ ')' ALWAYS?
+    ;
+
+supplemental_id_key_clause
+    : DATA '(' ( ','? ( ALL
+                  | PRIMARY KEY
+                  | UNIQUE
+                  | FOREIGN KEY
+                  )
+               )+
+           ')'
+      COLUMNS
+    ; 
+   
+allocate_extent_clause
+    : ALLOCATE EXTENT
+       ( '(' ( SIZE size_clause
+             | DATAFILE datafile=CHAR_STRING
+             | INSTANCE inst_num=UNSIGNED_INTEGER
+             )+
+         ')' 
+       )?
+    ;
+
+deallocate_unused_clause
+    : DEALLOCATE UNUSED (KEEP size_clause)?
+    ;
+
+shrink_clause
+    : SHRINK SPACE_KEYWORD COMPACT? CASCADE?
+    ;
+
+records_per_block_clause
+    : (MINIMIZE | NOMINIMIZE)? RECORDS_PER_BLOCK
+    ;
+
+upgrade_table_clause
+    : UPGRADE (NOT? INCLUDING DATA) //column_properties TODO
+    ;
+    
 drop_table
     : DROP TABLE tableview_name SEMICOLON
     ;
@@ -1052,16 +1099,43 @@ alter_table
       | drop_constraint
       | enable_constraint
       | disable_constraint
+      | alter_table_properties
       )
     ;
 
+alter_table_properties
+    : alter_table_properties_1
+    | RENAME TO tableview_name
+    | shrink_clause
+    | READ ONLY
+    | READ WRITE
+    | REKEY CHAR_STRING
+    ;
+
+alter_table_properties_1
+    : ( physical_attributes_clause
+      | logging_clause
+      | table_compression
+      | supplemental_table_logging
+      | allocate_extent_clause
+      | deallocate_unused_clause
+      | (CACHE | NOCACHE)
+      | RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')'
+      | upgrade_table_clause
+      | records_per_block_clause
+      | parallel_clause
+      | row_movement_clause
+      | flashback_archive_clause
+      )+
+    ;
+
 add_constraint
-    : ADD (CONSTRAINT constraint_name)?
+    : ADD (','? (CONSTRAINT constraint_name)?
      ( primary_key_clause
      | foreign_key_clause
      | unique_key_clause
      | check_constraint
-     )
+     ) )+
     ;
 
 check_constraint

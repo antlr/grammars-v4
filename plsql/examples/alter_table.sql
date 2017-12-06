@@ -36,3 +36,18 @@ ALTER TABLE suppliers
 
 ALTER TABLE suppliers
   DISABLE CONSTRAINT check_supplier_id;
+
+ALTER TABLE customers
+   PARALLEL;
+
+ALTER TABLE employees
+    DEALLOCATE UNUSED;
+
+ALTER TABLE countries_demo INITRANS 4;
+
+ALTER TABLE employees 
+   PCTFREE 30
+   PCTUSED 60; 
+
+ALTER TABLE employees
+  ALLOCATE EXTENT (SIZE 5K INSTANCE 4);
