@@ -14,6 +14,14 @@ create or replace package body pkgtest is
       open pkgtest.cuData;
       fetch cuData into sbData;
       close cuData;
+
+      if cuData%isopen then
+        dbms_output.put_line('should work');
+      end if;
+
+      if sql%rowcount > 0 then
+        dbms_output.put_line('should work too');
+      end if;
     end;
 end;
 /

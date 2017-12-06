@@ -3020,6 +3020,7 @@ regular_id
     | NCLOB
     | NESTED
     | NEW
+    | NEXT
     | NO
     | NOAUDIT
     // | NOCACHE
@@ -3142,6 +3143,7 @@ regular_id
     | SNAPSHOT
     | SOME
     | SPECIFICATION
+    | SQL
     | SQLDATA
     | SQLERROR
     | STANDALONE
