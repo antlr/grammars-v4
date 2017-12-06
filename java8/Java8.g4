@@ -1716,6 +1716,9 @@ CARET : '^';
 MOD : '%';
 ARROW : '->';
 COLONCOLON : '::';
+LSHIFT : '<<';
+RSHIFT : '>>';
+URSHIFT : '>>>';
 
 ADD_ASSIGN : '+=';
 SUB_ASSIGN : '-=';
