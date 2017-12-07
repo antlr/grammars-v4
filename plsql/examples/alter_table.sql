@@ -51,3 +51,16 @@ ALTER TABLE employees
 
 ALTER TABLE employees
   ALLOCATE EXTENT (SIZE 5K INSTANCE 4);
+
+ALTER TABLE customers
+   ADD (online_acct_pw VARCHAR2(8) ENCRYPT 'NOMAC' NO SALT );
+
+ALTER TABLE employees ADD (resume CLOB)
+  LOB (resume) STORE AS resume_seg (TABLESPACE example);
+
+ALTER TABLE employees ADD (resume CLOB)
+LOB (resume) STORE AS SECUREFILE resume_seg (TABLESPACE auto_seg_ts);
+
+ALTER TABLE employees ADD (skills number)
+    NESTED TABLE skills STORE AS nested_skill_table;
+

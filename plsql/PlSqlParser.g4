@@ -701,6 +701,18 @@ inline_constraint
       constraint_state?
     ;
 
+inline_ref_constraint
+    : SCOPE IS tableview_name
+      | WITH ROWID
+      | (CONSTRAINT constraint_name)? references_clause constraint_state?
+    ; 
+
+out_of_line_ref_constraint
+    : SCOPE FOR '(' ref_col_or_attr=regular_id ')' IS tableview_name
+      | REF '(' ref_col_or_attr=regular_id ')' WITH ROWID
+      | (CONSTRAINT constraint_name)? FOREIGN KEY '(' ( ','? ref_col_or_attr=regular_id)+ ')' references_clause constraint_state?
+      ;
+
 out_of_line_constraint
     : ( (CONSTRAINT constraint_name)?
           ( primary_key_clause
@@ -828,7 +840,6 @@ build_clause
 parallel_clause
     : NOPARALLEL
     | PARALLEL (parallel_count=UNSIGNED_INTEGER)?
-      
     ;
 
 create_materialized_view_log
@@ -935,7 +946,7 @@ table_range_partition_by_clause
               )?
           )?
         '('
-            (COMMA? PARTITION partition_name=REGULAR_ID
+            (COMMA? PARTITION partition_name
                  VALUES LESS THAN
 // Supposed to be literal in here, will need to refine this                      
                      '('
@@ -1070,7 +1081,7 @@ records_per_block_clause
     ;
 
 upgrade_table_clause
-    : UPGRADE (NOT? INCLUDING DATA) //column_properties TODO
+    : UPGRADE (NOT? INCLUDING DATA) column_properties 
     ;
     
 drop_table
@@ -1100,6 +1111,7 @@ alter_table
       | enable_constraint
       | disable_constraint
       | alter_table_properties
+      | column_clauses
       )
     ;
 
@@ -1127,6 +1139,150 @@ alter_table_properties_1
       | row_movement_clause
       | flashback_archive_clause
       )+
+    ;
+column_clauses
+    : add_column_clause
+    ;
+
+add_column_clause
+    : ADD '(' ( ','? column_definition
+              | ','? virtual_column_definition
+              )+
+          ')'
+       column_properties?
+//TODO       ( ','? out_of_line_part_storage' )
+    ;
+
+varray_col_properties
+    : VARRAY varray_item ( substitutable_column_clause? varray_storage_clause
+                         | substitutable_column_clause
+                         )
+    ;
+
+varray_storage_clause
+    : STORE AS (SECUREFILE|BASICFILE)? LOB ( lob_segname? '(' lob_storage_parameters ')'
+                                           | lob_segname
+                                           )
+    ;
+
+lob_segname
+    : regular_id
+    ;
+
+lob_item
+    : regular_id
+    ;
+
+lob_storage_parameters
+    :  TABLESPACE tablespace | (lob_parameters storage_clause? ) 
+    |  storage_clause
+    ;
+
+lob_storage_clause
+    : LOB ( '(' ( ','? lob_item)+ ')' STORE AS ( (SECUREFILE|BASICFILE) | '(' lob_storage_parameters ')' )+
+          | '(' lob_item ')' STORE AS ( (SECUREFILE | BASICFILE) | lob_segname | '(' lob_storage_parameters ')' )+
+          )
+    ;
+
+lob_parameters
+    : ( (ENABLE | DISABLE) STORAGE IN ROW
+      | CHUNK UNSIGNED_INTEGER
+      | PCTVERSION UNSIGNED_INTEGER
+      | FREEPOOLS UNSIGNED_INTEGER
+      | lob_retention_clause
+      | lob_deduplicate_clause
+      | lob_compression_clause
+      | ENCRYPT encryption_spec
+      | DECRYPT
+      | (CACHE | NOCACHE | CACHE READS) logging_clause?
+      )+
+    ;
+
+lob_deduplicate_clause
+    : DEDUPLICATE
+    | KEEP_DUPLICATES
+    ;
+
+lob_compression_clause
+    : NOCOMPRESS
+    | COMPRESS (HIGH | MEDIUM | LOW )?
+    ;
+
+lob_retention_clause
+    : RETENTION (MAX | MIN UNSIGNED_INTEGER | AUTO | NONE )?
+    ;
+
+encryption_spec
+    : ( USING  CHAR_STRING )? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? ( NO? SALT )? 
+    ;     
+tablespace
+    : regular_id
+    ;
+
+varray_item
+    : regular_id
+    ;
+
+column_properties
+    : object_type_col_properties
+    | nested_table_col_properties
+    | (varray_col_properties | lob_storage_clause) //TODO '(' ( ','? lob_partition_storage)+ ')'
+//TODO | xmltype_column_properties
+    ;
+
+column_definition
+    : column_name datatype
+         SORT?  (DEFAULT expression)? (ENCRYPT ( USING  CHAR_STRING )? (IDENTIFIED BY regular_id)? CHAR_STRING? ( NO? SALT )? )?  ( inline_constraint* | inline_ref_constraint)
+    ;
+
+virtual_column_definition
+    : column_name datatype? (GENERATED ALWAYS)? AS '(' expression ')'
+        VIRTUAL? inline_constraint*
+    ;
+
+out_of_line_part_storage
+    : PARTITION partition_name 
+    ;
+
+nested_table_col_properties
+    : NESTED TABLE  (nested_item|COLUMN_VALUE) substitutable_column_clause? (LOCAL|GLOBAL)?
+       STORE AS tableview_name ( '(' ( '(' object_properties ')'
+                                     | physical_properties
+                                     | column_properties
+                                     )+
+                                  ')'
+                               )?
+        (RETURN AS? (LOCATOR|VALUE) )?
+     ;
+                     
+nested_item
+    : regular_id
+    ;
+
+substitutable_column_clause
+    : ELEMENT? IS OF TYPE? '(' type_name ')'
+    | NOT? SUBSTITUTABLE AT ALL LEVELS
+    ;
+
+partition_name
+    : regular_id
+    ; 
+
+object_properties
+    : column_or_attribute (DEFAULT expression)? ( inline_constraint+ | inline_ref_constraint )
+    | ( out_of_line_constraint | out_of_line_ref_constraint | supplemental_logging_props )
+    ; 
+
+supplemental_logging_props
+    : SUPPLEMENTAL LOG (supplemental_log_grp_clause|supplemental_id_key_clause )
+    ;
+
+column_or_attribute
+    : regular_id
+    ;
+
+object_type_col_properties
+    : COLUMN column=regular_id substitutable_column_clause
     ;
 
 add_constraint
