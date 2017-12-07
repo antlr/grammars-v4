@@ -1037,22 +1037,26 @@ flashback_archive_clause
       )
     ;
 
+log_grp
+    : UNSIGNED_INTEGER
+    ;
+
 supplemental_table_logging
     : ADD  
        ( ','? SUPPLEMENTAL LOG  (supplemental_log_grp_clause | supplemental_id_key_clause ) )*
-     |DROP ( ','? SUPPLEMENTAL LOG (supplemental_id_key_clause | GROUP log_group=UNSIGNED_INTEGER ) )*
+    | DROP ( ','? SUPPLEMENTAL LOG (supplemental_id_key_clause | GROUP log_grp ) )*
     ;  
 
 supplemental_log_grp_clause
-    : GROUP log_group=UNSIGNED_INTEGER '(' ( ','? regular_id (NO LOG)? )+ ')' ALWAYS?
+    : GROUP log_grp '(' ( ','? regular_id (NO LOG)? )+ ')' ALWAYS?
     ;
 
 supplemental_id_key_clause
     : DATA '(' ( ','? ( ALL
-                  | PRIMARY KEY
-                  | UNIQUE
-                  | FOREIGN KEY
-                  )
+                      | PRIMARY KEY
+                      | UNIQUE
+                      | FOREIGN KEY
+                      )
                )+
            ')'
       COLUMNS
