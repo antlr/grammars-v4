@@ -621,7 +621,7 @@ proxy_clause
             (WITH (NO ROLES | ROLE role_clause))?
             (AUTHENTICATION REQUIRED)?
             (AUTHENTICATED USING (PASSWORD | CERTIFICATE | DISTINGUISHED NAME))?
-       )
+        )
     ;
 
 container_names
@@ -672,10 +672,9 @@ create_view
     ;
 
 view_options
-    : ( view_alias_constraint 
-      | object_view_clause
-//      | xmltype_view_clause //TODO
-      )
+    :  view_alias_constraint 
+    | object_view_clause
+//  | xmltype_view_clause //TODO
     ;
 
 view_alias_constraint
@@ -703,15 +702,15 @@ inline_constraint
 
 inline_ref_constraint
     : SCOPE IS tableview_name
-      | WITH ROWID
-      | (CONSTRAINT constraint_name)? references_clause constraint_state?
+    | WITH ROWID
+    | (CONSTRAINT constraint_name)? references_clause constraint_state?
     ; 
 
 out_of_line_ref_constraint
     : SCOPE FOR '(' ref_col_or_attr=regular_id ')' IS tableview_name
-      | REF '(' ref_col_or_attr=regular_id ')' WITH ROWID
-      | (CONSTRAINT constraint_name)? FOREIGN KEY '(' ( ','? ref_col_or_attr=regular_id)+ ')' references_clause constraint_state?
-      ;
+    | REF '(' ref_col_or_attr=regular_id ')' WITH ROWID
+    | (CONSTRAINT constraint_name)? FOREIGN KEY '(' ( ','? ref_col_or_attr=regular_id)+ ')' references_clause constraint_state?
+    ;
 
 out_of_line_constraint
     : ( (CONSTRAINT constraint_name)?
@@ -839,7 +838,7 @@ build_clause
 
 parallel_clause
     : NOPARALLEL
-    | PARALLEL (parallel_count=UNSIGNED_INTEGER)?
+    | PARALLEL parallel_count=UNSIGNED_INTEGER?
     ;
 
 create_materialized_view_log
@@ -985,15 +984,15 @@ table_compression
               | (QUERY | ARCHIVE) (LOW | HIGH)?
               )
         )?
-      | NOCOMPRESS
+    | NOCOMPRESS
     ;
 
 physical_attributes_clause
     : (PCTFREE pctfree=UNSIGNED_INTEGER
-        | PCTUSED pctused=UNSIGNED_INTEGER
-        | INITRANS inittrans=UNSIGNED_INTEGER
-        | storage_clause
-        )+
+      | PCTUSED pctused=UNSIGNED_INTEGER
+      | INITRANS inittrans=UNSIGNED_INTEGER
+      | storage_clause
+      )+
     ;
 
 storage_clause
@@ -1032,9 +1031,8 @@ row_movement_clause
     ;
 
 flashback_archive_clause
-    : ( FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
-      | NO FLASHBACK ARCHIVE
-      )
+    : FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
+    | NO FLASHBACK ARCHIVE
     ;
 
 log_grp
@@ -1043,21 +1041,21 @@ log_grp
 
 supplemental_table_logging
     : ADD  
-       ( ','? SUPPLEMENTAL LOG  (supplemental_log_grp_clause | supplemental_id_key_clause ) )*
-    | DROP ( ','? SUPPLEMENTAL LOG (supplemental_id_key_clause | GROUP log_grp ) )*
+       (','? SUPPLEMENTAL LOG  (supplemental_log_grp_clause | supplemental_id_key_clause) )*
+    | DROP (','? SUPPLEMENTAL LOG (supplemental_id_key_clause | GROUP log_grp) )*
     ;  
 
 supplemental_log_grp_clause
-    : GROUP log_grp '(' ( ','? regular_id (NO LOG)? )+ ')' ALWAYS?
+    : GROUP log_grp '(' (','? regular_id (NO LOG)?)+ ')' ALWAYS?
     ;
 
 supplemental_id_key_clause
-    : DATA '(' ( ','? ( ALL
-                      | PRIMARY KEY
-                      | UNIQUE
-                      | FOREIGN KEY
-                      )
-               )+
+    : DATA '('( ','? ( ALL
+                     | PRIMARY KEY
+                     | UNIQUE
+                     | FOREIGN KEY
+                     )
+              )+
            ')'
       COLUMNS
     ; 
@@ -1149,12 +1147,12 @@ column_clauses
     ;
 
 add_column_clause
-    : ADD '(' ( ','? column_definition
-              | ','? virtual_column_definition
+    : ADD '(' (','? column_definition
+              |','? virtual_column_definition
               )+
           ')'
        column_properties?
-//TODO       ( ','? out_of_line_part_storage' )
+//TODO       (','? out_of_line_part_storage )
     ;
 
 varray_col_properties
@@ -1183,7 +1181,7 @@ lob_storage_parameters
     ;
 
 lob_storage_clause
-    : LOB ( '(' ( ','? lob_item)+ ')' STORE AS ( (SECUREFILE|BASICFILE) | '(' lob_storage_parameters ')' )+
+    : LOB ( '(' (','? lob_item)+ ')' STORE AS ( (SECUREFILE|BASICFILE) | '(' lob_storage_parameters ')' )+
           | '(' lob_item ')' STORE AS ( (SECUREFILE | BASICFILE) | lob_segname | '(' lob_storage_parameters ')' )+
           )
     ;
@@ -1209,15 +1207,15 @@ lob_deduplicate_clause
 
 lob_compression_clause
     : NOCOMPRESS
-    | COMPRESS (HIGH | MEDIUM | LOW )?
+    | COMPRESS (HIGH | MEDIUM | LOW)?
     ;
 
 lob_retention_clause
-    : RETENTION (MAX | MIN UNSIGNED_INTEGER | AUTO | NONE )?
+    : RETENTION (MAX | MIN UNSIGNED_INTEGER | AUTO | NONE)?
     ;
 
 encryption_spec
-    : ( USING  CHAR_STRING )? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? ( NO? SALT )? 
+    : (USING  CHAR_STRING)? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? (NO? SALT)? 
     ;     
 tablespace
     : regular_id
@@ -1236,7 +1234,7 @@ column_properties
 
 column_definition
     : column_name datatype
-         SORT?  (DEFAULT expression)? (ENCRYPT ( USING  CHAR_STRING )? (IDENTIFIED BY regular_id)? CHAR_STRING? ( NO? SALT )? )?  ( inline_constraint* | inline_ref_constraint)
+         SORT?  (DEFAULT expression)? (ENCRYPT (USING  CHAR_STRING)? (IDENTIFIED BY regular_id)? CHAR_STRING? (NO? SALT)? )?  (inline_constraint* | inline_ref_constraint)
     ;
 
 virtual_column_definition
@@ -1249,14 +1247,14 @@ out_of_line_part_storage
     ;
 
 nested_table_col_properties
-    : NESTED TABLE  (nested_item|COLUMN_VALUE) substitutable_column_clause? (LOCAL|GLOBAL)?
+    : NESTED TABLE  (nested_item | COLUMN_VALUE) substitutable_column_clause? (LOCAL | GLOBAL)?
        STORE AS tableview_name ( '(' ( '(' object_properties ')'
                                      | physical_properties
                                      | column_properties
                                      )+
                                   ')'
                                )?
-        (RETURN AS? (LOCATOR|VALUE) )?
+        (RETURN AS? (LOCATOR | VALUE) )?
      ;
                      
 nested_item
@@ -1273,12 +1271,14 @@ partition_name
     ; 
 
 object_properties
-    : column_or_attribute (DEFAULT expression)? ( inline_constraint+ | inline_ref_constraint )
-    | ( out_of_line_constraint | out_of_line_ref_constraint | supplemental_logging_props )
+    : column_or_attribute (DEFAULT expression)? (inline_constraint+ | inline_ref_constraint)
+    | out_of_line_constraint
+    | out_of_line_ref_constraint
+    | supplemental_logging_props
     ; 
 
 supplemental_logging_props
-    : SUPPLEMENTAL LOG (supplemental_log_grp_clause|supplemental_id_key_clause )
+    : SUPPLEMENTAL LOG (supplemental_log_grp_clause | supplemental_id_key_clause)
     ;
 
 column_or_attribute
