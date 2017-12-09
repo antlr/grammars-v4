@@ -456,7 +456,8 @@ methodDeclarator
 	;
 
 formalParameterList
-	:	formalParameters ',' lastFormalParameter
+	:	receiverParameter
+	|	formalParameters ',' lastFormalParameter
 	|	lastFormalParameter
 	;
 
@@ -1667,7 +1668,7 @@ ZeroToThree
 // This is not in the spec but prevents having to preprocess the input
 fragment
 UnicodeEscape
-    :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
+    :   '\\' 'u'+  HexDigit HexDigit HexDigit HexDigit
     ;
 
 // §3.10.7 The Null Literal
