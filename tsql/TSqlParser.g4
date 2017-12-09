@@ -32,7 +32,8 @@ tsql_file
     ;
 
 batch
-    : sql_clauses go_statement*
+    : execute_body go_statement*
+    | execute_body? sql_clauses go_statement*
     ;
 
 sql_clauses
@@ -222,7 +223,9 @@ ddl_clause
     | drop_xml_schema_collection
     | disable_trigger
     | enable_trigger
+    | lock_table
     | truncate_table
+    | update_statistics
     ;
 backup_statement
     : backup_database
@@ -313,13 +316,14 @@ while_statement
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/print-transact-sql
 print_statement
-    : PRINT expression ';'?
+    : PRINT (expression | DOUBLE_QUOTE_ID) (',' LOCAL_ID)* ';'?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/raiserror-transact-sql
 raiseerror_statement
     : RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' severity=constant_LOCAL_ID ','
     state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' (WITH (LOG | SETERROR))? ';'?
+    | RAISERROR DECIMAL formatstring=(STRING | LOCAL_ID | DOUBLE_QUOTE_ID) (',' argument=(DECIMAL | STRING | LOCAL_ID))*
     ;
 
 empty_statement
@@ -339,6 +343,7 @@ another_statement
     | set_statement
     | transaction_statement
     | use_statement
+    | setuser_statement
     ;
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
 
@@ -954,6 +959,10 @@ disable_trigger
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/enable-trigger-transact-sql
 enable_trigger
      : ENABLE TRIGGER ( ( COMMA? (schema_name=id DOT)? trigger_name=id )+ | ALL)         ON ( (schema_id=id DOT)? object_name=id|DATABASE|ALL SERVER)
+     ;
+
+lock_table
+     : LOCK TABLE table_name IN (SHARE | EXCLUSIVE) MODE (WAIT seconds=DECIMAL | NOWAIT)? ';'? 
      ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/truncate-table-transact-sql
@@ -1745,7 +1754,7 @@ merge_not_matched
 // https://msdn.microsoft.com/en-us/library/ms189835.aspx
 delete_statement
     : with_expression?
-      DELETE (TOP '(' expression ')' PERCENT?)?
+      DELETE (TOP '(' expression ')' PERCENT? | TOP DECIMAL)?
       FROM? delete_statement_from
       insert_with_table_hints?
       output_clause?
@@ -1951,13 +1960,17 @@ create_statistics
             (',' NORECOMPUTE)? (',' INCREMENTAL EQUAL on_off)? )? ';'?
     ;
 
+update_statistics
+    : UPDATE (INDEX | ALL)? STATISTICS full_table_name id?  (USING DECIMAL VALUES)?
+    ;
+
 // https://msdn.microsoft.com/en-us/library/ms174979.aspx
 create_table
-    : CREATE TABLE table_name '(' column_def_table_constraints ','? ')' table_options* (ON id | DEFAULT)? (TEXTIMAGE_ON id | DEFAULT)?';'?
+    : CREATE TABLE table_name '(' column_def_table_constraints ','? ')' (LOCK simple_id)? table_options* (ON id | DEFAULT)? (TEXTIMAGE_ON id | DEFAULT)?';'?
     ;
 
 table_options
-    : WITH '(' index_option (',' index_option)* ')'
+    : WITH ('(' index_option (',' index_option)* ')' | index_option (',' index_option)*)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
@@ -1980,6 +1993,7 @@ alter_table
                              | DROP CONSTRAINT constraint=id
                              | WITH CHECK ADD CONSTRAINT constraint=id FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
                              | CHECK CONSTRAINT constraint=id
+                             | (ENABLE | DISABLE) TRIGGER id?
                              | REBUILD table_options)
                              ';'?
     ;
@@ -2339,7 +2353,7 @@ cursor_statement
     // https://msdn.microsoft.com/en-us/library/ms175035(v=sql.120).aspx
     : CLOSE GLOBAL? cursor_name ';'?
     // https://msdn.microsoft.com/en-us/library/ms188782(v=sql.120).aspx
-    | DEALLOCATE GLOBAL? cursor_name ';'?
+    | DEALLOCATE GLOBAL? CURSOR? cursor_name ';'?
     // https://msdn.microsoft.com/en-us/library/ms180169(v=sql.120).aspx
     | declare_cursor
     // https://msdn.microsoft.com/en-us/library/ms180152(v=sql.120).aspx
@@ -2478,8 +2492,12 @@ backup_service_master_key
 
 // https://msdn.microsoft.com/en-us/library/ms188332.aspx
 execute_statement
-    : EXECUTE (return_status=LOCAL_ID '=')? (func_proc_name | expression) (execute_statement_arg (',' execute_statement_arg)*)? ';'?
-    | EXECUTE '(' execute_var_string ('+' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? ';'?
+    : EXECUTE execute_body
+    ;
+
+execute_body
+    : (return_status=LOCAL_ID '=')? (func_proc_name | expression) (execute_statement_arg (',' execute_statement_arg)*)? ';'?
+    | '(' execute_var_string ('+' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? ';'?
     ;
 
 execute_statement_arg
@@ -2618,6 +2636,8 @@ transaction_statement
     | COMMIT (TRAN | TRANSACTION) ((id | LOCAL_ID) (WITH '(' DELAYED_DURABILITY EQUAL (OFF | ON) ')')?)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178628.aspx
     | COMMIT WORK? ';'?
+    | COMMIT id
+    | ROLLBACK id
     // https://msdn.microsoft.com/en-us/library/ms181299.aspx
     | ROLLBACK (TRAN | TRANSACTION) (id | LOCAL_ID)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms174973.aspx
@@ -2634,6 +2654,10 @@ go_statement
 // https://msdn.microsoft.com/en-us/library/ms188366.aspx
 use_statement
     : USE database=id ';'?
+    ;
+
+setuser_statement
+    : SETUSER user=STRING?
     ;
 
 dbcc_clause
@@ -2670,6 +2694,7 @@ column_def_table_constraints
 
 column_def_table_constraint
     : column_definition
+    | materialized_column_definition
     | table_constraint
     ;
 
@@ -2680,6 +2705,10 @@ column_definition
        | IDENTITY ('(' seed=DECIMAL ',' increment=DECIMAL ')')? (NOT FOR REPLICATION)?)?
       ROWGUIDCOL?
       column_constraint*
+    ;
+
+materialized_column_definition
+    : id (COMPUTE | AS) expression (MATERIALIZED | NOT MATERIALIZED)?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms186712.aspx
@@ -2697,7 +2726,7 @@ table_constraint
        ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list_with_order ')' index_options? (ON id)?
          | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
          | DEFAULT '('?  (STRING | PLUS | function_call | DECIMAL)+ ')'? FOR id
-         | FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?)
+         | FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name ('(' pk = column_name_list')')? on_delete? on_update?)
     ;
 
 on_delete
@@ -2723,7 +2752,7 @@ index_option
 declare_cursor
     : DECLARE cursor_name
       (CURSOR (declare_set_cursor_common (FOR UPDATE (OF column_name_list)?)?)?
-      | INSENSITIVE? SCROLL? CURSOR FOR select_statement (FOR (READ ONLY | UPDATE | (OF column_name_list)))?
+      | (SEMI_SENSITIVE | INSENSITIVE)? SCROLL? CURSOR FOR select_statement (FOR (READ ONLY | UPDATE | (OF column_name_list)))?
       ) ';'?
     ;
 
@@ -2751,7 +2780,7 @@ set_special
     : SET id (id | constant_LOCAL_ID | on_off) ';'?
     // https://msdn.microsoft.com/en-us/library/ms173763.aspx
     | SET TRANSACTION ISOLATION LEVEL
-      (READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SNAPSHOT | SERIALIZABLE) ';'?
+      (READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SNAPSHOT | SERIALIZABLE | DECIMAL) ';'?
     // https://msdn.microsoft.com/en-us/library/ms188059.aspx
     | SET IDENTITY_INSERT table_name on_off ';'?
     | SET ANSI_NULLS on_off
@@ -2779,7 +2808,7 @@ expression
     | bracket_expression
     | unary_operator_expression
     | expression op=('*' | '/' | '%') expression
-    | expression op=('+' | '-' | '&' | '^' | '|') expression
+    | expression op=('+' | '-' | '&' | '^' | '|' | '||') expression
     | expression comparison_operator expression
     | expression assignment_operator expression
     | over_clause
@@ -3211,7 +3240,7 @@ insert_with_table_hints
 // READCOMMITTEDLOCK, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, TABLOCK, TABLOCKX
 // UPDLOCK, XLOCK)
 table_hint
-    : NOEXPAND? ( INDEX '(' index_value (',' index_value)* ')'
+    : NOEXPAND? ( INDEX ('(' index_value (',' index_value)* ')' | index_value (',' index_value)*)
                 | INDEX '=' index_value
                 | FORCESEEK ('(' index_value '(' ID  (',' ID)* ')' ')')?
                 | SERIALIZABLE
@@ -3375,6 +3404,7 @@ simple_name
 
 func_proc_name
     : (database=id '.' (schema=id)? '.' | (schema=id) '.')? procedure=id
+    | server=id '.' database=id '.' (schema=id)? '.' procedure=id
     ;
 
 ddl_object
@@ -3494,6 +3524,7 @@ data_type
     | DATETIME2
     | DATETIMEOFFSET '(' DECIMAL ')'
     | DECIMAL '(' DECIMAL ',' DECIMAL ')'
+    | DOUBLE PRECISION?
     | FLOAT
     | GEOGRAPHY
     | GEOMETRY
@@ -3519,6 +3550,7 @@ data_type
     | VARCHAR '(' DECIMAL | MAX ')'
     | XML*/
     : id IDENTITY? ('(' (DECIMAL | MAX) (',' DECIMAL)? ')')?
+    | DOUBLE PRECISION?
     | INT
     | TINYINT
     | SMALLINT
@@ -3555,155 +3587,424 @@ id
 simple_id
     : ID
     | ABSOLUTE
+    | ACCENT_SENSITIVITY
+    | ACTION
+    | ACTIVATION
     | ACTIVE
     | ADDRESS
+    | AES_128
+    | AES_192
+    | AES_256
+    | AFFINITY
+    | AFTER
+    | AGGREGATE
+    | ALGORITHM
+    | ALLOW_ENCRYPTED_VALUE_MODIFICATIONS
+    | ALLOW_SNAPSHOT_ISOLATION
+    | ALLOWED
+    | ANSI_NULL_DEFAULT
+    | ANSI_NULLS
+    | ANSI_PADDING
+    | ANSI_WARNINGS
+    | APPLICATION_LOG
     | APPLY
+    | ARITHABORT
+    | ASSEMBLY
+    | AUDIT
+    | AUDIT_GUID
     | AUTO
+    | AUTO_CLEANUP
+    | AUTO_CLOSE
+    | AUTO_CREATE_STATISTICS
+    | AUTO_SHRINK
+    | AUTO_UPDATE_STATISTICS
+    | AUTO_UPDATE_STATISTICS_ASYNC
     | AVAILABILITY
     | AVG
+    | BACKUP_PRIORITY
+    | BEGIN_DIALOG
+    | BIGINT
+    | BINARY_BASE64
+    | BINARY_CHECKSUM
+    | BINDING
+    | BLOB_STORAGE
+    | BROKER
+    | BROKER_INSTANCE
+    | BULK_LOGGED
     | CALLED
     | CALLER
+    | CAP_CPU_PERCENT
     | CAST
+    | CATALOG
     | CATCH
+    | CHANGE_RETENTION
+    | CHANGE_TRACKING
+    | CHECKSUM
     | CHECKSUM_AGG
+    | CLEANUP
+    | COLLECTION
+    | COLUMN_MASTER_KEY
     | COMMITTED
+    | COMPATIBILITY_LEVEL
     | CONCAT
     | CONCAT_NULL_YIELDS_NULL
+    | CONTENT
     | CONTROL
     | COOKIE
     | COUNT
-    | COUNTER
     | COUNT_BIG
+    | COUNTER
+    | CPU
+    | CREATE_NEW
+    | CREATION_DISPOSITION
+    | CREDENTIAL
+    | CRYPTOGRAPHIC
+    | CURSOR_CLOSE_ON_COMMIT
+    | CURSOR_DEFAULT
     | DATA_COMPRESSION
+    | DATE_CORRELATION_OPTIMIZATION
+    | DATEADD
+    | DATEDIFF
+    | DATENAME
+    | DATEPART
+    | DAYS
+    | DB_CHAINING
+    | DB_FAILOVER
+    | DECRYPTION
+    | DEFAULT_DOUBLE_QUOTE
+    | DEFAULT_FULLTEXT_LANGUAGE
+    | DEFAULT_LANGUAGE
     | DELAY
+    | DELAYED_DURABILITY
     | DELETED
     | DENSE_RANK
+    | DEPENDENTS
+    | DES
+    | DESCRIPTION
+    | DESX
+    | DHCP
+    | DIALOG
+    | DIRECTORY_NAME
     | DISABLE
+    | DISABLE_BROKER
+    | DISABLED
+    | DISK_DRIVE
+    | DOCUMENT
     | DYNAMIC
+    | EMERGENCY
+    | EMPTY
+    | ENABLE
+    | ENABLE_BROKER
+    | ENCRYPTED_VALUE
     | ENCRYPTION
+    | ENDPOINT_URL
+    | ERROR_BROKER_CONVERSATIONS
     | EVENTDATA
+    | EXCLUSIVE
+    | EXECUTABLE
+    | EXIST
     | EXPAND
+    | EXPIRY_DATE
+    | EXPLICIT
+    | FAIL_OPERATION
+    | FAILOVER_MODE
+    | FAILURE
+    | FAILURE_CONDITION_LEVEL
     | FAST
     | FAST_FORWARD
+    | FILEGROUP
+    | FILEGROWTH
     | FILENAME
+    | FILEPATH
+    | FILESTREAM
     | FILLFACTOR
+    | FILTER
     | FIRST
+    | FIRST_VALUE
     | FOLLOWING
     | FORCE
+    | FORCE_FAILOVER_ALLOW_DATA_LOSS
+    | FORCED
     | FORCESEEK
+    | FORMAT
     | FORWARD_ONLY
     | FULLSCAN
+    | FULLTEXT
+    | GB
+    | GETDATE
+    | GETUTCDATE
     | GLOBAL
+    | GO
+    | GROUP_MAX_REQUESTS
     | GROUPING
     | GROUPING_ID
+    | HADR
     | HASH
+    | HEALTH_CHECK_TIMEOUT
+    | HIGH
+    | HONOR_BROKER_PRIORITY
+    | HOURS
+    | IDENTITY_VALUE
+    | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
+    | IMMEDIATE
     | IMPERSONATE
+    | IMPORTANCE
+    | INCREMENTAL
+    | INIT
+    | INITIATOR
+    | INPUT
     | INSENSITIVE
     | INSERTED
+    | INT
+    | IP
     | ISOLATION
+    | KB
     | KEEP
     | KEEPFIXED
     | KEY
-    | FORCED
+    | KEY_SOURCE
+    | KEYS
     | KEYSET
-    | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
-    | INPUT
+    | LAG
     | LAST
+    | LAST_VALUE
+    | LEAD
     | LEVEL
+    | LIST
+    | LISTENER
+    | LISTENER_URL
+    | LOB_COMPACTION
     | LOCAL
     | LOCATION
+    | LOCK
     | LOCK_ESCALATION
     | LOGIN
     | LOOP
-    | MASTER
+    | LOW
+    | MANUAL
     | MARK
+    | MASTER
+    | MATERIALIZED
     | MAX
+    | MAX_CPU_PERCENT
+    | MAX_DOP
+    | MAX_FILES
+    | MAX_IOPS_PER_VOLUME
+    | MAX_MEMORY
+    | MAX_MEMORY_PERCENT
+    | MAX_PROCESSES
+    | MAX_QUEUE_READERS
+    | MAX_ROLLOVER_FILES
     | MAXDOP
     | MAXRECURSION
-    | MAX_ROLLOVER_FILES
-    | MAX_MEMORY
+    | MAXSIZE
+    | MB
+    | MEDIUM
+    | MEMORY_OPTIMIZED_DATA
+    | MESSAGE
     | MIN
+    | MIN_ACTIVE_ROWVERSION
+    | MIN_CPU_PERCENT
+    | MIN_IOPS_PER_VOLUME
+    | MIN_MEMORY_PERCENT
+    | MINUTES
+    | MIRROR_ADDRESS
+    | MIXED_PAGE_ALLOCATION
+    | MODE
     | MODIFY
+    | MOVE
+    | MULTI_USER
     | NAME
+    | NESTED_TRIGGERS
+    | NEW_ACCOUNT
+    | NEW_BROKER
+    | NEW_PASSWORD
     | NEXT
+    | NO
+    | NO_TRUNCATE
+    | NO_WAIT
     | NOCOUNT
+    | NODES
     | NOEXPAND
+    | NON_TRANSACTED_ACCESS
     | NORECOMPUTE
+    | NORECOVERY
+    | NOWAIT
     | NTILE
+    | NUMANODE
     | NUMBER
+    | NUMERIC_ROUNDABORT
+    | OBJECT
+    | OFFLINE
     | OFFSET
     | OFFSETS
+    | OLD_ACCOUNT
     | ONLINE
     | ONLY
+    | OPEN_EXISTING
     | OPTIMISTIC
     | OPTIMIZE
     | OUT
     | OUTPUT
     | OWNER
     | PAGE
+    | PAGE_VERIFY
     | PARAMETERIZATION
     | PARTITION
+    | PARTITIONS
+    | PARTNER
     | PATH
+    | POISON_MESSAGE_HANDLING
+    | POOL
+    | PORT
     | PRECEDING
+    | PRIMARY_ROLE
     | PRIOR
+    | PRIORITY
+    | PRIORITY_LEVEL
+    | PRIVATE
+    | PRIVATE_KEY
     | PRIVILEGES
+    | PROCEDURE_NAME
+    | PROPERTY
+    | PROVIDER
+    | PROVIDER_KEY_NAME
     | PUBLIC
+    | QUERY
+    | QUEUE
+    | QUEUE_DELAY
+    | QUOTED_IDENTIFIER
+    | R
     | RANGE
     | RANK
     | RAW
-    | READONLY
+    | RC2
+    | RC4
+    | RC4_128
+    | READ_COMMITTED_SNAPSHOT
     | READ_ONLY
+    | READ_ONLY_ROUTING_LIST
+    | READ_WRITE
+    | READONLY
+    | REBUILD
+    | RECEIVE
     | RECOMPILE
+    | RECOVERY
+    | RECURSIVE_TRIGGERS
     | RELATIVE
     | REMOTE
+    | REMOTE_SERVICE_NAME
+    | REMOVE
+    | REORGANIZE
     | REPEATABLE
+    | REPLICA
+    | REQUEST_MAX_CPU_TIME_SEC
+    | REQUEST_MAX_MEMORY_GRANT_PERCENT
+    | REQUEST_MEMORY_GRANT_TIMEOUT_SEC
+    | REQUIRED_SYNCHRONIZED_SECONDARIES_TO_COMMIT
+    | RESERVE_DISK_SPACE
+    | RESOURCE
+    | RESOURCE_MANAGER_LOCATION
+    | RESTRICTED_USER
+    | RETENTION
     | RETURN
     | RETURNS
     | ROBUST
     | ROOT
+    | ROUTE
     | ROW
+    | ROW_NUMBER
     | ROWCOUNT
     | ROWGUID
     | ROWS
-    | ROW_NUMBER
     | SAFETY
     | SAMPLE
-    | SID
-    | SIZE
     | SCHEMABINDING
+    | SCOPED
     | SCROLL
     | SCROLL_LOCKS
+    | SEARCH
+    | SECONDARY
+    | SECONDARY_ONLY
+    | SECONDARY_ROLE
+    | SECONDS
+    | SECRET
+    | SECURITY_LOG
+    | SEEDING_MODE
     | SELF
+    | SEMI_SENSITIVE
+    | SEND
+    | SENT
     | SERIALIZABLE
     | SERVER
+    | SESSION_TIMEOUT
+    | SETERROR
+    | SHARE
+    | SHOWPLAN
+    | SID
+    | SID
+    | SIGNATURE
     | SIMPLE
+    | SINGLE_USER
+    | SIZE
+    | SMALLINT
     | SNAPSHOT
     | SOURCE
     | SPATIAL_WINDOW_MAX_CELLS
+    | STANDBY
+    | START
+    | START_DATE
     | STATE
     | STATIC
     | STATS_STREAM
+    | STATUS
     | STDEV
     | STDEVP
+    | STOPLIST
+    | STUFF
+    | SUBJECT
     | SUM
+    | SUSPEND
+    | SYMMETRIC
+    | SYNCHRONOUS_COMMIT
+    | SYNONYM
+    | TAKE
     | TARGET
+    | TARGET_RECOVERY_TIME
+    | TB
     | TEXTIMAGE_ON
     | THROW
     | TIES
     | TIME
+    | TIMEOUT
+    | TIMER
+    | TINYINT
+    | TORN_PAGE_DETECTION
+    | TRANSFORM_NOISE_WORDS
+    | TRIPLE_DES
+    | TRIPLE_DES_3KEY
+    | TRUSTWORTHY
     | TRY
+    | TSQL
+    | TWO_DIGIT_YEAR_CUTOFF
     | TYPE
     | TYPE_WARNING
     | UNBOUNDED
     | UNCOMMITTED
     | UNKNOWN
+    | UNLIMITED
     | USING
+    | VALID_XML
+    | VALIDATION
+    | VALUE
     | VAR
     | VARP
-    | VALUE
     | VIEW_METADATA
     | VIEWS
+    | WAIT
+    | WELL_FORMED_XML
     | WORK
+    | WORKLOAD
     | XML
     | XMLNAMESPACES
     ;
