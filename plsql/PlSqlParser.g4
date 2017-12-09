@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2009-2011 Alexandre Porcelli <alexandre.porcelli@gmail.com>
  * Copyright (c) 2015-2017 Ivan Kochurkin (KvanTTT, kvanttt@gmail.com, Positive Technologies).
+ * Copyright (c) 2017      Mark Adams <madams51703@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +27,8 @@ sql_script
     ;
 
 unit_statement
-    : alter_function
+    : transaction_control_statements 
+    | alter_function
     | alter_package
     | alter_procedure
     | alter_sequence
@@ -43,9 +45,11 @@ unit_statement
 
     | create_index
     | create_table
-//  | create_view //TODO
+    | create_tablespace
+    | create_view //TODO
 //  | create_directory //TODO
-//  | create_materialized_view //TODO
+    | create_materialized_view 
+    | create_materialized_view_log
     | create_user
 
     | create_sequence
@@ -517,7 +521,7 @@ sequence_start_clause
     ;
 
 create_index
-    : CREATE UNIQUE? INDEX index_name ON tableview_name paren_column_list (COMPUTE STATISTICS)? ';'
+    : CREATE UNIQUE? INDEX index_name ON tableview_name paren_column_list (TABLESPACE id_expression)? (COMPUTE STATISTICS)? ';'
     ;
 
 alter_index
@@ -617,7 +621,7 @@ proxy_clause
             (WITH (NO ROLES | ROLE role_clause))?
             (AUTHENTICATION REQUIRED)?
             (AUTHENTICATED USING (PASSWORD | CERTIFICATE | DISTINGUISHED NAME))?
-       )
+        )
     ;
 
 container_names
@@ -661,57 +665,270 @@ container_clause
     : CONTAINER EQUALS_OP (CURRENT | ALL)
     ;
 
-create_table
-    : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        ( '(' (','? datatype_null_enable)+
-        (',' CONSTRAINT constraint_name
+create_view
+    : CREATE (OR REPLACE)? (OR? FORCE)? EDITIONING? VIEW
+      tableview_name view_options?
+      AS subquery subquery_restriction_clause?
+    ;
+
+view_options
+    :  view_alias_constraint 
+    | object_view_clause
+//  | xmltype_view_clause //TODO
+    ;
+
+view_alias_constraint
+    : '(' ( ','? (table_alias inline_constraint* | out_of_line_constraint) )+ ')'
+    ;
+
+object_view_clause
+    : OF type_name 
+       ( WITH OBJECT (IDENTIFIER|ID|OID) ( DEFAULT | '(' (','? REGULAR_ID)+ ')' )
+       | UNDER tableview_name
+       )
+       ( '(' ( ','? (out_of_line_constraint | REGULAR_ID inline_constraint ) )+ ')' )*
+    ;
+
+inline_constraint
+    : (CONSTRAINT constraint_name)?
+        ( NOT? NULL
+        | UNIQUE
+        | PRIMARY KEY
+        | references_clause
+        | check_constraint
+        )
+      constraint_state?
+    ;
+
+inline_ref_constraint
+    : SCOPE IS tableview_name
+    | WITH ROWID
+    | (CONSTRAINT constraint_name)? references_clause constraint_state?
+    ; 
+
+out_of_line_ref_constraint
+    : SCOPE FOR '(' ref_col_or_attr=regular_id ')' IS tableview_name
+    | REF '(' ref_col_or_attr=regular_id ')' WITH ROWID
+    | (CONSTRAINT constraint_name)? FOREIGN KEY '(' ( ','? ref_col_or_attr=regular_id)+ ')' references_clause constraint_state?
+    ;
+
+out_of_line_constraint
+    : ( (CONSTRAINT constraint_name)?
           ( primary_key_clause
           | foreign_key_clause
           | unique_key_clause
           | check_constraint
           )
+       )+
+      constraint_state? 
+    ;     
+
+constraint_state
+    : ( NOT? DEFERRABLE
+      | INITIALLY (IMMEDIATE|DEFERRED)
+      | (RELY|NORELY)
+      | (ENABLE|DISABLE)
+      | (VALIDATE|NOVALIDATE)
+      )+
+    ;
+
+create_tablespace
+    : CREATE (BIGFILE | SMALLFILE)? 
+        ( permanent_tablespace_clause
+        | temporary_tablespace_clause
+        | undo_tablespace_clause
+        )
+      ';'
+    ;
+
+permanent_tablespace_clause
+    : TABLESPACE id_expression datafile_specification? 
+        ( MINIMUM EXTENT size_clause
+        | BLOCKSIZE size_clause
+        | logging_clause
+        | FORCE LOGGING
+        | (ONLINE | OFFLINE)
+        | ENCRYPTION tablespace_encryption_spec
+        | DEFAULT //TODO table_compression? storage_clause?
+        | extent_management_clause
+        | segment_management_clause
+        | flashback_mode_clause
+        )*
+    ;      
+
+tablespace_encryption_spec
+    : USING encrypt_algorithm=CHAR_STRING
+    ;
+
+logging_clause
+    : LOGGING
+     | NOLOGGING
+     | FILESYSTEM_LIKE_LOGGING
+    ;
+
+extent_management_clause
+    : EXTENT MANAGEMENT LOCAL 
+        ( AUTOALLOCATE
+        | UNIFORM (SIZE size_clause)?
+        )?
+    ;
+
+segment_management_clause
+    : SEGMENT SPACE_KEYWORD MANAGEMENT (AUTO | MANUAL)
+    ;
+
+flashback_mode_clause
+    : FLASHBACK (ON | OFF)
+    ;
+
+temporary_tablespace_clause
+    : TEMPORARY TABLESPACE tablespace_name=id_expression
+        tempfile_specification?
+        tablespace_group_clause? extent_management_clause?
+    ;
+
+tablespace_group_clause
+    : TABLESPACE GROUP (REGULAR_ID | CHAR_STRING)
+    ;
+
+undo_tablespace_clause
+    : UNDO TABLESPACE tablespace_name=id_expression
+        datafile_specification? 
+        extent_management_clause? tablespace_retention_clause?
+    ;
+
+tablespace_retention_clause
+    : RETENTION (GUARANTEE | NOGUARANTEE)
+    ;
+
+datafile_specification
+    : DATAFILE
+	  (','? datafile_tempfile_spec) 
+    ;
+
+tempfile_specification
+    : TEMPFILE
+	  (','? datafile_tempfile_spec) 
+    ;
+
+datafile_tempfile_spec
+    : CHAR_STRING? (SIZE size_clause)? REUSE? autoextend_clause?
+    ;
+
+redo_log_file_spec
+    : DATAFILE ( CHAR_STRING
+      | '(' ( ','? CHAR_STRING )+ ')'
+      )?
+        (SIZE size_clause)?
+        (BLOCKSIZE size_clause)?
+        REUSE?
+    ;
+
+autoextend_clause
+    : AUTOEXTEND (OFF | ON (NEXT size_clause)? maxsize_clause? )
+    ;
+
+maxsize_clause
+    : MAXSIZE (UNLIMITED | size_clause)
+    ;
+
+build_clause
+    : BUILD (IMMEDIATE | DEFERRED)
+    ;
+
+parallel_clause
+    : NOPARALLEL
+    | PARALLEL parallel_count=UNSIGNED_INTEGER?
+    ;
+
+create_materialized_view_log
+    : CREATE MATERIALIZED VIEW LOG ON tableview_name
+        ( ( physical_attributes_clause
+          | TABLESPACE tablespace_name=id_expression
+          | logging_clause
+          | (CACHE | NOCACHE)
+          )+
+         )?
+        parallel_clause?
+        // table_partitioning_clauses TODO
+        ( WITH
+           ( ','?
+             ( OBJECT ID
+             | PRIMARY KEY
+             | ROWID
+             | SEQUENCE
+             | COMMIT SCN
+             )
+           )*
+           ('(' ( ','? regular_id )+ ')' new_values_clause? )?
+           mv_log_purge_clause?
+        )*
+    ;
+
+new_values_clause
+    : (INCLUDING | EXCLUDING ) NEW VALUES
+    ;
+
+mv_log_purge_clause
+    : PURGE
+         ( IMMEDIATE (SYNCHRONOUS | ASYNCHRONOUS)? 
+      // |START WITH CLAUSES TODO
+         ) 
+    ;
+
+create_materialized_view
+    : CREATE MATERIALIZED VIEW tableview_name
+      (OF type_name )?
+//scoped_table_ref and column alias goes here  TODO
+        ( ON PREBUILT TABLE ( (WITH | WITHOUT) REDUCED PRECISION)?
+        | physical_properties?  (CACHE | NOCACHE)? parallel_clause? build_clause?
+        )
+        ( USING INDEX ( (physical_attributes_clause | TABLESPACE mv_tablespace=id_expression)+ )*
+        | USING NO INDEX
+        )?
+        create_mv_refresh?
+        (FOR UPDATE)?
+        ( (DISABLE | ENABLE) QUERY REWRITE )?
+        AS subquery
+        ';'
+    ;
+
+create_mv_refresh
+    : ( NEVER REFRESH
+      | REFRESH
+         ( (FAST | COMPLETE | FORCE)
+         | ON (DEMAND | COMMIT)
+         | (START WITH | NEXT) //date goes here TODO
+         | WITH (PRIMARY KEY | ROWID)
+         | USING
+             ( DEFAULT (MASTER | LOCAL)? ROLLBACK SEGMENT
+             | (MASTER | LOCAL)? ROLLBACK SEGMENT rb_segment=REGULAR_ID
+             )
+         | USING (ENFORCED | TRUSTED) CONSTRAINTS
+         )+
+      )
+    ;
+
+create_table
+    : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
+        ( '(' (','? datatype_null_enable)+
+        (',' (CONSTRAINT constraint_name)?
+          ( primary_key_clause
+          | foreign_key_clause
+          | unique_key_clause
+          | check_constraint
+          ) constraint_state?
         )*
         ')' )?
         (ON COMMIT (DELETE | PRESERVE) ROWS)?
-        (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
-        (PCTFREE pctfree=UNSIGNED_INTEGER
-        | PCTUSED pctused=UNSIGNED_INTEGER
-        | INITRANS inittrans=UNSIGNED_INTEGER
-        )*
-        (STORAGE '('
-          (INITIAL initial_size=size_clause
-          | NEXT next_size=size_clause
-          | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
-          | PCTINCREASE pctincrease=UNSIGNED_INTEGER
-          | FREELISTS freelists=UNSIGNED_INTEGER
-          | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
-          | OPTIMAL (size_clause | NULL )
-          | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
-          | FLASH_CACHE (KEEP | NONE | DEFAULT)
-          | ENCRYPT
-          )+
-         ')'
-        )?
-        (TABLESPACE tablespace_name=id_expression)?
-        (LOGGING | NOLOGGING | FILESYSTEM_LIKE_LOGGING)?
-        (COMPRESS
-           (BASIC
-           | FOR (OLTP
-                 | (QUERY | ARCHIVE) (LOW | HIGH)?
-                 )
-           )?
-        | NOCOMPRESS
-        )?
+        physical_properties?
+        table_compression?
 // Column_properties clause goes here
 // Partition clause goes here
          table_range_partition_by_clause?
 // Many more varations to capture
-
-       ((ENABLE | DISABLE)? ROW MOVEMENT)?
-
-       (FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
-       | NO FLASHBACK ARCHIVE
-       )?
+       row_movement_clause?
+       flashback_archive_clause?
 
       (AS subquery)?
 
@@ -728,44 +945,29 @@ table_range_partition_by_clause
               )?
           )?
         '('
-            (COMMA? PARTITION partition_name=REGULAR_ID
+            (COMMA? PARTITION partition_name
                  VALUES LESS THAN
 // Supposed to be literal in here, will need to refine this                      
                      '('
-                        (','? STRING
+                        (','? CHAR_STRING
                         | ','? string_function
                         | ','? numeric
                         | ','? MAXVALUE
                         )+
                      ')'
-                (TABLESPACE partition_tablespace=REGULAR_ID)?
+                (TABLESPACE partition_tablespace=id_expression)?
 
                 (ON COMMIT (DELETE | PRESERVE) ROWS)?
-                (SEGMENT CREATION (IMMEDIATE | DEFERRED))?
-                 (PCTFREE pctfree=UNSIGNED_INTEGER
-                 | PCTUSED pctused=UNSIGNED_INTEGER
-                 | INITRANS inittrans=UNSIGNED_INTEGER
-                 )*
-                 (STORAGE '('
-                   (INITIAL initial_size=size_clause
-                   | NEXT next_size=size_clause
-                   | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
-                   | PCTINCREASE pctincrease=UNSIGNED_INTEGER
-                   | FREELISTS freelists=UNSIGNED_INTEGER
-                   | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
-                   | OPTIMAL (size_clause | NULL)
-                   | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
-                   | FLASH_CACHE (KEEP | NONE | DEFAULT)
-                   | ENCRYPT
-                   )+
-                  ')'
-                 )?
+                deferred_segment_creation? 
+                physical_attributes_clause?
             )+
         ')'
     ;
 
 datatype_null_enable
-   :  column_name datatype (NOT NULL)? (ENABLE | DISABLE)?
+   : column_name datatype
+         SORT?  (DEFAULT expression)? (ENCRYPT ( USING  CHAR_STRING )? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? ( NO? SALT )? )?  
+         (NOT NULL)? (ENABLE | DISABLE)?
    ;
 
 //Technically, this should only allow 'K' | 'M' | 'G' | 'T' | 'P' | 'E'
@@ -774,6 +976,116 @@ size_clause
     : UNSIGNED_INTEGER REGULAR_ID?
     ;
 
+
+table_compression
+    : COMPRESS
+        ( BASIC
+        | FOR ( OLTP
+              | (QUERY | ARCHIVE) (LOW | HIGH)?
+              )
+        )?
+    | NOCOMPRESS
+    ;
+
+physical_attributes_clause
+    : (PCTFREE pctfree=UNSIGNED_INTEGER
+      | PCTUSED pctused=UNSIGNED_INTEGER
+      | INITRANS inittrans=UNSIGNED_INTEGER
+      | storage_clause
+      )+
+    ;
+
+storage_clause
+    : STORAGE '('
+         (INITIAL initial_size=size_clause
+         | NEXT next_size=size_clause
+         | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
+         | PCTINCREASE pctincrease=UNSIGNED_INTEGER
+         | FREELISTS freelists=UNSIGNED_INTEGER
+         | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
+         | OPTIMAL (size_clause | NULL )
+         | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
+         | FLASH_CACHE (KEEP | NONE | DEFAULT)
+         | ENCRYPT
+         )+
+       ')'
+    ;
+
+deferred_segment_creation
+    : SEGMENT CREATION (IMMEDIATE | DEFERRED)
+    ;
+
+segment_attributes_clause
+    : ( physical_attributes_clause
+      | TABLESPACE tablespace_name=id_expression
+      | logging_clause
+      )+
+    ;
+
+physical_properties
+    : deferred_segment_creation?  segment_attributes_clause table_compression?
+    ;
+
+row_movement_clause
+    : (ENABLE | DISABLE)? ROW MOVEMENT
+    ;
+
+flashback_archive_clause
+    : FLASHBACK ARCHIVE flashback_archive=REGULAR_ID
+    | NO FLASHBACK ARCHIVE
+    ;
+
+log_grp
+    : UNSIGNED_INTEGER
+    ;
+
+supplemental_table_logging
+    : ADD  
+       (','? SUPPLEMENTAL LOG  (supplemental_log_grp_clause | supplemental_id_key_clause) )*
+    | DROP (','? SUPPLEMENTAL LOG (supplemental_id_key_clause | GROUP log_grp) )*
+    ;  
+
+supplemental_log_grp_clause
+    : GROUP log_grp '(' (','? regular_id (NO LOG)?)+ ')' ALWAYS?
+    ;
+
+supplemental_id_key_clause
+    : DATA '('( ','? ( ALL
+                     | PRIMARY KEY
+                     | UNIQUE
+                     | FOREIGN KEY
+                     )
+              )+
+           ')'
+      COLUMNS
+    ; 
+   
+allocate_extent_clause
+    : ALLOCATE EXTENT
+       ( '(' ( SIZE size_clause
+             | DATAFILE datafile=CHAR_STRING
+             | INSTANCE inst_num=UNSIGNED_INTEGER
+             )+
+         ')' 
+       )?
+    ;
+
+deallocate_unused_clause
+    : DEALLOCATE UNUSED (KEEP size_clause)?
+    ;
+
+shrink_clause
+    : SHRINK SPACE_KEYWORD COMPACT? CASCADE?
+    ;
+
+records_per_block_clause
+    : (MINIMIZE | NOMINIMIZE)? RECORDS_PER_BLOCK
+    ;
+
+upgrade_table_clause
+    : UPGRADE (NOT? INCLUDING DATA) column_properties 
+    ;
+    
 drop_table
     : DROP TABLE tableview_name SEMICOLON
     ;
@@ -800,16 +1112,190 @@ alter_table
       | drop_constraint
       | enable_constraint
       | disable_constraint
+      | alter_table_properties
+      | column_clauses
       )
     ;
 
+alter_table_properties
+    : alter_table_properties_1
+    | RENAME TO tableview_name
+    | shrink_clause
+    | READ ONLY
+    | READ WRITE
+    | REKEY CHAR_STRING
+    ;
+
+alter_table_properties_1
+    : ( physical_attributes_clause
+      | logging_clause
+      | table_compression
+      | supplemental_table_logging
+      | allocate_extent_clause
+      | deallocate_unused_clause
+      | (CACHE | NOCACHE)
+      | RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')'
+      | upgrade_table_clause
+      | records_per_block_clause
+      | parallel_clause
+      | row_movement_clause
+      | flashback_archive_clause
+      )+
+    ;
+column_clauses
+    : add_column_clause
+    ;
+
+add_column_clause
+    : ADD '(' (','? column_definition
+              |','? virtual_column_definition
+              )+
+          ')'
+       column_properties?
+//TODO       (','? out_of_line_part_storage )
+    ;
+
+varray_col_properties
+    : VARRAY varray_item ( substitutable_column_clause? varray_storage_clause
+                         | substitutable_column_clause
+                         )
+    ;
+
+varray_storage_clause
+    : STORE AS (SECUREFILE|BASICFILE)? LOB ( lob_segname? '(' lob_storage_parameters ')'
+                                           | lob_segname
+                                           )
+    ;
+
+lob_segname
+    : regular_id
+    ;
+
+lob_item
+    : regular_id
+    ;
+
+lob_storage_parameters
+    :  TABLESPACE tablespace | (lob_parameters storage_clause? ) 
+    |  storage_clause
+    ;
+
+lob_storage_clause
+    : LOB ( '(' (','? lob_item)+ ')' STORE AS ( (SECUREFILE|BASICFILE) | '(' lob_storage_parameters ')' )+
+          | '(' lob_item ')' STORE AS ( (SECUREFILE | BASICFILE) | lob_segname | '(' lob_storage_parameters ')' )+
+          )
+    ;
+
+lob_parameters
+    : ( (ENABLE | DISABLE) STORAGE IN ROW
+      | CHUNK UNSIGNED_INTEGER
+      | PCTVERSION UNSIGNED_INTEGER
+      | FREEPOOLS UNSIGNED_INTEGER
+      | lob_retention_clause
+      | lob_deduplicate_clause
+      | lob_compression_clause
+      | ENCRYPT encryption_spec
+      | DECRYPT
+      | (CACHE | NOCACHE | CACHE READS) logging_clause?
+      )+
+    ;
+
+lob_deduplicate_clause
+    : DEDUPLICATE
+    | KEEP_DUPLICATES
+    ;
+
+lob_compression_clause
+    : NOCOMPRESS
+    | COMPRESS (HIGH | MEDIUM | LOW)?
+    ;
+
+lob_retention_clause
+    : RETENTION (MAX | MIN UNSIGNED_INTEGER | AUTO | NONE)?
+    ;
+
+encryption_spec
+    : (USING  CHAR_STRING)? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? (NO? SALT)? 
+    ;     
+tablespace
+    : regular_id
+    ;
+
+varray_item
+    : regular_id
+    ;
+
+column_properties
+    : object_type_col_properties
+    | nested_table_col_properties
+    | (varray_col_properties | lob_storage_clause) //TODO '(' ( ','? lob_partition_storage)+ ')'
+//TODO | xmltype_column_properties
+    ;
+
+column_definition
+    : column_name datatype
+         SORT?  (DEFAULT expression)? (ENCRYPT (USING  CHAR_STRING)? (IDENTIFIED BY regular_id)? CHAR_STRING? (NO? SALT)? )?  (inline_constraint* | inline_ref_constraint)
+    ;
+
+virtual_column_definition
+    : column_name datatype? (GENERATED ALWAYS)? AS '(' expression ')'
+        VIRTUAL? inline_constraint*
+    ;
+
+out_of_line_part_storage
+    : PARTITION partition_name 
+    ;
+
+nested_table_col_properties
+    : NESTED TABLE  (nested_item | COLUMN_VALUE) substitutable_column_clause? (LOCAL | GLOBAL)?
+       STORE AS tableview_name ( '(' ( '(' object_properties ')'
+                                     | physical_properties
+                                     | column_properties
+                                     )+
+                                  ')'
+                               )?
+        (RETURN AS? (LOCATOR | VALUE) )?
+     ;
+                     
+nested_item
+    : regular_id
+    ;
+
+substitutable_column_clause
+    : ELEMENT? IS OF TYPE? '(' type_name ')'
+    | NOT? SUBSTITUTABLE AT ALL LEVELS
+    ;
+
+partition_name
+    : regular_id
+    ; 
+
+object_properties
+    : column_or_attribute (DEFAULT expression)? (inline_constraint+ | inline_ref_constraint)
+    | out_of_line_constraint
+    | out_of_line_ref_constraint
+    | supplemental_logging_props
+    ; 
+
+supplemental_logging_props
+    : SUPPLEMENTAL LOG (supplemental_log_grp_clause | supplemental_id_key_clause)
+    ;
+
+column_or_attribute
+    : regular_id
+    ;
+
+object_type_col_properties
+    : COLUMN column=regular_id substitutable_column_clause
+    ;
+
 add_constraint
-    : ADD (CONSTRAINT constraint_name)?
+    : ADD (','? (CONSTRAINT constraint_name)?
      ( primary_key_clause
      | foreign_key_clause
      | unique_key_clause
      | check_constraint
-     )
+     ) )+
     ;
 
 check_constraint
@@ -853,7 +1339,7 @@ primary_key_clause
 // Anonymous PL/SQL code block
 
 anonymous_block
-    : (DECLARE seq_of_declare_specs)? BEGIN seq_of_statements END SEMICOLON
+    : (DECLARE seq_of_declare_specs)? BEGIN seq_of_statements (EXCEPTION exception_handler+)? END SEMICOLON
     ;
 
 // Common DDL Clauses
@@ -963,7 +1449,7 @@ ref_cursor_type_def
     ;
 
 type_declaration
-    :  TYPE identifier IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
+    : TYPE identifier IS (table_type_def | varray_type_def | record_type_def | ref_cursor_type_def) ';'
     ;
 
 table_type_def
@@ -1042,7 +1528,7 @@ else_part
     ;
 
 loop_statement
-    : label_name? (WHILE condition | FOR cursor_loop_param)? LOOP seq_of_statements END LOOP label_name?
+    : label_declaration? (WHILE condition | FOR cursor_loop_param)? LOOP seq_of_statements END LOOP label_name?
     ;
 
 // Loop Specific Clause
@@ -1210,7 +1696,7 @@ savepoint_statement
 /* TODO
 //SHOULD BE OVERRIDEN!
 compilation_unit
-    :  seq_of_statements* EOF
+    : seq_of_statements* EOF
     ;
 
 //SHOULD BE OVERRIDEN!
@@ -1304,7 +1790,7 @@ table_ref_aux
     ;
 
 table_ref_aux_internal
-    :  dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
+    : dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
     | '(' table_ref subquery_operation_part* ')' (pivot_clause | unpivot_clause)?  # table_ref_aux_internal_two
     | ONLY '(' dml_table_expression_clause ')'                                     # table_ref_aux_internal_three
     ;
@@ -2163,7 +2649,7 @@ variable_name
     ;
 
 index_name
-    : identifier
+    : identifier ('.' id_expression)?
     ;
 
 cursor_name
@@ -2586,6 +3072,7 @@ regular_id
     | COMMIT
     | COMMITTED
     | COMPATIBILITY
+    | COMPLETE
     | COMPILE
     | COMPOUND
     //| CONNECT
@@ -2686,6 +3173,7 @@ regular_id
     //| HAVING
     | HIDE
     | HOUR
+    | ID
     //| IF
     | IGNORE
     | IMMEDIATE
@@ -2747,6 +3235,7 @@ regular_id
     | MEMBER
     | MERGE
     //| MINUS
+    | MINIMUM
     | MINUTE
     | MINVALUE
     | MLSLABEL
@@ -2765,6 +3254,7 @@ regular_id
     | NCLOB
     | NESTED
     | NEW
+    | NEXT
     | NO
     | NOAUDIT
     // | NOCACHE
@@ -2887,6 +3377,7 @@ regular_id
     | SNAPSHOT
     | SOME
     | SPECIFICATION
+    | SQL
     | SQLDATA
     | SQLERROR
     | STANDALONE

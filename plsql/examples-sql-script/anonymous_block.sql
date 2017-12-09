@@ -2,6 +2,8 @@ DECLARE
   NUX NUMBER := 1;
 BEGIN
   DBMS_OUTPUT.PUT_LINE('Hello');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Something went wrong!');
 END;
 /
-

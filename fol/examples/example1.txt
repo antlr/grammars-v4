@@ -1,2 +1,3 @@
-Forall ?a B
+_isProf(#Lucy)
+Forall(?x)_isProf(?x)->_isPerson(?x)
 
