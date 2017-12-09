@@ -1108,13 +1108,16 @@ comment_on_table
 
 alter_table
     : ALTER TABLE tableview_name
-      ( add_constraint
-      | drop_constraint
-      | enable_constraint
-      | disable_constraint
+      ( 
       | alter_table_properties
       | column_clauses
+      | constraint_clauses
+//TODO      | alter_table_partitioning
+//TODO      | alter_external_table
+      | move_table_clause 
       )
+      ((enable_disable_clause | (ENABLE | DISABLE) (TABLE LOCK | ALL TRIGGERS) )+)?
+      ';'
     ;
 
 alter_table_properties
@@ -1141,9 +1144,116 @@ alter_table_properties_1
       | row_movement_clause
       | flashback_archive_clause
       )+
+      alter_iot_clauses?
     ;
+
+alter_iot_clauses
+    : index_org_table_clause
+    | alter_overflow_clause
+    | alter_mapping_table_clause
+    | COALESCE
+    ;
+
+alter_mapping_table_clause
+    : MAPPING TABLE (allocate_extent_clause | deallocate_unused_clause)
+    ;
+
+alter_overflow_clause
+    : add_overflow_clause
+    | OVERFLOW (segment_attributes_clause | allocate_extent_clause | shrink_clause | deallocate_unused_clause)+
+    ;
+
+add_overflow_clause
+    : ADD OVERFLOW segment_attributes_clause?  ('(' (','? PARTITION segment_attributes_clause? )+  ')' )?
+    ;
+
+
+enable_disable_clause
+    : (ENABLE | DISABLE) (VALIDATE | NOVALIDATE)? (UNIQUE '(' (','? column_name)+ ')' | PRIMARY KEY | CONSTRAINT constraint_name) using_index_clause? exceptions_clause? CASCADE? ((KEEP | DROP) INDEX)?
+    ;
+
+using_index_clause
+    : USING INDEX (index_name | '(' create_index ')' ) //TODO - add index_properties
+    ;
+
+exceptions_clause
+    : EXCEPTIONS INTO tableview_name
+    ;
+
+move_table_clause
+    : MOVE ONLINE? segment_attributes_clause? table_compression? index_org_table_clause? ((lob_storage_clause | varray_col_properties)+)? parallel_clause?
+    ;
+
+index_org_table_clause
+    : (mapping_table_clause| PCTTHRESHOLD UNSIGNED_INTEGER | key_compression) index_org_overflow_clause?
+    ;
+
+mapping_table_clause
+    : MAPPING TABLE
+    | NOMAPPING
+    ;
+
+key_compression
+    : NOCOMPRESS
+    | COMPRESS UNSIGNED_INTEGER
+    ;
+
+index_org_overflow_clause
+    : (INCLUDING column_name)? OVERFLOW segment_attributes_clause?
+    ; 
+
 column_clauses
-    : add_column_clause
+    : add_modify_drop_column_clauses 
+    | rename_column_clause
+    | modify_collection_retrieval
+    | modify_lob_storage_clause
+    ;
+
+modify_collection_retrieval
+    : MODIFY NESTED TABLE collection_item RETURN AS (LOCATOR | VALUE)
+    ;
+
+collection_item
+    : tableview_name
+    ;
+
+rename_column_clause
+    : RENAME COLUMN old_column_name TO new_column_name
+    ;
+
+old_column_name
+    : column_name
+    ;
+
+new_column_name
+    : column_name
+    ;
+
+add_modify_drop_column_clauses
+    : (add_column_clause
+      |modify_column_clauses
+      |drop_column_clause
+      )+
+    ;
+
+drop_column_clause
+    : SET UNUSED (COLUMN column_name| ('(' (','? column_name)+ ')' ) ) (CASCADE CONSTRAINTS | INVALIDATE)*
+    | DROP (COLUMN column_name | '(' (','? column_name)+ ')' ) (CASCADE CONSTRAINTS | INVALIDATE)* (CHECKPOINT UNSIGNED_INTEGER)?
+    | DROP (UNUSED COLUMNS | COLUMNS CONTINUE) (CHECKPOINT UNSIGNED_INTEGER)
+    ;
+
+modify_column_clauses
+    : MODIFY ('(' (','? modify_col_properties)+ ')'
+             | modify_col_substitutable
+             )
+    ;
+
+modify_col_properties
+    : column_name datatype? (DEFAULT expression)? (ENCRYPT encryption_spec | DECRYPT)? inline_constraint* lob_storage_clause? //TODO alter_xmlschema_clause
+    ;
+
+modify_col_substitutable
+    : COLUMN column_name NOT? SUBSTITUTABLE AT ALL LEVELS FORCE?
     ;
 
 add_column_clause
@@ -1153,6 +1263,10 @@ add_column_clause
           ')'
        column_properties?
 //TODO       (','? out_of_line_part_storage )
+    ;
+
+alter_varray_col_properties
+    : MODIFY VARRAY varray_item '(' modify_lob_parameters ')'
     ;
 
 varray_col_properties
@@ -1184,6 +1298,27 @@ lob_storage_clause
     : LOB ( '(' (','? lob_item)+ ')' STORE AS ( (SECUREFILE|BASICFILE) | '(' lob_storage_parameters ')' )+
           | '(' lob_item ')' STORE AS ( (SECUREFILE | BASICFILE) | lob_segname | '(' lob_storage_parameters ')' )+
           )
+    ;
+
+modify_lob_storage_clause
+    : MODIFY LOB '(' lob_item ')' '(' modify_lob_parameters ')'
+    ;
+
+modify_lob_parameters
+    : ( storage_clause
+      | (PCTVERSION | FREEPOOLS) UNSIGNED_INTEGER
+      | REBUILD FREEPOOLS
+      | lob_retention_clause
+      | lob_deduplicate_clause
+      | lob_compression_clause
+      | ENCRYPT encryption_spec
+      | DECRYPT
+      | CACHE 
+      | (CACHE | NOCACHE | CACHE READS) logging_clause?
+      | allocate_extent_clause
+      | shrink_clause
+      | deallocate_unused_clause
+     )+
     ;
 
 lob_parameters
@@ -1287,6 +1422,30 @@ column_or_attribute
 
 object_type_col_properties
     : COLUMN column=regular_id substitutable_column_clause
+    ;
+
+constraint_clauses
+    : ADD (out_of_line_constraint* | out_of_line_ref_constraint)
+    | MODIFY (CONSTRAINT constraint_name | PRIMARY KEY | UNIQUE '(' (','? column_name)+ ')' )  constraint_state CASCADE?
+    | RENAME CONSTRAINT old_constraint_name TO new_constraint_name
+    | drop_constraint_clause+
+    ;
+
+old_constraint_name
+    : constraint_name
+    ;
+
+new_constraint_name
+    : constraint_name
+    ;
+
+drop_constraint_clause
+    : DROP  drop_primary_key_or_unique_or_generic_clause 
+    ;
+
+drop_primary_key_or_unique_or_generic_clause
+    : (PRIMARY KEY | UNIQUE '(' (','? column_name)+ ')' ) CASCADE? (KEEP | DROP)?
+    | CONSTRAINT constraint_name CASCADE?
     ;
 
 add_constraint
