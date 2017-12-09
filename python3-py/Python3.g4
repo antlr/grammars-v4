@@ -36,19 +36,67 @@ grammar Python3;
 
 tokens { INDENT, DEDENT }
 
-//Note that indentation of code inside 
+//Note that indentation of code inside
 
 @lexer::header{
 from antlr4.Token import CommonToken
-from Python3Parser import Python3Parser
 import re
+import importlib
+
+# Allow languages to extend the lexer and parser, by loading the parser dinamically
+module_path = __name__[:-5]
+language_name = __name__.split('.')[-1]
+language_name = language_name[:-5]  # Remove Lexer from name
+LanguageParser = getattr(importlib.import_module('{}Parser'.format(module_path)), '{}Parser'.format(language_name))
 }
 
 @lexer::members {
-tokens = []
-indents = []
-opened = 0;
-lastToken = None
+@property
+def tokens(self):
+    try:
+        return self._tokens
+    except AttributeError:
+        self._tokens = []
+        return self._tokens
+
+@property
+def indents(self):
+    try:
+        return self._indents
+    except AttributeError:
+        self._indents = []
+        return self._indents
+
+@property
+def opened(self):
+    try:
+        return self._opened
+    except AttributeError:
+        self._opened = 0
+        return self._opened
+
+@opened.setter
+def opened(self, value):
+    self._opened = value
+
+@property
+def lastToken(self):
+    try:
+        return self._lastToken
+    except AttributeError:
+        self._lastToken = None
+        return self._lastToken
+
+@lastToken.setter
+def lastToken(self, value):
+    self._lastToken = value
+
+def reset(self):
+    super().reset()
+    self.tokens = []
+    self.indents = []
+    self.opened = 0
+    self.lastToken = None
 
 def emitToken(self, t):
     super().emitToken(t)
@@ -60,19 +108,19 @@ def nextToken(self):
             if self.tokens[i].type == Token.EOF:
                 self.tokens.pop(i)
 
-        self.emitToken(self.commonToken(Python3Parser.NEWLINE, '\n'))
+        self.emitToken(self.commonToken(LanguageParser.NEWLINE, '\n'))
         while self.indents:
             self.emitToken(self.createDedent())
             self.indents.pop()
 
-        self.emitToken(self.commonToken(Python3Parser.EOF, "<EOF>"))
+        self.emitToken(self.commonToken(LanguageParser.EOF, "<EOF>"))
     next = super().nextToken()
     if next.channel == Token.DEFAULT_CHANNEL:
         self.lastToken = next
     return next if not self.tokens else self.tokens.pop(0)
 
 def createDedent(self):
-    dedent = self.commonToken(Python3Parser.DEDENT, "")
+    dedent = self.commonToken(LanguageParser.DEDENT, "")
     dedent.line = self.lastToken.line
     return dedent
 
@@ -145,11 +193,11 @@ parameters
 ///                ['*' [tfpdef] (',' tfpdef ['=' test])* [',' '**' tfpdef] | '**' tfpdef]]
 ///              |  '*' [tfpdef] (',' tfpdef ['=' test])* [',' '**' tfpdef] | '**' tfpdef)
 typedargslist
- : tfpdef ( '=' test )? ( ',' tfpdef ( '=' test )? )* ( ',' ( '*' tfpdef? ( ',' tfpdef ( '=' test )? )* ( ',' '**' tfpdef )? 
-                                                            | '**' tfpdef 
-                                                            )? 
+ : tfpdef ( '=' test )? ( ',' tfpdef ( '=' test )? )* ( ',' ( '*' tfpdef? ( ',' tfpdef ( '=' test )? )* ( ',' '**' tfpdef )?
+                                                            | '**' tfpdef
+                                                            )?
                                                       )?
- | '*' tfpdef? ( ',' tfpdef ( '=' test )? )* ( ',' '**' tfpdef )? 
+ | '*' tfpdef? ( ',' tfpdef ( '=' test )? )* ( ',' '**' tfpdef )?
  | '**' tfpdef
  ;
 
@@ -162,9 +210,9 @@ tfpdef
 ///       ['*' [vfpdef] (',' vfpdef ['=' test])* [',' '**' vfpdef] | '**' vfpdef]]
 ///     |  '*' [vfpdef] (',' vfpdef ['=' test])* [',' '**' vfpdef] | '**' vfpdef)
 varargslist
- : vfpdef ( '=' test )? ( ',' vfpdef ( '=' test )? )* ( ',' ( '*' vfpdef? ( ',' vfpdef ( '=' test )? )* ( ',' '**' vfpdef )? 
-                                                            | '**' vfpdef 
-                                                            )? 
+ : vfpdef ( '=' test )? ( ',' vfpdef ( '=' test )? )* ( ',' ( '*' vfpdef? ( ',' vfpdef ( '=' test )? )* ( ',' '**' vfpdef )?
+                                                            | '**' vfpdef
+                                                            )?
                                                       )?
  | '*' vfpdef? ( ',' vfpdef ( '=' test )? )* ( ',' '**' vfpdef )?
  | '**' vfpdef
@@ -177,7 +225,7 @@ vfpdef
 
 /// stmt: simple_stmt | compound_stmt
 stmt
- : simple_stmt 
+ : simple_stmt
  | compound_stmt
  ;
 
@@ -189,23 +237,23 @@ simple_stmt
 /// small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
 ///              import_stmt | global_stmt | nonlocal_stmt | assert_stmt)
 small_stmt
- : expr_stmt 
- | del_stmt 
- | pass_stmt 
- | flow_stmt 
- | import_stmt 
- | global_stmt 
- | nonlocal_stmt 
+ : expr_stmt
+ | del_stmt
+ | pass_stmt
+ | flow_stmt
+ | import_stmt
+ | global_stmt
+ | nonlocal_stmt
  | assert_stmt
  ;
 
 /// expr_stmt: testlist_star_expr (augassign (yield_expr|testlist) |
 ///                      ('=' (yield_expr|testlist_star_expr))*)
 expr_stmt
- : testlist_star_expr ( augassign ( yield_expr | testlist) 
+ : testlist_star_expr ( augassign ( yield_expr | testlist)
                       | ( '=' ( yield_expr| testlist_star_expr ) )*
                       )
- ;           
+ ;
 
 /// testlist_star_expr: (test|star_expr) (',' (test|star_expr))* [',']
 testlist_star_expr
@@ -215,18 +263,18 @@ testlist_star_expr
 /// augassign: ('+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' |
 ///             '<<=' | '>>=' | '**=' | '//=')
 augassign
- : '+=' 
- | '-=' 
- | '*=' 
+ : '+='
+ | '-='
+ | '*='
  | '@=' // PEP 465
- | '/=' 
- | '%=' 
- | '&=' 
- | '|=' 
- | '^=' 
- | '<<=' 
- | '>>=' 
- | '**=' 
+ | '/='
+ | '%='
+ | '&='
+ | '|='
+ | '^='
+ | '<<='
+ | '>>='
+ | '**='
  | '//='
  ;
 
@@ -242,10 +290,10 @@ pass_stmt
 
 /// flow_stmt: break_stmt | continue_stmt | return_stmt | raise_stmt | yield_stmt
 flow_stmt
- : break_stmt 
- | continue_stmt 
- | return_stmt 
- | raise_stmt 
+ : break_stmt
+ | continue_stmt
+ | return_stmt
+ | raise_stmt
  | yield_stmt
  ;
 
@@ -276,7 +324,7 @@ raise_stmt
 
 /// import_stmt: import_name | import_from
 import_stmt
- : import_name 
+ : import_name
  | import_from
  ;
 
@@ -289,13 +337,13 @@ import_name
 /// import_from: ('from' (('.' | '...')* dotted_name | ('.' | '...')+)
 ///               'import' ('*' | '(' import_as_names ')' | import_as_names))
 import_from
- : FROM ( ( '.' | '...' )* dotted_name 
-        | ('.' | '...')+ 
+ : FROM ( ( '.' | '...' )* dotted_name
+        | ('.' | '...')+
         )
-   IMPORT ( '*' 
-          | '(' import_as_names ')' 
+   IMPORT ( '*'
+          | '(' import_as_names ')'
           | import_as_names
-          )         
+          )
  ;
 
 /// import_as_name: NAME ['as' NAME]
@@ -340,13 +388,13 @@ assert_stmt
 
 /// compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated
 compound_stmt
- : if_stmt 
- | while_stmt 
- | for_stmt 
- | try_stmt 
- | with_stmt 
- | funcdef 
- | classdef 
+ : if_stmt
+ | while_stmt
+ | for_stmt
+ | try_stmt
+ | with_stmt
+ | funcdef
+ | classdef
  | decorated
  ;
 
@@ -371,8 +419,8 @@ for_stmt
 ///       ['finally' ':' suite] |
 ///      'finally' ':' suite))
 try_stmt
- : TRY ':' suite ( ( except_clause ':' suite )+ 
-                   ( ELSE ':' suite )? 
+ : TRY ':' suite ( ( except_clause ':' suite )+
+                   ( ELSE ':' suite )?
                    ( FINALLY ':' suite )?
                  | FINALLY ':' suite
                  )
@@ -396,7 +444,7 @@ except_clause
 
 /// suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
 suite
- : simple_stmt 
+ : simple_stmt
  | NEWLINE INDENT stmt+ DEDENT
  ;
 
@@ -408,7 +456,7 @@ test
 
 /// test_nocond: or_test | lambdef_nocond
 test_nocond
- : or_test 
+ : or_test
  | lambdef_nocond
  ;
 
@@ -434,7 +482,7 @@ and_test
 
 /// not_test: 'not' not_test | comparison
 not_test
- : NOT not_test 
+ : NOT not_test
  | comparison
  ;
 
@@ -482,15 +530,15 @@ and_expr
 
 /// shift_expr: arith_expr (('<<'|'>>') arith_expr)*
 shift_expr
- : arith_expr ( '<<' arith_expr 
-              | '>>' arith_expr 
+ : arith_expr ( '<<' arith_expr
+              | '>>' arith_expr
               )*
  ;
 
 /// arith_expr: term (('+'|'-') term)*
 arith_expr
  : term ( '+' term
-        | '-' term 
+        | '-' term
         )*
  ;
 
@@ -498,17 +546,17 @@ arith_expr
 term
  : factor ( '*' factor
           | '/' factor
-          | '%' factor 
-          | '//' factor 
+          | '%' factor
+          | '//' factor
           | '@' factor // PEP 465
           )*
  ;
 
 /// factor: ('+'|'-'|'~') factor | power
 factor
- : '+' factor 
- | '-' factor 
- | '~' factor 
+ : '+' factor
+ | '-' factor
+ | '~' factor
  | power
  ;
 
@@ -522,13 +570,13 @@ power
 ///        '{' [dictorsetmaker] '}' |
 ///        NAME | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False')
 atom
- : '(' ( yield_expr | testlist_comp )? ')' 
- | '[' testlist_comp? ']'  
- | '{' dictorsetmaker? '}' 
- | NAME 
- | number 
- | strr+ 
- | '...' 
+ : '(' ( yield_expr | testlist_comp )? ')'
+ | '[' testlist_comp? ']'
+ | '{' dictorsetmaker? '}'
+ | NAME
+ | number
+ | strr+
+ | '...'
  | NONE
  | TRUE
  | FALSE
@@ -536,15 +584,15 @@ atom
 
 /// testlist_comp: test ( comp_for | (',' test)* [','] )
 testlist_comp
- : test ( comp_for 
-        | ( ',' test )* ','? 
+ : test ( comp_for
+        | ( ',' test )* ','?
         )
  ;
 
 /// trailer: '(' [arglist] ')' | '[' subscriptlist ']' | '.' NAME
 trailer
- : '(' arglist? ')' 
- | '[' subscriptlist ']' 
+ : '(' arglist? ')'
+ | '[' subscriptlist ']'
  | '.' NAME
  ;
 
@@ -555,7 +603,7 @@ subscriptlist
 
 /// subscript: test | [test] ':' [test] [sliceop]
 subscript
- : test 
+ : test
  | test? ':' test? sliceop?
  ;
 
@@ -577,11 +625,11 @@ testlist
 /// dictorsetmaker: ( (test ':' test (comp_for | (',' test ':' test)* [','])) |
 ///                   (test (comp_for | (',' test)* [','])) )
 dictorsetmaker
- : test ':' test ( comp_for 
-                 | ( ',' test ':' test )* ','? 
-                 ) 
- | test ( comp_for 
-        | ( ',' test )* ','? 
+ : test ':' test ( comp_for
+                 | ( ',' test ':' test )* ','?
+                 )
+ | test ( comp_for
+        | ( ',' test )* ','?
         )
  ;
 
@@ -604,13 +652,13 @@ arglist
 /// # results in an ambiguity. ast.c makes sure it's a NAME.
 /// argument: test [comp_for] | test '=' test  # Really [keyword '='] test
 argument
- : test comp_for? 
+ : test comp_for?
  | test '=' test
  ;
 
 /// comp_iter: comp_for | comp_if
 comp_iter
- : comp_for 
+ : comp_for
  | comp_if
  ;
 
@@ -631,7 +679,7 @@ yield_expr
 
 /// yield_arg: 'from' test | testlist
 yield_arg
- : FROM test 
+ : FROM test
  | testlist
  ;
 
@@ -713,7 +761,7 @@ else:
         self.skip()
     elif indent > previous:
         self.indents.append(indent)
-        self.emitToken(self.commonToken(Python3Parser.INDENT, spaces))
+        self.emitToken(self.commonToken(LanguageParser.INDENT, spaces))
     else:
         while self.indents and self.indents[0] > indent:
             self.emitToken(self.createDedent())
@@ -827,8 +875,8 @@ UNKNOWN_CHAR
  : .
  ;
 
-/* 
- * fragments 
+/*
+ * fragments
  */
 
 /// shortstring     ::=  "'" shortstringitem* "'" | '"' shortstringitem* '"'
@@ -918,7 +966,7 @@ fragment SHORT_BYTES
  : '\'' ( SHORT_BYTES_CHAR_NO_SINGLE_QUOTE | BYTES_ESCAPE_SEQ )* '\''
  | '"' ( SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE | BYTES_ESCAPE_SEQ )* '"'
  ;
-    
+
 /// longbytes      ::=  "'''" longbytesitem* "'''" | '"""' longbytesitem* '"""'
 fragment LONG_BYTES
  : '\'\'\'' LONG_BYTES_ITEM*? '\'\'\''
@@ -938,7 +986,7 @@ fragment SHORT_BYTES_CHAR_NO_SINGLE_QUOTE
  | [\u000E-\u0026]
  | [\u0028-\u005B]
  | [\u005D-\u007F]
- ; 
+ ;
 
 fragment SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE
  : [\u0000-\u0009]
@@ -946,7 +994,7 @@ fragment SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE
  | [\u000E-\u0021]
  | [\u0023-\u005B]
  | [\u005D-\u007F]
- ; 
+ ;
 
 /// longbyteschar  ::=  <any ASCII character except "\">
 fragment LONG_BYTES_CHAR

@@ -29,7 +29,7 @@
 grammar ANTLRv3;
 
 grammarDef
-   : DOC_COMMENT? ('lexer' | 'parser' | 'tree')? 'grammar' id ';' optionsSpec? tokensSpec? attrScope* action* rule_+
+   : DOC_COMMENT? ('lexer' | 'parser' | 'tree')? 'grammar' id ';' optionsSpec? tokensSpec? attrScope* action* rule_ +
    ;
 
 tokensSpec
@@ -89,11 +89,11 @@ ruleScopeSpec
    ;
 
 block
-   : '(' ((optionsSpec)? ':')? alternative rewrite? ('|' alternative rewrite?)* ')'
+   : '(' ((optionsSpec)? ':')? alternative? rewrite? ('|' (alternative rewrite?)?)* ')'
    ;
 
 altList
-   : alternative rewrite? ('|' alternative rewrite?)*
+   : alternative rewrite? ('|' (alternative rewrite?)?)*
    ;
 
 alternative
@@ -128,10 +128,10 @@ elementNoOptionSpec
    ;
 
 atom
-   : range (('^' | '!'))
+   : range
    | terminal_
-   | notSet (('^' | '!'))
-   | RULE_REF (ARG_ACTION)? (('^' | '!'))?
+   | notSet
+   | RULE_REF (ARG_ACTION)?
    ;
 
 notSet
@@ -232,6 +232,7 @@ id
    | RULE_REF
    ;
 
+
 CHAR_LITERAL
    : '\'' LITERAL_CHAR '\''
    ;
@@ -307,7 +308,6 @@ fragment ACTION_ESC
    ;
 
 
-
 OPTIONS
    : 'options' WS_LOOP '{'
    ;
@@ -321,6 +321,7 @@ TOKENS
 fragment SRC
    : 'src' ' ' ACTION_STRING_LITERAL ' ' INT
    ;
+
 
 fragment WS_LOOP
    : (WS | SL_COMMENT | ML_COMMENT)*
@@ -369,11 +370,6 @@ POSITIVE_CLOSURE
 
 SYNPRED
    : 'SYNPRED'
-   ;
-
-
-RANGE
-   : 'RANGE'
    ;
 
 
@@ -467,6 +463,7 @@ SCOPE
    : 'scope'
    ;
 
+
 SEMPRED
    : 'SEMPRED'
    ;
@@ -507,7 +504,7 @@ BANG
    ;
 
 
-RANGE2
+RANGE
    : '..'
    ;
 
@@ -518,7 +515,7 @@ REWRITE
 
 
 SL_COMMENT
-   : '//' ~[\r\n]* -> skip
+   : '//' ~ [\r\n]* -> skip
    ;
 
 
@@ -526,13 +523,16 @@ ML_COMMENT
    : '/*' .*? '*/' -> skip
    ;
 
+
 WS
    : (' ' | '\t' | '\r'? '\n') + -> skip
    ;
 
+
 TOKEN_REF
    : 'A' .. 'Z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
    ;
+
 
 RULE_REF
    : 'a' .. 'z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
