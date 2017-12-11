@@ -1,4 +1,4 @@
-/**
+ /**
  * Oracle(c) PL/SQL 11g Parser
  *
  * Copyright (c) 2009-2011 Alexandre Porcelli <alexandre.porcelli@gmail.com>
@@ -714,12 +714,12 @@ out_of_line_ref_constraint
 
 out_of_line_constraint
     : ( (CONSTRAINT constraint_name)?
-          ( primary_key_clause
+          ( UNIQUE '(' (','? column_name)+ ')'
+          | PRIMARY KEY '(' (','? column_name)+ ')'
           | foreign_key_clause
-          | unique_key_clause
-          | check_constraint
+          | CHECK '(' expression ')'
           )
-       )+
+       )
       constraint_state? 
     ;     
 
@@ -911,30 +911,46 @@ create_mv_refresh
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        ( '(' (','? datatype_null_enable)+
-        (',' (CONSTRAINT constraint_name)?
-          ( primary_key_clause
-          | foreign_key_clause
-          | unique_key_clause
-          | check_constraint
-          ) constraint_state?
-        )*
-        ')' )?
-        (ON COMMIT (DELETE | PRESERVE) ROWS)?
-        physical_properties?
-        table_compression?
-// Column_properties clause goes here
-// Partition clause goes here
-         table_range_partition_by_clause?
-// Many more varations to capture
-       row_movement_clause?
-       flashback_archive_clause?
-
-      (AS subquery)?
-
+        (relational_table|object_table) (AS subquery)?
       ';'
     ;
 
+object_table 
+    : OF type_name object_table_substitution? ('(' (','? object_properties)+ ')')? (ON COMMIT (DELETE | PRESERVE) ROWS )? oid_clause? oid_index_clause? physical_properties? column_properties? table_partitioning_clauses? (CACHE | NOCACHE)? ( RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')' )? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? (enable_disable_clause+)? row_movement_clause? flashback_archive_clause?
+    ;
+
+oid_index_clause
+    : OIDINDEX index_name? '(' (physical_attributes_clause | TABLESPACE tablespace)+ ')'
+    ;
+
+oid_clause
+    : OBJECT IDENTIFIER IS (SYSTEM GENERATED | PRIMARY KEY)
+    ;
+
+object_properties
+    : (column_name | attribute_name) (DEFAULT expression)? ((','? inline_constraint)+ | inline_ref_constraint)? 
+
+    | out_of_line_constraint
+    | out_of_line_ref_constraint
+    | supplemental_logging_props
+    ;
+
+object_table_substitution
+    : NOT? SUBSTITUTABLE AT ALL LEVELS
+    ;
+
+relational_table
+    : ( '(' relational_properties ')' )? (ON COMMIT (DELETE | PRESERVE) ROWS)? physical_properties? column_properties? table_partitioning_clauses? (CACHE | NOCACHE)? ( RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')' )? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? (enable_disable_clause+)? row_movement_clause? flashback_archive_clause? 
+    ;
+ 
+relational_properties
+    : (','? column_definition | virtual_column_definition | out_of_line_constraint | out_of_line_ref_constraint | supplemental_logging_props)+
+    ;
+
+table_partitioning_clauses
+    : table_range_partition_by_clause
+    ;
+ 
 table_range_partition_by_clause
     : PARTITION BY RANGE
         paren_column_list
@@ -1164,7 +1180,7 @@ alter_overflow_clause
     ;
 
 add_overflow_clause
-    : ADD OVERFLOW segment_attributes_clause?  ('(' (','? PARTITION segment_attributes_clause? )+  ')' )?
+    : ADD OVERFLOW segment_attributes_clause? ('(' (','? PARTITION segment_attributes_clause?)+  ')' )?
     ;
 
 
@@ -1185,7 +1201,7 @@ move_table_clause
     ;
 
 index_org_table_clause
-    : (mapping_table_clause| PCTTHRESHOLD UNSIGNED_INTEGER | key_compression) index_org_overflow_clause?
+    : (mapping_table_clause | PCTTHRESHOLD UNSIGNED_INTEGER | key_compression) index_org_overflow_clause?
     ;
 
 mapping_table_clause
@@ -1237,7 +1253,7 @@ add_modify_drop_column_clauses
     ;
 
 drop_column_clause
-    : SET UNUSED (COLUMN column_name| ('(' (','? column_name)+ ')' ) ) (CASCADE CONSTRAINTS | INVALIDATE)*
+    : SET UNUSED (COLUMN column_name| ('(' (','? column_name)+ ')' )) (CASCADE CONSTRAINTS | INVALIDATE)*
     | DROP (COLUMN column_name | '(' (','? column_name)+ ')' ) (CASCADE CONSTRAINTS | INVALIDATE)* (CHECKPOINT UNSIGNED_INTEGER)?
     | DROP (UNUSED COLUMNS | COLUMNS CONTINUE) (CHECKPOINT UNSIGNED_INTEGER)
     ;
@@ -1368,7 +1384,7 @@ column_properties
     ;
 
 column_definition
-    : column_name datatype
+    : column_name (datatype | type_name)
          SORT?  (DEFAULT expression)? (ENCRYPT (USING  CHAR_STRING)? (IDENTIFIED BY regular_id)? CHAR_STRING? (NO? SALT)? )?  (inline_constraint* | inline_ref_constraint)
     ;
 
@@ -1405,13 +1421,6 @@ partition_name
     : regular_id
     ; 
 
-object_properties
-    : column_or_attribute (DEFAULT expression)? (inline_constraint+ | inline_ref_constraint)
-    | out_of_line_constraint
-    | out_of_line_ref_constraint
-    | supplemental_logging_props
-    ; 
-
 supplemental_logging_props
     : SUPPLEMENTAL LOG (supplemental_log_grp_clause | supplemental_id_key_clause)
     ;
@@ -1426,7 +1435,7 @@ object_type_col_properties
 
 constraint_clauses
     : ADD (out_of_line_constraint* | out_of_line_ref_constraint)
-    | MODIFY (CONSTRAINT constraint_name | PRIMARY KEY | UNIQUE '(' (','? column_name)+ ')' )  constraint_state CASCADE?
+    | MODIFY (CONSTRAINT constraint_name | PRIMARY KEY | UNIQUE '(' (','? column_name)+ ')')  constraint_state CASCADE?
     | RENAME CONSTRAINT old_constraint_name TO new_constraint_name
     | drop_constraint_clause+
     ;
@@ -1444,7 +1453,7 @@ drop_constraint_clause
     ;
 
 drop_primary_key_or_unique_or_generic_clause
-    : (PRIMARY KEY | UNIQUE '(' (','? column_name)+ ')' ) CASCADE? (KEEP | DROP)?
+    : (PRIMARY KEY | UNIQUE '(' (','? column_name)+ ')') CASCADE? (KEEP | DROP)?
     | CONSTRAINT constraint_name CASCADE?
     ;
 
@@ -1486,13 +1495,11 @@ on_delete_clause
     ;
 
 unique_key_clause
-    : UNIQUE paren_column_list
-      // TODO implement  USING INDEX clause
+    : UNIQUE paren_column_list using_index_clause?
     ;
 
 primary_key_clause
-    : PRIMARY KEY paren_column_list
-      // TODO implement  USING INDEX clause
+    : PRIMARY KEY paren_column_list using_index_clause?
     ;
 
 // Anonymous PL/SQL code block
