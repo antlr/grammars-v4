@@ -911,12 +911,12 @@ create_mv_refresh
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        (relational_table|object_table) (AS subquery)?
+        (relational_table | object_table) (AS subquery)?
       ';'
     ;
 
 object_table 
-    : OF type_name object_table_substitution? ('(' (','? object_properties)+ ')')? (ON COMMIT (DELETE | PRESERVE) ROWS )? oid_clause? oid_index_clause? physical_properties? column_properties? table_partitioning_clauses? (CACHE | NOCACHE)? ( RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')' )? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? (enable_disable_clause+)? row_movement_clause? flashback_archive_clause?
+    : OF type_name object_table_substitution? ('(' (','? object_properties)+ ')')? (ON COMMIT (DELETE | PRESERVE) ROWS)? oid_clause? oid_index_clause? physical_properties? column_properties? table_partitioning_clauses? (CACHE | NOCACHE)? (RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')')? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? (enable_disable_clause+)? row_movement_clause? flashback_archive_clause?
     ;
 
 oid_index_clause
@@ -929,7 +929,6 @@ oid_clause
 
 object_properties
     : (column_name | attribute_name) (DEFAULT expression)? ((','? inline_constraint)+ | inline_ref_constraint)? 
-
     | out_of_line_constraint
     | out_of_line_ref_constraint
     | supplemental_logging_props
@@ -940,7 +939,7 @@ object_table_substitution
     ;
 
 relational_table
-    : ( '(' relational_properties ')' )? (ON COMMIT (DELETE | PRESERVE) ROWS)? physical_properties? column_properties? table_partitioning_clauses? (CACHE | NOCACHE)? ( RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')' )? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? (enable_disable_clause+)? row_movement_clause? flashback_archive_clause? 
+    : ('(' relational_properties ')')? (ON COMMIT (DELETE | PRESERVE) ROWS)? physical_properties? column_properties? table_partitioning_clauses? (CACHE | NOCACHE)? (RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')')? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? (enable_disable_clause+)? row_movement_clause? flashback_archive_clause? 
     ;
  
 relational_properties
