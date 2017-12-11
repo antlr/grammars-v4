@@ -911,8 +911,31 @@ create_mv_refresh
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        (relational_table | object_table) (AS subquery)?
+        (relational_table | object_table | xmltype_table) (AS subquery)?
       ';'
+    ;
+
+xmltype_table
+    : OF XMLTYPE ('(' object_properties ')')? (XMLTYPE xmltype_storage)? xmlschema_spec? xmltype_virtual_columns? (ON COMMIT (DELETE | PRESERVE) ROWS)? oid_clause? oid_index_clause? physical_properties? column_properties? table_partitioning_clauses? (CACHE | NOCACHE)? (RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')')? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? (enable_disable_clause+)? row_movement_clause? flashback_archive_clause?
+    ;
+
+xmltype_virtual_columns
+    : VIRTUAL COLUMNS '(' (','? column_name AS '(' expression ')')+ ')'
+    ;
+
+xmltype_column_properties
+    : XMLTYPE COLUMN? column_name xmltype_storage? xmlschema_spec?
+    ;
+
+xmltype_storage
+    : STORE  AS (OBJECT RELATIONAL
+                | (SECUREFILE | BASICFILE)? (CLOB | BINARY XML) (lob_segname ('(' lob_parameters ')')? | '(' lob_parameters ')')?
+                )
+    | STORE VARRAYS AS (LOBS | TABLES)
+    ;
+
+xmlschema_spec
+    : (XMLSCHEMA DELIMITED_ID)? ELEMENT DELIMITED_ID ((ALLOW | DISALLOW) NONSCHEMA )? ((ALLOW | DISALLOW) ANYSCHEMA)?
     ;
 
 object_table 
@@ -1372,14 +1395,14 @@ tablespace
     ;
 
 varray_item
-    : regular_id
+    : (id_expression '.')? (id_expression '.')? id_expression
     ;
 
 column_properties
     : object_type_col_properties
     | nested_table_col_properties
     | (varray_col_properties | lob_storage_clause) //TODO '(' ( ','? lob_partition_storage)+ ')'
-//TODO | xmltype_column_properties
+    | xmltype_column_properties
     ;
 
 column_definition
@@ -3636,6 +3659,7 @@ regular_id
     | XMLROOT
     | XMLSERIALIZE
     | XMLTABLE
+    | XMLTYPE
     | YEAR
     | YES
     | YMINTERVAL_UNCONSTRAINED
