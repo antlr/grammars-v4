@@ -68,6 +68,7 @@
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
 				<module>html</module>
+                <module>hypertalk</module>
 				<module>icalendar</module>
 				<module>idl</module>
 				<module>inf</module>
