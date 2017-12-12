@@ -1071,8 +1071,7 @@ composite_hash_partitions
     ;
 
 reference_partitioning
-    : PARTITION BY REFERENCE '(' 
-             (inline_constraint | out_of_line_constraint | inline_ref_constraint |out_of_line_ref_constraint) ')'
+    : PARTITION BY REFERENCE '(' regular_id ')'
              ('(' (','? reference_partition_desc)+ ')')?
     ;
 
