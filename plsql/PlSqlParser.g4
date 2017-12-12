@@ -916,7 +916,14 @@ create_table
     ;
 
 xmltype_table
-    : OF XMLTYPE ('(' object_properties ')')? (XMLTYPE xmltype_storage)? xmlschema_spec? xmltype_virtual_columns? (ON COMMIT (DELETE | PRESERVE) ROWS)? oid_clause? oid_index_clause? physical_properties? column_properties? table_partitioning_clauses? (CACHE | NOCACHE)? (RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')')? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? (enable_disable_clause+)? row_movement_clause? flashback_archive_clause?
+    : OF XMLTYPE ('(' object_properties ')')? 
+         (XMLTYPE xmltype_storage)? xmlschema_spec? xmltype_virtual_columns? 
+         (ON COMMIT (DELETE | PRESERVE) ROWS)? oid_clause? oid_index_clause?
+         physical_properties? column_properties? table_partitioning_clauses? 
+         (CACHE | NOCACHE)? (RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')')? 
+         parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? 
+	 (enable_disable_clause+)? row_movement_clause? 
+         flashback_archive_clause?
     ;
 
 xmltype_virtual_columns
@@ -935,11 +942,19 @@ xmltype_storage
     ;
 
 xmlschema_spec
-    : (XMLSCHEMA DELIMITED_ID)? ELEMENT DELIMITED_ID ((ALLOW | DISALLOW) NONSCHEMA)? ((ALLOW | DISALLOW) ANYSCHEMA)?
+    : (XMLSCHEMA DELIMITED_ID)? ELEMENT DELIMITED_ID 
+         (allow_or_disallow NONSCHEMA)?
+         (allow_or_disallow ANYSCHEMA)?
     ;
 
 object_table 
-    : OF type_name object_table_substitution? ('(' (','? object_properties)+ ')')? (ON COMMIT (DELETE | PRESERVE) ROWS)? oid_clause? oid_index_clause? physical_properties? column_properties? table_partitioning_clauses? (CACHE | NOCACHE)? (RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')')? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? (enable_disable_clause+)? row_movement_clause? flashback_archive_clause?
+    : OF type_name object_table_substitution? 
+      ('(' (','? object_properties)+ ')')?
+      (ON COMMIT (DELETE | PRESERVE) ROWS)? oid_clause? oid_index_clause?
+      physical_properties? column_properties? table_partitioning_clauses? 
+      (CACHE | NOCACHE)? (RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')')? 
+      parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)?
+      (enable_disable_clause+)? row_movement_clause? flashback_archive_clause?
     ;
 
 oid_index_clause
@@ -962,11 +977,23 @@ object_table_substitution
     ;
 
 relational_table
-    : ('(' relational_properties ')')? (ON COMMIT (DELETE | PRESERVE) ROWS)? physical_properties? column_properties? table_partitioning_clauses? (CACHE | NOCACHE)? (RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')')? parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? (enable_disable_clause+)? row_movement_clause? flashback_archive_clause? 
+    : ('(' relational_properties ')')? 
+      (ON COMMIT (DELETE | PRESERVE) ROWS)?
+      physical_properties? column_properties? table_partitioning_clauses? 
+      (CACHE | NOCACHE)? (RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')')?
+      parallel_clause? 
+      (ROWDEPENDENCIES | NOROWDEPENDENCIES)? 
+      (enable_disable_clause+)? row_movement_clause? flashback_archive_clause? 
     ;
  
 relational_properties
-    : (','? column_definition | virtual_column_definition | out_of_line_constraint | out_of_line_ref_constraint | supplemental_logging_props)+
+    : (','? (column_definition
+            | virtual_column_definition
+            | out_of_line_constraint 
+            | out_of_line_ref_constraint
+            | supplemental_logging_props
+            )
+      )+
     ;
 
 table_partitioning_clauses
@@ -1132,6 +1159,15 @@ comment_on_column
     : COMMENT ON COLUMN tableview_name PERIOD column_name IS quoted_string
     ;
 
+enable_or_disable
+    : ENABLE
+    | DISABLE
+    ;
+allow_or_disallow
+    : ALLOW 
+    | DISALLOW
+    ;
+
 // Synonym DDL Clauses
 
 create_synonym
@@ -1154,7 +1190,7 @@ alter_table
 //TODO      | alter_external_table
       | move_table_clause 
       )
-      ((enable_disable_clause | (ENABLE | DISABLE) (TABLE LOCK | ALL TRIGGERS) )+)?
+      ((enable_disable_clause | enable_or_disable (TABLE LOCK | ALL TRIGGERS) )+)?
       ';'
     ;
 
@@ -1207,7 +1243,12 @@ add_overflow_clause
 
 
 enable_disable_clause
-    : (ENABLE | DISABLE) (VALIDATE | NOVALIDATE)? (UNIQUE '(' (','? column_name)+ ')' | PRIMARY KEY | CONSTRAINT constraint_name) using_index_clause? exceptions_clause? CASCADE? ((KEEP | DROP) INDEX)?
+    : (ENABLE | DISABLE) (VALIDATE | NOVALIDATE)? 
+         (UNIQUE '(' (','? column_name)+ ')' 
+         | PRIMARY KEY 
+         | CONSTRAINT constraint_name
+         ) using_index_clause? exceptions_clause? 
+         CASCADE? ((KEEP | DROP) INDEX)?
     ;
 
 using_index_clause
