@@ -47,7 +47,7 @@ unit_statement
     | create_table
     | create_tablespace
     | create_view //TODO
-//  | create_directory //TODO
+    | create_directory 
     | create_materialized_view 
     | create_materialized_view_log
     | create_user
@@ -665,6 +665,19 @@ container_clause
     : CONTAINER EQUALS_OP (CURRENT | ALL)
     ;
 
+create_directory
+    : CREATE (OR REPLACE)? DIRECTORY directory_name AS directory_path 
+      ';'
+    ;
+
+directory_name
+    : regular_id
+    ;
+
+directory_path
+    : CHAR_STRING
+    ;
+
 create_view
     : CREATE (OR REPLACE)? (OR? FORCE)? EDITIONING? VIEW
       tableview_name view_options?
@@ -997,36 +1010,200 @@ relational_properties
     ;
 
 table_partitioning_clauses
-    : table_range_partition_by_clause
+    : range_partitions
+    | list_partitions
+    | hash_partitions
+    | composite_range_partitions
+    | composite_list_partitions
+    | composite_hash_partitions
+    | reference_partitioning
+    | system_partitioning
     ;
- 
-table_range_partition_by_clause
-    : PARTITION BY RANGE
-        paren_column_list
-          (INTERVAL '(' expression ')'
-              (STORE IN '('
-                        (','? tablespace_name=REGULAR_ID )+
-                        ')'
-              )?
-          )?
-        '('
-            (COMMA? PARTITION partition_name
-                 VALUES LESS THAN
-// Supposed to be literal in here, will need to refine this                      
-                     '('
-                        (','? CHAR_STRING
-                        | ','? string_function
-                        | ','? numeric
-                        | ','? MAXVALUE
-                        )+
-                     ')'
-                (TABLESPACE partition_tablespace=id_expression)?
 
-                (ON COMMIT (DELETE | PRESERVE) ROWS)?
-                deferred_segment_creation? 
-                physical_attributes_clause?
-            )+
-        ')'
+range_partitions
+    : PARTITION BY RANGE '(' (','? column_name)+ ')'
+        (INTERVAL '(' expression ')' (STORE IN '(' (','? tablespace)+ ')' )? )?
+          '(' (','? PARTITION partition_name? range_values_clause table_partition_description)+ ')'
+    ;
+
+list_partitions
+    : PARTITION BY LIST '(' column_name ')' 
+        '(' (','? PARTITION partition_name? list_values_clause table_partition_description )+ ')'
+    ;
+
+hash_partitions
+    : PARTITION BY HASH '(' (','? column_name)+ ')'
+        (individual_hash_partitions | hash_partitions_by_quantity)
+    ;
+
+individual_hash_partitions
+    : '(' (','? PARTITION partition_name? partitioning_storage_clause?)+ ')'
+    ;
+
+hash_partitions_by_quantity
+    : PARTITIONS hash_partition_quantity 
+       (STORE IN '(' (','? tablespace)+ ')')?
+         (table_compression | key_compression)?
+         (OVERFLOW STORE IN '(' (','? tablespace)+ ')' )?
+    ;
+
+hash_partition_quantity
+    : UNSIGNED_INTEGER
+    ;
+
+composite_range_partitions
+    : PARTITION BY RANGE '(' (','? column_name)+ ')'
+       (INTERVAL '(' expression ')' (STORE IN '(' (','? tablespace)+ ')' )? )?
+       (subpartition_by_range | subpartition_by_list | subpartition_by_hash)
+         '(' (','? range_partition_desc)+ ')'
+    ;
+
+composite_list_partitions
+    : PARTITION BY LIST '(' column_name ')'
+       (subpartition_by_range | subpartition_by_list | subpartition_by_hash)
+        '(' (','? list_partition_desc)+ ')'
+    ;
+
+composite_hash_partitions
+    : PARTITION BY HASH '(' (',' column_name)+ ')'
+       (subpartition_by_range | subpartition_by_list | subpartition_by_hash)
+         (individual_hash_partitions | hash_partitions_by_quantity)
+    ;
+
+reference_partitioning
+    : PARTITION BY REFERENCE '(' regular_id ')'
+             ('(' (','? reference_partition_desc)+ ')')?
+    ;
+
+reference_partition_desc
+    : PARTITION partition_name? table_partition_description
+    ;
+
+system_partitioning
+    : PARTITION BY SYSTEM 
+       (PARTITIONS UNSIGNED_INTEGER | (','? reference_partition_desc)+)?
+    ;
+
+range_partition_desc
+    : PARTITION partition_name? range_values_clause table_partition_description
+        ( ( '(' ( (','? range_subpartition_desc)+
+                | (','? list_subpartition_desc)+
+                | (','? individual_hash_subparts)+
+                )
+            ')'
+          | hash_subparts_by_quantity
+          )
+        )?
+    ;
+
+list_partition_desc
+    : PARTITION partition_name? list_values_clause table_partition_description
+        ( ( '(' ( (','? range_subpartition_desc)+
+                | (','? list_subpartition_desc)+
+                | (','? individual_hash_subparts)+
+                )
+            ')'
+          | hash_subparts_by_quantity
+          )
+        )?
+    ;
+
+subpartition_template
+    : SUBPARTITION TEMPLATE
+        ( ( '(' ( (','? range_subpartition_desc)+
+                | (','? list_subpartition_desc)+
+                | (','? individual_hash_subparts)+
+                )
+            ')'
+          | hash_subpartition_quantity
+          )
+        )
+    ;
+
+hash_subpartition_quantity
+    : UNSIGNED_INTEGER
+    ;
+
+subpartition_by_range
+    : SUBPARTITION BY RANGE '(' (','? column_name)+ ')' subpartition_template?
+    ;
+
+subpartition_by_list
+    : SUBPARTITION BY LIST '(' column_name ')' subpartition_template?
+    ;
+
+subpartition_by_hash
+    : SUBPARTITION BY HASH '(' (','? column_name)+ ')'
+       (SUBPARTITIONS UNSIGNED_INTEGER (STORE IN '(' (','? tablespace)+ ')' )?
+       | subpartition_template
+       )?
+    ;
+
+subpartition_name
+    : partition_name
+    ;
+
+range_subpartition_desc
+    : SUBPARTITION subpartition_name? range_values_clause partitioning_storage_clause?
+    ;
+
+list_subpartition_desc
+    : SUBPARTITION subpartition_name? list_values_clause partitioning_storage_clause?
+    ;
+
+individual_hash_subparts
+    : SUBPARTITION subpartition_name? partitioning_storage_clause?
+    ;
+
+hash_subparts_by_quantity
+    : SUBPARTITIONS UNSIGNED_INTEGER (STORE IN '(' (','? tablespace)+ ')' )?
+    ;
+                                 
+range_values_clause
+    : VALUES LESS THAN '(' 
+         (','? CHAR_STRING
+         | ','? string_function
+         | ','? numeric
+         | ','? MAXVALUE
+         )+
+                       ')'
+    ;
+
+list_values_clause
+    : VALUES '('
+       (
+         (','? CHAR_STRING
+         | ','? string_function
+         | ','? numeric
+         )+
+       | DEFAULT
+       )
+              ')'
+    ;
+
+table_partition_description
+    : deferred_segment_creation? segment_attributes_clause?
+        (table_compression | key_compression)?
+        (OVERFLOW segment_attributes_clause? )? 
+        (lob_storage_clause | varray_col_properties | nested_table_col_properties)?
+    ;
+
+partitioning_storage_clause
+    : ( TABLESPACE tablespace
+      | OVERFLOW (TABLESPACE tablespace)?
+      | table_compression
+      | key_compression
+      | lob_partitioning_storage
+      | VARRAY varray_item STORE AS (BASICFILE | SECUREFILE)? LOB lob_segname
+      )+
+    ; 
+
+lob_partitioning_storage
+    : LOB '(' lob_item ')'
+       STORE AS (BASICFILE | SECUREFILE)?
+               (lob_segname ('(' TABLESPACE tablespace ')' )?
+               | '(' TABLESPACE tablespace ')'
+               )
     ;
 
 datatype_null_enable
