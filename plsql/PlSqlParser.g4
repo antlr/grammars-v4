@@ -136,11 +136,11 @@ create_package_body
 // Create Package Specific Clauses
 
 package_obj_spec
-    : variable_declaration
+    : pragma_declaration
+    | variable_declaration
     | subtype_declaration
     | cursor_declaration
     | exception_declaration
-    | pragma_declaration
     | type_declaration
     | procedure_spec
     | function_spec
@@ -1618,11 +1618,11 @@ seq_of_declare_specs
     ;
 
 declare_spec
-    : variable_declaration
+    : pragma_declaration
+    | variable_declaration
     | subtype_declaration
     | cursor_declaration
     | exception_declaration
-    | pragma_declaration
     | type_declaration
     | procedure_spec
     | function_spec
