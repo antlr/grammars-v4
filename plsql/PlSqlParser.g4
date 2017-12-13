@@ -521,9 +521,145 @@ sequence_start_clause
     ;
 
 create_index
-    : CREATE UNIQUE? INDEX index_name ON tableview_name paren_column_list (TABLESPACE id_expression)? (COMPUTE STATISTICS)? ';'
+    : CREATE (UNIQUE | BITMAP)? INDEX index_name
+       ON (cluster_index_clause | table_index_clause | bitmap_join_index_clause)
+       UNUSABLE? 
+       ';'
     ;
 
+cluster_index_clause
+    : CLUSTER cluster_name index_attributes?
+    ;
+
+cluster_name
+    : (id_expression '.')? id_expression
+    ;
+
+table_index_clause
+    : tableview_name table_alias? '(' (','? index_expr (ASC | DESC)? )+ ')'
+          index_properties?
+    ;
+bitmap_join_index_clause
+    : tableview_name '(' (','? (tableview_name | table_alias)? column_name (ASC | DESC)? )+ ')'
+        FROM (','? tableview_name table_alias)+
+        where_clause local_partitioned_index? index_attributes?
+    ;
+
+index_expr
+    : column_name
+    | expression
+    ;
+
+index_properties
+    : (global_partitioned_index | local_partitioned_index | index_attributes)+
+    | INDEXTYPE IS (domain_index_clause | xmlindex_clause)
+    ;
+
+index_attributes
+    : (physical_attributes_clause
+      | logging_clause
+      | ONLINE
+      | TABLESPACE (tablespace | DEFAULT)
+      | key_compression
+      | (SORT | NOSORT)
+      | REVERSE
+      | (VISIBLE | INVISIBLE)
+      | parallel_clause
+      )+
+    ;
+
+domain_index_clause
+    : indextype local_domain_index_clause? parallel_clause? (PARAMETERS '(' odci_parameters ')' )?
+    ;
+
+local_domain_index_clause
+    : LOCAL ('(' (','? PARTITION partition_name (PARAMETERS '(' odci_parameters ')' )? )+ ')' )?
+    ;
+
+xmlindex_clause
+    : (XDB '.')? XMLINDEX local_xmlindex_clause?
+        parallel_clause? //TODO xmlindex_parameters_clause?
+    ;
+
+local_xmlindex_clause
+    : LOCAL ('(' (','? PARTITION partition_name //TODO xmlindex_parameters_clause? 
+                                                       )+ ')')?
+    ;
+
+global_partitioned_index
+    : GLOBAL PARTITION BY (RANGE '(' (','? column_name)+ ')' '(' index_partitioning_clause ')'
+                          | HASH '(' (','? column_name)+ ')' 
+                                            (individual_hash_partitions
+                                            | hash_partitions_by_quantity 
+                                            )
+                          )
+    ;
+
+index_partitioning_clause
+    : PARTITION partition_name? VALUES LESS THAN '(' 
+                                        (','? (CHAR_STRING
+                                              | string_function
+                                              | numeric
+                                              | MAXVALUE
+                                              )
+                                        )+ 
+                                                 ')'
+                                        segment_attributes_clause?
+    ;
+
+local_partitioned_index
+    : LOCAL (on_range_partitioned_table
+            | on_list_partitioned_table
+            | on_hash_partitioned_table
+            | on_comp_partitioned_table
+            )?
+    ;
+
+on_range_partitioned_table
+    : '(' (','? PARTITION partition_name?
+              ((segment_attributes_clause | key_compression)+ )?
+              UNUSABLE? )+
+      ')'
+    ;
+
+on_list_partitioned_table
+    : '(' (','? PARTITION partition_name?
+              ((segment_attributes_clause | key_compression)+ )?
+              UNUSABLE? )+
+      ')'
+    ;
+
+on_hash_partitioned_table
+    : STORE IN '(' (','? tablespace)+ ')'
+    | '(' (','? PARTITION partition_name? (TABLESPACE tablespace)?
+                key_compression? UNUSABLE?)+
+      ')'
+    ;
+
+on_comp_partitioned_table
+    : (STORE IN '(' (','? tablespace)+ ')' )?
+        '(' (','? PARTITION partition_name?
+            ((segment_attributes_clause | key_compression)+)?
+            UNUSABLE index_subpartition_clause? )+
+        ')'
+    ;
+
+index_subpartition_clause
+    : STORE IN '(' (','? tablespace)+ ')'
+    | '(' (','? SUBPARTITION subpartition_name? (TABLESPACE tablespace)?
+        key_compression? UNUSABLE?)+
+      ')'
+    ;
+
+
+odci_parameters
+    : CHAR_STRING
+    ;
+
+indextype
+    : (id_expression '.')? id_expression
+    ;
+  
 alter_index
     : ALTER INDEX old_index_name=index_name RENAME TO new_index_name=index_name ';'
     ;
@@ -3782,6 +3918,7 @@ regular_id
     | SMALLINT
     | SNAPSHOT
     | SOME
+    | SOURCE
     | SPECIFICATION
     | SQL
     | SQLDATA
