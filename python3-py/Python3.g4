@@ -751,11 +751,11 @@ spaces = re.sub("[\r\n]+", "", tempt)
 next = self._input.LA(1)
 
 if self.opened > 0 or next == '\r' or next == '\n' or next == '#':
-    skip()
+    self.skip()
 else:
     self.emitToken(self.commonToken(self.NEWLINE, newLine))
     indent = self.getIndentationCount(spaces)
-    previous = self.indents[0] if self.indents else 0
+    previous = self.indents[-1] if self.indents else 0
 
     if indent == previous:
         self.skip()
@@ -763,7 +763,7 @@ else:
         self.indents.append(indent)
         self.emitToken(self.commonToken(LanguageParser.INDENT, spaces))
     else:
-        while self.indents and self.indents[0] > indent:
+        while self.indents and self.indents[-1] > indent:
             self.emitToken(self.createDedent())
             self.indents.pop()
     }
