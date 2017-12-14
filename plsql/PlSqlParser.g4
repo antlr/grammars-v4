@@ -2991,7 +2991,7 @@ standard_function
 literal
     : CHAR_STRING 
     | string_function 
-    |  numeric 
+    | numeric 
     | MAXVALUE 
     ;
  
