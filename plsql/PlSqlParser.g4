@@ -28,6 +28,7 @@ sql_script
 
 unit_statement
     : transaction_control_statements 
+    | alter_cluster
     | alter_function
     | alter_package
     | alter_procedure
@@ -1633,6 +1634,282 @@ comment_on_table
     : COMMENT ON TABLE tableview_name IS quoted_string
     ;
 
+alter_cluster
+    : ALTER CLUSTER  cluster_name 
+           (physical_attributes_clause
+           | SIZE size_clause
+           | allocate_extent_clause
+           | deallocate_unused_clause
+           | (CACHE | NOCACHE)
+           )+
+          parallel_clause? 
+          ';'
+    ;
+
+database_name
+    : regular_id
+    ;
+
+alter_database
+    : ALTER DATABASE database_name?
+       (startup_clauses
+       | recovery_clauses
+       | database_file_clauses
+       | logfile_clauses
+       | controlfile_clauses
+       | standby_database_clauses
+       | default_settings_clause
+       | instance_clauses
+       | security_clause
+       )
+      ';'
+    ;
+
+startup_clauses
+    : MOUNT ((STANDBY | CLONE) DATABASE)?
+    | OPEN (READ WRITE)? (RESETLOGS | NORESETLOGS)? (UPGRADE | DOWNGRADE)?
+    | OPEN READ ONLY
+    ;
+
+recovery_clauses
+    : general_recovery
+    | managed_standby_recovery
+    | (BEGIN | END) BACKUP
+    ;
+
+general_recovery
+    : RECOVER AUTOMATIC? (FROM CHAR_STRING)?
+       ( (full_database_recovery | partial_database_recovery | LOGFILE CHAR_STRING )+ 
+         ((TEST | ALLOW UNSIGNED_INTEGER CORRUPTION | parallel_clause)+ )?  
+       | CONTINUE DEFAULT?
+       | CANCEL
+       )
+    ;  
+
+//Need to come back to
+full_database_recovery
+    : STANDBY? DATABASE ((UNTIL (CANCEL |TIME CHAR_STRING | CHANGE UNSIGNED_INTEGER | CONSISTENT) 
+                         | USING BACKUP CONTROLFILE
+                         )+
+                        )?
+    ;
+
+partial_database_recovery
+    : TABLESPACE (','? tablespace)+
+    | DATAFILE (','? CHAR_STRING | filenumber)+
+    ;
+
+managed_standby_recovery
+    : RECOVER (MANAGED STANDBY DATABASE
+               ((USING CURRENT LOGFILE
+                | DISCONNECT (FROM SESSION)?
+                | NODELAY
+                | UNTIL CHANGE UNSIGNED_INTEGER
+                | UNTIL CONSISTENT
+                | parallel_clause
+                )+
+               | FINISH
+               | CANCEL
+               )?
+              | TO LOGICAL STANDBY (db_name | KEEP IDENTITY)
+              )
+    ;
+
+db_name
+    : regular_id
+    ;
+database_file_clauses
+    : RENAME FILE (','? filename)+ TO filename
+    | create_datafile_clause
+    | alter_datafile_clause
+    | alter_tempfile_clause
+    ;
+
+create_datafile_clause
+    : CREATE DATAFILE (','? (filename | filenumber) )+ 
+        (AS (//TODO (','? file_specification)+ |
+              NEW) )?
+    ;
+
+alter_datafile_clause
+    : DATAFILE (','? filename|filenumber)+ 
+        (ONLINE
+        | OFFLINE (FOR DROP)?
+        | RESIZE size_clause
+        | autoextend_clause
+        | END BACKUP
+        )
+    ;
+
+alter_tempfile_clause
+    : TEMPFILE (','? filename|filenumber)+
+        (RESIZE size_clause
+        | autoextend_clause
+        | DROP (INCLUDING DATAFILES)
+        | ONLINE
+        | OFFLINE
+        )
+    ;
+
+logfile_clauses
+    : (ARCHIVELOG MANUAL? | NOARCHIVELOG)
+    | NO? FORCE LOGGING
+    | RENAME FILE (','? filename)+ TO filename
+    | CLEAR UNARCHIVED LOGFILE (','? logfile_descriptor)+ (UNRECOVERABLE DATAFILE)?
+    | add_logfile_clauses
+    | drop_logfile_clauses
+    | switch_logfile_clause
+    | supplemental_db_logging
+    ;
+
+add_logfile_clauses
+    : ADD STANDBY? LOGFILE
+//TODO       ((INSTANCE CHAR_STRING | THREAD UNSIGNED_INTEGER)?
+//TODO          (','? (GROUP UNSIGNED_INTEGER)? //TODO redo_logfile_spec
+//TODO          )+
+//TODO       | MEMBER (','? filename REUSE?)+ TO (','? logfile_descriptor)+
+//TODO       )
+    ;
+
+drop_logfile_clauses
+    : DROP STANDBY? LOGFILE ((','? logfile_descriptor)+
+                            | MEMBER (','? filename)+
+                            )
+    ;
+
+switch_logfile_clause
+    : SWITCH ALL LOGFILES TO BLOCKSIZE UNSIGNED_INTEGER
+    ;
+
+supplemental_db_logging
+    : (ADD | DROP) SUPPLEMENTAL LOG (DATA
+                                    | supplemental_id_key_clause
+                                    | supplemental_plsql_clause
+                                    )
+    ;
+
+
+supplemental_plsql_clause
+    : DATA FOR PROCEDURAL REPLICATION
+    ;
+
+logfile_descriptor
+    : GROUP UNSIGNED_INTEGER
+    | '(' (','? filename)+ ')' 
+    | filename
+    ;
+
+controlfile_clauses
+    : CREATE (LOGICAL | PHYSICAL)? STANDBY CONTROLFILE AS filename REUSE?
+    | BACKUP CONTROLFILE TO (filename REUSE? | trace_file_clause)
+    ;
+
+trace_file_clause
+    : TRACE (AS filename REUSE?)? (RESETLOGS|NORESETLOGS)?
+    ;
+
+standby_database_clauses
+    : (activate_standby_db_clause
+      | maximize_standby_db_clause
+      | register_logfile_clause
+      | commit_switchover_clause
+      | start_standby_clause
+      | stop_standby_clause
+      | convert_database_clause
+      )
+      parallel_clause?
+    ;
+
+activate_standby_db_clause
+    : ACTIVATE (PHYSICAL | LOGICAL)? STANDBY DATABASE (FINISH APPLY)?
+    ;
+
+maximize_standby_db_clause
+    : SET STANDBY DATABASE TO MAXIMIZE (PROTECTION | AVAILABILITY | PERFORMANCE)
+    ; 
+
+register_logfile_clause
+    : REGISTER (OR REPLACE)? (PHYSICAL | LOGICAL) LOGFILE //TODO (','? file_specification)+
+    //TODO   (FOR logminer_session_name)?
+    ;
+
+commit_switchover_clause
+    : (PREPARE | COMMIT) TO SWITCHOVER
+        ((TO (((PHYSICAL | LOGICAL)? PRIMARY |  PHYSICAL? STANDBY)
+           ((WITH | WITHOUT)? SESSION SHUTDOWN (WAIT | NOWAIT) )?
+          | LOGICAL STANDBY
+          )
+         | LOGICAL STANDBY
+         )
+        | CANCEL
+        )?
+    ;
+
+start_standby_clause
+    : START LOGICAL STANDBY APPLY IMMEDIATE? NODELAY?
+        ( NEW PRIMARY regular_id
+        | INITIAL scn_value=UNSIGNED_INTEGER?
+        | SKIP_ FAILED TRANSACTION
+        | FINISH
+        )?
+    ;
+
+stop_standby_clause
+    : (STOP | ABORT) LOGICAL STANDBY APPLY
+    ;
+
+convert_database_clause
+    : CONVERT TO (PHYSICAL | SNAPSHOT) STANDBY
+    ;
+
+default_settings_clause
+    : DEFAULT EDITION EQUALS_OP edition_name
+    | SET DEFAULT (BIGFILE | SMALLFILE) TABLESPACE
+    | DEFAULT TABLESPACE tablespace
+    | DEFAULT TEMPORARY TABLESPACE (tablespace | tablespace_group_name)
+    | RENAME GLOBAL_NAME TO database ('.' domain)+
+    | ENABLE BLOCK CHANGE TRACKING (USING FILE filename REUSE?)?
+    | DISABLE BLOCK CHANGE TRACKING
+    | flashback_mode_clause
+    | set_time_zone_clause
+    ;
+
+tablespace_group_name
+    : regular_id
+    ;
+
+set_time_zone_clause
+    : SET TIMEZONE EQUALS_OP CHAR_STRING
+    ;
+
+instance_clauses
+    : (ENABLE | DISABLE) INSTANCE CHAR_STRING
+    ;
+
+security_clause
+    : GUARD (ALL | STANDBY | NONE)
+    ;
+
+domain
+    : regular_id
+    ;
+
+database
+    : regular_id
+    ;
+
+edition_name
+    : regular_id
+    ;
+
+filenumber
+    : UNSIGNED_INTEGER
+    ;
+
+filename
+    : CHAR_STRING
+    ;
+   
 alter_table
     : ALTER TABLE tableview_name
       ( 
