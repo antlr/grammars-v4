@@ -46,6 +46,8 @@ unit_statement
     | create_index
     | create_table
     | create_tablespace
+    | create_cluster
+    | create_context
     | create_view //TODO
     | create_directory 
     | create_materialized_view 
@@ -596,15 +598,8 @@ global_partitioned_index
     ;
 
 index_partitioning_clause
-    : PARTITION partition_name? VALUES LESS THAN '(' 
-                                        (','? (CHAR_STRING
-                                              | string_function
-                                              | numeric
-                                              | MAXVALUE
-                                              )
-                                        )+ 
-                                                 ')'
-                                        segment_attributes_clause?
+    : PARTITION partition_name? VALUES LESS THAN '(' (','? literal)+ ')'
+        segment_attributes_clause?
     ;
 
 local_partitioned_index
@@ -659,9 +654,148 @@ odci_parameters
 indextype
     : (id_expression '.')? id_expression
     ;
-  
+
+//https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_1010.htm#SQLRF00805  
 alter_index
-    : ALTER INDEX old_index_name=index_name RENAME TO new_index_name=index_name ';'
+    : ALTER INDEX index_name (alter_index_ops_set1 | alter_index_ops_set2) ';'
+    ;
+
+alter_index_ops_set1
+    : ( deallocate_unused_clause
+      | allocate_extent_clause
+      | shrink_clause
+      | parallel_clause
+      | physical_attributes_clause
+      | logging_clause
+      )+
+    ;
+
+alter_index_ops_set2
+    : rebuild_clause
+    | PARAMETERS '(' odci_parameters ')'
+    | COMPILE
+    | enable_or_disable
+    | UNUSABLE
+    | visible_or_invisible
+    | RENAME TO new_index_name
+    | COALESCE
+    | monitoring_nomonitoring USAGE
+    | UPDATE BLOCK REFERENCES
+    | alter_index_partitioning
+    ;
+
+visible_or_invisible
+    : VISIBLE
+    | INVISIBLE
+    ;
+
+monitoring_nomonitoring
+    : MONITORING
+    | NOMONITORING
+    ;
+
+rebuild_clause
+    : REBUILD ( PARTITION partition_name
+              | SUBPARTITION subpartition_name
+              | REVERSE
+              | NOREVERSE
+              )?
+              ( parallel_clause
+              | TABLESPACE tablespace
+              | PARAMETERS '(' odci_parameters ')'
+//TODO        | xmlindex_parameters_clause
+              | ONLINE
+              | physical_attributes_clause
+              | key_compression
+              | logging_clause
+              )*
+    ;
+
+alter_index_partitioning
+    : modify_index_default_attrs
+    | add_hash_index_partition
+    | modify_index_partition
+    | rename_index_partition
+    | drop_index_partition
+    | split_index_partition
+    | coalesce_index_partition
+    | modify_index_subpartition
+    ;
+     
+modify_index_default_attrs
+    : MODIFY DEFAULT ATTRIBUTES (FOR PARTITION partition_name)?
+         ( physical_attributes_clause
+         | TABLESPACE (tablespace | DEFAULT)
+         | logging_clause
+         )
+    ;
+
+add_hash_index_partition
+    : ADD PARTITION partition_name? (TABLESPACE tablespace)?
+        key_compression? parallel_clause?
+    ;
+
+coalesce_index_partition
+    : COALESCE PARTITION parallel_clause?
+    ;
+
+modify_index_partition
+    : MODIFY PARTITION partition_name
+        ( modify_index_partitions_ops+
+        | PARAMETERS '(' odci_parameters ')'
+        | COALESCE
+        | UPDATE BLOCK REFERENCES
+        | UNUSABLE
+        )
+    ;
+          
+modify_index_partitions_ops
+    : deallocate_unused_clause
+    | allocate_extent_clause
+    | physical_attributes_clause
+    | logging_clause
+    | key_compression
+    ;
+ 
+rename_index_partition
+    : RENAME (PARTITION partition_name | SUBPARTITION subpartition_name)
+         TO new_partition_name
+    ; 
+
+drop_index_partition
+    : DROP PARTITION partition_name
+    ;
+
+split_index_partition
+    : SPLIT PARTITION partition_name_old AT '(' (','? literal)+ ')' 
+        (INTO '(' index_partition_description ',' index_partition_description ')' ) ? parallel_clause?
+    ;
+
+index_partition_description
+    : PARTITION (partition_name ( (segment_attributes_clause | key_compression)+
+                                | PARAMETERS '(' odci_parameters ')'
+                                )
+                                UNUSABLE?
+                )?
+    ;
+
+modify_index_subpartition
+    : MODIFY SUBPARTITION subpartition_name (UNUSABLE
+                                            | allocate_extent_clause
+                                            | deallocate_unused_clause
+                                            )
+    ;
+
+partition_name_old
+    : partition_name
+    ;
+
+new_partition_name
+    : partition_name
+    ;
+
+new_index_name
+    : index_name
     ;
 
 create_user
@@ -1058,6 +1192,32 @@ create_mv_refresh
       )
     ;
 
+create_context
+    : CREATE (OR REPLACE)? CONTEXT namespace USING (schema_object_name '.')? package_name 
+           (INITIALIZED (EXTERNALLY | GLOBALLY)
+           | ACCESSED GLOBALLY
+           )?
+      ';'
+    ;
+
+namespace
+    : id_expression
+    ;
+
+//https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_5001.htm#SQLRF01201
+create_cluster
+    : CREATE CLUSTER  cluster_name '(' (','? column_name datatype SORT?)+ ')'
+          ( physical_attributes_clause
+          | SIZE size_clause
+          | TABLESPACE tablespace
+          | INDEX
+          | (SINGLE TABLE)? HASHKEYS UNSIGNED_INTEGER (HASH IS expression)?
+          )*
+          parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? 
+          (CACHE | NOCACHE)?
+          ';'
+    ;
+
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
         (relational_table | object_table | xmltype_table) (AS subquery)?
@@ -1296,25 +1456,11 @@ hash_subparts_by_quantity
     ;
                                  
 range_values_clause
-    : VALUES LESS THAN '(' 
-         (','? CHAR_STRING
-         | ','? string_function
-         | ','? numeric
-         | ','? MAXVALUE
-         )+
-                       ')'
+    : VALUES LESS THAN '(' (','? literal)+ ')'
     ;
 
 list_values_clause
-    : VALUES '('
-       (
-         (','? CHAR_STRING
-         | ','? string_function
-         | ','? numeric
-         )+
-       | DEFAULT
-       )
-              ')'
+    : VALUES '(' ((','? literal)+ | DEFAULT) ')'
     ;
 
 table_partition_description
@@ -1378,6 +1524,7 @@ storage_clause
          (INITIAL initial_size=size_clause
          | NEXT next_size=size_clause
          | MINEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
+         | MAXEXTENTS minextents=(UNSIGNED_INTEGER | UNLIMITED)
          | PCTINCREASE pctincrease=UNSIGNED_INTEGER
          | FREELISTS freelists=UNSIGNED_INTEGER
          | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
@@ -2847,7 +2994,14 @@ standard_function
     | numeric_function_wrapper
     | other_function
     ;
-    
+
+literal
+    : CHAR_STRING 
+    | string_function 
+    | numeric 
+    | MAXVALUE 
+    ;
+ 
 numeric_function_wrapper
     : numeric_function (single_column_for_loop | multi_column_for_loop)?
     ;
@@ -3920,6 +4074,7 @@ regular_id
     | SOME
     | SOURCE
     | SPECIFICATION
+    | SPLIT
     | SQL
     | SQLDATA
     | SQLERROR
