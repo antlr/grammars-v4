@@ -658,12 +658,11 @@ indextype
 
 //https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_1010.htm#SQLRF00805  
 alter_index
-    : ALTER INDEX index_name (alter_index_ops_set1 | alter_index_ops_set2)
-      ';'
+    : ALTER INDEX index_name (alter_index_ops_set1 | alter_index_ops_set2) ';'
     ;
 
 alter_index_ops_set1
-    : (deallocate_unused_clause
+    : ( deallocate_unused_clause
       | allocate_extent_clause
       | shrink_clause
       | parallel_clause
@@ -678,12 +677,22 @@ alter_index_ops_set2
     | COMPILE
     | enable_or_disable
     | UNUSABLE
-    | (VISIBLE | INVISIBLE)
+    | visible_or_invisible
     | RENAME TO new_index_name
     | COALESCE
-    | (MONITORING | NOMONITORING) USAGE
+    | monitoring_nomonitoring USAGE
     | UPDATE BLOCK REFERENCES
     | alter_index_partitioning
+    ;
+
+visible_or_invisible
+    : VISIBLE
+    | INVISIBLE
+    ;
+
+monitoring_nomonitoring
+    : MONITORING
+    | NOMONITORING
     ;
 
 rebuild_clause
@@ -692,16 +701,15 @@ rebuild_clause
               | REVERSE
               | NOREVERSE
               )?
-              (( parallel_clause
-               | TABLESPACE tablespace
-               | PARAMETERS '(' odci_parameters ')'
-//TODO         | xmlindex_parameters_clause
-               | ONLINE
-               | physical_attributes_clause
-               | key_compression
-               | logging_clause
-               )+
-              )?
+              ( parallel_clause
+              | TABLESPACE tablespace
+              | PARAMETERS '(' odci_parameters ')'
+//TODO        | xmlindex_parameters_clause
+              | ONLINE
+              | physical_attributes_clause
+              | key_compression
+              | logging_clause
+              )*
     ;
 
 alter_index_partitioning
@@ -734,7 +742,7 @@ coalesce_index_partition
 
 modify_index_partition
     : MODIFY PARTITION partition_name
-        (modify_index_partitions_ops+
+        ( modify_index_partitions_ops+
         | PARAMETERS '(' odci_parameters ')'
         | COALESCE
         | UPDATE BLOCK REFERENCES
@@ -1200,13 +1208,12 @@ namespace
 //https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_5001.htm#SQLRF01201
 create_cluster
     : CREATE CLUSTER  cluster_name '(' (','? column_name datatype SORT?)+ ')'
-          ((physical_attributes_clause
-           | SIZE size_clause
-           | TABLESPACE tablespace
-           | INDEX
-           | (SINGLE TABLE)? HASHKEYS UNSIGNED_INTEGER (HASH IS expression)?
-           )+
-          )?
+          ( physical_attributes_clause
+          | SIZE size_clause
+          | TABLESPACE tablespace
+          | INDEX
+          | (SINGLE TABLE)? HASHKEYS UNSIGNED_INTEGER (HASH IS expression)?
+          )*
           parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)? 
           (CACHE | NOCACHE)?
           ';'
