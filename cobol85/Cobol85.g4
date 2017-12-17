@@ -1,24 +1,20 @@
 /*
-* Copyright (C) 2017, Ulrich Wolffgang <u.wol@wwu.de>
+* Copyright (C) 2017, Ulrich Wolffgang <ulrich.wolffgang@proleap.io>
 * All rights reserved.
 *
 * This software may be modified and distributed under the terms
-* of the BSD 3-clause license. See the LICENSE file for details.
+* of the MIT license. See the LICENSE file for details.
 */
 
 /*
-* Cobol 85 Grammar for ANTLR4
+* COBOL 85 Grammar for ANTLR4
 *
-* This is an approximate grammar for Cobol 85 and the parser at
-* https://github.com/uwol/cobol85parser. It is akin but neither copied from
-* nor identical to the Cobol.jj, Cobol.kg and VS COBOL II grammars.
+* This is a COBOL 85 grammar, which is part of the COBOL parser at
+* https://github.com/uwol/cobol85parser.
 *
-* Characteristics:
-*
-* 1. Passes the NIST tests.
-*
-* 2. To be used in conjunction with the provided preprocessor, which executes
-*    COPY and REPLACE statements.
+* The grammar passes the NIST test suite and has successfully been applied to
+* numerous COBOL files from banking and insurance. To be used in conjunction
+* with the provided preprocessor, which executes COPY and REPLACE statements.
 */
 
 grammar Cobol85;
@@ -853,7 +849,7 @@ reportGroupTypeControlFooting
    ;
 
 reportGroupUsageClause
-   : (USAGE IS?)? (DISPLAY | DISPLAY_1)	
+   : (USAGE IS?)? (DISPLAY | DISPLAY_1)
    ;
 
 reportGroupTypePageFooting
@@ -1163,7 +1159,7 @@ statement
 // accept statement
 
 acceptStatement
-   : ACCEPT identifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)?
+   : ACCEPT identifier (acceptFromDateStatement | acceptFromEscapeKeyStatement | acceptFromMnemonicStatement | acceptMessageCountStatement)? onExceptionClause? notOnExceptionClause? END_ACCEPT?
    ;
 
 acceptFromDateStatement
@@ -1379,11 +1375,11 @@ divideStatement
    ;
 
 divideIntoStatement
-   : INTO (identifier | literal) divideGivingPhrase?
+   : INTO divideInto+
    ;
 
 divideIntoGivingStatement
-   : INTO divideGiving+
+   : INTO (identifier | literal) divideGivingPhrase?
    ;
 
 divideByGivingStatement
@@ -1392,6 +1388,10 @@ divideByGivingStatement
 
 divideGivingPhrase
    : GIVING divideGiving+
+   ;
+
+divideInto
+   : identifier ROUNDED?
    ;
 
 divideGiving
@@ -1669,7 +1669,11 @@ moveToSendingArea
    ;
 
 moveCorrespondingToStatement
-   : (CORRESPONDING | CORR) qualifiedDataName TO identifier+
+   : (CORRESPONDING | CORR) moveCorrespondingToSendingArea TO identifier+
+   ;
+
+moveCorrespondingToSendingArea
+   : identifier
    ;
 
 // multiply statement
@@ -1854,7 +1858,7 @@ receiveStatus
 
 // release statement
 
-releaseStatement 
+releaseStatement
    : RELEASE recordName (FROM qualifiedDataName)?
    ;
 
@@ -2041,7 +2045,7 @@ stringSendingPhrase
    ;
 
 stringSending
-   : tableCall | literal
+   : identifier | literal
    ;
 
 stringDelimitedByPhrase
@@ -2329,7 +2333,7 @@ relationCombinedCondition
    ;
 
 relationalOperator
-   : (IS | ARE)? (NOT? (GREATER THAN? | MORETHANCHAR | LESS THAN? | LESSTHANCHAR | EQUAL TO? | EQUALCHAR) | GREATER THAN? OR EQUAL TO? | MORETHANOREQUAL | LESS THAN? OR EQUAL TO? | LESSTHANOREQUAL)
+   : (IS | ARE)? (NOT? (GREATER THAN? | MORETHANCHAR | LESS THAN? | LESSTHANCHAR | EQUAL TO? | EQUALCHAR) | NOTEQUALCHAR | GREATER THAN? OR EQUAL TO? | MORETHANOREQUAL | LESS THAN? OR EQUAL TO? | LESSTHANOREQUAL)
    ;
 
 abbreviation
@@ -2457,7 +2461,7 @@ dataName
    ;
 
 dataDescName
-   : FILLER | CURSOR | dataName 
+   : FILLER | CURSOR | dataName
    ;
 
 environmentName
@@ -2597,13 +2601,13 @@ figurativeConstant
    ;
 
 specialRegister
-   : ADDRESS OF identifier 
+   : ADDRESS OF identifier
    | DATE | DAY | DAY_OF_WEEK | DEBUG_CONTENTS | DEBUG_ITEM | DEBUG_LINE | DEBUG_NAME | DEBUG_SUB_1 | DEBUG_SUB_2 | DEBUG_SUB_3
-   | LENGTH OF? identifier | LINAGE_COUNTER | LINE_COUNTER 
-   | PAGE_COUNTER 
-   | RETURN_CODE 
-   | SHIFT_IN | SHIFT_OUT | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN 
-   | TALLY | TIME 
+   | LENGTH OF? identifier | LINAGE_COUNTER | LINE_COUNTER
+   | PAGE_COUNTER
+   | RETURN_CODE
+   | SHIFT_IN | SHIFT_OUT | SORT_CONTROL | SORT_CORE_SIZE | SORT_FILE_SIZE | SORT_MESSAGE | SORT_MODE_SIZE | SORT_RETURN
+   | TALLY | TIME
    | WHEN_COMPILED
    ;
 
@@ -2774,6 +2778,7 @@ EMI : E M I;
 EMPTY_CHECK : E M P T Y MINUSCHAR C H E C K;
 ENABLE : E N A B L E;
 END : E N D;
+END_ACCEPT : E N D MINUSCHAR A C C E P T;
 END_ADD : E N D MINUSCHAR A D D;
 END_CALL : E N D MINUSCHAR C A L L;
 END_COMPUTE : E N D MINUSCHAR C O M P U T E;
@@ -3163,6 +3168,7 @@ LPARENCHAR : '(';
 MINUSCHAR : '-';
 MORETHANCHAR : '>';
 MORETHANOREQUAL : '>=';
+NOTEQUALCHAR : '<>';
 PLUSCHAR : '+';
 SINGLEQUOTE : '\'';
 RPARENCHAR : ')';

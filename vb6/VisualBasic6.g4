@@ -1,29 +1,21 @@
 /*
-* Copyright (C) 2016, Ulrich Wolffgang <u.wol@wwu.de>
+* Copyright (C) 2017, Ulrich Wolffgang <ulrich.wolffgang@proleap.io>
 * All rights reserved.
 *
 * This software may be modified and distributed under the terms
-* of the BSD 3-clause license. See the LICENSE file for details.
+* of the MIT license. See the LICENSE file for details.
 */
 
 /*
 * Visual Basic 6.0 Grammar for ANTLR4
 *
-* This is a grammar for Visual Basic 6.0 and the parser at
-* https://github.com/uwol/vb6parser. The grammar is derived from the 
-* Visual Basic 6.0 language reference 
-* http://msdn.microsoft.com/en-us/library/aa338033%28v=vs.60%29.aspx 
-* and tested against MSDN VB6 statements as well as several Visual 
+* This is a Visual Basic 6.0 grammar, which is part of the Visual Basic 6.0
+* parser at https://github.com/uwol/vb6parser.
+*
+* The grammar is derived from the Visual Basic 6.0 language reference
+* http://msdn.microsoft.com/en-us/library/aa338033%28v=vs.60%29.aspx
+* and has been tested with MSDN VB6 statements as well as several Visual
 * Basic 6.0 code repositories.
-*
-* Characteristics:
-*
-* 1. This grammar is line-based and takes into account whitespace, so that
-*    member calls (e.g. "A.B") are distinguished from contextual object calls 
-*    in WITH statements (e.g. "A .B").
-*
-* 2. Keywords can be used as identifiers depending on the context, enabling
-*    e.g. "A.Type", but not "Type.B".
 */
 
 grammar VisualBasic6;
@@ -41,11 +33,11 @@ module
 moduleReferences
    : moduleReference+
    ;
-	
-moduleReference 
+
+moduleReference
    : OBJECT WS? EQ WS? moduleReferenceGUID SEMICOLON WS? moduleReferenceComponent NEWLINE*
    ;
-	 
+
 moduleReferenceGUID
    : STRINGLITERAL
    ;
@@ -102,28 +94,28 @@ moduleBodyElement
 
 // controls ----------------------------------
 
-controlProperties 
+controlProperties
 	: WS? BEGIN WS cp_ControlType WS cp_ControlIdentifier WS? NEWLINE+ cp_Properties+ END NEWLINE*
 	;
 
-cp_Properties 
+cp_Properties
 	: cp_SingleProperty
 	| cp_NestedProperty
 	| controlProperties;
 
-cp_SingleProperty 
+cp_SingleProperty
 	: WS? implicitCallStmt_InStmt WS? EQ WS? '$'? literal FRX_OFFSET? NEWLINE+
 	;
 
-cp_PropertyName 
+cp_PropertyName
 	: (OBJECT '.')? complexType
 	;
 
-cp_NestedProperty 
+cp_NestedProperty
 	: WS? BEGINPROPERTY WS ambiguousIdentifier (LPAREN INTEGERLITERAL RPAREN)? (WS GUID)? NEWLINE+ (cp_Properties+)? ENDPROPERTY NEWLINE+
 	;
 
-cp_ControlType 
+cp_ControlType
 	: complexType
 	;
 
@@ -653,7 +645,7 @@ implicitCallStmt_InBlock
 
 // parantheses are forbidden in case of args
 // variables cannot be called in blocks
-// certainIdentifier instead of ambiguousIdentifier for preventing ambiguity with statement keywords 
+// certainIdentifier instead of ambiguousIdentifier for preventing ambiguity with statement keywords
 iCS_B_ProcedureCall
    : certainIdentifier (WS argsCall)?
    ;
@@ -795,13 +787,13 @@ literal
    | NULL
    ;
 
-publicPrivateVisibility 
-	: PRIVATE 
+publicPrivateVisibility
+	: PRIVATE
 	| PUBLIC
 	;
 
-publicPrivateGlobalVisibility 
-	: PRIVATE 
+publicPrivateGlobalVisibility
+	: PRIVATE
 	| PUBLIC
 	| GLOBAL
 	;
@@ -1522,7 +1514,7 @@ NULL
    : N U L L
    ;
 
-OBJECT 
+OBJECT
    : O B J E C T
    ;
 
@@ -1931,7 +1923,7 @@ LEQ
    : '<='
    ;
 
-LBRACE 
+LBRACE
 	: '{'
 	;
 
