@@ -1921,8 +1921,8 @@ alter_table
     : ALTER TABLE tableview_name
       ( 
       | alter_table_properties
-      | column_clauses
       | constraint_clauses
+      | column_clauses
 //TODO      | alter_table_partitioning
 //TODO      | alter_external_table
       | move_table_clause 
@@ -2234,7 +2234,8 @@ object_type_col_properties
     ;
 
 constraint_clauses
-    : ADD (out_of_line_constraint* | out_of_line_ref_constraint)
+    : ADD '(' (out_of_line_constraint* | out_of_line_ref_constraint) ')'
+    | ADD  (out_of_line_constraint* | out_of_line_ref_constraint) 
     | MODIFY (CONSTRAINT constraint_name | PRIMARY KEY | UNIQUE '(' (','? column_name)+ ')')  constraint_state CASCADE?
     | RENAME CONSTRAINT old_constraint_name TO new_constraint_name
     | drop_constraint_clause+
@@ -4373,6 +4374,7 @@ regular_id
     | SUSPEND
     | SYSDATE
     | TEMPORARY
+    | TEST
     //| TABLE
     //| THE
     //| THEN
