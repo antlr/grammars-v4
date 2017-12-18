@@ -69,7 +69,7 @@
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
 				<module>html</module>
-                <module>hypertalk</module>
+    			        <module>hypertalk</module>
 				<module>icalendar</module>
 				<module>idl</module>
 				<module>inf</module>
@@ -160,6 +160,7 @@
 				<module>tnt</module>
 				<module>tsql</module>
 				<module>turtle</module>
+				<module>turtle-doc</module>
 				<module>ucb-logo</module>
 				<module>unicode</module>
 				<module>upnp</module>
