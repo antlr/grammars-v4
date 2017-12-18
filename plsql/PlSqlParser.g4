@@ -4148,6 +4148,7 @@ regular_id
     //| GRANT
     //| GROUP
     | GROUPING
+    | GROUPS
     | HASH
     //| HAVING
     | HIDE
