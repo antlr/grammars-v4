@@ -54,6 +54,7 @@
 				<module>dice</module>
 				<module>dot</module>
 				<module>ecmascript</module>
+				<module>edif300</module>
 				<module>emailaddress</module>
 				<module>erlang</module>
 				<module>fasta</module>
