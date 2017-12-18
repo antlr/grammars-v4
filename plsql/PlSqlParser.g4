@@ -558,19 +558,6 @@ index_properties
     | INDEXTYPE IS (domain_index_clause | xmlindex_clause)
     ;
 
-index_attributes
-    : (physical_attributes_clause
-      | logging_clause
-      | ONLINE
-      | TABLESPACE (tablespace | DEFAULT)
-      | key_compression
-      | (SORT | NOSORT)
-      | REVERSE
-      | (VISIBLE | INVISIBLE)
-      | parallel_clause
-      )+
-    ;
-
 domain_index_clause
     : indextype local_domain_index_clause? parallel_clause? (PARAMETERS '(' odci_parameters ')' )?
     ;
@@ -1990,7 +1977,24 @@ enable_disable_clause
     ;
 
 using_index_clause
-    : USING INDEX (index_name | '(' create_index ')' ) //TODO - add index_properties
+    : USING INDEX (index_name | '(' create_index ')' | index_attributes )?
+    ;
+
+index_attributes
+    : ( physical_attributes_clause
+      | logging_clause
+      | TABLESPACE (tablespace | DEFAULT)
+      | key_compression
+      | sort_or_nosort
+      | REVERSE
+      | visible_or_invisible
+      | parallel_clause
+      )+
+    ;
+
+sort_or_nosort
+    : SORT
+    | NOSORT
     ;
 
 exceptions_clause
