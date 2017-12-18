@@ -1013,6 +1013,7 @@ constraint_state
       | (RELY|NORELY)
       | (ENABLE|DISABLE)
       | (VALIDATE|NOVALIDATE)
+      | using_index_clause
       )+
     ;
 
