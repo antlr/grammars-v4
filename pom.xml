@@ -160,6 +160,7 @@
 				<module>tnt</module>
 				<module>tsql</module>
 				<module>turtle</module>
+				<module>turtle-doc</module>
 				<module>ucb-logo</module>
 				<module>unicode</module>
 				<module>upnp</module>
