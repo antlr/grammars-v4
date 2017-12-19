@@ -2717,7 +2717,7 @@ explain_statement
     ;
 
 select_statement
-    : subquery_factoring_clause? subquery (for_update_clause | order_by_clause)*
+    : subquery_factoring_clause? subquery (for_update_clause | order_by_clause | offset_clause | fetch_clause)*
     ;
 
 // Select Specific Clauses
@@ -2964,6 +2964,14 @@ order_by_clause
 
 order_by_elements
     : expression (ASC | DESC)? (NULLS (FIRST | LAST))?
+    ;
+
+offset_clause
+    : OFFSET expression (ROW | ROWS)
+    ;
+
+fetch_clause
+    : FETCH (FIRST | NEXT) (expression PERCENT_KEYWORD?)? (ROW | ROWS) (ONLY | WITH TIES)
     ;
 
 for_update_clause
