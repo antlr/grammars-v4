@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-grammar turtle;
+grammar Turtle;
 
 turtleDoc: statement* ;
 statement: directive | triples Dot ;
