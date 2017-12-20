@@ -1631,14 +1631,19 @@ comment_on_table
 
 alter_cluster
     : ALTER CLUSTER  cluster_name 
-           (physical_attributes_clause
-           | SIZE size_clause
-           | allocate_extent_clause
-           | deallocate_unused_clause
-           | (CACHE | NOCACHE)
-           )+
-          parallel_clause? 
-          ';'
+        ( physical_attributes_clause
+        | SIZE size_clause
+        | allocate_extent_clause
+        | deallocate_unused_clause
+        | cache_or_nocache
+        )+
+        parallel_clause? 
+        ';'
+    ;
+
+cache_or_nocache
+    : CACHE
+    | NOCACHE
     ;
 
 database_name
@@ -1647,7 +1652,7 @@ database_name
 
 alter_database
     : ALTER DATABASE database_name?
-       (startup_clauses
+       ( startup_clauses
        | recovery_clauses
        | database_file_clauses
        | logfile_clauses
@@ -1662,14 +1667,29 @@ alter_database
 
 startup_clauses
     : MOUNT ((STANDBY | CLONE) DATABASE)?
-    | OPEN (READ WRITE)? (RESETLOGS | NORESETLOGS)? (UPGRADE | DOWNGRADE)?
+    | OPEN (READ WRITE)? resetlogs_or_noresetlogs? upgrade_or_downgrade?
     | OPEN READ ONLY
     ;
 
+resetlogs_or_noresetlogs
+    : RESETLOGS
+    | NORESETLOGS
+    ;
+   
+upgrade_or_downgrade
+    : UPGRADE
+    | DOWNGRADE
+    ;
+ 
 recovery_clauses
     : general_recovery
     | managed_standby_recovery
-    | (BEGIN | END) BACKUP
+    | begin_or_end BACKUP
+    ;
+
+begin_or_end
+    : BEGIN
+    | END
     ;
 
 general_recovery
@@ -1683,10 +1703,11 @@ general_recovery
 
 //Need to come back to
 full_database_recovery
-    : STANDBY? DATABASE ((UNTIL (CANCEL |TIME CHAR_STRING | CHANGE UNSIGNED_INTEGER | CONSISTENT) 
-                         | USING BACKUP CONTROLFILE
-                         )+
-                        )?
+    : STANDBY? DATABASE
+          ((UNTIL (CANCEL |TIME CHAR_STRING | CHANGE UNSIGNED_INTEGER | CONSISTENT) 
+           | USING BACKUP CONTROLFILE
+           )+
+          )?
     ;
 
 partial_database_recovery
@@ -1728,7 +1749,7 @@ create_datafile_clause
 
 alter_datafile_clause
     : DATAFILE (','? filename|filenumber)+ 
-        (ONLINE
+        ( ONLINE
         | OFFLINE (FOR DROP)?
         | RESIZE size_clause
         | autoextend_clause
@@ -1738,7 +1759,7 @@ alter_datafile_clause
 
 alter_tempfile_clause
     : TEMPFILE (','? filename|filenumber)+
-        (RESIZE size_clause
+        ( RESIZE size_clause
         | autoextend_clause
         | DROP (INCLUDING DATAFILES)
         | ONLINE
@@ -1767,9 +1788,10 @@ add_logfile_clauses
     ;
 
 drop_logfile_clauses
-    : DROP STANDBY? LOGFILE ((','? logfile_descriptor)+
-                            | MEMBER (','? filename)+
-                            )
+    : DROP STANDBY? 
+          LOGFILE ((','? logfile_descriptor)+
+                  | MEMBER (','? filename)+
+                  )
     ;
 
 switch_logfile_clause
@@ -1777,12 +1799,17 @@ switch_logfile_clause
     ;
 
 supplemental_db_logging
-    : (ADD | DROP) SUPPLEMENTAL LOG (DATA
-                                    | supplemental_id_key_clause
-                                    | supplemental_plsql_clause
-                                    )
+    :  add_or_drop
+          SUPPLEMENTAL LOG (DATA
+                           | supplemental_id_key_clause
+                           | supplemental_plsql_clause
+                           )
     ;
 
+add_or_drop
+    : ADD
+    | DROP
+    ;
 
 supplemental_plsql_clause
     : DATA FOR PROCEDURAL REPLICATION
@@ -1804,7 +1831,7 @@ trace_file_clause
     ;
 
 standby_database_clauses
-    : (activate_standby_db_clause
+    : ( activate_standby_db_clause
       | maximize_standby_db_clause
       | register_logfile_clause
       | commit_switchover_clause
@@ -1878,7 +1905,7 @@ set_time_zone_clause
     ;
 
 instance_clauses
-    : (ENABLE | DISABLE) INSTANCE CHAR_STRING
+    : enable_or_disable INSTANCE CHAR_STRING
     ;
 
 security_clause
