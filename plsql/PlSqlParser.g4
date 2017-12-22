@@ -39,6 +39,9 @@ unit_statement
     | alter_index
     | alter_user
 
+    | analyze
+    | associate_statistics
+
     | create_function_body
     | create_procedure_body
     | create_package
@@ -897,6 +900,124 @@ add_rem_container_data
 container_data_clause
     : set_container_data
     | add_rem_container_data (FOR container_tableview_name)?
+    ;
+
+// https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4005.htm#SQLRF01105
+analyze
+    : ( ANALYZE (TABLE tableview_name | INDEX index_name) partition_extention_clause?
+      | CLUSTER cluster_name
+      )
+
+      ( validation_clauses
+      | LIST CHAINED ROWS into_clause1 ?
+      | DELETE SYSTEM? STATISTICS
+      )
+      ';'
+    ;
+      
+partition_extention_clause
+    : PARTITION ( '(' partition_name ')'
+                | FOR '(' (','? partition_key_value)+ ')'
+                )
+    | SUBPARTITION ( '(' subpartition_name ')'
+                   | FOR '(' (','? subpartition_key_value)+ ')'
+                   )
+    ;
+
+validation_clauses
+    : VALIDATE REF UPDATE (SET DANGLING TO NULL)?
+    | VALIDATE STRUCTURE 
+        ( CASCADE ( FAST
+                  | COMPLETE (online_or_offline) into_clause?
+                  )
+        )?
+    ;
+
+online_or_offline
+    : OFFLINE
+    | ONLINE
+    ;
+
+into_clause1
+    : INTO tableview_name?
+    ;
+
+//Making assumption on partition ad subpartition key value clauses
+partition_key_value
+    : literal
+    ;
+
+subpartition_key_value
+    : literal
+    ;
+
+//https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4006.htm#SQLRF01106
+associate_statistics
+    : ASSOCIATE STATISTICS 
+        WITH ( column_association
+             | function_association
+             )
+         storage_table_clause?
+      ';'
+    ;
+
+column_association
+    : COLUMNS (','? tableview_name '.' column_name)+ using_statistics_type
+    ;
+
+function_association
+    : ( FUNCTIONS (','? function_name)+
+      | PACKAGES (','? package_name)+
+      | TYPES (','? type_name)+
+      | INDEXES (','? index_name)+
+      | INDEXTYPES (','? indextype_name)+
+      )
+
+      ( using_statistics_type
+      | default_cost_clause (',' default_selectivity_clause)?
+      | default_selectivity_clause (',' default_cost_clause)?
+      )
+    ;
+
+indextype_name
+    : id_expression
+    ;
+
+
+using_statistics_type
+    : USING (statistics_type_name | NULL)
+    ;
+
+statistics_type_name
+    : regular_id
+    ;
+
+default_cost_clause
+    : DEFAULT COST '(' cpu_cost ',' io_cost ',' network_cost ')'
+    ;
+
+cpu_cost
+    : UNSIGNED_INTEGER
+    ;
+
+io_cost
+    : UNSIGNED_INTEGER
+    ;
+
+network_cost
+    : UNSIGNED_INTEGER
+    ;
+
+default_selectivity_clause
+    : DEFAULT SELECTIVITY default_selectivity
+    ;
+
+default_selectivity
+    : UNSIGNED_INTEGER
+    ;
+
+storage_table_clause
+    : WITH (SYSTEM | USER) MANAGED STORAGE TABLES
     ;
 
 drop_index
