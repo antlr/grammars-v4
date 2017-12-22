@@ -109,4 +109,4 @@ ALTER TABLE employees MODIFY LOB (resume) (NOCACHE);
 
 ALTER TABLE employees MODIFY LOB (resume) (NOCACHE);
 
-
+alter TABLE employee add ( constraint employee_pk UNique ( a , b ) ) ;
