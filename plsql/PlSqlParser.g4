@@ -5260,7 +5260,7 @@ non_reserved_keywords
     | PENDING
     | PERCENTILE_CONT
     | PERCENTILE_DISC
-    | PERCENT
+    | PERCENT_KEYWORD
     | PERCENT_RANKM
     | PERCENT_RANK
     | PERFORMANCE
@@ -5910,6 +5910,7 @@ non_reserved_keywords
     | SYS_XSID_TO_RAW
     | SYS_ZMAP_FILTER
     | SYS_ZMAP_REFRESH
+    | TABLE
     | TABLE_LOOKUP_BY_NL
     | TABLES
     | TABLESPACE
@@ -5928,6 +5929,7 @@ non_reserved_keywords
     | TEXT
     | THAN
     | THE
+    | THEN
     | THREAD
     | THROUGH
     | TIER
