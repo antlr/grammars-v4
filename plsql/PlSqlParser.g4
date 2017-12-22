@@ -2838,7 +2838,7 @@ explain_statement
     ;
 
 select_statement
-    : subquery_factoring_clause? subquery (for_update_clause | order_by_clause)*
+    : subquery_factoring_clause? subquery (for_update_clause | order_by_clause | offset_clause | fetch_clause)*
     ;
 
 // Select Specific Clauses
@@ -3085,6 +3085,14 @@ order_by_clause
 
 order_by_elements
     : expression (ASC | DESC)? (NULLS (FIRST | LAST))?
+    ;
+
+offset_clause
+    : OFFSET expression (ROW | ROWS)
+    ;
+
+fetch_clause
+    : FETCH (FIRST | NEXT) (expression PERCENT_KEYWORD?)? (ROW | ROWS) (ONLY | WITH TIES)
     ;
 
 for_update_clause
@@ -5373,7 +5381,7 @@ non_reserved_keywords
     | PENDING
     | PERCENTILE_CONT
     | PERCENTILE_DISC
-    | PERCENT
+    | PERCENT_KEYWORD
     | PERCENT_RANKM
     | PERCENT_RANK
     | PERFORMANCE
@@ -6023,6 +6031,7 @@ non_reserved_keywords
     | SYS_XSID_TO_RAW
     | SYS_ZMAP_FILTER
     | SYS_ZMAP_REFRESH
+    | TABLE
     | TABLE_LOOKUP_BY_NL
     | TABLES
     | TABLESPACE
@@ -6041,6 +6050,7 @@ non_reserved_keywords
     | TEXT
     | THAN
     | THE
+    | THEN
     | THREAD
     | THROUGH
     | TIER

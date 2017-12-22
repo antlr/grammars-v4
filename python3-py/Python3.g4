@@ -124,8 +124,8 @@ def createDedent(self):
     dedent.line = self.lastToken.line
     return dedent
 
-def commonToken(self, type, text):
-    stop = self.getCharIndex()-1
+def commonToken(self, type, text, indent=0):
+    stop = self.getCharIndex()-1-indent
     start = (stop - len(text) + 1) if text else stop
     return CommonToken(self._tokenFactorySourcePair, type, super().DEFAULT_TOKEN_CHANNEL, start, stop)
 
@@ -748,15 +748,19 @@ NEWLINE
 tempt = Lexer.text.fget(self)
 newLine = re.sub("[^\r\n]+", "", tempt)
 spaces = re.sub("[\r\n]+", "", tempt)
-next = self._input.LA(1)
+la_char = ""
+try:
+    la = self._input.LA(1)
+    la_char = chr(la)       # Python does not compare char to ints directly
+except ValueError:          # End of file
+    pass
 
-if self.opened > 0 or next == '\r' or next == '\n' or next == '#':
+if self.opened > 0 or la_char == '\r' or la_char == '\n' or la_char == '#':
     self.skip()
 else:
-    self.emitToken(self.commonToken(self.NEWLINE, newLine))
     indent = self.getIndentationCount(spaces)
     previous = self.indents[-1] if self.indents else 0
-
+    self.emitToken(self.commonToken(self.NEWLINE, newLine, indent=indent))      # NEWLINE is actually the '\n' char
     if indent == previous:
         self.skip()
     elif indent > previous:

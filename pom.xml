@@ -54,6 +54,7 @@
 				<module>dice</module>
 				<module>dot</module>
 				<module>ecmascript</module>
+				<module>edif300</module>
 				<module>emailaddress</module>
 				<module>erlang</module>
 				<module>fasta</module>
@@ -159,6 +160,7 @@
 				<module>tnt</module>
 				<module>tsql</module>
 				<module>turtle</module>
+				<module>turtle-doc</module>
 				<module>ucb-logo</module>
 				<module>unicode</module>
 				<module>upnp</module>
@@ -181,8 +183,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.7</antlr.version>
-		<antlr4test-maven-plugin.version>1.9</antlr4test-maven-plugin.version>
+		<antlr.version>4.7.1</antlr.version>
+		<antlr4test-maven-plugin.version>1.10</antlr4test-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
