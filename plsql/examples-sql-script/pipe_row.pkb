@@ -15,9 +15,10 @@ end;
 
 function prodfunc(n number) return mytabletype pipelined is
 begin
-	for i in 1 .. 5 loop
+    <<pipes>>
+    for i in 1 .. 5 loop
     	pipe row (myobjectformat(n,sysdate+i,'row '||i));
-    end loop;
+    end loop pipes;
     return;
 end;
 

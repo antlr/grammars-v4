@@ -1,2 +1,2 @@
-Exists ?a B
-
+Forall(?x) Forall(?y) _isProf(?x) ^ _isDean(?y) -> _isFriendOf(?x,?y) \/!_Knows(?x,?y)
+Forall(?x) Exists(?y) _isFriendOf(?y,?x)
