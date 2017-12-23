@@ -143,6 +143,9 @@ on testProperties
     the itemdelimiter
     put "," into the itemdelimiter
     set the itemdelimiter to "|"
+    answer the selectedfield
+    put the selectedchunk
+    get the selectedline
 
     -- part properties
     set the name of me to x
@@ -150,6 +153,10 @@ on testProperties
     get the first char of the name of me
     put "name" into me
     put "before" before the first word of the name of me   -- not legal in HyperCard, okay here
+
+    the selectedchunk of fld 1
+    the selectedline of cd fld id 32
+    the selectedline of fld "my field"
 
 end testProperties
 
@@ -243,6 +250,10 @@ on testSingleArgFunctions
     the number of lines of x
     the number of menuitems of x
     the number of cards of x
+    the number of card field x
+    the number of fld x
+    the number of background button id y
+    the number of button "x"
 
     the random of x
     random(x)
