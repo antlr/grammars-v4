@@ -37,10 +37,14 @@ script
 // Start symbol accepting any sequence of HyperTalk statements, expressions, whitespace and comments. Suitable when
 // evaluating the message box or HyperTalk strings via the 'do' command and 'value of' function.
 scriptlet
-    : statement
-    | scriptlet NEWLINE statement NEWLINE?
-    | NEWLINE scriptlet EOF
-    | scriptlet NEWLINE
+    : statement EOF
+    | multilineScriptlet
+    ;
+
+multilineScriptlet
+    : statement NEWLINE multilineScriptlet
+    | statement EOF
+    | NEWLINE multilineScriptlet
     | EOF
     ;
 
@@ -70,7 +74,7 @@ parameterList
     ;
 
 statementList
-    : statement? NEWLINE+ statementList
+    : statement? NEWLINE statementList
     | statement NEWLINE+
     ;
 
@@ -303,8 +307,8 @@ menuItem
     ;
 
 property
-    : globalProperty
-    | partProperty
+    : partProperty
+    | globalProperty
     ;
 
 globalProperty
@@ -491,6 +495,7 @@ singleArgFunc
     | 'number' 'of' line
     | 'number' 'of' 'menuitems'
     | 'number' 'of' cards
+    | 'number'
     | 'random'
     | 'sqrt'
     | 'trunc'
@@ -619,6 +624,10 @@ find
 // Not all properties need to be enumerated here, only those sharing a name with another keyword.
 propertyName
     : 'marked'
+    | 'selectedtext'
+    | 'selectedchunk'
+    | 'selectedfield'
+    | 'selectedline'
     | 'number'
     | 'id'
     | 'rect'
