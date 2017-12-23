@@ -2956,9 +2956,7 @@ label_declaration
     ;
 
 statement
-    : CREATE swallow_to_semi
-    | TRUNCATE swallow_to_semi
-    | body
+    : body
     | block
     | assignment_statement
     | continue_statement
@@ -2970,7 +2968,7 @@ statement
     | null_statement
     | raise_statement
     | return_statement
-    | case_statement/*[true]*/
+    | case_statement
     | sql_statement
     | function_call
     | pipe_row_statement
