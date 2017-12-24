@@ -1,4 +1,4 @@
- /**
+ /**CTIO
  * Oracle(c) PL/SQL 11g Parser
  *
  * Copyright (c) 2009-2011 Alexandre Porcelli <alexandre.porcelli@gmail.com>
@@ -21,7 +21,7 @@
 parser grammar PlSqlParser;
 
 options { tokenVocab=PlSqlLexer; }
-
+@members {boolean version12=false;}
 sql_script
     : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
     ;
@@ -905,7 +905,7 @@ container_data_clause
 // https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4005.htm#SQLRF01105
 analyze
     : ( ANALYZE (TABLE tableview_name | INDEX index_name) partition_extention_clause?
-      | CLUSTER cluster_name
+      | ANALYZE CLUSTER cluster_name
       )
 
       ( validation_clauses
@@ -927,10 +927,11 @@ partition_extention_clause
 validation_clauses
     : VALIDATE REF UPDATE (SET DANGLING TO NULL)?
     | VALIDATE STRUCTURE 
-        ( CASCADE ( FAST
-                  | COMPLETE (online_or_offline) into_clause?
-                  )
+        ( CASCADE  FAST
+        | CASCADE online_or_offline? into_clause?
+        | CASCADE
         )?
+        online_or_offline? into_clause?
     ;
 
 online_or_offline
@@ -2336,6 +2337,19 @@ column_properties
     | xmltype_column_properties
     ;
 
+period_definition
+    : {version12}? PERIOD FOR column_name 
+        ( '(' start_time_column ',' end_time_column ')' )?
+    ;
+
+start_time_column
+    : column_name
+    ;
+
+end_time_column
+    : column_name
+    ;
+
 column_definition
     : column_name (datatype | type_name)
          SORT?  (DEFAULT expression)? (ENCRYPT (USING  CHAR_STRING)? (IDENTIFIED BY regular_id)? CHAR_STRING? (NO? SALT)? )?  (inline_constraint* | inline_ref_constraint)
@@ -2889,7 +2903,7 @@ from_clause
 
 select_list_elements
     : tableview_name '.' '*'
-    | (regular_id '.')? expression
+    | (regular_id '.')? expressions
     ;
 
 table_ref_list
@@ -4147,8 +4161,9 @@ outer_join_sign
     ;
     
 regular_id
-    : REGULAR_ID
-    | non_reserved_keywords
+    : non_reserved_keywords_pre12c
+    | non_reserved_keywords_in_12c
+    | REGULAR_ID
     | A_LETTER
     | AGENT
     | AGGREGATE
@@ -4222,24 +4237,330 @@ regular_id
     | COVAR_
     ;
 
-non_reserved_keywords
+non_reserved_keywords_in_12c
+    : ACL
+    | ACTION
+    | ACTIONS
+    | ACTIVE
+    | ACTIVE_DATA
+    | ACTIVITY
+    | ADAPTIVE_PLAN
+    | ADVANCED
+    | AFD_DISKSTRING
+    | ANOMALY
+    | ANSI_REARCH
+    | APPLICATION
+    | APPROX_COUNT_DISTINCT
+    | ARCHIVAL
+    | ARCHIVED
+    | ASIS
+    | ASSIGN
+    | AUTO_LOGIN
+    | AUTO_REOPTIMIZE
+    | AVRO
+    | BACKGROUND
+    | BATCHSIZE
+    | BATCH_TABLE_ACCESS_BY_ROWID
+    | BEGINNING
+    | BEQUEATH
+    | BITMAP_AND
+    | BSON
+    | CACHING
+    | CALCULATED
+    | CALLBACK
+    | CAPACITY
+    | CDBDEFAULT
+    | CLASSIFIER
+    | CLEANUP
+    | CLIENT
+    | CLUSTER_DETAILS
+    | CLUSTER_DISTANCE
+    | CLUSTERING
+    | COMMON_DATA
+    | COMPONENT
+    | COMPONENTS
+    | CON_DBID_TO_ID
+    | CONDITION
+    | CONDITIONAL
+    | CON_GUID_TO_ID
+    | CON_ID
+    | CON_NAME_TO_ID
+    | CONTAINER_DATA
+    | CONTAINERS
+    | CON_UID_TO_ID
+    | COOKIE
+    | COPY
+    | CREATE_FILE_DEST
+    | CREDENTIAL
+    | CRITICAL
+    | CUBE_AJ
+    | CUBE_SJ
+    | DATAMOVEMENT
+    | DATAOBJ_TO_MAT_PARTITION
+    | DATAPUMP
+    | DATA_SECURITY_REWRITE_LIMIT
+    | DAYS
+    | DB_UNIQUE_NAME
+    | DECORRELATE
+    | DEFINE
+    | DELEGATE
+    | DELETE_ALL
+    | DESTROY
+    | DIMENSIONS
+    | DISABLE_ALL
+    | DISABLE_PARALLEL_DML
+    | DISCARD
+    | DISTRIBUTE
+    | DUPLICATE
+    | DV
+    | EDITIONABLE
+    | ELIM_GROUPBY
+    | EM
+    | ENABLE_ALL
+    | ENABLE_PARALLEL_DML
+    | EQUIPART
+    | EVAL
+    | EVALUATE
+    | EXISTING
+    | EXPRESS
+    | EXTRACTCLOBXML
+    | FACTOR
+    | FAILOVER
+    | FAILURE
+    | FAMILY
+    | FAR
+    | FASTSTART
+    | FEATURE_DETAILS
+    | FETCH
+    | FILE_NAME_CONVERT
+    | FIXED_VIEW_DATA
+    | FORMAT
+    | GATHER_OPTIMIZER_STATISTICS
+    | GET
+    | ILM
+    | INACTIVE
+    | INDEXING
+    | INHERIT
+    | INMEMORY
+    | INMEMORY_PRUNING
+    | INPLACE
+    | INTERLEAVED
+    | JSON
+    | JSON_ARRAY
+    | JSON_ARRAYAGG
+    | JSON_EQUAL
+    | JSON_EXISTS
+    | JSON_EXISTS2
+    | JSONGET
+    | JSON_OBJECT
+    | JSON_OBJECTAGG
+    | JSONPARSE
+    | JSON_QUERY
+    | JSON_SERIALIZE
+    | JSON_TABLE
+    | JSON_TEXTCONTAINS
+    | JSON_TEXTCONTAINS2
+    | JSON_VALUE
+    | KEYSTORE
+    | LABEL
+    | LAX
+    | LIFECYCLE
+    | LINEAR
+    | LOCKING
+    | LOGMINING
+    | MAP
+    | MATCH
+    | MATCHES
+    | MATCH_NUMBER
+    | MATCH_RECOGNIZE
+    | MAX_SHARED_TEMP_SIZE
+    | MEMCOMPRESS
+    | METADATA
+    | MODEL_NB
+    | MODEL_SV
+    | MODIFICATION
+    | MODULE
+    | MONTHS
+    | MULTIDIMENSIONAL
+    | NEG
+    | NO_ADAPTIVE_PLAN
+    | NO_ANSI_REARCH
+    | NO_AUTO_REOPTIMIZE
+    | NO_BATCH_TABLE_ACCESS_BY_ROWID
+    | NO_CLUSTERING
+    | NO_COMMON_DATA
+    | NOCOPY
+    | NO_DATA_SECURITY_REWRITE
+    | NO_DECORRELATE
+    | NO_ELIM_GROUPBY
+    | NO_GATHER_OPTIMIZER_STATISTICS
+    | NO_INMEMORY
+    | NO_INMEMORY_PRUNING
+    | NOKEEP
+    | NONEDITIONABLE
+    | NO_OBJECT_LINK
+    | NO_PARTIAL_JOIN
+    | NO_PARTIAL_ROLLUP_PUSHDOWN
+    | NOPARTITION
+    | NO_PQ_CONCURRENT_UNION
+    | NO_PQ_REPLICATE
+    | NO_PQ_SKEW
+    | NO_PX_FAULT_TOLERANCE
+    | NORELOCATE
+    | NOREPLAY
+    | NO_ROOT_SW_FOR_LOCAL
+    | NO_SQL_TRANSLATION
+    | NO_USE_CUBE
+    | NO_USE_VECTOR_AGGREGATION
+    | NO_VECTOR_TRANSFORM
+    | NO_VECTOR_TRANSFORM_DIMS
+    | NO_VECTOR_TRANSFORM_FACT
+    | NO_ZONEMAP
+    | OBJ_ID
+    | OFFSET
+    | OLS
+    | OMIT
+    | ONE
+    | ORA_CHECK_ACL
+    | ORA_CHECK_PRIVILEGE
+    | ORA_CLUSTERING
+    | ORA_INVOKING_USER
+    | ORA_INVOKING_USERID
+    | ORA_INVOKING_XS_USER
+    | ORA_INVOKING_XS_USER_GUID
+    | ORA_RAWCOMPARE
+    | ORA_RAWCONCAT
+    | ORA_WRITE_TIME
+    | PARTIAL
+    | PARTIAL_JOIN
+    | PARTIAL_ROLLUP_PUSHDOWN
+    | PAST
+    | PATCH
+    | PATH_PREFIX
+    | PATTERN
+    | PER
+    | PERIOD
+    | PERMUTE
+    | PLUGGABLE
+    | POOL_16K
+    | POOL_2K
+    | POOL_32K
+    | POOL_4K
+    | POOL_8K
+    | PQ_CONCURRENT_UNION
+    | PQ_DISTRIBUTE_WINDOW
+    | PQ_FILTER
+    | PQ_REPLICATE
+    | PQ_SKEW
+    | PRELOAD
+    | PRETTY
+    | PREV
+    | PRINTBLOBTOCLOB
+    | PRIORITY
+    | PRIVILEGED
+    | PROXY
+    | PRUNING
+    | PX_FAULT_TOLERANCE
+    | REALM
+    | REDEFINE
+    | RELOCATE
+    | RESTART
+    | ROLESET
+    | ROWID_MAPPING_TABLE
+    | RUNNING
+    | SAVE
+    | SCRUB
+    | SDO_GEOM_MBR
+    | SECRET
+    | SERIAL
+    | SERVICE_NAME_CONVERT
+    | SERVICES
+    | SHARING
+    | SHELFLIFE
+    | SOURCE_FILE_DIRECTORY
+    | SOURCE_FILE_NAME_CONVERT
+    | SQL_TRANSLATION_PROFILE
+    | STANDARD_HASH
+    | STANDBYS
+    | STATE
+    | STATEMENT
+    | STREAM
+    | SUBSCRIBE
+    | SUBSET
+    | SUCCESS
+    | SYSBACKUP
+    | SYS_CHECK_PRIVILEGE
+    | SYSDG
+    | SYS_GET_COL_ACLIDS
+    | SYSGUID
+    | SYSKM
+    | SYS_MKXTI
+    | SYSOBJ
+    | SYS_OP_CYCLED_SEQ
+    | SYS_OP_HASH
+    | SYS_OP_KEY_VECTOR_CREATE
+    | SYS_OP_KEY_VECTOR_FILTER
+    | SYS_OP_KEY_VECTOR_FILTER_LIST
+    | SYS_OP_KEY_VECTOR_SUCCEEDED
+    | SYS_OP_KEY_VECTOR_USE
+    | SYS_OP_PART_ID
+    | SYS_OP_ZONE_ID
+    | SYS_RAW_TO_XSID
+    | SYS_XSID_TO_RAW
+    | SYS_ZMAP_FILTER
+    | SYS_ZMAP_REFRESH
+    | TAG
+    | TEXT
+    | TIER
+    | TIES
+    | TO_ACLID
+    | TRANSLATION
+    | TRUST
+    | UCS2
+    | UNCONDITIONAL
+    | UNMATCHED
+    | UNPLUG
+    | UNSUBSCRIBE
+    | USABLE
+    | USE_CUBE
+    | USE_HIDDEN_PARTITIONS
+    | USER_DATA
+    | USER_TABLESPACES
+    | USE_VECTOR_AGGREGATION
+    | USING_NO_EXPAND
+    | UTF16BE
+    | UTF16LE
+    | UTF32
+    | UTF8
+    | V1
+    | V2
+    | VALID_TIME_END
+    | VECTOR_TRANSFORM
+    | VECTOR_TRANSFORM_DIMS
+    | VECTOR_TRANSFORM_FACT
+    | VERIFIER
+    | VIOLATION
+    | VISIBILITY
+    | WEEK
+    | WEEKS
+    | WITH_PLSQL
+    | WRAPPER
+    | XS
+    | YEARS
+    | ZONEMAP
+    ;
+
+non_reserved_keywords_pre12c
     : ABORT
     | ABS
     | ACCESSED
     | ACCESS
     | ACCOUNT
-    | ACL
     | ACOS
-    | ACTION
-    | ACTIONS
     | ACTIVATE
     | ACTIVE_COMPONENT
-    | ACTIVE_DATA
     | ACTIVE_FUNCTION
-    | ACTIVE
     | ACTIVE_TAG
-    | ACTIVITY
-    | ADAPTIVE_PLAN
     | ADD_COLUMN
     | ADD_GROUP
     | ADD_MONTHS
@@ -4248,10 +4569,8 @@ non_reserved_keywords
     | ADMINISTER
     | ADMINISTRATOR
     | ADMIN
-    | ADVANCED
     | ADVISE
     | ADVISOR
-    | AFD_DISKSTRING
     | AFTER
     | ALIAS
     | ALLOCATE
@@ -4261,27 +4580,19 @@ non_reserved_keywords
     | ANALYZE
     | ANCILLARY
     | AND_EQUAL
-    | ANOMALY
-    | ANSI_REARCH
     | ANTIJOIN
     | ANYSCHEMA
     | APPENDCHILDXML
     | APPEND
     | APPEND_VALUES
-    | APPLICATION
     | APPLY
-    | APPROX_COUNT_DISTINCT
-    | ARCHIVAL
-    | ARCHIVED
     | ARCHIVELOG
     | ARCHIVE
     | ARRAY
     | ASCII
     | ASCIISTR
     | ASIN
-    | ASIS
     | ASSEMBLY
-    | ASSIGN
     | ASSOCIATE
     | ASYNCHRONOUS
     | ASYNC
@@ -4297,27 +4608,19 @@ non_reserved_keywords
     | AUTHORIZATION
     | AUTOALLOCATE
     | AUTOEXTEND
-    | AUTO_LOGIN
     | AUTOMATIC
     | AUTO
-    | AUTO_REOPTIMIZE
     | AVAILABILITY
     | AVG
-    | AVRO
-    | BACKGROUND
     | BACKUP
     | BASICFILE
     | BASIC
     | BATCH
-    | BATCHSIZE
-    | BATCH_TABLE_ACCESS_BY_ROWID
     | BECOME
     | BEFORE
     | BEGIN
-    | BEGINNING
     | BEGIN_OUTLINE_DATA
     | BEHALF
-    | BEQUEATH
     | BFILE
     | BFILENAME
     | BIGFILE
@@ -4332,7 +4635,6 @@ non_reserved_keywords
     | BINDING
     | BIN_TO_NUM
     | BITAND
-    | BITMAP_AND
     | BITMAP
     | BITMAPS
     | BITMAP_TREE
@@ -4348,7 +4650,6 @@ non_reserved_keywords
     | BRANCH
     | BREADTH
     | BROADCAST
-    | BSON
     | BUFFER_CACHE
     | BUFFER
     | BUFFER_POOL
@@ -4361,18 +4662,13 @@ non_reserved_keywords
     | CACHE_INSTANCES
     | CACHE
     | CACHE_TEMP_TABLE
-    | CACHING
-    | CALCULATED
-    | CALLBACK
     | CALL
     | CANCEL
-    | CAPACITY
     | CARDINALITY
     | CASCADE
     | CASE
     | CAST
     | CATEGORY
-    | CDBDEFAULT
     | CEIL
     | CELL_FLASH_CACHE
     | CERTIFICATE
@@ -4389,21 +4685,15 @@ non_reserved_keywords
     | CHOOSE
     | CHR
     | CHUNK
-    | CLASSIFIER
     | CLASS
-    | CLEANUP
     | CLEAR
-    | CLIENT
     | CLOB
     | CLONE
     | CLOSE_CACHED_OPEN_CURSORS
     | CLOSE
     | CLUSTER_BY_ROWID
-    | CLUSTER_DETAILS
-    | CLUSTER_DISTANCE
     | CLUSTER_ID
     | CLUSTERING_FACTOR
-    | CLUSTERING
     | CLUSTER_PROBABILITY
     | CLUSTER_SET
     | COALESCE
@@ -4421,28 +4711,19 @@ non_reserved_keywords
     | COMMENT
     | COMMIT
     | COMMITTED
-    | COMMON_DATA
     | COMPACT
     | COMPATIBILITY
     | COMPILE
     | COMPLETE
     | COMPLIANCE
-    | COMPONENT
-    | COMPONENTS
     | COMPOSE
     | COMPOSITE_LIMIT
     | COMPOSITE
     | COMPOUND
     | COMPUTE
     | CONCAT
-    | CON_DBID_TO_ID
-    | CONDITIONAL
-    | CONDITION
     | CONFIRM
     | CONFORMING
-    | CON_GUID_TO_ID
-    | CON_ID
-    | CON_NAME_TO_ID
     | CONNECT_BY_CB_WHR_ONLY
     | CONNECT_BY_COMBINE_SW
     | CONNECT_BY_COST_BASED
@@ -4458,18 +4739,13 @@ non_reserved_keywords
     | CONST
     | CONSTRAINT
     | CONSTRAINTS
-    | CONTAINER_DATA
     | CONTAINER
-    | CONTAINERS
     | CONTENT
     | CONTENTS
     | CONTEXT
     | CONTINUE
     | CONTROLFILE
-    | CON_UID_TO_ID
     | CONVERT
-    | COOKIE
-    | COPY
     | CORR_K
     | CORR
     | CORR_S
@@ -4487,18 +4763,13 @@ non_reserved_keywords
     | CPU_PER_CALL
     | CPU_PER_SESSION
     | CRASH
-    | CREATE_FILE_DEST
     | CREATE_STORED_OUTLINES
     | CREATION
-    | CREDENTIAL
-    | CRITICAL
     | CROSSEDITION
     | CROSS
     | CSCONVERT
-    | CUBE_AJ
     | CUBE_GB
     | CUBE
-    | CUBE_SJ
     | CUME_DISTM
     | CUME_DIST
     | CURRENT_DATE
@@ -4517,22 +4788,16 @@ non_reserved_keywords
     | DATABASE
     | DATAFILE
     | DATAFILES
-    | DATAMOVEMENT
     | DATA
     | DATAOBJNO
-    | DATAOBJ_TO_MAT_PARTITION
     | DATAOBJ_TO_PARTITION
-    | DATAPUMP
-    | DATA_SECURITY_REWRITE_LIMIT
     | DATE_MODE
     | DAY
-    | DAYS
     | DBA
     | DBA_RECYCLEBIN
     | DBMS_STATS
     | DB_ROLE_CHANGE
     | DBTIMEZONE
-    | DB_UNIQUE_NAME
     | DB_VERSION
     | DDL
     | DEALLOCATE
@@ -4540,9 +4805,7 @@ non_reserved_keywords
     | DEBUG
     | DECLARE
     | DEC
-    | DECODE
     | DECOMPOSE
-    | DECORRELATE
     | DECREMENT
     | DECR
     | DECRYPT
@@ -4551,12 +4814,9 @@ non_reserved_keywords
     | DEFERRABLE
     | DEFERRED
     | DEFINED
-    | DEFINE
     | DEFINER
     | DEGREE
     | DELAY
-    | DELEGATE
-    | DELETE_ALL
     | DELETEXML
     | DEMAND
     | DENSE_RANKM
@@ -4566,23 +4826,18 @@ non_reserved_keywords
     | DEQUEUE
     | DEREF
     | DEREF_NO_REWRITE
-    | DESTROY
     | DETACHED
     | DETERMINES
     | DICTIONARY
     | DIMENSION
-    | DIMENSIONS
     | DIRECT_LOAD
     | DIRECTORY
     | DIRECT_PATH
-    | DISABLE_ALL
     | DISABLE
-    | DISABLE_PARALLEL_DML
     | DISABLE_PRESET
     | DISABLE_RPKE
     | DISALLOW
     | DISASSOCIATE
-    | DISCARD
     | DISCONNECT
     | DISKGROUP
     | DISK
@@ -4590,7 +4845,6 @@ non_reserved_keywords
     | DISMOUNT
     | DISTINGUISHED
     | DISTRIBUTED
-    | DISTRIBUTE
     | DML
     | DML_UPDATE
     | DOCFIDELITY
@@ -4605,28 +4859,21 @@ non_reserved_keywords
     | DROP_GROUP
     | DST_UPGRADE_INSERT_CONV
     | DUMP
-    | DUPLICATE
-    | DV
     | DYNAMIC
     | DYNAMIC_SAMPLING_EST_CDN
     | DYNAMIC_SAMPLING
     | EACH
-    | EDITIONABLE
     | EDITIONING
     | EDITION
     | EDITIONS
     | ELEMENT
-    | ELIM_GROUPBY
     | ELIMINATE_JOIN
     | ELIMINATE_OBY
     | ELIMINATE_OUTER_JOIN
-    | EM
     | EMPTY_BLOB
     | EMPTY_CLOB
     | EMPTY
-    | ENABLE_ALL
     | ENABLE
-    | ENABLE_PARALLEL_DML
     | ENABLE_PRESET
     | ENCODING
     | ENCRYPTION
@@ -4639,16 +4886,13 @@ non_reserved_keywords
     | ENTERPRISE
     | ENTITYESCAPING
     | ENTRY
-    | EQUIPART
     | ERROR_ARGUMENT
     | ERROR
     | ERROR_ON_OVERLAP_TIME
     | ERRORS
     | ESCAPE
     | ESTIMATE
-    | EVAL
     | EVALNAME
-    | EVALUATE
     | EVALUATION
     | EVENTS
     | EVERY
@@ -4659,7 +4903,6 @@ non_reserved_keywords
     | EXCLUDING
     | EXECUTE
     | EXEMPT
-    | EXISTING
     | EXISTSNODE
     | EXPAND_GSET_TO_UNION
     | EXPAND_TABLE
@@ -4669,38 +4912,27 @@ non_reserved_keywords
     | EXP
     | EXPORT
     | EXPR_CORR_CHECK
-    | EXPRESS
     | EXTENDS
     | EXTENT
     | EXTENTS
     | EXTERNALLY
     | EXTERNAL
-    | EXTRACTCLOBXML
     | EXTRACT
     | EXTRACTVALUE
     | EXTRA
     | FACILITY
     | FACT
     | FACTORIZE_JOIN
-    | FACTOR
     | FAILED_LOGIN_ATTEMPTS
     | FAILED
     | FAILGROUP
-    | FAILOVER
-    | FAILURE
     | FALSE
-    | FAMILY
-    | FAR
     | FAST
-    | FASTSTART
     | FBTSCAN
-    | FEATURE_DETAILS
     | FEATURE_ID
     | FEATURE_SET
     | FEATURE_VALUE
-    | FETCH
     | FILE
-    | FILE_NAME_CONVERT
     | FILESYSTEM_LIKE_LOGGING
     | FILTER
     | FINAL
@@ -4710,7 +4942,6 @@ non_reserved_keywords
     | FIRST
     | FIRST_ROWS
     | FIRST_VALUE
-    | FIXED_VIEW_DATA
     | FLAGGER
     | FLASHBACK
     | FLASH_CACHE
@@ -4724,7 +4955,6 @@ non_reserved_keywords
     | FORCE_XML_QUERY_REWRITE
     | FOREIGN
     | FOREVER
-    | FORMAT
     | FORWARD
     | FRAGMENT_NUMBER
     | FREELIST
@@ -4736,12 +4966,10 @@ non_reserved_keywords
     | FULL_OUTER_JOIN_TO_OUTER
     | FUNCTION
     | FUNCTIONS
-    | GATHER_OPTIMIZER_STATISTICS
     | GATHER_PLAN_STATISTICS
     | GBY_CONC_ROLLUP
     | GBY_PUSHDOWN
     | GENERATED
-    | GET
     | GLOBALLY
     | GLOBAL
     | GLOBAL_NAME
@@ -4784,11 +5012,9 @@ non_reserved_keywords
     | IGNORE_OPTIM_EMBEDDED_HINTS
     | IGNORE_ROW_ON_DUPKEY_INDEX
     | IGNORE_WHERE_CLAUSE
-    | ILM
     | IMMEDIATE
     | IMPACT
     | IMPORT
-    | INACTIVE
     | INCLUDE
     | INCLUDE_VERSION
     | INCLUDING
@@ -4803,7 +5029,6 @@ non_reserved_keywords
     | INDEXES
     | INDEX_FFS
     | INDEX_FILTER
-    | INDEXING
     | INDEX_JOIN
     | INDEX_ROWS
     | INDEX_RRS
@@ -4821,7 +5046,6 @@ non_reserved_keywords
     | INDICATOR
     | INFINITE
     | INFORMATIONAL
-    | INHERIT
     | INITCAP
     | INITIALIZED
     | INITIALLY
@@ -4830,10 +5054,7 @@ non_reserved_keywords
     | INLINE
     | INLINE_XMLTYPE_NT
     | IN_MEMORY_METADATA
-    | INMEMORY
-    | INMEMORY_PRUNING
     | INNER
-    | INPLACE
     | INSERTCHILDXMLAFTER
     | INSERTCHILDXMLBEFORE
     | INSERTCHILDXML
@@ -4849,7 +5070,6 @@ non_reserved_keywords
     | INSTRB
     | INSTRC
     | INSTR
-    | INTERLEAVED
     | INTERMEDIATE
     | INTERNAL_CONVERT
     | INTERNAL_USE
@@ -4866,22 +5086,6 @@ non_reserved_keywords
     | JAVA
     | JOB
     | JOIN
-    | JSON_ARRAYAGG
-    | JSON_ARRAY
-    | JSON_EQUAL
-    | JSON_EXISTS2
-    | JSON_EXISTS
-    | JSONGET
-    | JSON
-    | JSON_OBJECTAGG
-    | JSON_OBJECT
-    | JSONPARSE
-    | JSON_QUERY
-    | JSON_SERIALIZE
-    | JSON_TABLE
-    | JSON_TEXTCONTAINS2
-    | JSON_TEXTCONTAINS
-    | JSON_VALUE
     | KEEP_DUPLICATES
     | KEEP
     | KERBEROS
@@ -4889,15 +5093,12 @@ non_reserved_keywords
     | KEY
     | KEYSIZE
     | KEYS
-    | KEYSTORE
     | KILL
-    | LABEL
     | LAG
     | LAST_DAY
     | LAST
     | LAST_VALUE
     | LATERAL
-    | LAX
     | LAYER
     | LDAP_REGISTRATION_ENABLED
     | LDAP_REGISTRATION
@@ -4915,7 +5116,6 @@ non_reserved_keywords
     | LEVEL
     | LEVELS
     | LIBRARY
-    | LIFECYCLE
     | LIFE
     | LIFETIME
     | LIKE2
@@ -4923,7 +5123,6 @@ non_reserved_keywords
     | LIKEC
     | LIKE_EXPAND
     | LIMIT
-    | LINEAR
     | LINK
     | LISTAGG
     | LIST
@@ -4940,14 +5139,12 @@ non_reserved_keywords
     | LOCATION
     | LOCATOR
     | LOCKED
-    | LOCKING
     | LOGFILE
     | LOGFILES
     | LOGGING
     | LOGICAL
     | LOGICAL_READS_PER_CALL
     | LOGICAL_READS_PER_SESSION
-    | LOGMINING
     | LOG
     | LOGOFF
     | LOGON
@@ -4963,14 +5160,9 @@ non_reserved_keywords
     | MANAGE
     | MANAGER
     | MANUAL
-    | MAP
     | MAPPING
     | MASTER
     | MATCHED
-    | MATCHES
-    | MATCH
-    | MATCH_NUMBER
-    | MATCH_RECOGNIZE
     | MATERIALIZED
     | MATERIALIZE
     | MAXARCHLOGS
@@ -4982,7 +5174,6 @@ non_reserved_keywords
     | MAXLOGHISTORY
     | MAXLOGMEMBERS
     | MAX
-    | MAX_SHARED_TEMP_SIZE
     | MAXSIZE
     | MAXTRANS
     | MAXVALUE
@@ -4991,14 +5182,12 @@ non_reserved_keywords
     | MEDIAN
     | MEDIUM
     | MEMBER
-    | MEMCOMPRESS
     | MEMORY
     | MERGEACTIONS
     | MERGE_AJ
     | MERGE_CONST_ON
     | MERGE
     | MERGE_SJ
-    | METADATA
     | METHOD
     | MIGRATE
     | MIGRATION
@@ -5019,26 +5208,20 @@ non_reserved_keywords
     | MODEL_DYNAMIC_SUBQUERY
     | MODEL_MIN_ANALYSIS
     | MODEL
-    | MODEL_NB
     | MODEL_NO_ANALYSIS
     | MODEL_PBY
     | MODEL_PUSH_REF
-    | MODEL_SV
-    | MODIFICATION
     | MODIFY_COLUMN_TYPE
     | MODIFY
     | MOD
-    | MODULE
     | MONITORING
     | MONITOR
     | MONTH
     | MONTHS_BETWEEN
-    | MONTHS
     | MOUNT
     | MOUNTPATH
     | MOVEMENT
     | MOVE
-    | MULTIDIMENSIONAL
     | MULTISET
     | MV_MERGE
     | NAMED
@@ -5056,7 +5239,6 @@ non_reserved_keywords
     | NCHR
     | NCLOB
     | NEEDED
-    | NEG
     | NESTED
     | NESTED_TABLE_FAST_INSERT
     | NESTED_TABLE_GET_REFS
@@ -5098,39 +5280,29 @@ non_reserved_keywords
     | NLS_TERRITORY
     | NLS_UPPER
     | NO_ACCESS
-    | NO_ADAPTIVE_PLAN
-    | NO_ANSI_REARCH
     | NOAPPEND
     | NOARCHIVELOG
     | NOAUDIT
-    | NO_AUTO_REOPTIMIZE
     | NO_BASETABLE_MULTIMV_REWRITE
-    | NO_BATCH_TABLE_ACCESS_BY_ROWID
     | NO_BIND_AWARE
     | NO_BUFFER
     | NOCACHE
     | NO_CARTESIAN
     | NO_CHECK_ACL_REWRITE
     | NO_CLUSTER_BY_ROWID
-    | NO_CLUSTERING
     | NO_COALESCE_SQ
-    | NO_COMMON_DATA
     | NO_CONNECT_BY_CB_WHR_ONLY
     | NO_CONNECT_BY_COMBINE_SW
     | NO_CONNECT_BY_COST_BASED
     | NO_CONNECT_BY_ELIM_DUPS
     | NO_CONNECT_BY_FILTERING
-    | NOCOPY
     | NO_COST_XML_QUERY_REWRITE
     | NO_CPU_COSTING
     | NOCPU_COSTING
     | NOCYCLE
-    | NO_DATA_SECURITY_REWRITE
-    | NO_DECORRELATE
     | NODELAY
     | NO_DOMAIN_INDEX_FILTER
     | NO_DST_UPGRADE_INSERT_CONV
-    | NO_ELIM_GROUPBY
     | NO_ELIMINATE_JOIN
     | NO_ELIMINATE_OBY
     | NO_ELIMINATE_OUTER_JOIN
@@ -5143,15 +5315,11 @@ non_reserved_keywords
     | NO_FILTERING
     | NOFORCE
     | NO_FULL_OUTER_JOIN_TO_OUTER
-    | NO_GATHER_OPTIMIZER_STATISTICS
     | NO_GBY_PUSHDOWN
     | NOGUARANTEE
     | NO_INDEX_FFS
     | NO_INDEX
     | NO_INDEX_SS
-    | NO_INMEMORY
-    | NO_INMEMORY_PRUNING
-    | NOKEEP
     | NO_LOAD
     | NOLOCAL
     | NOLOGGING
@@ -5168,12 +5336,10 @@ non_reserved_keywords
     | NO
     | NO_NATIVE_FULL_OUTER_JOIN
     | NONBLOCKING
-    | NONEDITIONABLE
     | NONE
     | NO_NLJ_BATCHING
     | NO_NLJ_PREFETCH
     | NONSCHEMA
-    | NO_OBJECT_LINK
     | NOORDER
     | NO_ORDER_ROLLUPS
     | NO_OUTER_JOIN_TO_ANTI
@@ -5184,35 +5350,25 @@ non_reserved_keywords
     | NO_PARALLEL
     | NOPARALLEL
     | NO_PARTIAL_COMMIT
-    | NO_PARTIAL_JOIN
-    | NO_PARTIAL_ROLLUP_PUSHDOWN
-    | NOPARTITION
     | NO_PLACE_DISTINCT
     | NO_PLACE_GROUP_BY
-    | NO_PQ_CONCURRENT_UNION
     | NO_PQ_MAP
-    | NO_PQ_REPLICATE
-    | NO_PQ_SKEW
     | NO_PRUNE_GSETS
     | NO_PULL_PRED
     | NO_PUSH_PRED
     | NO_PUSH_SUBQ
-    | NO_PX_FAULT_TOLERANCE
     | NO_PX_JOIN_FILTER
     | NO_QKN_BUFF
     | NO_QUERY_TRANSFORMATION
     | NO_REF_CASCADE
-    | NORELOCATE
     | NORELY
     | NOREPAIR
-    | NOREPLAY
     | NORESETLOGS
     | NO_RESULT_CACHE
     | NOREVERSE
     | NO_REWRITE
     | NOREWRITE
     | NORMAL
-    | NO_ROOT_SW_FOR_LOCAL
     | NOROWDEPENDENCIES
     | NOSCHEMACHECK
     | NOSEGMENT
@@ -5220,7 +5376,6 @@ non_reserved_keywords
     | NO_SEMI_TO_INNER
     | NO_SET_TO_JOIN
     | NOSORT
-    | NO_SQL_TRANSLATION
     | NO_SQL_TUNE
     | NO_STAR_TRANSFORMATION
     | NO_STATEMENT_QUEUING
@@ -5236,24 +5391,18 @@ non_reserved_keywords
     | NOTIFICATION
     | NO_TRANSFORM_DISTINCT_AGG
     | NO_UNNEST
-    | NO_USE_CUBE
     | NO_USE_HASH_AGGREGATION
     | NO_USE_HASH_GBY_FOR_PUSHDOWN
     | NO_USE_HASH
     | NO_USE_INVISIBLE_INDEXES
     | NO_USE_MERGE
     | NO_USE_NL
-    | NO_USE_VECTOR_AGGREGATION
     | NOVALIDATE
-    | NO_VECTOR_TRANSFORM_DIMS
-    | NO_VECTOR_TRANSFORM_FACT
-    | NO_VECTOR_TRANSFORM
     | NO_XDB_FASTPATH_INSERT
     | NO_XML_DML_REWRITE
     | NO_XMLINDEX_REWRITE_IN_SELECT
     | NO_XMLINDEX_REWRITE
     | NO_XML_QUERY_REWRITE
-    | NO_ZONEMAP
     | NTH_VALUE
     | NTILE
     | NULLIF
@@ -5267,22 +5416,17 @@ non_reserved_keywords
     | NVL
     | OBJECT2XML
     | OBJECT
-    | OBJ_ID
     | OBJNO
     | OBJNO_REUSE
     | OCCURENCES
     | OFFLINE
     | OFF
-    | OFFSET
     | OIDINDEX
     | OID
     | OLAP
     | OLD
     | OLD_PUSH_PRED
-    | OLS
     | OLTP
-    | OMIT
-    | ONE
     | ONLINE
     | ONLY
     | OPAQUE
@@ -5299,9 +5443,6 @@ non_reserved_keywords
     | OPTIMIZER_GOAL
     | OPT_PARAM
     | ORA_BRANCH
-    | ORA_CHECK_ACL
-    | ORA_CHECK_PRIVILEGE
-    | ORA_CLUSTERING
     | ORADEBUG
     | ORA_DST_AFFECTED
     | ORA_DST_CONVERT
@@ -5309,17 +5450,10 @@ non_reserved_keywords
     | ORA_GET_ACLIDS
     | ORA_GET_PRIVILEGES
     | ORA_HASH
-    | ORA_INVOKING_USERID
-    | ORA_INVOKING_USER
-    | ORA_INVOKING_XS_USER_GUID
-    | ORA_INVOKING_XS_USER
-    | ORA_RAWCOMPARE
-    | ORA_RAWCONCAT
     | ORA_ROWSCN
     | ORA_ROWSCN_RAW
     | ORA_ROWVERSION
     | ORA_TABVERSION
-    | ORA_WRITE_TIME
     | ORDERED
     | ORDERED_PREDICATES
     | ORDINALITY
@@ -5348,10 +5482,7 @@ non_reserved_keywords
     | PARAM
     | PARENT
     | PARITY
-    | PARTIAL_JOIN
     | PARTIALLY
-    | PARTIAL
-    | PARTIAL_ROLLUP_PUSHDOWN
     | PARTITION_HASH
     | PARTITION_LIST
     | PARTITION
@@ -5366,12 +5497,8 @@ non_reserved_keywords
     | PASSWORD_REUSE_MAX
     | PASSWORD_REUSE_TIME
     | PASSWORD_VERIFY_FUNCTION
-    | PAST
-    | PATCH
     | PATH
-    | PATH_PREFIX
     | PATHS
-    | PATTERN
     | PBL_HS_BEGIN
     | PBL_HS_END
     | PCTINCREASE
@@ -5385,11 +5512,8 @@ non_reserved_keywords
     | PERCENT_RANKM
     | PERCENT_RANK
     | PERFORMANCE
-    | PERIOD
     | PERMANENT
     | PERMISSION
-    | PERMUTE
-    | PER
     | PFILE
     | PHYSICAL
     | PIKEY
@@ -5405,26 +5529,15 @@ non_reserved_keywords
     | PLSQL_DEBUG
     | PLSQL_OPTIMIZE_LEVEL
     | PLSQL_WARNINGS
-    | PLUGGABLE
     | POINT
     | POLICY
-    | POOL_16K
-    | POOL_2K
-    | POOL_32K
-    | POOL_4K
-    | POOL_8K
     | POST_TRANSACTION
     | POWERMULTISET_BY_CARDINALITY
     | POWERMULTISET
     | POWER
-    | PQ_CONCURRENT_UNION
     | PQ_DISTRIBUTE
-    | PQ_DISTRIBUTE_WINDOW
-    | PQ_FILTER
     | PQ_MAP
     | PQ_NOMAP
-    | PQ_REPLICATE
-    | PQ_SKEW
     | PREBUILT
     | PRECEDES
     | PRECEDING
@@ -5437,22 +5550,16 @@ non_reserved_keywords
     | PREDICTION
     | PREDICTION_PROBABILITY
     | PREDICTION_SET
-    | PRELOAD
     | PREPARE
     | PRESENT
     | PRESENTNNV
     | PRESENTV
     | PRESERVE
     | PRESERVE_OID
-    | PRETTY
     | PREVIOUS
-    | PREV
     | PRIMARY
-    | PRINTBLOBTOCLOB
-    | PRIORITY
     | PRIVATE
     | PRIVATE_SGA
-    | PRIVILEGED
     | PRIVILEGE
     | PRIVILEGES
     | PROCEDURAL
@@ -5464,13 +5571,10 @@ non_reserved_keywords
     | PROPAGATE
     | PROTECTED
     | PROTECTION
-    | PROXY
-    | PRUNING
     | PULL_PRED
     | PURGE
     | PUSH_PRED
     | PUSH_SUBQ
-    | PX_FAULT_TOLERANCE
     | PX_GRANULE
     | PX_JOIN_FILTER
     | QB_NAME
@@ -5496,7 +5600,6 @@ non_reserved_keywords
     | RDBA
     | READ
     | READS
-    | REALM
     | REAL
     | REBALANCE
     | REBUILD
@@ -5507,7 +5610,6 @@ non_reserved_keywords
     | RECYCLEBIN
     | RECYCLE
     | REDACTION
-    | REDEFINE
     | REDO
     | REDUCED
     | REDUNDANCY
@@ -5538,7 +5640,6 @@ non_reserved_keywords
     | REJECT
     | REKEY
     | RELATIONAL
-    | RELOCATE
     | RELY
     | REMAINDER
     | REMOTE_MAPPED
@@ -5554,7 +5655,6 @@ non_reserved_keywords
     | RESOLVE
     | RESOLVER
     | RESPECT
-    | RESTART
     | RESTORE_AS_INTERVALS
     | RESTORE
     | RESTRICT_ALL_REF_CONS
@@ -5573,14 +5673,12 @@ non_reserved_keywords
     | REWRITE_OR_ERROR
     | RIGHT
     | ROLE
-    | ROLESET
     | ROLES
     | ROLLBACK
     | ROLLING
     | ROLLUP
     | ROUND
     | ROWDEPENDENCIES
-    | ROWID_MAPPING_TABLE
     | ROWID
     | ROWIDTOCHAR
     | ROWIDTONCHAR
@@ -5593,11 +5691,9 @@ non_reserved_keywords
     | RTRIM
     | RULE
     | RULES
-    | RUNNING
     | SALT
     | SAMPLE
     | SAVE_AS_INTERVALS
-    | SAVE
     | SAVEPOINT
     | SB4
     | SCALE
@@ -5610,14 +5706,11 @@ non_reserved_keywords
     | SCN_ASCENDING
     | SCN
     | SCOPE
-    | SCRUB
     | SD_ALL
     | SD_INHIBIT
-    | SDO_GEOM_MBR
     | SD_SHOW
     | SEARCH
     | SECOND
-    | SECRET
     | SECUREFILE_DBA
     | SECUREFILE
     | SECURITY
@@ -5633,10 +5726,7 @@ non_reserved_keywords
     | SEQUENCE
     | SEQUENTIAL
     | SERIALIZABLE
-    | SERIAL
     | SERVERERROR
-    | SERVICE_NAME_CONVERT
-    | SERVICES
     | SESSION_CACHED_CURSORS
     | SESSION
     | SESSIONS_PER_USER
@@ -5648,8 +5738,6 @@ non_reserved_keywords
     | SEVERE
     | SHARED
     | SHARED_POOL
-    | SHARING
-    | SHELFLIFE
     | SHOW
     | SHRINK
     | SHUTDOWN
@@ -5672,8 +5760,6 @@ non_reserved_keywords
     | SOME
     | SORT
     | SOUNDEX
-    | SOURCE_FILE_DIRECTORY
-    | SOURCE_FILE_NAME_CONVERT
     | SOURCE
     | SPACE_KEYWORD
     | SPECIFICATION
@@ -5683,22 +5769,17 @@ non_reserved_keywords
     | SQLLDR
     | SQL
     | SQL_TRACE
-    | SQL_TRANSLATION_PROFILE
     | SQRT
     | STALE
     | STANDALONE
-    | STANDARD_HASH
     | STANDBY_MAX_DATA_DELAY
     | STANDBY
-    | STANDBYS
     | STAR
     | STAR_TRANSFORMATION
     | STARTUP
     | STATEMENT_ID
-    | STATEMENT
     | STATEMENT_QUEUING
     | STATEMENTS
-    | STATE
     | STATIC
     | STATISTICS
     | STATS_BINOMIAL_TEST
@@ -5719,7 +5800,6 @@ non_reserved_keywords
     | STOP
     | STORAGE
     | STORE
-    | STREAM
     | STREAMS
     | STRICT
     | STRING
@@ -5733,8 +5813,6 @@ non_reserved_keywords
     | SUBPARTITIONS
     | SUBQUERIES
     | SUBQUERY_PRUNING
-    | SUBSCRIBE
-    | SUBSET
     | SUBSTITUTABLE
     | SUBSTR2
     | SUBSTR4
@@ -5742,7 +5820,6 @@ non_reserved_keywords
     | SUBSTRC
     | SUBSTR
     | SUCCESSFUL
-    | SUCCESS
     | SUMMARY
     | SUM
     | SUPPLEMENTAL
@@ -5755,15 +5832,12 @@ non_reserved_keywords
     | SYSASM
     | SYS_AUDIT
     | SYSAUX
-    | SYSBACKUP
     | SYS_CHECKACL
-    | SYS_CHECK_PRIVILEGE
     | SYS_CONNECT_BY_PATH
     | SYS_CONTEXT
     | SYSDATE
     | SYSDBA
     | SYS_DBURIGEN
-    | SYSDG
     | SYS_DL_CURSOR
     | SYS_DM_RXFORM_CHR
     | SYS_DM_RXFORM_NUM
@@ -5781,18 +5855,13 @@ non_reserved_keywords
     | SYS_FNMATCHES
     | SYS_FNREPLACE
     | SYS_GET_ACLIDS
-    | SYS_GET_COL_ACLIDS
     | SYS_GET_PRIVILEGES
     | SYS_GETTOKENID
     | SYS_GETXTIVAL
     | SYS_GUID
-    | SYSGUID
-    | SYSKM
     | SYS_MAKEXML
     | SYS_MAKE_XMLNODEID
     | SYS_MKXMLATTR
-    | SYS_MKXTI
-    | SYSOBJ
     | SYS_OP_ADT2BIN
     | SYS_OP_ADTCONS
     | SYS_OP_ALSCRVAL
@@ -5814,7 +5883,6 @@ non_reserved_keywords
     | SYS_OP_CSCONVTEST
     | SYS_OP_CSR
     | SYS_OP_CSX_PATCH
-    | SYS_OP_CYCLED_SEQ
     | SYS_OP_DECOMP
     | SYS_OP_DESCEND
     | SYS_OP_DISTINCT
@@ -5826,14 +5894,8 @@ non_reserved_keywords
     | SYS_OP_EXTRACT
     | SYS_OP_GROUPING
     | SYS_OP_GUID
-    | SYS_OP_HASH
     | SYS_OP_IIX
     | SYS_OP_ITR
-    | SYS_OP_KEY_VECTOR_CREATE
-    | SYS_OP_KEY_VECTOR_FILTER_LIST
-    | SYS_OP_KEY_VECTOR_FILTER
-    | SYS_OP_KEY_VECTOR_SUCCEEDED
-    | SYS_OP_KEY_VECTOR_USE
     | SYS_OP_LBID
     | SYS_OP_LOBLOC2BLOB
     | SYS_OP_LOBLOC2CLOB
@@ -5858,7 +5920,6 @@ non_reserved_keywords
     | SYS_OP_PARGID_1
     | SYS_OP_PARGID
     | SYS_OP_PAR
-    | SYS_OP_PART_ID
     | SYS_OP_PIVOT
     | SYS_OP_R2O
     | SYS_OP_RAWTONUM
@@ -5886,7 +5947,6 @@ non_reserved_keywords
     | SYS_OP_XPTHIDX
     | SYS_OP_XPTHOP
     | SYS_OP_XTXT2SQLT
-    | SYS_OP_ZONE_ID
     | SYS_ORDERKEY_DEPTH
     | SYS_ORDERKEY_MAXCHILD
     | SYS_ORDERKEY_PARENT
@@ -5897,7 +5957,6 @@ non_reserved_keywords
     | SYS_PATHID_LASTNMSPC
     | SYS_PATH_REVERSE
     | SYS_PXQEXTRACT
-    | SYS_RAW_TO_XSID
     | SYS_RID_ORDER
     | SYS_ROW_DELTA
     | SYS_SC_2_XMLT
@@ -6028,9 +6087,6 @@ non_reserved_keywords
     | SYS_XQTREATAS
     | SYS_XQ_UPKXML2SQL
     | SYS_XQXFORM
-    | SYS_XSID_TO_RAW
-    | SYS_ZMAP_FILTER
-    | SYS_ZMAP_REFRESH
     | TABLE
     | TABLE_LOOKUP_BY_NL
     | TABLES
@@ -6038,7 +6094,6 @@ non_reserved_keywords
     | TABLESPACE_NO
     | TABLE_STATS
     | TABNO
-    | TAG
     | TANH
     | TAN
     | TBLORIDXPARTNUM
@@ -6047,14 +6102,11 @@ non_reserved_keywords
     | TEMPORARY
     | TEMP_TABLE
     | TEST
-    | TEXT
     | THAN
     | THE
     | THEN
     | THREAD
     | THROUGH
-    | TIER
-    | TIES
     | TIME
     | TIMEOUT
     | TIMES
@@ -6067,7 +6119,6 @@ non_reserved_keywords
     | TIMEZONE_REGION
     | TIV_GB
     | TIV_SSF
-    | TO_ACLID
     | TO_BINARY_DOUBLE
     | TO_BINARY_FLOAT
     | TO_BLOB
@@ -6096,7 +6147,6 @@ non_reserved_keywords
     | TRANSITIONAL
     | TRANSITION
     | TRANSLATE
-    | TRANSLATION
     | TREAT
     | TRIGGERS
     | TRIM
@@ -6104,7 +6154,6 @@ non_reserved_keywords
     | TRUNCATE
     | TRUNC
     | TRUSTED
-    | TRUST
     | TUNING
     | TX
     | TYPE
@@ -6112,12 +6161,10 @@ non_reserved_keywords
     | TZ_OFFSET
     | UB2
     | UBA
-    | UCS2
     | UID
     | UNARCHIVED
     | UNBOUNDED
     | UNBOUND
-    | UNCONDITIONAL
     | UNDER
     | UNDO
     | UNDROP
@@ -6126,19 +6173,16 @@ non_reserved_keywords
     | UNLIMITED
     | UNLOAD
     | UNLOCK
-    | UNMATCHED
     | UNNEST_INNERJ_DISTINCT_VIEW
     | UNNEST
     | UNNEST_NOSEMIJ_NODISTINCTVIEW
     | UNNEST_SEMIJ_VIEW
     | UNPACKED
     | UNPIVOT
-    | UNPLUG
     | UNPROTECTED
     | UNQUIESCE
     | UNRECOVERABLE
     | UNRESTRICTED
-    | UNSUBSCRIBE
     | UNTIL
     | UNUSABLE
     | UNUSED
@@ -6151,15 +6195,12 @@ non_reserved_keywords
     | UPPER
     | UPSERT
     | UROWID
-    | USABLE
     | USAGE
     | USE_ANTI
     | USE_CONCAT
-    | USE_CUBE
     | USE_HASH_AGGREGATION
     | USE_HASH_GBY_FOR_PUSHDOWN
     | USE_HASH
-    | USE_HIDDEN_PARTITIONS
     | USE_INVISIBLE_INDEXES
     | USE_MERGE_CARTESIAN
     | USE_MERGE
@@ -6167,30 +6208,19 @@ non_reserved_keywords
     | USE_NL
     | USE_NL_WITH_INDEX
     | USE_PRIVATE_OUTLINES
-    | USER_DATA
     | USER_DEFINED
     | USERENV
     | USERGROUP
     | USER
     | USER_RECYCLEBIN
     | USERS
-    | USER_TABLESPACES
     | USE_SEMI
     | USE_STORED_OUTLINES
     | USE_TTT_FOR_GSETS
-    | USE_VECTOR_AGGREGATION
     | USE_WEAK_NAME_RESL
     | USING
-    | USING_NO_EXPAND
-    | UTF16BE
-    | UTF16LE
-    | UTF32
-    | UTF8
-    | V1
-    | V2
     | VALIDATE
     | VALIDATION
-    | VALID_TIME_END
     | VALUE
     | VARIANCE
     | VAR_POP
@@ -6200,10 +6230,6 @@ non_reserved_keywords
     | VARYING
     | VECTOR_READ
     | VECTOR_READ_TRACE
-    | VECTOR_TRANSFORM_DIMS
-    | VECTOR_TRANSFORM_FACT
-    | VECTOR_TRANSFORM
-    | VERIFIER
     | VERIFY
     | VERSIONING
     | VERSION
@@ -6214,16 +6240,12 @@ non_reserved_keywords
     | VERSIONS_STARTSCN
     | VERSIONS_STARTTIME
     | VERSIONS_XID
-    | VIOLATION
     | VIRTUAL
-    | VISIBILITY
     | VISIBLE
     | VOLUME
     | VSIZE
     | WAIT
     | WALLET
-    | WEEK
-    | WEEKS
     | WELLFORMED
     | WHENEVER
     | WHEN
@@ -6231,10 +6253,8 @@ non_reserved_keywords
     | WIDTH_BUCKET
     | WITHIN
     | WITHOUT
-    | WITH_PLSQL
     | WORK
     | WRAPPED
-    | WRAPPER
     | WRITE
     | XDB_FASTPATH_INSERT
     | X_DYN_PRUNE
@@ -6272,12 +6292,9 @@ non_reserved_keywords
     | XMLTRANSFORM
     | XMLTYPE
     | XPATHTABLE
-    | XS
     | XS_SYS_CONTEXT
     | YEAR
-    | YEARS
     | YES
-    | ZONEMAP
     | ZONE
     ;
 
