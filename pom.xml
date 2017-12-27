@@ -130,6 +130,7 @@
 				<module>r</module>
 				<module>rcs</module>
 				<module>redcode</module>
+				<module>restructuredtext</module>
 				<module>rexx</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
