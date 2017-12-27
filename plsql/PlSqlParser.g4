@@ -21,7 +21,7 @@
 parser grammar PlSqlParser;
 
 options { tokenVocab=PlSqlLexer; }
-@members {boolean version12=false;}
+@members {boolean version12=true;}
 sql_script
     : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
     ;
@@ -38,9 +38,12 @@ unit_statement
     | alter_table
     | alter_index
     | alter_user
+    | alter_view
 
     | analyze
     | associate_statistics
+    | audit_traditional
+    | unified_auditing
 
     | create_function_body
     | create_procedure_body
@@ -909,7 +912,7 @@ analyze
       )
 
       ( validation_clauses
-      | LIST CHAINED ROWS into_clause1 ?
+      | LIST CHAINED ROWS into_clause1?
       | DELETE SYSTEM? STATISTICS
       )
       ';'
@@ -1021,6 +1024,149 @@ storage_table_clause
     : WITH (SYSTEM | USER) MANAGED STORAGE TABLES
     ;
 
+// https://docs.oracle.com/database/121/SQLRF/statements_4008.htm#SQLRF56110
+unified_auditing
+    : {version12}? 
+      AUDIT (POLICY policy_name ((BY|EXCEPT) (','? audit_user)+ )? 
+                                (WHENEVER NOT? SUCCESSFUL)?
+            | CONTEXT NAMESPACE oracle_namespace 
+                      ATTRIBUTES (','? attribute_name)+ (BY (','? audit_user)+)?
+            )
+      ';'
+    ;
+
+policy_name
+    : identifier
+    ;
+
+// https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4007.htm#SQLRF01107
+// https://docs.oracle.com/database/121/SQLRF/statements_4007.htm#SQLRF01107
+
+audit_traditional
+    : AUDIT ( audit_operation_clause (auditing_by_clause | IN SESSION CURRENT)?
+            | audit_schema_object_clause
+            | NETWORK
+            | audit_direct_path
+            )
+        (BY (SESSION | ACCESS) )? (WHENEVER NOT? SUCCESSFUL)?
+        audit_container_clause? 
+      ';'
+    ;
+
+audit_direct_path
+    : {version12}? DIRECT_PATH auditing_by_clause
+    ;
+
+audit_container_clause
+    : {version12}? (CONTAINER EQUALS_OP (CURRENT | ALL))
+    ;
+
+audit_operation_clause
+    : ( (','? (sql_statement_shortcut | ALL | ALL STATEMENTS) )+
+      | (','? (system_privilege | ALL PRIVILEGES) )+
+      )
+    ;
+
+auditing_by_clause
+    : BY (','? audit_user)+
+    ;
+
+audit_user
+    : regular_id
+    ;
+
+audit_schema_object_clause
+    : ( (','? sql_operation)+
+      | ALL
+      )
+
+      auditing_on_clause
+    ;
+
+sql_operation
+    : ALTER
+    | AUDIT 
+    | COMMENT
+    | DELETE
+    | EXECUTE
+    | FLASHBACK
+    | GRANT
+    | INDEX
+    | INSERT
+    | LOCK
+    | READ
+    | RENAME
+    | SELECT
+    | UPDATE
+    ;
+
+auditing_on_clause
+    : ON ( object_name
+         | DIRECTORY regular_id
+         | MINING MODEL model_name
+         | {version12}? SQL TRANSLATION PROFILE profile_name
+         | DEFAULT
+         )
+    ;
+
+model_name
+    : (id_expression '.')? id_expression
+    ;
+
+object_name
+    : (id_expression '.')? id_expression
+    ;
+
+profile_name
+    : (id_expression '.')? id_expression
+    ;
+
+sql_statement_shortcut
+    : ALTER SYSTEM
+    | CLUSTER
+    | CONTEXT
+    | DATABASE LINK
+    | DIMENSION
+    | DIRECTORY
+    | INDEX
+    | MATERIALIZED VIEW
+    | NOT EXISTS
+    | OUTLINE
+    | {version12}? PLUGGABLE DATABASE
+    | PROCEDURE
+    | PROFILE
+    | PUBLIC DATABASE LINK
+    | PUBLIC SYNONYM
+    | ROLE
+    | ROLLBACK SEGMENT
+    | SEQUENCE
+    | SESSION
+    | SYNONYM
+    | SYSTEM AUDIT
+    | SYSTEM GRANT
+    | TABLE
+    | TABLESPACE
+    | TRIGGER
+    | TYPE
+    | USER
+    | VIEW
+    | ALTER SEQUENCE
+    | ALTER TABLE
+    | COMMENT TABLE
+    | DELETE TABLE
+    | EXECUTE PROCEDURE
+    | GRANT DIRECTORY
+    | GRANT PROCEDURE
+    | GRANT SEQUENCE
+    | GRANT TABLE
+    | GRANT TYPE
+    | INSERT TABLE
+    | LOCK TABLE
+    | SELECT SEQUENCE
+    | SELECT TABLE
+    | UPDATE TABLE
+    ;
+
 drop_index
     : DROP INDEX index_name ';'
     ;
@@ -1058,6 +1204,27 @@ directory_path
     : CHAR_STRING
     ;
 
+// https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4004.htm#SQLRF01104
+// https://docs.oracle.com/database/121/SQLRF/statements_4004.htm#SQLRF01104
+alter_view
+    : ALTER VIEW tableview_name
+       ( ADD out_of_line_constraint
+       | MODIFY CONSTRAINT constraint_name (RELY | NORELY)
+       | DROP ( CONSTRAINT constraint_name
+              | PRIMARY KEY
+              | UNIQUE '(' (','? column_name)+ ')'
+              )
+       | COMPILE
+       | READ (ONLY | WRITE)
+       | alter_view_editionable?
+       )
+      ';'
+    ;   
+
+alter_view_editionable
+    : {version12}? (EDITIONABLE | NONEDITIONABLE)
+    ;
+ 
 create_view
     : CREATE (OR REPLACE)? (OR? FORCE)? EDITIONING? VIEW
       tableview_name view_options?
@@ -1304,14 +1471,14 @@ create_mv_refresh
     ;
 
 create_context
-    : CREATE (OR REPLACE)? CONTEXT namespace USING (schema_object_name '.')? package_name 
+    : CREATE (OR REPLACE)? CONTEXT oracle_namespace USING (schema_object_name '.')? package_name 
            (INITIALIZED (EXTERNALLY | GLOBALLY)
            | ACCESSED GLOBALLY
            )?
       ';'
     ;
 
-namespace
+oracle_namespace
     : id_expression
     ;
 
@@ -4601,7 +4768,6 @@ non_reserved_keywords_pre12c
     | AT
     | ATTRIBUTE
     | ATTRIBUTES
-    | AUDIT
     | AUTHENTICATED
     | AUTHENTICATION
     | AUTHID
