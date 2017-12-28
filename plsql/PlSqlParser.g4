@@ -1,4 +1,4 @@
- /**CTIO
+ /**
  * Oracle(c) PL/SQL 11g Parser
  *
  * Copyright (c) 2009-2011 Alexandre Porcelli <alexandre.porcelli@gmail.com>
@@ -21,7 +21,9 @@
 parser grammar PlSqlParser;
 
 options { tokenVocab=PlSqlLexer; }
+
 @members {boolean version12=true;}
+
 sql_script
     : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
     ;
@@ -930,7 +932,7 @@ partition_extention_clause
 validation_clauses
     : VALIDATE REF UPDATE (SET DANGLING TO NULL)?
     | VALIDATE STRUCTURE 
-        ( CASCADE  FAST
+        ( CASCADE FAST
         | CASCADE online_or_offline? into_clause?
         | CASCADE
         )?
@@ -958,10 +960,8 @@ subpartition_key_value
 //https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4006.htm#SQLRF01106
 associate_statistics
     : ASSOCIATE STATISTICS 
-        WITH ( column_association
-             | function_association
-             )
-         storage_table_clause?
+        WITH (column_association | function_association)
+        storage_table_clause?
       ';'
     ;
 
@@ -1027,7 +1027,7 @@ storage_table_clause
 // https://docs.oracle.com/database/121/SQLRF/statements_4008.htm#SQLRF56110
 unified_auditing
     : {version12}? 
-      AUDIT (POLICY policy_name ((BY|EXCEPT) (','? audit_user)+ )? 
+      AUDIT (POLICY policy_name ((BY | EXCEPT) (','? audit_user)+ )? 
                                 (WHENEVER NOT? SUCCESSFUL)?
             | CONTEXT NAMESPACE oracle_namespace 
                       ATTRIBUTES (','? attribute_name)+ (BY (','? audit_user)+)?
@@ -1062,7 +1062,7 @@ audit_container_clause
     ;
 
 audit_operation_clause
-    : ( (','? (sql_statement_shortcut | ALL | ALL STATEMENTS) )+
+    : ( (','? (sql_statement_shortcut | ALL STATEMENTS?) )+
       | (','? (system_privilege | ALL PRIVILEGES) )+
       )
     ;
@@ -1076,11 +1076,7 @@ audit_user
     ;
 
 audit_schema_object_clause
-    : ( (','? sql_operation)+
-      | ALL
-      )
-
-      auditing_on_clause
+    : ( (','? sql_operation)+ | ALL) auditing_on_clause
     ;
 
 sql_operation
