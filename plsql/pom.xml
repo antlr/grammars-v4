@@ -20,7 +20,8 @@
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
 						<include>PlSqlLexer.g4</include>
-						<include>PlSqlParser.g4</include>
+						<include>PlSqlParser.g4</include> 
+						<include>Java/PlSqlBaseParser.java</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>

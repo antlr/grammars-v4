@@ -20,9 +20,9 @@
 
 parser grammar PlSqlParser;
 
-options { tokenVocab=PlSqlLexer; }
-
-@members {boolean version12=true;}
+options { tokenVocab=PlSqlLexer; 
+          superClass=PlSqlBaseParser;
+        }
 
 sql_script
     : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
@@ -1026,7 +1026,7 @@ storage_table_clause
 
 // https://docs.oracle.com/database/121/SQLRF/statements_4008.htm#SQLRF56110
 unified_auditing
-    : {version12}? 
+    : {allow_version12()}? 
       AUDIT (POLICY policy_name ((BY | EXCEPT) (','? audit_user)+ )? 
                                 (WHENEVER NOT? SUCCESSFUL)?
             | CONTEXT NAMESPACE oracle_namespace 
@@ -1054,11 +1054,11 @@ audit_traditional
     ;
 
 audit_direct_path
-    : {version12}? DIRECT_PATH auditing_by_clause
+    : {allow_version12()}? DIRECT_PATH auditing_by_clause
     ;
 
 audit_container_clause
-    : {version12}? (CONTAINER EQUALS_OP (CURRENT | ALL))
+    : {allow_version12()}? (CONTAINER EQUALS_OP (CURRENT | ALL))
     ;
 
 audit_operation_clause
@@ -1100,7 +1100,7 @@ auditing_on_clause
     : ON ( object_name
          | DIRECTORY regular_id
          | MINING MODEL model_name
-         | {version12}? SQL TRANSLATION PROFILE profile_name
+         | {allow_version12()}? SQL TRANSLATION PROFILE profile_name
          | DEFAULT
          )
     ;
@@ -1128,7 +1128,7 @@ sql_statement_shortcut
     | MATERIALIZED VIEW
     | NOT EXISTS
     | OUTLINE
-    | {version12}? PLUGGABLE DATABASE
+    | {allow_version12()}? PLUGGABLE DATABASE
     | PROCEDURE
     | PROFILE
     | PUBLIC DATABASE LINK
@@ -1218,7 +1218,7 @@ alter_view
     ;   
 
 alter_view_editionable
-    : {version12}? (EDITIONABLE | NONEDITIONABLE)
+    : {allow_version12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
  
 create_view
@@ -2501,7 +2501,7 @@ column_properties
     ;
 
 period_definition
-    : {version12}? PERIOD FOR column_name 
+    : {allow_version12()}? PERIOD FOR column_name 
         ( '(' start_time_column ',' end_time_column ')' )?
     ;
 
