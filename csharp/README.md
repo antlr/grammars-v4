@@ -10,7 +10,7 @@ This ANTLR 4 C# grammar is based on the C# ANTLR 3 grammar from
 
 ## Using
 
-Due to uncompilied code can be placed after such preprocessor directives:
+Due to uncompiled code can be placed after such preprocessor directives:
 ```CSharp
 #if SILVERLIGHT && WINDOWS_PHONE || DEBUG || foo == true
 // Some code
