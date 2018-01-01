@@ -463,13 +463,14 @@ expression
     : primary
     | expression bop='.'
       (IDENTIFIER
+      | IDENTIFIER '(' expressionList? ')'
       | THIS
       | NEW nonWildcardTypeArguments? innerCreator
       | SUPER superSuffix
       | explicitGenericInvocation
       )
     | expression '[' expression ']'
-    | expression '(' expressionList? ')'
+    | IDENTIFIER '(' expressionList? ')'
     | NEW creator
     | '(' typeType ')' expression
     | expression postfix=('++' | '--')
