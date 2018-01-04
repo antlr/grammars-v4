@@ -35,7 +35,7 @@ public class TestJava {
     }
 
     /**
-     * around 38 seconds [linux, intel-i7, ssd] (47 seconds on branch master at c17c753412d4c2e5e25cf1b433977f0bf7098c4f)
+     * around 40 seconds [linux, intel-i7, ssd] (47 seconds on branch master at c17c753412d4c2e5e25cf1b433977f0bf7098c4f)
      */
     @Ignore
     @Test

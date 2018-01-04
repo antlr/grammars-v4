@@ -382,7 +382,7 @@ class Foo { // Top-level class
         // https://docs.oracle.com/javase/specs/jls/se9/html/jls-15.html#jls-15.9
         Foo foo = new Foo();
         Foo.Bar fooBar1 = foo.new Bar();
-        // Foo.Bar fooBar2 = new Foo().new Bar(); // todo: not covered yet
+        Foo.Bar fooBar2 = new Foo().new Bar();
     }
 }
 

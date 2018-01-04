@@ -459,18 +459,22 @@ expressionList
     : expression (',' expression)*
     ;
 
+methodCall
+    : IDENTIFIER '(' expressionList? ')'
+    ;
+
 expression
     : primary
     | expression bop='.'
       (IDENTIFIER
-      | IDENTIFIER '(' expressionList? ')'
+      | methodCall
       | THIS
       | NEW nonWildcardTypeArguments? innerCreator
       | SUPER superSuffix
       | explicitGenericInvocation
       )
     | expression '[' expression ']'
-    | IDENTIFIER '(' expressionList? ')'
+    | methodCall
     | NEW creator
     | '(' typeType ')' expression
     | expression postfix=('++' | '--')
