@@ -9,6 +9,7 @@ import java.io.File;
 public class TestJava {
 
     private static File [] ok = new File("../java/examples").listFiles(File::isFile);
+    private static final int NUM_ITERATIONS_FOR_PERFORMANCE_MEASUREMENT = 100;
 
     private static File[] gfiles = new File[]{
             new File("../java/JavaLexer.g4"),
@@ -26,24 +27,10 @@ public class TestJava {
     @Ignore
     @Test
     public void general_performance() throws Exception {
-        parseMultipleTimes(
-                100,
-                new File("../java/examples/AllInOne7.java"),
-                new File("../java/examples/AllInOne8.java"),
-                new File("../java/examples/ManyStringsConcat.java")
-        );
+        parseMultipleTimes(ok);
     }
 
-    /**
-     * around 40 seconds [linux, intel-i7, ssd] (47 seconds on branch master at c17c753412d4c2e5e25cf1b433977f0bf7098c4f)
-     */
-    @Ignore
-    @Test
-    public void performance_of_method_call_parsing() throws Exception {
-        parseMultipleTimes(100, new File("../java/examples/ManyMethodCalls.java"));
-    }
-
-    private void parseMultipleTimes(final int iterations, File ... files) throws Exception {
+    private void parseMultipleTimes(File... files) throws Exception {
         GenericParser gp = new GenericParser(gfiles);
         DefaultTreeListener t = new DefaultTreeListener();
         gp.setListener(t);
@@ -51,7 +38,7 @@ public class TestJava {
         DefaultTreeListener dt = new DefaultTreeListener();
         gp.setListener(dt);
         for (File file : files) {
-            for (int i = 0; i < iterations; i++) {
+            for (int i = 0; i < NUM_ITERATIONS_FOR_PERFORMANCE_MEASUREMENT; i++) {
                 gp.parse(file, "compilationUnit", GenericParser.CaseSensitiveType.NONE);
             }
         }
