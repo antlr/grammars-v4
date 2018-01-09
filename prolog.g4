@@ -97,14 +97,14 @@ string
     ;
 
 LCLETTER
-    : [a-z_];
+    : [a-z_]+;
 
 UCLETTER
-    : [A-Z];
+    : [A-Z]+;
 
 DIGIT
-    : [0-9];
+    : [0-9]+;
 
 WS
-   : [ \t\r\n] -> skip
+   : [ \t\r\n]+ -> skip
    ;
