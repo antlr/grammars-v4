@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar prolog;
 
 program 
-    : clauselist query?
+    : clauselist query? EOF
     ;
 
 clauselist 
@@ -41,7 +41,8 @@ clauselist
     ;
 
 clause 
-    : (predicate '.') | (predicate ':-') (predicatelist '.')
+    : (predicate '.')
+    | (predicate ':-') (predicatelist '.')
     ;
 
 predicatelist 
@@ -49,15 +50,20 @@ predicatelist
     ;
 
 predicate 
-    : atom | atom '(' termlist ')'
+    : atom
+    | atom '(' termlist ')'
     ;
 
 termlist 
-    : term | termlist ',' term
+    : term ( ',' term )*
     ;
 
 term 
-    : numeral | atom | variable | structure
+    : VARIABLE
+    | atom
+    | integer
+    | FLOAT
+    | structure
     ;
 
 structure 
@@ -69,42 +75,82 @@ query
     ;
 
 atom 
-    : smallatom | '\'' string '\''
+    : '[' ']'
+    | '{' '}'
+    | SMALLATOM
+    | GRAPHIC_TOKEN
+    | QUOTED_TOKEN
+    | '\'' STRING '\'' //FIXME escapes in strings
+    | '"' STRING '"'
+    | '`' STRING '`'
+    | ';'
+    | '!'
     ;
 
-smallatom 
-    : LCLETTER | smallatom character
+
+integer
+    : DECIMAL
+    | BINARY
+    | OCTAL
+    | HEX
     ;
 
-variable 
-    : UCLETTER | variable character
+// Lexer
+
+SMALLATOM
+    : LCLETTER CHARACTER*
     ;
 
-numeral 
-    : DIGIT | numeral DIGIT
+VARIABLE
+    : UCLETTER CHARACTER*
     ;
 
-character 
-    : LCLETTER | UCLETTER | DIGIT | special
+DECIMAL: DIGIT+ ;
+BINARY: [01]+ ;
+OCTAL: [0-7]+ ;
+HEX: [0-9a-fA-F]+ ;
+
+FLOAT
+    : DECIMAL '.' [0-9]+ ( [eE] [+-] DECIMAL )?
     ;
 
-special 
-    : '+' | '-' | '*' | '/' | '\\' | '^' | '~' | ':' | '.' | '?' | '#'| '$' | '&'
+fragment CHARACTER
+    : LCLETTER
+    | UCLETTER
+    | DIGIT
+    | SPECIAL
     ;
 
-string 
-    : character | string character
+GRAPHIC_TOKEN: GRAPHIC | '\\' ;
+fragment GRAPHIC: [#$&*+-./:<=>?@^~] ; // 6.5.1 graphic char
+
+QUOTED_TOKEN: NON_QUOTE_CHAR | '\'\'' | '"' | '`' ;
+fragment NON_QUOTE_CHAR // 6.4.2.1
+    : GRAPHIC
+    | LCLETTER | UCLETTER // == alphanumeric char 6.5.2
+    // the others partly duplicate stuff, like allowing single space
     ;
 
-LCLETTER
-    : [a-z_]+;
+fragment SPECIAL
+    : '+' | '-' | '*' | '/' | '\\' | '^' | '~' | ':' | '.' | '?' | '#' | '$' | '&'
+    ;
 
-UCLETTER
-    : [A-Z]+;
+STRING
+    : CHARACTER+
+    ;
 
-DIGIT
-    : [0-9]+;
+fragment LCLETTER
+    : [a-z_];
+
+fragment UCLETTER
+    : [A-Z];
+
+fragment DIGIT
+    : [0-9];
 
 WS
    : [ \t\r\n]+ -> skip
    ;
+
+COMMENT: '%' ~[\n\r]* ( [\n\r] | EOF) -> channel(HIDDEN) ;
+MULTILINE_COMMENT: '/*' ( MULTILINE_COMMENT | . )*? ('*/' | EOF) -> channel(HIDDEN);
