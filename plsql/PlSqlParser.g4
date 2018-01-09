@@ -1332,7 +1332,7 @@ alter_tablespace
        | COALESCE
        | SHRINK SPACE_KEYWORD (KEEP size_clause)?
        | RENAME TO new_tablespace_name
-       | (BEGIN | END) BACKUP
+       | begin_or_end BACKUP
        | datafile_tempfile_clauses
        | tablespace_logging_clauses
        | tablespace_group_clause
@@ -1369,7 +1369,8 @@ tablespace_state_clauses
     : ONLINE
     | OFFLINE (NORMAL | TEMPORARY | IMMEDIATE)?
     | READ (ONLY | WRITE)
-    | (PERMANENT | TEMPORARY)
+    | PERMANENT
+    | TEMPORARY
     ;
 
 flashback_mode_clause
