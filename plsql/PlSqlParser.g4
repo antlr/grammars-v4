@@ -38,7 +38,11 @@ unit_statement
     | alter_trigger
     | alter_type
     | alter_table
+    | alter_tablespace
     | alter_index
+    | alter_library
+    | alter_materialized_view
+    | alter_materialized_view_log
     | alter_user
     | alter_view
 
@@ -1200,6 +1204,37 @@ directory_path
     : CHAR_STRING
     ;
 
+// https://docs.oracle.com/cd/E11882_01/appdev.112/e25519/alter_library.htm#LNPLS99946
+// https://docs.oracle.com/database/121/LNPLS/alter_library.htm#LNPLS99946
+alter_library
+    : ALTER LIBRARY library_name
+       ( COMPILE library_debug? compiler_parameters_clause* (REUSE SETTINGS)?
+       | library_editionable
+       )
+     ';'
+    ;
+
+library_editionable
+    : {version12}? (EDITIONABLE | NONEDITIONABLE)
+    ;
+
+library_debug
+    : {version12}? DEBUG
+    ;
+
+
+compiler_parameters_clause
+    : parameter_name EQUALS_OP parameter_value
+    ;
+
+parameter_value
+    : regular_id
+    ;
+
+library_name
+    : (regular_id '.')? regular_id
+    ;
+
 // https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4004.htm#SQLRF01104
 // https://docs.oracle.com/database/121/SQLRF/statements_4004.htm#SQLRF01104
 alter_view
@@ -1289,6 +1324,63 @@ constraint_state
       )+
     ;
 
+alter_tablespace
+    : ALTER TABLESPACE tablespace
+       ( DEFAULT table_compression? storage_clause?
+       | MINIMUM EXTENT size_clause
+       | RESIZE size_clause
+       | COALESCE
+       | SHRINK SPACE_KEYWORD (KEEP size_clause)?
+       | RENAME TO new_tablespace_name
+       | begin_or_end BACKUP
+       | datafile_tempfile_clauses
+       | tablespace_logging_clauses
+       | tablespace_group_clause
+       | tablespace_state_clauses
+       | autoextend_clause
+       | flashback_mode_clause
+       | tablespace_retention_clause
+       )
+     ';'
+    ;
+
+datafile_tempfile_clauses
+    : ADD (datafile_specification | tempfile_specification)
+    | DROP (DATAFILE | TEMPFILE) (filename | UNSIGNED_INTEGER) (KEEP size_clause)?
+    | SHRINK TEMPFILE (filename | UNSIGNED_INTEGER) (KEEP size_clause)?
+    | RENAME DATAFILE (','? filename)+ TO (','? filename)+
+    | (DATAFILE | TEMPFILE) (online_or_offline)
+    ;     
+
+tablespace_logging_clauses
+    : logging_clause
+    | NO? FORCE LOGGING
+    ;
+
+tablespace_group_clause
+    : TABLESPACE GROUP (tablespace_group_name | CHAR_STRING)
+    ;
+
+tablespace_group_name
+    : regular_id
+    ;
+
+tablespace_state_clauses
+    : ONLINE
+    | OFFLINE (NORMAL | TEMPORARY | IMMEDIATE)?
+    | READ (ONLY | WRITE)
+    | PERMANENT
+    | TEMPORARY
+    ;
+
+flashback_mode_clause
+    : FLASHBACK (ON | OFF)
+    ;
+
+new_tablespace_name
+    : tablespace
+    ;
+
 create_tablespace
     : CREATE (BIGFILE | SMALLFILE)? 
         ( permanent_tablespace_clause
@@ -1334,18 +1426,10 @@ segment_management_clause
     : SEGMENT SPACE_KEYWORD MANAGEMENT (AUTO | MANUAL)
     ;
 
-flashback_mode_clause
-    : FLASHBACK (ON | OFF)
-    ;
-
 temporary_tablespace_clause
     : TEMPORARY TABLESPACE tablespace_name=id_expression
         tempfile_specification?
         tablespace_group_clause? extent_management_clause?
-    ;
-
-tablespace_group_clause
-    : TABLESPACE GROUP (REGULAR_ID | CHAR_STRING)
     ;
 
 undo_tablespace_clause
@@ -1397,6 +1481,114 @@ parallel_clause
     : NOPARALLEL
     | PARALLEL parallel_count=UNSIGNED_INTEGER?
     ;
+
+alter_materialized_view
+    : ALTER MATERIALIZED VIEW tableview_name
+       ( physical_attributes_clause
+       | modify_mv_column_clause
+       | table_compression
+       | (','? lob_storage_clause)+
+       | (','? modify_lob_storage_clause)+
+//TODO | alter_table_partitioning
+       | parallel_clause
+       | logging_clause
+       | allocate_extent_clause
+       | deallocate_unused_clause
+       | shrink_clause
+       | (cache_or_nocache)
+       )?
+       alter_iot_clauses?
+       (USING INDEX physical_attributes_clause)?
+       alter_mv_option1?
+       ( enable_or_disable QUERY REWRITE
+       | COMPILE
+       | CONSIDER FRESH
+       )?
+     ';'
+    ;  
+
+alter_mv_option1
+    : alter_mv_refresh
+//TODO  | MODIFY scoped_table_ref_constraint
+    ;
+
+alter_mv_refresh
+    : REFRESH ( FAST
+              | COMPLETE
+              | FORCE
+              | ON (DEMAND | COMMIT)
+              | START WITH expression
+              | NEXT expression
+              | WITH PRIMARY KEY
+              | USING DEFAULT? MASTER ROLLBACK SEGMENT rollback_segment?
+              | USING (ENFORCED | TRUSTED) CONSTRAINTS
+              )+
+    ;
+
+rollback_segment
+    : regular_id
+    ; 
+
+modify_mv_column_clause
+    : MODIFY '(' column_name (ENCRYPT encryption_spec | DECRYPT)? ')'
+    ;
+
+alter_materialized_view_log
+    : ALTER MATERIALIZED VIEW LOG FORCE? ON tableview_name
+       ( physical_attributes_clause
+       | add_mv_log_column_clause
+//TODO | alter_table_partitioning
+       | parallel_clause
+       | logging_clause
+       | allocate_extent_clause
+       | shrink_clause
+       | move_mv_log_clause
+       | cache_or_nocache
+       )?
+       mv_log_augmentation? mv_log_purge_clause?
+      ';'
+    ;
+add_mv_log_column_clause
+    : ADD '(' column_name ')'
+    ;
+
+move_mv_log_clause
+    : MOVE segment_attributes_clause parallel_clause?
+    ;
+
+mv_log_augmentation
+    : ADD ( ( OBJECT ID
+            | PRIMARY KEY
+            | ROWID
+            | SEQUENCE
+            )
+            ('(' (','? column_name)+ ')')?
+
+          | '(' (','? column_name)+ ')'
+          )
+          new_values_clause?
+    ;
+
+// Should bound this to just date/time expr
+datetime_expr
+    : expression
+    ;
+
+// Should bound this to just interval expr
+interval_expr
+    : expression
+    ;
+
+synchronous_or_asynchronous
+    : SYNCHRONOUS
+    | ASYNCHRONOUS
+    ;
+
+including_or_excluding
+    : INCLUDING
+    | EXCLUDING
+    ;
+
 
 create_materialized_view_log
     : CREATE MATERIALIZED VIEW LOG ON tableview_name
@@ -2181,10 +2373,6 @@ default_settings_clause
     | set_time_zone_clause
     ;
 
-tablespace_group_name
-    : regular_id
-    ;
-
 set_time_zone_clause
     : SET TIMEZONE EQUALS_OP CHAR_STRING
     ;
@@ -2216,7 +2404,7 @@ filenumber
 filename
     : CHAR_STRING
     ;
-   
+
 alter_table
     : ALTER TABLE tableview_name
       ( 
@@ -2643,10 +2831,6 @@ anonymous_block
 
 invoker_rights_clause
     : AUTHID (CURRENT_USER | DEFINER)
-    ;
-
-compiler_parameters_clause
-    : identifier '=' expression
     ;
 
 call_spec
