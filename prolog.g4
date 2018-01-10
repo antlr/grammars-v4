@@ -32,28 +32,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar prolog;
 
-program 
-    : term* query? EOF
+
+// Prolog text and data formed from terms (6.2)
+
+program: (directive | clause) * EOF ;
+
+directive
+    :   ':-'
+    (   'dynamic' term
+    |   'multifile' term
+    |   'discontiguous' term
+    |   'op' term term term
+    |   'char_conversion' term term
+    |   'initialization' term
+    |   'include' term
+    |   'ensure_loaded' term
+    |   'set_prolog_flag' term term
+    ) //TODO: in directive also other compound syntaxes possible (e.g. op(1150, fx, record). )
+    '.'
     ;
 
-query
-    : '?-' termlist '.'
-    ;
+clause: term '.' ;
 
-clause
-    : term ':-' termlist '.'  # rule
-    | term '.'   # fact
-    ;
 
-termlist 
+// Abstract Syntax (6.3): terms formed from tokens
+
+termlist
     : term ( ',' term )* //XXX: resolve different meanings of , and implement their precedence
     ;
 
 term 
     : VARIABLE          # variable
     | '(' term ')'      # braced_term
-    | integer           # integer_term
-    | FLOAT             # float
+    | '-'? integer      # integer_term
+    | '-'? FLOAT        # float
     // structure / compound term
     | atom '(' termlist ')'     # compound_term
     | term operator term        # binary_operator
@@ -102,7 +114,8 @@ integer
     | HEX
     ;
 
-// Lexer
+
+// Lexer (6.4 & 6.5): Tokens formed from Characters
 
 SMALLATOM
     : LCLETTER CHARACTER*
