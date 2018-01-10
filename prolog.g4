@@ -33,58 +33,65 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar prolog;
 
 program 
-    : clauselist query? EOF
+    : term* query? EOF
     ;
 
-clauselist 
-    :  clause*
+query
+    : '?-' termlist '.'
     ;
 
-clause 
-    : (predicate '.')
-    | (predicate ':-') (predicatelist '.')
-    ;
-
-predicatelist 
-    :  predicate (',' predicate)*
-    ;
-
-predicate 
-    : atom
-    | atom '(' termlist ')'
+clause
+    : term ':-' termlist '.'  # rule
+    | term '.'   # fact
     ;
 
 termlist 
-    : term ( ',' term )*
+    : term ( ',' term )* //XXX: resolve different meanings of , and implement their precedence
     ;
 
 term 
-    : VARIABLE
-    | atom
-    | integer
-    | FLOAT
-    | structure
+    : VARIABLE          # variable
+    | '(' term ')'      # braced_term
+    | integer           # integer_term
+    | FLOAT             # float
+    // structure / compound term
+    | atom '(' termlist ')'     # compound_term
+    | term operator term        # binary_operator
+    | operator term             # unary_operator
+    | '[' termlist ( '|' term )? ']' # list_term //TODO: priority <= 999 //TODO: find out what [|] list syntax means
+    | '{' termlist '}'          # curly_bracketed_term
+    | atom              # atom_term
     ;
 
-structure 
-    : atom '(' termlist ')'
-    ;
-
-query 
-    : '?-' predicatelist '.'
+operator //TODO: modifying operator table
+    : ':-' | '-->'
+    | '?-'
+    | ';'
+    | '->'
+    | ','
+    | '\\+'
+    | '=' | '\\='
+    | '==' | '\\==' | '@<' | '@=<' | '@>' | '@>='
+    | '=..'
+    | 'is' | '=:=' | '=\\=' | '<' | '=<' | '>' | '>='
+    | '+' | '-' | '/\\' | '\\/'
+    | '*' | '/' | '//' | 'rem' | 'mod' | '<<' | '>>'
+    | '**'
+    | '^'
+    | '\\'
     ;
 
 atom 
-    : '[' ']'
-    | '{' '}'
-    | SMALLATOM
-    | GRAPHIC_TOKEN
-    | QUOTED_TOKEN
-    | '\'' STRING '\'' //FIXME escapes in strings
-    | '"' STRING '"'
-    | '`' STRING '`'
-    | ';'
-    | '!'
+    : '[' ']'           # empty_list
+    | '{' '}'           # empty_braces
+    | SMALLATOM         # name
+    | GRAPHIC_TOKEN     # graphic
+    | QUOTED_TOKEN      # quoted
+    | '\'' STRING '\''  # quoted_string //FIXME escapes in strings
+    | '"' STRING '"'    # dq_string
+    | '`' STRING '`'    # backq_string
+    | ';'               # semicolon
+    | '!'               # cut
     ;
 
 
@@ -103,6 +110,7 @@ SMALLATOM
 
 VARIABLE
     : UCLETTER CHARACTER*
+    | '_' CHARACTER+
     ;
 
 DECIMAL: DIGIT+ ;
@@ -121,7 +129,7 @@ fragment CHARACTER
     | SPECIAL
     ;
 
-GRAPHIC_TOKEN: GRAPHIC | '\\' ;
+GRAPHIC_TOKEN: (GRAPHIC | '\\')+ ;
 fragment GRAPHIC: [#$&*+-./:<=>?@^~] ; // 6.5.1 graphic char
 
 QUOTED_TOKEN: NON_QUOTE_CHAR | '\'\'' | '"' | '`' ;
