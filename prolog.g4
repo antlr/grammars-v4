@@ -35,7 +35,7 @@ grammar prolog;
 
 // Prolog text and data formed from terms (6.2)
 
-program: (directive | clause) * EOF ;
+p_text: (directive | clause) * EOF ;
 
 directive
     :   ':-'
@@ -68,7 +68,7 @@ term
     | '-'? FLOAT        # float
     // structure / compound term
     | atom '(' termlist ')'     # compound_term
-    | term operator term        # binary_operator
+    | term operator term        # binary_operator //FIXME: , should have precedence over :- see e.g. `head :- one, two.`
     | operator term             # unary_operator
     | '[' termlist ( '|' term )? ']' # list_term //TODO: priority <= 999 //TODO: find out what [|] list syntax means
     | '{' termlist '}'          # curly_bracketed_term
@@ -93,22 +93,22 @@ operator //TODO: modifying operator table
     | '\\'
     ;
 
-atom 
+atom // 6.4.2 and 6.1.2
     : '[' ']'           # empty_list
     | '{' '}'           # empty_braces
-    | SMALLATOM         # name
+    | LETTER_DIGIT      # name
     | GRAPHIC_TOKEN     # graphic
-    | QUOTED_TOKEN      # quoted
-    | '\'' STRING '\''  # quoted_string //FIXME escapes in strings
-    | '"' STRING '"'    # dq_string
-    | '`' STRING '`'    # backq_string
+    | QUOTED            # quoted_string
+    | DOUBLE_QUOTED_LIST# dq_string
+    | BACK_QUOTED_STRING# backq_string
     | ';'               # semicolon
     | '!'               # cut
     ;
 
 
-integer
+integer // 6.4.4
     : DECIMAL
+    | CHARACTER_CODE_CONSTANT
     | BINARY
     | OCTAL
     | HEX
@@ -117,57 +117,67 @@ integer
 
 // Lexer (6.4 & 6.5): Tokens formed from Characters
 
-SMALLATOM
-    : LCLETTER CHARACTER*
+LETTER_DIGIT // 6.4.2
+    : SMALL_LETTER ALPHANUMERIC*
     ;
 
-VARIABLE
-    : UCLETTER CHARACTER*
-    | '_' CHARACTER+
+VARIABLE // 6.4.3
+    : CAPITAL_LETTER ALPHANUMERIC*
+    | '_' ALPHANUMERIC+
+    | '_'
     ;
 
+// 6.4.4
 DECIMAL: DIGIT+ ;
-BINARY: [01]+ ;
-OCTAL: [0-7]+ ;
-HEX: [0-9a-fA-F]+ ;
+BINARY: '0b' [01]+ ;
+OCTAL: '0o' [0-7]+ ;
+HEX: '0x' HEX_DIGIT+ ;
 
-FLOAT
-    : DECIMAL '.' [0-9]+ ( [eE] [+-] DECIMAL )?
-    ;
+CHARACTER_CODE_CONSTANT: '0' '\'' SINGLE_QUOTED_CHARACTER ;
 
-fragment CHARACTER
-    : LCLETTER
-    | UCLETTER
-    | DIGIT
-    | SPECIAL
-    ;
+FLOAT: DECIMAL '.' [0-9]+ ( [eE] [+-] DECIMAL )? ;
 
-GRAPHIC_TOKEN: (GRAPHIC | '\\')+ ;
+
+GRAPHIC_TOKEN: (GRAPHIC | '\\')+ ; // 6.4.2 //XXX @=<, somehow contains , which should be in list
 fragment GRAPHIC: [#$&*+-./:<=>?@^~] ; // 6.5.1 graphic char
 
-QUOTED_TOKEN: NON_QUOTE_CHAR | '\'\'' | '"' | '`' ;
-fragment NON_QUOTE_CHAR // 6.4.2.1
+// 6.4.2.1
+fragment SINGLE_QUOTED_CHARACTER: NON_QUOTE_CHAR | '\'\'' | '"' | '`' ;
+fragment DOUBLE_QUOTED_CHARACTER: NON_QUOTE_CHAR | '\'' | '""' | '`' ;
+fragment BACK_QUOTED_CHARACTER: NON_QUOTE_CHAR | '\'' | '"' | '``' ;
+fragment NON_QUOTE_CHAR
     : GRAPHIC
-    | LCLETTER | UCLETTER // == alphanumeric char 6.5.2
-    // the others partly duplicate stuff, like allowing single space
+    | ALPHANUMERIC
+    | SOLO
+    | ' ' // space char
+    | META_ESCAPE
+    | CONTROL_ESCAPE
+    | OCTAL_ESCAPE
+    | HEX_ESCAPE
     ;
+META_ESCAPE: '\\' [\\'"`] ; // meta char
+CONTROL_ESCAPE: '\\' [abrftnv] ;
+OCTAL_ESCAPE: '\\' [0-7]+ '\\' ;
+HEX_ESCAPE: '\\x' HEX_DIGIT+ '\\' ;
 
-fragment SPECIAL
-    : '+' | '-' | '*' | '/' | '\\' | '^' | '~' | ':' | '.' | '?' | '#' | '$' | '&'
-    ;
+QUOTED:          '\'' (CONTINUATION_ESCAPE | SINGLE_QUOTED_CHARACTER )*? '\'' ; // 6.4.2
+DOUBLE_QUOTED_LIST: '"' (CONTINUATION_ESCAPE | DOUBLE_QUOTED_CHARACTER )*? '"'; // 6.4.6
+BACK_QUOTED_STRING: '`' (CONTINUATION_ESCAPE | BACK_QUOTED_CHARACTER )*? '`'; // 6.4.7
+fragment CONTINUATION_ESCAPE: '\\\n' ;
 
-STRING
-    : CHARACTER+
-    ;
+// 6.5.2
+fragment ALPHANUMERIC: ALPHA | DIGIT ;
+fragment ALPHA: '_' | SMALL_LETTER | CAPITAL_LETTER ;
+fragment SMALL_LETTER: [a-z_];
 
-fragment LCLETTER
-    : [a-z_];
+fragment CAPITAL_LETTER: [A-Z];
 
-fragment UCLETTER
-    : [A-Z];
+fragment DIGIT: [0-9] ;
+fragment HEX_DIGIT: [0-9a-fA-F] ;
 
-fragment DIGIT
-    : [0-9];
+// 6.5.3
+fragment SOLO: [!(),;[{}|%] | ']' ;
+
 
 WS
    : [ \t\r\n]+ -> skip
