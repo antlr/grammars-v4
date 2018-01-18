@@ -2078,7 +2078,7 @@ upgrade_table_clause
     ;
     
 drop_table
-    : DROP TABLE tableview_name (PURGE)? SEMICOLON
+    : DROP TABLE tableview_name PURGE? SEMICOLON
     ;
 
 comment_on_column
