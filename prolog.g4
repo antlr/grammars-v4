@@ -77,6 +77,7 @@ operator
     | '==' | '\\==' | '@<' | '@=<' | '@>' | '@>='
     | '=..'
     | 'is' | '=:=' | '=\\=' | '<' | '=<' | '>' | '>='
+    | ':' // modules: 5.2.1
     | '+' | '-' | '/\\' | '\\/'
     | '*' | '/' | '//' | 'rem' | 'mod' | '<<' | '>>' //TODO: '/' cannot be used as atom because token here not in GRAPHIC. only works because , is operator too. example: swipl/filesex.pl:177
     | '**'
