@@ -57,18 +57,19 @@ term
     | atom '(' termlist ')'     # compound_term
     |<assoc=right> term operator term        # binary_operator
     | operator term             # unary_operator
-    | '[' termlist ( '|' term )? ']' # list_term  //TODO: find out what [|] list syntax means
+    | '[' termlist ( '|' term )? ']' # list_term
     | '{' termlist '}'          # curly_bracketed_term
 
     | atom              # atom_term
     ;
-//TODO: operator priority, associativity, arity. valid priority ranges for e.g. [list] syntax
+
+//TODO: operator priority, associativity, arity. Filter valid priority ranges for e.g. [list] syntax
 //TODO: modifying operator table
 
 operator
     : ':-' | '-->'
     | '?-'
-    | 'dynamic' | 'multifile' | 'discontiguous' | 'public'
+    | 'dynamic' | 'multifile' | 'discontiguous' | 'public' //TODO: move operators used in directives to "built-in" definition of dialect
     | ';'
     | '->'
     | ','
@@ -86,7 +87,7 @@ operator
     ;
 
 atom // 6.4.2 and 6.1.2
-    : '[' ']'           # empty_list
+    : '[' ']'           # empty_list //NOTE [] is not atom anymore in swipl 7 and later
     | '{' '}'           # empty_braces
     | LETTER_DIGIT      # name
     | GRAPHIC_TOKEN     # graphic
