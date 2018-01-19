@@ -1686,7 +1686,7 @@ create_cluster
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name 
-        (relational_table | object_table | xmltype_table) (AS subquery)?
+        (relational_table | object_table | xmltype_table) (AS select_statement)?
       ';'
     ;
 
@@ -2078,7 +2078,7 @@ upgrade_table_clause
     ;
     
 drop_table
-    : DROP TABLE tableview_name SEMICOLON
+    : DROP TABLE tableview_name PURGE? SEMICOLON
     ;
 
 comment_on_column
