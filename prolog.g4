@@ -37,28 +37,15 @@ grammar prolog;
 
 p_text: (directive | clause) * EOF ;
 
-directive
-    :   ':-'
-    (   'dynamic' term
-    |   'multifile' term
-    |   'discontiguous' term
-    |   'op' term term term
-    |   'char_conversion' term term
-    |   'initialization' term
-    |   'include' term
-    |   'ensure_loaded' term
-    |   'set_prolog_flag' term term
-    ) //TODO: in directive also other compound syntaxes possible (e.g. op(1150, fx, record). )
-    '.'
-    ;
+directive: ':-' term '.' ; // also 3.58
 
-clause: term '.' ;
+clause: term '.' ; // also 3.33
 
 
 // Abstract Syntax (6.3): terms formed from tokens
 
 termlist
-    : term ( ',' term )* //XXX: resolve different meanings of , and implement their precedence
+    : term ( ',' term )*
     ;
 
 term 
@@ -68,16 +55,20 @@ term
     | '-'? FLOAT        # float
     // structure / compound term
     | atom '(' termlist ')'     # compound_term
-    | term operator term        # binary_operator //FIXME: , should have precedence over :- see e.g. `head :- one, two.`
+    |<assoc=right> term operator term        # binary_operator
     | operator term             # unary_operator
-    | '[' termlist ( '|' term )? ']' # list_term //TODO: priority <= 999 //TODO: find out what [|] list syntax means
+    | '[' termlist ( '|' term )? ']' # list_term  //TODO: find out what [|] list syntax means
     | '{' termlist '}'          # curly_bracketed_term
+
     | atom              # atom_term
     ;
+//TODO: operator priority, associativity, arity. valid priority ranges for e.g. [list] syntax
+//TODO: modifying operator table
 
-operator //TODO: modifying operator table
+operator
     : ':-' | '-->'
     | '?-'
+    | 'dynamic' | 'multifile' | 'discontiguous' | 'public'
     | ';'
     | '->'
     | ','
@@ -87,7 +78,7 @@ operator //TODO: modifying operator table
     | '=..'
     | 'is' | '=:=' | '=\\=' | '<' | '=<' | '>' | '>='
     | '+' | '-' | '/\\' | '\\/'
-    | '*' | '/' | '//' | 'rem' | 'mod' | '<<' | '>>'
+    | '*' | '/' | '//' | 'rem' | 'mod' | '<<' | '>>' //TODO: '/' cannot be used as atom because token here not in GRAPHIC. only works because , is operator too. example: swipl/filesex.pl:177
     | '**'
     | '^'
     | '\\'
