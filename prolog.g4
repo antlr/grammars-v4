@@ -129,8 +129,8 @@ CHARACTER_CODE_CONSTANT: '0' '\'' SINGLE_QUOTED_CHARACTER ;
 FLOAT: DECIMAL '.' [0-9]+ ( [eE] [+-] DECIMAL )? ;
 
 
-GRAPHIC_TOKEN: (GRAPHIC | '\\')+ ; // 6.4.2 //XXX @=<, somehow contains , which should be in list
-fragment GRAPHIC: [#$&*+-./:<=>?@^~] ; // 6.5.1 graphic char
+GRAPHIC_TOKEN: (GRAPHIC | '\\')+ ; // 6.4.2
+fragment GRAPHIC: [#$&*+./:<=>?@^~] | '-' ; // 6.5.1 graphic char
 
 // 6.4.2.1
 fragment SINGLE_QUOTED_CHARACTER: NON_QUOTE_CHAR | '\'\'' | '"' | '`' ;
