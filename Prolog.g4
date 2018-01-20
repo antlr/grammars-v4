@@ -51,7 +51,7 @@ termlist
 term 
     : VARIABLE          # variable
     | '(' term ')'      # braced_term
-    | '-'? integer      # integer_term
+    | '-'? integer      # integer_term //TODO: negative case should be covered by unary_operator
     | '-'? FLOAT        # float
     // structure / compound term
     | atom '(' termlist ')'     # compound_term
@@ -148,10 +148,10 @@ fragment NON_QUOTE_CHAR
     | OCTAL_ESCAPE
     | HEX_ESCAPE
     ;
-META_ESCAPE: '\\' [\\'"`] ; // meta char
-CONTROL_ESCAPE: '\\' [abrftnv] ;
-OCTAL_ESCAPE: '\\' [0-7]+ '\\' ;
-HEX_ESCAPE: '\\x' HEX_DIGIT+ '\\' ;
+fragment META_ESCAPE: '\\' [\\'"`] ; // meta char
+fragment CONTROL_ESCAPE: '\\' [abrftnv] ;
+fragment OCTAL_ESCAPE: '\\' [0-7]+ '\\' ;
+fragment HEX_ESCAPE: '\\x' HEX_DIGIT+ '\\' ;
 
 QUOTED:          '\'' (CONTINUATION_ESCAPE | SINGLE_QUOTED_CHARACTER )*? '\'' ; // 6.4.2
 DOUBLE_QUOTED_LIST: '"' (CONTINUATION_ESCAPE | DOUBLE_QUOTED_CHARACTER )*? '"'; // 6.4.6
