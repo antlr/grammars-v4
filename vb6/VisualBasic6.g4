@@ -104,7 +104,7 @@ cp_Properties
 	| controlProperties;
 
 cp_SingleProperty
-	: WS? cp_PropertyName WS? EQ WS? cp_PropertyValue FRX_OFFSET? NEWLINE+
+	: WS? implicitCallStmt_InStmt WS? EQ WS? '$'? cp_PropertyValue FRX_OFFSET? NEWLINE+
 	;
 
 cp_PropertyName
@@ -671,7 +671,7 @@ iCS_S_VariableOrProcedureCall
    ;
 
 iCS_S_ProcedureOrArrayCall
-   : (ambiguousIdentifier | baseType | iCS_S_NestedProcedureCall) typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN dictionaryCallStmt?
+   : (ambiguousIdentifier | baseType | iCS_S_NestedProcedureCall) typeHint? WS? (LPAREN WS? (argsCall WS?)? RPAREN)+ dictionaryCallStmt?
    ;
 
 iCS_S_NestedProcedureCall
