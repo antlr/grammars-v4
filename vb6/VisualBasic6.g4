@@ -602,11 +602,11 @@ variableStmt
    ;
 
 variableListStmt
-   : ambiguousIdentifier typeHint? (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? (WS asTypeClause)?
+   : variableSubStmt (WS? COMMA WS? variableSubStmt)*
    ;
 
 variableSubStmt
-   : ambiguousIdentifier (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? typeHint? (WS asTypeClause)?
+   : ambiguousIdentifier typeHint? (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? (WS asTypeClause)?
    ;
 
 whileWendStmt
@@ -671,15 +671,20 @@ iCS_S_VariableOrProcedureCall
    ;
 
 iCS_S_ProcedureOrArrayCall
-   : (ambiguousIdentifier | baseType) typeHint? WS? (LPAREN WS? (argsCall WS?)? RPAREN)+ dictionaryCallStmt?
+   : (ambiguousIdentifier | baseType | iCS_S_NestedProcedureCall) typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN dictionaryCallStmt?
    ;
+
+iCS_S_NestedProcedureCall
+	: ambiguousIdentifier typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN
+	;
+
 
 iCS_S_MembersCall
    : (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)? iCS_S_MemberCall + dictionaryCallStmt?
    ;
 
 iCS_S_MemberCall
-   : DOT (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)
+   : WS? DOT (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)
    ;
 
 iCS_S_DictionaryCall
@@ -784,6 +789,7 @@ literal
    | DOUBLELITERAL
    | FILENUMBER
    | INTEGERLITERAL
+   | OCTALLITERAL
    | STRINGLITERAL
    | TRUE
    | FALSE
@@ -2037,6 +2043,10 @@ FILENUMBER
    : HASH LETTERORDIGIT +
    ;
 
+OCTALLITERAL
+   : (PLUS | MINUS)? '&O' [0-7] + AMPERSAND?
+   ;
+   
 // misc
 FRX_OFFSET
 	: COLON [0-9A-F]+
