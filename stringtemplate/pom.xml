@@ -18,6 +18,12 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>STParser.g4</grammars>
+					<includes>
+						<include>STGLexer.g4</include>
+						<include>STGParser.g4</include>
+						<include>STLexer.g4</include>
+						<include>STParser.g4</include>
+					</includes>
 					<excludes>
 						<exclude>LexBasic.g4</exclude>
 						<exclude>LexUnicode.g4</exclude>

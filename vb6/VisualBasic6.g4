@@ -1,34 +1,27 @@
 /*
-* Copyright (C) 2016, Ulrich Wolffgang <u.wol@wwu.de>
+* Copyright (C) 2017, Ulrich Wolffgang <ulrich.wolffgang@proleap.io>
 * All rights reserved.
 *
 * This software may be modified and distributed under the terms
-* of the BSD 3-clause license. See the LICENSE file for details.
+* of the MIT license. See the LICENSE file for details.
 */
 
 /*
 * Visual Basic 6.0 Grammar for ANTLR4
 *
-* This is a grammar for Visual Basic 6.0 and the parser at
-* https://github.com/uwol/vb6parser. The grammar is derived from the 
-* Visual Basic 6.0 language reference 
-* http://msdn.microsoft.com/en-us/library/aa338033%28v=vs.60%29.aspx 
-* and tested against MSDN VB6 statements as well as several Visual 
+* This is a Visual Basic 6.0 grammar, which is part of the Visual Basic 6.0
+* parser at https://github.com/uwol/vb6parser.
+*
+* The grammar is derived from the Visual Basic 6.0 language reference
+* http://msdn.microsoft.com/en-us/library/aa338033%28v=vs.60%29.aspx
+* and has been tested with MSDN VB6 statements as well as several Visual
 * Basic 6.0 code repositories.
-*
-* Characteristics:
-*
-* 1. This grammar is line-based and takes into account whitespace, so that
-*    member calls (e.g. "A.B") are distinguished from contextual object calls 
-*    in WITH statements (e.g. "A .B").
-*
-* 2. Keywords can be used as identifiers depending on the context, enabling
-*    e.g. "A.Type", but not "Type.B".
 */
 
 grammar VisualBasic6;
 
 // module ----------------------------------
+
 startRule
    : module EOF
    ;
@@ -37,21 +30,21 @@ module
    : WS? NEWLINE* (moduleHeader NEWLINE +)? moduleReferences? NEWLINE* controlProperties? NEWLINE* moduleConfig? NEWLINE* moduleAttributes? NEWLINE* moduleOptions? NEWLINE* moduleBody? NEWLINE* WS?
    ;
 
- moduleReferences
-	: moduleReference+
-	;
-	
-moduleReference 
-	: OBJECT WS? EQ WS? moduleReferenceValue (SEMICOLON WS? moduleReferenceComponent)? NEWLINE*
-	;
-	 
+moduleReferences
+   : moduleReference+
+   ;
+
+moduleReference
+   : OBJECT WS? EQ WS? moduleReferenceValue (SEMICOLON WS? moduleReferenceComponent)? NEWLINE*
+   ;
+
 moduleReferenceValue
-	: STRINGLITERAL
-	;
+   : STRINGLITERAL
+   ;
 
 moduleReferenceComponent
-	: STRINGLITERAL
-	;
+   : STRINGLITERAL
+   ;
 
 moduleHeader
    : VERSION WS DOUBLELITERAL (WS CLASS)?
@@ -99,34 +92,34 @@ moduleBodyElement
    | typeStmt
    ;
 
-// Controls ----------------------------------
+// controls ----------------------------------
 
-controlProperties 
+controlProperties
 	: WS? BEGIN WS cp_ControlType WS cp_ControlIdentifier WS? NEWLINE+ cp_Properties+ END NEWLINE*
 	;
 
-cp_Properties 
+cp_Properties
 	: cp_SingleProperty
 	| cp_NestedProperty
 	| controlProperties;
 
-cp_SingleProperty 
+cp_SingleProperty
 	: WS? cp_PropertyName WS? EQ WS? cp_PropertyValue FRX_OFFSET? NEWLINE+
 	;
 
-cp_PropertyName 
+cp_PropertyName
 	: (OBJECT DOT)? ambiguousIdentifier (LPAREN literal RPAREN)? (DOT ambiguousIdentifier (LPAREN literal RPAREN)?)*
 	;
 
 cp_PropertyValue
-	: DOLLAR? (literal | (LBRACE ambiguousIdentifier RBRACE) | POW ambiguousIdentifier)
-	;
+    : DOLLAR? (literal | (LBRACE ambiguousIdentifier RBRACE) | POW ambiguousIdentifier)
+    ;
 
-cp_NestedProperty 
+cp_NestedProperty
 	: WS? BEGINPROPERTY WS ambiguousIdentifier (LPAREN INTEGERLITERAL RPAREN)? (WS GUID)? NEWLINE+ (cp_Properties+)? ENDPROPERTY NEWLINE+
 	;
 
-cp_ControlType 
+cp_ControlType
 	: complexType
 	;
 
@@ -135,6 +128,7 @@ cp_ControlIdentifier
 	;
 
 // block ----------------------------------
+
 moduleBlock
    : block
    ;
@@ -218,6 +212,7 @@ blockStmt
    ;
 
 // statements ----------------------------------
+
 appActivateStmt
    : APPACTIVATE WS valueStmt (WS? COMMA WS? valueStmt)?
    ;
@@ -309,7 +304,7 @@ forEachStmt
    ;
 
 forNextStmt
-   : FOR WS ambiguousIdentifier typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt WS TO WS valueStmt (WS STEP WS valueStmt)? NEWLINE + (block NEWLINE +)? NEXT (WS ambiguousIdentifier typeHint?)?
+   : FOR WS iCS_S_VariableOrProcedureCall typeHint? (WS asTypeClause)? WS? EQ WS? valueStmt WS TO WS valueStmt (WS STEP WS valueStmt)? NEWLINE + (block NEWLINE +)? NEXT (WS ambiguousIdentifier typeHint?)?
    ;
 
 functionStmt
@@ -431,8 +426,8 @@ outputList
    ;
 
 outputList_Expression
-   : valueStmt
-   | (SPC | TAB) (WS? LPAREN WS? argsCall WS? RPAREN)?
+   : (SPC | TAB) (WS? LPAREN WS? argsCall WS? RPAREN)?
+   | valueStmt
    ;
 
 printStmt
@@ -569,37 +564,37 @@ unlockStmt
 
 // operator precedence is represented by rule order
 valueStmt
-   : literal # vsLiteral
-   | implicitCallStmt_InStmt # vsICS
-   | LPAREN WS? valueStmt (WS? COMMA WS? valueStmt)* WS? RPAREN # vsStruct
-   | NEW WS valueStmt # vsNew
-   | typeOfStmt # vsTypeOf
-   | midStmt # vsMid
-   | ADDRESSOF WS valueStmt # vsAddressOf
-   | implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt # vsAssign
-   | valueStmt WS IS WS valueStmt # vsIs
-   | valueStmt WS LIKE WS valueStmt # vsLike
-   | valueStmt WS? GEQ WS? valueStmt # vsGeq
-   | valueStmt WS? LEQ WS? valueStmt # vsLeq
-   | valueStmt WS? GT WS? valueStmt # vsGt
-   | valueStmt WS? LT WS? valueStmt # vsLt
-   | valueStmt WS? NEQ WS? valueStmt # vsNeq
-   | valueStmt WS? EQ WS? valueStmt # vsEq
-   | valueStmt WS? AMPERSAND WS? valueStmt # vsAmp
-   | MINUS WS? valueStmt # vsNegation
-   | PLUS WS? valueStmt # vsPlus
-   | valueStmt WS? PLUS WS? valueStmt # vsAdd
-   | valueStmt WS? MOD WS? valueStmt # vsMod
-   | valueStmt WS? DIV WS? valueStmt # vsDiv
-   | valueStmt WS? MULT WS? valueStmt # vsMult
-   | valueStmt WS? MINUS WS? valueStmt # vsMinus
-   | valueStmt WS? POW WS? valueStmt # vsPow
-   | valueStmt WS IMP WS valueStmt # vsImp
-   | valueStmt WS EQV WS valueStmt # vsEqv
-   | valueStmt WS? XOR WS? valueStmt # vsXor
-   | valueStmt WS? OR WS? valueStmt # vsOr
-   | valueStmt WS AND WS valueStmt # vsAnd
-   | NOT WS valueStmt # vsNot
+   : literal                                                         # vsLiteral
+   | LPAREN WS? valueStmt (WS? COMMA WS? valueStmt)* WS? RPAREN      # vsStruct
+   | NEW WS valueStmt                                                # vsNew
+   | typeOfStmt                                                      # vsTypeOf
+   | ADDRESSOF WS valueStmt                                          # vsAddressOf
+   | implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt                # vsAssign
+   | valueStmt WS? POW WS? valueStmt                                 # vsPow
+   | MINUS WS? valueStmt                                             # vsNegation
+   | PLUS WS? valueStmt                                              # vsPlus
+   | valueStmt WS? DIV WS? valueStmt                                 # vsDiv
+   | valueStmt WS? MULT WS? valueStmt                                # vsMult
+   | valueStmt WS? MOD WS? valueStmt                                 # vsMod
+   | valueStmt WS? PLUS WS? valueStmt                                # vsAdd
+   | valueStmt WS? MINUS WS? valueStmt                               # vsMinus
+   | valueStmt WS? AMPERSAND WS? valueStmt                             # vsAmp
+   | valueStmt WS? EQ WS? valueStmt                                  # vsEq
+   | valueStmt WS? NEQ WS? valueStmt                                 # vsNeq
+   | valueStmt WS? LT WS? valueStmt                                  # vsLt
+   | valueStmt WS? GT WS? valueStmt                                  # vsGt
+   | valueStmt WS? LEQ WS? valueStmt                                 # vsLeq
+   | valueStmt WS? GEQ WS? valueStmt                                 # vsGeq
+   | valueStmt WS LIKE WS valueStmt                                  # vsLike
+   | valueStmt WS IS WS valueStmt                                    # vsIs
+   | NOT (WS valueStmt | LPAREN WS? valueStmt WS? RPAREN)            # vsNot
+   | valueStmt WS? AND WS? valueStmt                                 # vsAnd
+   | valueStmt WS? OR WS? valueStmt                                  # vsOr
+   | valueStmt WS? XOR WS? valueStmt                                 # vsXor
+   | valueStmt WS? EQV WS? valueStmt                                 # vsEqv
+   | valueStmt WS? IMP WS? valueStmt                                 # vsImp
+   | implicitCallStmt_InStmt                                         # vsICS
+   | midStmt                                                         # vsMid
    ;
 
 variableStmt
@@ -607,11 +602,11 @@ variableStmt
    ;
 
 variableListStmt
-   : variableSubStmt (WS? COMMA WS? variableSubStmt)*
+   : ambiguousIdentifier typeHint? (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? (WS asTypeClause)?
    ;
 
 variableSubStmt
-   : ambiguousIdentifier typeHint? (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? (WS asTypeClause)?
+   : ambiguousIdentifier (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? typeHint? (WS asTypeClause)?
    ;
 
 whileWendStmt
@@ -631,6 +626,7 @@ writeStmt
    ;
 
 // complex call statements ----------------------------------
+
 explicitCallStmt
    : eCS_ProcedureCall
    | eCS_MemberProcedureCall
@@ -653,7 +649,7 @@ implicitCallStmt_InBlock
 
 // parantheses are forbidden in case of args
 // variables cannot be called in blocks
-// certainIdentifier instead of ambiguousIdentifier for preventing ambiguity with statement keywords 
+// certainIdentifier instead of ambiguousIdentifier for preventing ambiguity with statement keywords
 iCS_B_ProcedureCall
    : certainIdentifier (WS argsCall)?
    ;
@@ -675,19 +671,15 @@ iCS_S_VariableOrProcedureCall
    ;
 
 iCS_S_ProcedureOrArrayCall
-   : (ambiguousIdentifier | baseType | iCS_S_NestedProcedureCall) typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN dictionaryCallStmt?
+   : (ambiguousIdentifier | baseType) typeHint? WS? (LPAREN WS? (argsCall WS?)? RPAREN)+ dictionaryCallStmt?
    ;
-
-iCS_S_NestedProcedureCall
-	: ambiguousIdentifier typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN
-	;
 
 iCS_S_MembersCall
    : (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)? iCS_S_MemberCall + dictionaryCallStmt?
    ;
 
 iCS_S_MemberCall
-   : WS? DOT (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)
+   : DOT (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)
    ;
 
 iCS_S_DictionaryCall
@@ -695,6 +687,7 @@ iCS_S_DictionaryCall
    ;
 
 // atomic call statements ----------------------------------
+
 argsCall
    : (argCall? WS? (COMMA | SEMICOLON) WS?)* argCall (WS? (COMMA | SEMICOLON) WS? argCall?)*
    ;
@@ -729,6 +722,7 @@ subscript
    ;
 
 // atomic rules ----------------------------------
+
 ambiguousIdentifier
    : (IDENTIFIER | ambiguousKeyword) +
    | L_SQUARE_BRACKET (IDENTIFIER | ambiguousKeyword) + R_SQUARE_BRACKET
@@ -790,7 +784,6 @@ literal
    | DOUBLELITERAL
    | FILENUMBER
    | INTEGERLITERAL
-   | OCTALLITERAL
    | STRINGLITERAL
    | TRUE
    | FALSE
@@ -798,13 +791,13 @@ literal
    | NULL
    ;
 
-publicPrivateVisibility 
-	: PRIVATE 
+publicPrivateVisibility
+	: PRIVATE
 	| PUBLIC
 	;
 
-publicPrivateGlobalVisibility 
-	: PRIVATE 
+publicPrivateGlobalVisibility
+	: PRIVATE
 	| PUBLIC
 	| GLOBAL
 	;
@@ -978,6 +971,7 @@ ambiguousKeyword
    ;
 
 // lexer rules --------------------------------------------------------------------------------
+
 // keywords
 
 ACCESS
@@ -1524,7 +1518,7 @@ NULL
    : N U L L
    ;
 
-OBJECT 
+OBJECT
    : O B J E C T
    ;
 
@@ -1933,7 +1927,7 @@ LEQ
    : '<='
    ;
 
-LBRACE 
+LBRACE
 	: '{'
 	;
 
@@ -2042,10 +2036,6 @@ DOUBLELITERAL
 FILENUMBER
    : HASH LETTERORDIGIT +
    ;
-   
-OCTALLITERAL
-	: (PLUS | MINUS)? '&O' [0-7] + AMPERSAND?
-	;
 
 // misc
 FRX_OFFSET
@@ -2065,7 +2055,7 @@ IDENTIFIER
 // whitespace, line breaks, comments, ...
 
 LINE_CONTINUATION
-   : ' ' '_' '\r'? '\n' -> skip
+   : ' ' '_' '\r'? '\n' -> channel(HIDDEN)
    ;
 
 
@@ -2075,7 +2065,7 @@ NEWLINE
 
 
 COMMENT
-   : WS? ('\'' | COLON? REM ' ') (LINE_CONTINUATION | ~ ('\n' | '\r'))* -> skip
+   : WS? ('\'' | COLON? REM ' ') (LINE_CONTINUATION | ~ ('\n' | '\r'))* -> channel(HIDDEN)
    ;
 
 
@@ -2086,12 +2076,12 @@ WS
 // letters
 
 fragment LETTER
-   : [a-zA-Z_√§√∂√º√Ñ√ñ√ú]
+   : [a-zA-Z_‰ˆ¸ƒ÷‹·ÈÌÛ˙¡…Õ”⁄‚ÍÓÙ˚¬ Œ‘€‡ËÏÚ˘¿»Ã“Ÿ„?iıu√?I’UÁ«]
    ;
 
 
 fragment LETTERORDIGIT
-   : [a-zA-Z0-9_√§√∂√º√Ñ√ñ√ú]
+   : [a-zA-Z0-9_‰ˆ¸ƒ÷‹·ÈÌÛ˙¡…Õ”⁄‚ÍÓÙ˚¬ Œ‘€‡ËÏÚ˘¿»Ã“Ÿ„?iıu√?I’UÁ«]
    ;
 
 // case insensitive chars

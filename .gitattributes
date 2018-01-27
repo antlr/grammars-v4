@@ -1,5 +1,93 @@
-# Use \n line break for *.g4 and pom.xml files
-*.g4 eol=lf
-pom.xml eol=lf
+# Recipe from: https://help.github.com/articles/dealing-with-line-endings/#platform-all
+
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+*.abnf text
+*.agc text
+*.asn text
+*.b text
+*.bas text
+*.bnf text
+*.c text
+*.cl text
+*.cpp text
+*.cs text
+*.css text
+*.csv text
+*.dgs text
+*.dot text
+*.erl text
+*.errors text
+*.faa text
+*.ffn text
+*.fna text
+*.g text
+*.g4 text
+*.g42 text
+*.gff text
+*.gml text
+*.go text
+*.gradle text
+*.h text
+*.html text
+*.ics text
+*.idl text
+*.iri text
+*.java text
+*.js text
+*.json text
+*.kt text
+*.lua text
+*.m text
+*.map text
+*.md text
+*.mo text
+*.mps text
+*.ora text
+*.pas text
+*.pc text
+*.pgn text
+*.php text
+*.pkb text
+*.pks text
+*.properties text
+*.proto text
+*.py text
+*.rb text
+*.s text
+*.sh text
+*.smt2 text
+*.sno text
+*.sql text
+*.st text
+*.style text
+*.swift text
+*.tree text
+*.ttl text
+*.txt text
+*.upnp text
+*.vb text
+*.vhd text
+*.x text
+*.xml text
+*.yml text
+access_log text
+
+# Declare files that will always have LF line endings on checkout.
+# Unicode input files end with *.txt, but should not be converted on Windows
+/unicode/graphemes/examples/*.txt eol=lf
+
+# Declare files that will always have CRLF line endings on checkout.
+# Currently the /vb6/**/*.cls and *.frm file need this, otherwise the grammar fails. 
+*.cls text eol=crlf
+*.frm text eol=crlf
+
+# Denote all files that are truly binary and should not be modified.
+*.pdf binary
+*.png binary
+
 
 **/examples/* linguist-vendored

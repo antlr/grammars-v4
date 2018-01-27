@@ -122,6 +122,7 @@ UNCHECKED:     'unchecked';
 UNSAFE:        'unsafe';
 USHORT:        'ushort';
 USING:         'using';
+VAR:		   'var';
 VIRTUAL:       'virtual';
 VOID:          'void';
 VOLATILE:      'volatile';

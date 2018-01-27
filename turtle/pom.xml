@@ -25,6 +25,7 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
+					<grammars>TURTLE.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
 					<sourceDirectory>${basedir}</sourceDirectory>

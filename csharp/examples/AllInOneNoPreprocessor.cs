@@ -124,6 +124,7 @@ namespace My
             var remove = 0;
             var select = 0;
             var set = 0;
+			var var = 0;
             var when = 0;
             var where = 0;
             var yield = 0;

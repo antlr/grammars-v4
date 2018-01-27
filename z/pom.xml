@@ -18,7 +18,12 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>Z.g4</grammars>
+					<grammars>ZParser.g4</grammars>
+					<includes>
+						<include>ZLexer.g4</include>
+						<include>ZParser.g4</include>
+						<include>ZOperatorParser.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

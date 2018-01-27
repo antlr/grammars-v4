@@ -19,11 +19,9 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-						<include>PHPLexer.g4</include>
-						<include>PHPParser.g4</include>
+						<include>PhpLexer.g4</include>
+						<include>PhpParser.g4</include>
 					</includes>
-					<visitor>true</visitor>
-					<listener>true</listener>
 				</configuration>
 				<executions>
 					<execution>
@@ -41,8 +39,8 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>htmlDocument</entryPoint>
-					<grammarName>PHP</grammarName>
-					<caseInsensitive>true</caseInsensitive>
+					<grammarName>Php</grammarName>
+					<caseInsensitiveType>lower</caseInsensitiveType>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

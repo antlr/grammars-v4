@@ -45,22 +45,39 @@ multiplyingExpression
    ;
 
 powExpression
-   : atom (POW atom)*
+   : signedAtom (POW signedAtom)*
+   ;
+
+signedAtom
+   : PLUS signedAtom
+   | MINUS signedAtom
+   | func
+   | atom
    ;
 
 atom
    : scientific
    | variable
+   | constant
    | LPAREN expression RPAREN
-   | func
    ;
 
 scientific
-   : number (E number)?
+   : SCIENTIFIC_NUMBER
+   ;
+
+constant
+   : PI
+   | EULER
+   | I
+   ;
+
+variable
+   : VARIABLE
    ;
 
 func
-   : funcname LPAREN expression RPAREN
+   : funcname LPAREN expression (COMMA expression)* RPAREN
    ;
 
 funcname
@@ -72,20 +89,13 @@ funcname
    | ASIN
    | LOG
    | LN
+   | SQRT
    ;
 
 relop
    : EQ
    | GT
    | LT
-   ;
-
-number
-   : MINUS? DIGIT + (POINT DIGIT +)?
-   ;
-
-variable
-   : MINUS? LETTER (LETTER | DIGIT)*
    ;
 
 
@@ -126,6 +136,11 @@ LN
 
 LOG
    : 'log'
+   ;
+
+
+SQRT
+   : 'sqrt'
    ;
 
 
@@ -174,13 +189,13 @@ EQ
    ;
 
 
-POINT
-   : '.'
+COMMA
+   : ','
    ;
 
 
-E
-   : 'e' | 'E'
+POINT
+   : '.'
    ;
 
 
@@ -189,16 +204,61 @@ POW
    ;
 
 
-LETTER
-   : ('a' .. 'z') | ('A' .. 'Z')
+PI
+   : 'pi'
    ;
 
 
-DIGIT
-   : ('0' .. '9')
+EULER
+   : E2
+   ;
+
+
+I
+   : 'i'
+   ;
+
+
+VARIABLE
+   : VALID_ID_START VALID_ID_CHAR*
+   ;
+
+
+fragment VALID_ID_START
+   : ('a' .. 'z') | ('A' .. 'Z') | '_'
+   ;
+
+
+fragment VALID_ID_CHAR
+   : VALID_ID_START | ('0' .. '9')
+   ;
+
+
+SCIENTIFIC_NUMBER
+   : NUMBER ((E1 | E2) SIGN? NUMBER)?
+   ;
+
+
+fragment NUMBER
+   : ('0' .. '9') + ('.' ('0' .. '9') +)?
+   ;
+
+
+fragment E1
+   : 'E'
+   ;
+
+
+fragment E2
+   : 'e'
+   ;
+
+
+fragment SIGN
+   : ('+' | '-')
    ;
 
 
 WS
-   : [ \r\n\t] + -> channel (HIDDEN)
+   : [ \r\n\t] + -> skip
    ;
