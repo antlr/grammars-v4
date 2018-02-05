@@ -35,10 +35,10 @@ moduleReferences
    ;
 
 moduleReference
-   : OBJECT WS? EQ WS? moduleReferenceGUID SEMICOLON WS? moduleReferenceComponent NEWLINE*
+   : OBJECT WS? EQ WS? moduleReferenceValue (SEMICOLON WS? moduleReferenceComponent)? NEWLINE*
    ;
 
-moduleReferenceGUID
+moduleReferenceValue
    : STRINGLITERAL
    ;
 
@@ -104,12 +104,16 @@ cp_Properties
 	| controlProperties;
 
 cp_SingleProperty
-	: WS? implicitCallStmt_InStmt WS? EQ WS? '$'? literal FRX_OFFSET? NEWLINE+
+	: WS? implicitCallStmt_InStmt WS? EQ WS? '$'? cp_PropertyValue FRX_OFFSET? NEWLINE+
 	;
 
 cp_PropertyName
-	: (OBJECT '.')? complexType
+	: (OBJECT DOT)? ambiguousIdentifier (LPAREN literal RPAREN)? (DOT ambiguousIdentifier (LPAREN literal RPAREN)?)*
 	;
+
+cp_PropertyValue
+    : DOLLAR? (literal | (LBRACE ambiguousIdentifier RBRACE) | POW ambiguousIdentifier)
+    ;
 
 cp_NestedProperty
 	: WS? BEGINPROPERTY WS ambiguousIdentifier (LPAREN INTEGERLITERAL RPAREN)? (WS GUID)? NEWLINE+ (cp_Properties+)? ENDPROPERTY NEWLINE+
@@ -401,7 +405,7 @@ nameStmt
    ;
 
 onErrorStmt
-   : (ON_ERROR | ON_LOCAL_ERROR) WS (GOTO WS valueStmt | RESUME WS NEXT)
+   : (ON_ERROR | ON_LOCAL_ERROR) WS (GOTO WS valueStmt COLON? | RESUME WS NEXT)
    ;
 
 onGoToStmt
@@ -574,7 +578,7 @@ valueStmt
    | valueStmt WS? MOD WS? valueStmt                                 # vsMod
    | valueStmt WS? PLUS WS? valueStmt                                # vsAdd
    | valueStmt WS? MINUS WS? valueStmt                               # vsMinus
-   | valueStmt WS AMPERSAND WS valueStmt                             # vsAmp
+   | valueStmt WS? AMPERSAND WS? valueStmt                             # vsAmp
    | valueStmt WS? EQ WS? valueStmt                                  # vsEq
    | valueStmt WS? NEQ WS? valueStmt                                 # vsNeq
    | valueStmt WS? LT WS? valueStmt                                  # vsLt
@@ -602,7 +606,7 @@ variableListStmt
    ;
 
 variableSubStmt
-   : ambiguousIdentifier (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? typeHint? (WS asTypeClause)?
+   : ambiguousIdentifier typeHint? (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? (WS asTypeClause)?
    ;
 
 whileWendStmt
@@ -614,7 +618,7 @@ widthStmt
    ;
 
 withStmt
-   : WITH WS implicitCallStmt_InStmt NEWLINE + (block NEWLINE +)? END_WITH
+   : WITH WS (NEW WS)? implicitCallStmt_InStmt NEWLINE + (block NEWLINE +)? END_WITH
    ;
 
 writeStmt
@@ -635,7 +639,7 @@ eCS_ProcedureCall
 
 // parantheses are required in case of args -> empty parantheses are removed
 eCS_MemberProcedureCall
-   : CALL WS implicitCallStmt_InStmt? DOT ambiguousIdentifier typeHint? (WS? LPAREN WS? argsCall WS? RPAREN)?
+   : CALL WS implicitCallStmt_InStmt? DOT WS? ambiguousIdentifier typeHint? (WS? LPAREN WS? argsCall WS? RPAREN)?
    ;
 
 implicitCallStmt_InBlock
@@ -667,15 +671,20 @@ iCS_S_VariableOrProcedureCall
    ;
 
 iCS_S_ProcedureOrArrayCall
-   : (ambiguousIdentifier | baseType) typeHint? WS? (LPAREN WS? (argsCall WS?)? RPAREN)+ dictionaryCallStmt?
+   : (ambiguousIdentifier | baseType | iCS_S_NestedProcedureCall) typeHint? WS? (LPAREN WS? (argsCall WS?)? RPAREN)+ dictionaryCallStmt?
    ;
+
+iCS_S_NestedProcedureCall
+	: ambiguousIdentifier typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN
+	;
+
 
 iCS_S_MembersCall
    : (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)? iCS_S_MemberCall + dictionaryCallStmt?
    ;
 
 iCS_S_MemberCall
-   : DOT (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)
+   : WS? DOT (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)
    ;
 
 iCS_S_DictionaryCall
@@ -780,6 +789,7 @@ literal
    | DOUBLELITERAL
    | FILENUMBER
    | INTEGERLITERAL
+   | OCTALLITERAL
    | STRINGLITERAL
    | TRUE
    | FALSE
@@ -2033,6 +2043,10 @@ FILENUMBER
    : HASH LETTERORDIGIT +
    ;
 
+OCTALLITERAL
+   : (PLUS | MINUS)? '&O' [0-7] + AMPERSAND?
+   ;
+   
 // misc
 FRX_OFFSET
 	: COLON [0-9A-F]+
