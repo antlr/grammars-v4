@@ -7,8 +7,8 @@ function parser(__input) {
   var chars = new antlr4.InputStream(__input);
   var lexer = new Python2Lexer.Python2Lexer(chars);
   var tokens = new antlr4.CommonTokenStream(lexer);
-  this.parser = new Python2Parser.Python2Parser(tokens);
-  var tree = this.parser.file_input();
+  var parser = new Python2Parser.Python2Parser(tokens);
+  var tree = parser.file_input();
 }
 
 
