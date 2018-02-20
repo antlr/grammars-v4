@@ -862,12 +862,12 @@ interface_quantity_declaration
   ;
 
 interface_port_declaration
-  : identifier_list COLON signal_mode subtype_indication
+  : identifier_list COLON ( signal_mode )? subtype_indication
     ( BUS )? ( VARASGN expression )?
   ;
 
 interface_signal_declaration
-  : SIGNAL identifier_list COLON subtype_indication
+  : SIGNAL identifier_list COLON ( signal_mode )? subtype_indication
     ( BUS )? ( VARASGN expression )?
   ;
 
@@ -956,32 +956,37 @@ multiplying_operator
 //     ;
 // changed to avoid left-recursion to name (from selected_name, indexed_name,
 // slice_name, and attribute_name, respectively)
-// (2.2.2004, e.f.)
+// (2.2.2004, e.f.) + (12.07.2017, o.p.)
 name
-  : selected_name  
-  | name_part ( DOT name_part)*
+  : ( identifier | STRING_LITERAL ) ( name_part )*
   ;
 
 name_part
-   : selected_name (name_attribute_part | name_function_call_or_indexed_part | name_slice_part)?
-   ;
-   
-name_attribute_part
-   : APOSTROPHE attribute_designator ( expression ( COMMA expression )* )?
-   ;
-
-name_function_call_or_indexed_part
-   : LPAREN actual_parameter_part? RPAREN
-   ;
-
-name_slice_part
-   : ( LPAREN explicit_range ( COMMA explicit_range )* RPAREN )+
+  : selected_name_part
+  | function_call_or_indexed_name_part
+  | slice_name_part
+  | attribute_name_part
    ;
 
 selected_name
    : identifier (DOT suffix)*
    ;
 
+selected_name_part
+  : ( DOT suffix )+
+  ;
+
+function_call_or_indexed_name_part
+  : LPAREN actual_parameter_part RPAREN
+  ;
+
+slice_name_part
+  : LPAREN discrete_range RPAREN
+  ;
+
+attribute_name_part
+  : ( signature )? APOSTROPHE attribute_designator ( LPAREN expression RPAREN )?
+  ;
 
 nature_declaration
   : NATURE identifier IS nature_definition SEMI
