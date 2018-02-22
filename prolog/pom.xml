@@ -37,8 +37,8 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>program</entryPoint>
-					<grammarName>prolog</grammarName>
+					<entryPoint>p_text</entryPoint>
+					<grammarName>Prolog</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
