@@ -1,0 +1,21 @@
+namespace flatbuffer;
+
+table FResultInfo{
+    code : int;
+    data : FDebrisInfo;
+}
+
+table FDebrisInfo{
+    debrisList:[FDebris];
+    debrisHelp:string;
+
+}
+table FDebris{
+    image:string;
+    changeNum:int;
+    id:long;
+    name:string;
+    highlight:bool;
+}
+
+root_type FResultInfo;
