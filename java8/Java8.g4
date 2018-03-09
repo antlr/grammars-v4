@@ -70,11 +70,6 @@ literal
  * Productions from §4 (Types, Values, and Variables)
  */
 
-type
-	:	primitiveType
-	|	referenceType
-	;
-
 primitiveType
 	:	annotation* numericType
 	|	annotation* 'boolean'
@@ -456,7 +451,8 @@ methodDeclarator
 	;
 
 formalParameterList
-	:	formalParameters ',' lastFormalParameter
+	:	receiverParameter
+	|	formalParameters ',' lastFormalParameter
 	|	lastFormalParameter
 	;
 
