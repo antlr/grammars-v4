@@ -478,8 +478,8 @@ blockItemList
     ;
 
 blockItem
-    :   declaration
-    |   statement
+    :   statement
+    |   declaration
     ;
 
 expressionStatement
