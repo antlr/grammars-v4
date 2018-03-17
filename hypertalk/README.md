@@ -2,7 +2,7 @@
 
 An Antlr4 grammar for parsing HyperTalk, the scripting language of Apple's long-obsolete (but still insanely great) HyperCard. HyperTalk was created in 1987 by Dan Winkler and Bill Atkinson.
 
-This grammar is part of the [HyperTalk Java](https://github.com/defano/hypertalk-java) project, an open-sourced clone of HyperCard. A detailed description of this flavor of the language is [available here](https://github.com/defano/hypertalk-java#the-hypertalk-language).
+This grammar is part of the [WyldCard](https://github.com/defano/wyldcard) project, an open-sourced clone of HyperCard. A detailed description of this flavor of the language is [available here](https://github.com/defano/wyldcard#the-hypertalk-language).
 
 HyperTalk's elegant syntax mimics natural English (`sort the lines of field "Students" by the last word of each`), relying on a context-sensitive evaluation of terms (called _factors_) to eliminate referential and type formalities present in most programming languages. HyperTalk "does what I mean, not what I said."
 
@@ -27,14 +27,14 @@ Symbol      | Description
 -- stay within the bounds of the button named "Boundary".
 --
 on mouseDown
-	put the name of me into oldName
-	repeat while the mouse is down
-		if the mouseLoc is within the rect of card button "boundary" then
-			set the location of me to the mouseLoc
-			set the name of me to "(" & the mouseLoc & ")"
-		end if
-	end repeat
-	set the name of me to oldName
+  put the name of me into oldName
+  repeat while the mouse is down
+    if the mouseLoc is within the rect of card button "boundary" then
+      set the location of me to the mouseLoc
+      set the name of me to "(" & the mouseLoc & ")"
+    end if
+  end repeat
+  set the name of me to oldName
 end mouseDown
 ```
 

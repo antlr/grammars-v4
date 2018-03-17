@@ -63,18 +63,13 @@ handlerName
     | commandName   // Handlers can take the name of a command keyword (other keywords are disallowed)
     ;
 
-argumentList
-    : expression
-    | argumentList ',' expression
-    ;
-
 parameterList
     : ID
     | parameterList ',' ID
     ;
 
 statementList
-    : statement? NEWLINE statementList
+    : statement NEWLINE+ statementList
     | statement NEWLINE+
     ;
 
@@ -114,13 +109,13 @@ elseStatement
     ;
 
 repeatStatement
-    : 'repeat' repeatRange NEWLINE statementList 'end' 'repeat'
+    : 'repeat' repeatRange NEWLINE+ statementList 'end' 'repeat'
     | 'repeat' repeatRange NEWLINE+ 'end' 'repeat'
     ;
 
 messageStatement
     : ID
-    | ID argumentList
+    | ID listExpression
     ;
 
 commandStmnt
@@ -135,8 +130,8 @@ commandStmnt
     | 'beep' expression
     | 'choose' toolExpression 'tool'?
     | 'choose' 'tool' toolExpression
-    | 'click' 'at' expression
-    | 'click' 'at' expression 'with' argumentList
+    | 'click' 'at' listExpression
+    | 'click' 'at' listExpression 'with' listExpression
     | 'close' 'file' expression
     | 'convert' container 'to' convertible
     | 'convert' container 'from' convertible 'to' convertible
@@ -149,22 +144,29 @@ commandStmnt
     | 'divide' expression 'by' expression
     | 'do' expression
     | 'domenu' expression
-    | 'drag' 'from' expression 'to' expression
-    | 'drag' 'from' expression 'to' expression 'with' argumentList
+    | 'drag' 'from' listExpression 'to' listExpression
+    | 'drag' 'from' listExpression 'to' listExpression 'with' listExpression
+    | 'edit' 'the'? 'script' of expression
     | 'enable' expression
     | 'exit' handlerName
     | 'exit' 'repeat'
     | 'exit' 'to' 'hypercard'
-    | find expression
-    | find expression of expression
-    | find expression of 'marked' cards
-    | find expression of expression of 'marked' cards
+    | 'export' 'paint' 'to' 'file' expression
+    | 'find' expression? 'international'? expression of expression of 'marked' cards
+    | 'find' expression? 'international'? expression of expression
+    | 'find' expression? 'international'? expression of 'marked' cards
+    | 'find' expression? 'international'? expression
     | 'get' expression
     | 'go' 'to'? expression 'with' 'visual' expression
     | 'go' 'to'? expression
     | 'go' 'back'
     | 'go' 'back' 'with' 'visual' expression
     | 'hide' expression
+    | 'hide' card picture
+    | 'hide' background picture
+    | 'hide' picture of expression
+    | 'hide' 'titlebar'
+    | 'import' 'paint' 'from' 'file' expression
     | 'lock' 'screen'
     | 'multiply' expression 'by' expression
     | 'next' 'repeat'
@@ -174,8 +176,8 @@ commandStmnt
     | 'pop' card
     | 'push' card
     | 'push' expression
-    | 'put' expression
-    | 'put' expression preposition expression
+    | 'put' listExpression
+    | 'put' listExpression preposition expression
     | 'read' 'from' 'file' expression
     | 'read' 'from' 'file' expression 'for' expression
     | 'read' 'from' 'file' expression 'at' expression 'for' expression
@@ -190,8 +192,12 @@ commandStmnt
     | 'select' 'before' expression
     | 'select' 'after' expression
     | 'set' property 'to' propertyValue
-    | 'send' expression 'to' expression
+    | 'send' listExpression 'to' expression
     | 'show' expression
+    | 'show' card picture
+    | 'show' background picture
+    | 'show' picture of expression
+    | 'show' 'titlebar'
     | 'sort' sortChunkType expression sortDirection sortStyle
     | 'sort' sortChunkType expression sortDirection sortStyle 'by' expression
     | 'sort' sortDirection sortStyle 'by' expression
@@ -201,6 +207,9 @@ commandStmnt
     | 'sort' expression sortDirection sortStyle 'by' expression
     | 'sort' 'the'? cards of expression sortDirection sortStyle 'by' expression
     | 'sort' 'the'? 'marked' cards of expression sortDirection sortStyle 'by' expression
+    | 'speak' expression
+    | 'speak' expression 'with' gender=('male'|'female'|'neuter'|'robotic') 'voice'
+    | 'speak' expression 'with' 'voice' expression
     | 'subtract' expression 'from' expression
     | 'type' expression
     | 'type' expression 'with' ('commandkey' | 'cmdkey')
@@ -222,15 +231,15 @@ convertible
     ;
 
 conversionFormat
-    : 'seconds'
+    : seconds
     | 'dateitems'
-    | timeDateFormat 'date'
-    | timeDateFormat 'time'
+    | length 'date'
+    | length 'time'
     ;
 
-timeDateFormat
+length
     : ('english' | 'long')
-    | ('abbreviated' | 'abbrev')
+    | ('abbreviated' | 'abbrev' | 'abbr')
     | 'short'
     |
     ;
@@ -244,6 +253,8 @@ sortDirection
 sortChunkType
     : 'the'? line of
     | 'the'? item of
+    | 'the'? word of
+    | 'the'? character of
     |
     ;
 
@@ -316,7 +327,8 @@ globalProperty
     ;
 
 partProperty
-    : 'the'? propertyName of expression
+    : 'the'? propertyName of factor
+    | 'the'? length propertyName of factor
     ;
 
 part
@@ -328,25 +340,31 @@ part
     | fieldPart
     | bkgndPart
     | cardPart
+    | stackPart
+    ;
+
+stackPart
+    : 'this' stack
+    | stack factor
     ;
 
 buttonPart
     : card? button 'id' factor
-    | background? button 'id' factor
-    | background? button factor
-    | ordinal background? button
+    | background button 'id' factor
     | card? button factor
+    | background button factor
     | ordinal card? button
+    | ordinal background button
     | buttonPart of cardPart
     ;
 
 fieldPart
-    : card? field 'id' factor
+    : card field 'id' factor
     | background? field 'id' factor
+    | card field factor
     | background? field factor
+    | ordinal card field
     | ordinal background? field
-    | card? field factor
-    | ordinal card? field
     | fieldPart of cardPart
     ;
 
@@ -367,10 +385,16 @@ bkgndPart
     | position background
     ;
 
+listExpression
+    : expression
+    | expression ',' listExpression
+    ;
+
 expression
     : factor
     | 'not' expression
     | '-' expression
+    | op=('there is a'|'there is an'|'there is no'|'there is not a'|'there is not an') expression
     | expression '^' expression
     | expression op=('mod'| 'div'| '/'| '*') expression
     | expression op=('+'| '-') expression
@@ -394,6 +418,7 @@ factor
 container
     : ID
     | 'the'? 'selection'
+    | 'target'
     | property
     | menu
     | menuItem
@@ -430,14 +455,14 @@ effectExpression
 
 functionCall
     : builtInFunc
-    | ID '(' argumentList? ')'
+    | ID '(' listExpression? ')'
     ;
 
 builtInFunc
     : 'the' zeroArgFunc
     | 'the'? singleArgFunc of factor
-    | singleArgFunc '(' expression ')'
-    | multiArgFunc '(' argumentList ')'
+    | singleArgFunc '(' listExpression ')'
+    | multiArgFunc '(' listExpression ')'
     ;
 
 zeroArgFunc
@@ -448,10 +473,11 @@ zeroArgFunc
     | 'shiftkey'
     | 'optionkey'
     | 'ticks'
-    | 'seconds'
-    | timeDateFormat 'time'
-    | timeDateFormat 'date'
+    | seconds
+    | length 'time'
+    | length 'date'
     | 'tool'
+    | 'mouseclick'
     | 'number' 'of' card? 'parts'
     | 'number' 'of' background 'parts'
     | 'number' 'of' card? button
@@ -471,6 +497,9 @@ zeroArgFunc
     | 'selectedchunk'
     | 'selectedfield'
     | 'selectedline'
+    | 'target'
+    | 'speech'
+    | 'voices'
     | 'clicktext'
     | 'mouseh'
     | 'mousev'
@@ -530,9 +559,8 @@ literal
     | modifierKey
     | mouseState
     | knownType
+    | findType
     | LITERAL
-    | TWO_ITEM_LIST
-    | FOUR_ITEM_LIST
     ;
 
 preposition
@@ -613,12 +641,11 @@ knownType
     | 'bool'
     ;
 
-find
-    : 'find' 'word' 'international'?
-    | 'find' 'chars' 'international'?
-    | 'find' 'whole' 'international'?
-    | 'find' 'string' 'international'?
-    | 'find' 'international'?
+findType
+    : 'word'
+    | 'chars'
+    | 'whole'
+    | 'string'
     ;
 
 // Not all properties need to be enumerated here, only those sharing a name with another keyword.
@@ -638,6 +665,7 @@ propertyName
     | 'top'
     | 'center'
     | 'scroll'
+    | 'script'
     | ID
     ;
 
@@ -650,7 +678,7 @@ propertyValue
     | 'right'
     | 'top'
     | 'center'
-    | expression
+    | listExpression
     ;
 
 commandName
@@ -692,6 +720,20 @@ commandName
     | 'close'
     | 'select'
     | 'find'
+    | 'import'
+    | 'export'
+    ;
+
+picture
+    : 'picture'
+    | 'pict'
+    ;
+
+seconds
+    : 'seconds'
+    | 'secs'
+    | 'second'
+    | 'sec'
     ;
 
 speed
@@ -745,9 +787,7 @@ effect
 timeUnit
     : 'ticks'
     | 'tick'
-    | 'seconds'
-    | 'sec'
-    | 'second'
+    | seconds
     ;
 
 position
@@ -757,9 +797,7 @@ position
     ;
 
 message
-    : 'the'? ('message' | 'msg')
-    | 'the'? ('message' | 'msg') 'box'
-    | 'the'? ('message' | 'msg') 'window'
+    : 'the'? ('message' | 'msg') ('box' | 'window' | )
     ;
 
 cards
@@ -795,6 +833,10 @@ field
     | 'flds'
     ;
 
+stack
+    : 'stack'
+    ;
+
 character
     : 'character'
     | 'characters'
@@ -819,8 +861,8 @@ item
 
 of
     : 'of'
-    | 'in'
     | 'from'
+    | 'in'
     ;
 
 ID
@@ -828,7 +870,7 @@ ID
     ;
 
 BREAK
-    : ('|' | '¬') NEWLINE -> skip
+    : ('|' | '¬') WHITESPACE? COMMENT? WHITESPACE? NEWLINE -> skip
     ;
 
 LITERAL
@@ -849,14 +891,6 @@ NUMBER_LITERAL
 
 STRING_LITERAL
     : '"' ~('"' | '\r' | '\n')* '"'
-    ;
-
-TWO_ITEM_LIST
-    : (LITERAL ',' LITERAL)
-    ;
-
-FOUR_ITEM_LIST
-    : (LITERAL ',' LITERAL ',' LITERAL ',' LITERAL)
     ;
 
 ALPHA
