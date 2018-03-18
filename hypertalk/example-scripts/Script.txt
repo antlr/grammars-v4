@@ -108,6 +108,11 @@ on testLoops
         -- comment
     end repeat
 
+    repeat
+        -- comment
+        statement
+    end repeat
+
     repeat for x
 
     end repeat
@@ -143,9 +148,6 @@ on testProperties
     the itemdelimiter
     put "," into the itemdelimiter
     set the itemdelimiter to "|"
-    answer the selectedfield
-    put the selectedchunk
-    get the selectedline
 
     -- part properties
     set the name of me to x
@@ -154,9 +156,10 @@ on testProperties
     put "name" into me
     put "before" before the first word of the name of me   -- not legal in HyperCard, okay here
 
-    the selectedchunk of fld 1
-    the selectedline of cd fld id 32
-    the selectedline of fld "my field"
+    -- stack properties
+    get the name of this stack
+    get the name of stack "My Stack"
+    set the name of this stack to "Renamed"
 
 end testProperties
 
@@ -250,10 +253,6 @@ on testSingleArgFunctions
     the number of lines of x
     the number of menuitems of x
     the number of cards of x
-    the number of card field x
-    the number of fld x
-    the number of background button id y
-    the number of button "x"
 
     the random of x
     random(x)
@@ -427,6 +426,9 @@ on commandsTest
     drag from 10,10 to "100,100"
     drag from the mouseloc to 10,10 with shiftkey, optionkey
 
+    edit the script of cd btn 1
+    edit script of this card
+
     enable fld "My Field"
     enable menuitem "Undo" of menu "Edit"
     enable menu "File"
@@ -435,6 +437,9 @@ on commandsTest
     exit testCommands
     exit repeat
     exit to hypercard
+
+    export paint to file x
+    export paint to file "image.png"
 
     find x
     find x in card field 1
@@ -451,6 +456,9 @@ on commandsTest
     get char 3 of the middle word of item 11 of line 17 of theText
     get the number of bg button x
     get the number of the last card in this background
+    get the selectedchunk of x
+    get the selectedline of y
+    get the selectedtext of z
 
     go to card 1
     go to the last card
@@ -471,6 +479,19 @@ on commandsTest
 
     hide field "bananas"
     hide the third cd btn
+    hide card picture
+    hide bkgnd picture
+    hide picture of the last card
+    hide picture of background id 2
+
+    import paint from file "My Image.png"
+
+    show field "bananas"
+    show the third cd btn
+    show card picture
+    show bkgnd picture
+    show picture of the last card
+    show picture of background id 2
 
     lock screen
 
@@ -680,9 +701,9 @@ on operatorsTest
     x is in y
     9.99 is a number
     9 is an integer
-    10,10 is a point
-    10,10,20,20 is a rect
-    10,10,20,20 is a rectangle
+    "10,10" is a point
+    "10,10,20,20" is a rect
+    "10,10,20,20" is a rectangle
     "1/1/2012" is a date
     true is a logical
     false is a boolean
@@ -694,13 +715,17 @@ on operatorsTest
     x is not a logical
     x is not a boolean
     x is not a bool
-    100,100 is not in 10,10,20,20
+    "100,100" is not in "10,10,20,20"
     x = y
     x is not y
     x is y
     x is not within y
     x and y
     x or y
+    there is a card button "my button"
+    there is a card field id 2
+    there is not a first background
+    there is no field 13
 
 end operatorsTest
 
@@ -722,16 +747,15 @@ on literalsTest
     3-2
     -2-4
 
-    -- Point & Rect Literals
-    10,10
-    0,0,100,100
-
     -- Line wrapping
     answer "How are you?" |
         with "Choice 1"   |
         or "Choice 2"
 
     ask "Yes?" ¬
+        with "No"
+
+    ask "Yes?" ¬    -- Comments are acceptable here
         with "No"
 
     -- mouse states
@@ -867,9 +891,13 @@ end f
 --
 
 on answer
+    statement
+    -- comment
 end answer
 
 on ask
+    -- comment
+    statement
 end ask
 
 on put
