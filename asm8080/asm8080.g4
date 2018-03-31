@@ -29,7 +29,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
+/*
+* http://fms.komkon.org/comp/CPUs/8080.txt
+*/
 grammar asm8080;
 
 prog
@@ -168,6 +170,30 @@ opcode
    | 'DI'
    | 'EI'
    | 'RST'  
+   | 'JNZ'
+   | 'JZ'
+   | 'JNC'
+   | 'JC'
+   | 'JPO'
+   | 'JPE'
+   | 'JP'
+   | 'JM'
+   | 'CNZ'
+   | 'CZ'
+   | 'CNC'
+   | 'CC'
+   | 'CPO'
+   | 'CPE'
+   | 'CP'
+   | 'CM'
+   | 'RNZ'
+   | 'RZ'
+   | 'RNC'
+   | 'RC'
+   | 'RPO'
+   | 'RPE'
+   | 'RP'
+   | 'RM'
    ;
 
 NAME
