@@ -29,6 +29,7 @@
 				<module>apex</module>
 				<module>arithmetic</module>
 				<module>asm6502</module>
+				<module>asm8080</module>
 				<module>asn</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 				<!--		<module>aspectj</module> -->
