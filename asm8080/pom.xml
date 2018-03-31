@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>asm8080</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com 8080 Assembler Grammar</name>
+	<name>khubla.com 8080 grammar</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -35,7 +35,7 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<verbose>true</verbose>
+					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>prog</entryPoint>
 					<grammarName>asm8080</grammarName>
