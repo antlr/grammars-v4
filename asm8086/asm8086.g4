@@ -45,7 +45,7 @@ instruction
    ;
 
 directive
-   : argument? assemblerdirective expressionlist
+   : argument? assemblerdirective expressionlist?
    ;
 
 assemblerdirective
@@ -78,6 +78,7 @@ argument
    | name 
    | string
    | ('(' expression ')')
+   | 'not' expression
    ;
 
 dollar
@@ -333,7 +334,7 @@ NAME
 
 
 NUMBER
-   : '$'? ('-' |'+' )? [0-9a-fA-F] + ('H' | 'h')?
+   : '$'? ('-')? [0-9a-fA-F] + ('H' | 'h')?
    ;
 
 
