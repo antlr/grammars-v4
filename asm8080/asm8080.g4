@@ -124,7 +124,7 @@ ASSEMBLER_DIRECTIVE
    ;
 
 REGISTER
-    : 'A' | 'B' | 'C' | 'D' | 'E' | 'H' | 'L'
+    : 'A' | 'B' | 'C' | 'D' | 'E' | 'H' | 'L' | 'PC' | 'SP'
     ;
 
 OPCODE

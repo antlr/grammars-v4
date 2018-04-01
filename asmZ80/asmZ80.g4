@@ -113,7 +113,7 @@ comment
    ;
 
 REGISTER
-    : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'H'| 'L' | 'I' | 'R' | 'IXH' | 'IXL' | 'IYH' | 'IYL'
+    : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'H'| 'L' | 'I' | 'R' | 'IXH' | 'IXL' | 'IYH' | 'IYL' | 'AF' | 'BC' | 'DE' | 'HL' | 'PC' | 'SP' | 'IX' | 'IY'
     ;
 
 ASSEMBLER_DIRECTIVE
