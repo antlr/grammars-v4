@@ -36,7 +36,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>prog</entryPoint>
+					<entryPoint>compilation</entryPoint>
 					<grammarName>plm</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

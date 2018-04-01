@@ -46,7 +46,6 @@ nonquotecharacter
    | decimaldigit
    | '$'
    | specialcharacter
-   | blank
    ;
 
 letter
@@ -112,17 +111,9 @@ lowercaseletter
    | 'z'
    ;
 
-decimaldigit
-   : '0'
-   | '1'
-   | '2'
-   | '3'
-   | '4'
-   | '5'
-   | '6'
-   | '7'
-   | '8'
-   | '9'
+
+DECIMALDIGIT
+   : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
    ;
 
 specialcharacter
@@ -146,7 +137,6 @@ specialcharacter
 token
    : delimiter
    | identifier
-   | reservedword
    | numericconstant
    | string
    ;
@@ -276,8 +266,7 @@ plmtext
    ;
 
 separator
-   : blank
-   | comment
+   : comment?
    ;
 
 comment
@@ -285,7 +274,7 @@ comment
    ;
 
 compilation
-   : module [ E O F ]
+   : module
    ;
 
 module
@@ -356,10 +345,6 @@ variableattributes
    | 'EXTERNAL'? constantattribute?
    ;
 
-locator
-   : 'AT' (expression)
-   ;
-
 constantattribute
    : 'DATA'
    ;
@@ -425,10 +410,6 @@ memberelement
 
 unfactoredmember
    : membername (explicitdimension)? variabletype
-   ;
-
-membername
-   : identifier
    ;
 
 factoredmember
@@ -622,10 +603,6 @@ endstatement
    : 'END' identifier?
    ;
 
-procedurestatement
-   : procedurename ':' 'PROCEDURE' formalparameterlist? proceduretype? procedureattributes?
-   ;
-
 conditionalclause
    : ifcondition trueunit
    | ifcondition trueelement 'ELSE' falseelement
@@ -744,15 +721,6 @@ logicaloperator
    | 'OR'
    | 'NOT'
    | 'XOR'
-   ;
-
-relationaloperator
-   : '<'
-   | '>'
-   | '<='
-   | '>='
-   | '<>'
-   | '='
    ;
 
 arithmeticoperator
