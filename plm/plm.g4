@@ -255,11 +255,6 @@ STRINGBODYELEMENT
    | '"'
    ;
 
-plmtext
-   : token
-   | separator (token | separator)*
-   ;
-
 separator
    : COMMENT?
    ;
@@ -273,7 +268,7 @@ compilation
    ;
 
 module
-   : module name ':' simpledoblock
+   : modulename ':' simpledoblock
    ;
 
 modulename
@@ -408,11 +403,11 @@ unfactoredmember
    ;
 
 factoredmember
-   : (membername (',' membername)*) explicitdimension? variabletype
+   : membername (',' membername)* explicitdimension? variabletype
    ;
 
 proceduredefinition
-   : procedurestatement (declaration)? (unit*)? ending
+   : procedurestatement declaration? unit* ending
    ;
 
 procedurestatement
@@ -608,8 +603,8 @@ ifcondition
    ;
 
 trueelement
-   : (labeldefinition*)? doblock
-   | (labeldefinition*)? basicstatement
+   : labeldefinition* doblock
+   | labeldefinition* basicstatement
    ;
 
 falseelement
@@ -628,23 +623,23 @@ doblock
    ;
 
 simpledoblock
-   : simpledostatement (declaration*)? (unit*)? ending
+   : simpledostatement declaration* unit* ending
    ;
 
 ending
-   : (labeldefinition*)? endstatement
+   : labeldefinition* endstatement
    ;
 
 docaseblock
-   : docasestatement (unit*)? ending
+   : docasestatement unit* ending
    ;
 
 dowhileblock
-   : dowhilestatement (unit*)? ending
+   : dowhilestatement unit* ending
    ;
 
 iterativedoblock
-   : iterativedostatement (unit*)? ending
+   : iterativedostatement unit* ending
    ;
 
 primary
