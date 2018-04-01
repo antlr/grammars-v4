@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2018, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,46 +33,45 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar plm;
 
 
-<character>::= <apostrophe> | <non-quote character>;
-<apostrophe>::= '\'';
-<non-quote character>::= <letter> | <decimal digit> | $ | <special character> | blank;
-<letter>::= <uppercase letter> | <lowercase letter>;
-<uppercase letter>::= A | B | C | D | E | F | G | H | I | J | K | L |
-M | N | O | P | Q | R | S | T | U | V | W | X |
-Y | Z;
-<lowercase letter>::= a | b | c | d | e | f | g | h | i | j | k | l |
-m | n | o | p | q | r | s | t | u | v | w | x |
-y | z;
-<decimal digit>::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-<special character>::= + | - | * | / | < | > | = | : | ; | . | , |( | ) | @ | _;
+character : apostrophe | nonquotecharacter;
+apostrophe: '\'';
+nonquotecharacter: letter | decimaldigit | '$' | specialcharacter | blank;
 
-<token>::= <delimiter> | <identifier> | <reserved word> | <numeric constant> | <string>;
+letter : uppercaseletter | lowercaseletter;
+uppercaseletter : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' |
+'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' |
+'Y' | 'Z';
+lowercaseletter: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' |
+'m' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' |
+'y' | 'z';
+decimaldigit: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+specialcharacter:  '+' | '-' | '*' | '/' | '<' | '>' | '=' | ':' | ';' | '.' | ',' |'(' | ')' | '@' | '_';
 
-<delimiter>::= <simple delimiter> | <compound delimiter>;
-<simple delimiter>::= + | - | * | / | < | > | = | : | ; | . | , | ( |
-) | @;
-<compound delimiter>::= <> | <= | >= | :=;
+token: delimiter | identifier | reservedword | numericconstant | string;
 
-<first id character>::= <letter> | _;
-<identifier>::= <first id character> [<letter> |c<decimal digit> | $ | _ ]...
+delimiter: simpledelimiter | compounddelimiter;
+simpledelimiter: '+' | '-' | '*' | '/' | '<' | '>' | '=' | ':' | ';' | '.' | ',' | '(' |
+')' | '@';
+compounddelimiter: '<>' | '<=' | '>=' | ':=';
+
+firstidcharacter: letter | '_';
+identifier: firstidcharacter (letter | decimaldigit | '$' | '_' )*;
 
 
-<numeric constant>::= <binary number> | <octal number> |<decimal number> | <hexadecimal number> |
-<floating point number>;
-<binary number>::= <binary digit> [<binary digit> | $]... B | Q;
-<octal number>::= <octal digit> [<octal digit> | $]... { O | Q };
-<decimal number>::= <decimal digit> [<decimal digit> | $]... [D];
-<hexadecimal number>::= <decimal digit> [<hexadecimal digit>
-| $]... H;
-<floating point number>::= <digit string> <fractional part>
-[<exponent part>];
-<fractional part>::= [<.digit string>];
-<exponent part>::= E [+ | -] <digit string>;
-<digit string>::= <decimal digit> [<decimal digit> | $]...;
-<binary digit>::= 0 | 1;
-<octal digit>::= <binary digit> | 2 | 3 | 4 | 5 | 6 | 7;
-<decimal digit>::= <octal digit> | 8 | 9;
-<hexadecimal digit>::= <decimal digit> | A | B | C | D | E | F;
+numericconstant: binarynumber | octalnumber |decimalnumber | hexadecimalnumber |
+floatingpointnumber;
+binarynumber: binarydigit (binarydigit | '$')* 'B' | 'Q';
+octalnumber: octaldigit (octaldigit | '$')* ( 'O' | 'Q' );
+decimalnumber: decimaldigit (decimaldigit | '$')* ('D')?;
+hexadecimalnumber: decimaldigit (hexadecimaldigit| '$')* 'H';
+floatingpointnumber: digitstring fractionalpart (exponentpart)?;
+fractionalpart: ('.' digitstring)?;
+exponentpart: 'E' ('+' | '-')? digitstring;
+digitstring: decimaldigit (decimaldigit | '$')*;
+binarydigit: '0' | '1';
+octaldigit: binarydigit | '2' | '3' | '4' | '5' | '6' | '7';
+decimaldigit: octaldigit| '8' | '9';
+hexadecimaldigit: decimaldigit| 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
 
 <string>::= '<string body element> [<string body element>]... ';
 <string body element>::= <non-quote character> |";
@@ -80,81 +79,64 @@ y | z;
 <separator>::= blank | <comment>;
 <comment>::= /* [<character>]... */;
 
-<compilation>::= <module> [EOF];
-<module>::= <module name>:<simple do block>;
-<module name>::= <identifier>;
+compilation: module [EOF];
+module: module name ':' simpledoblock;
+modulename : identifier;
 
-<declaration>::= <declare statement> | <procedure definition>;
+declaration: declarestatement | proceduredefinition;
 
-<declare statement>::= DECLARE <declare element list>;
-<declare element list>::= <declare element>[,<declare element>]...;
-<declare element>::= <factored element> | <unfactored element>;
-<unfactored element>::= <variable element> | <literal element> |
-<label element>;
-<factored element>::= <factored variable element> |;
-<factored label element>
+declarestatement: 'DECLARE' declareelementlist;
+declareelementlist: declareelement (',' declareelement)*;
+declareelement: factoredelement | unfactoredelement;
+unfactoredelement: variableelement | literalelement |labelelement;
+factoredelement: factoredvariableelement |factoredlabelelement;
 
-<variable element>::= <variable name specifier> [<array specifier>]
-<variable type> | [<variable attributes>];
-<variable name specifier>::= <non-based name> |
-<based name> BASED <base specifier>;
-<non-based name>::= <variable name>;
-<based name>::= <variable name>;
-<variable name>::= <identifier>;
-<base specifier>::= <identifier>[.<identifier>];
-<variable attributes>::= [PUBLIC] [<locator>][<initialization>] |
-[EXTERNAL] [<constant attribute>];
-<locator>::= AT(<expression>);
-<constant attribute>::= DATA;
-<array specifier>::= <explicit dimension> | <implicit dimension>;
-<explicit dimension>::= (<numeric constant>);
-<implicit dimension>::= (*);
+variableelement: variablenamespecifier (arrayspecifier)? variabletype | (variableattributes)?;
+variablenamespecifier: nonbasedname | basedname 'BASED' basespecifier;
+nonbasedname: variablename;
+basedname: variablename;
+variablename: identifier;
+basespecifier: identifier ('.' identifier)?;
+variableattributes: 'PUBLIC'? locator? initialization? | 'EXTERNAL'? constantattribute?;
+locator: 'AT' (expression);
+constantattribute: 'DATA';
+arrayspecifier: explicitdimension | implicitdimension;
+explicitdimension: numericconstant;
+implicitdimension: '*';
 
-<variable type>::= <basic type> | <structure type>;
-<basic type>::= Address | BYTE | HWORD | DWORD | QWORD | CHARINT |
-OFFSET | SHORTINT | INTEGER | REAL | SELECTOR |
-POINTER | OFFSET;
+variabletype: basictype | structuretype;
+basictype: 'Address' | 'BYTE' | 'HWORD' | 'DWORD' | 'QWORD' | 'CHARINT' |
+'OFFSET' | 'SHORTINT' | 'INTEGER' | 'REAL' | 'SELECTOR' |
+'POINTER' | 'OFFSET';
 
-<label element>::= <identifier> LABEL [PUBLIC | EXTERNAL];
+labelelement: identifier 'LABEL' ('PUBLIC' | 'EXTERNAL')?;
 
-<literal element>::= <identifier> LITERALLY <string>;
+literalelement: identifier 'LITERALLY' string;
 
-<factored variable element>::= ( <variable name specifier>
-[,<variable name specifier>]...)
-[<explicit dimension>] <variable type>
-[<variable attributes>];
+factoredvariableelement: ( variablenamespecifier (',' variablenamespecifier)*) explicitdimension? variabletype variableattributes?;
 
-<factored label element>::= (<identifier> [,<identifier>]...)
-LABEL [PUBLIC | EXTERNAL];
+factoredlabelelement: (identifier (','<identifier>)*) 'LABEL' ('PUBLIC' | 'EXTERNAL')?;
 
-<structure type>::= STRUCTURE (<member element>
-[,<member element>]...);
-<member element>::= <unfactored member> | <factored member>;
-<unfactored member>::= <member name> [<explicit dimension>]
-<variable type>;
-<member name>::= <identifier>;
-<factored member>::= (<member name>(,<member name>)...)
-[<explicit dimension>] <variable type>;
+structuretype: 'STRUCTURE' (memberelement (',' memberelement)*);
+memberelement: unfactoredmember | factoredmember;
+unfactoredmember: membername (explicitdimension)? variabletype;
+membername: identifier;
+factoredmember: (membername(',' membername)*) explicitdimension? variabletype;
 
-<procedure definition>::= <procedure statement> [<declaration>...]
-[<unit>...] <ending>;
-<procedure statement>::= <procedure name> : PROCEDURE;
-[<formal parameter list>] [<procedure type>]
-[<procedure attributes>];
-<procedure name>::= <identifier>;
-<procedure type>::= <basic type>;
-<formal parameter list>::= (<formal parameter>
-[,<formal parameter>]...);
-<formal parameter>::= <identifier>;
-<procedure attributes>::= {EXTERNAL | PUBLIC;
+proceduredefinition:procedurestatement (declaration)? (unit*)? ending;
+procedurestatement: procedurename ':' 'PROCEDURE' formalparameterlist? proceduretype? procedureattributes?;
+procedurename: identifier;
+proceduretype: basictype;
+formalparameterlist: formalparameter (',' formalparameter)*;
+formalparameter: identifier;
+procedureattributes: ('EXTERNAL' | 'PUBLIC' | interrupt | 'REENTRANT')+;
 
-<locator>::= AT (<expression>);
+locator: 'AT' expression;
 
-<interrupt>::= INTERRUPT;
+interrupt: 'INTERRUPT';
 
-<initialization>::= {INITIAL | DATA} (<initial value>
-[,<initial value>]...);
-<initial value>::= <expression> | <string>;
+initialization: ('INITIAL' | 'DATA') (initialvalue (',' initialvalue)*);
+initialvalue: expression | string;
 
 <unit>::= <conditional clause> | <do block> | <basic statement> |
 <label definition><unit>
@@ -165,10 +147,11 @@ LABEL [PUBLIC | EXTERNAL];
 <scoping statement>::= <simple do statement> | <do-case statement> |
 <do-while statement> |
 <iterative do statement> | <end statement> |
-<procedure statement>
-<label definition>::= <identifier>:
+<procedure statement>;
+labeldefinition: identifier:
 
 <assignment statement>::= <left part >=<expression>;
+
 <left part>::= <variable reference> [,<variable reference>]...
 
 <call statement>::= CALL <simple variable>[<parameter list>];
@@ -177,7 +160,7 @@ LABEL [PUBLIC | EXTERNAL];
 
 <goto statement>::= {GOTO | GO TO} <identifier>
 
-<null statement>::= ;
+nullstatement: ;
 
 <return statement>::= <typed return> | <untyped return>
 <typed return>::= RETURN <expression>;
@@ -236,47 +219,42 @@ LABEL [PUBLIC | EXTERNAL];
 <iterative do block>::= <iterative do statement> [<unit>...] <ending>
 <primary>::= <constant> | <variable reference> | <location reference>
 | <subexpression>
-<subexpression>::= (<expression>)
+subexpression: expression;
 
-<constant>::= <numeric constant> | <string>
+constant: numericconstant | string;
 
-<variable reference>::= <data reference> | <function reference>
-<data reference>::= <name>[<subscript>] [<member specifier>]
-<subscript>::= (<expression>)
-<member specifier>::= .<member name>[<subscript>]
-<function reference>::= <name>[<actual parameters>]
-<actual parameters>::= (<expression>[,<expression>]...)
-<member name>::= <identifier>
-<name>::= <identifier>
-<location reference>::= @<constant list> | @<variable reference>
-<constant list>::= (<constant>[,<constant>]...)
-<operator>::= <logical operator> | <relational operator> |
-<arithmetic operator>
-<logical operator>::= AND | OR | NOT | XOR
-<relational operator>::= < | > | <= | >= | <> | =
-<arithmetic operator>::= + | - | PLUS | MINUS | * | / | MOD
+variablereference: datareference | functionreference;
+datareference: name subscript? memberspecifier?;
+subscript:expression;
+memberspecifier: '.' membername subscript?;
+functionreference: name actualparameters?;
+actualparameters: expression (',' expression)*;
+membername: identifier;
+name: identifier;
+locationreference: '@' constantlist | '@' variablereference;
+constantlist: constant (',' constant)*;
+operator: logicaloperator | relationaloperator | arithmeticoperator;
+logicaloperator: 'AND' | 'OR' | 'NOT' | 'XOR';
+relationaloperator: '<' | '>' | '<=' | '>=' | '<>' | '=';
+arithmeticoperator: '+' | '-' | 'PLUS' | 'MINUS' | '*' | '/' | 'MOD';
 
-<expression>::= <logical expression> | <embedded assignment>
-<embedded assignment>::= <variable reference> := <logical expression>
-<logical expression>::= <logical factor> | <logical expression>
-<or operator> <logical factor>
-<or operator>::= OR | XOR
-<logical factor>::= <logical secondary> | <logical factor>
-<and operator> <logical secondary>
-<and operator>::= AND
-<logical secondary>::= [<not operator>] <logical primary>
-<not operator>::= NOT
-<logical primary>::= <arithmetic expression> [<relational operator>
-<arithmetic expression>]
-<relational operator>::= < | > | <= | >= | <> | =
-<arithmetic expression>::= <term> | <arithmetic expression>
-<adding operator> <term>
-<adding operator>::= + | - | PLUS | MINUS
-<term>::= <secondary> | <term> <multiplying operator> <secondary>
-<multiplying operator>::= * | / | MOD
-<secondary>::= [<unary minus> | <unary plus>] <primary>
-<unary minus>::= -
-<unary plus>::= +
+expression: logicalexpression | embeddedassignment;
+embeddedassignment: variablereference ':=' logicalexpression;
+logicalexpression: logicalfactor | logicalexpression oroperator logicalfactor;
+oroperator: 'OR' | 'XOR';
+logicalfactor: logicalsecondary | logicalfactor andoperator logicalsecondary;
+andoperator: 'AND';
+logicalsecondary: notoperator? logicalprimary;
+notoperator: 'NOT';
+logicalprimary: arithmeticexpression (relationaloperator arithmeticexpression)?;
+relationaloperator: '<' | '>' | '<=' | '>=' | '<>' | '=';
+arithmeticexpression: term | arithmeticexpression addingoperator term;
+addingoperator: '+' | '-' | 'PLUS' | 'MINUS';
+term: secondary | term multiplyingoperator secondary;
+multiplyingoperator: '*' | '/' | 'MOD';
+secondary: (unaryminus | unaryplus)? primary;
+unaryminus: '-';
+unaryplus: '+';
 
 
 WS
