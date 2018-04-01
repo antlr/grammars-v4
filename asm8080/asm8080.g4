@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
 * http://fms.komkon.org/comp/CPUs/8080.txt
 */
+
 grammar asm8080;
 
 prog
@@ -39,7 +40,7 @@ prog
    ;
 
 line
-   : lbl? (instruction| directive)? comment?
+   : lbl? (instruction | directive)? comment?
    ;
 
 instruction
@@ -47,12 +48,12 @@ instruction
    ;
 
 opcode
-    : OPCODE
-    ;
+   : OPCODE
+   ;
 
 register
-    : REGISTER
-    ;
+   : REGISTER
+   ;
 
 directive
    : argument? assemblerdirective expressionlist
@@ -83,17 +84,17 @@ multiplyingExpression
    ;
 
 argument
-   : number 
+   : number
    | register
    | dollar
-   | name 
+   | name
    | string
    | ('(' expression ')')
    ;
 
 dollar
-    : '$'
-    ;
+   : '$'
+   ;
 
 string
    : STRING
@@ -111,102 +112,21 @@ comment
    : COMMENT
    ;
 
+
 ASSEMBLER_DIRECTIVE
-   : 'ORG'
-   | 'END'
-   | 'EQU' 
-   | 'DB' 
-   | 'DW'
-   | 'DS'
-   | 'IF'
-   | 'ENDIF'
-   | 'SET'
+   : 'ORG' | 'END' | 'EQU' | 'DB' | 'DW' | 'DS' | 'IF' | 'ENDIF' | 'SET'
    ;
+
 
 REGISTER
-    : 'A' | 'B' | 'C' | 'D' | 'E' | 'H' | 'L' | 'PC' | 'SP'
-    ;
+   : 'A' | 'B' | 'C' | 'D' | 'E' | 'H' | 'L' | 'PC' | 'SP'
+   ;
+
 
 OPCODE
-   : 'MOV'
-   | 'MVI'
-   | 'LDA'
-   | 'STA'
-   | 'LDAX'
-   | 'STAX'
-   | 'LHLD'
-   | 'SHLD'
-   | 'LXI'
-   | 'PUSH'
-   | 'POP'
-   | 'XTHL'
-   | 'SPHL'
-   | 'PCHL'
-   | 'XCHG'
-   | 'ADD'
-   | 'SUB'
-   | 'INR'
-   | 'DCR'
-   | 'CMP'
-   | 'ANA'
-   | 'ORA'
-   | 'XRA'
-   | 'ADI'
-   | 'SUI'
-   | 'CPI'
-   | 'ANI'
-   | 'ORI'
-   | 'XRI'
-   | 'DAA'
-   | 'ADC'
-   | 'ACI'
-   | 'SBB'
-   | 'SBI'
-   | 'DAD'
-   | 'INX'
-   | 'DCX'
-   | 'JMP'
-   | 'CALL'
-   | 'RET'
-   | 'RAL'
-   | 'RAR'
-   | 'RLC'
-   | 'RRC'
-   | 'IN'
-   | 'OUT'  
-   | 'CMC'
-   | 'STC'
-   | 'CMA'
-   | 'HLT'
-   | 'NOP'
-   | 'DI'
-   | 'EI'
-   | 'RST'  
-   | 'JNZ'
-   | 'JZ'
-   | 'JNC'
-   | 'JC'
-   | 'JPO'
-   | 'JPE'
-   | 'JP'
-   | 'JM'
-   | 'CNZ'
-   | 'CZ'
-   | 'CNC'
-   | 'CC'
-   | 'CPO'
-   | 'CPE'
-   | 'CP'
-   | 'CM'
-   | 'RNZ'
-   | 'RZ'
-   | 'RNC'
-   | 'RC'
-   | 'RPO'
-   | 'RPE'
-   | 'RP'
-   | 'RM'
+   : 'MOV' | 'MVI' | 'LDA' | 'STA' | 'LDAX' | 'STAX' | 'LHLD' | 'SHLD' | 'LXI' | 'PUSH' | 'POP' | 'XTHL' | 'SPHL' | 'PCHL' | 'XCHG' | 'ADD' | 'SUB' | 'INR' | 'DCR' | 'CMP' | 'ANA' | 'ORA' | 'XRA' | 'ADI' | 'SUI' | 'CPI' | 'ANI' | 'ORI' | 'XRI' | 'DAA' | 'ADC' | 'ACI' | 'SBB' | 'SBI' | 'DAD' | 'INX' | 'DCX' | 'JMP' | 'CALL' | 'RET' | 'RAL' | 'RAR' | 'RLC' | 'RRC' | 'IN' | 'OUT' | 'CMC' | 'STC' | 'CMA' | 'HLT' | 'NOP' | 'DI' | 'EI' | 'RST' | 'JNZ' | 'JZ' | 'JNC' | 'JC' | 'JPO' | 'JPE' | 'JP' | 'JM' | 'CNZ' | 'CZ' | 'CNC' | 'CC' | 'CPO' | 'CPE' | 'CP' | 'CM' | 'RNZ' | 'RZ' | 'RNC' | 'RC' | 'RPO' | 'RPE' | 'RP' | 'RM'
    ;
+
 
 NAME
    : [a-zA-Z] [a-zA-Z0-9."]*
