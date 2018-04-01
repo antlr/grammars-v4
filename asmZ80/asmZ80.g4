@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
 * http://fms.komkon.org/comp/CPUs/z80.txt
 */
+
 grammar asmZ80;
 
 prog
@@ -39,11 +40,19 @@ prog
    ;
 
 line
-   : lbl? (instruction| directive)? comment?
+   : lbl? (instruction | directive)? comment?
    ;
 
 instruction
    : opcode expressionlist?
+   ;
+
+opcode
+   : OPCODE
+   ;
+
+register
+   : REGISTER
    ;
 
 directive
@@ -74,18 +83,18 @@ multiplyingExpression
    : argument (('*' | '/') argument)*
    ;
 
-
 argument
-   : number 
+   : number
+   | register
    | dollar
-   | name 
+   | name
    | string
    | ('(' expression ')')
    ;
 
 dollar
-    : '$'
-    ;
+   : '$'
+   ;
 
 string
    : STRING
@@ -103,89 +112,21 @@ comment
    : COMMENT
    ;
 
-ASSEMBLER_DIRECTIVE
-   : 'ORG'
-   | 'END'
-   | 'EQU' 
-   | 'DEFB' 
-   | 'DEFW'
-   | 'DS'
-   | 'IF'
-   | 'ENDIF'
-   | 'SET'
+
+REGISTER
+   : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'H' | 'L' | 'I' | 'R' | 'IXH' | 'IXL' | 'IYH' | 'IYL' | 'AF' | 'BC' | 'DE' | 'HL' | 'PC' | 'SP' | 'IX' | 'IY'
    ;
 
-opcode
-   : 'ADC'
-    |'ADD'
-    |'AND'
-    |'BIT'
-    |'CALL'
-    |'CCF'
-    |'CP'
-    |'CPD'
-    |'CPDR'
-    |'CPI'
-    |'CPIR'
-    |'CPL'
-    |'DAA'
-    |'DEC'
-    |'DI'
-    |'DJNZ'
-    |'EI'
-    |'EX'
-    |'EXX'
-//    |'HALT'
-    |'IM'
-    |'IN'
-    |'INC'
-    |'IND'
-    |'INDR'
-    |'INI'
-    |'INIR'
-    |'JP'
-    |'JR'
-    |'LD'
-    |'LDD'
-    |'LDDR'
-    |'LDI'
-    |'LDIR'
-    |'NEG'
-    |'NOP'
-    |'OR'
-    |'OTDR'
-    |'OTIR'
-    |'OUT'
-    |'OUTD'
-    |'OUTI'
-    |'POP'
-    |'PUSH'
-    |'RES'
-    |'RET'
-    |'RETI'
-    |'RETN'
-    |'RL'
-    |'RLA'
-    |'RLC'
-    |'RLCA'
-    |'RLD'
-    |'RR'
-    |'RRA'
-    |'RRC'
-    |'RRCA'
-    |'RRD'
-    |'RST'
-    |'SBC'
-    |'SCF'
-    |'SET'
-    |'SLA'
-    |'SLL'
-    |'SL1'
-    |'SRA'
-    |'SRL'
-    |'SUB'
-    |'XOR'
+
+ASSEMBLER_DIRECTIVE
+   : 'ORG' | 'END' | 'EQU' | 'DEFB' | 'DEFW' | 'DS' | 'IF' | 'ENDIF' | 'SET'
    ;
+
+
+OPCODE
+   : 'ADC' | 'ADD' | 'AND' | 'BIT' | 'CALL' | 'CCF' | 'CP' | 'CPD' | 'CPDR' | 'CPI' | 'CPIR' | 'CPL' | 'DAA' | 'DEC' | 'DI' | 'DJNZ' | 'EI' | 'EX' | 'EXX' | 'IM' | 'IN' | 'INC' | 'IND' | 'INDR' | 'INI' | 'INIR' | 'JP' | 'JR' | 'LD' | 'LDD' | 'LDDR' | 'LDI' | 'LDIR' | 'NEG' | 'NOP' | 'OR' | 'OTDR' | 'OTIR' | 'OUT' | 'OUTD' | 'OUTI' | 'POP' | 'PUSH' | 'RES' | 'RET' | 'RETI' | 'RETN' | 'RL' | 'RLA' | 'RLC' | 'RLCA' | 'RLD' | 'RR' | 'RRA' | 'RRC' | 'RRCA' | 'RRD' | 'RST' | 'SBC' | 'SCF' | 'SET' | 'SLA' | 'SLL' | 'SL1' | 'SRA' | 'SRL' | 'SUB' | 'XOR'
+   ;
+
 
 NAME
    : [a-zA-Z] [a-zA-Z0-9."]*
