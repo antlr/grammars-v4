@@ -32,28 +32,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar plm;
 
-character
-   : apostrophe
-   | nonquotecharacter
+CHARACTER
+   : APOSTROPHE
+   | NONQUOTECHAR
    ;
 
-apostrophe
+APOSTROPHE
    : '\''
    ;
 
-nonquotecharacter
-   : letter
-   | decimaldigit
+NONQUOTECHAR
+   : LETTER
+   | DECIMALDIGIT
    | '$'
-   | specialcharacter
+   | SPECIALCHARACTER
    ;
 
-letter
-   : uppercaseletter
-   | lowercaseletter
+LETTER
+   : LOWERCASELETTER
+   | UPPERCASELETTER
    ;
 
-uppercaseletter
+UPPERCASELETTER
    : 'A'
    | 'B'
    | 'C'
@@ -82,7 +82,7 @@ uppercaseletter
    | 'Z'
    ;
 
-lowercaseletter
+LOWERCASELETTER
    : 'a'
    | 'b'
    | 'c'
@@ -111,12 +111,7 @@ lowercaseletter
    | 'z'
    ;
 
-
-DECIMALDIGIT
-   : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
-   ;
-
-specialcharacter
+SPECIALCHARACTER
    : '+'
    | '-'
    | '*'
@@ -138,7 +133,7 @@ token
    : delimiter
    | identifier
    | numericconstant
-   | string
+   | STRING
    ;
 
 delimiter
@@ -171,12 +166,12 @@ compounddelimiter
    ;
 
 firstidcharacter
-   : letter
+   : LETTER
    | '_'
    ;
 
 identifier
-   : firstidcharacter (letter | decimaldigit | '$' | '_')*
+   : firstidcharacter (LETTER | DECIMALDIGIT | '$' | '_')*
    ;
 
 numericconstant
@@ -188,20 +183,20 @@ numericconstant
    ;
 
 binarynumber
-   : binarydigit (binarydigit | '$')* 'B'
+   : BINARYDIGIT (BINARYDIGIT | '$')* 'B'
    | 'Q'
    ;
 
 octalnumber
-   : octaldigit (octaldigit | '$')* ('O' | 'Q')
+   : OCTALDIGIT (OCTALDIGIT | '$')* ('O' | 'Q')
    ;
 
 decimalnumber
-   : decimaldigit (decimaldigit | '$')* ('D')?
+   : DECIMALDIGIT (DECIMALDIGIT | '$')* ('D')?
    ;
 
 hexadecimalnumber
-   : decimaldigit (hexadecimaldigit | '$')* 'H'
+   : DECIMALDIGIT (HEXADECIMALDIGIT | '$')* 'H'
    ;
 
 floatingpointnumber
@@ -217,16 +212,16 @@ exponentpart
    ;
 
 digitstring
-   : decimaldigit (decimaldigit | '$')*
+   : DECIMALDIGIT (DECIMALDIGIT | '$')*
    ;
 
-binarydigit
+BINARYDIGIT
    : '0'
    | '1'
    ;
 
-octaldigit
-   : binarydigit
+OCTALDIGIT
+   : BINARYDIGIT
    | '2'
    | '3'
    | '4'
@@ -235,14 +230,14 @@ octaldigit
    | '7'
    ;
 
-decimaldigit
-   : octaldigit
+DECIMALDIGIT
+   : OCTALDIGIT
    | '8'
    | '9'
    ;
 
-hexadecimaldigit
-   : decimaldigit
+HEXADECIMALDIGIT
+   : DECIMALDIGIT
    | 'A'
    | 'B'
    | 'C'
@@ -251,12 +246,12 @@ hexadecimaldigit
    | 'F'
    ;
 
-string
-   : '\'' stringbodyelement + '\''
+STRING
+   : '\'' STRINGBODYELEMENT + '\''
    ;
 
-stringbodyelement
-   : nonquotecharacter
+STRINGBODYELEMENT
+   : NONQUOTECHAR
    | '"'
    ;
 
@@ -266,11 +261,11 @@ plmtext
    ;
 
 separator
-   : comment?
+   : COMMENT?
    ;
 
-comment
-   : '/*' character* '*/'
+COMMENT
+   : '/*' CHARACTER* '*/'
    ;
 
 compilation
@@ -388,7 +383,7 @@ labelelement
    ;
 
 literalelement
-   : identifier 'LITERALLY' string
+   : identifier 'LITERALLY' STRING
    ;
 
 factoredvariableelement
@@ -458,7 +453,7 @@ initialization
 
 initialvalue
    : expression
-   | string
+   | STRING
    ;
 
 unit
@@ -665,7 +660,7 @@ subexpression
 
 constant
    : numericconstant
-   | string
+   | STRING
    ;
 
 variablereference
