@@ -73,11 +73,13 @@ octaldigit: binarydigit | '2' | '3' | '4' | '5' | '6' | '7';
 decimaldigit: octaldigit| '8' | '9';
 hexadecimaldigit: decimaldigit| 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
 
-<string>::= '<string body element> [<string body element>]... ';
-<string body element>::= <non-quote character> |";
-<pl/m text>::= <token> | <separator> [<token> | <separator>]...;
-<separator>::= blank | <comment>;
-<comment>::= /* [<character>]... */;
+string: '<string body element> [<string body element>]... ';
+
+stringbodyelement: nonquotecharacter | '"';
+plmtext: token | separator (token | separator)*;
+
+separator: blank | comment;
+comment: '/*' character* '*/';
 
 compilation: module [EOF];
 module: module name ':' simpledoblock;
@@ -138,87 +140,89 @@ interrupt: 'INTERRUPT';
 initialization: ('INITIAL' | 'DATA') (initialvalue (',' initialvalue)*);
 initialvalue: expression | string;
 
-<unit>::= <conditional clause> | <do block> | <basic statement> |
-<label definition><unit>
-<basic statement>::= <assignment statement> | <call statement> |
-<goto statement> | <null statement> |
-<return statement> |
-<microprocessor dependent statement>
-<scoping statement>::= <simple do statement> | <do-case statement> |
-<do-while statement> |
-<iterative do statement> | <end statement> |
-<procedure statement>;
-labeldefinition: identifier:
+unit : conditionalclause | doblock | basicstatement | labeldefinition unit;
+basicstatement : assignmentstatement | callstatement | gotostatement | nullstatement | returnstatement | microprocessordependentstatement;
 
-<assignment statement>::= <left part >=<expression>;
+scopingstatement : simpledostatement | docasestatement | dowhilestatement | iterativedostatement | endstatement | procedurestatement;
 
-<left part>::= <variable reference> [,<variable reference>]...
+labeldefinition: identifier;
 
-<call statement>::= CALL <simple variable>[<parameter list>];
-<parameter list>::= (<expression>[,<expression>]...)
-<simple variable>::= <identifier> | <identifier>.<identifier>
+assignmentstatement: leftpart '=' expression;
 
-<goto statement>::= {GOTO | GO TO} <identifier>
+leftpart : variablereference (',' variablereference)*;
+
+callstatement: 'CALL'  simplevariable parameterlist?;
+
+parameterlist: expression (',' expression)*;
+
+simplevariable:  identifier | identifier '.' identifier;
+
+gotostatement: ('GOTO' | 'GO TO') identifier;
 
 nullstatement: ;
 
-<return statement>::= <typed return> | <untyped return>
-<typed return>::= RETURN <expression>;
-<untyped return>::= RETURN;
+returnstatement: typedreturn | untypedreturn;
 
-<microprocessor dependent statement>::= <disable statement> |
-<enable statement> |
-<halt statement> |
-<cause interrupt statement>
-<disable statement>::= DISABLE;
-<enable statement>::= ENABLE;
-<halt statement>::= HALT;
-<cause interrupt statement>::= CAUSE$INTERRUPT (numeric constant);
+typedreturn: 'RETURN' expression;
 
-<simple do statement>::= DO;
+untypedreturn: 'RETURN';
 
-<do-case statement>::= DO CASE <expression>;
+microprocessordependentstatement: disablestatement | enablestatement | haltstatement | causeinterruptstatement;
 
-<do-while statement>::= DO WHILE <expression>;
+disablestatement: 'DISABLE';
+enablestatement: 'ENABLE';
+haltstatement: 'HALT';
 
-<iterative do statement>::= DO <index part> <to part> [<by part>];
-<index part>::= <index variable>=<start expression>
-<to part>::= TO <bound expression>
-<by part>::= BY <step expression>
-<index variable>::= <simple variable>
-<start expression>::= <expression>
-<bound expression>::= <expression>
-<step expression>::= <expression>
+causeinterruptstatement: 'CAUSE$INTERRUPT' numericconstant;
 
-<end statement>::= END [<identifier>];
+simpledostatement: 'DO';
 
-<procedure statement>::= <procedure name> : PROCEDURE
-[<formal parameter list>] [<procedure type>]
-[<procedure attributes>];
+docasestatement: 'DO CASE' expression;
 
-<conditional clause>::= <if condition><true unit> |
-<if condition><true element> ELSE
-<false element>
-<if condition>::= IF <expression> THEN <true unit>
-<true element>::= [<label definition>...] <do block> |
-[<label definition>...] <basic statement>
-<false element>::= <unit>
-<true unit>::= <unit>
+dowhilestatement: 'DO WHILE' expression;
 
-<do block>::= <simple do block> | <do-case block> | <do-while block> |
-<iterative do block>
+iterativedostatement: 'DO' indexpart topart bypart?;
 
-<simple do block>::= <simple do statement>[<declaration>...]
-[<unit>...]<ending>
-<ending>::= [<label definition>...]<end statement>
+indexpart: indexvariable '=' startexpression;
 
-<do-case block>::= <do-case statement> [<unit>...] <ending>
+topart: 'TO' boundexpression;
 
-<do-while block>::= <do-while statement> [<unit>...] <ending>
+bypart: 'BY' stepexpression;
 
-<iterative do block>::= <iterative do statement> [<unit>...] <ending>
-<primary>::= <constant> | <variable reference> | <location reference>
-| <subexpression>
+indexvariable: simplevariable;
+
+startexpression :expression;
+
+boundexpression:expression;
+
+stepexpression:expression;
+
+endstatement: 'END' identifier?;
+
+procedurestatement: procedurename ':' 'PROCEDURE' formalparameterlist? proceduretype? procedureattributes?;
+
+conditionalclause: ifcondition trueunit | ifcondition trueelement 'ELSE' falseelement;
+ifcondition: 'IF' expression 'THEN' trueunit;
+
+trueelement: (labeldefinition*)? doblock | (labeldefinition*)? basicstatement;
+
+falseelement: unit;
+trueunit: unit;
+
+doblock: simpledoblock | docaseblock | dowhileblock | iterativedoblock;
+
+simpledoblock: simpledostatement (declaration*)? (unit*)? ending;
+
+ending: (labeldefinition*)? endstatement;
+
+docaseblock: docasestatement (unit*)? ending;
+
+dowhileblock: dowhilestatement (unit*)? ending;
+
+iterativedoblock: iterativedostatement (unit*)?ending;
+
+primary: constant | variablereference | locationreference | subexpression;
+
 subexpression: expression;
 
 constant: numericconstant | string;
