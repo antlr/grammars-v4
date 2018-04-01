@@ -46,6 +46,14 @@ instruction
    : opcode expressionlist?
    ;
 
+opcode
+    : OPCODE
+    ;
+
+register
+    : REGISTER
+    ;
+
 directive
    : argument? assemblerdirective expressionlist
    ;
@@ -74,9 +82,9 @@ multiplyingExpression
    : argument (('*' | '/') argument)*
    ;
 
-
 argument
    : number 
+   | register
    | dollar
    | name 
    | string
@@ -115,7 +123,11 @@ ASSEMBLER_DIRECTIVE
    | 'SET'
    ;
 
-opcode
+REGISTER
+    : 'A' | 'B' | 'C' | 'D' | 'E' | 'H' | 'L' | 'PC' | 'SP'
+    ;
+
+OPCODE
    : 'MOV'
    | 'MVI'
    | 'LDA'
