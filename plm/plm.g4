@@ -252,7 +252,7 @@ hexadecimaldigit
    ;
 
 string
-   : '<string body element> [<string body element>]... '
+   : '\'' stringbodyelement + '\''
    ;
 
 stringbodyelement
@@ -396,7 +396,7 @@ factoredvariableelement
    ;
 
 factoredlabelelement
-   : (identifier (',' < identifier >)*) 'LABEL' ('PUBLIC' | 'EXTERNAL')?
+   : (identifier (',' identifier)*) 'LABEL' ('PUBLIC' | 'EXTERNAL')?
    ;
 
 structuretype
