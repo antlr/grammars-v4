@@ -305,8 +305,8 @@ factoredelement
    ;
 
 variableelement
-   : variablenamespecifier (arrayspecifier)? variabletype
-   | (variableattributes)?
+   : (variablenamespecifier arrayspecifier? variabletype)
+   | variableattributes
    ;
 
 variablenamespecifier
@@ -331,8 +331,8 @@ basespecifier
    ;
 
 variableattributes
-   : 'PUBLIC'? locator? initialization?
-   | 'EXTERNAL'? constantattribute?
+   : 'PUBLIC'? locator? initialization
+   | 'EXTERNAL'? constantattribute
    ;
 
 constantattribute
@@ -382,7 +382,7 @@ literalelement
    ;
 
 factoredvariableelement
-   : (variablenamespecifier (',' variablenamespecifier)*) explicitdimension? variabletype variableattributes?
+   : variablenamespecifier (',' variablenamespecifier)* explicitdimension? variabletype variableattributes?
    ;
 
 factoredlabelelement
@@ -462,7 +462,6 @@ basicstatement
    : assignmentstatement
    | callstatement
    | gotostatement
-   | nullstatement
    | returnstatement
    | microprocessordependentstatement
    ;
@@ -503,10 +502,6 @@ simplevariable
 
 gotostatement
    : ('GOTO' | 'GO TO') identifier
-   ;
-
-nullstatement
-   :
    ;
 
 returnstatement
