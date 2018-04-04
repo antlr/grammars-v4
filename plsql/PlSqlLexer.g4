@@ -2275,8 +2275,6 @@ fragment QS_OTHER_CH: ~('<' | '{' | '[' | '(' | ' ' | '\t' | '\n' | '\r');
 
 DELIMITED_ID: '"' (~('"' | '\r' | '\n') | '"' '"')+ '"' ;
 
-// SQL_SPECIAL_CHAR was split into single rules
-
 PERCENT:                   '%';
 AMPERSAND:                 '&';
 LEFT_PAREN:                '(';
@@ -2289,8 +2287,6 @@ COMMA:                     ',';
 SOLIDUS:                   '/';
 AT_SIGN:                   '@';
 ASSIGN_OP:                 ':=';
-
-// See OCI reference for more information about this
 
 BINDVAR
     : ':' SIMPLE_LETTER  (SIMPLE_LETTER | [0-9] | '_')*
@@ -2312,76 +2308,41 @@ LESS_THAN_OP:              '<';
 COLON:                     ':';
 SEMICOLON:                 ';';
 
-fragment
-QUESTION_MARK: '?';
-
-// protected UNDERSCORE : '_' SEPARATOR ; // subtoken typecast within <INTRODUCER>
-BAR: '|';
+BAR:       '|';
 EQUALS_OP: '=';
 
-// Rule #532 <SQL_EMBDD_LANGUAGE_CHAR> was split into single rules:
-LEFT_BRACKET: '[';
+LEFT_BRACKET:  '[';
 RIGHT_BRACKET: ']';
 
-//{ Rule #319 <INTRODUCER>
-INTRODUCER
-    : '_' //(SEPARATOR {$type = UNDERSCORE;})?
-    ;
+INTRODUCER: '_';
 
-//{ Rule #479 <SEPARATOR>
-//  It was originally a protected rule set to be filtered out but the <COMMENT> and <'-'> clashed. 
-/*SEPARATOR
-    : '-' -> type('-')
-    | COMMENT -> channel(HIDDEN)
-    | (SPACE | NEWLINE)+ -> channel(HIDDEN)
-    ;*/
-//}
+// Comments https://docs.oracle.com/cd/E11882_01/server.112/e41084/sql_elements006.htm
 
-SPACES: [ \t\r\n]+ -> skip;
+SINGLE_LINE_COMMENT: '--' ~('\r' | '\n')* NEWLINE_EOF                 -> channel(HIDDEN);
+MULTI_LINE_COMMENT:  '/*' .*? '*/'                                    -> channel(HIDDEN);
+// https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve034.htm#SQPUG054
+REMARK_COMMENT:      'REM' 'ARK'? ~('\r' | '\n')* NEWLINE_EOF         -> channel(HIDDEN); // TODO: should starts with newline
 
-    
-// Rule #504 <SIMPLE_LETTER> - simple_latin _letter was generalised into SIMPLE_LETTER
-//  Unicode is yet to be implemented - see NSF0
-fragment
-SIMPLE_LETTER
-    : [A-Z]
-    ;
+// https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve032.htm#SQPUG052
+PROMPT_MESSAGE:      'PRO' 'MPT'? SPACE ~('\r' | '\n')* NEWLINE_EOF;                      // TODO: should starts with newline
 
-fragment
-FLOAT_FRAGMENT
-    : UNSIGNED_INTEGER* '.'? UNSIGNED_INTEGER+
-    ;
-
-// Rule #097 <COMMENT>
-
-SINGLE_LINE_COMMENT: '--' ~('\r' | '\n')* (NEWLINE | EOF)   -> channel(HIDDEN);
-MULTI_LINE_COMMENT:  '/*' .*? '*/'                          -> channel(HIDDEN);
-
-// SQL*Plus prompt
-// TODO should be grammar rule, but tricky to implement
-
-PROMPT
-    : 'prompt' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
-    ;
-
+// TODO: should starts with newline
 START_CMD
-    // TODO When using full word START there is a conflict with START WITH in sequences and CONNECT BY queries
-    // 'start' SPACE ( ~( '\r' | '\n') )* (NEWLINE|EOF)
-    : 'sta' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
-    // TODO Single @ conflicts with a database link name, like employees@remote
-    // | '@' ( ~('\r' | '\n') )* (NEWLINE|EOF)
-    | '@@' ( ~('\r' | '\n') )* (NEWLINE|EOF)
+    //: 'STA' 'RT'? SPACE ~('\r' | '\n')* NEWLINE_EOF
+    // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm // TODO: add support
+    // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12003.htm
+    : '@@' ~('\r' | '\n')* NEWLINE_EOF
     ;
-
-fragment
-NEWLINE: '\r'? '\n';
-    
-fragment
-SPACE: [ \t];
-
-//{ Rule #442 <REGULAR_ID> additionally encapsulates a few STRING_LITs.
-//  Within testLiterals all reserved and non-reserved words are being resolved
 
 REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
 
-ZV: '@!' -> channel(HIDDEN);
+SPACES: [ \t\r\n]+ -> channel(HIDDEN);
+
+// Fragment rules
+
+fragment NEWLINE_EOF    : NEWLINE | EOF;
+fragment QUESTION_MARK  : '?';
+fragment SIMPLE_LETTER  : [A-Z];
+fragment FLOAT_FRAGMENT : UNSIGNED_INTEGER* '.'? UNSIGNED_INTEGER+;
+fragment NEWLINE        : '\r'? '\n';
+fragment SPACE          : [ \t];
