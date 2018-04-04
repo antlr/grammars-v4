@@ -20,6 +20,10 @@
 
 lexer grammar PlSqlLexer;
 
+options {
+    superClass=PlSqlBaseLexer;
+}
+
 ABORT:                        'ABORT';
 ABS:                          'ABS';
 ACCESS:                       'ACCESS';
@@ -2321,17 +2325,17 @@ INTRODUCER: '_';
 SINGLE_LINE_COMMENT: '--' ~('\r' | '\n')* NEWLINE_EOF                 -> channel(HIDDEN);
 MULTI_LINE_COMMENT:  '/*' .*? '*/'                                    -> channel(HIDDEN);
 // https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve034.htm#SQPUG054
-REMARK_COMMENT:      'REM' 'ARK'? ~('\r' | '\n')* NEWLINE_EOF         -> channel(HIDDEN); // TODO: should starts with newline
+REMARK_COMMENT:      {IsLineBegin()}? 'REM' 'ARK'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF -> channel(HIDDEN);
 
 // https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve032.htm#SQPUG052
-PROMPT_MESSAGE:      'PRO' 'MPT'? SPACE ~('\r' | '\n')* NEWLINE_EOF;                      // TODO: should starts with newline
+PROMPT_MESSAGE:      {IsLineBegin()}? 'PRO' 'MPT'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF;
 
 // TODO: should starts with newline
 START_CMD
     //: 'STA' 'RT'? SPACE ~('\r' | '\n')* NEWLINE_EOF
-    // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm // TODO: add support
+    // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
     // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12003.htm
-    : '@@' ~('\r' | '\n')* NEWLINE_EOF
+    : {IsLineBegin()}? '@' '@'? ~('\r' | '\n')* NEWLINE_EOF
     ;
 
 REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
