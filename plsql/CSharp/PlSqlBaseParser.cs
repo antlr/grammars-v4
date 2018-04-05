@@ -10,4 +10,6 @@ public abstract class PlSqlBaseParser : Parser
     }
 
     public bool isVersion12() => _isVersion12;
+
+    public bool setVersion12(bool value) => _isVersion12 = value;
 }
