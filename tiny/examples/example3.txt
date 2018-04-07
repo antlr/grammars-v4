@@ -1,0 +1,5 @@
+BEGIN
+  READ a
+  b := a + 1
+  WRITE b
+END

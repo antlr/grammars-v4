@@ -1,0 +1,660 @@
+\chapter{\Betw\ model, promoted world}\label{ch5}
+
+─ section ch5 parents ch4 └ 
+
+\section{The world}
+
+\begin{LConsistency}[$Logbook$ consistency]
+\begin{zeves-theorem}{tLogbookConsistency}
+    \exists Logbook: \power~(NAMES \rel PayDetails) @ \\
+        \t1 Logbook = \power~(\{~PayDetails @ from \mapsto \theta PayDetails~\} \cup \\
+             \t2 \{~PayDetails @ to \mapsto \theta PayDetails ~\})
+\end{theorem}~\end{LConsistency}
+
+\begin{LADef}[Log book of payments]
+╷ Logbook : ℙ ( NAMES ↔ PayDetails ) |
+ Logbook = ℙ ( { PayDetails ⦁ from ↦ θ PayDetails } ∪ { PayDetails ⦁ to ↦ θ PayDetails } ) └ ~\end{LADef}
+\begin{LSDef}[Concrete world]
+┌ ConWorld 
+conAuthPurse : NAMES ⤕ ConPurse 
+ether : ℙ MESSAGE 
+archive : Logbook |
+ ∀ n : dom conAuthPurse ⦁ ( conAuthPurse n ) . name = n 
+∀ nld : archive ⦁ first nld ∈ dom conAuthPurse └ ~\end{LSDef}
+
+
+\section{Auxiliary definitions}\label{ch5.auxworld}
+
+Now, we leave the definition of $AuxWorld$ without mentioning
+any finiteness properties, but prove it later as a consequence of
+the involved sets being restricted to the domain of the finite injection $conAuthPurse$
+from $ConWorld$.
+\begin{LSDef}[Auxiliary definitions for the concrete world]
+┌ AuxWorld 
+ConWorld 
+allLogs : NAMES ↔ PayDetails 
+authenticFrom , authenticTo : ℙ PayDetails 
+fromLogged , toLogged : ℙ PayDetails 
+toInEpv , toInEapayee , fromInEpr , fromInEpa : ℙ PayDetails 
+definitelyLost : ℙ PayDetails 
+maybeLost : ℙ PayDetails |
+ toInEpv ∈ 𝔽 PayDetails 
+toInEapayee ∈ 𝔽 PayDetails 
+fromInEpr ∈ 𝔽 PayDetails 
+fromInEpa ∈ 𝔽 PayDetails 
+maybeLost ∈ 𝔽 PayDetails 
+fromLogged = { pd : authenticFrom | pd . from ↦ pd ∈ allLogs } 
+toLogged = { pd : authenticTo | pd . to ↦ pd ∈ allLogs } 
+authenticFrom = { pd : PayDetails | pd . from ∈ dom conAuthPurse } 
+authenticTo = { pd : PayDetails | pd . to ∈ dom conAuthPurse } 
+toInEpv = { pd : authenticTo | ( conAuthPurse pd . to ) . status = epv ∧ ( conAuthPurse pd . to ) . pdAuth = pd } 
+toInEapayee = { pd : authenticTo | ( conAuthPurse pd . to ) . status = eaTo ∧ ( conAuthPurse pd . to ) . pdAuth = pd } 
+fromInEpr = { pd : authenticFrom | ( conAuthPurse pd . from ) . status = epr ∧ ( conAuthPurse pd . from ) . pdAuth = pd } 
+fromInEpa = { pd : authenticFrom | ( conAuthPurse pd . from ) . status = epa ∧ ( conAuthPurse pd . from ) . pdAuth = pd } 
+allLogs = archive ∪ { n : dom conAuthPurse ; pd : PayDetails | pd ∈ ( conAuthPurse n ) . exLog } 
+definitelyLost = toLogged ∩ ( fromLogged ∪ fromInEpa ) 
+maybeLost = ( fromInEpa ∪ fromLogged ) ∩ toInEpv └ ~\end{LSDef}
+\begin{LThm}[Auxiliary world elements identity]
+\begin{zeves-theorem}{tAuxWorldIdentity}
+   \forall AuxWorld @ definitelyLost \cup maybeLost = \\
+        \t1 (fromInEpa \cup fromLogged) \cap (toInEpv \cup toLogged)
+\end{theorem}~\end{LThm}
+
+\subsection{Added information about finiteness}
+
+
+From the original document, it was left implicit that $authenticFrom$ and $authenticTo$ were finite as well.
+Thus, we explicitly prove that both $authenticFrom$ and $authenticTo$ are finite, something missing from
+the original definition. Before adding the necessary forward rules, we need some extra lemmas about the
+finiteness of particular $PayDetails$ sets.
+
+\subsubsection{Extending the toolkit}
+
+\begin{LToolkit}[Improved version of toolkit rule $crossFinite$]
+\begin{zeves-theorem}{rule rCrossFinite}
+  A \cross B \in \finset (C \cross D) \iff \\\t1
+  A = \{\} \lor B = \{\} \lor (A \in \finset C \land B \in \finset D)
+\end{theorem}~\end{LToolkit}
+
+\begin{LToolkit}[Subset of finite set is finite]
+\begin{zeves-theorem}{lFinsetSubset}
+  X \in \power Y \land Y \in \finset Z \implies X \in \finset Z
+\end{theorem}~\end{LToolkit}
+
+\subsubsection{$PayDetails$ bindings are finite}
+
+To prove these lemmas, we need to establish a basic theory for $PayDetais$ finiteness first.
+As we have already included finite types in $PayDetails$, it becomes possible to prove a more basic
+fact needed for the lemmas mentioned above. That is, the set of bindings $PayDetails$ represent is itself finite
+\begin{gzed}
+   PayDetails \in \finset \lblot from: NAME; to: NAME; value: \num; fromSeqNo: \num; toSeqNo: \num \rblot
+\end{gzed}
+To prove this basic lemma, we need to establish some facts about finiteness in general, they are given below.
+Firstly, let us define the space under concern as the cross product of $PayDetails$ components
+shaped as
+\begin{gzed}
+((from, to), (value, (fromSeqNo, toSeqNo)))
+\end{gzed}
+\begin{LNewADef}[Possible values for $PayDetails$ components]
+─ PayDetailsSpace == ( NAMES × NAMES ) × ( NAT × ( NAT × NAT ) ) └ ~\end{LNewADef}
+
+\begin{LNewADef}[Possible values for $PayDetails$ bindings]
+─ PayDetailsBindings == { PayDetails ⦁ ( ( ( from , to ) , ( value , ( fromSeqNo , toSeqNo ) ) ) , θ PayDetails ) } └ ~\end{LNewADef}
+
+\begin{LNewLemma}[$PayDetails$ space is finite]
+\begin{zeves-theorem}{lPayDetailsSpaceFiniteMaxType}
+    PayDetailsSpace \in \finset~((NAME \cross NAME) \cross (\num \cross (\num \cross \num)))
+\end{theorem}~\end{LNewLemma}
+
+\begin{LNewLemma}[$PayDetails$ bindings are within $PayDetails$ space]
+\begin{zeves-theorem}{lPayDetailsBindingsSubsetPayDetailsSpace}
+    \dom~PayDetailsBindings \in \power~PayDetailsSpace
+\end{theorem}~\end{LNewLemma}
+
+\begin{LNewLemma}[$PayDetails$ bindings are finite]
+\begin{zeves-theorem}{lPayDetailsBindingsFiniteMaxType}
+    \dom~PayDetailsBindings \in \finset~((NAME \cross NAME) \cross (\num \cross (\num \cross \num)))
+\end{theorem}~\end{LNewLemma}
+
+\begin{LGRT}[$PayDetails$ bindings maximal $\pfun$ type]
+\begin{zeves-theorem}{grule gPayDetailsBindingsPfun}
+    PayDetailsBindings \in ((NAME \cross NAME) \cross (\num \cross (\num \cross \num))) \pfun PayDetails
+\end{theorem}~\end{LGRT}
+
+\begin{LGRT}[$PayDetails$ bindings maximal $\ffun$ type]
+\begin{zeves-theorem}{grule gPayDetailsBindingsFfun}
+    PayDetailsBindings \in ((NAME \cross NAME) \cross (\num \cross (\num \cross \num))) \ffun PayDetails
+\end{theorem}~\end{LGRT}
+
+\begin{LNewLemma}[$PayDetails$ bindings encompass the whole of $PayDetails$]
+\begin{zeves-theorem}{rule lPayDetailsBindinsRange}
+    \ran~PayDetailsBindings = PayDetails
+\end{theorem}~\end{LNewLemma}
+
+\begin{LNewLemma}[$PayDetails$ is a finite set of its bindings]
+\begin{zeves-theorem}{grule lPayDetailsIsFinite}
+    PayDetails \in \finset~\lblot from: NAME; fromSeqNo: \num; to: NAME; toSeqNo: \num; value: \num \rblot
+\end{theorem}~\end{LNewLemma}
+
+\subsubsection{$PayDetails$ sets that we are interested in are finite}
+
+\begin{LNewLemma}[$PayDetails$ fixed $from$ is finite]
+\begin{zeves-theorem}{rule lPayDetailsFromPurseNameFinite}
+    \forall name: NAMES @ \{~  pd: PayDetails | pd.from = name ~\} \in \finset~PayDetails
+\end{theorem}~\end{LNewLemma}
+
+\begin{LNewLemma}[$PayDetails$ fixed $to$ is finite]
+\begin{zeves-theorem}{rule lPayDetailsToPurseNameFinite}
+    \forall name: NAMES @ \{~  pd: PayDetails | pd.to = name ~\} \in \finset~PayDetails
+\end{theorem}~\end{LNewLemma}
+
+\begin{LNewLemma}[$PayDetails$ $from$ purse from $\dom$ is finite]
+\begin{zeves-theorem}{rule lPayDetailsFromPurseDomainFinite}
+    \forall purse: NAMES \finj ConPurse  @ \\
+        \t1 \{~  pd: PayDetails | pd.from \in \dom~purse ~\} \in \finset~PayDetails
+\end{theorem}~\end{LNewLemma}
+
+\begin{LNewLemma}[$PayDetails$ $to$ purse from $\dom$ is finite]
+\begin{zeves-theorem}{rule lPayDetailsToPurseDomainFinite}
+    \forall purse: NAMES \finj ConPurse  @ \\
+        \t1 \{~  pd: PayDetails | pd.to \in \dom~purse ~\} \in \finset~PayDetails
+\end{theorem}~\end{LNewLemma}
+
+
+Now, from the definition of $AuxWorld$, the necessary theorems about its components is trivial.
+\begin{LFRT}[$AuxWorld$ $authenticFrom$ is finite]
+\begin{zeves-theorem}{frule fAuxWorldAuthenticFromIsFinite}
+   \forall AuxWorld @ authenticFrom \in \finset~PayDetails
+\end{theorem}~\end{LFRT}
+\begin{LFRT}[$AuxWorld$ $authenticFrom$ is finite]
+\begin{zeves-theorem}{frule fAuxWorldAuthenticToIsFinite}
+   \forall AuxWorld @ authenticTo \in \finset~PayDetails
+\end{theorem}~\end{LFRT}
+
+\subsection{$AuxWorld$ does not add constraints}
+
+\begin{LSDef}[Concrete world auxiliary definitions relationship]
+─ NewVariables == ∃ ConWorld ⦁ AuxWorld └ ~\end{LSDef}
+
+For the next theorem, because of the way finiteness is encoded in Mondex,
+we need additional lemmas. Furthermore, because \zeves\ does not accept
+using complex expressions (with schema binding selection within set comprehension)
+in the middle of a proof, we need to cover these finiteness properties through
+axiomatic definitions.
+
+Firstly, we add those payments related to the domain of authentic purses.
+\begin{LNewADef}[$PayDetails$ elements for $from$ $purse$]
+╷ PayDetailsFromDomPurse : ℙ PayDetails |
+ ∀ purse : NAMES ⤕ ConPurse ⦁ PayDetailsFromDomPurse = { pd : PayDetails | pd . from ∈ dom purse } └ ~\end{LNewADef}
+
+TODO: Add consistency lambda-terms here! See Z/EVES user's guide p.22 (3.1.3).
+\begin{LNewADef}[$PayDetails$ elements for $to$ $purse$]
+╷ PayDetailsToDomPurse : ℙ PayDetails |
+ ∀ purse : NAMES ⤕ ConPurse ⦁ PayDetailsToDomPurse = { pd : PayDetails | pd . to ∈ dom purse } └ ~\end{LNewADef}
+Next, we add those payments filtered accordingly.
+\begin{LNewADef}[$epr$ set of payment details via $from$]
+╷ PayDetailsFromDomEPRPurse : ℙ PayDetails |
+ ∀ purse : NAMES ⤕ ConPurse ⦁ PayDetailsFromDomEPRPurse = { pd : { pd1 : PayDetails | pd1 . from ∈ dom purse } | ( purse pd . from ) . status = epr ∧ ( purse pd . from ) . pdAuth = pd } └ ~\end{LNewADef}
+\begin{LNewADef}[$epa$ set of payment details via $from$]
+╷ PayDetailsFromDomEPAPurse : ℙ PayDetails |
+ ∀ purse : NAMES ⤕ ConPurse ⦁ PayDetailsFromDomEPAPurse = { pd : { pd1 : PayDetails | pd1 . from ∈ dom purse } | ( purse pd . from ) . status = epa ∧ ( purse pd . from ) . pdAuth = pd } └ ~\end{LNewADef}
+\begin{LNewADef}[$epv$ set of payment details via $to$]
+╷ PayDetailsToDomEPVPurse : ℙ PayDetails |
+ ∀ purse : NAMES ⤕ ConPurse ⦁ PayDetailsToDomEPVPurse = { pd : { pd1 : PayDetails | pd1 . to ∈ dom purse } | ( purse pd . to ) . status = epv ∧ ( purse pd . to ) . pdAuth = pd } └ ~\end{LNewADef}
+\begin{LNewADef}[$eaTo$ set of payment details via $to$]
+╷ PayDetailsToDomEATOPurse : ℙ PayDetails |
+ ∀ purse : NAMES ⤕ ConPurse ⦁ PayDetailsToDomEATOPurse = { pd : { pd1 : PayDetails | pd1 . to ∈ dom purse } | ( purse pd . to ) . status = eaTo ∧ ( purse pd . to ) . pdAuth = pd } └ ~\end{LNewADef}
+After that, we add the necessary lemmas
+\begin{LNewLemma}[$PayDetailsFromDomEPRPurse$ is finite]
+\begin{zeves-theorem}{rule lPayDetailsFromPurseEPRIsFinite}
+    \forall purse: NAMES \finj ConPurse @ PayDetailsFromDomEPRPurse \in \finset~PayDetails
+\end{theorem}~\end{LNewLemma}
+
+\begin{LNewLemma}[$epa$ set of payment details is finite via $from$]
+\begin{zeves-theorem}{rule lPayDetailsFromPurseEPAIsFinite}
+    \forall purse: NAMES \finj ConPurse @ PayDetailsFromDomEPAPurse \in \finset~PayDetails
+\end{theorem}~\end{LNewLemma}
+
+\begin{LNewLemma}[$epv$ set of payment details is finite via $to$]
+\begin{zeves-theorem}{rule lPayDetailsToPurseEPVIsFinite}
+    \forall purse: NAMES \finj ConPurse @ PayDetailsToDomEPVPurse \in \finset~PayDetails
+\end{theorem}~\end{LNewLemma}
+
+\begin{LNewLemma}[$eaTo$ set of payment details is finite via $to$]
+\begin{zeves-theorem}{rule lPayDetailsToPurseEATOIsFinite}
+    \forall purse: NAMES \finj ConPurse @ PayDetailsToDomEATOPurse \in \finset~PayDetails
+\end{theorem}~\end{LNewLemma}
+And finally, we prove the original Mondex theorem.
+\begin{LThm}[$AuxWorld$ do not add constraints to $ConWorld$] \begin{zeves-theorem}{tAuxWorldDoesNotAddConstraints}
+   \forall ConWorld @ \exists_1 NewVariables @ AuxWorld
+\end{theorem}~\end{LThm}
+
+\section{Constraints on the ether}\label{ch5.betweenworld}
+
+Due to the sheer size and complexity of the generated domain check proof,
+we decided to define $BetweenWorld$ by layering its properties via schema
+inclusion. This allows not only a smoother but also much faster proof.
+Essentially, we are factoring each case of the original proof with schemas.
+
+This is also a good idea because the assumptions immediately available for
+each domain check case from the original $BetweenWorld$ are given
+in sequence according to the declared schema predicates. Otherwise, if we
+had tried to prove the monolithic version, we would need a plethora of auxiliary
+lemmas.
+
+This layering also shows the interrelationship between different properties,
+and what predicates they depend upon. In the end, we just combine all properties
+to form the complete $BetweenWorld$. This layering idea comes from previous
+experience with a ZRC proof the a refinement model checking algorithm.
+
+\begin{LNewSDef}[Between world property $B1$]
+┌ BetweenWorldB1 
+AuxWorld |
+ ∀ pd : PayDetails | req pd ∈ ether ⦁ pd ∈ authenticTo └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[Between world property $B2$]
+┌ BetweenWorldB2 
+AuxWorld |
+ BetweenWorldB1 
+∀ pd : PayDetails | req pd ∈ ether ⦁ pd . toSeqNo < ( conAuthPurse pd . to ) . nextSeqNo └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[\textbf{Missing between world property for~}$\mathbf{B3}$]
+┌ BetweenWorldNEW1 
+AuxWorld |
+ ∀ pd : PayDetails | val pd ∈ ether ⦁ pd ∈ authenticTo └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[\textbf{Missing between world property for~}$\mathbf{B3}$]
+┌ BetweenWorldNEW2 
+AuxWorld |
+ ∀ pd : PayDetails | val pd ∈ ether ⦁ pd ∈ authenticFrom └ ~\end{LNewSDef}
+
+For property $B3$, the original purse was missing additional information about the
+authenticity of $val$ messages in the $ether$ for $to$ and $from$ purses. This did
+not happen for $rel$ messages, as property $B1$ shows.
+Moreover, we include the new properties in the predicate part to have a uniform signature
+across  $BetweenWorld$ properties. Although not strictly necessary, it helps \zeves\ while
+performing reduction or automatically applying forward ($frules$) rules.
+\begin{LNewSDef}[Between world property $B3$]
+┌ BetweenWorldB3 
+AuxWorld |
+ BetweenWorldNEW1 
+BetweenWorldNEW2 
+∀ pd : PayDetails | val pd ∈ ether ⦁ pd . toSeqNo < ( conAuthPurse pd . to ) . nextSeqNo ∧ pd . fromSeqNo < ( conAuthPurse pd . from ) . nextSeqNo └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[\textbf{Missing between world property for~}$\mathbf{B4}$]
+┌ BetweenWorldNEW3 
+AuxWorld |
+ ∀ pd : PayDetails | ack pd ∈ ether ⦁ pd ∈ authenticTo └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[\textbf{Missing between world property for~}$\mathbf{B4}$]
+┌ BetweenWorldNEW4 
+AuxWorld |
+ ∀ pd : PayDetails | ack pd ∈ ether ⦁ pd ∈ authenticFrom └ ~\end{LNewSDef}
+
+Similarly, for property $B4$, we need to include the authenticity of
+$ack$ messages in the $ether$ for $to$ and $from$ purses.
+\begin{LNewSDef}[Between world property $B4$]
+┌ BetweenWorldB4 
+AuxWorld |
+ BetweenWorldNEW3 
+BetweenWorldNEW4 
+∀ pd : PayDetails | ack pd ∈ ether ⦁ pd . toSeqNo < ( conAuthPurse pd . to ) . nextSeqNo ∧ pd . fromSeqNo < ( conAuthPurse pd . from ) . nextSeqNo └ ~\end{LNewSDef}
+
+For $B5$ nothing else is needed because the $from$ purses in $fromLogged$ are already authentic,
+as given by its definition in $AuxWorld$.
+\begin{LNewSDef}[Between world property $B5$]
+┌ BetweenWorldB5 
+AuxWorld |
+ ∀ pd : fromLogged ⦁ pd . fromSeqNo < ( conAuthPurse pd . from ) . nextSeqNo └ ~\end{LNewSDef}
+
+Similarly, for $B6$ $B7$ and $B8$, the $to$ purses in $toLogged$ and $from$ purses in $fromLogged$
+are already authentic as well.
+\begin{LNewSDef}[Between world property $B6$]
+┌ BetweenWorldB6 
+AuxWorld |
+ ∀ pd : toLogged ⦁ pd . toSeqNo < ( conAuthPurse pd . to ) . nextSeqNo └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[Between world property $B7$]
+┌ BetweenWorldB7 
+AuxWorld |
+ ∀ pd : fromLogged | ( conAuthPurse pd . from ) . status ∈ { epr , epa } ⦁ pd . fromSeqNo < ( conAuthPurse pd . from ) . pdAuth . fromSeqNo └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[Between world property $B8$]
+┌ BetweenWorldB8 
+AuxWorld |
+ ∀ pd : toLogged | ( conAuthPurse pd . to ) . status ∈ { epv , eaTo } ⦁ pd . toSeqNo < ( conAuthPurse pd . to ) . pdAuth . toSeqNo └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[Between world property $B9$]
+┌ BetweenWorldB9 
+AuxWorld |
+ ∀ pd : fromInEpr ⦁ disjoint ⟨ { val pd , ack pd } , ether ⟩ └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[Between world property $B10$]
+┌ BetweenWorldB10 
+AuxWorld |
+ ∀ pd : PayDetails ⦁ ( req pd ∈ ether ∧ ack pd ∉ ether ) ⇔ ( pd ∈ toInEpv ∪ toLogged ) └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[Between world property $B11$]
+┌ BetweenWorldB11 
+AuxWorld |
+ ∀ pd : PayDetails | val pd ∈ ether ∧ pd ∈ toInEpv ⦁ pd ∈ fromInEpa ∪ fromLogged └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[Between world property $B12$]
+┌ BetweenWorldB12 
+AuxWorld |
+ ∀ pd : fromInEpa ∪ fromLogged ⦁ req pd ∈ ether └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[Between world property $B13$]
+┌ BetweenWorldB13 
+AuxWorld |
+ toLogged ∈ 𝔽 PayDetails └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[Between world property $B14$]
+┌ BetweenWorldB14 
+AuxWorld |
+ ∀ pd : exceptionLogResult ∼ ⦇ ether ⦈ ⦁ pd ∈ allLogs └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[Between world property $B15$]
+┌ BetweenWorldB15 
+AuxWorld |
+ ∀ pds : ℙ↘1↖ PayDetails ; name : NAMES | exceptionLogClear ( name , image pds ) ∈ ether ⦁ { name } × pds ⊆ archive └ ~\end{LNewSDef}
+
+\begin{LNewSDef}[Between world property $B16$]
+┌ BetweenWorldB16 
+AuxWorld |
+ ∀ pd : fromLogged ∪ toLogged ⦁ req pd ∈ ether └ ~\end{LNewSDef}
+
+\begin{LSDef}[Complete between world definition]
+─ BetweenWorld == BetweenWorldB1 ∧ BetweenWorldB2 ∧ BetweenWorldB3 ∧ BetweenWorldB4 ∧ BetweenWorldB5 ∧ BetweenWorldB6 ∧ BetweenWorldB7 ∧ BetweenWorldB8 ∧ BetweenWorldB9 ∧ BetweenWorldB10 ∧ BetweenWorldB11 ∧ BetweenWorldB12 ∧ BetweenWorldB13 ∧ BetweenWorldB14 ∧ BetweenWorldB15 ∧ BetweenWorldB16 └ ~\end{LSDef}
+
+\subsection*{Expanded $BetweenWorld$}
+
+Cannot be a rule because of quantifiers in the goal.
+\begin{LNewLemma}[Between world simple expansion]
+\begin{zeves-theorem}{lBetweenWorldExpansion}
+    \forall BetweenWorld @
+    \znote{BetweenWorld components}
+    AuxWorld \land \\ \t1
+    \znote{BetweenWorld invariant}
+    (\forall pd : PayDetails | req~pd \in ether @ pd \in authenticTo) \\
+    \land
+    (\forall pd : PayDetails | req~pd \in ether @ \\
+        \t1 pd.toSeqNo < (conAuthPurse~ pd.to).nextSeqNo) \\
+    \land
+    (\forall pd : PayDetails | val~pd \in ether @ pd \in authenticTo) \\
+    \land
+    (\forall pd : PayDetails | val~pd \in ether @ pd \in authenticFrom) \\
+    \land
+    (\forall pd : PayDetails | val~pd \in ether @ \\
+        \t1 pd.toSeqNo < (conAuthPurse~ pd.to).nextSeqNo \\
+        \t1 \land pd.fromSeqNo < (conAuthPurse~ pd.from).nextSeqNo) \\
+    \land
+    (\forall pd : PayDetails | ack~pd \in ether @ pd \in authenticTo) \\
+    \land
+    (\forall pd : PayDetails | ack~pd \in ether @ pd \in authenticFrom) \\
+    \land
+    (\forall pd : PayDetails | ack~pd \in ether @ \\
+        \t1 pd.toSeqNo < (conAuthPurse~ pd.to).nextSeqNo  \\         \t1 \land pd.fromSeqNo < (conAuthPurse~ pd.from).nextSeqNo) \\
+    \land     (\forall pd : fromLogged @  \\         \t1 pd.fromSeqNo < (conAuthPurse~pd.from).nextSeqNo) \\
+    \land     (\forall pd : toLogged @ pd.toSeqNo < (conAuthPurse~pd.to).nextSeqNo) \\
+    \land     (\forall pd : fromLogged | \\         \t1 (conAuthPurse~pd.from).status \in \{epr,epa\} @  \\         \t2 pd.fromSeqNo \\         \t2 < (conAuthPurse~pd.from).pdAuth.fromSeqNo) \\
+    \land     (\forall pd : toLogged | (conAuthPurse~pd.to).status \in \{ epv,eaTo \} @ \\         \t1 pd.toSeqNo < (conAuthPurse~pd.to).pdAuth.toSeqNo) \\
+    \land     (\forall pd : fromInEpr @ \disjoint \langle \{ val~pd, ack~pd \} , ether \rangle) \\
+    \land     (\forall pd : PayDetails @ \\         \t1 (req~pd \in ether \land ack~pd \notin ether~) \\         \t2 \iff (pd \in toInEpv \cup toLogged)) \\
+    \land     (\forall pd : PayDetails | val~pd \in ether \land pd \in toInEpv @ \\         \t1 pd \in fromInEpa \cup fromLogged) \\
+    \land     (\forall pd : fromInEpa \cup fromLogged @  req~pd \in ether) \\
+    \land     (toLogged \in \finset PayDetails) \\
+    \land     (\forall pd : exceptionLogResult\inv \limg ether \rimg @ pd \in allLogs) \\
+    \land     (\forall pds : \power_1 PayDetails; name : NAMES | \\             \t2 exceptionLogClear(name, image~pds) \in ether @ \\         \t1 \{name\} \cross pds \subseteq archive) \\
+    \land     (\forall pd: fromLogged \cup toLogged @ req~pd \in ether)
+\end{theorem}~\end{LNewLemma}
+
+Unfortunately, if $AuxWorld$ elements or invariant are needed in proofs, the
+next theorem is required. That is because $AuxWorld$ is blown away by \zeves\
+when the closed $BetweenWorld$ appears early on the list of assumptions.
+\begin{LNewLemma}[Between $AuxWorld$ expansion]
+\begin{zeves-theorem}{lBetweenWorldAuxWorldExpansion}
+    \znote{AuxWorld components}
+    \forall BetweenWorld @ ConWorld \land
+            allLogs \in NAMES \rel PayDetails \land \\ \t1
+            authenticFrom \in \power~PayDetails \land
+            authenticTo \in \power~PayDetails \land \\ \t1
+            fromLogged \in \power~PayDetails \land
+            toLogged \in \power~PayDetails \land \\ \t1
+            toInEpv \in \power~PayDetails \land
+            toInEapayee \in \power~PayDetails \land \\ \t1
+            fromInEpr \in \power~PayDetails \land
+            fromInEpa \in \power~PayDetails \land \\ \t1
+            definitelyLost \in \power~PayDetails \land
+            maybeLost \in \power~PayDetails \land \\
+        \znote{AuxWorld invariant} \t1
+            toInEpv \in \finset~PayDetails \land \\ \t1
+            toInEapayee \in \finset~PayDetails \land
+            fromInEpr \in \finset~PayDetails \land \\ \t1
+            fromInEpa \in \finset~PayDetails \land
+            maybeLost \in \finset~PayDetails \land \\ \t1
+            authenticFrom \in \finset PayDetails \land
+            authenticTo \in \finset PayDetails \land \\ \t1
+            fromLogged = \{~ pd: authenticFrom | pd.from \mapsto pd \in allLogs ~\} \land \\ \t1
+            toLogged = \{~ pd: authenticTo | pd.to \mapsto pd \in allLogs ~\} \land \\ \t1
+            authenticFrom = \{~ pd: PayDetails | pd.from \in \dom~conAuthPurse~\} \land \\ \t1
+            authenticTo = \{~ pd: PayDetails | pd.to \in \dom~conAuthPurse~\} \land \\ \t1
+            toInEpv = \{~ pd: authenticTo | (conAuthPurse pd.to).status = epv \\
+                    \t4 \land (conAuthPurse pd.to).pdAuth = pd ~\} \land \\ \t1
+            toInEapayee = \{~ pd: authenticTo | (conAuthPurse pd.to).status = eaTo \\
+                    \t5 \land (conAuthPurse pd.to).pdAuth = pd ~\} \land \\ \t1
+            fromInEpr = \{~ pd: authenticFrom | (conAuthPurse pd.from).status = epr \\
+                    \t5 \land (conAuthPurse pd.from).pdAuth = pd ~\} \land \\ \t1
+            fromInEpa = \{~ pd: authenticFrom | (conAuthPurse pd.from).status = epa \\
+                    \t5 \land (conAuthPurse pd.from).pdAuth = pd ~\} \land \\ \t1
+            allLogs = archive \cup \\
+                \t2 \{~ n: \dom~conAuthPurse; pd: PayDetails | pd \in (conAuthPurse~n).exLog ~\} \land \\ \t1
+            definitelyLost = toLogged \cap (fromLogged \cup fromInEpa) \land \\ \t1
+            maybeLost = (fromInEpa \cup fromLogged) \cap toInEpv \land \\
+    \znote{BetweenWorld invariant}\t1
+            (\forall pd : PayDetails | req~pd \in ether @ pd \in authenticTo)
+            \land \\ \t1
+            (\forall pd : PayDetails | req~pd \in ether @
+                 pd.toSeqNo < (conAuthPurse~ pd.to).nextSeqNo) \\ \t1
+            \land
+            (\forall pd : PayDetails | val~pd \in ether @ pd \in authenticTo) \land \\ \t1
+            (\forall pd : PayDetails | val~pd \in ether @ pd \in authenticFrom) \land \\ \t1
+            (\forall pd : PayDetails | val~pd \in ether @ pd.toSeqNo < (conAuthPurse~ pd.to).nextSeqNo \\
+                \t2 \land pd.fromSeqNo < (conAuthPurse~ pd.from).nextSeqNo) \land \\ \t1
+            (\forall pd : PayDetails | ack~pd \in ether @ pd \in authenticTo)\land  \\ \t1
+            (\forall pd : PayDetails | ack~pd \in ether @ pd \in authenticFrom) \land \\ \t1
+            (\forall pd : PayDetails | ack~pd \in ether @ pd.toSeqNo < (conAuthPurse~ pd.to).nextSeqNo  \\                 \t2 \land pd.fromSeqNo < (conAuthPurse~ pd.from).nextSeqNo) \land \\ \t1
+            (\forall pd : fromLogged @  pd.fromSeqNo < (conAuthPurse~pd.from).nextSeqNo) \land \\ \t1
+            (\forall pd : toLogged @ pd.toSeqNo < (conAuthPurse~pd.to).nextSeqNo) \land  \\ \t1
+            (\forall pd : fromLogged | (conAuthPurse~pd.from).status \in \{epr,epa\} @  \\                 \t2 pd.fromSeqNo < (conAuthPurse~pd.from).pdAuth.fromSeqNo) \land \\ \t1
+            (\forall pd : toLogged | (conAuthPurse~pd.to).status \in \{ epv,eaTo \} @ \\                 \t2 pd.toSeqNo < (conAuthPurse~pd.to).pdAuth.toSeqNo) \land \\ \t1
+            (\forall pd : fromInEpr @ \disjoint \langle \{ val~pd, ack~pd \} , ether \rangle) \land \\ \t1
+            (\forall pd : PayDetails @ (req~pd \in ether \land ack~pd \notin ether~)
+                \iff (pd \in toInEpv \cup toLogged)) \\ \t1
+            \land (\forall pd : PayDetails | val~pd \in ether \land pd \in toInEpv @ \\                 \t3 pd \in fromInEpa \cup fromLogged) \land \\ \t1
+            (\forall pd : fromInEpa \cup fromLogged @  req~pd \in ether) \land
+            (toLogged \in \finset PayDetails) \land \\ \t1
+            (\forall pd : exceptionLogResult\inv \limg ether \rimg @ pd \in allLogs) \land \\ \t1
+            (\forall pds : \power_1 PayDetails; name : NAMES | \\                     \t3 exceptionLogClear(name, image~pds) \in ether @ \\                 \t4 \{name\} \cross pds \subseteq archive) \land \\ \t1
+            (\forall pd: fromLogged \cup toLogged @ req~pd \in ether)
+\end{theorem}~\end{LNewLemma}
+These theorems would be equivalent to having individual forward rules (frule),
+one for each invariant property and schema component. (see Chapter~\ref{ch10} for
+were it is used).
+\begin{LNewLemma}[Between world full expansion]
+\begin{zeves-theorem}{lBetweenWorldFullExpansion}
+    \znote{ConWorld components and invariant}
+    \forall BetweenWorld @ conAuthPurse \in NAMES \finj ConPurse \land
+            ether \in \power~MESSAGE \land \\ \t1
+            archive \in Logbook \land  (\forall n: \dom~conAuthPurse @ (conAuthPurse~n).name = n) \land \\ \t1
+            (\forall nld: archive @ first~nld \in \dom~conAuthPurse) \land \\
+        \znote{AuxWorld components and invariant} \t1
+            allLogs \in NAMES \rel PayDetails \land
+            authenticFrom \in \power~PayDetails \land \\ \t1
+            authenticTo \in \power~PayDetails \land
+            fromLogged \in \power~PayDetails \land \\ \t1
+            toLogged \in \power~PayDetails \land
+            toInEpv \in \power~PayDetails \land \\ \t1
+            toInEapayee \in \power~PayDetails \land
+            fromInEpr \in \power~PayDetails \land \\ \t1
+            fromInEpa \in \power~PayDetails \land
+            definitelyLost \in \power~PayDetails \land \\ \t1
+            maybeLost \in \power~PayDetails \land
+            toInEpv \in \finset~PayDetails \land \\ \t1
+            toInEapayee \in \finset~PayDetails \land
+            fromInEpr \in \finset~PayDetails \land \\ \t1
+            fromInEpa \in \finset~PayDetails \land
+            maybeLost \in \finset~PayDetails \land \\ \t1
+            authenticFrom \in \finset PayDetails \land
+            authenticTo \in \finset PayDetails \land \\ \t1
+            fromLogged = \{~ pd: authenticFrom | pd.from \mapsto pd \in allLogs ~\} \land \\ \t1
+            toLogged = \{~ pd: authenticTo | pd.to \mapsto pd \in allLogs ~\} \land \\ \t1
+            authenticFrom = \{~ pd: PayDetails | pd.from \in \dom~conAuthPurse~\} \land \\ \t1
+            authenticTo = \{~ pd: PayDetails | pd.to \in \dom~conAuthPurse~\} \land \\ \t1
+            toInEpv = \{~ pd: authenticTo | (conAuthPurse pd.to).status = epv \\
+                    \t4 \land (conAuthPurse pd.to).pdAuth = pd ~\} \land \\ \t1
+            toInEapayee = \{~ pd: authenticTo | (conAuthPurse pd.to).status = eaTo \\
+                    \t5 \land (conAuthPurse pd.to).pdAuth = pd ~\} \land \\ \t1
+            fromInEpr = \{~ pd: authenticFrom | (conAuthPurse pd.from).status = epr \\
+                    \t5 \land (conAuthPurse pd.from).pdAuth = pd ~\} \land \\ \t1
+            fromInEpa = \{~ pd: authenticFrom | (conAuthPurse pd.from).status = epa \\
+                    \t5 \land (conAuthPurse pd.from).pdAuth = pd ~\} \land \\ \t1
+            allLogs = archive \cup \\
+                \t2 \{~ n: \dom~conAuthPurse; pd: PayDetails | pd \in (conAuthPurse~n).exLog ~\} \land \\ \t1
+            definitelyLost = toLogged \cap (fromLogged \cup fromInEpa) \land \\ \t1
+            maybeLost = (fromInEpa \cup fromLogged) \cap toInEpv \land \\
+    \znote{BetweenWorld invariant}\t1
+            (\forall pd : PayDetails | req~pd \in ether @ pd \in authenticTo)
+            \land \\ \t1
+            (\forall pd : PayDetails | req~pd \in ether @
+                 pd.toSeqNo < (conAuthPurse~ pd.to).nextSeqNo) \\ \t1
+            \land
+            (\forall pd : PayDetails | val~pd \in ether @ pd \in authenticTo) \land \\ \t1
+            (\forall pd : PayDetails | val~pd \in ether @ pd \in authenticFrom) \land \\ \t1
+            (\forall pd : PayDetails | val~pd \in ether @ pd.toSeqNo < (conAuthPurse~ pd.to).nextSeqNo \\
+                \t2 \land pd.fromSeqNo < (conAuthPurse~ pd.from).nextSeqNo) \land \\ \t1
+            (\forall pd : PayDetails | ack~pd \in ether @ pd \in authenticTo)\land  \\ \t1
+            (\forall pd : PayDetails | ack~pd \in ether @ pd \in authenticFrom) \land \\ \t1
+            (\forall pd : PayDetails | ack~pd \in ether @ pd.toSeqNo < (conAuthPurse~ pd.to).nextSeqNo  \\                 \t2 \land pd.fromSeqNo < (conAuthPurse~ pd.from).nextSeqNo) \land \\ \t1
+            (\forall pd : fromLogged @  pd.fromSeqNo < (conAuthPurse~pd.from).nextSeqNo) \land \\ \t1
+            (\forall pd : toLogged @ pd.toSeqNo < (conAuthPurse~pd.to).nextSeqNo) \land  \\ \t1
+            (\forall pd : fromLogged | (conAuthPurse~pd.from).status \in \{epr,epa\} @  \\                 \t2 pd.fromSeqNo < (conAuthPurse~pd.from).pdAuth.fromSeqNo) \land \\ \t1
+            (\forall pd : toLogged | (conAuthPurse~pd.to).status \in \{ epv,eaTo \} @ \\                 \t2 pd.toSeqNo < (conAuthPurse~pd.to).pdAuth.toSeqNo) \land \\ \t1
+            (\forall pd : fromInEpr @ \disjoint \langle \{ val~pd, ack~pd \} , ether \rangle) \land \\ \t1
+            (\forall pd : PayDetails @ (req~pd \in ether \land ack~pd \notin ether~)
+                \iff (pd \in toInEpv \cup toLogged)) \\ \t1
+            \land (\forall pd : PayDetails | val~pd \in ether \land pd \in toInEpv @ \\                 \t3 pd \in fromInEpa \cup fromLogged) \land \\ \t1
+            (\forall pd : fromInEpa \cup fromLogged @  req~pd \in ether) \land
+            (toLogged \in \finset PayDetails) \land \\ \t1
+            (\forall pd : exceptionLogResult\inv \limg ether \rimg @ pd \in allLogs) \land \\ \t1
+            (\forall pds : \power_1 PayDetails; name : NAMES | \\                     \t3 exceptionLogClear(name, image~pds) \in ether @ \\                 \t4 \{name\} \cross pds \subseteq archive) \land \\ \t1
+            (\forall pd: fromLogged \cup toLogged @ req~pd \in ether)
+\end{theorem}~\end{LNewLemma}
+
+
+\section{Framing schema}\label{ch5.phibop}
+
+We could have used $\Phi BOp$, but this creates a naming compatibility
+between the \zeves\ GUI and \zeves\ x-emacs interfaces.
+\begin{LSDef}[Between world promotion schema]
+┌ PhiBOp 
+ΔBetweenWorld 
+ΔConPurse 
+m? , m! : MESSAGE 
+name? : NAMES |
+ m? ∈ ether 
+name? ∈ dom conAuthPurse 
+θ ConPurse = conAuthPurse name? 
+conAuthPurse′ = conAuthPurse ⊕ { name? ↦ θ ConPurse ′ } 
+archive′ = archive 
+ether′ = ether ∪ { m! } └ ~\end{LSDef}
+
+\section{$Ignore$, $Increase$ and $Abort$}\label{ch5.ignore.increase.abort}
+
+\begin{LSDef}[Between world ignore operation]
+─ Ignore == [ ΞBetweenWorld ; name? : NAMES ; m? , m! : MESSAGE | m! = bot ] └ ~\end{LSDef}
+
+\begin{LSDef}[Between world increase operation]
+─ Increase == Ignore ∨ ( ∃ ΔConPurse ⦁ PhiBOp ∧ IncreasePurseOkay ) └ ~\end{LSDef}
+
+\begin{LSDef}[Between world abort operation]
+─ Abort == Ignore ∨ ( ∃ ΔConPurse ⦁ AbortPurseOkay ∧ [ PhiBOp | m! = bot ] ) └ ~\end{LSDef}
+
+\section{Promoted operations}\label{ch5.promoted}
+
+\subsection{Value transfer operations}\label{ch5.promoted.valuetransfer}
+
+\begin{LSDef}[Between world value transfer $startFrom$ complete operation]
+─ StartFrom == Ignore ∨ Abort ∨ ( ∃ ΔConPurse ⦁ PhiBOp ∧ StartFromPurseOkay ) └ ~\end{LSDef}
+
+\begin{LSDef}[Between world value transfer $startTo$ complete operation]
+─ StartTo == Ignore ∨ Abort ∨ ( ∃ ΔConPurse ⦁ PhiBOp ∧ StartToPurseOkay ) └ ~\end{LSDef}
+
+The next two operations are used in lemmas from Section~\ref{ch14.between-special}.
+\begin{LSDef}[Promoted $StartFrom$ without $Ignore$ and $Abort$]
+─ StartFromEafromOkay == ∃ ΔConPurse ⦁ PhiBOp ∧ StartFromPurseEafromOkay └ ~\end{LSDef}
+
+\begin{LSDef}[Promoted $StartTo$ without $Ignore$ and $Abort$]
+─ StartToEafromOkay == ∃ ΔConPurse ⦁ PhiBOp ∧ StartToPurseEafromOkay └ ~\end{LSDef}
+
+\begin{LSDef}[Between world value transfer request operation]
+─ Req == Ignore ∨ ( ∃ ΔConPurse ⦁ PhiBOp ∧ ReqPurseOkay ) └ ~\end{LSDef}
+
+\begin{LSDef}[Between world value transfer value operation]
+─ Val == Ignore ∨ ( ∃ ΔConPurse ⦁ PhiBOp ∧ ValPurseOkay ) └ ~\end{LSDef}
+
+\begin{LSDef}[Between world value transfer acknowledgement operation]
+─ Ack == Ignore ∨ ( ∃ ΔConPurse ⦁ PhiBOp ∧ AckPurseOkay ) └ ~\end{LSDef}
+
+\subsection{Exception log operations}\label{ch5.promoted.exception}
+
+\begin{LSDef}[Between world read exception log complete operation]
+─ ReadExceptionLog == Ignore ∨ ( ∃ ΔConPurse ⦁ PhiBOp ∧ ReadExceptionLogPurseOkay ) └ ~\end{LSDef}
+
+Why considers abort twice?
+\begin{LSDef}[Between world clear exception log complete operation]
+─ ClearExceptionLog == Ignore ∨ Abort ∨ ( ∃ ΔConPurse ⦁ PhiBOp ∧ ClearExceptionLogPurseOkay ) └ ~\end{LSDef}
+
+The next two operations are used in lemmas from Section~\ref{ch14.between-special}.
+\begin{LSDef}[Promoted $ReadExceptionLog$ without $Ignore$ and $Abort$]
+─ ReadExceptionLogEafromOkay == ∃ ΔConPurse ⦁ PhiBOp ∧ ReadExceptionLogPurseEafromOkay └ ~\end{LSDef}
+
+\begin{LSDef}[Promoted $ClearExceptionLog$ without $Ignore$ and $Abort$]
+─ ClearExceptionLogEafromOkay == ∃ ΔConPurse ⦁ PhiBOp ∧ ClearExceptionLogPurseEafromOkay └ ~\end{LSDef}
+
+\section{Operations at the world level only}\label{ch5.worldop}
+
+\subsection{Exception Log clear authorisation}
+
+\begin{LSDef}[Between world authorised exception log clear operation]
+┌ AuthoriseExLogClearOkay 
+ΔBetweenWorld 
+m? , m! : MESSAGE 
+name? : NAMES |
+ conAuthPurse′ = conAuthPurse 
+∃ pds : ℙ↘1↖ PayDetails ⦁ { name? } × pds ⊆ archive ∧ m! = exceptionLogClear ( name? , image pds ) 
+ether′ = ether ∪ { m! } 
+archive = archive′ └ ~\end{LSDef}
+
+\begin{LSDef}[Authorised between world log clear operation]
+─ AuthoriseExLogClear == Ignore ∨ AuthoriseExLogClearOkay └ ~\end{LSDef}
+
+\begin{LSDef}[Between world exception log archiving operation]
+┌ Archive 
+ΔBetweenWorld 
+m? , m! : MESSAGE 
+name? : NAMES |
+ conAuthPurse′ = conAuthPurse 
+ether′ = ether 
+archive ⊆ archive′ ⊆ archive ∪ { log : NAMES × PayDetails | exceptionLogResult log ∈ ether } 
+m! = bot └ ~\end{LSDef}
+
+\section{The complete protocol}
+
+\begin{LSDef}[Complete transfer protocol between concrete levels]
+─ CompleteProtocol == StartFrom ⨟ StartTo ⨟ Req ⨟ Val ⨟ Ack └ ~\end{LSDef}
+
+\newpage
+\section{Summary}\label{ch5.summary}
+
+\ldefsummary \lthmsummary \lthmaddeddefsummary \lthmaddedthmsummary \lzevessummary

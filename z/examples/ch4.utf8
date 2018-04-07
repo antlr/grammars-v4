@@ -1,0 +1,407 @@
+\chapter{\Betw\ model, single purse, operations}\label{ch4}
+
+─ section ch4 parents ch3 └ 
+
+\section{Status}
+
+\begin{LFType}[Between world status type]
+─ STATUS ::= eaFrom | eaTo | epr | epv | epa └ ~\end{LFType}
+
+\section{Message details}\label{ch4.msgdetails}
+
+\subsection{Start message counter party details}
+
+As $CounterPartyDetails$ appears in ($\mu$-) equivalences
+and expressions related to $PayDetails$, we also change
+to be a finite schema.
+\begin{LSDef}[Counter party details]
+┌ CounterPartyDetails 
+name : NAMES 
+value : NAT 
+nextSeqNo : NAT └ ~\end{LSDef}
+
+\subsection{Payment log message details}
+
+During the various definitions and theorems where $PayDetails$
+appear, it often happens that some sets of its bindings restricted
+in particular ways are finite. Unfortunately, that is not true
+because the space of names and possible values are not bounded.
+To amend that and make the claimed finiteness assumptions appearing
+in the PRG $true$, we need change the values to be bounded as $NAT$.
+\begin{LSDef}[Payment details]
+┌ PayDetails 
+TransferDetails 
+fromSeqNo , toSeqNo : NAT |
+ from ≠ to └ ~\end{LSDef}
+There are two (wrong) assumptions made in the PRG:~one implicit,
+and another explicit. The implicit one is that the set
+\begin{gzed}
+   \{~ pd: PayDetails | pd.from = name ~\} \in \finset~PayDetails
+\end{gzed}
+of $PayDetails$ bindings is finite. This true if, and only if, the available names
+are finite and the values are bounded. Otherwise, we could have
+payments from the same person $to$ infinitely many other persons with
+infinitely many possible values. The explicit one is that the set
+\begin{gzed}
+   purse \in NAME \ffun ConPurse \implies \\ \t1
+   \{~ pd: PayDetails | pd.from \in \dom~purse ~\} \in \finset~PayDetails
+\end{gzed}
+is finite. It is explicit because the PRG clearly mentions (p.40) for
+the definition of $toInEpv$ being finite ``because $conAuthPurse$ is finite'',
+which is not $true$.
+
+\section{Clear exception log validation}
+
+\begin{LGSet}[Exception log clearance code for $PayDetails$]
+─ [ CLEAR ] └ ~\end{LGSet}
+
+To prove the consistency of $image$ below, we require that at
+leat one payment details could be created, which is ensured by
+the next lemma.
+\begin{LNewLemma}[It is always possible to find a payment details]
+\begin{zeves-theorem}{lExistsPayDetails}
+    \exists pd: PayDetails @ true
+\end{theorem}~\end{LNewLemma}
+
+TODO: Add discharging axiomatic definition to make
+$image$ an injection on some choice of $c \in CLEAR$.
+\begin{LADef}[$PayDetails$ exception log clearance code]
+╷ image : ℙ↘1↖ PayDetails ↣ CLEAR └ ~\end{LADef}
+
+\section{Messages}
+\begin{LFType}[Between world message type]
+─ MESSAGE ::= startFrom ⟪ CounterPartyDetails ⟫ | startTo ⟪ CounterPartyDetails ⟫ | readExceptionLog | req ⟪ PayDetails ⟫ | val ⟪ PayDetails ⟫ | ack ⟪ PayDetails ⟫ | exceptionLogResult ⟪ NAMES × PayDetails ⟫ | exceptionLogClear ⟪ NAMES × CLEAR ⟫ | bot └ ~\end{LFType}
+
+\section{A concrete purse}
+
+Although there are no finiteness restrictions
+on expressions involving $ConPurse$, it appears in expressions
+updating $PayDetails$, which includes finiteness restrictions.
+Thus, differently from $AbPurse$, we need to impose restrictions
+on the elements of $ConPurse$ affected by $PayDetails$.
+\begin{LSDef}[Concrete purse definition]
+┌ ConPurse 
+balance : ℕ 
+exLog : ℙ PayDetails 
+name : NAMES 
+nextSeqNo : NAT 
+pdAuth : PayDetails 
+status : STATUS |
+ ∀ pd : exLog ⦁ name ∈ { pd . from , pd . to } 
+status = epr ⇒ name = pdAuth . from ∧ pdAuth . value ≤ balance ∧ pdAuth . fromSeqNo < nextSeqNo 
+status = epv ⇒ pdAuth . toSeqNo < nextSeqNo 
+status = epa ⇒ pdAuth . fromSeqNo < nextSeqNo └ ~\end{LSDef}
+
+\section{Invisible operations}
+
+\subsection{Increase purse}
+
+\begin{LSDef}[Concrete purse signature for increase operations]
+─ ConPurseIncrease == ConPurse ⧹ ( nextSeqNo ) └ ~\end{LSDef}
+
+\begin{LSDef}[Concrete purse successful increase operation]
+┌ IncreasePurseOkay 
+ΔConPurse 
+m? , m! : MESSAGE |
+ ΞConPurseIncrease 
+nextSeqNo′ ≥ nextSeqNo 
+m! = bot └ ~\end{LSDef}
+
+\subsection{Exception logging}
+
+This is the same as subsection $2.3.1$ (p.$13$) from PRG-$126$.
+\begin{LSDef}[Exception log security property for concrete purses]
+┌ LogIfNecessary 
+ΔConPurse |
+ exLog′ = exLog ∪ ( if ( status ∈ { epv , epa } ) then { pdAuth } else ∅ ) └ ~\end{LSDef}
+
+\subsection{Abort purse}
+
+\begin{LSDef}[Concrete purse signature for aborted operations]
+─ ConPurseAbort == ConPurse ⧹ ( nextSeqNo , exLog , pdAuth , status ) └ ~\end{LSDef}
+
+\begin{LSDef}[Concrete purse successful abort operation]
+┌ AbortPurseOkay 
+ΔConPurse 
+m? , m! : MESSAGE |
+ ΞConPurseAbort 
+LogIfNecessary 
+status′ = eaFrom 
+nextSeqNo′ ≥ nextSeqNo └ ~\end{LSDef}
+
+\section{Value transfer operations}\label{ch4.valTransferOp}
+
+\begin{LSDef}[Concrete purse signature for start operations]
+─ ConPurseStart == ConPurse ⧹ ( nextSeqNo , pdAuth , status ) └ ~\end{LSDef}
+
+\begin{LSDef}[Concrete purse signature for request operations]
+─ ConPurseReq == ConPurse ⧹ ( balance , status ) └ ~\end{LSDef}
+
+\begin{LSDef}[Concrete purse signature for value transfer operations]
+─ ConPurseVal == ConPurse ⧹ ( balance , status ) └ ~\end{LSDef}
+
+\begin{LSDef}[Concrete purse signature for acknowledgement operations]
+─ ConPurseAck == ConPurse ⧹ ( status , pdAuth ) └ ~\end{LSDef}
+
+\subsection*{Automation for $StartFromPurse$}
+
+The following $3$ rules are needed for discharging goals involving the types of elements
+from counter party details schema. They appear because in the definite description of
+\begin{gzed} StartFromPurseEafromOkay \end{gzed} we make direct use of the fields of $cpd$.
+\begin{LFRT}[$CounterPartyDetails$ $name$ type]
+\begin{zeves-theorem}{frule fCounterPartyDetailsNameType}
+   x \in CounterPartyDetails \implies x.name \in NAMES
+\end{theorem}~\end{LFRT}
+
+\begin{LFRT}[$CounterPartyDetails$ $value$ upper bound]
+\begin{zeves-theorem}{frule fCounterPartyDetailsValueUpperBound}
+   x \in CounterPartyDetails \implies x.value \leq MAX\_NAT
+\end{theorem}~\end{LFRT}
+
+\begin{LFRT}[$CounterPartyDetails$ $value$ lower bound]
+\begin{zeves-theorem}{frule fCounterPartyDetailsValueLowerBound}
+   x \in CounterPartyDetails \implies 0 \leq x.value
+\end{theorem}~\end{LFRT}
+
+\begin{LFRT}[$CounterPartyDetails$ $nextSeqNo$ upper bound]
+\begin{zeves-theorem}{frule fCounterPartyDetailsNextSeqNoUpperBound}
+   x \in CounterPartyDetails \implies x.nextSeqNo \leq MAX\_NAT
+\end{theorem}~\end{LFRT}
+
+\begin{LFRT}[$CounterPartyDetails$ $nextSeqNo$ lower bound]
+\begin{zeves-theorem}{frule fCounterPartyDetailsNextSeqNoLowerBound}
+   x \in CounterPartyDetails \implies 0 \leq x.nextSeqNo
+\end{theorem}~\end{LFRT}
+The following $5$ rules are needed for discharging goals involving \begin{gzed} startFrom\inv m? \end{gzed}
+The relationship between them is explained in the corresponding proof scripts below.
+\begin{LFRT}[$CounterPartyDetails$ binding type]
+\begin{zeves-theorem}{frule fCounterPartyDetailsMember}
+    x \in  CounterPartyDetails \implies  x \in  \lblot name: NAME; nextSeqNo: \nat ; value: \nat \rblot
+\end{theorem}~\end{LFRT}
+
+\begin{LFRT}[$CounterPartyDetails$ binding membership]
+\begin{zeves-theorem}{frule fCounterPartyDetailsInSetMember}
+   x \in  \lblot name: NAMES; nextSeqNo: NAT ; value: NAT \rblot  \implies  x \in  CounterPartyDetails
+\end{theorem}~\end{LFRT}
+
+\begin{LGRT}[$startFrom$ $MESSAGE$ relation type]
+\begin{zeves-theorem}{grule gMESSAGEStartFromRelType}
+   startFrom \in  \lblot name: NAME; nextSeqNo: \nat ; value: \nat \rblot  \rel  MESSAGE
+\end{theorem}~\end{LGRT}
+
+\begin{LGRT}[$startFrom$ $MESSAGE$ partial function type]
+\begin{zeves-theorem}{grule gMESSAGEStartFromPFunType}
+   startFrom \in  \lblot name: NAME; nextSeqNo: \nat ; value: \nat \rblot  \pfun  MESSAGE
+\end{theorem}~\end{LGRT}
+
+\begin{LGRT}[$startFrom$ $MESSAGE$ partial injection type]
+\begin{zeves-theorem}{grule gMESSAGEStartFromPInjType}
+   startFrom \in \lblot name: NAME; nextSeqNo: \nat ;  value: \nat \rblot \pinj MESSAGE
+\end{theorem}~\end{LGRT}
+Interestingly, during the experiments with an old version of \zeves\ in an old machine,
+we had the last theorem as
+\begin{gzed}
+  startFrom \in \lblot name: NAME; value: \nat; nextSeqNo: \nat \rblot \pinj MESSAGE
+\end{gzed}
+which should be irrelevant, but the old prover complained that ``\textit{You may only make binding sets of an already-declared schema type}''
+(error code: \texttt{NoBindingSetAlphabet}). The solution is trivial: the earlier version requires that
+binding variable names appears in alphabetical order, rather than in declaration order.
+Similar changes in the order of binding variable names are needed in:
+\begin{table}[ht]
+\[
+\begin{array}{|c|l|l|}
+    \hline
+    \multicolumn{1}{|c}{\mbox{\textbf{Chapter}}} & \multicolumn{1}{|c}{\mbox{\textbf{Binding}}} & \multicolumn{1}{|c|}{\mbox{\textbf{Theorem}}} \\
+    \hline
+    \ref{ch4}               & CounterPartyDetails     & gMESSAGEStartToPInjType \\
+    \hline
+    \ref{ch5}               & PayDetails              & lPayDetailsIsFinite \\
+    \hline
+    \ref{ch6}               & PayDetails              & fPayDetailsMember \\
+    \hline
+    \ref{ch6}               & PayDetails              & gMESSAGEReqRelType \\
+    \hline
+    \ref{ch6}               & PayDetails              & gMESSAGEReqPFunType \\
+    \hline
+    \ref{ch6}               & PayDetails              & gMESSAGEReqPInjType \\
+    \hline
+\end{array}
+\]
+\caption{Bindings changed to alphabetical rather than declaration order}
+\end{table}
+
+\subsection{StartFromPurse}\label{ch4.valTransferOp.StartFromPurse}
+
+Maybe a schema inclusion with the interface is better for \zeves\ automation.
+Let us see.
+\begin{LSDef}[$startFrom$ operation invariant]
+┌ ValidStartFrom 
+ConPurse 
+m? : MESSAGE 
+cpd : CounterPartyDetails |
+ m? ∈ ran startFrom 
+cpd = ( startFrom ∼ ) m? 
+cpd . name ≠ name 
+cpd . value ≤ balance └ ~\end{LSDef}
+
+\begin{LSDef}[Successful $startFrom$ operation over concrete purses]
+┌ StartFromPurseEafromOkay 
+ΔConPurse 
+m? , m! : MESSAGE 
+cpd : CounterPartyDetails |
+ ValidStartFrom 
+status = eaFrom 
+ΞConPurseStart 
+nextSeqNo < MAX_NAT 
+nextSeqNo′ > nextSeqNo 
+pdAuth′ = ( μ PayDetails | from = name ∧ to = cpd . name ∧ value = cpd . value ∧ fromSeqNo = nextSeqNo ∧ toSeqNo = cpd . nextSeqNo ) 
+status′ = epr 
+m! = bot └ ~\end{LSDef}
+
+\begin{LSDef}[Successful $startFrom$ operation with recovery from abortion]
+─ StartFromPurseOkay == AbortPurseOkay ⨟ StartFromPurseEafromOkay ⧹ ( cpd ) └ ~\end{LSDef}
+
+\subsection{StartToPurse}
+
+\subsection*{Automation for $ValidStartTo$}
+
+These theorems are similar to those for $startFrom$ in~\ref{ch4.valTransferOp}
+\begin{LGRT}[$startTo$ $MESSAGE$ relation type]
+\begin{zeves-theorem}{grule gMESSAGEStartToRelType}
+   startTo \in  \lblot name: NAME; nextSeqNo: \nat ; value: \nat \rblot  \rel  MESSAGE
+\end{theorem}~\end{LGRT}
+
+\begin{LGRT}[$startTo$ $MESSAGE$ partial function type]
+\begin{zeves-theorem}{grule gMESSAGEStartToPFunType}
+   startTo \in  \lblot name: NAME; nextSeqNo: \nat ; value: \nat \rblot  \pfun  MESSAGE
+\end{theorem}~\end{LGRT}
+
+\begin{LGRT}[$startTo$ $MESSAGE$ partial injection type]
+\begin{zeves-theorem}{grule gMESSAGEStartToPInjType}
+   startTo \in \lblot name: NAME; nextSeqNo: \nat; value: \nat \rblot \pinj MESSAGE
+\end{theorem}~\end{LGRT}
+
+\subsection*{$StartToPurse$ definition}
+
+\begin{LSDef}[$startTo$ operation invariant]
+┌ ValidStartTo 
+ConPurse 
+m? : MESSAGE 
+cpd : CounterPartyDetails |
+ m? ∈ ran startTo 
+cpd = ( startTo ∼ ) m? 
+cpd . name ≠ name └ ~\end{LSDef}
+
+\begin{LSDef}[Successful $startTo$ operation over concrete purses]
+┌ StartToPurseEafromOkay 
+ΔConPurse 
+m? , m! : MESSAGE 
+cpd : CounterPartyDetails |
+ ValidStartTo 
+status = eaFrom 
+ΞConPurseStart 
+nextSeqNo < MAX_NAT 
+nextSeqNo′ > nextSeqNo 
+pdAuth′ = ( μ PayDetails | to = name ∧ from = cpd . name ∧ value = cpd . value ∧ toSeqNo = nextSeqNo ∧ fromSeqNo = cpd . nextSeqNo ) 
+status′ = epv 
+m! = req pdAuth′ └ ~\end{LSDef}
+
+\begin{LSDef}[Successful $startTo$ operation with recovery from abortion]
+─ StartToPurseOkay == AbortPurseOkay ⨟ StartToPurseEafromOkay ⧹ ( cpd ) └ ~\end{LSDef}
+
+\pagebreak
+\subsection{$ReqPurse$}
+
+\begin{LSDef}[Request operation invariant]
+┌ AuthenticReqMessage 
+ConPurse 
+m? : MESSAGE |
+ m? = req pdAuth └ ~\end{LSDef}
+
+\begin{LSDef}[Successful request operation over concrete purses]
+┌ ReqPurseOkay 
+ΔConPurse 
+m? , m! : MESSAGE |
+ AuthenticReqMessage 
+status = epr 
+ΞConPurseReq 
+balance′ = balance − pdAuth . value 
+status′ = epa 
+m! = val pdAuth └ ~\end{LSDef}
+
+\subsection{ValPurse}
+
+\begin{LSDef}[Value operation invariant]
+┌ AuthenticValMessage 
+ConPurse 
+m? : MESSAGE |
+ m? = val pdAuth └ ~\end{LSDef}
+
+\begin{LSDef}[Successful value operation over concrete purses]
+┌ ValPurseOkay 
+ΔConPurse 
+m? , m! : MESSAGE |
+ AuthenticValMessage 
+status = epv 
+ΞConPurseVal 
+balance′ = balance + pdAuth . value 
+status′ = eaTo 
+m! = ack pdAuth └ ~\end{LSDef}
+
+\subsection{AckPurse}
+
+\begin{LSDef}[Acknowledgement operation invariant]
+┌ AuthenticAckMessage 
+ConPurse 
+m? : MESSAGE |
+ m? = ack pdAuth └ ~\end{LSDef}
+
+\begin{LSDef}[Successful ack operation over concrete purses]
+┌ AckPurseOkay 
+ΔConPurse 
+m? , m! : MESSAGE |
+ AuthenticAckMessage 
+status = epa 
+ΞConPurseAck 
+status′ = eaFrom 
+m! = bot └ ~\end{LSDef}
+
+\section{Exception logging operations}\label{ch4.exlog}
+
+\subsection{ReadExceptionLogPurse}
+
+\begin{LSDef}[Successful read exception log over concrete purses]
+┌ ReadExceptionLogPurseEafromOkay 
+ΞConPurse 
+m? , m! : MESSAGE |
+ m? = readExceptionLog 
+status = eaFrom 
+m! ∈ { bot } ∪ { ld : exLog′ ⦁ exceptionLogResult ( name , ld ) } └ ~\end{LSDef}
+
+\begin{LSDef}[Successful read exception log with recovery from abortion]
+─ ReadExceptionLogPurseOkay == AbortPurseOkay ⨟ ReadExceptionLogPurseEafromOkay └ ~\end{LSDef}
+
+\subsection{ClearExceptionLogPurse}
+
+\begin{LSDef}[Concrete purse signature for clearing the exception log]
+─ ConPurseClear == ConPurse ⧹ ( exLog ) └ ~\end{LSDef}
+
+\begin{LSDef}[Successful clear exception log over concrete purses]
+┌ ClearExceptionLogPurseEafromOkay 
+ΔConPurse 
+m? , m! : MESSAGE |
+ exLog ≠ ∅ 
+m? = exceptionLogClear ( name , image exLog ) 
+status = eaFrom 
+ΞConPurseClear 
+exLog′ = ∅ 
+m! = bot └ ~\end{LSDef}
+
+\begin{LSDef}[Successful clear exception log with recovery from abortion]
+─ ClearExceptionLogPurseOkay == AbortPurseOkay ⨟ ClearExceptionLogPurseEafromOkay └ ~\end{LSDef}
+
+\newpage
+
+\section{Summary}\label{ch4.summary}
+
+\ldefsummary \lthmsummary \lthmaddeddefsummary \lthmaddedthmsummary \lzevessummary 

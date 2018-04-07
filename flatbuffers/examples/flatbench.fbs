@@ -1,0 +1,37 @@
+// trying to represent a typical mix of datatypes:
+// 1 array of 3 elements, each element: 1 string, 3 nested objects, 9 scalars
+// root element has the array, additional string and an enum
+
+namespace benchfb;
+
+enum Enum : short { Apples, Pears, Bananas }
+
+struct Foo {
+  id:ulong;
+  count:short;
+  prefix:byte;
+  length:uint;
+}
+
+struct Bar {
+  parent:Foo;
+  time:int;
+  ratio:float;
+  size:ushort;
+}
+
+table FooBar {
+  sibling:Bar;
+  name:string;
+  rating:double;
+  postfix:ubyte;
+}
+
+table FooBarContainer {
+  list:[FooBar];  // 3 copies of the above
+  initialized:bool;
+  fruit:Enum;
+  location:string;
+}
+
+root_type FooBarContainer;

@@ -1,1 +1,0 @@
-line 1:15 extraneous input ';' expecting {<EOF>, 'select', 'where', ',', 'inner', 'join', 'cross', 'straight_join', 'natural', 'left', 'right'}

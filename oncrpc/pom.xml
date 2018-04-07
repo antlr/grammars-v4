@@ -19,6 +19,11 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
+					<grammars>oncrpcv2.g4</grammars>
+					<includes>
+						<include>oncrpcv2.g4</include>
+						<include>xdr.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

@@ -1,0 +1,1 @@
+answer "Hi, how are you?" with "Fine" or "Dandy"

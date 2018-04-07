@@ -35,7 +35,7 @@ CDATA       :   '<![CDATA[' .*? ']]>' ;
 /** Scarf all DTD stuff, Entity Declarations like <!ENTITY ...>,
  *  and Notation Declarations <!NOTATION ...>
  */
-DTD         :   '<!' .*? '>'            -> skip ; 
+DTD         :   '<!' .*? '>'            -> skip ;
 EntityRef   :   '&' Name ';' ;
 CharRef     :   '&#' DIGIT+ ';'
             |   '&#x' HEXDIGIT+ ';'
@@ -70,7 +70,7 @@ DIGIT       :   [0-9] ;
 
 fragment
 NameChar    :   NameStartChar
-            |   '-' | '_' | '.' | DIGIT 
+            |   '-' | '_' | '.' | DIGIT
             |   '\u00B7'
             |   '\u0300'..'\u036F'
             |   '\u203F'..'\u2040'
@@ -79,10 +79,10 @@ NameChar    :   NameStartChar
 fragment
 NameStartChar
             :   [:a-zA-Z]
-            |   '\u2070'..'\u218F' 
-            |   '\u2C00'..'\u2FEF' 
-            |   '\u3001'..'\uD7FF' 
-            |   '\uF900'..'\uFDCF' 
+            |   '\u2070'..'\u218F'
+            |   '\u2C00'..'\u2FEF'
+            |   '\u3001'..'\uD7FF'
+            |   '\uF900'..'\uFDCF'
             |   '\uFDF0'..'\uFFFD'
             ;
 

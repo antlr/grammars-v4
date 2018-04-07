@@ -1,0 +1,115 @@
+─ section dstest parents ds └ 
+
+We start by testing the $InitDS$ schema.
+
+─ ⊢? ⦉ file′ == ⟨ ⟩ ⦊ ∈ InitDS └ 
+\vspace{-6ex}
+─ ⊢? ⦉ file′ == ⟨ 3 ⟩ ⦊ ∉ InitDS └ 
+
+For $readFILE$, we design a set of positive tests that all work
+on the same input file contents, $eg1$.  So when writing the set of tests,
+it is convenient to use the schema calculus to factor out the 
+unchanging $file, file'$ from the other test values.
+─ eg1 == ⟨ 1 , 255 ⟩ └ ─ dsPos == [ file == eg1 ; file′ == eg1 ] ∧ { ⦉ offset? == 0 , length? == 0 , data! == ⟨ ⟩ ⦊ , ⦉ offset? == 0 , length? == 3 , data! == ⟨ 1 , 255 ⟩ ⦊ , ⦉ offset? == 1 , length? == 1 , data! == ⟨ 1 ⟩ ⦊ , ⦉ offset? == 3 , length? == 2 , data! == ⟨ 0 , 0 ⟩ ⦊ } └ 
+
+─ ⊢? dsPos ⊆ readFILE └ 
+
+Here is the output from ZLive when we use its \texttt{conjectures}
+command to evaluate all the conjectures in this $dstest$
+section.\footnote{We have added the conjecture names into the ZLive output
+by hand in this example, but hope to automate this in the future.
+The problem is that the Z standard currently does not pass the
+conjecture names from the \LaTeX\ markup to the Unicode markup, so
+getting access to the names within the parser and ZLive will require
+some extensions to the Z standard, which we have not yet made.}
+
+\begin{small}
+\begin{verbatim}
+dstest> conjectures
+Conjecture on line 7 (InitDSEmpty)
+true
+Conjecture on line 11 (InitDSNot3)
+true
+Conjecture on line 29 (readFILEPos)
+false
+\end{verbatim}
+\end{small}
+
+To investigate the failing conjecture~$readFILEPos$ on line~29, we ask
+ZLive to evaluate $dsPos \setminus readFILE$.  This displays just the
+test vectors that are not members of $readFILE$, which tells us that
+the third and fourth tests failed.  For each of these, we investigate
+why it failed by using the ZLive `\texttt{do}' command to search for
+any solution to the $readFILE$ schema with the given input values.
+For the third test, we get this output: \begin{small} \begin{verbatim}
+dstest> do [readFILE | file=eg1; offset?=1; length?=1] \end{verbatim}
+\vskip -3ex \[ 1: \lblot file == \{ ( 1 , 1 ) , ( 2 , 255 ) \}, file'
+== \{ ( 1 , 1 ) , ( 2 , 255 ) \} , \\ \t1 offset? == 1 , length? == 1
+, data! == \{ ( 1 , 255 ) \} \rblot \] \end{small} Oops, this test
+should have had 255 in $data!$ rather than $1$, because in POSIX,
+$offset?=1$ refers to the \emph{second} byte of the file.
+
+\begin{small}
+\begin{verbatim}
+dstest> do [readFILE | file=eg1; offset?=3; length?=2]
+\end{verbatim}
+\vskip -3ex
+\[
+1: \lblot file == \{ ( 1 , 1 ) , ( 2 , 255 ) \},
+ file' == \{ ( 1 , 1 ) , ( 2 , 255 ) \} , \\
+ \t1 offset? == 3 , length? == 2 , data! == \{ \} \rblot
+\]
+\end{small}
+Ah, of course!  Reading past the end of the file should return empty
+$data!$, rather than zeroes.  (When designing this fourth test, Mark was 
+incorrectly thinking of the behaviour of the Write command past the end
+of the file, which inserts zeroes automatically.) 
+Once these two errors in the expected output values are corrected,
+all tests give true.
+
+
+\subsection{Negative Tests for $readFILE$}
+
+Our first two negative tests check that $\negate 1$ is not a valid
+input for $offset?$ or $length?$.  In the latter test ($ReadNotLenNeg$),
+we show how we can write the test values inside the $readFILE$ schema, 
+which can sometimes be more convenient.
+
+─ ⊢? ( [ offset? == - 1 ] ∧ readFILE ) = { } └ 
+
+\vspace{-3ex}
+─ ⊢? [ readFILE | length? = - 1 ] = { } └ 
+
+The remaining negative tests are partially specified, so each
+conjecture actually checks a set of negative test tuples.  The
+$ReadNoChange$ test checks that the read operation does not
+change the contents of our example file $eg1$.  The
+$ReadNotLonger$ test checks that the output $data!$ is
+never longer than the contents of file $eg1$.  This is actually
+proving that the property $\# data! > 2$ is false for all lengths $0
+\upto 3$, which is a form of finite proof by exhaustive enumeration.
+
+─ ⊢? [ readFILE | file = eg1 ; file′ ≠ eg1 ] = { } └ 
+\vspace{-6ex}
+─ ⊢? [ readFILE | file = eg1 ; offset? = 0 ; length? < 4 ; # data! > 2 ] = { } └ 
+
+This illustrates that there is a continuum between testing and proof.
+We usually test just one input-output tuple at a time, but the idea of
+testing can be extended (as in this paper) to allow a given property
+to be evaluated for all members of a finite/small set.  This is
+similar to model-checking, where properties of finite systems are
+proved by exhaustive enumeration.  Animators like ZLive use a mixture
+of symbolic manipulation techniques and exhaustive enumeration.  The
+more they use symbolic manipulation, the closer they become to general
+theorem provers.  So the testing-proof continuum ranges from testing
+of single input-output tuples, through enumeration (or 
+model-checking) of finite systems, to full symbolic proof.
+
+
+
+We can write positive and negative unit tests for the $writeFile$
+operation in a similar way to $readFile$, but space does not permit us
+to show the details of this.
+
+
+

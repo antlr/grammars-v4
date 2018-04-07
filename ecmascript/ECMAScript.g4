@@ -170,6 +170,8 @@ grammar ECMAScript;
             case DecimalLiteral:
             case HexIntegerLiteral:
             case StringLiteral:
+            case PlusPlus:
+            case MinusMinus:
                 // After any of the tokens above, no regex literal can follow.
                 return false;
             default:
@@ -311,21 +313,21 @@ iterationStatement
 ///     continue ;
 ///     continue [no LineTerminator here] Identifier ;
 continueStatement
- : Continue Identifier? eos
+ : Continue ({!here(LineTerminator)}? Identifier)? eos
  ;
 
 /// BreakStatement :
 ///     break ;
 ///     break [no LineTerminator here] Identifier ;
 breakStatement
- : Break Identifier? eos
+ : Break ({!here(LineTerminator)}? Identifier)? eos
  ;
 
 /// ReturnStatement :
 ///     return ;
 ///     return [no LineTerminator here] Expression ;
 returnStatement
- : Return expressionSequence? eos
+ : Return ({!here(LineTerminator)}? expressionSequence)? eos
  ;
 
 /// WithStatement :
@@ -375,7 +377,7 @@ labelledStatement
 /// ThrowStatement :
 ///     throw [no LineTerminator here] Expression ;
 throwStatement
- : Throw expressionSequence eos
+ : Throw {!here(LineTerminator)}? expressionSequence eos
  ;
 
 /// TryStatement :
@@ -452,7 +454,8 @@ elision
 ///     { PropertyNameAndValueList }
 ///     { PropertyNameAndValueList , }
 objectLiteral
- : '{' propertyNameAndValueList? ','? '}'
+ : '{' '}'
+ | '{' propertyNameAndValueList ','? '}'
  ;
 
 /// PropertyNameAndValueList :
@@ -1457,7 +1460,7 @@ fragment RegularExpressionFlags
 ///     RegularExpressionBackslashSequence
 ///     RegularExpressionClass
 fragment RegularExpressionFirstChar
- : ~[\r\n\u2028\u2029*\\/\[]
+ : ~[\r\n\u2028\u2029*\\/[]
  | RegularExpressionBackslashSequence
  | RegularExpressionClass
  ;
@@ -1467,7 +1470,7 @@ fragment RegularExpressionFirstChar
 ///     RegularExpressionBackslashSequence
 ///     RegularExpressionClass
 fragment RegularExpressionChar
- : ~[\r\n\u2028\u2029\\/\[]
+ : ~[\r\n\u2028\u2029\\/[]
  | RegularExpressionBackslashSequence
  | RegularExpressionClass
  ;

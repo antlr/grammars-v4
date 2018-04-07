@@ -1,0 +1,18 @@
+[Event "The Royal Tour"]
+[Site ""]
+[Date "??"]
+[Round "1"]
+[Black "a"]
+[White "b"]
+[Result "1-0"]
+[Setup "1"]
+[FEN "W:W27,19,18,11,7,6,5:B28,26,25,20,17,10,9,4,3,2."]
+
+{27-24 Beginning a spectacular shot in which White pitches (almost) all his men
+} 1. 19-15 10x19 2. 5-1 3x10 3. 11-8 4x11 4. 27-24 20x27 5. 18-14 9x18 6. 1-5
+2x9 {2-9 and now the coup de grace that inspired the name of this problem...}
+7. 5x32 {5-32 (Several different jumping sequences are possible, for example 5
+x 14 x 7 x 16 x 23 x 14 x 21 x 30 x 23 x 32) White Wins. As an interesting side
+note, this nine-piece jump is the theoretical maximum number of pieces it is
+possible to jump in a single turn in checkers (try setting up a 10-piece jump -
+the board lacks sufficient space!)} 1-0

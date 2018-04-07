@@ -37,7 +37,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>true</showTree>
-					<entryPoint>fragmentaddress</entryPoint>
+					<entryPoint>url</entryPoint>
 					<grammarName>url</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

@@ -950,7 +950,7 @@ UNDERSCORE : '_';
 WS : ([ \t] | LINE_CONTINUATION)+;
 
 // identifier
-IDENTIFIER :  (~[\[\]\(\)\r\n\t.,'"|!@#$%^&*-+:=; ])+ | L_SQUARE_BRACKET (~[!\]\r\n])+ R_SQUARE_BRACKET;
+IDENTIFIER :  ~[\]()\r\n\t.,'"|!@#$%^&*\-+:=; ]+ | L_SQUARE_BRACKET (~[!\]\r\n])+ R_SQUARE_BRACKET;
 
 
 // letters

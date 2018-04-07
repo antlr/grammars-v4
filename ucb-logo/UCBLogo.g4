@@ -647,7 +647,7 @@ END   : E N D;
 MACRO : '.' M A C R O;
 
 WORD
- : {listDepth > 0}?  ~[ \t\r\n\[\];] ( ~[ \t\r\n\];~] | LINE_CONTINUATION | '\\' ( [ \t\[\]();~] | LINE_BREAK ) )*
+ : {listDepth > 0}?  ~[ \t\r\n[\];] ( ~[ \t\r\n\];~] | LINE_CONTINUATION | '\\' ( [ \t[\]();~] | LINE_BREAK ) )*
  | {arrayDepth > 0}? ~[ \t\r\n{};]   ( ~[ \t\r\n};~]  | LINE_CONTINUATION | '\\' ( [ \t{}();~]   | LINE_BREAK ) )*
  ;
 
@@ -684,7 +684,7 @@ GT_EQ  : '>=';
 NOT_EQ : '<>';
 
 QUOTED_WORD
- : '"' ( ~[ \t\r\n\[\]();~] | LINE_CONTINUATION | '\\' ( [ \t\[\]();~] | LINE_BREAK ) )*
+ : '"' ( ~[ \t\r\n[\]();~] | LINE_CONTINUATION | '\\' ( [ \t[\]();~] | LINE_BREAK ) )*
  ;
 
 NUMBER
@@ -696,7 +696,7 @@ VARIABLE
  ;
 
 NAME
- : ~[-+*/=<> \t\r\n\[\]()":{}] ( ~[-+*/=<> \t\r\n\[\](){}] | LINE_CONTINUATION | '\\' [-+*/=<> \t\r\n\[\]();~{}] )*
+ : ~[-+*/=<> \t\r\n[\]()":{}] ( ~[-+*/=<> \t\r\n[\](){}] | LINE_CONTINUATION | '\\' [-+*/=<> \t\r\n[\]();~{}] )*
  ;
 
 ANY

@@ -32,7 +32,7 @@ form : (attribute | function | ruleClauses) '.' ;
 
 tokAtom : TokAtom ;
 TokAtom : [a-z@][0-9a-zA-Z_@]*
-        | '\'' ( '\\' (~'\\'|'\\') | ~[\\''] )* '\'' ;
+        | '\'' ( '\\' (~'\\'|'\\') | ~[\\'] )* '\'' ;
 
 tokVar : TokVar ;
 TokVar : [A-Z_][0-9a-zA-Z_]* ;

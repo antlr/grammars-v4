@@ -239,7 +239,7 @@ lexerElement
 
 // but preds can be anywhere
 labeledLexerElement
-   : identifier (ASSIGN | PLUS_ASSIGN) (lexerAtom | block)
+   : identifier (ASSIGN | PLUS_ASSIGN) (lexerAtom | lexerBlock)
    ;
 
 lexerBlock
@@ -314,8 +314,7 @@ lexerAtom
    ;
 
 atom
-   : characterRange
-   | terminal
+   : terminal
    | ruleref
    | notSet
    | DOT elementOptions?

@@ -8,7 +8,7 @@ json
    : value
    ;
 
-object
+obj
    : '{' pair (',' pair)* '}'
    | '{' '}'
    ;
@@ -25,7 +25,7 @@ array
 value
    : STRING
    | NUMBER
-   | object
+   | obj
    | array
    | 'true'
    | 'false'
@@ -34,7 +34,7 @@ value
 
 
 STRING
-   : '"' (ESC | ~ ["\\])* '"'
+   : '"' (ESC | SAFECODEPOINT)* '"'
    ;
 
 
@@ -53,8 +53,13 @@ fragment HEX
    ;
 
 
+fragment SAFECODEPOINT
+   : ~ ["\\\u0000-\u001F]
+   ;
+
+
 NUMBER
-   : '-'? INT '.' [0-9] + EXP? | '-'? INT EXP | '-'? INT
+   : '-'? INT ('.' [0-9] +)? EXP?
    ;
 
 

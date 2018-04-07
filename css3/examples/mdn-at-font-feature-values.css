@@ -1,0 +1,21 @@
+@font-feature-values Font One { /* How to activate nice-style in Font One */
+  @styleset {
+    nice-style: 12;
+  }
+}
+ 
+@font-feature-values Font Two { /* How to activate nice-style in Font Two */
+  @styleset {
+    nice-style: 4;
+  }
+} 
+
+.nice-look { font-variant-alternates: styleset(nice-style); } /* Independent of the font */
+
+@media print {
+  @font-feature-values 'Font Three' {
+    @styleset {
+      nice-style: 4;
+    }
+  } 
+}

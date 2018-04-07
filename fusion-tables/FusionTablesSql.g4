@@ -371,7 +371,7 @@ MULTILINE_COMMENT
  ;
 
 WHITESPACE
- : [ \u000B\t\r\n] -> channel(WHITESPACE)
+ : [ \u000B\t\r\n] -> channel(HIDDEN)
  ;
 
 

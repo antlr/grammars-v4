@@ -1,0 +1,19 @@
+─ section as parents cs , expansion_rules , simplification_rules └ 
+
+Storage and channel systems together form the access system where
+every channel must refer to an existing file.
+
+┌ AS 
+SS 
+CS |
+ { chan : ran cstore ⦁ chan . fid } ⊆ dom fstore └ 
+
+┌ ΦAS 
+ΔAS 
+ΔCHAN 
+cid? : CID |
+ cid? ∈ dom cstore 
+θ CHAN = cstore ( cid? ) 
+cstore′ = cstore ⊕ { cid? ↦ θ CHAN ′ } └ 
+
+─ InitAS == InitSS ∧ InitCS └ ─ readAS == ( ΦAS ∧ readCHAN ) ⧹ ( offset? , fid , fid′ , posn , posn′ ) └ ─ writeAS == ( ΦAS ∧ writeCHAN ) ⧹ ( offset? , fid , fid′ , posn , posn′ ) └ ─ seekAS == ( ΦAS ∧ seekCHAN ) ⧹ ( fid , fid′ , posn , posn′ ) └ 

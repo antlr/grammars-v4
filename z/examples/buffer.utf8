@@ -1,0 +1,69 @@
+\documentclass{article}
+\usepackage{z-eves}
+\begin{document}
+
+─ section buffer parents standard_toolkit └ 
+
+─ [ MSG ] └ 
+
+╷ MaxSize : ℕ └ 
+
+┌ Buffer 
+items : seq MSG |
+ # items ≤ MaxSize └ 
+
+┌ BufferINIT 
+Buffer |
+ items = ⟨ ⟩ └ 
+
+
+┌ Join 
+ΔBuffer 
+msg? : MSG |
+ # items < MaxSize 
+items′ = items ⁀ ⟨ msg? ⟩ └ 
+
+
+┌ Leave 
+ΔBuffer 
+msg! : MSG |
+ # items > 0 
+items = ⟨ msg! ⟩ ⁀ items′ └ 
+
+
+
+┌ Flush 
+ΔBuffer 
+out! : seq MSG |
+ out! = items 
+items′ = ⟨ ⟩ └ 
+
+┌ Count 
+ΞBuffer 
+m? : MSG 
+count! : ℕ |
+ count! = # ( items ▷ { m? } ) └ 
+
+─ NewJoin == [ ΞBuffer ; m? : MSG | m? ∉ ran items ] ∧ Join └ 
+
+┌ Duplicate 
+ΔBuffer |
+ # items ∈ 1 .. ( MaxSize − 1 ) 
+items′ = items ⁀ ⟨ head items ⟩ └ 
+
+┌ Size 
+ΞBuffer 
+n! : ℕ |
+ n! = # items └ 
+
+┌ Titanic 
+ΔBuffer 
+msgs? : seq MSG |
+ items′ = ( 1 .. MaxSize ) ◁ ( items ⁀ msgs? ) └ 
+
+┌ Penguin 
+ΔBuffer 
+msgs? : seq MSG |
+ ∃ s : seq MSG ⦁ s ⁀ items′ = items ⁀ msgs? ∧ ( s ≠ ⟨ ⟩ ⇒ # items′ = MaxSize ) └ 
+
+\end{document}

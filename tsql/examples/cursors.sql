@@ -271,3 +271,22 @@ END;
 
 CLOSE Employee_Cursor;
 DEALLOCATE Employee_Cursor;
+
+-- FAST_FORWARD can be after READ_ONLY
+
+DECLARE Employee_Cursor CURSOR READ_ONLY FAST_FORWARD FOR
+SELECT LastName, FirstName
+FROM AdventureWorks2012.HumanResources.vEmployee
+WHERE LastName like 'B%';
+
+OPEN Employee_Cursor;
+
+FETCH NEXT FROM Employee_Cursor;
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    FETCH NEXT FROM Employee_Cursor
+END;
+
+CLOSE Employee_Cursor;
+DEALLOCATE Employee_Cursor;
+

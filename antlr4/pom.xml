@@ -43,8 +43,8 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<verbose>true</verbose>
-					<showTree>true</showTree>
+					<verbose>false</verbose>
+					<showTree>false</showTree>
 					<entryPoint>grammarSpec</entryPoint>
 					<grammarName>ANTLRv4</grammarName>
 					<packageName>org.antlr.parser.antlr4</packageName>

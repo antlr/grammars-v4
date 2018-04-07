@@ -1,0 +1,1 @@
+(upnp:class = "object.container.album.musicAlbum" and dc:title contains "cap \"a\"")

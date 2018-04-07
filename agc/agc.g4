@@ -353,7 +353,7 @@ standard_opcode
 // labels can contain "&" as well as math symbols "+-*/" and "."
 //
 LABEL
-    : [a-zA-Z0-9_.+\\-/*=&]+
+    : [a-zA-Z0-9_.+\\\-/*=&]+
     ; 
 
 INTE

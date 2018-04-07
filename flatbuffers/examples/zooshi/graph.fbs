@@ -1,0 +1,54 @@
+// Copyright 2015 Google Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include "attributes.fbs";
+include "common_modules.fbs";
+include "pindrop_module.fbs";
+include "mathfu_module.fbs";
+include "corgi_module.fbs";
+
+namespace fpl.zooshi;
+
+union InputType {
+  breadboard.module_library.OutputEdgeTarget,
+  breadboard.module_library.Pulse,
+  breadboard.module_library.Bool,
+  breadboard.module_library.Int,
+  breadboard.module_library.Float,
+  breadboard.module_library.String,
+  breadboard.module_library.Entity,
+  breadboard.module_library.Vec3,
+  breadboard.module_library.Vec4,
+  breadboard.module_library.SoundHandle,
+  breadboard.module_library.AudioChannel,
+}
+
+table InputEdgeDef {
+  edge:InputType;
+}
+
+table NodeDef {
+  module:string;
+  name:string;
+  input_edge_list:[InputEdgeDef];
+}
+
+table GraphDef {
+  node_list:[NodeDef];
+}
+
+file_identifier "GRPH";
+file_extension "bbgraph";
+
+root_type GraphDef;
