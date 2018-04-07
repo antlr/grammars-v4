@@ -25,7 +25,7 @@
 
 grammar Clojure;
 
-file: form *;
+file: form * EOF;
 
 form: literal
     | list
@@ -96,7 +96,7 @@ lambda
     ;
 
 meta_data
-    : '#^' (map form | form) 
+    : '#^' (map form | form)
     ;
 
 var_quote
@@ -236,7 +236,7 @@ fragment
 SYMBOL_HEAD
     : ~('0' .. '9'
         | '^' | '`' | '\'' | '"' | '#' | '~' | '@' | ':' | '/' | '%' | '(' | ')' | '[' | ']' | '{' | '}' // FIXME: could be one group
-        | [ \n\r\t\,] // FIXME: could be WS
+        | [ \n\r\t,] // FIXME: could be WS
         )
     ;
 
@@ -251,7 +251,7 @@ SYMBOL_REST
 //--------------------------------------------------------------------
 
 fragment
-WS : [ \n\r\t\,] ;
+WS : [ \n\r\t,] ;
 
 fragment
 COMMENT: ';' ~[\r\n]* ;

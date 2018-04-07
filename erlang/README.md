@@ -1,6 +1,10 @@
-#erlang-grammar • [Bitbucket](https://bitbucket.org/fenollp/erlang-grammar.git)
+# Erlang grammar
 
-# Overview
+## Source
+
+[https://bitbucket.org/fenollp/erlang-grammar](https://bitbucket.org/fenollp/erlang-grammar)
+
+## Overview
 
 An unofficial Erlang grammar adaptation in **ANTLR v4**.
 Typically, the only one on the web.
@@ -11,24 +15,31 @@ It is meant for students and people who work on Erlang's syntax.
 
 
 ## Requierements
+
 * [antlr4](http://www.antlr.org/wiki/display/ANTLR4/Getting+Started+with+ANTLR+v4)
 * Erlang's **erlc** for preprocessing purposes.
 
-# Usage
+## Usage
 
 Generate the grammar from Erlang.g4 with:
 
-    :::bash
-    make clean all
+```
+:::bash
+make clean all
+```
 
 Live debug with tree representation:
 
-    :::bash
-    make debug
-    …type Erlang forms…
-    ^D
+```
+:::bash
+make debug
+…type Erlang forms…
+^D
+```
 
 Check Erlang.g4 against the whole Erlang/OTP's `.erl` sources:
 
-    :::bash
-    make check
+```
+:::bash
+make check
+```

@@ -1,0 +1,1 @@
+(gtin (gtin13 (ean13 (ean13_ismn (gs1_prefix_ismn 9 7 9 0) (ismn_publisher_number (any_digit 2) (any_digit 6) (any_digit 0) (any_digit 0)) (ismn_item_number (any_digit 0) (any_digit 0) (any_digit 4) (any_digit 3)) (check_code (any_digit 8))))) <EOF>)

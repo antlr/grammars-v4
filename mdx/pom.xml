@@ -35,8 +35,8 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<verbose>true</verbose>
-					<showTree>true</showTree>
+					<verbose>false</verbose>
+					<showTree>false</showTree>
 					<entryPoint>mdx_statement</entryPoint>
 					<grammarName>mdx</grammarName>
 					<packageName></packageName>
