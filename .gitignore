@@ -4,6 +4,8 @@
 /**/.settings/
 /**/target
 
+# Visual Studio Code Generated
+.antlr
 
 .fetch_time_cache
 

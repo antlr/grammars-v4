@@ -349,9 +349,13 @@ query_continuation
 
 //B.2.5 Statements
 statement
-	: identifier ':' statement                                       #labeledStatement
+	: labeled_Statement			                                     #labeledStatement
 	| (local_variable_declaration | local_constant_declaration) ';'  #declarationStatement
 	| embedded_statement                                             #embeddedStatement
+	;
+
+labeled_Statement
+	: identifier ':' statement  
 	;
 
 embedded_statement
@@ -371,7 +375,7 @@ simple_embedded_statement
 	| WHILE OPEN_PARENS expression CLOSE_PARENS embedded_statement                                        #whileStatement
 	| DO embedded_statement WHILE OPEN_PARENS expression CLOSE_PARENS ';'                                 #doStatement
 	| FOR OPEN_PARENS for_initializer? ';' expression? ';' for_iterator? CLOSE_PARENS embedded_statement  #forStatement
-	| FOREACH OPEN_PARENS type identifier IN expression CLOSE_PARENS embedded_statement                   #foreschStatement
+	| FOREACH OPEN_PARENS local_variable_type identifier IN expression CLOSE_PARENS embedded_statement    #foreachStatement
 
     // jump statements
 	| BREAK ';'                                                   #breakStatement
@@ -395,10 +399,14 @@ simple_embedded_statement
 block
 	: OPEN_BRACE statement_list? CLOSE_BRACE
 	;
-
 local_variable_declaration
-	: type local_variable_declarator ( ','  local_variable_declarator)*
+	: local_variable_type local_variable_declarator ( ','  local_variable_declarator)*
 	;
+
+local_variable_type 
+	: VAR
+	| type
+;
 
 local_variable_declarator
 	: identifier ('=' local_variable_initializer)?
@@ -1144,6 +1152,7 @@ identifier
 	| REMOVE
 	| SELECT
 	| SET
+	| VAR
 	| WHEN
 	| WHERE
 	| YIELD

@@ -89,9 +89,10 @@ unaryOperator
     ;
 
 castExpression
-    :   unaryExpression
-    |   '(' typeName ')' castExpression
+    :   '(' typeName ')' castExpression
     |   '__extension__' '(' typeName ')' castExpression
+    |   unaryExpression
+    |   DigitSequence // for
     ;
 
 multiplicativeExpression
@@ -159,6 +160,7 @@ conditionalExpression
 assignmentExpression
     :   conditionalExpression
     |   unaryExpression assignmentOperator assignmentExpression
+    |   DigitSequence // for
     ;
 
 assignmentOperator
@@ -236,6 +238,7 @@ typeSpecifier
     |   enumSpecifier
     |   typedefName
     |   '__typeof__' '(' constantExpression ')' // GCC extension
+    |   typeSpecifier pointer
     ;
 
 structOrUnionSpecifier
@@ -331,6 +334,8 @@ directDeclarator
     |   directDeclarator '[' typeQualifierList? '*' ']'
     |   directDeclarator '(' parameterTypeList ')'
     |   directDeclarator '(' identifierList? ')'
+    |   Identifier ':' DigitSequence  // bit field
+    |   '(' typeSpecifier? pointer directDeclarator ')' // function pointer like: (__cdecl *f)
     ;
 
 gccDeclaratorExtension
@@ -473,8 +478,8 @@ blockItemList
     ;
 
 blockItem
-    :   declaration
-    |   statement
+    :   statement
+    |   declaration
     ;
 
 expressionStatement
@@ -487,10 +492,27 @@ selectionStatement
     ;
 
 iterationStatement
-    :   'while' '(' expression ')' statement
-    |   'do' statement 'while' '(' expression ')' ';'
-    |   'for' '(' expression? ';' expression? ';' expression? ')' statement
-    |   'for' '(' declaration expression? ';' expression? ')' statement
+    :   While '(' expression ')' statement
+    |   Do statement While '(' expression ')' ';'
+    |   For '(' forCondition ')' statement
+    ;
+
+//    |   'for' '(' expression? ';' expression?  ';' forUpdate? ')' statement
+//    |   For '(' declaration  expression? ';' expression? ')' statement
+
+forCondition
+	:   forDeclaration ';' forExpression? ';' forExpression?
+	|   expression? ';' forExpression? ';' forExpression?
+	;
+
+forDeclaration
+    :   declarationSpecifiers initDeclaratorList
+	| 	declarationSpecifiers
+    ;
+
+forExpression
+    :   assignmentExpression
+    |   forExpression ',' assignmentExpression
     ;
 
 jumpStatement
@@ -774,7 +796,6 @@ Sign
     :   '+' | '-'
     ;
 
-fragment
 DigitSequence
     :   Digit+
     ;

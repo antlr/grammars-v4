@@ -29,7 +29,7 @@
 grammar ANTLRv3;
 
 grammarDef
-   : DOC_COMMENT? ('lexer' | 'parser' | 'tree')? 'grammar' id ';' optionsSpec? tokensSpec? attrScope* action* rule_+
+   : DOC_COMMENT? ('lexer' | 'parser' | 'tree')? 'grammar' id ';' optionsSpec? tokensSpec? attrScope* action* rule_ +
    ;
 
 tokensSpec
@@ -71,7 +71,7 @@ optionValue
    ;
 
 rule_
-   : DOC_COMMENT? (('protected' | 'public' | 'private' | 'fragment'))? id '!'? (ARG_ACTION)? ('returns' ARG_ACTION)? throwsSpec? optionsSpec? ruleScopeSpec? ruleAction* ':' altList ';' exceptionGroup?
+   : DOC_COMMENT? (('protected' | 'public' | 'private' | 'fragment'))? id '!'? (ARG_ACTION)? ('returns' ARG_ACTION)? throwsSpec? optionsSpec? ruleScopeSpec? ruleAction* ':' altList? ';' exceptionGroup?
    ;
 
 ruleAction
@@ -89,11 +89,11 @@ ruleScopeSpec
    ;
 
 block
-   : '(' ((optionsSpec)? ':')? alternative rewrite ('|' alternative rewrite)* ')'
+   : '(' ((optionsSpec)? ':')? alternative? rewrite? ('|' (alternative rewrite?)?)* ')'
    ;
 
 altList
-   : alternative rewrite? ('|' alternative rewrite?)*
+   : alternative rewrite? ('|' (alternative rewrite?)?)*
    ;
 
 alternative
@@ -118,9 +118,9 @@ element
    ;
 
 elementNoOptionSpec
-   : id ('=' | '+=') atom (ebnfSuffix)
-   | id ('=' | '+=') block (ebnfSuffix)
-   | atom (ebnfSuffix)
+   : id ('=' | '+=') atom (ebnfSuffix?)
+   | id ('=' | '+=') block (ebnfSuffix?)
+   | atom (ebnfSuffix?)
    | ebnf
    | ACTION
    | SEMPRED ('=>')
@@ -128,10 +128,10 @@ elementNoOptionSpec
    ;
 
 atom
-   : range (('^' | '!'))
+   : range
    | terminal_
-   | notSet (('^' | '!'))
-   | RULE_REF (ARG_ACTION)? (('^' | '!'))?
+   | notSet
+   | RULE_REF (ARG_ACTION)?
    ;
 
 notSet
@@ -143,7 +143,7 @@ treeSpec
    ;
 
 ebnf
-   : block ('?' | '*' | '+' | '=>')
+   : block ('?' | '*' | '+' | '=>')?
    ;
 
 range
@@ -151,7 +151,7 @@ range
    ;
 
 terminal_
-   : (CHAR_LITERAL | TOKEN_REF (ARG_ACTION) | STRING_LITERAL | '.') ('^' | '!')?
+   : (CHAR_LITERAL | TOKEN_REF (ARG_ACTION?) | STRING_LITERAL | '.') ('^' | '!')?
    ;
 
 notTerminal
@@ -232,6 +232,7 @@ id
    | RULE_REF
    ;
 
+
 CHAR_LITERAL
    : '\'' LITERAL_CHAR '\''
    ;
@@ -307,16 +308,6 @@ fragment ACTION_ESC
    ;
 
 
-TOKEN_REF
-   : 'A' .. 'Z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
-   ;
-
-
-RULE_REF
-   : 'a' .. 'z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
-   ;
-
-
 OPTIONS
    : 'options' WS_LOOP '{'
    ;
@@ -330,6 +321,7 @@ TOKENS
 fragment SRC
    : 'src' ' ' ACTION_STRING_LITERAL ' ' INT
    ;
+
 
 fragment WS_LOOP
    : (WS | SL_COMMENT | ML_COMMENT)*
@@ -378,11 +370,6 @@ POSITIVE_CLOSURE
 
 SYNPRED
    : 'SYNPRED'
-   ;
-
-
-RANGE
-   : 'RANGE'
    ;
 
 
@@ -517,7 +504,7 @@ BANG
    ;
 
 
-RANGE2
+RANGE
    : '..'
    ;
 
@@ -528,7 +515,7 @@ REWRITE
 
 
 SL_COMMENT
-   : '//' ~[\r\n]* -> skip
+   : '//' ~ [\r\n]* -> skip
    ;
 
 
@@ -536,7 +523,17 @@ ML_COMMENT
    : '/*' .*? '*/' -> skip
    ;
 
+
 WS
    : (' ' | '\t' | '\r'? '\n') + -> skip
    ;
 
+
+TOKEN_REF
+   : 'A' .. 'Z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
+   ;
+
+
+RULE_REF
+   : 'a' .. 'z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
+   ;
