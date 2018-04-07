@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
 * http://fms.komkon.org/comp/CPUs/z80.txt
 */
+
 grammar asmZ80;
 
 prog
@@ -39,11 +40,19 @@ prog
    ;
 
 line
-   : lbl? (instruction| directive)? comment?
+   : lbl? (instruction | directive)? comment?
    ;
 
 instruction
    : opcode expressionlist?
+   ;
+
+opcode
+   : OPCODE
+   ;
+
+register
+   : REGISTER
    ;
 
 directive
@@ -74,18 +83,18 @@ multiplyingExpression
    : argument (('*' | '/') argument)*
    ;
 
-
 argument
-   : number 
+   : number
+   | register
    | dollar
-   | name 
+   | name
    | string
    | ('(' expression ')')
    ;
 
 dollar
-    : '$'
-    ;
+   : '$'
+   ;
 
 string
    : STRING
@@ -103,89 +112,151 @@ comment
    : COMMENT
    ;
 
-ASSEMBLER_DIRECTIVE
-   : 'ORG'
-   | 'END'
-   | 'EQU' 
-   | 'DEFB' 
-   | 'DEFW'
-   | 'DS'
-   | 'IF'
-   | 'ENDIF'
-   | 'SET'
+
+REGISTER
+   : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'H' | 'L' | 'I' | 'R' | 'IXH' | 'IXL' | 'IYH' | 'IYL' | 'AF' | 'BC' | 'DE' | 'HL' | 'PC' | 'SP' | 'IX' | 'IY'
    ;
 
-opcode
-   : 'ADC'
-    |'ADD'
-    |'AND'
-    |'BIT'
-    |'CALL'
-    |'CCF'
-    |'CP'
-    |'CPD'
-    |'CPDR'
-    |'CPI'
-    |'CPIR'
-    |'CPL'
-    |'DAA'
-    |'DEC'
-    |'DI'
-    |'DJNZ'
-    |'EI'
-    |'EX'
-    |'EXX'
-//    |'HALT'
-    |'IM'
-    |'IN'
-    |'INC'
-    |'IND'
-    |'INDR'
-    |'INI'
-    |'INIR'
-    |'JP'
-    |'JR'
-    |'LD'
-    |'LDD'
-    |'LDDR'
-    |'LDI'
-    |'LDIR'
-    |'NEG'
-    |'NOP'
-    |'OR'
-    |'OTDR'
-    |'OTIR'
-    |'OUT'
-    |'OUTD'
-    |'OUTI'
-    |'POP'
-    |'PUSH'
-    |'RES'
-    |'RET'
-    |'RETI'
-    |'RETN'
-    |'RL'
-    |'RLA'
-    |'RLC'
-    |'RLCA'
-    |'RLD'
-    |'RR'
-    |'RRA'
-    |'RRC'
-    |'RRCA'
-    |'RRD'
-    |'RST'
-    |'SBC'
-    |'SCF'
-    |'SET'
-    |'SLA'
-    |'SLL'
-    |'SL1'
-    |'SRA'
-    |'SRL'
-    |'SUB'
-    |'XOR'
+
+ASSEMBLER_DIRECTIVE
+   : (O R G) | (E N D) | (E Q U) | (D E F B) | (D E F W) | (D S) | (I F) | (E N D I F) | (S E T)
    ;
+
+
+OPCODE
+   : (A D C) | (A D D) | (A N D) | (B I T) | (C A L L) | (C C F) | (C P) | (C P D) | (C P D R) | (C P I) | (C P I R) | (C P L) | (D A A) | (D E C) | (D I) | (D J N Z) | (E I) | (E X) | (E X X) | (I M) | (I N) | (I N C) | (I N D) | (I N D R) | (I N I) | (I N I R) | (J P) | (J R) | (L D) | (L D D) | (L D D R) | (L D I) | (L D I R) | (N E G) | (N O P) | (O R) | (O T D R) | (O T I R) | (O U T) | (O U T D) | (O U T I) | (P O P) | (P U S H) | (R E S) | (R E T) | (R E T I) | (R E T N) | (R L) | (R L A) | (R L C) | (R L C A) | (R L D) | (R R) | (R R A) | (R R C) | (R R C A) | (R R D) | (R S T) | (S B C) | (S C F) | (S E T) | (S L A) | (S L L) | (S L '1') | (S R A) | (S R L) | (S U B) | (X O R)
+   ;
+
+
+fragment A
+   : ('a' | 'A')
+   ;
+
+
+fragment B
+   : ('b' | 'B')
+   ;
+
+
+fragment C
+   : ('c' | 'C')
+   ;
+
+
+fragment D
+   : ('d' | 'D')
+   ;
+
+
+fragment E
+   : ('e' | 'E')
+   ;
+
+
+fragment F
+   : ('f' | 'F')
+   ;
+
+
+fragment G
+   : ('g' | 'G')
+   ;
+
+
+fragment H
+   : ('h' | 'H')
+   ;
+
+
+fragment I
+   : ('i' | 'I')
+   ;
+
+
+fragment J
+   : ('j' | 'J')
+   ;
+
+
+fragment K
+   : ('k' | 'K')
+   ;
+
+
+fragment L
+   : ('l' | 'L')
+   ;
+
+
+fragment M
+   : ('m' | 'M')
+   ;
+
+
+fragment N
+   : ('n' | 'N')
+   ;
+
+
+fragment O
+   : ('o' | 'O')
+   ;
+
+
+fragment P
+   : ('p' | 'P')
+   ;
+
+
+fragment Q
+   : ('q' | 'Q')
+   ;
+
+
+fragment R
+   : ('r' | 'R')
+   ;
+
+
+fragment S
+   : ('s' | 'S')
+   ;
+
+
+fragment T
+   : ('t' | 'T')
+   ;
+
+
+fragment U
+   : ('u' | 'U')
+   ;
+
+
+fragment V
+   : ('v' | 'V')
+   ;
+
+
+fragment W
+   : ('w' | 'W')
+   ;
+
+
+fragment X
+   : ('x' | 'X')
+   ;
+
+
+fragment Y
+   : ('y' | 'Y')
+   ;
+
+
+fragment Z
+   : ('z' | 'Z')
+   ;
+
 
 NAME
    : [a-zA-Z] [a-zA-Z0-9."]*
