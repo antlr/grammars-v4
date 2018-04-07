@@ -64,3 +64,49 @@ LOB (resume) STORE AS SECUREFILE resume_seg (TABLESPACE auto_seg_ts);
 ALTER TABLE employees ADD (skills number)
     NESTED TABLE skills STORE AS nested_skill_table;
 
+ALTER TABLE employees
+   ENABLE VALIDATE CONSTRAINT emp_manager_fk
+   EXCEPTIONS INTO exceptions;
+
+ALTER TABLE print_media MODIFY NESTED TABLE ad_textdocs_ntab
+   RETURN AS VALUE; 
+
+ALTER TABLE employees
+   ENABLE NOVALIDATE PRIMARY KEY
+   ENABLE NOVALIDATE CONSTRAINT emp_last_name_nn;
+
+ALTER TABLE locations
+   MODIFY PRIMARY KEY DISABLE CASCADE;
+
+ALTER TABLE employees ADD CONSTRAINT check_comp
+   CHECK (salary + (commission_pct*salary) <= 5000)
+   DISABLE;
+
+ALTER TABLE employees
+   ENABLE ALL TRIGGERS;
+
+ALTER TABLE employees
+    DEALLOCATE UNUSED;
+
+ALTER TABLE customers
+   RENAME COLUMN credit_limit TO credit_amount;
+
+ALTER TABLE t1 DROP (pk) CASCADE CONSTRAINTS;
+
+ALTER TABLE t1 DROP (pk, fk, c1);
+ALTER TABLE customers
+   MODIFY (online_acct_pw DECRYPT);
+
+ALTER TABLE departments
+    DROP PRIMARY KEY CASCADE; 
+
+ALTER TABLE employees
+    DROP UNIQUE (email);
+
+ALTER TABLE employees MODIFY LOB (resume) (CACHE);
+
+ALTER TABLE employees MODIFY LOB (resume) (NOCACHE);
+
+ALTER TABLE employees MODIFY LOB (resume) (NOCACHE);
+
+alter TABLE employee add ( constraint employee_pk UNique ( a , b ) ) ;
