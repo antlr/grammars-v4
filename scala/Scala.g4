@@ -246,14 +246,14 @@ simplePattern
    : '_'
    | Varid
    | literal
-   | stableId ('(' patterns ')')?
-   | stableId '(' (patterns ',')? (Varid '@')? '_' '*' ')'
+   | stableId ('(' patterns? ')')?
+   | stableId '(' (patterns? ',')? (Varid '@')? '_' '*' ')'
    | '(' patterns? ')'
    ;
 
 patterns
-   : pattern (',' patterns)*
-   | '_'*
+   : pattern (',' pattern)*
+   | '_'+
    ;
 
 typeParamClause

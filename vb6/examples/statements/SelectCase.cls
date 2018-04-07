@@ -19,7 +19,7 @@ Select Case Percent
 	Case 26 To 49, 50
 	Case 51 To 75
 		Beep
-	Case 76 To 100
+	Case 76 To 80, 81, 82 To 89, Is > 90
 	Case Else
 		Beep
 End Select

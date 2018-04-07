@@ -294,7 +294,7 @@ STRINGLITERAL1
 
 
 STRINGLITERAL2
-   : '\'' ~ [\'\r\n]* '\''
+   : '\'' ~['\r\n]* '\''
    ;
 
 

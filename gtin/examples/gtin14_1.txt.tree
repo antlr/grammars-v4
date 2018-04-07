@@ -1,0 +1,1 @@
+(gtin (gtin14 (ean14 (ean14_packaging 1) (ean14_product (any_digit 2) (any_digit 3) (any_digit 4) (any_digit 5) (any_digit 6) (any_digit 7) (any_digit 8) (any_digit 9) (any_digit 0) (any_digit 1) (any_digit 2) (any_digit 3)) (check_code (any_digit 1)))) <EOF>)

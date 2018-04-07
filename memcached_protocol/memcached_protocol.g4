@@ -16,7 +16,7 @@
 grammar memcached_protocol;
 
 command_line
-   : (storage_command | retrieval_command | delete_command | increment_command | decrement_command | statistics_command | flush_command | version_command | verbosity_command | quit_command)
+   : (storage_command | retrieval_command | delete_command | increment_command | decrement_command | statistics_command | flush_command | version_command | verbosity_command | quit_command)+
    ;
 
 storage_command
@@ -125,11 +125,11 @@ general_error
    ;
 
 client_error_message
-   : 'CLIENT_ERROR' . +
+   : 'CLIENT_ERROR' .+?
    ;
 
 server_error_message
-   : 'SERVER_ERROR' . +
+   : 'SERVER_ERROR' .+?
    ;
 
 end

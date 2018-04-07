@@ -1,5 +1,0 @@
-line 8:0 extraneous input 'set' expecting {<EOF>, '%', IDENTIFIER, ' ', CR}
-line 8:10 extraneous input '=' expecting {BREAK, CLOSE, DO, ELSE, FOR, GOTO, HALT, HANG, JOB, KILL, LOCK, MERGE, NEW, OPEN, QUIT, READ, SET, TCOMMIT, TRESTART, TROLLBACK, TSTART, USE, VIEW, WRITE, XECUTE, ' '}
-line 8:12 extraneous input '1' expecting {BREAK, CLOSE, DO, ELSE, FOR, GOTO, HALT, HANG, JOB, KILL, LOCK, MERGE, NEW, OPEN, QUIT, READ, SET, TCOMMIT, TRESTART, TROLLBACK, TSTART, USE, VIEW, WRITE, XECUTE, ' '}
-line 12:1 extraneous input 'set' expecting {<EOF>, '%', IDENTIFIER, ' ', CR}
-line 12:5 extraneous input '^' expecting {<EOF>, ' ', CR}

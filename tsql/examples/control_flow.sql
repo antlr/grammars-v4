@@ -374,6 +374,23 @@ GO
 EXEC TimeDelay_hh_mm_ss '00:00:10';
 GO
 
+-- waitfor with receive statement
+WAITFOR (
+  RECEIVE *
+  FROM ExpenseQueue);
+
+-- waitfor with receive statement and timeout
+WAITFOR (
+  RECEIVE *
+  FROM ExpenseQueue ), TIMEOUT 60000;
+
+-- waitfor with receive statement containing column select
+DECLARE @ConversationHandle uniqueidentifier;
+WAITFOR (
+  RECEIVE TOP (1)
+  @ConversationHandle = conversation_handle
+  FROM dbo.ReplicationInboundQueue), TIMEOUT 3000;
+
 -----------------------------------------------------------------------
 -- WHILE https://msdn.microsoft.com/en-us/library/ms178642.aspx
 

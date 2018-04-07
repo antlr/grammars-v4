@@ -1,0 +1,1 @@
+disposable.style.email.with+symbol@example.com

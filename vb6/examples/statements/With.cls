@@ -1,6 +1,10 @@
-Dim Object As Variant
+Dim o As Variant
 
-With Object
+With o
 	.MemberPropertyCall = "SomeValue"
 	.MemberFunctionCall
+End With
+
+With New clsFoo
+    .Display
 End With

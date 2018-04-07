@@ -1,0 +1,5 @@
+#Fri Jan 17 22:37:45 MYT 2014
+dbpassword=password
+database=localhost
+dbuser=uuu
+

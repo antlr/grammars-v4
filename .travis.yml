@@ -1,8 +1,6 @@
 language: java 
 jdk:
-  - oraclejdk7
   - oraclejdk8
-  - openjdk7
-sudo: false
-script: mvn clean package
+sudo: required
 
+install: true

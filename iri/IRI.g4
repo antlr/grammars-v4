@@ -338,13 +338,31 @@ non_zero_digit
  *//// ucschar        = %xA0-D7FF / %xF900-FDCF / %xFDF0-FFEF///                / %x10000-1FFFD / %x20000-2FFFD / %x30000-3FFFD///                / %x40000-4FFFD / %x50000-5FFFD / %x60000-6FFFD///                / %x70000-7FFFD / %x80000-8FFFD / %x90000-9FFFD///                / %xA0000-AFFFD / %xB0000-BFFFD / %xC0000-CFFFD///                / %xD0000-DFFFD / %xE1000-EFFFD
 
 UCSCHAR
-   : '\u00A0' .. '\uD7FF' | '\uF900' .. '\uFDCF' | '\uFDF0' .. '\uFFEF' | '\u10000' .. '\u1FFFD' | '\u20000' .. '\u2FFFD' | '\u30000' .. '\u3FFFD' | '\u40000' .. '\u4FFFD' | '\u50000' .. '\u5FFFD' | '\u60000' .. '\u6FFFD' | '\u70000' .. '\u7FFFD' | '\u80000' .. '\u8FFFD' | '\u90000' .. '\u9FFFD' | '\uA0000' .. '\uAFFFD' | '\uB0000' .. '\uBFFFD' | '\uC0000' .. '\uCFFFD' | '\uD0000' .. '\uDFFFD' | '\uE1000' .. '\uEFFFD'
+   : '\u00A0' .. '\uD7FF'
+   | '\uF900' .. '\uFDCF'
+   | '\uFDF0' .. '\uFFEF'
+   | '\u{10000}' .. '\u{1FFFD}'
+   | '\u{20000}' .. '\u{2FFFD}'
+   | '\u{30000}' .. '\u{3FFFD}'
+   | '\u{40000}' .. '\u{4FFFD}'
+   | '\u{50000}' .. '\u{5FFFD}'
+   | '\u{60000}' .. '\u{6FFFD}'
+   | '\u{70000}' .. '\u{7FFFD}'
+   | '\u{80000}' .. '\u{8FFFD}'
+   | '\u{90000}' .. '\u{9FFFD}'
+   | '\u{A0000}' .. '\u{AFFFD}'
+   | '\u{B0000}' .. '\u{BFFFD}'
+   | '\u{C0000}' .. '\u{CFFFD}'
+   | '\u{D0000}' .. '\u{DFFFD}'
+   | '\u{E1000}' .. '\u{EFFFD}'
    ;
 
 /// iprivate       = %xE000-F8FF / %xF0000-FFFFD / %x100000-10FFFD
 
 IPRIVATE
-   : '\uE000' .. '\uF8FF' | '\uF0000' .. '\uFFFFD' | '\u100000' .. '\u10FFFD'
+   : '\uE000' .. '\uF8FF'
+   | '\u{F0000}' .. '\u{FFFFD}'
+   | '\u{100000}' .. '\u{10FFFD}'
    ;
 
 

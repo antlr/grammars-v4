@@ -171,7 +171,7 @@ BACKSLASH	: '\\';
 
 //A.2.2.3 Characters
 fragment
-CHAR			: [0-9~!#$%^&*_+{}|:<>?`\-=\[\];,./A-Za-z];
+CHAR			: [0-9~!#$%^&*_+{}|:<>?`\-=[\];,./A-Za-z];
 
 fragment
 DIGIT			: [0-9];
@@ -191,7 +191,7 @@ fragment
 INNERSTRINGQUOTE	: '\'' ;
 
 fragment
-INNERNAMEQUOTE		: '\"' ;
+INNERNAMEQUOTE		: '"' ;
 
 fragment
 INNERBACKSLASH		: '\\';
@@ -231,7 +231,7 @@ NAMECHARSEQUENCE
 
 // A.2.2.1 White space
 WHITE
-	:	[ \t\n\r\v]							-> skip
+	:	[ \t\n\r\u000B]							-> skip
 	;
 	
 BLOCKCOMMENT 

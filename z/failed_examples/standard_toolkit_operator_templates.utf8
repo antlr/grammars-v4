@@ -1,0 +1,228 @@
+section prelude
+─generic (ℙ _)└
+─function 30 leftassoc (_ + _)└
+
+section set toolkit
+
+B.2.1 Relations
+─generic 5 rightassoc (_ ↔ _)└
+
+B.2.2 Total functions
+─generic 5 rightassoc (_ → _)└
+
+B.3.1 Inequality relation
+─relation (_ ≠ _)└
+
+B.3.2 Non-membership
+─relation (_ ∉ _)└
+
+B.3.4 Subset relation
+─relation (_ ⊆ _)└
+
+B.3.5 Proper subset relation
+─relation (_ ⊂ _)└
+
+B.3.7 Set union
+─function 30 leftassoc (_ ∪ _)└
+
+B.3.8 Set intersection
+─function 40 leftassoc (_ ∩ _)└
+
+B.3.9 Set difference
+─function 30 leftassoc (_ ∖ _)└
+
+B.3.10 Set symmetric difference
+─function 25 leftassoc (_ ⊖ _)└
+
+B.3.11 Generalized union
+─function (⋃ _)└
+
+B.3.12 Generalized intersection
+─function (⋂ _)└
+
+
+B.4.1 Finite subsets
+─generic (𝔽 _)└
+
+
+section relation toolkit parents set toolkit
+
+B.5.1 First component projection
+─function (first _)└
+
+B.5.2 Second component projection
+─function (second _)└
+
+B.5.3 Maplet
+─function 10 leftassoc (_ ↦ _)└
+
+B.5.4 Domain
+─function (dom _)└
+
+B.5.5 Range
+─function (ran _)└
+
+B.5.6 Identity relation
+─generic (id _)└
+
+B.5.7 Relational composition
+─function 40 leftassoc (_ ⨾ _)└
+
+B.5.8 Functional composition
+─function 40 leftassoc (_ ∘ _)└
+
+B.5.9 Domain restriction
+─function 65 rightassoc (_ ◁ _)└
+
+B.5.10 Range restriction
+─function 60 leftassoc (_ ▷ _)└
+
+B.5.11 Domain subtraction
+─function 65 rightassoc (_ ⩤ _)└
+
+B.5.12 Range subtraction
+─function 60 leftassoc (_ ⩥ _)└
+
+B.5.13 Relational inversion
+─function (_ ∼)└
+
+B.5.14 Relational image
+─function (_ ⦇ _ ⦈)└
+
+B.5.15 Overriding
+─function 50 leftassoc (_ ⊕ _)└
+
+B.5.16 Transitive closure
+─function (_ ↗+↙)└
+
+B.5.17 Reflexive transitive closure
+─function (_ ↗*↙)└
+
+section function toolkit parents relation toolkit
+
+B.6.1 Partial functions
+─generic 5 rightassoc (_ ⇸ _)└
+
+B.6.2 Partial injections
+─generic 5 rightassoc (_ ⤔ _)└
+
+B.6.3 Total injections
+─generic 5 rightassoc (_ ↣ _)└
+
+B.6.4 Partial surjections
+─generic 5 rightassoc (_ ⤀ _)└
+
+B.6.5 Total surjections
+─generic 5 rightassoc (_ ↠ _)└
+
+B.6.6 Bijections
+─generic 5 rightassoc (_ ⤖ _)└
+
+B.6.7 Finite functions
+─generic 5 rightassoc (_ ⇻ _)└
+
+B.6.8 Finite injections
+─generic 5 rightassoc (_ ⤕ _)└
+
+B.6.9 Disjointness
+─relation (disjoint _)└
+
+B.6.10 Partitions
+─relation (_ partition _)└
+
+
+section number toolkit
+
+B.7.1 Successor
+─function (succ _)└
+
+B.7.3 Addition of integers, arithmetic negation
+─function (- _)└
+
+B.7.4 Subtraction
+─function 30 leftassoc (_ − _)└
+
+B.7.5 Less-than-or-equal
+─relation (_ ≤ _)└
+
+B.7.6 Less-than
+─relation (_ < _)└
+
+B.7.7 Greater-than-or-equal
+─relation (_ ≥ _)└
+
+B.7.8 Greater-than
+─relation (_ > _)└
+
+B.7.11 Multiplication of integers
+─function 40 leftassoc (_ * _)└
+
+B.7.12 Division, modulus
+─function 40 leftassoc (_ div _)└
+─function 40 leftassoc (_ mod _)└
+
+section sequence toolkit parents function toolkit; number toolkit
+
+B.8.1 Number range
+─function 20 leftassoc (_ .. _)└
+
+B.8.2 Iteration
+─function (iter _)└
+─function (_ ↗_↙)└
+
+B.8.3 Number of members of a set
+─function (# _)└
+
+B.8.4 Minimum
+─function (min _)└
+
+B.8.5 Maximum
+─function (max _)└
+
+B.8.6 Finite sequences
+─generic (seq _)└
+
+B.8.8 Injective sequences
+─generic (iseq _)└
+
+B.8.9 Sequence brackets
+─function (⟨ ,, ⟩)└
+
+B.8.10 Concatenation
+─function 30 leftassoc (_ ⁀ _)└
+
+B.8.11 Reverse
+─function (rev _)└
+
+B.8.12 Head of a sequence
+─function (head _)└
+
+B.8.13 Last of a sequence
+─function (last _)└
+
+B.8.14 Tail of a sequence
+─function (tail _)└
+
+B.8.15 Front of a sequence
+─function (front _)└
+
+B.8.16 Squashing
+─function (squash _)└
+
+B.8.17 Extraction
+─function 45 rightassoc (_ ↿ _)└
+
+B.8.18 Filtering
+─function 40 leftassoc (_ ↾ _)└
+
+B.8.19 Prefix relation
+─relation (_ prefix _)└
+
+B.8.20 Suffix relation
+─relation (_ suffix _)└
+
+B.8.21 Infix relation
+─relation (_ infix _)└
+
+B.8.22 Distributed concatenation
+─function (⁀/ _)└

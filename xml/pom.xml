@@ -19,6 +19,10 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>XMLParser.g4</grammars>
+					<includes>
+						<include>XMLLexer.g4</include>
+						<include>XMLParser.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

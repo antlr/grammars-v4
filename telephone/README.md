@@ -1,11 +1,3 @@
-#Telephone Grammar
+# Telephone Grammar
 
-# Summary
-
-An ANTLR4 grammar for Telephone numbers
-
-
-
-
-
-
+An ANTLR4 grammar for Telephone numbers.

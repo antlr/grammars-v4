@@ -16,3 +16,5 @@ Declare Function SetComputerName Lib "kernel32" _
 Private Declare Function ExitWindowsEx Lib "user32" ( _
   ByVal uFlags As Long, _
   ByVal dwReserved As Long) As Long
+  
+Declare Function Func Lib "Foo.dll" (a$)

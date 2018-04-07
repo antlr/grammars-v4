@@ -5,3 +5,6 @@ Sub Mult(ByVal Factor1 As Integer, Factor2 As Integer)
 	' some comment
 	Debug.Print Product
 End Sub 
+
+Public Sub Foo(a$, b&, c!, d#, e@)
+End Sub

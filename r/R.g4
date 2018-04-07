@@ -61,7 +61,7 @@ expr:   expr '[[' sublist ']' ']'  // '[[' follows R's yacc grammar
     |   expr '[' sublist ']'
     |   expr ('::'|':::') expr
     |   expr ('$'|'@') expr
-    |   expr '^'<assoc=right> expr
+    |   <assoc=right> expr '^' expr
     |   ('-'|'+') expr
     |   expr ':' expr
     |   expr USER_OP expr // anything wrappedin %: '%' .* '%'

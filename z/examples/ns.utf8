@@ -1,0 +1,55 @@
+─ section ns parents as └ 
+
+─ [ SYL ] └ ─ NAME == seq SYL └ 
+
+┌ NS0 
+nstore : NAME ⇸ FID └ 
+
+┌ InitNS0 
+NS0 ′ |
+ nstore′ = ∅ └ 
+
+┌ createNS 
+ΔNS0 
+name? : NAME 
+fid : FID |
+ nstore′ = nstore ⊕ { name? ↦ fid } └ 
+
+┌ lookupNS 
+ΞNS0 
+name? : NAME 
+fid′ : FID |
+ name? ∈ dom nstore 
+fid′ = nstore ( name? ) └ 
+
+┌ destroyNS 
+ΔNS0 
+name? : NAME |
+ name? ∈ dom nstore 
+nstore′ = { name? } ⩤ nstore └ 
+
+┌ NS 
+NS0 
+dnames : ℙ NAME |
+ ∀ f : dnames ∪ dom nstore ⦁ front ( f ) ∈ dnames └ 
+
+┌ InitNS 
+NS ′ 
+InitNS0 |
+ dnames′ = ∅ └ 
+
+┌ lsNS 
+ΞNS 
+dir? : NAME 
+contents! : ℙ SYL |
+ dir? ∈ dnames 
+contents! = last ⦇ { n : dom nstore | n ≠ ∅ ∧ front n = dir? } ⦈ └ 
+
+╷ dirformat : FILE ⇸ ( SYL ⇸ FID ) 
+RootFid : FID └ 
+
+┌ dirstored 
+SS 
+NS |
+ ran nstore ⊆ dom fstore 
+nstore = { n : NAME ; fid : FID | n ≠ ∅ ∧ n ∈ dom nstore ∧ fid = ( dirformat ( fstore ( nstore ( front n ) ) ) ) ( last n ) } ∪ { ∅ ↦ RootFid } └ 

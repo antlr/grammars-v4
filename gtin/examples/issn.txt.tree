@@ -1,0 +1,1 @@
+(gtin (gtin13 (ean13 (ean13_issn (gs1_prefix_issn 9 7 7) (issn (any_digit 1) (any_digit 2) (any_digit 3) (any_digit 4) (any_digit 1) (any_digit 2) (any_digit 3) (any_digit 4) (any_digit 5)) (check_code (any_digit 7))))) <EOF>)

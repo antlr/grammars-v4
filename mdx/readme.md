@@ -1,4 +1,4 @@
-#MDX Grammar
+# MDX Grammar
 
 Antlr4 grammar for [MDX](https://en.wikipedia.org/wiki/MultiDimensional_eXpressions)
 
