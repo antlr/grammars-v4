@@ -1,29 +1,21 @@
 /*
-* Copyright (C) 2016, Ulrich Wolffgang <u.wol@wwu.de>
+* Copyright (C) 2017, Ulrich Wolffgang <ulrich.wolffgang@proleap.io>
 * All rights reserved.
 *
 * This software may be modified and distributed under the terms
-* of the BSD 3-clause license. See the LICENSE file for details.
+* of the MIT license. See the LICENSE file for details.
 */
 
 /*
 * Visual Basic 6.0 Grammar for ANTLR4
 *
-* This is a grammar for Visual Basic 6.0 and the parser at
-* https://github.com/uwol/vb6parser. The grammar is derived from the 
-* Visual Basic 6.0 language reference 
-* http://msdn.microsoft.com/en-us/library/aa338033%28v=vs.60%29.aspx 
-* and tested against MSDN VB6 statements as well as several Visual 
+* This is a Visual Basic 6.0 grammar, which is part of the Visual Basic 6.0
+* parser at https://github.com/uwol/vb6parser.
+*
+* The grammar is derived from the Visual Basic 6.0 language reference
+* http://msdn.microsoft.com/en-us/library/aa338033%28v=vs.60%29.aspx
+* and has been tested with MSDN VB6 statements as well as several Visual
 * Basic 6.0 code repositories.
-*
-* Characteristics:
-*
-* 1. This grammar is line-based and takes into account whitespace, so that
-*    member calls (e.g. "A.B") are distinguished from contextual object calls 
-*    in WITH statements (e.g. "A .B").
-*
-* 2. Keywords can be used as identifiers depending on the context, enabling
-*    e.g. "A.Type", but not "Type.B".
 */
 
 grammar VisualBasic6;
@@ -41,12 +33,12 @@ module
 moduleReferences
    : moduleReference+
    ;
-	
-moduleReference 
-   : OBJECT WS? EQ WS? moduleReferenceGUID SEMICOLON WS? moduleReferenceComponent NEWLINE*
+
+moduleReference
+   : OBJECT WS? EQ WS? moduleReferenceValue (SEMICOLON WS? moduleReferenceComponent)? NEWLINE*
    ;
-	 
-moduleReferenceGUID
+
+moduleReferenceValue
    : STRINGLITERAL
    ;
 
@@ -102,28 +94,32 @@ moduleBodyElement
 
 // controls ----------------------------------
 
-controlProperties 
+controlProperties
 	: WS? BEGIN WS cp_ControlType WS cp_ControlIdentifier WS? NEWLINE+ cp_Properties+ END NEWLINE*
 	;
 
-cp_Properties 
+cp_Properties
 	: cp_SingleProperty
 	| cp_NestedProperty
 	| controlProperties;
 
-cp_SingleProperty 
-	: WS? implicitCallStmt_InStmt WS? EQ WS? '$'? literal FRX_OFFSET? NEWLINE+
+cp_SingleProperty
+	: WS? implicitCallStmt_InStmt WS? EQ WS? '$'? cp_PropertyValue FRX_OFFSET? NEWLINE+
 	;
 
-cp_PropertyName 
-	: (OBJECT '.')? complexType
+cp_PropertyName
+	: (OBJECT DOT)? ambiguousIdentifier (LPAREN literal RPAREN)? (DOT ambiguousIdentifier (LPAREN literal RPAREN)?)*
 	;
 
-cp_NestedProperty 
+cp_PropertyValue
+    : DOLLAR? (literal | (LBRACE ambiguousIdentifier RBRACE) | POW ambiguousIdentifier)
+    ;
+
+cp_NestedProperty
 	: WS? BEGINPROPERTY WS ambiguousIdentifier (LPAREN INTEGERLITERAL RPAREN)? (WS GUID)? NEWLINE+ (cp_Properties+)? ENDPROPERTY NEWLINE+
 	;
 
-cp_ControlType 
+cp_ControlType
 	: complexType
 	;
 
@@ -409,7 +405,7 @@ nameStmt
    ;
 
 onErrorStmt
-   : (ON_ERROR | ON_LOCAL_ERROR) WS (GOTO WS valueStmt | RESUME WS NEXT)
+   : (ON_ERROR | ON_LOCAL_ERROR) WS (GOTO WS valueStmt COLON? | RESUME WS NEXT)
    ;
 
 onGoToStmt
@@ -582,7 +578,7 @@ valueStmt
    | valueStmt WS? MOD WS? valueStmt                                 # vsMod
    | valueStmt WS? PLUS WS? valueStmt                                # vsAdd
    | valueStmt WS? MINUS WS? valueStmt                               # vsMinus
-   | valueStmt WS AMPERSAND WS valueStmt                             # vsAmp
+   | valueStmt WS? AMPERSAND WS? valueStmt                             # vsAmp
    | valueStmt WS? EQ WS? valueStmt                                  # vsEq
    | valueStmt WS? NEQ WS? valueStmt                                 # vsNeq
    | valueStmt WS? LT WS? valueStmt                                  # vsLt
@@ -610,7 +606,7 @@ variableListStmt
    ;
 
 variableSubStmt
-   : ambiguousIdentifier (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? typeHint? (WS asTypeClause)?
+   : ambiguousIdentifier typeHint? (WS? LPAREN WS? (subscripts WS?)? RPAREN WS?)? (WS asTypeClause)?
    ;
 
 whileWendStmt
@@ -622,7 +618,7 @@ widthStmt
    ;
 
 withStmt
-   : WITH WS implicitCallStmt_InStmt NEWLINE + (block NEWLINE +)? END_WITH
+   : WITH WS (NEW WS)? implicitCallStmt_InStmt NEWLINE + (block NEWLINE +)? END_WITH
    ;
 
 writeStmt
@@ -643,7 +639,7 @@ eCS_ProcedureCall
 
 // parantheses are required in case of args -> empty parantheses are removed
 eCS_MemberProcedureCall
-   : CALL WS implicitCallStmt_InStmt? DOT ambiguousIdentifier typeHint? (WS? LPAREN WS? argsCall WS? RPAREN)?
+   : CALL WS implicitCallStmt_InStmt? DOT WS? ambiguousIdentifier typeHint? (WS? LPAREN WS? argsCall WS? RPAREN)?
    ;
 
 implicitCallStmt_InBlock
@@ -653,7 +649,7 @@ implicitCallStmt_InBlock
 
 // parantheses are forbidden in case of args
 // variables cannot be called in blocks
-// certainIdentifier instead of ambiguousIdentifier for preventing ambiguity with statement keywords 
+// certainIdentifier instead of ambiguousIdentifier for preventing ambiguity with statement keywords
 iCS_B_ProcedureCall
    : certainIdentifier (WS argsCall)?
    ;
@@ -675,15 +671,20 @@ iCS_S_VariableOrProcedureCall
    ;
 
 iCS_S_ProcedureOrArrayCall
-   : (ambiguousIdentifier | baseType) typeHint? WS? (LPAREN WS? (argsCall WS?)? RPAREN)+ dictionaryCallStmt?
+   : (ambiguousIdentifier | baseType | iCS_S_NestedProcedureCall) typeHint? WS? (LPAREN WS? (argsCall WS?)? RPAREN)+ dictionaryCallStmt?
    ;
+
+iCS_S_NestedProcedureCall
+	: ambiguousIdentifier typeHint? WS? LPAREN WS? (argsCall WS?)? RPAREN
+	;
+
 
 iCS_S_MembersCall
    : (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)? iCS_S_MemberCall + dictionaryCallStmt?
    ;
 
 iCS_S_MemberCall
-   : DOT (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)
+   : WS? DOT (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)
    ;
 
 iCS_S_DictionaryCall
@@ -788,6 +789,7 @@ literal
    | DOUBLELITERAL
    | FILENUMBER
    | INTEGERLITERAL
+   | OCTALLITERAL
    | STRINGLITERAL
    | TRUE
    | FALSE
@@ -795,13 +797,13 @@ literal
    | NULL
    ;
 
-publicPrivateVisibility 
-	: PRIVATE 
+publicPrivateVisibility
+	: PRIVATE
 	| PUBLIC
 	;
 
-publicPrivateGlobalVisibility 
-	: PRIVATE 
+publicPrivateGlobalVisibility
+	: PRIVATE
 	| PUBLIC
 	| GLOBAL
 	;
@@ -1522,7 +1524,7 @@ NULL
    : N U L L
    ;
 
-OBJECT 
+OBJECT
    : O B J E C T
    ;
 
@@ -1931,7 +1933,7 @@ LEQ
    : '<='
    ;
 
-LBRACE 
+LBRACE
 	: '{'
 	;
 
@@ -2041,6 +2043,10 @@ FILENUMBER
    : HASH LETTERORDIGIT +
    ;
 
+OCTALLITERAL
+   : (PLUS | MINUS)? '&O' [0-7] + AMPERSAND?
+   ;
+   
 // misc
 FRX_OFFSET
 	: COLON [0-9A-F]+

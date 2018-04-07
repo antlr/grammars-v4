@@ -1,0 +1,1009 @@
+
+--
+-- Script to remove all alternative labels from the grammar definition
+--
+on mouseUp
+	put the ticks into startTime
+
+	-- much faster if we copy cd fld 1 into a temporary variable
+	repeat with n = 1 to the number of lines in cd fld 1
+		if line n of cd fld 1 contains "#" then  -- ignore lines without alternative labels
+			put offset("#", line n of cd fld 1) into firstChar
+			put the number of chars in line n of cd fld 1 into lastChar
+			delete chars firstChar to lastChar of line n of cd fld 1
+		end if
+	end repeat
+
+	-- How long did it take?
+	put the ticks - startTime into duration
+	put "Completed in " & duration / 60.0 & " seconds"
+end mouseUp
+
+--
+-- Flow Control
+--
+
+on testConditionalBranching
+
+    if x
+    then doSomethingCool
+
+    if x
+    then
+    end if
+
+    if x
+    then
+    else
+    end if
+
+    if x then
+        -- comment body
+    end if
+
+    if x then
+        -- comment body
+    else
+        -- comment body
+    end if
+
+    if x < y then put x
+
+    -- empty body
+    if x then
+
+    end if
+
+    if x < y then
+        put x
+    end if
+
+    if x < y then
+        put x
+        put y
+    end if
+
+    if x > y then put x else put y
+
+    if x < y then
+        put x
+        put y
+    else put z
+
+    if x < y then
+        put x
+    else
+        put y
+    end if
+
+    if x > y then put x
+    else put y
+
+    if x > y then
+        put x   -- a comment in here
+        put y
+    else if x > z then put z
+
+    if x > y then put y
+    else if x > z then put z
+    else if x > a then put a
+
+    if x > y then
+        put x
+        put y
+    else if x > z then put x
+    else if x > a then
+        put x
+        put a
+    end if
+
+end testConditionalBranching
+
+on testLoops
+
+    repeat for x
+    end repeat
+
+    repeat for x
+        -- comment
+    end repeat
+
+    repeat
+        -- comment
+        statement
+    end repeat
+
+    repeat for x
+
+    end repeat
+
+    repeat
+        put w
+    end repeat
+
+    repeat forever
+        put x
+    end repeat
+
+    repeat for x
+        put y
+    end repeat
+
+    repeat with n = x to the number of words in y
+        put n
+    end repeat
+
+    repeat with n = the number of chars in "blah" down to 1
+        put n
+    end repeat
+end testLoops
+
+--
+-- Properties
+--
+
+on testProperties
+
+    -- HyperCard properties
+    the itemdelimiter
+    put "," into the itemdelimiter
+    set the itemdelimiter to "|"
+
+    -- part properties
+    set the name of me to x
+    get the name of me
+    get the first char of the name of me
+    put "name" into me
+    put "before" before the first word of the name of me   -- not legal in HyperCard, okay here
+
+    -- stack properties
+    get the name of this stack
+    get the name of stack "My Stack"
+    set the name of this stack to "Renamed"
+
+end testProperties
+
+--
+-- Built-in function calls
+--
+on testNoArgFunctions
+
+    the mouse
+    the mouseloc
+    the result
+    the commandkey
+    the cmdkey
+    the shiftkey
+    the optionkey
+    the ticks
+    the seconds
+    the time
+    the long time
+    the english time
+
+    the date
+    the long date
+    the short date
+    the english date
+    the abbreviated date
+    the abbrev date
+
+    the time
+    the long time
+    the short time
+    the english time
+    the abbreviated time
+    the abbrev time
+
+    the tool
+    the number of parts
+    the number of card parts
+    the number of background parts
+    the number of card buttons
+    the number of background buttons
+    the number of card field
+    the number of fields
+    the number of bg fields
+    the number of menus
+    the number of cards
+    the number of marked cards
+    the number of backgrounds
+    the number of background in this stack
+
+    the menus
+    the diskspace
+    the params
+    the paramcount
+
+    the sound
+    the selectedtext
+    the selectedchunk
+    the selectedline
+    the clicktext
+    the mouseh
+    the mousev
+    the screenrect
+    the clickloc
+    the clickh
+    the clickv
+    the foundchunk
+    the foundfield
+    the foundline
+    the foundtext
+
+end testNoArgFunctions
+
+on testSingleArgFunctions
+
+    the average of x
+    average(x)
+
+    the min of x
+    min(x)
+
+    the max of x
+    max(x)
+
+    the sum of x
+    sum(x)
+
+    the number of characters of x
+    the number of words of x
+    the number of items of x
+    the number of lines of x
+    the number of menuitems of x
+    the number of cards of x
+
+    the random of x
+    random(x)
+
+    the sqrt of x
+    sqrt(x)
+
+    the trunc of x
+    trunc(x)
+
+    the sin of x
+    sin(x)
+
+    the cos of x
+    cos(x)
+
+    the tan of x
+    tan(x)
+
+    the atan of x
+    atan(x)
+
+    the exp of x
+    exp(x)
+
+    the exp1 of x
+    exp1(x)
+
+    the exp2 of x
+    exp2(x)
+
+    the ln of x
+    ln(x)
+
+    the ln1 of x
+    ln1(x)
+
+    the log2 of x
+    log2(x)
+
+    the abs of x
+    abs(x)
+
+    the chartonum of x
+    chartonum(x)
+
+    the numtochar of x
+    numtochar(x)
+
+    the value of x
+    value(x)
+
+    the length of x
+    length(x)
+
+    the diskspace of x
+    diskspace(x)
+
+    the param of x
+    param(x)
+
+end testSingleArgFunctions
+
+on testMultiArgFunctions
+
+    annuity(x, y)
+    compound(x, y)
+    offset(x, y)
+
+end testMultiArgFunctions
+
+--
+-- Commands
+--
+
+on commandsTest
+    answer x
+    answer x with a
+    answer x with a or b
+    answer x with a or b or c
+
+    ask a
+    ask a with b
+    ask "How long?" with the number of characters in "Not long"
+
+    beep
+    beep 10 + 3
+
+    choose browse tool
+    choose button tool
+    choose field tool
+    choose oval tool
+    choose brush tool
+    choose pencil tool
+    choose bucket tool
+    choose poly tool
+    choose polygon tool
+    choose rect tool
+    choose rectangle tool
+    choose curve tool
+    choose reg poly tool
+    choose regular poly tool
+    choose regular polygon tool
+    choose eraser tool
+    choose round rect tool
+    choose round rectangle tool
+    choose select tool
+    choose lasso tool
+    choose spray tool
+    choose spray can tool
+    choose line tool
+    choose text tool
+    choose (word 1 of card field 2) tool
+    choose tool 1
+    choose tool (word 1 of card field 2)
+
+    click at 10,10
+    click at "10, 10"
+    click at the mouseloc
+    click at 10,10 with commandkey, optionkey, shiftkey
+
+    close file theFile
+
+    convert cd fld 1 to seconds
+    convert cd fld 1 to dateitems
+    convert cd fld 1 to long date
+    convert cd fld 1 to english date
+    convert cd fld 1 to date
+    convert cd fld 1 to short date
+    convert cd fld 1 to abbrev date
+    convert cd fld 1 to abbreviated date
+    convert cd fld 1 to time
+    convert cd fld 1 to short time
+    convert cd fld 1 to abbrev time
+    convert cd fld 1 to abbreviated time
+    convert cd fld 1 to english time
+    convert cd fld 1 to long time
+    convert cd fld 1 from seconds to long date
+    convert cd fld 1 from seconds to long time and long date
+    convert 100 from seconds to date
+
+    create menu "My Great Menu"
+    create menu item 1 of fld id 13
+
+    delete menu "My Great Menu"
+    delete menuitem 1 from menu "My Great Menu"
+    delete the first menuitem from menu "My Great Menu"
+    delete the last menuitem from menu "My Great Menu"
+    delete menuitem "My Item" from menu "My Great Menu"
+    delete card field 1
+    delete bg btn id 13
+    delete the first cd btn
+    delete item 1 of the msg box
+    delete chars 13 to 27 of the middle line of card field x
+
+    dial the last line of x
+    dial "588-2300"
+
+    disable card button "x"
+    disable the first menuitem of the last menu
+    disable menu "Edit"
+    disable (card field x)
+
+    divide x by 3
+    divide word 17 of x by the message window
+
+    domenu "New Button"
+    domenu ("New" && "Field")
+
+    drag from x to y
+    drag from 10,10 to "100,100"
+    drag from the mouseloc to 10,10 with shiftkey, optionkey
+
+    edit the script of cd btn 1
+    edit script of this card
+
+    enable fld "My Field"
+    enable menuitem "Undo" of menu "Edit"
+    enable menu "File"
+    enable the last menu
+
+    exit testCommands
+    exit repeat
+    exit to hypercard
+
+    export paint to file x
+    export paint to file "image.png"
+
+    find x
+    find x in card field 1
+    find x of marked cards
+    find x in card field 1 of marked cards
+    find word "word" in card field 1
+    find chars "chars" of marked cards
+    find whole "whole" in bg fld id 3 of marked cards
+    find string "string"
+    find international "bonjour"
+    find string international "bonjour" in field id 14 of marked cards
+
+    get 2 + 2 / 3
+    get char 3 of the middle word of item 11 of line 17 of theText
+    get the number of bg button x
+    get the number of the last card in this background
+    get the selectedchunk of x
+    get the selectedline of y
+    get the selectedtext of z
+
+    go to card 1
+    go to the last card
+    go to the middle card
+    go to the first card
+    go to the next card
+    go to prev card
+    go to the previous card
+    go bg 1
+    go to the next background
+    go to the middle bg
+    go back
+    go next card
+    go card 13
+    go the first card of the last background
+    go card 14 of bkgnd 15
+    go next card with visual effect dissolve very slowly to black
+
+    hide field "bananas"
+    hide the third cd btn
+    hide card picture
+    hide bkgnd picture
+    hide picture of the last card
+    hide picture of background id 2
+
+    import paint from file "My Image.png"
+
+    show field "bananas"
+    show the third cd btn
+    show card picture
+    show bkgnd picture
+    show picture of the last card
+    show picture of background id 2
+
+    lock screen
+
+    multiply x by y
+    multiply the first char of the last word of cd fld 1 by 22
+
+    next repeat
+
+    open file "file"
+    open file f
+
+    pass testCommands
+
+    play "b a g a b b b"
+    play the first word of the name of button id 2
+    play "c d e" tempo 200
+    play flute x
+    play harpsichord y
+    play boing tempo x y
+    wait until the sound is done
+
+    pop card
+    push card
+    push next background
+    push card 13
+
+    put "hello world"
+    put x into y
+    put y before z
+    put z after a
+
+    read from file x for y
+    read from file x at y for z
+    read from file x until "found me!"
+
+    reset the menubar
+    reset paint
+
+    select the first card button
+    select field "my field"
+    select empty
+    select text of bg fld 1
+    select before text of background field "f"
+    select after text of background fld x
+    select the first char of the middle word of the fifth line of field 1
+    select before the middle word of the middle line of field f
+    select after item ten of bkgnd fld 11
+
+    set the bottom of me to x
+    set the bottomRight of me to x
+    set the contents of me to x
+    set the enabled of me to true
+    set the height of me to 100
+    set the left of me to x
+    set the location of me to 10,10
+    set the name of me to "name"
+    set the rectangle of me to 10,10,100,100
+    set the right of me to z
+    set the script of me to "answer hello"
+    set the style of me to default
+    set the style of me to classic
+    set the style of me to shadow
+    set the style of me to oval
+    set the style of me to rectangular
+    set the style of me to transparent
+    set the style of me to opaque
+    set the style of me to checkbox
+    set the style of me to radio
+    set the style of me to menu
+    set the textalign of me to left
+    set the textalign of me to right
+    set the textalign of me to center
+    set the textfont of me to arial
+    set the textsize of me to 24
+    set the textstyle of me to plain
+    set the textstyle of me to bold
+    set the textstyle of me to italic
+    set the top of me to y
+    set the topLeft of me to 110,220
+    set the visible of me to true
+    set the width of me to the height of me
+    set the autohilite of me to true
+    set the hilite of me to false
+    set the iconalign of me to top
+    set the iconalign of me to left
+    set the iconalign of me to right
+    set the iconalign of me to bottom
+    set the showname of me to false
+    set the autoselect of me to true
+    set the autotab of me to x
+    set the locktext of me to the visible of x
+    set the showlines of me to true
+    set the dontwrap of me to the showlines of me
+    set the multiplelines of me to x
+    set the scroll of me to 100
+    set the scrolling of me to false
+    set the sharedtext of me to true
+    set the widemargins of me to true
+    set the textfont of the last word of cd fld 1 to courier
+    set the textsize of lines 1 to 3 of bg field 2 to 48
+    set the textstyle of the middle character of me to bold
+
+    sort the items of x
+    sort lines of the middle card field
+    sort the items of x by the last word of each
+    sort the lines of x by the random of 10
+    sort items of x descending
+    sort items of x ascending text
+    sort items of x descending numeric by chars 2 to 4 of each
+    sort items of x descending international
+    sort items of x ascending datetime
+    sort stack descending by the first word of the first card field
+    sort this stack by the first word of the first card field
+    sort the cards by the random of 100
+    sort the cards of this stack ascending numeric by x
+    sort the marked cards of this stack descending international by x
+    sort the first bg by x
+    sort background "sorted" ascending text by the last line of card field 1
+    sort the cards of the last background by x
+    sort the marked cards of bkgnd id 3 by y
+
+    subtract the random of 200 from x
+
+    type the first line of card field 1
+    type "z" with commandkey
+    type "z" with cmdkey
+
+    unlock screen
+    unlock screen with visual effect iris open very fast to black
+
+    visual effect barn door open
+    visual effect barn door close
+    visual effect checkerboard
+    visual effect iris open
+    visual effect iris close
+    visual effect plain
+    visual effect push up
+    visual effect push down
+    visual effect push left
+    visual effect push right
+    visual effect scroll down
+    visual effect scroll up
+    visual effect scroll left
+    visual effect scroll right
+    visual effect shrink to top
+    visual effect shrink to bottom
+    visual effect shrink to center
+    visual effect stretch from top
+    visual effect stretch from bottom
+    visual effect stretch from center
+    visual effect venetian blinds
+    visual effect wipe up
+    visual effect wipe down
+    visual effect wipe left
+    visual effect wipe right
+    visual effect zoom in
+    visual effect zoom out
+    visual effect zoom open
+    visual effect zoom close
+    visual dissolve to black
+    visual dissolve to white
+    visual dissolve to gray
+    visual dissolve to grey
+    visual dissolve to card
+    visual dissolve to inverse
+    visual effect iris open fast
+    visual effect iris open very fast
+    visual effect iris open slow
+    visual effect iris open slowly
+    visual effect iris open very slowly
+    visual effect iris open very slow
+    visual effect dissolve very slowly to white
+
+    wait for 10 ticks
+    wait 3 seconds
+    wait until the last word of the message window contains "done!"
+    wait while the mouse is down
+
+    write the last line of the first card field to file "lines.txt"
+    write "Thanks for playing" to file x at eof
+    write "Thanks for playing" to file x at end
+    write 2 + 3 to file x at -7
+
+end commandsTest
+
+on operatorsTest
+
+    not x
+    not false
+    -x
+    x ^ y
+    x mod y
+    x div y
+    x / y
+    x * y
+    x + y
+    x - y
+    x && y
+    x & y
+    x >= y
+    x <= y
+    x ≥ y
+    x ≤ y
+    x > y
+    x < y
+    x contains y
+    x is in y
+    9.99 is a number
+    9 is an integer
+    "10,10" is a point
+    "10,10,20,20" is a rect
+    "10,10,20,20" is a rectangle
+    "1/1/2012" is a date
+    true is a logical
+    false is a boolean
+    true is a bool
+    x is not a number
+    x is not an integer
+    x is not a rect
+    x is not a rectangle
+    x is not a logical
+    x is not a boolean
+    x is not a bool
+    "100,100" is not in "10,10,20,20"
+    x = y
+    x is not y
+    x is y
+    x is not within y
+    x and y
+    x or y
+    there is a card button "my button"
+    there is a card field id 2
+    there is not a first background
+    there is no field 13
+
+end operatorsTest
+
+on literalsTest
+
+    -- String Literals
+    unquotedLiteral
+    "quotedLiteral"
+
+    -- Number Literals
+    0
+    -0
+    .25
+    -.25
+    1.25
+    -1.25
+    2.
+    -2.
+    3-2
+    -2-4
+
+    -- Line wrapping
+    answer "How are you?" |
+        with "Choice 1"   |
+        or "Choice 2"
+
+    ask "Yes?" ¬
+        with "No"
+
+    ask "Yes?" ¬    -- Comments are acceptable here
+        with "No"
+
+    -- mouse states
+    the mouse is down
+    the mouse is up
+
+end literalsTest
+
+--
+-- Constants
+--
+on constantsTest
+    put zero + one + two + three + four + five + six + seven + eight + nine + ten into theSum
+
+    if x is empty then answer "empty"
+    the random of pi
+    put quote & space & "name" & space & quote & return into x
+    write tab & formfeed & linefeed to file x
+    word 1 of x contains comma
+    put "http" && colon & colon into scheme
+
+    the first word of x
+    the second char in x
+    the third item from x
+    the fourth line of x
+    the fifth word in x
+    the sixth char from x
+    the seventh item of x
+    the eighth line in x
+    the ninth word from x
+    the tenth char of x
+    the mid item in x
+    the middle line from x
+    the last word of x
+
+end constantsTest
+
+--
+-- Chunk expressions
+--
+on chunkTest
+
+    -- Prepositional chunks
+    put x into y
+    put x after y
+    put x before y
+
+    -- Singular chunks
+    the first char of x
+    the first character of x
+    char 1 of x
+    the last char of x
+    the middle character of x
+    any character of x
+
+    the second word of x
+    word 2 of x
+    the last word of x
+    the middle word of x
+    any word of x
+
+    the third item of x
+    item 3 of x
+    the last item of x
+    the middle item of x
+    any item of x
+
+    the fourth line of x
+    line 3 of x
+    the last line of x
+    the middle line of x
+    any line of x
+
+    -- Ranged chunks
+    char 1 to 2 of x
+    chars 1 to 2 of x
+    word 1 to 2 of x
+    words 1 to 2 of x
+    item 1 to 2 of x
+    items 1 to 2 of x
+    line 1 to 2 of x
+    lines 1 to 2 of x
+
+    -- Expression chunks
+    word 2 + 3 of x
+
+    -- Compound chunks
+    the first char of the second word of the third line of x
+    chars 1 to 2 of words 3 to 4 of items 5 to 6 of line 7 to 8 of x
+    put char 1 of word 2 of line 3 of x before char 4 of word 5 of item 6 of line 7 of y
+
+end chunkTest
+
+--
+-- Handler and function declarations
+--
+
+on messages
+    f()
+    f(x)
+    f(x,y,z)
+
+    doSomething     -- with a comment
+    doSomething cool
+    doSomething cool, andFun   -- an another comment
+end messages
+
+on emptyHandler    -- with a comment
+
+end emptyHandler   -- and another comment
+
+on commentHandler
+    -- comment
+end commentHandler
+
+on noArgHandler
+end noArgHandler
+
+on paramHandler p
+end paramHandler
+
+on paramsHandler p1, p2, p3
+end paramsHandler
+
+function f
+end f
+
+function f p1, p2, p3
+end f
+
+--
+-- Command keywords in the language should be usable as block names.
+--
+
+on answer
+    statement
+    -- comment
+end answer
+
+on ask
+    -- comment
+    statement
+end ask
+
+on put
+end put
+
+on get
+end get
+
+on set
+end set
+
+on send
+end send
+
+on wait
+end wait
+
+on sort
+end sort
+
+on go
+end go
+
+on enable
+end enable
+
+on disable
+end disable
+
+on read
+end read
+
+on write
+end write
+
+on hide
+end hide
+
+on show
+end show
+
+on add
+end add
+
+on subtract
+end subtract
+
+on multiply
+end multiply
+
+on divide
+end divide
+
+on choose
+end choose
+
+on click
+end click
+
+on drag
+end drag
+
+on type
+end type
+
+on lock
+end lock
+
+on unlock
+end unlock
+
+on pass
+end pass
+
+on domenu
+end domenu
+
+on visual
+end visual
+
+on reset
+end reset
+
+on create
+end create
+
+on delete
+end delete
+
+on play
+end play
+
+on dial
+end dial
+
+on beep
+end beep
+
+on open
+end open
+
+on close
+end close
+
+on select
+end select
+
+on find
+end find

@@ -38,6 +38,9 @@ public class LexerTest {
         long lastReceivedMessageId = 0L;
         double hexDouble1 = 0x1.0p0;
         double hexDouble2 = 0x1.956ad0aae33a4p117;
+        int octal = 01234567;
+        long hexUpper = 0x1234567890ABCDEFL;
+        long hexLower = 0x1234567890abcedfl;
 
         int x1 = _52;              // This is an identifier, not a numeric literal
         int x2 = 5_2;              // OK (decimal literal)
@@ -63,13 +66,37 @@ public class LexerTest {
         result = ++x;
         result = --y;
         boolean ok = false;
-        boolean not_ok = !ok; 
+        boolean not_ok = !ok;
+
+        // assignments yield a value
+        (result = System.class).getName();
 
         // Prefix & postfix
         ++x;
         x++;
         --y;
         y--;
+        LexerTest.prePost++;
+        LexerTest.prePost--;
+        myapplication.mylibrary.LexerTest.prePost++;
+        myapplication.mylibrary.LexerTest.prePost--;
+        this.prePost++;
+        this.prePost--;
+        super.prePost++;
+        super.prePost--;
+        someMethod()[0]++;
+        someMethod()[0]--;
+
+        ++LexerTest.prePost;
+        --LexerTest.prePost;
+        ++myapplication.mylibrary.LexerTest.prePost;
+        --myapplication.mylibrary.LexerTest.prePost;
+        ++this.prePost;
+        --this.prePost;
+        ++super.prePost;
+        --super.prePost;
+        ++someMethod()[0];
+        --someMethod()[0];
 
         // Relational operators
         result = x == y;
@@ -110,6 +137,18 @@ public class LexerTest {
         result <<= x;
         result >>= x;
         result >>>= x;
+    }
+
+    public static void methodCalls() {
+        new Object().getClass().hashCode();
+        new String[] { "test" }[0].getLength();
+        String[] strings;
+        (strings = new String[] {"test"})[0].charAt(0);
+        strings[0].length();
+        Foo foo = new Foo().new Bar();
+        foo.hashCode();
+        Foo.class.hashCode();
+        new HashMap<Object, String>(5).get(null);
     }
 }
 
@@ -315,6 +354,16 @@ public class HelloWorld {
         int[][] numbers = new int[2][]; //Initialization of the first dimension only
         numbers[0] = new int[3];
         numbers[1] = new int[2];
+
+        // Prefix & postfix
+        numbers[0][0]++;
+        numbers[0][0]--;
+        ++numbers[0][0];
+        --numbers[0][0];
+        foo()[0]++;
+        foo()[0]--;
+        ++foo()[0];
+        --foo()[0];
     }
 }
 
@@ -327,6 +376,13 @@ class Foo {
 // Inner class
 class Foo { // Top-level class
     class Bar { // Inner class
+    }
+
+    static void inner_class_constructor() {
+        // https://docs.oracle.com/javase/specs/jls/se9/html/jls-15.html#jls-15.9
+        Foo foo = new Foo();
+        Foo.Bar fooBar1 = foo.new Bar();
+        Foo.Bar fooBar2 = new Foo().new Bar();
     }
 }
 
@@ -348,6 +404,7 @@ class Foo {
 // Anonymous class
 class Foo {
     void bar() {
+
         new Object() {// Creation of a new anonymous class extending Object
         };
     }
@@ -464,7 +521,7 @@ public class CustomClass extends AbstractClass {
     public static void main(String[] args) {
         CustomClass nc = new CustomClass();
         hello();
-        //AbstractClass.hello();//also valid
+        AbstractClass.hello();//also valid
     }
 }
 

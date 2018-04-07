@@ -29,6 +29,8 @@
 				<module>apex</module>
 				<module>arithmetic</module>
 				<module>asm6502</module>
+				<module>asm8080</module>
+				<module>asmZ80</module>
 				<module>asn</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 				<!--		<module>aspectj</module> -->
@@ -38,6 +40,7 @@
 				<module>brainfuck</module>
 				<module>c</module>
 				<module>calculator</module>
+				<module>capnproto</module>				
 				<module>clf</module>
 				<module>clif</module>
 				<module>clojure</module>
@@ -54,10 +57,12 @@
 				<module>dice</module>
 				<module>dot</module>
 				<module>ecmascript</module>
+				<module>edif300</module>
 				<module>emailaddress</module>
 				<module>erlang</module>
 				<module>fasta</module>
 				<module>fen</module>
+				<module>flatbuffers</module>
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
@@ -68,6 +73,7 @@
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
 				<module>html</module>
+                <module>hypertalk</module>
 				<module>icalendar</module>
 				<module>idl</module>
 				<module>inf</module>
@@ -128,6 +134,7 @@
 				<module>r</module>
 				<module>rcs</module>
 				<module>redcode</module>
+				<module>restructuredtext</module>
 				<module>rexx</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
@@ -151,6 +158,7 @@
 				<module>swift3</module>
 				<module>swift-fin</module>
 				<module>telephone</module>
+				<module>thrift</module>
 				<module>tiny</module>
 				<module>tinybasic</module>
 				<module>tinyc</module>
@@ -158,6 +166,7 @@
 				<module>tnt</module>
 				<module>tsql</module>
 				<module>turtle</module>
+				<module>turtle-doc</module>
 				<module>ucb-logo</module>
 				<module>unicode</module>
 				<module>upnp</module>
@@ -180,8 +189,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.7</antlr.version>
-		<antlr4test-maven-plugin.version>1.9</antlr4test-maven-plugin.version>
+		<antlr.version>4.7.1</antlr.version>
+		<antlr4test-maven-plugin.version>1.10</antlr4test-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
