@@ -90,7 +90,7 @@ public abstract class JavaScriptBaseLexer : Lexer
     {
         if (_lastToken == null || _lastToken.Type == OpenBrace)
         {
-            if (Text == "\"use strict\"" || Text == "'use strict'")
+            if (Text.Equals("\"use strict\"") || Text.Equals("'use strict'"))
             {
                 if (scopeStrictModes.Count > 0)
                     scopeStrictModes.Pop();
