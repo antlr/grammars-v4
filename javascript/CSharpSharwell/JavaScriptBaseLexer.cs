@@ -56,6 +56,7 @@ public abstract class JavaScriptBaseLexer : Lexer
     /// token in case it resides on the default channel. This recorded token
     /// is used to determine when the lexer could possibly match a regex
     /// literal.
+    /// 
     /// </summary>
     /// <returns>
     /// The next token from the character stream.
@@ -65,26 +66,7 @@ public abstract class JavaScriptBaseLexer : Lexer
         // Get the next token.
         IToken next = base.NextToken();
 
-        if (next.Type == OpenBrace)
-        {
-            _useStrictCurrent = scopeStrictModes.Count > 0 && scopeStrictModes.Peek() ? true : UseStrictDefault;
-            scopeStrictModes.Push(_useStrictCurrent);
-        }
-        else if (next.Type == CloseBrace)
-        {
-            _useStrictCurrent = scopeStrictModes.Count > 0 ? scopeStrictModes.Pop() : UseStrictDefault;
-        }
-        else if (next.Type == StringLiteral &&
-            (_lastToken == null || _lastToken.Type == OpenBrace) &&
-            (next.Text.Substring(1, next.Text.Length - 2)) == "use strict")
-        {
-            if (scopeStrictModes.Count > 0)
-                scopeStrictModes.Pop();
-            _useStrictCurrent = true;
-            scopeStrictModes.Push(_useStrictCurrent);
-        }
-
-        if (next.Channel == Lexer.DefaultTokenChannel)
+        if (next.Channel == DefaultTokenChannel)
         {
             // Keep track of the last token on the default channel.
             _lastToken = next;
@@ -93,10 +75,35 @@ public abstract class JavaScriptBaseLexer : Lexer
         return next;
     }
 
+    protected void ProcessOpenBrace()
+    {
+        _useStrictCurrent = scopeStrictModes.Count > 0 && scopeStrictModes.Peek() ? true : UseStrictDefault;
+        scopeStrictModes.Push(_useStrictCurrent);
+    }
+
+    protected void ProcessCloseBrace()
+    {
+        _useStrictCurrent = scopeStrictModes.Count > 0 ? scopeStrictModes.Pop() : UseStrictDefault;
+    }
+
+    protected void ProcessStringLiteral()
+    {
+        if (_lastToken == null || _lastToken.Type == OpenBrace)
+        {
+            if (Text == "\"use strict\"" || Text == "'use strict'")
+            {
+                if (scopeStrictModes.Count > 0)
+                    scopeStrictModes.Pop();
+                _useStrictCurrent = true;
+                scopeStrictModes.Push(_useStrictCurrent);
+            }
+        }
+    }
+
     /// <summary>
     /// Returns true if the lexer can match a regex literal.
     /// </summary>
-    protected bool RegexPossible()
+    protected bool IsRegexPossible()
     {
         if (_lastToken == null)
         {
