@@ -2,9 +2,9 @@ import org.antlr.v4.runtime.*;
 
 public abstract class PlSqlBaseLexer extends Lexer
 {
-    public PlSqlBaseLexer(ICharStream input)
-        : base(input)
-    {
+    public PlSqlBaseLexer(CharStream input) 
+	{
+		super(input);
     }
 
     protected boolean IsNewlineAtPos(int pos)

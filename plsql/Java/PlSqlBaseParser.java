@@ -5,7 +5,7 @@ public abstract class PlSqlBaseParser extends Parser
     private boolean _isVersion12 = true;
 
     public PlSqlBaseParser(TokenStream input) {
-        : super(input);
+        super(input);
     }
 
     public boolean isVersion12() {
