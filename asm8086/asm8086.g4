@@ -236,9 +236,6 @@ fragment Z
    : ('z' | 'Z')
    ;
 
-COMMENT
-   : ';' ~ [\r\n]* -> skip
-   ;
 
 
 ASSEMBLER_DIRECTIVE
@@ -348,6 +345,11 @@ NUMBER
 
 STRING
    : '\u0027' ~ ['\u0027']* '\u0027'
+   ;
+
+
+COMMENT
+   : ';' ~ [\r\n]* -> skip
    ;
 
 
