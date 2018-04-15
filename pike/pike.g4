@@ -263,8 +263,7 @@ arrow
 
 program_specifier
    :
-   /*string_constant*/
-   | constant_identifier
+   /*string_constant |*/ constant_identifier
    ;
 
 parenthesis
