@@ -33,15 +33,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar asm8086;
 
 prog
-   : (line? EOL) +
+   : (line EOL)*
    ;
 
 line
-   : lbl? (instruction| directive)? comment?
+   : lbl? (instruction | directive | title | include)? comment?
+   ;
+
+title
+   : TITLE string
+   ;
+
+include
+   : INCLUDE NAME
    ;
 
 instruction
-   : opcode expressionlist?
+   : prefix? opcode expressionlist?
+   ;
+
+prefix
+   : REP
    ;
 
 directive
@@ -73,17 +85,16 @@ multiplyingExpression
    ;
 
 argument
-   : number 
-   | dollar
-   | name 
+   : number
+   | DOLLAR
+   | REGISTER
+   | name
    | string
    | ('(' expression ')')
-   | 'not' expression
+   | ('[' expression ']')
+   | NOT expression
+   | OFFSET expression
    ;
-
-dollar
-    : '$'
-    ;
 
 string
    : STRING
@@ -98,9 +109,8 @@ number
    ;
 
 opcode
-    : OPCODE
-    | '[' OPCODE ']'
-    ;
+   : OPCODE
+   ;
 
 comment
    : COMMENT
@@ -237,99 +247,55 @@ fragment Z
    ;
 
 
+REP
+   : R E P
+   ;
+
+
+NOT
+   : N O T
+   ;
+
+
+OFFSET
+   : O F F S E T
+   ;
+
+
+COMMENT
+   : ';' ~ [\r\n]*
+   ;
+
+
+INCLUDE
+   : I N C L U D E
+   ;
+
+
+TITLE
+   : T I T L E
+   ;
+
+
+REGISTER
+   : A X | B C | C X | D X | C I | D I | B P | S P | I P | C S | D S | E S | S S
+   ;
+
 
 ASSEMBLER_DIRECTIVE
-   : O R G
-   | E N D
-   | E Q U
-   | D B 
-   | D W
-   | D S
-   | I F
-   | E N D I F
-   | S E T
+   : O R G | E N D | E Q U | D B | D W | D S | I F | E N D I F | S E T
    ;
 
+
 OPCODE
-   : M O V
-   | M V I
-   | L D A
-   | S T A
-   | L D A X
-   | S T A X
-   | L H L D
-   | S H L D
-   | L X I
-   | P U S H
-   | P O P
-   | X T H L
-   | S P H L
-   | P C H L
-   | X C H G
-   | A D D
-   | S U B
-   | I N R
-   | D C R
-   | C M P
-   | A N A
-   | O R A
-   | X R A
-   | A D I
-   | S U I
-   | C P I
-   | A N I
-   | O R I
-   | X R I
-   | D A A
-   | A D C
-   | A C I
-   | S B B
-   | S B I
-   | D A D
-   | I N X
-   | D C X
-   | J M P
-   | C A L L
-   | R E T
-   | R A L
-   | R A R
-   | R L C
-   | R R C
-   | I N
-   | O U T  
-   | C M C
-   | S T C
-   | C M A
-   | H L T
-   | N O P
-   | D I
-   | E I
-   | R S T  
-   | J N Z
-   | J Z
-   | J N C
-   | J C
-   | J P O
-   | J P E
-   | J P
-   | J M
-   | C N Z
-   | C Z
-   | C N C
-   | C C
-   | C P O
-   | C P E
-   | C P 
-   | C M
-   | R N Z
-   | R Z
-   | R N C
-   | R C
-   | R P O
-   | R P E
-   | R P
-   | R M
+   : M O V | A N D | M O V S | M V I | L D A | S T A | L D A X | S T A X | L H L D | S H L D | L X I | P U S H | P O P | X T H L | S P H L | P C H L | X C H G | A D D | S U B | I N R | I N C | D C R | C M P | A N A | O R A | O R | X R A | A D I | S U I | C P I | A N I | O R I | X R I | D A A | A D C | A C I | S B B | S B I | D A D | I N X | D C X | J M P | C A L L | R E T | R A L | R A R | R L C | R R C | I N | O U T | C M C | S T C | J M P S | T E S T | X O R | S H L | S H R | C M A | H L T | N O P | D I | E I | R S T | J N Z | J N B | J N E | J Z | J E | J N C | D E C | J C | J P O | J P E | J P | J M | C N Z | C Z | C N C | C C | C P O | C P E | C P | C M | R N Z | R Z | R N C | R C | R P O | R P E | R P | R M | J B | J A
    ;
+
+
+DOLLAR
+   : '$'
+   ;
+
 
 NAME
    : [a-zA-Z] [a-zA-Z0-9."_]*
@@ -341,15 +307,8 @@ NUMBER
    ;
 
 
-
-
 STRING
    : '\u0027' ~ ['\u0027']* '\u0027'
-   ;
-
-
-COMMENT
-   : ';' ~ [\r\n]* -> skip
    ;
 
 
