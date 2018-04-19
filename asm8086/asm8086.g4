@@ -138,7 +138,7 @@ argument
    | name
    | string
    | ('(' expression ')')
-   | ('[' expression ']')
+   | ((number | name)? '[' expression ']')
    | PTR expression
    | NOT expression
    | OFFSET expression
