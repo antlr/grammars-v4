@@ -37,15 +37,15 @@ prog
    ;
 
 line
-   : (assemblerdirective | instruction)? comment?
+   :lbl? (assemblerdirective | instruction)? comment?
    ;
 
 instruction
-   : lbl? prefix? opcode expressionlist?
+   : prefix? opcode? expressionlist?
    ;
 
 lbl
-   : label ':'
+   : label ':'?
    ;
 
 prefix
@@ -60,8 +60,18 @@ assemblerdirective
    | equ
    | db
    | dw
+   | cseg
+   | dseg
    | title
    | include
+   ;
+
+cseg
+   : CSEG
+   ;
+
+dseg
+   : DSEG
    ;
 
 dw
@@ -89,7 +99,7 @@ end
    ;
 
 org
-   : ORG string
+   : ORG name
    ;
 
 title
@@ -276,6 +286,16 @@ fragment Y
 
 fragment Z
    : ('z' | 'Z')
+   ;
+
+
+DSEG
+   : D S E G
+   ;
+
+
+CSEG
+   : C S E G
    ;
 
 
