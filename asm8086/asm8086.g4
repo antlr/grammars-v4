@@ -37,7 +37,7 @@ prog
    ;
 
 line
-   :lbl? (assemblerdirective | instruction)? comment?
+   : lbl? (assemblerdirective | instruction)? comment?
    ;
 
 instruction
@@ -64,14 +64,19 @@ assemblerdirective
    | dseg
    | title
    | include
+   | rw
+   ;
+
+rw
+   : name? RW expression
    ;
 
 cseg
-   : CSEG
+   : CSEG expression?
    ;
 
 dseg
-   : DSEG
+   : DSEG expression?
    ;
 
 dw
@@ -99,7 +104,7 @@ end
    ;
 
 org
-   : ORG name
+   : ORG expression
    ;
 
 title
@@ -107,7 +112,7 @@ title
    ;
 
 include
-   : INCLUDE string
+   : INCLUDE name
    ;
 
 expressionlist
@@ -134,6 +139,7 @@ argument
    | string
    | ('(' expression ')')
    | ('[' expression ']')
+   | PTR expression
    | NOT expression
    | OFFSET expression
    ;
@@ -349,6 +355,11 @@ DB
    ;
 
 
+PTR
+   : P T R
+   ;
+
+
 NOT
    : N O T
    ;
@@ -356,6 +367,11 @@ NOT
 
 OFFSET
    : O F F S E T
+   ;
+
+
+RW
+   : R W
    ;
 
 
@@ -395,7 +411,7 @@ STRING
 
 
 EOL
-   : '\r'? '\n'
+   : [\r\n] +
    ;
 
 
