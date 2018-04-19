@@ -37,7 +37,7 @@ prog
    ;
 
 line
-   : (instruction | assemblerdirective)? comment?
+   : (assemblerdirective | instruction)? comment?
    ;
 
 instruction
@@ -45,7 +45,7 @@ instruction
    ;
 
 lbl
-   : label ':'?
+   : label ':'
    ;
 
 prefix
@@ -73,7 +73,7 @@ db
    ;
 
 equ
-   : string EQU expression
+   : name EQU expression
    ;
 
 if_
