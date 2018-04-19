@@ -124,7 +124,7 @@ label
    ;
 
 expression
-   : multiplyingExpression (('+' | '-') multiplyingExpression)*
+   : multiplyingExpression (SIGN multiplyingExpression)*
    ;
 
 multiplyingExpression
@@ -133,7 +133,7 @@ multiplyingExpression
 
 argument
    : number
-   | DOLLAR
+   | dollar
    | register
    | name
    | string
@@ -146,6 +146,10 @@ argument
 
 ptr
    : (BYTE | WORD | DWORD)? PTR
+   ;
+
+dollar
+   : DOLLAR
    ;
 
 register
@@ -161,7 +165,7 @@ name
    ;
 
 number
-   : NUMBER
+   : SIGN? NUMBER
    ;
 
 opcode
@@ -418,13 +422,18 @@ DOLLAR
    ;
 
 
+SIGN
+   : '+' | '-'
+   ;
+
+
 NAME
    : [a-zA-Z] [a-zA-Z0-9."_]*
    ;
 
 
 NUMBER
-   : '$'? ('-')? [0-9a-fA-F] + ('H' | 'h')?
+   : [0-9a-fA-F] + ('H' | 'h')?
    ;
 
 
