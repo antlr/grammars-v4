@@ -139,9 +139,13 @@ argument
    | string
    | ('(' expression ')')
    | ((number | name)? '[' expression ']')
-   | PTR expression
+   | ptr expression
    | NOT expression
    | OFFSET expression
+   ;
+
+ptr
+   : (BYTE | WORD | DWORD)? PTR
    ;
 
 register
@@ -296,6 +300,21 @@ fragment Y
 
 fragment Z
    : ('z' | 'Z')
+   ;
+
+
+BYTE
+   : B Y T E
+   ;
+
+
+WORD
+   : W O R D
+   ;
+
+
+DWORD
+   : D W O R D
    ;
 
 
