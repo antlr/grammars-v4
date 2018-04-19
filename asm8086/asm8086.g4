@@ -37,7 +37,7 @@ prog
    ;
 
 line
-   : lbl? (assemblerdirective | instruction)? comment?
+   : lbl? (assemblerdirective | instruction) comment?
    ;
 
 instruction
@@ -134,7 +134,7 @@ multiplyingExpression
 argument
    : number
    | DOLLAR
-   | REGISTER
+   | register
    | name
    | string
    | ('(' expression ')')
@@ -142,6 +142,10 @@ argument
    | PTR expression
    | NOT expression
    | OFFSET expression
+   ;
+
+register
+   : REGISTER
    ;
 
 string
@@ -381,7 +385,7 @@ COMMENT
 
 
 REGISTER
-   : A X | B C | C X | D X | C I | D I | B P | S P | I P | C S | D S | E S | S S
+   : A X | B X | C X | D X | C I | D I | B P | S P | I P | C S | D S | E S | S S
    ;
 
 
