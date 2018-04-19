@@ -37,7 +37,60 @@ prog
    ;
 
 line
-   : lbl? (instruction | directive | title | include)? comment?
+   : (instruction | assemblerdirective)? comment?
+   ;
+
+instruction
+   : lbl? PREFIX? opcode expressionlist?
+   ;
+
+lbl
+   : label ':'?
+   ;
+
+
+PREFIX
+   : R E P
+   ;
+
+assemblerdirective
+   : org
+   | end
+   | if_
+   | endif
+   | equ
+   | db
+   | dw
+   | title
+   | include
+   ;
+
+dw
+   : DW expressionlist
+   ;
+
+db
+   : DB expressionlist
+   ;
+
+equ
+   : string EQU expression
+   ;
+
+if_
+   : IF expression
+   ;
+
+endif
+   : ENDIF
+   ;
+
+end
+   : END
+   ;
+
+org
+   : ORG string
    ;
 
 title
@@ -45,27 +98,7 @@ title
    ;
 
 include
-   : INCLUDE NAME
-   ;
-
-instruction
-   : prefix? opcode expressionlist?
-   ;
-
-prefix
-   : REP
-   ;
-
-directive
-   : argument? assemblerdirective expressionlist?
-   ;
-
-assemblerdirective
-   : ASSEMBLER_DIRECTIVE
-   ;
-
-lbl
-   : label ':'?
+   : INCLUDE string
    ;
 
 expressionlist
@@ -247,8 +280,48 @@ fragment Z
    ;
 
 
-REP
-   : R E P
+INCLUDE
+   : I N C L U D E
+   ;
+
+
+TITLE
+   : T I T L E
+   ;
+
+
+END
+   : E N D
+   ;
+
+
+ORG
+   : O R G
+   ;
+
+
+ENDIF
+   : E N D I F
+   ;
+
+
+IF
+   : I F
+   ;
+
+
+EQU
+   : E Q U
+   ;
+
+
+DW
+   : D W
+   ;
+
+
+DB
+   : D B
    ;
 
 
@@ -267,23 +340,8 @@ COMMENT
    ;
 
 
-INCLUDE
-   : I N C L U D E
-   ;
-
-
-TITLE
-   : T I T L E
-   ;
-
-
 REGISTER
    : A X | B C | C X | D X | C I | D I | B P | S P | I P | C S | D S | E S | S S
-   ;
-
-
-ASSEMBLER_DIRECTIVE
-   : O R G | E N D | E Q U | D B | D W | D S | I F | E N D I F | S E T
    ;
 
 
