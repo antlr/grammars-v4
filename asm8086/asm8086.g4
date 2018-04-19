@@ -41,16 +41,15 @@ line
    ;
 
 instruction
-   : lbl? PREFIX? opcode expressionlist?
+   : lbl? prefix? opcode expressionlist?
    ;
 
 lbl
    : label ':'?
    ;
 
-
-PREFIX
-   : R E P
+prefix
+   : REP
    ;
 
 assemblerdirective
@@ -277,6 +276,11 @@ fragment Y
 
 fragment Z
    : ('z' | 'Z')
+   ;
+
+
+REP
+   : R E P
    ;
 
 
