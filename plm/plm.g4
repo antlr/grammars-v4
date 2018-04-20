@@ -551,16 +551,9 @@ constantlist
    ;
 
 operator
-   : logicaloperator
-   | relationaloperator
+   : LOGICALOPERATOR
+   | RELATIONALOPERATOR
    | arithmeticoperator
-   ;
-
-logicaloperator
-   : 'AND'
-   | 'OR'
-   | 'NOT'
-   | 'XOR'
    ;
 
 arithmeticoperator
@@ -610,16 +603,7 @@ notoperator
    ;
 
 logicalprimary
-   : arithmeticexpression (relationaloperator arithmeticexpression)?
-   ;
-
-relationaloperator
-   : '<'
-   | '>'
-   | '<='
-   | '>='
-   | '<>'
-   | '='
+   : arithmeticexpression (RELATIONALOPERATOR arithmeticexpression)?
    ;
 
 arithmeticexpression
@@ -647,6 +631,16 @@ multiplyingoperator
 
 secondary
    : ('-' | '+')? primary
+   ;
+
+
+RELATIONALOPERATOR
+   : '<' | '>' | '<=' | '>=' | '<>' | '='
+   ;
+
+
+LOGICALOPERATOR
+   : 'AND' | 'OR' | 'NOT' | 'XOR'
    ;
 
 
