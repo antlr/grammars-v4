@@ -32,103 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar plm;
 
-CHARACTER
-   : APOSTROPHE
-   | NONQUOTECHAR
-   ;
-
-APOSTROPHE
-   : '\''
-   ;
-
-NONQUOTECHAR
-   : LETTER
-   | DECIMALDIGIT
-   | '$'
-   | SPECIALCHARACTER
-   ;
-
-LETTER
-   : LOWERCASELETTER
-   | UPPERCASELETTER
-   ;
-
-UPPERCASELETTER
-   : 'A'
-   | 'B'
-   | 'C'
-   | 'D'
-   | 'E'
-   | 'F'
-   | 'G'
-   | 'H'
-   | 'I'
-   | 'J'
-   | 'K'
-   | 'L'
-   | 'M'
-   | 'N'
-   | 'O'
-   | 'P'
-   | 'Q'
-   | 'R'
-   | 'S'
-   | 'T'
-   | 'U'
-   | 'V'
-   | 'W'
-   | 'X'
-   | 'Y'
-   | 'Z'
-   ;
-
-LOWERCASELETTER
-   : 'a'
-   | 'b'
-   | 'c'
-   | 'd'
-   | 'e'
-   | 'f'
-   | 'g'
-   | 'h'
-   | 'i'
-   | 'j'
-   | 'k'
-   | 'l'
-   | 'm'
-   | 'n'
-   | 'o'
-   | 'p'
-   | 'q'
-   | 'r'
-   | 's'
-   | 't'
-   | 'u'
-   | 'v'
-   | 'w'
-   | 'x'
-   | 'y'
-   | 'z'
-   ;
-
-SPECIALCHARACTER
-   : '+'
-   | '-'
-   | '*'
-   | '/'
-   | '<'
-   | '>'
-   | '='
-   | ':'
-   | ';'
-   | '.'
-   | ','
-   | '('
-   | ')'
-   | '@'
-   | '_'
-   ;
-
 token
    : delimiter
    | identifier
@@ -215,52 +118,8 @@ digitstring
    : DECIMALDIGIT (DECIMALDIGIT | '$')*
    ;
 
-BINARYDIGIT
-   : '0'
-   | '1'
-   ;
-
-OCTALDIGIT
-   : BINARYDIGIT
-   | '2'
-   | '3'
-   | '4'
-   | '5'
-   | '6'
-   | '7'
-   ;
-
-DECIMALDIGIT
-   : OCTALDIGIT
-   | '8'
-   | '9'
-   ;
-
-HEXADECIMALDIGIT
-   : DECIMALDIGIT
-   | 'A'
-   | 'B'
-   | 'C'
-   | 'D'
-   | 'E'
-   | 'F'
-   ;
-
-STRING
-   : '\'' STRINGBODYELEMENT + '\''
-   ;
-
-STRINGBODYELEMENT
-   : NONQUOTECHAR
-   | '"'
-   ;
-
 separator
    : COMMENT?
-   ;
-
-COMMENT
-   : '/*' CHARACTER* '*/'
    ;
 
 compilation
@@ -800,6 +659,76 @@ unaryminus
 
 unaryplus
    : '+'
+   ;
+
+
+BINARYDIGIT
+   : '0' | '1'
+   ;
+
+
+OCTALDIGIT
+   : BINARYDIGIT | '2' | '3' | '4' | '5' | '6' | '7'
+   ;
+
+
+DECIMALDIGIT
+   : OCTALDIGIT | '8' | '9'
+   ;
+
+
+HEXADECIMALDIGIT
+   : DECIMALDIGIT | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+   ;
+
+
+STRING
+   : '\'' STRINGBODYELEMENT + '\''
+   ;
+
+
+STRINGBODYELEMENT
+   : NONQUOTECHAR | '"'
+   ;
+
+
+CHARACTER
+   : APOSTROPHE | NONQUOTECHAR
+   ;
+
+
+APOSTROPHE
+   : '\''
+   ;
+
+
+NONQUOTECHAR
+   : LETTER | DECIMALDIGIT | '$' | SPECIALCHARACTER
+   ;
+
+
+LETTER
+   : LOWERCASELETTER | UPPERCASELETTER
+   ;
+
+
+UPPERCASELETTER
+   : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
+   ;
+
+
+LOWERCASELETTER
+   : 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
+   ;
+
+
+SPECIALCHARACTER
+   : '+' | '-' | '*' | '/' | '<' | '>' | '=' | ':' | ';' | '.' | ',' | '(' | ')' | '@' | '_'
+   ;
+
+
+COMMENT
+   : '/*' CHARACTER* '*/'
    ;
 
 
