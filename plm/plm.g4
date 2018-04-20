@@ -500,11 +500,7 @@ primary
    : constant
    | variablereference
    | locationreference
-   | subexpression
-   ;
-
-subexpression
-   : expression
+   | expression
    ;
 
 constant
@@ -650,15 +646,7 @@ multiplyingoperator
    ;
 
 secondary
-   : (unaryminus | unaryplus)? primary
-   ;
-
-unaryminus
-   : '-'
-   ;
-
-unaryplus
-   : '+'
+   : ('-' | '+')? primary
    ;
 
 
