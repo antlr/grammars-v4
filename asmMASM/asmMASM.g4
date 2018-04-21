@@ -62,6 +62,17 @@ assemblerdirective
    | segment
    | endsegment
    | group
+   | label_
+   ;
+
+label_
+   : name LABEL type
+   ;
+
+type
+   : BYTE
+   | WORD
+   | DWORD
    ;
 
 group
@@ -463,6 +474,11 @@ PAGE
 
 ALIGN
    : A L I G N
+   ;
+
+
+LABEL
+   : L A B E L
    ;
 
 
