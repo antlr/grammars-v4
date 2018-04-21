@@ -127,6 +127,7 @@ argument
    | string
    | ('(' expression ')')
    | ('[' expression ']')
+   | NOT expression
    | gross
    ;
 
@@ -356,6 +357,11 @@ DS
 
 PUT
    : P U T
+   ;
+
+
+NOT
+   : N O T
    ;
 
 
