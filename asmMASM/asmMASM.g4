@@ -58,7 +58,12 @@ assemblerdirective
    | dm
    | ds
    | put
+   | assign
    ;
+
+assign
+    : name ASSIGN expression
+    ;
 
 put
     : PUT expressionlist
@@ -102,7 +107,7 @@ expressionlist
    ;
 
 label
-   : name
+   : name | gross
    ;
 
 expression
@@ -116,6 +121,7 @@ multiplyingExpression
 argument
    : number
    | dollar
+   | ques
    | register
    | name
    | string
@@ -132,12 +138,16 @@ gross
     ;
 
 grossrawassemblerdirective
-    : PUT  | IF | ENDIF | ORG
+    : PUT  | IF | ENDIF | ORG | EQU
     ;
 
 dollar
    : DOLLAR
    ;
+
+ques:
+        QUES;
+
 
 register
    : REGISTER
@@ -155,8 +165,9 @@ number
    : SIGN? NUMBER
    ;
 
+/* not sure what JMPS is */
 opcode
-   : OPCODE
+   : OPCODE | 'JMPS'
    ;
 
 comment
@@ -481,10 +492,17 @@ OPCODE
 |X O R
    ;
 
+ASSIGN
+    : '='
+    ;
 
 DOLLAR
    : '$'
    ;
+
+QUES
+    : '?'
+    ;
 
 
 SIGN
