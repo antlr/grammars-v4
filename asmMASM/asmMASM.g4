@@ -61,6 +61,11 @@ assemblerdirective
    | assign
    | segment
    | endsegment
+   | group
+   ;
+
+group
+   : name GROUP name (',' name)*
    ;
 
 segment
@@ -138,11 +143,12 @@ argument
    | dollar
    | ques
    | register
-   | name
+   | (name ':')? name
    | string
    | ('(' expression ')')
    | ('[' expression ']')
    | NOT expression
+   | OFFSET expression
    | gross
    ;
 
@@ -400,6 +406,11 @@ ASSIGN
    ;
 
 
+OFFSET
+   : O F F S E T
+   ;
+
+
 DOLLAR
    : '$'
    ;
@@ -417,6 +428,11 @@ SEGMENT
 
 SEGMENTEND
    : E N D S
+   ;
+
+
+GROUP
+   : G R O U P
    ;
 
 
