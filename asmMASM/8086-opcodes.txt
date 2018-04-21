@@ -1,3 +1,5 @@
+OPCODE:
+
 A A A
 |A A D
 |A A M
@@ -60,6 +62,7 @@ A A A
 |J Z
 |J C X Z
 |J M P
+|J M P S
 |L A H F
 |L D S
 |L E A
@@ -73,6 +76,7 @@ A A A
 |L O O P N Z
 |L O O P Z
 |M O V
+|M O V S
 |M O V S B
 |M O V S W
 |M U L
@@ -87,11 +91,6 @@ A A A
 |P U S H F
 |R C L
 |R C R
-|R E P
-|R E P E
-|R E P N E
-|R E P N Z
-|R E P Z
 |R E T
 |R E T N
 |R E T F
@@ -117,3 +116,14 @@ A A A
 |X C H G
 |X L A T
 |X O R
+;
+
+REP:
+R E P
+|R E P E
+|R E P N E
+|R E P N Z
+|R E P Z
+;
+
+
