@@ -62,16 +62,16 @@ assemblerdirective
    ;
 
 assign
-    : name ASSIGN expression
-    ;
+   : name ASSIGN expression
+   ;
 
 put
-    : PUT expressionlist
-    ;
+   : PUT expressionlist
+   ;
 
 ds
-    : DS expressionlist
-    ;
+   : DS expressionlist
+   ;
 
 dw
    : DW expressionlist
@@ -101,13 +101,13 @@ org
    : ORG expression
    ;
 
-
 expressionlist
    : expression (',' expression)*
    ;
 
 label
-   : name | gross
+   : name
+   | gross
    ;
 
 expression
@@ -134,27 +134,33 @@ argument
  MASM allows opcode names such as "RET" to be label names and also allows assemlber directives such as "PUT" as names
 */
 gross
-    : opcode | grossrawassemblerdirective
-    ;
+   : opcode
+   | grossrawassemblerdirective
+   ;
 
 grossrawassemblerdirective
-    : PUT  | IF | ENDIF | ORG | EQU
-    ;
+   : PUT
+   | IF
+   | ENDIF
+   | ORG
+   | EQU
+   ;
 
 dollar
    : DOLLAR
    ;
 
-ques:
-        QUES;
-
+ques
+   : QUES
+   ;
 
 register
    : REGISTER
    ;
 
 string
-   : STRING1 | STRING2
+   : STRING1
+   | STRING2
    ;
 
 name
@@ -167,7 +173,8 @@ number
 
 /* not sure what JMPS is */
 opcode
-   : OPCODE | 'JMPS'
+   : OPCODE
+   | 'JMPS'
    ;
 
 comment
@@ -304,6 +311,7 @@ fragment Z
    : ('z' | 'Z')
    ;
 
+
 ORG
    : O R G
    ;
@@ -333,176 +341,45 @@ DB
    : D B
    ;
 
+
 DM
-    : D M
-    ;
+   : D M
+   ;
+
 
 DS
-    : D S
-    ;
+   : D S
+   ;
+
 
 PUT
    : P U T
    ;
 
+
 REGISTER
-   : A H
-|A L
-|B H
-|B L
-|C H
-|C L
-|D H
-|D L
-|A X
-|B X
-|C X
-|D X
-|C I
-|D I
-|B P
-|S P
-|I P
-|C S
-|D S
-|E S
-|S S
+   : A H | A L | B H | B L | C H | C L | D H | D L | A X | B X | C X | D X | C I | D I | B P | S P | I P | C S | D S | E S | S S
    ;
 
 
 OPCODE
-   : A A A
-|A A D
-|A A M
-|A A S
-|A D C
-|A D D
-|A N D
-|C A L L
-|C B W
-|C L C
-|C L D
-|C L I
-|C M C
-|C M P
-|C M P S B
-|C M P S W
-|C W D
-|D A A
-|D A S
-|D E C
-|D I V
-|E S C
-|H L T
-|I D I V
-|I M U L
-|I N
-|I N C
-|I N T
-|I N T O
-|I R E T 
-|J A
-|J A E
-|J B
-|J B E
-|J C
-|J E
-|J G
-|J G E
-|J L
-|J L E
-|J N A
-|J N A E
-|J N B 
-|J N B E
-|J N C
-|J N E
-|J N G
-|J N G E
-|J N L
-|J N L E
-|J N O
-|J N P
-|J N S
-|J N Z
-|J O
-|J P
-|J P E
-|J P O
-|J S
-|J Z
-|J C X Z
-|J M P
-|L A H F
-|L D S
-|L E A
-|L E S
-|L O C K
-|L O D S B
-|L O D S W
-|L O O P
-|L O O P E
-|L O O P N E
-|L O O P N Z
-|L O O P Z
-|M O V
-|M O V S B
-|M O V S W
-|M U L
-|N E G
-|N O P
-|N O T
-|O R
-|O U T
-|P O P
-|P O P F
-|P U S H
-|P U S H F
-|R C L
-|R C R
-|R E P
-|R E P E
-|R E P N E
-|R E P N Z
-|R E P Z
-|R E T
-|R E T N
-|R E T F
-|R O L
-|R O R
-|S A H F
-|S A L
-|S A R
-|S A L C
-|S B B
-|S C A S B
-|S C A S W
-|S H L
-|S H R
-|S T C
-|S T D
-|S T I
-|S T O S B
-|S T O S W
-|S U B
-|T E S T
-|W A I T 
-|X C H G
-|X L A T
-|X O R
+   : A A A | A A D | A A M | A A S | A D C | A D D | A N D | C A L L | C B W | C L C | C L D | C L I | C M C | C M P | C M P S B | C M P S W | C W D | D A A | D A S | D E C | D I V | E S C | H L T | I D I V | I M U L | I N | I N C | I N T | I N T O | I R E T | J A | J A E | J B | J B E | J C | J E | J G | J G E | J L | J L E | J N A | J N A E | J N B | J N B E | J N C | J N E | J N G | J N G E | J N L | J N L E | J N O | J N P | J N S | J N Z | J O | J P | J P E | J P O | J S | J Z | J C X Z | J M P | L A H F | L D S | L E A | L E S | L O C K | L O D S B | L O D S W | L O O P | L O O P E | L O O P N E | L O O P N Z | L O O P Z | M O V | M O V S B | M O V S W | M U L | N E G | N O P | N O T | O R | O U T | P O P | P O P F | P U S H | P U S H F | R C L | R C R | R E P | R E P E | R E P N E | R E P N Z | R E P Z | R E T | R E T N | R E T F | R O L | R O R | S A H F | S A L | S A R | S A L C | S B B | S C A S B | S C A S W | S H L | S H R | S T C | S T D | S T I | S T O S B | S T O S W | S U B | T E S T | W A I T | X C H G | X L A T | X O R
    ;
 
+
 ASSIGN
-    : '='
-    ;
+   : '='
+   ;
+
 
 DOLLAR
    : '$'
    ;
 
+
 QUES
-    : '?'
-    ;
+   : '?'
+   ;
 
 
 SIGN
@@ -524,14 +401,16 @@ STRING1
    : '"' ~ ['"']* '"'
    ;
 
+
 STRING2
-   :  '\u0027' ~ ['\u0027']* '\u0027'
+   : '\u0027' ~ ['\u0027']* '\u0027'
    ;
 
 
 COMMENT
    : ';' ~ [\r\n]* -> skip
    ;
+
 
 EOL
    : [\r\n] +
