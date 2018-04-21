@@ -59,6 +59,21 @@ assemblerdirective
    | ds
    | put
    | assign
+   | segment
+   | endsegment
+   ;
+
+segment
+   : name SEGMENT align?
+   ;
+
+endsegment
+   : name SEGMENTEND
+   ;
+
+align
+   : (BYTE | WORD | DWORD | PARA | PAGE)
+   | (ALIGN '(' number ')')
    ;
 
 assign
@@ -392,6 +407,46 @@ DOLLAR
 
 QUES
    : '?'
+   ;
+
+
+SEGMENT
+   : S E G M E N T
+   ;
+
+
+SEGMENTEND
+   : E N D S
+   ;
+
+
+BYTE
+   : B Y T E
+   ;
+
+
+WORD
+   : W O R D
+   ;
+
+
+DWORD
+   : D W O R D
+   ;
+
+
+PARA
+   : P A R A
+   ;
+
+
+PAGE
+   : P A G E
+   ;
+
+
+ALIGN
+   : A L I G N
    ;
 
 
