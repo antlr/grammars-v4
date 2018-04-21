@@ -116,6 +116,10 @@ dm
    : DM expressionlist
    ;
 
+dup
+   : number DUP expression
+   ;
+
 equ
    : EQU expression
    ;
@@ -161,6 +165,7 @@ argument
    | NOT expression
    | OFFSET expression
    | gross
+   | dup
    ;
 
 /*
@@ -479,6 +484,11 @@ ALIGN
 
 LABEL
    : L A B E L
+   ;
+
+
+DUP
+   : D U P
    ;
 
 
