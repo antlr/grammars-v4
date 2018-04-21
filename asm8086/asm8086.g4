@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar asm8086;
 
 prog
-   : (line EOL)*
+   : (line ('!' line)* EOL)*
    ;
 
 line
