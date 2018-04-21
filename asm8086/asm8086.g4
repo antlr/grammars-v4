@@ -61,10 +61,20 @@ assemblerdirective
    | title
    | include
    | rw
+   | rb
+   | rs
    ;
 
 rw
    : name? RW expression
+   ;
+
+rb
+   : name? RB expression
+   ;
+
+rs
+   : name? RS expression
    ;
 
 cseg
@@ -138,6 +148,7 @@ argument
    | ptr expression
    | NOT expression
    | OFFSET expression
+   | LENGTH expression
    ;
 
 ptr
@@ -264,6 +275,21 @@ OFFSET
 
 RW
    : R W
+   ;
+
+
+RB
+   : R B
+   ;
+
+
+RS
+   : R S
+   ;
+
+
+LENGTH
+   : L E N G T H
    ;
 
 
