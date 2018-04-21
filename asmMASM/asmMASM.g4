@@ -37,11 +37,11 @@ prog
    ;
 
 line
-   : lbl? (assemblerdirective | instruction) comment?
+   : lbl? (assemblerdirective | instruction)? comment?
    ;
 
 instruction
-   : opcode? expressionlist?
+   : opcode expressionlist?
    ;
 
 lbl
@@ -115,9 +115,16 @@ argument
    | name
    | string
    | ('(' expression ')')
-   | ((number | name)? '[' expression ']')
-   | NOT expression
+   | ('[' expression ']')
+   | gross
    ;
+
+/*
+ MASM allows instruction names such as "RET" to be label names.
+*/
+gross
+    : INSTRUCTION
+    ;
 
 dollar
    : DOLLAR
@@ -318,14 +325,6 @@ PTR
    : P T R
    ;
 
-
-NOT
-   : N O T
-   ;
-
-
-
-
 REGISTER
    : A X | B X | C X | D X | C I | D I | B P | S P | I P | C S | D S | E S | S S
    ;
@@ -361,7 +360,7 @@ STRING1
    ;
 
 STRING2
-   : '\'' ~ ['\'']* '\''
+   :  '\u0027' ~ ['\u0027']* '\u0027'
    ;
 
 
