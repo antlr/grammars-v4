@@ -109,7 +109,7 @@ compilation
    ;
 
 module
-   : modulename ':' simpledoblock
+   : (modulename ':')? simpledoblock
    ;
 
 modulename
@@ -730,7 +730,7 @@ SPECIALCHARACTER
 
 
 COMMENT
-   : '/*' CHARACTER* '*/'
+   : '/*' CHARACTER* '*/' ->skip
    ;
 
 
