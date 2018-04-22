@@ -1,0 +1,366 @@
+	title	'Customized Basic I/O System'
+
+;*********************************************
+;*                                           *
+;* This Customized BIOS adapts CP/M-86 to    *
+;* the following hardware configuration      *
+;*     Processor:                            *
+;*     Brand:                                *
+;*     Controller:                           *
+;*                                           *
+;*                                           *
+;*     Programmer:                           *
+;*     Revisions :                           *
+;*                                           *
+;*********************************************
+
+true		equ -1
+false		equ not true
+cr		equ 0dh ;carriage return
+lf		equ 0ah ;line feed
+
+;*********************************************
+;*                                           *
+;* Loader_bios is true if assembling the     *
+;* LOADER BIOS, otherwise BIOS is for the    *
+;* CPM.SYS file.                             *
+;*                                           *
+;*********************************************
+
+loader_bios	equ false
+bdos_int	equ 224 ;reserved BDOS interrupt
+
+	IF	not loader_bios
+;---------------------------------------------
+;|                                           |
+bios_code	equ 2500h
+ccp_offset	equ 0000h
+bdos_ofst	equ 0B06h ;BDOS entry point
+;|                                           |
+;---------------------------------------------
+	ENDIF	;not loader_bios
+
+	IF	loader_bios
+;---------------------------------------------
+;|                                           |
+bios_code	equ 1200h ;start of LDBIOS
+ccp_offset	equ 0003h ;base of CPMLOADER
+bdos_ofst	equ 0406h ;stripped BDOS entry
+;|                                           |
+;---------------------------------------------
+	ENDIF	;loader_bios
+
+	cseg
+	org	ccpoffset
+ccp:
+	org	bios_code
+
+;*********************************************
+;*                                           *
+;* BIOS Jump Vector for Individual Routines  *
+;*                                           *
+;*********************************************
+
+ jmp INIT	;Enter from BOOT ROM or LOADER
+ jmp WBOOT	;Arrive here from BDOS call 0  
+ jmp CONST	;return console keyboard status
+ jmp CONIN	;return console keyboard char
+ jmp CONOUT  	;write char to console device
+ jmp LISTOUT	;write character to list device
+ jmp PUNCH	;write character to punch device
+ jmp READER  	;return char from reader device 
+ jmp HOME	;move to trk 00 on cur sel drive
+ jmp SELDSK  	;select disk for next rd/write
+ jmp SETTRK  	;set track for next rd/write
+ jmp SETSEC  	;set sector for next rd/write
+ jmp SETDMA  	;set offset for user buff (DMA)
+ jmp READ	;read a 128 byte sector
+ jmp WRITE	;write a 128 byte sector
+ jmp LISTST  	;return list status 
+ jmp SECTRAN 	;xlate logical->physical sector 
+ jmp SETDMAB 	;set seg base for buff (DMA)
+ jmp GETSEGT 	;return offset of Mem Desc Table
+ jmp GETIOBF	;return I/O map byte (IOBYTE)
+ jmp SETIOBF	;set I/O map byte (IOBYTE) 
+
+;*********************************************
+;*                                           *
+;* INIT Entry Point, Differs for LDBIOS and  *
+;* BIOS, according to "Loader_Bios" value    *
+;*                                           *
+;*********************************************
+
+INIT:	;print signon message and initialize hardware
+	mov ax,cs	;we entered with a JMPF so use
+	mov ss,ax	;CS: as the initial value of SS:,
+	mov ds,ax	;DS:,
+	mov es,ax	;and ES:
+	;use local stack during initialization
+	mov sp,offset stkbase
+	cld		;set forward direction
+
+	IF	not loader_bios
+;---------------------------------------------
+;|                                           |
+	; This is a BIOS for the CPM.SYS file.
+	; Setup all interrupt vectors in low
+	; memory to address trap
+
+	push ds		;save the DS register
+	mov IOBYTE,0	;clear IOBYTE
+	mov ax,0
+	mov ds,ax
+	mov es,ax 	;set ES and DS to zero
+	;setup interrupt 0 to address trap routine
+	mov int0_offset,offset int_trap
+	mov int0_segment,CS
+	mov di,4
+	mov si,0	;then propagate
+	mov cx,510	;trap vector to
+	rep movs ax,ax	;all 256 interrupts
+	;BDOS offset to proper interrupt
+	mov bdos_offset,bdos_ofst
+	pop ds		;restore the DS register
+
+;	(additional CP/M-86 initialization)
+;|                                           |
+;---------------------------------------------
+	ENDIF	;not loader_bios
+
+	IF	loader_bios
+;---------------------------------------------
+;|                                           |
+	;This is a BIOS for the LOADER
+	push ds		;save data segment
+	mov ax,0
+	mov ds,ax	;point to segment zero
+	;BDOS interrupt offset
+	mov bdos_offset,bdos_ofst
+	mov bdos_segment,CS ;bdos interrupt segment
+;	(additional LOADER initialization)
+	pop ds		;restore data segment
+;|                                           |
+;---------------------------------------------
+	ENDIF	;loader_bios
+
+	mov bx,offset signon
+	call pmsg	;print signon message
+	mov cl,0	;default to dr A: on coldstart
+	jmp ccp		;jump to cold start entry of CCP
+
+WBOOT:	jmp ccp+6	;direct entry to CCP at command level
+
+	IF	not loader_bios
+;---------------------------------------------
+;|                                           |
+int_trap:
+	cli		;block interrupts
+	mov ax,cs
+	mov ds,ax	;get our data segment
+	mov bx,offset int_trp
+	call pmsg
+	hlt		;hardstop
+;|                                           |
+;---------------------------------------------
+	ENDIF	;not loader_bios
+
+;*********************************************
+;*                                           *
+;*   CP/M Character I/O Interface Routines   *
+;*                                           *
+;*********************************************
+
+CONST:		;console status
+	rs	10	;(fill-in)
+	ret
+
+CONIN:			;console input
+	call CONST
+	jz CONIN	;wait for RDA
+	rs	10	;(fill-in)
+	ret
+
+CONOUT:		;console output
+	rs	10	;(fill-in)
+	ret		;then return data
+
+LISTOUT:		;list device output
+	rs	10	;(fill-in)
+	ret
+
+LISTST:			;poll list status
+	rs	10	;(fill-in)
+	ret
+
+PUNCH:		;write punch device
+	rs	10	;(fill-in)
+	ret
+
+READER:
+	rs	10	;(fill-in)
+	ret
+
+GETIOBF:
+	mov al,IOBYTE
+	ret
+
+SETIOBF:
+	mov IOBYTE,cl	;set iobyte
+	ret		;iobyte not implemented
+
+pmsg:
+	mov al,[BX] 	;get next char from message
+	test al,al
+	jz return	;if zero return
+	mov CL,AL
+	call CONOUT  	;print it
+	inc BX
+	jmps pmsg	;next character and loop
+
+;*********************************************
+;*                                           *
+;*          Disk Input/Output Routines       *
+;*                                           *
+;*********************************************
+
+SELDSK:		;select disk given by register CL
+ndisks	equ	2 ;number of disks (up to 16)
+	mov disk,cl	;save disk number
+	mov bx,0000h	;ready for error return
+	cmp cl,ndisks	;n beyond max disks?
+	jnb return	;return if so
+	mov ch,0	;double(n)
+	mov bx,cx	;bx = n
+	mov cl,4	;ready for *16
+	shl bx,cl	;n = n * 16
+	mov cx,offset dpbase
+	add bx,cx	;dpbase + n * 16
+return:	ret		;bx = .dph
+
+HOME:	;move selected disk to home position (Track 0)
+	mov trk,0	;set disk i/o to track zero
+	rs	10	;(fill-in)
+	ret
+
+SETTRK: ;set track address given by CX
+	mov trk,CX
+	ret
+
+SETSEC: ;set sector number given by cx
+	mov sect,CX
+	ret
+
+SECTRAN: ;translate sector CX using table at [DX]
+	mov bx,cx
+	add bx,dx	;add sector to tran table address
+	mov bl,[bx]	;get logical sector
+	ret
+
+SETDMA: ;set DMA offset given by CX
+	mov dma_adr,CX
+	ret
+
+SETDMAB: ;set DMA segment given by CX
+	mov dma_seg,CX
+	ret
+;
+GETSEGT:  ;return address of physical memory table
+	mov bx,offset seg_table
+	ret
+
+;*********************************************
+;*                                           *
+;*  All disk I/O parameters are setup:       *
+;*     DISK     is disk number      (SELDSK) *
+;*     TRK      is track number     (SETTRK) *
+;*     SECT     is sector number    (SETSEC) *
+;*     DMA_ADR  is the DMA offset   (SETDMA) *
+;*     DMA_SEG  is the DMA segment  (SETDMAB)*
+;*  READ reads the selected sector to the DMA*
+;*  address, and WRITE writes the data from  *
+;*  the DMA address to the selected sector   *
+;*  (return 00 if successful,  01 if perm err)*
+;*                                           *
+;*********************************************
+
+READ:
+	rs	50	;fill-in
+	ret
+
+WRITE:
+	rs	50	;(fill-in)
+	ret
+
+
+;*********************************************
+;*                                           *
+;*               Data Areas                  *
+;*                                           *
+;*********************************************
+data_offset	equ offset $
+
+	dseg
+	org	data_offset	;contiguous with code segment
+IOBYTE	db	0
+disk	db	0	;disk number
+trk	dw	0	;track number
+sect	dw	0	;sector number
+dma_adr	dw	0	;DMA offset from DS
+dma_seg	dw	0	;DMA Base Segment
+
+	IF	loader_bios
+;---------------------------------------------
+;|                                           |
+signon 	db	cr,lf,cr,lf
+	db	'CP/M-86 Version 1.0',cr,lf,0
+;|                                           |
+;---------------------------------------------
+	ENDIF	;loader_bios
+
+	IF	not loader_bios
+;---------------------------------------------
+;|                                           |
+signon	db	cr,lf,cr,lf
+	db	'System Generated 00/00/00'
+	db	cr,lf,0
+;|                                           |
+;---------------------------------------------
+	ENDIF	;not loader_bios
+
+int_trp	db	cr,lf
+	db	'Interrupt Trap Halt'
+	db	cr,lf
+
+;	System Memory Segment Table
+
+segtable db 2	;2 segments
+	dw tpa_seg	;1st seg starts after BIOS
+	dw tpa_len	;and extends to 08000
+	dw 2000h	;second is 20000 -
+	dw 2000h	;3FFFF (128k)
+
+	include singles.lib ;read in disk definitions
+
+loc_stk	rw  32	;local stack for initialization
+stkbase	equ offset $
+
+lastoff	equ offset $
+tpa_seg	equ (lastoff+0400h+15) / 16
+tpa_len	equ 0800h - tpa_seg
+	db 0	;fill last address for GENCMD
+
+;*********************************************
+;*                                           *
+;*          Dummy Data Section               *
+;*                                           *
+;*********************************************
+	dseg	0	;absolute low memory
+	org 	0	;(interrupt vectors)
+int0_offset	rw	1
+int0_segment	rw	1
+;	pad to system call vector
+	rw	2*(bdos_int-1)
+
+bdos_offset	rw	1
+bdos_segment	rw	1
+	END
