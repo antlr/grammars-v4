@@ -86,20 +86,19 @@ numericconstant
    ;
 
 binarynumber
-   : BINARYDIGIT (BINARYDIGIT | '$')* 'B'
-   | 'Q'
+   : BINARYNUMBER
    ;
 
 octalnumber
-   : OCTALDIGIT (OCTALDIGIT | '$')* ('O' | 'Q')
+   : OCTALNUMBER
    ;
 
 decimalnumber
-   : DECIMALDIGIT (DECIMALDIGIT | '$')* ('D')?
+   : DECIMALNUMBER
    ;
 
 hexadecimalnumber
-   : DECIMALDIGIT (HEXADECIMALDIGIT | '$')* 'H'
+   : HEXADECIMALNUMBER
    ;
 
 floatingpointnumber
@@ -503,6 +502,10 @@ primary
    | expression
    ;
 
+secondary
+   : ('-' | '+')? primary
+   ;
+
 constant
    : numericconstant
    | STRING
@@ -557,13 +560,7 @@ operator
    ;
 
 arithmeticoperator
-   : '+'
-   | '-'
-   | 'PLUS'
-   | 'MINUS'
-   | '*'
-   | '/'
-   | 'MOD'
+   : ARITHMETICOPERASTOR
    ;
 
 expression
@@ -619,8 +616,7 @@ addingoperator
    ;
 
 term
-   : secondary
-   | term multiplyingoperator secondary
+   : (term multiplyingoperator)? secondary
    ;
 
 multiplyingoperator
@@ -629,8 +625,9 @@ multiplyingoperator
    | 'MOD'
    ;
 
-secondary
-   : ('-' | '+')? primary
+
+ARITHMETICOPERASTOR
+   : '+' | '-' | 'PLUS' | 'MINUS' | '*' | '/' | 'MOD'
    ;
 
 
@@ -646,6 +643,26 @@ LOGICALOPERATOR
 
 BINARYDIGIT
    : '0' | '1'
+   ;
+
+
+BINARYNUMBER
+   : BINARYDIGIT (BINARYDIGIT | '$')* 'B' | 'Q'
+   ;
+
+
+DECIMALNUMBER
+   : DECIMALDIGIT (DECIMALDIGIT | '$')* ('D')?
+   ;
+
+
+HEXADECIMALNUMBER
+   : DECIMALDIGIT (HEXADECIMALDIGIT | '$')* 'H'
+   ;
+
+
+OCTALNUMBER
+   : OCTALDIGIT (OCTALDIGIT | '$')* ('O' | 'Q')
    ;
 
 
