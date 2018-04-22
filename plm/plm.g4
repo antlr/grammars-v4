@@ -68,13 +68,8 @@ compounddelimiter
    | ':='
    ;
 
-firstidcharacter
-   : LETTER
-   | '_'
-   ;
-
 identifier
-   : firstidcharacter (LETTER | DECIMALDIGIT | '$' | '_')*
+   : IDENTIFIER
    ;
 
 numericconstant
@@ -102,19 +97,7 @@ hexadecimalnumber
    ;
 
 floatingpointnumber
-   : digitstring fractionalpart (exponentpart)?
-   ;
-
-fractionalpart
-   : ('.' digitstring)?
-   ;
-
-exponentpart
-   : 'E' ('+' | '-')? digitstring
-   ;
-
-digitstring
-   : DECIMALDIGIT (DECIMALDIGIT | '$')*
+   : FLOATINGPOINTNUMBER
    ;
 
 separator
@@ -626,6 +609,26 @@ multiplyingoperator
    ;
 
 
+IDENTIFIER
+   : (LETTER | '_') (LETTER | DECIMALDIGIT | '$' | '_')*
+   ;
+
+
+FLOATINGPOINTNUMBER
+   : DIGITSTRING FRACTIONALPART? (EXPONENTPART)?
+   ;
+
+
+EXPONENTPART
+   : 'E' ('+' | '-')? DIGITSTRING
+   ;
+
+
+FRACTIONALPART
+   : '.' DIGITSTRING
+   ;
+
+
 ARITHMETICOPERASTOR
    : '+' | '-' | 'PLUS' | 'MINUS' | '*' | '/' | 'MOD'
    ;
@@ -668,6 +671,11 @@ OCTALNUMBER
 
 OCTALDIGIT
    : BINARYDIGIT | '2' | '3' | '4' | '5' | '6' | '7'
+   ;
+
+
+DIGITSTRING
+   : DECIMALDIGIT (DECIMALDIGIT | '$')*
    ;
 
 
