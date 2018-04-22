@@ -171,6 +171,7 @@ argument
    | NOT expression
    | OFFSET expression
    | LENGTH expression
+   | (register ':') expression
    ;
 
 ptr
