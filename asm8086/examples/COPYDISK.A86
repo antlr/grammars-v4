@@ -1,0 +1,618 @@
+	title	'COPYDISK 1 Feb 82'
+
+ver	equ	20	; Version 2.0			-jrp
+
+;  COPYDISK duplicates entire diskettes using all of the 
+; available storage as a multiple track buffer.
+
+;	This program must be built with a large extra segment 
+; as follows:
+
+;		ASM86 COPYDISK
+;		GENCMD COPYDISK EXTRA[M0200,XFF00]
+
+; This allows COPYDISK to utilize all the left-over memory in your
+; system as its buffer.
+
+
+
+	cseg	; code segment
+start:
+	mov	si,offset signon_message
+	call	pmsg				; print signon message
+next_copy:
+				; reload local stack for retries.
+	pushf					; save interrupt flag in stack
+	pop	bx				; put it in bx
+	cli					; disable interrupts
+	mov	ax,ds				; get our data segment
+	mov	ss,ax				;  and use as stack segment
+	mov	sp,offset stack_end		; set stack pointer
+	push	bx				; flags back into stack
+	popf					; restore interrupt status
+
+	mov	si,offset source_message	; prompt for source drive
+	call	get_drive			; request drive code
+	cmp	al, cr - 'A'			; see if it was a <cr>
+	jne	next_1				; no, continue
+	jmp	exit				; yes, we should exit
+next_1:
+	cmp	al,drive_cnt			; see if valid drive code
+	jb	save_source			; yes, go save it
+drive_err:
+	mov	si,offset bad_drive		; else, print
+	call	pmsg				;  a bad drive message
+	jmp	another				; and try to get another
+
+save_source:
+	mov	source,al			; save it as the source drive
+	add	al,'A'				; make ascii drive code
+	mov	source_ascii,al			; save for messages
+
+	mov	cl,source			; get source drive
+	mov	dl,0				; force first time selection
+	call	seldsk				; select it
+	test	bx,bx				; insure the drive exists
+	jz	drive_err			; no, fatal
+	mov	si,ES:word ptr 10[bx]		; get pointer to DPB
+			; create local copy of disk definition
+	push ds ! push es			; save segments
+	pop ds ! pop es				; and exchange them
+	mov	di,offset disk_def		; point to local disk def table
+	mov	cx,15				; diskdef is 15 bytes long
+	cld ! rep movsb				; copy it
+	push ds ! push es			; swap back 
+	pop ds ! pop es				;   segment registers
+
+	mov	dx,es:word ptr 00[bx]		; get secttran table address
+	mov	cx,0				; logical sector zero
+	call	sectran				; find out first sector number
+	mov	base_sector,bx			; save this for track reads
+
+
+	mov	si,offset dest_message		; prompt for destination
+	call	get_drive			; get the drive code
+	cmp	al,source			; see if same as source
+	jne	not_same			; no, go see if > max
+	mov	si,offset same_message		; can't have same drive
+	call	pmsg				; so we print message
+	jmp	another				; and go try again
+
+not_same:
+	cmp	al,drive_cnt			; is dest > max?
+	jnb	drive_err			; go print invalid drive error
+
+	mov	dest,al				; save destination drive
+	add	al,'A'				; make ascii drive code
+	mov	dest_ascii,al			; save for messages
+
+	mov	cl,dest				; get destination drive
+	mov	dl,0				; force first time selection
+	call	seldsk				; select destination drive
+	test	bx,bx				; insure drive exists
+	jz	drive_err			; no, go error out
+	mov	di,ES:word ptr 10[bx]		; point to destination DPB
+	mov	si,offset disk_def		; point to source drives def
+	mov	cx,15				; length of a definition
+	cld ! rep cmpsb				; compare the definitions
+	je	next_2				; must be equal.
+	jmp	different_type			; else go print error
+next_2:
+	mov	dx,es:word ptr 00[bx]		; get secttran table address
+	mov	cx,0				; logical sector zero
+	call	sectran				; find out first sector number
+	cmp	bx,base_sector			; make sure its the same
+	je	next_3				; the same is OK, 
+	jmp	different_type			; no, fatal error
+
+next_3:				; determine track capacity
+	mov	ax,spt				; get the sectors per track
+	mov	dl,128				; length of a sector
+	mul	dl				; get track capacity
+	mov	track_size,ax			; save it
+
+				; determine number of tracks on diskette
+	mov	al,blm				; get block mask
+	inc	al				; plus 1 gives sectors/block
+	mov	ah,0				; make 16 bits
+	mov	dx,0				; make 32 bits
+	mul	dsm				; total sectors/data area
+	add	ax,spt				; force round up
+	dec	ax				;  by adding SPT-1
+	div	spt				; compute number of tracks
+	add	ax,off				; add in operating sys tracks
+	dec	ax				; number of last track
+	mov	max_track,ax			; save value
+
+				; compute number of tracks that will
+				;  fit in our data segment
+	mov	ax,extra_length			; get low 16 bits of DS length
+	mov	dl,extra_length_H		; get other 8 bits
+	mov	dh,0				; zero rest of 32 bit divisor
+	div	track_size			; divide buff_len / track_size
+	mov	NTS,ax				; save this value.
+	cmp	ax,2				; must be at least 2 tracks
+	jae	adequite_memory			; ok, continue
+	mov	si,offset memory_message	; else print
+	call	pmsg				;	error message
+
+aborting:			; here if exiting because of error
+	mov	si,offset abort_message
+	call	pmsg
+	jmp	another
+
+
+adequite_memory:
+
+	mov	si,offset ready_message		; insure this is correct
+	call	get_yn				; print request
+	jc	aborting			; if NO, then get new input
+	mov	si,offset copy_message		; else tell user OK.
+	call	pmsg
+
+	mov	ax,max_track			; get maximum track number
+	mov	base_track,ax			; save as outer loop index
+next_block:
+	mov	ax,base_track			; get loop index
+	cmp	ax,0				; see if we are outside limits
+	jl	next_block_x				; yes, terminate loop
+	sub	ax,nts				; lower by number of tracks per buffer
+	inc	ax				; and adjust by 1.
+	jns	not_neg				; check to make sure its positive
+	mov	ax,0				; no, zero is floor
+not_neg:
+	mov	btr,ax				; save as last track for this copy pass
+
+	mov	si,offset reading_message	; point to read message
+	mov	ax,offset read			; and proper subroutine
+	mov	cl,source			; select source diskette
+	call	track_block
+
+	mov	si,offset writing_message	; point to write message
+	mov	ax,offset write			; and proper subroutine
+	mov	cl,dest				; select destination
+	call	track_block
+
+	mov	si,offset verify_message	; point to verify message
+	mov	ax,offset verify
+	mov	cl,dest				; reselect destination
+	call	track_block
+
+	mov	ax,base_track
+	sub	ax,nts				; adjust base track by number we copied
+	mov	base_track,ax
+ 	jmps	next_block
+
+next_block_x:			; here, we are done with a sucessful copy
+	mov	si,offset done_message		; print message
+	call	pmsg				;  announcing success
+
+another:
+	mov	si,offset another_message
+	call	getyn				; see if we want another copy
+	jc	exit				; no, go exit
+next_copy_v:					; convienient for short jumps
+	jmp	next_copy			; back for another disk copy
+
+
+exit:						; here, we are exiting
+	mov	si,offset exit_message
+	call	pmsg
+
+	mov	cl,13
+	int	BDOS
+
+	mov	cl,0				; reboot
+	mov	dl,0				;	CP/M-86
+	int	BDOS
+
+different_type:
+	mov	si,offset type_error_message
+	call	pmsg
+	jmp	aborting
+
+track_block:
+	mov	message_pointer,si		; save pointer to message
+	mov	disk_function,ax		; save pointer to read/write
+	mov	selected_disk,cl		; save drive select code
+	mov	dl,1				; tell bios have selected before
+	call	seldsk				; select diskette drive
+	mov	ax,base_track			; get base track number for this pass
+	mov	trk,ax				; save as loop index
+next_track:						; first inner loop...
+	mov	ax,trk				; get the index
+	cmp	ax,btr				; see if less than last
+	jnl	next_4				; no, continue
+	jmp	next_track_x			; yeah, exit loop
+next_4:
+	mov	si,message_pointer
+	call	pmsg				; print "<xxxx> Track "
+	mov	ax,trk				; get the track number
+	call	pdec				; print as decimal
+	mov	si,offset space_message		; then, print some
+	call	pmsg				;  spaces to blank any garbage
+	mov	cx,trk				; get desired track address
+	call	settrk				; give to bios
+	mov	cx,0				; start with logical sector 0
+next_sector:
+	push	cx				; save current sector number
+	mov	sector,cx			; save sector number (0 org)
+	add	cx,base_sector			; correct for first sector number
+	call	setsec				; pass to cbios
+
+				; compute dma address and segment
+	mov	ax,base_track			; get starting track number
+	sub	ax,trk				; gives relative track of pass
+	mov	dx,0				; make dword
+	mul	spt				; compute sector of track
+	add	ax,sector			; add in current logical sector
+	adc	dx,0				; make double precision add
+	mov	cx,128				; length of a sector
+	mul	cx				; gives base offset as 32 bits
+	mov	dma_offset,ax			; gives base dma offset
+	mov cl,12 ! shl dx,cl			; move to high nibble
+	add	dx,extra_base			; offset extra segment
+	mov	dma_segment,dx			; save DMA segment
+	mov	cx,dx				; put in argument register
+	call	setdmab				; pass to CBIOS
+	mov	cx,dma_offset			; get the offset again
+	call	setdma				; and pass it to BIOS also
+
+	mov	ax,sector			; fetch current sector number
+	inc	ax				; add one to it
+	cmp	ax,spt				; see if last sector on track
+	mov	cl,0				; might be then normal write
+	jb	execute_function		; skip if not last
+	mov	cl,1				; if last, then treating as 
+						;   dir write forces flush 
+execute_function:
+	call	disk_function			; read/write/verify a sector
+	test	al,al				; check error return code
+	jz	no_disk_error			; see if we got a bad sector
+
+			; got fatal disk error
+	mov	si,offset disk_error_message
+	call	pmsg				; print disk error
+	mov	si,message_pointer		; get pointer to read/write
+	inc	si				; skip leading <cr>
+	call	pmsg				; print that
+	mov	ax,trk				; get track number
+	call	pdec				; print it
+	mov	si,offset sector_message	; print ", Sector "
+	call	pmsg
+	mov	ax,sector			; get sector number (0 org)
+	add	ax,base_sector			; correct if 1 origin
+	call	pdec				; print the sector number
+	mov	si,offset continue_message	; see if user wants to ignore
+	call	get_yn				; ask for a Y/N response
+	jnc	next_5				; yes, continue
+	jmp	aborting			; NO, go ask for new disks
+next_5:
+	call	crlf
+no_disk_error:
+	pop	cx				; recover sector number
+	inc	cx				; sector = sector + 1
+	cmp	cx,spt				; see if past last sector
+	jae	next_6				; done, exit
+	jmp	next_sector			; else, continue
+next_6:
+	dec	trk				; track = track - 1
+	jmp	next_track			; continue loading buffer
+next_track_x:
+	ret
+
+
+
+
+verify:			; verify a 128 byte sector
+	mov	cx,offset verify_buffer		; point at our 128 byte buffer
+	call	setdma				; make it the dma buffer
+	mov	cx,ds				; get our data segment
+	call	setdmab				; point dma base address
+	call	read				; read 128 byte record
+	push	ax				; save read error in stack
+	mov	si,offset verify_buffer		; point to sector we just read
+	les	di,dword ptr dma_offset		; get pointer to one we wrote
+	mov	cx,128				; 128 byte record
+	cld ! rep cmpsb				; compare them
+	mov	al,0				; no error
+	je	verify_good			; so we are ok
+	mov	al,0FFh				; else, we got compare error
+verify_good:
+	pop	dx				; recover read error byte
+	or	al,dl				; merge into return code
+	ret					; back to caller
+
+
+;	***********************************
+;	*
+;	*	BIOS direct entry points
+;	*
+;	***********************************
+
+home:
+	mov	al,8
+	jmps	bios_call
+
+seldsk:
+	mov	al,9
+	jmps	bios_call
+
+settrk:
+	mov	al,10
+	jmps	bios_call
+
+setsec:
+	mov	al,11
+	jmps	bios_call
+
+setdma:
+	mov	al,12
+	jmps	bios_call
+
+setdmab:
+	mov	al,17
+	jmps	bios_call
+
+read:
+	mov	al,13
+	jmps	bios_call
+
+write:
+	mov	al,14
+	jmps	bios_call
+
+sectran:
+	mov	al,16
+	jmps	bios_call
+
+bios_call:
+	mov	bios_function,al
+	mov	bios_CX,cx
+	mov	bios_DX,DX
+	mov	cl,50
+	mov	dx,offset bios_function
+	int	BDOS
+	ret
+
+
+;	****************************************
+;	*
+;	*	Operator interaction subroutines
+;	*
+;	****************************************
+
+get_drive:			; print message and read drive code
+	call	pmsg				; first, print the message
+	call	get_upper			; then get an upper case letter
+	sub	al,'A'				; and normalize to 0...
+	ret
+
+get_upper:			; get upper case console input w/ echo
+	call	get_char			; get console character
+	cmp	al,'a'				; see if lower case
+	jb	get_upper_x			; below, leave
+	cmp	al,'z'				; insure not > z
+	ja	get_upper_x			; not lower at all
+	sub	al,'a'-'A'			; make upper
+get_upper_x:
+	ret
+
+get_yn:				; print message and get Y or N
+	push	si				; save message pointer
+	call	pmsg				; print the message
+	call	get_upper			; get a upper case letter
+	pop	si				; recover message pointer
+	cmp	al,'Y'				; see if response was 'Y'
+	je	get_yn_x			; yes, return w/ no carry
+	cmp	al,'N'				; see if was 'N'
+	jne	get_yn				; no, invalid. reprompt
+	stc					; set carry for a NO
+get_yn_x:
+	ret
+
+get_char:			; read a line from CONIN and return first char
+	mov	cl,10				; function for line in
+	mov	dx,offset line_buff		; point at buffer	
+	int	BDOS				; read the line
+	mov	al,line_buff+1			; get input length
+	cmp	al,1				; insure single char entered
+	jb	get_char_1			; no, go 
+	mov	al,line_buff+2			; get the character
+	ret
+get_char_1:
+	mov	al,cr				; null string, return a <CR>
+	ret
+
+
+crlf:				; print a <CR><LF>
+	mov	si,offset crlf_message
+					; fall into pmsg
+
+pmsg:				; print message at [SI] to zero
+	lods	al				; get a character
+	test	al,al				; see if zero terminator
+	jz	pmsg_x				; yes, exit
+	push	si				; save pointer
+	call	conout				; not done, print character
+	pop	si				; recover pointer
+	jmp	pmsg				; and loop
+pmsg_x:
+	ret
+
+conin:				; get character from console into AL
+	mov	cl,6
+	mov	dl,0FFh
+	int	BDOS
+	test	al,al
+	jz	conin
+	ret
+
+conout:				; output character in AL to console
+	mov	dl,al
+	mov	cl,6
+	int	BDOS
+	ret
+
+pdec:				; print unsigned 16 bits in AX as decimal
+					;	with zero suppresion
+	mov	cx,0			; cx is digit counter
+pdec_1:					; here to divide out next digit
+	sub	dx,dx			; Zero DX
+	mov	bx,10			; constant 10
+	div	bx			; quotient to AX, remainder to DX
+	add	dl,'0'			; make remainder ascii digit
+	push	dx			; and stick onto stack
+	inc	cx			; bump digit counter
+	test	ax,ax			; see if any quotient left
+	jnz	pdec_1			; yes, continue stacking digits
+pdec_2:
+	pop	ax			; get a digit from the stack
+	push	cx			; save count
+	call	conout			; print it
+	pop	cx			; restore count
+	loop	pdec_2			; and continue if more in stack
+	ret				; done. . .
+
+
+
+		; ** DATA SEGMENT **
+	dseg
+
+cr	equ	0dh		; ascii carriage return
+lf	equ	0ah		; ascii line feed
+
+drive_cnt equ	16		; CP/M currently supports up to 16 drives
+
+BDOS	equ	224		; system call interrupt number
+
+
+				; CP/M-86 Page Zero
+
+code_length	rw	1		; low 16 bits code length
+code_length_H	rb	1		; high 8 bits  ''   ''
+code_base	rw	1		; base of the code segment
+model_8080	rb	1		; 8080 memory model flag
+data_length	rw	1		; low 16 bits data length
+data_length_H	rb	1		; high 8 bits  ''   ''
+data_base	rw	1		; base of the data segment
+		rs	1		; not used
+extra_length	rw	1		; low 16 bits extra length
+extra_length_H	rb	1		; high 8 bits  ''    ''
+extra_base	rw	1		; base of the extra segment
+
+
+	org	005Ch
+
+default_FCB	rs	35		; default File Control Block
+
+	org	0080h
+
+default_buffer	rs	128		; default record buffer
+
+	org	0100h		; start of user data segment
+
+
+				; MESSAGES
+
+signon_message	db	cr,lf,'CP/M-86 Full Disk COPY Utility'
+		db	cr,lf,'     Version '
+		db	ver/10+'0', '.', (ver mod 10)+'0',cr,lf,0
+
+source_message	db	cr,lf,cr,lf,'Enter Source Disk Drive (A-D) ? ',0
+
+dest_message	db	cr,lf,cr,lf,' Destination Disk Drive (A-D) ? ',0
+
+ready_message	db	cr,lf,cr,lf,'Copying Disk '
+source_ascii	rb	1
+		db	': to Disk '
+dest_ascii	rb	1
+		db	':',cr,lf
+		db	'Is this what you want to do (Y/N) ? ',0
+
+memory_message	db	cr,lf,'Insufficient memory available for copy',0
+
+abort_message	db	cr,lf,cr,lf,'Copy aborted',cr,lf,0
+
+done_message	db	cr,lf,'Copy completed.',0
+
+another_message	db	cr,lf,cr,lf,'Copy another disk (Y/N) ? ',0
+
+copy_message	db	cr,lf,'Copy started',cr,lf,0
+
+reading_message	db	cr,'  Reading Track ',0
+
+writing_message	db	cr,'  Writing Track ',0
+
+verify_message	db	cr,'Verifying Track ',0
+
+space_message	db	'      ',0
+
+bad_drive	db	cr,lf,'Illegal Diskette Drive',cr,lf,0
+
+same_message	db	cr,lf,'Source and Destination cannot be the same'
+		db	cr,lf,0
+
+type_error_message db	cr,lf,'Source and Destination disks must be'
+		db	cr,lf,'the same type',cr,lf,0
+
+continue_message db	cr,lf,'Ignore error (Y/N) ? ',0
+
+sector_message	db	', Sector ',0
+
+disk_error_message db	cr,lf,'Permanent Error ',0
+
+crlf_message	db	cr,lf,0
+
+exit_message	db	cr,lf,'COPY program exiting',cr,lf,0
+
+
+	; VARIABLES
+
+source		rb	1	; source drive select code
+dest		rb	1	; destination drive select code
+selected_disk	rb	1	; current drive select code
+trk		rw	1	; current track number
+sector		rw	1	; current sector number (0 origin)
+nts		rw	1	; number of tracks per buffer full
+base_track	rw	1	; starting track number for this pass
+track_size	rw	1	; size of each track in bytes
+btr		rw	1	; last track number of this pass
+dma_offset	rw	1	; current buffer offset
+dma_segment	rw	1	; current buffer segment base
+message_pointer	rw	1	; points to appropriate read/write message
+disk_function	rw	1	; points to     ''       ''   ''  subroutine
+base_sector	rw	1	; either 0 or 1 normally
+max_track	rw	1	; total number of tracks on disk
+
+line_buff	db	80
+		db	0
+		rb	80
+
+bios_function	rb	1	; bios function number
+bios_cx		rw	1	; first argument for BIOS call
+bios_dx		rw	1	; second argument for BIOS call
+
+
+disk_def	rs	0	; disk definition table gets copied here
+	spt	rw	1	; 128 byte sectors per track
+	bsh	rb	1	; block shift factor
+	blm	rb	1	; block mask
+	exm	rb	1	; extent mask
+	dsm	rw	1	; disk size in blocks
+	drm	rw	1	; directory size
+	al0	rb	1	; alloc 0
+	al1	rb	1	; alloc 1
+	cks	rw	1	; checksum size
+	off	rw	1	; directory offset
+
+		rw	128
+stack_end	rw	0
+
+
+verify_buffer	rs	128	; sector buffer for verify function
+
+	db	0		; force out data segment
+
+
+	end
