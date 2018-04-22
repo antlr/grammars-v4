@@ -69,6 +69,7 @@ A A A
 |L E A
 |L E S
 |L O C K
+|L O D S
 |L O D S B
 |L O D S W
 |L O O P
