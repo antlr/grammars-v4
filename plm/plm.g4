@@ -478,17 +478,6 @@ iterativedoblock
    : iterativedostatement unit* ending
    ;
 
-primary
-   : constant
-   | variablereference
-   | locationreference
-   | expression
-   ;
-
-secondary
-   : ('-' | '+')? primary
-   ;
-
 constant
    : numericconstant
    | STRING
@@ -547,39 +536,20 @@ arithmeticoperator
    ;
 
 expression
-   : logicalexpression
-   | embeddedassignment
+   : (variablereference ':=')? logicalexpression
    ;
 
-embeddedassignment
-   : variablereference ':=' logicalexpression
-   ;
 
 logicalexpression
-   : logicalfactor
-   | logicalexpression oroperator logicalfactor
-   ;
-
-oroperator
-   : 'OR'
-   | 'XOR'
+   : logicalfactor (oroperator logicalfactor)*
    ;
 
 logicalfactor
-   : logicalsecondary
-   | logicalfactor andoperator logicalsecondary
-   ;
-
-andoperator
-   : 'AND'
+   : logicalsecondary (andoperator logicalsecondary)*
    ;
 
 logicalsecondary
    : notoperator? logicalprimary
-   ;
-
-notoperator
-   : 'NOT'
    ;
 
 logicalprimary
@@ -587,8 +557,37 @@ logicalprimary
    ;
 
 arithmeticexpression
-   : term
-   | arithmeticexpression addingoperator term
+   : term (addingoperator term)*
+   ;
+
+term
+   : secondary (multiplyingoperator secondary)*
+   ;
+
+secondary
+   : ('-' | '+')? primary
+   ;
+
+primary
+   : constant
+   | variablereference
+   | locationreference
+
+     // Is this a good idea?
+     //   | expression
+   ;
+
+oroperator
+   : 'OR'
+   | 'XOR'
+   ;
+
+andoperator
+   : 'AND'
+   ;
+
+notoperator
+   : 'NOT'
    ;
 
 addingoperator
@@ -596,10 +595,6 @@ addingoperator
    | '-'
    | 'PLUS'
    | 'MINUS'
-   ;
-
-term
-   : (term multiplyingoperator)? secondary
    ;
 
 multiplyingoperator
