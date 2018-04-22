@@ -156,7 +156,7 @@ expression
    ;
 
 multiplyingExpression
-   : argument (('*' | '/' | 'mod' | AND) argument)*
+   : argument (('*' | '/' | 'mod' | 'and') argument)*
    ;
 
 argument
@@ -253,11 +253,6 @@ END
 
 ORG
    : O R G
-   ;
-
-
-AND
-   : A N D
    ;
 
 
