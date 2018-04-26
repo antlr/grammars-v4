@@ -151,7 +151,7 @@
 				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
-				<module>solidity	</module>
+				<module>solidity</module>
 				<module>sparql</module>
 				<module>sqlite</module>
 				<module>stacktrace</module>
