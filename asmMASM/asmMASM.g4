@@ -37,7 +37,7 @@ prog
    ;
 
 line
-   : lbl? (assemblerdirective | masmdirective | instruction)? comment?
+   : lbl? (assemblerdirective | masmdirectives | instruction)? comment?
    ;
 
 instruction
@@ -66,6 +66,10 @@ assemblerdirective
    | assume
    | extern
    | (type expressionlist +)
+   ;
+
+masmdirectives
+   : masmdirective+
    ;
 
 masmdirective
