@@ -37,7 +37,7 @@ prog
    ;
 
 line
-   : lbl? (assemblerdirective | instruction)? comment?
+   : lbl? (assemblerdirective | masmdirective | instruction)? comment?
    ;
 
 instruction
@@ -64,6 +64,12 @@ assemblerdirective
    | group
    | label_
    | assume
+   | extern
+   | (type expressionlist +)
+   ;
+
+masmdirective
+   : MASMDIRECTIVE expressionlist?
    ;
 
 assume
@@ -76,6 +82,7 @@ label_
 
 type
    : BYTE
+   | SBYTE
    | WORD
    | DWORD
    ;
@@ -127,6 +134,10 @@ dup
 
 equ
    : EQU expression
+   ;
+
+extern
+   : EXTERN expression
    ;
 
 if_
@@ -331,6 +342,9 @@ BYTE
    : B Y T E
    ;
 
+SBYTE
+   : S B Y T E
+   ;
 
 WORD
    : W O R D
@@ -377,8 +391,18 @@ SIGN
    ;
 
 
+EXTERN
+   : E X T E R N
+   ;
+
+
+MASMDIRECTIVE
+   : '.' [a-zA-Z0-9] +
+   ;
+
+
 NAME
-   : [a-zA-Z] [a-zA-Z0-9._]*
+   : [_a-zA-Z] [a-zA-Z0-9._@]*
    ;
 
 
