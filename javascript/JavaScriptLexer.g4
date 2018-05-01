@@ -28,21 +28,20 @@
  */
 lexer grammar JavaScriptLexer;
 
-options {
-    superClass=JavaScriptBaseLexer;
-}
+channels { ERROR }
 
-RegularExpressionLiteral:       {RegexPossible()}? '/' RegularExpressionBody '/' RegularExpressionFlags;
+options { superClass=JavaScriptBaseLexer; }
 
-/// Line Terminators
-LineTerminator:                 [\r\n\u2028\u2029] -> channel(HIDDEN);
+MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
+SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
+RegularExpressionLiteral:       '/' RegularExpressionChar+ {IsRegexPossible()}? '/' IdentifierPart*;
 
 OpenBracket:                    '[';
 CloseBracket:                   ']';
 OpenParen:                      '(';
 CloseParen:                     ')';
-OpenBrace:                      '{';
-CloseBrace:                     '}';
+OpenBrace:                      '{' {ProcessOpenBrace();};
+CloseBrace:                     '}' {ProcessCloseBrace();};
 SemiColon:                      ';';
 Comma:                          ',';
 Assign:                         '=';
@@ -107,7 +106,7 @@ DecimalLiteral:                 DecimalIntegerLiteral '.' [0-9]* ExponentPart?
 /// Numeric Literals
 
 HexIntegerLiteral:              '0' [xX] HexDigit+;
-OctalIntegerLiteral:            {!IsSrictMode()}? '0' [0-7]+;
+OctalIntegerLiteral:            '0' [0-7]+ {!IsSrictMode()}?;
 OctalIntegerLiteral2:           '0' [oO] [0-7]+;
 BinaryIntegerLiteral:           '0' [bB] [01]+;
 
@@ -153,36 +152,37 @@ Import:                         'import';
 /// The following tokens are also considered to be FutureReservedWords 
 /// when parsing strict mode
 
-Implements:                     {IsSrictMode()}? 'implements';
-Let:                            {IsSrictMode()}? 'let';
-Private:                        {IsSrictMode()}? 'private';
-Public:                         {IsSrictMode()}? 'public';
-Interface:                      {IsSrictMode()}? 'interface';
-Package:                        {IsSrictMode()}? 'package';
-Protected:                      {IsSrictMode()}? 'protected';
-Static:                         {IsSrictMode()}? 'static';
-Yield:                          {IsSrictMode()}? 'yield';
+Implements:                     'implements' {IsSrictMode()}?;
+Let:                            'let' {IsSrictMode()}?;
+Private:                        'private' {IsSrictMode()}?;
+Public:                         'public' {IsSrictMode()}?;
+Interface:                      'interface' {IsSrictMode()}?;
+Package:                        'package' {IsSrictMode()}?;
+Protected:                      'protected' {IsSrictMode()}?;
+Static:                         'static' {IsSrictMode()}?;
+Yield:                          'yield' {IsSrictMode()}?;
 
 /// Identifier Names and Identifiers
 
 Identifier:                     IdentifierStart IdentifierPart*;
 
 /// String Literals
-StringLiteral:                  '"' DoubleStringCharacter* '"'
-            |                   '\'' SingleStringCharacter* '\''
-            ;
+StringLiteral:                 ('"' DoubleStringCharacter* '"'
+             |                  '\'' SingleStringCharacter* '\'') {ProcessStringLiteral();}
+             ;
 
 TemplateStringLiteral:          '`' ('\\`' | ~'`')* '`';
 
 WhiteSpaces:                    [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN);
 
+LineTerminator:                 [\r\n\u2028\u2029] -> channel(HIDDEN);
+
 /// Comments
 
-MultiLineComment:               '/*' .*? '*/' -> channel(HIDDEN);
-SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
+
 HtmlComment:                    '<!--' .*? '-->' -> channel(HIDDEN);
 CDataComment:                   '<![CDATA[' .*? ']]>' -> channel(HIDDEN);
-UnexpectedCharacter:            . ;
+UnexpectedCharacter:            . -> channel(ERROR);
 
 // Fragment rules
 
@@ -238,12 +238,7 @@ fragment EscapeCharacter
     ;
 
 fragment LineContinuation
-    : '\\' LineTerminatorSequence 
-    ;
-
-fragment LineTerminatorSequence
-    : '\r\n'
-    | LineTerminator
+    : '\\' [\r\n\u2028\u2029]
     ;
 
 fragment HexDigit
@@ -259,19 +254,19 @@ fragment ExponentPart
     : [eE] [+-]? [0-9]+
     ;
 
-fragment IdentifierStart
-    : UnicodeLetter
-    | [$_]
-    | '\\' UnicodeEscapeSequence
-    ;
-
 fragment IdentifierPart
     : IdentifierStart
     | UnicodeCombiningMark
     | UnicodeDigit
     | UnicodeConnectorPunctuation
-    | ZWNJ
-    | ZWJ
+    | '\u200C'
+    | '\u200D'
+    ;
+
+fragment IdentifierStart
+    : UnicodeLetter
+    | [$_]
+    | '\\' UnicodeEscapeSequence
     ;
 
 fragment UnicodeLetter
@@ -674,47 +669,17 @@ fragment UnicodeConnectorPunctuation
     | [\uFF65]
     ;
 
-fragment ZWNJ
-    : '\u200C'
-    ;
-
-fragment ZWJ
-    : '\u200D'
-    ;
-
-fragment RegularExpressionBody
-    : RegularExpressionFirstChar RegularExpressionChar*
-    ;
-
-fragment RegularExpressionFlags
-    : IdentifierPart*
-    ;
-
-fragment RegularExpressionFirstChar
-    : ~[\r\n\u2028\u2029*\\/[]
-    | RegularExpressionBackslashSequence
-    | RegularExpressionClass
-    ;
-
 fragment RegularExpressionChar
     : ~[\r\n\u2028\u2029\\/[]
     | RegularExpressionBackslashSequence
-    | RegularExpressionClass
-    ;
-
-fragment RegularExpressionNonTerminator
-    : ~[\r\n\u2028\u2029]
-    ;
-
-fragment RegularExpressionBackslashSequence
-    : '\\' RegularExpressionNonTerminator
-    ;
-
-fragment RegularExpressionClass
-    : '[' RegularExpressionClassChar* ']'
+    | '[' RegularExpressionClassChar* ']'
     ;
 
 fragment RegularExpressionClassChar
     : ~[\r\n\u2028\u2029\]\\]
     | RegularExpressionBackslashSequence
+    ;
+
+fragment RegularExpressionBackslashSequence
+    : '\\' ~[\r\n\u2028\u2029]
     ;

@@ -56,25 +56,6 @@ public abstract class JavaScriptBaseLexer extends Lexer
     public Token nextToken() {
         Token next = super.nextToken();
 
-        if (next.getType() == JavaScriptLexer.OpenBrace)
-        {
-            useStrictCurrent = scopeStrictModes.size() > 0 && scopeStrictModes.peek() ? true : useStrictDefault;
-            scopeStrictModes.push(useStrictCurrent);
-        }
-        else if (next.getType() == JavaScriptLexer.CloseBrace)
-        {
-            useStrictCurrent = scopeStrictModes.size() > 0 ? scopeStrictModes.pop() : useStrictDefault;
-        }
-        else if (next.getType() == JavaScriptLexer.StringLiteral &&
-                (lastToken == null || lastToken.getType() == JavaScriptLexer.OpenBrace) &&
-                (next.getText().substring(1, next.getText().length() - 1)).equals("use strict"))
-        {
-            if (scopeStrictModes.size() > 0)
-                scopeStrictModes.pop();
-            useStrictCurrent = true;
-            scopeStrictModes.push(useStrictCurrent);
-        }
-
         if (next.getChannel() == Token.DEFAULT_CHANNEL) {
             // Keep track of the last token on the default channel.
             this.lastToken = next;
@@ -83,10 +64,36 @@ public abstract class JavaScriptBaseLexer extends Lexer
         return next;
     }
 
+    protected void ProcessOpenBrace()
+    {
+        useStrictCurrent = scopeStrictModes.size() > 0 && scopeStrictModes.peek() ? true : useStrictDefault;
+        scopeStrictModes.push(useStrictCurrent);
+    }
+
+    protected void ProcessCloseBrace()
+    {
+        useStrictCurrent = scopeStrictModes.size() > 0 ? scopeStrictModes.pop() : useStrictDefault;
+    }
+
+    protected void ProcessStringLiteral()
+    {
+        if (lastToken == null || lastToken.getType() == JavaScriptLexer.OpenBrace)
+        {
+            String text = getText();
+            if (text.equals("\"use strict\"") || text.equals("'use strict'"))
+            {
+                if (scopeStrictModes.size() > 0)
+                    scopeStrictModes.pop();
+                useStrictCurrent = true;
+                scopeStrictModes.push(useStrictCurrent);
+            }
+        }
+    }
+
     /**
      * Returns {@code true} if the lexer can match a regex literal.
      */
-    protected boolean RegexPossible() {
+    protected boolean IsRegexPossible() {
                                        
         if (this.lastToken == null) {
             // No token has been produced yet: at the start of the input,

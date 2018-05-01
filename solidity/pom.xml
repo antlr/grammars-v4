@@ -37,7 +37,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>chunk</entryPoint>
+					<entryPoint>sourceUnit</entryPoint>
 					<grammarName>Solidity</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
