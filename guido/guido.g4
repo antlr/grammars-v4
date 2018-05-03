@@ -60,22 +60,36 @@ tagname
    | meter
    | slur
    | key
+   | barformat
+   | staff
+   | t
+   | repeatEnd
    ;
 
 parameters
-   : '<' parameter '>'
+   : '<' parameter (',' parameter)* '>'
    ;
 
 parameter
    : STRINGLITERAL
+   | number
+   | kvpair
+   ;
+
+kvpair
+   : STRING '=' STRING
    ;
 
 notes
-   : '(' note ')'
+   : '(' (note | chord +) ')'
    ;
 
 note
    : notename accidental? octave? duration? dotting?
+   ;
+
+chord
+   : '{' note (',' note)* '}'
    ;
 
 notename
@@ -97,7 +111,7 @@ octave
    ;
 
 fraction
-   : number? '/' number?
+   : number? ('/' number)?
    ;
 
 duration
@@ -132,6 +146,22 @@ key
    : 'key'
    ;
 
+barformat
+   : 'barFormat'
+   ;
+
+staff
+   : 'staff'
+   ;
+
+repeatEnd
+   : 'repeatEnd'
+   ;
+
+t
+   : 't'
+   ;
+
 
 TAGSTART
    : '\\'
@@ -140,6 +170,11 @@ TAGSTART
 
 REST
    : '_'
+   ;
+
+
+NUMBER
+   : [0-9] +
    ;
 
 
@@ -153,8 +188,8 @@ STRINGLITERAL
    ;
 
 
-NUMBER
-   : [0-9] +
+COMMENT
+   : '%' ~ [\r\n]* -> skip
    ;
 
 
