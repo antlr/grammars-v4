@@ -34,11 +34,15 @@ grammar guido;
 
 prog
    : (segment +)
-   | sequence
+   | sequencelist
    ;
 
 segment
-   : '{' sequence + '}'
+   : '{' sequencelist + '}'
+   ;
+
+sequencelist
+   : sequence (',' sequence)*
    ;
 
 sequence
@@ -76,6 +80,7 @@ note
 
 notename
    : STRING
+   | REST
    ;
 
 accidental
@@ -130,6 +135,11 @@ key
 
 TAGSTART
    : '\\'
+   ;
+
+
+REST
+   : '_'
    ;
 
 
