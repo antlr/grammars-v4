@@ -77,7 +77,7 @@ argument_list
 	;
 
 argument
-	: (identifier ':')? refout=(REF | OUT)? expression
+	: (identifier ':')? refout=(REF | OUT)? (VAR | type)? expression
 	;
 
 expression
