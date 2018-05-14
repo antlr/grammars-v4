@@ -1424,7 +1424,7 @@ castExpression
 
 // LEXER
 
-identifier : Identifier | 'to' | 'module' | 'open' | 'with';
+identifier : Identifier | 'to' | 'module' | 'open' | 'with' | 'provides' | 'uses' | 'opens' | 'requires' | 'exports';
 
 // §3.9 Keywords
 
