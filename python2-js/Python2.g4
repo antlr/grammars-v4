@@ -7,7 +7,7 @@
  * Added lexer rules, and code to handle INDENT's, DEDENT's,
  * line continuations, etc.
  *
- * Compiles with ANTLR 4.7, generated lexer/parser for Python 2 target.
+ * Compiles with ANTLR 4.7, generated lexer/parser for JavaScript target.
  */
  
  grammar Python2;
