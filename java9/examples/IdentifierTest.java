@@ -19,6 +19,10 @@ public class to {
 	  return with.to();
   }
   public to to() {
+	  to exports = null;
+	  to provides = null;
+	  to requires = null;
+	  to uses = null;
 	  return to();
   }
  
