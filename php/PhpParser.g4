@@ -454,7 +454,7 @@ parenthesis
     ;
 
 // Expressions
-// Grouped by prioriries: http://php.net/manual/en/language.operators.precedence.php
+// Grouped by priorities: http://php.net/manual/en/language.operators.precedence.php
 expression
     : Clone expression                                         #CloneExpression
     | newExpr                                                  #NewExpression

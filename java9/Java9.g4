@@ -57,7 +57,7 @@ Total lexer+parser time 914ms.
 ~/antlr/code/grammars-v4/java9 $ java Test examples/TryWithResourceDemo.java
 /home/kwong/projects/grammars-v4/java9/examples/TryWithResourceDemo.java
 Total lexer+parser time 3634ms.
-~/antlr/code/grammars-v4/java9 $ java Test examples/helloworld.java 
+~/antlr/code/grammars-v4/java9 $ java Test examples/helloworld.java
 /home/kwong/projects/grammars-v4/java9/examples/helloworld.java
 Total lexer+parser time 2497ms.
 
@@ -125,16 +125,16 @@ classOrInterfaceType
 	;
 
 classType
-	:	annotation* Identifier typeArguments?
-	|	classOrInterfaceType '.' annotation* Identifier typeArguments?
+	:	annotation* identifier typeArguments?
+	|	classOrInterfaceType '.' annotation* identifier typeArguments?
 	;
 
 classType_lf_classOrInterfaceType
-	:	'.' annotation* Identifier typeArguments?
+	:	'.' annotation* identifier typeArguments?
 	;
 
 classType_lfno_classOrInterfaceType
-	:	annotation* Identifier typeArguments?
+	:	annotation* identifier typeArguments?
 	;
 
 interfaceType
@@ -150,7 +150,7 @@ interfaceType_lfno_classOrInterfaceType
 	;
 
 typeVariable
-	:	annotation* Identifier
+	:	annotation* identifier
 	;
 
 arrayType
@@ -164,7 +164,7 @@ dims
 	;
 
 typeParameter
-	:	typeParameterModifier* Identifier typeBound?
+	:	typeParameterModifier* identifier typeBound?
 	;
 
 typeParameterModifier
@@ -207,37 +207,37 @@ wildcardBounds
  */
 
 moduleName
-	:	Identifier
-	|	moduleName '.' Identifier
+	:	identifier
+	|	moduleName '.' identifier
 	;
 
 packageName
-	:	Identifier
-	|	packageName '.' Identifier
+	:	identifier
+	|	packageName '.' identifier
 	;
 
 typeName
-	:	Identifier
-	|	packageOrTypeName '.' Identifier
+	:	identifier
+	|	packageOrTypeName '.' identifier
 	;
 
 packageOrTypeName
-	:	Identifier
-	|	packageOrTypeName '.' Identifier
+	:	identifier
+	|	packageOrTypeName '.' identifier
 	;
 
 expressionName
-	:	Identifier
-	|	ambiguousName '.' Identifier
+	:	identifier
+	|	ambiguousName '.' identifier
 	;
 
 methodName
-	:	Identifier
+	:	identifier
 	;
 
 ambiguousName
-	:	Identifier
-	|	ambiguousName '.' Identifier
+	:	identifier
+	|	ambiguousName '.' identifier
 	;
 
 /*
@@ -281,7 +281,7 @@ typeImportOnDemandDeclaration
 	;
 
 singleStaticImportDeclaration
-	:	'import' 'static' typeName '.' Identifier ';'
+	:	'import' 'static' typeName '.' identifier ';'
 	;
 
 staticImportOnDemandDeclaration
@@ -321,7 +321,7 @@ classDeclaration
 	;
 
 normalClassDeclaration
-	:	classModifier* 'class' Identifier typeParameters? superclass? superinterfaces? classBody
+	:	classModifier* 'class' identifier typeParameters? superclass? superinterfaces? classBody
 	;
 
 classModifier
@@ -398,7 +398,7 @@ variableDeclarator
 	;
 
 variableDeclaratorId
-	:	Identifier dims?
+	:	identifier dims?
 	;
 
 variableInitializer
@@ -438,16 +438,16 @@ unannClassOrInterfaceType
 	;
 
 unannClassType
-	:	Identifier typeArguments?
-	|	unannClassOrInterfaceType '.' annotation* Identifier typeArguments?
+	:	identifier typeArguments?
+	|	unannClassOrInterfaceType '.' annotation* identifier typeArguments?
 	;
 
 unannClassType_lf_unannClassOrInterfaceType
-	:	'.' annotation* Identifier typeArguments?
+	:	'.' annotation* identifier typeArguments?
 	;
 
 unannClassType_lfno_unannClassOrInterfaceType
-	:	Identifier typeArguments?
+	:	identifier typeArguments?
 	;
 
 unannInterfaceType
@@ -463,7 +463,7 @@ unannInterfaceType_lfno_unannClassOrInterfaceType
 	;
 
 unannTypeVariable
-	:	Identifier
+	:	identifier
 	;
 
 unannArrayType
@@ -500,7 +500,7 @@ result
 	;
 
 methodDeclarator
-	:	Identifier '(' formalParameterList? ')' dims?
+	:	identifier '(' formalParameterList? ')' dims?
 	;
 
 formalParameterList
@@ -529,7 +529,7 @@ lastFormalParameter
 	;
 
 receiverParameter
-	:	annotation* unannType (Identifier '.')? 'this'
+	:	annotation* unannType (identifier '.')? 'this'
 	;
 
 throws_
@@ -574,7 +574,7 @@ constructorDeclarator
 	;
 
 simpleTypeName
-	:	Identifier
+	:	identifier
 	;
 
 constructorBody
@@ -589,7 +589,7 @@ explicitConstructorInvocation
 	;
 
 enumDeclaration
-	:	classModifier* 'enum' Identifier superinterfaces? enumBody
+	:	classModifier* 'enum' identifier superinterfaces? enumBody
 	;
 
 enumBody
@@ -601,7 +601,7 @@ enumConstantList
 	;
 
 enumConstant
-	:	enumConstantModifier* Identifier ('(' argumentList? ')')? classBody?
+	:	enumConstantModifier* identifier ('(' argumentList? ')')? classBody?
 	;
 
 enumConstantModifier
@@ -622,7 +622,7 @@ interfaceDeclaration
 	;
 
 normalInterfaceDeclaration
-	:	interfaceModifier* 'interface' Identifier typeParameters? extendsInterfaces? interfaceBody
+	:	interfaceModifier* 'interface' identifier typeParameters? extendsInterfaces? interfaceBody
 	;
 
 interfaceModifier
@@ -677,7 +677,7 @@ interfaceMethodModifier
 	;
 
 annotationTypeDeclaration
-	:	interfaceModifier* '@' 'interface' Identifier annotationTypeBody
+	:	interfaceModifier* '@' 'interface' identifier annotationTypeBody
 	;
 
 annotationTypeBody
@@ -693,7 +693,7 @@ annotationTypeMemberDeclaration
 	;
 
 annotationTypeElementDeclaration
-	:	annotationTypeElementModifier* unannType Identifier '(' ')' dims? defaultValue? ';'
+	:	annotationTypeElementModifier* unannType identifier '(' ')' dims? defaultValue? ';'
 	;
 
 annotationTypeElementModifier
@@ -721,7 +721,7 @@ elementValuePairList
 	;
 
 elementValuePair
-	:	Identifier '=' elementValue
+	:	identifier '=' elementValue
 	;
 
 elementValue
@@ -821,11 +821,11 @@ emptyStatement
 	;
 
 labeledStatement
-	:	Identifier ':' statement
+	:	identifier ':' statement
 	;
 
 labeledStatementNoShortIf
-	:	Identifier ':' statementNoShortIf
+	:	identifier ':' statementNoShortIf
 	;
 
 expressionStatement
@@ -882,7 +882,7 @@ switchLabel
 	;
 
 enumConstantName
-	:	Identifier
+	:	identifier
 	;
 
 whileStatement
@@ -937,11 +937,11 @@ enhancedForStatementNoShortIf
 	;
 
 breakStatement
-	:	'break' Identifier? ';'
+	:	'break' identifier? ';'
 	;
 
 continueStatement
-	:	'continue' Identifier? ';'
+	:	'continue' identifier? ';'
 	;
 
 returnStatement
@@ -1106,22 +1106,22 @@ primaryNoNewArray_lfno_primary_lfno_arrayAccess_lfno_primary
 
 classLiteral
 	:	(typeName|numericType|'boolean') ('[' ']')* '.' 'class'
-	|	'void' '.' 'class'	
+	|	'void' '.' 'class'
 	;
 
 classInstanceCreationExpression
-	:	'new' typeArguments? annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	expressionName '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	primary '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	'new' typeArguments? annotation* identifier ('.' annotation* identifier)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	|	expressionName '.' 'new' typeArguments? annotation* identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	|	primary '.' 'new' typeArguments? annotation* identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
 	;
 
 classInstanceCreationExpression_lf_primary
-	:	'.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	'.' 'new' typeArguments? annotation* identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
 	;
 
 classInstanceCreationExpression_lfno_primary
-	:	'new' typeArguments? annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	expressionName '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	'new' typeArguments? annotation* identifier ('.' annotation* identifier)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	|	expressionName '.' 'new' typeArguments? annotation* identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
 	;
 
 typeArgumentsOrDiamond
@@ -1130,18 +1130,18 @@ typeArgumentsOrDiamond
 	;
 
 fieldAccess
-	:	primary '.' Identifier
-	|	'super' '.' Identifier
-	|	typeName '.' 'super' '.' Identifier
+	:	primary '.' identifier
+	|	'super' '.' identifier
+	|	typeName '.' 'super' '.' identifier
 	;
 
 fieldAccess_lf_primary
-	:	'.' Identifier
+	:	'.' identifier
 	;
 
 fieldAccess_lfno_primary
-	:	'super' '.' Identifier
-	|	typeName '.' 'super' '.' Identifier
+	:	'super' '.' identifier
+	|	typeName '.' 'super' '.' identifier
 	;
 
 /*arrayAccess
@@ -1176,23 +1176,23 @@ arrayAccess_lfno_primary
 
 methodInvocation
 	:	methodName '(' argumentList? ')'
-	|	typeName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	expressionName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	primary '.' typeArguments? Identifier '(' argumentList? ')'
-	|	'super' '.' typeArguments? Identifier '(' argumentList? ')'
-	|	typeName '.' 'super' '.' typeArguments? Identifier '(' argumentList? ')'
+	|	typeName '.' typeArguments? identifier '(' argumentList? ')'
+	|	expressionName '.' typeArguments? identifier '(' argumentList? ')'
+	|	primary '.' typeArguments? identifier '(' argumentList? ')'
+	|	'super' '.' typeArguments? identifier '(' argumentList? ')'
+	|	typeName '.' 'super' '.' typeArguments? identifier '(' argumentList? ')'
 	;
 
 methodInvocation_lf_primary
-	:	'.' typeArguments? Identifier '(' argumentList? ')'
+	:	'.' typeArguments? identifier '(' argumentList? ')'
 	;
 
 methodInvocation_lfno_primary
 	:	methodName '(' argumentList? ')'
-	|	typeName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	expressionName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	'super' '.' typeArguments? Identifier '(' argumentList? ')'
-	|	typeName '.' 'super' '.' typeArguments? Identifier '(' argumentList? ')'
+	|	typeName '.' typeArguments? identifier '(' argumentList? ')'
+	|	expressionName '.' typeArguments? identifier '(' argumentList? ')'
+	|	'super' '.' typeArguments? identifier '(' argumentList? ')'
+	|	typeName '.' 'super' '.' typeArguments? identifier '(' argumentList? ')'
 	;
 
 argumentList
@@ -1200,24 +1200,24 @@ argumentList
 	;
 
 methodReference
-	:	expressionName '::' typeArguments? Identifier
-	|	referenceType '::' typeArguments? Identifier
-	|	primary '::' typeArguments? Identifier
-	|	'super' '::' typeArguments? Identifier
-	|	typeName '.' 'super' '::' typeArguments? Identifier
+	:	expressionName '::' typeArguments? identifier
+	|	referenceType '::' typeArguments? identifier
+	|	primary '::' typeArguments? identifier
+	|	'super' '::' typeArguments? identifier
+	|	typeName '.' 'super' '::' typeArguments? identifier
 	|	classType '::' typeArguments? 'new'
 	|	arrayType '::' 'new'
 	;
 
 methodReference_lf_primary
-	:	'::' typeArguments? Identifier
+	:	'::' typeArguments? identifier
 	;
 
 methodReference_lfno_primary
-	:	expressionName '::' typeArguments? Identifier
-	|	referenceType '::' typeArguments? Identifier
-	|	'super' '::' typeArguments? Identifier
-	|	typeName '.' 'super' '::' typeArguments? Identifier
+	:	expressionName '::' typeArguments? identifier
+	|	referenceType '::' typeArguments? identifier
+	|	'super' '::' typeArguments? identifier
+	|	typeName '.' 'super' '::' typeArguments? identifier
 	|	classType '::' typeArguments? 'new'
 	|	arrayType '::' 'new'
 	;
@@ -1251,13 +1251,13 @@ lambdaExpression
 	;
 
 lambdaParameters
-	:	Identifier
+	:	identifier
 	|	'(' formalParameterList? ')'
 	|	'(' inferredFormalParameterList ')'
 	;
 
 inferredFormalParameterList
-	:	Identifier (',' Identifier)*
+	:	identifier (',' identifier)*
 	;
 
 lambdaBody
@@ -1423,6 +1423,8 @@ castExpression
 	;
 
 // LEXER
+
+identifier : Identifier | 'to' | 'module' | 'open' | 'with' | 'provides' | 'uses' | 'opens' | 'requires' | 'exports';
 
 // §3.9 Keywords
 
