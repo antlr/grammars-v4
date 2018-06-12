@@ -80,33 +80,6 @@ expression
    | OBJECTID ASSIGNMENT expression # assignment
    ;
 
-// skip spaces, tabs, newlines, note that \v is not suppoted in antlr
-
-WHITESPACE
-   : [ \t\r\n\f] + -> skip
-   ;
-
-// comments
-
-OPEN_COMMENT
-   : '(*'
-   ;
-
-
-CLOSE_COMMENT
-   : '*)'
-   ;
-
-
-COMMENT
-   : OPEN_COMMENT (COMMENT | .)*? CLOSE_COMMENT -> channel (HIDDEN)
-   ;
-
-
-ONE_LINE_COMMENT
-   : '--' (~ '\n')* '\n'? -> channel (HIDDEN)
-   ;
-
 // key words
 
 CLASS
@@ -372,4 +345,31 @@ fragment UNICODE
 
 fragment HEX
    : [0-9a-fA-F]
+   ;
+
+// comments
+
+OPEN_COMMENT
+   : '(*'
+   ;
+
+
+CLOSE_COMMENT
+   : '*)'
+   ;
+
+
+COMMENT
+   : OPEN_COMMENT (COMMENT | .)*? CLOSE_COMMENT -> skip
+   ;
+
+
+ONE_LINE_COMMENT
+   : '--' (~ '\n')* '\n'? -> skip
+   ;
+
+// skip spaces, tabs, newlines, note that \v is not suppoted in antlr
+
+WHITESPACE
+   : [ \t\r\n\f] + -> skip
    ;
