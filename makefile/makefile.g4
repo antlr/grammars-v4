@@ -40,6 +40,15 @@ file
    ;
 
 recipe
+   : target_declaration
+   | variable
+   ;
+
+variable
+   : VARNAME '=' VARNAME EOL
+   ;
+
+target_declaration
    : target_line command_lines
    ;
 
@@ -57,6 +66,11 @@ target
 
 dependencies
    : NAME
+   ;
+
+
+VARNAME
+   : [a-zA-Z] [a-zA-Z0-9."]*
    ;
 
 
