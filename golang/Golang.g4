@@ -904,12 +904,12 @@ STRING_LIT
 
 //raw_string_lit         = "`" { unicode_char | newline } "`" .
 fragment RAW_STRING_LIT
-    : '`' ( UNICODE_CHAR | NEWLINE )* '`'
+    : '`' ( UNICODE_CHAR | NEWLINE | [~`] )*? '`'
     ;
 
 //interpreted_string_lit = `"` { unicode_value | byte_value } `"` .
 fragment INTERPRETED_STRING_LIT
-    : '"' ( UNICODE_VALUE | BYTE_VALUE )* '"'
+    : '"' ( '\\"' | UNICODE_VALUE | BYTE_VALUE )*? '"'
     ;
 
 
