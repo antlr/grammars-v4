@@ -902,7 +902,7 @@ fragment Z
 
 
 SL_COMMENT
-   : '//' ~ [\n\r'] -> skip
+   : '//' ~ [\r\n]* -> skip
    ;
 
 

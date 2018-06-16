@@ -121,7 +121,6 @@ global_variables_decl
    : (GLOBAL | SHARED) VARIABLES (variable_decl | constant_decl)* END VARIABLES
    ;
 
-// Variable declaration
 variable_decl_sub
    : (INDIRECT)? access_modif_part? scope_modif?
    ;
@@ -469,9 +468,6 @@ identifier_name
    : ID
    ;
 
-// this one can be used in expressions like:
-// excel_object.Application.Sheets("Sheet1").Select()
-// identifier_name_ex is never the first part in the identifier (except for DESCRIBE).
 identifier_name_ex
    : identifier_name
    | SELECT
@@ -522,10 +518,6 @@ atom
    | QUOTED_STRING
    | DATE
    | TIME
-   ;
-
-swallow_to_semi
-   : ~ (SEMI) +
    ;
 
 //swallow_to_newline
