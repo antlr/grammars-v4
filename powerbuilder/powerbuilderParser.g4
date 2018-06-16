@@ -28,7 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 parser grammar powerbuilderParser;
 
-options { tokenVocab=powerbuilderLexer; }
+options
+   { tokenVocab = powerbuilderLexer; }
 
 start_rule
    :
@@ -55,7 +56,8 @@ body_rule
    ;
 
 export_header
-   : (swallow_to_newline | EXPORT_HEADER | PBSELECT)
+   : EXPORT_HEADER
+   | PBSELECT
    ;
 
 release_information
@@ -75,8 +77,8 @@ window_property_attributes_sub
    ;
 
 window_property_attribute_sub
-   : ((NULL | numeric_atom | DQUOTED_STRING | DATE | TIME) NEWLINE? COMMA?)
-   | (attribute_name eq = EQ (attribute_value array_decl_sub? | LPAREN window_property_attributes_sub RPAREN)) NEWLINE? COMMA?
+   : ((NULL | numeric_atom | DQUOTED_STRING | DATE | TIME) COMMA?)
+   | (attribute_name eq = EQ (attribute_value array_decl_sub? | LPAREN window_property_attributes_sub RPAREN)) COMMA?
    ;
 
 attribute_name
@@ -202,7 +204,6 @@ scope_modif
    | LOCAL
    ;
 
-
 expression
    : (close_call_sub)
    | (LCURLY)
@@ -211,7 +212,7 @@ expression
 expression_list
    : (REF? expression) (COMMA REF? expression)*
    ;
- 
+
 boolean_expression
    : condition_or
    ;
@@ -227,7 +228,6 @@ condition_and
 condition_not
    : (NOT)? condition_comparison
    ;
-
 
 condition_comparison
    : add_expr ((EQ | GT | LT | GTLT | GTE | LTE) add_expr)?
@@ -245,7 +245,6 @@ unary_sign_expr
    : (LPAREN expression RPAREN)
    | (MINUS | PLUS)? atom
    ;
-
 
 statement
    : (if_simple_statement)
@@ -529,10 +528,9 @@ swallow_to_semi
    : ~ (SEMI) +
    ;
 
-swallow_to_newline
-   : ~ (NEWLINE) +
-   ;
-
+//swallow_to_newline
+//   : ~ (NEWLINE) +
+//   ;
 array_access_atom
    : identifier_name LBRACE expression_list RBRACE
    ;
@@ -545,8 +543,6 @@ boolean_atom
    : BOOLEAN_ATOM
    ;
 
-
-
 cast_expression
    : data_type_sub LPAREN expression (COMMA expression)* RPAREN
    ;
@@ -555,11 +551,7 @@ data_type_sub
    : DATA_TYPE_SUB
    ;
 
-
-
 data_type_name
    : data_type_sub
    | identifier_name
    ;
-
-

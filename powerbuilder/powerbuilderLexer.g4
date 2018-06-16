@@ -28,15 +28,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 lexer grammar powerbuilderLexer;
 
+
 DATA_TYPE_SUB
    : (A N Y) | (B L O B) | (B O O L E A N) | (B Y T E) | (C H A R A C T E R) | (C H A R) | (D A T E) | (D A T E T I M E) | (D E C I M A L) | (D E C) | (D O U B L E) | (I N T E G E R) | (I N T) | (L O N G) | (L O N G L O N G) | (R E A L) | (S T R I N G) | (T I M E) | (U N S I G N E D I N T E G E R) | (U I N T) | (U N S I G N E D L O N G) | (U L O N G) | (W I N D O W)
    ;
 
 
-
 BOOLEAN_ATOM
    : (T R U E) | (F A L S E)
    ;
+
 
 GLOBAL
    : G L O B A L
@@ -382,33 +383,136 @@ SUPER
    : S U P E R
    ;
 
-   LIBRARY:L I B R A R Y;
-RPCFUNC:R P C F U N C;
-ALIAS:A L I A S ;
-THROWS:T  H R O W S;
-EQ:'=';
-GT:'>';
-GTE:'>=';
-LT:'<';
-LTE:'<=';
-GTLT:'<>';
-PLUS:'+';
-MINUS:'-';
-PLUSEQ:'+=';
-MINUSEQ:'-=';
 
-COLONCOLON:'::';
-MULT:'*';
-DIV:'/';
-MULTEQ:'*=';
-DIVEQ:'/=';
-CARAT:'^';
-LCURLY:'{';
-RCURLY:'}';
-LBRACE:'[';
-RBRACE:']';
-BRACES:'[]';
-TICK:'`';
+LIBRARY
+   : L I B R A R Y
+   ;
+
+
+RPCFUNC
+   : R P C F U N C
+   ;
+
+
+ALIAS
+   : A L I A S
+   ;
+
+
+THROWS
+   : T H R O W S
+   ;
+
+
+EQ
+   : '='
+   ;
+
+
+GT
+   : '>'
+   ;
+
+
+GTE
+   : '>='
+   ;
+
+
+LT
+   : '<'
+   ;
+
+
+LTE
+   : '<='
+   ;
+
+
+GTLT
+   : '<>'
+   ;
+
+
+PLUS
+   : '+'
+   ;
+
+
+MINUS
+   : '-'
+   ;
+
+
+PLUSEQ
+   : '+='
+   ;
+
+
+MINUSEQ
+   : '-='
+   ;
+
+
+COLONCOLON
+   : '::'
+   ;
+
+
+MULT
+   : '*'
+   ;
+
+
+DIV
+   : '/'
+   ;
+
+
+MULTEQ
+   : '*='
+   ;
+
+
+DIVEQ
+   : '/='
+   ;
+
+
+CARAT
+   : '^'
+   ;
+
+
+LCURLY
+   : '{'
+   ;
+
+
+RCURLY
+   : '}'
+   ;
+
+
+LBRACE
+   : '['
+   ;
+
+
+RBRACE
+   : ']'
+   ;
+
+
+BRACES
+   : '[]'
+   ;
+
+
+TICK
+   : '`'
+   ;
+
 
 AUTOINSTANTIATE
    : A U T O I N S T A N T I A T E
@@ -798,17 +902,12 @@ fragment Z
 
 
 SL_COMMENT
-   : '//' ~ ('\n' | '\r')* -> skip
+   : '//' ~ [\n\r'] + -> skip
    ;
 
 
 ML_COMMENT
    : '/*' (.)* '*/' -> skip
-   ;
-
-
-NEWLINE
-   : [\r\n] +
    ;
 
 
