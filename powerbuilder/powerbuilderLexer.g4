@@ -636,12 +636,12 @@ fragment DIGIT
 
 
 LINE_CONTINUATION
-   : '&' WS* [\r\n] + -> skip
+   : '&' WS* [\r\n] -> skip
    ;
 
 
 EXPORT_HEADER
-   : '$' 'A' .. 'Z' (('A' .. 'Z' | DIGIT | '-' | '#' | '%' | '_'))* '$' ~ [\r\n] +
+   : '$' 'A' .. 'Z' (('A' .. 'Z' | DIGIT | '-' | '#' | '%' | '_'))* '$' ~ [\r\n]
    ;
 
 
@@ -902,7 +902,7 @@ fragment Z
 
 
 SL_COMMENT
-   : '//' ~ [\n\r'] + -> skip
+   : '//' ~ [\n\r'] -> skip
    ;
 
 
@@ -912,5 +912,5 @@ ML_COMMENT
 
 
 WS
-   : (' ' | '\t') -> skip
+   : [ \t\r\n] -> skip
    ;
