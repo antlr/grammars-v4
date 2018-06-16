@@ -628,7 +628,6 @@ fragment E_TILDE
    : '~~'
    ;
 
-//TILDE : '~';
 
 fragment DIGIT
    : '0' .. '9'
@@ -667,107 +666,6 @@ TQ
 
 DOUBLE_PIPE
    : '||'
-   ;
-
-
-ASTROOT
-   : 'astroot'
-   ;
-
-
-HEADER
-   : 'header'
-   ;
-
-
-BOODY
-   : 'body'
-   ;
-
-
-DATATYPEDECL
-   : 'datatypedecl'
-   ;
-
-
-FORWARDDECL
-   : 'forwarddecl'
-   ;
-
-
-TYPEVARIABLESDECL
-   : 'typevariablesdecl'
-   ;
-
-
-GLOBALVARIABLESDECL
-   : 'globalvariablesdecl'
-   ;
-
-
-VARIABLEDECL
-   : 'variabledecl'
-   ;
-
-
-CONSTANTDECL
-   : 'constantdecl'
-   ;
-
-
-FUNCTIONFORWARDDECL
-   : 'functionforwarddecl'
-   ;
-
-
-FUNCTIONSFORWARDDECL
-   : 'functionsforwarddecl'
-   ;
-
-
-FUNCTIONBODY
-   : 'functionbody'
-   ;
-
-
-ONBODY
-   : 'onbody'
-   ;
-
-
-EVENTBODY
-   : 'eventbody'
-   ;
-
-
-STATEMENT
-   : 'statement'
-   ;
-
-
-SQLSTATEMENT
-   : 'sqlstatement'
-   ;
-
-
-WINDOWPROP
-   : 'windowprop'
-   ;
-
-
-WINDOWSUBPROP
-   : 'windowsubprop'
-   ;
-
-
-WINDOWSUBPROPNAME
-   : 'windowsubpropname'
-   ;
-
-// windowsubpropname :: "retreive" is what you're looking for
-
-WINDOWSUBPROPVAL
-   : 'windowsubpropval'
    ;
 
 

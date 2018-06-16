@@ -32,8 +32,7 @@ options
    { tokenVocab = powerbuilderLexer; }
 
 start_rule
-   :
-   /* header_rule? */ body_rule + EOF
+   : header_rule? body_rule + EOF
    ;
 
 header_rule
