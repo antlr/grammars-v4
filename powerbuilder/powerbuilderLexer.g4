@@ -388,6 +388,10 @@ LIBRARY
    : L I B R A R Y
    ;
 
+SYSTEM
+    : S Y S T E M
+    ;
+
 
 RPCFUNC
    : R P C F U N C

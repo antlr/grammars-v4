@@ -142,7 +142,7 @@ constant_decl_sub
    ;
 
 constant_decl
-   : constant_decl_sub (SEMI)
+   : constant_decl_sub SEMI
    ;
 
 function_forward_decl
@@ -162,7 +162,7 @@ functions_forward_decl
    ;
 
 function_body
-   : (PUBLIC | PRIVATE | PROTECTED)? scope_modif? (FUNCTION data_type_name | SUBROUTINE) identifier_name LPAREN parameters_list_sub? RPAREN (THROWS identifier_name)? (SEMI statement)* END (FUNCTION | SUBROUTINE)
+   : access_type? scope_modif? (FUNCTION data_type_name | SUBROUTINE) identifier_name LPAREN parameters_list_sub? RPAREN (THROWS identifier_name)? (SEMI statement)* END (FUNCTION | SUBROUTINE)
    ;
 
 on_body
@@ -182,8 +182,14 @@ event_body
    : EVENT (TYPE data_type_name)? (identifier_name COLONCOLON)? (identifier_name | OPEN | CLOSE) (LPAREN parameters_list_sub? RPAREN)? (SEMI statement)* END EVENT
    ;
 
+access_type
+   : PUBLIC
+   | PRIVATE
+   | PROTECTED
+   ;
+
 access_modif
-   : (PUBLIC | PRIVATE | PROTECTED) ':'
+   : access_type ':'
    ;
 
 access_modif_part
@@ -518,9 +524,6 @@ atom
    | TIME
    ;
 
-//swallow_to_newline
-//   : ~ (NEWLINE) +
-//   ;
 array_access_atom
    : identifier_name LBRACE expression_list RBRACE
    ;

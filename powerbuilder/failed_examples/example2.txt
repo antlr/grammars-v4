@@ -1,8 +1,0 @@
-$PBExportHeader$append.srf
-global type append from function_object
-end type
-
-type prototypes
-global function boolean append (ref blob ab_source, readonly string as_append, ...) system library "fastfuncs100.dll" alias for "Append"
-global function boolean append (ref string as_source, readonly string as_append, ...) system library "fastfuncs100.dll" alias for "Append"
-end prototypes
