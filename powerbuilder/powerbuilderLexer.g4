@@ -388,9 +388,10 @@ LIBRARY
    : L I B R A R Y
    ;
 
+
 SYSTEM
-    : S Y S T E M
-    ;
+   : S Y S T E M
+   ;
 
 
 RPCFUNC
@@ -809,7 +810,7 @@ fragment LETTER
 
 
 EXPORT_HEADER
-   : '$' 'A' .. 'Z' ((LETTER | DIGIT | '-' | '#' | '%' | '_'))* '$' (LETTER | DIGIT | '.') + ~ [\r\n]
+   : '$' 'A' .. 'Z' ((LETTER | DIGIT | '-' | '#' | '%' | '_'))* '$' (LETTER | DIGIT | '.' | ' ') + ~ [\r\n]
    ;
 
 
