@@ -794,6 +794,11 @@ LINE_CONTINUATION
    ;
 
 
+DOTDOTDOT
+   : '...'
+   ;
+
+
 fragment LETTER
    : 'A' .. 'Z' | 'a' .. 'z'
    ;

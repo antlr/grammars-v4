@@ -150,11 +150,11 @@ function_forward_decl
    ;
 
 parameter_sub
-   : (READONLY)? (REF)? data_type_name decimal_decl_sub? identifier_name array_decl_sub?
+   : READONLY? REF? data_type_name decimal_decl_sub? identifier_name array_decl_sub?
    ;
 
 parameters_list_sub
-   : parameter_sub (COMMA parameter_sub)*
+   : parameter_sub (COMMA parameter_sub)* (COMMA DOTDOTDOT)?
    ;
 
 functions_forward_decl
