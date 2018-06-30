@@ -634,16 +634,6 @@ fragment DIGIT
    ;
 
 
-LINE_CONTINUATION
-   : '&' WS* [\r\n] -> skip
-   ;
-
-
-EXPORT_HEADER
-   : '$' 'A' .. 'Z' (('A' .. 'Z' | DIGIT | '-' | '#' | '%' | '_'))* '$' ~ [\r\n]
-   ;
-
-
 DATE
    : DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT
    ;
@@ -799,16 +789,31 @@ fragment Z
    ;
 
 
+LINE_CONTINUATION
+   : '&' WS* [\r\n] -> skip
+   ;
+
+
+fragment LETTER
+   : 'A' .. 'Z' | 'a' .. 'z'
+   ;
+
+
+EXPORT_HEADER
+   : '$' 'A' .. 'Z' ((LETTER | DIGIT | '-' | '#' | '%' | '_'))* '$' (LETTER | DIGIT | '.') + ~ [\r\n]
+   ;
+
+
 SL_COMMENT
    : '//' ~ [\r\n]* -> skip
    ;
 
 
 ML_COMMENT
-   : '/*' (.)* '*/' -> skip
+   : '/*' (.)*? '*/' -> skip
    ;
 
 
 WS
-   : [ \t\r\n] -> skip
+   : [ \t\r\n] + -> skip
    ;

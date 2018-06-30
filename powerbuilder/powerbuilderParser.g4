@@ -56,7 +56,6 @@ body_rule
 
 export_header
    : EXPORT_HEADER
-   | PBSELECT
    ;
 
 release_information
