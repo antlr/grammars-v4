@@ -73,6 +73,21 @@ grammar Golang;
         return (type == COMMENT && (text.contains("\r") || text.contains("\n"))) ||
                 (type == TERMINATOR);
     }
+
+    private boolean NoTerminatorBetween(int tokenOffset) {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        Token token = stream.LT(tokenOffset);
+        
+        stream.fill();
+        
+        int tokenIndex = token.getStartIndex() - 1;
+        
+        if (tokenIndex > stream.size()) {
+            return false;
+        }
+        
+        return !stream.get(tokenIndex).getText().contains("\n");
+    }
 }
 
 @lexer::members {
@@ -477,8 +492,9 @@ channelType
     ;
 
 methodSpec
-    : IDENTIFIER signature
+    : {NoTerminatorBetween(3)}? IDENTIFIER parameters result
     | typeName
+    |  IDENTIFIER parameters
     ;
 
 
@@ -607,7 +623,7 @@ structType
     ;
 
 fieldDecl
-    : (identifierList type | anonymousField) STRING_LIT?
+    : ({NoTerminatorBetween(2)}? identifierList type | anonymousField) STRING_LIT?
     ;
 
 anonymousField
