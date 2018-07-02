@@ -110,7 +110,7 @@ grammar Golang;
         BufferedTokenStream stream = (BufferedTokenStream)_input;
         int leftParams = 1;
         int rightParams = 0;
-        string value;
+        String value;
 
         if (stream.LT(tokenOffset).getText().equals("(")) {
             // Scan past parameters
