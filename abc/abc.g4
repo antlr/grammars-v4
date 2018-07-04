@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2018, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,20 +33,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar abc;
 
 abc
-   : (line? EOL) +
+   : header body
    ;
 
-line
-    : headerline | bodyline;
+header
+   : pair +
+   ;
 
-headerline
-    : string ':' string
-    ;
+pair
+   : key ':' value
+   ;
 
+key
+   : string
+   ;
+
+value
+   : (string | number | '/') +
+   ;
+
+body
+   : bar ('|' bar)*
+   ;
+
+bar
+   : note +
+   ;
+
+note
+   : NOTE
+   ;
 
 string
-    : STRING
-    ;
+   : STRING
+   ;
 
 number
    : NUMBER
@@ -57,8 +77,8 @@ comment
    ;
 
 
-STRINGLITERAL
-   : '"' STRING
+NOTE
+   : [a-gA-G1-9\]] +
    ;
 
 
@@ -77,11 +97,6 @@ COMMENT
    ;
 
 
-EOL
-   : '\r'? '\n'
-   ;
-
-
 WS
-   : [ \t\r\n] -> skip
+   : [ \t\r\n] + -> skip
    ;
