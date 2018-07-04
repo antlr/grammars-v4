@@ -62,7 +62,7 @@ FLOATINGPOINT
 
 
 fragment NUMBER
-   : ('0' .. '9') + ('.' ('0' .. '9') +)?
+   : ('0' .. '9') + ('.' ('0' .. '9')*)?
    ;
 
 
@@ -77,7 +77,7 @@ fragment SIGN
 
 
 COMMENT
-   : '"c' ~ ["]* '"' EOL -> skip
+   : '"c' ~ ["]* '"' ' '* EOL -> skip
    ;
 
 
