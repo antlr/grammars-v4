@@ -54,6 +54,7 @@
 				<module>csharp</module>
 				<module>css3</module>
 				<module>csv</module>
+				<module>databank</module>
 				<module>datetime</module>
 				<module>dcm</module>
 				<module>dice</module>
