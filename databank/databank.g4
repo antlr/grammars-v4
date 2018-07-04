@@ -48,7 +48,7 @@ dateline
    ;
 
 sample
-   : number EOL?
+   : (number | 'NA') EOL?
    ;
 
 number
