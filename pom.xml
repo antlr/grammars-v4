@@ -169,6 +169,7 @@
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>tsql</module>
+				<module>tsv</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>ucb-logo</module>
