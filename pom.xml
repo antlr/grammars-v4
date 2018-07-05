@@ -54,6 +54,7 @@
 				<module>csharp</module>
 				<module>css3</module>
 				<module>csv</module>
+				<module>databank</module>
 				<module>datetime</module>
 				<module>dcm</module>
 				<module>dice</module>
@@ -169,6 +170,7 @@
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>tsql</module>
+				<module>tsv</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>ucb-logo</module>
