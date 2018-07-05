@@ -42,7 +42,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>stylesheet</entryPoint>
-					<grammarName>LessParser</grammarName>
+					<grammarName>Less</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
