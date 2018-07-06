@@ -37,11 +37,55 @@ program
    ;
 
 block
-   : (CONST ident '=' number (',' ident '=' number)* ';')? (VAR ident (',' ident)* ';')? (PROCEDURE ident ';' block ';')* statement
+   : consts? vars? procedure* statement
+   ;
+
+consts
+   : CONST ident '=' number (',' ident '=' number)* ';'
+   ;
+
+vars
+   : VAR ident (',' ident)* ';'
+   ;
+
+procedure
+   : PROCEDURE ident ';' block ';'
    ;
 
 statement
-   : (ident ':=' expression | CALL ident | WRITE ident | '?' ident | '!' expression | BEGIN statement (';' statement)* END | IF condition THEN statement | WHILE condition DO statement)?
+   : (assignstmt | callstmt | writestmt | qstmt | bangstmt | beginstmt | ifstmt | whilestmt)?
+   ;
+
+assignstmt
+   : ident ':=' expression
+   ;
+
+callstmt
+   : CALL ident
+   ;
+
+writestmt
+   : WRITE ident
+   ;
+
+qstmt
+   : '?' ident
+   ;
+
+bangstmt
+   : '!' expression
+   ;
+
+beginstmt
+   : BEGIN statement (';' statement)* END
+   ;
+
+ifstmt
+   : IF condition THEN statement
+   ;
+
+whilestmt
+   : WHILE condition DO statement
    ;
 
 condition
