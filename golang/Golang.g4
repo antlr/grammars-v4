@@ -73,6 +73,65 @@ grammar Golang;
         return (type == COMMENT && (text.contains("\r") || text.contains("\n"))) ||
                 (type == TERMINATOR);
     }
+
+     /**
+     * Returns {@code true} if no line terminator exists between the specified
+     * token offset and the prior one on the {@code HIDDEN} channel.
+     *
+     * @return {@code true} if no line terminator exists between the specified
+     * token offset and the prior one on the {@code HIDDEN} channel.
+     */
+    private boolean noTerminatorBetween(int tokenOffset) {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        List<Token> tokens = stream.getHiddenTokensToLeft(stream.LT(tokenOffset).getTokenIndex());
+        
+        if (tokens == null) {
+            return true;
+        }
+
+        for (Token token : tokens) {
+            if (token.getText().contains("\n"))
+                return false;
+        }
+
+        return true;
+    }
+
+     /**
+     * Returns {@code true} if no line terminator exists after any encounterd
+     * parameters beyond the specified token offset and the next on the
+     * {@code HIDDEN} channel.
+     *
+     * @return {@code true} if no line terminator exists after any encounterd
+     * parameters beyond the specified token offset and the next on the
+     * {@code HIDDEN} channel.
+     */
+    private boolean noTerminatorAfterParams(int tokenOffset) {
+        BufferedTokenStream stream = (BufferedTokenStream)_input;
+        int leftParams = 1;
+        int rightParams = 0;
+        String value;
+
+        if (stream.LT(tokenOffset).getText().equals("(")) {
+            // Scan past parameters
+            while (leftParams != rightParams) {
+                tokenOffset++;
+                value = stream.LT(tokenOffset).getText();
+
+                if (value.equals("(")) {
+                    leftParams++;
+                }
+                else if (value.equals(")")) {
+                    rightParams++;
+                }
+            }
+
+            tokenOffset++;
+            return noTerminatorBetween(tokenOffset);
+        }
+        
+        return true;
+    }
 }
 
 @lexer::members {
@@ -164,7 +223,7 @@ expressionList
 
 //TypeDecl     = "type" ( TypeSpec | "(" { TypeSpec ";" } ")" ) .
 typeDecl
-    : 'type' ( typeSpec | '(' ( typeSpec ';' )* ')' )
+    : 'type' ( typeSpec | '(' ( typeSpec eos )* ')' )
     ;
 
 //TypeSpec     = identifier Type .
@@ -477,8 +536,9 @@ channelType
     ;
 
 methodSpec
-    : IDENTIFIER signature
+    : {noTerminatorAfterParams(2)}? IDENTIFIER parameters result
     | typeName
+    | IDENTIFIER parameters
     ;
 
 
@@ -607,7 +667,7 @@ structType
     ;
 
 fieldDecl
-    : (identifierList type | anonymousField) STRING_LIT?
+    : ({noTerminatorBetween(2)}? identifierList type | anonymousField) STRING_LIT?
     ;
 
 anonymousField
@@ -904,12 +964,12 @@ STRING_LIT
 
 //raw_string_lit         = "`" { unicode_char | newline } "`" .
 fragment RAW_STRING_LIT
-    : '`' ( UNICODE_CHAR | NEWLINE )* '`'
+    : '`' ( UNICODE_CHAR | NEWLINE | [~`] )*? '`'
     ;
 
 //interpreted_string_lit = `"` { unicode_value | byte_value } `"` .
 fragment INTERPRETED_STRING_LIT
-    : '"' ( UNICODE_VALUE | BYTE_VALUE )* '"'
+    : '"' ( '\\"' | UNICODE_VALUE | BYTE_VALUE )*? '"'
     ;
 
 

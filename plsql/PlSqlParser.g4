@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009-2011 Alexandre Porcelli <alexandre.porcelli@gmail.com>
  * Copyright (c) 2015-2017 Ivan Kochurkin (KvanTTT, kvanttt@gmail.com, Positive Technologies).
- * Copyright (c) 2017      Mark Adams <madams51703@gmail.com>
+ * Copyright (c) 2017-2018 Mark Adams <madams51703@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,10 @@
 
 parser grammar PlSqlParser;
 
-options { tokenVocab=PlSqlLexer; }
-
-@members {boolean version12=true;}
+options {
+    tokenVocab=PlSqlLexer;
+    superClass=PlSqlBaseParser;
+}
 
 sql_script
     : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
@@ -31,6 +32,7 @@ sql_script
 unit_statement
     : transaction_control_statements 
     | alter_cluster
+    | alter_database
     | alter_function
     | alter_package
     | alter_procedure
@@ -1030,7 +1032,7 @@ storage_table_clause
 
 // https://docs.oracle.com/database/121/SQLRF/statements_4008.htm#SQLRF56110
 unified_auditing
-    : {version12}? 
+    : {isVersion12()}? 
       AUDIT (POLICY policy_name ((BY | EXCEPT) (','? audit_user)+ )? 
                                 (WHENEVER NOT? SUCCESSFUL)?
             | CONTEXT NAMESPACE oracle_namespace 
@@ -1058,11 +1060,11 @@ audit_traditional
     ;
 
 audit_direct_path
-    : {version12}? DIRECT_PATH auditing_by_clause
+    : {isVersion12()}? DIRECT_PATH auditing_by_clause
     ;
 
 audit_container_clause
-    : {version12}? (CONTAINER EQUALS_OP (CURRENT | ALL))
+    : {isVersion12()}? (CONTAINER EQUALS_OP (CURRENT | ALL))
     ;
 
 audit_operation_clause
@@ -1104,7 +1106,7 @@ auditing_on_clause
     : ON ( object_name
          | DIRECTORY regular_id
          | MINING MODEL model_name
-         | {version12}? SQL TRANSLATION PROFILE profile_name
+         | {isVersion12()}? SQL TRANSLATION PROFILE profile_name
          | DEFAULT
          )
     ;
@@ -1132,7 +1134,7 @@ sql_statement_shortcut
     | MATERIALIZED VIEW
     | NOT EXISTS
     | OUTLINE
-    | {version12}? PLUGGABLE DATABASE
+    | {isVersion12()}? PLUGGABLE DATABASE
     | PROCEDURE
     | PROFILE
     | PUBLIC DATABASE LINK
@@ -1215,11 +1217,11 @@ alter_library
     ;
 
 library_editionable
-    : {version12}? (EDITIONABLE | NONEDITIONABLE)
+    : {isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
 library_debug
-    : {version12}? DEBUG
+    : {isVersion12()}? DEBUG
     ;
 
 
@@ -1253,7 +1255,7 @@ alter_view
     ;   
 
 alter_view_editionable
-    : {version12}? (EDITIONABLE | NONEDITIONABLE)
+    : {isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
  
 create_view
@@ -1442,6 +1444,8 @@ tablespace_retention_clause
     : RETENTION (GUARANTEE | NOGUARANTEE)
     ;
 
+// asm_filename is just a charater string.  Would need to parse the string
+// to find diskgroup...
 datafile_specification
     : DATAFILE
 	  (','? datafile_tempfile_spec) 
@@ -1453,11 +1457,12 @@ tempfile_specification
     ;
 
 datafile_tempfile_spec
-    : CHAR_STRING? (SIZE size_clause)? REUSE? autoextend_clause?
+    : (CHAR_STRING)? (SIZE size_clause)? REUSE? autoextend_clause?
     ;
 
+
 redo_log_file_spec
-    : DATAFILE ( CHAR_STRING
+    : (DATAFILE CHAR_STRING
       | '(' ( ','? CHAR_STRING )+ ')'
       )?
         (SIZE size_clause)?
@@ -2124,7 +2129,7 @@ cache_or_nocache
     ;
 
 database_name
-    : regular_id
+    : regular_id 
     ;
 
 alter_database
@@ -2171,7 +2176,7 @@ begin_or_end
 
 general_recovery
     : RECOVER AUTOMATIC? (FROM CHAR_STRING)?
-       ( (full_database_recovery | partial_database_recovery | LOGFILE CHAR_STRING )+ 
+       ( (full_database_recovery | partial_database_recovery | LOGFILE CHAR_STRING )? 
          ((TEST | ALLOW UNSIGNED_INTEGER CORRUPTION | parallel_clause)+ )?  
        | CONTINUE DEFAULT?
        | CANCEL
@@ -2190,7 +2195,17 @@ full_database_recovery
 partial_database_recovery
     : TABLESPACE (','? tablespace)+
     | DATAFILE (','? CHAR_STRING | filenumber)+
+    | partial_database_recovery_10g
     ;
+
+partial_database_recovery_10g
+    : {isVersion10()}? STANDBY
+      ( TABLESPACE (','? tablespace)+
+      | DATAFILE (','? CHAR_STRING | filenumber)+
+      )
+      UNTIL (CONSISTENT WITH)? CONTROLFILE
+    ;
+
 
 managed_standby_recovery
     : RECOVER (MANAGED STANDBY DATABASE
@@ -2225,7 +2240,7 @@ create_datafile_clause
     ;
 
 alter_datafile_clause
-    : DATAFILE (','? filename|filenumber)+ 
+    : DATAFILE (','? (filename|filenumber) )+ 
         ( ONLINE
         | OFFLINE (FOR DROP)?
         | RESIZE size_clause
@@ -2248,7 +2263,7 @@ logfile_clauses
     : (ARCHIVELOG MANUAL? | NOARCHIVELOG)
     | NO? FORCE LOGGING
     | RENAME FILE (','? filename)+ TO filename
-    | CLEAR UNARCHIVED LOGFILE (','? logfile_descriptor)+ (UNRECOVERABLE DATAFILE)?
+    | CLEAR UNARCHIVED? LOGFILE (','? logfile_descriptor)+ (UNRECOVERABLE DATAFILE)?
     | add_logfile_clauses
     | drop_logfile_clauses
     | switch_logfile_clause
@@ -2257,11 +2272,15 @@ logfile_clauses
 
 add_logfile_clauses
     : ADD STANDBY? LOGFILE
-//TODO       ((INSTANCE CHAR_STRING | THREAD UNSIGNED_INTEGER)?
-//TODO          (','? (GROUP UNSIGNED_INTEGER)? //TODO redo_logfile_spec
-//TODO          )+
-//TODO       | MEMBER (','? filename REUSE?)+ TO (','? logfile_descriptor)+
-//TODO       )
+             (
+//TODO        (INSTANCE CHAR_STRING | THREAD UNSIGNED_INTEGER)?
+               (log_file_group   redo_log_file_spec)+ 
+             | MEMBER (','? filename REUSE?)+ TO (','? logfile_descriptor)+
+             )
+    ;
+
+log_file_group
+    :(','? (THREAD UNSIGNED_INTEGER)? GROUP UNSIGNED_INTEGER)
     ;
 
 drop_logfile_clauses
@@ -2689,7 +2708,7 @@ column_properties
     ;
 
 period_definition
-    : {version12}? PERIOD FOR column_name 
+    : {isVersion12()}? PERIOD FOR column_name 
         ( '(' start_time_column ',' end_time_column ')' )?
     ;
 
@@ -2956,9 +2975,7 @@ label_declaration
     ;
 
 statement
-    : CREATE swallow_to_semi
-    | TRUNCATE swallow_to_semi
-    | body
+    : body
     | block
     | assignment_statement
     | continue_statement
@@ -2970,7 +2987,7 @@ statement
     | null_statement
     | raise_statement
     | return_statement
-    | case_statement/*[true]*/
+    | case_statement
     | sql_statement
     | function_call
     | pipe_row_statement
@@ -3990,7 +4007,7 @@ xmlserialize_param_ident_part
 sql_plus_command
     : '/'
     | EXIT
-    | PROMPT
+    | PROMPT_MESSAGE
     | SHOW (ERR | ERRORS)
     | START_CMD
     | whenever_command
@@ -3999,7 +4016,7 @@ sql_plus_command
 
 whenever_command
     : WHENEVER (SQLERROR | OSERROR)
-         ( EXIT (SUCCESS | FAILURE | WARNING) (COMMIT | ROLLBACK)
+         ( EXIT (SUCCESS | FAILURE | WARNING | variable_name) (COMMIT | ROLLBACK)
          | CONTINUE (COMMIT | ROLLBACK | NONE))
     ;
 

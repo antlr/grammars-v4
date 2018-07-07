@@ -20,6 +20,10 @@
 
 lexer grammar PlSqlLexer;
 
+options {
+    superClass=PlSqlBaseLexer;
+}
+
 ABORT:                        'ABORT';
 ABS:                          'ABS';
 ACCESS:                       'ACCESS';
@@ -103,6 +107,7 @@ AUTHID:                       'AUTHID';
 AUTHORIZATION:                'AUTHORIZATION';
 AUTOALLOCATE:                 'AUTOALLOCATE';
 AUTO:                         'AUTO';
+AUTOBACKUP:                   'AUTOBACKUP';
 AUTOEXTEND:                   'AUTOEXTEND';
 AUTO_LOGIN:                   'AUTO_LOGIN';
 AUTOMATIC:                    'AUTOMATIC';
@@ -112,6 +117,7 @@ AVAILABILITY:                 'AVAILABILITY';
 AVRO:                         'AVRO';
 BACKGROUND:                   'BACKGROUND';
 BACKUP:                       'BACKUP';
+BACKUPSET:                    'BACKUPSET';
 BASIC:                        'BASIC';
 BASICFILE:                    'BASICFILE';
 BATCH:                        'BATCH';
@@ -190,6 +196,7 @@ CERTIFICATE:                  'CERTIFICATE';
 CFILE:                        'CFILE';
 CHAINED:                      'CHAINED';
 CHANGE:                       'CHANGE';
+CHANGETRACKING:               'CHANGETRACKING';
 CHANGE_DUPKEY_ERROR_INDEX:    'CHANGE_DUPKEY_ERROR_INDEX';
 CHARACTER:                    'CHARACTER';
 CHAR:                         'CHAR';
@@ -336,6 +343,7 @@ DATABASE:                     'DATABASE';
 DATA:                         'DATA';
 DATAFILE:                     'DATAFILE';
 DATAFILES:                    'DATAFILES';
+DATAGUARDCONFIG:              'DATAGUARDCONFIG';
 DATAMOVEMENT:                 'DATAMOVEMENT';
 DATAOBJNO:                    'DATAOBJNO';
 DATAOBJ_TO_MAT_PARTITION:     'DATAOBJ_TO_MAT_PARTITION';
@@ -408,6 +416,7 @@ DISCARD:                      'DISCARD';
 DISCONNECT:                   'DISCONNECT';
 DISK:                         'DISK';
 DISKGROUP:                    'DISKGROUP';
+DISKGROUP_PLUS:               '\'+ DISKGROUP';
 DISKS:                        'DISKS';
 DISMOUNT:                     'DISMOUNT';
 DISTINCT:                     'DISTINCT';
@@ -430,6 +439,7 @@ DROP_GROUP:                   'DROP_GROUP';
 DSINTERVAL_UNCONSTRAINED:     'DSINTERVAL_UNCONSTRAINED';
 DST_UPGRADE_INSERT_CONV:      'DST_UPGRADE_INSERT_CONV';
 DUMP:                         'DUMP';
+DUMPSET:                      'DUMPSET';
 DUPLICATE:                    'DUPLICATE';
 DV:                           'DV';
 DYNAMIC:                      'DYNAMIC';
@@ -1139,6 +1149,7 @@ OLTP:                         'OLTP';
 OMIT:                         'OMIT';
 ONE:                          'ONE';
 ONLINE:                       'ONLINE';
+ONLINELOG:                    'ONLINELOG';
 ONLY:                         'ONLY';
 ON:                           'ON';
 OPAQUE:                       'OPAQUE';
@@ -1208,6 +1219,7 @@ PACKAGES:                     'PACKAGES';
 PARALLEL_ENABLE:              'PARALLEL_ENABLE';
 PARALLEL_INDEX:               'PARALLEL_INDEX';
 PARALLEL:                     'PARALLEL';
+PARAMETERFILE:                'PARAMETERFILE';
 PARAMETERS:                   'PARAMETERS';
 PARAM:                        'PARAM';
 PARENT:                       'PARENT';
@@ -1509,6 +1521,7 @@ SEMI_TO_INNER:                'SEMI_TO_INNER';
 SEQUENCED:                    'SEQUENCED';
 SEQUENCE:                     'SEQUENCE';
 SEQUENTIAL:                   'SEQUENTIAL';
+SEQ:                          'SEQ';
 SERIALIZABLE:                 'SERIALIZABLE';
 SERIALLY_REUSABLE:            'SERIALLY_REUSABLE';
 SERIAL:                       'SERIAL';
@@ -2177,6 +2190,7 @@ XML:                          'XML';
 XPATHTABLE:                   'XPATHTABLE';
 XS_SYS_CONTEXT:               'XS_SYS_CONTEXT';
 XS:                           'XS';
+XTRANSPORT:                   'XTRANSPORT';
 YEARS:                        'YEARS';
 YEAR:                         'YEAR';
 YES:                          'YES';
@@ -2262,7 +2276,7 @@ APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT ('E' ('+'|'-')? (FLOAT_FRAGMENT | [0-9]+))? 
 
 // Rule #--- <CHAR_STRING> is a base for Rule #065 <char_string_lit> , it incorporates <character_representation>
 // and a superfluous subtoken typecasting of the "QUOTE"
-CHAR_STRING: '\'' (~('\'' | '\r' | '\n') | '\'' '\'' | NEWLINE)* '\'';
+CHAR_STRING: '\''  (~('\'' | '\r' | '\n') | '\'' '\'' | NEWLINE)* '\'';
 
 // Perl-style quoted string, see Oracle SQL reference, chapter String Literals
 CHAR_STRING_PERL    : 'Q' ( QS_ANGLE | QS_BRACE | QS_BRACK | QS_PAREN) -> type(CHAR_STRING);
@@ -2274,8 +2288,6 @@ fragment QS_PAREN   : QUOTE '(' .*? ')' QUOTE ;
 fragment QS_OTHER_CH: ~('<' | '{' | '[' | '(' | ' ' | '\t' | '\n' | '\r');
 
 DELIMITED_ID: '"' (~('"' | '\r' | '\n') | '"' '"')+ '"' ;
-
-// SQL_SPECIAL_CHAR was split into single rules
 
 PERCENT:                   '%';
 AMPERSAND:                 '&';
@@ -2289,8 +2301,6 @@ COMMA:                     ',';
 SOLIDUS:                   '/';
 AT_SIGN:                   '@';
 ASSIGN_OP:                 ':=';
-
-// See OCI reference for more information about this
 
 BINDVAR
     : ':' SIMPLE_LETTER  (SIMPLE_LETTER | [0-9] | '_')*
@@ -2312,76 +2322,41 @@ LESS_THAN_OP:              '<';
 COLON:                     ':';
 SEMICOLON:                 ';';
 
-fragment
-QUESTION_MARK: '?';
-
-// protected UNDERSCORE : '_' SEPARATOR ; // subtoken typecast within <INTRODUCER>
-BAR: '|';
+BAR:       '|';
 EQUALS_OP: '=';
 
-// Rule #532 <SQL_EMBDD_LANGUAGE_CHAR> was split into single rules:
-LEFT_BRACKET: '[';
+LEFT_BRACKET:  '[';
 RIGHT_BRACKET: ']';
 
-//{ Rule #319 <INTRODUCER>
-INTRODUCER
-    : '_' //(SEPARATOR {$type = UNDERSCORE;})?
-    ;
+INTRODUCER: '_';
 
-//{ Rule #479 <SEPARATOR>
-//  It was originally a protected rule set to be filtered out but the <COMMENT> and <'-'> clashed. 
-/*SEPARATOR
-    : '-' -> type('-')
-    | COMMENT -> channel(HIDDEN)
-    | (SPACE | NEWLINE)+ -> channel(HIDDEN)
-    ;*/
-//}
+// Comments https://docs.oracle.com/cd/E11882_01/server.112/e41084/sql_elements006.htm
 
-SPACES: [ \t\r\n]+ -> skip;
+SINGLE_LINE_COMMENT: '--' ~('\r' | '\n')* NEWLINE_EOF                 -> channel(HIDDEN);
+MULTI_LINE_COMMENT:  '/*' .*? '*/'                                    -> channel(HIDDEN);
+// https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve034.htm#SQPUG054
+REMARK_COMMENT:      'REM' {IsNewlineAtPos(-4)}? 'ARK'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF -> channel(HIDDEN);
 
-    
-// Rule #504 <SIMPLE_LETTER> - simple_latin _letter was generalised into SIMPLE_LETTER
-//  Unicode is yet to be implemented - see NSF0
-fragment
-SIMPLE_LETTER
-    : [A-Z]
-    ;
+// https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve032.htm#SQPUG052
+PROMPT_MESSAGE:      'PRO' {IsNewlineAtPos(-4)}? 'MPT'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF;
 
-fragment
-FLOAT_FRAGMENT
-    : UNSIGNED_INTEGER* '.'? UNSIGNED_INTEGER+
-    ;
-
-// Rule #097 <COMMENT>
-
-SINGLE_LINE_COMMENT: '--' ~('\r' | '\n')* (NEWLINE | EOF)   -> channel(HIDDEN);
-MULTI_LINE_COMMENT:  '/*' .*? '*/'                          -> channel(HIDDEN);
-
-// SQL*Plus prompt
-// TODO should be grammar rule, but tricky to implement
-
-PROMPT
-    : 'prompt' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
-    ;
-
+// TODO: should starts with newline
 START_CMD
-    // TODO When using full word START there is a conflict with START WITH in sequences and CONNECT BY queries
-    // 'start' SPACE ( ~( '\r' | '\n') )* (NEWLINE|EOF)
-    : 'sta' SPACE ( ~('\r' | '\n') )* (NEWLINE|EOF)
-    // TODO Single @ conflicts with a database link name, like employees@remote
-    // | '@' ( ~('\r' | '\n') )* (NEWLINE|EOF)
-    | '@@' ( ~('\r' | '\n') )* (NEWLINE|EOF)
+    //: 'STA' 'RT'? SPACE ~('\r' | '\n')* NEWLINE_EOF
+    // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12002.htm
+    // https://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12003.htm
+    : '@' {IsNewlineAtPos(-2)}? '@'? ~('\r' | '\n')* NEWLINE_EOF
     ;
-
-fragment
-NEWLINE: '\r'? '\n';
-    
-fragment
-SPACE: [ \t];
-
-//{ Rule #442 <REGULAR_ID> additionally encapsulates a few STRING_LITs.
-//  Within testLiterals all reserved and non-reserved words are being resolved
 
 REGULAR_ID: SIMPLE_LETTER (SIMPLE_LETTER | '$' | '_' | '#' | [0-9])*;
 
-ZV: '@!' -> channel(HIDDEN);
+SPACES: [ \t\r\n]+ -> channel(HIDDEN);
+
+// Fragment rules
+
+fragment NEWLINE_EOF    : NEWLINE | EOF;
+fragment QUESTION_MARK  : '?';
+fragment SIMPLE_LETTER  : [A-Z];
+fragment FLOAT_FRAGMENT : UNSIGNED_INTEGER* '.'? UNSIGNED_INTEGER+;
+fragment NEWLINE        : '\r'? '\n';
+fragment SPACE          : [ \t];
