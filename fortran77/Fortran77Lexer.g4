@@ -594,41 +594,8 @@ LOGICAL
    ;
 
 
-CONTINUATION
+fragment CONTINUATION
    : ~ ('0' | ' ')
-   ;
-
-
-COMMENT
-   : ('c' | '*' | '!')
-   ;
-
-// '' is used to drop the charater when forming the lexical token
-// Strings are assumed to start with a single quote (') and two
-// single quotes is meant as a literal single quote
-
-SCON
-   : '\'' ('\'' '\'' | ~ ('\'' | '\n' | '\r') | (('\n' | '\r' ('\n')?) '     ' CONTINUATION) ('\n' | '\r' ('\n')?) '     ' CONTINUATION)* '\''
-   ;
-
-
-RCON
-   : '.' (NUM)* (EXPON)?
-   ;
-
-
-NAME
-   : (('i' | 'f' | 'd' | 'g' | 'e') (NUM) + '.') FDESC | (ALNUM +) (ALNUM)*
-   ;
-
-
-fragment ALPHA
-   : ('a' .. 'z') | ('A' .. 'Z')
-   ;
-
-
-fragment NUM
-   : ('0' .. '9')
    ;
 
 
@@ -654,6 +621,39 @@ fragment FDESC
 
 fragment EXPON
    : ('e' | 'd') (SIGN)? (NUM) +
+   ;
+
+
+fragment ALPHA
+   : ('a' .. 'z') | ('A' .. 'Z')
+   ;
+
+
+fragment NUM
+   : ('0' .. '9')
+   ;
+
+// '' is used to drop the charater when forming the lexical token
+// Strings are assumed to start with a single quote (') and two
+// single quotes is meant as a literal single quote
+
+SCON
+   : '\'' ('\'' '\'' | ~ ('\'' | '\n' | '\r') | (('\n' | '\r' ('\n')?) '     ' CONTINUATION) ('\n' | '\r' ('\n')?) '     ' CONTINUATION)* '\''
+   ;
+
+
+RCON
+   : '.' (NUM)* (EXPON)?
+   ;
+
+
+NAME
+   : (('i' | 'f' | 'd' | 'g' | 'e') (NUM) + '.') FDESC | (ALNUM +) (ALNUM)*
+   ;
+
+
+COMMENT
+   : 'c' ~ [\r\n]*
    ;
 
 
