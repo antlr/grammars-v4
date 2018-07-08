@@ -22,6 +22,10 @@
 /**
  * ported to Antlr4 by Tom Everett
  */
+
+/*
+ * Updated by Tom Everett, 2018
+ */
 lexer grammar Fortran77Lexer;
 
 
@@ -613,57 +617,42 @@ RCON
    ;
 
 
-ZCON
-   : 'z' '\'' (HEX) + '\''
-   ;
-
-
 NAME
    : (('i' | 'f' | 'd' | 'g' | 'e') (NUM) + '.') FDESC | (ALNUM +) (ALNUM)*
    ;
 
 
-ALPHA
+fragment ALPHA
    : ('a' .. 'z') | ('A' .. 'Z')
    ;
 
 
-NUM
+fragment NUM
    : ('0' .. '9')
    ;
 
 
-ALNUM
+fragment ALNUM
    : (ALPHA | NUM)
    ;
 
 
-HEX
+fragment HEX
    : (NUM | 'a' .. 'f')
    ;
 
 
-SIGN
+fragment SIGN
    : ('+' | '-')
    ;
 
 
-NOTNL
-   : ~ ('\n' | '\r')
-   ;
-
-
-INTVAL
-   : (NUM) +
-   ;
-
-
-FDESC
+fragment FDESC
    : ('i' | 'f' | 'd') (NUM) + '.' (NUM) + | ('e' | 'g') (NUM) + '.' (NUM) + ('e' (NUM) +)?
    ;
 
 
-EXPON
+fragment EXPON
    : ('e' | 'd') (SIGN)? (NUM) +
    ;
 

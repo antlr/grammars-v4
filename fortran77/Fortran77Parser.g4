@@ -22,6 +22,10 @@
 /**
  * ported to Antlr4 by Tom Everett
  */
+
+/*
+ * Updated by Tom Everett, 2018
+ */
 parser grammar Fortran77Parser;
 
 options
