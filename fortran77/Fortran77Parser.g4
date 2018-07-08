@@ -70,7 +70,7 @@ executableStatement
    ;
 
 programStatement
-   : PROGRAM NAME
+   : PROGRAM NAME EOL
    ;
 
 entryStatement
@@ -112,7 +112,7 @@ subprogramBody
    ;
 
 wholeStatement
-   : LABEL? statement
+   : LABEL? statement EOL
    ;
 
 endStatement

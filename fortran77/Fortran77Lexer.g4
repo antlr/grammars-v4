@@ -657,6 +657,14 @@ COMMENT
    ;
 
 
+STRINGLITERAL
+   : '"' ~ ["\r\n]* '"'
+   ;
+
+EOL
+   : [\r\n] + 
+   ;
+    
 WS
-   : [\r\n\t ] + -> skip
+   : [\t ] + -> skip
    ;
