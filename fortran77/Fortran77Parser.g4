@@ -22,7 +22,10 @@
 /**
  * ported to Antlr4 by Tom Everett
  */
-grammar fortran77;
+parser grammar Fortran77Parser;
+
+options
+   { tokenVocab = Fortran77Lexer; }
 
 program
    : executableUnit +
@@ -63,32 +66,27 @@ executableStatement
    ;
 
 programStatement
-   : 'program' NAME seos
-   | 'PROGRAM' NAME seos
+   : PROGRAM NAME_ seos
    ;
 
 seos
-   : ('\r\n' | '\n')
+   : SEOS
    ;
 
 entryStatement
-   : 'entry' NAME (LPAREN namelist RPAREN)?
-   | 'ENTRY' NAME (LPAREN namelist RPAREN)?
+   : ENTRY NAME (LPAREN namelist RPAREN)?
    ;
 
 functionStatement
-   : (type)? 'function' NAME LPAREN (namelist)? RPAREN seos
-   | (type)? 'FUNCTION' NAME LPAREN (namelist)? RPAREN seos
+   : (type)? FUNCTION NAME LPAREN (namelist)? RPAREN seos
    ;
 
 blockdataStatement
-   : 'block' NAME seos
-   | 'BLOCK' NAME seos
+   : BLOCK NAME seos
    ;
 
 subroutineStatement
-   : 'subroutine' NAME (LPAREN (namelist)? RPAREN)? seos
-   | 'SUBROUTINE' NAME (LPAREN (namelist)? RPAREN)? seos
+   : SUBROUTINE NAME (LPAREN (namelist)? RPAREN)? seos
    ;
 
 namelist
@@ -120,18 +118,15 @@ wholeStatement
    ;
 
 endStatement
-   : (LABEL)? 'end' seos
-   | (LABEL)? 'END' seos
+   : (LABEL)? END seos
    ;
 
 dimensionStatement
-   : 'dimension' arrayDeclarators
-   | 'DIMENSION' arrayDeclarators
+   : DIMENSION arrayDeclarators
    ;
 
 arrayDeclarator
-   : (NAME | 'real') LPAREN arrayDeclaratorExtents RPAREN
-   | (NAME | 'REAL') LPAREN arrayDeclaratorExtents RPAREN
+   : (NAME | REAL) LPAREN arrayDeclaratorExtents RPAREN
    ;
 
 arrayDeclarators
@@ -148,8 +143,7 @@ arrayDeclaratorExtent
    ;
 
 equivalenceStatement
-   : 'equivalence' equivEntityGroup (COMMA equivEntityGroup)*
-   | 'EQUIVALENCE' equivEntityGroup (COMMA equivEntityGroup)*
+   : EQUIVALENCE equivEntityGroup (COMMA equivEntityGroup)*
    ;
 
 equivEntityGroup
@@ -161,8 +155,7 @@ equivEntity
    ;
 
 commonStatement
-   : 'common' (commonBlock (COMMA commonBlock)* | commonItems)
-   | 'COMMON' (commonBlock (COMMA commonBlock)* | commonItems)
+   : COMMON (commonBlock (COMMA commonBlock)* | commonItems)
    ;
 
 commonName
@@ -209,7 +202,7 @@ typeStatementLenSpec
    ;
 
 typename
-   : (('real' | 'REAL') | ('complex' | 'COMPLEX') (STAR ICON?)? | 'double' 'complex' | 'DOUBLE' 'COMPLEX' | 'double' 'precision' | 'DOUBLE' 'PRECISION' | ('integer' | 'INTEGER') | ('logical' | 'LOGICAL'))
+   : (REAL | COMPLEX (STAR ICON?)? | DOUBLE COMPLEX | DOUBLE PRECISION | INTEGER | LOGICAL)
    ;
 
 type
@@ -222,8 +215,7 @@ typenameLen
    ;
 
 pointerStatement
-   : 'pointer' pointerDecl (COMMA pointerDecl)*
-   | 'POINTER' pointerDecl (COMMA pointerDecl)*
+   : POINTER pointerDecl (COMMA pointerDecl)*
    ;
 
 pointerDecl
@@ -231,8 +223,7 @@ pointerDecl
    ;
 
 implicitStatement
-   : 'implicit' (implicitNone | implicitSpecs)
-   | 'IMPLICIT' (implicitNone | implicitSpecs)
+   : IMPLICIT (implicitNone | implicitSpecs)
    ;
 
 implicitSpec
@@ -244,8 +235,7 @@ implicitSpecs
    ;
 
 implicitNone
-   : 'none'
-   | 'NONE'
+   : NONE
    ;
 
 implicitLetter
@@ -267,8 +257,7 @@ lenSpecification
    ;
 
 characterWithLen
-   : 'character' (cwlLen)?
-   | 'CHARACTER' (cwlLen)?
+   : characterExpression (cwlLen)?
    ;
 
 cwlLen
@@ -276,8 +265,7 @@ cwlLen
    ;
 
 parameterStatement
-   : 'parameter' LPAREN paramlist RPAREN
-   | 'PARAMETER' LPAREN paramlist RPAREN
+   : PARAMETER LPAREN paramlist RPAREN
    ;
 
 paramlist
@@ -289,18 +277,15 @@ paramassign
    ;
 
 externalStatement
-   : 'external' namelist
-   | 'EXTERNAL' namelist
+   : EXTERNAL namelist
    ;
 
 intrinsicStatement
-   : 'intrinsic' namelist
-   | 'INTRINSIC' namelist
+   : INTRINSIC namelist
    ;
 
 saveStatement
-   : 'save' (saveEntity (COMMA saveEntity)*)?
-   | 'SAVE' (saveEntity (COMMA saveEntity)*)?
+   : SAVE (saveEntity (COMMA saveEntity)*)?
    ;
 
 saveEntity
@@ -308,8 +293,7 @@ saveEntity
    ;
 
 dataStatement
-   : 'data' dataStatementEntity ((COMMA)? dataStatementEntity)*
-   | 'DATA' dataStatementEntity ((COMMA)? dataStatementEntity)*
+   : DATA dataStatementEntity ((COMMA)? dataStatementEntity)*
    ;
 
 dataStatementItem
@@ -351,8 +335,7 @@ dataImpliedDoListWhat
    ;
 
 gotoStatement
-   : ('goto' | 'go' to) (unconditionalGoto | computedGoto | assignedGoto)
-   | ('GOTO' | 'GO' to) (unconditionalGoto | computedGoto | assignedGoto)
+   : ((GO | GOTO) to) (unconditionalGoto | computedGoto | assignedGoto)
    ;
 
 unconditionalGoto
@@ -376,8 +359,7 @@ assignedGoto
    ;
 
 ifStatement
-   : 'if' LPAREN logicalExpression RPAREN (blockIfStatement | logicalIfStatement | arithmeticIfStatement)
-   | 'IF' LPAREN logicalExpression RPAREN (blockIfStatement | logicalIfStatement | arithmeticIfStatement)
+   : IF LPAREN logicalExpression RPAREN (blockIfStatement | logicalIfStatement | arithmeticIfStatement)
    ;
 
 arithmeticIfStatement
@@ -393,28 +375,23 @@ blockIfStatement
    ;
 
 firstIfBlock
-   : 'then' seos (wholeStatement) +
-   | 'THEN' seos (wholeStatement) +
+   : THEN seos (wholeStatement) +
    ;
 
 elseIfStatement
-   : ('elseif' | 'else' 'if') LPAREN logicalExpression RPAREN 'then' seos (wholeStatement)*
-   | ('ELSEIF' | 'ELSE' 'IF') LPAREN logicalExpression RPAREN 'then' seos (wholeStatement)*
+   : (ELSEIF | (ELSE IF)) LPAREN logicalExpression RPAREN THEN seos (wholeStatement)*
    ;
 
 elseStatement
-   : 'else' seos (wholeStatement)*
-   | 'ELSE' seos (wholeStatement)*
+   : ELSE seos (wholeStatement)*
    ;
 
 endIfStatement
-   : ('endif' | 'end' 'if')
-   | ('ENDIF' | 'END' 'IF')
+   : (ENDIF | END IF)
    ;
 
 doStatement
-   : 'do' (doWithLabel | doWithEndDo)
-   | 'DO' (doWithLabel | doWithEndDo)
+   : DO (doWithLabel | doWithEndDo)
    ;
 
 doVarArgs
@@ -434,38 +411,31 @@ doWithEndDo
    ;
 
 enddoStatement
-   : ('enddo' | 'end' 'do')
-   | ('ENDDO' | 'END' 'DO')
+   : (ENDDO | (END DO))
    ;
 
 continueStatement
-   : 'continue'
-   | 'CONTINUE'
+   : CONTINUE
    ;
 
 stopStatement
-   : 'stop' (ICON | HOLLERITH)?
-   | 'STOP' (ICON | HOLLERITH)?
+   : STOP (ICON | HOLLERITH)?
    ;
 
 pauseStatement
-   : 'pause' (ICON | HOLLERITH)
-   | 'PAUSE' (ICON | HOLLERITH)
+   : PAUSE (ICON | HOLLERITH)
    ;
 
 writeStatement
-   : 'write' LPAREN controlInfoList RPAREN ((COMMA ioList) +)?
-   | 'WRITE' LPAREN controlInfoList RPAREN ((COMMA ioList) +)?
+   : WRITE LPAREN controlInfoList RPAREN ((COMMA ioList) +)?
    ;
 
 readStatement
-   : 'read' (formatIdentifier ((COMMA ioList) +)?)
-   | 'READ' (formatIdentifier ((COMMA ioList) +)?)
+   : READ (formatIdentifier ((COMMA ioList) +)?)
    ;
 
 printStatement
-   : 'print' (formatIdentifier ((COMMA ioList) +)?)
-   | 'PRINT' (formatIdentifier ((COMMA ioList) +)?)
+   : PRINT (formatIdentifier ((COMMA ioList) +)?)
    ;
 
 assignmentStatement
@@ -508,8 +478,7 @@ ioImpliedDoList
    ;
 
 openStatement
-   : 'open' LPAREN openControl (COMMA openControl)* RPAREN
-   | 'OPEN' LPAREN openControl (COMMA openControl)* RPAREN
+   : OPEN LPAREN openControl (COMMA openControl)* RPAREN
    ;
 
 openControl
@@ -526,13 +495,11 @@ openControl
    ;
 
 controlFmt
-   : 'fmt'
-   | 'FMT'
+   : FMT
    ;
 
 controlUnit
-   : 'unit'
-   | 'UNIT'
+   : UNIT
    ;
 
 controlRec
@@ -540,83 +507,67 @@ controlRec
    ;
 
 controlEnd
-   : 'end'
-   | 'END'
+   : END
    ;
 
 controlErr
-   : 'err'
-   | 'ERR'
+   : ERR
    ;
 
 controlIostat
-   : 'iostat'
-   | 'IOSTAT'
+   : IOSTART
    ;
 
 controlFile
-   : 'file'
-   | 'FILE'
+   : FILE
    ;
 
 controlStatus
-   : 'status'
-   | 'STATUS'
+   : STATUS
    ;
 
 controlAccess
-   : 'access'
-   | 'ACCESS'
+   : ACCESS
    ;
 
 controlPosition
-   : 'position'
-   | 'POSITION'
+   : POSITION
    ;
 
 controlForm
-   : 'form'
-   | 'FORM'
+   : FORM
    ;
 
 controlRecl
-   : 'recl'
-   | 'RECL'
+   : RECL
    ;
 
 controlBlank
-   : 'blank'
-   | 'BLANK'
+   : BLANK
    ;
 
 controlExist
-   : 'exist'
-   | 'EXIST'
+   : EXIST
    ;
 
 controlOpened
-   : 'opened'
-   | 'OPENED'
+   : OPENED
    ;
 
 controlNumber
-   : 'number'
-   | 'NUMBER'
+   : NUMBER
    ;
 
 controlNamed
-   : 'named'
-   | 'NAMED'
+   : NAMED
    ;
 
 controlName
-   : 'name'
-   | 'NAME'
+   : NAME
    ;
 
 controlSequential
-   : 'sequential'
-   | 'SEQUETIAL'
+   : SEQUENTIAL
    ;
 
 controlDirect
@@ -624,23 +575,19 @@ controlDirect
    ;
 
 controlFormatted
-   : 'formatted'
-   | 'FORMATTED'
+   : FORMATTED
    ;
 
 controlUnformatted
-   : 'unformatted'
-   | 'UNFORMATTED'
+   : UNFORMATTED
    ;
 
 controlNextrec
-   : 'nextrec'
-   | 'NEXTREC'
+   : NEXTREC
    ;
 
 closeStatement
-   : 'close' LPAREN closeControl (COMMA closeControl)* RPAREN
-   | 'CLOSE' LPAREN closeControl (COMMA closeControl)* RPAREN
+   : CLOSE LPAREN closeControl (COMMA closeControl)* RPAREN
    ;
 
 closeControl
@@ -652,8 +599,7 @@ closeControl
    ;
 
 inquireStatement
-   : 'inquire' LPAREN inquireControl (COMMA inquireControl)* RPAREN
-   | 'INQUIRE' LPAREN inquireControl (COMMA inquireControl)* RPAREN
+   : INQUIRE LPAREN inquireControl (COMMA inquireControl)* RPAREN
    ;
 
 inquireControl
@@ -665,18 +611,15 @@ inquireControl
    ;
 
 backspaceStatement
-   : 'backspace' berFinish
-   | 'BACKSPACE' berFinish
+   : BACKSPACE berFinish
    ;
 
 endfileStatement
-   : 'endfile' berFinish
-   | 'ENDFILE' berFinish
+   : ENDFILE berFinish
    ;
 
 rewindStatement
-   : 'rewind' berFinish
-   | 'REWIND' berFinish
+   : REWIND berFinish
    ;
 
 berFinish
@@ -702,8 +645,7 @@ formatIdentifier
    ;
 
 formatStatement
-   : 'format' LPAREN fmtSpec RPAREN
-   | 'FORMAT' LPAREN fmtSpec RPAREN
+   : FORMAT LPAREN fmtSpec RPAREN
    ;
 
 fmtSpec
@@ -729,8 +671,7 @@ editElement
    ;
 
 statementFunctionStatement
-   : 'let' sfArgs ASSIGN expression
-   | 'LET' sfArgs ASSIGN expression
+   : LET sfArgs ASSIGN expression
    ;
 
 sfArgs
@@ -738,8 +679,7 @@ sfArgs
    ;
 
 callStatement
-   : 'call' subroutineCall
-   | 'CALL' subroutineCall
+   : CALL subroutineCall
    ;
 
 subroutineCall
@@ -756,8 +696,7 @@ callArgument
    ;
 
 returnStatement
-   : 'return' (integerExpr)?
-   | 'RETURN' (integerExpr)?
+   : RETURN (integerExpr)?
    ;
 
 expression
@@ -888,7 +827,7 @@ subscripts
    ;
 
 varRef
-   : (NAME | 'real') (subscripts (substringApp)?)?
+   : (NAME | REAL) (subscripts (substringApp)?)?
    ;
 
 varRefCode
@@ -939,8 +878,7 @@ logicalConstant
 // non-determinisms
 identifier
    : NAME
-   | ('real')
-   | ('REAL')
+   | REAL
    ;
 
 to
@@ -948,447 +886,71 @@ to
    ;
 
 keyword
-   : 'program'
-   | 'PROGRAM'
-   | 'entry'
-   | 'ENTRY'
-   | 'function'
-   | 'FUNCTION'
-   | 'block'
-   | 'BLOCK'
-   | 'subroutine'
-   | 'SUBROUTINE'
-   | 'end'
-   | 'END'
-   | 'dimension'
-   | 'DIMENSION'
-   | 'equivalence'
-   | 'EQUIVALENCE'
-   | 'common'
-   | 'COMMON'
-   | 'real' 'complex'
-   | 'REAL' 'COMPLEX'
-   | 'double'
-   | 'DOUBLE'
-   | 'precision'
-   | 'PRECISION'
-   | 'integer'
-   | 'INTEGER'
-   | 'logical'
-   | 'LOGICAL'
-   | 'pointer'
-   | 'POINTER'
-   | 'implicit'
-   | 'IMPLICIT'
-   | 'none'
-   | 'NONE'
-   | 'character'
-   | 'CHARACTER'
-   | 'parameter'
-   | 'PARAMETER'
-   | 'external'
-   | 'EXTERNAL'
-   | 'intrinsic'
-   | 'INTRINSIC'
-   | 'save'
-   | 'SAVE'
-   | 'data'
-   | 'DATA'
-   | 'assign'
-   | 'ASSIGN'
-   | 'go'
-   | 'GO'
-   | 'if'
-   | 'IF'
-   | 'then'
-   | 'THEN'
-   | 'elseif'
-   | 'ELSEIF'
-   | 'else'
-   | 'ELSE'
-   | 'endif'
-   | 'ENDIF'
-   | 'do'
-   | 'DO'
-   | 'enddo'
-   | 'ENDDO'
-   | 'continue'
-   | 'CONTINUE'
-   | 'stop'
-   | 'STOP'
-   | 'pause'
-   | 'PAUSE'
-   | 'write'
-   | 'WRITE'
-   | 'read'
-   | 'READ'
-   | 'print'
-   | 'PRINT'
-   | 'open'
-   | 'OPEN'
-   | 'fmt'
-   | 'FMT'
-   | 'unit'
-   | 'UNIT'
-   | 'iostat'
-   | 'IOSTAT'
-   | 'file'
-   | 'FILE'
-   | 'status'
-   | 'STATUS'
-   | 'access'
-   | 'ACCESS'
-   | 'position'
-   | 'POSITION'
-   | 'form'
-   | 'FORM'
-   | 'recl'
-   | 'RECL'
-   | 'blank'
-   | 'BLANK'
-   | 'exist'
-   | 'EXIST'
-   | 'opened'
-   | 'OPENED'
-   | 'number'
-   | 'NUMBER'
-   | 'named'
-   | 'NAMED'
-   | 'name'
-   | 'NAME'
-   | 'sequential'
-   | 'SEQUENTIAL'
-   | 'unformatted'
-   | 'UNFORMATTED'
-   | 'nextrec'
-   | 'NEXTREC'
-   | 'close'
-   | 'CLOSE'
-   | 'inquire'
-   | 'INQUIRE'
-   | 'backspace'
-   | 'BACKSPACE'
-   | 'endfile'
-   | 'ENDFILE'
-   | 'rewind'
-   | 'REWIND'
-   | 'format'
-   | 'FORMAT'
-   | 'let'
-   | 'LET'
-   | 'call'
-   | 'CALL'
-   | 'return'
-   | 'RETURN'
-   ;
-
-
-DOLLAR
-   : '$'
-   ;
-
-
-COMMA
-   : ','
-   ;
-
-
-LPAREN
-   : '('
-   ;
-
-
-RPAREN
-   : ')'
-   ;
-
-
-COLON
-   : ':'
-   ;
-
-
-ASSIGN
-   : '='
-   ;
-
-
-MINUS
-   : '-'
-   ;
-
-
-PLUS
-   : '+'
-   ;
-
-
-DIV
-   : '/'
-   ;
-
-
-STAR
-   : '*'
-   ;
-
-
-POWER
-   : '**'
-   ;
-
-
-LNOT
-   : '.not.' | '.NOT.'
-   ;
-
-
-LAND
-   : '.and.' | '.AND.'
-   ;
-
-
-LOR
-   : '.or.' | '.OR.'
-   ;
-
-
-EQV
-   : '.eqv.' | '.EQV.'
-   ;
-
-
-NEQV
-   : '.neqv.' | '.NEQV.'
-   ;
-
-
-XOR
-   : '.xor.' | '.XOR.'
-   ;
-
-
-EOR
-   : '.eor.' | '.EOR.'
-   ;
-
-
-LT
-   : '.lt.' | '.LT.'
-   ;
-
-
-LE
-   : '.le.' | '.LE.'
-   ;
-
-
-GT
-   : '.gt.' | '.GT.'
-   ;
-
-
-GE
-   : '.ge.' | '.GE.'
-   ;
-
-
-NE
-   : '.ne.' | '.NE.'
-   ;
-
-
-EQ
-   : '.eq.' | '.EQ.'
-   ;
-
-
-TRUE
-   : '.true.' | '.TRUE.'
-   ;
-
-
-FALSE
-   : '.false.' | '.FALSE.'
-   ;
-
-
-XCON
-   : 'XCON'
-   ;
-
-
-PCON
-   : 'PCON'
-   ;
-
-
-FCON
-   : 'FCON'
-   ;
-
-
-CCON
-   : 'CCON'
-   ;
-
-
-HOLLERITH
-   : 'HOLLERITH'
-   ;
-
-
-CONCATOP
-   : 'CONCATOP'
-   ;
-
-
-CTRLDIRECT
-   : 'CTRLDIRECT'
-   ;
-
-
-CTRLREC
-   : 'CTRLREC'
-   ;
-
-
-TO
-   : 'TO'
-   ;
-
-
-SUBPROGRAMBLOCK
-   : 'SUBPROGRAMBLOCK'
-   ;
-
-
-DOBLOCK
-   : 'DOBLOCK'
-   ;
-
-
-AIF
-   : 'AIF'
-   ;
-
-
-THENBLOCK
-   : 'THENBLOCK'
-   ;
-
-
-ELSEIF
-   : 'ELSEIF'
-   ;
-
-
-ELSEBLOCK
-   : 'ELSEBLOCK'
-   ;
-
-
-CODEROOT
-   : 'CODEROOT'
-   ;
-
-
-CONTINUATION
-   : ~ ('0' | ' ')
-   ;
-
-
-EOS
-   : (('\r')? '\n')
-   ;
-
-// Fortran 77 doesn't allow for empty lines. Therefore EOS (newline) is NOT
-// part of ignored white spaces. It is only ignored for line continuations.
-
-WS
-   : WHITE -> skip
-   ;
-
-// Fortran 77 comments must start with the character on the first column
-// we keep the comments inside the AST. See parser rules "wholeStatement".
-// We however trim empty comment lines.
-
-COMMENT
-   : ('c' | '*' | '!')
-   ;
-
-// '' is used to drop the charater when forming the lexical token
-// Strings are assumed to start with a single quote (') and two
-// single quotes is meant as a literal single quote
-
-SCON
-   : '\'' ('\'' '\'' | ~ ('\'' | '\n' | '\r') | (('\n' | '\r' ('\n')?) '     ' CONTINUATION) ('\n' | '\r' ('\n')?) '     ' CONTINUATION)* '\''
-   ;
-
-// numeral literal: ICON goes here what to do what to do?
-
-RCON
-   : '.' (NUM)* (EXPON)?
-   ;
-
-
-ZCON
-   : 'z' '\'' (HEX) + '\''
-   ;
-
-// identifier (keyword or variable)
-
-NAME
-   : (('i' | 'f' | 'd' | 'g' | 'e') (NUM) + '.') FDESC | (ALNUM +) (ALNUM)*
-   ;
-
-
-WHITE
-   : (' ' | '\t')
-   ;
-
-
-ALPHA
-   : ('a' .. 'z') | ('A' .. 'Z')
-   ;
-
-// case-insensitive
-
-NUM
-   : ('0' .. '9')
-   ;
-
-
-ALNUM
-   : (ALPHA | NUM)
-   ;
-
-
-HEX
-   : (NUM | 'a' .. 'f')
-   ;
-
-
-SIGN
-   : ('+' | '-')
-   ;
-
-
-NOTNL
-   : ~ ('\n' | '\r')
-   ;
-
-
-INTVAL
-   : (NUM) +
-   ;
-
-
-FDESC
-   : ('i' | 'f' | 'd') (NUM) + '.' (NUM) + | ('e' | 'g') (NUM) + '.' (NUM) + ('e' (NUM) +)?
-   ;
-
-
-EXPON
-   : ('e' | 'd') (SIGN)? (NUM) +
+   : PROGRAM
+   | ENTRY
+   | FUNCTION
+   | BLOCK
+   | SUBROUTINE
+   | END
+   | DIMENSION
+   | EQUIVALENCE
+   | COMMON
+   | REAL
+   | COMPLEX
+   | DOUBLE
+   | PRECISION
+   | INTEGER
+   | LOGICAL
+   | POINTER
+   | IMPLICIT
+   | NONE
+   | CHARACTER
+   | PARAMETER
+   | EXTERNAL
+   | INTRINSIC
+   | SAVE
+   | DATA
+   | ASSIGN
+   | GO
+   | IF
+   | THEN
+   | ELSEIF
+   | ELSE
+   | ENDIF
+   | DO
+   | ENDDO
+   | CONTINUE
+   | STOP
+   | PAUSE
+   | WRITE
+   | READ
+   | PRINT
+   | OPEN
+   | FMT
+   | UNIT
+   | IOSTAT
+   | FILE
+   | STATUS
+   | ACCESS
+   | POSITION
+   | FORM
+   | RECL
+   | BLANK
+   | EXIST
+   | OPENED
+   | NUMBER
+   | NAMED
+   | NAME_
+   | SEQUENTIAL
+   | UNFORMATTED
+   | NEXTREC
+   | CLOSE
+   | INQUIRE
+   | BACKSPACE
+   | ENDFILE
+   | REWIND
+   | FORMAT
+   | LET
+   | CALL
+   | RETURN
    ;

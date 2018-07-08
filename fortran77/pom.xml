@@ -38,7 +38,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>program</entryPoint>
-					<grammarName>fortran77</grammarName>
+					<grammarName>Fortran77</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
