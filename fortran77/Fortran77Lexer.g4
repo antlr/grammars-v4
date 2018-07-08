@@ -595,21 +595,6 @@ CONTINUATION
    ;
 
 
-EOS
-   : (('\r')? '\n')
-   ;
-
-// Fortran 77 doesn't allow for empty lines. Therefore EOS (newline) is NOT
-// part of ignored white spaces. It is only ignored for line continuations.
-
-WS
-   : WHITE -> skip
-   ;
-
-// Fortran 77 comments must start with the character on the first column
-// we keep the comments inside the AST. See parser rules "wholeStatement".
-// We however trim empty comment lines.
-
 COMMENT
    : ('c' | '*' | '!')
    ;
@@ -622,7 +607,6 @@ SCON
    : '\'' ('\'' '\'' | ~ ('\'' | '\n' | '\r') | (('\n' | '\r' ('\n')?) '     ' CONTINUATION) ('\n' | '\r' ('\n')?) '     ' CONTINUATION)* '\''
    ;
 
-// numeral literal: ICON goes here what to do what to do?
 
 RCON
    : '.' (NUM)* (EXPON)?
@@ -633,15 +617,9 @@ ZCON
    : 'z' '\'' (HEX) + '\''
    ;
 
-// identifier (keyword or variable)
 
 NAME
    : (('i' | 'f' | 'd' | 'g' | 'e') (NUM) + '.') FDESC | (ALNUM +) (ALNUM)*
-   ;
-
-
-WHITE
-   : (' ' | '\t')
    ;
 
 
@@ -649,7 +627,6 @@ ALPHA
    : ('a' .. 'z') | ('A' .. 'Z')
    ;
 
-// case-insensitive
 
 NUM
    : ('0' .. '9')
@@ -691,6 +668,6 @@ EXPON
    ;
 
 
-SEOS
-   : [/r/n] +
+WS
+   : [\r\n\t ] + -> skip
    ;

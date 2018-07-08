@@ -66,11 +66,7 @@ executableStatement
    ;
 
 programStatement
-   : PROGRAM NAME_ seos
-   ;
-
-seos
-   : SEOS
+   : PROGRAM NAME
    ;
 
 entryStatement
@@ -78,15 +74,15 @@ entryStatement
    ;
 
 functionStatement
-   : (type)? FUNCTION NAME LPAREN (namelist)? RPAREN seos
+   : (type)? FUNCTION NAME LPAREN (namelist)? RPAREN
    ;
 
 blockdataStatement
-   : BLOCK NAME seos
+   : BLOCK NAME
    ;
 
 subroutineStatement
-   : SUBROUTINE NAME (LPAREN (namelist)? RPAREN)? seos
+   : SUBROUTINE NAME (LPAREN (namelist)? RPAREN)?
    ;
 
 namelist
@@ -94,8 +90,7 @@ namelist
    ;
 
 statement
-   : formatStatement
-   | entryStatement
+   : entryStatement
    | implicitStatement
    | parameterStatement
    | typeStatement
@@ -109,16 +104,15 @@ statement
    ;
 
 subprogramBody
-   : (wholeStatement)* endStatement
+   : wholeStatement + endStatement
    ;
 
 wholeStatement
-   : COMMENT
-   | (LABEL)? statement seos
+   : LABEL? statement
    ;
 
 endStatement
-   : (LABEL)? END seos
+   : LABEL? END
    ;
 
 dimensionStatement
@@ -375,15 +369,15 @@ blockIfStatement
    ;
 
 firstIfBlock
-   : THEN seos (wholeStatement) +
+   : THEN wholeStatement +
    ;
 
 elseIfStatement
-   : (ELSEIF | (ELSE IF)) LPAREN logicalExpression RPAREN THEN seos (wholeStatement)*
+   : (ELSEIF | (ELSE IF)) LPAREN logicalExpression RPAREN THEN wholeStatement +
    ;
 
 elseStatement
-   : ELSE seos (wholeStatement)*
+   : ELSE wholeStatement +
    ;
 
 endIfStatement
@@ -403,7 +397,7 @@ doWithLabel
    ;
 
 doBody
-   : (wholeStatement)*
+   : (wholeStatement) +
    ;
 
 doWithEndDo
@@ -440,7 +434,6 @@ printStatement
 
 assignmentStatement
    : varRef ASSIGN expression
-   |
    ;
 
 controlInfoList
@@ -623,7 +616,7 @@ rewindStatement
    ;
 
 berFinish
-   : ((unitIdentifier EOS) (unitIdentifier) | LPAREN berFinishItem (COMMA berFinishItem)* RPAREN)
+   : (unitIdentifier (unitIdentifier) | LPAREN berFinishItem (COMMA berFinishItem)* RPAREN)
    ;
 
 berFinishItem
