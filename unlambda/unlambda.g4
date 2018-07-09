@@ -32,18 +32,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
 * http://www.madore.org/~david/programs/unlambda/#what_is
 */
+/*
+* https://esolangs.org/wiki/Unlambda
+*/
 
 grammar unlambda;
 
 prog
-   : function
+   : function+
    ;
 
 function
    : apply
-   | constant
    | constant_function
-   | substitution
    | substitution_first_partial
    | substituted_application
    | identity
@@ -61,16 +62,8 @@ apply
    : '`' function
    ;
 
-constant
-   : 'k'
-   ;
-
 constant_function
    : 'k' function
-   ;
-
-substitution
-   : 's'
    ;
 
 substitution_first_partial
@@ -119,7 +112,7 @@ read
 
 
 CHAR
-   : [0-9a-zA-Z]
+   : [0-9a-zA-Z ]
    ;
 
 
