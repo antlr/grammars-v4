@@ -32,7 +32,7 @@ options
    { tokenVocab = Fortran77Lexer; }
 
 program
-   : executableUnit + EOL+
+   : executableUnit + EOL*
    ;
 
 executableUnit
@@ -105,6 +105,7 @@ statement
    | dataStatement
    | (statementFunctionStatement) statementFunctionStatement
    | executableStatement
+   | commentStatement
    ;
 
 subprogramBody
@@ -172,6 +173,10 @@ commonItems
 commonBlock
    : commonName commonItems
    ;
+
+commentStatement
+    : COMMENT
+    ;
 
 typeStatement
    : typename typeStatementNameList
