@@ -32,7 +32,7 @@ options
    { tokenVocab = Fortran77Lexer; }
 
 program
-   : executableUnit +
+   : executableUnit + EOL*
    ;
 
 executableUnit
@@ -105,6 +105,7 @@ statement
    | dataStatement
    | (statementFunctionStatement) statementFunctionStatement
    | executableStatement
+   | commentStatement
    ;
 
 subprogramBody
@@ -172,6 +173,10 @@ commonItems
 commonBlock
    : commonName commonItems
    ;
+
+commentStatement
+    : COMMENT
+    ;
 
 typeStatement
    : typename typeStatementNameList
@@ -425,7 +430,7 @@ pauseStatement
    ;
 
 writeStatement
-   : WRITE LPAREN controlInfoList RPAREN ((COMMA ioList) +)?
+   : WRITE LPAREN controlInfoList RPAREN ((COMMA? ioList) +)?
    ;
 
 readStatement
@@ -882,72 +887,3 @@ to
    : NAME
    ;
 
-keyword
-   : PROGRAM
-   | ENTRY
-   | FUNCTION
-   | BLOCK
-   | SUBROUTINE
-   | END
-   | DIMENSION
-   | EQUIVALENCE
-   | COMMON
-   | REAL
-   | COMPLEX
-   | DOUBLE
-   | PRECISION
-   | INTEGER
-   | LOGICAL
-   | POINTER
-   | IMPLICIT
-   | NONE
-   | CHARACTER
-   | PARAMETER
-   | EXTERNAL
-   | INTRINSIC
-   | SAVE
-   | DATA
-   | ASSIGN
-   | GO
-   | IF
-   | THEN
-   | ELSEIF
-   | ELSE
-   | ENDIF
-   | DO
-   | ENDDO
-   | CONTINUE
-   | STOP
-   | PAUSE
-   | WRITE
-   | READ
-   | PRINT
-   | OPEN
-   | FMT
-   | UNIT
-   | IOSTAT
-   | FILE
-   | STATUS
-   | ACCESS
-   | POSITION
-   | FORM
-   | RECL
-   | BLANK
-   | EXIST
-   | OPENED
-   | NUMBER
-   | NAMED
-   | NAME_
-   | SEQUENTIAL
-   | UNFORMATTED
-   | NEXTREC
-   | CLOSE
-   | INQUIRE
-   | BACKSPACE
-   | ENDFILE
-   | REWIND
-   | FORMAT
-   | LET
-   | CALL
-   | RETURN
-   ;
