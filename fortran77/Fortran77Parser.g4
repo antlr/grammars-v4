@@ -430,7 +430,7 @@ pauseStatement
    ;
 
 writeStatement
-   : WRITE LPAREN controlInfoList RPAREN ((COMMA ioList) +)?
+   : WRITE LPAREN controlInfoList RPAREN ((COMMA? ioList) +)?
    ;
 
 readStatement
