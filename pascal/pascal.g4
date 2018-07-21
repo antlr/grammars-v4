@@ -65,7 +65,7 @@ label
    ;
 
 constantDefinitionPart
-   : CONST (constantDefinition SEMI)+
+   : CONST (constantDefinition SEMI) +
    ;
 
 constantDefinition
@@ -108,7 +108,7 @@ string
    ;
 
 typeDefinitionPart
-   : TYPE (typeDefinition SEMI)+
+   : TYPE (typeDefinition SEMI) +
    ;
 
 typeDefinition
@@ -187,7 +187,7 @@ recordType
    ;
 
 fieldList
-   : fixedPart (SEMI variantPart)? 
+   : fixedPart (SEMI variantPart)?
    | variantPart
    ;
 
@@ -307,15 +307,39 @@ variable
    ;
 
 expression
-   : simpleExpression ((EQUAL | NOT_EQUAL | LT | LE | GE | GT | IN) simpleExpression)*
+   : simpleExpression (relationaloperator expression)?
+   ;
+
+relationaloperator
+   : EQUAL
+   | NOT_EQUAL
+   | LT
+   | LE
+   | GE
+   | GT
+   | IN
    ;
 
 simpleExpression
-   : term ((PLUS | MINUS | OR) term)*
+   : term (additiveoperator simpleExpression)?
+   ;
+
+additiveoperator
+   : PLUS
+   | MINUS
+   | OR
    ;
 
 term
-   : signedFactor ((STAR | SLASH | DIV | MOD | AND) signedFactor)*
+   : signedFactor (multiplicativeoperator term)?
+   ;
+
+multiplicativeoperator
+   : STAR
+   | SLASH
+   | DIV
+   | MOD
+   | AND
    ;
 
 signedFactor
@@ -377,7 +401,8 @@ emptyStatement
    ;
 
 empty
-   :/* empty */
+   :
+   /* empty */
    ;
 
 structuredStatement
