@@ -103,6 +103,11 @@ sign
    | MINUS
    ;
 
+bool
+   : TRUE
+   | FALSE
+   ;
+
 string
    : STRING_LITERAL
    ;
@@ -353,6 +358,7 @@ factor
    | unsignedConstant
    | set
    | NOT factor
+   | bool
    ;
 
 unsignedConstant
@@ -961,6 +967,16 @@ IMPLEMENTATION
    ;
 
 
+TRUE
+   : T R U E
+   ;
+
+
+FALSE
+   : F A L S E
+   ;
+
+
 WS
    : [ \t\r\n] -> skip
    ;
@@ -985,9 +1001,11 @@ STRING_LITERAL
    : '\'' ('\'\'' | ~ ('\''))* '\''
    ;
 
+
 NUM_INT
-   : ('0' .. '9') + 
+   : ('0' .. '9') +
    ;
+
 
 NUM_REAL
    : ('0' .. '9') + (('.' ('0' .. '9') + (EXPONENT)?)? | EXPONENT)
