@@ -1,7 +1,5 @@
-
 lexer grammar CqlLexer;
 
- 
 LR_BRACKET: '(';
 RR_BRACKET: ')';
 
@@ -10,7 +8,6 @@ RC_BRACKET: '}';
 
 LS_BRACKET: '[';
 RS_BRACKET: ']';
-
 
 COMMA: ',';
 SEMI: ';';
@@ -24,7 +21,6 @@ LINE_COMMENT: (
 		| '--' ('\r'? '\n' | EOF)
 	) -> channel(HIDDEN);
 
- 
 DOT: '.';
 STAR: '*';
 DIVIDE: '/';
@@ -33,10 +29,9 @@ PLUS: '+';
 MINUSMINUS: '--';
 MINUS: '-';
 
-
 DQUOTE: '"';
 SQUOTE: '\'';
- 
+
 // Keywords
 K_ADD: A D D | 'ADD';
 K_AGGREGATE: A G G R E G A T E | 'AGGREGATE';
@@ -58,8 +53,6 @@ K_COLUMNFAMILY: C O L U M N F A M I L Y  | 'COLUMNFAMILY';
 K_COMPACT: C O M P A C T  | 'COMPACT';
 K_CONSISTENCY: C O N S I S T E N C Y  | 'CONSISTENCY';
 K_CONTAINS: C O N T A I N S  | 'CONTAINS';
-// K_COUNT: C O U N T  | 'COUNT';
-// K_COUNTER: C O U N T E R  | 'COUNTER';
 K_CREATE: C R E A T E  | 'CREATE';
 K_CUSTOM: C U S T O M  | 'CUSTOM';
 K_DELETE: D E L E T E  | 'DELETE';
@@ -76,7 +69,6 @@ K_FALSE: F A L S E  | 'FALSE';
 K_FILTERING: F I L T E R I N G  | 'FILTERING';
 K_FINALFUNC: F I N A L F U N C  | 'FINALFUNC';
 K_FROM: F R O M  | 'FROM';
-// K_FROZEN: F R O Z E N  | 'FROZEN';
 K_FULL: F U L L  | 'FULL';
 K_FUNCTION: F U N C T I O N  | 'FUNCTION';
 K_FUNCTIONS: F U N C T I O N S  | 'FUNCTIONS';
@@ -84,7 +76,6 @@ K_GRANT: G R A N T  | 'GRANT';
 K_IF: I F  | 'IF';
 K_IN: I N  | 'IN';
 K_INDEX: I N D E X  | 'INDEX';
-// K_INET: I N E T  | 'INET';
 K_INFINITY: I N F I N I T Y  | 'INFINITY';
 K_INITCOND: I N I T C O N D  | 'INITCOND';
 K_INPUT: I N P U T  | 'INPUT';
@@ -98,12 +89,10 @@ K_KEYSPACES: K E Y S P A C E S  | 'KEYSPACES';
 K_LANGUAGE: L A N G U A G E  | 'LANGUAGE';
 K_LEVEL: L E V E L  | 'LEVEL';
 K_LIMIT: L I M I T  | 'LIMIT';
-// K_LIST: L I S T  | 'LIST';
 K_LOCAL_ONE: L O C A L '_' O N E  | 'LOCAL_ONE';
 K_LOCAL_QUORUM: L O C A L '_' Q U O R U M  | 'LOCAL_QUORUM';
 K_LOGGED: L O G G E D  | 'LOGGED';
 K_LOGIN: L O G I N  | 'LOGIN';
-// K_MAP: M A P  | 'MAP';
 K_MATERIALIZED: M A T E R I A L I Z E D  | 'MATERIALIZED';
 K_MODIFY: M O D I F Y  | 'MODIFY';
 K_NAN: N A N  | 'NAN';
@@ -134,14 +123,13 @@ K_ROLES: R O L E S  | 'ROLES';
 K_SCHEMA: S C H E M A  | 'SCHEMA';
 K_SELECT: S E L E C T | 'SELECT';
 K_SET: S E T  | 'SET';
-K_SFUNC: S F U N C  | 'SFUNC'; 
+K_SFUNC: S F U N C  | 'SFUNC';
 K_STATIC: S T A T I C  | 'STATIC';
 K_STORAGE: S T O R A G E  | 'STORAGE';
 K_STYPE: S T Y P E  | 'STYPE';
 K_SUPERUSER: S U P E R U S E R  | 'SUPERUSER';
 K_TABLE: T A B L E  | 'TABLE';
 K_THREE: T H R E E  | 'THREE';
-// K_TIME: T I M E  | 'TIME';
 K_TIMESTAMP: T I M E S T A M P  | 'TIMESTAMP';
 K_TO: T O  | 'TO';
 K_TOKEN: T O K E N  | 'TOKEN';
@@ -155,7 +143,6 @@ K_UNLOGGED: U N L O G G E D  | 'UNLOGGED';
 K_UPDATE: U P D A T E  | 'UPDATE';
 K_USE: U S E  | 'USE';
 K_USER: U S E R  | 'USER';
-
 K_USING: U S I N G  | 'USING';
 K_UUID: U U I D  | 'UUID';
 K_VALUES: V A L U E S  | 'VALUES';
@@ -178,20 +165,16 @@ K_INET: I N E T;
 K_INT: I N T;
 K_LIST: L I S T;
 K_MAP: M A P;
-// K_SET: S E T;
 K_SMALLINT: S M A L L I N T;
 K_TEXT: T E X T;
-// K_TIMESTAMP: T I M E S T A M P;
 K_TIMEUUID: T I M E U U I D;
 K_TIME: T I M E;
 K_TINYINT: T I N Y I N T;
 K_TUPLE: T U P L E;
-// K_UUID: U U I D;
 K_VARCHAR: V A R C H A R;
 K_VARINT: V A R I N T;
- 
 
-fragment A : [aA]; // match either an 'a' or 'A'
+fragment A : [aA];
 fragment B : [bB];
 fragment C : [cC];
 fragment D : [dD];
@@ -223,7 +206,6 @@ fragment CODE_BLOCK_FRAG: '$$' ( ~'$' | ( '$' ~('$') ))*  '$$';
 fragment HEX_4DIGIT: [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F];
 fragment OBJECT_NAME_FRAG: [a-zA-Z][A-Za-z0-9_$]*;
 fragment SQUOTA_STRING:	'\'' ('\\' . | '\'\'' | ~('\'' | '\\'))* '\'';
-
 
 CODE_BLOCK: CODE_BLOCK_FRAG;
 STRING_LITERAL: SQUOTA_STRING;
