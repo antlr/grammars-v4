@@ -1,0 +1,3 @@
+LIST ROLES;
+LIST ROLES 
+OF manager;
