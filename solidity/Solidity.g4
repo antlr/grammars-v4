@@ -31,7 +31,7 @@ version
   : versionConstraint versionConstraint? ;
 
 versionOperator
-  : '^' | '>=' | '>' | '<' | '<=' ;
+  : '^' | '~' | '>=' | '>' | '<' | '<=' | '=' ;
 
 versionConstraint
   : versionOperator? VersionLiteral ;
@@ -56,6 +56,7 @@ contractPart
   : stateVariableDeclaration
   | usingForDeclaration
   | structDefinition
+  | constructorDefinition
   | modifierDefinition
   | functionDefinition
   | eventDefinition
@@ -72,6 +73,9 @@ usingForDeclaration
 structDefinition
   : 'struct' identifier
     '{' ( variableDeclaration ';' (variableDeclaration ';')* )? '}' ;
+
+constructorDefinition
+  : 'constructor' parameterList modifierList block ;
 
 modifierDefinition
   : 'modifier' identifier parameterList? block ;
@@ -138,7 +142,7 @@ functionTypeName
     ( 'returns' functionTypeParameterList )? ;
 
 storageLocation
-  : 'memory' | 'storage' ;
+  : 'memory' | 'storage' | 'calldata';
 
 stateMutability
   : PureKeyword | ConstantKeyword | ViewKeyword | PayableKeyword ;
@@ -157,6 +161,7 @@ statement
   | breakStatement
   | returnStatement
   | throwStatement
+  | emitStatement
   | simpleStatement ;
 
 expressionStatement
@@ -192,8 +197,14 @@ returnStatement
 throwStatement
   : 'throw' ';' ;
 
+emitStatement
+  : 'emit' functionCall ';' ;
+
 variableDeclarationStatement
-  : ( 'var' identifierList | variableDeclaration ) ( '=' expression )? ';';
+  : ( 'var' identifierList | variableDeclaration | '(' variableDeclarationList ')' ) ( '=' expression )? ';';
+
+variableDeclarationList
+  : variableDeclaration? (',' variableDeclaration? )* ;
 
 identifierList
   : '(' ( identifier? ',' )* identifier? ')' ;
@@ -264,6 +275,9 @@ nameValue
 functionCallArguments
   : '{' nameValueList? '}'
   | expressionList? ;
+
+functionCall
+  : expression '(' functionCallArguments ')' ;
 
 assemblyBlock
   : '{' assemblyItem* '}' ;
@@ -358,7 +372,7 @@ BooleanLiteral
   : 'true' | 'false' ;
 
 DecimalNumber
-  : [0-9]+ ( '.' [0-9]* )? ( [eE] [0-9]+ )? ;
+  : ([0-9]+ | ([0-9]* '.' [0-9]+)) ( [eE] [0-9]+ )? ;
 
 HexNumber
   : '0x' HexCharacter+ ;
