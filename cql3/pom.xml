@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>fortran77</artifactId>
+	<artifactId>cql3</artifactId>
 	<packaging>jar</packaging>
-	<name>fortran77 grammar</name>
+	<name>Apache Cassandra CQL 3 grammar</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -18,7 +18,10 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>fortran77.g4</grammars>
+					<includes>
+						<include>CqlLexer.g4</include>
+						<include>CqlParser.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -37,9 +40,10 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>program</entryPoint>
-					<grammarName>Fortran77</grammarName>
+					<entryPoint>root</entryPoint>
+					<grammarName>Cql</grammarName>
 					<packageName></packageName>
+					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

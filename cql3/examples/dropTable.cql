@@ -1,0 +1,1 @@
+DROP TABLE cycling.cyclist_name;
