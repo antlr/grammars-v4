@@ -50,10 +50,12 @@
 				<module>cookie</module>
 				<module>cool</module>
 				<module>cpp</module>
+				<module>cql3</module>
 				<module>creole</module>
 				<module>csharp</module>
 				<module>css3</module>
 				<module>csv</module>
+				<module>databank</module>
 				<module>datetime</module>
 				<module>dcm</module>
 				<module>dice</module>
@@ -120,6 +122,7 @@
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
+				<module>pl0</module>
 				<!-- <module>plsql</module> TODO: required superClass support -->
 				<module>postalcode</module>
 				<module>powerbuilder</module>
@@ -169,6 +172,7 @@
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>tsql</module>
+				<module>tsv</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>ucb-logo</module>

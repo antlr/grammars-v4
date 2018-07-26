@@ -1,3 +1,11 @@
+pragma solidity 0.4.4;
+pragma solidity ^0.4.4;
+pragma solidity ~0.4.4;
+pragma solidity >0.4.4;
+pragma solidity >=0.4.4;
+pragma solidity <0.4.4;
+pragma solidity <=0.4.4;
+pragma solidity =0.4.4;
 
 library a {}
 library b {}
@@ -514,5 +522,31 @@ contract test {
     assembly {
       n := byte(0x0)
     }
+  }
+}
+
+contract test {
+    function() {
+        emit EventCalled(1, 2, 3);
+    }
+}
+
+contract test {
+    constructor(uint a, uint b) withModifier {}
+}
+
+contract test {
+  function () payable {
+    (bytes32 a, uint b) = foo();
+  }
+}
+
+contract test {
+  uint x = .1 ether;
+}
+
+contract test {
+  function () {
+    return();
   }
 }
