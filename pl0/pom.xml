@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>less</artifactId>
+	<artifactId>pl0</artifactId>
 	<packaging>jar</packaging>
-	<name>less grammar</name>
+	<name>khubla.com PL0 grammar</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -18,11 +18,7 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>LessParser.g4</grammars>
-					<includes>
-						<include>LessLexer.g4</include>
-						<include>LessParser.g4</include>
-					</includes>
+					<grammars>pl0.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -41,8 +37,8 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>stylesheet</entryPoint>
-					<grammarName>Less</grammarName>
+					<entryPoint>program</entryPoint>
+					<grammarName>pl0</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
