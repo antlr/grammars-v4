@@ -967,7 +967,7 @@ lock_table
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/truncate-table-transact-sql
 truncate_table
-     : TRUNCATE TABLE  (database_name=id DOT)? (schema_name=id DOT)? table=id
+     : TRUNCATE TABLE table_name
           ( WITH LR_BRACKET
               PARTITIONS LR_BRACKET
                                 (COMMA? (DECIMAL|DECIMAL TO DECIMAL) )+
