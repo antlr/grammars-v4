@@ -130,6 +130,7 @@
 				<module>propcalc</module>
 				<module>properties</module>
 				<module>protobuf3</module>
+				<module>prov-n</module>
 				<module>python2</module>
 				<module>python3</module>
 				<module>python3-js</module>
