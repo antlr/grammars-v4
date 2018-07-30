@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>less</artifactId>
+	<artifactId>prov-n</artifactId>
 	<packaging>jar</packaging>
-	<name>less grammar</name>
+	<name>W3C PROV-O Notation: PROV-N grammar</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -18,11 +18,7 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>LessParser.g4</grammars>
-					<includes>
-						<include>LessLexer.g4</include>
-						<include>LessParser.g4</include>
-					</includes>
+					<grammars>PROV_N.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -41,8 +37,8 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>stylesheet</entryPoint>
-					<grammarName>Less</grammarName>
+					<entryPoint>document</entryPoint>
+					<grammarName>PROV_N</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
