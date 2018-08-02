@@ -1128,14 +1128,14 @@ STRING_USER_NAME:                    (
                                      );
 LOCAL_ID:                            '@'
                                 (
-                                  [A-Z0-9._$]+ 
+                                  [a-zA-Z0-9._$]+ 
                                   | SQUOTA_STRING
                                   | DQUOTA_STRING
                                   | BQUOTA_STRING
                                 );
 GLOBAL_ID:                           '@' '@' 
                                 (
-                                  [A-Z0-9._$]+ 
+                                  [a-zA-Z0-9._$]+ 
                                   | BQUOTA_STRING
                                 );
 
