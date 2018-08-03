@@ -293,7 +293,7 @@ enumerationStmt:
 
 enumerationStmt_Constant : ambiguousIdentifier (WS? EQ WS? valueStmt)? endOfStatement;
 
-eraseStmt : ERASE WS valueStmt;
+eraseStmt : ERASE WS valueStmt (',' WS valueStmt)*?;
 
 errorStmt : ERROR WS valueStmt;
 
