@@ -62,9 +62,7 @@ select 'abc' ' bcd' ' \' \' ' as col, \N c2, -.1e-3;
 
 #begin
 -- -- Variables
-SET @varNum= 1;
-SET @varstring='foo', @varString2='bar', @VARSTRING3='baz';
-SELECT @myvar, @varNum;
+SELECT @myvar;
 #end
 
 #begin

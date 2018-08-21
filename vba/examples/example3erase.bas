@@ -1,3 +1,3 @@
 Public Sub Module()
-    Dim sd As Boolean
+    Dim str As String * 3
 End Sub
