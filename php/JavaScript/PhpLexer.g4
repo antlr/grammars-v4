@@ -135,8 +135,8 @@ HtmlComment: '<' '!' '--' .*? '-->' -> channel(HIDDEN);
 HtmlDtd: '<' '!' .*? '>';
 HtmlOpen: '<' -> pushMode(INSIDE);
 Shebang:
-	{ this._input.LA(-1) <= 0 || this._input.LA(-1) === '\r'.charCodeAt(0) || this._input.LA(-1) === '\n'.charCodeAt(0)
-		}? '#' '!' ~[\r\n]*;
+	'#' { this._input.LA(-2) <= 0 || this._input.LA(-2) == '\r'.charCodeAt(0) || this._input.LA(-2) == '\n'.charCodeAt(0)
+	    }? '!' ~[\r\n]*;
 NumberSign: '#' ~[<]* -> more;
 Error: . -> channel(ErrorLexem);
 
@@ -215,8 +215,8 @@ StyleBody: .*? '</' 'style'? '>' -> popMode;
 
 mode PHP;
 
-PHPEnd: (('?' | {this.AspTags}? '%') '>')
-	| {this._phpScript}? '</script>';
+PHPEnd: ('?' | '%' {this.AspTags}?) '>' '</script>' {this._phpScript}?;
+
 Whitespace: [ \t\r\n]+ -> channel(SkipChannel);
 MultiLineComment: '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:
