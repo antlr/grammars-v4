@@ -28,12 +28,10 @@ lexer grammar PhpLexer;
 
 channels {
 	PhpComments,
-	ErrorLexem,
-	SkipChannel
+	ErrorLexem
 }
 
 @lexer::members {
-
     const old_lexer = PhpLexer;
     PhpLexer = function() {
         old_lexer.apply(this, arguments);
@@ -121,17 +119,16 @@ channels {
 
 }
 
-SeaWhitespace:[ \t\r\n]+ -> channel(HIDDEN);
+SeaWhitespace:[ \t\r\n]+ -> skip;
 HtmlText: ~[<#]+;
 PHPStartEcho:
 	PhpStartEchoFragment -> type(Echo), pushMode(PHP);
-PHPStart:
-	PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
+PHPStart: PhpStartFragment -> skip, pushMode(PHP);
 HtmlScriptOpen:
 	'<' 'script' { this._scriptTag = true } -> pushMode(INSIDE);
 HtmlStyleOpen:
 	'<' 'style' { this._styleTag = true } -> pushMode(INSIDE);
-HtmlComment: '<' '!' '--' .*? '-->' -> channel(HIDDEN);
+HtmlComment: '<' '!' '--' .*? '-->' -> skip;
 HtmlDtd: '<' '!' .*? '>';
 HtmlOpen: '<' -> pushMode(INSIDE);
 Shebang:
@@ -144,8 +141,7 @@ mode INSIDE;
 
 PHPStartEchoInside:
 	PhpStartEchoFragment -> type(Echo), pushMode(PHP);
-PHPStartInside:
-	PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
+PHPStartInside: PhpStartFragment -> skip, pushMode(PHP);
 HtmlClose:
 	'>' {
     this.popMode();
@@ -171,7 +167,7 @@ HtmlStartDoubleQuoteString:
 	'\\'? '"' -> pushMode(HtmlDoubleQuoteStringMode);
 HtmlHex: '#' HexDigit+;
 HtmlDecimal: Digit+;
-HtmlSpace: [ \t\r\n]+ -> channel(HIDDEN);
+HtmlSpace: [ \t\r\n]+ -> skip;
 HtmlName: NameStartChar NameChar*;
 ErrorInside: . -> channel(ErrorLexem);
 
@@ -180,7 +176,7 @@ mode HtmlQuoteStringMode;
 PHPStartEchoInsideQuoteString:
 	PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartInsideQuoteString:
-	PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
+	PhpStartFragment -> skip, pushMode(PHP);
 HtmlEndQuoteString: '\'' '\''? -> popMode;
 HtmlQuoteString: ~[<']+;
 ErrorHtmlQuote: . -> channel(ErrorLexem);
@@ -190,7 +186,7 @@ mode HtmlDoubleQuoteStringMode;
 PHPStartEchoDoubleQuoteString:
 	PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartDoubleQuoteString:
-	PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
+	PhpStartFragment -> skip, pushMode(PHP);
 HtmlEndDoubleQuoteString: '"' '"'? -> popMode;
 HtmlDoubleQuoteString: ~[<"]+;
 ErrorHtmlDoubleQuote: . -> channel(ErrorLexem);
@@ -203,8 +199,7 @@ ScriptText: ~[<]+;
 ScriptClose: '<' '/' 'script'? '>' -> popMode;
 PHPStartInsideScriptEcho:
 	PhpStartEchoFragment -> type(Echo), pushMode(PHP);
-PHPStartInsideScript:
-	PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
+PHPStartInsideScript: PhpStartFragment -> skip, pushMode(PHP);
 ScriptText2: '<' ~[<?/]* -> type(ScriptText);
 ScriptText3: '?' ~[<]* -> type(ScriptText);
 ScriptText4: '/' ~[<]* -> type(ScriptText);
@@ -217,12 +212,12 @@ mode PHP;
 
 PHPEnd: ('?' | '%' {this.AspTags}?) '>' '</script>' {this._phpScript}?;
 
-Whitespace: [ \t\r\n]+ -> channel(SkipChannel);
+Whitespace: [ \t\r\n]+ -> skip;
 MultiLineComment: '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:
-	'//' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
+	'//' -> skip, pushMode(SingleLineCommentMode);
 ShellStyleComment:
-	'#' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
+	'#' -> skip, pushMode(SingleLineCommentMode);
 
 Abstract: 'abstract';
 Array: 'array';
@@ -394,7 +389,7 @@ CloseCurlyBracket:
 	'}' {
 if (this._insideString) {
     this._insideString = false;
-    this.channel(SkipChannel);
+    this.skip;
     this.popMode();
 }
 };
@@ -432,8 +427,8 @@ VarNameInInterpolation:
 	'$' [a-zA-Z_][a-zA-Z_0-9]* -> type(VarName); // TODO: fix such cases: "$people->john"
 DollarString: '$' -> type(StringPart);
 CurlyDollar:
-	'{' {this._input.LA(1) === '$'.charCodeAt(0)}? {this._insideString = true} -> channel(
-		SkipChannel), pushMode(PHP);
+	'{' {this._input.LA(1) === '$'.charCodeAt(0)}? {this._insideString = true} -> channel( HIDDEN),
+		pushMode(PHP);
 CurlyString: '{' -> type(StringPart);
 EscapedChar: '\\' . -> type(StringPart);
 DoubleQuoteInInterpolation: '"' -> type(DoubleQuote), popMode;
@@ -445,8 +440,7 @@ Comment: ~[\r\n?]+ -> channel(PhpComments);
 PHPEndSingleLineComment: '?' '>';
 CommentQuestionMark:
 	'?' -> type(Comment), channel(PhpComments);
-CommentEnd:
-	[\r\n] -> channel(SkipChannel), popMode; // exit from comment.
+CommentEnd: [\r\n] -> skip, popMode; // exit from comment.
 
 mode HereDoc; // TODO: interpolation for heredoc strings.
 
