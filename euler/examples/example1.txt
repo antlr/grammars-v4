@@ -1,0 +1,11 @@
+begin new x;
+ label y;
+  begin new x;
+  		new z;
+		x; (* corresponding declaration on line 3 *)
+		y; (* corresponding declaration on line 2 *)
+		z (* corresponding declaration on line 4 *)
+	end;
+	y: (* corresponding declaration on line 2 *)
+		x (* corresponding declaration on line 1 *)
+	end
