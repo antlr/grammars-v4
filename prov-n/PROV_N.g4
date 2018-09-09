@@ -37,6 +37,11 @@ defaultNamespaceDeclaration
    : 'default' IRI_REF
    ;
 
+/* TODO ambiquity with PREFIX token
+   prefix ex <http://mynamespace> -- is recognized as 'prefix' token QUALIFIED_NAME token and 'namespace' token
+   should check whether it matches PREFX as some chars are not allowed in PREFX
+
+*/
 namespaceDeclaration
    : 'prefix' PREFX namespace
    ;
@@ -50,7 +55,7 @@ bundle
    ;
 
 identifier
-   : QUALIFIED_NAME
+   : PREFX | QUALIFIED_NAME
    ;
 
 expression
@@ -74,7 +79,7 @@ attributeValuePair
    ;
 
 attribute
-   : QUALIFIED_NAME
+   : PREFX | QUALIFIED_NAME
    ;
 
 literal
@@ -87,7 +92,7 @@ typedLiteral
    ;
 
 datatype
-   : QUALIFIED_NAME
+   : PREFX | QUALIFIED_NAME
    ;
 
 convenienceNotation
@@ -221,7 +226,7 @@ membershipExpression
    ;
 
 extensibilityExpression
-   : QUALIFIED_NAME '(' optionalIdentifier extensibilityArgument (',' extensibilityArgument)* optionalAttributeValuePairs ')'
+   : (PREFX|QUALIFIED_NAME) '(' optionalIdentifier extensibilityArgument (',' extensibilityArgument)* optionalAttributeValuePairs ')'
    ;
 
 extensibilityArgument
@@ -285,11 +290,6 @@ GREATER
    ;
 
 
-PREFX
-   : PN_PREFIX
-   ;
-
-
 DOT
    : '.'
    ;
@@ -334,27 +334,31 @@ fragment DIGIT
    ;
 
 
+PREFX
+   : PN_PREFIX
+   ;
+
 QUALIFIED_NAME
    : (PN_PREFIX ':')? PN_LOCAL | PN_PREFIX ':'
    ;
 
 
-PN_LOCAL
+fragment PN_LOCAL
    : (PN_CHARS_U | DIGIT | PN_CHARS_OTHERS) ((PN_CHARS | DOT | PN_CHARS_OTHERS)* (PN_CHARS | PN_CHARS_OTHERS))?
    ;
 
 
-PN_CHARS_OTHERS
+fragment PN_CHARS_OTHERS
    : '/' | '@' | '~' | '&' | '+' | '*' | '?' | '#' | '$' | '!' | PERCENT | PN_CHARS_ESC
    ;
 
 
-PN_CHARS_ESC
+fragment PN_CHARS_ESC
    : '\\' ('=' | '\'' | '(' | ')' | ',' | '-' | ':' | ';' | '[' | ']' | '.')
    ;
 
 
-PERCENT
+fragment PERCENT
    : '%' HEX HEX
    ;
 
