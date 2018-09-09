@@ -461,6 +461,8 @@ expressionList
 
 methodCall
     : IDENTIFIER '(' expressionList? ')'
+    | THIS '(' expressionList? ')'
+    | SUPER '(' expressionList? ')'
     ;
 
 expression

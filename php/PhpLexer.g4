@@ -139,7 +139,7 @@ HtmlComment:    '<' '!' '--' .*? '-->' -> channel(HIDDEN);
 HtmlDtd:        '<' '!' .*? '>';
 HtmlOpen:       '<' -> pushMode(INSIDE);
 Shebang
-    : { _input.LA(-1) <= 0 || _input.LA(-1) == '\r' || _input.LA(-1) == '\n' }? '#' '!' ~[\r\n]*
+    : '#' { _input.LA(-2) <= 0 || _input.LA(-2) == '\r' || _input.LA(-2) == '\n' }? '!' ~[\r\n]*
     ;
 NumberSign:     '#' ~[<]* -> more;
 Error:          .         -> channel(ErrorLexem);
@@ -219,8 +219,8 @@ StyleBody: .*? '</' 'style'? '>' -> popMode;
 
 mode PHP;
 
-PHPEnd:             (('?' | {AspTags}? '%') '>') | {_phpScript}? '</script>'
-      |             {_phpScript}? '</script>';
+PHPEnd:             ('?' | '%' {AspTags}?) '>'
+      |             '</script>' {_phpScript}?;
 Whitespace:         [ \t\r\n]+ -> channel(SkipChannel);
 MultiLineComment:   '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:  '//' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
@@ -414,7 +414,8 @@ VarName:            '$' [a-zA-Z_][a-zA-Z_0-9]*;
 Label:              [a-zA-Z_][a-zA-Z_0-9]*;
 Octal:              '0' [0-7]+;
 Decimal:            Digit+;
-Real:               (Digit+ '.' Digit* | '.' Digit+) ExponentPart? | Digit+ ExponentPart;
+Real:               (Digit+ '.' Digit* | '.' Digit+) ExponentPart?
+    |               Digit+ ExponentPart;
 Hex:                '0x' HexDigit+;
 Binary:             '0b' [01]+;
 

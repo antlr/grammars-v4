@@ -124,6 +124,7 @@
 				<module>php</module>
 				<module>pl0</module>
 				<!-- <module>plsql</module> TODO: required superClass support -->
+				<module>ply</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
 				<module>prolog</module>

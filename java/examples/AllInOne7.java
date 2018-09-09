@@ -447,6 +447,12 @@ class Foo {
 
 // Methods -------------------
 class Foo {
+    public Foo() {
+        System.out.println(Foo.class.getName() + ": constructor runtime");
+    }
+    public Foo(int a, int b) {
+        System.out.println(Foo.class.getName() + ": overloaded constructor " + this());
+    }
     int bar(int a, int b) {
         return (a*2) + b;
     }
@@ -515,6 +521,7 @@ public class CustomClass extends AbstractClass {
     }
 
     public CustomClass() {
+        super();
         System.out.println(CustomClass.class.getName() + ": constructor runtime");
     }
 
