@@ -37,7 +37,7 @@ ply
    ;
 
 header
-   : plydeclaration format (element | property )* end_header
+   : plydeclaration format (element | property)* end_header
    ;
 
 end_header
@@ -53,14 +53,17 @@ element
    ;
 
 property
-    : scalarproperty |listproperty;
+   : scalarproperty
+   | listproperty
+   ;
 
 scalarproperty
    : 'property' type string EOL
    ;
 
 listproperty
-    : 'property' 'list' type type string EOL;
+   : 'property' 'list' type type string EOL
+   ;
 
 type
    : 'char'
@@ -71,6 +74,9 @@ type
    | 'uint'
    | 'float'
    | 'double'
+   | 'float32'
+   | 'uint8'
+   | 'int32'
    ;
 
 plydeclaration
@@ -78,17 +84,19 @@ plydeclaration
    ;
 
 vertices
-    : vertex+;
+   : vertex +
+   ;
 
 faces
-: face+;
+   : face +
+   ;
 
 vertex
    : number number number EOL
    ;
 
 face
-   : number number number number number EOL
+   : number number number number + EOL
    ;
 
 number
@@ -106,7 +114,7 @@ STRING
 
 
 NUMBER
-   : [0-9] +
+   : ('-' | '+')? ('0' .. '9') + ('.' ('0' .. '9') +)?
    ;
 
 
