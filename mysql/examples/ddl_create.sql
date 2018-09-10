@@ -46,6 +46,7 @@ create schema if not exists myschema;
 create schema `select` default character set = utf8;
 create database if not exists `current_date` character set cp1251;
 create database super default character set utf8 collate = utf8_bin character set utf8 collate utf8_bin;
+create database super_cs default charset utf8 collate = utf8_bin character set utf8 collate utf8_bin;
 #end
 #begin
 -- Create event 1
