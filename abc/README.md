@@ -1,4 +1,4 @@
-# Logo Grammar
+# ABC Grammar
 
 An ANTLR4 grammar for [Logo](http://en.wikipedia.org/wiki/Logo_(programming_language)) files.
 
