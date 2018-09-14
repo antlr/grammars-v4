@@ -1,7 +1,5 @@
 /*
-* FOL originally written for Antlr3 by Stephan Opfer
-*
-* Ported to Antlr4 by Tom Everett
+* FOL rewritten for Antlr4 by Kamil Kapałka
 *
 */
 
@@ -10,105 +8,88 @@ grammar fol;
 /*------------------------------------------------------------------
  * PARSER RULES
  *------------------------------------------------------------------*/
-condition
-   : formula EOF
-   ;
 
-formula
-   : ((FORALL | EXISTS) VARIABLE)? disjunction
+ condition
+   :formula (ENDLINE formula)* ENDLINE* EOF
    ;
-
-disjunction
-   : conjunction (OR conjunction)*
-   ;
-
-conjunction
-   : negation (AND negation)*
-   ;
-
-negation
-   : NOT? (predicate | LPAREN formula RPAREN)
-   ;
-
-predicate
-   : PREPOSITION predicateTuple
-   | PREPOSITION
-   ;
-
-predicateTuple
-   : LPAREN term (',' term)* RPAREN
+ formula
+   : formula bin_connective formula 
+   | NOT formula bin_connective formula
+   | NOT formula 
+   | FORALL LPAREN variable RPAREN formula 
+   | EXISTS LPAREN variable RPAREN formula
+   | pred_constant LPAREN term (separator term)* RPAREN
+   | term EQUAL term
    ;
 
 term
-   : function
-   | VARIABLE
+   : ind_constant
+   | variable
+   | func_constant LPAREN term (separator term)* RPAREN
    ;
 
-function
-   : CONSTANT functionTuple
-   | CONSTANT
+bin_connective
+   : CONJ
+   | DISJ
+   | IMPL
+   | BICOND
    ;
-
-functionTuple
-   : LPAREN (CONSTANT | VARIABLE) (',' (CONSTANT | VARIABLE))* RPAREN
+//used in FORALL|EXISTS and following predicates
+variable
+   : '?'CHARACTER*
    ;
-
+//predicate constant - np. _isProfesor(?x)   
+pred_constant
+   : '_'CHARACTER*
+   ;
+//individual constant - used in single predicates
+ind_constant
+   :'#'CHARACTER*
+   ;
+//used to create functions, np. .presidentOf(?America) = #Trump
+func_constant
+   :'.'CHARACTER*
+   ;
 
 LPAREN
-   : '('
+   :'('
    ;
-
-
 RPAREN
-   : ')'
+   :')'
    ;
-
-
-AND
-   : '&'
+separator
+   :','
    ;
-
-
-OR
-   : '|'
+EQUAL
+   :'='
    ;
-
-
 NOT
-   : '!'
+   :'!'
    ;
-
-
 FORALL
-   : 'Forall'
+   :'Forall'
    ;
-
-
 EXISTS
-   : 'Exists'
+   :'Exists'
    ;
-
-
-VARIABLE
-   : '?' (('a' .. 'z') | ('0' .. '9')) CHARACTER*
+CHARACTER
+   :('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z')
    ;
-
-
-CONSTANT
-   : (('a' .. 'z') | ('0' .. '9')) CHARACTER*
+CONJ
+   :'\\/'
    ;
-
-
-PREPOSITION
-   : ('A' .. 'Z') CHARACTER*
+DISJ
+   :'^'
    ;
-
-
-fragment CHARACTER
-   : ('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '_')
+IMPL
+   :'->'
    ;
-
-
-WS
-   : (' ' | '\t' | '\r' | '\n') + -> skip
+BICOND
+   :'<->'
+   ;
+ENDLINE
+   :('\r'|'\n')+
+   ;
+WHITESPACE
+   :(' '|'\t')+->skip
    ;

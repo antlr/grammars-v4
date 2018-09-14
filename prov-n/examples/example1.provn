@@ -1,0 +1,13 @@
+document
+  prefix now <http://www.provbook.org/nownews/>
+  prefix nowpeople <http://www.provbook.org/nownews/people/>
+  prefix bk <http://www.provbook.org/ns/#>
+  prefix govftp <ftp://ftp.bls.gov/pub/special.requests/oes/>
+  prefix void <http://vocab.deri.ie/void#>
+
+  entity(now:employment-article-v1.html)
+  agent(nowpeople:Bob)
+  wasAttributedTo(now:employment-article-v1.html, nowpeople:Bob)
+  entity(govftp:oesm11st.zip, [prov:label="employment-stats-2011", prov:type="void:Dataset"])
+  wasDerivedFrom(now:employment-article-v1.html, govftp:oesm11st.zip, -, -, -)
+endDocument

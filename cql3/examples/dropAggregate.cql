@@ -1,0 +1,1 @@
+DROP AGGREGATE IF EXISTS cycling.avgState;

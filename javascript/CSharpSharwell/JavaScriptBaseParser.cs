@@ -1,5 +1,5 @@
 using Antlr4.Runtime;
-using static PT.PM.JavaScriptParseTreeUst.Parser.JavaScriptParser;
+using static PT.PM.JavaScriptParseTreeUst.JavaScriptParser;
 
 /// <summary>
 /// All parser methods that used in grammar (p, prev, notLineTerminator, etc.)

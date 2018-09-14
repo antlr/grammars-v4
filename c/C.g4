@@ -89,9 +89,9 @@ unaryOperator
     ;
 
 castExpression
-    :   unaryExpression
-    |   '(' typeName ')' castExpression
+    :   '(' typeName ')' castExpression
     |   '__extension__' '(' typeName ')' castExpression
+    |   unaryExpression
     |   DigitSequence // for
     ;
 
@@ -238,6 +238,7 @@ typeSpecifier
     |   enumSpecifier
     |   typedefName
     |   '__typeof__' '(' constantExpression ')' // GCC extension
+    |   typeSpecifier pointer
     ;
 
 structOrUnionSpecifier
@@ -334,6 +335,7 @@ directDeclarator
     |   directDeclarator '(' parameterTypeList ')'
     |   directDeclarator '(' identifierList? ')'
     |   Identifier ':' DigitSequence  // bit field
+    |   '(' typeSpecifier? pointer directDeclarator ')' // function pointer like: (__cdecl *f)
     ;
 
 gccDeclaratorExtension
@@ -476,8 +478,8 @@ blockItemList
     ;
 
 blockItem
-    :   declaration
-    |   statement
+    :   statement
+    |   declaration
     ;
 
 expressionStatement

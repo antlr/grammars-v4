@@ -278,7 +278,7 @@ mode Options;
 	OPT_DOT				: Dot				-> type(DOT)				;
 	OPT_ASSIGN			: Equal				-> type(ASSIGN)				;
 	OPT_STRING_LITERAL	: SQuoteLiteral		-> type(STRING_LITERAL)		;
-	OPT_INT				: Int				-> type(INT)				;
+	OPT_INT				: DecimalNumeral	-> type(INT)				;
 	OPT_STAR			: Star				-> type(STAR)				;
 	OPT_SEMI			: Semi				-> type(SEMI)				;
 
