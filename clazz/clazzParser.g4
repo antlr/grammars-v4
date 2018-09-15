@@ -30,67 +30,16 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-grammar clazz;
+/*
+*  Use encoding 'ISO_8859_1' not 'UTF-8'
+*/
+
+parser grammar clazzParser;
+
+options
+   { tokenVocab = clazzLexer; }
 
 clazz
-   : CC CA CF CE CB CA CB CE 
+   : XCA XFE XBA XBE 
    ;
-
-C0
-    : '\u0000'
-    ;
-
-C1
-    : '\u0001'
-    ;
-
-C2
-    : '\u0002'
-    ;
-
-C3
-    : '\u0003'
-    ;
-
-C4
-    : '\u0004'
-    ;
-
-C5
-    : '\u0005'
-    ;
-C6
-    : '\u0006'
-    ;
-C7
-    : '\u0007'
-    ;
-
-C8
-    : '\u0008'
-    ;
-
-C9
-    : '\u0009'
-    ;
-
-CA
-    : '\u000A'
-    ;
-
-CB
-    : '\u000B'
-    ;
-CC
-    : '\u000C'
-    ;
-CD
-    : '\u000D'
-    ;
-CE
-    : '\u000E'
-    ;
-CF
-    : '\u000F'
-    ;
 
