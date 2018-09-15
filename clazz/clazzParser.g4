@@ -29,7 +29,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 /*
 *  Use encoding 'ISO_8859_1' not 'UTF-8'
 */
@@ -40,6 +39,40 @@ options
    { tokenVocab = clazzLexer; }
 
 clazz
-   : XCA XFE XBA XBE 
+   : magic minor_version major_version constant_pool_count
    ;
 
+minor_version
+   : number
+   ;
+
+major_version
+   : number
+   ;
+
+constant_pool_count
+   : number
+   ;
+
+magic
+   : XCA XFE XBA XBE
+   ;
+
+number
+   : X00
+   | X01
+   | X02
+   | X03
+   | X04
+   | X05
+   | X06
+   | X07
+   | X08
+   | X09
+   | X0A
+   | X0B
+   | X0C
+   | X0D
+   | X0E
+   | X0F
+   ;
