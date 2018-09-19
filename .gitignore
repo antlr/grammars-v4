@@ -11,3 +11,4 @@
 .idea/
 *.iml
 /**/gen
+/.vs
