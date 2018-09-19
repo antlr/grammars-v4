@@ -19,6 +19,10 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<grammars>Cobol85.g4</grammars>
+					<includes>
+						<include>Cobol85.g4</include>
+						<include>Cobol85Preprocessor.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

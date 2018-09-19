@@ -18,7 +18,10 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>MySQL.g4</grammars>
+					<includes>
+						<include>MySqlLexer.g4</include>
+						<include>MySqlParser.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -37,9 +40,10 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>stat</entryPoint>
-					<grammarName>MySQL</grammarName>
+					<entryPoint>root</entryPoint>
+					<grammarName>MySql</grammarName>
 					<packageName></packageName>
+					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

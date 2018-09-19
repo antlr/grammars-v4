@@ -120,8 +120,11 @@ unaryExprNoRoot
 qName  :  nCName (':' nCName)?
   ;
 
+// Does not match NodeType, as per spec.
 functionName
-  :  qName  // Does not match nodeType, as per spec.
+  :  nCName ':' nCName
+  |  NCName
+  |  AxisName
   ;
 
 variableReference
@@ -135,6 +138,7 @@ nameTest:  '*'
 
 nCName  :  NCName
   |  AxisName
+  |  NodeType
   ;
 
 NodeType:  'comment'
@@ -210,7 +214,7 @@ AxisName:  'ancestor'
   APOS   
        :  '\'';
   QUOT   
-       :  '\"';
+       :  '"';
   
 Literal  :  '"' ~'"'* '"'
   |  '\'' ~'\''* '\''

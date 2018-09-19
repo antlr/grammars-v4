@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>tsql</artifactId>
 	<packaging>jar</packaging>
-	<name>tsql grammar</name>
+	<name>T-SQL grammar</name>
 	<parent>
 		<groupId>com.antlr.grammarsv4</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -18,9 +18,10 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>tsql.g4</grammars>
-					<visitor>true</visitor>
-					<listener>true</listener>
+					<includes>
+						<include>TSqlLexer.g4</include>
+						<include>TSqlParser.g4</include>
+					</includes>
 				</configuration>
 				<executions>
 					<execution>
@@ -38,7 +39,8 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>tsql_file</entryPoint>
-					<grammarName>tsql</grammarName>
+					<grammarName>TSql</grammarName>
+					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

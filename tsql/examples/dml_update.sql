@@ -541,3 +541,10 @@ END CATCH;
 IF @@TRANCOUNT > 0
     COMMIT TRANSACTION;
 GO
+
+-- ROWCOUNT
+SET ROWCOUNT 4;
+SELECT *
+FROM Production.ProductInventory
+WHERE Quantity < 300;
+GO

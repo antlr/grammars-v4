@@ -18,7 +18,7 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>jpa.g4</grammars>
+					<grammars>JPA.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

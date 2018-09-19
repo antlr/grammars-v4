@@ -1,0 +1,18 @@
+@font-face {
+  font-family: MyHelvetica;
+  src: local("Helvetica Neue Bold"),
+       local("HelveticaNeue-Bold"),
+       url(MgOpenModernaBold.ttf);
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Ampersand';
+  src: local('Times New Roman');
+  unicode-range: U+26;
+}
+
+div {
+  font-size: 4em;
+  font-family: Ampersand, Helvetica, sans-serif;	
+}

@@ -8,3 +8,6 @@ End Property
 Property Set CurrentObject(J AS Object)
 	Set CurrentObj = J 
 End Property
+
+Public Property Set Bar(a$)
+End Property

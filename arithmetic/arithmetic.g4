@@ -45,7 +45,13 @@ term
    ;
 
 factor
-   : atom (POW atom)*
+   : signedAtom (POW signedAtom)*
+   ;
+
+signedAtom
+   : PLUS signedAtom
+   | MINUS signedAtom
+   | atom
    ;
 
 atom
@@ -55,7 +61,11 @@ atom
    ;
 
 scientific
-   : number (E number)?
+   : SCIENTIFIC_NUMBER
+   ;
+
+variable
+   : VARIABLE
    ;
 
 relop
@@ -64,12 +74,40 @@ relop
    | LT
    ;
 
-number
-   : MINUS? DIGIT + (POINT DIGIT +)?
+
+VARIABLE
+   : VALID_ID_START VALID_ID_CHAR*
    ;
 
-variable
-   : MINUS? LETTER (LETTER | DIGIT)*
+
+fragment VALID_ID_START
+   : ('a' .. 'z') | ('A' .. 'Z') | '_'
+   ;
+
+
+fragment VALID_ID_CHAR
+   : VALID_ID_START | ('0' .. '9')
+   ;
+
+
+SCIENTIFIC_NUMBER
+   : NUMBER (E SIGN? NUMBER)?
+   ;
+
+//The integer part gets its potential sign from the signedAtom rule
+
+fragment NUMBER
+   : ('0' .. '9') + ('.' ('0' .. '9') +)?
+   ;
+
+
+fragment E
+   : 'E' | 'e'
+   ;
+
+
+fragment SIGN
+   : ('+' | '-')
    ;
 
 
@@ -123,26 +161,11 @@ POINT
    ;
 
 
-E
-   : 'e' | 'E'
-   ;
-
-
 POW
    : '^'
    ;
 
 
-LETTER
-   : ('a' .. 'z') | ('A' .. 'Z')
-   ;
-
-
-DIGIT
-   : ('0' .. '9')
-   ;
-
-
 WS
-   : [ \r\n\t] + -> channel (HIDDEN)
+   : [ \r\n\t] + -> skip
    ;

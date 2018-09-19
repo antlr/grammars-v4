@@ -4,11 +4,12 @@
 /**/.settings/
 /**/target
 
-
+# Visual Studio Generated
+.antlr
 .fetch_time_cache
+/.vs
 
 #IntelliJ Idea project files
 .idea/
 *.iml
 /**/gen
-/.vs

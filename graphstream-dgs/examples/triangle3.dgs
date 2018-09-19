@@ -1,0 +1,11 @@
+DGS004
+triangledp 0 6
+
+an A x:0   y:0
+an B x:1   y=0
+an C x=0.5 y=1
+
+ae AB A > B
+ae BC B < C
+ae CA C > A
+

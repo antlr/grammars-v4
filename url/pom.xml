@@ -36,8 +36,8 @@
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>true</showTree>
-					<entryPoint>fragmentaddress</entryPoint>
+					<showTree>false</showTree>
+					<entryPoint>url</entryPoint>
 					<grammarName>url</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
