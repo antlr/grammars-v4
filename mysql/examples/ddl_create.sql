@@ -24,6 +24,7 @@ create table ts_table(
   ts8 TIMESTAMP(6) NOT NULL,
   ts9 TIMESTAMP(6) NOT NULL DEFAULT NOW(6) ON UPDATE NOW(6)
 );
+create table with_check (c1 integer not null,c2 varchar(22),constraint c1 check (c2 in ('a', 'b', 'c')));
 #end
 #begin
 -- Rename table
