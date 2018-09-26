@@ -24,6 +24,7 @@ create table ts_table(
   ts8 TIMESTAMP(6) NOT NULL,
   ts9 TIMESTAMP(6) NOT NULL DEFAULT NOW(6) ON UPDATE NOW(6)
 );
+create table with_check (c1 integer not null,c2 varchar(22),constraint c1 check (c2 in ('a', 'b', 'c')));
 #end
 #begin
 -- Rename table
@@ -46,6 +47,7 @@ create schema if not exists myschema;
 create schema `select` default character set = utf8;
 create database if not exists `current_date` character set cp1251;
 create database super default character set utf8 collate = utf8_bin character set utf8 collate utf8_bin;
+create database super_cs default charset utf8 collate = utf8_bin character set utf8 collate utf8_bin;
 #end
 #begin
 -- Create event 1
