@@ -2,31 +2,35 @@
 grammar wkt;
 
 geometry
-   : (polygonGeometry | lineStringGeometry | pointGeometry | multiPointGeometry | multiLineStringGeometry | multiPolygonGeometry)
+   : (polygonGeometry | lineStringGeometry | pointGeometry | multiPointGeometry | multiLineStringGeometry | multiPolygonGeometry | circularStringGeometry) + EOF
    ;
 
 pointGeometry
-   : POINT LPAR point RPAR EOF
+   : POINT ((name? LPAR point RPAR) | EMPTY)
    ;
 
 lineStringGeometry
-   : LINESTRING lineString EOF
+   : LINESTRING lineString
    ;
 
 polygonGeometry
-   : POLYGON polygon EOF
+   : POLYGON polygon
    ;
 
 multiPointGeometry
-   : MULTIPOINT LPAR pointOrClosedPoint (COMMA pointOrClosedPoint)* RPAR EOF
+   : MULTIPOINT LPAR pointOrClosedPoint (COMMA pointOrClosedPoint)* RPAR
    ;
 
 multiLineStringGeometry
-   : MULTILINESTRING LPAR lineString (COMMA lineString)* RPAR EOF
+   : MULTILINESTRING LPAR lineString (COMMA lineString)* RPAR
    ;
 
 multiPolygonGeometry
-   : MULTIPOLYGON LPAR polygon (COMMA polygon)* RPAR EOF
+   : MULTIPOLYGON ((LPAR polygon (COMMA polygon)* RPAR) | EMPTY)
+   ;
+
+circularStringGeometry
+   : CIRCULARSTRING LPAR point (COMMA point)* RPAR
    ;
 
 pointOrClosedPoint
@@ -43,34 +47,35 @@ lineString
    ;
 
 point
-   : x = Decimal y = Decimal
+   : DECIMAL +
+   ;
+
+name
+   : STRING
    ;
 
 
-/**
- * Coordinates
- */
-Decimal
-   : '-'? IntegerPart (DOT DecimalPart)?
+DECIMAL
+   : '-'? INTEGERPART (DOT DECIMALPART)?
    ;
 
 
-IntegerPart
-   : '0' | NonZeroDigit Digit*
+INTEGERPART
+   : '0' | NONZERODIGIT DIGIT*
    ;
 
 
-DecimalPart
-   : Digit +
+DECIMALPART
+   : DIGIT +
    ;
 
 
-fragment Digit
-   : '0' | NonZeroDigit
+fragment DIGIT
+   : '0' | NONZERODIGIT
    ;
 
 
-fragment NonZeroDigit
+fragment NONZERODIGIT
    : [1-9]
    ;
 
@@ -125,6 +130,51 @@ MULTILINESTRING
 
 MULTIPOLYGON
    : M U L T I P O L Y G O N
+   ;
+
+
+GEOMETRYCOLLECTION
+   : G E O M E T R Y C O L L E C T I O N
+   ;
+
+
+EMPTY
+   : E M P T Y
+   ;
+
+
+CIRCULARSTRING
+   : C I R C U L A R S T R I N G
+   ;
+
+
+COMPOUNDCURVE
+   : C O M P O U N D C U R V E
+   ;
+
+
+CURVEPOLYGON
+   : C U R V E P O L Y G O N
+   ;
+
+
+MULTICURVE
+   : M U L T I C U R V E
+   ;
+
+
+TRIANGLE
+   : T R I A N G L E
+   ;
+
+
+TIN
+   : T I N
+   ;
+
+
+POLYHEDRALSURFACE
+   : P O L Y H E D R A L S U R F A C E
    ;
 
 
@@ -255,6 +305,11 @@ fragment Y
 
 fragment Z
    : ('z' | 'Z')
+   ;
+
+
+STRING
+   : [a-zA-Z] +
    ;
 
 
