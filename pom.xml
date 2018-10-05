@@ -124,6 +124,7 @@
 				<module>php</module>
 				<module>pl0</module>
 				<!-- <module>plsql</module> TODO: required superClass support -->
+				<module>ply</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
 				<module>prolog</module>
@@ -187,6 +188,7 @@
 				<module>vhdl</module>
 				<module>wavefront</module>
 				<module>webidl</module>
+				<module>wkt</module>
 				<module>xml</module>
 				<module>xpath</module>
 				<module>z</module>
