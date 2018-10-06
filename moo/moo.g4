@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar moo;
 
 prog
-   : declaration + '.'
+   : declaration +
    ;
 
 declaration
@@ -56,18 +56,19 @@ declaration
    | noteditdecl
    | createdecl
    | editdecl
+   | addaliasdecl
    ;
 
 programdecl
-   : '@program' name ':' name statement +
+   : '@program' name ':' name statement + '.'
    ;
 
 verbdecl
-   : '@verb' (property ':' name) name name name permissions
+   : '@verb' (property ':' name) name + permissions
    ;
 
 propertydecl
-   : ('@property' | '@prop') property '='? expression permissions
+   : ('@property' | '@prop') property '='? expression? permissions?
    ;
 
 rmpropertydecl
@@ -83,7 +84,7 @@ displaypropertydecl
    ;
 
 kidsdecl
-   : '@kida' name
+   : '@kids' name
    ;
 
 parentdecl
@@ -91,7 +92,7 @@ parentdecl
    ;
 
 describedecl
-   : '@describe' stringliteral 'as' expression
+   : '@describe' property 'as' expression
    ;
 
 contentsdecl
@@ -108,6 +109,10 @@ createdecl
 
 editdecl
    : '@edit' property
+   ;
+
+addaliasdecl
+   : '@addalias' name (',' name)* 'to' expression
    ;
 
 statement
@@ -252,7 +257,7 @@ username
    ;
 
 permissions
-   : ('r' | 'x' | 'd' | 'c') +
+   : PERMISSIONS
    ;
 
 
@@ -358,6 +363,11 @@ DOLLAR
 
 OBJREF
    : '#' [0-9] +
+   ;
+
+
+PERMISSIONS
+   : [rcxd] +
    ;
 
 
