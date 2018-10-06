@@ -30,9 +30,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*
-* https://en.wikipedia.org/wiki/MOO_(programming_language)
-*/
-/*
 * http://www2.iath.virginia.edu/courses/moo/ProgrammersManual.texinfo_4.html
 */
 
@@ -43,7 +40,7 @@ prog
    ;
 
 programdecl
-   : '@program' name ':' verb
+   : '@program' programname ':' verb
    ;
 
 statement
@@ -51,12 +48,13 @@ statement
    | whileblock
    | doblock
    | assignblock
+   | tryblock
    | '{' statement* '}'
-   | command ';'
+   | command SEMICOLON
    ;
 
 ifblock
-   : 'if' condition statement + ('else' statement)? 'endif'
+   : 'if' condition statement + ('else' statement +)? 'endif'
    ;
 
 whileblock
@@ -67,12 +65,16 @@ doblock
    : 'do' statement + 'while' condition
    ;
 
+tryblock
+   : 'try' statement + 'except' prop statement + 'endtry'
+   ;
+
 assignblock
-   : expression '=' expression ';'
+   : prop ASSIGN expression SEMICOLON
    ;
 
 condition
-   : '(' expression relop expression ')'
+   : LPAREN expression relop expression RPAREN
    ;
 
 relop
@@ -84,7 +86,7 @@ relop
    ;
 
 expressionlist
-   : expression (',' expression)*
+   : expression (COMMA expression)*
    ;
 
 expression
@@ -106,10 +108,9 @@ signedAtom
    ;
 
 atom
-   : id
-   | str
+   : stringliteral
    | prop
-   | integer
+   | number
    ;
 
 command
@@ -121,30 +122,26 @@ function
    ;
 
 prop
-   : obj ('.' property)*
+   : objname ('.' propertyname)*
    ;
 
-str
+stringliteral
    : STRINGLITERAL
    ;
 
-obj
+objname
    : STRING
    ;
 
-property
+propertyname
    : STRING
    ;
 
-id
-   : STRING
+number
+   : NUMBER
    ;
 
-integer
-   : INT
-   ;
-
-name
+programname
    : STRING
    ;
 
@@ -223,7 +220,22 @@ POW
    ;
 
 
-INT
+COMMA
+   : ','
+   ;
+
+
+ASSIGN
+   : '='
+   ;
+
+
+SEMICOLON
+   : ';'
+   ;
+
+
+NUMBER
    : [0-9] +
    ;
 
