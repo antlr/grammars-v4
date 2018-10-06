@@ -91,10 +91,13 @@ condition
 
 relop
    : EQ
+   | NEQ
    | GT
    | GTE
    | LT
    | LTE
+   | AND
+   | OR
    ;
 
 expressionlist
@@ -106,7 +109,7 @@ expression
    ;
 
 term
-   : factor ((TIMES | DIV) factor)*
+   : factor ((TIMES | DIV | MOD) factor)*
    ;
 
 factor
@@ -155,16 +158,6 @@ name
    ;
 
 
-STRING
-   : [a-zA-Z] [a-zA-Z0-9!] +
-   ;
-
-
-STRINGLITERAL
-   : '"' ~ ["\r\n]* '"'
-   ;
-
-
 LPAREN
    : '('
    ;
@@ -187,6 +180,11 @@ MINUS
 
 TIMES
    : '*'
+   ;
+
+
+MOD
+   : '%'
    ;
 
 
@@ -220,6 +218,21 @@ EQ
    ;
 
 
+AND
+   : '&&'
+   ;
+
+
+OR
+   : '||'
+   ;
+
+
+NEQ
+   : '!='
+   ;
+
+
 POW
    : '^'
    ;
@@ -237,6 +250,16 @@ ASSIGN
 
 SEMICOLON
    : ';'
+   ;
+
+
+STRING
+   : [a-zA-Z] [a-zA-Z0-9!] +
+   ;
+
+
+STRINGLITERAL
+   : '"' ~ ["\r\n]* '"'
    ;
 
 
