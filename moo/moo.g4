@@ -32,16 +32,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
 * http://www2.iath.virginia.edu/courses/moo/ProgrammersManual.texinfo_4.html
 */
+/*
+* https://www.hayseed.net/MOO/manuals/ProgrammersManual.html
+*/
 
 grammar moo;
 
 prog
-   : programdecl statement + '.'
+   : declaration+  '.'
    ;
 
+declaration
+    : programdecl
+    | verbdecl
+    ;
+
 programdecl
-   : '@program' programname ':' verbname
+   : '@program' programname ':' verbname statement +
    ;
+
+verbdecl
+    : '@verb' programname ':' verbname objname*
+    ;
 
 statement
    : ifblock
