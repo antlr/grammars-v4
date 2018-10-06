@@ -53,6 +53,9 @@ declaration
    | parentdecl
    | describedecl
    | contentsdecl
+   | noteditdecl
+   | createdecl
+   | editdecl
    ;
 
 programdecl
@@ -60,11 +63,11 @@ programdecl
    ;
 
 verbdecl
-   : '@verb' name ':' name +
+   : '@verb' (property ':' name) name name name permissions
    ;
 
 propertydecl
-   : ('@property' | '@prop') property '='? expression
+   : ('@property' | '@prop') property '='? expression permissions
    ;
 
 rmpropertydecl
@@ -88,11 +91,23 @@ parentdecl
    ;
 
 describedecl
-   : '@describe' name 'as' expression
+   : '@describe' stringliteral 'as' expression
    ;
 
 contentsdecl
    : '@contents' name
+   ;
+
+noteditdecl
+   : '@notedit' property
+   ;
+
+createdecl
+   : '@create' sysname 'called' expressionlist
+   ;
+
+editdecl
+   : '@edit' property
    ;
 
 statement
@@ -174,7 +189,12 @@ atom
    | integer
    | real
    | list
+   | objref
    | '(' expression ')'
+   ;
+
+objref
+   : OBJREF
    ;
 
 functioninvocation
@@ -229,6 +249,10 @@ sysname
 
 username
    : STRING
+   ;
+
+permissions
+   : ('r' | 'x' | 'd' | 'c') +
    ;
 
 
@@ -329,6 +353,11 @@ SEMICOLON
 
 DOLLAR
    : '$'
+   ;
+
+
+OBJREF
+   : '#' [0-9] +
    ;
 
 
