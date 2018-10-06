@@ -47,14 +47,25 @@ programdecl
    ;
 
 statement
-   : 'if' paren_expr statement
-   | 'if' paren_expr statement 'else' statement
-   | 'while' paren_expr statement
-   | 'do' statement 'while' paren_expr ';'
+   : ifblock
+   | whileblock
+   | doblock
    | '{' statement* '}'
    | expression ';'
    | ';'
    | command
+   ;
+
+ifblock
+   : 'if' paren_expr statement ('else' statement)?
+   ;
+
+whileblock
+   : 'while' paren_expr statement
+   ;
+
+doblock
+   : 'do' statement 'while' paren_expr ';'
    ;
 
 paren_expr
