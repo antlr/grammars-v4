@@ -50,26 +50,39 @@ statement
    : ifblock
    | whileblock
    | doblock
+   | assignblock
    | '{' statement* '}'
-   | expression ';'
-   | ';'
-   | command
+   | command ';'
    ;
 
 ifblock
-   : 'if' paren_expr statement ('else' statement)?
+   : 'if' condition statement ('else' statement)? 'endif'
    ;
 
 whileblock
-   : 'while' paren_expr statement
+   : 'while' condition statement
    ;
 
 doblock
-   : 'do' statement 'while' paren_expr ';'
+   : 'do' statement 'while' condition
    ;
 
-paren_expr
-   : '(' expression (',' expression)* ')'
+assignblock
+   : expression '=' expression
+   ;
+
+condition
+   : '(' expression relop expression ')'
+   ;
+
+relop
+   : '=='
+   | '<'
+   | '>'
+   ;
+
+expressionlist
+   : expression (',' expression)*
    ;
 
 expression
@@ -95,11 +108,6 @@ atom
    | str
    | var
    | integer
-   | paren_expr
-   ;
-
-assign
-   : id '=' expression
    ;
 
 command
@@ -107,7 +115,7 @@ command
    ;
 
 function
-   : verb (expression ';')?
+   : verb ('(' expressionlist ')')?
    ;
 
 var
