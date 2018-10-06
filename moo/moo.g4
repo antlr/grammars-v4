@@ -123,13 +123,28 @@ signedAtom
 
 atom
    : stringliteral
+   | functioninvocation
    | property
    | integer
    | real
    | list
+   | DOLLAR
+   ;
+
+functioninvocation
+   : name '(' expression ')'
    ;
 
 command
+   : verbinvocation
+   | returncommand
+   ;
+
+returncommand
+   : 'return' expression
+   ;
+
+verbinvocation
    : property ':' verb
    ;
 
@@ -138,7 +153,7 @@ verb
    ;
 
 property
-   : name ('.' name)*
+   : name (('.' name) | '[' expression ']')*
    ;
 
 list
@@ -254,6 +269,11 @@ ASSIGN
 
 SEMICOLON
    : ';'
+   ;
+
+
+DOLLAR
+   : '$'
    ;
 
 
