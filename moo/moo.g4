@@ -56,6 +56,7 @@ declaration
    | noteditdecl
    | createdecl
    | editdecl
+   | addaliasdecl
    ;
 
 programdecl
@@ -91,7 +92,7 @@ parentdecl
    ;
 
 describedecl
-   : '@describe' stringliteral 'as' expression
+   : '@describe' property 'as' expression
    ;
 
 contentsdecl
@@ -108,6 +109,10 @@ createdecl
 
 editdecl
    : '@edit' property
+   ;
+
+addaliasdecl
+   : '@addalias' name (',' name)* 'to' expression
    ;
 
 statement
