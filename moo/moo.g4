@@ -78,7 +78,7 @@ doblock
    ;
 
 forblock
-   : 'for' name 'in' '(' expression ')' statement + 'endfor'
+   : 'for' name 'in' expression statement + 'endfor'
    ;
 
 tryblock
@@ -135,6 +135,7 @@ atom
    | real
    | list
    | DOLLAR
+   | '(' expression ')'
    ;
 
 functioninvocation
@@ -155,7 +156,7 @@ verbinvocation
    ;
 
 verb
-   : name ('(' expressionlist ')')?
+   : name ('(' expressionlist? ')')?
    ;
 
 property
