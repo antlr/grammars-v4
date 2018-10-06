@@ -59,6 +59,7 @@ statement
    : ifblock
    | whileblock
    | doblock
+   | forblock
    | assignblock
    | tryblock
    | command SEMICOLON
@@ -74,6 +75,10 @@ whileblock
 
 doblock
    : 'do' statement + 'while' condition
+   ;
+
+forblock
+   : 'for' name 'in' '(' expression ')' statement + 'endfor'
    ;
 
 tryblock
@@ -132,7 +137,7 @@ atom
    ;
 
 functioninvocation
-   : name '(' expression ')'
+   : name '(' expressionlist ')'
    ;
 
 command
@@ -278,7 +283,7 @@ DOLLAR
 
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9!] +
+   : [a-zA-Z] [a-zA-Z0-9!_] +
    ;
 
 
