@@ -68,7 +68,7 @@ verbdecl
    ;
 
 propertydecl
-   : ('@property' | '@prop') property '='? expression permissions
+   : ('@property' | '@prop') property '='? expression? permissions?
    ;
 
 rmpropertydecl
@@ -84,7 +84,7 @@ displaypropertydecl
    ;
 
 kidsdecl
-   : '@kida' name
+   : '@kids' name
    ;
 
 parentdecl
