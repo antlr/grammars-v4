@@ -56,15 +56,15 @@ statement
    ;
 
 ifblock
-   : 'if' condition statement+ ('else' statement)? 'endif'
+   : 'if' condition statement + ('else' statement)? 'endif'
    ;
 
 whileblock
-   : 'while' condition statement+
+   : 'while' condition statement +
    ;
 
 doblock
-   : 'do' statement+ 'while' condition
+   : 'do' statement + 'while' condition
    ;
 
 assignblock
@@ -80,7 +80,7 @@ relop
    | GT
    | GTE
    | LT
-   | LTE  
+   | LTE
    ;
 
 expressionlist
@@ -108,20 +108,20 @@ signedAtom
 atom
    : id
    | str
-   | var
+   | prop
    | integer
    ;
 
 command
-   : obj ':' function
+   : prop ':' function
    ;
 
 function
    : verb ('(' expressionlist ')')?
    ;
 
-var
-   : obj '.' property
+prop
+   : obj ('.' property)*
    ;
 
 str
@@ -202,13 +202,14 @@ LT
    : '<'
    ;
 
+
 GTE
-   : '>+'
+   : '>='
    ;
 
 
 LTE
-   : '<+'
+   : '<='
    ;
 
 
