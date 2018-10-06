@@ -58,7 +58,7 @@ statement
    ;
 
 paren_expr
-   : '(' expression ')'
+   : '(' expression (',' expression)*  ')'
    ;
 
 expression
