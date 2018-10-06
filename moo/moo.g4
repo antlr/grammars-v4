@@ -179,9 +179,16 @@ real
    ;
 
 name
+   : username
+   | sysname
+   ;
+
+sysname
+   : DOLLAR STRING?
+   ;
+
+username
    : STRING
-   | (DOLLAR STRING)
-   | DOLLAR
    ;
 
 
