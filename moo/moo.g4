@@ -39,21 +39,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar moo;
 
 prog
-   : declaration+  '.'
+   : declaration + '.'
    ;
 
 declaration
-    : programdecl
-    | verbdecl
-    ;
+   : programdecl
+   | verbdecl
+   ;
 
 programdecl
-   : '@program' programname ':' verbname statement +
+   : '@program' name ':' name statement +
    ;
 
 verbdecl
-    : '@verb' programname ':' verbname objname*
-    ;
+   : '@verb' name ':' name +
+   ;
 
 statement
    : ifblock
@@ -122,7 +122,8 @@ signedAtom
 atom
    : stringliteral
    | prop
-   | number
+   | integer
+   | real
    ;
 
 command
@@ -130,34 +131,26 @@ command
    ;
 
 verb
-   : verbname ('(' expressionlist ')')?
+   : name ('(' expressionlist ')')?
    ;
 
 prop
-   : objname ('.' propertyname)*
+   : name ('.' name)*
    ;
 
 stringliteral
    : STRINGLITERAL
    ;
 
-objname
-   : STRING
+integer
+   : INTEGER
    ;
 
-propertyname
-   : STRING
+real
+   : REAL
    ;
 
-number
-   : NUMBER
-   ;
-
-programname
-   : STRING
-   ;
-
-verbname
+name
    : STRING
    ;
 
@@ -247,8 +240,13 @@ SEMICOLON
    ;
 
 
-NUMBER
+INTEGER
    : [0-9] +
+   ;
+
+
+REAL
+   : [0-9] + '.' [0-9] +
    ;
 
 
