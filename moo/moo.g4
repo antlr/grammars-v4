@@ -52,24 +52,34 @@ statement
    | 'while' paren_expr statement
    | 'do' statement 'while' paren_expr ';'
    | '{' statement* '}'
-   | expr ';'
+   | expression ';'
    | ';'
+   | command
    ;
 
 paren_expr
-   : '(' expr ')'
+   : '(' expression ')'
    ;
 
-expr
-   : command
-   | assign
-   ;
-
-assign
-   : id '=' expr
+expression
+   : term ((PLUS | MINUS) term)*
    ;
 
 term
+   : factor ((TIMES | DIV) factor)*
+   ;
+
+factor
+   : signedAtom (POW signedAtom)*
+   ;
+
+signedAtom
+   : PLUS signedAtom
+   | MINUS signedAtom
+   | atom
+   ;
+
+atom
    : id
    | str
    | var
@@ -77,12 +87,16 @@ term
    | paren_expr
    ;
 
-command
-   : obj ':' comm
+assign
+   : id '=' expression
    ;
 
-comm
-   : verb (paren_expr ';')?
+command
+   : obj ':' function
+   ;
+
+function
+   : verb (expression ';')?
    ;
 
 var
@@ -125,6 +139,51 @@ STRING
 
 STRINGLITERAL
    : '"' ~ ["\r\n]* '"'
+   ;
+
+
+LPAREN
+   : '('
+   ;
+
+
+RPAREN
+   : ')'
+   ;
+
+
+PLUS
+   : '+'
+   ;
+
+
+MINUS
+   : '-'
+   ;
+
+
+TIMES
+   : '*'
+   ;
+
+
+DIV
+   : '/'
+   ;
+
+
+GT
+   : '>'
+   ;
+
+
+LT
+   : '<'
+   ;
+
+
+EQ
+   : '='
    ;
 
 
