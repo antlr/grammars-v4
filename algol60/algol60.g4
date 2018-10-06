@@ -246,7 +246,7 @@ designational_expression
 simple_designational_expression
    : label
    | switch_designator
-   | (designational_expression)
+   | designational_expression
    ;
 
 switch_designator
