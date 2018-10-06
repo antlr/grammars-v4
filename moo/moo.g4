@@ -90,7 +90,7 @@ assignblock
    ;
 
 condition
-   : LPAREN expression relop expression RPAREN
+   : LPAREN expression (relop expression)* RPAREN
    ;
 
 relop
