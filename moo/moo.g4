@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar moo;
 
 prog
-   : programdecl statement +
+   : programdecl statement + '.'
    ;
 
 programdecl
@@ -62,19 +62,11 @@ paren_expr
 
 expr
    : command
-   | test
-   | (id '=' expr)
+   | assign
    ;
 
-test
-   : sum
-   | sum '<' sum
-   ;
-
-sum
-   : term
-   | sum '+' term
-   | sum '-' term
+assign
+   : id '=' expr
    ;
 
 term
@@ -86,7 +78,11 @@ term
    ;
 
 command
-   : obj ':' verb
+   : obj ':' comm
+   ;
+
+comm
+   : verb (paren_expr ';')?
    ;
 
 var
