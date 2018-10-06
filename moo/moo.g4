@@ -129,6 +129,7 @@ signedAtom
 atom
    : stringliteral
    | functioninvocation
+   | verbinvocation
    | property
    | integer
    | real
