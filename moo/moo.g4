@@ -45,6 +45,14 @@ prog
 declaration
    : programdecl
    | verbdecl
+   | propertydecl
+   | rmpropertydecl
+   | setpropertydecl
+   | displaypropertydecl
+   | kidsdecl
+   | parentdecl
+   | describedecl
+   | contentsdecl
    ;
 
 programdecl
@@ -53,6 +61,38 @@ programdecl
 
 verbdecl
    : '@verb' name ':' name +
+   ;
+
+propertydecl
+   : ('@property' | '@prop') property '='? expression
+   ;
+
+rmpropertydecl
+   : ('@rmproperty' | '@rmprop') name
+   ;
+
+setpropertydecl
+   : '@set' property 'to' expression
+   ;
+
+displaypropertydecl
+   : ('@display' | '@disp') property
+   ;
+
+kidsdecl
+   : '@kida' name
+   ;
+
+parentdecl
+   : '@parent' name
+   ;
+
+describedecl
+   : '@describe' name 'as' expression
+   ;
+
+contentsdecl
+   : '@contents' name
    ;
 
 statement
