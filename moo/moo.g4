@@ -45,6 +45,17 @@ prog
 declaration
    : programdecl
    | verbdecl
+   | propertydecl
+   | rmpropertydecl
+   | setpropertydecl
+   | displaypropertydecl
+   | kidsdecl
+   | parentdecl
+   | describedecl
+   | contentsdecl
+   | noteditdecl
+   | createdecl
+   | editdecl
    ;
 
 programdecl
@@ -52,7 +63,51 @@ programdecl
    ;
 
 verbdecl
-   : '@verb' name ':' name +
+   : '@verb' (property ':' name) name name name permissions
+   ;
+
+propertydecl
+   : ('@property' | '@prop') property '='? expression permissions
+   ;
+
+rmpropertydecl
+   : ('@rmproperty' | '@rmprop') name
+   ;
+
+setpropertydecl
+   : '@set' property 'to' expression
+   ;
+
+displaypropertydecl
+   : ('@display' | '@disp') property
+   ;
+
+kidsdecl
+   : '@kida' name
+   ;
+
+parentdecl
+   : '@parent' name
+   ;
+
+describedecl
+   : '@describe' stringliteral 'as' expression
+   ;
+
+contentsdecl
+   : '@contents' name
+   ;
+
+noteditdecl
+   : '@notedit' property
+   ;
+
+createdecl
+   : '@create' sysname 'called' expressionlist
+   ;
+
+editdecl
+   : '@edit' property
    ;
 
 statement
@@ -134,7 +189,12 @@ atom
    | integer
    | real
    | list
+   | objref
    | '(' expression ')'
+   ;
+
+objref
+   : OBJREF
    ;
 
 functioninvocation
@@ -189,6 +249,10 @@ sysname
 
 username
    : STRING
+   ;
+
+permissions
+   : ('r' | 'x' | 'd' | 'c') +
    ;
 
 
@@ -289,6 +353,11 @@ SEMICOLON
 
 DOLLAR
    : '$'
+   ;
+
+
+OBJREF
+   : '#' [0-9] +
    ;
 
 
