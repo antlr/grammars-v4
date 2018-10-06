@@ -59,14 +59,14 @@ statement
    : ifblock
    | whileblock
    | doblock
+   | forblock
    | assignblock
    | tryblock
-   | '{' statement* '}'
    | command SEMICOLON
    ;
 
 ifblock
-   : 'if' condition statement + ('else' statement +)? 'endif'
+   : 'if' condition statement + ('else' statement +)? 'endif' ';'?
    ;
 
 whileblock
@@ -75,6 +75,10 @@ whileblock
 
 doblock
    : 'do' statement + 'while' condition
+   ;
+
+forblock
+   : 'for' name 'in' expression statement + 'endfor'
    ;
 
 tryblock
@@ -86,7 +90,7 @@ assignblock
    ;
 
 condition
-   : LPAREN expression relop expression RPAREN
+   : LPAREN expression (relop expression)* RPAREN
    ;
 
 relop
@@ -124,21 +128,42 @@ signedAtom
 
 atom
    : stringliteral
+   | functioninvocation
+   | verbinvocation
    | property
    | integer
    | real
+   | list
+   | '(' expression ')'
+   ;
+
+functioninvocation
+   : name '(' expressionlist ')'
    ;
 
 command
+   : verbinvocation
+   | returncommand
+   ;
+
+returncommand
+   : 'return' expression
+   ;
+
+verbinvocation
    : property ':' verb
    ;
 
 verb
-   : name ('(' expressionlist ')')?
+   : name ('(' expressionlist? ')')?
    ;
 
 property
-   : name ('.' name)*
+   : name (('.' name) | '[' expression ']')*
+   ;
+
+list
+   : '{' expressionlist? '}'
    ;
 
 stringliteral
@@ -154,6 +179,15 @@ real
    ;
 
 name
+   : username
+   | sysname
+   ;
+
+sysname
+   : DOLLAR STRING?
+   ;
+
+username
    : STRING
    ;
 
@@ -253,8 +287,13 @@ SEMICOLON
    ;
 
 
+DOLLAR
+   : '$'
+   ;
+
+
 STRING
-   : [a-zA-Z] [a-zA-Z0-9!] +
+   : [a-zA-Z] [a-zA-Z0-9!_] +
    ;
 
 
