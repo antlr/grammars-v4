@@ -61,7 +61,6 @@ statement
    | doblock
    | assignblock
    | tryblock
-   | '{' statement* '}'
    | command SEMICOLON
    ;
 
@@ -127,6 +126,7 @@ atom
    | property
    | integer
    | real
+   | list
    ;
 
 command
@@ -139,6 +139,10 @@ verb
 
 property
    : name ('.' name)*
+   ;
+
+list
+   : '{' name* '}'
    ;
 
 stringliteral
