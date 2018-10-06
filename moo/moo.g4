@@ -32,15 +32,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
 * http://www2.iath.virginia.edu/courses/moo/ProgrammersManual.texinfo_4.html
 */
+/*
+* https://www.hayseed.net/MOO/manuals/ProgrammersManual.html
+*/
 
 grammar moo;
 
 prog
-   : programdecl statement + '.'
+   : declaration + '.'
+   ;
+
+declaration
+   : programdecl
+   | verbdecl
    ;
 
 programdecl
-   : '@program' programname ':' verb
+   : '@program' name ':' name statement +
+   ;
+
+verbdecl
+   : '@verb' name ':' name +
    ;
 
 statement
@@ -66,11 +78,11 @@ doblock
    ;
 
 tryblock
-   : 'try' statement + 'except' prop statement + 'endtry'
+   : 'try' statement + 'except' property statement + 'endtry'
    ;
 
 assignblock
-   : prop ASSIGN expression SEMICOLON
+   : property ASSIGN expression SEMICOLON
    ;
 
 condition
@@ -79,10 +91,13 @@ condition
 
 relop
    : EQ
+   | NEQ
    | GT
    | GTE
    | LT
    | LTE
+   | AND
+   | OR
    ;
 
 expressionlist
@@ -94,7 +109,7 @@ expression
    ;
 
 term
-   : factor ((TIMES | DIV) factor)*
+   : factor ((TIMES | DIV | MOD) factor)*
    ;
 
 factor
@@ -109,54 +124,37 @@ signedAtom
 
 atom
    : stringliteral
-   | prop
-   | number
+   | property
+   | integer
+   | real
    ;
 
 command
-   : prop ':' function
+   : property ':' verb
    ;
 
-function
-   : verb ('(' expressionlist ')')?
+verb
+   : name ('(' expressionlist ')')?
    ;
 
-prop
-   : objname ('.' propertyname)*
+property
+   : name ('.' name)*
    ;
 
 stringliteral
    : STRINGLITERAL
    ;
 
-objname
+integer
+   : INTEGER
+   ;
+
+real
+   : REAL
+   ;
+
+name
    : STRING
-   ;
-
-propertyname
-   : STRING
-   ;
-
-number
-   : NUMBER
-   ;
-
-programname
-   : STRING
-   ;
-
-verb
-   : STRING
-   ;
-
-
-STRING
-   : [a-zA-Z] [a-zA-Z0-9!] +
-   ;
-
-
-STRINGLITERAL
-   : '"' ~ ["\r\n]* '"'
    ;
 
 
@@ -182,6 +180,11 @@ MINUS
 
 TIMES
    : '*'
+   ;
+
+
+MOD
+   : '%'
    ;
 
 
@@ -215,6 +218,21 @@ EQ
    ;
 
 
+AND
+   : '&&'
+   ;
+
+
+OR
+   : '||'
+   ;
+
+
+NEQ
+   : '!='
+   ;
+
+
 POW
    : '^'
    ;
@@ -235,8 +253,28 @@ SEMICOLON
    ;
 
 
-NUMBER
+STRING
+   : [a-zA-Z] [a-zA-Z0-9!] +
+   ;
+
+
+STRINGLITERAL
+   : '"' ~ ["\r\n]* '"'
+   ;
+
+
+INTEGER
    : [0-9] +
+   ;
+
+
+REAL
+   : [0-9] + '.' [0-9] +
+   ;
+
+
+COMMENT
+   : ';' ~ [\r\n]* -> skip
    ;
 
 
