@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar moo;
 
 prog
-   : declaration + '.'
+   : declaration +
    ;
 
 declaration
@@ -59,11 +59,11 @@ declaration
    ;
 
 programdecl
-   : '@program' name ':' name statement +
+   : '@program' name ':' name statement + '.'
    ;
 
 verbdecl
-   : '@verb' (property ':' name) name name name permissions
+   : '@verb' (property ':' name) name + permissions
    ;
 
 propertydecl
@@ -252,7 +252,7 @@ username
    ;
 
 permissions
-   : ('r' | 'x' | 'd' | 'c') +
+   : PERMISSIONS
    ;
 
 
@@ -358,6 +358,11 @@ DOLLAR
 
 OBJREF
    : '#' [0-9] +
+   ;
+
+
+PERMISSIONS
+   : [rcxd] +
    ;
 
 
