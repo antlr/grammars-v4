@@ -78,11 +78,11 @@ doblock
    ;
 
 tryblock
-   : 'try' statement + 'except' prop statement + 'endtry'
+   : 'try' statement + 'except' property statement + 'endtry'
    ;
 
 assignblock
-   : prop ASSIGN expression SEMICOLON
+   : property ASSIGN expression SEMICOLON
    ;
 
 condition
@@ -121,20 +121,20 @@ signedAtom
 
 atom
    : stringliteral
-   | prop
+   | property
    | integer
    | real
    ;
 
 command
-   : prop ':' verb
+   : property ':' verb
    ;
 
 verb
    : name ('(' expressionlist ')')?
    ;
 
-prop
+property
    : name ('.' name)*
    ;
 
