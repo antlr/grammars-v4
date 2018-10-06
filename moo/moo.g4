@@ -66,7 +66,7 @@ statement
    ;
 
 ifblock
-   : 'if' condition statement + ('else' statement +)? 'endif'
+   : 'if' condition statement + ('else' statement +)? 'endif' ';'?
    ;
 
 whileblock
@@ -134,7 +134,6 @@ atom
    | integer
    | real
    | list
-   | DOLLAR
    | '(' expression ')'
    ;
 
@@ -164,7 +163,7 @@ property
    ;
 
 list
-   : '{' name* '}'
+   : '{' expressionlist? '}'
    ;
 
 stringliteral
@@ -181,6 +180,8 @@ real
 
 name
    : STRING
+   | (DOLLAR STRING)
+   | DOLLAR
    ;
 
 
