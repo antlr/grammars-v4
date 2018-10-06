@@ -40,7 +40,7 @@ prog
    ;
 
 programdecl
-   : '@program' programname ':' verb
+   : '@program' programname ':' verbname
    ;
 
 statement
@@ -114,11 +114,11 @@ atom
    ;
 
 command
-   : prop ':' function
+   : prop ':' verb
    ;
 
-function
-   : verb ('(' expressionlist ')')?
+verb
+   : verbname ('(' expressionlist ')')?
    ;
 
 prop
@@ -145,7 +145,7 @@ programname
    : STRING
    ;
 
-verb
+verbname
    : STRING
    ;
 
