@@ -29,11 +29,21 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/*
+* https://en.wikipedia.org/wiki/MOO_(programming_language)
+*/
+/*
+* http://www2.iath.virginia.edu/courses/moo/ProgrammersManual.texinfo_4.html
+*/
 
 grammar moo;
 
-program
-   : statement +
+prog
+   : programdecl statement +
+   ;
+
+programdecl
+   : '@program' name ':' verb
    ;
 
 statement
@@ -51,8 +61,9 @@ paren_expr
    ;
 
 expr
-   : test
-   | id '=' expr
+   : command
+   | test
+   | (id '=' expr)
    ;
 
 test
@@ -68,8 +79,30 @@ sum
 
 term
    : id
+   | str
+   | var
    | integer
    | paren_expr
+   ;
+
+command
+   : obj ':' verb
+   ;
+
+var
+   : obj '.' property
+   ;
+
+str
+   : STRINGLITERAL
+   ;
+
+obj
+   : STRING
+   ;
+
+property
+   : STRING
    ;
 
 id
@@ -80,15 +113,29 @@ integer
    : INT
    ;
 
+name
+   : STRING
+   ;
+
+verb
+   : STRING
+   ;
+
 
 STRING
-   : [a-z]+
+   : [a-zA-Z] [a-zA-Z0-9!] +
+   ;
+
+
+STRINGLITERAL
+   : '"' ~ ["\r\n]* '"'
    ;
 
 
 INT
    : [0-9] +
    ;
+
 
 WS
    : [ \r\n\t] -> skip
