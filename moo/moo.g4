@@ -56,19 +56,19 @@ statement
    ;
 
 ifblock
-   : 'if' condition statement ('else' statement)? 'endif'
+   : 'if' condition statement+ ('else' statement)? 'endif'
    ;
 
 whileblock
-   : 'while' condition statement
+   : 'while' condition statement+
    ;
 
 doblock
-   : 'do' statement 'while' condition
+   : 'do' statement+ 'while' condition
    ;
 
 assignblock
-   : expression '=' expression
+   : expression '=' expression ';'
    ;
 
 condition
@@ -76,9 +76,11 @@ condition
    ;
 
 relop
-   : '=='
-   | '<'
-   | '>'
+   : EQ
+   | GT
+   | GTE
+   | LT
+   | LTE  
    ;
 
 expressionlist
@@ -200,9 +202,18 @@ LT
    : '<'
    ;
 
+GTE
+   : '>+'
+   ;
+
+
+LTE
+   : '<+'
+   ;
+
 
 EQ
-   : '='
+   : '=='
    ;
 
 
