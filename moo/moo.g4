@@ -48,6 +48,7 @@ statement
    | whileblock
    | doblock
    | assignblock
+   | tryblock
    | '{' statement* '}'
    | command SEMICOLON
    ;
@@ -62,6 +63,10 @@ whileblock
 
 doblock
    : 'do' statement + 'while' condition
+   ;
+
+tryblock
+   : 'try' statement + 'except' prop statement + 'endtry'
    ;
 
 assignblock
