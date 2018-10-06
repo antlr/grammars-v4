@@ -240,6 +240,11 @@ NUMBER
    ;
 
 
+COMMENT
+   : ';' ~ [\r\n]* -> skip
+   ;
+
+
 WS
    : [ \r\n\t] -> skip
    ;
