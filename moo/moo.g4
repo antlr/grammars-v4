@@ -92,7 +92,7 @@ parentdecl
    ;
 
 describedecl
-   : '@describe' property 'as' expression
+   : '@describe' (property | stringliteral) 'as' expression
    ;
 
 contentsdecl
@@ -196,6 +196,7 @@ atom
    | list
    | objref
    | '(' expression ')'
+   | ('!' expression)
    ;
 
 objref
@@ -377,7 +378,7 @@ STRING
 
 
 STRINGLITERAL
-   : '"' ~ ["\r\n]* '"'
+   : '"' ~ ["]* '"'
    ;
 
 
