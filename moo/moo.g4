@@ -60,7 +60,12 @@ declaration
    ;
 
 programdecl
-   : '@program' name ':' name statement + '.'
+   : '@program' programname ':' name statement + '.'
+   ;
+
+programname
+   : name
+   | stringliteral
    ;
 
 verbdecl
@@ -92,7 +97,7 @@ parentdecl
    ;
 
 describedecl
-   : '@describe' (property | stringliteral) 'as' expression
+   : '@describe' property 'as' expression
    ;
 
 contentsdecl
@@ -225,7 +230,12 @@ verb
    ;
 
 property
-   : name (('.' name) | '[' expression ']')*
+   : propertyname (('.' name) | '[' expression ']')*
+   ;
+
+propertyname
+   : name
+   | stringliteral
    ;
 
 list
