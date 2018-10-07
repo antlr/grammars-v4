@@ -106,6 +106,7 @@
 				<module>modelica</module>
 				<module>modula2pim4</module>
 				<module>molecule</module>
+				<module>moo</module>
 				<module>morsecode</module>
 				<module>mps</module>
 				<module>mumath</module>
