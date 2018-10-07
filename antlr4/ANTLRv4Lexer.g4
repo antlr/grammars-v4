@@ -470,7 +470,7 @@ OPT_STRING_LITERAL
    ;
 
 OPT_INT
-   : Int -> type (INT)
+   : DecimalNumeral -> type (INT)
    ;
 
 OPT_STAR
