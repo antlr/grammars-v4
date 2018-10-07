@@ -76,6 +76,7 @@
 				<module>graphql</module>
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
+				<module>guido</module>				
 				<module>html</module>
                 <module>hypertalk</module>
 				<module>icalendar</module>

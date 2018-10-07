@@ -164,6 +164,7 @@ module_or_generate_item
    | attribute_instance* parameter_override
    | attribute_instance* continuous_assign
    | attribute_instance* gate_instantiation
+//   | attribute_instance* udp_instantiation
    | attribute_instance* module_instantiation
    | attribute_instance* initial_construct
    | attribute_instance* always_construct
@@ -314,12 +315,12 @@ variable_type
 
 // 2.2.2 Strengths
 drive_strength
-   : (strength0 ',' strength1)
-   | (strength1 ',' strength0)
-   | (strength0 ',' 'highz1')
-   | (strength1 ',' 'highz0')
-   | ('highz0' ',' strength1)
-   | ('highz1' ',' strength0)
+   : '(' strength0 ',' strength1 ')'
+   | '(' strength1 ',' strength0 ')'
+   | '(' strength0 ',' 'highz1' ')'
+   | '(' strength1 ',' 'highz0' ')'
+   | '(' 'highz0' ',' strength1 ')'
+   | '(' 'highz1' ',' strength0 ')'
    ;
 
 strength0
@@ -1957,14 +1958,13 @@ Simple_identifier
    : [a-zA-Z_] [a-zA-Z0-9_$]*
    ;
 
-
 Dollar_Identifier
    : '$' [a-zA-Z0-9_$] [a-zA-Z0-9_$]*
    ;
 
 
 Time_Identifier
-   : [0-9] + [mnpf] 's'
+   : [0-9] + [mnpf]? 's'
    ;
 
 system_function_identifier
