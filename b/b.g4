@@ -58,7 +58,11 @@ statement
    | gotostmt
    | returnstmt
    | functionstmmt
+   | expressionstmt
    ;
+
+expressionstmt
+    : expression ';' ;
 
 blockstmt
    : '{' statement* '}'
@@ -88,12 +92,12 @@ casestmt
    : 'case' constant ':' statement
    ;
 
-externsmt
-   : 'extrn' name (',' name)* ';' statement
+externsmt   
+   : 'extrn' name (',' name)* ';'
    ;
 
 autosmt
-   : 'auto' name constant (',' name constant)* ';' statement
+   : 'auto' name constant? (',' name constant?)* ';' 
    ;
 
 functionstmmt
@@ -119,7 +123,7 @@ expression
    ;
 
 assign
-   : '=' binary
+   : '=' binary?
    ;
 
 incdec
