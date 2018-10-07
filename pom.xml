@@ -80,6 +80,7 @@
 				<module>html</module>
                 <module>hypertalk</module>
 				<module>icalendar</module>
+				<module>icon</module>
 				<module>idl</module>
 				<module>inf</module>
 				<module>informix</module>
