@@ -60,11 +60,21 @@ declaration
    ;
 
 programdecl
-   : '@program' name ':' name statement + '.'
+   : '@program' programname ':' name statement + '.'
+   ;
+
+programname
+   : name
+   | stringliteral
    ;
 
 verbdecl
-   : '@verb' (property ':' name) name + permissions
+   : '@verb' (verbname ':' name) name + permissions?
+   ;
+
+verbname
+   : name
+   | stringliteral
    ;
 
 propertydecl
@@ -126,7 +136,7 @@ statement
    ;
 
 ifblock
-   : 'if' condition statement + ('else' statement +)? 'endif' ';'?
+   : 'if' condition statement + ('elseif' condition statement +)? ('else' statement +)? 'endif' ';'?
    ;
 
 whileblock
@@ -196,6 +206,7 @@ atom
    | list
    | objref
    | '(' expression ')'
+   | ('!' expression)
    ;
 
 objref
@@ -212,7 +223,7 @@ command
    ;
 
 returncommand
-   : 'return' expression
+   : 'return' expression?
    ;
 
 verbinvocation
@@ -224,7 +235,12 @@ verb
    ;
 
 property
-   : name (('.' name) | '[' expression ']')*
+   : propertyname (('.' name) | '[' expression ']')*
+   ;
+
+propertyname
+   : name
+   | stringliteral
    ;
 
 list
@@ -372,12 +388,12 @@ PERMISSIONS
 
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9!_] +
+   : [a-zA-Z] [a-zA-Z0-9!_*] +
    ;
 
 
 STRINGLITERAL
-   : '"' ~ ["\r\n]* '"'
+   : '"' ~ ["]* '"'
    ;
 
 
