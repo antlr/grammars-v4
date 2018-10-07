@@ -33,12 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar icon;
 
 start
-   : program
+   : prog
    ;
 
-program
+prog
    : declaration
-   | declaration program
+   | declaration prog
    ;
 
 endOfExpr
@@ -365,7 +365,12 @@ REAL_LITERAL
 
 
 STRING_LITERAL
-   : '"' ~ ["\r\n]* '"'
+   : '"' ~ ["]* '"'
+   ;
+
+
+EOL
+   : [\r\n]
    ;
 
 
