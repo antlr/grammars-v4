@@ -69,7 +69,12 @@ programname
    ;
 
 verbdecl
-   : '@verb' (property ':' name) name + permissions
+   : '@verb' (verbname ':' name) name + permissions
+   ;
+
+verbname
+   : name
+   | stringliteral
    ;
 
 propertydecl
@@ -131,7 +136,7 @@ statement
    ;
 
 ifblock
-   : 'if' condition statement + ('else' statement +)? 'endif' ';'?
+   : 'if' condition statement + ('elseif' condition statement +)? ('else' statement +)? 'endif' ';'?
    ;
 
 whileblock
@@ -218,7 +223,7 @@ command
    ;
 
 returncommand
-   : 'return' expression
+   : 'return' expression?
    ;
 
 verbinvocation
@@ -383,7 +388,7 @@ PERMISSIONS
 
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9!_] +
+   : [a-zA-Z] [a-zA-Z0-9!_*] +
    ;
 
 
