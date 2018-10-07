@@ -1,4 +1,7 @@
 function strict() {
+   /* comment */
+   // comment
+   // comment
   'use strict';
   function nested()
   {

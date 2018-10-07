@@ -30,6 +30,8 @@
 				<module>arithmetic</module>
 				<module>asm6502</module>
 				<module>asm8080</module>
+				<module>asm8086</module>
+				<module>asmMASM</module>
 				<module>asmZ80</module>
 				<module>asn</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
@@ -40,7 +42,7 @@
 				<module>brainfuck</module>
 				<module>c</module>
 				<module>calculator</module>
-				<module>capnproto</module>				
+				<module>capnproto</module>
 				<module>clf</module>
 				<module>clif</module>
 				<module>clojure</module>
@@ -48,10 +50,12 @@
 				<module>cookie</module>
 				<module>cool</module>
 				<module>cpp</module>
+				<module>cql3</module>
 				<module>creole</module>
 				<module>csharp</module>
 				<module>css3</module>
 				<module>csv</module>
+				<module>databank</module>
 				<module>datetime</module>
 				<module>dcm</module>
 				<module>dice</module>
@@ -84,6 +88,7 @@
 				<module>java8</module>
 				<module>java9</module>
 				<module>javadoc</module>
+				<!-- <module>javascript</module> TODO: required superClass support -->
 				<module>jpa</module>
 				<module>json</module>
 				<module>kotlin</module>
@@ -101,6 +106,7 @@
 				<module>modelica</module>
 				<module>modula2pim4</module>
 				<module>molecule</module>
+				<module>moo</module>
 				<module>morsecode</module>
 				<module>mps</module>
 				<module>mumath</module>
@@ -117,13 +123,16 @@
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
-				<module>plsql</module>
+				<module>pl0</module>
+				<!-- <module>plsql</module> TODO: required superClass support -->
+				<module>ply</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
 				<module>prolog</module>
 				<module>propcalc</module>
 				<module>properties</module>
 				<module>protobuf3</module>
+				<module>prov-n</module>
 				<module>python2</module>
 				<module>python3</module>
 				<module>python3-js</module>
@@ -149,6 +158,7 @@
 				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
+				<module>solidity</module>
 				<module>sparql</module>
 				<module>sqlite</module>
 				<module>stacktrace</module>
@@ -165,6 +175,7 @@
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>tsql</module>
+				<module>tsv</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>ucb-logo</module>
@@ -178,6 +189,7 @@
 				<module>vhdl</module>
 				<module>wavefront</module>
 				<module>webidl</module>
+				<module>wkt</module>
 				<module>xml</module>
 				<module>xpath</module>
 				<module>z</module>

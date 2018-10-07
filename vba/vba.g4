@@ -293,7 +293,7 @@ enumerationStmt:
 
 enumerationStmt_Constant : ambiguousIdentifier (WS? EQ WS? valueStmt)? endOfStatement;
 
-eraseStmt : ERASE WS valueStmt;
+eraseStmt : ERASE WS valueStmt (',' WS? valueStmt)*?;
 
 errorStmt : ERROR WS valueStmt;
 
@@ -655,7 +655,7 @@ ambiguousIdentifier :
 
 asTypeClause : AS WS? (NEW WS)? type (WS? fieldLength)?;
 
-baseType : BOOLEAN | BYTE | COLLECTION | DATE | DOUBLE | INTEGER | LONG | SINGLE | STRING | VARIANT;
+baseType : BOOLEAN | BYTE | COLLECTION | DATE | DOUBLE | INTEGER | LONG | SINGLE | STRING (WS? MULT WS? valueStmt)? | VARIANT;
 
 certainIdentifier : 
 	IDENTIFIER (ambiguousKeyword | IDENTIFIER)*
@@ -926,7 +926,6 @@ HEXLITERAL : '&H' [0-9A-F]+ '&'?;
 SHORTLITERAL : (PLUS|MINUS)? DIGIT+ ('#' | '&' | '@')?;
 INTEGERLITERAL : SHORTLITERAL (E SHORTLITERAL)?;
 DOUBLELITERAL : (PLUS|MINUS)? DIGIT* '.' DIGIT+ (E SHORTLITERAL)?;
-
 DATELITERAL : '#' DATEORTIME '#';
 fragment DATEORTIME : DATEVALUE WS? TIMEVALUE | DATEVALUE | TIMEVALUE;
 fragment DATEVALUE : DATEVALUEPART DATESEPARATOR DATEVALUEPART (DATESEPARATOR DATEVALUEPART)?;
@@ -951,7 +950,6 @@ WS : ([ \t] | LINE_CONTINUATION)+;
 
 // identifier
 IDENTIFIER :  ~[\]()\r\n\t.,'"|!@#$%^&*\-+:=; ]+ | L_SQUARE_BRACKET (~[!\]\r\n])+ R_SQUARE_BRACKET;
-
 
 // letters
 fragment LETTER : [a-zA-Z_äöüÄÖÜ];

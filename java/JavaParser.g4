@@ -461,12 +461,14 @@ expressionList
 
 methodCall
     : IDENTIFIER '(' expressionList? ')'
+    | THIS '(' expressionList? ')'
+    | SUPER '(' expressionList? ')'
     ;
 
 expression
     : primary
     | expression bop='.'
-      (IDENTIFIER
+      ( IDENTIFIER
       | methodCall
       | THIS
       | NEW nonWildcardTypeArguments? innerCreator
