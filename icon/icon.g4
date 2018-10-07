@@ -38,12 +38,11 @@ start
 
 prog
    : declaration
-   | declaration prog
+   | (declaration prog)
    ;
 
 endOfExpr
    : ';'
-   | EOL
    ;
 
 declaration
@@ -82,7 +81,6 @@ record_declaration
 
 field_list_opt
    : field_list
-   |
    ;
 
 field_list
@@ -95,22 +93,21 @@ field_name
    ;
 
 procedure_declaration
-   : proc_header locals_opt initial_opt expression_sequence 'end'
+   : proc_header locals_opt? initial_opt? expression_sequence 'end'
    ;
 
 proc_header
-   : 'procedure' identifier '(' parameter_list_opt ')' endOfExpr
+   : 'procedure' identifier '(' parameter_list_opt? ')'
    ;
 
 parameter_list_opt
    : parameter_list
-   |
    ;
 
 parameter_list
-   : identifier
-   | identifier '[' ']'
-   | identifier ',' parameter_list
+   : (identifier)
+   | (identifier '[' ']')
+   | (identifier ',' parameter_list)
    ;
 
 locals_opt
@@ -139,7 +136,6 @@ expression_sequence
 
 expression_opt
    : expression
-   |
    ;
 
 expression
@@ -160,27 +156,22 @@ expression
 
 suspend_do_clause_opt
    : 'do' expression
-   |
    ;
 
 while_do_clause_opt
    : 'do' expression
-   |
    ;
 
 until_do_clause_opt
    : 'do' expression
-   |
    ;
 
 every_do_clause_opt
    : 'do' expression
-   |
    ;
 
 else_clause_opt
    : 'else' expression
-   |
    ;
 
 case_list
@@ -366,11 +357,6 @@ REAL_LITERAL
 
 STRING_LITERAL
    : '"' ~ ["]* '"'
-   ;
-
-
-EOL
-   : [\r\n]
    ;
 
 
