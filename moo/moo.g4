@@ -69,7 +69,7 @@ programname
    ;
 
 verbdecl
-   : '@verb' (verbname ':' name) name + permissions
+   : '@verb' (verbname ':' name) name + permissions?
    ;
 
 verbname
