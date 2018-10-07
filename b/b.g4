@@ -48,7 +48,7 @@ ival
 
 statement
    : externsmt
-   | externsmt
+   | autosmt
    | (name ':' statement)
    | casestmt
    | blockstmt
@@ -184,7 +184,7 @@ STRING1
 
 
 STRING2
-   : '\'' ~ [\'\r\n]* '\''
+   : '\'' ~ ['\r\n]* '\''
    ;
 
 
