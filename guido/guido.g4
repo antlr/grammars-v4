@@ -46,7 +46,7 @@ sequencelist
    ;
 
 sequence
-   : '[' (tag | note) + ']'
+   : '[' (tag | note | chord) + ']'
    ;
 
 tag
@@ -77,11 +77,11 @@ parameter
    ;
 
 kvpair
-   : STRING '=' STRING
+   : STRING '=' (STRING | NUMBER) +
    ;
 
 notes
-   : '(' (note | chord +) ')'
+   : '(' (note | chord) + ')'
    ;
 
 note
