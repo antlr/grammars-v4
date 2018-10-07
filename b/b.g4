@@ -38,7 +38,7 @@ program
 
 definition
    : (name constant? (ival (',' ival)*)* ';')
-   | (name '(' (name (',' name)*)* ')' statement) 
+   | (name '(' (name (',' name)*)* ')' statement)
    ;
 
 ival
@@ -47,17 +47,57 @@ ival
    ;
 
 statement
-   : ('auto' name constant (',' name constant)* ';' statement)
-   | ('extrn' name (',' name)* ';' statement)
+   : externsmt
+   | externsmt
    | (name ':' statement)
-   | ('case' constant ':' statement)
-   | ( '{' statement* '}')
-   | ('if' '(' expression ')' statement ('else' statement))
-   | ('while' '(' expression ')' statement)
-   | ('switch' expression statement)
-   | ('goto' expression ';')
-   | ('return' ('(' expression ')')? ';')
-   | (expression ';')
+   | casestmt
+   | blockstmt
+   | ifstmt
+   | whilestmt
+   | switchstmt
+   | gotostmt
+   | returnstmt
+   | functionstmmt
+   ;
+
+blockstmt
+   : '{' statement* '}'
+   ;
+
+returnstmt
+   : 'return' ('(' expression ')')? ';'
+   ;
+
+gotostmt
+   : 'goto' expression ';'
+   ;
+
+switchstmt
+   : 'switch' expression statement
+   ;
+
+whilestmt
+   : 'while' '(' expression ')' statement
+   ;
+
+ifstmt
+   : 'if' '(' expression ')' statement ('else' statement)
+   ;
+
+casestmt
+   : 'case' constant ':' statement
+   ;
+
+externsmt
+   : 'extrn' name (',' name)* ';' statement
+   ;
+
+autosmt
+   : 'auto' name constant (',' name constant)* ';' statement
+   ;
+
+functionstmmt
+   : name expression ';'
    ;
 
 rvalue
@@ -139,13 +179,14 @@ INT
 
 
 STRING1
-   : '"' ~["\r\n]* '"'
+   : '"' ~ ["\r\n]* '"'
    ;
 
 
 STRING2
    : '\'' ~ [\'\r\n]* '\''
    ;
+
 
 WS
    : [ \t\r\n] -> skip
