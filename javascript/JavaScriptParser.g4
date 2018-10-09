@@ -183,7 +183,7 @@ classTail
     ;
 
 classElement
-    : Static? methodDefinition
+    : (Static | {n("static")}? Identifier)? methodDefinition
     | emptyStatement
     ;
 
