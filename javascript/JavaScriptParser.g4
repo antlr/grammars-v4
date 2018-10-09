@@ -184,6 +184,7 @@ classTail
 
 classElement
     : Static? methodDefinition
+    | emptyStatement
     ;
 
 methodDefinition
