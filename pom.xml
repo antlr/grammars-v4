@@ -56,13 +56,11 @@
 				<module>css3</module>
 				<module>csv</module>
 				<module>databank</module>
-				<module>datetime</module>
 				<module>dcm</module>
 				<module>dice</module>
 				<module>dot</module>
 				<module>ecmascript</module>
 				<module>edif300</module>
-				<module>emailaddress</module>
 				<module>erlang</module>
 				<module>fasta</module>
 				<module>fen</module>
@@ -147,6 +145,8 @@
 				<module>redcode</module>
 				<module>restructuredtext</module>
 				<module>rexx</module>
+				<module>rfc822-datetime</module>
+				<module>rfc822-emailaddress</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
 				<module>rpn</module>
