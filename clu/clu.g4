@@ -33,19 +33,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar clu;
 
 module:
-          equate* (procdure | iterator | cluster);
+          equate* (procedure | iterator | cluster);
 
 procedure:
              idn '=' 'proc' params? args rets? signals? where?  routine_body 'end' idn;
 
 iterator:
-            idn '=' 'iter' params? args yeilds? signals? where? routine_body 'end' idn;
+            idn '=' 'iter' params? args yields? signals? where? routine_body 'end' idn;
 
 cluster:
            idn '=' 'cluster' params? 'is' idn (',' idn)* where cluster_body 'end' idn;
 
 
-parms:
+params:
          param (',' param)*;
 
 param:
