@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar euler;
 
-program : block ENDPROG!;
+program : block 'end';
 vardecl : new id NEWDECL! ;
 fordecl : formal id FORMALDECL! ;
 labdecl : label id LABELDECL!;
