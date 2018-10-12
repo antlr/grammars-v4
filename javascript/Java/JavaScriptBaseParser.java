@@ -24,6 +24,20 @@ public abstract class JavaScriptBaseParser extends Parser
         return _input.LT(-1).getText().equals(str);
     }
 
+    /**
+     * Short form for next(String str)
+     */
+    protected boolean n(String str) {
+        return next(str);
+    }
+
+    /**
+     * Whether the next token value equals to @param str
+     */
+    protected boolean next(String str) {
+        return _input.LT(1).getText().equals(str);
+    }
+
     protected boolean notLineTerminator() {
         return !here(JavaScriptParser.LineTerminator);
     }
