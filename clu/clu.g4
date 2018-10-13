@@ -100,12 +100,12 @@ field_spec:  name (',' name)* type_spec;
 
 
 
-tag_arm: 'tag' name (',' name)*  ( '(' idn : type_spec ')') ? ':' body;
+tag_arm: 'tag' name (',' name)*  ( '(' idn ':' type_spec ')') ? ':' body;
 
 when_handler : ('when' name (',' name)* (decl (',' decl)*)? ':' body)
-               | 'when' name (',' name)* '(' '*' ')' ':' body);
+               | ('when' name (',' name)* '(' '*' ')' ':' body);
 
-others_handler: 'others' ('(' idn : type_spec ')')? ':' body;
+others_handler: 'others' ('(' idn ':' type_spec ')')? ':' body;
 
 
 body : equate* statement*;
@@ -114,10 +114,8 @@ invocation : primary  '(' expression (',' expression)* ')';
 
 field : name (',' name)* ':' expression;
 
-primary:'nil' | 'true' | 'false' |int_literal | real_literal | string_literal| idn | (idn (constant (',' constant)*) | (primary '.' name) | primary expression?| invocation | (type_spec '$' field (',' field)*
-  | (type_spec '$' '[' (expression ':')? (expression (',' expression)* ']')  | (type_spec '$' '[' constant (',' constant)* ']') | ('force' type_spec?)| ('up' '(' expression ')' )  | ('down' '(' expression ')' ) ;
 
-expression : primary;
+expression : primary
 | ('(' expression ')')
 | ('~' expression)
 | ( '-' expression ) 
@@ -145,7 +143,7 @@ expression : primary;
 
 statement: decl
          | (idn ':' type_spec ':=' expression)
-         | decl (',' decl)* ':=' invocation)
+         | (decl (',' decl)* ':=' invocation)
           | (idn (',' idn)* ':=' invocation)
 |  (idn (',' idn)* ':=' expression (',' expression)*)
 | (primary '.' name ':=' expression)
@@ -166,6 +164,24 @@ statement: decl
 | (statement 'except' when_handler* others_handler? 'end')
 ;
 
+
+primary:'nil' 
+       | 'true' 
+       | 'false' 
+       |int_literal 
+       | real_literal 
+       | string_literal
+       | idn 
+       | (idn (constant (',' constant)*)) 
+       | (primary '.' name) 
+       | (primary expression?)
+       | invocation 
+       | (type_spec '$' field (',' field)*)
+        | (type_spec '$' '[' (expression ':')? (expression (',' expression)* ']')  )
+| (type_spec '$' '[' constant (',' constant)* ']') 
+| ('force' type_spec?)
+| ('up' '(' expression ')' ) 
+| ('down' '(' expression ')' ) ;
 
 
 idn:
