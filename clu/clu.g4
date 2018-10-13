@@ -275,7 +275,7 @@ string_literal
 
 
 STRINGLITERAL
-   : '"' STRING
+   : '"' ~ ['"'] '"'
    ;
 
 
