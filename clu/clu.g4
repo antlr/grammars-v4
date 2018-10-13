@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar clu;
 
 module
-   : equate? (procedure | iterator | cluster)
+   : equate* (procedure | iterator | cluster)
    ;
 
 procedure
@@ -45,15 +45,15 @@ iterator
    ;
 
 cluster
-   : idn '=' 'cluster' parms? 'is' idn (',' idn) where? cluster_body 'end' idn
+   : idn '=' 'cluster' parms? 'is' idn (',' idn)* where? cluster_body 'end' idn
    ;
 
 parms
-   : param (',' param)*
+   : (param (',' param)*)?
    ;
 
 param
-   : idn (',' idn)* ('type' | type_spec)
+   : idn (',' idn)* ':' ('type' | type_spec)
    ;
 
 args
@@ -61,7 +61,7 @@ args
    ;
 
 decl
-   : idn (',' idn)* type_spec
+   : idn (',' idn)* ':' type_spec
    ;
 
 returnz
@@ -73,7 +73,7 @@ yeilds
    ;
 
 signals
-   : 'signals' exception (',' exception)*
+   : 'signals' '(' exception (',' exception)* ')'
    ;
 
 exception
@@ -90,20 +90,21 @@ restriction
    ;
 
 type_set
-   : (idn | idn 'has' oper_decl (',' oper_decl)* equate*)*
+   : (idn | (idn 'has' oper_decl (',' oper_decl)* equate*))*
    | idn
    ;
 
 oper_decl
-   : op_name (',' op_name)* type_spec
+   : op_name (',' op_name)* ':' type_spec
    ;
 
 op_name
-   : name (constant (',' constant)*)?
+   : name '[' (constant (',' constant)*)? ']'
    ;
 
 constant
-   : expression ':' type_spec
+   : expression
+   | type_spec
    ;
 
 routine_body
@@ -111,7 +112,7 @@ routine_body
    ;
 
 cluster_body
-   : equate* 'rep' '=' type_spec (equate (',' equate)*) (own_var (',' own_var)*) 'routine' (routine (',' routine)*)
+   : equate* 'rep' '=' type_spec equate* own_var* 'routine' routine*
    ;
 
 routine
@@ -152,7 +153,7 @@ type_spec
    ;
 
 field_spec
-   : name (',' name)* type_spec
+   : name (',' name)* ':' type_spec
    ;
 
 statement
