@@ -155,6 +155,30 @@ field_spec
    : name (',' name)* type_spec
    ;
 
+statement
+   : decl
+   | (idn ':' type_spec ':=' expression)
+   | (decl (',' decl)* ':=' invocation)
+   | (idn (',' idn)* ':=' invocation)
+   | (idn (',' idn)* ':=' expression (',' expression)*)
+   | (primary '.' name ':=' expression)
+   | invocation
+   | ('while' expression 'do' body 'end')
+   | ('for' (decl (',' decl)*)? 'in' invocation 'do' body 'end')
+   | ('for' (idn (',' idn)*)? 'in' invocation 'do' body 'end')
+   | ('if' expression 'then' body ('elseif' expression 'then' body)* ('else' body)? 'end')
+   | ('tagcase' expression tag_arm* ('others' ':' body)? 'end')
+   | ('return' (expression (',' expression)*)?)
+   | ('yeild' (expression (',' expression)*)?)
+   | ('signal' name (expression (',' expression)*)?)
+   | ('exit' name (expression (',' expression)*)?)
+   | 'break'
+   | 'continue'
+   | ('begin' body 'end')
+   | (statement 'resignal' name (',' name)*)
+   | (statement 'except' when_handler* others_handler? 'end')
+   ;
+
 tag_arm
    : 'tag' name (',' name)* ('(' idn ':' type_spec ')')? ':' body
    ;
@@ -170,14 +194,6 @@ others_handler
 
 body
    : equate* statement*
-   ;
-
-invocation
-   : primary '(' expression (',' expression)* ')'
-   ;
-
-field
-   : name (',' name)* ':' expression
    ;
 
 expression
@@ -208,30 +224,6 @@ expression
    | (expression 'cor' expression)
    ;
 
-statement
-   : decl
-   | (idn ':' type_spec ':=' expression)
-   | (decl (',' decl)* ':=' invocation)
-   | (idn (',' idn)* ':=' invocation)
-   | (idn (',' idn)* ':=' expression (',' expression)*)
-   | (primary '.' name ':=' expression)
-   | invocation
-   | ('while' expression 'do' body 'end')
-   | ('for' (decl (',' decl)*)? 'in' invocation 'do' body 'end')
-   | ('for' (idn (',' idn)*)? 'in' invocation 'do' body 'end')
-   | ('if' expression 'then' body ('elseif' expression 'then' body)* ('else' body)? 'end')
-   | ('tagcase' expression tag_arm* ('others' ':' body)? 'end')
-   | ('return' (expression (',' expression)*)?)
-   | ('yeild' (expression (',' expression)*)?)
-   | ('signal' name (expression (',' expression)*)?)
-   | ('exit' name (expression (',' expression)*)?)
-   | 'break'
-   | 'continue'
-   | ('begin' body 'end')
-   | (statement 'resignal' name (',' name)*)
-   | (statement 'except' when_handler* others_handler? 'end')
-   ;
-
 primary
    : 'nil'
    | 'true'
@@ -252,6 +244,14 @@ primary
    | ('down' '(' expression ')')
    ;
 
+invocation
+   : primary '(' expression (',' expression)* ')'
+   ;
+
+field
+   : name (',' name)* ':' expression
+   ;
+
 idn
    : STRING
    ;
@@ -261,19 +261,15 @@ name
    ;
 
 int_literal
-   : NUMBER
+   : INT
    ;
 
 real_literal
-   : NUMBER
+   : FLOAT
    ;
 
 string_literal
-   : NUMBER
-   ;
-
-comment
-   : COMMENT
+   : STRINGLITERAL
    ;
 
 
@@ -287,18 +283,18 @@ STRING
    ;
 
 
-NUMBER
+INT
    : [0-9] +
    ;
 
 
-COMMENT
-   : ';' ~ [\r\n]*
+FLOAT
+   : [0-9] + '.' [0-9]*
    ;
 
 
-EOL
-   : '\r'? '\n'
+COMMENT
+   : ';' ~ [\r\n]* -> skip
    ;
 
 
