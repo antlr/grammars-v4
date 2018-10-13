@@ -32,47 +32,154 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar clu;
 
-module:
-          equate* (procedure | iterator | cluster);
-
-procedure:
-             idn '=' 'proc' params? args rets? signals? where?  routine_body 'end' idn;
-
-iterator:
-            idn '=' 'iter' params? args yields? signals? where? routine_body 'end' idn;
-
-cluster:
-           idn '=' 'cluster' params? 'is' idn (',' idn)* where cluster_body 'end' idn;
+module :  equate? ( procedure| iterator |  cluster);
+   
 
 
-params:
-         param (',' param)*;
+procedure : idn '=' 'proc' parms ? args returnz ? signals ? where ?
+routine_body
+'end' idn;
 
-param:
-         idn (',' idn)* : ('type'  | type_spec);
-
-args:
-        '(' decl (',' decl)* ')';
-
-rets:
-        'returns' type_spec (',' type_spec)*;
-          
-yields:
-          'yeilds' type_spec (',' type_spec)*;
-
-signals
-    : 'signals' exception (',' exception)*;
-
-exception
-    : name (type_spec (',' type_spec)*)?;
-
-where:
-         'where' restriction (',' restriction)*;
-
-restriction
-    : (idn 'has' oper_decl (',' oper_decl)*) | (idn 'in' type_set);
+iterator : idn '=' 'iter'  parms ? args yeilds? signals ? where ?
+routine_body
+'end' idn;
 
 
+cluster : idn '=' 'cluster'  parms ? 'is' idn (',' idn) where?
+cluster_body
+'end' idn
+;
+
+
+parms : param (',' param)*;
+
+param : idn (',' idn)*  ('type' | type_spec);
+
+args : '(' decl (',' decl)* ')';
+
+decl: idn (',' idn)* type_spec;
+
+returnz: 'returns' '(' type_spec (',' type_spec)* ')';
+
+yeilds: 'yeilds' '(' type_spec (',' type_spec)* ')';
+
+signals: 'signals' exception (',' exception)*;
+
+exception : name (type_spec (',' type_spec)*)?;
+
+where : 'where' restriction (',' restriction)*;
+restriction: ( idn 'has' oper_decl (',' oper_decl)*) | (idn 'in' type_set);
+
+type_set : (idn | idn 'has' oper_decl (',' oper_decl)* equate*)* |idn;
+
+
+oper_decl : op_name (',' op_name)* type_spec;
+
+op_name : name ( constant (',' constant)*)?;
+
+constant: expression ':' type_spec;
+
+routine_body : equate* own_var*  statement*;
+
+cluster_body : equate* 'rep' '=' type_spec (equate (',' equate)*) (own_var (',' own_var)* )'routine' (routine (',' routine)*);
+
+
+
+routine:procedure | iterator;
+
+equate: idn '=' (constant | type_set);
+
+own_var : ('own' decl) | ('own' idn ':' type_spec ':=' expression) | ('own' (decl (',' decl)* ':=' invocation));
+
+type_spec :  'null' |'bool' | 'int' | 'real' | 'char' | 'string' | 'any' | 'rep' | 'cvt' | ('array' type_spec?) | ('sequence' type_spec?) | ('record' (field_spec (','field_spec)*)?) |  ('struct' (field_spec (','field_spec)*)? )
+  | ('oneof' (field_spec (','field_spec)*)?) | ('variant' (field_spec (','field_spec)*)?)| ('proctype' (field_spec (','field_spec)*)? returnz? signals? ) | ('itertype' (field_spec (','field_spec)*)? yeilds? signals? ) |(idn  (constant (',' constant)*)?) | idn;
+
+
+
+field_spec:  name (',' name)* type_spec;
+
+
+
+tag_arm: 'tag' name (',' name)*  ( '(' idn : type_spec ')') ? ':' body;
+
+when_handler : ('when' name (',' name)* (decl (',' decl)*)? ':' body)
+               | 'when' name (',' name)* '(' '*' ')' ':' body);
+
+others_handler: 'others' ('(' idn : type_spec ')')? ':' body;
+
+
+body : equate* statement*;
+
+invocation : primary  '(' expression (',' expression)* ')';
+
+field : name (',' name)* ':' expression;
+
+primary:'nil' | 'true' | 'false' |int_literal | real_literal | string_literal| idn | (idn (constant (',' constant)*) | (primary '.' name) | primary expression?| invocation | (type_spec '$' field (',' field)*
+  | (type_spec '$' '[' (expression ':')? (expression (',' expression)* ']')  | (type_spec '$' '[' constant (',' constant)* ']') | ('force' type_spec?)| ('up' '(' expression ')' )  | ('down' '(' expression ')' ) ;
+
+expression : primary;
+| ('(' expression ')')
+| ('~' expression)
+| ( '-' expression ) 
+| (expression '**' expression)
+| (expression '//' expression)
+| (expression '/' expression)
+| (expression '*' expression)
+| (expression '||' expression)
+| (expression '+' expression)
+| (expression '-' expression)
+| (expression '<' expression)
+| (expression '<=' expression)
+| (expression '=' expression)
+| (expression '>=' expression)
+| (expression '>' expression)
+| (expression '~<' expression)
+| (expression '~<=' expression)
+| (expression '~=' expression)
+| (expression '~>=' expression)
+| (expression '~>' expression)
+| (expression '&' expression)
+| (expression 'cand' expression)
+| (expression '|' expression)
+| (expression 'cor' expression);
+
+statement: decl
+         | (idn ':' type_spec ':=' expression)
+         | decl (',' decl)* ':=' invocation)
+          | (idn (',' idn)* ':=' invocation)
+|  (idn (',' idn)* ':=' expression (',' expression)*)
+| (primary '.' name ':=' expression)
+| invocation
+| ('while' expression 'do' body 'end')
+| ('for' (decl (',' decl)* )? 'in' invocation 'do' body 'end')
+| ('for' (idn (',' idn)* )? 'in' invocation 'do' body 'end')
+| ('if' expression 'then' body ('elseif' expression 'then' body)* ('else' body)? 'end')
+| ('tagcase' expression tag_arm*  ('others' ':' body)? 'end')
+| ('return' (expression (',' expression)* )?)
+|('yeild' (expression (',' expression)* )?)
+| ('signal' name (expression (',' expression)* )?)
+| ('exit' name (expression (',' expression)* )?)
+| 'break'
+| 'continue'
+| ('begin' body 'end')
+| (statement 'resignal' name (',' name)*)
+| (statement 'except' when_handler* others_handler? 'end')
+;
+
+
+
+idn:
+STRING;
+
+
+name:
+STRING;
+
+int_literal: NUMBER;
+
+real_literal: NUMBER;
+
+string_literal: NUMBER;
 
 comment
    : COMMENT
@@ -107,3 +214,4 @@ EOL
 WS
    : [ \t\r\n] -> skip
    ;
+
