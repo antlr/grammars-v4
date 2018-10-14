@@ -2,7 +2,7 @@ grammar algol60;
 
 /*
 [The "BSD licence"]
-Copyright (c) 2012 Tom Everett
+Copyright (c) 2018 Tom Everett
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
