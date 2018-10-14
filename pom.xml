@@ -37,6 +37,7 @@
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 				<!--		<module>aspectj</module> -->
 				<module>atl</module>
+			<!--	<module>b</module>-->
 				<module>basic</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
@@ -46,6 +47,7 @@
 				<module>clf</module>
 				<module>clif</module>
 				<module>clojure</module>
+			<!--	<module>clu</module>-->
 				<module>cobol85</module>
 				<module>cookie</module>
 				<module>cool</module>
@@ -56,13 +58,11 @@
 				<module>css3</module>
 				<module>csv</module>
 				<module>databank</module>
-				<module>datetime</module>
 				<module>dcm</module>
 				<module>dice</module>
 				<module>dot</module>
 				<module>ecmascript</module>
 				<module>edif300</module>
-				<module>emailaddress</module>
 				<module>erlang</module>
 				<module>fasta</module>
 				<module>fen</module>
@@ -76,9 +76,11 @@
 				<module>graphql</module>
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
+				<module>guido</module>				
 				<module>html</module>
                 <module>hypertalk</module>
 				<module>icalendar</module>
+				<module>icon</module>
 				<module>idl</module>
 				<module>inf</module>
 				<module>informix</module>
@@ -123,6 +125,7 @@
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
+<!--				<module>pike</module>-->
 				<module>pl0</module>
 				<!-- <module>plsql</module> TODO: required superClass support -->
 				<module>ply</module>
@@ -145,6 +148,8 @@
 				<module>redcode</module>
 				<module>restructuredtext</module>
 				<module>rexx</module>
+				<module>rfc822-datetime</module>
+				<module>rfc822-emailaddress</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
 				<module>rpn</module>
