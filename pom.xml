@@ -125,6 +125,7 @@
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
+<!--				<module>pike</module>-->
 				<module>pl0</module>
 				<!-- <module>plsql</module> TODO: required superClass support -->
 				<module>ply</module>
