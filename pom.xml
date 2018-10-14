@@ -37,6 +37,7 @@
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 				<!--		<module>aspectj</module> -->
 				<module>atl</module>
+			<!--	<module>b</module>-->
 				<module>basic</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
