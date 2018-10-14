@@ -47,6 +47,7 @@
 				<module>clf</module>
 				<module>clif</module>
 				<module>clojure</module>
+			<!--	<module>clu</module>-->
 				<module>cobol85</module>
 				<module>cookie</module>
 				<module>cool</module>
