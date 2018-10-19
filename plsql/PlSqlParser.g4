@@ -3290,7 +3290,7 @@ subquery_operation_part
     ;
 
 query_block
-    : SELECT (DISTINCT | UNIQUE | ALL)? ('*' | (','? selected_element)+)
+    : SELECT (DISTINCT | UNIQUE | ALL)? (ASTERISK | (','? selected_element)+)
       into_clause? from_clause where_clause? hierarchical_query_clause? group_by_clause? model_clause?
     ;
 
@@ -3303,7 +3303,7 @@ from_clause
     ;
 
 select_list_elements
-    : tableview_name '.' '*'
+    : tableview_name '.' ASTERISK
     | (regular_id '.')? expressions
     ;
 
@@ -3862,7 +3862,7 @@ numeric_function_wrapper
 
 numeric_function
    : SUM '(' (DISTINCT | ALL)? expression ')'
-   | COUNT '(' ( '*' | ((DISTINCT | UNIQUE | ALL)? concatenation)? ) ')' over_clause?
+   | COUNT '(' ( ASTERISK | ((DISTINCT | UNIQUE | ALL)? concatenation)? ) ')' over_clause?
    | ROUND '(' expression (',' UNSIGNED_INTEGER)?  ')'
    | AVG '(' (DISTINCT | ALL)? expression ')'
    | MAX '(' (DISTINCT | ALL)? expression ')'
@@ -3873,7 +3873,7 @@ numeric_function
 other_function
     : over_clause_keyword function_argument_analytic over_clause?
     | /*TODO stantard_function_enabling_using*/ regular_id function_argument_modeling using_clause?
-    | COUNT '(' ( '*' | (DISTINCT | UNIQUE | ALL)? concatenation) ')' over_clause?
+    | COUNT '(' ( ASTERISK | (DISTINCT | UNIQUE | ALL)? concatenation) ')' over_clause?
     | (CAST | XMLCAST) '(' (MULTISET '(' subquery ')' | concatenation) AS type_spec ')'
     | COALESCE '(' table_element (',' (numeric | quoted_string))? ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
@@ -3969,7 +3969,7 @@ windowing_elements
     ;
 
 using_clause
-    : USING ('*' | (','? using_element)+)
+    : USING (ASTERISK | (','? using_element)+)
     ;
 
 using_element
@@ -4287,7 +4287,7 @@ function_argument_analytic
 
 function_argument_modeling
     : '(' column_name (',' (numeric | NULL) (',' (numeric | NULL))?)?
-      USING (tableview_name '.' '*' | '*' | (','? expression column_alias?)+)
+      USING (tableview_name '.' ASTERISK | ASTERISK | (','? expression column_alias?)+)
       ')' keep_clause?
     ;
 
@@ -4310,7 +4310,7 @@ datatype
     ;
 
 precision_part
-    : '(' (numeric | '*') (',' numeric)? (CHAR | BYTE)? ')'
+    : '(' (numeric | ASTERISK) (',' numeric)? (CHAR | BYTE)? ')'
     ;
 
 native_datatype_element
