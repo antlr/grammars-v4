@@ -37,36 +37,87 @@ db
    ;
 
 room
-   : roomno name description location contents
+   : roomno name description location contents exits next key fail_message succ_message ofail osuccess owner pennies flags password
    ;
 
 roomno
-   : '#' NUMBER EOL
+   : '#' NUM EOL
    ;
 
 name
-   : STRING EOL
+   : string
    ;
 
 description
-   : STRING EOL
+   : string
    ;
 
 location
-   : coord coord coord coord
+   : ref
    ;
 
 contents
-   : STRING
-   | NUMBER
+   : ref
    ;
 
-coord
-   : NUMBER EOL
+exits
+   : ref
+   ;
+
+next
+   : ref
+   ;
+
+key
+   : bool
+   ;
+
+fail_message
+   : string
+   ;
+
+succ_message
+   : string
+   ;
+
+ofail
+   : string
+   ;
+
+osuccess
+   : string
+   ;
+
+owner
+   : ref
+   ;
+
+pennies
+   : ref
+   ;
+
+flags
+   : ref
+   ;
+
+password
+   : string
+   ;
+
+string
+   : STRING EOL
+   ;
+
+ref
+   : NUM EOL
+   ;
+
+bool
+   : NUM? EOL
    ;
 
 
-NUMBER
+NUM
    : '-'? [0-9] +
    ;
 
