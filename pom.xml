@@ -179,6 +179,7 @@
 				<module>tiny</module>
 				<module>tinybasic</module>
 				<module>tinyc</module>
+				<module>tinymud</module>
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>tsql</module>
