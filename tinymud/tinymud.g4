@@ -37,185 +37,134 @@ prog
    ;
 
 line
-   : cmd + comment?
-   | comment
-   | print comment?
-   | procedureDeclaration
+   : chowncommand
+   | createcommand
+   | describecommand
+   | digcommand
+   | failcommand
+   | findcommand
+   | linkcommand
+   | lockcommand
+   | namecommand
+   | ofailcommand
+   | opencommand
+   | osuccesscommand
+   | setcommand
+   | successcommand
+   | unlinkcommand
+   | unlockcommand
    ;
 
-cmd
-   : repeat
-   | fd
-   | bk
-   | rt
-   | lt
-   | cs
-   | pu
-   | pd
-   | ht
-   | st
-   | home
-   | label
-   | setxy
-   | make
-   | procedureInvocation
-   | ife
-   | stop
-   | fore
+chowncommand
+   : '@chown' object '=' player
    ;
 
-procedureInvocation
-   : name expression*
+createcommand
+   : '@create' name ('=' cost)?
    ;
 
-procedureDeclaration
-   : 'to' name parameterDeclarations* EOL? (line? EOL) + 'end'
+describecommand
+   : '@describe' object ('=' description)?
    ;
 
-parameterDeclarations
-   : ':' name (',' parameterDeclarations)*
+digcommand
+   : '@dig' name
    ;
 
-func
-   : random
+failcommand
+   : '@fail' name ('=' description)?
    ;
 
-repeat
-   : 'repeat' number block
+findcommand
+   : '@find' name?
    ;
 
-block
-   : '[' cmd + ']'
+linkcommand
+   : '@link' object '=' (number | dir | room)
    ;
 
-ife
-   : 'if' comparison block
+lockcommand
+   : '@lock' object '=' key
    ;
 
-comparison
-   : expression comparisonOperator expression
+namecommand
+   : '@name' object '=' name password?
    ;
 
-comparisonOperator
-   : '<'
-   | '>'
-   | '='
+ofailcommand
+   : '@ofail' object ('=' message)?
    ;
 
-make
-   : 'make' STRINGLITERAL value
+opencommand
+   : '@open' dir (';' dir)* ('=' number)?
    ;
 
-print
-   : 'print' (value | quotedstring)
+osuccesscommand
+   : '@osuccess' object ('=' message)?
    ;
 
-quotedstring
-   : '[' (quotedstring | ~ ']')* ']'
+setcommand
+   : '@set' object '=' '!'? flag
+   ;
+
+successcommand
+   : '@success' object ('=' message)?
+   ;
+
+unlinkcommand
+   : '@unlink' dir
+   ;
+
+unlockcommand
+   : '@unlock' object
+   ;
+
+object
+   : STRING
+   ;
+
+player
+   : STRING
    ;
 
 name
    : STRING
    ;
 
-value
-   : STRINGLITERAL
-   | expression
-   | deref
+description
+   : STRING
    ;
 
-signExpression
-   : (('+' | '-'))* (number | deref | func)
+cost
+   : NUMBER
    ;
 
-multiplyingExpression
-   : signExpression (('*' | '/') signExpression)*
+key
+   : NUMBER
    ;
 
-expression
-   : multiplyingExpression (('+' | '-') multiplyingExpression)*
+password
+   : STRING
    ;
 
-deref
-   : ':' name
+message
+   : STRING
    ;
 
-fd
-   : ('fd' | 'forward') expression
-   ;
-
-bk
-   : ('bk' | 'backward') expression
-   ;
-
-rt
-   : ('rt' | 'right') expression
-   ;
-
-lt
-   : ('lt' | 'left') expression
-   ;
-
-cs
-   : 'cs'
-   | 'clearscreen'
-   ;
-
-pu
-   : 'pu'
-   | 'penup'
-   ;
-
-pd
-   : 'pd'
-   | 'pendown'
-   ;
-
-ht
-   : 'ht'
-   | 'hideturtle'
-   ;
-
-st
-   : 'st'
-   | 'showturtle'
-   ;
-
-home
-   : 'home'
-   ;
-
-stop
-   : 'stop'
-   ;
-
-label
-   : 'label'
-   ;
-
-setxy
-   : 'setxy' expression expression
-   ;
-
-random
-   : 'random' expression
-   ;
-
-fore
-   : 'for' '[' name expression expression expression ']' block
+dir
+   : STRING
    ;
 
 number
    : NUMBER
    ;
 
-comment
-   : COMMENT
+room
+   : STRING
    ;
 
-
-STRINGLITERAL
-   : '"' STRING
+flag
+   : NUMBER
    ;
 
 
@@ -229,16 +178,11 @@ NUMBER
    ;
 
 
-COMMENT
-   : ';' ~ [\r\n]*
-   ;
-
-
 EOL
-   : '\r'? '\n'
+   : [r\n]
    ;
 
 
 WS
-   : [ \t\r\n] -> skip
+   : [ \t] -> skip
    ;
