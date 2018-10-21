@@ -37,22 +37,41 @@ prog
    ;
 
 line
-   : chowncommand
+   : command
+   | action
+   ;
+
+command
+   : bootcommand
+   | chowncommand
    | createcommand
    | describecommand
    | digcommand
+   | dumpcommand
    | failcommand
    | findcommand
    | linkcommand
    | lockcommand
    | namecommand
+   | newpassswordcommand
    | ofailcommand
    | opencommand
    | osuccesscommand
+   | passwordcommand
+   | pcreatecommand
    | setcommand
+   | shutdowncommand
+   | statscommand
    | successcommand
+   | teleportcommand
+   | toadcommand
    | unlinkcommand
    | unlockcommand
+   | wallcommand
+   ;
+
+bootcommand
+   : '@boot' player
    ;
 
 chowncommand
@@ -69,6 +88,10 @@ describecommand
 
 digcommand
    : '@dig' name
+   ;
+
+dumpcommand
+   : '@dump'
    ;
 
 failcommand
@@ -91,6 +114,10 @@ namecommand
    : '@name' object '=' name password?
    ;
 
+newpassswordcommand
+   : '@newpassword' player ('=' password)?
+   ;
+
 ofailcommand
    : '@ofail' object ('=' message)?
    ;
@@ -103,12 +130,36 @@ osuccesscommand
    : '@osuccess' object ('=' message)?
    ;
 
+passwordcommand
+   : '@password' password '=' password
+   ;
+
+pcreatecommand
+   : '@pcreate' name
+   ;
+
 setcommand
    : '@set' object '=' '!'? flag
    ;
 
+shutdowncommand
+   : '@shutdown'
+   ;
+
+statscommand
+   : '@stats' player
+   ;
+
 successcommand
    : '@success' object ('=' message)?
+   ;
+
+teleportcommand
+   : '@teleport' (object '=')? room
+   ;
+
+toadcommand
+   : '@toad' player
    ;
 
 unlinkcommand
@@ -117,6 +168,104 @@ unlinkcommand
 
 unlockcommand
    : '@unlock' object
+   ;
+
+wallcommand
+   : '@wall' message
+   ;
+
+action
+   : dropaction
+   | examineaction
+   | getaction
+   | giveaction
+   | gotoaction
+   | gripeaction
+   | helpaction
+   | inventoryaction
+   | killaction
+   | lookaction
+   | newsaction
+   | pageaction
+   | quitaction
+   | robaction
+   | sayaction
+   | scoreaction
+   | whisperaction
+   | whoaction
+   ;
+
+dropaction
+   : ('drop' | 'throw') object
+   ;
+
+examineaction
+   : 'examine' object
+   ;
+
+getaction
+   : ('get' | 'take') object
+   ;
+
+giveaction
+   : 'give' player '=' pennies
+   ;
+
+gotoaction
+   : ('go' | 'goto' | 'move') direction
+   ;
+
+gripeaction
+   : 'gripe' message
+   ;
+
+helpaction
+   : 'help'
+   ;
+
+inventoryaction
+   : 'inventory'
+   | 'inv'
+   ;
+
+killaction
+   : 'kill' player ('=' cost)
+   ;
+
+lookaction
+   : ('look' | 'read') object
+   ;
+
+newsaction
+   : 'news'
+   ;
+
+pageaction
+   : 'page' player ('=' message)
+   ;
+
+quitaction
+   : 'quit'
+   ;
+
+robaction
+   : 'rob' player
+   ;
+
+sayaction
+   : 'say' message
+   ;
+
+scoreaction
+   : 'score'
+   ;
+
+whisperaction
+   : 'whisper' player '=' message
+   ;
+
+whoaction
+   : 'who' player?
    ;
 
 object
@@ -165,6 +314,14 @@ room
 
 flag
    : NUMBER
+   ;
+
+pennies
+   : NUMBER
+   ;
+
+direction
+   : STRING
    ;
 
 
