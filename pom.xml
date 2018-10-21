@@ -112,6 +112,7 @@
 				<module>moo</module>
 				<module>morsecode</module>
 				<module>mps</module>
+				<module>muddb</module>				
 				<module>mumath</module>
 				<module>mumps</module>
 				<module>mysql</module>
