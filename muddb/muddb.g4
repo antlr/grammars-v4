@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar muddb;
 
 db
-   : room*
+   : room* END
    ;
 
 room
@@ -105,15 +105,20 @@ password
    ;
 
 string
-   : STRING EOL
+   : STRING? EOL
    ;
 
 ref
-   : NUM EOL
+   : NUM? EOL
    ;
 
 bool
    : NUM? EOL
+   ;
+
+
+END
+   : '***END OF DUMP***'
    ;
 
 
@@ -128,5 +133,5 @@ STRING
 
 
 EOL
-   : [\r\n] +
+   : [\r\n]
    ;
