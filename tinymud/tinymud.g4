@@ -33,12 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar tinymud;
 
 prog
-   : (line? EOL) + line?
+   : line + EOL*
    ;
 
 line
-   : command
-   | action
+   : (command | action) EOL
    ;
 
 command
@@ -50,6 +49,7 @@ command
    | dumpcommand
    | failcommand
    | findcommand
+   | forcecommand
    | linkcommand
    | lockcommand
    | namecommand
@@ -83,7 +83,7 @@ createcommand
    ;
 
 describecommand
-   : '@describe' object ('=' description)?
+   : ('@describe' | '@desc') object ('=' description)?
    ;
 
 digcommand
@@ -100,6 +100,10 @@ failcommand
 
 findcommand
    : '@find' name?
+   ;
+
+forcecommand
+   : '@force' player '=' command
    ;
 
 linkcommand
@@ -127,7 +131,7 @@ opencommand
    ;
 
 osuccesscommand
-   : '@osuccess' object ('=' message)?
+   : ('@osuccess' | '@osucc') object ('=' message)?
    ;
 
 passwordcommand
@@ -151,7 +155,7 @@ statscommand
    ;
 
 successcommand
-   : '@success' object ('=' message)?
+   : ('@success' | '@succ') object ('=' message)?
    ;
 
 teleportcommand
@@ -289,7 +293,7 @@ cost
    ;
 
 key
-   : NUMBER
+   : STRING
    ;
 
 password
@@ -326,7 +330,7 @@ direction
 
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9_]*
+   : [a-zA-Z] [a-zA-Z0-9_. %,']*
    ;
 
 

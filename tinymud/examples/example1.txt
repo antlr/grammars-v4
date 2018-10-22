@@ -1,0 +1,5 @@
+@desc me=Igor is a ferret with an evil glint in his eye.
+@lock me=me
+@fail me=Igor chomps you on the knee with his little sharp teeth.
+@ofail me=howls in pain as Igor bites them.
+
