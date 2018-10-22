@@ -2457,7 +2457,8 @@ filename
 
 alter_table
     : ALTER TABLE tableview_name
-      ( alter_table_properties
+      ( 
+      | alter_table_properties
       | constraint_clauses
       | column_clauses
 //TODO      | alter_table_partitioning
