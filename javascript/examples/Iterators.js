@@ -1,6 +1,6 @@
 "use strict";
 // TODO: Implement
-/*
+
 //------------------------------------------------------------------------------
 // Iterator & For-Of Operator
 // http://es6-features.org/#IteratorForOfOperator
@@ -24,4 +24,3 @@ for (let n of fibonacci) {
         break
     console.log(n)
 }
-*/
