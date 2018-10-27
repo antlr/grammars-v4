@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.antlr.grammarsv4</groupId>
 	<artifactId>grammarsv4</artifactId>
@@ -9,9 +8,9 @@
 	<profiles>
 		<profile>
 			<id>test</id>
-				<activation>
-					<activeByDefault>false</activeByDefault>
-				</activation>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
 			<modules>
 				<module>_grammar-test</module>
 			</modules>
@@ -24,7 +23,7 @@
 			<modules>
 				<module>abnf</module>
 				<module>agc</module>
-<!--				<module>algol60</module>-->
+				<!-- <module>algol60</module> -->
 				<module>antlr3</module>
 				<module>antlr4</module>
 				<module>apex</module>
@@ -36,9 +35,9 @@
 				<module>asmZ80</module>
 				<module>asn</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
-				<!--		<module>aspectj</module> -->
+				<!-- <module>aspectj</module> -->
 				<module>atl</module>
-			<!--	<module>b</module>-->
+				<!-- <module>b</module> -->
 				<module>basic</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
@@ -48,7 +47,7 @@
 				<module>clf</module>
 				<module>clif</module>
 				<module>clojure</module>
-			<!--	<module>clu</module>-->
+				<!-- <module>clu</module> -->
 				<module>cobol85</module>
 				<module>cookie</module>
 				<module>cool</module>
@@ -77,9 +76,9 @@
 				<module>graphql</module>
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
-				<module>guido</module>				
+				<module>guido</module>
 				<module>html</module>
-                <module>hypertalk</module>
+				<module>hypertalk</module>
 				<module>icalendar</module>
 				<module>icon</module>
 				<module>idl</module>
@@ -112,7 +111,7 @@
 				<module>moo</module>
 				<module>morsecode</module>
 				<module>mps</module>
-				<module>muddb</module>				
+				<module>muddb</module>
 				<module>mumath</module>
 				<module>mumps</module>
 				<module>mysql</module>
@@ -127,7 +126,7 @@
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
-<!--				<module>pike</module>-->
+				<!-- <module>pike</module> -->
 				<module>pl0</module>
 				<!-- <module>plsql</module> TODO: required superClass support -->
 				<module>ply</module>
@@ -202,7 +201,7 @@
 				<module>xpath</module>
 				<module>z</module>
 				<!-- testing repository -->
-				<!--<module>grammar-test</module>-->
+				<!--<module>grammar-test</module> -->
 			</modules>
 		</profile>
 	</profiles>
@@ -211,6 +210,7 @@
 		<target.jvm>1.6</target.jvm>
 		<antlr.version>4.7.1</antlr.version>
 		<antlr4test-maven-plugin.version>1.10</antlr4test-maven-plugin.version>
+		<junit.version>4.12</junit.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -223,7 +223,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>${junit.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -231,7 +231,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.0</version>
+				<version>3.8.0</version>
 				<configuration>
 					<source>${target.jvm}</source>
 					<target>${target.jvm}</target>
