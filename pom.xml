@@ -102,6 +102,7 @@
 				<module>lolcode</module>
 				<module>lua</module>
 				<module>masm</module>
+				<module>matlab</module>
 				<module>mdx</module>
 				<module>memcached_protocol</module>
 				<module>metric</module>
