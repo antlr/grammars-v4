@@ -34,14 +34,14 @@ options { superClass=JavaScriptBaseLexer; }
 
 MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
 SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
-RegularExpressionLiteral:       '/' RegularExpressionChar+ {IsRegexPossible()}? '/' IdentifierPart*;
+RegularExpressionLiteral:       '/' RegularExpressionChar+ {this.IsRegexPossible()}? '/' IdentifierPart*;
 
 OpenBracket:                    '[';
 CloseBracket:                   ']';
 OpenParen:                      '(';
 CloseParen:                     ')';
-OpenBrace:                      '{' {ProcessOpenBrace();};
-CloseBrace:                     '}' {ProcessCloseBrace();};
+OpenBrace:                      '{' {this.ProcessOpenBrace();};
+CloseBrace:                     '}' {this.ProcessCloseBrace();};
 SemiColon:                      ';';
 Comma:                          ',';
 Assign:                         '=';
@@ -106,7 +106,7 @@ DecimalLiteral:                 DecimalIntegerLiteral '.' [0-9]* ExponentPart?
 /// Numeric Literals
 
 HexIntegerLiteral:              '0' [xX] HexDigit+;
-OctalIntegerLiteral:            '0' [0-7]+ {!IsSrictMode()}?;
+OctalIntegerLiteral:            '0' [0-7]+ {!this.IsSrictMode()}?;
 OctalIntegerLiteral2:           '0' [oO] [0-7]+;
 BinaryIntegerLiteral:           '0' [bB] [01]+;
 
@@ -152,15 +152,15 @@ Import:                         'import';
 /// The following tokens are also considered to be FutureReservedWords 
 /// when parsing strict mode
 
-Implements:                     'implements' {IsSrictMode()}?;
-Let:                            'let' {IsSrictMode()}?;
-Private:                        'private' {IsSrictMode()}?;
-Public:                         'public' {IsSrictMode()}?;
-Interface:                      'interface' {IsSrictMode()}?;
-Package:                        'package' {IsSrictMode()}?;
-Protected:                      'protected' {IsSrictMode()}?;
-Static:                         'static' {IsSrictMode()}?;
-Yield:                          'yield' {IsSrictMode()}?;
+Implements:                     'implements' {this.IsSrictMode()}?;
+Let:                            'let' {this.IsSrictMode()}?;
+Private:                        'private' {this.IsSrictMode()}?;
+Public:                         'public' {this.IsSrictMode()}?;
+Interface:                      'interface' {this.IsSrictMode()}?;
+Package:                        'package' {this.IsSrictMode()}?;
+Protected:                      'protected' {this.IsSrictMode()}?;
+Static:                         'static' {this.IsSrictMode()}?;
+Yield:                          'yield' {this.IsSrictMode()}?;
 
 /// Identifier Names and Identifiers
 
@@ -168,7 +168,7 @@ Identifier:                     IdentifierStart IdentifierPart*;
 
 /// String Literals
 StringLiteral:                 ('"' DoubleStringCharacter* '"'
-             |                  '\'' SingleStringCharacter* '\'') {ProcessStringLiteral();}
+             |                  '\'' SingleStringCharacter* '\'') {this.ProcessStringLiteral();}
              ;
 
 TemplateStringLiteral:          '`' ('\\`' | ~'`')* '`';
