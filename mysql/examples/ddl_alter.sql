@@ -15,6 +15,8 @@ alter table table3column default character set = cp1251;
 alter table with_check add constraint check (c1 in (1, 2, 3, 4));
 alter table with_check add constraint c2 check (c1 in (1, 2, 3, 4));
 alter table with_check add check (c1 in (1, 2, 3, 4));
+alter table with_partition add partition (partition p201901 values less than (737425) engine = InnoDB);
+
 #end
 #begin
 -- Alter database
