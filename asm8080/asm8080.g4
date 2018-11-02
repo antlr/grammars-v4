@@ -51,7 +51,7 @@ opcode
    : OPCODE
    ;
 
-register
+register_
    : REGISTER
    ;
 
@@ -85,7 +85,7 @@ multiplyingExpression
 
 argument
    : number
-   | register
+   | register_
    | dollar
    | name
    | string
