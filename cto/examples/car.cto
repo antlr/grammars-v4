@@ -13,6 +13,6 @@ asset Vehicle identified by id {
 
 // asset
 asset Car extends Vehicle {
-  o String model
+  o String model //any
   o CarType type
 }

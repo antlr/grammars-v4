@@ -128,9 +128,13 @@ elementValuePair
 primitiveType
     : BOOLEAN
     | DATE_TIME
-    | DOUBLE
+    | STRING
+    | numericType
+    ;
+
+numericType
+    : DOUBLE
     | INTEGER
     | LONG
-    | STRING
     ;
 
