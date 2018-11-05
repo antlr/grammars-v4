@@ -1,9 +1,10 @@
 /*
  * model file sample
  */
-namespace org.basic.sample
+namespace org.sample.combined
 
-import foo.bar
+import org.sample.owner.Owner
+import org.sample.car.*
 
 enum CarType {
   o VAN
@@ -24,10 +25,12 @@ asset Car extends Vehicle {
 
 abstract concept Address {
   o String street
+  o String city
+  o String zipcode
 }
 
-concept UnitedStatesAddress extends Address {
-  o String zipcode optional
+concept SuburbAddress extends Address {
+  o String suburb optional
 }
 
 abstract participant Person identified by id {
@@ -37,7 +40,7 @@ abstract participant Person identified by id {
 
 @foo("arg", 2)
 participant Owner extends Person{
-  o UnitedStatesAddress address
+  o SuburbAddress address
 }
 
 transaction SampleTransaction {

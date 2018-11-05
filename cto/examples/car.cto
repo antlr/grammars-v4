@@ -1,0 +1,18 @@
+namespace org.sample.car
+
+enum CarType {
+  o VAN
+  o CONVERTIBLE
+}
+
+asset Vehicle identified by id {
+  o String id
+  o Integer [] wheels
+  --> Owner owner
+}
+
+// asset
+asset Car extends Vehicle {
+  o String model
+  o CarType type
+}
