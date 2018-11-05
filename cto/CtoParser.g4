@@ -124,7 +124,7 @@ decorator
     : AT qualifiedName ('(' elementValuePair ')')?;
 
 elementValuePair
-    : literal ',' (literal | IDENTIFIER);
+    : literal (',' literal)*;
 
 primitiveType
     : BOOLEAN
