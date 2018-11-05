@@ -9,6 +9,8 @@
 .antlr
 .fetch_time_cache
 /.vs
+.vscode/
+.gradle/
 
 #IntelliJ Idea project files
 .idea/
