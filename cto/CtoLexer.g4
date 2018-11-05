@@ -12,6 +12,7 @@ EXTENDS:            'extends';
 IDENTIFIED:         'identified by';
 IMPORT:             'import';
 NAMESPACE:          'namespace';
+OPTIONAL:           'optional';
 PARTICIPANT:        'participant';
 REGEX:              'regex';
 TRANSACTION:        'transaction';
@@ -38,7 +39,6 @@ BOOL_LITERAL:       'true'
             ;
 CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
 STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
-NULL_LITERAL:       'null';
 
 
 // Separators
@@ -51,7 +51,6 @@ RBRACK:             ']';
 SEMI:               ';';
 COMMA:              ',';
 DOT:                '.';
-APPO:               '"';
 
 // Operators
 ASSIGN:             '=';

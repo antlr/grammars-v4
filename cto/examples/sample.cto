@@ -27,7 +27,7 @@ abstract concept Address {
 }
 
 concept UnitedStatesAddress extends Address {
-  o String zipcode
+  o String zipcode optional
 }
 
 abstract participant Person identified by id {

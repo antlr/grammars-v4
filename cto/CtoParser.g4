@@ -77,7 +77,7 @@ classBodyDeclaration
     ;
 
 fieldDeclaration
-    : fieldType IDENTIFIER 
+    : fieldType IDENTIFIER OPTIONAL?
     | refType identifier;
 
 fieldType
@@ -103,7 +103,6 @@ literal
     | CHAR_LITERAL
     | STRING_LITERAL
     | BOOL_LITERAL
-    | NULL_LITERAL
     ;
 
 integerLiteral
