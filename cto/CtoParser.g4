@@ -66,7 +66,9 @@ transactionDeclaration
       classBody
     ;
 
-extendsOrIdentified: ((EXTENDS IDENTIFIER) | (IDENTIFIED IDENTIFIER));
+extendsOrIdentified: ((EXTENDS IDENTIFIER) | identified);
+
+identified: (IDENTIFIED IDENTIFIER);
 
 classBody
     : LBRACE classBodyDeclaration* RBRACE;
@@ -77,22 +79,34 @@ classBodyDeclaration
     ;
 
 fieldDeclaration
-    : fieldType IDENTIFIER defaultOptional
+    : fieldType identifier defaultOptional
+    | numericFieldType identifier defaultOptional rangeValidation?
+    | identifierFieldType identifier
     | refType identifier;
 
 fieldType
-    : VAR (primitiveType | IDENTIFIER) (LBRACK RBRACK)*;
+    : VAR otherPrimitive ('[' ']')*;
+
+identifierFieldType
+    : VAR IDENTIFIER ('[' ']')*;
+
+numericFieldType
+    : VAR numericPrimitive ('[' ']')*;
+
+numericPrimitive
+    : DOUBLE
+    | INTEGER
+    | LONG
+    ;
+
+otherPrimitive
+    : BOOLEAN
+    | DATE_TIME
+    | STRING
+    ;
 
 refType
-    : REF IDENTIFIER (LBRACK RBRACK)*;
-
-defaultOptional
-    : (DEFAULT ASSIGN literal)? OPTIONAL?;
-
-identifier: IDENTIFIER | ASSET;
-
-variableDeclaratorId
-    : IDENTIFIER ('[' ']')*;
+    : REF IDENTIFIER ('[' ']')*;
 
 qualifiedNameList
     : qualifiedName (',' qualifiedName)*;
@@ -100,19 +114,37 @@ qualifiedNameList
 qualifiedName
     : IDENTIFIER ('.' IDENTIFIER)*;
 
+rangeValidation
+    : RANGE ASSIGN rangeDeclaration;
+
+rangeDeclaration
+    : ('[' numberLiteral ',' ']')
+    | ('[' ',' numberLiteral ']')
+    | ('[' numberLiteral ',' numberLiteral ']');
+
+defaultOptional
+    : defaultLiteral? OPTIONAL?;
+
+defaultLiteral
+    : (DEFAULT ASSIGN literal);
+
+identifier: IDENTIFIER | ASSET | PARTICIPANT;
+
 literal
-    : integerLiteral
-    | floatLiteral
+    : numberLiteral
     | CHAR_LITERAL
     | STRING_LITERAL
     | BOOL_LITERAL
     ;
 
+numberLiteral
+    : integerLiteral
+    | floatLiteral;
+
 integerLiteral
     : DECIMAL_LITERAL
     | HEX_LITERAL
     | OCT_LITERAL
-    | BINARY_LITERAL
     ;
 
 floatLiteral
@@ -126,15 +158,3 @@ decorator
 elementValuePair
     : literal (',' literal)*;
 
-primitiveType
-    : BOOLEAN
-    | DATE_TIME
-    | STRING
-    | numericType
-    ;
-
-numericType
-    : DOUBLE
-    | INTEGER
-    | LONG
-    ;

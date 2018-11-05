@@ -20,4 +20,5 @@ asset Vehicle identified by id {
 asset Car extends Vehicle {
   o String model //any
   o CarType type
+  o Integer year range=[1990,]
 }
