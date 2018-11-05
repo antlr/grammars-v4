@@ -1,0 +1,18 @@
+/*
+ * model file sample
+ */
+namespace org.sample.trasaction
+
+import org.sample.owner.Owner
+import org.sample.car.*
+
+transaction Buy {
+  --> Car asset
+  o String newValue
+}
+
+event SampleEvent {
+  --> Car asset
+  o String oldValue
+  o String newValue
+}

@@ -77,7 +77,7 @@ classBodyDeclaration
     ;
 
 fieldDeclaration
-    : fieldType IDENTIFIER OPTIONAL?
+    : fieldType IDENTIFIER defaultOptional
     | refType identifier;
 
 fieldType
@@ -85,6 +85,9 @@ fieldType
 
 refType
     : REF IDENTIFIER (LBRACK RBRACK)*;
+
+defaultOptional
+    : (DEFAULT ASSIGN literal)? OPTIONAL?;
 
 identifier: IDENTIFIER | ASSET;
 
@@ -117,8 +120,6 @@ floatLiteral
     | HEX_FLOAT_LITERAL
     ;
 
-// ANNOTATIONS
-
 decorator
     : AT qualifiedName ('(' elementValuePair ')')?;
 
@@ -137,4 +138,3 @@ numericType
     | INTEGER
     | LONG
     ;
-

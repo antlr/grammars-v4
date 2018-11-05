@@ -1,4 +1,9 @@
+/*
+ * model file sample
+ */
 namespace org.sample.car
+
+import org.sample.owner.Owner
 
 enum CarType {
   o VAN
@@ -6,7 +11,7 @@ enum CarType {
 }
 
 asset Vehicle identified by id {
-  o String id
+  o String id default = "0815"
   o Integer [] wheels
   --> Owner owner
 }
