@@ -1,0 +1,45 @@
+/*
+ * model file sample
+ */
+namespace org.basic.sample
+
+import foo.bar
+
+enum ProductType {
+  o DAIRY
+  o BEEF
+}
+
+// asset
+abstract asset SampleAsset identified by assetId{
+  o String assetId
+  o Boolean enabled
+  o Integer [] cols
+  o ProductType type
+  --> SampleParticipant owner
+}
+
+abstract concept Address {
+  o String street
+}
+
+concept UnitedStatesAddress extends Address {
+  o String zipcode
+}
+
+@foo("arg", 2)
+participant SampleParticipant identified by id{
+  o String id
+  o String name
+}
+
+transaction SampleTransaction {
+  --> SampleAsset asset
+  o String newValue
+}
+
+event SampleEvent {
+  --> SampleAsset asset
+  o String oldValue
+  o String newValue
+}

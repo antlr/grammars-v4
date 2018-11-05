@@ -46,7 +46,7 @@
             <entryPoint>modelUnit</entryPoint>
             <packageName></packageName>
             <testFileExtension>.cto</testFileExtension>
-            <exampleFiles>src/test/resources/examples</exampleFiles>
+            <exampleFiles>examples</exampleFiles>
           </configuration>
           <executions>
             <execution>
