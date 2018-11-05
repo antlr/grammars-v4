@@ -30,10 +30,13 @@ concept UnitedStatesAddress extends Address {
   o String zipcode
 }
 
-@foo("arg", 2)
-participant Owner identified by id{
+abstract participant Person identified by id {
   o String id
   o String name
+}
+
+@foo("arg", 2)
+participant Owner extends Person{
   o UnitedStatesAddress address
 }
 

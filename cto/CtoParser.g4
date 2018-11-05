@@ -31,7 +31,7 @@ classModifier
 assetDeclaration
     : classModifier*
       ASSET IDENTIFIER
-      ((EXTENDS IDENTIFIER) | (IDENTIFIED IDENTIFIER))
+      extendsOrIdentified
       classBody
     ;
 
@@ -56,9 +56,7 @@ eventDeclaration
 participantDeclaration
     : classModifier*
       PARTICIPANT IDENTIFIER
-      (EXTENDS IDENTIFIER)?
-      IDENTIFIED
-      IDENTIFIER
+      extendsOrIdentified
       classBody
     ;
 
@@ -67,6 +65,8 @@ transactionDeclaration
       TRANSACTION IDENTIFIER
       classBody
     ;
+
+extendsOrIdentified: ((EXTENDS IDENTIFIER) | (IDENTIFIED IDENTIFIER));
 
 classBody
     : LBRACE classBodyDeclaration* RBRACE;
