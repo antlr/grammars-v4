@@ -19,7 +19,8 @@ abstract participant Person identified by id {
   o String firstName default = "" optional
 }
 
-@foo("arg", 2)
+@foo("arg", 1)
+@bar("arg", 2)
 participant Owner extends Person{
   o SuburbAddress address
 }
