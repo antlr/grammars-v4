@@ -31,9 +31,7 @@ classModifier
 assetDeclaration
     : classModifier*
       ASSET IDENTIFIER
-      (EXTENDS IDENTIFIER)?
-      IDENTIFIED
-      IDENTIFIER
+      ((EXTENDS IDENTIFIER) | (IDENTIFIED IDENTIFIER))
       classBody
     ;
 
