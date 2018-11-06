@@ -112,9 +112,10 @@ classBodyDeclaration
     ;
 
 fieldDeclaration
-    : stringField identifier defaultLiteral? regexDeclaration? OPTIONAL?
-    | numericField identifier defaultLiteral? rangeValidation? OPTIONAL?
-    | otherField identifier defaultOptional
+    : stringField identifier defaultString? regexDeclaration? OPTIONAL?
+    | booleanField identifier defaultBoolean? OPTIONAL?
+    | numericField identifier defaultNumber? rangeValidation? OPTIONAL?
+    | dateField identifier defaultDate? OPTIONAL?
     | identifierField identifier
     | reference identifier;
 
@@ -130,13 +131,14 @@ numericPrimitive
     | LONG
     ;
 
-otherField
-    : VAR otherPrimitive ('[' ']')*;
+booleanField
+    : VAR BOOLEAN ('[' ']')*;
 
-otherPrimitive
-    : BOOLEAN
-    | DATE_TIME
-    ;
+dateField
+    : VAR DATE_TIME ('[' ']')*;
+
+defaultDate
+    : (DEFAULT ASSIGN stringLiteral); //TODO literal for date
 
 regexDeclaration
     : REGEX ASSIGN REGEX_EXPR;
@@ -158,24 +160,31 @@ rangeDeclaration
     | ('[' ',' numberLiteral ']')
     | ('[' numberLiteral ',' numberLiteral ']');
 
-defaultOptional
-    : defaultLiteral? OPTIONAL?;
+defaultBoolean
+    : (DEFAULT ASSIGN BOOL_LITERAL);
 
-defaultLiteral
-    : (DEFAULT ASSIGN literal);
+defaultString
+    : (DEFAULT ASSIGN stringLiteral);
+
+defaultNumber
+    : (DEFAULT ASSIGN numberLiteral);
 
 identifier: IDENTIFIER | ASSET | PARTICIPANT;
 
 literal
     : numberLiteral
-    | CHAR_LITERAL
-    | STRING_LITERAL
+    | stringLiteral
     | BOOL_LITERAL
     ;
 
 numberLiteral
     : integerLiteral
     | floatLiteral;
+
+stringLiteral
+    : CHAR_LITERAL
+    | STRING_LITERAL
+    ;
 
 integerLiteral
     : DECIMAL_LITERAL
