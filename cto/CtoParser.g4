@@ -174,14 +174,10 @@ numberLiteral
 
 integerLiteral
     : DECIMAL_LITERAL
-    | HEX_LITERAL
     | OCT_LITERAL
     ;
 
-floatLiteral
-    : FLOAT_LITERAL
-    | HEX_FLOAT_LITERAL
-    ;
+floatLiteral: FLOAT_LITERAL;
 
 decorator
     : AT qualifiedName ('(' elementValuePair ')')?;

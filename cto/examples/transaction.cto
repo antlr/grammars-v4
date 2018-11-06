@@ -9,7 +9,8 @@ import org.sample.car.*
 transaction Buy {
   --> Car asset
   o String newValue
-  
+  o String foo 
+  o Integer bar
 }
 
 event SampleEvent {

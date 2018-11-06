@@ -11,8 +11,9 @@ enum CarType {
 }
 
 asset Vehicle identified by id {
-  o String id default = "0815"
+  o String id default = '0815'
   o Integer [] wheels
+  o Boolean damaged default=true
   --> Owner owner
 }
 
