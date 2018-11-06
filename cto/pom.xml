@@ -5,7 +5,7 @@
 	<groupId>com.antlr.grammarsv4</groupId>
 	<artifactId>cto</artifactId>
 	<packaging>jar</packaging>
-	<name>cto</name>
+	<name>Hyperledger Composer Modeling Language grammar</name>
 	<description>Hyperledger Composer Modelfile</description>
 	<parent>
 		<artifactId>grammarsv4</artifactId>
