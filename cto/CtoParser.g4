@@ -79,13 +79,11 @@ classBodyDeclaration
     ;
 
 fieldDeclaration
-    : fieldType identifier defaultOptional
+    : stringFieldType identifier defaultOptional //mostly used
     | numericFieldType identifier defaultOptional rangeValidation?
+    | otherFieldType identifier defaultOptional
     | identifierFieldType identifier
     | refType identifier;
-
-fieldType
-    : VAR otherPrimitive ('[' ']')*;
 
 identifierFieldType
     : VAR IDENTIFIER ('[' ']')*;
@@ -99,17 +97,19 @@ numericPrimitive
     | LONG
     ;
 
+otherFieldType
+    : VAR otherPrimitive ('[' ']')*;
+
 otherPrimitive
     : BOOLEAN
     | DATE_TIME
-    | STRING
     ;
+
+stringFieldType
+    : VAR STRING ('[' ']')*;
 
 refType
     : REF IDENTIFIER ('[' ']')*;
-
-qualifiedNameList
-    : qualifiedName (',' qualifiedName)*;
 
 qualifiedName
     : IDENTIFIER ('.' IDENTIFIER)*;

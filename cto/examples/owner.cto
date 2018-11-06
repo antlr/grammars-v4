@@ -10,13 +10,13 @@ abstract concept Address {
 }
 
 concept SuburbAddress extends Address {
-  o String suburb optional
+  o String suburb optional 
 }
 
 abstract participant Person identified by id {
   o String id
   o String name
-  o String firstName default = "" optional
+  o String firstName default = "" optional 
 }
 
 participant Relative extends Person {
