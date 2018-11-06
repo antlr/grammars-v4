@@ -70,6 +70,9 @@ COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
 LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
 SPC: ' ';
 
+//REGEX Expr
+REGEX_EXPR:         '/'.*?'/';
+
 // Identifiers
 
 IDENTIFIER:         Letter LetterOrDigit*;

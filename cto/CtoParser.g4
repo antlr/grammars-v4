@@ -79,8 +79,8 @@ classBodyDeclaration
     ;
 
 fieldDeclaration
-    : stringFieldType identifier defaultOptional //mostly used
-    | numericFieldType identifier defaultOptional rangeValidation?
+    : stringFieldType identifier defaultLiteral? regexDeclaration? OPTIONAL?
+    | numericFieldType identifier defaultLiteral? rangeValidation? OPTIONAL?
     | otherFieldType identifier defaultOptional
     | identifierFieldType identifier
     | refType identifier;
@@ -104,6 +104,9 @@ otherPrimitive
     : BOOLEAN
     | DATE_TIME
     ;
+
+regexDeclaration
+    : REGEX ASSIGN REGEX_EXPR;
 
 stringFieldType
     : VAR STRING ('[' ']')*;

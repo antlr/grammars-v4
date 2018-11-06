@@ -16,7 +16,7 @@ concept SuburbAddress extends Address {
 abstract participant Person identified by id {
   o String id
   o String name
-  o String firstName default = "" optional 
+  o String firstName default = "" regex=/[a-zA-Z]*/ optional 
 }
 
 participant Relative extends Person {
