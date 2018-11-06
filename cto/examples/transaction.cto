@@ -9,6 +9,7 @@ import org.sample.car.*
 transaction Buy {
   --> Car asset
   o String newValue
+  
 }
 
 event SampleEvent {

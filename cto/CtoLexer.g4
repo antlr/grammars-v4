@@ -82,8 +82,6 @@ DOT:                '.';
 
 // Operators
 ASSIGN:             '=';
-GT:                 '>';
-LT:                 '<';
 MUL:                '*';
 
 // Additional symbols
