@@ -9,6 +9,7 @@ abstract concept Address {
   o String zipcode
 }
 
+@baz(1)
 concept SuburbAddress extends Address {
   o String suburb optional 
 }
@@ -16,7 +17,8 @@ concept SuburbAddress extends Address {
 abstract participant Person identified by id {
   o String id
   o String name
-  o String firstName default = "Fred" regex=/^[a-zA-Z]*/ optional 
+  o String firstName default = "Fred" regex=/^[a-zA-Z]*/ optional
+  o DateTime birthDate default = "2000-01-01T12:00:00+01:00"
 }
 
 participant Relative extends Person {

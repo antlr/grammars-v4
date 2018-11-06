@@ -26,6 +26,11 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/*
+ A grammar for Hyperledge Compose Modeling Language
+ https://hyperledger.github.io/composer/latest/reference/cto_language.html
+ */
+
 parser grammar CtoParser;
 
 options { tokenVocab=CtoLexer; }
@@ -71,7 +76,7 @@ conceptDeclaration
     ;
 
 enumDeclaration
-    : ENUM IDENTIFIER LBRACE enumConstant* RBRACE;
+    : ENUM IDENTIFIER '{' enumConstant* '}';
 
 enumConstant
     : VAR IDENTIFIER;
@@ -99,7 +104,7 @@ extendsOrIdentified: ((EXTENDS IDENTIFIER) | identified);
 identified: (IDENTIFIED IDENTIFIER);
 
 classBody
-    : LBRACE classBodyDeclaration* RBRACE;
+    : '{' classBodyDeclaration* '}';
 
 classBodyDeclaration
     : ';'
@@ -107,16 +112,16 @@ classBodyDeclaration
     ;
 
 fieldDeclaration
-    : stringFieldType identifier defaultLiteral? regexDeclaration? OPTIONAL?
-    | numericFieldType identifier defaultLiteral? rangeValidation? OPTIONAL?
-    | otherFieldType identifier defaultOptional
-    | identifierFieldType identifier
-    | refType identifier;
+    : stringField identifier defaultLiteral? regexDeclaration? OPTIONAL?
+    | numericField identifier defaultLiteral? rangeValidation? OPTIONAL?
+    | otherField identifier defaultOptional
+    | identifierField identifier
+    | reference identifier;
 
-identifierFieldType
+identifierField
     : VAR IDENTIFIER ('[' ']')*;
 
-numericFieldType
+numericField
     : VAR numericPrimitive ('[' ']')*;
 
 numericPrimitive
@@ -125,7 +130,7 @@ numericPrimitive
     | LONG
     ;
 
-otherFieldType
+otherField
     : VAR otherPrimitive ('[' ']')*;
 
 otherPrimitive
@@ -136,10 +141,10 @@ otherPrimitive
 regexDeclaration
     : REGEX ASSIGN REGEX_EXPR;
 
-stringFieldType
+stringField
     : VAR STRING ('[' ']')*;
 
-refType
+reference
     : REF IDENTIFIER ('[' ']')*;
 
 qualifiedName
@@ -177,11 +182,11 @@ integerLiteral
     | OCT_LITERAL
     ;
 
-floatLiteral: FLOAT_LITERAL;
+floatLiteral
+    : FLOAT_LITERAL;
 
 decorator
     : AT qualifiedName ('(' elementValuePair ')')?;
 
 elementValuePair
     : literal (',' literal)*;
-

@@ -26,6 +26,11 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/*
+ A grammar for Hyperledge Compose Modeling Language
+ https://hyperledger.github.io/composer/latest/reference/cto_language.html
+ */
+
 lexer grammar CtoLexer;
 
 // Keywords
