@@ -27,7 +27,7 @@
 */
 
 /*
- A grammar for Hyperledge Compose Modeling Language
+ A grammar for Hyperledger Composer Modeling Language
  https://hyperledger.github.io/composer/latest/reference/cto_language.html
  */
 
