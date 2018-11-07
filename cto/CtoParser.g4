@@ -44,7 +44,7 @@ namespaceDeclaration
     ;
 
 importDeclaration
-    : IMPORT qualifiedName (DOT MUL)?
+    : IMPORT qualifiedName ('.' '*')?
     ;
 
 typeDeclaration
@@ -120,10 +120,10 @@ fieldDeclaration
     | reference identifier;
 
 identifierField
-    : VAR IDENTIFIER ('[' ']')*;
+    : VAR IDENTIFIER (square)*;
 
 numericField
-    : VAR numericPrimitive ('[' ']')*;
+    : VAR numericPrimitive (square)*;
 
 numericPrimitive
     : DOUBLE
@@ -132,10 +132,10 @@ numericPrimitive
     ;
 
 booleanField
-    : VAR BOOLEAN ('[' ']')*;
+    : VAR BOOLEAN (square)*;
 
 dateField
-    : VAR DATE_TIME ('[' ']')*;
+    : VAR DATE_TIME (square)*;
 
 defaultDate
     : DEFAULT ASSIGN DATE_TIME_LITERAL;
@@ -144,10 +144,10 @@ regexDeclaration
     : REGEX ASSIGN REGEX_EXPR;
 
 stringField
-    : VAR STRING ('[' ']')*;
+    : VAR STRING (square)*;
 
 reference
-    : REF IDENTIFIER ('[' ']')*;
+    : REF IDENTIFIER (square)*;
 
 qualifiedName
     : IDENTIFIER ('.' IDENTIFIER)*;
@@ -199,3 +199,5 @@ decorator
 
 elementValuePair
     : literal (',' literal)*;
+
+square: '[' ']';

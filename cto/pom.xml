@@ -46,7 +46,7 @@
 					<version>${antlr4test-maven-plugin.version}</version>
 					<configuration>
 						<verbose>false</verbose>
-						<showTree>true</showTree>
+						<showTree>false</showTree>
 						<grammarName>Cto</grammarName>
 						<entryPoint>modelUnit</entryPoint>
 						<packageName></packageName>

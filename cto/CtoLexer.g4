@@ -104,8 +104,8 @@ REGEX_EXPR:         '/'.*?'/';
 
 DATE_TIME_LITERAL: Bound FullDate 'T' FullTime Bound;
 fragment Bound: '"' | '\'';
-fragment FullDate: FullYear '-' Month '-' Day;
-fragment FullYear: Digit Digit Digit Digit;
+fragment FullDate: Year '-' Month '-' Day;
+fragment Year: Digit Digit Digit Digit;
 fragment Month: [0][0-9]|[1][0-2];
 fragment Day: [0-2][0-9]|[0-3][01];
 
@@ -114,9 +114,10 @@ fragment FullTime
 fragment TimeOffset
     : 'Z' | TimeNumOffset;
 fragment TimeNumOffset 
-    : '-' [01][0-2] (':' ([0][0] | [3][0]))?
-    | '+' [01][0-5] (':' ([0][0] | [3][0] | [4][5]))?
+    : '-' [01][0-2] (':' (HalfHour))?
+    | '+' [01][0-5] (':' (HalfHour | [4][5]))?
     ;
+fragment HalfHour: [0][0] | [3][0];
 fragment PartialTime 
     : [0-2][0-3] ':' Sixty ':' Sixty ('.' [0-9]*)?;
 fragment Sixty: [0-5] Digit;
