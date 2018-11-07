@@ -80,8 +80,6 @@ SEMI:               ';';
 COMMA:              ',';
 DOT:                '.';
 COLON:              ':';
-PLUS:               '+';
-MINUS:              '-';
 
 // Operators
 ASSIGN:             '=';
