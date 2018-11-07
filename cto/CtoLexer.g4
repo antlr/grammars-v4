@@ -68,9 +68,6 @@ FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?
 BOOL_LITERAL:       'true'
             |       'false'
             ;
-CHAR_LITERAL:       '\'' (~["\\\r\n] | EscapeSequence)* '\'';
-STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
-
 
 // Separators
 LPAREN:             '(';
@@ -82,6 +79,9 @@ RBRACK:             ']';
 SEMI:               ';';
 COMMA:              ',';
 DOT:                '.';
+COLON:              ':';
+PLUS:               '+';
+MINUS:              '-';
 
 // Operators
 ASSIGN:             '=';
@@ -102,9 +102,31 @@ SPC: ' ';
 //REGEX Expr
 REGEX_EXPR:         '/'.*?'/';
 
-// Identifiers
+DATE_TIME_LITERAL: Bound FullDate 'T' FullTime Bound;
+fragment Bound: '"' | '\'';
+fragment FullDate: FullYear '-' Month '-' Day;
+fragment FullYear: Digit Digit Digit Digit;
+fragment Month: [0][0-9]|[1][0-2];
+fragment Day: [0-2][0-9]|[0-3][01];
+
+fragment FullTime 
+    : PartialTime TimeOffset;
+fragment TimeOffset
+    : 'Z' | TimeNumOffset;
+fragment TimeNumOffset 
+    : '-' [01][0-2] (':' ([0][0] | [3][0]))?
+    | '+' [01][0-5] (':' ([0][0] | [3][0] | [4][5]))?
+    ;
+fragment PartialTime 
+    : [0-2][0-3] ':' Sixty ':' Sixty ('.' [0-9]*)?;
+fragment Sixty: [0-5] Digit;
+fragment Digit: [0-9];
+
 
 IDENTIFIER:         Letter LetterOrDigit*;
+
+CHAR_LITERAL:       '\'' (~["\\\r\n] | EscapeSequence)* '\'';
+STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
 
 // Fragment rules
 fragment ExponentPart

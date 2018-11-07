@@ -18,11 +18,15 @@ abstract participant Person identified by id {
   o String id
   o String name
   o String firstName default = "Fred" regex=/^[a-zA-Z]*/ optional
-  o DateTime birthDate default = "2000-01-01T12:00:00+01:00"
+  o DateTime birthDate default = "2000-01-31T23:59:59Z"
 }
 
 participant Relative extends Person {
   o String relation optional
+}
+
+participant Customer extends Person {
+  o DateTime since default = "2000-01-31T23:59:59.001+05:45"
 }
 
 @foo("arg1", 1)

@@ -138,7 +138,7 @@ dateField
     : VAR DATE_TIME ('[' ']')*;
 
 defaultDate
-    : (DEFAULT ASSIGN stringLiteral); //TODO literal for date
+    : DEFAULT ASSIGN DATE_TIME_LITERAL;
 
 regexDeclaration
     : REGEX ASSIGN REGEX_EXPR;
