@@ -77,7 +77,7 @@ masmdirective
    ;
 
 assume
-   : ASSUME register ':' name (',' register ':' name)*
+   : ASSUME register_ ':' name (',' register_ ':' name)*
    ;
 
 label_
@@ -177,7 +177,7 @@ argument
    : number
    | dollar
    | ques
-   | register
+   | register_
    | (name ':')? name
    | string
    | ('(' expression ')')
@@ -212,7 +212,7 @@ ques
    : QUES
    ;
 
-register
+register_
    : REGISTER
    ;
 
