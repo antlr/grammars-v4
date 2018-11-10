@@ -1,0 +1,6 @@
+namespace org.sample.invalid
+
+asset WrongDate identified by id {
+  o String id
+  o DateTime date default = "2000-01-31T23:59:59.001+05:41"
+}

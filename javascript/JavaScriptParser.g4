@@ -86,7 +86,7 @@ emptyStatement
     ;
 
 expressionStatement
-    : {notOpenBraceAndNotFunction()}? expressionSequence eos
+    : {this.notOpenBraceAndNotFunction()}? expressionSequence eos
     ;
 
 ifStatement
@@ -95,13 +95,13 @@ ifStatement
 
 
 iterationStatement
-    : Do statement While '(' expressionSequence ')' eos                                                 # DoStatement
-    | While '(' expressionSequence ')' statement                                                        # WhileStatement
-    | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement         # ForStatement
+    : Do statement While '(' expressionSequence ')' eos                                                         # DoStatement
+    | While '(' expressionSequence ')' statement                                                                # WhileStatement
+    | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement                 # ForStatement
     | For '(' varModifier variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')'
-          statement                                                                                     # ForVarStatement
-    | For '(' singleExpression (In | Identifier{p("of")}?) expressionSequence ')' statement             # ForInStatement
-    | For '(' varModifier variableDeclaration (In | Identifier{p("of")}?) expressionSequence ')' statement      # ForVarInStatement
+          statement                                                                                             # ForVarStatement
+    | For '(' singleExpression (In | Identifier{this.p("of")}?) expressionSequence ')' statement                # ForInStatement
+    | For '(' varModifier variableDeclaration (In | Identifier{this.p("of")}?) expressionSequence ')' statement # ForVarInStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
@@ -111,15 +111,15 @@ varModifier  // let, const - ECMAScript 6
     ;
 
 continueStatement
-    : Continue ({notLineTerminator()}? Identifier)? eos
+    : Continue ({this.notLineTerminator()}? Identifier)? eos
     ;
 
 breakStatement
-    : Break ({notLineTerminator()}? Identifier)? eos
+    : Break ({this.notLineTerminator()}? Identifier)? eos
     ;
 
 returnStatement
-    : Return ({notLineTerminator()}? expressionSequence)? eos
+    : Return ({this.notLineTerminator()}? expressionSequence)? eos
     ;
 
 withStatement
@@ -151,7 +151,7 @@ labelledStatement
     ;
 
 throwStatement
-    : Throw {notLineTerminator()}? expressionSequence eos
+    : Throw {this.notLineTerminator()}? expressionSequence eos
     ;
 
 tryStatement
@@ -275,8 +275,8 @@ singleExpression
     | singleExpression '.' identifierName                                    # MemberDotExpression
     | singleExpression arguments                                             # ArgumentsExpression
     | New singleExpression arguments?                                        # NewExpression
-    | singleExpression {notLineTerminator()}? '++'                           # PostIncrementExpression
-    | singleExpression {notLineTerminator()}? '--'                           # PostDecreaseExpression
+    | singleExpression {this.notLineTerminator()}? '++'                      # PostIncrementExpression
+    | singleExpression {this.notLineTerminator()}? '--'                      # PostDecreaseExpression
     | Delete singleExpression                                                # DeleteExpression
     | Void singleExpression                                                  # VoidExpression
     | Typeof singleExpression                                                # TypeofExpression
@@ -411,16 +411,16 @@ keyword
     ;
 
 getter
-    : Identifier{p("get")}? propertyName
+    : Identifier{this.p("get")}? propertyName
     ;
 
 setter
-    : Identifier{p("set")}? propertyName
+    : Identifier{this.p("set")}? propertyName
     ;
 
 eos
     : SemiColon
     | EOF
-    | {lineTerminatorAhead()}?
-    | {closeBrace()}?
+    | {this.lineTerminatorAhead()}?
+    | {this.closeBrace()}?
     ;
