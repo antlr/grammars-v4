@@ -36,7 +36,7 @@
  *	-- update for compatibility with Antlr v4.5
  */
 
-lexer grammar ANTLRv4Lexer;
+lexer grammar ANTLRv4LexerPythonTarget;
 
 options {
 	superClass = LexerAdaptor ;
