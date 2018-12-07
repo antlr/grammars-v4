@@ -5,27 +5,28 @@
 
 " zero i-list
 
-   dzm ii
-   jms copyz; dskbuf; 64
+   dzm ii			" Set ii to zero
+   jms copyz; dskbuf; 64	" Zero the 64-word dskbuf
 1:
-   lac ii
+   lac ii			" Zero blocks 0 to 709
    jms dskio; 07000
-   isz ii
+   isz ii			" Move up to next block number
    -710
    tad ii
    sza
-   jmp 1b
+   jmp 1b			" Loop back until we reach block 710
+				" i.e. we don't write block 710
 
 " free rest of disk
 
 1:
-   lac ii
+   lac ii			" Free blocks 710 up to 6399
    jms free
    isz ii
    -6400
    tad ii
    sza
-   jmp 1b
+   jmp 1b			" Loop back until we reach block 6400
 
 " read in tapes
 

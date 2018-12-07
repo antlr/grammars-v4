@@ -2,15 +2,15 @@
 "[handwritten page number top right of scan - 1]
 " ed1
    lac d1
-   sys write; 1f; 3
+   sys write; 1f; 3		" say hello
    lac o17
-   sys creat; tname
+   sys creat; tname		" create e.tmp for write
    spa
-   sys save
+   sys save			" dump core on error!
    dac sfo
-   sys open; tname; 0
+   sys open; tname; 0		" open e.tmp for read
    spa
-   sys save
+   sys save			" dump core on error!
    dac sfi
    -1
    tad lnodp
@@ -26,7 +26,7 @@
    dzm fbuf
    lac d1
    dac dskadr
-   dac wrlfg
+   dac wrflg
    dzm diskin
  "o------------> [scan markup]
    jmp advanc
@@ -36,24 +36,24 @@ advanc:
    jms rline
    lac linep
    dac tal
-   dzm adrflg
-   jms addres
-   jmp comand
+   dzm adrflg			" clear address flag
+   jms addres			" get address?
+   jmp comand			"  no: check if command
    -1
-   dac adrflg
+   dac adrflg			" set address flag
    lac addr
-   dac addr1
+   dac addr1			" set both addr1 & 2
    dac addr2
 1:
    lac char
-   sad o54
+   sad o54			" comma?
    jmp 2f
-   sad o73
+   sad o73			" semi?
    skp
    jmp chkwrp
    lac addr
    dac dot
-2:
+2:				" here for address range
    jms addres
    jmp error
    lac addr2
@@ -71,28 +71,28 @@ chkwrp:
 
 comand:
    lac char
-   sad o141
+   sad o141			" a?
    jmp ca
-   sad o143
+   sad o143			" c?
    jmp cc
-   sad o144
+   sad o144			" d?
    jmp cd
-   sad o160
+   sad o160			" p?
    jmp cp
-   sad o161
+   sad o161			" q?
    jmp cq
-   sad o162
+   sad o162			" r?
    jmp cr
-   sad o163
+   sad o163			" s?
    jmp cs
-   sad o167
+   sad o167			" w?
    jmp cw
-   sad o12
+   sad o12			" newline?
    jmp cnl
-   sad o75
+   sad o75			" =?
    jmp ceq
    jmp error
-ca:
+ca:				" a(ppend)
    jms newline
    jms setfl
    lac addr2
@@ -100,12 +100,12 @@ ca:
 ca1:
    jms rline
    lac line
-   sad o56012
+   sad o56012			" .NL?
    jmp advanc
    jms append
    jmp ca1
 
-cc: cd:
+cc: cd:				" c(change) and d(elete)
    jms newline
    jms setdd
    lac addr1
@@ -121,19 +121,19 @@ cc: cd:
    dac i 9
    sza
    jmp 2b
-"??? illegible line cut off - dac 0, lac 0, something else???
+   lac 9
 "** 08-rest.pdf page 10
 "[handwritten page number top right of scan - 3]
    dac eofp
    lac char
-   sad o144
-   jmp advanc
+   sad o144			" was delete?
+   jmp advanc			"  yes
    -1
    tad dot
    dac dot
    jmp ca1
 
-cp:
+cp:				" p(rint)
    jms newline
 cp1:
    jms setdd
@@ -155,14 +155,14 @@ cp1:
    dac addr1
    jmp 1b
 
-cq:
+cq:				" q(uit)
    jms newline
    lac adrflg
    sza
    jmp error
    sys exit
 
-cr:
+cr:				" r(ead)
    jms setfl
    lac addr2
    dac dot
@@ -185,7 +185,7 @@ cr:
    jms number
    jmp advanc
 2:
-"??? illegible line cut off - cma, sma, something else?
+   cma
 "** 08-rest.pdf page 11
 "[handwritten page number top right of scan - 4]
    tad d1
@@ -216,7 +216,7 @@ cr:
    isz c1
    jmp 2b
    jmp 1b
-cw:
+cw:				" w(rite)
    jms setfl
    lac i addr1
    sna
@@ -246,8 +246,8 @@ cw:
    sna
    jmp 3f
    isz num
-   jmp putsc; tal1
-   isz c2 "???
+   jms putsc; tal1
+   isz c2
 "** 08-rest.pdf page 12
 "[handwritten page number top right of scan - 5]
    jmp 3f
@@ -272,7 +272,7 @@ cw:
    jms putsc; tal1
 1:
    -1
-   tad tufp
+   tad tbufp
    cma
    tad tal1
    dac 1f
@@ -283,7 +283,7 @@ cw:
    jms number
    jmp advanc
 
-cn1:
+cnl:				" newline
    lac adrflg
    sna
    jmp 1f
@@ -298,7 +298,7 @@ cn1:
    dac dot
    jmp cp1
 
-ceq:
+ceq:				" = command
    jms newline
    jms setfl
    lac addr2
@@ -334,10 +334,10 @@ setfl: 0
    jmp i setfl
 
 newline: 0
-   jms getsc; tal
-   sad o12
+   jms getsc; tal		" get input char
+   sad o12			" newline?
    jmp i newline
-   jmp error
+   jmp error			" no, complain
 
 addres: 0
    dzm minflg "..) [stray scan mark?]
@@ -346,25 +346,25 @@ addres: 0
 ad1:
    jms getsc; tal
 ad2:
-   jms betwen; d47; d56
+   jms betwen; d47; d58		" digit?
    skp
    jmp numb
-   sad o40 "[o40 circled in scan]
+   sad o40 "[o40 circled in scan]	" space?
    jmp ad1 "[hand drawn check mark follows operand in scan]
-   sad o11
+   sad o11			" tab?
    jmp ad1 "[hand drawn check mark follows operand in scan]
            "[check mark underlined in scan]
-   sad o55
+   sad o55			" -?
    jmp amin "[hand drawn check mark follows operand in scan]
-   sad o56
+   sad o56			" .?
    jmp adot "[hand drawn check mark follows operand in scan]
-   sad o53
+   sad o53			" +?
    jmp ad1 "[hand drawn check mark follows operand in scan]
-   sad o44
+   sad o44			" $?
    jmp adol "[hand drawn check mark follows operand in scan]
-   sad o57
+   sad o57			" /?
    jmp fsrch "[hand drawn check mark follows operand in scan]
-   sad o77
+   sad o77			" '?'?
    jmp bsrch "[hand drawn check mark follows operand in scan]
    dac char
    lac minflg
@@ -406,35 +406,35 @@ amin:
 
 numb:
    dac char
-   sad o60
-   jmp 1f
-   lac d10
+   sad o60			" leading zero?
+   jmp 1f			"  yes: octal
+   lac d10			" no: decimal
    jmp 2f
 1:
-   lac d8
+   lac d8			" here for octal
 2:
-   dac 2f
+   dac 2f			" save radix for mul
    dzm num
 1:
    lac num
-   cll; mul; 2: 0
+   cll; mul; 2: 0		" multiply by radix
    lacq
-   tad char
-   tad dm48
-   dac num
-   jms getsc; tal
-   dac char
-   jms betwen; d47; d58
-   skp
-   jmp 1b
-   lac minflg
-   sna
-   jmp 1f
-   -1
+   tad char			" add digit
+   tad dm48			" subtract ASCII zero
+   dac num			" save
+   jms getsc; tal		" get another char
+   dac char			" save
+   jms betwen; d47; d58		" a digit?
+   skp				"  no: done
+   jmp 1b			" yes: process
+   lac minflg			" minus flag
+   sna				" set?
+   jmp 1f			"  no
+   -1				" yes: negate
    tad num
    cma
    dac num
-   dzm minflg
+   dzm minflg			" clear minus flag
 1:
    lac addr
 "** 08-rest.pdf page 15
@@ -448,7 +448,7 @@ numb:
    lac char
    jmp ad2
 
-number: 0
+number: 0		" format "num" in decimal to "tbuf"
    lac d100000
    dac n1
    law tbuf-1
@@ -523,7 +523,7 @@ gline: 0
    dac glint1
    jms getdsk
    lac glint1 " [these 6 lines were surrounded by a box
-   adn o17777 " that was Xed out with an arrow pointing to it]:
+   and o1777  " that was Xed out with an arrow pointing to it]:
    tad dskbfp " --
    dac ital   "|\/|
    lac linep  "|/\|<---
@@ -555,48 +555,48 @@ gline: 0
    tad otal
    jmp i gline
 
-rline: 0
+rline: 0			" read line from stdin
    lac linep
    dac tal
 
 1:
    cla
-   sys read; char; 1
+   sys read; char; 1		" read a char (or two)
    lac char
 "** 08-rest.pdf page 17
 "[handwritten page number top right of scan - 10]
    lrss 9
-   jms esc
+   jms esc			" process high char
    lac char
    and o777
-   jms esc
+   jms esc			" process low char
    jmp 1b
 
-esc: 0
+esc: 0				" edit/save char
    sna
-   jmp i esc
+   jmp i esc			" skip NUL
    jms putsc; tal
-   sad o12
+   sad o12			" newline?
    jmp 2f
-   sad o100
+   sad o100			" @ (kill)?
    jmp 1f
-   sad o43
+   sad o43			" # (erase)?
    skp
    jmp i esc
-   -1
-   tad tal
+   -1				" erase
+   tad tal			" decrement pointer
    dac tal
-   and o17777
-   sad linpm1
-   jmp 1f
+   and o17777			" mask to addr
+   sad linpm1			" before start?
+   jmp 1f			"  yes: reset
    jmp i esc
 
-1:
+1:				" saw @ (kill) reset pointer
    lac linep
    dac tal
    jmp i esc
 
-2:
+2:				" here with newline
    lac tal
    sma cla
    jmp 1f
@@ -607,49 +607,49 @@ esc: 0
    cma
    tad tal
    dac linsiz
-   jmp i rline
+   jmp i rline			" return from rline
 
-getsc: 0
-   lac i getsc
+getsc: 0			" call: jms getsc; pbufp
+   lac i getsc			" fetch buffer pointer addr from after call
    dac sctalp
-   isz getsc
-   lac i sctalp
+   isz getsc			" skip buffer pointer pointer
+   lac i sctalp			" fetch buffer pointer
    dac sctal
-   add o400000
-   dac i sctal
-   ral
-   lac i sctal
-   szl
-   lrss 9
-   and o777
+   add o400000			" flip high bit (carry wraps around)
+   dac i sctalp			" save pointer back
+   ral				" shift high bit into link
+   lac i sctal			" fetch word from buffer
+   szl				" link set?
+   lrss 9			"  yes: shift high char down
+   and o777			" mask to character
    jmp i getsc
 
-putsc: 0
-   and o777
+putsc: 0			" call: jms putsc; pbufp
+   and o777			" mask to single 9-bit character
 "** 08-rest.pdf page 18
 "[handwritten page number top right of scan - 11]
-   lmq
-   lac i putsc
+   lmq				" put in MQ
+   lac i putsc			" fetch buffer pointer pointer
    dac sctalp
-   isz putsc
-   lac i sctalp
-   dac sctal
-   add o400000
-   dac i sctalp
-   sma cla
-   jmp 1f
-   llss 27
-   dac i sctal
-   lrss 9
-   jmp i putsc
+   isz putsc			" skip over pointer pointer
+   lac i sctalp			" get pointer
+   dac sctal			" save it for later
+   add o400000			" flip high bit, wrap carry
+   dac i sctalp			" save back as buffer pointer pointer
+   sma cla			" high bit set?
+   jmp 1f			"  no
+   llss 27			" yes: get MQ in high half of AC
+   dac i sctal			" save to buffer
+   lrss 9			" shift char back down
+   jmp i putsc			" return
 
 1:
-   lac i sctal
-   and o777000
-   omq
-   dac i sctal
-   lacq
-   jmp i putsc
+   lac i sctal			" get word from buffer
+   and o777000			" mask to high character
+   omq				" OR in new char
+   dac i sctal			" save word
+   lacq				" restore char
+   jmp i putsc			" return
 
 append: 0
    -1
