@@ -36,7 +36,6 @@ lexer grammar CtoLexer;
 // Keywords
 ABSTRACT:           'abstract';
 ASSET:              'asset';
-CLASS:              'class';
 CONCEPT:            'concept';
 DEFAULT:            'default';
 ENUM:               'enum';
@@ -58,16 +57,6 @@ DOUBLE:             'Double';
 INTEGER:            'Integer';
 LONG:               'Long';
 STRING:             'String';
-
-// Literals
-DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;
-OCT_LITERAL:        '0' '_'* [0-7] ([0-7_]* [0-7])? [lL]?;
-FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?
-             |       Digits (ExponentPart [fFdD]? | [fFdD])
-             ;
-BOOL_LITERAL:       'true'
-            |       'false'
-            ;
 
 // Separators
 LPAREN:             '(';
@@ -91,16 +80,25 @@ ELLIPSIS:           '...';
 REF:                '-->';
 VAR:                'o';
 
+// Literals
+DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;
+OCT_LITERAL:        '0' '_'* [0-7] ([0-7_]* [0-7])? [lL]?;
+FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?
+             |       Digits (ExponentPart [fFdD]? | [fFdD])
+             ;
+BOOL_LITERAL:       'true'
+            |       'false'
+            ;
+DATE_TIME_LITERAL: Bound FullDate 'T' FullTime Bound;
+
 // Whitespace and comments
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
-COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
 LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
-SPC: ' ';
+COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
 
 //REGEX Expr
 REGEX_EXPR:         '/'.*?'/';
 
-DATE_TIME_LITERAL: Bound FullDate 'T' FullTime Bound;
 fragment Bound: '"' | '\'';
 fragment FullDate: Year '-' Month '-' Day;
 fragment Year: Digit Digit Digit Digit;

@@ -1,4 +1,4 @@
-" cat: cat [arg1 arg2 ...]
+" cat: cat arg1 [arg2 ...]
 
    " Load the pointer pointer in 017777 to see if we have any arguments
    lac 017777 i
@@ -41,16 +41,16 @@ loop1:
 badfile:
    lac name			" Get the pointer to the filename
    dac 1f			" Store it in 1f below
-   lac d8			" Load fd 8 which is stderr
+   lac d1			" Load fd 1 which is stdout
    sys write; 1:0; 4		" Write the four words of the filename
-   lac d8
+   lac d1
    sys write; 1f; 2		" and then write " ?\n"
    jmp loop1			" Now try doing the next argument
 
 1: 040;077012			" String literal: " ?\n"
 
 nofiles:
-   lac d8
+   lac d1
    sys write; 1f; 5		" Write "No files\n" to stderr
    sys exit			" and exit
 
