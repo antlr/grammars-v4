@@ -125,7 +125,7 @@ init2: 0			" start pass 2
    lac d1
 "** 05-1-4.pdf page 34
    dac passno			" passno = 1
-   sys write; 1f; 2f-1f		" output II
+   sys write; 1f; 2f-1f		" output II\n
    jms init
    lac o17
    sys creat; 2f		" create a.out
@@ -148,6 +148,7 @@ init: 0				" common init for both passes
    dac fname			" point to first file name
    -1
    dac eofflg
+   jms nextfil
    jms ioinit
    dzm savchr			" clear saved char
    dzm comflg			" clear line comment flag
@@ -477,13 +478,13 @@ nf1:
    sys open; fname: 0; 0	" open fname
    dac iof			" save fd
    sma				" open ok?
-   lac passno			"  yes, load pass number
-   sna				"   open failed: skip or open ok, pass 2
-   jmp nextfil i		"    pass 1, open OK, return.
+   lac passno			"  yes: load pass number
+   sna				" no: open failed: skip or open ok, pass 2
+   jmp nextfil i		"  pass 1, open OK, return.
    lac fname			" load filename pointer
    dac 1f			" save for write
    lac d1			" stdout
-   sys write; 1; 0; 4		" output filename
+   sys write; 1: 0; 4		" output filename
    lac iof			" load fd
    sma				" open ok?
    jmp 1f			"  yes, continue
@@ -675,7 +676,7 @@ num2: 0				" (radix stored here)
    jmp i gsymb			"  no, return
    dac name
    tad fbxp			" make index into "fbx" array
-   dac name+1			" ???save??? (crushed below)
+   dac name+1			" save for indirect fetch
    lac i name+1			" fetch fbx array entry
    dac name+1			" save fbx count in name
    lac savchr			" get break character
