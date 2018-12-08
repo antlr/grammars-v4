@@ -6,7 +6,6 @@
 	<fileSets>
 		<fileSet>
 			<directory>${project.basedir}</directory>
-			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>**/*.g4</include>
 			</includes>
