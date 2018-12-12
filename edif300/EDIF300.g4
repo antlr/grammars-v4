@@ -54,7 +54,7 @@ ampere : '(ampere'
 	unitExponent
 	')';
 
-and : '(and'
+and_ : '(and'
 	(  booleanExpression  )*
 	')';
 
@@ -142,7 +142,7 @@ booleanConstantRef : '(booleanConstantRef'
 	constantNameRef
 	')';
 
-booleanExpression : ( and  | booleanParameterRef | booleanToken | stringEqual | integerEqual | lessThan | lessThanOrEqual | not | or | xor | booleanConstantRef )
+booleanExpression : ( and_  | booleanParameterRef | booleanToken | stringEqual | integerEqual | lessThan | lessThanOrEqual | not_ | or_ | xor_ | booleanConstantRef )
 ;
 booleanMap : '(booleanMap'
 	booleanValue
@@ -1787,7 +1787,7 @@ nonPermutable : '(nonPermutable'
 	(  permutable  |  portRef  )*
 	')';
 
-not : '(not'
+not_ : '(not'
 	booleanExpression
 	')';
 
@@ -1849,7 +1849,7 @@ openShape : '(openShape'
 	curve
 	')';
 
-or : '(or'
+or_ : '(or'
 	(  booleanExpression  )*
 	')';
 
@@ -3380,7 +3380,7 @@ xCoordinate : integerValue;
 
 xNumberValue : numberValue;
 
-xor : '(xor'
+xor_ : '(xor'
 	(  booleanExpression  )*
 	')';
 
