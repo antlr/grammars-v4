@@ -115,6 +115,7 @@ select * from  t1 as tt1, t2 as tt2 inner join t1 on true;
 #begin
 -- where_condition test
 select col1 from t1 inner join t2 on (t1.col1 = t2.col2);
+select table_name from information_schema.TABLES where table_schema = DATABASE();
 #end
 #begin
 -- identifiers tests

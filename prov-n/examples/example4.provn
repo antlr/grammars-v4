@@ -1,0 +1,9 @@
+document
+  default <http://anotherexample.org/>
+  prefix ex <http://www.provbook.org/nonews/>
+
+  entity(e2)
+  agent(ag2)
+  entity(ex:e2)
+  agent(ex:ag2)
+endDocument

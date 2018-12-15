@@ -1,5 +1,5 @@
 using Antlr4.Runtime;
-using static PT.PM.JavaScriptParseTreeUst.Parser.JavaScriptParser;
+using static PT.PM.JavaScriptParseTreeUst.JavaScriptParser;
 
 /// <summary>
 /// All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
@@ -13,7 +13,7 @@ public abstract class JavaScriptBaseParser : Parser
     }
 
     /// <summary>
-    /// hort form for prev(String str)
+    /// Short form for prev(String str)
     /// </summary>
     protected bool p(string str)
     {
@@ -26,6 +26,18 @@ public abstract class JavaScriptBaseParser : Parser
     protected bool prev(string str)
     {
         return _input.Lt(-1).Text.Equals(str);
+    }
+
+    // Short form for next(String str)
+    protected bool n(string str)
+    {
+        return next(str);
+    }
+
+    // Whether the next token value equals to @param str
+    protected bool next(string str)
+    {
+        return _input.Lt(1).Text.Equals(str);
     }
 
     protected bool notLineTerminator()
