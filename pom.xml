@@ -140,6 +140,7 @@
 				<module>json</module>
 				<module>kotlin</module>
 				<module>kuka</module>
+				<module>l</module>				
 				<module>lambda</module>
 				<module>lcc</module>
 				<module>less</module>
