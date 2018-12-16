@@ -246,7 +246,7 @@ createView
 // details
 
 createDatabaseOption
-    : DEFAULT? CHARACTER SET '='? charsetName
+    : DEFAULT? (CHARACTER SET | CHARSET) '='? charsetName
     | DEFAULT? COLLATE '='? collationName
     ;
 
@@ -365,7 +365,8 @@ tableConstraint
     | (CONSTRAINT name=uid?)?
       FOREIGN KEY index=uid? indexColumnNames
       referenceDefinition                                           #foreignKeyTableConstraint
-    | CHECK '(' expression ')'                                      #checkTableConstraint
+    | (CONSTRAINT name=uid?)?
+      CHECK '(' expression ')'                                      #checkTableConstraint
     ;
 
 referenceDefinition
@@ -593,12 +594,14 @@ alterSpecification
       indexColumnNames indexOption*                                 #alterByAddSpecialIndex
     | ADD (CONSTRAINT name=uid?)? FOREIGN KEY
       indexName=uid? indexColumnNames referenceDefinition           #alterByAddForeignKey
+    | ADD (CONSTRAINT name=uid?)? CHECK '(' expression ')'          #alterByAddCheckTableConstraint
     | ALGORITHM '='? algType=(DEFAULT | INPLACE | COPY)             #alterBySetAlgorithm
     | ALTER COLUMN? uid
       (SET DEFAULT defaultValue | DROP DEFAULT)                     #alterByChangeDefault
     | CHANGE COLUMN? oldColumn=uid
       newColumn=uid columnDefinition
       (FIRST | AFTER afterColumn=uid)?                              #alterByChangeColumn
+    | RENAME COLUMN oldColumn=uid TO newColumn=uid                  #alterByRenameColumn
     | LOCK '='? lockType=(DEFAULT | NONE | SHARED | EXCLUSIVE)      #alterByLock
     | MODIFY COLUMN?
       uid columnDefinition (FIRST | AFTER uid)?                     #alterByModifyColumn
@@ -618,7 +621,7 @@ alterSpecification
     | IMPORT TABLESPACE                                             #alterByImportTablespace
     | FORCE                                                         #alterByForce
     | validationFormat=(WITHOUT | WITH) VALIDATION                  #alterByValidate
-    | ADD PARTITION partitionDefinition                             #alterByAddPartition
+    | ADD PARTITION '(' partitionDefinition ')'                     #alterByAddPartition
     | DROP PARTITION uidList                                        #alterByDropPartition
     | DISCARD PARTITION (uidList | ALL) TABLESPACE                  #alterByDiscardPartition
     | IMPORT PARTITION (uidList | ALL) TABLESPACE                   #alterByImportPartition
@@ -1869,6 +1872,7 @@ collationName
 engineName
     : ARCHIVE | BLACKHOLE | CSV | FEDERATED | INNODB | MEMORY
     | MRG_MYISAM | MYISAM | NDB | NDBCLUSTER | PERFOMANCE_SCHEMA
+    | STRING_LITERAL | REVERSE_QUOTE_ID
     ;
 
 uuidSet
@@ -1952,6 +1956,7 @@ nullNotnull
 
 constant
     : stringLiteral | decimalLiteral
+    | '-' decimalLiteral
     | hexadecimalLiteral | booleanLiteral
     | REAL_LITERAL | BIT_STRING
     | NOT? nullLiteral=(NULL_LITERAL | NULL_SPEC_LITERAL)
@@ -2402,7 +2407,7 @@ functionNameBase
     | COMPRESS | CONCAT | CONCAT_WS | CONNECTION_ID | CONV
     | CONVERT_TZ | COS | COT | COUNT | CRC32
     | CREATE_ASYMMETRIC_PRIV_KEY | CREATE_ASYMMETRIC_PUB_KEY
-    | CREATE_DH_PARAMETERS | CREATE_DIGEST | CROSSES | DATE
+    | CREATE_DH_PARAMETERS | CREATE_DIGEST | CROSSES | DATABASE | DATE
     | DATEDIFF | DATE_FORMAT | DAY | DAYNAME | DAYOFMONTH
     | DAYOFWEEK | DAYOFYEAR | DECODE | DEGREES | DES_DECRYPT
     | DES_ENCRYPT | DIMENSION | DISJOINT | ELT | ENCODE

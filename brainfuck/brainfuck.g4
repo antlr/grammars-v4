@@ -29,11 +29,16 @@
 grammar brainfuck;
 
 file
-   : opcode+
+   : statement*
    ;
 
+statement
+: opcode
+| LPAREN statement* RPAREN
+;
+
 opcode
-   : GT | LT | PLUS | MINUS | DOT | COMMA | LPAREN | RPAREN
+   : GT | LT | PLUS | MINUS | DOT | COMMA
    ;
 
 

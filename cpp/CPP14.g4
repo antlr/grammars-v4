@@ -172,8 +172,20 @@ postfixexpression
 	| Static_cast '<' thetypeid '>' '(' expression ')'
 	| Reinterpret_cast '<' thetypeid '>' '(' expression ')'
 	| Const_cast '<' thetypeid '>' '(' expression ')'
-	| Typeid '(' expression ')'
-	| Typeid '(' thetypeid ')'
+	| typeidofthetypeid '(' expression ')'
+	| typeidofthetypeid '(' thetypeid ')'
+;
+
+/*
+add a middle layer to eliminate duplicated function declarations
+*/
+typeidofexpr
+:
+	Typeid
+;
+typeidofthetypeid
+:
+	Typeid
 ;
 
 expressionlist

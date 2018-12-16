@@ -44,7 +44,7 @@ $ java TestR sample.R
 */
 grammar R;
 
-prog:   (   expr (';'|NL)
+prog:   (   expr (';'|NL)*
         |   NL
         )*
         EOF
@@ -110,6 +110,7 @@ formlist : form (',' form)* ;
 form:   ID
     |   ID '=' expr
     |   '...'
+    |   '.'
     ;
 
 sublist : sub (',' sub)* ;
@@ -122,6 +123,7 @@ sub :   expr
     |   'NULL' '='
     |   'NULL' '=' expr
     |   '...'
+    |   '.'
     |
     ;
 

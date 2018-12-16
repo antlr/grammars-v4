@@ -1,0 +1,5 @@
+namespace org.sample.invalid
+
+asset Foo identified by id {
+  o String id optional default = "0815"
+}

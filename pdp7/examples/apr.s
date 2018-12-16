@@ -62,7 +62,7 @@ floop1:
    tad d4
    dac name
 
-   sys open; name; ..; 0
+   sys open; name: ..; 0
    spa
    jmp ferror
    dac fi
@@ -72,7 +72,7 @@ ferror:
    lac name
    dac 1f
    lac d1
-   sys write; 1;..; 4
+   sys write; 1:..; 4
    lac d1
    sys write; 1f; 1
    jmp floop1
@@ -134,7 +134,7 @@ bksp:
    jmp cloop
 
 cret:
-   czm col
+   dzm col
    jmp cloop
 
 pass2:
@@ -278,6 +278,7 @@ hangup:
 abort:
    lac d1
    sys write; m2; m2s
+   jmp stop
 
 nofiles:
    lac d1
@@ -342,7 +343,7 @@ gcard: 0
    isz gcard
    sna
    jmp gcard i
-   irss 9
+   lrss 9
    sad o45
    jmp 1f
    jms putc

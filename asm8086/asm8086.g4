@@ -162,7 +162,7 @@ multiplyingExpression
 argument
    : number
    | dollar
-   | register
+   | register_
    | name
    | string
    | ('(' expression ')')
@@ -171,7 +171,7 @@ argument
    | NOT expression
    | OFFSET expression
    | LENGTH expression
-   | (register ':') expression
+   | (register_ ':') expression
    ;
 
 ptr
@@ -182,7 +182,7 @@ dollar
    : DOLLAR
    ;
 
-register
+register_
    : REGISTER
    ;
 
