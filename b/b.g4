@@ -38,7 +38,7 @@ program
 
 definition
    : (name constant? (ival (',' ival)*)* ';')
-   | (name '(' (name (',' name)*)* ')' statement)
+   | (name '(' (name (',' name)*)? ')' statement)
    ;
 
 ival
@@ -57,12 +57,12 @@ statement
    | switchstmt
    | gotostmt
    | returnstmt
-   | functionstmmt
    | expressionstmt
    ;
 
 expressionstmt
-    : expression ';' ;
+   : rvalue ';'
+   ;
 
 blockstmt
    : '{' statement* '}'
@@ -92,23 +92,19 @@ casestmt
    : 'case' constant ':' statement
    ;
 
-externsmt   
+externsmt
    : 'extrn' name (',' name)* ';'
    ;
 
 autosmt
-   : 'auto' name constant? (',' name constant?)* ';' 
-   ;
-
-functionstmmt
-   : name expression ';'
+   : 'auto' name constant? (',' name constant?)* ';'
    ;
 
 rvalue
    : expression
    | (expression binary rvalue)
    | (expression '?' rvalue ':' rvalue)
-   | (expression '(' rvalue (',' rvalue)* ')')
+   | (expression '(' (rvalue (',' rvalue)*)? ')')
    ;
 
 expression
