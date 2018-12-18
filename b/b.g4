@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar b;
 
 program
-   : definition
+   : definition*
    ;
 
 definition
@@ -58,6 +58,11 @@ statement
    | gotostmt
    | returnstmt
    | expressionstmt
+   | nullstmt
+   ;
+
+nullstmt
+   : ';'
    ;
 
 expressionstmt
@@ -69,23 +74,23 @@ blockstmt
    ;
 
 returnstmt
-   : 'return' ('(' expression ')')? ';'
+   : 'return' ('(' rvalue ')')? ';'
    ;
 
 gotostmt
-   : 'goto' expression ';'
+   : 'goto' rvalue ';'
    ;
 
 switchstmt
-   : 'switch' expression statement
+   : 'switch' rvalue statement
    ;
 
 whilestmt
-   : 'while' '(' expression ')' statement
+   : 'while' '(' rvalue ')' statement
    ;
 
 ifstmt
-   : 'if' '(' expression ')' statement ('else' statement)
+   : 'if' '(' rvalue ')' statement ('else' statement)?
    ;
 
 casestmt
@@ -102,20 +107,40 @@ autosmt
 
 rvalue
    : expression
-   | (expression binary rvalue)
-   | (expression '?' rvalue ':' rvalue)
-   | (expression '(' (rvalue (',' rvalue)*)? ')')
+   | comparison
+   | ternary
+   | assignment
+   ;
+
+ternary
+   : expression '?' rvalue ':' rvalue
+   ;
+
+comparison
+   : expression binary rvalue
+   ;
+
+assignment
+   : name assign rvalue
    ;
 
 expression
    : ('(' rvalue ')')
    | name
    | constant
-   | (name assign rvalue)
    | (incdec name)
    | (name incdec)
    | (unary rvalue)
    | ('&' name)
+   | functioninvocation
+   ;
+
+functioninvocation
+   : name '(' functionparameters? ')'
+   ;
+
+functionparameters
+   : rvalue (',' rvalue)*
    ;
 
 assign
@@ -184,6 +209,11 @@ STRING1
 
 STRING2
    : '\'' ~ ['\r\n]* '\''
+   ;
+
+
+BLOCKCOMMENT
+   : '/*' .*? '*/' -> skip
    ;
 
 
