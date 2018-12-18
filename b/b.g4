@@ -69,23 +69,23 @@ blockstmt
    ;
 
 returnstmt
-   : 'return' ('(' expression ')')? ';'
+   : 'return' ('(' rvalue ')')? ';'
    ;
 
 gotostmt
-   : 'goto' expression ';'
+   : 'goto' rvalue ';'
    ;
 
 switchstmt
-   : 'switch' expression statement
+   : 'switch' rvalue statement
    ;
 
 whilestmt
-   : 'while' '(' expression ')' statement
+   : 'while' '(' rvalue ')' statement
    ;
 
 ifstmt
-   : 'if' '(' expression ')' statement ('else' statement)
+   : 'if' '(' rvalue ')' statement ('else' statement)?
    ;
 
 casestmt
