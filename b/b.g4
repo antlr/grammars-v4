@@ -112,13 +112,13 @@ rvalue
    ;
 
 expression
-   : ('(' expression ')')
+   : ('(' rvalue ')')
    | name
    | constant
    | (name assign rvalue)
    | (incdec name)
    | (name incdec)
-   | (unary expression)
+   | (unary rvalue)
    | ('&' name)
    ;
 
