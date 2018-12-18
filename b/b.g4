@@ -102,9 +102,21 @@ autosmt
 
 rvalue
    : expression
-   | (expression binary rvalue)
-   | (expression '?' rvalue ':' rvalue)
-   | (expression '(' (rvalue (',' rvalue)*)? ')')
+   | comparison
+   | ternary
+   | functioninvocation
+   ;
+
+ternary
+   : expression '?' rvalue ':' rvalue
+   ;
+
+comparison
+   : expression binary rvalue
+   ;
+
+functioninvocation
+   : expression '(' (rvalue (',' rvalue)*)? ')'
    ;
 
 expression
