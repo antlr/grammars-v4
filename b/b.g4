@@ -105,6 +105,7 @@ rvalue
    | comparison
    | ternary
    | functioninvocation
+   | assignment
    ;
 
 ternary
@@ -119,11 +120,14 @@ functioninvocation
    : expression '(' (rvalue (',' rvalue)*)? ')'
    ;
 
+assignment
+   : name assign rvalue
+   ;
+
 expression
    : ('(' rvalue ')')
    | name
    | constant
-   | (name assign rvalue)
    | (incdec name)
    | (name incdec)
    | (unary rvalue)
