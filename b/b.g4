@@ -106,16 +106,16 @@ functionstmmt
 
 rvalue
    : expression
-   | (expression binary expression)
-   | (expression '?' expression ':' expression)
-   | (expression '(' expression (',' expression)* ')')
+   | (expression binary rvalue)
+   | (expression '?' rvalue ':' rvalue)
+   | (expression '(' rvalue (',' rvalue)* ')')
    ;
 
 expression
    : ('(' expression ')')
    | name
    | constant
-   | (name assign expression)
+   | (name assign rvalue)
    | (incdec name)
    | (name incdec)
    | (unary expression)
