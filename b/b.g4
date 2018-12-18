@@ -58,6 +58,11 @@ statement
    | gotostmt
    | returnstmt
    | expressionstmt
+   | nullstmt
+   ;
+
+nullstmt
+   : ';'
    ;
 
 expressionstmt
@@ -104,7 +109,6 @@ rvalue
    : expression
    | comparison
    | ternary
-   | functioninvocation
    | assignment
    ;
 
@@ -114,10 +118,6 @@ ternary
 
 comparison
    : expression binary rvalue
-   ;
-
-functioninvocation
-   : expression '(' (rvalue (',' rvalue)*)? ')'
    ;
 
 assignment
@@ -132,6 +132,15 @@ expression
    | (name incdec)
    | (unary rvalue)
    | ('&' name)
+   | functioninvocation
+   ;
+
+functioninvocation
+   : name '(' functionparameters? ')'
+   ;
+
+functionparameters
+   : rvalue (',' rvalue)*
    ;
 
 assign
@@ -200,6 +209,11 @@ STRING1
 
 STRING2
    : '\'' ~ ['\r\n]* '\''
+   ;
+
+
+BLOCKCOMMENT
+   : '/*' .*? '*/' -> skip
    ;
 
 
