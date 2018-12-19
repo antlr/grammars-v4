@@ -4,6 +4,7 @@
  * Copyright (c) 2014 by Bart Kiers (original author) and Alexandre Vitorelli (contributor -> ported to CSharp)
  * Copyright (c) 2017 by Ivan Kochurkin (Positive Technologies):
     added ECMAScript 6 support, cleared and transformed to the universal grammar.
+ * Copyright (c) 2018 by Juan Alvarez (contributor -> ported to Go)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
