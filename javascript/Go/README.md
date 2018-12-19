@@ -1,7 +1,13 @@
 # Go port
 
-**NOTE**: To use the Go version you **MUST** use the JavaScript[Lexer|Parser].g4
-files contained in this folder.
+**NOTE**: To use the Go version you **MUST** make some tweaks to the grammar files
+manually in order to have no compiler errors.
+
+* In the `JavaScriptLexer.g4` file:
+    * Go to lines 38, 110, 156-164 and replace the `this` prefix with `p` inside the predicate
+    * Go to lines 44, 45 and 172 and replace the `this` prefix with `l` inside the action
+* In the `JavaScriptParser.g4` file:
+    * Replace all `this.` ocurrences with `p.`
 
 **WARNING**: After generating both the parser and the lexer, there will be 1 runtime error.
 
