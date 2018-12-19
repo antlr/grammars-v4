@@ -45,7 +45,7 @@ sourceElement
 statement
     : block
     | variableStatement
-    | emptyStatement
+    | emptyStatement_
     | expressionStatement
     | ifStatement
     | iterationStatement
@@ -82,7 +82,7 @@ variableDeclaration
     : (Identifier | arrayLiteral | objectLiteral) ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
-emptyStatement
+emptyStatement_
     : SemiColon
     ;
 
@@ -185,7 +185,7 @@ classTail
 
 classElement
     : (Static | {p.n("static")}? Identifier)? methodDefinition
-    | emptyStatement
+    | emptyStatement_
     ;
 
 methodDefinition

@@ -3,15 +3,7 @@
 **NOTE**: To use the Go version you **MUST** use the JavaScript[Lexer|Parser].g4
 files contained in this folder.
 
-**WARNING**: After generating both the parser and the lexer, there will be 2 errors:
-1 compile error and 1 runtime error.
-
-**The compile error** is caused by a redeclared function in the generated file `javascript_parser.go`
-to fix this simply remove the function named `NewEmptyStatementContext` located in the line 884.
-
-The cause for this is unknown at the time of writing due to the lack of knowledge of the author of
-this port about how ANTLR4 generates the files, so it may be an ANTLR4 error instead
-of one related to the grammar.
+**WARNING**: After generating both the parser and the lexer, there will be 1 runtime error.
 
 **The runtime error** is caused by a nil pointer dereference, to fix this go to the generated file
 `javascript_lexer.go` and go to line 623, then remove the pointer `*` that's preceding
