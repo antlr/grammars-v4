@@ -35,7 +35,7 @@ options { superClass=JavaScriptBaseLexer; }
 
 MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
 SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
-RegularExpressionLiteral:       '/' RegularExpressionChar+ {this.IsRegexPossible()}? '/' IdentifierPart*;
+RegularExpressionLiteral:       '/' RegularExpressionFirstChar RegularExpressionChar* {this.IsRegexPossible()}? '/' IdentifierPart*;
 
 OpenBracket:                    '[';
 CloseBracket:                   ']';
@@ -668,6 +668,10 @@ fragment UnicodeConnectorPunctuation
     | [\uFE4D-\uFE4F]
     | [\uFF3F]
     | [\uFF65]
+    ;
+
+fragment RegularExpressionFirstChar
+    : ~'*'
     ;
 
 fragment RegularExpressionChar
