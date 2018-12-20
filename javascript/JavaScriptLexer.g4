@@ -671,7 +671,9 @@ fragment UnicodeConnectorPunctuation
     ;
 
 fragment RegularExpressionFirstChar
-    : ~'*'
+    : ~[*\r\n\u2028\u2029\\/[]
+    | RegularExpressionBackslashSequence
+    | '[' RegularExpressionClassChar* ']'
     ;
 
 fragment RegularExpressionChar
