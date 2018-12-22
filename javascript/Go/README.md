@@ -8,6 +8,7 @@ manually in order to have no compiler errors.
     * Go to lines 44, 45 and 172 and replace the `this` prefix with `l` inside the action
 * In the `JavaScriptParser.g4` file:
     * Replace all `this.` ocurrences with `p.`
+    * Rename the `emptyStatement` parser rule to `emptyStatement_` (Replace all `emptyStatement` ocurrences with `emptyStatement_`)
 
 **WARNING**: After generating both the parser and the lexer, there will be 1 runtime error.
 
