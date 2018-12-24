@@ -42,14 +42,18 @@ mathStatement
    ;
 
 expression
-   : measurement
-   | identifier
-   | identifier LPAREN values? RPAREN
-   | Color
-   | StringLiteral
-   | url
-   | variableName
-   ;
+
+  : measurement
+  | identifier IMPORTANT
+  | identifier
+  | identifier LPAREN values? RPAREN
+  | Color
+  | StringLiteral
+  | url
+  | variableName IMPORTANT
+  | variableName
+  ;
+
 
 function
    : FUNCTION_NAME LPAREN values? RPAREN
@@ -75,8 +79,13 @@ variableDeclaration
 
 //Imports
 importDeclaration
-   : '@import' referenceUrl mediaTypes? ';'
-   ;
+  : '@import' (LPAREN (importOption (COMMA importOption)*) RPAREN)? referenceUrl mediaTypes? ';'
+  ;
+
+
+importOption
+    : REFERENCE | INLINE | LESS | CSS | ONCE | MULTIPLE
+    ;
 
 referenceUrl
    : StringLiteral
@@ -118,24 +127,34 @@ selectors
    ;
 
 selector
-   : element + (selectorPrefix element)* attrib* pseudo?
-   ;
+
+  : element+  attrib* pseudo?
+  ;
+
 
 attrib
    : '[' Identifier (attribRelate (StringLiteral | Identifier))? ']'
    ;
+
+negation
+  : COLON NOT LPAREN LBRACK? selectors RBRACK? RPAREN
+  ;
 
 pseudo
    : (COLON | COLONCOLON) Identifier
    ;
 
 element
-   : identifier
-   | '#' identifier
-   | '.' identifier
-   | PARENTREF
-   | '*'
-   ;
+
+  : selectorPrefix identifier
+  | identifier
+  | '#' identifier
+  | pseudo
+  | negation
+  | PARENTREF
+  | '*'
+  ;
+
 
 selectorPrefix
    : (GT | PLUS | TIL)
