@@ -42,18 +42,16 @@ mathStatement
    ;
 
 expression
-
-  : measurement
-  | identifier IMPORTANT
-  | identifier
-  | identifier LPAREN values? RPAREN
-  | Color
-  | StringLiteral
-  | url
-  | variableName IMPORTANT
-  | variableName
-  ;
-
+   : measurement
+   | identifier IMPORTANT
+   | identifier
+   | identifier LPAREN values? RPAREN
+   | Color
+   | StringLiteral
+   | url
+   | variableName IMPORTANT
+   | variableName
+   ;
 
 function
    : FUNCTION_NAME LPAREN values? RPAREN
@@ -79,13 +77,17 @@ variableDeclaration
 
 //Imports
 importDeclaration
-  : '@import' (LPAREN (importOption (COMMA importOption)*) RPAREN)? referenceUrl mediaTypes? ';'
-  ;
-
+   : '@import' (LPAREN (importOption (COMMA importOption)*) RPAREN)? referenceUrl mediaTypes? ';'
+   ;
 
 importOption
-    : REFERENCE | INLINE | LESS | CSS | ONCE | MULTIPLE
-    ;
+   : REFERENCE
+   | INLINE
+   | LESS
+   | CSS
+   | ONCE
+   | MULTIPLE
+   ;
 
 referenceUrl
    : StringLiteral
@@ -127,34 +129,30 @@ selectors
    ;
 
 selector
-
-  : element+  attrib* pseudo?
-  ;
-
+   : element + attrib* pseudo?
+   ;
 
 attrib
    : '[' Identifier (attribRelate (StringLiteral | Identifier))? ']'
    ;
 
 negation
-  : COLON NOT LPAREN LBRACK? selectors RBRACK? RPAREN
-  ;
+   : COLON NOT LPAREN LBRACK? selectors RBRACK? RPAREN
+   ;
 
 pseudo
    : (COLON | COLONCOLON) Identifier
    ;
 
 element
-
-  : selectorPrefix identifier
-  | identifier
-  | '#' identifier
-  | pseudo
-  | negation
-  | PARENTREF
-  | '*'
-  ;
-
+   : selectorPrefix identifier
+   | identifier
+   | '#' identifier
+   | pseudo
+   | negation
+   | PARENTREF
+   | '*'
+   ;
 
 selectorPrefix
    : (GT | PLUS | TIL)
