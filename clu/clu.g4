@@ -164,20 +164,76 @@ statement
    | (idn (',' idn)* ':=' expression (',' expression)*)
    | (primary '.' name ':=' expression)
    | invocation
-   | ('while' expression 'do' body 'end')
-   | ('for' (decl (',' decl)*)? 'in' invocation 'do' body 'end')
-   | ('for' (idn (',' idn)*)? 'in' invocation 'do' body 'end')
-   | ('if' expression 'then' body ('elseif' expression 'then' body)* ('else' body)? 'end')
-   | ('tagcase' expression tag_arm* ('others' ':' body)? 'end')
-   | ('return' (expression (',' expression)*)?)
-   | ('yeild' (expression (',' expression)*)?)
-   | ('signal' name (expression (',' expression)*)?)
-   | ('exit' name (expression (',' expression)*)?)
-   | 'break'
-   | 'continue'
-   | ('begin' body 'end')
-   | (statement 'resignal' name (',' name)*)
-   | (statement 'except' when_handler* others_handler? 'end')
+   | whilestatement
+   | forstatement2
+   | forstatement1
+   | ifstatement
+   | tagcasestatement
+   | returnstatement
+   | yeildstatement
+   | signalstatement
+   | exitstatement
+   | breakstatement
+   | continuestatement
+   | beginstatement
+   | resignalstatement
+   | exceptstatement
+   ;
+
+whilestatement
+   : 'while' expression 'do' body 'end'
+   ;
+
+forstatement2
+   : 'for' (decl (',' decl)*)? 'in' invocation 'do' body 'end'
+   ;
+
+forstatement1
+   : 'for' (idn (',' idn)*)? 'in' invocation 'do' body 'end'
+   ;
+
+ifstatement
+   : 'if' expression 'then' body ('elseif' expression 'then' body)* ('else' body)? 'end'
+   ;
+
+tagcasestatement
+   : 'tagcase' expression tag_arm* ('others' ':' body)? 'end'
+   ;
+
+returnstatement
+   : 'return' (expression (',' expression)*)?
+   ;
+
+yeildstatement
+   : 'yeild' (expression (',' expression)*)?
+   ;
+
+signalstatement
+   : 'signal' name (expression (',' expression)*)?
+   ;
+
+exitstatement
+   : 'exit' name (expression (',' expression)*)?
+   ;
+
+continuestatement
+   : 'break'
+   ;
+
+breakstatement
+   : 'break'
+   ;
+
+beginstatement
+   : 'begin' body 'end'
+   ;
+
+resignalstatement
+   : statement 'resignal' name (',' name)*
+   ;
+
+exceptstatement
+   : statement 'except' when_handler* others_handler? 'end'
    ;
 
 tag_arm
