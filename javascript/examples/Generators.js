@@ -1,6 +1,6 @@
 "use strict";
 // TODO: Implement
-/*
+
 //------------------------------------------------------------------------------
 // Generator Function, Iterator Protocol
 // Support for generators, a special case of Iterators containing a generator
@@ -139,4 +139,3 @@ let Obj = {
         // …
     }
 }
-*/

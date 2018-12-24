@@ -702,6 +702,7 @@ expression
     | expression op=OR expression
 
     | expression QUESTION trueExpression=expression? COLON falseExpression=expression
+    | LP compoundStatement RP
 
     | unaryExpression assignmentOperator assignmentExpression=expression
     ;

@@ -6,37 +6,43 @@
 
 parser grammar LessParser;
 
-options { tokenVocab=LessLexer; }
+options
+   { tokenVocab = LessLexer; }
 
 stylesheet
-  : statement*
-  ;
+   : statement*
+   ;
 
 statement
-  : importDeclaration
-  | ruleset
-  | variableDeclaration ';'
-  | mixinDefinition
-  ;
+   : importDeclaration
+   | ruleset
+   | variableDeclaration ';'
+   | mixinDefinition
+   ;
 
 variableName
-  : AT variableName
-  | AT Identifier
-  ;
+   : AT variableName
+   | AT Identifier
+   ;
 
 commandStatement
-  : (expression+) mathStatement?
-  ;
+   : (expression +) mathStatement?
+   ;
 
 mathCharacter
-  : TIMES | PLUS | DIV | MINUS | PERC
-  ;
+   : TIMES
+   | PLUS
+   | DIV
+   | MINUS
+   | PERC
+   ;
 
 mathStatement
-  : mathCharacter commandStatement
-  ;
+   : mathCharacter commandStatement
+   ;
 
 expression
+
   : measurement
   | identifier IMPORTANT
   | identifier
@@ -48,93 +54,98 @@ expression
   | variableName
   ;
 
+
 function
-  : FUNCTION_NAME LPAREN values? RPAREN
-  ;
+   : FUNCTION_NAME LPAREN values? RPAREN
+   ;
 
 conditions
-  : condition ((AND|COMMA) condition)*
-  ;
+   : condition ((AND | COMMA) condition)*
+   ;
 
 condition
-  : LPAREN conditionStatement RPAREN
-  | NOT LPAREN conditionStatement RPAREN
-  ;
+   : LPAREN conditionStatement RPAREN
+   | NOT LPAREN conditionStatement RPAREN
+   ;
 
 conditionStatement
-  : commandStatement ( EQ | LT | GT | GTEQ | LTEQ ) commandStatement
-  | commandStatement
-  ;
+   : commandStatement (EQ | LT | GT | GTEQ | LTEQ) commandStatement
+   | commandStatement
+   ;
 
 variableDeclaration
-  : variableName COLON values
-  ;
+   : variableName COLON values
+   ;
 
 //Imports
 importDeclaration
   : '@import' (LPAREN (importOption (COMMA importOption)*) RPAREN)? referenceUrl mediaTypes? ';'
   ;
 
+
 importOption
     : REFERENCE | INLINE | LESS | CSS | ONCE | MULTIPLE
     ;
 
 referenceUrl
-    : StringLiteral
-    | UrlStart Url UrlEnd
-    ;
+   : StringLiteral
+   | UrlStart Url UrlEnd
+   ;
 
 mediaTypes
-  : (Identifier (COMMA Identifier)*)
-  ;
+   : (Identifier (COMMA Identifier)*)
+   ;
 
 //Rules
 ruleset
    : selectors block
-  ;
+   ;
 
 block
-  : BlockStart (property ';' | statement | mixinReference)* property? BlockEnd
-  ;
+   : BlockStart (property ';' | statement | mixinReference)* property? BlockEnd
+   ;
 
 mixinDefinition
-  : selectors LPAREN (mixinDefinitionParam (';' mixinDefinitionParam)*)? Ellipsis? RPAREN mixinGuard? block
-  ;
+   : selectors LPAREN (mixinDefinitionParam (';' mixinDefinitionParam)*)? Ellipsis? RPAREN mixinGuard? block
+   ;
 
 mixinGuard
-  : WHEN conditions
-  ;
+   : WHEN conditions
+   ;
 
 mixinDefinitionParam
-  : variableName
-  | variableDeclaration
-  ;
+   : variableName
+   | variableDeclaration
+   ;
 
 mixinReference
-  : selector LPAREN values? RPAREN IMPORTANT? ';'
-  ;
+   : selector LPAREN values? RPAREN IMPORTANT? ';'
+   ;
 
 selectors
-  : selector (COMMA selector)*
-  ;
+   : selector (COMMA selector)*
+   ;
 
 selector
+
   : element+  attrib* pseudo?
   ;
 
+
 attrib
-  : '[' Identifier (attribRelate (StringLiteral | Identifier))? ']'
-  ;
+   : '[' Identifier (attribRelate (StringLiteral | Identifier))? ']'
+   ;
 
 negation
   : COLON NOT LPAREN LBRACK? selectors RBRACK? RPAREN
   ;
 
 pseudo
-  : (COLON|COLONCOLON) Identifier
-  ;
+   : (COLON | COLONCOLON) Identifier
+   ;
 
 element
+
   : selectorPrefix identifier
   | identifier
   | '#' identifier
@@ -144,42 +155,43 @@ element
   | '*'
   ;
 
+
 selectorPrefix
-  : (GT | PLUS | TIL)
-  ;
+   : (GT | PLUS | TIL)
+   ;
 
 attribRelate
-  : '='
-  | '~='
-  | '|='
-  ;
+   : '='
+   | '~='
+   | '|='
+   ;
 
 identifier
-  : Identifier identifierPart*
-  | InterpolationStart identifierVariableName BlockEnd identifierPart*
-  ;
+   : Identifier identifierPart*
+   | InterpolationStart identifierVariableName BlockEnd identifierPart*
+   ;
 
 identifierPart
-  : InterpolationStartAfter identifierVariableName BlockEnd
-  | IdentifierAfter
-  ;
+   : InterpolationStartAfter identifierVariableName BlockEnd
+   | IdentifierAfter
+   ;
 
 identifierVariableName
-  : (Identifier | IdentifierAfter)
-  ;
+   : (Identifier | IdentifierAfter)
+   ;
 
 property
-  : identifier COLON values
-  ;
+   : identifier COLON values
+   ;
 
 values
-  : commandStatement (COMMA commandStatement)*
-  ;
+   : commandStatement (COMMA commandStatement)*
+   ;
 
 url
-  : UrlStart Url UrlEnd
-  ;
+   : UrlStart Url UrlEnd
+   ;
 
 measurement
-  : Number Unit?
-  ;
+   : Number Unit?
+   ;

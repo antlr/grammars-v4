@@ -3,60 +3,61 @@
 
 	" allocate a free disk block for a file (data or indirect)
 alloc: 0
-   -1
-   tad s.nfblks
-   spa
-   jmp 1f
-   dac s.nfblks
-   tad fblksp
-   jms laci
-   dac 9f+t
-   jms copyz; dskbuf; 64
-   lac 9f+t
-   jms dskwr
-   dzm .savblk
-   lac 9f+t
-   jmp alloc i
+   -1			" decrement the count
+   tad s.nfblks		" of free blocks at s.fblks
+   spa			" any left?
+   jmp 1f		"  no
+   dac s.nfblks		" Update the count of free block numbers
+   tad fblksp		" get pointer to last valid entry in s.fblks
+   jms laci		" fetch the word
+   dac 9f+t		" save in t0
+   jms copyz; dskbuf; 64	" zero dskbuf
+   lac 9f+t		" get block number back
+   jms dskwr		" write out the zeros
+   dzm .savblk		" cancel system block write
+   lac 9f+t		" get the block number back
+   jmp alloc i		" Return from routine
 1:
-   lac s.nxfblk
-   sna
+   lac s.nxfblk		" next block with list of free blocks
+   sna			" any?
    jms halt " OUT OF DISK
-   dac s.fblks
-   jms dskrd
-   lac dskbuf
-   dac s.nxfblk
-   jms copy; dskbuf+1; s.fblks+1; 9
-   lac d10
+   dac s.fblks		" save as first free block #
+   jms dskrd		" read the block
+   lac dskbuf		" get first word (pointer to next in chain)
+   dac s.nxfblk		" save as new "next"
+   jms copy; dskbuf+1; s.fblks+1; 9	" copy remaining 9 as free
+   lac d10		" reset free count
    dac s.nfblks
    jmp alloc+1
 
-	" free a disk block
+	" free the disk block whose number is in AC
 free: 0
-   lmq
-   lac s.nfblks
-   sad d10
-   jmp 1f
-   tad fblksp
-   dac 9f+t
-   lacq
-   dac 9f+t i
-   dzm .savblk
-   isz s.nfblks
-   jmp free i
+   lmq			" save block in MQ
+   lac s.nfblks		" get number of free blocks
+   sad d10		" 10?
+   jmp 1f		"  yes
+   tad fblksp		" no: get addr in s.fblks to store new block in
+   dac 9f+t		" save pointer
+   lacq			" get block number
+   dac 9f+t i		" save it in s.fblks
+   dzm .savblk		" cancel system block write
+   isz s.nfblks		" increment free count
+   jmp free i		" return
 1:
-   lac s.nxfblk
-   dac dskbuf
-   jms copy; s.fblks+1; dskbuf+1; 9
-   lacq
-   dac s.nxfblk
-   jms dskwr
-   dzm .savblk
-   lac d1
-   dac s.nfblks
-   jmp free i
+   lac s.nxfblk		" get head of free chain
+   dac dskbuf		" save (as chain ptr) in first word of disk buf
+   jms copy; s.fblks+1; dskbuf+1; 9	" with 9 of the 10 free blocks
+   lacq			" get the newly freed block back
+   dac s.nxfblk		" save as new head of free chain
+   jms dskwr		" write dskbuf to the newly freed block
+   dzm .savblk		" cancel system block write
+   lac d1		" reset free count to one
+   dac s.nfblks		" (the first word in s.fblks)
+   jmp free i		" Return from the routine
 t = t+1
 
 	" load AC indirect (without using indirect!)
+	" need to avoid use of indirect in interrupt service routines
 	" AC/ address
 	"   jms laci
 	" AC/ contents of address
@@ -141,140 +142,176 @@ copyz: 0
    jmp copyz i			" return
 t = t+1
 
+	" Character queue management routines
+	" (CALLED FROM PI: USE OF INDIRECT AVOIDED!)
+
+	" Queue numbers:
+	"  0: free list
+	"  1: tty input
+	"  2: tty output
+	"  3: display keyboard
+	"  4: paper tape reader
+	"  5: paper tape punch
+
+	" queue headers are two words: "first" and "last"(??)
+	" queue entries are two words: "next" and "char"
+
+	" put queued character
+	" character to store in "char"
+	" queue number in AC
+
 putchar: 0
 "** 01-s1.pdf page 23
-   dac 9f+t
-   cla
+   dac 9f+t		" save queue number in t0
+   cla			" get entry from free list
    jms takeq
-      jmp putchar i
-   tad o40001
+      jmp putchar i	" none free: return w/o skip
+   tad o40001		" turn into "dac addr+1"
    dac .+4
-   lac 9f+t
-   jms putq
-   lac char
-   dac q2+1 ..
-   isz putchar
+   lac 9f+t		" get queue number back
+   jms putq		" add entry
+   lac char		" get char
+   dac q2+1 ..		" save in second word of queue entry
+   isz putchar		" give skip return
    jmp putchar i
 t = t+1
 
+	" get queued character
+	" queue number in AC
+	" returns with skip if something found
 getchar: 0
-   jms takeq
-      jmp i getchar
-   tad o200001
+   jms takeq		" get entry from head of queue
+      jmp i getchar	"  nothing there: return w/o skip
+   tad o200001		" turn into "lac qentry+1" (fetch stored char)
    dac .+3
    cla
-   jms putq
-   lac q2+1 ..
-   isz getchar
+   jms putq		" put qentry on free list
+   lac q2+1 ..		" fetch queued character(!!!)
+   isz getchar		" give skip return
    jmp i getchar
 
+	" fetch first entry from a queue
+	" queue number in AC
+	" returns with skip if something dequeued
 takeq: 0
-   rcl
-   tad lacq1
+   rcl			" multiply queue number by two
+   tad lacq1		" add "lac q1"
    dac .+7
-   tad o640000
+   tad o640000		" turn "lac" into "dac"
    dac .+17
-   tad d1
+   tad d1		" increment addr
    dac .+14
-   tad o500000
+   tad o500000		" turn "dac" into "sad"
    dac .+5
-   lac q1 ..
-   sna
-   jmp takeq i
+   lac q1 ..		" load queue head
+   sna			" non-zero?
+   jmp takeq i		"  no: return zero w/o skip
    dac lnkaddr
-   sad q1+1 ..
-   jmp .+5
-   tad o200000
-   dac .+1
-   lac q2 ..
+   sad q1+1 ..		" different from tail(??)
+   jmp .+5		"  no -- (last entry?)
+   tad o200000		" yes: turn into lac
+   dac .+1		" save lac
+   lac q2 ..		" get next pointer from queue entry
    jmp .+3
-   cla
-   dac q1+1 ..
-   dac q1 ..
-   isz takeq
-   lac lnkaddr
+   cla			" here with head == tail(??)
+   dac q1+1 ..		" clear tail
+   dac q1 ..		" save (clear) head
+   isz takeq		" give skip return
+   lac lnkaddr		" return queue entry pointer
    jmp i takeq
 
+	" save queue entry (at lnkaddr) to a queue (queue number in AC)
 putq: 0
-   rcl
-   tad dacq1
+   rcl			" multiply by two
+   tad dacq1		" turn into "dac qhead"
    dac .+14
-   tad d1
+   tad d1		" turn into "dac qtail"
    dac .+13
-   tad o140000
+   tad o140000		" turn into "lac qtail"
    dac .+1
-   lac q1-1 ..
+   lac q1-1 ..		" fetch tail
 "** 01-s1.pdf page 24
-   sna
-   jmp .+6
-   tad o40000
+   sna			" non-zero?
+   jmp .+6		"  no: is zero
+   tad o40000		" turn into "dac qentry" (append to queue)
    dac .+2
-   lac lnkaddr
-   dac q2 ..
+   lac lnkaddr		" get new entry
+   dac q2 ..		" append to tail entry
    jmp .+3
-   lac lnkaddr
-   dac q1 ..
-   dac q1+1 ..
+   lac lnkaddr		" here with tail == 0
+   dac q1 ..		" save new entry as head
+   dac q1+1 ..		" save new tail
    jmp putq i
 
+	" NOTE!! srcdbs, collaps, dskrd, dskwr share the same "temp" vars:
+	" "t0" temp!!
+	" "t1" contains pointer to (addr, buffer)
+	" "t2" contains block number
+	
+	" check if disk block number in AC in memory
+	" give skip return if block NOT found
+
 srcdbs: 0
-   dac 9f+t+2   "* lmq
-   -ndskbs
-   dac 9f+t
-   law dskbs	"* -1 dac 8 written
-   dac 9f+t+1	"* lacq
+   dac 9f+t+2   "* lmq			" save block number in t2
+   -ndskbs				" loop for number of buffers
+   dac 9f+t				" in t0
+   law dskbs	"* -1 dac 8 written	" get address of first buffer
+   dac 9f+t+1	"* lacq			" in t1
 1:
-   lac 9f+t+2	"** crossed out
-   sad 9f+t+1	"** isz 8 written
-   jmp srcdbs i
-   law 65	"** ??? crossed out
+   lac 9f+t+2	"** crossed out		" get desired block number
+   sad 9f+t+1 i	"** "8 i" written	" match buffer block?
+   jmp srcdbs i				"  yes: return without skip
+   law 65	"** crossed out		" no: advance to next buffer
    tad 9f+t+1	"** crossed out isz 8 written
-   isz 9f+t+1
+   dac 9f+t+1
    isz 9f+t
    jmp 1b
-   isz srcdbs
+   isz srcdbs				" block not found: give skip return
    jmp srcdbs i
 
 collapse: 0
-   cla
-   jms srcdbs
-      jmp 1f
-   law dskbs
+   cla					" look for free buffer
+   jms srcdbs				" found?
+      jmp 1f				"  yes
+   law dskbs				" no: reuse last buffer
    dac 9f+t+1	"** 9f+t+1 crossed out: 8 written in
 1:
+		"** written: tad dm1
+		"** written: dac 8
    lac 9f+t+1	"** 9f+t+1 crossed out: 8 written in
-   dac 0f+1
-   tad d65	"** crossed out: d2-- original obscured
-   dac 0f
+   dac 0f+1				" save as copy dest
+   tad d65	"** crossed out w/ d2	" get start of next buffer
+   dac 0f				" save as copy src
    cma
    tad d1
-   tad edskbsp
-   and o17777
-   sna
-   jmp 0f+3
-   dac 0f+2
-   jms copy; 0:..; ..; ..
+   tad edskbsp				" subtract from end of buffers
+   and o17777				" mask to 13 bits
+   sna					" non-zero count?
+   jmp 0f+3				"  no: skip copy
+   dac 0f+2				" save as copy length
+   jms copy; 0:..; ..; ..		" slide buffers up
    -65
-   tad edskbsp
-   dac 9f+t
-   tad d1
-   dac 0f
-   lac dskaddr
-   dac 9f+t i
-   jms copy; dskbuf; 0:..; 64
+   tad edskbsp				" get addr of last buffer
+   dac 9f+t				" save in t0
+   tad d1				" get block data pointer
+   dac 0f				" save as copy dest
+   lac dskaddr				" get block number
+   dac 9f+t i				" save in buffer header
+   jms copy; dskbuf; 0:..; 64		" copy dskbuf to last buffer
    jmp collapse i
 
+	" read logical disk block number (2..7999) in AC into dskbuf
 dskrd: 0
    jms betwen; d2; d7999
 
 "** 01-s1.pdf page 25
-      jms halt
-   sad dskaddr
-   jmp dskrd i
-   dac dskaddr
-   jms srcdbs
-      jmp 1f
-   lac dskaddr
+      jms halt			" bad block number
+   sad dskaddr			" block currently in dskbuf
+   jmp dskrd i			"  yes: return
+   dac dskaddr			" save block address
+   jms srcdbs			" in memory?
+      jmp 1f			"  yes
+   lac dskaddr			" no: read from disk
    jms dskio; 06000
    jmp 2f
 1:
@@ -300,8 +337,9 @@ dskwr: 0
    jmp dskwr i
 t = t+3
 
+	" called to read/write logical block into "dskbuf"
 	" AC/ block
-	"   jms dskio; dsld_bits
+	"   jms dskio; DSLD_BITS
 dskio: 0
    dac dskaddr
    cll; idiv; 80
@@ -326,8 +364,10 @@ dskio: 0
    jmp dskio i
 t = t+1
 
-	" called with:
-	"   jms dsktrans; -WC; MAC; addr_ptr?; dsld_ptr
+	" perform disk I/O (both filesystem buffer and swapping)
+	" passed physical (BCD) disk address
+	" called:
+	"   jms dsktrans; -WC; MAC; addr_ptr; dsld_ptr
 dsktrans: 0
    -10
    dac 9f+t

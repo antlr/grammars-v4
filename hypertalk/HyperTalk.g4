@@ -25,7 +25,7 @@
 grammar HyperTalk;
 
 // Start symbol accepting only well-formed HyperTalk scripts that consist of handlers, functions, whitespace and
-// comments (representing scipts that are assignable to objects like buttons, fields and cards). Disallows statements or
+// comments (representing scripts that are assignable to objects like buttons, fields and cards). Disallows statements or
 // expressions that are not inside of a handler or function block.
 script
     : handler script
@@ -126,6 +126,8 @@ commandStmnt
     | 'answer' expression
     | 'ask' expression 'with' expression
     | 'ask' expression
+    | 'ask' 'file' expression
+    | 'ask' 'file' expression 'with' expression
     | 'beep'
     | 'beep' expression
     | 'choose' toolExpression 'tool'?
@@ -158,7 +160,7 @@ commandStmnt
     | 'find' expression? 'international'? expression
     | 'get' expression
     | 'go' 'to'? expression 'with' 'visual' expression
-    | 'go' 'to'? expression
+    | 'go' 'to'? expression remoteNavOption
     | 'go' 'back'
     | 'go' 'back' 'with' 'visual' expression
     | 'hide' expression
@@ -223,6 +225,13 @@ commandStmnt
     | 'write' expression 'to' 'file' expression
     | 'write' expression 'to' 'file' expression 'at' ('eof' | 'end')
     | 'write' expression 'to' 'file' expression 'at' expression
+    ;
+
+remoteNavOption
+    : 'in a' 'new' 'window'
+    | 'in a' 'new' 'window' 'without' 'dialog'
+    | 'without' 'dialog'
+    |
     ;
 
 convertible
@@ -341,10 +350,11 @@ part
     | bkgndPart
     | cardPart
     | stackPart
+    | windowPart
     ;
 
 stackPart
-    : 'this' stack
+    : 'this'? stack
     | stack factor
     ;
 
@@ -369,20 +379,32 @@ fieldPart
     ;
 
 cardPart
-    : 'this' card
+    : 'this'? card
     | card 'id' factor
     | position card
     | ordinal card
     | card factor
     | cardPart of bkgndPart
+    | cardPart of stackPart
     ;
 
 bkgndPart
-    : 'this' background
+    : 'this'? background
     | background 'id' factor
     | background factor
     | ordinal background
     | position background
+    | bkgndPart of stackPart
+    ;
+
+windowPart
+    : 'the'? card 'window'
+    | 'the'? 'tool' 'window'
+    | 'the'? 'pattern' 'window'
+    | 'the'? 'message' 'watcher'
+    | 'the'? 'variable' 'watcher'
+    | 'window' expression
+    | 'window' 'id' expression
     ;
 
 listExpression
@@ -422,7 +444,6 @@ container
     | property
     | menu
     | menuItem
-    | message
     | part
     | chunk container
     ;
@@ -484,33 +505,20 @@ zeroArgFunc
     | 'number' 'of' background button
     | 'number' 'of' card field
     | 'number' 'of' background? field
-    | 'number' 'of' 'menus'
-    | 'number' 'of' cards (of 'this' 'stack')?
+    | 'number' 'of' cards
+    | 'number' 'of' background
     | 'number' 'of' 'marked' cards
-    | 'number' 'of' background (of 'this' 'stack')?
+    | 'number' 'of' 'menus'
+    | 'number' 'of' 'windows'
     | 'menus'
     | 'diskspace'
     | 'params'
     | 'paramcount'
-    | 'sound'
-    | 'selectedtext'
-    | 'selectedchunk'
-    | 'selectedfield'
-    | 'selectedline'
     | 'target'
     | 'speech'
     | 'voices'
-    | 'clicktext'
-    | 'mouseh'
-    | 'mousev'
-    | 'screenrect'
-    | 'clickloc'
-    | 'clickh'
-    | 'clickv'
-    | 'foundchunk'
-    | 'foundfield'
-    | 'foundline'
-    | 'foundtext'
+    | 'windows'
+    | 'stacks'
     ;
 
 singleArgFunc
@@ -518,6 +526,15 @@ singleArgFunc
     | 'min'
     | 'max'
     | 'sum'
+    | 'number' 'of' card? 'parts'
+    | 'number' 'of' background 'parts'
+    | 'number' 'of' card? button
+    | 'number' 'of' background button
+    | 'number' 'of' card field
+    | 'number' 'of' background? field
+    | 'number' 'of' cards
+    | 'number' 'of' background
+    | 'number' 'of' 'marked' cards
     | 'number' 'of' character
     | 'number' 'of' word
     | 'number' 'of' item
@@ -666,6 +683,7 @@ propertyName
     | 'center'
     | 'scroll'
     | 'script'
+    | 'pattern'
     | ID
     ;
 
@@ -902,7 +920,7 @@ DIGIT
     ;
 
 COMMENT
-    : ('--' ~('\r' | '\n' | '|')*) -> skip
+    : ('--' ~('\r' | '\n' | '|')*) -> channel(HIDDEN)
     ;
 
 NEWLINE
@@ -910,7 +928,7 @@ NEWLINE
     ;
 
 WHITESPACE
-    : (' ' | '\t')+ -> skip
+    : (' ' | '\t')+ -> channel(HIDDEN)
     ;
 
 UNLEXED_CHAR
