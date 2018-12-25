@@ -417,6 +417,7 @@ fun foo() {
     1_1._foo()
     1._1foo()
     1._1_foo()
+    SimpleClass().foo<String>("")
 }
 
 

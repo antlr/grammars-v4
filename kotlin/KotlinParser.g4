@@ -385,8 +385,9 @@ indexingExpression
     ;
 
 callSuffix
-    : typeArguments? valueArguments annotatedLambda*
-    | typeArguments annotatedLambda*
+    : typeArguments valueArguments? annotatedLambda*
+    | valueArguments annotatedLambda*
+    | annotatedLambda+
     ;
 
 annotatedLambda
