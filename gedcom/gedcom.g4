@@ -58,22 +58,33 @@ parameter
    | id
    ;
 
+level
+    : DIGIT | (level+DIGIT);
 
-STRING
-   : [a-zA-Z] [\/-a-zA-Z0-9_]*
+any_char
+    :ALPHA | DIGIT | otherchar | ' ' | '#' | '@@';
+
+otherchar
+    : [!"$&'()*+-,.]
+
+alphanum
+    : ALPHA | DIGIT;
+
+ALPHA
+   : [a-zA-Z_]+
    ;
 
 
-NUMBER
-   : ('0' .. '9') + ('.' ('0' .. '9') +)?
+DIGIT
+   : [0-9]+
    ;
 
 
 EOL
-   : '\r'? '\n'
-   ;
+   : [\r\n]+
+       ;
 
 
 WS
-   : [ \t\r\n] -> skip
+   : [ \t] -> skip
    ;
