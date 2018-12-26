@@ -66,6 +66,7 @@ fragment DocComment
    : '/**' .*? ('*/' | EOF)
    ;
 
+
 fragment LineComment
    : '//' ~ [\r\n]*
    ;
