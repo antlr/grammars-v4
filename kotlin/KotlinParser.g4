@@ -15,11 +15,11 @@ parser grammar KotlinParser;
 options { tokenVocab = KotlinLexer; }
 
 kotlinFile
-    : NL* preamble topLevelObject* EOF
+    : NL* preamble anysemi* (topLevelObject (anysemi+ topLevelObject?)*)? EOF
     ;
 
 script
-    : NL* preamble anysemi* (expression (anysemi+ expression)* anysemi*)? EOF
+    : NL* preamble anysemi* (expression (anysemi+ expression?)*)? EOF
     ;
 
 preamble
@@ -51,11 +51,11 @@ importAlias
     ;
 
 topLevelObject
-    : (classDeclaration
+    : classDeclaration
     | objectDeclaration
     | functionDeclaration
     | propertyDeclaration
-    | typeAlias) anysemi*
+    | typeAlias
     ;
 
 classDeclaration
@@ -281,7 +281,7 @@ block
     ;
 
 statements
-    : anysemi* (statement (anysemi+ statement)*)? anysemi*
+    : anysemi* (statement (anysemi+ statement?)*)?
     ;
 
 statement
