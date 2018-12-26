@@ -59,7 +59,7 @@ prequelConstruct
    | delegateGrammars
    | tokensSpec
    | channelsSpec
-   | action
+   | action_
    ;
 
 // ------------
@@ -105,7 +105,7 @@ idList
    ;
 
 // Match stuff like @parser::members {int i;}
-action
+action_
    : AT (actionScopeName COLONCOLON)? identifier actionBlock
    ;
 
