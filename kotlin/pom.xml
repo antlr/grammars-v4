@@ -41,17 +41,30 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>kotlinFile</entryPoint>
 					<grammarName>Kotlin</grammarName>
 					<caseInsensitive>true</caseInsensitive>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>
+						<id>test-kotlinFile</id>
 						<goals>
 							<goal>test</goal>
 						</goals>
+						<configuration>
+							<entryPoint>kotlinFile</entryPoint>
+							<exampleFiles>examples/kotlinFile</exampleFiles>
+						</configuration>
+					</execution>
+					<execution>
+						<id>test-script</id>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<entryPoint>script</entryPoint>
+							<exampleFiles>examples/script</exampleFiles>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
