@@ -19,7 +19,7 @@ kotlinFile
     ;
 
 script
-    : NL* preamble expression* EOF
+    : NL* preamble (expression (anysemi+ expression)*)? anysemi* EOF
     ;
 
 preamble
