@@ -140,6 +140,7 @@
 				<module>jpa</module>
 				<module>json</module>
 				<module>kotlin</module>
+				<module>kotlin-formal</module>
 				<module>kuka</module>
 				<module>lambda</module>
 				<module>lcc</module>
@@ -250,6 +251,9 @@
 				<!-- testing repository -->
 				<!--<module>grammar-test</module> -->
 			</modules>
+		</profile>
+		<profile>
+			<id>deploy</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -257,7 +261,7 @@
 						<version>3.1.0</version>
 						<configuration>
 							<descriptors>
-								<descriptor>assembly.xml</descriptor>
+								<descriptor>${maven.multiModuleProjectDirectory}/assembly.xml</descriptor>
 							</descriptors>
 						</configuration>
 						<executions>
@@ -270,13 +274,6 @@
 							</execution>
 						</executions>
 					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>deploy</id>
-			<build>
-				<plugins>
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
