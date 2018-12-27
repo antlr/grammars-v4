@@ -15,11 +15,19 @@ parser grammar KotlinParser;
 options { tokenVocab = KotlinLexer; }
 
 kotlinFile
-    : NL* fileAnnotation? packageHeader importList topLevelObject* EOF
+    : NL* preamble anysemi* (topLevelObject (anysemi+ topLevelObject?)*)? EOF
     ;
 
 script
-    : NL* fileAnnotation? packageHeader importList(expression semi?)* EOF
+    : NL* preamble anysemi* (expression (anysemi+ expression?)*)? EOF
+    ;
+
+preamble
+    : fileAnnotations? packageHeader importList
+    ;
+
+fileAnnotations
+    : fileAnnotation+
     ;
 
 fileAnnotation
@@ -27,7 +35,7 @@ fileAnnotation
     ;
 
 packageHeader
-    : (PACKAGE identifier semi?)?
+    : (modifierList? PACKAGE identifier semi?)?
     ;
 
 importList
@@ -43,11 +51,11 @@ importAlias
     ;
 
 topLevelObject
-    : (classDeclaration
-    | functionDeclaration
+    : classDeclaration
     | objectDeclaration
+    | functionDeclaration
     | propertyDeclaration
-    | typeAlias) semi?
+    | typeAlias
     ;
 
 classDeclaration
@@ -100,7 +108,7 @@ classMemberDeclaration
     | propertyDeclaration
     | anonymousInitializer
     | secondaryConstructor
-    | typeAlias) semi?
+    | typeAlias) anysemi*
     ;
 
 anonymousInitializer
@@ -130,7 +138,6 @@ enumEntry
 
 functionDeclaration
     : modifierList? FUN
-    //(NL* typeParameters)?
     (NL* type NL* DOT)?
     (NL* typeParameters)?
     (NL* identifier)?
@@ -179,7 +186,7 @@ propertyDeclaration
     (NL* (multiVariableDeclaration | variableDeclaration))
     (NL* typeConstraints)?
     (NL* (BY | ASSIGNMENT) NL* expression)?
-    semi? (getter? (NL* setter)? | setter? (NL* getter)?)
+    (getter (semi setter)? | setter (semi getter)?)?
     ;
 
 multiVariableDeclaration
@@ -214,10 +221,10 @@ typeParameter
 
 type
     : typeModifierList?
-    ( parenthesizedType
+    ( functionType
+    | parenthesizedType
     | nullableType
-    | typeReference
-    | functionType)
+    | typeReference)
     ;
 
 typeModifierList
@@ -239,7 +246,7 @@ typeReference
     ;
 
 functionType
-    : (functionTypeReceiver NL* DOT NL*)? functionTypeParameters  NL* ARROW (NL* type)?
+    : (functionTypeReceiver NL* DOT NL*)? functionTypeParameters  NL* ARROW (NL* type)
     ;
 
 functionTypeReceiver
@@ -270,17 +277,20 @@ typeConstraint
     ;
 
 block
-    : LCURL NL* (statement semi)* (statement semi?)? NL* RCURL
+    : LCURL statements RCURL
     ;
 
 statements
-    : ((statement semi)* statement semi?)?
+    : anysemi* (statement (anysemi+ statement?)*)?
     ;
 
 statement
     : declaration
-    | assignment
-    | expression
+    | blockLevelExpression
+    ;
+
+blockLevelExpression
+    : annotations* NL* expression
     ;
 
 declaration
@@ -291,12 +301,8 @@ declaration
     | typeAlias)
     ;
 
-assignment
-    : assignableExpression assignmentOperator NL* disjunction
-    ;
-
 expression
-    : disjunction
+    : disjunction (assignmentOperator disjunction)*
     ;
 
 disjunction
@@ -304,20 +310,19 @@ disjunction
     ;
 
 conjunction
-    : equality (NL* CONJ NL* equality)*
+    : equalityComparison (NL* CONJ NL* equalityComparison)*
     ;
 
-equality
-    : comparison (equalityOperator NL* comparison)*
+equalityComparison
+    : comparison (equalityOperation NL* comparison)*
     ;
 
 comparison
-    : infixOperation (comparisonOperator NL* infixOperation)?
+    : namedInfix (comparisonOperator NL* namedInfix)?
     ;
 
-infixOperation
-    : elvisExpression (inOperator NL* elvisExpression)*
-    | elvisExpression (isOperator NL* type)?
+namedInfix
+    : elvisExpression ((inOperator NL* elvisExpression)+ | (isOperator NL* type))?
     ;
 
 elvisExpression
@@ -337,56 +342,44 @@ additiveExpression
     ;
 
 multiplicativeExpression
-    : asExpression (multiplicativeOperator NL* asExpression)*
+    : typeRHS (multiplicativeOperation NL* typeRHS)*
     ;
 
-asExpression
-    : prefixUnaryExpression asExpressionTail?
-    ;
-
-asExpressionTail
-    : NL* asOperator NL* type asExpressionTail?
+typeRHS
+    : prefixUnaryExpression (NL* typeOperation prefixUnaryExpression)*
     ;
 
 prefixUnaryExpression
-    : prefixUnaryOperator* postfixUnaryExpression
-    | annotations* postfixUnaryExpression
+    : prefixUnaryOperation* postfixUnaryExpression
     ;
 
 postfixUnaryExpression
-    : assignableExpression
-    | callExpression
-    | labeledExpression
-    | dotQualifiedExpression
-    | assignableExpression postfixUnaryOperator*
-    | LPAREN callableReference RPAREN postfixUnaryOperator+
-    | callableReference
+    : (atomicExpression | callableReference) postfixUnaryOperation*
     ;
 
-callExpression
-    : assignableExpression typeArguments? valueArguments? annotatedLambda*
+atomicExpression
+    : parenthesizedExpression
+    | literalConstant
+    | functionLiteral
+    | thisExpression // THIS labelReference?
+    | superExpression // SUPER (LANGLE type RANGLE)? labelReference?
+    | conditionalExpression // ifExpression, whenExpression
+    | tryExpression
+    | objectLiteral
+    | jumpExpression
+    | loopExpression
+    | collectionLiteral
+    | simpleIdentifier
     ;
 
-labeledExpression
-    : labelDefinition postfixUnaryExpression
-    ;
-
-dotQualifiedExpression
-    : assignableExpression (NL* memberAccessOperator postfixUnaryExpression)+
-    ;
-
-assignableExpression
-    : primaryExpression
-    | indexingExpression
-    ;
-
-indexingExpression
-    : identifier arrayAccess+
+parenthesizedExpression
+    : LPAREN expression RPAREN
     ;
 
 callSuffix
-    : typeArguments? valueArguments annotatedLambda*
-    | typeArguments annotatedLambda*
+    : typeArguments valueArguments? annotatedLambda*
+    | valueArguments annotatedLambda*
+    | annotatedLambda+
     ;
 
 annotatedLambda
@@ -398,8 +391,7 @@ arrayAccess
     ;
 
 valueArguments
-    : LPAREN valueArgument? RPAREN
-    | LPAREN valueArgument (COMMA valueArgument)* RPAREN
+    : LPAREN (valueArgument (COMMA valueArgument)*)? RPAREN
     ;
 
 typeArguments
@@ -418,29 +410,10 @@ valueArgument
     : (simpleIdentifier NL* ASSIGNMENT NL*)? MULT? NL* expression
     ;
 
-primaryExpression
-    : parenthesizedExpression
-    | literalConstant
-    | stringLiteral
-    | simpleIdentifier
-    | functionLiteral
-    | objectLiteral
-    | collectionLiteral
-    | thisExpression
-    | superExpression
-    | conditionalExpression
-    | tryExpression
-    | loopExpression
-    | jumpExpression
-    ;
-
-parenthesizedExpression
-    : LPAREN expression RPAREN
-    ;
-
 literalConstant
     : BooleanLiteral
     | IntegerLiteral
+    | stringLiteral
     | HexLiteral
     | BinLiteral
     | CharacterLiteral
@@ -601,7 +574,7 @@ assignmentOperator
     | MOD_ASSIGNMENT
     ;
 
-equalityOperator
+equalityOperation
     : EXCL_EQ
     | EXCL_EQEQ
     | EQEQ
@@ -627,28 +600,33 @@ additiveOperator
     : ADD | SUB
     ;
 
-multiplicativeOperator
+multiplicativeOperation
     : MULT
     | DIV
     | MOD
     ;
 
-asOperator
+typeOperation
     : AS
     | AS_SAFE
     | COLON
     ;
 
-prefixUnaryOperator
+prefixUnaryOperation
     : INCR
     | DECR
     | ADD
     | SUB
     | EXCL
+    | annotations
+    | labelDefinition
     ;
 
-postfixUnaryOperator
+postfixUnaryOperation
     : INCR | DECR | EXCL EXCL
+    | callSuffix
+    | arrayAccess
+    | NL* memberAccessOperator postfixUnaryExpression
     ;
 
 memberAccessOperator
@@ -805,4 +783,6 @@ simpleIdentifier
     | SUSPEND
     ;
 
-semi: NL+ | SEMICOLON | SEMICOLON NL+;
+semi: NL+ | NL* SEMICOLON NL*;
+
+anysemi: NL | SEMICOLON;
