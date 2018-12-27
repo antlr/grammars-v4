@@ -1820,7 +1820,7 @@ purespecifier
       : Integerliteral
       | Characterliteral
       | Floatingliteral
-      | Stringliteral
+      | Stringliteral+
       | booleanliteral
       | pointerliteral
       | userdefinedliteral
