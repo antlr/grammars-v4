@@ -77,8 +77,8 @@ MUL:                '*';
 // Additional symbols
 AT:                 '@';
 ELLIPSIS:           '...';
-REF:                '-->';
-VAR:                'o';
+REF:                '--> ';
+VAR:                'o ';
 
 // Literals
 DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;
@@ -95,6 +95,7 @@ DATE_TIME_LITERAL: Bound FullDate 'T' FullTime Bound;
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
 LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
 COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
+EOL:                [\r\n];
 
 //REGEX Expr
 REGEX_EXPR:         '/'.*?'/';

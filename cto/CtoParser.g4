@@ -40,7 +40,7 @@ modelUnit
     ;
 
 namespaceDeclaration
-    : NAMESPACE qualifiedName
+    : NAMESPACE qualifiedName EOL?
     ;
 
 importDeclaration
