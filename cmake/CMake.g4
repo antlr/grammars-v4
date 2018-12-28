@@ -15,12 +15,15 @@ file
 	;
 
 command_invocation
-	: Identifier '(' argument* ')'
+	: Identifier '(' (single_argument|compound_argument)* ')'
 	;
 
-argument
+single_argument
 	: Identifier | Unquoted_argument | Bracket_argument | Quoted_argument
-	| '(' argument* ')'
+	;
+
+compound_argument
+	: '(' (single_argument|compound_argument)* ')'
 	;
 
 Identifier
@@ -92,4 +95,3 @@ Space
 	: [ \t]+
 	-> skip
 	;
-
