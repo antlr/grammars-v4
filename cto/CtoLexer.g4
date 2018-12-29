@@ -121,7 +121,7 @@ fragment Sixty: [0-5] Digit;
 fragment Digit: [0-9];
 
 
-IDENTIFIER:         LetterOrDigit*;
+IDENTIFIER:         LetterOrDigit+;
 
 CHAR_LITERAL:       '\'' (~["\\\r\n] | EscapeSequence)* '\'';
 STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
