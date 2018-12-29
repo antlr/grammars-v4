@@ -92,9 +92,9 @@ BOOL_LITERAL:       'true'
 DATE_TIME_LITERAL: Bound FullDate 'T' FullTime Bound;
 
 // Whitespace and comments
-WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
-LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
-COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
+WS:                 [ \t\r\n\u000C]+ -> skip;
+LINE_COMMENT:       '//' ~[\r\n]*    -> skip;
+COMMENT:            '/*' .*? '*/'    -> skip;
 
 //REGEX Expr
 REGEX_EXPR:         '/'.*?'/';
