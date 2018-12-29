@@ -36,7 +36,7 @@ parser grammar CtoParser;
 options { tokenVocab=CtoLexer; }
 
 modelUnit
-    : namespaceDeclaration? importDeclaration* typeDeclaration* EOF
+    : namespaceDeclaration importDeclaration* typeDeclaration* EOF
     ;
 
 namespaceDeclaration
