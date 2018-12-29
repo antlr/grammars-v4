@@ -95,7 +95,6 @@ DATE_TIME_LITERAL: Bound FullDate 'T' FullTime Bound;
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
 LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
 COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
-EOL:                [\r\n];
 
 //REGEX Expr
 REGEX_EXPR:         '/'.*?'/';
