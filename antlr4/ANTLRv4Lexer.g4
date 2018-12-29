@@ -45,7 +45,7 @@ tokens
    { TOKEN_REF , RULE_REF , LEXER_CHAR_SET }
 
 channels
-   { OFF_CHANNEL }
+   { OFF_CHANNEL, COMMENT }
 
 // ======================================================
 // Lexer specification
@@ -59,12 +59,12 @@ DOC_COMMENT
 
 
 BLOCK_COMMENT
-   : BlockComment -> channel (OFF_CHANNEL)
+   : BlockComment -> channel (COMMENT)
    ;
 
 
 LINE_COMMENT
-   : LineComment -> channel (OFF_CHANNEL)
+   : LineComment -> channel (COMMENT)
    ;
 
 // -------------------------
@@ -434,15 +434,15 @@ BEGIN_ARGUMENT
          // -------------------------
          mode Options;
          OPT_DOC_COMMENT
-            : DocComment -> type (DOC_COMMENT) , channel (OFF_CHANNEL)
+            : DocComment -> type (DOC_COMMENT) , channel (COMMENT)
             ;
          
          OPT_BLOCK_COMMENT
-            : BlockComment -> type (BLOCK_COMMENT) , channel (OFF_CHANNEL)
+            : BlockComment -> type (BLOCK_COMMENT) , channel (COMMENT)
             ;
          
          OPT_LINE_COMMENT
-            : LineComment -> type (LINE_COMMENT) , channel (OFF_CHANNEL)
+            : LineComment -> type (LINE_COMMENT) , channel (COMMENT)
             ;
          
          OPT_LBRACE
@@ -488,15 +488,15 @@ BEGIN_ARGUMENT
          // -------------------------
          mode Tokens;
          TOK_DOC_COMMENT
-            : DocComment -> type (DOC_COMMENT) , channel (OFF_CHANNEL)
+            : DocComment -> type (DOC_COMMENT) , channel (COMMENT)
             ;
          
          TOK_BLOCK_COMMENT
-            : BlockComment -> type (BLOCK_COMMENT) , channel (OFF_CHANNEL)
+            : BlockComment -> type (BLOCK_COMMENT) , channel (COMMENT)
             ;
          
          TOK_LINE_COMMENT
-            : LineComment -> type (LINE_COMMENT) , channel (OFF_CHANNEL)
+            : LineComment -> type (LINE_COMMENT) , channel (COMMENT)
             ;
          
          TOK_LBRACE
@@ -527,15 +527,15 @@ BEGIN_ARGUMENT
          mode Channels;
          // currently same as Tokens mode; distinguished by keyword
          CHN_DOC_COMMENT
-            : DocComment -> type (DOC_COMMENT) , channel (OFF_CHANNEL)
+            : DocComment -> type (DOC_COMMENT) , channel (COMMENT)
             ;
          
          CHN_BLOCK_COMMENT
-            : BlockComment -> type (BLOCK_COMMENT) , channel (OFF_CHANNEL)
+            : BlockComment -> type (BLOCK_COMMENT) , channel (COMMENT)
             ;
          
          CHN_LINE_COMMENT
-            : LineComment -> type (LINE_COMMENT) , channel (OFF_CHANNEL)
+            : LineComment -> type (LINE_COMMENT) , channel (COMMENT)
             ;
          
          CHN_LBRACE
