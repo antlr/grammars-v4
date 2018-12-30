@@ -1,0 +1,5 @@
+//missing mandatory namespace
+
+enum Foo {
+  o BAR
+}
