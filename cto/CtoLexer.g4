@@ -28,7 +28,7 @@
 
 /*
  A grammar for Hyperledger Composer Modeling Language
- https://hyperledger.github.io/composer/latest/reference/cto_language.html
+ https://hyperledger.github.io/composer/v0.19/reference/cto_language.html
  */
 
 lexer grammar CtoLexer;
