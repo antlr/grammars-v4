@@ -24,6 +24,10 @@ options {
     superClass=PlSqlBaseLexer;
 }
 
+@lexer::postinclude {
+#include <PlSqlBaseLexer.h>
+}
+
 ABORT:                        'ABORT';
 ABS:                          'ABS';
 ACCESS:                       'ACCESS';
@@ -1120,7 +1124,7 @@ NO_XML_QUERY_REWRITE:         'NO_XML_QUERY_REWRITE';
 NO_ZONEMAP:                   'NO_ZONEMAP';
 NTH_VALUE:                    'NTH_VALUE';
 NULLIF:                       'NULLIF';
-NULL:                         'NULL';
+NULL_:                        'NULL';
 NULLS:                        'NULLS';
 NUMBER:                       'NUMBER';
 NUMERIC:                      'NUMERIC';

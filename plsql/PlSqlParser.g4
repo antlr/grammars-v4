@@ -25,6 +25,10 @@ options {
     superClass=PlSqlBaseParser;
 }
 
+@parser::postinclude {
+#include <PlSqlBaseParser.h>
+}
+
 sql_script
     : ((unit_statement | sql_plus_command) SEMICOLON?)* EOF
     ;
@@ -406,7 +410,7 @@ object_under_part
     ;
 
 nested_table_type_def
-    : TABLE OF type_spec (NOT NULL)?
+    : TABLE OF type_spec (NOT NULL_)?
     ;
 
 sqlj_object_type
@@ -967,7 +971,7 @@ partition_extention_clause
     ;
 
 validation_clauses
-    : VALIDATE REF UPDATE (SET DANGLING TO NULL)?
+    : VALIDATE REF UPDATE (SET DANGLING TO NULL_)?
     | VALIDATE STRUCTURE
         ( CASCADE FAST
         | CASCADE online_or_offline? into_clause?
@@ -1026,7 +1030,7 @@ indextype_name
 
 
 using_statistics_type
-    : USING (statistics_type_name | NULL)
+    : USING (statistics_type_name | NULL_)
     ;
 
 statistics_type_name
@@ -1315,7 +1319,7 @@ object_view_clause
 
 inline_constraint
     : (CONSTRAINT constraint_name)?
-        ( NOT? NULL
+        ( NOT? NULL_
         | UNIQUE
         | PRIMARY KEY
         | references_clause
@@ -1993,7 +1997,7 @@ lob_partitioning_storage
 datatype_null_enable
    : column_name datatype
          SORT?  (DEFAULT expression)? (ENCRYPT ( USING  CHAR_STRING )? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? ( NO? SALT )? )?
-         (NOT NULL)? (ENABLE | DISABLE)?
+         (NOT NULL_)? (ENABLE | DISABLE)?
    ;
 
 //Technically, this should only allow 'K' | 'M' | 'G' | 'T' | 'P' | 'E'
@@ -2030,7 +2034,7 @@ storage_clause
          | PCTINCREASE pctincrease=UNSIGNED_INTEGER
          | FREELISTS freelists=UNSIGNED_INTEGER
          | FREELIST GROUPS freelist_groups=UNSIGNED_INTEGER
-         | OPTIMAL (size_clause | NULL )
+         | OPTIMAL (size_clause | NULL_ )
          | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
          | FLASH_CACHE (KEEP | NONE | DEFAULT)
          | ENCRYPT
@@ -2862,7 +2866,7 @@ references_clause
     ;
 
 on_delete_clause
-    : ON DELETE (CASCADE | SET NULL)
+    : ON DELETE (CASCADE | SET NULL_)
     ;
 
 unique_key_clause
@@ -2936,11 +2940,11 @@ declare_spec
 
 // incorporates constant_declaration
 variable_declaration
-    : identifier CONSTANT? type_spec (NOT NULL)? default_value_part? ';'
+    : identifier CONSTANT? type_spec (NOT NULL_)? default_value_part? ';'
     ;
 
 subtype_declaration
-    : SUBTYPE identifier IS type_spec (RANGE expression '..' expression)? (NOT NULL)? ';'
+    : SUBTYPE identifier IS type_spec (RANGE expression '..' expression)? (NOT NULL_)? ';'
     ;
 
 // cursor_declaration incorportates curscursor_body and cursor_spec
@@ -2974,7 +2978,7 @@ record_type_def
     ;
 
 field_spec
-    : column_name type_spec? (NOT NULL)? default_value_part?
+    : column_name type_spec? (NOT NULL_)? default_value_part?
     ;
 
 ref_cursor_type_def
@@ -2986,7 +2990,7 @@ type_declaration
     ;
 
 table_type_def
-    : TABLE OF type_spec table_indexed_by_part? (NOT NULL)?
+    : TABLE OF type_spec table_indexed_by_part? (NOT NULL_)?
     ;
 
 table_indexed_by_part
@@ -2994,7 +2998,7 @@ table_indexed_by_part
     ;
 
 varray_type_def
-    : (VARRAY | VARYING ARRAY) '(' expression ')' OF type_spec (NOT NULL)?
+    : (VARRAY | VARYING ARRAY) '(' expression ')' OF type_spec (NOT NULL_)?
     ;
 
 // Statements
@@ -3093,7 +3097,7 @@ upper_bound
     ;
 
 null_statement
-    : NULL
+    : NULL_
     ;
 
 raise_statement
@@ -3700,7 +3704,7 @@ cursor_expression
 
 logical_expression
     : multiset_expression (IS NOT?
-        (NULL | NAN | PRESENT | INFINITE | A_LETTER SET | EMPTY | OF TYPE?
+        (NULL_ | NAN | PRESENT | INFINITE | A_LETTER SET | EMPTY | OF TYPE?
         '(' ONLY? type_spec (',' type_spec)* ')'))*
     | NOT logical_expression
     | logical_expression AND logical_expression
@@ -3900,7 +3904,7 @@ other_function
     | XMLPI
       '(' (NAME identifier | EVALNAME concatenation) (',' concatenation)? ')' ('.' general_element_part)?
     | XMLQUERY
-      '(' concatenation xml_passing_clause? RETURNING CONTENT (NULL ON EMPTY)? ')' ('.' general_element_part)?
+      '(' concatenation xml_passing_clause? RETURNING CONTENT (NULL_ ON EMPTY)? ')' ('.' general_element_part)?
     | XMLROOT
       '(' concatenation (',' xmlroot_param_version_part)? (',' xmlroot_param_standalone_part)? ')' ('.' general_element_part)?
     | XMLSERIALIZE
@@ -4287,7 +4291,7 @@ function_argument_analytic
     ;
 
 function_argument_modeling
-    : '(' column_name (',' (numeric | NULL) (',' (numeric | NULL))?)?
+    : '(' column_name (',' (numeric | NULL_) (',' (numeric | NULL_))?)?
       USING (tableview_name '.' ASTERISK | ASTERISK | (','? expression column_alias?)+)
       ')' keep_clause?
     ;
@@ -4524,7 +4528,7 @@ constant
     | numeric
     | DATE quoted_string
     | quoted_string
-    | NULL
+    | NULL_
     | TRUE
     | FALSE
     | DBTIMEZONE
