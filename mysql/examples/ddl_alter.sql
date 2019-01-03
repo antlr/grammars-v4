@@ -10,6 +10,7 @@ alter table t3 drop index t3_i1;
 alter table childtable drop index fk_idParent_parentTable;
 alter table t2 drop primary key;
 alter table t3 rename to table3column;
+alter table db2.t3 rename to db2.table3column;
 alter table childtable add constraint `fk1` foreign key (idParent) references parenttable(id) on delete restrict on update cascade;
 alter table table3column default character set = cp1251;
 alter table with_check add constraint check (c1 in (1, 2, 3, 4));
