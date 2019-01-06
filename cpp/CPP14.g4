@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * The MIT License (MIT)
  *
@@ -23,13 +22,15 @@
  * SOFTWARE.
  ******************************************************************************/
 grammar CPP14;
-
 /*Basic concepts*/
+
+
 translationunit
    : declarationseq? EOF
    ;
-
 /*Expressions*/
+   
+
 primaryexpression
    : literal
    | This
@@ -132,10 +133,11 @@ postfixexpression
    | typeidofthetypeid '(' expression ')'
    | typeidofthetypeid '(' thetypeid ')'
    ;
-
 /*
 add a middle layer to eliminate duplicated function declarations
 */
+   
+
 typeidofexpr
    : Typeid_
    ;
@@ -318,8 +320,9 @@ expression
 constantexpression
    : conditionalexpression
    ;
-
 /*Statements*/
+   
+
 statement
    : labeledstatement
    | attributespecifierseq? expressionstatement
@@ -394,8 +397,9 @@ jumpstatement
 declarationstatement
    : blockdeclaration
    ;
-
 /*Declarations*/
+   
+
 declarationseq
    : declaration
    | declarationseq declaration
@@ -699,8 +703,9 @@ balancedtoken
    | '[' balancedtokenseq ']'
    | '{' balancedtokenseq '}'
    ;
-
 /*Declarators*/
+   
+
 initdeclaratorlist
    : initdeclarator
    | initdeclaratorlist ',' initdeclarator
@@ -846,8 +851,9 @@ bracedinitlist
    : '{' initializerlist ','? '}'
    | '{' '}'
    ;
-
 /*Classes*/
+   
+
 classname
    : Identifier
    | simpletemplateid
@@ -911,1124 +917,1011 @@ virtspecifier
    : Override
    | Final
    ;
-
 /*
 purespecifier:
 	'=' '0'//Conflicts with the lexer
  ;
  */
+   
+
 purespecifier
-   : Assign val = Octalliteral{if($val.text.compareTo("0")!=0) throw new InputMismatchException(this);};
-   
-   /*Derived classes*/
-   baseclause
-      : ':' basespecifierlist
-      ;
-   
-   basespecifierlist
-      : basespecifier '...'?
-      | basespecifierlist ',' basespecifier '...'?
-      ;
-   
-   basespecifier
-      : attributespecifierseq? basetypespecifier
-      | attributespecifierseq? Virtual accessspecifier? basetypespecifier
-      | attributespecifierseq? accessspecifier Virtual? basetypespecifier
-      ;
-   
-   classordecltype
-      : nestednamespecifier? classname
-      | decltypespecifier
-      ;
-   
-   basetypespecifier
-      : classordecltype
-      ;
-   
-   accessspecifier
-      : Private
-      | Protected
-      | Public
-      ;
-   
-   /*Special member functions*/
-   conversionfunctionid
-      : Operator conversiontypeid
-      ;
-   
-   conversiontypeid
-      : typespecifierseq conversiondeclarator?
-      ;
-   
-   conversiondeclarator
-      : ptroperator conversiondeclarator?
-      ;
-   
-   ctorinitializer
-      : ':' meminitializerlist
-      ;
-   
-   meminitializerlist
-      : meminitializer '...'?
-      | meminitializer '...'? ',' meminitializerlist
-      ;
-   
-   meminitializer
-      : meminitializerid '(' expressionlist? ')'
-      | meminitializerid bracedinitlist
-      ;
-   
-   meminitializerid
-      : classordecltype
-      | Identifier
-      ;
-   
-   /*Overloading*/
-   operatorfunctionid
-      : Operator theoperator
-      ;
-   
-   literaloperatorid
-      : Operator Stringliteral Identifier
-      | Operator Userdefinedstringliteral
-      ;
-   
-   /*Templates*/
-   templatedeclaration
-      : Template '<' templateparameterlist '>' declaration
-      ;
-   
-   templateparameterlist
-      : templateparameter
-      | templateparameterlist ',' templateparameter
-      ;
-   
-   templateparameter
-      : typeparameter
-      | parameterdeclaration
-      ;
-   
-   typeparameter
-      : Class '...'? Identifier?
-      | Class Identifier? '=' thetypeid
-      | Typename_ '...'? Identifier?
-      | Typename_ Identifier? '=' thetypeid
-      | Template '<' templateparameterlist '>' Class '...'? Identifier?
-      | Template '<' templateparameterlist '>' Class Identifier? '=' idexpression
-      ;
-   
-   simpletemplateid
-      : templatename '<' templateargumentlist? '>'
-      ;
-   
-   templateid
-      : simpletemplateid
-      | operatorfunctionid '<' templateargumentlist? '>'
-      | literaloperatorid '<' templateargumentlist? '>'
-      ;
-   
-   templatename
-      : Identifier
-      ;
-   
-   templateargumentlist
-      : templateargument '...'?
-      | templateargumentlist ',' templateargument '...'?
-      ;
-   
-   templateargument
-      : thetypeid
-      | constantexpression
-      | idexpression
-      ;
-   
-   typenamespecifier
-      : Typename_ nestednamespecifier Identifier
-      | Typename_ nestednamespecifier Template? simpletemplateid
-      ;
-   
-   explicitinstantiation
-      : Extern? Template declaration
-      ;
-   
-   explicitspecialization
-      : Template '<' '>' declaration
-      ;
-   
-   /*Exception handling*/
-   tryblock
-      : Try compoundstatement handlerseq
-      ;
-   
-   functiontryblock
-      : Try ctorinitializer? compoundstatement handlerseq
-      ;
-   
-   handlerseq
-      : handler handlerseq?
-      ;
-   
-   handler
-      : Catch '(' exceptiondeclaration ')' compoundstatement
-      ;
-   
-   exceptiondeclaration
-      : attributespecifierseq? typespecifierseq declarator
-      | attributespecifierseq? typespecifierseq abstractdeclarator?
-      | '...'
-      ;
-   
-   throwexpression
-      : Throw assignmentexpression?
-      ;
-   
-   exceptionspecification
-      : dynamicexceptionspecification
-      | noexceptspecification
-      ;
-   
-   dynamicexceptionspecification
-      : Throw '(' typeidlist? ')'
-      ;
-   
-   typeidlist
-      : thetypeid '...'?
-      | typeidlist ',' thetypeid '...'?
-      ;
-   
-   noexceptspecification
-      : Noexcept '(' constantexpression ')'
-      | Noexcept
-      ;
-   
-   /*Preprocessing directives*/
-   
-   MultiLineMacro
-      : '#' (~ [\n]*? '\\' '\r'? '\n') + ~ [\n] + -> channel (HIDDEN)
-      ;
-   
-   
-   Directive
-      : '#' ~ [\n]* -> channel (HIDDEN)
-      ;
-   
-   /*Lexer*/
-   /*Keywords*/
-   
-   Alignas
-      : 'alignas'
-      ;
-   
-   
-   Alignof
-      : 'alignof'
-      ;
-   
-   
-   Asm
-      : 'asm'
-      ;
-   
-   
-   Auto
-      : 'auto'
-      ;
-   
-   
-   Bool
-      : 'bool'
-      ;
-   
-   
-   Break
-      : 'break'
-      ;
-   
-   
-   Case
-      : 'case'
-      ;
-   
-   
-   Catch
-      : 'catch'
-      ;
-   
-   
-   Char
-      : 'char'
-      ;
-   
-   
-   Char16
-      : 'char16_t'
-      ;
-   
-   
-   Char32
-      : 'char32_t'
-      ;
-   
-   
-   Class
-      : 'class'
-      ;
-   
-   
-   Const
-      : 'const'
-      ;
-   
-   
-   Constexpr
-      : 'constexpr'
-      ;
-   
-   
-   Const_cast
-      : 'const_cast'
-      ;
-   
-   
-   Continue
-      : 'continue'
-      ;
-   
-   
-   Decltype
-      : 'decltype'
-      ;
-   
-   
-   Default
-      : 'default'
-      ;
-   
-   
-   Delete
-      : 'delete'
-      ;
-   
-   
-   Do
-      : 'do'
-      ;
-   
-   
-   Double
-      : 'double'
-      ;
-   
-   
-   Dynamic_cast
-      : 'dynamic_cast'
-      ;
-   
-   
-   Else
-      : 'else'
-      ;
-   
-   
-   Enum
-      : 'enum'
-      ;
-   
-   
-   Explicit
-      : 'explicit'
-      ;
-   
-   
-   Export
-      : 'export'
-      ;
-   
-   
-   Extern
-      : 'extern'
-      ;
-   
-   
-   False
-      : 'false'
-      ;
-   
-   
-   Final
-      : 'final'
-      ;
-   
-   
-   Float
-      : 'float'
-      ;
-   
-   
-   For
-      : 'for'
-      ;
-   
-   
-   Friend
-      : 'friend'
-      ;
-   
-   
-   Goto
-      : 'goto'
-      ;
-   
-   
-   If
-      : 'if'
-      ;
-   
-   
-   Inline
-      : 'inline'
-      ;
-   
-   
-   Int
-      : 'int'
-      ;
-   
-   
-   Long
-      : 'long'
-      ;
-   
-   
-   Mutable
-      : 'mutable'
-      ;
-   
-   
-   Namespace
-      : 'namespace'
-      ;
-   
-   
-   New
-      : 'new'
-      ;
-   
-   
-   Noexcept
-      : 'noexcept'
-      ;
-   
-   
-   Nullptr
-      : 'nullptr'
-      ;
-   
-   
-   Operator
-      : 'operator'
-      ;
-   
-   
-   Override
-      : 'override'
-      ;
-   
-   
-   Private
-      : 'private'
-      ;
-   
-   
-   Protected
-      : 'protected'
-      ;
-   
-   
-   Public
-      : 'public'
-      ;
-   
-   
-   Register
-      : 'register'
-      ;
-   
-   
-   Reinterpret_cast
-      : 'reinterpret_cast'
-      ;
-   
-   
-   Return
-      : 'return'
-      ;
-   
-   
-   Short
-      : 'short'
-      ;
-   
-   
-   Signed
-      : 'signed'
-      ;
-   
-   
-   Sizeof
-      : 'sizeof'
-      ;
-   
-   
-   Static
-      : 'static'
-      ;
-   
-   
-   Static_assert
-      : 'static_assert'
-      ;
-   
-   
-   Static_cast
-      : 'static_cast'
-      ;
-   
-   
-   Struct
-      : 'struct'
-      ;
-   
-   
-   Switch
-      : 'switch'
-      ;
-   
-   
-   Template
-      : 'template'
-      ;
-   
-   
-   This
-      : 'this'
-      ;
-   
-   
-   Thread_local
-      : 'thread_local'
-      ;
-   
-   
-   Throw
-      : 'throw'
-      ;
-   
-   
-   True
-      : 'true'
-      ;
-   
-   
-   Try
-      : 'try'
-      ;
-   
-   
-   Typedef
-      : 'typedef'
-      ;
-   
-   
-   Typeid_
-      : 'typeid'
-      ;
-   
-   
-   Typename_
-      : 'typename'
-      ;
-   
-   
-   Union
-      : 'union'
-      ;
-   
-   
-   Unsigned
-      : 'unsigned'
-      ;
-   
-   
-   Using
-      : 'using'
-      ;
-   
-   
-   Virtual
-      : 'virtual'
-      ;
-   
-   
-   Void
-      : 'void'
-      ;
-   
-   
-   Volatile
-      : 'volatile'
-      ;
-   
-   
-   Wchar
-      : 'wchar_t'
-      ;
-   
-   
-   While
-      : 'while'
-      ;
-   
-   /*Operators*/
-   
-   LeftParen
-      : '('
-      ;
-   
-   
-   RightParen
-      : ')'
-      ;
-   
-   
-   LeftBracket
-      : '['
-      ;
-   
-   
-   RightBracket
-      : ']'
-      ;
-   
-   
-   LeftBrace
-      : '{'
-      ;
-   
-   
-   RightBrace
-      : '}'
-      ;
-   
-   
-   Plus
-      : '+'
-      ;
-   
-   
-   Minus
-      : '-'
-      ;
-   
-   
-   Star
-      : '*'
-      ;
-   
-   
-   Div
-      : '/'
-      ;
-   
-   
-   Mod
-      : '%'
-      ;
-   
-   
-   Caret
-      : '^'
-      ;
-   
-   
-   And
-      : '&'
-      ;
-   
-   
-   Or
-      : '|'
-      ;
-   
-   
-   Tilde
-      : '~'
-      ;
-   
-   
-   Not
-      : '!'
-      ;
-   
-   
-   Assign
-      : '='
-      ;
-   
-   
-   Less
-      : '<'
-      ;
-   
-   
-   Greater
-      : '>'
-      ;
-   
-   
-   PlusAssign
-      : '+='
-      ;
-   
-   
-   MinusAssign
-      : '-='
-      ;
-   
-   
-   StarAssign
-      : '*='
-      ;
-   
-   
-   DivAssign
-      : '/='
-      ;
-   
-   
-   ModAssign
-      : '%='
-      ;
-   
-   
-   XorAssign
-      : '^='
-      ;
-   
-   
-   AndAssign
-      : '&='
-      ;
-   
-   
-   OrAssign
-      : '|='
-      ;
-   
-   
-   LeftShift
-      : '<<'
-      ;
-   
-   rightShift
-      :
-      //'>>' Greater Greater
-      ;
-   
-   
-   LeftShiftAssign
-      : '<<='
-      ;
-   
-   rightShiftAssign
-      :
-      //'>>=' Greater Greater Assign
-      ;
-   
-   
-   Equal
-      : '=='
-      ;
-   
-   
-   NotEqual
-      : '!='
-      ;
-   
-   
-   LessEqual
-      : '<='
-      ;
-   
-   
-   GreaterEqual
-      : '>='
-      ;
-   
-   
-   AndAnd
-      : '&&'
-      ;
-   
-   
-   OrOr
-      : '||'
-      ;
-   
-   
-   PlusPlus
-      : '++'
-      ;
-   
-   
-   MinusMinus
-      : '--'
-      ;
-   
-   
-   Comma
-      : ','
-      ;
-   
-   
-   ArrowStar
-      : '->*'
-      ;
-   
-   
-   Arrow
-      : '->'
-      ;
-   
-   
-   Question
-      : '?'
-      ;
-   
-   
-   Colon
-      : ':'
-      ;
-   
-   
-   Doublecolon
-      : '::'
-      ;
-   
-   
-   Semi
-      : ';'
-      ;
-   
-   
-   Dot
-      : '.'
-      ;
-   
-   
-   DotStar
-      : '.*'
-      ;
-   
-   
-   Ellipsis
-      : '...'
-      ;
-   
-   theoperator
-      : New
-      | Delete
-      | New '[' ']'
-      | Delete '[' ']'
-      | '+'
-      | '-'
-      | '*'
-      | '/'
-      | '%'
-      | '^'
-      | '&'
-      | '|'
-      | '~'
-      | '!'
-      | '='
-      | '<'
-      | '>'
-      | '+='
-      | '-='
-      | '*='
-      | '/='
-      | '%='
-      | '^='
-      | '&='
-      | '|='
-      | '<<'
-      | rightShift
-      | rightShiftAssign
-      | '<<='
-      | '=='
-      | '!='
-      | '<='
-      | '>='
-      | '&&'
-      | '||'
-      | '++'
-      | '--'
-      | ','
-      | '->*'
-      | '->'
-      | '(' ')'
-      | '[' ']'
-      ;
-   
-   /*Lexer*/
-   
-   fragment Hexquad
-      : HEXADECIMALDIGIT HEXADECIMALDIGIT HEXADECIMALDIGIT HEXADECIMALDIGIT
-      ;
-   
-   
-   fragment Universalcharactername
-      : '\\u' Hexquad | '\\U' Hexquad Hexquad
-      ;
-   
-   
-   Identifier
-      :
-      /*
+   : Assign val = Octalliteral
+   {if($val.text.compareTo("0")!=0) throw new InputMismatchException(this);}
+   ;
+/*Derived classes*/
+   
+
+baseclause
+   : ':' basespecifierlist
+   ;
+
+basespecifierlist
+   : basespecifier '...'?
+   | basespecifierlist ',' basespecifier '...'?
+   ;
+
+basespecifier
+   : attributespecifierseq? basetypespecifier
+   | attributespecifierseq? Virtual accessspecifier? basetypespecifier
+   | attributespecifierseq? accessspecifier Virtual? basetypespecifier
+   ;
+
+classordecltype
+   : nestednamespecifier? classname
+   | decltypespecifier
+   ;
+
+basetypespecifier
+   : classordecltype
+   ;
+
+accessspecifier
+   : Private
+   | Protected
+   | Public
+   ;
+/*Special member functions*/
+   
+
+conversionfunctionid
+   : Operator conversiontypeid
+   ;
+
+conversiontypeid
+   : typespecifierseq conversiondeclarator?
+   ;
+
+conversiondeclarator
+   : ptroperator conversiondeclarator?
+   ;
+
+ctorinitializer
+   : ':' meminitializerlist
+   ;
+
+meminitializerlist
+   : meminitializer '...'?
+   | meminitializer '...'? ',' meminitializerlist
+   ;
+
+meminitializer
+   : meminitializerid '(' expressionlist? ')'
+   | meminitializerid bracedinitlist
+   ;
+
+meminitializerid
+   : classordecltype
+   | Identifier
+   ;
+/*Overloading*/
+   
+
+operatorfunctionid
+   : Operator theoperator
+   ;
+
+literaloperatorid
+   : Operator Stringliteral Identifier
+   | Operator Userdefinedstringliteral
+   ;
+/*Templates*/
+   
+
+templatedeclaration
+   : Template '<' templateparameterlist '>' declaration
+   ;
+
+templateparameterlist
+   : templateparameter
+   | templateparameterlist ',' templateparameter
+   ;
+
+templateparameter
+   : typeparameter
+   | parameterdeclaration
+   ;
+
+typeparameter
+   : Class '...'? Identifier?
+   | Class Identifier? '=' thetypeid
+   | Typename_ '...'? Identifier?
+   | Typename_ Identifier? '=' thetypeid
+   | Template '<' templateparameterlist '>' Class '...'? Identifier?
+   | Template '<' templateparameterlist '>' Class Identifier? '=' idexpression
+   ;
+
+simpletemplateid
+   : templatename '<' templateargumentlist? '>'
+   ;
+
+templateid
+   : simpletemplateid
+   | operatorfunctionid '<' templateargumentlist? '>'
+   | literaloperatorid '<' templateargumentlist? '>'
+   ;
+
+templatename
+   : Identifier
+   ;
+
+templateargumentlist
+   : templateargument '...'?
+   | templateargumentlist ',' templateargument '...'?
+   ;
+
+templateargument
+   : thetypeid
+   | constantexpression
+   | idexpression
+   ;
+
+typenamespecifier
+   : Typename_ nestednamespecifier Identifier
+   | Typename_ nestednamespecifier Template? simpletemplateid
+   ;
+
+explicitinstantiation
+   : Extern? Template declaration
+   ;
+
+explicitspecialization
+   : Template '<' '>' declaration
+   ;
+/*Exception handling*/
+   
+
+tryblock
+   : Try compoundstatement handlerseq
+   ;
+
+functiontryblock
+   : Try ctorinitializer? compoundstatement handlerseq
+   ;
+
+handlerseq
+   : handler handlerseq?
+   ;
+
+handler
+   : Catch '(' exceptiondeclaration ')' compoundstatement
+   ;
+
+exceptiondeclaration
+   : attributespecifierseq? typespecifierseq declarator
+   | attributespecifierseq? typespecifierseq abstractdeclarator?
+   | '...'
+   ;
+
+throwexpression
+   : Throw assignmentexpression?
+   ;
+
+exceptionspecification
+   : dynamicexceptionspecification
+   | noexceptspecification
+   ;
+
+dynamicexceptionspecification
+   : Throw '(' typeidlist? ')'
+   ;
+
+typeidlist
+   : thetypeid '...'?
+   | typeidlist ',' thetypeid '...'?
+   ;
+
+noexceptspecification
+   : Noexcept '(' constantexpression ')'
+   | Noexcept
+   ;
+/*Preprocessing directives*/
+   
+
+MultiLineMacro
+   : '#' (~ [\n]*? '\\' '\r'? '\n')+ ~ [\n]+ -> channel (HIDDEN)
+   ;
+
+Directive
+   : '#' ~ [\n]* -> channel (HIDDEN)
+   ;
+/*Lexer*/
+   
+/*Keywords*/
+   
+
+Alignas
+   : 'alignas'
+   ;
+
+Alignof
+   : 'alignof'
+   ;
+
+Asm
+   : 'asm'
+   ;
+
+Auto
+   : 'auto'
+   ;
+
+Bool
+   : 'bool'
+   ;
+
+Break
+   : 'break'
+   ;
+
+Case
+   : 'case'
+   ;
+
+Catch
+   : 'catch'
+   ;
+
+Char
+   : 'char'
+   ;
+
+Char16
+   : 'char16_t'
+   ;
+
+Char32
+   : 'char32_t'
+   ;
+
+Class
+   : 'class'
+   ;
+
+Const
+   : 'const'
+   ;
+
+Constexpr
+   : 'constexpr'
+   ;
+
+Const_cast
+   : 'const_cast'
+   ;
+
+Continue
+   : 'continue'
+   ;
+
+Decltype
+   : 'decltype'
+   ;
+
+Default
+   : 'default'
+   ;
+
+Delete
+   : 'delete'
+   ;
+
+Do
+   : 'do'
+   ;
+
+Double
+   : 'double'
+   ;
+
+Dynamic_cast
+   : 'dynamic_cast'
+   ;
+
+Else
+   : 'else'
+   ;
+
+Enum
+   : 'enum'
+   ;
+
+Explicit
+   : 'explicit'
+   ;
+
+Export
+   : 'export'
+   ;
+
+Extern
+   : 'extern'
+   ;
+
+False
+   : 'false'
+   ;
+
+Final
+   : 'final'
+   ;
+
+Float
+   : 'float'
+   ;
+
+For
+   : 'for'
+   ;
+
+Friend
+   : 'friend'
+   ;
+
+Goto
+   : 'goto'
+   ;
+
+If
+   : 'if'
+   ;
+
+Inline
+   : 'inline'
+   ;
+
+Int
+   : 'int'
+   ;
+
+Long
+   : 'long'
+   ;
+
+Mutable
+   : 'mutable'
+   ;
+
+Namespace
+   : 'namespace'
+   ;
+
+New
+   : 'new'
+   ;
+
+Noexcept
+   : 'noexcept'
+   ;
+
+Nullptr
+   : 'nullptr'
+   ;
+
+Operator
+   : 'operator'
+   ;
+
+Override
+   : 'override'
+   ;
+
+Private
+   : 'private'
+   ;
+
+Protected
+   : 'protected'
+   ;
+
+Public
+   : 'public'
+   ;
+
+Register
+   : 'register'
+   ;
+
+Reinterpret_cast
+   : 'reinterpret_cast'
+   ;
+
+Return
+   : 'return'
+   ;
+
+Short
+   : 'short'
+   ;
+
+Signed
+   : 'signed'
+   ;
+
+Sizeof
+   : 'sizeof'
+   ;
+
+Static
+   : 'static'
+   ;
+
+Static_assert
+   : 'static_assert'
+   ;
+
+Static_cast
+   : 'static_cast'
+   ;
+
+Struct
+   : 'struct'
+   ;
+
+Switch
+   : 'switch'
+   ;
+
+Template
+   : 'template'
+   ;
+
+This
+   : 'this'
+   ;
+
+Thread_local
+   : 'thread_local'
+   ;
+
+Throw
+   : 'throw'
+   ;
+
+True
+   : 'true'
+   ;
+
+Try
+   : 'try'
+   ;
+
+Typedef
+   : 'typedef'
+   ;
+
+Typeid_
+   : 'typeid'
+   ;
+
+Typename_
+   : 'typename'
+   ;
+
+Union
+   : 'union'
+   ;
+
+Unsigned
+   : 'unsigned'
+   ;
+
+Using
+   : 'using'
+   ;
+
+Virtual
+   : 'virtual'
+   ;
+
+Void
+   : 'void'
+   ;
+
+Volatile
+   : 'volatile'
+   ;
+
+Wchar
+   : 'wchar_t'
+   ;
+
+While
+   : 'while'
+   ;
+/*Operators*/
+   
+
+LeftParen
+   : '('
+   ;
+
+RightParen
+   : ')'
+   ;
+
+LeftBracket
+   : '['
+   ;
+
+RightBracket
+   : ']'
+   ;
+
+LeftBrace
+   : '{'
+   ;
+
+RightBrace
+   : '}'
+   ;
+
+Plus
+   : '+'
+   ;
+
+Minus
+   : '-'
+   ;
+
+Star
+   : '*'
+   ;
+
+Div
+   : '/'
+   ;
+
+Mod
+   : '%'
+   ;
+
+Caret
+   : '^'
+   ;
+
+And
+   : '&'
+   ;
+
+Or
+   : '|'
+   ;
+
+Tilde
+   : '~'
+   ;
+
+Not
+   : '!'
+   ;
+
+Assign
+   : '='
+   ;
+
+Less
+   : '<'
+   ;
+
+Greater
+   : '>'
+   ;
+
+PlusAssign
+   : '+='
+   ;
+
+MinusAssign
+   : '-='
+   ;
+
+StarAssign
+   : '*='
+   ;
+
+DivAssign
+   : '/='
+   ;
+
+ModAssign
+   : '%='
+   ;
+
+XorAssign
+   : '^='
+   ;
+
+AndAssign
+   : '&='
+   ;
+
+OrAssign
+   : '|='
+   ;
+
+LeftShift
+   : '<<'
+   ;
+
+rightShift
+   :
+   //'>>' Greater Greater
+   ;
+
+LeftShiftAssign
+   : '<<='
+   ;
+
+rightShiftAssign
+   :
+   //'>>=' Greater Greater Assign
+   ;
+
+Equal
+   : '=='
+   ;
+
+NotEqual
+   : '!='
+   ;
+
+LessEqual
+   : '<='
+   ;
+
+GreaterEqual
+   : '>='
+   ;
+
+AndAnd
+   : '&&'
+   ;
+
+OrOr
+   : '||'
+   ;
+
+PlusPlus
+   : '++'
+   ;
+
+MinusMinus
+   : '--'
+   ;
+
+Comma
+   : ','
+   ;
+
+ArrowStar
+   : '->*'
+   ;
+
+Arrow
+   : '->'
+   ;
+
+Question
+   : '?'
+   ;
+
+Colon
+   : ':'
+   ;
+
+Doublecolon
+   : '::'
+   ;
+
+Semi
+   : ';'
+   ;
+
+Dot
+   : '.'
+   ;
+
+DotStar
+   : '.*'
+   ;
+
+Ellipsis
+   : '...'
+   ;
+
+theoperator
+   : New
+   | Delete
+   | New '[' ']'
+   | Delete '[' ']'
+   | '+'
+   | '-'
+   | '*'
+   | '/'
+   | '%'
+   | '^'
+   | '&'
+   | '|'
+   | '~'
+   | '!'
+   | '='
+   | '<'
+   | '>'
+   | '+='
+   | '-='
+   | '*='
+   | '/='
+   | '%='
+   | '^='
+   | '&='
+   | '|='
+   | '<<'
+   | rightShift
+   | rightShiftAssign
+   | '<<='
+   | '=='
+   | '!='
+   | '<='
+   | '>='
+   | '&&'
+   | '||'
+   | '++'
+   | '--'
+   | ','
+   | '->*'
+   | '->'
+   | '(' ')'
+   | '[' ']'
+   ;
+/*Lexer*/
+   
+
+fragment Hexquad
+   : HEXADECIMALDIGIT HEXADECIMALDIGIT HEXADECIMALDIGIT HEXADECIMALDIGIT
+   ;
+
+fragment Universalcharactername
+   : '\\u' Hexquad
+   | '\\U' Hexquad Hexquad
+   ;
+
+Identifier
+   :
+/*
 	Identifiernondigit
 	| Identifier Identifiernondigit
 	| Identifier DIGIT
-	*/ Identifiernondigit (Identifiernondigit | DIGIT)*
-      ;
-   
-   
-   fragment Identifiernondigit
-      : NONDIGIT | Universalcharactername
-      ;
-   
-   
-   fragment NONDIGIT
-      : [a-zA-Z_]
-      ;
-   
-   
-   fragment DIGIT
-      : [0-9]
-      ;
-   
-   literal
-      : Integerliteral
-      | Characterliteral
-      | Floatingliteral
-      | Stringliteral+
-      | booleanliteral
-      | pointerliteral
-      | userdefinedliteral
-      ;
-   
-   
-   Integerliteral
-      : Decimalliteral Integersuffix? | Octalliteral Integersuffix? | Hexadecimalliteral Integersuffix? | Binaryliteral Integersuffix?
-      ;
-   
-   
-   Decimalliteral
-      : NONZERODIGIT ('\''? DIGIT)*
-      ;
-   
-   
-   Octalliteral
-      : '0' ('\''? OCTALDIGIT)*
-      ;
-   
-   
-   Hexadecimalliteral
-      : ('0x' | '0X') HEXADECIMALDIGIT ('\''? HEXADECIMALDIGIT)*
-      ;
-   
-   
-   Binaryliteral
-      : ('0b' | '0B') BINARYDIGIT ('\''? BINARYDIGIT)*
-      ;
-   
-   
-   fragment NONZERODIGIT
-      : [1-9]
-      ;
-   
-   
-   fragment OCTALDIGIT
-      : [0-7]
-      ;
-   
-   
-   fragment HEXADECIMALDIGIT
-      : [0-9a-fA-F]
-      ;
-   
-   
-   fragment BINARYDIGIT
-      : [01]
-      ;
-   
-   
-   Integersuffix
-      : Unsignedsuffix Longsuffix? | Unsignedsuffix Longlongsuffix? | Longsuffix Unsignedsuffix? | Longlongsuffix Unsignedsuffix?
-      ;
-   
-   
-   fragment Unsignedsuffix
-      : [uU]
-      ;
-   
-   
-   fragment Longsuffix
-      : [lL]
-      ;
-   
-   
-   fragment Longlongsuffix
-      : 'll' | 'LL'
-      ;
-   
-   
-   Characterliteral
-      : '\'' Cchar + '\'' | 'u' '\'' Cchar + '\'' | 'U' '\'' Cchar + '\'' | 'L' '\'' Cchar + '\''
-      ;
-   
-   
-   fragment Cchar
-      : ~ ['\\\r\n] | Escapesequence | Universalcharactername
-      ;
-   
-   
-   fragment Escapesequence
-      : Simpleescapesequence | Octalescapesequence | Hexadecimalescapesequence
-      ;
-   
-   
-   fragment Simpleescapesequence
-      : '\\\'' | '\\"' | '\\?' | '\\\\' | '\\a' | '\\b' | '\\f' | '\\n' | '\\r' | '\\t' | '\\v'
-      ;
-   
-   
-   fragment Octalescapesequence
-      : '\\' OCTALDIGIT | '\\' OCTALDIGIT OCTALDIGIT | '\\' OCTALDIGIT OCTALDIGIT OCTALDIGIT
-      ;
-   
-   
-   fragment Hexadecimalescapesequence
-      : '\\x' HEXADECIMALDIGIT +
-      ;
-   
-   
-   Floatingliteral
-      : Fractionalconstant Exponentpart? Floatingsuffix? | Digitsequence Exponentpart Floatingsuffix?
-      ;
-   
-   
-   fragment Fractionalconstant
-      : Digitsequence? '.' Digitsequence | Digitsequence '.'
-      ;
-   
-   
-   fragment Exponentpart
-      : 'e' SIGN? Digitsequence | 'E' SIGN? Digitsequence
-      ;
-   
-   
-   fragment SIGN
-      : [+-]
-      ;
-   
-   
-   fragment Digitsequence
-      : DIGIT ('\''? DIGIT)*
-      ;
-   
-   
-   fragment Floatingsuffix
-      : [flFL]
-      ;
-   
-   
-   Stringliteral
-      : Encodingprefix? '"' Schar* '"' | Encodingprefix? 'R' Rawstring
-      ;
-   
-   
-   fragment Encodingprefix
-      : 'u8' | 'u' | 'U' | 'L'
-      ;
-   
-   
-   fragment Schar
-      : ~ ["\\\r\n] | Escapesequence | Universalcharactername
-      ;
-   
-   
-   fragment Rawstring
-      : '"' .*? '(' .*? ')' .*? '"'
-      ;
-   
-   booleanliteral
-      : False
-      | True
-      ;
-   
-   pointerliteral
-      : Nullptr
-      ;
-   
-   userdefinedliteral
-      : Userdefinedintegerliteral
-      | Userdefinedfloatingliteral
-      | Userdefinedstringliteral
-      | Userdefinedcharacterliteral
-      ;
-   
-   
-   Userdefinedintegerliteral
-      : Decimalliteral Udsuffix | Octalliteral Udsuffix | Hexadecimalliteral Udsuffix | Binaryliteral Udsuffix
-      ;
-   
-   
-   Userdefinedfloatingliteral
-      : Fractionalconstant Exponentpart? Udsuffix | Digitsequence Exponentpart Udsuffix
-      ;
-   
-   
-   Userdefinedstringliteral
-      : Stringliteral Udsuffix
-      ;
-   
-   
-   Userdefinedcharacterliteral
-      : Characterliteral Udsuffix
-      ;
-   
-   
-   fragment Udsuffix
-      : Identifier
-      ;
-   
-   
-   Whitespace
-      : [ \t] + -> skip
-      ;
-   
-   
-   Newline
-      : ('\r' '\n'? | '\n') -> skip
-      ;
-   
-   
-   BlockComment
-      : '/*' .*? '*/' -> skip
-      ;
-   
-   
-   LineComment
-      : '//' ~ [\r\n]* -> skip
-      ;
-   
+	*/
+   Identifiernondigit (Identifiernondigit | DIGIT)*
+   ;
+
+fragment Identifiernondigit
+   : NONDIGIT
+   | Universalcharactername
+   ;
+
+fragment NONDIGIT
+   : [a-zA-Z_]
+   ;
+
+fragment DIGIT
+   : [0-9]
+   ;
+
+literal
+   : Integerliteral
+   | Characterliteral
+   | Floatingliteral
+   | Stringliteral+
+   | booleanliteral
+   | pointerliteral
+   | userdefinedliteral
+   ;
+
+Integerliteral
+   : Decimalliteral Integersuffix?
+   | Octalliteral Integersuffix?
+   | Hexadecimalliteral Integersuffix?
+   | Binaryliteral Integersuffix?
+   ;
+
+Decimalliteral
+   : NONZERODIGIT ('\''? DIGIT)*
+   ;
+
+Octalliteral
+   : '0' ('\''? OCTALDIGIT)*
+   ;
+
+Hexadecimalliteral
+   : ('0x' | '0X') HEXADECIMALDIGIT ('\''? HEXADECIMALDIGIT)*
+   ;
+
+Binaryliteral
+   : ('0b' | '0B') BINARYDIGIT ('\''? BINARYDIGIT)*
+   ;
+
+fragment NONZERODIGIT
+   : [1-9]
+   ;
+
+fragment OCTALDIGIT
+   : [0-7]
+   ;
+
+fragment HEXADECIMALDIGIT
+   : [0-9a-fA-F]
+   ;
+
+fragment BINARYDIGIT
+   : [01]
+   ;
+
+Integersuffix
+   : Unsignedsuffix Longsuffix?
+   | Unsignedsuffix Longlongsuffix?
+   | Longsuffix Unsignedsuffix?
+   | Longlongsuffix Unsignedsuffix?
+   ;
+
+fragment Unsignedsuffix
+   : [uU]
+   ;
+
+fragment Longsuffix
+   : [lL]
+   ;
+
+fragment Longlongsuffix
+   : 'll'
+   | 'LL'
+   ;
+
+Characterliteral
+   : '\'' Cchar+ '\''
+   | 'u' '\'' Cchar+ '\''
+   | 'U' '\'' Cchar+ '\''
+   | 'L' '\'' Cchar+ '\''
+   ;
+
+fragment Cchar
+   : ~ ['\\\r\n]
+   | Escapesequence
+   | Universalcharactername
+   ;
+
+fragment Escapesequence
+   : Simpleescapesequence
+   | Octalescapesequence
+   | Hexadecimalescapesequence
+   ;
+
+fragment Simpleescapesequence
+   : '\\\''
+   | '\\"'
+   | '\\?'
+   | '\\\\'
+   | '\\a'
+   | '\\b'
+   | '\\f'
+   | '\\n'
+   | '\\r'
+   | '\\t'
+   | '\\v'
+   ;
+
+fragment Octalescapesequence
+   : '\\' OCTALDIGIT
+   | '\\' OCTALDIGIT OCTALDIGIT
+   | '\\' OCTALDIGIT OCTALDIGIT OCTALDIGIT
+   ;
+
+fragment Hexadecimalescapesequence
+   : '\\x' HEXADECIMALDIGIT+
+   ;
+
+Floatingliteral
+   : Fractionalconstant Exponentpart? Floatingsuffix?
+   | Digitsequence Exponentpart Floatingsuffix?
+   ;
+
+fragment Fractionalconstant
+   : Digitsequence? '.' Digitsequence
+   | Digitsequence '.'
+   ;
+
+fragment Exponentpart
+   : 'e' SIGN? Digitsequence
+   | 'E' SIGN? Digitsequence
+   ;
+
+fragment SIGN
+   : [+-]
+   ;
+
+fragment Digitsequence
+   : DIGIT ('\''? DIGIT)*
+   ;
+
+fragment Floatingsuffix
+   : [flFL]
+   ;
+
+Stringliteral
+   : Encodingprefix? '"' Schar* '"'
+   | Encodingprefix? 'R' Rawstring
+   ;
+
+fragment Encodingprefix
+   : 'u8'
+   | 'u'
+   | 'U'
+   | 'L'
+   ;
+
+fragment Schar
+   : ~ ["\\\r\n]
+   | Escapesequence
+   | Universalcharactername
+   ;
+
+fragment Rawstring
+   : '"' .*? '(' .*? ')' .*? '"'
+   ;
+
+booleanliteral
+   : False
+   | True
+   ;
+
+pointerliteral
+   : Nullptr
+   ;
+
+userdefinedliteral
+   : Userdefinedintegerliteral
+   | Userdefinedfloatingliteral
+   | Userdefinedstringliteral
+   | Userdefinedcharacterliteral
+   ;
+
+Userdefinedintegerliteral
+   : Decimalliteral Udsuffix
+   | Octalliteral Udsuffix
+   | Hexadecimalliteral Udsuffix
+   | Binaryliteral Udsuffix
+   ;
+
+Userdefinedfloatingliteral
+   : Fractionalconstant Exponentpart? Udsuffix
+   | Digitsequence Exponentpart Udsuffix
+   ;
+
+Userdefinedstringliteral
+   : Stringliteral Udsuffix
+   ;
+
+Userdefinedcharacterliteral
+   : Characterliteral Udsuffix
+   ;
+
+fragment Udsuffix
+   : Identifier
+   ;
+
+Whitespace
+   : [ \t]+ -> skip
+   ;
+
+Newline
+   : ('\r' '\n'? | '\n') -> skip
+   ;
+
+BlockComment
+   : '/*' .*? '*/' -> skip
+   ;
+
+LineComment
+   : '//' ~ [\r\n]* -> skip
+   ;
+
