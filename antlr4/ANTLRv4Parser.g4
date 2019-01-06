@@ -1,4 +1,3 @@
-
 /*
  * [The "BSD license"]
  *  Copyright (c) 2012-2014 Terence Parr
@@ -30,7 +29,6 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 /*	A grammar for ANTLR v4 written in ANTLR v4.
  *
  *	Modified 2015.06.16 gbr
@@ -39,7 +37,6 @@
  *	-- moved members to LexerAdaptor
  * 	-- move fragments to imports
  */
-
 parser grammar ANTLRv4Parser;
 
 
