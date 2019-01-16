@@ -29,7 +29,7 @@ translationunit
    : declarationseq? EOF
    ;
 /*Expressions*/
-   
+ 
 
 primaryexpression
    : literal
@@ -136,7 +136,7 @@ postfixexpression
 /*
 add a middle layer to eliminate duplicated function declarations
 */
-   
+
 
 typeidofexpr
    : Typeid_
@@ -244,9 +244,13 @@ additiveexpression
 
 shiftexpression
    : additiveexpression
-   | shiftexpression '<<' additiveexpression
-   | shiftexpression rightShift additiveexpression
+   | shiftexpression shiftoperator additiveexpression
    ;
+
+shiftoperator
+  : RightShift
+  | LeftShift
+  ;
 
 relationalexpression
    : shiftexpression
@@ -305,8 +309,8 @@ assignmentoperator
    | '%='
    | '+='
    | '-='
-   | rightShiftAssign
-   | '<<='
+   | RightShiftAssign
+   | LeftShiftAssign
    | '&='
    | '^='
    | '|='
@@ -321,7 +325,7 @@ constantexpression
    : conditionalexpression
    ;
 /*Statements*/
-   
+
 
 statement
    : labeledstatement
@@ -398,7 +402,7 @@ declarationstatement
    : blockdeclaration
    ;
 /*Declarations*/
-   
+
 
 declarationseq
    : declaration
@@ -704,7 +708,7 @@ balancedtoken
    | '{' balancedtokenseq '}'
    ;
 /*Declarators*/
-   
+
 
 initdeclaratorlist
    : initdeclarator
@@ -852,7 +856,7 @@ bracedinitlist
    | '{' '}'
    ;
 /*Classes*/
-   
+
 
 classname
    : Identifier
@@ -922,14 +926,14 @@ purespecifier:
 	'=' '0'//Conflicts with the lexer
  ;
  */
-   
+
 
 purespecifier
    : Assign val = Octalliteral
    {if($val.text.compareTo("0")!=0) throw new InputMismatchException(this);}
    ;
 /*Derived classes*/
-   
+
 
 baseclause
    : ':' basespecifierlist
@@ -961,7 +965,7 @@ accessspecifier
    | Public
    ;
 /*Special member functions*/
-   
+
 
 conversionfunctionid
    : Operator conversiontypeid
@@ -994,7 +998,7 @@ meminitializerid
    | Identifier
    ;
 /*Overloading*/
-   
+
 
 operatorfunctionid
    : Operator theoperator
@@ -1005,7 +1009,7 @@ literaloperatorid
    | Operator Userdefinedstringliteral
    ;
 /*Templates*/
-   
+
 
 templatedeclaration
    : Template '<' templateparameterlist '>' declaration
@@ -1068,7 +1072,7 @@ explicitspecialization
    : Template '<' '>' declaration
    ;
 /*Exception handling*/
-   
+
 
 tryblock
    : Try compoundstatement handlerseq
@@ -1115,7 +1119,7 @@ noexceptspecification
    | Noexcept
    ;
 /*Preprocessing directives*/
-   
+
 
 MultiLineMacro
    : '#' (~ [\n]*? '\\' '\r'? '\n')+ ~ [\n]+ -> channel (HIDDEN)
@@ -1125,9 +1129,9 @@ Directive
    : '#' ~ [\n]* -> channel (HIDDEN)
    ;
 /*Lexer*/
-   
+
 /*Keywords*/
-   
+
 
 Alignas
    : 'alignas'
@@ -1429,7 +1433,7 @@ While
    : 'while'
    ;
 /*Operators*/
-   
+
 
 LeftParen
    : '('
@@ -1543,18 +1547,18 @@ LeftShift
    : '<<'
    ;
 
-rightShift
+RightShift
    :
-   //'>>' Greater Greater
+   '>>'
    ;
 
 LeftShiftAssign
    : '<<='
    ;
 
-rightShiftAssign
+RightShiftAssign
    :
-   //'>>=' Greater Greater Assign
+   '>>='
    ;
 
 Equal
@@ -1655,10 +1659,10 @@ theoperator
    | '^='
    | '&='
    | '|='
-   | '<<'
-   | rightShift
-   | rightShiftAssign
-   | '<<='
+   | LeftShift
+   | RightShift
+   | RightShiftAssign
+   | LeftShiftAssign
    | '=='
    | '!='
    | '<='
@@ -1674,7 +1678,7 @@ theoperator
    | '[' ']'
    ;
 /*Lexer*/
-   
+
 
 fragment Hexquad
    : HEXADECIMALDIGIT HEXADECIMALDIGIT HEXADECIMALDIGIT HEXADECIMALDIGIT
@@ -1924,4 +1928,3 @@ BlockComment
 LineComment
    : '//' ~ [\r\n]* -> skip
    ;
-
