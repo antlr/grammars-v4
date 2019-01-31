@@ -103,6 +103,7 @@
 				<module>css3</module>
 				<module>csv</module>
 				<module>cto</module>
+				<module>dart2</module>
 				<module>databank</module>
 				<module>dcm</module>
 				<module>dice</module>
