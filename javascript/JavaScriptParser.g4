@@ -46,6 +46,7 @@ statement
     : block
     | variableStatement
     | emptyStatement
+    | classDeclaration
     | expressionStatement
     | ifStatement
     | iterationStatement
@@ -59,7 +60,6 @@ statement
     | tryStatement
     | debuggerStatement
     | functionDeclaration
-    | classDeclaration
     ;
 
 block
