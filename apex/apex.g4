@@ -576,6 +576,7 @@ primary
     |   VOID '.' CLASS
     |   nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
     |   SoqlLiteral
+    |   DATABASE
     ;
 
 creator
