@@ -196,6 +196,7 @@
 				<module>r</module>
 				<module>rcs</module>
 				<module>redcode</module>
+				<module>rego</module>
 				<module>restructuredtext</module>
 				<module>rexx</module>
 				<module>rfc822-datetime</module>
