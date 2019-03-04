@@ -1,0 +1,1 @@
+upnp:class derivedfrom "object.item.audioItem.musicTrack" and (upnp:artist contains "FindThis")

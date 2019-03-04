@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2013, 2018, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -105,6 +105,7 @@ expression
 
 term
    : variable
+   | function
    | NUMBER
    | LPAREN expression RPAREN
    ;
@@ -119,8 +120,12 @@ identifier
    ;
 
 variable
-   : (CARAT | DOLLAR | AMPERSAND)* identifier (LPAREN arglist RPAREN)?
+   : (CARAT | AMPERSAND)* identifier
    ;
+
+function
+    : DOLLAR identifier (LPAREN arglist RPAREN)?
+    ;
 
 /*
 * COMMANDS
@@ -132,11 +137,11 @@ variable
 * command word and its post-conditional, if present, and the argument.
 */
 break_
-   : (BREAK) postcondition?
+   : BREAK postcondition?
    ;
 
 do_
-   : (DO) postcondition? SPACE + identifier (LPAREN paramlist? RPAREN)?
+   : DO postcondition? SPACE + identifier (LPAREN paramlist? RPAREN)?
    ;
 
 for_
@@ -144,7 +149,7 @@ for_
    ;
 
 halt_
-   : (HALT) postcondition?
+   : HALT postcondition?
    ;
 
 hang_
@@ -164,19 +169,19 @@ merge_
    ;
 
 new_
-   : (NEW) postcondition? SPACE + arglist
+   : NEW postcondition? SPACE + arglist
    ;
 
 quit_
-   : (QUIT) postcondition? (SPACE + term)?
+   : QUIT postcondition? (SPACE + term)?
    ;
 
 read_
-   : (READ) postcondition? SPACE + arglist
+   : READ postcondition? SPACE + arglist
    ;
 
 set_
-   : (SET) postcondition? SPACE + assign (',' assign)*
+   : SET postcondition? SPACE + assign (',' assign)*
    ;
 
 view_
@@ -184,7 +189,7 @@ view_
    ;
 
 write_
-   : (WRITE) postcondition? SPACE + arglist
+   : WRITE postcondition? SPACE + arglist
    ;
 
 xecute_
@@ -488,11 +493,6 @@ NUMBER
    ;
 
 
-SPACE
-   : ' '
-   ;
-
-
 NOT
    : '\''
    ;
@@ -632,9 +632,12 @@ COMMENT
    : ';' ~[\r\n]* -> skip
    ;
 
+SPACE
+   : ' '
+   ;
 
 CR
-   : '\r'? '\n'
+   : [\r\n]+
    ;
 
 

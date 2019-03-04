@@ -181,9 +181,9 @@ if (interpolatedStringLevel > 0)
 {
     int ind = 1;
     bool switchToFormatString = true;
-    while ((char)_input.La(ind) != '}')
+    while ((char)InputStream.LA(ind) != '}')
     {
-        if (_input.La(ind) == ':' || _input.La(ind) == ')')
+        if (InputStream.LA(ind) == ':' || InputStream.LA(ind) == ')')
         {
             switchToFormatString = false;
             break;

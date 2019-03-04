@@ -1,0 +1,239 @@
+	title  'CP/M-86 Loader'
+
+;	The CPMLDR consists of this module along with the
+;	LDRBDOS and LBIOS.
+
+;	CPMLDR resides on the first two tracks of a
+;	CP/M-86 system diskette and is brought into memory
+;	by the ROM bootstrap loader to load initiate CP/M-86
+
+;	It opens the file 'CPM.SYS' using the LDRBDOS and LBIOS
+;	and then reads it into memory. Finally, a jump to the BIOS
+;	initialization entry point starts CP/M-86
+
+;	The first 128 byte record of the CPM.SYS file is a header
+;	with the following format:
+
+;	ty	rb	1		;seg type (not used here)
+;	len	rw	1		;length (not used here)
+;	abs	dw	ldrstart	;absolute segment address for LOADER
+;	min	rw	1		;minimum mem (not used here)
+;	max	rw	1		;max mem needed	(not used here)
+
+;	(This header record is constructed automatically by the
+;	GENCMD utility).
+
+;	CPMLDR may be read into any segment that does not
+;	overlap the desired system load segment as it makes
+;	all memory references using copies of the CS: register
+;	it is entered with.
+
+false		equ	0
+true		equ	not false
+
+cr		equ	0dh
+lf		equ	0ah
+
+lbios_offset	equ	1200h		; offset of LBIOS
+
+biosoff		equ	2500h		; offset of BIOS from start of CPM.SYS
+					; this is the entry point into CPM.SYS
+
+bootdrv		equ	0		; boot drive always zero
+
+					; 128 bytes of CPM.SYS
+
+lbdosoff	equ	406H		;location of LBDOS in LOADER
+
+bdos_int	equ	224		;lbdos interrupt number
+
+	; dummy section for interrupt vectors
+
+		dseg	0
+		org	0
+abs_zero	rw	2*bdosint
+bdos_offset	rw	1
+bdos_segment	rw	1
+
+	; bdos function numbers
+
+coutf		equ	2
+pstrf		equ	9
+seldsk		equ	14
+openf		equ	15
+readsf		equ	20	
+dmaf		equ	26		
+dmabf		equ	51		
+
+
+;*******************************
+;*
+;*	CPMLDR starts here
+;*
+;*******************************
+
+	cseg
+	org	0				; JMPF to here from boot ROM
+
+	jmp	LBIOS				; allow loader BIOS to
+						;	initialize
+start:						; loader BIOS jumps here 
+
+	xor ax,ax ! mov	ds,ax			; temp DS at absolute zero
+	mov bdos_offset,lbdosoff		;  to patch in interrupt table
+	mov bdos_segment,cs			;   offset and segment
+	mov ax,cs ! mov ss,ax			; make ss, ds, es = cs
+	mov ds,ax ! mov es,ax
+	mov sp,offset(stack)			; set up local stack
+
+	call initlbdos				;warm up lbdos and lbios
+	call openfnc				;open CPM.SYS
+	cmp al,255 ! jne perr			; insure good file
+	mov dx,offset nofile ! call msg		; no CPM.SYS file
+	jmp stop				;  then halt the machine
+perr:
+	mov dx,cs ! call setdmab
+	mov dx,offset page1 ! call setdma	;read first page of CPM.SYS
+	call read
+	mov ax,word ptr page1+3			;get abs field from header
+	mov ldseg,ax				; save it and
+	mov dx,ax ! call setdmab		; set DMA segment for disk IO
+	mov dx,offset segment ! call msg	; put memory map on console
+	mov ax,ldseg ! call phex		; print base system segment
+
+;
+	mov dx,0				;offset of CPM in segment
+readit:
+	call setdma				; set DMA offset for
+	push dx ! call read			; next sector read
+	cmp al,01H ! je done			; check for EOF 
+	cmp al,0 ! je prerr			; check for good write  
+	mov dx,offset rerr ! call msg		; print READ ERROR message
+	jmp stop				; hard stop on any error
+
+prerr:	pop dx ! add dx,80h			; address for next record
+	jmp readit
+done:
+	mov dx,offset lenmsg ! call msg		; print length message
+	pop ax ! dec ax ! call phex		; print last address
+	call pcrlf				; and a crlf
+	jmpf bios				; leap to BIOS initialization
+
+;*****************************
+;*
+;*	subroutines
+;*
+;*****************************
+
+;******
+phex:				;print 4 hex characters from ax
+	mov cx,0404h		; 4 in both CH and CL
+lhex:	
+	rol ax,cl		; rotate left 4
+	push cx ! push ax	; save crucial registers
+	call pnib		; print hex nibble
+	pop ax ! pop cx		; restore registers
+	dec ch ! jnz lhex	; and loop four times
+	ret
+pnib:				;print low nibble in AL as hex char
+	and al,0fh ! cmp al,9
+	ja p10			;above 9 ?
+	add al,'0'		;digit
+	jmp prn
+p10:	add al,'A'-10		;char a-e
+prn:	mov dl,al
+
+;******
+putchar:
+	mov cl,coutf
+	jmp sys_vec
+
+;******
+initlbdos:
+	mov cl,seldsk ! mov dx,bootdrv		; select boot disk
+	jmp sys_vec
+
+;******
+openfnc:
+	mov cl,openf ! mov dx,offset fcb	; fcb already initialized
+	mov cl,openf
+	jmp sys_vec
+ 
+;********
+;
+setdma:				;set new dma addr in dx
+	mov cl,dmaf
+	jmp sys_vec
+
+;********
+;
+setdmab:			; set new dma segment base from DX
+	mov cl,dmabf
+	jmp sys_vec
+
+;******
+;
+pcrlf:	mov dx,offset crlf	;print carriage return, line feed
+
+;******
+;
+msg:				;print msg starting at dx until $
+	mov cl,pstrf		;print string function
+	jmp sys_vec
+
+;*****
+;
+read:
+	mov dx,offset fcb ! mov cl,readsf
+;	jmp sys_vec
+
+;******
+;
+sys_vec:
+	int bdos_int
+	ret
+
+;******
+;
+stop:	hlt			; hard stop 8086 for error
+	jmp	stop
+
+;********************************
+;*
+;*	DATA AREA
+;*
+;********************************
+
+nofile		db	cr,lf,'The File CPM.SYS Not Found On This Disk$'
+rerr		db	cr,lf,'Error In Reading CPM.SYS$'
+segment		db	cr,lf,'Segment Address = $'
+lenmsg		db	cr,lf,'    Last Offset = $'
+crlf		db	cr,lf,'$'
+
+
+	; vector for jmpf indirect to start CP/M
+
+bios		dd	abs_zero		; (dummy value)
+
+	org offset bios			; overlay preceding with DW's
+
+biosstart	dw	biosoff		; first word is BIOS offset
+ldseg		rw	1		; second is segment to put CPM.SYS
+
+
+fcb	db	0,'CPM     ','SYS',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
+	org	(offset $+1) and 0FFFEh	; even address for stack
+	rw	32
+stack	equ offset $
+
+	dseg
+	org stack
+page1	rb	128
+
+
+				; dummy section for BIOS init label
+	org	lbios_offset
+lbios:
+
+	end

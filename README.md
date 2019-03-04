@@ -8,25 +8,6 @@ This repository is a collection of Antlr4 grammars.
 
 The root directory name is the all-lowercase name of the language parsed by the grammar. For example, java, cpp, csharp, c, etc...
 
-## Using the grammars
+# FAQ
 
-There is a simple example of using a grammar [here](https://github.com/teverett/antlr4example)
-
-## Contributing
-
-The grammars-v4 tree uses Travis in conjunction with [antlr4test-maven-plugin](https://github.com/antlr/antlr4test-maven-plugin) to test all grammars against example inputs. This ensures that all grammars on the tree parse, compile and work with the example inputs.
-
-Therefore:
-
-* Pull requests which cause test failures will be rejected
-* Pull requests which include additional examples to be used as test cases are strongly preferred
-
-## License
-
-Beware of the licenses on the individual grammars. There is no common license. When in doubt or you don't know what you're doing, please use the BSD or MIT license.
-
-## Testing the Grammars
-
-```
-mvn clean test
-```
+Please refer to the [grammars-v4 Wiki](https://github.com/antlr/grammars-v4/wiki)

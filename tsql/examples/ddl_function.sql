@@ -21,7 +21,7 @@ END
 GO
 
 --create function return @val table 
-CREATE FUNCTION [dbo].[Foo](@String nvarchar(4000))
+CREATE OR ALTER FUNCTION [dbo].[Foo](@String nvarchar(4000))
 RETURNS @Bar TABLE (Col1 nvarchar(4000))
 AS
    BEGIN
@@ -30,7 +30,7 @@ AS
 END
 
 --Alter Function, should behave the same as create function, except the ALTER keyword
-Alter FUNCTION [dbo].[Foo](@String nvarchar(4000))
+ALTER FUNCTION [dbo].[Foo](@String nvarchar(4000))
 RETURNS @Bar TABLE (Col1 nvarchar(4000))
 AS
    BEGIN

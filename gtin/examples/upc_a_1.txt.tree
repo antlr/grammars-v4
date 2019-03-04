@@ -1,0 +1,1 @@
+(gtin (gtin12 (upc (upc_a (num_system (any_digit 0)) (upc_a_manufacturer (upc_a_5 (any_digit 4) (any_digit 2) (any_digit 1) (any_digit 0) (any_digit 0))) (upc_a_product (upc_a_5 (any_digit 0) (any_digit 0) (any_digit 5) (any_digit 2) (any_digit 6))) (check_code (any_digit 4))))) <EOF>)

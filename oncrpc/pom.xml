@@ -5,7 +5,7 @@
 	<packaging>jar</packaging>
 	<name>ONCRPC and XDR grammars</name>
 	<parent>
-		<groupId>com.antlr.grammarsv4</groupId>
+		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
 		<version>1.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
@@ -19,6 +19,11 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
+					<grammars>oncrpcv2.g4</grammars>
+					<includes>
+						<include>oncrpcv2.g4</include>
+						<include>xdr.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

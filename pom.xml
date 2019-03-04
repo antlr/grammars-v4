@@ -1,169 +1,36 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.antlr.grammarsv4</groupId>
+	<groupId>org.antlr.grammars</groupId>
 	<artifactId>grammarsv4</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
 	<name>ANTLR4 grammars</name>
-	<profiles>
-		<profile>
-			<id>test</id>
-				<activation>
-					<activeByDefault>false</activeByDefault>
-				</activation>
-			<modules>
-				<module>_grammar-test</module>
-			</modules>
-		</profile>
-		<profile>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<id>grammarv4</id>
-			<modules>
-			<module>abnf</module>
-			<module>agc</module>
-			<!--		<module>antlr3</module>-->
-			<module>antlr4</module>
-			<module>apex</module>
-			<module>arithmetic</module>
-			<module>asm6502</module>
-			<module>asn</module>
-			<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
-			<!--		<module>aspectj</module> -->
-			<module>atl</module>
-			<module>basic</module>
-			<module>bnf</module>
-			<module>brainfuck</module>
-			<module>c</module>
-			<module>calculator</module>
-			<module>clf</module>
-			<module>clif</module>
-			<module>clojure</module>
-			<module>cobol85</module>
-			<module>cookie</module>			
-			<module>cool</module>
-			<module>cpp</module>
-			<module>creole</module>
-			<module>csharp</module>
-			<module>css3</module>
-			<module>csv</module>
-			<module>datetime</module>
-			<module>dcm</module>
-         <module>dice</module>
-			<module>dot</module>
-			<module>ecmascript</module>
-			<module>emailaddress</module>
-			<module>erlang</module>
-			<module>fasta</module>
-			<module>fol</module>
-			<module>fortran77</module>
-			<module>fusion-tables</module>
-			<module>gff3</module>
-			<module>gml</module>
-			<module>golang</module>
-			<module>graphql</module>
-			<module>graphstream-dgs</module>
-			<module>html</module>
-			<module>icalendar</module>
-			<module>idl</module>
-			<module>informix</module>
-			<module>iri</module>
-			<module>java</module>
-			<module>java8</module>
-			<module>java8-pt</module>
-			<module>javadoc</module>
-			<module>jpa</module>
-			<module>json</module>
-			<module>kotlin</module>
-			<module>kuka</module>
-			<module>lambda</module>
-			<module>less</module>
-			<module>logo</module>
-			<module>lolcode</module>
-			<module>lua</module>
-			<module>masm</module>
-			<module>mdx</module>
-			<module>memcached_protocol</module>
-			<module>metric</module>
-			<module>modelica</module>
-			<module>modula2pim4</module>
-			<module>mps</module>
-			<module>mumath</module>
-			<module>mumps</module>
-			<module>mysql</module>
-			<!-- <module>objc</module> -->
-			<module>oncrpc</module>
-			<module>p</module>
-			<module>pascal</module>
-			<module>pcre</module>
-			<module>pddl</module>
-			<module>pdp7</module>
-			<module>peoplecode</module>
-			<module>pgn</module>
-			<module>php</module>
-			<module>plsql</module>
-			<module>postalcode</module>
-			<module>powerbuilder</module>
-			<module>prolog</module>
-			<module>propcalc</module>
-			<module>protobuf3</module>
-			<module>properties</module>
-			<module>python3</module>
-			<module>python3alt</module>
-			<module>r</module>
-			<module>rcs</module>
-			<module>redcode</module>
-			<module>robotwars</module>
-			<module>romannumerals</module>
-			<module>rpn</module>
-			<module>ruby</module>
-			<module>scala</module>
-			<module>scss</module>
-			<module>sexpression</module>
-			<module>sharc</module>
-			<module>smalltalk</module>
-			<module>snobol</module>
-			<module>sparql</module>
-			<module>sqlite</module>
-			<module>stacktrace</module>
-			<module>stringtemplate</module>
-			<module>suokif</module>
-			<module>swift2</module>
-			<module>swift3</module>
-			<module>swift-fin</module>
-			<module>telephone</module>
-			<module>tiny</module>
-			<module>tinyc</module>
-			<module>tnsnames</module>
-			<module>tnt</module>
-			<module>tsql</module>
-			<module>turtle</module>
-			<module>ucb-logo</module>
-			<module>unicode</module>
-			<module>url</module>
-			<module>useragent</module>
-			<module>vb6</module>
-			<module>vba</module>
-			<module>verilog</module>
-			<module>vhdl</module>
-			<module>wavefront</module>
-			<module>webidl</module>
-			<module>xml</module>
-			<module>xpath</module>
-			<module>z</module>
-			<!-- testing repository -->
-			<!--<module>grammar-test</module>-->
-			</modules>
-		</profile>
-	</profiles>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.6</target.jvm>
-		<antlr.version>4.7</antlr.version>
-		<antlr4test-maven-plugin.version>1.9</antlr4test-maven-plugin.version>
+		<antlr.version>4.7.2</antlr.version>
+		<antlr4test-maven-plugin.version>1.11</antlr4test-maven-plugin.version>
+		<junit.version>4.12</junit.version>
 	</properties>
+	<prerequisites>
+		<maven>3.1.0</maven>
+	</prerequisites>
+	<developers>
+		<developer>
+			<id>teverett</id>
+			<name>Tom Everett</name>
+			<email>tom@khubla.com</email>
+		</developer>
+	</developers>
+	<scm>
+		<connection>https://github.com/antlr/grammars-v4.git</connection>
+		<tag>HEAD</tag>
+	</scm>
+	<organization>
+		<name>ANTLR</name>
+		<url>http://www.antlr.org</url>
+	</organization>
 	<dependencies>
 		<dependency>
 			<groupId>org.antlr</groupId>
@@ -175,7 +42,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>${junit.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -183,7 +50,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.0</version>
+				<version>3.8.0</version>
 				<configuration>
 					<source>${target.jvm}</source>
 					<target>${target.jvm}</target>
@@ -191,4 +58,299 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<id>grammarv4</id>
+			<modules>
+				<module>abnf</module>
+				<module>agc</module>
+				<!-- <module>algol60</module> -->
+				<module>antlr3</module>
+				<module>antlr4</module>
+				<module>apex</module>
+				<module>arithmetic</module>
+				<module>asm6502</module>
+				<module>asm8080</module>
+				<module>asm8086</module>
+				<module>asmMASM</module>
+				<module>asmZ80</module>
+				<module>asn</module>
+				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
+				<!-- <module>aspectj</module> -->
+				<module>atl</module>
+				<!-- <module>b</module> -->
+				<module>basic</module>
+				<module>bnf</module>
+				<module>brainfuck</module>
+				<module>c</module>
+				<module>calculator</module>
+				<module>capnproto</module>
+				<module>clf</module>
+				<module>clif</module>
+				<module>clojure</module>
+				<!-- <module>clu</module> -->
+				<module>cmake</module>
+				<module>cobol85</module>
+				<module>cookie</module>
+				<module>cool</module>
+				<module>cpp</module>
+				<module>cql3</module>
+				<module>creole</module>
+				<module>csharp</module>
+				<module>css3</module>
+				<module>csv</module>
+				<module>cto</module>
+				<module>dart2</module>
+				<module>databank</module>
+				<module>dcm</module>
+				<module>dice</module>
+				<module>dot</module>
+				<module>ecmascript</module>
+				<module>edif300</module>
+				<module>erlang</module>
+				<module>fasta</module>
+				<module>fen</module>
+				<module>flatbuffers</module>
+				<module>fol</module>
+				<module>fortran77</module>
+				<module>fusion-tables</module>
+				<module>gff3</module>
+				<module>gml</module>
+				<module>golang</module>
+				<module>graphql</module>
+				<module>graphstream-dgs</module>
+				<module>gtin</module>
+				<module>guido</module>
+				<module>html</module>
+				<module>hypertalk</module>
+				<module>icalendar</module>
+				<module>icon</module>
+				<module>idl</module>
+				<module>inf</module>
+				<module>informix</module>
+				<module>iri</module>
+				<module>istc</module>
+				<module>java</module>
+				<module>java8</module>
+				<module>java9</module>
+				<module>javadoc</module>
+				<!-- <module>javascript</module> TODO: required superClass support -->
+				<module>jpa</module>
+				<module>json</module>
+				<module>kotlin</module>
+				<module>kotlin-formal</module>
+				<module>kuka</module>
+				<module>lambda</module>
+				<module>lcc</module>
+				<module>less</module>
+				<module>logo</module>
+				<module>lolcode</module>
+				<module>lua</module>
+				<module>masm</module>
+				<module>matlab</module>
+				<module>mdx</module>
+				<module>memcached_protocol</module>
+				<module>metric</module>
+				<module>modelica</module>
+				<module>modula2pim4</module>
+				<module>molecule</module>
+				<module>moo</module>
+				<module>morsecode</module>
+				<module>mps</module>
+				<module>muddb</module>
+				<module>mumath</module>
+				<module>mumps</module>
+				<module>mysql</module>
+				<!-- <module>objc</module> -->
+				<module>oncrpc</module>
+				<module>p</module>
+				<module>pascal</module>
+				<module>pcre</module>
+				<module>pddl</module>
+				<module>pdn</module>
+				<module>pdp7</module>
+				<module>peoplecode</module>
+				<module>pgn</module>
+				<module>php</module>
+				<!-- <module>pike</module> -->
+				<module>pl0</module>
+				<!-- <module>plsql</module> TODO: required superClass support -->
+				<module>ply</module>
+				<module>postalcode</module>
+				<module>powerbuilder</module>
+				<module>prolog</module>
+				<module>propcalc</module>
+				<module>properties</module>
+				<module>protobuf3</module>
+				<module>prov-n</module>
+				<module>python2</module>
+				<module>python3</module>
+				<module>python3-js</module>
+				<module>python3-py</module>
+				<module>python3-ts</module>
+				<module>python3alt</module>
+				<module>quakemap</module>
+				<module>r</module>
+				<module>rcs</module>
+				<module>redcode</module>
+				<module>rego</module>
+				<module>restructuredtext</module>
+				<module>rexx</module>
+				<module>rfc822-datetime</module>
+				<module>rfc822-emailaddress</module>
+				<module>robotwars</module>
+				<module>romannumerals</module>
+				<module>rpn</module>
+				<module>ruby</module>
+				<module>scala</module>
+				<module>scss</module>
+				<module>sexpression</module>
+				<module>sgf</module>
+				<module>sharc</module>
+				<module>smalltalk</module>
+				<module>smiles</module>
+				<module>smtlibv2</module>
+				<module>snobol</module>
+				<module>solidity</module>
+				<module>sparql</module>
+				<module>sqlite</module>
+				<module>stacktrace</module>
+				<module>stringtemplate</module>
+				<module>suokif</module>
+				<module>swift2</module>
+				<module>swift3</module>
+				<module>swift-fin</module>
+				<module>telephone</module>
+				<module>thrift</module>
+				<module>tiny</module>
+				<module>tinybasic</module>
+				<module>tinyc</module>
+				<module>tinymud</module>
+				<module>tnsnames</module>
+				<module>tnt</module>
+				<module>tsql</module>
+				<module>tsv</module>
+				<module>turtle</module>
+				<module>turtle-doc</module>
+				<module>ucb-logo</module>
+				<module>unicode</module>
+				<module>upnp</module>
+				<module>url</module>
+				<module>useragent</module>
+				<module>vb6</module>
+				<module>vba</module>
+				<module>verilog</module>
+				<module>vhdl</module>
+				<module>wavefront</module>
+				<module>webidl</module>
+				<module>wkt</module>
+				<module>xml</module>
+				<module>xpath</module>
+				<module>z</module>
+				<!-- testing repository -->
+				<!--<module>grammar-test</module> -->
+			</modules>
+		</profile>
+		<profile>
+			<id>deploy</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>3.1.0</version>
+						<configuration>
+							<descriptors>
+								<descriptor>${maven.multiModuleProjectDirectory}/assembly.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.8</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.0.1</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.0.1	</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>test</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<modules>
+				<module>_grammar-test</module>
+			</modules>
+		</profile>
+	</profiles>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 </project>

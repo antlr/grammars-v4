@@ -5,11 +5,34 @@ create table log_table(row varchar(512));
 create table ships(name varchar(255), class_id int, id int);
 create table ships_guns(guns_id int, ship_id int);
 create table guns(id int, power decimal(7,2), callibr decimal(10,3));
-create table ship_class(id int, class_name varchar(100), tonange decimal(10,2), max_length decimal(10,2), start_build year, max_guns_size int);
+create table ship_class(id int, class_name varchar(100), tonange decimal(10,2), max_length decimal(10,2), start_build year, end_build year(4), max_guns_size int);
 create table `some table $$`(id int auto_increment key, class varchar(10), data binary) engine=MYISAM;
+create table quengine(id int auto_increment key, class varchar(10), data binary) engine='InnoDB';
+create table quengine(id int auto_increment key, class varchar(10), data binary) engine="Memory";
+create table quengine(id int auto_increment key, class varchar(10), data binary) engine=`CSV`;
+create table quengine(id int auto_increment key, class varchar(10), data binary COMMENT 'CSV') engine=MyISAM;
 create table `parent_table`(id int primary key, column1 varchar(30), index parent_table_i1(column1(20)), check(char_length(column1)>10)) engine InnoDB;
 create table child_table(id int unsigned auto_increment primary key, id_parent int references parent_table(id) match full on update cascade on delete set null) engine=InnoDB;
 create table `another some table $$` like `some table $$`;
+create table `actor` (`last_update` timestamp default CURRENT_TIMESTAMP, `birthday` datetime default CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP);
+create table boolean_table(c1 bool, c2 boolean default true);
+create table default_table(c1 int default 42, c2 int default -42);
+create table ts_table(
+  ts1 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  ts2 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIME,
+  ts3 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP,
+  ts4 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(),
+  ts5 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIME(),
+  ts6 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP(),
+  ts7 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE NOW(),
+  ts8 TIMESTAMP(6) NOT NULL,
+  ts9 TIMESTAMP(6) NOT NULL DEFAULT NOW(6) ON UPDATE NOW(6)
+);
+create table with_check (c1 integer not null,c2 varchar(22),constraint c1 check (c2 in ('a', 'b', 'c')));
+CREATE TABLE genvalue1 (id binary(16) NOT NULL, val char(32) GENERATED ALWAYS AS (hex(id)) STORED, PRIMARY KEY (id));
+CREATE TABLE genvalue2 (id binary(16) NOT NULL, val char(32) AS (hex(id)) STORED, PRIMARY KEY (id));
+CREATE TABLE genvalue3 (id binary(16) NOT NULL, val char(32) GENERATED ALWAYS AS (hex(id)) VIRTUAL, PRIMARY KEY (id));
+CREATE TABLE check_table_kw (id int primary key, upgrade varchar(256), quick varchar(256), fast varchar(256), medium varchar(256), extended varchar(256), changed varchar(256));
 #end
 #begin
 -- Rename table
@@ -32,6 +55,7 @@ create schema if not exists myschema;
 create schema `select` default character set = utf8;
 create database if not exists `current_date` character set cp1251;
 create database super default character set utf8 collate = utf8_bin character set utf8 collate utf8_bin;
+create database super_cs default charset utf8 collate = utf8_bin character set utf8 collate utf8_bin;
 #end
 #begin
 -- Create event 1

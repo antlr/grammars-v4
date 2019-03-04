@@ -40,152 +40,164 @@ itrunc: 0
    dac i.flags
    jmp itrunc i
 t = t+4
-
+			" Given a pointer to a 4-word filename after
+			" the jms to namei, and with AC holding the
+			" i-num of the directory it is in, return the
+			" i-number of the filename (and skip)
+			" return zero in AC if not found (no skip)
 namei: 0
-   jms iget
+   jms iget		" Get the inode from the i-num in the AC
    -1
-   tad namei i
-   dac 9f+t+1
-   isz namei
+   tad namei i		" get argptr-1
+   dac 9f+t+1		" save in t1
+   isz namei		" skip over argument
    lac i.flags
-   and o20
-   sna
-   jmp namei i
+   and o20		" get directory bit
+   sna			" Is this a directory?
+   jmp namei i		"  no: return without skip
    -8
-   tad i.size
+   tad i.size		" Subtract 8 from the file's size
    cma
    lrss 3
-   dac 9f+t
-   sna
-   jmp namei i
-   dzm di
+   dac 9f+t		" negative count of directory entries in t0
+   sna			" any?
+   jmp namei i		"  no: return without skip
+   dzm di		" Store zero in di
 1:
    lac di
 
 "** 01-s1.pdf page 35
 
-   jms dget
-   lac d.i
-   sna
-   jmp 2f
-   lac 9f+t+1
+   jms dget		" Get a directory entry from the dirblock
+   lac d.i		" get i-num
+   sna			" in use?
+   jmp 2f		"  no
+   lac 9f+t+1		" get argptr-1
    dac 8
-   lac d.name
-   sad 8 i
+   lac d.name		" Compare the four words of the filename in the
+   sad 8 i		" directory entry with the argument to namei
    skp
-   jmp 2f
+   jmp 2f		" No match
    lac d.name+1
    sad 8 i
    skp
-   jmp 2f
+   jmp 2f		" No match
    lac d.name+2
    sad 8 i
    skp
-   jmp 2f
+   jmp 2f		" No match
    lac d.name+3
    sad 8 i
    skp
-   jmp 2f
-   lac d.i
-   isz namei
+   jmp 2f		" No match
+   lac d.i		" A match. Get the i-number into AC
+   isz namei		" give skip return
    jmp namei i
 2:
-   isz di
-   isz 9f+t
-   jmp 1b
-   jmp namei i
+   isz di		" No match, move up to the next direntry
+   isz 9f+t		" any left?
+   jmp 1b		"  yes: keep going
+   jmp namei i		" Didn't find it, return zero in AC (without skip)
 t = t+2
 
+		" NOTE: iget/iput share "temp" vars!!!
+                        " Given an i-number in AC, fetch that i-node
+                        " from disk and store it in the inode buffer
 iget: 0
-   dac ii
-   cll; idiv; 5
-   dac 9f+t
-   lacq
-   tad d2
-   dac 9f+t+1
-   jms dskrd
+   dac ii		" Store the i-number in ii
+   cll; idiv; 5		" Divide by 5: 5 inodes in a block
+   dac 9f+t		" Store the remainder in 9f+t: the i-node
+   lacq			" number within the block
+   tad d2		" Add 2 to the quotient to get the block number
+   dac 9f+t+1		" and store in 9f+t+1
+   jms dskrd		" Get the block
    lac 9f+t
-   cll; mul; 12
-   lacq
-   tad dskbufp
-   dac 9f+t
+   cll; mul; 12		" Multiply the i-num within the block by 12
+   lacq			" to get the offset into the block
+   tad dskbufp		" Add on the base of the disk buffer
+   dac 9f+t		" save pointer into dskbuf in "t0"
    dac .+2
-   jms copy; ..; inode; 12
-   jmp iget i
+   jms copy; ..; inode; 12	" Copy 12 words from buffer to inode
+   jmp iget i		" and return
 
 iput: 0
-   lac 9f+t+1
-   jms dskrd
-   law inode-1
-   dac 8
+   lac 9f+t+1		" get block number saved by iget
+   jms dskrd		" read the block
+   law inode-1		" pointer to "in core" inode
+   dac 8		" in index 8
    -1
-   tad 9f+t
-   dac 9
-   -12
-   dac 9f+t+2
+   tad 9f+t		" get saved pointer into buffer
+   dac 9		" in index 9
+   -12			" 12 word loop count
+   dac 9f+t+2		" in t2
 1:
-   lac 8 i
+   lac 8 i		" fetch source word
 
 "** 01-s1.pdf page 36
 
-   sad 9 i
-   skp
-   jmp 2f
-   isz 9f+t+2
-   jmp 1b
-   jmp iput i
-2:
-   -1
+   sad 9 i		" differs from disk?
+   skp			"  no:
+   jmp 2f		"   yes: 
+   isz 9f+t+2		" no difference: done?
+   jmp 1b		"  no: keep going
+   jmp iput i		" yes: return w/o writing to disk
+2:			" here with in-core inode changed
+   -1			" back up both pointers
    tad 8
    dac 8
    -1
    tad 9
    dac 9
 1:
-   lac 8 i
-   dac 9 i
-   isz 9f+t+2
-   jmp 1b
-   lac 9f+t+1
-   jms dskwr
-   jmp iput i
+   lac 8 i		" fetch word
+   dac 9 i		" copy to dskbuf
+   isz 9f+t+2		" done?
+   jmp 1b		"  no: keep going
+   lac 9f+t+1		" get block number
+   jms dskwr		" write back to disk
+   jmp iput i		" return
 t = t+3
 
+	" NOTE! dget/dput share "temp" vars
+	" allocate directory entry
+	" AC/ entry number
 dget: 0
-   dac di
-   alss 3
-   dac 9f+t
-   jms pget
-   dac 9f+t+1
-   jms dskrd
-   lac 9f+t
-   and o77
-   tad dskbufp
-   dac 9f+t+2
-   dac .+2
-   jms copy; ..; dnode; 8
-   lac 9f+t
-   tad d8
-   jms betwen; d0; i.size
-      skp
-   jmp dget i
-   jms dacisize
-   dzm d.i
-   jmp dget i
+   dac di			" save entry number
+   alss 3			" get word number
+   dac 9f+t			" save in t0
+   jms pget			" get free disk block
+   dac 9f+t+1			" save in t1
+   jms dskrd			" read block
+   lac 9f+t			" get word number
+   and o77			" get word within block
+   tad dskbufp			" make pointer into dskbuf
+   dac 9f+t+2			" save in t2
+   dac .+2			" save as copy source
+   jms copy; ..; dnode; 8	" copy entry into dnode
+   lac 9f+t			" get word number
+   tad d8			" of end of new node
+   jms betwen; d0; i.size	" already allocated?
+      skp			"  no
+   jmp dget i			"   yes: return
+   jms dacisize			" store new file size
+   dzm d.i			" mark new entry as free
+   jmp dget i			" return
 
+	" write directory entry (back) to disk
 dput: 0
-   lac 9f+t+1
-   jms dskrd
-   lac 9f+t+2
-   dac .+3
-   jms copy; dnode; ..; 8
-   lac 9f+t+1
-   jms dskwr
+   lac 9f+t+1			" get disk block number back
+   jms dskrd			" read into dskbuf
+   lac 9f+t+2			" get pointer into dskbuf
+   dac .+3			" save as copy dest
+   jms copy; dnode; ..; 8	" copy into dskbuf
+   lac 9f+t+1			" get disk block number
+   jms dskwr			" write back to disk
    jmp dput i
 
 t = t+3
 
-	" allocate a block for a file, returns disk block number
+	" get a block number for a file, returns disk block number
+	" allocates block if not allocated
 	" AC/ file offset
 	"   jms pget
 	" AC/ disk block number
@@ -254,6 +266,10 @@ pget: 0
    jmp pget i				" return it
 t = t+3
 
+	" write to file referenced by loaded inode
+	" AC/ file offset
+	"    jms iwrite; addr; count
+
 iwrite: 0
    dac 9f+t				" save arg in t0
    lac iwrite				" load return address
@@ -265,14 +281,14 @@ iwrite: 0
    dac iwrite				" save as iwrite instruction
    jmp 1f
 
-	" iread from file referenced by loaded inode
+	" read from file referenced by loaded inode
 	" AC/ file offset
 	"    jms iread; addr; count
 iread: 0
    dac 9f+t				" save offset in t0
    lac cnop				" get nop
    dac iwrite				" save as iwrite instruction
-1:
+1:					" common code for iread/iwrite
    -1
    tad iread i				" get word before return addr
    dac 10				" store in index 10 & 11
@@ -281,7 +297,7 @@ iread: 0
    lac iread i				" load addr
    dac 9f+t+1				" save in t1
    isz iread				" increment return addr
-   lac o70000
+   lac o70000				" get max file size
    xct iwrite				" skip if write
    lac i.size				"  read: get file size
    cma
@@ -291,10 +307,10 @@ iread: 0
       lac 9f+t+1
    dac 9f+t+2
    cma
-   tad d1
-   sna
-   jmp iread i
-   dac 9f+t+1
+   tad d1				" subtract offset
+   sna					" offset == size?
+   jmp iread i				"  yes, return
+   dac 9f+t+1				" save size-offset in t1
 1:
    lac 9f+t
    jms pget
@@ -304,7 +320,7 @@ iread: 0
    and o77
    tad dskbufp
    tad dm1
-   xct iwrite
+   xct iwrite				" skip if write
    jmp .+3
    dac 10
 cskp:

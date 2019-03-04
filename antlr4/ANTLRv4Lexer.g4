@@ -28,7 +28,6 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 /**
  *	A grammar for ANTLR v4 implemented using v4 syntax
  *
@@ -37,321 +36,268 @@
  */
 lexer grammar ANTLRv4Lexer;
 
-options
-   { superClass = LexerAdaptor; }
+
+options { superClass = LexerAdaptor; }
 import LexBasic;
 // Standard set of fragments
-tokens
-   { TOKEN_REF , RULE_REF , LEXER_CHAR_SET }
-
-channels
-   { OFF_CHANNEL }
-
+tokens { TOKEN_REF , RULE_REF , LEXER_CHAR_SET }
+channels { OFF_CHANNEL , COMMENT }
 // ======================================================
 // Lexer specification
 //
 // -------------------------
 // Comments
-
 DOC_COMMENT
    : DocComment
    ;
 
-
 BLOCK_COMMENT
-   : BlockComment -> channel (OFF_CHANNEL)
+   : BlockComment -> channel (COMMENT)
    ;
-
 
 LINE_COMMENT
-   : LineComment -> channel (OFF_CHANNEL)
+   : LineComment -> channel (COMMENT)
    ;
-
-// -------------------------
-// Integer
-//
+   // -------------------------
+   // Integer
+   //
 
 INT
    : DecimalNumeral
    ;
-
-// -------------------------
-// Literal string
-//
-// ANTLR makes no distinction between a single character literal and a
-// multi-character string. All literals are single quote delimited and
-// may contain unicode escape sequences of the form \uxxxx, where x
-// is a valid hexadecimal number (per Unicode standard).
+   // -------------------------
+   // Literal string
+   //
+   // ANTLR makes no distinction between a single character literal and a
+   // multi-character string. All literals are single quote delimited and
+   // may contain unicode escape sequences of the form \uxxxx, where x
+   // is a valid hexadecimal number (per Unicode standard).
 
 STRING_LITERAL
    : SQuoteLiteral
    ;
 
-
 UNTERMINATED_STRING_LITERAL
    : USQuoteLiteral
    ;
-
-// -------------------------
-// Arguments
-//
-// Certain argument lists, such as those specifying call parameters
-// to a rule invocation, or input parameters to a rule specification
-// are contained within square brackets.
+   // -------------------------
+   // Arguments
+   //
+   // Certain argument lists, such as those specifying call parameters
+   // to a rule invocation, or input parameters to a rule specification
+   // are contained within square brackets.
 
 BEGIN_ARGUMENT
-   : LBrack{ handleBeginArgument(); };
-   
-// -------------------------
-// Actions
+   : LBrack
+   { handleBeginArgument(); }
+   ;
+   // -------------------------
+   // Actions
 
 BEGIN_ACTION
    : LBrace -> pushMode (Action)
    ;
-
-// -------------------------
-// Keywords
-//
-// Keywords may not be used as labels for rules or in any other context where
-// they would be ambiguous with the keyword vs some other identifier.  OPTIONS,
-// TOKENS, & CHANNELS blocks are handled idiomatically in dedicated lexical modes.
+   // -------------------------
+   // Keywords
+   //
+   // Keywords may not be used as labels for rules or in any other context where
+   // they would be ambiguous with the keyword vs some other identifier.  OPTIONS,
+   // TOKENS, & CHANNELS blocks are handled idiomatically in dedicated lexical modes.
 
 OPTIONS
    : 'options' -> pushMode (Options)
    ;
 
-
 TOKENS
    : 'tokens' -> pushMode (Tokens)
    ;
-
 
 CHANNELS
    : 'channels' -> pushMode (Channels)
    ;
 
-
 IMPORT
    : 'import'
    ;
-
 
 FRAGMENT
    : 'fragment'
    ;
 
-
 LEXER
    : 'lexer'
    ;
-
 
 PARSER
    : 'parser'
    ;
 
-
 GRAMMAR
    : 'grammar'
    ;
-
 
 PROTECTED
    : 'protected'
    ;
 
-
 PUBLIC
    : 'public'
    ;
-
 
 PRIVATE
    : 'private'
    ;
 
-
 RETURNS
    : 'returns'
    ;
-
 
 LOCALS
    : 'locals'
    ;
 
-
 THROWS
    : 'throws'
    ;
-
 
 CATCH
    : 'catch'
    ;
 
-
 FINALLY
    : 'finally'
    ;
 
-
 MODE
    : 'mode'
    ;
-
-// -------------------------
-// Punctuation
+   // -------------------------
+   // Punctuation
 
 COLON
    : Colon
    ;
 
-
 COLONCOLON
    : DColon
    ;
-
 
 COMMA
    : Comma
    ;
 
-
 SEMI
    : Semi
    ;
-
 
 LPAREN
    : LParen
    ;
 
-
 RPAREN
    : RParen
    ;
-
 
 LBRACE
    : LBrace
    ;
 
-
 RBRACE
    : RBrace
    ;
-
 
 RARROW
    : RArrow
    ;
 
-
 LT
    : Lt
    ;
-
 
 GT
    : Gt
    ;
 
-
 ASSIGN
    : Equal
    ;
-
 
 QUESTION
    : Question
    ;
 
-
 STAR
    : Star
    ;
-
 
 PLUS_ASSIGN
    : PlusAssign
    ;
 
-
 PLUS
    : Plus
    ;
-
 
 OR
    : Pipe
    ;
 
-
 DOLLAR
    : Dollar
    ;
-
 
 RANGE
    : Range
    ;
 
-
 DOT
    : Dot
    ;
-
 
 AT
    : At
    ;
 
-
 POUND
    : Pound
    ;
 
-
 NOT
    : Tilde
    ;
-
-// -------------------------
-// Identifiers - allows unicode rule/token names
+   // -------------------------
+   // Identifiers - allows unicode rule/token names
 
 ID
    : Id
    ;
-
-// -------------------------
-// Whitespace
+   // -------------------------
+   // Whitespace
 
 WS
-   : Ws + -> channel (OFF_CHANNEL)
+   : Ws+ -> channel (OFF_CHANNEL)
    ;
-
-// -------------------------
-// Illegal Characters
-//
-// This is an illegal character trap which is always the last rule in the
-// lexer specification. It matches a single character of any value and being
-// the last rule in the file will match when no other rule knows what to do
-// about the character. It is reported as an error but is not passed on to the
-// parser. This means that the parser to deal with the gramamr file anyway
-// but we will not try to analyse or code generate from a file with lexical
-// errors.
-//
-// Comment this rule out to allow the error to be propagated to the parser
+   // -------------------------
+   // Illegal Characters
+   //
+   // This is an illegal character trap which is always the last rule in the
+   // lexer specification. It matches a single character of any value and being
+   // the last rule in the file will match when no other rule knows what to do
+   // about the character. It is reported as an error but is not passed on to the
+   // parser. This means that the parser to deal with the gramamr file anyway
+   // but we will not try to analyse or code generate from a file with lexical
+   // errors.
+   //
+   // Comment this rule out to allow the error to be propagated to the parser
 
 ERRCHAR
    : . -> channel (HIDDEN)
    ;
+   // ======================================================
+   // Lexer modes
+   // -------------------------
+   // Arguments
 
-// ======================================================
-// Lexer modes
-// -------------------------
-// Arguments
 mode Argument;
 // E.g., [int x, List<String> a[]]
 NESTED_ARGUMENT
@@ -371,9 +317,11 @@ ARGUMENT_CHAR_LITERAL
    ;
 
 END_ARGUMENT
-   : RBrack{ handleEndArgument(); };
-      
-// added this to return non-EOF token type here. EOF does something weird
+   : RBrack
+   { handleEndArgument(); }
+   ;
+   // added this to return non-EOF token type here. EOF does something weird
+
 UNTERMINATED_ARGUMENT
    : EOF -> popMode
    ;
@@ -381,16 +329,16 @@ UNTERMINATED_ARGUMENT
 ARGUMENT_CONTENT
    : .
    ;
+   // -------------------------
+   // Actions
+   //
+   // Many language targets use {} as block delimiters and so we
+   // must recursively match {} delimited blocks to balance the
+   // braces. Additionally, we must make some assumptions about
+   // literal string representation in the target language. We assume
+   // that they are delimited by ' or " and so consume these
+   // in their own alts so as not to inadvertantly match {}.
 
-// -------------------------
-// Actions
-//
-// Many language targets use {} as block delimiters and so we
-// must recursively match {} delimited blocks to balance the
-// braces. Additionally, we must make some assumptions about
-// literal string representation in the target language. We assume
-// that they are delimited by ' or " and so consume these
-// in their own alts so as not to inadvertantly match {}.
 mode Action;
 NESTED_ACTION
    : LBrace -> type (ACTION_CONTENT) , pushMode (Action)
@@ -421,7 +369,9 @@ ACTION_LINE_COMMENT
    ;
 
 END_ACTION
-   : RBrace{ handleEndAction(); };
+   : RBrace
+   { handleEndAction(); }
+   ;
 
 UNTERMINATED_ACTION
    : EOF -> popMode
@@ -430,19 +380,19 @@ UNTERMINATED_ACTION
 ACTION_CONTENT
    : .
    ;
+   // -------------------------
 
-// -------------------------
 mode Options;
 OPT_DOC_COMMENT
-   : DocComment -> type (DOC_COMMENT) , channel (OFF_CHANNEL)
+   : DocComment -> type (DOC_COMMENT) , channel (COMMENT)
    ;
 
 OPT_BLOCK_COMMENT
-   : BlockComment -> type (BLOCK_COMMENT) , channel (OFF_CHANNEL)
+   : BlockComment -> type (BLOCK_COMMENT) , channel (COMMENT)
    ;
 
 OPT_LINE_COMMENT
-   : LineComment -> type (LINE_COMMENT) , channel (OFF_CHANNEL)
+   : LineComment -> type (LINE_COMMENT) , channel (COMMENT)
    ;
 
 OPT_LBRACE
@@ -470,7 +420,7 @@ OPT_STRING_LITERAL
    ;
 
 OPT_INT
-   : Int -> type (INT)
+   : DecimalNumeral -> type (INT)
    ;
 
 OPT_STAR
@@ -482,21 +432,21 @@ OPT_SEMI
    ;
 
 OPT_WS
-   : Ws + -> type (WS) , channel (OFF_CHANNEL)
+   : Ws+ -> type (WS) , channel (OFF_CHANNEL)
    ;
+   // -------------------------
 
-// -------------------------
 mode Tokens;
 TOK_DOC_COMMENT
-   : DocComment -> type (DOC_COMMENT) , channel (OFF_CHANNEL)
+   : DocComment -> type (DOC_COMMENT) , channel (COMMENT)
    ;
 
 TOK_BLOCK_COMMENT
-   : BlockComment -> type (BLOCK_COMMENT) , channel (OFF_CHANNEL)
+   : BlockComment -> type (BLOCK_COMMENT) , channel (COMMENT)
    ;
 
 TOK_LINE_COMMENT
-   : LineComment -> type (LINE_COMMENT) , channel (OFF_CHANNEL)
+   : LineComment -> type (LINE_COMMENT) , channel (COMMENT)
    ;
 
 TOK_LBRACE
@@ -520,22 +470,22 @@ TOK_COMMA
    ;
 
 TOK_WS
-   : Ws + -> type (WS) , channel (OFF_CHANNEL)
+   : Ws+ -> type (WS) , channel (OFF_CHANNEL)
    ;
+   // -------------------------
 
-// -------------------------
 mode Channels;
 // currently same as Tokens mode; distinguished by keyword
 CHN_DOC_COMMENT
-   : DocComment -> type (DOC_COMMENT) , channel (OFF_CHANNEL)
+   : DocComment -> type (DOC_COMMENT) , channel (COMMENT)
    ;
 
 CHN_BLOCK_COMMENT
-   : BlockComment -> type (BLOCK_COMMENT) , channel (OFF_CHANNEL)
+   : BlockComment -> type (BLOCK_COMMENT) , channel (COMMENT)
    ;
 
 CHN_LINE_COMMENT
-   : LineComment -> type (LINE_COMMENT) , channel (OFF_CHANNEL)
+   : LineComment -> type (LINE_COMMENT) , channel (COMMENT)
    ;
 
 CHN_LBRACE
@@ -559,13 +509,13 @@ CHN_COMMA
    ;
 
 CHN_WS
-   : Ws + -> type (WS) , channel (OFF_CHANNEL)
+   : Ws+ -> type (WS) , channel (OFF_CHANNEL)
    ;
+   // -------------------------
 
-// -------------------------
 mode LexerCharSet;
 LEXER_CHAR_SET_BODY
-   : (~ [\]\\] | EscAny) + -> more
+   : (~ [\]\\] | EscAny)+ -> more
    ;
 
 LEXER_CHAR_SET
@@ -575,9 +525,10 @@ LEXER_CHAR_SET
 UNTERMINATED_CHAR_SET
    : EOF -> popMode
    ;
+   // ------------------------------------------------------------------------------
+   // Grammar specific Keywords, Punctuation, etc.
 
-// ------------------------------------------------------------------------------
-// Grammar specific Keywords, Punctuation, etc.
 fragment Id
    : NameStartChar NameChar*
    ;
+

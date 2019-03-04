@@ -164,6 +164,7 @@ module_or_generate_item
    | attribute_instance* parameter_override
    | attribute_instance* continuous_assign
    | attribute_instance* gate_instantiation
+//   | attribute_instance* udp_instantiation
    | attribute_instance* module_instantiation
    | attribute_instance* initial_construct
    | attribute_instance* always_construct
@@ -199,7 +200,7 @@ parameter_override
 // 2.1 Declaration types
 // 2.1.1 Module parameter declarations
 local_parameter_declaration
-   : 'localparam' ('signed')? (range)? list_of_param_assignments ';'
+   : 'localparam' ('signed')? (range_)? list_of_param_assignments ';'
    | 'localparam' 'integer' list_of_param_assignments ';'
    | 'localparam' 'real' list_of_param_assignments ';'
    | 'localparam' 'realtime' list_of_param_assignments ';'
@@ -214,7 +215,7 @@ parameter_declaration
 // #(parameter B=8) since it wants a ';' in (...). Rule
 // module_parameter_port_list calls this one.
 parameter_declaration_
-   : 'parameter' ('signed')? (range)? list_of_param_assignments
+   : 'parameter' ('signed')? (range_)? list_of_param_assignments
    | 'parameter' 'integer' list_of_param_assignments
    | 'parameter' 'real' list_of_param_assignments
    | 'parameter' 'realtime' list_of_param_assignments
@@ -222,22 +223,22 @@ parameter_declaration_
    ;
 
 specparam_declaration
-   : 'specparam' (range)? list_of_specparam_assignments ';'
+   : 'specparam' (range_)? list_of_specparam_assignments ';'
    ;
 
 // 2.1.2 Port declarations
 inout_declaration
-   : 'inout' (net_type)? ('signed')? (range)? list_of_port_identifiers
+   : 'inout' (net_type)? ('signed')? (range_)? list_of_port_identifiers
    ;
 
 input_declaration
-   : 'input' (net_type)? ('signed')? (range)? list_of_port_identifiers
+   : 'input' (net_type)? ('signed')? (range_)? list_of_port_identifiers
    ;
 
 output_declaration
-   : 'output' (net_type)? ('signed')? (range)? list_of_port_identifiers
-   | 'output' ('reg')? ('signed')? (range)? list_of_port_identifiers
-   | 'output' 'reg' ('signed')? (range)? list_of_variable_port_identifiers
+   : 'output' (net_type)? ('signed')? (range_)? list_of_port_identifiers
+   | 'output' ('reg')? ('signed')? (range_)? list_of_port_identifiers
+   | 'output' 'reg' ('signed')? (range_)? list_of_variable_port_identifiers
    | 'output' (output_variable_type)? list_of_port_identifiers
    | 'output' output_variable_type list_of_variable_port_identifiers
    ;
@@ -268,7 +269,7 @@ realtime_declaration
    ;
 
 reg_declaration
-   : 'reg' ('signed')? (range)? list_of_variable_identifiers ';'
+   : 'reg' ('signed')? (range_)? list_of_variable_identifiers ';'
    ;
 
 net_declaration
@@ -276,10 +277,10 @@ net_declaration
    | net_type (drive_strength)? ('signed')? (delay3)? list_of_net_decl_assignments ';'
    | 'trireg' (drive_strength)? ('signed')? (delay3)? list_of_net_decl_assignments ';'
    | 'trireg' (charge_strength)? ('signed')? (delay3)? list_of_net_identifiers ';'
-   | 'trireg' (charge_strength)? ('vectored' | 'scalared')? ('signed')? range (delay3)? list_of_net_identifiers ';'
-   | 'trireg' (drive_strength)? ('vectored' | 'scalared')? ('signed')? range (delay3)? list_of_net_decl_assignments ';'
-   | net_type (drive_strength)? ('vectored' | 'scalared')? ('signed')? range (delay3)? list_of_net_decl_assignments ';'
-   | net_type ('vectored' | 'scalared')? ('signed')? range (delay3)? list_of_net_identifiers ';'
+   | 'trireg' (charge_strength)? ('vectored' | 'scalared')? ('signed')? range_ (delay3)? list_of_net_identifiers ';'
+   | 'trireg' (drive_strength)? ('vectored' | 'scalared')? ('signed')? range_ (delay3)? list_of_net_decl_assignments ';'
+   | net_type (drive_strength)? ('vectored' | 'scalared')? ('signed')? range_ (delay3)? list_of_net_decl_assignments ';'
+   | net_type ('vectored' | 'scalared')? ('signed')? range_ (delay3)? list_of_net_identifiers ';'
    ;
 
 // 2.2 Declaration data types
@@ -314,12 +315,12 @@ variable_type
 
 // 2.2.2 Strengths
 drive_strength
-   : (strength0 ',' strength1)
-   | (strength1 ',' strength0)
-   | (strength0 ',' 'highz1')
-   | (strength1 ',' 'highz0')
-   | ('highz0' ',' strength1)
-   | ('highz1' ',' strength0)
+   : '(' strength0 ',' strength1 ')'
+   | '(' strength1 ',' strength0 ')'
+   | '(' strength0 ',' 'highz1' ')'
+   | '(' strength1 ',' 'highz0' ')'
+   | '(' 'highz0' ',' strength1 ')'
+   | '(' 'highz1' ',' strength0 ')'
    ;
 
 strength0
@@ -437,7 +438,7 @@ dimension
    : '[' dimension_constant_expression ':' dimension_constant_expression ']'
    ;
 
-range
+range_
    : '[' msb_constant_expression ':' lsb_constant_expression ']'
    ;
 
@@ -463,7 +464,7 @@ function_port
    ;
 
 range_or_type
-   : range
+   : range_
    | 'integer'
    | 'real'
    | 'realtime'
@@ -492,7 +493,7 @@ task_port_item
 // TJP added net_type? to these input/output/inout decls. wasn't in spec.
 // factored out header
 tf_decl_header
-   : ('input' | 'output' | 'inout') net_type? ('reg')? ('signed')? (range)?
+   : ('input' | 'output' | 'inout') net_type? ('reg')? ('signed')? (range_)?
    | ('input' | 'output' | 'inout') net_type? (task_port_type)?
    ;
 
@@ -520,7 +521,7 @@ block_item_declaration
    ;
 
 block_reg_declaration
-   : 'reg' ('signed')? (range)? list_of_block_variable_identifiers ';'
+   : 'reg' ('signed')? (range_)? list_of_block_variable_identifiers ';'
    ;
 
 list_of_block_variable_identifiers
@@ -579,7 +580,7 @@ pull_gate_instance
    ;
 
 name_of_gate_instance
-   : gate_instance_identifier (range)?
+   : gate_instance_identifier (range_)?
    ;
 
 // 3.2 Primitive strengths
@@ -694,7 +695,7 @@ module_instance
    ;
 
 name_of_instance
-   : module_instance_identifier (range)?
+   : module_instance_identifier (range_)?
    ;
 
 list_of_port_connections
@@ -823,7 +824,7 @@ Edge_symbol : [rRfFpPnN*] ;
 
 udp_instantiation : udp_identifier ( drive_strength )? ( delay2 )? udp_instance ( ',' udp_instance )* ';' ;
 udp_instance : ( name_of_udp_instance )? '(' output_terminal ',' input_terminal ( ',' input_terminal )* ')' ;
-name_of_udp_instance : udp_instance_identifier ( range )? ;
+name_of_udp_instance : udp_instance_identifier ( range_ )? ;
 
 */
 continuous_assign
@@ -1822,7 +1823,7 @@ config_identifier
    ;
 
 escaped_arrayed_identifier
-   : Escaped_identifier (range)?
+   : Escaped_identifier (range_)?
    ;
 
 escaped_hierarchical_identifier
@@ -1941,7 +1942,7 @@ real_identifier
    ;
 
 simple_arrayed_identifier
-   : Simple_identifier (range)?
+   : Simple_identifier (range_)?
    ;
 
 simple_hierarchical_identifier
@@ -1957,14 +1958,13 @@ Simple_identifier
    : [a-zA-Z_] [a-zA-Z0-9_$]*
    ;
 
-
 Dollar_Identifier
    : '$' [a-zA-Z0-9_$] [a-zA-Z0-9_$]*
    ;
 
 
 Time_Identifier
-   : [0-9] + [mnpf] 's'
+   : [0-9] + [mnpf]? 's'
    ;
 
 system_function_identifier
