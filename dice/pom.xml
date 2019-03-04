@@ -41,7 +41,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>parse</entryPoint>
+					<entryPoint>notation</entryPoint>
 					<grammarName>DiceNotation</grammarName>
                <lexerName>DiceNotationLexer</lexerName>
 					<packageName></packageName>
