@@ -29,7 +29,7 @@ translationunit
    : declarationseq? EOF
    ;
 /*Expressions*/
- 
+
 
 primaryexpression
    : literal
@@ -179,6 +179,7 @@ unaryoperator
    | '!'
    | '~'
    | '-'
+   | 'not'
    ;
 
 newexpression
@@ -284,11 +285,13 @@ inclusiveorexpression
 logicalandexpression
    : inclusiveorexpression
    | logicalandexpression '&&' inclusiveorexpression
+   | logicalandexpression 'and' inclusiveorexpression
    ;
 
 logicalorexpression
    : logicalandexpression
    | logicalorexpression '||' logicalandexpression
+   | logicalorexpression 'or' logicalandexpression
    ;
 
 conditionalexpression
@@ -923,7 +926,7 @@ virtspecifier
    ;
 /*
 purespecifier:
-	'=' '0'//Conflicts with the lexer
+   '=' '0'//Conflicts with the lexer
  ;
  */
 
@@ -1497,6 +1500,7 @@ Tilde
 
 Not
    : '!'
+   | 'not'
    ;
 
 Assign
@@ -1579,10 +1583,12 @@ GreaterEqual
 
 AndAnd
    : '&&'
+   | 'and'
    ;
 
 OrOr
    : '||'
+   | 'or'
    ;
 
 PlusPlus
@@ -1648,6 +1654,7 @@ theoperator
    | '|'
    | '~'
    | '!'
+   | 'not'
    | '='
    | '<'
    | '>'
@@ -1668,7 +1675,9 @@ theoperator
    | '<='
    | '>='
    | '&&'
+   | 'and'
    | '||'
+   | 'or'
    | '++'
    | '--'
    | ','
@@ -1692,10 +1701,10 @@ fragment Universalcharactername
 Identifier
    :
 /*
-	Identifiernondigit
-	| Identifier Identifiernondigit
-	| Identifier DIGIT
-	*/
+   Identifiernondigit
+   | Identifier Identifiernondigit
+   | Identifier DIGIT
+   */
    Identifiernondigit (Identifiernondigit | DIGIT)*
    ;
 
@@ -1716,7 +1725,7 @@ literal
    : Integerliteral
    | Characterliteral
    | Floatingliteral
-   | Stringliteral+
+   | Stringliteral
    | booleanliteral
    | pointerliteral
    | userdefinedliteral
