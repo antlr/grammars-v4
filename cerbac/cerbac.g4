@@ -41,46 +41,80 @@ policylist
     ;
 
 policystatement
-    : '{' kvlist '}'
+    : '{' decllist '}'
+    ;
+
+decllist
+    : decl (',' decl)*
+    ;
+
+decl
+    : iddecl
+    | typedecl
+    | whodecl
+    | actiondecl
+    | whatdecl
+    | triggerdecl
+    | whydecl
+    | howdecl
+    | whendecl
+ //   | wheredecl
+    ;
+
+iddecl
+    : '"Id"' ':' QUOTEDSTRING
+    ;
+
+typedecl
+    : '"Type"' ':'  ('"A+"'| '"A-"'| '"O+"'| '"O-"'|)
+    ;
+
+whodecl
+    : '"Who"' ':'  ('*' | QUOTEDSTRING)
+    ;
+
+actiondecl
+    : '"Action"' ':' ('*' | stringlist)
+    ;
+
+whatdecl
+    : '"What"' ':' kvlist
+    ;
+
+triggerdecl
+    : '"Trigger"' ':' QUOTEDSTRING
+    ;
+
+whydecl
+    : '"Why"' ':' QUOTEDSTRING
+    ;
+
+howdecl
+    : '"How"' ':' QUOTEDSTRING
+    ;
+
+whendecl
+    : '"When"' ':' timetype ':' kvlist
+    ;
+
+stringlist
+    : '[' QUOTEDSTRING (',' QUOTEDSTRING)* ']'
     ;
 
 kvlist
-    : kv (',' kv)*
-    ;
-
-kv
-    : key  ':' value
-    ;
-
-key
-    : QUOTEDSTRING
-    ;
-
-value
-    : QUOTEDSTRING
-    | kvvalue
-    | stringlistvalue
-    | timevalue
-    ;
-
-QUOTEDSTRING
-    : '"' ~'"'* '"' 
-    ;
-
-kvvalue
     : '{' kv (',' kv)* '}'
     ;
 
-stringlistvalue
-    : '[' value (',' value)* ']'
-    ;
-
-timevalue
-    : timetype ':' value
+kv
+    : QUOTEDSTRING ':' QUOTEDSTRING
     ;
 
 timetype
     : '"timeEquals"'|'"timeAfter"'|'"timeBefore"'|'"timeBetween"'
+    ;
+
+QUOTEDSTRING
+    : '"' ~'"'* '"' 
     ;
 
 WS

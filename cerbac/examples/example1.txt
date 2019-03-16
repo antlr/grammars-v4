@@ -8,7 +8,7 @@ PolicyStatement:[
 
    "Who": "Admin",
 
-   "Action": "",
+   "Action": *,
 
   "What" : {"Resource": "Email"}
 
