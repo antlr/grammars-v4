@@ -1,7 +1,7 @@
 # take from https://cmake.org/cmake/help/v3.12/manual/cmake-language.7.html
 add_executable(hello world.c)
 
-if(FALSE AND (FALSE OR TRUE)) # evaluates to FALSE
+if(FALSE AND (FALSE OR (HELLO WORLD) TRUE)) # evaluates to FALSE
 
 message([=[
 This is the first line in a bracket argument with bracket length 1.

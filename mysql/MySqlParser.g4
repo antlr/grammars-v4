@@ -354,6 +354,7 @@ columnConstraint
     | COLUMN_FORMAT colformat=(FIXED | DYNAMIC | DEFAULT)           #formatColumnConstraint
     | STORAGE storageval=(DISK | MEMORY | DEFAULT)                  #storageColumnConstraint
     | referenceDefinition                                           #referenceColumnConstraint
+    | (GENERATED ALWAYS)? AS '(' expression ')' (VIRTUAL | STORED)? #generatedColumnConstraint
     ;
 
 tableConstraint
@@ -611,7 +612,7 @@ alterSpecification
     | DROP FOREIGN KEY uid                                          #alterByDropForeignKey
     | DISABLE KEYS                                                  #alterByDisableKeys
     | ENABLE KEYS                                                   #alterByEnableKeys
-    | RENAME renameFormat=(TO | AS)? uid                            #alterByRename
+    | RENAME renameFormat=(TO | AS)? (uid | fullId)                 #alterByRename
     | ORDER BY uidList                                              #alterByOrder
     | CONVERT TO CHARACTER SET charsetName
       (COLLATE collationName)?                                      #alterByConvertCharset
@@ -621,7 +622,10 @@ alterSpecification
     | IMPORT TABLESPACE                                             #alterByImportTablespace
     | FORCE                                                         #alterByForce
     | validationFormat=(WITHOUT | WITH) VALIDATION                  #alterByValidate
-    | ADD PARTITION '(' partitionDefinition ')'                     #alterByAddPartition
+    | ADD PARTITION
+        '('
+          partitionDefinition (',' partitionDefinition)*
+        ')'                                                         #alterByAddPartition
     | DROP PARTITION uidList                                        #alterByDropPartition
     | DISCARD PARTITION (uidList | ALL) TABLESPACE                  #alterByDiscardPartition
     | IMPORT PARTITION (uidList | ALL) TABLESPACE                   #alterByImportPartition
@@ -2338,7 +2342,7 @@ keywordsCanBeId
     : ACCOUNT | ACTION | AFTER | AGGREGATE | ALGORITHM | ANY
     | AT | AUTHORS | AUTOCOMMIT | AUTOEXTEND_SIZE
     | AUTO_INCREMENT | AVG_ROW_LENGTH | BEGIN | BINLOG | BIT
-    | BLOCK | BOOL | BOOLEAN | BTREE | CASCADED | CHAIN
+    | BLOCK | BOOL | BOOLEAN | BTREE | CASCADED | CHAIN | CHANGED
     | CHANNEL | CHECKSUM | CIPHER | CLIENT | COALESCE | CODE
     | COLUMNS | COLUMN_FORMAT | COMMENT | COMMIT | COMPACT
     | COMPLETION | COMPRESSED | COMPRESSION | CONCURRENT
@@ -2348,7 +2352,7 @@ keywordsCanBeId
     | DISABLE | DISCARD | DISK | DO | DUMPFILE | DUPLICATE
     | DYNAMIC | ENABLE | ENCRYPTION | ENDS | ENGINE | ENGINES
     | ERROR | ERRORS | ESCAPE | EVEN | EVENT | EVENTS | EVERY
-    | EXCHANGE | EXCLUSIVE | EXPIRE | EXTENT_SIZE | FAULTS
+    | EXCHANGE | EXCLUSIVE | EXPIRE | EXTENDED | EXTENT_SIZE | FAST | FAULTS
     | FIELDS | FILE_BLOCK_SIZE | FILTER | FIRST | FIXED
     | FOLLOWS | FULL | FUNCTION | GLOBAL | GRANTS
     | GROUP_REPLICATION | HASH | HOST | IDENTIFIED
@@ -2366,7 +2370,7 @@ keywordsCanBeId
     | MASTER_TLS_VERSION | MASTER_USER
     | MAX_CONNECTIONS_PER_HOUR | MAX_QUERIES_PER_HOUR
     | MAX_ROWS | MAX_SIZE | MAX_UPDATES_PER_HOUR
-    | MAX_USER_CONNECTIONS | MEMORY | MERGE | MID | MIGRATE
+    | MAX_USER_CONNECTIONS | MEDIUM | MEMORY | MERGE | MID | MIGRATE
     | MIN_ROWS | MODIFY | MUTEX | MYSQL | NAME | NAMES
     | NCHAR | NEVER | NO | NODEGROUP | NONE | OFFLINE | OFFSET
     | OJ | OLD_PASSWORD | ONE | ONLINE | ONLY | OPTIMIZER_COSTS

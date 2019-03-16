@@ -167,7 +167,7 @@ Module_keyword_only : 'module' ;
 Nand : 'nand' ;
 Negedge : 'negedge' ;
 Nmos : 'nmos' ;
-None : 'none' ;
+NONE : 'none' ;
 Nor : 'nor' ;
 Not : 'not' ;
 Notif0 : 'notif0' ;
@@ -254,11 +254,10 @@ ALPHA : [a-zA-Z_] ;
 fragment
 DIGIT : [0-9] ;
 
-//Broken_string_literal : '"' ('\\' [\\"nt\[\]\|] | ~[\\"\r\n])* '\n' ;
 Dollar_Identifier : '$' [a-zA-Z0-9_$] [a-zA-Z0-9_$]* ;
 Escaped_identifier : '\\' ~[ \r\t\n]* ;
 Simple_identifier : ALPHA (ALPHA | DIGIT)* ;
-String_literal : '"' ('\\' [\\"nt\[\]\|] | ~[\\"\r\n])* '"' ;
+String_literal : '"' (~('"'|'\n'|'\r') | '""')* '"'  ;
 
 
 // punctuation
@@ -711,7 +710,7 @@ net_type    :   Supply0
             |   Wire
             |   Wand
             |   Wor
-            |   None
+            |   NONE
             ;
 
 drive_strength  :   Open_parenthesis drive_strength_value_0 Comma drive_strength_value_1 Close_parenthesis ;

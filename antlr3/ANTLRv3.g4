@@ -25,15 +25,14 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar ANTLRv3;
 
 grammarDef
-   : DOC_COMMENT? ('lexer' | 'parser' | 'tree')? 'grammar' id ';' optionsSpec? tokensSpec? attrScope* action* rule_ +
+   : DOC_COMMENT? ('lexer' | 'parser' | 'tree')? 'grammar' id ';' optionsSpec? tokensSpec? attrScope* action* rule_+
    ;
 
 tokensSpec
-   : TOKENS tokenSpec + '}'
+   : TOKENS tokenSpec+ '}'
    ;
 
 tokenSpec
@@ -55,7 +54,7 @@ actionScopeName
    ;
 
 optionsSpec
-   : OPTIONS (option ';') + '}'
+   : OPTIONS (option ';')+ '}'
    ;
 
 option
@@ -97,11 +96,11 @@ altList
    ;
 
 alternative
-   : element +
+   : element+
    ;
 
 exceptionGroup
-   : (exceptionHandler) + (finallyClause)?
+   : (exceptionHandler)+ (finallyClause)?
    | finallyClause
    ;
 
@@ -139,7 +138,7 @@ notSet
    ;
 
 treeSpec
-   : '^(' element (element) + ')'
+   : '^(' element (element)+ ')'
    ;
 
 ebnf
@@ -180,7 +179,7 @@ rewrite_tree_block
    ;
 
 rewrite_tree_alternative
-   : rewrite_tree_element +
+   : rewrite_tree_element+
    ;
 
 rewrite_tree_element
@@ -232,308 +231,253 @@ id
    | RULE_REF
    ;
 
-
 CHAR_LITERAL
    : '\'' LITERAL_CHAR '\''
    ;
-
 
 STRING_LITERAL
    : '\'' LITERAL_CHAR LITERAL_CHAR* '\''
    ;
 
-
 fragment LITERAL_CHAR
-   : ESC | ~ ('\'' | '\\')
+   : ESC
+   | ~ ('\'' | '\\')
    ;
-
 
 DOUBLE_QUOTE_STRING_LITERAL
    : '"' (ESC | ~ ('\\' | '"'))* '"'
    ;
 
-
 DOUBLE_ANGLE_STRING_LITERAL
    : '<<' ()*? '>>'
    ;
-
 
 fragment ESC
    : '\\' ('n' | 'r' | 't' | 'b' | 'f' | '"' | '\'' | '\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | .)
    ;
 
-
 fragment XDIGIT
-   : '0' .. '9' | 'a' .. 'f' | 'A' .. 'F'
+   : '0' .. '9'
+   | 'a' .. 'f'
+   | 'A' .. 'F'
    ;
-
 
 INT
-   : '0' .. '9' +
+   : '0' .. '9'+
    ;
-
 
 ARG_ACTION
    : NESTED_ARG_ACTION
    ;
 
-
 fragment NESTED_ARG_ACTION
    : '[' (NESTED_ARG_ACTION | ACTION_STRING_LITERAL | ACTION_CHAR_LITERAL | .)*? ']'
    ;
-
 
 ACTION
    : NESTED_ACTION ('?')?
    ;
 
-
 fragment NESTED_ACTION
    : '{' (NESTED_ACTION | SL_COMMENT | ML_COMMENT | ACTION_STRING_LITERAL | ACTION_CHAR_LITERAL | .)*? '}'
    ;
-
 
 fragment ACTION_CHAR_LITERAL
    : '\'' (ACTION_ESC | ~ ('\\' | '\'')) '\''
    ;
 
-
 fragment ACTION_STRING_LITERAL
    : '"' (ACTION_ESC | ~ ('\\' | '"'))* '"'
    ;
 
-
 fragment ACTION_ESC
-   : '\\\'' | '\\' '"' | '\\' ~ ('\'' | '"')
+   : '\\\''
+   | '\\' '"'
+   | '\\' ~ ('\'' | '"')
    ;
-
 
 OPTIONS
    : 'options' WS_LOOP '{'
    ;
 
-
 TOKENS
    : 'tokens' WS_LOOP '{'
    ;
-
 
 fragment SRC
    : 'src' ' ' ACTION_STRING_LITERAL ' ' INT
    ;
 
-
 fragment WS_LOOP
    : (WS | SL_COMMENT | ML_COMMENT)*
    ;
-
 
 DOC_COMMENT
    : 'DOC_COMMENT'
    ;
 
-
 PARSER
    : 'PARSER'
    ;
-
 
 LEXER
    : 'LEXER'
    ;
 
-
 RULE
    : 'RULE'
    ;
-
 
 BLOCK
    : 'BLOCK'
    ;
 
-
 OPTIONAL
    : 'OPTIONAL'
    ;
-
 
 CLOSURE
    : 'CLOSURE'
    ;
 
-
 POSITIVE_CLOSURE
    : 'POSITIVE_CLOSURE'
    ;
-
 
 SYNPRED
    : 'SYNPRED'
    ;
 
-
 CHAR_RANGE
    : 'CHAR_RANGE'
    ;
-
 
 EPSILON
    : 'EPSILON'
    ;
 
-
 ALT
    : 'ALT'
    ;
-
 
 EOR
    : 'EOR'
    ;
 
-
 EOB
    : 'EOB'
    ;
 
-
 EOA
    : 'EOA'
    ;
-
-// end of alt
+   // end of alt
 
 ID
    : 'ID'
    ;
 
-
 ARG
    : 'ARG'
    ;
-
 
 ARGLIST
    : 'ARGLIST'
    ;
 
-
 RET
    : 'RET'
    ;
-
 
 LEXER_GRAMMAR
    : 'LEXER_GRAMMAR'
    ;
 
-
 PARSER_GRAMMAR
    : 'PARSER_GRAMMAR'
    ;
-
 
 TREE_GRAMMAR
    : 'TREE_GRAMMAR'
    ;
 
-
 COMBINED_GRAMMAR
    : 'COMBINED_GRAMMAR'
    ;
-
 
 INITACTION
    : 'INITACTION'
    ;
 
-
 LABEL
    : 'LABEL'
    ;
-
 
 TEMPLATE
    : 'TEMPLATE'
    ;
 
-
 SCOPE
    : 'scope'
    ;
-
 
 SEMPRED
    : 'SEMPRED'
    ;
 
-
 GATED_SEMPRED
    : 'GATED_SEMPRED'
    ;
-
 
 SYN_SEMPRED
    : 'SYN_SEMPRED'
    ;
 
-
 BACKTRACK_SEMPRED
    : 'BACKTRACK_SEMPRED'
    ;
-
 
 FRAGMENT
    : 'fragment'
    ;
 
-
 TREE_BEGIN
    : '^('
    ;
-
 
 ROOT
    : '^'
    ;
 
-
 BANG
    : '!'
    ;
-
 
 RANGE
    : '..'
    ;
 
-
 REWRITE
    : '->'
    ;
-
 
 SL_COMMENT
    : '//' ~ [\r\n]* -> skip
    ;
 
-
 ML_COMMENT
    : '/*' .*? '*/' -> skip
    ;
 
-
 WS
-   : (' ' | '\t' | '\r'? '\n') + -> skip
+   : (' ' | '\t' | '\r'? '\n')+ -> skip
    ;
-
 
 TOKEN_REF
    : 'A' .. 'Z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
    ;
 
-
 RULE_REF
    : 'a' .. 'z' ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
    ;
+
