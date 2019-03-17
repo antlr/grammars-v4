@@ -1,0 +1,31 @@
+     A          R RECORD1                   CA03(03 'Exit')
+     A                                      CA21(01 'Command Line')
+     A                                  1 38'Lab 4'
+     A                                  1 71DATE
+     A                                      EDTCDE(Y)
+     A                                  2 71TIME
+     A                                  1  3USER
+     A                                  4  3'Please select one of the following-
+     A                                       options:'
+     A                                 19  3'F3=Exit'
+     A                                 19 23'F21=Command Line'
+     A                                  5 14'1. Currency Symbol Used by this Sy-
+     A                                      stem.'
+     A                                  6 14'2. IPL type (Initial Program Load -
+     A                                      for System Reboot)'
+     A                                  7 14'3. Signed on User''s Message Queue'
+     A                                  8 14'4. Initial number of active jobs f-
+     A                                      or storage allocation'
+     A                                  9 14'5. Display System Serial Number'
+     A                                 10 14'6. Maximum Password Length'
+     A                                 11 14'7. Previous sign on by signed on u-
+     A                                      ser'
+     A  30                             13 18'Option:'
+
+     A            OPTION         2A  B 13 26
+     A  30                                  DSPATR(RI)
+     A                                      DSPATR(PC)
+     A            OUTMSG        70   O 15  5
+     A                                  2  3'Anh Khoi Do'
+
+ 

@@ -1,0 +1,12 @@
+     A          R RECORD1                   CA03(03 'Exit')
+     A                                  1 69DATE
+     A                                      EDTCDE(Y)
+     A                                  1  5USER
+     A                                  2  5'Anh Khoi Do'
+     A                                  2 69TIME
+     A                                  1 30'The cat generator'
+     A                                  5 10'The name of your cat:'
+     A            OPTIONAL      20   O  7 10
+     A            CATNAME       20   O  5 36
+     A            OWNRNAME      20   O  7 36 
+     
