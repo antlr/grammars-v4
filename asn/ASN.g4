@@ -45,6 +45,8 @@ If you have some comments/improvements, send me an e-mail.
 
 grammar ASN;
 
+modules: moduleDefinition+;
+
 moduleDefinition :  IDENTIFIER (L_BRACE (IDENTIFIER L_PARAN NUMBER R_PARAN)* R_BRACE)?
      DEFINITIONS_LITERAL
      tagDefault
