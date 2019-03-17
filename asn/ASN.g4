@@ -425,6 +425,18 @@ contentsConstraint :
    CONTAINING_LITERAL asnType
  |  ENCODED_LITERAL BY_LITERAL value
  |  CONTAINING_LITERAL asnType ENCODED_LITERAL BY_LITERAL value
+ |  WITH_LITERAL COMPONENTS_LITERAL L_BRACE componentPresenceLists R_BRACE
+;
+
+componentPresenceLists:
+   componentPresenceList? (EXTENSTIONENDMARKER (COMMA componentPresenceList)?)?
+  |  ELLIPSIS (COMMA componentPresenceList)?
+;
+
+componentPresenceList: (componentPresence) (COMMA componentPresence)*
+;
+
+componentPresence: IDENTIFIER (ABSENT_LITERAL | PRESENT_LITERAL)
 ;
 
 
