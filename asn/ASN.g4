@@ -369,6 +369,8 @@ builtinType :
  | setOfType
  | objectidentifiertype
  | objectClassFieldType
+ | BOOLEAN_LITERAL
+ | NULL_LITERAL
 
 	;
 
