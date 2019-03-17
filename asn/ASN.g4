@@ -443,6 +443,7 @@ builtinValue :
 	|	objectIdentifierValue
 	|	booleanValue
 	|   CSTRING
+	|   BSTRING
  ;
 
 objectIdentifierValue : L_BRACE /*(definedValue)?*/ objIdComponentsList R_BRACE
