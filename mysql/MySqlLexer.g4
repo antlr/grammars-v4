@@ -240,6 +240,7 @@ TEXT:                                'TEXT';
 MEDIUMTEXT:                          'MEDIUMTEXT';
 LONGTEXT:                            'LONGTEXT';
 ENUM:                                'ENUM';
+SERIAL:                              'SERIAL';
 
 
 // Interval type Keywords
