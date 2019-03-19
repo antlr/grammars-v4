@@ -33,6 +33,15 @@ CREATE TABLE genvalue1 (id binary(16) NOT NULL, val char(32) GENERATED ALWAYS AS
 CREATE TABLE genvalue2 (id binary(16) NOT NULL, val char(32) AS (hex(id)) STORED, PRIMARY KEY (id));
 CREATE TABLE genvalue3 (id binary(16) NOT NULL, val char(32) GENERATED ALWAYS AS (hex(id)) VIRTUAL, PRIMARY KEY (id));
 CREATE TABLE check_table_kw (id int primary key, upgrade varchar(256), quick varchar(256), fast varchar(256), medium varchar(256), extended varchar(256), changed varchar(256));
+CREATE TABLE sercol1 (id SERIAL, val INT);
+CREATE TABLE sercol2 (id SERIAL PRIMARY KEY, val INT);
+CREATE TABLE sercol3 (id SERIAL NULL, val INT);
+CREATE TABLE sercol4 (id SERIAL NOT NULL, val INT);
+CREATE TABLE serval1 (id SMALLINT SERIAL DEFAULT VALUE, val INT);
+CREATE TABLE serval2 (id SMALLINT SERIAL DEFAULT VALUE PRIMARY KEY, val INT);
+CREATE TABLE serval3 (id SMALLINT(3) NULL SERIAL DEFAULT VALUE, val INT);
+CREATE TABLE serval4 (id SMALLINT(5) UNSIGNED SERIAL DEFAULT VALUE NOT NULL, val INT);
+CREATE TABLE serial (serial INT);
 #end
 #begin
 -- Rename table

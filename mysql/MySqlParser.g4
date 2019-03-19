@@ -355,6 +355,7 @@ columnConstraint
     | STORAGE storageval=(DISK | MEMORY | DEFAULT)                  #storageColumnConstraint
     | referenceDefinition                                           #referenceColumnConstraint
     | (GENERATED ALWAYS)? AS '(' expression ')' (VIRTUAL | STORED)? #generatedColumnConstraint
+    | SERIAL DEFAULT VALUE                                          #serialDefaultColumnConstraint
     ;
 
 tableConstraint
@@ -1985,7 +1986,7 @@ dataType
       lengthTwoOptionalDimension? UNSIGNED? ZEROFILL?               #dimensionDataType
     | typeName=(
         DATE | TINYBLOB | BLOB | MEDIUMBLOB | LONGBLOB
-        | BOOL | BOOLEAN
+        | BOOL | BOOLEAN | SERIAL
       )                                                             #simpleDataType
     | typeName=(
         BIT | TIME | TIMESTAMP | DATETIME | BINARY
@@ -2385,7 +2386,7 @@ keywordsCanBeId
     | REPLICATE_REWRITE_DB | REPLICATE_WILD_DO_TABLE
     | REPLICATE_WILD_IGNORE_TABLE | REPLICATION | RESUME
     | RETURNS | ROLLBACK | ROLLUP | ROTATE | ROW | ROWS
-    | ROW_FORMAT | SAVEPOINT | SCHEDULE | SECURITY | SERVER
+    | ROW_FORMAT | SAVEPOINT | SCHEDULE | SECURITY | SERIAL | SERVER
     | SESSION | SHARE | SHARED | SIGNED | SIMPLE | SLAVE
     | SNAPSHOT | SOCKET | SOME | SOUNDS | SOURCE
     | SQL_AFTER_GTIDS | SQL_AFTER_MTS_GAPS | SQL_BEFORE_GTIDS
