@@ -43,36 +43,46 @@ eval_input: testlist NEWLINE* EOF;
 
 decorator: AT dotted_name ( OPEN_PAREN (arglist)? CLOSE_PAREN )? NEWLINE;
 decorators: decorator+;
-decorated: decorators (classdef | funcdef | async_funcdef);
+decorated: decorators (classdef | funcdef);
 
-async_funcdef: ASYNC funcdef;
-funcdef: DEF NAME parameters (ARROW test)? COLON suite;
+funcdef: (ASYNC)? DEF NAME parameters (func_annotation)? COLON suite;
+func_annotation: ARROW test;
 
 parameters: OPEN_PAREN (typedargslist)? CLOSE_PAREN;
-typedargslist: (tfpdef (ASSIGN test)? (COMMA tfpdef (ASSIGN test)?)* (COMMA (
-        STAR (tfpdef)? (COMMA tfpdef (ASSIGN test)?)* (COMMA (POWER tfpdef (COMMA)?)?)?
-      | POWER tfpdef (COMMA)?)?)?
-  | STAR (tfpdef)? (COMMA tfpdef (ASSIGN test)?)* (COMMA (POWER tfpdef (COMMA)?)?)?
-  | POWER tfpdef (COMMA)?);
-tfpdef: NAME (COLON test)?;
-varargslist: (vfpdef (ASSIGN test)? (COMMA vfpdef (ASSIGN test)?)* (COMMA (
-        STAR (vfpdef)? (COMMA vfpdef (ASSIGN test)?)* (COMMA (POWER vfpdef (COMMA)?)?)?
-      | POWER vfpdef (COMMA)?)?)?
-  | STAR (vfpdef)? (COMMA vfpdef (ASSIGN test)?)* (COMMA (POWER vfpdef (COMMA)?)?)?
-  | POWER vfpdef (COMMA)?
-);
+typedargslist
+    : (def_parameters COMMA)? args (COMMA def_parameters)? (COMMA kwargs)?
+    |(def_parameters COMMA)? kwargs (COMMA def_parameters)? (COMMA args)?
+    | def_parameters;
+args: STAR named_parameter;
+kwargs: POWER named_parameter;
+def_parameters: def_parameter (COMMA def_parameter)*;
+vardef_parameters: vardef_parameter (COMMA vardef_parameter)*;
+def_parameter: named_parameter (ASSIGN test)?;
+vardef_parameter: NAME (ASSIGN test)?;
+named_parameter: NAME (COLON test)?;
+varargslist
+    : (vardef_parameters COMMA)? varargs (COMMA vardef_parameters)? (COMMA varkwargs)
+    | (vardef_parameters COMMA)? varkwargs (COMMA vardef_parameters)? (STAR varargs);
+    
+varargs: STAR NAME;
+varkwargs: POWER NAME;
 vfpdef: NAME;
-
 stmt: simple_stmt | compound_stmt;
-simple_stmt: small_stmt (SEMI_COLON small_stmt)* (SEMI_COLON)? NEWLINE;
+simple_stmt: small_stmt (SEMI_COLON small_stmt)* (SEMI_COLON)? (NEWLINE | EOF);
 small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
              import_stmt | global_stmt | nonlocal_stmt | assert_stmt);
-expr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
-                     (ASSIGN (yield_expr|testlist_star_expr))*);
-annassign: COLON test (ASSIGN test)?;
+
+expr_stmt: testlist_star_expr | annassign | augassign | assign;
+
+assign: testlist_star_expr (ASSIGN (yield_expr|testlist_star_expr))*;
+
+annassign: testlist_star_expr COLON test (ASSIGN test)? (yield_expr|testlist);
+
 testlist_star_expr: (test|star_expr) (COMMA (test|star_expr))* (COMMA)?;
-augassign: ('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' |
-            '<<=' | '>>=' | '**=' | '//=');
+
+augassign: testlist_star_expr op=('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' |
+              '<<=' | '>>=' | '**=' | '//=') (yield_expr|testlist);
+
 // For normal and annotated assignments, additional restrictions enforced by the interpreter
 del_stmt: DEL exprlist;
 pass_stmt: PASS;
@@ -91,54 +101,64 @@ import_as_name: NAME (AS NAME)?;
 dotted_as_name: dotted_name (AS NAME)?;
 import_as_names: import_as_name (COMMA import_as_name)* (COMMA)?;
 dotted_as_names: dotted_as_name (COMMA dotted_as_name)*;
-dotted_name: NAME ('.' NAME)*;
+dotted_name
+  : dotted_name DOT dotted_name
+  | NAME;
 global_stmt: GLOBAL NAME (COMMA NAME)*;
 nonlocal_stmt: NONLOCAL NAME (COMMA NAME)*;
 assert_stmt: ASSERT test (COMMA test)?;
 
 compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated | async_stmt;
 async_stmt: ASYNC (funcdef | with_stmt | for_stmt);
-if_stmt: IF test COLON suite (ELIF test COLON suite)* (ELSE COLON suite)?;
-while_stmt: WHILE test COLON suite (ELSE COLON suite)?;
-for_stmt: FOR exprlist IN testlist COLON suite (ELSE COLON suite)?;
+if_stmt: IF test COLON suite (elif_clause)* (else_clause)?;
+elif_clause: ELIF test COLON suite;
+while_stmt: WHILE test COLON suite (else_clause)?;
+for_stmt: FOR exprlist IN testlist COLON suite (else_clause)?;
 try_stmt: (TRY COLON suite
-           ((except_clause COLON suite)+
-            (ELSE COLON suite)?
-            (FINALLY COLON suite)? |
-           FINALLY COLON suite));
+           ((except_clause+ else_clause? finaly_clause?) 
+            |finaly_clause));
 with_stmt: WITH with_item (COMMA with_item)*  COLON suite;
 with_item: test (AS expr)?;
 // NB compile.c makes sure that the default except clause is last
-except_clause: EXCEPT (test (AS NAME)?)?;
+except_clause: EXCEPT (test (AS NAME)?)? COLON suite;
+else_clause: ELSE COLON suite;
+finaly_clause: FINALLY COLON suite;
 suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT;
 
-test: or_test (IF or_test ELSE test)? | lambdef;
-test_nocond: or_test | lambdef_nocond;
+test: logical_test (IF logical_test ELSE test)? | lambdef;
+test_nocond: logical_test | lambdef_nocond;
 lambdef: LAMBDA (varargslist)? COLON test;
 lambdef_nocond: LAMBDA (varargslist)? COLON test_nocond;
-or_test: and_test (OR and_test)*;
-and_test: not_test (AND not_test)*;
-not_test: NOT not_test | comparison;
-comparison: expr (comp_op expr)*;
+logical_test
+    : logical_test op=OR logical_test
+    | logical_test op=AND logical_test
+    | NOT logical_test
+    | comparison;    
 // <> isn't actually a valid comparison operator in Python. It's here for the
 // sake of a __future__ import described in PEP 401 (which really works :-)
-comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|IN|NOT IN|IS|IS NOT;
+comparison
+    : comparison op=(LESS_THAN|GREATER_THAN|EQUALS|GT_EQ|LT_EQ|NOT_EQ_1|NOT_EQ_1|IN|IS|NOT) comparison
+    | comparison (NOT IN | IS NOT) comparison
+    | expr;
 star_expr: STAR expr;
-expr: xor_expr (OR_OP xor_expr)*;
-xor_expr: and_expr ('^' and_expr)*;
-and_expr: shift_expr ('&' shift_expr)*;
-shift_expr: arith_expr (('<<'|'>>') arith_expr)*;
-arith_expr: term (('+'|'-') term)*;
-term: factor ((STAR|'@'|'/'|'%'|'//') factor)*;
-factor: ('+'|'-'|'~') factor | power;
-power: atom_expr (POWER factor)?;
+expr
+    : expr op=OR_OP expr
+    | expr op=XOR expr
+    | expr op=AND_OP expr
+    | expr op=(LEFT_SHIFT | RIGHT_SHIFT) expr
+    | expr op=(ADD | MINUS) expr
+    | expr op=(STAR|'@'|'/'|'%'|'//') expr
+    | expr op=('+'|'-'|'~') expr
+    | expr op=POWER expr
+    | expr op=('+'|'-'|'~') expr
+    | atom_expr;
 atom_expr: (AWAIT)? atom trailer*;
 atom: (OPEN_PAREN (yield_expr|testlist_comp)? CLOSE_PAREN |
        OPEN_BRACK (testlist_comp)? CLOSE_BRACK |
        OPEN_BRACE (dictorsetmaker)? CLOSE_BRACE |
-       NAME | NUMBER | STRING+ | ELLIPSIS | NONE | TRUE | FALSE);
+       dotted_name | NUMBER | STRING+ | ELLIPSIS | NONE | TRUE | FALSE);
 testlist_comp: (test|star_expr) ( comp_for | (COMMA (test|star_expr))* (COMMA)? );
-trailer: OPEN_PAREN (arglist)? CLOSE_PAREN | OPEN_BRACK subscriptlist CLOSE_BRACK | '.' NAME;
+trailer: OPEN_PAREN (arglist)? CLOSE_PAREN | OPEN_BRACK subscriptlist CLOSE_BRACK;
 subscriptlist: subscript (COMMA subscript)* (COMMA)?;
 subscript: test | (test)? COLON (test)? (sliceop)?;
 sliceop: COLON (test)?;
@@ -168,7 +188,7 @@ argument: ( test (comp_for)? |
             STAR test );
 
 comp_iter: comp_for | comp_if;
-comp_for: (ASYNC)? FOR exprlist IN or_test (comp_iter)?;
+comp_for: (ASYNC)? FOR exprlist IN logical_test (comp_iter)?;
 comp_if: IF test_nocond (comp_iter)?;
 
 // not used in grammar, but may appear in "node" passed from Parser to Compiler
