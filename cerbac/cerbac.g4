@@ -58,7 +58,7 @@ decl
     | whydecl
     | howdecl
     | whendecl
- //   | wheredecl
+    | wheredecl
     ;
 
 iddecl
@@ -93,6 +93,10 @@ howdecl
     : '"How"' ':' QUOTEDSTRING
     ;
 
+wheredecl
+    : '"Where"' ':' kvlist
+    ;
+
 whendecl
     : '"When"' ':' timetype ':' kvlist
     ;
@@ -106,7 +110,15 @@ kvlist
     ;
 
 kv
-    : QUOTEDSTRING ':' QUOTEDSTRING
+    : k ':' v
+    ;
+
+k
+    : QUOTEDSTRING
+    ;
+
+v
+    : QUOTEDSTRING | stringlist
     ;
 
 timetype
