@@ -51,9 +51,9 @@ decllist
 decl
     : iddecl
     | typedecl
-    | whodecl
     | actiondecl
     | whatdecl
+    | whodecl 
     | triggerdecl
     | whydecl
     | howdecl
