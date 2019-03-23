@@ -429,7 +429,7 @@ contentsConstraint :
 ;
 
 componentPresenceLists:
-   componentPresenceList? (EXTENSTIONENDMARKER (COMMA componentPresenceList)?)?
+   componentPresenceList? (COMMA ELLIPSIS (COMMA componentPresenceList)?)?
   |  ELLIPSIS (COMMA componentPresenceList)?
 ;
 
