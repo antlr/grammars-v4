@@ -3403,8 +3403,7 @@ simple_name
     ;
 
 func_proc_name
-    : (database=id '.' (schema=id)? '.' | (schema=id) '.')? procedure=id
-    | server=id '.' database=id '.' (schema=id)? '.' procedure=id
+    : ((schema=id) '.')? procedure=id
     ;
 
 ddl_object
