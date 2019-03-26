@@ -1666,7 +1666,7 @@ queue_settings
            (
              (
               (STATUS EQUAL (ON | OFF) COMMA? )?
-              (PROCEDURE_NAME EQUAL func_proc_name COMMA?)?
+              (PROCEDURE_NAME EQUAL func_proc_name_three_part COMMA?)?
               (MAX_QUEUE_READERS EQUAL max_readers=DECIMAL COMMA?)?
               (EXECUTE AS (SELF | user_name=STRING | OWNER) COMMA?)?
              )
@@ -1857,7 +1857,7 @@ create_index
 
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
 create_or_alter_procedure
-    : ((CREATE (OR ALTER)?) | ALTER) proc=(PROC | PROCEDURE) func_proc_name (';' DECIMAL)?
+    : ((CREATE (OR ALTER)?) | ALTER) proc=(PROC | PROCEDURE) func_proc_name_two_part (';' DECIMAL)?
       ('('? procedure_param (',' procedure_param)* ')'?)?
       (WITH procedure_option (',' procedure_option)*)?
       (FOR REPLICATION)? AS sql_clauses
@@ -1903,7 +1903,7 @@ ddl_trigger_operation
 
 // https://msdn.microsoft.com/en-us/library/ms186755.aspx
 create_or_alter_function
-    : ((CREATE (OR ALTER)?) | ALTER) FUNCTION func_proc_name
+    : ((CREATE (OR ALTER)?) | ALTER) FUNCTION func_proc_name_two_part
         (('(' procedure_param (',' procedure_param)* ')') | '(' ')') //must have (), but can be empty
         (func_body_returns_select | func_body_returns_table | func_body_returns_scalar) ';'?
     ;
@@ -2274,7 +2274,7 @@ drop_backward_compatible_index
 
 // https://msdn.microsoft.com/en-us/library/ms174969.aspx
 drop_procedure
-    : DROP proc=(PROC | PROCEDURE) (IF EXISTS)? func_proc_name (',' func_proc_name)* ';'?
+    : DROP proc=(PROC | PROCEDURE) (IF EXISTS)? func_proc_name_two_part (',' func_proc_name_two_part)* ';'?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-trigger-transact-sql
@@ -2294,7 +2294,7 @@ drop_ddl_trigger
 
 // https://msdn.microsoft.com/en-us/library/ms190290.aspx
 drop_function
-    : DROP FUNCTION (IF EXISTS)? func_proc_name (',' func_proc_name)* ';'?
+    : DROP FUNCTION (IF EXISTS)? func_proc_name_two_part (',' func_proc_name_two_part)* ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms175075.aspx
@@ -2496,7 +2496,7 @@ execute_statement
     ;
 
 execute_body
-    : (return_status=LOCAL_ID '=')? (func_proc_name | expression) (execute_statement_arg (',' execute_statement_arg)*)? ';'?
+    : (return_status=LOCAL_ID '=')? (func_proc_name_four_part | expression) (execute_statement_arg (',' execute_statement_arg)*)? ';'?
     | '(' execute_var_string ('+' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? ';'?
     ;
 
@@ -3402,8 +3402,18 @@ simple_name
     : (schema=id '.')? name=id
     ;
 
-func_proc_name
+func_proc_name_two_part
     : ((schema=id) '.')? procedure=id
+    ;
+
+func_proc_name_three_part
+    : func_proc_name_two_part
+    : (database=id '.' (schema=id)? '.')? procedure=id
+    ;
+
+func_proc_name_four_part
+    : func_proc_three_part
+    : (server=id '.' database=id '.' (schema=id)? '.')? procedure=id
     ;
 
 ddl_object
@@ -3455,7 +3465,7 @@ null_or_default
     ;
 
 scalar_function_name
-    : func_proc_name
+    : func_proc_name_four_part
     | RIGHT
     | LEFT
     | BINARY_CHECKSUM
