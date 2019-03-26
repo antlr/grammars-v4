@@ -3408,12 +3408,12 @@ func_proc_name_two_part
 
 func_proc_name_three_part
     : func_proc_name_two_part
-    : (database=id '.' (schema=id)? '.')? procedure=id
+    | (database=id '.' (schema=id)? '.')? procedure=id
     ;
 
 func_proc_name_four_part
     : func_proc_three_part
-    : (server=id '.' database=id '.' (schema=id)? '.')? procedure=id
+    | (server=id '.' database=id '.' (schema=id)? '.')? procedure=id
     ;
 
 ddl_object
