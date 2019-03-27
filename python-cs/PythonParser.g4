@@ -56,7 +56,7 @@ args: STAR named_parameter;
 kwargs: POWER named_parameter;
 def_parameters: def_parameter (COMMA def_parameter)*;
 vardef_parameters: vardef_parameter (COMMA vardef_parameter)*;
-def_parameter: named_parameter (ASSIGN test)?;
+def_parameter: (named_parameter (ASSIGN test)?) | STAR;
 vardef_parameter: NAME (ASSIGN test)?;
 named_parameter: NAME (COLON test)?;
 
@@ -110,7 +110,7 @@ return_stmt: RETURN (testlist)?
     ;
 yield_stmt: yield_expr
     ;
-raise_stmt: RAISE (test (COMMA test (COMMA test)?)?)?
+raise_stmt: RAISE (test (COMMA test (COMMA test)?)?)? (FROM test)?
     ;
 import_stmt: import_name | import_from
     ;
@@ -206,7 +206,7 @@ logical_test
 // <> isn't actually a valid comparison operator in Python. It's here for the
 // sake of a __future__ import described in PEP 401 (which really works :-)
 comparison
-    : comparison op=(LESS_THAN|GREATER_THAN|EQUALS|GT_EQ|LT_EQ|NOT_EQ_1|NOT_EQ_1|IN|IS|NOT) comparison
+    : comparison op=(LESS_THAN|GREATER_THAN|EQUALS|GT_EQ|LT_EQ|NOT_EQ_1|NOT_EQ_2|IN|IS|NOT) comparison
     | comparison (NOT IN | IS NOT) comparison
     | expr
     ;
@@ -221,9 +221,9 @@ expr
     | expr op=(LEFT_SHIFT | RIGHT_SHIFT) expr
     | expr op=(ADD | MINUS) expr
     | expr op=(STAR|'/'|'%'|'//') expr
-    | expr op=('+'|'-'|'~') expr
+    | expr op=('+'|'-') expr
     | expr op=POWER expr
-    | expr op=('+'|'-'|'~') expr
+    | op=('+'|'-'|'~') expr
     | atom_expr
     ;
 
@@ -231,9 +231,9 @@ atom_expr: (AWAIT)? atom trailer*
     ;
 atom:  (OPEN_PAREN (yield_expr|testlist_comp)? CLOSE_PAREN |
         OPEN_BRACKET (testlist_comp)? CLOSE_BRACKET |
-        CLOSE_BRACE (dictorsetmaker)? CLOSE_BRACE |
+        OPEN_BRACE (dictorsetmaker)? CLOSE_BRACE |
         (REVERSE_QUOTE testlist COMMA? REVERSE_QUOTE) | ELLIPSIS | // tt: added elipses.
-        dotted_name | NAME | NUMBER | PRINT | TRUE | FALSE | NONE |STRING+)
+        dotted_name | PRINT | TRUE | FALSE | NAME | NUMBER | MINUS NUMBER | NONE |STRING+)
     ;
     
 testlist_comp: (test|star_expr) ( comp_for | (COMMA (test|star_expr))* (COMMA)? )
@@ -262,9 +262,7 @@ classdef: CLASS NAME (OPEN_PAREN (arglist)? CLOSE_PAREN)? COLON suite
     ;
 
 
-arglist: (argument COMMA)* (argument (COMMA)?
-                         |STAR test (COMMA argument)* (COMMA POWER test)?
-                         |POWER test)
+arglist: argument (COMMA argument)*  (COMMA)?
 // The reason that keywords are test nodes instead of NAME is that using NAME
 // results in an ambiguity. ast.c makes sure it's a NAME.
     ;
