@@ -137,7 +137,7 @@ logical_test
 // <> isn't actually a valid comparison operator in Python. It's here for the
 // sake of a __future__ import described in PEP 401 (which really works :-)
 comparison
-    : comparison op=(LESS_THAN|GREATER_THAN|EQUALS|GT_EQ|LT_EQ|NOT_EQ_1|NOT_EQ_1|IN|IS|NOT) comparison
+    : comparison op=(LESS_THAN|GREATER_THAN|EQUALS|GT_EQ|LT_EQ|NOT_EQ_1|NOT_EQ_2|IN|IS|NOT) comparison
     | comparison (NOT IN | IS NOT) comparison
     | expr;
 star_expr: STAR expr;
