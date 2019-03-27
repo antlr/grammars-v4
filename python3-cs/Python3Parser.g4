@@ -51,7 +51,7 @@ func_annotation: ARROW test;
 parameters: OPEN_PAREN (typedargslist)? CLOSE_PAREN;
 typedargslist
     : (def_parameters COMMA)? args (COMMA def_parameters)? (COMMA kwargs)?
-    |(def_parameters COMMA)? kwargs (COMMA def_parameters)? (COMMA args)?
+    |(def_parameters COMMA)? kwargs
     | def_parameters;
 args: STAR named_parameter;
 kwargs: POWER named_parameter;
@@ -62,7 +62,7 @@ vardef_parameter: NAME (ASSIGN test)?;
 named_parameter: NAME (COLON test)?;
 varargslist
     : (vardef_parameters COMMA)? varargs (COMMA vardef_parameters)? (COMMA varkwargs)
-    | (vardef_parameters COMMA)? varkwargs (COMMA vardef_parameters)? (STAR varargs);
+    | vardef_parameters;
     
 varargs: STAR NAME;
 varkwargs: POWER NAME;
@@ -109,7 +109,7 @@ nonlocal_stmt: NONLOCAL NAME (COMMA NAME)*;
 assert_stmt: ASSERT test (COMMA test)?;
 
 compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated | async_stmt;
-async_stmt: ASYNC (funcdef | with_stmt | for_stmt);
+async_stmt: ASYNC (with_stmt | for_stmt);
 if_stmt: IF test COLON suite (elif_clause)* (else_clause)?;
 elif_clause: ELIF test COLON suite;
 while_stmt: WHILE test COLON suite (else_clause)?;
