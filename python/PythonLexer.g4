@@ -53,6 +53,8 @@ CLASS : 'class';
 YIELD : 'yield';
 DEL : 'del';
 PASS : 'pass';
+PRINT: 'print';
+EXEC: 'exec';
 
 CONTINUE : 'continue';
 BREAK : 'break';
@@ -69,23 +71,17 @@ OPEN_BRACKET:   '[' {Opened++;};
 CLOSE_BRACKET:  ']' {Opened--;};
 
 NEWLINE
- : ( {AtStartOfInput()}?   SPACES
-   | ( '\r'? '\n' | '\r' | '\f' ) SPACES?
-   )
+ : (( '\r'? '\n' | '\r' | '\f' ) SPACES?)
    { HandleNewLine(); }
  ;
 
 /// identifier   ::=  id_start id_continue*
 // TODO: move to parser rule
+
 NAME
- : TRUE | FALSE | EXEC | PRINT 
+ : TRUE | FALSE
  | (ID_START ID_CONTINUE*)
  ;
-
-PRINT: 'print'
-  ;
-EXEC: 'exec'
-  ;
 TRUE : 'True'
   ;
 FALSE : 'False'

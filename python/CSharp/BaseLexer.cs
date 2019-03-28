@@ -142,9 +142,4 @@ public abstract class PythonBaseLexer : Lexer
         }
         return count;
     }
-
-    public bool AtStartOfInput()
-    {
-        return Column == 0 && Line == 1;
-    }
 }
