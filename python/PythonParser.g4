@@ -97,8 +97,8 @@ augassign: testlist_star_expr op=('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&='
 //    ;
 // python 2
 print_stmt: PRINT
-            NAME ( ( test (COMMA test)* (COMMA)? )? |
-                 '>>' test ( (COMMA test)+ (COMMA)? )? )
+            ( ( test (COMMA test)* (COMMA)? ) |
+                 '>>' test ( (COMMA test)+ (COMMA)? ) )
     ;
 del_stmt: DEL exprlist
     ;
@@ -236,7 +236,7 @@ atom:  (OPEN_PAREN (yield_expr|testlist_comp)? CLOSE_PAREN |
         OPEN_BRACKET (testlist_comp)? CLOSE_BRACKET |
         OPEN_BRACE (dictorsetmaker)? CLOSE_BRACE |
         (REVERSE_QUOTE testlist COMMA? REVERSE_QUOTE) | ELLIPSIS | // tt: added elipses.
-        dotted_name | NAME | NUMBER | MINUS NUMBER | NONE |STRING+)
+        dotted_name | NAME | PRINT | EXEC | NUMBER | MINUS NUMBER | NONE |STRING+)
     ;
     
 testlist_comp: (test|star_expr) ( comp_for | (COMMA (test|star_expr))* (COMMA)? )
