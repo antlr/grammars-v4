@@ -76,6 +76,7 @@ NEWLINE
  ;
 
 /// identifier   ::=  id_start id_continue*
+// TODO: move to parser rule
 NAME
  : TRUE | FALSE | EXEC | PRINT 
  | (ID_START ID_CONTINUE*)

@@ -77,12 +77,15 @@ small_stmt: (expr_stmt | print_stmt  | del_stmt | pass_stmt | flow_stmt |
              import_stmt | global_stmt | exec_stmt | assert_stmt | nonlocal_stmt)
     ;
 
+//Python 3
 nonlocal_stmt: NONLOCAL NAME (COMMA NAME)*;
 
 expr_stmt: testlist_star_expr | annassign | augassign | assign;
 
+// if left expression in assign is bool literal, it's mean that is Python 2 here
 assign: testlist_star_expr (ASSIGN (yield_expr|testlist_star_expr))*;
 
+//Only Pytnoh 3 supports annotations for variables
 annassign: testlist_star_expr COLON test (ASSIGN test)? (yield_expr|testlist);
 
 testlist_star_expr: (test|star_expr) (COMMA (test|star_expr))* (COMMA)?;
@@ -92,6 +95,7 @@ augassign: testlist_star_expr op=('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&='
 //print_stmt: 'print' ( ( test (COMMA test)* (COMMA)? )? |
 //                      '>>' test ( (COMMA test)+ (COMMA)? )? )
 //    ;
+// python 2
 print_stmt: PRINT
             NAME ( ( test (COMMA test)* (COMMA)? )? |
                  '>>' test ( (COMMA test)+ (COMMA)? )? )
@@ -137,8 +141,6 @@ exec_stmt: EXEC expr (IN test (COMMA test)?)?
     ;
 assert_stmt: ASSERT test (COMMA test)?
     ;
-
-
 compound_stmt: 
     if_stmt 
     | while_stmt 
@@ -173,7 +175,8 @@ with_stmt: WITH with_item (COMMA with_item)*  COLON suite
 with_item: test (AS expr)?
 // NB compile.c makes sure that the default except clause is last
     ;
-except_clause: EXCEPT (test (AS NAME)?)? COLON suite
+// Python 2 : EXCEPT test COMMA NAME, Python 3 : EXCEPT test AS NAME
+except_clause: EXCEPT (test ((COMMA NAME) | (AS NAME))?)? COLON suite
     ;
 suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
     ;
@@ -233,7 +236,7 @@ atom:  (OPEN_PAREN (yield_expr|testlist_comp)? CLOSE_PAREN |
         OPEN_BRACKET (testlist_comp)? CLOSE_BRACKET |
         OPEN_BRACE (dictorsetmaker)? CLOSE_BRACE |
         (REVERSE_QUOTE testlist COMMA? REVERSE_QUOTE) | ELLIPSIS | // tt: added elipses.
-        dotted_name | PRINT | TRUE | FALSE | NAME | NUMBER | MINUS NUMBER | NONE |STRING+)
+        dotted_name | NAME | NUMBER | MINUS NUMBER | NONE |STRING+)
     ;
     
 testlist_comp: (test|star_expr) ( comp_for | (COMMA (test|star_expr))* (COMMA)? )
