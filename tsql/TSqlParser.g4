@@ -1890,7 +1890,7 @@ dml_trigger_operation
     ;
 
 create_or_alter_ddl_trigger
-    : ((CREATE (OR ALTER)?) | ALTER) TRIGGER simple_name
+    : ((CREATE (OR ALTER)?) | ALTER) TRIGGER simple_id
       ON (ALL SERVER | DATABASE)
       (WITH dml_trigger_option (',' dml_trigger_option)* )?
       (FOR | AFTER) ddl_trigger_operation (',' dml_trigger_operation)*
