@@ -86,7 +86,7 @@ expr_stmt: testlist_star_expr | annassign | augassign | assign;
 assign: testlist_star_expr (ASSIGN (yield_expr|testlist_star_expr))*;
 
 //Only Pytnoh 3 supports annotations for variables
-annassign: testlist_star_expr COLON test (ASSIGN test)? (yield_expr|testlist);
+annassign: testlist_star_expr COLON test (ASSIGN (yield_expr|testlist))?;
 
 testlist_star_expr: (test|star_expr) (COMMA (test|star_expr))* (COMMA)?;
 
@@ -256,10 +256,12 @@ exprlist: expr (COMMA expr)* (COMMA)?
     ;
 testlist: test (COMMA test)* (COMMA)?
     ;
-dictorsetmaker: ( (test COLON test (comp_for | (COMMA test COLON test)* (COMMA)?)) |
-                  (test (comp_for | (COMMA test)* (COMMA)?)) )
-    ;
 
+dictorsetmaker: ( ((test COLON test | POWER expr)
+                   (comp_for | (COMMA (test COLON test | POWER expr))* (COMMA)?)) |
+                  ((test | star_expr)
+                   (comp_for | (COMMA (test | star_expr))* (COMMA)?)) )
+    ;
 
 classdef: CLASS NAME (OPEN_PAREN (arglist)? CLOSE_PAREN)? COLON suite
     ;
