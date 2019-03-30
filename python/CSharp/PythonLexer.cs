@@ -1,19 +1,24 @@
+using System.Collections.Generic;
 using Antlr4.Runtime;
 using System.Text.RegularExpressions;
 using PythonParseTree;
 
 public abstract class PythonBaseLexer : Lexer
 {
+    private static Regex _newLineRegex = new Regex("[^\r\n\f]+");
+    private static Regex _spacesRegex = new Regex("[\r\n\f]+");
+
     // A queue where extra tokens are pushed on (see the NEWLINE lexer rule).
-    private System.Collections.Generic.LinkedList<IToken> Tokens = new System.Collections.Generic.LinkedList<IToken>();
+    private LinkedList<IToken> Tokens = new LinkedList<IToken>();
     // The stack that keeps track of the indentation level.
-    private System.Collections.Generic.Stack<int> Indents = new System.Collections.Generic.Stack<int>();
+    private Stack<int> Indents = new Stack<int>();
     // The amount of opened braces, brackets and parenthesis.
     public int Opened = 0;
     // The most recently produced token.
-    public IToken LastToken = null;
+    public IToken LastToken;
 
-    public PythonBaseLexer(ICharStream charStream) : base(charStream)
+    public PythonBaseLexer(ICharStream charStream)
+            : base(charStream)
     {
     }
 
@@ -25,8 +30,8 @@ public abstract class PythonBaseLexer : Lexer
 
     public void HandleNewLine()
     {
-        var newLine = (new Regex("[^\r\n\f]+")).Replace(Text, "");
-        var spaces = (new Regex("[\r\n\f]+")).Replace(Text, "");
+        var newLine = _newLineRegex.Replace(Text, "");
+        var spaces = _spacesRegex.Replace(Text, "");
 
         int next = _input.La(1);
         if (Opened > 0 || next == '\r' || next == '\n' || next == '\f' || next == '#')
@@ -55,7 +60,7 @@ public abstract class PythonBaseLexer : Lexer
                 // Possibly emit more than 1 DEDENT token.
                 while (Indents.Count != 0 && Indents.Peek() > indent)
                 {
-                    this.Emit(CreateDedent());
+                    Emit(CreateDedent());
                     Indents.Pop();
                 }
             }
@@ -66,14 +71,7 @@ public abstract class PythonBaseLexer : Lexer
     {
         int stop = CharIndex - 1;
         int start = text.Length == 0 ? stop : stop - text.Length + 1;
-        return new CommonToken(this._tokenFactorySourcePair, type, DefaultTokenChannel, start, stop);
-    }
-
-    private IToken CreateDedent()
-    {
-        var dedent = CommonToken(PythonLexer.DEDENT, "");
-        dedent.Line = LastToken.Line;
-        return dedent;
+        return new CommonToken(_tokenFactorySourcePair, type, DefaultTokenChannel, start, stop);
     }
 
     public override IToken NextToken()
@@ -89,11 +87,12 @@ public abstract class PythonBaseLexer : Lexer
                 {
                     Tokens.Remove(node);
                 }
+
                 node = temp;
             }
 
             // First emit an extra line break that serves as the end of the statement.
-            this.Emit(CommonToken(PythonLexer.NEWLINE, "\n"));
+            Emit(CommonToken(PythonLexer.NEWLINE, "\n"));
 
             // Now emit as much DEDENT tokens as needed.
             while (Indents.Count != 0)
@@ -103,7 +102,7 @@ public abstract class PythonBaseLexer : Lexer
             }
 
             // Put the EOF back on the token stream.
-            Emit(CommonToken(PythonLexer.Eof, "<EOF>"));
+            Emit(CommonToken(Eof, "<EOF>"));
         }
 
         var next = base.NextToken();
@@ -117,12 +116,39 @@ public abstract class PythonBaseLexer : Lexer
         {
             return next;
         }
-        else
+
+        var x = Tokens.First.Value;
+        Tokens.RemoveFirst();
+        return x;
+    }
+
+    public bool AtStartOfInputWithSpaces()
+    {
+        int index = -1;
+
+        while (char.IsWhiteSpace((char)_input.La(index)))
         {
-            var x = Tokens.First.Value;
-            Tokens.RemoveFirst();
-            return x;
+            index--;
         }
+
+        return _input.Index + index < 0; // TODO: check
+    }
+
+    protected void IncIndentLevel()
+    {
+        Opened++;
+    }
+
+    protected void DecIndentLevel()
+    {
+        Opened--;
+    }
+
+    private IToken CreateDedent()
+    {
+        var dedent = CommonToken(PythonLexer.DEDENT, "");
+        dedent.Line = LastToken.Line;
+        return dedent;
     }
 
     // Calculates the indentation of the provided spaces, taking the
@@ -133,13 +159,15 @@ public abstract class PythonBaseLexer : Lexer
     //  the replacement is a multiple of eight [...]"
     //
     //  -- https://docs.python.org/3.1/reference/lexical_analysis.html#indentation
-    static int GetIndentationCount(string spaces)
+    private static int GetIndentationCount(string spaces)
     {
         int count = 0;
-        foreach (char ch in spaces.ToCharArray())
+
+        foreach (char ch in spaces)
         {
-            count += ch == '\t' ? 8 - (count % 8) : 1;
+            count += ch == '\t' ? 8 - count % 8 : 1;
         }
+
         return count;
     }
 }
