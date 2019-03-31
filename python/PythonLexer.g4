@@ -89,8 +89,8 @@ RIGHT_SHIFT_ASSIGN : '>>=';
 POWER_ASSIGN       : '**=';
 IDIV_ASSIGN        : '//=';
 
-STRING             : ([rR] | [uU] | [bB] | [fF] | [fF] [rR] | [rR] [fF])? (SHORT_STRING | LONG_STRING)
-                   | ([bB] | [bB] [rR] | [rR] [bB]) (SHORT_BYTES | LONG_BYTES)
+STRING             : ([uU] | [fF] [rR]? | [rR] [fF]?)? (SHORT_STRING | LONG_STRING)
+                   | ([bB] [rR]? | [rR] [bB]) (SHORT_BYTES | LONG_BYTES)
                    ;
 
 DECIMAL_INTEGER    : [1-9] [0-9]*
