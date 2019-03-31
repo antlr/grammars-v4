@@ -23,9 +23,9 @@ parser grammar PythonParser;
 options { tokenVocab=PythonLexer; }
 
 root
-    : single_input
+    : (single_input
     | file_input
-    | eval_input
+    | eval_input)? EOF
     ;
 
 single_input
@@ -35,11 +35,11 @@ single_input
     ;
 
 file_input
-    : (NEWLINE | stmt)* EOF
+    : (NEWLINE | stmt)+
     ;
 
 eval_input
-    : testlist NEWLINE* EOF
+    : testlist NEWLINE*
     ;
 
 decorator
