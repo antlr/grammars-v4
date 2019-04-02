@@ -20,6 +20,7 @@ alter table with_partition add partition (partition p201901 values less than (73
 alter table with_partition add partition (partition p1 values less than (837425) engine = InnoDB, partition p2 values less than (MAXVALUE) engine = InnoDB);
 alter table t1 stats_auto_recalc=default stats_sample_pages=50;
 alter table t1 stats_auto_recalc=default, stats_sample_pages=50;
+alter table t1 modify column c1 enum('abc','cba','aaa') character set 'utf8' collate 'utf8_unicode_ci' not null default 'abc';
 #end
 #begin
 -- Alter database

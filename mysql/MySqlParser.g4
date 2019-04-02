@@ -1994,12 +1994,20 @@ dataType
       )
       lengthOneDimension?                                           #dimensionDataType
     | typeName=(ENUM | SET)
-      '(' STRING_LITERAL (',' STRING_LITERAL)* ')' BINARY?
+      collectionOptions BINARY?
       (CHARACTER SET charsetName)? (COLLATE collationName)?         #collectionDataType
     | typeName=(
         GEOMETRYCOLLECTION | LINESTRING | MULTILINESTRING
         | MULTIPOINT | MULTIPOLYGON | POINT | POLYGON
       )                                                             #spatialDataType
+    ;
+
+collectionOptions
+    : '(' collectionOption (',' collectionOption)* ')'
+    ;
+
+collectionOption
+    : STRING_LITERAL
     ;
 
 convertedDataType
