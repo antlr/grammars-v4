@@ -2003,11 +2003,7 @@ dataType
     ;
 
 collectionOptions
-    : '(' collectionOption (',' collectionOption)* ')'
-    ;
-
-collectionOption
-    : STRING_LITERAL
+    : '(' STRING_LITERAL (',' STRING_LITERAL)* ')'
     ;
 
 convertedDataType
