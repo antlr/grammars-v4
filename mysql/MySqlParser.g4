@@ -1980,9 +1980,9 @@ dataType
         TINYINT | SMALLINT | MEDIUMINT | INT | INTEGER | BIGINT
       )
       lengthOneDimension? UNSIGNED? ZEROFILL?                       #dimensionDataType
-    | typeName=(REAL | DOUBLE | FLOAT)
+    | typeName=(REAL | DOUBLE)
       lengthTwoDimension? UNSIGNED? ZEROFILL?                       #dimensionDataType
-    | typeName=(DECIMAL | NUMERIC)
+    | typeName=(DECIMAL | NUMERIC | FLOAT)
       lengthTwoOptionalDimension? UNSIGNED? ZEROFILL?               #dimensionDataType
     | typeName=(
         DATE | TINYBLOB | BLOB | MEDIUMBLOB | LONGBLOB
