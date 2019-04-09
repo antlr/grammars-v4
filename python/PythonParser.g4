@@ -382,7 +382,7 @@ expr
     | expr op=AND_OP expr
     | expr op=(LEFT_SHIFT | RIGHT_SHIFT) expr
     | expr op=(ADD | MINUS) expr
-    | expr op=(STAR | DIV | MOD | IDIV) expr
+    | expr op=(STAR | DIV | MOD | IDIV | AT) expr // @ is multiply operator for numpy arrays
     | expr op=(ADD | MINUS) expr
     | expr op=POWER expr
     | op=(ADD | MINUS | NOT_OP) expr
