@@ -39,7 +39,7 @@ namespace GrammarGrammar
          */
         private int CurrentRuleType { get; set; } = TokenConstants.InvalidType;
 
-        protected void HandleBeginArgument()
+        protected void handleBeginArgument()
         {
             if (InLexerRule)
             {
@@ -52,7 +52,7 @@ namespace GrammarGrammar
             }
         }
 
-        protected void HandleEndArgument()
+        protected void handleEndArgument()
         {
             PopMode();
             if (ModeStack.Count > 0)
@@ -61,7 +61,7 @@ namespace GrammarGrammar
             }
         }
 
-        protected void HandleEndAction()
+        protected void handleEndAction()
         {
             PopMode();
             if (ModeStack.Count > 0)
