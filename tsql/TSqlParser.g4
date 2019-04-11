@@ -3172,6 +3172,8 @@ function_call
     | ISNULL '(' expression ',' expression ')'          #ISNULL
     // https://docs.microsoft.com/en-us/sql/t-sql/xml/xml-data-type-methods
     | xml_data_type_methods                             #XML_DATA_TYPE_FUNC
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/logical-functions-iif-transact-sql
+    | IIF '(' search_condition ',' expression ',' expression ')'
     ;
 
 xml_data_type_methods
