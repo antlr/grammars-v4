@@ -208,7 +208,7 @@ Small : 'small' ;
 Specify : 'specify' ;
 Specparam : 'specparam' ;
 Static : 'static' ;
-String : 'string' ;
+SVString : 'string' ;
 Strong0 : 'strong0' ;
 Strong1 : 'strong1' ;
 Struct : 'struct' ;
@@ -798,7 +798,7 @@ genvar_declaration  :   Genvar list_of_variable_descriptions ;
 
 usertype_variable_declaration   : (Automatic)? user_type (dimension)? list_of_variable_descriptions ;
 
-string_declaration  :   String list_of_variable_descriptions ;
+string_declaration  :   SVString list_of_variable_descriptions ;
 
 struct_declaration  :   struct_type list_of_variable_descriptions ;
 
@@ -820,7 +820,7 @@ function_type   : Logic
                 | Realtime
                 | Time
                 | Reg
-                | String
+                | SVString
                 | bits_type
                 | user_type
                 ;
@@ -1473,7 +1473,7 @@ variable_type   : Int
                 //| Realtime
                 //| Time
                 //| Reg
-                //| String
+                //| SVString
                 //| bits_type
                 ;
 
