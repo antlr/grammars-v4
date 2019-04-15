@@ -200,54 +200,42 @@ suite
     | NEWLINE INDENT stmt+ DEDENT
     ;
 
-old_test
-    : logical_test
-    | LAMBDA varargslist? COLON old_test   // Old lambda def
-    ;
-
+// https://docs.python.org/3/reference/expressions.html#operator-precedence
 test
     : logical_test (IF logical_test ELSE test)?
-    | lambdef
-    ;
-
-test_nocond
-    : logical_test
-    | LAMBDA varargslist? COLON test_nocond  // Lamda def no cond
+    | LAMBDA varargslist? COLON test
     ;
 
 logical_test
-    : logical_test op=OR logical_test
-    | logical_test op=AND logical_test
+    : comparison
     | NOT logical_test
-    | comparison
+    | logical_test op=AND logical_test
+    | logical_test op=OR logical_test
     ;
 
-// <> isn't actually a valid comparison operator in Python. It's here for the
-// sake of a __future__ import described in PEP 401 (which really works :-)
 comparison
     : comparison (LESS_THAN | GREATER_THAN | EQUALS | GT_EQ | LT_EQ | NOT_EQ_1 | NOT_EQ_2 | IN | IS optional=NOT? | NOT optional=IN?) comparison
     | expr
     ;
 
 expr
-    : expr op=OR_OP expr
-    | expr op=XOR expr
-    | expr op=AND_OP expr
-    | expr op=(LEFT_SHIFT | RIGHT_SHIFT) expr
-    | expr op=(ADD | MINUS) expr
-    | expr op=(STAR | DIV | MOD | IDIV | AT) expr // @ is multiply operator for numpy arrays
-    | expr op=(ADD | MINUS) expr
-    | expr op=POWER expr
+    : AWAIT? atom trailer*
+    | <assoc=right> expr op=POWER expr
     | op=(ADD | MINUS | NOT_OP) expr
-    | AWAIT? atom trailer*
+    | expr op=(STAR | DIV | MOD | IDIV | AT) expr
+    | expr op=(ADD | MINUS) expr
+    | expr op=(LEFT_SHIFT | RIGHT_SHIFT) expr
+    | expr op=AND_OP expr
+    | expr op=XOR expr
+    | expr op=OR_OP expr
     ;
 
 atom
-    : dotted_name
-    | OPEN_PAREN (yield_expr | testlist_comp)? CLOSE_PAREN
+    : OPEN_PAREN (yield_expr | testlist_comp)? CLOSE_PAREN
     | OPEN_BRACKET testlist_comp? CLOSE_BRACKET
     | OPEN_BRACE dictorsetmaker? CLOSE_BRACE
     | REVERSE_QUOTE testlist COMMA? REVERSE_QUOTE
+    | dotted_name
     | ELLIPSIS
     | name
     | PRINT
@@ -287,10 +275,6 @@ integer
     | OCT_INTEGER
     | HEX_INTEGER
     | BIN_INTEGER
-    ;
-
-lambdef
-    : LAMBDA varargslist? COLON test
     ;
 
 trailer
@@ -351,7 +335,7 @@ argument
 
 list_iter
     : FOR exprlist IN testlist_safe list_iter?
-    | IF old_test list_iter?
+    | IF test list_iter?
     ;
 
 // Backward compatibility cruft to support:
@@ -360,12 +344,12 @@ list_iter
 // lambda x: 5 if x else 2
 // (But not a mix of the two)
 testlist_safe
-    : old_test ((COMMA old_test)+ COMMA?)?
+    : test ((COMMA test)+ COMMA?)?
     ;
 
 comp_iter
     : comp_for
-    | IF old_test comp_iter?
+    | IF test comp_iter?
     ;
 
 comp_for
