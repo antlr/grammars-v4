@@ -346,8 +346,8 @@ booleanLiteral
 stringLiteral: SingleLineString;
 //stringLiteral: SingleLineString;
 SingleLineString
-  : '"' ~["]* '"'
-  | '\'' ~[']* '\''
+  : '"' (~["] | '\\"')* '"'
+  | '\'' (~['] | '\\\'')* '\''
 //  | 'r\'' (~('\'' | NEWLINE))* '\'' // TODO
 //  | 'r"' (~('\'' | NEWLINE))* '"'
   ;
