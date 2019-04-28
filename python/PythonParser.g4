@@ -47,9 +47,10 @@ decorator
     ;
 
 //python 3 paramters
+// parameters list may have a trailing comma
 typedargslist
-    : (def_parameters COMMA)? (args (COMMA def_parameters)? (COMMA kwargs)? | kwargs)
-    | def_parameters
+    : (def_parameters COMMA)? (args (COMMA def_parameters)? (COMMA kwargs)? | kwargs) COMMA?
+    | def_parameters COMMA?
     ;
 
 args

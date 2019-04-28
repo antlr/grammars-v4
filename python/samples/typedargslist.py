@@ -1,0 +1,17 @@
+# typedargslist
+#     : (def_parameters COMMA)? (args (COMMA def_parameters)? (COMMA kwargs)? | kwargs)
+#     | def_parameters
+#     ;
+
+# def_parameters COMMA
+def single(x,): pass
+
+# def_parameters COMMA kwargs
+def f1(x, y, **z): pass
+
+# def_parameters COMMA args COMMA def_parameters COMMA kwargs COMMA
+def f1(x, y, *z, a, b, **c,): pass
+
+# def_parameters COMMA args
+def f1(x, y, *z): pass
+
