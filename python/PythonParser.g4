@@ -42,11 +42,66 @@ eval_input
     : testlist NEWLINE*
     ;
 
+stmt
+    : simple_stmt
+    | compound_stmt
+    ;
+
+//---------------- compound statement ----------------------------------------------------------------------------------
+compound_stmt
+    : IF cond=test COLON suite elif_clause* else_clause?                           #if_stmt
+    | WHILE test COLON suite else_clause?                                          #while_stmt
+    | ASYNC? FOR exprlist IN testlist COLON suite else_clause?                     #for_stmt
+    | TRY COLON suite (except_clause+ else_clause? finaly_clause? | finaly_clause) #try_stmt
+    | ASYNC? WITH with_item (COMMA with_item)* COLON suite                         #with_stmt
+    | decorator* (classdef | funcdef)                                              #class_or_func_def_stmt
+    ;
+
+suite
+    : simple_stmt
+    | NEWLINE INDENT stmt+ DEDENT
+    ;
+
 decorator
     : AT dotted_name (OPEN_PAREN arglist? CLOSE_PAREN)? NEWLINE
     ;
 
-//python 3 paramters
+elif_clause
+    : ELIF test COLON suite
+    ;
+
+else_clause
+    : ELSE COLON suite
+    ;
+
+finaly_clause
+    : FINALLY COLON suite
+    ;
+
+with_item
+    // NB compile.c makes sure that the default except clause is last
+    : test (AS expr)?
+    ;
+
+// Python 2 : EXCEPT test COMMA name
+// Python 3 : EXCEPT test AS name
+except_clause
+    : EXCEPT (test (COMMA name | AS name)?)? COLON suite
+    ;
+//----------------------------------------------------------------------------------------------------------------------
+
+// ------ class definition ---------------------------------------------------------------------------------------------
+classdef
+    : CLASS name (OPEN_PAREN arglist? CLOSE_PAREN)? COLON suite
+    ;
+//----------------------------------------------------------------------------------------------------------------------
+
+// ------- function and it's parameters definition ---------------------------------------------------------------------
+funcdef
+    : ASYNC? DEF name OPEN_PAREN typedargslist? CLOSE_PAREN (ARROW test)? COLON suite
+    ;
+
+// python 3 paramters
 // parameters list may have a trailing comma
 typedargslist
     : (def_parameters COMMA)? (args (COMMA def_parameters)? (COMMA kwargs)? | kwargs) COMMA?
@@ -73,34 +128,9 @@ def_parameter
 named_parameter
     : name (COLON test)?
     ;
+//----------------------------------------------------------------------------------------------------------------------
 
-//python 2 paramteters
-varargslist
-    : (vardef_parameters COMMA)? varargs (COMMA vardef_parameters)? (COMMA varkwargs)
-    | vardef_parameters
-    ;
-
-vardef_parameters
-    : vardef_parameter (COMMA vardef_parameter)*
-    ;
-
-vardef_parameter
-    : name (ASSIGN test)?
-    ;
-
-varargs
-    : STAR name
-    ;
-
-varkwargs
-    : POWER name
-    ;
-
-stmt
-    : simple_stmt
-    | compound_stmt
-    ;
-
+// -------- simple statement -------------------------------------------------------------------------------------------
 simple_stmt
     : small_stmt (SEMI_COLON small_stmt)* SEMI_COLON? (NEWLINE | EOF)
     ;
@@ -123,9 +153,15 @@ small_stmt
     | ASSERT test (COMMA test)?                                                       #assert_stmt
     | NONLOCAL name (COMMA name)*                                                     #nonlocal_stmt // Python 3
     ;
+//----------------------------------------------------------------------------------------------------------------------
 
+// -------- expression statement ---------------------------------------------------------------------------------------
 testlist_star_expr
     : (test | star_expr) (COMMA (test | star_expr))* COMMA?
+    ;
+
+star_expr
+    : STAR expr
     ;
 
 assign_part
@@ -148,6 +184,12 @@ assign_part
       (yield_expr | testlist)
     ;
 
+exprlist
+    : expr (COMMA expr)* COMMA?
+    ;
+//----------------------------------------------------------------------------------------------------------------------
+
+// -------- import statement -------------------------------------------------------------------------------------------
 import_as_names
     : import_as_name (COMMA import_as_name)* COMMA?
     ;
@@ -163,50 +205,45 @@ dotted_as_names
 dotted_as_name
     : dotted_name (AS name)?
     ;
+//----------------------------------------------------------------------------------------------------------------------
 
-compound_stmt
-    : IF cond=test COLON suite elif_clause* else_clause?                           #if_stmt
-    | WHILE test COLON suite else_clause?                                          #while_stmt
-    | ASYNC? FOR exprlist IN testlist COLON suite else_clause?                     #for_stmt
-    | TRY COLON suite (except_clause+ else_clause? finaly_clause? | finaly_clause) #try_stmt
-    | ASYNC? WITH with_item (COMMA with_item)* COLON suite                         #with_stmt
-    | decorator* (classdef | funcdef)                                              #class_or_func_def_stmt
-    ;
-
-elif_clause
-    : ELIF test COLON suite
-    ;
-
-else_clause
-    : ELSE COLON suite
-    ;
-
-finaly_clause
-    : FINALLY COLON suite
-    ;
-
-with_item
-    // NB compile.c makes sure that the default except clause is last
-    : test (AS expr)?
-    ;
-
-// Python 2 : EXCEPT test COMMA name
-// Python 3 : EXCEPT test AS name
-except_clause
-    : EXCEPT (test (COMMA name | AS name)?)? COLON suite
-    ;
-
-suite
-    : simple_stmt
-    | NEWLINE INDENT stmt+ DEDENT
-    ;
-
+// -------------------------- test, lambda and it's parameters ---------------------------------------------------------
+/*
+ * Warning!
+ * According to https://docs.python.org/3/reference/expressions.html#lambda LAMBDA shouls be followed by
+ * `parameter_list` (in our case it is `typedargslist`)
+ * But that's not true! `typedargslist` may have parameters with type hinting, but that's not permitted in lambda
+ * definition
+ */
 // https://docs.python.org/3/reference/expressions.html#operator-precedence
 test
     : logical_test (IF logical_test ELSE test)?
     | LAMBDA varargslist? COLON test
     ;
 
+varargslist
+    : (vardef_parameters COMMA)? varargs (COMMA vardef_parameters)? (COMMA varkwargs)
+    | vardef_parameters
+    ;
+
+vardef_parameters
+    : vardef_parameter (COMMA vardef_parameter)*
+    ;
+
+vardef_parameter
+    : name (ASSIGN test)?
+    ;
+
+varargs
+    : STAR name
+    ;
+
+varkwargs
+    : POWER name
+    ;
+//----------------------------------------------------------------------------------------------------------------------
+
+// -------------------------- tests and comparisons --------------------------------------------------------------------
 logical_test
     : comparison
     | NOT logical_test
@@ -218,7 +255,9 @@ comparison
     : comparison (LESS_THAN | GREATER_THAN | EQUALS | GT_EQ | LT_EQ | NOT_EQ_1 | NOT_EQ_2 | IN | IS optional=NOT? | NOT optional=IN?) comparison
     | expr
     ;
+//----------------------------------------------------------------------------------------------------------------------
 
+// -------------------------- expressions ------------------------------------------------------------------------------
 expr
     : AWAIT? atom trailer*
     | <assoc=right> expr op=POWER expr
@@ -231,6 +270,9 @@ expr
     | expr op=OR_OP expr
     ;
 
+//----------------------------------------------------------------------------------------------------------------------
+
+// -------------------------- atom -------------------------------------------------------------------------------------
 atom
     : OPEN_PAREN (yield_expr | testlist_comp)? CLOSE_PAREN
     | OPEN_BRACKET testlist_comp? CLOSE_BRACKET
@@ -246,17 +288,31 @@ atom
     | STRING+
     ;
 
-dotted_name
-    : dotted_name DOT name
-    | name
-    ;
-
 yield_expr
     : YIELD yield_arg?
     ;
 
+yield_arg
+    : FROM test
+    | testlist
+    ;
+
 testlist_comp
     : (test | star_expr) (comp_for | (COMMA (test | star_expr))* COMMA?)
+    ;
+
+dictorsetmaker
+    : (test COLON test | POWER expr) (comp_for | (COMMA (test COLON test | POWER expr))* COMMA?)
+    | (test | star_expr) (comp_for | (COMMA (test | star_expr))* COMMA?)
+    ;
+
+testlist
+    : test (COMMA test)* COMMA?
+    ;
+
+dotted_name
+    : dotted_name DOT name
+    | name
     ;
 
 name
@@ -277,11 +333,33 @@ integer
     | HEX_INTEGER
     | BIN_INTEGER
     ;
+//----------------------------------------------------------------------------------------------------------------------
 
+// -------------------------- trailer ----------------------------------------------------------------------------------
 trailer
     : OPEN_PAREN arglist? CLOSE_PAREN
     | OPEN_BRACKET subscriptlist CLOSE_BRACKET
     | DOT name
+    ;
+
+arglist
+    // The reason that keywords are test nodes instead of name is that using name
+    // results in an ambiguity. ast.c makes sure it's a name.
+    : argument (COMMA argument)* COMMA?
+    ;
+
+argument
+    : test (comp_for | ASSIGN test)?
+    | (POWER | STAR) test
+    ;
+
+comp_for
+    : FOR exprlist IN logical_test comp_iter?
+    ;
+
+comp_iter
+    : comp_for
+    | IF test comp_iter?
     ;
 
 subscriptlist
@@ -297,43 +375,9 @@ subscript
 sliceop
     : COLON test?
     ;
+//----------------------------------------------------------------------------------------------------------------------
 
-exprlist
-    : expr (COMMA expr)* COMMA?
-    ;
-
-testlist
-    : test (COMMA test)* COMMA?
-    ;
-
-dictorsetmaker
-    : (test COLON test | POWER expr) (comp_for | (COMMA (test COLON test | POWER expr))* COMMA?)
-    | (test | star_expr) (comp_for | (COMMA (test | star_expr))* COMMA?)
-    ;
-
-star_expr
-    : STAR expr
-    ;
-
-classdef
-    : CLASS name (OPEN_PAREN arglist? CLOSE_PAREN)? COLON suite
-    ;
-
-funcdef
-    : ASYNC? DEF name OPEN_PAREN typedargslist? CLOSE_PAREN (ARROW test)? COLON suite
-    ;
-
-arglist
-    // The reason that keywords are test nodes instead of name is that using name
-    // results in an ambiguity. ast.c makes sure it's a name.
-    : argument (COMMA argument)* COMMA?
-    ;
-
-argument
-    : test (comp_for | ASSIGN test)?
-    | (POWER | STAR) test
-    ;
-
+// --------------------- !!! WARNING completely unused !!!--------------------------------------------------------------
 list_iter
     : FOR exprlist IN testlist_safe list_iter?
     | IF test list_iter?
@@ -347,17 +391,4 @@ list_iter
 testlist_safe
     : test ((COMMA test)+ COMMA?)?
     ;
-
-comp_iter
-    : comp_for
-    | IF test comp_iter?
-    ;
-
-comp_for
-    : FOR exprlist IN logical_test comp_iter?
-    ;
-
-yield_arg
-    : FROM test
-    | testlist
-    ;
+//----------------------------------------------------------------------------------------------------------------------
