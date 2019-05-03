@@ -10,7 +10,7 @@ def single(x,): pass
 def f1(x, y, **z): pass
 
 # def_parameters COMMA args COMMA def_parameters COMMA kwargs COMMA
-def f1(x, y, *z, a, b, **c,): pass
+def f1(x, y, *z: int, a, b, **c: int,): pass
 
 # def_parameters COMMA args
 def f1(x, y, *z): pass
