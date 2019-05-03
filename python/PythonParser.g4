@@ -122,7 +122,6 @@ def_parameters
 
 def_parameter
     : named_parameter (ASSIGN test)?
-    | STAR
     ;
 
 named_parameter
