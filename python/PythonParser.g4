@@ -147,8 +147,8 @@ small_stmt
     | RAISE (test (COMMA test (COMMA test)?)?)? (FROM test)?                          #raise_stmt
     | yield_expr                                                                      #yield_stmt
     | IMPORT dotted_as_names                                                          #import_stmt
-    | (FROM ((DOT | ELLIPSIS)* dotted_name | (DOT | ELLIPSIS)+)
-       IMPORT (STAR | OPEN_PAREN import_as_names CLOSE_PAREN | import_as_names))      #from_stmt
+    | FROM ((DOT | ELLIPSIS)* dotted_name | (DOT | ELLIPSIS)+)
+      IMPORT (STAR | OPEN_PAREN import_as_names CLOSE_PAREN | import_as_names)        #from_stmt
     | GLOBAL name (COMMA name)*                                                       #global_stmt
     | EXEC expr (IN test (COMMA test)?)?                                              #exec_stmt
     | ASSERT test (COMMA test)?                                                       #assert_stmt
@@ -197,6 +197,7 @@ import_as_names
     : import_as_name (COMMA import_as_name)* COMMA?
     ;
 
+// TODO: that means we can use keyword True as the name here: `from foo import bar as True` -- no
 import_as_name
     : name (AS name)?
     ;
