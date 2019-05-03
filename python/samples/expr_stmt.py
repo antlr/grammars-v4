@@ -1,3 +1,7 @@
+# expr_stmt: testlist_star_expr assign_part?
+#
+# testlist_star_expr : (test | star_expr) (COMMA (test | star_expr))* COMMA?
+#
 # assign_part
 #     : (ASSIGN testlist_star_expr)* (ASSIGN yield_expr)?
 #     | COLON test (ASSIGN testlist)?
@@ -20,26 +24,26 @@
 
 # Yield tests (should not be used outside the function)
 def f():
-    # ASSIGN yield_expr
+    # test ASSIGN yield_expr
     x = yield
 
-    # ASSIGN testlist_star_expr ASSIGN yield_expr
-    x = y = yield
+    # test COMMA test COMMA ASSIGN test COMMA star_expr ASSIGN yield_expr
+    x, [*t], = y, *z = yield
 
-    # testlist_star_expr '+=' yield_expr
+    # test '+=' yield_expr
     x += yield
 
-# ASSIGN testlist_star_expr
-z = 5
+# test ASSIGN testlist_star_expr
+z = 1, *y
 
-# testlist_star_expr ASSIGN testlist_star_expr ASSIGN testlist_star_expr
-x = y = z
+# test ASSIGN test COMMA test ASSIGN test COMMA star_expr COMMA
+x = y, a = z, *q,
 
-# COLON test
+# test COLON test
 x: int
 
 # COLON test ASSIGN testlist
 x: int = 8
 
-# '-=' testlist
+# test '-=' testlist
 x -= 9
