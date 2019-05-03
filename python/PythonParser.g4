@@ -161,6 +161,7 @@ small_stmt
 // -------- expression statement ---------------------------------------------------------------------------------------
 testlist_star_expr
     : ((test | star_expr) COMMA)+ (test | star_expr)?
+    | testlist
     ;
 
 star_expr
