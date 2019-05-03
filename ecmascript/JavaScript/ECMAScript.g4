@@ -158,7 +158,7 @@ sourceElements
 ///     Statement
 ///     FunctionDeclaration
 sourceElement
- : statement
+ : {this._input.LA(1).type != ECMAScriptParser.Function}? statement
  | functionDeclaration
  ;
 
@@ -182,7 +182,7 @@ statement
  : block
  | variableStatement
  | emptyStatement
- | expressionStatement
+ | {this._input.LA(1).type != ECMAScriptParser.OpenBrace}? expressionStatement
  | ifStatement
  | iterationStatement
  | continueStatement

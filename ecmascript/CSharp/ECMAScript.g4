@@ -178,7 +178,7 @@ sourceElements
 ///     Statement
 ///     FunctionDeclaration
 sourceElement
- : statement
+ : {this.InputStream.LA(1) != Function}? statement
  | functionDeclaration
  ;
 
@@ -202,7 +202,7 @@ statement
  : block
  | variableStatement
  | emptyStatement
- | expressionStatement
+ | {this.InputStream.LA(1) != OpenBrace}? expressionStatement
  | ifStatement
  | iterationStatement
  | continueStatement
@@ -263,7 +263,7 @@ emptyStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : {(this.InputStream.LA(1) != OpenBrace) && (this.InputStream.LA(1) != Function)}? expressionSequence eos
+ : expressionSequence eos
  ;
 
 /// IfStatement :
