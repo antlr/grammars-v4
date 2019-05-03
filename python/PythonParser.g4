@@ -152,7 +152,7 @@ small_stmt
     | FROM ((DOT | ELLIPSIS)* dotted_name | (DOT | ELLIPSIS)+)
       IMPORT (STAR | OPEN_PAREN import_as_names CLOSE_PAREN | import_as_names)        #from_stmt
     | GLOBAL name (COMMA name)*                                                       #global_stmt
-    | EXEC expr (IN test (COMMA test)?)?                                              #exec_stmt
+    | EXEC expr (IN test (COMMA test)?)?                                              #exec_stmt     // Python 2
     | ASSERT test (COMMA test)?                                                       #assert_stmt
     | NONLOCAL name (COMMA name)*                                                     #nonlocal_stmt // Python 3
     ;
