@@ -49,12 +49,12 @@ stmt
 
 //---------------- compound statement ----------------------------------------------------------------------------------
 compound_stmt
-    : IF cond=test COLON suite elif_clause* else_clause?                           #if_stmt
-    | WHILE test COLON suite else_clause?                                          #while_stmt
-    | ASYNC? FOR exprlist IN testlist COLON suite else_clause?                     #for_stmt
-    | TRY COLON suite (except_clause+ else_clause? finaly_clause? | finaly_clause) #try_stmt
-    | ASYNC? WITH with_item (COMMA with_item)* COLON suite                         #with_stmt
-    | decorator* (classdef | funcdef)                                              #class_or_func_def_stmt
+    : IF cond=test COLON suite elif_clause* else_clause?                             #if_stmt
+    | WHILE test COLON suite else_clause?                                            #while_stmt
+    | ASYNC? FOR exprlist IN testlist COLON suite else_clause?                       #for_stmt
+    | TRY COLON suite (except_clause+ else_clause? finally_clause? | finally_clause) #try_stmt
+    | ASYNC? WITH with_item (COMMA with_item)* COLON suite                           #with_stmt
+    | decorator* (classdef | funcdef)                                                #class_or_func_def_stmt
     ;
 
 suite
@@ -74,7 +74,7 @@ else_clause
     : ELSE COLON suite
     ;
 
-finaly_clause
+finally_clause
     : FINALLY COLON suite
     ;
 
