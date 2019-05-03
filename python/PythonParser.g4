@@ -134,6 +134,8 @@ simple_stmt
     : small_stmt (SEMI_COLON small_stmt)* SEMI_COLON? (NEWLINE | EOF)
     ;
 
+// TODO 1: left part augmented assignment should be `test` only, no stars or lists
+// TODO 2: semantically annotated declaration is not an assignment
 small_stmt
     : testlist_star_expr assign_part?                                                 #expr_stmt
     | PRINT ((test (COMMA test)* COMMA?) | RIGHT_SHIFT test ((COMMA test)+ COMMA?))   #print_stmt   // Python 2
@@ -155,6 +157,8 @@ small_stmt
 //----------------------------------------------------------------------------------------------------------------------
 
 // -------- expression statement ---------------------------------------------------------------------------------------
+// TODO `testlist_star_expr` should _always_ contain COMMA, so maybe this way?
+// testlist_star_expr: test | star_expr COMMA (test | star_expr (COMMA test | star_expr)*)? COMMA?
 testlist_star_expr
     : (test | star_expr) (COMMA (test | star_expr))* COMMA?
     ;
