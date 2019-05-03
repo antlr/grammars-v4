@@ -159,10 +159,8 @@ small_stmt
 //----------------------------------------------------------------------------------------------------------------------
 
 // -------- expression statement ---------------------------------------------------------------------------------------
-// TODO `testlist_star_expr` should _always_ contain COMMA, so maybe this way?
-// testlist_star_expr: test | star_expr COMMA (test | star_expr (COMMA test | star_expr)*)? COMMA?
 testlist_star_expr
-    : (test | star_expr) (COMMA (test | star_expr))* COMMA?
+    : ((test | star_expr) COMMA)+ (test | star_expr)?
     ;
 
 star_expr
