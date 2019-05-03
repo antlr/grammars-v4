@@ -4,7 +4,7 @@
 #     ;
 
 # def_parameters COMMA
-def single(x,): pass
+def single(x, *, i): pass
 
 # def_parameters COMMA kwargs
 def f1(x, y, **z): pass

@@ -120,8 +120,10 @@ def_parameters
     : def_parameter (COMMA def_parameter)*
     ;
 
+// TODO: bare STAR parameter must follow named ones
 def_parameter
     : named_parameter (ASSIGN test)?
+    | STAR
     ;
 
 named_parameter
