@@ -170,7 +170,7 @@ star_expr
     ;
 
 assign_part
-    : ASSIGN testlist_star_expr | (ASSIGN testlist_star_expr)* ASSIGN yield_expr // if left expression in assign is bool literal, it's mean that is Python 2 here
+    : (ASSIGN testlist_star_expr)+ | (ASSIGN testlist_star_expr)* ASSIGN yield_expr // if left expression in assign is bool literal, it's mean that is Python 2 here
     | COLON test (ASSIGN testlist)? // annassign Python3 rule
     | op=( ADD_ASSIGN
          | SUB_ASSIGN
