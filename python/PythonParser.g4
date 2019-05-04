@@ -260,7 +260,7 @@ logical_test
     ;
 
 comparison
-    : comparison (LESS_THAN | GREATER_THAN | EQUALS | GT_EQ | LT_EQ | NOT_EQ_1 | NOT_EQ_2 | IN | IS optional=NOT? | NOT optional=IN?) comparison
+    : comparison (LESS_THAN | GREATER_THAN | EQUALS | GT_EQ | LT_EQ | NOT_EQ_1 | NOT_EQ_2 | optional=NOT? IN | IS optional=NOT?) comparison
     | expr
     ;
 //----------------------------------------------------------------------------------------------------------------------
