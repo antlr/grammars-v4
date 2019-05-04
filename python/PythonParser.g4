@@ -296,15 +296,6 @@ atom
     | STRING+
     ;
 
-yield_expr
-    : YIELD yield_arg?
-    ;
-
-yield_arg
-    : FROM test
-    | testlist
-    ;
-
 testlist_comp
     : (test | star_expr) (comp_for | (COMMA (test | star_expr))* COMMA?)
     ;
@@ -340,6 +331,17 @@ integer
     | OCT_INTEGER
     | HEX_INTEGER
     | BIN_INTEGER
+    ;
+//----------------------------------------------------------------------------------------------------------------------
+
+// -------------------------- yield_expr -------------------------------------------------------------------------------
+yield_expr
+    : YIELD yield_arg?
+    ;
+
+yield_arg
+    : FROM test
+    | testlist
     ;
 //----------------------------------------------------------------------------------------------------------------------
 
