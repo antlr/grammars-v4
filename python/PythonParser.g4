@@ -226,17 +226,20 @@ test
     | LAMBDA varargslist? COLON test
     ;
 
+// the same as `typedargslist`, but with no types
 varargslist
-    : (vardef_parameters COMMA)? varargs (COMMA vardef_parameters)? (COMMA varkwargs)
-    | vardef_parameters
+    : (vardef_parameters COMMA)? (varargs (COMMA vardef_parameters)? (COMMA varkwargs)? | varkwargs) COMMA?
+    | vardef_parameters COMMA?
     ;
 
 vardef_parameters
     : vardef_parameter (COMMA vardef_parameter)*
     ;
 
+// TODO: bare STAR parameter must follow named ones
 vardef_parameter
     : name (ASSIGN test)?
+    | STAR
     ;
 
 varargs
