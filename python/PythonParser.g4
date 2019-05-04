@@ -347,6 +347,8 @@ yield_arg
 //----------------------------------------------------------------------------------------------------------------------
 
 // -------------------------- trailer ----------------------------------------------------------------------------------
+// TODO: this way we can pass: `f(x for x in i, a)`, but it's invalid.
+// See: https://docs.python.org/3/reference/expressions.html#calls
 trailer
     : OPEN_PAREN arglist? CLOSE_PAREN
     | OPEN_BRACKET subscriptlist CLOSE_BRACKET
@@ -376,6 +378,7 @@ subscript
     | test? COLON test? sliceop?
     ;
 
+// TODO: maybe inline?
 sliceop
     : COLON test?
     ;
