@@ -353,6 +353,7 @@ trailer
     | DOT name
     ;
 
+// TODO: maybe inline?
 arglist
     // The reason that keywords are test nodes instead of name is that using name
     // results in an ambiguity. ast.c makes sure it's a name.
@@ -364,15 +365,7 @@ argument
     | (POWER | STAR) test
     ;
 
-comp_for
-    : FOR exprlist IN logical_test comp_iter?
-    ;
-
-comp_iter
-    : comp_for
-    | IF test comp_iter?
-    ;
-
+// TODO: maybe inline?
 subscriptlist
     : subscript (COMMA subscript)* COMMA?
     ;
@@ -388,6 +381,18 @@ sliceop
     ;
 //----------------------------------------------------------------------------------------------------------------------
 
+// --------------------- comprehension ---------------------------------------------------------------------------------
+comp_for
+    : FOR exprlist IN logical_test comp_iter?
+    ;
+
+comp_iter
+    : comp_for
+    | IF test comp_iter?
+    ;
+//----------------------------------------------------------------------------------------------------------------------
+
+// TODO delete it
 // --------------------- !!! WARNING completely unused !!!--------------------------------------------------------------
 list_iter
     : FOR exprlist IN testlist_safe list_iter?
