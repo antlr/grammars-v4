@@ -296,13 +296,13 @@ atom
     | STRING+
     ;
 
-testlist_comp
-    : (test | star_expr) (comp_for | (COMMA (test | star_expr))* COMMA?)
-    ;
-
 dictorsetmaker
     : (test COLON test | POWER expr) (comp_for | (COMMA (test COLON test | POWER expr))* COMMA?)
-    | (test | star_expr) (comp_for | (COMMA (test | star_expr))* COMMA?)
+    | testlist_comp
+    ;
+
+testlist_comp
+    : (test | star_expr) (comp_for | (COMMA (test | star_expr))* COMMA?)
     ;
 
 testlist
