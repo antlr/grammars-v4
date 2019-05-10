@@ -701,7 +701,8 @@ MRG_MYISAM:                          'MRG_MYISAM';
 MYISAM:                              'MYISAM';
 NDB:                                 'NDB';
 NDBCLUSTER:                          'NDBCLUSTER';
-PERFOMANCE_SCHEMA:                   'PERFOMANCE_SCHEMA';
+PERFORMANCE_SCHEMA:                  'PERFORMANCE_SCHEMA';
+TOKUDB:                              'TOKUDB';
 
 
 // Transaction Levels
