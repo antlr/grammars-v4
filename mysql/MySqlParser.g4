@@ -2072,7 +2072,7 @@ userVariables
 
 defaultValue
     : NULL_LITERAL
-    | constant
+    | unaryOperator? constant
     | currentTimestamp (ON UPDATE currentTimestamp)?
     ;
 
