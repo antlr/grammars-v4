@@ -1705,7 +1705,7 @@ showStatement
 // details
 
 variableClause
-    : LOCAL_ID | GLOBAL_ID | ( ('@' '@')? (GLOBAL | SESSION)  )? uid
+    : LOCAL_ID | GLOBAL_ID | ( ('@' '@')? (GLOBAL | SESSION | LOCAL)  )? uid
     ;
 
 showCommonEntity
