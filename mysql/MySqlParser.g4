@@ -347,7 +347,7 @@ columnDefinition
 columnConstraint
     : nullNotnull                                                   #nullColumnConstraint
     | DEFAULT defaultValue                                          #defaultColumnConstraint
-    | AUTO_INCREMENT                                                #autoIncrementColumnConstraint
+    | (AUTO_INCREMENT | ON UPDATE currentTimestamp)                 #autoIncrementColumnConstraint
     | PRIMARY? KEY                                                  #primaryKeyColumnConstraint
     | UNIQUE KEY?                                                   #uniqueKeyColumnConstraint
     | COMMENT STRING_LITERAL                                        #commentColumnConstraint
