@@ -354,6 +354,7 @@ columnConstraint
     | COLUMN_FORMAT colformat=(FIXED | DYNAMIC | DEFAULT)           #formatColumnConstraint
     | STORAGE storageval=(DISK | MEMORY | DEFAULT)                  #storageColumnConstraint
     | referenceDefinition                                           #referenceColumnConstraint
+    | COLLATE collationName                                         #collateColumnConstraint
     | (GENERATED ALWAYS)? AS '(' expression ')' (VIRTUAL | STORED)? #generatedColumnConstraint
     | SERIAL DEFAULT VALUE                                          #serialDefaultColumnConstraint
     ;
