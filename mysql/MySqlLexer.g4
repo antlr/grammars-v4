@@ -330,6 +330,7 @@ CHAIN:                               'CHAIN';
 CHANGED:                             'CHANGED';
 CHANNEL:                             'CHANNEL';
 CHECKSUM:                            'CHECKSUM';
+PAGE_CHECKSUM:                       'PAGE_CHECKSUM';
 CIPHER:                              'CIPHER';
 CLIENT:                              'CLIENT';
 CLOSE:                               'CLOSE';

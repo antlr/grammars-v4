@@ -406,7 +406,7 @@ tableOption
     | AUTO_INCREMENT '='? decimalLiteral                            #tableOptionAutoIncrement
     | AVG_ROW_LENGTH '='? decimalLiteral                            #tableOptionAverage
     | DEFAULT? (CHARACTER SET | CHARSET) '='? charsetName           #tableOptionCharset
-    | CHECKSUM '='? boolValue=('0' | '1')                           #tableOptionChecksum
+    | (CHECKSUM | PAGE_CHECKSUM) '='? boolValue=('0' | '1')         #tableOptionChecksum
     | DEFAULT? COLLATE '='? collationName                           #tableOptionCollate
     | COMMENT '='? STRING_LITERAL                                   #tableOptionComment
     | COMPRESSION '='? STRING_LITERAL                               #tableOptionCompression
