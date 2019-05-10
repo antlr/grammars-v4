@@ -430,6 +430,7 @@ tableOption
     | STATS_PERSISTENT '='? extBoolValue=(DEFAULT | '0' | '1')      #tableOptionPersistent
     | STATS_SAMPLE_PAGES '='? decimalLiteral                        #tableOptionSamplePage
     | TABLESPACE uid tablespaceStorage?                             #tableOptionTablespace
+    | tablespaceStorage                                             #tableOptionTablespace
     | UNION '='? '(' tables ')'                                     #tableOptionUnion
     ;
 
