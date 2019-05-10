@@ -302,7 +302,7 @@ indexOption
     ;
 
 procedureParameter
-    : direction=(IN | OUT | INOUT) uid dataType
+    : direction=(IN | OUT | INOUT)? uid dataType
     ;
 
 functionParameter
