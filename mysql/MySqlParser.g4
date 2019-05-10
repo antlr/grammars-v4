@@ -557,7 +557,7 @@ alterServer
 alterTable
     : ALTER intimeAction=(ONLINE | OFFLINE)?
       IGNORE? TABLE tableName
-      alterSpecification (',' alterSpecification)*
+      (alterSpecification (',' alterSpecification)*)?
       partitionDefinitions?
     ;
 
