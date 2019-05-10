@@ -489,7 +489,7 @@ partitionDefinition
     ;
 
 partitionDefinerAtom
-    : constant | MAXVALUE | expression
+    : constant | expression | MAXVALUE
     ;
 
 partitionDefinerVector
