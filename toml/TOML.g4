@@ -1,10 +1,10 @@
-grammar TOML;
+grammar toml;
 
 /*
  * Parser Rules
  */
 
-toml : expression (NL expression)* ;
+document : expression (NL expression)* ;
 
 expression : key_value comment | table comment | comment ;
 
