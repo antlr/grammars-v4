@@ -231,6 +231,7 @@
 				<module>tinymud</module>
 				<module>tnsnames</module>
 				<module>tnt</module>
+				<module>toml</module>
 				<module>tsql</module>
 				<module>tsv</module>
 				<module>turtle</module>
