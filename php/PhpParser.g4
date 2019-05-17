@@ -31,22 +31,17 @@ options { tokenVocab=PhpLexer; }
 // Also see here: https://github.com/antlr/grammars-v4/tree/master/html
 
 htmlDocument
-    : Shebang? htmlElementOrPhpBlock* EOF
+    : Shebang? (inlineHtml | phpBlock)* EOF
     ;
 
-htmlElementOrPhpBlock
-    : htmlElements
-    | phpBlock
-    | scriptTextPart
-    ;
-
-htmlElements
+inlineHtml
     : htmlElement+
+    | scriptText
     ;
 
+// TODO: split into html, css and xml elements
 htmlElement
     : HtmlDtd
-    | HtmlScriptOpen
     | HtmlClose
     | HtmlStyleOpen
     | HtmlOpen
@@ -66,15 +61,16 @@ htmlElement
 
     | StyleBody
 
-    | ScriptClose
+    | HtmlScriptOpen
+    | HtmlScriptClose
 
     | XmlStart XmlText* XmlClose
     ;
 
 // Script
-// Parse JavaScript with https://github.com/antlr/grammars-v4/tree/master/ecmascript if necessary.
+// Parse JavaScript with https://github.com/antlr/grammars-v4/tree/master/javascript if necessary.
 
-scriptTextPart
+scriptText
     : ScriptText+
     ;
 
@@ -328,11 +324,6 @@ declareStatement
 
 inlineHtmlStatement
     : inlineHtml+
-    ;
-
-inlineHtml
-    : htmlElements
-    | scriptTextPart
     ;
 
 declareList
