@@ -2012,8 +2012,8 @@ dataType
       collectionOptions BINARY?
       (CHARACTER SET charsetName)? (COLLATE collationName)?         #collectionDataType
     | typeName=(
-        GEOMETRYCOLLECTION | LINESTRING | MULTILINESTRING
-        | MULTIPOINT | MULTIPOLYGON | POINT | POLYGON
+        GEOMETRYCOLLECTION | GEOMCOLLECTION | LINESTRING | MULTILINESTRING
+        | MULTIPOINT | MULTIPOLYGON | POINT | POLYGON | JSON | GEOMETRY
       )                                                             #spatialDataType
     ;
 
