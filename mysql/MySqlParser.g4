@@ -2010,7 +2010,7 @@ dataType
       lengthOneDimension?                                           #dimensionDataType
     | typeName=(ENUM | SET)
       collectionOptions BINARY?
-      (CHARACTER SET charsetName)? (COLLATE collationName)?         #collectionDataType
+      ((CHARACTER SET | CHARSET) charsetName)?                      #collectionDataType
     | typeName=(
         GEOMETRYCOLLECTION | GEOMCOLLECTION | LINESTRING | MULTILINESTRING
         | MULTIPOINT | MULTIPOLYGON | POINT | POLYGON | JSON | GEOMETRY
