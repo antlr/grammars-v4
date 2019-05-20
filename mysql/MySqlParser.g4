@@ -1979,9 +1979,16 @@ constant
 dataType
     : typeName=(
       CHAR | VARCHAR | TINYTEXT | TEXT | MEDIUMTEXT | LONGTEXT
+       | NCHAR | NVARCHAR
       )
       lengthOneDimension? BINARY?
-      (CHARACTER SET charsetName)? (COLLATE collationName)?         #stringDataType
+      ((CHARACTER SET | CHARSET) charsetName)?                      #stringDataType
+    | NATIONAL typeName=(VARCHAR | CHARACTER)
+      lengthOneDimension? BINARY?                                   #nationalStringDataType
+    | NCHAR typeName=VARCHAR
+      lengthOneDimension? BINARY?                                   #nationalStringDataType
+    | NATIONAL typeName=(CHAR | CHARACTER) VARYING
+      lengthOneDimension? BINARY?                                   #nationalVaryingStringDataType
     | typeName=(
         TINYINT | SMALLINT | MEDIUMINT | INT | INTEGER | BIGINT
       )

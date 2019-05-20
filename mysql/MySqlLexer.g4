@@ -229,6 +229,8 @@ DATETIME:                            'DATETIME';
 YEAR:                                'YEAR';
 CHAR:                                'CHAR';
 VARCHAR:                             'VARCHAR';
+NVARCHAR:                            'NVARCHAR';
+NATIONAL:                            'NATIONAL';
 BINARY:                              'BINARY';
 VARBINARY:                           'VARBINARY';
 TINYBLOB:                            'TINYBLOB';
@@ -240,6 +242,7 @@ TEXT:                                'TEXT';
 MEDIUMTEXT:                          'MEDIUMTEXT';
 LONGTEXT:                            'LONGTEXT';
 ENUM:                                'ENUM';
+VARYING:                             'VARYING';
 SERIAL:                              'SERIAL';
 
 
