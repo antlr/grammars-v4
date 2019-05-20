@@ -1992,11 +1992,11 @@ dataType
     | typeName=(
         TINYINT | SMALLINT | MEDIUMINT | INT | INTEGER | BIGINT
       )
-      lengthOneDimension? UNSIGNED? ZEROFILL?                       #dimensionDataType
+      lengthOneDimension? (SIGNED | UNSIGNED)? ZEROFILL?            #dimensionDataType
     | typeName=(REAL | DOUBLE)
-      lengthTwoDimension? UNSIGNED? ZEROFILL?                       #dimensionDataType
+      lengthTwoDimension? (SIGNED | UNSIGNED)? ZEROFILL?            #dimensionDataType
     | typeName=(DECIMAL | NUMERIC | FLOAT)
-      lengthTwoOptionalDimension? UNSIGNED? ZEROFILL?               #dimensionDataType
+      lengthTwoOptionalDimension? (SIGNED | UNSIGNED)? ZEROFILL?    #dimensionDataType
     | typeName=(
         DATE | TINYBLOB | BLOB | MEDIUMBLOB | LONGBLOB
         | BOOL | BOOLEAN | SERIAL
