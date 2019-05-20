@@ -35,7 +35,7 @@ root
     ;
 
 sqlStatements
-    : (sqlStatement MINUSMINUS? SEMI | emptyStatement)*
+    : (sqlStatement MINUSMINUS? SEMI? | emptyStatement)*
     (sqlStatement (MINUSMINUS? SEMI)? | emptyStatement)
     ;
 
@@ -361,7 +361,8 @@ columnConstraint
 
 tableConstraint
     : (CONSTRAINT name=uid?)?
-      PRIMARY KEY indexType? indexColumnNames indexOption*          #primaryKeyTableConstraint
+      PRIMARY KEY index=uid? indexType?
+      indexColumnNames indexOption*                                 #primaryKeyTableConstraint
     | (CONSTRAINT name=uid?)?
       UNIQUE indexFormat=(INDEX | KEY)? index=uid?
       indexType? indexColumnNames indexOption*                      #uniqueKeyTableConstraint
@@ -1858,11 +1859,11 @@ fullColumnName
     ;
 
 indexColumnName
-    : uid ('(' decimalLiteral ')')? sortType=(ASC | DESC)?
+    : (uid | STRING_LITERAL) ('(' decimalLiteral ')')? sortType=(ASC | DESC)?
     ;
 
 userName
-    : STRING_USER_NAME | ID;
+    : STRING_USER_NAME | ID | STRING_LITERAL;
 
 mysqlVariable
     : LOCAL_ID
