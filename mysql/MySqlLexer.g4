@@ -222,6 +222,7 @@ DOUBLE:                              'DOUBLE';
 PRECISION:                           'PRECISION';
 FLOAT:                               'FLOAT';
 DECIMAL:                             'DECIMAL';
+DEC:                                 'DEC';
 NUMERIC:                             'NUMERIC';
 DATE:                                'DATE';
 TIME:                                'TIME';

@@ -1997,7 +1997,7 @@ dataType
       lengthTwoDimension? (SIGNED | UNSIGNED)? ZEROFILL?            #dimensionDataType
     | typeName=DOUBLE PRECISION?
           lengthTwoDimension? (SIGNED | UNSIGNED)? ZEROFILL?            #dimensionDataType
-    | typeName=(DECIMAL | NUMERIC | FLOAT)
+    | typeName=(DECIMAL | DEC | FIXED | NUMERIC | FLOAT)
       lengthTwoOptionalDimension? (SIGNED | UNSIGNED)? ZEROFILL?    #dimensionDataType
     | typeName=(
         DATE | TINYBLOB | BLOB | MEDIUMBLOB | LONGBLOB
