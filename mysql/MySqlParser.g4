@@ -1340,7 +1340,7 @@ blockStatement
         (declareCondition SEMI)*
         (declareCursor SEMI)*
         (declareHandler SEMI)*
-        (procedureSqlStatement)*
+        procedureSqlStatement*
       )?
       END uid?
     ;
