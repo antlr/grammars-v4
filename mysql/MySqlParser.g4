@@ -374,7 +374,7 @@ tableConstraint
     ;
 
 referenceDefinition
-    : REFERENCES tableName indexColumnNames
+    : REFERENCES tableName indexColumnNames?
       (MATCH matchType=(FULL | PARTIAL | SIMPLE))?
       referenceAction?
     ;
