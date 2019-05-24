@@ -342,58 +342,49 @@ booleanLiteral
   | 'false'
   ;
 
-//stringLiteral: (MultilineString | SingleLineString)+;
-stringLiteral: SingleLineString;
-//stringLiteral: SingleLineString;
+stringLiteral: (MultiLineString | SingleLineString)+;
+
 SingleLineString
-  : '"' (~[\\"] | '\\\\' | ESCAPE_SEQUENCE | '\\"')* '"'
-  | '\'' (~[\\'] | '\\\\' | ESCAPE_SEQUENCE | '\\\'')* '\''
-//  | 'r\'' (~('\'' | NEWLINE))* '\'' // TODO
-//  | 'r"' (~('\'' | NEWLINE))* '"'
+  : '"' StringContentDQ* '"'
+  | '\'' StringContentSQ* '\''
+  | 'r\'' (~('\'' | '\n' | '\r'))* '\''
+  | 'r"' (~('"' | '\n' | '\r'))* '"'
   ;
 
-//MultilineString
-//  : '"""' StringContentTDQ* '"""'
-//  | '\'\'\'' StringContentTDQ* '\'\'\''
-//  | 'r"""' (~'"""')* '"""' // TODO
-//  | 'r\'\'\'' (~'\'\'\'')* '\'\'\''
-//  ;
-//StringContentSQ: .;// TODO
-//StringContentTDQ: .;// TODO
 fragment
-ESCAPE_SEQUENCE
-  : '\\n'
-  | '\\r'
-  | '\\f'
-  | '\\b'
-  | '\\t'
-  | '\\v'
-  | '\\x' HEX_DIGIT HEX_DIGIT
-  | '\\u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-  | '\\u{' HEX_DIGIT_SEQUENCE '}'
-  | '\\$'
+StringContentDQ
+  : ~('\\' | '"' /*| '$'*/ | '\n' | '\r')
+  | '\\' ~('\n' | '\r')
+  //| stringInterpolation
   ;
+
 fragment
-HEX_DIGIT_SEQUENCE
-  : HEX_DIGIT HEX_DIGIT? HEX_DIGIT?
-    HEX_DIGIT? HEX_DIGIT? HEX_DIGIT?
+StringContentSQ
+  : ~('\\' | '\'' /*| '$'*/ | '\n' | '\r')
+  | '\\' ~('\n' | '\r')
+  //| stringInterpolation
   ;
-/*TODO
-<stringContentDQ> ::= \~{}( `\\' | `"' | `$' | <NEWLINE> )
-  \alt `\\' \~{}( <NEWLINE> )
-  \alt <stringInterpolation>
 
-<stringContentSQ> ::= \~{}( `\\' | `\'' | `$' | <NEWLINE> )
-  \alt `\\' \~{}( <NEWLINE> )
-  \alt <stringInterpolation>
-<stringContentTDQ> ::= \~{}( `\\' | `"""' | `$')
-  \alt `\\' \~{}( <NEWLINE> )
-  \alt <stringInterpolation>
+MultiLineString
+  : '"""' StringContentTDQ* '"""'
+  | '\'\'\'' StringContentTSQ* '\'\'\''
+  | 'r"""' (~'"' | '"' ~'"' | '""' ~'"')* '"""'
+  | 'r\'\'\'' (~'\'' | '\'' ~'\'' | '\'\'' ~'\'')* '\'\'\''
+  ;
 
-<stringContentTSQ> ::= \~{}( `\\' | `\'\'\'' | `$')
-  \alt `\\' \~{}( <NEWLINE> )
-  \alt <stringInterpolation>
-*/
+fragment
+StringContentTDQ
+  : ~('\\' | '"' /*| '$'*/)
+  | '"' ~'"' | '""' ~'"'
+  //| stringInterpolation
+  ;
+
+fragment StringContentTSQ
+  : ~('\\' | '\'' /*| '$'*/)
+  | '\'' ~'\'' | '\'\'' ~'\''
+  //| stringInterpolation
+  ;
+
 NEWLINE
   : '\n'
   | '\r'
