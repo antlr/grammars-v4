@@ -140,6 +140,7 @@
 				<!-- <module>javascript</module> TODO: required superClass support -->
 				<module>jpa</module>
 				<module>json</module>
+				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kotlin-formal</module>
 				<module>kuka</module>
