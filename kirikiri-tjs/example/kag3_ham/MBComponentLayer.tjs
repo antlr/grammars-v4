@@ -1,0 +1,101 @@
+/******************************************************************************
+	system_mb/ui/MBComponentLayer.tjs
+*******************************************************************************/
+
+
+class MBComponentLayer extends GraphicLayer
+{
+	var isNewLayer = false;
+	
+	function MBComponentLayer(win, par)
+	{
+		// コンストラクタ
+		
+		super.GraphicLayer(win, par);
+		
+		name = "コンポーネントレイヤー";
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onKeyDown(key, shift)
+	{
+		SystemManager.fcSetKBOperationState(true);
+		super.onKeyDown(...);
+	}
+	
+	function onMouseDown(x, y, key, shift)
+	{
+		SystemManager.fcSetKBOperationState(false);
+		super.onMouseDown(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseMove(x, y, shift)
+	{
+		super.onMouseMove(...);
+		isNewLayer = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onEscapeKeyDown() {
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onRightClickedOnChild() {}
+	
+	//--------------------------------------------------------------------------
+	
+	function assignComp()
+	{
+		super.assignComp();
+		assignVisibleState(comp);
+	}
+	
+	
+	//==========================================================================
+	
+	function loadImages(elm)
+	{
+		// loadImages オーバーライド
+		
+		// super.loadImages(elm);
+		try {
+			global.GraphicLayer.loadImages(elm);
+		}
+		catch(e) {
+			var filename = elm.storage.substring(elm.storage.indexOf('>') + 1);
+			
+			if(isPrimary) {
+				elm.mode = "rect"; // レイヤモードを変えられると困るので
+				elm.visible = true;
+			}
+			
+			else if (filename.indexOf('bgimage/') == 0) {
+				filename = sysfunc.getPathBGImage(filename.substring(8));
+			}
+			else if (filename.indexOf('fgimage/') == 0) {
+				filename = sysfunc.getPathCharImage(filename.substring(8));
+			}
+			else if (filename.indexOf('image/') == 0) {
+				filename = sysfunc.getPathImage(filename.substring(6));
+			}
+			
+			//dm(filename);
+			elm.storage = filename;
+			global.GraphicLayer.loadImages(elm);
+			
+			dm("<MBSystem> ゲームフォルダのパスが変更になったため、画像読込パスを再設定しました。");
+		}
+	}
+}

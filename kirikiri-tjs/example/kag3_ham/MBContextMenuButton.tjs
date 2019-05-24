@@ -1,0 +1,32 @@
+/******************************************************************************
+	system_mb/mb/system/cmenu/MBContextMenuButton.tjs
+*******************************************************************************/
+
+
+class MBContextMenuButton extends MBButton
+{
+	var owner;
+	
+	
+	function MBContextMenuButton(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBButton(win, par);
+		
+		owner = parent;
+	}
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		// マウスが押された
+		
+		if (button == mbRight)
+		{
+			owner.close();
+			return;
+		}
+		
+		super.onMouseDown(...);
+	}
+}

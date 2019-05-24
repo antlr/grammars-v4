@@ -1,0 +1,191 @@
+//
+// $Id: ScrollSample.tjs,v 1.3 2007/09/10 08:37:00 m2 Exp $
+//
+
+
+/*----------------------------------------------------------------------
+ * バーチャルスクロール
+ ----------------------------------------------------------------------*/
+class KVirtualImage extends KVirtualWidget
+{
+  // ソースイメージを保持するレイヤ
+  var imageLayer;
+
+  // コンストラクタ
+  function KVirtualImage(win, filename, name) {
+    super.KVirtualWidget(win, name);
+    // ソースイメージを読み込み
+    imageLayer = new global.Layer(win, this);
+    imageLayer.loadImages(filename);
+    imageLayer.setSizeToImageSize();
+    // ソースの3×3サイズを仮想キャンバスに設定
+    setFixedSize(imageLayer.width * 3, imageLayer.height * 3);
+  }
+
+  function finalize {
+    discard(imageLayer);
+    super.finalize(...);
+  }
+
+  // 再描画
+  function onDraw(vleft, vtop, vwidth, vheight) {
+    var srcRect = new KRect(vleft, vtop, vwidth, vheight);
+    // ソースから3×3回、イメージをコピー
+    for (var x = 0; x < 3; x++)
+      for (var y = 0; y < 3; y++) {
+        // 描画対象領域を決定
+        var dstRect = new KRect(x * imageLayer.width, y * imageLayer.height, imageLayer.width, imageLayer.height);
+        // 再描画領域との交差を求める
+        dstRect.intersectWith(srcRect);
+        // 交差があれば実際に描画を行う
+        if (dstRect.isValid) {
+          // 再描画
+          copyRect(dstRect.left, dstRect.top,
+                   imageLayer,
+                   dstRect.left % imageLayer.width, dstRect.top % imageLayer.height, dstRect.width, dstRect.height);
+        }
+      }
+  }
+}
+
+/*----------------------------------------------------------------------
+ * スクロールサンプル
+ ----------------------------------------------------------------------*/
+class ScrollSample extends KWindow
+{
+  function ScrollSample {
+    super.KWindow("scrollsample");
+
+    // ウィンドウ初期設定
+    caption = 'スクロールサンプル';
+    imeMode = imDontCare;
+
+    // アライメントを初期設定
+    defaultAlignHorizontal = ALIGN_LEFT;
+    defaultAlignVertical = ALIGN_TOP;
+
+    // ウィジェットを作成、配置
+    var hspliter, vspliter, abs, scroll, frame, rel;
+
+    // 横方向のスプリッタ
+    hspliter = new KHorizontalSpliterLayout(this, "hspliter");
+    hspliter.splitAlignment = ALIGN_LEFT;
+
+    // 縦方向のスプリッタ
+    vspliter = new KVerticalSpliterLayout(this, "vspliter");
+    hspliter.add(vspliter);
+
+    // スプリッタにスクロールバーつきイメージラベルを詰め込み
+      frame = new KFrameLayout(this, FRAME_SUNKEN);
+        scroll = new KScrollLayout(this);
+        scroll.add(new KImageLabel(this, "cg02"));
+      frame.add(scroll);
+    vspliter.add(frame);
+
+       frame = new KFrameLayout(this, FRAME_SUNKEN);
+         scroll = new KScrollLayout(this);
+           rel = new KRelativeLayout(this);
+           rel.add(new KVirtualImage(this, "cg03"));
+           rel.add(new KVirtualImage(this, "cg06"));
+         scroll.add(rel);
+       frame.add(scroll);
+    vspliter.add(frame);
+
+    // ガンマ補正の走査対象になるイメージを「image」の名前で詰め込み
+    abs = new KAbsoluteLayout(this);
+      scroll = new KScrollLayout(this);
+      scroll.add(new KImageLabel(this, "cg01", "image"));
+    abs.add(scroll);
+
+    // RGBグリッド
+    var rgbGrid = new KGridLayout(this);
+    rgbGrid.marginLeft = 20;
+    rgbGrid.marginTop = 20;
+    rgbGrid.space = 5;
+    rgbGrid.type = ltOpaque;
+    rgbGrid.neutralColor = WIN_BG;
+    rgbGrid.fillRect(0, 0, rgbGrid.width, rgbGrid.height, WIN_BG);
+
+    defaultAlignHorizontal = ALIGN_CENTER;
+    defaultAlignVertical = ALIGN_CENTER;
+
+    rgbGrid.add(0, 0, new KTextLabel(this, "R"));
+    rgbGrid.add(1, 0, new KTextInputSlider(this, 0, 20, 0, 90, 1, "r"));
+    rgbGrid.add(0, 1, new KTextLabel(this, "G"));
+    rgbGrid.add(1, 1, new KTextInputSlider(this, 0, 20, 0, 90, 1, "g"));
+    rgbGrid.add(0, 2, new KTextLabel(this, "B"));
+    rgbGrid.add(1, 2, new KTextInputSlider(this, 0, 20, 0, 90, 1, "b"));
+    
+    abs.add(rgbGrid);
+    frame = new KFrameLayout(this, FRAME_SUNKEN);
+    frame.add(abs);
+    hspliter.add(frame);
+
+    var grid = new KGridLayout(this);
+    grid.add(0, 0, hspliter);
+    var resizeHandle = new KWindowResizeHandle(this);
+    resizeHandle.alignHorizontal = ALIGN_RIGHT;
+    resizeHandle.setFixedSize(20, 20);
+    grid.add(0, 1, resizeHandle);
+
+    primaryWidget.add(grid);
+
+    // 初期値設定
+    image.alignVertical = ALIGN_CENTER;
+    image.alignHorizontal = ALIGN_CENTER;
+    r.value = 10;
+    g.value = 10;
+    b.value = 10;
+
+    // 永続化辞書の作成
+    var dict = new KPersistentDictionary(System.dataPath + "scrollsample_dict.txt");
+    add(dict);
+    bindPersistentDictionary(dict);
+
+    // カラーの初期化
+    invalidateColor();
+
+    // 表示
+    visible = true;
+  }
+
+  // ウィジェットの値が更新された時に呼ばれるフック関数
+  function onChildValueModified(child, value) {
+    switch (child.name) {
+    default:
+      Debug.message("child value modified", child.name, value);
+      break;
+    case "r":
+    case "g":
+    case "b":
+      invalidateColor();
+      break;
+    }
+  }
+
+  // 画像のガンマを更新する
+  function invalidateColor {
+    // 画像再読み込み
+    image.label = "cg01";
+    // ガンマ補正
+    image.adjustGamma(r.value / 10, 0, 255,
+		      g.value / 10, 0, 255,
+		      b.value / 10, 0, 255);
+  }
+}
+
+//----------------------------------------------------------------------
+// サンプル表示・非表示の切り替え
+global.scrollSample = void;
+
+function showScrollSample
+{
+  if (scrollSample === void)
+    scrollSample = new ScrollSample();
+  scrollSample.visible = true;
+}
+
+function hideScrollSample
+{
+  scrollSample.visible = false;
+}

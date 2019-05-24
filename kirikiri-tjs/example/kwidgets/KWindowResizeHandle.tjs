@@ -1,0 +1,83 @@
+//
+// $Id: KWindowResizeHandle.tjs,v 1.3 2007/09/04 10:29:44 m2 Exp $
+//
+
+
+/*----------------------------------------------------------------------
+ * ウィンドウリサイズハンドル
+ ----------------------------------------------------------------------*/
+class KWindowResizeHandle extends KWidget
+{
+  var baseX, baseY, baseW, baseH;
+  var dragging;
+  var label;
+
+  /*------------------------------
+   * コンストラクタ
+   *
+   * このウィジェットをドラッグすると、ウィンドウを
+   * リサイズすることが出来ます。
+   *
+   * デフォルトで alignHorizontal が ALIGN_RIGHTになっている。
+   * 
+   * @param win ウィンドウ
+   * @param w 幅
+   * @param h 高さ
+   * @param name 名前
+   ------------------------------*/
+  function KWindowResizeHandle(win, w, h, name = "") {
+    super.KWidget(win, name);
+
+    // パラメータ設定
+    hitThreshold = 0;
+    cursor = crSizeNWSE;
+    dragging = false;
+    
+    // ラベル作成
+    label = new KImageLabel(win, "k_resize_handle");
+    label.margin = false;
+    label.parent = this;
+
+    // アライメント設定
+    alignHorizontal = ALIGN_RIGHT;
+
+    // サイズ設定
+    setFixedSize(w, h);
+  }
+
+  /*------------------------------
+   * マウス押下でドラッグ開始
+   ------------------------------*/
+  function onMouseDown {
+    dragging = true;
+    baseX = window.primaryLayer.cursorX;
+    baseY = window.primaryLayer.cursorY;
+    baseW = window.width;
+    baseH = window.height;
+  }
+
+  /*------------------------------
+   * マウス移動でドラッグ、リサイズ
+   ------------------------------*/
+  function onMouseMove {
+    if (dragging)
+      window.setSize(baseW + (window.primaryLayer.cursorX - baseX) * window.zoomNumer / window.zoomDenom,
+                     baseH + (window.primaryLayer.cursorY - baseY) * window.zoomNumer / window.zoomDenom);
+  }
+
+  /*------------------------------
+   * マウス離床でドラッグ終了
+   ------------------------------*/
+  function onMouseUp {
+    dragging = false;
+  }
+
+  /*------------------------------
+   * サイズ変更時に再描画
+   ------------------------------*/
+  function onSizeModified {
+    // ラベルを右下に表示
+    label.setPos(width - label.width,
+                 height - label.height);
+  }
+}

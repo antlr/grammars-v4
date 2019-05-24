@@ -1,0 +1,62 @@
+/******************************************************************************
+	system_mb/mb/ui/MBToolManualLayer.tjs
+*******************************************************************************/
+
+
+class MBToolManualLayer extends MBComponentLayer
+{
+	var owner;
+	
+	
+	function MBToolManualLayer(win, par, own)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(win, par);
+		owner = own;
+		
+		name = "マニュアル";
+		
+		hitType = htMask;
+		hitThreshold = 0;	// 全域不透過
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	
+	//==========================================================================
+	
+	function hide()
+	{
+		visible = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		super.onMouseDown(...);
+		
+		if (button == mbLeft) {
+			hide();
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onKeyDown(key, shift)
+	{
+		super.onKeyDown(...);
+		
+		key = SystemManager.convertPadToKey(key);
+		
+		if (key == VK_RETURN || key == VK_SPACE) {
+			hide();
+		}
+	}
+}

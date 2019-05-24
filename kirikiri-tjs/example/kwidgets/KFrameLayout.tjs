@@ -1,0 +1,255 @@
+//
+// $Id: KFrameLayout.tjs,v 1.4 2007/09/11 15:40:56 m2 Exp $
+//
+
+
+/**----------------------------------------------------------------------
+ * フレームレイアウト
+ ----------------------------------------------------------------------*/
+class KFrameLayout extends KWidget
+{
+  var frameLayer;
+  var child;
+  var _type;
+  var _label;
+  var _helpText = "";
+  var _helpWidget;
+  var redrawn;
+
+  /**------------------------------
+   * コンストラクタ
+   * 
+   * @param window ウィンドウ
+   * @param type フレームタイプ。FRAME_FLATTEN, FRAME_SUNKEN, FRAME_RAISEDのいずれかを指定する
+   * @param label ラベル
+   * @param name 名前
+   ------------------------------*/
+  function KFrameLayout(window, type, label = "", name = "") {
+    super.KWidget(window, name);
+    _type = type;
+    _label = label;
+    frameLayer = new global.KWidget(window);
+    frameLayer.parent = this;
+    hasImage = false;
+  }
+
+  /**------------------------------
+   * フレームタイプ
+   *
+   * @param v フレームタイプ
+   * @return フレームタイプ
+   ------------------------------*/ 
+  property type {
+    getter {
+      return _type;
+    }
+    setter(v) {
+      if (_type == v)
+        return;
+      _type = v;
+      invalidateLayout();
+      return v;
+    }
+  }
+
+  /**------------------------------
+   * ラベル
+   * 
+   * @param v ラベル
+   * @return ラベル
+   ------------------------------*/
+  property label {
+    getter {
+      return _label;
+    }
+    setter(v) {
+      if (_label == v)
+        return;
+      _label = v;
+      invalidateLayout();
+      return v;
+    }
+  }
+
+  /**------------------------------
+   * ヘルプテキスト
+   * 
+   * @param v テキスト
+   * @return テキスト
+   ------------------------------*/
+  property helpText {
+    getter {
+      return _helpText;
+    }
+    setter(v) {
+      if (_helpText == v)
+        return;
+      _helpText = v;
+      invalidateLayout();
+      return v;
+    }
+  }
+
+  property helpWidget {
+    getter {
+      if (_helpWidget === void) {
+        _helpWidget = new global.KWidget(window);
+        _helpWidget.parent = this;
+        _helpWidget.loadImages("k_help");
+        _helpWidget.setFixedSizeToImageSize();
+      }
+      return _helpWidget;
+    }
+  };
+  
+  /**------------------------------
+   * 子ウィジェットを配置する
+   *
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function add(child) {
+    this.child = child;
+    child.parent = this;
+    invalidateLayout();
+  }
+
+  /**------------------------------
+   * 子ウィジェットを削除する
+   *
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    this.child = void;
+    child.parent = widgetDepot;
+    invalidateLayout();
+    if (doInvalidate)
+      invalidate child;
+  }
+
+  /*------------------------------
+   * 各種フック関数
+   ------------------------------*/
+  function onChildMinMaxSizeModified {
+    invalidateLayout();
+  }
+
+  function onChildMarginModified {
+    invalidateLayout();
+  }
+
+  function onChildAlignModified {
+    invalidateLayout();
+  }
+
+  function onSizeModified {
+    redraw();
+  }
+
+  function onFontHeightModified {
+    frameLayer.fontHeight = fontHeight;
+    invalidateLayout();
+  }
+
+  function onFontFaceModified {
+    frameLayer.fontFace = fontFace;
+    invalidateLayout();
+  }
+
+  function onFontColorModified {
+    frameLayer.fontColo = fontColor;
+    redraw();
+  }
+
+  function onNodeEnabled {
+    frameLayer.opacity = 255;
+  }
+
+  function onNodeDisabled {
+    frameLayer.opacity = 64;
+  }
+
+  /*------------------------------
+   * レイアウトやり直し
+   ------------------------------*/
+  function invalidateLayout {
+    var minW, minH, maxW, maxH;
+    var labelW, labelH;
+
+    minW = minH = maxW = maxH = 0;
+    labelW = labelH = 0;
+
+    if (child) {
+      minW = child.minWidth + child.marginHorizontal;
+      minH = child.minHeight + child.marginVertical;
+      maxW = child.maxWidth + child.marginHorizontal;
+      maxH = child.maxHeight + child.marginVertical;
+    }
+
+    minW += 4;
+    minH += 4;
+    maxW += 4;
+    maxH += 4;
+
+    if (label != "") {
+      labelW = fontHeight * 2 + frameLayer.font.getTextWidth(label);
+      labelH = fontHeight;
+      if (helpText != "") 
+        labelW += helpWidget.width;
+    }
+
+    minW = int(Math.max(minW, labelW));
+    maxW = int(Math.max(maxW, labelW));
+    minH += labelH;
+    maxH += labelH;
+
+    redrawn = false;
+    setMinMaxSize(minW, minH, maxW, maxH);
+    if (! redrawn)
+      redraw();
+  }
+
+  /*------------------------------
+   * リドロー
+   ------------------------------*/
+  function redraw {
+    redrawn = true;
+
+    if (! child)
+      return;
+    
+    var labelW, labelH;
+    labelW = labelH = 0;
+    if (label != "") {
+      labelW = frameLayer.font.getTextWidth(label);
+      labelH = fontHeight;
+      if (helpText != "") 
+        labelW += helpWidget.width;
+    }
+
+    var frameTop = int(labelH / 2);
+    frameLayer.setFixedSize(width, height);
+    frameLayer.fillRect(0, 0, width, frameTop, neutralColor);
+    frameLayer.drawFrame(type, 0, frameTop, width, height - frameTop, neutralColor);
+
+    helpWidget.visible = false;
+    if (label != "") {
+      var x;
+      switch (child.alignHorizontal) {
+      case ALIGN_LEFT: x = fontHeight; break;
+      case ALIGN_CENTER: x = int((width - labelW) / 2); break;
+      case ALIGN_RIGHT: x = width - labelW - fontHeight; break;
+      }
+      frameLayer.fillRect(x, 0, labelW, fontHeight, neutralColor);
+      frameLayer.drawText(x, 0, label, fontColor);
+      if (helpText != "") {
+        helpWidget.visible = true;
+        helpWidget.setPos(x + labelW - helpWidget.width, fontHeight / 2 - helpWidget.height / 2);
+        helpWidget.hint = helpText;
+      }
+    } 
+
+    child.setSize(width - 4 - child.marginHorizontal, height - labelH - 4 - child.marginVertical);
+    locateChild(2, labelH + 2, width - 4, height - labelH - 4, child);
+  }
+}

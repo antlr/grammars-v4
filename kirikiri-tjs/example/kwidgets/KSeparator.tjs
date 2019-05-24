@@ -1,0 +1,50 @@
+//
+// $Id$
+//
+
+
+/**----------------------------------------------------------------------
+ * 垂直方向セパレーター(横長に伸びる分割線)
+ ----------------------------------------------------------------------*/
+class KVerticalSeparator extends KWidget
+{
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @window ウィンドウ
+   * @name 名前
+   ------------------------------*/
+  function KVerticalSeparator(window, name = "") {
+    super.KWidget(window, name);
+    this.setMinMaxSize(2, 2, 10000, 2);
+  }
+
+  // サイズが変わったら再描画
+  function onSizeModified {
+    fillRect(0, 0, width, 1, WIN_DARKEN1);
+    fillRect(0, 1, width, 1, WIN_LIGHTEN2);
+  }
+}
+
+/**----------------------------------------------------------------------
+ * 水平方向セパレーター(縦長に伸びる分割線)
+ ----------------------------------------------------------------------*/
+class KHorizontalSeparator extends KWidget
+{
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @window ウィンドウ
+   * @name 名前
+   ------------------------------*/
+  function KHorizontalSeparator(window, name = "") {
+    super.KWidget(window, name);
+    this.setMinMaxSize(2, 2, 2, 10000);
+  }
+
+  // サイズが変わったら再描画
+  function onSizeModified {
+    fillRect(0, 0, 1, height, WIN_DARKEN1);
+    fillRect(1, 0, 1, height, WIN_LIGHTEN2);
+  }
+}

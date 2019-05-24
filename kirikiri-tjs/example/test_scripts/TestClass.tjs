@@ -1,0 +1,44 @@
+class Test {
+  
+  var tests = [];
+  var name;
+  
+  function Test(name) {
+    this.name = name;
+  }
+  
+  function puts(str) {
+    Debug.message(str);
+  }
+  
+  function assert_equal(v, expected, str='') {
+    if (v === expected) return true;
+    var ex = expected;
+    if (ex === void) ex = 'void';
+    else if (ex === null) ex = 'null';
+    if (v === void) v = 'void';
+    else if (v === null) v = 'null';
+    str = str.length ? @'${str}: ' : '';
+    throw new Exception(@'${str}${ex} is expected, but ${v}');
+  }
+  
+  function setup() { }
+  
+  function teardown() { }
+  
+  function run() {
+    puts(@'@@@ TEST ${name} ==============================');
+    setup();
+    for (var i = 0; i < tests.count; ++i) {
+      var test = tests[i];
+      try {
+        this[test]();
+        puts(@'\033[32m  ${test}: success\033[0m');
+      } catch (e) {
+        puts(@'\033[31m  ${test}: ${e.message}\033[0m');
+      }
+    }
+    teardown();
+    puts(@'$$$ TEST ${name} ==============================');
+  }
+}

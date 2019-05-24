@@ -1,0 +1,31 @@
+Debug.message("start tests. - in operator");
+
+var dic = %["a"=>1, "b"=>2, "cde"=>3, "fgh"=>4];
+if( "a" in dic ) {
+	Debug.message("success");
+} else {
+	Debug.message("failed");
+}
+
+var cde = 0;
+cde = dic.cde if "cde" in dic;
+if( cde == 3 ) {
+	Debug.message("success");
+} else {
+	Debug.message("failed");
+}
+
+var a = "fgh" in dic;
+if( a ) {
+	Debug.message("success");
+} else {
+	Debug.message("failed");
+}
+
+var b = "ijk" in dic;
+if( b ) {
+	Debug.message("failed");
+} else {
+	Debug.message("success");
+}
+

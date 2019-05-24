@@ -1,0 +1,61 @@
+/******************************************************************************
+	modules/system/MBControlPanelContainer.tjs
+	
+	KAGから環境設定を呼ぶ場合のコンテナオブジェクト
+*******************************************************************************/
+
+class MBControlPanelContainer extends MBComponentLayer
+{
+	var isNewLayer = false;
+	var finishTrigger = "end_config_from_kag";
+	var objWorker;
+	
+	
+	function MBControlPanelContainer(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(win, par);
+		
+		width        = window.fore.base.width;
+		height       = window.fore.base.height;
+		absolute     = MBLayerAbs.backpack;	// セーブ・ロードと同階層
+		hitType      = htMask;
+		hitThreshold = 255;
+		visible      = true;
+		name         = "環境設定コンテナ";
+		
+		init();
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate objWorker if (objWorker !== void);
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function init()
+	{
+		// 初期化
+		
+		objWorker = new MBControllPanel(window, parent, this);
+		objWorker.setControllPanel();
+		objWorker.show();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onControllPanelHasGone()
+	{
+		// 終了処理
+		
+		invalidate objWorker if (objWorker !== void);
+		SystemManager.acDisactivateCanceller();
+		window.trigger(finishTrigger);
+	}
+}
