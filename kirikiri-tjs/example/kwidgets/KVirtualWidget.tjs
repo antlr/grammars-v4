@@ -1,0 +1,1025 @@
+//
+// $Id$
+//
+
+
+/*----------------------------------------------------------------------
+ * 仮想ウィジェット
+ ----------------------------------------------------------------------*/
+class KVirtualWidget extends KWidget
+{
+  var _site;
+  var _virtualBufLayer;
+  var _avoidSiteUpdateDrawing;
+  var _canvas;
+  var _clip = void;
+  var _canvasClip = void;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * 仮想ウィジェットを作成します。
+   *
+   * 仮想ウィジェットは 、スクロール中に実際に画面に表示される
+   * 領域のみをキャンパスとして保持する仮想レイヤーオブジェクトです。
+   * 非常に広い領域のキャンパスを、レイヤの
+   * サイズを気にせずに確保することが出来ます。
+   *
+   * 仮想ウィジェット本体は hasImage = false のレイヤホルダとして宣言されています。
+   *
+   * 画像の描画はキャンパス上に行う関係で、キャンパス上の画像の
+   * α値に関わらずマウスイベントは「常に受け取る」設定となっています。
+   *
+   * @param win ウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KVirtualWidget(win, name) {
+    super.KWidget(win, name);
+    _avoidSiteUpdateDrawing = false;
+    _site = new KRect(0, 0, 0, 0);
+    hasImage = false;
+    hitThreshold = 0;
+    _canvas = new global.KWidget(win);
+    _canvas.parent = this;
+    _canvas.visible = true;
+    _canvas.hitThreshold = 256;
+    _virtualBufLayer = new global.Layer(win, this);
+  };
+
+  /*------------------------------
+   * デストラクタ
+   ------------------------------*/
+  function finalize {
+    super.finalize(...);
+  }
+
+  /**------------------------------
+   * サイトの更新時の再描画を行うか？
+   *
+   * @param v サイトの更新時の再描画を行うか？
+   * @return サイトの更新時の再描画を行うか？
+   ------------------------------*/
+  property avoidSiteUpdateDrawing { 
+    getter {
+      return _avoidSiteUpdateDrawing;
+    }
+    setter(v) {
+      _avoidSiteUpdateDrawing = v;
+    }
+  }
+
+  /**------------------------------
+   * キャンパスレイヤ
+   *
+   * @return キャンパスレイヤ自身
+   ------------------------------*/
+  property canvas {
+    getter {
+      return _canvas;
+    }
+  }
+
+  function setClip(left, top, width, height) {
+    if (left === void) 
+      _clip = void;
+    else
+      _clip = new KRect(left, top, width, height);
+    updateClip();
+  }
+
+  function setCanvasClip(left, top, width, height) {
+    if (left === void) 
+      _canvasClip = void;
+    else
+      _canvasClip = new KRect(left, top, width, height);
+    updateClip();
+  }
+
+  function updateClip() {
+    var clip = void;
+    if (_clip !== void && _canvasClip !== void) {
+      clip = _clip.dup();
+      clip.intersectWith(_canvasClip);
+    } else if (_clip !== void) {
+      clip = _clip.dup();
+    } else if (_canvasClip !== void) {
+      clip = _canvasClip.dup();
+    }
+    if (clip === void) {
+      _canvas.setClip();
+      return;
+    }
+    
+    clip.left -= _site.left;
+    clip.top -= _site.top;
+    clip.right -= _site.left;
+    clip.bottom -= _site.top;
+    clip.intersectWith(new KRect(0, 0, _canvas.width, _canvas.height));
+    if (! clip.isValid) 
+      _canvas.setClip(0, 0, 0, 0);
+    else
+      _canvas.setClip(clip.left, clip.top, clip.width, clip.height);
+  }
+
+  /**------------------------------
+   * 描画要求
+   *
+   * スクロール領域の大きさが変更される、画面がスクロールするなどの
+   * 理由で画面の再描画が必要になった時に呼ばれるコールバック関数です。
+   *
+   * 派生クラスで実装し、指定された矩形内の要素の再描画を行って下さい。
+   * 矩形は仮想座標系で表現されているので、 virtual のプレフィクスを持つ
+   * 仮想座標系描画関数を使って描画処理を行うことを推奨します。
+   *
+   * この関数が呼び出される時点で、矩形の領域はクリッピングされているので
+   * 領域外へはみ出すような描画命令を発行しても問題ありません。
+   *
+   * @param vleft 左端座標(仮想座標系)
+   * @param vtop 上端座標(仮想座標系)
+   * @param vwidth 幅(仮想座標系)
+   * @param vheight 高さ((仮想座標系)
+   ------------------------------*/
+  function onDraw(vleft, vtop, vwidth, vheight) {
+  }
+
+  /**------------------------------
+   * 強制描画
+   *
+   * スクロールにより自動的に発生する描画要求とは別に、
+   * 強制的に指定した領域への描画処理を発行します。
+   *
+   * @param vleft 左端座標(仮想座標系)
+   * @param vtop 上端座標(仮想座標系)
+   * @param vwidth 幅(仮想座標系)
+   * @param vheight 高さ((仮想座標系)
+   ------------------------------*/
+  function redrawRect(vleft, vtop, vwidth, vheight) {
+    var rect = new KRect(vleft, vtop, vwidth, vheight);
+    rect.intersectWith(_site);
+    if (rect.isValid) {
+      setCanvasClip(rect.left, rect.top, rect.width, rect.height);
+      onDraw(rect.left, rect.top,
+             rect.width, rect.height);
+      setCanvasClip();
+    }
+  }
+
+  /**------------------------------
+   * 強制描画
+   *
+   * スクロールにより自動的に発生する描画要求とは別に、
+   * 強制的に全画面(現在の視界)への描画処理を発行します。
+   ------------------------------*/
+  function redrawAll {
+    redrawRect(_site.left, _site.top, _site.width, _site.height);
+  }
+
+  /**------------------------------
+   * 視界(画面上に表示されている範囲)の左端
+   *
+   * @return 左端
+   ------------------------------*/
+  property siteLeft {
+    getter {
+      return _site.left;
+    }
+  }
+
+  /**------------------------------
+   * 視界(画面上に表示されている範囲)の上端
+   *
+   * @return 上端
+   ------------------------------*/
+  property siteTop {
+    getter {
+      return _site.top;
+    }
+  }
+
+  /**------------------------------
+   * 視界(画面上に表示されている範囲)の幅
+   *
+   * @return 幅
+   ------------------------------*/
+  property siteWidth {
+    getter {
+      return _site.width;
+    }
+  }
+
+  /**------------------------------
+   * 視界(画面上に表示されている範囲)の高さ
+   *
+   * @return 高さ
+   ------------------------------*/
+  property siteHeight {
+    getter {
+      return _site.height;
+    }
+  }
+
+  /*----------------------------------------------------------------------
+   * レイヤ描画関数
+   ----------------------------------------------------------------------*/
+  property font {
+    getter {
+      if (hasImage)
+        return super.font;
+      else
+        return _canvas.font;
+    }
+  }
+
+  /**------------------------------
+   * 矩形重ね合わせ
+   *
+   * @param left 　塗りつぶす矩形の左端位置を ( 画像位置における ) ピクセル単位で指定します。
+   * @param top 　塗りつぶす矩形の上端位置を ( 画像位置における ) ピクセル単位で指定します。
+   * @param width 　塗りつぶす矩形の横幅を ( 画像位置における ) ピクセル単位で指定します。
+   * @param height 　塗りつぶす矩形の縦幅を ( 画像位置における ) ピクセル単位で指定します。
+   * @param value 　塗りつぶす色や値を指定します。
+   * @param opa 　塗りつぶす不透明度 ( -255 〜 0 〜 255 ) を指定します。
+   ------------------------------*/
+  function colorRect(left, top, width, height, value, opa=255) {
+    _canvas.colorRect(left - _site.left, top - _site.top, width, height, value, opa);
+  }
+
+  /**------------------------------
+   * 矩形コピー
+   *
+   * @param left コピー先の矩形の左端位置を ( コピー先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param top コピー先の矩形の上端位置を ( コピー先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param src 　コピー元のレイヤオブジェクトを指定します。
+   * @param sleft 　コピーする矩形の左端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param stop 　コピーする矩形の上端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param swidth 　コピーする矩形の横幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param sheight 　コピーする矩形の縦幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   ------------------------------*/
+  function copyRect(left, top, src, sleft, stop, swidth, sheight) {
+     _canvas.copyRect(left - _site.left, top - _site.top, src, sleft, stop, swidth, sheight);
+  }
+
+  /**------------------------------
+   * 矩形ブレンド
+   *
+   * @param left 重ね合わせ先の矩形の左端位置を ( コピー先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param top 重ね合わせ先の矩形の上端位置を ( コピー先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param src 　重ね合わせ元のレイヤオブジェクトを指定します。
+   * @param sleft 　重ね合わせする矩形の左端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param stop 　重ね合わせする矩形の上端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param swidth 　重ね合わせする矩形の横幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param sheight 　重ね合わせする矩形の縦幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param opa 　重ね合わせの不透明度 ( 0 〜 255 ) を指定します。
+   ------------------------------*/
+  function blendRect(left, top, src, sleft, stop, swidth, sheight, opa = 255) {
+    _canvas.blendRect(left - _site.left, top - _site.top, src, sleft, stop, swidth, sheight, opa);
+  }
+
+  /**------------------------------
+   * 文字描画
+   *
+   * @param x 　文字描画を開始する原点の ( 画像位置における ) x 座標をピクセル単位で、仮想座標系において指定します。
+   * @param y 　文字描画を開始する原点の ( 画像位置における ) y 座標をピクセル単位で、仮想座標系において指定します。
+   * @param text 　描画する文字を指定します。
+   * @param color 　描画する文字の色を 0xRRGGBB 形式で指定します。
+   * @param opa 　描画する文字の不透明度 ( -255 〜 0 〜 255 ) を指定します。
+   * @param aa 　アンチエイリアスを行うかどうかを指定します。
+   * @param shadowlevel 　影の不透明度を指定します。shadowwidth 引数の値によって適切な値は変動します。
+   * @param shadowcolor 　影の色を 0xRRGGBB 形式で指定します。
+   * @param shadowwidth 　影の幅 ( ぼけ ) を指定します。 0 がもっともシャープ ( ぼけない ) で、値を大きく すると影をぼかすことができます。
+   * @param shadowofsx 　影の位置の x 座標の値をピクセル単位で指定します。 0 を指定すると影は真下に描画されます。
+   * @param shadowofsy 　影の位置の y 座標の値をピクセル単位で指定します。 0 を指定すると影は真下に描画されます。
+   ------------------------------*/
+  function drawText(x, y, text, color, opa=255, aa=true, shadowlevel=0, shadowcolor=0x000000, shadowwidth=0, shadowofsx=0, shadowofsy=0) {
+     _canvas.drawText(x - _site.left, y - _site.top, text, color, opa, aa, shadowlevel, shadowcolor, shadowwidth, shadowofsx, shadowofsy);
+  }
+
+  /**------------------------------
+   * 矩形塗りつぶし
+   *
+   * @param left 　塗りつぶす矩形の左端位置を ( 画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param top 　塗りつぶす矩形の上端位置を ( 画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param width 　塗りつぶす矩形の横幅を ( 画像位置における ) ピクセル単位で指定します。
+   * @param height 　塗りつぶす矩形の縦幅を ( 画像位置における ) ピクセル単位で指定します。
+   * @param value 　塗りつぶす色や値を指定します。 
+   ------------------------------*/
+  function fillRect(left, top, width, height, value) {
+     _canvas.fillRect(left - _site.left, top - _site.top, width, height, value);
+  }
+
+  function fillGradientRectLR(left, top, width, height, value1, value2) {
+    _canvas.fillGradientRectLR(left - _site.left, top - _site.top, width, height, value1, value2);
+  }
+
+  function fillGradientRectUD(left, top, width, height, value1, value2) {
+    _canvas.fillGradientRectUD(left - _site.left, top - _site.top, width, height, value1, value2);
+  }
+
+  function colorGradientRectLR(left, top, width, height, value1, value2) {
+    _canvas.colorGradientRectLR(left - _site.left, top - _site.top, width, height, value1, value2);
+  }
+
+  function colorGradientRectUD(left, top, width, height, value1, value2) {
+    _canvas.colorGradientRectUD(left - _site.left, top - _site.top, width, height, value1, value2);
+  }
+
+  /**------------------------------
+   * 矩形演算合成 
+   *
+   * @param vleft 　left 　演算先の矩形の左端位置を ( 演算先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param vleft 　top 　演算先の矩形の上端位置を ( 演算先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param vleft 　src 　演算元のレイヤオブジェクトを指定します。
+   * @param vleft 　sleft 　演算する矩形の左端位置を ( 演算元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param vleft 　stop 　演算する矩形の上端位置を ( 演算元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param vleft 　swidth 　演算する矩形の横幅を ( 演算元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param vleft 　sheight 　演算する矩形の縦幅を ( 演算元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param vleft 　mode 　演算のモードを指定します。
+   * @param vleft 　opa 　演算の強度 ( 0 〜 255 ) を指定します。 
+   ------------------------------*/
+  function operateRect(left, top, src, sleft, stop, swidth, sheight, mode=omAuto, opa=255) {
+     _canvas.operateRect(left - _site.left, top - _site.top, src, sleft, stop, swidth, sheight, mode, opa);
+  }
+
+  /**------------------------------
+   * 拡大縮小演算合成 
+   *
+   * @param left 　重ね合わせ先の矩形の左端位置を ( 重ね合わせ先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param top 　重ね合わせ先の矩形の上端位置を ( 重ね合わせ先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param width 　重ね合わせ先の矩形の横幅を ( 重ね合わせ先レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param height 　重ね合わせ先の矩形の縦幅を ( 重ね合わせ先レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param src 　重ね合わせ元のレイヤオブジェクトを指定します。
+   * @param sleft 　重ね合わせる矩形の左端位置を ( 重ね合わせ元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param stop 　重ね合わせる矩形の上端位置を ( 重ね合わせ元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param swidth 　重ね合わせる矩形の横幅を ( 重ね合わせ元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param sheight 　重ね合わせる矩形の縦幅を ( 重ね合わせ元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param mode 　演算のモードを指定します。
+   * @param opa 　演算の強度 ( 0 〜 255 ) を指定します。
+   * @param type 　拡大縮小のタイプを指定します。 
+   ------------------------------*/
+  function operateStretch(left, top, width, height, src, sleft, stop, swidth, sheight, mode=omAuto, opa=255, type=stNearest) {
+     _canvas.operateStretch(left - _site.left, top - _site.top, width, height, src, sleft, stop, swidth, sheight, mode, opa, type);
+  }
+
+  /**------------------------------  
+   * レイヤを重ね合わせた画像をコピー   
+   *
+   * @param left 　コピー先の矩形の左端位置を ( コピー先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param top 　コピー先の矩形の上端位置を ( コピー先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param src 　コピー元のレイヤオブジェクトを指定します。
+   * @param sleft 　コピーする矩形の左端位置を ( コピー元レイヤの表示位置における ) ピクセル単位で指定します。
+   * @param stop 　コピーする矩形の上端位置を ( コピー元レイヤの表示位置における ) ピクセル単位で指定します。
+   * @param swidth 　コピーする矩形の横幅を ( コピー元レイヤの表示位置における ) ピクセル単位で指定します。
+   * @param sheight 　コピーする矩形の縦幅を ( コピー元レイヤの表示位置における ) ピクセル単位で指定します。
+   ------------------------------*/
+  function piledCopy(left, top, src, sleft, stop, swidth, sheight) {
+     _canvas.piledCopy(left - _site.left, top - _site.top, src, sleft, stop, swidth, sheight);
+  }
+
+  /**------------------------------
+   * 拡大縮小コピー 
+   *
+   * @param left 　コピー先の矩形の左端位置を ( コピー先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param top 　コピー先の矩形の上端位置を ( コピー先レイヤの画像位置における ) ピクセル単位で、仮想座標系において指定します。
+   * @param width 　コピー先の矩形の横幅を ( コピー先レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param height 　コピー先の矩形の縦幅を ( コピー先レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param src 　コピー元のレイヤオブジェクトを指定します。
+   * @param sleft 　コピーする矩形の左端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param stop 　コピーする矩形の上端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param swidth 　コピーする矩形の横幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param sheight 　コピーする矩形の縦幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param type 　拡大縮小のタイプを指定します。
+   ------------------------------*/
+  function stretchCopy(left, top, vwidth, vheight, src, sleft, stop, swidth, sheight, type=stNearest) {
+     _canvas.stretchCopy(left - _site.left, top - _site.top, vwidth, vheight, src, sleft, stop, swidth, sheight, type);
+  }
+
+  /**------------------------------
+   * affineコピー
+   * 
+   * @param src 　コピー元のレイヤオブジェクトを指定します。
+   * @param sleft 　コピーする矩形の左端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param stop 　コピーする矩形の上端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param swidth 　コピーする矩形の横幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param sheight 　コピーする矩形の縦幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param affine 続く６つの引数 (A 〜 F パラメータ)をどのように扱うかを指定します。
+   * @param A A パラメータです。affine 引数によって解釈が変わります。
+   * @param B B パラメータです。affine 引数によって解釈が変わります。
+   * @param C C パラメータです。affine 引数によって解釈が変わります。
+   * @param D D パラメータです。affine 引数によって解釈が変わります。
+   * @param E E パラメータです。affine 引数によって解釈が変わります。
+   * @param F F パラメータです。affine 引数によって解釈が変わります。
+   * @param type アフィン変換のタイプを指定します。
+   * @param clear 転送先レイヤの、アフィン変換された画像の周囲をLayer.neutralColor プロパティで示された色・透明度でクリアするかどうかを指定します.
+   ------------------------------*/
+  function affineCopy(src, sleft, stop, swidth, sheight, affine, A, B, C, D, E, F, type = stNearest, clear = false) {
+    if (affine) {
+      var a, b, c, d, e, f;
+      a = A * -0.5 + C * -0.5 + E;
+      b = B * -0.5 + D * -0.5 + F;
+      c = A * (swidth - 0.5) + C * -0.5 + E;
+      d = B * (swidth - 0.5) + D * -0.5 + F;
+      e = A * -0.5 + C * (sheight - 0.5) + E;
+      f = B * -0.5 + D * (sheight - 0.5) + F;
+      A = a, B = b, C = c, D = d, E = e, F = f;
+    }
+    _canvas.affineCopy(src, sleft, stop, swidth, sheight, false, A - _site.left, B - _site.top, C - _site.left, D - _site.top, E - _site.left, F - _site.top, type, clear);
+  }
+
+  /**------------------------------
+   * アフィン変換演算合成
+   * 
+   * @param src 　コピー元のレイヤオブジェクトを指定します。
+   * @param sleft 　コピーする矩形の左端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param stop 　コピーする矩形の上端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param swidth 　コピーする矩形の横幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param sheight 　コピーする矩形の縦幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param affine 続く６つの引数 (A 〜 F パラメータ)をどのように扱うかを指定します。
+   * @param A A パラメータです。affine 引数によって解釈が変わります。
+   * @param B B パラメータです。affine 引数によって解釈が変わります。
+   * @param C C パラメータです。affine 引数によって解釈が変わります。
+   * @param D D パラメータです。affine 引数によって解釈が変わります。
+   * @param E E パラメータです。affine 引数によって解釈が変わります。
+   * @param F F パラメータです。affine 引数によって解釈が変わります。
+   * @param mode 演算のモードを指定します。
+   * @param opa 重ね合わせの不透明度 ( 0 〜 255 ) を指定します。
+   * @param type アフィン変換のタイプを指定します。
+   ------------------------------*/
+  function operateAffine(src, sleft, stop, swidth, sheight, affine, A, B, C, D, E, F, mode = omAuto, opa = 255, type = stNearest) {
+    if (affine) {
+      var a, b, c, d, e, f;
+      a = A * -0.5 + C * -0.5 + E;
+      b = B * -0.5 + D * -0.5 + F;
+      c = A * (swidth - 0.5) + C * -0.5 + E;
+      d = B * (swidth - 0.5) + D * -0.5 + F;
+      e = A * -0.5 + C * (sheight - 0.5) + E;
+      f = B * -0.5 + D * (sheight - 0.5) + F;
+      A = a, B = b, C = c, D = d, E = e, F = f;
+    }
+    _canvas.operateAffine(src, sleft, stop, swidth, sheight, false, A - _site.left, B - _site.top, C - _site.left, D - _site.top, E - _site.left, F - _site.top, mode, opa, type);
+  }
+
+  /**------------------------------
+   * ベジェパッチコピー
+   * 
+   * @param src 　コピー元のレイヤオブジェクトを指定します。
+   * @param sleft 　コピーする矩形の左端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param stop 　コピーする矩形の上端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param swidth 　コピーする矩形の横幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param sheight 　コピーする矩形の縦幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param bezierPatch ベジェパッチ。16個のコントロールポイントの座標値を、32個の小数値の配列として指定します。
+   * @param divisionX X方向分割数。X方向をいくつのポリゴンに分割するか指定します。1=分割無し。
+   * @param divisionY Y方向分割数。Y方向をいくつのポリゴンに分割するか指定します。1=分割無し。
+   * @param type アフィン変換のタイプを指定します。
+   * @param clear 転送先レイヤの、アフィン変換された画像の周囲をLayer.neutralColor プロパティで示された色・透明度でクリアするかどうかを指定します.
+   */
+  function bezierPatchCopy(src, sleft, stop, swidth, sheight, bezierPatch, divisionX, divisionY, type, clear) {
+    var nbp = BezierPatch.translatePatch(bezierPatch, - _site.left, - _site.top);
+    _canvas.bezierPatchCopy(src, sleft, stop, swidth, sheight, nbp, divisionX, divisionY, type, clear);
+  }
+
+  /**------------------------------
+   * ベジェパッチ合成
+   * 
+   * @param src 　コピー元のレイヤオブジェクトを指定します。
+   * @param sleft 　コピーする矩形の左端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param stop 　コピーする矩形の上端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param swidth 　コピーする矩形の横幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param sheight 　コピーする矩形の縦幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param bezierPatch ベジェパッチ。16個のコントロールポイントの座標値を、32個の小数値の配列として指定します。
+   * @param divisionX X方向分割数。X方向をいくつのポリゴンに分割するか指定します。1=分割無し。
+   * @param divisionY Y方向分割数。Y方向をいくつのポリゴンに分割するか指定します。1=分割無し。
+   * @param mode 演算のモードを指定します。
+   * @param opa 重ね合わせの不透明度 ( 0 〜 255 ) を指定します。
+   * @param type アフィン変換のタイプを指定します。
+   */
+  function operateBezierPatch(src, sleft, stop, swidth, sheight, bezierPatch, divisionX, divisionY, mode, opa, type) {
+    var nbp = BezierPatch.translatePatch(bezierPatch, - _site.left, - _site.top);
+    _canvas.operateBezierPatch(src, sleft, stop, swidth, sheight, nbp, divisionX, divisionY, mode, opa, type);
+  }
+
+  /**------------------------------
+   * メッシュコピー
+   * 
+   * @param src 　コピー元のレイヤオブジェクトを指定します。
+   * @param sleft 　コピーする矩形の左端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param stop 　コピーする矩形の上端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param swidth 　コピーする矩形の横幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param sheight 　コピーする矩形の縦幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param mesh メッシュ。
+   * @param divisionX X方向分割数。X方向をいくつのポリゴンに分割するか指定します。1=分割無し。
+   * @param divisionY Y方向分割数。Y方向をいくつのポリゴンに分割するか指定します。1=分割無し。
+   * @param type アフィン変換のタイプを指定します。
+   * @param clear 転送先レイヤの、アフィン変換された画像の周囲をLayer.neutralColor プロパティで示された色・透明度でクリアするかどうかを指定します.
+   */
+  function meshCopy(src, sleft, stop, swidth, sheight, mesh, divisionX, divisionY, type, clear) {
+    var nbp = BezierPatch.translatePatch(mesh, - _site.left, - _site.top);
+    _canvas.meshCopy(src, sleft, stop, swidth, sheight, nbp, divisionX, divisionY, type, clear);
+  }
+
+  /**------------------------------
+   * メッシュ合成
+   * 
+   * @param src 　コピー元のレイヤオブジェクトを指定します。
+   * @param sleft 　コピーする矩形の左端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param stop 　コピーする矩形の上端位置を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param swidth 　コピーする矩形の横幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param sheight 　コピーする矩形の縦幅を ( コピー元レイヤの画像位置における ) ピクセル単位で指定します。
+   * @param mesh メッシュ。
+   * @param divisionX X方向分割数。X方向をいくつのポリゴンに分割するか指定します。1=分割無し。
+   * @param divisionY Y方向分割数。Y方向をいくつのポリゴンに分割するか指定します。1=分割無し。
+   * @param mode 演算のモードを指定します。
+   * @param opa 重ね合わせの不透明度 ( 0 〜 255 ) を指定します。
+   * @param type アフィン変換のタイプを指定します。
+   */
+  function operateMesh(src, sleft, stop, swidth, sheight, mesh, divisionX, divisionY, mode, opa, type) {
+    var nbp = BezierPatch.translatePatch(mesh, - _site.left, - _site.top);
+    _canvas.operateMesh(src, sleft, stop, swidth, sheight, nbp, divisionX, divisionY, mode, opa, type);
+  }
+
+  /*----------------------------------------------------------------------
+   * layerExDraw描画関数の仮想座標系バージョン
+   ----------------------------------------------------------------------*/
+  /**
+   * 円弧の描画
+   * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+   * @param x 左上座標
+   * @param y 左上座標
+   * @param width 横幅
+   * @param height 縦幅
+   * @param startAngle 時計方向円弧開始位置
+   * @param sweepAngle 描画角度
+   * @return 更新領域情報の辞書 left, top, width, height
+   */
+  function drawArc(app, x, y, width, height, startAngle, sweepAngle) {
+    return _canvas.drawArc(app, x - _site.left, y - _site.top, width, , height, startAngle, sweepAngle);
+  }
+
+  /**
+   * 円錐の描画
+   * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+   * @param x 左上座標
+   * @param y 左上座標
+   * @param width 横幅
+   * @param height 縦幅
+   * @param startAngle 時計方向円弧開始位置
+   * @param sweepAngle 描画角度
+   * @return 更新域情報(RectF)
+   */
+  function drawPie(app, x, y, width, height, startAngle, sweepAngle) {
+    return _canvas.drawPie(app, x - _site.left, y - _site.top, width, height, startAngle, sweepAngle);
+  }
+
+  /**
+   * ベジェ曲線の描画
+   * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+   * @param x1
+   * @param y1
+   * @param x2
+   * @param y2
+   * @param x3
+   * @param y3
+   * @param x4
+   * @param y4
+   * @return 更新域情報(RectF)
+   */
+  function drawBezier(app, x1, y1, x2, y2, x3, y3, x4, y4) {
+    var l = _site.left, t = _site.top;
+    return _canvas.drawBezier(app, x1 - l, y1 - t, x2 - l, y2 - t, x3 - l, y3 - t, x4 - l, y4 - t);
+  }
+
+  /**
+   * 連続ベジェ曲線の描画
+   * @param app アピアランス
+   * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+   * @return 更新域情報(RectF)
+   */
+  function drawBeziers(app, points) {
+    var newPoints = [];
+    for (var i = 0; i < points.count; i++)
+      newPoints.add([ points[i][0] - _site.left, points[i][1] - _site.top ]);
+    return _canvas.drawBeziers(app, newPoints);
+  }
+
+  /**
+   * Closed cardinal spline の描画
+   * @param app アピアランス
+   * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+   * @return 更新域情報(RectF)
+   */
+  function drawClosedCurve(app, points) {
+    var newPoints = [];
+    for (var i = 0; i < points.count; i++)
+      newPoints.add([ points[i][0] - _site.left, points[i][1] - _site.top ]);
+    return _canvas.drawClosedCurve(app, newPoints);
+  }
+
+  /**
+   * Closed cardinal spline の描画
+   * @param app アピアランス
+   * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+   * @param tension テンション
+   * @return 更新域情報(RectF)
+   */
+  function drawClosedCurve2(app, points, tension) {
+    var newPoints = [];
+    for (var i = 0; i < points.count; i++)
+      newPoints.add([ points[i][0] - _site.left, points[i][1] - _site.top ]);
+    return _canvas.drawClosedCurve2(app, newPoints, tension);
+  }
+
+  /**
+   * cardinal spline の描画
+   * @param app アピアランス
+   * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+   * @return 更新域情報(RectF)
+   */
+  function drawCurve(app, points) {
+    var newPoints = [];
+    for (var i = 0; i < points.count; i++)
+      newPoints.add([ points[i][0] - _site.left, points[i][1] - _site.top ]);
+    return _canvas.drawCurve(app, newPoints);
+  }
+
+  /**
+   * cardinal spline の描画
+   * @param app アピアランス
+   * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+   * @param tension テンション
+   * @return 更新域情報(RectF)
+   */
+  function drawCurve2(app, points, tension) {
+    var newPoints = [];
+    for (var i = 0; i < points.count; i++)
+      newPoints.add([ points[i][0] - _site.left, points[i][1] - _site.top ]);
+    return _canvas.drawCurve2(app, newPoints, tension);
+  }
+
+  /**
+   * cardinal spline の描画
+   * @param app アピアランス
+   * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+   * @param offset
+   * @param numberOfSegments
+   * @param tension テンション
+   * @return 更新域情報(RectF)
+   */
+  function drawCurve3(app, points, offset, numberOfSegments, tension) {
+    var newPoints = [];
+    for (var i = 0; i < points.count; i++)
+      newPoints.add([ points[i][0] - _site.left, points[i][1] - _site.top ]);
+    return _canvas.drawCurve3(app, newPoints, offset, numberOfSegments, tension);
+  }
+	
+  /**
+   * 楕円の描画
+   * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   * @return 更新域情報(RectF)
+   */
+  function drawEllipse(app, x, y, width, height) {
+    return _canvas.drawEllipse(app, x - _site.left, y - _site.top, width, height);
+  }
+
+  /**
+   * 線分の描画
+   * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+   * @param x1 始点X座標
+   * @param y1 始点Y座標
+   * @param x2 終点X座標
+   * @param y2 終点Y座標
+   * @return 更新域情報(RectF)
+   */
+  function drawLine(app, x1, y1, x2, y2) {
+    var l = _site.left, t = _site.top;
+    return _canvas.drawLine(app, x1 - l, y1 - t, x2 - l, y2 - t);
+  }
+
+  /**
+   * 連続線分の描画
+   * @param app アピアランス
+   * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+   * @return 更新域情報(RectF)
+   */
+  function drawLines(app, points) {
+    var newPoints = [];
+    for (var i = 0; i < points.count; i++)
+      newPoints.add([ points[i][0] - _site.left, points[i][1] - _site.top ]);
+    return _canvas.drawLines(app, newPoints);
+  }
+
+  /**
+   * 多角形の描画
+   * @param app アピアランス
+   * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+   * @return 更新域情報(RectF)
+   */
+  function drawPolygon(app, points) {
+    var newPoints = [];
+    for (var i = 0; i < points.count; i++)
+      newPoints.add([ points[i][0] - _site.left, points[i][1] - _site.top ]);
+    return _canvas.drawPolygon(app, newPoints);
+  }
+  
+  /**
+   * 矩形の描画
+   * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   * @return 更新域情報(RectF)
+   */
+  function drawRectangle(app, x, y, width, height) {
+    return _canvas.drawRectangle(app, x - _site.left, y - _site.top, width, height);
+  }
+
+  /**
+   * 複数矩形の描画
+   * @param app アピアランス
+   * @param rects 矩形の配列 [ [x1, y1, width1, height1], [x2, y2, width2, height2] .... ]
+   * @return 更新域情報(RectF)
+   */
+  function drawRectangles(app, rects) {
+    var newRects = [];
+    for (var i = 0; i < rects.count; i++)
+      newRects.add([ rects[i][0] - _site.left, rects[i][1] - _site.top, rects[i][2] ,rects[i][3] ]);
+    return _canvas.drawRectangles(app, newRects);
+  }
+  
+  /**
+   * 文字列のパスベースでの描画
+   * @param font フォント GdiPlus.Font でフォントを指定します
+   * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+   * @param x 描画位置X
+   * @param y 描画位置Y
+   * @param text 描画テキスト
+   * @return 更新域情報(RectF)
+   */
+  function drawPathString(font, app, x, y, text) {
+    return _canvas.drawPathString(font, app, x - _site.left, y - _site.top, text);
+  }
+
+  /**
+   * 文字列の描画。描画のクオリティは textRenderingHint に従います。
+   * @param font フォント GdiPlus.Font でフォントを指定します
+   * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します。※ブラシしか参照されません
+   * @param x 描画位置X
+   * @param y 描画位置Y
+   * @param text 描画テキスト
+   * @return 更新域情報(RectF)
+   */
+  function drawString(font, app, x, y, text) {
+    return _canvas.drawString(font, app, x - _site.left, y - _site.top, text);
+  }
+
+  /**
+   * 画像の描画。コピー先は元画像の Bounds を配慮した位置、サイズは Pixel 指定になります。
+   * @param x コピー先原点X
+   * @param y コピー先原点Y
+   * @param image コピー元画像(Image/Layer/ファイル名)
+   * @return 更新域情報(RectF)
+   */
+  function drawImage(dleft, dtop, src) {
+    return _canvas.drawImage(dleft - _site.left, dtop - _site.top, src);
+  }
+
+  /**
+   * 画像の矩形コピー
+   * @param dleft コピー先左端
+   * @param dtop  コピー先上端
+   * @param src コピー元画像(Image/Layer/ファイル名)
+   * @param sleft 元矩形の左端
+   * @param stop  元矩形の上端
+   * @param swidth 元矩形の横幅
+   * @param sheight  元矩形の縦幅
+   * @return 更新域情報(RectF)
+   */
+  function drawImageRect(dleft, dtop, src, sleft, stop, swidth, sheight) {
+    return _canvas.drawImageRect(dleft - _site.left, dtop - _site.top, src, sleft, stop, swidth, sheight);
+  }
+
+  /**
+   * 画像の拡大縮小コピー
+   * @param dleft コピー先左端
+   * @param dtop  コピー先上端
+   * @param dwidth コピー先の横幅
+   * @param dheight  コピー先の縦幅
+   * @param src コピー元画像(Image/Layer/ファイル名)
+   * @param sleft 元矩形の左端
+   * @param stop  元矩形の上端
+   * @param swidth 元矩形の横幅
+   * @param sheight  元矩形の縦幅
+   * @return 更新域情報(RectF)
+   */
+  function drawImageStretch(dleft, dtop, dwidth, dheight, src, sleft, stop, swidth, sheight) {
+    return _canvas.drawImageStretch(dleft - _site.left, dtop - _site.top, dwidth, dheight, src, sleft, stop, swidth, sheight);
+  }
+
+  /**
+   * 画像のアフィン変換コピー
+   * @param src コピー元画像(Image/Layer/ファイル名)
+   * @param sleft 元矩形の左端
+   * @param stop  元矩形の上端
+   * @param swidth 元矩形の横幅
+   * @param sheight  元矩形の縦幅
+   * @param affine アフィンパラメータの種類(true:変換行列, false:座標指定), 
+   * @return 更新域情報(RectF)
+   */
+  function drawImageAffine(src, sleft, stop, swidth, sheight, affine, A, B, C, D, E, F) {
+    if (affine) {
+      var a, b, c, d, e, f;
+      a = A * -0.5 + C * -0.5 + E;
+      b = B * -0.5 + D * -0.5 + F;
+      c = A * (swidth - 0.5) + C * -0.5 + E;
+      d = B * (swidth - 0.5) + D * -0.5 + F;
+      e = A * -0.5 + C * (sheight - 0.5) + E;
+      f = B * -0.5 + D * (sheight - 0.5) + F;
+      A = a, B = b, C = c, D = d, E = e, F = f;
+    }
+    return _canvas.drawImageAffine(src, sleft, stop, swidth, sheight, false, A, B, C, D, E, F);
+  }
+
+  /**
+   * ベジャパッチの枠描画
+   * @param outerApp 外枠を描くアピアランス GdiPlus.Appearance で描画スタイルを指定します
+   * @param innerApp 内枠を描くアピアランス GdiPlus.Appearance で描画スタイルを指定します
+   * @param bezierPatch ベジェパッチ。16個のコントロールポイントの座標値を、32個の小数値の配列として指定します。
+   */
+  function drawBezierPatchFrame(outerApp, innerApp, bezierPatch) {
+    var nbp = BezierPatch.translatePatch(bezierPatch, - _site.left, - _site.top);
+    _canvas.drawBezierPatchFrame(outerApp, innerApp, nbp);
+  }
+
+  /*----------------------------------------------------------------------
+   * ウィジェット描画関数の仮想座標系バージョン
+   ----------------------------------------------------------------------*/
+  /*------------------------------
+   * へっこんだフレームを描く
+   *
+   * @param left フレームの左端
+   * @param top フレームの上端
+   * @param width フレームの幅
+   * @param height フレームの高さ
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function drawSunkenFrame(left, top, width, height, boxColor = WIN_BG) {
+    _canvas.drawSunkenFrame(left - _site.left, top - _site.top, width, height, boxColor);
+  }
+
+  /*------------------------------
+   * へっこんだフレームでレイヤ全体を塗り潰す
+   *
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function fillSunkenFrame(boxColor = WIN_BG) {
+    drawSunkenFrame(0, 0, width, height, boxColor);
+  }
+
+  /*------------------------------
+   * 出っぱったフレームを描く
+   *
+   * @param left フレームの左端
+   * @param top フレームの上端
+   * @param width フレームの幅
+   * @param height フレームの高さ
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function drawRaisedFrame(left, top, width, height, boxColor = WIN_BG) {
+    _canvas.drawRaisedFrame(left - _site.left, top - _site.top, width, height, boxColor);
+  }
+
+  /*------------------------------
+   * 出っぱったフレームでレイヤ全体を塗り潰す
+   *
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function fillRaisedFrame(boxColor = WIN_BG) {
+    drawRaisedFrame(0, 0, width, height, boxColor);
+  }
+
+  /*------------------------------
+   * 平坦なフレームを描く
+   *
+   * @param left フレームの左端
+   * @param top フレームの上端
+   * @param width フレームの幅
+   * @param height フレームの高さ
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function drawFlattenFrame(left, top, width, height, boxColor = WIN_BG) {
+    _canvas.drawFlattenFrame(left - _site.left, top - _site.top, width, height, boxColor);
+  }
+
+  /*------------------------------
+   * 平坦なフレームでレイヤ全体を塗り潰す
+   *
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function fillFlattenFrame(boxColor = WIN_BG) {
+    drawFlattenFrame(0, 0, width, height, boxColor);
+  }
+
+  /*------------------------------
+   * フレームを描く
+   *
+   * @param type タイプ
+   * @param left フレームの左端
+   * @param top フレームの上端
+   * @param width フレームの幅
+   * @param height フレームの高さ
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function drawFrame(type, left, top, width, height, boxColor = WIN_BG) {
+    _canvas.drawFrame(type, left - _site.left, top - _site.top, width, height, boxColor);
+  }
+
+  /*------------------------------
+   * フレームでレイヤ全体を塗り潰す
+   *
+   * @param type タイプ
+   * @param boxColor 塗り潰すフレームの地の色
+   ------------------------------*/
+  function fillFillFrame(type, boxColor = WIN_BG) {
+    fillFrame(type, 0, 0, width, height, boxColor);
+  }
+
+  /*------------------------------
+   * チェッカー模様を描く
+   *
+   * @param l チェッカーの左端
+   * @param t チェッカーの上端
+   * @param w チェッカーの幅
+   * @param h チェッカーの高さ
+   * @param csize チェッカーサイズ
+   * @param color1 カラー1
+   * @param color2 カラー2
+   ------------------------------*/
+  function drawChecker(l, t, w, h, csize, color1 = 0xFFFFFFFF, color2 = 0xFFC0C0C0) {
+    var srcLayer = new global.Layer(window, this);
+    srcLayer.setSize(csize * 2, csize * 2);
+    srcLayer.fillRect(0, 0, csize, csize, color1);
+    srcLayer.fillRect(csize, 0, csize, csize, color2);
+    srcLayer.fillRect(0, csize, csize, csize, color2);
+    srcLayer.fillRect(csize, csize, csize, csize, color1);
+    _canvas.copyWrappedRect(l - _site.left, t - _site.top, w, h, 
+                            srcLayer, 0, 0, csize * 2, csize * 2,
+                            _site.left, _site.top);
+    invalidate srcLayer;
+  }
+
+  /*----------------------------------------------------------------------
+   * 以下、内部処理
+   ----------------------------------------------------------------------*/
+  /*------------------------------
+   * サイトの更新
+   ------------------------------*/
+  function onSizeModified {
+    _site = new KRect(0, 0, 0, 0);
+  }
+
+  function onViewModified(vleft, vtop, vwidth, vheight) {
+    updateSite(new KRect(vleft, vtop, vwidth, vheight));
+  }
+
+  function updateSite(newSite) {
+    if (_avoidSiteUpdateDrawing) {
+      _canvas.setFixedSize(newSite.width, newSite.height);
+      _site = newSite;
+    }
+
+    // 現在のレイヤの内容を一旦_virtualBufLayerにコピー
+    _virtualBufLayer.assignImages(_canvas);
+    // サイズを設定
+    _canvas.setFixedSize(newSite.width, newSite.height);
+    _canvas.setPos(newSite.left, newSite.top);
+    // 共通部を判定
+    if (_site.intersects(newSite)) {
+      // 共通矩形を計算
+      var iSite = _site.dup();
+      iSite.intersectWith(newSite);
+      // 共通部を前回の画像からコピー
+      _canvas.copyRect(iSite.left - newSite.left, iSite.top - newSite.top,
+                       _virtualBufLayer,
+                       iSite.left - _site.left, iSite.top - _site.top,
+                       iSite.width, iSite.height);
+    }
+    // 新規描画するリージョンを計算
+    var newSiteRegion = new KRegion();
+    newSiteRegion.assign(newSite);
+    newSiteRegion.exclude(_site);
+    // サイトを更新
+    _site = newSite;
+    // リージョン中の全矩形に対して描画処理を発行
+    for (var i = 0; i < newSiteRegion.rectCount; i++) {
+      var rect = newSiteRegion.rectAt(i);
+      setCanvasClip(rect.left, rect.top, rect.width, rect.height);
+      onDraw(rect.left, rect.top,
+             rect.width, rect.height);
+    }
+    setCanvasClip();
+  }
+}
+

@@ -1,0 +1,208 @@
+//==============================================================================
+// Preferences.tjs
+// Ham拡張の設定ファイル
+//==============================================================================
+
+
+//------------------------------------------------------------------------------
+// グローバル設定
+
+// ◆ クイックセーブ用のスロット番号
+// 基本的にはこのままで良いと思いますが、爆発的にセーブファイル数を増やしたりして、
+// この数値に届いてしまいそうな場合は調整してください。
+MBSystemPref.quickSaveBookMark = 500;
+
+
+// ◆ 追加するモジュールの初期化ファイル
+// Hamフォルダからのパスで記入してください。
+// モジュールはここに記述した順に読み込まれます。
+MBSystemPref.modules = [
+];
+
+
+// ◆ 標準スクリーンサイズ
+// Config.tjsで定義する「画面サイズ」とは異なります。
+// Ham拡張で標準的に用意されている画面部品を「画面サイズ」にフィットさせるために
+// 使用される値です。
+// セーブ・ロード画面、コンフィグ画面、バックログ画面を「画面サイズ」に合わせて
+// デザインし、画像部品を入れ替えた場合は、ここの値も変更してください。
+MBGraphicPref.RegularScreenSize = %[width : 800, height : 600];
+
+
+//------------------------------------------------------------------------------
+// クイックセーブメニュー表示設定
+
+// ◆ クイックセーブ機能を有効にするかどうか
+MBSystemPref.enableQuickSave = true;
+
+// ◆ 表示位置指定方法
+// lbMargin: 左下に指定マージンを取って表示
+// rbmargin: 右下に以下同文
+// ltMargin: 左上に以下同文
+// rtMargin: 右上に以下同文
+// absolute: 表示座標を直接指定
+MBGraphicPref.quicksavePositionType = "lbMargin";
+
+// ◆ 表示位置
+// 指定方法がマージンの場合は各方向のマージン値、
+// 座標の場合は座標として扱われます。
+MBGraphicPref.quicksavePositionValue = %[x : 10,  y : 10];
+
+// ◆ 「保存」と「再開」の距離
+// 「保存」ボタンの右下座標からの距離なので、
+// 水平や垂直に整列させる場合はその幅の分だけマイナスにしてください。
+MBGraphicPref.quicksaveButtonMargin = %[x : 5, y : -20];
+
+
+//------------------------------------------------------------------------------
+
+// ◆ メニューボタンを表示するかどうか
+MBSystemPref.cmenuButtonEnabled = true;
+
+// ◆メニューボタンの表示位置指定方法
+// lbMargin: 左下に指定マージンを取って表示
+// rbmargin: 右下に以下同文
+// ltMargin: 左上に以下同文
+// rtMargin: 右上に以下同文
+// absolute: 表示座標を直接指定
+MBGraphicPref.cmenuButtonPositionType = "rtMargin";
+
+// ◆ 表示位置
+MBGraphicPref.cmenuButtonPositionValue = %[x : 10, y : 10];
+
+
+//------------------------------------------------------------------------------
+// Ham拡張システムカラー指定
+
+// ウィンドウ枠線
+MBColors.window.border = 0xffc6c6c6;
+
+// ウィンドウ背景
+MBColors.window.background = 0xcc000000;
+
+// タイトルバー文字色
+MBColors.font.label.title = 0x474a35;
+
+// 通常文字色
+MBColors.font.label.normal = 0xffffff;
+
+// 選択不可等文字色
+MBColors.font.label.disabled = 0x888888;
+
+// メニュー等選択時背景
+MBColors.font.label.bg_selected = 0x400080ff;
+
+// メニュー等非選択自背景
+MBColors.font.label.bg_normal = 0x00000000;
+
+
+//------------------------------------------------------------------------------
+// Ham拡張システムフォント指定
+
+// ◆ ダイアログ用フォントサイズ
+MBFontStyle.size.label = 14;
+
+// ◆ プロポーショナルフォント
+MBFontStyle.face.propotional = "ＭＳ Ｐゴシック";
+
+// ◆ 通常フォント
+MBFontStyle.face.normal = "ＭＳ ゴシック";
+
+//------------------------------------------------------------------------------
+// レイヤ重ね順の設定
+
+// クイックセーブメニュー
+MBLayerAbs.quicksave = 1700500;
+
+// メニューボタン（コンテクストメニューを呼び出す）
+MBLayerAbs.cmenuButton = 1700600;
+
+// コンテクストメニュー
+MBLayerAbs.contextMenu = 1900000;
+
+// セーブ・ロードパネル
+MBLayerAbs.backpack = 2000000;
+
+// ゲーム内ダイアログ
+MBLayerAbs.dialog = 2500000;
+
+// アクションキャンセラ
+MBLayerAbs.actCanceller = 3100000;
+
+
+//------------------------------------------------------------------------------
+// コンテクストメニュー表示設定
+
+// 「閉じる」ボタンのサイズ
+MBGraphicPref.cmenuCloseButtonSize = %[width : 147, height : 25];
+
+
+//------------------------------------------------------------------------------
+// セーブ・ロード画面表示設定
+
+// ◆ セーブデータパネルの文字色
+MBGraphicPref.BookmarkSelectorTextColor = 0xf0f0f0;
+
+// ◆ セーブデータパネルにヒストリを表示するかどうか
+MBGraphicPref.BookmarkSelectorHistoryVisible = true;
+
+// ◆ セーブデータの選択消去を有効にするかどうか。
+/*
+	この機能を使用する場合は ktl_local_files.dll が別途必要です。
+	32bit版の場合は次のページから入手できます：
+	http://www.boleros.x0.com/doc/ktlwiki/index.php?KTLWiki#downloads-
+	※plugin.zipをダウンロードして展開した中に含まれています。
+	
+	64bit版の場合はGitHubのKTLリポジトリからソースを取得の上、
+	適宜ビルドしてください。
+	
+	どちらの場合も実行パスの適切なプラグイン用フォルダに格納してください。
+	KTL作者のボレロ村上氏に厚く御礼申し上げます。
+*/
+MBGraphicPref.BookmarkDeleterEnabled = false;
+
+// Config.tjsの設定をいくつか上書きする
+
+// ◆ フリーセーブ
+kag.freeSaveDataMode = false;
+
+// ◆サムネイルを保存するか
+kag.saveThumbnail = true;
+
+// ◆サムネイルの保存サイズ
+kag.thumbnailWidth = 120;
+
+// ◆ 栞にマクロの情報を保存するかどうか
+kag.saveMacros = false;
+
+// ◆ 利用可能な栞の数
+kag.numBookMarks = 60;
+
+
+//------------------------------------------------------------------------------
+// コンフィグ関連
+
+// ◆ 文字表示テストの文字色
+MBGraphicPref.ConfigTextColor = 0xffffff;
+
+// ◆ 表示速度テストの文字パターン
+// 各行30文字以内で設定してください。
+MBGraphicPref.ConfigNormalTestText = [
+"文字表示速度のテストです。",
+"プレイヤーの好みに近い速度で文字を表示します。",
+"あなたはどのくらいの速度がお好みですか？"
+];
+
+// ◆ 自動読み進め時の行末待ち時間テストの文字パターン
+// 合計30文字以内で設定してください。
+MBGraphicPref.ConfigLineWaitTestText = [
+"lタグやxlマクロによる、",
+"待ち時間はこれくらいです。"
+];
+
+// ◆ 自動読み進め時のページ待ち時間テストの文字パターン
+// 各行30文字以内で設定してください。
+MBGraphicPref.ConfigPageWaitTestText = [
+"自動読み進めのときのページ待ち時間です。",
+"これくらい待つと次に進みます。"
+];

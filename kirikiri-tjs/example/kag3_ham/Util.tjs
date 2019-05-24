@@ -1,0 +1,129 @@
+/*******************************************************************************
+	各種ユーティリティ関数群
+********************************************************************************/
+
+var sysfunc = %[];
+var sysvalue = %[];
+
+// 使用画像パスを取得する
+sysfunc.getPathImage = function(path)
+{
+	var np = MBBasePath + "assets/" + path;
+	dm(np);
+	return np;
+} incontextof kag;
+
+// 右クリックの呼び出しラベルを取得
+sysfunc.getContextMenuLabel = function()
+{
+	var res = "*rclick_default";
+	
+	return res;
+} incontextof kag;
+
+// 二つのオブジェクトの矩形当たり判定を行う
+sysfunc.collideTestRect = function(obj1, obj2)
+{
+	var px = [obj1.left, obj1.left + obj1.width];
+	var py = [obj1.top, obj1.top + obj1.height];
+	var cx = [obj2.left, obj2.left + obj2.width];
+	var cy = [obj2.top, obj2.top + obj2.height];
+	
+	var msg = "obj1: " + px[0] + ", " + py[0] + ", " + px[1] + ", " + py[1] + "\n";
+	msg += "obj2: " + cx[0] + ", " + cy[0] + ", " + cx[1] + ", " + cy[1];
+	
+	return (cx[0] < px[1] && px[0] < cx[1] && cy[0] < py[1] && py[0] < cy[1]);
+} incontextof kag;
+
+
+// 画面拡縮比率の計算
+sysfunc.getScreenScale = function(larger)
+{
+	var wr = kag.fore.base.width / MBGraphicPref.RegularScreenSize.width;
+	var hr = kag.fore.base.height / MBGraphicPref.RegularScreenSize.height;
+	
+	var scale = 1;
+	var lscale = 1;
+	
+	if (wr > hr) {
+		scale = hr;
+		lscale = wr;
+	}
+	else {
+		scale = wr;
+		lscale = hr;
+	}
+	
+	if (larger) {
+		return lscale;
+	}
+	else {
+		return scale;
+	}
+} incontextof kag;
+
+
+//------------------------------------------------------------------------------
+
+var sndfunc = %[];
+var sndavail = %[];
+
+var menuSounds = ["menu_open", "menu_select", "menu_cancel", "menu_decide"];
+
+for (tf.i=0; tf.i<menuSounds.count; tf.i++) {
+	var path = "%s.wav".sprintf(menuSounds[tf.i]);
+	sndavail[menuSounds[tf.i]] = Storages.isExistentStorage(path);
+}
+
+// メニュー入力を促す
+sndfunc.seMenuStart = function(buf=2)
+{
+	if (se.count < buf + 1 || se[buf].currentVolume < 1 || !sndavail["menu_open"]) {
+		return;
+	}
+	
+	se[buf].play(%[
+		storage : "menu_open",
+		loop : false
+	]);
+} incontextof kag;
+
+
+// メニュー選択音を鳴らす
+sndfunc.seSelect = function(buf=2)
+{
+	if (se.count < buf + 1 || se[buf].currentVolume < 1 || !sndavail["menu_select"]) {
+		return;
+	}
+	
+	se[buf].play(%[
+		storage : "menu_select",
+		loop : false
+	]);
+} incontextof kag;
+
+// メニュー決定音を鳴らす
+sndfunc.seDecide = function(buf=2)
+{
+	if (se.count < buf + 1 || se[buf].currentVolume < 1 || !sndavail["menu_decide"]) {
+		return;
+	}
+	
+	se[buf].play(%[
+		storage : "menu_decide",
+		loop : false
+	]);
+} incontextof kag;
+
+// メニューキャンセル音を鳴らす
+sndfunc.seCancel = function(buf=2)
+{
+	if (se.count < buf + 1 || se[buf].currentVolume < 1 || !sndavail["menu_cancel"]) {
+		return;
+	}
+	
+	se[buf].play(%[
+		storage : "menu_cancel",
+		loop : false
+	]);
+} incontextof kag;

@@ -1,0 +1,118 @@
+//
+// $Id: KTextLabel.tjs,v 1.6 2007/09/04 10:29:44 m2 Exp $
+//
+
+
+/**----------------------------------------------------------------------
+ * テキストラベル
+ ----------------------------------------------------------------------*/
+class KTextLabel extends KWidget
+{
+  var _label = "";
+  var lineSpacing = 1;
+  var _maxLabelWidth = 0;
+
+  /*------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィンドウ
+   * @param label ラベルの値
+   * @param name 名前
+   ------------------------------*/
+  function KTextLabel(win, label = "", name = "") {
+    // 親クラス呼び出し
+    super.KWidget(win, name);
+    // マウスの辺り判定は透過
+    hitThreshold = 0;
+    // 値を設定
+    this.label = label;
+  }
+
+  /**------------------------------
+   * ラベルの値
+   *
+   * @return ラベルの値
+   * @param v 新規のラベルの値
+   ------------------------------*/
+  property label {
+    getter {
+      return _label;
+    }
+
+    setter(v) {
+      // 必ず文字列にする
+      v = string(v);
+      // 内容が更新されている時だけ処理
+      if (_label == v)
+        return;
+      // 値を更新
+      _label = v;
+      // 再描画
+      drawContent();
+    }
+  }
+
+  // ラベルの内容を描画。サイズを再設定
+  function drawContent {
+    // 改行で分割
+    var lines = _label.split(/\r\n|\r|\n/);
+
+    // サイズを計算して再設定
+    var tw, th;
+    for(var i=0; i<lines.count; i++) {
+      var fw = font.getTextWidth(lines[i]);
+      tw = fw if fw > tw;
+      th += font.height + lineSpacing;
+    }
+    th -= lineSpacing;
+    setFixedSize(_maxLabelWidth ? Math.min(_maxLabelWidth, tw) : tw, th);
+
+    // 透明に塗りつぶし
+    fillRect(0, 0, width, height, 0);
+
+    // 黒でテキスト描画
+    var t = 0;
+    for(var i=0; i<lines.count; i++) {
+      drawText(0, t, lines[i], fontColor, 255);
+      t += font.height + lineSpacing;
+    }
+  }
+
+  // 最大ラベル幅が変更されたら再描画
+  property maxLabelWidth {
+    getter { 
+      return _maxLabelWidth;
+    }
+    setter(v) {
+      if (v == _maxLabelWidth)
+        return;
+      _maxLabelWidth = v;
+      drawContent();
+    }
+  }
+
+  // フォントカラーが変更されたら再描画
+  function onFontColorModified {
+    drawContent();
+  }
+
+  // フォントフェイスが変更されたら再描画
+  function onFontFaceModified {
+    drawContent();
+  }
+
+  // フォントヘイトが変更されたら再描画
+  function onFontHeightModified {
+    drawContent();
+  }
+
+  // enabled==trueならそのまま表示
+  function onNodeEnabled {
+    opacity = 255;
+  }
+
+  // enabled=falseなら半透明で表示
+  function onNodeDisabled {
+    opacity = 64;
+  }
+}

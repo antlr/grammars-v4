@@ -1,0 +1,1128 @@
+//
+// $Id$
+//
+
+/*----------------------------------------------------------------------
+  操作方法
+ 
+  = 画面レイアウト
+  == キャンバス 画面上部、オブジェクトを操作する空間
+  == レイヤツリー     画面下部左、レイヤツリーの構成図
+  == タイムロケーター 画面下部上、現在の時間を表示するライン
+  == タイムライン     画面下部中央、各レイヤのタイムライン
+
+  = その他の操作
+  == タイムライン上部の「M」と書いてあるボタンを押す→「S」「M」「L」の間でループ。タイムラインのグリッドサイズを変更できる。
+
+  = ツリー部の操作
+  == ツリーのルート、もしくは既存のレイヤ上で右クリック→「新規レイヤ」でレイヤ作成
+  == レイヤ上で右クリック→「削除」でレイヤの削除
+  == レイヤをドラッグしてルートもしくは別のレイヤにドロップ→ドロップしたレイヤの子として移動
+  == Ctrl+Cもしくはレイヤを右クリック→「レイヤのコピー」で自分自身と子をまとめてコピー
+  == Ctrl+Vもしくはレイヤを右クリップ→「レイヤのペースト」でクリップボードの内容をペースト
+  == レイヤ上でCtrl+カーソル→レイヤの階層を移動。
+  
+  = タイムライン操作・ルート
+  == 右クリックして、ループポイントを設定する。
+  == ループポイントの左端をドラッグして移動することも出来る。
+
+  = タイムライン操作・レイヤ
+  == フレームの境界をドラッグしてフレームを伸長。
+  == Ctrl+フレームの境界をドラッグして、後方のフレームの長さを保ったままフレームを伸長。
+  == ドラッグで範囲選択。
+  == Ctrlを押しながら選択範囲をドラッグすることで、選択範囲内のフレームの移動
+  == Ctrl+Cもしくは選択範囲を右クリック→「コピーする」で範囲内のフレームのコピー
+  == Ctrl+Xもしくは選択範囲を右クリック→「カットする」で範囲内のフレームのカット
+  == Ctrl+Vもしくは選択範囲を右クリック→「ペーストする」で範囲内のフレームのペースト
+  == Insertもしくはキーフレームを右クリック→「キーフレームを挿入する」で新規キーフレームを挿入
+  == Deleteもしくはキーフレームを右クリック→「キーフレームを削除する」でキーフレームを削除
+  == Homeもしくはフレーム間を右クリック→「フレームを分割する」でフレームを補完する位置で分割する
+  == Endもしくはフレーム間を右クリック→「空フレームを挿入する」で指定位置に空フレームを挿入する
+  == Ctrl+Cもしくは右クリック→「フレームをコピーする」でフレームの内容をコピー
+  == Ctrl+Xもしくは右クリック→「フレームをカットする」でフレームの内容をカット
+  == Ctrl+Vもしくは右クリック→「フレームをペーストする」でクリップボードの内容をペースト
+  == カーソルキーでカーソルを移動
+  == Shiftを押しながらカーソルで範囲選択
+  == Ctrlを押しながらカーソルで、選択範囲を移動
+
+  = タイムロケーター
+  == クリックすることで時間指定
+  == Ctrl+ドラッグで、全てのフレームをまとめて移動。
+  == 右クリック→「フレームツリーをコピーする」でツリー内の全レイヤのフレームを一括コピー
+  == 右クリック→「フレームツリーをペーストする」でクリップボードの内容をペースト
+
+  = キャンバス
+  == レイヤにフレームを追加すると対応するオブジェクトがキャンバスにあらわれる。
+  == タイムラインでキーフレームになっているオブジェクトをドラッグして移動する。
+  == カーソルキーで、選択されているスフィアを移動。
+  == CTRL+カーソルキーで大きく移動。
+  == レイヤは親子関係を持ち、子の移動量は親の移動量に対するオフセットになっている。
+  == キーフレームで無いフレームのオブジェクトは、ダブルクリックするとその場でキーフレームを追加出来る(レイヤタイムラインの「フレームを分割する」と同一の動作)。
+  == レイヤが重なっている場合は、右クリックでメニューを表示してレイヤを選択する。
+  == 右下の再生ボタンを押すとアニメーションの再生開始
+  == 停止ボタンを押すとアニメーションの再生停止
+  == 巻き戻しボタンを押すと時間0に巻き戻し
+  == ループが設定してあると、末尾からその地点へアニメーションがループする
+  ----------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------
+ * 定数
+ ----------------------------------------------------------------------*/
+global.TYPE_FRAME_TREE =  "application/x-kwidgets.timelinesample.frameTree";
+global.TYPE_LAYER =       "application/x-kwidgets.timelinesample.layer";
+global.TYPE_LAYER_RANGE = "application/x-kwidgets.timelinesample.layerRange";
+global.DD_LAYER = "dd.timelinesample.layer";
+
+/*----------------------------------------------------------------------
+ * マウスイベントキャプチャ
+ ----------------------------------------------------------------------*/
+class TimeLineSampleMouseEventCapture extends Layer
+{
+  // ターゲット
+  var target;
+
+  //------------------------------
+  // マウスイベントを全てキャプチャしてターゲットへ転送する
+  //------------------------------
+  function TimeLineSampleMouseEventCapture {
+    super.Layer(...);
+    hasImage = false;
+    hitThreshold = 0;
+  }
+
+  function onMouseDown {
+    target.onMouseDown(...);
+  }
+
+  function onMouseMove {
+    target.onMouseMove(...);
+  }
+
+  function onMouseUp {
+    target.onMouseUp(...);
+  }
+
+  function onDoubleClick {
+    target.onDoubleClick(...);
+  }
+}
+
+/*----------------------------------------------------------------------
+ * スフィア(レイヤに対応した球体オブジェクト)
+ ----------------------------------------------------------------------*/
+class TimeLineSampleSphere extends KWidget
+{
+  // バインドされたレイヤアイテム
+  var layerItem;
+  // 現在のフレーム
+  var curFrame;
+  // ドラッグ中
+  var dragging;
+  // フレームの元座標
+  var frameOrigLeft, frameOrigTop;
+  // マウス押下時の座標
+  var mouseDownX, mouseDownY;
+  // フレームのパラメータ
+  var params = %[];
+
+  //------------------------------
+  // コンストラクタ
+  //------------------------------
+  function TimeLineSampleSphere(window, parent) {
+    super.KWidget(window);
+    this.parent = parent;
+    loadImages("sphere");
+    setFixedSizeToImageSize();
+    dragging = false;
+  }
+
+  //------------------------------
+  // スフィアをレイヤと結びつける
+  //------------------------------
+  function bindLayerItem(layerItem, curFrame, keyFrame, editable) {
+    this.layerItem = layerItem;
+    this.curFrame = curFrame;
+    setPos(layerItem.curLeft - width / 2, layerItem.curTop - height / 2);
+    visible = true;
+    var prevParams = params;
+    params = %[ keyFrame: keyFrame,
+                selected: layerItem.selected,
+                editable: editable,
+                label: layerItem.label ];
+    // パラメータが変わったら画像を再描画
+    if (! equalStruct(prevParams, params)) {
+      loadImages("sphere");
+      if (params.editable) {
+        if (params.keyFrame) {
+          var color = params.selected ? 0xFF0000 : 0x0000FF;
+          colorRect(0, 0, width, height, color, 64);
+          color |= 0xFF000000;
+          fillRect(0, 0, width, 1, color);
+          fillRect(0, 0, 1, height, color);
+          fillRect(0, height - 1, width, 1, color);
+          fillRect(width - 1, 0, 1, height, color);
+        }
+        drawText(2, 2, params.label, 0x000000, 255, true, 2048, 0xFFFFFF, 1);
+      }
+    }
+  }
+
+  //------------------------------
+  // マウスダウン
+  //------------------------------
+  function onMouseDown {
+    // クリックしたらそのレイヤを選択
+    if (params.editable) {
+      layerItem.select();
+      parent.focus();
+    }
+    super.onMouseDown(...);
+  }
+
+  //------------------------------
+  // ドラッグ開始
+  //------------------------------
+  function onDragEnter {
+    // キーフレームのみドラッグ可能
+    if (! params.editable
+        || ! params.keyFrame)
+      return;
+    dragging = true;
+    mouseDownX = parent.cursorX;
+    mouseDownY = parent.cursorY;
+    frameOrigLeft = curFrame.content.left;
+    frameOrigTop = curFrame.content.top;
+  }
+
+  //------------------------------
+  // ドラッグ中
+  //------------------------------
+  function onDragMove {
+    if (dragging) {
+      curFrame.content.left = frameOrigLeft + (parent.cursorX - mouseDownX);
+      curFrame.content.top  = frameOrigTop + (parent.cursorY - mouseDownY);
+      window.renderCanvas();
+    }
+  }
+
+  //------------------------------
+  // ドラッグ終了
+  //------------------------------
+  function onDragLeave {
+    dragging = false;
+  }
+
+  //------------------------------
+  // ダブルクリックでそのフレームをキーフレームに変換
+  //------------------------------
+  function onDoubleClick {
+    if (params.editable
+	&& ! params.keyFrame) {
+      layerItem.select();
+      layerItem.onSplitFrame(window.timelineControl.selectedTime);
+      parent.focus();
+    }
+  }
+
+  //------------------------------
+  // 右クリックで重なっているレイヤから1つを選択するメニューを表示
+  //------------------------------
+  function onRightClick {
+    var menu = new KContextMenu();
+    var sphereList = parent.sphereList;
+    for (var i = 0; i < parent.freeSphereCount; i++) {
+      var sphere = sphereList[i];
+      if (sphere.curFrame !== void
+	  && (sphere.left <= parent.cursorX
+	      && parent.cursorX < sphere.left + sphere.width
+	      && sphere.top <= parent.cursorY
+	      && parent.cursorY < sphere.top + sphere.height)) {
+	var item = sphere.layerItem;
+	menu.addToggleItem(item.label, item.selected, "", true, funccall(onSelectItem, item));
+      }
+    }
+    menu.show();
+  }
+
+  //------------------------------
+  // アイテム選択
+  //------------------------------
+  function onSelectItem(item) {
+    item.select();
+    parent.focus();
+  }
+}
+
+/*----------------------------------------------------------------------
+ * キャンバス(スフィアを配置する領域)
+ ----------------------------------------------------------------------*/
+class TimeLineSampleCanvas extends KVirtualWidget
+{
+  // スフィア配列
+  var sphereList;
+  // 空きスフィアの数
+  var freeSphereCount;
+  // マウスイベントキャプチャ
+  var mouseEventCapture;
+
+  //------------------------------
+  // コンストラクタ
+  //------------------------------
+  function TimeLineSampleCanvas(window, name) {
+    super.KVirtualWidget(...);
+    setFixedSize(4000, 4000);
+    sphereList = [];
+    mouseEventCapture = new TimeLineSampleMouseEventCapture(window, this);
+    _canvas.absolute = -1;
+    focusable = true;
+  }
+
+  //------------------------------
+  // 自分自身の描画処理
+  //------------------------------
+  function onDraw(l, t, w, h) {
+    // 背景に市松模様を描画
+    var unitPixel = 10;
+    var fromX, toX, fromY, toY;
+    fromX = int(l / unitPixel);
+    toX = int((l + w + unitPixel - 1) / unitPixel);
+    fromY = int(t / unitPixel);
+    toY = int((t + h + unitPixel - 1) / unitPixel);
+    drawChecker(fromX * unitPixel, fromY * unitPixel,
+		(toX - fromX) * unitPixel, (toY - fromY) * unitPixel,
+		unitPixel);
+    fillRect(0, height / 2, width, 1, focused ? 0xFF0000FF : 0xFFFF0000);
+    fillRect(width / 2, 0, 1, height, focused ? 0xFF0000FF : 0xFFFF0000);
+  }
+
+  //------------------------------
+  // フォーカス
+  //------------------------------
+  function onFocus {
+    redrawAll();
+  }
+
+  //------------------------------
+  // ブラー
+  //------------------------------
+  function onBlur {
+    redrawAll();
+  }
+
+  //------------------------------
+  // レンダリング前処理
+  //------------------------------
+  function beforeRender {
+    // 全てのスフィアを非表示にする
+    for (var i = 0; i < sphereList.count; i++)
+      sphereList[i].visible = false;
+    freeSphereCount = 0;
+  }
+
+  //------------------------------
+  // スフィア割り当て
+  //------------------------------
+  function allocSphere {
+    if (freeSphereCount >= sphereList.count) 
+      sphereList.add(new TimeLineSampleSphere(window, this));
+    return sphereList[freeSphereCount++];
+  }
+
+  //------------------------------
+  // レンダリング後処理
+  //------------------------------
+  function afterRender {
+    // 表示されたスフィアの優先度を設定し、
+    // 選択状態のレイヤに対応したスフィアに、マウスイベントキャプチャを設定する。
+    mouseEventCapture.visible = false;
+    for (var i = 0; i < freeSphereCount; i++) {
+      var sphere = sphereList[i];
+      sphere.absolute = i;
+      if (sphere.curFrame !== void
+	  && sphere.layerItem.selected) {
+	mouseEventCapture.target = sphere;
+	mouseEventCapture.visible = true;
+	mouseEventCapture.absolute = freeSphereCount;
+	mouseEventCapture.setPos(sphere.left, sphere.top);
+	mouseEventCapture.setSize(sphere.width, sphere.height);
+      }
+    }
+  }
+
+  //------------------------------
+  // キー処理
+  //------------------------------
+  function onKeyDown(key, shift) {
+    var activeSphere = void;
+    for (var i = 0; i < freeSphereCount; i++) {
+      var sphere = sphereList[i];
+      if (sphere.curFrame !== void
+          && sphere.params.selected
+          && sphere.params.editable
+          && sphere.params.keyFrame) {
+        activeSphere = sphere;
+        break;
+      }
+    }
+
+    switch (key) {
+    default:
+      super.onKeyDown(...);
+      break;
+    case VK_LEFT:
+      if (activeSphere) {
+        activeSphere.curFrame.content.left -= (shift & ssCtrl) ? 10 : 1;
+        window.renderCanvas();
+      }
+      break;
+    case VK_RIGHT:
+      if (activeSphere) {
+        activeSphere.curFrame.content.left += (shift & ssCtrl) ? 10 : 1;
+        window.renderCanvas();
+      }
+      break;
+    case VK_UP:
+      if (activeSphere) {
+        activeSphere.curFrame.content.top -= (shift & ssCtrl) ? 10 : 1;
+        window.renderCanvas();
+      }
+      break;
+    case VK_DOWN:
+      if (activeSphere) {
+        activeSphere.curFrame.content.top += (shift & ssCtrl) ? 10 : 1;
+        window.renderCanvas();
+      }
+      break;
+    }
+  }
+}
+
+/*----------------------------------------------------------------------
+ * タイムラインサンプルアイテム(ルートアイテムとレイヤアイテムの基底)
+ ----------------------------------------------------------------------*/
+class TimeLineSampleItem extends KTimeLineItem
+{
+  // 座標
+  var curLeft, curTop;
+
+  //------------------------------
+  // コンストラクタ
+  //------------------------------
+  function TimeLineSampleItem(label, name) {
+    super.KTimeLineItem(...);
+    curLeft = curTop = 0;
+  }
+
+  //------------------------------
+  // レイヤアイテムのドロップ可能
+  //------------------------------
+  function isPacketAcceptable(packet) {
+    return (packet.name == DD_LAYER
+	    && packet.arg != this);
+  }
+
+  //------------------------------
+  // レイヤアイテムをドロップしたら子アイテムにする
+  //------------------------------
+  function onPacketDrop(x, y, packet) {
+    var item = packet.arg;
+    item.parent.remove(item, false);
+    add(item);
+  }
+
+  //------------------------------
+  // キャンバスにアイテムのレンダリングを行う
+  //------------------------------
+  function renderCanvas(canvas, time, editable) {
+    for (var i = 0; i < childCount; i++)
+      childAt(i).renderCanvas(canvas, time, editable);
+  }
+
+  //------------------------------
+  // ツリー構造をオブジェクトにして返す
+  //------------------------------
+  function buildTreeStructure {
+    var data = %[];
+    data.label = label;
+    data.children = [];
+    for (var i = 0; i < childCount; i++)
+      data.children.add(childAt(i).buildTreeStructure());
+    return data;
+  }
+
+  //------------------------------
+  // ツリーのフレーム情報を全てオブジェクトにして返す
+  //------------------------------
+  function buildContentTree(time) {
+    var data = %[];
+    var frame = frameAt(findFrame(time));
+    if (frame !== void) {
+      data.type = frame.type;
+      data.content = getCompleteFrameContent(time);
+    } else {
+      data.type = TIMELINE_FRAME_TYPE_NULL;
+      data.content = void;
+    }
+    data.children = [];
+    for (var i = 0; i < childCount; i++)
+      data.children.add(childAt(i).buildContentTree(...));
+    return data;
+  }
+
+  //------------------------------
+  // オブジェクトからツリーのフレーム情報を再構成する
+  //------------------------------
+  function restoreContentTree(time, data) {
+    if (data.content !== void)
+      onPasteContent(time, data.type, data.content);
+    for (var i = 0; i < childCount; i++)
+      childAt(i).restoreContentTree(time, data.children[i]);
+  }
+
+  //------------------------------
+  // フレーム情報のペースト時に呼ばれるイベント関数
+  //------------------------------
+  function onPasteContent(time, type, content) {
+  }
+}
+
+/*----------------------------------------------------------------------
+ * タイムラインルートアイテム(このタイムラインではループ設定を行う)
+ ----------------------------------------------------------------------*/
+class TimeLineSampleRootItem extends TimeLineSampleItem
+{
+  //------------------------------
+  // コンストラクタ
+  //------------------------------
+  function TimeLineSampleRootItem(label, name) {
+    super.TimeLineSampleItem(...);
+    opened = true;
+    singleFrameColor = 0xFF0000;
+  }
+
+  //------------------------------
+  // キャンバスにレンダリングする
+  //------------------------------
+  function renderCanvas(canvas, time, editable) {
+    // 座標をキャンバスの原点に設定する
+    curLeft = int(canvas.width / 2);
+    curTop = int(canvas.height / 2);
+    super.renderCanvas(canvas, time, editable);
+  }
+
+  //------------------------------
+  // レイヤリストを右クリック時のコンテキストメニュー
+  //------------------------------
+  function onRightClick {
+    var menu = new KContextMenu();
+    menu.addItem("レイヤを追加する", "", true, this.onNewLayer);
+    menu.show();
+  }
+
+  //------------------------------
+  // レイヤ新規作成
+  //------------------------------
+  function onNewLayer {
+    add(new TimeLineSampleLayerItem(root.window.newLayerLabel));
+  }
+}
+
+/*----------------------------------------------------------------------
+ * タイムラインレイヤアイテム
+ ----------------------------------------------------------------------*/
+class TimeLineSampleLayerItem extends TimeLineSampleItem
+{
+  // バインドしたスフィア
+  var sphere;
+
+  //------------------------------
+  // コンストラクタ
+  //------------------------------
+  function TimeLineSampleLayerItem(label, name) {
+    super.TimeLineSampleItem(...);
+    opened = true;
+  }
+
+  //------------------------------
+  // フレーム情報の初期値
+  //------------------------------
+  function createFrameContent {
+    return %[ left: 0, top: 0 ];
+  }
+
+  //------------------------------
+  // フレーム情報を補完する
+  //------------------------------
+  function tweenFrameContent(from, to, ratio) {
+    return %[ left: tweenIntValue(from.left, to.left, ratio),
+              top:  tweenIntValue(from.top, to.top, ratio) ];
+  }
+
+  //------------------------------
+  // キャンバスにスフィアを描画
+  //------------------------------
+  function renderCanvas(canvas, time, editable) {
+    // 座標は親からのオフセット。
+    // スフィアを新たに確保してバインド。
+    curLeft = parent.curLeft;
+    curTop = parent.curTop;
+    var curContent = getCompleteFrameContent(time);
+    if (curContent !== void) {
+      curLeft += curContent.left;
+      curTop += curContent.top;
+      sphere = canvas.allocSphere();
+      var curFrame = frameAt(findFrame(time));
+      sphere.bindLayerItem(this, curFrame, curFrame.time == time, editable);
+    } else {
+      sphere = void;
+    }
+    super.renderCanvas(canvas, time, editable);
+  }
+
+  //------------------------------
+  // レイヤリストを右クリック時のコンテキストメニュー
+  //------------------------------
+  function onRightClick {
+    var menu = new KContextMenu();
+    menu.addItem("レイヤを追加する", "", true, this.onNewLayer);
+    menu.addSeparator();
+    menu.addItem("削除する", "", true, this.onRemove);
+    menu.addSeparator();
+    menu.addItem("レイヤをコピーする", "copyLayerItem", true, funccall(this.onCopy));
+    var canPaste = Clipboard.hasFormat(cbfTJS) && Clipboard.asTJS.type == TYPE_LAYER;
+    menu.addItem("レイヤをペーストする", "pasteLayerItem", canPaste, canPaste ? funccall(this.onPaste, Clipboard.asTJS.body) : void);
+    menu.copyLayerItem.shortcut = "Ctrl+C";
+    menu.pasteLayerItem.shortcut = "Ctrl+P";
+    menu.show();
+  }
+
+  //------------------------------
+  // 新規レイヤ
+  //------------------------------
+  function onNewLayer {
+    add(new global.TimeLineSampleLayerItem(root.window.newLayerLabel));
+  }
+
+  //------------------------------
+  // 自分自身を削除
+  //------------------------------
+  function onRemove {
+    removeSelf();
+  }
+
+  //------------------------------
+  // レイヤ(子レイヤ含む)の内容をコピー
+  //------------------------------
+  function onCopy {
+    Clipboard.asTJS = %[ type: TYPE_LAYER, body: serialize() ];
+  }
+
+  //------------------------------
+  // クリップボードの内容をペースト
+  //------------------------------
+  function onPaste(body) {
+    removeAll(true);
+    unserialize(body);
+  }
+
+  //------------------------------
+  // レイヤドラッグ開始
+  //------------------------------
+  function onDragEnter {
+    beginDragPacket(new KPacket(DD_LAYER, this));
+  }
+
+  //------------------------------
+  // キー操作
+  //------------------------------
+  function onKeyDown(key, shift) {
+    if (shift & ssCtrl) {
+      switch (key) {
+      // Ctrl+UPでレイヤ上に
+      case VK_UP:
+        if (index > 0)
+          index --;
+        return;
+      // Ctrl+UPでレイヤ下に
+      case VK_DOWN:
+        if (index < parent.childCount - 1)
+          index++;
+        return;
+      // Ctrl+左で階層上に
+      case VK_LEFT:
+        if (parent.className == "TimeLineSampleLayerItem") {
+          var newIndex = parent.index + 1;
+          var newParent = parent.parent;
+          parent.remove(this);
+          newParent.insert(newIndex, this);
+          parent.opened = true;
+          select();
+        }
+        return;
+      // Ctrl+右で階層下に
+      case VK_RIGHT:
+        if (index > 0) {
+          var newParent = parent.childAt(index - 1);
+          parent.remove(this);
+          newParent.add(this);
+          parent.opened = true;
+          select();
+        }
+        return;
+      // Ctrl+Cでコピー
+      case VK_C:
+        onCopy();
+        break;
+      // Ctrl+Vでペースト
+      case VK_V:
+        if (Clipboard.hasFormat(cbfTJS) && Clipboard.asTJS.type == TYPE_LAYER) 
+          onPaste(Clipboard.asTJS.body);
+        break;
+      }
+    }
+    super.onKeyDown(...);
+  }
+
+  //------------------------------
+  // タイムラインを右クリック時のコンテキストメニュー
+  //------------------------------
+  function onTimeLineRightClick(time) {
+    var menu = new KContextMenu();
+    var frame = frameAt(findFrame(time));
+    menu.addItem("キーフレームを挿入する", "insertKeyFrameItem", (frame !== void && frame.type != TIMELINE_FRAME_TYPE_NULL && frame.time != time) || (frame !== void && frame.type == TIMELINE_FRAME_TYPE_NULL) || frame === void, funccall(this.onInsertFrame, time));
+    menu.addItem("キーフレームを削除する", "deleteKeyFrameItem", frame !== void && frame.type != TIMELINE_FRAME_TYPE_NULL && frame.time == time, funccall(this.onDeleteFrame, time));
+    menu.addItem("フレームを分割する", "splitFrameItem", frame !== void && frame.type != TIMELINE_FRAME_TYPE_NULL && frame.time != time, funccall(this.onSplitFrame, time));
+    menu.addItem("空フレームを挿入する", "nullFrameItem", (frame !== void && frame.type != TIMELINE_FRAME_TYPE_NULL), funccall(this.onNullFrame, time));
+    menu.addSeparator();
+    menu.addItem("全選択", "selectAllItem", true, this.onSelectAll);
+    menu.addItem("フレームをコピーする", "copyFrameItem", true, this.onCopyFrame);
+    menu.addItem("フレームをカットーする", "cutFrameItem", true, this.onCutFrame);
+    menu.addItem("フレームをペーストする", "pasteFrameItem", root.window.isLayerRangeAvailableToPaste, root.window.onPasteLayerRange);
+    menu.insertKeyFrameItem.shortcut = "Ins";
+    menu.deleteKeyFrameItem.shortcut = "Del";
+    menu.splitFrameItem.shortcut = "Home";
+    menu.nullFrameItem.shortcut = "End";
+    menu.selectAllItem.shortcut = "Ctrl+A";
+    menu.copyFrameItem.shortcut = "Ctrl+C";
+    menu.cutFrameItem.shortcut = "Ctrl+X";
+    menu.pasteFrameItem.shortcut = "Ctrl+V";
+    menu.show();
+  }
+
+  //------------------------------
+  // タイムライン上でキーを押した際の処理
+  //------------------------------
+  function onTimeLineKeyDown(key, shift) {
+    switch (key) {
+      // Ctrl+Aで全選択
+    case VK_A:
+      if (shift & ssCtrl) 
+	onSelectAll();
+      break;
+
+      // Ctrl+Cでフレームをコピー
+    case VK_C:
+      if (shift & ssCtrl)
+        onCopyFrame();
+      break;
+      // Ctrl+Xでフレームをカット
+    case VK_X:
+      if (shift & ssCtrl)
+        onCutFrame();
+      // Ctrl+Vでフレームをペースト
+    case VK_V:
+      if ((shift & ssCtrl)
+          && root.window.isLayerRangeAvailableToPaste)
+        root.window.onPasteLayerRange();
+      break;
+      // Insertでキーフレーム挿入
+    case VK_INSERT:
+      var time = root.owner.selectedTime;
+      var frame = frameAt(findFrame(time));
+      if ((frame !== void && frame.type != TIMELINE_FRAME_TYPE_NULL && frame.time != time) || (frame !== void && frame.type == TIMELINE_FRAME_TYPE_NULL) || frame === void)
+        onInsertFrame(time);
+      break;
+      // Insertでキーフレーム削除
+    case VK_DELETE:
+      var time = root.owner.selectedTime;
+      var frame = frameAt(findFrame(time));
+      if (frame !== void && frame.type != TIMELINE_FRAME_TYPE_NULL && frame.time == time)
+        onDeleteFrame(time);
+      break;
+      // Insertでキーフレーム挿入
+    case VK_HOME:
+      var time = root.owner.selectedTime;
+      var frame = frameAt(findFrame(time));
+      if (frame !== void && frame.type != TIMELINE_FRAME_TYPE_NULL && frame.time != time)
+        onSplitFrame(time);
+      break;
+      // ENDで空フレーム挿入
+    case VK_END:
+      var time = root.owner.selectedTime;
+      var frame = frameAt(findFrame(time));
+      if (frame !== void && frame.type != TIMELINE_FRAME_TYPE_NULL)
+        onNullFrame(time);
+      break;
+    }
+  }
+
+  //------------------------------
+  // キーフレーム挿入
+  //------------------------------
+  function onInsertFrame(time) {
+    insertKeyFrame(time, TIMELINE_FRAME_TYPE_TWEEN, createFrameContent());
+  }
+
+  //------------------------------
+  // キーフレーム削除
+  //------------------------------
+  function onDeleteFrame(time) {
+    deleteKeyFrame(time);
+  }
+
+  //------------------------------
+  // フレーム分割
+  //------------------------------
+  function onSplitFrame(time) {
+    splitFrame(time);
+  }
+
+  //------------------------------
+  // ヌルフレーム挿入
+  //------------------------------
+  function onNullFrame(time) {
+    insertKeyFrame(time, TIMELINE_FRAME_TYPE_NULL);
+  }
+
+  //------------------------------
+  // 全選択
+  //------------------------------
+  function onSelectAll {
+    root.owner.selectAll();
+  }
+
+  //------------------------------
+  // フレームをコピーする
+  //------------------------------
+  function onCopyFrame {
+    Clipboard.asTJS = %[ type: TYPE_LAYER_RANGE, body: [ copyFrameRange(root.owner.selectedTime, root.owner.selectedTime + 1) ] ];
+  }
+
+  //------------------------------
+  // フレームをカットする
+  //------------------------------
+  function onCutFrame {
+    Clipboard.asTJS = %[ type: TYPE_LAYER_RANGE, body: [ cutFrameRange(root.owner.selectedTime, root.owner.selectedTime + 1) ] ];
+  }
+
+  //------------------------------
+  // フレームペースト時処理
+  //------------------------------
+  function onPasteContent(time, type, content) {
+    insertKeyFrame(time, type);
+    frameAt(findFrame(time)).content = content;
+    redrawAllFrame();
+  }
+}
+
+/*----------------------------------------------------------------------
+ * タイムラインサンプル
+ ----------------------------------------------------------------------*/
+class TimeLineSample extends KWindow
+{
+  // 新規レイヤ作成時のインデックス(単調増加する整数)
+  var newLayerIndex;
+
+  //------------------------------
+  // コンストラクタ
+  //------------------------------
+  function TimeLineSample {
+    super.KWindow("timelineSample");
+
+    // ウィンドウ初期設定
+    caption = 'タイムラインサンプル';
+    imeMode = imDontCare;
+    defaultAlignVertical = ALIGN_TOP;
+    defaultFocusable = true;
+
+    // ウィジェットを配置
+    primaryWidget.add(new KGridLayout(this, "rootGrid"));
+
+    rootGrid.add(0, 0, new KVerticalSpliterLayout(this, "vsplit"));
+      vsplit.add(new KAbsoluteLayout(this, "topAbsolute"));
+        topAbsolute.add(new KScrollLayout(this, true, true, "canvasScroll"));
+          canvasScroll.add(new TimeLineSampleCanvas(this, "canvas"));
+        topAbsolute.add(new KGridLayout(this, "buttonGrid"));
+          buttonGrid.add(0, 0, new KImageButton(this, "button_stop", "stop"));
+          buttonGrid.add(1, 0, new KImageButton(this, "button_play", "play"));
+          buttonGrid.add(2, 0, new KImageButton(this, "button_rewind", "rewind"));
+      vsplit.add(new KTimeLineControl(this, "timelineControl"));
+
+    // パラメータ初期化
+    buttonGrid.margin = 13;
+    buttonGrid.space = 3;
+    buttonGrid.alignHorizontal = ALIGN_RIGHT;
+    buttonGrid.alignVertical = ALIGN_BOTTOM;
+    stop.focusable = false;
+    play.focusable = false;
+    rewind.focusable = false;
+    canvas.alignHorizontal = canvas.alignVertical = ALIGN_CENTER;
+    vsplit.splitRatio = 1.0;
+    timelineControl.resize = true;
+    timelineControl.framePerSecond = 60;
+    timelineControl.add(new KTimeLineLoopItem("ループ", "loopItem"));
+    timelineControl.add(new TimeLineSampleRootItem("ルート", "rootItem"));
+
+    timelineControl.onRenderFrame = this.onRenderFrame;
+    timelineControl.onTimeLocatorRightClick = this.onTimeLocatorRightClick;
+    timelineControl.onTimeLineSelectionRightClick = this.onTimeLineSelectionRightClick;
+    timelineControl.onTimeLineSelectionKeyDown = this.onTimeLineSelectionKeyDown;
+
+    // キャンバスの中央を表示
+    canvasScroll.setChildViewPos((canvas.width - canvasScroll.childViewWidth) / 2,
+                                 (canvas.height - canvasScroll.childViewHeight) / 2);
+
+
+    // 永続化辞書の作成
+    var dict = new KPersistentDictionary(System.dataPath + "timelinesample_dict.txt");
+    add(dict);
+    bindPersistentDictionary(dict);
+
+    // 初期描画
+    renderCanvas();
+
+    // 表示
+    visible = true;
+  }
+
+  //------------------------------
+  // ファイナライザ
+  //------------------------------
+  function finalize {
+    if (dict) {
+      dict.set("newLayerIndex", newLayerIndex);
+      dict.set("contents", rootItem.serialize());
+      dict.set("loop", loopItem.serialize());
+    }
+    super.finalize(...);
+  }
+
+  //------------------------------
+  // 辞書とバインド
+  //------------------------------
+  function bindPersistentDictionary(dict) {
+    super.bindPersistentDictionary(dict);
+    newLayerIndex = dict.init("newLayerIndex", 0);
+    loopItem.unserialize(dict.init("loop", loopItem.serialize()));
+    rootItem.unserialize(dict.init("contents", rootItem.serialize()));
+  }
+
+  //------------------------------
+  // 新規レイヤのラベルを生成する
+  //------------------------------
+  property newLayerLabel {
+    getter {
+      newLayerIndex++;
+      return "レイヤ" + newLayerIndex;
+    }
+  }
+
+  //------------------------------
+  // フレームレンダリングイベント
+  //------------------------------
+  function onRenderFrame {
+    renderCanvas();
+  }
+
+  //------------------------------
+  // キャンバスのレンダリングをキック
+  //------------------------------
+  function renderCanvas {
+    asyncCaller.callOnce(this.doRenderCanvas);
+  }
+
+  //------------------------------
+  // キャンバスのレンダリングを実行
+  //------------------------------
+  function doRenderCanvas {
+    canvas.beforeRender();
+    rootItem.renderCanvas(canvas, timelineControl.selectedTime, ! timelineControl.playing);
+    canvas.afterRender();
+  }
+
+  //------------------------------
+  // 再生・停止・早送りボタンをハンドリング
+  //------------------------------
+  function onChildValueModified(child, value) {
+    switch (child.name) {
+    case "rewind": onRewindPress(); break;
+    case "play": onPlayPress(); break;
+    case "stop": onStopPress(); break;
+    }
+  }
+
+  //------------------------------
+  // 巻き戻し処理
+  //------------------------------
+  function onRewindPress {
+    timelineControl.selectedTime = 0;
+  }
+
+  //------------------------------
+  // 再生開始処理
+  //------------------------------
+  function onPlayPress {
+    if (timelineControl.selectedTime >= timelineControl.lastTime) 
+      timelineControl.selectedTime = 0;
+    timelineControl.play();
+  }
+
+  //------------------------------
+  // 再生停止処理
+  //------------------------------
+  function onStopPress {
+    timelineControl.stop();
+  }
+
+  //------------------------------
+  // タイムロケーター右クリック時のコンテキストメニュー
+  //------------------------------
+  function onTimeLocatorRightClick(time) {
+    var menu = new KContextMenu();
+    menu.addItem("フレームツリーをコピーする", "", true, funccall(this.onCopyFrameTree, time));
+    var canPaste = Clipboard.hasFormat(cbfTJS) && Clipboard.asTJS.type == TYPE_FRAME_TREE && equalStruct(Clipboard.asTJS.body.structure, rootItem.buildTreeStructure());
+    menu.addItem("フレームツリーをペーストする", "", canPaste, canPaste ? funccall(this.onPasteFrameTree, time, Clipboard.asTJS.body.contents) : void);
+    menu.show();
+  }
+
+  //------------------------------
+  // この時間のフレーム構造をまとめてコピー
+  //------------------------------
+  function onCopyFrameTree(time, onlySelected = false) {
+    Clipboard.asTJS = %[ type: TYPE_FRAME_TREE, body: %[ structure: rootItem.buildTreeStructure(), contents: rootItem.buildContentTree(time, onlySelected) ] ];
+  }
+
+  //------------------------------
+  // クリップボードの内容をペースト
+  //------------------------------
+  function onPasteFrameTree(time, data) {
+    rootItem.restoreContentTree(time, data);
+  }
+
+  //------------------------------
+  // レイヤー範囲コピー可能
+  //------------------------------
+  property isLayerRangeAvailableToCopy {
+    getter {
+      return ! (rootItem.hasSelection
+                && timelineControl.hasSelection);
+    }      
+  }
+
+  //------------------------------
+  // レイヤー範囲ペースト可能
+  //------------------------------
+  property isLayerRangeAvailableToPaste {
+    getter {
+      return Clipboard.hasFormat(cbfTJS)
+        && Clipboard.asTJS.type == TYPE_LAYER_RANGE
+        && timelineControl.selectedLayer >= 1;
+    }
+  }
+
+  //------------------------------
+  // タイムラインセレクション右クリック時のコンテキストメニュー
+  //------------------------------
+  function onTimeLineSelectionRightClick {
+    var menu = new KContextMenu();
+    menu.addItem("全選択", "selectAllItem", true, onSelectAll);
+    menu.addItem("コピーする",   "copyLayerRangeItem", isLayerRangeAvailableToCopy, funccall(this.onCopyLayerRange));
+    menu.addItem("カットする",   "cutLayerRangeItem",  isLayerRangeAvailableToCopy, funccall(this.onCutLayerRange));
+    menu.addItem("ペーストする", "pasteLayerRangeItem", isLayerRangeAvailableToPaste, funccall(this.onPasteLayerRange));
+    menu.selectAllItem.shortcut = "Ctrl+A";
+    menu.copyLayerRangeItem.shortcut = "Ctrl+C";
+    menu.cutLayerRangeItem.shortcut = "Ctrl+X";
+    menu.pasteLayerRangeItem.shortcut = "Ctrl+V";
+    menu.show();
+  }
+
+  //------------------------------
+  // タイムラインセレクションキー処理
+  //------------------------------
+  function onTimeLineSelectionKeyDown(key, shift) {
+    if (key == VK_A && shift == ssCtrl)
+      onSelectAll();
+    else if (key == VK_C && shift == ssCtrl
+        && isLayerRangeAvailableToCopy)
+      onCopyLayerRange();
+    else if (key == VK_X && shift == ssCtrl
+             && isLayerRangeAvailableToCopy)
+      onCutLayerRange();
+    else if (key == VK_V && shift == ssCtrl
+             && isLayerRangeAvailableToPaste)
+      onPasteLayerRange();
+  }
+
+  function onSelectAll {
+    timelineControl.selectAll();
+  }
+
+  //------------------------------
+  // レイヤ範囲をコピー
+  //------------------------------
+  function onCopyLayerRange {
+    var body = [];
+    var drawItemList = timelineControl.drawItemList;
+    for (var i = 0; i < drawItemList.count; i++) {
+      var item = drawItemList[i];
+      if (item.hasSelection)
+        body.add(item.copyFrameRange(item.selection[0], item.selection[1]));
+    }
+    Clipboard.asTJS = %[ type: TYPE_LAYER_RANGE, body: body ];
+  }
+
+  //------------------------------
+  // レイヤ範囲をカット
+  //------------------------------
+  function onCutLayerRange {
+    var body = [];
+    var drawItemList = timelineControl.drawItemList;
+    for (var i = 0; i < drawItemList.count; i++) {
+      var item = drawItemList[i];
+      if (item.hasSelection)
+        body.add(item.cutFrameRange(item.selection[0], item.selection[1]));
+    }
+    Clipboard.asTJS = %[ type: TYPE_LAYER_RANGE, body: body ];
+  }
+
+  //------------------------------
+  // レイヤ範囲をペースト
+  //------------------------------
+  function onPasteLayerRange {
+    var body = Clipboard.asTJS.body;
+    var drawItemList = timelineControl.drawItemList;
+    for (var i = 0; i < body.count; i++) {
+      if (timelineControl.selectedLayer + i > drawItemList.count - 1)
+        return;
+      drawItemList[timelineControl.selectedLayer + i].pasteFrame(timelineControl.selectedTime, body[i]);
+    }
+  }
+};
+
+//----------------------------------------------------------------------
+// サンプル表示・非表示の切り替え
+global.timelineSample = void;
+
+function showTimeLineSample
+{
+  if (timelineSample === void)
+    timelineSample = new TimeLineSample();
+  timelineSample.visible = true;
+}
+
+function hideTimeLineSample
+{
+  timelineSample.visible = false;
+}
+
+    

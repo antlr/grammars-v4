@@ -1,0 +1,94 @@
+
+var str = "abc漢字";
+var n1 = str.length;  // n には 5 が代入される
+var n2 = "abc漢字".length; // これも同じく 5 が代入される
+
+if( str != "abc漢字" ) {
+	Debug.message( "faild: str != \"abc漢字\"" );
+}
+if( n1 != 5 ) {
+	Debug.message( "faild: n1 != 5" );
+}
+if( n2 != 5 ) {
+	Debug.message( "faild: n2 != 5" );
+}
+
+var isSuccess = false;
+
+str = "abcdef";
+var c0 = str[0];  // 'a' が c に代入される
+var c2 = str[2];  // 'c' が c に代入される
+
+if( c0 != 'a' || c2 != 'c' ) {
+	Debug.message( "faild: c0 = str[0]" );
+}
+
+try{
+	str[3] = 'A'; // 代入式は生成できないのでエラーになる
+} catch {
+	isSuccess = true;
+}
+if( isSuccess != true ) {
+	Debug.message( "faild: str[3] = 'A'" );
+}
+
+var isSuccess = false;
+try{
+	var c100 = str[100]; // c 値が範囲外なのでエラーになる
+} catch {
+	isSuccess = true;
+}
+if( isSuccess != true ) {
+	Debug.message( "faild: c100 = str[100]" );
+}
+
+var c6 = str[6]; // 空文字 '' が代入される
+if( c6 != '' ) {
+	Debug.message( "faild: c6 = str[6]" );
+}
+
+var c3 = str.charAt(3);
+if( c3 != 'd' ) {
+	Debug.message( "faild: c3 = str.charAt(3)" );
+}
+
+str = "abcdefghijklabc";
+var nfgh = str.indexOf("fgh"); // n には 5 が代入される
+if( nfgh != 5 ) {
+	Debug.message( "faild: nfgh = str.indexOf(\"fgh\")" );
+}
+var nxyz = str.indexOf("xyz"); // n には -1 が代入される
+if( nxyz != -1 ) {
+	Debug.message( "faild: nxyz = str.indexOf(\"xyz\")" );
+}
+var nabc = str.indexOf("abc",4);
+if( nabc != 12 ) {
+	Debug.message( "faild: nabc = str.indexOf(\"abc\",4)" );
+}
+var lwr="ABCDEF".toLowerCase();
+if( lwr != "abcdef" ) {
+	Debug.message( "faild: lwr=\"ABCDEF\".toLowerCase()" );
+}
+var upr="abcdef".toUpperCase();
+if( upr != "ABCDEF" ) {
+	Debug.message( "faild: lwr=\"abcdef\".toUpperCase()" );
+}
+
+var ss="abcdefghijkl".substring(3,3);
+if( ss != "def" ) {
+	Debug.message( "faild: ss=\"abcdefghijkl\".substring(3,3)" );
+}
+var ss2="abcdefghijkl".substr(3,3);
+if( ss2 != "def" ) {
+	Debug.message( "faild: ss2=\"abcdefghijkl\".substr(3,3)" );
+}
+
+var formatted = "%04X %c %5d".sprintf(10, 'b', 30);
+if( formatted != "000A b    30" ) {
+	Debug.message( "faild: formatted = \"%04X %c %5d\".sprintf(10, 'b', 30)" );
+}
+var replaced = "abcdef".replace(/cd/, "ab");
+if( replaced != "ababef" ) {
+	Debug.message( "faild: replaced = \"abcdef\".replace(\"cd\", \"ab\")" );
+}
+

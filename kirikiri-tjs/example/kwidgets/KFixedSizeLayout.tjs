@@ -1,0 +1,116 @@
+//
+// $Id$
+//
+
+
+/*----------------------------------------------------------------------
+ * サイズ固定レイアウト
+ ----------------------------------------------------------------------*/
+class KFixedSizeLayout extends KWidget
+{
+  var child;
+  var fixHorizontal;
+  var fixVertical;
+  var redrawn;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * 子の縦、または横方向の「最大サイズ」を常に「最小サイズ」のまま
+   * になるようにロックするためのレイアウト。
+   *
+   * @param window ウィンドウ
+   * @param fixHorizontal 横方向ロック
+   * @param fixVertical 縦方向ロック
+   * @param name 名前
+   ------------------------------*/
+  function KFixedSizeLayout(window, fixHorizontal, fixVertical, name = "") {
+    super.KWidget(window, name);
+
+    this.fixHorizontal = fixHorizontal;
+    this.fixVertical = fixVertical;
+
+    hasImage = false;
+  }
+
+  /**------------------------------
+   * 子ウィジェットを配置する
+   *
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function add(child) {
+    this.child = child;
+    child.parent = this;
+    invalidateLayout();
+  }
+
+  /**------------------------------
+   * 子ウィジェットを削除する
+   *
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    this.child = void;
+    child.parent = widgetDepot;
+    invalidateLayout();
+    if (doInvalidate)
+      invalidate child;
+  }
+
+  /*------------------------------
+   * 各種フック関数
+   ------------------------------*/
+  function onChildMinMaxSizeModified {
+    invalidateLayout();
+  }
+
+  function onChildMarginModified {
+    invalidateLayout();
+  }
+
+  function onChildAlignModified {
+    invalidateLayout();
+  }
+
+  function onSizeModified {
+    redraw();
+  }
+
+  /*------------------------------
+   * レイアウトやり直し
+   ------------------------------*/
+  function invalidateLayout {
+    if (! child)
+      return;
+
+    var minW, minH, maxW, maxH;
+    minW = child.minWidth + child.marginHorizontal;
+    minH = child.minHeight + child.marginVertical;
+    maxW = child.maxWidth + child.marginHorizontal;
+    maxH = child.maxHeight + child.marginVertical;
+
+    if (fixHorizontal)
+      maxW = minW;
+    if (fixVertical)
+      maxH = minH;
+
+    redrawn = false;
+    setMinMaxSize(minW, minH, maxW, maxH);
+    if (! redrawn)
+      redraw();
+  }
+  
+  /*------------------------------
+   * リドロー
+   ------------------------------*/
+  function redraw {
+    redrawn = true;
+
+    if (! child)
+      return;
+    
+    child.setSize(width - child.marginHorizontal, height - child.marginVertical);
+    locateChild(0, 0, width, height, child);
+  }
+}

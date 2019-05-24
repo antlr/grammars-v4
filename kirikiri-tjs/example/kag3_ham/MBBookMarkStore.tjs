@@ -1,0 +1,114 @@
+/******************************************************************************
+	system_mb/mb/system/MBBookMarkStore.tjs
+*******************************************************************************/
+
+
+class MBBookMarkStore extends MBBookMarkRestore
+{
+	// プロパティ
+	var strTitleImage = 'bookmark/ti_save';
+	
+	var blForceActivate = true;	// とにかくパネルを選べるようにするかどうか
+	
+	
+	// 管理オブジェクト
+	
+	
+	// その他メンバ変数
+	
+	
+	function MBBookMarkStore(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBBookMarkRestore(win, par);
+		name = 'データセーバー';
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	
+	//==========================================================================
+	// 動作関連
+	
+	function makeConfirmation(sender)
+	{
+		// 確認を行う
+		
+		intTempTarget = sender.intDataNumber;
+		
+		// 使用済み領域の場合
+		if (sender.blHaveContent) {
+			// ロックされていたら警告を表示
+			if (window.bookMarkProtectedStates[intTempTarget]) {
+				showConfirmation('locked');
+			}
+			else {
+				showConfirmation('over');
+			}
+		}
+		
+		// 未使用領域の場合
+		else {
+			showConfirmation('new');
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function showConfirmation(type)
+	{
+		// ダイアログを表示
+		
+		var strConfirm;
+		
+		invalidate objDialog if (objDialog !== void);
+		
+		switch (type) {
+			case 'new':
+				strConfirm = "No.%dにセーブします。\nよろしいですか？".sprintf(intTempTarget + 1);
+				break;
+			
+			case 'over':
+				strConfirm = "No.%dには既にデータが存在します。\n上書きしてもよろしいですか？".sprintf(intTempTarget + 1);
+				break;
+			
+			case 'locked':
+				strConfirm = "No.%dはロックされています。\n他の欄を選択してください。".sprintf(intTempTarget + 1);
+				objDialog = new MBPseudyNoticeDialog(window, window.fore.base, strConfirm);
+				objDialog.show();
+				return;
+				break;
+			
+			default:
+				return;
+		}
+		
+		objDialog = new MBPseudyYesNoDialog(window, window.fore.base, this, strConfirm);
+		objDialog.show();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function doMyWork()
+	{
+		// 動作を行う
+		
+		sf.backpack_lastused = intTempTarget;
+		f.current_savenum    = intTempTarget;
+		
+		window.saveBookMark(intTempTarget);
+		updateBookMarkButtons();
+		
+		invalidate objDialog if (objDialog !== void);
+		
+		var str = "セーブが完了しました。";
+		objDialog = new MBPseudyNoticeDialog(window, window.fore.base, str);
+		objDialog.show();
+	}
+}

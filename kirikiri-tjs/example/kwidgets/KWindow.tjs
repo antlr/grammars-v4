@@ -1,0 +1,646 @@
+//
+// $Id: KWindow.tjs,v 1.23 2007/09/22 21:38:39 cvs Exp $
+//
+
+
+// 現在カーソルの乗っているウィンドウ
+global._existentWindowList = [];
+
+/**----------------------------------------------------------------------
+ * ウィジェットを格納するウィンドウ
+ ----------------------------------------------------------------------*/
+class KWindow extends Window
+{
+  /// デフォルトのフォントフェイス
+  var defaultFontFace;
+  /// デフォルトのフォントヘイト
+  var defaultFontHeight;
+  /// デフォルトのフォントカラー
+  var defaultFontColor;
+  /// デフォルトのマージン
+  var defaultMarginLeft;
+  var defaultMarginTop;
+  var defaultMarginRight;
+  var defaultMarginBottom;
+  /// デフォルトのスペース
+  var defaultSpaceVertical;
+  var defaultSpaceHorizontal;
+  /// デフォルトのアライメント
+  var defaultAlignVertical;
+  var defaultAlignHorizontal;
+  /// デフォルトのフォーカス能
+  var defaultFocusable;
+  /// 名前
+  var name;
+  /// 辞書
+  var dict;
+  /// ウィンドウの最大・最小サイズ
+  var innerMinWidth, innerMinHeight, innerMaxWidth, innerMaxHeight;
+  // 常に最小サイズを取る
+  var _alwaysSetToMinSize = false;
+  // ステータスバー
+  var _statusBar = void;
+  // 1度でもinvalidate実行された
+  var onceResize = false;
+  // ウィジェット
+  var _nameCache = %[];
+  // checked画像
+  var menuCheckedLayer;
+  // mainウィンドウか？
+  var isMain = false;
+  // 新規ウィンドウを全て直系の子にするか？
+  var _createNewWindowAsChild = true;
+  // 初期表示？
+  var firstVisible = true;
+  // zoom
+  var _denom = 1;
+  var _numer = 1;
+  
+  /**------------------------------
+   * コンストラクタ
+   *
+   * ウィジェットを格納するための専用ウィンドウです。
+   * KWindowはコンストラクト時に、自動的に専用の KPrimaryWidget を
+   * プライマリレイヤとしてnewし、登録します。
+   *
+   * @param name 名前
+   ------------------------------*/
+  function KWindow(name, parentWindow = null, ignoreGlobalZoom = false) {
+    _existentWindowList.insert(0, this);
+
+    if (k_kirikiriz) {
+      // 吉里吉里Zでは存在しないプロパティーをダミー対応
+      this.innerSunken = false;
+      this.showScrollBars = true;
+      // 吉里吉里Zではヒントは独自実装が必要
+      this.hintLayer = void;
+
+      // メインウィンドウ以外のウィンドウを全て直系の子にするかどうか
+      if (parentWindow == null
+          && global.Window.mainWindow != null
+          && global.Window.mainWindow.createNewWindowAsChild)
+        super.Window(global.Window.mainWindow);
+      else
+        super.Window(parentWindow);
+    } else {
+      super.Window();
+    }
+
+    isMain = (mainWindow === this);
+    // 自分自身がメインウィンドウでなかったら、メインウィンドウの管理オブジェクトにする。
+    if (! isMain)
+      mainWindow.add(this);
+
+    // 名前
+    this.name = name;
+
+    // とりあえず最小に
+    setSize(0, 0);
+
+    // スクロールバー無し
+    showScrollBars = false;
+    // へこみ無し
+    innerSunken = false;
+
+    // ウィジェットの初期値を、グローバル設定からコピる。
+    defaultFontFace = global.defaultFontFace;
+    defaultFontHeight = global.defaultFontHeight;
+    defaultFontColor = global.defaultFontColor;
+    defaultMarginLeft = global.defaultMarginLeft;
+    defaultMarginTop = global.defaultMarginTop;
+    defaultMarginRight = global.defaultMarginRight;
+    defaultMarginBottom = global.defaultMarginBottom;
+    defaultSpaceHorizontal = global.defaultSpaceHorizontal;
+    defaultSpaceVertical = global.defaultSpaceVertical;
+    defaultAlignHorizontal = global.defaultAlignHorizontal;
+    defaultAlignVertical = global.defaultAlignVertical;
+    defaultFocusable = global.defaultFocusable;
+
+    // windowExプラグインのイベントを有効にする
+    registerExEvent();
+
+    // メニューに細工
+    menu.find = function(name) {
+      for (var i = 0; i < children.count; i++) {
+        var child = children[i];
+        if (child instanceof "KMenuItem") {
+          var widget = child.find(name);
+          if (widget)
+            return widget;
+        }
+      }
+      return void;
+    } incontextof(menu);
+
+    menu.finalize = function  {
+      // 子レイヤーを全て破棄する
+      discardArray(children);
+    } incontextof(menu);
+
+    menu.isAvoidDictionaryRegistration = false;
+
+    menu.bindPersistentDictionary = function(dict) {
+      if (isAvoidDictionaryRegistration)
+        return;
+
+      for (var i = 0; i < children.count; i++) {
+        var child = children[i];
+        if (child instanceof "KMenuItem") 
+          child.bindPersistentDictionary(dict);
+      }
+    } incontextof(menu);
+
+    menu.clearItems = function {
+      discardArray(children);
+    } incontextof(menu);
+
+    menu.addSeparator = function {
+      add(new global.MenuItem(window, "-"));
+      window.invalidateMenuIcon();
+    } incontextof(menu);
+
+    menu.addItem = function(caption, name = "") {
+      var item = new global.KMenuItem(window, caption, name);
+      add(item);
+      window.invalidateMenuIcon();
+      return item;
+    } incontextof(menu);
+
+    menu.addToggleItem = function(caption, value, name = "") {
+      var item = new globa.KToggleMenuItem(window, caption, name);
+      add(item);
+      window.invalidateMenuIcon();
+      return item;
+    } incontextof(menu);
+
+    menu.invalidateMenuIcon = function {
+      if (this isvalid) {
+        for (var i = 0; i < children.count; i++) {
+          var child = children[i];
+          if (child instanceof "KMenuItem") 
+          child.invalidateMenuIcon();
+        }
+      }
+    } incontextof(menu);
+
+    // プライマリウィジェットを作る
+    add(new KPrimaryWidget(this));
+
+    // メニュー用チェックマーク
+    menuCheckedLayer = new Layer(this, primaryLayer);
+    menuCheckedLayer.loadImages("k_checked");
+    menuCheckedLayer.setSizeToImageSize();
+
+    // missing を有効にする
+    Scripts.setCallMissing(this);
+
+    if (k_kirikiriz) {
+      // ヒントレイヤを用意
+      hintLayer = new Layer(this, primaryLayer);
+      hintLayer.visible = false;
+      hintLayer.ignoreHintSensing = true;
+      hintLayer.font.height = 14;
+      hintLayer.hitThreshold = 256;
+    }
+    if (! ignoreGlobalZoom)
+      super.setZoom(global.KWindow.globalZoomNumer, global.KWindow.globalZoomDenom);
+  }
+
+  function finalize {
+    visible = false;
+    if (dict) {
+      dict.set(name + "_left", left);
+      dict.set(name + "_top", top);
+      if (onceResize) {
+        dict.set(name + "_width", primaryLayer.width + width - innerWidth);
+        dict.set(name + "_height", primaryLayer.height + height - innerHeight);
+      }
+    }
+    _existentWindowList.remove(this);
+    invalidate(menu);
+    super.finalize(...);
+  }
+
+  property createNewWindowAsChild {
+    setter (v) {
+      if (! isMain) 
+        throw new Exception("Window.createNewWindowAsChild property is only available at main window");
+      _createNewWindowAsChild = v;
+    }
+    getter {
+      if (! isMain) 
+        throw new Exception("Window.createNewWindowAsChild property is only available at main window");
+      return _createNewWindowAsChild;
+    }
+  }
+
+  property defaultMargin {
+    setter(v) {
+      defaultMarginLeft = defaultMarginTop = defaultMarginRight = defaultMarginBottom = v;
+    }
+  }
+
+  property defaultMarginHorizontal {
+    setter(v) {
+      defaultMarginLeft = defaultMarginRight = v;
+    }
+  }
+
+  property defaultMarginVertical {
+    setter(v) {
+      defaultMarginTop = defaultMarginBottom = v;
+    }
+  }
+
+  property defaultSpace {
+    setter(v) {
+      defaultSpaceVertical = defaultSpaceHorizontal = v;
+    }
+  }
+
+  /**------------------------------
+   * クラスツリー
+   *
+   * @return 自分自身の属するクラスツリーを配列で返す
+   ------------------------------*/
+  property classTrees {
+    getter {
+      return Scripts.getClassNames(this);
+    }
+  }
+
+  /**------------------------------
+   * クラス名
+   *
+   * @return 自分自身のクラス名を返す
+   ------------------------------*/
+  property className {
+    getter {
+      return Scripts.getClassNames(this)[0];
+    }
+  }
+
+  /**------------------------------
+   * プライマリウィジェットを参照します。primaryLayerと同じ値が返ります。
+   * 
+   * @return プライマリウィジェット
+   ------------------------------*/
+  property primaryWidget {
+    getter {
+      return primaryLayer;
+    }
+  }
+
+  /**------------------------------
+   * ウィジェットツリーから特定の名前を持った子ウィジェットを捜します
+   *
+   * @param name 検索するウィジェットの名前
+   * @return 名前の一致したウィジェット
+   ------------------------------*/
+  function find(name) {
+    var widget;
+    widget = primaryWidget.find(name);
+    if (widget !== void)
+      return widget;
+    widget = menu.find(name);
+    return widget;
+  }
+
+  /**------------------------------
+   * ウィジェットツリーから特定の名前を持った子ウィジェットを捜します
+   *
+   * find関数を経由せずに、オブジェクトのプロパティ扱いで名前を指定して
+   * ウィジェットツリー中のウィジェットを参照することが出来ます。
+   *
+   * パフォーマンスの都合で、グローバルに同名のシンボルが存在する場合は
+   * 優先的にそちらを見に行くという挙動をするので注意。
+   ------------------------------*/
+  function missing(get_or_set, name, value) {
+    if (! get_or_set) {
+      if (typeof(global[name]) != "undefined")
+        return false;
+      if (typeof(_nameCache[name]) != "undefined") {
+        var widget = _nameCache[name];
+        if (widget isvalid
+            && widget.name == name) {
+          *value = widget;
+          return true;
+        } else {
+          delete _nameCache[name];
+        }
+      }
+      var widget = find(name);
+      if (widget) {
+        _nameCache[name] = widget;
+        *value = widget;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // ダミー
+  function action {
+  }
+
+  /**------------------------------
+   * プロパティをバインドする
+   *
+   * ツリー内のウィジェットを KProperty クラスのオブジェクトにバインドします。
+   *
+   * @param バインドするプロパティ
+   ------------------------------*/
+  function bindPersistentDictionary(dict) {
+    // ウィジェットをバインド
+    primaryWidget.bindPersistentDictionary(dict);
+    // メニューをバインド
+    menu.bindPersistentDictionary(dict);
+
+    // nameが指定されてたらウィンドウもバインド
+    if (name != "") {
+      this.dict = dict;
+      width = dict.init(name + "_width", width);
+      height = dict.init(name + "_height", height);
+      left = dict.init(name + "_left", left);
+      top = dict.init(name + "_top", top);
+    }
+  }
+
+  /**------------------------------
+   * プライマリウィジェットのマージンが変更された時に呼ばれるフック関数
+   *
+   * @param child マージンの変更された子ウィジェット
+   * @param newMarginLeft   新規左マージン
+   * @param newMarginTop    新規上マージン
+   * @param newMarginRight  新規右マージン
+   * @param newMarginBottom 新規下マージン
+   * @param oldMarginLeft   変更前の左マージン
+   * @param oldMarginTop    変更前の上マージン
+   * @param oldMarginRight  変更前の右マージン
+   * @param oldMarginBottom 変更前の下マージン
+   *------------------------------*/
+  function onChildMarginModified(child,
+                                 newMarginLeft, newMarginTop, newMarginRight, newMarginBottom,
+                                 oldMarginLeft, oldMarginTop, oldMarginRight, oldMarginBottom) {
+  }
+
+  /*------------------------------
+   * プライマリウィジェットのアライメントが変更された時に呼ばれるフック関数
+   *
+   * @param child アライメントの変更された子ウィジェット
+   * @param newAlignHorizontal 新規水平アライメント
+   * @param newAlignVertical 新規垂直アライメント
+   * @param oldAlignHorizontal 変更前の水平アライメント
+   * @param oldAlignVertical 変更前の垂直アライメント
+   ------------------------------*/
+  function onChildAlignModified(child,
+                                newAlignHorizontal, newAlignVertical,
+                                oldAlignHorizontal, oldAlignVertical) {
+  }
+
+  /**----------------------------------------------------------------------
+   * プライマリウィジェットの最小サイズ、最大サイズの更新に伴って呼ばれるフック関数
+   *
+   * @param child 最小・最大サイズの更新された子ウィジェット
+   * @param newMinWidth 新規最小幅
+   * @param newMinHeight 新規最小高さ
+   * @param newMaxWidth 新規最大幅
+   * @param oldMinWidth 変更前の最小幅
+   * @param oldMinHeight 変更前の最小高さ
+   * @param oldMaxWidth 変更前の最大幅
+   * @param oldMaxHeight 変更前の最大高さ
+   ----------------------------------------------------------------------*/
+  function onChildMinMaxSizeModified(child,
+                                     newMinWidth, newMinHeight, newMaxWidth, newMaxHeight,
+                                     oldMinWidth, oldMinHeight, oldMaxWidth, oldMaxHeight) {
+    setMinMaxSize(newMinWidth, newMinHeight, newMaxWidth, newMaxHeight);
+  }
+
+  /**------------------------------
+   * ウィジェットの「値」が変わった時に呼ばれるフック関数
+   *
+   * ウィジェットの「値」値が変更された時に呼ばれます。
+   * ウィジェット自身のonValueChangedをオーバーライドするか、
+   * ウィジェットのいずれかの祖先のonChildValueModifiedをオーバーライド
+   * すると、ウィンドウまで通知は届きません。
+   *
+   * @param child 値の変更された子ウィジェット
+   * @param newValue 新規の値
+   * @param oldValue 変更前の値
+   ------------------------------*/
+  function onChildValueModified(child, newValue, oldValue) {
+  }
+
+  /**----------------------------------------------------------------------
+   * ウィンドウのサイズを常に最小に設定するかどうか
+   *
+   * 値を真に設定すると、ウィンドウは常に取りうる最小サイズを取るようになる。
+   *
+   * @param v ウィンドウのサイズを常に最小に設定するかどうか
+   * @return ウィンドウのサイズを常に最小に設定するかどうか
+   ----------------------------------------------------------------------*/
+  property alwaysSetToMinSize {
+    getter {
+      return _alwaysSetToMinSize;
+    }
+    setter (v) {
+      _alwaysSetToMinSize = v;
+    }
+  }
+
+  function invalidateLayout {
+    var minW, minH, maxW, maxH;
+    minW = innerMinWidth * zoomNumer / zoomDenom + (width - innerWidth);
+    minH = innerMinHeight * zoomNumer / zoomDenom + (height - innerHeight);
+    maxW = innerMaxWidth * zoomNumer / zoomDenom + (width - innerWidth);
+    maxH = innerMaxHeight * zoomNumer / zoomDenom + (height - innerHeight);
+    setMinSize(minW, minH);
+    setMaxSize(maxW, maxH);
+  }
+
+  function setMinMaxSize(minWidth, minHeight, maxWidth, maxHeight) {
+    // minとmaxの逆転をチェック
+    if (minWidth > maxWidth || minHeight > maxHeight)
+      throw new Exception("KWindow: minmax size mismatch(minW:%d,minH:%d,maxW:%d,maxH:%d)".sprintf(minWidth,minHeight,maxWidth,maxHeight));
+
+    innerMinWidth = minWidth;
+    innerMinHeight = minHeight;
+    innerMaxWidth = _alwaysSetToMinSize ? minWidth : maxWidth;
+    innerMaxHeight = _alwaysSetToMinSize ? minHeight : maxHeight;
+    asyncCaller.callOnce(this.invalidateLayout, this);
+  }
+
+  function onResize {
+    primaryLayer.setSize(innerWidth * zoomDenom / zoomNumer, innerHeight * zoomDenom / zoomNumer);
+    onceResize = true;
+    invalidateLayout();
+  }
+
+  function setZoom(numer, denom) {
+    _numer = numer;
+    _denom = denom;
+    var w, h;
+    w = innerWidth * zoomDenom / zoomNumer;
+    h = innerHeight * zoomDenom / zoomNumer;
+    super.setZoom(numer * global.KWindow.globalZoomNumer, denom * global.KWindow.globalZoomDenom);
+    invalidateLayout();
+    setSize(w * zoomNumer / zoomDenom + (width - innerWidth),
+	    h * zoomNumer / zoomDenom + (height - innerHeight));
+  }
+
+  /*------------------------------
+   * ファイルドロップ。
+   *
+   * ドロップ情報をレイヤに転送する
+   ------------------------------*/
+  function onFileDrop(files) {
+    var shift = 0;
+    if (System.getKeyState(VK_SHIFT))
+      shift |= ssShift;
+    if (System.getKeyState(VK_MENU))
+      shift |= ssAlt;
+    if (System.getKeyState(VK_CONTROL))
+      shift |= ssCtrl;
+
+    var targetWidget = primaryLayer.getWidgetAt(primaryLayer.cursorX,
+                                                primaryLayer.cursorY);
+    if (targetWidget)
+      targetWidget.onFileDrop(targetWidget.cursorX,
+                              targetWidget.cursorY,
+                              files,
+                              shift);
+  }
+
+  /**------------------------------
+   * ステータスバーを参照する
+   ------------------------------*/
+  property statusBar {
+    getter {
+      return _statusBar;
+    }
+  }
+
+  function onActivate {
+    _existentWindowList.remove(this);
+    _existentWindowList.insert(0, this);
+    if (focusedLayer instanceof "KWidget")
+      focusedLayer.onWindowActivate();
+  }
+
+  function onDeactivate {
+    if (focusedLayer instanceof "KWidget")
+      focusedLayer.onWindowDeactivate();
+  }
+
+  function invalidateMenuIcon {
+    asyncCaller.callOnce(menu.invalidateMenuIcon);
+  }
+
+  /**------------------------------
+   * ヒントを表示する
+   ------------------------------*/
+  function onHintChanged(text,x,y,isshow) {
+    if( isshow ) {
+      x *= zoomDenom / zoomNumer;
+      y *= zoomDenom / zoomNumer;
+      y += 32;
+      var lines = text.split(/(\r|\n|\r\n)/);
+      var w = 0, h = 0;
+      for (var i = 0; i < lines.count; i++) {
+        w = Math.max(w, hintLayer.font.getTextWidth(lines[i]));
+        h += hintLayer.font.getTextHeight(lines[i]);
+      }
+      w += 6;
+      h += 4 + 4;
+      hintLayer.bringToFront();
+      hintLayer.setImageSize( w, h );
+      hintLayer.setSizeToImageSize();
+
+      var iw = innerWidth * zoomDenom / zoomNumer;
+      var ih = innerHeight * zoomDenom / zoomNumer;
+      
+      if( (x+w) > iw ) { x = iw - w; }
+      if( (y+h) > ih ) { y = ih - h; }
+      hintLayer.setPos( x, y );
+      
+      hintLayer.fillRect( 0, 0, w, h, 0 );
+      hintLayer.colorRect( 0, 0, w, h, clInfoBk, 196 );
+      
+      hintLayer.colorRect( 0, 0, 1, h, 0xFFFFFF );
+      hintLayer.colorRect( 0, 0, w, 1, 0xFFFFFF );
+      hintLayer.colorRect( w-1, 0, 1, h, 0xFFFFFF );
+      hintLayer.colorRect( 0, h-1, w, 1, 0xFFFFFF );
+
+      var tx = 2, ty = 2;
+      for (var i = 0; i < lines.count; i++) {
+        hintLayer.drawText( tx, ty, lines[i], clInfoText, 220 );
+        ty += hintLayer.font.getTextHeight(lines[0]);
+      }
+      hintLayer.visible = true;
+    } else {
+      hintLayer.visible = false;
+    }
+  }
+
+  /**------------------------------
+   * ディスプレイに収まるようにサイズ調整する
+   * windowExプラグインをリンクしてる時のみ機能する
+   ------------------------------*/
+  function inscribeIntoDisplay {
+    if (typeof(System.getMonitorInfo) == "undefined")
+      return;
+
+    var monitorInfo = System.getMonitorInfo(true, this);
+    setPos(Math.max(monitorInfo.monitor.x, Math.min(monitorInfo.monitor.x + monitorInfo.monitor.w - width, left)),
+           Math.max(monitorInfo.monitor.y, Math.min(monitorInfo.monitor.y + monitorInfo.monitor.h - height, top)));
+    setSize(Math.min(monitorInfo.monitor.w, width),
+            Math.min(monitorInfo.monitor.h, height));
+  }
+
+  property visible {
+    getter {
+      return super.visible;
+    }
+    setter(v) {
+      if (typeof(System.getMonitorInfo) == "undefined"
+          || ! firstVisible) {
+        super.visible = v;
+        return;
+      }
+
+      firstVisible = false;
+
+      var region = new KRegion();
+      var displays = System.getDisplayMonitors();
+      for (var i = 0; i < displays.count; i++) {
+        var display = displays[i];
+        region.include(new KRect(display.monitor.x,
+                                 display.monitor.y,
+                                 display.monitor.w,
+                                 display.monitor.h));
+      }
+      region.intersectWith(new KRect(left, top, width, height));
+      var activeArea = 0;
+      for (var i = 0; i < region.rectCount; i++) {
+        var rect = region.rectAt(i);
+        activeArea += rect.width * rect.height;
+      }
+      if (activeArea / (width * height) < 1)
+        inscribeIntoDisplay();
+      super.visible = v;
+    }
+  }
+};
+
+
+KWindow.globalZoomNumer = 1;
+KWindow.globalZoomDenom = 1;
+
+KWindow.setGlobalZoom = function(numer, denom) {
+  global.KWindow.globalZoomNumer = numer;
+  global.KWindow.globalZoomDenom = denom;
+  for (var i = 0; i < _existentWindowList.count; i++) {
+    var win = _existentWindowList[i];
+    win.setZoom(win._numer, win._denom);
+  }
+};

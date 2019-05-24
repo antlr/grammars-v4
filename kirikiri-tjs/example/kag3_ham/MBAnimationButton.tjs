@@ -1,0 +1,101 @@
+/******************************************************************************
+	system_mb/ui/MBAnimationButton.tjs
+*******************************************************************************/
+
+
+class MBAnimationButton extends MBButton
+{
+	var layGraph = [];	// 画像を置くレイヤ
+	
+	function MBAnimationButton(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBButton(win, par);
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		var i;
+		for (i=0; i<layGraph.count; i++) {
+			invalidate layGraph[i] if (layGraph[i] !== void);
+		}
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function loadButtonImages(fl1, fl2)
+	{
+		// ボタンに使用するイメージを指定する
+		// 通常 : onMouseEnter & onMouseDown の順。
+		
+		var useImage = [fl1, fl2];
+		var i;
+		
+		for (i=0; i<useImage.count; i++) {
+			if (layGraph[i] === void) {
+				layGraph[i] = new GraphicLayer(window, this);
+			}
+			layGraph[i].setPos(0, 0);
+			layGraph[i].hitType = htMask;
+			layGraph[i].hitThreshold = 256;
+			layGraph[i].setImageSize(width, height);
+			layGraph[i].setSizeToImageSize();
+			layGraph[i].loadImages(%[storage : useImage[i]]);
+		}
+		
+		layGraph[0].visible = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function changeFace(state)
+	{
+		// ボタンの画像を変える
+		
+		switch (state) {
+			case "normal":
+				layGraph[0].visible = true;
+				layGraph[1].visible = false;
+				break;
+			
+			case "active":
+				layGraph[0].visible = false;
+				layGraph[1].visible = true;
+				break;
+			
+			default:
+				layGraph[0].visible = true;
+				layGraph[1].visible = false;
+				break;
+		}
+	}
+	
+	function clearButtonImages()
+	{
+		// ボタン画像を開放
+		
+		layGraph[0].freeImage();
+		layGraph[1].freeImage();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseEnter()
+	{
+		super.onMouseEnter(...);
+		
+		changeFace("active");
+	}
+	
+	function onMouseLeave()
+	{
+		super.onMouseLeave(...);
+		
+		changeFace("normal");
+	}
+}

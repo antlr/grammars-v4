@@ -1,0 +1,217 @@
+//
+// $Id$
+//
+
+
+/*----------------------------------------------------------------------
+ * 相対位置レイアウト
+ ----------------------------------------------------------------------*/
+class KRelativeLayout extends KWidget
+{
+  // 格納してるウィジェット
+  var childList;
+  // 基準レイヤ
+  var nomativeChild;
+
+  /**------------------------------
+   * 絶対位置レイアウト
+   * 
+   * ウィジェットを、レイアウト中に相対座標基準で設置します。
+   * いわゆる「多重スクロール」を実現することが出来ます。
+   * KRelativeLayoutをKScrollLayoutに登録した上で、
+   * 大きさの異なる複数のウィジェットを内部に配置し、
+   * その相対的な位置関係によってスクロール量を自動的に調整します。
+   *
+   * @param win ウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KRelativeLayout(win, name) {
+    super.KWidget(win, name);
+
+    childList = [];
+    nomativeChild = void;
+    hasImage = false;
+  }
+
+  /**------------------------------
+   * ウィジェットをレイアウトに登録する
+   * 
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function add(child) {
+    child.parent = this;
+    childList.add(child);
+    invalidateLayout();
+  }
+
+  /**------------------------------
+   * 基準ウィジェットをレイアウトに登録する
+   * 
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function insert(index, child) {
+    child.parent = this;
+    childList.insert(index, child);
+    invalidateLayout();
+  }
+
+  /**------------------------------
+   * ウィジェットをレイアウトから開放する
+   * 
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    if (child === nomativeChild)
+      nomativeChild = void;
+    child.parent = widgetDepot;
+    childList.remove(child);
+    invalidateLayout();
+    if (doInvalidate)
+      invalidate child;
+  }
+
+  /**------------------------------
+   * ウィジェットをレイアウトから開放する
+   * 
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function erase(index, doInvalidate = true) {
+    var child = childList[index];
+    if (child === nomativeChild)
+      nomativeChild = void;
+    child.parent = widgetDepot;
+    childList.remove(child);
+    invalidateLayout();
+    if (doInvalidate)
+      invalidate child;
+  }
+
+  /**------------------------------
+   * 子アイテムをカウントする
+   * 
+   * @return 子アイテム数
+   ------------------------------*/
+  property childCount {
+    getter {
+      return childList.count;
+    }
+  }
+
+  /**------------------------------
+   * 子ウィジェットを参照する
+   *
+   * @param index インデックス
+   * @return 子ウィジェット
+   ------------------------------*/
+  function childAt(index) {
+    return childList[index];
+  }
+
+  /*------------------------------
+   * 基準ウィジェットを設定する
+   *
+   * @param v 基準ウィジェット
+   * @return 基準ウィジェット
+   *
+   * 自分自身のサイズを決める際の「基準ウィジェット」を指定します。
+   * 
+   ------------------------------*/
+  property nomative {
+    getter {
+      return _nomativeChild;
+    }
+    setter(v) {
+      if (_nomativeChild === v)
+        return;
+      _nomativeChild = v;
+      invalidateLayout();
+    }
+  }
+
+  /*------------------------------
+   * レイアウトをやり直し
+   ------------------------------*/
+  function invalidateLayout {
+    var minW, minH, maxW, maxH;
+    minW = minH = maxW = maxH = 0;
+    if (nomativeChild !== void) {
+      minW = nomativeChild.minWidth;
+      minH = nomativeChild.minHeight;
+      minW = nomativeChild.maxWidth;
+      minH = nomativeChild.maxHeight;
+    } else {
+      for (var i = 0; i < childList.count; i++) {
+        var child = childList[i];
+        minW = int(Math.max(minW, child.minWidth));
+        minH = int(Math.max(minH, child.minHeight));
+        maxW = int(Math.max(maxW, child.maxWidth));
+        maxH = int(Math.max(maxH, child.maxHeight));
+      }
+    }
+    setMinMaxSize(minW, minH, maxW, maxH);
+    for (var i = 0; i < childList.count; i++) {
+      var child = childList[i];
+      child.setSize(width, height);
+    }
+    var view = viewingRect;
+    onViewModified(view.left, view.top, view.width, view.height);
+  }
+
+  function onChildAlignModified {
+    invalidateLayout();
+  }
+
+  function onChildMinMaxSizeModified {
+    invalidateLayout();
+  }
+
+  function onSizeModified {
+    invalidateLayout();
+  }
+
+  function onViewModified(vleft, vtop, vwidth, vheight) {
+    for (var i = 0; i < childList.count; i++) {
+      var child = childList[i];
+      var childLeft = 0, childTop = 0;
+      var site = new KRect(vleft, vtop, vwidth, vheight);
+      var childSite = new KRect(0, 0, 0, 0);
+      childSite.top = site.top;
+      childSite.height = site.height;
+
+      if (child.width >= site.width
+                 && width > vwidth) {
+        childSite.left = int((child.width - site.width) * vleft / (width - vwidth));
+        childSite.width = site.width;
+        childLeft = site.left - childSite.left;
+      } else {
+        childSite.left = 0;
+        childSite.right = child.width;
+        switch (child.alignHorizontal) {
+        case ALIGN_LEFT: childLeft = site.left; break;
+        case ALIGN_CENTER: childLeft = site.left + int((site.width - child.width) / 2); break;
+        case ALIGN_RIGHT: childLeft = site.left + site.width - child.width; break;
+        }
+      }
+
+      if (child.height >= site.height
+                 && height > vheight) {
+        childSite.top = int((child.height - site.height) * vtop / (height - vheight));
+        childSite.height = site.height;
+        childTop = site.top - childSite.top;
+      } else {
+        childSite.top = 0;
+        childSite.bottom = child.height;
+        switch (child.alignHorizontal) {
+        case ALIGN_TOP: childTop = site.top; break;
+        case ALIGN_CENTER: childTop = site.top + int((site.height - child.height) / 2); break;
+        case ALIGN_BOTTOM: childTop = site.top + site.height - child.height; break;
+        }
+      }
+
+      child.setPos(childLeft, childTop);
+      child.onViewModified(childSite.left, childSite.top, childSite.width, childSite.height);
+    }
+  }
+};

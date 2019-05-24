@@ -1,0 +1,114 @@
+/******************************************************************************
+	Base/StandBy.tjs
+	
+	Ham拡張（MercuryBlue）システムを起動します。
+*******************************************************************************/
+
+
+// 統括オブジェクトを作ってKAGに挿す
+var MBSystem = new MercuryBlue(kag);
+kag.addPlugin(MBSystem);
+
+kag.leftClickHook.add(MBSystem.cancelKBOperationFlagOnMouseClick);
+kag.rightClickHook.add(MBSystem.cancelKBOperationFlagOnMouseClick);
+
+
+// システムマネージャをグローバルに参照しておく
+var SystemManager = MBSystem.objSystemManager;
+
+kag.keyDownHook.add(SystemManager.objFocusController.onKeyDown);
+
+
+// クイックセーブメニューオブジェクト
+var _QuickSaves = %[
+	fore : new MBQuickSave(kag, kag.fore.base),
+	back : new MBQuickSave(kag, kag.back.base)
+];
+
+if (!MBSystemPref.enableQuickSave) {
+	_QuickSaves.fore.setActiveness(false);
+	_QuickSaves.back.setActiveness(false);
+}
+
+
+// ヒストリレイヤを作り直す
+kag.remove(kag.historyLayer);
+invalidate kag.historyLayer;
+kag.historyLayer = new MBHistoryLayer(kag, kag.fore.base);
+kag.add(kag.historyLayer);
+
+
+// 右クリックをコンテクストメニューに割り当てる
+TAG.rclick(%[
+	enabled : true,
+	call : true,
+	storage : MBBasePath + "assets/kag/HamRoutines.ks",
+	target : "*rclick_wrapper"
+]);
+
+
+// コンテクストメニューの設定を行う
+KAGLoadScript(MBBasePath + "MenuSettings.tjs");
+
+
+// コンテクストメニュー呼び出しボタンを設置
+var _CMenuButtons = %[];
+if (MBSystemPref.cmenuButtonEnabled) {
+	_CMenuButtons = %[
+		fore : new MBContextMenuCaller(kag, kag.fore.base),
+		back : new MBContextMenuCaller(kag, kag.back.base)
+	];
+}
+
+//==============================================================================
+// 追加KAGタグ
+
+/*
+	[qsstate] - クイックセーブの表示・有効を切り替える
+		visible : 表示するかどうか
+		enabled : 有効かどうか
+*/
+TAG.qsstate = function(elm)
+{
+	if (!MBSystemPref.enableQuickSave) {
+		// 有効になっていない場合は帰る
+		return 0;
+	}
+	
+	if (elm.visible !== void) {
+		if (!elm.forse && kag.skipMode > 0) {
+			// スキップ中は強制的に非表示
+			_QuickSaves.fore.hide();
+			_QuickSaves.back.hide();
+		}
+		else {
+			switch (elm.visible) {
+				case 'true':
+					_QuickSaves.fore.show();
+					_QuickSaves.back.show();
+					break;
+				
+				case 'false':
+					_QuickSaves.fore.hide();
+					_QuickSaves.back.hide();
+					break;
+			}
+		}
+	}
+	
+	if (elm.enabled !== void) {
+		switch (elm.enabled) {
+			case 'true':
+				_QuickSaves.fore.setEnabled();
+				_QuickSaves.back.setEnabled();
+				break;
+			
+			case 'false':
+				_QuickSaves.fore.unsetEnabled();
+				_QuickSaves.back.unsetEnabled();
+				break;
+		}
+	}
+	
+	return 0;
+} incontextof kag;

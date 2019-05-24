@@ -1,0 +1,614 @@
+// GraphicLayer.tjs - グラフィック系レイヤ(背景,キャラクタ)
+// Copyright (C)2001-2009, W.Dee and contributors  改変・配布は自由です
+
+class ProvinceContext
+{
+	// 領域アクション用コンテキスト
+	var target;
+	var storage;
+	var onenter;
+	var onleave;
+	var hint;
+	var exp;
+	var cursor;
+	var countpage;
+	var autodisable;
+
+	function ProvinceContext() {};
+	function finalize() {};
+}
+
+class GraphicLayer extends AnimationLayer
+{
+	// 背景/前景レイヤの基本クラス
+
+	var comp; // 対のレイヤ
+	var id; // ID
+	var provinceActions = void; // クリッカブルマップの領域ごとのアクション定義
+	var pointingProvince = 0; // 現在指し示している領域番号
+	var loadedProvinceImage = ""; // loadImages 後に読み込まれた領域画像
+	var loadedProvinceActions = ""; // loadImages 後に読み込まれた領域アクション
+	var defaultCursor = crDefault; // デフォルトのカーソル
+	var lastMouseDownX; // 最後にマウスがクリックされた X 座標
+	var lastMouseDownY; // 最後にマウスがクリックされた Y 座標
+
+	function GraphicLayer(win, par, name, id)
+	{
+		// GraphicLayer コンストラクタ
+		// win    : ウィンドウオブジェクト
+		// par    : 親レイヤ
+		// name   : レイヤの名前
+		super.AnimationLayer(win, par);
+
+		this.name = name;
+		this.id = id;
+		/* 対のレイヤ は、このオブジェクトを作成後に setCompLayer で設定すること */
+	}
+
+	function finalize()
+	{
+		clearProvinceActions();
+		super.finalize(...);
+	}
+
+	function setCompLayer(lay) { comp = lay; }
+
+	function setDefaultCursor(c)
+	{
+		cursor = defaultCursor = c;
+	}
+
+	function loadImages(elm)
+	{
+		// elm に記述されている内容に従ってこのレイヤに画像を読み込む
+		clearProvinceActions();
+		loadedProvinceImage = "";
+		super.loadImages(elm);
+		if(elm !== void)
+		{
+			if(elm.mapimage !== void) super.loadProvinceImage(elm.mapimage); // 領域画像を読む
+			if(elm.mapaction !== void)
+			{
+				internalLoadProvinceActions(elm.mapaction); // 領域アクションを読む
+			}
+			else
+			{
+				var name;
+				var storage = Storages.getPlacedPath(
+					name = (Storages.chopStorageExt(elm.storage) + ".ma")); // 拡張子が .ma のファイル
+				if(storage != '')
+					loadProvinceActions(name);
+			}
+		}
+	}
+
+	function loadProvinceImage(fn)
+	{
+		// 領域画像 fn を読み込む
+		super.loadProvinceImage(fn);
+		loadedProvinceImage = fn;
+	}
+
+	function assignComp()
+	{
+		// 対になるレイヤの内容をコピー
+		assign(comp);
+	}
+
+	function assign(src)
+	{
+		super.assign(...);
+
+		if(provinceActions !== void)
+		{
+			invalidate provinceActions;
+			window.disableMouseKey();
+		}
+		if(src.provinceActions !== void)
+		{
+			(provinceActions = []).assign(src.provinceActions);
+			window.enableMouseKey();
+		}
+		else
+		{
+			provinceActions = void;
+		}
+		loadedProvinceImage = src.loadedProvinceImage;
+		loadedProvinceActions = src.loadedProvinceActions;
+	}
+
+	function beginTransition(elm)
+	{
+		// elm に従ってトランジションを行う
+		comp.stopTransition(); // comp で行われていたトランジションも停止
+		super.beginTransition(elm, comp);
+	}
+
+	function exchangeInfo()
+	{
+		// comp と情報を取り替える
+		// すでに 画像の内容、ツリー構造は取り変わっているので
+		// 名前などを取り替える
+		// また、ウィンドウの管理情報も更新するようにする
+		var src = comp;
+		var tmp = src.name;
+		src.name = name;
+		name = tmp;
+		tmp = src.cursor;
+		src.cursor = cursor;
+		cursor = tmp;
+	}
+
+	function clearImage(process = true)
+	{
+		// AnimationLayer.clearImage オーバーライド
+		super.clearImage(process);
+		loadedProvinceImage = "";
+		clearProvinceActions();
+	}
+
+	function clearProvinceActions()
+	{
+		if(provinceActions !== void)
+		{
+			invalidate provinceActions;
+			provinceActions = void;
+			pointingProvince = 0;
+			cursor = defaultCursor;
+			hint = "";
+			showParentHint = true;
+			window.disableMouseKey();
+		}
+		loadedProvinceActions = "";
+	}
+
+	function internalLoadProvinceActions(fn)
+	{
+		// ファイル名 fn を領域アクション定義ファイルとして読み込む
+		clearProvinceActions();
+
+		var file = [];
+		file.load(fn);
+		var filelines = file.count;
+
+		// ファイルに従ってスクリプトを動的に生成
+		var body = "function { var a = provinceActions; \n";
+		for(var i = 0; i<filelines; i++)
+		{
+			var line = file[i];
+			if(line == "" || line[0] == ';') continue;
+			var colon = line.indexOf(':');
+			if(colon == -1) continue;
+			body += "a[" + line.substring(0, colon) + "] = function { " +
+				line.substring(colon + 1) + " ;};\n";
+		}
+		body += "}\n";
+
+		provinceActions = [];
+		(Scripts.eval(body) incontextof this) (); // body のコンパイルをしてこのコンテキスト上で実行
+
+		window.enableMouseKey();
+	}
+
+	function loadProvinceActions(fn)
+	{
+		internalLoadProvinceActions(fn);
+		loadedProvinceActions = fn;
+	}
+
+	function queryProvinceAction(n, checkzero = true)
+	{
+		// 領域番号 n に関するアクションを返す
+		// アクションがなにも定義されていなければ void を返す
+//		dm(n, provinceActions, provinceActions[n]);
+		if(provinceActions === void) return void;
+		if(checkzero) { if(n == 0) return void; }
+		var action = provinceActions[n];
+		if(action === void) return void;
+		var ar = new ProvinceContext();
+		(action incontextof ar) (); // ar のコンテキスト上でアクションを実行
+		if(ar.target === void && ar.storage === void && ar.onenter === void &&
+			ar.onleave === void && ar.hint === void && ar.exp === void &&
+			ar.cursor === void && ar.countpage === void && ar.autodisable === void)
+				return void;
+		return ar;
+	}
+
+	function onMouseMove(x, y)
+	{
+		// onMouseMove イベントハンドラ
+		super.onMouseMove(...);
+		if(provinceActions !== void)
+		{
+			var n = window.messageLayerHiding ? 0 : getProvincePixel(x - imageLeft, y - imageTop);
+			if(n != pointingProvince)
+			{
+				// 異なる領域の上を動いた場合
+				if(pointingProvince != 0) onProvinceLeave(pointingProvince);
+				if(n != 0) onProvinceEnter(n);
+				pointingProvince = n;
+			}
+			if(n == 0)
+			{
+				hint = "";
+				showParentHint = true;
+				cursor = defaultCursor;
+			}
+		}
+	}
+
+	function onMouseLeave()
+	{
+		// onMouseLeave イベントハンドラ
+		super.onMouseLeave(...);
+		if(pointingProvince != 0)
+		{
+			onProvinceLeave(pointingProvince);
+			pointingProvince = 0;
+		}
+	}
+
+	function onProvinceEnter(n)
+	{
+		// 領域番号 n にマウスが移動した
+		var action = queryProvinceAction(n);
+		if(action !== void)
+		{
+			if(action.onenter !== void) Scripts.eval(action.onenter);
+			if(action.hint !== void) hint = action.hint;
+			if(action.cursor !== void)
+				cursor = action.cursor; // カーソル指定の方法に注意(&はつけない)
+			else
+				cursor = window.cursorPointed;
+		}
+		else
+		{
+			hint = "";
+			showParentHint = true;
+			cursor = defaultCursor;
+		}
+	}
+
+	function onProvinceLeave(n)
+	{
+		// 領域番号 n からマウスが離れた
+		var action = queryProvinceAction(n);
+		if(action !== void && action.onleave !== void) Scripts.eval(action.onleave);
+		hint = "";
+		showParentHint = true;
+	}
+
+	function processProvince(x, y)
+	{
+		// x, y 位置の領域で指定されたシナリオにジャンプする
+		// 処理された場合は true, されなかった場合は false を返す
+		var n = window.messageLayerHiding ? 0 : getProvincePixel(x - imageLeft, y - imageTop);
+		var action = queryProvinceAction(n);
+		if(action === void) return false;
+		if(action.exp !== void) Scripts.eval(action.exp);
+		if(action.storage != '' || action.target != '')
+		{
+			var q = queryProvinceAction(0, false);
+			if(q === void || q.autodisable === void || +q.autodisable) clearProvinceActions();
+			window.process(action.storage, action.target, +action.countpage);
+		}
+		return true;
+	}
+
+	function onMouseDown(x, y, button)
+	{
+		lastMouseDownX = x;
+		lastMouseDownY = y;
+		super.onMouseDown(...);
+	}
+
+	function store()
+	{
+		// 情報を辞書配列に記録
+		var dic = super.store();
+		dic.loadedProvinceImage = loadedProvinceImage;
+		dic.loadedProvinceActions = loadedProvinceActions;
+		return dic;
+	}
+
+	function restore(dic)
+	{
+		// dic から情報を読み出す
+		super.restore(dic);
+		if(dic.loadedProvinceImage !== void && dic.loadedProvinceImage !== '')
+			loadProvinceImage(dic.loadedProvinceImage);
+		else
+			loadedProvinceImage = "";
+		if(dic.loadedProvinceActions !== void && dic.loadedProvinceActions !== '')
+			loadProvinceActions(dic.loadedProvinceActions);
+		else
+			clearProvinceActions();
+	}
+}
+
+class BaseLayer extends GraphicLayer
+{
+	// 背景レイヤ
+
+	function BaseLayer(win, par, name, id)
+	{
+		super.GraphicLayer(win, par, name, id);
+		type = ltCoverRect;
+		hitType = htMask;
+		hitThreshold = 0;
+	}
+
+	function finalize()
+	{
+		super.finalize(...);
+	}
+
+	function assign(src)
+	{
+		// assign オーバーライド
+		super.assign(src);
+		// 親クラスの assign は可視・不可視などをコピーしないが、
+		// 背景レイヤなのでそれでよい
+	}
+
+	function loadImages(elm)
+	{
+		// loadImages オーバーライド
+		if(elm !== void)
+		{
+			elm.mode = "opaque"; // レイヤモードを変えられると困るので
+			delete elm.index; // インデックスを変えられると困るので
+
+			if(elm.visible !== void)
+			{
+				// visible の状態を変えられると困るので
+				if(isPrimary) elm.visible = true; else elm.visible = false;
+			}
+		}
+		super.loadImages(elm);
+	}
+
+	function restore(dic)
+	{
+		// restore オーバーライド
+		if(isPrimary) dic.visible = true; else dic.visible = false;
+		dic.absolute = 0;
+		super.restore(dic);
+	}
+
+	function setOptions(elm)
+	{
+		// setOptions オーバーライド
+		if(elm.visible !== void)
+		{
+			if(isPrimary) elm.visible = true; else elm.visible = false;
+		}
+		super.setOptions(elm);
+	}
+
+	function internalOnMouseDown(x, y, button, processprovince = true)
+	{
+		// 内部関数
+		var provinceprocessed = false;
+		if(button == mbLeft && processprovince && !window.messageLayerHiding)
+			provinceprocessed = processProvince(x, y);
+		if(button == mbLeft && !provinceprocessed)
+		{
+			// 自身がプライマリレイヤならば、ウィンドウの
+			// onPrimaryClick を呼ぶ
+			if(isPrimary) window.onPrimaryClick();
+		}
+		else if(button == mbRight)
+		{
+			// 自身がプライマリレイヤならば、ウィンドウの
+			// onPrimaryRightClick を呼ぶ
+			if(isPrimary) window.onPrimaryRightClick();
+		}
+	}
+
+	function onMouseDown(x, y, button)
+	{
+		// マウスが押された
+		super.onMouseDown(...);
+		internalOnMouseDown(x, y, button);
+	}
+
+	function clearImage()
+	{
+		// GraphicLayer.clearImage オーバーライド
+		super.clearImage(false);
+		setImageSize(window.scWidth, window.scHeight);
+		setSizeToImageSize();
+		face = dfAlpha;
+		fillRect(0, 0, imageWidth, imageHeight, 0xff000000);
+	}
+
+	function atEndOfTransition(src, withchildren, exchange)
+	{
+		// atEndOfTransition オーバーライド
+		super.atEndOfTransition(...);
+		if(src == null)
+		{
+			//・背景レイヤがsrcなしでトランジション(children=true)
+			//　何もしなくてよいが、終了時に子レイヤは非表示になる。
+			//・背景レイヤがsrcなしでトランジション(children=false)
+			//　本当に何もしない。
+		}
+		else
+		{
+			if(withchildren)
+			{
+				//・背景レイヤがsrcありでトランジション(children=true)
+				//　重要な情報をトランジション元と交換、しかも子レイヤに対してもこの
+				//　「重要な情報を相手と交換」の指示を出す。exchange=false の場合はさらに
+				//　トランジション元の情報をトランジション先にコピー。これも、子レイヤすべて
+				//　に対しても指示する。
+				if(!exchange)
+				{
+					assign(src);
+					window.callAssignTransSrc();
+				}
+				super.exchangeInfo();
+				window.exchangeForeBack();
+				window.callExchangeInfo();
+			}
+			else
+			{
+				//・背景レイヤがsrcありでトランジション(children=false)
+				//　重要な情報をトランジション元と交換。子レイヤに対しては
+				//　「重要な情報を相手と交換」の指示をださない。exchange=false の場合は
+				//　さらにトランジション元の情報をトランジション先にコピー。
+				//　これも子レイヤに対しては指示しない。
+				if(!exchange)
+				{
+					assign(src);
+				}
+				exchangeInfo();
+			}
+		}
+	}
+
+	function exchangeInfo()
+	{
+		// exchangeInfo オーバーライド
+		super.exchangeInfo();
+		window.swapBaseLayer();
+	}
+
+    property isPrimary {
+        getter() {
+            return this === window.fore.base;
+        }
+    }
+}
+
+class CharacterLayer extends GraphicLayer
+{
+	// 前景レイヤ
+	var autoHide = false; // メッセージレイヤと一緒に隠れることができるか
+	var invisibleByUser = false; // ユーザにより一時的に不可視
+	var visibleBeforeUserInvisible  = false;
+
+	function CharacterLayer(win, par, name, id)
+	{
+		super.GraphicLayer(win, par, name, id);
+		freeImage();
+		type = ltCoverRect;
+		hitType = htMask;
+		hitThreshold = 64;
+	}
+
+	function finalize()
+	{
+		super.finalize(...);
+	}
+
+	function onHitTest(x, y, hit)
+	{
+		// onHitTest オーバーライド
+		if(!hit || provinceActions === void)
+		{
+			// hit==false または領域アクションが定義されていない場合
+			super.onHitTest(x, y, false);
+		}
+		else
+		{
+			// hit==true かつ 領域アクションが定義されている場合
+			super.onHitTest(x, y, !window.messageLayerHiding);
+		}
+		return;
+	}
+
+	function assign(src)
+	{
+		// assign オーバーライド
+		super.assign(src);
+		assignVisibleState(src);
+		// 親クラスの assign は可視・不可視などの情報をコピーしないため
+		// ここで assignVisibleState を呼ぶ必要がある
+		autoHide = src.autoHide;
+	}
+
+	function setOptions(elm)
+	{
+		// setOptions オーバーライド
+		super.setOptions(elm);
+		autoHide = +elm.autohide if elm.autohide !== void;
+	}
+
+	function atEndOfTransition(src, withchildren, exchange)
+	{
+		// atEndOfTransition オーバーライド
+		super.atEndOfTransition(...);
+		if(src == null)
+		{
+			//・メッセージレイヤ、前景レイヤが、srcなしでトランジション (children=true)
+			//　何もしなくてよいが、終了後それらの子レイヤは自動的に非表示になる。
+		}
+		else
+		{
+			//・メッセージレイヤ、前景レイヤが、srcありでトランジション (children=true)
+			//　重要な情報をトランジション元と交換、exchange=false の場合はさらに
+			//　トランジション元の情報をトランジション先にコピー。ただし、このコピーの際に
+			//　ウィンドウの可視・不可視の情報はコピーしない。
+			super.assign(src);
+			exchangeInfo();
+			window.swapCharacterLayer(id);
+		}
+	}
+
+	function assignTransSrc()
+	{
+		// トランジションもと(comp)をコピーする
+		assign(comp);
+	}
+
+	function setHiddenStateByUser(b)
+	{
+		// ユーザが右クリックなどでメッセージレイヤを一時的に隠すときに
+		// 呼ばれる
+		if(autoHide)
+		{
+			if(b)
+			{
+				visibleBeforeUserInvisible = visible;
+				invisibleByUser = true; // ユーザにより一時的に不可視
+				visible = false;
+			}
+			else
+			{
+				invisibleByUser = false; // 可視
+				visible = visibleBeforeUserInvisible;
+			}
+		}
+	}
+
+	function onMouseDown(x, y, button)
+	{
+		// マウスが押された
+		super.onMouseDown(...);
+		if(button == mbLeft)
+			processProvince(x, y);
+		else if(button == mbRight)
+			window.onPrimaryRightClick();
+			// 右ボタンは window.onPrimaryRightClick() を呼ぶ
+	}
+
+	function store()
+	{
+		// store オーバーライド
+		var dic = super.store();
+		dic.autoHide = autoHide;
+		return dic;
+	}
+
+	function restore(dic)
+	{
+		// restore オーバーライド
+		autoHide = +dic.autoHide if dic.autoHide !== void;
+		super.restore(dic);
+	}
+
+}
+
+

@@ -1,0 +1,265 @@
+//
+// $Id: KButton.tjs,v 1.6 2007/09/17 12:09:52 m2 Exp $
+//
+
+
+/**----------------------------------------------------------------------
+ * ボタン
+ ----------------------------------------------------------------------*/
+class KButton extends KValueWidget
+{
+  // ラベルウィジェット
+  var child;
+  // ボタンイメージ描画用のベースレイヤ
+  var baseLayer;
+  // 押下中
+  var pressing;
+  // ボタンの値
+  var value = void;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィンドウ
+   * @param labelWidget ボタンの真ん中に表示するラベルウィジェット
+   * @param name 名前
+   ------------------------------*/
+  function KButton(win, labelWidget, name) {
+    // super
+    super.KWidget(win, name);
+
+    // ベースレイヤをセットアップ
+    baseLayer = new global.KWidget(win);
+    baseLayer.parent = this;
+    baseLayer.hitThreshold = 256;
+
+    // childをセットアップ
+    child = labelWidget;
+    child.parent = this;
+    child.hitThreshold = 256;
+
+    // デフォルトフォーカス
+    focusable = win.defaultFocusable;
+
+    // 辺り判定オール受けつけ
+    hitThreshold = 0;
+
+    // 自分自身はイメージ持たず
+    hasImage = false;
+
+    // 押下中では無い
+    pressing = false;
+
+    // レイアウト再設定
+    invalidateLayout();
+  }
+
+  // レイアウトをやり直す
+  function invalidateLayout {
+    setMinMaxSize(child.minWidth + child.marginHorizontal + 2,
+                  child.minHeight + child.marginVertical + 2,
+                  child.maxWidth +  child.marginHorizontal + 2,
+                  child.maxHeight + child.marginVertical + 2);
+    drawContent();
+  }
+
+  // 内容を描画する
+  function drawContent {
+    // ベースレイヤに枠を描画
+    baseLayer.setFixedSize(width, height);
+    baseLayer.fillRect(0, 0, width, height, focused ? WIN_HIGHLIGHT : 0);
+    baseLayer.drawRaisedFrame(1, 1, width - 2, height - 2);
+    // 子レイヤのサイズ・位置を再設定
+    child.setSize(width - 2 - child.marginHorizontal, height - 2 - child.marginVertical);
+    locateChild(1, 1, width - 2, height - 2, child);
+  }  
+
+  /**------------------------------
+   * イベントを発生させ強制的に現在の値を通知する。
+   *
+   * 値trueで onValueModifiedを呼びます。
+   ------------------------------*/
+  function invalidateValue {
+    if (nodeEnabled)
+      onValueModified(value);
+  }
+
+  /*------------------------------
+   * ボタン押下時の反応
+   * 
+   * ボタンを押されたグラフィックにしてonValuChangedを呼ぶ
+   ------------------------------*/
+  function buttonDown {
+    // フォーカスした上で
+    focus();
+    // フラットフレームを描画
+    baseLayer.drawFlattenFrame(1, 1, baseLayer.width - 2, baseLayer.height - 2);
+    // ラベルを(+1,+1)オフセットした位置に描画
+    locateChild(2, 2, width - 2, height - 2, child);
+    // 押下中
+    pressing = true;
+  }
+
+  /*------------------------------
+   * ボタン開放時の反応
+   * 
+   * ボタンのグラフィックを元に戻し、、onValueChanged() を呼ぶ
+   ------------------------------*/
+  function buttonUp {
+    if (! pressing)
+      return;
+
+    pressing = false;
+
+    // フレームを元に戻す
+    baseLayer.drawRaisedFrame(1, 1, baseLayer.width - 2, baseLayer.height - 2);
+    // ラベルの位置を元に戻す
+    locateChild(1, 1, width - 2, height - 2, child);
+    // 値の更新を通知
+    invalidateValue();
+  }
+
+  /*------------------------------
+   * マウスに反応する
+   ------------------------------*/
+  function onMouseDown {
+    super.onMouseDown(...);
+    buttonDown();
+  }
+
+  function onMouseUp {
+    super.onMouseUp(...);
+    buttonUp();
+  }
+
+  /*------------------------------
+   * キーボードに反応する
+   ------------------------------*/
+  function onKeyDown(key, shift) {
+    if (key == VK_SPACE || key == VK_RETURN) {
+      buttonDown();
+    } else {
+      super.onKeyDown(...);
+    }      
+  }
+
+  function onKeyUp(key, shift) {
+    buttonUp();
+    super.onKeyUp(...);
+  }
+
+  // 子の最小最大サイズが変わったらレイアウトやり直し
+  function onChildMinMaxSizeModified(child) {
+    if (child == baseLayer)
+      return;
+    invalidateLayout();
+  }
+
+  // 子のマージンが変わったらレイアウトやり直し
+  function onChildMarginModified {
+    invalidateLayout();
+  }
+
+  // サイズが変わったら再描画
+  function onSizeModified {
+    drawContent();
+  }
+
+  // フォーカスされたら再描画
+  function onFocus {
+    drawContent();
+  }
+
+  // フォーカスが外れたら再描画
+  function onBlur {
+    drawContent();
+  }
+  
+  // enabled==trueならそのまま表示
+  function onNodeEnabled {
+    baseLayer.opacity = 255;
+  } 
+
+  // enabled=falseなら半透明で表示
+  function onNodeDisabled {
+    baseLayer.opacity = 64;
+  }
+
+  // 永続化辞書にはバインドしない。
+  function bindPersistentDictionary() {
+  }
+}  
+
+/*----------------------------------------------------------------------
+ * テキストボタン
+ *
+ * テキストをラベルに持ったボタン。
+ * 内部的に KTextLabel をラベルとして保持しています。
+ ----------------------------------------------------------------------*/
+class KTextButton extends KButton
+{
+  /*------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィンドウ
+   * @param label ラベル
+   * @param name 名前
+   ------------------------------*/
+   function KTextButton(win, label, name) {
+    var labelWidget = new KTextLabel(win, label);
+    labelWidget.setMargin(15, 10);
+    super.KButton(win, labelWidget, name);
+  }
+
+  /**------------------------------
+   * ラベルの値
+   *
+   * @return ラベルの値
+   * @param v 新規のラベルの値
+   ------------------------------*/
+  property label {
+    getter {
+      return child.label;
+    }
+    setter(v) {
+      child.label = v;
+    }
+  }
+}
+
+/*----------------------------------------------------------------------
+ * イメージボタン
+ *
+ * イメージをラベルに持ったボタン。
+ * 内部的に KImageLabel をラベルとして保持しています。
+ ----------------------------------------------------------------------*/
+class KImageButton extends KButton
+{
+  /*------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィンドウ
+   * @param label イメージファイル名
+   * @param name 名前
+   ------------------------------*/
+  function KImageButton(win, label, name) {
+    var labelWidget = new KImageLabel(win, label);
+    labelWidget.margin = 5;
+    super.KButton(win, labelWidget, name);
+  }
+
+  /**------------------------------
+   * ラベルの値
+   *
+   * @return ラベルの値
+   * @param v 新規のラベルの値
+   ------------------------------*/
+  property label {
+    getter {
+      return child.label;
+    }
+    setter(v) {
+      child.label = v;
+    }
+  }
+}

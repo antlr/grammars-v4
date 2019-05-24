@@ -1,0 +1,242 @@
+//
+// $Id: KSpiralLayout.tjs,v 1.2 2007/09/10 08:37:00 m2 Exp $
+//
+
+
+/**----------------------------------------------------------------------
+ * スパイラルレイアウト(左から右、上から下にウィジェットを並べるレイアウト
+ ----------------------------------------------------------------------*/
+
+class KSpiralLayout extends KWidget
+{
+  var childList;
+  var _marginalWidth, _marginalHeight;
+  var sizeModified;
+  var layoutRequired;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param window ウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KSpiralLayout(window, name) {
+    super.KWidget(window, name);
+    childList = [];
+    _marginalWidth = _marginalHeight = 1000;
+    neutralColor = WIN_WHITE;
+//    type = ltOpaque;
+    hasImage = false;
+//    fillRect(0, 0, width, height, neutralColor);
+    setMinMaxSize(0, 0, _marginalWidth, _marginalHeight);
+    hitThreshold = 0;
+  }
+
+  /**------------------------------
+   * 最低限のサイズを設定する
+   *
+   * 項目が少なくても最低限広げられる
+   * 「最低最大サイズ」を決定する。
+   * デフォルト値は1000x1000
+   *
+   * @param w 幅
+   * @param h 高さ
+   ------------------------------*/
+  function setMarginalSize(w, h) {
+    _marginalWidth = w;
+    _marginalHeight = h;
+    invalidateLayout();
+  }
+
+  /**------------------------------
+   * 子ウィジェットを追加する
+   *
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function add(child) {
+    child.parent = this;
+    childList.add(child);
+    delayLayout();
+  }
+
+  /**------------------------------
+   * 子ウィジェットを挿入する
+   *
+   * @param index 挿入位置
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function insert(index, child) {
+    child.parent = this;
+    childList.insert(index, child);
+    delayLayout();
+  }
+
+  /**------------------------------
+   * 子ウィジェットを取り除く
+   *
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    child.parent = widgetDepot;
+    childList.remove(child);
+    delayLayout();
+    if (doInvalidate)
+      invalidate child;
+  }
+
+  /**------------------------------
+   * 子ウィジェットを全て取り除く
+   *
+   * @param doInvalidate 取り除いた子ウィジェットを無効化するか
+   ------------------------------*/
+  function removeAll(doInvalidate = true)
+  {
+    while(childList.count > 0)
+    {
+      var child = childList[0];
+      childList.remove(child);
+      if(doInvalidate)
+        invalidate child;
+      else
+        child.parent = widgetDepot;
+    }
+    delayLayout();
+  }
+
+  /**------------------------------
+   * 子アイテムをカウントする
+   * 
+   * @return 子アイテム数
+   ------------------------------*/
+  property childCount {
+    getter {
+      return childList.count;
+    }
+  }
+
+  /**------------------------------
+   * 子ウィジェットを参照する
+   *
+   * @param index インデックス
+   * @return 子ウィジェット
+   ------------------------------*/
+  function childAt(index) {
+    return childList[index];
+  }
+
+  /*------------------------------
+   * レイアウトを計算する
+   ------------------------------*/
+  function delayLayout {
+    layoutRequired = true;
+    update();
+  }
+
+  function executeDelayedLayout {
+    if (layoutRequired) {
+      invalidateLayout();
+    }
+  }
+
+  function onPaint {
+    executeDelayedLayout();
+  }
+
+  function invalidateLayout {
+    callOnPaint = false;
+    layoutRequired = false;
+
+    var minW, minH, maxW, maxH;
+
+    minW = minH = maxW = maxH = 0;
+
+    for (var i = 0; i < childList.count; i++) {
+      minW = int(Math.max(minW, childList[i].minWidth + childList[i].marginHorizontal));
+      minH = int(Math.max(minH, childList[i].minHeight + childList[i].marginVertical));
+      maxH += childList[i].minHeight + childList[i].marginVertical;
+    }
+
+    maxH += spaceVertical * (childList.count - 1);
+    
+    maxW = Math.max(minW, _marginalWidth);
+    maxH = Math.max(maxH, _marginalHeight);
+
+    sizeModified = false;
+    setMinMaxSize(minW, minH, maxW, maxH);
+    if (! sizeModified)
+      onSizeModified();
+  }
+
+  /*------------------------------
+   * レイアウトに従ってウィジェットを配置する
+   ------------------------------*/
+  function redraw {
+    executeDelayedLayout();
+
+    var x, y, w, h;
+    x = y = w = h = 0;
+    var rowChildList = [];
+
+    for (var i = 0; i < childList.count; i++) {
+      var child;
+      var childW, childH;
+      child = childList[i];
+      childW = child.minWidth + child.marginHorizontal;
+      childH = child.minHeight + child.marginVertical;
+
+      var drawLine = false;
+
+      if (w + childW > width) {
+        drawLine = true;
+        i--;
+      } else {
+        rowChildList.add(child);
+        w += childW;
+        h = Math.max(h, childH);
+        if (i == childList.count - 1) 
+          drawLine = true;
+      }
+
+      if (drawLine) {
+        for (var j = 0; j < rowChildList.count; j++) {
+          var child;
+          var childW, childH;
+          child = rowChildList[j];
+          childW = child.minWidth + child.marginHorizontal;
+          child.setSize(child.minWidth, child.minHeight);
+          locateChild(x, y, childW, h, child);
+          x += childW + spaceHorizontal;
+        }
+        y += h;
+        x = w = h = 0;
+        rowChildList = [];
+        if (i != childList.count - 1)
+          y += spaceVertical;
+      }
+    }
+
+    setMinMaxSize(minWidth, y, maxWidth, Math.max(y, maxHeight));
+  }
+
+  function onChildMinMaxSizeModified {
+    invalidateLayout();
+  }
+
+  function onChilAlignModified {
+    invalidateLayout();
+  }
+
+  function onChildMarginModified {
+    invalidateLayout();
+  }
+
+  function onSpaceChanged {
+    invalidateLayout();
+  }
+
+  function onSizeModified {
+    sizeModified = true;
+    redraw();
+  }
+}

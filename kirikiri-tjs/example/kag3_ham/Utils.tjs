@@ -1,0 +1,181 @@
+// Utils.tjs - ユーティリティ関数
+// Copyright (C)2001-2009, W.Dee and contributors  改変・配布は自由です
+
+
+property random
+{
+	getter { return Math.random(); }
+}
+
+function intrandom(min = 0, max = 0) 
+{
+	// min 以上 max 以下の整数の乱数を返す
+	// 引数が一個だけの場合は 0 〜 その数までの整数を返す
+	if(min>max) { min <-> max; }
+	return int(Math.random() * (max-min+1)) + min;
+}
+
+function str2num(str)
+{
+	// 文字列->数字 ( 全角対応 )
+	var res;
+	var i;
+	for(i=0; i<str.length; i++)
+	{
+		var ch = str[i];
+		switch(ch)
+		{
+		case "０": res+="0"; break;
+		case "１": res+="1"; break;
+		case "２": res+="2"; break;
+		case "３": res+="3"; break;
+		case "４": res+="4"; break;
+		case "５": res+="5"; break;
+		case "６": res+="6"; break;
+		case "７": res+="7"; break;
+		case "８": res+="8"; break;
+		case "９": res+="9"; break;
+		case "ｅ": res+="e"; break;
+		case "Ｅ": res+="E"; break;
+		case "。": res+="."; break;
+		case "．": res+="."; break;
+		case "−": res+="-"; break;
+		case "ー": res+="-"; break;
+		default: res+=ch; break;
+		}
+	}
+	return +res;
+}
+
+
+function han2zen(str)
+{
+	// 半角→全角 ( 英数のみ )
+	var res;
+	var i;
+	for(i=0;i<str.length;i++)
+	{
+		var num=#str[i];
+		if(num>=0x0020 && num<=0x7e)
+			res+=$(0xff00+num-0x20); // UNICODE
+		else res+=str[i];
+	}
+	return res;
+}
+
+
+function kansuuji(
+	n,
+	digits = "〇一二三四五六七八九",
+	small_units = "　十百千",
+	large_units = "　万億兆京",
+	zero_expression = "ゼロ",
+	minus_expression = "マイナス"
+	)
+{
+	// n を一般的な漢数字表記にして返す
+	// TJS の整数型は 922京ほどまでなので京より上の桁の処理は必要ない
+
+	n = int n;
+	if(n == 0) return zero_expression;
+	var out = ""; // 出力文字列
+	if(n < 0) n = -n, out = minus_expression;
+	n = string n; // 文字列に変換
+
+	var n_len = n.length;
+	var n_pos = n_len - 1;
+	var nonzero = false;
+
+	for(var i = 0; i < n_len; i ++, n_pos --)
+	{
+		var small_unit = n_pos & 3;
+		var digit = +n[i];
+		switch(small_unit)
+		{
+		case 0: // 1 の桁
+			if(digit != 0) out += digits[digit], nonzero = true;
+			if(nonzero && n_pos) out += large_units[n_pos >> 2];
+			nonzero = false;
+			break;
+		case 1: // 十の桁
+		case 2: // 百の桁
+		case 3: // 千の桁
+			if(digit != 0)
+			{
+				/* 千の桁は 万以上の場合慣用的に 一千という。
+				   また、一百や一十とはいわない。 */
+				if(digit != 1 || (small_unit == 3 && n_pos > 4))
+					out += digits[digit] + small_units[small_unit];
+				else
+					out += small_units[small_unit];
+				nonzero = true;
+			}
+			break;
+		}
+	}
+
+	return out;
+}
+
+function kansuuji_simple(
+	n,
+	digits = "〇一二三四五六七八九",
+	point = "・",
+	minus = "マイナス")
+{
+	// n を漢数字表記にするが、桁単位はつけない
+
+	n = string n;
+	var n_len = n.length;
+	var out = "";
+	for(var i = 0; i < n_len; i++)
+	{
+		var digit = n[i];
+		if(digit == ".")
+			out += point;
+		else if(digit == "-")
+			out += minus;
+		else if(digit >= '0' && digit <= '9')
+			out += digits[+digit];
+		else
+			out += digit;
+	}
+	return out;
+}
+
+function number_format(n)
+{
+	// n を３桁ごとに カンマで区切った数値表現にする
+	n = string n;
+	var n_len = n.length;
+	var n_digits = 0;
+
+	// 数字の数を数える
+	for(var i = 0; i < n_len; i++)
+	{
+		var digit = n[i];
+		if(digit >= '0' && digit <= '9') n_digits ++;
+		else if(digit == '.' || digit == 'e') break;
+	}
+
+	var out = "";
+
+	// カンマを挿入
+	for(var i = 0; i < n_len; i++)
+	{
+		var digit = n[i];
+		if(digit >= '0' && digit <= '9')
+		{
+			n_digits --;
+			out += digit;
+			if(n_digits > 0 && n_digits % 3 == 0)
+				out += ",";
+		}
+		else
+		{
+			out += digit;
+		}
+	}
+
+	return out;
+}

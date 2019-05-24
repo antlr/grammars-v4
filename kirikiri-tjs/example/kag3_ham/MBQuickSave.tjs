@@ -1,0 +1,278 @@
+/******************************************************************************
+	system_mb/mb/system/MBQuickSave.tjs
+*******************************************************************************/
+
+class MBQuickSave extends MBComponentLayer
+{
+	var isNewLayer = false;
+	
+	var intBookMarkNumber = MBSystemPref.quickSaveBookMark;	// 使用する栞の番号
+	
+	var objSaveButton;
+	var objLoadButton;
+	var objDialog;
+	
+	var currentMode;	// セーブ中かロード中か
+	
+	
+	function MBQuickSave(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(win, par);
+		
+		width        = 100;
+		height       =  20;
+		hitType      = htMask;
+		hitThreshold = 256;
+		absolute     = MBLayerAbs.quicksave;
+		visible      = false;
+		name         = "クイックセーブ";
+		
+		init();
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate objSaveButton if (objSaveButton !== void);
+		invalidate objLoadButton if (objLoadButton !== void);
+		invalidate objDialog     if (objDialog !== void);
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function init()
+	{
+		// 初期化
+		
+		fillRect(0, 0, width, height, 0x00000000);
+		
+		objSaveButton = new MBButton(window, this);
+		objSaveButton.setSizeToImageSize();
+		objSaveButton.loadImages(sysfunc.getPathImage('bookmark/bt_quicksave'));
+		objSaveButton.setPos(0, 0);
+		objSaveButton.visible = true;
+		
+		objLoadButton = new MBButton(window, this);
+		objLoadButton.setSizeToImageSize();
+		objLoadButton.loadImages(sysfunc.getPathImage('bookmark/bt_quickload'));
+		objLoadButton.setPos(
+			objSaveButton.left + objSaveButton.width + MBGraphicPref.quicksaveButtonMargin.x,
+			objSaveButton.top + objSaveButton.height + MBGraphicPref.quicksaveButtonMargin.y
+		);
+		objLoadButton.visible = true;
+		
+		// レイヤ幅を調整しておく
+		var nw = objLoadButton.width + objLoadButton.left;
+		var nh = objSaveButton.height + objSaveButton.top;
+		if (objLoadButton.height + objLoadButton.top > nh) {
+			nh = objLoadButton.height + objLoadButton.top;
+		}
+		
+		
+		setSize(nw, nh);
+		setPositionByPreference();
+	}
+	
+	
+	function setPositionByPreference()
+	{
+		// 設定ファイルに従って表示位置を設定する
+		
+		var bw = window.fore.base.width;
+		var bh = window.fore.base.height;
+		
+		switch (MBGraphicPref.quicksavePositionType) {
+			case "lbMargin":
+				setPos(MBGraphicPref.quicksavePositionValue.x,
+					bh - (height + MBGraphicPref.quicksavePositionValue.y));
+				break;
+			
+			case "rbMargin":
+				setPos(bw - (width + MBGraphicPref.quicksavePositionValue.x),
+					bh - (height + MBGraphicPref.quicksavePositionValue.y));
+				break;
+			
+			case "rtMargin":
+				setPos(bw - (width + MBGraphicPref.quicksavePositionValue.x),
+					MBGraphicPref.quicksavePositionValue.y);
+				break;
+			
+			case "ltMargin":
+			case "absolute":
+			default:
+				setPos(MBGraphicPref.quicksavePositionValue.x,
+					MBGraphicPref.quicksavePositionValue.y);
+				break;
+		}
+	}
+	
+	
+	//==========================================================================
+	// ステータスの変更関連
+	
+	function show()
+	{
+		// 表示
+		
+		visible = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function hide()
+	{
+		// 隠す
+		
+		visible = false;
+		enabled = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setEnabled()
+	{
+		// 機能を有効にする
+		
+		enabled = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function unsetEnabled()
+	{
+		// 機能を無効にする
+		
+		enabled = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setActiveness(enabled)
+	{
+		// 有効・表示状態を一括変更
+		
+		if (enabled) {
+			show();
+			setEnabled();
+		}
+		else {
+			hide();
+			unsetEnabled();
+		}
+	}
+	
+	
+	//==========================================================================
+	// 動作関連
+	
+	function onSelectedItemClick(sender)
+	{
+		// ボタンが押されたときの動作
+		
+		var withConfirmation = (sf.userconfig.qsWithoutDialog) ? false : true;
+		
+		switch (sender) {
+			case objSaveButton:
+				quickSave(withConfirmation);
+				break;
+			
+			case objLoadButton:
+				quickLoad(withConfirmation);
+				break;
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function quickSave(cf)
+	{
+		// クイックセーブ
+		
+		if (cf) {
+			currentMode = 'save';
+			var str = 'このシーンでクイックセーブします。\nよろしいですか？';
+			invalidate objDialog if (objDialog !== void);
+			objDialog = new MBPseudyYesNoDialog(window, window.fore.base, this, str);
+			objDialog.show();
+		}
+		else {
+			internalQuickSave();
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function internalQuickSave()
+	{
+		// セーブを実際に行う
+		
+		f.current_savenum    = intBookMarkNumber;
+		
+		window.saveBookMark(intBookMarkNumber);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function quickLoad(cf)
+	{
+		// クイックロード
+		
+		// もしデータがなければ戻る
+		if (!Storages.isExistentStorage("%s/%s%d.bmp".sprintf(window.saveDataLocation, window.dataName, intBookMarkNumber))) {
+			return;
+		}
+		
+		if (cf) {
+			currentMode = 'load';
+			var str = 'クイックセーブしたシーンから再開します。\nよろしいですか？';
+			invalidate objDialog if (objDialog !== void);
+			objDialog = new MBPseudyYesNoDialog(window, window.fore.base, this, str);
+			objDialog.show();
+		}
+		else {
+			internalQuickLoad();
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function internalQuickLoad()
+	{
+		// ロードを実際に行う
+		
+		tf.lastloaded_savenum = intBookMarkNumber;
+		
+		window.loadBookMark(intBookMarkNumber);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onYesNoSelected(res)
+	{
+		// Yes/Noの選択結果
+		
+		if (res) {
+			switch (currentMode) {
+				case 'save':
+					internalQuickSave();
+					break;
+				
+				case 'load':
+					internalQuickLoad();
+					break;
+			}
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onEscapeKeyDown(key)
+	{
+		// エスケープキーが押されても何もしない
+	}
+}

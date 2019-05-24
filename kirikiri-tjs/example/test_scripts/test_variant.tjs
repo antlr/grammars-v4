@@ -1,0 +1,1618 @@
+
+testVariant();
+function testVariant() {
+	Debug.message("###  Variant operation");
+	var isFaild = false;
+
+	var a, b, c;
+	b = 10;
+	a=b if b!=0;
+	if( a != 10 ) {
+		Debug.message("faild:a=b if b!=0");
+		isFaild = true;
+	}
+
+	c = (a=1, b=2); // a=1, b=2 が評価され、c には 2 が代入される
+	if( c != 2 ) {
+		Debug.message("faild:c = (a=1, b=2);");
+		isFaild = true;
+	}
+	a=1, b=2, c=3; // a=1, b=2, c=3 の順に評価される
+	if( a == 1 && b == 2 && c == 3 ) {
+	} else {
+		Debug.message("faild:a=1, b=2, c=3");
+		isFaild = true;
+	}
+
+	isFaild = false;
+	var int5 = 5;
+	var int8 = 8;
+	var int10 = 10;
+	var real5 = 5.0;
+	var real8 = 8.0;
+	var real10 = 10.0;
+	var str5 = "5";
+	var str8 = "8";
+	var str10 = "10";
+	var oct5 = <% 5 %>;
+	var oct8 = <% 8 %>;
+	var oct10 = <% 10 %>;
+	var voidval;
+	var tmp;
+	if( int5 != 5 ) {
+		Debug.message("faild: int5 = 5"); isFaild = true;
+	}
+	if( int8 != 8 ) {
+		Debug.message("faild: int8 = 8"); isFaild = true;
+	}
+	if( real5 != 5.0 ) {
+		Debug.message("faild: real5 = 5.0"); isFaild = true;
+	}
+	if( real10 != 10.0 ) {
+		Debug.message("faild: real10 = 10.0"); isFaild = true;
+	}
+	if( str5 != "5" ) {
+		Debug.message("faild: str5 = \"5\""); isFaild = true;
+	}
+	if( str10 != "10" ) {
+		Debug.message("faild: str10 = \"10\""); isFaild = true;
+	}
+	if( voidval !== void ) {
+		Debug.message("faild: voidval !== void"); isFaild = true;
+	}
+	if( voidval === void ) {
+	} else {
+		Debug.message("faild: voidval !== void"); isFaild = true;
+	}
+	if( int5 === real5 ) {
+		Debug.message("faild: int5 === real5"); isFaild = true;
+	}
+	if( int5 !== real5 ) {
+	} else {
+		Debug.message("faild: int5 !== real5"); isFaild = true;
+	}
+	if( int5 === str5 ) {
+		Debug.message("faild: int5 === str5"); isFaild = true;
+	}
+	if( int5 !== str5 ) {
+	} else {
+		Debug.message("faild: int5 !== str5"); isFaild = true;
+	}
+	if( real5 === str5 ) {
+		Debug.message("faild: real5 === str5"); isFaild = true;
+	}
+	if( real5 !== str5 ) {
+	} else {
+		Debug.message("faild: real5 !== str5"); isFaild = true;
+	}
+	tmp = int5 if int10 == 10;
+	if( tmp != int5 ) {
+		Debug.message("faild: tmp = int5 if int10 == 10"); isFaild = true;
+	}
+	tmp = int8 if int10 != 10;
+	if( tmp != int5 ) {
+		Debug.message("faild: tmp = int8 if int10 != 10"); isFaild = true;
+	}
+	if( int10 instanceof "Number" ) {
+	} else {
+		Debug.message("faild: int10 instanceof Number"); isFaild = true;
+	}
+	if( real10 instanceof "Number" ) {
+	} else {
+		Debug.message("faild: real10 instanceof Number"); isFaild = true;
+	}
+	if( str10 instanceof "String" ) {
+	} else {
+		Debug.message("faild: str10 instanceof String"); isFaild = true;
+	}
+	if( oct10 instanceof "Octet" ) {
+	} else {
+		Debug.message("faild: oct10 instanceof Octet"); isFaild = true;
+	}
+	if( (voidval instanceof "void") == false ) {
+	} else {
+		Debug.message("faild: voidval instanceof void"); isFaild = true;
+	}
+
+	if( (typeof int10) == "Integer" ) {
+	} else {
+		Debug.message("faild: (typeof int10) == Integer"); isFaild = true;
+	}
+	if( (typeof real10) == "Real" ) {
+	} else {
+		Debug.message("faild: (typeof real10) == Real"); isFaild = true;
+	}
+	if( (typeof str10) == "String" ) {
+	} else {
+		Debug.message("faild: (typeof str10) == String"); isFaild = true;
+	}
+	if( (typeof oct10) == "Octet" ) {
+	} else {
+		Debug.message("faild: (typeof oct10) == Octet"); isFaild = true;
+	}
+	if( (typeof voidval) == "void" ) {
+	} else {
+		Debug.message("faild: (typeof voidval) == void"); isFaild = true;
+	}
+	tmp = 5.5;
+	if( (int tmp) != 5 ) {
+		Debug.message("faild: (int tmp) != 5"); isFaild = true;
+	}
+	tmp = 5;
+	if( (real tmp) !== 5.0 ) {
+		Debug.message("faild: (real tmp) !== 5.0"); isFaild = true;
+	}
+	tmp = 10;
+	if( (string tmp) !== "10" ) {
+		Debug.message("faild: (string tmp) !== \"10\""); isFaild = true;
+	}
+	tmp = 5.5;
+	if( ((int)tmp) != 5 ) {
+		Debug.message("faild: ((int)tmp) != 5"); isFaild = true;
+	}
+	tmp = 5;
+	if( ((real)tmp) !== 5.0 ) {
+		Debug.message("faild: ((real)tmp) !== 5.0"); isFaild = true;
+	}
+	tmp = 10;
+	if( ((string)tmp) !== "10" ) {
+		Debug.message("faild: ((string)tmp) !== \"10\""); isFaild = true;
+	}
+	if( isFaild ) {
+		Debug.message("faild:substitution");
+	} else {
+		Debug.message("success:substitution");
+	}
+	isFaild = false;
+
+	// 加減算演算子, 乗除余算演算子
+	if( (int5 + int10) != 15 ) {
+		Debug.message("faild:(int5 + int10) != 15");
+		isFaild = true;
+	}
+	if( (int10 - int5) != 5 ) {
+		Debug.message("faild:(int10 - int5) != 5");
+		isFaild = true;
+	}
+	if( (int8 % int5) != 3 ) {
+		Debug.message("faild:(int8 % int5) != 3");
+		isFaild = true;
+	}
+	if( (int10 / int5) != 2 ) {
+		Debug.message("faild:(int10 / int5) != 2");
+		isFaild = true;
+	}
+	if( (int8 / int5) != 1.6 ) {
+		Debug.message("faild:(int8 / int5) != 1.6");
+		isFaild = true;
+	}
+	if( (int10 \ int5) != 2 ) {
+		Debug.message("faild:(int10 \ int5) != 2");
+		isFaild = true;
+	}
+	if( (int8 \ int5) != 1 ) {
+		Debug.message("faild:(int8 \ int5) != 1");
+		isFaild = true;
+	}
+	if( (int10 * int5) != 50 ) {
+		Debug.message("faild:(int10 * int5) != 50");
+		isFaild = true;
+	}
+	if( (int8 * int5) != 40 ) {
+		Debug.message("faild:(int8 * int5) != 40");
+		isFaild = true;
+	}
+	tmp = int5;
+	if( tmp != int5 ) {
+		Debug.message("faild:tmp = int5");
+		isFaild = true;
+	}
+	tmp <-> int10;
+	if( tmp != 10 || int10 != 5 ) {
+		Debug.message("faild:tmp <-> int10");
+		isFaild = true;
+	}
+	tmp <-> int10;
+	var int7 = 7;
+	int7 &= 2;
+	if( int7 != 2 ) {
+		Debug.message("faild:int7 != 2");
+		isFaild = true;
+	}
+	tmp = int5;
+	tmp |= int10;
+	if( tmp != 15 ) {
+		Debug.message("faild:int5 |= int10");
+		isFaild = true;
+	}
+	tmp = int10;
+	tmp ^= int8;
+	if( tmp != 2 ) {
+		Debug.message("faild:int10 ^= int8");
+		isFaild = true;
+	}
+	tmp = int10;
+	tmp -= int5;
+	if( tmp != 5 ) {
+		Debug.message("faild:int10 -= int5");
+		isFaild = true;
+	}
+	tmp = int10;
+	tmp += int5;
+	if( tmp != 15 ) {
+		Debug.message("faild:int10 += int5");
+		isFaild = true;
+	}
+	tmp = int10;
+	tmp %= int8;
+	if( tmp != 2 ) {
+		Debug.message("faild:int10 %= int8");
+		isFaild = true;
+	}
+	tmp = int10;
+	tmp /= int8;
+	if( tmp != 1.25 ) {
+		Debug.message("faild:int10 /= int8");
+		isFaild = true;
+	}
+	tmp = int10;
+	tmp \= int8;
+	if( tmp != 1 ) {
+		Debug.message("faild:int10 \= int8");
+		isFaild = true;
+	}
+	tmp = int10;
+	tmp /= int5;
+	if( tmp != 2 ) {
+		Debug.message("faild:int10 /= int5");
+		isFaild = true;
+	}
+	tmp = int10;
+	tmp \= int5;
+	if( tmp != 2 ) {
+		Debug.message("faild:int10 \= int5");
+		isFaild = true;
+	}
+	tmp = int10;
+	tmp *= int5;
+	if( tmp != 50 ) {
+		Debug.message("faild:int10 *= int5");
+		isFaild = true;
+	}
+	tmp = 0;
+	tmp ||= int5;
+	if( !tmp ) {
+		Debug.message("faild:0 ||= int5");
+		isFaild = true;
+	}
+	tmp = 0;
+	tmp ||= 0;
+	if( tmp ) {
+		Debug.message("faild:0 ||= 0");
+		isFaild = true;
+	}
+	tmp = 0;
+	tmp &&= int5;
+	if( tmp ) {
+		Debug.message("faild:0 &&= int5");
+		isFaild = true;
+	}
+	tmp = 0;
+	tmp &&= 0;
+	if( tmp ) {
+		Debug.message("faild:0 &&= 0");
+		isFaild = true;
+	}
+	tmp = int5;
+	tmp &&= int10;
+	if( !tmp ) {
+		Debug.message("faild:int5 &&= int10");
+		isFaild = true;
+	}
+	tmp = int10;
+	tmp >>= 1;
+	if( tmp != 5 ) {
+		Debug.message("faild:int10 >>= 1");
+		isFaild = true;
+	}
+	tmp = -1;
+	tmp >>= 1;
+	if( tmp != -1 ) {
+		Debug.message("faild:-1 >>= 1,"+tmp);
+		isFaild = true;
+	}
+	tmp = int10;
+	tmp <<= 1;
+	if( tmp != 20 ) {
+		Debug.message("faild:int10 <<= 1");
+		isFaild = true;
+	}
+	tmp = -1;
+	tmp >>>= 1;
+	@if(environment > 0) // java
+	if( tmp != 2147483647 ) {
+		Debug.message("faild:-1 >>>= 1");
+		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
+		isFaild = true;
+	}
+	@endif
+	@if(environment == 0) // windows
+	if( tmp != 9223372036854775807 ) {
+		Debug.message("faild:-1 >>>= 1,"+tmp);
+		isFaild = true;
+	}
+	@endif
+	tmp = 10;
+	if( int10 == 9 || tmp == 10 ) {
+	} else {
+		Debug.message("faild:int10 == 9 || tmp == 10");
+		isFaild = true;
+	}
+	var int1 = 1;
+	var int0 = 0;
+	if( int1 == 1 && tmp == 10 ) {
+	} else {
+		Debug.message("faild:int1 == 1 && tmp == 10");
+		isFaild = true;
+	}
+	if( tmp == 10 && int0 == 1 ) {
+		Debug.message("faild:tmp == 10 && int0 == 1");
+		isFaild = true;
+	}
+
+	tmp = -1 >> 1;
+	if( tmp != -1 ) {
+		Debug.message("faild:-1 >> 1,"+tmp);
+		isFaild = true;
+	}
+	tmp = -1 >>> 1;
+	@if(environment > 0) // java
+	if( tmp != 2147483647 ) {
+		Debug.message("faild:-1 >>> 1");
+		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
+		isFaild = true;
+	}
+	@endif
+	@if(environment == 0) // windows
+	if( tmp != 9223372036854775807 ) {
+		Debug.message("faild:-1 >>> 1,"+tmp);
+		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
+		isFaild = true;
+	}
+	@endif
+	tmp = int5 == 5 ? 1 : 0;
+	if( tmp != 1 ) {
+		Debug.message("faild:tmp = int5 == 5 ? 1 : 0;");
+		isFaild = true;
+	}
+
+	tmp = int5 != 5 ? 1 : 0;
+	if( tmp != 0 ) {
+		Debug.message("faild:tmp = int5 != 5 ? 1 : 0;");
+		isFaild = true;
+	}
+
+
+	tmp = int7 & 2;
+	if( tmp != 2 ) {
+		Debug.message("faild:int7 & 2");
+		isFaild = true;
+	}
+	tmp = int5 | int10;
+	if( tmp != 15 ) {
+		Debug.message("faild:int5 | int10");
+		isFaild = true;
+	}
+	tmp = int10 ^ int8;
+	if( tmp != 2 ) {
+		Debug.message("faild:int10 ^ int8");
+		isFaild = true;
+	}
+
+	if( int5 < int10 ) {
+	} else {
+		Debug.message("faild:int5 < int10");
+		isFaild = true;
+	}
+	if( int10 < int5 ) {
+		Debug.message("faild:int10 < int5");
+		isFaild = true;
+	}
+
+	if( int5 > int10 ) {
+		Debug.message("faild:int5 > int10");
+		isFaild = true;
+	}
+	if( int10 > int5 ) {
+	} else {
+		Debug.message("faild:int10 > int5");
+		isFaild = true;
+	}
+
+	if( int5 <= int10 ) {
+	} else {
+		Debug.message("faild:int5 <= int10");
+		isFaild = true;
+	}
+	if( int10 <= int5 ) {
+		Debug.message("faild:int10 <= int5");
+		isFaild = true;
+	}
+	if( int10 <= 10 ) {
+	} else {
+		Debug.message("faild:int10 <= 10");
+		isFaild = true;
+	}
+
+	if( int5 >= int10 ) {
+		Debug.message("faild:int5 >= int10");
+		isFaild = true;
+	}
+	if( int10 >= int5 ) {
+	} else {
+		Debug.message("faild:int10 >= int5");
+		isFaild = true;
+	}
+	if( int5 >= 5 ) {
+	} else {
+		Debug.message("faild:int5 >= 5");
+		isFaild = true;
+	}
+
+	tmp = int10 >> 1;
+	if( tmp != 5 ) {
+		Debug.message("faild:int10 >> 1");
+		isFaild = true;
+	}
+	tmp = -1 >> 1;
+	if( tmp != -1 ) {
+		Debug.message("faild:-1 >> 1");
+		isFaild = true;
+	}
+	tmp = int10 << 1;
+	if( tmp != 20 ) {
+		Debug.message("faild:int10 << 1");
+		isFaild = true;
+	}
+	tmp = int10 >>> 1;
+	if( tmp != 5 ) {
+		Debug.message("faild:int10 >>> 1");
+		isFaild = true;
+	}
+	tmp = +int5;
+	if( tmp != 5 ) {
+		Debug.message("faild:tmp = +int5");
+		isFaild = true;
+	}
+	tmp = -int5;
+	if( tmp != -5 ) {
+		Debug.message("faild:tmp = -int5");
+		isFaild = true;
+	}
+
+	if( !int5 ) {
+		Debug.message("faild:!int5");
+		isFaild = true;
+	}
+	tmp = 0;
+	if( !tmp ) {
+	} else {
+		Debug.message("faild:!tmp(0)");
+		isFaild = true;
+	}
+	tmp = ~int5;
+	if( tmp != -6 ) {
+		Debug.message("faild:tmp = ~int5");
+		isFaild = true;
+	}
+	tmp = int5;
+	if( --tmp != 4 ) {
+		Debug.message("faild:--tmp != 4");
+		isFaild = true;
+	}
+	tmp = int5;
+	if( ++tmp != 6 ) {
+		Debug.message("faild:++tmp != 6");
+		isFaild = true;
+	}
+	tmp = 65;
+	if( (#tmp) != 54 ) {
+		Debug.message("faild:(#tmp) != 54");
+		isFaild = true;
+	}
+	tmp = 66;
+	if( ($tmp) != 'B' ) {
+		Debug.message("faild:($tmp) != 'B'");
+		isFaild = true;
+	}
+
+
+	if( isFaild ) {
+		Debug.message("faild:int operation");
+	} else {
+		Debug.message("success:int operation");
+	}
+	isFaild = false;
+
+	/*
+	 ************************************************************************************************
+	*/
+
+	// 加減算演算子, 乗除余算演算子
+	if( (real5 + real10) != 15.0 ) {
+		Debug.message("faild:(real5 + real10) != 15.0");
+		isFaild = true;
+	}
+	if( (real10 - real5) != 5.0 ) {
+		Debug.message("faild:(real10 - real5) != 5.0");
+		isFaild = true;
+	}
+	if( (real8 % real5) != 3.0 ) {
+		Debug.message("faild:(real8 % real5) != 3.0");
+		isFaild = true;
+	}
+	if( (real10 / real5) != 2.0 ) {
+		Debug.message("faild:(real10 / real5) != 2.0");
+		isFaild = true;
+	}
+	if( (real8 / real5) != 1.6 ) {
+		Debug.message("faild:(real8 / real5) != 1.6");
+		isFaild = true;
+	}
+	if( (real10 \ real5) != 2 ) {
+		Debug.message("faild:(real10 \ real5) != 2");
+		isFaild = true;
+	}
+	if( (real8 \ real5) != 1 ) {
+		Debug.message("faild:(real8 \ real5) != 1");
+		isFaild = true;
+	}
+	if( (real10 * real5) != 50.0 ) {
+		Debug.message("faild:(real10 * real5) != 50.0");
+		isFaild = true;
+	}
+	if( (real8 * real5) != 40.0 ) {
+		Debug.message("faild:(real8 * real5) != 40.0");
+		isFaild = true;
+	}
+	tmp = real5;
+	if( tmp != real5 ) {
+		Debug.message("faild:tmp = real5");
+		isFaild = true;
+	}
+	tmp <-> real10;
+	if( tmp != 10.0 || real10 != 5.0 ) {
+		Debug.message("faild:tmp <-> real10");
+		isFaild = true;
+	}
+	tmp <-> real10;
+	var real7 = 7.0;
+	real7 &= 2;
+	if( real7 != 2 ) {
+		Debug.message("faild:real7 != 2");
+		isFaild = true;
+	}
+	tmp = real5;
+	tmp |= real10;
+	if( tmp != 15 ) {
+		Debug.message("faild:real5 |= real10");
+		isFaild = true;
+	}
+	tmp = real10;
+	tmp ^= real8;
+	if( tmp != 2 ) {
+		Debug.message("faild:real10 ^= real8");
+		isFaild = true;
+	}
+	tmp = real10;
+	tmp -= real5;
+	if( tmp != 5.0 ) {
+		Debug.message("faild:real10 -= real5");
+		isFaild = true;
+	}
+	tmp = real10;
+	tmp += real5;
+	if( tmp != 15.0 ) {
+		Debug.message("faild:real10 += real5");
+		isFaild = true;
+	}
+	tmp = real10;
+	tmp %= real8;
+	if( tmp != 2 ) {
+		Debug.message("faild:real10 %= real8");
+		isFaild = true;
+	}
+	tmp = real10;
+	tmp /= real8;
+	if( tmp != 1.25 ) {
+		Debug.message("faild:real10 /= real8");
+		isFaild = true;
+	}
+	tmp = real10;
+	tmp \= real8;
+	if( tmp != 1 ) {
+		Debug.message("faild:real10 \= real8");
+		isFaild = true;
+	}
+	tmp = real10;
+	tmp /= real5;
+	if( tmp != 2.0 ) {
+		Debug.message("faild:real10 /= real5");
+		isFaild = true;
+	}
+	tmp = real10;
+	tmp \= real5;
+	if( tmp != 2 ) {
+		Debug.message("faild:real10 \= real5");
+		isFaild = true;
+	}
+	tmp = real10;
+	tmp *= real5;
+	if( tmp != 50.0 ) {
+		Debug.message("faild:real10 *= real5");
+		isFaild = true;
+	}
+	tmp = 0.0;
+	tmp ||= real5;
+	if( !tmp ) {
+		Debug.message("faild:0 ||= real5");
+		isFaild = true;
+	}
+	tmp = 0.0;
+	tmp ||= 0.0;
+	if( tmp ) {
+		Debug.message("faild:0 ||= 0");
+		isFaild = true;
+	}
+	tmp = 0.0;
+	tmp &&= real5;
+	if( tmp ) {
+		Debug.message("faild:0 &&= real5");
+		isFaild = true;
+	}
+	tmp = 0.0;
+	tmp &&= 0.0;
+	if( tmp ) {
+		Debug.message("faild:0 &&= 0");
+		isFaild = true;
+	}
+	tmp = real5;
+	tmp &&= real10;
+	if( !tmp ) {
+		Debug.message("faild:real5 &&= real10");
+		isFaild = true;
+	}
+	tmp = real10;
+	tmp >>= 1;
+	if( tmp != 5.0 ) {
+		Debug.message("faild:real10 >>= 1");
+		isFaild = true;
+	}
+	tmp = -1.0;
+	tmp >>= 1;
+	if( tmp != -1 ) {
+		Debug.message("faild:-1 >>= 1,"+tmp);
+		isFaild = true;
+	}
+	tmp = real10;
+	tmp <<= 1;
+	if( tmp != 20.0 ) {
+		Debug.message("faild:real10 <<= 1");
+		isFaild = true;
+	}
+	tmp = -1.0;
+	tmp >>>= 1;
+	@if(environment > 0) // java
+	if( tmp != 2147483647 ) {
+		Debug.message("faild:-1 >>>= 1");
+		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
+		isFaild = true;
+	}
+	@endif
+	@if(environment == 0) // windows
+	if( tmp != 9223372036854775807 ) {
+		Debug.message("faild:-1 >>>= 1,"+tmp);
+		isFaild = true;
+	}
+	@endif
+	tmp = 10.0;
+	if( real10 == 9.0 || tmp == 10.0 ) {
+	} else {
+		Debug.message("faild:real10 == 9.0 || tmp == 10.0");
+		isFaild = true;
+	}
+	var real1 = 1.0;
+	var real0 = 0.0;
+	if( real1 == 1.0 && tmp == 10.0 ) {
+	} else {
+		Debug.message("faild:real1 == 1.0 && tmp == 10.0");
+		isFaild = true;
+	}
+	if( tmp == 10.0 && real0 == 1.0 ) {
+		Debug.message("faild:tmp == 10.0 && real0 == 1.0");
+		isFaild = true;
+	}
+
+	tmp = -1.0 >> 1;
+	if( tmp != -1.0 ) {
+		Debug.message("faild:-1 >> 1,"+tmp);
+		isFaild = true;
+	}
+	tmp = -1.0 >>> 1;
+	@if(environment > 0) // java
+	if( tmp != 2147483647 ) {
+		Debug.message("faild:-1 >>> 1");
+		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
+		isFaild = true;
+	}
+	@endif
+	@if(environment == 0) // windows
+	if( tmp != 9223372036854775807 ) {
+		Debug.message("faild:-1 >>> 1,"+tmp);
+		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
+		isFaild = true;
+	}
+	@endif
+	tmp = real5 == 5.0 ? 1.0 : 0.0;
+	if( tmp != 1 ) {
+		Debug.message("faild:tmp = real5 == 5 ? 1 : 0;");
+		isFaild = true;
+	}
+
+	tmp = real5 != 5.0 ? 1.0 : 0.0;
+	if( tmp != 0 ) {
+		Debug.message("faild:tmp = real5 != 5 ? 1 : 0;");
+		isFaild = true;
+	}
+
+
+	tmp = real7 & 2.0;
+	if( tmp != 2.0 ) {
+		Debug.message("faild:real7 & 2");
+		isFaild = true;
+	}
+	tmp = real5 | real10;
+	if( tmp != 15.0 ) {
+		Debug.message("faild:real5 | real10");
+		isFaild = true;
+	}
+	tmp = real10 ^ real8;
+	if( tmp != 2.0 ) {
+		Debug.message("faild:real10 ^ real8");
+		isFaild = true;
+	}
+
+	if( real5 < real10 ) {
+	} else {
+		Debug.message("faild:real5 < real10");
+		isFaild = true;
+	}
+	if( real10 < real5 ) {
+		Debug.message("faild:real10 < real5");
+		isFaild = true;
+	}
+
+	if( real5 > real10 ) {
+		Debug.message("faild:real5 > real10");
+		isFaild = true;
+	}
+	if( real10 > real5 ) {
+	} else {
+		Debug.message("faild:real10 > real5");
+		isFaild = true;
+	}
+
+	if( real5 <= real10 ) {
+	} else {
+		Debug.message("faild:real5 <= real10");
+		isFaild = true;
+	}
+	if( real10 <= real5 ) {
+		Debug.message("faild:real10 <= real5");
+		isFaild = true;
+	}
+	if( real10 <= 10 ) {
+	} else {
+		Debug.message("faild:real10 <= 10");
+		isFaild = true;
+	}
+
+	if( real5 >= real10 ) {
+		Debug.message("faild:real5 >= real10");
+		isFaild = true;
+	}
+	if( real10 >= real5 ) {
+	} else {
+		Debug.message("faild:real10 >= real5");
+		isFaild = true;
+	}
+	if( real5 >= 5.0 ) {
+	} else {
+		Debug.message("faild:real5 >= 5");
+		isFaild = true;
+	}
+
+	tmp = real10 >> 1;
+	if( tmp != 5.0 ) {
+		Debug.message("faild:real10 >> 1");
+		isFaild = true;
+	}
+	tmp = -1.0 >> 1;
+	if( tmp != -1.0 ) {
+		Debug.message("faild:-1 >> 1");
+		isFaild = true;
+	}
+	tmp = real10 << 1;
+	if( tmp != 20.0 ) {
+		Debug.message("faild:real10 << 1");
+		isFaild = true;
+	}
+	tmp = real10 >>> 1;
+	if( tmp != 5.0 ) {
+		Debug.message("faild:real10 >>> 1");
+		isFaild = true;
+	}
+	tmp = +real5;
+	if( tmp != 5.0 ) {
+		Debug.message("faild:tmp = +real5");
+		isFaild = true;
+	}
+	tmp = -real5;
+	if( tmp != -5.0 ) {
+		Debug.message("faild:tmp = -real5");
+		isFaild = true;
+	}
+
+	if( isFaild ) {
+		Debug.message("faild:real operation");
+	} else {
+		Debug.message("success:real operation");
+	}
+	isFaild = false;
+
+	/*
+	 ************************************************************************************************
+	*/
+	// 加減算演算子, 乗除余算演算子
+	if( (str5 + str10) != "510" ) {
+		Debug.message("faild:(str5 + str10) != 15");
+		isFaild = true;
+	}
+	if( (str10 - str5) != 5 ) {
+		Debug.message("faild:(str10 - str5) != 5");
+		isFaild = true;
+	}
+	if( (str8 % str5) != 3 ) {
+		Debug.message("faild:(str8 % str5) != 3");
+		isFaild = true;
+	}
+	if( (str10 / str5) != 2 ) {
+		Debug.message("faild:(str10 / str5) != 2");
+		isFaild = true;
+	}
+	if( (str8 / str5) != 1.6 ) {
+		Debug.message("faild:(str8 / str5) != 1.6");
+		isFaild = true;
+	}
+	if( (str10 \ str5) != 2 ) {
+		Debug.message("faild:(str10 \ str5) != 2");
+		isFaild = true;
+	}
+	if( (str8 \ str5) != 1 ) {
+		Debug.message("faild:(str8 \ str5) != 1");
+		isFaild = true;
+	}
+	if( (str10 * str5) != 50 ) {
+		Debug.message("faild:(str10 * str5) != 50");
+		isFaild = true;
+	}
+	if( (str8 * str5) != 40 ) {
+		Debug.message("faild:(str8 * str5) != 40");
+		isFaild = true;
+	}
+	tmp = str5;
+	if( tmp != str5 ) {
+		Debug.message("faild:tmp = str5");
+		isFaild = true;
+	}
+	tmp <-> str10;
+	if( tmp != "10" || str10 != "5" ) {
+		Debug.message("faild:tmp <-> str10");
+		isFaild = true;
+	}
+	tmp <-> str10;
+	var str7 = "7";
+	str7 &= 2;
+	if( str7 != 2 ) {
+		Debug.message("faild:str7 != 2");
+		isFaild = true;
+	}
+	tmp = str5;
+	tmp |= str10;
+	if( tmp != 15 ) {
+		Debug.message("faild:str5 |= str10");
+		isFaild = true;
+	}
+	tmp = str10;
+	tmp ^= str8;
+	if( tmp != 2 ) {
+		Debug.message("faild:str10 ^= str8");
+		isFaild = true;
+	}
+	tmp = str10;
+	tmp -= str5;
+	if( tmp != 5 ) {
+		Debug.message("faild:str10 -= str5");
+		isFaild = true;
+	}
+	tmp = str10;
+	tmp += str5;
+	if( tmp != "105" ) {
+		Debug.message("faild:str10 += str5");
+		isFaild = true;
+	}
+	tmp = str10;
+	tmp %= str8;
+	if( tmp != 2 ) {
+		Debug.message("faild:str10 %= str8");
+		isFaild = true;
+	}
+	tmp = str10;
+	tmp /= str8;
+	if( tmp != 1.25 ) {
+		Debug.message("faild:str10 /= str8");
+		isFaild = true;
+	}
+	tmp = str10;
+	tmp \= str8;
+	if( tmp != 1 ) {
+		Debug.message("faild:str10 \= str8");
+		isFaild = true;
+	}
+	tmp = str10;
+	tmp /= str5;
+	if( tmp != 2 ) {
+		Debug.message("faild:str10 /= str5");
+		isFaild = true;
+	}
+	tmp = str10;
+	tmp \= str5;
+	if( tmp != 2 ) {
+		Debug.message("faild:str10 \= str5");
+		isFaild = true;
+	}
+	tmp = str10;
+	tmp *= str5;
+	if( tmp != 50 ) {
+		Debug.message("faild:str10 *= str5");
+		isFaild = true;
+	}
+	tmp = "0";
+	tmp ||= str5;
+	if( !tmp ) {
+		Debug.message("faild:0 ||= str5");
+		isFaild = true;
+	}
+	tmp = "0";
+	tmp ||= "0";
+	if( tmp ) {
+		Debug.message("faild:0 ||= 0");
+		isFaild = true;
+	}
+	tmp = "0";
+	tmp &&= str5;
+	if( tmp ) {
+		Debug.message("faild:0 &&= str5");
+		isFaild = true;
+	}
+	tmp = "0";
+	tmp &&= "0";
+	if( tmp ) {
+		Debug.message("faild:0 &&= 0");
+		isFaild = true;
+	}
+	tmp = str5;
+	tmp &&= str10;
+	if( !tmp ) {
+		Debug.message("faild:str5 &&= str10");
+		isFaild = true;
+	}
+	tmp = str10;
+	tmp >>= 1;
+	if( tmp != 5 ) {
+		Debug.message("faild:str10 >>= 1");
+		isFaild = true;
+	}
+	tmp = "-1";
+	tmp >>= 1;
+	if( tmp != -1 ) {
+		Debug.message("faild:-1 >>= 1,"+tmp);
+		isFaild = true;
+	}
+	tmp = str10;
+	tmp <<= 1;
+	if( tmp != 20 ) {
+		Debug.message("faild:str10 <<= 1");
+		isFaild = true;
+	}
+	tmp = "-1";
+	tmp >>>= 1;
+	@if(environment > 0) // java
+	if( tmp != 2147483647 ) {
+		Debug.message("faild:-1 >>>= 1");
+		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
+		isFaild = true;
+	}
+	@endif
+	@if(environment == 0) // windows
+	if( tmp != 9223372036854775807 ) {
+		Debug.message("faild:-1 >>>= 1,"+tmp);
+		isFaild = true;
+	}
+	@endif
+	tmp = "10";
+	if( str10 == 9 || tmp == 10 ) {
+	} else {
+		Debug.message("faild:str10 == 9 || tmp == 10");
+		isFaild = true;
+	}
+	var str1 = "1";
+	var str0 = "0";
+	if( str1 == 1 && tmp == 10 ) {
+	} else {
+		Debug.message("faild:str1 == 1 && tmp == 10");
+		isFaild = true;
+	}
+	if( tmp == 10 && str0 == 1 ) {
+		Debug.message("faild:tmp == 10 && str0 == 1");
+		isFaild = true;
+	}
+
+	tmp = "-1" >> 1;
+	if( tmp != -1 ) {
+		Debug.message("faild:-1 >> 1,"+tmp);
+		isFaild = true;
+	}
+	tmp = "-1" >>> 1;
+	@if(environment > 0) // java
+	if( tmp != 2147483647 ) {
+		Debug.message("faild:-1 >>> 1");
+		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
+		isFaild = true;
+	}
+	@endif
+	@if(environment == 0) // windows
+	if( tmp != 9223372036854775807 ) {
+		Debug.message("faild:-1 >>> 1,"+tmp);
+		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
+		isFaild = true;
+	}
+	@endif
+	tmp = str5 == "5" ? 1 : 0;
+	if( tmp != 1 ) {
+		Debug.message("faild:tmp = str5 == 5 ? 1 : 0;");
+		isFaild = true;
+	}
+
+	tmp = str5 != "5" ? 1 : 0;
+	if( tmp != 0 ) {
+		Debug.message("faild:tmp = str5 != 5 ? 1 : 0;");
+		isFaild = true;
+	}
+
+
+	tmp = str7 & 2;
+	if( tmp != 2 ) {
+		Debug.message("faild:str7 & 2");
+		isFaild = true;
+	}
+	tmp = str5 | str10;
+	if( tmp != 15 ) {
+		Debug.message("faild:str5 | str10");
+		isFaild = true;
+	}
+	tmp = str10 ^ str8;
+	if( tmp != 2 ) {
+		Debug.message("faild:str10 ^ str8");
+		isFaild = true;
+	}
+
+	if( str5 > str10 ) {
+	} else {
+		Debug.message("faild:str5 > str10");
+		isFaild = true;
+	}
+	if( str10 < str5 ) {
+	} else {
+		Debug.message("faild:str10 < str5");
+		isFaild = true;
+	}
+
+	if( str5 < str10 ) {
+		Debug.message("faild:str5 < str10");
+		isFaild = true;
+	}
+	if( str10 < str5 ) {
+	} else {
+		Debug.message("faild:str10 < str5");
+		isFaild = true;
+	}
+
+	if( str5 >= str10 ) {
+	} else {
+		Debug.message("faild:str5 >= str10");
+		isFaild = true;
+	}
+	if( str10 >= str5 ) {
+		Debug.message("faild:str10 >= str5");
+		isFaild = true;
+	}
+	if( str10 <= 10 ) {
+	} else {
+		Debug.message("faild:str10 <= 10");
+		isFaild = true;
+	}
+
+	if( str5 <= str10 ) {
+		Debug.message("faild:str5 <= str10");
+		isFaild = true;
+	}
+	if( str10 <= str5 ) {
+	} else {
+		Debug.message("faild:str10 <= str5");
+		isFaild = true;
+	}
+	if( str5 >= 5 ) {
+	} else {
+		Debug.message("faild:str5 >= 5");
+		isFaild = true;
+	}
+
+	tmp = str10 >> 1;
+	if( tmp != 5 ) {
+		Debug.message("faild:str10 >> 1");
+		isFaild = true;
+	}
+	tmp = -1 >> 1;
+	if( tmp != -1 ) {
+		Debug.message("faild:-1 >> 1");
+		isFaild = true;
+	}
+	tmp = str10 << 1;
+	if( tmp != 20 ) {
+		Debug.message("faild:str10 << 1");
+		isFaild = true;
+	}
+	tmp = str10 >>> 1;
+	if( tmp != 5 ) {
+		Debug.message("faild:str10 >>> 1");
+		isFaild = true;
+	}
+	tmp = +str5;
+	if( tmp != 5 ) {
+		Debug.message("faild:tmp = +str5");
+		isFaild = true;
+	}
+	tmp = -str5;
+	if( tmp != -5 ) {
+		Debug.message("faild:tmp = -str5");
+		isFaild = true;
+	}
+
+	// 代入演算子
+	if( isFaild ) {
+		Debug.message("faild:str operation");
+	} else {
+		Debug.message("success:str operation");
+	}
+	isFaild = false;
+
+	/*
+	 ************************************************************************************************
+	*/
+	// 次はOctet の加算をやる
+	var iscatch;
+	if( (oct5 + oct10) != <% 05 10 %> ) {
+		//tmp = (oct5 + oct10);
+		//Debug.message( tmp );
+		Debug.message("faild:(oct5 + oct10) != <% 5 10 %>");
+		isFaild = true;
+	}
+	iscatch = false;
+	try {
+		tmp = oct10 - oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = oct10 - oct5"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		tmp = oct8 % oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = oct8 % oct5"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		tmp = oct10 / oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = oct10 / oct5"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		tmp = oct10 \ oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = oct10 \ oct5"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		tmp = oct10 * oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = oct10 * oct5"); isFaild = true; }
+
+	tmp = oct5;
+	if( tmp != oct5 ) {
+		Debug.message("faild:tmp = oct5");
+		isFaild = true;
+	}
+	tmp <-> oct10;
+	if( tmp != <% 10 %> || oct10 != oct5 ) {
+		Debug.message("faild:tmp <-> oct10");
+		isFaild = true;
+	}
+	tmp <-> oct10;
+
+	var oct7 = <% 7 %>;
+	iscatch = false;
+	try {
+		oct7 &= <% 2 %>;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:oct7 &= <% 2 %>"); isFaild = true; }
+
+
+	tmp = oct5;
+	iscatch = false;
+	try {
+		tmp |= oct10;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp |= oct10"); isFaild = true; }
+
+	tmp = oct10;
+	iscatch = false;
+	try {
+		tmp ^= oct8;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp ^= oct8"); isFaild = true; }
+
+	tmp = oct10;
+	iscatch = false;
+	try {
+		tmp -= oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp -= oct5"); isFaild = true; }
+
+	tmp = oct10;
+	tmp += oct5;
+	if( tmp != <% 10 5 %> ) {
+		Debug.message("faild:oct10 += oct5");
+		isFaild = true;
+	}
+	tmp = oct10;
+	iscatch = false;
+	try {
+		tmp %= oct8;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp %= oct8"); isFaild = true; }
+
+
+	tmp = oct10;
+	iscatch = false;
+	try {
+		tmp /= oct8;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp /= oct8"); isFaild = true; }
+
+
+	tmp = oct10;
+	iscatch = false;
+	try {
+		tmp \= oct8;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp \= oct8"); isFaild = true; }
+
+	tmp = oct10;
+	iscatch = false;
+	try {
+		tmp /= oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp /= oct5"); isFaild = true; }
+
+
+	tmp = oct10;
+	iscatch = false;
+	try {
+		tmp *= oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp *= oct5"); isFaild = true; }
+
+
+	tmp = oct10;
+	tmp ||= oct5;
+	if( tmp == false ) {
+		Debug.message("faild:tmp ||= oct5"); isFaild = true;
+	}
+
+	tmp = oct10;
+	tmp &&= oct5;
+	if( tmp == false ) {
+		Debug.message("faild:tmp &&= oct5"); isFaild = true;
+	}
+
+	tmp = oct10;
+	iscatch = false;
+	try {
+		tmp >>= oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp >>= oct5"); isFaild = true; }
+
+
+	tmp = oct10;
+	iscatch = false;
+	try {
+		tmp <<= oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp <<= oct5"); isFaild = true; }
+
+
+	tmp = oct10;
+	iscatch = false;
+	try {
+		tmp >>>= oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp >>>= oct5"); isFaild = true; }
+
+	tmp = <% 10 %>;
+	if( oct10 == <% 9 %> || tmp == <% 10 %> ) {
+	} else {
+		Debug.message("faild:oct10 == <% 9 %> || tmp == <% 10 %>");
+		isFaild = true;
+	}
+	var oct1 = <% 1 %>;
+	var oct0 = <% 0 %>;
+	if( oct1 == <% 1 %> && tmp == <% 10 %> ) {
+	} else {
+		Debug.message("faild:oct1 == <% 1 %> && tmp == <% 10 %>");
+		isFaild = true;
+	}
+	if( tmp == <% 10 %> && oct0 == <% 1 %> ) {
+		Debug.message("faild:tmp == <% 10 %> && oct0 == <% 1 %>");
+		isFaild = true;
+	}
+
+	iscatch = false;
+	try {
+		tmp = <% 1 %>;
+		tmp = tmp >> <% 1 %>;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = <% 1 %> >> <% 1 %>"); isFaild = true; }
+
+
+	iscatch = false;
+	try {
+		tmp = <% 1 %>;
+		tmp = tmp >>> <% 1 %>;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = <% 1 %> >>> <% 1 %>"); isFaild = true; }
+
+	tmp = oct5 == <% 5 %> ? <% 1 %> : <% 0 %>;
+	if( tmp != <% 1 %> ) {
+		Debug.message("faild:tmp = oct5 == <% 5 %> ? <% 1 %> : <% 0 %>");
+		isFaild = true;
+	}
+
+	tmp = oct5 != <% 5 %> ? <% 1 %> : <% 0 %>;
+	if( tmp != <% 0 %> ) {
+		Debug.message("faild:tmp = oct5 != <% 5 %> ? <% 1 %> : <% 0 %>");
+		isFaild = true;
+	}
+
+
+	iscatch = false;
+	try {
+		tmp = oct7 & <% 2 %>;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = oct7 & <% 2 %>"); isFaild = true; }
+
+
+	iscatch = false;
+	try {
+		tmp = oct7 | <% 2 %>;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = oct7 | <% 2 %>"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		tmp = oct7 ^ <% 2 %>;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = oct7 ^ <% 2 %>"); isFaild = true; }
+
+
+	iscatch = false;
+	try {
+		if( oct5 < oct10 ) {}
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:oct5 < oct10"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		if( oct5 > oct10 ) {}
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:oct5 > oct10"); isFaild = true; }
+
+
+	iscatch = false;
+	try {
+		if( oct5 <= oct10 ) {}
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:oct5 <= oct10"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		if( oct5 >= oct10 ) {}
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:oct5 >= oct10"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		tmp = oct10 >> <% 1 %>;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = oct10 >> <% 1 %>"); isFaild = true; }
+
+
+	iscatch = false;
+	try {
+		tmp = oct10 << <% 1 %>;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = oct10 << <% 1 %>"); isFaild = true; }
+
+
+	iscatch = false;
+	try {
+		tmp = oct10 >>> <% 1 %>;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = oct10 >>> <% 1 %>"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		tmp = +oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = +oct5"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		tmp = -oct5;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = -oct5"); isFaild = true; }
+
+
+	if( !oct5 ) {
+		Debug.message("faild:!oct5");
+		isFaild = true;
+	}
+	tmp = <% 0 %>;
+	if( !tmp ) {
+		Debug.message("faild:!tmp(<% 0 %>)");
+		isFaild = true;
+	}
+
+	iscatch = false;
+	try {
+		tmp = ~oct10;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:tmp = ~oct10"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		tmp = oct5;
+		--tmp;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:--oct5"); isFaild = true; }
+
+	iscatch = false;
+	try {
+		tmp = oct5;
+		++tmp;
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:++oct5"); isFaild = true; }
+
+	tmp = <% 6 %>;
+	iscatch = false;
+	try {
+		if( (#tmp) != 54 ) {}
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:if( (#tmp) != 54 ) {}"); isFaild = true; }
+
+	tmp = <% 6 %>;
+	iscatch = false;
+	try {
+		if( ($tmp) != 'B' ) {}
+	} catch {
+		iscatch = true;
+	}
+	if( iscatch == false ) { Debug.message("faild:if( ($tmp) != 'B' ) {}"); isFaild = true; }
+
+	if( isFaild ) {
+		Debug.message("faild:oct operation");
+	} else {
+		Debug.message("success:oct operation");
+	}
+}
+

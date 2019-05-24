@@ -1,0 +1,3299 @@
+//
+// $Id$
+//
+
+
+/*----------------------------------------------------------------------
+ * 定数(内部定数)
+ ----------------------------------------------------------------------*/
+global.TIMELINE_FRAME_HEIGHT = 14;
+global.TIMELINE_LOCATOR_HEIGHT = 20;
+
+global.TIMELINE_FRAME_TYPE_NULL = 0;
+global.TIMELINE_FRAME_TYPE_SINGLE = 1;
+global.TIMELINE_FRAME_TYPE_CONTINUOUS = 2;
+global.TIMELINE_FRAME_TYPE_TWEEN = 3;
+
+global.TIMELINE_MARKER_MASK_NONE = 0;
+global.TIMELINE_MARKER_MASK_LEFT = 1;
+global.TIMELINE_MARKER_MASK_RIGHT = 2;
+
+global.TIMELINE_FRAME_WIDTH_LIST = [ 4, 6, 10, 14 ];
+global.TIMELINE_FRAME_WIDTH_LABEL_LIST = [ "SS", "S", "M", "L" ];
+
+/*----------------------------------------------------------------------
+ * タイムラインユーティリティ
+ ----------------------------------------------------------------------*/
+function ktimeline_shallow_copy_frame_list(frameList)
+{
+  var newFrameList = [];
+  for (var i = 0; i < frameList.count; i++) {
+    var newFrame = %[];
+    (Dictionary.assign incontextof newFrame)(frameList[i]);
+    newFrameList.add(newFrame);
+  }
+  return newFrameList;
+}
+
+function ktimeline_invalidate_null_frame(frameList)
+{
+  // 連続するヌルフレームを統合する
+  for (var i = 1; i < frameList.count; i++) {
+    if (frameList[i - 1].type == TIMELINE_FRAME_TYPE_NULL
+        && frameList[i].type == TIMELINE_FRAME_TYPE_NULL) {
+      frameList.erase(i);
+      i--;
+      continue;
+    }
+  }
+  // 先頭のヌルフレームを削除する
+  if (frameList.count
+      && frameList[0].type == TIMELINE_FRAME_TYPE_NULL)
+    frameList.erase(0);
+  // 連続フレームか補完フレームの場合、空リストで無ければ末尾に必ずヌルフレームを追加する
+  if (frameList.count
+      && (frameList[-1].type == TIMELINE_FRAME_TYPE_CONTINUOUS
+          || frameList[-1].type == TIMELINE_FRAME_TYPE_TWEEN))
+    frameList.add(%[ time: frameList[-1].time + 1, type: TIMELINE_FRAME_TYPE_NULL, content: void]);
+}
+                                       
+
+function ktimeline_fix_invalid_frame(frameList)
+{
+  for (var i = frameList.count - 1; i > 0; i--) {
+    if (frameList[i - 1].time >= frameList[i].time) 
+      frameList.erase(i - 1);
+  }
+  ktimeline_invalidate_null_frame(frameList);
+}
+
+/*----------------------------------------------------------------------
+ * タイムロケーター(内部パーツ)
+ ----------------------------------------------------------------------*/
+class KTimeLineTimeLocator extends KVirtualWidget
+{
+  // オーナー(タイムラインコントロール本体)
+  var owner;
+  // ドラッグ中か？
+  var dragging;
+
+  // ドラッグ関係
+  var frameDragMoving;
+  var frameDragItemList;
+  var frameDragFrameList;
+  var frameDragTime;
+  var frameDragPrevTime, frameDragMinTime;
+  var frameDragLeftList;
+
+  // アクティブレンジ
+  var activeBegin = void;
+  var activeEnd = void;
+  var activeDragging = false;
+  var activeDragBeginTime;
+  var _activeRangeEnabled = false;
+
+  // コンストラクタ
+  function KTimeLineTimeLocator(window, owner, name) {
+    super.KVirtualWidget(window, name);
+    setFixedSize(2000, TIMELINE_LOCATOR_HEIGHT);
+    this.owner = owner;
+    canvas.fontHeight = 12;
+    canvas.font.bold = true;
+    dragging = false;
+  }
+
+  property TIMELINE_FRAME_WIDTH {
+    getter {
+      return owner.TIMELINE_FRAME_WIDTH;
+    }
+  }
+
+  function updateCursor {
+    var x = owner.selectedTime;
+    redrawRect(x * TIMELINE_FRAME_WIDTH, 0, TIMELINE_FRAME_WIDTH, height);
+  }
+
+  function setActiveRange(begin, end) {
+    activeBegin = begin;
+    activeEnd = end;
+    redrawAll();
+  }
+
+  property activeRangeBegin {
+    getter {
+      return activeBegin;
+    }
+    setter (v) {
+      activeBegin = v;
+      if (activeBegin !== void
+          && activeEnd !== void
+          && activeBegin > activeEnd) {
+        activeEnd = activeBegin;
+      }
+      redrawAll();
+    }
+  }
+
+  property activeRangeEnd {
+    getter {
+      return activeEnd;
+    }
+    setter (v) {
+      activeEnd = v;
+      if (activeBegin !== void
+          && activeEnd !== void
+          && activeBegin > activeEnd) {
+        activeBegin = activeEnd;
+      }
+      redrawAll();
+    }
+  }
+
+  property activeRangeEnabled {
+    getter {
+      return _activeRangeEnabled;
+    }
+    setter (v) {
+      _activeRangeEnabled = v;
+      if (! v)
+        setActiveRange(void, void);
+    }
+  }
+
+  // 描画
+  function onDraw(l, t, w, h) {
+    // フレーム幅単位で表示
+    var fromX, toX, fromY, toY;
+    fromX = int(l / TIMELINE_FRAME_WIDTH);
+    toX = int((l + w + TIMELINE_FRAME_WIDTH - 1) / TIMELINE_FRAME_WIDTH);
+
+    // ロケータのバックグラウンドを描画
+    for (var x = fromX; x < toX; x ++) {
+      if (x != owner.selectedTime) {
+        fillRect(x * TIMELINE_FRAME_WIDTH, 0, TIMELINE_FRAME_WIDTH, height, WIN_BG);
+      } else {
+	var cursorColor = (typeof(owner["_layerView"]) != "undefined" && owner._layerView.focused) ? 0xFF0000FF : 0xFFFF0000;
+        fillRect(x * TIMELINE_FRAME_WIDTH, 0, TIMELINE_FRAME_WIDTH, height, cursorColor);
+        fillRect(x * TIMELINE_FRAME_WIDTH + 1, 1, TIMELINE_FRAME_WIDTH - 2, height - 2, blendColor(cursorColor, WIN_BG));
+      }
+      fillRect(x * TIMELINE_FRAME_WIDTH + TIMELINE_FRAME_WIDTH - 1, height - 5, 1, 4, WIN_DARKEN1);
+      fillRect(x * TIMELINE_FRAME_WIDTH, height - 1, TIMELINE_FRAME_WIDTH, 1, WIN_DARKEN1);
+    }
+    // 5マス単位で時刻表示
+    var dFromX, dToX;
+    dFromX = int(fromX / 5);
+    dToX = int((toX + 5 - 1) / 5);
+    for (var x = dFromX; x < dToX; x++) {
+      drawText(x * 5 * TIMELINE_FRAME_WIDTH, (height - fontHeight) / 2, string(x * 5));
+    }
+    // アクティブ強調
+    if (activeBegin !== void
+        || activeEnd !== void) {
+      var activeBeginX, activeEndX;
+      if (activeBegin === void) 
+        activeBeginX = fromX;
+      else
+        activeBeginX = activeBegin;
+      if (activeEnd === void)
+        activeEndX = toX;
+      else
+        activeEndX = activeEnd;
+
+      for (var x = fromX; x < toX; x++) {
+        var active = (activeBeginX <= x && x <= activeEndX);
+        if (! active) {
+          colorRect(x * TIMELINE_FRAME_WIDTH, 0, TIMELINE_FRAME_WIDTH, height, WIN_BG & 0xFFFFFF, 192);
+        } else {
+          fillRect(x * TIMELINE_FRAME_WIDTH, height - 1, TIMELINE_FRAME_WIDTH, 1, 0xFFFF0000);
+        }
+        if (x == activeBeginX - 1
+            || x == activeEndX)
+          fillRect(x * TIMELINE_FRAME_WIDTH + TIMELINE_FRAME_WIDTH - 1, height - 5, 1, 4, 0xFFFF0000);
+      }
+    }
+  }
+
+  // マウスダウン
+  function onMouseDown(x, y, button, shift) {
+    // オーナーが「再生中」のクリックなら、即座に再生停止
+    if (owner.playing)
+      owner.playing = false;
+    // Shift+左クリックでレンジドラッグ開始
+    if (owner.editable
+        && _activeRangeEnabled
+        && button == mbLeft
+        && (shift & ssShift)) {
+      owner.selectedTime = int(x / TIMELINE_FRAME_WIDTH);
+      owner.resetSelection();
+      setActiveRange(void, void);
+      activeDragBeginTime = owner.selectedTime;
+      activeDragging = true;
+      return;
+    }
+    // Ctrl+左クリックでフレームドラッグ開始
+    if (owner.editable
+        && button == mbLeft
+        && (shift & ssCtrl)) {
+      var curTime = int(x / TIMELINE_FRAME_WIDTH);
+      if (curTime != owner.selectedTime)
+        return;
+      owner.resetSelection();
+      owner.renderAtTimeModification = false;
+      frameDragMoving = true;
+      frameDragTime = frameDragPrevTime = owner.selectedTime;
+      frameDragItemList = owner._layerList.descendants;
+      frameDragFrameList = [];
+      frameDragMinTime = 0;
+      var leftMap = %[];
+      leftMap[frameDragTime] = true;
+      for (var i = 0; i < frameDragItemList.count; i++) {
+        var item = frameDragItemList[i];
+        item.mapLeftSideFrame(frameDragTime, leftMap);
+        frameDragFrameList.add(ktimeline_shallow_copy_frame_list(item.frameList));
+      }
+      frameDragLeftList = dictionaryKeys(leftMap);
+      for (var i = 0; i < frameDragLeftList.count; i++)
+        frameDragLeftList[i] = +frameDragLeftList[i];
+      frameDragLeftList.sort();
+      frameDragMinTime = Math.max(frameDragLeftList.count - 1, 0);
+      return;
+    }
+
+    // 左クリックでドラッグ開始
+    if (button == mbLeft) {
+      owner.selectedTime = int(x / TIMELINE_FRAME_WIDTH);
+      owner.resetSelection();
+      dragging = true;
+      return;
+    } 
+    // 右クリックでコールバック関数をキック
+    if (owner.editable
+        && button == mbRight) {
+      owner.selectedTime = int(x / TIMELINE_FRAME_WIDTH);
+      owner.resetSelection();
+      owner.onTimeLocatorRightClick(owner.selectedTime);
+      return;
+    }
+  }
+
+  // マウスムーブ
+  function onMouseMove(x, y, button, shift) {
+    // フレームドラッグ中なら、処理
+    if (frameDragMoving) {
+      owner.selectedTime = int(Math.max(int(x / TIMELINE_FRAME_WIDTH), frameDragMinTime));
+      owner.resetSelection();
+      var curTime = owner.selectedTime;
+      if (curTime != frameDragPrevTime) {
+        frameDragPrevTime = curTime;
+        var fromTime = frameDragTime;
+        var toTime = curTime;
+        if (toTime < fromTime
+            && frameDragLeftList.count) {
+          var toLeft = [];
+          toLeft.assign(frameDragLeftList);
+          for (var i = toLeft.count - 1; i >= 0; i--) {
+            if (toLeft[i] > toTime) {
+              toLeft[i] = toTime--;
+            } else {
+              break;
+            }
+          }
+          fromTime = frameDragLeftList;
+          toTime = toLeft;
+        }
+        for (var i = 0; i < frameDragItemList.count; i++) {
+          var item = frameDragItemList[i];
+          item.frameList = ktimeline_shallow_copy_frame_list(frameDragFrameList[i]);
+          item.moveFrame(fromTime, toTime, true);
+        }
+      }
+      return;
+    }
+    // 左ドラッグ中なら、選択を変更
+    if (dragging) {
+      owner.selectedTime = int(x / TIMELINE_FRAME_WIDTH);
+      owner.resetSelection();
+      return;
+    }
+    // アクティブレンジドラッグ中なら、アクティブレンジを変更
+    if (activeDragging) {
+      owner.selectedTime = int(x / TIMELINE_FRAME_WIDTH);
+      owner.resetSelection();
+      if (owner.selectedTime == activeDragBeginTime)
+        setActiveRange(void, void);
+      else
+        setActiveRange(Math.min(activeDragBeginTime, owner.selectedTime),
+                       Math.max(activeDragBeginTime, owner.selectedTime));
+    }
+  }
+
+  // マウスアップ
+  function onMouseUp(x, y, button, shift) {
+    // フレームドラッグを解除
+    if (frameDragMoving
+        && button == mbLeft) {
+      owner.renderAtTimeModification = true;
+      frameDragMoving = false;
+      if (owner.selectedTime != frameDragTime) {
+        owner.onRenderFrame();
+        owner.onMultipleFrameDragged();
+      }
+      return;
+    }
+    // 左ドラッグを解除
+    if (dragging
+        && button == mbLeft) {
+      dragging = false;
+      return;
+    }
+    // アクティブドラッグを解除
+    if (activeDragging
+        && button == mbLeft) {
+      activeDragging = false;
+      return;
+    }
+  }
+
+  // enabled==trueならそのまま表示
+  function onNodeEnabled {
+    _canvas.opacity = 255;
+  } 
+
+  // enabled=falseなら半透明で表示
+  function onNodeDisabled {
+    _canvas.opacity = 64;
+  }
+}
+
+/*----------------------------------------------------------------------
+ * レイヤビュー(内部パーツ)
+ ----------------------------------------------------------------------*/
+class KTimeLineLayerView extends KVirtualWidget
+{
+  // オーナー(タイムラインコントロール本体)
+  var owner;
+  // レイヤリストへの参照
+  var list;
+  // フレームトップマーカー
+  var frameLeftMarkerLayer;
+  var frameRightMarkerLayer;
+  var oneSecondFrameBgLayer;
+  var halfSecondFrameBgLayer;
+  var fifthFrameBgLayer;
+  var normalFrameBgLayer;
+  // 破線app
+  var dashLineApp;
+  // カーソルレイヤ
+  var cursorLayer;
+
+  // カーソルキードラッグ
+  var cursorKeyDragging = false;
+  var cursorKeySelectionBeginTime;
+  var cursorKeySelectionBeginLayer;
+  // マウスドラッグ
+  var mouseDragging = false;
+  var mouseSelectionBeginTime;
+  var mouseSelectionBeginLayer;
+  var mouseDraggingMoved = false;
+
+  // フレーム境界のドラッグ
+  var boundaryDragMoving;            // ドラッグ中
+  var boundaryDragFrameList;         // 元フレームリスト
+  var boundaryDragFrameIndex;        // ドラッグ開始フレームのインデックス
+  var boundaryDragTime;              // ドラッグ時間
+  var boundaryDragLayer;             // ドラッグレイヤ
+  var boundaryDragPrevTime;          // 前回の時間
+  var boundaryDragMinTime;           // 下限
+  var boundaryDragMoved;             // 動いた
+  var boundaryDragSaveLength;        // 長さ保存
+
+  // 範囲ドラッグ
+  var rangeDragMoving;
+  var rangeDragTime;
+  var rangeDragPrevTime;
+  var rangeDragMinTime;
+  var rangeDragFrameList;
+  var rangeDragSelectionList;
+  var rangeDragOffset;
+  var rangeDragLeftList;
+  var prevFrame;
+
+  // コンストラクタ
+  function KTimeLineLayerView(window, owner, name) {
+    super.KVirtualWidget(window, name);
+    this.owner = owner;
+    list = owner._layerList;
+    setMinMaxSize(2000, list.minHeight, 2000, list.maxHeight);
+    focusable = window.defaultFocusable;
+    cursorLayer = new global.Layer(window, this);
+    cursorLayer.hitThreshold = 256;
+    mouseDraggingMoved = false;
+    cursorKeyDragging = false;
+    rangeDragMoving = false;
+    updateCursor();
+
+    frameLeftMarkerLayer = new global.Layer(window, this);
+    frameRightMarkerLayer = new global.Layer(window, this);
+    oneSecondFrameBgLayer = new global.Layer(window, this);
+    halfSecondFrameBgLayer = new global.Layer(window, this);
+    fifthFrameBgLayer = new global.Layer(window, this);
+    normalFrameBgLayer = new global.Layer(window, this);
+
+    onUpdateFrameWidth();
+
+    if (typeof(global["GdiPlus"]) != "undefined") {
+      dashLineApp = new GdiPlus.Appearance();
+      dashLineApp.addPen(WIN_DARKEN2, %[ width: 1, dashStyle: [ 3, 2 ] ], 0.5, 0);
+    }
+  }
+
+  property TIMELINE_FRAME_WIDTH {
+    getter {
+      return owner.TIMELINE_FRAME_WIDTH;
+    }
+  }
+
+  function updateBgLayer(layer, color) {
+    layer.setSize(TIMELINE_FRAME_WIDTH, TIMELINE_FRAME_HEIGHT);
+    layer.fillRect(0, 0, TIMELINE_FRAME_WIDTH, TIMELINE_FRAME_HEIGHT, color);
+    layer.fillRect(0 + TIMELINE_FRAME_WIDTH - 1, 0, 1, TIMELINE_FRAME_HEIGHT, WIN_DARKEN1);
+    layer.fillRect(0, 0 + TIMELINE_FRAME_HEIGHT - 1, TIMELINE_FRAME_WIDTH, 1, WIN_DARKEN1);
+  }
+
+  function onUpdateFrameWidth() {
+    frameLeftMarkerLayer.setImageSize(6, TIMELINE_FRAME_HEIGHT);
+    frameLeftMarkerLayer.setSize(6, TIMELINE_FRAME_HEIGHT);
+    frameLeftMarkerLayer.fillRect(0, 0, 6, TIMELINE_FRAME_HEIGHT, 0);
+    var cw = 7;
+    for (var i = 0; i < cw - 2; i++) 
+      frameLeftMarkerLayer.fillRect(2 + i, (TIMELINE_FRAME_HEIGHT - (cw - i * 2)) / 2, 1, cw - i * 2, WIN_DARKEN2);
+
+    frameRightMarkerLayer.assignImages(frameLeftMarkerLayer);
+    frameRightMarkerLayer.flipLR();
+    frameRightMarkerLayer.setSize(6, TIMELINE_FRAME_HEIGHT);
+
+    updateBgLayer(oneSecondFrameBgLayer, 0xffffe0f2);
+    updateBgLayer(halfSecondFrameBgLayer, 0xffe0ffff);
+    updateBgLayer(fifthFrameBgLayer, WIN_LIGHTEN1);
+    updateBgLayer(normalFrameBgLayer, WIN_WHITE);
+  }
+
+  function onSearchNextFocusable(layer) {
+    owner.onSearchNextFocusable(layer);
+    super.onSearchNextFocusable(owner.searchTarget);
+  }
+
+  function updateCursor {
+    var cursorColor = focused ? 0xFF0000FF : 0xFFFF0000;
+    cursorLayer.setSize(TIMELINE_FRAME_WIDTH, height);
+    cursorLayer.fillRect(0, 0, cursorLayer.width, cursorLayer.height, 0);
+    cursorLayer.fillRect(int(TIMELINE_FRAME_WIDTH / 2) - 1, 0, 1, cursorLayer.height, cursorColor);
+    cursorLayer.fillRect(0, owner.selectedLayer * TIMELINE_FRAME_HEIGHT, cursorLayer.width, TIMELINE_FRAME_HEIGHT, cursorColor);
+    cursorLayer.fillRect(1, owner.selectedLayer * TIMELINE_FRAME_HEIGHT + 1, cursorLayer.width - 2, TIMELINE_FRAME_HEIGHT - 2, cursorColor & 0x00FFFFFF | 0x40000000);
+    cursorLayer.setPos(owner.selectedTime * TIMELINE_FRAME_WIDTH, 0);
+    cursorLayer.visible = true;
+  }
+
+  function onFocus {
+    if (! System.getKeyState(VK_SHIFT))
+      cursorKeyDragging = false;
+    owner.updateCursor();
+  }
+
+  function onBlur {
+    owner.updateCursor();
+  }
+
+  // 描画
+  function onDraw(l, t, w, h) {
+    // 時間単位で描画処理
+    var fromX, toX, fromY, toY;
+    fromX = int(l / TIMELINE_FRAME_WIDTH);
+    toX = int((l + w + TIMELINE_FRAME_WIDTH - 1) / TIMELINE_FRAME_WIDTH);
+    fromY = int(t / TIMELINE_FRAME_HEIGHT);
+    toY = int((t + h + TIMELINE_FRAME_HEIGHT - 1) / TIMELINE_FRAME_HEIGHT);
+    // アイテム単位でフレームを描画
+    for (var y = fromY; y < toY; y++) {
+      if (! (list.drawItemList[y] isvalid))
+	continue;
+      if (y < list.drawItemList.count) {
+        list.drawItemList[y].drawTimeLine(this, fromX, toX);
+      } else {
+        fillRect(0, y * TIMELINE_FRAME_HEIGHT, width, TIMELINE_FRAME_HEIGHT, WIN_WHITE);
+      }
+   }
+  }
+
+  // 選択をしているかどうか
+  property hasSelection {
+    getter {
+      for (var i = 0; i < list.drawItemList.count; i++) {
+        var item = list.drawItemList[i];
+        if (item isvalid
+	    && item.selection !== void) 
+          return true;
+      }
+      return false;
+    }
+  }    
+
+  // マウスオーバー
+  function onMouseOver(layerItem, frameIndex) {
+  }
+
+  // ポイントが選択範囲内にあるかどうか判定
+  function isPointInSelection(x, y) {
+    var time = int(x / TIMELINE_FRAME_WIDTH);
+    var layer = int(y / TIMELINE_FRAME_HEIGHT);
+    if (layer >= list.drawItemList.count)
+      return false;
+    var selection = list.drawItemList[layer].selection;
+    return selection !== void
+      && selection[0] <= time
+      && time < selection[1];
+  }
+
+  // マウスオーバー状態アップデート
+  function updateMouseOver(x, y) {
+    var curTime = int(x / TIMELINE_FRAME_WIDTH);
+    var curLayer = int(y / TIMELINE_FRAME_HEIGHT);
+    if (! (curTime < 0 || curLayer < 0 || curLayer >= list.drawItemList.count)) {
+      var item = list.drawItemList[curLayer];
+      var frameIndex = item.findFrame(curTime);
+      var frame = item.frameAt(frameIndex);
+      if (frame !== void
+	  && frame.type != TIMELINE_FRAME_TYPE_NULL
+	  && (frame.type != TIMELINE_FRAME_TYPE_SINGLE
+	      || x < frame.time * TIMELINE_FRAME_WIDTH + TIMELINE_FRAME_HEIGHT)) {
+	if (prevFrame !== frame) {
+	  prevFrame = frame;
+	  onMouseOver(item, frameIndex);
+	}
+	return;
+      }
+    }
+
+    prevFrame = void;
+    onMouseOver(void, void);
+  }
+
+  // カーソル選択
+  function updateMouseCursor(x, y) {
+    updateMouseOver(...);
+    cursor = crDefault;
+    boundaryDragFrameIndex = -1;
+    if (mouseDragging
+        || cursorKeyDragging
+        || rangeDragMoving) {
+      return;
+    }
+    var curTime = int(x / TIMELINE_FRAME_WIDTH);
+    var curLayer = int(y / TIMELINE_FRAME_HEIGHT);
+    if (curTime < 0 || curLayer < 0 || curLayer >= list.drawItemList.count) {
+      return;
+    }
+    var item = list.drawItemList[curLayer];
+    var frameIndex = item.findFrame(curTime);
+    var frame = item.frameAt(frameIndex);
+    if (frame !== void
+        && Math.abs(frame.time * TIMELINE_FRAME_WIDTH - x) <= 3) {
+      boundaryDragFrameIndex = frameIndex;
+      boundaryDragTime = frame.time;
+      boundaryDragLayer = curLayer;
+      cursor = crHSplit;
+      return;
+    }
+    var frameIndex = item.findFrame(curTime) + 1;
+    var frame = item.frameAt(frameIndex);
+    if (frame !== void
+        && Math.abs(frame.time * TIMELINE_FRAME_WIDTH - x) <= 3) {
+      boundaryDragFrameIndex = frameIndex;
+      boundaryDragTime = frame.time;
+      boundaryDragLayer = curLayer;
+      cursor = crHSplit;
+      return;
+    }
+  }
+
+  // マウスダウン
+  function onMouseDown(x, y, button, shift) {
+    focus();
+
+    // オーナーが再生中なら即停止
+    if (owner.playing)
+      owner.playing = false;
+
+    // 選択範囲をドラッグで、範囲ドラッグ開始
+    if (button == mbLeft
+        && (shift & ssCtrl)
+        && isPointInSelection(x, y)) {
+      owner.selectedTime = int(x / TIMELINE_FRAME_WIDTH);
+      focus();
+      owner.renderAtTimeModification = false;
+      rangeDragPrevTime = rangeDragTime = owner.selectedTime;
+      rangeDragMoving = true;
+      rangeDragSelectionList = [];
+      rangeDragFrameList = [];
+      rangeDragMinTime = 0;
+      var leftMap = %[];
+      for (var i = 0; i < list.drawItemList.count; i++) {
+        var item = list.drawItemList[i];
+        if (item.hasSelection) {
+          rangeDragSelectionList.add(duplicateStruct(item.selection));
+          rangeDragFrameList.add(ktimeline_shallow_copy_frame_list(item.frameList));
+          item.setSelection(item.selection[0], item.selection[1], true);
+//          rangeDragMinTime = int(Math.max(rangeDragMinTime, item.leftSideFrameNum(item.selection[0])));
+          item.mapLeftSideFrame(item.selection[0], leftMap);
+          rangeDragOffset = owner.selectedTime - item.selection[0];
+          leftMap[item.selection[0]] = true;
+        } else {
+          rangeDragSelectionList.add(void);
+          rangeDragFrameList.add(void);
+        }          
+      } 
+      rangeDragLeftList = dictionaryKeys(leftMap);
+      for (var i = 0; i < rangeDragLeftList.count; i++)
+        rangeDragLeftList[i] = +rangeDragLeftList[i];
+      rangeDragLeftList.sort();
+      rangeDragMinTime = Math.max(rangeDragLeftList.count - 1, 0);
+      return;
+    }
+
+    // フレーム境界をドラッグで、境界ドラッグ開始
+    if (button == mbLeft
+        && boundaryDragFrameIndex >= 0) {
+      var item = list.drawItemList[boundaryDragLayer];
+      boundaryDragFrameList = duplicateStruct(item.frameList);
+      boundaryDragPrevTime = boundaryDragTime;
+      boundaryDragMinTime = item.leftSideFrameNum(boundaryDragTime);
+      boundaryDragSaveLength = shift & ssCtrl;
+      boundaryDragMoving = true;
+      boundaryDragMoved = false;
+      return;
+    }                                     
+
+    // 左クリック
+    if (button == mbLeft) {
+      owner.selectedTime = int(x / TIMELINE_FRAME_WIDTH);
+      owner.selectedLayer = int(y / TIMELINE_FRAME_HEIGHT);
+      focus();
+      owner.resetSelection();
+      if (owner.selectedTime >= 0
+          && owner.selectedLayer >= 0) {
+        mouseSelectionBeginTime = owner.selectedTime;
+        mouseSelectionBeginLayer = owner.selectedLayer;
+        mouseDragging = true;
+        mouseDraggingMoved = false;
+      }
+      return;
+    }
+    // 右クリック
+    if (button == mbRight) {
+      if (hasSelection) {
+        owner.onTimeLineSelectionRightClick();
+      } else if (owner.selectedLayer >= 0) {
+	var layerItem = list.drawItemList[owner.selectedLayer];
+        layerItem.onTimeLineRightClick(owner.selectedTime);
+      }
+      boundaryDragFrameIndex = -1;
+    }
+  }
+
+  // マウスムーブ
+  function onMouseMove(x, y, shift) {
+    // 境界ドラッグ中ならその処理
+    if (boundaryDragMoving) {
+      var item = list.drawItemList[boundaryDragLayer];
+      var curTime = int((x + TIMELINE_FRAME_WIDTH / 2) / TIMELINE_FRAME_WIDTH);
+      curTime = int(Math.max(curTime, boundaryDragMinTime));
+      if (curTime != boundaryDragPrevTime) {
+        boundaryDragMoved = true;
+        boundaryDragPrevTime = curTime;
+        item.frameList = duplicateStruct(boundaryDragFrameList);
+        item.moveFrame(boundaryDragTime, curTime, boundaryDragSaveLength);
+      }
+      return;
+    }
+
+    // カーソル更新
+    updateMouseCursor(x, y);
+
+    // 範囲ドラッグ中なら選択範囲移動
+    if (rangeDragMoving) {
+      owner.selectedTime = int(Math.max(int(x / TIMELINE_FRAME_WIDTH), rangeDragMinTime + rangeDragOffset));
+      var curTime = owner.selectedTime;
+      if (curTime != rangeDragPrevTime) {
+        rangeDragPrevTime = curTime;
+        var fromTime = rangeDragTime - rangeDragOffset;
+        var toTime = curTime - rangeDragOffset;
+        if (toTime < fromTime
+            && rangeDragLeftList.count) {
+          var toLeft = [];
+          toLeft.assign(rangeDragLeftList);
+          for (var i = toLeft.count - 1; i >= 0; i--) {
+            if (toLeft[i] > toTime) {
+              toLeft[i] = toTime--;
+            } else {
+              break;
+            }
+          }
+          fromTime = rangeDragLeftList;
+          toTime = toLeft;
+        }
+        for (var i = 0; i < list.drawItemList.count; i++) {
+          var item = list.drawItemList[i];
+          if (! item.hasSelection)
+            continue;
+          item.frameList = ktimeline_shallow_copy_frame_list(rangeDragFrameList[i]);
+          item.moveFrame(fromTime,
+                         toTime,
+                         true);
+          item.setSelection(rangeDragSelectionList[i][0] + curTime - rangeDragTime,
+                            rangeDragSelectionList[i][1] + curTime - rangeDragTime,
+                            true);
+        }
+      }
+      return;
+    }
+
+    // マウスドラッグ中なら選択範囲更新
+    if (mouseDragging) {
+      var selectionEndTime, selectionEndLayer;
+      owner.selectedTime = int(x / TIMELINE_FRAME_WIDTH);
+      owner.selectedLayer = int(y / TIMELINE_FRAME_HEIGHT);
+      focus();
+      if (mouseDraggingMoved
+          || (owner.selectedTime != mouseSelectionBeginTime
+              || owner.selectedLayer != mouseSelectionBeginLayer)) {
+        mouseDraggingMoved = true;
+        var selectionEndTime, selectionEndLayer;
+        selectionEndTime = owner.selectedTime;
+        selectionEndLayer = owner.selectedLayer;
+        var fromTime, toTime, fromLayer, toLayer;
+        fromTime = int(Math.min(mouseSelectionBeginTime, selectionEndTime));
+        toTime =   int(Math.max(mouseSelectionBeginTime, selectionEndTime));
+        fromLayer = int(Math.min(mouseSelectionBeginLayer, selectionEndLayer));
+        toLayer =   int(Math.max(mouseSelectionBeginLayer, selectionEndLayer));
+        for (var i = fromLayer; i <= toLayer; i++)
+          list.drawItemList[i].setSelection(fromTime, toTime + 1);
+      }
+      return;
+    }
+  }
+
+  // マウスアップ
+  function onMouseUp(x, y, button, shift) {
+    // 境界ドラッグ終了
+    if (boundaryDragMoving) {
+      boundaryDragMoving = false;
+      // 境界を結局動かしてないなら、カーソルをその位置へ移動
+      if (! boundaryDragMoved) {
+        owner.selectedTime = int(x / TIMELINE_FRAME_WIDTH);
+        owner.selectedLayer = int(y / TIMELINE_FRAME_HEIGHT);
+        focus();
+      }
+      if (boundaryDragTime != boundaryDragPrevTime) {
+        var item = list.drawItemList[boundaryDragLayer];
+        item.onFrameDragged();
+        owner.onRenderFrame();
+      }
+      return;
+    }
+
+    // 範囲ドラッグ終了
+    if (rangeDragMoving) {
+      rangeDragMoving = false;
+      owner.renderAtTimeModification = true;
+      for (var i = 0; i < list.drawItemList.count; i++) {
+        var item = list.drawItemList[i];
+        if (item.hasSelection) {
+          item.setSelection(item.selection[0], item.selection[1], false);
+        }
+      }
+      if (rangeDragTime != owner.selectedTime) {
+        owner.onMultipleFrameDragged();
+        owner.onRenderFrame();
+      }
+      return;
+    }
+
+    // マウスドラッグ終了
+    if (mouseDragging
+        && button == mbLeft) {
+      mouseDragging = false;
+      return;
+    }
+  }
+
+  function onMouseLeave {
+    prevFrame = void;
+    super.onMouseLeave(...);
+  }
+
+  function notifyMove {
+    owner.resetSelection();
+    noticeRect(owner.selectedTime * TIMELINE_FRAME_WIDTH,
+               owner.selectedLayer * TIMELINE_FRAME_HEIGHT,
+               TIMELINE_FRAME_WIDTH,
+               TIMELINE_FRAME_HEIGHT);
+  }
+
+  function stepForwardFrame(step = 1) {
+    owner.selectedFrame += step;
+    notifyMove();
+  }
+
+  function stepBackwardFrame(step = 1) {
+    owner.selectedFrame -= step;
+    notifyMove();
+  }
+
+  function jumpForwardFrame {
+    if (owner.selectedLayer >= 0) {
+      var item = list.drawItemList[owner.selectedLayer];
+      var frameIndex = item.findFrame(owner.selectedTime);
+      if (frameIndex < item.frameCount - 1) {
+        owner.selectedTime = item.frameAt(frameIndex + 1).time;
+        notifyMove();
+      }
+    }
+  }
+
+  function jumpBackwardFrame {
+    if (owner.selectedLayer >= 0) {
+      var item = list.drawItemList[owner.selectedLayer];
+      var frameIndex = item.findFrame(owner.selectedTime -1, true);
+      var frame = item.frameAt(frameIndex);
+      if (frame !== void) {
+        owner.selectedTime = frame.time;
+        notifyMove();
+      } else {
+        owner.selectedTime = 0;
+        notifyMove();
+      }
+    }
+   }
+
+  function onKeyDown(key, shift) {
+    var cursorMoved = false;
+    switch (key) {
+    default:
+      if (hasSelection) 
+        owner.onTimeLineSelectionKeyDown(key, shift);
+      else if (owner.selectedLayer >= 0) 
+        list.drawItemList[owner.selectedLayer].onTimeLineKeyDown(key, shift);
+      super.onKeyDown(...);
+      break;
+
+    case VK_SHIFT:
+      if (owner.selectedTime >= 0
+          && owner.selectedLayer >= 0) {
+        cursorKeyDragging = true;
+        cursorKeySelectionBeginTime = owner.selectedTime;
+        cursorKeySelectionBeginLayer = owner.selectedLayer;
+      }
+      break;
+        
+    case VK_LEFT: 
+      if (shift & ssCtrl) {
+        var step = (shift & ssShift) ? 10 : 1;
+        if (hasSelection) {
+          var movable = true;
+          for (var i = 0; i < list.drawItemList.count; i++) {
+            var item = list.drawItemList[i];
+            if (! item.hasSelection)
+              continue;
+            step = Math.min(step, item.selection[0] - item.leftSideFrameNum(item.selection[0]));
+            if (step <= 0) {
+              movable = false;
+              break;
+            }
+          }
+          if (movable) {
+            for (var i = 0; i < list.drawItemList.count; i++) {
+              var item = list.drawItemList[i];
+              if (item.hasSelection) {
+                item.moveFrame(item.selection[0], item.selection[0] - step, true, false);
+                item.setSelection(item.selection[0] - step, item.selection[1] - step);
+              }
+            }
+            list.redrawAllItemsView();
+            owner.onMultipleFrameDragged();
+            owner.onRenderFrame();
+          }
+        } else {
+          if (owner.selectedLayer >= 0) {
+            var item = list.drawItemList[owner.selectedLayer];
+            step = Math.min(step, owner.selectedTime - item.leftSideFrameNum(owner.selectedTime));
+            if (step > 0) {
+              item.moveFrame(owner.selectedTime, owner.selectedTime - step, true);
+              item.onFrameDragged();
+              owner.onRenderFrame();
+            }
+          } 
+        }             
+        owner.selectedTime -= step;
+        noticeRect(owner.selectedTime * TIMELINE_FRAME_WIDTH,
+                   owner.selectedLayer * TIMELINE_FRAME_HEIGHT,
+                   TIMELINE_FRAME_WIDTH,
+                   TIMELINE_FRAME_HEIGHT);
+        return;
+      }
+      if (shift & ssAlt) {
+        if (owner.selectedLayer >= 0) {
+          var item = list.drawItemList[owner.selectedLayer];
+          var frameIndex = item.findFrame(owner.selectedTime -1, true);
+          var frame = item.frameAt(frameIndex);
+          if (frame !== void) {
+            owner.selectedTime = frame.time;
+            cursorMoved = true;
+          } else {
+            owner.selectedTime = 0;
+            cursorMoved = true;
+          }
+        }
+      } else {
+        if (owner.selectedTime > 0) {
+          owner.selectedTime--;
+          cursorMoved = true;
+        }
+      }
+      break;
+    case VK_RIGHT:
+      if (shift & ssCtrl) {
+        var step = (shift & ssShift) ? 10 : 1;
+        if (hasSelection) {
+          for (var i = 0; i < list.drawItemList.count; i++) {
+            var item = list.drawItemList[i];
+            if (item.hasSelection) {
+              item.moveFrame(item.selection[0], item.selection[0] + step, true, false);
+              item.setSelection(item.selection[0] + step, item.selection[1] + step);
+            }
+          }
+          list.redrawAllItemsView();
+          owner.onMultipleFrameDragged();
+          owner.onRenderFrame();
+        } else {
+          if (owner.selectedLayer >= 0) {
+            var item = list.drawItemList[owner.selectedLayer];
+            item.moveFrame(owner.selectedTime, owner.selectedTime + step, true);
+            item.onFrameDragged();
+            owner.onRenderFrame();
+          } 
+        }
+        owner.selectedTime += step;
+        noticeRect(owner.selectedTime * TIMELINE_FRAME_WIDTH,
+                   owner.selectedLayer * TIMELINE_FRAME_HEIGHT,
+                   TIMELINE_FRAME_WIDTH,
+                   TIMELINE_FRAME_HEIGHT);
+        return;
+      }
+      if (shift & ssAlt) {
+        if (owner.selectedLayer >= 0) {
+          var item = list.drawItemList[owner.selectedLayer];
+          var frameIndex = item.findFrame(owner.selectedTime);
+          if (frameIndex < item.frameCount - 1) {
+            owner.selectedTime = item.frameAt(frameIndex + 1).time;
+            cursorMoved = true;
+          }
+        }
+      } else {
+        {
+          owner.selectedTime++;
+          cursorMoved = true;
+        }
+      }
+      break;
+    case VK_UP:
+      if (shift & ssCtrl) 
+        return;
+      if (owner.selectedLayer > 0) {
+        owner.selectedLayer--;
+        cursorMoved = true;
+      }
+      break;
+    case VK_DOWN:
+      if (shift & ssCtrl) 
+        return;
+      if (owner.selectedLayer < list.drawItemList.count - 1) {
+        owner.selectedLayer++;
+        cursorMoved = true;
+      }
+      break;
+    case VK_SHIFT:
+      if (owner.selectedTime >= 0
+          && owner.selectedLayer >= 0) {
+        cursorKeyDragging = true;
+        cursorKeySelectionBeginTime = owner.selectedTime;
+        cursorKeySelectionBeginLayer = owner.selectedLayer;
+      }
+      break;
+    }
+
+    if (cursorMoved) {
+      focus();
+      noticeRect(owner.selectedTime * TIMELINE_FRAME_WIDTH,
+                 owner.selectedLayer * TIMELINE_FRAME_HEIGHT,
+                 TIMELINE_FRAME_WIDTH,
+                 TIMELINE_FRAME_HEIGHT);
+      owner.resetSelection();
+      if (cursorKeyDragging) {
+        var selectionEndTime, selectionEndLayer;
+        selectionEndTime = owner.selectedTime;
+        selectionEndLayer = owner.selectedLayer;
+        var fromTime, toTime, fromLayer, toLayer;
+        fromTime = int(Math.min(cursorKeySelectionBeginTime, selectionEndTime));
+        toTime =   int(Math.max(cursorKeySelectionBeginTime, selectionEndTime));
+        fromLayer = int(Math.min(cursorKeySelectionBeginLayer, selectionEndLayer));
+        toLayer =   int(Math.max(cursorKeySelectionBeginLayer, selectionEndLayer));
+        for (var i = fromLayer; i <= toLayer; i++)
+          list.drawItemList[i].setSelection(fromTime, toTime + 1);
+      }
+    }
+  }
+
+  function onKeyUp(key, shift) {
+    switch (key) {
+    default:
+      super.onKeyUp(...);
+      break;
+    case VK_SHIFT:
+      cursorKeyDragging = false;
+      break;
+    }
+  }
+
+  // enabled==trueならそのまま表示
+  function onNodeEnabled {
+    _canvas.opacity = 255;
+  } 
+
+  // enabled=falseなら半透明で表示
+  function onNodeDisabled {
+    _canvas.opacity = 64;
+  }
+};
+
+/*----------------------------------------------------------------------
+ * レイヤリスト(内部パーツ)
+ ----------------------------------------------------------------------*/
+class KTimeLineLayerList extends KList
+{
+  var owner;
+
+  // コンストラクタ
+  function KTimeLineLayerList(window, owner, name) {
+    super.KList(window, name);
+    this.owner = owner;
+    fontHeight = 12;
+    spaceVertical = TIMELINE_FRAME_HEIGHT - fontHeight;
+  }
+
+  property TIMELINE_FRAME_WIDTH {
+    getter {
+      return owner.TIMELINE_FRAME_WIDTH;
+    }
+  }
+
+  // 描画イベントをオーナーに通知
+  function onPaint {
+    super.onPaint(...);
+    owner.onListModified();
+  }
+
+  // 選択イベントをオーナーに通知
+  function onFocusItem() {
+    if (owner.playing)
+      owner.playing = false;
+    owner.onListSelect(...);
+  }
+
+  function onSearchPrevFocusable(layer) {
+    owner.onSearchPrevFocusable(layer);
+    super.onSearchPrevFocusable(owner.searchTarget);
+  }
+
+  function redrawAllItemsView {
+    for (var i = 0; i < drawItemList.count; i++) {
+      if (drawItemList[i] !== void
+          && (drawItemList[i] isvalid))
+        drawItemList[i].redrawAllFrame();
+    }
+  }
+
+  function onKeyDown(key, shift) {
+    if ((shift & ssAlt)
+        && (key == VK_LEFT 
+            || key == VK_RIGHT
+            || key == VK_UP
+            || key == VK_DOWN)) {
+      owner._layerView.onKeyDown(...);
+      focus();
+      return;
+    } else {
+      super.onKeyDown(...);
+    }
+  }
+
+  function onBeginLabelEdit {
+    owner.onBeginLabelEdit(...);
+  }
+
+  function onFinishLabelEdit {
+    owner.onFinishLabelEdit(...);
+  }
+}
+
+/**----------------------------------------------------------------------
+ * タイムラインアイテム
+ ----------------------------------------------------------------------*/
+class KTimeLineItem extends KListItem
+{
+  // フレーム配列
+  var frameList;
+  // シングルフレーム描画色
+  var _singleFrameLeftColor = 0xbfffff;
+  var _singleFrameRightColor = 0xbfffff;
+  // 連続フレーム描画色
+  var _continuousFrameLeftColor = 0xbfffff;
+  var _continuousFrameRightColor = 0xbfffff;
+  // 補完フレーム描画色
+  var _tweenFrameLeftColor = 0xffbfbf;
+  var _tweenFrameRightColor = 0xffbfbf;
+  // 選択範囲
+  var selection = void;
+  // マーカーマスク
+  var markerMask = TIMELINE_MARKER_MASK_LEFT;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param label ラベル
+   * @param name 名前
+   *
+   * タイムラインアイテムを作成する。
+   * 
+   * KTimeLineItem は KListItem を拡張したクラスで、
+   * リストアイテムの全ての動作に加え、タイムラインごとのフレーム情報を
+   * 管理する機能を持っている。
+   *
+   * フレームは time, type, content の4つのフィールドを持つ
+   * オブジェクトとして定義される。timeはフレームの開始時間、
+   * content はユーザー定義のフレーム情報となる。
+   * type はフレームの種別。以下の4種類のどれかとなる
+   * - TIMELINE_FRAME_TYPE_NULL ヌルフレーム。フレームが存在しない領域として扱われる
+   * - TIMELINE_FRAME_TYPE_SINGLE シングルフレーム。1単位だけ占有する連続しないフレーム
+   * - TIMELINE_FRAME_TYPE_CONTINUOUS  連続フレーム。次のフレームまで連続する領域を占有するフレーム。
+   * - TIMELINE_FRAME_TYPE_TWEEN 連続補完フレーム。次のフレームまで連続する領域を補完しながらつなぐフレーム。
+   *
+   * 既存のフレームを参照するには以下の関数群を使う。
+   * 参照したフレームの内容を直接書き換えることでフレーム情報を上書き出来るが、
+   * フレームオブジェクトはフレーム操作によって頻繁に更新されるので、
+   * 参照したフレームを長時間に渡って参照し続ける事は推奨しない。
+   * 編集する都度、参照するべきである。
+   *
+   * - frameCount フレーム数を参照する
+   * - frameAt(index) フレームを参照する
+   * - frameLengthAt(index) フレームの長さを参照する
+   * - findFrame(time) 時間に対応したフレームのインデックスを得る。
+   * - lastTime 末尾のフレームの時間を得る
+   * - getCompleteFrameContent(time) 時間に対応したフレーム情報を計算する
+   *
+   * フレームを操作するには以下のフレーム操作関数群を使う。
+   *
+   * - insertKeyFrame(time, type) キーフレームを挿入する。
+   * - deleteKeyFrame(time)       キーフレームを削除する。
+   * - splitFrame(time)           フレームを分割する。
+   * - deleteAllFrame()           全てのフレームを削除する。
+   * 
+   * 特定区間のフレームをコピ、ペーストするには以下の関数群を使う
+   *
+   * - copyFrameRange(beginTime, endTime) フレームをコピーする
+   * - cutFrameRange(beginTime, endTime)  フレームをカットする
+   * - pasteFrame(time, frameList)        フレームをペーストする
+   *
+   * フレーム操作関数を呼ぶと、必要に応じて以下の関数群が内部的に
+   * 呼び出される。ユーザーは、適切にこれらの関数を実装しておく必要がある。
+   *
+   * - tweenFrameContent(fromContent, toContent, ratio) フレーム間の補完を行う。
+   *
+   * フレームの補完計算を行うために以下の補完関数が用意されている。
+   *
+   * - tweenIntValue(fromValue, toValue, ratio) 整数をリニアに補完する
+   *
+   * また、フレームの見た目や挙動を設定する以下のプロパティ群が存在する。
+   *
+   * - singleFrameColor シングルフレームのBGカラーを設定する
+   * - continuousFrameColor 連続フレームのBGカラーを設定する
+   * - tweenFrameColor     補完フレームのBGカラーを設定する
+   *
+   * フレーム情報を変更したなどの理由でフレームの再描画が必要な時は以下の関数群を使う。
+   *
+   * - redrawFrameRange(fromTime, toTime) 指定範囲のフレームを再描画する。
+   * - redrawAllFrame() 全てのフレームを再描画する。
+   *
+   * 標準で、以下のシリアライズ関数を持つ。
+   *
+   * - serialize() アイテムの内容をオブジェクトにシリアライズする。
+   * - unserialize(data) オブジェクトの内容をアンシリアライズする。
+   *
+   * また、特定のタイミングで以下のイベント関数が呼び出される
+   *
+   * - onTimeLineRightClick(time) タイムラインが右クリックされると呼び出される。
+   * - onTimeLineKeyDown(key, shift) タイムライン上でキーが押されると呼び出される。
+   * - onFrameDragged() フレームがドラッグされた
+   ------------------------------*/
+  function KTimeLineItem(label = "", name = "") {
+    super.KListItem(label, name);
+    frameList = [];
+  }
+
+  property TIMELINE_FRAME_WIDTH {
+    getter {
+      return root.TIMELINE_FRAME_WIDTH;
+    }
+  }
+
+  /**------------------------------
+   * フレーム数をカウントする
+   *
+   * @return フレーム数
+   ------------------------------*/
+  property frameCount {
+    getter {
+      return frameList.count;
+    }
+  }
+
+  /**------------------------------
+   * フレームを参照する
+   *
+   * @param index インデックス
+   *
+   * インデックスに対応するフレームを返す。
+   * インデックスが無効な場合はvoidを返す。
+   ------------------------------*/
+  function frameAt(index) {
+    if (index < 0
+        || index >= frameList.count)
+      return void;
+    else
+      return frameList[index];
+  }
+
+  /**------------------------------
+   * 時間を対応してフレームを検索する
+   *
+   * @param time 時間
+   * @param includeTail ラストフレーム以降の末尾のスペースを含めて検索するかどうか
+   * @return インデックス
+   *
+   * 時間に対応するフレームのインデックスを返す。
+   * フレームが見つからなかった時は-1を返す。
+   ------------------------------*/
+  function findFrame(time, includeTail = false) {
+    return timeline_find_frame(this.frameList, time, includeTail);
+
+    // C++プラグインのリファレンス実装
+    var begin, end, mid;
+    begin = 0; end = frameList.count;
+
+    // 末尾だけ特殊処理
+    if (end) {
+      if (! includeTail) {
+        if (frameList[end - 1].time == time)
+          return end - 1;
+        if (frameList[end - 1].time < time)
+          return -1;
+      } else {
+        if (frameList[end - 1].time <= time)
+          return end - 1;
+      }
+    }
+
+    // 二分検索
+    while (begin < end) {
+      mid = int((begin + end) / 2);
+      var frame = frameList[mid];
+      var nextFrame = frameList[mid + 1];
+      if (frame.time <= time && time < nextFrame.time)
+        return mid;
+      if (time < frame.time)
+        end = mid;
+      else
+        begin = mid + 1;
+    }
+    return -1;
+  }  
+
+  /**------------------------------
+   * 末尾のフレームの終端時間を得る
+   *
+   * @return 終端時間
+   *
+   * フレームが存在しない場合-1を返す
+   ------------------------------*/
+  property lastTime {
+    getter {
+      if (frameList.count) {
+        if (frameList[-1].type == TIMELINE_FRAME_TYPE_NULL)
+          return frameList[-1].time - 1;
+        else
+          return frameList[-1].time;
+      } else
+	return -1;
+    }
+  }
+
+  /**------------------------------
+   * フレームの長さを取得する
+   *
+   * @param index インデックス
+   ------------------------------*/
+  function frameLengthAt(index) {
+    if (index < frameList.count - 1)
+      return frameList[index + 1].time - frameList[index].time;
+    else {
+      var frame = frameList[index - 1];
+      var loopEndTime = root.owner.loopEndTime;
+      if (loopEndTime >= 0
+          && loopEndTime > frame.time )
+        return loopEndTime - frame.time;
+      else
+        return 0;
+    }
+  }
+
+  /**------------------------------
+   * 時間に対応したフレーム情報を計算する
+   *
+   * @param time 時間
+   * @return フレーム情報
+   *
+   * 時間に対応したフレーム情報を計算して返す。
+   * 補完可能なトゥイーンフレームがあれば、トゥイーンを済ませたフレーム情報を返す。
+   * 補完可能なフレームが無ければキーフレームのフレーム情報をそのまま返す。
+   * 指定ポイントにフレームが無ければvoidを返す
+   ------------------------------*/
+  function getCompleteFrameContent(time) {
+    var frameIndex = findFrame(time);
+    if (frameIndex < 0) {
+      return void;
+    }
+    var frame = frameAt(frameIndex);
+    switch (frame.type) {
+    case TIMELINE_FRAME_TYPE_NULL:
+      return void;
+    case TIMELINE_FRAME_TYPE_SINGLE:
+      if (frame.time == time)
+        return frame.content;
+      else
+        return void;
+    case TIMELINE_FRAME_TYPE_CONTINUOUS:
+      return frame.content;
+    case TIMELINE_FRAME_TYPE_TWEEN:
+      var nextFrame = frameAt(frameIndex + 1);
+      if (nextFrame.type == TIMELINE_FRAME_TYPE_NULL) {
+        var loopBeginTime = root.owner.loopBeginTime;
+        var loopEndTime = root.owner.loopEndTime;
+        if (loopEndTime == nextFrame.time
+            && loopBeginTime < frame.time
+            && findFrame(loopBeginTime) >= 0
+            && frameAt(findFrame(loopBeginTime)).type != TIMELINE_FRAME_TYPE_NULL) {
+          nextFrame = createNewFrame(root.owner.loopEndTime, TIMELINE_FRAME_TYPE_CONTINUOUS, getCompleteFrameContent(loopBeginTime));
+        }
+      }
+      if (nextFrame !== void
+          && nextFrame.type !== TIMELINE_FRAME_TYPE_NULL) 
+        return tweenFrameContent(frame.content,
+                                nextFrame.content,
+                                (time - frame.time)
+                                / (nextFrame.time - frame.time));
+      else
+        return frame.content;
+    }
+  }
+
+  /**------------------------------
+   * フレームの挿入
+   *
+   * @param time 時間
+   * @param type タイプ
+   * @param content 初期コンテント。
+   *
+   * 新規フレームを挿入する。
+   * 
+   * 指定箇所に既存のフレームがある場合は上書きする。
+   * 空フレームの場合は content を明示的に指定してやる。
+   ------------------------------*/
+  function insertKeyFrame(time, type, content = void) {
+    var frameIndex = findFrame(time, true);
+    var frame = frameAt(frameIndex);
+
+    if (frame !== void
+        && frame.time == time) {
+      frameList.erase(frameIndex);
+      frameIndex--;
+    } else if (frame !== void
+               && frameIndex == frameList.count - 1
+               && frame.type == TIMELINE_FRAME_TYPE_NULL) {
+      frameList.erase(frameIndex);
+      frameIndex--;
+    }
+
+    var newFrame;
+    if (type == TIMELINE_FRAME_TYPE_NULL)
+      newFrame = createNewFrame(time, type, void);
+    else 
+      newFrame = createNewFrame(time, type, content);
+
+    frameList.insert(frameIndex + 1, newFrame);
+    invalidateNullFrame();
+    redrawAllFrame();
+    root.owner.onRenderFrame();
+    root.owner.invalidateMaxTime();
+  }
+
+  /**------------------------------
+   * フレームの削除
+   *
+   * @param time 時間
+   *
+   * 指定箇所にあるフレームを削除する。
+   * 指定箇所にフレームが無い場合は何もしない。
+   ------------------------------*/
+  function deleteKeyFrame(time) {
+    var frameIndex = findFrame(time);
+    if (frameIndex < 0)
+      return;
+    frameList.erase(frameIndex);
+    invalidateNullFrame();
+    redrawAllFrame();
+    root.owner.onRenderFrame();
+  }
+
+  /**------------------------------
+   * 全てのフレームを削除する
+   ------------------------------*/
+  function deleteAllFrame {
+    frameList = [];
+    redrawAllFrame();
+    root.owner.onRenderFrame();
+  }
+
+  /**------------------------------
+   * フレームを分割する
+   *
+   * @param time 時間
+   *
+   * フレームを指定時間で分割します。
+   *
+   * 分割の対象になるのは連続フレーム、もしくは補完フレームです。
+   *
+   * 末尾で他のフレームと隣接している補完フレームは、
+   * splitTweenFrame()関数を使って分割される。
+   * それ以外のフレームは splitContinuousFrame()関数を使って分割される。
+   ------------------------------*/
+  function splitFrame(time) {
+    var frameIndex = findFrame(time);
+    if (frameIndex < 0)
+      return;
+    var frame = frameAt(frameIndex);
+    if (frame.type == TIMELINE_FRAME_TYPE_NULL
+        || frame.type == TIMELINE_FRAME_TYPE_SINGLE
+        || frame.time == time)
+      return;
+    var newFrames;
+    if (frame.type == TIMELINE_FRAME_TYPE_TWEEN) {
+      var nextFrame = frameAt(frameIndex + 1);
+      if (nextFrame === void
+          || frameIndex == frameCount - 2) {
+        var loopBeginTime = root.owner.loopBeginTime;
+        var loopEndTime = root.owner.loopEndTime;
+        if (loopBeginTime >= 0
+            && loopEndTime > frame.time
+            && loopBeginTime < frame.time
+            && findFrame(loopBeginTime) >= 0
+            && frameAt(findFrame(loopBeginTime)).type != TIMELINE_FRAME_TYPE_NULL) {
+          nextFrame = createNewFrame(root.owner.loopEndTime, TIMELINE_FRAME_TYPE_CONTINUOUS, getCompleteFrameContent(loopBeginTime));
+        }
+      }
+      if (nextFrame !== void
+          && nextFrame.type != TIMELINE_FRAME_TYPE_NULL)
+        newFrames = splitTweenFrame(frame, nextFrame, time);
+      else
+        newFrames = splitContinuousFrame(frame, time);
+    } else
+      newFrames = splitContinuousFrame(frame, time);
+    frameList[frameIndex] = newFrames[0];
+    frameList.insert(frameIndex + 1, newFrames[1]);
+    redrawAllFrame();
+    root.owner.onRenderFrame();
+  }
+
+  /**------------------------------
+   *  フレーム情報を補完する
+   *
+   * @param  fromContent 補完元フレーム情報
+   * @param  toContent 補完先フレーム情報
+   * @param  ratio 比率 (0.0〜1.0)
+   * @return 補完済みフレーム情報
+   *
+   * フレーム情報を補完して、新たなフレーム情報を返す。
+   *
+   * フレーム情報はユーザー定義の任意のデータなので、
+   * 派生クラスで必要に応じて適切に実装する必要がある。
+   *
+   * デフォルト実装ではvoidを返す。
+   ------------------------------*/
+  function tweenFrameContent(fromContent, toContent, ratio) {
+    return void;
+  }
+
+  /**------------------------------
+   * シングルフレームカラー
+   *
+   * @param v シングルフレームカラー
+   * @return シングルフレームカラー
+   *
+   * シングルフレームのカラーを設定する
+   ------------------------------*/
+  property singleFrameColor {
+    getter {
+      return _singleFrameLeftColor;
+    }
+    setter(v) {
+      _singleFrameLeftColor = v;
+      _singleFrameRightColor = v;
+    }
+  }
+
+  property singleFrameLeftColor {
+    getter {
+      return _singleFrameLeftColor;
+    }
+    setter(v) {
+      _singleFrameLeftColor = v;
+    }
+  }
+
+  property singleFrameRightColor {
+    getter {
+      return _singleFrameRightColor;
+    }
+    setter(v) {
+      _singleFrameRightColor = v;
+    }
+  }
+  
+  /**------------------------------
+   *  連続フレームカラー
+   * 
+   * @param v 連続フレームカラー
+   * @return 連続フレームカラー
+   * 
+   * 連続フレームのカラーを設定する
+   ------------------------------*/
+  property continuousFrameColor {
+    getter {
+      return _continuousFrameLeftColor;
+    }
+    setter(v) {
+      _continuousFrameLeftColor = v;
+      _continuousFrameRightColor = v;
+    }
+  }
+
+  property continuousFrameLeftColor {
+    getter {
+      return _continuousFrameLeftColor;
+    }
+    setter(v) {
+      _continuousFrameLeftColor = v;
+    }
+  }
+
+  property continuousFrameRightColor {
+    getter {
+      return _continuousFrameRightColor;
+    }
+    setter(v) {
+      _continuousFrameRightColor = v;
+    }
+  }
+
+  /**------------------------------
+   *  補完フレームカラー
+   * 
+   * @param v 補完フレームカラー
+   * @return 補完フレームカラー
+   * 
+   * 補完フレームのカラーを設定する
+   ------------------------------*/
+  property tweenFrameColor {
+    getter {
+      return _tweenFrameLeftColor;
+    }
+    setter(v) {
+      _tweenFrameLeftColor = v;
+      _tweenFrameRightColor = v;
+    }
+  }
+
+  property tweenFrameLeftColor {
+    getter {
+      return _tweenFrameLeftColor;
+    }
+    setter(v) {
+      _tweenFrameLeftColor = v;
+    }
+  }
+
+  property tweenFrameRightColor {
+    getter {
+      return _tweenFrameRightColor;
+    }
+    setter(v) {
+      _tweenFrameRightColor = v;
+    }
+  }
+
+  /**------------------------------
+   * フレームを再描画する
+   *
+   * @param fromTime 始点
+   * @param toTime 終点
+   ------------------------------*/
+  function redrawFrameRange(fromTime, toTime) {
+    if (visible)
+      root.owner._layerView.redrawRect(fromTime * TIMELINE_FRAME_WIDTH, layer.top, (toTime - fromTime + 1) * TIMELINE_FRAME_WIDTH, TIMELINE_FRAME_HEIGHT);
+  }    
+
+  /**------------------------------
+   * 全フレームを再描画する
+   ------------------------------*/
+  function redrawAllFrame {
+    redrawFrameRange(0, Math.ceil(root.owner._layerView.width / TIMELINE_FRAME_WIDTH));
+  }
+
+  /**------------------------------
+   * シリアライズ
+   *
+   * @return シリアライズしたオブジェクト
+   * 
+   * アイテムの内容をシリアライズする。
+   ------------------------------*/
+  function serialize {
+    var data = %[ className: className,
+              label:label,
+              name:name,
+              frameList: duplicateStruct(frameList),
+              childList: [] ];
+    for (var i = 0; i < childCount; i++)
+      data.childList.add(childAt(i).serialize());
+    return data;
+  }
+
+  /**------------------------------
+   * アンシリアライズ
+   *
+   * @param data シリアライズしたオブジェクト
+   *
+   * アイテムの内容をアンシリアライズする。
+   * シリアライズした内容に子レイヤが含まれていたら、自動的に子レイヤも復元する。
+   ------------------------------*/
+  function unserialize(data) {
+    var prevLastTime = lastTime;
+    label = data.label;
+    name = data.name;
+    frameList = duplicateStruct(data.frameList);
+    for (var i = 0; i < data.childList.count; i++) {
+      var child = new global[data.childList[i].className](data.childList[i].label,
+                                                          data.childList[i].name);
+      child.unserialize(data.childList[i]);
+      add(child);
+    }
+    redrawFrameRange(0, Math.max(lastTime, prevLastTime));
+    if (root !== void)
+      root.owner.onRenderFrame();
+  }
+
+  /**------------------------------
+   * フレームリストを更新する
+   ------------------------------*/
+  function updateFrameList(newFrameList) {
+    var prevLastTime = lastTime;
+    frameList = duplicateStruct(newFrameList);
+    redrawFrameRange(0, Math.max(lastTime, prevLastTime));
+    if (root !== void)
+      root.owner.onRenderFrame();
+  }
+
+  /**------------------------------
+   * 指定の範囲のフレーム情報をコピーする
+   *
+   * @param beginTime 開始時間
+   * @param endTime   終端時間
+   * @return コピーしたフレーム情報
+   ------------------------------*/
+  function copyFrameRange(beginTime, endTime) {
+    var result = [];
+    for (var i = 0; i < frameList.count; i++) {
+      var frame = frameList[i];
+      if (beginTime <= frame.time
+          && frame.time < endTime) {
+        var copyFrame = duplicateStruct(frame);
+        copyFrame.time -= beginTime;
+        result.add(copyFrame);
+      }
+    }
+    return result;
+  }
+
+  /**------------------------------
+   * 指定の範囲のフレーム情報をカットする
+   *
+   * @param beginTime 開始時間
+   * @param endTime   終端時間
+   * @return カットしたフレーム情報
+   ------------------------------*/
+  function cutFrameRange(beginTime, endTime) {
+    var result = copyFrameRange(beginTime, endTime);
+    // 範囲内にあるフレームをひとまず削除
+    for (var i = 0; i < frameList.count; i++) {
+      var frame = frameList[i];
+      if (beginTime <= frame.time
+          && frame.time < endTime) {
+        frameList.erase(i);
+        i--;
+      }
+    }
+    invalidateNullFrame();
+    redrawAllFrame();
+    root.owner.onRenderFrame();
+    return result;
+  }
+
+  /**------------------------------
+   * コピーしたフレーム情報をペーストする
+   *
+   * @param time ペーストする時間
+   * @param frameList コピーしたフレーム情報
+   ------------------------------*/
+  function pasteFrame(time, copyFrameList) {
+    // リストが空ならそのまま。
+    if (copyFrameList.count == 0)
+      return;
+    var beginTime, endTime;
+    beginTime = time + copyFrameList[0].time;
+    endTime = time + copyFrameList[-1].time + 1;
+    // 範囲内にあるフレームをひとまず削除
+    for (var i = 0; i < frameList.count; i++) {
+      var frame = frameList[i];
+      if (beginTime <= frame.time
+          && frame.time < endTime) {
+        frameList.erase(i);
+        i--;
+      }
+    }
+    // 挿入可能位置にフレームを全て挿入
+    var insertIndex;
+    for (insertIndex = 0; insertIndex < frameList.count; insertIndex++)
+      if (frameList[insertIndex].time >= endTime)
+        break;
+    for (var i = 0; i < copyFrameList.count; i++) {
+      var item = duplicateStruct(copyFrameList[i]);
+      item.time += time;
+      frameList.insert(insertIndex + i, item);
+    }
+    invalidateNullFrame();
+    redrawAllFrame();
+    root.owner.onRenderFrame();
+  }
+
+  /**------------------------------
+   * タイムラインが右クリックされた時に呼ばれるフック関数
+   *
+   * @param fromTime 選択範囲・開始時間
+   * @param toTime 選択範囲・終了時間
+   ------------------------------*/
+  function onTimeLineRightClick(fromTime, toTime) {
+  }
+
+  /**------------------------------
+   * タイムライン上でキーが押された時に呼ばれるフック関数
+   *
+   * @param key 仮想キーコード
+   * @param shift シフトキーの論理和
+   ------------------------------*/
+  function onTimeLineKeyDown(key, shift) {
+  }
+
+  /*------------------------------
+   * フレームがドラッグされた
+   ------------------------------*/
+  function onFrameDragged {
+  }
+
+  // 不要なヌルフレームを削除する
+  function invalidateNullFrame {
+    ktimeline_invalidate_null_frame(frameList);
+  }
+
+  // 値の補完
+  function tweenIntValue(fromValue, toValue, ratio) {
+    return int(fromValue * (1 - ratio) + toValue * ratio);
+  }
+
+
+  // 選択範囲を設定する
+  function setSelection(headTime, tailTime, dragging = false) {
+    var prevSelection = selection;
+    selection = [ headTime, tailTime, dragging ];
+    drawSelection(prevSelection);
+    drawSelection(selection);
+  }
+
+  // 選択範囲を拡張する
+  function expandSelection(headTime, tailTime, dragging = false) {
+    if (selection == void)
+      setSelection(...);
+    else
+      setSelection(int(Math.min(headTime, selection[0])),
+		   int(Math.max(tailTime, selection[1])),
+		   dragging);
+  }
+
+  // 選択範囲を解除する
+  function releaseSelection {
+    var prevSelection = selection;
+    selection = void;
+    drawSelection(prevSelection);
+    drawSelection(selection);
+  }
+
+  // 選択範囲を持っているか
+  property hasSelection {
+    getter {
+      return selection !== void;
+    }
+  }
+
+  // 選択範囲を描画する
+  function drawSelection(aSelection) {
+    if (aSelection === void)
+      return;
+    if (! visible)
+      return;
+    var drawItemIndex = root.drawItemList.find(this);
+    root.timeLineView.redrawRect(aSelection[0] * TIMELINE_FRAME_WIDTH, drawItemIndex * TIMELINE_FRAME_HEIGHT,
+                                 (aSelection[1] - aSelection[0]) * TIMELINE_FRAME_WIDTH,
+                                 TIMELINE_FRAME_HEIGHT);
+  }
+
+  // BGを描画する
+  function drawBg(view, y, fromTime, toTime) {
+    timeline_draw_bg(this, view, y, fromTime, toTime);
+    return;
+
+    // バックグラウンドを描画
+    for (var time = fromTime; time < toTime; time ++) {
+      var x = time * TIMELINE_FRAME_WIDTH;
+      var layer;
+      if (time % 60 == 0) {
+        layer = view.oneSecondFrameBgLayer;
+      } else if (time % 30 == 0) {
+        layer = view.halfSecondFrameBgLayer;
+      } else if (time % 5 == 0) {
+        layer = view.fifthFrameBgLayer;
+      } else {
+        layer = view.normalFrameBgLayer;
+      }
+      view.copyRect(x, y, layer, 0, 0, TIMELINE_FRAME_WIDTH, TIMELINE_FRAME_HEIGHT);
+    }
+  }
+
+  // フレームを描画する
+  function drawFrame(view, y, frame, length) {
+    timeline_draw_frame(this, view, y, frame, length, markerMask);
+    return;
+
+    // C++リファレンス実装
+    switch (frame.type) {
+    case TIMELINE_FRAME_TYPE_NULL:
+      drawBg(view, y, frame.time, frame.time + length);
+      return;
+    case TIMELINE_FRAME_TYPE_SINGLE:
+      drawBg(view, y, frame.time + 1, frame.time + length - 1);
+      view.fillGradientRectLR(frame.time * TIMELINE_FRAME_WIDTH, y, TIMELINE_FRAME_WIDTH - 1, TIMELINE_FRAME_HEIGHT - 1, _singleFrameLeftColor | 0xFF000000, _singleFrameRightColor | 0xFF000000);
+      return;
+    case TIMELINE_FRAME_TYPE_CONTINUOUS:
+    case TIMELINE_FRAME_TYPE_TWEEN:
+      var leftColor, rightColor;
+      if (frame.type == TIMELINE_FRAME_TYPE_CONTINUOUS) {
+        leftColor = _continuousFrameLeftColor;
+        rightColor = _continuousFrameRightColor;
+      } else {
+        leftColor = _tweenFrameLeftColor;
+        rightColor = _tweenFrameRightColor;
+      }
+      leftColor = leftColor | 0xFF000000;
+      rightColor = rightColor | 0xFF000000;
+      // BG描画
+      view.fillRect((frame.time + length) * TIMELINE_FRAME_WIDTH - 1, y, 1, TIMELINE_FRAME_HEIGHT, WIN_DARKEN2);
+      view.fillRect(frame.time * TIMELINE_FRAME_WIDTH, y + TIMELINE_FRAME_HEIGHT - 1, length * TIMELINE_FRAME_WIDTH, 1, WIN_DARKEN2);
+      view.fillGradientRectLR(frame.time * TIMELINE_FRAME_WIDTH, y,
+                              length * TIMELINE_FRAME_WIDTH - 1,
+                              TIMELINE_FRAME_HEIGHT - 1,
+                              leftColor, rightColor);
+      var leftMarker = markerMask & TIMELINE_MARKER_MASK_LEFT;
+      var rightMarker = markerMask & TIMELINE_MARKER_MASK_RIGHT;
+      if (rightMarker && leftMarker && length == 1)
+        rightMarker = false;
+      // 左マーカー描画
+      if (leftMarker)
+        view.operateRect(frame.time * TIMELINE_FRAME_WIDTH, y, 
+                         view.frameLeftMarkerLayer, 0, 0, view.frameLeftMarkerLayer.width, view.frameLeftMarkerLayer.height);
+      // 右マーカー描画
+      if (rightMarker)
+        view.operateRect((frame.time + length) * TIMELINE_FRAME_WIDTH - view.frameRightMarkerLayer.width, y, 
+                         view.frameRightMarkerLayer, 0, 0, view.frameRightMarkerLayer.width, view.frameRightMarkerLayer.height);
+      // トゥイーンの破線描画
+      var fromTime = frame.time + (leftMarker ? 1 : 0), toTime = frame.time + length - (rightMarker ? 1 : 0);
+      if (frame.type == TIMELINE_FRAME_TYPE_TWEEN) {
+        if (view.dashLineApp !== void) {
+          view.drawLine(view.dashLineApp, (fromTime) * TIMELINE_FRAME_WIDTH, y + TIMELINE_FRAME_HEIGHT / 2 - 1, (toTime) * TIMELINE_FRAME_WIDTH, y + TIMELINE_FRAME_HEIGHT / 2 - 1);
+        } else {
+          for (var i = fromTime; i < toTime; i++) {
+            view.fillRect(i * TIMELINE_FRAME_WIDTH, y + TIMELINE_FRAME_HEIGHT / 2 - 1, TIMELINE_FRAME_WIDTH / 2 - 2, 1, WIN_DARKEN2);
+            view.fillRect(i * TIMELINE_FRAME_WIDTH + TIMELINE_FRAME_WIDTH / 2, y + TIMELINE_FRAME_HEIGHT / 2 - 1, TIMELINE_FRAME_WIDTH / 2 - 2, 1, WIN_DARKEN2);
+          }
+        }
+      }
+      // フレーム数描画
+      if (length > 2) {
+        view.canvas.fontHeight = TIMELINE_FRAME_HEIGHT - 4;
+        var text = string(length);
+        var textWidth = view.canvas.font.getTextWidth(text);
+        var l = frame.time * TIMELINE_FRAME_WIDTH + ((length * TIMELINE_FRAME_WIDTH) - textWidth) / 2;
+        var t = y + int((TIMELINE_FRAME_HEIGHT - view.canvas.fontHeight) / 2) - 1;
+        view.setClip(l - 1, t - 1, textWidth + 2, view.canvas.fontHeight + 2);
+        view.fillGradientRectLR(frame.time * TIMELINE_FRAME_WIDTH, y,
+                                length * TIMELINE_FRAME_WIDTH - 1,
+                                TIMELINE_FRAME_HEIGHT - 1,
+                                leftColor, rightColor);
+        view.setClip();
+        view.drawText(l, t, text, WIN_DARKEN2 & 0xFFFFFF);
+      }
+      return;
+    }
+  }
+
+  // タイムラインを描画する
+  function drawTimeLine(view, fromTime, toTime) {
+    timeline_draw_timeline(this, view, fromTime, toTime);
+    return;
+
+    // 以下、C++リファレンス実装。
+    
+    // 描画範囲を確定
+    var y = layer.top;
+    var fromFrame = findFrame(fromTime, true);
+    var toFrame = findFrame(toTime, true);
+
+    // バックグラウンドを描画
+    if (fromFrame < 0 && toFrame < 0) {
+      drawBg(view, y, fromTime, toTime);
+    } else {
+      if (fromFrame < 0) 
+        drawBg(view, y, fromTime, frameList[0].time);
+      if (toFrame == frameList.count - 1) 
+        drawBg(view, y, frameList[-1].time, toTime);
+    }
+
+    // フレームを描画
+    for (var i = fromFrame; i <= toFrame; i++) {
+      if (i == -1)
+        continue;
+      var frame = frameList[i];
+      var headTime, tailTime;
+      headTime = frame.time;
+      if (i < frameList.count - 1) 
+        tailTime = frameList[i + 1].time;
+      else 
+        tailTime = headTime;
+      if (! (tailTime < fromTime
+             || headTime > toTime)) {
+        drawFrame(view, y, frame, tailTime - headTime);
+      }
+    }
+    // 選択範囲描画
+    if (selection !== void)
+      view.colorRect(selection[0] * TIMELINE_FRAME_WIDTH, y, (selection[1] - selection[0]) * TIMELINE_FRAME_WIDTH, TIMELINE_FRAME_HEIGHT, selection[2] ? 0xFF0000 : 0, 128);
+  }
+
+  // 新規フレームを作成して返す
+  function createNewFrame(time, type, content) {
+    return %[ time: time,
+              type: type,
+              content: content ];
+  }
+
+  // 連続フレームを2つに分割する
+  function splitContinuousFrame(fromFrame, splitTime) {
+    var result = [];
+    result[0] = duplicateStruct(fromFrame);
+    result[1] = createNewFrame(splitTime, fromFrame.type, duplicateStruct(fromFrame.content));
+    return result;
+  }
+
+  // 補完フレームを2つに分割する
+  function splitTweenFrame(fromFrame, toFrame, splitTime) {
+    var result = []; 
+    result[0] = duplicateStruct(fromFrame);
+    result[1] = createNewFrame(splitTime, fromFrame.type, tweenFrameContent(fromFrame.content, toFrame.content, (splitTime - fromFrame.time) / (toFrame.time - fromFrame.time)));
+    return result;
+  }
+
+  // 指定時間の左側にあるフレームの数
+  function leftSideFrameNum(time) {
+    var count = 0;
+
+    for (var i = 0; i < frameList.count; i++)
+      if (frameList[i].time > time
+          && ! (i > 0
+                && frameList[i - 1].type == TIMELINE_FRAME_TYPE_NULL))
+        return count - 1;
+      else if (frameList[i].time >= time) 
+	return count;
+      else if (frameList[i].type != TIMELINE_FRAME_TYPE_NULL)
+        count++;
+    
+    return count;
+  }
+  
+  // 指定時間の左側にあるフレームをマッピング
+  function mapLeftSideFrame(time, map) {
+    for (var i = 0; i < frameList.count; i++) {
+      if (frameList[i].time > time)
+        return;
+      if (frameList[i].type != TIMELINE_FRAME_TYPE_NULL
+          || i == frameList.count - 1)
+        map[frameList[i].time] = true;
+    }
+  }
+  
+  // フレームを移動する
+  function moveFrame(fromTime, toTime, saveLength = false, render = true) {
+    if (fromTime == toTime)
+      ;
+    // 左へ移動(配列による指定)
+    if (typeof(fromTime) == "Object") {
+      // 時間指定が配列で来た場合の対応
+      var leftIndex = 0;
+      for (var i = 0; i < frameList.count; i++) {
+        var frame = frameList[i];
+        // 変化した時間以前なら、いじらない。
+        if (frame.time < fromTime[leftIndex]) {
+          ;
+        }
+        // 変化した時間以降なら、直接シフトして終わり
+        else if (frame.time >= fromTime[-1]) {
+          frame.time += - fromTime[-1] + toTime[-1];
+        } 
+        // 時間指定配列のindexを、現在フレームの時間が範囲内に入るまで進める
+        else {
+          while (frame.time >= fromTime[leftIndex + 1])
+            leftIndex++;
+          // 時間を更新
+          frame.time += -fromTime[leftIndex] + toTime[leftIndex];
+        }
+        // 直前のフレームがアレだったら削除
+        if (i > 0
+            && frameList[i - 1].time >= frameList[i].time) {
+          frameList.erase(i - 1);
+          i--;
+        }
+      }
+    }
+    // 左へ移動
+    else if (toTime < fromTime) {
+      var curFrame = frameAt(findFrame(fromTime, true));
+      
+      for (var i = frameList.count - 1; i >= 0; i--) {
+        var frame = frameList[i];
+        
+        if (frame.time > fromTime) {
+          if (saveLength)
+            frame.time += toTime - fromTime;
+        } else if (frame.time == fromTime) 
+          frame.time = toTime;
+        else {
+          var baseTime = toTime + 1;
+          if (i < frameList.count - 1)
+            baseTime = Math.min(frameList[i + 1].time, baseTime);
+          if (frame.time >= baseTime) {
+            if (frame.type == TIMELINE_FRAME_TYPE_NULL
+                && i < frameList.count - 1
+                && frameList[i + 1].time == baseTime) {
+              frameList.erase(i);
+            } else {
+              frame.time = baseTime - 1;
+            }
+          }
+        }
+      }
+    // 右へ移動
+    } else {
+      for (var i = 0; i < frameList.count; i++) {
+        var frame = frameList[i];
+        
+        if (frame.time < fromTime)
+          ;
+        else if (saveLength)
+          frame.time += toTime - fromTime;
+        else if (frame.time == fromTime)
+          frame.time = toTime;
+        else if (i > 0
+                 && frame.time <= frameList[i - 1].time) {
+          if (frameList[i - 1].type == TIMELINE_FRAME_TYPE_NULL) {
+            frame.time = frameList[i - 1].time;
+            frameList.erase(i - 1);
+            i--;
+          } else {
+            frame.time = frameList[i - 1].time + 1;
+          }
+        }
+      }
+    }
+    if (render) {
+      if (this instanceof "KTimeLineLoopItem")
+        root.redrawAllItemsView();
+      else
+        redrawAllFrame();
+    }
+  }
+};
+
+/**----------------------------------------------------------------------
+ * タイムラインループ設定アイテム
+ ----------------------------------------------------------------------*/
+class KTimeLineLoopItem extends KTimeLineItem
+{
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param label ラベル
+   * @param name 名前
+   *
+   * タイムラインループアイテムを取得します。
+   *
+   * このアイテムをタイムラインに追加することで、KTimeLineControl の
+   * loopBeginTime, loopEndTime の2種類のプロパティを、GUIで設定できる
+   * ようになります
+   ------------------------------*/
+  function KTimeLineLoopItem(label = "", name = "") {
+    super.KTimeLineItem(label, name);
+    singleFrameColor = 0xFF0000;
+    continuousFrameColor = 0xFF8080;
+    markerMask = TIMELINE_MARKER_MASK_LEFT | TIMELINE_MARKER_MASK_RIGHT;
+  }
+
+  function buildTimeLinneRightClickContextMenu(menu, time) {
+    menu.addItem("ループの始点を設定する", "", true, funccall(this.onSetLoopBeginTime, time));
+    menu.addItem("ループの終点を設定する", "", true, funccall(this.onSetLoopEndTime, time + 1));
+    menu.addSeparator();
+    menu.addItem("最終フレームを設定する", "", true, funccall(this.onSetLastTime, time));
+    menu.addSeparator();
+    menu.addItem("ループ/最終フレームを解除する", "", hasLastFrame || hasLoopFrame, funccall(this.onRelease));
+  }
+
+  function onTimeLineRightClick(time) {
+    var menu = new KContextMenu();
+    buildTimeLinneRightClickContextMenu(menu, time);
+    menu.show();
+  }
+
+  property hasLoopFrame {
+    getter {
+      return frameCount != 0 
+        && frameAt(0).type == TIMELINE_FRAME_TYPE_CONTINUOUS;
+    }
+  }
+
+  property hasLastFrame {
+    getter {
+      return frameCount != 0 
+        && frameAt(0).type == TIMELINE_FRAME_TYPE_SINGLE;
+    }
+  }
+
+  property primaryLastTime {
+    getter {
+      if (! hasLastFrame)
+        return -1;
+      else
+        return frameAt(0).time;
+    }
+    setter(v) {
+      if (v == -1) {
+        if (hasLastFrame) {
+          frameList = [];
+          root.redrawAllItemsView();
+        }
+        return;
+      }
+      setLoopTime(-1, -1);
+      if (frameCount == 0) {
+        frameList[0] = createNewFrame(v, TIMELINE_FRAME_TYPE_SINGLE);
+      } else {
+        frameList[0].time = v;
+      }
+      root.redrawAllItemsView();
+    }
+  }
+
+  property loopBeginTime {
+    getter {
+      if (! hasLoopFrame)
+        return -1;
+      else 
+        return frameAt(0).time;
+    }
+    setter(v) {
+      if (v == -1) {
+        if (hasLoopFrame) {
+          frameList = [];
+          root.redrawAllItemsView();
+        }
+        return;
+      }
+      primaryLastTime = -1;
+      if (frameCount == 0) {
+        frameList[0] = createNewFrame(v, TIMELINE_FRAME_TYPE_CONTINUOUS);
+        frameList[1] = createNewFrame(v + 1, TIMELINE_FRAME_TYPE_NULL);
+      } else {
+        frameAt(0).time = v;
+        if (frameAt(0).time >= frameAt(1).time)
+          frameAt(1).time = v + 1;
+      }
+      root.redrawAllItemsView();
+    }
+  }
+
+  property loopEndTime {
+    getter {
+      if (! hasLoopFrame)
+        return -1;
+      else 
+        return frameAt(1).time;
+    }
+    setter(v) {
+      if (v == -1) {
+        if (hasLoopFrame) {
+          frameList = [];
+          root.redrawAllItemsView();
+        }
+        return;
+      }
+      primaryLastTime = -1;
+      if (v == 0)
+        v = 1;
+      if (frameCount == 0) {
+        frameList[0] = createNewFrame(0, TIMELINE_FRAME_TYPE_CONTINUOUS);
+        frameList[1] = createNewFrame(v, TIMELINE_FRAME_TYPE_NULL);
+      } else {
+        frameAt(1).time = v;
+        if (frameAt(0).time >= frameAt(1).time)
+          frameAt(0).time = v - 1;
+      }
+      root.redrawAllItemsView();
+    }
+  }
+
+  function setLoopTime(beginTime, endTime) {
+    if (beginTime == -1) {
+      if (hasLoopFrame) 
+        frameList = [];
+    } else {
+      primaryLastTime = -1;
+      if (frameCount == 0) {
+        frameList[0] = createNewFrame(beginTime, TIMELINE_FRAME_TYPE_CONTINUOUS);
+        frameList[1] = createNewFrame(endTime, TIMELINE_FRAME_TYPE_NULL);
+      } else {
+        frameAt(0).time = beginTime;
+        frameAt(1).time = endTime;
+      }
+    }
+    root.redrawAllItemsView();
+  }
+  
+  function onSetLoopBeginTime(time) {
+    loopBeginTime = time;
+    onLoopModifiedByMenu();
+  }
+
+  function onSetLoopEndTime(time) {
+    loopEndTime = time;
+    onLoopModifiedByMenu();
+  }
+
+  function onRelease {
+    loopBeginTime = -1;
+    primaryLastTime = -1;
+    onLoopModifiedByMenu();
+  }
+
+  function onSetLastTime(time) {
+    primaryLastTime = time;
+    onLoopModifiedByMenu();
+  }
+
+  function onLoopModifiedByMenu {
+  }
+}
+
+
+/**----------------------------------------------------------------------
+ * フレーム指定用TextInput 
+ ----------------------------------------------------------------------*/
+class KFrameTextInput extends KTextInput
+{
+  var owner;
+  function KFrameTextInput(_owner, window, w, h, type, name) {
+    owner = _owner;
+    super.KTextInput(window, w, h, type, name);
+  }
+
+  function onValueModified(value) {
+    super.onValueModified(value);
+    owner.selectedTime = value;
+    owner._layerView.notifyMove();
+  }
+}
+
+/**----------------------------------------------------------------------
+ * タイムラインコントロール
+ ----------------------------------------------------------------------*/
+class KTimeLineControl extends KHorizontalSpliterLayout
+{
+  // 辞書
+  var dict;
+  // ラベル
+  var _label;
+  // 現在選択している時間
+  var _selectedTime;
+  //
+  var _timeInputEnabled = null;
+  // fps
+  var _framePerSecond;
+  // 再生中か？
+  var _playing;
+  // 再生用のタイマー
+  var _playTimer;
+  // プレイ開始システム時刻
+  var _playBeginTick;
+  // プレイ開始時間
+  var _playBeginTime;
+  // ビュー表示サイズ
+  var _viewWidth = 2;
+  // 時間選択時の再レンダリング
+  var renderAtTimeModification = true;
+  // 検索対象
+  var searchTarget;
+  // ループ開始時間
+  var _loopBeginTime = -1;
+  // ループ終了時間
+  var _loopEndTime = -1;
+  // 再生終了時間
+  var _lastTime = -1;
+  // 編集可能？
+  var _editable = true;
+
+  /**------------------------------
+   * コンストラクタ
+   * 
+   * @param window ウィンドウ
+   * @param name 名前
+   *
+   * タイムラインコントロールを作成する。
+   *
+   * 以下の関数群を使い、KTimeLineItem 派生クラスのオブジェクトを登録できる。
+   * KTimeLineItemはKListItemの派生クラスであり、通常のリストアイテム同様に入れ子の
+   * リストを形成できる。
+   * 
+   * - childCount 子アイテムをカウントする
+   * - childAt(index) 子アイテムを参照する
+   * - add(item) 子アイテムを追加する
+   * - insert(index, item) 子アイテムを挿入する
+   * - remove(item) 子アイテムを削除する
+   * - removeAll(doInvalidate) 子アイテムを全て削除する
+   *
+   * コントロールの挙動を制御するために、以下の関数群が使用できる。
+   *
+   * - label ラベル
+   * - resize リサイズハンドルを表示するかどうか
+   *
+   * タイムラインのパラメータは以下の関数で取得、設定できる。
+   *
+   * - selectedTime 現在ポイントされている時間
+   * - selectedLayer 現在ポイントされているレイヤ
+   * - loopBeginTime ループの開始時間を設定、取得する
+   * - loopEndTime ループの終了時間を設定、取得する
+   * - setLoopTime(beginTime, endTime) ループの始点と終点を同時に設定する
+   *
+   * タイムラインコントロールはタイムラインの再生機能を持っている。
+   * 以下の関数群でその制御を行う。
+   *
+   * - framePerSecond fpsを設定する
+   * - playing 再生中かどうか。
+   * - play() 再生を開始する
+   * - stop() 再生を停止する
+   * 
+   * 特定のタイミングで以下のイベント関数が呼ばれる
+   *
+   * - onTimeLocatorRightClick(time) タイムロケーターが右クリックされた時に呼ばれる
+   * - onTimeLineSelectionRightClick() タイムラインが選択状態で右クリックされた時に呼ばれる
+   * - onTimeLineSelectionKeyDown(key, shift) タイムラインが選択状態でキーが押された時に呼ばれる
+   * - onMultipleFrameDragged() 複数フレームがまとめてドラッグされた
+   * - onRenderFrame() フレームのレンダリングが必要な時に呼ばれる
+   * - onTimeSelect(time) ポイントされている時間が変更された時に呼ばれる
+   * - onLayerSelect(layer) ポイントされているレイヤが変更された時に呼ばれる
+   * - onPlay() 再生開始時に呼ばれる
+   * - onStop(playOverLastFrame) 再生停止時に呼ばれる
+   ------------------------------*/
+  function KTimeLineControl(window, name) {
+    super.KHorizontalSpliterLayout(...);
+
+    // ウィジェットのデフォルトパラメータを一時リセット
+    var defaultMarginLeft, defaultMarginTop, defaultMarginRight, defaultMarginBottom;
+    var defaultAlignVertical, defaultAlignHorizontal;
+    var defaultSpaceHorizontal, defaultSpaceVertical;
+
+    defaultMarginLeft = window.defaultMarginLeft;
+    defaultMarginRight = window.defaultMarginRight;
+    defaultMarginTop = window.defaultMarginTop;
+    defaultMarginBottom = window.defaultMarginBottom;
+    defaultAlignVertical = window.defaultAlignVertical;
+    defaultAlignHorizontal = window.defaultAlignHorizontal;
+    defaultSpaceVertical = window.defaultSpaceVertical;
+    defaultSpaceHorizontal = window.defaultSpaceHorizontal;
+
+    window.defaultMarginLeft = 0;
+    window.defaultMarginRight = 0;
+    window.defaultMarginTop = 0;
+    window.defaultMarginBottom = 0;
+    window.defaultSpaceHorizontal = 0;
+    window.defaultSpaceVertical = 0;
+    window.defaultAlignHorizontal = ALIGN_LEFT;
+    window.defaultAlignVertical = ALIGN_TOP;
+
+    // ウィジェット生成
+    _selectedTime = 0;
+
+    super.add(new global.KGridLayout(window, "_leftGrid"));
+    super.add(new global.KGridLayout(window, "_rightGrid"));
+    _leftGrid.isAvoidDictionaryRegistration = true;
+    _rightGrid.isAvoidDictionaryRegistration = true;
+    _leftGrid.add(0, 1, new KScrollLayout(window, true, true, "_layerListScroll"), 3);
+    _layerListScroll.hideHorizontalBar = true;
+    _layerListScroll.hideVerticalBar = true;
+    _layerListScroll.add(new timelineLayerListClass(window, this, "_layerList"));
+    _rightGrid.add(0, 0, new KScrollLayout(window, true, false, "_timeLocatorScroll"));
+    _timeLocatorScroll.hideHorizontalBar = true;
+    _timeLocatorScroll.add(new KTimeLineTimeLocator(window, this, "_timeLocator"));
+    _rightGrid.add(0, 1, new KScrollLayout(window, true, true, "_layerViewScroll"), 2, 2);
+    _layerViewScroll.add(new timelineLayerViewClass(window, this, "_layerView"));
+    _leftGrid.add(0, 0, new KStatusBar(window, "_titleLabel"));
+    _leftGrid.add(1, 0, new KGridLayout(window, "additionalControlGrid"));
+    _leftGrid.add(2, 0, new KTextButton(window, "M", "_viewWidthButton"));
+    _leftGrid.add(0, 2, new global.KGridLayout(window, "_frameGrid"), 3);
+
+    _rightGrid.add(1, 0, new KSpacer(window, _layerViewScroll.verticalBar.width));
+    _layerViewScroll.onChildViewModified = this.onLayerViewModified;
+    _layerListScroll.onChildViewModified = this.onLayerListModified;
+    _layerList.timeLineView = _layerView;
+    _titleLabel.font.bold = true;
+    _titleLabel.fontHeight = TIMELINE_LOCATOR_HEIGHT - 6;
+    _titleLabel.margin = 3;
+    _titleLabel.attachToWindow = false;
+    _viewWidthButton.alignHorizontal = ALIGN_RIGHT;
+    _viewWidthButton.alignVertical = ALIGN_CENTER;
+    _viewWidthButton.child.setMargin(2, 2);
+    _viewWidthButton.focusable = false;
+    _viewWidthButton.child.fontHeight = 12;
+    _viewWidthButton.onValueModified = this.onViewWidthChange;
+
+    // パラメータ初期設定
+    _framePerSecond = 10;
+    _playTimer = new Timer(this.onPlayTimer, "");
+    _playTimer.capacity = 1;
+    _playTimer.interval = 1000 / _framePerSecond;
+
+    splitRatio = 0;
+
+    // ウィジェットのデフォルトパラメータ群を復帰。
+    window.defaultMarginLeft =  defaultMarginLeft;
+    window.defaultMarginRight = defaultMarginRight;
+    window.defaultMarginTop =   defaultMarginTop;
+    window.defaultMarginBottom = defaultMarginBottom;
+    window.defaultAlignVertical = defaultAlignVertical;
+    window.defaultAlignHorizontal = defaultAlignHorizontal;
+    window.defaultSpaceVertical = defaultSpaceVertical;
+    window.defaultSpaceHorizontal = defaultSpaceHorizontal;
+
+    // ステータスバー生成 
+    timeInputEnabled = 0;
+    redrawStatusBar();
+  }
+
+  /*------------------------------
+   * ファイナライザ
+   ------------------------------*/
+  function finalize {
+    if (dict !== void) {
+      dict.set(name + "_view_width", viewWidth);
+    }
+    discard(_playTimer);
+    super.finalize(...);
+  }
+
+  /*------------------------------
+   * 辞書登録
+   ------------------------------*/
+  function bindPersistentDictionary(dict) {
+    super.bindPersistentDictionary(dict);
+    viewWidth = dict.init(name + "_view_width", viewWidth);
+  }
+
+  /*------------------------------
+   * レイヤーリストクラス
+   ------------------------------*/
+  property timelineLayerListClass {
+    getter {
+      return KTimeLineLayerList;
+    }
+  }
+
+  /*------------------------------
+   * レイヤービュークラス
+   ------------------------------*/
+  property timelineLayerViewClass {
+    getter {
+      return KTimeLineLayerView;
+    }
+  }
+
+  /**------------------------------
+   * 子アイテムをカウントする
+   * 
+   * @return 子アイテム数
+   ------------------------------*/
+  property childCount {
+    getter {
+      return _layerList.childCount;
+    }
+  }
+
+  /**------------------------------
+   * 子アイテムを参照する
+   *
+   * @param index インデックス
+   * @return 子アイテム
+   ------------------------------*/
+  function childAt(index) {
+    return _layerList.childAt(index);
+  }
+
+  /**------------------------------
+   * 子アイテムを追加する
+   *
+   * @param item アイテム
+   ------------------------------*/
+  function add(item) {
+    _layerList.add(item);
+  }
+
+  /**------------------------------
+   * 子アイテムを挿入する
+   *
+   * @param index インデックス
+   * @param item アイテム
+   ------------------------------*/
+  function insert(index, item) {
+    _layerList.insert(index, item);
+  }
+
+  /**------------------------------
+   * 子アイテムを削除する
+   * 
+   * @param item アイテム
+   * @param doInvalidate invalidateするかどうか
+   * @return 削除したアイテム自身
+   ------------------------------*/
+  function remove(item, doInvalidate = true) {
+    _layerList.remove(item, doInvalidate);
+  }
+
+  /**------------------------------
+   * 子アイテムを全て削除する
+   *
+   * @param doInvalidate 取り除いた子ウィジェットを無効化するか
+   ------------------------------*/
+  function removeAll(doInvalidate = true) {
+    _layerList.removeAll(doInvalidate);
+  }
+
+  /**------------------------------
+   * ラベル
+   *
+   * @param v ラベル
+   * @return ラベル
+   *
+   * コントロール左上に表示されるラベルの内容を設定する
+   ------------------------------*/
+  property label {
+    getter {
+      return _titleLabel.label;
+    }
+    setter(v) {
+      _titleLabel.label = v;
+    }
+  }
+
+  /**------------------------------
+   * リサイズハンドルを表示するかどうか
+   *
+   * @param v 表示/非表示
+   * @return 表示/非表示
+   ------------------------------*/
+  property resize {
+    getter {
+      return _layerViewScroll.resize;
+    }
+    setter(v) {
+      _layerViewScroll.resize = v;
+    }
+  }
+
+  /**------------------------------
+   * 現在ポイントされている時間
+   *
+   * @param v 時間
+   * @return 時間
+   ------------------------------*/
+  property selectedTime {
+    getter {
+      return _selectedTime;
+    }
+    setter(v) {
+      v = int(Math.max(0, v));
+      if (_selectedTime == v)
+        return;
+      var prevSelectedFrame = _selectedTime;
+      _selectedTime = v;
+//      if (! playing) {
+        _timeLocator.redrawRect(prevSelectedFrame * TIMELINE_FRAME_WIDTH, 0, TIMELINE_FRAME_WIDTH, _timeLocator.height);
+        _timeLocator.redrawRect(_selectedTime * TIMELINE_FRAME_WIDTH, 0, TIMELINE_FRAME_WIDTH, _timeLocator.height);
+        updateCursor();
+//      }
+      onTimeSelect(v);
+      if (renderAtTimeModification)
+        onRenderFrame();
+      redrawStatusBar();
+      invalidateMaxTime(false);
+    }      
+  }
+
+  /**------------------------------
+   * 0以外を設定すると選択フレーム位置をテキスト入力できる 
+   ------------------------------*/
+  property timeInputEnabled {
+    getter {
+      return _timeInputEnabled;
+    }
+    setter(v) {
+      if(_timeInputEnabled != v){
+        _timeInputEnabled = v;
+
+        _frameGrid.removeAll();
+        if(timeInputEnabled){
+          _frameGrid.add(0, 0, new KFrameTextInput(this, window, 30, 20, TEXT_DIGIT, "_frameText"));
+          _frameGrid.add(1, 0, new KStatusBar(window, "_statusBar"));
+        } else {
+          _frameGrid.add(0, 0, new KStatusBar(window, "_statusBar"));
+        }
+        _statusBar.font.bold = true;
+        _statusBar.fontHeight = _layerViewScroll.horizontalBar.height - 10;
+        _statusBar.marginTop = _statusBar.marginBottom = 5;
+        _statusBar.attachToWindow = false;
+
+        redrawStatusBar();
+      }
+    }
+  }
+
+  /**------------------------------
+   * 現在ポイントされているレイヤ
+   *
+   * @param v レイヤインデックス
+   * @return レイヤインデックス
+   *
+   * 現在ポイントされているレイヤのインデックスを設定・取得する
+   *
+   * インデックスはその時点で「表示されている」レイヤに対応する物であり、
+   * 表示を閉じているレイヤがある場合は必ずしもレイヤツリーの構造とは一致しない事に注意。
+   *
+   * 現在ポイントされているレイヤが存在しない場合-1を返す。
+   ------------------------------*/
+  property selectedLayer {
+    getter {
+      return _layerList.selectionIndex;
+    }
+    setter(v) {
+      if (v >= _layerList.drawItemList.count)
+        v = _layerList.drawItemList.count - 1;
+      if (v < 0)
+        return;
+      updateCursor();
+      _layerList.drawItemList[v].select();
+      onLayerSelect(v);
+      onRenderFrame();
+    }
+  }
+
+  /**------------------------------
+   * fps(frame per second)
+   *
+   * @param v fps
+   * @return fps
+   * 
+   * 何フレームが1秒に相当するかを設定する。
+   *------------------------------*/
+  property framePerSecond {
+    getter {
+      return _framePerSecond;
+    }
+    setter(v) {
+      _framePerSecond = v;
+      _playTimer.interval = 1000 / v;
+      _layerView.redrawAll();
+      redrawStatusBar();
+    }
+  }
+
+  /**------------------------------
+   * 選択をしているかどうか
+   * 
+   * @return 選択をしているかどうか
+   ------------------------------*/
+  property hasSelection {
+    getter {
+      for (var i = 0; i < _layerList.drawItemList.count; i++) {
+        var item = _layerList.drawItemList[i];
+        if (item isvalid
+	    && item.selection !== void) 
+          return true;
+      }
+      return false;
+    }
+  }    
+
+  /*------------------------------
+   * 表示中のリストアイテムの一覧
+   *
+   * @return アイテムの一覧
+   ------------------------------*/
+  property drawItemList {
+    getter {
+      var result = [];
+      result.assign(_layerList.drawItemList);
+      return result;
+    }
+  }
+
+  /**------------------------------
+   * 再生中かどうか
+   * 
+   * @param v 再生中かどうか
+   * @return 再生中かどうか
+   ------------------------------*/
+  property playing {
+    getter {
+      return _playing;
+    }
+    setter(v) {
+      if (_playing == v)
+        return;
+      if (v)
+        play();
+      else
+        stop();
+    }
+  }
+
+  /**------------------------------
+   * 再生開始
+   *
+   * タイムラインの再生を開始する
+   ------------------------------*/
+  function play {
+    if (_playing)
+      return;
+    _playing = true;
+    _playBeginTick = System.getTickCount();
+    _playBeginTime = selectedTime;
+    _playTimer.enabled = true;
+    onPlay();
+  }
+
+  /**------------------------------
+   * 再生停止
+   *
+   * タイムラインの再生を停止する
+   ------------------------------*/
+  function stop {
+    if (! _playing)
+      return;
+    doStop();
+  }
+
+  /**------------------------------
+   * タイムロケーターが右クリックされた
+   *
+   * @param time クリックされた時間
+   ------------------------------*/
+  function onTimeLocatorRightClick(time) {
+  }
+
+  /**------------------------------
+   * タイムラインが選択状態で右クリックされた
+   ------------------------------*/
+  function onTimeLineSelectionRightClick {
+  }
+
+  /*------------------------------
+   * 複数のフレームがまとめてドラッグされた
+   ------------------------------*/
+  function onMultipleFrameDragged {
+  }
+
+  /**------------------------------
+   * タイムラインが選択状態でキーが押された
+   *
+   * @param key 仮想キーコード
+   * @param shift シフトキーの論理和
+   ------------------------------*/
+  function onTimeLineSelectionKeyDown(key, shift) {
+  }
+
+  /**------------------------------
+   * フレームのレンダリングが必要
+   *
+   * フレームのレンダリングが必要だと判断されたタイミングで呼ばれる。
+   * 具体的には以下のシチュエーションが該当する
+   *
+   * - アイテムに新規フレームを追加した時
+   * - アイテムからフレームを削除した時
+   * - アイテムにキーフレームを挿入した時
+   * - アイテムからキーフレームを削除した時
+   * - アイテムをアンシリライズした時
+   * - アイテムをドラッグして移動した時
+   * - ポイントしている時間が変更された時
+   * - ポイントされているレイヤが変更された時
+   ------------------------------*/
+  function onRenderFrame {
+  }
+
+  /**------------------------------
+   * ポイントされている時間が変更された時に呼ばれる
+   *
+   * @param time 時間
+   ------------------------------*/
+  function onTimeSelect(time) {
+  }
+
+  /**------------------------------
+   * ポイントされているレイヤが変更された時に呼ばれる
+   *
+   * @param layer レイヤインデックス
+   ------------------------------*/
+  function onLayerSelect(layer) {
+  }
+
+  /**------------------------------
+   * 再生開始時に呼ばれる
+   ------------------------------*/
+  function onPlay {
+  }
+
+  /**------------------------------
+   * 再生停止時に呼ばれる
+   *
+   * @param playOverLastFrame 最終フレームまで再生したか？
+   *
+   * 再生停止時に呼ばれるイベント関数。
+   * 最終フレームまで再生が終了して自動的に停止した場合、
+   * playOverLastFrameがtrueになって呼ばれる。
+   ------------------------------*/
+  function onStop(playOverLastFrame) {
+  }
+
+  // 実際の停止処理
+  function doStop(playOverLastFrame = false) {
+    _playing = false;
+    _playTimer.enabled = false;
+    onStop(playOverLastFrame);
+    _timeLocator.redrawAll();
+    _layerView.redrawAll();
+    updateCursor();
+  }
+
+  // 再生タイマの呼び先
+  function onPlayTimer {
+    var tick = System.getTickCount();
+    var time = _playBeginTime + Math.round((tick - _playBeginTick) / _playTimer.interval);
+    var loopBegin = loopBeginTime, loopEnd = loopEndTime;
+    if (loopBegin >= 0) {
+      if (time < loopBegin) 
+        selectedTime = time;
+      else
+        selectedTime = loopBegin + (time - loopBegin) % (loopEnd - loopBegin);
+    } else {
+      if (time <= lastTime) {
+        selectedTime = time;
+      } else {
+        selectedTime = lastTime;
+        doStop(true);
+      }
+    }
+  }
+
+  // ステータスバーを再描画
+  function redrawStatusBar {
+    if(timeInputEnabled){
+      _frameText.value = string(selectedTime);
+      _statusBar.label = " %0.1ffps  %0.1fs".sprintf(framePerSecond, selectedTime / framePerSecond);
+    } else {
+      _statusBar.label = "  %d  %0.1ffps  %0.1fs".sprintf(selectedTime, framePerSecond, selectedTime / framePerSecond);
+    }
+ }
+
+  // タイムラインビューの横幅を必要に応じて自動的に拡張する
+  function invalidateMaxTime(calcLastTime = true) {
+    var size = _layerView.maxWidth;
+    size = Math.max(size, (int(selectedTime / 100) * 100 + 200) * TIMELINE_FRAME_WIDTH);
+    if (calcLastTime)
+      size = Math.max(size, (int(lastTime  / 100) * 100 + 200) * TIMELINE_FRAME_WIDTH);
+    size = int(size);
+    if (size <= _layerView.maxWidth)
+      return;
+    _layerView.setMinMaxSize(size, _layerView.minHeight, size, _layerView.maxHeight);
+    _timeLocator.setMinMaxSize(size, _timeLocator.minHeight, size, _timeLocator.maxHeight);
+  }
+
+  // レイヤビューのスクロール状況を監視
+  function onLayerViewModified(childViewLeft, childViewTop, childViewWidth, childViewHeight, childWidth, childHeight) {
+    _layerListScroll.setChildViewPos(_layerListScroll.childViewLeft, childViewTop);
+    _timeLocatorScroll.setChildViewPos(childViewLeft, _timeLocatorScroll.childViewTop);
+  }
+
+  // レイヤリストのスクロール状況を監視
+  function onLayerListModified(childViewLeft, childViewTop, childViewWidth, childViewHeight, childWidth, childHeight) {
+    _layerViewScroll.setChildViewPos(_layerViewScroll.childViewLeft, childViewTop);
+  }
+
+  // レイヤリストの再描画を監視
+  function onListModified {
+    _layerView.setMinMaxSize(_layerView.minWidth, _layerList.minHeight,
+                            _layerView.maxWidth, _layerList.maxHeight);
+    _layerView.redrawAll();
+    _layerViewScroll.setChildViewPos(_layerViewScroll.childViewLeft, _layerListScroll.childViewTop);
+    resetCursor();
+    resetSelection();
+    onLayerSelect(selectedLayer);
+    onRenderFrame();
+    invalidateMaxTime();
+  }
+
+  // レイヤリストの選択アイテム変更を監視
+  function onListSelect {
+    resetCursor();
+    resetSelection();
+    onLayerSelect(selectedLayer);
+    onRenderFrame();
+  }
+
+  function resetCursor {
+    updateCursor();
+  }
+
+  function updateCursor {
+    _layerView.updateCursor();
+    _timeLocator.updateCursor();
+  }
+
+  // 選択範囲の設定をリセットする
+  function resetSelection {
+    var drawItemList = _layerList.drawItemList;
+    var time = selectedTime, layer = selectedLayer;
+    for (var i = 0; i < drawItemList.count; i++) {
+      if (drawItemList[i] isvalid)
+        drawItemList[i].releaseSelection();
+    }
+  }
+
+  property TIMELINE_FRAME_WIDTH {
+    getter {
+      return global.TIMELINE_FRAME_WIDTH_LIST[_viewWidth];
+    }
+  }
+
+  property viewWidth {
+    getter {
+      return _viewWidth;
+    }
+    setter (v) {
+      _viewWidth = v;
+      _viewWidthButton.label = TIMELINE_FRAME_WIDTH_LABEL_LIST[v];
+      invalidateMaxTime();
+      _timeLocator.redrawAll();
+      _layerView.onUpdateFrameWidth();
+      _layerView.redrawAll();
+      updateCursor();
+    }
+  }
+
+  function onViewWidthChange {
+    var menu = new KContextMenu();
+    for (var i = 0; i < TIMELINE_FRAME_WIDTH_LABEL_LIST.count; i++) 
+      menu.addRadioItem(TIMELINE_FRAME_WIDTH_LABEL_LIST[i], i, "viewWidth", true, this.onViewWidthDecide);
+    menu.viewWidth.value = viewWidth;
+    menu.show();
+  }
+
+  function onViewWidthDecide(value) {
+    viewWidth = value;
+  }
+
+  function onSearchNextFocusable(layer) {
+    searchTarget = layer;
+  }
+
+  function onSearchPrevFocusable(layer) {
+    searchTarget = layer;
+  }
+
+  function findLoopItem(itemList) {
+    for (var i = 0; i < itemList.count; i++) {
+      var item = itemList[i];
+      if (item instanceof "KTimeLineLoopItem")
+        return item;
+      if (item.childList.count) {
+        var result = findLoopItem(item.childList);
+        if (result  !== void)
+          return result;
+      }
+    }
+    return void;
+  }
+
+  property loopItem {
+    getter {
+      return findLoopItem(_layerList.childList);
+    }
+  }
+
+  property loopBeginTime {
+    getter {
+      var item = loopItem;
+      if (item == void)
+        return _loopBeginTime;
+      else
+        return item.loopBeginTime;
+    }
+    setter(v) {
+      var item = loopItem;
+      if (item !== void) {
+        item.loopBeginTime = v;
+        return;
+      }
+      _lastTime = -1;
+      _loopBeginTime = v;
+      if (_loopBeginTime == -1)
+        _loopEndTime = -1;
+      else if ( _loopBeginTime >= _loopEndTime)
+        _loopEndTime = _loopBeginTime + 1;
+    }
+  }
+
+  property loopEndTime {
+    getter {
+      var item = loopItem;
+      if (item == void)
+        return _loopEndTime;
+      else
+        return item.loopEndTime;
+    }
+    setter(v) {
+      var item = loopItem;
+      if (item !== void) {
+        item.loopEndTime = v;
+        return;
+      }
+      if (v == 0)
+        v = 1;
+      _lastTime = -1;
+      _loopEndTime = v;
+      if (_loopEndTime == -1)
+        _loopBeginTime = -1;
+      else if (_loopBeginTime == -1)
+        _loopBeginTime = 0;
+      else if (_loopBeginTime >= _loopEndTime)
+        _loopBeginTime = _loopEndTime - 1;
+    }
+  }
+
+  function setLoopTime(beginTime, endTime) {
+    var item = loopItem;
+    if (item !== void) {
+      item.setLoopTime(beginTime, endTime);
+    } else {
+      _lastTime = -1;
+      _loopBeginTime = beginTime;
+      _loopEndTime = endTime;
+    }      
+  }
+
+  /**------------------------------
+   * 全アイテムの内、フレームの存在する最大の時間を返す
+   * 
+   * @param v 最終時間(-1を設定するとリセット)
+   * @return 時間
+   ------------------------------*/
+  property lastTime {
+    setter(v) {
+      var item = loopItem;
+      if (item !== void)
+        item.primaryLastTime = v;
+      else {
+        _lastTime = v;
+        _loopBeginTime = -1;
+        _loopEndTime = -1;
+      }
+    }
+    getter {
+      var item = loopItem;
+      if (item !== void
+          && item.primaryLastTime != -1)
+        return item.primaryLastTime;
+      if (item === void
+          && _lastTime != -1)
+        return _lastTime;
+      var result = -1;
+      var items = _layerList.descendants;
+      for (var i = 0; i < items.count; i++) 
+	result = Math.max(result, items[i].lastTime);
+      return int(result);
+    }
+  }
+
+
+
+  function setActiveRange(begin, end) {
+    _timeLocator.setActiveRange(begin, end);
+  }
+
+  property activeRangeEnabled {
+    getter {
+      return _timeLocator.activeRangeEnabled;
+    }
+    setter (v) {
+      _timeLocator.activeRangeEnabled = v;
+    }
+  }      
+
+  property activeRangeBegin {
+    getter {
+      return _timeLocator.activeRangeBegin;
+    }
+    setter (v) {
+      _timeLocator.activeRangeBegin = v;
+    }
+  }      
+
+  property activeRangeEnd {
+    getter {
+      return _timeLocator.activeRangeEnd;
+    }
+    setter (v) {
+      _timeLocator.activeRangeEnd = v;
+    }
+  }      
+
+  function onBeginLabelEdit {
+  }
+
+  function onFinishLabelEdit {
+  }
+
+  function selectAll {
+    if (_layerList.selection === void)
+      return;
+
+    var lastTime = this.lastTime + 1;
+    if (! hasSelection) {
+      _layerList.selection.setSelection(0, lastTime);
+    } else {
+      var allSelection = true, rowAllSelection = true;
+      var itemList = _layerList.drawItemList;
+      for (var i = 0; i < itemList.count; i++) {
+	var item = itemList[i];
+	if (! item.hasSelection) {
+	  allSelection = false;
+	  continue;
+	}
+	if (item.selection[0] != 0
+	    || item.selection[1] != lastTime)
+	  rowAllSelection = false;
+      }
+      if (allSelection)
+	resetSelection();
+      else if (rowAllSelection) {
+	for (var i = 0; i < itemList.count; i++) {
+	  var item = itemList[i];
+	  item.setSelection(0, lastTime);
+	}
+      } else {
+	for (var i = 0; i < itemList.count; i++) {
+	  var item = itemList[i];
+	  if (item.hasSelection)
+	    item.setSelection(0, lastTime);
+	}
+      }
+    }
+  }
+
+  property editable {
+    getter {
+      return _editable;
+    }
+    setter(v) {
+      _editable = v;
+      _layerList.enabled = v;
+      _layerView.enabled = v;
+    }
+  }
+
+  property multipleSelection {
+    getter {
+      return _layerList.multipleSelection;
+    }
+
+    setter(v) {
+      _layerList.multipleSelection = v;
+    }
+  }
+};
+
+
