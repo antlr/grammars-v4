@@ -26,36 +26,23 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 program
-   : block
-   | compound_statement
+   : (block | compound_statement) EOF
    ;
 
 block
-   : unlabelled_block
-   | label ':' block
-   ;
-
-unlabelled_block
-   : block_head ';' compound_tail
+   : (label ':')? block_head compound_tail
    ;
 
 block_head
-   : 'begin' declaration
-   | block_head ';' declaration
+   : 'begin' (declaration ';')+
    ;
 
 compound_statement
-   : unlabelled_compound
-   | label ':' compound_statement
-   ;
-
-unlabelled_compound
-   : 'begin' compound_tail
+   : (label ':')? 'begin' compound_tail
    ;
 
 compound_tail
-   : statement 'end'
-   | statement ';' compound_tail
+   : (statement ';')* statement 'end'
    ;
 
 declaration
@@ -70,8 +57,7 @@ type_declaration
    ;
 
 local_or_own_type
-   : type
-   | 'own' type
+   : 'own'? type
    ;
 
 type
@@ -81,23 +67,19 @@ type
    ;
 
 type_list
-   : simple_variable
-   | simple_variable ',' type_list
+   : simple_variable (',' simple_variable)*
    ;
 
 array_declaration
-   : 'array' array_list
-   | local_or_own_type 'array' array_list
+   : local_or_own_type? 'array' array_list
    ;
 
 array_list
-   : array_segment
-   | array_list ',' array_segment
+   : array_segment (',' array_segment)*
    ;
 
 array_segment
-   : array_identifier   bound_pair_list?
-   | array_identifier ',' array_segment
+   : (array_identifier ',')* array_identifier bound_pair_list
    ;
 
 array_identifier
@@ -105,8 +87,7 @@ array_identifier
    ;
 
 bound_pair_list
-   : bound_pair
-   | bound_pair_list ',' bound_pair
+   : bound_pair (',' bound_pair)*
    ;
 
 bound_pair
@@ -130,13 +111,11 @@ switch_identifier
    ;
 
 switch_list
-   : designational_expression
-   | switch_list ',' designational_expression
+   : designational_expression (',' designational_expression)*
    ;
 
 procedure_declaration
-   : 'procedure' procedure_heading procedure_body
-   | type 'procedure' procedure_heading procedure_body
+   :  type? 'procedure' procedure_heading procedure_body
    ;
 
 procedure_heading
@@ -148,13 +127,11 @@ procedure_identifier
    ;
 
 formal_parameter_part
-   : 
-   (formal_parameter_list)
+   : formal_parameter_list
    ;
 
 formal_parameter_list
-   : formal_parameter
-   | formal_parameter_list parameter_delimiter formal_parameter
+   : '(' formal_parameter (parameter_delimiter formal_parameter)* ')'
    ;
 
 formal_parameter
@@ -166,25 +143,20 @@ value_part
    ;
 
 specification_part
-   :
-   specifier identifier_list ';'
-   | specification_part? specifier identifier_list
+   : specifier identifier_list (';' specifier identifier_list)*
    ;
 
 specifier
    : STRING
    | type
-   | 'array'
-   | type 'array'
+   | type? 'array'
    | 'label'
    | 'switch'
-   | 'procedure'
-   | type 'procedure'
+   | type? 'procedure'
    ;
 
 identifier_list
-   : identifier
-   | identifier_list ',' identifier
+   : identifier (',' identifier)*
    ;
 
 procedure_body
@@ -204,8 +176,7 @@ unconditional_statement
    ;
 
 basic_statement
-   : unlabelled_basic_statement?
-   | label ':' basic_statement
+   : (label ':')* unlabelled_basic_statement?
    ;
 
 label
@@ -220,18 +191,15 @@ unlabelled_basic_statement
    ;
 
 assignment_statement
-   : left_part_list arithmetic_expression
-   | left_part_list boolean_expression
+   : left_part_list (arithmetic_expression | boolean_expression)
    ;
 
 left_part_list
-   : left_part
-   | left_part_list left_part
+   : left_part+
    ;
 
 left_part
-   : variable ':='
-   | procedure_identifier ':='
+   : (variable | procedure_identifier) ':='
    ;
 
 go_to_statement
@@ -239,18 +207,13 @@ go_to_statement
    ;
 
 designational_expression
-   : simple_designational_expression
-   | if_clause simple_designational_expression 'else' designational_expression
-   ;
-
-simple_designational_expression
    : label
    | switch_designator
-   | designational_expression
+   | if_clause designational_expression 'else' designational_expression
    ;
 
 switch_designator
-   : switch_identifier  subscript_expression?
+   : switch_identifier subscript_expression?
    ;
 
 procedure_statement
@@ -262,13 +225,12 @@ actual_parameter_part
    ;
 
 actual_parameter_list
-   : actual_parameter
-   | actual_parameter_list parameter_delimiter actual_parameter
+   : actual_parameter (parameter_delimiter actual_parameter)*
    ;
 
 parameter_delimiter
    : ','
-   | ')' letter_string ': ('
+   | ')' letter_string ':' '('
    ;
 
 actual_parameter
@@ -280,10 +242,7 @@ actual_parameter
    ;
 
 conditional_statement
-   : if_statement
-   | if_statement 'else' statement
-   | if_clause for_statement
-   | label ':' conditional_statement
+   : (label ':')* ((if_statement ('else' statement)?) | (if_clause for_statement)) 
    ;
 
 if_statement
@@ -295,8 +254,7 @@ if_clause
    ;
 
 for_statement
-   : for_clause statement
-   | label ':' for_statement
+   : (label ':')* for_clause statement
    ;
 
 for_clause
@@ -304,13 +262,11 @@ for_clause
    ;
 
 for_list
-   : for_list_element
-   | for_list ',' for_list_element
+   : for_list_element (',' for_list_element)*
    ;
 
 for_list_element
-   : arithmetic_expression
-   |
+   : arithmetic_expression?
    ;
 
 arithmetic_expression
@@ -330,9 +286,7 @@ arithmetic_expression2
    ;
 
 simple_arithmetic_expression
-   : term
-   | adding_operator term
-   | simple_arithmetic_expression adding_operator term
+   : adding_operator? term (adding_operator term)*
    ;
 
 adding_operator
@@ -341,8 +295,7 @@ adding_operator
    ;
 
 term
-   : factor
-   | term multiplying_operator factor
+   : factor (multiplying_operator factor)*
    ;
 
 multiplying_operator
@@ -352,16 +305,14 @@ multiplying_operator
    ;
 
 factor
-   : primary
-   | factor
-   | factor '↑' primary
+   : primary ('↑' primary)*
    ;
 
 primary
    : unsigned_number
    | variable
    | function_designator
-   | (arithmetic_expression)
+   | '(' arithmetic_expression ')'
    ;
 
 unsigned_number
@@ -377,8 +328,7 @@ decimal_number
    ;
 
 unsigned_integer
-   : DIGIT
-   | unsigned_integer DIGIT
+   : DIGIT+
    ;
 
 decimal_fraction
@@ -390,48 +340,23 @@ exponential_part
    ;
 
 integer
-   : unsigned_integer
-   | '+' unsigned_integer
-   | '–' unsigned_integer
+   : ('+' |'–')? unsigned_integer
    ;
 
-boolean_expression
-   : simple_boolean
-   | if_clause simple_boolean 'else' boolean_expression
-   ;
-
-simple_boolean
-   : implication
-   | simple_boolean '≣' implication
-   ;
-
-implication
-   : boolean_term
-   | implication '⊃' boolean_term
-   ;
-
-boolean_term
-   : boolean_factor
-   | boolean_term '⋁' boolean_factor
-   ;
-
-boolean_factor
-   : boolean_secondary
-   | boolean_factor '⋀' boolean_secondary
-   ;
-
-boolean_secondary
-   : boolean_primary
-   | '¬' boolean_primary
-   ;
-
-boolean_primary
-   : logical_value
+boolean_expression:
+   if_clause boolean_expression 'else' boolean_expression
+   | boolean_expression '≣' boolean_expression
+   | boolean_expression '⊃' boolean_expression
+   | boolean_expression '⋁' boolean_expression
+   | boolean_expression '⋀' boolean_expression
+   | '¬' boolean_expression
+   | logical_value
    | variable
    | function_designator
    | relation
-   | (boolean_expression)
+   | '(' boolean_expression ')'
    ;
+
 
 relation
    : simple_arithmetic_expression relational_operator simple_arithmetic_expression
@@ -468,8 +393,7 @@ subscripted_variable
    ;
 
 subscript_list
-   : subscript_expression
-   | subscript_list ',' subscript_expression
+   : subscript_expression (',' subscript_expression)*
    ;
 
 subscript_expression
@@ -481,8 +405,7 @@ STRING
    ;
 
 open_string
-   : proper_string? STRING
-   | open_string open_string
+   : proper_string? STRING (proper_string? STRING)+
    ;
 
 proper_string
@@ -490,14 +413,11 @@ proper_string
    ;
 
 letter_string
-   : LETTER
-   | letter_string LETTER
+   : LETTER+
    ;
 
 identifier
-   : LETTER
-   | identifier LETTER
-   | identifier DIGIT
+   : LETTER (LETTER | DIGIT)*
    ;
 
 basic_symbol
