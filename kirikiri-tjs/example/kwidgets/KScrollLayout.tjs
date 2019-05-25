@@ -1,0 +1,954 @@
+//
+// $Id: KScrollLayout.tjs,v 1.12 2007/09/04 10:29:44 m2 Exp $
+//
+
+
+//------------------------------
+// 定数
+global.SCROLL_BAR_MIN_WIDTH = 50;
+global.SCROLL_LAYOUT_MIN_WIDTH = 100;
+global.SCROLL_HANDLE_MIN_SIZE = 10;
+
+
+/*----------------------------------------------------------------------
+ * 垂直スクロールバー
+ ----------------------------------------------------------------------*/
+class KVerticalScrollBar extends KWidget
+{
+  var baseLayer;
+  var upButton;
+  var downButton;
+  var targetRealSize, targetWindowSize;
+  var barRange;
+  var handleBegin, handleEnd;
+  var handleSize, blankSize;
+  var dragging = false;
+  var mouseDownY, mouseDownTargetPos;
+  var _targetPos;
+  var clickBlankToPageScroll = false; // 空領域をクリックしたら、ページ単位でバーを移動するかどうか
+
+  // コンストラクタ
+  function KVerticalScrollBar(win) {
+    super.KWidget(win);
+
+    // レイヤパラメータ設定
+    hasImage = false;
+    hitThreshold = 0;
+
+    // ベースレイヤ作成
+    baseLayer = new global.KWidget(window);
+    baseLayer.parent = this;
+    baseLayer.hitThreshold = 256;
+
+    // ボタン作成
+    initButton();
+
+    // 名前設定
+    name = "_vertical";
+  }
+
+  // ボタン作成
+  function initButton {
+    // 上ボタン
+    upButton = new KImageButton(window, "k_scroll_up", "up");
+    upButton.space = 2;
+    upButton.focusable = false;
+    upButton.parent = this;
+    // 下ボタン
+    downButton = new KImageButton(window, "k_scroll_down", "down");
+    downButton.space = 2;
+    downButton.focusable = false;
+    downButton.parent = this;
+  }    
+
+  property buttonWidth {
+    getter {
+      return upButton.width + 2;
+    }
+  }
+
+  // ターゲット位置更新
+  property targetPos {
+    getter {
+      return _targetPos;
+    }
+    setter (pos) {
+      pos = Math.min(Math.max(0, pos), targetRealSize - targetWindowSize);
+      if (_targetPos == pos)
+        return;
+      _targetPos = pos;
+      drawBar();
+      onValueModified(targetPos);
+    }
+  }
+
+  // ターゲットサイズ更新
+  function setTargetSize(realSize, windowSize, targetPos) {
+    // サイズ記録
+    targetRealSize = realSize;
+    targetWindowSize = windowSize;
+    _targetPos = targetPos;
+    // 表示領域と実領域が同サイズなら disable
+    enabled = (targetRealSize != targetWindowSize);
+    // 再描画
+    drawBar();
+  }
+
+  // スクロールバーを描画する
+  function drawBar {
+    var barSize = (barRange.end - barRange.begin);
+    var rect;
+
+    handleSize = int(Math.max(barSize * targetWindowSize / targetRealSize, SCROLL_HANDLE_MIN_SIZE));
+    blankSize = barSize - handleSize;
+
+    handleBegin = ! enabled ?  barRange.begin : 
+      barRange.begin + int(blankSize * targetPos / (targetRealSize - targetWindowSize));
+    handleEnd = handleBegin + handleSize;
+
+    fill(barRange.begin, barRange.end - barRange.begin, WIN_LIGHTEN1);
+    fillBar(handleBegin, handleEnd - handleBegin);
+  }
+
+  // 上ボタンが押されたら10ドット上へ
+  function onPressTop {
+    targetPos = Math.max(targetPos - 10, 0);
+  }
+
+  // 下ボタンが押されたら10ドット下へ
+  function onPressBottom {
+    targetPos = Math.min(targetPos + 10,
+                         targetRealSize - targetWindowSize);
+  }
+
+  // 上ブランクが押されたらスクロール領域の9割上へ
+  function onPressUpper {
+    targetPos = Math.max(targetPos - int((barRange.end - barRange.begin) * 0.9),
+                         0);
+  }
+ 
+  // 下ブランクが押されたらスクロール領域の9割下へ
+  function onPressLower {
+    targetPos = Math.min(targetPos + int((barRange.end - barRange.begin) * 0.9),
+                         targetRealSize - targetWindowSize);
+  }
+
+  // ボタンが押された事を検知
+  function onChildValueModified(child) {
+    switch (child.name) {
+    case "up": 
+      onPressTop();
+      break;
+    case "down": 
+      onPressBottom();
+      break;
+    }
+  }
+
+  // マウス処理。
+  // 空領域が押されたらそちらへバーを移動。
+  // バーをドラッグしたら、直接スクロール
+  function onMouseDown (x, y) {
+    if(clickBlankToPageScroll) {
+      if (y < handleBegin) {
+        targetPos = Math.max(targetPos - targetWindowSize, 0);
+      } else if (y >= handleEnd) {
+        targetPos = Math.min(targetPos + targetWindowSize, targetRealSize - targetWindowSize);
+      } else {
+        dragging = true;
+        mouseDownY = y;
+        mouseDownTargetPos = targetPos;
+      }
+    } else {
+      if (y < handleBegin) {
+        onPressUpper();
+      } else if (y >= handleEnd) {
+        onPressLower();
+      } else {
+        dragging = true;
+        mouseDownY = y;
+        mouseDownTargetPos = targetPos;
+      }
+    }
+  }
+
+  function onMouseMove(x, y) {
+    if (! dragging)
+      return;
+
+    var pos = mouseDownTargetPos
+      + int((y - mouseDownY) * (targetRealSize - targetWindowSize) / blankSize);
+    targetPos = Math.max(0, Math.min(pos, targetRealSize - targetWindowSize));
+  }
+
+  function onMouseUp {
+    dragging = false;
+  }
+
+  // 指定の範囲を無地でfill
+  function fill(pos, size, color) {
+    baseLayer.fillRect(2, pos, width - 4, size, color);
+  }
+
+  // 指定の範囲にバーを描く
+  function fillBar(pos, size) {
+    baseLayer.drawRaisedFrame(2, pos, width - 4, size);
+  }
+
+  // enable時はバーをフル描画
+  function onNodeEnabled {
+    baseLayer.opacity = 255;
+  }
+
+  // disable時はバーを半透明描画
+  function onNodeDisabled {
+    baseLayer.opacity = 64;
+  }
+
+  // サイズ更新時にはスクロールバーを更新
+  function onSizeModified {
+    baseLayer.setFixedSize(width, height);
+    baseLayer.drawSunkenFrame(0, 0, width, height);
+    locateButton();
+    drawBar();
+  }
+
+  // ボタンを再配置
+  function locateButton {
+    upButton.setPos(1, 1);
+    downButton.setPos(1, height - downButton.height - 2);
+    barRange = %[ begin:upButton.height + 2, end:downButton.top - 1];
+  }
+
+}
+
+
+/*----------------------------------------------------------------------
+ * 水平スクロールバー(垂直バーからの差分)
+ ----------------------------------------------------------------------*/
+class KHorizontalScrollBar extends KVerticalScrollBar
+{
+  // コンストラクタ
+  function KHorizontalScrollBar {
+    super.KVerticalScrollBar(...);
+    // 名前を指定
+    name = "_horizontal";
+  }
+
+  // ボタン初期化
+  function initButton {
+    // 左ボタン
+    upButton = new KImageButton(window, "k_scroll_left", "up");
+    upButton.space = 2;
+    upButton.focusable = false;
+    upButton.parent = this;
+    // 右ボタン
+    downButton = new KImageButton(window, "k_scroll_right", "down");
+    downButton.space = 2;
+    downButton.focusable = false;
+    downButton.parent = this;
+  }    
+
+  property buttonWidth {
+    getter {
+      return upButton.height + 2;
+    }
+  }
+  // マウスのX/Yをすり替えて処理
+  function onMouseDown(x, y) {
+    super.onMouseDown(y, x);
+  }
+
+  function onMouseMove(x, y) {
+    super.onMouseMove(y, x);
+  }
+
+  function onMouseUp(x, y) {
+    super.onMouseUp(y, x);
+  }
+
+  // 無地でフィル
+  function fill(pos, size, color) {
+    baseLayer.fillRect(pos, 2, size, height - 4, color);
+  }
+
+  // バーを描画
+  function fillBar(pos, size) {
+    baseLayer.drawRaisedFrame(pos, 2, size, height - 4);
+  }
+
+  // ボタンを再配置
+  function locateButton {
+    upButton.setPos(1, 1);
+    downButton.setPos(width - downButton.width - 2, 0);
+    barRange = %[ begin:upButton.width + 2, end:downButton.left - 1 ];
+  }
+}
+
+
+/*----------------------------------------------------------------------
+ * スクロールフレーム(実際にchildを格納する枠)
+ ----------------------------------------------------------------------*/
+class KScrollFrame extends KWidget
+{
+  function KScrollFrame {
+    super.KWidget(...);
+    hasImage = false;
+  }
+
+  // アライメントに従って、スクロール範囲に収まるようにchildの座標を設定する
+  function setChildPos(l, t) {
+    if (children.count == 0)
+      return;
+
+    var child = children[0];
+    var childMinLeft, childMaxLeft, childMinTop, childMaxTop;
+    childMinLeft = width - child.width;
+    childMaxLeft = 0;
+    childMinTop = height - child.height;
+    childMaxTop = 0;
+    var newLeft = int(Math.max(childMinLeft, Math.min(childMaxLeft, l)));
+    var newTop = int(Math.max(childMinTop, Math.min(childMaxTop, t)));
+
+    if (child.width < width) {
+      switch (child.alignHorizontal) {
+      case ALIGN_LEFT:   newLeft = 0; break;
+      case ALIGN_CENTER: newLeft = int((width - child.width) / 2); break;
+      case ALIGN_RIGHT:  newLeft = (width - child.width); break;
+      }
+    }
+
+    if (child.height < height) {
+      switch (child.alignVertical) {
+      case ALIGN_TOP:    newTop = 0; break;
+      case ALIGN_CENTER: newTop = int((height - child.height) / 2); break;
+      case ALIGN_BOTTOM: newTop = (height - child.height); break;
+      }
+    }
+
+    child.setPos(newLeft, newTop);
+    child.onViewModified(int(Math.max(0, -newLeft)),
+                         int(Math.max(0, -newTop)),
+                         int(Math.min(child.width, width)),
+                         int(Math.min(child.height, height)));
+  }
+  
+  // サイズ更新、アライメントに従って、childを再配置
+  function onSizeModified(newWidth, newHeight, oldWidth, oldHeight) {
+    if (children.count == 0)
+      return;
+
+    var child = children[0];
+    child.setSize(newWidth, newHeight);
+
+    var childMinLeft, childMaxLeft, childMinTop, childMaxTop;
+    var originX, originY;
+    var l, t;
+
+    childMinLeft = width - child.width;
+    childMaxLeft = 0;
+    childMinTop = height - child.height;
+    childMaxTop = 0;
+
+    switch (child.alignHorizontal) {
+    case ALIGN_LEFT: {
+      l = child.left;
+      break;
+    }
+    case ALIGN_CENTER: {
+      originX = - child.left + int(oldWidth / 2);
+      l = - originX + int(newWidth / 2);
+      break;
+    }
+    case ALIGN_RIGHT: {
+      originX = - child.left + oldWidth;
+      l = - originX + newWidth;
+      break;
+    }
+    }
+
+    switch (child.alignVertical) {
+    case ALIGN_TOP: {
+      t = child.top;
+      break;
+    }
+    case ALIGN_CENTER: {
+      originY = - child.top + int(oldHeight / 2);
+      t = - originY + int(newHeight / 2);
+      break;
+    }
+    case ALIGN_BOTTOM: {
+      originY = - child.top + oldHeight; 
+      t = - originY - newHeight;
+      break;
+    }
+    }
+
+    setChildPos(l, t);
+  }
+
+  // childのマージンが更新されたらparentに通知
+  function onChildMarginModified {
+    parent.onChildMarginModified(...);
+  }
+
+  // childのアライメントが更新されたらparentに通知
+  function onChildAlignModified {
+    parent.onChildAlignModified(...);
+  }
+
+  // childのminmaxサイズが更新されたらparentに通知
+  function onChildMinMaxSizeModified {
+    parent.onChildMinMaxSizeModified(...);
+  }
+
+  // childの矩形ノティファイをparentに通知
+  function onChildNoticeRect {
+    parent.onChildNoticeRect(...);
+  }
+}
+ 
+
+/*----------------------------------------------------------------------
+ * スクロールレイアウト
+ *
+ * スクロールバーのついたレイアウト
+ ----------------------------------------------------------------------*/
+class KScrollLayout extends KWidget
+{
+  // 横方向スクロールバー
+  var horizontalBar;
+  // 縦方向スクロールバー
+  var verticalBar;
+  // スクロールフレーム
+  var frame;
+  // リサイズハンドル
+  var _resizeHandle;
+  var _resize;
+  // child
+  var child;
+  // レイアウト
+  var frameMinW, frameMinH, frameMaxW, frameMaxH;
+  var boxMinW, boxMinH, boxMaxW, boxMaxH;
+  var horizontalBarMinW, horizontalBarMinH, horizontalBarMaxW, horizontalBarMaxH;
+  var verticalBarMinW, verticalBarMinH, verticalBarMaxW, verticalBarMaxH;
+  var minW, minH, maxW, maxH;
+  var marginalWidth, marginalHeight;
+  var _hideHorizontalBar, _hideVerticalBar;
+  // サイズ更新フラグ
+  var sizeModified;
+  // カーソルによるスクロール
+  var _cursorToScroll = false;
+  var lastCursorX, lastCursorY;
+
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * ウィジェットを、スクロールバーの中に配置します。
+   *
+   * @param win ウィンドウ
+   * @param horizontal 横方向スクロールバーを表示するかどうか
+   * @param vertical 縦方向スクロールバーを表示するかどうか
+   * @param name 名前
+   ------------------------------*/
+  function KScrollLayout(win, horizontal = true, vertical = true, name = "") {
+    super.KWidget(win, name);
+
+    // パラメータ設定
+    hasImage = false;
+    neutralColor = WIN_BG;
+    marginalWidth = marginalHeight = SCROLL_LAYOUT_MIN_WIDTH;
+
+    // 水平バー
+    horizontalBar = new KHorizontalScrollBar(win);
+    horizontalBar.parent = this;
+    horizontalBar.visible = horizontal;
+    _hideHorizontalBar = false;
+
+    // 垂直バー
+    verticalBar = new KVerticalScrollBar(win);
+    verticalBar.parent = this;
+    verticalBar.visible = vertical;
+    _hideVerticalBar = false;
+
+    // 子ウィジェットを格納するフレーム
+    frame = new KScrollFrame(win);
+    frame.parent = this;
+
+    // リサイズハンドル
+    _resizeHandle = new KWindowResizeHandle(win, 
+                                            verticalBar.buttonWidth,
+                                            horizontalBar.buttonWidth);
+    _resizeHandle.parent = this;
+    _resizeHandle.visible = false;
+  }
+
+  /**------------------------------
+   * 最低限のサイズを設定する
+   *
+   * リスト項目が少なくても最低限広げられる
+   * 「最低最大サイズ」を決定する。
+   * デフォルト値は100x100
+   *
+   * @param w 幅
+   * @param h 高さ
+   ------------------------------*/
+  function setMarginalSize(w, h) {
+    marginalWidth = w;
+    marginalHeight = h;
+    invalidateLayout();
+  }
+
+  /**------------------------------
+   * 子ウィジェットを配置する
+   * 
+   * 子ウィジェットをスクロールバーの中に配置します。
+   * KScrollLayoutには一度に1つのウィジェットしか add できません。
+   *
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function add(child) {
+    this.child = child;
+    child.parent = frame;
+    invalidateLayout();
+  }
+
+  /**------------------------------
+   * 子ウィジェットを開放する
+   *
+   * 子ウィジェットをスクロールバーから開放します
+   * 
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    this.child = void;
+    child.parent = widgetDepot;
+    invalidateLayout();
+    if (doInvalidate)
+      invalidate child;
+  }
+
+  /**------------------------------
+   * 水平スクロールを有効にするかどうか
+   *
+   * @param v 有効/無効
+   * @return 有効/無効
+   ------------------------------*/
+  property horizontal {
+    getter {
+      return horizontalBar.visible;
+    }
+    setter(v) {
+      // パラメータ更新
+      horizontalBar.visible = v;
+      // 再レイアウト
+      invalidateLayout();
+    }
+  }
+
+  /**------------------------------
+   * 垂直スクロールを有効にするかどうか
+   *
+   * @param v 有効/無効
+   * @return 有効/無効
+   ------------------------------*/
+  property vertical {
+    getter {
+      return verticalBar.visible;
+    }
+    setter(v) {
+      // パラメータ更新
+      verticalBar.visible = v;
+      // 再レイアウト
+      invalidateLayout();
+    }
+  }
+
+  /**------------------------------
+   * 水平スクロールバーを画面に表示するかどうか
+   *
+   * @param v 表示/非表示
+   * @return 表示/非表示
+   ------------------------------*/
+  property hideHorizontalBar {
+    getter {
+      return _hideHorizontalBar;
+    }
+    setter (v) {
+      _hideHorizontalBar = v;
+      invalidateLayout();
+    }
+  }
+
+  /**------------------------------
+   * 垂直スクロールバーを画面に表示するかどうか
+   *
+   * @param v 表示/非表示
+   * @return 表示/非表示
+   ------------------------------*/
+  property hideVerticalBar {
+    getter {
+      return _hideVerticalBar;
+    }
+    setter (v) {
+      _hideVerticalBar = v;
+      invalidateLayout();
+    }
+  }
+
+  /**------------------------------
+   * リサイズハンドルを表示するかどうか
+   *
+   * @param v 表示/非表示
+   * @return 表示/非表示
+   ------------------------------*/
+  property resize {
+    getter {
+      return _resize;
+    }
+    setter(v) {
+      // パラメータ更新
+      _resize = v;
+      // 再レイアウト
+      invalidateLayout();
+    }
+  }
+
+  /**------------------------------
+   * childの表示幅
+   ------------------------------*/
+  property childViewWidth {
+    getter {
+      return frame.width;
+    }
+  }
+  /**------------------------------
+   * childの表示高さ
+   ------------------------------*/
+  property childViewHeight {
+    getter {
+      return frame.height;
+    }
+  }
+  /**------------------------------
+   * childの表示X座標
+   ------------------------------*/
+  property childViewLeft {
+    getter {
+      return -child.left;
+    }
+    setter(l) {
+      horizontalBar.targetPos = l;
+      frame.setChildPos(-horizontalBar.targetPos, -verticalBar.targetPos);
+    }
+  }
+  /**------------------------------
+   * childの表示Y座標
+   ------------------------------*/
+  property childViewTop {
+    getter {
+      return -child.top;
+    }
+    setter(t) {
+      verticalBar.targetPos = t;
+      frame.setChildPos(-horizontalBar.targetPos, -verticalBar.targetPos);
+    }
+  }
+  /**------------------------------
+   * childの実幅
+   ------------------------------*/
+  property childWidth {
+    getter {
+      return child.width;
+    }
+  }
+  /**------------------------------
+   * childの実高さ
+   ------------------------------*/
+  property childHeight {
+    getter {
+      return child.height;
+    }
+  }
+  /**------------------------------
+   * childの位置を設定する
+   ------------------------------*/
+  function setChildViewPos(l, t) {
+    horizontalBar.targetPos = l;
+    verticalBar.targetPos = t;
+    frame.setChildPos(-horizontalBar.targetPos, -verticalBar.targetPos);
+  }
+
+  // childのマージンが更新された
+  function onChildMarginModified {
+      // 再レイアウト
+    invalidateLayout();
+  }
+
+  // childのアライメントが更新された
+  function onChildAlignModified {
+      // 再レイアウト
+    invalidateLayout();
+  }
+
+  // childのminmaxが更新された
+  function onChildMinMaxSizeModified(child) {
+    if (child == this.child) {
+      invalidateLayout();
+    }
+  }
+
+  /*------------------------------
+   * 再レイアウト
+   ------------------------------*/
+  function invalidateLayout {
+    if (! child)
+      return;
+
+    // ボックス(フレーム格納領域)のレンジを計算
+    if (horizontal) {
+      boxMinW = marginalWidth;
+      boxMaxW = child.maxWidth + child.marginHorizontal;
+      boxMaxW = int(Math.max(boxMinW, boxMaxW));
+    } else {
+      boxMinW = child.minWidth + child.marginHorizontal;
+      boxMaxW = child.maxWidth + child.marginHorizontal;
+      if (boxMinW <= marginalWidth && marginalWidth <= boxMaxW)
+        boxMinW = marginalWidth;
+    }
+
+    if (vertical) {
+      boxMinH = marginalHeight;
+      boxMaxH = child.maxHeight + child.marginVertical;
+      boxMaxH = int(Math.max(boxMinH, boxMaxH));
+    } else {
+      boxMinH = child.minHeight + child.marginVertical;
+      boxMaxH = child.maxHeight + child.marginVertical;
+      if (boxMinH <= marginalHeight && marginalHeight <= boxMaxH)
+        boxMinH = marginalHeight;
+    }
+
+    // フレームのレンジを計算
+    frameMinW = boxMinW - child.marginHorizontal;
+    frameMinH = boxMinH - child.marginVertical;
+    frameMaxW = boxMaxW - child.marginHorizontal;
+    frameMaxH = boxMaxH - child.marginVertical;
+
+    // 水平バーのレンジを計算
+    horizontalBarMinW = boxMinW;
+    horizontalBarMinH = horizontalBar.buttonWidth;
+    horizontalBarMaxW = boxMaxW;
+    horizontalBarMaxH = horizontalBar.buttonWidth;
+
+    // 垂直バーのレンジを計算
+    verticalBarMinW = verticalBar.buttonWidth;
+    verticalBarMinH = boxMinH;
+    verticalBarMaxW = verticalBar.buttonWidth;
+    verticalBarMaxH = boxMaxH;
+
+    // 全体のレンジを計算
+    minW = boxMinW + (vertical ? verticalBar.buttonWidth : 0);
+    minH = boxMinH + (horizontal ? horizontalBar.buttonWidth : 0);
+    maxW = boxMaxW + (vertical ? verticalBar.buttonWidth : 0);
+    maxH = boxMaxH + (horizontal ? horizontalBar.buttonWidth : 0);
+
+    // フレームのレンジを設定
+    frame.setMinMaxSize(frameMinW, 
+                        frameMinH,
+                        frameMaxW,
+                        frameMaxH);
+    // 水平バーのレンジを設定
+    if (horizontal)
+      horizontalBar.setMinMaxSize(horizontalBarMinW,
+                                  horizontalBarMinH,
+                                  horizontalBarMaxW,
+                                  horizontalBarMaxH);
+    // 垂直バーのレンジを設定
+    if (vertical)
+      verticalBar.setMinMaxSize(verticalBarMinW,
+                                verticalBarMinH,
+                                verticalBarMaxW,
+                                verticalBarMaxH);
+
+    if (horizontal
+        && hideHorizontalBar) {
+      minH -= horizontalBar.height;
+      maxH -= horizontalBar.height;
+    }
+
+    if (vertical
+        && hideVerticalBar) {
+      maxW -= verticalBar.width;
+      minW -= verticalBar.width;
+    }
+
+    // スクロールレイアウト全体のレンジを設定
+    // その際、サイズの変更がかからなかったら、強制的に再描画
+    sizeModified = false;
+    setMinMaxSize(minW, minH, maxW, maxH);
+    if (! sizeModified)
+      onSizeModified();
+  }    
+
+  /*------------------------------
+   * サイズ更新。
+   *
+   * スクロールバーを再描画する。
+   ------------------------------*/
+  function onSizeModified {
+    sizeModified = true;
+
+    // ボックスサイズ計算
+    var boxW, boxH;
+    boxW = width - ((vertical && ! hideVerticalBar) ? verticalBar.width : 0);
+    boxH = height - ((horizontal && ! hideHorizontalBar) ? horizontalBar.height : 0);
+    // フレーム再配置
+    var frameW, frameH;
+    frameW = boxW - child.marginHorizontal;
+    frameH = boxH - child.marginVertical;
+    if (frameW == frame.width
+        && frameH == frame.height)
+      frame.onSizeModified(frameW, frameH, frameW, frameH);
+    else
+      frame.setSize(frameW, frameH);
+    frame.setPos(child.marginLeft, child.marginTop);
+
+    // 水平バー再配置
+    if (horizontal) {
+      horizontalBar.setSize(boxW, horizontalBar.buttonWidth);
+      horizontalBar.setPos(0, boxH);
+      horizontalBar.setTargetSize(child.width, 
+                                  int(Math.min(child.width, frame.width)),
+                                  - child.left);
+    }
+    // 垂直バー再配置
+    if (vertical) {
+      verticalBar.setSize(verticalBar.buttonWidth, boxH);
+      verticalBar.setTargetSize(child.height, 
+                                int(Math.min(child.height, frame.height)),
+                                - child.top);
+      verticalBar.setPos(boxW, 0);
+    }
+
+    // 水平・垂直バーの双方を表示し、
+    // resize表示指定がある時のみ、
+    // リサイズハンドルを右下に表示する
+    if (horizontal 
+        && vertical
+        && _resize) {
+      _resizeHandle.visible = true;
+      _resizeHandle.setPos(boxW, boxH);
+    } else {
+      _resizeHandle.visible = false;
+    }
+
+    onChildViewModified(childViewLeft, childViewTop, childViewWidth, childViewHeight, childWidth, childHeight);
+  }
+
+  /*------------------------------
+   * スクロールバーの値更新を検出、
+   * 子ウィジェットをスクロールさせる
+   ------------------------------*/
+  function onChildValueModified(child, value) {
+    switch (child.name) {
+    // その他の通知はそのまま上位ウィジェットへ転送する
+    default:
+      super.onChildValueModified(...);
+      break;
+    // 水平バー反映
+    case "_horizontal":
+      frame.setChildPos(- value, this.child.top); 
+      onChildViewModified(childViewLeft, childViewTop, childViewWidth, childViewHeight, childWidth, childHeight);
+      break;
+    // 垂直バー反映
+    case "_vertical": 
+      frame.setChildPos(this.child.left, - value); 
+      onChildViewModified(childViewLeft, childViewTop, childViewWidth, childViewHeight, childWidth, childHeight);
+      break;
+    }
+  }
+
+  function onMouseWheel(shift, delta) {
+    if (vertical
+        && verticalBar.enabled) {
+      verticalBar.targetPos -= delta / 4;
+    }
+    else if (horizontal
+        && horizontalBar.enabled) {
+      horizontalBar.targetPos -= delta / 4;
+   } 
+  }
+
+  function onChildNoticeRect(child, l, t, w, h) {
+    var targetLeft, targetTop;
+    if (horizontalBar) {
+      targetLeft = horizontalBar.targetPos;
+      if (targetLeft + frame.width < l + w)
+        targetLeft = l + w - frame.width;
+      if (l < targetLeft)
+        targetLeft = l;
+      horizontalBar.targetPos = targetLeft;
+    }
+    if (verticalBar) {
+      targetTop = verticalBar.targetPos;
+      if (targetTop + frame.height < t + h)
+        targetTop = t + h - frame.height;
+      if (t < targetTop)
+        targetTop = t;
+      verticalBar.targetPos = targetTop;
+    }
+  }
+
+  function onChildViewModified(childViewLeft, childViewTop, childViewWidth, childViewHeight, childWidth, childHeight) {
+  }
+
+  property clickBlankToPageScroll
+  {
+    getter { return verticalBar.clickBlankToPageScroll; }
+    setter(v) { verticalBar.clickBlankToPageScroll = horizontalBar.clickBlankToPageScroll = +v; }
+  }
+
+  property cursorToScroll
+  {
+    getter { return _cursorToScroll; }
+    setter(v) {
+      if(+v)
+      {
+        var chgHitThreshold = function(p, ht, func) {
+          p.hitThreshold = ht;
+          for(var i=0; i<p.children.count; i++)
+            func(p.children[i], ht, func);
+        };
+        chgHitThreshold(frame, 256, chgHitThreshold); // frame 以下のレイヤーを全てカーソルイベント透過にしてしまう
+      }
+      _cursorToScroll = +v;
+    }
+  }
+
+  function onMouseDown(x, y, button, shift) {
+    if(cursorToScroll && button == mbLeft) {
+      lastCursorX = x;
+      lastCursorY = y;
+    }
+  }
+
+  function onMouseMove(x, y) {
+    if(lastCursorX !== void) {
+      var mv = x - lastCursorX;
+      childViewLeft -= mv;
+      lastCursorX += mv;
+      mv = y - lastCursorY;
+      childViewTop -= mv;
+      lastCursorY += mv;
+    }
+  }
+
+  function onMouseUp(x, y, button, shift) {
+    if(button == mbLeft) {
+      lastCursorX = lastCursorY = void;
+    }
+  }
+};
+

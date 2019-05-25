@@ -1,0 +1,543 @@
+/*******************************************************************************
+	system_mb/ui/MBWindows.tjs
+	
+	砂専用擬似ウィンドウクラス
+********************************************************************************/
+
+
+//==============================================================================
+// シンプルなメッセージダイアログ
+
+class MBPseudySimpleWindow extends MBSystemLayer
+{
+	var owner;
+	
+	var defWidth = 500;	// 設定横幅
+	var defHeight = 57;	// 設定縦幅
+	
+	var sentence = [];	// 載せる文章
+	var lineParPage = 2;	// 一度に載せる行数
+	
+	var hdlString = "";
+	var currentLine = 0;
+	var currentPos = 0;
+	
+	var canHideByClick = false;
+	var isAutoHide = false;	// 自動消滅フラグ
+	var autoHideTime = 1000;	// 消滅までのウェイト
+	
+	function MBPseudySimpleWindow(win, own, st, cap)
+	{
+		// コンストラクタ
+		
+		super.MBSystemLayer(win, win.fore.base, cap);
+		
+		owner = own;
+		sentence = st.split("\n");
+		name = '擬似コンソールウィンドウ';
+		absolute = MBLayerAbs.dialog;
+		focusable = true;
+		
+		font.face = "ＭＳ ゴシック";
+		
+		var i;
+		for (i=0; i<sentence.count; i++) {
+			if (font.getTextWidth(sentence[i]) + (borderWidth + marginWidth) * 2 > defWidth) {
+				defWidth = font.getTextWidth(sentence[i]) + (borderWidth + marginWidth) * 2;
+				posX = Math.round(win.primaryLayer.width - defWidth) / 2;
+			}
+		}
+		defHeight = (fontSize + (fontSize>>1)) * lineParPage - (fontSize>>1) + (borderWidth + marginWidth) * 2;
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	function recalcDefHeight(line)
+	{
+		// 行数と縦幅を再設定
+		
+		if (line < 2) {
+			return;
+		}
+		
+		lineParPage = line;
+		defHeight = (fontSize + (fontSize>>1)) * lineParPage - (fontSize>>1) + (borderWidth + marginWidth) * 2;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function show()
+	{
+		SystemManager.blDialogVisible = true;
+		SystemManager.destroyContextMenu();
+		
+		super.show();
+	}
+	
+	function onEndOfShowing()
+	{
+		// 表示完了後の処理
+		
+		super.onEndOfShowing(...);
+		try {
+			setMode();
+		}
+		catch(e) {
+			dm("[MBPseudySubWindow] Maybe this window has mode.");
+		}
+		showContent();
+		makeOperationButtons();
+	}
+	
+	function onEndOfHiding()
+	{
+		// 消去完了後の処理
+		
+		super.onEndOfHiding(...);
+		try {
+			removeMode();
+		}
+		catch(e) {
+			dm("[MBPseudySubWindow] Maybe this window has no mode.");
+		}
+		window.trigger("end_system_message");
+		SystemManager.blDialogVisible = false;
+	}
+	
+	function showContent()
+	{
+		// 内容表示トリガー
+		
+		timer = new Timer(onTimerTalking, '');
+		timer.interval = 50;
+		timer.enabled = true;
+	}
+	
+	function onTimerTalkingOld()
+	{
+		// 内容をすらすら表示
+		
+		fillRect(0, 0, width, height, borderColor);
+		fillRect(borderWidth, borderWidth, width - borderWidth * 2, height - borderWidth * 2, bgColor);
+		
+		if (currentPos >= sentence[currentLine].length) {
+			currentLine += 1;
+			currentPos = 0;
+			hdlString = "";
+		}
+		
+		if (currentLine > 0) {
+			var i;
+			var start = currentLine - lineParPage + 1;
+			if (start < 0) {
+				start = 0;
+			}
+			var end = (currentLine > lineParPage - 1) ? lineParPage - 1 : currentLine;
+			for (i=0; i<end; i++) {
+				drawText(
+					borderWidth + marginWidth * 2,
+					borderWidth + marginWidth + fontSize * 1.5 * i,
+					sentence[start + i],
+					fontColor
+				);	
+			}
+		
+		}
+		
+		if (currentLine >= sentence.count) {
+			fillRect(
+				borderWidth + marginWidth * 2,
+				borderWidth + marginWidth + (fontSize * 1.5) * (lineParPage - 1),
+				fontSize>>1, fontSize,
+				fontColor + 0xff000000
+			);
+			invalidate timer;
+			onEndOfTalking();
+			return;
+		}
+		
+		var th = (currentLine < lineParPage - 1) ?
+			borderWidth + marginWidth + fontSize * 1.5 * currentLine :
+			borderWidth + marginWidth + (fontSize * 1.5) * (lineParPage - 1);
+		drawText(
+			borderWidth + marginWidth * 2,
+			th,
+			hdlString,
+			fontColor
+		);
+		drawText(
+			borderWidth + marginWidth * 2 + font.getTextWidth(hdlString),
+			th,
+			sentence[currentLine].charAt(currentPos),
+			fontColor
+		);
+		
+		hdlString = "%s%s".sprintf(hdlString, sentence[currentLine].charAt(currentPos++));
+		
+		fillRect(
+			borderWidth + marginWidth * 2 + font.getTextWidth(hdlString),
+			th,
+			fontSize>>1, fontSize,
+			fontColor + 0xff000000
+		);
+	}
+	
+	function onTimerTalking()
+	{
+		// 内容をすらすら表示
+		
+		fillRect(0, 0, width, height, borderColor);
+		fillRect(borderWidth, borderWidth, width - borderWidth * 2, height - borderWidth * 2, bgColor);
+		
+		if (currentLine > 0) {
+			var i;
+			var start = currentLine - lineParPage + 1;
+			if (start < 0) {
+				start = 0;
+			}
+			var end = (currentLine > lineParPage - 1) ? lineParPage - 1 : currentLine;
+			for (i=0; i<end; i++) {
+				drawText(
+					borderWidth + marginWidth * 2,
+					borderWidth + marginWidth + fontSize * 1.5 * i,
+					sentence[start + i],
+					fontColor
+				);	
+			}
+		
+		}
+		
+		if (currentLine >= sentence.count) {
+			invalidate timer;
+			onEndOfTalking();
+			return;
+		}
+		
+		var th = (currentLine < lineParPage - 1) ?
+			borderWidth + marginWidth + fontSize * 1.5 * currentLine :
+			borderWidth + marginWidth + (fontSize * 1.5) * (lineParPage - 1);
+		drawText(
+			borderWidth + marginWidth * 2,
+			th,
+			hdlString,
+			fontColor
+		);
+		drawText(
+			borderWidth + marginWidth * 2,
+			th,
+			sentence[currentLine++],
+			fontColor
+		);
+	}
+	
+	function onEndOfTalking()
+	{
+		// 表示終了後どうするかを決める
+		
+		if (isAutoHide) {
+			timer = new Timer(waitAndHide, '');
+			timer.interval = autoHideTime;
+			timer.enabled = true;
+		}
+		
+		else {
+			
+		}
+		
+		canHideByClick = true;
+	}
+	
+	function waitAndHide()
+	{
+		timer.enabled = false;
+		invalidate timer;
+		hide();
+	}
+	
+	function makeOperationButtons()
+	{
+	
+	}
+	
+	function onMouseUp()
+	{
+		if (canHideByClick) {
+			hide();
+		}
+	}
+}
+
+
+//==============================================================================
+// OKダイアログ
+
+class MBPseudyNoticeDialog extends MBPseudySimpleWindow
+{
+	var objOKButton;
+	var defWidth = 300;	// 設定横幅
+	
+	var refFocusMember;
+	
+	
+	function MBPseudyNoticeDialog(win, par, str, cap='NOTICE')
+	{
+		// コンストラクタ
+		
+		super.MBPseudySimpleWindow(win, par, str, cap);
+		defHeight = (fontSize + (fontSize>>1)) * (lineParPage + 3) - borderWidth + marginWidth + titleHeight;
+		name = '擬似確認ダイアログ';
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		SystemManager.fcRemoveStackMember(refFocusMember);
+		
+		invalidate objOKButton if (objOKButton !== void);
+		
+		super.finalize(...);
+	}
+	
+	function onEndOfShowing()
+	{
+		// 表示完了後の処理
+		
+		super.onEndOfShowing(...);
+		
+		setMenuStack();
+		SystemManager.fcApplyFocusTargetSearch();
+	}
+	
+	function onEndOfHiding()
+	{
+		// 消去完了後の処理
+		
+		super.onEndOfHiding(...);
+		SystemManager.fcRemoveStackMember(refFocusMember);
+		window.trigger("end_notice");
+	}
+	
+	function showContent()
+	{
+		// 質問を表示
+		
+		var i, tmp;
+		var lm = marginWidth + borderWidth;
+		var tm = lm + titleHeight;
+		
+		for (i=0; i<sentence.count; i++) {
+			drawText(
+				lm,
+				tm + (fontSize + (fontSize>>1)) * i,
+				sentence[i],
+				fontColor
+			);
+		}
+	}
+	
+	function makeOperationButtons()
+	{
+		// 操作用ボタンを作る
+		
+		invalidate objOKButton if (objOKButton !== void);
+		
+		objOKButton = new MBButton(window, this);
+		objOKButton.loadImages(sysfunc.getPathImage("btDialogClose"));
+		objOKButton.setPos(
+			width - (borderWidth + marginWidth + objOKButton.width),
+			height - (borderWidth + marginWidth + objOKButton.height)
+		);
+		
+		objOKButton.visible = true;
+	}
+	
+	function setMenuStack()
+	{
+		// スタックにボタンを入れる
+		
+		objOKButton.objCursorMapHash.left   = objOKButton;
+		objOKButton.objCursorMapHash.right  = objOKButton;
+		objOKButton.objCursorMapHash.top    = objOKButton;
+		objOKButton.objCursorMapHash.bottom = objOKButton;
+		
+		refFocusMember = SystemManager.fcPushFocusStack(objOKButton);
+	}
+	
+	function onSelectedItemClick(sender)
+	{
+		// 操作ボタンのアクション
+		
+		sndfunc.seDecide();
+		hide();
+	}
+	
+	function onKeyDown(key, shift)
+	{
+		if (key == VK_RETURN || key == VK_SPACE) {
+			onSelectedItemClick(objOKButton);
+			return;
+		}
+		
+		super.onKeyDown(...);
+	}
+}
+
+
+//==============================================================================
+// Yes/No ダイアログ
+
+class MBPseudyYesNoDialog extends MBPseudySimpleWindow
+{
+	var strWindowCaption;	// ウィンドウの名前
+	
+	var defWidth = 300;	// 設定横幅
+	var defHeight = 100;	// 設定縦幅
+	var result;
+	
+	var objCancelButton;	// キャンセルボタン
+	var objOKButton;	// OKボタン
+	
+	var refFocusMember;
+	
+	
+	function MBPseudyYesNoDialog(win, par, own, str)
+	{
+		// コンストラクタ
+		
+		super.MBPseudySimpleWindow(win, par, str, 'CONFIRMATION');
+		
+		owner = own;
+		font.face = 'ＭＳ ゴシック';
+		
+		defHeight = (fontSize + (fontSize>>1)) * (lineParPage + 3) - borderWidth + marginWidth + titleHeight;
+		name = '擬似Yes/Noダイアログ';
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		SystemManager.fcRemoveStackMember(refFocusMember);
+		
+		invalidate objOKButton if (objOKButton !== void);
+		invalidate objCancelButton if (objCancelButton !== void);
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onEndOfShowing()
+	{
+		// 表示完了後の処理
+		
+		super.onEndOfShowing();
+		
+		//sndfunc.seNotice();
+		setMenuStack();
+		SystemManager.fcApplyFocusTargetSearch();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function showContent()
+	{
+		// 質問を表示
+		
+		var i, tmp;
+		var lm = marginWidth + borderWidth;
+		var tm = lm + titleHeight;
+		
+		for (i=0; i<sentence.count; i++) {
+			drawText(
+				lm,
+				tm + (fontSize + (fontSize>>1)) * i,
+				sentence[i],
+				fontColor
+			);
+		}
+	}
+	
+	function makeOperationButtons()
+	{
+		// 操作用ボタンを作る
+		
+		// はい
+		invalidate objOKButton if (objOKButton !== void);
+		objOKButton = new MBButton(window, this);
+		objOKButton.loadImages(sysfunc.getPathImage("btDialogYes"));
+		objOKButton.setPos(
+			width - (borderWidth + marginWidth) - 150,
+			height - borderWidth - marginWidth - objOKButton.height
+		);
+		objOKButton.visible = true;
+		
+		// いいえ
+		invalidate objCancelButton if (objCancelButton !== void);
+		objCancelButton = new MBButton(window, this, this);
+		objCancelButton.loadImages(sysfunc.getPathImage("btDialogNo"));
+		objCancelButton.setPos(
+			width - (borderWidth + marginWidth) - 70,
+			height - borderWidth - marginWidth - objCancelButton.height
+		);
+		objCancelButton.visible = true;
+	}
+	
+	function setMenuStack()
+	{
+		// メニューをスタックに積む
+		
+		objOKButton.objCursorMapHash.left = objCancelButton;
+		objOKButton.objCursorMapHash.right = objOKButton.objCursorMapHash.left;
+		
+		objCancelButton.objCursorMapHash.left = objOKButton;
+		objCancelButton.objCursorMapHash.right = objCancelButton.objCursorMapHash.left;
+		
+		refFocusMember = SystemManager.fcPushFocusStack(objCancelButton);
+	}
+	
+	function onEndOfHiding()
+	{
+		// 消去完了後の処理
+		
+		super.onEndOfHiding();
+		SystemManager.fcPopFocusStack();
+		owner.onYesNoSelected(result);	
+	}
+	
+	function onSelectedItemClick(sender)
+	{
+		// 操作ボタンのアクション
+		
+		switch (sender) {
+			case objOKButton:
+				sndfunc.seDecide();
+				result = true;
+				break;
+			
+			case objCancelButton:
+				sndfunc.seCancel();
+				result = false;
+				break;
+		}
+		
+		hide();
+	}
+	
+	function onKeyDown(key, shift)
+	{
+		if (key == VK_ESCAPE) {
+			onSelectedItemClick(objCancelButton);
+			return;
+		}
+		
+		super.onKeyDown(...);
+	}
+}
+

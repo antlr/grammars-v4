@@ -1,0 +1,311 @@
+/******************************************************************************
+	system_mb/mb/system/MBFocusController.tjs
+*******************************************************************************/
+
+class MBFocusController
+{
+	var objFocusStack = [];	// フォーカススタック
+	var intCurrentIndex;	// 現在の添え字
+	
+	var blUserConfSetCursor;	// ユーザー設定でカーソル合わせがONかどうか
+	var blOperationWithKB;	// キーボード操作中かどうか
+	var isActive = false;	// マネージャがアクティブかどうか
+	
+	var window;	// ウィンドウ参照
+	var objTimer;	// 照準あわせ用タイマー
+	var ptActionCanceller;	// アクションキャンセラ参照
+	
+	
+	function MBFocusController(win)
+	{
+		// コンストラクタ
+		
+		window = win;
+		
+		initFocusStack();
+		
+		blUserConfSetCursor = sf.userconfig.setCursor;
+		blOperationWithKB = false;
+		
+		objTimer = new Timer(onTimerFocusMaking, '');
+		objTimer.interval = 10;
+		objTimer.enabled = false;
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate objTimer if (objTimer !== void);
+		invalidate objFocusStack if (objFocusStack !== void);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function initFocusStack()
+	{
+		// スタックを初期化する
+		
+		isActive = false;
+		objFocusStack.clear();
+		intCurrentIndex = void;
+		/*
+		if (objFocusStack.count < 1) {
+			return;
+		}
+		
+		var i;
+		for (i=0; i<objFocusStack[i].count; i++) {
+			invalidate objFocusStack[i] if (objFocusStack[i] !== void);
+		}
+		
+		intCurrentIndex = 0;
+		objFocusStack = [];
+		*/
+	}
+	
+	function pushFocusStack(obj)
+	{
+		// スタックに積む
+		
+		if (objFocusStack.count > 0) {
+			//objFocusStack[intCurrentIndex].baselayer.enabled = false;
+		}
+		
+		objFocusStack.add(%[
+			baselayer : obj.parent,
+			cursorstay : obj,
+			primarycursorstay : obj
+		]);
+		
+		intCurrentIndex = objFocusStack.count - 1;
+		//objFocusStack[intCurrentIndex].baselayer.enabled = true;
+		
+		/*dm("<SystemManager> フォーカススタックに 1 メンバ (%s) 追加されました".sprintf(objFocusStack[objFocusStack.count - 1]));
+		dm("<SystemManager> 現在 %d のメンバがスタックされています".sprintf(objFocusStack.count));
+		dm("<SystemManager> 現在スタック %d (%s)を操作中です".sprintf(intCurrentIndex, objFocusStack[intCurrentIndex]));*/
+		
+		return objFocusStack[intCurrentIndex];
+	}
+	
+	function relFocusStack(obj)
+	{
+		// スタック末尾を手動更新
+		
+		if (objFocusStack.count < 1) {
+			return;
+		}
+		
+		objFocusStack[intCurrentIndex].cursorstay = obj;
+	}
+	
+	function removeFocusStackItem(obj)
+	{
+		// スタックメンバを狙い撃ちして消す
+		
+		//dm("<FocusController> フォーカスメンバを削除します...");
+		objTimer.enabled = false;
+		if (objFocusStack.count < 1 || obj === void) {
+			//dm("<FocusController> メンバの削除に失敗しました。");
+			return;
+		}
+		
+		var mem = objFocusStack.find(obj);
+		if (mem > -1) {
+			objFocusStack.erase(mem);
+			intCurrentIndex = objFocusStack.count - 1;
+			/*dm("<SystemManager> フォーカススタックから 1 メンバ (%s) 削除されました".sprintf(obj));
+			dm("<SystemManager> 現在 %d のメンバがスタックされています".sprintf(objFocusStack.count));
+			dm("<SystemManager> 現在スタック %d (%s)を操作中です".sprintf(intCurrentIndex, objFocusStack[intCurrentIndex]));*/
+			
+			if (intCurrentIndex > -1) {
+				//objFocusStack[intCurrentIndex].baselayer.enabled = true;
+				setCursorToTarget();
+			}
+		}
+	}
+	
+	function popFocusStack()
+	{
+		// スタックの末尾を捨てる
+		
+		if (objFocusStack.count < 1) {
+			return;
+		}
+		
+		invalidate objFocusStack[intCurrentIndex] if (objFocusStack[intCurrentIndex] !== void);
+		
+		objFocusStack.erase(intCurrentIndex);
+		dm("<SystemManager> フォーカススタックから 1 メンバ削除されました");
+		dm("<SystemManager> 現在 %d のメンバがスタックされています".sprintf(objFocusStack.count));
+		
+		if (intCurrentIndex > 0) {
+			intCurrentIndex = objFocusStack.count - 1;
+			if (intCurrentIndex > -1) {
+				//objFocusStack[intCurrentIndex].baselayer.enabled = true;
+				setCursorToTarget();
+			}
+		}
+	}
+	
+	function setCursorToTarget(bl)
+	{
+		// 可能ならカーソルを現在のターゲットに合わせる
+		
+		if (objFocusStack.count < 1) {
+			objTimer.enabled = false;
+			return;
+		}
+		if (ptActionCanceller.getCancellerState()) {
+			return;
+		}
+		
+		objTimer.enabled = false;
+		
+		if (getAutoFocusState()) {
+			isActive = true;
+			//objFocusStack[intCurrentIndex].baselayer.isNewLayer = true;
+			if (objFocusStack[intCurrentIndex] !== void && isvalid(objFocusStack[intCurrentIndex].cursorstay)) {
+				objFocusStack[intCurrentIndex].cursorstay.getCursorFromManager((bl == void) ? false : bl);
+			}
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function isMemberOfFocusStack(obj)
+	{
+		// 引数にとったオブジェクトがスタックのメンバーかどうかを返す
+		
+		if (objFocusStack.find(obj) > -1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onKeyDown(key, shift)
+	{
+		// KAGにフックをかける
+		
+		key = SystemManager.convertPadToKey(key);
+		
+		// スタックにブツがなかったら帰る
+		if (objFocusStack.count < 1) {
+			return false;
+		}
+		
+		// マネージャがアクティブでない場合は、矢印キーによるフォーカスのみ動作
+		// （スタックに積んである場所からは動かず、それにフォーカスする
+		if (!isActive) {
+			var res;
+			switch (key) {
+				case VK_UP:
+				case VK_DOWN:
+				case VK_RIGHT:
+				case VK_LEFT:
+					//dm("<FocusController> 初期ターゲットから操作を開始します。");
+					setOperationWithKB(true);
+					setCursorToTarget(true);
+					break;
+				
+				default:
+					break;
+			}
+			
+			return;
+		}
+		
+		// アクティブなら通常動作
+		else {
+			var res;
+			switch(key) {
+				// 操作キーならオブジェクトに渡す
+				case VK_RETURN:
+				case VK_SPACE:
+				case VK_ESCAPE:
+				case VK_UP:
+				case VK_DOWN:
+				case VK_RIGHT:
+				case VK_LEFT:
+				case VK_TAB:
+					if (isvalid(objFocusStack[intCurrentIndex].cursorstay)) {
+						setOperationWithKB(true);
+						objFocusStack[intCurrentIndex].cursorstay.onCallFromFocusStackManager(key, shift);
+						res = true;
+					}
+					break;
+				
+				// そうでなければ何もせずにフックを外す
+				default:
+					res = false;
+					break;
+			}
+			
+			return res;
+		}
+		
+		// 何も起きなかった場合はとりあえずKAGに返す
+		return false;
+	}
+	
+	
+	//--------------------------------------------------------------------------
+	
+	function changeCursorStay(obj)
+	{
+		// カーソル位置記憶を変更する
+		
+		if (typeof(obj) == "Object") {
+			objFocusStack[intCurrentIndex].cursorstay = obj;
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	function setOperationWithKB(bl)
+	{
+		// KB操作モードを記憶する
+		
+		if (bl) {
+			blOperationWithKB = true;
+		}
+		else {
+			blOperationWithKB = false;
+		}
+	}
+	
+	function getAutoFocusState()
+	{
+		// KB操作モードを返す
+		
+		if (blOperationWithKB || blUserConfSetCursor) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function activateFocusMaker()
+	{
+		// 強制フォーカス合わせの起動
+		
+		objTimer.enabled = true;
+	}
+	
+	function onTimerFocusMaking()
+	{
+		// フォーカスされたレイヤがない場合に強制的に合わせる
+		
+		//dm("<FocusController> システムをチェック中...");
+		setCursorToTarget();
+	}
+}

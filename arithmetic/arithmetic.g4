@@ -32,32 +32,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar arithmetic;
 
+file : equation* EOF;
+
 equation
    : expression relop expression
    ;
 
 expression
-   : term ((PLUS | MINUS) term)*
-   ;
-
-term
-   : factor ((TIMES | DIV) factor)*
-   ;
-
-factor
-   : signedAtom (POW signedAtom)*
-   ;
-
-signedAtom
-   : PLUS signedAtom
-   | MINUS signedAtom
-   | atom
+   :  expression  POW expression
+   |  expression  (TIMES | DIV)  expression
+   |  expression  (PLUS | MINUS) expression
+   |  LPAREN expression RPAREN
+   |  (PLUS | MINUS)* atom
    ;
 
 atom
    : scientific
    | variable
-   | LPAREN expression RPAREN
    ;
 
 scientific

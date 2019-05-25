@@ -219,8 +219,10 @@ INTEGER:                             'INTEGER';
 BIGINT:                              'BIGINT';
 REAL:                                'REAL';
 DOUBLE:                              'DOUBLE';
+PRECISION:                           'PRECISION';
 FLOAT:                               'FLOAT';
 DECIMAL:                             'DECIMAL';
+DEC:                                 'DEC';
 NUMERIC:                             'NUMERIC';
 DATE:                                'DATE';
 TIME:                                'TIME';
@@ -229,6 +231,8 @@ DATETIME:                            'DATETIME';
 YEAR:                                'YEAR';
 CHAR:                                'CHAR';
 VARCHAR:                             'VARCHAR';
+NVARCHAR:                            'NVARCHAR';
+NATIONAL:                            'NATIONAL';
 BINARY:                              'BINARY';
 VARBINARY:                           'VARBINARY';
 TINYBLOB:                            'TINYBLOB';
@@ -240,6 +244,8 @@ TEXT:                                'TEXT';
 MEDIUMTEXT:                          'MEDIUMTEXT';
 LONGTEXT:                            'LONGTEXT';
 ENUM:                                'ENUM';
+VARYING:                             'VARYING';
+SERIAL:                              'SERIAL';
 
 
 // Interval type Keywords
@@ -329,6 +335,7 @@ CHAIN:                               'CHAIN';
 CHANGED:                             'CHANGED';
 CHANNEL:                             'CHANNEL';
 CHECKSUM:                            'CHECKSUM';
+PAGE_CHECKSUM:                       'PAGE_CHECKSUM';
 CIPHER:                              'CIPHER';
 CLIENT:                              'CLIENT';
 CLOSE:                               'CLOSE';
@@ -699,7 +706,8 @@ MRG_MYISAM:                          'MRG_MYISAM';
 MYISAM:                              'MYISAM';
 NDB:                                 'NDB';
 NDBCLUSTER:                          'NDBCLUSTER';
-PERFOMANCE_SCHEMA:                   'PERFOMANCE_SCHEMA';
+PERFORMANCE_SCHEMA:                  'PERFORMANCE_SCHEMA';
+TOKUDB:                              'TOKUDB';
 
 
 // Transaction Levels
@@ -713,6 +721,8 @@ SERIALIZABLE:                        'SERIALIZABLE';
 // Spatial data types
 
 GEOMETRYCOLLECTION:                  'GEOMETRYCOLLECTION';
+GEOMCOLLECTION:                      'GEOMCOLLECTION';
+GEOMETRY:                            'GEOMETRY';
 LINESTRING:                          'LINESTRING';
 MULTILINESTRING:                     'MULTILINESTRING';
 MULTIPOINT:                          'MULTIPOINT';
@@ -1156,7 +1166,7 @@ fragment CHARSET_NAME:               ARMSCII8 | ASCII | BIG5 | BINARY | CP1250
                                      | UCS2 | UJIS | UTF16 | UTF16LE | UTF32 
                                      | UTF8 | UTF8MB4;
 
-fragment EXPONENT_NUM_PART:          'E' '-'? DEC_DIGIT+;
+fragment EXPONENT_NUM_PART:          'E' [-+]? DEC_DIGIT+;
 fragment ID_LITERAL:                 [A-Z_$0-9]*?[A-Z_$]+?[A-Z_$0-9]*;
 fragment DQUOTA_STRING:              '"' ( '\\'. | '""' | ~('"'| '\\') )* '"';
 fragment SQUOTA_STRING:              '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';

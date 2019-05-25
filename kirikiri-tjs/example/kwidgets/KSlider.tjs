@@ -1,0 +1,202 @@
+//
+// $Id: KSlider.tjs,v 1.5 2007/09/04 19:02:38 cvs Exp $
+//
+
+global.SLIDER_ADAPTIVE_WIDTH = 0;
+global.SLIDER_SLIDER_WIDTH = 8;
+global.SLIDER_FRAME_SIZE = 3;
+
+/**----------------------------------------------------------------------
+ * スライダー
+ ----------------------------------------------------------------------*/
+class KSlider extends KValueWidget
+{
+  // スライダーの幅(定数)
+  var sliderWidth = SLIDER_SLIDER_WIDTH;
+  // フレームのサイズ(定数)
+  var frameSize = SLIDER_FRAME_SIZE;
+
+  // 最小値、最大値
+  var leftValue, rightValue;
+  var minValue, maxValue;
+  // 値
+  var _value;
+  // スライドする範囲
+  var railLeft, railTop, railWidth, railHeight;
+  // スライダーの座標値関連
+  var sliderLeft, mouseDownX, mouseDownSliderLeft;
+  var sign;
+  var dragging;
+  // 刻み幅
+  var step;
+  // 永続化辞書
+  var dict;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * スライダーを作成します。
+   * wに定数SLIDER_ADAPTIVE_WIDTHを指定すると、スライダーは最小値から最大値まで
+   * 全ての値をスライドで指定できるのにじゅうぶんな最小の
+   * 幅を自動的に計算して指定します。
+   *
+   * @param win ウィンドウ
+   * @param w スライダーの幅
+   * @param h スライダーの高さ
+   * @param minValue 値の最小値
+   * @param maxValue 値の最大値
+   * @param name 名前
+   * @param step 刻み幅
+   ------------------------------*/
+  function KSlider(win, w, h, leftValue, rightValue, step = 1, name = "") {
+    super.KWidget(win, name);
+    this.step = step;
+    this.leftValue = int(leftValue / step);
+    this.rightValue = int(rightValue / step);
+    this.minValue = int(Math.min(this.leftValue, this.rightValue));
+    this.maxValue = int(Math.max(this.leftValue, this.rightValue));
+    sign = leftValue < rightValue ? 1 : -1;
+    _value = this.leftValue;
+    if (w == SLIDER_ADAPTIVE_WIDTH)
+      w = adaptiveWidth;
+    else
+      w += SLIDER_SLIDER_WIDTH + SLIDER_FRAME_SIZE * 2;
+
+    // デフォルトフォーカス
+    focusable = win.defaultFocusable;
+
+    setFixedSize(w, h);
+  }
+
+  // 「最適な」幅
+  property adaptiveWidth {
+    getter {
+      return maxValue - minValue + 1 + frameSize * 2 + sliderWidth;
+    }
+  }
+
+  /**------------------------------
+   * 値
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property value {
+    getter {
+      var v = _value * step;
+      if (step == int(step))
+        v = int(v);
+      return v;
+    }
+    setter (v) {
+      v = int(v / step);
+      if (_value == v) {
+        return;
+      }
+      _value = v;
+      drawContent();
+    }
+  }
+
+  /*------------------------------
+   * サイズが更新されたら、
+   * スライダサイズを更新して再描画
+   ------------------------------*/
+  function onSizeModified(w, h) {
+    railLeft = railTop = frameSize;
+    railWidth = w - frameSize * 2;
+    railHeight = h - frameSize * 2;
+    drawContent();
+  }
+  
+  /*------------------------------
+   * スライダを描画する
+   ------------------------------*/
+  function drawContent {
+    fillRect(0, 0, width, height, focused ? WIN_HIGHLIGHT : 0);
+    drawSunkenFrame(1, 1, width - 2, height - 2, WIN_LIGHTEN1);
+    sliderLeft = railLeft + int((_value - leftValue) * (railWidth - sliderWidth)
+                                / (rightValue - leftValue));
+    drawRaisedFrame(sliderLeft, railTop, sliderWidth, railHeight);
+  }
+
+  /*------------------------------
+   * マウス入力を処理する。
+   ------------------------------*/
+  function onMouseDown(x) {
+    super.onMouseDown(...);
+    focus();
+    drawContent();
+    if (x < sliderLeft) {
+      setValue(_value - sign);
+    } else if (x >= sliderLeft + sliderWidth) {
+      setValue(_value + sign);
+    } else {
+      dragging = true;
+      mouseDownX = x;
+      mouseDownSliderLeft = sliderLeft;
+    }
+  }
+
+  function onMouseMove(x) {
+    super.onMouseMove(...);
+    if (dragging) {
+      var curSliderLeft = mouseDownSliderLeft - mouseDownX + x;
+      curSliderLeft = Math.max(curSliderLeft, railLeft);
+      curSliderLeft = Math.min(curSliderLeft, railLeft + railWidth - 1);
+      var curValue = 
+        int((rightValue - leftValue) * (curSliderLeft - railLeft) / (railWidth - sliderWidth) + leftValue);
+      setValue(curValue);
+    }
+  }
+
+  function onMouseUp {
+    super.onMouseUp(...);
+    dragging = false;
+  }
+
+  /*------------------------------
+   * フォーカス時のキー入力を処理する
+   ------------------------------*/
+  function onKeyDown(key) {
+    if (key == VK_LEFT)
+      setValue(_value - sign);
+    else if (key == VK_RIGHT)
+      setValue(_value + sign);
+    else
+      super.onKeyDown(...);
+  }
+
+  /*------------------------------
+   * 内部的な値の更新処理。
+   * 値を更新して、スライダーを再描画し、値の更新を通知する
+   ------------------------------*/
+  function setValue(v) {
+    v = int(Math.min(maxValue, Math.max(v, minValue)));
+    if (_value == v) {
+      return;
+    }
+    value = v * step;
+    invalidateValue();
+  }
+
+  // フォーカスされたら再描画
+  function onFocus {
+    drawContent();
+  }
+
+  // フォーカスが外れたら再描画
+  function onBlur {
+    drawContent();
+  }
+
+  // enabled==trueならそのまま表示
+  function onNodeEnabled {
+    opacity = 255;
+  }
+
+  // enabled=falseなら半透明で表示
+  function onNodeDisabled {
+    opacity = 64;
+  }
+};

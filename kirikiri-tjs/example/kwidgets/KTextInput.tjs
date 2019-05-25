@@ -1,0 +1,412 @@
+//
+// $Id: KTextInput.tjs,v 1.10 2007/09/22 21:38:39 cvs Exp $
+//
+
+
+/// テキストの入力モード
+global.TEXT_SYMBOL = 0; ///< 英数字のみ
+global.TEXT_DIGIT = 1;  ///< 整数のみ
+global.TEXT_ANY = 2;    ///< なんでもあり
+global.TEXT_REAL = 3;   ///< 小数のみ
+
+/*----------------------------------------------------------------------
+ * テキストインプット用にカスタマイズしたテキストエディット
+ ----------------------------------------------------------------------*/
+class KTextInputEdit extends KTextEdit
+{
+  // 直前の値
+  var prevValue;
+  // 文字のパターン
+  var acceptStrPat;
+  // 文字受け入れタイプ
+  var _type;
+
+  /*------------------------------
+   * コンストラクタ
+   ------------------------------*/
+  function KTextInputEdit(window, type) {
+    super.KTextEdit(window, "text");
+
+    // 指定のタイプにより、受け入れる文字列パターンを決定
+    this.type = type;
+
+    // 右端での折り返しを停止
+    lineWrapping = false;
+
+    // キーバインドを一旦クリア、必要なキーだけバインドをやり直す
+    clearKeyBind();
+    bindKey(VK_LEFT,   1, 0,       moveLeft);
+    bindKey(VK_RIGHT,  1, 0,       moveRight);
+    bindKey(VK_LEFT,   1, ssCtrl,  backwardWord);
+    bindKey(VK_RIGHT,  1, ssCtrl,  forwardWord);
+    bindKey(VK_RETURN, 0, 0,       enterValue);
+    bindKey(VK_ESCAPE, 0, 0,       cancelValue);
+    bindKey(VK_BACK,   0, 0,       backspaceAtPointer);
+    bindKey(VK_DELETE, 0, 0,       deleteAtPointer);
+    bindKey(VK_V,      0, ssCtrl,  pasteAtPointer);
+    bindKey(VK_INSERT, 0, ssShift, pasteAtPointer);
+    bindKey(VK_C,      0, ssCtrl,  copySelection);
+    bindKey(VK_INSERT, 0, ssCtrl,  copySelection);
+    bindKey(VK_X,      0, ssCtrl,  cutSelection);
+    bindKey(VK_DELETE, 0, ssShift, cutSelection);
+    bindKey(VK_A,      2, ssCtrl,  selectAll);
+    bindKey(VK_Z,      2, ssCtrl,  undo);
+    bindKey(VK_HOME,   1, 0,       physicalHeadOfCol);
+    bindKey(VK_END,    1, 0,       physicalTailOfCol);
+  }
+
+  function onKeyDown {
+    parent.parent.onKeyDown(...);
+  }
+
+  function onKeyDownSuper {
+    super.onKeyDown(...);
+  }
+
+  // 値を決定する
+  function decideValue {
+    // 値に変更があったら、変更を通知
+    if (value != prevValue) {
+      prevValue = value;
+      onValueModified(value);
+    }
+  }
+
+  // ENTERキーで値を決定
+  function enterValue {
+    decideValue();
+    // TextInput本体のフック関数をコール
+    parent.parent.onEnter();
+  }
+
+
+  // 値をキャンセルする
+  function cancelValue {
+    // 値に変更があったら、元の値に差し戻して全選択状態にする
+    if (value != prevValue) {
+      value = prevValue;
+      selectAll();
+      setPointer(0, curRow.count);
+    }
+    // TextInput本体のフック関数をコール
+    parent.parent.onCancel();
+  }
+
+  // フォーカスを得た
+  function onFocus {
+    // フォーカス
+    super.onFocus(...);
+    // 親に教える
+    parent.parent.onChildFocus(...);
+    // 全選択
+    selectAll();
+    setPointer(0, curRow.count);
+    // 現在の値を記録
+    prevValue = value;
+  }
+
+  // フォーカスを失った
+  function onBlur {
+    // フォーカスロスト
+    super.onBlur(...);
+    // 親に教える
+    parent.parent.onChildBlur(...);
+    // 選択を解除
+    deselect();
+    // 値を決定する
+    decideValue();
+  }
+
+  // テキストを挿入する
+  function insertAtPointer(str, locate) {
+    // パターンに一致しない文字を削除する
+    var strPat = acceptStrPat;
+    var result = "";
+    while (strPat.test(str)) {
+      result += strPat.lastMatch;
+      str = strPat.rightContext;
+    }
+    if (result.length)
+      super.insertAtPointer(result, locate);
+  }
+
+  // キーが押された
+  function onKeyPress(str) {
+    // パターンに一致する文字のみ受けつける
+    if (acceptStrPat.test(str))
+      super.onKeyPress(str);
+  }
+
+  /*------------------------------
+   * 文字の受け入れタイプを設定する
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property type {
+    getter {
+      return _type;
+    }
+    setter(v) {
+      if(v !== type)
+      {
+        _type = v;
+        switch (type) {
+        case TEXT_SYMBOL: acceptStrPat = new RegExp("[a-zA-Z0-9_]+");   break;
+        case TEXT_DIGIT:  acceptStrPat = new RegExp("[0-9-]+");         break;
+        case TEXT_REAL:   acceptStrPat = new RegExp("[0-9.e-]+");         break;
+        case TEXT_ANY:
+          if (k_kirikiriz)
+            acceptStrPat = new RegExp("[^\\000\\000-\\037\\000]+"); 
+          else
+            acceptStrPat = new RegExp("[^\\000-\\037]+");
+          break;
+        }
+      }
+    }
+  }
+};
+
+/*----------------------------------------------------------------------
+ * テキストインプットフレーム(KTextInputEditを自動スクロールさせるために必要
+ ----------------------------------------------------------------------*/
+class KTextInputFrame extends KWidget
+{
+  /*------------------------------
+   * コンストラクタ
+   ------------------------------*/
+  function KTextInputFrame(window, w, h) {
+    super.KWidget(window);
+    // サイズ固定
+    setFixedSize(w, h);
+    // イメージは持たず
+    hasImage = false;
+  }
+
+  /*------------------------------
+   * テキストエディットのカーソルが
+   * 常に画面に収まるように
+   * 適宜スクロールを行う
+   ------------------------------*/
+  function onChildNoticeRect(child, l, t, w, h) {
+    var x = - child.left;
+    if (x + width < l + w)
+      x = l + w - width;
+    if (l < x)
+      x = l;
+    x = int(Math.max(0, Math.min(child.width - width, x)));
+    child.left = -x;
+  }
+
+  /*------------------------------
+   * テキストエディットのサイズを
+   * 常に最小に保つ
+   ------------------------------*/
+  function onChildMinMaxSizeModified(child) {
+    child.setSize(width, height);
+  }
+}
+
+
+/**----------------------------------------------------------------------
+ * テキストインプット
+ ----------------------------------------------------------------------*/
+class KTextInput extends KValueWidget
+{
+  // 枠を表示するレイヤ
+  var box;
+  // フレームレイヤ
+  var frame;
+  // テキストレイヤ
+  var text;
+  // 古い値
+  var oldValue;
+
+  /*------------------------------
+   * コンストラクタ
+   *
+   * @param window ウィンドウ
+   * @param w 幅
+   * @param h 高さ
+   * @param type テキスト入力モード
+   * @param name 名前
+   ------------------------------*/
+  function KTextInput(window, w, h, type = TEXT_SYMBOL, name = '') {
+    super.KWidget(window, name);
+    // サイズ固定
+    setFixedSize(w, h);
+    // イメージは持たず
+    hasImage = false;
+
+    // 背景に敷くボックス
+    box = new global.KWidget(window);
+    box.setFixedSize(w, h);
+    box.parent = this;
+
+    // テキストエディットを収めるフレーム
+    frame = new KTextInputFrame(window, w - 10, h - 8);
+    frame.setPos(5, 4);
+    frame.parent = this;
+
+    // テキストエディット
+    text = new KTextInputEdit(window, type);
+    text.fontHeight = h - 8;
+    text.setSize(w - 10, h - 8);
+    text.parent = frame;
+
+    // 古い内容
+    oldValue = "";
+
+    // ボックスを描画
+    redrawBox();
+  }
+
+  /*------------------------------
+   * 値を設定する
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property value {
+    getter {
+      var result = filterValue(text.value);
+      return result;
+    }
+    setter(v) {
+      // テキストエディットの持つ文字パターンでマッチングする文字のみをフィルタ
+      var strPat = text.acceptStrPat;
+      var result = "";
+      while (strPat.test(v)) {
+        result += strPat.lastMatch;
+        v = strPat.rightContext;
+      }
+      // 文字を設定
+      oldValue = text.value = result;
+      text.prevValue = text.value;
+    }
+  }
+
+  /**------------------------------
+   * 値の更新に反応するかどうか
+   *
+   * @param v 値の更新に反応するかどうか
+   * @return 値の更新に反応するかどうか
+   ------------------------------*/
+  property respondToValueModification {
+    getter {
+      return text.respondToValueModification;
+    }
+    setter(v) {
+      text.respondToValueModification = v;
+    }
+  }
+
+  /*------------------------------
+   * テキストを隠す？
+   ------------------------------*/
+  property hideText {
+    getter {
+      return text.hideText;
+    }
+    setter(v) {
+      text.hideText = v;
+    }
+  }
+
+  /*------------------------------
+   * 文字の受け入れタイプを設定する
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property type {
+    getter {
+      return text.type;
+    }
+    setter(v) {
+      text.type = v;
+    }
+  }
+
+  /*------------------------------
+   * ENTERキーを押した時に呼ばれるフック関数
+   ------------------------------*/
+  function onEnter {
+  }
+
+  /*------------------------------
+   * ESCを押してキャンセルした時に呼ばれるフック関数
+   ------------------------------*/
+  function onCancel {
+  }
+
+  /*------------------------------
+   *  フォーカスを受け取る
+   ------------------------------*/
+  function focus {
+    text.focus();
+  }
+
+  // 検索時に子の「名前」を拾わないようにトラップ。
+  function find(name) {
+    if (this.name === name)
+      return this;
+    else
+      return void;
+  }
+
+  // ボックスを描画する
+  function redrawBox {
+    box.fillRect(0, 0, width, height, text.focused ? WIN_WHITE : 0);
+    box.drawSunkenFrame(1, 1, width - 2, height - 2, WIN_WHITE);
+  }
+
+  // 子(テキストエディット)の更新をそのまま自分の更新にすり替えて通知
+  function onChildValueModified(child, value) {
+    var ov = oldValue;
+    oldValue = value;
+    onValueModified(filterValue(value), filterValue(ov));
+  }
+
+  // フォーカスしたらボックスを再描画
+  function onChildFocus {
+    redrawBox();
+  }
+
+  // フォーカスロストしたらボックスを再描画
+  function onChildBlur {
+    redrawBox();
+  }
+
+  // フォントが変更されたら、テキストエディットに反映
+  function onFontFaceModified {
+    text.fontFace = fontFace;
+  }
+
+  // ENALBEされたらボックスを不透明に
+  function onNodeEnabled {
+    box.opacity = 255;
+  }
+
+  // DISABLEされたらボックスを半透明に
+  function onNodeDisabled {
+    box.opacity = 64;
+  }
+
+  // 値をフィルタリングして、数値の場合は文字列から数値に変換して返す。
+  function filterValue(v) {
+    switch (type) {
+    case TEXT_DIGIT:
+    case TEXT_REAL:
+      return +v;
+    default:
+      return v;
+    }
+  }
+
+  function onKeyDown {
+    text.onKeyDownSuper(...);
+  }
+}
+
+

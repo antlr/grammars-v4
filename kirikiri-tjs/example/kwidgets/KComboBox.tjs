@@ -1,0 +1,906 @@
+//
+// KComboBox.tjs
+//
+
+Scripts.execStorage("KDropDownList.tjs");
+
+global.COMBO_STYLE_DROPDOWN = 0;
+global.COMBO_STYLE_SIMPLE = 1;			//未対応
+global.COMBO_STYLE_DROPDOWNLIST = 2;
+/**----------------------------------------------------------------------
+ * コンボボックス
+ ----------------------------------------------------------------------*/
+//#################################################################################
+class KComboBox extends KValueWidget
+{
+	var name;
+	var	target;
+	var selLeft;			//	選択部分表示位置
+
+	var _values		= [];	//	値(こっちが本体)
+	var _captions	= [];	//	表示(こっちがサポート)
+	var _selected	= -1;	//	どれを選択しているか？(-1は未選択)
+	var _combostyle = -1;	//	コンボスタイル
+	var inputvalue = "";	//	ドロップダウンコンボで直接入力された文字列
+	var lastinputvalue = "";//	ドロップダウンコンボで前回直接入力された文字列
+	var clickcyclic = true;	//	ドロップダウンリストのショートクリックで次の候補に変更する
+	var popupstate = false;	//	ドロップダウン状態 true:表示中 / false:非表示中
+
+	var _selcolor		= 0xFFFFFFFF;
+	var _selframecolor	= 0xFF000080;
+	var _textcolor		= 0x00000000;
+	var _seltextcolor	= 0x00FFFFFF;
+	var _dropdowntime	= 200;		//ポップアップするまでのクリック持続待機時間(ms)
+	var _dropclosetime	= 350;		//ポップアップが終わってから次のポップアップを許容するまでの待ち時間(ms)
+	var aa				= true;
+
+	var FIXED_MARGIN		= 1;	//コントロール枠の位置微調整
+	var FIXED_XOFFSET		= 2;	//コントロール枠の位置微調整
+	var FIXED_YOFFSET		= 2;	//コントロール枠の位置微調整
+	var FIXED_HEIGHTMARGIN	= 8;	//コントロールサイズのマージン(KTextInputの位置に合わせた値)
+	var FIXED_LEFTMARGIN	= 5;	//コントロール内のテキスト書き出し位置(KTextInputの位置に合わせた値)
+
+	var _pointed;
+	var lastselected = -1;
+
+	// ポップアップ用タイマー
+	var popupTimer;
+	var closeTimer;
+	
+	// オブジェクト定義
+	var dropinput;
+	var dropbutton;
+	var dropface = "k_scroll_down.png";
+
+	var dispCount; // ドロップダウンメニューの表示数
+
+	/**------------------------------
+	* コンストラクタ
+	*
+	* @param window
+	* @param w			width
+	* @param h			height
+	* @param type		combostyle={ COMBO_STYLE_DROPDOWN, COMBO_STYLE_SIMPLE, COMBO_STYLE_DROPDOWNLIST }
+	* @param name		名前
+	------------------------------*/
+	function KComboBox(window, w, h, type=COMBO_STYLE_DROPDOWNLIST, name="") {
+		popupTimer	= new Timer(onPopup, "");
+		popupTimer.enabled = false;
+		
+		closeTimer	= new Timer(onClose, "");
+		closeTimer.enabled = false;
+		
+		_combostyle = type;
+		
+		//コントロールを構成する基本ウィジェットの初期化
+		switch( combostyle ){
+		case COMBO_STYLE_DROPDOWNLIST:
+			super.KValueWidget(window, name);
+			break;
+		case COMBO_STYLE_DROPDOWN:
+			super.KValueWidget(window, name);
+			break;
+		case COMBO_STYLE_SIMPLE:
+			break;
+		}
+		
+		// ウィンドウ初期化
+//071005フォーカス系不具合修正
+		focusable = defaultFocusable;
+//		focusable = true;
+		hasImage = true;
+		hitThreshold = 0;
+		useAttention = true;
+		imeMode = imDontCare;
+		this.name = name;
+		
+		target	= window;
+		_marginLeft = _marginRight = _marginTop = _marginBottom = 1;
+		setMinMaxSize( w, h, w, h );
+		setSize(w,h);
+		_pointed= false;
+
+		// テキスト入力ボックスを配置
+		dropinput = new KTextInput(window, w - h + FIXED_XOFFSET + FIXED_MARGIN, h, TEXT_ANY, "_dropinput");
+		with(dropinput)
+		{
+//071005フォーカス系不具合修正
+			.focusable = defaultFocusable;
+			.parent = this;
+			.onValueModified = this.onInputValueModified;
+			.setMinMaxSize( w-h+FIXED_XOFFSET+FIXED_MARGIN, h, w-h+FIXED_XOFFSET+FIXED_MARGIN, h );
+			.setPos( 0, 0 );
+			.respondToValueModification = true;
+			
+			switch( combostyle ){
+			case COMBO_STYLE_DROPDOWNLIST:
+				.visible = false;
+				break;
+			case COMBO_STYLE_DROPDOWN:
+				.visible = true;
+				break;
+			case COMBO_STYLE_SIMPLE:
+				.visible = false;
+				break;
+			}
+		}
+
+		//ドロップダウンボタンを配置
+		dropbutton = new KImageButton(window, dropface, "_dropbutton");
+		with(dropbutton)
+		{
+//071005フォーカス系不具合修正
+			.focusable = false;
+			.parent = this;
+			.onValueModified = this.onPopup;
+			.setMinMaxSize( h, h, h, h );
+			.setPos( w - h, 0 );
+
+			switch( combostyle ){
+			case COMBO_STYLE_DROPDOWNLIST:
+				.visible = true;
+				break;
+			case COMBO_STYLE_DROPDOWN:
+				.visible = true;
+				break;
+			case COMBO_STYLE_SIMPLE:
+				.visible = false;
+				break;
+			}
+			//071030右クリック抑止
+			.onMouseDown = function(x, y, button, shift){
+				if( button == mbLeft ){
+					buttonDown();
+				}
+			};
+			.onMouseUp = function(x, y, button, shift){
+				if( button == mbLeft ){
+					buttonUp();
+				}
+			};
+		}
+		
+		//初期表示
+		draw();
+	}
+
+	/*------------------------------
+	* ファイナライザ
+	------------------------------*/
+	function finalize {
+		// タイマを消去
+		discard(popupTimer);
+		discard(closeTimer);
+// 配列は明示的にinvalidateしないでもgcで回収されるはず
+// KValuWidgetのfinalizeでvalueが参照できないとまずいので
+// _valuesと_captionsは残しておく
+//		discard(_values);
+//		discard(_captions);
+		super.finalize(...);
+	}
+
+	function setSize(w, h)
+	{
+          //dm("setSize called[name:" + name + "], old_w=" + width + " old_h=" + height + " new_w=" + w + " new_h=" + h );
+		super.setSize(w, h);
+		fontHeight = height - FIXED_HEIGHTMARGIN;
+
+	}
+
+	// 枠描画
+	function _drawFrame()
+	{
+		//dm("draw frame");
+		
+		//	はみ出してdrawTextされていた場合を考慮し、全域を塗りつぶし
+		drawFrame( FRAME_FLATTEN, 0, 0, width, height );
+		//	選択部分の枠
+		if(pointed){
+			drawFrame( FRAME_SUNKEN, 0, 0, width - height + FIXED_XOFFSET + FIXED_MARGIN, height - FIXED_YOFFSET, selframecolor);
+		}else{
+			drawFrame( FRAME_SUNKEN, 0, 0, width - height + FIXED_XOFFSET + FIXED_MARGIN, height - FIXED_YOFFSET, selcolor);
+		}
+	}
+
+	// キャプション描画
+	function draw()
+	{
+		_drawFrame();
+
+		//	選択されている値
+		var c = caption;
+		if(c!="")
+		{
+			//dm("draw value: "+caption);
+			switch( combostyle ){
+			case COMBO_STYLE_DROPDOWNLIST:
+				//ボックス内にテキストを描画
+				if(pointed){
+					drawText(FIXED_LEFTMARGIN, FIXED_MARGIN + FIXED_YOFFSET, c, seltextcolor,, aa);
+				}else{
+					drawText(FIXED_LEFTMARGIN, FIXED_MARGIN + FIXED_YOFFSET, c, textcolor,, aa);
+				}
+				break;
+			case COMBO_STYLE_DROPDOWN:
+				//インプットコントロールの文字列を指定
+				dropinput.value = caption;
+				break;
+				
+			case COMBO_STYLE_SIMPLE:
+				break;
+			}
+		}
+	}
+
+
+	/*----------------------------------------------------------------------
+	* 以下、各種フック処理
+	----------------------------------------------------------------------*/
+	// マウスダウンでフォーカス、ポインタ移動
+	function onMouseDown(x, y, button, shift=0)
+	{
+		//071030右クリック抑止
+		if( button == mbLeft ){
+			focus();
+			switch( combostyle ){
+			case COMBO_STYLE_DROPDOWNLIST:
+				//ボックス自身を長時間押すと選択レイヤーのポップアップタイマーが開始する
+				popupTimer.interval	= _dropdowntime;
+				popupTimer.enabled	= true;
+				break;
+				
+			case COMBO_STYLE_DROPDOWN:
+				//ボックスの上にインプットコントロールが配置されているのでここでは何もしない
+				break;
+				
+			case COMBO_STYLE_SIMPLE:
+				break;
+			}
+		}
+	}
+
+	function onMouseUp(x, y, button, shift=0)
+	{
+		//071030右クリック抑止
+		if( button == mbLeft ){
+			switch( combostyle ){
+			case COMBO_STYLE_DROPDOWNLIST:
+				if( clickcyclic && ! popupstate ){
+					// 短時間のクリックでは次項目への切り替え動作
+					if(popupTimer.enabled){
+						popupTimer.enabled	= false;
+						popupTimer.interval	= 0;
+						
+						//	次を選択状態にする
+						lastselected = _selected;
+						if(_selected < captions.count - 1){
+							_selected++;
+						}else{
+							_selected	= 0;
+						}
+						if( lastselected != _selected ){
+							onChanged();
+						}
+						draw();
+					}
+				}
+				break;
+				
+			case COMBO_STYLE_DROPDOWN:
+				break;
+				
+			case COMBO_STYLE_SIMPLE:
+				break;
+			}
+		}
+	}
+
+	// ポップアップイベント：コンテキストメニューでドロップダウン
+	function onPopup()
+	{
+		//ポップアップ中・もしくは閉じてすぐは次のポップアップをさせない
+		if( popupstate ){
+			popupTimer.enabled	= false;
+			popupTimer.interval	= 0;
+			return;
+		}
+		switch( combostyle ){
+		case COMBO_STYLE_DROPDOWNLIST:
+		case COMBO_STYLE_DROPDOWN:
+			popupTimer.enabled	= false;
+			popupTimer.interval	= 0;
+//			var menu = new KContextMenu();
+			var	menu = new KDropDownList(, this.onSelected, this.onUnSelected);
+			for( var idx=0; idx<_values.count; idx++ ){
+				menu.addValueItem(_captions[idx], _values[idx], "", true, this.onSelected);
+			}
+			//コンボ枠左下にポップアップ表示
+			menu.dispCount	= dispCount if typeof menu.dispCount != "undefined" && dispCount != void;
+			menu.show(this, 0, height - FIXED_YOFFSET - FIXED_MARGIN );
+			menu.value	= value if typeof menu.value != "undefined";
+			//buttonUpにて通知されるよう仕様変更になったため余剰発行をしてはいけないため削除
+			//dropbutton.buttonUp();
+			break;
+			
+		case COMBO_STYLE_SIMPLE:
+			break;
+		}
+		popupstate = true;
+	}
+
+	// ポップアップ終了状態の遅延リセット
+	function onClose()
+	{
+		closeTimer.enabled	= false;
+		closeTimer.interval	= 0;
+		popupstate = false;
+	}
+	
+	// マウスムーブで選択範囲変更
+	function onMouseMove(x, y)
+	{
+		//dm("KComboBox onMouseMove["+x+","+y+"]");
+		pointed	= true;
+		super.onMouseMove(x, y);
+		draw();
+	}
+
+	// マウスポインタのロスト
+	function onMouseLeave()
+	{
+		//dm("KComboBox onMouseLeave");
+		super.onMouseLeave(...);
+		pointed	= false;
+		draw();
+	}
+	
+	//	選択イベントハンドラ
+	function onSelected(val)
+	{
+		//dm("KComboBox onSelected val=" + val);
+		for(var i=0; i<values.count; i++)
+		{
+			if(_values[i] === val)
+			{
+				switch( combostyle ){
+				case COMBO_STYLE_DROPDOWNLIST:
+					if( _selected != i ){
+						//選択された項目に状態を変更
+						lastselected = _selected;
+						_selected = i;
+						onChanged();
+					}else{
+						//変化なしの場合は前回値の更新のみ
+						lastselected = _selected;
+					}
+					break;
+						
+				case COMBO_STYLE_DROPDOWN:
+					if( _selected != i ){
+						//選択状態とインプットコントロール状態を変更
+						lastselected = _selected;
+						_selected = i;
+						lastinputvalue = inputvalue;
+						inputvalue = _captions[i];
+						dropinput.value = _captions[i];
+						onChanged();
+					}else{
+						//変化なしの場合は前回値の更新のみ
+						lastselected = _selected;
+						lastinputvalue = inputvalue;
+					}
+					break;
+						
+				case COMBO_STYLE_SIMPLE:
+					break;
+				}
+				break;
+			}
+		}
+		closeTimer.interval	= _dropclosetime;
+		closeTimer.enabled	= true;
+	}
+	
+	//	選択終了イベントハンドラ
+	function onUnSelected()
+	{
+		closeTimer.interval	= _dropclosetime;
+		closeTimer.enabled	= true;
+	}
+	
+	//	変更が加えられた
+	function onChanged()
+	{
+		//dm("KComboBox onChanged");
+		switch( combostyle ){
+		case COMBO_STYLE_DROPDOWNLIST:
+			//値の更新を通知
+			onValueModified(value, _values[lastselected]);
+			break;
+			
+		case COMBO_STYLE_DROPDOWN:
+			if( _selected != -1 ){
+				//選択状態更新を通知
+				onValueModified(value, _values[lastselected]);
+			}else{
+				//インプット状態の更新を通知
+				onValueModified(inputvalue, lastinputvalue);
+			}
+			break;
+			
+		case COMBO_STYLE_SIMPLE:
+			break;
+		}
+		draw();
+	}
+	
+	//	inputパーツのイベント
+	function onInputValueModified()
+	{
+		switch( combostyle ){
+		case COMBO_STYLE_DROPDOWNLIST:
+			//インプットコントロールは非表示なのでここには来ない
+			break;
+			
+		case COMBO_STYLE_DROPDOWN:
+			var findidx = -1;
+			for(var i=0; i<values.count; i++){
+				//既にコンボにある項目が入力された場合は選択状態にする
+				if(_captions[i] === dropinput.value)
+				{
+					findidx = i;
+					lastinputvalue = inputvalue;
+					inputvalue = dropinput.value;
+					lastselected = _selected;
+					_selected = i;
+					break;
+				}
+			}
+			if( findidx == -1 ){
+				//コンボにない項目が入力された場合現在選択しているインデックスを無効とする
+				lastinputvalue = inputvalue;
+				inputvalue = dropinput.value;
+				lastselected = _selected;
+				_selected = -1;
+			}
+			onChanged();
+			break;
+			
+		case COMBO_STYLE_SIMPLE:
+			break;
+		}
+	}
+	
+	//	項目の初期化
+	function clear()
+	{
+		discard(_values);
+		discard(_captions);
+		_values	= [];
+		_captions= [];
+		_selected = -1;
+		inputvalue = "";		//クリア漏れ修正 2007/11/14
+		lastselected = -1;
+		dropinput.value = "";
+	}
+
+	//	項目の追加
+	function add(cap, val)
+	{
+		values	= [] if(values == void);
+		captions= [] if(captions == void);
+		values.add(val);
+		captions[values.count - 1]	= cap;
+	}
+
+	//	項目を先頭に追加
+	function addhead(cap, val)
+	{
+		var oldvalues = [];
+		var oldcaptions = [];
+		
+		values	= [] if(values == void);
+		captions= [] if(captions == void);
+		
+		//退避
+		(Array.assign incontextof oldvalues)(values);
+		(Array.assign incontextof oldcaptions)(captions);
+		
+		//初期化
+		discard(_values);
+		discard(_captions);
+		_values = [];
+		_captions = [];
+		
+		//新規追加を先頭に
+		this.add(cap, val);
+		
+		//既存のものを配置
+		for( var i=0; i<oldvalues.count; i++ ){
+			this.add( oldcaptions[i], oldvalues[i] );
+		}
+	}
+	
+	//	項目の削除(index指定 idx=0...count-1)
+	function delAt(idx)
+	{
+		if(idx < 0 || idx > values.count-1){
+			return false;
+		}
+		values.erase(idx);
+		captions.erase(idx);
+		
+		if( idx == _selected ){
+			//選択状態のものが削除された場合、先頭レコード選択状態にする(★仕様検討要)
+			lastselected = _selected;
+			_selected = 0;
+			lastinputvalue = inputvalue;
+			inputvalue = _captions[_selected];
+			dropinput.value = _captions[_selected];
+			draw();
+		}
+		return true;
+	}
+
+	//	項目の削除(値をキーにしてサーチ)
+	function delByValue(val)
+	{
+		if(values == void){
+			return false;
+		}
+		for(var i=0; i<values.count; i++)
+		{
+			if(values[i] === val)
+			{
+				values.erase(i);
+				captions.erase(i);
+				//選択状態のものが削除された場合、先頭レコード選択状態にする(★仕様検討要)
+				if( i == _selected ){
+					lastselected = _selected;
+					_selected = 0;
+					lastinputvalue = inputvalue;
+					inputvalue = _captions[_selected];
+					dropinput.value = _captions[_selected];
+					draw();
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	//	項目の削除(文字列をキーにしてサーチ)
+	function delByCaption(cap)
+	{
+		if(captions == void)
+			return false;
+		for(var i=0; i<captions.count; i++)
+		{
+			if(captions[i] === cap)
+			{
+				captions.erase(i);
+				values.erase(i);
+				//選択状態のものが削除された場合、先頭レコード選択状態にする(★仕様検討要)
+				if( i == _selected ){
+					lastselected = _selected;
+					_selected = 0;
+					lastinputvalue = inputvalue;
+					inputvalue = _captions[_selected];
+					dropinput.value = _captions[_selected];
+					draw();
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	//コンボスタイルの途中変更
+	property combostyle
+	{
+		setter(style)
+		{
+			if( style == _combostyle ){
+				return;
+			}
+			
+			_combostyle = style;
+			
+			switch( style ){
+			case COMBO_STYLE_DROPDOWNLIST:
+				dropinput.visible = false;
+				lastinputvalue = "";
+				inputvalue = "";
+				//インプット入力によりどこも選択状態でない場合先頭にする(★仕様検討要)
+				if( _selected < 0 ){
+					_selected = 0;
+				}
+				lastselected = -1;
+				draw();
+				break;
+				
+			case COMBO_STYLE_DROPDOWN:
+				//何も選ばれていない状態にする
+				dropinput.visible = true;
+				lastinputvalue = "";
+				inputvalue = "";
+				_selected = -1;
+				dropinput.value = "";
+				draw();
+				break;
+				
+			case COMBO_STYLE_SIMPLE:
+				throw new Exception("ごめんなさいまだ対応してないです。 m(_ _)m \n");
+				break;
+			}
+		}
+		getter{ return _combostyle; }
+	}
+
+
+	//	値項目
+	property value
+	{
+		setter(v)	{
+			for(var i=0; i<_values.count; i++)
+			{
+              if(equalStructNumericLoose(v, _values[i]))
+				{
+					if( selected != i ){
+						lastselected = _selected;
+						_selected	= i;
+						lastinputvalue = inputvalue;
+						inputvalue = _captions[i];
+						dropinput.value = _captions[i];
+						draw();
+					}
+					break;
+				}
+			}
+		}
+		getter	{ return selected >= 0 ? _values[selected] : -1; }
+	}
+
+	//	値項目(配列全体)
+	property values
+	{
+		setter(v)	{ _values	= v;	}
+		getter		{ return _values;	}
+	}
+
+	//	文字列選択肢
+	property caption
+	{
+		setter(c)
+		{
+			var find = false;
+			for(var i=0; i<_captions.count; i++)
+			{
+				if(c == _captions[i])
+				{
+					if( selected != i ){
+						//変更された
+						lastselected = _selected;
+						_selected	= i;
+						lastinputvalue = inputvalue;
+						inputvalue = c;
+						dropinput.value = c;
+						draw();
+						find = true;
+					}
+					break;
+				}
+			}
+			if( find == false ){
+				switch( combostyle ){
+				case COMBO_STYLE_DROPDOWNLIST:
+					break;
+				case COMBO_STYLE_DROPDOWN:
+					if( inputvalue != c ){
+						//変更された
+						lastselected = _selected;
+						_selected	= -1;
+						lastinputvalue = inputvalue;
+						inputvalue = c;
+						dropinput.value = c;
+						draw();
+					}
+					break;
+					
+				case COMBO_STYLE_SIMPLE:
+					break;
+				}
+			}
+		}
+		getter
+		{
+			//dm("s = "+selected+" / captions = "+captions);
+			var s = selected;
+			
+			switch( combostyle ){
+			case COMBO_STYLE_DROPDOWNLIST:
+				if(s<0){
+					return "";
+				}else{
+					return _captions[s];
+				}
+				break;
+			case COMBO_STYLE_DROPDOWN:
+				//文字列編集１文字毎にイベントを受けるようになったため不要だが念のため参照時の状態と内部状態を比較しておく
+				if( inputvalue != dropinput.value ){
+					onInputValueModified();
+				}
+				return inputvalue;
+				break;
+				
+			case COMBO_STYLE_SIMPLE:
+				break;
+			}
+		}
+	}
+
+	//	文字列選択肢(配列全体)
+	property captions
+	{
+		setter(c)	{	_captions	= c;	}
+		getter		{	return _captions;	}
+	}
+
+	//	選択されているインデックス
+	property selected
+	{
+		setter(s)
+		{
+			//dm("selected: "+selected+" to "+s);
+			if(selected!==s)
+			{
+				lastselected = _selected;
+				
+				if(s<0 || s>=captions.count){
+					//負値もしくはインデックスを超えた値が指定された
+					_selected	= -1;
+					
+					switch( combostyle ){
+					case COMBO_STYLE_DROPDOWNLIST:
+						break;
+					case COMBO_STYLE_DROPDOWN:
+						//未選択状態にする
+						lastinputvalue = inputvalue;
+						inputvalue = "";
+						dropinput.value = "";
+						draw();
+						break;
+						
+					case COMBO_STYLE_SIMPLE:
+						break;
+					}
+				}else{
+					//有効なインデックスが指定された
+					_selected	= s;
+					
+					switch( combostyle ){
+					case COMBO_STYLE_DROPDOWNLIST:
+						break;
+					case COMBO_STYLE_DROPDOWN:
+						lastinputvalue = inputvalue;
+						inputvalue = _captions[s];
+						draw();
+						break;
+						
+					case COMBO_STYLE_SIMPLE:
+						break;
+					}
+				}
+
+				//onChanged();
+				draw();
+			}
+
+		}
+		getter	{	return _selected;	}
+	}
+
+	//	フォーカス状態
+	property pointed
+	{
+		setter(b)
+		{
+			if(b!=_pointed)
+			{
+				_pointed	= b;
+				draw();
+			}
+		}
+		getter	{	return _pointed;	}
+	}
+	
+	//ポップアップまでの時間(この時間未満のクリックで次メンバへの切り替え動作)
+	property dropdowntime
+	{
+		setter(time){	_dropdowntime = time;	}
+		getter		{	return _dropdowntime;	}
+	}
+	
+	//コンボ枠色設定
+	property selcolor
+	{
+		setter(color){	_selcolor = color;	}
+		getter		 {	return _selcolor;	}
+	}
+	
+	property selframecolor
+	{
+		setter(color){	_selframecolor = color;	}
+		getter		 {	return _selframecolor;	}
+	}
+	
+	//テキストラベル色設定
+	property textcolor
+	{
+		setter(color){	_textcolor = color;	}
+		getter		 {	return _textcolor;	}
+	}
+	
+	property seltextcolor
+	{
+		setter(color){	_seltextcolor = color;	}
+		getter		 {	return _seltextcolor;	}
+	}
+	
+	//再表示
+	function drawContent {
+		draw();
+	}
+	
+	// サイズが変わったらレイアウトやり直し
+	function onSizeModified {
+		switch( combostyle ){
+		case COMBO_STYLE_DROPDOWNLIST:
+		case COMBO_STYLE_DROPDOWN:
+			//※コンストラクタで指定したサイズ固定でないとコンボボックスは不自然・・・
+			//locateLayout();
+			break;
+			
+		case COMBO_STYLE_SIMPLE:
+			break;
+		}
+	}
+
+	// フォント更新
+	function updateRowFont {
+		switch( combostyle ){
+		case COMBO_STYLE_DROPDOWNLIST:
+		case COMBO_STYLE_DROPDOWN:
+			//※コンストラクタで指定したサイズ固定でないとコンボボックスは不自然・・・
+			//locateLayout();
+			break;
+			
+		case COMBO_STYLE_SIMPLE:
+			break;
+		}
+	}
+	
+	// フォントが変わったらアップデート
+	function onFontFaceModified {
+		updateRowFont();
+	}
+
+	// フォントが変わったらアップデート
+	function onFontHeightModified {
+		updateRowFont();
+	}
+
+	// ノードがイネーブルされたら不透明に
+	function onNodeEnabled {
+		opacity = 255;
+	}
+
+	// ノードがディセーブルされたら半透明に
+	function onNodeDisabled {
+		opacity = 64;
+	}
+}
+
+/*----------------------------------------------------------------------------/
+/
+/----------------------------------------------------------------------------*/

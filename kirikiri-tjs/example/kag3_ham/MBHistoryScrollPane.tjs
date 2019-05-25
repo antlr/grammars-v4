@@ -1,0 +1,112 @@
+/******************************************************************************
+	system_mb/mb/system/history/MBHistoryScrollPane.tjs
+*******************************************************************************/
+
+
+class MBHistoryScrollPane extends MBComponentLayer
+{
+	var objSlideBar;	// スライドバー
+	var objSlidePeg;	// つまみ
+	
+	var defaultLength = 482;	// 標準長さ
+	var intMaxPegTop = 440;	// つまみ標準最大位置
+	
+	
+	function MBHistoryScrollPane(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(win, par);
+		
+		init(defaultLength);
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate objSlideBar if (objSlideBar !== void);
+		invalidate objSlidePeg if (objSlidePeg !== void);
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function init(len)
+	{
+		// イニシャライザ
+		
+		if (objSlideBar === void || !isvalid(objSlideBar)) {
+			objSlideBar = new MBHistoryScrollBar(window, this);
+			objSlidePeg = new MBHistoryScrollPeg(window, this);
+		}
+		
+		setSize(objSlidePeg.width, len);
+		intMaxPegTop = len - objSlidePeg.height;
+		
+		objSlideBar.setPos(
+			(width - objSlideBar.width) * 0.5,
+			0);
+		
+		hitType      = htMask;
+		hitThreshold = 0;
+		visible      = true;
+	}
+	
+	
+	//==========================================================================
+	
+	function initPegPosition(num)
+	{
+		// つまみの位置とかを初期化
+		
+		objSlidePeg.intMaxStartLine = num;
+		objSlidePeg.top             = intMaxPegTop;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setPegPositionByLine(num)
+	{
+		// スクロールしたときにつまみの位置を変える
+		
+		objSlidePeg.top = Math.round(
+			intMaxPegTop * (num / objSlidePeg.intMaxStartLine)
+		);
+	}
+	
+	//==========================================================================
+	
+	function scrollByBarClick(num, updatestate)
+	{
+		// バーのクリックで表示を変える
+		
+		if (num > intMaxPegTop) {
+			num = intMaxPegTop;
+		}
+		else if (num < 0) {
+			num = 0;
+		}
+		
+		var tg = Math.round(
+			objSlidePeg.intMaxStartLine * (num / intMaxPegTop)
+		);
+		
+		parent.dispStart = (int) tg;
+		parent.updatePageBySlidePane(updatestate);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		if (button == mbRight) {
+			parent.onRightClickedOnChild();
+			return;
+		}
+		
+		super.onMouseDown(...);
+		scrollByBarClick(y - objSlidePeg.height * 0.5, true);
+	}
+}

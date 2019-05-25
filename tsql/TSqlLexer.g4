@@ -178,6 +178,7 @@ IDENTITY:                              'IDENTITY';
 IDENTITYCOL:                           'IDENTITYCOL';
 IDENTITY_INSERT:                       'IDENTITY_INSERT';
 IF:                                    'IF';
+IIF:                                   'IIF';
 IN:                                    'IN';
 INCLUDE:                               'INCLUDE';
 INCREMENT:                             'INCREMENT';

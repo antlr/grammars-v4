@@ -140,6 +140,7 @@
 				<!-- <module>javascript</module> TODO: required superClass support -->
 				<module>jpa</module>
 				<module>json</module>
+				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kotlin-formal</module>
 				<module>kuka</module>
@@ -231,6 +232,7 @@
 				<module>tinymud</module>
 				<module>tnsnames</module>
 				<module>tnt</module>
+				<module>toml</module>
 				<module>tsql</module>
 				<module>tsv</module>
 				<module>turtle</module>
@@ -244,6 +246,7 @@
 				<module>vba</module>
 				<module>verilog</module>
 				<module>vhdl</module>
+				<module>wat</module>
 				<module>wavefront</module>
 				<module>webidl</module>
 				<module>wkt</module>

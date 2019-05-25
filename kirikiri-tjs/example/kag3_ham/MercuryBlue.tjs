@@ -1,0 +1,212 @@
+/******************************************************************************
+	Base/MercuryBlue.tjs
+	
+	Ham拡張（MercuryBlue）システムの統括。
+	具体的には、独自クラスをきちんと片付けたり、
+	余計なものをセーブしないようにしたりします。
+	
+	このオブジェクトは必ずkag.addPlugin()されていなければなりません。
+*******************************************************************************/
+
+
+class MercuryBlue extends KAGPlugin
+{
+	// プロパティ
+	var window;	// ウィンドウ参照
+	
+	// 管理オブジェクト
+	var objSystemManager;	// システムマネージャ
+	//var objGraphicManager;	// 画像オブジェクトマネージャ
+	//var objSceneManager;	// ノベルマネージャ
+	
+	var objXMBPluginKeys = [];	// XMBプラグイン管理キー配列
+	var objXMBPlugins    = %[];	// XMBプラグイン管理辞書配列
+	
+	
+	// その他インスタンス変数
+	var objTemps = [];	// その他一時使用オブジェクト格納用配列
+	
+	
+	
+	function MercuryBlue(win)
+	{
+		// コンストラクタ
+		
+		window = win;
+		
+		objSystemManager  = new MBSystemManager(window);
+		//objGraphicManager = new MBGraphicManager(window);
+		//objSceneManager   = new MBSceneManager2(window);
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		var i;
+		for (i=0; i<objTemps.count; i++) {
+			invalidate objTemps[i] if (objTemps[i] !== void);
+		}
+		invalidate objTemps if (objTemps !== void);
+		
+		for (i=0; i<objXMBPlugins.count; i++) {
+			invalidate objXMBPlugins[objXMBPluginKeys[i]] if (objXMBPlugins[objXMBPluginKeys[i]] !== void);
+		}
+		
+		//invalidate objSceneManager   if (objSceneManager   !== void);
+		//invalidate objGraphicManager if (objGraphicManager !== void);
+		invalidate objSystemManager  if (objSystemManager  !== void);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function addTempObject(obj)
+	{
+		// 一時オブジェクトを作って参照を返す
+		
+		objTemps.add(obj);
+		dm("<MBSystem> 一時オブジェクトが生成されました (計 %d 個)。".sprintf(objTemps.count));
+		return objTemps[objTemps.count - 1];
+	}
+	
+	function removeTempObject(obj)
+	{
+		// 一時オブジェクトを片付ける
+		
+		var index = objTemps.find(obj);
+		invalidate objTemps[index] if (objTemps[index] !== void);
+		objTemps.remove(obj);
+		dm("<MBSystem> 一時オブジェクトが削除されました (計 %d 個)。".sprintf(objTemps.count));
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function destoryAllTempObjects()
+	{
+		var i;
+		for (i=0; i<objTemps.count; i++) {
+			invalidate objTemps[i] if (objTemps[i] !== void);
+		}
+		objTemps.clear();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function cancelKBOperationFlagOnMouseClick()
+	{
+		// マウスクリックされたときにキーボード操作中フラグを下ろす
+		// KAGのleftClickHook, rightClickHookから呼ばれる
+		
+		SystemManager.fcSetKBOperationState(false);
+		return false;	// このままメソッドを呼び続けるため常にfalseを返す
+	}
+	
+	
+	//==========================================================================
+	// XMBプラグイン
+	
+	function addXMBPlugin(obj)
+	{
+		// プラグインを管理下に編入
+		
+		if (obj !== void) {
+			var key = "pl%d".sprintf(objXMBPluginKeys.count);
+			objXMBPlugins[key] = obj;
+			objXMBPluginKeys.add(key);
+			
+			dm("<MBSystem> XMBプラグインが追加されました。現在 %d 個のプラグインが管理下にあります。".sprintf(objXMBPluginKeys.count));
+			
+			return key;
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function removeXMBPlugin(key)
+	{
+		// プラグインを抜く
+		
+		if (key == "") {
+			return;
+		}
+		
+		var idx = objXMBPluginKeys.find(key);
+		
+		if (idx < 0) {
+			dm("<MBSystem> 指定されたXMBプラグインは使用されていないか、管理下にありません。この処理はスキップされました。");
+			return;
+		}
+		
+		invalidate objXMBPlugins[key] if (objXMBPlugins[key] !== void);
+		objXMBPluginKeys.erase(idx);
+		
+		dm("<MBSystem> XMBプラグインが削除されました。現在 %d 個のプラグインが管理下にあります。".sprintf(objXMBPluginKeys.count));
+	}
+	
+	
+	//==========================================================================
+	
+	function onStore(f, elm)
+	{
+		// セーブ時に呼ばれる
+		
+		dm("<MBSystem> データのセーブを開始します...");
+		var st = System.getTickCount();
+		
+		if (f.MercuryBlue === void) {
+			f.MercuryBlue = %[
+				plugins    : %[]
+			];
+		}
+		
+		var dict = f.MercuryBlue;
+		dict.systemManager  = objSystemManager.save();
+		//dict.graphicManager = objGraphicManager.save();
+		//dict.sceneManager   = objSceneManager.save();
+		
+		var i;
+		for (i=0; i<objXMBPluginKeys.count; i++) {
+			var key = objXMBPluginKeys[i];
+			dict.plugins[key] = objXMBPlugins[key].save();
+		}
+		
+		dm("<MBSystem> データのセーブが完了しました (%dmsec)".sprintf(System.getTickCount() - st));
+	}
+	
+	function onRestore(f, elm, clear)
+	{
+		// ロード時に呼ばれる
+		
+		dm("<MBSystem> データのロードを開始します...");
+		var st = System.getTickCount();
+		
+		// 一時オブジェクトは全て破棄する
+		var i;
+		for (i=0; i<objTemps.count; i++) {
+			invalidate objTemps[i] if (objTemps[i] !== void);
+		}
+		objTemps.clear();
+		
+		var dict = f.MercuryBlue;
+		
+		objSystemManager.load(dict.systemManager);
+		//objGraphicManager.load(dict.graphicManager);
+		//objSceneManager.load(dict.sceneManager);
+		
+		var i;
+		for (i=0; i<objXMBPluginKeys.count; i++) {
+			var key = objXMBPluginKeys[i];
+			if (objXMBPlugins[key] !== void) {
+				objXMBPlugins[key].load(dict.plugins[key]);
+			}
+		}
+		
+		//GraphicManager.hideLoadingCartain();
+		
+		if (MBSystemPref !== void && MBSystemPref.title != "") {
+			window.caption = MBSystemPref.title;
+		}
+		
+		dm("<MBSystem> データのロードが完了しました (%dmsec)".sprintf(System.getTickCount() - st));
+	}
+}

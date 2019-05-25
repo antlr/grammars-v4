@@ -1,0 +1,415 @@
+//
+// $id: WidgetSample.tjs,v 1.10 2007/09/22 21:38:39 cvs Exp $
+//
+
+/*----------------------------------------------------------------------
+ * タグテキストエディットサンプル
+ ----------------------------------------------------------------------*/
+class TagTextEdit extends KTagTextEdit
+{
+  // tagPat
+  var tagStr;
+  // valueプロパティを上書き
+  var valueOld;
+
+  // コンストラクタ
+  function TagTextEdit {
+    super.KTagTextEdit(...);
+
+    // タグ文字の設定
+    tagStr = "@";
+    // valueプロパティをつけかえる
+    valueOld = &value;
+    &value = &valueNew;
+  }
+
+  // valueプロパティの置き換え
+  property valueNew {
+    setter(v) {
+      // 値からタグを取り覗いてまず文字として設定
+      valueOld = v.replace(new RegExp(tagStr, "g"), "");
+      // 改行で分割して配列に格納
+      var text = v.split(linefeedPat);
+      // タグをあらわす正規表現
+      var tagPat = new RegExp(tagStr);
+      // 前から順に、タグを検出して挿入していく
+      for (var row = 0; row < text.count; row++) {
+	var str = text[row];
+	var col = 0;
+	while (tagPat.test(str)) {
+	  col += tagPat.index;
+	  str = tagPat.rightContext;
+	  insertTag(row, col, void, false);
+	}
+      }
+    }
+
+    getter {
+      // テキストの値を改行で分割して配列に格納
+      var text = valueOld.split(linefeedPat);
+      // 後ろから順に、タグの位置に文字列を挿入
+      for (var index = tagCount - 1; index >= 0; index--) {
+	var tag = tagAt(index);
+	text[tag.row] = text[tag.row].substr(0, tag.col) + tagStr + text[tag.row].substr(tag.col);
+      }
+      // 再びテキストをつなぎ合わせて返す
+      return text.join("\r\n");
+    }
+  }
+
+  // コンテキストメニューの拡張
+  function buildContextMenu {
+    var menu = super.buildContextMenu();
+    menu.addSeparator();
+    menu.addItem("タグを挿入する", "", ! isTagOnPointer, this.insertTagAtPointer);
+    menu.addItem("タグを削除する", "", isTagOnPointer, this.deleteTagAtPointer);
+    return menu;
+  }
+
+  // ポインタがタグをポイントした時に呼ばれる
+  function onTagPointAt(index) {
+    Debug.message("タグポイント", index);
+  }
+
+  // ポインタに比べて一番小さいタグ(カレントタグ)が変わった時に呼ばれる
+  function onTagRegionAt(index) {
+    Debug.message("タグリージョン", index);
+  }
+
+  // タグが挿入された時に呼ばれる
+  function onTagInsertAt(index) {
+    Debug.message("タグ挿入", index);
+  }
+
+  // タグが削除された時に呼ばれる
+  function onTagDeleteAt(index) {
+    Debug.message("タグ削除", index);
+  }
+}
+
+
+
+/*----------------------------------------------------------------------
+ * ウィジェットサンプル
+ ----------------------------------------------------------------------*/
+class WidgetSample extends KWindow
+{
+  // コンストラクタ
+  function WidgetSample() {
+    super.KWindow("widgetsample_window");
+
+    // ウィンドウ初期設定
+    caption = 'ウィジェットサンプル';
+    imeMode = imDontCare;
+    borderStyle = bsSingle;
+    alwaysSetToMinSize = true;
+
+    // ウィンドウ内のウィジェットの初期値を設定
+    defaultSpace = 4;
+    defaultMargin = 6;
+    defaultAlignHorizontal = ALIGN_CENTER;
+    defaultAlignVertical = ALIGN_CENTER;
+    defaultFocusable = true;
+
+    // メニューを作成、配置
+    menu.addItem("メニュー", "menuTop");
+    menuTop.addItem("アクション1", "menuAction1");
+    menuTop.addItem("アクション2", "menuAction2");
+    menuTop.addSeparator();
+    menuTop.addToggleItem("トグル1", false, "menuToggle1");
+    menuTop.addToggleItem("トグル2", true, "menuToggle2");
+    menuTop.addSeparator();
+    menuTop.addItem("入れ子メニュー", "menuNest");
+    menuNest.addRadioItem("ラジオその1", 1, "menuRadio");
+    menuNest.addRadioItem("ラジオその2", 2, "menuRadio");
+    menuNest.addRadioItem("ラジオその3", 3, "menuRadio");
+    menuTop.addSeparator();
+    menuTop.addItem("カスタムダイアログ", "customDialogTest");
+
+    menu.addItem("ズーム", "zoomRoot");
+    zoomRoot.addRadioItem("50%", 50, "zoom");
+    zoomRoot.addRadioItem("60%", 60, "zoom");
+    zoomRoot.addRadioItem("70%", 70, "zoom");
+    zoomRoot.addRadioItem("80%", 80, "zoom");
+    zoomRoot.addRadioItem("90%", 90, "zoom");
+    zoomRoot.addRadioItem("100%", 100, "zoom");
+    zoomRoot.addRadioItem("110%", 110, "zoom");
+    zoomRoot.addRadioItem("120%", 120, "zoom");
+    zoomRoot.addRadioItem("130%", 130, "zoom");
+    zoomRoot.addRadioItem("140%", 140, "zoom");
+    zoomRoot.addRadioItem("150%", 150, "zoom");
+    zoom.value = 100;
+
+    menuAction1.shortcut = "Ctrl+1";
+    menuAction2.shortcut = "Ctrl+2";
+    menuToggle1.shortcut = "Ctrl+3";
+    menuToggle2.shortcut = "Ctrl+4";
+
+    // ウィジェットを作成、配置
+    var tabs, tabGrid, widgetFrame, widgetGrid, scroll, colorGrid;
+    tabs = new KTabLayout(this, FRAME_RAISED, "tabs");
+
+    // ボタンのサンプル
+    tabGrid = new KGridLayout(this);
+    widgetFrame = new KFrameLayout(this, FRAME_FLATTEN, "ノーマルボタン", "normalButtonFrame");
+        widgetGrid = new KGridLayout(this);
+          widgetGrid.add(0, 0, new KTextButton(this, "ボタン", "textbutton"));
+          widgetGrid.add(1, 0, new KImageButton(this, "gotta_mail", "imagebutton"));
+      widgetFrame.add(widgetGrid);
+    tabGrid.add(0, 0, widgetFrame);
+      widgetFrame = new KFrameLayout(this, FRAME_FLATTEN, "トグルボタン");
+        widgetGrid = new KGridLayout(this);
+         widgetGrid.add(0, 0, new KTextToggleButton(this, "ボタン", "texttogglebutton"));
+         widgetGrid.add(1, 0, new KImageToggleButton(this, "gotta_mail", "imagetogglebutton"));
+      widgetFrame.add(widgetGrid);
+    tabGrid.add(0, 1, widgetFrame);
+
+    tabs.add("ボタン", tabGrid);
+
+    // ラジオボタンのサンプル
+    tabGrid = new KGridLayout(this);
+      widgetFrame = new KFrameLayout(this, FRAME_FLATTEN, "ラジオボタン");
+       widgetGrid = new KRadioLayout(this, "radio1");
+         widgetGrid.add(0, 0, new KRadioButton(this, "項目1", 1));
+         widgetGrid.add(1, 0, new KRadioButton(this, "項目2", 2));
+         widgetGrid.add(0, 1, new KRadioButton(this, "項目3", 3));
+         widgetGrid.add(1, 1, new KRadioButton(this, "項目4", 4));
+       widgetFrame.add(widgetGrid);
+    tabGrid.add(0, 0, widgetFrame);
+      widgetFrame = new KFrameLayout(this, FRAME_FLATTEN, "異種混合");
+        widgetGrid = new KRadioLayout(this, "radio2");
+          widgetGrid.add(0, 0, new KRadioButton(this, "項目1", 1));
+          widgetGrid.add(1, 0, new KCheckBox(this, "項目2", 2));
+          widgetGrid.add(0, 1, new KTextToggleButton(this, "項目3", 3));
+          widgetGrid.add(1, 1, new KImageToggleButton(this, "gotta_mail", 4));
+      widgetFrame.add(widgetGrid);
+    tabGrid.add(0, 1, widgetFrame);
+  
+    tabs.add("ラジオボタン", tabGrid);
+
+    // スライダーのサンプル
+    tabGrid = new KGridLayout(this);
+      widgetFrame = new KFrameLayout(this, FRAME_FLATTEN, "スライダー");
+        widgetGrid = new KGridLayout(this);
+          widgetGrid.add(0, 0, new KTextLabel(this, "0〜100"));
+          widgetGrid.add(1, 0, new KSlider(this, SLIDER_ADAPTIVE_WIDTH, 20, 0, 100, 1, "slider1"));
+          widgetGrid.add(0, 1, new KTextLabel(this, "-1000〜1000"));
+          widgetGrid.add(1, 1, new KSlider(this, 200, 20, -1000, 1000, 1, "slider2"));
+          widgetGrid.add(0, 2, new KTextLabel(this, "24〜34"));
+          widgetGrid.add(1, 2, new KSlider(this, 200, 20, 24, 34, 1, "slider3"));
+      widgetFrame.add(widgetGrid);
+    tabGrid.add(0, 0, widgetFrame);
+      widgetFrame = new KFrameLayout(this, FRAME_FLATTEN, "テキストスライダー");
+        widgetGrid = new KGridLayout(this);
+          widgetGrid.add(0, 0, new KTextLabel(this, "0〜10(0.1刻み)"));
+          widgetGrid.add(1, 0, new KTextInputSlider(this, SLIDER_ADAPTIVE_WIDTH, 20, 0, 10, 0.1, "textinputslider"));
+      widgetFrame.add(widgetGrid);
+    tabGrid.add(0, 1, widgetFrame);
+    
+    tabs.add("スライダー", tabGrid);
+
+    // コンボボックスのサンプル
+    tabGrid = new KGridLayout(this);
+      widgetFrame = new KFrameLayout(this, FRAME_FLATTEN, "コンボボックス");
+        widgetGrid = new KGridLayout(this);
+        widgetGrid.add(0, 0, new KComboBox(this, 200, 20, COMBO_STYLE_DROPDOWN, "combobox1"));
+        widgetGrid.add(0, 1, new KComboBox(this, 200, 20, COMBO_STYLE_DROPDOWNLIST, "combobox2"));
+      widgetFrame.add(widgetGrid);
+    tabGrid.add(0, 0, widgetFrame);
+
+    tabs.add("コンボボックス", tabGrid);
+
+    // テキスト入力のサンプル
+    tabGrid = new KGridLayout(this);
+      widgetFrame = new KFrameLayout(this, FRAME_FLATTEN, "テキストインプット");
+        widgetGrid = new KGridLayout(this);
+          widgetGrid.add(0, 0, new KTextLabel(this, "英数字のみ"));
+          widgetGrid.add(1, 0, new KTextInput(this, 100, 20, TEXT_SYMBOL, "textinput1"));
+          widgetGrid.add(0, 1, new KTextLabel(this, "整数のみ"));
+          widgetGrid.add(1, 1, new KTextInput(this, 100, 20, TEXT_DIGIT, "textinput2"));
+          widgetGrid.add(0, 3, new KTextLabel(this, "少数のみ"));
+          widgetGrid.add(1, 3, new KTextInput(this, 100, 20, TEXT_REAL, "textinput3"));
+          widgetGrid.add(0, 4, new KTextLabel(this, "なんでも"));
+          widgetGrid.add(1, 4, new KTextInput(this, 100, 20, TEXT_ANY, "textinput4"));
+      widgetFrame.add(widgetGrid);
+    tabGrid.add(0, 0, widgetFrame);
+      widgetFrame = new KFrameLayout(this, FRAME_FLATTEN, "テキストエディット");
+        widgetGrid = new KGridLayout(this);
+        widgetGrid.margin = 0;
+	  var radioGrid = new KRadioLayout(this, "textedit_keybind");
+	  radioGrid.add(0, 0, new KCheckBox(this, "WINバインド", "windows_bind"));
+	  radioGrid.add(1, 0, new KCheckBox(this, "emacsバインド", "emacs_bind"));
+	  radioGrid.onValueModified = function(value) {
+	    switch (value) {
+	      case "windows_bind": window.textedit.bindWindowsKeyMap(); break;
+	      case "emacs_bind":   window.textedit.bindEmacsKeyMap();   break;
+	    }
+	  } incontextof(radioGrid);
+        widgetGrid.add(0, 0, radioGrid);
+          scroll = new KScrollLayout(this, false, true);
+          scroll.add(new TagTextEdit(this, "textedit"));
+          scroll.textedit.margin = 0;
+        widgetGrid.add(0, 1, scroll);
+      widgetFrame.add(widgetGrid);
+    tabGrid.add(0, 1, widgetFrame);
+
+    tabs.add("テキスト", tabGrid);
+
+    // カラーボックスのサンプル
+    tabGrid = new KGridLayout(this);
+      widgetFrame = new KFrameLayout(this, FRAME_FLATTEN, "カラー(α無し)");
+        colorGrid = new KGridLayout(this);
+        colorGrid.space = 5;
+        for (var y = 0; y < 5; y++) 
+          for (var x = 0; x < 10; x++) {
+            var colorBox = new KColorBox(this, 20, 20, "color" + x + y);
+            var rgb = Layer.HSV2RGB(x * 360 / 10, y * 100 / 4, 100);
+            colorBox.value = (rgb.r << 16) | (rgb.g << 8) | (rgb.b);
+            colorBox.margin = 0;
+            var colorFrame = new KFrameLayout(this, FRAME_SUNKEN);
+            colorFrame.add(colorBox);
+            colorFrame.margin = 0;
+            colorGrid.add(x, y, colorFrame);
+          }
+      widgetFrame.add(colorGrid);
+    tabGrid.add(0, 0, widgetFrame);
+      widgetFrame = new KFrameLayout(this, FRAME_FLATTEN, "カラー(α有り)");
+        colorGrid = new KGridLayout(this);
+        colorGrid.space = 5;
+        for (var y = 0; y < 5; y++) 
+          for (var x = 0; x < 10; x++) {
+            var colorBox = new KColorBox(this, 20, 20, "alpha" + x + y);
+            colorBox.hasAlpha = true;
+            var rgb = Layer.HSV2RGB(x * 360 / 10, y * 100 / 4, 100);
+            colorBox.value = 0x80000000 | (rgb.r << 16) | (rgb.g << 8) | (rgb.b);
+            colorBox.margin = 0;
+            var colorFrame = new KFrameLayout(this, FRAME_SUNKEN);
+            colorFrame.add(colorBox);
+            colorFrame.margin = 0;
+            colorGrid.add(x, y, colorFrame);
+          }
+      widgetFrame.add(colorGrid);
+    tabGrid.add(0, 1, widgetFrame);
+
+    tabs.add("カラー", tabGrid);
+
+    defaultMargin = 0;
+    defaultSpace = 0;
+    var rootGrid = new KGridLayout(this);
+    rootGrid.add(0, 0, tabs);
+    rootGrid.add(0, 1, new KVerticalSeparator(this));
+    rootGrid.add(0, 2, new KStatusBar(this));
+    statusBar.margin = 3;
+      
+    // プライマリウィジェットにタブを登録
+    primaryWidget.add(rootGrid);
+
+    // ウィジェットの初期設定
+    // 値持ちウィジェットは登録した名前で直接参照できる
+    radio1.value = 1;
+    radio2.value = 1;
+    textedit_keybind.value = "windows_bind";
+    textedit_keybind.windows_bind.focusable = false;
+    textedit_keybind.emacs_bind.focusable = false;
+
+    combobox1.add("ドロップダウンコンボのいち", "combo11");
+    combobox1.add("ドロップダウンコンボのに",   "combo12");
+    combobox1.add("ドロップダウンコンボのさん", "combo13");
+    combobox1.add("ドロップダウンコンボのよん", "combo14");
+    combobox1.add("ドロップダウンコンボのご",   "combo15");
+    combobox1.caption = "ドロップダウンコンボ入力";
+
+    combobox2.add("ドロップダウンリストのいち", "combo21");
+    combobox2.add("ドロップダウンリストのに",   "combo22");
+    combobox2.add("ドロップダウンリストのさん", "combo23");
+    combobox2.add("ドロップダウンリストのよん", "combo24");
+    combobox2.add("ドロップダウンリストのご",   "combo25");
+    combobox2.value = "combo22";
+
+    // ステータスバーの設定
+    statusBar.defaultLabel = "ステータスバー";
+    textbutton.status = textbutton.hint = "テキストボタン";
+    imagebutton.status = imagebutton.hint = "イメージボタン";
+    texttogglebutton.status = texttogglebutton.hint = "テキストトグルボタン";
+    imagetogglebutton.status = imagetogglebutton.hint = "イメージトグルボタン";
+    radio1.status = "ラジオボタン1";
+    radio2.status = "ラジオボタン2";
+    slider1.status = "スライダー1";
+    slider2.status = "スライダー2";
+    slider3.status = "スライダー3";
+    textinputslider.status = "テキストインプットスライダー";
+    combobox1.status = "コンボボックス1";
+    combobox2.status = "コンボボックス2";
+    textinput1.status = "テキストインプット(英数字)";
+    textinput2.status = "テキストインプット(整数のみ)";
+    textinput3.status = "テキストインプット(少数のみ)";
+    textinput4.status = "テキストインプット(なんでも)";
+    textedit.status = "テキストエディット";
+
+    // ヘルプテキストの設定
+    normalButtonFrame.helpText = "任意のヘルプメッセージを\nこの場所に表示出来ます";
+    
+    // 永続化辞書の作成
+    var dict = new KPersistentDictionary(System.dataPath + "widgetsample_dict.txt");
+    // ウィンドウの管理オブジェクトに辞書を追加して、
+    // finalize時に自動的に内容がセーブされるようにする。
+    add(dict);
+    // ウィンドウ内の名前を持っているウィジェットと辞書をバインドする。
+    // これにより、アプリ終了時のウィジェットの値が次回起動時に持ち越される。
+    // ウィンドウ自身のサイズと座標も辞書に記録される。
+    bindPersistentDictionary(dict);
+
+    // テキストエディットのバインドの初期値を反映させる
+    textedit_keybind.invalidateValue();
+
+    // ズームの初期値を反映させる
+    zoom.invalidateValue();
+  }
+
+  // ウィジェットの値が更新された時に呼ばれるフック関数
+  function onChildValueModified(child, value) {
+    switch (child.name) {
+    default: {
+      // 更新のあったウィジェットの名前と値を表示。
+      Debug.message("child value modified", child.name, typeof(value), value);
+      break;
+    }
+      // ズーム変更
+    case "zoom":
+      setZoom(value, 100);
+      break;
+
+      // プレーンダイアログテスト
+    case "customDialogTest":
+      queryCustomDialog(this, dict, 
+                       %[ 
+                         name: "test_dialog",
+                         caption: "Test Dialog",
+                         widgetList: [ %[ name: "check", label: "チェックボックス", type: DIALOG_WIDGET_TYPE_CHECKBOX,  defaultValue: true ],
+                                       %[ name: "int",   label: "整数入力",         type: DIALOG_WIDGET_TYPE_TEXTINPUT, textType: TEXT_DIGIT ],
+                                       %[ name: "real",  label: "小数入力",         type: DIALOG_WIDGET_TYPE_TEXTINPUT, textType: TEXT_REAL, defaultValue: 0.5 ],
+                                       %[ name: "str",   label: "文字入力",         type: DIALOG_WIDGET_TYPE_TEXTINPUT, textType: TEXT_ANY ],
+                                       %[ name: "text",  label: "テキスト",         type: DIALOG_WIDGET_TYPE_TEXTAREA,   defaultValue: "ほげ\nもげ" ],
+                                       %[ name: "list",  label: "リスト",           type: DIALOG_WIDGET_TYPE_DROPDOWNLIST, listItems: [ "項目1", [ "項目2", 2 ], [ "項目3", 3 ] ], defaultValue: 2]
+                                       ]
+                          ]);
+      break;
+    }
+  }
+};
+
+//----------------------------------------------------------------------
+// サンプル表示・非表示の切り替え
+global.widgetSample = void;
+
+function showWidgetSample
+{
+  if (widgetSample === void)
+    widgetSample = new WidgetSample();
+  widgetSample.visible = true;
+}
+
+function hideWidgetSample
+{
+  widgetSample.visible = false;
+}

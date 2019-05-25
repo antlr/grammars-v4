@@ -1,0 +1,182 @@
+//Scripts.dump();
+//Scripts.execStorage("test.tjs");
+
+var isFaild = false;
+
+// property test
+Debug.message( "property test" );
+
+var propvalue;
+property property1
+{
+	setter(v)
+	{
+		propvalue = v;
+	}
+	getter
+	{
+		return propvalue;
+	}
+}
+property1=5;
+property1++;
+if( property1 != 6 ) {
+	Debug.message( "faild: property1" );
+}
+function proptest() {
+	var p = &property1;
+	*p = 30;
+	if( (*p) != 30 ) {
+		Debug.message( "faild: &property1" );
+	}
+}
+proptest();
+
+
+Debug.message( "class test" );
+class test {
+	function test() {
+		variable = 0;
+		if( variable != 0 ) {
+			Debug.message( "faild: class test::test," + variable );
+		}
+	}
+
+	function finalize() {
+		Debug.message("success: class test::finalize");
+	}
+
+	function method1() {
+		if( variable != 5 ) {
+			Debug.message( "faild: class test::method1," + variable );
+		}
+	}
+	function method2() {
+		return variable;
+	}
+	function getVal() { return variable; }
+	var variable;
+	property prop {
+		getter() { return variable; }
+		setter(v) { variable = v; }
+	}
+	property prop2 {
+		setter(v) { variable = v; }
+		getter() { return variable; }
+	}
+}
+var tmp = new test();
+tmp.variable = 6;
+if( tmp.prop != 6 ) {
+	Debug.message( "faild: class test::prop" );
+}
+tmp.prop = 4;
+tmp.prop++;
+tmp.method1();
+// test closure
+var objmethod = tmp.method1;
+objmethod();
+var t2 = new test();
+objmethod = tmp.getVal;
+if( (objmethod incontextof tmp)() != 5 ) {
+	Debug.message( "faild: class test incontextof" );
+}
+if( (objmethod incontextof t2)() != 0 ) {
+	Debug.message( "faild: class test incontextof" );
+}
+function classproptest() {
+	var p = &property1;
+	&tmp.addProp = p; // p を tmp の addProp として登録する
+	tmp.addProp = 20;
+	if( tmp.addProp != 20 ) {
+		Debug.message( "faild: tmp.addProp" );
+	}
+	if( (*p) != 20 ) {
+		Debug.message( "faild: &property1" );
+	}
+	if( property1 != 20 ) {
+		Debug.message( "faild: &property1" );
+	}
+}
+classproptest();
+
+invalidate tmp;
+
+class arg2Class {
+	var a, b;
+	function arg2Class( a, b ) {
+		if( a == 5 && b == 6 ) {
+		} else {
+			Debug.message("faild: arg2Class");
+		}
+		this.a = a;
+		this.b = b;
+	}
+	property x {
+		getter() { return a; }
+		setter(v) { a = v; }
+	}
+}
+var newobject = new arg2Class(5, 6);
+invalidate newobject;
+
+// test 継承
+class testInherited extends test {
+	function testInherited() {
+		super.test();
+		if( variable != 0 ) {
+			Debug.message( "faild: class testInherited::testInherited," + variable );
+		}
+	}
+	function finalize() {
+		super.finalize();
+	}
+	function method2() {
+		var t = super.method2();
+		if( t != 5 ) {
+			Debug.message( "faild: class testInherited::method2" );
+		}
+		return t;
+	}
+}
+var tmp2 = new testInherited();
+tmp2.prop = 5;
+tmp2.method1();
+tmp2.method2();
+
+
+class ClassA {
+	var a;
+	function ClassA() {
+		a = 10;
+	}
+	function finalize() {
+		Debug.message("success: class ClassA::finalize");
+	}
+}
+class ClassB {
+	var b;
+	function ClassB() {
+		b = 20;
+	}
+	function finalize() {
+		Debug.message("success: class ClassB::finalize");
+	}
+}
+class SubClass extends ClassA, ClassB {
+	function SubClass() {
+		ClassA();
+		ClassB();
+	}
+	function finalize() {
+		global.ClassA.finalize();
+		global.ClassB.finalize();
+	}
+}
+var sub = new SubClass();
+if( sub.a != 10 || sub.b != 20 ) {
+	Debug.message( "faild: class SubClass" );
+}
+
+
+

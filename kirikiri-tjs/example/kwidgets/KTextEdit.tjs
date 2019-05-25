@@ -1,0 +1,1870 @@
+//
+// $Id: KTextEdit.tjs,v 1.18 2007/09/22 21:38:39 cvs Exp $
+//
+
+/*----------------------------------------------------------------------
+ * テキストエディットの1行
+ ----------------------------------------------------------------------*/
+class KTextEditRow extends Layer
+{
+  // キャラのリスト(文字列そのもの)  
+  var charList;
+  // 見た目上の文字列のリスト
+  var charViewList;
+  // キャラのリスト(文字列そのもの)  
+  var charList;
+  // キャラの表示幅のリスト
+  var charWidthList;
+  // 最小幅(キャラの表示幅の内最大のもの)
+  var minWidth;
+  // テキスト幅の合計
+  var textWidth;
+  // キャラの表示座標。文字数+1のサイズを持つ(末尾のカーソル表示座標)
+  var charX, charY;
+  // 行の表示範囲(配列で、左端インデックス、右端インデックス、右端X座標を記録)
+  var rowRange;
+  // レイアウト変更が必須かどうか？
+  var requireLayout;
+  // 選択範囲
+  var selectionBegin, selectionEnd;
+  // テキストを隠す？
+  var _hideText = false;
+  // 隠しパターン
+  var hidePat = /./g;
+
+  /*------------------------------
+   * コンストラクタ
+   ------------------------------*/
+  function KTextEditRow(window, parent) {
+    super.Layer(window, parent);
+    // 親のフォント基準にフォント決定
+    font.height = parent.font.height;
+    font.face = parent.font.face;
+    // 初期化
+    charList = charViewList = "";
+    charWidthList = [];
+    charX = [];
+    charY = [];
+    selectionBegin = selectionEnd = -1;
+    // マウスイベントは透過
+    hitThreshold = 256;
+    // カーソルの後ろに表示
+    absolute = 0;
+  }
+
+  /*------------------------------
+   * 隠しテキストエンコード
+   ------------------------------*/
+  function encodeHidden(v) {
+    if (_hideText)
+      return v.replace(hidePat, "*");
+    else
+      return v;
+  }
+
+  /*------------------------------
+   * テキストを隠す？
+   ------------------------------*/
+  property hideText {
+    getter {
+      return _hideText;
+    }
+    setter(v) {
+      if (v == _hideText)
+        return;
+      _hideText = v;
+      charViewList = encodeHidden(charList);
+      for (var i = 0; i < charList.length; i++) {
+        charWidthList[i] = font.getTextWidth(charViewList[i]);
+      }
+      calcMinWidth();
+    }
+  }
+
+  /*------------------------------
+   * フォントアップデート
+   ------------------------------*/
+  function updateFont {
+    // 親のフォント基準にフォント決定
+    font.height = parent.font.height;
+    font.face = parent.font.face;
+    for (var i = 0; i < charList.length; i++) {
+      charWidthList[i] = font.getTextWidth(charViewList[i]);
+    }
+    calcMinWidth();
+  }
+
+  /*------------------------------
+   * テキストを末尾に追加する
+   ------------------------------*/
+  function add(str) {
+    charList += str;
+    str = encodeHidden(str);
+    charViewList += str;
+    for (var i = 0; i < str.length; i++) {
+      charWidthList.add(font.getTextWidth(str[i]));
+    }
+    calcMinWidth();
+  }
+
+  /*------------------------------
+   * テキストを任意の位置に挿入する
+   ------------------------------*/
+  function insert(index, str) {
+    charList = charList.substr(0, index) + str + charList.substr(index);
+    str = encodeHidden(str);
+    charViewList = charViewList.substr(0, index) + str + charViewList.substr(index);
+    for (var i = 0; i < str.length; i++) {
+      charWidthList.insert(index + i, font.getTextWidth(str[i]));
+    }
+    calcMinWidth();
+  }
+
+  /*------------------------------
+   * 任意の範囲のテキストを削除する
+   ------------------------------*/
+  function erase(index, size = 1) {
+    charList = charList.substr(0, index) + charList.substr(index + size);
+    charViewList = charViewList.substr(0, index) + charViewList.substr(index + size);
+    for (var i = 0; i < size; i++)
+      charWidthList.erase(index);
+    calcMinWidth();
+  }
+
+  /*------------------------------
+   * テキストをクリアする
+   ------------------------------*/
+  function clear() {
+    charList = charViewList = "";
+    charWidthList = [];
+    calcMinWidth();
+    width = 0;
+    selectionBegin = selectionEnd = void;
+  }
+
+  /*------------------------------
+   * 文字そのものを参照する
+   ------------------------------*/
+  property str {
+    getter {
+      return charList.substr(0);
+    }
+  }
+
+  /*------------------------------
+   * 部分文字列を参照する
+   ------------------------------*/
+  function substr {
+    return charList.substr(...);
+  }
+
+  /*------------------------------
+   * 文字数をカウントする
+   ------------------------------*/
+  property count {
+    getter {
+      return charList.length;
+    }
+  }
+
+  /*------------------------------
+   * 空行か？
+   ------------------------------*/
+  property isEmptyLine {
+    getter {
+      for (var i = 0; i < charList.length; i++)
+        if (charList[i] != " ")
+          return false;
+      return true;
+    }
+  }
+
+  /*------------------------------
+   * 文字インデックスに対応したポインタの位置を親の座標系で返す
+   *
+   * @param index インデックス
+   * @param tail 行末文字かどうか(右端で自動改行する行は、折り返しの右端と次の行の左端が同じポインタ位置を意味する。そのどちらの座標を取るかの選択)
+   ------------------------------*/
+  function pointerPos(index, tail = false) {
+    if (tail) {
+      for (var i = 0; i < rowRange.count; i++) {
+        if (rowRange[i][1] == index)
+          return [ left + rowRange[i][2], top + i * font.height ];
+      }
+    }
+
+    return [ left + charX[index], top + charY[index]];
+  }
+
+  /*------------------------------
+   * 座標に一番近い文字情報を返す
+   * [ インデックス, 行末の文字かどうか ]
+   ------------------------------*/
+  function nearestChar(x, y) {
+    x -= left;
+    y -= top;
+    y /= font.height;
+    y = int(Math.max(0, Math.min(y, rowRange.count - 1)));
+    var from, to, w;
+    from = rowRange[y][0];
+    to = rowRange[y][1];
+    w = rowRange[y][2];
+    var minLen, len, minIndex;
+    minIndex = to;
+    minLen = Math.abs(x - w);
+    for (var i = from; i < to; i++) {
+      len = Math.abs(charX[i] - x);
+      if (len < minLen) {
+        minLen = len;
+        minIndex = i;
+      }
+    }
+    return [ minIndex, minIndex == to ];
+  }
+
+  /*------------------------------
+   * 選択範囲を設定する
+   ------------------------------*/
+  function select(begin, end) {
+    if (begin == selectionBegin
+        && end == selectionEnd)
+      return;
+    selectionBegin = begin;
+    selectionEnd = end;
+    redraw();
+  }
+
+  /*------------------------------
+   * 選択範囲を解除する
+   ------------------------------*/
+  function deselect {
+    select(-1, -1);
+  }
+
+  /*------------------------------
+   * 全選択
+   ------------------------------*/
+  function selectAll {
+    select(0, count);
+  }
+
+  // 最小幅の再計算
+  function calcMinWidth {
+    minWidth = 0;
+    textWidth = 0;
+    
+    for (var i = 0; i < charWidthList.count; i++) {
+      minWidth = Math.max(charWidthList[i], minWidth);
+      textWidth += charWidthList[i];
+    }
+
+    charX.count = charList.length + 1;
+    charY.count = charList.length + 1;
+
+    requireLayout = true;
+  }
+
+  // 再描画
+  function redraw {
+    // フォントを実際に描画する
+    fillRect(0, 0, width, height, WIN_WHITE);
+    // 行単位でさくっと描画
+    for (var i = 0; i < rowRange.count; i++) {
+      // まず普通に描画
+      var from, to;
+      from = rowRange[i][0];
+      to = rowRange[i][1];
+      drawText(charX[from], charY[from], charViewList.substr(from, to - from), 0);
+      // 選択範囲に入っていたら、その分の文字を描画
+      if (selectionBegin <= to && selectionEnd >= from) {
+        from = int(Math.max(selectionBegin, from));
+        to = int(Math.min(selectionEnd, to));
+        var w;
+        if (to == rowRange[i][1])
+          w = rowRange[i][2] - charX[from];
+        else
+          w = charX[to] - charX[from];
+        fillRect(charX[from], charY[from], w, font.height, WIN_SELECTED);
+        drawText(charX[from], charY[from], charViewList.substr(from, to - from), 0xFFFFFF);
+      }
+    }
+  }
+    
+  // レイアウトのやり直し
+  function layout(w) {
+    // レイアウトの必要が無く、横幅が変化してないなら、そのまま終了
+    if (! requireLayout
+        && width == w)
+      return;
+
+    // レイアウトの必要が無く、行が1行だけの時は、右端を白く濡りつぶすだけで終了
+     if (! requireLayout
+	 && rowRange.count <= 1
+	 && charX[charList.length] <= w) {
+      var oldWidth = width;
+      width = w;
+      if (oldWidth < width)
+        fillRect(oldWidth, 0, width - oldWidth, height, WIN_WHITE);
+      return;
+    }
+
+    requireLayout = false;
+
+    var x, y, h, n, i;
+    x = y = h = n = 0;
+    rowRange = [];
+
+    // 全文字について走査、表示座標を決定
+    for (i = 0; i < charWidthList.count; i++) {
+      var charWidth = charWidthList[i];
+      // 横幅をオーバーしてたら改行
+      if (x + charWidth > w) {
+	// 行情報を記録
+        rowRange.add([ n, i, x ]);
+	// 改行
+        y += font.height;
+        x = 0;
+        n = i;
+      }
+      // 文字の座標を記録
+      charX[i] = x;
+      charY[i] = y;
+      x += charWidth;
+    }
+    // 末尾の改行位置の座標を記録
+    charX[i] = x;
+    charY[i] = y;
+    // 最終行の情報を記録
+    rowRange.add([ n, i, x ]);
+    h = y + font.height;
+    // サイズ設定
+    setSize(w, h);
+
+    // 再描画
+    redraw();
+  }
+}
+
+
+/*----------------------------------------------------------------------
+ * テキストエディットポイント
+ ----------------------------------------------------------------------*/
+class KTextEditPoint
+{
+  var row, col;
+
+  function KTextEditPoint(row = 0, col = 0) {
+    this.row = row;
+    this.col = col;
+  }
+
+  function compare(r) {
+    if (row < r.row)
+      return -1;
+    if (row > r.row)
+      return 1;
+    if (col < r.col)
+      return -1;
+    if (col > r.col)
+      return 1;
+    return 0;
+  }
+
+  function eq(r) {
+    return compare(r) == 0;
+  }
+  
+  function ne(r) {
+    return ! eq(r);
+  }
+
+  function lt(r) {
+    return compare(r) == -1;
+  }
+   
+  function le(r) {
+    return compare(r) <= 0;
+  }
+
+  function gt(r) {
+    return compare(r) == 1;
+  }
+
+  function ge(r) {
+    return compare(r) >= 0;
+  }
+
+  function set(row, col) {
+    this.row = row;
+    this.col = col;
+  }
+
+  function assign(r) {
+    row = r.row;
+    col = r.col;
+  }
+}
+
+/**----------------------------------------------------------------------
+ * テキストエディット
+ ----------------------------------------------------------------------*/
+class KTextEdit extends KValueWidget
+{
+  // 最小限サイズ
+  var _marginalWidth, _marginalHeight;
+  // 行レイヤのリスト
+  var rowList, rowPool;
+  // 背景埋めるためのレイヤ
+  var bgLayer;
+  // ポインタレイヤ
+  var pointerLayer;
+  // 改行をあらわす正規表現
+  var linefeedPat;
+  // 入力可能な文字をあらわす正規表現
+  var strPat;
+  // 「単語」のパターン
+  var wordPat;
+  // 「タブ」のパターン
+  var tabPat;
+  // ポインタの行と列
+  var pointer;
+  // ポインタの表示座標
+  var pointerX, pointerY;
+  // ポインタ点滅用タイマー
+  var pointerTimer;
+  // ポインタ基準X座標
+  var pointerMoveBaseX;
+  // キーバインド
+  var keyBind;
+  // CTRL-SPACEが押されているか？(emacs bindのためのフラグ)
+  var ctrlSpacePressed;
+  // 選択範囲
+  var selectionBegin, selectionEnd;
+  // マーク
+  var marker;
+  var wordSelection;
+  var wordSelectionBegin, wordSelectionEnd;
+  var doubleClicked;
+  // ドラッグ中
+  var dragging;
+  var firstMove;
+  // UNDOモード
+  var UNDO_DELETE = 1, UNDO_PASTE = 2;
+  var undoMode;
+  // UNDO用削除文字列
+  var undoDeleteStr, undoDeletePoint;
+  // UNDO用貼りつけ範囲
+  var undoPasteBegin, undoPasteEnd;
+  // タブ幅
+  var _tabWidth;
+  // 行右端での折り返し
+  var _lineWrapping;
+  // 値の更新に反応する？
+  var _respondToValueModification;
+  // テキストを隠す？
+  var _hideText;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param window
+   * @param name 名前
+   ------------------------------*/
+  function KTextEdit(window, name) {
+    super.KWidget(...);
+    // ウィンドウ初期化
+    focusable = true;
+    hasImage = false;
+    hitThreshold = 0;
+    cursor = crIBeam;
+    useAttention = true;
+    imeMode = imDontCare;
+    // 基準サイズ1000x1000で初期化
+    _marginalWidth = _marginalHeight = 1000;
+    // 行配列初期化
+    rowList = [];
+    rowPool = [];
+    // タブウイドスは4で初期化
+    _tabWidth = 4;
+    // 行折り返しあり
+    _lineWrapping = true;
+    // 値の更新に反応しない
+    _respondToValueModification = false;
+    // 選択範囲初期化
+    selectionBegin = new KTextEditPoint(-1, -1);
+    selectionEnd = new KTextEditPoint(-1, -1);
+    // ポインタ座標は(0,0)から
+    pointer = new KTextEditPoint(0, 0);
+    marker = new KTextEditPoint(0, 0);
+    // テキストは隠さない
+    _hideText = false;
+    // UNDO初期化
+    undoDeletePoint = new KTextEditPoint(0, 0);
+    undoPasteBegin = new KTextEditPoint(0, 0);
+    undoPasteEnd = new KTextEditPoint(0, 0);
+    // 正規表現初期化
+    linefeedPat = new RegExp("\r\n|\r|\n");
+    if (k_kirikiriz)
+      strPat = new RegExp("[^\\000\\000-\\037\\000]");
+    else
+      strPat = new RegExp("[^\\000-\\037]");
+    wordPat = new RegExp("[a-zA-Z0-9]+|[ァ-ヶー]+[ぁ-んー]*|[亜-龠ー]+[ぁ-んー]*|[ぁ-んー]+");
+    tabPat = new RegExp("\t", "g");
+    // キーバインド配列
+    keyBind = [];
+    // 背景レイヤ作成
+    bgLayer = new global.Layer(window, this);
+    bgLayer.visible = true;
+    bgLayer.neutralColor = WIN_WHITE;
+    bgLayer.fillRect(0, 0, bgLayer.width, bgLayer.height, WIN_WHITE);
+    bgLayer.hitThreshold = 256;
+    // ポインタレイヤ作成
+    pointerLayer = new global.Layer(window, this);
+    pointerLayer.setSize(2, font.height);
+    pointerLayer.fillRect(0, 0, 2, font.height, WIN_WHITE);
+    pointerX = -1, pointerY = 0;
+    pointerLayer.hitThreshold = 256;
+    pointerLayer.setPos(pointerX, pointerY);
+    pointerLayer.absolute = 100;
+    pointerLayer.type = ltPsDifference;
+    // ポインタ用のタイマ作成
+    pointerTimer = new Timer(this, "onPointerTimer");
+    pointerTimer.interval = 300;
+    // とりあえず空文字列で初期化
+    value = "";
+    // ウィンドウズのキーマップでバインドする
+    bindWindowsKeyMap();
+  }
+
+  /*------------------------------
+   * ファイナライザ
+   ------------------------------*/
+  function finalize {
+    // タイマを消去
+    discard(pointerTimer);
+    super.finalize(...);
+  }
+
+  /**------------------------------
+   * テキストの値
+   *
+   * @param v テキストの値
+   * @return テキストの値
+   ------------------------------*/
+  property value {
+    getter {
+      var textRows = [];
+      for (var i = 0; i < rowList.count; i++)
+        textRows.add(rowList[i].str);
+      return textRows.join("\r\n");
+    }
+    setter(v) {
+      initAllRows(expandTab(v).split(linefeedPat));
+    }
+  }
+
+  /**------------------------------
+   * タブ幅
+   *
+   * タブ入りの文字列を食わせた時に、そのタブを何文字の
+   * スペースに展開するかを設定します。
+   *
+   * @param v タブ幅
+   * @return タブ幅
+   ------------------------------*/
+  property tabWidth {
+    getter {
+      return _tabWidth;
+    }
+    setter(v) {
+      _tabWidth = v;
+    }
+  }
+
+  /**------------------------------
+   * ライン右端の折り返しを行うかどうか
+   *
+   * @param v ライン右端の折り返しを行うかどうか
+   * @return ライン右端の折り返しを行うかどうか
+   ------------------------------*/
+  property lineWrapping {
+    getter {
+      return _lineWrapping;
+    }
+    setter(v) {
+      if (_lineWrapping == v)
+        return;
+      _lineWrapping = v;
+      locateLayout();
+    }
+  }
+
+  /**------------------------------
+   * 値の更新に反応するかどうか
+   *
+   * @param v 値の更新に反応するかどうか
+   * @return 値の更新に反応するかどうか
+   ------------------------------*/
+  property respondToValueModification {
+    getter {
+      return _respondToValueModification;
+    }
+    setter(v) {
+      _respondToValueModification = v;
+    }
+  }
+
+  /**------------------------------
+   * 行数
+   ------------------------------*/
+  property rowCount {
+    getter {
+      return rowList.count;
+    }
+  }
+
+  /**------------------------------
+   * 行データ
+   * 
+   * @param row 行
+   ------------------------------*/
+  function rowAt(row) {
+    return rowList[row];
+  }
+
+  /**------------------------------
+   * キーバインドをクリアする
+   ------------------------------*/
+  function clearKeyBind {
+    keyBind = [];
+  }
+
+  /**------------------------------
+   * キーを機能とバインドする
+   *
+   * @param key 仮想キーコード
+   * @param shift コントロールキー
+   * @param shiftSelect シフトキーを押しながらの移動による選択を有効にするか
+   * @param func 実行する関数
+   ------------------------------*/
+  function bindKey(key, shiftSelect, shift, func) {
+    keyBind.add([ key, shiftSelect, shift, func ]);
+  }
+
+  /**------------------------------
+   * キーをアンバインドする
+   *
+   * @param key 仮想キーコード
+   ------------------------------*/
+  function unbindKey(key) {
+    for (var i = 0; i < keyBind.count; i++) {
+      if (keyBind[i][0] == key) {
+        keyBind.erase(i);
+        i--;
+      }
+    }
+  }
+
+  /**------------------------------
+   * ウィンドウズメモ帳仕様のキーマップをバインドする
+   ------------------------------*/
+  function bindWindowsKeyMap {
+    clearKeyBind();
+    bindKey(VK_LEFT,   1, 0,       moveLeft);
+    bindKey(VK_RIGHT,  1, 0,       moveRight);
+    bindKey(VK_UP,     1, 0,       moveUp);
+    bindKey(VK_DOWN,   1, 0,       moveDown);
+    bindKey(VK_LEFT,   1, ssCtrl,  backwardWord);
+    bindKey(VK_RIGHT,  1, ssCtrl,  forwardWord);
+    bindKey(VK_RETURN, 0, 0,       splitAtPointer);
+    bindKey(VK_BACK,   0, 0,       backspaceAtPointer);
+    bindKey(VK_DELETE, 0, 0,       deleteAtPointer);
+    bindKey(VK_V,      0, ssCtrl,  pasteAtPointer);
+    bindKey(VK_INSERT, 0, ssShift, pasteAtPointer);
+    bindKey(VK_C,      0, ssCtrl,  copySelection);
+    bindKey(VK_INSERT, 0, ssCtrl,  copySelection);
+    bindKey(VK_X,      0, ssCtrl,  cutSelection);
+    bindKey(VK_DELETE, 0, ssShift, cutSelection);
+    bindKey(VK_A,      2, ssCtrl,  selectAll);
+    bindKey(VK_Z,      2, ssCtrl,  undo);
+    bindKey(VK_PRIOR,  1, 0,       pageUp);
+    bindKey(VK_NEXT,   1, 0,       pageDown);
+    bindKey(VK_HOME,   1, ssCtrl,  headOfRow);
+    bindKey(VK_END,    1, ssCtrl,  tailOfRow);
+    bindKey(VK_HOME,   1, 0,       physicalHeadOfCol);
+    bindKey(VK_END,    1, 0,       physicalTailOfCol);
+  }
+
+  /**------------------------------
+   * emacs仕様のキーマップをバインドする
+   ------------------------------*/
+  function bindEmacsKeyMap {
+    clearKeyBind();
+    bindKey(VK_LEFT,   0, 0,      moveLeft);
+    bindKey(VK_RIGHT,  0, 0,      moveRight);
+    bindKey(VK_UP,     0, 0,      moveUp);
+    bindKey(VK_DOWN,   0, 0,      moveDown);
+    bindKey(VK_B,      0, ssCtrl, moveLeft);
+    bindKey(VK_F,      0, ssCtrl, moveRight);
+    bindKey(VK_P,      0, ssCtrl, moveUp);
+    bindKey(VK_N,      0, ssCtrl, moveDown);
+    bindKey(VK_LEFT,   0, ssCtrl, backwardWord);
+    bindKey(VK_RIGHT,  0, ssCtrl, forwardWord);
+    bindKey(VK_B,      0, ssAlt,  backwardWord);
+    bindKey(VK_F,      0, ssAlt,  forwardWord);
+    bindKey(VK_RETURN, 0, 0,      splitAtPointer);
+    bindKey(VK_J,      0, ssCtrl, splitAtPointer);
+    bindKey(VK_BACK,   0, 0,      backspaceAtPointer);
+    bindKey(VK_DELETE, 0, 0,      deleteAtPointer);
+    bindKey(VK_H,      0, ssCtrl, backspaceAtPointer);
+    bindKey(VK_D,      0, ssCtrl, deleteAtPointer);
+    bindKey(VK_Y,      0, ssCtrl, pasteAtPointer);
+    bindKey(VK_W,      0, ssAlt,  copyMarkToPointer);
+    bindKey(VK_W,      0, ssCtrl, cutMarkToPointer);
+    bindKey(VK_K,      0, ssCtrl, killLine);
+    bindKey(VK_SPACE,  0, ssCtrl, markAtPointer);
+    bindKey(VK_2,      0, ssCtrl | ssShift, markAtPointer); // Ctrl-@ (英語キーボード)
+    bindKey(0xC0,      0, ssCtrl, markAtPointer);   // Ctrl-@ (日本語キーボード)
+    bindKey(0xBD,      2, ssShift | ssCtrl, undo);  // Shift-Ctrl-_ (英語キーボード)
+    bindKey(0xE2,      2, ssShift | ssCtrl, undo);  // Shift-Ctrl-_ (日本語キーボード)
+    bindKey(VK_PRIOR,  0, 0,      pageUp);
+    bindKey(VK_NEXT,   0, 0,      pageDown);
+    bindKey(VK_V,      0, ssAlt,  pageUp);
+    bindKey(VK_V,      0, ssCtrl, pageDown);
+    bindKey(0xBC,      0, ssAlt | ssShift, markAndHeadOfRow); // Shift-Alt-<
+    bindKey(0xBE,      0, ssAlt | ssShift, markAndTailOfRow); // Shift-Alt->
+    bindKey(VK_A,      0, ssCtrl, headOfCol);
+    bindKey(VK_E,      0, ssCtrl, tailOfCol);
+    bindKey(VK_UP,     0, ssCtrl, backwardParagraph);
+    bindKey(VK_DOWN,   0, ssCtrl, forwardParagraph);
+    bindKey(0xDB,      0, ssAlt | ssShift, backwardParagraph); // Shift-Alt-{
+    bindKey(0xDD,      0, ssAlt | ssShift, forwardParagraph);  // Shift-Alt-}
+  }
+
+  /**------------------------------
+   * 右クリックで表示されるコンテキストメニューの中身を作成する
+   * 継承クラスでオーバーライドすることで、好きにコンテキストメニューを
+   * 拡張することが出来る
+   * 
+   * @return コンテキストメニュー
+   ------------------------------*/
+  function buildContextMenu {
+    var menu = new KContextMenu();
+    menu.addItem("元に戻す", "", undoAvailable, this.undo);
+    menu.addSeparator();
+    menu.addItem("切り取り", "", hasSelection, this.cutSelection);
+    menu.addItem("コピー",   "", hasSelection, this.copySelection);
+    menu.addItem("貼り付け", "", Clipboard.hasFormat(cbfText), this.pasteAtPointer);
+    menu.addItem("削除",     "", hasSelection, this.deleteSelection);
+    menu.addSeparator();
+    menu.addItem("すべて選択", "", ! hasAllSelection, this.selectAll);
+    return menu;
+  }
+
+  /*----------------------------------------------------------------------
+   * 以下、キーバインドに対応する各種コマンド関数
+   ----------------------------------------------------------------------*/
+  // アンドゥ
+  function undo {
+    switch (undoMode) {
+    case UNDO_DELETE: {
+      pointer.assign(undoDeletePoint);
+      insertAtPointer(undoDeleteStr);
+      select(undoDeletePoint, pointer);
+      break;
+    } 
+
+    case UNDO_PASTE: {
+      select(undoPasteBegin, undoPasteEnd);
+      deleteSelection();
+      break;
+    }
+    }
+  }
+
+  // ポインタ位置にクリップポードから挿入
+  function pasteAtPointer {
+    if (Clipboard.hasFormat(cbfText)) {
+      if (hasSelection)
+        deleteSelection(false);
+      insertAtPointer(expandTab(Clipboard.asText));
+    }
+  }
+
+  // マークを設定
+  function markAtPointer {
+    marker.assign(pointer);
+  }
+
+  // 左へ移動
+  function moveLeft {
+    if (! isOnHeadOfCol)
+      setPointer(pointer.row, pointer.col - 1);
+    else if (! isOnHeadOfRow)
+      setPointer(pointer.row - 1, rowList[pointer.row - 1].count);
+    pointerMoveBaseX = pointerX;
+  }
+
+  // 右へ移動
+  function moveRight {
+    if (! isOnTailOfCol)
+      setPointer(pointer.row, pointer.col + 1, true);
+    else if (! isOnTailOfRow)
+      setPointer(pointer.row + 1, 0);
+    pointerMoveBaseX = pointerX;
+  }
+
+  // 上へ移動
+  function moveUp {
+    setPointerPos(Math.max(pointerX, pointerMoveBaseX), pointerY - font.height);
+  }
+
+  // 下へ移動
+  function moveDown {
+    setPointerPos(Math.max(pointerX, pointerMoveBaseX), pointerY + font.height);
+  }
+
+  // ページアップ
+  function pageUp {
+    var rect = viewingRect;
+    setPointerPos(Math.max(pointerX, pointerMoveBaseX), Math.min(pointerY - font.height, rect.top - rect.height + font.height * 2));
+  }
+
+  // ページダウン
+  function pageDown {
+    var rect = viewingRect;
+    setPointerPos(Math.max(pointerX, pointerMoveBaseX), Math.max(pointerY + font.height, rect.bottom + rect.height - font.height * 2));
+  }
+
+  // 文頭
+  function headOfRow {
+    setPointer(0, 0);
+  }
+
+  // 文末
+  function tailOfRow {
+    setPointer(rowList.count - 1, rowList[rowList.count - 1].count);
+  }
+
+  // マークして文頭
+  function markAndHeadOfRow {
+    markAtPointer();
+    setPointer(0, 0);
+  }
+
+  // マークして文末
+  function markAndTailOfRow {
+    markAtPointer();
+    setPointer(rowList.count - 1, rowList[rowList.count - 1].count);
+  }
+
+  // 行頭
+  function headOfCol {
+    setPointer(pointer.row, 0);
+  }
+
+  // 行末
+  function tailOfCol {
+    setPointer(pointer.row, curRow.count);
+  }
+
+  // 物理的行頭
+  function physicalHeadOfCol {
+    var nearestChar = curRow.nearestChar(0, pointerY);
+    setPointer(pointer.row, nearestChar[0], nearestChar[1]);
+  }
+
+  // 物理的行末
+  function physicalTailOfCol {
+    var nearestChar = curRow.nearestChar(width, pointerY);
+    setPointer(pointer.row, nearestChar[0], nearestChar[1]);
+  }
+
+  // 次のパラグラフ
+  function forwardParagraph {
+    pointer.col = 0;
+    while (pointer.row != rowList.count - 1
+           && curRow.isEmptyLine)
+      pointer.row++;
+    while (pointer.row != rowList.count - 1
+           && ! curRow.isEmptyLine)
+      pointer.row++;
+    setPointer(pointer.row, pointer.col);
+  }
+
+  // 前のパラグラフ
+  function backwardParagraph {
+        pointer.col = 0;
+    while (! isOnHeadOfRow
+           && curRow.isEmptyLine)
+      pointer.row--;
+    while (! isOnHeadOfRow
+           && ! curRow.isEmptyLine)
+      pointer.row--;
+    setPointer(pointer.row, pointer.col);
+  }
+
+  // 次の単語
+  function forwardWord {
+    var i, wordRange;
+
+    wordRange = parseWordRange(curRow.str);
+    for (i = 0; i < wordRange.count; i++) {
+      if (pointer.col < wordRange[i][1]) {
+        setPointer(pointer.row, wordRange[i][1]);
+        return;
+      }
+    }
+
+    for (i = pointer.row + 1; i < rowList.count; i++) {
+      wordRange = parseWordRange(rowList[i].str);
+      if (wordRange.count) {
+        setPointer(i, wordRange[0][1]);
+        return;
+      }
+    }
+
+    tailOfRow();
+  }
+
+  // 前の単語
+  function backwardWord {
+    var i, wordRange;
+
+    wordRange = parseWordRange(curRow.str);
+    for (i = wordRange.count - 1; i >= 0; i--) {
+      if (pointer.col > wordRange[i][0]) {
+        setPointer(pointer.row, wordRange[i][0]);
+        return;
+      }
+    }
+
+    for (i = pointer.row - 1; i >= 0; i--) {
+      wordRange = parseWordRange(rowList[i].str);
+      if (wordRange.count) {
+        setPointer(i, wordRange[wordRange.count - 1][0]);
+        return;
+      }
+    }
+
+    headOfRow();
+  }
+
+  // 1行削除(emacs仕様)
+  function killLine {
+    var n;
+
+    if (isOnTailOfRow)
+      return;
+
+    if (isOnTailOfCol)
+      n = 1;
+    else
+      n = curRow.count - pointer.col;
+
+    for (; n > 0; n--)
+      deleteAtPointer(false);
+
+    locateLayout();
+
+    Clipboard.asText = undoDeleteStr;
+  }
+
+  // ポインタ位置を1文字削除
+  function deleteAtPointer(locate = true) {
+    if (hasSelection) {
+      deleteSelection();
+      return;
+    } else if (isOnTailOfRow)
+      return;
+    
+    var deleteStr, deleteOnBack;
+    if (isOnTailOfCol) {
+      // 行末
+      // マークがポインタより後にあったら、位置補正
+      if (marker.gt(pointer)) {
+        marker.row--;
+        if (marker.row == pointer.row)
+          marker.col += pointer.col;
+      }
+      // UNDO記録
+      deleteStr = "\r\n";
+      deleteOnBack = (undoDeletePoint.row == pointer.row + 1
+                      && undoDeletePoint.col == 0);
+      // 次の行との結合処理
+      curRow.insert(pointer.col, nextRow.str);
+      deleteRowLayer(nextRow);
+      rowList.erase(pointer.row + 1);
+      onJoinAt(pointer.row, pointer.col);
+      // 再描画
+      if (locate) {
+        locateLayout();
+        // 値の更新を通知
+        if (respondToValueModification)
+          invalidateValue();
+      }
+    } else {
+      // マークがポインタと同じ行でポインタより後にあったら、位置補正
+      if (marker.row == pointer.row && marker.col > pointer.col)
+        marker.col--;
+      // 1文字削除
+      deleteStr = curRow.substr(pointer.col, 1);
+      deleteOnBack = (undoDeletePoint.row == pointer.row
+                      && undoDeletePoint.col == pointer.col + 1);
+      curRow.erase(pointer.col, 1);
+      // フック関数呼び出し
+      onDeleteAt(pointer.row, pointer.col, deleteStr);
+      // 再描画
+      if (locate) {
+        var h = curRow.height;
+        curRow.layout(width);
+	if (! lineWrapping
+	    || h != curRow.height)
+          locateLayout();
+	else {
+	  setPointer(pointer.row, pointer.col);
+	  onRedraw();
+	}
+        // 値の更新を通知
+        if (respondToValueModification)
+          invalidateValue();
+      }
+    }
+
+    // UNDO記録
+    if (undoMode === UNDO_DELETE
+        && undoDeletePoint.eq(pointer)) {
+      // 現在のUNDO削除位置での削除
+      undoDeleteStr += deleteStr;
+    } else if (undoMode === UNDO_DELETE
+               && deleteOnBack) {
+      // 現在のUNDO削除位置の一個前での削除
+      undoDeleteStr = deleteStr + undoDeleteStr;
+      undoDeletePoint.assign(pointer);
+    } else {
+      // それ以外。新規UNDO削除記録開始
+      undoMode = UNDO_DELETE;
+      undoDeleteStr = deleteStr;
+      undoDeletePoint.assign(pointer);
+    }
+  }
+
+  // ポインタ位置を1文字バックスペース
+  function backspaceAtPointer(locate = true) {
+    if (hasSelection) {
+      deleteSelection();
+      return;
+    } else if (isOnHeadOfRow)
+      return;
+    else {
+      // 一個左に移動して
+      moveLeft();
+      // 削除処理
+      deleteAtPointer(locate);
+    }
+  }
+  
+  // ポインタ位置で行を2つに分割
+  function splitAtPointer(locate = true) {
+    // マークがポインタより後にあったら、位置補正
+    if (marker.gt(pointer)) {
+      if (marker.row == pointer.row)
+        marker.col -= pointer.col;
+      marker.row++;
+    }
+    // UNDO記録
+    if (undoMode === UNDO_PASTE
+        && undoPasteEnd.eq(pointer)) {
+      undoPasteEnd.row++;
+      undoPasteEnd.col = 0;
+    } else {
+      undoMode = UNDO_PASTE;
+      undoPasteBegin.assign(pointer);
+      undoPasteEnd.set(pointer.row + 1, 0);
+    }
+    // 分割位置を記憶
+    var splitPoint = new KTextEditPoint();
+    splitPoint.assign(pointer);
+    // ポインタ以降の文字列を分離
+    var tailStr = curRow.substr(pointer.col);
+    curRow.erase(pointer.col, curRow.count - pointer.col);
+    // 新規行を作成し挿入、ポインタをその行の先頭に移動
+    var rowLayer = newRowLayer();
+    rowLayer.add(tailStr);
+    rowList.insert(++pointer.row, rowLayer);
+    pointer.col = 0;
+    // フック関数呼び出し
+    onSplitAt(splitPoint.row, splitPoint.col);
+      // 再描画
+    if (locate) {
+      locateLayout();
+      // 値の更新を通知
+      if (respondToValueModification)
+        invalidateValue();
+    }
+  }
+
+  // ポインタ位置に文字列を挿入
+  function insertAtPointer(str, locate = true) {
+    if (hasSelection)
+      deleteSelection(false);
+
+    // まず文字を改行で分割する
+    var list = str.split(linefeedPat);
+
+    if (list.count == 1) {
+      // 1行分の挿入処理
+      // マークがポインタと同じ行でポインタより後にあったら、位置補正
+      if (marker.row == pointer.row && marker.col > pointer.col)
+        marker.col += list[0].length;
+      // UNDO記録
+      if (undoMode === UNDO_PASTE
+          && undoPasteEnd.eq(pointer)) {
+        undoPasteEnd.col += str.length;
+      } else {
+        undoMode = UNDO_PASTE;
+        undoPasteBegin.assign(pointer);
+        undoPasteEnd.set(pointer.row, pointer.col + str.length);
+      }
+      // 挿入位置を記憶
+      var insertPoint = new KTextEditPoint();
+      insertPoint.assign(pointer);
+      // ポインタ位置に文字列挿入、ポインタを進める
+      curRow.insert(pointer.col, list[0]);
+      pointer.col += str.length;
+      // フック関数呼び出し
+      onInsertAt(insertPoint.row, insertPoint.col, str);
+      // 再描画
+      if (locate) {
+        var h = curRow.height;
+        curRow.layout(width);
+	if (! lineWrapping
+	    || h != curRow.height) 
+	  locateLayout();
+	else {
+	  setPointer(pointer.row, pointer.col);
+	  onRedraw();
+	}
+        // 値の更新を通知
+        if (respondToValueModification)
+          invalidateValue();
+      }
+    } else {
+      // 複数行分の処理
+
+      for (var i = 0; i < list.count; i++) {
+        // この行の分の文字列をポインタ位置に挿入
+        insertAtPointer(list[i], false);
+        // 最終行で無ければ、ここで行を分割
+        if (i != list.count - 1)
+          splitAtPointer(false);
+      }
+      // 再描画
+      if (locate) {
+        locateLayout();
+        // 値の更新を通知
+        if (respondToValueModification)
+          invalidateValue();
+      }
+    }
+  }
+
+  // 選択範囲を削除
+  function deleteSelection(responce = true) {
+    if (! hasSelection)
+      return;
+
+    // マークが選択範囲内にあれば、選択範囲の先頭にマークを移動
+    if (selectionBegin.le(marker)
+        && selectionEnd.ge(marker)) {
+      marker.assign(selectionBegin);
+    }
+
+    // 削除範囲をUNDO記録
+    undoMode = UNDO_DELETE;
+    undoDeleteStr = selectionStr;
+    undoDeletePoint.assign(selectionBegin);
+
+    // ポインタを選択範囲の先頭に移動
+    pointer.assign(selectionBegin);
+    // まず全ての行について、削除範囲の文字列を削除
+    for (var i = selectionBegin.row; i <= selectionEnd.row; i++) {
+      var from, to;
+      from = (i == selectionBegin.row) ? selectionBegin.col : 0;
+      to = (i == selectionEnd.row) ? selectionEnd.col : rowList[i].count;
+      var deleteStr = rowList[i].substr(from, to - from);
+      rowList[i].erase(from, to - from);
+      // フック関数をコール
+      onDeleteAt(i, from, deleteStr);
+    }
+    // 続けて、必要な回数だけ行を統合
+    for (var n = selectionEnd.row - selectionBegin.row; n > 0; n--) {
+      curRow.insert(pointer.col, nextRow.str);
+      deleteRowLayer(nextRow);
+      rowList.erase(pointer.row + 1);
+      // フック関数をコール
+      onJoinAt(pointer.row, pointer.col);
+    }
+    // 選択解除
+    deselect();
+    // レイアウトやり直し
+    locateLayout();
+    // 値の更新を通知
+    if (respondToValueModification
+        && responce)
+      invalidateValue();
+  }
+
+  // 選択範囲をコピー
+  function copySelection {
+    if (! hasSelection)
+      return;
+    if (hideText)
+      return;
+
+    Clipboard.asText = selectionStr;
+  }
+
+  // 選択範囲をカット
+  function cutSelection {
+    copySelection();
+    deleteSelection();
+  }
+
+  // マークからポインタまでコピー
+  function copyMarkToPointer {
+    if (! hasSelection) 
+      select(marker, pointer);
+    copySelection();
+    deselect();
+  }
+
+  // マークからポインタまでカット
+  function cutMarkToPointer {
+    if (! hasSelection)
+      select(marker, pointer);
+    cutSelection();
+  }
+
+  /*----------------------------------------------------------------------
+   * 以下、文字編集に伴って呼び出されるフック関数の口
+   ----------------------------------------------------------------------*/
+  /**------------------------------
+   * ポインタが移動した時に呼ばれる
+   *
+   * @param row 行
+   * @param col 列
+   ------------------------------*/
+  function onPointAt(row, col) {
+  }
+
+  /**------------------------------
+   * 行が分割された時に呼ばれるフック関数
+   *
+   * @param row 行
+   * @param col 列
+   ------------------------------*/
+  function onSplitAt(row, col) {
+  }
+
+  /**------------------------------
+   * 行が結合された時に呼ばれるフック関数
+   *
+   * @param row 行
+   * @param col 列
+   ------------------------------*/
+  function onJoinAt(row, col) {
+  }
+
+  /**------------------------------
+   * 文字列が挿入された時に呼ばれるフック関数
+   * 
+   * 挿入は常に行単位で処理され、行をまたぐことは無い
+   *
+   * @param row 行
+   * @param col 列
+   * @param str 挿入された文字列
+   ------------------------------*/
+  function onInsertAt(row, col, str) {
+  }
+
+  /**------------------------------
+   * 文字列が削除された時に呼ばれるフック関数
+   * 
+   * 削除は常に行単位で処理され、行をまたぐことは無い
+   *
+   * @param row 行
+   * @param col 列
+   * @param str 削除された文字列
+   ------------------------------*/
+  function onDeleteAt(row, col, str) {
+  }
+
+  /**------------------------------
+   * 文字変数の結果、再描画が発生した時に呼ばれる
+   ------------------------------*/
+  function onRedraw {
+  }
+  
+  /*----------------------------------------------------------------------
+   * 以下、KTextEditの各種ユーティリティ関数
+   ----------------------------------------------------------------------*/
+
+  // カレント行
+  property curRow {
+    getter {
+      return rowList[pointer.row];
+    }
+  }
+
+  // 一個前の行
+  property prevRow {
+    getter {
+      return rowList[pointer.row - 1];
+    }
+  }
+
+  // 次の行
+  property nextRow {
+    getter {
+      return rowList[pointer.row + 1];
+    }
+  }
+
+  // 文頭にいるかどうか？
+  property isOnHeadOfRow {
+    getter {
+      return isOnHeadOfCol && (pointer.row == 0);
+    }
+  }
+
+  // 文末にいるかどうか？
+  property isOnTailOfRow {
+    getter {
+      return isOnTailOfCol && (pointer.row == rowList.count -1);
+    }
+  }
+
+  // 行頭にいるかどうか？
+  property isOnHeadOfCol {
+    getter {
+      return pointer.col == 0;
+    }
+  }
+
+  // 行末にいるかどうか？
+  property isOnTailOfCol {
+    getter {
+      return pointer.col == rowList[pointer.row].count;
+    }
+  }
+
+  // 文字列を単語単位にばらす
+  function parseWordRange(str) {
+    var result = [], index = 0;
+    while (wordPat.test(str)) {
+      result.add([ index + wordPat.index, index + wordPat.lastIndex ]);
+      index += wordPat.lastIndex;
+      str = wordPat.rightContext;
+    }
+    return result;
+  }
+
+  // 文字列を単語単位にばらした時の分割位置をリスト化
+  function parseWordSplit(str) {
+    var wordRange = parseWordRange(str);
+    var result = [ 0 ];
+    for (var i = 0; i < wordRange.count; i++) {
+      if (wordRange[i][0] != result[result.count - 1])
+	result.add(wordRange[i][0]);
+      result.add(wordRange[i][1]);
+    }
+    if (str.length != result[result.count - 1])
+      result.add(str.length);
+    return result;
+  }
+  
+  // 特定座標での単語分割位置を切り出し
+  function getWordPointPairAtPos(x, y) {
+    var rowIndex = findRowIndex(y);
+    var row = rowList[rowIndex];
+    var colIndex = row.nearestChar(x, y);
+    var split = parseWordSplit(row.str);
+    for (var i = 1; i < split.count; i++) {
+      var pointerPos = row.pointerPos(split[i]);
+      if (y <= pointerPos[1] + font.height
+          && x <= pointerPos[0]) {
+        return [ new KTextEditPoint(rowIndex, split[i - 1]),
+                 new KTextEditPoint(rowIndex, split[i]) ];
+      }
+      
+    }
+    return [ new KTextEditPoint(rowIndex, split[ split.count - 1]),
+             new KTextEditPoint(rowIndex, split[ split.count - 1]) ];
+  }
+
+  // undo可能?
+  property undoAvailable {
+    getter {
+      return undoMode !== void;
+    }
+  }
+
+  // 選択範囲の変更
+  function select(begin, end) {
+    if (begin.eq(end)) {
+      begin = new KTextEditPoint(-1, -1);
+      end = new KTextEditPoint(-1, -1);
+    }
+
+    if (begin.gt(end)) {
+      var t;
+      t = begin; begin = end; end = t;
+    }
+
+    if (selectionBegin.eq(begin)
+        && selectionEnd.eq(end))
+      return;
+
+    selectionBegin.assign(begin);
+    selectionEnd.assign(end);
+
+    for (var i = 0; i < rowList.count; i++) {
+      if (i < begin.row
+          || i > end.row) 
+        rowList[i].deselect();
+      else {
+        var from, to;
+        from = (i == begin.row) ? begin.col : 0;
+        to = (i == end.row) ? end.col : rowList[i].count;
+        rowList[i].select(from, to);
+      }
+    }
+  }
+
+  // 全選択
+  function selectAll {
+    select(new KTextEditPoint(0, 0),
+           new KTextEditPoint(rowList.count - 1, rowList[rowList.count - 1].count));
+  }
+
+  // 選択解除
+  function deselect {
+    if (hasSelection)
+      select(new KTextEditPoint(-1, -1), new KTextEditPoint(-1, -1));
+  }
+
+  // 選択があるかどうか？
+  property hasSelection {
+    getter {
+      return selectionBegin.row != -1;
+    }
+  }
+
+  // 全選択かどうか
+  property hasAllSelection {
+    getter {
+      return selectionBegin.row == 0
+        && selectionBegin.col == 0
+        && selectionEnd.row == rowList.count - 1
+        && selectionEnd.col == rowList[rowList.count - 1].count;
+    }
+  }
+
+  // 範囲内の文字列
+  function getStrInRange(begin, end) {
+    var list = [];
+    for (var i = begin.row; i <= end.row; i++) {
+      var from, to;
+      from = (i == begin.row) ? begin.col : 0;
+      to = (i == end.row) ? end.col : rowList[i].count;
+      list.add(rowList[i].substr(from, to - from));
+    }
+    return list.join("\r\n");
+  }
+
+  // 選択範囲の文字列
+  property selectionStr {
+    getter {
+      if (! hasSelection)
+        return "";
+      return getStrInRange(selectionBegin, selectionEnd);
+    }
+  }
+
+  // 行レイヤを新規生成
+  function newRowLayer {
+    var rowLayer;
+    if (rowPool.count) {
+      // プールにあればそこから拾う
+      rowLayer = rowPool[rowPool.count - 1];
+      rowPool.erase(rowPool.count - 1);
+    } else {
+      // プールに無ければ新規作成
+      rowLayer = new KTextEditRow(window, this);
+    }
+    rowLayer.visible = true;
+    rowLayer.opacity = nodeEnabled ? 255 : 64;
+    return rowLayer;
+  }
+
+  // 行レイヤを削除
+  function deleteRowLayer(rowLayer) {
+    // 非表示にしてプールへ貯める
+    rowLayer.clear();
+    rowLayer.visible = false;
+    rowPool.add(rowLayer);
+  }
+
+  // valueの代入時、テキストを全初期化する
+  function initAllRows(textRows) {
+    // 選択範囲を解除
+    deselect();
+    // 全ての行を削除
+    for (var i = 0; i < rowList.count; i++) {
+      deleteRowLayer(rowList[i]);
+    }
+    rowList = [];
+    
+    var charCount = 0;
+    var minW, minH;
+
+    // 新規行を生成
+    for (var i = 0; i < textRows.count; i++) {
+      var textRow = textRows[i];
+      var rowLayer = newRowLayer();
+      rowLayer.add(textRow);
+      rowList.add(rowLayer);
+      charCount += Math.max(1, rowLayer.count);
+      minW = Math.max(minW, rowLayer.minWidth);
+    }
+    minH = font.height;
+    // サイズを仮決定
+    setMinMaxSize(minW, minH, Math.max(minW, _marginalWidth), Math.max(minH, _marginalHeight));
+    // レイアウトを行う
+    locateLayout();
+  }
+
+  // レイアウトを行う
+  function locateLayout {
+    if (lineWrapping) {
+      // 全ての行を、横幅に合わせてレイアウトする
+      var y = 0;
+      for (var i = 0; i < rowList.count; i++) {
+        var rowLayer = rowList[i];
+        rowLayer.setPos(0, y);
+        rowLayer.layout(width);
+        y += rowLayer.height;
+      }
+      // 最小サイズを決定する
+      setMinMaxSize(minWidth, y, maxWidth, Math.max(y, _marginalHeight));
+      // 行が足りなくて画面が余ったら、bgLayerで埋める
+      bgLayer.setPos(0, y);
+      bgLayer.setSize(width, height - y);
+      // ポインタを現在位置に再表示
+      setPointer(pointer.row, pointer.col);
+    } else {
+      // 全ての行を、最大の横幅でレイアウトする
+      var w = 0;
+      for (var i = 0; i < rowList.count; i++) {
+        w = Math.max(rowList[i].textWidth, w);
+      }
+      var y = 0;
+      for (var i = 0; i < rowList.count; i++) {
+        var rowLayer = rowList[i];
+        rowLayer.setPos(0, y);
+        rowLayer.layout(w);
+        y += rowLayer.height;
+      }
+      // 最小サイズを決定する
+      setMinMaxSize(w, y, Math.max(w, _marginalWidth), Math.max(y, _marginalHeight));
+      // 行が足りなくて画面が余ったら、bgLayerで埋める
+      bgLayer.setPos(0, y);
+      bgLayer.setSize(width, height - y);
+      // ポインタを現在位置に再表示
+      setPointer(pointer.row, pointer.col);
+    }
+    onRedraw();
+  }
+
+  // Y座標に対応する行レイヤのインデックスを取得する
+  function findRowIndex(y) {
+    if (y < 0)
+      return 0;
+    if (y >= rowList[rowList.count - 1].top)
+      return rowList.count - 1;
+    var begin, end, mid;
+    begin = 0, end = rowList.count;
+    while (begin < end) {
+      mid = int((begin + end) / 2);
+      var rowLayer = rowList[mid];
+      if (rowLayer.top <= y && y < rowLayer.top + rowLayer.height)
+        return mid;
+      if (y > rowLayer.top) 
+        begin = mid + 1;
+      else
+        end = mid;
+    }
+  }
+
+  // ポインターの位置を座標で決定する
+  function setPointerPos(x, y) {
+    var row = findRowIndex(y);
+    var nearestChar = rowList[row].nearestChar(x, y);
+    setPointer(row, nearestChar[0], nearestChar[1]);
+  }    
+
+  // ポインタの位置を行と列で決定する
+  function setPointer(row, col, tail = false) {
+    row = int(Math.max(0, Math.min(rowList.count - 1, row)));
+    col = int(Math.max(0, Math.min(rowList[row].count, col)));
+    pointer.set(row, col);
+    var pos = rowList[row].pointerPos(col, tail);
+    pointerX = pos[0], pointerY = pos[1];
+    pointerLayer.setPos(pointerX - 1, pointerY);
+    setAttentionPos(pointerX, pointerY);
+    noticeRect(pointerX - 1, pointerY, 2, font.height);
+    onPointAt(row, col);
+  }
+
+  // ポインタの点滅開始
+  function startPointerBlink {
+    pointerLayer.visible = true;
+    pointerTimer.enabled = true;
+  }
+
+  // ポインタの点滅終了
+  function stopPointerBlink {
+    pointerLayer.visible = false;
+    pointerTimer.enabled = false;
+  }
+
+  // ポインタをタイマーで点滅させる
+  function onPointerTimer {
+    pointerLayer.visible = ! pointerLayer.visible;
+  }
+
+  // フォント更新
+  function updateRowFont {
+    for (var i = 0; i < rowList.count; i++)
+      rowList[i].updateFont();
+    for (var i = 0; i < rowPool.count; i++)
+      rowPool[i].updateFont();
+    pointerLayer.setSize(2, font.height);
+    pointerLayer.fillRect(0, 0, 2, font.height, WIN_WHITE);
+    locateLayout();
+  }
+
+  // テキスト隠蔽
+  property hideText {
+    getter {
+      return _hideText;
+    }
+    setter(v) {
+      if (v == _hideText)
+        return;
+      _hideText = v;
+      for (var i = 0; i < rowList.count; i++)
+        rowList[i].hideText = v;
+      for (var i = 0; i < rowPool.count; i++)
+        rowPool[i].hideText = v;
+      pointerLayer.setSize(2, font.height);
+      pointerLayer.fillRect(0, 0, 2, font.height, WIN_WHITE);
+      locateLayout();
+    }
+  }
+
+  // タブを展開する
+  function expandTab(str) {
+    return str.replace(tabPat, " ".repeat(tabWidth));
+  }
+
+  /*----------------------------------------------------------------------
+   * 以下、各種フック処理
+   ----------------------------------------------------------------------*/
+  // ダブルクリックで、ワードセレクションへ移行
+  function onDoubleClick {
+    wordSelection = true;
+  }
+
+  // マウスダウンでフォーカス、ポインタ移動
+  function onMouseDown(x, y, button) {
+    if (button == mbLeft) {
+      dragging = true;
+      firstMove = true;
+      deselect();
+      setPointerPos(x, y);
+
+      if (wordSelection) {
+        var pair = getWordPointPairAtPos(x, y);
+        wordSelectionBegin = pair[0];
+        wordSelectionEnd = pair[1];
+        select(pair[0], pair[1]);
+        marker.assign(pair[0]);
+        firstMove = false;
+      }
+      focus();
+    }
+    super.onMouseDown(...);
+  }
+
+  // マウスムーブで選択範囲変更
+  function onMouseMove(x, y) {
+    if (dragging) {
+      if (firstMove) {
+        firstMove = false;
+        marker.assign(pointer);
+      }
+      setPointerPos(x, y);
+
+      if (! wordSelection) 
+        select(marker, pointer);
+      else {
+        var pair = getWordPointPairAtPos(x, y);
+        if (pair[0].lt(wordSelectionBegin)) {
+          select(pair[0], wordSelectionEnd);
+          marker.assign(wordSelectionEnd);
+        } else if (pair[1].gt(wordSelectionEnd)) {
+          select(wordSelectionBegin, pair[1]);
+          marker.assign(wordSelectionBegin);
+        } else {
+          select(wordSelectionBegin, wordSelectionEnd);
+          marker.assign(wordSelectionBegin);
+        }
+      }
+    }
+    super.onMouseMove(...);
+  }
+
+  function onMouseUp(x, y, button) {
+    if (button == mbLeft) {
+      dragging = false;
+
+      if (wordSelection) {
+        wordSelection = false;
+        if (hasSelection
+            && selectionBegin.lt(wordSelectionBegin)) {
+          setPointer(selectionBegin.row, selectionBegin.col);
+        } else if (hasSelection
+                    && selectionEnd.gt(wordSelectionEnd)) {
+          setPointer(selectionEnd.row, selectionEnd.col, true);
+        } else {
+          setPointer(wordSelectionBegin.row, wordSelectionBegin.col);
+        }
+      }
+    }
+    super.onMouseUp(...);
+  }
+
+  // キー入力で文字挿入
+  function onKeyPress(key) {
+    if (dragging)
+      return;
+    if (key == ' '
+	&& ctrlSpacePressed)
+      return;
+    if (strPat.test(key)) {
+      insertAtPointer(key);
+    }
+  }
+
+  // キーダウンでキーバインド処理
+  function onKeyDown(key, shift) {
+    if (dragging)
+      return;
+
+    // 余分なシフトをマスク
+    shift &= ssAlt | ssShift | ssCtrl;
+
+    // C-SPACEが押されてたらスペースの文字入力を回避(emacsバインド用処理)
+    if (key == VK_SPACE && shift == ssCtrl)
+      ctrlSpacePressed = true;
+
+    // キーバインド処理
+    for (var i = 0; i < keyBind.count; i++)
+      if (keyBind[i][0] == key
+	  && keyBind[i][2] == ((keyBind[i][1] == 1) ? (shift & ~ssShift) : shift)) {
+        var prevRow, prevCol;
+        prevRow = pointer.row, prevCol = pointer.col;
+	keyBind[i][3]();
+        if (keyBind[i][1] == 2)
+          ;
+        else if (keyBind[i][1] == 0 || ! (shift & ssShift)) {
+          deselect();
+        } else if (prevRow == pointer.row
+                   && prevCol == pointer.col) {
+          return;
+        } else {
+          if (! hasSelection) {
+            marker.row = prevRow, marker.col = prevCol;
+          }
+          select(marker, pointer);
+        }          
+	return;
+      }
+
+    // カーソルキーを食い取る
+    switch (key) {
+    default:
+      super.onKeyDown(...);
+      break;
+    case VK_UP:
+    case VK_DOWN:
+    case VK_RIGHT:
+    case VK_LEFT:
+      break;
+    }
+  }
+
+  // キーアップ
+  function onKeyUp(key) {
+    if (key == VK_SPACE)
+      ctrlSpacePressed = false;
+  }
+
+  // ライトクリック
+  function onRightClick {
+    if (dragging)
+      return;
+
+    var menu = buildContextMenu();
+    menu.show();
+  }
+
+  // フォーカスしたらカーソル点滅
+  function onFocus {
+    startPointerBlink();
+  }
+  
+  // フォーカスロストしたらカーソル消去
+  function onBlur {
+    stopPointerBlink();
+  }
+
+  // サイズが変わったらレイアウトやり直し
+  function onSizeModified {
+    locateLayout();
+  }
+
+  // フォントが変わったらアップデート
+  function onFontFaceModified {
+    updateRowFont();
+  }
+
+  // フォントが変わったらアップデート
+  function onFontHeightModified {
+    updateRowFont();
+  }
+
+  // ノードがイネーブルされたら不透明に
+  function onNodeEnabled {
+    for (var i = 0; i < children.count; i++)
+      children[i].opacity = 255;
+  }
+
+  // ノードがディセーブルされたら半透明に
+  function onNodeDisabled {
+    for (var i = 0; i < children.count; i++)
+      children[i].opacity = 64;
+  }
+}

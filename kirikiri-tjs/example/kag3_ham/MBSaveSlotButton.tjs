@@ -1,0 +1,27 @@
+/******************************************************************************
+	mb/system/bookmark/MBSaveSlotButton.tjs
+*******************************************************************************/
+
+
+class MBSaveSlotButton extends MBButton
+{
+	function MBSaveSlotButton(window, parent)
+	{
+		super.MBButton(...);
+	}
+	
+	function finalize()
+	{
+		super.finalize(...);
+	}
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		if (button == mbRight) {
+			parent.onEscapeKeyDown();
+			return;
+		}
+		
+		super.onMouseDown(...);
+	}
+}
