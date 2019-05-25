@@ -1,30 +1,6 @@
 lexer grammar GoLexer;
 
-@lexer::members
-{// The most recently produced token.
-private Token lastToken = null;
-
-/**
- * Return the next token from the character stream and records this last
- * token in case it resides on the default channel. This recorded token
- * is used to determine when the lexer could possibly match a regex
- * literal.
- *
- * @return the next token from the character stream.
- */
-@Override
-public Token nextToken() {
-
-    // Get the next token.
-    Token next = super.nextToken();
-
-    if (next.getChannel() == Token.DEFAULT_CHANNEL) {
-        // Keep track of the last token on the default channel.
-        this.lastToken = next;
-    }
-
-    return next;
-}}
+options { superClass=GoBaseLexer; }
 
 // Keywords
 
@@ -58,21 +34,21 @@ IDENTIFIER             : LETTER (LETTER | UNICODE_DIGIT)*;
 
 // Punctuation
 
-L_PAREN                 : '(';
-R_PAREN                 : ')';
-L_CURLY                 : '{';
-R_CURLY                 : '}';
-L_BRACKET               : '[';
-R_BRACKET               : ']';
-ASSIGN                  : '=';
-COMMA                   : ',';
-SEMI                    : ';';
-COLON                   : ':';
-DOT                     : '.';
-PLUS_PLUS               : '++';
-MINUS_MINUS             : '--';
-DECLARE_ASSIGN          : ':=';
-ELLIPSIS                : '...';
+L_PAREN                : '(';
+R_PAREN                : ')';
+L_CURLY                : '{';
+R_CURLY                : '}';
+L_BRACKET              : '[';
+R_BRACKET              : ']';
+ASSIGN                 : '=';
+COMMA                  : ',';
+SEMI                   : ';';
+COLON                  : ':';
+DOT                    : '.';
+PLUS_PLUS              : '++';
+MINUS_MINUS            : '--';
+DECLARE_ASSIGN         : ':=';
+ELLIPSIS               : '...';
 
 // Logical
 
@@ -128,8 +104,8 @@ RUNE_LIT               : '\'' (UNICODE_VALUE | BYTE_VALUE) '\'';
 
 // String literals
 
-RAW_STRING_LIT         : '`' ~'`'*                                        '`';
-INTERPRETED_STRING_LIT : '"' ('\\"' | UNICODE_VALUE | BYTE_VALUE | ~'"')* '"';
+RAW_STRING_LIT         : '`' ~'`'*                                         '`';
+INTERPRETED_STRING_LIT : '"' ('\\"' | UNICODE_VALUE | BYTE_VALUE | ~'"')*? '"';
 
 // Hidden tokens
 
@@ -152,10 +128,6 @@ fragment BYTE_VALUE
     | '\\' 'x' HEX_DIGIT HEX_DIGIT
     ;
 
-fragment EXPONENT
-    : [eE] [+-]? DECIMALS
-    ;
-
 fragment DECIMALS
     : [0-9]+
     ;
@@ -166,6 +138,10 @@ fragment OCTAL_DIGIT
 
 fragment HEX_DIGIT
     : [0-9a-fA-F]
+    ;
+
+fragment EXPONENT
+    : [eE] [+-]? DECIMALS
     ;
 
 fragment LETTER
