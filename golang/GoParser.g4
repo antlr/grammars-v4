@@ -88,11 +88,11 @@ varSpec
     ;
 
 block
-    : '{' statementList '}'
+    : '{' statementList? '}'
     ;
 
 statementList
-    : (statement eos)*
+    : (statement eos)+
     ;
 
 statement
@@ -183,7 +183,8 @@ ifStmt
     ;
 
 switchStmt
-    : exprSwitchStmt | typeSwitchStmt
+    : exprSwitchStmt
+    | typeSwitchStmt
     ;
 
 exprSwitchStmt
@@ -191,11 +192,12 @@ exprSwitchStmt
     ;
 
 exprCaseClause
-    : exprSwitchCase ':' statementList
+    : exprSwitchCase ':' statementList?
     ;
 
 exprSwitchCase
-    : 'case' expressionList | 'default'
+    : 'case' expressionList
+    | 'default'
     ;
 
 typeSwitchStmt
@@ -207,11 +209,12 @@ typeSwitchGuard
     ;
 
 typeCaseClause
-    : typeSwitchCase ':' statementList
+    : typeSwitchCase ':' statementList?
     ;
 
 typeSwitchCase
-    : 'case' typeList | 'default'
+    : 'case' typeList
+    | 'default'
     ;
 
 typeList
@@ -227,7 +230,8 @@ commClause
     ;
 
 commCase
-    : 'case' (sendStmt | recvStmt) | 'default'
+    : 'case' (sendStmt | recvStmt)
+    | 'default'
     ;
 
 recvStmt
@@ -336,7 +340,29 @@ parameterDecl
     : identifierList? '...'? type
     ;
 
-// Operands
+expression
+    : primaryExpr
+    | ('+' | '-' | '!' | '^' | '*' | '&' | '<-') expression
+    | expression ('*' | '/' | '%' | '<<' | '>>' | '&' | '&^') expression
+    | expression ('+' | '-' | '|' | '^') expression
+    | expression ('==' | '!=' | '<' | '<=' | '>' | '>=') expression
+    | expression '&&' expression
+    | expression '||' expression
+    ;
+
+primaryExpr
+    : operand
+    | conversion
+    | primaryExpr ( selector
+                  | index
+                  | slice
+                  | typeAssertion
+                  | arguments)
+    ;
+
+conversion
+    : type '(' expression ','? ')'
+    ;
 
 operand
     : literal
@@ -433,16 +459,6 @@ functionLit
     : 'func' function
     ;
 
-primaryExpr
-    : operand
-    | conversion
-    | primaryExpr selector
-    | primaryExpr index
-    | primaryExpr slice
-    | primaryExpr typeAssertion
-    | primaryExpr arguments
-    ;
-
 selector
     : '.' IDENTIFIER
     ;
@@ -452,7 +468,7 @@ index
     ;
 
 slice
-    : '[' ((expression? ':' expression?) | (expression? ':' expression ':' expression)) ']'
+    : '[' (expression? ':' expression? | expression? ':' expression ':' expression) ']'
     ;
 
 typeAssertion
@@ -469,23 +485,7 @@ methodExpr
 
 receiverType
     : typeName
-    | '(' '*' typeName ')'
-    | '(' receiverType ')'
-    ;
-
-expression
-    : unaryExpr
-//    | expression BINARY_OP expression
-    | expression ('||' | '&&' | '==' | '!=' | '<' | '<=' | '>' | '>=' | '+' | '-' | '|' | '^' | '*' | '/' | '%' | '<<' | '>>' | '&' | '&^') expression
-    ;
-
-unaryExpr
-    : primaryExpr
-    | ('+'|'-'|'!'|'^'|'*'|'&'|'<-') unaryExpr
-    ;
-
-conversion
-    : type '(' expression ','? ')'
+    | '(' ('*' typeName | receiverType) ')'
     ;
 
 eos
