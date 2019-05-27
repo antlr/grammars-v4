@@ -394,20 +394,3 @@ comp_iter
     | IF test comp_iter?
     ;
 //----------------------------------------------------------------------------------------------------------------------
-
-// TODO delete it
-// --------------------- !!! WARNING completely unused !!!--------------------------------------------------------------
-list_iter
-    : FOR exprlist IN testlist_safe list_iter?
-    | IF test list_iter?
-    ;
-
-// Backward compatibility cruft to support:
-// [ x for x in lambda: True, lambda: False if x() ]
-// even while also allowing:
-// lambda x: 5 if x else 2
-// (But not a mix of the two)
-testlist_safe
-    : test ((COMMA test)+ COMMA?)?
-    ;
-//----------------------------------------------------------------------------------------------------------------------
