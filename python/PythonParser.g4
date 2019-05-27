@@ -355,7 +355,6 @@ trailer
     | DOT name
     ;
 
-// TODO: maybe inline?
 arglist
     // The reason that keywords are test nodes instead of name is that using name
     // results in an ambiguity. ast.c makes sure it's a name.
