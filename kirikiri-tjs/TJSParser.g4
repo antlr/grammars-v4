@@ -6,7 +6,7 @@ options {
 }
 
 program
-    : statements? EOF
+    : statement* EOF
     ;
 
 statement
@@ -30,11 +30,7 @@ statement
     ;
 
 block
-    : '{' statementList? '}'
-    ;
-
-statementList
-    : statement+
+    : '{' statement* '}'
     ;
 
 variableStatement
@@ -110,11 +106,11 @@ caseClauses
     ;
 
 caseClause
-    : Case expressionSequence ':' statementList?
+    : Case expressionSequence ':' statement*
     ;
 
 defaultClause
-    : Default ':' statementList?
+    : Default ':' statement*
     ;
 
 throwStatement
@@ -142,11 +138,13 @@ functionDeclaration
     ;
 
 classDeclaration
-    : Class Identifier? classTail
+    : Class Identifier? (Extends singleExpression (',' singleExpression)* )? '{' classStatement* '}'
     ;
-
-classTail // Another strange behavior for TJS: we can write almost any statement in TJS class body
-    : (Extends singleExpression (',' singleExpression)* )? '{' statement* '}'
+classStatement
+    : variableStatement
+    | functionDeclaration
+    | propertyDefinition
+    | classDeclaration
     ;
 
 propertyDefinition // TJS Property define
@@ -161,10 +159,6 @@ tjsSetter
     : Setter '(' functionParameters? ')' '{' functionBody '}'
     ;
 
-methodDefinition
-    : propertyName '(' functionParameters? ')' '{' functionBody '}'
-    ;
-
 functionParameters
     : functionParameter (',' functionParameter)*
     ;
@@ -175,11 +169,7 @@ functionParameter
     ;
 
 functionBody
-    : statements?
-    ;
-
-statements
-    : statement+
+    : statement*
     ;
 
 arrayLiteral
@@ -187,21 +177,26 @@ arrayLiteral
     ;
 
 elementList
-    : arrayElement (','+ arrayElement)*
+    : arrayElement ((','|'=>')+ arrayElement)*
     ;
 
 arrayElement
     : singleExpression
-    | singleExpression '=>' singleExpression
+    //| singleExpression '=>' singleExpression
     ;
 
 objectLiteral
-    : varModifier? '%[' (propertyAssignment (',' propertyAssignment)*)? ','? ']'
+    : //varModifier? '%[' (propertyAssignment (',' propertyAssignment)*)? ','? ']'
+    varModifier? '%[' propertyAssignment? (',' propertyAssignment)* ','?']'
+    ;
+
+propertySeprator
+    : ':' |'=' | '=>' | ','
     ;
 
 propertyAssignment
-    : propertyName (':' |'=' | '=>' | ',') singleExpression # PropertyExpressionAssignment  // {a:b,c:d} in TJS can be write like %[a,b,c,d], weird right?
-    | singleExpression '=>' singleExpression                # InPropertyCall                // another weird behavior, need investigate
+    : propertyName propertySeprator singleExpression //# PropertyExpressionAssignment  // {a:b,c:d} in TJS can be write like %[a,b,c,d], weird right?
+    //| singleExpression '=>' singleExpression                # InPropertyCall                // another weird behavior, need investigate
     ;
 
 propertyName
@@ -379,6 +374,6 @@ keyword
 eos
     : SemiColon
     | EOF
-    | {this.lineTerminatorAhead()}?
-    | {this.closeBrace()}?
+    | {this.lineTerminatorAhead()}? // TODO: Uncomment this
+    //| {this.closeBrace()}?
     ;
