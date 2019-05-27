@@ -145,6 +145,9 @@ classStatement
     | functionDeclaration
     | propertyDefinition
     | classDeclaration
+    | singleExpression eos
+    | ifStatement // TODO: but why?
+    | emptyStatement
     ;
 
 propertyDefinition // TJS Property define
@@ -186,8 +189,7 @@ arrayElement
     ;
 
 objectLiteral
-    : //varModifier? '%[' (propertyAssignment (',' propertyAssignment)*)? ','? ']'
-    varModifier? '%[' propertyAssignment? (',' propertyAssignment)* ','?']'
+    : varModifier? '%[' propertyAssignment? (',' propertyAssignment)* ','?']'
     ;
 
 propertySeprator
@@ -195,8 +197,8 @@ propertySeprator
     ;
 
 propertyAssignment
-    : propertyName propertySeprator singleExpression //# PropertyExpressionAssignment  // {a:b,c:d} in TJS can be write like %[a,b,c,d], weird right?
-    //| singleExpression '=>' singleExpression                # InPropertyCall                // another weird behavior, need investigate
+    : propertyName propertySeprator singleExpression
+    | singleExpression '=>' singleExpression         // TODO: TJS will use lvalue, if a = %['b'=>123], %[a.b=>1]['123'] = 1
     ;
 
 propertyName
