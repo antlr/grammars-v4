@@ -215,7 +215,7 @@ dotted_as_name
 // -------------------------- test, lambda and it's parameters ---------------------------------------------------------
 /*
  * Warning!
- * According to https://docs.python.org/3/reference/expressions.html#lambda LAMBDA shouls be followed by
+ * According to https://docs.python.org/3/reference/expressions.html#lambda LAMBDA should be followed by
  * `parameter_list` (in our case it is `typedargslist`)
  * But that's not true! `typedargslist` may have parameters with type hinting, but that's not permitted in lambda
  * definition
