@@ -28,6 +28,8 @@ grammar ECMAScript;
 
 @parser::members {
   
+    
+    private ITokenStream _input => this.InputStream as ITokenStream;
     ///<summary>Returns <c>true</c> iff on the current index of the parser's
     ///token stream a token of the given <c>type</c> exists on the
     ///<c>Hidden</c> channel.</summary>
@@ -103,8 +105,8 @@ grammar ECMAScript;
         return this.strictMode;
     }
 
-	///<summary>Sets whether the lexer operates in strict mode or not.</summary>
-	///<param name="strictMode">the flag indicating the lexer operates in strict mode or not.</param>
+ ///<summary>Sets whether the lexer operates in strict mode or not.</summary>
+ ///<param name="strictMode">the flag indicating the lexer operates in strict mode or not.</param>
     public void SetStrictMode(bool strictMode) {
         this.strictMode = strictMode;
     }
@@ -261,7 +263,7 @@ emptyStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : {(_input.La(1) != OpenBrace) && (_input.La(1) != Function)}? expressionSequence eos
+ : {(_input.LA(1) != OpenBrace) && (_input.LA(1) != Function)}? expressionSequence eos
  ;
 
 /// IfStatement :
@@ -642,7 +644,7 @@ singleExpression
  ;
 
 /// AssignmentOperator : one of
-///     *=	/=	%=	+=	-=	<<=	>>=	>>>=	&=	^=	|=
+///     *=   /=  %=  +=  -=  <<= >>= >>>=    &=  ^=  |=
 assignmentOperator
  : '*=' 
  | '/=' 
@@ -734,18 +736,18 @@ futureReservedWord
  ;
 
 getter
- : {_input.Lt(1).Text.Equals("get")}? Identifier propertyName
+ : {_input.LT(1).Text.Equals("get")}? Identifier propertyName
  ;
 
 setter
- : {_input.Lt(1).Text.Equals("set")}? Identifier propertyName
+ : {_input.LT(1).Text.Equals("set")}? Identifier propertyName
  ;
 
 eos
  : SemiColon
  | EOF
  | {lineTerminatorAhead()}?
- | {_input.Lt(1).Type == CloseBrace}?
+ | {_input.LT(1).Type == CloseBrace}?
  ;
 
 eof
