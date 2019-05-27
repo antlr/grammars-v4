@@ -96,7 +96,7 @@ classdef
     ;
 //----------------------------------------------------------------------------------------------------------------------
 
-// ------- function and it's parameters definition ---------------------------------------------------------------------
+// ------- function and its parameters definition ----------------------------------------------------------------------
 funcdef
     : ASYNC? DEF name OPEN_PAREN typedargslist? CLOSE_PAREN (ARROW test)? COLON suite
     ;
@@ -212,7 +212,7 @@ dotted_as_name
     ;
 //----------------------------------------------------------------------------------------------------------------------
 
-// -------------------------- test, lambda and it's parameters ---------------------------------------------------------
+// -------------------------- test, lambda and its parameters ----------------------------------------------------------
 /*
  * Warning!
  * According to https://docs.python.org/3/reference/expressions.html#lambda LAMBDA should be followed by
