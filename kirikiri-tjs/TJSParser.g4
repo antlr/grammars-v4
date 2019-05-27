@@ -42,7 +42,7 @@ variableDeclarationList
     ;
 
 variableDeclaration
-    : Identifier ('=' varModifier? singleExpression)? // ECMAScript 6: Array & Object Matching
+    : Identifier ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
 emptyStatement
@@ -50,13 +50,12 @@ emptyStatement
     ;
 
 expressionStatement
-    : {this.notOpenBraceAndNotFunction()}? expressionSequence eos
+    : expressionSequence eos
     ;
 
 ifStatement
     : If '(' expressionSequence ')' statement (Else statement)?
     ;
-
 
 iterationStatement
     : Do statement While '(' expressionSequence ')' eos                                                         # DoStatement
@@ -134,11 +133,11 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Function Identifier? ('(' functionParameters? ')')? ('{' functionBody '}')?
+    : Function Identifier? ('(' functionParameters? ')')? block
     ;
 
 classDeclaration
-    : Class Identifier? (Extends singleExpression (',' singleExpression)* )? '{' classStatement* '}'
+    : Class Identifier (Extends singleExpression (',' singleExpression)* )? '{' classStatement* '}'
     ;
 classStatement
     : variableStatement
@@ -151,15 +150,10 @@ classStatement
     ;
 
 propertyDefinition // TJS Property define
-    : Property Identifier '{' (tjsGetter|tjsSetter)* '}'
-    ;
-
-tjsGetter
-    : Getter ('(' ')')? '{' functionBody '}'
-    ;
-
-tjsSetter
-    : Setter '(' functionParameters? ')' '{' functionBody '}'
+    : Property Identifier '{'
+        ( Getter ('(' ')')? block
+        | Setter '(' functionParameter ')' block
+    )* '}'
     ;
 
 functionParameters
@@ -169,10 +163,6 @@ functionParameters
 functionParameter
     : Identifier ('=' singleExpression)?      // TJS2, ECMAScript 6: Initialization
     | Identifier? '*'
-    ;
-
-functionBody
-    : statement*
     ;
 
 arrayLiteral
@@ -185,7 +175,6 @@ elementList
 
 arrayElement
     : singleExpression
-    //| singleExpression '=>' singleExpression
     ;
 
 objectLiteral
@@ -197,14 +186,7 @@ propertySeprator
     ;
 
 propertyAssignment
-    : propertyName propertySeprator singleExpression
-    | singleExpression '=>' singleExpression         // TODO: TJS will use lvalue, if a = %['b'=>123], %[a.b=>1]['123'] = 1
-    ;
-
-propertyName
-    : identifierName
-    | StringLiteral
-    | numericLiteral
+    : singleExpression propertySeprator singleExpression // TJS resolve object key in runtime
     ;
 
 arguments
@@ -221,9 +203,9 @@ expressionSequence
     : singleExpression (',' singleExpression)*
     ;
 
+// TODO: optimize this
 singleExpression
     : functionDeclaration                                                       # FunctionExpression
-    | classDeclaration                                                          # ClassExpression
     | singleExpression '[' expressionSequence ']'                               # MemberIndexExpression
     | singleExpression '.' identifierName                                       # MemberDotExpression
     | singleExpression arguments                                                # ArgumentsExpression
@@ -305,6 +287,7 @@ tjsStringLiteral // tjs can use C like string literal: "part1""part2"
     : (StringLiteral
     | TemplateStringLiteral)+
     ;
+
 octetLiteral
     : '<%'                  // Hack for octet literal
     ( NonIdentHexByte       // 0f 7a 08.....
@@ -376,6 +359,4 @@ keyword
 eos
     : SemiColon
     | EOF
-    | {this.lineTerminatorAhead()}? // TODO: Uncomment this
-    //| {this.closeBrace()}?
     ;
