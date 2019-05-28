@@ -26,7 +26,7 @@ Link: https://github.com/krkrz/kwidgets
 
 ### test_scripts
 
-Official TJS2 test script
+Official TJS2 test script, modified to work without preprocessor.
 
 Link: https://github.com/krkrz/test_scripts
 
