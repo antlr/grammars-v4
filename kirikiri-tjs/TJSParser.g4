@@ -25,8 +25,8 @@ statement
     | throwStatement
     | tryStatement
     | debuggerStatement
-    | function
-    | property
+    | functionDeclaration
+    | propertyDeclaration
     ;
 
 block
@@ -34,14 +34,14 @@ block
     ;
 
 variableStatement
-    : varModifier variableDeclarations eos
+    : varModifier variables eos
     ;
 
-variableDeclarations
-    : variableDeclaration (',' variableDeclaration)*
+variables
+    : variable (',' variable)*
     ;
 
-variableDeclaration
+variable
     : Identifier ('=' expression)?
     ;
 
@@ -50,18 +50,18 @@ emptyStatement
     ;
 
 expressionStatement
-    : expressionSequence eos
+    : expressions eos
     ;
 
 ifStatement
-    : If '(' expressionSequence ')' statement (Else statement)?
+    : If '(' expressions ')' statement (Else statement)?
     ;
 
 iterationStatement
-    : Do statement While '(' expressionSequence ')' eos                                                         # DoStatement
-    | While '(' expressionSequence ')' statement                                                                # WhileStatement
-    | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement                 # ForStatement
-    | For '(' varModifier variableDeclarations ';' expressionSequence? ';' expressionSequence? ')' statement # ForVarStatement
+    : Do statement While '(' expressions ')' eos                                                         # DoStatement
+    | While '(' expressions ')' statement                                                                # WhileStatement
+    | For '(' expressions? ';' expressions? ';' expressions? ')' statement                 # ForStatement
+    | For '(' varModifier variables ';' expressions? ';' expressions? ')' statement    # ForVarStatement
     ;
 
 varModifier
@@ -85,19 +85,19 @@ breakStatement
     ;
 
 returnStatement
-    : Return expressionSequence? eos
+    : Return expressions? eos
     ;
 
 withStatement
-    : With '(' expressionSequence ')' statement
+    : With '(' expressions ')' statement
     ;
 
 switchStatement
-    : Switch '(' expressionSequence ')' '{' ( caseClause | defaultClause )* '}'
+    : Switch '(' expressions ')' '{' ( caseClause | defaultClause )* '}'
     ;
 
 caseClause
-    : Case expressionSequence ':' statement*
+    : Case expressions ':' statement*
     ;
 
 defaultClause
@@ -105,30 +105,30 @@ defaultClause
     ;
 
 throwStatement
-    : Throw expressionSequence eos
+    : Throw expressions eos
     ;
 
 tryStatement
-    : Try block catchProduction
-    ;
-
-catchProduction
-    : Catch ('(' Identifier? ')')? block
+    : Try block Catch ('(' Identifier? ')')? block
     ;
 
 debuggerStatement
     : Debugger eos
     ;
 
-function
-    : Function Identifier? ('(' functionParameters? ')')? block
+functionDeclaration
+    : Function Identifier ('(' functionParameters? ')')? block
+    ;
+
+anoymousFunctionDeclaration
+    : Function ('(' functionParameters? ')')? block
     ;
 
 classDeclaration
     : Class Identifier (Extends expression (',' expression)* )? block
     ;
 
-property // TJS Property define
+propertyDeclaration
     : Property Identifier '{'
         ( Getter ('(' ')')? block
         | Setter '(' functionParameter ')' block
@@ -140,7 +140,7 @@ functionParameters
     ;
 
 functionParameter
-    : Identifier ('=' expression)?      // TJS2, ECMAScript 6: Initialization
+    : Identifier ('=' expression)?
     | Identifier? '*'
     ;
 
@@ -175,21 +175,22 @@ argument
     | '*'
     ;
 
-expressionSequence
+expressions
     : expression (',' expression)*
     ;
 
+
+// TODO: can we optimize it?
 expression
-    : function                                   # FunctionExpression
-    | expression '[' expressionSequence ']'                 # MemberIndexExpression
+    : anoymousFunctionDeclaration                           # FunctionExpression
+    | expression '[' expressions ']'                        # MemberIndexExpression
     | expression '.' identifierName                         # MemberDotExpression
     | '.' identifierName                                    # WithDotExpression
-    | expression arguments                                  # ArgumentsExpression
+    | expression arguments                                  # CallExpression
     | New expression arguments?                             # NewExpression
-    | '&' expression                                        # TJSRefExpression
-    | '*' expression                                        # TJSPtrExpression
+    | '&' expression                                        # ReferenceExpression
+    | '*' expression                                        # PointerExpression
     | expression '<->' expression                           # SwapExpression
-
     | expression '!'                                        # EvalExpression        // t.f incontextof 's'! => 0721 (s=%[v=>0721])
     | expression Incontextof expression                     # InContextOfExpression // a incontextof d++ => Error: object++
     | expression '++'                                       # PostIncrementExpression
@@ -200,6 +201,7 @@ expression
     | Typeof expression                                     # TypeofExpression      // typeof 1 instanceof "String" => 'Integer'
     | expression Instanceof expression                      # InstanceofExpression  // 1 instanceof "Number" isvalid => 0,isvalid 1 instanceof "String"=>1
     | Invalidate expression                                 # InvalidateExpression  // invalidate a instanceof "Number" => 0
+    | expression In expression                              # InExpression          // TODO: any standard for it?
     | '++' expression                                       # PreIncrementExpression
     | '--' expression                                       # PreDecreaseExpression // typeof 1 + 1 = 'Integer1'
     | '+' expression                                        # UnaryPlusExpression
@@ -210,7 +212,6 @@ expression
     | expression ('+' | '-') expression                     # AdditiveExpression
     | expression ('<<' | '>>' | '>>>') expression           # BitShiftExpression
     | expression ('<' | '>' | '<=' | '>=') expression       # RelationalExpression
-    | expression In expression                              # InExpression          // TODO: any standard for it?
     | expression ('==' | '!=' | '===' | '!==') expression   # EqualityExpression
     | expression '&' expression                             # BitAndExpression
     | expression '^' expression                             # BitXOrExpression
@@ -227,8 +228,8 @@ expression
     | literal                                               # LiteralExpression
     | arrayLiteral                                          # ArrayLiteralExpression
     | objectLiteral                                         # ObjectLiteralExpression
-    | '(' expressionSequence ')'                            # ParenthesizedExpression
-    | expression If expressionSequence                      # TJSIfExpression       // b = c = 1 if a ==> (b=c=1)if a
+    | '(' expressions ')'                                   # ParenthesizedExpression
+    | expression If expressions                             # IfExpression          // b = c = 1 if a ==> (b=c=1)if a
     ;
 
 assignmentOperator
