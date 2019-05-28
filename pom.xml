@@ -91,7 +91,7 @@
 				<module>clf</module>
 				<module>clif</module>
 				<module>clojure</module>
-				<!-- <module>clu</module> -->
+				<module>clu</module>
 				<module>cmake</module>
 				<module>cobol85</module>
 				<module>cookie</module>
