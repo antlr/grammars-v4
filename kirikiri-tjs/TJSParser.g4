@@ -10,7 +10,7 @@ program
     ;
 
 statement
-    : block
+    : block 
     | variableStatement
     | emptyStatement
     | classDeclaration
@@ -25,8 +25,8 @@ statement
     | throwStatement
     | tryStatement
     | debuggerStatement
-    | functionDeclaration
-    | propertyDefinition
+    | function
+    | property
     ;
 
 block
@@ -34,15 +34,15 @@ block
     ;
 
 variableStatement
-    : varModifier variableDeclarationList eos
+    : varModifier variableDeclarations eos
     ;
 
-variableDeclarationList
+variableDeclarations
     : variableDeclaration (',' variableDeclaration)*
     ;
 
 variableDeclaration
-    : Identifier ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
+    : Identifier ('=' expression)?
     ;
 
 emptyStatement
@@ -61,7 +61,7 @@ iterationStatement
     : Do statement While '(' expressionSequence ')' eos                                                         # DoStatement
     | While '(' expressionSequence ')' statement                                                                # WhileStatement
     | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement                 # ForStatement
-    | For '(' varModifier variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')' statement # ForVarStatement
+    | For '(' varModifier variableDeclarations ';' expressionSequence? ';' expressionSequence? ')' statement # ForVarStatement
     ;
 
 varModifier
@@ -93,15 +93,7 @@ withStatement
     ;
 
 switchStatement
-    : Switch '(' expressionSequence ')' caseBlock
-    ;
-
-caseBlock
-    : '{' caseClauses? (defaultClause caseClauses?)? '}'
-    ;
-
-caseClauses
-    : caseClause+
+    : Switch '(' expressionSequence ')' '{' ( caseClause | defaultClause )* '}'
     ;
 
 caseClause
@@ -117,39 +109,26 @@ throwStatement
     ;
 
 tryStatement
-    : Try block (catchProduction finallyProduction? | finallyProduction)
+    : Try block catchProduction
     ;
 
 catchProduction
     : Catch ('(' Identifier? ')')? block
     ;
 
-finallyProduction
-    : Finally block
-    ;
-
 debuggerStatement
     : Debugger eos
     ;
 
-functionDeclaration
+function
     : Function Identifier? ('(' functionParameters? ')')? block
     ;
 
 classDeclaration
-    : Class Identifier (Extends singleExpression (',' singleExpression)* )? '{' classStatement* '}'
-    ;
-classStatement
-    : variableStatement
-    | functionDeclaration
-    | propertyDefinition
-    | classDeclaration
-    | singleExpression eos
-    | ifStatement // TODO: but why?
-    | emptyStatement
+    : Class Identifier (Extends expression (',' expression)* )? block
     ;
 
-propertyDefinition // TJS Property define
+property // TJS Property define
     : Property Identifier '{'
         ( Getter ('(' ')')? block
         | Setter '(' functionParameter ')' block
@@ -161,100 +140,95 @@ functionParameters
     ;
 
 functionParameter
-    : Identifier ('=' singleExpression)?      // TJS2, ECMAScript 6: Initialization
+    : Identifier ('=' expression)?      // TJS2, ECMAScript 6: Initialization
     | Identifier? '*'
     ;
 
 arrayLiteral
-    : varModifier? '[' ','* elementList? ','* ']'
+    : varModifier? '[' arrayElementSeprator* elementList? arrayElementSeprator* ']'
     ;
 
 elementList
-    : arrayElement ((','|'=>')+ arrayElement)*
+    : expression (arrayElementSeprator+ expression)*
     ;
 
-arrayElement
-    : singleExpression
+arrayElementSeprator
+    : ','
+    | '=>'
     ;
 
 objectLiteral
-    : varModifier? '%[' propertyAssignment? (',' propertyAssignment)* ','?']'
+    : varModifier? '%[' objectProperty? (',' objectProperty)* ','?']'
     ;
 
-propertySeprator
-    : ':' |'=' | '=>' | ','
-    ;
-
-propertyAssignment
-    : singleExpression propertySeprator singleExpression // TJS resolve object key in runtime
+objectProperty
+    : expression (':' |'=' | '=>' | ',') expression // TJS resolve object key in runtime
     ;
 
 arguments
-    : '(' tjsArgument? (',' tjsArgument?)* ')'
-    | '(' ( Ellipsis | '*') ')' // ... means use argument (JS function argument)
+    : '(' argument? (',' argument?)* ')'
+    | '(' Ellipsis ')' // ... means use argument (JS function argument)
     ;
 
-tjsArgument // In TJS, argument can expanded by using *
-    : singleExpression '*'?
+argument
+    : expression '*'?
     | '*'
     ;
 
 expressionSequence
-    : singleExpression (',' singleExpression)*
+    : expression (',' expression)*
     ;
 
-// TODO: optimize this
-singleExpression
-    : functionDeclaration                                                       # FunctionExpression
-    | singleExpression '[' expressionSequence ']'                               # MemberIndexExpression
-    | singleExpression '.' identifierName                                       # MemberDotExpression
-    | singleExpression arguments                                                # ArgumentsExpression
-    | New singleExpression arguments?                                           # NewExpression
-    | singleExpression '++'                                                     # PostIncrementExpression
-    | singleExpression '--'                                                     # PostDecreaseExpression
-    | Delete singleExpression                                                   # DeleteExpression
-    | Void singleExpression?                                                    # VoidExpression
-    | Typeof singleExpression                                                   # TypeofExpression
-    | '++' singleExpression                                                     # PreIncrementExpression
-    | '--' singleExpression                                                     # PreDecreaseExpression
-    | '+' singleExpression                                                      # UnaryPlusExpression
-    | '-' singleExpression                                                      # UnaryMinusExpression
-    | '~' singleExpression                                                      # BitNotExpression
-    | '!' singleExpression                                                      # NotExpression
-    | singleExpression '!'                                                      # EvalExpression
-    | singleExpression ('*' | '/' | '%' | '\\') singleExpression                # MultiplicativeExpression
-    | singleExpression ('+' | '-') singleExpression                             # AdditiveExpression
-    | singleExpression ('<<' | '>>' | '>>>') singleExpression                   # BitShiftExpression
-    | singleExpression ('<' | '>' | '<=' | '>=') singleExpression               # RelationalExpression
-    | singleExpression Instanceof singleExpression                              # InstanceofExpression
-    | singleExpression In singleExpression                                      # InExpression
-    | singleExpression ('==' | '!=' | '===' | '!==') singleExpression           # EqualityExpression
-    | singleExpression '&' singleExpression                                     # BitAndExpression
-    | singleExpression '^' singleExpression                                     # BitXOrExpression
-    | singleExpression '|' singleExpression                                     # BitOrExpression
-    | singleExpression '&&' singleExpression                                    # LogicalAndExpression
-    | singleExpression '||' singleExpression                                    # LogicalOrExpression
-    | singleExpression '?' singleExpression ':' singleExpression                # TernaryExpression
-    | singleExpression '=' singleExpression                                     # AssignmentExpression
-    | singleExpression '<->' singleExpression                                   # SwapExpression
-    | singleExpression assignmentOperator singleExpression                      # AssignmentOperatorExpression
-    | singleExpression TemplateStringLiteral+                                   # TemplateStringExpression  // ECMAScript 6, TJS has simillar feature
-    | This                                                                      # ThisExpression
-    | Identifier                                                                # IdentifierExpression
-    | Super                                                                     # SuperExpression
-    | typeConverter singleExpression                                            # TypeConvertExpression
-    | literal                                                                   # LiteralExpression
-    | arrayLiteral                                                              # ArrayLiteralExpression
-    | objectLiteral                                                             # ObjectLiteralExpression
-    | '(' expressionSequence ')'                                                # ParenthesizedExpression
-    | singleExpression Incontextof singleExpression                             # InContextOfExpression
-    | singleExpression If singleExpression                                      # TJSIfExpression
-    | Invalidate (('(' identifierName ')') |identifierName)                     # InvalidateExpression
-    | '&' singleExpression                                                      # TJSRefExpression
-    | '*' singleExpression                                                      # TJSPtrExpression
-    | '.' identifierName                                                        # WithDotExpression
-    | singleExpression Isvalid                                                  # IsValidExpression
-    | Isvalid singleExpression                                                  # IsValidExpression
+expression
+    : function                                   # FunctionExpression
+    | expression '[' expressionSequence ']'                 # MemberIndexExpression
+    | expression '.' identifierName                         # MemberDotExpression
+    | '.' identifierName                                    # WithDotExpression
+    | expression arguments                                  # ArgumentsExpression
+    | New expression arguments?                             # NewExpression
+    | '&' expression                                        # TJSRefExpression
+    | '*' expression                                        # TJSPtrExpression
+    | expression '<->' expression                           # SwapExpression
+
+    | expression '!'                                        # EvalExpression        // t.f incontextof 's'! => 0721 (s=%[v=>0721])
+    | expression Incontextof expression                     # InContextOfExpression // a incontextof d++ => Error: object++
+    | expression '++'                                       # PostIncrementExpression
+    | expression '--'                                       # PostDecreaseExpression
+    | expression Isvalid                                    # IsValidExpression     // t incontextof ctx isvalid => 1
+    | Delete expression                                     # DeleteExpression      // delete a.c isvalid => error
+    | Isvalid expression                                    # IsValidExpression     // isvalid delete a.c => 1
+    | Typeof expression                                     # TypeofExpression      // typeof 1 instanceof "String" => 'Integer'
+    | expression Instanceof expression                      # InstanceofExpression  // 1 instanceof "Number" isvalid => 0,isvalid 1 instanceof "String"=>1
+    | Invalidate expression                                 # InvalidateExpression  // invalidate a instanceof "Number" => 0
+    | '++' expression                                       # PreIncrementExpression
+    | '--' expression                                       # PreDecreaseExpression // typeof 1 + 1 = 'Integer1'
+    | '+' expression                                        # UnaryPlusExpression
+    | '-' expression                                        # UnaryMinusExpression
+    | '~' expression                                        # BitNotExpression
+    | '!' expression                                        # NotExpression
+    | expression ('*' | '/' | '%' | '\\') expression        # MultiplicativeExpression
+    | expression ('+' | '-') expression                     # AdditiveExpression
+    | expression ('<<' | '>>' | '>>>') expression           # BitShiftExpression
+    | expression ('<' | '>' | '<=' | '>=') expression       # RelationalExpression
+    | expression In expression                              # InExpression          // TODO: any standard for it?
+    | expression ('==' | '!=' | '===' | '!==') expression   # EqualityExpression
+    | expression '&' expression                             # BitAndExpression
+    | expression '^' expression                             # BitXOrExpression
+    | expression '|' expression                             # BitOrExpression
+    | expression '&&' expression                            # LogicalAndExpression
+    | expression '||' expression                            # LogicalOrExpression
+    | expression '?' expression ':' expression              # TernaryExpression
+    | expression '=' expression                             # AssignmentExpression
+    | expression assignmentOperator expression              # AssignmentOperatorExpression
+    | This                                                  # ThisExpression
+    | Identifier                                            # IdentifierExpression
+    | Super                                                 # SuperExpression
+    | typeConverter expression                              # TypeConvertExpression
+    | literal                                               # LiteralExpression
+    | arrayLiteral                                          # ArrayLiteralExpression
+    | objectLiteral                                         # ObjectLiteralExpression
+    | '(' expressionSequence ')'                            # ParenthesizedExpression
+    | expression If expressionSequence                      # TJSIfExpression       // b = c = 1 if a ==> (b=c=1)if a
     ;
 
 assignmentOperator
@@ -277,15 +251,11 @@ assignmentOperator
 literal
     : NullLiteral
     | BooleanLiteral
-    | tjsStringLiteral
+    | (StringLiteral | TemplateStringLiteral)+
     | octetLiteral
     | RegularExpressionLiteral
     | numericLiteral
-    ;
-
-tjsStringLiteral // tjs can use C like string literal: "part1""part2"
-    : (StringLiteral
-    | TemplateStringLiteral)+
+    | Void
     ;
 
 octetLiteral
