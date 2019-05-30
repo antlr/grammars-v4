@@ -470,9 +470,8 @@ fragment UnicodeLetter
     | [\u3105-\u312C]
     | [\u3131-\u318E]
     | [\u31A0-\u31B7]
-    | [\u3400]
-    | [\u4DB5]
-    | [\u4E00-\u9FA5] // CJK, As a language from East Asia, we need it
+    | [\u3400-\u4DBF]
+    | [\u4E00-\u9FFF] // CJK, As a language from East Asia, we need it
     | [\uA000-\uA48C]
     | [\uAC00]
     | [\uD7A3]
