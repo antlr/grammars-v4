@@ -1072,10 +1072,14 @@ groupByItem
 limitClause
     : LIMIT
     (
-      (offset=decimalLiteral ',')? limit=decimalLiteral
-      | limit=decimalLiteral OFFSET offset=decimalLiteral
+      (offset=limitClauseAtom ',')? limit=limitClauseAtom
+      | limit=limitClauseAtom OFFSET offset=limitClauseAtom
     )
     ;
+
+limitClauseAtom
+	: decimalLiteral | mysqlVariable
+	;
 
 
 // Transaction's Statements
