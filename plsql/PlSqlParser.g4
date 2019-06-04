@@ -487,7 +487,7 @@ overriding_subprogram_spec
 
 overriding_function_spec
     : FUNCTION function_name ('(' type_elements_parameter (',' type_elements_parameter)* ')')?
-      RETURN (type_spec | SELF AS RESULT) 
+      RETURN (type_spec | SELF AS RESULT)
      (PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body))? ';'?
     ;
 
@@ -539,12 +539,12 @@ alter_session
         | CLOSE DATABASE LINK parameter_name
         | enable_or_disable COMMIT IN PROCEDURE
         | enable_or_disable GUARD
-        | (enable_or_disable | FORCE) PARALLEL (DML | DDL | QUERY) (PARALLEL (literal | parameter_name))? 
-        | SET alter_session_set_clause 
+        | (enable_or_disable | FORCE) PARALLEL (DML | DDL | QUERY) (PARALLEL (literal | parameter_name))?
+        | SET alter_session_set_clause
     )
     ;
 
-alter_session_set_clause 
+alter_session_set_clause
     : parameter_name '=' parameter_value
     ;
 
@@ -2461,7 +2461,7 @@ filename
 
 alter_table
     : ALTER TABLE tableview_name
-      ( 
+      (
       | alter_table_properties
       | constraint_clauses
       | column_clauses
@@ -3703,12 +3703,19 @@ cursor_expression
     ;
 
 logical_expression
-    : multiset_expression (IS NOT?
-        (NULL_ | NAN | PRESENT | INFINITE | A_LETTER SET | EMPTY | OF TYPE?
-        '(' ONLY? type_spec (',' type_spec)* ')'))*
-    | NOT logical_expression
-    | logical_expression AND logical_expression
-    | logical_expression OR logical_expression
+    : unary_logical_expression
+    | logical_expression op=(AND | OR) logical_expression
+    ;
+
+unary_logical_expression
+    : NOT? multiset_expression (IS NOT? logical_operation)*
+    ;
+
+logical_operation:
+        (NULL_
+        | NAN | PRESENT
+        | INFINITE | A_LETTER SET | EMPTY
+        | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')')
     ;
 
 multiset_expression
