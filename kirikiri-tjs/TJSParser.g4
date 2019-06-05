@@ -58,10 +58,10 @@ ifStatement
     ;
 
 iterationStatement
-    : Do statement While '(' expressions ')' eos                                                         # DoStatement
-    | While '(' expressions ')' statement                                                                # WhileStatement
-    | For '(' expressions? ';' expressions? ';' expressions? ')' statement                 # ForStatement
-    | For '(' varModifier variables ';' expressions? ';' expressions? ')' statement    # ForVarStatement
+    : Do statement While '(' expressions ')' eos                                    # DoStatement
+    | While '(' expressions ')' statement                                           # WhileStatement
+    | For '(' expressions? ';' expressions? ';' expressions? ')' statement          # ForStatement
+    | For '(' varModifier variables ';' expressions? ';' expressions? ')' statement # ForVarStatement
     ;
 
 varModifier
@@ -179,7 +179,6 @@ expressions
     : expression (',' expression)*
     ;
 
-
 // TODO: can we optimize it?
 expression
     : anoymousFunctionDeclaration                           # FunctionExpression
@@ -253,19 +252,10 @@ literal
     : NullLiteral
     | BooleanLiteral
     | (StringLiteral | TemplateStringLiteral)+
-    | octetLiteral
+    | OctetLiteral
     | RegularExpressionLiteral
     | numericLiteral
     | Void
-    ;
-
-octetLiteral
-    : '<%'                  // Hack for octet literal
-    ( NonIdentHexByte       // 0f 7a 08.....
-    | OctalIntegerLiteral   // 00 07 .....
-    | DecimalLiteral        // 13 75 .....
-    | Identifier)*          // ef b9 .....
-    '%>'                    // Remember handle it in type recognization
     ;
 
 numericLiteral
