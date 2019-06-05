@@ -7,7 +7,7 @@ ERR=lasterror.txt
 DEFAULTTEST=example/**/*.tjs
 TEST=${@:-$DEFAULTTEST}
 FAIL=0
-for i in $TEST
+time for i in $TEST
 do
     echo Test $i
     cat $i | node preprocess.js | grun TJS program 2> $ERR

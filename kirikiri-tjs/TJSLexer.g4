@@ -6,9 +6,7 @@ options { superClass=TJSBaseLexer; }
 MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
 SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
 RegularExpressionLiteral:       {this.IsRegexPossible()}? '/' RegularExpressionFirstChar RegularExpressionChar* '/' IdentifierPart*;
-
-StartOctet:                     '<%';
-EndOctet:                       '%>';
+OctetLiteral:                   '<%' .*? '%>';
 
 OpenBracket:                    '[';
 CloseBracket:                   ']';

@@ -49,7 +49,7 @@
 					<entryPoint>program</entryPoint>
 					<grammarName>TJS</grammarName>
 					<packageName></packageName>
-					<exampleFiles>example/kag3_ham</exampleFiles>
+					<exampleFiles>example/test_scripts</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>
