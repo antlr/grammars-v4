@@ -63,6 +63,9 @@ select 'abc' ' bcd' ' \' \' ' as col, \N c2, -.1e-3;
 #begin
 -- -- Variables
 SELECT @myvar;
+select * from t1 limit @varcount;
+select * from t1 limit @varoffset, @varcount;
+select * from t1 limit @varcount offset @varoffset;
 #end
 
 #begin
