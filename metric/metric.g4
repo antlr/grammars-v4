@@ -29,7 +29,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar metric;
 
 uom
@@ -105,12 +104,11 @@ derivedunit
    | 'kat'
    ;
 
-
 INTE
-   : [0-9] +
+   : [0-9]+
    ;
-
 
 WS
    : [ \t\r\n] -> skip
    ;
+
