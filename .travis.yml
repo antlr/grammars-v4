@@ -1,6 +1,6 @@
 language: java 
 jdk:
-  - oraclejdk9
+  - openjdk12
 sudo: required
 
 install: true
