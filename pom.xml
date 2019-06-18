@@ -252,6 +252,7 @@
 				<module>wkt</module>
 				<module>xml</module>
 				<module>xpath</module>
+				<module>xsd-regex</module>
 				<module>z</module>
 				<!-- testing repository -->
 				<!--<module>grammar-test</module> -->
