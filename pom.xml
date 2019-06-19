@@ -125,6 +125,7 @@
 				<module>gtin</module>
 				<module>guido</module>
 				<module>html</module>
+				<module>http</module>
 				<module>hypertalk</module>
 				<module>icalendar</module>
 				<module>icon</module>
