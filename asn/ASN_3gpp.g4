@@ -178,7 +178,7 @@ extensionAdditionList  :  (extensionAddition) (COMMA  extensionAddition)*
 ;
 extensionAddition  : componentType  |  extensionAdditionGroup
 ;
-extensionAdditionGroup  :  DOUBLE_L_BRACKET  versionNumber  componentTypeList  DOUBLE_R_BRACKET
+extensionAdditionGroup  :  DOUBLE_L_BRACKET  versionNumber  componentTypeList tag?  DOUBLE_R_BRACKET
 ;
 versionNumber  :  (NUMBER  COLON )?
 ;
