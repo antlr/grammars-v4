@@ -43,7 +43,7 @@ If you have some comments/improvements, send me an e-mail.
 */
 
 
-grammar ASN;
+grammar ASN_3gpp;
 
 modules: moduleDefinition+;
 
@@ -131,20 +131,38 @@ optionalExtensionMarker :  ( COMMA  ELLIPSIS )?
 ;
 
 componentTypeLists :
-   rootComponentTypeList (COMMA  extensionAndException  extensionAdditions   (optionalExtensionMarker|(EXTENSTIONENDMARKER  COMMA  rootComponentTypeList)))?
+   rootComponentTypeList (tag | (COMMA tag? extensionAndException  extensionAdditions   (optionalExtensionMarker|(EXTENSTIONENDMARKER  COMMA  rootComponentTypeList tag?))))?
 //  |  rootComponentTypeList  COMMA  extensionAndException  extensionAdditions    optionalExtensionMarker
 //  |  rootComponentTypeList  COMMA  extensionAndException  extensionAdditions     EXTENSTIONENDMARKER  COMMA  rootComponentTypeList
-  |  extensionAndException  extensionAdditions  (optionalExtensionMarker | (EXTENSTIONENDMARKER  COMMA    rootComponentTypeList))
+  |  extensionAndException  extensionAdditions  (optionalExtensionMarker | (EXTENSTIONENDMARKER  COMMA    rootComponentTypeList tag?))
 //  |  extensionAndException  extensionAdditions  optionalExtensionMarker
 ;
 rootComponentTypeList  : componentTypeList
 ;
-componentTypeList  : (componentType) (COMMA componentType)*
+componentTypeList  : (componentType) (COMMA tag? componentType)*
 ;
 componentType  :
   namedType (OPTIONAL_LITERAL | DEFAULT_LITERAL value )?
  |  COMPONENTS_LITERAL OF_LITERAL  asnType
 ;
+
+tag
+  : needTag
+  | condTag
+  | INVALID_TAG
+  ;
+
+needTag
+  : '-- Need' IDENTIFIER
+  ;
+
+condTag
+  : '-- Cond' IDENTIFIER
+  ;
+
+INVALID_TAG
+  : '--' ~('\n'|'\r')*
+  ;
 
 extensionAdditions  :  (COMMA  extensionAdditionList)?
 ;
@@ -973,7 +991,7 @@ fragment Exponent
     ;
 
 LINE_COMMENT
-    : '--' ~('\n'|'\r')* '\r'? '\n' ->skip
+    : {getCharPositionInLine() == 0}? (' ' | '\t')*? '--' ~('\n'|'\r')* '\r'? '\n' ->skip
     ;
 
 BSTRING
