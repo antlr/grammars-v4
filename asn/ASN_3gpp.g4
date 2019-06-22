@@ -153,11 +153,19 @@ tag
   ;
 
 needTag
-  : '-- Need' IDENTIFIER
+  : NEED_LITERAL IDENTIFIER
+  ;
+
+NEED_LITERAL
+  : '--' (' ' | '\t')*? 'Need'
   ;
 
 condTag
-  : '-- Cond' IDENTIFIER
+  : COND_LITERAL IDENTIFIER
+  ;
+
+COND_LITERAL
+  : '--' (' ' | '\t')*? 'Cond'
   ;
 
 INVALID_TAG
