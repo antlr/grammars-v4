@@ -78,6 +78,7 @@
 				<module>asmMASM</module>
 				<module>asmZ80</module>
 				<module>asn</module>
+				<module>asn_3gpp</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 				<!-- <module>aspectj</module> -->
 				<module>atl</module>
