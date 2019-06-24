@@ -16,7 +16,7 @@ create table child_table(id int unsigned auto_increment primary key, id_parent i
 create table `another some table $$` like `some table $$`;
 create table `actor` (`last_update` timestamp default CURRENT_TIMESTAMP, `birthday` datetime default CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP);
 create table boolean_table(c1 bool, c2 boolean default true);
-create table default_table(c1 int default 42, c2 int default -42);
+create table default_table(c1 int default 42, c2 int default -42, c3 varchar(256) DEFAULT _utf8mb3'xxx');
 create table ts_table(
   ts1 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   ts2 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIME,
