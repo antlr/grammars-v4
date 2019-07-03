@@ -6,7 +6,8 @@ options {
 }
 
 sourceFile
-    : packageClause eos (importDecl eos)* (topLevelDecl eos)*
+//    : packageClause eos (importDecl eos)* (topLevelDecl eos)*
+    : packageClause eos (importDecl eos)* ((functionDecl | methodDecl | declaration) eos)*
     ;
 
 packageClause
@@ -25,11 +26,12 @@ importPath
     : string
     ;
 
-topLevelDecl
+/*topLevelDecl
     : declaration
     | functionDecl
     | methodDecl
     ;
+*/
 
 declaration
     : constDecl
@@ -300,6 +302,7 @@ sliceType
     : '[' ']' elementType
     ;
 
+// It's possible to replace `type` with more restricted typeLit list and also pay attention to nil maps
 mapType
     : 'map' '[' type ']' elementType
     ;
@@ -329,12 +332,14 @@ result
     ;
 
 parameters
-    : '(' (parameterList ','?)? ')'
+    : '(' parameterDecl (',' parameterDecl)* ')' //'(' (parameterList ','?)? ')'
     ;
 
+/*
 parameterList
     : parameterDecl (',' parameterDecl)*
     ;
+*/
 
 parameterDecl
     : identifierList? '...'? type
@@ -353,7 +358,7 @@ expression
 primaryExpr
     : operand
     | conversion
-    | primaryExpr ( selector
+    | primaryExpr ( DOT IDENTIFIER
                   | index
                   | slice
                   | typeAssertion
@@ -459,10 +464,6 @@ functionLit
     : 'func' function
     ;
 
-selector
-    : '.' IDENTIFIER
-    ;
-
 index
     : '[' expression ']'
     ;
@@ -480,12 +481,16 @@ arguments
     ;
 
 methodExpr
-    : receiverType '.' IDENTIFIER
+    : receiverType DOT IDENTIFIER
     ;
 
-receiverType
+/*receiverType
     : typeName
     | '(' ('*' typeName | receiverType) ')'
+    ;
+*/
+receiverType
+    : type
     ;
 
 eos
