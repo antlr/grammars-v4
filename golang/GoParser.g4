@@ -332,14 +332,12 @@ result
     ;
 
 parameters
-    : '(' parameterDecl (',' parameterDecl)* ')' //'(' (parameterList ','?)? ')'
+    : '(' (parameterList COMMA?)? ')'
     ;
 
-/*
 parameterList
-    : parameterDecl (',' parameterDecl)*
+    : parameterDecl (COMMA parameterDecl)*
     ;
-*/
 
 parameterDecl
     : identifierList? '...'? type
