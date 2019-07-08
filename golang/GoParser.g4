@@ -66,15 +66,15 @@ typeSpec
 // Function declarations
 
 functionDecl
-    : 'func' IDENTIFIER (function | signature)
+    : 'func' IDENTIFIER (signature block?)
     ;
-
+/*
 function
     : signature block
     ;
-
+*/
 methodDecl
-    : 'func' receiver IDENTIFIER (function | signature)
+    : 'func' receiver IDENTIFIER (signature block?)
     ;
 
 receiver
@@ -133,7 +133,7 @@ sendStmt
     ;
 
 incDecStmt
-    : expression ('++' | '--')
+    : expression (PLUS_PLUS | MINUS_MINUS)
     ;
 
 assignment
@@ -332,12 +332,13 @@ result
     ;
 
 parameters
-    : '(' (parameterList COMMA?)? ')'
+    : '(' (parameterDecl (COMMA parameterDecl)* COMMA?)? ')'
     ;
 
-parameterList
+/*parameterList
     : parameterDecl (COMMA parameterDecl)*
     ;
+*/
 
 parameterDecl
     : identifierList? '...'? type
@@ -459,7 +460,7 @@ anonymousField
     ;
 
 functionLit
-    : 'func' function
+    : 'func' signature block // function
     ;
 
 index
