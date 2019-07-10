@@ -30,6 +30,8 @@ IMPORT                 : 'import';
 RETURN                 : 'return';
 VAR                    : 'var';
 
+NIL_LIT                : 'nil';
+
 IDENTIFIER             : LETTER (LETTER | UNICODE_DIGIT)*;
 
 // Punctuation

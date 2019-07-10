@@ -346,7 +346,7 @@ parameterDecl
 
 expression
     : primaryExpr
-    | ('+' | '-' | '!' | '^' | '*' | '&' | '<-') expression
+    | unaryExpr
     | expression ('*' | '/' | '%' | '<<' | '>>' | '&' | '&^') expression
     | expression ('+' | '-' | '|' | '^') expression
     | expression ('==' | '!=' | '<' | '<=' | '>' | '>=') expression
@@ -362,6 +362,11 @@ primaryExpr
                   | slice
                   | typeAssertion
                   | arguments)
+    ;
+
+unaryExpr
+    : primaryExpr 
+    | ('+' | '-' | '!' | '^' | '*' | '&' | '<-') expression
     ;
 
 conversion
@@ -382,7 +387,8 @@ literal
     ;
 
 basicLit
-    : integer
+    : NIL_LIT
+    | integer
     | string
     | FLOAT_LIT
     | IMAGINARY_LIT
