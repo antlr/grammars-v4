@@ -80,15 +80,17 @@ fragment VALID_ID_CHAR
    : VALID_ID_START | ('0' .. '9')
    ;
 
-
+//The NUMBER part gets its potential sign from "(PLUS | MINUS)* atom" in the expression rule
 SCIENTIFIC_NUMBER
-   : NUMBER (E SIGN? NUMBER)?
+   : NUMBER (E SIGN? UNSIGNED_INTEGER)?
    ;
-
-//The integer part gets its potential sign from the signedAtom rule
 
 fragment NUMBER
    : ('0' .. '9') + ('.' ('0' .. '9') +)?
+   ;
+
+fragment UNSIGNED_INTEGER
+   : ('0' .. '9')+
    ;
 
 
