@@ -145,7 +145,7 @@ createIndex
         ALGORITHM '='? algType=(DEFAULT | INPLACE | COPY)
         | LOCK '='?
           lockType=(DEFAULT | NONE | SHARED | EXCLUSIVE)
-      )?
+      )*
     ;
 
 createLogfileGroup
@@ -670,10 +670,9 @@ dropIndex
       uid ON tableName
       (
         ALGORITHM '='? algType=(DEFAULT | INPLACE | COPY)
-      )?
-      (
-        LOCK '='? lockType=(DEFAULT | NONE | SHARED | EXCLUSIVE)
-      )?
+        | LOCK '='?
+          lockType=(DEFAULT | NONE | SHARED | EXCLUSIVE)
+      )*
     ;
 
 dropLogfileGroup

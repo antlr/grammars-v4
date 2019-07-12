@@ -90,6 +90,10 @@ do begin update test.t2 set 1c = 1c + 1; end; -- //
 create index index1 on t1(col1) comment 'test index' comment 'some test' using btree;
 create unique index index2 using btree on t2(1c desc, `_` asc);
 create index index3 using hash on antlr_tokens(token(30) asc);
+create index index4 on antlr_tokens(token(30) asc) lock default;
+create index index5 on antlr_tokens(token(30) asc) algorithm default;
+create index index6 on antlr_tokens(token(30) asc) algorithm default lock default;
+create index index7 on antlr_tokens(token(30) asc) lock default algorithm default;
 #end
 #begin
 -- Create logfile group
