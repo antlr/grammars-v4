@@ -24,6 +24,10 @@ drop event someevent;
 drop index index1 on t1 algorithm=default;
 drop index index2 on t2 algorithm=default lock none;
 drop index index3 on antlr_tokens algorithm default lock=none;
+drop index index4 on antlr_tokens lock default;
+drop index index5 on antlr_tokens algorithm default;
+drop index index6 on antlr_tokens algorithm default lock default;
+drop index index7 on antlr_tokens lock default algorithm default;
 #end
 #begin
 -- Drop logfile group
