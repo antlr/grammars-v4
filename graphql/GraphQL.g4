@@ -149,11 +149,6 @@ array
    ;
 
 
-NAME
-   : [_A-Za-z] [_0-9A-Za-z]*
-   ;
-
-
 STRING
    : '"' ( ESC | ~ ["\\] )* '"'
    ;
@@ -161,6 +156,11 @@ STRING
 
 BOOLEAN
    : 'true' | 'false'
+   ;
+
+
+NAME
+   : [_A-Za-z] [_0-9A-Za-z]*
    ;
 
 
