@@ -2030,7 +2030,7 @@ collectionOptions
 
 convertedDataType
     : typeName=(BINARY| NCHAR) lengthOneDimension?
-    | typeName=CHAR lengthOneDimension? (CHARACTER SET charsetName)?
+    | typeName=CHAR lengthOneDimension? ((CHARACTER SET | CHARSET) charsetName)?
     | typeName=(DATE | DATETIME | TIME)
     | typeName=DECIMAL lengthTwoDimension?
     | (SIGNED | UNSIGNED) INTEGER?
