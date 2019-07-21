@@ -244,6 +244,7 @@
 				<module>upnp</module>
 				<module>url</module>
 				<module>useragent</module>
+				<module>v</module>
 				<module>vb6</module>
 				<module>vba</module>
 				<module>verilog</module>
