@@ -11,6 +11,7 @@ create table quengine(id int auto_increment key, class varchar(10), data binary)
 create table quengine(id int auto_increment key, class varchar(10), data binary) engine="Memory";
 create table quengine(id int auto_increment key, class varchar(10), data binary) engine=`CSV`;
 create table quengine(id int auto_increment key, class varchar(10), data binary COMMENT 'CSV') engine=MyISAM;
+create table quengine(id int auto_increment key, class varchar(10), data binary) engine=Aria;
 create table `parent_table`(id int primary key, column1 varchar(30), index parent_table_i1(column1(20)), check(char_length(column1)>10)) engine InnoDB;
 create table child_table(id int unsigned auto_increment primary key, id_parent int references parent_table(id) match full on update cascade on delete set null) engine=InnoDB;
 create table `another some table $$` like `some table $$`;
