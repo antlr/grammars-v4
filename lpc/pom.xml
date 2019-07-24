@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>LPC</artifactId>
 	<packaging>jar</packaging>
-	<name>C grammar</name>
+	<name>LPC grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -37,7 +37,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>compilationUnit</entryPoint>
+					<entryPoint>lpc_program</entryPoint>
 					<grammarName>LPC</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
