@@ -5,3 +5,8 @@ GRANT ALL ON *.* TO admin;
 GRANT ALL ON *.* TO `admin`;
 GRANT ALL ON *.* TO 'admin';
 GRANT ALL ON *.* TO "admin";
+GRANT ALL ON db.* TO "admin";
+GRANT ALL on db.tbl to 'admin';
+GRANT ALL on `db`.`tbl` to 'admin';
+GRANT ALL on `db`.tbl to 'admin';
+GRANT ALL on db.`tbl` to 'admin';

@@ -1589,6 +1589,7 @@ privilegeLevel
     | '*' '.' '*'                                                   #globalPrivLevel
     | uid '.' '*'                                                   #definiteSchemaPrivLevel
     | uid '.' uid                                                   #definiteFullTablePrivLevel
+    | uid dottedId                                                  #definiteFullTablePrivLevel2
     | uid                                                           #definiteTablePrivLevel
     ;
 
