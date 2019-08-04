@@ -45,7 +45,7 @@ _phpScript = False
 _insideString = False
 
 def nextToken(self):
-    token = super(PhpLexer_Python, self).nextToken()
+    token = super(PhpLexer, self).nextToken()
 
     if token.type == self.PHPEnd or token.type == self.PHPEndSingleLineComment:
         if self._mode == self.SingleLineCommentMode:
@@ -64,7 +64,7 @@ def nextToken(self):
                 self._prevTokenType == self.Colon or \
                 self._prevTokenType == self.OpenCurlyBracket or \
                 self._prevTokenType == self.CloseCurlyBracket:
-                token = super(PhpLexer_Python, self).nextToken()
+                token = super(PhpLexer, self).nextToken()
             else:
                 token = CommonToken(type=self.SemiColon)
                 token.text = ';'
@@ -80,20 +80,25 @@ def nextToken(self):
         if token.type == self.HereDocText:
             if self.CheckHeredocEnd(token.text):
                 self.popMode()
+                heredoc_identifier = self.GetHeredocEnd(token.text)
                 if token.text.strip().endswith(';'):
+                    text = heredoc_identifier + ";\n"
                     token = CommonToken(type=self.SemiColon)
-                    token.text = ';'
+                    token.text = text
                 else:
-                    token = super(PhpLexer_Python, self).nextToken()
+                    token = super(PhpLexer, self).nextToken()
+                    token.text = heredoc_identifier + "\n;"
     elif self._mode == self.PHP:
         if self._channel == self.HIDDEN:
             self._prevTokenType = token.type
 
     return token
 
+def GetHeredocEnd(self, text):
+    return text.strip().rstrip(';')
+
 def CheckHeredocEnd(self, text):
-    identifier = text.strip().rstrip(';')
-    return identifier == self._heredocIdentifier
+    return self.GetHeredocEnd(text) == self._heredocIdentifier
 
 }
 
