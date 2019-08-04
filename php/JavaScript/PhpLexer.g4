@@ -93,11 +93,13 @@ channels {
             if (token.type === this.HereDocText) {
                 if (this.CheckHeredocEnd(token.text)) {
                     this.popMode()
+                    const heredocIdentifier = this.GetHeredocEnd(token.text)
                     if (token.text.trim().endsWith(';')) {
-                        token = CommonToken(type=this.SemiColon);
-                        token.text = ';';
+                        token = new CommonToken(CommonToken.EMPTY_SOURCE, type=this.SemiColon);
+                        token.text = `${heredocIdentifier};\n`;
                     } else {
                         token = antlr4.Lexer.prototype.nextToken.call(this);
+                        token.text = `${heredocIdentifier}\n;`;
                     }
                 }
             }
@@ -112,9 +114,12 @@ channels {
         return token;
     };
 
+    PhpLexer.prototype.GetHeredocEnd = function(text) {
+        return text.trim().replace(/\;$/, "");
+    }
+
     PhpLexer.prototype.CheckHeredocEnd = function(text) {
-        const identifier = text.trim().replace(/\;$/, "");
-        return identifier === _heredocIdentifier;
+        return this.GetHeredocEnd(text) === this._heredocIdentifier;
     };
 
 }
