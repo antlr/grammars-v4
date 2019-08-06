@@ -49,7 +49,7 @@ public override IToken NextToken()
             PopMode(); // exit from SingleLineComment mode.
         }
         PopMode(); // exit from PHP mode.
-        
+
         if (string.Equals(token.Text, "</script>", System.StringComparison.Ordinal))
         {
             _phpScript = false;
@@ -96,13 +96,17 @@ public override IToken NextToken()
                 if (CheckHeredocEnd(token.Text))
                 {
                     PopMode();
+
+                    var heredocIdentifier = GetHeredocIdentifier(token.Text);
                     if (token.Text.Trim().EndsWith(";"))
                     {
+                        token.Text = heredocIdentifier + ";\n";
                         token.Type = SemiColon;
                     }
                     else
                     {
-                        token.Channel = SkipChannel;
+                        token = (CommonToken)base.NextToken();
+                        token.Text = heredocIdentifier + "\n;";
                     }
                 }
                 break;
@@ -119,13 +123,16 @@ public override IToken NextToken()
     return token;
 }
 
-bool CheckHeredocEnd(string text)
+string GetHeredocIdentifier(string text)
 {
     text = text.Trim();
     bool semi = text.Length > 0 ? text[text.Length - 1] == ';' : false;
-    string identifier = semi ? text.Substring(0, text.Length - 1) : text;
-    var result = string.Equals(identifier, _heredocIdentifier, System.StringComparison.Ordinal);
-    return result;
+    return semi ? text.Substring(0, text.Length - 1) : text;
+}
+
+bool CheckHeredocEnd(string text)
+{
+    return string.Equals(GetHeredocIdentifier(text), _heredocIdentifier, System.StringComparison.Ordinal);
 }}
 
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);

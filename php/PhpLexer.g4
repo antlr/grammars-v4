@@ -96,13 +96,16 @@ public Token nextToken()
                 if (CheckHeredocEnd(token.getText()))
                 {
                     popMode();
+
+                    String heredocIdentifier = GetHeredocIdentifier(token.getText());
                     if (token.getText().trim().endsWith(";"))
                     {
-                        token = new CommonToken(SemiColon);
+                        token = new CommonToken(SemiColon, heredocIdentifier + ";\n");
                     }
                     else
                     {
-                        token.setChannel(SkipChannel);
+                        token = (CommonToken)super.nextToken();
+                        token.setText(heredocIdentifier + "\n;");
                     }
                 }
                 break;
@@ -119,13 +122,16 @@ public Token nextToken()
     return token;
 }
 
+String GetHeredocIdentifier(String text)
+{
+    String trimmedText = text.trim();
+    boolean semi = (trimmedText.length() > 0) ? (trimmedText.charAt(trimmedText.length() - 1) == ';') : false;
+    return semi ? trimmedText.substring(0, trimmedText.length() - 1) : trimmedText;
+}
+
 boolean CheckHeredocEnd(String text)
 {
-    text = text.trim();
-    boolean semi = (text.length() > 0) ? (text.charAt(text.length() - 1) == ';') : false;
-    String identifier = semi ? text.substring(0, text.length() - 1) : text;
-    boolean result = identifier.equals(_heredocIdentifier);
-    return result;
+    return GetHeredocIdentifier(text).equals(_heredocIdentifier);
 }}
 
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);
