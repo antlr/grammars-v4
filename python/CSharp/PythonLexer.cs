@@ -91,8 +91,11 @@ public abstract class PythonBaseLexer : Lexer
                 node = temp;
             }
 
-            // First emit an extra line break that serves as the end of the statement.
-            Emit(CommonToken(PythonLexer.NEWLINE, "\n"));
+            if (Tokens.Last.Value.Type != PythonLexer.NEWLINE)
+            {
+                // First emit an extra line break that serves as the end of the statement.
+                Emit(CommonToken(PythonLexer.NEWLINE, "\n"));
+            }
 
             // Now emit as much DEDENT tokens as needed.
             while (Indents.Count != 0)
