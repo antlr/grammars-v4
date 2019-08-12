@@ -26,113 +26,9 @@ lexer grammar PhpLexer;
 
 channels { PhpComments, ErrorLexem, SkipChannel }
 
-@lexer::members
-{public boolean AspTags = true;
-boolean _scriptTag;
-boolean _styleTag;
-String _heredocIdentifier;
-int _prevTokenType;
-String _htmlNameText;
-boolean _phpScript;
-boolean _insideString;
-
-@Override
-public Token nextToken()
-{
-    CommonToken token = (CommonToken)super.nextToken();
-
-    if (token.getType() == PHPEnd || token.getType() == PHPEndSingleLineComment)
-    {
-        if (_mode == SingleLineCommentMode)
-        {
-            // SingleLineCommentMode for such allowed syntax:
-            // <?php echo "Hello world"; // comment ?>
-            popMode(); // exit from SingleLineComment mode.
-        }
-        popMode(); // exit from PHP mode.
-        
-        if (token.getText().equals("</script>"))
-        {
-            _phpScript = false;
-            token.setType(ScriptClose);
-        }
-        else
-        {
-            // Add semicolon to the end of statement if it is absente.
-            // For example: <?php echo "Hello world" ?>
-            if (_prevTokenType == SemiColon || _prevTokenType == Colon
-                || _prevTokenType == OpenCurlyBracket || _prevTokenType == CloseCurlyBracket)
-            {
-                token.setChannel(SkipChannel);
-            }
-            else
-            {
-                token = new CommonToken(SemiColon);
-            }
-        }
-    }
-    else if (token.getType() == HtmlName)
-    {
-        _htmlNameText = token.getText();
-    }
-    else if (token.getType() == HtmlDoubleQuoteString)
-    {
-        if (token.getText().equals("php") && _htmlNameText.equals("language"))
-        {
-            _phpScript = true;
-        }
-    }
-    else if (_mode == HereDoc)
-    {
-        // Heredoc and Nowdoc syntax support: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
-        switch (token.getType())
-        {
-            case StartHereDoc:
-            case StartNowDoc:
-                _heredocIdentifier = token.getText().substring(3).trim().replace("\'","");
-                break;
-
-            case HereDocText:
-                if (CheckHeredocEnd(token.getText()))
-                {
-                    popMode();
-
-                    String heredocIdentifier = GetHeredocIdentifier(token.getText());
-                    if (token.getText().trim().endsWith(";"))
-                    {
-                        token = new CommonToken(SemiColon, heredocIdentifier + ";\n");
-                    }
-                    else
-                    {
-                        token = (CommonToken)super.nextToken();
-                        token.setText(heredocIdentifier + "\n;");
-                    }
-                }
-                break;
-        }
-    }
-    else if (_mode == PHP)
-    {
-        if (_channel != HIDDEN)
-        {
-            _prevTokenType = token.getType();
-        }
-    }
-
-    return token;
+options {
+    superClass=PhpBaseParser;
 }
-
-String GetHeredocIdentifier(String text)
-{
-    String trimmedText = text.trim();
-    boolean semi = (trimmedText.length() > 0) ? (trimmedText.charAt(trimmedText.length() - 1) == ';') : false;
-    return semi ? trimmedText.substring(0, trimmedText.length() - 1) : trimmedText;
-}
-
-boolean CheckHeredocEnd(String text)
-{
-    return GetHeredocIdentifier(text).equals(_heredocIdentifier);
-}}
 
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);
 HtmlText:       ~[<#]+;
@@ -145,7 +41,7 @@ HtmlComment:    '<' '!' '--' .*? '-->' -> channel(HIDDEN);
 HtmlDtd:        '<' '!' .*? '>';
 HtmlOpen:       '<' -> pushMode(INSIDE);
 Shebang
-    : '#' { _input.LA(-2) <= 0 || _input.LA(-2) == '\r' || _input.LA(-2) == '\n' }? '!' ~[\r\n]*
+    : '#' { this.IsNewLineOrStart(-2) }? '!' ~[\r\n]*
     ;
 NumberSign:     '#' ~[<]* -> more;
 Error:          .         -> channel(ErrorLexem);
@@ -161,26 +57,7 @@ mode INSIDE;
 
 PHPStartEchoInside: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartInside:     PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
-HtmlClose: '>' {
-popMode();
-if (_scriptTag)
-{
-    if (!_phpScript)
-    {
-        pushMode(SCRIPT);
-    }
-    else
-    {
-        pushMode(PHP);
-    }
-    _scriptTag = false;
-}
-else if (_styleTag)
-{
-    pushMode(STYLE);
-    _styleTag = false;
-}
-};
+HtmlClose: '>' { this.PushModeOnHtmlClose() };
 HtmlSlashClose: '/>' -> popMode;
 HtmlSlash:      '/';
 HtmlEquals:     '=';
@@ -225,8 +102,8 @@ StyleBody: .*? '</' 'style'? '>' -> popMode;
 
 mode PHP;
 
-PHPEnd:             ('?' | '%' {AspTags}?) '>'
-      |             '</script>' {_phpScript}?;
+PHPEnd:             ('?' | '%' {this.HasAspTags()}?) '>'
+      |             '</script>' {this.HasPhpScriptTag()}?;
 Whitespace:         [ \t\r\n]+ -> channel(SkipChannel);
 MultiLineComment:   '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:  '//' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
@@ -401,14 +278,7 @@ OpenSquareBracket:  '[';
 CloseSquareBracket: ']';
 OpenCurlyBracket:   '{';
 CloseCurlyBracket:  '}'
-{
-if (_insideString)
-{
-    _insideString = false;
-    setChannel(SkipChannel);
-    popMode();
-}
-};
+{ this.PopModeOnCurlyBracketClose(); };
 Comma:              ',';
 Colon:              ':';
 SemiColon:          ';';
@@ -430,10 +300,10 @@ SingleQuoteString: '\'' (~('\'' | '\\') | '\\' . )* '\'';
 DoubleQuote:       '"' -> pushMode(InterpolationString);
 
 StartNowDoc
-    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { _input.LA(1) == '\r' || _input.LA(1) == '\n' }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { this.ShouldPushHereDocMode(1); }? -> pushMode(HereDoc)
     ;
 StartHereDoc
-    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { _input.LA(1) == '\r' || _input.LA(1) == '\n' }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { this.ShouldPushHereDocMode(1); }? -> pushMode(HereDoc)
     ;
 ErrorPhp:                   .          -> channel(ErrorLexem);
 
@@ -441,7 +311,7 @@ mode InterpolationString;
 
 VarNameInInterpolation:     '$' [a-zA-Z_][a-zA-Z_0-9]*                          -> type(VarName); // TODO: fix such cases: "$people->john"
 DollarString:               '$'                                                 -> type(StringPart);
-CurlyDollar:                '{' {_input.LA(1) == '$'}? {_insideString = true;}  -> channel(SkipChannel), pushMode(PHP);
+CurlyDollar:                '{' { this.IsCurlyDollar(1); }? { this.SetInsideString() }  -> channel(SkipChannel), pushMode(PHP);
 CurlyString:                '{'                                                 -> type(StringPart);
 EscapedChar:                '\\' .                                              -> type(StringPart);
 DoubleQuoteInInterpolation: '"'                                                 -> type(DoubleQuote), popMode;
@@ -461,8 +331,8 @@ HereDocText: ~[\r\n]*? ('\r'? '\n' | '\r');
 // fragments.
 // '<?=' will be transformed to 'echo' token.
 // '<?= "Hello world"; ?>' will be transformed to '<?php echo "Hello world"; ?>'
-fragment PhpStartEchoFragment: '<' ('?' '=' | {AspTags}? '%' '=');
-fragment PhpStartFragment:     '<' ('?' 'php'? | {AspTags}? '%');
+fragment PhpStartEchoFragment: '<' ('?' '=' | { this.HasAspTags(); }? '%' '=');
+fragment PhpStartFragment:     '<' ('?' 'php'? | { this.HasAspTags(); }? '%');
 fragment NameChar
     : NameStartChar
     | '-'
