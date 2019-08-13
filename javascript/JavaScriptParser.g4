@@ -184,7 +184,7 @@ classTail
     ;
 
 classElement
-    : (Static | {n("static")}? Identifier)? methodDefinition
+    : (Static | {this.n("static")}? Identifier)? methodDefinition
     | emptyStatement
     ;
 
