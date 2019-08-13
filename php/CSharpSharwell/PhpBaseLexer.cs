@@ -24,18 +24,24 @@ THE SOFTWARE.
 */
 
 using Antlr4.Runtime;
-using System.Collections.Generic;
+// Replace PhpParser with its fully qualified name below
+//using static PhpLexer;
 
 public abstract class PhpBaseLexer : Lexer
 {
-    public bool AspTags = true;
-    bool _scriptTag;
-    bool _styleTag;
-    string _heredocIdentifier;
-    int _prevTokenType;
-    string _htmlNameText;
-    bool _phpScript;
-    bool _insideString;
+    protected bool AspTags = true;
+    protected bool _scriptTag;
+    protected bool _styleTag;
+    protected string _heredocIdentifier;
+    protected int _prevTokenType;
+    protected string _htmlNameText;
+    protected bool _phpScript;
+    protected bool _insideString;
+
+    public PhpBaseLexer(ICharStream input)
+        : base(input)
+    {
+    }
 
     public override IToken NextToken()
     {
@@ -183,12 +189,12 @@ public abstract class PhpBaseLexer : Lexer
         }
     }
 
-    protected bool ShouldPushHereDocMode(pos)
+    protected bool ShouldPushHereDocMode(int pos)
     {
         return _input.La(pos) == '\r' || _input.La(pos) == '\n';
     }
 
-    protected bool IsCurlyDollar(pos) {
+    protected bool IsCurlyDollar(int pos) {
         return _input.La(pos) == '$';
     }
 
