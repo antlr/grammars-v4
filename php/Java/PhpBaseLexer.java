@@ -1,24 +1,29 @@
 import org.antlr.v4.runtime.*;
 
+import java.util.Stack;
+
 public abstract class PhpBaseLexer extends Lexer
 {
-    public boolean AspTags = true;
-    boolean _scriptTag;
-    boolean _styleTag;
-    String _heredocIdentifier;
-    int _prevTokenType;
-    String _htmlNameText;
-    boolean _phpScript;
-    boolean _insideString;
+    protected boolean AspTags = true;
+    protected boolean _scriptTag;
+    protected boolean _styleTag;
+    protected String _heredocIdentifier;
+    protected int _prevTokenType;
+    protected String _htmlNameText;
+    protected boolean _phpScript;
+    protected boolean _insideString;
+
+    public PhpBaseLexer(CharStream input) {
+        super(input);
+    }
 
     @Override
-    public Token nextToken()
-    {
+    public Token nextToken() {
         CommonToken token = (CommonToken)super.nextToken();
 
-        if (token.getType() == PHPEnd || token.getType() == PHPEndSingleLineComment)
+        if (token.getType() == PhpLexer.PHPEnd || token.getType() == PhpLexer.PHPEndSingleLineComment)
         {
-            if (_mode == SingleLineCommentMode)
+            if (_mode == PhpLexer.SingleLineCommentMode)
             {
                 // SingleLineCommentMode for such allowed syntax:
                 // <?php echo "Hello world"; // comment ?>
@@ -29,45 +34,45 @@ public abstract class PhpBaseLexer extends Lexer
             if (token.getText().equals("</script>"))
             {
                 _phpScript = false;
-                token.setType(ScriptClose);
+                token.setType(PhpLexer.ScriptClose);
             }
             else
             {
                 // Add semicolon to the end of statement if it is absente.
                 // For example: <?php echo "Hello world" ?>
-                if (_prevTokenType == SemiColon || _prevTokenType == Colon
-                        || _prevTokenType == OpenCurlyBracket || _prevTokenType == CloseCurlyBracket)
+                if (_prevTokenType == PhpLexer.SemiColon || _prevTokenType == PhpLexer.Colon
+                        || _prevTokenType == PhpLexer.OpenCurlyBracket || _prevTokenType == PhpLexer.CloseCurlyBracket)
                 {
-                    token.setChannel(SkipChannel);
+                    token.setChannel(PhpLexer.SkipChannel);
                 }
                 else
                 {
-                    token = new CommonToken(SemiColon);
+                    token = new CommonToken(PhpLexer.SemiColon);
                 }
             }
         }
-        else if (token.getType() == HtmlName)
+        else if (token.getType() == PhpLexer.HtmlName)
         {
             _htmlNameText = token.getText();
         }
-        else if (token.getType() == HtmlDoubleQuoteString)
+        else if (token.getType() == PhpLexer.HtmlDoubleQuoteString)
         {
             if (token.getText().equals("php") && _htmlNameText.equals("language"))
             {
                 _phpScript = true;
             }
         }
-        else if (_mode == HereDoc)
+        else if (_mode == PhpLexer.HereDoc)
         {
             // Heredoc and Nowdoc syntax support: http://php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
             switch (token.getType())
             {
-                case StartHereDoc:
-                case StartNowDoc:
+                case PhpLexer.StartHereDoc:
+                case PhpLexer.StartNowDoc:
                     _heredocIdentifier = token.getText().substring(3).trim().replace("\'","");
                     break;
 
-                case HereDocText:
+                case PhpLexer.HereDocText:
                     if (CheckHeredocEnd(token.getText()))
                     {
                         popMode();
@@ -75,7 +80,7 @@ public abstract class PhpBaseLexer extends Lexer
                         String heredocIdentifier = GetHeredocIdentifier(token.getText());
                         if (token.getText().trim().endsWith(";"))
                         {
-                            token = new CommonToken(SemiColon, heredocIdentifier + ";\n");
+                            token = new CommonToken(PhpLexer.SemiColon, heredocIdentifier + ";\n");
                         }
                         else
                         {
@@ -86,9 +91,9 @@ public abstract class PhpBaseLexer extends Lexer
                     break;
             }
         }
-        else if (_mode == PHP)
+        else if (_mode == PhpLexer.PHP)
         {
-            if (_channel != HIDDEN)
+            if (_channel != PhpLexer.HIDDEN)
             {
                 _prevTokenType = token.getType();
             }
@@ -97,20 +102,17 @@ public abstract class PhpBaseLexer extends Lexer
         return token;
     }
 
-    private String GetHeredocIdentifier(String text)
-    {
+    private String GetHeredocIdentifier(String text) {
         String trimmedText = text.trim();
         boolean semi = (trimmedText.length() > 0) ? (trimmedText.charAt(trimmedText.length() - 1) == ';') : false;
         return semi ? trimmedText.substring(0, trimmedText.length() - 1) : trimmedText;
     }
 
-    private boolean CheckHeredocEnd(String text)
-    {
+    private boolean CheckHeredocEnd(String text) {
         return GetHeredocIdentifier(text).equals(_heredocIdentifier);
     }
 
-    protected boolean IsNewLineOrStart(int pos)
-    {
+    protected boolean IsNewLineOrStart(int pos) {
         return this._input.LA(pos) <= 0 || this._input.LA(pos) == '\r' || this._input.LA(pos) == '\n';
     }
 
@@ -120,47 +122,43 @@ public abstract class PhpBaseLexer extends Lexer
         {
             if (!_phpScript)
             {
-                pushMode(SCRIPT);
+                pushMode(PhpLexer.SCRIPT);
             }
             else
             {
-                pushMode(PHP);
+                pushMode(PhpLexer.PHP);
             }
             _scriptTag = false;
         }
         else if (_styleTag)
         {
-            pushMode(STYLE);
+            pushMode(PhpLexer.STYLE);
             _styleTag = false;
         }
     }
 
-    protected boolean HasAspTags()
-    {
+    protected boolean HasAspTags() {
         return this.AspTags;
     }
 
-    protected boolean HasPhpScriptTag()
-    {
+    protected boolean HasPhpScriptTag() {
         return this._phpScript;
     }
 
-    protected void PopModeOnCurlyBracketClose()
-    {
+    protected void PopModeOnCurlyBracketClose() {
         if (_insideString)
         {
             _insideString = false;
-            setChannel(SkipChannel);
+            setChannel(PhpLexer.SkipChannel);
             popMode();
         }
     }
 
-    protected bool ShouldPushHereDocMode(pos)
-    {
+    protected boolean ShouldPushHereDocMode(int pos) {
         return _input.LA(pos) == '\r' || _input.LA(pos) == '\n';
     }
 
-    protected bool IsCurlyDollar(pos) {
+    protected boolean IsCurlyDollar(int pos) {
         return _input.LA(pos) == '$';
     }
 

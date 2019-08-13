@@ -27,7 +27,7 @@ lexer grammar PhpLexer;
 channels { PhpComments, ErrorLexem, SkipChannel }
 
 options {
-    superClass=PhpBaseParser;
+    superClass=PhpBaseLexer;
 }
 
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);

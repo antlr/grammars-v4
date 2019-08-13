@@ -10,7 +10,12 @@
 		<version>1.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
+	<properties>
+		<!-- location of java sources -->
+		<src.dir>Java</src.dir>
+	</properties>
 	<build>
+		<sourceDirectory>${src.dir}</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.antlr</groupId>
@@ -36,6 +41,7 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
+					<enabled>true</enabled>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>htmlDocument</entryPoint>
