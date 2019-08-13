@@ -57,7 +57,7 @@ mode INSIDE;
 
 PHPStartEchoInside: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartInside:     PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
-HtmlClose: '>' { this.PushModeOnHtmlClose() };
+HtmlClose: '>' { this.PushModeOnHtmlClose(); };
 HtmlSlashClose: '/>' -> popMode;
 HtmlSlash:      '/';
 HtmlEquals:     '=';
@@ -300,10 +300,10 @@ SingleQuoteString: '\'' (~('\'' | '\\') | '\\' . )* '\'';
 DoubleQuote:       '"' -> pushMode(InterpolationString);
 
 StartNowDoc
-    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { this.ShouldPushHereDocMode(1); }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { this.ShouldPushHereDocMode(1) }? -> pushMode(HereDoc)
     ;
 StartHereDoc
-    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { this.ShouldPushHereDocMode(1); }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { this.ShouldPushHereDocMode(1) }? -> pushMode(HereDoc)
     ;
 ErrorPhp:                   .          -> channel(ErrorLexem);
 
@@ -311,7 +311,7 @@ mode InterpolationString;
 
 VarNameInInterpolation:     '$' [a-zA-Z_][a-zA-Z_0-9]*                          -> type(VarName); // TODO: fix such cases: "$people->john"
 DollarString:               '$'                                                 -> type(StringPart);
-CurlyDollar:                '{' { this.IsCurlyDollar(1); }? { this.SetInsideString() }  -> channel(SkipChannel), pushMode(PHP);
+CurlyDollar:                '{' { this.IsCurlyDollar(1) }? { this.SetInsideString(); }  -> channel(SkipChannel), pushMode(PHP);
 CurlyString:                '{'                                                 -> type(StringPart);
 EscapedChar:                '\\' .                                              -> type(StringPart);
 DoubleQuoteInInterpolation: '"'                                                 -> type(DoubleQuote), popMode;
@@ -331,8 +331,8 @@ HereDocText: ~[\r\n]*? ('\r'? '\n' | '\r');
 // fragments.
 // '<?=' will be transformed to 'echo' token.
 // '<?= "Hello world"; ?>' will be transformed to '<?php echo "Hello world"; ?>'
-fragment PhpStartEchoFragment: '<' ('?' '=' | { this.HasAspTags(); }? '%' '=');
-fragment PhpStartFragment:     '<' ('?' 'php'? | { this.HasAspTags(); }? '%');
+fragment PhpStartEchoFragment: '<' ('?' '=' | { this.HasAspTags() }? '%' '=');
+fragment PhpStartFragment:     '<' ('?' 'php'? | { this.HasAspTags() }? '%');
 fragment NameChar
     : NameStartChar
     | '-'
