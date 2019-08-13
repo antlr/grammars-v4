@@ -107,7 +107,7 @@ DecimalLiteral:                 DecimalIntegerLiteral '.' [0-9]* ExponentPart?
 /// Numeric Literals
 
 HexIntegerLiteral:              '0' [xX] HexDigit+;
-OctalIntegerLiteral:            '0' [0-7]+ {!this.IsSrictMode()}?;
+OctalIntegerLiteral:            '0' [0-7]+ {!this.IsStrictMode()}?;
 OctalIntegerLiteral2:           '0' [oO] [0-7]+;
 BinaryIntegerLiteral:           '0' [bB] [01]+;
 
@@ -153,15 +153,15 @@ Import:                         'import';
 /// The following tokens are also considered to be FutureReservedWords 
 /// when parsing strict mode
 
-Implements:                     'implements' {this.IsSrictMode()}?;
-Let:                            'let' {this.IsSrictMode()}?;
-Private:                        'private' {this.IsSrictMode()}?;
-Public:                         'public' {this.IsSrictMode()}?;
-Interface:                      'interface' {this.IsSrictMode()}?;
-Package:                        'package' {this.IsSrictMode()}?;
-Protected:                      'protected' {this.IsSrictMode()}?;
-Static:                         'static' {this.IsSrictMode()}?;
-Yield:                          'yield' {this.IsSrictMode()}?;
+Implements:                     'implements' {p.IsStrictMode()}?;
+Let:                            'let' {p.IsStrictMode()}?;
+Private:                        'private' {p.IsStrictMode()}?;
+Public:                         'public' {p.IsStrictMode()}?;
+Interface:                      'interface' {p.IsStrictMode()}?;
+Package:                        'package' {p.IsStrictMode()}?;
+Protected:                      'protected' {p.IsStrictMode()}?;
+Static:                         'static' {p.IsStrictMode()}?;
+Yield:                          'yield' {p.IsStrictMode()}?;
 
 /// Identifier Names and Identifiers
 
