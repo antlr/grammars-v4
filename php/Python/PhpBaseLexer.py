@@ -24,8 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-
 from antlr4 import *
+from antlr4.Token import CommonToken
+
 
 class PhpBaseLexer(Lexer):
     AspTags = True
@@ -38,7 +39,7 @@ class PhpBaseLexer(Lexer):
     _insideString = False
 
     def nextToken(self):
-        token = super(PhpLexer, self).nextToken()
+        token = super(PhpBaseLexer, self).nextToken()
 
         if token.type == self.PHPEnd or token.type == self.PHPEndSingleLineComment:
             if self._mode == self.SingleLineCommentMode:
@@ -57,7 +58,7 @@ class PhpBaseLexer(Lexer):
                         self._prevTokenType == self.Colon or \
                         self._prevTokenType == self.OpenCurlyBracket or \
                         self._prevTokenType == self.CloseCurlyBracket:
-                    token = super(PhpLexer, self).nextToken()
+                    token = super(PhpBaseLexer, self).nextToken()
                 else:
                     token = CommonToken(type=self.SemiColon)
                     token.text = ';'
@@ -79,7 +80,7 @@ class PhpBaseLexer(Lexer):
                         token = CommonToken(type=self.SemiColon)
                         token.text = text
                     else:
-                        token = super(PhpLexer, self).nextToken()
+                        token = super(PhpBaseLexer, self).nextToken()
                         token.text = heredoc_identifier + "\n;"
         elif self._mode == self.PHP:
             if self._channel == self.HIDDEN:
