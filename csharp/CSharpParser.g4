@@ -364,7 +364,7 @@ embedded_statement
 	;
 
 simple_embedded_statement
-	: ';'                                                         #emptyStatement
+	: ';'                                                         #theEmptyStatement
 	| expression ';'                                              #expressionStatement
 
 	// selection statements
