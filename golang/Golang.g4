@@ -207,7 +207,7 @@ constDecl
 
 //ConstSpec      = IdentifierList [ [ Type ] "=" ExpressionList ] .
 constSpec
-    : identifierList ( type? '=' expressionList )?
+    : identifierList ( type_? '=' expressionList )?
     ;
 
 //
@@ -228,7 +228,7 @@ typeDecl
 
 //TypeSpec     = identifier Type .
 typeSpec
-    : IDENTIFIER type
+    : IDENTIFIER type_
     ;
 
 
@@ -263,7 +263,7 @@ varDecl
     ;
 
 varSpec
-    : identifierList ( type ( '=' expressionList )? | '=' expressionList )
+    : identifierList ( type_ ( '=' expressionList )? | '=' expressionList )
     ;
 
 
@@ -420,7 +420,7 @@ typeSwitchCase
     : 'case' typeList | 'default'
     ;
 typeList
-    : type ( ',' type )*
+    : type_ ( ',' type_ )*
     ;
 
 
@@ -467,10 +467,10 @@ goStmt
     ;
 
 //Type      = TypeName | TypeLit | "(" Type ")" .
-type
+type_
     : typeName
     | typeLit
-    | '(' type ')'
+    | '(' type_ ')'
     ;
 
 //TypeName  = identifier | QualifiedIdent .
@@ -502,13 +502,13 @@ arrayLength
     ;
 
 elementType
-    : type
+    : type_
     ;
 
 //PointerType = "*" BaseType .
 //BaseType    = Type .
 pointerType
-    : '*' type
+    : '*' type_
     ;
 
 //InterfaceType      = "interface" "{" { MethodSpec ";" } "}" .
@@ -527,7 +527,7 @@ sliceType
 //MapType     = "map" "[" KeyType "]" ElementType .
 //KeyType     = Type .
 mapType
-    : 'map' '[' type ']' elementType
+    : 'map' '[' type_ ']' elementType
     ;
 
 //ChannelType = ( "chan" | "chan" "<-" | "<-" "chan" ) ElementType .
@@ -559,7 +559,7 @@ signature
 
 result
     : parameters
-    | type
+    | type_
     ;
 
 parameters
@@ -571,7 +571,7 @@ parameterList
     ;
 
 parameterDecl
-    : identifierList? '...'? type
+    : identifierList? '...'? type_
     ;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -668,7 +668,7 @@ structType
     ;
 
 fieldDecl
-    : ({noTerminatorBetween(2)}? identifierList type | anonymousField) STRING_LIT?
+    : ({noTerminatorBetween(2)}? identifierList type_ | anonymousField) STRING_LIT?
     ;
 
 anonymousField
@@ -720,11 +720,11 @@ slice
     ;
 
 typeAssertion
-    : '.' '(' type ')'
+    : '.' '(' type_ ')'
     ;
 
 arguments
-    : '(' ( ( expressionList | type ( ',' expressionList )? ) '...'? ','? )? ')'
+    : '(' ( ( expressionList | type_ ( ',' expressionList )? ) '...'? ','? )? ')'
     ;
 
 //MethodExpr    = ReceiverType "." MethodName .
@@ -755,7 +755,7 @@ unaryExpr
 
 //Conversion = Type "(" Expression [ "," ] ")" .
 conversion
-    : type '(' expression ','? ')'
+    : type_ '(' expression ','? ')'
     ;
 
 eos
