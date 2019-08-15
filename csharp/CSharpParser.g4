@@ -21,7 +21,7 @@ namespace_or_type_name
 	;
 
 //B.2.2 Types
-type 
+type_
 	: base_type ('?' | rank_specifier | '*')*
 	;
 
@@ -68,7 +68,7 @@ class_type
 	;
 
 type_argument_list 
-	: '<' type ( ',' type)* '>'
+	: '<' type_ ( ',' type_)* '>'
 	;
 
 //B.2.4 Expressions
@@ -77,7 +77,7 @@ argument_list
 	;
 
 argument
-	: (identifier ':')? refout=(REF | OUT)? (VAR | type)? expression
+	: (identifier ':')? refout=(REF | OUT)? (VAR | type_)? expression
 	;
 
 expression
@@ -132,7 +132,7 @@ equality_expression
 	;
 
 relational_expression
-	: shift_expression (('<' | '>' | '<=' | '>=') shift_expression | IS isType | AS type)*
+	: shift_expression (('<' | '>' | '<=' | '>=') shift_expression | IS isType | AS type_)*
 	;
 
 shift_expression
@@ -156,7 +156,7 @@ unary_expression
 	| '~' unary_expression
 	| '++' unary_expression
 	| '--' unary_expression
-	| OPEN_PARENS type CLOSE_PARENS unary_expression
+	| OPEN_PARENS type_ CLOSE_PARENS unary_expression
 	| AWAIT unary_expression // C# 5
 	| '&' unary_expression
 	| '*' unary_expression
@@ -176,18 +176,18 @@ primary_expression_start
 	| LITERAL_ACCESS                            #literalAccessExpression
 	| THIS                                      #thisReferenceExpression
 	| BASE ('.' identifier type_argument_list? | '[' expression_list ']') #baseAccessExpression
-	| NEW (type (object_creation_expression
+	| NEW (type_ (object_creation_expression
 	             | object_or_collection_initializer
 	             | '[' expression_list ']' rank_specifier* array_initializer?
 	             | rank_specifier+ array_initializer)
 	      | anonymous_object_initializer
 	      | rank_specifier array_initializer)                       #objectCreationExpression
-	| TYPEOF OPEN_PARENS (unbound_type_name | type | VOID) CLOSE_PARENS   #typeofExpression
+	| TYPEOF OPEN_PARENS (unbound_type_name | type_ | VOID) CLOSE_PARENS   #typeofExpression
 	| CHECKED OPEN_PARENS expression CLOSE_PARENS                   #checkedExpression
 	| UNCHECKED OPEN_PARENS expression CLOSE_PARENS                 #uncheckedExpression
-	| DEFAULT OPEN_PARENS type CLOSE_PARENS                         #defaultValueExpression
+	| DEFAULT OPEN_PARENS type_ CLOSE_PARENS                         #defaultValueExpression
 	| ASYNC? DELEGATE (OPEN_PARENS explicit_anonymous_function_parameter_list? CLOSE_PARENS)? block #anonymousMethodExpression
-	| SIZEOF OPEN_PARENS type CLOSE_PARENS                          #sizeofExpression
+	| SIZEOF OPEN_PARENS type_ CLOSE_PARENS                          #sizeofExpression
 	// C# 6: https://msdn.microsoft.com/en-us/library/dn986596.aspx
 	| NAMEOF OPEN_PARENS (identifier '.')* identifier CLOSE_PARENS  #nameofExpression
 	;
@@ -286,7 +286,7 @@ explicit_anonymous_function_parameter_list
 	;
 
 explicit_anonymous_function_parameter
-	: refout=(REF | OUT)? type identifier
+	: refout=(REF | OUT)? type_ identifier
 	;
 
 implicit_anonymous_function_parameter_list
@@ -303,7 +303,7 @@ query_expression
 	;
 
 from_clause
-	: FROM type? identifier IN expression
+	: FROM type_? identifier IN expression
 	;
 
 query_body
@@ -327,7 +327,7 @@ where_clause
 	;
 
 combined_join_clause
-	: JOIN type? identifier IN expression ON expression EQUALS expression (INTO identifier)?
+	: JOIN type_? identifier IN expression ON expression EQUALS expression (INTO identifier)?
 	;
 
 orderby_clause
@@ -364,7 +364,7 @@ embedded_statement
 	;
 
 simple_embedded_statement
-	: ';'                                                         #emptyStatement
+	: ';'                                                         #theEmptyStatement
 	| expression ';'                                              #expressionStatement
 
 	// selection statements
@@ -405,7 +405,7 @@ local_variable_declaration
 
 local_variable_type 
 	: VAR
-	| type
+	| type_
 ;
 
 local_variable_declarator
@@ -419,7 +419,7 @@ local_variable_initializer
 	;
 
 local_constant_declaration
-	: CONST type constant_declarators
+	: CONST type_ constant_declarators
 	;
 
 if_body
@@ -621,7 +621,7 @@ common_member_declaration
 	;
 
 typed_member_declaration
-	: type
+	: type_
 	  ( namespace_or_type_name '.' indexer_declaration
 	  | method_declaration
 	  | property_declaration
@@ -653,7 +653,7 @@ variable_initializer
 	;
 
 return_type
-	: type
+	: type_
 	| VOID
 	;
 
@@ -754,7 +754,7 @@ overloadable_operator
 	;
 
 conversion_operator_declarator
-	: (IMPLICIT | EXPLICIT) OPERATOR type OPEN_PARENS arg_declaration CLOSE_PARENS
+	: (IMPLICIT | EXPLICIT) OPERATOR type_ OPEN_PARENS arg_declaration CLOSE_PARENS
 	;
 
 constructor_initializer
@@ -777,7 +777,7 @@ struct_body
 
 struct_member_declaration
 	: attributes? all_member_modifiers?
-	  (common_member_declaration | FIXED type fixed_size_buffer_declarator+ ';')
+	  (common_member_declaration | FIXED type_ fixed_size_buffer_declarator+ ';')
 	;
 
 //B.2.9 Arrays
@@ -816,12 +816,12 @@ interface_body
 
 interface_member_declaration
 	: attributes? NEW?
-	  (UNSAFE? type
+	  (UNSAFE? type_
 	    ( identifier type_parameter_list? OPEN_PARENS formal_parameter_list? CLOSE_PARENS type_parameter_constraints_clauses? ';'
 	    | identifier OPEN_BRACE interface_accessors CLOSE_BRACE
 	    | THIS '[' formal_parameter_list ']' OPEN_BRACE interface_accessors CLOSE_BRACE)
 	  | UNSAFE? VOID identifier type_parameter_list? OPEN_PARENS formal_parameter_list? CLOSE_PARENS type_parameter_constraints_clauses? ';'
-	  | EVENT type identifier ';')
+	  | EVENT type_ identifier ';')
 	;
 
 interface_accessors
@@ -830,7 +830,7 @@ interface_accessors
 
 //B.2.11 Enums
 enum_base
-	: ':' type
+	: ':' type_
 	;
 
 enum_body
@@ -902,7 +902,7 @@ fixed_size_buffer_declarator
 	;
 
 local_variable_initializer_unsafe
-	: STACKALLOC type '[' expression ']'
+	: STACKALLOC type_ '[' expression ']'
 	;
 
 right_arrow
@@ -1074,7 +1074,7 @@ delegate_definition
 	;
 
 event_declaration
-	: EVENT type (variable_declarators ';' | member_name OPEN_BRACE event_accessor_declarations CLOSE_BRACE)
+	: EVENT type_ (variable_declarators ';' | member_name OPEN_BRACE event_accessor_declarations CLOSE_BRACE)
 	;
 
 field_declaration
@@ -1086,7 +1086,7 @@ property_declaration // Property initializer & lambda in properties C# 6
 	;
 
 constant_declaration
-	: CONST type constant_declarators ';'
+	: CONST type_ constant_declarators ';'
 	;
 
 indexer_declaration // lamdas from C# 6
@@ -1116,7 +1116,7 @@ operator_declaration // lamdas form C# 6
 	;
 
 arg_declaration
-	: type identifier ('=' expression)?
+	: type_ identifier ('=' expression)?
 	;
 
 method_invocation
