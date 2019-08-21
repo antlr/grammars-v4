@@ -59,8 +59,8 @@ classQualifier
    : '[' Id ']'
    ;
 
-type
-   : functionArgTypes '=>' type
+type_
+   : functionArgTypes '=>' type_
    | infixType existentialClause?
    ;
 
@@ -104,7 +104,7 @@ typeArgs
    ;
 
 types
-   : type (',' type)*
+   : type_ (',' type_)*
    ;
 
 refinement
@@ -118,7 +118,7 @@ refineStat
    ;
 
 typePat
-   : type
+   : type_
    ;
 
 ascription
@@ -270,7 +270,7 @@ variantTypeParam
    ;
 
 typeParam
-   : (Id | '_') typeParamClause? ('>:' type)? ('<:' type)? ('<%' type)* (':' type)*
+   : (Id | '_') typeParamClause? ('>:' type_)? ('<:' type_)? ('<%' type_)* (':' type_)*
    ;
 
 paramClauses
@@ -290,9 +290,9 @@ param
    ;
 
 paramType
-   : type
-   | '=>' type
-   | type '*'
+   : type_
+   | '=>' type_
+   | type_ '*'
    ;
 
 classParamClauses
@@ -316,7 +316,7 @@ bindings
    ;
 
 binding
-   : (Id | '_') (':' type)?
+   : (Id | '_') (':' type_)?
    ;
 
 modifier
@@ -362,8 +362,8 @@ templateStat
    ;
 
 selfType
-   : Id (':' type)? '=>'
-   | 'this' ':' type '=>'
+   : Id (':' type_)? '=>'
+   | 'this' ':' type_ '=>'
    ;
 
 import_
@@ -390,15 +390,15 @@ dcl
    ;
 
 valDcl
-   : ids ':' type
+   : ids ':' type_
    ;
 
 varDcl
-   : ids ':' type
+   : ids ':' type_
    ;
 
 funDcl
-   : funSig (':' type)?
+   : funSig (':' type_)?
    ;
 
 funSig
@@ -406,7 +406,7 @@ funSig
    ;
 
 typeDcl
-   : Id typeParamClause? ('>:' type)? ('<:' type)?
+   : Id typeParamClause? ('>:' type_)? ('<:' type_)?
    ;
 
 patVarDef
@@ -422,22 +422,22 @@ def
    ;
 
 patDef
-   : pattern2 (',' pattern2)* (':' type)* '=' expr
+   : pattern2 (',' pattern2)* (':' type_)* '=' expr
    ;
 
 varDef
    : patDef
-   | ids ':' type '=' '_'
+   | ids ':' type_ '=' '_'
    ;
 
 funDef
-   : funSig (':' type)? '=' expr
+   : funSig (':' type_)? '=' expr
    | funSig '{' block '}'
    | 'this' paramClause paramClauses ('=' constrExpr | constrBlock)
    ;
 
 typeDef
-   : Id typeParamClause? '=' type
+   : Id typeParamClause? '=' type_
    ;
 
 tmplDef
