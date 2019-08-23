@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.*;
  * All lexer methods that used in grammar (IsStrictMode)
  * should start with Upper Case Char similar to Lexer rules.
  */
-public abstract class GolangBaseLexer extends Lexer
+public abstract class GoBaseLexer extends Lexer
 {
     // The most recently produced token.
     private Token lastToken = null;

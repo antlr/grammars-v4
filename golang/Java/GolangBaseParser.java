@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.*;
  * All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
  * should start with lower case char similar to parser rules.
  */
-public abstract class GolangBaseParser extends Parser
+public abstract class GoBaseParser extends Parser
 {
 
     /**
