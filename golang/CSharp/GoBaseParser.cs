@@ -122,6 +122,6 @@ public abstract class GoBaseParser : Parser
 
     protected bool checkPreviousTokenText(string text)
     {
-        return _input.Lt(1).Text.Equals(text);
+        return _input.Lt(1).Text?.Equals(text) ?? false;
     }
 }
