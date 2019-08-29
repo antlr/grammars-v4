@@ -228,7 +228,7 @@ selectStmt
     ;
 
 commClause
-    : commCase ':' statementList
+    : commCase ':' statementList?
     ;
 
 commCase
@@ -365,7 +365,7 @@ primaryExpr
     ;
 
 unaryExpr
-    : primaryExpr 
+    : primaryExpr
     | ('+' | '-' | '!' | '^' | '*' | '&' | '<-') expression
     ;
 
