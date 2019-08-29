@@ -489,13 +489,9 @@ methodExpr
     : receiverType DOT IDENTIFIER
     ;
 
-/*receiverType
+receiverType
     : typeName
     | '(' ('*' typeName | receiverType) ')'
-    ;
-*/
-receiverType
-    : type
     ;
 
 eos
