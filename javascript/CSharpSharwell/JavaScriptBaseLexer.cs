@@ -46,7 +46,7 @@ public abstract class JavaScriptBaseLexer : Lexer
         }
     }
 
-    public bool IsSrictMode()
+    public bool IsStrictMode()
     {
         return _useStrictCurrent;
     }

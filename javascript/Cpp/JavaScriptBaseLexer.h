@@ -18,7 +18,7 @@ public:
 
     bool getStrictDefault();
     void setUseStrictDefault(bool value);
-    bool IsSrictMode();
+    bool IsStrictMode();
     virtual std::unique_ptr<antlr4::Token> nextToken() override;
     void ProcessOpenBrace();
     void ProcessCloseBrace();

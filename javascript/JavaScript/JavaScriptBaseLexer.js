@@ -21,7 +21,7 @@ JavaScriptBaseLexer.prototype.setUseStrictDefault = function(value) {
     this.useStrictCurrent = value;
 };
 
-JavaScriptBaseLexer.prototype.IsSrictMode = function() {
+JavaScriptBaseLexer.prototype.IsStrictMode = function() {
     return this.useStrictCurrent;
 };
 

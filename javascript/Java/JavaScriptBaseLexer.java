@@ -39,7 +39,7 @@ public abstract class JavaScriptBaseLexer extends Lexer
         useStrictCurrent = value;
     }
 
-    public boolean IsSrictMode() {
+    public boolean IsStrictMode() {
         return useStrictCurrent;
     }
 
