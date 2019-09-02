@@ -17,7 +17,7 @@ void JavaScriptBaseLexer::setUseStrictDefault(bool value)
     useStrictCurrent = value;
 }
 
-bool JavaScriptBaseLexer::IsSrictMode()
+bool JavaScriptBaseLexer::IsStrictMode()
 {
     return useStrictCurrent;
 }
