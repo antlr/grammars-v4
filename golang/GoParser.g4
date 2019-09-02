@@ -60,7 +60,7 @@ typeDecl
     ;
 
 typeSpec
-    : IDENTIFIER type
+    : IDENTIFIER ASSIGN? type
     ;
 
 // Function declarations
