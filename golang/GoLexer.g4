@@ -102,12 +102,12 @@ IMAGINARY_LIT          : (DECIMALS | FLOAT_LIT) 'i';
 
 // Rune literals
 
-RUNE_LIT               : '\'' (UNICODE_VALUE | BYTE_VALUE) '\'';
+RUNE_LIT               : '\'' (~[\n\\] | ESCAPED_VALUE) '\'';
 
 // String literals
 
-RAW_STRING_LIT         : '`' ~'`'*                                         '`';
-INTERPRETED_STRING_LIT : '"' ('\\"' | UNICODE_VALUE | BYTE_VALUE | ~'"')*? '"';
+RAW_STRING_LIT         : '`' ~'`'*                      '`';
+INTERPRETED_STRING_LIT : '"' (~["\\] | ESCAPED_VALUE)*  '"';
 
 // Hidden tokens
 
@@ -118,16 +118,12 @@ LINE_COMMENT           : '//' ~[\r\n]*      -> channel(HIDDEN);
 
 // Fragments
 
-fragment UNICODE_VALUE
-    : ~'\u000A'
-    | '\\u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-    | '\\U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-    | '\\' [abfnrtv\\'"]
-    ;
-
-fragment BYTE_VALUE
-    : '\\' OCTAL_DIGIT OCTAL_DIGIT OCTAL_DIGIT
-    | '\\' 'x' HEX_DIGIT HEX_DIGIT
+fragment ESCAPED_VALUE
+    : '\\' ('u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+           | 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+           | [abfnrtv\\'"]
+           | OCTAL_DIGIT OCTAL_DIGIT OCTAL_DIGIT
+           | 'x' HEX_DIGIT HEX_DIGIT)
     ;
 
 fragment DECIMALS
