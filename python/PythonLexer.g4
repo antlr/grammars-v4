@@ -2,6 +2,8 @@ lexer grammar PythonLexer;
 
 options { superClass=PythonBaseLexer; }
 
+// Artificial tokens only for parser
+
 tokens { INDENT, DEDENT, LINE_BREAK }
 
 // Keywords
