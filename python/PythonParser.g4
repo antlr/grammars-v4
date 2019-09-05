@@ -16,7 +16,7 @@
  *       single_input is a single interactive statement;
  *       file_input is a module or sequence of commands read from an input file;
  *       eval_input is the input for the eval() and input() functions.
- * NB: compound_stmt in single_input is followed by extra NEWLINE!
+ * NB: compound_stmt in single_input is followed by extra LINE_BREAK!
  */
 parser grammar PythonParser;
 
@@ -29,17 +29,17 @@ root
     ;
 
 single_input
-    : NEWLINE
+    : LINE_BREAK
     | simple_stmt
-    | compound_stmt NEWLINE
+    | compound_stmt LINE_BREAK
     ;
 
 file_input
-    : (NEWLINE | stmt)+
+    : (LINE_BREAK | stmt)+
     ;
 
 eval_input
-    : testlist NEWLINE*
+    : testlist LINE_BREAK*
     ;
 
 stmt
@@ -59,11 +59,11 @@ compound_stmt
 
 suite
     : simple_stmt
-    | NEWLINE INDENT stmt+ DEDENT
+    | LINE_BREAK INDENT stmt+ DEDENT
     ;
 
 decorator
-    : AT dotted_name (OPEN_PAREN arglist? CLOSE_PAREN)? NEWLINE
+    : AT dotted_name (OPEN_PAREN arglist? CLOSE_PAREN)? LINE_BREAK
     ;
 
 elif_clause
@@ -133,7 +133,7 @@ named_parameter
 
 // -------- simple statement -------------------------------------------------------------------------------------------
 simple_stmt
-    : small_stmt (SEMI_COLON small_stmt)* SEMI_COLON? (NEWLINE | EOF)
+    : small_stmt (SEMI_COLON small_stmt)* SEMI_COLON? (LINE_BREAK | EOF)
     ;
 
 // TODO 1: left part augmented assignment should be `test` only, no stars or lists

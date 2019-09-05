@@ -1,131 +1,117 @@
 using System.Collections.Generic;
 using Antlr4.Runtime;
-using System.Text.RegularExpressions;
 using PythonParseTree;
 
 public abstract class PythonBaseLexer : Lexer
 {
-    private static Regex _newLineRegex = new Regex("[^\r\n\f]+");
-    private static Regex _spacesRegex = new Regex("[\r\n\f]+");
+    public static int TabSize { get; set; } = 8;
 
-    // A queue where extra tokens are pushed on (see the NEWLINE lexer rule).
-    private LinkedList<IToken> Tokens = new LinkedList<IToken>();
-    // The stack that keeps track of the indentation level.
-    private Stack<int> Indents = new Stack<int>();
     // The amount of opened braces, brackets and parenthesis.
-    public int Opened = 0;
-    // The most recently produced token.
-    public IToken LastToken;
+    private int _opened;
 
-    public PythonBaseLexer(ICharStream charStream)
+    // The stack that keeps track of the indentation level.
+    private readonly Stack<int> _indents = new Stack<int>();
+
+    // A list where extra tokens are pushed on (see the NEWLINE lexer rule).
+    private int _tokensInd;
+    private readonly List<IToken> _tokens = new List<IToken>();
+
+    protected PythonBaseLexer(ICharStream charStream)
             : base(charStream)
     {
     }
 
     public override void Emit(IToken token)
     {
-        base.Token = token;
-        Tokens.AddLast(token);
-    }
-
-    public void HandleNewLine()
-    {
-        var newLine = _newLineRegex.Replace(Text, "");
-        var spaces = _spacesRegex.Replace(Text, "");
-
-        int next = _input.La(1);
-        if (Opened > 0 || next == '\r' || next == '\n' || next == '\f' || next == '#')
-        {
-            // If we're inside a list or on a blank line, ignore all indents,
-            // dedents and line breaks.
-            Skip();
-        }
-        else
-        {
-            Emit(CommonToken(PythonLexer.NEWLINE, newLine));
-            int indent = GetIndentationCount(spaces);
-            int previous = Indents.Count == 0 ? 0 : Indents.Peek();
-            if (indent == previous)
-            {
-                // skip indents of the same size as the present indent-size
-                Skip();
-            }
-            else if (indent > previous)
-            {
-                Indents.Push(indent);
-                Emit(CommonToken(PythonLexer.INDENT, spaces));
-            }
-            else
-            {
-                // Possibly emit more than 1 DEDENT token.
-                while (Indents.Count != 0 && Indents.Peek() > indent)
-                {
-                    Emit(CreateDedent());
-                    Indents.Pop();
-                }
-            }
-        }
-    }
-
-    private CommonToken CommonToken(int type, string text)
-    {
-        int stop = CharIndex - 1;
-        int start = text.Length == 0 ? stop : stop - text.Length + 1;
-        return new CommonToken(_tokenFactorySourcePair, type, DefaultTokenChannel, start, stop);
+        base.Emit(token);
+        _tokens.Add(token);
     }
 
     public override IToken NextToken()
     {
         // Check if the end-of-file is ahead and there are still some DEDENTS expected.
-        if (_input.La(1) == Eof && Indents.Count != 0)
+        if (_input.La(1) == Eof && _indents.Count > 0)
         {
             // Remove any trailing EOF tokens from our buffer.
-            for (var node = Tokens.First; node != null;)
+            while (_tokensInd < _tokens.Count && _tokens[_tokensInd].Type == Eof)
             {
-                var temp = node.Next;
-                if (node.Value.Type == Eof)
-                {
-                    Tokens.Remove(node);
-                }
-
-                node = temp;
+                _tokens[_tokensInd] = null;
+                _tokensInd++;
             }
 
-            if (Tokens.Last.Value.Type != PythonLexer.NEWLINE)
+            if (_tokensInd < _tokens.Count && _tokens[_tokensInd].Type != PythonLexer.LINE_BREAK)
             {
                 // First emit an extra line break that serves as the end of the statement.
-                Emit(CommonToken(PythonLexer.NEWLINE, "\n"));
+                Emit(PythonLexer.LINE_BREAK);
             }
 
             // Now emit as much DEDENT tokens as needed.
-            while (Indents.Count != 0)
+            while (_indents.Count != 0)
             {
-                Emit(CreateDedent());
-                Indents.Pop();
+                Emit(PythonLexer.DEDENT);
+                _indents.Pop();
             }
 
             // Put the EOF back on the token stream.
-            Emit(CommonToken(Eof, "<EOF>"));
+            Emit(Eof);
         }
 
-        var next = base.NextToken();
-        if (next.Channel == DefaultTokenChannel)
-        {
-            // Keep track of the last token on the default channel.
-            LastToken = next;
-        }
+        IToken next = base.NextToken();
 
-        if (Tokens.Count == 0)
+        if (_tokens.Count == _tokensInd)
         {
             return next;
         }
 
-        var x = Tokens.First.Value;
-        Tokens.RemoveFirst();
-        return x;
+        var result = _tokens[_tokensInd];
+        _tokens[_tokensInd++] = null;
+        return result;
     }
 
-    public bool AtStartOfInputWithSpaces()
+    protected void HandleNewLine()
+    {
+        char next = (char)_input.La(1);
+
+        Emit(new CommonToken(_tokenFactorySourcePair, PythonLexer.NEWLINE, Hidden,
+            CharIndex - Text.Length, CharIndex)
+        {
+            Line = Line - 1,
+            Text = Text
+        });
+
+        if (_opened == 0 && !IsNewLine(next) && next != '#')
+        {
+            Emit(PythonLexer.LINE_BREAK);
+
+            int wsInd = 0;
+            if (wsInd < Text.Length && IsNewLine(Text[wsInd]))
+            {
+                wsInd++;
+                if (wsInd < Text.Length && IsNewLine(Text[wsInd]))
+                    wsInd++;
+            }
+
+            int indent = GetIndentationCount(Text, wsInd);
+            int previous = _indents.Count == 0 ? 0 : _indents.Peek();
+
+            if (indent > previous)
+            {
+                _indents.Push(indent);
+                Emit(PythonLexer.INDENT);
+            }
+            else
+            {
+                // Possibly emit more than 1 DEDENT token.
+                while (_indents.Count != 0 && _indents.Peek() > indent)
+                {
+                    Emit(PythonLexer.DEDENT);
+                    _indents.Pop();
+                }
+            }
+        }
+    }
+
+    protected bool AtStartOfInputWithSpaces()
     {
         int index = -1;
 
@@ -137,21 +123,27 @@ public abstract class PythonBaseLexer : Lexer
         return _input.Index + index < 0; // TODO: check
     }
 
-    protected void IncIndentLevel()
-    {
-        Opened++;
-    }
+    protected void IncIndentLevel() => _opened++;
 
     protected void DecIndentLevel()
     {
-        Opened--;
+        if (_opened > 0)
+        {
+            --_opened;
+        }
     }
 
-    private IToken CreateDedent()
+    private static bool IsNewLine(char c) => c == '\r' || c == '\n' || c == '\f';
+
+    private void Emit(int tokenType)
     {
-        var dedent = CommonToken(PythonLexer.DEDENT, "");
-        dedent.Line = LastToken.Line;
-        return dedent;
+        Emit(new CommonToken(_tokenFactorySourcePair, tokenType, DefaultTokenChannel,
+            CharIndex, CharIndex)
+        {
+            Line = Line,
+            Column = Column,
+            Text = ""
+        });
     }
 
     // Calculates the indentation of the provided spaces, taking the
@@ -162,13 +154,13 @@ public abstract class PythonBaseLexer : Lexer
     //  the replacement is a multiple of eight [...]"
     //
     //  -- https://docs.python.org/3.1/reference/lexical_analysis.html#indentation
-    private static int GetIndentationCount(string spaces)
+    private static int GetIndentationCount(string spaces, int startInd)
     {
         int count = 0;
 
-        foreach (char ch in spaces)
+        for (int i = startInd; i < spaces.Length; i++)
         {
-            count += ch == '\t' ? 8 - count % 8 : 1;
+            count += spaces[i] == '\t' ? TabSize - count % TabSize : 1;
         }
 
         return count;

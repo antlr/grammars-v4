@@ -2,7 +2,7 @@ lexer grammar PythonLexer;
 
 options { superClass=PythonBaseLexer; }
 
-tokens { INDENT, DEDENT }
+tokens { INDENT, DEDENT, LINE_BREAK }
 
 // Keywords
 
@@ -114,8 +114,7 @@ NEWLINE            :
                    ( SPACES {AtStartOfInputWithSpaces()}?
                    | ( '\r'? '\n' | '\r' | '\f' ) SPACES?
                    )
-                   { HandleNewLine(); }
-                   ;
+                   { HandleNewLine(); }                      -> channel(HIDDEN);
 
 NAME               : ID_START ID_CONTINUE*;
 
