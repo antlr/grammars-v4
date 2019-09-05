@@ -146,12 +146,18 @@ public abstract class PythonBaseLexer : Lexer
 
     private void Emit(int tokenType, int channel = DefaultTokenChannel, string text = "")
     {
-        Emit(new CommonToken(_tokenFactorySourcePair, tokenType, channel,
-            CharIndex - text.Length, CharIndex)
-        {
-            Line = Line,
-            Column = Column,
-            Text = text
-        });
+        IToken token =
+#if LIGHT_TOKEN
+            new PT.PM.AntlrUtils.LightToken((PT.PM.AntlrUtils.LightInputStream)_tokenFactorySourcePair.Item2, tokenType,
+                channel, -1, CharIndex - text.Length, CharIndex);
+#else
+            new CommonToken(_tokenFactorySourcePair, tokenType, channel, CharIndex - text.Length, CharIndex)
+            {
+                Line = Line,
+                Column = Column,
+                Text = text
+            };
+#endif
+        Emit(token);
     }
 }
