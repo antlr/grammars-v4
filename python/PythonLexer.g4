@@ -110,17 +110,12 @@ CLOSE_BRACE        : '}' {DecIndentLevel();};
 OPEN_BRACKET       : '[' {IncIndentLevel();};
 CLOSE_BRACKET      : ']' {DecIndentLevel();};
 
-NEWLINE            :
-                   ( SPACES {AtStartOfInputWithSpaces()}?
-                   | ( '\r'? '\n' | '\r' | '\f' ) SPACES?
-                   )
-                   { HandleNewLine(); }                      -> channel(HIDDEN);
-
 NAME               : ID_START ID_CONTINUE*;
 
-WS                 : SPACES                                  -> channel(HIDDEN);
-COMMENT            : '#' ~[\r\n\f]*                          -> channel(HIDDEN);
-LINE_JOINING       : '\\' SPACES? ('\r'? '\n' | '\r' | '\f') -> channel(HIDDEN);
+LINE_JOINING       : '\\' SPACES? ('\r'? '\n' | '\r' | '\f')        -> channel(HIDDEN);
+NEWLINE            : ('\r'? '\n' | '\r' | '\f' ) {HandleNewLine();} -> channel(HIDDEN);
+WS                 : SPACES                      {HandleSpaces();}  -> channel(HIDDEN);
+COMMENT            : '#' ~[\r\n\f]*                                 -> channel(HIDDEN);
 
 fragment SHORT_STRING
     : '\'' ('\\' . | ~[\\\r\n\f'])* '\''

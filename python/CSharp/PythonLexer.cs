@@ -15,6 +15,7 @@ public abstract class PythonBaseLexer : Lexer
     // A list where extra tokens are pushed on (see the NEWLINE lexer rule).
     private int _tokensInd;
     private readonly List<IToken> _tokens = new List<IToken>();
+    private IToken _lastToken;
 
     protected PythonBaseLexer(ICharStream charStream)
             : base(charStream)
@@ -25,6 +26,7 @@ public abstract class PythonBaseLexer : Lexer
     {
         base.Emit(token);
         _tokens.Add(token);
+        _lastToken = token;
     }
 
     public override IToken NextToken()
@@ -70,57 +72,41 @@ public abstract class PythonBaseLexer : Lexer
 
     protected void HandleNewLine()
     {
+        Emit(PythonLexer.NEWLINE, Hidden, Text);
+
         char next = (char)_input.La(1);
 
-        Emit(new CommonToken(_tokenFactorySourcePair, PythonLexer.NEWLINE, Hidden,
-            CharIndex - Text.Length, CharIndex)
+        // Process whitespaces in HandleSpaces
+        if (next != ' ' && next != '\t' && IsNotNewLineOrComment(next))
         {
-            Line = Line - 1,
-            Text = Text
-        });
-
-        if (_opened == 0 && !IsNewLine(next) && next != '#')
-        {
-            Emit(PythonLexer.LINE_BREAK);
-
-            int wsInd = 0;
-            if (wsInd < Text.Length && IsNewLine(Text[wsInd]))
-            {
-                wsInd++;
-                if (wsInd < Text.Length && IsNewLine(Text[wsInd]))
-                    wsInd++;
-            }
-
-            int indent = GetIndentationCount(Text, wsInd);
-            int previous = _indents.Count == 0 ? 0 : _indents.Peek();
-
-            if (indent > previous)
-            {
-                _indents.Push(indent);
-                Emit(PythonLexer.INDENT);
-            }
-            else
-            {
-                // Possibly emit more than 1 DEDENT token.
-                while (_indents.Count != 0 && _indents.Peek() > indent)
-                {
-                    Emit(PythonLexer.DEDENT);
-                    _indents.Pop();
-                }
-            }
+            ProcessNewLine(0);
         }
     }
 
-    protected bool AtStartOfInputWithSpaces()
+    protected void HandleSpaces()
     {
-        int index = -1;
+        char next = (char)_input.La(1);
 
-        while (char.IsWhiteSpace((char)_input.La(index)))
+        if ((_lastToken == null || _lastToken.Type == PythonLexer.NEWLINE) && IsNotNewLineOrComment(next))
         {
-            index--;
+            // Calculates the indentation of the provided spaces, taking the
+            // following rules into account:
+            //
+            // "Tabs are replaced (from left to right) by one to eight spaces
+            //  such that the total number of characters up to and including
+            //  the replacement is a multiple of eight [...]"
+            //
+            //  -- https://docs.python.org/3.1/reference/lexical_analysis.html#indentation
+
+            int indent = 0;
+
+            foreach (char c in Text)
+                indent += c == '\t' ? TabSize - indent % TabSize : 1;
+
+            ProcessNewLine(indent);
         }
 
-        return _input.Index + index < 0; // TODO: check
+        Emit(PythonLexer.WS, Hidden, Text);
     }
 
     protected void IncIndentLevel() => _opened++;
@@ -133,36 +119,39 @@ public abstract class PythonBaseLexer : Lexer
         }
     }
 
-    private static bool IsNewLine(char c) => c == '\r' || c == '\n' || c == '\f';
+    private bool IsNotNewLineOrComment(char next) =>
+        _opened == 0 && next != '\r' && next != '\n' && next != '\f' && next != '#';
 
-    private void Emit(int tokenType)
+    private void ProcessNewLine(int indent)
     {
-        Emit(new CommonToken(_tokenFactorySourcePair, tokenType, DefaultTokenChannel,
-            CharIndex, CharIndex)
+        Emit(PythonLexer.LINE_BREAK);
+
+        int previous = _indents.Count == 0 ? 0 : _indents.Peek();
+
+        if (indent > previous)
+        {
+            _indents.Push(indent);
+            Emit(PythonLexer.INDENT);
+        }
+        else
+        {
+            // Possibly emit more than 1 DEDENT token.
+            while (_indents.Count != 0 && _indents.Peek() > indent)
+            {
+                Emit(PythonLexer.DEDENT);
+                _indents.Pop();
+            }
+        }
+    }
+
+    private void Emit(int tokenType, int channel = DefaultTokenChannel, string text = "")
+    {
+        Emit(new CommonToken(_tokenFactorySourcePair, tokenType, channel,
+            CharIndex - text.Length, CharIndex)
         {
             Line = Line,
             Column = Column,
-            Text = ""
+            Text = text
         });
-    }
-
-    // Calculates the indentation of the provided spaces, taking the
-    // following rules into account:
-    //
-    // "Tabs are replaced (from left to right) by one to eight spaces
-    //  such that the total number of characters up to and including
-    //  the replacement is a multiple of eight [...]"
-    //
-    //  -- https://docs.python.org/3.1/reference/lexical_analysis.html#indentation
-    private static int GetIndentationCount(string spaces, int startInd)
-    {
-        int count = 0;
-
-        for (int i = startInd; i < spaces.Length; i++)
-        {
-            count += spaces[i] == '\t' ? TabSize - count % TabSize : 1;
-        }
-
-        return count;
     }
 }
