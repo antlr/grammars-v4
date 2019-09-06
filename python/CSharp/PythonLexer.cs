@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Antlr4.Runtime;
 
@@ -13,9 +14,10 @@ namespace PythonParseTree
         // The stack that keeps track of the indentation level.
         private readonly Stack<int> _indents = new Stack<int>();
 
-        // A list where extra tokens are pushed on (see the NEWLINE lexer rule).
-        private int _tokensInd;
-        private readonly List<IToken> _tokens = new List<IToken>();
+        // A circular buffer where extra tokens are pushed on (see the NEWLINE and WS lexer rules).
+        private int _firstTokensInd;
+        private int _lastTokenInd;
+        private IToken[] _buffer = new IToken[16];
         private IToken _lastToken;
 
         protected PythonBaseLexer(ICharStream charStream)
@@ -26,7 +28,27 @@ namespace PythonParseTree
         public override void Emit(IToken token)
         {
             base.Emit(token);
-            _tokens.Add(token);
+
+            if (!(_buffer[_firstTokensInd] is null))
+            {
+                IncTokenInd(ref _lastTokenInd);
+
+                if (_lastTokenInd == _firstTokensInd)
+                {
+                    // Enlarge buffer
+                    var newArray = new IToken[_buffer.Length * 2];
+                    int destInd = newArray.Length - (_buffer.Length - _firstTokensInd);
+
+                    Array.Copy(_buffer, 0, newArray, 0, _firstTokensInd);
+                    Array.Copy(_buffer, _firstTokensInd,
+                        newArray, destInd, _buffer.Length - _firstTokensInd);
+
+                    _firstTokensInd = destInd;
+                    _buffer = newArray;
+                }
+            }
+
+            _buffer[_lastTokenInd] = token;
             _lastToken = token;
         }
 
@@ -35,14 +57,7 @@ namespace PythonParseTree
             // Check if the end-of-file is ahead and there are still some DEDENTS expected.
             if (_input.La(1) == Eof && _indents.Count > 0)
             {
-                // Remove any trailing EOF tokens from our buffer.
-                while (_tokensInd < _tokens.Count && _tokens[_tokensInd].Type == Eof)
-                {
-                    _tokens[_tokensInd] = null;
-                    _tokensInd++;
-                }
-
-                if (_tokensInd < _tokens.Count && _tokens[_tokensInd].Type != PythonLexer.LINE_BREAK)
+                if (_buffer[_lastTokenInd] is null || _buffer[_lastTokenInd].Type != PythonLexer.LINE_BREAK)
                 {
                     // First emit an extra line break that serves as the end of the statement.
                     Emit(PythonLexer.LINE_BREAK);
@@ -54,20 +69,23 @@ namespace PythonParseTree
                     Emit(PythonLexer.DEDENT);
                     _indents.Pop();
                 }
-
-                // Put the EOF back on the token stream.
-                Emit(Eof);
             }
 
             IToken next = base.NextToken();
 
-            if (_tokens.Count == _tokensInd)
+            if (_buffer[_firstTokensInd] is null)
             {
                 return next;
             }
 
-            var result = _tokens[_tokensInd];
-            _tokens[_tokensInd++] = null;
+            var result = _buffer[_firstTokensInd];
+            _buffer[_firstTokensInd] = null;
+
+            if (_firstTokensInd != _lastTokenInd)
+            {
+                IncTokenInd(ref _firstTokensInd);
+            }
+
             return result;
         }
 
@@ -144,6 +162,8 @@ namespace PythonParseTree
                 }
             }
         }
+
+        private void IncTokenInd(ref int ind) => ind = (ind + 1) % _buffer.Length;
 
         private void Emit(int tokenType, int channel = DefaultTokenChannel, string text = "")
         {
