@@ -114,14 +114,14 @@ CLOSE_BRACKET      : ']' {DecIndentLevel();};
 
 NAME               : ID_START ID_CONTINUE*;
 
-LINE_JOINING       : '\\' SPACES? ('\r'? '\n' | '\r' | '\f')        -> channel(HIDDEN);
-NEWLINE            : ('\r'? '\n' | '\r' | '\f' ) {HandleNewLine();} -> channel(HIDDEN);
-WS                 : SPACES                      {HandleSpaces();}  -> channel(HIDDEN);
-COMMENT            : '#' ~[\r\n\f]*                                 -> channel(HIDDEN);
+LINE_JOIN          : '\\' [ \t]* RN                        -> channel(HIDDEN);
+NEWLINE            : RN                {HandleNewLine();}  -> channel(HIDDEN);
+WS                 : [ \t]+            {HandleSpaces();}   -> channel(HIDDEN);
+COMMENT            : '#' ~[\r\n\f]*                        -> channel(HIDDEN);
 
 fragment SHORT_STRING
-    : '\'' ('\\' . | ~[\\\r\n\f'])* '\''
-    | '"' ('\\' . | ~[\\\r\n\f"])* '"'
+    : '\'' ('\\' (RN | .) | ~[\\\r\n'])* '\''
+    | '"'  ('\\' (RN | .) | ~[\\\r\n"])* '"'
     ;
 
 fragment LONG_STRING
@@ -131,7 +131,11 @@ fragment LONG_STRING
 
 fragment LONG_STRING_ITEM
     : ~'\\'
-    | '\\' .
+    | '\\' (RN | .)
+    ;
+
+fragment RN
+    : '\r'? '\n'
     ;
 
 fragment EXPONENT_OR_POINT_FLOAT
@@ -150,8 +154,8 @@ fragment SHORT_BYTES
     ;
 
 fragment LONG_BYTES
-    : '\'\'\'' LONG_BYTES_ITEM* '\'\'\''
-    | '"""' LONG_BYTES_ITEM* '"""'
+    : '\'\'\'' LONG_BYTES_ITEM*? '\'\'\''
+    | '"""' LONG_BYTES_ITEM*? '"""'
     ;
 
 fragment LONG_BYTES_ITEM
@@ -175,22 +179,18 @@ fragment SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE
     | [\u005D-\u007F]
     ;
 
-/// longbyteschar  ::=  <any ASCII character except "\">
+/// Any ASCII character except "\"
 fragment LONG_BYTES_CHAR
     : [\u0000-\u005B]
     | [\u005D-\u007F]
     ;
 
-/// bytesescapeseq ::=  "\" <any ASCII character>
+/// "\" <any ASCII character>
 fragment BYTES_ESCAPE_SEQ
     : '\\' [\u0000-\u007F]
     ;
 
-fragment SPACES
-    : [ \t]+
-    ;
-
-/// id_continue  ::=  <all characters in id_start, plus characters in the categories Mn, Mc, Nd, Pc and others with the Other_ID_Continue property>
+/// All characters in id_start, plus characters in the categories Mn, Mc, Nd, Pc and others with the Other_ID_Continue property
 fragment ID_CONTINUE
     : ID_START
     | [0-9]
@@ -396,7 +396,7 @@ fragment ID_CONTINUE
     | '\uFF3F'
     ;
 
-/// id_start     ::=  <all characters in general categories Lu, Ll, Lt, Lm, Lo, Nl, the underscore, and characters with the Other_ID_Start property>
+/// all characters in general categories Lu, Ll, Lt, Lm, Lo, Nl, the underscore, and characters with the Other_ID_Start property
 fragment ID_START
     : '_'
     | [A-Z]
