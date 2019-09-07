@@ -40,8 +40,7 @@ namespace PythonParseTree
                     int destInd = newArray.Length - (_buffer.Length - _firstTokensInd);
 
                     Array.Copy(_buffer, 0, newArray, 0, _firstTokensInd);
-                    Array.Copy(_buffer, _firstTokensInd,
-                        newArray, destInd, _buffer.Length - _firstTokensInd);
+                    Array.Copy(_buffer, _firstTokensInd, newArray, destInd, _buffer.Length - _firstTokensInd);
 
                     _firstTokensInd = destInd;
                     _buffer = newArray;

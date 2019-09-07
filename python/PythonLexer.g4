@@ -119,6 +119,8 @@ NEWLINE            : RN                {HandleNewLine();}  -> channel(HIDDEN);
 WS                 : [ \t]+            {HandleSpaces();}   -> channel(HIDDEN);
 COMMENT            : '#' ~[\r\n\f]*                        -> channel(HIDDEN);
 
+// Fragments
+
 fragment SHORT_STRING
     : '\'' ('\\' (RN | .) | ~[\\\r\n'])* '\''
     | '"'  ('\\' (RN | .) | ~[\\\r\n"])* '"'
