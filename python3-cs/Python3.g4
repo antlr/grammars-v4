@@ -28,17 +28,268 @@
  *                https://github.com/bkiers/python3-parser
  * Developed by : Bart Kiers, bart@big-o.nl
  */
-
-lexer grammar Python3Lexer;
+grammar Python3;
 
 // All comments that start with "///" are copy-pasted from
 // The Python Language Reference
 
 tokens { INDENT, DEDENT }
+ 
+@lexer::header{
+using System.Linq;
+using System.Text.RegularExpressions;
+}
 
-options {
-    superClass=PythonBaseLexer;
+@lexer::members {
+	// A queue where extra tokens are pushed on (see the NEWLINE lexer rule).
+	private System.Collections.Generic.LinkedList<IToken> Tokens = new System.Collections.Generic.LinkedList<IToken>();
+	// The stack that keeps track of the indentation level.
+	private System.Collections.Generic.Stack<int> Indents = new System.Collections.Generic.Stack<int>();
+	// The amount of opened braces, brackets and parenthesis.
+	private int Opened = 0;
+	// The most recently produced token.
+	private IToken LastToken = null;
+
+	public override void Emit(IToken token)
+	{
+	    base.Token = token;
+	    Tokens.AddLast(token);
+	}
+
+	private CommonToken CommonToken(int type, string text)
+	{
+	    int stop = CharIndex - 1;
+	    int start = text.Length == 0 ? stop : stop - text.Length + 1;
+	    return new CommonToken(this._tokenFactorySourcePair, type, DefaultTokenChannel, start, stop);
+	}
+
+	private IToken CreateDedent()
+	{
+	    var dedent = CommonToken(Python3Parser.DEDENT, "");
+	    dedent.Line = LastToken.Line;
+	    return dedent;
+	}
+
+	public override IToken NextToken()
+	{
+	    // Check if the end-of-file is ahead and there are still some DEDENTS expected.
+	    if (_input.La(1) == Eof && Indents.Count != 0)
+	    {
+            // Remove any trailing EOF tokens from our buffer.
+            for (var node  = Tokens.First; node != null; )
+            {
+                var temp = node.Next;
+                if (node.Value.Type == Eof)
+                {
+                    Tokens.Remove(node);
+                }
+                node = temp;
+            }
+            
+            // First emit an extra line break that serves as the end of the statement.
+            this.Emit(CommonToken(Python3Parser.NEWLINE, "\n"));
+
+	        // Now emit as much DEDENT tokens as needed.
+	        while (Indents.Count != 0)
+	        {
+	            Emit(CreateDedent());
+	            Indents.Pop();
+	        }
+
+	        // Put the EOF back on the token stream.
+	        Emit(CommonToken(Python3Parser.Eof, "<EOF>"));
+	    }
+
+	    var next = base.NextToken();
+	    if (next.Channel == DefaultTokenChannel)
+	    {
+	        // Keep track of the last token on the default channel.
+	        LastToken = next;
+	    }
+
+	    if (Tokens.Count == 0)
+	    {
+	        return next;
+	    }
+	    else
+	    {
+	        var x = Tokens.First.Value;
+	        Tokens.RemoveFirst();
+	        return x;
+	    }
+	}
+
+    // Calculates the indentation of the provided spaces, taking the
+    // following rules into account:
+    //
+    // "Tabs are replaced (from left to right) by one to eight spaces
+    //  such that the total number of characters up to and including
+    //  the replacement is a multiple of eight [...]"
+    //
+    //  -- https://docs.python.org/3.1/reference/lexical_analysis.html#indentation
+    static int GetIndentationCount(string spaces)
+    {
+        int count = 0;
+        foreach (char ch in spaces.ToCharArray())
+        {
+            count += ch == '\t' ? 8 - (count % 8) : 1;
+        }
+        return count;
     }
+
+    bool AtStartOfInput()
+    {
+        return Column == 0 && Line == 1;
+    }
+}
+
+/*
+ * parser rules
+ */
+
+single_input: NEWLINE | simple_stmt | compound_stmt NEWLINE;
+file_input: (NEWLINE | stmt)* EOF;
+eval_input: testlist NEWLINE* EOF;
+
+decorator: '@' dotted_name ( '(' (arglist)? ')' )? NEWLINE;
+decorators: decorator+;
+decorated: decorators (classdef | funcdef | async_funcdef);
+
+async_funcdef: ASYNC funcdef;
+funcdef: 'def' NAME parameters ('->' test)? ':' suite;
+
+parameters: '(' (typedargslist)? ')';
+typedargslist: (tfpdef ('=' test)? (',' tfpdef ('=' test)?)* (',' (
+        '*' (tfpdef)? (',' tfpdef ('=' test)?)* (',' ('**' tfpdef (',')?)?)?
+      | '**' tfpdef (',')?)?)?
+  | '*' (tfpdef)? (',' tfpdef ('=' test)?)* (',' ('**' tfpdef (',')?)?)?
+  | '**' tfpdef (',')?);
+tfpdef: NAME (':' test)?;
+varargslist: (vfpdef ('=' test)? (',' vfpdef ('=' test)?)* (',' (
+        '*' (vfpdef)? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef (',')?)?)?
+      | '**' vfpdef (',')?)?)?
+  | '*' (vfpdef)? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef (',')?)?)?
+  | '**' vfpdef (',')?
+);
+vfpdef: NAME;
+
+stmt: simple_stmt | compound_stmt;
+simple_stmt: small_stmt (';' small_stmt)* (';')? NEWLINE;
+small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
+             import_stmt | global_stmt | nonlocal_stmt | assert_stmt);
+expr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
+                     ('=' (yield_expr|testlist_star_expr))*);
+annassign: ':' test ('=' test)?;
+testlist_star_expr: (test|star_expr) (',' (test|star_expr))* (',')?;
+augassign: ('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' |
+            '<<=' | '>>=' | '**=' | '//=');
+// For normal and annotated assignments, additional restrictions enforced by the interpreter
+del_stmt: 'del' exprlist;
+pass_stmt: 'pass';
+flow_stmt: break_stmt | continue_stmt | return_stmt | raise_stmt | yield_stmt;
+break_stmt: 'break';
+continue_stmt: 'continue';
+return_stmt: 'return' (testlist)?;
+yield_stmt: yield_expr;
+raise_stmt: 'raise' (test ('from' test)?)?;
+import_stmt: import_name | import_from;
+import_name: 'import' dotted_as_names;
+// note below: the ('.' | '...') is necessary because '...' is tokenized as ELLIPSIS
+import_from: ('from' (('.' | '...')* dotted_name | ('.' | '...')+)
+              'import' ('*' | '(' import_as_names ')' | import_as_names));
+import_as_name: NAME ('as' NAME)?;
+dotted_as_name: dotted_name ('as' NAME)?;
+import_as_names: import_as_name (',' import_as_name)* (',')?;
+dotted_as_names: dotted_as_name (',' dotted_as_name)*;
+dotted_name: NAME ('.' NAME)*;
+global_stmt: 'global' NAME (',' NAME)*;
+nonlocal_stmt: 'nonlocal' NAME (',' NAME)*;
+assert_stmt: 'assert' test (',' test)?;
+
+compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated | async_stmt;
+async_stmt: ASYNC (funcdef | with_stmt | for_stmt);
+if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ('else' ':' suite)?;
+while_stmt: 'while' test ':' suite ('else' ':' suite)?;
+for_stmt: 'for' exprlist 'in' testlist ':' suite ('else' ':' suite)?;
+try_stmt: ('try' ':' suite
+           ((except_clause ':' suite)+
+            ('else' ':' suite)?
+            ('finally' ':' suite)? |
+           'finally' ':' suite));
+with_stmt: 'with' with_item (',' with_item)*  ':' suite;
+with_item: test ('as' expr)?;
+// NB compile.c makes sure that the default except clause is last
+except_clause: 'except' (test ('as' NAME)?)?;
+suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT;
+
+test: or_test ('if' or_test 'else' test)? | lambdef;
+test_nocond: or_test | lambdef_nocond;
+lambdef: 'lambda' (varargslist)? ':' test;
+lambdef_nocond: 'lambda' (varargslist)? ':' test_nocond;
+or_test: and_test ('or' and_test)*;
+and_test: not_test ('and' not_test)*;
+not_test: 'not' not_test | comparison;
+comparison: expr (comp_op expr)*;
+// <> isn't actually a valid comparison operator in Python. It's here for the
+// sake of a __future__ import described in PEP 401 (which really works :-)
+comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not';
+star_expr: '*' expr;
+expr: xor_expr ('|' xor_expr)*;
+xor_expr: and_expr ('^' and_expr)*;
+and_expr: shift_expr ('&' shift_expr)*;
+shift_expr: arith_expr (('<<'|'>>') arith_expr)*;
+arith_expr: term (('+'|'-') term)*;
+term: factor (('*'|'@'|'/'|'%'|'//') factor)*;
+factor: ('+'|'-'|'~') factor | power;
+power: atom_expr ('**' factor)?;
+atom_expr: (AWAIT)? atom trailer*;
+atom: ('(' (yield_expr|testlist_comp)? ')' |
+       '[' (testlist_comp)? ']' |
+       '{' (dictorsetmaker)? '}' |
+       NAME | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False');
+testlist_comp: (test|star_expr) ( comp_for | (',' (test|star_expr))* (',')? );
+trailer: '(' (arglist)? ')' | '[' subscriptlist ']' | '.' NAME;
+subscriptlist: subscript (',' subscript)* (',')?;
+subscript: test | (test)? ':' (test)? (sliceop)?;
+sliceop: ':' (test)?;
+exprlist: (expr|star_expr) (',' (expr|star_expr))* (',')?;
+testlist: test (',' test)* (',')?;
+dictorsetmaker: ( ((test ':' test | '**' expr)
+                   (comp_for | (',' (test ':' test | '**' expr))* (',')?)) |
+                  ((test | star_expr)
+                   (comp_for | (',' (test | star_expr))* (',')?)) );
+
+classdef: 'class' NAME ('(' (arglist)? ')')? ':' suite;
+
+arglist: argument (',' argument)*  (',')?;
+
+// The reason that keywords are test nodes instead of NAME is that using NAME
+// results in an ambiguity. ast.c makes sure it's a NAME.
+// "test '=' test" is really "keyword '=' test", but we have no such token.
+// These need to be in a single rule to avoid grammar that is ambiguous
+// to our LL(1) parser. Even though 'test' includes '*expr' in star_expr,
+// we explicitly match '*' here, too, to give it proper precedence.
+// Illegal combinations and orderings are blocked in ast.c:
+// multiple (test comp_for) arguments are blocked; keyword unpackings
+// that precede iterable unpackings are blocked; etc.
+argument: ( test (comp_for)? |
+            test '=' test |
+            '**' test |
+            '*' test );
+
+comp_iter: comp_for | comp_if;
+comp_for: (ASYNC)? 'for' exprlist 'in' or_test (comp_iter)?;
+comp_if: 'if' test_nocond (comp_iter)?;
+
+// not used in grammar, but may appear in "node" passed from Parser to Compiler
+encoding_decl: NAME;
+
+yield_expr: 'yield' (yield_arg)?;
+yield_arg: 'from' test | testlist;
+
+/*
+ * lexer rules
+ */
 
 STRING
  : STRING_LITERAL
@@ -98,7 +349,41 @@ NEWLINE
  : ( {AtStartOfInput()}?   SPACES
    | ( '\r'? '\n' | '\r' | '\f' ) SPACES?
    )
-   { HandleNewLine(); }
+   {
+		var newLine = (new Regex("[^\r\n\f]+")).Replace(Text, "");
+		var spaces = (new Regex("[\r\n\f]+")).Replace(Text, "");
+
+		int next = _input.La(1);
+		if (Opened > 0 || next == '\r' || next == '\n' || next == '\f' || next == '#')
+		{
+			// If we're inside a list or on a blank line, ignore all indents, 
+			// dedents and line breaks.
+			Skip();
+		}
+		else
+		{
+			Emit(CommonToken(NEWLINE, newLine));
+			int indent = GetIndentationCount(spaces);
+			int previous = Indents.Count == 0 ? 0 : Indents.Peek();
+			if (indent == previous)
+			{
+				// skip indents of the same size as the present indent-size
+				Skip();
+			}
+			else if (indent > previous) {
+				Indents.Push(indent);
+				Emit(CommonToken(Python3Parser.INDENT, spaces));
+			}
+			else {
+				// Possibly emit more than 1 DEDENT token.
+				while(Indents.Count != 0 && Indents.Peek() > indent)
+				{
+					this.Emit(CreateDedent());
+					Indents.Pop();
+				}
+			}
+		}
+   }
  ;
 
 /// identifier   ::=  id_start id_continue*
@@ -207,8 +492,8 @@ UNKNOWN_CHAR
  : .
  ;
 
-/*
- * fragments
+/* 
+ * fragments 
  */
 
 /// shortstring     ::=  "'" shortstringitem* "'" | '"' shortstringitem* '"'
@@ -298,7 +583,7 @@ fragment SHORT_BYTES
  : '\'' ( SHORT_BYTES_CHAR_NO_SINGLE_QUOTE | BYTES_ESCAPE_SEQ )* '\''
  | '"' ( SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE | BYTES_ESCAPE_SEQ )* '"'
  ;
-
+    
 /// longbytes      ::=  "'''" longbytesitem* "'''" | '"""' longbytesitem* '"""'
 fragment LONG_BYTES
  : '\'\'\'' LONG_BYTES_ITEM*? '\'\'\''
@@ -318,7 +603,7 @@ fragment SHORT_BYTES_CHAR_NO_SINGLE_QUOTE
  | [\u000E-\u0026]
  | [\u0028-\u005B]
  | [\u005D-\u007F]
- ;
+ ; 
 
 fragment SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE
  : [\u0000-\u0009]
@@ -326,7 +611,7 @@ fragment SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE
  | [\u000E-\u0021]
  | [\u0023-\u005B]
  | [\u005D-\u007F]
- ;
+ ; 
 
 /// longbyteschar  ::=  <any ASCII character except "\">
 fragment LONG_BYTES_CHAR
