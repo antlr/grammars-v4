@@ -172,12 +172,12 @@ namespace PythonParseTree
                     tokenType,
                     channel, -1, CharIndex - text.Length, CharIndex);
 #else
-            new CommonToken(_tokenFactorySourcePair, tokenType, channel, CharIndex - text.Length, CharIndex)
-            {
-                Line = Line,
-                Column = Column,
-                Text = text
-            };
+                new CommonToken(_tokenFactorySourcePair, tokenType, channel, CharIndex - text.Length, CharIndex)
+                {
+                    Line = Line,
+                    Column = Column,
+                    Text = text
+                };
 #endif
             Emit(token);
         }
