@@ -1,6 +1,6 @@
 lexer grammar PythonLexer;
 
-options { superClass=PythonBaseLexer; }
+options { superClass=PythonLexerBase; }
 
 // Artificial tokens only for parser
 

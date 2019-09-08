@@ -4,7 +4,7 @@ using Antlr4.Runtime;
 
 namespace PythonParseTree
 {
-    public abstract class PythonBaseLexer : Lexer
+    public abstract class PythonLexerBase : Lexer
     {
         public static int TabSize { get; set; } = 8;
 
@@ -20,7 +20,7 @@ namespace PythonParseTree
         private IToken[] _buffer = new IToken[16];
         private IToken _lastToken;
 
-        protected PythonBaseLexer(ICharStream charStream)
+        protected PythonLexerBase(ICharStream charStream)
             : base(charStream)
         {
         }

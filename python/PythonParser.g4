@@ -20,7 +20,7 @@
  */
 parser grammar PythonParser;
 
-options { tokenVocab=PythonLexer; superClass=PythonBaseParser; }
+options { tokenVocab=PythonLexer; superClass=PythonParserBase; }
 
 root
     : (single_input

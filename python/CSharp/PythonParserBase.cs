@@ -9,11 +9,11 @@ namespace PythonParseTree
         Python3 = 3
     }
 
-    public abstract class PythonBaseParser : Parser
+    public abstract class PythonParserBase : Parser
     {
         public PythonVersion Version { get; set; }
 
-        protected PythonBaseParser(ITokenStream input) : base(input)
+        protected PythonParserBase(ITokenStream input) : base(input)
         {
         }
 
