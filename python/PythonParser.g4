@@ -1,23 +1,30 @@
-// Header included from Python site:
 /*
- * Grammar for Python
- *
- * Note:  Changing the grammar specified in this file will most likely
- *        require corresponding changes in the parser module
- *        (../Modules/parsermodule.c).  If you can't make the changes to
- *        that module yourself, please co-ordinate the required changes
- *        with someone who can; ask around on python-dev for help.  Fred
- *        Drake <fdrake@acm.org> will probably be listening there.
- *
- * NOTE WELL: You should also follow all the steps listed in PEP 306,
- * "How to Change Python's Grammar"
- *
- * Start symbols for the grammar:
- *       single_input is a single interactive statement;
- *       file_input is a module or sequence of commands read from an input file;
- *       eval_input is the input for the eval() and input() functions.
- * NB: compound_stmt in single_input is followed by extra LINE_BREAK!
- */
+Python grammar.
+The MIT License (MIT).
+Copyright (c) 2014, Bart Kiers, bart@big-o.nl
+Copyright (c) 2019, Dmitriy Litovchenko, Dmitry.Litovchenko1@yandex.ru, Positive Technologies
+Copyright (c) 2019, Nikita Subbotin, sub.nik.and@gmail.com, Positive Technologies
+Copyright (c) 2019, Ivan Kochurkin, kvanttt@gmail.com, Positive Technologies
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
 parser grammar PythonParser;
 
 options { tokenVocab=PythonLexer; superClass=PythonParserBase; }
@@ -28,16 +35,19 @@ root
     | eval_input)? EOF
     ;
 
+// A single interactive statement;
 single_input
     : LINE_BREAK
     | simple_stmt
     | compound_stmt LINE_BREAK
     ;
 
+// A module or sequence of commands read from an input file
 file_input
     : (LINE_BREAK | stmt)+
     ;
 
+// An input for the eval() and input() functions
 eval_input
     : testlist LINE_BREAK*
     ;
