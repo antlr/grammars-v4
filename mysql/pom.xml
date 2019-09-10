@@ -17,7 +17,7 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
-					<sourceDirectory>${basedir}</sourceDirectory>
+					<sourceDirectory>${basedir}/Positive-Technologies</sourceDirectory>
 					<includes>
 						<include>MySqlLexer.g4</include>
 						<include>MySqlParser.g4</include>
