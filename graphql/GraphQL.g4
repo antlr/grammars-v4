@@ -1,4 +1,3 @@
-
 /*
 The MIT License (MIT)
 
@@ -28,7 +27,7 @@ GraphQL grammar derived from:
 
     http://facebook.github.io/graphql/
     https://github.com/facebook/graphql
-
+  AB:10-dep19: replaced type with type_ to resolve conflict for golang generator
 */
 grammar GraphQL;
 
@@ -109,7 +108,7 @@ variableDefinitions
    ;
 
 variableDefinition
-   : variable ':' type defaultValue?
+   : variable ':' type_ defaultValue?
    ;
 
 variable
@@ -128,7 +127,7 @@ value
    : STRING # stringValue | NUMBER # numberValue | BOOLEAN # booleanValue | array # arrayValue
    ;
 
-type
+type_
    : typeName nonNullType? | listType nonNullType?
    ;
 
@@ -137,7 +136,7 @@ typeName
    ;
 
 listType
-   : '[' type ']'
+   : '[' type_ ']'
    ;
 
 nonNullType
@@ -149,6 +148,11 @@ array
    ;
 
 
+NAME
+   : [_A-Za-z] [_0-9A-Za-z]*
+   ;
+
+
 STRING
    : '"' ( ESC | ~ ["\\] )* '"'
    ;
@@ -156,11 +160,6 @@ STRING
 
 BOOLEAN
    : 'true' | 'false'
-   ;
-
-
-NAME
-   : [_A-Za-z] [_0-9A-Za-z]*
    ;
 
 
@@ -199,3 +198,4 @@ fragment EXP
 WS
    : [ \t\n\r]+ -> skip
    ;
+   
