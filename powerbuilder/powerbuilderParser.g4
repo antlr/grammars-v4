@@ -36,7 +36,7 @@ start_rule
    ;
 
 header_rule
-   : export_header* release_information? window_property_line*
+   : EXPORT_HEADER* release_information? window_property*
    ;
 
 body_rule
@@ -54,16 +54,8 @@ body_rule
    | event_body
    ;
 
-export_header
-   : EXPORT_HEADER
-   ;
-
 release_information
    : RELEASE NUMBER SEMI
-   ;
-
-window_property_line
-   : window_property +
    ;
 
 window_property

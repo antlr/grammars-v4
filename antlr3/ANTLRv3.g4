@@ -166,7 +166,7 @@ ebnfSuffix
    ;
 
 rewrite
-   : ('->' SEMPREDrewrite_alternative)* '->' rewrite_alternative
+   : ('->' SEMPRED rewrite_alternative)* '->' rewrite_alternative
    ;
 
 rewrite_alternative
