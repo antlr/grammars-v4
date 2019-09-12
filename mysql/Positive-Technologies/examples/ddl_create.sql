@@ -47,6 +47,8 @@ CREATE TABLE serval4 (id SMALLINT(5) UNSIGNED SERIAL DEFAULT VALUE NOT NULL, val
 CREATE TABLE serial (serial INT);
 CREATE TABLE float_table (f1 FLOAT, f2 FLOAT(10), f3 FLOAT(7,4));
 CREATE TABLE USER (INTERNAL BOOLEAN DEFAULT FALSE);
+create table table_with_character_set_eq (id int, data varchar(50)) character set = default;
+create table table_with_character_set (id int, data varchar(50)) character set default;
 #end
 #begin
 -- Rename table
@@ -70,6 +72,8 @@ create schema `select` default character set = utf8;
 create database if not exists `current_date` character set cp1251;
 create database super default character set utf8 collate = utf8_bin character set utf8 collate utf8_bin;
 create database super_cs default charset utf8 collate = utf8_bin character set utf8 collate utf8_bin;
+create database db_with_character_set_eq character set = default;
+create database db_with_character_set character set default;
 #end
 #begin
 -- Create event 1
