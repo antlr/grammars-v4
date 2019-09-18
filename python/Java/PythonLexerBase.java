@@ -19,7 +19,7 @@ public abstract class PythonLexerBase extends Lexer {
     // A circular buffer where extra tokens are pushed on (see the NEWLINE and WS lexer rules).
     private int _firstTokensInd;
     private int _lastTokenInd;
-    private Token[] _buffer = new Token[16];
+    private Token[] _buffer = new Token[32];
     private Token _lastToken;
 
     protected PythonLexerBase(CharStream input) {

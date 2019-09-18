@@ -17,7 +17,7 @@ namespace PythonParseTree
         // A circular buffer where extra tokens are pushed on (see the NEWLINE and WS lexer rules).
         private int _firstTokensInd;
         private int _lastTokenInd;
-        private IToken[] _buffer = new IToken[16];
+        private IToken[] _buffer = new IToken[32];
         private IToken _lastToken;
 
         protected PythonLexerBase(ICharStream charStream)
