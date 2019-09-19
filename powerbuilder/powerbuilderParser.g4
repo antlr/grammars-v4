@@ -87,8 +87,8 @@ attribute_value
    | REF
    | NULL
    | OPEN
-   | LPAREN LPAREN (expression | DATA_TYPE_SUB) (COMMA (expression | DATA_TYPE_SUB))? RPAREN (COMMA LPAREN (expression | DATA_TYPE_SUB) (COMMA (expression | DATA_TYPE_SUB))? RPAREN)* RPAREN
-   | DATA_TYPE_SUB (LPAREN NUMBER RPAREN)?
+   | LPAREN LPAREN (expression | dataTypeSub) (COMMA (expression | dataTypeSub))? RPAREN (COMMA LPAREN (expression | dataTypeSub) (COMMA (expression | dataTypeSub))? RPAREN)* RPAREN
+   | dataTypeSub (LPAREN NUMBER RPAREN)?
    ;
 
 forward_decl
@@ -199,7 +199,7 @@ expression
    ;
 
 expression_list
-   : (REF? expression) (COMMA REF? expression)*
+   : REF? expression (COMMA REF? expression)*
    ;
 
 boolean_expression
@@ -231,7 +231,7 @@ mul_expr
    ;
 
 unary_sign_expr
-   : (LPAREN expression RPAREN)
+   : LPAREN expression RPAREN
    | (MINUS | PLUS)? atom
    ;
 
@@ -447,7 +447,7 @@ identifier_name_ex
    | GOTO
    | INSERT
    | DESCRIBE
-   | TIME2
+   | TIME
    | READONLY
    ;
 
@@ -502,14 +502,41 @@ numeric_atom
    ;
 
 boolean_atom
-   : BOOLEAN_ATOM
+   : TRUE
+   | FALSE
    ;
 
 cast_expression
-   : DATA_TYPE_SUB LPAREN expression (COMMA expression)* RPAREN
+   : dataTypeSub LPAREN expression (COMMA expression)* RPAREN
    ;
 
 data_type_name
-   : DATA_TYPE_SUB
+   : dataTypeSub
    | identifier_name
+   ;
+
+dataTypeSub
+   : ANY
+   | BLOB
+   | BOOLEAN
+   | BYTE
+   | CHARACTER
+   | CHAR
+   | DATE_TYPE
+   | DATETIME
+   | DECIMAL
+   | DEC
+   | DOUBLE
+   | INTEGER
+   | INT
+   | LONG
+   | LONGLONG
+   | REAL
+   | STRING
+   | TIME_TYPE
+   | UNSIGNEDINTEGER
+   | UINT
+   | UNSIGNEDLONG
+   | ULONG
+   | WINDOW
    ;

@@ -30,33 +30,32 @@ lexer grammar powerbuilderLexer;
 
 // Keywords
 
-DATA_TYPE_SUB:      'ANY'
-             |      'BLOB'
-             |      'BOOLEAN'
-             |      'BYTE'
-             |      'CHARACTER'
-             |      'CHAR'
-             |      'DATE'
-             |      'DATETIME'
-             |      'DECIMAL'
-             |      'DEC'
-             |      'DOUBLE'
-             |      'INTEGER'
-             |      'INT'
-             |      'LONG'
-             |      'LONGLONG'
-             |      'REAL'
-             |      'STRING'
-             |      'TIME'
-             |      'UNSIGNEDINTEGER'
-             |      'UINT'
-             |      'UNSIGNEDLONG'
-             |      'ULONG'
-             |      'WINDOW'
-             ;
+ANY:                'ANY';
+BLOB:               'BLOB';
+BOOLEAN:            'BOOLEAN';
+BYTE:               'BYTE';
+CHARACTER:          'CHARACTER';
+CHAR:               'CHAR';
+DATE_TYPE:          'DATE';
+DATETIME:           'DATETIME';
+DECIMAL:            'DECIMAL';
+DEC:                'DEC';
+DOUBLE:             'DOUBLE';
+INTEGER:            'INTEGER';
+INT:                'INT';
+LONG:               'LONG';
+LONGLONG:           'LONGLONG';
+REAL:               'REAL';
+STRING:             'STRING';
+TIME_TYPE:          'TIME';
+UNSIGNEDINTEGER:    'UNSIGNEDINTEGER';
+UINT:               'UINT';
+UNSIGNEDLONG:       'UNSIGNEDLONG';
+ULONG:              'ULONG';
+WINDOW:             'WINDOW';
 
-BOOLEAN_ATOM:       'TRUE'
-            |       'FALSE';
+TRUE:               'TRUE';
+FALSE:              'FALSE';
 GLOBAL:             'GLOBAL';
 SHARED:             'SHARED';
 END:                'END';
@@ -117,7 +116,6 @@ TRIGGER:            'TRIGGER';
 SELECT:             'SELECT';
 DELETE:             'DELETE';
 INSERT:             'INSERT';
-TIME2:              'TIME';
 DESCRIBE:           'DESCRIBE';
 RETURN:             'RETURN';
 OR:                 'OR';
