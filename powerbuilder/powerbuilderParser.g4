@@ -26,9 +26,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-parser grammar powerbuilderParser;
+parser grammar PowerBuilderParser;
 
-options { tokenVocab = powerbuilderLexer; }
+options { tokenVocab = PowerBuilderLexer; }
 
 start_rule
    : header_rule? body_rule+ EOF

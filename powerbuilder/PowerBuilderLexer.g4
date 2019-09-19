@@ -26,7 +26,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-lexer grammar powerbuilderLexer;
+lexer grammar PowerBuilderLexer;
 
 // Keywords
 
