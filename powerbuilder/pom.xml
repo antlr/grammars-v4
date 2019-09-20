@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>powerbuilder</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com powerbuilder grammar</name>
+	<name>PowerBuilder grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -18,9 +18,10 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>powerbuilder.g4</grammars>
-					<visitor>true</visitor>
-					<listener>true</listener>
+					<includes>
+						<include>PowerBuilderLexer.g4</include>
+						<include>PowerBuilderParser.g4</include>
+					</includes>
 				</configuration>
 				<executions>
 					<execution>
@@ -38,9 +39,9 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>start_rule</entryPoint>
-					<grammarName>powerbuilder</grammarName>
+					<grammarName>PowerBuilder</grammarName>
+					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>

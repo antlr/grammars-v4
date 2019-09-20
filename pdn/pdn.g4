@@ -45,15 +45,15 @@ tag
    ;
 
 moves
-   : move + result
+   : move+ (result | '*')
    ;
 
 move
-   : movenum movespec +
+   : movenum movespec+
    ;
 
 movespec
-   : (MOVE1 | MOVE2) result?
+   : (MOVE1 | MOVE2) (result | '*')?
    ;
 
 movenum
@@ -64,7 +64,6 @@ result
    : '1/2-1/2'
    | '1-0'
    | '0-1'
-   | '*'?
    ;
 
 text

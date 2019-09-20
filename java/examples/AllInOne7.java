@@ -115,6 +115,9 @@ public class LexerTest {
 
         result = (x > 10) ? x : y;
         
+        // Ternary operator right associativity
+        int f =  b1 ? b2 : b3 ? 3 : 4;
+
         // Bitwise and Bit shift operators
         result = ~x;
         result = x << 1;

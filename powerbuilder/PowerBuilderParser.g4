@@ -26,17 +26,16 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-parser grammar powerbuilderParser;
+parser grammar PowerBuilderParser;
 
-options
-   { tokenVocab = powerbuilderLexer; }
+options { tokenVocab = PowerBuilderLexer; }
 
 start_rule
-   : header_rule? body_rule + EOF
+   : header_rule? body_rule+ EOF
    ;
 
 header_rule
-   : export_header* release_information? window_property_line*
+   : EXPORT_HEADER* (RELEASE NUMBER SEMI)? window_property+
    ;
 
 body_rule
@@ -54,29 +53,18 @@ body_rule
    | event_body
    ;
 
-export_header
-   : EXPORT_HEADER
-   ;
-
-release_information
-   : RELEASE NUMBER SEMI
-   ;
-
-window_property_line
-   : window_property +
-   ;
-
 window_property
-   : (attribute_name array_decl_sub? LPAREN window_property_attributes_sub? RPAREN)
-   ;
-
-window_property_attributes_sub
-   : window_property_attribute_sub +
+   : attribute_name array_decl_sub? LPAREN window_property_attribute_sub* RPAREN
    ;
 
 window_property_attribute_sub
-   : ((NULL | numeric_atom | DQUOTED_STRING | DATE | TIME) COMMA?)
-   | (attribute_name eq = EQ (attribute_value array_decl_sub? | LPAREN window_property_attributes_sub RPAREN)) COMMA?
+   : ( NULL
+     | numeric_atom
+     | DQUOTED_STRING
+     | DATE
+     | TIME
+     | attribute_name eq=EQ (attribute_value array_decl_sub? | LPAREN window_property_attribute_sub+ RPAREN)
+     ) COMMA?
    ;
 
 attribute_name
@@ -84,9 +72,9 @@ attribute_name
    ;
 
 attribute_value
-   : (atom_sub_call1)
-   | (atom_sub_member1)
-   | (MINUS)? numeric_atom
+   : atom_sub_call1
+   | atom_sub_member1
+   | MINUS? numeric_atom
    | boolean_atom
    | ENUM
    | DQUOTED_STRING
@@ -99,16 +87,18 @@ attribute_value
    | REF
    | NULL
    | OPEN
-   | LPAREN LPAREN (expression | data_type_sub) (COMMA (expression | data_type_sub))? RPAREN (COMMA LPAREN (expression | data_type_sub) (COMMA (expression | data_type_sub))? RPAREN)* RPAREN
-   | data_type_sub (LPAREN NUMBER RPAREN)?
+   | LPAREN LPAREN (expression | dataTypeSub) (COMMA (expression | dataTypeSub))? RPAREN (COMMA LPAREN (expression | dataTypeSub) (COMMA (expression | dataTypeSub))? RPAREN)* RPAREN
+   | dataTypeSub (LPAREN NUMBER RPAREN)?
    ;
 
 forward_decl
-   : FORWARD (datatype_decl | variable_decl) + END FORWARD
+   : FORWARD (datatype_decl | variable_decl)+ END FORWARD
    ;
 
 datatype_decl
-   : scope_modif? TYPE identifier_name FROM (identifier_name TICK)? data_type_name (WITHIN identifier_name)? (AUTOINSTANTIATE)? (DESCRIPTOR DQUOTED_STRING EQ DQUOTED_STRING)? (variable_decl | event_forward_decl)* END TYPE
+   : scope_modif? TYPE identifier_name FROM (identifier_name TICK)? data_type_name (WITHIN identifier_name)? AUTOINSTANTIATE? (DESCRIPTOR DQUOTED_STRING EQ DQUOTED_STRING)?
+     (variable_decl | event_forward_decl)*
+     END TYPE
    ;
 
 type_variables_decl
@@ -119,12 +109,12 @@ global_variables_decl
    : (GLOBAL | SHARED) VARIABLES (variable_decl | constant_decl)* END VARIABLES
    ;
 
-variable_decl_sub
-   : (INDIRECT)? access_modif_part? scope_modif?
+variable_decl
+   : variable_decl_sub SEMI
    ;
 
-variable_decl
-   : variable_decl_sub (SEMI)
+variable_decl_sub
+   : INDIRECT? access_modif_part? scope_modif?
    ;
 
 decimal_decl_sub
@@ -158,7 +148,7 @@ parameters_list_sub
    ;
 
 functions_forward_decl
-   : (FORWARD | TYPE) PROTOTYPES function_forward_decl + END PROTOTYPES
+   : (FORWARD | TYPE) PROTOTYPES function_forward_decl+ END PROTOTYPES
    ;
 
 function_body
@@ -169,13 +159,9 @@ on_body
    : ON (identifier | OPEN | CLOSE)
    ;
 
-event_forward_decl_sub
+event_forward_decl
    : EVENT (identifier_name | CREATE | DESTROY) identifier_name? (LPAREN parameters_list_sub? RPAREN)?
    | EVENT TYPE data_type_name identifier_name (LPAREN parameters_list_sub? RPAREN)
-   ;
-
-event_forward_decl
-   : event_forward_decl_sub
    ;
 
 event_body
@@ -208,12 +194,12 @@ scope_modif
    ;
 
 expression
-   : (close_call_sub)
-   | (LCURLY)
+   : close_call_sub
+   | LCURLY
    ;
 
 expression_list
-   : (REF? expression) (COMMA REF? expression)*
+   : REF? expression (COMMA REF? expression)*
    ;
 
 boolean_expression
@@ -229,7 +215,7 @@ condition_and
    ;
 
 condition_not
-   : (NOT)? condition_comparison
+   : NOT? condition_comparison
    ;
 
 condition_comparison
@@ -245,29 +231,29 @@ mul_expr
    ;
 
 unary_sign_expr
-   : (LPAREN expression RPAREN)
+   : LPAREN expression RPAREN
    | (MINUS | PLUS)? atom
    ;
 
 statement
-   : (if_simple_statement)
-   | (DESCRIBE identifier_name)
-   | (assignment_statement)
-   | (statement_sub SEMI)
-   | (if_statement)
-   | (TRY)
-   | (post_event)
-   | (function_call_statement)
-   | (event_call_statement)
-   | (constant_decl)
-   | (variable_decl)
-   | (super_call_statement)
-   | (do_loop_while_statement)
-   | (do_while_loop_statement)
-   | (create_call_statement)
-   | (destroy_call_statement)
-   | (label_stat)
-   | (identifier)
+   : if_simple_statement
+   | DESCRIBE identifier_name
+   | assignment_statement
+   | statement_sub SEMI
+   | if_statement
+   | TRY
+   | post_event
+   | function_call_statement
+   | event_call_statement
+   | constant_decl
+   | variable_decl
+   | super_call_statement
+   | do_loop_while_statement
+   | do_while_loop_statement
+   | create_call_statement
+   | destroy_call_statement
+   | label_stat
+   | identifier
    | throw_stat
    | goto_stat
    | choose_statement
@@ -279,22 +265,22 @@ statement
    ;
 
 statement_sub
-   : (function_virtual_call_expression_sub)
-   | (function_call_expression_sub)
-   | (return_sub)
-   | (open_call_sub)
-   | (close_call_sub)
-   | (variable_decl_sub)
-   | (super_call_sub)
-   | (create_call_sub)
-   | (destroy_call_sub)
-   | (continue_sub)
-   | (goto_stat_sub)
-   | (assignment_sub)
+   : function_virtual_call_expression_sub
+   | function_call_expression_sub
+   | return_statement
+   | open_call_sub
+   | close_call_sub
+   | variable_decl_sub
+   | super_call_statement
+   | create_call_sub
+   | destroy_call_sub
+   | continue_sub
+   | goto_stat
+   | assignment_sub
    ;
 
 assignment_sub
-   : lvalue_sub (EQ | PLUSEQ | MINUSEQ | MULTEQ | DIVEQ) ((NOT) | (LCURLY) | (boolean_expression) | expression)
+   : lvalue_sub (EQ | PLUSEQ | MINUSEQ | MULTEQ | DIVEQ) (NOT | LCURLY | boolean_expression | expression)
    ;
 
 assignment_statement
@@ -302,29 +288,24 @@ assignment_statement
    ;
 
 lvalue_sub
-   : (atom_sub (DOT identifier_name_ex))
-   | (atom_sub_call1)
-   | (atom_sub_array1)
-   | (atom_sub_ref1)
-   | (atom_sub_member1)
-   ;
-
-return_sub
-   : RETURN expression?
+   : atom_sub DOT identifier_name_ex
+   | atom_sub_call1
+   | atom_sub_array1
+   | atom_sub_ref1
+   | atom_sub_member1
    ;
 
 return_statement
-   : return_sub
+   : RETURN expression?
    ;
 
 function_call_expression_sub
-   : (atom_sub (DOT identifier_name_ex))
+   : atom_sub DOT identifier_name_ex
    | atom_sub_call1
    ;
 
 function_virtual_call_expression_sub
-   : identifier_name DOT DYNAMIC (EVENT)? function_call_expression_sub
-   | identifier_name DOT EVENT DYNAMIC function_call_expression_sub
+   : identifier_name DOT (DYNAMIC EVENT? | EVENT DYNAMIC) function_call_expression_sub
    ;
 
 open_call_sub
@@ -337,19 +318,18 @@ close_call_sub
    ;
 
 function_call_statement
-   : (function_call_expression_sub | function_virtual_call_expression_sub | open_call_sub | close_call_sub)
-   ;
-
-super_call_sub
-   : CALL (identifier_name TICK)? ((atom_sub_call1) | atom_sub_member1)
+   : function_call_expression_sub
+   | function_virtual_call_expression_sub
+   | open_call_sub
+   | close_call_sub
    ;
 
 super_call_statement
-   : super_call_sub
+   : CALL (identifier_name TICK)? (atom_sub_call1 | atom_sub_member1)
    ;
 
 event_call_statement_sub
-   : ((identifier_name DOT (identifier_name DOT)?) | (SUPER COLONCOLON))? EVENT atom_sub_call1
+   : (identifier_name DOT (identifier_name DOT)? | SUPER COLONCOLON)? EVENT atom_sub_call1
    ;
 
 event_call_statement
@@ -357,7 +337,7 @@ event_call_statement
    ;
 
 create_call_sub
-   : CREATE (USING)? (identifier_name DOT)? data_type_name (LPAREN expression_list? RPAREN)?
+   : CREATE USING? (identifier_name DOT)? data_type_name (LPAREN expression_list? RPAREN)?
    ;
 
 create_call_statement
@@ -385,39 +365,35 @@ do_loop_while_statement
    ;
 
 if_statement
-   : IF boolean_expression THEN statement* (ELSEIF boolean_expression THEN statement*)* (ELSE statement*)? END IF (SEMI |)
+   : IF boolean_expression THEN statement* (ELSEIF boolean_expression THEN statement*)* (ELSE statement*)? END IF SEMI?
    ;
 
 if_simple_statement
    : IF boolean_expression THEN statement
    ;
 
+continue_statement
+   : CONTINUE
+   ;
+
 continue_sub
    : CONTINUE
    ;
 
-continue_statement
-   : continue_sub
-   ;
-
-post_event_sub
-   : (atom_sub_member1 DOT)? (POST | TRIGGER) (EVENT)? identifier_name_ex LPAREN expression_list? RPAREN
-   ;
-
 post_event
-   : post_event_sub
-   ;
-
-exit_statement_sub
-   : EXIT
+   : (atom_sub_member1 DOT)? (POST | TRIGGER) EVENT? identifier_name_ex LPAREN expression_list? RPAREN
    ;
 
 exit_statement
-   : exit_statement_sub
+   : EXIT
    ;
 
 choose_statement
-   : CHOOSE CASE expression ((choose_case_range_sub) | (choose_case_cond_sub) | (choose_case_else_sub) | choose_case_value_sub) + END CHOOSE
+   : CHOOSE CASE expression ( choose_case_range_sub
+                            | choose_case_cond_sub
+                            | choose_case_else_sub
+                            | choose_case_value_sub)+
+     END CHOOSE
    ;
 
 choose_case_value_sub
@@ -436,12 +412,8 @@ choose_case_else_sub
    : CASE ELSE statement*
    ;
 
-goto_stat_sub
-   : GOTO identifier_name
-   ;
-
 goto_stat
-   : goto_stat_sub
+   : GOTO identifier_name
    ;
 
 label_stat
@@ -452,12 +424,8 @@ try_catch_block
    : TRY statement* (CATCH LPAREN variable_decl_sub RPAREN statement*)* (FINALLY statement*)? END TRY
    ;
 
-throw_stat_sub
-   : THROW expression
-   ;
-
 throw_stat
-   : throw_stat_sub
+   : THROW expression
    ;
 
 identifier
@@ -466,10 +434,6 @@ identifier
    | identifier_name COLONCOLON (CREATE | DESTROY)
    | identifier_name DOT (CREATE | DESTROY)
    | identifier_name COLONCOLON identifier_name_ex
-   ;
-
-identifier_name
-   : ID
    ;
 
 identifier_name_ex
@@ -483,12 +447,17 @@ identifier_name_ex
    | GOTO
    | INSERT
    | DESCRIBE
-   | TIME2
+   | TIME
    | READONLY
    ;
 
+identifier_name
+   : ID
+   ;
+
 atom_sub
-   : (((array_access_atom) | (identifier_name LPAREN expression_list? RPAREN) | identifier_name))
+   : array_access_atom
+   | identifier_name (LPAREN expression_list? RPAREN)?
    ;
 
 atom_sub_call1
@@ -508,13 +477,13 @@ atom_sub_member1
    ;
 
 atom
-   : (event_call_statement_sub)
-   | (atom_sub (DOT identifier_name_ex))
-   | (cast_expression)
-   | (atom_sub_call1)
-   | (atom_sub_array1)
-   | (atom_sub_ref1)
-   | (atom_sub_member1)
+   : event_call_statement_sub
+   | atom_sub (DOT identifier_name_ex)
+   | cast_expression
+   | atom_sub_call1
+   | atom_sub_array1
+   | atom_sub_ref1
+   | atom_sub_member1
    | numeric_atom
    | boolean_atom
    | ENUM
@@ -533,18 +502,41 @@ numeric_atom
    ;
 
 boolean_atom
-   : BOOLEAN_ATOM
+   : TRUE
+   | FALSE
    ;
 
 cast_expression
-   : data_type_sub LPAREN expression (COMMA expression)* RPAREN
-   ;
-
-data_type_sub
-   : DATA_TYPE_SUB
+   : dataTypeSub LPAREN expression (COMMA expression)* RPAREN
    ;
 
 data_type_name
-   : data_type_sub
+   : dataTypeSub
    | identifier_name
+   ;
+
+dataTypeSub
+   : ANY
+   | BLOB
+   | BOOLEAN
+   | BYTE
+   | CHARACTER
+   | CHAR
+   | DATE_TYPE
+   | DATETIME
+   | DECIMAL
+   | DEC
+   | DOUBLE
+   | INTEGER
+   | INT
+   | LONG
+   | LONGLONG
+   | REAL
+   | STRING
+   | TIME_TYPE
+   | UNSIGNEDINTEGER
+   | UINT
+   | UNSIGNEDLONG
+   | ULONG
+   | WINDOW
    ;
