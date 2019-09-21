@@ -79,15 +79,15 @@ block
    ;
 
 multiline
-   : 'text:' ('  ' | HTAB)* (HASHCOMMENT | CRLF) (multilineliteral | multilinedotstart)* '.' CRLF
+   : 'text:' (multilineliteral | multilinedotstart)* '.'
    ;
 
 multilineliteral
-   : (OCTETNOTPERIOD OCTETNOTCRLF*)? CRLF
+   : (OCTETNOTPERIOD OCTETNOTCRLF*)
    ;
 
 multilinedotstart
-   : '.' OCTETNOTCRLF+ CRLF
+   : '.' OCTETNOTCRLF+
    ;
 
 quotedstring
@@ -129,7 +129,7 @@ OCTETNOTPERIOD
    ;
 
 OCTETNOTQSPECIAL
-   : [0%x01-0x09]
+   : [0x01-0x09]
    | [0x0B-0x0C]
    | [0x0E-0x21]
    | [0x23-0x5B]
@@ -137,16 +137,14 @@ OCTETNOTQSPECIAL
    ;
 
 NOTSTAR
-   : CRLF
-   | [0x01-0x09]
+   : [0x01-0x09]
    | [0x0B-0x0C]
    | [0x0E-0x29]
    | [0x2B-0xFF]
    ;
 
 NOTSTARSLASH
-   : CRLF
-   | [0x01-0x09]
+   : [0x01-0x09]
    | [0x0B-0x0C]
    | [0x0E-0x29]
    | [0x2B-0x2E]
@@ -203,16 +201,11 @@ ALPHA
    : [A-Za-z]
    ;
 
-
 LINECOMMENT
    : '#' ~ [\r\n]* -> skip
    ;
 
-CRLF
-   : [\r\n]
-   ;
-
 WS
-   : [ \t\r\n] -> skip
+   : [ \t\r\n]+ -> skip
    ;
 
