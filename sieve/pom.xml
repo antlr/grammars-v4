@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>logo</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com logo grammar</name>
+	<name>khubla.com Sieve grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
@@ -18,7 +18,7 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>logo.g4</grammars>
+					<grammars>sieve.g4</grammars>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -37,8 +37,8 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>prog</entryPoint>
-					<grammarName>logo</grammarName>
+					<entryPoint>start</entryPoint>
+					<grammarName>sieve</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

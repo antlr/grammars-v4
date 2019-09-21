@@ -44,7 +44,7 @@ commands
    ;
 
 command
-   : IDENTIFIER arguments (';' | block)
+   : identifier arguments (';' | block)
    ;
 
 arguments
@@ -53,6 +53,7 @@ arguments
 
 argument
    : stringlist
+   | string
    | NUMBER
    | TAG
    ;
@@ -62,16 +63,16 @@ testlist
    ;
 
 test
-   : IDENTIFIER arguments
+   : identifier arguments
    ;
 
 stringlist
    : '[' string (',' string)* ']'
-   | string
    ;
 
 string
-   : quotedstring multiline
+   : quotedstring
+   | multiline
    ;
 
 block
@@ -99,8 +100,7 @@ quotedtext
    ;
 
 quotedsafe
-   : CRLF
-   | OCTETNOTQSPECIAL
+   : OCTETNOTQSPECIAL
    ;
 
 quotedspecial
@@ -111,54 +111,74 @@ quotedother
    : '\\' OCTETNOTQSPECIAL
    ;
 
-bracketcomment
-   : '/*'* NOTSTAR STAR+ (NOTSTARSLASH NOTSTAR* STAR+)* '/'
+identifier
+   : (ALPHA | '_') (ALPHA | DIGIT | '_')*
+   ;
+
+tag
+   : ':' identifier
+   ;
+
+comparator
+   : ':comparator' string
+   ;
+
+LINECOMMENT
+   : '#' ~ [\r\n]* -> skip
+   ;
+
+WS
+   : [ \t\r\n]+ -> skip
+   ;
+
+DIGIT
+   : [0-9]
+   ;
+
+ALPHA
+   : [A-Za-z]
    ;
 
 OCTETNOTCRLF
-   : [0x01-0x09]
-   | [0x0B-0x0C]
-   | [0x0E-0xFF]
+   : [\u0001-\u0009]
+   | [\u000B-\u000C]
+   | [\u000E-\u00FF]
    ;
 
 OCTETNOTPERIOD
-   : [0x01-0x09]
-   | [0x0B-0x0C]
-   | [0x0E-0x2D]
-   | [0x2F-0xFF]
+   : [\u0001-\u0009]
+   | [\u000B-\u000C]
+   | [\u000E-\u002D]
+   | [\u002F-\u00FF]
    ;
 
 OCTETNOTQSPECIAL
-   : [0x01-0x09]
-   | [0x0B-0x0C]
-   | [0x0E-0x21]
-   | [0x23-0x5B]
-   | [0x5D-oxFF]
+   : [\u0001-\u0009]
+   | [\u000B-\u000C]
+   | [\u000E-\u0021]
+   | [\u0023-\u005B]
+   | [\u005D-\u00FF]
    ;
 
 NOTSTAR
-   : [0x01-0x09]
-   | [0x0B-0x0C]
-   | [0x0E-0x29]
-   | [0x2B-0xFF]
+   : [\u0001-\u0009]
+   | [\u000B-\u000C]
+   | [\u000E-\u0029]
+   | [\u002B-\u00FF]
    ;
 
 NOTSTARSLASH
-   : [0x01-0x09]
-   | [0x0B-0x0C]
-   | [0x0E-0x29]
-   | [0x2B-0x2E]
-   | [0x30-0xFF]
+   : [\u0001-\u0009]
+   | [\u000B-\u000C]
+   | [\u000E-\u0029]
+   | [\u002B-\u002E]
+   | [\u0030-\u00FF]
    ;
 
 ADDRESSPART
    : ':localpart'
    | ':domain'
    | ':all'
-   ;
-
-comparator
-   : ':comparator' string
    ;
 
 MATCHTYPE
@@ -175,10 +195,6 @@ NUMBER
    : DIGIT+ QUANTIFIER?
    ;
 
-TAG
-   : ':' IDENTIFIER
-   ;
-
 STAR
    : '*'
    ;
@@ -187,25 +203,5 @@ QUANTIFIER
    : 'K'
    | 'M'
    | 'G'
-   ;
-
-IDENTIFIER
-   : (ALPHA | '_')* (ALPHA | DIGIT | '_')
-   ;
-
-DIGIT
-   : [0-9]
-   ;
-
-ALPHA
-   : [A-Za-z]
-   ;
-
-LINECOMMENT
-   : '#' ~ [\r\n]* -> skip
-   ;
-
-WS
-   : [ \t\r\n]+ -> skip
    ;
 
