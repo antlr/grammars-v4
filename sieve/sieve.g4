@@ -29,80 +29,164 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar sieve;
 
-start        : commands;
+start
+   : commands
+   ;
 
-commands     : command;
-command      : IDENTIFIER arguments (';' | block);
+commands
+   : command
+   ;
 
-arguments    : argument* ( test | testlist )?;
- 
-argument     :stringlist | NUMBER | TAG;
-   
+command
+   : IDENTIFIER arguments (';' | block)
+   ;
 
-testlist    : '(' test (',' test)* ')';
+arguments
+   : argument* (test | testlist)?
+   ;
 
-   
-test         : IDENTIFIER arguments;
-      
-   
-stringlist  : '[' string (',' string)* ']' | string;
+argument
+   : stringlist
+   | NUMBER
+   | TAG
+   ;
 
-                              
-string      : quotedstring / multiline;
+testlist
+   : '(' test (',' test)* ')'
+   ;
 
+test
+   : IDENTIFIER arguments
+   ;
 
-block        : '{' commands '}';
+stringlist
+   : '[' string (',' string)* ']'
+   | string
+   ;
 
+string
+   : quotedstring multiline
+   ;
 
+block
+   : '{' commands '}'
+   ;
 
- multiline         : 'text:' ('  ' / HTAB)* (HASHCOMMENT | CRLF)
-                        (multilineliteral | multilinedotstart)*
-                        '.' CRLF;
+multiline
+   : 'text:' ('  ' HTAB)* (HASHCOMMENT | CRLF) (multilineliteral | multilinedotstart)* '.' CRLF
+   ;
 
-multilineliteral  : ( OCTETNOTPERIOD OCTETNOTCRLF* )? CRLF;
+multilineliteral
+   : (OCTETNOTPERIOD OCTETNOTCRLF*)? CRLF
+   ;
 
-multilinedotstart : '.' OCTETNOTCRLF+ CRLF;
+multilinedotstart
+   : '.' OCTETNOTCRLF+ CRLF
+   ;
 
-quotedstring      : DQUOTE quotedtext DQUOTE;
-quotedtext        : (quotedsafe | quotedspecial | quotedother)*;
-quotedsafe        : CRLF | OCTETNOTQSPECIAL;
-quotedspecial     : '\\' ( DQUOTE | '\\' );
-quotedother       : '\\' OCTETNOTQSPECIAL;
+quotedstring
+   : DQUOTE quotedtext DQUOTE
+   ;
 
-OCTETNOTCRLF     : [0x01-0x09] | [0x0B-0x0C] | [0x0E-0xFF];
-   
-OCTETNOTPERIOD   : [0x01-0x09] | [0x0B-0x0C] | [0x0E-0x2D] | [0x2F-0xFF];
-   
-OCTETNOTQSPECIAL : [0%x01-0x09] | [0x0B-0x0C] | [0x0E-0x21] | [0x23-0x5B] | [0x5D-oxFF];                    
-   
-ADDRESSPART : ':localpart' | ':domain' | ':all';
+quotedtext
+   : (quotedsafe | quotedspecial | quotedother)*
+   ;
 
-HASHCOMMENT       : '#' octetnotcrlf* CRLF;
+quotedsafe
+   : CRLF
+   | OCTETNOTQSPECIAL
+   ;
 
-comparator   : ':comparator' string;
+quotedspecial
+   : '\\' (DQUOTE | '\\')
+   ;
 
-MATCHTYPE   : ':is' | ':contains' | ':matches';
+quotedother
+   : '\\' OCTETNOTQSPECIAL
+   ;
 
-DQUOTE: '"';
-NUMBER             : DIGIT+  QUANTIFIER?;
+OCTETNOTCRLF
+   : [0x01-0x09]
+   | [0x0B-0x0C]
+   | [0x0E-0xFF]
+   ;
 
-TAG                : ':' IDENTIFIER;
-  
-STAR               : '*';
+OCTETNOTPERIOD
+   : [0x01-0x09]
+   | [0x0B-0x0C]
+   | [0x0E-0x2D]
+   | [0x2F-0xFF]
+   ;
 
-QUANTIFIER         : 'K' | 'M' | 'G';
+OCTETNOTQSPECIAL
+   : [0%x01-0x09]
+   | [0x0B-0x0C]
+   | [0x0E-0x21]
+   | [0x23-0x5B]
+   | [0x5D-oxFF]
+   ;
 
-IDENTIFIER         : (ALPHA | '_')* (ALPHA | DIGIT | '_');
+ADDRESSPART
+   : ':localpart'
+   | ':domain'
+   | ':all'
+   ;
 
-DIGIT: [0-9];
-ALPHA: [A-Za-z];
-    
+HASHCOMMENT
+   : '#' octetnotcrlf* CRLF
+   ;
+
+comparator
+   : ':comparator' string
+   ;
+
+MATCHTYPE
+   : ':is'
+   | ':contains'
+   | ':matches'
+   ;
+
+DQUOTE
+   : '"'
+   ;
+
+NUMBER
+   : DIGIT+ QUANTIFIER?
+   ;
+
+TAG
+   : ':' IDENTIFIER
+   ;
+
+STAR
+   : '*'
+   ;
+
+QUANTIFIER
+   : 'K'
+   | 'M'
+   | 'G'
+   ;
+
+IDENTIFIER
+   : (ALPHA | '_')* (ALPHA | DIGIT | '_')
+   ;
+
+DIGIT
+   : [0-9]
+   ;
+
+ALPHA
+   : [A-Za-z]
+   ;
+
 CRLF
-    : [\r\n];
+   : [\r\n]
+   ;
 
 WS
    : [ \t\r\n] -> skip
    ;
+
