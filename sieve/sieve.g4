@@ -55,7 +55,7 @@ argument
    : stringlist
    | string
    | NUMBER
-   | TAG
+   | tag
    ;
 
 testlist
@@ -98,15 +98,18 @@ quotedstring
 quotedtext
    : (quotedsafe | quotedspecial | quotedother)*
    ;
-
+   // either a CRLF pair, OR a single octet other than NUL, CR, LF, double-quote, or backslash
+   
 quotedsafe
    : OCTETNOTQSPECIAL
    ;
-
+   // represents just a double-quote or backslash
+   
 quotedspecial
    : '\\' (DQUOTE | '\\')
    ;
-
+   // represents just the octet-no-qspecial character.  SHOULD NOT be used
+   
 quotedother
    : '\\' OCTETNOTQSPECIAL
    ;
@@ -131,27 +134,24 @@ WS
    : [ \t\r\n]+ -> skip
    ;
 
-DIGIT
-   : [0-9]
-   ;
 
-ALPHA
-   : [A-Za-z]
-   ;
-
+   // a single octet other than NUL, CR, or LF
+   
 OCTETNOTCRLF
    : [\u0001-\u0009]
    | [\u000B-\u000C]
    | [\u000E-\u00FF]
    ;
-
+   // a single octet other than NUL,CR, LF, or period
+   
 OCTETNOTPERIOD
    : [\u0001-\u0009]
    | [\u000B-\u000C]
    | [\u000E-\u002D]
    | [\u002F-\u00FF]
    ;
-
+   // a single octet other than NUL, CR, LF, double-quote, or backslash
+   
 OCTETNOTQSPECIAL
    : [\u0001-\u0009]
    | [\u000B-\u000C]
@@ -159,14 +159,16 @@ OCTETNOTQSPECIAL
    | [\u0023-\u005B]
    | [\u005D-\u00FF]
    ;
-
+   // either a CRLF pair, OR a single octet other than NUL, CR, LF, or star
+   
 NOTSTAR
    : [\u0001-\u0009]
    | [\u000B-\u000C]
    | [\u000E-\u0029]
    | [\u002B-\u00FF]
    ;
-
+   // either a CRLF pair, OR a single octet  other than NUL, CR, LF, star, or slash
+   
 NOTSTARSLASH
    : [\u0001-\u0009]
    | [\u000B-\u000C]
@@ -193,6 +195,14 @@ DQUOTE
 
 NUMBER
    : DIGIT+ QUANTIFIER?
+   ;
+
+DIGIT
+   : [0-9]
+   ;
+
+ALPHA
+   : [A-Za-z]
    ;
 
 STAR
