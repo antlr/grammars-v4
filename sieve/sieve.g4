@@ -29,6 +29,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/*
+    https://www.ietf.org/rfc/rfc5228.txt
+*/
 grammar sieve;
 
 start
@@ -75,7 +79,7 @@ block
    ;
 
 multiline
-   : 'text:' ('  ' HTAB)* (HASHCOMMENT | CRLF) (multilineliteral | multilinedotstart)* '.' CRLF
+   : 'text:' ('  ' | HTAB)* (HASHCOMMENT | CRLF) (multilineliteral | multilinedotstart)* '.' CRLF
    ;
 
 multilineliteral
@@ -107,6 +111,10 @@ quotedother
    : '\\' OCTETNOTQSPECIAL
    ;
 
+bracketcomment
+   : '/*'* NOTSTAR STAR+ (NOTSTARSLASH NOTSTAR* STAR+)* '/'
+   ;
+
 OCTETNOTCRLF
    : [0x01-0x09]
    | [0x0B-0x0C]
@@ -128,14 +136,27 @@ OCTETNOTQSPECIAL
    | [0x5D-oxFF]
    ;
 
+NOTSTAR
+   : CRLF
+   | [0x01-0x09]
+   | [0x0B-0x0C]
+   | [0x0E-0x29]
+   | [0x2B-0xFF]
+   ;
+
+NOTSTARSLASH
+   : CRLF
+   | [0x01-0x09]
+   | [0x0B-0x0C]
+   | [0x0E-0x29]
+   | [0x2B-0x2E]
+   | [0x30-0xFF]
+   ;
+
 ADDRESSPART
    : ':localpart'
    | ':domain'
    | ':all'
-   ;
-
-HASHCOMMENT
-   : '#' octetnotcrlf* CRLF
    ;
 
 comparator
@@ -180,6 +201,11 @@ DIGIT
 
 ALPHA
    : [A-Za-z]
+   ;
+
+
+LINECOMMENT
+   : '#' ~ [\r\n]* -> skip
    ;
 
 CRLF
