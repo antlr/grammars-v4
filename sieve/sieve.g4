@@ -71,7 +71,7 @@ stringlist
    ;
 
 string
-   : quotedstring
+   : QUOTEDSTRING
    | multiline
    ;
 
@@ -83,6 +83,10 @@ multiline
    : 'text:' (multilineliteral | multilinedotstart)* '.'
    ;
 
+comparator
+   : ':comparator' string
+   ;
+
 multilineliteral
    : OCTETNOTPERIOD OCTETNOTCRLF*
    ;
@@ -91,39 +95,16 @@ multilinedotstart
    : '.' OCTETNOTCRLF+
    ;
 
-quotedstring
-   : DQUOTE quotedtext DQUOTE
-   ;
-
-quotedtext
-   : (quotedsafe | quotedspecial | quotedother)*
-   ;
-   // either a CRLF pair, OR a single octet other than NUL, CR, LF, double-quote, or backslash
-   
-quotedsafe
-   : OCTETNOTQSPECIAL
-   ;
-   // represents just a double-quote or backslash
-   
-quotedspecial
-   : '\\' (DQUOTE | '\\')
-   ;
-   // represents just the octet-no-qspecial character.  SHOULD NOT be used
-   
-quotedother
-   : '\\' OCTETNOTQSPECIAL
-   ;
-
-comparator
-   : ':comparator' string
-   ;
-
 LINECOMMENT
    : '#' ~ [\r\n]* -> skip
    ;
 
 WS
    : [ \t\r\n]+ -> skip
+   ;
+
+QUOTEDSTRING
+   : '"' OCTETNOTQSPECIAL '"'
    ;
 
 DIGIT
@@ -176,13 +157,6 @@ NOTSTAR
    ;
    // either a CRLF pair, OR a single octet  other than NUL, CR, LF, star, or slash
    
-NOTSTARSLASH
-   : [\u0001-\u0009]
-   | [\u000B-\u000C]
-   | [\u000E-\u0029]
-   | [\u002B-\u002E]
-   | [\u0030-\u00FF]
-   ;
 
 ADDRESSPART
    : ':localpart'
@@ -196,15 +170,9 @@ MATCHTYPE
    | ':matches'
    ;
 
-DQUOTE
-   : '"'
-   ;
-
 NUMBER
    : DIGIT+ QUANTIFIER?
    ;
-
-
 
 STAR
    : '*'
