@@ -40,11 +40,11 @@ start
    ;
 
 commands
-   : command
+   : command+
    ;
 
 command
-   : identifier arguments (';' | block)
+   : IDENTIFIER arguments (';' | block)
    ;
 
 arguments
@@ -55,7 +55,7 @@ argument
    : stringlist
    | string
    | NUMBER
-   | tag
+   | TAG
    ;
 
 testlist
@@ -63,7 +63,7 @@ testlist
    ;
 
 test
-   : identifier arguments
+   : IDENTIFIER arguments
    ;
 
 stringlist
@@ -84,7 +84,7 @@ multiline
    ;
 
 multilineliteral
-   : (OCTETNOTPERIOD OCTETNOTCRLF*)
+   : OCTETNOTPERIOD OCTETNOTCRLF*
    ;
 
 multilinedotstart
@@ -114,14 +114,6 @@ quotedother
    : '\\' OCTETNOTQSPECIAL
    ;
 
-identifier
-   : (ALPHA | '_') (ALPHA | DIGIT | '_')*
-   ;
-
-tag
-   : ':' identifier
-   ;
-
 comparator
    : ':comparator' string
    ;
@@ -134,6 +126,21 @@ WS
    : [ \t\r\n]+ -> skip
    ;
 
+DIGIT
+   : [0-9]
+   ;
+
+ALPHA
+   : [A-Za-z]
+   ;
+
+IDENTIFIER
+   : (ALPHA | '_') (ALPHA | DIGIT | '_')*
+   ;
+
+TAG
+   : ':' IDENTIFIER
+   ;
 
    // a single octet other than NUL, CR, or LF
    
@@ -197,13 +204,7 @@ NUMBER
    : DIGIT+ QUANTIFIER?
    ;
 
-DIGIT
-   : [0-9]
-   ;
 
-ALPHA
-   : [A-Za-z]
-   ;
 
 STAR
    : '*'
