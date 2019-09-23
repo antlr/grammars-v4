@@ -9,6 +9,9 @@ select
 , q'<'so,' she said, 'it's finished.'>'
 , q'{select * from employees where last_name = 'smith'}'
 , q'"name like '['"'
+, q'#name like #smth #'
+, q''name like 'smth ''
+, q'(name like )) )'
 , n'nchar literal'
 from dual
 
