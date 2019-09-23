@@ -3330,7 +3330,7 @@ table_ref_aux
     ;
 
 table_ref_aux_internal
-    : dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
+    : dml_table_expression_clause (pivot_clause | unpivot_clause)?                 # table_ref_aux_internal_one
     | '(' table_ref subquery_operation_part* ')' (pivot_clause | unpivot_clause)?  # table_ref_aux_internal_two
     | ONLY '(' dml_table_expression_clause ')'                                     # table_ref_aux_internal_three
     ;
@@ -3918,8 +3918,7 @@ other_function
       '(' (DOCUMENT | CONTENT) concatenation (AS type_spec)?
       xmlserialize_param_enconding_part? xmlserialize_param_version_part? xmlserialize_param_ident_part? ((HIDE | SHOW) DEFAULTS)? ')'
       ('.' general_element_part)?
-    | XMLTABLE
-      '(' xml_namespaces_clause? concatenation xml_passing_clause? (COLUMNS xml_table_column (',' xml_table_column))? ')' ('.' general_element_part)?
+    | xmltable
     ;
 
 over_clause_keyword
@@ -4002,7 +4001,7 @@ cost_matrix_clause
     ;
 
 xml_passing_clause
-    : PASSING (BY VALUE)? expression column_alias? (',' expression column_alias?)
+    : PASSING (BY VALUE)? expression column_alias? (',' expression column_alias?)*
     ;
 
 xml_attributes_clause
@@ -4013,8 +4012,7 @@ xml_attributes_clause
 
 xml_namespaces_clause
     : XMLNAMESPACES
-      '(' (concatenation column_alias)? (',' concatenation column_alias)*
-      xml_general_default_part? ')'
+      '(' (concatenation column_alias)? (',' concatenation column_alias)* xml_general_default_part? ')'
     ;
 
 xml_table_column
@@ -4238,7 +4236,12 @@ column_name
 
 tableview_name
     : identifier ('.' id_expression)?
-      ('@' link_name | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
+          ('@' link_name | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
+    | xmltable
+    ;
+
+xmltable
+    : XMLTABLE '(' (xml_namespaces_clause ',')? concatenation xml_passing_clause? (COLUMNS xml_table_column (',' xml_table_column)*)? ')' ('.' general_element_part)?
     ;
 
 char_set_name
