@@ -3668,7 +3668,7 @@ dml_table_expression_clause
     ;
 
 table_collection_expression
-    : (TABLE | THE) ('(' subquery ')' | '(' expression ')' ('(' '+' ')')?)
+    : (TABLE | THE) ('(' subquery ')' | '(' expression ')' outer_join_sign?)
     ;
 
 subquery_restriction_clause
@@ -4237,7 +4237,7 @@ column_name
 tableview_name
     : identifier ('.' id_expression)?
           ('@' link_name | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
-    | xmltable
+    | xmltable outer_join_sign?
     ;
 
 xmltable
