@@ -139,6 +139,8 @@ Throw:                          'throw';
 Delete:                         'delete';
 In:                             'in';
 Try:                            'try';
+As:                             'as';
+From:                           'from';
 
 /// Future Reserved Words
 

@@ -10,11 +10,11 @@ export function sum (x, y) { return x + y }
 export var pi = 3.141593
 
 //  someApp.js
-// TODO: import * as math from "lib/math"
+import * as math from "lib/math"
 console.log("2π = " + math.sum(math.pi, math.pi))
 
 //  otherApp.js
-// TODO: import { sum, pi } from "lib/math"
+import { sum, pi } from "lib/math"
 console.log("2π = " + sum(pi, pi))
 
 //------------------------------------------------------------------------------
@@ -24,10 +24,10 @@ console.log("2π = " + sum(pi, pi))
 //------------------------------------------------------------------------------
 
 //  lib/mathplusplus.js
-// TODO: export * from "lib/math"
+export * from "lib/math"
 export var e = 2.71828182846
-// TODO: export default (x) => Math.exp(x)
+export default (x) => Math.exp(x)
 
 //  someApp.js
-// TODO: import exp, { pi, e } from "lib/mathplusplus"
+import exp, { pi, e } from "lib/mathplusplus"
 console.log("e^{π} = " + exp(pi))
