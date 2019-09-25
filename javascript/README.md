@@ -78,7 +78,7 @@ Grammar supports the following list of ECMAScript 6 features taken from
 * ~~Iterators~~ (not supported for now)
 * Map/Set& WeakMap/WeakSet
 * Meta-Programming
-* ~~Modules~~ (partial support)
+* Modules
 * New Build-In Methods
 * Promises
 * Scoping

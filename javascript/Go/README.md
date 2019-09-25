@@ -4,8 +4,8 @@
 manually in order to have no compiler errors.
 
 * In the `JavaScriptLexer.g4` file:
-    * Go to lines 38, 110, 156-164 and replace the `this` prefix with `p` inside the predicate
-    * Go to lines 44, 45 and 172 and replace the `this` prefix with `l` inside the action
+    * Go to lines 38, 110, 158-166 and replace the `this` prefix with `p` inside the predicate
+    * Go to lines 44, 45 and 174 and replace the `this` prefix with `l` inside the action
 * In the `JavaScriptParser.g4` file:
     * Replace all `this.` ocurrences with `p.`
     * Rename the `emptyStatement` parser rule to `emptyStatement_` (Replace all `emptyStatement` ocurrences with `emptyStatement_`)

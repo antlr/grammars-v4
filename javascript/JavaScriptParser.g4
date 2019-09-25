@@ -45,6 +45,8 @@ sourceElement
 statement
     : block
     | variableStatement
+    | importStatement
+    | exportStatement
     | emptyStatement
     | classDeclaration
     | expressionStatement
@@ -68,6 +70,22 @@ block
 
 statementList
     : statement+
+    ;
+
+importStatement
+    : Import fromBlock
+    ;
+
+fromBlock
+    : (Multiply | multipleImportStatement) (As identifierName)? From StringLiteral eos
+    ;
+
+multipleImportStatement
+    : (identifierName ',')? '{' identifierName (',' identifierName)* '}'
+    ;
+
+exportStatement
+    : Export Default? (fromBlock | statement)
     ;
 
 variableStatement
