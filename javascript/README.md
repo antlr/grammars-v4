@@ -75,7 +75,7 @@ Grammar supports the following list of ECMAScript 6 features taken from
 * Extended Parameter Handling
 * ~~Generators~~
 * Internationalization & Localization
-* ~~Iterators~~ (not supported for now)
+* Iterators
 * Map/Set& WeakMap/WeakSet
 * Meta-Programming
 * Modules

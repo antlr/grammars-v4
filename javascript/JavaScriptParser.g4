@@ -14,7 +14,7 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
@@ -55,6 +55,7 @@ statement
     | continueStatement
     | breakStatement
     | returnStatement
+    | yieldStatement
     | withStatement
     | labelledStatement
     | switchStatement
@@ -141,6 +142,9 @@ returnStatement
     : Return ({this.notLineTerminator()}? expressionSequence)? eos
     ;
 
+yieldStatement
+    : Yield ({this.notLineTerminator()}? expressionSequence)? eos
+    ;
 withStatement
     : With '(' expressionSequence ')' statement
     ;
@@ -214,7 +218,18 @@ methodDefinition
     ;
 
 generatorMethod
-    : '*'? Identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : '*'?  Identifier '(' formalParameterList? ')' '{' functionBody '}'
+    ;
+
+generatorFunction
+    : '*' iteratorDefinition
+    ;
+
+iteratorBlock
+    : '{' (iteratorDefinition (',' iteratorDefinition)*)? ','? '}'
+    ;
+iteratorDefinition
+    : '[' singleExpression ']' '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 formalParameterList
@@ -321,6 +336,8 @@ singleExpression
     | singleExpression '=' singleExpression                                  # AssignmentExpression
     | singleExpression assignmentOperator singleExpression                   # AssignmentOperatorExpression
     | singleExpression TemplateStringLiteral                                 # TemplateStringExpression  // ECMAScript 6
+    | iteratorBlock                                                          # IteratorsExpression // ECMAScript 6
+    | generatorFunction                                                      # GeneratorsExpression // ECMAScript 6
     | This                                                                   # ThisExpression
     | Identifier                                                             # IdentifierExpression
     | Super                                                                  # SuperExpression
