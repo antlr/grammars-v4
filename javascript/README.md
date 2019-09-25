@@ -73,7 +73,7 @@ Grammar supports the following list of ECMAScript 6 features taken from
 * Enhanced Regular Expression
 * Extended Literals
 * Extended Parameter Handling
-* ~~Generators~~
+* Generators
 * Internationalization & Localization
 * Iterators
 * Map/Set& WeakMap/WeakSet

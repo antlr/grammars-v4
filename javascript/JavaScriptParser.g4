@@ -63,6 +63,7 @@ statement
     | tryStatement
     | debuggerStatement
     | functionDeclaration
+    | generatorFunctionDeclaration
     ;
 
 block
@@ -145,6 +146,7 @@ returnStatement
 yieldStatement
     : Yield ({this.notLineTerminator()}? expressionSequence)? eos
     ;
+    
 withStatement
     : With '(' expressionSequence ')' statement
     ;
@@ -221,13 +223,22 @@ generatorMethod
     : '*'?  Identifier '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
-generatorFunction
+generatorFunctionDeclaration
+    : Function '*' Identifier? '(' formalParameterList? ')' '{' functionBody '}'
+    ;
+
+generatorBlock
+    : '{' (generatorDefinition (',' generatorDefinition)*)? ','? '}'
+    ;
+
+generatorDefinition
     : '*' iteratorDefinition
     ;
 
 iteratorBlock
     : '{' (iteratorDefinition (',' iteratorDefinition)*)? ','? '}'
     ;
+
 iteratorDefinition
     : '[' singleExpression ']' '(' formalParameterList? ')' '{' functionBody '}'
     ;
@@ -256,7 +267,7 @@ sourceElements
     ;
 
 arrayLiteral
-    : '[' ','* elementList? ','* ']'
+    : ('[' elementList? ']')
     ;
 
 elementList
@@ -265,7 +276,7 @@ elementList
     ;
 
 lastElement                      // ECMAScript 6: Spread Operator
-    : Ellipsis Identifier
+    : Ellipsis (Identifier | singleExpression)
     ;
 
 objectLiteral
@@ -337,7 +348,9 @@ singleExpression
     | singleExpression assignmentOperator singleExpression                   # AssignmentOperatorExpression
     | singleExpression TemplateStringLiteral                                 # TemplateStringExpression  // ECMAScript 6
     | iteratorBlock                                                          # IteratorsExpression // ECMAScript 6
-    | generatorFunction                                                      # GeneratorsExpression // ECMAScript 6
+    | generatorBlock                                                         # GeneratorsExpression // ECMAScript 6
+    | generatorFunctionDeclaration                                           # GeneratorsFunctionExpression // ECMAScript 6
+    | yieldStatement                                                         # YieldExpression // ECMAScript 6
     | This                                                                   # ThisExpression
     | Identifier                                                             # IdentifierExpression
     | Super                                                                  # SuperExpression

@@ -1,5 +1,4 @@
 "use strict";
-// TODO: Implement
 
 //------------------------------------------------------------------------------
 // Generator Function, Iterator Protocol
