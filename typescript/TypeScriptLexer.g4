@@ -163,6 +163,8 @@ Declare: 'declare';
 
 Abstract: 'abstract';
 
+Is: 'is';
+
 //
 // Ext.2 Additions to 1.8: Decorators
 //

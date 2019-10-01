@@ -5,6 +5,7 @@
  * Copyright (c) 2017 by Ivan Kochurkin (Positive Technologies):
     added ECMAScript 6 support, cleared and transformed to the universal grammar.
  * Copyright (c) 2018 by Juan Alvarez (contributor -> ported to Go)
+ * Copyright (c) 2019 by Andrii Artiushok (contributor -> added TypeScript support)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -34,43 +35,54 @@ options {
     superClass=TypeScriptBaseParser;
 }
 
-// Supported
-//
-initializer: '=' singleExpression;
+// SupportSyntax
+
+initializer
+    : '=' singleExpression
+    ;
 
 bindingPattern
     : (arrayLiteral | objectLiteral)
     ;
 
-// TSPart
-//
+// TypeScript SPart
 // A.1 Types
-//
 
-// - typeParams:
-typeParameters: '<' typeParameterList '>';
+typeParameters
+    : '<' typeParameterList? '>'
+    ;
 
-typeParameterList: typeParameter (',' typeParameter)*;
+typeParameterList
+    : typeParameter (',' typeParameter)*
+    ;
 
-typeParameter: Identifier constraint?;
+typeParameter
+    : Identifier constraint?
+    | typeParameters
+    ;
 
-constraint: 'extends' type_;
+constraint
+    : 'extends' type_
+    ;
 
+typeArguments
+    : '<' typeArgumentList? '>'
+    ;
 
-// - typeArguments: (like typeParams but not allowing constraint)
+typeArgumentList
+    : typeArgument (',' typeArgument)*
+    ;
 
-typeArguments: '<' typeArgumentList '>' ;
+typeArgument
+    : type_
+    ;
 
-typeArgumentList: typeArgument (',' typeArgument)* ;
-
-typeArgument: type_;
-
-
-// - Types:
 type_
     : unionOrIntersectionOrPrimaryType
     | functionType
     | constructorType
+    | typeGeneric
+    | StringLiteral
     ;
 
 unionOrIntersectionOrPrimaryType
@@ -88,11 +100,8 @@ primaryType
     | '[' tupleElementTypes ']'                     #TuplePrimType
     | typeQuery                                     #QueryPrimType
     | This                                          #ThisPrimType
+    | typeReference Is primaryType                  #RedefinitionOfType
     ;
-
-// -- primary Types: paranthesized and predefined
-
-//parenthesizedType: '(' type ')';
 
 predefinedType
     : Any
@@ -103,54 +112,69 @@ predefinedType
     | Void
     ;
 
-// -- primary Types: typeReference
+typeReference
+    : typeName ( typeIncludeGeneric | typeGeneric)?
+    ;
 
-typeReference: typeName typeArguments? ;
+// I tried recursive include, but it's not working.
+// typeGeneric
+//    : '<' typeArgumentList typeGeneric?'>'
+//    ;
+//
+// TODO: Fix recursive
+//
+typeGeneric
+    : '<' typeArgumentList '>'
+    ;
+
+typeIncludeGeneric
+    :'<' typeArgumentList '<' typeArgumentList ('>' bindingPattern '>' | '>>')
+    ;
 
 typeName
     : Identifier
     | namespaceName
     ;
 
-// -- primary Types: objectType
+objectType
+    : '{' typeBody? '}'
+    ;
 
-objectType: '{' typeBody? '}';
+typeBody
+    : typeMemberList (SemiColon | ',')?
+    ;
 
-typeBody: typeMemberList (SemiColon | ',')? ;
-
-typeMemberList: typeMember ((SemiColon | ',') typeMember)* ;
+typeMemberList
+    : typeMember ((SemiColon | ',') typeMember)*
+    ;
 
 typeMember
     : propertySignatur
     | callSignature
     | constructSignature
     | indexSignature
-    | methodSignature
-    | methodSignature '=>' type_
+    | methodSignature ('=>' type_)?
     ;
 
-// -- primary Types: array- and tupleTypes
+arrayType
+    : primaryType {notLineTerminator()}? '[' ']'
+    ;
 
-arrayType: primaryType {notLineTerminator()}? '[' ']';
+tupleType
+    : '[' tupleElementTypes ']'
+    ;
 
-tupleType: '[' tupleElementTypes ']';
+tupleElementTypes
+    : type_ (',' type_)*
+    ;
 
-tupleElementTypes: type_ (',' type_)* ;
-
-// -- union/intersection types + function/constructor types:
-// (not sure why they are sorted here in the spec, in the middle of primary Types)
-
-//unionType: unionOrIntersectionOrPrimaryType '|' intersectionOrPrimaryType;
-
-//intersectionType: intersectionOrPrimaryType '&' primaryType;
-
-functionType: typeParameters? '(' parameterList? ')' '=>' type_;
+functionType
+    : typeParameters? '(' parameterList? ')' '=>' type_
+    ;
 
 constructorType
     : 'new' typeParameters? '(' parameterList? ')' '=>' type_
     ;
-
-// -- primary Types: typeQuery and thisType
 
 typeQuery
     : 'typeof' typeQueryExpression
@@ -158,27 +182,26 @@ typeQuery
 
 typeQueryExpression
     : Identifier
-    | (identifierName '.')+ identifierName //idName includes idReference
+    | (identifierName '.')+ identifierName
     ;
 
+propertySignatur
+    : ReadOnly? propertyName '?'? typeAnnotation? ('=>' type_)?
+    ;
 
-propertySignatur: ReadOnly? propertyName '?'? typeAnnotation? ('=>' type_)?;
+typeAnnotation
+    : ':' type_
+    ;
 
-typeAnnotation: ':' type_;
-
-// -- typeMembers: callSignature
-
-callSignature: typeParameters? '(' parameterList? ')' typeAnnotation?  ;
+callSignature
+    : typeParameters? '(' parameterList? ')' typeAnnotation?
+    ;
 
 parameterList
-    : requiredParameterList
-    | optionalParameterList
-    | restParameter
-    | requiredParameterList ',' optionalParameterList
-    | requiredParameterList ',' restParameter
-    | optionalParameterList ',' restParameter
-    | requiredParameterList ',' optionalParameterList ',' restParameter
+    : restParameter
     | predefinedType (',' predefinedType)*
+    | optionalParameterList (',' restParameter)?
+    | requiredParameterList (',' (optionalParameterList (',' restParameter)? | restParameter))?
     ;
 
 requiredParameterList
@@ -186,8 +209,7 @@ requiredParameterList
     ;
 
 requiredParameter
-    : decoratorList? accessibilityModifier? identifierOrPattern typeAnnotation? //added decoratorList for Ext.2
-    | decoratorList? identifierName ':' StringLiteral //added decoratorList for Ext.2
+    : decoratorList? accessibilityModifier? identifierOrPattern typeAnnotation?
     ;
 
 accessibilityModifier
@@ -201,36 +223,42 @@ identifierOrPattern
     | bindingPattern
     ;
 
-optionalParameterList: optionalParameter (',' optionalParameter)* ;
-
-optionalParameter
-    : decoratorList? accessibilityModifier? identifierOrPattern '?' typeAnnotation? //added decoratorList for Ext.2
-    | decoratorList? accessibilityModifier? identifierOrPattern typeAnnotation? initializer //added decoratorList for Ext.2
-    | decoratorList? Identifier '?' ':' StringLiteral //added decoratorList for Ext.2
+optionalParameterList
+    : optionalParameter (',' optionalParameter)*
     ;
 
-restParameter: '...' Identifier typeAnnotation? ;
+optionalParameter
+    : decoratorList? ( accessibilityModifier? identifierOrPattern ('?' typeAnnotation? | typeAnnotation? initializer))
+    ;
 
-// -- typeMembers: constructSignature, indexSignature, methodSignature:
+restParameter
+    : '...' singleExpression
+    ;
 
-constructSignature: 'new' typeParameters? '(' parameterList? ')' typeAnnotation? ;
+constructSignature
+    : 'new' typeParameters? '(' parameterList? ')' typeAnnotation?
+    ;
 
-indexSignature: '[' Identifier ':' (Number|String) ']' typeAnnotation;
+indexSignature
+    : '[' Identifier ':' (Number|String) ']' typeAnnotation
+    ;
 
-methodSignature: propertyName '?'? callSignature;
+methodSignature
+    : propertyName '?'? callSignature
+    ;
 
-// - typeAliasDeclaration (not used yet, but will be in A.3)
+typeAliasDeclaration
+    : 'type' Identifier typeParameters? '=' type_ SemiColon
+    ;
 
-typeAliasDeclaration: 'type' Identifier typeParameters? '=' type_ SemiColon ;
-
-// - Class Elements - constructors:
-constructorDeclaration : accessibilityModifier? Constructor '(' formalParameterList? ')' ( ('{' functionBody '}') | SemiColon)? ;
+constructorDeclaration
+    : accessibilityModifier? Constructor '(' formalParameterList? ')' ( ('{' functionBody '}') | SemiColon)?
+    ;
 
 // A.5 Interface
-//
 
 interfaceDeclaration
-    : Interface Identifier typeParameters? interfaceExtendsClause? objectType SemiColon?
+    : Export? Interface Identifier typeParameters? interfaceExtendsClause? objectType SemiColon?
     ;
 
 interfaceExtendsClause
@@ -241,28 +269,25 @@ classOrInterfaceTypeList
     : typeReference (',' typeReference)*
     ;
 
-
 // A.7 Interface
-//
 
 enumDeclaration
     : Const? Enum Identifier '{' enumBody? '}'
     ;
 
 enumBody
-    :enumMemberList ','?
+    : enumMemberList ','?
     ;
 
 enumMemberList
-    :enumMember (',' enumMember)*
+    : enumMember (',' enumMember)*
     ;
 
 enumMember
-    :propertyName ('=' singleExpression)?
+    : propertyName ('=' singleExpression)?
     ;
 
 // A.8 Namespaces
-//
 
 namespaceDeclaration
     : Namespace namespaceName '{' statementList? '}'
@@ -276,27 +301,23 @@ importAliasDeclaration
     : Identifier '=' namespaceName SemiColon
     ;
 
-
 // Ext.2 Additions to 1.8: Decorators
-//
-/* https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Decorators.md:
- * "A Decorator is a special kind of declaration that can be attached to a
- * class declaration, method, accessor, property, or parameter."
- */
-/* First try: using the grammar of the official ecmascript proposal: https://tc39.github.io/proposal-decorators/  */
 
+decoratorList
+    : decorator+ ;
 
-decoratorList: decorator+ ; //TODO unit test
-
-decorator: '@' (decoratorMemberExpression | decoratorCallExpression);
+decorator
+    : '@' (decoratorMemberExpression | decoratorCallExpression)
+    ;
 
 decoratorMemberExpression
     : Identifier
     | decoratorMemberExpression '.' identifierName
-    | '(' singleExpression ')' //actually: 'expression', not singleexpression
+    | '(' singleExpression ')'
     ;
 
-decoratorCallExpression: decoratorMemberExpression arguments;
+decoratorCallExpression
+    : decoratorMemberExpression arguments;
 
 // ECMAPart
 program
@@ -330,10 +351,12 @@ statement
     | tryStatement
     | debuggerStatement
     | functionDeclaration
+    | arrowFunctionDeclaration
     | generatorFunctionDeclaration
     | typeAliasDeclaration //ADDED
     | enumDeclaration      //ADDED
     | expressionStatement
+    | Export statement
     ;
 
 block
@@ -345,8 +368,7 @@ statementList
     ;
 
 abstractDeclaration
-    : Abstract Identifier callSignature eos
-    | Abstract variableStatement eos
+    : Abstract (Identifier callSignature | variableStatement) eos
     ;
 
 importStatement
@@ -366,9 +388,8 @@ exportStatement
     ;
 
 variableStatement
-    : Identifier typeAnnotation? initializer? SemiColon?
-    | bindingPattern typeAnnotation? initializer SemiColon?
-    | varModifier ReadOnly? variableDeclarationList SemiColon?
+    : bindingPattern typeAnnotation? initializer SemiColon?
+    | accessibilityModifier? varModifier? ReadOnly? variableDeclarationList SemiColon?
     ;
 
 variableDeclarationList
@@ -376,7 +397,7 @@ variableDeclarationList
     ;
 
 variableDeclaration
-    : ( Identifier | arrayLiteral | objectLiteral) typeAnnotation? ('=' typeParameters? singleExpression)? // ECMAScript 6: Array & Object Matching
+    : ( Identifier | arrayLiteral | objectLiteral) typeAnnotation? singleExpression? ('=' typeParameters? singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
 emptyStatement
@@ -395,14 +416,14 @@ ifStatement
 iterationStatement
     : Do statement While '(' expressionSequence ')' eos                                                         # DoStatement
     | While '(' expressionSequence ')' statement                                                                # WhileStatement
-    | For '(' expressionSequence? SemiColon expressionSequence? SemiColon expressionSequence? ')' statement                 # ForStatement
+    | For '(' expressionSequence? SemiColon expressionSequence? SemiColon expressionSequence? ')' statement     # ForStatement
     | For '(' varModifier variableDeclarationList SemiColon expressionSequence? SemiColon expressionSequence? ')'
           statement                                                                                             # ForVarStatement
     | For '(' singleExpression (In | Identifier{this.p("of")}?) expressionSequence ')' statement                # ForInStatement
     | For '(' varModifier variableDeclaration (In | Identifier{this.p("of")}?) expressionSequence ')' statement # ForVarInStatement
     ;
 
-varModifier  // let, const - ECMAScript 6
+varModifier
     : Var
     | Let
     | Const
@@ -497,15 +518,12 @@ implementsClause
     : Implements classOrInterfaceTypeList
     ;
 
-//classElement
-//    : (Static | {this.n("static")}? Identifier)? methodDefinition
-//    | emptyStatement
-//    ;
 // Classes modified
 classElement
     : constructorDeclaration
     | propertyMemberDeclaration
     | indexMemberDeclaration
+    | statement
     ;
 
 propertyMemberDeclaration
@@ -522,14 +540,6 @@ propertyMemberBase
 indexMemberDeclaration
     : indexSignature SemiColon
     ;
-    
-//methodDefinition
-//    : propertyName '(' formalParameterList? ')' '{' functionBody '}'
-//    | getter '(' ')' '{' functionBody '}'
-//    | setter '(' formalParameterList? ')' '{' functionBody '}'
-//    | generatorMethod
-//    | constructorDeclaration
-//    ;
 
 generatorMethod
     : '*'?  Identifier '(' formalParameterList? ')' '{' functionBody '}'
@@ -540,7 +550,7 @@ generatorFunctionDeclaration
     ;
 
 generatorBlock
-    : '{' (generatorDefinition (',' generatorDefinition)*)? ','? '}'
+    : '{' generatorDefinition (',' generatorDefinition)* ','? '}'
     ;
 
 generatorDefinition
@@ -548,7 +558,7 @@ generatorDefinition
     ;
 
 iteratorBlock
-    : '{' (iteratorDefinition (',' iteratorDefinition)*)? ','? '}'
+    : '{' iteratorDefinition (',' iteratorDefinition)* ','? '}'
     ;
 
 iteratorDefinition
@@ -558,12 +568,12 @@ iteratorDefinition
 formalParameterList
     : formalParameterArg (',' formalParameterArg)* (',' lastFormalParameterArg)?
     | lastFormalParameterArg
-    | arrayLiteral                            // ECMAScript 6: Parameter Context Matching
-    | objectLiteral                           // ECMAScript 6: Parameter Context Matching
+    | arrayLiteral                              // ECMAScript 6: Parameter Context Matching
+    | objectLiteral (':' formalParameterList)?  // ECMAScript 6: Parameter Context Matching
     ;
 
 formalParameterArg
-    : Identifier typeAnnotation? ('=' singleExpression)?      // ECMAScript 6: Initialization
+    : accessibilityModifier? Identifier typeAnnotation? ('=' singleExpression)?      // ECMAScript 6: Initialization
     ;
 
 lastFormalParameterArg                        // ECMAScript 6: Rest Parameter
@@ -603,6 +613,7 @@ propertyAssignment
     | setAccessor                                             # PropertySetter
     | generatorMethod                                         # MethodProperty
     | Identifier                                              # PropertyShorthand
+    | restParameter                                           # RestParameterInObject
     ;
 
 getAccessor
@@ -640,6 +651,7 @@ functionExpressionDeclaration
 
 singleExpression
     : functionExpressionDeclaration                                          # FunctionExpression
+    | arrowFunctionDeclaration                                               # ArrowFunctionExpression   // ECMAScript 6
     | Class Identifier? classTail                                            # ClassExpression
     | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
     | singleExpression '.' identifierName                                    # MemberDotExpression
@@ -682,9 +694,12 @@ singleExpression
     | literal                                                                # LiteralExpression
     | arrayLiteral                                                           # ArrayLiteralExpression
     | objectLiteral                                                          # ObjectLiteralExpression
-    | typeArguments         #GenericTypes
     | '(' expressionSequence ')'                                             # ParenthesizedExpression
-    | arrowFunctionParameters typeAnnotation? '=>' arrowFunctionBody         # ArrowFunctionExpression   // ECMAScript 6
+    | typeArguments expressionSequence?                                      # GenericTypes
+    ;
+
+arrowFunctionDeclaration
+    : Async? arrowFunctionParameters typeAnnotation? '=>' arrowFunctionBody
     ;
 
 arrowFunctionParameters

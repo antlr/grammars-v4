@@ -1,6 +1,6 @@
 # TypeScript grammar
 
-This JTypeScript grammar does not exactly corresponds to TypeScript standard.
+This TypeScript grammar does not exactly corresponds to TypeScript standard.
 The main goal during developing was practical usage, performance and clarity
 (getting rid of duplicates).
 
@@ -65,8 +65,6 @@ Based on [JavaScript grammar](https://github.com/loonydev/grammars-v4/tree/maste
 ### TypeScript
 
 See [examples](examples) directory with test data files.
-
-
 
 ## Main contributors
 

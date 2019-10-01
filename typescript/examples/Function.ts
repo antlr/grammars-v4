@@ -34,3 +34,8 @@ let sumShortArrow = (x: number, y: number) => x + y;
 function Greet(greeting: string, ...names: string[]) {
     return greeting + " " + names.join(", ") + "!";
 }
+
+
+function Test(value: TestClass | TestClass2): value is TestClass {
+    return (<TestClass>value).someFunction !== undefined;
+}

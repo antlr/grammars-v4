@@ -18,3 +18,10 @@ playerCodes = {     //Compiler Error: Cannot assign to playerCodes because it is
     player3 : 13,
     player4 : 20
 };
+
+playerCodesArray = {     //Compiler Error: Cannot assign to playerCodes because it is a constant or read-only
+    player1 : 50,   // Modified value
+    player2 : playerCodes[Test],
+    player3 : 13,
+    player4 : 20
+};
