@@ -220,6 +220,16 @@ keyType
     |   'string'
     ;
 
+reservedWord
+    :   MESSAGE
+    |   OPTION
+    |   PACKAGE
+    |   SERVICE
+    |   STREAM
+    |   STRING
+    |   SYNTAX
+    |   WEAK
+    ;
 //
 // Lexical elements
 //
@@ -307,6 +317,7 @@ messageOrEnumName
 
 fieldName
     :   Ident
+    |   reservedWord
     ;
 
 oneofName
