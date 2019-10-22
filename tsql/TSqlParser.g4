@@ -3006,8 +3006,7 @@ udt_method_arguments
 
 // https://docs.microsoft.com/ru-ru/sql/t-sql/queries/select-clause-transact-sql
 asterisk
-    : '*'
-    | table_name '.' asterisk
+    : (table_name '.')? '*'
     ;
 
 column_elem
