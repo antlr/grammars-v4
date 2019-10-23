@@ -49,6 +49,8 @@ CREATE TABLE float_table (f1 FLOAT, f2 FLOAT(10), f3 FLOAT(7,4));
 CREATE TABLE USER (INTERNAL BOOLEAN DEFAULT FALSE);
 create table table_with_character_set_eq (id int, data varchar(50)) character set = default;
 create table table_with_character_set (id int, data varchar(50)) character set default;
+create table table_with_visible_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC) INVISIBLE VISIBLE);
+create table table_with_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC));
 #end
 #begin
 -- Rename table

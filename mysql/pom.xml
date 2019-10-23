@@ -44,7 +44,7 @@
 					<grammarName>MySql</grammarName>
 					<packageName></packageName>
 					<caseInsensitiveType>UPPER</caseInsensitiveType>
-					<exampleFiles>examples/</exampleFiles>
+					<exampleFiles>Positive-Technologies/examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>
