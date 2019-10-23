@@ -10,3 +10,7 @@ GRANT ALL on db.tbl to 'admin';
 GRANT ALL on `db`.`tbl` to 'admin';
 GRANT ALL on `db`.tbl to 'admin';
 GRANT ALL on db.`tbl` to 'admin';
+GRANT SESSION_VARIABLES_ADMIN on *.* to 'u2';
+GRANT 'SESSION_VARIABLES_ADMIN' on *.* to 'u2';
+GRANT `SESSION_VARIABLES_ADMIN` on *.* to 'u2';
+GRANT "SESSION_VARIABLES_ADMIN" on *.* to 'u2';
