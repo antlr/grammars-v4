@@ -43,41 +43,41 @@ type StructWithNumberFields struct {
 }
 
 type person struct {
-    name string
-    age  int
-    personfunc func()
+	name string
+	age  int
+	personfunc func()
 }
 
 func (*person) outside() {
-    fmt.Println("Declared outside and invoked!!!")
+	fmt.Println("Declared outside and invoked!!!")
 }
 
 func Structs() {
-    fPtr := func() { fmt.Println("LAUNCH FROM  PERSON STRUCT INSTANCE") }
+	fPtr := func() { fmt.Println("LAUNCH FROM  PERSON STRUCT INSTANCE") }
 
-    fmt.Println(person{"Bob", 20, fPtr})
+	fmt.Println(person{"Bob", 20, fPtr})
 
-    fmt.Println(person{name: "Alice", age: 30})
+	fmt.Println(person{name: "Alice", age: 30})
 
-    fmt.Println(person{name: "Fred"})
+	fmt.Println(person{name: "Fred"})
 
-    fmt.Println(&person{name: "Ann", age: 40})
+	fmt.Println(&person{name: "Ann", age: 40})
 
-    s := person{name: "Sean", age: 50, personfunc: fPtr}
-    fmt.Println(s.name)
+	s := person{name: "Sean", age: 50, personfunc: fPtr}
+	fmt.Println(s.name)
 
-    s.personfunc()
-    s.outside();
+	s.personfunc()
+	s.outside();
 
-    sp := &s
-    fmt.Println(sp.age)
+	sp := &s
+	fmt.Println(sp.age)
 
-    sp.age = 51
-    fmt.Println(sp.age)
+	sp.age = 51
+	fmt.Println(sp.age)
 
-    var zeroPerson person
-    fmt.Println(zeroPerson)
+	var zeroPerson person
+	fmt.Println(zeroPerson)
 
-    newPerson := new(person)
-    fmt.Println(newPerson)
+	newPerson := new(person)
+	fmt.Println(newPerson)
 }

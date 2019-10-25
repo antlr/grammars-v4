@@ -3,8 +3,8 @@ package samples
 import "fmt"
 
 func goRoutineA(a <-chan int) {
-    val := <-a
-    fmt.Println("goRoutineA received the data", val)
+	val := <-a
+	fmt.Println("goRoutineA received the data", val)
 }
 
 func BufChan() {
@@ -30,5 +30,5 @@ func BufChan() {
 	// c <- 7
 
 	ch := make(chan int)
-    go goRoutineA(ch)
+	go goRoutineA(ch)
 }

@@ -33,7 +33,7 @@ func TypeAssertions() {
 	f, ok := i.(float64)
 	fmt.Println(f, ok)
 
-    t, ok := i.(TwoS)
+	t, ok := i.(TwoS)
 	fmt.Println(t, ok)
 
 	//f = i.(float64) // panic

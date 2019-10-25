@@ -7,11 +7,11 @@ import (
 )
 
 func DeferCallee() {
-    fmt.Println("Called from the first defer!")
+	fmt.Println("Called from the first defer!")
 }
 
 func DeferCallee2() {
-    fmt.Println("Called from the second defer!")
+	fmt.Println("Called from the second defer!")
 }
 
 func Defers() {

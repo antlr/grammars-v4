@@ -1,7 +1,7 @@
 package samples
 
 import ("fmt"
-"reflect"
+	"reflect"
 )
 
 func ParamTest(a, b int32, c int16) {

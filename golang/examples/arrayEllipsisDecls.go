@@ -5,10 +5,10 @@ import (
 )
 
 type Custom struct {
-     string
+	string
 }
 
 func ArrayEllipsisDecls() {
-    stooges := [...]Custom{{"Moe"}, {"Larry"}, {"Curly"}} // len(stooges) == 3
-    fmt.Println("Stooges: ", stooges)
+	stooges := [...]Custom{{"Moe"}, {"Larry"}, {"Curly"}} // len(stooges) == 3
+	fmt.Println("Stooges: ", stooges)
 }
