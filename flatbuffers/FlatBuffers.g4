@@ -26,7 +26,7 @@ rpc_method : IDENT '(' IDENT ')' ':' IDENT metadata ';' ;
 // fixed original grammar: allow namespaces for IDENTs
 type : '[' type ']' | BASE_TYPE_NAME | ns_ident ;
 
-enumval_decl : ns_ident ( '=' INTEGER_CONSTANT )? ;
+enumval_decl : ns_ident ( '=' integer_const )? ;
 
 commasep_enumval_decl : enumval_decl ( ',' enumval_decl )* ','? ;
 
@@ -37,7 +37,7 @@ commasep_ident_with_opt_single_value : ident_with_opt_single_value ( ',' ident_w
 metadata : ( '(' commasep_ident_with_opt_single_value ')' )? ;
 
 // fix original grammar: enum values (IDENT) are allowed as well
-scalar : INTEGER_CONSTANT | FLOAT_CONSTANT | IDENT ;
+scalar : INTEGER_CONSTANT | HEX_INTEGER_CONSTANT | FLOAT_CONSTANT | IDENT ;
 
 object : '{' commasep_ident_with_value '}' ;
 
@@ -57,6 +57,8 @@ file_identifier_decl : 'file_identifier' STRING_CONSTANT ;
 
 ns_ident : IDENT ( '.' IDENT )* ;
 
+integer_const :  INTEGER_CONSTANT | HEX_INTEGER_CONSTANT ;
+
 // Lexer rules
 
 STRING_CONSTANT : '"' ~["\r\n]* '"' ;
@@ -65,9 +67,13 @@ BASE_TYPE_NAME : 'bool' | 'byte' | 'ubyte' | 'short' | 'ushort' | 'int' | 'uint'
 
 IDENT : [a-zA-Z_] [a-zA-Z0-9_]* ;
 
-INTEGER_CONSTANT : '-'? [0-9]+ | 'true' | 'false' ;
+HEX_INTEGER_CONSTANT : [-+]? '0' [xX][0-9a-fA-F]+ ;
+
+INTEGER_CONSTANT : [-+]? [0-9]+ | 'true' | 'false' ;
 
 FLOAT_CONSTANT : '-'? [0-9]+ '.' [0-9]+ (('e'|'E') ('+'|'-')? [0-9]+ )? ;
+
+BLOCK_COMMENT:	'/*' .*? '*/' -> channel(HIDDEN);
 
 // fixed original grammar: allow line comments
 COMMENT : '//' ~[\r\n]* -> channel(HIDDEN);
