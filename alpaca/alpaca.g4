@@ -32,13 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar alpaca;
 
 prog
-   : defns ('.' | 'begin' /*initial-configuration*/
-   
-   )
+   : defns ('.' | 'begin')
    ;
 
 defns
-   : defn defn
+   : defn (';' defn)*
    ;
 
 defn
@@ -136,7 +134,7 @@ arrowchain
    ;
 
 QUOTEDCHAR
-   : '"' ~ '"' '"'
+   : '"' ~ '"'* '"'
    ;
 
 QUOTE
