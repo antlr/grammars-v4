@@ -214,6 +214,7 @@
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
+				<module>sickbay</module>
 				<module>smalltalk</module>
 				<module>smiles</module>
 				<module>smtlibv2</module>
