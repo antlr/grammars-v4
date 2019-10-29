@@ -338,6 +338,7 @@ another_statement
     | create_queue
     | alter_queue
     | execute_statement
+    | kill_statement
     | message_statement
     | security_statement
     | set_statement
@@ -962,7 +963,7 @@ enable_trigger
      ;
 
 lock_table
-     : LOCK TABLE table_name IN (SHARE | EXCLUSIVE) MODE (WAIT seconds=DECIMAL | NOWAIT)? ';'? 
+     : LOCK TABLE table_name IN (SHARE | EXCLUSIVE) MODE (WAIT seconds=DECIMAL | NOWAIT)? ';'?
      ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/truncate-table-transact-sql
@@ -2489,6 +2490,10 @@ backup_service_master_key
          ENCRYPTION BY PASSWORD EQUAL encryption_password=STRING
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/language-elements/kill-transact-sql
+kill_statement
+    : KILL (session_id=DECIMAL | SINGLE_QUOTE session_id=DECIMAL SINGLE_QUOTE | UOW) (WITH STATUSONLY)?
+    ;
 
 // https://msdn.microsoft.com/en-us/library/ms188332.aspx
 execute_statement
