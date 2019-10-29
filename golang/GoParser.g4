@@ -220,7 +220,7 @@ typeSwitchCase
     ;
 
 typeList
-    : type (',' type)*
+    : (type | NIL_LIT) (',' (type | NIL_LIT))*
     ;
 
 selectStmt
