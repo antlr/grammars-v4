@@ -2,6 +2,7 @@
 PHP grammar.
 The MIT License (MIT).
 Copyright (c) 2015-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+Copyright (c) 2019, Student Main for php7 support.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -103,9 +104,9 @@ useDeclaration
 useDeclarationContentList
     : '\\'? useDeclarationContent (',' '\\'? useDeclarationContent)*
     ;
-    
+
 useDeclarationContent
-    : namespaceNameList (As identifier)?
+    : namespaceNameList //(As identifier)?
     ;
 
 namespaceDeclaration
@@ -121,7 +122,7 @@ namespaceStatement
     ;
 
 functionDeclaration
-    : attributes Function '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' blockStatement
+    : attributes Function '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' typeHint)? blockStatement
     ;
 
 classDeclaration
@@ -416,7 +417,7 @@ traitMethodReference
     ;
 
 baseCtorCall
-    : ':' identifier arguments
+    : ':' identifier arguments?
     ;
 
 methodBody
@@ -456,6 +457,8 @@ parenthesis
 // Expressions
 // Grouped by priorities: http://php.net/manual/en/language.operators.precedence.php
 expression
+    // TODO: according to https://www.php.net/manual/en/migration70.new-features.php#119625
+    // 'foo'::$bar seems an expression
     : Clone expression                                         #CloneExpression
     | newExpr                                                  #NewExpression
     
@@ -489,7 +492,7 @@ expression
     | (Include | IncludeOnce) expression                       #SpecialWordExpression
     | (Require | RequireOnce) expression                       #SpecialWordExpression
 
-    | Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? blockStatement  #LambdaFunctionExpression
+    | lambdaFunctionExpr                                       #LambdaFunctionExpression
 
     | <assoc=right> expression op='**' expression                 #ArithmeticExpression
     | expression InstanceOf typeRef                               #InstanceOfExpression
@@ -508,6 +511,8 @@ expression
     | expression op='||' expression                               #BitwiseExpression
 
     | expression op=QuestionMark expression? ':' expression       #ConditionalExpression
+    | expression op='??' expression                               #NullCoalescingExpression
+    | expression op='<=>' expression                              #SpaceshipExpression
 
     | chain assignmentOperator expression                         #AssignmentExpression
     | chain Eq '&' (chain | newExpr)                              #AssignmentExpression
@@ -515,6 +520,10 @@ expression
     | expression op=LogicalAnd expression                         #LogicalExpression
     | expression op=LogicalXor expression                         #LogicalExpression
     | expression op=LogicalOr expression                          #LogicalExpression
+    ;
+
+lambdaFunctionExpr
+    : Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? (':' typeHint)? blockStatement
     ;
 
 newExpr
@@ -539,6 +548,7 @@ assignmentOperator
 
 yieldExpression
     : Yield expression ('=>' expression)?
+    | Yield From functionCall
     ;
 
 arrayItemList
@@ -567,6 +577,14 @@ typeRef
     : (qualifiedNamespaceName | indirectTypeRef) genericDynamicArgs?
     | primitiveType
     | Static
+    | anoymousClass
+    ;
+
+anoymousClass
+    : attributes Private? modifier? Partial? (
+      classEntryType typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)?
+    | Interface identifier typeParameterListInBrackets? (Extends interfaceList)? )
+      OpenCurlyBracket classStatement* '}'
     ;
 
 indirectTypeRef
@@ -578,7 +596,14 @@ qualifiedNamespaceName
     ;
 
 namespaceNameList
-    : identifier ('\\' identifier)*
+    : identifier
+    | identifier ('\\' identifier)* '\\' namespaceNameTail
+    ;
+
+namespaceNameTail
+    : identifier As identifier
+    | OpenCurlyBracket namespaceNameTail (','namespaceNameTail)* '}'
+    | identifier
     ;
 
 qualifiedNamespaceNameList
@@ -648,6 +673,7 @@ string
     | DoubleQuote interpolatedStringPart* DoubleQuote
     ;
 
+// TODO: \u{00abcd}
 interpolatedStringPart
     : StringPart
     | chain
@@ -658,7 +684,13 @@ chainList
     ;
 
 chain
-    : (chainBase | functionCall | '(' newExpr ')') memberAccess*
+    : chainOrigin memberAccess*
+    ;
+
+chainOrigin
+    : chainBase
+    | functionCall
+    | '(' newExpr ')'
     ;
 
 memberAccess
@@ -673,8 +705,9 @@ functionCallName
     : qualifiedNamespaceName
     | classConstant
     | chainBase
+    | parenthesis // TODO: Hack for IIFE, seen in generatorReturn.php
     ;
-    
+
 actualArguments
     : genericDynamicArgs? arguments squareCurlyExpression*
     ;
@@ -804,6 +837,7 @@ identifier
     | Var
     | While
     | Yield
+    | From
 
     | Get
     | Set

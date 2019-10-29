@@ -3,6 +3,7 @@ PHP grammar.
 The MIT License (MIT).
 Copyright (c) 2015-2019, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 Copyright (c) 2019, Thierry Marianne (thierry.marianne@weaving-the-web.org)
+Copyright (c) 2019, Student Main for php7 support.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -198,6 +199,7 @@ Use:                'use';
 Var:                'var';
 While:              'while';
 Yield:              'yield';
+From:               'from';
 
 Get:                '__get';
 Set:                '__set';
@@ -224,6 +226,7 @@ Line__:             '__line__';
 File__:             '__file__';
 Dir__:              '__dir__';
 
+Spaceship:          '<=>';
 Lgeneric:           '<:';
 Rgeneric:           ':>';
 DoubleArrow:        '=>';
@@ -251,6 +254,9 @@ OrEqual:            '|=';
 XorEqual:           '^=';
 BooleanOr:          '||';
 BooleanAnd:         '&&';
+
+NullCoalescing:     '??';
+
 ShiftLeft:          '<<';
 ShiftRight:         '>>';
 DoubleColon:        '::';
