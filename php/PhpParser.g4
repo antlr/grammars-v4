@@ -106,7 +106,7 @@ useDeclarationContentList
     ;
 
 useDeclarationContent
-    : namespaceNameList //(As identifier)?
+    : namespaceNameList
     ;
 
 namespaceDeclaration
@@ -241,16 +241,16 @@ blockStatement
     ;
     
 ifStatement
-    : If parenthesis statement elseIfStatement* elseStatement?
-    | If parenthesis ':' innerStatementList elseIfColonStatement* elseColonStatement? EndIf ';'
+    : If parentheses statement elseIfStatement* elseStatement?
+    | If parentheses ':' innerStatementList elseIfColonStatement* elseColonStatement? EndIf ';'
     ;
 
 elseIfStatement
-    : ElseIf parenthesis statement
+    : ElseIf parentheses statement
     ;
 
 elseIfColonStatement
-    : ElseIf parenthesis ':' innerStatementList
+    : ElseIf parentheses ':' innerStatementList
     ;
 
 elseStatement
@@ -262,11 +262,11 @@ elseColonStatement
     ;
 
 whileStatement
-    : While parenthesis (statement | ':' innerStatementList EndWhile ';')
+    : While parentheses (statement | ':' innerStatementList EndWhile ';')
     ;
 
 doWhileStatement
-    : Do statement While parenthesis ';'
+    : Do statement While parentheses ';'
     ;
     
 forStatement
@@ -282,7 +282,7 @@ forUpdate
     ;
     
 switchStatement
-    : Switch parenthesis (OpenCurlyBracket ';'? switchBlock* '}' | ':' ';'? switchBlock* EndSwitch ';')
+    : Switch parentheses (OpenCurlyBracket ';'? switchBlock* '}' | ':' ';'? switchBlock* EndSwitch ';')
     ;
 
 switchBlock
@@ -450,76 +450,78 @@ expressionList
     : expression (',' expression)*
     ;
 
-parenthesis
+parentheses
     : '(' (expression | yieldExpression) ')'
     ;
 
 // Expressions
 // Grouped by priorities: http://php.net/manual/en/language.operators.precedence.php
 expression
-    // TODO: according to https://www.php.net/manual/en/migration70.new-features.php#119625
-    // 'foo'::$bar seems an expression
-    : Clone expression                                         #CloneExpression
-    | newExpr                                                  #NewExpression
+    : Clone expression                                          #CloneExpression
+    | newExpr                                                   #NewExpression
     
-    | stringConstant '[' expression ']'                        #IndexerExpression
+    | stringConstant '[' expression ']'                         #IndexerExpression
 
-    | '(' castOperation ')' expression                         #CastExpression
-    | ('~' | '@') expression                                   #UnaryOperatorExpression
+    | '(' castOperation ')' expression                          #CastExpression
+    | ('~' | '@') expression                                    #UnaryOperatorExpression
 
-    | ('!' | '+' | '-') expression                             #UnaryOperatorExpression
+    | ('!' | '+' | '-') expression                              #UnaryOperatorExpression
 
-    | ('++' | '--') chain                                      #PrefixIncDecExpression
-    | chain ('++' | '--')                                      #PostfixIncDecExpression
+    | ('++' | '--') chain                                       #PrefixIncDecExpression
+    | chain ('++' | '--')                                       #PostfixIncDecExpression
 
-    | Print expression                                         #PrintExpression
+    | Print expression                                          #PrintExpression
 
-    | chain                                                    #ChainExpression
-    | constant                                                 #ScalarExpression
-    | string                                                   #ScalarExpression
-    | Label                                                    #ScalarExpression
+    | chain                                                     #ChainExpression
+    | constant                                                  #ScalarExpression
+    | string                                                    #ScalarExpression
+    | Label                                                     #ScalarExpression
 
-    | BackQuoteString                                          #BackQuoteStringExpression
-    | parenthesis                                              #ParenthesisExpression
-    | (Array '(' arrayItemList? ')' | '[' arrayItemList? ']') ('[' expression ']')?            #ArrayCreationExpression
+    | BackQuoteString                                           #BackQuoteStringExpression
+    | parentheses                                               #ParenthesisExpression
+    | arrayCreation                                             #ArrayCreationExpression
 
-    | Yield                                                    #SpecialWordExpression
-    | List '(' assignmentList ')' Eq expression                #SpecialWordExpression
-    | IsSet '(' chainList ')'                                  #SpecialWordExpression
-    | Empty '(' chain ')'                                      #SpecialWordExpression
-    | Eval '(' expression ')'                                  #SpecialWordExpression
-    | Exit ( '(' ')' | parenthesis )?                          #SpecialWordExpression
-    | (Include | IncludeOnce) expression                       #SpecialWordExpression
-    | (Require | RequireOnce) expression                       #SpecialWordExpression
+    | Yield                                                     #SpecialWordExpression
+    | List '(' assignmentList ')' Eq expression                 #SpecialWordExpression
+    | IsSet '(' chainList ')'                                   #SpecialWordExpression
+    | Empty '(' chain ')'                                       #SpecialWordExpression
+    | Eval '(' expression ')'                                   #SpecialWordExpression
+    | Exit ( '(' ')' | parentheses )?                           #SpecialWordExpression
+    | (Include | IncludeOnce) expression                        #SpecialWordExpression
+    | (Require | RequireOnce) expression                        #SpecialWordExpression
 
-    | lambdaFunctionExpr                                       #LambdaFunctionExpression
+    | lambdaFunctionExpr                                        #LambdaFunctionExpression
 
-    | <assoc=right> expression op='**' expression                 #ArithmeticExpression
-    | expression InstanceOf typeRef                               #InstanceOfExpression
-    | expression op=('*' | Divide | '%') expression               #ArithmeticExpression
+    | <assoc=right> expression op='**' expression               #ArithmeticExpression
+    | expression InstanceOf typeRef                             #InstanceOfExpression
+    | expression op=('*' | Divide | '%') expression             #ArithmeticExpression
 
-    | expression op=('+' | '-' | '.') expression                  #ArithmeticExpression
+    | expression op=('+' | '-' | '.') expression                #ArithmeticExpression
 
-    | expression op=('<<' | '>>') expression                      #ComparisonExpression
-    | expression op=(Less | '<=' | Greater | '>=') expression     #ComparisonExpression
-    | expression op=('===' | '!==' | '==' | IsNotEq) expression   #ComparisonExpression
+    | expression op=('<<' | '>>') expression                    #ComparisonExpression
+    | expression op=(Less | '<=' | Greater | '>=') expression   #ComparisonExpression
+    | expression op=('===' | '!==' | '==' | IsNotEq) expression #ComparisonExpression
 
-    | expression op='&' expression                                #BitwiseExpression
-    | expression op='^' expression                                #BitwiseExpression
-    | expression op='|' expression                                #BitwiseExpression
-    | expression op='&&' expression                               #BitwiseExpression
-    | expression op='||' expression                               #BitwiseExpression
+    | expression op='&' expression                              #BitwiseExpression
+    | expression op='^' expression                              #BitwiseExpression
+    | expression op='|' expression                              #BitwiseExpression
+    | expression op='&&' expression                             #BitwiseExpression
+    | expression op='||' expression                             #BitwiseExpression
 
-    | expression op=QuestionMark expression? ':' expression       #ConditionalExpression
-    | expression op='??' expression                               #NullCoalescingExpression
-    | expression op='<=>' expression                              #SpaceshipExpression
+    | expression op=QuestionMark expression? ':' expression     #ConditionalExpression
+    | expression op='??' expression                             #NullCoalescingExpression
+    | expression op='<=>' expression                            #SpaceshipExpression
 
-    | chain assignmentOperator expression                         #AssignmentExpression
-    | chain Eq '&' (chain | newExpr)                              #AssignmentExpression
+    | chain assignmentOperator expression                       #AssignmentExpression
+    | chain Eq '&' (chain | newExpr)                            #AssignmentExpression
 
-    | expression op=LogicalAnd expression                         #LogicalExpression
-    | expression op=LogicalXor expression                         #LogicalExpression
-    | expression op=LogicalOr expression                          #LogicalExpression
+    | expression op=LogicalAnd expression                       #LogicalExpression
+    | expression op=LogicalXor expression                       #LogicalExpression
+    | expression op=LogicalOr expression                        #LogicalExpression
+    ;
+
+arrayCreation
+    : (Array '(' arrayItemList? ')' | '[' arrayItemList? ']') ('[' expression ']')?
     ;
 
 lambdaFunctionExpr
@@ -547,8 +549,7 @@ assignmentOperator
     ;
 
 yieldExpression
-    : Yield expression ('=>' expression)?
-    | Yield From functionCall
+    : Yield (expression ('=>' expression)? | From expression)
     ;
 
 arrayItemList
@@ -597,13 +598,12 @@ qualifiedNamespaceName
 
 namespaceNameList
     : identifier
-    | identifier ('\\' identifier)* '\\' namespaceNameTail
+    | identifier ('\\' identifier)* ('\\' namespaceNameTail)?
     ;
 
 namespaceNameTail
-    : identifier As identifier
+    : identifier (As identifier)?
     | OpenCurlyBracket namespaceNameTail (','namespaceNameTail)* '}'
-    | identifier
     ;
 
 qualifiedNamespaceNameList
@@ -659,7 +659,7 @@ numericConstant
 
 classConstant
     : (Class | Parent_) '::' (identifier | Constructor | Get | Set)
-    | (qualifiedStaticTypeRef | keyedVariable) '::' identifier
+    | (qualifiedStaticTypeRef | keyedVariable | string) '::' (identifier | keyedVariable) // 'foo'::$bar works in php7
     ;
 
 stringConstant
@@ -673,9 +673,9 @@ string
     | DoubleQuote interpolatedStringPart* DoubleQuote
     ;
 
-// TODO: \u{00abcd}
 interpolatedStringPart
     : StringPart
+    | UnicodeEscape
     | chain
     ;
 
@@ -705,7 +705,7 @@ functionCallName
     : qualifiedNamespaceName
     | classConstant
     | chainBase
-    | parenthesis // TODO: Hack for IIFE, seen in generatorReturn.php
+    | parentheses
     ;
 
 actualArguments

@@ -10,6 +10,8 @@ function gen2()
 {
     yield 3;
     yield 4;
+    yield from [5,6];
+    yield from new ArrayIterator([7, 8]);
 }
 
 foreach (gen() as $val)

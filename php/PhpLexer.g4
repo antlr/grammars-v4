@@ -322,6 +322,7 @@ CurlyDollar:                '{' { this.IsCurlyDollar(1) }? { this.SetInsideStrin
 CurlyString:                '{'                                                 -> type(StringPart);
 EscapedChar:                '\\' .                                              -> type(StringPart);
 DoubleQuoteInInterpolation: '"'                                                 -> type(DoubleQuote), popMode;
+UnicodeEscape:              '\\u{' [a-zA-Z0-9] [a-zA-Z0-9]+ '}';
 StringPart:                 ~[${\\"]+;
 
 mode SingleLineCommentMode;
