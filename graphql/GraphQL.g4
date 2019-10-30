@@ -27,10 +27,14 @@
  AB:10-sep19: replaced type with type_ to resolve conflict for golang generator
  
  AB: 13-oct-19: added type system as per June 2018 specs
+ AB: 26-oct-19: added ID type
+ AB: 30-Oct-19: description, boolean, schema & Block string fix.
+     now parses: https://raw.githubusercontent.com/graphql-cats/graphql-cats/master/scenarios/validation/validation.schema.graphql
+
  */
 grammar GraphQL;
 
-document: definition+;
+document: description*  definition+;
 
 definition:
 	execDefinition
@@ -46,7 +50,7 @@ typeSystemDefinition:
 
 // https://graphql.github.io/graphql-spec/June2018/#sec-Schema
 schemaDefinition:
-	'schema' directives rootOperationTypeDefinitionList;
+	 'schema' directives? rootOperationTypeDefinitionList;
 
 rootOperationTypeDefinitionList:
 	'{' rootOperationTypeDefinition (
@@ -65,7 +69,7 @@ typeDefinition:
 	| inputObjectTypeDefinition;
 
 scalarTypeDefinition: description? 'scalar' NAME directives;
-description: STRING;
+description: String_;
 
 // https://graphql.github.io/graphql-spec/June2018/#sec-Objects
 objectTypeDefinition
@@ -80,7 +84,7 @@ implementsInterfaces '&' type_;
 
 fieldsDefinitions: '{'  fieldsDefinition+'}';
 fieldsDefinition: description? NAME  argumentsDefinition? ':' type_  directives? ;
-argumentsDefinition: '(' inputValueDefinition+ ')';
+argumentsDefinition: '(' inputValueDefinition (',' inputValueDefinition)* ')';
 inputValueDefinition:  description? NAME ':' type_ defaultValue? directives?;
 
 //https://graphql.github.io/graphql-spec/June2018/#sec-Interfaces
@@ -191,13 +195,18 @@ defaultValue: '=' value;
 valueOrVariable: value | variable;
 
 value:
-	STRING		# stringValue
+	String_		# stringValue
 	| NUMBER	# numberValue
-	| BOOLEAN	# booleanValue
+	| BooleanLiteral	# booleanValue
 	| array		# arrayValue
-   | 'null'  # nullValue;
+	| ID    	# idValue        //The ID scalar type represents a unique identifier, often used to refetch an object or as the key for a cache. The ID type is serialized in the same way as a String; however, defining it as an ID signifies that it is not intended to be human‐readable.
+   | 'null'  # nullValue
+   ;
 
-
+BooleanLiteral
+	:	'true'
+	|	'false'
+	;
 
 type_: typeName nonNullType? | listType nonNullType?;
 
@@ -211,9 +220,16 @@ array: '[' value ( ',' value)* ']' | '[' ']';
 
 NAME: [_A-Za-z] [_0-9A-Za-z]*;
 
+String_ : STRING | BLOCK_STRING;
+
 STRING: '"' ( ESC | ~ ["\\])* '"';
 
-BOOLEAN: 'true' | 'false';
+BLOCK_STRING
+    :   '"""' .*? '"""'
+    ;
+
+ID: STRING;
+
 
 fragment ESC: '\\' ( ["\\/bfnrt] | UNICODE);
 
@@ -232,3 +248,8 @@ fragment EXP: [Ee] [+\-]? INT;
 // \- since - means "range" inside [...]
 
 WS: [ \t\n\r]+ -> skip;
+
+LineComment
+    :   '#' ~[\r\n]*
+        -> skip
+    ;
