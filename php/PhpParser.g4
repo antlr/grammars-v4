@@ -122,7 +122,7 @@ namespaceStatement
     ;
 
 functionDeclaration
-    : attributes Function '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' typeHint)? blockStatement
+    : attributes Function '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' QuestionMark? typeHint)? blockStatement
     ;
 
 classDeclaration
@@ -322,7 +322,7 @@ tryCatchFinally
     ;
 
 catchClause
-    : Catch '(' qualifiedStaticTypeRef VarName ')' blockStatement
+    : Catch '(' qualifiedStaticTypeRef ('|' qualifiedStaticTypeRef)* VarName ')' blockStatement
     ;
 
 finallyStatement
@@ -359,7 +359,7 @@ formalParameterList
     ;
 
 formalParameter
-    : attributes typeHint? '&'? '...'? variableInitializer
+    : attributes QuestionMark? typeHint? '&'? '...'? variableInitializer
     ;
 
 typeHint
@@ -387,8 +387,8 @@ staticVariableStatement
     ;
 
 classStatement
-    : attributes propertyModifiers variableInitializer (',' variableInitializer)* ';'
-    | attributes Const identifierInititalizer (',' identifierInititalizer)* ';'
+    : attributes propertyModifiers typeHint? variableInitializer (',' variableInitializer)* ';'
+    | attributes memberModifiers? Const typeHint? identifierInititalizer (',' identifierInititalizer)* ';'
     | attributes memberModifiers? Function '&'? identifier
           typeParameterListInBrackets? '(' formalParameterList ')' baseCtorCall? methodBody
     | Use qualifiedNamespaceNameList traitAdaptations
@@ -526,6 +526,7 @@ arrayCreation
 
 lambdaFunctionExpr
     : Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? (':' typeHint)? blockStatement
+    | LambdaFn '(' formalParameterList')' '=>' expression
     ;
 
 newExpr
@@ -546,6 +547,7 @@ assignmentOperator
     | '^='
     | '<<='
     | '>>='
+    | '??='
     ;
 
 yieldExpression
@@ -603,7 +605,7 @@ namespaceNameList
 
 namespaceNameTail
     : identifier (As identifier)?
-    | OpenCurlyBracket namespaceNameTail (','namespaceNameTail)* '}'
+    | OpenCurlyBracket namespaceNameTail (','namespaceNameTail)* ','? '}'
     ;
 
 qualifiedNamespaceNameList
@@ -611,12 +613,13 @@ qualifiedNamespaceNameList
     ;
 
 arguments
-    : '(' ( actualArgument (',' actualArgument)* | yieldExpression)? ')'
+    : '(' ( actualArgument (',' actualArgument)* | yieldExpression)? ','? ')'
     ;
     
 actualArgument
     : '...'? expression
     | '&' chain
+    | arrayItem // list("id" => $id1, "name" => $name1)
     ;
 
 constantInititalizer
@@ -685,6 +688,7 @@ chainList
 
 chain
     : chainOrigin memberAccess*
+    | arrayCreation // [$a,$b]=$c
     ;
 
 chainOrigin

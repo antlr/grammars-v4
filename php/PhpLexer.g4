@@ -200,6 +200,7 @@ Var:                'var';
 While:              'while';
 Yield:              'yield';
 From:               'from';
+LambdaFn:           'fn';
 
 Get:                '__get';
 Set:                '__set';
@@ -256,6 +257,7 @@ BooleanOr:          '||';
 BooleanAnd:         '&&';
 
 NullCoalescing:     '??';
+NullCoalescingEqual:'??=';
 
 ShiftLeft:          '<<';
 ShiftRight:         '>>';
@@ -300,7 +302,7 @@ Decimal:            Digit+;
 Real:               (Digit+ '.' Digit* | '.' Digit+) ExponentPart?
     |               Digit+ ExponentPart;
 Hex:                '0x' HexDigit+;
-Binary:             '0b' [01]+;
+Binary:             '0b' [01_]+;
 
 BackQuoteString:   '`' ~'`'* '`';
 SingleQuoteString: '\'' (~('\'' | '\\') | '\\' . )* '\'';
@@ -360,5 +362,5 @@ fragment NameStartChar
     | '\uFDF0'..'\uFFFD'
     ;
 fragment ExponentPart:         'e' [+-]? Digit+;
-fragment Digit:                [0-9];
-fragment HexDigit:             [a-fA-F0-9];
+fragment Digit:                [0-9_];
+fragment HexDigit:             [a-fA-F0-9_];
