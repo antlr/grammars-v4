@@ -3,6 +3,7 @@ PHP grammar.
 The MIT License (MIT).
 Copyright (c) 2015-2019, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 Copyright (c) 2019, Thierry Marianne (thierry.marianne@weaving-the-web.org)
+Copyright (c) 2019, Student Main for php7 support.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -198,6 +199,8 @@ Use:                'use';
 Var:                'var';
 While:              'while';
 Yield:              'yield';
+From:               'from';
+LambdaFn:           'fn';
 
 Get:                '__get';
 Set:                '__set';
@@ -224,6 +227,7 @@ Line__:             '__line__';
 File__:             '__file__';
 Dir__:              '__dir__';
 
+Spaceship:          '<=>';
 Lgeneric:           '<:';
 Rgeneric:           ':>';
 DoubleArrow:        '=>';
@@ -251,6 +255,10 @@ OrEqual:            '|=';
 XorEqual:           '^=';
 BooleanOr:          '||';
 BooleanAnd:         '&&';
+
+NullCoalescing:     '??';
+NullCoalescingEqual:'??=';
+
 ShiftLeft:          '<<';
 ShiftRight:         '>>';
 DoubleColon:        '::';
@@ -294,7 +302,7 @@ Decimal:            Digit+;
 Real:               (Digit+ '.' Digit* | '.' Digit+) ExponentPart?
     |               Digit+ ExponentPart;
 Hex:                '0x' HexDigit+;
-Binary:             '0b' [01]+;
+Binary:             '0b' [01_]+;
 
 BackQuoteString:   '`' ~'`'* '`';
 SingleQuoteString: '\'' (~('\'' | '\\') | '\\' . )* '\'';
@@ -316,6 +324,7 @@ CurlyDollar:                '{' { this.IsCurlyDollar(1) }? { this.SetInsideStrin
 CurlyString:                '{'                                                 -> type(StringPart);
 EscapedChar:                '\\' .                                              -> type(StringPart);
 DoubleQuoteInInterpolation: '"'                                                 -> type(DoubleQuote), popMode;
+UnicodeEscape:              '\\u{' [a-zA-Z0-9] [a-zA-Z0-9]+ '}';
 StringPart:                 ~[${\\"]+;
 
 mode SingleLineCommentMode;
@@ -353,5 +362,5 @@ fragment NameStartChar
     | '\uFDF0'..'\uFFFD'
     ;
 fragment ExponentPart:         'e' [+-]? Digit+;
-fragment Digit:                [0-9];
-fragment HexDigit:             [a-fA-F0-9];
+fragment Digit:                [0-9_];
+fragment HexDigit:             [a-fA-F0-9_];
