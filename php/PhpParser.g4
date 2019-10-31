@@ -311,8 +311,8 @@ unsetStatement
     
 foreachStatement
     : Foreach 
-        ( '(' chain As '&'? chain ('=>' '&'? chain)? ')'
-        | '(' expression As chain ('=>' '&'? chain)? ')'
+        ( '(' chain As '&'? assignable ('=>' '&'? chain)? ')'
+        | '(' expression As assignable ('=>' '&'? chain)? ')'
         | '(' chain As List '(' assignmentList ')' ')' )
       (statement | ':' innerStatementList EndForeach ';')
     ;
@@ -512,12 +512,17 @@ expression
     | expression op='??' expression                             #NullCoalescingExpression
     | expression op='<=>' expression                            #SpaceshipExpression
 
-    | chain assignmentOperator expression                       #AssignmentExpression
-    | chain Eq '&' (chain | newExpr)                            #AssignmentExpression
+    | assignable assignmentOperator expression     #AssignmentExpression
+    | assignable Eq '&' (chain | newExpr)          #AssignmentExpression
 
     | expression op=LogicalAnd expression                       #LogicalExpression
     | expression op=LogicalXor expression                       #LogicalExpression
     | expression op=LogicalOr expression                        #LogicalExpression
+    ;
+
+assignable
+    : chain
+    | arrayCreation
     ;
 
 arrayCreation
@@ -619,7 +624,6 @@ arguments
 actualArgument
     : '...'? expression
     | '&' chain
-    | arrayItem // list("id" => $id1, "name" => $name1)
     ;
 
 constantInititalizer
@@ -688,7 +692,7 @@ chainList
 
 chain
     : chainOrigin memberAccess*
-    | arrayCreation // [$a,$b]=$c
+    //| arrayCreation // [$a,$b]=$c
     ;
 
 chainOrigin
@@ -746,6 +750,7 @@ assignmentList
 assignmentListElement
     : chain
     | List '('  assignmentList ')'
+    | arrayItem
     ;
 
 modifier
