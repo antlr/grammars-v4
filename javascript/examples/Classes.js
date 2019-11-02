@@ -175,3 +175,10 @@ r.area === 1000
 class A {
     ;
 }
+
+////
+class B {
+    get [runtimeCalc]() {return 1};
+    set [runtimeCalc](p) {};
+    get 'string as key'() {};
+}
