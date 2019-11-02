@@ -2,7 +2,7 @@ parser grammar GoParser;
 
 options {
     tokenVocab=GoLexer;
-    superClass=GoBaseParser;
+    superClass=GoParserBase;
 }
 
 sourceFile

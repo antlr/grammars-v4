@@ -1,6 +1,6 @@
 lexer grammar GoLexer;
 
-options { superClass=GoBaseLexer; }
+options { superClass=GoLexerBase; }
 
 // Keywords
 
