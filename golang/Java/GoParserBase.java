@@ -1,11 +1,17 @@
+package GoParseTree;
+
+import java.util.List;
 import org.antlr.v4.runtime.*;
 
 /**
  * All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
  * should start with lower case char similar to parser rules.
  */
-public abstract class GoBaseParser extends Parser
+public abstract class GoParserBase extends Parser
 {
+    protected GoParserBase(TokenStream input) {
+        super(input);
+    }
 
     /**
      * Returns {@code true} iff on the current index of the parser's
@@ -18,21 +24,27 @@ public abstract class GoBaseParser extends Parser
      * either is a line terminator, or is a multi line comment that
      * contains a line terminator.
      */
-    private boolean lineTerminatorAhead() {
+    protected boolean lineTerminatorAhead() {
         // Get the token ahead of the current index.
         int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
+
+        if (possibleIndexEosToken == -1)
+        {
+            return true;
+        }
+
         Token ahead = _input.get(possibleIndexEosToken);
         if (ahead.getChannel() != Lexer.HIDDEN) {
             // We're only interested in tokens on the HIDDEN channel.
             return false;
         }
 
-        if (ahead.getType() == TERMINATOR) {
+        if (ahead.getType() == GoLexer.TERMINATOR) {
             // There is definitely a line terminator ahead.
             return true;
         }
 
-        if (ahead.getType() == WS) {
+        if (ahead.getType() == GoLexer.WS) {
             // Get the token ahead of the current whitespaces.
             possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 2;
             ahead = _input.get(possibleIndexEosToken);
@@ -43,8 +55,8 @@ public abstract class GoBaseParser extends Parser
         int type = ahead.getType();
 
         // Check if the token is, or contains a line terminator.
-        return (type == COMMENT && (text.contains("\r") || text.contains("\n"))) ||
-                (type == TERMINATOR);
+        return (type == GoLexer.COMMENT && (text.contains("\r") || text.contains("\n"))) ||
+                (type == GoLexer.TERMINATOR);
     }
 
      /**
@@ -54,7 +66,7 @@ public abstract class GoBaseParser extends Parser
      * @return {@code true} if no line terminator exists between the specified
      * token offset and the prior one on the {@code HIDDEN} channel.
      */
-    private boolean noTerminatorBetween(int tokenOffset) {
+    protected boolean noTerminatorBetween(int tokenOffset) {
         BufferedTokenStream stream = (BufferedTokenStream)_input;
         List<Token> tokens = stream.getHiddenTokensToLeft(stream.LT(tokenOffset).getTokenIndex());
         
@@ -79,22 +91,22 @@ public abstract class GoBaseParser extends Parser
      * parameters beyond the specified token offset and the next on the
      * {@code HIDDEN} channel.
      */
-    private boolean noTerminatorAfterParams(int tokenOffset) {
+    protected boolean noTerminatorAfterParams(int tokenOffset) {
         BufferedTokenStream stream = (BufferedTokenStream)_input;
         int leftParams = 1;
         int rightParams = 0;
-        String value;
+        int valueType;
 
-        if (stream.LT(tokenOffset).getText().equals("(")) {
+        if (stream.LT(tokenOffset).getType() == GoLexer.L_PAREN) {
             // Scan past parameters
             while (leftParams != rightParams) {
                 tokenOffset++;
-                value = stream.LT(tokenOffset).getText();
+                valueType = stream.LT(tokenOffset).getType();
 
-                if (value.equals("(")) {
+                if (valueType == GoLexer.L_PAREN){
                     leftParams++;
                 }
-                else if (value.equals(")")) {
+                else if (valueType == GoLexer.R_PAREN) {
                     rightParams++;
                 }
             }
@@ -102,13 +114,18 @@ public abstract class GoBaseParser extends Parser
             tokenOffset++;
             return noTerminatorBetween(tokenOffset);
         }
-        
+
         return true;
     }
 
-    private boolean closeBrace() {
+    protected boolean checkPreviousTokenText(String text)
+    {
         BufferedTokenStream stream = (BufferedTokenStream)_input;
-
-        return stream.LT(1).getText().equals("}");
+        String prevTokenText = stream.LT(1).getText();
+        
+        if (prevTokenText == null)
+            return false;
+        
+        return prevTokenText.equals(text);
     }
 }
