@@ -1,7 +1,5 @@
 lexer grammar GoLexer;
 
-options { superClass=GoLexerBase; }
-
 // Keywords
 
 BREAK                  : 'break';
