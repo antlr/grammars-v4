@@ -4,7 +4,7 @@
 # sed -f pitch.sed JavaScriptParser.g4 > JavaScriptParser-CppRuntime.g4
 # sed -f pitch.sed JavaScriptLexer.g4  > JavaScriptLexer-CppRuntime.g4
 #
-# Replease 'this.' TO 'this->'; 
+# Replace 'this.' TO 'this->'; 
 #
 s/this\./this->/g
 
