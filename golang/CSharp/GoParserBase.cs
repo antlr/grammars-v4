@@ -96,19 +96,19 @@ namespace GoParseTree
             int leftParams = 1;
             int rightParams = 0;
 
-            if (stream.Lt(tokenOffset).Text.Equals("("))
+            if (stream.Lt(tokenOffset).Type == L_PAREN)
             {
                 // Scan past parameters
                 while (leftParams != rightParams)
                 {
                     tokenOffset++;
-                    var value = stream.Lt(tokenOffset).Text;
+                    int tokenType = stream.Lt(tokenOffset).Type;
 
-                    if (value.Equals("("))
+                    if (tokenType == L_PAREN)
                     {
                         leftParams++;
                     }
-                    else if (value.Equals(")"))
+                    else if (tokenType == R_PAREN)
                     {
                         rightParams++;
                     }
