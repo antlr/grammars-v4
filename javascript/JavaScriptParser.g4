@@ -39,7 +39,7 @@ program
     ;
 
 sourceElement
-    : Export? statement
+    : statement
     ;
 
 statement
@@ -80,11 +80,13 @@ importStatement
     ;
 
 fromBlock
-    : (Multiply | multipleImportStatement) (As identifierName)? From StringLiteral eos
+    : (aliasName ',')* '*' (As identifierName )? From StringLiteral eos
+    | (aliasName ',')? '{' aliasName (',' aliasName)* ','? '}' ('*' (As identifierName ))? (From StringLiteral)? eos
+    | StringLiteral
     ;
 
-multipleImportStatement
-    : (identifierName ',')? '{' identifierName (',' identifierName)* '}'
+aliasName
+    : identifierName (As identifierName )?
     ;
 
 exportStatement
@@ -122,8 +124,8 @@ iterationStatement
     | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement                 # ForStatement
     | For '(' varModifier variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')'
           statement                                                                                             # ForVarStatement
-    | For Await? '(' singleExpression (In | Identifier{this.p("of")}?) expressionSequence ')' statement                # ForInStatement
-    | For Await? '(' varModifier variableDeclaration (In | Identifier{this.p("of")}?) expressionSequence ')' statement # ForVarInStatement
+    | For Await? '(' singleExpression (In | Of ) expressionSequence ')' statement                # ForInStatement
+    | For Await? '(' varModifier variableDeclaration (In | Of ) expressionSequence ')' statement # ForVarInStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
@@ -185,7 +187,7 @@ tryStatement
     ;
 
 catchProduction
-    : Catch ('(' Identifier? ')')? block
+    : Catch ('(' (Identifier|arrayLiteral|objectLiteral)? ')')? block
     ;
 
 finallyProduction
@@ -220,30 +222,6 @@ methodDefinition
     | '*'? '#'? setter '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
-/*generatorMethod
-    : '*'?  Identifier '(' formalParameterList? ')' '{' functionBody '}'
-    ;
-
-generatorFunctionDeclaration
-    : Function '*' Identifier? '(' formalParameterList? ')' '{' functionBody '}'
-    ;*/
-/*
-generatorBlock
-    : '{' (generatorDefinition (',' generatorDefinition)*)? ','? '}'
-    ;
-
-generatorDefinition
-    : '*' iteratorDefinition
-    ;
-
-iteratorBlock
-    : '{' (iteratorDefinition (',' iteratorDefinition)*)? ','? '}'
-    ;
-
-iteratorDefinition
-    : '[' singleExpression ']' '(' formalParameterList? ')' '{' functionBody '}'
-    ;
-*/
 formalParameterList
     : formalParameterArg (',' formalParameterArg)* (',' lastFormalParameterArg)?
     | lastFormalParameterArg
@@ -282,12 +260,12 @@ objectLiteral
     ;
 
 propertyAssignment
-    : propertyName (':' |'=') singleExpression       # PropertyExpressionAssignment
-    | '[' singleExpression ']' ':' singleExpression  # ComputedPropertyExpressionAssignment
+    : propertyName (':' |'=') singleExpression                                      # PropertyExpressionAssignment
+    | '[' singleExpression ']' ':' singleExpression                                 # ComputedPropertyExpressionAssignment
     | Async? '*'? propertyName '(' formalParameterList?  ')'  '{' functionBody '}'  # FunctionProperty
-    | getter '(' ')' '{' functionBody '}'                              # PropertyGetter
-    | setter '(' formalParameterArg ')' '{' functionBody '}'                   # PropertySetter
-    | Ellipsis? Identifier                                                                    # PropertyShorthand
+    | getter '(' ')' '{' functionBody '}'                                           # PropertyGetter
+    | setter '(' formalParameterArg ')' '{' functionBody '}'                        # PropertySetter
+    | Ellipsis? Identifier                                                          # PropertyShorthand
     ;
 
 propertyName
@@ -310,56 +288,57 @@ expressionSequence
     ;
 
 singleExpression
-    : anoymousFunction /*Async? Function '*'? Identifier? '(' formalParameterList? ')' '{' functionBody '}' */   # FunctionExpression
-    | Class Identifier? classTail                                            # ClassExpression
-    | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
-    | singleExpression '?'? '.' '#'? identifierName                          # MemberDotExpression
-    | singleExpression arguments                                             # ArgumentsExpression
-    | New singleExpression arguments?                                        # NewExpression
-    | singleExpression {this.notLineTerminator()}? '++'                      # PostIncrementExpression
-    | singleExpression {this.notLineTerminator()}? '--'                      # PostDecreaseExpression
-    | Delete singleExpression                                                # DeleteExpression
-    | Void singleExpression                                                  # VoidExpression
-    | Typeof singleExpression                                                # TypeofExpression
-    | '++' singleExpression                                                  # PreIncrementExpression
-    | '--' singleExpression                                                  # PreDecreaseExpression
-    | '+' singleExpression                                                   # UnaryPlusExpression
-    | '-' singleExpression                                                   # UnaryMinusExpression
-    | '~' singleExpression                                                   # BitNotExpression
-    | '!' singleExpression                                                   # NotExpression
-    | <assoc=right> singleExpression '**' singleExpression                   # PowerExpression
-    | singleExpression ('*' | '/' | '%') singleExpression                    # MultiplicativeExpression
-    | singleExpression ('+' | '-') singleExpression                          # AdditiveExpression
-    | singleExpression '??' singleExpression                                 # CoalesceExpression
-    | singleExpression ('<<' | '>>' | '>>>') singleExpression                # BitShiftExpression
-    | singleExpression ('<' | '>' | '<=' | '>=') singleExpression            # RelationalExpression
-    | singleExpression Instanceof singleExpression                           # InstanceofExpression
-    | singleExpression In singleExpression                                   # InExpression
-    | singleExpression ('==' | '!=' | '===' | '!==') singleExpression        # EqualityExpression
-    | singleExpression '&' singleExpression                                  # BitAndExpression
-    | singleExpression '^' singleExpression                                  # BitXOrExpression
-    | singleExpression '|' singleExpression                                  # BitOrExpression
-    | singleExpression '&&' singleExpression                                 # LogicalAndExpression
-    | singleExpression '||' singleExpression                                 # LogicalOrExpression
-    | singleExpression '?' singleExpression ':' singleExpression             # TernaryExpression
-    | <assoc=right> singleExpression '=' singleExpression                    # AssignmentExpression
-    | <assoc=right> singleExpression assignmentOperator singleExpression     # AssignmentOperatorExpression
-    | singleExpression TemplateStringLiteral                                 # TemplateStringExpression  // ECMAScript 6
-    | yieldStatement                                                         # YieldExpression // ECMAScript 6
-    | This                                                                   # ThisExpression
-    | Identifier                                                             # IdentifierExpression
-    | Super                                                                  # SuperExpression
-    | literal                                                                # LiteralExpression
-    | arrayLiteral                                                           # ArrayLiteralExpression
-    | objectLiteral                                                          # ObjectLiteralExpression
-    | '(' expressionSequence ')'                                             # ParenthesizedExpression
-    | Await singleExpression                                                 # AwaitExpression
+    : anoymousFunction                                                      # FunctionExpression
+    | Class Identifier? classTail                                           # ClassExpression
+    | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
+    | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
+    | singleExpression arguments                                            # ArgumentsExpression
+    | New singleExpression arguments?                                       # NewExpression
+    | New '.' Identifier                                                    # MetaExpression // new.target
+    | singleExpression {this.notLineTerminator()}? '++'                     # PostIncrementExpression
+    | singleExpression {this.notLineTerminator()}? '--'                     # PostDecreaseExpression
+    | Delete singleExpression                                               # DeleteExpression
+    | Void singleExpression                                                 # VoidExpression
+    | Typeof singleExpression                                               # TypeofExpression
+    | '++' singleExpression                                                 # PreIncrementExpression
+    | '--' singleExpression                                                 # PreDecreaseExpression
+    | '+' singleExpression                                                  # UnaryPlusExpression
+    | '-' singleExpression                                                  # UnaryMinusExpression
+    | '~' singleExpression                                                  # BitNotExpression
+    | '!' singleExpression                                                  # NotExpression
+    | <assoc=right> singleExpression '**' singleExpression                  # PowerExpression
+    | singleExpression ('*' | '/' | '%') singleExpression                   # MultiplicativeExpression
+    | singleExpression ('+' | '-') singleExpression                         # AdditiveExpression
+    | singleExpression '??' singleExpression                                # CoalesceExpression
+    | singleExpression ('<<' | '>>' | '>>>') singleExpression               # BitShiftExpression
+    | singleExpression ('<' | '>' | '<=' | '>=') singleExpression           # RelationalExpression
+    | singleExpression Instanceof singleExpression                          # InstanceofExpression
+    | singleExpression In singleExpression                                  # InExpression
+    | singleExpression ('==' | '!=' | '===' | '!==') singleExpression       # EqualityExpression
+    | singleExpression '&' singleExpression                                 # BitAndExpression
+    | singleExpression '^' singleExpression                                 # BitXOrExpression
+    | singleExpression '|' singleExpression                                 # BitOrExpression
+    | singleExpression '&&' singleExpression                                # LogicalAndExpression
+    | singleExpression '||' singleExpression                                # LogicalOrExpression
+    | singleExpression '?' singleExpression ':' singleExpression            # TernaryExpression
+    | <assoc=right> singleExpression '=' singleExpression                   # AssignmentExpression
+    | <assoc=right> singleExpression assignmentOperator singleExpression    # AssignmentOperatorExpression
+    | singleExpression TemplateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
+    | yieldStatement                                                        # YieldExpression // ECMAScript 6
+    | This                                                                  # ThisExpression
+    | Identifier                                                            # IdentifierExpression
+    | Super                                                                 # SuperExpression
+    | literal                                                               # LiteralExpression
+    | arrayLiteral                                                          # ArrayLiteralExpression
+    | objectLiteral                                                         # ObjectLiteralExpression
+    | '(' expressionSequence ')'                                            # ParenthesizedExpression
+    | Await singleExpression                                                # AwaitExpression
     ;
 
 anoymousFunction
-    : functionDeclaration
-    | Async? Function '*'? '(' formalParameterList? ')' '{' functionBody '}'
-    | Async? arrowFunctionParameters '=>' arrowFunctionBody
+    : functionDeclaration                                                       # FunctionDecl
+    | Async? Function '*'? '(' formalParameterList? ')' '{' functionBody '}'    # AnoymousFunctionDecl
+    | Async? arrowFunctionParameters '=>' arrowFunctionBody                     # ArrowFunction
     ;
 
 arrowFunctionParameters
@@ -384,6 +363,7 @@ assignmentOperator
     | '&='
     | '^='
     | '|='
+    | '**='
     ;
 
 literal

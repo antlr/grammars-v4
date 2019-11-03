@@ -89,6 +89,7 @@ RightShiftLogicalAssign:        '>>>=';
 BitAndAssign:                   '&=';
 BitXorAssign:                   '^=';
 BitOrAssign:                    '|=';
+PowerAssign:                    '**=';
 ARROW:                          '=>';
 
 /// Null Literals
@@ -179,7 +180,7 @@ Yield:                          'yield' {this.IsStrictMode()}?;
 /// Identifier Names and Identifiers
 
 Identifier:                     IdentifierStart IdentifierPart*;
-
+Of:                             'of';
 /// String Literals
 StringLiteral:                 ('"' DoubleStringCharacter* '"'
              |                  '\'' SingleStringCharacter* '\'') {this.ProcessStringLiteral();}
