@@ -1,3 +1,5 @@
+package PlSqlParseTree;
+
 import org.antlr.v4.runtime.*;
 
 public abstract class PlSqlParserBase extends Parser

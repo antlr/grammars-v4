@@ -1,15 +1,18 @@
 using Antlr4.Runtime;
 
-public abstract class PlSqlLexerBase : Lexer
+namespace PlSqlParseTree
 {
-    public PlSqlLexerBase(ICharStream input)
-        : base(input)
+    public abstract class PlSqlLexerBase : Lexer
     {
-    }
+        public PlSqlLexerBase(ICharStream input)
+            : base(input)
+        {
+        }
 
-    protected bool IsNewlineAtPos(int pos)
-    {
-        int la = _input.La(pos);
-        return la == -1 || la == '\n';
+        protected bool IsNewlineAtPos(int pos)
+        {
+            int la = _input.La(pos);
+            return la == -1 || la == '\n';
+        }
     }
 }
