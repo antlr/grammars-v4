@@ -1,4 +1,4 @@
-package parser
+package GoParseTree
 
 import (
 	"strings"
@@ -6,8 +6,8 @@ import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
-// GoBaseParser implementation.
-type GoBaseParser struct {
+// GoParserBase implementation.
+type GoParserBase struct {
 	*antlr.BaseParser
 }
 
@@ -15,7 +15,7 @@ type GoBaseParser struct {
 // token stream a token exists on the Hidden channel which
 // either is a line terminator, or is a multi line comment that
 // contains a line terminator.
-func (p *GoBaseParser) lineTerminatorAhead() bool {
+func (p *GoParserBase) lineTerminatorAhead() bool {
 	// Get the token ahead of the current index.
 	possibleIndexEosToken := p.GetCurrentToken().GetTokenIndex() - 1
 	ahead := p.GetTokenStream().Get(possibleIndexEosToken)
@@ -25,12 +25,12 @@ func (p *GoBaseParser) lineTerminatorAhead() bool {
 		return true
 	}
 
-	if ahead.GetTokenType() == GolangParserTERMINATOR {
+	if ahead.GetTokenType() == GoParserTERMINATOR {
 		// There is definitely a line terminator ahead.
 		return true
 	}
 
-	if ahead.GetTokenType() == GolangParserWS {
+	if ahead.GetTokenType() == GoParserWS {
 		// Get the token ahead of the current whitespaces.
 		possibleIndexEosToken = p.GetCurrentToken().GetTokenIndex() - 2
 		ahead = p.GetTokenStream().Get(possibleIndexEosToken)
@@ -41,11 +41,11 @@ func (p *GoBaseParser) lineTerminatorAhead() bool {
 	_type := ahead.GetTokenType()
 
 	// Check if the token is, or contains a line terminator.
-	return (_type == GolangParserCOMMENT && (strings.Contains(text, "\r") || strings.Contains(text, "\n"))) ||
-		(_type == GolangParserTERMINATOR)
+	return (_type == GoParserCOMMENT && (strings.Contains(text, "\r") || strings.Contains(text, "\n"))) ||
+		(_type == GoParserTERMINATOR)
 }
 
-func (p *GoBaseParser) noTerminatorBetween(tokenOffset int) bool {
+func (p *GoParserBase) noTerminatorBetween(tokenOffset int) bool {
 	var s antlr.TokenStream
 	s = p.GetTokenStream()
 	stream := s.(*antlr.CommonTokenStream)
@@ -62,19 +62,19 @@ func (p *GoBaseParser) noTerminatorBetween(tokenOffset int) bool {
 	return true
 }
 
-func (p *GoBaseParser) noTerminatorAfterParams(tokenOffset int) bool {
+func (p *GoParserBase) noTerminatorAfterParams(tokenOffset int) bool {
 	stream := p.GetTokenStream()
 	leftParams := 1
 	rightParams := 0
-	var value string
+	var tokenType int
 
-	if stream.LT(tokenOffset).GetText() == "(" {
+	if stream.LT(tokenOffset).GetTokenType() == GoParserL_PAREN {
 		for leftParams != rightParams {
 			tokenOffset++
-			value = stream.LT(tokenOffset).GetText()
-			if value == "(" {
+			tokenType = stream.LT(tokenOffset).GetTokenType()
+			if tokenType == GoParserL_PAREN {
 				leftParams++
-			} else if value == ")" {
+			} else if tokenType == GoParserR_PAREN {
 				rightParams++
 			}
 		}
@@ -84,7 +84,7 @@ func (p *GoBaseParser) noTerminatorAfterParams(tokenOffset int) bool {
 	return true
 }
 
-func (p *GoBaseParser) closeBrace() bool {
+func (p *GoParserBase) checkPreviousTokenText(text string) bool {
 	stream := p.GetTokenStream()
-	return stream.LT(1).GetText() == "}"
+	return stream.LT(1).GetText() == text
 }
