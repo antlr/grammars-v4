@@ -211,13 +211,13 @@ classTail
 classElement
     : (Static | {this.n("static")}? Identifier | Async)* methodDefinition
     | emptyStatement
+    | '#'? propertyName '=' singleExpression
     ;
 
 methodDefinition
-    : '*'? propertyName '(' formalParameterList? ')' '{' functionBody '}'
-    | '*'? getter '(' ')' '{' functionBody '}'
-    | '*'? setter '(' formalParameterList? ')' '{' functionBody '}'
-    //| generatorMethod
+    : '*'? '#'? propertyName '(' formalParameterList? ')' '{' functionBody '}'
+    | '*'? '#'? getter '(' ')' '{' functionBody '}'
+    | '*'? '#'? setter '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 /*generatorMethod
@@ -313,7 +313,7 @@ singleExpression
     : anoymousFunction /*Async? Function '*'? Identifier? '(' formalParameterList? ')' '{' functionBody '}' */   # FunctionExpression
     | Class Identifier? classTail                                            # ClassExpression
     | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
-    | singleExpression '.' identifierName                                    # MemberDotExpression
+    | singleExpression '?'? '.' '#'? identifierName                          # MemberDotExpression
     | singleExpression arguments                                             # ArgumentsExpression
     | New singleExpression arguments?                                        # NewExpression
     | singleExpression {this.notLineTerminator()}? '++'                      # PostIncrementExpression
@@ -330,6 +330,7 @@ singleExpression
     | <assoc=right> singleExpression '**' singleExpression                   # PowerExpression
     | singleExpression ('*' | '/' | '%') singleExpression                    # MultiplicativeExpression
     | singleExpression ('+' | '-') singleExpression                          # AdditiveExpression
+    | singleExpression '??' singleExpression                                 # CoalesceExpression
     | singleExpression ('<<' | '>>' | '>>>') singleExpression                # BitShiftExpression
     | singleExpression ('<' | '>' | '<=' | '>=') singleExpression            # RelationalExpression
     | singleExpression Instanceof singleExpression                           # InstanceofExpression
@@ -344,7 +345,6 @@ singleExpression
     | <assoc=right> singleExpression '=' singleExpression                    # AssignmentExpression
     | <assoc=right> singleExpression assignmentOperator singleExpression     # AssignmentOperatorExpression
     | singleExpression TemplateStringLiteral                                 # TemplateStringExpression  // ECMAScript 6
-    //| generatorFunctionDeclaration                                           # GeneratorsFunctionExpression // ECMAScript 6
     | yieldStatement                                                         # YieldExpression // ECMAScript 6
     | This                                                                   # ThisExpression
     | Identifier                                                             # IdentifierExpression
@@ -352,10 +352,7 @@ singleExpression
     | literal                                                                # LiteralExpression
     | arrayLiteral                                                           # ArrayLiteralExpression
     | objectLiteral                                                          # ObjectLiteralExpression
-    //| iteratorBlock                                                          # IteratorsExpression // ECMAScript 6
-    //    | generatorBlock                                                         # GeneratorsExpression // ECMAScript 6
-        | '(' expressionSequence ')'                                             # ParenthesizedExpression
-    //| Async? arrowFunctionParameters '=>' arrowFunctionBody                  # ArrowFunctionExpression   // ECMAScript 6
+    | '(' expressionSequence ')'                                             # ParenthesizedExpression
     | Await singleExpression                                                 # AwaitExpression
     ;
 

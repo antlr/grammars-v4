@@ -60,6 +60,8 @@ Multiply:                       '*';
 Divide:                         '/';
 Modulus:                        '%';
 Power:                          '**';
+NullCoalesce:                   '??';
+Hashtag:                        '#';
 RightShiftArithmetic:           '>>';
 LeftShiftArithmetic:            '<<';
 RightShiftLogical:              '>>>';
