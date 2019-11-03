@@ -1,11 +1,11 @@
 using Antlr4.Runtime;
 
-public abstract class PlSqlBaseParser : Parser
+public abstract class PlSqlParserBase : Parser
 {
     private bool _isVersion10 = false;
     private bool _isVersion12 = true;
 
-    protected PlSqlBaseParser(ITokenStream input)
+    protected PlSqlParserBase(ITokenStream input)
         : base(input)
     {
     }

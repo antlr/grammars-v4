@@ -22,11 +22,11 @@ parser grammar PlSqlParser;
 
 options {
     tokenVocab=PlSqlLexer;
-    superClass=PlSqlBaseParser;
+    superClass=PlSqlParserBase;
 }
 
 @parser::postinclude {
-#include <PlSqlBaseParser.h>
+#include <PlSqlParserBase.h>
 }
 
 sql_script

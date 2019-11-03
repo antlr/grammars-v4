@@ -1,8 +1,8 @@
 using Antlr4.Runtime;
 
-public abstract class PlSqlBaseLexer : Lexer
+public abstract class PlSqlLexerBase : Lexer
 {
-    public PlSqlBaseLexer(ICharStream input)
+    public PlSqlLexerBase(ICharStream input)
         : base(input)
     {
     }

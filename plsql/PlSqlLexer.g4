@@ -21,11 +21,11 @@
 lexer grammar PlSqlLexer;
 
 options {
-    superClass=PlSqlBaseLexer;
+    superClass=PlSqlLexerBase;
 }
 
 @lexer::postinclude {
-#include <PlSqlBaseLexer.h>
+#include <PlSqlLexerBase.h>
 }
 
 ABORT:                        'ABORT';

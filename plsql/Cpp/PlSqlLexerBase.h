@@ -1,12 +1,12 @@
-#ifndef PLSQLBASELEXER_H
-#define PLSQLBASELEXER_H
+#ifndef PLSQLLEXERBASE_H
+#define PLSQLLEXERBASE_H
 
 #include "antlr4-runtime.h"
 
-class PlSqlBaseLexer : public antlr4::Lexer
+class PlSqlLexerBase : public antlr4::Lexer
 {
 public:
-  PlSqlBaseLexer(antlr4::CharStream *input) : Lexer(input) {}
+  PlSqlLexerBase(antlr4::CharStream *input) : Lexer(input) {}
 
 protected:
   bool IsNewlineAtPos(int pos)
