@@ -41,7 +41,6 @@ options {
 }
 
 sourceFile
-//    : packageClause eos (importDecl eos)* (topLevelDecl eos)*
     : packageClause eos (importDecl eos)* ((functionDecl | methodDecl | declaration) eos)*
     ;
 
@@ -60,13 +59,6 @@ importSpec
 importPath
     : string_
     ;
-
-/*topLevelDecl
-    : declaration
-    | functionDecl
-    | methodDecl
-    ;
-*/
 
 declaration
     : constDecl
@@ -103,11 +95,7 @@ typeSpec
 functionDecl
     : 'func' IDENTIFIER (signature block?)
     ;
-/*
-function
-    : signature block
-    ;
-*/
+
 methodDecl
     : 'func' receiver IDENTIFIER (signature block?)
     ;
@@ -369,11 +357,6 @@ result
 parameters
     : '(' (parameterDecl (COMMA parameterDecl)* COMMA?)? ')'
     ;
-
-/*parameterList
-    : parameterDecl (COMMA parameterDecl)*
-    ;
-*/
 
 parameterDecl
     : identifierList? '...'? type_

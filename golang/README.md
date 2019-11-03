@@ -19,7 +19,7 @@ An ANTLR4 grammar for Golang based on [The Go Programming Language Specification
     * Fixes and refactoring
 * Dmitry Rassadin, flipparassa@gmail.com, Positive Technologies, 2019:
     * Samples set
-    * Bug fixes
+    * Fixes and refactoring
 
 ## License
 
