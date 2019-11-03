@@ -3704,7 +3704,8 @@ cursor_expression
 
 logical_expression
     : unary_logical_expression
-    | logical_expression op=(AND | OR) logical_expression
+    | logical_expression AND logical_expression
+    | logical_expression OR logical_expression
     ;
 
 unary_logical_expression
