@@ -1,3 +1,38 @@
+/*
+ [The "BSD licence"]
+ Copyright (c) 2017 Sasa Coh, Michał Błotniak
+ Copyright (c) 2019 Ivan Kochurkin, kvanttt@gmail.com, Positive Technologies
+ Copyright (c) 2019 Dmitry Rassadin, flipparassa@gmail.com, Positive Technologies
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/*
+ * A Go grammar for ANTLR 4 derived from the Go Language Specification
+ * https://golang.org/ref/spec
+ */
+ 
 parser grammar GoParser;
 
 options {
@@ -23,7 +58,7 @@ importSpec
     ;
 
 importPath
-    : string
+    : string_
     ;
 
 /*topLevelDecl
@@ -44,7 +79,7 @@ constDecl
     ;
 
 constSpec
-    : identifierList (type? '=' expressionList)?
+    : identifierList (type_? '=' expressionList)?
     ;
 
 identifierList
@@ -60,7 +95,7 @@ typeDecl
     ;
 
 typeSpec
-    : IDENTIFIER ASSIGN? type
+    : IDENTIFIER ASSIGN? type_
     ;
 
 // Function declarations
@@ -86,7 +121,7 @@ varDecl
     ;
 
 varSpec
-    : identifierList (type ('=' expressionList)? | '=' expressionList)
+    : identifierList (type_ ('=' expressionList)? | '=' expressionList)
     ;
 
 block
@@ -220,7 +255,7 @@ typeSwitchCase
     ;
 
 typeList
-    : (type | NIL_LIT) (',' (type | NIL_LIT))*
+    : (type_ | NIL_LIT) (',' (type_ | NIL_LIT))*
     ;
 
 selectStmt
@@ -256,10 +291,10 @@ goStmt
     : 'go' expression
     ;
 
-type
+type_
     : typeName
     | typeLit
-    | '(' type ')'
+    | '(' type_ ')'
     ;
 
 typeName
@@ -287,11 +322,11 @@ arrayLength
     ;
 
 elementType
-    : type
+    : type_
     ;
 
 pointerType
-    : '*' type
+    : '*' type_
     ;
 
 interfaceType
@@ -304,7 +339,7 @@ sliceType
 
 // It's possible to replace `type` with more restricted typeLit list and also pay attention to nil maps
 mapType
-    : 'map' '[' type ']' elementType
+    : 'map' '[' type_ ']' elementType
     ;
 
 channelType
@@ -328,7 +363,7 @@ signature
 
 result
     : parameters
-    | type
+    | type_
     ;
 
 parameters
@@ -341,7 +376,7 @@ parameters
 */
 
 parameterDecl
-    : identifierList? '...'? type
+    : identifierList? '...'? type_
     ;
 
 expression
@@ -370,7 +405,7 @@ unaryExpr
     ;
 
 conversion
-    : type '(' expression ','? ')'
+    : type_ '(' expression ','? ')'
     ;
 
 operand
@@ -389,7 +424,7 @@ literal
 basicLit
     : NIL_LIT
     | integer
-    | string
+    | string_
     | FLOAT_LIT
     | IMAGINARY_LIT
     | RUNE_LIT
@@ -453,10 +488,10 @@ structType
     ;
 
 fieldDecl
-    : ({noTerminatorBetween(2)}? identifierList type | anonymousField) string?
+    : ({noTerminatorBetween(2)}? identifierList type_ | anonymousField) string_?
     ;
 
-string
+string_
     : RAW_STRING_LIT
     | INTERPRETED_STRING_LIT
     ;
@@ -478,11 +513,11 @@ slice
     ;
 
 typeAssertion
-    : '.' '(' type ')'
+    : '.' '(' type_ ')'
     ;
 
 arguments
-    : '(' ((expressionList | type (',' expressionList)?) '...'? ','?)? ')'
+    : '(' ((expressionList | type_ (',' expressionList)?) '...'? ','?)? ')'
     ;
 
 methodExpr
