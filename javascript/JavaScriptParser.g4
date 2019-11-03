@@ -63,7 +63,7 @@ statement
     | tryStatement
     | debuggerStatement
     | functionDeclaration
-    | generatorFunctionDeclaration
+    //| generatorFunctionDeclaration
     ;
 
 block
@@ -76,6 +76,7 @@ statementList
 
 importStatement
     : Import fromBlock
+    | Import '(' singleExpression ')'
     ;
 
 fromBlock
@@ -121,8 +122,8 @@ iterationStatement
     | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement                 # ForStatement
     | For '(' varModifier variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')'
           statement                                                                                             # ForVarStatement
-    | For '(' singleExpression (In | Identifier{this.p("of")}?) expressionSequence ')' statement                # ForInStatement
-    | For '(' varModifier variableDeclaration (In | Identifier{this.p("of")}?) expressionSequence ')' statement # ForVarInStatement
+    | For Await? '(' singleExpression (In | Identifier{this.p("of")}?) expressionSequence ')' statement                # ForInStatement
+    | For Await? '(' varModifier variableDeclaration (In | Identifier{this.p("of")}?) expressionSequence ')' statement # ForVarInStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
@@ -184,7 +185,7 @@ tryStatement
     ;
 
 catchProduction
-    : Catch '(' Identifier ')' block
+    : Catch ('(' Identifier? ')')? block
     ;
 
 finallyProduction
@@ -196,7 +197,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Function Identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : Async? Function '*'? Identifier '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 classDeclaration
@@ -208,25 +209,25 @@ classTail
     ;
 
 classElement
-    : (Static | {this.n("static")}? Identifier)? methodDefinition
+    : (Static | {this.n("static")}? Identifier | Async)* methodDefinition
     | emptyStatement
     ;
 
 methodDefinition
-    : propertyName '(' formalParameterList? ')' '{' functionBody '}'
-    | getter '(' ')' '{' functionBody '}'
-    | setter '(' formalParameterList? ')' '{' functionBody '}'
-    | generatorMethod
+    : '*'? propertyName '(' formalParameterList? ')' '{' functionBody '}'
+    | '*'? getter '(' ')' '{' functionBody '}'
+    | '*'? setter '(' formalParameterList? ')' '{' functionBody '}'
+    //| generatorMethod
     ;
 
-generatorMethod
+/*generatorMethod
     : '*'?  Identifier '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 generatorFunctionDeclaration
     : Function '*' Identifier? '(' formalParameterList? ')' '{' functionBody '}'
-    ;
-
+    ;*/
+/*
 generatorBlock
     : '{' (generatorDefinition (',' generatorDefinition)*)? ','? '}'
     ;
@@ -242,20 +243,18 @@ iteratorBlock
 iteratorDefinition
     : '[' singleExpression ']' '(' formalParameterList? ')' '{' functionBody '}'
     ;
-
+*/
 formalParameterList
     : formalParameterArg (',' formalParameterArg)* (',' lastFormalParameterArg)?
     | lastFormalParameterArg
-    | arrayLiteral                            // ECMAScript 6: Parameter Context Matching
-    | objectLiteral                           // ECMAScript 6: Parameter Context Matching
     ;
 
 formalParameterArg
-    : Identifier ('=' singleExpression)?      // ECMAScript 6: Initialization
+    : (Identifier | arrayLiteral | objectLiteral) ('=' singleExpression)?      // ECMAScript 6: Initialization
     ;
 
 lastFormalParameterArg                        // ECMAScript 6: Rest Parameter
-    : Ellipsis Identifier
+    : Ellipsis (Identifier | singleExpression)
     ;
 
 functionBody
@@ -267,16 +266,15 @@ sourceElements
     ;
 
 arrayLiteral
-    : ('[' elementList? ']')
+    : ('[' elementList ']')
     ;
 
 elementList
-    : singleExpression (','+ singleExpression)* (','+ lastElement)?
-    | lastElement
+    : ','* arrayElement? (','+ arrayElement)* ','* // Yes, everything is optional
     ;
 
-lastElement                      // ECMAScript 6: Spread Operator
-    : Ellipsis (Identifier | singleExpression)
+arrayElement
+    : Ellipsis? (Identifier | singleExpression)
     ;
 
 objectLiteral
@@ -286,27 +284,25 @@ objectLiteral
 propertyAssignment
     : propertyName (':' |'=') singleExpression       # PropertyExpressionAssignment
     | '[' singleExpression ']' ':' singleExpression  # ComputedPropertyExpressionAssignment
-    | getter '(' ')' '{' functionBody '}'            # PropertyGetter
-    | setter '(' Identifier ')' '{' functionBody '}' # PropertySetter
-    | generatorMethod                                # MethodProperty
-    | Identifier                                     # PropertyShorthand
+    | Async? '*'? propertyName '(' formalParameterList?  ')'  '{' functionBody '}'  # FunctionProperty
+    | getter '(' ')' '{' functionBody '}'                              # PropertyGetter
+    | setter '(' formalParameterArg ')' '{' functionBody '}'                   # PropertySetter
+    | Ellipsis? Identifier                                                                    # PropertyShorthand
     ;
 
 propertyName
     : identifierName
     | StringLiteral
     | numericLiteral
+    | '[' singleExpression ']'
     ;
 
 arguments
-    : '('(
-          singleExpression (',' singleExpression)* (',' lastArgument)? |
-          lastArgument
-       )?')'
+    : '('(argument (',' argument)* ','?)?')'
     ;
 
-lastArgument                                  // ECMAScript 6: Spread Operator
-    : Ellipsis Identifier
+argument
+    : Ellipsis? (singleExpression | Identifier)
     ;
 
 expressionSequence
@@ -314,7 +310,7 @@ expressionSequence
     ;
 
 singleExpression
-    : Function Identifier? '(' formalParameterList? ')' '{' functionBody '}' # FunctionExpression
+    : anoymousFunction /*Async? Function '*'? Identifier? '(' formalParameterList? ')' '{' functionBody '}' */   # FunctionExpression
     | Class Identifier? classTail                                            # ClassExpression
     | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
     | singleExpression '.' identifierName                                    # MemberDotExpression
@@ -331,6 +327,7 @@ singleExpression
     | '-' singleExpression                                                   # UnaryMinusExpression
     | '~' singleExpression                                                   # BitNotExpression
     | '!' singleExpression                                                   # NotExpression
+    | <assoc=right> singleExpression '**' singleExpression                   # PowerExpression
     | singleExpression ('*' | '/' | '%') singleExpression                    # MultiplicativeExpression
     | singleExpression ('+' | '-') singleExpression                          # AdditiveExpression
     | singleExpression ('<<' | '>>' | '>>>') singleExpression                # BitShiftExpression
@@ -347,9 +344,7 @@ singleExpression
     | <assoc=right> singleExpression '=' singleExpression                    # AssignmentExpression
     | <assoc=right> singleExpression assignmentOperator singleExpression     # AssignmentOperatorExpression
     | singleExpression TemplateStringLiteral                                 # TemplateStringExpression  // ECMAScript 6
-    | iteratorBlock                                                          # IteratorsExpression // ECMAScript 6
-    | generatorBlock                                                         # GeneratorsExpression // ECMAScript 6
-    | generatorFunctionDeclaration                                           # GeneratorsFunctionExpression // ECMAScript 6
+    //| generatorFunctionDeclaration                                           # GeneratorsFunctionExpression // ECMAScript 6
     | yieldStatement                                                         # YieldExpression // ECMAScript 6
     | This                                                                   # ThisExpression
     | Identifier                                                             # IdentifierExpression
@@ -357,8 +352,17 @@ singleExpression
     | literal                                                                # LiteralExpression
     | arrayLiteral                                                           # ArrayLiteralExpression
     | objectLiteral                                                          # ObjectLiteralExpression
-    | '(' expressionSequence ')'                                             # ParenthesizedExpression
-    | arrowFunctionParameters '=>' arrowFunctionBody                         # ArrowFunctionExpression   // ECMAScript 6
+    //| iteratorBlock                                                          # IteratorsExpression // ECMAScript 6
+    //    | generatorBlock                                                         # GeneratorsExpression // ECMAScript 6
+        | '(' expressionSequence ')'                                             # ParenthesizedExpression
+    //| Async? arrowFunctionParameters '=>' arrowFunctionBody                  # ArrowFunctionExpression   // ECMAScript 6
+    | Await singleExpression                                                 # AwaitExpression
+    ;
+
+anoymousFunction
+    : functionDeclaration
+    | Async? Function '*'? '(' formalParameterList? ')' '{' functionBody '}'
+    | Async? arrowFunctionParameters '=>' arrowFunctionBody
     ;
 
 arrowFunctionParameters
@@ -392,6 +396,7 @@ literal
     | TemplateStringLiteral
     | RegularExpressionLiteral
     | numericLiteral
+    | bigintLiteral
     ;
 
 numericLiteral
@@ -400,6 +405,13 @@ numericLiteral
     | OctalIntegerLiteral
     | OctalIntegerLiteral2
     | BinaryIntegerLiteral
+    ;
+
+bigintLiteral
+    : BigDecimalIntegerLiteral
+    | BigHexIntegerLiteral
+    | BigOctalIntegerLiteral
+    | BigBinaryIntegerLiteral
     ;
 
 identifierName
@@ -457,14 +469,16 @@ keyword
     | Protected
     | Static
     | Yield
+    | Async
+    | Await
     ;
 
 getter
-    : Identifier{this.p("get")}? propertyName
+    : Identifier {this.p("get")}? propertyName
     ;
 
 setter
-    : Identifier{this.p("set")}? propertyName
+    : Identifier {this.p("set")}? propertyName
     ;
 
 eos

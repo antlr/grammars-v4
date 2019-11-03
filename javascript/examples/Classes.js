@@ -182,3 +182,11 @@ class B {
     set [runtimeCalc](p) {};
     get 'string as key'() {};
 }
+// extended object
+let Obj = {
+  [asdfg](a){},
+  * foo () {},
+  f(){},
+  get a(){},
+  set a([aa]=123){}
+}

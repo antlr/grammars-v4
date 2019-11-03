@@ -2,7 +2,7 @@ var e\u0065e;
 var e\u{0065}e; // var eee;
 
 var Π;
-var 全世界无产者联合起来;
+// var 全世界无产者联合起来; //UTF8
 var \u4e00;
 
 0b0n;
@@ -31,3 +31,10 @@ const {a, ...c} = obj;
 const obj2 = { ...obj1, z: 26 ,...obj2};
 const [aa,b,...ca] = aarr;
 const v = [asdf,...gh,jk];
+var f = [,,c,...a,b,,];
+var g = [,,]; // [undefined,undefined]
+
+function f([asdfg]=12345){}
+/* TODO:
+function async (proc, ...params) {}
+var async = 1;*/
