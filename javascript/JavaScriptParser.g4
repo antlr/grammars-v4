@@ -63,7 +63,6 @@ statement
     | tryStatement
     | debuggerStatement
     | functionDeclaration
-    //| generatorFunctionDeclaration
     ;
 
 block
@@ -119,13 +118,14 @@ ifStatement
 
 
 iterationStatement
-    : Do statement While '(' expressionSequence ')' eos                                                         # DoStatement
-    | While '(' expressionSequence ')' statement                                                                # WhileStatement
-    | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement                 # ForStatement
+    : Do statement While '(' expressionSequence ')' eos                                                                 # DoStatement
+    | While '(' expressionSequence ')' statement                                                                        # WhileStatement
+    | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement                         # ForStatement
     | For '(' varModifier variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')'
-          statement                                                                                             # ForVarStatement
-    | For Await? '(' singleExpression (In | Of ) expressionSequence ')' statement                # ForInStatement
-    | For Await? '(' varModifier variableDeclaration (In | Of ) expressionSequence ')' statement # ForVarInStatement
+          statement                                                                                                     # ForVarStatement
+    // strange, 'of' is an identifier. and this.p("of") not work in sometime.
+    | For Await? '(' singleExpression (In | Identifier{this.p("of")}? ) expressionSequence ')' statement                # ForInStatement
+    | For Await? '(' varModifier variableDeclaration (In | Identifier{this.p("of")}?) expressionSequence ')' statement  # ForVarInStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
