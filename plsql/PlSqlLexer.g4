@@ -2,7 +2,7 @@
  * Oracle(c) PL/SQL 11g Parser
  *
  * Copyright (c) 2009-2011 Alexandre Porcelli <alexandre.porcelli@gmail.com>
- * Copyright (c) 2015-2017 Ivan Kochurkin (KvanTTT, kvanttt@gmail.com, Positive Technologies).
+ * Copyright (c) 2015-2019 Ivan Kochurkin (KvanTTT, kvanttt@gmail.com, Positive Technologies).
  * Copyright (c) 2017 Mark Adams <madams51703@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,11 +21,11 @@
 lexer grammar PlSqlLexer;
 
 options {
-    superClass=PlSqlBaseLexer;
+    superClass=PlSqlLexerBase;
 }
 
 @lexer::postinclude {
-#include <PlSqlBaseLexer.h>
+#include <PlSqlLexerBase.h>
 }
 
 ABORT:                        'ABORT';
@@ -2260,7 +2260,7 @@ DOUBLE_PERIOD:  '..';
 PERIOD:         '.';
 
 //{ Rule #238 <EXACT_NUM_LIT>
-//  This rule is a bit tricky - it resolves the ambiguity with <PERIOD> 
+//  This rule is a bit tricky - it resolves the ambiguity with <PERIOD>
 //  It also incorporates <mantisa> and <exponent> for the <APPROXIMATE_NUM_LIT>
 //  Rule #501 <signed_integer> was incorporated directly in the token <APPROXIMATE_NUM_LIT>
 //  See also the rule #617 <unsigned_num_lit>
@@ -2282,14 +2282,17 @@ APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT ('E' ('+'|'-')? (FLOAT_FRAGMENT | [0-9]+))? 
 // and a superfluous subtoken typecasting of the "QUOTE"
 CHAR_STRING: '\''  (~('\'' | '\r' | '\n') | '\'' '\'' | NEWLINE)* '\'';
 
-// Perl-style quoted string, see Oracle SQL reference, chapter String Literals
-CHAR_STRING_PERL    : 'Q' ( QS_ANGLE | QS_BRACE | QS_BRACK | QS_PAREN) -> type(CHAR_STRING);
-fragment QUOTE      : '\'' ;
-fragment QS_ANGLE   : QUOTE '<' .*? '>' QUOTE ;
-fragment QS_BRACE   : QUOTE '{' .*? '}' QUOTE ;
-fragment QS_BRACK   : QUOTE '[' .*? ']' QUOTE ;
-fragment QS_PAREN   : QUOTE '(' .*? ')' QUOTE ;
-fragment QS_OTHER_CH: ~('<' | '{' | '[' | '(' | ' ' | '\t' | '\n' | '\r');
+// See https://livesql.oracle.com/apex/livesql/file/content_CIREYU9EA54EOKQ7LAMZKRF6P.html
+// TODO: context sensitive string quotes (any characted after quote)
+CHAR_STRING_PERL    : 'Q' '\'' (QS_ANGLE | QS_BRACE | QS_BRACK | QS_PAREN | QS_EXCLAM | QS_SHARP | QS_QUOTE | QS_DQUOTE) '\'' -> type(CHAR_STRING);
+fragment QS_ANGLE   : '<' .*? '>';
+fragment QS_BRACE   : '{' .*? '}';
+fragment QS_BRACK   : '[' .*? ']';
+fragment QS_PAREN   : '(' .*? ')';
+fragment QS_EXCLAM  : '!' .*? '!';
+fragment QS_SHARP   : '#' .*? '#';
+fragment QS_QUOTE   : '\'' .*? '\'';
+fragment QS_DQUOTE  : '"' .*? '"';
 
 DELIMITED_ID: '"' (~('"' | '\r' | '\n') | '"' '"')+ '"' ;
 

@@ -1,15 +1,15 @@
-#ifndef PLSQLBASEPARSER_H
-#define PLSQLBASEPARSER_H
+#ifndef PLSQLPARSERBASE_H
+#define PLSQLPARSERBASE_H
 
 #include "antlr4-runtime.h"
 
-class PlSqlBaseParser : public antlr4::Parser
+class PlSqlParserBase : public antlr4::Parser
 {
     bool _isVersion12 = true;
     bool _isVersion10 = true;
 
   public:
-    PlSqlBaseParser(antlr4::TokenStream *input) : Parser(input) {}
+    PlSqlParserBase(antlr4::TokenStream *input) : Parser(input) {}
 
     bool isVersion12()
     {

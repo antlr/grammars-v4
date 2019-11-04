@@ -2,7 +2,7 @@
  * Oracle(c) PL/SQL 11g Parser
  *
  * Copyright (c) 2009-2011 Alexandre Porcelli <alexandre.porcelli@gmail.com>
- * Copyright (c) 2015-2017 Ivan Kochurkin (KvanTTT, kvanttt@gmail.com, Positive Technologies).
+ * Copyright (c) 2015-2019 Ivan Kochurkin (KvanTTT, kvanttt@gmail.com, Positive Technologies).
  * Copyright (c) 2017-2018 Mark Adams <madams51703@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,11 +22,11 @@ parser grammar PlSqlParser;
 
 options {
     tokenVocab=PlSqlLexer;
-    superClass=PlSqlBaseParser;
+    superClass=PlSqlParserBase;
 }
 
 @parser::postinclude {
-#include <PlSqlBaseParser.h>
+#include <PlSqlParserBase.h>
 }
 
 sql_script
@@ -487,7 +487,7 @@ overriding_subprogram_spec
 
 overriding_function_spec
     : FUNCTION function_name ('(' type_elements_parameter (',' type_elements_parameter)* ')')?
-      RETURN (type_spec | SELF AS RESULT) 
+      RETURN (type_spec | SELF AS RESULT)
      (PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body))? ';'?
     ;
 
@@ -539,12 +539,12 @@ alter_session
         | CLOSE DATABASE LINK parameter_name
         | enable_or_disable COMMIT IN PROCEDURE
         | enable_or_disable GUARD
-        | (enable_or_disable | FORCE) PARALLEL (DML | DDL | QUERY) (PARALLEL (literal | parameter_name))? 
-        | SET alter_session_set_clause 
+        | (enable_or_disable | FORCE) PARALLEL (DML | DDL | QUERY) (PARALLEL (literal | parameter_name))?
+        | SET alter_session_set_clause
     )
     ;
 
-alter_session_set_clause 
+alter_session_set_clause
     : parameter_name '=' parameter_value
     ;
 
@@ -2461,7 +2461,7 @@ filename
 
 alter_table
     : ALTER TABLE tableview_name
-      ( 
+      (
       | alter_table_properties
       | constraint_clauses
       | column_clauses
@@ -3330,7 +3330,7 @@ table_ref_aux
     ;
 
 table_ref_aux_internal
-    : dml_table_expression_clause (pivot_clause | unpivot_clause)?                # table_ref_aux_internal_one
+    : dml_table_expression_clause (pivot_clause | unpivot_clause)?                 # table_ref_aux_internal_one
     | '(' table_ref subquery_operation_part* ')' (pivot_clause | unpivot_clause)?  # table_ref_aux_internal_two
     | ONLY '(' dml_table_expression_clause ')'                                     # table_ref_aux_internal_three
     ;
@@ -3668,7 +3668,7 @@ dml_table_expression_clause
     ;
 
 table_collection_expression
-    : (TABLE | THE) ('(' subquery ')' | '(' expression ')' ('(' '+' ')')?)
+    : (TABLE | THE) ('(' subquery ')' | '(' expression ')' outer_join_sign?)
     ;
 
 subquery_restriction_clause
@@ -3703,12 +3703,20 @@ cursor_expression
     ;
 
 logical_expression
-    : multiset_expression (IS NOT?
-        (NULL_ | NAN | PRESENT | INFINITE | A_LETTER SET | EMPTY | OF TYPE?
-        '(' ONLY? type_spec (',' type_spec)* ')'))*
-    | NOT logical_expression
+    : unary_logical_expression
     | logical_expression AND logical_expression
     | logical_expression OR logical_expression
+    ;
+
+unary_logical_expression
+    : NOT? multiset_expression (IS NOT? logical_operation)*
+    ;
+
+logical_operation:
+        (NULL_
+        | NAN | PRESENT
+        | INFINITE | A_LETTER SET | EMPTY
+        | OF TYPE? '(' ONLY? type_spec (',' type_spec)* ')')
     ;
 
 multiset_expression
@@ -3911,8 +3919,7 @@ other_function
       '(' (DOCUMENT | CONTENT) concatenation (AS type_spec)?
       xmlserialize_param_enconding_part? xmlserialize_param_version_part? xmlserialize_param_ident_part? ((HIDE | SHOW) DEFAULTS)? ')'
       ('.' general_element_part)?
-    | XMLTABLE
-      '(' xml_namespaces_clause? concatenation xml_passing_clause? (COLUMNS xml_table_column (',' xml_table_column))? ')' ('.' general_element_part)?
+    | xmltable
     ;
 
 over_clause_keyword
@@ -3995,7 +4002,7 @@ cost_matrix_clause
     ;
 
 xml_passing_clause
-    : PASSING (BY VALUE)? expression column_alias? (',' expression column_alias?)
+    : PASSING (BY VALUE)? expression column_alias? (',' expression column_alias?)*
     ;
 
 xml_attributes_clause
@@ -4006,8 +4013,7 @@ xml_attributes_clause
 
 xml_namespaces_clause
     : XMLNAMESPACES
-      '(' (concatenation column_alias)? (',' concatenation column_alias)*
-      xml_general_default_part? ')'
+      '(' (concatenation column_alias)? (',' concatenation column_alias)* xml_general_default_part? ')'
     ;
 
 xml_table_column
@@ -4231,7 +4237,12 @@ column_name
 
 tableview_name
     : identifier ('.' id_expression)?
-      ('@' link_name | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
+          ('@' link_name | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
+    | xmltable outer_join_sign?
+    ;
+
+xmltable
+    : XMLTABLE '(' (xml_namespaces_clause ',')? concatenation xml_passing_clause? (COLUMNS xml_table_column (',' xml_table_column)*)? ')' ('.' general_element_part)?
     ;
 
 char_set_name

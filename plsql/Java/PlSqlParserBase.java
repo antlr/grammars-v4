@@ -1,11 +1,13 @@
+package PlSqlParseTree;
+
 import org.antlr.v4.runtime.*;
 
-public abstract class PlSqlBaseParser extends Parser
+public abstract class PlSqlParserBase extends Parser
 {
     private boolean _isVersion12 = true;
     private boolean _isVersion10 = true;
 
-    public PlSqlBaseParser(TokenStream input) {
+    public PlSqlParserBase(TokenStream input) {
         super(input);
     }
 

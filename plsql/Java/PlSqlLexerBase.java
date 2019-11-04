@@ -1,8 +1,10 @@
+package PlSqlParseTree;
+
 import org.antlr.v4.runtime.*;
 
-public abstract class PlSqlBaseLexer extends Lexer
+public abstract class PlSqlLexerBase extends Lexer
 {
-    public PlSqlBaseLexer(CharStream input) 
+    public PlSqlLexerBase(CharStream input)
 	{
 		super(input);
     }
