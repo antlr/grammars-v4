@@ -5,6 +5,7 @@
  * Copyright (c) 2017 by Ivan Kochurkin (Positive Technologies):
     added ECMAScript 6 support, cleared and transformed to the universal grammar.
  * Copyright (c) 2018 by Juan Alvarez (contributor -> ported to Go)
+ * Copyright (c) 2019 by Student Main (contributor -> ES2020)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -35,7 +36,7 @@ options {
 }
 
 program
-    : sourceElements? EOF
+    : HashBangLine? sourceElements? EOF
     ;
 
 sourceElement
@@ -80,7 +81,7 @@ importStatement
 
 fromBlock
     : (aliasName ',')* '*' (As identifierName )? From StringLiteral eos
-    | (aliasName ',')? '{' aliasName (',' aliasName)* ','? '}' ('*' (As identifierName ))? (From StringLiteral)? eos
+    | (aliasName ',')? '{' (aliasName (',' aliasName)* ','?)? '}' ('*' (As identifierName ))? (From StringLiteral)? eos
     | StringLiteral
     ;
 

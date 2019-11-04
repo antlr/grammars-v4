@@ -32,4 +32,6 @@ export default (x) => Math.exp(x)
 import exp, { pi, e } from "lib/mathplusplus"
 console.log("e^{π} = " + exp(pi))
 
+export {};
+import a,{aaa as bbb} from 'ccc';
 import('runtime_import');
