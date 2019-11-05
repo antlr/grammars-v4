@@ -90,8 +90,8 @@ Grammar supports the following list of ECMAScript 6 features taken from
 
 See [examples](examples) directory with test data files.
 
-
 ### ES6 to ES2020
+
 * HashBang Comment
 * `**` and `**=`
 * Numeric Literal Seprator (`1_23`)
@@ -103,7 +103,6 @@ See [examples](examples) directory with test data files.
 * Null Coalesce (`a??b`)
 * Optional Chain (`a?.b`)
 * Calculated Property (`[name]:value`)
-
 
 ### Outdated
 
@@ -123,8 +122,8 @@ Also this grammar supports outdated syntax such as
 * Student Main (2019):
   * Update to ES2020
 
-
 ## Running fuzz test
+
 1. You need recent Node.js
 2. `npm i -g eslump`
 3. `generate.bat` (For linux: manually run them....)
