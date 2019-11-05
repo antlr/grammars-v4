@@ -75,14 +75,29 @@ statementList
     ;
 
 importStatement
-    : Import fromBlock
-    | Import '(' singleExpression ')'
+    : Import importFromBlock
     ;
 
-fromBlock
-    : (aliasName ',')* '*' (As identifierName )? From StringLiteral eos
-    | (aliasName ',')? '{' (aliasName (',' aliasName)* ','?)? '}' ('*' (As identifierName ))? (From StringLiteral)? eos
-    | StringLiteral
+importFromBlock
+    : importDefault? importNamespace importFrom eos
+    | importDefault? moduleItems importFrom eos
+    | StringLiteral eos
+    ;
+
+moduleItems
+    : '{' (aliasName ',')* (aliasName ','?)? '}'
+    ;
+
+importDefault
+    : aliasName ','
+    ;
+
+importNamespace
+    : '*' (As identifierName)?
+    ;
+
+importFrom
+    : From StringLiteral
     ;
 
 aliasName
@@ -90,7 +105,19 @@ aliasName
     ;
 
 exportStatement
-    : Export Default? (fromBlock | statement)
+    : Export (exportFromBlock | declaration) eos    # ExportDeclaration
+    | Export Default singleExpression eos           # ExportDefaultDeclaration
+    ;
+
+exportFromBlock
+    : importNamespace importFrom eos
+    | moduleItems importFrom? eos
+    ;
+
+declaration
+    : variableStatement
+    | classDeclaration
+    | functionDeclaration
     ;
 
 variableStatement
@@ -102,7 +129,7 @@ variableDeclarationList
     ;
 
 variableDeclaration
-    : (Identifier | arrayLiteral | objectLiteral) ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
+    : assignable ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
 emptyStatement
@@ -188,7 +215,7 @@ tryStatement
     ;
 
 catchProduction
-    : Catch ('(' (Identifier | arrayLiteral | objectLiteral)? ')')? block
+    : Catch ('(' assignable? ')')? block
     ;
 
 finallyProduction
@@ -229,11 +256,11 @@ formalParameterList
     ;
 
 formalParameterArg
-    : (Identifier | arrayLiteral | objectLiteral) ('=' singleExpression)?      // ECMAScript 6: Initialization
+    : assignable ('=' singleExpression)?      // ECMAScript 6: Initialization
     ;
 
 lastFormalParameterArg                        // ECMAScript 6: Rest Parameter
-    : Ellipsis (Identifier | singleExpression)
+    : Ellipsis singleExpression
     ;
 
 functionBody
@@ -253,7 +280,7 @@ elementList
     ;
 
 arrayElement
-    : Ellipsis? (Identifier | singleExpression)
+    : Ellipsis? singleExpression
     ;
 
 objectLiteral
@@ -261,12 +288,12 @@ objectLiteral
     ;
 
 propertyAssignment
-    : propertyName (':' |'=') singleExpression                                      # PropertyExpressionAssignment
+    : propertyName ':' singleExpression                                             # PropertyExpressionAssignment
     | '[' singleExpression ']' ':' singleExpression                                 # ComputedPropertyExpressionAssignment
     | Async? '*'? propertyName '(' formalParameterList?  ')'  '{' functionBody '}'  # FunctionProperty
     | getter '(' ')' '{' functionBody '}'                                           # PropertyGetter
     | setter '(' formalParameterArg ')' '{' functionBody '}'                        # PropertySetter
-    | Ellipsis? Identifier                                                          # PropertyShorthand
+    | Ellipsis? singleExpression                                                    # PropertyShorthand
     ;
 
 propertyName
@@ -307,6 +334,7 @@ singleExpression
     | '-' singleExpression                                                  # UnaryMinusExpression
     | '~' singleExpression                                                  # BitNotExpression
     | '!' singleExpression                                                  # NotExpression
+    | Await singleExpression                                                # AwaitExpression
     | <assoc=right> singleExpression '**' singleExpression                  # PowerExpression
     | singleExpression ('*' | '/' | '%') singleExpression                   # MultiplicativeExpression
     | singleExpression ('+' | '-') singleExpression                         # AdditiveExpression
@@ -324,6 +352,7 @@ singleExpression
     | singleExpression '?' singleExpression ':' singleExpression            # TernaryExpression
     | <assoc=right> singleExpression '=' singleExpression                   # AssignmentExpression
     | <assoc=right> singleExpression assignmentOperator singleExpression    # AssignmentOperatorExpression
+    | Import '(' singleExpression ')'                                       # ImportExpression
     | singleExpression TemplateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
     | yieldStatement                                                        # YieldExpression // ECMAScript 6
     | This                                                                  # ThisExpression
@@ -333,7 +362,12 @@ singleExpression
     | arrayLiteral                                                          # ArrayLiteralExpression
     | objectLiteral                                                         # ObjectLiteralExpression
     | '(' expressionSequence ')'                                            # ParenthesizedExpression
-    | Await singleExpression                                                # AwaitExpression
+    ;
+
+assignable
+    : Identifier
+    | arrayLiteral
+    | objectLiteral
     ;
 
 anoymousFunction
@@ -449,6 +483,8 @@ keyword
     | Yield
     | Async
     | Await
+    | From
+    | As
     ;
 
 getter

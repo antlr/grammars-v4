@@ -105,8 +105,8 @@ BooleanLiteral:                 'true'
 
 /// Numeric Literals
 
-DecimalLiteral:                 DecimalIntegerLiteral '.' [0-9_]* ExponentPart?
-              |                 '.' [0-9_]+ ExponentPart?
+DecimalLiteral:                 DecimalIntegerLiteral '.' [0-9] [0-9_]* ExponentPart?
+              |                 '.' [0-9] [0-9_]* ExponentPart?
               |                 DecimalIntegerLiteral ExponentPart?
               ;
 

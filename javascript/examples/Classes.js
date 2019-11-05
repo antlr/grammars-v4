@@ -188,5 +188,10 @@ let Obj = {
   * foo () {},
   f(){},
   get a(){},
-  set a([aa]=123){}
+  set a([aa]=123){},
+  ...anotherObj,
+  ...{
+    speradObjectLiteral
+  },
+  ...functionResult()
 }
