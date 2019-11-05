@@ -15,7 +15,7 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
@@ -34,7 +34,7 @@ channels { ERROR }
 
 options { superClass=JavaScriptBaseLexer; }
 
-HashBangLine:                   '#!' ~[\r\n\u2028\u2029]*; // only allowed at start
+HashBangLine:                   { this.IsStartOfFile()}? '#!' ~[\r\n\u2028\u2029]*; // only allowed at start
 MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
 SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
 RegularExpressionLiteral:       '/' RegularExpressionFirstChar RegularExpressionChar* {this.IsRegexPossible()}? '/' IdentifierPart*;
@@ -166,7 +166,7 @@ Import:                         'import';
 Async:                          'async';
 Await:                          'await';
 
-/// The following tokens are also considered to be FutureReservedWords 
+/// The following tokens are also considered to be FutureReservedWords
 /// when parsing strict mode
 
 Implements:                     'implements' {this.IsStrictMode()}?;
@@ -556,7 +556,7 @@ fragment UnicodeCombiningMark
     | [\u0591-\u05A1]
     | [\u05A3-\u05B9]
     | [\u05BB-\u05BD]
-    | [\u05BF] 
+    | [\u05BF]
     | [\u05C1-\u05C2]
     | [\u05C4]
     | [\u064B-\u0655]

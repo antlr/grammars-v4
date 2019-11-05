@@ -16,6 +16,7 @@ public:
     bool useStrictDefault = false;
     bool useStrictCurrent = false;
 
+    bool IsStartOfFile();
     bool getStrictDefault();
     void setUseStrictDefault(bool value);
     bool IsStrictMode();

@@ -150,7 +150,7 @@ returnStatement
 yieldStatement
     : Yield ({this.notLineTerminator()}? expressionSequence)? eos
     ;
-    
+
 withStatement
     : With '(' expressionSequence ')' statement
     ;
@@ -188,7 +188,7 @@ tryStatement
     ;
 
 catchProduction
-    : Catch ('(' (Identifier|arrayLiteral|objectLiteral)? ')')? block
+    : Catch ('(' (Identifier | arrayLiteral | objectLiteral)? ')')? block
     ;
 
 finallyProduction

@@ -15,6 +15,10 @@ type JavaScriptBaseLexer struct {
 	useStrictCurrent bool
 }
 
+func (l *JavaScriptBaseLexer) IsStartOfFile() {
+    return l.lastToken == nil
+}
+
 func (l *JavaScriptBaseLexer) pushStrictModeScope(v bool) {
 	if l.stackIx == l.stackLength {
 		l.scopeStrictModes = append(l.scopeStrictModes, v)

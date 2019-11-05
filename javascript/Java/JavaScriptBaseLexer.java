@@ -30,6 +30,10 @@ public abstract class JavaScriptBaseLexer extends Lexer
         super(input);
     }
 
+    public boolean IsStartOfFile() {
+        return lastToken == null;
+    }
+
     public boolean getStrictDefault() {
         return useStrictDefault;
     }
