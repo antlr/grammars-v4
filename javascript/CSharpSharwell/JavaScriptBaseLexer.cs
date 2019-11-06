@@ -33,6 +33,10 @@ public abstract class JavaScriptBaseLexer : Lexer
     {
     }
 
+    public bool IsStartOfFile(){
+        return _lastToken == null;
+    }
+
     public bool UseStrictDefault
     {
         get

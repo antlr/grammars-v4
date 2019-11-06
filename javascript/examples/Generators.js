@@ -77,8 +77,9 @@ let [ n1, n2, n3, ...others ] = fibonacci(1000)
 // http://es6-features.org/#GeneratorControlFlow
 //------------------------------------------------------------------------------
 
+// async is a keyword now...
 //  generic asynchronous control-flow driver
-function async (proc, ...params) {
+function fasync (proc, ...params) {
     var iterator = proc(...params)
     return new Promise((resolve, reject) => {
         let loop = (value) => {
@@ -113,7 +114,7 @@ function makeAsync (text, after) {
 }
 
 //  application-specific asynchronous procedure
-async(function* (greeting) {
+fasync(function* (greeting) {
     let foo = yield makeAsync("foo", 300)
     let bar = yield makeAsync("bar", 200)
     let baz = yield makeAsync("baz", 100)

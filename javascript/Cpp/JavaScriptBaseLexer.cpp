@@ -11,6 +11,12 @@ bool JavaScriptBaseLexer::getStrictDefault()
     return useStrictDefault;
 }
 
+bool JavaScriptBaseLexer::IsStartOfFile(){
+    // No token has been produced yet: at the start of the input,
+    // no division is possible, so a regex literal _is_ possible.
+    return lastToken;
+}
+
 void JavaScriptBaseLexer::setUseStrictDefault(bool value)
 {
     useStrictDefault = value;

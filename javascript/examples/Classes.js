@@ -175,3 +175,23 @@ r.area === 1000
 class A {
     ;
 }
+
+////
+class B {
+    get [runtimeCalc]() {return 1};
+    set [runtimeCalc](p) {};
+    get 'string as key'() {};
+}
+// extended object
+let Obj = {
+  [asdfg](a){},
+  * foo () {},
+  f(){},
+  get a(){},
+  set a([aa]=123){},
+  ...anotherObj,
+  ...{
+    speradObjectLiteral
+  },
+  ...functionResult()
+}

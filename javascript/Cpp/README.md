@@ -19,3 +19,5 @@
     ```
 
 * In both `JavaScriptLexer.g4` and `JavaScriptParser.g4`, replace all `this.` ocurrences with `this->`
+
+Or you can use `pitch.sed` to do convert.

@@ -94,4 +94,9 @@ JavaScriptBaseLexer.prototype.IsRegexPossible = function() {
     }
 };
 
+JavaScriptBaseLexer.prototype.IsStartOfFile = function() {
+    return this.lastToken === null;
+};
+
+
 module.exports.JavaScriptBaseLexer = JavaScriptBaseLexer;

@@ -90,6 +90,20 @@ Grammar supports the following list of ECMAScript 6 features taken from
 
 See [examples](examples) directory with test data files.
 
+### ES6 to ES2020
+
+* HashBang Comment
+* `**` and `**=`
+* Numeric Literal Seprator (`1_23`)
+* BigInt (`123456n`)
+* Async Await 
+* Async Iteration (`for await`)
+* Dynamic Import (`import()`)
+* Private Field (`#field`)
+* Null Coalesce (`a??b`)
+* Optional Chain (`a?.b`)
+* Calculated Property (`[name]:value`)
+
 ### Outdated
 
 Also this grammar supports outdated syntax such as
@@ -105,6 +119,18 @@ Also this grammar supports outdated syntax such as
   * Cleared & optimized
   * Universal code actions & predicates
   * Support of some outdated syntax (Html comment, CData)
+* Student Main (2019):
+  * Update to ES2020
+
+## Running fuzz test
+
+1. You need recent Node.js
+2. `npm i -g eslump`
+3. `generate.bat` (For linux: manually run them....)
+4. `fuzztest.bat` (Or: `eslump wrapper.js gen/`)
+5. Ctrl-C to stop
+
+Error will show in terminal, correspond code located in `gen/temp.js`
 
 ## License
 
