@@ -79,8 +79,7 @@ importStatement
     ;
 
 importFromBlock
-    : importDefault? importNamespace importFrom eos
-    | importDefault? moduleItems importFrom eos
+    : importDefault? (importNamespace | moduleItems) importFrom eos
     | StringLiteral eos
     ;
 
@@ -148,12 +147,10 @@ ifStatement
 iterationStatement
     : Do statement While '(' expressionSequence ')' eos                                                                 # DoStatement
     | While '(' expressionSequence ')' statement                                                                        # WhileStatement
-    | For '(' expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement                         # ForStatement
-    | For '(' varModifier variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')'
-          statement                                                                                                     # ForVarStatement
+    | For '(' (expressionSequence | variableStatement)? ';' expressionSequence? ';' expressionSequence? ')' statement   # ForStatement
+    | For '(' (singleExpression | variableStatement) In expressionSequence ')' statement                                # ForInStatement
     // strange, 'of' is an identifier. and this.p("of") not work in sometime.
-    | For Await? '(' singleExpression (In | Identifier{this.p("of")}? ) expressionSequence ')' statement                # ForInStatement
-    | For Await? '(' varModifier variableDeclaration (In | Identifier{this.p("of")}?) expressionSequence ')' statement  # ForVarInStatement
+    | For Await? '(' (singleExpression | variableStatement) Identifier{this.p("of")}? expressionSequence ')' statement  # ForOfStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
