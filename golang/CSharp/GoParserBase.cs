@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Antlr4.Runtime;
 using static GoParseTree.GoLexer;
 
@@ -7,7 +8,13 @@ namespace GoParseTree
 {
     public abstract class GoParserBase : Parser
     {
-        protected GoParserBase(ITokenStream input) : base(input)
+        protected GoParserBase(ITokenStream input)
+            : base(input)
+        {
+        }
+
+        protected GoParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
+            : base(input, output, errorOutput)
         {
         }
 
