@@ -1,0 +1,193 @@
+namespace = aleran_ongoing
+
+country_event = {
+	id = aleran_ongoing.1
+	#hide_window = yes
+	#is_triggered_only = yes
+	title = "aleran_ongoing.1.name"
+	desc = "aleran_ongoing.1.desc"
+	picture = GFX_evt_unknown_ships
+	show_sound = event_construction
+	
+	trigger = {
+		NOT = {has_country_flag = aleran_expansion}
+		has_valid_civic = civic_dragon_gov
+		num_starbases > 25
+		num_owned_planets > 5
+	}
+
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	immediate = {
+		set_country_flag = aleran_expansion
+	}
+	
+	option = {
+		name = "aleran_ongoing.1.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			add_modifier = {
+				modifier = aleran_expansion
+				days = -1
+			}
+		}
+		
+	}
+}
+
+country_event = {
+	id = aleran_ongoing.2
+	#hide_window = yes
+	#is_triggered_only = yes
+	title = "aleran_ongoing.2.name"
+	desc = "aleran_ongoing.2.desc"
+	picture = GFX_evt_unknown_ships
+	show_sound = event_construction
+	
+	trigger = {
+		NOT = {has_country_flag = aleran_expansion_2}
+		has_technology = "tech_aleran_expansion"
+	}
+
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	immediate = {
+		set_country_flag = aleran_expansion_2
+	}
+	
+	option = {
+		name = "aleran_ongoing.2.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			#add_modifier = {
+			#	modifier = aleran_expansion_2
+			#	days = -1
+			#}
+			every_owned_ship = {
+				limit = {
+					OR = {
+						is_ship_class = shipclass_colonizer
+						is_ship_class = shipclass_science
+						is_ship_class = shipclass_construction
+					}
+				}
+				add_modifier = {
+					modifier = aleran_expansion_2b
+					days = -1
+				}
+			}
+		}
+		
+	}
+}
+
+country_event = {
+	id = aleran_ongoing.3
+	#hide_window = yes
+	#is_triggered_only = yes
+	title = "aleran_ongoing.3.name"
+	desc = "aleran_ongoing.3.desc"
+	picture = GFX_evt_unknown_ships
+	show_sound = event_construction
+	
+	trigger = {
+		NOT = {has_country_flag = aleran_expansion_3}
+		has_country_flag = aleran_expansion_2
+		num_starbases > 400
+		num_owned_planets > 20
+	}
+
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	immediate = {
+		set_country_flag = aleran_expansion_3
+	}
+	
+	option = {
+		name = "aleran_ongoing.3.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			add_modifier = {
+				modifier = aleran_expansion_3
+				days = -1
+			}
+			every_owned_ship = {
+				add_modifier = {
+					modifier = aleran_expansion_3b
+					days = -1
+				}
+			}
+		}
+		
+	}
+}
+
+country_event = {
+	id = aleran_ongoing.4
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = {
+				has_country_flag = aleran_expansion_2
+			}
+			every_owned_ship = {
+				limit = {
+					OR = {
+						is_ship_class = shipclass_colonizer
+						is_ship_class = shipclass_science
+						is_ship_class = shipclass_construction
+					}
+				}
+				remove_modifier = aleran_expansion_2b
+				add_modifier = {
+					modifier = aleran_expansion_2b
+					days = -1
+				}
+			}			
+		}
+		if = {
+			limit = {
+				has_country_flag = aleran_expansion_3
+			}
+			every_owned_ship = {
+				remove_modifier = aleran_expansion_3b
+				add_modifier = {
+					modifier = aleran_expansion_3b
+					days = -1
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_ongoing.10
+	hide_window = yes
+	
+	trigger = {
+		has_country_flag = aleran
+		has_federation = yes	
+	}
+
+	mean_time_to_happen = {
+		days = 10
+	}
+	
+	immediate = {
+		set_federation_leader = this
+	}
+}
