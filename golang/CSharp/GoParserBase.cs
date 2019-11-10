@@ -27,7 +27,7 @@ namespace GoParseTree
                 return true;
             }
 
-            IToken ahead = _input.Get(possibleIndexEosToken);
+            IToken ahead = TokenStream.Get(possibleIndexEosToken);
             if (ahead.Channel != Lexer.Hidden)
             {
                 // We're only interested in tokens on the HIDDEN channel.
@@ -50,7 +50,7 @@ namespace GoParseTree
                     return true;
                 }
 
-                ahead = _input.Get(possibleIndexEosToken);
+                ahead = TokenStream.Get(possibleIndexEosToken);
             }
 
             // Get the token's text and type.
@@ -68,8 +68,8 @@ namespace GoParseTree
         /// </summary>
         protected bool noTerminatorBetween(int tokenOffset)
         {
-            BufferedTokenStream stream = (BufferedTokenStream) _input;
-            IList<IToken> tokens = stream.GetHiddenTokensToLeft(stream.Lt(tokenOffset).TokenIndex);
+            BufferedTokenStream stream = (BufferedTokenStream) TokenStream;
+            IList<IToken> tokens = stream.GetHiddenTokensToLeft(stream.LT(tokenOffset).TokenIndex);
 
             if (tokens == null)
             {
@@ -92,17 +92,17 @@ namespace GoParseTree
         /// </summary>
         protected bool noTerminatorAfterParams(int tokenOffset)
         {
-            BufferedTokenStream stream = (BufferedTokenStream) _input;
+            BufferedTokenStream stream = (BufferedTokenStream) TokenStream;
             int leftParams = 1;
             int rightParams = 0;
 
-            if (stream.Lt(tokenOffset).Type == L_PAREN)
+            if (stream.LT(tokenOffset).Type == L_PAREN)
             {
                 // Scan past parameters
                 while (leftParams != rightParams)
                 {
                     tokenOffset++;
-                    int tokenType = stream.Lt(tokenOffset).Type;
+                    int tokenType = stream.LT(tokenOffset).Type;
 
                     if (tokenType == L_PAREN)
                     {
@@ -123,7 +123,7 @@ namespace GoParseTree
 
         protected bool checkPreviousTokenText(string text)
         {
-            return _input.Lt(1).Text?.Equals(text) ?? false;
+            return TokenStream.LT(1).Text?.Equals(text) ?? false;
         }
     }
 }
