@@ -29,7 +29,7 @@ lexer grammar PhpLexer;
 channels { PhpComments, ErrorLexem, SkipChannel }
 
 options {
-    superClass=PhpBaseLexer;
+    superClass=PhpLexerBase;
 }
 
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);

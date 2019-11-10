@@ -25,7 +25,7 @@
 const antlr4 = require("antlr4/index");
 const CommonToken = require('antlr4/Token').CommonToken;
 
-function PhpBaseLexer(input) {
+function PhpLexerBase(input) {
     antlr4.Lexer.call(this, input);
     this.AspTags = true;
     this._scriptTag = false;
@@ -37,10 +37,10 @@ function PhpBaseLexer(input) {
     this._insideString = false;
 }
 
-PhpBaseLexer.prototype = Object.create(antlr4.Lexer.prototype);
-PhpBaseLexer.prototype.constructor = antlr4.Lexer;
+PhpLexerBase.prototype = Object.create(antlr4.Lexer.prototype);
+PhpLexerBase.prototype.constructor = antlr4.Lexer;
 
-PhpBaseLexer.prototype.nextToken = function() {
+PhpLexerBase.prototype.nextToken = function() {
     let token = antlr4.Lexer.prototype.nextToken.call(this);
 
     if (token.type === this.PHPEnd || token.type === this.PHPEndSingleLineComment) {
@@ -106,20 +106,20 @@ PhpBaseLexer.prototype.nextToken = function() {
     return token;
 };
 
-PhpBaseLexer.prototype.GetHeredocEnd = function(text) {
+PhpLexerBase.prototype.GetHeredocEnd = function(text) {
     return text.trim().replace(/\;$/, "");
 };
 
-PhpBaseLexer.prototype.CheckHeredocEnd = function(text) {
+PhpLexerBase.prototype.CheckHeredocEnd = function(text) {
     return this.GetHeredocEnd(text) === this._heredocIdentifier;
 };
 
-PhpBaseLexer.prototype.IsNewLineOrStart = function (pos) {
+PhpLexerBase.prototype.IsNewLineOrStart = function (pos) {
     return this._input.LA(pos) <= 0 || this._input.LA(pos) == '\r'.charCodeAt(0) ||
         this._input.LA(pos) == '\n'.charCodeAt(0)
 };
 
-PhpBaseLexer.prototype.PushModeOnHtmlClose = function () {
+PhpLexerBase.prototype.PushModeOnHtmlClose = function () {
     this.popMode();
     if (this._scriptTag) {
         if (!this._phpScript) {
@@ -133,15 +133,15 @@ PhpBaseLexer.prototype.PushModeOnHtmlClose = function () {
         this._styleTag = false;
     }
 };
-PhpBaseLexer.prototype.HasAspTags = function () {
+PhpLexerBase.prototype.HasAspTags = function () {
     return this.AspTags;
 };
 
-PhpBaseLexer.prototype.HasPhpScriptTag = function () {
+PhpLexerBase.prototype.HasPhpScriptTag = function () {
     return this._phpScript;
 };
 
-PhpBaseLexer.prototype.PopModeOnCurlyBracketClose = function () {
+PhpLexerBase.prototype.PopModeOnCurlyBracketClose = function () {
     if (this._insideString) {
         this._insideString = false;
         this.skip;
@@ -149,16 +149,16 @@ PhpBaseLexer.prototype.PopModeOnCurlyBracketClose = function () {
     }
 };
 
-PhpBaseLexer.prototype.ShouldPushHereDocMode = function (pos) {
+PhpLexerBase.prototype.ShouldPushHereDocMode = function (pos) {
     return this._input.LA(pos) === '\r'.charCodeAt(0) || this._input.LA(pos) === '\n'.charCodeAt(0);
 };
 
-PhpBaseLexer.prototype.IsCurlyDollar = function (pos) {
+PhpLexerBase.prototype.IsCurlyDollar = function (pos) {
     return this._input.LA(pos) === '$'.charCodeAt(0);
 };
 
-PhpBaseLexer.prototype.SetInsideString = function () {
+PhpLexerBase.prototype.SetInsideString = function () {
     this._insideString = true
 };
 
-exports.PhpBaseLexer = PhpBaseLexer;
+exports.PhpLexerBase = PhpLexerBase;

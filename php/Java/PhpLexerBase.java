@@ -27,7 +27,7 @@ import org.antlr.v4.runtime.*;
 
 import java.util.Stack;
 
-public abstract class PhpBaseLexer extends Lexer
+public abstract class PhpLexerBase extends Lexer
 {
     protected boolean AspTags = true;
     protected boolean _scriptTag;
@@ -38,7 +38,7 @@ public abstract class PhpBaseLexer extends Lexer
     protected boolean _phpScript;
     protected boolean _insideString;
 
-    public PhpBaseLexer(CharStream input) {
+    public PhpLexerBase(CharStream input) {
         super(input);
     }
 
