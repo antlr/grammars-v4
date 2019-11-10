@@ -1,0 +1,153 @@
+namespace = dragon_misc
+
+country_event = {
+	id = dragon_misc.1
+	hide_window = yes
+	#is_triggered_only = yes
+	
+	trigger = {
+		NOT = {has_country_flag = is_under_war}
+		any_war = {
+			any_defender = { is_same_value = this }
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 2
+	}
+	
+	immediate = {
+		set_country_flag = is_under_war
+	}
+}
+
+country_event = {
+	id = dragon_misc.2
+	hide_window = yes
+	#is_triggered_only = yes
+	
+	trigger = {
+		has_country_flag = is_under_war
+		NOT = {
+			any_war = {
+				any_defender = { is_same_value = this }
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 1
+	}
+	
+	immediate = {
+		remove_country_flag = is_under_war
+	}
+}
+
+planet_event = {
+	id = dragon_misc.25
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		from = { #tile
+			if = {
+				limit = {
+					has_building = building_hydroponics_farm_1
+					planet = {
+						owner = {
+							has_country_flag = aleran
+						}
+					}
+				}
+				set_building = building_meat_lab_1
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = dragon_misc.26
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		switch = {
+			trigger = has_planet_flag
+			tb_animals_at@from = {
+				owner = {add_food = 40} #1/5 of basic stockpile limit
+			}
+		}
+	}
+}
+
+country_event = {
+	id = dragon_misc.30
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = {
+				from = {
+					is_country_type = enclave
+				}
+			}
+			set_country_flag = attacked_enclave
+		}
+	}
+}
+
+country_event = {
+	id = dragon_misc.31
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = {
+				from = {
+					OR = {
+						is_country_type = guardian
+						is_country_type = guardian_dragon
+						is_country_type = guardian_stellarite
+						is_country_type = guardian_wraith #
+						is_country_type = guardian_hiver
+						is_country_type = guardian_horror
+						is_country_type = guardian_fortress
+						is_country_type = guardian_dreadnought
+						is_country_type = guardian_sphere
+						is_country_type = guardian_scavenger_bot
+						is_country_type = guardian_elderly_tiyanki
+						is_country_type = guardian_hatchling
+					}
+				}
+			}
+			country_event = {id = dragon_misc.32}
+		}
+	}
+}
+
+country_event = {
+	id = dragon_misc.32
+	is_triggered_only = yes
+	title = "dragon_misc.32.name"
+	desc = "dragon_misc.32.desc"
+	picture = GFX_evt_wraith
+	show_sound = event_space_whale
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "dragon_misc.32.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			add_influence = 100
+		}
+		
+	}
+}

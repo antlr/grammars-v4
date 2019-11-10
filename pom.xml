@@ -224,6 +224,7 @@
 				<module>sparql</module>
 				<module>sqlite</module>
 				<module>stacktrace</module>
+				<module>stellaris</module>
 				<module>stringtemplate</module>
 				<module>suokif</module>
 				<module>swift2</module>
