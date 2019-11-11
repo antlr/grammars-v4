@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Antlr4.Runtime;
 using static GoParseTree.GoLexer;
 
@@ -7,9 +8,17 @@ namespace GoParseTree
 {
     public abstract class GoParserBase : Parser
     {
-        protected GoParserBase(ITokenStream input) : base(input)
+        protected GoParserBase(ITokenStream input)
+            : base(input)
         {
         }
+
+    #if ANTLR_STANDARD
+        protected GoParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
+            : base(input, output, errorOutput)
+        {
+        }
+    #endif
 
         /// <summary>
         /// Returns `true` if on the current index of the parser's
@@ -27,7 +36,7 @@ namespace GoParseTree
                 return true;
             }
 
-            IToken ahead = _input.Get(possibleIndexEosToken);
+            IToken ahead = tokenStream.Get(possibleIndexEosToken);
             if (ahead.Channel != Lexer.Hidden)
             {
                 // We're only interested in tokens on the HIDDEN channel.
@@ -50,7 +59,7 @@ namespace GoParseTree
                     return true;
                 }
 
-                ahead = _input.Get(possibleIndexEosToken);
+                ahead = tokenStream.Get(possibleIndexEosToken);
             }
 
             // Get the token's text and type.
@@ -68,8 +77,8 @@ namespace GoParseTree
         /// </summary>
         protected bool noTerminatorBetween(int tokenOffset)
         {
-            BufferedTokenStream stream = (BufferedTokenStream) _input;
-            IList<IToken> tokens = stream.GetHiddenTokensToLeft(stream.Lt(tokenOffset).TokenIndex);
+            BufferedTokenStream stream = (BufferedTokenStream)tokenStream;
+            IList<IToken> tokens = stream.GetHiddenTokensToLeft(LT(stream, tokenOffset).TokenIndex);
 
             if (tokens == null)
             {
@@ -92,17 +101,17 @@ namespace GoParseTree
         /// </summary>
         protected bool noTerminatorAfterParams(int tokenOffset)
         {
-            BufferedTokenStream stream = (BufferedTokenStream) _input;
+            BufferedTokenStream stream = (BufferedTokenStream) tokenStream;
             int leftParams = 1;
             int rightParams = 0;
 
-            if (stream.Lt(tokenOffset).Type == L_PAREN)
+            if (LT(stream, tokenOffset).Type == L_PAREN)
             {
                 // Scan past parameters
                 while (leftParams != rightParams)
                 {
                     tokenOffset++;
-                    int tokenType = stream.Lt(tokenOffset).Type;
+                    int tokenType = LT(stream, tokenOffset).Type;
 
                     if (tokenType == L_PAREN)
                     {
@@ -123,7 +132,28 @@ namespace GoParseTree
 
         protected bool checkPreviousTokenText(string text)
         {
-            return _input.Lt(1).Text?.Equals(text) ?? false;
+            return LT(tokenStream, 1).Text?.Equals(text) ?? false;
+        }
+
+        private IToken LT(ITokenStream stream, int k)
+        {
+        #if ANTLR_STANDARD
+            return stream.LT(k);
+        #else
+            return stream.Lt(k);
+        #endif
+        }
+
+        private ITokenStream tokenStream
+        {
+            get
+            {
+            #if ANTLR_STANDARD
+                return TokenStream;
+            #else
+                return _input;
+            #endif
+            }
         }
     }
 }
