@@ -709,6 +709,7 @@ balancedtoken
    : '(' balancedtokenseq ')'
    | '[' balancedtokenseq ']'
    | '{' balancedtokenseq '}'
+   | ~('('|')'|'{'|'}'|'['|']')+
    ;
 /*Declarators*/
 
