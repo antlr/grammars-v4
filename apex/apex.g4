@@ -26,10 +26,10 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** 
+/**
  *  An Apexcode grammar derived from Java 1.7 grammar for ANTLR v4.
  *  Uses ANTLR v4's left-recursive expression notation.
- *  
+ *
  *  @maintainer: Andrey Gavrikov
  *
  *  You can test with
@@ -422,6 +422,7 @@ statement
     |   FOR '(' forControl ')' statement
     |   WHILE parExpression statement
     |   DO statement WHILE parExpression ';'
+    |   RUNAS '(' Identifier ')' statement
     |   TRY block (catchClause+ finallyBlock? | finallyBlock)
     |   TRY resourceSpecification block catchClause* finallyBlock?
     |   RETURN expression? ';'
@@ -510,7 +511,7 @@ constantExpression
 apexDbExpressionLong
     :   DATABASE '.' (DB_INSERT | DB_UPSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) parExpression
     ;
-	
+
 apexDbExpressionShort
     :   (DB_INSERT | DB_UPSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) expression
     ;
@@ -520,7 +521,7 @@ apexDbExpression
 	: apexDbExpressionLong
 	| apexDbExpressionShort
 	;
-	
+
 expression
     :   primary
     |   expression '.' GET '(' expressionList? ')'
@@ -650,7 +651,7 @@ arguments
 SoqlLiteral
     : '[' WS* SELECT (SelectRestNoInnerBrackets | SelectRestAllowingInnerBrackets)*? ']'
 	;
-	
+
 fragment SelectRestAllowingInnerBrackets
 	:  '[' ~']' .*? ']'
 	|	~'[' .*?
@@ -728,6 +729,7 @@ DB_UPDATE     : U P D A T E;
 DB_DELETE     : D E L E T E;
 DB_UNDELETE   : U N D E L E T E;
 TESTMETHOD   : T E S T M E T H O D;
+RUNAS        : S Y S T E M DOT R U N A S;
 
 
 // ?3.10.1 Integer Literals
