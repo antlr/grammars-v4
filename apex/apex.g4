@@ -515,7 +515,7 @@ expression
     |   expression '.' SET '(' expressionList? ')'
     |   expression '.' Identifier
     |   expression '.' THIS
-    |   expression '.' NEW nonWildcardTypeArguments? innerCreator
+    |   expression '.' NEW
     |   expression '.' SUPER superSuffix
     |   expression '.' explicitGenericInvocation
     |   expression '[' expression ']'
