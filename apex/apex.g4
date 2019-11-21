@@ -422,7 +422,7 @@ statement
     |   FOR '(' forControl ')' statement
     |   WHILE parExpression statement
     |   DO statement WHILE parExpression ';'
-    |   RUNAS '(' Identifier ')' statement
+    |   RUNAS '(' expression ')' statement
     |   TRY block (catchClause+ finallyBlock? | finallyBlock)
     |   TRY resourceSpecification block catchClause* finallyBlock?
     |   RETURN expression? ';'
