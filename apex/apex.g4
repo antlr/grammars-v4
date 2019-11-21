@@ -508,18 +508,13 @@ constantExpression
     :   expression
     ;
 
-apexDbExpressionLong
-    :   DATABASE '.' (DB_INSERT | DB_UPSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) parExpression
-    ;
-
 apexDbExpressionShort
     :   (DB_INSERT | DB_UPSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) expression
     ;
 
 
 apexDbExpression
-	: apexDbExpressionLong
-	| apexDbExpressionShort
+	:  apexDbExpressionShort
 	;
 
 expression
@@ -577,7 +572,6 @@ primary
     |   VOID '.' CLASS
     |   nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
     |   SoqlLiteral
-    |   DATABASE
     ;
 
 creator
@@ -668,7 +662,6 @@ OVERRIDE      : O V E R R I D E;
 VIRTUAL       : V I R T U A L;
 SET           : S E T;
 GET           : G E T;
-DATABASE      : D A T A B A S E;
 ABSTRACT      : A B S T R A C T;
 BOOLEAN       : B O O L E A N;
 BREAK         : B R E A K;
