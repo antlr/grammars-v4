@@ -516,6 +516,13 @@ expression
     |   expression '.' Identifier
     |   expression '.' THIS
     |   expression '.' NEW
+    |   expression '.'
+        (   DB_INSERT
+        |   DB_UPSERT
+        |   DB_UPDATE
+        |   DB_DELETE
+        |   DB_UNDELETE
+        )
     |   expression '.' SUPER superSuffix
     |   expression '.' explicitGenericInvocation
     |   expression '[' expression ']'
