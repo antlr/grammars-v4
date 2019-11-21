@@ -508,13 +508,8 @@ constantExpression
     :   expression
     ;
 
-apexDbExpressionShort
-    :   (DB_INSERT | DB_UPSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) expression
-    ;
-
-
 apexDbExpression
-	:  apexDbExpressionShort
+	:   (DB_INSERT | DB_UPSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) expression
 	;
 
 expression
