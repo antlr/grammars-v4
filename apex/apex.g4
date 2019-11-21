@@ -271,14 +271,11 @@ classOrInterfaceType
     ;
 
 primitiveType
-    :   BOOLEAN
-    |   CHAR
+    :   CHAR
     |   BYTE
     |   SHORT
     |   INT
-    |   LONG
     |   FLOAT
-    |   DOUBLE
     ;
 
 typeArguments
@@ -658,7 +655,6 @@ VIRTUAL       : V I R T U A L;
 SET           : S E T;
 GET           : G E T;
 ABSTRACT      : A B S T R A C T;
-BOOLEAN       : B O O L E A N;
 BREAK         : B R E A K;
 BYTE          : B Y T E;
 CATCH         : C A T C H;
@@ -668,7 +664,6 @@ CONST         : C O N S T;
 CONTINUE      : C O N T I N U E;
 DEFAULT       : D E F A U L T;
 DO            : D O;
-DOUBLE        : D O U B L E;
 ELSE          : E L S E;
 ENUM          : E N U M;
 EXTENDS       : E X T E N D S;
@@ -683,7 +678,6 @@ IMPORT        : I M P O R T;
 INSTANCEOF    : I N S T A N C E O F;
 INT           : I N T;
 INTERFACE     : I N T E R F A C E;
-LONG          : L O N G;
 NATIVE        : N A T I V E;
 NEW           : N E W;
 PACKAGE       : P A C K A G E;
