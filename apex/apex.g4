@@ -601,11 +601,17 @@ arrayCreatorRest
     ;
 
 mapCreatorRest
-    :   '{' ( Identifier | expression ) '=>' ( literal | expression ) (',' (Identifier | expression) '=>' ( literal | expression ) )* '}'
+    :   '{'
+        (   '}'
+        | ( Identifier | expression ) '=>' ( literal | expression ) (',' (Identifier | expression) '=>' ( literal | expression ) )* '}'
+        )
     ;
 
 setCreatorRest
-	: '{' ( literal | expression ) (',' ( literal | expression ))* '}'
+	:   '{'
+        (   '}'
+        | ( literal | expression ) (',' ( literal | expression ))* '}'
+        )
 	;
 
 classCreatorRest
