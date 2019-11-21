@@ -433,6 +433,7 @@ statement
     |   statementExpression ';'
     |   Identifier ':' statement
     |   apexDbExpression ';'
+    |   localVariableDeclarationStatement
     ;
 
 propertyBlock
