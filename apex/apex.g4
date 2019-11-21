@@ -505,8 +505,13 @@ constantExpression
     :   expression
     ;
 
+apexDbUpsertExpression
+    :   DB_UPSERT expression (expression)*
+    ;
+
 apexDbExpression
-	:   (DB_INSERT | DB_UPSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) expression
+	:   (DB_INSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) expression
+    |   apexDbUpsertExpression
 	;
 
 expression
