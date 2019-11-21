@@ -530,7 +530,7 @@ expression
     |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression
     |   expression ('<=' | '>=' | '>' | '<') expression
     |   expression INSTANCEOF type
-    |   expression ('==' | '!=') expression
+    |   expression ('==' | '!=' | '<>') expression
     |   expression '&' expression
     |   expression '^' expression
     |   expression '|' expression
