@@ -768,7 +768,7 @@ IntegerTypeSuffix
 
 fragment
 DecimalNumeral
-    :   '0'
+    :   '0' Digit?
     |   NonZeroDigit (Digits? | Underscores Digits)
     ;
 
