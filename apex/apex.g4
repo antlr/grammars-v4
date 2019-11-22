@@ -26,10 +26,10 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** 
+/**
  *  An Apexcode grammar derived from Java 1.7 grammar for ANTLR v4.
  *  Uses ANTLR v4's left-recursive expression notation.
- *  
+ *
  *  @maintainer: Andrey Gavrikov
  *
  *  You can test with
@@ -271,14 +271,11 @@ classOrInterfaceType
     ;
 
 primitiveType
-    :   BOOLEAN
-    |   CHAR
+    :   CHAR
     |   BYTE
     |   SHORT
     |   INT
-    |   LONG
     |   FLOAT
-    |   DOUBLE
     ;
 
 typeArguments
@@ -422,6 +419,7 @@ statement
     |   FOR '(' forControl ')' statement
     |   WHILE parExpression statement
     |   DO statement WHILE parExpression ';'
+    |   RUNAS '(' expression ')' statement
     |   TRY block (catchClause+ finallyBlock? | finallyBlock)
     |   TRY resourceSpecification block catchClause* finallyBlock?
     |   RETURN expression? ';'
@@ -507,27 +505,29 @@ constantExpression
     :   expression
     ;
 
-apexDbExpressionLong
-    :   DATABASE '.' (DB_INSERT | DB_UPSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) parExpression
+apexDbUpsertExpression
+    :   DB_UPSERT expression (expression)*
     ;
-	
-apexDbExpressionShort
-    :   (DB_INSERT | DB_UPSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) expression
-    ;
-
 
 apexDbExpression
-	: apexDbExpressionLong
-	| apexDbExpressionShort
+	:   (DB_INSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) expression
+    |   apexDbUpsertExpression
 	;
-	
+
 expression
     :   primary
     |   expression '.' GET '(' expressionList? ')'
     |   expression '.' SET '(' expressionList? ')'
     |   expression '.' Identifier
     |   expression '.' THIS
-    |   expression '.' NEW nonWildcardTypeArguments? innerCreator
+    |   expression '.' NEW
+    |   expression '.'
+        (   DB_INSERT
+        |   DB_UPSERT
+        |   DB_UPDATE
+        |   DB_DELETE
+        |   DB_UNDELETE
+        )
     |   expression '.' SUPER superSuffix
     |   expression '.' explicitGenericInvocation
     |   expression '[' expression ']'
@@ -542,7 +542,7 @@ expression
     |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression
     |   expression ('<=' | '>=' | '>' | '<') expression
     |   expression INSTANCEOF type
-    |   expression ('==' | '!=') expression
+    |   expression ('==' | '!=' | '<>') expression
     |   expression '&' expression
     |   expression '^' expression
     |   expression '|' expression
@@ -576,7 +576,6 @@ primary
     |   VOID '.' CLASS
     |   nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
     |   SoqlLiteral
-    |   DATABASE
     ;
 
 creator
@@ -602,11 +601,17 @@ arrayCreatorRest
     ;
 
 mapCreatorRest
-    :   '{' ( Identifier | expression ) '=>' ( literal | expression ) (',' (Identifier | expression) '=>' ( literal | expression ) )* '}'
+    :   '{'
+        (   '}'
+        | ( Identifier | expression ) '=>' ( literal | expression ) (',' (Identifier | expression) '=>' ( literal | expression ) )* '}'
+        )
     ;
 
 setCreatorRest
-	: '{' ( literal | expression ) (',' ( literal | expression ))* '}'
+	:   '{'
+        (   '}'
+        | ( literal | expression ) (',' ( literal | expression ))* '}'
+        )
 	;
 
 classCreatorRest
@@ -650,7 +655,7 @@ arguments
 SoqlLiteral
     : '[' WS* SELECT (SelectRestNoInnerBrackets | SelectRestAllowingInnerBrackets)*? ']'
 	;
-	
+
 fragment SelectRestAllowingInnerBrackets
 	:  '[' ~']' .*? ']'
 	|	~'[' .*?
@@ -667,9 +672,7 @@ OVERRIDE      : O V E R R I D E;
 VIRTUAL       : V I R T U A L;
 SET           : S E T;
 GET           : G E T;
-DATABASE      : D A T A B A S E;
 ABSTRACT      : A B S T R A C T;
-BOOLEAN       : B O O L E A N;
 BREAK         : B R E A K;
 BYTE          : B Y T E;
 CATCH         : C A T C H;
@@ -679,7 +682,6 @@ CONST         : C O N S T;
 CONTINUE      : C O N T I N U E;
 DEFAULT       : D E F A U L T;
 DO            : D O;
-DOUBLE        : D O U B L E;
 ELSE          : E L S E;
 ENUM          : E N U M;
 EXTENDS       : E X T E N D S;
@@ -694,7 +696,6 @@ IMPORT        : I M P O R T;
 INSTANCEOF    : I N S T A N C E O F;
 INT           : I N T;
 INTERFACE     : I N T E R F A C E;
-LONG          : L O N G;
 NATIVE        : N A T I V E;
 NEW           : N E W;
 PACKAGE       : P A C K A G E;
@@ -728,6 +729,7 @@ DB_UPDATE     : U P D A T E;
 DB_DELETE     : D E L E T E;
 DB_UNDELETE   : U N D E L E T E;
 TESTMETHOD   : T E S T M E T H O D;
+RUNAS        : S Y S T E M DOT R U N A S;
 
 
 // ?3.10.1 Integer Literals
@@ -766,7 +768,7 @@ IntegerTypeSuffix
 
 fragment
 DecimalNumeral
-    :   '0'
+    :   '0' Digit?
     |   NonZeroDigit (Digits? | Underscores Digits)
     ;
 
