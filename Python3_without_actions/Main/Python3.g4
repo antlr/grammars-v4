@@ -30,7 +30,7 @@
  * Developed by : Bart Kiers, bart@big-o.nl
  *
  * Project      : Tiny Python3-parser; an ANTLR4 grammar for a considerably stripped down version of Python 3
- *                https://github.com
+ *                https://github.com/RobEin/grammars-v4/tree/master/Python3_without_actions
  * Developed by : Robert Einhorn, robert.einhorn.hu@gmail.com
  */
 
