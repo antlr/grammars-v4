@@ -51,11 +51,21 @@ packageStatement
 //
 
 option
-    :   'option' optionName '=' constant ';'
+    :   'option' optionName '=' (constant | optionBody)  ';'
     ;
 
 optionName
-    :   (Ident | '(' fullIdent ')' ) ('.' Ident)*
+    :   (Ident | '(' fullIdent ')' ) ('.' (Ident | reservedWord))*
+    ;
+
+optionBody
+    : '{'
+        (optionBodyVariable)*
+      '}'
+    ;
+
+optionBodyVariable
+    : optionName ':' constant
     ;
 
 //
@@ -229,6 +239,7 @@ reservedWord
     |   STRING
     |   SYNTAX
     |   WEAK
+    |   RPC
     ;
 //
 // Lexical elements
@@ -341,7 +352,7 @@ messageType
     ;
 
 messageOrEnumType
-    :   '.'? (Ident '.')* messageOrEnumName
+    :   '.'? ( (Ident | reservedWord) '.')* messageOrEnumName
     ;
 
 // Integer literals
