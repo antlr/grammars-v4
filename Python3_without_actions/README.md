@@ -1,4 +1,4 @@
-# Python 3 without actions &nbsp; [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# Python 3 grammar without actions &nbsp; [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 The [ANTLR4](https://www.antlr.org/) grammar is based on the [Bart Kiers's Python 3.3 grammar](https://github.com/bkiers/python3-parser) with an improved indent/dedent handling with the following advantages:
 -  warning for mixture of space and tab indentation
