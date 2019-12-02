@@ -25,6 +25,8 @@ public abstract class LexerAdaptor extends Lexer {
 	 */
 	private int _currentRuleType = Token.INVALID_TYPE;
 
+	private boolean insideOptionsBlock = false;
+
 	public int getCurrentRuleType() {
 		return _currentRuleType;
 	}
@@ -50,9 +52,24 @@ public abstract class LexerAdaptor extends Lexer {
 	}
 
 	protected void handleEndAction() {
-		popMode();
-		if (_modeStack.size() > 0) {
+	    int oldMode = _mode;
+        int newMode = popMode();
+        boolean isActionWithinAction = _modeStack.size() > 0
+            && newMode == ANTLRv4Lexer.Action
+            && oldMode == newMode;
+
+		if (isActionWithinAction) {
 			setType(ANTLRv4Lexer.ACTION_CONTENT);
+		}
+	}
+
+	protected void handleOptionsLBrace() {
+		if (insideOptionsBlock) {
+			setType(ANTLRv4Lexer.BEGIN_ACTION);
+			pushMode(ANTLRv4Lexer.Action);
+		} else {
+			setType(ANTLRv4Lexer.LBRACE);
+			insideOptionsBlock = true;
 		}
 	}
 

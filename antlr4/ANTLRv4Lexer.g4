@@ -396,7 +396,8 @@ OPT_LINE_COMMENT
    ;
 
 OPT_LBRACE
-   : LBrace -> type (LBRACE)
+   : LBrace
+   { handleOptionsLBrace(); }
    ;
 
 OPT_RBRACE
