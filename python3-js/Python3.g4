@@ -739,9 +739,12 @@ NEWLINE
    ) {
      let newLine = this.text.replace(/[^\r\n]+/g, '');
      let spaces = this.text.replace(/[\r\n]+/g, '');
-     let next = this._input.LA(1);
 
-     if (this.opened > 0 || next === 13 /* '\r' */ || next === 10 /* '\n' */ || next === 35 /* '#' */) {
+     // Strip newlines inside open clauses except if we are near EOF. We keep NEWLINEs near EOF to
+     // satisfy the final newline needed by the single_put rule used by the REPL.
+     let next = this._input.LA(1);
+     let nextnext = this._input.LA(2);
+     if (this.opened > 0 || (nextnext != -1 /* EOF */ && (next === 13 /* '\r' */ || next === 10 /* '\n' */ || next === 35 /* '#' */))) {
        // If we're inside a list or on a blank line, ignore all indents,
        // dedents and line breaks.
        this.skip();

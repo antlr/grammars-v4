@@ -353,8 +353,11 @@ NEWLINE
 		var newLine = (new Regex("[^\r\n\f]+")).Replace(Text, "");
 		var spaces = (new Regex("[\r\n\f]+")).Replace(Text, "");
 
+		// Strip newlines inside open clauses except if we are near EOF. We keep NEWLINEs near EOF to
+		// satisfy the final newline needed by the single_put rule used by the REPL.
 		int next = _input.La(1);
-		if (Opened > 0 || next == '\r' || next == '\n' || next == '\f' || next == '#')
+		int nextnext = _input.La(2);
+		if (Opened > 0 || (nextnext != -1 && (next == '\r' || next == '\n' || next == '\f' || next == '#')))
 		{
 			// If we're inside a list or on a blank line, ignore all indents, 
 			// dedents and line breaks.
