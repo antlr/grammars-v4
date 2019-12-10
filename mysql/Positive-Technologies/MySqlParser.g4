@@ -174,7 +174,7 @@ createFunction
       '(' functionParameter? (',' functionParameter)* ')'
       RETURNS dataType
       routineOption*
-    routineBody
+    (routineBody | returnStatement)
     ;
 
 createServer
