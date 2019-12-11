@@ -360,7 +360,17 @@ try:
 except ValueError:          # End of file
     pass
 
-if self.opened > 0 or la_char == '\r' or la_char == '\n' or la_char == '\f' or la_char == '#':
+# Strip newlines inside open clauses except if we are near EOF. We keep NEWLINEs near EOF to
+# satisfy the final newline needed by the single_put rule used by the REPL.
+try:
+    nextnext_la = self._input.LA(2)
+    nextnext_la_char = chr(nextnext_la)
+except ValueError:
+    nextnext_eof = True
+else:
+    nextnext_eof = False
+
+if self.opened > 0 or nextnexteof is False and (la_char == '\r' or la_char == '\n' or la_char == '\f' or la_char == '#'):
     self.skip()
 else:
     indent = self.getIndentationCount(spaces)

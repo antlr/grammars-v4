@@ -334,8 +334,12 @@ NEWLINE
    {
      String newLine = getText().replaceAll("[^\r\n\f]+", "");
      String spaces = getText().replaceAll("[\r\n\f]+", "");
+	 
+     // Strip newlines inside open clauses except if we are near EOF. We keep NEWLINEs near EOF to
+     // satisfy the final newline needed by the single_put rule used by the REPL.
      int next = _input.LA(1);
-     if (opened > 0 || next == '\r' || next == '\n' || next == '\f' || next == '#') {
+     int nextnext = _input.LA(2);
+     if (opened > 0 || (nextnext != -1 && (next == '\r' || next == '\n' || next == '\f' || next == '#'))) {
        // If we're inside a list or on a blank line, ignore all indents, 
        // dedents and line breaks.
        skip();
