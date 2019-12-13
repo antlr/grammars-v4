@@ -345,6 +345,7 @@ another_statement
     | transaction_statement
     | use_statement
     | setuser_statement
+    | reconfigure_statement
     | shutdown_statement
     ;
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
@@ -2678,6 +2679,11 @@ use_statement
 
 setuser_statement
     : SETUSER user=STRING?
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/language-elements/reconfigure-transact-sql
+reconfigure_statement
+    : RECONFIGURE (WITH OVERRIDE)?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/shutdown-transact-sql
