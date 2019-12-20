@@ -169,7 +169,7 @@ sourceElements
 ///     Statement
 ///     FunctionDeclaration
 sourceElement
- : statement
+ : {p.GetInputStream().LA(1) != ECMAScriptParserFunction}? statement
  | functionDeclaration
  ;
 
@@ -193,7 +193,7 @@ statement
  : block
  | variableStatement
  | voidStatement
- | expressionStatement
+ | {p.GetInputStream().LA(1) != ECMAScriptParserOpenBrace}? expressionStatement
  | ifStatement
  | iterationStatement
  | continueStatement
@@ -254,7 +254,7 @@ voidStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : {(p.GetInputStream().LA(1) != ECMAScriptParserOpenBrace) && (p.GetInputStream().LA(1) != ECMAScriptParserFunction)}? expressionSequence eos
+ : expressionSequence eos
  ;
 
 /// IfStatement :

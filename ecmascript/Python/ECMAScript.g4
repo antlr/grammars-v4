@@ -182,7 +182,7 @@ sourceElements
 ///     Statement
 ///     FunctionDeclaration
 sourceElement
- : statement
+ : {self._input.LA(1) != ECMAScriptParser.Function}? statement
  | functionDeclaration
  ;
 
@@ -206,7 +206,7 @@ statement
  : block
  | variableStatement
  | emptyStatement
- | expressionStatement
+ | {self._input.LA(1) != ECMAScriptParser.OpenBrace}? expressionStatement
  | ifStatement
  | iterationStatement
  | continueStatement
@@ -267,7 +267,7 @@ emptyStatement
 /// ExpressionStatement :
 ///     [lookahead ∉ {{, function}] Expression ;
 expressionStatement
- : {(self._input.LA(1) != ECMAScriptParser.OpenBrace) and (self._input.LA(1) != ECMAScriptParser.Function)}? expressionSequence eos
+ : expressionSequence eos
  ;
 
 /// IfStatement :
