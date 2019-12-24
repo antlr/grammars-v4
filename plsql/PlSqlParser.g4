@@ -657,7 +657,7 @@ on_list_partitioned_table
 
 partitioned_table
     :  PARTITION partition_name?
-        ((segment_attributes_clause | key_compression)+ )?
+        (segment_attributes_clause | key_compression)*
         UNUSABLE?
     ;
 
@@ -677,7 +677,7 @@ on_comp_partitioned_table
 
 on_comp_partitioned_clause
     : PARTITION partition_name?
-        ((segment_attributes_clause | key_compression)+)?
+        (segment_attributes_clause | key_compression)*
         UNUSABLE index_subpartition_clause?
     ;
 
@@ -1799,7 +1799,7 @@ object_table_substitution
     ;
 
 relational_table
-    : ('(' relational_properties (',' relational_properties)* ')')?
+    : ('(' relational_property (',' relational_property)* ')')?
       (ON COMMIT (DELETE | PRESERVE) ROWS)?
       physical_properties? column_properties? table_partitioning_clauses?
       (CACHE | NOCACHE)? (RESULT_CACHE '(' MODE (DEFAULT | FORCE) ')')?
@@ -1808,7 +1808,7 @@ relational_table
       (enable_disable_clause+)? row_movement_clause? flashback_archive_clause?
     ;
 
-relational_properties
+relational_property
     : (column_definition
         | virtual_column_definition
         | out_of_line_constraint
@@ -2077,9 +2077,9 @@ log_grp
     ;
 
 supplemental_table_logging
-    : ADD (SUPPLEMENTAL LOG  (supplemental_log_grp_clause | supplemental_id_key_clause) )?
+    : ADD SUPPLEMENTAL LOG  (supplemental_log_grp_clause | supplemental_id_key_clause)
        (',' SUPPLEMENTAL LOG  (supplemental_log_grp_clause | supplemental_id_key_clause) )*
-    | DROP (SUPPLEMENTAL LOG (supplemental_id_key_clause | GROUP log_grp) )?
+    | DROP SUPPLEMENTAL LOG (supplemental_id_key_clause | GROUP log_grp)
         (',' SUPPLEMENTAL LOG (supplemental_id_key_clause | GROUP log_grp) )*
     ;
 
