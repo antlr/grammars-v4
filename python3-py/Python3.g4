@@ -370,7 +370,7 @@ except ValueError:
 else:
     nextnext_eof = False
 
-if self.opened > 0 or nextnexteof is False and (la_char == '\r' or la_char == '\n' or la_char == '\f' or la_char == '#'):
+if self.opened > 0 or nextnext_eof is False and (la_char == '\r' or la_char == '\n' or la_char == '\f' or la_char == '#'):
     self.skip()
 else:
     indent = self.getIndentationCount(spaces)
