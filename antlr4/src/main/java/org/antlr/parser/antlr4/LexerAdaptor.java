@@ -7,6 +7,9 @@ import org.antlr.v4.runtime.misc.Interval;
 
 public abstract class LexerAdaptor extends Lexer {
 
+	// Generic type for OPTIONS, TOKENS and CHANNELS
+	private static int PREQUEL_CONSTRUCT = -10;
+
 	public LexerAdaptor(CharStream input) {
 		super(input);
 	}
@@ -75,7 +78,16 @@ public abstract class LexerAdaptor extends Lexer {
 
 	@Override
 	public Token emit() {
-		if (_type == ANTLRv4Lexer.ID) {
+		if ((_type == ANTLRv4Lexer.OPTIONS || _type == ANTLRv4Lexer.TOKENS || _type == ANTLRv4Lexer.CHANNELS)
+				&& _currentRuleType == Token.INVALID_TYPE) { // enter prequel construct ending with an RBRACE
+			_currentRuleType = PREQUEL_CONSTRUCT;
+		} else if (_type == ANTLRv4Lexer.RBRACE && _currentRuleType == PREQUEL_CONSTRUCT) { // exit prequel construct
+			_currentRuleType = Token.INVALID_TYPE;
+		} else if (_type == ANTLRv4Lexer.AT && _currentRuleType == Token.INVALID_TYPE) { // enter action
+			_currentRuleType = ANTLRv4Lexer.AT;
+		} else if (_type == ANTLRv4Lexer.END_ACTION && _currentRuleType == ANTLRv4Lexer.AT) { // exit action
+			_currentRuleType = Token.INVALID_TYPE;
+		} else if (_type == ANTLRv4Lexer.ID) {
 			String firstChar = _input.getText(Interval.of(_tokenStartCharIndex, _tokenStartCharIndex));
 			if (Character.isUpperCase(firstChar.charAt(0))) {
 				_type = ANTLRv4Lexer.TOKEN_REF;
