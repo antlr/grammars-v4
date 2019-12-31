@@ -3058,7 +3058,7 @@ select_list_elem
     : asterisk
     | column_elem
     | udt_elem
-    | expression_elem                                                   
+    | expression_elem
     ;
 
 table_sources
