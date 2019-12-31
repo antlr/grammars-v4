@@ -3204,7 +3204,7 @@ function_call
     | aggregate_windowed_function                       #AGGREGATE_WINDOWED_FUNC
     | analytic_windowed_function                        #ANALYTIC_WINDOWED_FUNC
     | scalar_function_name '(' expression_list? ')'     #SCALAR_FUNCTION
-    | STRING_AGG '(' aggcol=expression ',' (expression | STRING) ')' (WITHIN GROUP '(' order_by_clause ')')?  #STRINGAGG
+    | STRING_AGG '(' expr=expression ',' separator=expression ')' (WITHIN GROUP '(' order_by_clause ')')?  #STRINGAGG
     ;
 
 xml_data_type_methods
@@ -4004,6 +4004,7 @@ simple_id
     | STDEV
     | STDEVP
     | STOPLIST
+    | STRING_AGG
     | STUFF
     | SUBJECT
     | SUM
