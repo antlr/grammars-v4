@@ -3058,7 +3058,7 @@ select_list_elem
     : asterisk
     | column_elem
     | udt_elem
-    | expression_elem
+    | expression_elem                                                   
     ;
 
 table_sources
@@ -3204,6 +3204,7 @@ function_call
     | aggregate_windowed_function                       #AGGREGATE_WINDOWED_FUNC
     | analytic_windowed_function                        #ANALYTIC_WINDOWED_FUNC
     | scalar_function_name '(' expression_list? ')'     #SCALAR_FUNCTION
+    | STRING_AGG '(' aggcol=expression ',' (expression | STRING) ')' (WITHIN GROUP '(' order_by_clause ')')?  #STRINGAGG
     ;
 
 xml_data_type_methods
@@ -3992,6 +3993,7 @@ simple_id
     | SNAPSHOT
     | SOURCE
     | SPATIAL_WINDOW_MAX_CELLS
+    | SPLIT
     | STANDBY
     | START
     | START_DATE

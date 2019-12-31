@@ -767,6 +767,7 @@ STATUSONLY:                            'STATUSONLY';
 STDEV:                                 'STDEV';
 STDEVP:                                'STDEVP';
 STOPLIST:                              'STOPLIST';
+STRING_AGG:                            'STRING_AGG';
 STUFF:                                 'STUFF';
 SUBJECT:                               'SUBJECT';
 SUBSCRIPTION:                          'SUBSCRIPTION';
