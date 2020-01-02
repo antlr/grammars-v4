@@ -3486,7 +3486,7 @@ model_column
     ;
 
 model_rules_clause
-    : model_rules_part? '(' model_rules_element? (',' model_rules_element)* ')'
+    : model_rules_part? '(' (model_rules_element (',' model_rules_element)*)? ')'
     ;
 
 model_rules_part
@@ -4304,11 +4304,11 @@ keep_clause
     ;
 
 function_argument
-    : '(' argument? (',' argument)* ')' keep_clause?
+    : '(' (argument (',' argument)*)? ')' keep_clause?
     ;
 
 function_argument_analytic
-    : '(' (argument respect_or_ignore_nulls?)? (',' argument respect_or_ignore_nulls?)* ')' keep_clause?
+    : '(' (argument respect_or_ignore_nulls? (',' argument respect_or_ignore_nulls?)*)? ')' keep_clause?
     ;
 
 function_argument_modeling
