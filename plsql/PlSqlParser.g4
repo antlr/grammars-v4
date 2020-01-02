@@ -3304,12 +3304,13 @@ subquery_operation_part
     ;
 
 query_block
-    : SELECT (DISTINCT | UNIQUE | ALL)? (ASTERISK | selected_element (',' selected_element)*)
+    : SELECT (DISTINCT | UNIQUE | ALL)? selected_list
       into_clause? from_clause where_clause? hierarchical_query_clause? group_by_clause? model_clause?
     ;
 
-selected_element
-    : select_list_elements column_alias?
+selected_list
+    : '*'
+    | select_list_elements (',' select_list_elements)*
     ;
 
 from_clause
@@ -3318,7 +3319,7 @@ from_clause
 
 select_list_elements
     : tableview_name '.' ASTERISK
-    | (regular_id '.')? expressions
+    | expression column_alias?
     ;
 
 table_ref_list
@@ -3994,7 +3995,7 @@ using_clause
     ;
 
 using_element
-    : (IN OUT? | OUT)? select_list_elements column_alias?
+    : (IN OUT? | OUT)? select_list_elements
     ;
 
 collect_order_by_part
