@@ -3304,12 +3304,13 @@ subquery_operation_part
     ;
 
 query_block
-    : SELECT (DISTINCT | UNIQUE | ALL)? (ASTERISK | selected_element (',' selected_element)*)
+    : SELECT (DISTINCT | UNIQUE | ALL)? selected_list
       into_clause? from_clause where_clause? hierarchical_query_clause? group_by_clause? model_clause?
     ;
 
-selected_element
-    : select_list_elements column_alias?
+selected_list
+    : '*'
+    | select_list_elements (',' select_list_elements)*
     ;
 
 from_clause
@@ -3318,7 +3319,7 @@ from_clause
 
 select_list_elements
     : tableview_name '.' ASTERISK
-    | (regular_id '.')? expressions
+    | expression column_alias?
     ;
 
 table_ref_list
@@ -3485,7 +3486,7 @@ model_column
     ;
 
 model_rules_clause
-    : model_rules_part? '(' model_rules_element? (',' model_rules_element)* ')'
+    : model_rules_part? '(' (model_rules_element (',' model_rules_element)*)? ')'
     ;
 
 model_rules_part
@@ -3994,7 +3995,7 @@ using_clause
     ;
 
 using_element
-    : (IN OUT? | OUT)? select_list_elements column_alias?
+    : (IN OUT? | OUT)? select_list_elements
     ;
 
 collect_order_by_part
@@ -4303,11 +4304,11 @@ keep_clause
     ;
 
 function_argument
-    : '(' argument? (',' argument)* ')' keep_clause?
+    : '(' (argument (',' argument)*)? ')' keep_clause?
     ;
 
 function_argument_analytic
-    : '(' (argument respect_or_ignore_nulls?)? (',' argument respect_or_ignore_nulls?)* ')' keep_clause?
+    : '(' (argument respect_or_ignore_nulls? (',' argument respect_or_ignore_nulls?)*)? ')' keep_clause?
     ;
 
 function_argument_modeling
