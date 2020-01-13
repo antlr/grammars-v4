@@ -3162,6 +3162,8 @@ function_call
     // https://msdn.microsoft.com/en-us/library/ms187928.aspx
     | CAST '(' expression AS data_type ')'              #CAST
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/try-convert-transact-sql
+    | TRY_CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                       #TRY_CONVERT
     // https://msdn.microsoft.com/en-us/library/ms189788.aspx
     | CHECKSUM '(' '*' ')'                              #CHECKSUM
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
