@@ -195,6 +195,7 @@
 				<module>python3-js</module>
 				<module>python3-py</module>
 				<module>python3-ts</module>
+				<module>python3_without_actions</module>
 				<module>python3alt</module>
 				<module>quakemap</module>
 				<module>r</module>
