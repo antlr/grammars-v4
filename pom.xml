@@ -156,7 +156,6 @@
 				<module>muddb</module>
 				<module>mumath</module>
 				<module>mumps</module>
-				<module>mysql</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
 				<module>p</module>
@@ -170,7 +169,6 @@
 				<module>php</module>
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
-				<!-- <module>plsql</module> TODO: required superClass support -->
 				<module>ply</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
@@ -205,7 +203,7 @@
 				<module>snobol</module>
 				<module>solidity</module>
 				<module>sparql</module>
-				<module>sqlite</module>
+				<module>sql</module>
 				<module>stacktrace</module>
 				<module>stellaris</module>
 				<module>stringtemplate</module>
@@ -221,7 +219,6 @@
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>
-				<module>tsql</module>
 				<module>tsv</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
