@@ -15,6 +15,5 @@
 	<modules>
 		<module>swift2</module>
 		<module>swift3</module>
-		<module>swift-fin</module>
 	</modules>
 </project>
