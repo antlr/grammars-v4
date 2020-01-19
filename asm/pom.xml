@@ -18,5 +18,6 @@
 		<module>asm8086</module>
 		<module>asmMASM</module>
 		<module>asmZ80</module>
+		<module>masm</module>
 	</modules>
 </project>
