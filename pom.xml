@@ -105,7 +105,6 @@
 				<module>dcm</module>
 				<module>dice</module>
 				<module>dot</module>
-				<module>ecmascript</module>
 				<module>edif300</module>
 				<module>erlang</module>
 				<module>fasta</module>
@@ -132,7 +131,7 @@
 				<module>istc</module>
 				<module>java</module>
 				<module>javadoc</module>
-				<!-- <module>javascript</module> TODO: required superClass support -->
+				<module>javascript</module>
 				<module>jpa</module>
 				<module>json</module>
 				<module>kirikiri-tjs</module>
