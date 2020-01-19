@@ -69,17 +69,11 @@
 				<module>agc</module>
 				<module>algol60</module>
 				<module>alpaca</module>
-				<module>antlr3</module>
-				<module>antlr4</module>
+				<module>antlr</module>
 				<module>apex</module>
 				<module>arithmetic</module>
-				<module>asm6502</module>
-				<module>asm8080</module>
-				<module>asm8086</module>
-				<module>asmMASM</module>
-				<module>asmZ80</module>
+				<module>asm</module>
 				<module>asn</module>
-				<module>asn_3gpp</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
 				<!-- <module>aspectj</module> -->
 				<module>atl</module>
@@ -110,7 +104,6 @@
 				<module>dcm</module>
 				<module>dice</module>
 				<module>dot</module>
-				<module>ecmascript</module>
 				<module>edif300</module>
 				<module>erlang</module>
 				<module>fasta</module>
@@ -136,15 +129,12 @@
 				<module>iri</module>
 				<module>istc</module>
 				<module>java</module>
-				<module>java8</module>
-				<module>java9</module>
 				<module>javadoc</module>
-				<!-- <module>javascript</module> TODO: required superClass support -->
+				<module>javascript</module>
 				<module>jpa</module>
 				<module>json</module>
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
-				<module>kotlin-formal</module>
 				<module>kuka</module>
 				<module>lambda</module>
 				<module>lcc</module>
@@ -153,7 +143,6 @@
 				<module>lolcode</module>
 				<module>lpc</module>
 				<module>lua</module>
-				<module>masm</module>
 				<module>matlab</module>
 				<module>mdx</module>
 				<module>memcached_protocol</module>
@@ -167,7 +156,6 @@
 				<module>muddb</module>
 				<module>mumath</module>
 				<module>mumps</module>
-				<module>mysql</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
 				<module>p</module>
@@ -181,7 +169,6 @@
 				<module>php</module>
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
-				<!-- <module>plsql</module> TODO: required superClass support -->
 				<module>ply</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
@@ -190,13 +177,7 @@
 				<module>properties</module>
 				<module>protobuf3</module>
 				<module>prov-n</module>
-				<module>python2</module>
-				<module>python3</module>
-				<module>python3-js</module>
-				<module>python3-py</module>
-				<module>python3-ts</module>
-				<module>python3_without_actions</module>
-				<module>python3alt</module>
+				<module>python</module>
 				<module>quakemap</module>
 				<module>r</module>
 				<module>rcs</module>
@@ -204,8 +185,7 @@
 				<module>rego</module>
 				<module>restructuredtext</module>
 				<module>rexx</module>
-				<module>rfc822-datetime</module>
-				<module>rfc822-emailaddress</module>
+				<module>rfc822</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
 				<module>rpn</module>
@@ -223,13 +203,12 @@
 				<module>snobol</module>
 				<module>solidity</module>
 				<module>sparql</module>
-				<module>sqlite</module>
+				<module>sql</module>
 				<module>stacktrace</module>
 				<module>stellaris</module>
 				<module>stringtemplate</module>
 				<module>suokif</module>
-				<module>swift2</module>
-				<module>swift3</module>
+				<module>swift</module>
 				<module>swift-fin</module>
 				<module>telephone</module>
 				<module>thrift</module>
@@ -240,11 +219,9 @@
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>
-				<module>tsql</module>
 				<module>tsv</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
-				<module>ucb-logo</module>
 				<module>unicode</module>
 				<module>upnp</module>
 				<module>url</module>

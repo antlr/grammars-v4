@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>javaparent</artifactId>
+	<artifactId>pythonparent</artifactId>
 	<packaging>pom</packaging>
-	<name>Java Grammars</name>
+	<name>Python Grammars</name>
 
 	 <parent>
 		<groupId>org.antlr.grammars</groupId>
@@ -13,8 +13,12 @@
     </parent>
 
 	<modules>
-		<module>java</module>
-		<module>java8</module>
-		<module>java9</module>
+		<module>python2</module>
+		<module>python3</module>
+		<module>python3-js</module>
+		<module>python3-py</module>
+		<module>python3-ts</module>
+		<module>python3_without_actions</module>
+		<module>python3alt</module>
 	</modules>
 </project>
