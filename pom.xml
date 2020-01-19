@@ -135,7 +135,6 @@
 				<module>json</module>
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
-				<module>kotlin-formal</module>
 				<module>kuka</module>
 				<module>lambda</module>
 				<module>lcc</module>
