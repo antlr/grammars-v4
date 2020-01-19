@@ -69,8 +69,7 @@
 				<module>agc</module>
 				<module>algol60</module>
 				<module>alpaca</module>
-				<module>antlr3</module>
-				<module>antlr4</module>
+				<module>antlr</module>
 				<module>apex</module>
 				<module>arithmetic</module>
 				<module>asm</module>
@@ -229,7 +228,6 @@
 				<module>tsv</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
-				<module>ucb-logo</module>
 				<module>unicode</module>
 				<module>upnp</module>
 				<module>url</module>
