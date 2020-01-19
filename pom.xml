@@ -187,8 +187,7 @@
 				<module>rego</module>
 				<module>restructuredtext</module>
 				<module>rexx</module>
-				<module>rfc822-datetime</module>
-				<module>rfc822-emailaddress</module>
+				<module>rfc822</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
 				<module>rpn</module>
