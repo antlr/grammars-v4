@@ -52,12 +52,12 @@ ids
 
 path
    : Id ('.' Id)*
-   |(Id '.')? 'this'
+   | (Id '.')? 'this'
    ;
 
 stableId
-   : (path '.' Id) | Id
-   | (Id '.') 'super' classQualifier? '.' Id
+   : (path '.')? Id
+   | Id '.' 'super' classQualifier? '.' Id
    ;
 
 classQualifier
@@ -175,8 +175,8 @@ simpleExpr1
    : literal
    | path
    | '_'
-   | '(' expr? ')'
-   | simpleExpr  '.' Id
+   | '(' exprs? ')'
+   | simpleExpr '.' Id
    | simpleExpr1 '.' Id
    | simpleExpr  typeArgs
    | simpleExpr1 typeArgs
@@ -389,7 +389,7 @@ importSelectors
    ;
 
 importSelector
-   : Id ('=>' Id | '=>' '_')?
+   : Id ('=>' (Id | '_'))?
    ;
 
 dcl
