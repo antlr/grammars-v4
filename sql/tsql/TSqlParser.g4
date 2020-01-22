@@ -2982,7 +2982,8 @@ for_clause
     ;
 
 xml_common_directives
-    : ',' (BINARY_BASE64 | TYPE | ROOT)
+    : ',' (BINARY_BASE64 | TYPE)
+    | (COMMA ROOT ('(' STRING ')')?)
     ;
 
 order_by_expression
