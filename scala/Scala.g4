@@ -50,9 +50,14 @@ ids
    : Id (',' Id)*
    ;
 
+path
+   : Id ('.' Id)*
+   |(Id '.')? 'this'
+   ;
+
 stableId
-   : (Id | (Id '.')? 'this') '.' Id
-   | (Id '.')? 'super' classQualifier? '.' Id
+   : (path '.' Id) | Id
+   | (Id '.') 'super' classQualifier? '.' Id
    ;
 
 classQualifier
@@ -135,15 +140,14 @@ expr
 expr1
    : 'if' '(' expr ')' expr (Semi? 'else' expr)?
    | 'while' '(' expr ')' expr
-   | 'try' ('{' block '}' | expr) ('catch' '{' caseClauses '}')? ('finally' expr)?
+   | 'try' expr ('catch' expr)? ('finally' expr)?
    | 'do' expr Semi? 'while' '(' expr ')'
    | 'for' ('(' enumerators ')' | '{' enumerators '}') 'yield'? expr
    | 'throw' expr
    | 'return' expr?
-   | (('new' (classTemplate | templateBody) | blockExpr | simpleExpr1 '_'?) '.') Id '=' expr
+   | ((simpleExpr | simpleExpr1) '.')? Id '=' expr
    | simpleExpr1 argumentExprs '=' expr
-   | postfixExpr
-   | postfixExpr ascription
+   | postfixExpr ascription?
    | postfixExpr 'match' '{' caseClauses '}'
    ;
 
@@ -157,17 +161,25 @@ infixExpr
    ;
 
 prefixExpr
-   : ('-' | '+' | '~' | '!')? ('new' (classTemplate | templateBody) | blockExpr | simpleExpr1 '_'?)
+   : ('-' | '+' | '~' | '!')? (simpleExpr | simpleExpr1)
    ;
 
+simpleExpr
+   : 'new' (classTemplate | templateBody)
+   | blockExpr
+   ;
+
+// Dublicate lines to prevent left-recursive code.
+// can't use (simpleExpr|simpleExpr1) '.' Id
 simpleExpr1
    : literal
-   | stableId
-   | (Id '.')? 'this'
+   | path
    | '_'
-   | '(' exprs? ')'
-   | ('new' (classTemplate | templateBody) | blockExpr) '.' Id
-   | ('new' (classTemplate | templateBody) | blockExpr) typeArgs
+   | '(' expr? ')'
+   | simpleExpr  '.' Id
+   | simpleExpr1 '.' Id
+   | simpleExpr  typeArgs
+   | simpleExpr1 typeArgs
    | simpleExpr1 argumentExprs
    ;
 
@@ -187,7 +199,7 @@ blockExpr
    ;
 
 block
-   : blockStat (Sep blockStat)* resultExpr?
+   : blockStat (Sep? blockStat)* resultExpr?
    ;
 
 blockStat
@@ -195,7 +207,6 @@ blockStat
    | annotation* ('implicit' | 'lazy')? def
    | annotation* localModifier* tmplDef
    | expr1
-   |
    ;
 
 resultExpr
@@ -358,7 +369,6 @@ templateStat
    | (annotation)* modifier* def
    | (annotation)* modifier* dcl
    | expr
-   |
    ;
 
 selfType
@@ -371,7 +381,7 @@ import_
    ;
 
 importExpr
-   : stableId '.' (Id | '_' | importSelectors)
+   : stableId* ('.' (Id | '_' | importSelectors))?
    ;
 
 importSelectors
@@ -379,7 +389,7 @@ importSelectors
    ;
 
 importSelector
-   : Id ('=>' Id | '=>' '_')
+   : Id ('=>' Id | '=>' '_')?
    ;
 
 dcl
@@ -510,7 +520,7 @@ selfInvocation
    ;
 
 topStatSeq
-   : topStat (Sep topStat)*
+   : topStat (Sep? topStat)*
    ;
 
 topStat
@@ -518,7 +528,6 @@ topStat
    | import_
    | packaging
    | packageObject
-   |
    ;
 
 packaging
@@ -559,7 +568,7 @@ SymbolLiteral
 
 
 IntegerLiteral
-   : (DecimalNumeral | HexNumeral) ('L' | 'l')
+   : (DecimalNumeral | HexNumeral) ('L' | 'l')?
    ;
 
 
