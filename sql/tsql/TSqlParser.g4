@@ -3081,7 +3081,7 @@ table_source_item
     | rowset_function             as_table_alias?
     | derived_table              (as_table_alias column_alias_list?)?
     | change_table                as_table_alias
-    | function_call               as_table_alias?
+    | function_call              (as_table_alias column_alias_list?)?
     | LOCAL_ID                    as_table_alias?
     | LOCAL_ID '.' function_call (as_table_alias column_alias_list?)?
     | open_xml
