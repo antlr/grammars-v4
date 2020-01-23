@@ -50,9 +50,14 @@ ids
    : Id (',' Id)*
    ;
 
+path
+   : Id ('.' Id)*
+   | (Id '.')? 'this'
+   ;
+
 stableId
-   : (Id | (Id '.')? 'this') '.' Id
-   | (Id '.')? 'super' classQualifier? '.' Id
+   : (path '.')? Id
+   | Id '.' 'super' classQualifier? '.' Id
    ;
 
 classQualifier
@@ -70,7 +75,7 @@ functionArgTypes
    ;
 
 existentialClause
-   : 'forSome' '{' existentialDcl (Sep existentialDcl)* '}'
+   : 'forSome' '{' existentialDcl (Sep? existentialDcl)* '}'
    ;
 
 existentialDcl
@@ -95,7 +100,7 @@ simpleType
    : simpleType typeArgs
    | simpleType '#' Id
    | stableId
-   | (stableId | (Id '.')? 'this') '.' 'type'
+   | path '.' 'type'
    | '(' types ')'
    ;
 
@@ -108,13 +113,12 @@ types
    ;
 
 refinement
-   : '{' refineStat (Sep refineStat)* '}'
+   : '{' refineStat (Sep? refineStat)* '}'
    ;
 
 refineStat
    : dcl
    | 'type' typeDef
-   |
    ;
 
 typePat
@@ -133,22 +137,21 @@ expr
    ;
 
 expr1
-   : 'if' '(' expr ')' expr (Semi? 'else' expr)?
+   : 'if' '(' expr ')' expr (Sep? 'else' expr)?
    | 'while' '(' expr ')' expr
-   | 'try' ('{' block '}' | expr) ('catch' '{' caseClauses '}')? ('finally' expr)?
-   | 'do' expr Semi? 'while' '(' expr ')'
+   | 'try' expr ('catch' expr)? ('finally' expr)?
+   | 'do' expr Sep? 'while' '(' expr ')'
    | 'for' ('(' enumerators ')' | '{' enumerators '}') 'yield'? expr
    | 'throw' expr
    | 'return' expr?
-   | (('new' (classTemplate | templateBody) | blockExpr | simpleExpr1 '_'?) '.') Id '=' expr
+   | ((simpleExpr | simpleExpr1 '_'?) '.')? Id '=' expr
    | simpleExpr1 argumentExprs '=' expr
-   | postfixExpr
-   | postfixExpr ascription
+   | postfixExpr ascription?
    | postfixExpr 'match' '{' caseClauses '}'
    ;
 
 postfixExpr
-   : infixExpr (Id)?
+   : infixExpr Id? (prefixExpr)*
    ;
 
 infixExpr
@@ -157,17 +160,25 @@ infixExpr
    ;
 
 prefixExpr
-   : ('-' | '+' | '~' | '!')? ('new' (classTemplate | templateBody) | blockExpr | simpleExpr1 '_'?)
+   : ('-' | '+' | '~' | '!')? (simpleExpr | simpleExpr1 '_'?)
    ;
 
+simpleExpr
+   : 'new' (classTemplate | templateBody)
+   | blockExpr
+   ;
+
+// Dublicate lines to prevent left-recursive code.
+// can't use (simpleExpr|simpleExpr1) '.' Id
 simpleExpr1
    : literal
-   | stableId
-   | (Id '.')? 'this'
+   | path
    | '_'
    | '(' exprs? ')'
-   | ('new' (classTemplate | templateBody) | blockExpr) '.' Id
-   | ('new' (classTemplate | templateBody) | blockExpr) typeArgs
+   | simpleExpr '.' Id
+   | simpleExpr1 '_'?  '.' Id
+   | simpleExpr  typeArgs
+   | simpleExpr1 '_'? typeArgs
    | simpleExpr1 argumentExprs
    ;
 
@@ -187,7 +198,7 @@ blockExpr
    ;
 
 block
-   : blockStat (Sep blockStat)* resultExpr?
+   : blockStat (Sep? blockStat)* resultExpr?
    ;
 
 blockStat
@@ -195,7 +206,6 @@ blockStat
    | annotation* ('implicit' | 'lazy')? def
    | annotation* localModifier* tmplDef
    | expr1
-   |
    ;
 
 resultExpr
@@ -204,11 +214,11 @@ resultExpr
    ;
 
 enumerators
-   : generator (Sep generator)*
+   : generator (Sep? generator)*
    ;
 
 generator
-   : pattern1 '<-' expr (Semi? guard | Semi pattern1 '=' expr)*
+   : pattern1 '<-' expr (Sep? guard | Sep pattern1 '=' expr)*
    ;
 
 caseClauses
@@ -228,13 +238,12 @@ pattern
    ;
 
 pattern1
-   : Varid ':' typePat
-   | '_' ':' typePat
+   : (Varid| '_') ':' typePat
    | pattern2
    ;
 
 pattern2
-   : Varid ('@' pattern3)?
+   : Id ('@' pattern3)?
    | pattern3
    ;
 
@@ -248,13 +257,13 @@ simplePattern
    | Varid
    | literal
    | stableId ('(' patterns? ')')?
-   | stableId '(' (patterns? ',')? (Varid '@')? '_' '*' ')'
+   | stableId '(' (patterns ',')? (Id '@')? '_' '*' ')'
    | '(' patterns? ')'
    ;
 
 patterns
-   : pattern (',' pattern)*
-   | '_'+
+   : pattern (',' patterns)?
+   | '_' '*'
    ;
 
 typeParamClause
@@ -266,7 +275,7 @@ funTypeParamClause
    ;
 
 variantTypeParam
-   : annotation? ('+' | '-')? typeParam
+   : annotation* ('+' | '-')? typeParam
    ;
 
 typeParam
@@ -371,7 +380,7 @@ import_
    ;
 
 importExpr
-   : stableId '.' (Id | '_' | importSelectors)
+   : stableId* ('.' (Id | '_' | importSelectors))?
    ;
 
 importSelectors
@@ -379,7 +388,7 @@ importSelectors
    ;
 
 importSelector
-   : Id ('=>' Id | '=>' '_')
+   : Id ('=>' (Id | '_'))?
    ;
 
 dcl
@@ -510,7 +519,7 @@ selfInvocation
    ;
 
 topStatSeq
-   : topStat (Sep topStat)*
+   : topStat (Sep? topStat)*
    ;
 
 topStat
@@ -518,7 +527,6 @@ topStat
    | import_
    | packaging
    | packageObject
-   |
    ;
 
 packaging
@@ -559,14 +567,13 @@ SymbolLiteral
 
 
 IntegerLiteral
-   : (DecimalNumeral | HexNumeral) ('L' | 'l')
+   : (DecimalNumeral | HexNumeral) ('L' | 'l')?
    ;
 
 
 StringLiteral
    : '"' StringElement* '"' | '"""' MultiLineChars '"""'
    ;
-
 
 FloatingPointLiteral
    : Digit + '.' Digit + ExponentPart? FloatType? | '.' Digit + ExponentPart? FloatType? | Digit ExponentPart FloatType? | Digit + ExponentPart? FloatType
@@ -576,7 +583,6 @@ FloatingPointLiteral
 Varid
    : Lower Idrest
    ;
-
 
 Paren
    : '(' | ')' | '[' | ']' | '{' | '}'
