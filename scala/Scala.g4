@@ -75,7 +75,7 @@ functionArgTypes
    ;
 
 existentialClause
-   : 'forSome' '{' existentialDcl (Sep existentialDcl)* '}'
+   : 'forSome' '{' existentialDcl (Sep? existentialDcl)* '}'
    ;
 
 existentialDcl
@@ -100,7 +100,7 @@ simpleType
    : simpleType typeArgs
    | simpleType '#' Id
    | stableId
-   | (stableId | (Id '.')? 'this') '.' 'type'
+   | path '.' 'type'
    | '(' types ')'
    ;
 
@@ -113,13 +113,12 @@ types
    ;
 
 refinement
-   : '{' refineStat (Sep refineStat)* '}'
+   : '{' refineStat (Sep? refineStat)* '}'
    ;
 
 refineStat
    : dcl
    | 'type' typeDef
-   |
    ;
 
 typePat
@@ -138,21 +137,21 @@ expr
    ;
 
 expr1
-   : 'if' '(' expr ')' expr (Semi? 'else' expr)?
+   : 'if' '(' expr ')' expr (Sep? 'else' expr)?
    | 'while' '(' expr ')' expr
    | 'try' expr ('catch' expr)? ('finally' expr)?
-   | 'do' expr Semi? 'while' '(' expr ')'
+   | 'do' expr Sep? 'while' '(' expr ')'
    | 'for' ('(' enumerators ')' | '{' enumerators '}') 'yield'? expr
    | 'throw' expr
    | 'return' expr?
-   | ((simpleExpr | simpleExpr1) '.')? Id '=' expr
+   | ((simpleExpr | simpleExpr1 '_'?) '.')? Id '=' expr
    | simpleExpr1 argumentExprs '=' expr
    | postfixExpr ascription?
    | postfixExpr 'match' '{' caseClauses '}'
    ;
 
 postfixExpr
-   : infixExpr (Id)?
+   : infixExpr Id? (prefixExpr)*
    ;
 
 infixExpr
@@ -161,7 +160,7 @@ infixExpr
    ;
 
 prefixExpr
-   : ('-' | '+' | '~' | '!')? (simpleExpr | simpleExpr1)
+   : ('-' | '+' | '~' | '!')? (simpleExpr | simpleExpr1 '_'?)
    ;
 
 simpleExpr
@@ -177,9 +176,9 @@ simpleExpr1
    | '_'
    | '(' exprs? ')'
    | simpleExpr '.' Id
-   | simpleExpr1 '.' Id
+   | simpleExpr1 '_'?  '.' Id
    | simpleExpr  typeArgs
-   | simpleExpr1 typeArgs
+   | simpleExpr1 '_'? typeArgs
    | simpleExpr1 argumentExprs
    ;
 
@@ -215,11 +214,11 @@ resultExpr
    ;
 
 enumerators
-   : generator (Sep generator)*
+   : generator (Sep? generator)*
    ;
 
 generator
-   : pattern1 '<-' expr (Semi? guard | Semi pattern1 '=' expr)*
+   : pattern1 '<-' expr (Sep? guard | Sep pattern1 '=' expr)*
    ;
 
 caseClauses
@@ -239,13 +238,12 @@ pattern
    ;
 
 pattern1
-   : Varid ':' typePat
-   | '_' ':' typePat
+   : (Varid| '_') ':' typePat
    | pattern2
    ;
 
 pattern2
-   : Varid ('@' pattern3)?
+   : Id ('@' pattern3)?
    | pattern3
    ;
 
@@ -259,13 +257,13 @@ simplePattern
    | Varid
    | literal
    | stableId ('(' patterns? ')')?
-   | stableId '(' (patterns? ',')? (Varid '@')? '_' '*' ')'
+   | stableId '(' (patterns ',')? (Id '@')? '_' '*' ')'
    | '(' patterns? ')'
    ;
 
 patterns
-   : pattern (',' pattern)*
-   | '_'+
+   : pattern (',' patterns)?
+   | '_' '*'
    ;
 
 typeParamClause
@@ -277,7 +275,7 @@ funTypeParamClause
    ;
 
 variantTypeParam
-   : annotation? ('+' | '-')? typeParam
+   : annotation* ('+' | '-')? typeParam
    ;
 
 typeParam
@@ -369,6 +367,7 @@ templateStat
    | (annotation)* modifier* def
    | (annotation)* modifier* dcl
    | expr
+   |
    ;
 
 selfType
@@ -576,7 +575,6 @@ StringLiteral
    : '"' StringElement* '"' | '"""' MultiLineChars '"""'
    ;
 
-
 FloatingPointLiteral
    : Digit + '.' Digit + ExponentPart? FloatType? | '.' Digit + ExponentPart? FloatType? | Digit ExponentPart FloatType? | Digit + ExponentPart? FloatType
    ;
@@ -585,7 +583,6 @@ FloatingPointLiteral
 Varid
    : Lower Idrest
    ;
-
 
 Paren
    : '(' | ')' | '[' | ']' | '{' | '}'
