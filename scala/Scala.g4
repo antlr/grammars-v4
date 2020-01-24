@@ -50,14 +50,10 @@ ids
    : Id (',' Id)*
    ;
 
-path
-   : Id ('.' Id)*
-   | (Id '.')? 'this'
-   ;
-
 stableId
-   : (path '.')? Id
-   | Id '.' 'super' classQualifier? '.' Id
+   : Id
+   | stableId '.' Id
+   | (Id '.')? ('this' | 'super' classQualifier? '.' Id)
    ;
 
 classQualifier
@@ -99,8 +95,7 @@ annotType
 simpleType
    : simpleType typeArgs
    | simpleType '#' Id
-   | stableId
-   | path '.' 'type'
+   | stableId ('.' 'type')?
    | '(' types ')'
    ;
 
@@ -172,7 +167,7 @@ simpleExpr
 // can't use (simpleExpr|simpleExpr1) '.' Id
 simpleExpr1
    : literal
-   | path
+   | stableId
    | '_'
    | '(' exprs? ')'
    | simpleExpr '.' Id
@@ -238,7 +233,7 @@ pattern
    ;
 
 pattern1
-   : (Varid| '_') ':' typePat
+   : (BoundVarid| '_' | Id) ':' typePat
    | pattern2
    ;
 
@@ -584,6 +579,10 @@ Varid
    : Lower Idrest
    ;
 
+BoundVarid
+   : Varid
+   | '`' Varid '`'
+   ;
 Paren
    : '(' | ')' | '[' | ']' | '{' | '}'
    ;
