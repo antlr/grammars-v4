@@ -76,7 +76,7 @@ block
    ;
 
 statement
-   : label? assignstmt
+   : label? (assignstmt | assertstmt)
    ;
 
 label
@@ -87,12 +87,30 @@ assignstmt
    : lhs ':=' expression ';'
    ;
 
+assertstmt
+   : 'assert' expression ';'
+   ;
+
 lhs
    : identifier
    ;
 
 expression
-   : atom (('+' | '-') atom)+
+   : (atom addop expression)
+   | (atom compareop expression)
+   | atom
+   ;
+
+addop
+   : '+'
+   | '-'
+   ;
+
+compareop
+   : '<'
+   | '>'
+   | '>='
+   | '<='
    ;
 
 moduleend
