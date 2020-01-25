@@ -60,7 +60,7 @@ variables
    ;
 
 vardecl
-   : identifier (('=' atom) | ('\\in') set)
+   : identifier (('=' expression) | ('\\in') set)
    ;
 
 set
@@ -104,11 +104,15 @@ invariants
    ;
 
 invariant
-   : identifier '==' expression
+   : identifier '==' (expression | equation)
    ;
 
 lhs
    : identifier
+   ;
+
+equation
+   : expression '=' expression
    ;
 
 expression
