@@ -60,7 +60,11 @@ variables
    ;
 
 vardecl
-   : identifier '=' atom
+   : identifier (('=' atom) | ('\\in') set)
+   ;
+
+set
+   : atom '..' atom
    ;
 
 algostart
@@ -76,7 +80,7 @@ block
    ;
 
 statement
-   : label? (assignstmt | assertstmt)
+   : label? (assignstmt | assertstmt | ifstmt)
    ;
 
 label
@@ -89,6 +93,10 @@ assignstmt
 
 assertstmt
    : 'assert' expression ';'
+   ;
+
+ifstmt
+   : 'if' expression 'then' statement* 'end' 'if' ';'
    ;
 
 lhs
