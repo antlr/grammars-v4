@@ -1,0 +1,11 @@
+-- algorithm OneBitClock {
+  variable clock \in {0, 1};
+  {
+    while (TRUE) {
+      if (clock = 0)
+        clock := 1
+      else 
+        clock := 0    
+    }
+  }
+}
