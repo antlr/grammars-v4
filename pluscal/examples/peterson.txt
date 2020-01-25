@@ -1,0 +1,15 @@
+   --algorithm Peterson {
+      variables flag = [i \in {0, 1} |-> FALSE],  turn = 0;
+         \* Declares the global variables flag and turn and their initial values;
+         \* flag is a 2-element array with initially flag[0] = flag[1] = FALSE.
+      fair process (proc \in {0,1}) {
+        \* Declares two processes with identifier self equal to 0 and 1.
+        \* The keyword fair means that no process can stop forever if it can
+        \* always take a step.
+        a1: while (TRUE) {
+             skip ;  \* the noncritical section
+        a2:  flag[self] := TRUE ;
+        a3:  turn := 1 - self ;   
+        a4:  await (flag[1-self] = FALSE) \/ (turn = self); \* \/ is written || in C.
+        cs:  skip ;  \* the critical section
+        a5:  flag[self] := FALSE               }     }     }
