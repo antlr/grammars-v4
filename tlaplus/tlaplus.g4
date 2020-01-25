@@ -44,7 +44,7 @@ moduleheader
    ;
 
 modulebody
-   : extends_? algo
+   : extends_? algo invariants?
    ;
 
 extends_
@@ -99,6 +99,14 @@ ifstmt
    : 'if' expression 'then' statement* 'end' 'if' ';'
    ;
 
+invariants
+   : invariant+
+   ;
+
+invariant
+   : identifier '==' expression
+   ;
+
 lhs
    : identifier
    ;
@@ -136,6 +144,10 @@ number
 
 identifier
    : ID
+   ;
+
+COMMENT
+   : '\\*' ~ [\r\n]* -> skip
    ;
 
 DIGIT

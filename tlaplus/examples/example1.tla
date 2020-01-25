@@ -1,4 +1,4 @@
----- MODULE transfer ----
+---- MODULE Transfer ----
 EXTENDS Naturals, TLC
 
 (* --algorithm transfer
@@ -13,4 +13,11 @@ end if;
 C: assert alice_account >= 0;
 
 end algorithm *)
-=====
+
+\* BEGIN TRANSLATION
+\* Removed for clarity...
+\* END TRANSLATION
+
+MoneyNotNegative == money >= 0
+
+====
