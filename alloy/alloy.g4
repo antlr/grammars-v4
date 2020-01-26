@@ -36,7 +36,7 @@ moduleDecl
    ;
 
 import_
-   : 'open' qualName (qualName (',' qualName)*)? ('as' name)?
+   : 'open' qualName (',' qualName)* ('as' name)?
    ;
 
 paragraph
@@ -87,9 +87,10 @@ paraDecls
 assertDecl
    : 'assert' name? block
    ;
-
+   // qualname | bloclk should be optional
+   
 cmdDecl
-   : (name ':')? ('run' | 'check')? (qualName | block)? scope?
+   : (name ':')? ('run' | 'check')? (qualName | block) scope?
    ;
 
 scope
@@ -102,14 +103,14 @@ typescope
    ;
 
 expr
-   : const
+   : const_
    | qualName
    | '@' name
    | 'this'
    | unOp expr
    | expr binOp expr
    | expr arrowOp expr
-   | expr ((',' expr)*)?
+   | expr (',' expr)+
    | expr ('!' | 'not') compareOp expr
    | expr ('=>' | 'implies') expr 'else' expr
    | 'let' letDecl (',' letDecl)* blockOrBar
@@ -119,7 +120,7 @@ expr
    | block
    ;
 
-const
+const_
    : '-'? number
    | 'none'
    | 'univ'
