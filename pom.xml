@@ -68,6 +68,7 @@
 				<module>abnf</module>
 				<module>agc</module>
 				<module>algol60</module>
+				<module>alloy</module>
 				<module>alpaca</module>
 				<module>antlr</module>
 				<module>apex</module>
