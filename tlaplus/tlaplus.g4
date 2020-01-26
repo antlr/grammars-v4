@@ -80,7 +80,7 @@ block
    ;
 
 statement
-   : label? (assignstmt | assertstmt | ifstmt)
+   : label (assignstmt | assertstmt | ifstmt)+
    ;
 
 label
