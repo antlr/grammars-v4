@@ -80,7 +80,7 @@ variable
    ;
 
 variables
-   : 'variables' vardecl (',' vardecl)+ ';'
+   : 'variables' vardecl (',' vardecl)* ';'
    ;
 
 vardecl
@@ -111,7 +111,7 @@ block
    ;
 
 statement
-   : label (assignstmt | assertstmt | ifstmt | whilestmt | withstmt)+
+   : label? (assignstmt | assertstmt | ifstmt | whilestmt | withstmt)+
    ;
 
 label
