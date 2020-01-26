@@ -52,31 +52,48 @@ extends_
    ;
 
 algo
-   : '(*' algostart variables block algoend '*)'
+   : '(*' '--algorithm' identifier vars? (processes | block) 'end' 'algorithm' '*)'
+   ;
+
+processes
+   : process+
+   ;
+
+process
+   : 'process' vardecl vars? block 'end' 'process'
+   ;
+
+vars
+   : (variable | variables)
+   ;
+
+variable
+   : 'variable' vardecl ';'
    ;
 
 variables
-   : 'variables' vardecl (',' vardecl)* ';'
+   : 'variables' vardecl (',' vardecl)+ ';'
    ;
 
 vardecl
-   : identifier (('=' expression) | ('\\in') set)
+   : expressiondecl
+   | setdecl
+   ;
+
+expressiondecl
+   : identifier ('=' expression)
+   ;
+
+setdecl
+   : identifier '\\in' set
    ;
 
 set
    : atom '..' atom
    ;
 
-algostart
-   : '--algorithm' identifier
-   ;
-
-algoend
-   : 'algorithm'
-   ;
-
 block
-   : 'begin' statement* 'end'
+   : 'begin' statement*
    ;
 
 statement
