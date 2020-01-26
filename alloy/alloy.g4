@@ -110,7 +110,7 @@ expr
    | unOp expr
    | expr binOp expr
    | expr arrowOp expr
-   | expr (',' expr)+
+   | expr '[' (',' expr)+ ']'
    | expr ('!' | 'not') compareOp expr
    | expr ('=>' | 'implies') expr 'else' expr
    | 'let' letDecl (',' letDecl)* blockOrBar
@@ -131,7 +131,7 @@ unOp
    : '!'
    | 'not'
    | 'no'
-   | 'mult'
+   | mult
    | 'set'
    | '#'
    | '~'
