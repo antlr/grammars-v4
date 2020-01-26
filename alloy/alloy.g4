@@ -28,7 +28,7 @@
 grammar alloy;
 
 alloyModule
-   : moduleDecl? import_* paragraph*
+   : moduleDecl? import_* paragraph+
    ;
 
 moduleDecl
@@ -49,7 +49,7 @@ paragraph
    ;
 
 sigDecl
-   : 'abstract'? mult? 'sig' name (',' name)* sigExt? '{' decl (',' decl)* '}' block?
+   : 'abstract'? mult? 'sig' name (',' name)* sigExt? '{' (decl (',' decl)*)? '}' block?
    ;
 
 sigExt
@@ -215,7 +215,7 @@ IDENTIFIER
    ;
 
 COMMENT
-   : ';' ~ [\r\n]*
+   : '//' ~ [\r\n]* -> skip
    ;
 
 WS
