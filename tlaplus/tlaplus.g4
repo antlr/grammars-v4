@@ -52,7 +52,7 @@ extends_
    ;
 
 algo
-   : '(*' '--algorithm' identifier vars? (processes | block) 'end' 'algorithm' '*)'
+   : '(*' '--algorithm' identifier vars? constants? (processes | block) 'end' 'algorithm' '*)'
    ;
 
 processes
@@ -60,7 +60,15 @@ processes
    ;
 
 process
-   : 'process' vardecl vars? block 'end' 'process'
+   : 'process' vardecl vars? constants? block 'end' 'process'
+   ;
+
+constants
+   : 'define' constant+ 'end' 'define' ';'
+   ;
+
+constant
+   : identifier '==' 'DOMAN' expression
    ;
 
 vars
@@ -78,18 +86,28 @@ variables
 vardecl
    : expressiondecl
    | setdecl
+   | tupledecl
    ;
 
 expressiondecl
-   : identifier ('=' expression)
+   : identifier '=' expression
    ;
 
 setdecl
-   : identifier '\\in' set
+   : identifier IN atom '..' atom
    ;
 
 set
-   : atom '..' atom
+   : ('{' expression (',' expression)* '}')
+   | ('{' '}')
+   ;
+
+tupledecl
+   : identifier '=' tuple
+   ;
+
+tuple
+   : '<<' ((atom | tuple) (',' (atom | tuple))*)? ','? '>>'
    ;
 
 block
@@ -133,14 +151,23 @@ equation
    ;
 
 expression
-   : (atom addop expression)
+   : (atom binop expression)
    | (atom compareop expression)
-   | atom
+   | (atom)
+   | ('(' expression ')')
    ;
 
-addop
+binop
    : '+'
    | '-'
+   | '*'
+   | '/'
+   | '/='
+   | '*='
+   | '+='
+   | '-='
+   | AND
+   | OR
    ;
 
 compareop
@@ -157,6 +184,9 @@ moduleend
 atom
    : number
    | identifier
+   | (identifier '[' expression ']')
+   | TRUE
+   | FALSE
    ;
 
 number
@@ -165,6 +195,66 @@ number
 
 identifier
    : ID
+   ;
+
+IN
+   : '\\in'
+   ;
+
+EXISTS
+   : '\\E'
+   ;
+
+ALL
+   : '\\A'
+   ;
+
+COMBINE
+   : '\\o'
+   ;
+
+CARTESIANPRODUCT
+   : '\\X'
+   ;
+
+KEYVAL
+   : '|->'
+   ;
+
+MULTIASSIGN
+   : '||'
+   ;
+
+IMPLIES
+   : '=>'
+   ;
+
+EITHER
+   : '<=>'
+   ;
+
+CHOOSE
+   : 'CHOOSE'
+   ;
+
+DOMAIN
+   : 'DOMAIN'
+   ;
+
+TRUE
+   : 'TRUE'
+   ;
+
+FALSE
+   : 'FALSE'
+   ;
+
+AND
+   : '/\\'
+   ;
+
+OR
+   : '\\/'
    ;
 
 COMMENT
