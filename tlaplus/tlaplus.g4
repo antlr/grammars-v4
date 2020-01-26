@@ -68,7 +68,7 @@ constants
    ;
 
 constant
-   : identifier '==' 'DOMAN' expression
+   : identifier '==' expression
    ;
 
 vars
@@ -86,7 +86,6 @@ variables
 vardecl
    : expressiondecl
    | setdecl
-   | tupledecl
    ;
 
 expressiondecl
@@ -102,12 +101,9 @@ set
    | ('{' '}')
    ;
 
-tupledecl
-   : identifier '=' tuple
-   ;
-
 tuple
-   : '<<' ((atom | tuple) (',' (atom | tuple))*)? ','? '>>'
+   : ('<<' expression (',' expression)* '>>')
+   | ('<<' '>>')
    ;
 
 block
@@ -115,7 +111,7 @@ block
    ;
 
 statement
-   : label (assignstmt | assertstmt | ifstmt)+
+   : label (assignstmt | assertstmt | ifstmt | whilestmt | withstmt)+
    ;
 
 label
@@ -132,6 +128,14 @@ assertstmt
 
 ifstmt
    : 'if' expression 'then' statement* 'end' 'if' ';'
+   ;
+
+whilestmt
+   : 'while' expression 'do' statement* 'end' 'while' ';'
+   ;
+
+withstmt
+   : 'with' 'from' expression 'to' expression 'do' statement* 'end' 'with' ';'
    ;
 
 invariants
@@ -155,6 +159,7 @@ expression
    | (atom compareop expression)
    | (atom)
    | ('(' expression ')')
+   | func
    ;
 
 binop
@@ -187,6 +192,16 @@ atom
    | (identifier '[' expression ']')
    | TRUE
    | FALSE
+   | tuple
+   | set
+   ;
+
+func
+   : domainfunc
+   ;
+
+domainfunc
+   : DOMAIN expression
    ;
 
 number
