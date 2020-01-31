@@ -114,6 +114,7 @@ administrationStatement
 utilityStatement
     : simpleDescribeStatement | fullDescribeStatement
     | helpStatement | useStatement | signalStatement
+    | resignalStatement | diagnosticsStatement
     ;
 
 
@@ -1845,6 +1846,11 @@ signalStatement
         ( SET signalConditionInformation ( ',' signalConditionInformation)* )?
     ;
 
+resignalStatement
+    : RESIGNAL ( ( SQLSTATE VALUE? stringLiteral ) | ID | REVERSE_QUOTE_ID )?
+        ( SET signalConditionInformation ( ',' signalConditionInformation)* )?
+    ;
+
 signalConditionInformation
     : ( CLASS_ORIGIN
           | SUBCLASS_ORIGIN
@@ -1857,7 +1863,31 @@ signalConditionInformation
           | SCHEMA_NAME
           | TABLE_NAME
           | COLUMN_NAME
+          | CURSOR_NAME
         ) '=' ( stringLiteral | DECIMAL_LITERAL )
+    ;
+
+diagnosticsStatement
+    : GET ( CURRENT | STACKED )? DIAGNOSTICS (
+          ( variableClause '=' ( NUMBER | ROW_COUNT ) ( ',' variableClause '=' ( NUMBER | ROW_COUNT ) )* )
+        | ( CONDITION  ( decimalLiteral | variableClause ) variableClause '=' diagnosticsConditionInformationName ( ',' variableClause '=' diagnosticsConditionInformationName )* )
+      )
+    ;
+
+diagnosticsConditionInformationName
+    : CLASS_ORIGIN
+    | SUBCLASS_ORIGIN
+    | RETURNED_SQLSTATE
+    | MESSAGE_TEXT
+    | MYSQL_ERRNO
+    | CONSTRAINT_CATALOG
+    | CONSTRAINT_SCHEMA
+    | CONSTRAINT_NAME
+    | CATALOG_NAME
+    | SCHEMA_NAME
+    | TABLE_NAME
+    | COLUMN_NAME
+    | CURSOR_NAME
     ;
 
 // details
@@ -2401,8 +2431,9 @@ keywordsCanBeId
     | COMPLETION | COMPRESSED | COMPRESSION | CONCURRENT
     | CONNECTION | CONSISTENT | CONSTRAINT_CATALOG | CONSTRAINT_NAME
     | CONSTRAINT_SCHEMA | CONTAINS | CONTEXT
-    | CONTRIBUTORS | COPY | CPU | DATA | DATAFILE | DEALLOCATE
-    | DEFAULT_AUTH | DEFINER | DELAY_KEY_WRITE | DES_KEY_FILE | DIRECTORY
+    | CONTRIBUTORS | COPY | CPU | CURRENT | CURSOR_NAME
+    | DATA | DATAFILE | DEALLOCATE
+    | DEFAULT_AUTH | DEFINER | DELAY_KEY_WRITE | DES_KEY_FILE | DIAGNOSTICS | DIRECTORY
     | DISABLE | DISCARD | DISK | DO | DUMPFILE | DUPLICATE
     | DYNAMIC | ENABLE | ENCRYPTION | END | ENDS | ENGINE | ENGINES
     | ERROR | ERRORS | ESCAPE | EVEN | EVENT | EVENTS | EVERY
@@ -2427,7 +2458,7 @@ keywordsCanBeId
     | MAX_USER_CONNECTIONS | MEDIUM | MEMORY | MERGE | MESSAGE_TEXT
     | MID | MIGRATE
     | MIN_ROWS | MODE | MODIFY | MUTEX | MYSQL | MYSQL_ERRNO | NAME | NAMES
-    | NCHAR | NEVER | NEXT | NO | NODEGROUP | NONE | OFFLINE | OFFSET
+    | NCHAR | NEVER | NEXT | NO | NODEGROUP | NONE | NUMBER | OFFLINE | OFFSET
     | OJ | OLD_PASSWORD | ONE | ONLINE | ONLY | OPEN | OPTIMIZER_COSTS
     | OPTIONS | OWNER | PACK_KEYS | PAGE | PARSER | PARTIAL
     | PARTITIONING | PARTITIONS | PASSWORD | PHASE | PLUGINS
@@ -2439,13 +2470,13 @@ keywordsCanBeId
     | REPLICATE_IGNORE_DB | REPLICATE_IGNORE_TABLE
     | REPLICATE_REWRITE_DB | REPLICATE_WILD_DO_TABLE
     | REPLICATE_WILD_IGNORE_TABLE | REPLICATION | RESET | RESUME
-    | RETURNS | ROLLBACK | ROLLUP | ROTATE | ROW | ROWS
+    | RETURNED_SQLSTATE | RETURNS | ROLLBACK | ROLLUP | ROTATE | ROW | ROWS
     | ROW_FORMAT | SAVEPOINT | SCHEDULE | SCHEMA_NAME | SECURITY | SERIAL | SERVER
     | SESSION | SHARE | SHARED | SIGNED | SIMPLE | SLAVE
     | SLOW | SNAPSHOT | SOCKET | SOME | SONAME | SOUNDS | SOURCE
     | SQL_AFTER_GTIDS | SQL_AFTER_MTS_GAPS | SQL_BEFORE_GTIDS
     | SQL_BUFFER_RESULT | SQL_CACHE | SQL_NO_CACHE | SQL_THREAD
-    | START | STARTS | STATS_AUTO_RECALC | STATS_PERSISTENT
+    | STACKED | START | STARTS | STATS_AUTO_RECALC | STATS_PERSISTENT
     | STATS_SAMPLE_PAGES | STATUS | STOP | STORAGE | STRING
     | SUBCLASS_ORIGIN | SUBJECT | SUBPARTITION | SUBPARTITIONS | SUSPEND | SWAPS
     | SWITCHES | TABLE_NAME | TABLESPACE | TEMPORARY | TEMPTABLE | THAN | TRADITIONAL
