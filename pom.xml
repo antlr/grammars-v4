@@ -159,6 +159,7 @@
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
 				<module>p</module>
+				<module>parkingsign</module>
 				<module>pascal</module>
 				<module>pcre</module>
 				<module>pddl</module>
