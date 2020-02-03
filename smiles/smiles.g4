@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar smiles;
 
-smiles 
+smiles
     : chain terminator
     ;
 
@@ -72,7 +72,7 @@ symbol
    ;
 
 isotope
-   : NUMBER
+   : DIGIT+
    ;
 
 element_symbols
@@ -279,15 +279,15 @@ hcount
 
 charge
    : '-'
-   | '-' DIGIT
+   | '-' DIGIT+
    | '+'
-   | '+' DIGIT
+   | '+' DIGIT+
    | '--'
    | '++'
    ;
 
 class_
-   : ':' NUMBER
+   : ':' DIGIT+
    ;
 
 bond
@@ -328,6 +328,8 @@ terminator
    | CARRIAGE_RETURN
    ;
 
+
+
 DOT
    : '.'
    ;
@@ -349,9 +351,6 @@ DIGIT
    : '0' .. '9'
    ;
 
-NUMBER
-   : DIGIT +
-   ;
 
 TAB
    : '\t'
