@@ -25,12 +25,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar smiles;
 
-smiles 
-    : chain terminator
-    ;
+smiles
+   : chain terminator
+   ;
 
 atom
    : bracket_atom
@@ -72,7 +71,7 @@ symbol
    ;
 
 isotope
-   : NUMBER
+   : number
    ;
 
 element_symbols
@@ -274,20 +273,20 @@ chiral
 
 hcount
    : 'H'
-   | 'H' DIGIT
+   | 'H' number
    ;
 
 charge
    : '-'
-   | '-' DIGIT
+   | '-' number
    | '+'
-   | '+' DIGIT
+   | '+' number
    | '--'
    | '++'
    ;
 
 class_
-   : ':' NUMBER
+   : ':' number
    ;
 
 bond
@@ -301,8 +300,8 @@ bond
    ;
 
 ringbond
-   : bond? DIGIT
-   | bond? '%' DIGIT DIGIT
+   : bond? number
+   | bond? '%' number number
    ;
 
 branched_atom
@@ -328,10 +327,13 @@ terminator
    | CARRIAGE_RETURN
    ;
 
+number
+   : NUMBER
+   ;
+
 DOT
    : '.'
    ;
-
 
 LINEFEED
    : '\r'
@@ -345,14 +347,15 @@ SPACE
    : ' '
    ;
 
-DIGIT
+fragment DIGIT
    : '0' .. '9'
    ;
 
 NUMBER
-   : DIGIT +
+   : DIGIT+
    ;
 
 TAB
    : '\t'
    ;
+
