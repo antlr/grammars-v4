@@ -150,21 +150,22 @@ iterationStatement
     | For '(' (expressionSequence | variableStatement)? ';' expressionSequence? ';' expressionSequence? ')' statement   # ForStatement
     | For '(' (singleExpression | variableStatement) In expressionSequence ')' statement                                # ForInStatement
     // strange, 'of' is an identifier. and this.p("of") not work in sometime.
-    | For Await? '(' (singleExpression | variableStatement) Identifier{this.p("of")}? expressionSequence ')' statement  # ForOfStatement
+    | For Await? '(' (singleExpression | variableStatement) identifier{this.p("of")}? expressionSequence ')' statement  # ForOfStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
     : Var
-    | Let
+    | StrictLet
+    | NonStrictLet
     | Const
     ;
 
 continueStatement
-    : Continue ({this.notLineTerminator()}? Identifier)? eos
+    : Continue ({this.notLineTerminator()}? identifier)? eos
     ;
 
 breakStatement
-    : Break ({this.notLineTerminator()}? Identifier)? eos
+    : Break ({this.notLineTerminator()}? identifier)? eos
     ;
 
 returnStatement
@@ -200,7 +201,7 @@ defaultClause
     ;
 
 labelledStatement
-    : Identifier ':' statement
+    : identifier ':' statement
     ;
 
 throwStatement
@@ -224,11 +225,11 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Async? Function '*'? Identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : Async? Function '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 classDeclaration
-    : Class Identifier classTail
+    : Class identifier classTail
     ;
 
 classTail
@@ -236,7 +237,7 @@ classTail
     ;
 
 classElement
-    : (Static | {this.n("static")}? Identifier | Async)* methodDefinition
+    : (Static | {this.n("static")}? identifier | Async)* methodDefinition
     | emptyStatement
     | '#'? propertyName '=' singleExpression
     ;
@@ -305,7 +306,7 @@ arguments
     ;
 
 argument
-    : Ellipsis? (singleExpression | Identifier)
+    : Ellipsis? (singleExpression | identifier)
     ;
 
 expressionSequence
@@ -314,12 +315,12 @@ expressionSequence
 
 singleExpression
     : anoymousFunction                                                      # FunctionExpression
-    | Class Identifier? classTail                                           # ClassExpression
+    | Class identifier? classTail                                           # ClassExpression
     | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
     | singleExpression arguments                                            # ArgumentsExpression
     | New singleExpression arguments?                                       # NewExpression
-    | New '.' Identifier                                                    # MetaExpression // new.target
+    | New '.' identifier                                                    # MetaExpression // new.target
     | singleExpression {this.notLineTerminator()}? '++'                     # PostIncrementExpression
     | singleExpression {this.notLineTerminator()}? '--'                     # PostDecreaseExpression
     | Delete singleExpression                                               # DeleteExpression
@@ -353,7 +354,7 @@ singleExpression
     | singleExpression TemplateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
     | yieldStatement                                                        # YieldExpression // ECMAScript 6
     | This                                                                  # ThisExpression
-    | Identifier                                                            # IdentifierExpression
+    | identifier                                                            # IdentifierExpression
     | Super                                                                 # SuperExpression
     | literal                                                               # LiteralExpression
     | arrayLiteral                                                          # ArrayLiteralExpression
@@ -362,7 +363,7 @@ singleExpression
     ;
 
 assignable
-    : Identifier
+    : identifier
     | arrayLiteral
     | objectLiteral
     ;
@@ -374,7 +375,7 @@ anoymousFunction
     ;
 
 arrowFunctionParameters
-    : Identifier
+    : identifier
     | '(' formalParameterList? ')'
     ;
 
@@ -423,8 +424,13 @@ bigintLiteral
     | BigBinaryIntegerLiteral
     ;
 
-identifierName
+identifier
     : Identifier
+    | NonStrictLet
+    ;
+
+identifierName
+    : identifier
     | reservedWord
     ;
 
@@ -470,7 +476,8 @@ keyword
     | Export
     | Import
     | Implements
-    | Let
+    | StrictLet
+    | NonStrictLet
     | Private
     | Public
     | Interface
@@ -485,11 +492,11 @@ keyword
     ;
 
 getter
-    : Identifier {this.p("get")}? propertyName
+    : identifier {this.p("get")}? propertyName
     ;
 
 setter
-    : Identifier {this.p("set")}? propertyName
+    : identifier {this.p("set")}? propertyName
     ;
 
 eos
