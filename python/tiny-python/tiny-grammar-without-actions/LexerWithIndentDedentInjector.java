@@ -47,7 +47,6 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
     // *******************************************************************************************************
     // The stack that keeps track of the indentation lengths
     private final Stack<Integer> indentLengths = new Stack<>() {{ push(0); }}; // initializing with default 0 indentation length
-
     // A queue where extra tokens are pushed on
     private final Deque<Token> pendingTokens = new ArrayDeque<>();
     // An integer that stores the type of the last appended token to the token stream
@@ -61,14 +60,14 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
     // Was there TAB char in the indentations?
     private boolean wasTabIndentation = false;
 
-    // A string list that stores the lexer error messages
-    private List<String> errors = new ArrayList<>();
     // A string list that stores the lexer warnings
     private List<String> warnings = new ArrayList<>();
+    // A string list that stores the lexer error messages
+    private List<String> errors = new ArrayList<>();
 
     // Patterns for the custom error listener to recognize error messages
-    public static final String ERROR_PATTERN_LEXER = "lexer --> ";
-    public static final String ERROR_PATTERN_INSERTED_INDENT = "inserted INDENT";
+    public static final String TEXT_LEXER = "lexer --> ";
+    public static final String TEXT_INSERTED_INDENT = "inserted INDENT";
 
     @Override
     public Token nextToken() {
@@ -126,9 +125,9 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
     private void insertLeadingTokens(boolean atVeryFirstCharWhichIsSpaceOrTAB, int type, int startIndex) {
         if (atVeryFirstCharWhichIsSpaceOrTAB &&   // We're at the first line of the input starting with a space or TAB
             !List.of(NEWLINE, EOF).contains(type) // and within that the first token that is visible (comments were skiped and OPEN_PAREN, OPEN_BRACK OPEN_BRACE cannot be the first token)
-           ) {                                    // We need to insert a NEWLINE and an INDENT token before the first token to raise an 'unexpected indent' error by the parser later
+            ) {                                   // We need to insert a NEWLINE and an INDENT token before the first token to raise an 'unexpected indent' error by the parser later
             this.insertToken(0, startIndex - 1, "<inserted leading NEWLINE>" + " ".repeat(startIndex), NEWLINE, 1, 0);
-            this.insertToken(startIndex, startIndex - 1, "<" + ERROR_PATTERN_INSERTED_INDENT + ", " + this.getIndentationDescription(startIndex) + ">", Python3Parser.INDENT, 1, startIndex);
+            this.insertToken(startIndex, startIndex - 1, "<" + TEXT_INSERTED_INDENT + ", " + this.getIndentationDescription(startIndex) + ">", Python3Parser.INDENT, 1, startIndex);
             this.indentLengths.push(startIndex);
         }
     }
@@ -138,7 +137,7 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
         int previousIndentLength = this.indentLengths.peek();
 
         if (currentIndentLength > previousIndentLength) { // insert an INDENT token
-            this.insertToken("<" + ERROR_PATTERN_INSERTED_INDENT + ", " + this.getIndentationDescription(currentIndentLength) + ">", Python3Parser.INDENT);
+            this.insertToken("<" + TEXT_INSERTED_INDENT + ", " + this.getIndentationDescription(currentIndentLength) + ">", Python3Parser.INDENT);
             this.indentLengths.push(currentIndentLength);
         } else if (currentIndentLength < previousIndentLength) {
             do {   // More than 1 DEDENT token may be inserted
@@ -148,7 +147,7 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
                     this.insertToken("<inserted DEDENT, " + this.getIndentationDescription(previousIndentLength) + ">", Python3Parser.DEDENT);
                 } else {
                     this.insertToken("<inserted (I N C O N S I S T E N T!) DEDENT, " + this.getIndentationDescription(currentIndentLength) + ">", Python3Parser.DEDENT);
-                    this.errors.add(ERROR_PATTERN_LEXER + "line " + getLine() + ":" + getCharPositionInLine() + "\t IndentationError: unindent does not match any outer indentation level");
+                    this.errors.add(TEXT_LEXER + "line " + getLine() + ":" + getCharPositionInLine() + "\t IndentationError: unindent does not match any outer indentation level");
                 }
             } while (currentIndentLength < previousIndentLength);
         }
@@ -165,6 +164,10 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
         }
     }
 
+    private String getIndentationDescription(int lengthOfIndent) {
+        return "length=" + lengthOfIndent + ", level=" + (this.indentLengths.size());
+    }
+
     private void insertToken(String text, int type) {
         final int startIndex = _tokenStartCharIndex + getText().length(); //*** https://www.antlr.org/api/Java/org/antlr/v4/runtime/Lexer.html#_tokenStartCharIndex
         this.insertToken(startIndex, startIndex - 1, text, type, getLine(), getCharPositionInLine());
@@ -176,12 +179,6 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
         token.setLine(line);
         token.setCharPositionInLine(charPositionInLine);
         this.pendingTokens.addLast(token);
-    }
-
-    private void checkSpaceAndTabIndentation() {
-        if (this.wasSpaceIndentation && this.wasTabIndentation) {
-            this.warnings.add("Mixture of space and tab were used for indentation.");
-        }
     }
 
     // Calculates the indentation of the provided spaces, taking the
@@ -210,15 +207,17 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
         return count;
     }
 
-    private String getIndentationDescription(int lengthOfIndent) {
-        return "length=" + lengthOfIndent + ", level=" + (this.indentLengths.size());
-    }
-
-    public List<String> getErrorMessages() { // can be called from a grammar embedded action also
-        return this.errors;
+    private void checkSpaceAndTabIndentation() {
+        if (this.wasSpaceIndentation && this.wasTabIndentation) {
+            this.warnings.add("Mixture of space and tab were used for indentation.");
+        }
     }
 
     public List<String> getWarnings() { // can be called from a grammar embedded action also
         return this.warnings;
+    }
+
+    public List<String> getErrorMessages() { // can be called from a grammar embedded action also
+        return this.errors;
     }
 }

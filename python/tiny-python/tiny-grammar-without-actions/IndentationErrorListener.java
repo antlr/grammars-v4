@@ -12,17 +12,17 @@ public class IndentationErrorListener extends BaseErrorListener {
 
         if (isFirstTime) {
             isFirstTime = false;
-            System.err.println();
+            System.out.println();
             System.err.println("ERROR:");
         }
 
-        if (msg.startsWith(LexerWithIndentDedentInjector.ERROR_PATTERN_LEXER)) { // this is a custom error message from the lexer contained a pattern
-            System.err.println(msg.substring(LexerWithIndentDedentInjector.ERROR_PATTERN_LEXER.length())); // displaying the lexer error message without the pattern
+        if (msg.startsWith(LexerWithIndentDedentInjector.TEXT_LEXER)) { // this is a custom error message from the lexer contained a pattern
+            System.err.println(msg.substring(LexerWithIndentDedentInjector.TEXT_LEXER.length())); // displaying the lexer error message without the pattern
         } else { // this is a parser error message
             String startOfMessage = "line " + line + ":" + charPositionInLine + "\t ";
             if (msg.startsWith("missing INDENT")) {
                 System.err.println(startOfMessage + "IndentationError: expected an indented block"); // displaying the modified parser error message
-            } else if (msg.startsWith("extraneous input '<" + LexerWithIndentDedentInjector.ERROR_PATTERN_INSERTED_INDENT)) {
+            } else if (msg.startsWith("extraneous input '<" + LexerWithIndentDedentInjector.TEXT_INSERTED_INDENT)) {
                 System.err.println(startOfMessage + "IndentationError: unexpected indent"); // displaying the modified parser error message
             } else {
                 System.err.println(startOfMessage + "at " + offendingSymbol + ": " + msg); // displaying the original parser error message
