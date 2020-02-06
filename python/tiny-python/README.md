@@ -34,5 +34,4 @@ java Main test.py
 
 [Bart Kiers's Python 3.3 ANTLR4 grammar](https://github.com/bkiers/python3-parser)
 
-[Python 3 parser without grammar actions](https://github.com/RobEin/grammars-v4/blob/master/python/python3-without-actions/README.md)
 
