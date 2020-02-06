@@ -120,11 +120,11 @@ declaration
     ;
 
 variableStatement
-    : varModifier variableDeclarationList eos
+    : variableDeclarationList eos
     ;
 
 variableDeclarationList
-    : variableDeclaration (',' variableDeclaration)*
+    : varModifier variableDeclaration (',' variableDeclaration)*
     ;
 
 variableDeclaration
@@ -147,10 +147,10 @@ ifStatement
 iterationStatement
     : Do statement While '(' expressionSequence ')' eos                                                                 # DoStatement
     | While '(' expressionSequence ')' statement                                                                        # WhileStatement
-    | For '(' (expressionSequence | variableStatement)? ';' expressionSequence? ';' expressionSequence? ')' statement   # ForStatement
-    | For '(' (singleExpression | variableStatement) In expressionSequence ')' statement                                # ForInStatement
+    | For '(' (expressionSequence | variableDeclarationList)? ';' expressionSequence? ';' expressionSequence? ')' statement   # ForStatement
+    | For '(' (singleExpression | variableDeclarationList) In expressionSequence ')' statement                                # ForInStatement
     // strange, 'of' is an identifier. and this.p("of") not work in sometime.
-    | For Await? '(' (singleExpression | variableStatement) Identifier{this.p("of")}? expressionSequence ')' statement  # ForOfStatement
+    | For Await? '(' (singleExpression | variableDeclarationList) Identifier{this.p("of")}? expressionSequence ')' statement  # ForOfStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
