@@ -8,24 +8,24 @@ A Python 3 parser that based on the Bart Kiers's Python 3.3 grammar with an impr
 #### Some indentation errors with message:
 ```python
  i = 1 # first line begins with space
-#  line 2:1	IndentationError: unexpected indent
+#  line 1:1	IndentationError: unexpected indent
 
 
 if i == 1:
 j = 
-#  line 3:0	IndentationError: expected an indented block
+#  line 2:0	IndentationError: expected an indented block
 
 
 if i == 1:
     j = 0
         k = 0
-#  line 4:5	IndentationError: unexpected indent
+#  line 3:8	IndentationError: unexpected indent
 
 
 if i == 1:
     j = 0
   k = 0
-#  line 4:3	IndentationError: unindent does not match any outer indentation level
+#  line 3:2	IndentationError: unindent does not match any outer indentation level
 ```
 
 ## How to use
