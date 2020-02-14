@@ -98,8 +98,8 @@ unionMemberTypes: '='  type_ ('|' type_)* ;
 unionTypeExtension : 'extend' unionTypeDefinition;
 
 enumTypeDefinition:  description? 'enum' NAME directives? enumValuesDefinitions?; 
-enumValuesDefinitions: '{' ( description? enumValue  directives?)+  '}';
-enumValue: NAME ;// not (nullValue | booleanValue)
+enumValuesDefinitions: '{' ( description? enumElementValue  directives?)+  '}';
+enumElementValue: NAME ;// not (nullValue | booleanValue)
 
 enumTypeExtension: 'extend' enumTypeDefinition;
 
@@ -196,6 +196,7 @@ valueOrVariable: value | variable;
 
 value:
 	String_		# stringValue
+	| NAME          # enumValue
 	| NUMBER	# numberValue
 	| BooleanLiteral	# booleanValue
 	| array		# arrayValue
