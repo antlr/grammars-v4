@@ -1,31 +1,31 @@
 /*
  The MIT License (MIT)
- 
+
  Copyright (c) 2015 Joseph T. McBride
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  associated documentation files (the "Software"), to deal in the Software without restriction,
  including without limitation the rights to use, copy, modify, merge, publish, distribute,
  sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in all copies or
  substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
  OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- 
+
  GraphQL grammar derived from:
- 
+
  GraphQL Draft Specification - July 2015
- 
- http://facebook.github.io/graphql/ https://github.com/facebook/graphql 
- 
+
+ http://facebook.github.io/graphql/ https://github.com/facebook/graphql
+
  AB:10-sep19: replaced type with type_ to resolve conflict for golang generator
- 
+
  AB: 13-oct-19: added type system as per June 2018 specs
  AB: 26-oct-19: added ID type
  AB: 30-Oct-19: description, boolean, schema & Block string fix.
@@ -34,7 +34,7 @@
  */
 grammar GraphQL;
 
-document: description*  definition+;
+document: definition+;
 
 definition:
 	execDefinition
@@ -50,12 +50,8 @@ typeSystemDefinition:
 
 // https://graphql.github.io/graphql-spec/June2018/#sec-Schema
 schemaDefinition:
-	 'schema' directives? rootOperationTypeDefinitionList;
+	 'schema' directives? '{' rootOperationTypeDefinition+ '}';
 
-rootOperationTypeDefinitionList:
-	'{' rootOperationTypeDefinition (
-		','? rootOperationTypeDefinition
-	)* '}';
 rootOperationTypeDefinition: operationType ':' namedType;
 namedType: NAME;
 
@@ -68,38 +64,39 @@ typeDefinition:
 	| enumTypeDefinition
 	| inputObjectTypeDefinition;
 
-scalarTypeDefinition: description? 'scalar' NAME directives;
+scalarTypeDefinition: description? 'scalar' NAME directives?;
 description: String_;
 
 // https://graphql.github.io/graphql-spec/June2018/#sec-Objects
-objectTypeDefinition
-: description? 'type' NAME 
-implementsInterfaces?
-directives?
-fieldsDefinitions?;
+objectTypeDefinition : description?
+  'type' NAME
+   implementsInterfaces?
+   directives?
+   fieldsDefinition?;
 
-implementsInterfaces: 'implements' '&'? type_ |
-implementsInterfaces '&' type_;
+implementsInterfaces: 'implements' '&'? namedType
+    | implementsInterfaces '&' namedType
+    ;
 
 
-fieldsDefinitions: '{'  fieldsDefinition+'}';
-fieldsDefinition: description? NAME  argumentsDefinition? ':' type_  directives? ;
-argumentsDefinition: '(' inputValueDefinition (',' inputValueDefinition)* ')';
+fieldsDefinition: '{'  fieldDefinition+ '}';
+fieldDefinition: description? NAME  argumentsDefinition? ':' type_  directives? ;
+argumentsDefinition: '(' inputValueDefinition+ ')';
 inputValueDefinition:  description? NAME ':' type_ defaultValue? directives?;
 
 //https://graphql.github.io/graphql-spec/June2018/#sec-Interfaces
 interfaceTypeDefinition
- : description? 'interface' NAME directives? fieldsDefinitions?;
+ : description? 'interface' NAME directives? fieldsDefinition?;
 
 // https://graphql.github.io/graphql-spec/June2018/#sec-Unions
 unionTypeDefinition:  description? 'union' NAME directives? unionMemberTypes?;
-unionMemberTypes: '='  type_ ('|' type_)* ;
+unionMemberTypes: '=' '|'?  type_ ('|' type_)* ;
 
 unionTypeExtension : 'extend' unionTypeDefinition;
 
-enumTypeDefinition:  description? 'enum' NAME directives? enumValuesDefinitions?; 
-enumValuesDefinitions: '{' ( description? enumElementValue  directives?)+  '}';
-enumElementValue: NAME ;// not (nullValue | booleanValue)
+enumTypeDefinition:  description? 'enum' NAME directives? enumValuesDefinition?;
+enumValuesDefinition: '{' ( description? enumValue  directives?)+  '}';
+enumValue: NAME; //{ not (nullValue | booleanValue) };
 
 enumTypeExtension: 'extend' enumTypeDefinition;
 
@@ -112,7 +109,7 @@ directiveDefinition: description? 'directive' '@' NAME argumentsDefinition? 'on'
 directiveLocations: directiveLocation ('|' directiveLocations)*;
 directiveLocation: executableDirectiveLocation | typeSystemDirectiveLocation;
 
-executableDirectiveLocation: 
+executableDirectiveLocation:
 'QUERY' |
 'MUTATION' |
 'SUBSCRIPTION' |
@@ -140,29 +137,29 @@ typeSystemExtension: schemaExtension | typeExtension;
 schemaExtension: 'extend' schemaDefinition ;
 typeExtension: 'extend' typeDefinition;
 
-// original code: execution definitions 
+// original code: execution definitions
 // GraphQL Draft Specification - July 2015
 execDefinition: operationDefinition | fragmentDefinition;
 
 operationDefinition:
 	selectionSet
-	| operationType NAME variableDefinitions? directives? selectionSet;
+	| operationType NAME? variableDefinitions? directives? selectionSet;
 
-selectionSet: '{' selection ( ','? selection)* '}';
+selectionSet: '{' selection+ '}';
 
 operationType: 'query' | 'mutation' | 'subscription';
 
 selection: field | fragmentSpread | inlineFragment;
 
-field: fieldName arguments? directives? selectionSet?;
+field: alias? fieldName arguments? directives? selectionSet?;
 
-fieldName: alias | NAME;
+fieldName: NAME;
 
-alias: NAME ':' NAME;
+alias: NAME ':';
 
-arguments: '(' argument ( ',' argument)* ')';
+arguments: '(' argument+ ')';
 
-argument: NAME ':' valueOrVariable;
+argument: NAME ':' value;
 
 fragmentSpread: '...' fragmentName directives?;
 
@@ -177,14 +174,11 @@ fragmentName: NAME;
 directives:  directive+;
 
 directive:
-	'@' NAME ':' valueOrVariable
-	| '@' NAME
-	| '@' NAME '(' argument ')';
+	'@' NAME arguments?;
 
 typeCondition: typeName;
 
-variableDefinitions:
-	'(' variableDefinition (',' variableDefinition)* ')';
+variableDefinitions: '(' variableDefinition+ ')';
 
 variableDefinition: variable ':' type_ defaultValue?;
 
@@ -192,32 +186,39 @@ variable: '$' NAME;
 
 defaultValue: '=' value;
 
-valueOrVariable: value | variable;
-
 value:
-	String_		# stringValue
-	| NAME          # enumValue
-	| NUMBER	# numberValue
+	 variable           # variableValue
+	| NUMBER	        # numberValue
+	| String_	        # stringValue
 	| BooleanLiteral	# booleanValue
-	| array		# arrayValue
-	| ID    	# idValue        //The ID scalar type represents a unique identifier, often used to refetch an object or as the key for a cache. The ID type is serialized in the same way as a String; however, defining it as an ID signifies that it is not intended to be human‐readable.
-   | 'null'  # nullValue
+	| 'null'            # nullValue
+	| enumValue         # constValue
+	| array		        # arrayValue
+	| object            # objectValue
    ;
+
+object: '{' '}'
+    | '{' objectField '}'
+    ;
+
+objectField: NAME ':' value;
 
 BooleanLiteral
 	:	'true'
 	|	'false'
 	;
 
-type_: typeName nonNullType? | listType nonNullType?;
+type_: typeName nonNull? | listType nonNull?;
 
 typeName: NAME;
 
 listType: '[' type_ ']';
 
-nonNullType: '!';
+nonNull: '!';
 
-array: '[' value ( ',' value)* ']' | '[' ']';
+array: '[' value+ ']'
+    | '[' ']'
+    ;
 
 NAME: [_A-Za-z] [_0-9A-Za-z]*;
 
@@ -231,7 +232,6 @@ BLOCK_STRING
 
 ID: STRING;
 
-
 fragment ESC: '\\' ( ["\\/bfnrt] | UNICODE);
 
 fragment UNICODE: 'u' HEX HEX HEX HEX;
@@ -239,6 +239,17 @@ fragment UNICODE: 'u' HEX HEX HEX HEX;
 fragment HEX: [0-9a-fA-F];
 
 NUMBER: '-'? INT '.' [0-9]+ EXP? | '-'? INT EXP | '-'? INT;
+PUNCTUATOR: '!'
+    | '$'
+    | '(' | ')'
+    | '...'
+    | ':'
+    | '='
+    | '@'
+    | '[' | ']'
+    | '{' | '}'
+    | '|'
+    ;
 
 fragment INT: '0' | [1-9] [0-9]*;
 
@@ -249,8 +260,18 @@ fragment EXP: [Ee] [+\-]? INT;
 // \- since - means "range" inside [...]
 
 WS: [ \t\n\r]+ -> skip;
-
+COMMA: ',' -> skip;
 LineComment
     :   '#' ~[\r\n]*
         -> skip
     ;
+
+UNICODE_BOM: (UTF8_BOM
+    | UTF16_BOM
+    | UTF32_BOM
+    ) -> skip
+    ;
+
+UTF8_BOM: '\uEFBBBF';
+UTF16_BOM: '\uFEFF';
+UTF32_BOM: '\u0000FEFF';
