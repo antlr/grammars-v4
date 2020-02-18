@@ -12,7 +12,7 @@ A Python 3 parser that based on the Bart Kiers's Python 3.3 grammar with an impr
 
 
 if i == 1:
-j = 
+j = 0
 #  line 2:0	IndentationError: expected an indented block
 
 
