@@ -1,4 +1,4 @@
-# Python 3 parser without grammar actions &nbsp; [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# Python 3 parser without embedded grammar actions &nbsp; [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A Python 3 parser that based on the Bart Kiers's Python 3.3 grammar with an improved indentation handling outside of the grammar with the following advantages:
 -  more informative token metadata
