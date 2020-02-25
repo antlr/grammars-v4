@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.*;
 // *************************************************************************************************************
 // **** THE FOLLOWING IMPORT SECTION ALSO CAN BE USED IN THE SECTION OF THE @lexer::header{} IN THE GRAMMAR ****
 // *************************************************************************************************************
+import org.antlr.v4.runtime.misc.Interval;
 import java.util.*;
 
 public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://www.antlr.org/api/Java/org/antlr/v4/runtime/Lexer.html
@@ -71,13 +72,13 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
 
     @Override
     public Token nextToken() {
-        final boolean atVeryFirstCharWhichIsSpaceOrTAB = getCharIndex() == 0 && List.of((int) ' ', (int) '\t').contains(_input.LA(1));
         Token currentToken;
 
+        final boolean atVeryFirstCharWhichIsSpaceOrTAB = getCharIndex() == 0 && _input.getText(new Interval(0, 0)).trim().isEmpty();
         while (true) {
             currentToken = super.nextToken(); // get the next token from the inputstream
             if (atVeryFirstCharWhichIsSpaceOrTAB) { // We're at the first line of the input starting with a space or a TAB
-                this.insertLeadingTokens(currentToken.getType(), currentToken.getStartIndex());
+                this.insertLeadingTokens(currentToken.getType(), currentToken.getStartIndex()); // We need an 'unexpected indent' error if the first token is visible
             }
 
             switch (currentToken.getType()) {
@@ -105,15 +106,15 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
                                 continue;  // We're on a blank line or before a comment, skip the NEWLINE token
                             default:
                                 this.pendingTokens.addLast(currentToken); // insert the current NEWLINE token
-                                this.insertIndentDedentTokens(this.getIndentationLength(currentToken.getText()));       //*** https://docs.python.org/3/reference/lexical_analysis.html#indentation
+                                this.insertIndentDedentTokens(this.getIndentationLength(currentToken.getText())); //*** https://docs.python.org/3/reference/lexical_analysis.html#indentation
                         }
                     }
                     break;
                 case EOF:
                     if ( !this.indentLengths.isEmpty()) {
-                        this.insertTrailingTokens(); // indentLengths stack wil be empty
+                        this.insertTrailingTokens(this.lastPendingToken.getType()); // indentLengths stack wil be empty
                         this.pendingTokens.addLast(currentToken); // insert the current EOF token
-                        this.checkSpaceAndTabIndentation();
+                        this.checkSpaceAndTabIndentation(); // end of the token processing
                     }
                     break;
                 default:
@@ -126,15 +127,14 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
     }
 
     private void insertLeadingTokens(int type, int startIndex) {
-        if ( !List.of(NEWLINE, EOF).contains(type)) { // We're at the first token that is visible (comments were skipped and OPEN_PAREN, OPEN_BRACK OPEN_BRACE cannot be the first token)
-            // We insert a NEWLINE and an INDENT token before the first token to raise an 'unexpected indent' error by the parser later
+        if (type != NEWLINE && type != EOF) { // The first token is visible, We insert a NEWLINE and an INDENT token before it to raise an 'unexpected indent' error by the parser later
             this.insertToken(0, startIndex - 1, "<inserted leading NEWLINE>" + " ".repeat(startIndex), NEWLINE, 1, 0);
             this.insertToken(startIndex, startIndex - 1, "<" + TEXT_INSERTED_INDENT + ", " + this.getIndentationDescription(startIndex) + ">", Python3Parser.INDENT, 1, startIndex);
             this.indentLengths.push(startIndex);
         }
     }
 
-    private void insertIndentDedentTokens(final int currentIndentLength) {
+    private void insertIndentDedentTokens(int currentIndentLength) {
         int previousIndentLength = this.indentLengths.peek();
 
         if (currentIndentLength > previousIndentLength) { // insert an INDENT token
@@ -154,8 +154,8 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
         }
     }
 
-    private void insertTrailingTokens() {
-        if ( !List.of(NEWLINE, Python3Parser.DEDENT).contains(this.lastPendingToken.getType())) { // If the last pending token was not NEWLINE or DEDENT then
+    private void insertTrailingTokens(int type) {
+        if (type != NEWLINE && type != Python3Parser.DEDENT) { // If the last pending token was not NEWLINE or DEDENT then
             this.insertToken("<inserted trailing NEWLINE>", NEWLINE); // insert an extra trailing NEWLINE token that serves as the end of the statement
         }
 
@@ -214,11 +214,11 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
         }
     }
 
-    public List<String> getWarnings() { // can be called from a grammar embedded action also
+    public List<String> getWarnings() {
         return this.warnings;
     }
 
-    public List<String> getErrorMessages() { // can be called from a grammar embedded action also
+    public List<String> getErrorMessages() {
         return this.errors;
     }
 }
