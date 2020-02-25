@@ -88,6 +88,8 @@ unit_statement
     | data_manipulation_language_statements
     | drop_table
     | drop_index
+    
+    | rename_object
 
     | comment_on_column
     | comment_on_table
@@ -176,7 +178,7 @@ procedure_spec
 
 function_spec
     : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')?
-      RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';'
+      RETURN type_spec (PIPELINED)? (DETERMINISTIC)? (RESULT_CACHE)? ';'
     ;
 
 package_obj_body
@@ -204,7 +206,7 @@ alter_procedure
 function_body
     : FUNCTION identifier ('(' parameter (',' parameter)* ')')?
       RETURN type_spec (invoker_rights_clause | parallel_enable_clause | result_cache_clause | DETERMINISTIC)*
-      ((PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
+      ((PIPELINED? DETERMINISTIC? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
 
 procedure_body
@@ -1214,6 +1216,10 @@ sql_statement_shortcut
 drop_index
     : DROP INDEX index_name ';'
     ;
+    
+rename_object
+    : RENAME object_name TO object_name ';'
+    ;
 
 grant_statement
     : GRANT
@@ -1301,9 +1307,9 @@ alter_view_editionable
     ;
 
 create_view
-    : CREATE (OR REPLACE)? (OR? FORCE)? EDITIONING? VIEW
+    : CREATE (OR REPLACE)? (OR? FORCE)? EDITIONABLE? EDITIONING? VIEW
       tableview_name view_options?
-      AS subquery subquery_restriction_clause?
+      AS select_only_statement subquery_restriction_clause?
     ;
 
 view_options
@@ -1685,7 +1691,7 @@ create_materialized_view
         create_mv_refresh?
         (FOR UPDATE)?
         ( (DISABLE | ENABLE) QUERY REWRITE )?
-        AS subquery
+        AS select_only_statement
         ';'
     ;
 
@@ -1733,7 +1739,7 @@ create_cluster
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name
-        (relational_table | object_table | xmltype_table) (AS select_statement)?
+        (relational_table | object_table | xmltype_table) (AS select_only_statement)?
       ';'
     ;
 
@@ -3266,8 +3272,12 @@ explain_statement
       FOR (select_statement | update_statement | delete_statement | insert_statement | merge_statement)
     ;
 
+select_only_statement
+    : subquery_factoring_clause? subquery 
+    ;
+
 select_statement
-    : subquery_factoring_clause? subquery (for_update_clause | order_by_clause | offset_clause | fetch_clause)*
+    : select_only_statement (for_update_clause | order_by_clause | offset_clause | fetch_clause)*
     ;
 
 // Select Specific Clauses
@@ -4247,7 +4257,7 @@ column_name
 
 tableview_name
     : identifier ('.' id_expression)?
-          ('@' link_name | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
+          (AT_SIGN link_name | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
     | xmltable outer_join_sign?
     ;
 
@@ -4612,6 +4622,7 @@ regular_id
     | EXCEPTION
     | EXCEPTION_INIT
     | EXCEPTIONS
+    | EXISTS
     | EXIT
     | FLOAT
     | FORALL
@@ -4867,6 +4878,7 @@ non_reserved_keywords_in_12c
     | PATTERN
     | PER
     | PERIOD
+    | PERIOD_KEYWORD
     | PERMUTE
     | PLUGGABLE
     | POOL_16K
