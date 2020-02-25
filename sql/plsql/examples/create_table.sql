@@ -38,3 +38,12 @@ create table junk (
        me date,
        primary key (me)
 );
+
+CREATE TABLE TEST
+      AS 
+      WITH TESTCTE AS (
+        SELECT 1 ONE FROM DUAL
+      )
+      SELECT 'A', 'B', 'C'
+      FROM DUAL
+      JOIN TESTCTE;
