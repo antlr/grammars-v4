@@ -45,6 +45,7 @@ tokens { INDENT, DEDENT }
 
 // this embedded code section will be copied to the generated file: Python3Lexer.java
 @lexer::header {                                                     //*** https://github.com/antlr/antlr4/blob/master/doc/grammars.md#actions-at-the-grammar-level
+import org.antlr.v4.runtime.misc.Interval;
 import java.util.*;
 }
 
@@ -77,115 +78,114 @@ public static final String TEXT_INSERTED_INDENT = "inserted INDENT";
 
 @Override
 public Token nextToken() {
-	final boolean atVeryFirstCharWhichIsSpaceOrTAB = getCharIndex() == 0 && List.of((int) ' ', (int) '\t').contains(_input.LA(1));
-	Token currentToken;
+       Token currentToken;
 
-	while (true) {
-		currentToken = super.nextToken(); // get the next token from the inputstream
-		if (atVeryFirstCharWhichIsSpaceOrTAB) { // We're at the first line of the input starting with a space or a TAB
-			this.insertLeadingTokens(currentToken.getType(), currentToken.getStartIndex());
-		}
+       final boolean atVeryFirstCharWhichIsSpaceOrTAB = getCharIndex() == 0 && _input.getText(new Interval(0, 0)).trim().isEmpty();
+       while (true) {
+       currentToken = super.nextToken(); // get the next token from the inputstream
+       if (atVeryFirstCharWhichIsSpaceOrTAB) { // We're at the first line of the input starting with a space or a TAB
+              this.insertLeadingTokens(currentToken.getType(), currentToken.getStartIndex()); // We need an 'unexpected indent' error if the first token is visible
+       }
 
-		switch (currentToken.getType()) {
-			case OPEN_PAREN:
-			case OPEN_BRACK:
-			case OPEN_BRACE:
-				this.opened++;
-				this.pendingTokens.addLast(currentToken);  // insert the current open parentheses or square bracket or curly brace token
-				break;
-			case CLOSE_PAREN:
-			case CLOSE_BRACK:
-			case CLOSE_BRACE:
-				this.opened--;
-				this.pendingTokens.addLast(currentToken);  // insert the current close parentheses or square bracket or curly brace token
-				break;
-			case NEWLINE:
-				if (this.opened > 0) {                             //*** https://docs.python.org/3/reference/lexical_analysis.html#implicit-line-joining
-					continue;  // We're inside an implicit line joining section, skip the NEWLINE token
-				} else {
-					switch (_input.LA(1) /* next symbol */) {    //*** https://www.antlr.org/api/Java/org/antlr/v4/runtime/IntStream.html#LA(int)
-						case '\r':
-						case '\n':
-						case '\f':
-						case '#':                                  //*** https://docs.python.org/3/reference/lexical_analysis.html#blank-lines
-							continue;  // We're on a blank line or before a comment, skip the NEWLINE token
-						default:
-							this.pendingTokens.addLast(currentToken); // insert the current NEWLINE token
-							this.insertIndentDedentTokens(this.getIndentationLength(currentToken.getText()));       //*** https://docs.python.org/3/reference/lexical_analysis.html#indentation
-					}
-				}
-				break;
-			case EOF:
-				if ( !this.indentLengths.isEmpty()) {
-					this.insertTrailingTokens(); // indentLengths stack wil be empty
-					this.pendingTokens.addLast(currentToken); // insert the current EOF token
-					this.checkSpaceAndTabIndentation();
-				}
-				break;
-			default:
-				this.pendingTokens.addLast(currentToken); // insert the current token
-		}
-		break; // exit from the loop
-	}
-	this.lastPendingToken = this.pendingTokens.peekLast(); // save the last pending token because the next pollFirst() may remove it
-	return this.pendingTokens.pollFirst(); // append a token to the token stream until the first returning EOF
+       switch (currentToken.getType()) {
+              case OPEN_PAREN:
+              case OPEN_BRACK:
+              case OPEN_BRACE:
+              this.opened++;
+              this.pendingTokens.addLast(currentToken);  // insert the current open parentheses or square bracket or curly brace token
+              break;
+              case CLOSE_PAREN:
+              case CLOSE_BRACK:
+              case CLOSE_BRACE:
+              this.opened--;
+              this.pendingTokens.addLast(currentToken);  // insert the current close parentheses or square bracket or curly brace token
+              break;
+              case NEWLINE:
+              if (this.opened > 0) {                             //*** https://docs.python.org/3/reference/lexical_analysis.html#implicit-line-joining
+                     continue;  // We're inside an implicit line joining section, skip the NEWLINE token
+              } else {
+                     switch (_input.LA(1) /* next symbol */) {    //*** https://www.antlr.org/api/Java/org/antlr/v4/runtime/IntStream.html#LA(int)
+                     case '\r':
+                     case '\n':
+                     case '\f':
+                     case '#':                                  //*** https://docs.python.org/3/reference/lexical_analysis.html#blank-lines
+                            continue;  // We're on a blank line or before a comment, skip the NEWLINE token
+                     default:
+                            this.pendingTokens.addLast(currentToken); // insert the current NEWLINE token
+                            this.insertIndentDedentTokens(this.getIndentationLength(currentToken.getText())); //*** https://docs.python.org/3/reference/lexical_analysis.html#indentation
+                     }
+              }
+              break;
+              case EOF:
+              if ( !this.indentLengths.isEmpty()) {
+                     this.insertTrailingTokens(this.lastPendingToken.getType()); // indentLengths stack wil be empty
+                     this.pendingTokens.addLast(currentToken); // insert the current EOF token
+                     this.checkSpaceAndTabIndentation(); // end of the token processing
+              }
+              break;
+              default:
+              this.pendingTokens.addLast(currentToken); // insert the current token
+       }
+       break; // exit from the loop
+       }
+       this.lastPendingToken = this.pendingTokens.peekLast(); // save the last pending token because the next pollFirst() may remove it
+       return this.pendingTokens.pollFirst(); // append a token to the token stream until the first returning EOF
 }
 
 private void insertLeadingTokens(int type, int startIndex) {
-	if ( !List.of(NEWLINE, EOF).contains(type)) { // We're at the first token that is visible (comments were skipped and OPEN_PAREN, OPEN_BRACK OPEN_BRACE cannot be the first token)
-		// We insert a NEWLINE and an INDENT token before the first token to raise an 'unexpected indent' error by the parser later
-		this.insertToken(0, startIndex - 1, "<inserted leading NEWLINE>" + " ".repeat(startIndex), NEWLINE, 1, 0);
-		this.insertToken(startIndex, startIndex - 1, "<" + TEXT_INSERTED_INDENT + ", " + this.getIndentationDescription(startIndex) + ">", Python3Parser.INDENT, 1, startIndex);
-		this.indentLengths.push(startIndex);
-	}
+       if (type != NEWLINE && type != EOF) { // The first token is visible, We insert a NEWLINE and an INDENT token before it to raise an 'unexpected indent' error by the parser later
+       this.insertToken(0, startIndex - 1, "<inserted leading NEWLINE>" + " ".repeat(startIndex), NEWLINE, 1, 0);
+       this.insertToken(startIndex, startIndex - 1, "<" + TEXT_INSERTED_INDENT + ", " + this.getIndentationDescription(startIndex) + ">", Python3Parser.INDENT, 1, startIndex);
+       this.indentLengths.push(startIndex);
+       }
 }
 
-private void insertIndentDedentTokens(final int currentIndentLength) {
-	int previousIndentLength = this.indentLengths.peek();
+private void insertIndentDedentTokens(int currentIndentLength) {
+       int previousIndentLength = this.indentLengths.peek();
 
-	if (currentIndentLength > previousIndentLength) { // insert an INDENT token
-		this.insertToken("<" + TEXT_INSERTED_INDENT + ", " + this.getIndentationDescription(currentIndentLength) + ">", Python3Parser.INDENT);
-		this.indentLengths.push(currentIndentLength);
-	} else {
-		while (currentIndentLength < previousIndentLength) {   // More than 1 DEDENT token may be inserted
-			this.indentLengths.pop();
-			previousIndentLength = this.indentLengths.peek();
-			if (currentIndentLength <= previousIndentLength) {
-				this.insertToken("<inserted DEDENT, " + this.getIndentationDescription(previousIndentLength) + ">", Python3Parser.DEDENT);
-			} else {
-				this.insertToken("<inserted (I N C O N S I S T E N T !) DEDENT, " + this.getIndentationDescription(currentIndentLength) + ">", Python3Parser.DEDENT);
-				this.errors.add(TEXT_LEXER + "line " + getLine() + ":" + getCharPositionInLine() + "\t IndentationError: unindent does not match any outer indentation level");
-			}
-		}
-	}
+       if (currentIndentLength > previousIndentLength) { // insert an INDENT token
+       this.insertToken("<" + TEXT_INSERTED_INDENT + ", " + this.getIndentationDescription(currentIndentLength) + ">", Python3Parser.INDENT);
+       this.indentLengths.push(currentIndentLength);
+       } else {
+       while (currentIndentLength < previousIndentLength) {   // More than 1 DEDENT token may be inserted
+              this.indentLengths.pop();
+              previousIndentLength = this.indentLengths.peek();
+              if (currentIndentLength <= previousIndentLength) {
+              this.insertToken("<inserted DEDENT, " + this.getIndentationDescription(previousIndentLength) + ">", Python3Parser.DEDENT);
+              } else {
+              this.insertToken("<inserted (I N C O N S I S T E N T !) DEDENT, " + this.getIndentationDescription(currentIndentLength) + ">", Python3Parser.DEDENT);
+              this.errors.add(TEXT_LEXER + "line " + getLine() + ":" + getCharPositionInLine() + "\t IndentationError: unindent does not match any outer indentation level");
+              }
+       }
+       }
 }
 
-private void insertTrailingTokens() {
-	if ( !List.of(NEWLINE, Python3Parser.DEDENT).contains(this.lastPendingToken.getType())) { // If the last pending token was not NEWLINE or DEDENT then
-		this.insertToken("<inserted trailing NEWLINE>", NEWLINE); // insert an extra trailing NEWLINE token that serves as the end of the statement
-	}
+private void insertTrailingTokens(int type) {
+       if (type != NEWLINE && type != Python3Parser.DEDENT) { // If the last pending token was not NEWLINE or DEDENT then
+       this.insertToken("<inserted trailing NEWLINE>", NEWLINE); // insert an extra trailing NEWLINE token that serves as the end of the statement
+       }
 
-	this.indentLengths.removeElementAt(0); // remove the default 0 indentation length
-	while ( !this.indentLengths.isEmpty()) { // Now insert as much trailing DEDENT tokens as needed
-		this.insertToken("<inserted trailing DEDENT, " + this.getIndentationDescription(this.indentLengths.pop()) + ">", Python3Parser.DEDENT);
-	}
+       this.indentLengths.removeElementAt(0); // remove the default 0 indentation length
+       while ( !this.indentLengths.isEmpty()) { // Now insert as much trailing DEDENT tokens as needed
+       this.insertToken("<inserted trailing DEDENT, " + this.getIndentationDescription(this.indentLengths.pop()) + ">", Python3Parser.DEDENT);
+       }
 }
 
 private String getIndentationDescription(int lengthOfIndent) {
-	return "length=" + lengthOfIndent + ", level=" + (this.indentLengths.size());
+       return "length=" + lengthOfIndent + ", level=" + (this.indentLengths.size());
 }
 
 private void insertToken(String text, int type) {
-	final int startIndex = _tokenStartCharIndex + getText().length(); //*** https://www.antlr.org/api/Java/org/antlr/v4/runtime/Lexer.html#_tokenStartCharIndex
-	this.insertToken(startIndex, startIndex - 1, text, type, getLine(), getCharPositionInLine());
+       final int startIndex = _tokenStartCharIndex + getText().length(); //*** https://www.antlr.org/api/Java/org/antlr/v4/runtime/Lexer.html#_tokenStartCharIndex
+       this.insertToken(startIndex, startIndex - 1, text, type, getLine(), getCharPositionInLine());
 }
 
 private void insertToken(int startIndex, int stopIndex, String text, int type, int line, int charPositionInLine) {
-	CommonToken token = new CommonToken(_tokenFactorySourcePair, type, DEFAULT_TOKEN_CHANNEL, startIndex, stopIndex); //*** https://www.antlr.org/api/Java/org/antlr/v4/runtime/CommonToken.html
-	token.setText(text);
-	token.setLine(line);
-	token.setCharPositionInLine(charPositionInLine);
-	this.pendingTokens.addLast(token);
+       CommonToken token = new CommonToken(_tokenFactorySourcePair, type, DEFAULT_TOKEN_CHANNEL, startIndex, stopIndex); //*** https://www.antlr.org/api/Java/org/antlr/v4/runtime/CommonToken.html
+       token.setText(text);
+       token.setLine(line);
+       token.setCharPositionInLine(charPositionInLine);
+       this.pendingTokens.addLast(token);
 }
 
 // Calculates the indentation of the provided spaces, taking the
@@ -197,35 +197,35 @@ private void insertToken(int startIndex, int stopIndex, String text, int type, i
 //
 //  -- https://docs.python.org/3.1/reference/lexical_analysis.html#indentation
 private int getIndentationLength(String textOfMatchedNEWLINE) {
-	int count = 0;
+       int count = 0;
 
-	for (char ch : textOfMatchedNEWLINE.toCharArray()) {
-		switch (ch) {
-			case ' ': // A normal space char
-				this.wasSpaceIndentation = true;
-				count++;
-				break;
-			case '\t':
-				this.wasTabIndentation = true;
-				count += 8 - (count % 8);
-				break;
-		}
-	}
-	return count;
+       for (char ch : textOfMatchedNEWLINE.toCharArray()) {
+       switch (ch) {
+              case ' ': // A normal space char
+              this.wasSpaceIndentation = true;
+              count++;
+              break;
+              case '\t':
+              this.wasTabIndentation = true;
+              count += 8 - (count % 8);
+              break;
+       }
+       }
+       return count;
 }
 
 private void checkSpaceAndTabIndentation() {
-	if (this.wasSpaceIndentation && this.wasTabIndentation) {
-		this.warnings.add("Mixture of space and tab were used for indentation.");
-	}
+       if (this.wasSpaceIndentation && this.wasTabIndentation) {
+       this.warnings.add("Mixture of space and tab were used for indentation.");
+       }
 }
 
-public List<String> getWarnings() { // can be called from a grammar embedded action also
-	return this.warnings;
+public List<String> getWarnings() {
+       return this.warnings;
 }
 
-public List<String> getErrorMessages() { // can be called from a grammar embedded action also
-	return this.errors;
+public List<String> getErrorMessages() {
+       return this.errors;
 }
 }
 
