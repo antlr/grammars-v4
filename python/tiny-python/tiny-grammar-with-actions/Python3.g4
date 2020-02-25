@@ -78,9 +78,9 @@ public static final String TEXT_INSERTED_INDENT = "inserted INDENT";
 
 @Override
 public Token nextToken() {
+       final boolean atVeryFirstCharWhichIsSpaceOrTAB = getCharIndex() == 0 && _input.getText(new Interval(0, 0)).trim().isEmpty();
        Token currentToken;
 
-       final boolean atVeryFirstCharWhichIsSpaceOrTAB = getCharIndex() == 0 && _input.getText(new Interval(0, 0)).trim().isEmpty();
        while (true) {
        currentToken = super.nextToken(); // get the next token from the inputstream
        if (atVeryFirstCharWhichIsSpaceOrTAB) { // We're at the first line of the input starting with a space or a TAB
