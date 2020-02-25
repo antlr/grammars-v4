@@ -48,3 +48,12 @@ CREATE OR REPLACE VIEW oc_inventories OF inventory_typ
 CREATE EDITIONABLE VIEW TEST (A, B, C)
       AS SELECT 'A', 'B', 'C'
       FROM DUAL;
+
+CREATE VIEW TEST (A, B, C)
+      AS 
+      WITH TESTCTE AS (
+        SELECT 1 ONE FROM DUAL
+      )
+      SELECT 'A', 'B', 'C'
+      FROM DUAL
+      JOIN TESTCTE;
