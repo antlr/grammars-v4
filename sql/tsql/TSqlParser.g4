@@ -3041,7 +3041,7 @@ asterisk
     ;
 
 column_elem
-    : (table_name '.')? (column_name=id | '$' IDENTITY | '$' ROWGUID | NULL) as_column_alias?
+    : ((table_name '.')? (column_name=id | '$' IDENTITY | '$' ROWGUID) | NULL) as_column_alias?
     ;
 
 udt_elem
