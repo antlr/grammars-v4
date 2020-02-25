@@ -178,7 +178,7 @@ procedure_spec
 
 function_spec
     : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')?
-      RETURN type_spec (PIPELINED)? (DETERMINISTIC)? (RESULT_CACHE)? ';'
+      RETURN type_spec PIPELINED? DETERMINISTIC? (RESULT_CACHE)? ';'
     ;
 
 package_obj_body
