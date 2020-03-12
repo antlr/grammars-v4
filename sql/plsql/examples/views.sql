@@ -44,3 +44,16 @@ CREATE OR REPLACE VIEW oc_inventories OF inventory_typ
            i.quantity_on_hand
     FROM inventories i, warehouses w
     WHERE i.warehouse_id=w.warehouse_id;
+
+CREATE EDITIONABLE VIEW TEST (A, B, C)
+      AS SELECT 'A', 'B', 'C'
+      FROM DUAL;
+
+CREATE VIEW TEST (A, B, C)
+      AS 
+      WITH TESTCTE AS (
+        SELECT 1 ONE FROM DUAL
+      )
+      SELECT 'A', 'B', 'C'
+      FROM DUAL
+      JOIN TESTCTE;

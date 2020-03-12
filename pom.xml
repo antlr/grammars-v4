@@ -71,6 +71,7 @@
 				<module>alpaca</module>
 				<module>antlr</module>
 				<module>apex</module>
+				<module>apt</module>				
 				<module>arithmetic</module>
 				<module>asm</module>
 				<module>asn</module>
@@ -159,6 +160,7 @@
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
 				<module>p</module>
+				<module>parkingsign</module>
 				<module>pascal</module>
 				<module>pcre</module>
 				<module>pddl</module>
