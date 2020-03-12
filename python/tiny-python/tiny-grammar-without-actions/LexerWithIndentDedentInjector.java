@@ -32,9 +32,9 @@
 
 import org.antlr.v4.runtime.*;
 
-// *************************************************************************************************************
-// **** THE FOLLOWING IMPORT SECTION ALSO CAN BE USED IN THE SECTION OF THE @lexer::header{} IN THE GRAMMAR ****
-// *************************************************************************************************************
+// ******************************************************************************************************
+// **** THE FOLLOWING IMPORT SECTION ALSO CAN BE USED IN THE @lexer::header{} SECTION OF THE GRAMMAR ****
+// ******************************************************************************************************
 import org.antlr.v4.runtime.misc.Interval;
 import java.util.*;
 
@@ -43,9 +43,9 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
         super(input);
     }
 
-    // *******************************************************************************************************
-    // **** THE FOLLOWING SECTION ALSO CAN BE USED IN THE SECTION OF THE @lexer::members{} IN THE GRAMMAR ****
-    // *******************************************************************************************************
+    // ************************************************************************************************
+    // **** THE FOLLOWING SECTION ALSO CAN BE USED IN THE @lexer::members{} SECTION OF THE GRAMMAR ****
+    // ************************************************************************************************
     // The stack that keeps track of the indentation lengths
     private Stack<Integer> indentLengths = new Stack<>() {{ push(0); }}; // initializing with default 0 indentation length
     // A queue where extra tokens are pushed on
@@ -61,9 +61,9 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
     // Was there TAB char in the indentations?
     private boolean wasTabIndentation = false;
 
-    // A string list that stores the lexer warnings
+    // A String list that stores the lexer warnings
     private List<String> warnings = new ArrayList<>();
-    // A string list that stores the lexer error messages
+    // A String list that stores the lexer error messages
     private List<String> errors = new ArrayList<>();
 
     // Patterns for the custom error listener to recognize error messages
@@ -72,12 +72,15 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
 
     @Override
     public Token nextToken() {
-        final boolean atVeryFirstCharWhichIsSpaceOrTAB = getCharIndex() == 0 && _input.getText(new Interval(0, 0)).trim().isEmpty();
-        Token currentToken;
+        if (_input.size() == 0) {
+            return new CommonToken(EOF, "<EOF>"); // processing of the input stream until the first returning EOF
+        }
 
+        final boolean isFirstCharOfInputSpaceOrTAB = getCharIndex() == 0 && _input.getText(new Interval(0, 0)).trim().isEmpty();
+        Token currentToken;
         while (true) {
-            currentToken = super.nextToken(); // get the next token from the inputstream
-            if (atVeryFirstCharWhichIsSpaceOrTAB) { // We're at the first line of the input starting with a space or a TAB
+            currentToken = super.nextToken(); // get the next token from the input stream
+            if (isFirstCharOfInputSpaceOrTAB) { // We're at the first line of the input starting with a space or a TAB
                 this.insertLeadingTokens(currentToken.getType(), currentToken.getStartIndex()); // We need an 'unexpected indent' error if the first token is visible
             }
 
@@ -114,7 +117,7 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
                     if ( !this.indentLengths.isEmpty()) {
                         this.insertTrailingTokens(this.lastPendingToken.getType()); // indentLengths stack wil be empty
                         this.pendingTokens.addLast(currentToken); // insert the current EOF token
-                        this.checkSpaceAndTabIndentation(); // end of the token processing
+                        this.checkSpaceAndTabIndentation();
                     }
                     break;
                 default:
@@ -127,7 +130,7 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
     }
 
     private void insertLeadingTokens(int type, int startIndex) {
-        if (type != NEWLINE && type != EOF) { // The first token is visible, We insert a NEWLINE and an INDENT token before it to raise an 'unexpected indent' error by the parser later
+        if (type != NEWLINE && type != EOF) { // The first token is visible, so We insert a NEWLINE and an INDENT token before it to raise an 'unexpected indent' error by the parser later
             this.insertToken(0, startIndex - 1, "<inserted leading NEWLINE>" + " ".repeat(startIndex), NEWLINE, 1, 0);
             this.insertToken(startIndex, startIndex - 1, "<" + TEXT_INSERTED_INDENT + ", " + this.getIndentationDescription(startIndex) + ">", Python3Parser.INDENT, 1, startIndex);
             this.indentLengths.push(startIndex);
@@ -147,7 +150,7 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
                 if (currentIndentLength <= previousIndentLength) {
                     this.insertToken("<inserted DEDENT, " + this.getIndentationDescription(previousIndentLength) + ">", Python3Parser.DEDENT);
                 } else {
-                    this.insertToken("<inserted (I N C O N S I S T E N T !) DEDENT, " + this.getIndentationDescription(currentIndentLength) + ">", Python3Parser.DEDENT);
+                    this.insertToken("<inserted inconsistent DEDENT, " + this.getIndentationDescription(currentIndentLength) + ">", Python3Parser.DEDENT);
                     this.errors.add(TEXT_LEXER + "line " + getLine() + ":" + getCharPositionInLine() + "\t IndentationError: unindent does not match any outer indentation level");
                 }
             }
@@ -155,7 +158,7 @@ public class LexerWithIndentDedentInjector extends Python3Lexer { //*** https://
     }
 
     private void insertTrailingTokens(int type) {
-        if (type != NEWLINE && type != Python3Parser.DEDENT) { // If the last pending token was not NEWLINE or DEDENT then
+        if (type != NEWLINE && type != Python3Parser.DEDENT) { // If the last pending token was not a NEWLINE and not a DEDENT then
             this.insertToken("<inserted trailing NEWLINE>", NEWLINE); // insert an extra trailing NEWLINE token that serves as the end of the statement
         }
 
