@@ -10,6 +10,9 @@ public class Main {
         System.out.println(input.toString()); // displaying the input source code
 
         System.out.println();
+        System.out.println("Displaying Format:");
+        System.out.println("[@TokenIndex,startIndex:stopIndex='text',<TokenType is RuleName>,line:charPositionInLine]");
+        System.out.println("-----------------------------------------------------------------------------------------");
         tokens.fill(); // explicit loading all tokens from the lexer until the EOF
         for (Token t : tokens.getTokens()) {
             System.out.println(getTokenMetaDataWithRuleName(parser, t)); // displaying a token metadata
@@ -21,7 +24,7 @@ public class Main {
             parser.notifyErrorListeners(errMsg);
         }
 
-        parser.file_input(); // begin the parsing at the file_input rule and displaying the lexer and the parser error messages
+        parser.file_input(); // begin the parsing at the file_input grammar rule and displaying the lexer and the parser error messages
 
         if (lexer.getWarnings().size() > 0) {
             System.err.println();
