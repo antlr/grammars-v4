@@ -100,7 +100,7 @@ importFrom
     ;
 
 aliasName
-    : identifierName (As identifierName )?
+    : identifierName (As identifierName)?
     ;
 
 exportStatement
@@ -236,7 +236,7 @@ classTail
     ;
 
 classElement
-    : (Static | {this.n("static")}? identifierOrLet | Async)* methodDefinition
+    : (Static | {this.n("static")}? identifierOrLet | Async)* (methodDefinition | assignable '=' objectLiteral ';')
     | emptyStatement
     | '#'? propertyName '=' singleExpression
     ;
@@ -278,10 +278,6 @@ elementList
 
 arrayElement
     : Ellipsis? singleExpression
-    ;
-
-objectLiteral
-    : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
     ;
 
 propertyAssignment
@@ -365,6 +361,10 @@ assignable
     : identifierOrLet
     | arrayLiteral
     | objectLiteral
+    ;
+
+objectLiteral
+    : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
     ;
 
 anoymousFunction
