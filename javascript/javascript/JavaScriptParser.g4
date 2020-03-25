@@ -92,7 +92,7 @@ importDefault
     ;
 
 importNamespace
-    : '*' (As identifierName)?
+    : ('*' | identifierName) (As identifierName)?
     ;
 
 importFrom
