@@ -170,7 +170,8 @@ Await:                          'await';
 /// when parsing strict mode
 
 Implements:                     'implements' {this.IsStrictMode()}?;
-Let:                            'let' {this.IsStrictMode()}?;
+StrictLet:                      'let' {this.IsStrictMode()}?;
+NonStrictLet:                   'let' {!this.IsStrictMode()}?;
 Private:                        'private' {this.IsStrictMode()}?;
 Public:                         'public' {this.IsStrictMode()}?;
 Interface:                      'interface' {this.IsStrictMode()}?;
