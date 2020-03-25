@@ -145,12 +145,12 @@ ifStatement
 
 
 iterationStatement
-    : Do statement While '(' expressionSequence ')' eos                                                                 # DoStatement
-    | While '(' expressionSequence ')' statement                                                                        # WhileStatement
+    : Do statement While '(' expressionSequence ')' eos                                                                       # DoStatement
+    | While '(' expressionSequence ')' statement                                                                              # WhileStatement
     | For '(' (expressionSequence | variableDeclarationList)? ';' expressionSequence? ';' expressionSequence? ')' statement   # ForStatement
     | For '(' (singleExpression | variableDeclarationList) In expressionSequence ')' statement                                # ForInStatement
     // strange, 'of' is an identifier. and this.p("of") not work in sometime.
-    | For Await? '(' (singleExpression | variableDeclarationList) identifierOrLet{this.p("of")}? expressionSequence ')' statement  # ForOfStatement
+    | For Await? '(' (singleExpression | variableDeclarationList) identifier{this.p("of")}? expressionSequence ')' statement  # ForOfStatement
     ;
 
 varModifier  // let, const - ECMAScript 6
@@ -160,11 +160,11 @@ varModifier  // let, const - ECMAScript 6
     ;
 
 continueStatement
-    : Continue ({this.notLineTerminator()}? identifierOrLet)? eos
+    : Continue ({this.notLineTerminator()}? identifier)? eos
     ;
 
 breakStatement
-    : Break ({this.notLineTerminator()}? identifierOrLet)? eos
+    : Break ({this.notLineTerminator()}? identifier)? eos
     ;
 
 returnStatement
@@ -200,7 +200,7 @@ defaultClause
     ;
 
 labelledStatement
-    : identifierOrLet ':' statement
+    : identifier ':' statement
     ;
 
 throwStatement
@@ -224,11 +224,11 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Async? Function '*'? identifierOrLet '(' formalParameterList? ')' '{' functionBody '}'
+    : Async? Function '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 classDeclaration
-    : Class identifierOrLet classTail
+    : Class identifier classTail
     ;
 
 classTail
@@ -236,7 +236,7 @@ classTail
     ;
 
 classElement
-    : (Static | {this.n("static")}? identifierOrLet | Async)* (methodDefinition | assignable '=' objectLiteral ';')
+    : (Static | {this.n("static")}? identifier | Async)* (methodDefinition | assignable '=' objectLiteral ';')
     | emptyStatement
     | '#'? propertyName '=' singleExpression
     ;
@@ -301,7 +301,7 @@ arguments
     ;
 
 argument
-    : Ellipsis? (singleExpression | identifierOrLet)
+    : Ellipsis? (singleExpression | identifier)
     ;
 
 expressionSequence
@@ -310,12 +310,12 @@ expressionSequence
 
 singleExpression
     : anoymousFunction                                                      # FunctionExpression
-    | Class identifierOrLet? classTail                                      # ClassExpression
+    | Class identifier? classTail                                           # ClassExpression
     | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
     | singleExpression arguments                                            # ArgumentsExpression
     | New singleExpression arguments?                                       # NewExpression
-    | New '.' identifierOrLet                                               # MetaExpression // new.target
+    | New '.' identifier                                                    # MetaExpression // new.target
     | singleExpression {this.notLineTerminator()}? '++'                     # PostIncrementExpression
     | singleExpression {this.notLineTerminator()}? '--'                     # PostDecreaseExpression
     | Delete singleExpression                                               # DeleteExpression
@@ -349,7 +349,7 @@ singleExpression
     | singleExpression TemplateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
     | yieldStatement                                                        # YieldExpression // ECMAScript 6
     | This                                                                  # ThisExpression
-    | identifierOrLet                                                       # IdentifierExpression
+    | identifier                                                            # IdentifierExpression
     | Super                                                                 # SuperExpression
     | literal                                                               # LiteralExpression
     | arrayLiteral                                                          # ArrayLiteralExpression
@@ -358,7 +358,7 @@ singleExpression
     ;
 
 assignable
-    : identifierOrLet
+    : identifier
     | arrayLiteral
     | objectLiteral
     ;
@@ -374,7 +374,7 @@ anoymousFunction
     ;
 
 arrowFunctionParameters
-    : identifierOrLet
+    : identifier
     | '(' formalParameterList? ')'
     ;
 
@@ -424,21 +424,22 @@ bigintLiteral
     ;
 
 getter
-    : identifierOrLet {this.p("get")}? propertyName
+    : identifier {this.p("get")}? propertyName
     ;
 
 setter
-    : identifierOrLet {this.p("set")}? propertyName
+    : identifier {this.p("set")}? propertyName
     ;
 
 identifierName
-    : identifierOrLet
+    : identifier
     | reservedWord
     ;
 
-identifierOrLet
+identifier
     : Identifier
     | NonStrictLet
+    | Async
     ;
 
 reservedWord
