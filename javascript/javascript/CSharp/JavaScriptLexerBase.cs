@@ -1,12 +1,12 @@
 using Antlr4.Runtime;
 using System.Collections.Generic;
-using static PT.PM.JavaScriptParseTreeUst.JavaScriptParser;
+using static JavaScriptParseTree.JavaScriptParser;
 
 /// <summary>
 /// All lexer methods that used in grammar (IsStrictMode)
 /// should start with Upper Case Char similar to Lexer rules.
 /// </summary>
-public abstract class JavaScriptBaseLexer : Lexer
+public abstract class JavaScriptLexerBase : Lexer
 {
     /// <summary>
     /// Stores values of nested modes. By default mode is strict or
@@ -28,7 +28,7 @@ public abstract class JavaScriptBaseLexer : Lexer
     /// </summary>
     private bool _useStrictCurrent = false;
 
-    public JavaScriptBaseLexer(ICharStream input)
+    public JavaScriptLexerBase(ICharStream input)
         : base(input)
     {
     }

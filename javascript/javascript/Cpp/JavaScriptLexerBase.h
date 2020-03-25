@@ -4,9 +4,9 @@
 
 #include "antlr4-runtime.h"
 
-class JavaScriptBaseLexer : public antlr4::Lexer {
+class JavaScriptLexerBase : public antlr4::Lexer {
 public:
-    JavaScriptBaseLexer(antlr4::CharStream *input);
+    JavaScriptLexerBase(antlr4::CharStream *input);
 
     std::stack<bool> scopeStrictModes;
     

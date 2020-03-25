@@ -6,48 +6,48 @@ import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
-// JavaScriptBaseParser implementation.
-type JavaScriptBaseParser struct {
-	*antlr.BaseParser
+// JavaScriptParserBase implementation.
+type JavaScriptParserBase struct {
+	*antlr.ParserBase
 }
 
 // Short for p.prev(str string)
-func (p *JavaScriptBaseParser) p(str string) bool {
+func (p *JavaScriptParserBase) p(str string) bool {
 	return p.prev(str)
 }
 
 // Whether the previous token value equals to str.
-func (p *JavaScriptBaseParser) prev(str string) bool {
+func (p *JavaScriptParserBase) prev(str string) bool {
 	return p.GetTokenStream().LT(-1).GetText() == str
 }
 
 // Short for p.next(str string)
-func (p *JavaScriptBaseParser) n(str string) bool {
+func (p *JavaScriptParserBase) n(str string) bool {
 	return p.next(str)
 }
 
 // Whether the next token value equals to str.
-func (p *JavaScriptBaseParser) next(str string) bool {
+func (p *JavaScriptParserBase) next(str string) bool {
 	return p.GetTokenStream().LT(1).GetText() == str
 }
 
-func (p *JavaScriptBaseParser) notLineTerminator() bool {
+func (p *JavaScriptParserBase) notLineTerminator() bool {
 	return !p.here(JavaScriptParserLineTerminator)
 }
 
-func (p *JavaScriptBaseParser) notOpenBraceAndNotFunction() bool {
+func (p *JavaScriptParserBase) notOpenBraceAndNotFunction() bool {
 	nextTokenType := p.GetTokenStream().LT(1).GetTokenType()
 	return nextTokenType != JavaScriptParserOpenBrace && nextTokenType != JavaScriptParserFunction
 }
 
-func (p *JavaScriptBaseParser) closeBrace() bool {
+func (p *JavaScriptParserBase) closeBrace() bool {
 	return p.GetTokenStream().LT(1).GetTokenType() == JavaScriptParserCloseBrace
 }
 
 // Returns true if on the current index of the parser's
 // token stream a token of the given type exists on the
 // Hidden channel.
-func (p *JavaScriptBaseParser) here(_type int) bool {
+func (p *JavaScriptParserBase) here(_type int) bool {
 	// Get the token ahead of the current index.
 	possibleIndexEosToken := p.GetCurrentToken().GetTokenIndex() - 1
 	ahead := p.GetTokenStream().Get(possibleIndexEosToken)
@@ -61,7 +61,7 @@ func (p *JavaScriptBaseParser) here(_type int) bool {
 // token stream a token exists on the Hidden channel which
 // either is a line terminator, or is a multi line comment that
 // contains a line terminator.
-func (p *JavaScriptBaseParser) lineTerminatorAhead() bool {
+func (p *JavaScriptParserBase) lineTerminatorAhead() bool {
 	// Get the token ahead of the current index.
 	possibleIndexEosToken := p.GetCurrentToken().GetTokenIndex() - 1
 	ahead := p.GetTokenStream().Get(possibleIndexEosToken)

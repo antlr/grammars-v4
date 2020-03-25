@@ -2,33 +2,33 @@
 
 using namespace antlr4;
 
-JavaScriptBaseLexer::JavaScriptBaseLexer(CharStream *input) : Lexer(input)
+JavaScriptLexerBase::JavaScriptLexerBase(CharStream *input) : Lexer(input)
 {
 }
 
-bool JavaScriptBaseLexer::getStrictDefault()
+bool JavaScriptLexerBase::getStrictDefault()
 {
     return useStrictDefault;
 }
 
-bool JavaScriptBaseLexer::IsStartOfFile(){
+bool JavaScriptLexerBase::IsStartOfFile(){
     // No token has been produced yet: at the start of the input,
     // no division is possible, so a regex literal _is_ possible.
     return lastToken;
 }
 
-void JavaScriptBaseLexer::setUseStrictDefault(bool value)
+void JavaScriptLexerBase::setUseStrictDefault(bool value)
 {
     useStrictDefault = value;
     useStrictCurrent = value;
 }
 
-bool JavaScriptBaseLexer::IsStrictMode()
+bool JavaScriptLexerBase::IsStrictMode()
 {
     return useStrictCurrent;
 }
 
-std::unique_ptr<antlr4::Token> JavaScriptBaseLexer::nextToken() {
+std::unique_ptr<antlr4::Token> JavaScriptLexerBase::nextToken() {
     auto next = Lexer::nextToken();
 
     if (next->getChannel() == Token::DEFAULT_CHANNEL) {
@@ -40,13 +40,13 @@ std::unique_ptr<antlr4::Token> JavaScriptBaseLexer::nextToken() {
     return next;
 }
 
-void JavaScriptBaseLexer::ProcessOpenBrace()
+void JavaScriptLexerBase::ProcessOpenBrace()
 {
     useStrictCurrent = scopeStrictModes.size() > 0 && scopeStrictModes.top() ? true : useStrictDefault;
     scopeStrictModes.push(useStrictCurrent);
 }
 
-void JavaScriptBaseLexer::ProcessCloseBrace()
+void JavaScriptLexerBase::ProcessCloseBrace()
 {
     if (scopeStrictModes.size() > 0) {
         useStrictCurrent = scopeStrictModes.top();
@@ -56,7 +56,7 @@ void JavaScriptBaseLexer::ProcessCloseBrace()
     }
 }
 
-void JavaScriptBaseLexer::ProcessStringLiteral()
+void JavaScriptLexerBase::ProcessStringLiteral()
 {
     if (lastToken || lastTokenType == JavaScriptLexer::OpenBrace)
     {
@@ -71,7 +71,7 @@ void JavaScriptBaseLexer::ProcessStringLiteral()
     }
 }
 
-bool JavaScriptBaseLexer::IsRegexPossible()
+bool JavaScriptLexerBase::IsRegexPossible()
 {
     if (lastToken) {
         // No token has been produced yet: at the start of the input,
