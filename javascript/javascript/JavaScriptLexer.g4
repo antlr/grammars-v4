@@ -2,7 +2,7 @@
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 by Bart Kiers (original author) and Alexandre Vitorelli (contributor -> ported to CSharp)
- * Copyright (c) 2017 by Ivan Kochurkin (Positive Technologies):
+ * Copyright (c) 2017-2020 by Ivan Kochurkin (Positive Technologies):
     added ECMAScript 6 support, cleared and transformed to the universal grammar.
  * Copyright (c) 2018 by Juan Alvarez (contributor -> ported to Go)
  * Copyright (c) 2019 by Student Main (contributor -> ES2020)
@@ -32,7 +32,7 @@ lexer grammar JavaScriptLexer;
 
 channels { ERROR }
 
-options { superClass=JavaScriptBaseLexer; }
+options { superClass=JavaScriptLexerBase; }
 
 HashBangLine:                   { this.IsStartOfFile()}? '#!' ~[\r\n\u2028\u2029]*; // only allowed at start
 MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
@@ -170,7 +170,8 @@ Await:                          'await';
 /// when parsing strict mode
 
 Implements:                     'implements' {this.IsStrictMode()}?;
-Let:                            'let' {this.IsStrictMode()}?;
+StrictLet:                      'let' {this.IsStrictMode()}?;
+NonStrictLet:                   'let' {!this.IsStrictMode()}?;
 Private:                        'private' {this.IsStrictMode()}?;
 Public:                         'public' {this.IsStrictMode()}?;
 Interface:                      'interface' {this.IsStrictMode()}?;
@@ -200,17 +201,124 @@ LineTerminator:                 [\r\n\u2028\u2029] -> channel(HIDDEN);
 HtmlComment:                    '<!--' .*? '-->' -> channel(HIDDEN);
 CDataComment:                   '<![CDATA[' .*? ']]>' -> channel(HIDDEN);
 UnexpectedCharacter:            . -> channel(ERROR);
+CDATA:                          '<![CDATA[' .*? ']]>' -> channel(HIDDEN);
+
+//
+// html tag declarations
+//
+mode TAG;
+
+TAG_OPEN
+    : LessThan -> pushMode(TAG)
+    ;
+TAG_CLOSE
+    : MoreThan -> popMode
+    ;
+
+TAG_SLASH_CLOSE
+    : '/>' -> popMode
+    ;
+
+TAG_SLASH
+    : Divide
+    ;
+    
+TAG_NAME
+    : TAG_NameStartChar TAG_NameChar*
+    ;
+
+// an attribute value may have spaces b/t the '=' and the value
+ATTVALUE_VALUE
+    : [ ]* ATTRIBUTE -> popMode
+    ;
+
+ATTRIBUTE
+    : DOUBLE_QUOTE_STRING
+    | SINGLE_QUOTE_STRING
+    | ATTCHARS
+    | HEXCHARS
+    | DECCHARS
+    ;
+
+//
+// lexing mode for attribute values
+//
+mode ATTVALUE;
+
+TAG_EQUALS
+    : Assign -> pushMode(ATTVALUE)
+    ;
 
 // Fragment rules
+fragment ATTCHAR
+    : '-'
+    | '_'
+    | '.'
+    | '/'
+    | '+'
+    | ','
+    | '?'
+    | '='
+    | ':'
+    | ';'
+    | '#'
+    | [0-9a-zA-Z]
+    ;
+
+fragment ATTCHARS
+    : ATTCHAR+ ' '?
+    ;
+
+fragment HEXCHARS
+    : '#' [0-9a-fA-F]+
+    ;
+
+fragment DECCHARS
+    : [0-9]+ '%'?
+    ;
+
+fragment DOUBLE_QUOTE_STRING
+    : '"' ~[<"]* '"'
+    ;
+fragment SINGLE_QUOTE_STRING
+    : '\'' ~[<']* '\''
+    ;
+
+fragment
+TAG_NameStartChar
+    :   [:a-zA-Z]
+    |   '\u2070'..'\u218F'
+    |   '\u2C00'..'\u2FEF'
+    |   '\u3001'..'\uD7FF'
+    |   '\uF900'..'\uFDCF'
+    |   '\uFDF0'..'\uFFFD'
+    ;
+
+fragment
+TAG_NameChar
+    : TAG_NameStartChar
+    | '-'
+    | '_'
+    | '.'
+    | DIGIT
+    |   '\u00B7'
+    |   '\u0300'..'\u036F'
+    |   '\u203F'..'\u2040'
+    ;
+
+fragment
+DIGIT
+    : [0-9]
+    ;
 
 fragment DoubleStringCharacter
-    : ~["\\\r\n]
+    : ~["\\]
     | '\\' EscapeSequence
     | LineContinuation
     ;
 
 fragment SingleStringCharacter
-    : ~['\\\r\n]
+    : ~['\\]
     | '\\' EscapeSequence
     | LineContinuation
     ;
