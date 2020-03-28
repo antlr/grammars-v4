@@ -2,9 +2,9 @@ package parser
 
 import "github.com/antlr/antlr4/runtime/Go/antlr"
 
-// JavaScriptBaseLexer state
-type JavaScriptBaseLexer struct {
-	*antlr.BaseLexer
+// JavaScriptLexerBase state
+type JavaScriptLexerBase struct {
+	*antlr.LexerBase
 
 	scopeStrictModes []bool
 	stackLength      int
@@ -15,11 +15,11 @@ type JavaScriptBaseLexer struct {
 	useStrictCurrent bool
 }
 
-func (l *JavaScriptBaseLexer) IsStartOfFile() {
+func (l *JavaScriptLexerBase) IsStartOfFile() {
     return l.lastToken == nil
 }
 
-func (l *JavaScriptBaseLexer) pushStrictModeScope(v bool) {
+func (l *JavaScriptLexerBase) pushStrictModeScope(v bool) {
 	if l.stackIx == l.stackLength {
 		l.scopeStrictModes = append(l.scopeStrictModes, v)
 		l.stackLength++
@@ -29,7 +29,7 @@ func (l *JavaScriptBaseLexer) pushStrictModeScope(v bool) {
 	l.stackIx++
 }
 
-func (l *JavaScriptBaseLexer) popStrictModeScope() bool {
+func (l *JavaScriptLexerBase) popStrictModeScope() bool {
 	l.stackIx--
 	v := l.scopeStrictModes[l.stackIx]
 	l.scopeStrictModes[l.stackIx] = false
@@ -37,13 +37,13 @@ func (l *JavaScriptBaseLexer) popStrictModeScope() bool {
 }
 
 // IsStrictMode is self explanatory.
-func (l *JavaScriptBaseLexer) IsStrictMode() bool {
+func (l *JavaScriptLexerBase) IsStrictMode() bool {
 	return l.useStrictCurrent
 }
 
 // NextToken from the character stream.
-func (l *JavaScriptBaseLexer) NextToken() antlr.Token {
-	next := l.BaseLexer.NextToken() // Get next token
+func (l *JavaScriptLexerBase) NextToken() antlr.Token {
+	next := l.LexerBase.NextToken() // Get next token
 	if next.GetChannel() == antlr.TokenDefaultChannel {
 		// Keep track of the last token on default channel
 		l.lastToken = next
@@ -53,7 +53,7 @@ func (l *JavaScriptBaseLexer) NextToken() antlr.Token {
 
 // ProcessOpenBrace is called when a { is encountered during
 // lexing, we push a new scope everytime.
-func (l *JavaScriptBaseLexer) ProcessOpenBrace() {
+func (l *JavaScriptLexerBase) ProcessOpenBrace() {
 	l.useStrictCurrent = l.useStrictDefault
 	if l.stackIx > 0 && l.scopeStrictModes[l.stackIx-1] {
 		l.useStrictCurrent = true
@@ -63,7 +63,7 @@ func (l *JavaScriptBaseLexer) ProcessOpenBrace() {
 
 // ProcessCloseBrace is called when a } is encountered during
 // lexing, we pop a scope unless we're inside global scope.
-func (l *JavaScriptBaseLexer) ProcessCloseBrace() {
+func (l *JavaScriptLexerBase) ProcessCloseBrace() {
 	l.useStrictCurrent = l.useStrictDefault
 	if l.stackIx > 0 {
 		l.useStrictCurrent = l.popStrictModeScope()
@@ -71,7 +71,7 @@ func (l *JavaScriptBaseLexer) ProcessCloseBrace() {
 }
 
 // ProcessStringLiteral is called when lexing a string literal.
-func (l *JavaScriptBaseLexer) ProcessStringLiteral() {
+func (l *JavaScriptLexerBase) ProcessStringLiteral() {
 	if l.lastToken == nil || l.lastToken.GetTokenType() == JavaScriptLexerOpenBrace {
 		if l.GetText() == `"use strict"` || l.GetText() == "'use strict'" {
 			if l.stackIx > 0 {
@@ -85,7 +85,7 @@ func (l *JavaScriptBaseLexer) ProcessStringLiteral() {
 
 // IsRegexPossible returns true if the lexer can match a
 // regex literal.
-func (l *JavaScriptBaseLexer) IsRegexPossible() bool {
+func (l *JavaScriptLexerBase) IsRegexPossible() bool {
 	if l.lastToken == nil {
 		return true
 	}
