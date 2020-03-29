@@ -44,5 +44,5 @@ insert INTO `wptests_posts` (`post_author`, `post_date`, `post_date_gmt`, `post_
 #end
 #begin
 -- insert in default table
-INSERT INTO default_table() VALUES(), ();
+INSERT INTO default_table() VALUES();
 #end
