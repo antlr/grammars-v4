@@ -31,10 +31,10 @@
 grammar SQLite;
 
 parse
- : ( sql_stmt_list | error_ )* EOF
+ : ( sql_stmt_list | error )* EOF
  ;
 
-error_
+error
  : UNEXPECTED_CHAR 
    { 
      throw new RuntimeException("UNEXPECTED_CHAR=" + $UNEXPECTED_CHAR.text); 
