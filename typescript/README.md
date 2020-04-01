@@ -41,7 +41,7 @@ For **C#** runtime by Sam Harwell it described by
 ```CSharp
 protected bool prev(string str)
 {
-    return _input.Lt(-1).Text.Equals(str);
+    return _input.LT(-1).Text.Equals(str);
 }
 ```
 
