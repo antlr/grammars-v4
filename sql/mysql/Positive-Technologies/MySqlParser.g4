@@ -760,7 +760,7 @@ insertStatement
     : INSERT
       priority=(LOW_PRIORITY | DELAYED | HIGH_PRIORITY)?
       IGNORE? INTO? tableName
-      (PARTITION '(' partitions=uidList ')' )?
+      (PARTITION '(' partitions=uidList? ')' )?
       (
         ('(' columns=uidList ')')? insertStatementValue
         | SET
@@ -848,8 +848,8 @@ updateStatement
 insertStatementValue
     : selectStatement
     | insertFormat=(VALUES | VALUE)
-      '(' expressionsWithDefaults ')'
-        (',' '(' expressionsWithDefaults ')')*
+      '(' expressionsWithDefaults? ')'
+        (',' '(' expressionsWithDefaults? ')')*
     ;
 
 updatedElement
