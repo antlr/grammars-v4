@@ -17,6 +17,10 @@ function Greet(greeting: string, name?: string ) : string {
     return greeting + ' ' + name + '!';
 }
 
+function terminateJob(jobId: string) {
+    return this.http.delete<IOperationResult<any>>();
+}
+
 function Greet2(name: string, greeting: string = "Hello") : string {
     return greeting + ' ' + name + '!';
 }
