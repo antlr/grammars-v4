@@ -1,13 +1,13 @@
 using Antlr4.Runtime;
-using static PT.PM.JavaScriptParseTreeUst.JavaScriptParser;
+using static JavaScriptParseTree.JavaScriptParser;
 
 /// <summary>
 /// All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
 /// should start with lower case char similar to parser rules.
 /// </summary>
-public abstract class JavaScriptBaseParser : Parser
+public abstract class JavaScriptParserBase : Parser
 {
-    public JavaScriptBaseParser(ITokenStream input)
+    public JavaScriptParserBase(ITokenStream input)
         : base(input)
     {
     }

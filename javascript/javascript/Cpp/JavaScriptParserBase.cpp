@@ -2,48 +2,48 @@
 
 using namespace antlr4;
 
-JavaScriptBaseParser::JavaScriptBaseParser(TokenStream *input) : Parser(input)
+JavaScriptParserBase::JavaScriptParserBase(TokenStream *input) : Parser(input)
 {
 }
 
-bool JavaScriptBaseParser::p(std::string str)
+bool JavaScriptParserBase::p(std::string str)
 {
     return prev(str);
 }
 
-bool JavaScriptBaseParser::prev(std::string str)
+bool JavaScriptParserBase::prev(std::string str)
 {
     return _input->LT(-1)->getText() == str;
 }
 
-bool JavaScriptBaseParser::n(std::string str)
+bool JavaScriptParserBase::n(std::string str)
 {
     return next(str);
 }
 
-bool JavaScriptBaseParser::next(std::string str)
+bool JavaScriptParserBase::next(std::string str)
 {
     return _input->LT(1)->getText() == str;
 }
 
-bool JavaScriptBaseParser::notLineTerminator()
+bool JavaScriptParserBase::notLineTerminator()
 {
     return !here(JavaScriptParser::LineTerminator);
 }
 
-bool JavaScriptBaseParser::notOpenBraceAndNotFunction()
+bool JavaScriptParserBase::notOpenBraceAndNotFunction()
 {
     int nextTokenType = _input->LT(1)->getType();
     return nextTokenType != JavaScriptParser::OpenBrace && nextTokenType != JavaScriptParser::Function;
 
 }
 
-bool JavaScriptBaseParser::closeBrace()
+bool JavaScriptParserBase::closeBrace()
 {
     return _input->LT(1)->getType() == JavaScriptParser::CloseBrace;
 }
 
-bool JavaScriptBaseParser::here(int type)
+bool JavaScriptParserBase::here(int type)
 {
     // Get the token ahead of the current index.
     int possibleIndexEosToken = this->getCurrentToken()->getTokenIndex() - 1;
@@ -54,7 +54,7 @@ bool JavaScriptBaseParser::here(int type)
     return (ahead->getChannel() == Lexer::HIDDEN) && (ahead->getType() == type);
 }
 
-bool JavaScriptBaseParser::lineTerminatorAhead()
+bool JavaScriptParserBase::lineTerminatorAhead()
 {
     // Get the token ahead of the current index.
     int possibleIndexEosToken = this->getCurrentToken()->getTokenIndex() - 1;
