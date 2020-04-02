@@ -10,7 +10,11 @@
 		<version>1.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
+	<properties>
+		<src.dir>Java</src.dir>
+	</properties>
 	<build>
+		<sourceDirectory>${src.dir}</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.antlr</groupId>
@@ -18,9 +22,12 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>Haskell.g4</grammars>
+					<includes>
+						<include>HaskellLexer.g4</include>
+						<include>HaskellParser.g4</include>
+					</includes>
 					<visitor>false</visitor>
-					<listener>false</listener>v
+					<listener>false</listener>
 				</configuration>
 				<executions>
 					<execution>
