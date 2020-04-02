@@ -34,9 +34,6 @@ protected boolean prev(String str) {
     return _input.LT(-1).getText().equals(str);
 }
 ```
-For **C#** Standard runtime it described by 
-[CSharp/JavaScriptParserBase.cs](CSharp/JavaScriptParserBase.cs)
-
 
 For **C#** runtime by Sam Harwell it described by 
 [CSharp/JavaScriptParserBase.cs](CSharp/JavaScriptParserBase.cs)
