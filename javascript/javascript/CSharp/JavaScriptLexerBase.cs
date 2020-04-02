@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Antlr4.Runtime;
-using static JavaScriptParser;
+using System.Collections.Generic;
+using static JavaScriptParseTree.JavaScriptParser;
 
 /// <summary>
 /// All lexer methods that used in grammar (IsStrictMode)
@@ -14,41 +12,42 @@ public abstract class JavaScriptLexerBase : Lexer
     /// Stores values of nested modes. By default mode is strict or
     /// defined externally(useStrictDefault)
     /// </summary>
-    private readonly Stack<bool> _scopeStrictModes = new Stack<bool>();
+    private Stack<bool> scopeStrictModes = new Stack<bool>();
 
-    private IToken _lastToken;
+    private IToken _lastToken = null;
 
     /// <summary>
     /// Default value of strict mode
     /// Can be defined externally by changing UseStrictDefault
     /// </summary>
-    private bool _useStrictDefault;
+    private bool _useStrictDefault = false;
 
     /// <summary>
     /// Current value of strict mode
     /// Can be defined during parsing, see StringFunctions.js and StringGlobal.js samples
     /// </summary>
-    private bool _useStrictCurrent;
+    private bool _useStrictCurrent = false;
 
-    public JavaScriptLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput)
-        : base(input, output, errorOutput)
+    public JavaScriptLexerBase(ICharStream input)
+        : base(input)
     {
+    }
+
+    public bool IsStartOfFile(){
+        return _lastToken == null;
     }
 
     public bool UseStrictDefault
     {
-        get => _useStrictDefault;
-
+        get
+        {
+            return _useStrictDefault;
+        }
         set
         {
             _useStrictDefault = value;
             _useStrictCurrent = value;
         }
-    }
-
-    public bool IsStartOfFile()
-    {
-        return _lastToken == null;
     }
 
     public bool IsStrictMode()
@@ -82,29 +81,25 @@ public abstract class JavaScriptLexerBase : Lexer
 
     protected void ProcessOpenBrace()
     {
-        _useStrictCurrent = (_scopeStrictModes.Count > 0 && _scopeStrictModes.Peek()) || UseStrictDefault;
-        _scopeStrictModes.Push(_useStrictCurrent);
+        _useStrictCurrent = scopeStrictModes.Count > 0 && scopeStrictModes.Peek() ? true : UseStrictDefault;
+        scopeStrictModes.Push(_useStrictCurrent);
     }
 
     protected void ProcessCloseBrace()
     {
-        _useStrictCurrent = _scopeStrictModes.Count > 0 ? _scopeStrictModes.Pop() : UseStrictDefault;
+        _useStrictCurrent = scopeStrictModes.Count > 0 ? scopeStrictModes.Pop() : UseStrictDefault;
     }
 
     protected void ProcessStringLiteral()
     {
         if (_lastToken == null || _lastToken.Type == OpenBrace)
         {
-            if (Text.Equals("\"use strict\"", StringComparison.InvariantCulture) ||
-                Text.Equals("'use strict'", StringComparison.InvariantCulture))
+            if (Text.Equals("\"use strict\"") || Text.Equals("'use strict'"))
             {
-                if (_scopeStrictModes.Count > 0)
-                {
-                    _scopeStrictModes.Pop();
-                }
-
+                if (scopeStrictModes.Count > 0)
+                    scopeStrictModes.Pop();
                 _useStrictCurrent = true;
-                _scopeStrictModes.Push(_useStrictCurrent);
+                scopeStrictModes.Push(_useStrictCurrent);
             }
         }
     }
@@ -112,7 +107,6 @@ public abstract class JavaScriptLexerBase : Lexer
     /// <summary>
     /// Returns true if the lexer can match a regex literal.
     /// </summary>
-    /// <returns>bool</returns>
     protected bool IsRegexPossible()
     {
         if (_lastToken == null)
