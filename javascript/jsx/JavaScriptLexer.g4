@@ -208,36 +208,36 @@ CDATA:                          '<![CDATA[' .*? ']]>' -> channel(HIDDEN);
 //
 mode TAG;
 
-TAG_OPEN
+TagOpen
     : LessThan -> pushMode(TAG)
     ;
-TAG_CLOSE
+TagClose
     : MoreThan -> popMode
     ;
 
-TAG_SLASH_CLOSE
+TagSlashClose
     : '/>' -> popMode
     ;
 
-TAG_SLASH
+TagSlash
     : Divide
     ;
     
-TAG_NAME
-    : TAG_NameStartChar TAG_NameChar*
+TagName
+    : TagNameStartChar TagNameChar*
     ;
 
 // an attribute value may have spaces b/t the '=' and the value
-ATTVALUE_VALUE
-    : [ ]* ATTRIBUTE -> popMode
+AttributeValue
+    : [ ]* Attribute -> popMode
     ;
 
-ATTRIBUTE
-    : DOUBLE_QUOTE_STRING
-    | SINGLE_QUOTE_STRING
-    | ATTCHARS
-    | HEXCHARS
-    | DECCHARS
+Attribute
+    : DoubleQuoteString
+    | SingleQuoteString
+    | AttributeChar
+    | HexChars
+    | DecChars
     ;
 
 //
@@ -245,12 +245,12 @@ ATTRIBUTE
 //
 mode ATTVALUE;
 
-TAG_EQUALS
+TagEquals
     : Assign -> pushMode(ATTVALUE)
     ;
 
 // Fragment rules
-fragment ATTCHAR
+fragment AttributeChar
     : '-'
     | '_'
     | '.'
@@ -265,27 +265,27 @@ fragment ATTCHAR
     | [0-9a-zA-Z]
     ;
 
-fragment ATTCHARS
-    : ATTCHAR+ ' '?
+fragment AttributeChars
+    : AttributeChar+ ' '?
     ;
 
-fragment HEXCHARS
+fragment HexChars
     : '#' [0-9a-fA-F]+
     ;
 
-fragment DECCHARS
+fragment DecChars
     : [0-9]+ '%'?
     ;
 
-fragment DOUBLE_QUOTE_STRING
+fragment DoubleQuoteString
     : '"' ~[<"]* '"'
     ;
-fragment SINGLE_QUOTE_STRING
+fragment SingleQuoteString
     : '\'' ~[<']* '\''
     ;
 
 fragment
-TAG_NameStartChar
+TagNameStartChar
     :   [:a-zA-Z]
     |   '\u2070'..'\u218F'
     |   '\u2C00'..'\u2FEF'
@@ -295,19 +295,19 @@ TAG_NameStartChar
     ;
 
 fragment
-TAG_NameChar
-    : TAG_NameStartChar
+TagNameChar
+    : TagNameStartChar
     | '-'
     | '_'
     | '.'
-    | DIGIT
+    | Digit
     |   '\u00B7'
     |   '\u0300'..'\u036F'
     |   '\u203F'..'\u2040'
     ;
 
 fragment
-DIGIT
+Digit
     : [0-9]
     ;
 

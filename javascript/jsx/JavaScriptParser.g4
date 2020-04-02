@@ -375,7 +375,7 @@ htmlContent
 
 
 htmlTagName
-    : TAG_NAME
+    : TagName
     | Identifier
     ;
 
@@ -385,7 +385,7 @@ htmlAttribute
     ;
 
 htmlAttributeName
-    : TAG_NAME
+    : TagName
     | Identifier
     ;
 
@@ -394,7 +394,7 @@ htmlChardata
     ;
 
 htmlAttributeValue
-    : ATTVALUE_VALUE
+    : AttributeValue
     | StringLiteral
     | objectExpressionSequence
     ;
