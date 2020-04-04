@@ -364,7 +364,8 @@ htmlElements
     ;
 
 htmlElement
-    : '<' htmlTagName htmlAttribute* '>' htmlContent '<''/' htmlTagName '>'
+    : '<' htmlTagStartName htmlAttribute* '>' htmlContent '<''/' htmlTagClosingName '>'
+    | '<' htmlTagName htmlAttribute* htmlContent '/''>'
     | '<' htmlTagName htmlAttribute* '/''>'
     | '<' htmlTagName htmlAttribute* '>'
     ;
@@ -373,9 +374,17 @@ htmlContent
     : htmlChardata? ((htmlElement | objectExpressionSequence) htmlChardata?)*
     ;
 
+htmlTagStartName
+    : htmlTagName {this.pushHtmlTagName($htmlTagName.text);}
+    ;
+
+htmlTagClosingName
+    : htmlTagName {this.popHtmlTagName($htmlTagName.text)}?
+    ;
 
 htmlTagName
     : TagName
+    | keyword
     | Identifier
     ;
 
