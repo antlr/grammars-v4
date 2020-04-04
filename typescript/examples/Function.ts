@@ -43,3 +43,9 @@ function Greet(greeting: string, ...names: string[]) {
 function Test(value: TestClass | TestClass2): value is TestClass {
     return (<TestClass>value).someFunction !== undefined;
 }
+
+function buildName(firstName: string, lastName?: string) {
+    if (lastName) return firstName + " " + lastName;
+    else return firstName;
+  }
+  

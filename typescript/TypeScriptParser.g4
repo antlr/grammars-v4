@@ -204,13 +204,24 @@ callSignature
 
 parameterList
     : restParameter
-    | predefinedType (',' predefinedType)*
-    | optionalParameterList (',' restParameter)?
-    | requiredParameterList (',' (optionalParameterList (',' restParameter)? | restParameter))?
+    | parameter (',' parameter)* (',' restParameter)?
     ;
 
 requiredParameterList
     : requiredParameter (',' requiredParameter)*
+    ;
+
+parameter
+    : requiredParameter
+    | optionalParameter
+    ;
+
+optionalParameter
+    : decoratorList? ( accessibilityModifier? identifierOrPattern ('?' typeAnnotation? | typeAnnotation? initializer))
+    ;
+
+restParameter
+    : '...' singleExpression typeAnnotation?
     ;
 
 requiredParameter
@@ -226,18 +237,6 @@ accessibilityModifier
 identifierOrPattern
     : identifierName
     | bindingPattern
-    ;
-
-optionalParameterList
-    : optionalParameter (',' optionalParameter)*
-    ;
-
-optionalParameter
-    : decoratorList? ( accessibilityModifier? identifierOrPattern ('?' typeAnnotation? | typeAnnotation? initializer))
-    ;
-
-restParameter
-    : '...' singleExpression
     ;
 
 constructSignature
@@ -404,7 +403,7 @@ variableDeclarationList
     ;
 
 variableDeclaration
-    : ( Identifier | arrayLiteral | objectLiteral) typeAnnotation? singleExpression? ('=' typeParameters? singleExpression)? // ECMAScript 6: Array & Object Matching
+    : ( identifierOrKeyWord | arrayLiteral | objectLiteral) typeAnnotation? singleExpression? ('=' typeParameters? singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
 emptyStatement
@@ -534,7 +533,7 @@ classElement
     ;
 
 propertyMemberDeclaration
-    : propertyMemberBase propertyName typeAnnotation? initializer? SemiColon                        # PropertyDeclarationExpression
+    : propertyMemberBase propertyName '?'? typeAnnotation? initializer? SemiColon                   # PropertyDeclarationExpression
     | propertyMemberBase propertyName callSignature ( ('{' functionBody '}') | SemiColon)           # MethodDeclarationExpression
     | propertyMemberBase (getAccessor | setAccessor)                                                # GetterSetterDeclarationExpression
     | abstractDeclaration                                                                           # AbstractMemberDeclaration
@@ -580,7 +579,7 @@ formalParameterList
     ;
 
 formalParameterArg
-    : decorator? accessibilityModifier? Identifier typeAnnotation? ('=' singleExpression)?      // ECMAScript 6: Initialization
+    : decorator? accessibilityModifier? identifierOrKeyWord '?'? typeAnnotation? ('=' singleExpression)?      // ECMAScript 6: Initialization
     ;
 
 lastFormalParameterArg                        // ECMAScript 6: Rest Parameter
@@ -618,7 +617,7 @@ propertyAssignment
     | getAccessor                                             # PropertyGetter
     | setAccessor                                             # PropertySetter
     | generatorMethod                                         # MethodProperty
-    | Identifier                                              # PropertyShorthand
+    | identifierOrKeyWord                                     # PropertyShorthand
     | restParameter                                           # RestParameterInObject
     ;
 
@@ -637,14 +636,15 @@ propertyName
     ;
 
 arguments
-    : '('(
-          singleExpression (',' singleExpression)* (',' lastArgument)? |
-          lastArgument
-       )?')'
+    : '(' (argumentList ','?)? ')'
     ;
 
-lastArgument                                  // ECMAScript 6: Spread Operator
-    : Ellipsis Identifier
+argumentList
+    : argument (',' argument)*
+    ;
+
+argument                      // ECMAScript 6: Spread Operator
+    : Ellipsis? (singleExpression | Identifier)
     ;
 
 expressionSequence
@@ -758,6 +758,12 @@ numericLiteral
 identifierName
     : Identifier
     | reservedWord
+    ;
+
+identifierOrKeyWord
+    : Identifier
+    | TypeAlias
+    | Require
     ;
 
 reservedWord
