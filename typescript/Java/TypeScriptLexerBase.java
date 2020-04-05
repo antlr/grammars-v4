@@ -6,7 +6,7 @@ import java.util.Stack;
  * All lexer methods that used in grammar (IsStrictMode)
  * should start with Upper Case Char similar to Lexer rules.
  */
-public abstract class TypeScriptBaseLexer extends Lexer
+public abstract class TypeScriptLexerBase extends Lexer
 {
     /**
      * Stores values of nested modes. By default mode is strict or
@@ -26,7 +26,7 @@ public abstract class TypeScriptBaseLexer extends Lexer
      */
     private boolean useStrictCurrent = false;
 
-    public TypeScriptBaseLexer(CharStream input) {
+    public TypeScriptLexerBase(CharStream input) {
         super(input);
     }
 
