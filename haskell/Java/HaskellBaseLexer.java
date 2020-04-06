@@ -181,16 +181,17 @@ public abstract class HaskellBaseLexer extends Lexer {
         }
 
         Token next = super.nextToken();
+        int   type = next.getType();
 
         if (startIndent == -1
-            && next.getType() != HaskellLexer.NEWLINE
-            && next.getType() !=  HaskellLexer.WS
-            && next.getType() !=  HaskellLexer.TAB
-            && next.getType() != HaskellLexer.OCURLY) {
-            if (next.getType() ==  HaskellLexer.MODULE) {
+            && type != HaskellLexer.NEWLINE
+            && type !=  HaskellLexer.WS
+            && type !=  HaskellLexer.TAB
+            && type != HaskellLexer.OCURLY) {
+            if (type ==  HaskellLexer.MODULE) {
                 moduleStartIndent = true;
                 wasModuleExport = true;
-            } if (next.getType() !=  HaskellLexer.MODULE && !moduleStartIndent) {
+            } if (type !=  HaskellLexer.MODULE && !moduleStartIndent) {
                 startIndent = next.getCharPositionInLine();
             } else if (lastKeyWord.equals("where") && moduleStartIndent) {
                 lastKeyWord = "";
@@ -199,12 +200,12 @@ public abstract class HaskellBaseLexer extends Lexer {
                 moduleStartIndent = false;
                 startIndent = next.getCharPositionInLine();
                 tokenQueue.offer(createToken(HaskellLexer.VOCURLY, "VOCURLY", next));
-                tokenQueue.offer(createToken(next.getType(), next.getText(), next));
+                tokenQueue.offer(createToken(type, next.getText(), next));
                 return tokenQueue.poll();
             }
         }
 
-        if (next.getType() == HaskellLexer.OCURLY) {
+        if (type == HaskellLexer.OCURLY) {
             if (prevWasKeyWord) {
                 nestedLevel--;
                 prevWasKeyWord = false;
@@ -222,21 +223,21 @@ public abstract class HaskellBaseLexer extends Lexer {
 
         if (prevWasKeyWord && !prevWasEndl
             && !moduleStartIndent
-            && next.getType() !=  HaskellLexer.WS
-            && next.getType() != HaskellLexer.NEWLINE
-            && next.getType() !=  HaskellLexer.TAB
-            && next.getType() != HaskellLexer.OCURLY) {
+            && type !=  HaskellLexer.WS
+            && type != HaskellLexer.NEWLINE
+            && type !=  HaskellLexer.TAB
+            && type != HaskellLexer.OCURLY) {
             prevWasKeyWord = false;
             indentStack.push(new Pair<String, Integer>(lastKeyWord, next.getCharPositionInLine()));
             tokenQueue.offer(createToken(HaskellLexer.VOCURLY, "VOCURLY", next));
         }
 
         if (ignoreIndent
-            && (next.getType() == HaskellLexer.WHERE
-            || next.getType() == HaskellLexer.DO
-            || next.getType() == HaskellLexer.LET
-            || next.getType() ==  HaskellLexer.OF
-            || next.getType() ==  HaskellLexer.CCURLY)
+            && (type == HaskellLexer.WHERE
+            || type == HaskellLexer.DO
+            || type == HaskellLexer.LET
+            || type ==  HaskellLexer.OF
+            || type ==  HaskellLexer.CCURLY)
            ) {
             ignoreIndent = false;
         }
@@ -245,8 +246,8 @@ public abstract class HaskellBaseLexer extends Lexer {
             && prevWasKeyWord
             && !ignoreIndent
             && indentCount <= getSavedIndent()
-            && next.getType() != HaskellLexer.NEWLINE
-            && next.getType() !=  HaskellLexer.WS) {
+            && type != HaskellLexer.NEWLINE
+            && type !=  HaskellLexer.WS) {
 
             tokenQueue.offer(createToken(HaskellLexer.VOCURLY, "VOCURLY", next));
             prevWasKeyWord = false;
@@ -257,14 +258,14 @@ public abstract class HaskellBaseLexer extends Lexer {
         if (pendingDent && prevWasEndl
             && !ignoreIndent
             && indentCount <= getSavedIndent()
-            && next.getType() != HaskellLexer.NEWLINE
-            && next.getType() !=  HaskellLexer.WS
-            && next.getType() != HaskellLexer.WHERE
-            && next.getType() !=  HaskellLexer.IN
-            && next.getType() != HaskellLexer.DO
-            && next.getType() !=  HaskellLexer.OF
-            && next.getType() !=  HaskellLexer.CCURLY
-            && next.getType() != EOF) {
+            && type != HaskellLexer.NEWLINE
+            && type !=  HaskellLexer.WS
+            && type != HaskellLexer.WHERE
+            && type !=  HaskellLexer.IN
+            && type != HaskellLexer.DO
+            && type !=  HaskellLexer.OF
+            && type !=  HaskellLexer.CCURLY
+            && type != EOF) {
 
             while (nestedLevel > indentStack.size()) {
                 if (nestedLevel > 0)
@@ -299,9 +300,9 @@ public abstract class HaskellBaseLexer extends Lexer {
             && !moduleStartIndent
             && !ignoreIndent
             && indentCount > getSavedIndent()
-            && next.getType() != HaskellLexer.NEWLINE
-            && next.getType() !=  HaskellLexer.WS
-            && next.getType() != EOF) {
+            && type != HaskellLexer.NEWLINE
+            && type !=  HaskellLexer.WS
+            && type != EOF) {
 
             prevWasKeyWord = false;
 
@@ -315,25 +316,25 @@ public abstract class HaskellBaseLexer extends Lexer {
 
         if (pendingDent
             && initialIndentToken == null
-            && HaskellLexer.NEWLINE != next.getType()) {
+            && HaskellLexer.NEWLINE != type) {
             initialIndentToken = next;
         }
 
-        if (next != null && next.getType() == HaskellLexer.NEWLINE) {
+        if (next != null && type == HaskellLexer.NEWLINE) {
             prevWasEndl = true;
         }
 
-        if (next.getType() == HaskellLexer.WHERE
-            || next.getType() == HaskellLexer.LET
-            || next.getType() == HaskellLexer.DO
-            || next.getType() ==  HaskellLexer.OF) {
+        if (type == HaskellLexer.WHERE
+            || type == HaskellLexer.LET
+            || type == HaskellLexer.DO
+            || type ==  HaskellLexer.OF) {
             // if next will be HaskellLexer.OCURLY need to decrement nestedLevel
             nestedLevel++;
             prevWasKeyWord = true;
             prevWasEndl = false;
             lastKeyWord = next.getText();
 
-            if (next.getType() == HaskellLexer.WHERE) {
+            if (type == HaskellLexer.WHERE) {
                 if (!indentStack.empty() && (indentStack.peek().first().equals("do"))) {
                     tokenQueue.offer(createToken(HaskellLexer.SEMI, "SEMI", next));
                     tokenQueue.offer(createToken(HaskellLexer.VCCURLY, "VCCURLY", next));
@@ -343,19 +344,19 @@ public abstract class HaskellBaseLexer extends Lexer {
             }
         }
 
-        if (next != null && next.getType() == HaskellLexer.OCURLY) {
+        if (next != null && type == HaskellLexer.OCURLY) {
             prevWasKeyWord = false;
         }
 
-        if (next == null || HIDDEN == next.getChannel() || HaskellLexer.NEWLINE == next.getType()) {
+        if (next == null || HIDDEN == next.getChannel() || HaskellLexer.NEWLINE == type) {
             return next;
         }
 
-        if (next.getType() ==  HaskellLexer.IN) {
+        if (type ==  HaskellLexer.IN) {
             processINToken(next);
         }
 
-        if (next.getType() == EOF) {
+        if (type == EOF) {
             processEOFToken(next);
         }
 
