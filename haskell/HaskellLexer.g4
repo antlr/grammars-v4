@@ -1,830 +1,45 @@
-grammar Haskell;
-
-@lexer::members {
-    public class Pair<L,R> {
-        private final L left;
-        private final R right;
-        public Pair(L left, R right) {
-            this.left = left;
-            this.right = right;
-        }
-
-        public L first() { return left; }
-        public R second() { return right; }
-
-        @Override
-        public int hashCode() { return left.hashCode() ^ right.hashCode(); }
-
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof Pair)) return false;
-            Pair pairo = (Pair) o;
-            return this.left.equals(pairo.first()) &&
-                this.right.equals(pairo.second());
-        }
-    }
-
-    boolean pendingDent = true;
-
-    // Current indent
-    private int indentCount = 0;
-    // A queue where extra tokens are pushed on
-    private java.util.LinkedList<Token> tokenQueue = new java.util.LinkedList<>();
-    // The stack that keeps key word and indent after that
-    private java.util.Stack<Pair<String, Integer>> indentStack = new java.util.Stack<>();
-    // Pointer keeps last indent token
-    private Token initialIndentToken = null;
-    private String  lastKeyWord = "";
-
-    private boolean prevWasEndl = false;
-    private boolean prevWasKeyWord = false;
-    // Need, for example, in {}-block
-    private boolean ignoreIndent = false;
-    // Check moment, when you should calculate start indent
-    // module ... where {now you should remember start indent}
-    private boolean moduleStartIndent = false;
-    private boolean wasModuleExport   = false;
-
-    // Haskell saves indent before first() symbol as null indent
-    private int startIndent = -1;
-    // Count of "active" key words in this moment
-    private int nestedLevel = 0;
-
-    private int getSavedIndent() { return indentStack.empty() ? startIndent : indentStack.peek().second(); }
-
-    private CommonToken
-    createToken(int type, String text, Token next) {
-        CommonToken token = new CommonToken(type, text);
-        if (initialIndentToken != null) {
-            token.setStartIndex(initialIndentToken.getStartIndex());
-            token.setLine(initialIndentToken.getLine());
-            token.setCharPositionInLine(initialIndentToken.getCharPositionInLine());
-            token.setStopIndex(next.getStartIndex() - 1);
-        }
-        return token;
-    }
-
-    private void processINToken(Token next) {
-        while (!indentStack.empty() && indentStack.peek().first() != "let") {
-            tokenQueue.offer(createToken(SEMI, "SEMI", next));
-            tokenQueue.offer(createToken(VCCURLY, "VCCURLY", next));
-            nestedLevel--;
-            indentStack.pop();
-        }
-
-        if (!indentStack.empty() && indentStack.peek().first().equals("let")) {
-            tokenQueue.offer(createToken(SEMI, "SEMI", next));
-            tokenQueue.offer(createToken(VCCURLY, "VCCURLY", next));
-            nestedLevel--;
-            indentStack.pop();
-        }
-    }
-
-    private void processEOFToken(Token next) {
-        indentCount = startIndent;
-        if (!pendingDent) {
-            initialIndentToken = next;
-        }
-
-        while (nestedLevel > indentStack.size()) {
-            if (nestedLevel > 0)
-                nestedLevel--;
-
-            tokenQueue.offer(createToken(SEMI, "SEMI", next));
-            tokenQueue.offer(createToken(VCCURLY, "VCCURLY", next));
-        }
-
-        while (indentCount < getSavedIndent()) {
-            if (!indentStack.empty() && nestedLevel > 0) {
-                indentStack.pop();
-                nestedLevel--;
-            }
-
-            tokenQueue.offer(createToken(SEMI, "SEMI", next));
-            tokenQueue.offer(createToken(VCCURLY, "VCCURLY", next));
-        }
-
-        if (indentCount == getSavedIndent()) {
-            tokenQueue.offer(createToken(SEMI, "SEMI", next));
-        }
-
-        if (wasModuleExport) {
-            tokenQueue.offer(createToken(VCCURLY, "VCCURLY", next));
-        }
-
-        startIndent = -1;
-    }
-
-    // Algorithm's description here:
-    // https://www.haskell.org/onlinereport/haskell2010/haskellch10.html
-    // https://en.wikibooks.org/wiki/Haskell/Indentation
-    @Override
-    public Token nextToken() {
-        if (!tokenQueue.isEmpty()) {
-            return tokenQueue.poll();
-        }
-
-        Token next = super.nextToken();
-
-        if (startIndent == -1 
-            && next.getType() != NEWLINE 
-            && next.getType() != WS 
-            && next.getType() != TAB
-            && next.getType() != OCURLY) {
-            if (next.getType() == MODULE) {
-                moduleStartIndent = true;
-                wasModuleExport = true;
-            } if (next.getType() != MODULE && !moduleStartIndent) {
-                startIndent = next.getCharPositionInLine();
-            } else if (lastKeyWord.equals("where") && moduleStartIndent) {
-                lastKeyWord = "";
-                prevWasKeyWord = false;
-                nestedLevel = 0;
-                moduleStartIndent = false;
-                startIndent = next.getCharPositionInLine();
-                tokenQueue.offer(createToken(VOCURLY, "VOCURLY", next));
-                tokenQueue.offer(createToken(next.getType(), next.getText(), next));
-                return tokenQueue.poll();
-            }
-        }
-
-        if (next.getType() == OCURLY) {
-            if (prevWasKeyWord) {
-                nestedLevel--;
-                prevWasKeyWord = false;
-            }
-
-            if (moduleStartIndent) {
-                moduleStartIndent = false;
-                // because will be CCURLY in the end of file
-                wasModuleExport = false;
-            }
-
-            ignoreIndent = true;
-            prevWasEndl = false;
-        }
-
-        if (prevWasKeyWord && !prevWasEndl
-            && !moduleStartIndent
-            && next.getType() != WS
-            && next.getType() != NEWLINE
-            && next.getType() != TAB
-            && next.getType() != OCURLY) {
-            prevWasKeyWord = false;
-            indentStack.push(new Pair<String, Integer>(lastKeyWord, next.getCharPositionInLine()));
-            tokenQueue.offer(createToken(VOCURLY, "VOCURLY", next));
-        }
-
-        if (ignoreIndent
-            && (next.getType() == WHERE
-            || next.getType() == DO
-            || next.getType() == LET
-            || next.getType() == OF
-            || next.getType() == CCURLY)
-           ) {
-            ignoreIndent = false;
-        }
-
-        if (pendingDent
-            && prevWasKeyWord
-            && !ignoreIndent
-            && indentCount <= getSavedIndent()
-            && next.getType() != NEWLINE
-            && next.getType() != WS) {
-
-            tokenQueue.offer(createToken(VOCURLY, "VOCURLY", next));
-            prevWasKeyWord = false;
-            prevWasEndl = true;
-        }
-
-
-        if (pendingDent && prevWasEndl
-            && !ignoreIndent
-            && indentCount <= getSavedIndent()
-            && next.getType() != NEWLINE
-            && next.getType() != WS
-            && next.getType() != WHERE
-            && next.getType() != IN
-            && next.getType() != DO
-            && next.getType() != OF
-            && next.getType() != CCURLY
-            && next.getType() != EOF) {
-
-            while (nestedLevel > indentStack.size()) {
-                if (nestedLevel > 0)
-                    nestedLevel--;
-
-                tokenQueue.offer(createToken(SEMI, "SEMI", next));
-                tokenQueue.offer(createToken(VCCURLY, "VCCURLY", next));
-            }
-
-            while (indentCount < getSavedIndent()) {
-                if (!indentStack.empty() && nestedLevel > 0) {
-                    indentStack.pop();
-                    nestedLevel--;
-                }
-
-                tokenQueue.offer(createToken(SEMI, "SEMI", next));
-                tokenQueue.offer(createToken(VCCURLY, "VCCURLY", next));
-            }
-
-            if (indentCount == getSavedIndent()) {
-                tokenQueue.offer(createToken(SEMI, "SEMI", next));
-            }
-
-            prevWasEndl = false;
-            if (indentCount == startIndent) {
-                pendingDent = false;
-            }
-        }
-
-
-        if (pendingDent && prevWasKeyWord
-            && !moduleStartIndent
-            && !ignoreIndent
-            && indentCount > getSavedIndent()
-            && next.getType() != NEWLINE
-            && next.getType() != WS
-            && next.getType() != EOF) {
-
-            prevWasKeyWord = false;
-
-            if (prevWasEndl) {
-                indentStack.push(new Pair<String, Integer>(lastKeyWord, indentCount));
-                prevWasEndl = false;
-            }
-
-            tokenQueue.offer(createToken(VOCURLY, "VOCURLY", next));
-        }
-
-        if (pendingDent 
-            && initialIndentToken == null 
-            && NEWLINE != next.getType()) {
-            initialIndentToken = next;
-        }
-
-        if (next != null && next.getType() == NEWLINE) {
-            prevWasEndl = true;
-        }
-
-        if (next.getType() == WHERE
-            || next.getType() == LET 
-            || next.getType() == DO 
-            || next.getType() == OF) {
-            // if next will be OCURLY need to decrement nestedLevel
-            nestedLevel++;
-            prevWasKeyWord = true;
-            prevWasEndl = false;
-            lastKeyWord = next.getText();
-
-            if (next.getType() == WHERE) {
-                if (!indentStack.empty() && (indentStack.peek().first().equals("do"))) {
-                    tokenQueue.offer(createToken(SEMI, "SEMI", next));
-                    tokenQueue.offer(createToken(VCCURLY, "VCCURLY", next));
-                    indentStack.pop();
-                    nestedLevel--;
-                }
-            }
-        }
-
-        if (next != null && next.getType() == OCURLY) {
-            prevWasKeyWord = false;
-        }
-
-        if (next == null || HIDDEN == next.getChannel() || NEWLINE == next.getType()) {
-            return next;
-        }
-
-        if (next.getType() == IN) {
-            processINToken(next);
-        }
-
-        if (next.getType() == EOF) {
-            processEOFToken(next);
-        }
-
-        pendingDent = true;
-        tokenQueue.offer(next);
-
-        return tokenQueue.poll();
-    }
-}
-
-@parser::members {
-    boolean MultiWayIf = true;
-    boolean MagicHash  = true;
-    bool FlexibleInstances = true;
-}
-
-// parser rules
-
-module :  semi* pragmas? semi* ((MODULE modid exports? WHERE open body close semi*) | body) EOF;
-
-pragmas
-    :
-    pragma+
-    ;
-
-pragma
-    :
-    '{-#' 'LANGUAGE'  extension (',' extension)* '#-}'
-    ;
-
-extension
-    :
-    conid
-    ;
-
-body
-    :
-    (impdecls topdecls)
-    | impdecls
-    | topdecls
-    ;
-
-impdecls
-    :
-    (impdecl | NEWLINE | semi)+
-    ;
-
-exports
-    :
-    '(' (exprt (',' exprt)*)? ','? ')'
-    ;
-
-exprt
-    :
-    qvar
-    | ( qtycon ( ('(' '..' ')') | ('(' (cname (',' cname)*)? ')') )? )
-    | ( qtycls ( ('(' '..' ')') | ('(' (qvar (',' qvar)*)? ')') )? )
-    | ( MODULE modid )
-    ;
-
-impdecl
-    :
-    IMPORT QUALIFIED? modid ('as' modid)? impspec? semi+
-    ;
-
-impspec
-    :
-    ('(' (himport (',' himport)* ','?)? ')')
-    | ( 'hiding' '(' (himport (',' himport)* ','?)? ')' )
-     ;
-
-himport
-    :
-    var
-    | ( tycon ( ('(' '..' ')') | ('(' (cname (',' cname)*)? ')') )? )
-    | ( tycls ( ('(' '..' ')') | ('(' (var (',' var)*)? ')') )? )
-    ;
-
-cname
-    :
-    var | con
-    ;
-
-topdecls : ((topdecl semi+) | NEWLINE | semi)+;
-
-topdecl
-    :
-    (TYPE simpletype '=' type)
-    | (DATA (typecontext '=>')? simpletype ('=' constrs)? deriving?)
-    | (NEWTYPE (typecontext '=>')? simpletype '=' newconstr deriving?)
-    | (CLASS (scontext '=>')? tycls tyvar (WHERE cdecls)?)
-    | (INSTANCE (scontext '=>')? qtycls inst (WHERE idecls)?)
-    | (DEFAULT '(' (type (',' type)*)? ')' )
-    | (FOREIGN fdecl)
-    | decl;
-
-decls
-    :
-    open ((decl semi+)* decl semi*)? close
-    ;
-
-decl
-    :
-    '{-#' 'INLINE' qvar '#-}'
-    | '{-#' 'NOINLINE' qvar '#-}'
-    | '{-#' 'SPECIALIZE' specs '-#}'
-    | gendecl
-    | ((funlhs | pat) rhs)
-    | semi+
-    ;
-
-specs
-    :
-    spec (',' spec)*
-    ;
-
-spec
-    :
-    vars '::' type
-    ;
-
-cdecls
-    :
-    open ((cdecl semi+)* cdecl semi*)? close
-    ;
-
-cdecl
-    :
-    gendecl
-    | ((funlhs | var) rhs)
-    ;
-
-idecls
-    :
-    open ((idecl semi+)* idecl semi*)? close
-    ;
-
-idecl
-    :
-    (funlhs | var) rhs
-    ;
-
-gendecl
-    :
-    vars '::' (typecontext '=>')? type
-    | (fixity (DECIMAL)? ops)
-    ;
-
-ops
-    :
-    op (',' op)*
-    ;
-
-vars
-    :
-    var (',' var)*
-    ;
-
-fixity
-    :
-    INFIX | INFIXL | INFIXL
-    ;
-
-type
-    :
-    btype ('->' type)?
-    ;
-
-btype
-    :
-    atype+
-    ;
-
-atype
-    :
-    gtycon
-    | varid
-    | ( '(' type (',' type)* ')' )
-    | ( '[' type ']' )
-    | ( '(' type ')' )
-    ;
-
-gtycon
-    :
-    qtycon
-    | ( '(' ')' )
-    | ( '[' ']' )
-    | ( '(' '->' ')' )
-    | ( '(' ',' '{' ',' '}' ')' )
-    ;
-
-typecontext
-    :
-    cls
-    | ( '(' cls (',' cls)* ')' )
-    ;
-
-cls
-    :
-    (conid varid)
-    | ( qtycls '(' tyvar (atype (',' atype)*) ')' )
-    ;
-
-scontext
-    :
-    simpleclass
-    | ( '(' (simpleclass (',' simpleclass)*)? ')' )
-    ;
-
-simpleclass
-    :
-    qtycls tyvar
-    ;
-
-simpletype
-    :
-    tycon tyvar*
-    ;
-
-constrs
-    :
-    constr ('|' constr)*
-    ;
-
-constr
-    :
-    (con ('!'? atype)*)
-    | ((btype | ('!' atype)) conop (btype | ('!' atype)))
-    | (con '{' (fielddecl (',' fielddecl)* )? '}')
-    ;
-
-newconstr
-    :
-    (con atype)
-    | (con '{' var '::' type '}')
-    ;
-
-fielddecl
-    :
-    vars '::' (type | ('!' atype))
-    ;
-
-deriving
-    :
-    DERIVING (dclass | ('(' (dclass (',' dclass)*)? ')' ))
-    ;
-
-dclass
-    :
-    qtycls
-    ;
-
-inst
-    :
-    gtycon
-    | ( '(' gtycon tyvar* ')' )
-    | ( {FlexibleInstances}? '(' gtycon tycon* ')' )
-    | ( '(' tyvar ',' tyvar (',' tyvar)* ')')
-    | ( '[' tyvar ']')
-    | ( '(' tyvar '->' tyvar ')' )
-    ;
-
-fdecl
-    :
-    (IMPORT callconv safety? impent var '::' type)
-    | (EXPORT callconv expent var '::' type)
-    ;
-
-callconv
-    :
-    'ccall' | 'stdcall' | 'cplusplus' | 'jvm' | 'dotnet'
-    ;
-
-impent : pstring;
-expent : pstring;
-safety : 'unsafe' | 'safe';
-
-funlhs
-    :
-    (var apat+)
-    | (pat varop pat)
-    | ( '(' funlhs ')' apat+)
-    ;
-
-rhs
-    :
-    ('=' exp (WHERE decls)?)
-    | (gdrhs (WHERE decls)?);
-
-gdrhs
-    :
-    gdrh+
-    ;
-
-gdrh
-    :
-    '|' guards '=' exp
-    ;
-
-guards
-    :
-    guard (',' guard)*
-    ;
-
-guard
-    :
-    pat '<-' infixexp
-    | LET decls
-    | infixexp
-    ;
-
-exp
-    :
-    (infixexp '::' (typecontext '=>')? type)
-    | infixexp
-    ;
-
-infixexp
-    :
-    (lexp qop infixexp)
-    | ('-' infixexp)
-    | lexp
-    ;
-
-lexp
-    :
-    ('\\' apat+ '->' exp)
-    | (LET decls IN exp)
-    | (IF exp semi? THEN exp semi? ELSE exp)
-    | ({MultiWayIf}? IF ifgdpats)
-    | (CASE exp OF alts)
-    | (DO stmts)
-    | fexp
-    ;
-
-fexp
-    :
-    aexp+
-    ;
-
-aexp
-    :
-    qvar
-    | gcon
-    | literal
-    | ( '(' exp ')' )
-    | ( '(' exp ',' exp (',' exp)* ')' )
-    | ( '[' exp (',' exp)* ']' )
-    | ( '[' exp (',' exp)? '..' exp? ']' )
-    | ( '[' exp '|' qual (',' qual)* ']' )
-    | ( '(' infixexp qop ')' )
-    | ( '(' qop infixexp ')' )
-    | ( qcon '{' (fbind (',' fbind))? '}' )
-    | ('{' fbind (',' fbind)* '}')+
-    ;
-
-qual
-    :
-    (pat '<-' exp)
-    | (LET decls)
-    | exp
-    ;
-
-alts
-    :
-    open (alt semi+)+ close
-    ;
-
-alt
-    :
-    (pat '->' exp (WHERE decls)?)
-    | (pat gdpats (WHERE decls)?)
-    ;
-
-gdpats
-    :
-    gdpat+
-    ;
-
-// In ghc parser on GitLab second rule is 'gdpats close'
-// Unclearly possible errors with this implemmentation
-
-// Now extension is always works (follow semantic predicate in 'lexp' rule)
-ifgdpats
-    :
-    '{' gdpats '}'
-    | gdpats
-    ;
-
-gdpat
-    :
-    '|' guards '->' exp
-    ;
-
-stmts
-    :
-    open (stmt)* exp semi* close
-    ;
-
-stmt
-    :
-    (exp semi+)
-    | (pat '<-' exp semi+)
-    | (LET decls semi+)
-    | semi+
-    ;
-
-fbind
-    :
-    qvar '=' exp
-    ;
-
-pat
-    :
-    (lpat qconop pat)
-    | lpat
-    ;
-
-lpat
-    :
-    apat
-    | ('-' (integer | pfloat))
-    | (gcon apat+)
-    ;
-
-apat
-    :
-    (var ('@' apat)?)
-    | gcon
-    | (qcon '{' (fpat (',' fpat)*)? '}')
-    | literal
-    | '_'
-    | ('(' pat ')')
-    | ('(' pat ',' pat (',' pat)* ')')
-    | ('[' pat (',' pat)* ']')
-    | ('~'apat)
-    ;
-
-fpat
-    :
-    qvar '=' pat
-    ;
-
-gcon
-    :
-    ('(' ')')
-    | ('[' ']')
-    | ('(' (',')+ ')')
-    | qcon
-    ;
-
-var	:    varid   | ( '(' varsym ')' );
-qvar:    qvarid  | ( '(' qvarsym ')');
-con :    conid   | ( '(' consym ')' );
-qcon:    qconid  | ( '(' gconsym ')');
-varop:   varsym  | ('`' varid '`')   ;
-qvarop:  qvarsym | ('`' qvarid '`')	 ;
-conop:   consym  | ('`' conid '`')	 ;
-qconop:  gconsym | ('`' qconid '`')	 ;
-op:      varop   | conop			 ;
-qop:     qvarop  | qconop			 ;
-gconsym: ':'  	 | qconsym			 ;
-
-open : VOCURLY | OCURLY;
-close : VCCURLY | CCURLY;
-semi : ';' | SEMI;
-
-literal : integer | pfloat | pchar | pstring;
-special : '(' | ')' | ',' | ';' | '[' | ']' | '`' | '{' | '}';
-
-varid : (VARID | AS | HIDING) ({MagicHash}?'#'*);
-conid : CONID ({MagicHash}? '#'*);
-
-symbol: ascSymbol;
-ascSymbol: '!' | '#' | '$' | '%' | '&' | '*' | '+'
-        | '.' | '/' | '<' | '=' | '>' | '?' | '@'
-        | '\\' | '^' | '|' | '-' | '~' | ':' ;
-
-varsym : ascSymbol+;
-consym : ':' ascSymbol*;
-
-tyvar : varid;
-tycon : conid;
-tycls : conid;
-modid : (conid '.')* conid;
-
-qvarid : (modid '.')? varid;
-qconid : (modid '.')? conid;
-qtycon : (modid '.')? tycon;
-qtycls : (modid '.')? tycls;
-qvarsym: (modid '.')? varsym;
-qconsym: (modid '.')? consym;
-
-integer
-    :
-    DECIMAL
-    | OCTAL
-    | HEXADECIMAL
-     ;
-
-
-pfloat: FLOAT;
-pchar: CHAR;
-pstring: STRING;
-
-// lexer rules
+/*
+BSD License
+Copyright (c) 2020, Evgeniy Slobodkin
+All rights reserved.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. Neither the name of Tom Everett nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+lexer grammar HaskellLexer;
+
+options { superClass=HaskellBaseLexer; }
 
 NEWLINE : ('\r'? '\n' | '\r') {
-    if (pendingDent) { setChannel(HIDDEN); }
-    indentCount = 0;
-    initialIndentToken = null;
+    this.processNEWLINEToken();
 } ;
 
 TAB : [\t]+ {
-    setChannel(HIDDEN);
-    if (pendingDent) {
-        indentCount += 8*getText().length();
-    }
+    this.processTABToken();
 } ;
 
 WS : [\u0020\u00a0\u1680\u2000\u200a\u202f\u205f\u3000]+ {
-    setChannel(HIDDEN);
-    if (pendingDent) {
-        indentCount += getText().length();
-    }
+    this.processWSToken();
 } ;
 
 COMMENT  : '--' (~[\r\n])* -> skip;
@@ -862,8 +77,58 @@ WHERE    : 'where'   ;
 WILDCARD : '_'       ;
 QUALIFIED: 'qualified';
 
-AS : 'as';
+AS     : 'as';
 HIDING : 'hiding';
+
+LANGUAGE  : 'LANGUAGE';
+INLINE    : 'INLINE';
+NOINLINE  : 'NOINLINE';
+SPECIALIZE: 'SPECIALIZE';
+
+CCALL     : 'ccall';
+STDCALL   : 'stdcall';
+CPPCALL   : 'cplusplus';
+JVMCALL   : 'jvm';
+DOTNETCALL: 'dotnet';
+
+SAFE  : 'safe';
+UNSAFE: 'unsafe';
+
+DoubleArrow        : '=>';
+DoubleColon        : '::';
+Arrow              : '->';
+Revarrow           : '<-';
+Hash               : '#';
+Less               : '<';
+Greater            : '>';
+Ampersand          : '&';
+Pipe               : '|';
+Bang               : '!';
+Caret              : '^';
+Plus               : '+';
+Minus              : '-';
+Asterisk           : '*';
+Percent            : '%';
+Divide             : '/';
+Tilde              : '~';
+Atsign             : '@';
+Dollar             : '$';
+Dot                : '.';
+Semi               : ';';
+DoubleDot          :  '..';
+QuestionMark       : '?';
+OpenRoundBracket   :   '(';
+CloseRoundBracket  :  ')';
+OpenSquareBracket  :  '[';
+CloseSquareBracket : ']';
+OpenCommentBracket : '{-#';
+CloseCommentBracket: '#-}';
+Comma              : ',';
+Colon              : ':';
+Eq                 : '=';
+Quote              : '\'';
+DoubleQuote        : '\\';
+BackQuote          :'`';
 
 CHAR : '\'' (' ' | DECIMAL | SMALL | LARGE
               | ASCSYMBOL | DIGIT | ',' | ';' | '(' | ')'
@@ -2135,8 +1400,7 @@ ASCSYMBOL : '!' | '#' | '$' | '%' | '&' | '*' | '+'
         | '.' | '/' | '<' | '=' | '>' | '?' | '@'
         | '\\' | '^' | '|' | '-' | '~' | ':' ;
 
-UNISYMBOL
-    :
+UNISYMBOL :
     CLASSIFY_Sc | CLASSIFY_Sk | CLASSIFY_Sm | CLASSIFY_So
 ;
 
