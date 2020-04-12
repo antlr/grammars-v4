@@ -169,6 +169,7 @@ breakStatement
 
 returnStatement
     : Return ({this.notLineTerminator()}? expressionSequence)? eos
+    | Return '(' htmlElements ')' eos
     ;
 
 yieldStatement
@@ -354,7 +355,57 @@ singleExpression
     | literal                                                               # LiteralExpression
     | arrayLiteral                                                          # ArrayLiteralExpression
     | objectLiteral                                                         # ObjectLiteralExpression
+    | htmlElements                                                          # htmlElementExpression
     | '(' expressionSequence ')'                                            # ParenthesizedExpression
+    ;
+
+htmlElements
+    : htmlElement+
+    ;
+
+htmlElement
+    : '<' htmlTagStartName htmlAttribute* '>' htmlContent '<''/' htmlTagClosingName '>'
+    | '<' htmlTagName htmlAttribute* htmlContent '/''>'
+    | '<' htmlTagName htmlAttribute* '/''>'
+    | '<' htmlTagName htmlAttribute* '>'
+    ;
+
+htmlContent
+    : htmlChardata? ((htmlElement | objectExpressionSequence) htmlChardata?)*
+    ;
+
+htmlTagStartName
+    : htmlTagName {this.pushHtmlTagName($htmlTagName.text);}
+    ;
+
+htmlTagClosingName
+    : htmlTagName {this.popHtmlTagName($htmlTagName.text)}?
+    ;
+
+htmlTagName
+    : TagName
+    | keyword
+    | Identifier
+    ;
+
+htmlAttribute
+    : htmlAttributeName '=' htmlAttributeValue
+    | htmlAttributeName
+    ;
+
+htmlAttributeName
+    : TagName
+    | Identifier
+    ;
+
+htmlChardata
+    : ~('<'|'{')+
+    ;
+
+htmlAttributeValue
+    : AttributeValue
+    | StringLiteral
+    | objectExpressionSequence
     ;
 
 assignable
@@ -365,6 +416,10 @@ assignable
 
 objectLiteral
     : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
+    ;
+
+objectExpressionSequence
+    : '{' expressionSequence '}'
     ;
 
 anoymousFunction

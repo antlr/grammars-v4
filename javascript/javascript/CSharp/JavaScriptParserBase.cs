@@ -7,6 +7,7 @@ using static JavaScriptParseTree.JavaScriptParser;
 /// </summary>
 public abstract class JavaScriptParserBase : Parser
 {
+    private readonly Stack<string> _tagNames = new Stack<string>();
     public JavaScriptParserBase(ITokenStream input)
         : base(input)
     {
@@ -112,5 +113,15 @@ public abstract class JavaScriptParserBase : Parser
         // Check if the token is, or contains a line terminator.
         return (type == MultiLineComment && (text.Contains("\r") || text.Contains("\n"))) ||
                 (type == LineTerminator);
+    }
+
+    protected void pushHtmlTagName(string tagName)
+    {
+        _tagNames.Push(tagName);
+    }
+
+    protected bool popHtmlTagName(string tagName)
+    {
+        return string.Equals(_tagNames.Pop(),tagName, StringComparison.InvariantCulture);
     }
 }
