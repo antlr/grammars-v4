@@ -145,10 +145,10 @@ reserved
     ;
 
 ranges
-    :   range (',' range)*
+    :   rangeRule (',' rangeRule)*
     ;
 
-    range
+    rangeRule
     :   IntLit
     |   IntLit 'to' IntLit
     ;
@@ -161,7 +161,7 @@ fieldNames
 // Fields
 //
 
-type
+typeRule
     :   (   'double'
         |   'float'
         |   'int32'
@@ -188,7 +188,7 @@ fieldNumber
 // Normal field
 
 field
-    :   'repeated'? type fieldName '=' fieldNumber ('[' fieldOptions ']')? ';'
+    :   'repeated'? typeRule fieldName '=' fieldNumber ('[' fieldOptions ']')? ';'
     ;
 
 fieldOptions
@@ -206,13 +206,13 @@ oneof
     ;
 
 oneofField
-    :   type fieldName '=' fieldNumber ('[' fieldOptions ']')? ';'
+    :   typeRule fieldName '=' fieldNumber ('[' fieldOptions ']')? ';'
     ;
 
 // Map field
 
 mapField
-    :   'map' '<' keyType ',' type '>' mapName '=' fieldNumber ('[' fieldOptions ']')? ';'
+    :   'map' '<' keyType ',' typeRule '>' mapName '=' fieldNumber ('[' fieldOptions ']')? ';'
     ;
 
 keyType
