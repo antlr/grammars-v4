@@ -250,12 +250,12 @@ reservedWord
     |   MESSAGE
     |   OPTION
     |   PACKAGE
+    |   RPC
     |   SERVICE
     |   STREAM
     |   STRING
     |   SYNTAX
     |   WEAK
-    |   RPC
     ;
 //
 // Lexical elements
