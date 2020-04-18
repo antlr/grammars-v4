@@ -198,9 +198,11 @@ public abstract class HaskellBaseLexer extends Lexer {
                 prevWasKeyWord = false;
                 nestedLevel = 0;
                 moduleStartIndent = false;
+                prevWasEndl = false;
                 startIndent = next.getCharPositionInLine();
                 tokenQueue.offer(createToken(HaskellLexer.VOCURLY, "VOCURLY", next));
                 tokenQueue.offer(createToken(type, next.getText(), next));
+
                 return tokenQueue.poll();
             }
         }
