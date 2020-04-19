@@ -87,8 +87,9 @@ unit_statement
     | drop_type
     | data_manipulation_language_statements
     | drop_table
+    | drop_view
     | drop_index
-    
+
     | rename_object
 
     | comment_on_column
@@ -1216,7 +1217,7 @@ sql_statement_shortcut
 drop_index
     : DROP INDEX index_name ';'
     ;
-    
+
 rename_object
     : RENAME object_name TO object_name ';'
     ;
@@ -2132,6 +2133,10 @@ upgrade_table_clause
 
 drop_table
     : DROP TABLE tableview_name PURGE? SEMICOLON
+    ;
+
+drop_view
+    : DROP VIEW tableview_name (CASCADE CONSTRAINT)? SEMICOLON
     ;
 
 comment_on_column
@@ -3273,7 +3278,7 @@ explain_statement
     ;
 
 select_only_statement
-    : subquery_factoring_clause? subquery 
+    : subquery_factoring_clause? subquery
     ;
 
 select_statement
@@ -3315,7 +3320,7 @@ subquery_operation_part
 
 query_block
     : SELECT (DISTINCT | UNIQUE | ALL)? selected_list
-      into_clause? from_clause where_clause? hierarchical_query_clause? group_by_clause? model_clause?
+      into_clause? from_clause where_clause? hierarchical_query_clause? group_by_clause? model_clause? order_by_clause?
     ;
 
 selected_list

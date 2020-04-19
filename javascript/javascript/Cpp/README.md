@@ -6,7 +6,7 @@
 
     ```
     @header {
-        #include "JavaScriptBaseLexer.h"
+        #include "JavaScriptLexerBase.h"
     }
     ```
 
@@ -14,7 +14,7 @@
 
     ```
     @header {
-        #include "JavaScriptBaseParser.h"
+        #include "JavaScriptParserBase.h"
     }
     ```
 

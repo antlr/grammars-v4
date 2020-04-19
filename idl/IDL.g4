@@ -32,7 +32,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     Initial IDL spec implementation in ANTLR v3 by Dong Nguyen.
     Migrated to ANTLR v4 by Steve Osselton.
     Current revision prepared by Nikita Visnevski.
+    Renaming of COMA to COMMA and addition of OCTAL_LITERAL in `literal`
+    by Oliver Kellogg.
 */
+
 grammar IDL;
 
 specification
@@ -89,7 +92,7 @@ export
    ;
 
 interface_inheritance_spec
-   : COLON interface_name (COMA interface_name)*
+   : COLON interface_name (COMMA interface_name)*
    ;
 
 interface_name
@@ -125,7 +128,7 @@ value_header
    ;
 
 value_inheritance_spec
-   : (COLON (KW_TRUNCATABLE)? value_name (COMA value_name)*)? (KW_SUPPORTS interface_name (COMA interface_name)*)?
+   : (COLON (KW_TRUNCATABLE)? value_name (COMMA value_name)*)? (KW_SUPPORTS interface_name (COMMA interface_name)*)?
    ;
 
 value_name
@@ -145,7 +148,7 @@ init_decl
    ;
 
 init_param_decls
-   : init_param_decl (COMA init_param_decl)*
+   : init_param_decl (COMMA init_param_decl)*
    ;
 
 init_param_decl
@@ -217,7 +220,7 @@ primary_expr
    ;
 
 literal
-   : (HEX_LITERAL | INTEGER_LITERAL | STRING_LITERAL | WIDE_STRING_LITERAL | CHARACTER_LITERAL | WIDE_CHARACTER_LITERAL | FIXED_PT_LITERAL | FLOATING_PT_LITERAL | BOOLEAN_LITERAL)
+   : (HEX_LITERAL | INTEGER_LITERAL | OCTAL_LITERAL | STRING_LITERAL | WIDE_STRING_LITERAL | CHARACTER_LITERAL | WIDE_CHARACTER_LITERAL | FIXED_PT_LITERAL | FLOATING_PT_LITERAL | BOOLEAN_LITERAL)
    ;
 
 positive_int_const
@@ -274,7 +277,7 @@ constr_type_spec
    ;
 
 declarators
-   : declarator (COMA declarator)*
+   : declarator (COMMA declarator)*
    ;
 
 declarator
@@ -401,7 +404,7 @@ element_spec
    ;
 
 enum_type
-   : KW_ENUM ID LEFT_BRACE enumerator (COMA enumerator)* RIGHT_BRACE
+   : KW_ENUM ID LEFT_BRACE enumerator (COMMA enumerator)* RIGHT_BRACE
    ;
 
 enumerator
@@ -409,7 +412,7 @@ enumerator
    ;
 
 sequence_type
-   : KW_SEQUENCE LEFT_ANG_BRACKET simple_type_spec COMA positive_int_const RIGHT_ANG_BRACKET
+   : KW_SEQUENCE LEFT_ANG_BRACKET simple_type_spec COMMA positive_int_const RIGHT_ANG_BRACKET
    | KW_SEQUENCE LEFT_ANG_BRACKET simple_type_spec RIGHT_ANG_BRACKET
    ;
 
@@ -454,7 +457,7 @@ op_type_spec
    ;
 
 parameter_decls
-   : LEFT_BRACKET param_decl (COMA param_decl)* RIGHT_BRACKET
+   : LEFT_BRACKET param_decl (COMMA param_decl)* RIGHT_BRACKET
    | LEFT_BRACKET RIGHT_BRACKET
    ;
 
@@ -469,11 +472,11 @@ param_attribute
    ;
 
 raises_expr
-   : KW_RAISES LEFT_BRACKET scoped_name (COMA scoped_name)* RIGHT_BRACKET
+   : KW_RAISES LEFT_BRACKET scoped_name (COMMA scoped_name)* RIGHT_BRACKET
    ;
 
 context_expr
-   : KW_CONTEXT LEFT_BRACKET STRING_LITERAL (COMA STRING_LITERAL)* RIGHT_BRACKET
+   : KW_CONTEXT LEFT_BRACKET STRING_LITERAL (COMMA STRING_LITERAL)* RIGHT_BRACKET
    ;
 
 param_type_spec
@@ -484,7 +487,7 @@ param_type_spec
    ;
 
 fixed_pt_type
-   : KW_FIXED LEFT_ANG_BRACKET positive_int_const COMA positive_int_const RIGHT_ANG_BRACKET
+   : KW_FIXED LEFT_ANG_BRACKET positive_int_const COMMA positive_int_const RIGHT_ANG_BRACKET
    ;
 
 fixed_pt_const_type
@@ -523,7 +526,7 @@ readonly_attr_spec
 
 readonly_attr_declarator
    : simple_declarator raises_expr
-   | simple_declarator (COMA simple_declarator)*
+   | simple_declarator (COMMA simple_declarator)*
    ;
 
 attr_spec
@@ -532,7 +535,7 @@ attr_spec
 
 attr_declarator
    : simple_declarator attr_raises_expr
-   | simple_declarator (COMA simple_declarator)*
+   | simple_declarator (COMMA simple_declarator)*
    ;
 
 attr_raises_expr
@@ -549,7 +552,7 @@ set_excep_expr
    ;
 
 exception_list
-   : LEFT_BRACKET scoped_name (COMA scoped_name)* RIGHT_BRACKET
+   : LEFT_BRACKET scoped_name (COMMA scoped_name)* RIGHT_BRACKET
    ;
 
 component
@@ -570,7 +573,7 @@ component_header
    ;
 
 supported_interface_spec
-   : KW_SUPPORTS scoped_name (COMA scoped_name)*
+   : KW_SUPPORTS scoped_name (COMMA scoped_name)*
    ;
 
 component_inheritance_spec
@@ -696,7 +699,10 @@ fragment INTEGER_TYPE_SUFFIX
 
 
 FLOATING_PT_LITERAL
-   : ('0' .. '9') + '.' ('0' .. '9')* EXPONENT? FLOAT_TYPE_SUFFIX? | '.' ('0' .. '9') + EXPONENT? FLOAT_TYPE_SUFFIX? | ('0' .. '9') + EXPONENT FLOAT_TYPE_SUFFIX? | ('0' .. '9') + EXPONENT? FLOAT_TYPE_SUFFIX
+   : ('0' .. '9') + '.' ('0' .. '9')* EXPONENT? FLOAT_TYPE_SUFFIX?
+   | '.' ('0' .. '9') + EXPONENT? FLOAT_TYPE_SUFFIX?
+   | ('0' .. '9') + EXPONENT FLOAT_TYPE_SUFFIX?
+   | ('0' .. '9') + EXPONENT? FLOAT_TYPE_SUFFIX
    ;
 
 
@@ -736,17 +742,22 @@ STRING_LITERAL
 
 
 BOOLEAN_LITERAL
-   : 'TRUE' | 'FALSE'
+   : 'TRUE'
+   | 'FALSE'
    ;
 
 
 fragment ESCAPE_SEQUENCE
-   : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\') | UNICODE_ESCAPE | OCTAL_ESCAPE
+   : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\')
+   | UNICODE_ESCAPE
+   | OCTAL_ESCAPE
    ;
 
 
 fragment OCTAL_ESCAPE
-   : '\\' ('0' .. '3') ('0' .. '7') ('0' .. '7') | '\\' ('0' .. '7') ('0' .. '7') | '\\' ('0' .. '7')
+   : '\\' ('0' .. '3') ('0' .. '7') ('0' .. '7')
+   | '\\' ('0' .. '7') ('0' .. '7')
+   | '\\' ('0' .. '7')
    ;
 
 
@@ -756,12 +767,38 @@ fragment UNICODE_ESCAPE
 
 
 fragment LETTER
-   : '\u0024' | '\u0041' .. '\u005a' | '\u005f' | '\u0061' .. '\u007a' | '\u00c0' .. '\u00d6' | '\u00d8' .. '\u00f6' | '\u00f8' .. '\u00ff' | '\u0100' .. '\u1fff' | '\u3040' .. '\u318f' | '\u3300' .. '\u337f' | '\u3400' .. '\u3d2d' | '\u4e00' .. '\u9fff' | '\uf900' .. '\ufaff'
+   : '\u0024'
+   | '\u0041' .. '\u005a'
+   | '\u005f'
+   | '\u0061' .. '\u007a'
+   | '\u00c0' .. '\u00d6'
+   | '\u00d8' .. '\u00f6'
+   | '\u00f8' .. '\u00ff'
+   | '\u0100' .. '\u1fff'
+   | '\u3040' .. '\u318f'
+   | '\u3300' .. '\u337f'
+   | '\u3400' .. '\u3d2d'
+   | '\u4e00' .. '\u9fff'
+   | '\uf900' .. '\ufaff'
    ;
 
 
 fragment ID_DIGIT
-   : '\u0030' .. '\u0039' | '\u0660' .. '\u0669' | '\u06f0' .. '\u06f9' | '\u0966' .. '\u096f' | '\u09e6' .. '\u09ef' | '\u0a66' .. '\u0a6f' | '\u0ae6' .. '\u0aef' | '\u0b66' .. '\u0b6f' | '\u0be7' .. '\u0bef' | '\u0c66' .. '\u0c6f' | '\u0ce6' .. '\u0cef' | '\u0d66' .. '\u0d6f' | '\u0e50' .. '\u0e59' | '\u0ed0' .. '\u0ed9' | '\u1040' .. '\u1049'
+   : '\u0030' .. '\u0039'
+   | '\u0660' .. '\u0669'
+   | '\u06f0' .. '\u06f9'
+   | '\u0966' .. '\u096f'
+   | '\u09e6' .. '\u09ef'
+   | '\u0a66' .. '\u0a6f'
+   | '\u0ae6' .. '\u0aef'
+   | '\u0b66' .. '\u0b6f'
+   | '\u0be7' .. '\u0bef'
+   | '\u0c66' .. '\u0c6f'
+   | '\u0ce6' .. '\u0cef'
+   | '\u0d66' .. '\u0d6f'
+   | '\u0e50' .. '\u0e59'
+   | '\u0ed0' .. '\u0ed9'
+   | '\u1040' .. '\u1049'
    ;
 
 
@@ -775,7 +812,7 @@ COLON
    ;
 
 
-COMA
+COMMA
    : ','
    ;
 
@@ -1218,3 +1255,4 @@ COMMENT
 LINE_COMMENT
    : '//' ~ ('\n' | '\r')* '\r'? '\n' -> channel (HIDDEN)
    ;
+

@@ -760,7 +760,7 @@ insertStatement
     : INSERT
       priority=(LOW_PRIORITY | DELAYED | HIGH_PRIORITY)?
       IGNORE? INTO? tableName
-      (PARTITION '(' partitions=uidList ')' )?
+      (PARTITION '(' partitions=uidList? ')' )?
       (
         ('(' columns=uidList ')')? insertStatementValue
         | SET
@@ -848,8 +848,8 @@ updateStatement
 insertStatementValue
     : selectStatement
     | insertFormat=(VALUES | VALUE)
-      '(' expressionsWithDefaults ')'
-        (',' '(' expressionsWithDefaults ')')*
+      '(' expressionsWithDefaults? ')'
+        (',' '(' expressionsWithDefaults? ')')*
     ;
 
 updatedElement
@@ -871,7 +871,7 @@ singleDeleteStatement
     FROM tableName
       (PARTITION '(' uidList ')' )?
       (WHERE expression)?
-      orderByClause? (LIMIT decimalLiteral)?
+      orderByClause? (LIMIT limitClauseAtom)?
     ;
 
 multipleDeleteStatement
@@ -896,12 +896,12 @@ handlerReadIndexStatement
         comparisonOperator '(' constants ')'
         | moveOrder=(FIRST | NEXT | PREV | LAST)
       )
-      (WHERE expression)? (LIMIT decimalLiteral)?
+      (WHERE expression)? (LIMIT limitClauseAtom)?
     ;
 
 handlerReadStatement
     : HANDLER tableName READ moveOrder=(FIRST | NEXT)
-      (WHERE expression)? (LIMIT decimalLiteral)?
+      (WHERE expression)? (LIMIT limitClauseAtom)?
     ;
 
 handlerCloseStatement

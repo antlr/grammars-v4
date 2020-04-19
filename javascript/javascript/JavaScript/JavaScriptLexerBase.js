@@ -1,7 +1,7 @@
 const antlr4 = require("antlr4/index");
 const JavaScriptLexer = require("./JavaScriptLexer");
 
-function JavaScriptBaseLexer(input) {
+function JavaScriptLexerBase(input) {
     antlr4.Lexer.call(this, input);
 
     this.scopeStrictModes = new Array();
@@ -10,26 +10,26 @@ function JavaScriptBaseLexer(input) {
     this.useStrictCurrent = false;
 }
 
-JavaScriptBaseLexer.prototype = Object.create(antlr4.Lexer.prototype);
+JavaScriptLexerBase.prototype = Object.create(antlr4.Lexer.prototype);
 
-JavaScriptBaseLexer.prototype.getStrictDefault = function() {
+JavaScriptLexerBase.prototype.getStrictDefault = function() {
     return this.useStrictDefault;
 };
 
-JavaScriptBaseLexer.prototype.setUseStrictDefault = function(value) {
+JavaScriptLexerBase.prototype.setUseStrictDefault = function(value) {
     this.useStrictDefault = value;
     this.useStrictCurrent = value;
 };
 
-JavaScriptBaseLexer.prototype.IsStrictMode = function() {
+JavaScriptLexerBase.prototype.IsStrictMode = function() {
     return this.useStrictCurrent;
 };
 
-JavaScriptBaseLexer.prototype.getCurrentToken = function() {
+JavaScriptLexerBase.prototype.getCurrentToken = function() {
     return antlr4.Lexer.prototype.nextToken.call(this);
 };
 
-JavaScriptBaseLexer.prototype.nextToken = function() {
+JavaScriptLexerBase.prototype.nextToken = function() {
     var next = antlr4.Lexer.prototype.nextToken.call(this);
 
     if (next.channel === antlr4.Token.DEFAULT_CHANNEL) {
@@ -38,7 +38,7 @@ JavaScriptBaseLexer.prototype.nextToken = function() {
     return next;
 };
 
-JavaScriptBaseLexer.prototype.ProcessOpenBrace = function() {
+JavaScriptLexerBase.prototype.ProcessOpenBrace = function() {
     this.useStrictCurrent =
         this.scopeStrictModes.length > 0 && this.scopeStrictModes[0]
             ? true
@@ -46,14 +46,14 @@ JavaScriptBaseLexer.prototype.ProcessOpenBrace = function() {
     this.scopeStrictModes.push(this.useStrictCurrent);
 };
 
-JavaScriptBaseLexer.prototype.ProcessCloseBrace = function() {
+JavaScriptLexerBase.prototype.ProcessCloseBrace = function() {
     this.useStrictCurrent =
         this.scopeStrictModes.length > 0
             ? this.scopeStrictModes.pop()
             : this.useStrictDefault;
 };
 
-JavaScriptBaseLexer.prototype.ProcessStringLiteral = function() {
+JavaScriptLexerBase.prototype.ProcessStringLiteral = function() {
     if (
         this.lastToken !== undefined &&
         (this.lastToken === null ||
@@ -70,7 +70,7 @@ JavaScriptBaseLexer.prototype.ProcessStringLiteral = function() {
     }
 };
 
-JavaScriptBaseLexer.prototype.IsRegexPossible = function() {
+JavaScriptLexerBase.prototype.IsRegexPossible = function() {
     if (this.lastToken === null) {
         return true;
     }
@@ -94,9 +94,9 @@ JavaScriptBaseLexer.prototype.IsRegexPossible = function() {
     }
 };
 
-JavaScriptBaseLexer.prototype.IsStartOfFile = function() {
+JavaScriptLexerBase.prototype.IsStartOfFile = function() {
     return this.lastToken === null;
 };
 
 
-module.exports.JavaScriptBaseLexer = JavaScriptBaseLexer;
+module.exports.JavaScriptLexerBase = JavaScriptLexerBase;

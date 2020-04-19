@@ -17,11 +17,20 @@ class Person implements IPerson {
 
 class Employee extends Person {
     empCode: number;
+    currentUser: any;
     static pi: number = 3.14;
 
     constructor(empcode: number, name:string) {
         super(name);
         this.empCode = empcode;
+    }
+
+    get user() {
+        return this.currentUser;
+    }
+
+    set user(usr: any) {
+        this.currentUser = usr;
     }
 
     displayName():void {
