@@ -122,9 +122,7 @@ listValue: '[' ']'
     ;
 
 //https://spec.graphql.org/June2018/#sec-Input-Object-Values
-objectValue: '{' '}'
-    | '{' objectField '}'
-    ;
+objectValue: '{' objectField* '}';
 
 objectField: name ':' value;
 
