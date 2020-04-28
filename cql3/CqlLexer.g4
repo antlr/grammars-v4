@@ -357,6 +357,10 @@ K_IS
    : I S | 'IS'
    ;
 
+K_JSON
+   : J S O N | 'JSON'
+   ;
+
 
 K_KEY
    : K E Y | 'KEY'
