@@ -272,8 +272,8 @@ chiral
    ;
 
 hcount
-   : 'H'
-   | 'H' DIGIT
+   : UH
+   | UH DIGIT
    ;
 
 charge
