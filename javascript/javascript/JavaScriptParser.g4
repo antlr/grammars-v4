@@ -424,11 +424,11 @@ bigintLiteral
     ;
 
 getter
-    : identifier {this.p("get")}? propertyName
+    : {this.n("get")}? identifier propertyName
     ;
 
 setter
-    : identifier {this.p("set")}? propertyName
+    : {this.n("set")}? identifier propertyName
     ;
 
 identifierName
