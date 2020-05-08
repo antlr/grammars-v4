@@ -1,9 +1,13 @@
 name: "Test"
 
-on: pull_request
+on:
+  pull_request:
+  push:
+    branches:
+      - master
 
 jobs:
-  run-tasks:
+  run-tests:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
