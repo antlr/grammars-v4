@@ -484,10 +484,9 @@ UndefinedSymbol:
 
 start
     : script EOF
-    ;
-
-response
-    : general_response EOF
+    | general_response EOF
+    | theory_decl EOF
+    | logic EOF
     ;
 
 generalReservedWord
