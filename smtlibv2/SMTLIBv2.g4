@@ -483,10 +483,10 @@ UndefinedSymbol:
 // Starting rule(s)
 
 start
-    : script EOF
-    | general_response EOF
+    : logic EOF
     | theory_decl EOF
-    | logic EOF
+    | script EOF
+    | general_response EOF
     ;
 
 generalReservedWord
