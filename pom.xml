@@ -10,7 +10,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.7</target.jvm>
 		<antlr.version>4.8-1</antlr.version>
-		<antlr4test-maven-plugin.version>1.13</antlr4test-maven-plugin.version>
+		<antlr4test-maven-plugin.version>1.14</antlr4test-maven-plugin.version>
 		<junit.version>4.12</junit.version>
 	</properties>
 	<prerequisites>
@@ -157,6 +157,8 @@
 				<module>muddb</module>
 				<module>mumath</module>
 				<module>mumps</module>
+				<module>muparser</module>				
+				<module>oberon</module>				
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
 				<module>p</module>
