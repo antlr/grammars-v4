@@ -37,7 +37,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>prog</entryPoint>
+					<entryPoint>module</entryPoint>
 					<grammarName>oberon</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

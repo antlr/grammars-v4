@@ -222,10 +222,10 @@ ifStatement
    ;
 
 caseStatement
-   : CASE expression OF case ('|' case)* END
+   : CASE expression OF case_ ('|' case_)* END
    ;
 
-case
+case_
    : (caseLabelList ':' statementSequence)?
    ;
 
@@ -268,11 +268,11 @@ procedureBody
    ;
 
 declarationSequence
-   : (CONST (ConstDeclaration ';')*)? (TYPE (typeDeclaration ';')*)? (VAR (variableDeclaration ';')*)? (procedureDeclaration ';')*
+   : (CONST (constDeclaration ';')*)? (TYPE (typeDeclaration ';')*)? (VAR (variableDeclaration ';')*)? (procedureDeclaration ';')*
    ;
 
 formalParameters
-   : '(' (FPSection (';' FPSection)*)? ')' (':' qualident)?
+   : '(' (fPSection (';' fPSection)*)? ')' (':' qualident)?
    ;
 
 fPSection
@@ -293,6 +293,138 @@ importList
 
 import_
    : ident (':=' ident)?
+   ;
+
+ARRAY
+   : 'ARRAY'
+   ;
+
+OF
+   : 'OF'
+   ;
+
+END
+   : 'END'
+   ;
+
+POINTER
+   : 'POINTER'
+   ;
+
+TO
+   : 'TO'
+   ;
+
+RECORD
+   : 'RECORD'
+   ;
+
+PROCEDURE
+   : 'PROCEDURE'
+   ;
+
+IN
+   : 'IN'
+   ;
+
+IS
+   : 'IS'
+   ;
+
+OR
+   : 'OR'
+   ;
+
+DIV
+   : 'DIV'
+   ;
+
+MOD
+   : 'MOD'
+   ;
+
+NIL
+   : 'NIL'
+   ;
+
+TRUE
+   : 'TRUE'
+   ;
+
+FALSE
+   : 'FALSE'
+   ;
+
+IF
+   : 'IF'
+   ;
+
+THEN
+   : 'THEN'
+   ;
+
+ELSIF
+   : 'ELSIF'
+   ;
+
+ELSE
+   : 'ELSE'
+   ;
+
+CASE
+   : 'CASE'
+   ;
+
+WHILE
+   : 'WHILE'
+   ;
+
+DO
+   : 'DO'
+   ;
+
+REPEAT
+   : 'REPEAT'
+   ;
+
+UNTIL
+   : 'UNTIL'
+   ;
+
+FOR
+   : 'FOR'
+   ;
+
+BY
+   : 'BY'
+   ;
+
+BEGIN
+   : 'BEGIN'
+   ;
+
+RETURN
+   : 'RETURN'
+   ;
+
+CONST
+   : 'CONST'
+   ;
+
+TYPE
+   : 'TYPE'
+   ;
+
+VAR
+   : 'VAR'
+   ;
+
+MODULE
+   : 'MODULE'
+   ;
+
+IMPORT
+   : 'IMPORT'
    ;
 
 STRING
