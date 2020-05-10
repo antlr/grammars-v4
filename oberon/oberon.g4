@@ -40,7 +40,7 @@ ident
    ;
 
 qualident
-   : (ident '.') ident
+   : (ident '.')? ident
    ;
 
 identdef
@@ -428,8 +428,8 @@ IMPORT
    ;
 
 STRING
-   : '"' ~ '"' '"'
-   | DIGIT HEXDIGIT* 'X'
+   : ('"' .*? '"')
+   | (DIGIT HEXDIGIT* 'X')
    ;
 
 HEXDIGIT
