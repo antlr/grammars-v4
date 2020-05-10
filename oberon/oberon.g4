@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar oberon;
 
 ident
-   : LETTER (LETTER | DIGIT)*
+   : IDENT
    ;
 
 qualident
@@ -442,12 +442,20 @@ HEXDIGIT
    | 'F'
    ;
 
+IDENT
+   : LETTER (LETTER | DIGIT)*
+   ;
+
 LETTER
    : [a-zA-Z]
    ;
 
 DIGIT
    : [0-9]
+   ;
+
+COMMENT
+   : '(*' .*? '*)' -> skip
    ;
 
 WS
