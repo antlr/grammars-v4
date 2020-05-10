@@ -33,142 +33,286 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
 * https://people.inf.ethz.ch/wirth/Oberon/Oberon07.Report.pdf
 */
-
 grammar oberon;
 
-ident :  LETTER (LETTER | DIGIT)*;
+ident
+   : LETTER (LETTER | DIGIT)*
+   ;
 
-qualident : (ident '.') ident;
+qualident
+   : (ident '.') ident
+   ;
 
-identdef : ident '*'?;
+identdef
+   : ident '*'?
+   ;
 
-integer : (DIGIT+) | (DIGIT HEXDIGIT* 'H');
+integer
+   : (DIGIT+)
+   | (DIGIT HEXDIGIT* 'H')
+   ;
 
-real : DIGIT+ '.' DIGIT* scaleFactor?;
+real
+   : DIGIT+ '.' DIGIT* scaleFactor?
+   ;
 
-scaleFactor : 'E' ('+' | '-')? DIGIT+;
+scaleFactor
+   : 'E' ('+' | '-')? DIGIT+
+   ;
 
-number : integer | real;
+number
+   : integer
+   | real
+   ;
 
-constDeclaration : identdef '=' constExpression;
+constDeclaration
+   : identdef '=' constExpression
+   ;
 
-constExpression : expression;
+constExpression
+   : expression
+   ;
 
-typeDeclaration : identdef '=' type;
+typeDeclaration
+   : identdef '=' type
+   ;
 
-type : qualident | arrayType | recordType | pointerType | procedureType;
+type
+   : qualident
+   | arrayType
+   | recordType
+   | pointerType
+   | procedureType
+   ;
 
-arrayType : ARRAY length (',' length)* OF type;
+arrayType
+   : ARRAY length (',' length)* OF type
+   ;
 
-length : constExpression;
+length
+   : constExpression
+   ;
 
-recordType : RECORD ('(' baseType ')')? fieldListSequence? END;
+recordType
+   : RECORD ('(' baseType ')')? fieldListSequence? END
+   ;
 
-baseType : qualident;
+baseType
+   : qualident
+   ;
 
-fieldListSequence : fieldList (';' fieldList)*;
+fieldListSequence
+   : fieldList (';' fieldList)*
+   ;
 
-fieldList : identList ':' type;
+fieldList
+   : identList ':' type
+   ;
 
-identList : identdef (',' identdef)*;
+identList
+   : identdef (',' identdef)*
+   ;
 
-pointerType : POINTER TO type;
+pointerType
+   : POINTER TO type
+   ;
 
-procedureType : PROCEDURE formalParameters?;
+procedureType
+   : PROCEDURE formalParameters?
+   ;
 
-variableDeclaration : identList ':' type;
+variableDeclaration
+   : identList ':' type
+   ;
 
-expression : simpleExpression (relation simpleExpression)?;
+expression
+   : simpleExpression (relation simpleExpression)?
+   ;
 
-relation : '=' | '#' | '<' | '<=' | '>' | '>=' | IN | IS;
+relation
+   : '='
+   | '#'
+   | '<'
+   | '<='
+   | '>'
+   | '>='
+   | IN
+   | IS
+   ;
 
-simpleExpression : ('+' | '-')? term (addOperator term)*;
+simpleExpression
+   : ('+' | '-')? term (addOperator term)*
+   ;
 
-addOperator : '+' | '-' | OR;
+addOperator
+   : '+'
+   | '-'
+   | OR
+   ;
 
-term : factor (mulOperator factor)*;
+term
+   : factor (mulOperator factor)*
+   ;
 
-mulOperator : '*' | '/' | DIV | MOD | '&';
+mulOperator
+   : '*'
+   | '/'
+   | DIV
+   | MOD
+   | '&'
+   ;
 
-factor : number | STRING | NIL | TRUE | FALSE |  set | designator (actualParameters)? | '(' expression ')' | '~' factor;
+factor
+   : number
+   | STRING
+   | NIL
+   | TRUE
+   | FALSE
+   | set
+   | designator (actualParameters)?
+   | '(' expression ')'
+   | '~' factor
+   ;
 
-designator : qualident selector*;
+designator
+   : qualident selector*
+   ;
 
-selector : '.' ident | '[' expList ']' | '^' | '(' qualident ')';
+selector
+   : '.' ident
+   | '[' expList ']'
+   | '^'
+   | '(' qualident ')'
+   ;
 
-set : '{' (element (',' element)* )? '}';
+set
+   : '{' (element (',' element)*)? '}'
+   ;
 
-element : expression ('..' expression)?;
+element
+   : expression ('..' expression)?
+   ;
 
-expList : expression (',' expression)*;
+expList
+   : expression (',' expression)*
+   ;
 
-actualParameters : '(' expList? ')';
+actualParameters
+   : '(' expList? ')'
+   ;
 
-statement : (assignment | procedureCall | ifStatement | caseStatement |
- whileStatement | repeatStatement | forStatement)?;
+statement
+   : (assignment | procedureCall | ifStatement | caseStatement | whileStatement | repeatStatement | forStatement)?
+   ;
 
-assignment : designator ':=' expression;
+assignment
+   : designator ':=' expression
+   ;
 
-procedureCall :designator actualParameters?;
+procedureCall
+   : designator actualParameters?
+   ;
 
-statementSequence : statement (';' statement)*;
+statementSequence
+   : statement (';' statement)*
+   ;
 
-ifStatement : IF expression THEN statementSequence
- (ELSIF expression THEN statementSequence)*
- (ELSE statementSequence)? END;
+ifStatement
+   : IF expression THEN statementSequence (ELSIF expression THEN statementSequence)* (ELSE statementSequence)? END
+   ;
 
-caseStatement : CASE expression OF case ('|' case)* END;
+caseStatement
+   : CASE expression OF case ('|' case)* END
+   ;
 
-case : (caseLabelList ':' statementSequence)?;
+case
+   : (caseLabelList ':' statementSequence)?
+   ;
 
-caseLabelList : labelRange (',' labelRange)*;
+caseLabelList
+   : labelRange (',' labelRange)*
+   ;
 
-labelRange : label ('..' label)?;
+labelRange
+   : label ('..' label)?
+   ;
 
-label : integer | STRING | qualident;
+label
+   : integer
+   | STRING
+   | qualident
+   ;
 
+whileStatement
+   : WHILE expression DO statementSequence (ELSIF expression DO statementSequence)* END
+   ;
 
-whileStatement : WHILE expression DO statementSequence
-(ELSIF expression DO statementSequence)*END;
+repeatStatement
+   : REPEAT statementSequence UNTIL expression
+   ;
 
-repeatStatement : REPEAT statementSequence UNTIL expression;
+forStatement
+   : FOR ident ':=' expression TO expression (BY constExpression)? DO statementSequence END
+   ;
 
-forStatement : FOR ident ':=' expression TO expression (BY constExpression)?
-DO statementSequence END;
+procedureDeclaration
+   : procedureHeading ';' procedureBody ident
+   ;
 
-procedureDeclaration : procedureHeading ';' procedureBody ident;
+procedureHeading
+   : PROCEDURE identdef formalParameters?
+   ;
 
-procedureHeading : PROCEDURE identdef formalParameters?;
+procedureBody
+   : declarationSequence (BEGIN statementSequence)? (RETURN expression)? END
+   ;
 
-procedureBody : declarationSequence (BEGIN statementSequence)?
- (RETURN expression)? END;
+declarationSequence
+   : (CONST (ConstDeclaration ';')*)? (TYPE (typeDeclaration ';')*)? (VAR (variableDeclaration ';')*)? (procedureDeclaration ';')*
+   ;
 
+formalParameters
+   : '(' (FPSection (';' FPSection)*)? ')' (':' qualident)?
+   ;
 
-declarationSequence : (CONST (ConstDeclaration ';')*)?
- (TYPE (typeDeclaration ';')*)?
- (VAR (variableDeclaration ';')*)?
- (procedureDeclaration ';')*;
+fPSection
+   : VAR? ident (',' ident)* ':' formalType
+   ;
 
-formalParameters : '(' (FPSection (';' FPSection)*)? ')' (':' qualident)?;
+formalType
+   : (ARRAY OF)* qualident
+   ;
 
-fPSection : VAR? ident (',' ident)* ':' formalType;
+module
+   : MODULE ident ';' importList? declarationSequence (BEGIN statementSequence)? END ident '.'
+   ;
 
-formalType : (ARRAY OF)* qualident;
+importList
+   : IMPORT import_ (',' import_)* ';'
+   ;
 
-module : MODULE ident ';' importList? declarationSequence
- (BEGIN statementSequence)? END ident '.' ;
+import_
+   : ident (':=' ident)?
+   ;
 
- importList : IMPORT import_ (',' import_)* ';';
- import_ : ident (':=' ident)?;
+STRING
+   : '"' ~ '"' '"'
+   | DIGIT HEXDIGIT* 'X'
+   ;
 
-STRING : '"' ~'"' '"' | DIGIT HEXDIGIT* 'X';
-
-HEXDIGIT : DIGIT | 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+HEXDIGIT
+   : DIGIT
+   | 'A'
+   | 'B'
+   | 'C'
+   | 'D'
+   | 'E'
+   | 'F'
+   ;
 
 LETTER
    : [a-zA-Z]
    ;
-
 
 DIGIT
    : [0-9]
@@ -177,3 +321,4 @@ DIGIT
 WS
    : [ \t\r\n] -> skip
    ;
+
