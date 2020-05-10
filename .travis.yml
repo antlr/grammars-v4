@@ -1,0 +1,6 @@
+language: java
+jdk:
+  - openjdk12
+sudo: required
+
+install: true
