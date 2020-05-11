@@ -476,7 +476,9 @@ PK_Version
 UndefinedSymbol:
     Sym (Digit | Sym)*;
 
-
+ModelResponse
+    : 'model'
+    ;
 
 // Parser Rules Start
 
@@ -997,8 +999,10 @@ model_response
     : ParOpen CMD_DefineFun function_def ParClose
     | ParOpen CMD_DefineFunRec function_def ParClose
     // cardinalitiees for function_dec and term have to be n+1
-    | ParOpen CMD_DefineFunsRec ParOpen function_dec+ ParClose ParOpen term+
-    ParClose ParClose
+    | ParOpen CMD_DefineFunsRec
+    ParOpen function_dec+ ParClose
+    ParOpen term+ ParClose
+    ParClose
     ;
 
 info_response
@@ -1042,7 +1046,7 @@ get_info_response
     ;
 
 get_model_response
-    : ParOpen model_response* ParClose
+    : ParOpen ModelResponse model_response* ParClose
     ;
 
 get_option_response
