@@ -473,12 +473,13 @@ PK_Version
     : ':version'
     ;
 
+RS_Model //  for model responses
+    : 'model'
+    ;
+
 UndefinedSymbol:
     Sym (Digit | Sym)*;
 
-ModelResponse
-    : 'model'
-    ;
 
 // Parser Rules Start
 
@@ -505,6 +506,7 @@ generalReservedWord
     | GRW_Numeral
     | GRW_Par
     | GRW_String
+    | RS_Model
     ;
 
 
@@ -1046,7 +1048,8 @@ get_info_response
     ;
 
 get_model_response
-    : ParOpen ModelResponse model_response* ParClose
+    : ParOpen RS_Model model_response* ParClose
+    | ParOpen model_response* ParClose
     ;
 
 get_option_response
