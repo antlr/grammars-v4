@@ -998,13 +998,9 @@ reason_unknown
     ;
 
 model_response
-    : ParOpen CMD_DefineFun function_def ParClose
-    | ParOpen CMD_DefineFunRec function_def ParClose
-    // cardinalitiees for function_dec and term have to be n+1
-    | ParOpen CMD_DefineFunsRec
-    ParOpen function_dec+ ParClose
-    ParOpen term+ ParClose
-    ParClose
+    : ParOpen cmd_defineFun ParClose
+    | ParOpen cmd_defineFunRec ParClose
+    | ParOpen cmd_defineFunsRec ParClose
     ;
 
 info_response
