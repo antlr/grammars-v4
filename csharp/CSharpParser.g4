@@ -159,14 +159,11 @@ multiplicative_expression
 	;
 
 switch_expression
-    : range_expression
-    | range_expression 'switch' '{' '}'
-    | range_expression 'switch' '{' switch_expression_arms ','? '}'
+    : range_expression ('switch' '{' (switch_expression_arms ','?)? '}')?
     ;
 
 switch_expression_arms
-    : switch_expression_arm
-    | switch_expression_arms ',' switch_expression_arm
+    : switch_expression_arm (',' switch_expression_arm)*
     ;
 
 switch_expression_arm
@@ -225,13 +222,13 @@ primary_expression_start
 	| NAMEOF OPEN_PARENS (identifier '.')* identifier CLOSE_PARENS  #nameofExpression
 	;
 
-throw_expression
-	: THROW expression
-	;
-
 throwable_expression
 	: expression
 	| throw_expression
+	;
+
+throw_expression
+	: THROW expression
 	;
 
 member_access
