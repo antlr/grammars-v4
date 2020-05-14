@@ -796,8 +796,8 @@ class CSharp70
     {
         switch (arg)
         {
-            case ""A"" when b > 50:
-            case ""B"" when b < 50:
+            case "A" when b > 50:
+            case "B" when b < 50:
             default:
                 break;
         }
@@ -1054,8 +1054,8 @@ namespace CSharp80
 
 		void UsingDeclarators()
 		{
-			using var item = new FileStream(""./.f"");
-			fixed char* ch = ""hell"";
+			using var item = new FileStream("./.f");
+			fixed char* ch = "hell";
 			item.Dispose(); // no!
 		}
 
@@ -1080,21 +1080,21 @@ namespace CSharp80
 
 	interface IA
 	{
-		void M() { WriteLine(""IA.M""); }
+		void M() { WriteLine("IA.M"); }
 	}
 
 	interface IA
 	{
-		void M() { WriteLine(""IA.M""); }
+		void M() { WriteLine("IA.M"); }
 	}
 
 	interface IB : IA
 	{
-		override void IA.M() { WriteLine(""IB.M""); } // explicitly named
+		override void IA.M() { WriteLine("IB.M"); } // explicitly named
 	}
 
 	interface IC : IA
 	{
-		override void M() { WriteLine(""IC.M""); } // implicitly named
+		override void M() { WriteLine("IC.M"); } // implicitly named
 	}
 }
