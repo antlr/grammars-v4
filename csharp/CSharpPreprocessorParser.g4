@@ -58,7 +58,7 @@ preprocessor_directive returns [boolean value]
 
 	| PRAGMA TEXT directive_new_line_or_sharp      { $value = allConditions(); }   #preprocessorPragma
 
-	| NULLABLE TEXT directive_new_line_or_sharp      { $value = conditions.All(c => c); }   #preprocessorNullable
+	| NULLABLE TEXT directive_new_line_or_sharp      { $value = allConditions(); }   #preprocessorNullable
 	;
 
 directive_new_line_or_sharp
