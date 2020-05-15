@@ -30,7 +30,7 @@
  */
 
 /**
- * A Java 8 grammar for ANTLR 4 derived from the Java Language Specification
+ * A Java 9 grammar for ANTLR 4 derived from the Java Language Specification
  * chapter 19.
  *
  * NOTE: This grammar results in a generated parser that is much slower
