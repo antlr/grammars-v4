@@ -22,6 +22,10 @@ alter table with_partition add partition (partition p1 values less than (837425)
 alter table t1 stats_auto_recalc=default stats_sample_pages=50;
 alter table t1 stats_auto_recalc=default, stats_sample_pages=50;
 alter table t1 modify column c1 enum('abc','cba','aaa') character set 'utf8' collate 'utf8_unicode_ci' not null default 'abc';
+alter table table1 add primary key (id);
+alter table table1 add primary key table_pk (id);
+alter table table1 add primary key `table_pk` (id);
+alter table table1 add primary key `table_pk` (`id`);
 #end
 #begin
 -- Alter database
