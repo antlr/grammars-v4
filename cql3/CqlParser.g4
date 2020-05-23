@@ -582,7 +582,7 @@ assignmentElement
    ;
 
 assignmentSet
-   : syntaxBracketLc ((constant (syntaxComma constant)*) |) syntaxBracketRc
+   : syntaxBracketLc (constant (syntaxComma constant)*)?  syntaxBracketRc
    ;
 
 assignmentMap
@@ -594,13 +594,14 @@ assignmentList
    ;
 
 assignmentTuple
-   : syntaxBracketLr constant (syntaxComma constant)* syntaxBracketRr
-   | syntaxBracketLr constant (syntaxComma assignmentTuple)* syntaxBracketRr
-   | syntaxBracketLr assignmentTuple (syntaxComma assignmentTuple)* syntaxBracketRr
+   : syntaxBracketLr (
+         constant ((syntaxComma constant)* | (syntaxComma assignmentTuple)*) |
+         assignmentTuple (syntaxComma assignmentTuple)*
+     ) syntaxBracketRr
    ;
 
 insert
-   : (beginBatch |) kwInsert kwInto (keyspace DOT |) table (insertColumnSpec |) insertValuesSpec (ifNotExist |) usingTtlTimestamp?
+   : beginBatch? kwInsert kwInto (keyspace DOT)? table insertColumnSpec? insertValuesSpec ifNotExist? usingTtlTimestamp?
    ;
 
 usingTtlTimestamp
@@ -644,11 +645,19 @@ columnList
    ;
 
 expressionList
-   : (constant | assignmentMap | assignmentSet | assignmentList | assignmentTuple) (syntaxComma (constant | assignmentMap | assignmentSet | assignmentList | assignmentTuple))*
+   : expression (syntaxComma expression)*
+   ;
+
+expression
+   : constant
+   | assignmentMap
+   | assignmentSet
+   | assignmentList
+   | assignmentTuple
    ;
 
 select
-   : kwSelect (distinctSpec |) (jsonSpec |) selectElements fromSpec whereSpec? orderSpec? limitSpec? allowFilteringSpec?
+   : kwSelect distinctSpec? kwJson? selectElements fromSpec whereSpec? orderSpec? limitSpec? allowFilteringSpec?
    ;
 
 allowFilteringSpec
@@ -678,10 +687,6 @@ orderSpecElement
 
 whereSpec
    : kwWhere relationElements
-   ;
-
-jsonSpec
-   : kwJson
    ;
 
 distinctSpec
