@@ -16,3 +16,6 @@ INSERT INTO cycling.cyclist_teams (id,lastname,teams)
     VALUES(5b6962dd-3f90-4c93-8f61-eabfa4a803e2,'VOS',$$Women's Tour of New Zealand$$);
 
 INSERT INTO cycling.route(race_id,race_name,lat_long) VALUES (500, 'Name', ('Champagne', (46.833,6.65)));
+
+INSERT INTO "students"("id", "address", "name", "[age]", "age", "colu'mn1", "colu68mn1", "height") values
+    (740, 'hongkong','alice',null,32,'','',172);

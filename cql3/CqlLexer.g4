@@ -958,7 +958,7 @@ fragment HEX_4DIGIT
 
 
 fragment OBJECT_NAME_FRAG
-   : [a-zA-Z] [A-Za-z0-9_$]*
+   : [a-zA-Z] [A-Za-z0-9_$]* | '"' ~'"' + '"'
    ;
 
 
