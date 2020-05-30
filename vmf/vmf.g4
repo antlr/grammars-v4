@@ -36,7 +36,7 @@ vmf
    ;
 
 keyvalue
-   : key (atomicvalue | listvalue)
+   : key (atomicvalue+ | listvalue+)
    ;
 
 key
