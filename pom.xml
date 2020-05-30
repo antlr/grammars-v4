@@ -235,6 +235,7 @@
 				<module>vba</module>
 				<module>verilog</module>
 				<module>vhdl</module>
+				<module>vmf</module>
 				<module>wat</module>
 				<module>wavefront</module>
 				<module>webidl</module>
