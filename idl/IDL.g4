@@ -34,6 +34,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     Current revision prepared by Nikita Visnevski.
     Renaming of COMA to COMMA and addition of OCTAL_LITERAL in `literal`
     by Oliver Kellogg.
+    Support for IDL4 annotation applications, integration of eProsima IDL4
+    updates by Oliver Kellogg.
 */
 
 grammar IDL;
@@ -43,26 +45,31 @@ specification
    ;
 
 definition
-   : type_decl SEMICOLON
-   | const_decl SEMICOLON
-   | except_decl SEMICOLON
-   | interface_or_forward_decl SEMICOLON
-   | module SEMICOLON
-   | value SEMICOLON
-   | type_id_decl SEMICOLON
-   | type_prefix_decl SEMICOLON
-   | event SEMICOLON
-   | component SEMICOLON
-   | home_decl SEMICOLON
+   : annapps
+     ( type_decl SEMICOLON
+     | const_decl SEMICOLON
+     | except_decl SEMICOLON
+     | interface_or_forward_decl SEMICOLON
+     | module SEMICOLON
+     | value SEMICOLON
+     | type_id_decl SEMICOLON
+     | type_prefix_decl SEMICOLON
+     | event SEMICOLON
+     | component SEMICOLON
+     | home_decl SEMICOLON
+     | annotation_decl SEMICOLON
+     )
    ;
 
 module
-   : KW_MODULE ID LEFT_BRACE definition + RIGHT_BRACE
+   : KW_MODULE identifier LEFT_BRACE definition + RIGHT_BRACE
    ;
 
 interface_or_forward_decl
-   : interface_decl
-   | forward_decl
+   : annapps
+     ( interface_decl
+     | forward_decl
+     )
    ;
 
 interface_decl
@@ -70,11 +77,11 @@ interface_decl
    ;
 
 forward_decl
-   : (KW_ABSTRACT | KW_LOCAL)? KW_INTERFACE ID
+   : (KW_ABSTRACT | KW_LOCAL)? KW_INTERFACE identifier
    ;
 
 interface_header
-   : (KW_ABSTRACT | KW_LOCAL)? KW_INTERFACE ID (interface_inheritance_spec)?
+   : (KW_ABSTRACT | KW_LOCAL)? KW_INTERFACE identifier (interface_inheritance_spec)?
    ;
 
 interface_body
@@ -82,13 +89,15 @@ interface_body
    ;
 
 export
-   : type_decl SEMICOLON
-   | const_decl SEMICOLON
-   | except_decl SEMICOLON
-   | attr_decl SEMICOLON
-   | op_decl SEMICOLON
-   | type_id_decl SEMICOLON
-   | type_prefix_decl SEMICOLON
+   : annapps
+     ( type_decl SEMICOLON
+     | const_decl SEMICOLON
+     | except_decl SEMICOLON
+     | attr_decl SEMICOLON
+     | op_decl SEMICOLON
+     | type_id_decl SEMICOLON
+     | type_prefix_decl SEMICOLON
+     )
    ;
 
 interface_inheritance_spec
@@ -96,7 +105,12 @@ interface_inheritance_spec
    ;
 
 interface_name
-   : scoped_name
+   : a_scoped_name
+   ;
+
+// scoped_name with optional prefixed annotations
+a_scoped_name
+   : annapps scoped_name
    ;
 
 scoped_name
@@ -104,19 +118,20 @@ scoped_name
    ;
 
 value
-   : (value_decl | value_abs_decl | value_box_decl | value_forward_decl)
+   : annapps
+     (value_decl | value_abs_decl | value_box_decl | value_forward_decl)
    ;
-
+ 
 value_forward_decl
-   : (KW_ABSTRACT)? KW_VALUETYPE ID
+   : (KW_ABSTRACT)? KW_VALUETYPE identifier
    ;
 
 value_box_decl
-   : KW_VALUETYPE ID type_spec
+   : KW_VALUETYPE identifier type_spec
    ;
 
 value_abs_decl
-   : KW_ABSTRACT KW_VALUETYPE ID value_inheritance_spec LEFT_BRACE export* RIGHT_BRACE
+   : KW_ABSTRACT KW_VALUETYPE identifier value_inheritance_spec LEFT_BRACE export* RIGHT_BRACE
    ;
 
 value_decl
@@ -124,7 +139,7 @@ value_decl
    ;
 
 value_header
-   : (KW_CUSTOM)? KW_VALUETYPE ID value_inheritance_spec
+   : (KW_CUSTOM)? KW_VALUETYPE identifier value_inheritance_spec
    ;
 
 value_inheritance_spec
@@ -132,7 +147,7 @@ value_inheritance_spec
    ;
 
 value_name
-   : scoped_name
+   : a_scoped_name
    ;
 
 value_element
@@ -140,11 +155,11 @@ value_element
    ;
 
 state_member
-   : (KW_PUBLIC | KW_PRIVATE) type_spec declarators SEMICOLON
+   : annapps ( KW_PUBLIC annapps | KW_PRIVATE annapps ) type_spec declarators SEMICOLON
    ;
 
 init_decl
-   : KW_FACTORY ID LEFT_BRACKET (init_param_decls)? RIGHT_BRACKET (raises_expr)? SEMICOLON
+   : annapps KW_FACTORY identifier LEFT_BRACKET (init_param_decls)? RIGHT_BRACKET (raises_expr)? SEMICOLON
    ;
 
 init_param_decls
@@ -152,7 +167,7 @@ init_param_decls
    ;
 
 init_param_decl
-   : init_param_attribute param_type_spec simple_declarator
+   : annapps init_param_attribute annapps param_type_spec annapps simple_declarator
    ;
 
 init_param_attribute
@@ -160,20 +175,22 @@ init_param_attribute
    ;
 
 const_decl
-   : KW_CONST const_type ID EQUAL const_exp
+   : KW_CONST const_type identifier EQUAL const_exp
    ;
 
 const_type
-   : integer_type
-   | char_type
-   | wide_char_type
-   | boolean_type
-   | floating_pt_type
-   | string_type
-   | wide_string_type
-   | fixed_pt_const_type
-   | scoped_name
-   | octet_type
+   : annapps
+     ( integer_type
+     | char_type
+     | wide_char_type
+     | boolean_type
+     | floating_pt_type
+     | string_type
+     | wide_string_type
+     | fixed_pt_const_type
+     | scoped_name
+     | octet_type
+     )
    ;
 
 const_exp
@@ -228,11 +245,13 @@ positive_int_const
    ;
 
 type_decl
-   : KW_TYPEDEF type_declarator
+   : KW_TYPEDEF annapps type_declarator
    | struct_type
    | union_type
    | enum_type
-   | KW_NATIVE simple_declarator
+   | bitset_type
+   | bitmask_type
+   | KW_NATIVE annapps simple_declarator
    | constr_forward_decl
    ;
 
@@ -251,6 +270,12 @@ simple_type_spec
    | scoped_name
    ;
 
+bitfield_type_spec
+   : integer_type
+   | boolean_type
+   | octet_type
+   ;
+
 base_type_spec
    : floating_pt_type
    | integer_type
@@ -265,6 +290,8 @@ base_type_spec
 
 template_type_spec
    : sequence_type
+   | set_type
+   | map_type
    | string_type
    | wide_string_type
    | fixed_pt_type
@@ -274,6 +301,12 @@ constr_type_spec
    : struct_type
    | union_type
    | enum_type
+   | bitset_type
+   | bitmask_type
+   ;
+
+simple_declarators
+   : identifier (COMMA identifier)*
    ;
 
 declarators
@@ -281,8 +314,10 @@ declarators
    ;
 
 declarator
-   : simple_declarator
-   | complex_declarator
+   : annapps
+     ( simple_declarator
+     | complex_declarator
+     )
    ;
 
 simple_declarator
@@ -306,36 +341,52 @@ signed_int
    : signed_short_int
    | signed_long_int
    | signed_longlong_int
+   | signed_tiny_int
+   ;
+
+signed_tiny_int
+   : KW_INT8
    ;
 
 signed_short_int
    : KW_SHORT
+   | KW_INT16
    ;
 
 signed_long_int
    : KW_LONG
+   | KW_INT32
    ;
 
 signed_longlong_int
    : KW_LONG KW_LONG
+   | KW_INT64
    ;
 
 unsigned_int
    : unsigned_short_int
    | unsigned_long_int
    | unsigned_longlong_int
+   | unsigned_tiny_int
+   ;
+
+unsigned_tiny_int
+   : KW_UINT8
    ;
 
 unsigned_short_int
    : KW_UNSIGNED KW_SHORT
+   | KW_UINT16
    ;
 
 unsigned_long_int
    : KW_UNSIGNED KW_LONG
+   | KW_UINT32
    ;
 
 unsigned_longlong_int
    : KW_UNSIGNED KW_LONG KW_LONG
+   | KW_UINT64
    ;
 
 char_type
@@ -362,25 +413,80 @@ object_type
    : KW_OBJECT
    ;
 
+annotation_decl
+   : annotation_def
+   | annotation_forward_dcl
+   ;
+
+annotation_def
+   : annotation_header LEFT_BRACE annotation_body RIGHT_BRACE
+   ;
+
+annotation_header
+   : KW_AT_ANNOTATION identifier (annotation_inheritance_spec)?
+   ;
+
+annotation_inheritance_spec
+   : COLON scoped_name
+   ;
+
+annotation_body
+   : ( annotation_member
+     | enum_type SEMICOLON
+     | const_decl SEMICOLON
+     | KW_TYPEDEF type_declarator SEMICOLON
+     )*
+   ;
+
+annotation_member
+   : const_type simple_declarator (KW_DEFAULT const_exp)? SEMICOLON
+   ;
+
+annotation_forward_dcl
+   : KW_AT_ANNOTATION scoped_name
+   ;
+
+bitset_type
+   : KW_BITSET identifier (COLON scoped_name)? LEFT_BRACE bitfield RIGHT_BRACE
+   ;
+
+bitfield
+   : ( bitfield_spec (simple_declarators)? SEMICOLON )+
+   ;
+
+bitfield_spec
+   : annapps KW_BITFIELD LEFT_ANG_BRACKET positive_int_const (COMMA bitfield_type_spec)? RIGHT_ANG_BRACKET
+   ;
+
+bitmask_type
+   : KW_BITMASK identifier LEFT_BRACE bit_values RIGHT_BRACE
+   ;
+
+bit_values
+   : identifier (COMMA identifier)*
+   ;
+
 struct_type
-   : KW_STRUCT ID LEFT_BRACE member_list RIGHT_BRACE
+   : KW_STRUCT identifier (COLON scoped_name)? LEFT_BRACE member_list RIGHT_BRACE
    ;
 
 member_list
-   : member +
+   : member *
    ;
 
 member
-   : type_spec declarators SEMICOLON
+   : annapps type_spec declarators SEMICOLON
    ;
 
 union_type
-   : KW_UNION ID KW_SWITCH LEFT_BRACKET switch_type_spec RIGHT_BRACKET LEFT_BRACE switch_body RIGHT_BRACE
+   : KW_UNION identifier KW_SWITCH LEFT_BRACKET annapps switch_type_spec RIGHT_BRACKET LEFT_BRACE switch_body RIGHT_BRACE
    ;
 
 switch_type_spec
    : integer_type
    | char_type
+   | wide_char_type
+   | octet_type
    | boolean_type
    | enum_type
    | scoped_name
@@ -395,35 +501,42 @@ case_stmt
    ;
 
 case_label
-   : KW_CASE const_exp COLON
-   | KW_DEFAULT COLON
+   : annapps
+     ( KW_CASE const_exp COLON
+     | KW_DEFAULT COLON
+     )
    ;
 
 element_spec
-   : type_spec declarator
+   : annapps type_spec declarator
    ;
 
 enum_type
-   : KW_ENUM ID LEFT_BRACE enumerator (COMMA enumerator)* RIGHT_BRACE
+   : KW_ENUM identifier LEFT_BRACE enumerator (COMMA enumerator)* RIGHT_BRACE
    ;
 
 enumerator
-   : ID
+   : identifier
    ;
 
 sequence_type
-   : KW_SEQUENCE LEFT_ANG_BRACKET simple_type_spec COMMA positive_int_const RIGHT_ANG_BRACKET
-   | KW_SEQUENCE LEFT_ANG_BRACKET simple_type_spec RIGHT_ANG_BRACKET
+   : KW_SEQUENCE LEFT_ANG_BRACKET annapps simple_type_spec (COMMA positive_int_const)? RIGHT_ANG_BRACKET
+   ;
+
+set_type
+   : KW_SET LEFT_ANG_BRACKET simple_type_spec (COMMA positive_int_const)? RIGHT_ANG_BRACKET
+   ;
+
+map_type
+   : KW_MAP LEFT_ANG_BRACKET simple_type_spec COMMA simple_type_spec (COMMA positive_int_const)?  RIGHT_ANG_BRACKET
    ;
 
 string_type
-   : KW_STRING LEFT_ANG_BRACKET positive_int_const RIGHT_ANG_BRACKET
-   | KW_STRING
+   : KW_STRING (LEFT_ANG_BRACKET positive_int_const RIGHT_ANG_BRACKET)?
    ;
 
 wide_string_type
-   : KW_WSTRING LEFT_ANG_BRACKET positive_int_const RIGHT_ANG_BRACKET
-   | KW_WSTRING
+   : KW_WSTRING (LEFT_ANG_BRACKET positive_int_const RIGHT_ANG_BRACKET)?
    ;
 
 array_declarator
@@ -440,11 +553,11 @@ attr_decl
    ;
 
 except_decl
-   : KW_EXCEPTION ID LEFT_BRACE member* RIGHT_BRACE
+   : KW_EXCEPTION identifier LEFT_BRACE member* RIGHT_BRACE
    ;
 
 op_decl
-   : (op_attribute)? op_type_spec ID parameter_decls (raises_expr)? (context_expr)?
+   : (op_attribute)? op_type_spec identifier parameter_decls (raises_expr)? (context_expr)?
    ;
 
 op_attribute
@@ -452,17 +565,18 @@ op_attribute
    ;
 
 op_type_spec
-   : param_type_spec
-   | KW_VOID
+   : annapps
+     ( param_type_spec
+     | KW_VOID
+     )
    ;
 
 parameter_decls
-   : LEFT_BRACKET param_decl (COMMA param_decl)* RIGHT_BRACKET
-   | LEFT_BRACKET RIGHT_BRACKET
+   : LEFT_BRACKET ( param_decl (COMMA param_decl)* )? RIGHT_BRACKET
    ;
 
 param_decl
-   : param_attribute param_type_spec simple_declarator
+   : annapps param_attribute annapps param_type_spec annapps simple_declarator
    ;
 
 param_attribute
@@ -472,7 +586,7 @@ param_attribute
    ;
 
 raises_expr
-   : KW_RAISES LEFT_BRACKET scoped_name (COMMA scoped_name)* RIGHT_BRACKET
+   : KW_RAISES LEFT_BRACKET a_scoped_name (COMMA a_scoped_name)* RIGHT_BRACKET
    ;
 
 context_expr
@@ -504,7 +618,7 @@ constr_forward_decl
    ;
 
 import_decl
-   : KW_IMPORT imported_scope SEMICOLON
+   : annapps KW_IMPORT annapps imported_scope SEMICOLON
    ;
 
 imported_scope
@@ -513,29 +627,33 @@ imported_scope
    ;
 
 type_id_decl
-   : KW_TYPEID scoped_name STRING_LITERAL
+   : KW_TYPEID a_scoped_name STRING_LITERAL
    ;
 
 type_prefix_decl
-   : KW_TYPEPREFIX scoped_name STRING_LITERAL
+   : KW_TYPEPREFIX a_scoped_name STRING_LITERAL
    ;
 
 readonly_attr_spec
-   : KW_READONLY KW_ATTRIBUTE param_type_spec readonly_attr_declarator
+   : KW_READONLY KW_ATTRIBUTE annapps param_type_spec readonly_attr_declarator
    ;
 
 readonly_attr_declarator
-   : simple_declarator raises_expr
-   | simple_declarator (COMMA simple_declarator)*
+   : annapps simple_declarator
+     ( raises_expr
+     | (COMMA annapps simple_declarator)*
+     )
    ;
 
 attr_spec
-   : KW_ATTRIBUTE param_type_spec attr_declarator
+   : KW_ATTRIBUTE annapps param_type_spec attr_declarator
    ;
 
 attr_declarator
-   : simple_declarator attr_raises_expr
-   | simple_declarator (COMMA simple_declarator)*
+   : annapps simple_declarator
+     ( attr_raises_expr
+     | (COMMA annapps simple_declarator)*
+     )
    ;
 
 attr_raises_expr
@@ -552,7 +670,7 @@ set_excep_expr
    ;
 
 exception_list
-   : LEFT_BRACKET scoped_name (COMMA scoped_name)* RIGHT_BRACKET
+   : LEFT_BRACKET a_scoped_name (COMMA a_scoped_name)* RIGHT_BRACKET
    ;
 
 component
@@ -569,15 +687,15 @@ component_decl
    ;
 
 component_header
-   : KW_COMPONENT ID (component_inheritance_spec)? (supported_interface_spec)?
+   : KW_COMPONENT identifier (component_inheritance_spec)? (supported_interface_spec)?
    ;
 
 supported_interface_spec
-   : KW_SUPPORTS scoped_name (COMMA scoped_name)*
+   : KW_SUPPORTS a_scoped_name (COMMA a_scoped_name)*
    ;
 
 component_inheritance_spec
-   : COLON scoped_name
+   : COLON a_scoped_name
    ;
 
 component_body
@@ -585,12 +703,14 @@ component_body
    ;
 
 component_export
-   : provides_decl SEMICOLON
-   | uses_decl SEMICOLON
-   | emits_decl SEMICOLON
-   | publishes_decl SEMICOLON
-   | consumes_decl SEMICOLON
-   | attr_decl SEMICOLON
+   : annapps
+     ( provides_decl SEMICOLON
+     | uses_decl SEMICOLON
+     | emits_decl SEMICOLON
+     | publishes_decl SEMICOLON
+     | consumes_decl SEMICOLON
+     | attr_decl SEMICOLON
+     )
    ;
 
 provides_decl
@@ -598,8 +718,10 @@ provides_decl
    ;
 
 interface_type
-   : scoped_name
-   | KW_OBJECT
+   : annapps
+     ( scoped_name
+     | KW_OBJECT
+     )
    ;
 
 uses_decl
@@ -607,15 +729,15 @@ uses_decl
    ;
 
 emits_decl
-   : KW_EMITS scoped_name ID
+   : KW_EMITS a_scoped_name ID
    ;
 
 publishes_decl
-   : KW_PUBLISHES scoped_name ID
+   : KW_PUBLISHES a_scoped_name ID
    ;
 
 consumes_decl
-   : KW_CONSUMES scoped_name ID
+   : KW_CONSUMES a_scoped_name ID
    ;
 
 home_decl
@@ -623,15 +745,15 @@ home_decl
    ;
 
 home_header
-   : KW_HOME ID (home_inheritance_spec)? (supported_interface_spec)? KW_MANAGES scoped_name (primary_key_spec)?
+   : KW_HOME identifier (home_inheritance_spec)? (supported_interface_spec)? KW_MANAGES a_scoped_name (primary_key_spec)?
    ;
 
 home_inheritance_spec
-   : COLON scoped_name
+   : COLON a_scoped_name
    ;
 
 primary_key_spec
-   : KW_PRIMARYKEY scoped_name
+   : KW_PRIMARYKEY a_scoped_name
    ;
 
 home_body
@@ -640,16 +762,19 @@ home_body
 
 home_export
    : export
-   | factory_decl SEMICOLON
-   | finder_decl SEMICOLON
+   | annapps
+     ( factory_decl
+     | finder_decl
+     )
+     SEMICOLON
    ;
 
 factory_decl
-   : KW_FACTORY ID LEFT_BRACKET (init_param_decls)? RIGHT_BRACKET (raises_expr)?
+   : KW_FACTORY identifier LEFT_BRACKET (init_param_decls)? RIGHT_BRACKET (raises_expr)?
    ;
 
 finder_decl
-   : KW_FINDER ID LEFT_BRACKET (init_param_decls)? RIGHT_BRACKET (raises_expr)?
+   : KW_FINDER identifier LEFT_BRACKET (init_param_decls)? RIGHT_BRACKET (raises_expr)?
    ;
 
 event
@@ -661,7 +786,7 @@ event_forward_decl
    ;
 
 event_abs_decl
-   : KW_ABSTRACT KW_EVENTTYPE ID value_inheritance_spec LEFT_BRACE export* RIGHT_BRACE
+   : KW_ABSTRACT KW_EVENTTYPE identifier value_inheritance_spec LEFT_BRACE export* RIGHT_BRACE
    ;
 
 event_decl
@@ -669,7 +794,28 @@ event_decl
    ;
 
 event_header
-   : (KW_CUSTOM)? KW_EVENTTYPE ID value_inheritance_spec
+   : (KW_CUSTOM)? KW_EVENTTYPE identifier value_inheritance_spec
+   ;
+
+annapps
+   : ( annotation_appl )*
+   ;
+
+annotation_appl
+   : AT scoped_name ( LEFT_BRACKET annotation_appl_params RIGHT_BRACKET )?
+   ;
+
+annotation_appl_params
+   : const_exp
+   | annotation_appl_param ( COMMA annotation_appl_param )*
+   ;
+
+annotation_appl_param
+   : ID EQUAL const_exp
+   ;
+
+identifier
+   : annapps ID
    ;
 
 
@@ -919,6 +1065,10 @@ RIGHT_SHIFT
 
 LEFT_SHIFT
    : '<<'
+   ;
+
+
+AT : '@'
    ;
 
 
@@ -1236,6 +1386,61 @@ KW_COMPONENT
    : 'component'
    ;
 
+KW_SET
+   : 'set'
+   ;
+
+KW_MAP
+   : 'map'
+   ;
+
+KW_BITFIELD
+   : 'bitfield'
+   ;
+
+KW_BITSET
+   : 'bitset'
+   ;
+
+KW_BITMASK
+   : 'bitmask'
+   ;
+
+KW_INT8
+   : 'int8'
+   ;
+
+KW_UINT8
+   : 'uint8'
+   ;
+
+KW_INT16
+   : 'int16'
+   ;
+
+KW_UINT16
+   : 'uint16'
+   ;
+
+KW_INT32
+   : 'int32'
+   ;
+
+KW_UINT32
+   : 'uint32'
+   ;
+
+KW_INT64
+   : 'int64'
+   ;
+
+KW_UINT64
+   : 'uint64'
+   ;
+
+KW_AT_ANNOTATION
+   : '@annotation'
+   ;
 
 ID
    : LETTER (LETTER | ID_DIGIT)*
