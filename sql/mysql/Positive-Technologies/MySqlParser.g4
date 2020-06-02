@@ -2039,7 +2039,7 @@ constant
 
 dataType
     : typeName=(
-      CHAR | VARCHAR | TINYTEXT | TEXT | MEDIUMTEXT | LONGTEXT
+      CHAR | CHARACTER | VARCHAR | TINYTEXT | TEXT | MEDIUMTEXT | LONGTEXT
        | NCHAR | NVARCHAR
       )
       lengthOneDimension? BINARY?
