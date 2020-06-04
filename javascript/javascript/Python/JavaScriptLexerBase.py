@@ -7,7 +7,6 @@ if __name__ is not None and "." in __name__:
 
 class JavaScriptLexerBase(Lexer):
     def __init__(self, *args, **kwargs):
-        print("JavaScriptBaseLexerInit")
         super(JavaScriptLexerBase, self).__init__(*args, **kwargs)
 
         """Stores values of nested modes. By default mode is strict or
