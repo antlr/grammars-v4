@@ -5,7 +5,7 @@ relativeImport = False
 if __name__ is not None and "." in __name__:
     relativeImport = True
 
-class JavaScriptBaseParser(Parser):
+class JavaScriptParserBase(Parser):
     @staticmethod
     def parser():
         if relativeImport:
