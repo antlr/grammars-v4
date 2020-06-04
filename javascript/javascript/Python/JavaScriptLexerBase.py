@@ -5,10 +5,10 @@ relativeImport = False
 if __name__ is not None and "." in __name__:
     relativeImport = True
 
-class JavaScriptBaseLexer(Lexer):
+class JavaScriptLexerBase(Lexer):
     def __init__(self, *args, **kwargs):
         print("JavaScriptBaseLexerInit")
-        super(JavaScriptBaseLexer, self).__init__(*args, **kwargs)
+        super(JavaScriptLexerBase, self).__init__(*args, **kwargs)
 
         """Stores values of nested modes. By default mode is strict or
         defined externally (useStrictDefault)"""
@@ -44,7 +44,7 @@ class JavaScriptBaseLexer(Lexer):
         string 'use strict';
 
         :return the next token from the character stream."""
-        next_token: Token = super(JavaScriptBaseLexer, self).nextToken()
+        next_token: Token = super(JavaScriptLexerBase, self).nextToken()
 
         if next_token.channel == Token.DEFAULT_CHANNEL:
             self.lastToken = next_token
