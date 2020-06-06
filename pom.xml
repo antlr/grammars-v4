@@ -119,7 +119,7 @@
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
 				<module>guido</module>
-               <!-- <module>guitartab</module>-->
+                <module>guitartab</module>
 				<module>html</module>
 				<module>http</module>
 				<module>hypertalk</module>
@@ -203,7 +203,7 @@
 				<module>sharc</module>
 				<module>sickbay</module>
 				<module>smalltalk</module>
-				<module>smiles</module>
+			<!--	<module>smiles</module> -->
 				<module>smtlibv2</module>
 				<module>snobol</module>
 				<module>solidity</module>
