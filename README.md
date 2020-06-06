@@ -1,4 +1,4 @@
-[![Travis Status](https://api.travis-ci.org/antlr/grammars-v4.png)](https://travis-ci.org/antlr/grammars-v4)
+![CI](https://github.com/antlr/grammars-v4/workflows/CI/badge.svg)
 
 # grammars-v4
 
