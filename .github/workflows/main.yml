@@ -14,6 +14,6 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8 
+        java-version: 12   
     - name: Build with Maven
       run: mvn clean package deploy
