@@ -119,6 +119,7 @@
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
 				<module>guido</module>
+                <module>guitartab</module>
 				<module>html</module>
 				<module>http</module>
 				<module>hypertalk</module>
