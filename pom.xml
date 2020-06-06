@@ -203,7 +203,7 @@
 				<module>sharc</module>
 				<module>sickbay</module>
 				<module>smalltalk</module>
-				<module>smiles</module>
+			<!--	<module>smiles</module> -->
 				<module>smtlibv2</module>
 				<module>snobol</module>
 				<module>solidity</module>

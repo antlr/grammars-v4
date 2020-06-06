@@ -130,6 +130,6 @@ FRET
    ;
 
 WHITESPACE
-   : (' ' | '\t' | '\n')+ -> skip
+   : [ \r\n\t]+ -> skip
    ;
 
