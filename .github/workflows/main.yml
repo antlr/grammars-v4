@@ -17,4 +17,4 @@ jobs:
       with:
         java-version: 12
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B -T 4 package --file pom.xml
