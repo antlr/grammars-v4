@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>guitartab</artifactId>
 	<packaging>jar</packaging>
-	<name>khubla.com Guirar Tab grammar</name>
+	<name>khubla.com Guitar Tab grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
