@@ -218,7 +218,7 @@ add_expr
    ;
 
 mult_expr
-   : unary_expr (('*' | SLASH | PERCENT) unary_expr)*
+   : unary_expr ((STAR | SLASH | PERCENT) unary_expr)*
    ;
 
 unary_expr
