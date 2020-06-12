@@ -1,1 +1,1 @@
-(smiles (chain (chain (branched_atom (atom (aliphatic_organic N)))) (bond #) (branched_atom (atom (aliphatic_organic N)))) (terminator \n))
+(smiles (chain (chain (branched_atom (atom (aliphatic_organic N)))) (bond #) (branched_atom (atom (aliphatic_organic N)))))
