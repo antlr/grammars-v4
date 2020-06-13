@@ -1,0 +1,147 @@
+/*
+BSD License
+
+Copyright (c) 2020, Tom Everett
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. Neither the name of Tom Everett nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+grammar ccs;
+
+value
+   : exp
+   | exp PERCENT
+   | exp VW
+   | exp VH
+   | exp SEC
+   ;
+
+var
+   : DOLL NAME
+   ;
+
+lit
+   : NUM
+   | STR
+   | COLOR
+   | NONE
+   ;
+
+exp1
+   : exp PLUS exp
+   | exp SUB exp
+   ;
+
+exp2
+   : exp STAR exp
+   | exp DIV exp
+   ;
+
+exp
+   : exp2
+   | exp1
+   | lit
+   | var
+   ;
+
+alist
+   : value
+   | alist COMMA value
+   ;
+
+comma_sep_altexp
+   : value
+   | comma_sep_altexp COMMA value
+   ;
+
+selector
+   : STAR
+   | CARET
+   | NAME
+   | DOT NAME
+   | HASH NAME
+   | selector COLON NAME (OPAREN alist CPAREN)?
+   | selector COLON COLON NAME (OPAREN alist CPAREN)?
+   | selector IMM_CHI selector
+   | selector ADJ_SIB selector
+   | selector GEN_SIB selector
+   | selector ALT selector
+   | OPAREN selector CPAREN
+   ;
+
+style_type
+   : NAME
+   | NAME OPAREN alist CPAREN
+   ;
+
+stylize
+   : style_type COLON comma_sep_altexp
+   ;
+
+trigger
+   : style_type COLON rule
+   | style_type COLON body
+   ;
+
+line
+   : stylize SEMI
+   | trigger SEMI
+   ;
+
+body
+   : OBRACE
+   {line} CBRACE
+   ;
+
+rule
+   : selector body
+   ;
+
+stmt
+   : rule
+   | NAME ASSGN rule
+   | NAME ASSGN body
+   | NAME ASSGN exp
+   | NAME
+   ;
+
+stmts
+   :
+   {stmt SEMI}
+   ;
+
+DIGIT
+   : [0-9]
+   ;
+
+LETTER
+   : [A-Za-z]
+   ;
+
+WS
+   : [ \t\r\n] -> skip
+   ;
+
