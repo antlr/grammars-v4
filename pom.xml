@@ -120,7 +120,8 @@
 				<module>gtin</module>
 				<module>guido</module>
                 <module>guitartab</module>
-				<module>html</module>
+                <module>haskell</module>
+                <module>html</module>
 				<module>http</module>
 				<module>hypertalk</module>
 				<module>icalendar</module>
