@@ -11,6 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        java: [7.0.181, 8.0.192, 9.0.x, 11.0.x, 11.0.3, 12, 13 ]
       fail-fast: false
 
     steps:
@@ -19,6 +20,6 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 12
+        java-version: ${{ matrix.java }}
     - name: Build with Maven
       run: mvn -B package --file pom.xml
