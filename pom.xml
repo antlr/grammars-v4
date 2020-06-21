@@ -217,6 +217,7 @@
 				<module>swift</module>
 				<module>swift-fin</module>
 				<module>telephone</module>
+				<module>terraform</module>
 				<module>thrift</module>
 				<module>tiny</module>
 				<module>tinybasic</module>
