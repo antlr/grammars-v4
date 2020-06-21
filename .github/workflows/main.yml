@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        java: [7.0.181, 8.0.192, 9.0.x, 11.0.x, 11.0.3, 12, 13 ]
+        java: [ 9.0.x, 12 ]
       fail-fast: false
 
     steps:
