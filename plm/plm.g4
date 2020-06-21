@@ -32,12 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar plm;
 
-token
-   : delimiter
-   | identifier
-   | numericconstant
-   | STRING
-   ;
+//token
+//   : delimiter
+//   | identifier
+//   | numericconstant
+//   | STRING
+//   ;
 
 delimiter
    : simpledelimiter
@@ -98,10 +98,6 @@ hexadecimalnumber
 
 floatingpointnumber
    : FLOATINGPOINTNUMBER
-   ;
-
-separator
-   : COMMENT?
    ;
 
 compilation
@@ -307,14 +303,14 @@ basicstatement
    | microprocessordependentstatement
    ;
 
-scopingstatement
-   : simpledostatement
-   | docasestatement
-   | dowhilestatement
-   | iterativedostatement
-   | endstatement
-   | procedurestatement
-   ;
+//scopingstatement
+//   : simpledostatement
+//   | docasestatement
+//   | dowhilestatement
+//   | iterativedostatement
+//   | endstatement
+//   | procedurestatement
+//   ;
 
 labeldefinition
    : identifier
@@ -525,15 +521,15 @@ constantlist
    : constant (',' constant)*
    ;
 
-operator
-   : LOGICALOPERATOR
-   | RELATIONALOPERATOR
-   | arithmeticoperator
-   ;
+//operator
+//   : LOGICALOPERATOR
+//   | RELATIONALOPERATOR
+//   | arithmeticoperator
+//   ;
 
-arithmeticoperator
-   : ARITHMETICOPERASTOR
-   ;
+//arithmeticoperator
+//   : ARITHMETICOPERASTOR
+//   ;
 
 expression
    : (variablereference ':=')? logicalexpression
