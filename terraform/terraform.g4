@@ -64,7 +64,13 @@ identifier
    ;
 
 expression
-   : val
+   : section ('.' section)*
+   ;
+
+section
+   : list
+   | map
+   | val
    ;
 
 val
@@ -72,14 +78,22 @@ val
    | NUMBER
    | string
    | BOOL
-   | IDENTIFIER
+   | IDENTIFIER index?
    | DESCRIPTION
-   | list
-   | map
+   | filedecl
+   | EOF_
+   ;
+
+index
+   : '[' expression ']'
+   ;
+
+filedecl
+   : 'file' '(' expression ')'
    ;
 
 list
-   : '[' val (',' val)* ','? ']'
+   : '[' expression (',' expression)* ','? ']'
    ;
 
 map
@@ -93,6 +107,10 @@ string
 
 fragment DIGIT
    : [0-9]
+   ;
+
+EOF_
+   : '<<EOF' .*? 'EOF'
    ;
 
 NULL
@@ -117,15 +135,15 @@ MULTILINESTRING
    ;
 
 STRING
-   : '"' .*? '"'
+   : '"' (~ [\r\n"] | '""')* '"'
    ;
 
 IDENTIFIER
-   : [a-zA-Z] ([a-zA-Z0-9._-])*
+   : [a-zA-Z] ([a-zA-Z0-9_-])*
    ;
 
 COMMENT
-   : '#' ~ [\r\n]* -> skip
+   : ('#' | '//') ~ [\r\n]* -> skip
    ;
 
 WS
