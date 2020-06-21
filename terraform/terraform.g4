@@ -70,18 +70,25 @@ expression
 val
    : NULL
    | NUMBER
-   | STRING
+   | string
    | BOOL
+   | IDENTIFIER
+   | DESCRIPTION
    | list
    | map
    ;
 
 list
-   : '[' val* ']'
+   : '[' val (',' val)* ','? ']'
    ;
 
 map
    : '{' argument* '}'
+   ;
+
+string
+   : STRING
+   | MULTILINESTRING
    ;
 
 fragment DIGIT
@@ -101,16 +108,24 @@ BOOL
    | 'false'
    ;
 
-STRING
-   : '"' ~ ["\r\n]* '"'
+DESCRIPTION
+   : '<<DESCRIPTION' .*? 'DESCRIPTION'
    ;
 
-fragment CHAR
-   : [a-zA-Z_]
+MULTILINESTRING
+   : '<<-EOF' .*? 'EOF'
+   ;
+
+STRING
+   : '"' .*? '"'
    ;
 
 IDENTIFIER
-   : CHAR+
+   : [a-zA-Z] ([a-zA-Z0-9._-])*
+   ;
+
+COMMENT
+   : '#' ~ [\r\n]* -> skip
    ;
 
 WS
