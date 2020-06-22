@@ -36,12 +36,16 @@ program
    ;
 
 statements
-   : ifstmt statements
-   | dostmt statements
-   | callstmt statements
-   | readstmt statements
-   | writestmt statements
-   | lvalstmt statements
+   : statement+
+   ;
+
+statement
+   : ifstmt
+   | dostmt
+   | callstmt
+   | readstmt
+   | writestmt
+   | lvalstmt
    ;
 
 ifstmt
@@ -49,7 +53,7 @@ ifstmt
    ;
 
 dostmt
-   : 'FROM' expression ('DO' statements)? ('LOOP' statements) 'UNTIL' expression
+   : 'FROM' expression ('DO' statements)? ('LOOP' statements)? 'UNTIL' expression
    ;
 
 callstmt
@@ -74,6 +78,7 @@ modstmt
    : '+=' expression
    | '-=' expression
    | '!=' expression
+   | '<=>' expression
    ;
 
 swapstmt
@@ -120,11 +125,15 @@ BINOP
    ;
 
 IDENT
-   : [a-zA-Z]+
+   : [a-zA-Z] [a-zA-Z0-9]*
    ;
 
 NUM
    : [0-9]
+   ;
+
+COMMENT
+   : ';' ~ [\r\n]* -> skip
    ;
 
 WS
