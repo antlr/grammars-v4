@@ -131,7 +131,8 @@
 				<module>informix</module>
 				<module>iri</module>
 				<module>istc</module>
-				<module>java</module>
+				<module>janus</module>
+                <module>java</module>
 				<module>javadoc</module>
 				<module>javascript</module>
 				<module>jpa</module>
