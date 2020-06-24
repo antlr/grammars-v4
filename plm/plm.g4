@@ -29,14 +29,17 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar plm;
-
 //token
+
 //   : delimiter
+
 //   | identifier
+
 //   | numericconstant
+
 //   | STRING
+
 //   ;
 
 delimiter
@@ -142,8 +145,7 @@ factoredelement
    ;
 
 variableelement
-   : (variablenamespecifier arrayspecifier? variabletype)
-   | variableattributes
+   : variablenamespecifier arrayspecifier? (variabletype | variableattributes?)
    ;
 
 variablenamespecifier
@@ -168,8 +170,8 @@ basespecifier
    ;
 
 variableattributes
-   : 'PUBLIC'? locator? initialization
-   | 'EXTERNAL'? constantattribute
+   : 'PUBLIC'? locator? initialization?
+   | 'EXTERNAL'? constantattribute?
    ;
 
 constantattribute
@@ -182,11 +184,11 @@ arrayspecifier
    ;
 
 explicitdimension
-   : numericconstant
+   : '(' numericconstant ')'
    ;
 
 implicitdimension
-   : '*'
+   : '('* ')'
    ;
 
 variabletype
@@ -244,7 +246,7 @@ factoredmember
    ;
 
 proceduredefinition
-   : procedurestatement declaration? unit* ending
+   : procedurestatement declaration* unit* ending
    ;
 
 procedurestatement
@@ -268,11 +270,11 @@ formalparameter
    ;
 
 procedureattributes
-   : ('EXTERNAL' | 'PUBLIC' | interrupt | 'REENTRANT') +
+   : ('EXTERNAL' | 'PUBLIC' | interrupt | 'REENTRANT')+
    ;
 
 locator
-   : 'AT' expression
+   : 'AT' '(' expression ')'
    ;
 
 interrupt
@@ -303,14 +305,14 @@ basicstatement
    | microprocessordependentstatement
    ;
 
-//scopingstatement
-//   : simpledostatement
-//   | docasestatement
-//   | dowhilestatement
-//   | iterativedostatement
-//   | endstatement
-//   | procedurestatement
-//   ;
+scopingstatement
+   : simpledostatement
+   | docasestatement
+   | dowhilestatement
+   | iterativedostatement
+   | endstatement
+   | procedurestatement
+   ;
 
 labeldefinition
    : identifier
@@ -374,7 +376,7 @@ haltstatement
    ;
 
 causeinterruptstatement
-   : 'CAUSE$INTERRUPT' numericconstant
+   : 'CAUSE$INTERRUPT' '(' numericconstant ')'
    ;
 
 simpledostatement
@@ -382,11 +384,11 @@ simpledostatement
    ;
 
 docasestatement
-   : 'DO CASE' expression
+   : 'DO' 'CASE' expression
    ;
 
 dowhilestatement
-   : 'DO WHILE' expression
+   : 'DO' 'WHILE' expression
    ;
 
 iterativedostatement
@@ -521,27 +523,29 @@ constantlist
    : constant (',' constant)*
    ;
 
-//operator
-//   : LOGICALOPERATOR
-//   | RELATIONALOPERATOR
-//   | arithmeticoperator
-//   ;
-
-//arithmeticoperator
-//   : ARITHMETICOPERASTOR
-//   ;
-
-expression
-   : (variablereference ':=')? logicalexpression
+operator
+   : LOGICALOPERATOR
+   | RELATIONALOPERATOR
+   | ARITHMETICOPERASTOR
    ;
 
+expression
+   : logicalexpression
+   | embeddedassignment
+   ;
+
+embeddedassignment
+   : variablereference ':=' logicalexpression
+   ;
 
 logicalexpression
-   : logicalfactor (oroperator logicalfactor)*
+   : logicalfactor
+   | logicalexpression oroperator logicalfactor
    ;
 
 logicalfactor
-   : logicalsecondary (andoperator logicalsecondary)*
+   : logicalsecondary
+   | logicalfactor andoperator logicalsecondary
    ;
 
 logicalsecondary
@@ -553,11 +557,13 @@ logicalprimary
    ;
 
 arithmeticexpression
-   : term (addingoperator term)*
+   : term
+   | arithmeticexpression addingoperator term
    ;
 
 term
-   : secondary (multiplyingoperator secondary)*
+   : secondary
+   | term multiplyingoperator secondary
    ;
 
 secondary
@@ -568,9 +574,10 @@ primary
    : constant
    | variablereference
    | locationreference
-
-     // Is this a good idea?
-     //   | expression
+   // Is this a good idea?
+   
+   //   | expression
+   
    ;
 
 oroperator
@@ -599,137 +606,211 @@ multiplyingoperator
    | 'MOD'
    ;
 
-
 IDENTIFIER
    : (LETTER | '_') (LETTER | DECIMALDIGIT | '$' | '_')*
    ;
-
 
 FLOATINGPOINTNUMBER
    : DIGITSTRING FRACTIONALPART? (EXPONENTPART)?
    ;
 
-
 EXPONENTPART
    : 'E' ('+' | '-')? DIGITSTRING
    ;
-
 
 FRACTIONALPART
    : '.' DIGITSTRING
    ;
 
-
 ARITHMETICOPERASTOR
-   : '+' | '-' | 'PLUS' | 'MINUS' | '*' | '/' | 'MOD'
+   : '+'
+   | '-'
+   | 'PLUS'
+   | 'MINUS'
+   | '*'
+   | '/'
+   | 'MOD'
    ;
-
 
 RELATIONALOPERATOR
-   : '<' | '>' | '<=' | '>=' | '<>' | '='
+   : '<'
+   | '>'
+   | '<='
+   | '>='
+   | '<>'
+   | '='
    ;
-
 
 LOGICALOPERATOR
-   : 'AND' | 'OR' | 'NOT' | 'XOR'
+   : 'AND'
+   | 'OR'
+   | 'NOT'
+   | 'XOR'
    ;
-
 
 BINARYDIGIT
-   : '0' | '1'
+   : '0'
+   | '1'
    ;
-
 
 BINARYNUMBER
-   : BINARYDIGIT (BINARYDIGIT | '$')* 'B' | 'Q'
+   : BINARYDIGIT (BINARYDIGIT | '$')* 'B'
+   | 'Q'
    ;
-
 
 DECIMALNUMBER
    : DECIMALDIGIT (DECIMALDIGIT | '$')* ('D')?
    ;
 
-
 HEXADECIMALNUMBER
    : DECIMALDIGIT (HEXADECIMALDIGIT | '$')* 'H'
    ;
-
 
 OCTALNUMBER
    : OCTALDIGIT (OCTALDIGIT | '$')* ('O' | 'Q')
    ;
 
-
 OCTALDIGIT
-   : BINARYDIGIT | '2' | '3' | '4' | '5' | '6' | '7'
+   : BINARYDIGIT
+   | '2'
+   | '3'
+   | '4'
+   | '5'
+   | '6'
+   | '7'
    ;
-
 
 DIGITSTRING
    : DECIMALDIGIT (DECIMALDIGIT | '$')*
    ;
 
-
 DECIMALDIGIT
-   : OCTALDIGIT | '8' | '9'
+   : OCTALDIGIT
+   | '8'
+   | '9'
    ;
-
 
 HEXADECIMALDIGIT
-   : DECIMALDIGIT | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+   : DECIMALDIGIT
+   | 'A'
+   | 'B'
+   | 'C'
+   | 'D'
+   | 'E'
+   | 'F'
    ;
-
 
 STRING
-   : '\'' STRINGBODYELEMENT + '\''
+   : '\'' STRINGBODYELEMENT+ '\''
    ;
-
 
 STRINGBODYELEMENT
-   : NONQUOTECHAR | '"'
+   : NONQUOTECHAR
+   | '"'
    ;
-
 
 CHARACTER
-   : APOSTROPHE | NONQUOTECHAR
+   : APOSTROPHE
+   | NONQUOTECHAR
    ;
-
 
 APOSTROPHE
    : '\''
    ;
 
-
 NONQUOTECHAR
-   : LETTER | DECIMALDIGIT | '$' | SPECIALCHARACTER
+   : LETTER
+   | DECIMALDIGIT
+   | '$'
+   | SPECIALCHARACTER
    ;
-
 
 LETTER
-   : LOWERCASELETTER | UPPERCASELETTER
+   : LOWERCASELETTER
+   | UPPERCASELETTER
    ;
-
 
 UPPERCASELETTER
-   : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
+   : 'A'
+   | 'B'
+   | 'C'
+   | 'D'
+   | 'E'
+   | 'F'
+   | 'G'
+   | 'H'
+   | 'I'
+   | 'J'
+   | 'K'
+   | 'L'
+   | 'M'
+   | 'N'
+   | 'O'
+   | 'P'
+   | 'Q'
+   | 'R'
+   | 'S'
+   | 'T'
+   | 'U'
+   | 'V'
+   | 'W'
+   | 'X'
+   | 'Y'
+   | 'Z'
    ;
-
 
 LOWERCASELETTER
-   : 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
+   : 'a'
+   | 'b'
+   | 'c'
+   | 'd'
+   | 'e'
+   | 'f'
+   | 'g'
+   | 'h'
+   | 'i'
+   | 'j'
+   | 'k'
+   | 'l'
+   | 'm'
+   | 'n'
+   | 'o'
+   | 'p'
+   | 'q'
+   | 'r'
+   | 's'
+   | 't'
+   | 'u'
+   | 'v'
+   | 'w'
+   | 'x'
+   | 'y'
+   | 'z'
    ;
-
 
 SPECIALCHARACTER
-   : '+' | '-' | '*' | '/' | '<' | '>' | '=' | ':' | ';' | '.' | ',' | '(' | ')' | '@' | '_'
+   : '+'
+   | '-'
+   | '*'
+   | '/'
+   | '<'
+   | '>'
+   | '='
+   | ':'
+   | ';'
+   | '.'
+   | ','
+   | '('
+   | ')'
+   | '@'
+   | '_'
    ;
-
 
 COMMENT
-   : '/*' CHARACTER* '*/' ->skip
+   : '/*' CHARACTER* '*/' -> skip
    ;
-
 
 WS
    : [ \t\r\n] -> skip
    ;
+
