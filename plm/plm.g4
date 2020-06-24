@@ -528,10 +528,11 @@ primary
    : constant
    | variablereference
    | locationreference
-   // Is this a good idea?
+   | subexpression
+   ;
 
-   //   | expression
-
+subexpression
+   : '(' expression ')'
    ;
 
 oroperator
@@ -761,7 +762,7 @@ SPECIALCHARACTER
    ;
 
 COMMENT
-   : '/*' CHARACTER* '*/' -> skip
+   : '/*' (CHARACTER | ' ')* '*/' -> skip
    ;
 
 WS
