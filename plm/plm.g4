@@ -210,7 +210,7 @@ proceduredefinition
    ;
 
 procedurestatement
-   : procedurename ':' 'PROCEDURE' formalparameterlist? proceduretype? procedureattributes?
+   : procedurename ':' 'PROCEDURE' formalparameterlist? proceduretype? procedureattributes? ';'
    ;
 
 procedurename
@@ -340,19 +340,19 @@ causeinterruptstatement
    ;
 
 simpledostatement
-   : 'DO'
+   : 'DO' ';'
    ;
 
 docasestatement
-   : 'DO' 'CASE' expression
+   : 'DO' 'CASE' expression ';'
    ;
 
 dowhilestatement
-   : 'DO' 'WHILE' expression
+   : 'DO' 'WHILE' expression ';'
    ;
 
 iterativedostatement
-   : 'DO' indexpart topart bypart?
+   : 'DO' indexpart topart bypart? ';'
    ;
 
 indexpart
@@ -384,7 +384,7 @@ stepexpression
    ;
 
 endstatement
-   : 'END' identifier?
+   : 'END' identifier? ';'
    ;
 
 conditionalclause
@@ -762,7 +762,7 @@ SPECIALCHARACTER
    ;
 
 COMMENT
-   : '/*' (CHARACTER | ' ')* '*/' -> skip
+   : '/' '*' (CHARACTER | ' ')* '*' '/' -> skip
    ;
 
 WS
