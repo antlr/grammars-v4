@@ -558,7 +558,6 @@ BASICTYPE
    | 'REAL'
    | 'SELECTOR'
    | 'POINTER'
-   | 'OFFSET'
    ;
 
 IDENTIFIER
