@@ -152,24 +152,8 @@ implicitdimension
    ;
 
 variabletype
-   : basictype
+   : BASICTYPE
    | structuretype
-   ;
-
-basictype
-   : 'Address'
-   | 'BYTE'
-   | 'HWORD'
-   | 'DWORD'
-   | 'QWORD'
-   | 'CHARINT'
-   | 'OFFSET'
-   | 'SHORTINT'
-   | 'INTEGER'
-   | 'REAL'
-   | 'SELECTOR'
-   | 'POINTER'
-   | 'OFFSET'
    ;
 
 labelelement
@@ -218,7 +202,7 @@ procedurename
    ;
 
 proceduretype
-   : basictype
+   : BASICTYPE
    ;
 
 formalparameterlist
@@ -559,6 +543,22 @@ multiplyingoperator
    : '*'
    | '/'
    | 'MOD'
+   ;
+
+BASICTYPE
+   : 'Address'
+   | 'BYTE'
+   | 'HWORD'
+   | 'DWORD'
+   | 'QWORD'
+   | 'CHARINT'
+   | 'OFFSET'
+   | 'SHORTINT'
+   | 'INTEGER'
+   | 'REAL'
+   | 'SELECTOR'
+   | 'POINTER'
+   | 'OFFSET'
    ;
 
 IDENTIFIER
