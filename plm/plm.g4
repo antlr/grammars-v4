@@ -239,6 +239,7 @@ unit
    | doblock
    | basicstatement
    | labeldefinition unit
+   | scopingstatement //???
    ;
 
 basicstatement
