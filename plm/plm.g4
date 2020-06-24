@@ -762,7 +762,7 @@ SPECIALCHARACTER
    ;
 
 COMMENT
-   : '/' '*' (CHARACTER | ' ')* '*' '/' -> skip
+   : '/' '*' .*? '*' '/' -> skip
    ;
 
 WS
