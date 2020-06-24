@@ -30,46 +30,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar plm;
-//token
-
-//   : delimiter
-
-//   | identifier
-
-//   | numericconstant
-
-//   | STRING
-
-//   ;
-
-delimiter
-   : simpledelimiter
-   | compounddelimiter
-   ;
-
-simpledelimiter
-   : '+'
-   | '-'
-   | '*'
-   | '/'
-   | '<'
-   | '>'
-   | '='
-   | ':'
-   | ';'
-   | '.'
-   | ','
-   | '('
-   | ')'
-   | '@'
-   ;
-
-compounddelimiter
-   : '<>'
-   | '<='
-   | '>='
-   | ':='
-   ;
 
 identifier
    : IDENTIFIER
@@ -523,12 +483,6 @@ constantlist
    : constant (',' constant)*
    ;
 
-operator
-   : LOGICALOPERATOR
-   | RELATIONALOPERATOR
-   | ARITHMETICOPERASTOR
-   ;
-
 expression
    : logicalexpression
    | embeddedassignment
@@ -575,9 +529,9 @@ primary
    | variablereference
    | locationreference
    // Is this a good idea?
-   
+
    //   | expression
-   
+
    ;
 
 oroperator
