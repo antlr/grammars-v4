@@ -49,7 +49,7 @@ declaration
    ;
 
 declarestatement
-   : 'DECLARE'  declareelementlist  ';'
+   : 'DECLARE' declareelementlist ';'
    ;
 
 declareelementlist
@@ -133,15 +133,15 @@ literalelement
    ;
 
 factoredvariableelement
-   : variablenamespecifier (',' variablenamespecifier)* explicitdimension? variabletype variableattributes?
+   : '(' variablenamespecifier (',' variablenamespecifier)* ')' explicitdimension? variabletype variableattributes?
    ;
 
 factoredlabelelement
-   : (identifier (',' identifier)*) 'LABEL' ('PUBLIC' | 'EXTERNAL')?
+   : '(' identifier (',' identifier)* ')' 'LABEL' ('PUBLIC' | 'EXTERNAL')?
    ;
 
 structuretype
-   : 'STRUCTURE' (memberelement (',' memberelement)*)
+   : 'STRUCTURE' '(' memberelement (',' memberelement)* ')'
    ;
 
 memberelement
@@ -154,7 +154,7 @@ unfactoredmember
    ;
 
 factoredmember
-   : membername (',' membername)* explicitdimension? variabletype
+   : '(' membername ('(' ',' membername ')')* ')' explicitdimension? variabletype
    ;
 
 proceduredefinition
@@ -208,7 +208,7 @@ unit
    | basicstatement
    | labeldefinition unit
    | scopingstatement //???
-
+   
    ;
 
 basicstatement
