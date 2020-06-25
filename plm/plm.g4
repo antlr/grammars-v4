@@ -528,7 +528,7 @@ multiplyingoperator
    ;
 
 BASICTYPE
-   : 'Address'
+   : 'ADDRESS'
    | 'BYTE'
    | 'HWORD'
    | 'DWORD'
