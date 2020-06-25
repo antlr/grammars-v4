@@ -1,10 +1,10 @@
 SORT$PROGRAM:
-DO; / * Beginning of main program module* /
+DO; /* Beginning of main program module*/
 COPY: PROCEDURE (SRC$PTR, DST$PTR, COUNT) EXTERNAL;
-/ * Usage declaration of COpy procedure, which is
-defined in module COPY$MODULE* /
+/* Usage declaration of COpy procedure, which is
+defined in module COPY$MODULE*/
 DECLARE (SRC$PTR, DST$PTR) ADDRESS;
-DECLARE COU NT BYTE;
+DECLARE COUNT BYTE;
 END COPY;
 DECLARE RECORD (128) STRUCTURE (
 KEY BYTE,
@@ -13,7 +13,7 @@ DECLARE CURRENT STRUCTURE (
 KEY BYTE,
 INFO ADDRESS);
 DECLARE 0, I) BYTE;
-/ * Data is read in to initialize records. * /
+/* Data is read in to initialize records. */
 SORT: DO J = 1 TO 127;
 CALL COPY (.RECORD(J), .CURRENT, 3);
 1= J;
@@ -23,5 +23,5 @@ CALL. COPY (.RECORD(I-1), .RECORD(I), 3);
 END FIND;
 CALL COPY (.CURRENT, .RECORD(I), 3);
 END SORT;
-/ * Data is written out from records. * /
-END SORT$PROGRAM; /*End of main program module* / 
+/* Data is written out from records. */
+END SORT$PROGRAM; /*End of main program module*/ 
