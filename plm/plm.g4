@@ -241,7 +241,7 @@ leftpart
    ;
 
 callstatement
-   : 'CALL' simplevariable parameterlist?
+   : 'CALL' simplevariable parameterlist? ';'
    ;
 
 parameterlist
@@ -250,7 +250,7 @@ parameterlist
 
 simplevariable
    : identifier
-   | identifier '.' identifier
+   | (identifier '.' identifier)
    ;
 
 gotostatement
@@ -263,11 +263,11 @@ returnstatement
    ;
 
 typedreturn
-   : 'RETURN' expression
+   : 'RETURN' expression ';'
    ;
 
 untypedreturn
-   : 'RETURN'
+   : 'RETURN' ';'
    ;
 
 microprocessordependentstatement
@@ -278,19 +278,19 @@ microprocessordependentstatement
    ;
 
 disablestatement
-   : 'DISABLE'
+   : 'DISABLE' ';'
    ;
 
 enablestatement
-   : 'ENABLE'
+   : 'ENABLE' ';'
    ;
 
 haltstatement
-   : 'HALT'
+   : 'HALT' ';'
    ;
 
 causeinterruptstatement
-   : 'CAUSE$INTERRUPT' '(' numericconstant ')'
+   : 'CAUSE$INTERRUPT' '(' numericconstant ')' ';'
    ;
 
 simpledostatement
