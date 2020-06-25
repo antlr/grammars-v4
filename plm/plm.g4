@@ -35,34 +35,6 @@ identifier
    : IDENTIFIER
    ;
 
-numericconstant
-   : binarynumber
-   | octalnumber
-   | decimalnumber
-   | hexadecimalnumber
-   | floatingpointnumber
-   ;
-
-binarynumber
-   : BINARYNUMBER
-   ;
-
-octalnumber
-   : OCTALNUMBER
-   ;
-
-decimalnumber
-   : DECIMALNUMBER
-   ;
-
-hexadecimalnumber
-   : HEXADECIMALNUMBER
-   ;
-
-floatingpointnumber
-   : FLOATINGPOINTNUMBER
-   ;
-
 compilation
    : module
    ;
@@ -519,6 +491,14 @@ primary
 
 subexpression
    : '(' expression ')'
+   ;
+
+numericconstant
+   : BINARYNUMBER
+   | OCTALNUMBER
+   | DECIMALNUMBER
+   | HEXADECIMALNUMBER
+   | FLOATINGPOINTNUMBER
    ;
 
 oroperator
