@@ -208,7 +208,7 @@ unit
    | basicstatement
    | labeldefinition unit
    | scopingstatement //???
-   
+
    ;
 
 basicstatement
@@ -229,7 +229,7 @@ scopingstatement
    ;
 
 labeldefinition
-   : identifier
+   : identifier ':'
    ;
 
 assignmentstatement
