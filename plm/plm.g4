@@ -49,7 +49,7 @@ declaration
    ;
 
 declarestatement
-   : 'DECLARE' declareelementlist
+   : 'DECLARE'  declareelementlist  ';'
    ;
 
 declareelementlist
@@ -208,7 +208,7 @@ unit
    | basicstatement
    | labeldefinition unit
    | scopingstatement //???
-   
+
    ;
 
 basicstatement
