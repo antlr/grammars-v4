@@ -174,7 +174,7 @@ proceduretype
    ;
 
 formalparameterlist
-   : formalparameter (',' formalparameter)*
+   : '(' formalparameter (',' formalparameter)* ')'
    ;
 
 formalparameter
