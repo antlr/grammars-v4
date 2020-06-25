@@ -31,10 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar plm;
 
-identifier
-   : IDENTIFIER
-   ;
-
 compilation
    : module
    ;
@@ -491,6 +487,10 @@ primary
 
 subexpression
    : '(' expression ')'
+   ;
+
+identifier
+   : IDENTIFIER
    ;
 
 numericconstant
