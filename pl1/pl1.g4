@@ -45,7 +45,7 @@ statements	:	{ "(" { condition-prefix }","+ ")" ":" }* { label-prefix ":" }*
 
 
 
-percent-statements	:	"%" { label-prefix ":" }* statement_body ";";
+percent_statements	:	"%" { label_prefix ":" }* statement_body ";";
 
 
 
@@ -62,7 +62,7 @@ attribute	:	"KEYED";
 
 attribute	:	"EXCLUSIVE";
 
-attribute	:	"ENVIRONMENT" "(" characteristic-list ")";
+attribute	:	"ENVIRONMENT" "(" characteristic_list ")";
 
 attribute	:	"BACKWARDS";
 
@@ -76,8 +76,8 @@ attribute	:	( "RECORD" | "STREAM" );
 
 attribute	:	"FILE";
 
-attribute	:	generic-name "GENERIC"
-"(" { entry-reference "WHEN" "(" { generic-descriptor }","* ")" }","+ ")";
+attribute	:	generic_name "GENERIC"
+"(" { entry_reference "WHEN" "(" { generic_descriptor }","* ")" }","+ ")";
 
 attribute	:	"BUILTIN";
 
@@ -85,9 +85,9 @@ attribute	:	[ ( "IRREDUCIBLE" | "REDUCIBLE" ) ];
 
 attribute	:	"RETURNS" "(" { attribute }+ ")";
 
-attribute	:	"OPTIONS" "(" characteristic-list ")";
+attribute	:	"OPTIONS" "(" characteristic_list ")";
 
-attribute	:	"ENTRY" [ "(" [ parameter-descriptor-list ] ")" ];
+attribute	:	"ENTRY" [ "(" [ parameter_descriptor_list ] ")" ];
 
 attribute	:	"INITIAL" "(" { item }","+ ")";
 
@@ -97,13 +97,13 @@ attribute	:	"POSITION" "(" expression ")";
 
 attribute	:	"DEFINED" ( reference | "(" reference ")" );
 
-attribute	:	"OFFSET" [ "(" area-variable ")" ];
+attribute	:	"OFFSET" [ "(" area_variable ")" ];
 
 attribute	:	"AREA" [ ( "(" "*" ")" | "(" expression [ "REFER" "(" variable ")" ] ")" ) ];
 
 attribute	:	"POINTER";
 
-attribute	:	"BASED" [ "(" locator-reference ")" ];
+attribute	:	"BASED" [ "(" locator_reference ")" ];
 
 attribute	:	"CONTROLLED";
 
@@ -113,7 +113,7 @@ attribute	:	"STATIC";
 
 attribute	:	( "INTERNAL" | "EXTERNAL" );
 
-attribute	:	"LIKE" structure-variable;
+attribute	:	"LIKE" structure_variable;
 
 attribute	:	"(" { bound }","+ ")";
 
@@ -121,13 +121,13 @@ attribute	:	( "ALIGNED" | "UNALIGNED" );
 
 attribute	:	"VARIABLE";
 
-attribute	:	"LABEL" [ "(" { label-constant }","+ ")" ];
+attribute	:	"LABEL" [ "(" { label_constant }","+ ")" ];
 
 attribute	:	"EVENT";
 
 attribute	:	( "FIXED" | "FLOAT" );
 
-attribute	:	"(" number-of-digits [ "," scaling-factor ] ")";
+attribute	:	"(" number_of_digits [ "," scaling_factor ] ")";
 
 attribute	:	( "REAL" | "COMPLEX" );
 
@@ -139,7 +139,7 @@ attribute	:	"GRAPHIC" [ "(" length [ "REFER" "(" variable ")" ] ")" ];
 
 attribute	:	"VARYING";
 
-attribute	:	"PICTURE" "'" picture-specification "'";
+attribute	:	"PICTURE" "'" picture_specification "'";
 
 
 
@@ -152,7 +152,7 @@ constant	:	"'" { ( "0" | "1" ) }* "'B";
 
 constant	:	"'" { hex_digit }* ( "'BX" | "'B4" );
 
-constant	:	"'" { graphic-symbol }* "'G";
+constant	:	"'" { graphic_symbol }* "'G";
 
 constant	:	"'" { hex_digit hex_digit hex_digit hex_digit }* "'GX";
 
@@ -161,81 +161,81 @@ constant	:	"'" { ( character | "'" "'" | "<" { graphic_symbol }+ ">" ) }* "'M";
 
 
 
-attribute-bound	:	( [ lower-bound ":" ] upper-bound | "*" );
+attribute_bound	:	( [ lower_bound ":" ] upper_bound | "*" );
 
 
 
 
-attribute-upper-bound	:	expression [ "REFER" "(" variable ")" ];
+attribute_upper_bound	:	expression [ "REFER" "(" variable ")" ];
 
 
 
 
-attribute-lower-bound	:	expression [ "REFER" "(" variable ")" ];
+attribute_lower_bound	:	expression [ "REFER" "(" variable ")" ];
 
 
 
 
-expression	:	unary-expression { infix-operator unary-expression }*;
+expression	:	unary_expression { infix_operator unary_expression }*;
 
 
 
 
-expression-unary-expression	:	{ prefix-operator }* elementary-expression;
+expression_unary_expression	:	{ prefix_operator }* elementary_expression;
 
 
 
 
-expression-elementary-expression	:	( "(" expression ")" | reference | constant | isub6 );
+expression_elementary_expression	:	( "(" expression ")" | reference | constant | isub6 );
 
 
 
 
-expression-reference	:	[ locator-qualifier ] basic-reference
-[ "(" subscript-list ")" ] [ "(" [ argument-list ] ")" ];
+expression_reference	:	[ locator_qualifier ] basic_reference
+[ "(" subscript_list ")" ] [ "(" [ argument_list ] ")" ];
 
 
 
 
-expression-locator-qualifier	:	reference "->";
+expression_locator_qualifier	:	reference "->";
 
 
 
 
-expression-subscript-list	:	{ ( expression | "*" ) }","+;
+expression_subscript_list	:	{ ( expression | "*" ) }","+;
 
 
 
 
-expression-argument-list	:	{ expression }","+;
+expression_argument_list	:	{ expression }","+;
 
 
 
 
-expression-basic-reference	:	[ structure-qualification ] name;
+expression_basic_reference	:	[ structure_qualification ] name;
 
 
 
 
-expression-structure-qualification	:	basic-reference [ "(" subscript-list ")" ];
+expression_structure_qualification	:	basic_reference [ "(" subscript_list ")" ];
 
 
 
 
-statement	:	"FETCH" { entry-constant }","+ ";";
+statement	:	"FETCH" { entry_constant }","+ ";";
 
 statement	:	"%" ";";
 
 statement	:	"%" { label ":" }* "NOTE" "(" message [ "," code ] ")" ";";
 
 statement	:	"%" { label ":" }* "IF" preprocessor_expression
-"%" "THEN" preprocessor-unit1 [ "%" "ELSE" preprocessor-unit2 ];
+"%" "THEN" preprocessor_unit1 [ "%" "ELSE" preprocessor_unit2 ];
 
 statement	:	"%" { label ":" }* "GO_TO" label ";";
 
 statement	:	"%" { label ":" }* "END" [ label ] ";";
 
-statement	:	"%" { label ":" }* "DO" preprocessor-do-specification ";";
+statement	:	"%" { label ":" }* "DO" preprocessor_do_specification ";";
 statement	:	"%" { label ":" }* "DO" ";";
 
 statement	:	"%" { label ":" }* "DECLARE" { identifier ( "FIXED" | "CHARACTER" | "ENTRY" | "BUILTIN" ) }","+ ";";
@@ -243,11 +243,11 @@ statement	:	"%" { label ":" }* "DECLARE" { identifier ( "FIXED" | "CHARACTER" | 
 statement	:	"%" { label ":" }* "DEACTIVATE" { identifier }","+ ";";
 
 statement	:	"%" { label ":" }*
-preprocessor-variable "=" preprocessor_expression ";";
+preprocessor_variable "=" preprocessor_expression ";";
 
 statement	:	"%" { label ":" }* "ACTIVATE" { identifier [ ( "RESCAN" | "NORESCAN" ) ] }","+ ";";
 
-statement	:	{ label ":" }* "RETURN" "(" preprocessor-expression ")" ";";
+statement	:	{ label ":" }* "RETURN" "(" preprocessor_expression ")" ";";
 
 statement	:	"%" { entry_name ":" }+ "PROCEDURE" [ "(" { parameter }","+ ")" ]
 [ "STATEMENT" ] "RETURNS" "(" ( "CHARACTER" | "FIXED" ) ")" ";";
@@ -262,33 +262,33 @@ statement	:	"%" "PAGE" ";";
 
 statement	:	"%" "NOPRINT" ";";
 
-statement	:	"%" "INCLUDE" { ( dataset "(" member-name ")" | member-name ) }","+ ";"
+statement	:	"%" "INCLUDE" { ( dataset "(" member_name ")" | member_name ) }","+ ";"
 ;
 statement	:	"SIGNAL" condition ";";
 
 statement	:	"REVERT" condition ";";
 
-statement	:	"ON" condition [ "SNAP" ] ( "SYSTEM" ";" | on-unit );
+statement	:	"ON" condition [ "SNAP" ] ( "SYSTEM" ";" | on_unit );
 
-statement	:	{ label ":" }+ "FORMAT" "(" format-list ")" ";";
+statement	:	{ label ":" }+ "FORMAT" "(" format_list ")" ";";
 
-statement	:	"PUT-STRING" "(" character-reference ")" data-specification ";";
+statement	:	"PUT-STRING" "(" character_reference ")" data_specification ";";
 
 statement	:	"PUT" [ "FILE" "(" file_reference ")" ] [ data_specification ]
 [ ( "PAGE" [ "LINE" "(" expression ")" ] | "SKIP" [ "(" expression ")" ] | "LINE" "(" expression ")" ) ] ";";
 
-statement	:	"GET-STRING" "(" expression ")" data-specification ";";
+statement	:	"GET-STRING" "(" expression ")" data_specification ";";
 
-statement	:	"GET" [ "FILE" "(" file-reference ")" ] [ data-specification ]
-[ "COPY" "(" file-reference ")" ]
+statement	:	"GET" [ "FILE" "(" file_reference ")" ] [ data_specification ]
+[ "COPY" "(" file_reference ")" ]
 [ "SKIP" [ "(" expression ")" ] ] ";";
 
-statement	:	"UNLOCK" "FILE" "(" file-reference ")" "KEY" "(" expression ")" ";";
+statement	:	"UNLOCK" "FILE" "(" file_reference ")" "KEY" "(" expression ")" ";";
 
-statement	:	"DELETE" "FILE" "(" file-reference ")" [ "KEY" "(" expression ")" ]
+statement	:	"DELETE" "FILE" "(" file_reference ")" [ "KEY" "(" expression ")" ]
 [ "EVENT" "(" event_reference ")" ] ";";
 
-statement	:	"LOCATE" based-variable
+statement	:	"LOCATE" based_variable
 ( "FILE" "(" file_reference ")" | "SET" "(" pointer_reference | "KEYFROM" "(" expression ")" ) ";";
 
 statement	:	"REWRITE_FILE" "(" file_reference ")" [ "FROM" "(" reference ")" ]
@@ -304,30 +304,30 @@ statement	:	"READ" "FILE" "(" file_reference ")"
 statement	:	"CLOSE"
 { "FILE" "(" file_reference ")" [ "ENVIRONMENT" "(" ( "LEAVE" | "REREAD" ) ")" ] }","+ ";";
 
-statement	:	"OPEN" { options-group }","+ ";";
+statement	:	"OPEN" { options_group }","+ ";";
 
 statement	:	"RETURN" [ "(" expression ")" ] ";";
 
-statement	:	"CALL" ( entry-reference | generic-name | built-in-name ) [ "(" { argument }","* ")" ]
-[ "TASK" [ "(" task_reference ")" ] ] [ "EVENT" "(" event-reference ")" ]
+statement	:	"CALL" ( entry_reference | generic_name | built_in_name ) [ "(" { argument }","* ")" ]
+[ "TASK" [ "(" task_reference ")" ] ] [ "EVENT" "(" event_reference ")" ]
 [ "PRIORITY" "(" expression ")" ] ";";
 
-statement	:	( "COBOL" | "FORTRAN" ) [ "NOMAP" [ "(" parameter-list ")" ] ]
+statement	:	( "COBOL" | "FORTRAN" ) [ "NOMAP" [ "(" parameter_list ")" ] ]
 [ "NOMAPIN" [ "(" parameter_list ")" ] ]
 [ "NOMAPOUT" [ "(" parameter_list ")" ] ];
 
 statement	:	( "MAIN" [ "NOEXECOPS" ] [ "REENTRANT" ] [ "TASK" ] | "COBOL" [ additional_options ] | "FORTRAN" [ additional_options ] );
 
-statement	:	{ entry-constant ":" }+ "ENTRY" [ "(" { parameter }","+ ")" ]
+statement	:	{ entry_constant ":" }+ "ENTRY" [ "(" { parameter }","+ ")" ]
 [ "RETURNS" "(" { attribute }+ ")" ]
-[ "OPTIONS" "(" characteristic-list ")" ] [ ( "REDUCIBLE" | "IRREDUCIBLE" ) ] ";";
+[ "OPTIONS" "(" characteristic_list ")" ] [ ( "REDUCIBLE" | "IRREDUCIBLE" ) ] ";";
 
-statement	:	{ entry-constant ":" }+ "PROCEDURE" [ "(" { parameter }","+ ")" ]
+statement	:	{ entry_constant ":" }+ "PROCEDURE" [ "(" { parameter }","+ ")" ]
 [ "RETURNS" "(" { attribute }+ ")" ]
-[ "OPTIONS" "(" characteristic-list ")" ] [ ( "REDUCIBLE" | "IRREDUCIBLE" ) ]
+[ "OPTIONS" "(" characteristic_list ")" ] [ ( "REDUCIBLE" | "IRREDUCIBLE" ) ]
 [ "RECURSIVE" ] [ ( "ORDER" | "REORDER" ) ] [ ( "CHARGRAPHIC" | "NOCHARGRAPHIC" ) ] ";";
 
-statement	:	"WAIT" "(" { event-reference }","+ ")" [ "(" expression ")" ] ";";
+statement	:	"WAIT" "(" { event_reference }","+ ")" [ "(" expression ")" ] ";";
 
 statement	:	"STOP" ";";
 
@@ -336,13 +336,13 @@ statement	:	"SELECT" [ "(" exp1 ")" ] ";"
 
 statement	:	";";
 
-statement	:	"LEAVE" [ label-constant ] ";";
+statement	:	"LEAVE" [ label_constant ] ";";
 
 statement	:	"IF" expression "THEN" unit1 [ "ELSE" unit2 ];
 
 statement	:	( "GO" "TO" | "GOTO" ) label_reference ";";
 
-statement	:	"END" [ statement-label ] ";";
+statement	:	"END" [ statement_label ] ";";
 
 statement	:	"DO" reference "=" { specification }","+ ";";
 
@@ -363,11 +363,11 @@ statement	:	"FREE" { option }","+ ";";
 
 statement	:	"ALLOCATE" { based_variable [ reference ] }","+ ";";
 
-statement	:	"FREE" { controlled-variable }","+ ";";
+statement	:	"FREE" { controlled_variable }","+ ";";
 
-statement	:	"ALLOCATE" { [ level ] controlled-variable [ attribute ] }","+;
+statement	:	"ALLOCATE" { [ level ] controlled_variable [ attribute ] }","+;
 
-statement	:	"RELEASE" { entry-constant }+ ";";
+statement	:	"RELEASE" { entry_constant }+ ";";
 
 statement	:	"BEGIN" [ ( "ORDER" | "REORDER" ) ] [ ( "CHARGRAPHIC" | "NOCHARGRAPHIC" ) ] ";";
 
@@ -378,50 +378,50 @@ statement	:	"DEFAULT" { ( simple_specification | factored_specification ) }","+ 
 
 
 
-statement-simple-specification	:	( "RANGE" "(" { ( { letter }+ | letter ":" letter ) }+ ")" [ attribute_specification ] | "RANGE" "(" "*" ")" [ attribute_specification ] | "DESCRIPTORS" [ attribute_specifications ] );
+statement_simple_specification	:	( "RANGE" "(" { ( { letter }+ | letter ":" letter ) }+ ")" [ attribute_specification ] | "RANGE" "(" "*" ")" [ attribute_specification ] | "DESCRIPTORS" [ attribute_specifications ] );
 
 
 
 
-statement-factored-specification	:	"(" { ( simple_specification | factored_specification ) }","+ ")" [ attribute_specification ];
+statement_factored_specification	:	"(" { ( simple_specification | factored_specification ) }","+ ")" [ attribute_specification ];
 
 
 
 
-statement-attribute-specification	:	( { attribute }+ [ "VALUE" "(" { value_specification }","+ ")" ] | "VALUE" "(" { value_specification }","+ ")" );
+statement_attribute_specification	:	( { attribute }+ [ "VALUE" "(" { value_specification }","+ ")" ] | "VALUE" "(" { value_specification }","+ ")" );
 
 
 
 
-statement-value-specification	:	( "AREA" "(" size ")" | "BIT" "(" length ")" | "CHARACTER" "(" length ")" | "GRAPHIC" "(" length ")" | additional_options );
+statement_value_specification	:	( "AREA" "(" size ")" | "BIT" "(" length ")" | "CHARACTER" "(" length ")" | "GRAPHIC" "(" length ")" | additional_options );
 
 
 
 
-statement-additional-options	:	[ ( "REAL" | "COMPLEX" ) ] [ ( "FIXED" | "FLOAT" ) ] [ ( "BINARY" | "DECIMAL" ) ]
+statement_additional_options	:	[ ( "REAL" | "COMPLEX" ) ] [ ( "FIXED" | "FLOAT" ) ] [ ( "BINARY" | "DECIMAL" ) ]
 [ "(" precision [ "," scaling_factor ] ")" ];
 
-statement-additional-options	:	[ "NOMAP" [ "(" parameter_list ")" ] ]
+statement_additional_options	:	[ "NOMAP" [ "(" parameter_list ")" ] ]
 [ "NOMAPIN" [ "(" parameter_list ")" ] ]
 [ "NOMAPOUT" [ "(" parameter_list ")" ] ];
 
 
 
-statement-attribute	:	( dimension | "CHARACTER" "(" length | "BIT" "(" length ")" | "GRAPHIC" "(" length ")" | "AREA" "(" size ")" | "INITIAL" "(" { "ITEM" }","+ ")" | initial_call_entry_reference [ "(" { argument }","+ ")" ] );
+statement_attribute	:	( dimension | "CHARACTER" "(" length | "BIT" "(" length ")" | "GRAPHIC" "(" length ")" | "AREA" "(" size ")" | "INITIAL" "(" { "ITEM" }","+ ")" | initial_call_entry_reference [ "(" { argument }","+ ")" ] );
 
 
 
-locator-qualification	:	locator-reference "->" { based-locator-reference "->" }*
-based-reference;
+locator_qualification	:	locator_reference "->" { based_locator_reference "->" }*
+based_reference;
 
 
 
-statement-reference	:	[ "IN" "(" area_reference ")" ] [ "SET" "(" locator_reference ")" ];
+statement_reference	:	[ "IN" "(" area_reference ")" ] [ "SET" "(" locator_reference ")" ];
 
 
 
-statement-option	:	[ locator-qualifier ">" ] based-variable
-[ "IN" "(" area-reference ")" ];
+statement_option	:	[ locator_qualifier ">" ] based_variable
+[ "IN" "(" area_reference ")" ];
 
 
 
@@ -429,303 +429,303 @@ option	:	expression "REFER" "(" variable ")";
 
 option	:	"PRIORITY" "(" expression ")";
 
-option	:	"EVENT" "(" event-reference ")";
+option	:	"EVENT" "(" event_reference ")";
 
-option	:	"TASK" [ "(" task-reference ")" ];
-
-
-
-attribute-item	:	( "*" | initial_constant | reference | "(" expression ")" | iteration_specification );
+option	:	"TASK" [ "(" task_reference ")" ];
 
 
 
-attribute-iteration_specification	:	"(" iteration_factor ")" iteration_item;
+attribute_item	:	( "*" | initial_constant | reference | "(" expression ")" | iteration_specification );
 
 
 
-attribute-iteration_item	:	( "*" | initial_constant | reference | "(" { item }","+ ")" );
+attribute_iteration_specification	:	"(" iteration_factor ")" iteration_item;
 
 
 
-attribute-initial-constant	:	( [ ( "+" | "-" ) ] arithmetic_constant | bit_constant | character_constant | graphic_constant | entry_constant | file_constant | label_constant | [ ( "+" | "-" ) ] real_constant ( "+" | "-" ) imaginary_constant );
-
-attribute-initial-constant	:	"INITIAL" "CALL" entry-reference [ "(" { argument }","+ ")" ];
+attribute_iteration_item	:	( "*" | initial_constant | reference | "(" { item }","+ ")" );
 
 
 
-statement-specification	:	exp1 [ ( "TO" exp2 [ "BY" exp3 ] | "BY" exp3 [ "TO" exp2 ] | "REPEAT" exp6 ) ]
+attribute_initial_constant	:	( [ ( "+" | "-" ) ] arithmetic_constant | bit_constant | character_constant | graphic_constant | entry_constant | file_constant | label_constant | [ ( "+" | "-" ) ] real_constant ( "+" | "-" ) imaginary_constant );
+
+attribute_initial_constant	:	"INITIAL" "CALL" entry_reference [ "(" { argument }","+ ")" ];
+
+
+
+statement_specification	:	exp1 [ ( "TO" exp2 [ "BY" exp3 ] | "BY" exp3 [ "TO" exp2 ] | "REPEAT" exp6 ) ]
 [ ( "WHILE" "(" exp4 ")" [ "(" "UNTIL" "(" exp5 ")" ] | "UNTIL" "(" exp5 ")" [ "(" "WHILE" "(" exp4 ")" ] ) ];
 
 
 
-entry-data	:	"ENTRY" [ "(" parameter-descriptor-list ")" ]
-[ "RETURNS" "(" attribute-list ")" ]
-[ "OPTIONS" "(" characteristic-list ")" ] [ "EXTERNAL" ]
+entry_data	:	"ENTRY" [ "(" parameter_descriptor_list ")" ]
+[ "RETURNS" "(" attribute_list ")" ]
+[ "OPTIONS" "(" characteristic_list ")" ] [ "EXTERNAL" ]
 [ ( "IRREDUCIBLE" | "REDUCIBLE" ) ];
 
-entry-data	:	"ENTRY" [ "(" parameter_descriptor_list ")" ] [ "VARIABLE" ]
+entry_data	:	"ENTRY" [ "(" parameter_descriptor_list ")" ] [ "VARIABLE" ]
 [ "RETURNS" "(" attribute_list ")" ]
 [ "OPTIONS" "(" characteristic_list ")" ] [ ( "IRREDUCIBLE" | "REDUCIBLE" ) ]
-[ scope-attribute ] [ storage-attribute ]
-[ alignment-attribute ] [ parameter ]
+[ scope_attribute ] [ storage_attribute ]
+[ alignment_attribute ] [ parameter ]
 [ "DEFINED" ] [ "INITIAL" ];
 
 
 
 
-attribute-parameter-descriptor-list	:	{ parameter-descriptor }","+;
+attribute_parameter_descriptor_list	:	{ parameter_descriptor }","+;
 
 
 
 
-attribute-parameter-descriptor	:	[ ( { attribute }+ | "*" | structure-parameter-descriptor ) ];
+attribute_parameter_descriptor	:	[ ( { attribute }+ | "*" | structure_parameter_descriptor ) ];
 
 
 
 
-attribute-structure-parameter-descriptor	:	"1" { attribute }* "," { level { attribute }* }","+;
+attribute_structure_parameter_descriptor	:	"1" { attribute }* "," { level { attribute }* }","+;
 
 
 
 
-attribute-characteristic-list	:	( "COBOL" | "FORTRAN" | "ASSEMBLER" ) [ additional-options ];
+attribute_characteristic_list	:	( "COBOL" | "FORTRAN" | "ASSEMBLER" ) [ additional_options ];
 
 
 
 
-attribute-additional-options	:	[ "NOMAP" [ "(" { argi }","+ ")" ] ] [ "NOMAPIN" [ "(" { argi }+ ")" ] ]
+attribute_additional_options	:	[ "NOMAP" [ "(" { argi }","+ ")" ] ] [ "NOMAPIN" [ "(" { argi }+ ")" ] ]
 [ "NOMAPOUT" [ "(" { argi }","+ ")" ] ] [ "INTER" ] [ "RETCODE" ];
 
 
 
-built-in-function	:	name [ "(" { argument }","* ")" ];
+built_in_function	:	name [ "(" { argument }","* ")" ];
 
-built-in-function	:	"PARMSET" "(" x ")";
+built_in_function	:	"PARMSET" "(" x ")";
 
-built-in-function	:	"COUNTER";
+built_in_function	:	"COUNTER";
 
-built-in-function	:	"COMPILETIME";
+built_in_function	:	"COMPILETIME";
 
-built-in-function	:	"VERIFY" "(" x "," y ")";
+built_in_function	:	"VERIFY" "(" x "," y ")";
 
-built-in-function	:	"UNSPEC" "(" x ")";
+built_in_function	:	"UNSPEC" "(" x ")";
 
-built-in-function	:	"TRUNC" "(" x ")";
+built_in_function	:	"TRUNC" "(" x ")";
 
-built-in-function	:	"TRANSLATE" "(" x "," y [ "," z ] ")";
+built_in_function	:	"TRANSLATE" "(" x "," y [ "," z ] ")";
 
-built-in-function	:	"TIME" [ "(" ")" ];
+built_in_function	:	"TIME" [ "(" ")" ];
 
-built-in-function	:	"TANH" "(" x ")";
+built_in_function	:	"TANH" "(" x ")";
 
-built-in-function	:	"TAND" "(" x ")";
+built_in_function	:	"TAND" "(" x ")";
 
-built-in-function	:	"TAN" "(" x ")";
+built_in_function	:	"TAN" "(" x ")";
 
-built-in-function	:	"SYSNULL" [ "(" ")" ];
+built_in_function	:	"SYSNULL" [ "(" ")" ];
 
-built-in-function	:	"SUM" "(" x ")";
+built_in_function	:	"SUM" "(" x ")";
 
-built-in-function	:	"SUBSTR" "(" x "," y [ "," z ] ")";
+built_in_function	:	"SUBSTR" "(" x "," y [ "," z ] ")";
 
-built-in-function	:	"STRING" "(" x ")";
+built_in_function	:	"STRING" "(" x ")";
 
-built-in-function	:	"STORAGE" "(" x ")";
+built_in_function	:	"STORAGE" "(" x ")";
 
-built-in-function	:	"STATUS" [ "(" x ")" ];
+built_in_function	:	"STATUS" [ "(" x ")" ];
 
-built-in-function	:	"SQRT" "(" x ")";
+built_in_function	:	"SQRT" "(" x ")";
 
-built-in-function	:	"SINH" "(" x ")";
+built_in_function	:	"SINH" "(" x ")";
 
-built-in-function	:	"SIND" "(" x ")";
+built_in_function	:	"SIND" "(" x ")";
 
-built-in-function	:	"SIN" "(" x ")";
+built_in_function	:	"SIN" "(" x ")";
 
-built-in-function	:	"SIGN" "(" x ")";
+built_in_function	:	"SIGN" "(" x ")";
 
-built-in-function	:	"SAMEKEY" "(" x ")";
+built_in_function	:	"SAMEKEY" "(" x ")";
 
-built-in-function	:	"ROUND" "(" x "," y ")";
+built_in_function	:	"ROUND" "(" x "," y ")";
 
-built-in-function	:	"REPEAT" "(" x "," y ")";
+built_in_function	:	"REPEAT" "(" x "," y ")";
 
-built-in-function	:	"REAL" "(" x ")";
+built_in_function	:	"REAL" "(" x ")";
 
-built-in-function	:	"PROD" "(" x ")";
+built_in_function	:	"PROD" "(" x ")";
 
-built-in-function	:	"PRIORITY" "(" x ")";
+built_in_function	:	"PRIORITY" "(" x ")";
 
-built-in-function	:	"PRECISION" "(" x "," p [ "," q ] ")";
+built_in_function	:	"PRECISION" "(" x "," p [ "," q ] ")";
 
-built-in-function	:	"POLY" "(" x "," y ")";
+built_in_function	:	"POLY" "(" x "," y ")";
 
-built-in-function	:	"POINTERVALUE" "(" x ")";
+built_in_function	:	"POINTERVALUE" "(" x ")";
 
-built-in-function	:	"POINTERADD" "(" x "," y ")";
+built_in_function	:	"POINTERADD" "(" x "," y ")";
 
-built-in-function	:	"POINTER" "(" x "," y ")";
+built_in_function	:	"POINTER" "(" x "," y ")";
 
-built-in-function	:	"PLIRETV" [ "(" ")" ];
+built_in_function	:	"PLIRETV" [ "(" ")" ];
 
-built-in-function	:	"ONSOURCE" [ "(" ")" ];
+built_in_function	:	"ONSOURCE" [ "(" ")" ];
 
-built-in-function	:	"ONLOC" [ "(" ")" ];
+built_in_function	:	"ONLOC" [ "(" ")" ];
 
-built-in-function	:	"ONKEY" [ "(" ")" ];
+built_in_function	:	"ONKEY" [ "(" ")" ];
 
-built-in-function	:	"ONFILE" [ "(" ")" ];
+built_in_function	:	"ONFILE" [ "(" ")" ];
 
-built-in-function	:	"ONCOUNT" [ "(" ")" ];
+built_in_function	:	"ONCOUNT" [ "(" ")" ];
 
-built-in-function	:	"ONCODE" [ "(" ")" ];
+built_in_function	:	"ONCODE" [ "(" ")" ];
 
-built-in-function	:	"ONCHAR" [ "(" ")" ];
+built_in_function	:	"ONCHAR" [ "(" ")" ];
 
-built-in-function	:	"OFFSET" "(" x "," y ")";
+built_in_function	:	"OFFSET" "(" x "," y ")";
 
-built-in-function	:	"NULL" [ "(" ")" ];
+built_in_function	:	"NULL" [ "(" ")" ];
 
-built-in-function	:	"MULTIPLY" "(" x "," y "," p [ "," q ] ")";
+built_in_function	:	"MULTIPLY" "(" x "," y "," p [ "," q ] ")";
 
-built-in-function	:	"MPSTR" "(" x "," r [ "," y ] ")";
+built_in_function	:	"MPSTR" "(" x "," r [ "," y ] ")";
 
-built-in-function	:	"MOD" "(" x "," y ")";
+built_in_function	:	"MOD" "(" x "," y ")";
 
-built-in-function	:	"MIN" "(" { x }","+ ")";
+built_in_function	:	"MIN" "(" { x }","+ ")";
 
-built-in-function	:	"MAX" "(" { x }","+ ")";
+built_in_function	:	"MAX" "(" { x }","+ ")";
 
-built-in-function	:	"LOW" "(" x ")";
+built_in_function	:	"LOW" "(" x ")";
 
-built-in-function	:	"LOG10" "(" x ")";
+built_in_function	:	"LOG10" "(" x ")";
 
-built-in-function	:	"LOG2" "(" x ")";
+built_in_function	:	"LOG2" "(" x ")";
 
-built-in-function	:	"LOG" "(" x ")";
+built_in_function	:	"LOG" "(" x ")";
 
-built-in-function	:	"LINENO" "(" x ")";
+built_in_function	:	"LINENO" "(" x ")";
 
-built-in-function	:	"LENGTH" "(" x ")";
+built_in_function	:	"LENGTH" "(" x ")";
 
-built-in-function	:	"LBOUND" "(" x "," y ")";
+built_in_function	:	"LBOUND" "(" x "," y ")";
 
-built-in-function	:	"INDEX" "(" x "," y ")";
+built_in_function	:	"INDEX" "(" x "," y ")";
 
-built-in-function	:	"IMAG" "(" x ")";
+built_in_function	:	"IMAG" "(" x ")";
 
-built-in-function	:	"HIGH" "(" x ")";
+built_in_function	:	"HIGH" "(" x ")";
 
-built-in-function	:	"HBOUND" "(" x "," y ")";
+built_in_function	:	"HBOUND" "(" x "," y ")";
 
-built-in-function	:	"GRAPHIC" "(" x [ "," y ] ")";
+built_in_function	:	"GRAPHIC" "(" x [ "," y ] ")";
 
-built-in-function	:	"FLOOR" "(" x ")";
+built_in_function	:	"FLOOR" "(" x ")";
 
-built-in-function	:	"FLOAT" "(" x [ "," p ] ")";
+built_in_function	:	"FLOAT" "(" x [ "," p ] ")";
 
-built-in-function	:	"FIXED" "(" x [ "," p [ "," q ] ] ")";
+built_in_function	:	"FIXED" "(" x [ "," p [ "," q ] ] ")";
 
-built-in-function	:	"EXP" "(" x ")";
+built_in_function	:	"EXP" "(" x ")";
 
-built-in-function	:	"ERFC" "(" x ")";
+built_in_function	:	"ERFC" "(" x ")";
 
-built-in-function	:	"ERF" "(" x ")";
+built_in_function	:	"ERF" "(" x ")";
 
-built-in-function	:	"ENTRYADDR" "(" x ")";
+built_in_function	:	"ENTRYADDR" "(" x ")";
 
-built-in-function	:	"EMPTY" [ "(" ")" ];
+built_in_function	:	"EMPTY" [ "(" ")" ];
 
-built-in-function	:	"DIVIDE" "(" x "," y "," p [ "," q ] ")";
+built_in_function	:	"DIVIDE" "(" x "," y "," p [ "," q ] ")";
 
-built-in-function	:	"DIM" "(" x "," y ")";
+built_in_function	:	"DIM" "(" x "," y ")";
 
-built-in-function	:	"DECIMAL" "(" x [ "," p [ "," q ] ] ")";
+built_in_function	:	"DECIMAL" "(" x [ "," p [ "," q ] ] ")";
 
-built-in-function	:	"DATETIME" [ "(" ")" ];
+built_in_function	:	"DATETIME" [ "(" ")" ];
 
-built-in-function	:	"DATE" [ "(" ")" ];
+built_in_function	:	"DATE" [ "(" ")" ];
 
-built-in-function	:	"DATAFIELD" [ "(" ")" ];
+built_in_function	:	"DATAFIELD" [ "(" ")" ];
 
-built-in-function	:	"CURRENTSTORAGE" "(" x ")";
+built_in_function	:	"CURRENTSTORAGE" "(" x ")";
 
-built-in-function	:	"COUNT" "(" x ")";
+built_in_function	:	"COUNT" "(" x ")";
 
-built-in-function	:	"COSH" "(" x ")";
+built_in_function	:	"COSH" "(" x ")";
 
-built-in-function	:	"COSD" "(" x ")";
+built_in_function	:	"COSD" "(" x ")";
 
-built-in-function	:	"COS" "(" x ")";
+built_in_function	:	"COS" "(" x ")";
 
-built-in-function	:	"CONJG" "(" x ")";
+built_in_function	:	"CONJG" "(" x ")";
 
-built-in-function	:	"COMPLEX" "(" x "," y ")";
+built_in_function	:	"COMPLEX" "(" x "," y ")";
 
-built-in-function	:	"COMPLETION" "(" x ")";
+built_in_function	:	"COMPLETION" "(" x ")";
 
-built-in-function	:	"CHAR" "(" x [ "," y ] ")";
+built_in_function	:	"CHAR" "(" x [ "," y ] ")";
 
-built-in-function	:	"CEIL" "(" x ")";
+built_in_function	:	"CEIL" "(" x ")";
 
-built-in-function	:	"BOOL" "(" x "," y "," z ")";
+built_in_function	:	"BOOL" "(" x "," y "," z ")";
 
-built-in-function	:	"BIT" "(" x [ "," y ] ")";
+built_in_function	:	"BIT" "(" x [ "," y ] ")";
 
-built-in-function	:	"BINARYVALUE" "(" x ")";
+built_in_function	:	"BINARYVALUE" "(" x ")";
 
-built-in-function	:	"BINARY" "(" x [ "," p [ "," q ] ] ")";
+built_in_function	:	"BINARY" "(" x [ "," p [ "," q ] ] ")";
 
-built-in-function	:	"ATANH" "(" x ")";
+built_in_function	:	"ATANH" "(" x ")";
 
-built-in-function	:	"ATAND" "(" x [ "," y ] ")";
+built_in_function	:	"ATAND" "(" x [ "," y ] ")";
 
-built-in-function	:	"ATAN" "(" x [ "," y ] ")";
+built_in_function	:	"ATAN" "(" x [ "," y ] ")";
 
-built-in-function	:	"ASIN" "(" x ")";
+built_in_function	:	"ASIN" "(" x ")";
 
-built-in-function	:	"ANY" "(" x ")";
+built_in_function	:	"ANY" "(" x ")";
 
-built-in-function	:	"ALLOCATION" "(" x ")";
+built_in_function	:	"ALLOCATION" "(" x ")";
 
-built-in-function	:	"ALL" "(" x ")";
+built_in_function	:	"ALL" "(" x ")";
 
-built-in-function	:	"ADDR" "(" x ")";
+built_in_function	:	"ADDR" "(" x ")";
 
-built-in-function	:	"ADD" "(" x "," y "," p [ "," q ] ")";
+built_in_function	:	"ADD" "(" x "," y "," p [ "," q ] ")";
 
-built-in-function	:	"ACOS" "(" x ")";
+built_in_function	:	"ACOS" "(" x ")";
 
-built-in-function	:	"ABS" "(" x ")";
+built_in_function	:	"ABS" "(" x ")";
 
 
 
 
-built-in-subroutine	:	call-name [ "(" { argument }","* ")" ] ";";
+built_in_subroutine	:	call_name [ "(" { argument }","* ")" ] ";";
 
-built-in-subroutine	:	"PLITEST" [ "(" command-list ")" ];
+built_in_subroutine	:	"PLITEST" [ "(" command_list ")" ];
 
-built-in-subroutine	:	"PLITDLI" "(" { argument }","+ ")";
+built_in_subroutine	:	"PLITDLI" "(" { argument }","+ ")";
 
-built-in-subroutine	:	"PLISRTD" "(" { argument }","+ ")";
+built_in_subroutine	:	"PLISRTD" "(" { argument }","+ ")";
 
-built-in-subroutine	:	"PLISRTC" "(" { argument }","+ ")";
+built_in_subroutine	:	"PLISRTC" "(" { argument }","+ ")";
 
-built-in-subroutine	:	"PLISRTB" "(" { argument }","+ ")";
+built_in_subroutine	:	"PLISRTB" "(" { argument }","+ ")";
 
-built-in-subroutine	:	"PLISRTA" "(" { argument }","+ ")";
+built_in_subroutine	:	"PLISRTA" "(" { argument }","+ ")";
 
-built-in-subroutine	:	"PLIRETC" "(" return-code ")";
+built_in_subroutine	:	"PLIRETC" "(" return_code ")";
 
-built-in-subroutine	:	"PLIREST";
+built_in_subroutine	:	"PLIREST";
 
-built-in-subroutine	:	"PLIDUMP" "(" { argument }","+ ")";
+built_in_subroutine	:	"PLIDUMP" "(" { argument }","+ ")";
 
-built-in-subroutine	:	"PLICKPT" "(" { argument }","+ ")";
+built_in_subroutine	:	"PLICKPT" "(" { argument }","+ ")";
 
-built-in-subroutine	:	"PLICANC";
+built_in_subroutine	:	"PLICANC";
 
-built-in-subroutine	:	"ASMTDLI" "(" { argument }","+ ")";
+built_in_subroutine	:	"ASMTDLI" "(" { argument }","+ ")";
 
 
 
@@ -756,7 +756,7 @@ pseudovariable	:	"UNSPEC" "(" x ")";
 
 
 
-statement-options-group	:	"FILE" "(" file-reference ")" [ ( "STREAM" | "RECORD" ) ]
+statement_options_group	:	"FILE" "(" file_reference ")" [ ( "STREAM" | "RECORD" ) ]
 [ ( "INPUT" | "OUTPUT" | "UPDATE" ) ] [ ( "DIRECT" | "SEQUENTIAL" | "TRANSIENT" ) ] [ ( "BUFFERED" | "UNBUFFERED" ) ]
 [ "BACKWARDS" ] [ "EXCLUSIVE" ] [ "KEYED" ]
 [ "PRINT" ] [ "TITLE" "(" expression ")" ]
@@ -766,78 +766,78 @@ statement-options-group	:	"FILE" "(" file-reference ")" [ ( "STREAM" | "RECORD" 
 
 
 
-data-specification	:	( [ "LIST" ] "(" data-specification-data-list ")" | "DATA" [ "(" { data-specification-data-list }","+ ")" ] | "EDIT" { "(" data-specification-data-list ")" "(" data-specification-format-list ")" }+ )
+data_specification	:	( [ "LIST" ] "(" data_specification_data_list ")" | "DATA" [ "(" { data_specification_data_list }","+ ")" ] | "EDIT" { "(" data_specification_data_list ")" "(" data_specification_format_list ")" }+ )
 ;
 
 
 
-data-specification-data-list	:	( { data-list-item }","+ | { "(" data-list-item-type-3-do ")" }+ )
+data_specification_data_list	:	( { data_list_item }","+ | { "(" data_list_item_type_3_do ")" }+ )
 ;
 
 
 
-data-specification-format-list	:	{ ( format-item | n-format-item | n "(" format-list ")" ) }","+
+data_specification_format_list	:	{ ( format_item | n_format_item | n "(" format_list ")" ) }","+
 ;
 
 
 
-list-directed-data-value	:	( [ ( "+" | "-" ) ] arithmetic-constant | [ ( "+" | "-" ) ] real-constant ( "+" | "-" ) imaginary-constant | character-constant | bit-constant | graphic-constant )
+list_directed_data_value	:	( [ ( "+" | "-" ) ] arithmetic_constant | [ ( "+" | "-" ) ] real_constant ( "+" | "-" ) imaginary_constant | character_constant | bit_constant | graphic_constant )
 ;
 
 
 
-data-directed-data-specification	:	"DATA" [ "(" data_list ")" ]
+data_directed_data_specification	:	"DATA" [ "(" data_list ")" ]
 ;
 
 
 
-data-directed-element-assignment	:	{ { element-variable "=" data-value }+ }","+ ";"
+data_directed_element_assignment	:	{ { element_variable "=" data_value }+ }","+ ";"
 ;
 
 
 
-edit-directed-data-specification	:	"EDIT" { "(" data_list ")" "(" format_list ")" }+
+edit_directed_data_specification	:	"EDIT" { "(" data_list ")" "(" format_list ")" }+
 ;
 
 
 
-edit-directed-data-specification-format-list	:	( { format_item }","+ | { n_format_item }","+ | { n "(" format_list ")" }","+ )
+edit_directed_data_specification_format_list	:	( { format_item }","+ | { n_format_item }","+ | { n "(" format_list ")" }","+ )
 ;
 
 
 
-format-item	:	"A" [ "(" field-width ")" ]
+format_item	:	"A" [ "(" field_width ")" ]
 ;
-format-item	:	"B" [ "(" field-width ")" ]
+format_item	:	"B" [ "(" field_width ")" ]
 ;
-format-item	:	"C" "(" { real-format-item }","+ ")"
+format_item	:	"C" "(" { real_format_item }","+ ")"
 ;
-format-item	:	"COLUMN" "(" character-position ")"
+format_item	:	"COLUMN" "(" character_position ")"
 ;
-format-item	:	"E" "(" field-width "," fractional-digits
-[ "," significant-digits ] ")"
+format_item	:	"E" "(" field_width "," fractional_digits
+[ "," significant_digits ] ")"
 ;
-format-item	:	"F" "(" field-width
-[ "," fractional-digits [ "," scaling-factor ] ] ")"
+format_item	:	"F" "(" field_width
+[ "," fractional_digits [ "," scaling_factor ] ] ")"
 ;
-format-item	:	"G" [ "(" field-width ")" ]
+format_item	:	"G" [ "(" field_width ")" ]
 ;
-format-item	:	"LINE" "(" line-number ")"
+format_item	:	"LINE" "(" line_number ")"
 ;
-format-item	:	"P" "'" picture-specification "'"
+format_item	:	"P" "'" picture_specification "'"
 ;
-format-item	:	"PAGE"
+format_item	:	"PAGE"
 ;
-format-item	:	"R" "(" label-reference ")"
+format_item	:	"R" "(" label_reference ")"
 ;
-format-item	:	"SKIP" [ "(" relative-line ")" ]
+format_item	:	"SKIP" [ "(" relative_line ")" ]
 ;
-format-item	:	"X" "(" field-width ")"
+format_item	:	"X" "(" field_width ")"
 ;
 
 
 
-scaling-factor-character	:	"F" "(" [ ( "+" | "-" ) ] integer ")"
+scaling_factor_character	:	"F" "(" [ ( "+" | "-" ) ] integer ")"
 ;
 
 
@@ -852,9 +852,9 @@ condition	:	"CONDITION" "(" name ")"
 ;
 condition	:	"CONVERSION"
 ;
-condition	:	"ENDFILE" "(" file-reference ")"
+condition	:	"ENDFILE" "(" file_reference ")"
 ;
-condition	:	"ENDPAGE" "(" file-reference ")"
+condition	:	"ENDPAGE" "(" file_reference ")"
 ;
 condition	:	"ERROR"
 ;
@@ -862,15 +862,15 @@ condition	:	"FINISH"
 ;
 condition	:	"FIXEDOVERFLOW"
 ;
-condition	:	"KEY" "(" file-reference ")"
+condition	:	"KEY" "(" file_reference ")"
 ;
-condition	:	"NAME" "(" file-reference ")"
+condition	:	"NAME" "(" file_reference ")"
 ;
 condition	:	"OVERFLOW"
 ;
-condition	:	"PENDING" "(" file-reference ")"
+condition	:	"PENDING" "(" file_reference ")"
 ;
-condition	:	"RECORD" "(" file-reference ")"
+condition	:	"RECORD" "(" file_reference ")"
 ;
 condition	:	"SIZE"
 ;
@@ -880,9 +880,9 @@ condition	:	"STRINGSIZE"
 ;
 condition	:	"SUBSCRIPTRANGE"
 ;
-condition	:	"TRANSMIT" "(" file-reference ")"
+condition	:	"TRANSMIT" "(" file_reference ")"
 ;
-condition	:	"UNDEFINEDFILE" "(" file-reference ")"
+condition	:	"UNDEFINEDFILE" "(" file_reference ")"
 ;
 condition	:	"UNDERFLOW"
 ;
@@ -891,8 +891,8 @@ condition	:	"ZERODIVIDE"
 
 
 
-statement-preprocessor-do-specification	:	preprocessor-variable "=" preprocessor-exp1
-[ ( "TO" preprocessor-exp2 [ "BY" preprocessor-exp3 ] | "BY" preprocessor-exp3 [ "TO" preprocessor-exp2 ] ) ]
+statement_preprocessor_do_specification	:	preprocessor_variable "=" preprocessor_exp1
+[ ( "TO" preprocessor_exp2 [ "BY" preprocessor_exp3 ] | "BY" preprocessor_exp3 [ "TO" preprocessor_exp2 ] ) ]
 ;
 
 
