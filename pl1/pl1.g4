@@ -456,7 +456,7 @@ end_statement
    ;
 
 do1_statement
-   : '%' (label ':')* 'DO' preprocessor_do_specification ';'
+   : '%' (label ':')* 'DO' statement_preprocessor_do_specification ';'
    ;
 
 do2_statement
@@ -1672,16 +1672,38 @@ statement_preprocessor_do_specification
    : preprocessor_variable '=' preprocessor_exp1 (('TO' preprocessor_exp2 ('BY' preprocessor_exp3)? | 'BY' preprocessor_exp3 ('TO' preprocessor_exp2)?))?
    ;
 
+/*
+* various guesses...
+*/
+file_reference: identifier;
+
+number_of_digits: expression;
+
+
+length: expression;
+
+call_name: identifier;
+
+argument: expression;
+
+field_width : expression;
+
+label: IDENTIFIER;
+
+variable : identifier;
+
+identifier: IDENTIFIER;
+
+hex_digit : HEX_DIGIT;
+
+HEX_DIGIT: [0-9abcdef]+;
+
 COMMENT
    : '/*' .*? '*/' -> skip
    ;
 
-STRING
-   : [a-zA-Z] [a-zA-Z]*
-   ;
-
-NUMBER
-   : [0-9]+
+IDENTIFIER
+   : [a-zA-Z] [a-zA-Z0-9]*
    ;
 
 WS
