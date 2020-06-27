@@ -44,6 +44,55 @@ percent_statements
    ;
 
 attribute
+   : bindec_attribute
+   | task_attribute
+   | condition_attribute
+   | print_attribute
+   | keyed_attribute
+   | exclusive_attribute
+   | environment_attribute
+   | backwards_attribute
+   | buffered_attribute
+   | direct_attribute
+   | input_attribute
+   | record_attribute
+   | file_attribute
+   | generic_attribute
+   | builtin_attribute
+   | reducible_attribute
+   | returns_attribute
+   | options_attribute
+   | entry_attribute
+   | initial_attribute
+   | connected_attribute
+   | position_attribute
+   | defined_attribute
+   | area_attribute
+   | area_attribute
+   | pointer_attribute
+   | based_attribute
+   | controlled_attribute
+   | automatic_attribute
+   | static_attribute
+   | internal_attribute
+   | like_attribute
+   | parenth_attribute
+   | aligned_attribute
+   | variable_attribute
+   | label_attribute
+   | event_attribute
+   | fixed_attribute
+   | digits_attribute
+   | real_attribute
+   | bit_attribute
+   | character_attribute
+   | graphic_attribute
+   | varying_attribute
+   | picture_attribute
+   | offset_attribute
+   ;
+
+bindec_attribute
    : ('BINARY' | 'DECIMAL')
    ;
 
@@ -112,11 +161,11 @@ returns_attribute
    ;
 
 options_attribute
-   : 'OPTIONS' '(' characteristic_list ')'
+   : 'OPTIONS' '(' attribute_characteristic_list ')'
    ;
 
 entry_attribute
-   : 'ENTRY' ('(' parameter_descriptor_list? ')')?
+   : 'ENTRY' ('(' attribute_parameter_descriptor_list? ')')?
    ;
 
 initial_attribute
@@ -223,7 +272,17 @@ picture_attribute
    : 'PICTURE' '\'' picture_specification '\''
    ;
 
-charcter_constant
+constant
+   : character_constant
+   | hex_constant
+   | binary_constant
+   | hex2_constant
+   | graphic_constant
+   | hex3_constant
+   | graphic2_constant
+   ;
+
+character_constant
    : '\'' ((character | '"'))* '\''
    ;
 
@@ -252,7 +311,7 @@ graphic2_constant
    ;
 
 attribute_bound
-   : ((lower_bound ':')? upper_bound | '*')
+   : ((attribute_lower_bound ':')? attribute_upper_bound | '*')
    ;
 
 attribute_upper_bound
@@ -264,23 +323,23 @@ attribute_lower_bound
    ;
 
 expression
-   : unary_expression (infix_operator unary_expression)*
+   : expression_unary_expression (infix_operator expression_unary_expression)*
    ;
 
 expression_unary_expression
-   : (prefix_operator)* elementary_expression
+   : (prefix_operator)* expression_elementary_expression
    ;
 
 expression_elementary_expression
-   : ('(' expression ')' | reference | constant | isub6)
+   : ('(' expression ')' | expression_reference | constant | isub6)
    ;
 
 expression_reference
-   : locator_qualifier? basic_reference ('(' subscript_list ')')? ('(' argument_list? ')')?
+   : expression_locator_qualifier? expression_basic_reference ('(' expression_subscript_list ')')? ('(' expression_argument_list? ')')?
    ;
 
 expression_locator_qualifier
-   : reference '->'
+   : expression_reference '->'
    ;
 
 expression_subscript_list
@@ -292,14 +351,87 @@ expression_argument_list
    ;
 
 expression_basic_reference
-   : structure_qualification? name
+   : expression_structure_qualification? name
    ;
 
 expression_structure_qualification
-   : basic_reference ('(' subscript_list ')')?
+   : expression_basic_reference ('(' expression_subscript_list ')')?
    ;
 
 statement
+   : fetch_statement
+   | fetch_statement
+   | note_statement
+   | if_statement
+   | goto_statement
+   | end_statement
+   | do1_statement
+   | do2_statement
+   | declare_statement
+   | deactivate_statement
+   | assign_statement
+   | activate_statement
+   | return_statement
+   | procedure_statement
+   | exit_statement
+   | skip_statement
+   | print_statement
+   | page_statement
+   | noprint_statement
+   | include_statement
+   | signal_statement
+   | revert_statement
+   | on_statement
+   | format_statement
+   | put_statement
+   | putstring_statement
+   | put_statement
+   | getstring_statement
+   | get_statement
+   | unlock_statement
+   | delete_statement
+   | locate_statement
+   | rewritefile_statement
+   | writefile_statement
+   | readfile_statement
+   | close_statement
+   | open_statement
+   | return2_statement
+   | call_statement
+   | cobol_statement
+   | main_statement
+   | entry_statement
+   | procedure2_statement
+   | main_statement
+   | wait_statement
+   | stop_statement
+   | select_statement
+   | wait_statement
+   | leave_statement
+   | if2_statement
+   | goto2_statement
+   | end2_statement
+   | do3_statement
+   | do4_statement
+   | do5_statement
+   | display1_statement
+   | delay_statement
+   | display1_statement
+   | display2_statement
+   | free_statement
+   | free2_statement
+   | allocate_statement
+   | allocate2_statement
+   | release_statement
+   | begin_statement
+   | declare_statement
+   | declare2_statement
+   | default_statement
+   | null_statement
+   | percent_statement
+   ;
+
+fetch_statement
    : 'FETCH' (entry_constant ',')+ ';'
    ;
 
@@ -456,7 +588,7 @@ cobol_statement
    ;
 
 main_statement
-   : ('MAIN' 'NOEXECOPS'? 'REENTRANT'? 'TASK'? | 'COBOL' additional_options | 'FORTRAN' additional_options)
+   : ('MAIN' 'NOEXECOPS'? 'REENTRANT'? 'TASK'? | 'COBOL' statement_additional_options | 'FORTRAN' statement_additional_options)
    ;
 
 entry_statement
@@ -547,7 +679,7 @@ release_statement
    : 'RELEASE' entry_constant+ ';'
    ;
 
-begine_statement
+begin_statement
    : 'BEGIN' ('ORDER' | 'REORDER')? ('CHARGRAPHIC' | 'NOCHARGRAPHIC')? ';'
    ;
 
@@ -556,23 +688,23 @@ declare2_statement
    ;
 
 default_statement
-   : 'DEFAULT' ((simple_specification | factored_specification) ',')+ ';'
+   : 'DEFAULT' ((statement_simple_specification | statement_factored_specification) ',')+ ';'
    ;
 
 statement_simple_specification
-   : ('RANGE' '(' ((letter+ | letter ':' letter))+ ')' attribute_specification? | 'RANGE' '(' '*' ')' attribute_specification? | 'DESCRIPTORS' attribute_specifications?)
+   : ('RANGE' '(' ((letter+ | letter ':' letter))+ ')' statement_attribute_specification? | 'RANGE' '(' '*' ')' statement_attribute_specification? | 'DESCRIPTORS' statement_attribute_specification?)
    ;
 
 statement_factored_specification
-   : '(' ((simple_specification | factored_specification) ',')+ ')' attribute_specification?
+   : '(' ((statement_simple_specification | statement_factored_specification) ',')+ ')' statement_attribute_specification?
    ;
 
 statement_attribute_specification
-   : (attribute+ ('VALUE' '(' (value_specification ',')+ ')')? | 'VALUE' '(' (value_specification ',')+ ')')
+   : (attribute+ ('VALUE' '(' (statement_value_specification ',')+ ')')? | 'VALUE' '(' (statement_value_specification ',')+ ')')
    ;
 
 statement_value_specification
-   : ('AREA' '(' size ')' | 'BIT' '(' length ')' | 'CHARACTER' '(' length ')' | 'GRAPHIC' '(' length ')' | additional_options)
+   : ('AREA' '(' size ')' | 'BIT' '(' length ')' | 'CHARACTER' '(' length ')' | 'GRAPHIC' '(' length ')' | statement_additional_options)
    ;
 
 statement_additional_options
@@ -600,27 +732,34 @@ statement_option
    ;
 
 option
+   : refer_option
+   | priority_option
+   | event_option
+   | task_option
+   ;
+
+refer_option
    : expression 'REFER' '(' variable ')'
    ;
 
-option
+priority_option
    : 'PRIORITY' '(' expression ')'
    ;
 
-option
+event_option
    : 'EVENT' '(' event_reference ')'
    ;
 
-option
+task_option
    : 'TASK' ('(' task_reference ')')?
    ;
 
 attribute_item
-   : ('*' | initial_constant | reference | '(' expression ')' | iteration_specification)
+   : ('*' | initial_constant | reference | '(' expression ')' | attribute_iteration_specification)
    ;
 
 attribute_iteration_specification
-   : '(' iteration_factor ')' iteration_item
+   : '(' iteration_factor ')' attribute_iteration_item
    ;
 
 attribute_iteration_item
@@ -635,24 +774,24 @@ attribute_initial_constant2
    : 'INITIAL' 'CALL' entry_reference ('(' (argument ',')+ ')')?
    ;
 
-statement_specification
+statement_specificationstatement_specification
    : exp1 (('TO' exp2 ('BY' exp3)? | 'BY' exp3 ('TO' exp2)? | 'REPEAT' exp6))? (('WHILE' '(' exp4 ')' ('(' 'UNTIL' '(' exp5 ')')? | 'UNTIL' '(' exp5 ')' ('(' 'WHILE' '(' exp4 ')')?))?
    ;
 
 entry_data1
-   : 'ENTRY' ('(' parameter_descriptor_list ')')? ('RETURNS' '(' attribute_list ')')? ('OPTIONS' '(' characteristic_list ')')? 'EXTERNAL'? (('IRREDUCIBLE' | 'REDUCIBLE'))?
+   : 'ENTRY' ('(' attribute_parameter_descriptor_list ')')? ('RETURNS' '(' attribute_list ')')? ('OPTIONS' '(' attribute_characteristic_list ')')? 'EXTERNAL'? (('IRREDUCIBLE' | 'REDUCIBLE'))?
    ;
 
 entry_data2
-   : 'ENTRY' ('(' parameter_descriptor_list ')')? 'VARIABLE'? ('RETURNS' '(' attribute_list ')')? ('OPTIONS' '(' characteristic_list ')')? (('IRREDUCIBLE' | 'REDUCIBLE'))? scope_attribute? storage_attribute? alignment_attribute?? parameter?? 'DEFINED' 'INITIAL'?
+   : 'ENTRY' ('(' attribute_parameter_descriptor_list ')')? 'VARIABLE'? ('RETURNS' '(' attribute_list ')')? ('OPTIONS' '(' attribute_characteristic_list ')')? (('IRREDUCIBLE' | 'REDUCIBLE'))? scope_attribute? storage_attribute? alignment_attribute?? parameter? 'DEFINED' 'INITIAL'?
    ;
 
 attribute_parameter_descriptor_list
-   : (parameter_descriptor ',')+
+   : (attribute_parameter_descriptor ',')+
    ;
 
 attribute_parameter_descriptor
-   : (((attribute)+ | '*' | structure_parameter_descriptor))?
+   : (((attribute)+ | '*' | attribute_structure_parameter_descriptor))?
    ;
 
 attribute_structure_parameter_descriptor
@@ -660,11 +799,115 @@ attribute_structure_parameter_descriptor
    ;
 
 attribute_characteristic_list
-   : ('COBOL' | 'FORTRAN' | 'ASSEMBLER') additional_options?
+   : ('COBOL' | 'FORTRAN' | 'ASSEMBLER') attribute_additional_options?
    ;
 
 attribute_additional_options
    : ('NOMAP' ('(' (argi ',')+ ')')?)? ('NOMAPIN' ('(' (argi)+ ')')?)? ('NOMAPOUT' ('(' (argi ',')+ ')')?)? 'INTER'? 'RETCODE'?
+   ;
+
+built_in
+   : built_in_function
+   | parmset_built_in_function
+   | counter_built_in_function
+   | compiletime_built_in_function
+   | verify_built_in_function
+   | unspec_built_in_function
+   | trunc_built_in_function
+   | translate_built_in_function
+   | time_built_in_function
+   | tanh_built_in_function
+   | tand_built_in_function
+   | tan_built_in_function
+   | sysnull_built_in_function
+   | sum_built_in_function
+   | substr_built_in_function
+   | string_built_in_function
+   | storage_built_in_function
+   | status_built_in_function
+   | sqrt_built_in_function
+   | sinh_built_in_function
+   | sind_built_in_function
+   | sin_built_in_function
+   | sin_built_in_function
+   | samekey_built_in_function
+   | round_built_in_function
+   | repeat_built_in_function
+   | real_built_in_function
+   | prod_built_in_function
+   | priority_built_in_function
+   | precision_built_in_function
+   | poly_built_in_function
+   | pointer_built_in_function
+   | pointeradd_built_in_function
+   | pointervalue_built_in_function
+   | onchar_built_in_function
+   | oncode_built_in_function
+   | oncount_built_in_function
+   | onfile_built_in_function
+   | onkey_built_in_function
+   | onfile_built_in_function
+   | onloc_built_in_function
+   | onsource_built_in_function
+   | onloc_built_in_function
+   | offset_built_in_function
+   | null_built_in_function
+   | mpstr_built_in_function
+   | mod_built_in_function
+   | min_built_in_function
+   | max_built_in_function
+   | log2_built_in_function
+   | log10_built_in_function
+   | log_built_in_function
+   | low_built_in_function
+   | lineno_built_in_function
+   | length_built_in_function
+   | lbound_built_in_function
+   | index_built_in_function
+   | imag_built_in_function
+   | high_built_in_function
+   | hbound_built_in_function
+   | graphic_built_in_function
+   | float_built_in_function
+   | float_built_in_function
+   | fixed_built_in_function
+   | exp_built_in_function
+   | erfc_built_in_function
+   | erf_built_in_function
+   | entryaddr_built_in_function
+   | empty_built_in_function
+   | divide_built_in_function
+   | dim_built_in_function
+   | decimal_built_in_function
+   | date_built_in_function
+   | datetime_built_in_function
+   | datafield_built_in_function
+   | currentstorage_built_in_function
+   | count_built_in_function
+   | cosh_built_in_function
+   | cos_built_in_function
+   | cosd_built_in_function
+   | complex_built_in_function
+   | conjg_built_in_function
+   | completion_built_in_function
+   | chat_built_in_function
+   | ceil_built_in_function
+   | bool_built_in_function
+   | bit_built_in_function
+   | binaryvalue_built_in_function
+   | binary_built_in_function
+   | atan_built_in_function
+   | atand_built_in_function
+   | atanh_built_in_function
+   | asin_built_in_function
+   | any_built_in_function
+   | allocation_built_in_function
+   | all_built_in_function
+   | addr_built_in_function
+   | add_built_in_function
+   | acos_built_in_function
+   | abs_built_in_function
+   | multiply_built_in_function
    ;
 
 built_in_function
@@ -672,7 +915,7 @@ built_in_function
    ;
 
 parmset_built_in_function
-   : 'PARMSET' '(' x ')'
+   : 'PARMSET' '(' expression ')'
    ;
 
 counter_built_in_function
@@ -684,19 +927,19 @@ compiletime_built_in_function
    ;
 
 verify_built_in_function
-   : 'VERIFY' '(' x ',' y ')'
+   : 'VERIFY' '(' expression ',' expression ')'
    ;
 
-nuspec_built_in_function
-   : 'UNSPEC' '(' x ')'
+unspec_built_in_function
+   : 'UNSPEC' '(' expression ')'
    ;
 
 trunc_built_in_function
-   : 'TRUNC' '(' x ')'
+   : 'TRUNC' '(' expression ')'
    ;
 
 translate_built_in_function
-   : 'TRANSLATE' '(' x ',' y (',' z)? ')'
+   : 'TRANSLATE' '(' expression ',' expression (',' expression)? ')'
    ;
 
 time_built_in_function
@@ -704,15 +947,15 @@ time_built_in_function
    ;
 
 tanh_built_in_function
-   : 'TANH' '(' x ')'
+   : 'TANH' '(' expression ')'
    ;
 
 tand_built_in_function
-   : 'TAND' '(' x ')'
+   : 'TAND' '(' expression ')'
    ;
 
 tan_built_in_function
-   : 'TAN' '(' x ')'
+   : 'TAN' '(' expression ')'
    ;
 
 sysnull_built_in_function
@@ -720,87 +963,87 @@ sysnull_built_in_function
    ;
 
 sum_built_in_function
-   : 'SUM' '(' x ')'
+   : 'SUM' '(' expression ')'
    ;
 
 substr_built_in_function
-   : 'SUBSTR' '(' x ',' y (',' z)? ')'
+   : 'SUBSTR' '(' expression ',' expression (',' expression)? ')'
    ;
 
 string_built_in_function
-   : 'STRING' '(' x ')'
+   : 'STRING' '(' expression ')'
    ;
 
 storage_built_in_function
-   : 'STORAGE' '(' x ')'
+   : 'STORAGE' '(' expression ')'
    ;
 
 status_built_in_function
-   : 'STATUS' ('(' x ')')?
+   : 'STATUS' ('(' expression ')')?
    ;
 
 sqrt_built_in_function
-   : 'SQRT' '(' x ')'
+   : 'SQRT' '(' expression ')'
    ;
 
 sinh_built_in_function
-   : 'SINH' '(' x ')'
+   : 'SINH' '(' expression ')'
    ;
 
 sind_built_in_function
-   : 'SIND' '(' x ')'
+   : 'SIND' '(' expression ')'
    ;
 
 sin_built_in_function
-   : 'SIN' '(' x ')'
+   : 'SIN' '(' expression ')'
    ;
 
 sign_built_in_function
-   : 'SIGN' '(' x ')'
+   : 'SIGN' '(' expression ')'
    ;
 
 samekey_built_in_function
-   : 'SAMEKEY' '(' x ')'
+   : 'SAMEKEY' '(' expression ')'
    ;
 
 round_built_in_function
-   : 'ROUND' '(' x ',' y ')'
+   : 'ROUND' '(' expression ',' expression ')'
    ;
 
 repeat_built_in_function
-   : 'REPEAT' '(' x ',' y ')'
+   : 'REPEAT' '(' expression ',' expression ')'
    ;
 
 real_built_in_function
-   : 'REAL' '(' x ')'
+   : 'REAL' '(' expression ')'
    ;
 
 prod_built_in_function
-   : 'PROD' '(' x ')'
+   : 'PROD' '(' expression ')'
    ;
 
 priority_built_in_function
-   : 'PRIORITY' '(' x ')'
+   : 'PRIORITY' '(' expression ')'
    ;
 
 precision_built_in_function
-   : 'PRECISION' '(' x ',' p (',' q)? ')'
+   : 'PRECISION' '(' expression ',' expression (',' expression)? ')'
    ;
 
 poly_built_in_function
-   : 'POLY' '(' x ',' y ')'
+   : 'POLY' '(' expression ',' expression ')'
    ;
 
 pointervalue_built_in_function
-   : 'POINTERVALUE' '(' x ')'
+   : 'POINTERVALUE' '(' expression ')'
    ;
 
 pointeradd_built_in_function
-   : 'POINTERADD' '(' x ',' y ')'
+   : 'POINTERADD' '(' expression ',' expression ')'
    ;
 
 pointer_built_in_function
-   : 'POINTER' '(' x ',' y ')'
+   : 'POINTER' '(' expression ',' expression ')'
    ;
 
 pliretv_built_in_function
@@ -836,7 +1079,7 @@ onchar_built_in_function
    ;
 
 offset_built_in_function
-   : 'OFFSET' '(' x ',' y ')'
+   : 'OFFSET' '(' expression ',' expression ')'
    ;
 
 null_built_in_function
@@ -844,115 +1087,115 @@ null_built_in_function
    ;
 
 multiply_built_in_function
-   : 'MULTIPLY' '(' x ',' y ',' p (',' q)? ')'
+   : 'MULTIPLY' '(' expression ',' expression ',' expression (',' expression)? ')'
    ;
 
 mpstr_built_in_function
-   : 'MPSTR' '(' x ',' r (',' y)? ')'
+   : 'MPSTR' '(' expression ',' expression (',' expression)? ')'
    ;
 
 mod_built_in_function
-   : 'MOD' '(' x ',' y ')'
+   : 'MOD' '(' expression ',' expression ')'
    ;
 
 min_built_in_function
-   : 'MIN' '(' (x ',')+ ')'
+   : 'MIN' '(' (expression ',')+ ')'
    ;
 
 max_built_in_function
-   : 'MAX' '(' (x ',')+ ')'
+   : 'MAX' '(' (expression ',')+ ')'
    ;
 
 low_built_in_function
-   : 'LOW' '(' x ')'
+   : 'LOW' '(' expression ')'
    ;
 
 log10_built_in_function
-   : 'LOG10' '(' x ')'
+   : 'LOG10' '(' expression ')'
    ;
 
 log2_built_in_function
-   : 'LOG2' '(' x ')'
+   : 'LOG2' '(' expression ')'
    ;
 
 log_built_in_function
-   : 'LOG' '(' x ')'
+   : 'LOG' '(' expression ')'
    ;
 
 lineno_built_in_function
-   : 'LINENO' '(' x ')'
+   : 'LINENO' '(' expression ')'
    ;
 
 length_built_in_function
-   : 'LENGTH' '(' x ')'
+   : 'LENGTH' '(' expression ')'
    ;
 
 lbound_built_in_function
-   : 'LBOUND' '(' x ',' y ')'
+   : 'LBOUND' '(' expression ',' expression ')'
    ;
 
 index_built_in_function
-   : 'INDEX' '(' x ',' y ')'
+   : 'INDEX' '(' expression ',' expression ')'
    ;
 
 imag_built_in_function
-   : 'IMAG' '(' x ')'
+   : 'IMAG' '(' expression ')'
    ;
 
 high_built_in_function
-   : 'HIGH' '(' x ')'
+   : 'HIGH' '(' expression ')'
    ;
 
 hbound_built_in_function
-   : 'HBOUND' '(' x ',' y ')'
+   : 'HBOUND' '(' expression ',' expression ')'
    ;
 
 graphic_built_in_function
-   : 'GRAPHIC' '(' x (',' y)? ')'
+   : 'GRAPHIC' '(' expression (',' expression)? ')'
    ;
 
 floor_built_in_function
-   : 'FLOOR' '(' x ')'
+   : 'FLOOR' '(' expression ')'
    ;
 
 float_built_in_function
-   : 'FLOAT' '(' x (',' p)? ')'
+   : 'FLOAT' '(' expression (',' expression)? ')'
    ;
 
 fixed_built_in_function
-   : 'FIXED' '(' x (',' p (',' q)?)? ')'
+   : 'FIXED' '(' expression (',' expression (',' expression)?)? ')'
    ;
 
 exp_built_in_function
-   : 'EXP' '(' x ')'
+   : 'EXP' '(' expression ')'
    ;
 
 erfc_built_in_function
-   : 'ERFC' '(' x ')'
+   : 'ERFC' '(' expression ')'
    ;
 
 erf_built_in_function
-   : 'ERF' '(' x ')'
+   : 'ERF' '(' expression ')'
    ;
 
 entryaddr_built_in_function
-   : 'ENTRYADDR' '(' x ')'
+   : 'ENTRYADDR' '(' expression ')'
    ;
 
 empty_built_in_function
    : 'EMPTY' ('(' ')')?
    ;
 
-devide_built_in_function
-   : 'DIVIDE' '(' x ',' y ',' p (',' q)? ')'
+divide_built_in_function
+   : 'DIVIDE' '(' expression ',' expression ',' expression (',' expression)? ')'
    ;
 
 dim_built_in_function
-   : 'DIM' '(' x ',' y ')'
+   : 'DIM' '(' expression ',' expression ')'
    ;
 
 decimal_built_in_function
-   : 'DECIMAL' '(' x (',' p (',' q)?)? ')'
+   : 'DECIMAL' '(' expression (',' expression (',' expression)?)? ')'
    ;
 
 datetime_built_in_function
@@ -968,103 +1211,119 @@ datafield_built_in_function
    ;
 
 currentstorage_built_in_function
-   : 'CURRENTSTORAGE' '(' x ')'
+   : 'CURRENTSTORAGE' '(' expression ')'
    ;
 
 count_built_in_function
-   : 'COUNT' '(' x ')'
+   : 'COUNT' '(' expression ')'
    ;
 
 cosh_built_in_function
-   : 'COSH' '(' x ')'
+   : 'COSH' '(' expression ')'
    ;
 
 cosd_built_in_function
-   : 'COSD' '(' x ')'
+   : 'COSD' '(' expression ')'
    ;
 
 cos_built_in_function
-   : 'COS' '(' x ')'
+   : 'COS' '(' expression ')'
    ;
 
 conjg_built_in_function
-   : 'CONJG' '(' x ')'
+   : 'CONJG' '(' expression ')'
    ;
 
 complex_built_in_function
-   : 'COMPLEX' '(' x ',' y ')'
+   : 'COMPLEX' '(' expression ',' expression ')'
    ;
 
 completion_built_in_function
-   : 'COMPLETION' '(' x ')'
+   : 'COMPLETION' '(' expression ')'
    ;
 
 chat_built_in_function
-   : 'CHAR' '(' x (',' y)? ')'
+   : 'CHAR' '(' expression (',' expression)? ')'
    ;
 
-ciel_built_in_function
-   : 'CEIL' '(' x ')'
+ceil_built_in_function
+   : 'CEIL' '(' expression ')'
    ;
 
 bool_built_in_function
-   : 'BOOL' '(' x ',' y ',' z ')'
+   : 'BOOL' '(' expression ',' expression ',' expression ')'
    ;
 
 bit_built_in_function
-   : 'BIT' '(' x (',' y)? ')'
+   : 'BIT' '(' expression (',' expression)? ')'
    ;
 
 binaryvalue_built_in_function
-   : 'BINARYVALUE' '(' x ')'
+   : 'BINARYVALUE' '(' expression ')'
    ;
 
 binary_built_in_function
-   : 'BINARY' '(' x (',' p (',' q)?)? ')'
+   : 'BINARY' '(' expression (',' expression (',' expression)?)? ')'
    ;
 
 atanh_built_in_function
-   : 'ATANH' '(' x ')'
+   : 'ATANH' '(' expression ')'
    ;
 
 atand_built_in_function
-   : 'ATAND' '(' x (',' y)? ')'
+   : 'ATAND' '(' expression (',' expression)? ')'
    ;
 
 atan_built_in_function
-   : 'ATAN' '(' x (',' y)? ')'
+   : 'ATAN' '(' expression (',' expression)? ')'
    ;
 
 asin_built_in_function
-   : 'ASIN' '(' x ')'
+   : 'ASIN' '(' expression ')'
    ;
 
 any_built_in_function
-   : 'ANY' '(' x ')'
+   : 'ANY' '(' expression ')'
    ;
 
 allocation_built_in_function
-   : 'ALLOCATION' '(' x ')'
+   : 'ALLOCATION' '(' expression ')'
    ;
 
 all_built_in_function
-   : 'ALL' '(' x ')'
+   : 'ALL' '(' expression ')'
    ;
 
 addr_built_in_function
-   : 'ADDR' '(' x ')'
+   : 'ADDR' '(' expression ')'
    ;
 
 add_built_in_function
-   : 'ADD' '(' x ',' y ',' p (',' q)? ')'
+   : 'ADD' '(' expression ',' expression ',' expression (',' expression)? ')'
    ;
 
 acos_built_in_function
-   : 'ACOS' '(' x ')'
+   : 'ACOS' '(' expression ')'
    ;
 
 abs_built_in_function
-   : 'ABS' '(' x ')'
+   : 'ABS' '(' expression ')'
+   ;
+
+built_in_subroutine
+   : call_built_in_subroutine
+   | plitest_built_in_subroutine
+   | plitdli_built_in_subroutine
+   | plisrtd_built_in_subroutine
+   | plisrtc_built_in_subroutine
+   | plisrbbuilt_in_subroutine
+   | plistra_built_in_subroutine
+   | pliretc_built_in_subroutine
+   | plirest_built_in_subroutine
+   | plidump_built_in_subroutine
+   | plickpt_built_in_subroutine
+   | plicanc_built_in_subroutine
+   | asmtdli_built_in_subroutine
    ;
 
 call_built_in_subroutine
@@ -1087,7 +1346,7 @@ plisrtc_built_in_subroutine
    : 'PLISRTC' '(' (argument ',')+ ')'
    ;
 
-plisRbuilt_in_subroutine
+plisrbbuilt_in_subroutine
    : 'PLISRTB' '(' (argument ',')+ ')'
    ;
 
@@ -1119,20 +1378,36 @@ asmtdli_built_in_subroutine
    : 'ASMTDLI' '(' (argument ',')+ ')'
    ;
 
+pseudovariable
+   : completion_pseudovariable
+   | complex_pseudovariable
+   | entryaddr_pseudovariable
+   | entryaddr_pseudovariable
+   | onchar_pseudovariable
+   | onsource_pseudovariable
+   | priority_pseudovariable
+   | real_pseudovariable
+   | status_pseudovariable
+   | string_pseudovariable
+   | substr_pseudovariable
+   | unspec_pseudovariable
+   | imag_pseudovariable
+   ;
+
 completion_pseudovariable
-   : 'COMPLETION' '(' x ')'
+   : 'COMPLETION' '(' expression ')'
    ;
 
 complex_pseudovariable
-   : 'COMPLEX' '(' x ',' y ')'
+   : 'COMPLEX' '(' expression ',' expression ')'
    ;
 
 entryaddr_pseudovariable
-   : 'ENTRYADDR' '(' x ')'
+   : 'ENTRYADDR' '(' expression ')'
    ;
 
 imag_pseudovariable
-   : 'IMAG' '(' x ')'
+   : 'IMAG' '(' expression ')'
    ;
 
 onchar_pseudovariable
@@ -1144,27 +1419,27 @@ onsource_pseudovariable
    ;
 
 priority_pseudovariable
-   : 'PRIORITY' ('(' x ')')?
+   : 'PRIORITY' ('(' expression ')')?
    ;
 
 real_pseudovariable
-   : 'REAL' '(' x ')'
+   : 'REAL' '(' expression ')'
    ;
 
 status_pseudovariable
-   : 'STATUS' ('(' x ')')?
+   : 'STATUS' ('(' expression ')')?
    ;
 
 string_pseudovariable
-   : 'STRING' '(' x ')'
+   : 'STRING' '(' expression ')'
    ;
 
 substr_pseudovariable
-   : 'SUBSTR' '(' x ',' y (',' z)? ')'
+   : 'SUBSTR' '(' expression ',' expression (',' expression)? ')'
    ;
 
 unspec_pseudovariable
-   : 'UNSPEC' '(' x ')'
+   : 'UNSPEC' '(' expression ')'
    ;
 
 statement_options_group
@@ -1201,6 +1476,22 @@ edit_directed_data_specification
 
 edit_directed_data_specification_format_list
    : ((format_item ',')+ | (n_format_item ',')+ | (n '(' format_list ')') ','+)
+   ;
+
+format_item
+   : format_item_a
+   | format_item_b
+   | format_item_c
+   | format_item_column
+   | format_item_e
+   | format_item_f
+   | format_item_g
+   | format_item_line
+   | format_item_p
+   | format_item_page
+   | format_item_r
+   | format_item_skip
+   | format_item_x
    ;
 
 format_item_a
