@@ -42,13 +42,7 @@ program
 statements	:	{ '(' { condition-prefix }','+ ')' ':' }* { label-prefix ':' }*
 [ statement_body ] ';';
 
-
-
-
 percent_statements	:	'%' { label_prefix ':' }* statement_body ';';
-
-
-
 
 attribute	:	( 'BINARY' | 'DECIMAL' );
 
@@ -141,9 +135,6 @@ attribute	:	'VARYING';
 
 attribute	:	'PICTURE' '/'' picture_specification /'';
 
-
-
-
 constant	:	'/'' { ( character | '"' ) }* '/'';
 
 constant	:	'/'' { hex_digit hex_digit }* '/'X';
@@ -158,69 +149,30 @@ constant	:	'/'' { hex_digit hex_digit hex_digit hex_digit }* '/'GX';
 
 constant	:	'/'' { ( character | '/'' '/'' | '<' { graphic_symbol }+ '>' ) }* '/'M';
 
-
-
-
 attribute_bound	:	( [ lower_bound ':' ] upper_bound | '*' );
-
-
-
 
 attribute_upper_bound	:	expression [ 'REFER' '(' variable ')' ];
 
-
-
-
 attribute_lower_bound	:	expression [ 'REFER' '(' variable ')' ];
-
-
-
 
 expression	:	unary_expression { infix_operator unary_expression }*;
 
-
-
-
 expression_unary_expression	:	{ prefix_operator }* elementary_expression;
 
-
-
-
 expression_elementary_expression	:	( '(' expression ')' | reference | constant | isub6 );
-
-
-
 
 expression_reference	:	[ locator_qualifier ] basic_reference
 [ '(' subscript_list ')' ] [ '(' [ argument_list ] ')' ];
 
-
-
-
 expression_locator_qualifier	:	reference '->';
-
-
-
 
 expression_subscript_list	:	{ ( expression | '*' ) }','+;
 
-
-
-
 expression_argument_list	:	{ expression }','+;
-
-
-
 
 expression_basic_reference	:	[ structure_qualification ] name;
 
-
-
-
 expression_structure_qualification	:	basic_reference [ '(' subscript_list ')' ];
-
-
-
 
 statement	:	'FETCH' { entry_constant }','+ ';';
 
@@ -644,9 +596,6 @@ built_in_function	:	'ACOS' '(' x ')';
 
 built_in_function	:	'ABS' '(' x ')';
 
-
-
-
 built_in_subroutine	:	call_name [ '(' { argument }','* ')' ] ';';
 
 built_in_subroutine	:	'PLITEST' [ '(' command_list ')' ];
@@ -811,132 +760,6 @@ condition	:	'ZERODIVIDE'
 statement_preprocessor_do_specification	:	preprocessor_variable '=' preprocessor_exp1
 [ ( 'TO' preprocessor_exp2 [ 'BY' preprocessor_exp3 ] | 'BY' preprocessor_exp3 [ 'TO' preprocessor_exp2 ] ) ]
 ;
-
-fragment A
-   : ('a' | 'A')
-   ;
-
-fragment B
-   : ('b' | 'B')
-   ;
-
-fragment C
-   : ('c' | 'C')
-   ;
-
-fragment D
-   : ('d' | 'D')
-   ;
-
-
-fragment E
-   : ('e' | 'E')
-   ;
-
-
-fragment F
-   : ('f' | 'F')
-   ;
-
-
-fragment G
-   : ('g' | 'G')
-   ;
-
-
-fragment H
-   : ('h' | 'H')
-   ;
-
-
-fragment I
-   : ('i' | 'I')
-   ;
-
-
-fragment J
-   : ('j' | 'J')
-   ;
-
-
-fragment K
-   : ('k' | 'K')
-   ;
-
-
-fragment L
-   : ('l' | 'L')
-   ;
-
-
-fragment M
-   : ('m' | 'M')
-   ;
-
-
-fragment N
-   : ('n' | 'N')
-   ;
-
-
-fragment O
-   : ('o' | 'O')
-   ;
-
-
-fragment P
-   : ('p' | 'P')
-   ;
-
-
-fragment Q
-   : ('q' | 'Q')
-   ;
-
-
-fragment R
-   : ('r' | 'R')
-   ;
-
-
-fragment S
-   : ('s' | 'S')
-   ;
-
-
-fragment T
-   : ('t' | 'T')
-   ;
-
-
-fragment U
-   : ('u' | 'U')
-   ;
-
-
-fragment V
-   : ('v' | 'V')
-   ;
-
-
-fragment W
-   : ('w' | 'W')
-   ;
-
-
-fragment X
-   : ('x' | 'X')
-   ;
-
-
-fragment Y
-   : ('y' | 'Y')
-   ;
-
-
-fragment Z
-   : ('z' | 'Z')
-   ;
 
 COMMENT	:	'/*'.*? '*/' -> skip;
 
