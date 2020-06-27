@@ -36,8 +36,7 @@ program
    ;
 
 statements
-   : ('('
-   { condition-prefix } ','+ ')' ':')* (label_prefix ':')* statement_body? ';'
+   : ('(' (condition_prefix ',')+ ')' ':')* (label_prefix ':')* statement_body? ';'
    ;
 
 percent_statements
@@ -48,211 +47,207 @@ attribute
    : ('BINARY' | 'DECIMAL')
    ;
 
-attribute
+task_attribute
    : 'TASK'
    ;
 
-attribute
+condition_attribute
    : 'CONDITION'
    ;
 
-attribute
+print_attribute
    : 'PRINT'
    ;
 
-attribute
+keyed_attribute
    : 'KEYED'
    ;
 
-attribute
+exclusive_attribute
    : 'EXCLUSIVE'
    ;
 
-attribute
+environment_attribute
    : 'ENVIRONMENT' '(' characteristic_list ')'
    ;
 
-attribute
+backwards_attribute
    : 'BACKWARDS'
    ;
 
-attribute
+buffered_attribute
    : ('BUFFERED' | 'UNBUFFERED')
    ;
 
-attribute
+direct_attribute
    : ('DIRECT' | 'SEQUENTIAL' | 'TRANSIENT')
    ;
 
-attribute
+input_attribute
    : ('INPUT' | 'OUTPUT' | 'UPDATE')
    ;
 
-attribute
+record_attribute
    : ('RECORD' | 'STREAM')
    ;
 
-attribute
+file_attribute
    : 'FILE'
    ;
 
-attribute
-   : generic_name 'GENERIC' '('
-   { entry_reference 'WHEN' '(' { generic_descriptor }','* ')' } ','+ ')'
+generic_attribute
+   : generic_name 'GENERIC' '(' (entry_reference 'WHEN' '(' (generic_descriptor ',')* ')' ',')+ ')'
    ;
 
-attribute
+builtin_attribute
    : 'BUILTIN'
    ;
 
-attribute
+reducible_attribute
    : ('IRREDUCIBLE' | 'REDUCIBLE')?
    ;
 
-attribute
+returns_attribute
    : 'RETURNS' '(' (attribute)+ ')'
    ;
 
-attribute
+options_attribute
    : 'OPTIONS' '(' characteristic_list ')'
    ;
 
-attribute
+entry_attribute
    : 'ENTRY' ('(' parameter_descriptor_list? ')')?
    ;
 
-attribute
-   : 'INITIAL' '('
-   { item } ','+ ')'
+initial_attribute
+   : 'INITIAL' '(' (item ',')+ ')'
    ;
 
-attribute
+connected_attribute
    : 'CONNECTED'
    ;
 
-attribute
+position_attribute
    : 'POSITION' '(' expression ')'
    ;
 
-attribute
+defined_attribute
    : 'DEFINED' (reference | '(' reference ')')
    ;
 
-attribute
+offset_attribute
    : 'OFFSET' ('(' area_variable ')')?
    ;
 
-attribute
+area_attribute
    : 'AREA' (('(' '*' ')' | '(' expression ('REFER' '(' variable ')')? ')'))?
    ;
 
-attribute
+pointer_attribute
    : 'POINTER'
    ;
 
-attribute
+based_attribute
    : 'BASED' ('(' locator_reference ')')?
    ;
 
-attribute
+controlled_attribute
    : 'CONTROLLED'
    ;
 
-attribute
+automatic_attribute
    : 'AUTOMATIC'
    ;
 
-attribute
+static_attribute
    : 'STATIC'
    ;
 
-attribute
+internal_attribute
    : ('INTERNAL' | 'EXTERNAL')
    ;
 
-attribute
+like_attribute
    : 'LIKE' structure_variable
    ;
 
-attribute
-   : '('
-   { bound } ','+ ')'
+parenth_attribute
+   : '(' (bound ',')+ ')'
    ;
 
-attribute
+aligned_attribute
    : ('ALIGNED' | 'UNALIGNED')
    ;
 
-attribute
+variable_attribute
    : 'VARIABLE'
    ;
 
-attribute
-   : 'LABEL' ('('
-   { label_constant } ','+ ')')?
+label_attribute
+   : 'LABEL' ('(' (label_constant ',')+ ')')?
    ;
 
-attribute
+event_attribute
    : 'EVENT'
    ;
 
-attribute
+fixed_attribute
    : ('FIXED' | 'FLOAT')
    ;
 
-attribute
+digits_attribute
    : '(' number_of_digits (',' scaling_factor)? ')'
    ;
 
-attribute
+real_attribute
    : ('REAL' | 'COMPLEX')
    ;
 
-attribute
+bit_attribute
    : 'BIT' ('(' length ('REFER' '(' variable ')')? ')')?
    ;
 
-attribute
+character_attribute
    : 'CHARACTER' ('(' length ('REFER' '(' variable ')')? ')')?
    ;
 
-attribute
+graphic_attribute
    : 'GRAPHIC' ('(' length ('REFER' '(' variable ')')? ')')?
    ;
 
-attribute
+varying_attribute
    : 'VARYING'
    ;
 
-attribute
+picture_attribute
    : 'PICTURE' '\'' picture_specification '\''
    ;
 
-constant
+charcter_constant
    : '\'' ((character | '"'))* '\''
    ;
 
-constant
+hex_constant
    : '\'' (hex_digit hex_digit)* '\'X'
    ;
 
-constant
+binary_constant
    : '\'' (('0' | '1'))* '\'B'
    ;
 
-constant
+hex2_constant
    : '\'' (hex_digit)* ('\'BX' | '\'B4')
    ;
 
-constant
+graphic_constant
    : '\'' (graphic_symbol)* '\'G'
    ;
 
-constant
+hex3_constant
    : '\'' (hex_digit hex_digit hex_digit hex_digit)* '\'GX'
    ;
 
-constant
+graphic2_constant
    : '\'' ((character | '\'' '\'' | '<' (graphic_symbol)+ '>'))* '\'M'
    ;
 
@@ -289,13 +284,11 @@ expression_locator_qualifier
    ;
 
 expression_subscript_list
-   :
-   { ( expression | '*' ) } ','+
+   : ((expression | '*') ',')+
    ;
 
 expression_argument_list
-   :
-   { expression } ','+
+   : (expression ',')+
    ;
 
 expression_basic_reference
@@ -307,283 +300,263 @@ expression_structure_qualification
    ;
 
 statement
-   : 'FETCH'
-   { entry_constant } ','+ ';'
+   : 'FETCH' (entry_constant ',')+ ';'
    ;
 
-statement
+percent_statement
    : '%' ';'
    ;
 
-statement
+note_statement
    : '%' (label ':')* 'NOTE' '(' message (',' code)? ')' ';'
    ;
 
-statement
+if_statement
    : '%' (label ':')* 'IF' preprocessor_expression '%' 'THEN' preprocessor_unit1 ('%' 'ELSE' preprocessor_unit2)?
    ;
 
-statement
+goto_statement
    : '%' (label ':')* 'GO_TO' label ';'
    ;
 
-statement
+end_statement
    : '%' (label ':')* 'END' label? ';'
    ;
 
-statement
+do1_statement
    : '%' (label ':')* 'DO' preprocessor_do_specification ';'
    ;
 
-statement
+do2_statement
    : '%' (label ':')* 'DO' ';'
    ;
 
-statement
-   : '%' (label ':')* 'DECLARE'
-   { identifier ( 'FIXED' | 'CHARACTER' | 'ENTRY' | 'BUILTIN' ) } ','+ ';'
+declare_statement
+   : '%' (label ':')* 'DECLARE' (identifier ('FIXED' | 'CHARACTER' | 'ENTRY' | 'BUILTIN' ','))+ ';'
    ;
 
-statement
-   : '%' (label ':')* 'DEACTIVATE'
-   { identifier } ','+ ';'
+deactivate_statement
+   : '%' (label ':')* 'DEACTIVATE' (identifier ',')+ ';'
    ;
 
-statement
+assign_statement
    : '%' (label ':')* preprocessor_variable '=' preprocessor_expression ';'
    ;
 
-statement
-   : '%' (label ':')* 'ACTIVATE'
-   { identifier ( ( 'RESCAN' | 'NORESCAN' ) )? } ','+ ';'
+activate_statement
+   : '%' (label ':')* 'ACTIVATE' (identifier (('RESCAN' | 'NORESCAN'))? ',')+ ';'
    ;
 
-statement
+return_statement
    : (label ':')* 'RETURN' '(' preprocessor_expression ')' ';'
    ;
 
-statement
-   : '%' (entry_name ':')+ 'PROCEDURE' ('('
-   { parameter } ','+ ')')? 'STATEMENT'? 'RETURNS' '(' ('CHARACTER' | 'FIXED') ')' ';'
+procedure_statement
+   : '%' (entry_name ':')+ 'PROCEDURE' ('(' (parameter ',')+ ')')? 'STATEMENT'? 'RETURNS' '(' ('CHARACTER' | 'FIXED') ')' ';'
    ;
 
-statement
+exit_statement
    : 'EXIT' ';'
    ;
 
-statement
+skip_statement
    : '%' 'SKIP' ('(' n ')')? ';'
    ;
 
-statement
+print_statement
    : '%' 'PRINT' ';'
    ;
 
-statement
+page_statement
    : '%' 'PAGE' ';'
    ;
 
-statement
+noprint_statement
    : '%' 'NOPRINT' ';'
    ;
 
-statement
-   : '%' 'INCLUDE'
-   { ( dataset '(' member_name ')' | member_name ) } ','+ ';'
+include_statement
+   : '%' 'INCLUDE' ((dataset '(' member_name ')' | member_name) ',')+ ';'
    ;
 
-statement
+signal_statement
    : 'SIGNAL' condition ';'
    ;
 
-statement
+revert_statement
    : 'REVERT' condition ';'
    ;
 
-statement
+on_statement
    : 'ON' condition 'SNAP'? ('SYSTEM' ';' | on_unit)
    ;
 
-statement
+format_statement
    : (label ':')+ 'FORMAT' '(' format_list ')' ';'
    ;
 
-statement
+putstring_statement
    : 'PUT-STRING' '(' character_reference ')' data_specification ';'
    ;
 
-statement
+put_statement
    : 'PUT' ('FILE' '(' file_reference ')')? data_specification? (('PAGE' ('LINE' '(' expression ')')? | 'SKIP' ('(' expression ')')? | 'LINE' '(' expression ')'))? ';'
    ;
 
-statement
+getstring_statement
    : 'GET-STRING' '(' expression ')' data_specification ';'
    ;
 
-statement
+get_statement
    : 'GET' ('FILE' '(' file_reference ')')? data_specification? ('COPY' '(' file_reference ')')? ('SKIP' ('(' expression ')')?)? ';'
    ;
 
-statement
+unlock_statement
    : 'UNLOCK' 'FILE' '(' file_reference ')' 'KEY' '(' expression ')' ';'
    ;
 
-statement
+delete_statement
    : 'DELETE' 'FILE' '(' file_reference ')' ('KEY' '(' expression ')')? ('EVENT' '(' event_reference ')')? ';'
    ;
 
-statement
+locate_statement
    : 'LOCATE' based_variable ('FILE' '(' file_reference ')' | 'SET' '(' pointer_reference | 'KEYFROM' '(' expression ')') ';'
    ;
 
-statement
+rewritefile_statement
    : 'REWRITE_FILE' '(' file_reference ')' ('FROM' '(' reference ')')? ('KEY' '(' expression ')')? ('EVENT' '(' event_reference)? ';'
    ;
 
-statement
+writefile_statement
    : 'WRITE' 'FILE' '(' file_reference ')' 'FROM' '(' reference ')' (('KEYFROM' '(' expression ')' | 'KEYTO' '(' reference ')'))? ('EVENT' '(' event_reference)? ';'
    ;
 
-statement
+readfile_statement
    : 'READ' 'FILE' '(' file_reference ')' ('INTO' '(' ref ')' (('KEY' '(' expression ')' 'NOLOCK'? | 'KEYTO' '(' reference ')'))? | 'SET' '(' pointer_ref ')' (('KEY' '(' expression ')' | 'KEYTO' '(' reference ')'))? | 'IGNORE' '(' expression ')') ('EVENT' '(' reference ')')? ';'
    ;
 
-statement
-   : 'CLOSE'
-   { 'FILE' '(' file_reference ')' ( 'ENVIRONMENT' '(' ( 'LEAVE' | 'REREAD' ) ')' )? } ','+ ';'
+close_statement
+   : 'CLOSE' ('FILE' '(' file_reference ')' ('ENVIRONMENT' '(' ('LEAVE' | 'REREAD') ')')? ',')+ ';'
    ;
 
-statement
-   : 'OPEN'
-   { options_group } ','+ ';'
+open_statement
+   : 'OPEN' (options_group ',')+ ';'
    ;
 
-statement
+return2_statement
    : 'RETURN' ('(' expression ')')? ';'
    ;
 
-statement
-   : 'CALL' (entry_reference | generic_name | built_in_name) ('('
-   { argument } ','* ')')? ('TASK' ('(' task_reference ')')?)? ('EVENT' '(' event_reference ')')? ('PRIORITY' '(' expression ')')? ';'
+call_statement
+   : 'CALL' (entry_reference | generic_name | built_in_name) ('(' (argument ',')* ')')? ('TASK' ('(' task_reference ')')?)? ('EVENT' '(' event_reference ')')? ('PRIORITY' '(' expression ')')? ';'
    ;
 
-statement
+cobol_statement
    : ('COBOL' | 'FORTRAN') ('NOMAP' ('(' parameter_list ')')?)? ('NOMAPIN' ('(' parameter_list ')')?)? ('NOMAPOUT' ('(' parameter_list ')')?)?
    ;
 
-statement
+main_statement
    : ('MAIN' 'NOEXECOPS'? 'REENTRANT'? 'TASK'? | 'COBOL' additional_options | 'FORTRAN' additional_options)
    ;
 
-statement
-   : (entry_constant ':')+ 'ENTRY' ('('
-   { parameter } ','+ ')')? ('RETURNS' '(' attribute+ ')')? ('OPTIONS' '(' characteristic_list ')')? (('REDUCIBLE' | 'IRREDUCIBLE'))? ';'
+entry_statement
+   : (entry_constant ':')+ 'ENTRY' ('(' (parameter ',')+ ')')? ('RETURNS' '(' attribute+ ')')? ('OPTIONS' '(' characteristic_list ')')? (('REDUCIBLE' | 'IRREDUCIBLE'))? ';'
    ;
 
-statement
-   : (entry_constant ':')+ 'PROCEDURE' ('('
-   { parameter } ','+ ')')? ('RETURNS' '(' attribute+ ')')? ('OPTIONS' '(' characteristic_list ')')? (('REDUCIBLE' | 'IRREDUCIBLE'))? 'RECURSIVE'? (('ORDER' | 'REORDER'))? (('CHARGRAPHIC' | 'NOCHARGRAPHIC'))? ';'
+procedure2_statement
+   : (entry_constant ':')+ 'PROCEDURE' ('(' (parameter ',')+ ')')? ('RETURNS' '(' attribute+ ')')? ('OPTIONS' '(' characteristic_list ')')? (('REDUCIBLE' | 'IRREDUCIBLE'))? 'RECURSIVE'? (('ORDER' | 'REORDER'))? (('CHARGRAPHIC' | 'NOCHARGRAPHIC'))? ';'
    ;
 
-statement
-   : 'WAIT' '('
-   { event_reference } ','+ ')' ('(' expression ')')? ';'
+wait_statement
+   : 'WAIT' '(' (event_reference ',')+ ')' ('(' expression ')')? ';'
    ;
 
-statement
+stop_statement
    : 'STOP' ';'
    ;
 
-statement
-   : 'SELECT' ('(' exp1 ')')? ';' ('WHEN' '('
-   { exp2 } ','+ ')' unit)* ('OTHERWISE' unit)?
+select_statement
+   : 'SELECT' ('(' exp1 ')')? ';' ('WHEN' '(' (exp2 ',')+ ')' unit)* ('OTHERWISE' unit)?
    ;
 
-statement
+null_statement
    : ';'
    ;
 
-statement
+leave_statement
    : 'LEAVE' label_constant? ';'
    ;
 
-statement
+if2_statement
    : 'IF' expression 'THEN' unit1 ('ELSE' unit2)?
    ;
 
-statement
+goto2_statement
    : ('GO' 'TO' | 'GOTO') label_reference ';'
    ;
 
-statement
+end2_statement
    : 'END' statement_label? ';'
    ;
 
-statement
-   : 'DO' reference '='
-   { specification } ','+ ';'
+do3_statement
+   : 'DO' reference '=' (specification ',')+ ';'
    ;
 
-statement
+do4_statement
    : 'DO' ('WHILE' '(' exp4 ')' ('UNTIL' '(' exp5 ')')? | 'UNTIL' '(' exp5 ')' ('WHILE' '(' exp4 ')')?) ';'
    ;
 
-statement
+do5_statement
    : 'DO' ';'
    ;
 
-statement
+display1_statement
    : 'DISPLAY' '(' expression ')' ('REPLY' '(' character_reference ')' ('EVENT' '(' event_reference ')')? | 'EVENT' '(' event_reference ')' reply '(' character_reference ')') ';'
    ;
 
-statement
+display2_statement
    : 'DISPLAY' '(' expression ')' ';'
    ;
 
-statement
+delay_statement
    : 'DELAY' '(' expression ')' ';'
    ;
 
-statement
-   :
-   { reference } ','+ '=' expression (',' 'BY' 'NAME')? ';'
+assign2_statement
+   : (reference ',')+ '=' expression (',' 'BY' 'NAME')? ';'
    ;
 
-statement
-   : 'FREE'
-   { option } ','+ ';'
+free_statement
+   : 'FREE' (option ',')+ ';'
    ;
 
-statement
-   : 'ALLOCATE'
-   { based_variable  reference?  } ','+ ';'
+allocate_statement
+   : 'ALLOCATE' (based_variable reference? ',')+ ';'
    ;
 
-statement
-   : 'FREE'
-   { controlled_variable } ','+ ';'
+free2_statement
+   : 'FREE' (controlled_variable ',')+ ';'
    ;
 
-statement
-   : 'ALLOCATE'
-   {  level?  controlled_variable  attribute?  } ','+
+allocate2_statement
+   : 'ALLOCATE' (level? controlled_variable attribute? ',')+
    ;
 
-statement
-   : 'RELEASE' (entry_constant)+ ';'
+release_statement
+   : 'RELEASE' entry_constant+ ';'
    ;
 
-statement
+begine_statement
    : 'BEGIN' ('ORDER' | 'REORDER')? ('CHARGRAPHIC' | 'NOCHARGRAPHIC')? ';'
    ;
 
-statement
+declare2_statement
    : 'DECLARE' (level? name attribute* 'SYSTEM'? ',')+ ';'
    ;
 
-statement
-   : 'DEFAULT'
-   { ( simple_specification | factored_specification ) } ','+ ';'
+default_statement
+   : 'DEFAULT' ((simple_specification | factored_specification) ',')+ ';'
    ;
 
 statement_simple_specification
@@ -591,14 +564,11 @@ statement_simple_specification
    ;
 
 statement_factored_specification
-   : '('
-   { ( simple_specification | factored_specification ) } ','+ ')' attribute_specification?
+   : '(' ((simple_specification | factored_specification) ',')+ ')' attribute_specification?
    ;
 
 statement_attribute_specification
-   : (attribute+ ('VALUE' '('
-   { value_specification } ','+ ')')? | 'VALUE' '('
-   { value_specification } ','+ ')')
+   : (attribute+ ('VALUE' '(' (value_specification ',')+ ')')? | 'VALUE' '(' (value_specification ',')+ ')')
    ;
 
 statement_value_specification
@@ -614,9 +584,7 @@ statement_additional_options
    ;
 
 statement_attribute
-   : (dimension | 'CHARACTER' '(' length | 'BIT' '(' length ')' | 'GRAPHIC' '(' length ')' | 'AREA' '(' size ')' | 'INITIAL' '('
-   { 'ITEM' } ','+ ')' | initial_call_entry_reference ('('
-   { argument } ','+ ')')?)
+   : (dimension | 'CHARACTER' '(' length | 'BIT' '(' length ')' | 'GRAPHIC' '(' length ')' | 'AREA' '(' size ')' | 'INITIAL' '(' ('ITEM' ',')+ ')' | initial_call_entry_reference ('(' (argument ',')+ ')')?)
    ;
 
 locator_qualification
@@ -656,34 +624,31 @@ attribute_iteration_specification
    ;
 
 attribute_iteration_item
-   : ('*' | initial_constant | reference | '('
-   { item } ','+ ')')
+   : ('*' | initial_constant | reference | '(' (item ',')+ ')')
    ;
 
-attribute_initial_constant
+attribute_initial_constant1
    : ((('+' | '-'))? arithmetic_constant | bit_constant | character_constant | graphic_constant | entry_constant | file_constant | label_constant | ('+' | '-')? real_constant ('+' | '-') imaginary_constant)
    ;
 
-attribute_initial_constant
-   : 'INITIAL' 'CALL' entry_reference ('('
-   { argument } ','+ ')')?
+attribute_initial_constant2
+   : 'INITIAL' 'CALL' entry_reference ('(' (argument ',')+ ')')?
    ;
 
 statement_specification
    : exp1 (('TO' exp2 ('BY' exp3)? | 'BY' exp3 ('TO' exp2)? | 'REPEAT' exp6))? (('WHILE' '(' exp4 ')' ('(' 'UNTIL' '(' exp5 ')')? | 'UNTIL' '(' exp5 ')' ('(' 'WHILE' '(' exp4 ')')?))?
    ;
 
-entry_data
+entry_data1
    : 'ENTRY' ('(' parameter_descriptor_list ')')? ('RETURNS' '(' attribute_list ')')? ('OPTIONS' '(' characteristic_list ')')? 'EXTERNAL'? (('IRREDUCIBLE' | 'REDUCIBLE'))?
    ;
 
-entry_data
+entry_data2
    : 'ENTRY' ('(' parameter_descriptor_list ')')? 'VARIABLE'? ('RETURNS' '(' attribute_list ')')? ('OPTIONS' '(' characteristic_list ')')? (('IRREDUCIBLE' | 'REDUCIBLE'))? scope_attribute? storage_attribute? alignment_attribute?? parameter?? 'DEFINED' 'INITIAL'?
    ;
 
 attribute_parameter_descriptor_list
-   :
-   { parameter_descriptor } ','+
+   : (parameter_descriptor ',')+
    ;
 
 attribute_parameter_descriptor
@@ -691,8 +656,7 @@ attribute_parameter_descriptor
    ;
 
 attribute_structure_parameter_descriptor
-   : '1' attribute* ','
-   { level  attribute * } ','+
+   : '1' attribute* ',' (level attribute* ',')+
    ;
 
 attribute_characteristic_list
@@ -700,520 +664,506 @@ attribute_characteristic_list
    ;
 
 attribute_additional_options
-   : ('NOMAP' ('('
-   { argi } ','+ ')')?)? ('NOMAPIN' ('(' (argi)+ ')')?)? ('NOMAPOUT' ('('
-   { argi } ','+ ')')?)? 'INTER'? 'RETCODE'?
+   : ('NOMAP' ('(' (argi ',')+ ')')?)? ('NOMAPIN' ('(' (argi)+ ')')?)? ('NOMAPOUT' ('(' (argi ',')+ ')')?)? 'INTER'? 'RETCODE'?
    ;
 
 built_in_function
-   : name ('('
-   { argument } ','* ')')?
+   : name ('(' (argument ',')* ')')?
    ;
 
-built_in_function
+parmset_built_in_function
    : 'PARMSET' '(' x ')'
    ;
 
-built_in_function
+counter_built_in_function
    : 'COUNTER'
    ;
 
-built_in_function
+compiletime_built_in_function
    : 'COMPILETIME'
    ;
 
-built_in_function
+verify_built_in_function
    : 'VERIFY' '(' x ',' y ')'
    ;
 
-built_in_function
+nuspec_built_in_function
    : 'UNSPEC' '(' x ')'
    ;
 
-built_in_function
+trunc_built_in_function
    : 'TRUNC' '(' x ')'
    ;
 
-built_in_function
+translate_built_in_function
    : 'TRANSLATE' '(' x ',' y (',' z)? ')'
    ;
 
-built_in_function
+time_built_in_function
    : 'TIME' ('(' ')')?
    ;
 
-built_in_function
+tanh_built_in_function
    : 'TANH' '(' x ')'
    ;
 
-built_in_function
+tand_built_in_function
    : 'TAND' '(' x ')'
    ;
 
-built_in_function
+tan_built_in_function
    : 'TAN' '(' x ')'
    ;
 
-built_in_function
+sysnull_built_in_function
    : 'SYSNULL' ('(' ')')?
    ;
 
-built_in_function
+sum_built_in_function
    : 'SUM' '(' x ')'
    ;
 
-built_in_function
+substr_built_in_function
    : 'SUBSTR' '(' x ',' y (',' z)? ')'
    ;
 
-built_in_function
+string_built_in_function
    : 'STRING' '(' x ')'
    ;
 
-built_in_function
+storage_built_in_function
    : 'STORAGE' '(' x ')'
    ;
 
-built_in_function
+status_built_in_function
    : 'STATUS' ('(' x ')')?
    ;
 
-built_in_function
+sqrt_built_in_function
    : 'SQRT' '(' x ')'
    ;
 
-built_in_function
+sinh_built_in_function
    : 'SINH' '(' x ')'
    ;
 
-built_in_function
+sind_built_in_function
    : 'SIND' '(' x ')'
    ;
 
-built_in_function
+sin_built_in_function
    : 'SIN' '(' x ')'
    ;
 
-built_in_function
+sign_built_in_function
    : 'SIGN' '(' x ')'
    ;
 
-built_in_function
+samekey_built_in_function
    : 'SAMEKEY' '(' x ')'
    ;
 
-built_in_function
+round_built_in_function
    : 'ROUND' '(' x ',' y ')'
    ;
 
-built_in_function
+repeat_built_in_function
    : 'REPEAT' '(' x ',' y ')'
    ;
 
-built_in_function
+real_built_in_function
    : 'REAL' '(' x ')'
    ;
 
-built_in_function
+prod_built_in_function
    : 'PROD' '(' x ')'
    ;
 
-built_in_function
+priority_built_in_function
    : 'PRIORITY' '(' x ')'
    ;
 
-built_in_function
+precision_built_in_function
    : 'PRECISION' '(' x ',' p (',' q)? ')'
    ;
 
-built_in_function
+poly_built_in_function
    : 'POLY' '(' x ',' y ')'
    ;
 
-built_in_function
+pointervalue_built_in_function
    : 'POINTERVALUE' '(' x ')'
    ;
 
-built_in_function
+pointeradd_built_in_function
    : 'POINTERADD' '(' x ',' y ')'
    ;
 
-built_in_function
+pointer_built_in_function
    : 'POINTER' '(' x ',' y ')'
    ;
 
-built_in_function
+pliretv_built_in_function
    : 'PLIRETV' ('(' ')')?
    ;
 
-built_in_function
+onsource_built_in_function
    : 'ONSOURCE' ('(' ')')?
    ;
 
-built_in_function
+onloc_built_in_function
    : 'ONLOC' ('(' ')')?
    ;
 
-built_in_function
+onkey_built_in_function
    : 'ONKEY' ('(' ')')?
    ;
 
-built_in_function
+onfile_built_in_function
    : 'ONFILE' ('(' ')')?
    ;
 
-built_in_function
+oncount_built_in_function
    : 'ONCOUNT' ('(' ')')
    ;
 
-built_in_function
+oncode_built_in_function
    : 'ONCODE' ('(' ')')
    ;
 
-built_in_function
+onchar_built_in_function
    : 'ONCHAR' ('(' ')')
    ;
 
-built_in_function
+offset_built_in_function
    : 'OFFSET' '(' x ',' y ')'
    ;
 
-built_in_function
+null_built_in_function
    : 'NULL' ('(' ')')
    ;
 
-built_in_function
+multiply_built_in_function
    : 'MULTIPLY' '(' x ',' y ',' p (',' q)? ')'
    ;
 
-built_in_function
+mpstr_built_in_function
    : 'MPSTR' '(' x ',' r (',' y)? ')'
    ;
 
-built_in_function
+mod_built_in_function
    : 'MOD' '(' x ',' y ')'
    ;
 
-built_in_function
-   : 'MIN' '('
-   { x } ','+ ')'
+min_built_in_function
+   : 'MIN' '(' (x ',')+ ')'
    ;
 
-built_in_function
-   : 'MAX' '('
-   { x } ','+ ')'
+max_built_in_function
+   : 'MAX' '(' (x ',')+ ')'
    ;
 
-built_in_function
+low_built_in_function
    : 'LOW' '(' x ')'
    ;
 
-built_in_function
+log10_built_in_function
    : 'LOG10' '(' x ')'
    ;
 
-built_in_function
+log2_built_in_function
    : 'LOG2' '(' x ')'
    ;
 
-built_in_function
+log_built_in_function
    : 'LOG' '(' x ')'
    ;
 
-built_in_function
+lineno_built_in_function
    : 'LINENO' '(' x ')'
    ;
 
-built_in_function
+length_built_in_function
    : 'LENGTH' '(' x ')'
    ;
 
-built_in_function
+lbound_built_in_function
    : 'LBOUND' '(' x ',' y ')'
    ;
 
-built_in_function
+index_built_in_function
    : 'INDEX' '(' x ',' y ')'
    ;
 
-built_in_function
+imag_built_in_function
    : 'IMAG' '(' x ')'
    ;
 
-built_in_function
+high_built_in_function
    : 'HIGH' '(' x ')'
    ;
 
-built_in_function
+hbound_built_in_function
    : 'HBOUND' '(' x ',' y ')'
    ;
 
-built_in_function
+graphic_built_in_function
    : 'GRAPHIC' '(' x (',' y)? ')'
    ;
 
-built_in_function
+floor_built_in_function
    : 'FLOOR' '(' x ')'
    ;
 
-built_in_function
+float_built_in_function
    : 'FLOAT' '(' x (',' p)? ')'
    ;
 
-built_in_function
+fixed_built_in_function
    : 'FIXED' '(' x (',' p (',' q)?)? ')'
    ;
 
-built_in_function
+exp_built_in_function
    : 'EXP' '(' x ')'
    ;
 
-built_in_function
+erfc_built_in_function
    : 'ERFC' '(' x ')'
    ;
 
-built_in_function
+erf_built_in_function
    : 'ERF' '(' x ')'
    ;
 
-built_in_function
+entryaddr_built_in_function
    : 'ENTRYADDR' '(' x ')'
    ;
 
-built_in_function
+empty_built_in_function
    : 'EMPTY' ('(' ')')?
    ;
 
-built_in_function
+devide_built_in_function
    : 'DIVIDE' '(' x ',' y ',' p (',' q)? ')'
    ;
 
-built_in_function
+dim_built_in_function
    : 'DIM' '(' x ',' y ')'
    ;
 
-built_in_function
+decimal_built_in_function
    : 'DECIMAL' '(' x (',' p (',' q)?)? ')'
    ;
 
-built_in_function
+datetime_built_in_function
    : 'DATETIME' ('(' ')')?
    ;
 
-built_in_function
+date_built_in_function
    : 'DATE' ('(' ')')?
    ;
 
-built_in_function
+datafield_built_in_function
    : 'DATAFIELD' ('(' ')')?
    ;
 
-built_in_function
+currentstorage_built_in_function
    : 'CURRENTSTORAGE' '(' x ')'
    ;
 
-built_in_function
+count_built_in_function
    : 'COUNT' '(' x ')'
    ;
 
-built_in_function
+cosh_built_in_function
    : 'COSH' '(' x ')'
    ;
 
-built_in_function
+cosd_built_in_function
    : 'COSD' '(' x ')'
    ;
 
-built_in_function
+cos_built_in_function
    : 'COS' '(' x ')'
    ;
 
-built_in_function
+conjg_built_in_function
    : 'CONJG' '(' x ')'
    ;
 
-built_in_function
+complex_built_in_function
    : 'COMPLEX' '(' x ',' y ')'
    ;
 
-built_in_function
+completion_built_in_function
    : 'COMPLETION' '(' x ')'
    ;
 
-built_in_function
+chat_built_in_function
    : 'CHAR' '(' x (',' y)? ')'
    ;
 
-built_in_function
+ciel_built_in_function
    : 'CEIL' '(' x ')'
    ;
 
-built_in_function
+bool_built_in_function
    : 'BOOL' '(' x ',' y ',' z ')'
    ;
 
-built_in_function
+bit_built_in_function
    : 'BIT' '(' x (',' y)? ')'
    ;
 
-built_in_function
+binaryvalue_built_in_function
    : 'BINARYVALUE' '(' x ')'
    ;
 
-built_in_function
+binary_built_in_function
    : 'BINARY' '(' x (',' p (',' q)?)? ')'
    ;
 
-built_in_function
+atanh_built_in_function
    : 'ATANH' '(' x ')'
    ;
 
-built_in_function
+atand_built_in_function
    : 'ATAND' '(' x (',' y)? ')'
    ;
 
-built_in_function
+atan_built_in_function
    : 'ATAN' '(' x (',' y)? ')'
    ;
 
-built_in_function
+asin_built_in_function
    : 'ASIN' '(' x ')'
    ;
 
-built_in_function
+any_built_in_function
    : 'ANY' '(' x ')'
    ;
 
-built_in_function
+allocation_built_in_function
    : 'ALLOCATION' '(' x ')'
    ;
 
-built_in_function
+all_built_in_function
    : 'ALL' '(' x ')'
    ;
 
-built_in_function
+addr_built_in_function
    : 'ADDR' '(' x ')'
    ;
 
-built_in_function
+add_built_in_function
    : 'ADD' '(' x ',' y ',' p (',' q)? ')'
    ;
 
-built_in_function
+acos_built_in_function
    : 'ACOS' '(' x ')'
    ;
 
-built_in_function
+abs_built_in_function
    : 'ABS' '(' x ')'
    ;
 
-built_in_subroutine
-   : call_name ('('
-   { argument } ','* ')')? ';'
+call_built_in_subroutine
+   : call_name ('(' (argument ',')* ')')? ';'
    ;
 
-built_in_subroutine
+plitest_built_in_subroutine
    : 'PLITEST' ('(' command_list ')')?
    ;
 
-built_in_subroutine
-   : 'PLITDLI' '('
-   { argument } ','+ ')'
+plitdli_built_in_subroutine
+   : 'PLITDLI' '(' (argument ',')+ ')'
    ;
 
-built_in_subroutine
-   : 'PLISRTD' '('
-   { argument } ','+ ')'
+plisrtd_built_in_subroutine
+   : 'PLISRTD' '(' (argument ',')+ ')'
    ;
 
-built_in_subroutine
-   : 'PLISRTC' '('
-   { argument } ','+ ')'
+plisrtc_built_in_subroutine
+   : 'PLISRTC' '(' (argument ',')+ ')'
    ;
 
-built_in_subroutine
-   : 'PLISRTB' '('
-   { argument } ','+ ')'
+plisRbuilt_in_subroutine
+   : 'PLISRTB' '(' (argument ',')+ ')'
    ;
 
-built_in_subroutine
-   : 'PLISRTA' '('
-   { argument } ','+ ')'
+plistra_built_in_subroutine
+   : 'PLISRTA' '(' (argument ',')+ ')'
    ;
 
-built_in_subroutine
+pliretc_built_in_subroutine
    : 'PLIRETC' '(' return_code ')'
    ;
 
-built_in_subroutine
+plirest_built_in_subroutine
    : 'PLIREST'
    ;
 
-built_in_subroutine
-   : 'PLIDUMP' '('
-   { argument } ','+ ')'
+plidump_built_in_subroutine
+   : 'PLIDUMP' '(' (argument ',')+ ')'
    ;
 
-built_in_subroutine
-   : 'PLICKPT' '('
-   { argument } ','+ ')'
+plickpt_built_in_subroutine
+   : 'PLICKPT' '(' (argument ',')+ ')'
    ;
 
-built_in_subroutine
+plicanc_built_in_subroutine
    : 'PLICANC'
    ;
 
-built_in_subroutine
-   : 'ASMTDLI' '('
-   { argument } ','+ ')'
+asmtdli_built_in_subroutine
+   : 'ASMTDLI' '(' (argument ',')+ ')'
    ;
 
-pseudovariable
+completion_pseudovariable
    : 'COMPLETION' '(' x ')'
    ;
 
-pseudovariable
+complex_pseudovariable
    : 'COMPLEX' '(' x ',' y ')'
    ;
 
-pseudovariable
+entryaddr_pseudovariable
    : 'ENTRYADDR' '(' x ')'
    ;
 
-pseudovariable
+imag_pseudovariable
    : 'IMAG' '(' x ')'
    ;
 
-pseudovariable
+onchar_pseudovariable
    : 'ONCHAR' ('(' ')')?
    ;
 
-pseudovariable
+onsource_pseudovariable
    : 'ONSOURCE' ('(' ')')?
    ;
 
-pseudovariable
+priority_pseudovariable
    : 'PRIORITY' ('(' x ')')?
    ;
 
-pseudovariable
+real_pseudovariable
    : 'REAL' '(' x ')'
    ;
 
-pseudovariable
+status_pseudovariable
    : 'STATUS' ('(' x ')')?
    ;
 
-pseudovariable
+string_pseudovariable
    : 'STRING' '(' x ')'
    ;
 
-pseudovariable
+substr_pseudovariable
    : 'SUBSTR' '(' x ',' y (',' z)? ')'
    ;
 
-pseudovariable
+unspec_pseudovariable
    : 'UNSPEC' '(' x ')'
    ;
 
@@ -1222,18 +1172,15 @@ statement_options_group
    ;
 
 data_specification
-   : ('LIST'? '(' data_specification_data_list ')' | 'DATA' ('('
-   { data_specification_data_list } ','+ ')')? | 'EDIT' ('(' data_specification_data_list ')' '(' data_specification_format_list ')')+)
+   : ('LIST'? '(' data_specification_data_list ')' | 'DATA' ('(' (data_specification_data_list ',')+ ')')? | 'EDIT' ('(' data_specification_data_list ')' '(' data_specification_format_list ')')+)
    ;
 
 data_specification_data_list
-   : (
-   { data_list_item } ','+ | ('(' data_list_item_type_3_do ')')+)
+   : ((data_list_item ',')+ | ('(' data_list_item_type_3_do ')')+)
    ;
 
 data_specification_format_list
-   :
-   { ( format_item | n_format_item | n '(' format_list ')' ) } ','+
+   : ((format_item | n_format_item | n '(' format_list ')') ',')+
    ;
 
 list_directed_data_value
@@ -1245,8 +1192,7 @@ data_directed_data_specification
    ;
 
 data_directed_element_assignment
-   :
-   { { element_variable '=' data_value }+ } ','+ ';'
+   : ((element_variable '=' data_value)+ ',')+ ';'
    ;
 
 edit_directed_data_specification
@@ -1254,62 +1200,58 @@ edit_directed_data_specification
    ;
 
 edit_directed_data_specification_format_list
-   : (
-   { format_item } ','+ |
-   { n_format_item } ','+ |
-   { n '(' format_list ')' } ','+)
+   : ((format_item ',')+ | (n_format_item ',')+ | (n '(' format_list ')') ','+)
    ;
 
-format_item
+format_item_a
    : 'A' ('(' field_width ')')?
    ;
 
-format_item
+format_item_b
    : 'B' ('(' field_width ')')?
    ;
 
-format_item
-   : 'C' '('
-   { real_format_item } ','+ ')'
+format_item_c
+   : 'C' '(' (real_format_item ',')+ ')'
    ;
 
-format_item
+format_item_column
    : 'COLUMN' '(' character_position ')'
    ;
 
-format_item
+format_item_e
    : 'E' '(' field_width ',' fractional_digits (',' significant_digits)? ')'
    ;
 
-format_item
+format_item_f
    : 'F' '(' field_width (',' fractional_digits (',' scaling_factor)?)? ')'
    ;
 
-format_item
+format_item_g
    : 'G' ('(' field_width ')')?
    ;
 
-format_item
+format_item_line
    : 'LINE' '(' line_number ')'
    ;
 
-format_item
+format_item_p
    : 'P' '\'' picture_specification '\''
    ;
 
-format_item
+format_item_page
    : 'PAGE'
    ;
 
-format_item
+format_item_r
    : 'R' '(' label_reference ')'
    ;
 
-format_item
+format_item_skip
    : 'SKIP' ('(' relative_line ')')?
    ;
 
-format_item
+format_item_x
    : 'X' '(' field_width ')'
    ;
 
@@ -1318,95 +1260,120 @@ scaling_factor_character
    ;
 
 condition
+   : condition_area
+   | condition_attention
+   | condition_check
+   | condition_condition
+   | condition_conversion
+   | condition_endfile
+   | condition_endpage
+   | condition_error
+   | condition_finish
+   | condition_fixedoverflow
+   | condition_key
+   | condition_name
+   | condition_overflow
+   | condition_pending
+   | condition_record
+   | condition_size
+   | condition_stringrange
+   | condition_stringsize
+   | condition_subscriptrange
+   | condition_transmit
+   | condition_undefinedfile
+   | condition_underflow
+   | condition_zeodivide
+   ;
+
+condition_area
    : 'AREA'
    ;
 
-condition
+condition_attention
    : 'ATTENTION'
    ;
 
-condition
-   : 'CHECK' ('('
-   { name } ','+ ')')?
+condition_check
+   : 'CHECK' ('(' (name ',')+ ')')?
    ;
 
-condition
+condition_condition
    : 'CONDITION' '(' name ')'
    ;
 
-condition
+condition_conversion
    : 'CONVERSION'
    ;
 
-condition
+condition_endfile
    : 'ENDFILE' '(' file_reference ')'
    ;
 
-condition
+condition_endpage
    : 'ENDPAGE' '(' file_reference ')'
    ;
 
-condition
+condition_error
    : 'ERROR'
    ;
 
-condition
+condition_finish
    : 'FINISH'
    ;
 
-condition
+condition_fixedoverflow
    : 'FIXEDOVERFLOW'
    ;
 
-condition
+condition_key
    : 'KEY' '(' file_reference ')'
    ;
 
-condition
+condition_name
    : 'NAME' '(' file_reference ')'
    ;
 
-condition
+condition_overflow
    : 'OVERFLOW'
    ;
 
-condition
+condition_pending
    : 'PENDING' '(' file_reference ')'
    ;
 
-condition
+condition_record
    : 'RECORD' '(' file_reference ')'
    ;
 
-condition
+condition_size
    : 'SIZE'
    ;
 
-condition
+condition_stringrange
    : 'STRINGRANGE'
    ;
 
-condition
+condition_stringsize
    : 'STRINGSIZE'
    ;
 
-condition
+condition_subscriptrange
    : 'SUBSCRIPTRANGE'
    ;
 
-condition
+condition_transmit
    : 'TRANSMIT' '(' file_reference ')'
    ;
 
-condition
+condition_undefinedfile
    : 'UNDEFINEDFILE' '(' file_reference ')'
    ;
 
-condition
+condition_underflow
    : 'UNDERFLOW'
    ;
 
-condition
+condition_zeodivide
    : 'ZERODIVIDE'
    ;
 
