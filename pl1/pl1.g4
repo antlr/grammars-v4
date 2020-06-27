@@ -29,10 +29,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/*
+* http://www.kednos.com/pli/docs/reference_manual/6291pro_contents.html
+*/
 grammar pl1;
 
 program
-   : statements
+   : (statements | percent_statements)*
    ;
 
 statements
@@ -572,7 +576,7 @@ close_statement
    ;
 
 open_statement
-   : 'OPEN' (options_group ',')+ ';'
+   : 'OPEN' (statement_options_group ',')+ ';'
    ;
 
 return2_statement
@@ -684,7 +688,7 @@ begin_statement
    ;
 
 declare2_statement
-   : 'DECLARE' (level? name attribute* 'SYSTEM'? ',')+ ';'
+   : 'DECLARE' (level? variable attribute* 'SYSTEM'? ',')+ ';'
    ;
 
 default_statement
@@ -908,11 +912,14 @@ built_in
    | acos_built_in_function
    | abs_built_in_function
    | multiply_built_in_function
+   | sign_built_in_function
+   | pliretv_built_in_function
+   | floor_built_in_function
    ;
 
-built_in_function
-   : name ('(' (argument ',')* ')')?
-   ;
+//built_in_function
+ //  : name ('(' (argument ',')* ')')?
+ //  ;
 
 parmset_built_in_function
    : 'PARMSET' '(' expression ')'
@@ -1671,39 +1678,65 @@ condition_zeodivide
 statement_preprocessor_do_specification
    : preprocessor_variable '=' preprocessor_exp1 (('TO' preprocessor_exp2 ('BY' preprocessor_exp3)? | 'BY' preprocessor_exp3 ('TO' preprocessor_exp2)?))?
    ;
-
 /*
 * various guesses...
 */
-file_reference: identifier;
-
-number_of_digits: expression;
 
 
-length: expression;
+file_reference
+   : identifier
+   ;
 
-call_name: identifier;
+number_of_digits
+   : expression
+   ;
 
-argument: expression;
+relative_line
+   : expression
+   ;
 
-field_width : expression;
+length
+   : expression
+   ;
 
-label: IDENTIFIER;
+call_name
+   : identifier
+   ;
 
-variable : identifier;
+argument
+   : expression
+   ;
 
-identifier: IDENTIFIER;
+field_width
+   : expression
+   ;
 
-hex_digit : HEX_DIGIT;
+label
+   : IDENTIFIER
+   ;
 
-HEX_DIGIT: [0-9abcdef]+;
+variable
+   : identifier
+   ;
+
+identifier
+   : IDENTIFIER
+   ;
+
+hex_digit
+   : HEX_DIGIT
+   ;
+
+HEX_DIGIT
+   : [0-9abcdef]+
+   ;
 
 COMMENT
    : '/*' .*? '*/' -> skip
    ;
 
 IDENTIFIER
-   : [a-zA-Z] [a-zA-Z0-9]*
+   : [a-zA-Z$_] [a-zA-Z$_0-9]*
    ;
 
 WS
