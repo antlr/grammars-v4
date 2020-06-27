@@ -375,28 +375,13 @@ statement	:	'DECLARE' { [ level ] name { attribute }* [ 'SYSTEM' ] }','+ ';';
 
 statement	:	'DEFAULT' { ( simple_specification | factored_specification ) }','+ ';';
 
-
-
-
 statement_simple_specification	:	( 'RANGE' '(' { ( { letter }+ | letter ':' letter ) }+ ')' [ attribute_specification ] | 'RANGE' '(' '*' ')' [ attribute_specification ] | 'DESCRIPTORS' [ attribute_specifications ] );
-
-
-
 
 statement_factored_specification	:	'(' { ( simple_specification | factored_specification ) }','+ ')' [ attribute_specification ];
 
-
-
-
 statement_attribute_specification	:	( { attribute }+ [ 'VALUE' '(' { value_specification }','+ ')' ] | 'VALUE' '(' { value_specification }','+ ')' );
 
-
-
-
 statement_value_specification	:	( 'AREA' '(' size ')' | 'BIT' '(' length ')' | 'CHARACTER' '(' length ')' | 'GRAPHIC' '(' length ')' | additional_options );
-
-
-
 
 statement_additional_options	:	[ ( 'REAL' | 'COMPLEX' ) ] [ ( 'FIXED' | 'FLOAT' ) ] [ ( 'BINARY' | 'DECIMAL' ) ]
 [ '(' precision [ ',' scaling_factor ] ')' ];
@@ -405,25 +390,15 @@ statement_additional_options	:	[ 'NOMAP' [ '(' parameter_list ')' ] ]
 [ 'NOMAPIN' [ '(' parameter_list ')' ] ]
 [ 'NOMAPOUT' [ '(' parameter_list ')' ] ];
 
-
-
 statement_attribute	:	( dimension | 'CHARACTER' '(' length | 'BIT' '(' length ')' | 'GRAPHIC' '(' length ')' | 'AREA' '(' size ')' | 'INITIAL' '(' { 'ITEM' }','+ ')' | initial_call_entry_reference [ '(' { argument }','+ ')' ] );
-
-
 
 locator_qualification	:	locator_reference '->' { based_locator_reference '->' }*
 based_reference;
 
-
-
 statement_reference	:	[ 'IN' '(' area_reference ')' ] [ 'SET' '(' locator_reference ')' ];
-
-
 
 statement_option	:	[ locator_qualifier '>' ] based_variable
 [ 'IN' '(' area_reference ')' ];
-
-
 
 option	:	expression 'REFER' '(' variable ')';
 
@@ -433,30 +408,18 @@ option	:	'EVENT' '(' event_reference ')';
 
 option	:	'TASK' [ '(' task_reference ')' ];
 
-
-
 attribute_item	:	( '*' | initial_constant | reference | '(' expression ')' | iteration_specification );
-
-
 
 attribute_iteration_specification	:	'(' iteration_factor ')' iteration_item;
 
-
-
 attribute_iteration_item	:	( '*' | initial_constant | reference | '(' { item }','+ ')' );
-
-
 
 attribute_initial_constant	:	( [ ( '+' | '-' ) ] arithmetic_constant | bit_constant | character_constant | graphic_constant | entry_constant | file_constant | label_constant | [ ( '+' | '-' ) ] real_constant ( '+' | '-' ) imaginary_constant );
 
 attribute_initial_constant	:	'INITIAL' 'CALL' entry_reference [ '(' { argument }','+ ')' ];
 
-
-
 statement_specification	:	exp1 [ ( 'TO' exp2 [ 'BY' exp3 ] | 'BY' exp3 [ 'TO' exp2 ] | 'REPEAT' exp6 ) ]
 [ ( 'WHILE' '(' exp4 ')' [ '(' 'UNTIL' '(' exp5 ')' ] | 'UNTIL' '(' exp5 ')' [ '(' 'WHILE' '(' exp4 ')' ] ) ];
-
-
 
 entry_data	:	'ENTRY' [ '(' parameter_descriptor_list ')' ]
 [ 'RETURNS' '(' attribute_list ')' ]
@@ -470,33 +433,16 @@ entry_data	:	'ENTRY' [ '(' parameter_descriptor_list ')' ] [ 'VARIABLE' ]
 [ alignment_attribute ] [ parameter ]
 [ 'DEFINED' ] [ 'INITIAL' ];
 
-
-
-
 attribute_parameter_descriptor_list	:	{ parameter_descriptor }','+;
-
-
-
 
 attribute_parameter_descriptor	:	[ ( { attribute }+ | '*' | structure_parameter_descriptor ) ];
 
-
-
-
 attribute_structure_parameter_descriptor	:	'1' { attribute }* ',' { level { attribute }* }','+;
-
-
-
 
 attribute_characteristic_list	:	( 'COBOL' | 'FORTRAN' | 'ASSEMBLER' ) [ additional_options ];
 
-
-
-
 attribute_additional_options	:	[ 'NOMAP' [ '(' { argi }','+ ')' ] ] [ 'NOMAPIN' [ '(' { argi }+ ')' ] ]
 [ 'NOMAPOUT' [ '(' { argi }','+ ')' ] ] [ 'INTER' ] [ 'RETCODE' ];
-
-
 
 built_in_function	:	name [ '(' { argument }','* ')' ];
 
@@ -727,9 +673,6 @@ built_in_subroutine	:	'PLICANC';
 
 built_in_subroutine	:	'ASMTDLI' '(' { argument }','+ ')';
 
-
-
-
 pseudovariable	:	'COMPLETION' '(' x ')';
 
 pseudovariable	:	'COMPLEX' '(' x ',' y ')';
@@ -754,8 +697,6 @@ pseudovariable	:	'SUBSTR' '(' x ',' y [ ',' z ] ')';
 
 pseudovariable	:	'UNSPEC' '(' x ')';
 
-
-
 statement_options_group	:	'FILE' '(' file_reference ')' [ ( 'STREAM' | 'RECORD' ) ]
 [ ( 'INPUT' | 'OUTPUT' | 'UPDATE' ) ] [ ( 'DIRECT' | 'SEQUENTIAL' | 'TRANSIENT' ) ] [ ( 'BUFFERED' | 'UNBUFFERED' ) ]
 [ 'BACKWARDS' ] [ 'EXCLUSIVE' ] [ 'KEYED' ]
@@ -764,47 +705,29 @@ statement_options_group	:	'FILE' '(' file_reference ')' [ ( 'STREAM' | 'RECORD' 
 [ 'PAGESIZE' '(' expression ')' ]
 ;
 
-
-
 data_specification	:	( [ 'LIST' ] '(' data_specification_data_list ')' | 'DATA' [ '(' { data_specification_data_list }','+ ')' ] | 'EDIT' { '(' data_specification_data_list ')' '(' data_specification_format_list ')' }+ )
 ;
-
-
 
 data_specification_data_list	:	( { data_list_item }','+ | { '(' data_list_item_type_3_do ')' }+ )
 ;
 
-
-
 data_specification_format_list	:	{ ( format_item | n_format_item | n '(' format_list ')' ) }','+
 ;
-
-
 
 list_directed_data_value	:	( [ ( '+' | '-' ) ] arithmetic_constant | [ ( '+' | '-' ) ] real_constant ( '+' | '-' ) imaginary_constant | character_constant | bit_constant | graphic_constant )
 ;
 
-
-
 data_directed_data_specification	:	'DATA' [ '(' data_list ')' ]
 ;
-
-
 
 data_directed_element_assignment	:	{ { element_variable '=' data_value }+ }','+ ';'
 ;
 
-
-
 edit_directed_data_specification	:	'EDIT' { '(' data_list ')' '(' format_list ')' }+
 ;
 
-
-
 edit_directed_data_specification_format_list	:	( { format_item }','+ | { n_format_item }','+ | { n '(' format_list ')' }','+ )
 ;
-
-
 
 format_item	:	'A' [ '(' field_width ')' ]
 ;
@@ -835,12 +758,8 @@ format_item	:	'SKIP' [ '(' relative_line ')' ]
 format_item	:	'X' '(' field_width ')'
 ;
 
-
-
 scaling_factor_character	:	'F' '(' [ ( '+' | '-' ) ] integer ')'
 ;
-
-
 
 condition	:	'AREA'
 ;
@@ -889,27 +808,21 @@ condition	:	'UNDERFLOW'
 condition	:	'ZERODIVIDE'
 ;
 
-
-
 statement_preprocessor_do_specification	:	preprocessor_variable '=' preprocessor_exp1
 [ ( 'TO' preprocessor_exp2 [ 'BY' preprocessor_exp3 ] | 'BY' preprocessor_exp3 [ 'TO' preprocessor_exp2 ] ) ]
 ;
-
 
 fragment A
    : ('a' | 'A')
    ;
 
-
 fragment B
    : ('b' | 'B')
    ;
 
-
 fragment C
    : ('c' | 'C')
    ;
-
 
 fragment D
    : ('d' | 'D')
