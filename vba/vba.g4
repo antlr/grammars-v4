@@ -921,7 +921,7 @@ R_SQUARE_BRACKET : ']';
 
 // literals
 STRINGLITERAL : '"' (~["\r\n] | '""')* '"';
-OCTLITERAL : '&O' [0-8]+ '&'?;
+OCTLITERAL : '&O' [0-7]+ '&'?;
 HEXLITERAL : '&H' [0-9A-F]+ '&'?;
 SHORTLITERAL : (PLUS|MINUS)? DIGIT+ ('#' | '&' | '@')?;
 INTEGERLITERAL : SHORTLITERAL (E SHORTLITERAL)?;

@@ -2,7 +2,7 @@
 
 ## Source
 
-Created for the [Dice Notation Tools for Java](https://github.com/Bernardo-MG/dice-notation-java/blob/master/LICENSE).
+Created for the [Dice Notation Tools for Java](https://github.com/Bernardo-MG/dice-notation-java/).
 
 ## Summary
 

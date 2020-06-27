@@ -1,0 +1,156 @@
+/******************************************************************************
+	system_mb/ui/MBPagingUnit.tjs
+	
+	フォーカススタックの操作は親レイヤに任せること
+*******************************************************************************/
+
+
+class MBPagingUnit extends MBComponentLayer
+{
+	var intPageNumber;		// ページ番号
+	var intMaxPageNumber;	// 最終ページ番号
+	
+	var objScrollButtonLeft;
+	var objScrollButtonRight;
+	
+	var fontColor = MBColors.font.label.normal;
+	var fontSize = MBFontStyle.size.label;
+	
+	
+	function MBPagingUnit(win, par, lpn)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(win, par);
+		
+		height = 14;
+		
+		font.face = MBFontStyle.face.normal;
+		font.height = fontSize;
+		
+		intPageNumber = 0;
+		intMaxPageNumber = Math.floor(lpn);
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate objScrollButtonLeft if (objScrollButtonLeft !== void);
+		invalidate objScrollButtonRight if (objScrollButtonRight !== void);
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function reload()
+	{
+		// 構築もしくは再構築
+		
+		var str = "%02d / %02d ページ".sprintf(intPageNumber + 1, intMaxPageNumber + 1);
+		
+		width = font.getTextWidth(str) + 56;
+		
+		fillRect(0, 0, width, height, 0x00000000);
+		
+		drawText(28, 0, str, fontColor);
+		
+		if (objScrollButtonLeft === void) {
+			objScrollButtonLeft = new MBScrollButtonLeft(window, this);
+			objScrollButtonLeft.setPos(0, 0);
+		}
+		objScrollButtonLeft.setValue(getScrollButtonValue('down'));
+		
+		if (objScrollButtonRight === void) {
+			objScrollButtonRight = new MBScrollButtonRight(window, this);
+			objScrollButtonRight.setPos(font.getTextWidth(str) + 42, 0);
+		}
+		objScrollButtonRight.setValue(getScrollButtonValue('up'));
+		
+		objScrollButtonLeft.objCursorMapHash.right = objScrollButtonRight;
+		objScrollButtonLeft.objCursorMapHash.left = objScrollButtonLeft;
+		
+		objScrollButtonRight.objCursorMapHash.left = objScrollButtonLeft;
+		objScrollButtonRight.objCursorMapHash.right = objScrollButtonRight;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function getScrollButtonValue(dir)	/* private */
+	{
+		// スクロールボタンに設定する値を取得
+		
+		var res;
+		
+		if (dir == 'up') {
+			res = intPageNumber + 1;
+			
+			if (res > intMaxPageNumber) {
+				res = 0;
+			}
+		}
+		
+		else if (dir == 'down') {
+			res = intPageNumber - 1;
+			
+			if (res < 0) {
+				res = intMaxPageNumber;
+			}
+		}
+		
+		else {
+			res = intPageNumber;
+		}
+		
+		return res;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onSelectedItemClick(sender)
+	{
+		switch (sender) {
+			case objScrollButtonLeft:
+				intPageNumber = sender.value;
+				reload();
+				parent.onScroll('left', intPageNumber);
+				break;
+			
+			case objScrollButtonRight:
+				intPageNumber = sender.value;
+				reload();
+				parent.onScroll('right', intPageNumber);
+				break;
+			
+			default:
+				break;
+		}
+	}
+	
+	function scrollByKB(dir)
+	{
+		// キーボードでスクロール
+		
+		switch (dir) {
+			case 'left':
+				onSelectedItemClick(objScrollButtonLeft);
+				break;
+			
+			case 'right':
+				onSelectedItemClick(objScrollButtonRight);
+				break;
+			
+			default:
+				break;
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onEscapeKeyDown(key, shift)
+	{
+		super.onEscapeKeyDown(...);
+		parent.onEscapeKeyDown(...);
+	}
+}

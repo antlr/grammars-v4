@@ -1,0 +1,531 @@
+// Conductor.tjs - KAG シナリオ進行処理
+// Copyright (C)2001-2009, W.Dee and contributors  改変・配布は自由です
+
+
+class ConductorException extends Exception
+{
+	// ConductorException - Conductor がタグハンドラを処理中に発生した例外を
+	// 投げる時に使われる例外クラス
+	function ConductorException() { super.Exception(...); }
+	function finalize() { super.finalize(...); }
+};
+
+class BaseConductor extends KAGParser
+{
+	// BaseConductor - シナリオ進行処理のベースクラス
+	var timer;
+	var oneshot;
+	var _interrupted = false; // 中断中か
+	var timerEnabled = false; // タイマが起動中か
+	var pendings; // 後回しにされたタグ
+	var inProcessing = false; // timerCallback を処理中かどうか
+	var reentered = false; // timerCallback 中に 再入したか
+	var nextTimerTick = 0; // 次にタイマーが発動されるはずの tick
+
+	function BaseConductor()
+	{
+		// コンストラクタ
+		super.KAGParser(...);
+
+		timer = new Timer(timerCallback, '');
+			// Timerの第二引数に空文字列を指定すると
+			// 第１引数に指定した関数を直接呼び出すようになる
+		oneshot = new AsyncTrigger(timerCallback, '');
+			// これも同様
+		oneshot.cached = true; // イベントのキャッシュを有効に
+
+		pendings = [];
+	}
+
+	function finalize()
+	{
+		// finalize()
+		invalidate timer;
+		invalidate oneshot;
+		super.finalize(...);
+	}
+
+	function clear()
+	{
+		// clear オーバーライド
+		pendings.clear();
+		super.clear();
+	}
+
+	function timerCallback()
+	{
+		// 次の要素を得る
+		nextTimerTick = timer.interval + System.getTickCount();
+		var obj;
+		try
+		{
+			if(inProcessing)
+			{
+				// 再入
+				reentered = true;
+				timer.interval = 0;
+				return;
+			}
+			inProcessing = true;
+			for(;;)
+			{
+				if(pendings.count > 0)
+				{
+					// 後回しにされたタグがある場合
+					obj = pendings[0];
+					pendings.erase(0);
+				}
+				else
+				{
+					// 後回しにされたタグがないので次のタグを得る
+					obj = getNextTag(); // 次のタグを得る
+
+					// getNextTag() の中で、pendings に追加された (iscript など)
+					if(pendings.count > 0)
+					{
+						pendings.add(obj);
+						continue;
+					}
+				}
+
+				if(obj === void)
+				{
+					// シナリオ終了
+					timer.enabled = false;
+					timerEnabled =false;
+					onStop();
+					inProcessing = false;
+					reentered = false;
+					return;
+				}
+				else
+				{
+					// onTag を呼ぶ
+					var step = onTag(obj);
+					if(step === void)
+						throw new Exception("onTag が void を返しました (" + obj.tagname + ")"
+							"( おそらくタグハンドラの戻り値を返し忘れた )");
+					step = int step; // step を数値に
+					if(step == 0)
+					{
+						// ウェイトを掛けずに次へ
+						timer.interval = 0;
+						continue;
+					}
+					else if(step < 0)
+					{
+						switch(step)
+						{
+						case -5: // いったんイベントを処理(現在のタグは後回し)
+							pendings.insert(0, obj);
+							oneshot.mode = atmAtIdle;
+							oneshot.trigger(); // トリガ
+							timer.interval = 0; // タイマは停止
+							inProcessing = false;
+							reentered = false;
+							return;
+						case -4: // いったんイベントを処理
+							oneshot.mode = atmAtIdle;
+							oneshot.trigger(); // トリガ
+							timer.interval = 0; // タイマは停止
+							inProcessing = false;
+							reentered = false;
+							return;
+						case -3: // 後回ししてブレーク
+							pendings.insert(0, obj);
+							timer.interval = 0; // タイマは停止
+							inProcessing = false;
+							reentered = false;
+							return;
+						case -2: // ブレーク
+							timer.interval = 0; // タイマは停止
+							inProcessing = false;
+							reentered = false;
+							return;
+						case -1: // シナリオ終了
+							timer.interval = 0; 
+							timer.enabled = false;
+							timerEnabled = false;
+							onStop();
+							inProcessing = false;
+							reentered = false;
+							return;
+						}
+					}
+					else
+					{
+						// 次へ
+						if(timer.interval != step)
+						{
+							timer.interval = step;
+							nextTimerTick = step + System.getTickCount();
+						}
+						inProcessing = false;
+						reentered = false;
+						return;
+					}
+				}
+			}
+			inProcessing = false;
+			reentered = false;
+		}
+		catch(e)
+		{
+//			Debug.logAsError();
+			timer.enabled = false;
+			timerEnabled =false;
+			onStop();
+			inProcessing = false;
+			var msg = "エラーが発生しました\n"
+				"ファイル : " + curStorage + "   行 : " + (curLine+1) + "\n"
+				"タグ : " + (obj === void ? "不明" : obj.tagname)
+				+ " ( ← エラーの発生した前後のタグを示している場合もあります )\n"
+				+ e.message;
+			if((typeof e.trace) != "undefined") dm("trace : " + e.trace);
+			dm(msg);
+			throw new ConductorException(msg);
+//			System.inform(msg, "エラー");
+		}
+	}
+
+	function onTag()
+	{
+		// オーバーライドすること
+		return -1;
+	}
+
+	function onStop()
+	{
+		// (シナリオの)停止時に呼ばれる。
+		// stop() から呼ばれるわけではない。
+		// オーバーライドすること。
+	}
+
+	function startProcess(immediate = false)
+	{
+		// シナリオ進行開始
+		// immediate = false の場合は非同期で実行を開始するので、
+		// このメソッド内でタグハンドラが呼ばれることはない
+		// 次のイベント配信のタイミングで最初のタグハンドラが呼ばれる。
+		// immediate = true の場合は、このメソッド内で初回のタグハンドラが
+		// 処理されるため、呼び出し側はこのメソッドの実行が終わったら
+		// すぐに吉里吉里に制御を戻す(すべての関数から抜ける)ようにするべき。
+		resetInterrupt();
+		timer.interval = 0; // 初期インターバル
+		timerEnabled = true;
+		if(!_interrupted)
+		{
+			timer.enabled = true; // タイマー開始
+			if(immediate)
+			{
+				timerCallback();
+			}
+			else
+			{
+				oneshot.mode = atmExclusive;
+					// イベントが配信されるまで他の非同期イベントをブロック
+				oneshot.trigger(); // トリガ
+			}
+		}
+	}
+
+	function start()
+	{
+		// タイマ開始
+		timerEnabled = true;
+		timer.enabled = true;
+	}
+
+	function stop()
+	{
+		// タイマ停止
+		timer.enabled = false;
+		timerEnabled = false;
+	}
+
+	property interrupted
+	{
+		getter() { return _interrupted; }
+		setter(x)
+		{
+			if(!x)
+			{
+				// enable
+				if(timerEnabled)
+				{
+					timer.interval = 0;
+					timer.enabled = true;
+					oneshot.mode = atmExclusive;
+						// イベントが配信されるまで他の非同期イベントをブロック
+					oneshot.trigger(); // トリガ
+				}
+			}
+			else
+			{
+				// disable
+				oneshot.cancel();
+				timer.enabled = false;
+			}
+			_interrupted = x;
+		}
+	}
+
+	function assign(src)
+	{
+		// src の状態をこのオブジェクトにコピー
+		var t = timer;
+		var st = src.timer;
+		t.enabled = false;
+		t.interval = st.interval;
+		nextTimerTick = src.nextTimerTick;
+		if(st.enabled && st.interval != 0)
+		{
+			// タイマ interval の調整
+			var delta = nextTimerTick - System.getTickCount();
+			if(delta > 0) t.interval = delta; else t.interval = 1;
+		}
+		t.enabled = st.enabled;
+		timerEnabled = src.timerEnabled;
+		_interrupted = src._interrupted;
+		if(src.pendings.count > 0)
+			pendings.assignStruct(src.pendings);
+		else
+			pendings.clear();
+		super.assign(src);
+	}
+
+	function store()
+	{
+		// store オーバーライド
+		return super.store(...);
+	}
+
+	function restore(dic)
+	{
+		// restore オーバーライド
+		super.restore(...);
+		pendings.clear();
+	}
+
+	function loadScenario()
+	{
+		// loadScenario オーバーライド
+		pendings.clear();
+		super.loadScenario(...);
+	}
+
+	function goToLabel()
+	{
+		// goToLabel オーバーライド
+		pendings.clear();
+		super.goToLabel(...);
+	}
+
+	function enqueueTag(tag)
+	{
+		pendings.add(tag);
+	}
+}
+
+
+class Conductor extends BaseConductor
+{
+	// Conductor - シナリオ進行処理
+	/*const*/ var mStop = 0; // 停止
+	/*const*/ var mRun = 1; // 動作中
+	/*const*/ var mWait = 2; // 待ち
+
+	var owner;
+	var handlers;
+	var status = mStop;
+	var timeOutTimer;
+	var waitUntil = %[];
+	var lastTagName = ''; // 直前のタグ名
+
+	function Conductor(owner, handlers)
+	{
+		// コンストラクタ
+		super.BaseConductor();
+		ignoreCR = global.ignoreCR;
+		debugLevel = tkdlVerbose;
+		this.owner = owner;
+		this.handlers = handlers;
+		timeOutTimer = new Timer(onTimeOut, '');
+	}
+
+	function finalize()
+	{
+		// finalize()
+		invalidate timeOutTimer;
+		super.finalize(...);
+	}
+
+	function run(immediate = false)
+	{
+		// 実行の開始
+		// immediate=true の場合は、
+		// このメソッドを実行したらすぐに吉里吉里に制御を戻す
+		// (すべての関数から戻る)こと
+		status = mRun;
+		startProcess(immediate);
+	}
+
+	function sleep()
+	{
+		// 実行の停止
+		status = mStop;
+		stop();
+	}
+
+	function wait(until)
+	{
+		// 待ち
+		// until = trigger で用いるシグナル名とコールバック関数の
+		// 辞書配列
+		status = mWait;
+		stop();
+		(Dictionary.assign incontextof waitUntil)(until);
+	}
+
+	function waitWithTimeOut(until, timeout)
+	{
+		// 待ちを行うが、タイムアウトがある
+		// タイムアウト時には 'timeout' がトリガされるので
+		// ハンドラを定義すること。
+		if(timeout == 0) timeout = 1; // timeout が 0 の場合は 1 に
+		status = mWait;
+		stop();
+		(Dictionary.assign incontextof waitUntil)(until);
+		timeOutTimer.interval = timeout;
+		timeOutTimer.enabled = true;
+	}
+
+	function onTimeOut()
+	{
+		// timeOutTimer がタイムアウトした
+		timeOutTimer.enabled = false;
+		trigger('timeout'); // 自分自身で timeout をトリガする
+	}
+
+	function trigger(name)
+	{
+		// waitUntil 内にシグナル名 name が存在すれば、実行再開、
+		// 同時に waitUntil に登録されたメソッド(リスタートハンドラ)を呼ぶ
+		// シグナル名に _arg がついたものが waitUntil 内にあれば、
+		// それを引数としてハンドラに渡す
+		// waitUntil はクリアされる
+		if(status != mWait) return false;
+		var func = waitUntil[name];
+		if(func !== void)
+		{
+			var arg = waitUntil[name + '_arg'];
+			if(arg !== void) func(arg); else func();
+			(Dictionary.clear incontextof waitUntil)();
+			run();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	function onTag(elm)
+	{
+		// タグの処理
+		var tagname = elm.tagname;
+		var handler = handlers[tagname];
+		if(handler !== void)
+		{
+			var ret = handler(elm);
+			lastTagName = tagname;
+			return ret;
+		}
+		return onUnknownTag(tagname, elm);
+	}
+
+	function onStop()
+	{
+		// BaseConductor.onStop オーバーライド
+		// 停止時に呼ばれるのでステータスを mStop にする
+		status = mStop;
+		if(owner.conductor == this) handlers.s(); // ハンドラの s (停止) を呼ぶ
+	}
+
+	function onScript(script, scriptname, lineofs)
+	{
+		// scirpt を実行する
+		try
+		{
+			Scripts.exec(script, scriptname, lineofs);
+		}
+		catch(e)
+		{
+			throw new Exception(scriptname + " の 行 " + lineofs + " から始まる"
+				" iscript ブロックでエラーが発生しました。"
+				"\n( 詳細はコンソールを参照してください )\n" + e.message);
+		}
+		return true;
+	}
+
+	function store()
+	{
+		// store オーバーライド
+		return super.store(...);
+	}
+
+	function restore(dic)
+	{
+		// restore オーバーライド
+		super.restore(...);
+		lastTagName = '';
+	}
+
+	function onScenarioLoad()
+	{
+		return owner.onConductorScenarioLoad(...);
+	}
+
+	function onScenarioLoaded()
+	{
+		return owner.onConductorScenarioLoaded(...);
+	}
+
+	function onLabel()
+	{
+		return owner.onConductorLabel(...);
+	}
+
+	function onJump()
+	{
+		return owner.onConductorJump(...);
+	}
+
+	function onCall()
+	{
+		return owner.onConductorCall(...);
+	}
+
+	function onReturn()
+	{
+		return owner.onConductorReturn(...);
+	}
+
+	function onAfterReturn()
+	{
+		return owner.onConductorAfterReturn(...);
+	}
+
+	function onScript()
+	{
+		return owner.onConductorScript(...);
+	}
+
+	function onUnknownTag()
+	{
+		return owner.onConductorUnknownTag(...);
+	}
+
+}
+
+

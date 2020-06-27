@@ -1,0 +1,184 @@
+//
+// $Id$
+//
+
+
+/**------------------------------
+ * カラーボックス
+ ------------------------------*/
+class KColorBox extends KValueWidget
+{
+  var _value;
+  var _hasAlpha;
+  var _pickerDict;
+  var _pickerName;
+  var pressing = false;
+
+  /**------------------------------
+   * カラーボックス
+   *
+   * 「色」を編集可能なカラーボックスのウィジェットです。
+   * ボックスをクリックするとカラーピッカーが表示されて色を編集できます。
+   *
+   * @param window ウィンドウ
+   * @param width 幅
+   * @param height 高さ
+   * @param name 名前
+   ------------------------------*/
+  function KColorBox(window, width, height, name = "") {
+    super.KWidget(window, name);
+    _value = 0xFFFFFF;
+    _hasAlpha = false;
+    _pickerDict = void;
+    _pickerName = "colorPicker";
+    setFixedSize(width, height);
+    update();
+  }
+
+  /**------------------------------
+   * αの有無
+   *
+   * 色の表現にα値を含むかどうかを指定します。
+   * α値を含む場合は0xAARRGGBB形式、
+   * 含まない場合は0xRRGGBB形式の整数で色を指定します。
+   * デフォルト設定はfalse(αを含まない)です。
+   *
+   * @return αの有無
+   * @param v αの有無
+   ------------------------------*/
+  property hasAlpha {
+    getter {
+      return _hasAlpha;
+    }
+    setter(v) {
+      if (v == _hasAlpha)
+        return;
+      _hasAlpha = v;
+      if (_hasAlpha) 
+        _value |= 0xFF000000;
+      else
+        _value &= 0xFFFFFF;
+      update();
+    }
+  }
+
+  /**------------------------------
+   * カラーの値
+   *
+   * hasAlpha = trueの時は 0xAARRGGBB、
+   * hasAlpha = falseの時は0xRRGGBB形式の整数で色を指定します。
+   *
+   * @return カラーの値
+   * @param v カラーの値
+   ------------------------------*/
+  property value {
+    getter {
+      return _value;
+    }
+    setter(v) {
+      if (_value == v)
+        return;
+      _value = v;
+      update();
+    }
+  }
+
+  /**------------------------------
+   * 色を16進数のテキストとして表現
+   *
+   * @return カラーテキスト
+   * @param v カラーテキスト
+   ------------------------------*/
+  property asText {
+    getter {
+      return convertColorToText(value, hasAlpha);
+    }
+    setter(v) {
+      value = convertTextToColor(v, hasAlpha);
+    }
+  }
+
+  /**------------------------------
+   * カラーピッカーの辞書
+   *
+   * @param dict 辞書
+   * @return 辞書
+   *
+   * カラーピッカーを開く時、その位置を記録する辞書を指定します。
+   * 指定を省略すると、KColorBoxにバインドされている辞書が使われます。
+   ------------------------------*/
+  property pickerDict {
+    getter {
+      return _pickerDict;
+    }
+    setter(dict) {
+      _pickerDict = dict;
+    }
+  }
+
+  /**------------------------------
+   * カラーピッカーの名前
+   *
+   * @param name 名前
+   * @return 名前
+   *
+   * カラーピッカーを辞書に記録する際の名前を指定します。
+   * 指定を省略すると、デフォルト名「colorPicker」が使われます。
+   ------------------------------*/
+  property pickerName {
+    getter {
+      return _pickerName;
+    }
+    setter(dict) {
+      _pickerName = name;
+    }
+  }
+
+  // 再描画
+  function onPaint {
+    if (hasAlpha) {
+      fillChecker(width < 16 ? int(width / 2) : 8);
+      colorRect(0, 0, width, height, _value & 0xFFFFFF, (_value >> 24) & 0xFF);
+    } else {
+      fillRect(0, 0, width, height, _value | 0xFF000000);
+    }
+  }
+
+  // マウスが押されたらダイアログを開く
+  function onMouseDown(x, y, button) {
+    super.onMouseDown(...);
+    if (button == mbLeft) {
+      pressing = true;
+    }
+  }
+
+  function onMouseUp(x, y, button) {
+    super.onMouseUp(...);
+    if (button == mbLeft) {
+      if (pressing) {
+        var result = queryColorPicker(value, hasAlpha, _pickerDict, _pickerName);
+        if (result !== void) {
+          value = result;
+          invalidateValue();
+        }
+      }
+      pressing = false;
+    }
+  }
+
+  function bindPersistentDictionary(dict) {
+    super.bindPersistentDictionary(...);
+    if (_pickerDict === void)
+      _pickerDict = dict;
+  }
+
+  // enabled==trueならそのまま表示
+  function onNodeEnabled {
+    opacity = 255;
+  } 
+
+  // enabled=falseなら半透明で表示
+  function onNodeDisabled {
+    opacity = 64;
+  }
+};

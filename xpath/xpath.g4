@@ -274,9 +274,7 @@ NCNameStartChar
   |  '\u3001'..'\uD7FF'
   |  '\uF900'..'\uFDCF'
   |  '\uFDF0'..'\uFFFD'
-// Unfortunately, java escapes can't handle this conveniently,
-// as they're limited to 4 hex digits. TODO.
-//  |  '\U010000'..'\U0EFFFF'
+  |  '\u{10000}'..'\u{EFFFF}'
   ;
 
 fragment

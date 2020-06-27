@@ -1,0 +1,60 @@
+if (typeof(global["Krkr2CompatUtils"]) !== "undefined") {
+  global.k_kirikiriz = 1;
+} else if (typeof(Debug["console"]) === "undefined") {
+  global.k_kirikiriz = 1;
+  Plugins.link("menu.dll");
+  global.Pad = %[];
+  Debug.console = %[];
+} else {
+  global.k_kirikiriz = 0;
+}
+
+Plugins.link("ksupport.dll");
+Plugins.link("windowEx.dll");
+Plugins.link("LayerExScreen.dll");
+Scripts.execStorage("KDefs.tjs");
+Scripts.execStorage("KUtils.tjs");
+Scripts.execStorage("KPersistentDictionary.tjs");
+Scripts.execStorage("KWidget.tjs");
+Scripts.execStorage("KVirtualWidget.tjs");
+Scripts.execStorage("KPrimaryWidget.tjs");
+Scripts.execStorage("KWindow.tjs");
+Scripts.execStorage("KStatusBar.tjs");
+Scripts.execStorage("KSpacer.tjs");
+Scripts.execStorage("KSeparator.tjs");
+Scripts.execStorage("KWindowResizeHandle.tjs");
+Scripts.execStorage("KTextLabel.tjs");
+Scripts.execStorage("KImageLabel.tjs");
+Scripts.execStorage("KButton.tjs");
+Scripts.execStorage("KToggleButton.tjs");
+Scripts.execStorage("KCheckBox.tjs");
+Scripts.execStorage("KRadioButton.tjs");
+Scripts.execStorage("KComboBox.tjs");
+Scripts.execStorage("KSlider.tjs");
+Scripts.execStorage("KTextInput.tjs");
+Scripts.execStorage("KTextInputSlider.tjs");
+Scripts.execStorage("KTextEdit.tjs");
+Scripts.execStorage("KTagTextEdit.tjs");
+Scripts.execStorage("KGridLayout.tjs");
+Scripts.execStorage("KRadioLayout.tjs");
+Scripts.execStorage("KAbsoluteLayout.tjs");
+Scripts.execStorage("KRelativeLayout.tjs");
+Scripts.execStorage("KScrollLayout.tjs");
+Scripts.execStorage("KMenu.tjs");
+Scripts.execStorage("KContextMenu.tjs");
+Scripts.execStorage("KList.tjs");
+Scripts.execStorage("KFrameLayout.tjs");
+Scripts.execStorage("KTabLayout.tjs");
+Scripts.execStorage("KSpliterLayout.tjs");
+Scripts.execStorage("KSpiralLayout.tjs");
+Scripts.execStorage("KFixedSizeLayout.tjs");
+Scripts.execStorage("KColorBox.tjs");
+Scripts.execStorage("KColorPickerDialog.tjs");
+Scripts.execStorage("KTimeLineControl.tjs");
+Scripts.execStorage("KCustomDialog.tjs");
+Scripts.execStorage("KTable.tjs");
+
+// マウスホイールはメッセージで取得
+// (DirectInput経由で取得するとたまにバグって吉里吉里が応答しなくなるのでその対策)
+System.setArgument('-wheel', 'message');
+

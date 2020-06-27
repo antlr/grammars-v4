@@ -1,0 +1,3 @@
+line 1:3 extraneous input ',' expecting {<EOF>, String, Bool, 'null', 'default', 'import', 'package', 'not', 'set(', '[', '{', '(', ArithOperator, UnsignedNumber, Name}
+line 1:8 extraneous input ',' expecting {<EOF>, String, Bool, 'null', 'default', 'import', 'package', 'not', 'set(', '[', '{', '(', ArithOperator, UnsignedNumber, Name}
+line 1:13 extraneous input '}' expecting {<EOF>, String, Bool, 'null', 'default', 'import', 'package', 'not', 'set(', '[', '{', '(', ArithOperator, UnsignedNumber, Name}

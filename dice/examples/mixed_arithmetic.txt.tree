@@ -1,1 +1,0 @@
-(parse (function (binaryOp (dice 1 d 20) - (function (binaryOp 5 + (function (dice 2 d 6)))))))

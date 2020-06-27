@@ -1,0 +1,2 @@
+DROP VIEW employee;
+DROP VIEW employee CASCADE CONSTRAINT;

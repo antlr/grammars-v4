@@ -1,0 +1,7 @@
+PROCEDURE fib
+  FROM i = n
+  DO
+    x1 += x2
+    x1 <=> x2
+    i -= 1
+  UNTIL i = 2
