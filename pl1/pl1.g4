@@ -139,24 +139,24 @@ attribute	:	"GRAPHIC" [ "(" length [ "REFER" "(" variable ")" ] ")" ];
 
 attribute	:	"VARYING";
 
-attribute	:	"PICTURE" "'" picture_specification "'";
+attribute	:	"PICTURE" '/'' picture_specification /'';
 
 
 
 
-constant	:	"'" { ( character | """ ) }* "'";
+constant	:	'/'' { ( character | """ ) }* '/'';
 
-constant	:	"'" { hex_digit hex_digit }* "'X";
+constant	:	'/'' { hex_digit hex_digit }* "'X";
 
-constant	:	"'" { ( "0" | "1" ) }* "'B";
+constant	:	'/'' { ( "0" | "1" ) }* "'B";
 
-constant	:	"'" { hex_digit }* ( "'BX" | "'B4" );
+constant	:	'/'' { hex_digit }* ( "'BX" | "'B4" );
 
-constant	:	"'" { graphic_symbol }* "'G";
+constant	:	'/'' { graphic_symbol }* "'G";
 
-constant	:	"'" { hex_digit hex_digit hex_digit hex_digit }* "'GX";
+constant	:	'/'' { hex_digit hex_digit hex_digit hex_digit }* "'GX";
 
-constant	:	"'" { ( character | "'" "'" | "<" { graphic_symbol }+ ">" ) }* "'M";
+constant	:	'/'' { ( character | '/'' '/'' | "<" { graphic_symbol }+ ">" ) }* "'M";
 
 
 
@@ -824,7 +824,7 @@ format_item	:	"G" [ "(" field_width ")" ]
 ;
 format_item	:	"LINE" "(" line_number ")"
 ;
-format_item	:	"P" "'" picture_specification "'"
+format_item	:	"P" '/'' picture_specification '/''
 ;
 format_item	:	"PAGE"
 ;
