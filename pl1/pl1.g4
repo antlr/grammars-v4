@@ -811,7 +811,7 @@ attribute_additional_options
    ;
 
 built_in
-   : built_in_function
+   :// built_in_function
    | parmset_built_in_function
    | counter_built_in_function
    | compiletime_built_in_function
