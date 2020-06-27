@@ -221,7 +221,7 @@ like_attribute
    ;
 
 parenth_attribute
-   : '(' (bound ',')+ ')'
+   : '(' (attribute_bound ',')+ ')'
    ;
 
 aligned_attribute
@@ -307,7 +307,7 @@ hex3_constant
    ;
 
 graphic2_constant
-   : '\'' ((character | '\'' '\'' | '<' (graphic_symbol)+ '>'))* '\'M'
+   : '\'' ((character | '\'' '\'' | '<' graphic_symbol+ '>'))* '\'M'
    ;
 
 attribute_bound
@@ -492,7 +492,7 @@ exit_statement
    ;
 
 skip_statement
-   : '%' 'SKIP' ('(' n ')')? ';'
+   : '%' 'SKIP' ('(' expression ')')? ';'
    ;
 
 print_statement
