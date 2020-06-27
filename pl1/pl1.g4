@@ -36,9 +36,6 @@ program
    : statements
    ;
 
-
-
-
 statements	:	( '(' { condition-prefix }','+ ')' ':' )* ( label_prefix ':' )*
  statement_body ? ';';
 
@@ -133,21 +130,21 @@ attribute	:	'GRAPHIC' ( '(' length ('REFER' '(' variable ')' )? ')' )?;
 
 attribute	:	'VARYING';
 
-attribute	:	'PICTURE' '/'' picture_specification '/'';
+attribute	:	'PICTURE' '\'' picture_specification '\'';
 
-constant	:	'/'' ( ( character | '/"' ) )* '/'';
+constant	:	'\'' ( ( character | '"' ) )* '\'';
 
-constant	:	'/'' ( hex_digit hex_digit )* '/'X';
+constant	:	'\'' ( hex_digit hex_digit )* '\'X';
 
-constant	:	'/'' ( ( '0' | '1' ) )* '/'B';
+constant	:	'\'' ( ( '0' | '1' ) )* '\'B';
 
-constant	:	'/'' ( hex_digit )* ( '/'BX' | '/'B4' )';
+constant	:	'\'' ( hex_digit )* ( '\'BX' | '\'B4' );
 
-constant	:	'/'' ( graphic_symbol )* '/'G';
+constant	:	'\'' ( graphic_symbol )* '\'G';
 
-constant	:	'/'' ( hex_digit hex_digit hex_digit hex_digit )* '/'GX';
+constant	:	'\'' ( hex_digit hex_digit hex_digit hex_digit )* '\'GX';
 
-constant	:	'/'' { ( character | '/'' '/'' | '<' { graphic_symbol }+ '>' ) }* '/'M';
+constant	:	'\'' ( ( character | '\'' '\'' | '<' ( graphic_symbol )+ '>' ) )* '\'M';
 
 attribute_bound	:	( ( lower_bound ':' )? upper_bound | '*' );
 
@@ -270,12 +267,12 @@ statement	:	( 'COBOL' | 'FORTRAN' ) ( 'NOMAP' ( '(' parameter_list ')' )? )?
 
 statement	:	( 'MAIN'  'NOEXECOPS'?   'REENTRANT' ?  'TASK' ? | 'COBOL'  additional_options  | 'FORTRAN'  additional_options  );
 
-statement	:	{ entry_constant ':' }+ 'ENTRY' ( '(' { parameter }','+ ')' )?
-( 'RETURNS' '(' { attribute }+ ')' )?
+statement	:	( entry_constant ':' )+ 'ENTRY' ( '(' { parameter }','+ ')' )?
+( 'RETURNS' '('  attribute + ')' )?
 ( 'OPTIONS' '(' characteristic_list ')' )? ( ( 'REDUCIBLE' | 'IRREDUCIBLE' ) )? ';';
 
-statement	:	{ entry_constant ':' }+ 'PROCEDURE' ( '(' { parameter }','+ ')' )?
-( 'RETURNS' '(' { attribute }+ ')' )?
+statement	:	( entry_constant ':' )+ 'PROCEDURE' ( '(' { parameter }','+ ')' )?
+( 'RETURNS' '('  attribute + ')' )?
 ( 'OPTIONS' '(' characteristic_list ')' )? ( ( 'REDUCIBLE' | 'IRREDUCIBLE' ) )?
  'RECURSIVE'? ( ( 'ORDER' | 'REORDER' ) )? ( ( 'CHARGRAPHIC' | 'NOCHARGRAPHIC' ) )? ';';
 
@@ -284,7 +281,7 @@ statement	:	'WAIT' '(' { event_reference }','+ ')' ( '(' expression ')' )? ';';
 statement	:	'STOP' ';';
 
 statement	:	'SELECT' ( '(' exp1 ')' )? ';'
-{ 'WHEN' '(' { exp2 }','+ ')' unit }* ( 'OTHERWISE' unit )?;
+( 'WHEN' '(' { exp2 }','+ ')' unit )* ( 'OTHERWISE' unit )?;
 
 statement	:	';';
 
@@ -319,19 +316,19 @@ statement	:	'FREE' { controlled_variable }','+ ';';
 
 statement	:	'ALLOCATE' {  level?  controlled_variable  attribute?  }','+;
 
-statement	:	'RELEASE' { entry_constant }+ ';';
+statement	:	'RELEASE' ( entry_constant )+ ';';
 
-statement	:	'BEGIN' ( ( 'ORDER' | 'REORDER' ) )? ( ( 'CHARGRAPHIC' | 'NOCHARGRAPHIC' ) ? ';';
+statement	:	'BEGIN' (  'ORDER' | 'REORDER' )?  ( 'CHARGRAPHIC' | 'NOCHARGRAPHIC' ) ? ';';
 
-statement	:	'DECLARE' {  level?  name { attribute }*  'SYSTEM'?s  }','+ ';';
+statement	:	'DECLARE' (  level?  name  attribute *  'SYSTEM'? ',' )+ ';';
 
 statement	:	'DEFAULT' { ( simple_specification | factored_specification ) }','+ ';';
 
-statement_simple_specification	:	( 'RANGE' '(' { ( { letter }+ | letter ':' letter ) }+ ')'  attribute_specification? | 'RANGE' '(' '*' ')'  attribute_specification?  | 'DESCRIPTORS'  attribute_specifications ? );
+statement_simple_specification	:	( 'RANGE' '(' ( (  letter + | letter ':' letter ) )+ ')'  attribute_specification? | 'RANGE' '(' '*' ')'  attribute_specification?  | 'DESCRIPTORS'  attribute_specifications ? );
 
 statement_factored_specification	:	'(' { ( simple_specification | factored_specification ) }','+ ')'  attribute_specification? ;
 
-statement_attribute_specification	:	( { attribute }+ ( 'VALUE' '(' { value_specification }','+ ')' )? | 'VALUE' '(' { value_specification }','+ ')' );
+statement_attribute_specification	:	(  attribute + ( 'VALUE' '(' { value_specification }','+ ')' )? | 'VALUE' '(' { value_specification }','+ ')' );
 
 statement_value_specification	:	( 'AREA' '(' size ')' | 'BIT' '(' length ')' | 'CHARACTER' '(' length ')' | 'GRAPHIC' '(' length ')' | additional_options );
 
@@ -344,7 +341,7 @@ statement_additional_options	:	( 'NOMAP' ( '(' parameter_list ')' )? )?
 
 statement_attribute	:	( dimension | 'CHARACTER' '(' length | 'BIT' '(' length ')' | 'GRAPHIC' '(' length ')' | 'AREA' '(' size ')' | 'INITIAL' '(' { 'ITEM' }','+ ')' | initial_call_entry_reference ( '(' { argument }','+ ')' )? );
 
-locator_qualification	:	locator_reference '->' { based_locator_reference '->' }*
+locator_qualification	:	locator_reference '->' ( based_locator_reference '->' )*
 based_reference;
 
 statement_reference	:	( 'IN' '(' area_reference ')' )? ( 'SET' '(' locator_reference ')' )?;
@@ -366,7 +363,7 @@ attribute_iteration_specification	:	'(' iteration_factor ')' iteration_item;
 
 attribute_iteration_item	:	( '*' | initial_constant | reference | '(' { item }','+ ')' );
 
-attribute_initial_constant	:	( ( ( '+' | '-' ) )? arithmetic_constant | bit_constant | character_constant | graphic_constant | entry_constant | file_constant | label_constant | [ ( '+' | '-' ) ] real_constant ( '+' | '-' ) imaginary_constant );
+attribute_initial_constant	:	( ( ( '+' | '-' ) )? arithmetic_constant | bit_constant | character_constant | graphic_constant | entry_constant | file_constant | label_constant |  ( '+' | '-' )? real_constant ( '+' | '-' ) imaginary_constant );
 
 attribute_initial_constant	:	'INITIAL' 'CALL' entry_reference ( '(' { argument }','+ ')' )?;
 
@@ -387,13 +384,13 @@ entry_data	:	'ENTRY' ( '(' parameter_descriptor_list ')' )?  'VARIABLE' ?
 
 attribute_parameter_descriptor_list	:	{ parameter_descriptor }','+;
 
-attribute_parameter_descriptor	:	( ( { attribute }+ | '*' | structure_parameter_descriptor ) )?;
+attribute_parameter_descriptor	:	( ( ( attribute )+ | '*' | structure_parameter_descriptor ) )?;
 
-attribute_structure_parameter_descriptor	:	'1' { attribute }* ',' { level { attribute }* }','+;
+attribute_structure_parameter_descriptor	:	'1'  attribute * ',' { level  attribute * }','+;
 
 attribute_characteristic_list	:	( 'COBOL' | 'FORTRAN' | 'ASSEMBLER' )  additional_options ?;
 
-attribute_additional_options	:	( 'NOMAP' ( '(' { argi }','+ ')' )? )? ( 'NOMAPIN' ( '(' { argi }+ ')' )? )?
+attribute_additional_options	:	( 'NOMAP' ( '(' { argi }','+ ')' )? )? ( 'NOMAPIN' ( '(' ( argi )+ ')' )? )?
 ( 'NOMAPOUT' ( '(' { argi }','+ ')' )? )?  'INTER' ?  'RETCODE' ?;
 
 built_in_function	:	name ( '(' { argument }','* ')' )?;
@@ -572,7 +569,7 @@ built_in_function	:	'BIT' '(' x ( ',' y )? ')';
 
 built_in_function	:	'BINARYVALUE' '(' x ')';
 
-built_in_function	:	'BINARY' '(' x () ',' p ( ',' q )? )? ')';
+built_in_function	:	'BINARY' '(' x ( ',' p ( ',' q )? )? ')';
 
 built_in_function	:	'ATANH' '(' x ')';
 
@@ -654,10 +651,10 @@ statement_options_group	:	'FILE' '(' file_reference ')'  ( 'STREAM' | 'RECORD' )
 ( 'PAGESIZE' '(' expression ')' )?
 ;
 
-data_specification	:	(  'LIST' ? '(' data_specification_data_list ')' | 'DATA' ( '(' { data_specification_data_list }','+ ')' )? | 'EDIT' { '(' data_specification_data_list ')' '(' data_specification_format_list ')' }+ )
+data_specification	:	(  'LIST' ? '(' data_specification_data_list ')' | 'DATA' ( '(' { data_specification_data_list }','+ ')' )? | 'EDIT' ( '(' data_specification_data_list ')' '(' data_specification_format_list ')' )+ )
 ;
 
-data_specification_data_list	:	( { data_list_item }','+ | { '(' data_list_item_type_3_do ')' }+ )
+data_specification_data_list	:	( { data_list_item }','+ | ( '(' data_list_item_type_3_do ')' )+ )
 ;
 
 data_specification_format_list	:	{ ( format_item | n_format_item | n '(' format_list ')' ) }','+
@@ -672,7 +669,7 @@ data_directed_data_specification	:	'DATA' ( '(' data_list ')' )?
 data_directed_element_assignment	:	{ { element_variable '=' data_value }+ }','+ ';'
 ;
 
-edit_directed_data_specification	:	'EDIT' { '(' data_list ')' '(' format_list ')' }+
+edit_directed_data_specification	:	'EDIT' ( '(' data_list ')' '(' format_list ')' )+
 ;
 
 edit_directed_data_specification_format_list	:	( { format_item }','+ | { n_format_item }','+ | { n '(' format_list ')' }','+ )
@@ -694,9 +691,9 @@ format_item	:	'F' '(' field_width
 ;
 format_item	:	'G' ( '(' field_width ')' )?
 ;
-format_item	:	'LINE' '(' line_number ')'
-;
-format_item	:	'P' '/'' picture_specification '/''
+format_item	:	'LINE' '(' line_number ')';
+
+format_item	:	'P' '\'' picture_specification '\''
 ;
 format_item	:	'PAGE'
 ;
