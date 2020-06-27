@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2018, Tom Everett
+Copyright (c) 2020, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,47 +29,109 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar zone;
 
 zonefile
-   :  orig include* entry*
+   : orig include* record*
    ;
 
 orig
-    :'$ORIGIN' domainname ;
+   : '$ORIGIN' domainname
+   ;
 
 include
-    : '$INCLUDE' filename dominaname?;
+   : '$INCLUDE' filename domainname?
+   ;
 
+record
+   : (domainname | '@')? rr
+   ;
 
-entry
-    : domainname rr;
+rr
+   : rr1
+   | rr2
+   ;
 
+rr1
+   : ttl? record_class? record_type? record_data
+   ;
 
+rr2
+   : record_class? ttl? record_type? record_data
+   ;
 
-ldhstr   : letdidhyp | (letdidhyp ldhstr);
+ttl
+   : integer
+   ;
 
-letdidhyp: LETTER | DIGIT | '-';
+record_class
+   : 'IN'
+   ;
 
-letdig : LETTER | DIGIT;
+record_type
+   : 'A'
+   ;
+
+filename
+   : LETTER+
+   ;
+
+integer
+   : DIGIT+
+   ;
+
+record_data
+   : (LETTER | DIGIT | '.')+
+   ;
+   // ***** domain name *****
+
+domainname
+   : subdomain
+   ;
+
+subdomain
+   : (subdomain '.')? label
+   ;
+
+label
+   : letter (ldhstr? LETDIG)?
+   ;
+
+letter
+   : LETTER
+   ;
+
+ldhstr
+   : LETDIGHYP
+   | (LETDIGHYP ldhstr)
+   ;
+
+LETDIGDOT
+   : LETTER
+   | DIGIT
+   | '.'
+   ;
+
+LETDIGHYP
+   : LETTER
+   | DIGIT
+   | '-'
+   ;
+
+LETDIG
+   : LETTER
+   | DIGIT
+   ;
 
 DIGIT
-: [0-9];
+   : [0-9]
+   ;
 
 LETTER
-    : [a-zA-Z];
-
+   : [a-zA-Z]
+   ;
 
 WS
    : [ \t\r\n] -> skip
    ;
-
-
-domainname: subdomain;
-
-subdomain: label | subdomain '.' label;
-
-label: letter [ [ <ldh-str> ] <let-dig> ]
-
 
