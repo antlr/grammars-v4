@@ -1,0 +1,8 @@
+MSG 0 1 . 52 178
+Content-Type: application/beep+xml
+
+<start number='1'>
+    <profile uri='http://iana.org/beep/SASL/OTP' />
+        <profile uri='http://iana.org/beep/SASL/ANONYMOUS' />
+</start>
+END
