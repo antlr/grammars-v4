@@ -93,7 +93,7 @@ ansno
    ;
 
 payload_trailer
-   : PAYLOAD_TRAILER CRLF
+   : PAYLOAD_TRAILER CRLF?
    ;
 
 DOT
