@@ -1,0 +1,1 @@
+(filter ( (filtercomp (item (substring (attr o) = (initial (value univ)) (any * (starval (value of) * (starval (value mich) *)))))) ))

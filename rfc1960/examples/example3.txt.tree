@@ -1,0 +1,1 @@
+(filter ( (filtercomp (and & (filterlist (filter ( (filtercomp (item (simple (attr objectClass) (filtertype =) (value Person)))) )) (filterlist (filter ( (filtercomp (or | (filterlist (filter ( (filtercomp (item (simple (attr sn) (filtertype =) (value Jensen)))) )) (filterlist (filter ( (filtercomp (item (substring (attr cn) = (initial (value Babs J)) (any *)))) )))))) )))))) ))
