@@ -67,7 +67,7 @@ string
    ;
 
 STRING
-   : [a-zA-Z]+
+   : [a-zA-Z ]+
    ;
 
 WS
