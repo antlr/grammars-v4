@@ -64,6 +64,7 @@ functionname
 
 string
    : STRING
+   | ESCSTRING
    ;
 
 ACTIVE
@@ -74,8 +75,12 @@ NEUTRAL
    : '##<'
    ;
 
+ESCSTRING
+   : '<' [a-zA-Z]+ '>'
+   ;
+
 STRING
-   : [a-zA-Z0-9@ ]+
+   : [a-zA-Z0-9@!#+\-*&$%'?=".|_ ]+
    ;
 
 WS

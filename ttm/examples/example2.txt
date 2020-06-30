@@ -1,1 +1,1 @@
-<ds;def;<##<ds;name;<text>>##<ss;name;subs>>>
+#<def;n!;N;<#<lt;N;2;1;<#<mu;N;#<n!;#<su;N;1>>>>>>>
