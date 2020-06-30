@@ -41,11 +41,11 @@ macro
    ;
 
 active
-   : '#' '(' arglist ')'
+   : '#' '(' name (',' arglist)? ')'
    ;
 
 neutral
-   : '##' '(' arglist ')'
+   : '##' '(' name (',' arglist)? ')'
    ;
 
 arglist
@@ -56,6 +56,10 @@ arg
    : macro
    | ('(' macro ')')
    | string
+   ;
+
+name
+   : string
    ;
 
 string
