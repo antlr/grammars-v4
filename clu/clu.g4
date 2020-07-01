@@ -241,7 +241,9 @@ primary
    | primary '.' name
    | primary expression
    | primary '(' expression_list ')'
-   | type_spec '$' (field_list | ('[' (((expression ':')? expression_list) | constant_list) ']'))
+   | type_spec '$' field_list
+   | type_spec '$' '[' ((expression ':')? expression_list) ']'
+   | type_spec '$' (name constant_list?)
    | ('force' type_spec?)
    | (('up' | 'down') '(' expression ')')
    ;
