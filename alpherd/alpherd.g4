@@ -1,7 +1,7 @@
 /*
  BSD License
 
- Copyright (c) 2018, Tom Everett All rights reserved.
+ Copyright (c) 2020, Tom Everett All rights reserved.
 
  Redistribution and use in source and binary forms, with or without modification, are permitted
  provided that the following conditions are met:
@@ -22,292 +22,434 @@
  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-grammar clu;
+grammar alpherd;
 
-module
-   : equate* (procedure | iterator | cluster)
+compilation_unit
+   : ('begin' block 'end')
+   | exec_decl_list
    ;
 
-procedure
-   : idn '=' 'proc' parms? args returnz? signals? where? routine_body 'end' idn
+block
+   : exec_decl_list (';' exec_decl_list)* stmt (';' stmt)* '*'
    ;
 
-iterator
-   : idn '=' 'iter' parms? args yields? signals? where? routine_body 'end' idn
+exec_decl_list
+   : exec_decl (';' exec_decl)*
    ;
 
-cluster
-   : idn '=' 'cluster' parms? 'is' idn_list where? cluster_body 'end' idn
-   ;
-
-parms
-   : param (',' param)*
-   ;
-
-param
-   : idn_list ':' ('type' | type_spec)
-   ;
-
-args
-   : '(' decl_list? ')'
-   ;
-
-decl_list
-   : decl (',' decl)*
-   ;
-
-decl
-   : idn_list ':' type_spec
-   ;
-
-returnz
-   : 'returns' '(' type_spec_list ')'
-   ;
-
-yields
-   : 'yields' '(' type_spec_list ')'
-   ;
-
-signals
-   : 'signals' '(' exception (',' exception)* ')'
-   ;
-
-exception
-   : name type_spec_list?
-   ;
-
-type_spec_list
-   : type_spec (',' type_spec)*
-   ;
-
-where
-   : 'where' restriction (',' restriction)*
-   ;
-
-restriction
-   : idn ('has' oper_decl_list | 'in' type_set)
-   ;
-
-type_set
-   : (idn | (idn 'has' oper_decl_list equate*))*
-   | idn
-   ;
-
-oper_decl_list
-   : oper_decl (',' oper_decl)*
-   ;
-
-oper_decl
-   : op_name_list ':' type_spec
-   ;
-
-op_name_list
-   : op_name (',' op_name)*
-   ;
-
-op_name
-   : name '[' constant_list? ']'
-   ;
-
-constant_list
-   : constant (',' constant)*
-   ;
-
-constant
-   : expression
-   | type_spec
-   ;
-
-routine_body
-   : equate* own_var* statement*
-   ;
-
-cluster_body
-   : equate* 'rep' '=' type_spec equate* own_var* 'routine' routine*
-   ;
-
-routine
-   : procedure
-   | iterator
-   ;
-
-equate
-   : idn '=' (constant | type_set)
-   ;
-
-own_var
-   : 'own' decl
-   | 'own' (idn ':' type_spec ':=' expression)
-   | 'own' (decl_list ':=' invocation)
-   ;
-
-type_spec
-   : 'null'
-   | 'bool'
-   | 'int'
-   | 'real'
-   | 'char'
-   | 'string'
-   | 'any'
-   | 'rep'
-   | 'cvt'
-   | ('array' | 'sequence' type_spec?)
-   | ('record' | 'struct' | 'oneof' | 'variant') field_spec_list?
-   | ('proctype' | 'itertype') field_spec_list? returnz? signals?
-   | (idn (constant_list)?)
-   ;
-
-field_spec_list
-   : (field_spec (',' field_spec)*)
-   ;
-
-field_spec
-   : name_list ':' type_spec
-   ;
-
-statement
-   : decl
-   | idn ':' type_spec ':=' expression
-   | decl_list ':=' invocation
-   | idn_list ':=' (invocation | expression_list)
-   | primary '.' name ':=' expression
-   | invocation
-   | 'while' expression 'do' body 'end'
-   | 'for' (decl_list | idn_list)? 'in' invocation 'do' body 'end'
-   | ('if' expression 'then' body ('elseif' expression 'then' body)* ('else' body)? 'end')
-   | ('tagcase' expression tag_arm* ('others' ':' body)? 'end')
-   | (('return' | 'yield') (expression_list)?)
-   | ('signal' name (expression_list)?)
-   | ('exit' name (expression_list)?)
-   | 'break'
-   | ('begin' body 'end')
-   | statement (('resignal' name_list) | ('except' when_handler* others_handler? 'end'))
-   ;
-
-tag_arm
-   : 'tag' name_list ('(' idn ':' type_spec ')')? ':' body
-   ;
-
-when_handler
-   : 'when' name_list ('(' '*' ')' | (decl_list)?) ':' body
-   ;
-
-others_handler
-   : 'others' ('(' idn ':' type_spec ')')? ':' body
-   ;
-
-body
-   : equate* statement*
-   ;
-
-expression_list
-   : expression (',' expression)*
+exec_decl
+   : var_decl
+   | const_decl
+   | proc_decl
+   | form_decl
+   | label_decl
    ;
 
 expression
-   : primary
-   | '(' expression ')'
-   | '~' expression
-   | '-' expression
-   | expression '**' expression
-   | expression '//' expression
-   | expression '/' expression
-   | expression '*' expression
-   | expression '||' expression
-   | expression '+' expression
-   | expression '-' expression
-   | expression '<' expression
-   | expression '<=' expression
-   | expression '=' expression
-   | expression '>=' expression
-   | expression '>' expression
-   | expression '~<' expression
-   | expression '~<=' expression
-   | expression '~=' expression
-   | expression '~>=' expression
-   | expression '~>' expression
-   | expression '&' expression
-   | expression 'cand' expression
-   | expression '|' expression
-   | expression 'cor' expression
+   : invocation
+   | conditional_expression
+   | value_expression
+   | with_expression
+   | first_expression
    ;
 
-primary
-   : 'nil'
-   | 'true'
-   | 'false'
-   | int_literal
-   | real_literal
-   | string_literal
-   | idn (constant_list)?
-   | primary '.' name
-   | primary expression
-   | primary '(' expression_list? ')'
-   | type_spec '$' field_list
-   | type_spec '$' '[' ((expression ':')? expression_list) ']'
-   | type_spec '$' (name constant_list?)
-   | ('force' type_spec?)
-   | (('up' | 'down') '(' expression ')')
+stmt
+   : expression
+   | loop_stmt
+   | exit_stmt
+   | null_stmt
+   | inner_block
+   | labeled_stmt
+   | assert_stmt
+   ;
+
+labeled_stmt
+   : identifier ':' stmt
    ;
 
 invocation
-   : primary '(' expression_list ')'
+   : special_literal
+   | simple_invocation actuals*
+   | '(' invocation ')'
    ;
 
-field_list
-   : field (',' field)*
+actuals
+   : actual (',' actual)*
    ;
 
-field
-   : name_list ':' expression
+actual
+   : expression
+   | type_description
    ;
 
-idn_list
-   : idn (',' idn)*
+simple_invocation
+   : ((identifier '$')* identifier)
+   | special_identifier
    ;
 
-idn
+conditional_expression
+   : if_expression
+   | case_expression
+   ;
+
+if_expression
+   : 'if' expression 'then' block ('elif' expression 'then' block)* ('else' block)* 'fi'
+   ;
+
+case_expression
+   : 'case' expression 'of' case ('elof' case)* ('else' block)* 'esac'
+   ;
+
+case
+   : expression (',' expression)* '::' block
+   ;
+
+value_expression
+   : 'value' identifier (':' obj_type)* 'of' block 'fo'
+   ;
+
+with_expression
+   : 'with' with_list 'in' block 'ni'
+   ;
+
+with_list
+   : (identifier ':' invocation) (',' (identifier ':' invocation))*
+   ;
+
+first_expression
+   : 'first' template 'suchthat' expression ('then' block)* ('else' block)* 'fi'
+   ;
+
+template
+   : identifier 'from' identifier (';' identifier)* type_description
+   | identifier 'from' invocation
+   ;
+
+loop_stmt
+   : simple_loop
+   | while_stmt
+   | for_stmt
+   ;
+
+simple_loop
+   : 'do' block 'od'
+   ;
+
+while_stmt
+   : 'while' expression simple_loop
+   ;
+
+for_stmt
+   : 'for' template simple_loop
+   ;
+
+exit_stmt
+   : 'exitloop'
+   | 'leave' identifier
+   ;
+
+null_stmt
+   : 'skip'
+   ;
+
+inner_block
+   : 'begin' block 'end'
+   | 'begin' block 'endof' (identifier)*
+   ;
+
+assert_stmt
+   : 'assert' assertion
+   ;
+
+label_decl
+   : 'label' identifier_list
+   ;
+
+var_decl
+   : aux 'var' (obj_decl_group init_fin_clause*) (',' (obj_decl_group init_fin_clause*))*
+   ;
+
+const_decl
+   : aux 'const' (obj_decl_group init_fin_clause* | const_assign (',' const_assign)*)
+   ;
+
+aux
+   : 'aux'*
+   ;
+
+obj_decl_group
+   : identifier_list ':' obj_type
+   ;
+
+obj_type
+   : type_description
+   | 'as' 'specified'
+   ;
+
+init_fin_clause
+   : expression
+   | ('init' stmt)* ('final' stmt)*
+   ;
+
+const_assign
+   : identifier '=' expression
+   ;
+
+type_description
+   : simple_invocation '(' (formal_qual (',' formal_qual)* ')')* update_set*
+   | '?' identifier update_set*
+   ;
+
+update_set
+   : '<' (identifier | special_identifier) (',' (identifier | special_identifier))* '>'
+   ;
+
+formal
+   : routine_formal
+   | binding obj_formal
+   | type_formal
+   ;
+
+formals
+   : formal (',' formal)*
+   ;
+
+routine_formal
+   : formal_id_list 'proc' parms
+   | formal_id_list (yproc | func | sel) vparms
+   ;
+
+binding
+   : ('copy' | alias*) ('const' | 'var')*
+   ;
+
+formal_id_list
+   : identifier_list ':'
+   ;
+
+obj_format
+   : formal_id_list type_description
+   ;
+
+type_formal
+   : formal_id_list ('form' | 'pform') update_set*
+   ;
+
+routine_decl
+   : vproc_decl
+   | proc_decl
+   | sel_decl
+   ;
+
+vproc_decl
+   : aux 'inline'* ('vproc' | 'proc') routine_id vparms pre_post assumes routine_body*
+   ;
+
+proc_decl
+   : aux 'inline'* 'proc' routine_id parms pre_post assumes routine_body*
+   ;
+
+sel_decl
+   : aux 'inline'* 'sel' routine_id vparms pre_post assumes routine_body*
+   ;
+
+routine_id
+   : identifier
+   | special_identifier
+   ;
+
+parms
+   : formals*
+   ;
+
+vparms
+   : formals* ':' type_description
+   ;
+
+pre
+   : ('pre' assertion ';')*
+   ;
+
+pre_post
+   : pre ('post' assertion ';')*
+   ;
+
+routine_body
+   : 'is' stmt
+   | 'is' 'as' 'specified'
+   | 'is' 'forward'
+   | 'is' 'external' system_specs
+   ;
+
+form_decl
+   : aux 'form' identifier formals* pre assumes 'is' form_body
+   ;
+
+form_body
+   : specs* impl* 'end' identifier*
+   | abbrev_body
+   | 'forward'
+   | 'external' system_specs
+   | 'as' 'specified'
+   ;
+
+specs
+   : 'specs' (var_decl | other_form_decls) (';' (var_decl | other_form_decls))*
+   ;
+
+impl
+   : 'impl' (shared var_decl | other_form_decls) (';' (shared var_decl | other_form_decls))*
+   ;
+
+other_form_decls
+   : routine_decl
+   | form_decl
+   | axiom
+   | shared const_decl
+   ;
+
+shared
+   : 'shared'*
+   ;
+
+axiom
+   : 'invariant' assertion
+   | 'initially' assertion
+   | 'axiom' assertion
+   | 'remap' assertion
+   | 'rule' identifier assertion
+   ;
+
+abbrev_body
+   : record_type
+   | enumerated_type
+   ;
+
+record_type
+   : 'record' obj_decl_group (',' obj_decl_group)*
+   ;
+
+enumerated_type
+   : 'enumerated' identifier_list
+   ;
+
+form_decl
+   : aux 'generator' identifier formals* ':' type_description pre assumes 'is' form_body
+   ;
+
+assumes
+   : ('assumes' form_decl)*
+   ;
+
+alphanumeric
+   : LETTER
+   | DIGIT
+   ;
+   //special_symbol: BASIC_SYMBOL|operator;
+   
+identifier
+   : IDENTIFIER
+   ;
+
+identifier_list
+   : identifier (',' identifier)*
+   ;
+
+string
    : STRING
    ;
 
-name_list
-   : name (',' name)*
+special_literal
+   : unsigned_integer
+   | unsigned_real
+   | string
+   | BOOLEAN
+   | radix
    ;
 
-name
-   : STRING
+unsigned_integer
+   : DIGIT+
    ;
 
-int_literal
-   : INT
+unsigned_real
+   : unsigned_rational ('E' scale_factor)?
+   | unsigned_integer ('E' scale_factor)?
    ;
 
-real_literal
-   : FLOAT
+unsigned_rational
+   : unsigned_integer '.' unsigned_integer
    ;
 
-string_literal
-   : STRINGLITERAL
+scale_factor
+   :
+   {'+' | '-'}? unsigned_integer
    ;
 
-STRINGLITERAL
-   : '"' ~ '"'* '"'
+special_identifier
+   : '@start'
+   | '@finish'
+   | '@next'
+   | '@done'
+   | '@value'
+   | '@subscript'
+   | '@' operator
+   ;
+
+unary_operator
+   : '+'
+   | '-'
+   | 'not'
+   ;
+
+binary_operator
+   : '$'
+   | '/'
+   | 'div'
+   | 'rem'
+   | '+'
+   | '-'
+   | '<'
+   | '<='
+   | '='
+   | '>='
+   | '>'
+   | 'and'
+   | 'or'
+   | 'cand'
+   | 'cor'
+   | 'imp'
+   | assign_op
+   ;
+
+operator
+   : unary_operator
+   | binary_operator
+   ;
+   //?
+   
+radix
+   : alphanumeric+
+   ;
+
+BOOLEAN
+   : 'true'
+   | 'false'
    ;
 
 STRING
-   : [a-zA-Z] [a-zA-Z0-9_]*
+   : '"' .*? '"'
    ;
 
-INT
-   : [0-9]+
+IDENTIFIER
+   : [a-zA-Z] [a-zA-Z0-9]*
    ;
 
-FLOAT
-   : [0-9]+ '.' [0-9]*
+LETTER
+   : [a-zA-Z]
    ;
 
-COMMENT
-   : '%' ~ [\r\n]* -> skip
+DIGIT
+   : [0-9]
    ;
 
 WS
