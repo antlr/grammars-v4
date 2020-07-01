@@ -1,3 +1,0 @@
-start_up = proc ()
- stressam$putl (po, "Hello, World!")
- end start_up
