@@ -230,7 +230,9 @@
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>
+				<module>trac</module>
 				<module>tsv</module>
+				<module>ttm</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
