@@ -40,7 +40,7 @@
 					<entryPoint>module</entryPoint>
 					<grammarName>clu</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
+					<exampleFiles></exampleFiles>
 				</configuration>
 				<executions>
 					<execution>
