@@ -136,7 +136,9 @@ equate
    ;
 
 own_var
-   : 'own' (decl | (idn ':' type_spec ':=' expression) | (decl_list ':=' invocation))
+   : 'own' decl
+   | 'own' (idn ':' type_spec ':=' expression)
+   | 'own' (decl_list ':=' invocation)
    ;
 
 type_spec
@@ -240,8 +242,10 @@ primary
    | idn (constant_list)?
    | primary '.' name
    | primary expression
-   | primary '(' expression_list ')'
-   | type_spec '$' (field_list | ('[' (((expression ':')? expression_list) | constant_list) ']'))
+   | primary '(' expression_list? ')'
+   | type_spec '$' field_list
+   | type_spec '$' '[' ((expression ':')? expression_list) ']'
+   | type_spec '$' (name constant_list?)
    | ('force' type_spec?)
    | (('up' | 'down') '(' expression ')')
    ;
