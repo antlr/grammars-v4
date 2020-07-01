@@ -136,7 +136,7 @@ equate
    ;
 
 own_var
-   : 'own' ((decl) | (idn ':' type_spec ':=' expression) | (decl_list ':=' invocation))
+   : 'own' (decl | (idn ':' type_spec ':=' expression) | (decl_list ':=' invocation))
    ;
 
 type_spec
