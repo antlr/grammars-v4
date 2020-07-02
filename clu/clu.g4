@@ -70,10 +70,10 @@ yields
    ;
 
 signals
-   : 'signals' '(' exception (',' exception)* ')'
+   : 'signals' '(' exception_ (',' exception_)* ')'
    ;
 
-exception
+exception_
    : name type_spec_list?
    ;
 
