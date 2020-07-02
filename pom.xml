@@ -71,7 +71,8 @@
 				<module>alpaca</module>
 				<module>antlr</module>
 				<module>apex</module>
-				<module>apt</module>				
+				<module>apt</module>
+				<module>argus</module>			
 				<module>arithmetic</module>
 				<module>asm</module>
 				<module>asn</module>
