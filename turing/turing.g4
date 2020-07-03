@@ -135,7 +135,6 @@ declarationOrStatement
 
 statement
    : (variableReference ':=' expn)
-   |
    | procedureCall
    | ('assert' booleanExpn)
    | 'result' expn
@@ -298,11 +297,11 @@ substringPosition
    ;
 
 ExplicitUnsignedIntegerConstant
-   : [0-9]+
+   : ('+' | '-')? [0-9]+
    ;
 
 ExplicitUnsignedRealConstant
-   : ExplicitUnsignedIntegerConstant '.' ExplicitUnsignedIntegerConstant
+   : ('+' | '-')? ([0-9]+ '.')? [0-9]+ ('e' [0-9]+)
    ;
 
 ExplicitStringConstant
