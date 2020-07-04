@@ -269,7 +269,7 @@ repeatable_command
    ;
 
 repeated_command
-   : repeatable_command 'REAPEAT'
+   : repeatable_command 'REPEAT'
    | repeatable_command 'REPEATUNTIL' expression
    | repeatable_command 'REPEATWHILE' expression
    ;
