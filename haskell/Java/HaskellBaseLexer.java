@@ -80,6 +80,7 @@ public abstract class HaskellBaseLexer extends Lexer {
     // module ... where {now you should remember start indent}
     private boolean moduleStartIndent = false;
     private boolean wasModuleExport   = false;
+    private boolean inPragmas         = false;
 
     // Haskell saves indent before first() symbol as null indent
     private int startIndent = -1;
@@ -121,7 +122,7 @@ public abstract class HaskellBaseLexer extends Lexer {
     }
 
     private void processINToken(Token next) {
-        while (!indentStack.empty() && indentStack.peek().first() != "let") {
+        while (!indentStack.empty() && !indentStack.peek().first().equals("let")) {
             tokenQueue.offer(createToken(HaskellLexer.SEMI, "SEMI", next));
             tokenQueue.offer(createToken(HaskellLexer.VCCURLY, "VCCURLY", next));
             nestedLevel--;
@@ -183,6 +184,10 @@ public abstract class HaskellBaseLexer extends Lexer {
         Token next = super.nextToken();
         int   type = next.getType();
 
+        if (type == HaskellLexer.OpenPragmaBracket) {
+            inPragmas = true;
+        }
+
         if (startIndent == -1
             && type != HaskellLexer.NEWLINE
             && type !=  HaskellLexer.WS
@@ -191,7 +196,7 @@ public abstract class HaskellBaseLexer extends Lexer {
             if (type ==  HaskellLexer.MODULE) {
                 moduleStartIndent = true;
                 wasModuleExport = true;
-            } if (type !=  HaskellLexer.MODULE && !moduleStartIndent) {
+            } if (type !=  HaskellLexer.MODULE && !moduleStartIndent && !inPragmas) {
                 startIndent = next.getCharPositionInLine();
             } else if (lastKeyWord.equals("where") && moduleStartIndent) {
                 lastKeyWord = "";
@@ -205,6 +210,10 @@ public abstract class HaskellBaseLexer extends Lexer {
 
                 return tokenQueue.poll();
             }
+        }
+
+        if (type == HaskellLexer.ClosePragmaBracket) {
+            inPragmas = false;
         }
 
         if (type == HaskellLexer.OCURLY) {
@@ -236,10 +245,13 @@ public abstract class HaskellBaseLexer extends Lexer {
 
         if (ignoreIndent
             && (type == HaskellLexer.WHERE
-            || type == HaskellLexer.DO
-            || type == HaskellLexer.LET
-            || type ==  HaskellLexer.OF
-            || type ==  HaskellLexer.CCURLY)
+            ||  type == HaskellLexer.DO
+            ||  type == HaskellLexer.MDO
+            ||  type == HaskellLexer.LET
+            ||  type == HaskellLexer.OF
+            ||  type == HaskellLexer.LCASE
+            ||  type == HaskellLexer.REC
+            ||  type == HaskellLexer.CCURLY)
            ) {
             ignoreIndent = false;
         }
@@ -265,7 +277,10 @@ public abstract class HaskellBaseLexer extends Lexer {
             && type != HaskellLexer.WHERE
             && type !=  HaskellLexer.IN
             && type != HaskellLexer.DO
+            && type != HaskellLexer.MDO
             && type !=  HaskellLexer.OF
+            && type != HaskellLexer.LCASE
+            && type != HaskellLexer.REC
             && type !=  HaskellLexer.CCURLY
             && type != EOF) {
 
@@ -326,10 +341,13 @@ public abstract class HaskellBaseLexer extends Lexer {
             prevWasEndl = true;
         }
 
-        if (type == HaskellLexer.WHERE
+        if (   type == HaskellLexer.WHERE
             || type == HaskellLexer.LET
             || type == HaskellLexer.DO
-            || type ==  HaskellLexer.OF) {
+            || type == HaskellLexer.MDO
+            || type == HaskellLexer.OF
+            || type == HaskellLexer.LCASE
+            || type == HaskellLexer.REC) {
             // if next will be HaskellLexer.OCURLY need to decrement nestedLevel
             nestedLevel++;
             prevWasKeyWord = true;
@@ -337,7 +355,9 @@ public abstract class HaskellBaseLexer extends Lexer {
             lastKeyWord = next.getText();
 
             if (type == HaskellLexer.WHERE) {
-                if (!indentStack.empty() && (indentStack.peek().first().equals("do"))) {
+                if (!indentStack.empty() 
+                    && (indentStack.peek().first().equals("do") 
+                    || indentStack.peek().first().equals("mdo"))) {
                     tokenQueue.offer(createToken(HaskellLexer.SEMI, "SEMI", next));
                     tokenQueue.offer(createToken(HaskellLexer.VCCURLY, "VCCURLY", next));
                     indentStack.pop();

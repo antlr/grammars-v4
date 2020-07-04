@@ -119,7 +119,9 @@
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
 				<module>guido</module>
-				<module>html</module>
+                <module>guitartab</module>
+                <module>haskell</module>
+                <module>html</module>
 				<module>http</module>
 				<module>hypertalk</module>
 				<module>icalendar</module>
@@ -129,7 +131,8 @@
 				<module>informix</module>
 				<module>iri</module>
 				<module>istc</module>
-				<module>java</module>
+				<module>janus</module>
+                <module>java</module>
 				<module>javadoc</module>
 				<module>javascript</module>
 				<module>jpa</module>
@@ -190,6 +193,9 @@
 				<module>restructuredtext</module>
 				<module>rexx</module>
 				<module>rfc822</module>
+				<module>rfc1035</module>
+				<module>rfc1960</module>
+				<module>rfc3080</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
 				<module>rpn</module>
@@ -202,7 +208,7 @@
 				<module>sharc</module>
 				<module>sickbay</module>
 				<module>smalltalk</module>
-				<module>smiles</module>
+			    <module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
 				<module>solidity</module>
@@ -215,6 +221,7 @@
 				<module>swift</module>
 				<module>swift-fin</module>
 				<module>telephone</module>
+				<module>terraform</module>
 				<module>thrift</module>
 				<module>tiny</module>
 				<module>tinybasic</module>
@@ -223,7 +230,10 @@
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>
+				<module>trac</module>
 				<module>tsv</module>
+				<module>ttm</module>
+                <module>turing</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
@@ -235,6 +245,7 @@
 				<module>vba</module>
 				<module>verilog</module>
 				<module>vhdl</module>
+				<module>vmf</module>
 				<module>wat</module>
 				<module>wavefront</module>
 				<module>webidl</module>

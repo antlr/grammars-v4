@@ -1662,7 +1662,8 @@ setStatement
     | setPasswordStatement                                          #setPassword
     | setTransactionStatement                                       #setTransaction
     | setAutocommitStatement                                        #setAutocommit
-    | SET fullId ('=' | ':=') expression                            #setNewValueInsideTrigger
+    | SET fullId ('=' | ':=') expression
+      (',' fullId ('=' | ':=') expression)*                         #setNewValueInsideTrigger
     ;
 
 showStatement
@@ -2039,7 +2040,7 @@ constant
 
 dataType
     : typeName=(
-      CHAR | VARCHAR | TINYTEXT | TEXT | MEDIUMTEXT | LONGTEXT
+      CHAR | CHARACTER | VARCHAR | TINYTEXT | TEXT | MEDIUMTEXT | LONGTEXT
        | NCHAR | NVARCHAR
       )
       lengthOneDimension? BINARY?
