@@ -193,6 +193,9 @@
 				<module>restructuredtext</module>
 				<module>rexx</module>
 				<module>rfc822</module>
+				<module>rfc1035</module>
+				<module>rfc1960</module>
+				<module>rfc3080</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
 				<module>rpn</module>
@@ -227,7 +230,10 @@
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>
+				<module>trac</module>
 				<module>tsv</module>
+				<module>ttm</module>
+                <module>turing</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
