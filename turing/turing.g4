@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar turing;
 
 program
-   : declarationOrStatementInMainProgram*
+   : declarationOrStatementInMainProgram+
    ;
 
 declarationOrStatementInMainProgram
@@ -49,7 +49,7 @@ declaration
 
 constantDeclaration
    : ('const' id ':=' expn)
-   | ('const' id '[' ':' typeSpec ']' ':=' initializingValue)
+   | ('const' id (':' typeSpec)? ':=' initializingValue)
    ;
 
 initializingValue
@@ -58,7 +58,7 @@ initializingValue
 
 variableDeclaration
    : ('var' id (',' id)* ':=' expn)
-   | ('var' id (',' id)* ':' typeSpec '[' ':=' initializingValue ']')
+   | ('var' id (',' id)* ':' typeSpec (':=' initializingValue)?)
    ;
 
 typeDeclaration
@@ -171,11 +171,11 @@ forStatement
    ;
 
 putStatement
-   : 'put' (':' streamNumber ',')? 'putItem' (',' putItem)? ('..')?
+   : 'put' (':' streamNumber ',')? putItem (',' putItem)? ('..')?
    ;
 
 putItem
-   : expn (':' widthExpn (':' fractionWidth (' :' exponentWidth)?)?)?
+   : expn (':' widthExpn (':' fractionWidth (':' exponentWidth)?)?)?
    | 'skip'
    ;
 
@@ -227,8 +227,11 @@ variableReference
    ;
 
 reference
-   : id
-   | (reference componentSelector)
+   : id reference_2
+   ;
+
+reference_2
+   : (componentSelector reference_2)?
    ;
 
 componentSelector
@@ -296,6 +299,10 @@ substringPosition
    : expn ('*' ('–' expn))
    ;
 
+id
+   : IDENTIFIER
+   ;
+
 ExplicitUnsignedIntegerConstant
    : ('+' | '-')? [0-9]+
    ;
@@ -305,18 +312,18 @@ ExplicitUnsignedRealConstant
    ;
 
 ExplicitStringConstant
-   : '"' ~ '"' '"'
-   ;
-
-id
-   : IDENTIFIER
+   : '"' ~ '"'* '"'
    ;
 
 IDENTIFIER
    : [a-zA-Z] [a-zA-Z_0-9]*
    ;
 
+COMMENT
+   : '%' ~ [\r\n]* -> channel (HIDDEN)
+   ;
+
 WS
-   : [ \r\n\t]+ -> skip
+   : [ \r\n\t]+ -> channel (HIDDEN)
    ;
 
