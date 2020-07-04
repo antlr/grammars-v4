@@ -234,6 +234,7 @@
 				<module>trac</module>
 				<module>tsv</module>
 				<module>ttm</module>
+                <module>turing</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>

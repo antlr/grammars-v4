@@ -22,6 +22,7 @@
  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 grammar clu;
 
 module
@@ -69,10 +70,10 @@ yields
    ;
 
 signals
-   : 'signals' '(' exception (',' exception)* ')'
+   : 'signals' '(' exception_ (',' exception_)* ')'
    ;
 
-exception
+exception_
    : name type_spec_list?
    ;
 
@@ -89,7 +90,7 @@ restriction
    ;
 
 type_set
-   : (idn | (idn 'has' oper_decl_list equate*))*
+   : (idn | idn 'has' oper_decl_list equate*)*
    | idn
    ;
 
@@ -136,9 +137,7 @@ equate
    ;
 
 own_var
-   : 'own' decl
-   | 'own' (idn ':' type_spec ':=' expression)
-   | 'own' (decl_list ':=' invocation)
+   : 'own' (decl | idn ':' type_spec ':=' expression | decl_list ':=' invocation)
    ;
 
 type_spec
@@ -151,14 +150,15 @@ type_spec
    | 'any'
    | 'rep'
    | 'cvt'
-   | ('array' | 'sequence' type_spec?)
+   | 'array'
+   | 'sequence' type_spec?
    | ('record' | 'struct' | 'oneof' | 'variant') field_spec_list?
    | ('proctype' | 'itertype') field_spec_list? returnz? signals?
-   | (idn (constant_list)?)
+   | idn constant_list?
    ;
 
 field_spec_list
-   : (field_spec (',' field_spec)*)
+   : field_spec (',' field_spec)*
    ;
 
 field_spec
@@ -174,14 +174,14 @@ statement
    | invocation
    | 'while' expression 'do' body 'end'
    | 'for' (decl_list | idn_list)? 'in' invocation 'do' body 'end'
-   | ('if' expression 'then' body ('elseif' expression 'then' body)* ('else' body)? 'end')
-   | ('tagcase' expression tag_arm* ('others' ':' body)? 'end')
-   | (('return' | 'yield') (expression_list)?)
-   | ('signal' name (expression_list)?)
-   | ('exit' name (expression_list)?)
+   | 'if' expression 'then' body ('elseif' expression 'then' body)* ('else' body)? 'end'
+   | 'tagcase' expression tag_arm* ('others' ':' body)? 'end'
+   | ('return' | 'yield') expression_list?
+   | 'signal' name expression_list?
+   | 'exit' name expression_list?
    | 'break'
-   | ('begin' body 'end')
-   | statement (('resignal' name_list) | ('except' when_handler* others_handler? 'end'))
+   | 'begin' body 'end'
+   | statement ('resignal' name_list | 'except' when_handler* others_handler? 'end')
    ;
 
 tag_arm
@@ -189,7 +189,7 @@ tag_arm
    ;
 
 when_handler
-   : 'when' name_list ('(' '*' ')' | (decl_list)?) ':' body
+   : 'when' name_list ('(' '*' ')' | decl_list?) ':' body
    ;
 
 others_handler
@@ -207,29 +207,13 @@ expression_list
 expression
    : primary
    | '(' expression ')'
-   | '~' expression
-   | '-' expression
+   | ('~' | '-') expression
    | expression '**' expression
-   | expression '//' expression
-   | expression '/' expression
-   | expression '*' expression
-   | expression '||' expression
-   | expression '+' expression
-   | expression '-' expression
-   | expression '<' expression
-   | expression '<=' expression
-   | expression '=' expression
-   | expression '>=' expression
-   | expression '>' expression
-   | expression '~<' expression
-   | expression '~<=' expression
-   | expression '~=' expression
-   | expression '~>=' expression
-   | expression '~>' expression
-   | expression '&' expression
-   | expression 'cand' expression
-   | expression '|' expression
-   | expression 'cor' expression
+   | expression ('//' | '/' | '*') expression
+   | expression ('||' | '+' | '-') expression
+   | expression ('<' | '<=' | '=' | '>=' | '>' | '~<' | '~<=' | '~=' | '~>=' | '~>') expression
+   | expression ('&' | 'cand') expression
+   | expression ('|' | 'cor') expression
    ;
 
 primary
@@ -239,15 +223,11 @@ primary
    | int_literal
    | real_literal
    | string_literal
-   | idn (constant_list)?
-   | primary '.' name
-   | primary expression
-   | primary '(' expression_list? ')'
-   | type_spec '$' field_list
-   | type_spec '$' '[' ((expression ':')? expression_list) ']'
-   | type_spec '$' (name constant_list?)
-   | ('force' type_spec?)
-   | (('up' | 'down') '(' expression ')')
+   | idn constant_list?
+   | primary ('.' name | expression | '(' expression_list? ')') 
+   | type_spec '$' (field_list | '[' (expression ':')? expression_list ']' | name constant_list?)
+   | 'force' type_spec?
+   | ('up' | 'down') '(' expression ')'
    ;
 
 invocation
@@ -291,7 +271,7 @@ string_literal
    ;
 
 STRINGLITERAL
-   : '"' ~ '"'* '"'
+   : '"' ~'"'* '"'
    ;
 
 STRING
@@ -307,10 +287,10 @@ FLOAT
    ;
 
 COMMENT
-   : '%' ~ [\r\n]* -> skip
+   : '%' ~[\r\n]* -> channel(HIDDEN)
    ;
 
 WS
-   : [ \t\r\n] -> skip
+   : [ \t\r\n]+ -> channel(HIDDEN)
    ;
 
