@@ -32,39 +32,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar pluscal;
 
 algorithm
-   : '--' 'algorithm' ID '{' varDecls? /*definitions?*/ macro* procedure* (compoundStmt | process+) '}'
+   : ('--algorithm' |'--fair algorithm') name '{' varDecls? definitions? macro* procedure* (compoundStmt | process+) '}'
    ;
 
-//definitions
-//  : 'define' '{' defs '}' ';'?
-// ;
+definitions
+  : 'define' '{' ~'}'* '}' ';'?
+ ;
 
 macro
-   : 'macro' ID '(' (ID (',' ID)*)? ')' compoundStmt ';'?
+   : 'macro' name '(' (pVarDecl (',' pVarDecl)*)? ')' compoundStmt ';'?
    ;
 
 procedure
-   : 'procedure' ID '(' (pVarDecls (',' pVarDecls)*)? ')' pVarDecls? compoundStmt ';'?
+   : 'procedure' name '(' (pVarDecls (',' pVarDecls)*)? ')' pVarDecls? compoundStmt ';'?
    ;
 
 process
-   : 'process' '(' ID (EQ | IN) expr ')' varDecls? compoundStmt ';'?
-   ;
-
-pVarDecls
-   : ('variable' | 'variables') (ID (EQ expr)? (';' | ',')?)+
+   : 'process' '(' name (EQ | IN) expr ')' varDecls? compoundStmt ';'?
    ;
 
 varDecls
-   : ('variable' | 'variables') (ID ((EQ | IN) expr)? (';' | ','))+
+   : ('variable' | 'variables') varDecl+
    ;
+
+varDecl: variable ((EQ | IN) expr)? (';' | ',');
+
+pVarDecls
+   : ('variable' | 'variables') (pVarDecl (';' | ','))+
+   ;
+
+pVarDecl: variable (EQ expr)? ';';
+
+
+
+
+
+
 
 compoundStmt
    : '{' stmt (';' stmt)* ';'? '}'
    ;
 
 stmt
-   : (ID ':')? (unlabeledStmt | compoundStmt)
+   : (label ':' ('+' | '-')?)? (unlabeledStmt | compoundStmt)
    ;
 
 unlabeledStmt
@@ -79,7 +89,7 @@ unlabeledStmt
    | 'skip'
    | 'return'
    | gotostmt
-   | 'call'? callstmt
+   | callstmt
    ;
 
 assignstmt
@@ -87,7 +97,7 @@ assignstmt
    ;
 
 lhs
-   : ID ('[' expr (',' expr)* ']' | '.' ID)*
+   : name ('[' expr (',' expr)* ']' | '.' name)*
    ;
 
 ifstmt
@@ -103,7 +113,7 @@ eitherstmt
    ;
 
 withstmt
-   : 'with' '(' ID (EQ | IN) expr ((';' | ',') ID (EQ | IN) expr)* (';' | ',')? ')' stmt
+   : 'with' '(' variable (EQ | IN) expr ((';' | ',') variable (EQ | IN) expr)* (';' | ',')? ')' stmt
    ;
 
 awaitstmt
@@ -119,12 +129,14 @@ assertstmt
    ;
 
 gotostmt
-   : 'goto' ID
+   : 'goto' label
    ;
 
 callstmt
-   : ID '(' (expr (',' expr)*)? ')'
+   : 'call'?  macrocall
    ;
+
+macrocall: name '(' (expr (',' expr)*)? ')';
 
 expr
    : atom ((AND | OR) atom)*
@@ -139,9 +151,8 @@ compare
 atom
    : bool
    | numb
-   | ID
+   | name
    ;
-
 
 list
    : '{' atom (',' atom)* '}'
@@ -154,6 +165,10 @@ numb
 bool
    : 'TRUE' | 'FALSE'
    ;
+
+label: ID;
+variable: ID;
+name: ID;
 
 AND
    : '/\\'
@@ -173,10 +188,6 @@ EQ
 IN
    : '\\in'
    ;
-
-//defs
- //  : 'A sequence of TLA+ definitions'
- //  ;
 
 DIGIT
    : '0' .. '9'
