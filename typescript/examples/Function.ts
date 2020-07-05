@@ -17,6 +17,10 @@ function Greet(greeting: string, name?: string ) : string {
     return greeting + ' ' + name + '!';
 }
 
+function terminateJob(jobId: string) {
+    return this.http.delete<IOperationResult<any>>();
+}
+
 function Greet2(name: string, greeting: string = "Hello") : string {
     return greeting + ' ' + name + '!';
 }
@@ -39,3 +43,9 @@ function Greet(greeting: string, ...names: string[]) {
 function Test(value: TestClass | TestClass2): value is TestClass {
     return (<TestClass>value).someFunction !== undefined;
 }
+
+function buildName(firstName: string, lastName?: string) {
+    if (lastName) return firstName + " " + lastName;
+    else return firstName;
+  }
+  

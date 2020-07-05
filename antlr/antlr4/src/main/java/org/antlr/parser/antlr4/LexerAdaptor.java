@@ -7,8 +7,10 @@ import org.antlr.v4.runtime.misc.Interval;
 
 public abstract class LexerAdaptor extends Lexer {
 
-	// Generic type for OPTIONS, TOKENS and CHANNELS
-	private static int PREQUEL_CONSTRUCT = -10;
+    /**
+     *  Generic type for OPTIONS, TOKENS and CHANNELS
+     */
+	private static final int PREQUEL_CONSTRUCT = -10;
 
 	public LexerAdaptor(CharStream input) {
 		super(input);

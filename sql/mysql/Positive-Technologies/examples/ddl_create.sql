@@ -2,6 +2,7 @@
 -- Create Table
 create table new_t  (like t1);
 create table log_table(row varchar(512));
+create table log_table(row character(512));
 create table ships(name varchar(255), class_id int, id int);
 create table ships_guns(guns_id int, ship_id int);
 create table guns(id int, power decimal(7,2), callibr decimal(10,3));
@@ -152,6 +153,21 @@ ON DUPLICATE KEY UPDATE
        write_key  = JSON_UNQUOTE(JSON_EXTRACT(CAST(CONVERT(NEW.write_keys USING utf8mb4) AS JSON), CONCAT('$[', i, ']')));
 SET i = i + 1;
 END WHILE;
+END
+#end
+#begin
+-- Create trigger 5
+CREATE TRIGGER `rtl_trigger_before_update`
+BEFORE UPDATE
+ON all_student_educator FOR EACH ROW
+BEGIN
+    IF NEW.student_words_read_total is not null AND NEW.student_words_read_total >= 3 AND NEW.badge_3_words_read_flag = 0 THEN
+        SET
+        NEW.badge_flag = 1,
+        NEW.badge_student_total = NEW.badge_student_total + 1,
+        NEW.badge_datetime = now();
+        INSERT IGNORE INTO user_platform_badge (platform_badge_id, user_id) VALUES (3, NEW.student_id);
+    END IF;
 END
 #end
 #begin

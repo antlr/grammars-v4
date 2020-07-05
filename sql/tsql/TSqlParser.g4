@@ -2982,7 +2982,7 @@ for_clause
     ;
 
 xml_common_directives
-    : ',' (BINARY_BASE64 | TYPE | ROOT)
+      : ',' (BINARY_BASE64 | TYPE | ROOT ('(' STRING ')')?)
     ;
 
 order_by_expression
@@ -3041,7 +3041,7 @@ asterisk
     ;
 
 column_elem
-    : (table_name '.')? (column_name=id | '$' IDENTITY | '$' ROWGUID) as_column_alias?
+    : ((table_name '.')? (column_name=id | '$' IDENTITY | '$' ROWGUID) | NULL) as_column_alias?
     ;
 
 udt_elem
@@ -3081,7 +3081,7 @@ table_source_item
     | rowset_function             as_table_alias?
     | derived_table              (as_table_alias column_alias_list?)?
     | change_table                as_table_alias
-    | function_call               as_table_alias?
+    | function_call              (as_table_alias column_alias_list?)?
     | LOCAL_ID                    as_table_alias?
     | LOCAL_ID '.' function_call (as_table_alias column_alias_list?)?
     | open_xml
@@ -3162,8 +3162,6 @@ function_call
     // https://msdn.microsoft.com/en-us/library/ms187928.aspx
     | CAST '(' expression AS data_type ')'              #CAST
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
-    // https://docs.microsoft.com/en-us/sql/t-sql/functions/try-convert-transact-sql
-    | TRY_CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                       #TRY_CONVERT
     // https://msdn.microsoft.com/en-us/library/ms189788.aspx
     | CHECKSUM '(' '*' ')'                              #CHECKSUM
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
@@ -3705,6 +3703,7 @@ simple_id
     | CRYPTOGRAPHIC
     | CURSOR_CLOSE_ON_COMMIT
     | CURSOR_DEFAULT
+    | DATA
     | DATA_COMPRESSION
     | DATE_CORRELATION_OPTIMIZATION
     | DATEADD
@@ -3973,12 +3972,14 @@ simple_id
     | SECONDARY_ROLE
     | SECONDS
     | SECRET
+    | SECURITY
     | SECURITY_LOG
     | SEEDING_MODE
     | SELF
     | SEMI_SENSITIVE
     | SEND
     | SENT
+    | SEQUENCE
     | SERIALIZABLE
     | SERVER
     | SESSION_TIMEOUT
@@ -4014,6 +4015,7 @@ simple_id
     | SYMMETRIC
     | SYNCHRONOUS_COMMIT
     | SYNONYM
+    | SYSTEM
     | TAKE
     | TARGET
     | TARGET_RECOVERY_TIME

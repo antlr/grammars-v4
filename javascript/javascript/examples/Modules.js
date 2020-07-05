@@ -35,3 +35,5 @@ console.log("e^{π} = " + exp(pi))
 export {};
 import a,{aaa as bbb} from 'ccc';
 import('runtime_import');
+
+import React from 'react';

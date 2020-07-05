@@ -70,3 +70,12 @@ CREATE MATERIALIZED VIEW products_mv
    AS SELECT SUM(list_price - min_price), category_id
          FROM product_information 
          GROUP BY category_id;
+
+CREATE MATERIALIZED VIEW TEST
+      AS 
+      WITH TESTCTE AS (
+        SELECT 1 ONE FROM DUAL
+      )
+      SELECT 'A', 'B', 'C'
+      FROM DUAL
+      JOIN TESTCTE;
