@@ -143,10 +143,13 @@ IDENTIFIER
    ;
 
 COMMENT
-   : ('#' | '//') ~ [\r\n]* -> skip
-   ;
+  : ('#' | '//') ~ [\r\n]* -> channel(HIDDEN)
+  ;
+
+BLOCKCOMMENT
+  : '/*' .*? '*/' -> channel(HIDDEN)
+  ;
 
 WS
    : [ \r\n\t]+ -> skip
    ;
-
