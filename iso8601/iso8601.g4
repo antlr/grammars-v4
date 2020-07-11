@@ -36,7 +36,7 @@ Digit: [0-9];
 Fraction: [,.] Digit+;
 
 // number
-int: Digit+;
+int_: Digit+;
 dec: Digit+ Fraction?;
 int2: Digit Digit;
 int4: Digit Digit Digit Digit;
@@ -180,11 +180,11 @@ intervalBasic: intervalT | intervalYMDBasic;
 intervalExtended: intervalT | intervalYMDExtended;
 // ENTRYRULE P1Y2M3DT4H5M6.789S
 intervalT
-    : P (int Y)? (int M)? (int D)? T (int H)? (int M)? dec S
-    | P (int Y)? (int M)? (int D)? T (int H)? dec M
-    | P (int Y)? (int M)? (int D)? T dec H
-    | P (int Y)? (int M)? dec D
-    | P (int Y)? dec M
+    : P (int_ Y)? (int_ M)? (int_ D)? T (int_ H)? (int_ M)? dec S
+    | P (int_ Y)? (int_ M)? (int_ D)? T (int_ H)? dec M
+    | P (int_ Y)? (int_ M)? (int_ D)? T dec H
+    | P (int_ Y)? (int_ M)? dec D
+    | P (int_ Y)? dec M
     | P dec Y
     | P dec W
     ;
@@ -224,7 +224,7 @@ durationExtended
     | intervalExtended
     ;
 
-recurringCount: R int?;
+recurringCount: R int_?;
 // ENTRYRULE R12/1900-01-01T00:00:00/P4294967296S 4.5.3
 recurring: recurringBasic | recurringExtended;
 recurringBasic: recurringCount '/' durationBasic;

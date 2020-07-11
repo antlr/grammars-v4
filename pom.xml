@@ -130,6 +130,7 @@
 				<module>inf</module>
 				<module>informix</module>
 				<module>iri</module>
+                <module>iso8601</module>
 				<module>istc</module>
 				<module>janus</module>
                 <module>java</module>
