@@ -1,0 +1,9 @@
+/* This is
+   a multiline
+   comment */
+
+variable "var" {
+  // single line comment
+  # single line comment
+  type = string
+}
