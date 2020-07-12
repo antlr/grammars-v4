@@ -39,6 +39,7 @@ Fraction: [,.] Digit+;
 int_: Digit+;
 dec: Digit+ Fraction?;
 int2: Digit Digit;
+int3: Digit Digit Digit;
 int4: Digit Digit Digit Digit;
 sint2p: ('+'|'-') Digit Digit+;
 sint4p: ('+'|'-') Digit Digit Digit Digit+;
@@ -55,7 +56,7 @@ year
     ;
 month: int2;
 day: int2;
-ordinalDay: int2;
+ordinalDay: int3;
 week: int2;
 weekDay: Digit;
 hour: int2;
@@ -189,15 +190,38 @@ intervalT
     | P dec W
     ;
 
+monthDateBasic
+    : month day
+    ;
+monthDateExtended
+    : month '-' day
+    ;
+
+intervalYMDTimeBasic
+    : monthDateBasic
+    | day
+    | datetimeBasic
+    | dateBasic
+    | localTimeBasic
+    ;
+intervalYMDTimeExtended
+    : monthDateExtended
+    | day
+    | datetimeExtended
+    | dateExtended
+    | localTimeExtended
+    | monthDateExtended
+    ;
+
 // ENTRYRULE P0001-02-03T00:00:00 4.4.4.2.2
-intervalYMD: intervalYMDBasic|intervalYMDExtended;
-intervalYMDBasic: P datetimeBasic;
-intervalYMDExtended: P datetimeExtended;
+intervalYMD: intervalYMDBasic | intervalYMDExtended;
+intervalYMDBasic: P intervalYMDTimeBasic;
+intervalYMDExtended: P intervalYMDTimeExtended;
 
 // ENTRYRULE 1234-05-06T00:07:08/1234-05-06T00:07:09 4.4.4.1
 timeBeginEnd: timeBeginEndBasic | timeBeginEndExtended;
-timeBeginEndBasic: datetimeBasic '/' datetimeBasic;
-timeBeginEndExtended: datetimeExtended '/' datetimeExtended;
+timeBeginEndBasic: intervalYMDTimeBasic '/' intervalYMDTimeBasic;
+timeBeginEndExtended: intervalYMDTimeExtended '/' intervalYMDTimeExtended;
 
 // ENTRYRULE 1234-05-06T00:07:08/P1M 4.4.4.3
 timeBeginInterval: timeBeginIntervalBasic|timeBeginIntervalExtended;
