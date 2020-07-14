@@ -360,6 +360,8 @@ columnConstraint
     | COLLATE collationName                                         #collateColumnConstraint
     | (GENERATED ALWAYS)? AS '(' expression ')' (VIRTUAL | STORED)? #generatedColumnConstraint
     | SERIAL DEFAULT VALUE                                          #serialDefaultColumnConstraint
+    | (CONSTRAINT name=uid?)?
+      CHECK '(' expression ')'                                      #checkColumnConstraint
     ;
 
 tableConstraint
@@ -2566,5 +2568,5 @@ functionNameBase
     | VALIDATE_PASSWORD_STRENGTH | VERSION | VISIBLE
     | WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS | WEEK | WEEKDAY
     | WEEKOFYEAR | WEIGHT_STRING | WITHIN | YEAR | YEARWEEK
-    | Y_FUNCTION | X_FUNCTION
+    | Y_FUNCTION | X_FUNCTION | JSON_VALID | JSON_SCHEMA_VALID
     ;
