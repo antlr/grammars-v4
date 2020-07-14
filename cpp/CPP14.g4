@@ -32,7 +32,7 @@ translationunit
 
 
 primaryexpression
-   : literal
+   : literal (literal)*
    | This
    | '(' expression ')'
    | idexpression
@@ -730,7 +730,7 @@ declarator
 
 ptrdeclarator
    : noptrdeclarator
-   | ptroperator ptrdeclarator
+   | ptroperator Const? ptrdeclarator
    ;
 
 noptrdeclarator
@@ -1865,7 +1865,6 @@ Stringliteral
    : Encodingprefix? '"' Schar* '"'
    | Encodingprefix? 'R' Rawstring
    ;
-
 fragment Encodingprefix
    : 'u8'
    | 'u'
