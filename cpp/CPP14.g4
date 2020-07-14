@@ -730,7 +730,7 @@ declarator
 
 ptrdeclarator
    : noptrdeclarator
-   | ptroperator ptrdeclarator
+   | ptroperator Const? ptrdeclarator
    ;
 
 noptrdeclarator
