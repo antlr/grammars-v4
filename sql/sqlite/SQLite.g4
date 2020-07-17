@@ -426,11 +426,10 @@ orderByOptional
  : K_ORDER K_BY expr+
  ;
 exprAscDescOptional
- : expr ascdescOption (',' expr ascdescOption)*
+ : expr ascdescOption? (',' expr ascdescOption?)*
  ;
 ascdescOption
  : K_ASC|K_DESC
- |
  ;
 frameclauseOptional
  :  (K_RANGE|K_ROWS)  (frame_start| K_BETWEEN  frame_start K_AND frame_end )
