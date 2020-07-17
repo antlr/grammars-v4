@@ -399,7 +399,6 @@ result_column
  : '*'
  | table_name '.' '*'
  | (expr|windowFunction) ( K_AS? column_alias )?
- | windowFunction 
  ;
 windowFunction
  : K_FIRST_VALUE '('  expr  ')' K_OVER '('  partitionbyOptional? K_ORDER K_BY exprAscDescOptional frameclauseOptional? ')'
@@ -434,8 +433,7 @@ ascdescOption
  |
  ;
 frameclauseOptional
- :  (K_RANGE|K_ROWS)  frame_start  
- |  (K_RANGE|K_ROWS)  K_BETWEEN  frame_start K_AND frame_end
+ :  (K_RANGE|K_ROWS)  (frame_start| K_BETWEEN  frame_start K_AND frame_end )
  ;
 frame_start
  : signed_number K_PRECEDING 
@@ -881,7 +879,7 @@ K_WHEN : W H E N;
 K_WHERE : W H E R E;
 K_WITH : W I T H;
 K_WITHOUT : W I T H O U T;
-K_FIRST_VALUE : [Ff][Ii][Rr][Ss][Tt][_][Vv][Aa][Ll][Uu][Ee];
+K_FIRST_VALUE : F I R S T'_'V A L U E;
 K_OVER  : O V E R;
 K_PARTITION : P A R T I T I O N;
 K_RANGE     : R A N G E;
@@ -889,16 +887,16 @@ K_PRECEDING : P R E C E D I N G;
 K_UBOUNDED   : U N B O U N D E D;
 K_CURRENT   : C U R R E N T;
 K_FOLLOWING : F O L L O W I N G;
-K_CUMEDIST  : [Cc][Uu][Mm][Ee][_][Dd][Ii][Ss][Tt];
-K_DENSERANK : [Dd][Ee][Nn][Ss][Ee][_][Rr][Aa][Nn][Kk];
+K_CUMEDIST  : C U M E'_'D I S T;
+K_DENSERANK : D E N S E'_'R A N K;
 K_LAG       : L A G;
-K_LASTVALUE  : [Ll][Aa][Ss][Tt][_][Vv][Aa][Ll][Uu][Ee];
+K_LASTVALUE : L A S T'_'V A L U E;
 K_LEAD       : L E A D;
-K_NTHVALUE   : [Nn][Tt][Hh][_][Vv][Aa][Ll][Uu][Ee];
+K_NTHVALUE  : N T H'_'V A L U E;
 K_NTILE      : N T I L E;
-K_PERCENTRANK : [Pp][Ee][Rr][Cc][Ee][Nn][Tt][_][Rr][Aa][Nn][Kk];
+K_PERCENTRANK : P E R C E N T'_'R A N K; 
 K_RANK       : R A N K;  
-K_ROWNUMBER  : [Rr][Oo][Ww][_][Nn][Uu][Mm][Bb][Ee][Rr];
+K_ROWNUMBER  : R O W'_'N U M B E R;
 
 
 IDENTIFIER
