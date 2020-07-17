@@ -338,6 +338,7 @@ expr
  | ( ( K_NOT )? K_EXISTS )? '(' select_stmt ')'
  | K_CASE expr? ( K_WHEN expr K_THEN expr )+ ( K_ELSE expr )? K_END
  | raise_function
+ | windowFunction
  ;
 
 foreign_key_clause
@@ -397,7 +398,51 @@ common_table_expression
 result_column
  : '*'
  | table_name '.' '*'
- | expr ( K_AS? column_alias )?
+ | (expr|windowFunction) ( K_AS? column_alias )?
+ ;
+windowFunction
+ : K_FIRST_VALUE '('  expr  ')' K_OVER '('  partitionbyOptional? K_ORDER K_BY exprAscDescOptional frameclauseOptional? ')'
+ | K_CUMEDIST '(' ')' K_OVER '('  partitionbyOptional?  orderByOptional? ')'
+ | K_DENSERANK '(' ')' K_OVER  '('  partitionbyOptional? K_ORDER K_BY exprAscDescOptional  ')'
+ | K_LAG  '(' expr offsetOptional? defaultOptional?  ')' K_OVER  '('  partitionbyOptional? K_ORDER K_BY exprAscDescOptional ')'
+ | K_LASTVALUE '('  expr  ')' K_OVER '(' partitionbyOptional?  K_ORDER K_BY exprAscDescOptional frameclauseOptional? ')'
+ | K_LEAD '(' expr offsetOptional? defaultOptional?  ')' K_OVER '('  partitionbyOptional? K_ORDER K_BY exprAscDescOptional  ')'
+ | K_NTHVALUE '(' expr ',' signed_number ')'  K_OVER '(' partitionbyOptional? K_ORDER K_BY exprAscDescOptional frameclauseOptional?  ')'
+ | K_NTILE '(' expr  ')' K_OVER '(' partitionbyOptional? K_ORDER K_BY exprAscDescOptional ')'
+ | K_PERCENTRANK '(' ')'  K_OVER   '(' partitionbyOptional? orderByOptional? ')' 
+ | K_RANK '(' ')' K_OVER   '(' partitionbyOptional?  K_ORDER K_BY  exprAscDescOptional ')'
+ | K_ROWNUMBER '(' ')' K_OVER '(' partitionbyOptional?  K_ORDER K_BY  exprAscDescOptional ')'
+ ;
+offsetOptional
+  : ',' signed_number
+  ;
+defaultOptional
+  : ',' signed_number
+  ;
+partitionbyOptional
+ : K_PARTITION K_BY expr+ 
+ ; 
+orderByOptional
+ : K_ORDER K_BY expr+
+ ;
+exprAscDescOptional
+ : expr ascdescOption? (',' expr ascdescOption?)*
+ ;
+ascdescOption
+ : K_ASC|K_DESC
+ ;
+frameclauseOptional
+ :  (K_RANGE|K_ROWS)  (frame_start| K_BETWEEN  frame_start K_AND frame_end )
+ ;
+frame_start
+ : signed_number K_PRECEDING 
+ | K_UBOUNDED K_PRECEDING
+ | K_CURRENT K_ROW
+ ;
+frame_end
+ : K_CURRENT K_ROW
+ | K_UBOUNDED K_FOLLOWING 
+ | signed_number K_FOLLOWING
  ;
 
 table_or_subquery
@@ -810,6 +855,7 @@ K_RESTRICT : R E S T R I C T;
 K_RIGHT : R I G H T;
 K_ROLLBACK : R O L L B A C K;
 K_ROW : R O W;
+K_ROWS : R O W S;
 K_SAVEPOINT : S A V E P O I N T;
 K_SELECT : S E L E C T;
 K_SET : S E T;
@@ -832,6 +878,25 @@ K_WHEN : W H E N;
 K_WHERE : W H E R E;
 K_WITH : W I T H;
 K_WITHOUT : W I T H O U T;
+K_FIRST_VALUE : F I R S T'_'V A L U E;
+K_OVER  : O V E R;
+K_PARTITION : P A R T I T I O N;
+K_RANGE     : R A N G E;
+K_PRECEDING : P R E C E D I N G;
+K_UBOUNDED   : U N B O U N D E D;
+K_CURRENT   : C U R R E N T;
+K_FOLLOWING : F O L L O W I N G;
+K_CUMEDIST  : C U M E'_'D I S T;
+K_DENSERANK : D E N S E'_'R A N K;
+K_LAG       : L A G;
+K_LASTVALUE : L A S T'_'V A L U E;
+K_LEAD       : L E A D;
+K_NTHVALUE  : N T H'_'V A L U E;
+K_NTILE      : N T I L E;
+K_PERCENTRANK : P E R C E N T'_'R A N K; 
+K_RANK       : R A N K;  
+K_ROWNUMBER  : R O W'_'N U M B E R;
+
 
 IDENTIFIER
  : '"' (~'"' | '""')* '"'
