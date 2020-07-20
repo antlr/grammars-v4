@@ -361,7 +361,7 @@ fragment NameStartChar
     | '\uF900'..'\uFDCF'
     | '\uFDF0'..'\uFFFD'
     ;
-fragment ExponentPart:         'e' [+-]? Digit+;
+fragment ExponentPart:         ('e'|'E') [+-]? Digit+;
 fragment NonZeroDigit:         [1-9_];
 fragment Digit:                [0-9_];
 fragment HexDigit:             [a-fA-F0-9_];
