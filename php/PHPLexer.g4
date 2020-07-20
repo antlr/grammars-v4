@@ -298,7 +298,7 @@ BackQuote:          '`';
 VarName:            '$' [a-zA-Z_][a-zA-Z_0-9]*;
 Label:              [a-zA-Z_][a-zA-Z_0-9]*;
 Octal:              '0' [0-7]+;
-Decimal:            '0' | NonZeroDigit Digit*;
+Decimal:            Digit+;
 Real:               (Digit+ '.' Digit* | '.' Digit+) ExponentPart?
     |               Digit+ ExponentPart;
 Hex:                '0x' HexDigit+;
@@ -362,6 +362,5 @@ fragment NameStartChar
     | '\uFDF0'..'\uFFFD'
     ;
 fragment ExponentPart:         'e' [+-]? Digit+;
-fragment NonZeroDigit:         [1-9_];
 fragment Digit:                [0-9_];
 fragment HexDigit:             [a-fA-F0-9_];
