@@ -2041,10 +2041,10 @@ constant
 //    Data Types
 
 dataType
-    : (typeName=(
+    : typeName=(
       CHAR | CHARACTER | VARCHAR | TINYTEXT | TEXT | MEDIUMTEXT | LONGTEXT
        | NCHAR | NVARCHAR | LONG
-      ) | typeName=LONG VARCHAR)                                    // LONG VARCHAR is the same as LONG
+      )
       lengthOneDimension? BINARY?
       ((CHARACTER SET | CHARSET) charsetName)?
       (COLLATE collationName)?                                      #stringDataType
@@ -2069,10 +2069,10 @@ dataType
         DATE | TINYBLOB | BLOB | MEDIUMBLOB | LONGBLOB
         | BOOL | BOOLEAN | SERIAL
       )                                                             #simpleDataType
-    | (typeName=(
+    | typeName=(
         BIT | TIME | TIMESTAMP | DATETIME | BINARY
         | VARBINARY | YEAR
-      ) | LONG typeName=VARBINARY)                                  // LONG VARBINARY is the same as VARBINARY
+      )
       lengthOneDimension?                                           #dimensionDataType
     | typeName=(ENUM | SET)
       collectionOptions BINARY?
@@ -2081,6 +2081,11 @@ dataType
         GEOMETRYCOLLECTION | GEOMCOLLECTION | LINESTRING | MULTILINESTRING
         | MULTIPOINT | MULTIPOLYGON | POINT | POLYGON | JSON | GEOMETRY
       )                                                             #spatialDataType
+    | typeName=LONG VARCHAR?
+      BINARY?
+      ((CHARACTER SET | CHARSET) charsetName)?
+      (COLLATE collationName)?                                      #longVarcharDataType    // LONG VARCHAR is the same as LONG
+    | LONG VARBINARY                                                #longVarbinaryDataType
     ;
 
 collectionOptions
