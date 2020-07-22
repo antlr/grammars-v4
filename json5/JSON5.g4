@@ -1,7 +1,10 @@
+// Student Main
+// 2020-07-22
+// Public domain
 
-/** Taken from "The Definitive ANTLR 4 Reference" by Terence Parr */
-
-// Derived from http://json.org
+// JSON5 is a superset of JSON, it included some feature from ES5.1
+// See https://json5.org/
+// Derived from ../json/JSON.g4 which original derived from http://json.org
 grammar JSON5;
 
 json5
@@ -20,6 +23,7 @@ pair
 key
    : STRING
    | IDENTIFIER
+   | LITERAL
    ;
 
 value
@@ -27,9 +31,7 @@ value
    | NUMBER
    | obj
    | arr
-   | 'true'
-   | 'false'
-   | 'null'
+   | LITERAL
    ;
 
 arr
@@ -45,6 +47,12 @@ SINGLE_LINE_COMMENT
 
 MULTI_LINE_COMMENT
    : '/*' .*? '*/' -> skip
+   ;
+
+LITERAL
+   : 'true'
+   | 'false'
+   | 'null'
    ;
 
 STRING
