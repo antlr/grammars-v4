@@ -137,7 +137,8 @@
 				<module>javadoc</module>
 				<module>javascript</module>
 				<module>jpa</module>
-				<module>json</module>
+                <module>json</module>
+                <module>json5</module>
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kuka</module>
