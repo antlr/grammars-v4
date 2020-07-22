@@ -9,16 +9,21 @@ json5
    ;
 
 obj
-   : '{' pair (',' pair)* '}'
+   : '{' pair (',' pair)* ','? '}'
    | '{' '}'
    ;
 
 pair
-   : STRING ':' value
+   : key ':' value
+   ;
+
+key
+   : STRING
+   | IDENTIFIER
    ;
 
 arr
-   : '[' value (',' value)* ']'
+   : '[' value (',' value)* ','? ']'
    | '[' ']'
    ;
 
@@ -37,11 +42,29 @@ STRING
    : '"' (ESC | SAFECODEPOINT)* '"'
    ;
 
-
-fragment ESC
-   : '\\' (["\\/bfnrt] | UNICODE)
+IDENTIFIER
+   : IDENTIFIER_START IDENTIFIER_PART*
    ;
 
+fragment IDENTIFIER_START
+   : [\p{L}]
+   | '$'
+   | '_'
+   | ESC
+   ;
+
+fragment IDENTIFIER_PART
+   : IDENTIFIER_START
+   | [\p{M}]
+   | [\p{N}]
+   | [\p{Pc}]
+   | '\u200C'
+   | '\u200D'
+   ;
+
+fragment ESC
+   : '\\' (["\\/bfnrt] | UNICODE )
+   ;
 
 fragment UNICODE
    : 'u' HEX HEX HEX HEX
