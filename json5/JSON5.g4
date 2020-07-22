@@ -29,7 +29,7 @@ arr
 
 value
    : STRING
-   | NUMBER
+   | number
    | obj
    | arr
    | 'true'
@@ -87,11 +87,28 @@ fragment SAFECODEPOINT
    : ~ ["\\\u0000-\u001F]
    ;
 
-
-NUMBER
-   : '-'? INT ('.' [0-9] +)? EXP?
+number
+   : DECNUM
+   | HEXNUM
+   | INFINITY
+   | NAN
    ;
 
+DECNUM
+   : [+-]? INT ('.' [0-9]*)? EXP?
+   | [+-]? '.' [0-9]+ EXP?
+   ;
+
+HEXNUM
+   : [+-]? '0' [xX] HEX+
+   ;
+
+INFINITY
+   : [+-]? 'Infinity'
+   ;
+NAN
+   : 'NaN'
+   ;
 
 fragment INT
    : '0' | [1-9] [0-9]*
