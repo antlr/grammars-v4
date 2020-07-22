@@ -37,9 +37,9 @@ value
    | 'null'
    ;
 
-
 STRING
-   : '"' (ESC | SAFECODEPOINT)* '"'
+   : '"' DOUBLE_QUOTE_CHAR* '"'
+   | '\'' SINGLE_QUOTE_CHAR* '\''
    ;
 
 IDENTIFIER
@@ -50,7 +50,7 @@ fragment IDENTIFIER_START
    : [\p{L}]
    | '$'
    | '_'
-   | ESC
+   | UNICODE_ESC
    ;
 
 fragment IDENTIFIER_PART
@@ -62,14 +62,21 @@ fragment IDENTIFIER_PART
    | '\u200D'
    ;
 
-fragment ESC
-   : '\\' (["\\/bfnrt] | UNICODE )
+fragment DOUBLE_QUOTE_CHAR
+   : '\\' ["\\/bfnrt\n]
+   | ~ ["\\\u0000-\u001F]
+   | UNICODE_ESC
    ;
 
-fragment UNICODE
-   : 'u' HEX HEX HEX HEX
+fragment SINGLE_QUOTE_CHAR
+   : '\\' ['\\/bfnrt\n]
+   | ~ ['\\\u0000-\u001F]
+   | UNICODE_ESC
    ;
 
+fragment UNICODE_ESC
+   : '\\u' HEX HEX HEX HEX
+   ;
 
 fragment HEX
    : [0-9a-fA-F]
