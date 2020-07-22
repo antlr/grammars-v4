@@ -37,6 +37,14 @@ value
    | 'null'
    ;
 
+SINGLE_LINE_COMMENT
+   : '//' ~[\r\n\u2028\u2029]* -> skip
+   ;
+
+MULTI_LINE_COMMENT
+   : '/*' .*? '*/' -> skip
+   ;
+
 STRING
    : '"' DOUBLE_QUOTE_CHAR* '"'
    | '\'' SINGLE_QUOTE_CHAR* '\''
