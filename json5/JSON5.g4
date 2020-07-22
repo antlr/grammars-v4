@@ -132,7 +132,8 @@ fragment EXP
    ;
 
 fragment NEWLINE
-   : [\r\n\u2028\u2029]
+   : '\r\n'
+   | [\r\n\u2028\u2029]
    ;
 
 WS
