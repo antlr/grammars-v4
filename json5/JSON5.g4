@@ -5,7 +5,7 @@
 grammar JSON5;
 
 json5
-   : value
+   : value? EOF
    ;
 
 obj
@@ -22,14 +22,9 @@ key
    | IDENTIFIER
    ;
 
-arr
-   : '[' value (',' value)* ','? ']'
-   | '[' ']'
-   ;
-
 value
    : STRING
-   | number
+   | NUMBER
    | obj
    | arr
    | 'true'
@@ -37,8 +32,15 @@ value
    | 'null'
    ;
 
+arr
+   : '[' value (',' value)* ','? ']'
+   | '[' ']'
+   ;
+
+// Lexer
+
 SINGLE_LINE_COMMENT
-   : '//' ~[\r\n\u2028\u2029]* -> skip
+   : '//' .*? (NEWLINE | EOF) -> skip
    ;
 
 MULTI_LINE_COMMENT
@@ -50,6 +52,27 @@ STRING
    | '\'' SINGLE_QUOTE_CHAR* '\''
    ;
 
+fragment DOUBLE_QUOTE_CHAR
+   : ~["\\\r\n]
+   | ESCAPE_SEQUENCE
+   ;
+
+fragment SINGLE_QUOTE_CHAR
+   : ~['\\\r\n]
+   | ESCAPE_SEQUENCE
+   ;
+
+fragment ESCAPE_SEQUENCE
+   : '\\'
+   ( NEWLINE
+   | UNICODE_SEQUENCE       // \u1234
+   | ['"\\/bfnrtv]          // single escape char
+   | ~['"\\bfnrtv0-9xu\r\n] // non escape char
+   | '0'                    // \0
+   | 'x' HEX HEX            // \x3a
+   )
+   ;
+
 IDENTIFIER
    : IDENTIFIER_START IDENTIFIER_PART*
    ;
@@ -58,7 +81,7 @@ fragment IDENTIFIER_START
    : [\p{L}]
    | '$'
    | '_'
-   | UNICODE_ESC
+   | '\\' UNICODE_SEQUENCE
    ;
 
 fragment IDENTIFIER_PART
@@ -70,65 +93,39 @@ fragment IDENTIFIER_PART
    | '\u200D'
    ;
 
-fragment DOUBLE_QUOTE_CHAR
-   : '\\' ["\\/bfnrt\n]
-   | ~ ["\\\u0000-\u001F]
-   | UNICODE_ESC
+fragment UNICODE_SEQUENCE
+   : 'u' HEX HEX HEX HEX
    ;
 
-fragment SINGLE_QUOTE_CHAR
-   : '\\' ['\\/bfnrt\n]
-   | ~ ['\\\u0000-\u001F]
-   | UNICODE_ESC
+NUMBER
+   : SYMBOL
+   ( INT ('.' [0-9]*)? EXP? // +1.e2, 1234, 1234.5
+   | '.' [0-9]+ EXP?        // -.2e3
+   | '0' [xX] HEX+          // 0x12345678
+   | 'Infinity'
+   | 'NaN'
+   )
    ;
 
-fragment UNICODE_ESC
-   : '\\u' HEX HEX HEX HEX
+fragment SYMBOL
+   : ('+' | '-')?
    ;
 
 fragment HEX
    : [0-9a-fA-F]
    ;
 
-
-fragment SAFECODEPOINT
-   : ~ ["\\\u0000-\u001F]
-   ;
-
-number
-   : DECNUM
-   | HEXNUM
-   | INFINITY
-   | NAN
-   ;
-
-DECNUM
-   : [+-]? INT ('.' [0-9]*)? EXP?
-   | [+-]? '.' [0-9]+ EXP?
-   ;
-
-HEXNUM
-   : [+-]? '0' [xX] HEX+
-   ;
-
-INFINITY
-   : [+-]? 'Infinity'
-   ;
-NAN
-   : 'NaN'
-   ;
-
 fragment INT
    : '0' | [1-9] [0-9]*
    ;
 
-// no leading zeros
-
 fragment EXP
-   : [Ee] [+\-]? INT
+   : [Ee] SYMBOL INT
    ;
 
-// \- since - means "range" inside [...]
+fragment NEWLINE
+   : [\r\n\u2028\u2029]
+   ;
 
 WS
    : [ \t\n\r] + -> skip
