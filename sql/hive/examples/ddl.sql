@@ -1,0 +1,1 @@
+create table a(id string comment 'id',name string comment 'name');
