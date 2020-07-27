@@ -81,7 +81,21 @@ val
    | IDENTIFIER index?
    | DESCRIPTION
    | filedecl
+   | functioncall
    | EOF_
+   ;
+
+functioncall
+   : functionname '(' functionarguments ')'
+   ;
+
+functionname
+   : IDENTIFIER
+   ;
+
+functionarguments
+   : //no arguments
+   | expression (',' expression)*
    ;
 
 index

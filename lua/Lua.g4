@@ -43,7 +43,7 @@ This grammar file derived from:
 
 Tested by Kazunori Sakamoto with Test suite for Lua 5.2 (http://www.lua.org/tests/5.2/)
 
-Tested by Alexander Alexeev with Test suite for Lua 5.3 http://www.lua.org/tests/lua-5.3.2-tests.tar.gz 
+Tested by Alexander Alexeev with Test suite for Lua 5.3 http://www.lua.org/tests/lua-5.3.2-tests.tar.gz
 */
 
 grammar Lua;
@@ -71,7 +71,15 @@ stat
     | 'for' namelist 'in' explist 'do' block 'end'
     | 'function' funcname funcbody
     | 'local' 'function' NAME funcbody
-    | 'local' namelist ('=' explist)?
+    | 'local' attnamelist ('=' explist)?
+    ;
+
+attnamelist
+    : NAME attrib (',' NAME attrib)*
+    ;
+
+attrib
+    : ('<' NAME '>')?
     ;
 
 retstat
@@ -151,7 +159,7 @@ prefixexp
     ;
 
 functioncall
-    : prefixexp args | prefixexp ':' NAME args 
+    : prefixexp args | prefixexp ':' NAME args
     ;
 */
 
@@ -187,13 +195,13 @@ fieldsep
     : ',' | ';'
     ;
 
-operatorOr 
+operatorOr
 	: 'or';
 
-operatorAnd 
+operatorAnd
 	: 'and';
 
-operatorComparison 
+operatorComparison
 	: '<' | '>' | '<=' | '>=' | '~=' | '==';
 
 operatorStrcat
@@ -229,7 +237,7 @@ NAME
     ;
 
 NORMALSTRING
-    : '"' ( EscapeSequence | ~('\\'|'"') )* '"' 
+    : '"' ( EscapeSequence | ~('\\'|'"') )* '"'
     ;
 
 CHARSTRING
@@ -284,14 +292,14 @@ EscapeSequence
     | HexEscape
     | UtfEscape
     ;
-    
+
 fragment
 DecimalEscape
     : '\\' Digit
     | '\\' Digit Digit
     | '\\' [0-2] Digit Digit
     ;
-    
+
 fragment
 HexEscape
     : '\\' 'x' HexDigit HexDigit
@@ -315,7 +323,7 @@ HexDigit
 COMMENT
     : '--[' NESTED_STR ']' -> channel(HIDDEN)
     ;
-    
+
 LINE_COMMENT
     : '--'
     (                                               // --
@@ -325,8 +333,8 @@ LINE_COMMENT
     ) ('\r\n'|'\r'|'\n'|EOF)
     -> channel(HIDDEN)
     ;
-    
-WS  
+
+WS
     : [ \t\u000C\r\n]+ -> skip
     ;
 
