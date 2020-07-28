@@ -406,14 +406,12 @@ HexDigit
 
 fragment
 Digit
-    :
-    '0'..'9'
+    : '0'..'9'
     ;
 
 fragment
 Exponent
-    :
-    ('e' | 'E') ( PLUS|MINUS )? (Digit)+
+    : ('e' | 'E') ( PLUS|MINUS )? (Digit)+
     ;
 
 fragment
@@ -425,36 +423,30 @@ RegexComponent
     ;
 
 StringLiteral
-    :
-    ( '\'' ( ~('\''|'\\') | ('\\' .) )* '\''
+    : ( '\'' ( ~('\''|'\\') | ('\\' .) )* '\''
     | '"' ( ~('"'|'\\') | ('\\' .) )* '"'
     )+
     ;
 
 CharSetLiteral
-    :
-    StringLiteral
+    : StringLiteral
     | '0' 'X' (HexDigit|Digit)+
     ;
 
 IntegralLiteral
-    :
-    (Digit)+ ('L' | 'S' | 'Y')
+    : (Digit)+ ('L' | 'S' | 'Y')
     ;
 
 NumberLiteral
-    :
-    Number ('D' | 'B' 'D')
+    : Number ('D' | 'B' 'D')
     ;
 
 ByteLengthLiteral
-    :
-    (Digit)+ ('b' | 'B' | 'k' | 'K' | 'm' | 'M' | 'g' | 'G')
+    : (Digit)+ ('b' | 'B' | 'k' | 'K' | 'm' | 'M' | 'g' | 'G')
     ;
 
 Number
-    :
-    (Digit)+ ( DOT (Digit)* (Exponent)? | Exponent)?
+    : (Digit)+ ( DOT (Digit)* (Exponent)? | Exponent)?
     ;
 
 /*
@@ -479,8 +471,7 @@ An Identifier can be:
 - window name
 */
 Identifier
-    :
-    (Letter | Digit) (Letter | Digit | '_')*
+    : (Letter | Digit) (Letter | Digit | '_')*
     | QuotedIdentifier  /* though at the language level we allow all Identifiers to be QuotedIdentifiers;
                                               at the API level only columns are allowed to be of this form */
     | '`' RegexComponent+ '`'
@@ -493,11 +484,10 @@ QuotedIdentifier
     ;
 
 CharSetName
-    :
-    '_' (Letter | Digit | '_' | '-' | '.' | ':' )+
+    : '_' (Letter | Digit | '_' | '-' | '.' | ':' )+
     ;
 
-WS  :  (' '|'\r'|'\t'|'\n') -> channel(HIDDEN)
+WS  : (' '|'\r'|'\t'|'\n') -> channel(HIDDEN)
     ;
 
 LINE_COMMENT

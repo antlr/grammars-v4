@@ -21,21 +21,17 @@ parser grammar SelectClauseParser;
 //----------------------- Rules for parsing selectClause -----------------------------
 // select a,b,c ...
 selectClause
-    :
-    KW_SELECT QUERY_HINT? (((KW_ALL | dist=KW_DISTINCT)? selectList)
-                          | (transform=KW_TRANSFORM selectTrfmClause))
-    |
-    trfmClause
+    : KW_SELECT QUERY_HINT? (((KW_ALL | KW_DISTINCT)? selectList)
+                          | (KW_TRANSFORM selectTrfmClause))
+    | trfmClause
     ;
 
 selectList
-    :
-    selectItem ( COMMA  selectItem )*
+    : selectItem ( COMMA  selectItem )*
     ;
 
 selectTrfmClause
-    :
-    LPAREN selectExpressionList RPAREN
+    : LPAREN selectExpressionList RPAREN
     rowFormat recordWriter
     KW_USING StringLiteral
     ( KW_AS ((LPAREN (aliasList | columnNameTypeList) RPAREN) | (aliasList | columnNameTypeList)))?
@@ -43,17 +39,14 @@ selectTrfmClause
     ;
 
 selectItem
-    :
-    (tableAllColumns)
-    |
-    ( expression
+    : tableAllColumns
+    | ( expression
       ((KW_AS? identifier) | (KW_AS LPAREN identifier (COMMA identifier)* RPAREN))?
     )
     ;
 
 trfmClause
-    :
-    (   KW_MAP    selectExpressionList
+    : (   KW_MAP    selectExpressionList
       | KW_REDUCE selectExpressionList )
     rowFormat recordWriter
     KW_USING StringLiteral
@@ -62,60 +55,56 @@ trfmClause
     ;
 
 selectExpression
-    :
-    (tableAllColumns)
-    |
-    expression
+    : (tableAllColumns)
+    | expression
     ;
 
 selectExpressionList
-    :
-    selectExpression (COMMA selectExpression)*
+    : selectExpression (COMMA selectExpression)*
     ;
 
 //---------------------- Rules for windowing clauses -------------------------------
 window_clause
-:
-  KW_WINDOW window_defn (COMMA window_defn)*
-;
+    :
+    KW_WINDOW window_defn (COMMA window_defn)*
+    ;
 
 window_defn
-:
-  identifier KW_AS window_specification
-;
+    :
+    identifier KW_AS window_specification
+    ;
 
 window_specification
-:
-  (identifier | ( LPAREN identifier? partitioningSpec? window_frame? RPAREN))
-;
+    :
+    (identifier | ( LPAREN identifier? partitioningSpec? window_frame? RPAREN))
+    ;
 
-window_frame :
- window_range_expression |
- window_value_expression
-;
+window_frame
+    : window_range_expression
+    | window_value_expression
+    ;
 
 window_range_expression
-:
- KW_ROWS sb=window_frame_start_boundary |
- KW_ROWS KW_BETWEEN s=window_frame_boundary KW_AND end=window_frame_boundary
-;
+    :
+    KW_ROWS window_frame_start_boundary |
+    KW_ROWS KW_BETWEEN window_frame_boundary KW_AND window_frame_boundary
+    ;
 
 window_value_expression
-:
- KW_RANGE sb=window_frame_start_boundary|
- KW_RANGE KW_BETWEEN s=window_frame_boundary KW_AND end=window_frame_boundary
-;
+    : KW_RANGE window_frame_start_boundary |
+    KW_RANGE KW_BETWEEN window_frame_boundary KW_AND window_frame_boundary
+    ;
 
 window_frame_start_boundary
-:
-  KW_UNBOUNDED KW_PRECEDING |
-  KW_CURRENT KW_ROW |
-  Number KW_PRECEDING
-;
+    :
+    KW_UNBOUNDED KW_PRECEDING |
+    KW_CURRENT KW_ROW |
+    Number KW_PRECEDING
+    ;
 
-window_frame_boundary
-:
-  KW_UNBOUNDED (KW_PRECEDING|KW_FOLLOWING) |
-  KW_CURRENT KW_ROW |
-  Number (KW_PRECEDING | KW_FOLLOWING )
-;
+    window_frame_boundary
+    :
+    KW_UNBOUNDED (KW_PRECEDING|KW_FOLLOWING) |
+    KW_CURRENT KW_ROW |
+    Number (KW_PRECEDING | KW_FOLLOWING )
+    ;

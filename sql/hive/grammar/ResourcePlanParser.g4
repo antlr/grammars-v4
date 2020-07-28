@@ -37,10 +37,8 @@ resourcePlanDdlStatements
     ;
 
 rpAssign
-  : (
-      (KW_QUERY_PARALLELISM EQUAL parallelism=Number)
-    | (KW_DEFAULT KW_POOL EQUAL poolPath)
-    )
+  : (KW_QUERY_PARALLELISM EQUAL Number)
+  | (KW_DEFAULT KW_POOL EQUAL poolPath)
   ;
 
 rpAssignList
@@ -48,10 +46,8 @@ rpAssignList
   ;
 
 rpUnassign
-  : (
-      (KW_QUERY_PARALLELISM)
-    | (KW_DEFAULT KW_POOL)
-    )
+  : (KW_QUERY_PARALLELISM)
+  | (KW_DEFAULT KW_POOL)
   ;
 
 rpUnassignList
@@ -60,26 +56,44 @@ rpUnassignList
 
 createResourcePlanStatement
     : KW_CREATE KW_RESOURCE KW_PLAN (
-          (name=identifier KW_LIKE likeName=identifier)
-        | (name=identifier (KW_WITH rpAssignList)?)
+          (identifier KW_LIKE identifier)
+        | (identifier (KW_WITH rpAssignList)?)
       )
     ;
 
 
-withReplace : KW_WITH KW_REPLACE;
-activate : KW_ACTIVATE withReplace?;
-enable : KW_ENABLE;
-disable : KW_DISABLE;
-unmanaged : KW_UNMANAGED;
+withReplace
+    : KW_WITH KW_REPLACE
+    ;
+
+
+activate
+    : KW_ACTIVATE withReplace?
+    ;
+
+
+enable
+    : KW_ENABLE
+    ;
+
+
+disable
+    : KW_DISABLE
+    ;
+
+
+unmanaged
+    : KW_UNMANAGED
+    ;
 
 
 alterResourcePlanStatement
-    : KW_ALTER KW_RESOURCE KW_PLAN name=identifier (
+    : KW_ALTER KW_RESOURCE KW_PLAN identifier (
           (KW_VALIDATE)
         | (KW_DISABLE)
         | (KW_SET rpAssignList)
         | (KW_UNSET rpUnassignList)
-        | (KW_RENAME KW_TO newName=identifier)
+        | (KW_RENAME KW_TO identifier)
         | ((activate enable? | enable activate?))
       )
     ;
@@ -92,13 +106,13 @@ globalWmStatement
 
 replaceResourcePlanStatement
     : KW_REPLACE (
-          (KW_ACTIVE KW_RESOURCE KW_PLAN KW_WITH src=identifier)
-        | (KW_RESOURCE KW_PLAN dest=identifier KW_WITH src=identifier)
+          (KW_ACTIVE KW_RESOURCE KW_PLAN KW_WITH identifier)
+        | (KW_RESOURCE KW_PLAN identifier KW_WITH identifier)
       )
     ;
 
 dropResourcePlanStatement
-    : KW_DROP KW_RESOURCE KW_PLAN name=identifier
+    : KW_DROP KW_RESOURCE KW_PLAN identifier
     ;
 
 poolPath
@@ -109,7 +123,8 @@ triggerExpression
     : triggerAtomExpression
     ;
 
-triggerExpressionStandalone : triggerExpression EOF ;
+triggerExpressionStandalone
+    : triggerExpression EOF ;
 
 /*
   The rules triggerOrExpression and triggerAndExpression are not being used right now.
@@ -142,18 +157,19 @@ triggerActionExpression
     | (KW_MOVE KW_TO poolPath)
     ;
 
-triggerActionExpressionStandalone : triggerActionExpression EOF ;
+triggerActionExpressionStandalone
+    : triggerActionExpression EOF ;
 
 createTriggerStatement
-    : KW_CREATE KW_TRIGGER rpName=identifier DOT triggerName=identifier
+    : KW_CREATE KW_TRIGGER identifier DOT identifier
       KW_WHEN triggerExpression KW_DO triggerActionExpression
     ;
 
 alterTriggerStatement
-    : KW_ALTER KW_TRIGGER rpName=identifier DOT triggerName=identifier (
+    : KW_ALTER KW_TRIGGER identifier DOT identifier (
         (KW_WHEN triggerExpression KW_DO triggerActionExpression)
-      | (KW_ADD KW_TO KW_POOL poolName=poolPath)
-      | (KW_DROP KW_FROM KW_POOL poolName=poolPath)
+      | (KW_ADD KW_TO KW_POOL poolPath)
+      | (KW_DROP KW_FROM KW_POOL poolPath)
       | (KW_ADD KW_TO KW_UNMANAGED)
       | (KW_DROP KW_FROM KW_UNMANAGED)
     )
@@ -161,15 +177,15 @@ alterTriggerStatement
 
 
 dropTriggerStatement
-    : KW_DROP KW_TRIGGER rpName=identifier DOT triggerName=identifier
+    : KW_DROP KW_TRIGGER identifier DOT identifier
     ;
 
 poolAssign
     : (
-        (KW_ALLOC_FRACTION EQUAL allocFraction=Number)
-      | (KW_QUERY_PARALLELISM EQUAL parallelism=Number)
-      | (KW_SCHEDULING_POLICY EQUAL policy=StringLiteral)
-      | (KW_PATH EQUAL path=poolPath)
+        (KW_ALLOC_FRACTION EQUAL Number)
+      | (KW_QUERY_PARALLELISM EQUAL Number)
+      | (KW_SCHEDULING_POLICY EQUAL StringLiteral)
+      | (KW_PATH EQUAL poolPath)
       )
     ;
 
@@ -178,38 +194,38 @@ poolAssignList
     ;
 
 createPoolStatement
-    : KW_CREATE KW_POOL rpName=identifier DOT poolPath
+    : KW_CREATE KW_POOL identifier DOT poolPath
       KW_WITH poolAssignList
     ;
 
 alterPoolStatement
-    : KW_ALTER KW_POOL rpName=identifier DOT poolPath (
+    : KW_ALTER KW_POOL identifier DOT poolPath (
         (KW_SET poolAssignList)
         | (KW_UNSET KW_SCHEDULING_POLICY)
-        | (KW_ADD KW_TRIGGER triggerName=identifier)
-        | (KW_DROP KW_TRIGGER triggerName=identifier)
+        | (KW_ADD KW_TRIGGER identifier)
+        | (KW_DROP KW_TRIGGER identifier)
       )
     ;
 
 dropPoolStatement
-    : KW_DROP KW_POOL rpName=identifier DOT poolPath
+    : KW_DROP KW_POOL identifier DOT poolPath
     ;
 
 createMappingStatement
-    : (KW_CREATE mappingType=(KW_USER | KW_GROUP | KW_APPLICATION)
-         KW_MAPPING name=StringLiteral
-         KW_IN rpName=identifier ((KW_TO path=poolPath) | unmanaged)
-         (KW_WITH KW_ORDER order=Number)?)
+    : (KW_CREATE (KW_USER | KW_GROUP | KW_APPLICATION)
+         KW_MAPPING StringLiteral
+         KW_IN identifier ((KW_TO poolPath) | unmanaged)
+         (KW_WITH KW_ORDER Number)?)
     ;
 
 alterMappingStatement
-    : (KW_ALTER mappingType=(KW_USER | KW_GROUP | KW_APPLICATION)
-         KW_MAPPING name=StringLiteral
-         KW_IN rpName=identifier ((KW_TO path=poolPath) | unmanaged)
-         (KW_WITH KW_ORDER order=Number)?)
+    : (KW_ALTER (KW_USER | KW_GROUP | KW_APPLICATION)
+         KW_MAPPING StringLiteral
+         KW_IN identifier ((KW_TO poolPath) | unmanaged)
+         (KW_WITH KW_ORDER Number)?)
     ;
 
 dropMappingStatement
-    : KW_DROP mappingType=(KW_USER | KW_GROUP | KW_APPLICATION) KW_MAPPING
-         name=StringLiteral KW_IN rpName=identifier
+    : KW_DROP (KW_USER | KW_GROUP | KW_APPLICATION) KW_MAPPING
+         StringLiteral KW_IN identifier
     ;

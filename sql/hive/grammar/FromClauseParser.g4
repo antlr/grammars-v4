@@ -28,51 +28,43 @@ tableAllColumns
 
 // (table|column)
 tableOrColumn
-    :
-    identifier
+    : identifier
     ;
 
 expressionList
-    :
-    expression (COMMA expression)*
+    : expression (COMMA expression)*
     ;
 
 aliasList
-    :
-    identifier (COMMA identifier)*
+    : identifier (COMMA identifier)*
     ;
 
 //----------------------- Rules for parsing fromClause ------------------------------
 // from [col1, col2, col3] table1, [col4, col5] table2
 fromClause
-    :
-    KW_FROM fromSource
+    : KW_FROM fromSource
     ;
 
 fromSource
-    :
-    uniqueJoinToken uniqueJoinSource (COMMA uniqueJoinSource)+
-    |
-    joinSource
+    : uniqueJoinToken uniqueJoinSource (COMMA uniqueJoinSource)+
+    | joinSource
     ;
 
 
 atomjoinSource
-    :  tableSource (lateralView)*
-    |  virtualTableSource (lateralView)*
-    |  subQuerySource (lateralView)*
-    |  partitionedTableFunction (lateralView)*
-    |  LPAREN joinSource RPAREN
+    : tableSource lateralView*
+    | virtualTableSource lateralView*
+    | subQuerySource lateralView*
+    | partitionedTableFunction lateralView*
+    | LPAREN joinSource RPAREN
     ;
 
 joinSource
-    :
-    atomjoinSource (joinToken joinSourcePart (KW_ON expression {$joinToken.start.getType() != COMMA}? | KW_USING columnParenthesesList {$joinToken.start.getType() != COMMA}?)?)*
+    : atomjoinSource (joinToken joinSourcePart (KW_ON expression {$joinToken.start.getType() != COMMA}? | KW_USING columnParenthesesList {$joinToken.start.getType() != COMMA}?)?)*
     ;
 
 joinSourcePart
-    :
-    (tableSource | virtualTableSource | subQuerySource | partitionedTableFunction) (lateralView)*
+    : (tableSource | virtualTableSource | subQuerySource | partitionedTableFunction) lateralView
     ;
 
 uniqueJoinSource
@@ -88,8 +80,7 @@ uniqueJoinToken
     ;
 
 joinToken
-    :
-      KW_JOIN
+    : KW_JOIN
     | KW_INNER KW_JOIN
     | COMMA
     | KW_CROSS KW_JOIN
@@ -100,87 +91,68 @@ joinToken
     ;
 
 lateralView
-	:
-	KW_LATERAL KW_VIEW KW_OUTER function tableAlias (KW_AS identifier (COMMA identifier)*)?
-	|
-	COMMA? KW_LATERAL KW_VIEW function tableAlias (KW_AS identifier (COMMA identifier)*)?
-    |
-    COMMA? KW_LATERAL KW_TABLE LPAREN valuesClause RPAREN KW_AS? tableAlias (LPAREN identifier (COMMA identifier)* RPAREN)?
+	: KW_LATERAL KW_VIEW KW_OUTER function tableAlias (KW_AS identifier (COMMA identifier)*)?
+	| COMMA? KW_LATERAL KW_VIEW function tableAlias (KW_AS identifier (COMMA identifier)*)?
+    | COMMA? KW_LATERAL KW_TABLE LPAREN valuesClause RPAREN KW_AS? tableAlias (LPAREN identifier (COMMA identifier)* RPAREN)?
 	;
 
 tableAlias
-    :
-    identifier
+    : identifier
     ;
 
 tableBucketSample
-    :
-    KW_TABLESAMPLE LPAREN KW_BUCKET (numerator=Number) KW_OUT KW_OF (denominator=Number) (KW_ON expr+=expression (COMMA expr+=expression)*)? RPAREN
+    : KW_TABLESAMPLE LPAREN KW_BUCKET (numerator=Number) KW_OUT KW_OF (denominator=Number) (KW_ON expr+=expression (COMMA expr+=expression)*)? RPAREN
     ;
 
 splitSample
-    :
-    KW_TABLESAMPLE LPAREN  (numerator=Number) (percent=KW_PERCENT|KW_ROWS) RPAREN
-    |
-    KW_TABLESAMPLE LPAREN  (numerator=ByteLengthLiteral) RPAREN
+    : KW_TABLESAMPLE LPAREN  (numerator=Number) (percent=KW_PERCENT|KW_ROWS) RPAREN
+    | KW_TABLESAMPLE LPAREN  (numerator=ByteLengthLiteral) RPAREN
     ;
 
 tableSample
-    :
-    tableBucketSample |
-    splitSample
+    : tableBucketSample
+    | splitSample
     ;
 
 tableSource
-    : tabname=tableName props=tableProperties? ts=tableSample? (KW_AS? alias=identifier)?
+    : tableName tableProperties? tableSample? (KW_AS? identifier)?
     ;
 
 uniqueJoinTableSource
-    : tabname=tableName ts=tableSample? (KW_AS? alias=identifier)?
+    : tableName tableSample? (KW_AS? identifier)?
     ;
 
 tableName
-    :
-    db=identifier DOT tab=identifier
-    |
-    tab=identifier
+    : identifier DOT identifier
+    | identifier
     ;
 
 viewName
-    :
-    (db=identifier DOT)? view=identifier
+    : (identifier DOT)? identifier
     ;
 
 subQuerySource
-    :
-    LPAREN queryStatementExpression RPAREN KW_AS? identifier
+    : LPAREN queryStatementExpression RPAREN KW_AS? identifier
     ;
 
 //---------------------- Rules for parsing PTF clauses -----------------------------
 partitioningSpec
-   :
-   partitionByClause orderByClause?
-   |
-   orderByClause
-   |
-   distributeByClause sortByClause?
-   |
-   sortByClause
-   |
-   clusterByClause
+   : partitionByClause orderByClause?
+   | orderByClause
+   | distributeByClause sortByClause?
+   | sortByClause
+   | clusterByClause
    ;
 
 partitionTableFunctionSource
-   :
-   subQuerySource |
-   tableSource |
-   partitionedTableFunction
+   : subQuerySource
+   | tableSource
+   | partitionedTableFunction
    ;
 
 partitionedTableFunction
-   :
-   name=identifier LPAREN KW_ON
-   ptfsrc=partitionTableFunctionSource spec=partitioningSpec?
+   : identifier LPAREN KW_ON
+   partitionTableFunctionSource partitioningSpec?
    (Identifier LPAREN expression RPAREN ( COMMA Identifier LPAREN expression RPAREN)*)?
    RPAREN alias=identifier?
    ;
@@ -188,13 +160,11 @@ partitionedTableFunction
 //----------------------- Rules for parsing whereClause -----------------------------
 // where a=b and ...
 whereClause
-    :
-    KW_WHERE searchCondition
+    : KW_WHERE searchCondition
     ;
 
 searchCondition
-    :
-    expression
+    : expression
     ;
 
 //-----------------------------------------------------------------------------------
@@ -209,18 +179,15 @@ VALUES(1,2),(3,4) means 2 rows, 2 columns each.
 VALUES(1,2,3) means 1 row, 3 columns
 */
 valuesClause
-    :
-    KW_VALUES valuesTableConstructor
+    : KW_VALUES valuesTableConstructor
     ;
 
 valuesTableConstructor
-    :
-    valueRowConstructor (COMMA valueRowConstructor)*
+    : valueRowConstructor (COMMA valueRowConstructor)*
     ;
 
 valueRowConstructor
-    :
-    expressionsInParenthesis
+    : expressionsInParenthesis
     ;
 
 /*
@@ -228,8 +195,7 @@ This represents a clause like this:
 TABLE(VALUES(1,2),(2,3)) as VirtTable(col1,col2)
 */
 virtualTableSource
-    :
-    KW_TABLE LPAREN valuesClause RPAREN KW_AS? tabAlias=tableAlias (LPAREN identifier (COMMA identifier)*)? RPAREN
+    : KW_TABLE LPAREN valuesClause RPAREN KW_AS? tableAlias (LPAREN identifier (COMMA identifier)*)? RPAREN
     ;
 
 //-----------------------------------------------------------------------------------

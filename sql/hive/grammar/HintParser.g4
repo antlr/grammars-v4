@@ -29,30 +29,25 @@ hint
     ;
 
 hintList
-    :
-    hintItem (COMMA hintItem)*
+    : hintItem (COMMA hintItem)*
     ;
 
 hintItem
-    :
-    hintName (LPAREN hintArgs RPAREN)?
+    : hintName (LPAREN hintArgs RPAREN)?
     ;
 
 hintName
-    :
-    KW_MAPJOIN
+    : KW_MAPJOIN
     | KW_SEMI
     | KW_STREAMTABLE
     ;
 
 hintArgs
-    :
-    hintArgName (COMMA hintArgName)*
+    : hintArgName (COMMA hintArgName)*
     ;
 
 hintArgName
-    :
-    Identifier
+    : Identifier
     | Number
     | KW_NONE
     ;

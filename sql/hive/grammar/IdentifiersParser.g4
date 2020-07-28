@@ -22,124 +22,102 @@ parser grammar IdentifiersParser;
 
 // group by a,b
 groupByClause
-    :
-    KW_GROUP KW_BY groupby_expression
+    : KW_GROUP KW_BY groupby_expression
     ;
 
 // support for new and old rollup/cube syntax
-groupby_expression :
- rollupStandard |
- rollupOldSyntax|
- groupByEmpty
-;
+groupby_expression
+    : rollupStandard
+    | rollupOldSyntax
+    | groupByEmpty
+    ;
 
 groupByEmpty
-    :
-    LPAREN RPAREN
+    : LPAREN RPAREN
     ;
 
 // standard rollup syntax
 rollupStandard
-    :
-    (rollup=KW_ROLLUP | cube=KW_CUBE)
+    : (KW_ROLLUP | KW_CUBE)
     LPAREN expression ( COMMA expression)* RPAREN
     ;
 
 // old hive rollup syntax
 rollupOldSyntax
-    :
-    expr=expressionsNotInParenthesis
-    ((rollup=KW_WITH KW_ROLLUP) | (cube=KW_WITH KW_CUBE)) ?
-    (sets=KW_GROUPING KW_SETS
+    : expressionsNotInParenthesis
+    (KW_WITH KW_ROLLUP | KW_WITH KW_CUBE) ?
+    (KW_GROUPING KW_SETS
     LPAREN groupingSetExpression ( COMMA groupingSetExpression)*  RPAREN ) ?
     ;
 
 
 groupingSetExpression
-   :
-   groupingSetExpressionMultiple
-   |
-   groupingExpressionSingle
+   : groupingSetExpressionMultiple
+   | groupingExpressionSingle
    ;
 
 groupingSetExpressionMultiple
-   :
-   LPAREN
+   : LPAREN
    expression? (COMMA expression)*
    RPAREN
    ;
 
 groupingExpressionSingle
-    :
-    expression
+    : expression
     ;
 
 havingClause
-    :
-    KW_HAVING havingCondition
+    : KW_HAVING havingCondition
     ;
 
 havingCondition
-    :
-    expression
+    : expression
     ;
 
 expressionsInParenthesis
-    :
-    LPAREN expressionsNotInParenthesis RPAREN
+    : LPAREN expressionsNotInParenthesis RPAREN
     ;
 
 expressionsNotInParenthesis
-    :
-    first=expression more=expressionPart?
+    : expression expressionPart?
     ;
 
 expressionPart
-    :
-    (COMMA expression)+
+    : (COMMA expression)+
     ;
 
 expressions
-    :
-    expressionsInParenthesis
-    |
-    expressionsNotInParenthesis
+    : expressionsInParenthesis
+    | expressionsNotInParenthesis
     ;
 
 columnRefOrderInParenthesis
-    :
-    LPAREN columnRefOrder (COMMA columnRefOrder)* RPAREN
+    : LPAREN columnRefOrder (COMMA columnRefOrder)* RPAREN
     ;
 
 columnRefOrderNotInParenthesis
-    :
-    columnRefOrder (COMMA columnRefOrder)*
+    : columnRefOrder (COMMA columnRefOrder)*
     ;
 
 // order by a,b
 orderByClause
-    :
-    KW_ORDER KW_BY columnRefOrder ( COMMA columnRefOrder)*
+    : KW_ORDER KW_BY columnRefOrder ( COMMA columnRefOrder)*
     ;
 
 clusterByClause
-    :
-    KW_CLUSTER KW_BY expressions
+    : KW_CLUSTER KW_BY expressions
     ;
 
 partitionByClause
-    :
-    KW_PARTITION KW_BY expressions
+    : KW_PARTITION KW_BY expressions
     ;
 
 distributeByClause
-    :
-    KW_DISTRIBUTE KW_BY expressions
+    : KW_DISTRIBUTE KW_BY expressions
     ;
 
 sortByClause
-    :
-    KW_SORT KW_BY
+    : KW_SORT KW_BY
     (
     columnRefOrderInParenthesis
     |
@@ -149,14 +127,13 @@ sortByClause
 
 // fun(par1, par2, par3)
 function
-    :
-    functionName
+    : functionName
     LPAREN
       (
-        star=STAR
-        | (dist=KW_DISTINCT | KW_ALL)? (selectExpression (COMMA selectExpression)*)?
+        STAR
+        | (KW_DISTINCT | KW_ALL)? (selectExpression (COMMA selectExpression)*)?
       )
-    RPAREN (KW_OVER ws=window_specification)?
+    RPAREN (KW_OVER window_specification)?
     ;
 
 functionName
@@ -167,8 +144,7 @@ functionName
     ;
 
 castExpression
-    :
-    KW_CAST
+    : KW_CAST
     LPAREN
           expression
           KW_AS
@@ -177,34 +153,29 @@ castExpression
     ;
 
 caseExpression
-    :
-    KW_CASE expression
+    : KW_CASE expression
     (KW_WHEN expression KW_THEN expression)+
     (KW_ELSE expression)?
     KW_END
     ;
 
 whenExpression
-    :
-    KW_CASE
-     ( KW_WHEN expression KW_THEN expression)+
+    : KW_CASE
+    ( KW_WHEN expression KW_THEN expression)+
     (KW_ELSE expression)?
     KW_END
     ;
 
 floorExpression
-    :
-    KW_FLOOR
+    : KW_FLOOR
     LPAREN
           expression
-          (KW_TO
-          (floorUnit=floorDateQualifiers))?
+          (KW_TO floorDateQualifiers)?
     RPAREN
     ;
 
 floorDateQualifiers
-    :
-    KW_YEAR
+    : KW_YEAR
     | KW_QUARTER
     | KW_MONTH
     | KW_WEEK
@@ -215,18 +186,16 @@ floorDateQualifiers
     ;
 
 extractExpression
-    :
-    KW_EXTRACT
+    : KW_EXTRACT
     LPAREN
-          (timeUnit=timeQualifiers)
+          timeQualifiers
           KW_FROM
           expression
     RPAREN
     ;
 
 timeQualifiers
-    :
-    KW_YEAR
+    : KW_YEAR
     | KW_QUARTER
     | KW_MONTH
     | KW_WEEK
@@ -238,8 +207,7 @@ timeQualifiers
     ;
 
 constant
-    :
-    intervalLiteral
+    : intervalLiteral
     | Number
     | dateLiteral
     | timestampLiteral
@@ -254,56 +222,44 @@ constant
     ;
 
 stringLiteralSequence
-    :
-    StringLiteral StringLiteral+
+    : StringLiteral StringLiteral+
     ;
 
 charSetStringLiteral
-    :
-    csName=CharSetName csLiteral=CharSetLiteral
+    : CharSetName CharSetLiteral
     ;
 
 dateLiteral
-    :
-    KW_DATE StringLiteral
-    |
-    KW_CURRENT_DATE
+    : KW_DATE StringLiteral
+    | KW_CURRENT_DATE
     ;
 
 timestampLiteral
-    :
-    KW_TIMESTAMP StringLiteral
-    |
-    KW_CURRENT_TIMESTAMP
+    : KW_TIMESTAMP StringLiteral
+    | KW_CURRENT_TIMESTAMP
     ;
 
 timestampLocalTZLiteral
-    :
-    KW_TIMESTAMPLOCALTZ StringLiteral
+    : KW_TIMESTAMPLOCALTZ StringLiteral
     ;
 
 intervalValue
-    :
-    StringLiteral | Number
+    : StringLiteral
+    | Number
     ;
 
 intervalLiteral
-    :
-    value=intervalValue qualifiers=intervalQualifiers
+    : intervalValue intervalQualifiers
     ;
 
 intervalExpression
-    :
-    LPAREN value=intervalValue RPAREN qualifiers=intervalQualifiers
-    |
-    KW_INTERVAL value=intervalValue qualifiers=intervalQualifiers
-    |
-    KW_INTERVAL LPAREN expr=expression RPAREN qualifiers=intervalQualifiers
+    : LPAREN intervalValue RPAREN intervalQualifiers
+    | KW_INTERVAL intervalValue intervalQualifiers
+    | KW_INTERVAL LPAREN expression RPAREN intervalQualifiers
     ;
 
 intervalQualifiers
-    :
-    KW_YEAR KW_TO KW_MONTH
+    : KW_YEAR KW_TO KW_MONTH
     | KW_DAY KW_TO KW_SECOND
     | KW_YEAR
     | KW_MONTH
@@ -314,13 +270,11 @@ intervalQualifiers
     ;
 
 expression
-    :
-    precedenceOrExpression
+    : precedenceOrExpression
     ;
 
 atomExpression
-    :
-    constant
+    : constant
     | intervalExpression
     | castExpression
     | extractExpression
@@ -334,14 +288,13 @@ atomExpression
     ;
 
 precedenceFieldExpression
-    :
-    atomExpression ((LSQUARE expression RSQUARE)
-    | (DOT identifier))*
+    : atomExpression ((LSQUARE expression RSQUARE) | (DOT identifier))*
     ;
 
 precedenceUnaryOperator
-    :
-    PLUS | MINUS | TILDE
+    : PLUS
+    | MINUS
+    | TILDE
     ;
 
 isCondition
@@ -354,242 +307,209 @@ isCondition
     ;
 
 precedenceUnaryPrefixExpression
-    :
-    (precedenceUnaryOperator)* precedenceFieldExpression
+    : precedenceUnaryOperator* precedenceFieldExpression
     ;
 
 precedenceUnarySuffixExpression
-    : precedenceUnaryPrefixExpression (a=KW_IS isCondition)?
+    : precedenceUnaryPrefixExpression (KW_IS isCondition)?
     ;
 
 
 precedenceBitwiseXorOperator
-    :
-    BITWISEXOR
+    : BITWISEXOR
     ;
 
 precedenceBitwiseXorExpression
-    :
-    precedenceUnarySuffixExpression (precedenceBitwiseXorOperator precedenceUnarySuffixExpression)*
+    : precedenceUnarySuffixExpression (precedenceBitwiseXorOperator precedenceUnarySuffixExpression)*
     ;
 
 
 precedenceStarOperator
-    :
-    STAR | DIVIDE | MOD | DIV
+    : STAR
+    | DIVIDE
+    | MOD
+    | DIV
     ;
 
 precedenceStarExpression
-    :
-    precedenceBitwiseXorExpression (precedenceStarOperator precedenceBitwiseXorExpression)*
+    : precedenceBitwiseXorExpression (precedenceStarOperator precedenceBitwiseXorExpression)*
     ;
 
 
 precedencePlusOperator
-    :
-    PLUS | MINUS
+    : PLUS
+    | MINUS
     ;
 
 precedencePlusExpression
-    :
-    precedenceStarExpression (precedencePlusOperator precedenceStarExpression)*
+    : precedenceStarExpression (precedencePlusOperator precedenceStarExpression)*
     ;
 
 precedenceConcatenateOperator
-    :
-    CONCATENATE
+    : CONCATENATE
     ;
 
 precedenceConcatenateExpression
-    :
-    (precedencePlusExpression)
-        (
-        precedenceConcatenateOperator plus=precedencePlusExpression
-        )*
+    : precedencePlusExpression (precedenceConcatenateOperator precedencePlusExpression)*
     ;
 
 precedenceAmpersandOperator
-    :
-    AMPERSAND
+    : AMPERSAND
     ;
 
 precedenceAmpersandExpression
-    :
-    precedenceConcatenateExpression (precedenceAmpersandOperator precedenceConcatenateExpression)*
+    : precedenceConcatenateExpression (precedenceAmpersandOperator precedenceConcatenateExpression)*
     ;
 
 
 precedenceBitwiseOrOperator
-    :
-    BITWISEOR
+    : BITWISEOR
     ;
 
 precedenceBitwiseOrExpression
-    :
-    precedenceAmpersandExpression (precedenceBitwiseOrOperator precedenceAmpersandExpression)*
+    : precedenceAmpersandExpression (precedenceBitwiseOrOperator precedenceAmpersandExpression)*
     ;
 
 
 precedenceRegexpOperator
-    :
-    KW_LIKE | KW_RLIKE | KW_REGEXP
+    : KW_LIKE
+    | KW_RLIKE
+    | KW_REGEXP
     ;
 
 precedenceSimilarOperator
-    :
-    precedenceRegexpOperator | LESSTHANOREQUALTO | LESSTHAN | GREATERTHANOREQUALTO | GREATERTHAN
+    : precedenceRegexpOperator
+    | LESSTHANOREQUALTO
+    | LESSTHAN
+    | GREATERTHANOREQUALTO
+    | GREATERTHAN
     ;
 
 subQueryExpression
-    :
-    LPAREN selectStatement RPAREN
+    : LPAREN selectStatement RPAREN
     ;
 
 precedenceSimilarExpression
-    :
-    precedenceSimilarExpressionMain
-    |
-    KW_EXISTS subQueryExpression
+    : precedenceSimilarExpressionMain
+    | KW_EXISTS subQueryExpression
     ;
 
 precedenceSimilarExpressionMain
-    :
-    a=precedenceBitwiseOrExpression part=precedenceSimilarExpressionPart?
+    : precedenceBitwiseOrExpression precedenceSimilarExpressionPart?
     ;
 
 precedenceSimilarExpressionPart
-    :
-    (precedenceSimilarOperator equalExpr=precedenceBitwiseOrExpression)
-    |
-    precedenceSimilarExpressionAtom
-    |
-    (KW_NOT precedenceSimilarExpressionPartNot)
+    : (precedenceSimilarOperator precedenceBitwiseOrExpression)
+    | precedenceSimilarExpressionAtom
+    | (KW_NOT precedenceSimilarExpressionPartNot)
     ;
 
 precedenceSimilarExpressionAtom
-    :
-    KW_IN precedenceSimilarExpressionIn
-    |
-    KW_BETWEEN (min=precedenceBitwiseOrExpression) KW_AND (max=precedenceBitwiseOrExpression)
-    |
-    KW_LIKE KW_ANY (expr=expressionsInParenthesis)
-    |
-    KW_LIKE KW_ALL (expr=expressionsInParenthesis)
+    : KW_IN precedenceSimilarExpressionIn
+    | KW_BETWEEN precedenceBitwiseOrExpression KW_AND precedenceBitwiseOrExpression
+    | KW_LIKE KW_ANY expressionsInParenthesis
+    | KW_LIKE KW_ALL expressionsInParenthesis
     ;
 
 precedenceSimilarExpressionIn
-    :
-    (subQueryExpression)
-    |
-    expr=expressionsInParenthesis
+    : subQueryExpression
+    | expressionsInParenthesis
     ;
 
 precedenceSimilarExpressionPartNot
-    :
-    precedenceRegexpOperator notExpr=precedenceBitwiseOrExpression
-    |
-    precedenceSimilarExpressionAtom
+    : precedenceRegexpOperator precedenceBitwiseOrExpression
+    | precedenceSimilarExpressionAtom
     ;
 
 precedenceDistinctOperator
-    :
-    KW_IS KW_DISTINCT KW_FROM
+    : KW_IS KW_DISTINCT KW_FROM
     ;
 
 precedenceEqualOperator
-    :
-    EQUAL | EQUAL_NS | NOTEQUAL | KW_IS KW_NOT KW_DISTINCT KW_FROM
+    : EQUAL
+    | EQUAL_NS
+    | NOTEQUAL
+    | KW_IS KW_NOT KW_DISTINCT KW_FROM
     ;
 
 precedenceEqualExpression
-    :
-    (precedenceSimilarExpression)
+    : precedenceSimilarExpression
     (
-        equal=precedenceEqualOperator p=precedenceSimilarExpression
-        |
-        dist=precedenceDistinctOperator p=precedenceSimilarExpression
+    precedenceEqualOperator
+    precedenceSimilarExpression | precedenceDistinctOperator
+    precedenceSimilarExpression
     )*
     ;
 
 precedenceNotOperator
-    :
-    KW_NOT
+    : KW_NOT
     ;
 
 precedenceNotExpression
-    :
-    (precedenceNotOperator)* precedenceEqualExpression
+    : precedenceNotOperator* precedenceEqualExpression
     ;
 
 
 precedenceAndOperator
-    :
-    KW_AND
+    : KW_AND
     ;
 
 precedenceAndExpression
-    :
-    precedenceNotExpression (precedenceAndOperator precedenceNotExpression)*
+    : precedenceNotExpression (precedenceAndOperator precedenceNotExpression)*
     ;
 
 
 precedenceOrOperator
-    :
-    KW_OR
+    : KW_OR
     ;
 
 precedenceOrExpression
-    :
-    precedenceAndExpression (precedenceOrOperator precedenceAndExpression)*
+    : precedenceAndExpression (precedenceOrOperator precedenceAndExpression)*
     ;
 
 
 booleanValue
-    :
-    KW_TRUE | KW_FALSE
+    : KW_TRUE
+    | KW_FALSE
     ;
 
 booleanValueTok
-   :
-   KW_TRUE
+   : KW_TRUE
    | KW_FALSE
    ;
 
 tableOrPartition
-   :
-   tableName partitionSpec?
+   : tableName partitionSpec?
    ;
 
 partitionSpec
-    :
-    KW_PARTITION
-     LPAREN partitionVal (COMMA  partitionVal )* RPAREN
-    ;
+   : KW_PARTITION
+   LPAREN partitionVal (COMMA  partitionVal)* RPAREN
+   ;
 
 partitionVal
-    :
-    identifier (EQUAL constant)?
+    : identifier (EQUAL constant)?
     ;
 
 dropPartitionSpec
-    :
-    KW_PARTITION
-     LPAREN dropPartitionVal (COMMA  dropPartitionVal )* RPAREN
+    : KW_PARTITION LPAREN dropPartitionVal (COMMA  dropPartitionVal )* RPAREN
     ;
 
 dropPartitionVal
-    :
-    identifier dropPartitionOperator constant
+    : identifier dropPartitionOperator constant
     ;
 
 dropPartitionOperator
-    :
-    EQUAL | NOTEQUAL | LESSTHANOREQUALTO | LESSTHAN | GREATERTHANOREQUALTO | GREATERTHAN
+    : EQUAL
+    | NOTEQUAL
+    | LESSTHANOREQUALTO
+    | LESSTHAN
+    | GREATERTHANOREQUALTO
+    | GREATERTHAN
     ;
 
 sysFuncNames
-    :
-      KW_AND
+    : KW_AND
     | KW_OR
     | KW_NOT
     | KW_LIKE
@@ -634,22 +554,19 @@ sysFuncNames
     ;
 
 descFuncNames
-    :
-      (sysFuncNames)
+    : sysFuncNames
     | StringLiteral
     | functionIdentifier
     ;
 
 identifier
-    :
-    Identifier
+    : Identifier
     | nonReserved
     ;
 
 functionIdentifier
-    : db=identifier DOT fn=identifier
-    |
-    identifier
+    : identifier DOT identifier
+    | identifier
     ;
 
 principalIdentifier
@@ -667,8 +584,7 @@ principalIdentifier
 //If you are not sure, please refer to the SQL2011 column in
 //http://www.postgresql.org/docs/9.5/static/sql-keywords-appendix.html
 nonReserved
-    :
-    KW_ABORT | KW_ADD | KW_ADMIN | KW_AFTER | KW_ANALYZE | KW_ARCHIVE | KW_ASC | KW_BEFORE | KW_BUCKET | KW_BUCKETS
+    : KW_ABORT | KW_ADD | KW_ADMIN | KW_AFTER | KW_ANALYZE | KW_ARCHIVE | KW_ASC | KW_BEFORE | KW_BUCKET | KW_BUCKETS
     | KW_CASCADE | KW_CHANGE | KW_CHECK | KW_CLUSTER | KW_CLUSTERED | KW_CLUSTERSTATUS | KW_COLLECTION | KW_COLUMNS
     | KW_COMMENT | KW_COMPACT | KW_COMPACTIONS | KW_COMPUTE | KW_CONCATENATE | KW_CONTINUE | KW_DATA | KW_DAY
     | KW_DATABASES | KW_DATETIME | KW_DBPROPERTIES | KW_DEFERRED | KW_DEFINED | KW_DELIMITED | KW_DEPENDENCY
@@ -718,6 +634,5 @@ nonReserved
 
 //The following SQL2011 reserved keywords are used as function name only, but not as identifiers.
 sql11ReservedKeywordsUsedAsFunctionName
-    :
-    KW_IF | KW_ARRAY | KW_MAP | KW_BIGINT | KW_BINARY | KW_BOOLEAN | KW_CURRENT_DATE | KW_CURRENT_TIMESTAMP | KW_DATE | KW_DOUBLE | KW_FLOAT | KW_GROUPING | KW_INT | KW_SMALLINT | KW_TIMESTAMP
+    : KW_IF | KW_ARRAY | KW_MAP | KW_BIGINT | KW_BINARY | KW_BOOLEAN | KW_CURRENT_DATE | KW_CURRENT_TIMESTAMP | KW_DATE | KW_DOUBLE | KW_FLOAT | KW_GROUPING | KW_INT | KW_SMALLINT | KW_TIMESTAMP
     ;
