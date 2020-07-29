@@ -224,7 +224,8 @@ eqname : QName | URIQualifiedName
  | KW_UNION
  ;
 
-auxilary : (expr NL+ )+ EOF;
+// Not per spec. Specified for testing.
+auxilary : (expr SEMI )+ EOF;
 
 
 AT : '@' ;
@@ -384,6 +385,8 @@ fragment FragChar : '\u0009' | '\u000a' | '\u000d'
   | '\u{10000}'..'\u{10ffff}'
  ;
 
-NL : ('\u000d' | '\u000a')+;
+// Per spec https://www.w3.org/TR/REC-xml/#NT-S
+Whitespace :  ('\u000d' | '\u000a' | '\u0020' | '\u0009')+ -> skip ;
 
-Whitespace :  ('\u0020' | '\u0009')+ -> skip ;
+// Not per spec. Specified for testing.
+SEMI : ';' ;
