@@ -84,9 +84,9 @@ joinToken
     | KW_INNER KW_JOIN
     | COMMA
     | KW_CROSS KW_JOIN
-    | KW_LEFT  (KW_OUTER)? KW_JOIN
-    | KW_RIGHT (KW_OUTER)? KW_JOIN
-    | KW_FULL  (KW_OUTER)? KW_JOIN
+    | KW_LEFT  KW_OUTER? KW_JOIN
+    | KW_RIGHT KW_OUTER? KW_JOIN
+    | KW_FULL  KW_OUTER? KW_JOIN
     | KW_LEFT KW_SEMI KW_JOIN
     ;
 
@@ -101,12 +101,12 @@ tableAlias
     ;
 
 tableBucketSample
-    : KW_TABLESAMPLE LPAREN KW_BUCKET (numerator=Number) KW_OUT KW_OF (denominator=Number) (KW_ON expr+=expression (COMMA expr+=expression)*)? RPAREN
+    : KW_TABLESAMPLE LPAREN KW_BUCKET Number KW_OUT KW_OF Number (KW_ON expression (COMMA expression)*)? RPAREN
     ;
 
 splitSample
-    : KW_TABLESAMPLE LPAREN  (numerator=Number) (percent=KW_PERCENT|KW_ROWS) RPAREN
-    | KW_TABLESAMPLE LPAREN  (numerator=ByteLengthLiteral) RPAREN
+    : KW_TABLESAMPLE LPAREN  Number (KW_PERCENT|KW_ROWS) RPAREN
+    | KW_TABLESAMPLE LPAREN  ByteLengthLiteral RPAREN
     ;
 
 tableSample
@@ -154,7 +154,7 @@ partitionedTableFunction
    : identifier LPAREN KW_ON
    partitionTableFunctionSource partitioningSpec?
    (Identifier LPAREN expression RPAREN ( COMMA Identifier LPAREN expression RPAREN)*)?
-   RPAREN alias=identifier?
+   RPAREN identifier?
    ;
 
 //----------------------- Rules for parsing whereClause -----------------------------

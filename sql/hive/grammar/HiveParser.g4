@@ -234,7 +234,7 @@ dropDatabaseStatement
 
 databaseComment
 
-    : KW_COMMENT comment=StringLiteral
+    : KW_COMMENT StringLiteral
     ;
 
 createTableStatement

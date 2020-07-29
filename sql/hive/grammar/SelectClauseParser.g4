@@ -55,7 +55,7 @@ trfmClause
     ;
 
 selectExpression
-    : (tableAllColumns)
+    : tableAllColumns
     | expression
     ;
 
@@ -86,25 +86,25 @@ window_frame
 
 window_range_expression
     :
-    KW_ROWS window_frame_start_boundary |
-    KW_ROWS KW_BETWEEN window_frame_boundary KW_AND window_frame_boundary
+    KW_ROWS window_frame_start_boundary
+    | KW_ROWS KW_BETWEEN window_frame_boundary KW_AND window_frame_boundary
     ;
 
 window_value_expression
-    : KW_RANGE window_frame_start_boundary |
-    KW_RANGE KW_BETWEEN window_frame_boundary KW_AND window_frame_boundary
+    : KW_RANGE window_frame_start_boundary
+    | KW_RANGE KW_BETWEEN window_frame_boundary KW_AND window_frame_boundary
     ;
 
 window_frame_start_boundary
     :
-    KW_UNBOUNDED KW_PRECEDING |
-    KW_CURRENT KW_ROW |
-    Number KW_PRECEDING
+    KW_UNBOUNDED KW_PRECEDING
+    | KW_CURRENT KW_ROW
+    | Number KW_PRECEDING
     ;
 
     window_frame_boundary
     :
-    KW_UNBOUNDED (KW_PRECEDING|KW_FOLLOWING) |
-    KW_CURRENT KW_ROW |
-    Number (KW_PRECEDING | KW_FOLLOWING )
+    KW_UNBOUNDED (KW_PRECEDING|KW_FOLLOWING)
+    | KW_CURRENT KW_ROW
+    | Number (KW_PRECEDING | KW_FOLLOWING )
     ;
