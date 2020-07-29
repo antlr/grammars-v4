@@ -385,7 +385,7 @@ fragment FragChar : '\u0009' | '\u000a' | '\u000d'
   | '\u{10000}'..'\u{10ffff}'
  ;
 
-// Per spec https://www.w3.org/TR/REC-xml/#NT-S
+// https://github.com/antlr/grammars-v4/blob/17d3db3fd6a8fc319a12176e0bb735b066ec0616/xpath/xpath31/XPath31.g4#L389
 Whitespace :  ('\u000d' | '\u000a' | '\u0020' | '\u0009')+ -> skip ;
 
 // Not per spec. Specified for testing.
