@@ -64,7 +64,7 @@ joinSource
     ;
 
 joinSourcePart
-    : (tableSource | virtualTableSource | subQuerySource | partitionedTableFunction) lateralView
+    : (tableSource | virtualTableSource | subQuerySource | partitionedTableFunction) lateralView*
     ;
 
 uniqueJoinSource
