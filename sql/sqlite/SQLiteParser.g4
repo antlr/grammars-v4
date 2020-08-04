@@ -269,8 +269,15 @@ conflict_clause:
 	ON CONFLICT (ROLLBACK | ABORT | FAIL | IGNORE | REPLACE);
 
 /*
- SQLite understands the following binary operators, in order from highest to lowest precedence: || /
- % + - << >> & | < <= > >= = == != <> IS IS NOT IN LIKE GLOB MATCH REGEXP AND OR
+ SQLite understands the following binary operators, in order from highest to lowest precedence: 
+ || 
+ * / % 
+ + - 
+ << >> & | 
+ < <= > >= 
+ = == != <> IS IS NOT IN LIKE GLOB MATCH REGEXP 
+ AND 
+ OR
  */
 expr:
 	literal_value
