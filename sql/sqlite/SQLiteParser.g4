@@ -67,25 +67,30 @@ sql_stmt: (EXPLAIN ( QUERY PLAN)?)? (
 	);
 
 alter_table_stmt:
-	ALTER TABLE (database_name '.')? table_name (
-		RENAME TO new_table_name
+	ALTER TABLE (schema_name '.')? table_name (
+		RENAME (
+			(TO new_table_name)
+			| (
+				COLUMN? old_column_name = column_name TO new_column_name = column_name
+			)
+		)
 		| ADD COLUMN? column_def
 	);
 
 analyze_stmt:
 	ANALYZE (
-		database_name
-		| (database_name '.')? table_or_index_name
+		schema_name
+		| (schema_name '.')? table_or_index_name
 	)?;
 
-attach_stmt: ATTACH DATABASE? expr AS database_name;
+attach_stmt: ATTACH DATABASE? expr AS schema_name;
 
 begin_stmt:
 	BEGIN (DEFERRED | IMMEDIATE | EXCLUSIVE)? (
 		TRANSACTION transaction_name?
 	)?;
 
-commit_stmt: ( COMMIT | END) ( TRANSACTION transaction_name?)?;
+commit_stmt: ( COMMIT | END) TRANSACTION?;
 
 common_table_statement:
 	WITH RECURSIVE? common_table_expression (
@@ -98,12 +103,12 @@ compound_select_stmt:
 	)+ order_by_stmt? limit_stmt?;
 
 create_index_stmt:
-	CREATE UNIQUE? INDEX (IF NOT EXISTS)? (database_name '.')? index_name ON table_name '('
+	CREATE UNIQUE? INDEX (IF NOT EXISTS)? (schema_name '.')? index_name ON table_name '('
 		indexed_column (',' indexed_column)* ')' (WHERE expr)?;
 
 create_table_stmt:
 	CREATE (TEMP | TEMPORARY)? TABLE (IF NOT EXISTS)? (
-		database_name '.'
+		schema_name '.'
 	)? table_name (
 		'(' column_def (',' column_def)* (',' table_constraint)* ')' (
 			WITHOUT IDENTIFIER
@@ -113,24 +118,22 @@ create_table_stmt:
 
 create_trigger_stmt:
 	CREATE (TEMP | TEMPORARY)? TRIGGER (IF NOT EXISTS)? (
-		database_name '.'
+		schema_name '.'
 	)? trigger_name (BEFORE | AFTER | INSTEAD OF)? (
 		DELETE
 		| INSERT
 		| UPDATE ( OF column_name ( ',' column_name)*)?
-	) ON (database_name '.')? table_name (FOR EACH ROW)? (
-		WHEN expr
-	)? BEGIN (
+	) ON table_name (FOR EACH ROW)? (WHEN expr)? BEGIN (
 		(update_stmt | insert_stmt | delete_stmt | select_stmt) ';'
 	)+ END;
 
 create_view_stmt:
 	CREATE (TEMP | TEMPORARY)? VIEW (IF NOT EXISTS)? (
-		database_name '.'
-	)? view_name AS select_stmt;
+		schema_name '.'
+	)? view_name ('(' column_name (',' column_name)* ')')? AS select_stmt;
 
 create_virtual_table_stmt:
-	CREATE VIRTUAL TABLE (IF NOT EXISTS)? (database_name '.')? table_name USING module_name (
+	CREATE VIRTUAL TABLE (IF NOT EXISTS)? (schema_name '.')? table_name USING module_name (
 		'(' module_argument (',' module_argument)* ')'
 	)?;
 
@@ -142,11 +145,11 @@ delete_stmt_limited:
 		order_by_stmt? limit_stmt
 	)?;
 
-detach_stmt: DETACH DATABASE? database_name;
+detach_stmt: DETACH DATABASE? schema_name;
 
 drop_stmt:
 	DROP object = (INDEX | TABLE | TRIGGER | VIEW) (IF EXISTS)? (
-		database_name '.'
+		schema_name '.'
 	)? any_name;
 
 factored_select_stmt:
@@ -163,18 +166,29 @@ insert_stmt:
 		INSERT
 		| REPLACE
 		| INSERT OR (REPLACE | ROLLBACK | ABORT | FAIL | IGNORE)
-	) INTO (database_name '.')? table_name (
+	) INTO (schema_name '.')? table_name (AS table_alias)? (
 		'(' column_name ( ',' column_name)* ')'
 	)? (
 		VALUES '(' expr (',' expr)* ')' (
 			',' '(' expr ( ',' expr)* ')'
 		)*
 		| select_stmt
-		| DEFAULT VALUES
-	);
+	) upsert_clause?
+	| DEFAULT VALUES;
 
+upsert_clause:
+	ON CONFLICT (
+		'(' indexed_column (',' indexed_column)* ')' (WHERE expr)?
+	)? DO NOTHING
+	| (
+		UPDATE SET (
+			(column_name | column_name_list) EQ expr (
+				',' (column_name | column_name_list) EQ expr
+			)* (WHERE expr)?
+		)
+	);
 pragma_stmt:
-	PRAGMA (database_name '.')? pragma_name (
+	PRAGMA (schema_name '.')? pragma_name (
 		'=' pragma_value
 		| '(' pragma_value ')'
 	)?;
@@ -182,15 +196,13 @@ pragma_stmt:
 reindex_stmt:
 	REINDEX (
 		collation_name
-		| ( database_name '.')? ( table_name | index_name)
+		| ( schema_name '.')? ( table_name | index_name)
 	)?;
 
 release_stmt: RELEASE SAVEPOINT? savepoint_name;
 
 rollback_stmt:
-	ROLLBACK (TRANSACTION transaction_name?)? (
-		TO SAVEPOINT? savepoint_name
-	)?;
+	ROLLBACK TRANSACTION? (TO SAVEPOINT? savepoint_name)?;
 
 savepoint_stmt: SAVEPOINT savepoint_name;
 
@@ -208,7 +220,13 @@ select_or_values:
 			table_or_subquery (',' table_or_subquery)*
 			| join_clause
 		)
-	)? (WHERE expr)? (GROUP BY expr ( ',' expr)* ( HAVING expr)?)?
+	)? (WHERE expr)? (GROUP BY expr (',' expr)* (HAVING expr)?)? (
+		(
+			WINDOW window_name AS window_defn (
+				',' window_name AS window_defn
+			)*
+		)?
+	)
 	| VALUES '(' expr (',' expr)* ')' (
 		',' '(' expr ( ',' expr)* ')'
 	)*;
@@ -216,18 +234,18 @@ select_or_values:
 update_stmt:
 	with_clause? UPDATE (
 		OR (ROLLBACK | ABORT | REPLACE | FAIL | IGNORE)
-	)? qualified_table_name SET column_name '=' expr (
-		',' column_name '=' expr
+	)? qualified_table_name SET (column_name | column_name_list) '=' expr (
+		',' (column_name | column_name_list) '=' expr
 	)* (WHERE expr)?;
 
 update_stmt_limited:
 	with_clause? UPDATE (
 		OR (ROLLBACK | ABORT | REPLACE | FAIL | IGNORE)
-	)? qualified_table_name SET column_name '=' expr (
-		',' column_name '=' expr
+	)? qualified_table_name SET (column_name | column_name_list) '=' expr (
+		',' (column_name | column_name_list) '=' expr
 	)* (WHERE expr)? (order_by_stmt? limit_stmt)?;
 
-vacuum_stmt: VACUUM;
+vacuum_stmt: VACUUM schema_name? (INTO filename)?;
 
 column_def: column_name type_name? column_constraint*;
 
@@ -238,26 +256,26 @@ type_name:
 	)?;
 
 column_constraint: (CONSTRAINT name)? (
-		PRIMARY KEY (ASC | DESC)? conflict_clause? AUTOINCREMENT?
-		| ((NOT? NULL) | UNIQUE) conflict_clause?
+		PRIMARY KEY asc_desc? conflict_clause? AUTOINCREMENT?
+		| ((NOT NULL) | UNIQUE) conflict_clause?
 		| CHECK '(' expr ')'
 		| DEFAULT (signed_number | literal_value | '(' expr ')')
 		| COLLATE collation_name
 		| foreign_key_clause
+		| (GENERATED ALWAYS)? AS '(' expr ')' (STORED | VIRTUAL)?
 	);
 
 conflict_clause:
 	ON CONFLICT (ROLLBACK | ABORT | FAIL | IGNORE | REPLACE);
 
 /*
- SQLite understands the following binary operators, in order from highest to lowest precedence:
- 
- || / % + - << >> & | < <= > >= = == != <> IS IS NOT IN LIKE GLOB MATCH REGEXP AND OR
+ SQLite understands the following binary operators, in order from highest to lowest precedence: || /
+ % + - << >> & | < <= > >= = == != <> IS IS NOT IN LIKE GLOB MATCH REGEXP AND OR
  */
 expr:
 	literal_value
 	| BIND_PARAMETER
-	| ( ( database_name '.')? table_name '.')? column_name
+	| ( ( schema_name '.')? table_name '.')? column_name
 	| unary_operator expr
 	| expr '||' expr
 	| expr ( '*' | '/' | '%') expr
@@ -279,8 +297,8 @@ expr:
 	) expr
 	| expr AND expr
 	| expr OR expr
-	| function_name '(' (DISTINCT? expr ( ',' expr)* | '*')? ')'
-	| '(' expr ')'
+	| function_name '(' (DISTINCT? expr ( ',' expr)* | '*')? ')' filter_clause? over_clause?
+	| '(' expr (',' expr)* ')'
 	| CAST '(' expr AS type_name ')'
 	| expr COLLATE collation_name
 	| expr NOT? (LIKE | GLOB | REGEXP | MATCH) expr (ESCAPE expr)?
@@ -288,27 +306,27 @@ expr:
 	| expr IS NOT? expr
 	| expr NOT? BETWEEN expr AND expr
 	| expr NOT? IN (
-		'(' ( select_stmt | expr ( ',' expr)*)? ')'
-		| ( database_name '.')? table_name
+		'(' (select_stmt | expr ( ',' expr)*)? ')'
+		| ( schema_name '.')? table_name
+		| (schema_name '.')? table_function_name '(' (
+			expr (',' expr)*
+		)? ')'
 	)
 	| ( ( NOT)? EXISTS)? '(' select_stmt ')'
 	| CASE expr? ( WHEN expr THEN expr)+ ( ELSE expr)? END
-	| raise_function
-	| window_function;
+	| raise_function;
 
 foreign_key_clause:
 	REFERENCES foreign_table (
 		'(' column_name ( ',' column_name)* ')'
 	)? (
-		(
-			ON (DELETE | UPDATE) (
-				SET (NULL | DEFAULT)
-				| CASCADE
-				| RESTRICT
-				| NO ACTION
-			)
-			| MATCH name
+		ON (DELETE | UPDATE) (
+			SET (NULL | DEFAULT)
+			| CASCADE
+			| RESTRICT
+			| NO ACTION
 		)
+		| MATCH name
 	)* (NOT? DEFERRABLE ( INITIALLY (DEFERRED | IMMEDIATE))?)?;
 
 raise_function:
@@ -318,7 +336,7 @@ raise_function:
 	) ')';
 
 indexed_column:
-	column_name (COLLATE collation_name)? (ASC | DESC)?;
+	(column_name | expr) (COLLATE collation_name)? asc_desc?;
 
 table_constraint: (CONSTRAINT name)? (
 		(PRIMARY KEY | UNIQUE) '(' indexed_column (
@@ -333,12 +351,15 @@ with_clause:
 		',' cte_table_name AS '(' select_stmt ')'
 	)*;
 
-qualified_table_name: (database_name '.')? table_name (
+qualified_table_name: (schema_name '.')? table_name (AS alias)? (
 		INDEXED BY index_name
 		| NOT INDEXED
 	)?;
 
-ordering_term: expr ( COLLATE collation_name)? ( ASC | DESC)?;
+ordering_term:
+	expr (COLLATE collation_name)? asc_desc? (
+		NULLS (FIRST | LAST)
+	)?;
 
 pragma_value: signed_number | name | STRING_LITERAL;
 
@@ -352,17 +373,17 @@ result_column:
 
 window_function:
 	FIRST_VALUE '(' expr ')' OVER '(' partition_by? order_by_expr_asc_desc frame_clause? ')'
-	| CUMEDIST '(' ')' OVER '(' partition_by? order_by_expr? ')'
-	| DENSERANK '(' ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
+	| CUME_DIST '(' ')' OVER '(' partition_by? order_by_expr? ')'
+	| DENSE_RANK '(' ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
 	| LAG '(' expr offset? default_value? ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
-	| LASTVALUE '(' expr ')' OVER '(' partition_by? order_by_expr_asc_desc frame_clause? ')'
+	| LAST_VALUE '(' expr ')' OVER '(' partition_by? order_by_expr_asc_desc frame_clause? ')'
 	| LEAD '(' expr offset? default_value? ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
-	| NTHVALUE '(' expr ',' signed_number ')' OVER '(' partition_by? order_by_expr_asc_desc
+	| NTH_VALUE '(' expr ',' signed_number ')' OVER '(' partition_by? order_by_expr_asc_desc
 		frame_clause? ')'
 	| NTILE '(' expr ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
-	| PERCENTRANK '(' ')' OVER '(' partition_by? order_by_expr? ')'
+	| PERCENT_RANK '(' ')' OVER '(' partition_by? order_by_expr? ')'
 	| RANK '(' ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
-	| ROWNUMBER '(' ')' OVER '(' partition_by? order_by_expr_asc_desc ')';
+	| ROW_NUMBER '(' ')' OVER '(' partition_by? order_by_expr_asc_desc ')';
 
 offset: ',' signed_number;
 
@@ -378,26 +399,27 @@ expr_asc_desc: expr asc_desc? (',' expr asc_desc?)*;
 
 asc_desc: ASC | DESC;
 
-frame_clause: (RANGE | ROWS) (
-		frame_start
-		| BETWEEN frame_start AND frame_end
+frame_clause: (RANGE | ROWS | GROUPS) (
+		frame_common
+		| BETWEEN frame_following AND frame_following
 	);
-frame_start:
-	signed_number PRECEDING
-	| UBOUNDED PRECEDING
-	| CURRENT ROW;
-frame_end:
-	signed_number FOLLOWING
-	| UBOUNDED FOLLOWING
+
+frame_following: frame_common | expr FOLLOWING;
+frame_common:
+	expr (PRECEDING)
+	| UNBOUNDED FOLLOWING
 	| CURRENT ROW;
 
-table_or_subquery: (database_name '.')? table_name (
+table_or_subquery: (schema_name '.')? table_name (
 		AS? table_alias
-	)? (INDEXED BY index_name | NOT INDEXED)?
+	)? ((INDEXED BY index_name) | (NOT INDEXED))?
+	| (schema_name '.')? table_function_name '(' expr (',' expr)* ')' (
+		AS? table_alias
+	)?
 	| '(' (
-		table_or_subquery ( ',' table_or_subquery)*
+		table_or_subquery (',' table_or_subquery)*
 		| join_clause
-	) ')' (AS? table_alias)?
+	) ')'
 	| '(' select_stmt ')' ( AS? table_alias)?;
 
 join_clause:
@@ -415,20 +437,73 @@ join_constraint: (
 	)?;
 
 select_core:
-	SELECT (DISTINCT | ALL)? result_column (',' result_column)* (
-		FROM (
-			table_or_subquery (',' table_or_subquery)*
-			| join_clause
-		)
-	)? (WHERE expr)? (GROUP BY expr ( ',' expr)* ( HAVING expr)?)?
+	(
+		SELECT (DISTINCT | ALL)? result_column (
+			',' result_column
+		)* (
+			FROM (
+				table_or_subquery (',' table_or_subquery)*
+				| join_clause
+			)
+		)? (WHERE expr)? (
+			GROUP BY expr (',' expr)* (HAVING expr)?
+		)? (
+			WINDOW window_name AS window_defn (
+				',' window_name AS window_defn
+			)*
+		)?
+	)
 	| VALUES '(' expr (',' expr)* ')' (
 		',' '(' expr ( ',' expr)* ')'
 	)*;
 
-compound_operator: UNION | UNION ALL | INTERSECT | EXCEPT;
+filter_clause: FILTER '(' WHERE expr ')';
+
+window_defn:
+	'(' base_window_name? (PARTITION BY expr (',' expr)?)? (
+		ORDER BY ordering_term (',' ordering_term)?
+	) frame_spec? ')';
+
+over_clause:
+	OVER window_name
+	| (
+		'(' base_window_name? (PARTITION BY expr (',' expr)?)? (
+			ORDER BY ordering_term (',' ordering_term)?
+		)? frame_spec? ')'
+	);
+
+frame_spec:
+	frame_clause (
+		EXCLUDE (NO OTHERS)
+		| (CURRENT ROW)
+		| GROUP
+		| TIES
+	)?;
+
+simple_function_invocation:
+	simple_func '(' ((expr (',' expr)*) | '*') ')';
+
+aggregate_function_invocation:
+	aggregate_func '(' ((DISTINCT? expr (',' expr)*) | '*')? ')' filter_clause?;
+
+window_function_invocation:
+	window_function '(' ((expr (',' expr)*) | '*')? ')' filter_clause? OVER (
+		window_defn
+		| window_name
+	);
+
+compound_operator: UNION ALL? | INTERSECT | EXCEPT;
 
 cte_table_name:
 	table_name ('(' column_name ( ',' column_name)* ')')?;
+
+recursive_cte:
+	cte_table_name AS '(' initial_select UNION ALL? recursive_select ')';
+
+//TODO BOTH OF THESE HAVE TO BE REWORKED TO FOLLOW THE SPEC
+initial_select: select_stmt;
+
+recursive_select: select_stmt;
 
 signed_number: ( '+' | '-')? NUMERIC_LITERAL;
 
@@ -437,9 +512,13 @@ literal_value:
 	| STRING_LITERAL
 	| BLOB_LITERAL
 	| NULL
+	| TRUE
+	| FALSE
 	| CURRENT_TIME
 	| CURRENT_DATE
 	| CURRENT_TIMESTAMP;
+
+column_name_list: '(' column_name (',' column_name)* ')';
 
 unary_operator: '-' | '+' | '~' | NOT;
 
@@ -554,6 +633,7 @@ keyword:
 	| RIGHT
 	| ROLLBACK
 	| ROW
+	| ROWS
 	| SAVEPOINT
 	| SELECT
 	| SET
@@ -575,7 +655,37 @@ keyword:
 	| WHEN
 	| WHERE
 	| WITH
-	| WITHOUT;
+	| WITHOUT
+	| FIRST_VALUE
+	| OVER
+	| PARTITION
+	| RANGE
+	| PRECEDING
+	| UNBOUNDED
+	| CURRENT
+	| FOLLOWING
+	| CUME_DIST
+	| DENSE_RANK
+	| LAG
+	| LAST_VALUE
+	| LEAD
+	| NTH_VALUE
+	| NTILE
+	| PERCENT_RANK
+	| RANK
+	| ROW_NUMBER
+	| GENERATED
+	| ALWAYS
+	| STORED
+	| TRUE
+	| FALSE
+	| WINDOW
+	| NULLS
+	| FIRST
+	| LAST
+	| FILTER
+	| GROUPS
+	| EXCLUDE;
 
 // TODO check all names below
 
@@ -583,7 +693,7 @@ name: any_name;
 
 function_name: any_name;
 
-database_name: any_name;
+schema_name: any_name;
 
 table_name: any_name;
 
@@ -612,6 +722,20 @@ savepoint_name: any_name;
 table_alias: any_name;
 
 transaction_name: any_name;
+
+window_name: any_name;
+
+alias: any_name;
+
+filename: any_name;
+
+base_window_name: any_name;
+
+simple_func: any_name;
+
+aggregate_func: any_name;
+
+table_function_name: any_name;
 
 any_name:
 	IDENTIFIER

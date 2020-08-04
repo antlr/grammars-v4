@@ -179,29 +179,45 @@ OVER: O V E R;
 PARTITION: P A R T I T I O N;
 RANGE: R A N G E;
 PRECEDING: P R E C E D I N G;
-UBOUNDED: U N B O U N D E D;
+UNBOUNDED: U N B O U N D E D;
 CURRENT: C U R R E N T;
 FOLLOWING: F O L L O W I N G;
-CUMEDIST: C U M E '_' D I S T;
-DENSERANK: D E N S E '_' R A N K;
+CUME_DIST: C U M E '_' D I S T;
+DENSE_RANK: D E N S E '_' R A N K;
 LAG: L A G;
-LASTVALUE: L A S T '_' V A L U E;
+LAST_VALUE: L A S T '_' V A L U E;
 LEAD: L E A D;
-NTHVALUE: N T H '_' V A L U E;
+NTH_VALUE: N T H '_' V A L U E;
 NTILE: N T I L E;
-PERCENTRANK: P E R C E N T '_' R A N K;
+PERCENT_RANK: P E R C E N T '_' R A N K;
 RANK: R A N K;
-ROWNUMBER: R O W '_' N U M B E R;
+ROW_NUMBER: R O W '_' N U M B E R;
+GENERATED: G E N E R A T E D;
+ALWAYS: A L W A Y S;
+STORED: S T O R E D;
+TRUE: T R U E;
+FALSE: F A L S E;
+WINDOW: W I N D O W;
+NULLS: N U L L S;
+FIRST: F I R S T;
+LAST: L A S T;
+FILTER: F I L T E R;
+GROUPS: G R O U P S;
+EXCLUDE: E X C L U D E;
+TIES: T I E S;
+OTHERS: O T H E R S;
+DO: D O;
+NOTHING: N O T H I N G;
 
 IDENTIFIER:
 	'"' (~'"' | '""')* '"'
 	| '`' (~'`' | '``')* '`'
 	| '[' ~']'* ']'
-	| [a-zA-Z_] [a-zA-Z_0-9]* ; // TODO check: needs more chars in set
+	| [a-zA-Z_] [a-zA-Z_0-9]*; // TODO check: needs more chars in set
 
 NUMERIC_LITERAL:
-	DIGIT+ ('.' DIGIT*)? (E [-+]? DIGIT+)?
-	| '.' DIGIT+ ( E [-+]? DIGIT+)?;
+	((DIGIT+ ('.' DIGIT*)?) | ('.' DIGIT+)) (E [-+]? DIGIT+)?
+	| '0x' HEX_DIGIT+;
 
 BIND_PARAMETER: '?' DIGIT* | [:@$] IDENTIFIER;
 
@@ -209,7 +225,8 @@ STRING_LITERAL: '\'' ( ~'\'' | '\'\'')* '\'';
 
 BLOB_LITERAL: X STRING_LITERAL;
 
-SINGLE_LINE_COMMENT: '--' ~[\r\n]* -> channel(HIDDEN);
+SINGLE_LINE_COMMENT:
+	'--' ~[\r\n]* ('\r'? '\n' | EOF) -> channel(HIDDEN);
 
 MULTILINE_COMMENT: '/*' .*? ( '*/' | EOF) -> channel(HIDDEN);
 
@@ -217,6 +234,7 @@ SPACES: [ \u000B\t\r\n] -> channel(HIDDEN);
 
 UNEXPECTED_CHAR: .;
 
+fragment HEX_DIGIT: [0-9a-fA-F];
 fragment DIGIT: [0-9];
 
 fragment A: [aA];
