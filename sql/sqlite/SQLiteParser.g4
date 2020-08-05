@@ -34,7 +34,7 @@ error:
      throw new RuntimeException("UNEXPECTED_CHAR=" + $UNEXPECTED_CHAR.text); 
    };
 
-sql_stmt_list: (';'* sql_stmt ';'+)+;
+sql_stmt_list: ';'* sql_stmt (';'+ sql_stmt)* ';'*;
 
 sql_stmt: (EXPLAIN ( QUERY PLAN)?)? (
 		alter_table_stmt
