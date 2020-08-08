@@ -1245,7 +1245,7 @@ Extern
    : 'extern'
    ;
 
-False
+BoolFalse
    : 'false'
    ;
 
@@ -1385,7 +1385,7 @@ Throw
    : 'throw'
    ;
 
-True
+BoolTrue
    : 'true'
    ;
 
@@ -1883,8 +1883,8 @@ fragment Rawstring
    ;
 
 booleanliteral
-   : False
-   | True
+   : BoolFalse
+   | BoolTrue
    ;
 
 pointerliteral
