@@ -13,6 +13,7 @@
     </parent>
 
 	<modules>
+		<module>antlr2</module>
 		<module>antlr3</module>
 		<module>antlr4</module>
 	</modules>
