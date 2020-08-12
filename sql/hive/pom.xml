@@ -53,9 +53,9 @@
                 <version>${antlr4test-maven-plugin.version}</version>
                 <configuration>
                     <verbose>false</verbose>
-                    <showTree>false</showTree>
-                    <entryPoint>root</entryPoint>
-                    <grammarName>hive</grammarName>
+                    <showTree>true</showTree>
+                    <entryPoint>statement</entryPoint>
+                    <grammarName>Hive</grammarName>
                     <packageName></packageName>
                     <caseInsensitiveType>UPPER</caseInsensitiveType>
                     <exampleFiles>examples/</exampleFiles>
