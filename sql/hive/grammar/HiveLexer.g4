@@ -477,7 +477,6 @@ Identifier
     | '`' RegexComponent+ '`'
     ;
 
-fragment
 QuotedIdentifier
     :
     '`'  ( '``' | ~('`') )* '`'
