@@ -1113,14 +1113,14 @@ columnNameColonType
     ;
 
 colType
-    : type
+    : type_db_col
     ;
 
 colTypeList
     : colType (COMMA colType)*
     ;
 
-type
+type_db_col
     : primitiveType
     | listType
     | structType
@@ -1149,7 +1149,7 @@ primitiveType
     ;
 
 listType
-    : KW_ARRAY LESSTHAN type GREATERTHAN
+    : KW_ARRAY LESSTHAN type_db_col GREATERTHAN
     ;
 
 structType
@@ -1157,7 +1157,7 @@ structType
     ;
 
 mapType
-    : KW_MAP LESSTHAN primitiveType COMMA type GREATERTHAN
+    : KW_MAP LESSTHAN primitiveType COMMA type_db_col GREATERTHAN
     ;
 
 unionType

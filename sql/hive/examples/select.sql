@@ -1,3 +1,1 @@
-select * from tb;
-
-with a as (select * from tb) select a,b,c from a;
+WITH A AS (SELECT * FROM TB) SELECT A,B,C FROM A

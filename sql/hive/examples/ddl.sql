@@ -1,1 +1,1 @@
-create table a(id string comment 'id',name string comment 'name');
+CREATE TABLE A(ID STRING COMMENT 'ID',NAME STRING COMMENT 'NAME')
