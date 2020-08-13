@@ -381,7 +381,6 @@ compound_select_stmt:
 		((UNION ALL?) | INTERSECT | EXCEPT) select_core
 	)+ order_by_stmt? limit_stmt?;
 
-//TODO MEEEE
 table_or_subquery: (
 		(schema_name '.')? table_name (AS? table_alias)? (
 			(INDEXED BY index_name)
