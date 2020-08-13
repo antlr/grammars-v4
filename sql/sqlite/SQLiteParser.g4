@@ -36,13 +36,12 @@ error:
 
 sql_stmt_list: ';'* sql_stmt (';'+ sql_stmt)* ';'*;
 
-sql_stmt: (EXPLAIN ( QUERY PLAN)?)? (
+sql_stmt: (EXPLAIN (QUERY PLAN)?)? (
 		alter_table_stmt
 		| analyze_stmt
 		| attach_stmt
 		| begin_stmt
 		| commit_stmt
-		| compound_select_stmt
 		| create_index_stmt
 		| create_table_stmt
 		| create_trigger_stmt
@@ -52,14 +51,12 @@ sql_stmt: (EXPLAIN ( QUERY PLAN)?)? (
 		| delete_stmt_limited
 		| detach_stmt
 		| drop_stmt
-		| factored_select_stmt
 		| insert_stmt
 		| pragma_stmt
 		| reindex_stmt
 		| release_stmt
 		| rollback_stmt
 		| savepoint_stmt
-		| simple_select_stmt
 		| select_stmt
 		| update_stmt
 		| update_stmt_limited
@@ -92,37 +89,92 @@ begin_stmt:
 
 commit_stmt: ( COMMIT | END) TRANSACTION?;
 
-common_table_statement:
-	WITH RECURSIVE? common_table_expression (
-		',' common_table_expression
-	)*;
+rollback_stmt:
+	ROLLBACK TRANSACTION? (TO SAVEPOINT? savepoint_name)?;
 
-compound_select_stmt:
-	common_table_statement? select_core (
-		(UNION ALL? | INTERSECT | EXCEPT) select_core
-	)+ order_by_stmt? limit_stmt?;
+savepoint_stmt: SAVEPOINT savepoint_name;
+
+release_stmt: RELEASE SAVEPOINT? savepoint_name;
 
 create_index_stmt:
 	CREATE UNIQUE? INDEX (IF NOT EXISTS)? (schema_name '.')? index_name ON table_name '('
 		indexed_column (',' indexed_column)* ')' (WHERE expr)?;
 
+indexed_column:
+	(column_name | expr) (COLLATE collation_name)? asc_desc?;
+
 create_table_stmt:
 	CREATE (TEMP | TEMPORARY)? TABLE (IF NOT EXISTS)? (
 		schema_name '.'
 	)? table_name (
-		'(' column_def (',' column_def)* (',' table_constraint)* ')' (
-			WITHOUT IDENTIFIER
-		)?
-		| AS select_stmt
+		(
+			'(' column_def (',' column_def)* (
+				',' table_constraint
+			)* ')' (WITHOUT rowID = IDENTIFIER)?
+		)
+		| (AS select_stmt)
 	);
 
+column_def: column_name type_name? column_constraint*;
+
+type_name:
+	name+ (
+		'(' signed_number ')'
+		| '(' signed_number ',' signed_number ')'
+	)?;
+
+column_constraint: (CONSTRAINT name)? (
+		(PRIMARY KEY asc_desc? conflict_clause? AUTOINCREMENT?)
+		| ((NOT NULL) | UNIQUE) conflict_clause?
+		| CHECK '(' expr ')'
+		| DEFAULT (
+			signed_number
+			| literal_value
+			| ('(' expr ')')
+		)
+		| COLLATE collation_name
+		| foreign_key_clause
+		| (GENERATED ALWAYS)? AS '(' expr ')' (STORED | VIRTUAL)?
+	);
+
+signed_number: ( '+' | '-')? NUMERIC_LITERAL;
+
+table_constraint: (CONSTRAINT name)? (
+		(
+			(PRIMARY KEY | UNIQUE) '(' indexed_column (
+				',' indexed_column
+			)* ')' conflict_clause?
+		)
+		| (CHECK '(' expr ')')
+		| (
+			FOREIGN KEY '(' column_name (',' column_name)* ')' foreign_key_clause
+		)
+	);
+
+foreign_key_clause:
+	REFERENCES foreign_table (
+		'(' column_name ( ',' column_name)* ')'
+	)? (
+		(
+			ON (DELETE | UPDATE) (
+				(SET (NULL | DEFAULT))
+				| CASCADE
+				| RESTRICT
+				| (NO ACTION)
+			)
+		)
+		| (MATCH name)
+	)* (NOT? DEFERRABLE ( INITIALLY (DEFERRED | IMMEDIATE))?)?;
+
+conflict_clause:
+	ON CONFLICT (ROLLBACK | ABORT | FAIL | IGNORE | REPLACE);
 create_trigger_stmt:
 	CREATE (TEMP | TEMPORARY)? TRIGGER (IF NOT EXISTS)? (
 		schema_name '.'
-	)? trigger_name (BEFORE | AFTER | INSTEAD OF)? (
+	)? trigger_name (BEFORE | AFTER | (INSTEAD OF))? (
 		DELETE
 		| INSERT
-		| UPDATE ( OF column_name ( ',' column_name)*)?
+		| (UPDATE ( OF column_name ( ',' column_name)*)?)
 	) ON table_name (FOR EACH ROW)? (WHEN expr)? BEGIN (
 		(update_stmt | insert_stmt | delete_stmt | select_stmt) ';'
 	)+ END;
@@ -136,6 +188,20 @@ create_virtual_table_stmt:
 	CREATE VIRTUAL TABLE (IF NOT EXISTS)? (schema_name '.')? table_name USING module_name (
 		'(' module_argument (',' module_argument)* ')'
 	)?;
+
+with_clause:
+	WITH RECURSIVE? cte_table_name AS '(' select_stmt ')' (
+		',' cte_table_name AS '(' select_stmt ')'
+	)*;
+
+cte_table_name:
+	table_name ('(' column_name ( ',' column_name)* ')')?;
+
+recursive_cte:
+	cte_table_name AS '(' initial_select UNION ALL? recursive_select ')';
+
+common_table_expression:
+	table_name ('(' column_name ( ',' column_name)* ')')? AS '(' select_stmt ')';
 
 delete_stmt:
 	with_clause? DELETE FROM qualified_table_name (WHERE expr)?;
@@ -152,132 +218,9 @@ drop_stmt:
 		schema_name '.'
 	)? any_name;
 
-factored_select_stmt:
-	common_table_statement? select_core (
-		compound_operator select_core
-	)* order_by_stmt? limit_stmt?;
-
-order_by_stmt: ORDER BY ordering_term ( ',' ordering_term)*;
-
-limit_stmt: LIMIT expr ( (OFFSET | ',') expr)?;
-
-insert_stmt:
-	with_clause? (
-		INSERT
-		| REPLACE
-		| INSERT OR (REPLACE | ROLLBACK | ABORT | FAIL | IGNORE)
-	) INTO (schema_name '.')? table_name (AS table_alias)? (
-		'(' column_name ( ',' column_name)* ')'
-	)? (
-		VALUES '(' expr (',' expr)* ')' (
-			',' '(' expr ( ',' expr)* ')'
-		)*
-		| select_stmt
-	) upsert_clause?
-	| DEFAULT VALUES;
-
-upsert_clause:
-	ON CONFLICT (
-		'(' indexed_column (',' indexed_column)* ')' (WHERE expr)?
-	)? DO NOTHING
-	| (
-		UPDATE SET (
-			(column_name | column_name_list) EQ expr (
-				',' (column_name | column_name_list) EQ expr
-			)* (WHERE expr)?
-		)
-	);
-pragma_stmt:
-	PRAGMA (schema_name '.')? pragma_name (
-		'=' pragma_value
-		| '(' pragma_value ')'
-	)?;
-
-reindex_stmt:
-	REINDEX (
-		collation_name
-		| ( schema_name '.')? ( table_name | index_name)
-	)?;
-
-release_stmt: RELEASE SAVEPOINT? savepoint_name;
-
-rollback_stmt:
-	ROLLBACK TRANSACTION? (TO SAVEPOINT? savepoint_name)?;
-
-savepoint_stmt: SAVEPOINT savepoint_name;
-
-simple_select_stmt:
-	common_table_statement? select_core order_by_stmt? limit_stmt?;
-
-select_stmt:
-	common_table_statement? select_or_values (
-		compound_operator select_or_values
-	)* order_by_stmt? limit_stmt?;
-
-select_or_values:
-	SELECT (DISTINCT | ALL)? result_column (',' result_column)* (
-		FROM (
-			table_or_subquery (',' table_or_subquery)*
-			| join_clause
-		)
-	)? (WHERE expr)? (GROUP BY expr (',' expr)* (HAVING expr)?)? (
-		(
-			WINDOW window_name AS window_defn (
-				',' window_name AS window_defn
-			)*
-		)?
-	)
-	| VALUES '(' expr (',' expr)* ')' (
-		',' '(' expr ( ',' expr)* ')'
-	)*;
-
-update_stmt:
-	with_clause? UPDATE (
-		OR (ROLLBACK | ABORT | REPLACE | FAIL | IGNORE)
-	)? qualified_table_name SET (column_name | column_name_list) '=' expr (
-		',' (column_name | column_name_list) '=' expr
-	)* (WHERE expr)?;
-
-update_stmt_limited:
-	with_clause? UPDATE (
-		OR (ROLLBACK | ABORT | REPLACE | FAIL | IGNORE)
-	)? qualified_table_name SET (column_name | column_name_list) '=' expr (
-		',' (column_name | column_name_list) '=' expr
-	)* (WHERE expr)? (order_by_stmt? limit_stmt)?;
-
-vacuum_stmt: VACUUM schema_name? (INTO filename)?;
-
-column_def: column_name type_name? column_constraint*;
-
-type_name:
-	name+ (
-		'(' signed_number ')'
-		| '(' signed_number ',' signed_number ')'
-	)?;
-
-column_constraint: (CONSTRAINT name)? (
-		PRIMARY KEY asc_desc? conflict_clause? AUTOINCREMENT?
-		| ((NOT NULL) | UNIQUE) conflict_clause?
-		| CHECK '(' expr ')'
-		| DEFAULT (signed_number | literal_value | '(' expr ')')
-		| COLLATE collation_name
-		| foreign_key_clause
-		| (GENERATED ALWAYS)? AS '(' expr ')' (STORED | VIRTUAL)?
-	);
-
-conflict_clause:
-	ON CONFLICT (ROLLBACK | ABORT | FAIL | IGNORE | REPLACE);
-
 /*
- SQLite understands the following binary operators, in order from highest to lowest precedence: 
- || 
- * / % 
- + - 
- << >> & | 
- < <= > >= 
- = == != <> IS IS NOT IN LIKE GLOB MATCH REGEXP 
- AND 
- OR
+ SQLite understands the following binary operators, in order from highest to lowest precedence: || /
+ % + - << >> & | < <= > >= = == != <> IS IS NOT IN LIKE GLOB MATCH REGEXP AND OR
  */
 expr:
 	literal_value
@@ -304,144 +247,108 @@ expr:
 	) expr
 	| expr AND expr
 	| expr OR expr
-	| function_name '(' (DISTINCT? expr ( ',' expr)* | '*')? ')' filter_clause? over_clause?
+	| function_name '(' ((DISTINCT? expr ( ',' expr)*) | '*')? ')' filter_clause? over_clause?
 	| '(' expr (',' expr)* ')'
 	| CAST '(' expr AS type_name ')'
 	| expr COLLATE collation_name
 	| expr NOT? (LIKE | GLOB | REGEXP | MATCH) expr (ESCAPE expr)?
-	| expr ( ISNULL | NOTNULL | NOT NULL)
+	| expr ( ISNULL | NOTNULL | (NOT NULL))
 	| expr IS NOT? expr
 	| expr NOT? BETWEEN expr AND expr
 	| expr NOT? IN (
-		'(' (select_stmt | expr ( ',' expr)*)? ')'
-		| ( schema_name '.')? table_name
-		| (schema_name '.')? table_function_name '(' (
-			expr (',' expr)*
-		)? ')'
+		('(' (select_stmt | expr ( ',' expr)*)? ')')
+		| (( schema_name '.')? table_name)
+		| (
+			(schema_name '.')? table_function_name '(' (
+				expr (',' expr)*
+			)? ')'
+		)
 	)
 	| ( ( NOT)? EXISTS)? '(' select_stmt ')'
 	| CASE expr? ( WHEN expr THEN expr)+ ( ELSE expr)? END
 	| raise_function;
 
-foreign_key_clause:
-	REFERENCES foreign_table (
-		'(' column_name ( ',' column_name)* ')'
-	)? (
-		ON (DELETE | UPDATE) (
-			SET (NULL | DEFAULT)
-			| CASCADE
-			| RESTRICT
-			| NO ACTION
-		)
-		| MATCH name
-	)* (NOT? DEFERRABLE ( INITIALLY (DEFERRED | IMMEDIATE))?)?;
-
 raise_function:
 	RAISE '(' (
 		IGNORE
-		| ( ROLLBACK | ABORT | FAIL) ',' error_message
+		| (( ROLLBACK | ABORT | FAIL) ',' error_message)
 	) ')';
 
-indexed_column:
-	(column_name | expr) (COLLATE collation_name)? asc_desc?;
+literal_value:
+	NUMERIC_LITERAL
+	| STRING_LITERAL
+	| BLOB_LITERAL
+	| NULL
+	| TRUE
+	| FALSE
+	| CURRENT_TIME
+	| CURRENT_DATE
+	| CURRENT_TIMESTAMP;
 
-table_constraint: (CONSTRAINT name)? (
-		(PRIMARY KEY | UNIQUE) '(' indexed_column (
-			',' indexed_column
-		)* ')' conflict_clause?
-		| CHECK '(' expr ')'
-		| FOREIGN KEY '(' column_name (',' column_name)* ')' foreign_key_clause
+insert_stmt:
+	with_clause? (
+		INSERT
+		| REPLACE
+		| (
+			INSERT OR (
+				REPLACE
+				| ROLLBACK
+				| ABORT
+				| FAIL
+				| IGNORE
+			)
+		)
+	) INTO (schema_name '.')? table_name (AS table_alias)? (
+		'(' column_name ( ',' column_name)* ')'
+	)? (
+		(
+			(
+				VALUES '(' expr (',' expr)* ')' (
+					',' '(' expr ( ',' expr)* ')'
+				)*
+			)
+			| select_stmt
+		) upsert_clause?
+	)
+	| (DEFAULT VALUES);
+
+upsert_clause:
+	ON CONFLICT (
+		'(' indexed_column (',' indexed_column)* ')' (WHERE expr)?
+	)? DO (
+		NOTHING
+		| (
+			UPDATE SET (
+				(column_name | column_name_list) EQ expr (
+					',' (column_name | column_name_list) EQ expr
+				)* (WHERE expr)?
+			)
+		)
 	);
 
-with_clause:
-	WITH RECURSIVE? cte_table_name AS '(' select_stmt ')' (
-		',' cte_table_name AS '(' select_stmt ')'
-	)*;
-
-qualified_table_name: (schema_name '.')? table_name (AS alias)? (
-		INDEXED BY index_name
-		| NOT INDEXED
-	)?;
-
-ordering_term:
-	expr (COLLATE collation_name)? asc_desc? (
-		NULLS (FIRST | LAST)
+pragma_stmt:
+	PRAGMA (schema_name '.')? pragma_name (
+		'=' pragma_value
+		| '(' pragma_value ')'
 	)?;
 
 pragma_value: signed_number | name | STRING_LITERAL;
 
-common_table_expression:
-	table_name ('(' column_name ( ',' column_name)* ')')? AS '(' select_stmt ')';
+reindex_stmt:
+	REINDEX (
+		collation_name
+		| (( schema_name '.')? ( table_name | index_name))
+	)?;
 
-result_column:
-	'*'
-	| table_name '.' '*'
-	| (expr | window_function) ( AS? column_alias)?;
-
-window_function:
-	FIRST_VALUE '(' expr ')' OVER '(' partition_by? order_by_expr_asc_desc frame_clause? ')'
-	| CUME_DIST '(' ')' OVER '(' partition_by? order_by_expr? ')'
-	| DENSE_RANK '(' ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
-	| LAG '(' expr offset? default_value? ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
-	| LAST_VALUE '(' expr ')' OVER '(' partition_by? order_by_expr_asc_desc frame_clause? ')'
-	| LEAD '(' expr offset? default_value? ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
-	| NTH_VALUE '(' expr ',' signed_number ')' OVER '(' partition_by? order_by_expr_asc_desc
-		frame_clause? ')'
-	| NTILE '(' expr ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
-	| PERCENT_RANK '(' ')' OVER '(' partition_by? order_by_expr? ')'
-	| RANK '(' ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
-	| ROW_NUMBER '(' ')' OVER '(' partition_by? order_by_expr_asc_desc ')';
-
-offset: ',' signed_number;
-
-default_value: ',' signed_number;
-
-partition_by: PARTITION BY expr+;
-
-order_by_expr: ORDER BY expr+;
-
-order_by_expr_asc_desc: ORDER BY order_by_expr_asc_desc;
-
-expr_asc_desc: expr asc_desc? (',' expr asc_desc?)*;
-
-asc_desc: ASC | DESC;
-
-frame_clause: (RANGE | ROWS | GROUPS) (
-		frame_common
-		| BETWEEN frame_following AND frame_following
-	);
-
-frame_following: frame_common | expr FOLLOWING;
-frame_common:
-	expr (PRECEDING)
-	| UNBOUNDED FOLLOWING
-	| CURRENT ROW;
-
-table_or_subquery: (schema_name '.')? table_name (
-		AS? table_alias
-	)? ((INDEXED BY index_name) | (NOT INDEXED))?
-	| (schema_name '.')? table_function_name '(' expr (',' expr)* ')' (
-		AS? table_alias
-	)?
-	| '(' (
-		table_or_subquery (',' table_or_subquery)*
-		| join_clause
-	) ')'
-	| '(' select_stmt ')' ( AS? table_alias)?;
+select_stmt:
+	common_table_stmt? select_core (
+		compound_operator select_core
+	)* order_by_stmt? limit_stmt?;
 
 join_clause:
 	table_or_subquery (
-		join_operator table_or_subquery join_constraint
+		join_operator table_or_subquery join_constraint?
 	)*;
-
-join_operator:
-	','
-	| NATURAL? ( LEFT OUTER? | INNER | CROSS)? JOIN;
-
-join_constraint: (
-		ON expr
-		| USING '(' column_name ( ',' column_name)* ')'
-	)?;
 
 select_core:
 	(
@@ -464,19 +371,87 @@ select_core:
 		',' '(' expr ( ',' expr)* ')'
 	)*;
 
+factored_select_stmt: select_stmt;
+
+simple_select_stmt:
+	common_table_stmt? select_core order_by_stmt? limit_stmt?;
+
+compound_select_stmt:
+	common_table_stmt? select_core (
+		((UNION ALL?) | INTERSECT | EXCEPT) select_core
+	)+ order_by_stmt? limit_stmt?;
+
+//TODO MEEEE
+table_or_subquery: (
+		(schema_name '.')? table_name (AS? table_alias)? (
+			(INDEXED BY index_name)
+			| (NOT INDEXED)
+		)?
+	)
+	| (
+		(schema_name '.')? table_function_name '(' expr (
+			',' expr
+		)* ')' (AS? table_alias)?
+	)
+	| '(' (
+		table_or_subquery (',' table_or_subquery)*
+		| join_clause
+	) ')'
+	| ('(' select_stmt ')' ( AS? table_alias)?);
+
+result_column:
+	'*'
+	| table_name '.' '*'
+	| expr ( AS? column_alias)?;
+
+join_operator:
+	','
+	| (NATURAL? ( (LEFT OUTER?) | INNER | CROSS)? JOIN);
+
+join_constraint:
+	(ON expr)
+	| (USING '(' column_name ( ',' column_name)* ')');
+
+compound_operator: (UNION ALL?) | INTERSECT | EXCEPT;
+
+update_stmt:
+	with_clause? UPDATE (
+		OR (ROLLBACK | ABORT | REPLACE | FAIL | IGNORE)
+	)? qualified_table_name SET (column_name | column_name_list) '=' expr (
+		',' (column_name | column_name_list) '=' expr
+	)* (WHERE expr)?;
+
+column_name_list: '(' column_name (',' column_name)* ')';
+
+update_stmt_limited:
+	with_clause? UPDATE (
+		OR (ROLLBACK | ABORT | REPLACE | FAIL | IGNORE)
+	)? qualified_table_name SET (column_name | column_name_list) '=' expr (
+		',' (column_name | column_name_list) '=' expr
+	)* (WHERE expr)? (order_by_stmt? limit_stmt)?;
+
+qualified_table_name: (schema_name '.')? table_name (AS alias)? (
+		(INDEXED BY index_name)
+		| (NOT INDEXED)
+	)?;
+
+vacuum_stmt: VACUUM schema_name? (INTO filename)?;
+
 filter_clause: FILTER '(' WHERE expr ')';
 
 window_defn:
-	'(' base_window_name? (PARTITION BY expr (',' expr)?)? (
-		ORDER BY ordering_term (',' ordering_term)?
+	'(' base_window_name? (PARTITION BY expr (',' expr)*)? (
+		ORDER BY ordering_term (',' ordering_term)*
 	) frame_spec? ')';
 
 over_clause:
-	OVER window_name
-	| (
-		'(' base_window_name? (PARTITION BY expr (',' expr)?)? (
-			ORDER BY ordering_term (',' ordering_term)?
-		)? frame_spec? ')'
+	OVER (
+		window_name
+		| (
+			'(' base_window_name? (PARTITION BY expr (',' expr)*)? (
+				ORDER BY ordering_term (',' ordering_term)*
+			)? frame_spec? ')'
+		)
 	);
 
 frame_spec:
@@ -487,6 +462,10 @@ frame_spec:
 		| TIES
 	)?;
 
+frame_clause: (RANGE | ROWS | GROUPS) (
+		frame_single
+		| BETWEEN frame_left AND frame_right
+	);
 simple_function_invocation:
 	simple_func '(' ((expr (',' expr)*) | '*') ')';
 
@@ -499,33 +478,67 @@ window_function_invocation:
 		| window_name
 	);
 
-compound_operator: UNION ALL? | INTERSECT | EXCEPT;
+common_table_stmt: //additional structures
+	WITH RECURSIVE? common_table_expression (
+		',' common_table_expression
+	)*;
 
-cte_table_name:
-	table_name ('(' column_name ( ',' column_name)* ')')?;
+order_by_stmt: ORDER BY ordering_term ( ',' ordering_term)*;
 
-recursive_cte:
-	cte_table_name AS '(' initial_select UNION ALL? recursive_select ')';
+limit_stmt: LIMIT expr ( (OFFSET | ',') expr)?;
+
+ordering_term:
+	expr (COLLATE collation_name)? asc_desc? (
+		NULLS (FIRST | LAST)
+	)?;
+asc_desc: ASC | DESC;
+
+frame_left:
+	(expr PRECEDING)
+	| (expr FOLLOWING)
+	| (CURRENT ROW)
+	| (UNBOUNDED PRECEDING);
+
+frame_right:
+	(expr PRECEDING)
+	| (expr FOLLOWING)
+	| (CURRENT ROW)
+	| (UNBOUNDED FOLLOWING);
+
+frame_single:
+	(expr PRECEDING)
+	| (UNBOUNDED PRECEDING)
+	| (CURRENT ROW);
+
+// unknown
+
+window_function:
+	(FIRST_VALUE | LAST_VALUE) '(' expr ')' OVER '(' partition_by? order_by_expr_asc_desc
+		frame_clause? ')'
+	| (CUME_DIST | PERCENT_RANK) '(' ')' OVER '(' partition_by? order_by_expr? ')'
+	| (DENSE_RANK | RANK | ROW_NUMBER) '(' ')' OVER '(' partition_by? order_by_expr_asc_desc ')'
+	| (LAG | LEAD) '(' expr offset? default_value? ')' OVER '(' partition_by? order_by_expr_asc_desc
+		')'
+	| NTH_VALUE '(' expr ',' signed_number ')' OVER '(' partition_by? order_by_expr_asc_desc
+		frame_clause? ')'
+	| NTILE '(' expr ')' OVER '(' partition_by? order_by_expr_asc_desc ')';
+
+offset: ',' signed_number;
+
+default_value: ',' signed_number;
+
+partition_by: PARTITION BY expr+;
+
+order_by_expr: ORDER BY expr+;
+
+order_by_expr_asc_desc: ORDER BY order_by_expr_asc_desc;
+
+expr_asc_desc: expr asc_desc? (',' expr asc_desc?)*;
 
 //TODO BOTH OF THESE HAVE TO BE REWORKED TO FOLLOW THE SPEC
 initial_select: select_stmt;
 
 recursive_select: select_stmt;
-
-signed_number: ( '+' | '-')? NUMERIC_LITERAL;
-
-literal_value:
-	NUMERIC_LITERAL
-	| STRING_LITERAL
-	| BLOB_LITERAL
-	| NULL
-	| TRUE
-	| FALSE
-	| CURRENT_TIME
-	| CURRENT_DATE
-	| CURRENT_TIMESTAMP;
-
-column_name_list: '(' column_name (',' column_name)* ')';
 
 unary_operator: '-' | '+' | '~' | NOT;
 
