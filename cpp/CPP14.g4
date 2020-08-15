@@ -934,7 +934,8 @@ purespecifier:
 
 purespecifier
    : Assign val = Octalliteral
-   {if($val.text.compareTo("0")!=0) throw new InputMismatchException(this);}
+   {if not $val.text == '0':
+        raise InputMismatchException(this)}
    ;
 /*Derived classes*/
 
