@@ -53,7 +53,7 @@
                 <version>${antlr4test-maven-plugin.version}</version>
                 <configuration>
                     <verbose>false</verbose>
-                    <showTree>true</showTree>
+                    <showTree>false</showTree>
                     <entryPoint>statement</entryPoint>
                     <grammarName>Hive</grammarName>
                     <packageName></packageName>
