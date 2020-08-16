@@ -32,10 +32,10 @@ selectList
 
 selectTrfmClause
     : LPAREN selectExpressionList RPAREN
-    rowFormat recordWriter
+    rowFormat? recordWriter?
     KW_USING StringLiteral
     ( KW_AS ((LPAREN (aliasList | columnNameTypeList) RPAREN) | (aliasList | columnNameTypeList)))?
-    rowFormat recordReader
+    rowFormat? recordReader?
     ;
 
 selectItem
@@ -48,10 +48,10 @@ selectItem
 trfmClause
     : (   KW_MAP    selectExpressionList
       | KW_REDUCE selectExpressionList )
-    rowFormat recordWriter
+    rowFormat? recordWriter?
     KW_USING StringLiteral
     ( KW_AS ((LPAREN (aliasList | columnNameTypeList) RPAREN) | (aliasList | columnNameTypeList)))?
-    rowFormat recordReader
+    rowFormat? recordReader?
     ;
 
 selectExpression
