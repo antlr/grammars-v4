@@ -1,0 +1,107 @@
+{
+import java.util.Vector;
+}
+
+/** Parse an entire html file, firing events to a single listener
+ *  for each image and href link encountered.  All tokens are
+ *  defined to skip so the lexer will continue scarfing until EOF.
+ */
+class LinkExtractor extends Lexer;
+options {
+	caseSensitive=false;
+	k=2;
+	filter=SCARF;
+	charVocabulary='\3'..'\177';
+}
+
+{
+	protected LinkListener listener;
+	
+	public void addLinkListener(LinkListener listener) {
+		this.listener = listener;
+	}
+
+	public void removeLinkListener(LinkListener listener) {
+		this.listener = null;
+	}
+
+	public void fireImageLinkEvent(String target, int line) {
+		listener.imageReference(target, line);
+	}
+
+	public void fireHREFLinkEvent(String target, int line) {
+		listener.hrefReference(target, line);
+	}
+
+	/** strip quotes from "..." or '...' strings */
+	public static String stripQuotes(String src) {
+		int h = src.indexOf('"');
+		if ( h==-1 ) h = src.indexOf('\'');
+		int t = src.lastIndexOf('"');
+		if ( t==-1 ) t = src.lastIndexOf('\'');
+		if ( h==-1 || t==-1 ) return src;
+		return src.substring(h+1,t);
+	}
+}
+
+AHREF
+	:	"<a" WS (ATTR)+ '>'		{$setType(Token.SKIP);}
+	;
+
+IMG	:	"<img" WS (ATTR)+ '>'	{$setType(Token.SKIP);}
+	;
+
+protected
+ATTR
+options {
+	ignore=WS;
+}
+	:	w:WORD '='
+		(	s:STRING
+		|	v:WORD
+		)
+		{
+		String target = s!=null ? stripQuotes(s.getText()) : v.getText();
+		if ( w.getText().equalsIgnoreCase("href") ) {
+			fireHREFLinkEvent(target, getLine());
+		}
+		else if ( w.getText().equalsIgnoreCase("src") ) {
+			fireImageLinkEvent(target, getLine());
+		}
+		}
+	;
+
+/** Match until next whitespace; can be file, int, etc... */
+protected
+WORD:	(
+			options {
+				generateAmbigWarnings=false;
+			}
+		:	'a'..'z' | '0'..'9' | '/' | '.' | '#' | '_'
+		)+
+	;
+
+protected
+STRING
+	:	'"' (~'"')* '"'
+	|	'\'' (~'\'')* '\''
+	;
+
+protected
+WS	:	(	' '
+		|	'\t'
+		|	'\f'
+		|	(	"\r\n"  // DOS
+			|	'\r'    // Macintosh
+			|	'\n'    // Unix (the right way)
+			)
+			{ newline(); }
+		)
+		{ $setType(Token.SKIP); }
+	;
+
+protected
+SCARF
+	:	WS	// track line numbers while you scarf
+	|	.
+	;
