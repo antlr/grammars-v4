@@ -97,8 +97,12 @@ tokensSpec
    ;
 
 tokenEntry
-   : (TOKEN_REF ( EQUAL STRING_LITERAL ) tokensSpecOptions?
-     | STRING_LITERAL tokensSpecOptions?
+   : (
+        TOKEN_REF
+        ( EQUAL STRING_LITERAL )?
+        tokensSpecOptions?
+        | STRING_LITERAL
+        tokensSpecOptions?
      )
      SEMI
    ;

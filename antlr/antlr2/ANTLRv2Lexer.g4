@@ -108,7 +108,7 @@ fragment LIT_STR
    ;
 
 fragment ESC
-   : '\\' ('n' | 'r' | 't' | 'b' | 'f' | '"' | '\'' | '\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | .)
+   : '\\' ('n' | 'r' | 't' | 'b' | 'f' | '"' | '\'' | '\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | OctDigit (OctDigit OctDigit?)? | .)
    ;
 
 fragment XDIGIT
@@ -225,12 +225,13 @@ fragment DocComment
 fragment LineComment
    : '//' ~ [\r\n]*
    ;
-   // -----------------------------------
-   // Escapes
-   // Any kind of escaped character that we can embed within ANTLR literal strings.
+
+// -----------------------------------
+// Escapes
+// Any kind of escaped character that we can embed within ANTLR literal strings.
 
 fragment EscSeq
-   : Esc ([btnfr"'\\] | UnicodeEsc | . | EOF)
+   : Esc ([btnfr"'\\] | UnicodeEsc | OctEsc | . | EOF)
    ;
 
 fragment EscAny
@@ -240,8 +241,13 @@ fragment EscAny
 fragment UnicodeEsc
    : 'u' (HexDigit (HexDigit (HexDigit HexDigit?)?)?)?
    ;
-   // -----------------------------------
-   // Numerals
+
+fragment OctEsc
+   : OctDigit (OctDigit OctDigit?)?
+   ;
+
+// -----------------------------------
+// Numerals
 
 fragment DecimalNumeral
    : '0'
@@ -257,8 +263,13 @@ fragment HexDigit
 fragment DecDigit
    : [0-9]
    ;
-   // -----------------------------------
-   // Literals
+
+fragment OctDigit
+   : [0-7]
+   ;
+
+// -----------------------------------
+// Literals
 
 fragment BoolLiteral
    : 'true'
