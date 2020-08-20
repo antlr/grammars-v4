@@ -641,7 +641,6 @@ SCON
    : '\'' ('\'' '\'' | ~ ('\'' | '\n' | '\r') | (('\n' | '\r' ('\n')?) '     ' CONTINUATION) ('\n' | '\r' ('\n')?) '     ' CONTINUATION)* '\''
    ;
 
-// real constant
 RCON
    : (NUM)+ '.' (NUM)* (EXPON)?
    ;
@@ -657,7 +656,7 @@ NAME
 
 COMMENT
    : {getCharPositionInLine() == 0}?
-     ('c' | STARCHAR) (~ [\n])* EOL
+     ('c' | STARCHAR) (~ [\r\n])* EOL
    ;
 
 STAR
@@ -666,11 +665,11 @@ STAR
 
 
 STRINGLITERAL
-   : '"' ~ ["\n]* '"'
+   : '"' ~ ["\r\n]* '"'
    ;
 
 EOL
-   : [\n] + 
+   : [\r\n] +
    ;
 
 LINECONT
