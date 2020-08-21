@@ -73,7 +73,7 @@ alias: name ':';
 //https://spec.graphql.org/June2018/#sec-Language.Fragments
 fragmentSpread: '...' fragmentName directives?;
 fragmentDefinition:
-	'fragment' fragmentName 'on' typeCondition directives? selectionSet;
+	'fragment' fragmentName typeCondition directives? selectionSet;
 fragmentName: name; // except on
 
 //https://spec.graphql.org/June2018/#sec-Type-Conditions
