@@ -655,8 +655,7 @@ NAME
 
 
 COMMENT
-   : {getCharPositionInLine() == 0}?
-     ('c' | STARCHAR) (~ [\r\n])* EOL
+   : {getCharPositionInLine() == 0}? ('c' | STARCHAR) (~ [\r\n])* EOL
    ;
 
 STAR
