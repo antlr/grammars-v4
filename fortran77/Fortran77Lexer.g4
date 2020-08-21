@@ -642,11 +642,11 @@ SCON
    ;
 
 RCON
-   : (NUM)+ '.' (NUM)* (EXPON)?
+   : NUM+ '.' NUM* EXPON?
    ;
 
 ICON
-   : (NUM)+
+   : NUM+
    ;
 
 NAME

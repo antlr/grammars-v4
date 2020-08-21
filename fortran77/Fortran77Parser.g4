@@ -83,7 +83,7 @@ entryStatement
    ;
 
 functionStatement
-   : (type)? FUNCTION NAME LPAREN (namelist)? RPAREN EOL?
+   : type? FUNCTION NAME LPAREN namelist? RPAREN EOL?
    ;
 
 blockdataStatement
@@ -91,7 +91,7 @@ blockdataStatement
    ;
 
 subroutineStatement
-   : SUBROUTINE NAME (LPAREN (namelist)? RPAREN)? EOL?
+   : SUBROUTINE NAME (LPAREN namelist? RPAREN)? EOL?
    ;
 
 namelist
@@ -374,7 +374,7 @@ logicalIfStatement
    ;
 
 blockIfStatement
-   : firstIfBlock (elseIfStatement)* (elseStatement)? endIfStatement
+   : firstIfBlock elseIfStatement* elseStatement? endIfStatement
    ;
 
 firstIfBlock
@@ -402,7 +402,7 @@ doVarArgs
    ;
 
 doWithLabel
-   : lblRef (COMMA)? doVarArgs EOL? doBody EOL? continueStatement
+   : lblRef COMMA? doVarArgs EOL? doBody EOL? continueStatement
    ;
 
 doBody
@@ -886,4 +886,3 @@ identifier
 to
    : NAME
    ;
-
