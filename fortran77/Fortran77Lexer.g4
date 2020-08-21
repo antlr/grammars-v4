@@ -264,11 +264,6 @@ SEQUENTIAL
    ;
 
 
-// ICON
-//    : 'ICON' | 'icon'
-//    ;
-
-
 LABEL
    : 'LABEL' | 'label'
    ;
