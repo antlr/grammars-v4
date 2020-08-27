@@ -1,7 +1,7 @@
 /*
  BSD License
 
- Copyright (c) 2018, Tom Everett All rights reserved.
+ Copyright (c) 2018, Martin Mirchev All rights reserved.
 
  Redistribution and use in source and binary forms, with or without modification, are permitted
  provided that the following conditions are met:
@@ -40,7 +40,7 @@ value:
 	| map
 	| set;
 
-tag: Hash Symbol;
+tag: Hash Symbol //maybe add more tags here? did not get a lot of info;
 keyword:
 	Colon (
 		Symbol
@@ -48,6 +48,7 @@ keyword:
 		| FloatingPointLiteral
 		| NilLiteral
 		| BooleanLiteral
+        // maybe a character literal here?
 	);
 list: LeftParenthesis value* RightParenthesis;
 vector: LeftBracket value* RightBracket;
@@ -113,6 +114,7 @@ Name: (( [-+.] (Alpha | Extra | Special)) | (Alpha | Extra)) (
 		| Extra
 		| Special
 	)*;
+    //TODO ADD more UTF-8 Compilant Characters
 fragment Alpha: [a-zA-Z];
 fragment Numeric: [0-9];
 fragment Extra: [.*+!\-_?$%&=<>];
