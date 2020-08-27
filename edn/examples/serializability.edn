@@ -1,0 +1,18 @@
+[:keyword
+ :keyword/with-namespace
+ symbol
+ symbol/with-namespace
+ nil
+ true
+ false
+ "string literal"
+ 1
+ 1N
+ 1.0
+ 1.0M
+ \A
+ #tagged "value"
+ #tagged/with-namespace "value"
+ #{"some" "set"}
+ {"some" "map"}
+ ("a" "list" "of" "things")]
