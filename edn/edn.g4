@@ -40,7 +40,8 @@ value:
 	| map
 	| set;
 
-tag: Hash Symbol //maybe add more tags here? did not get a lot of info;
+//maybe add more tags here? did not get a lot of info
+tag: Hash Symbol;
 keyword:
 	Colon (
 		Symbol
@@ -48,7 +49,7 @@ keyword:
 		| FloatingPointLiteral
 		| NilLiteral
 		| BooleanLiteral
-        // maybe a character literal here?
+		// maybe a character literal here?
 	);
 list: LeftParenthesis value* RightParenthesis;
 vector: LeftBracket value* RightBracket;
@@ -114,7 +115,7 @@ Name: (( [-+.] (Alpha | Extra | Special)) | (Alpha | Extra)) (
 		| Extra
 		| Special
 	)*;
-    //TODO ADD more UTF-8 Compilant Characters
+//TODO ADD more UTF-8 Compilant Characters
 fragment Alpha: [a-zA-Z];
 fragment Numeric: [0-9];
 fragment Extra: [.*+!\-_?$%&=<>];
