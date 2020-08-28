@@ -40,7 +40,7 @@ value:
 	| map
 	| set;
 
-//maybe add more tags here? did not get a lot of info
+//maybe add more tags here? did not get a lot of info from the spec
 tag: Hash Symbol;
 keyword:
 	Colon (
@@ -115,8 +115,7 @@ Name: (( [-+.] (Alpha | Extra | Special)) | (Alpha | Extra)) (
 		| Extra
 		| Special
 	)*;
-//TODO ADD more UTF-8 Compilant Characters
-fragment Alpha: [a-zA-Z];
+fragment Alpha: [a-zA-Z\p{L}];
 fragment Numeric: [0-9];
 fragment Extra: [.*+!\-_?$%&=<>];
 fragment Special: [#:];
