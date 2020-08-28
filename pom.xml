@@ -106,6 +106,7 @@
 				<module>dice</module>
 				<module>dot</module>
 				<module>edif300</module>
+				<module>edn</module>				
 				<module>erlang</module>
 				<module>fasta</module>
 				<module>fen</module>
