@@ -1,0 +1,35 @@
+;; You can run clojure.java.jdbc tests with: clj -A:test:runner
+;; You can also specify an alias to select which version of Clojure to test
+;; against: :1.7 :1.8 :1.9 :master
+
+{:paths ["src/main/clojure"]
+ :aliases {:test
+           {:extra-paths ["src/test/clojure"]
+            :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
+                         org.apache.derby/derby {:mvn/version "10.14.2.0"}
+                         org.hsqldb/hsqldb {:mvn/version "2.4.1"}
+                         com.h2database/h2 {:mvn/version "1.4.197"}
+                         net.sourceforge.jtds/jtds {:mvn/version "1.3.1"}
+                         ;; Note: Tests fail with 6.0.2+ driver
+                         mysql/mysql-connector-java {:mvn/version "5.1.41"}
+                         org.postgresql/postgresql {:mvn/version "42.2.2.jre7"}
+                         com.impossibl.pgjdbc-ng/pgjdbc-ng {:mvn/version "0.7.1"}
+                         org.xerial/sqlite-jdbc {:mvn/version "3.23.1"}
+                         ;; Note: Assumes Java 8; there's a .jre7 version as well
+                         com.microsoft.sqlserver/mssql-jdbc {:mvn/version "6.2.2.jre8"}}}
+           :1.7 {:override-deps {org.clojure/clojure {:mvn/version "1.7.0"}}}
+           :1.8 {:override-deps {org.clojure/clojure {:mvn/version "1.8.0"}}}
+           :1.9 {:override-deps {org.clojure/clojure {:mvn/version "1.9.0"}}}
+           :1.10 {:override-deps {org.clojure/clojure {:mvn/version "1.10.0"}}}
+           :master {:override-deps {org.clojure/clojure {:mvn/version "1.11.0-master-SNAPSHOT"}}}
+           :perf {:extra-paths ["src/perf/clojure"]
+                  :extra-deps {criterium {:mvn/version "0.4.4"}}
+                  :jvm-opts ["-server"
+                             "-Xmx4096m"
+                             "-Dclojure.compiler.direct-linking=true"]}
+           :runner
+           {:extra-deps {com.cognitect/test-runner
+                         {:git/url "https://github.com/cognitect-labs/test-runner"
+                          :sha "76568540e7f40268ad2b646110f237a60295fa3c"}}
+            :main-opts ["-m" "cognitect.test-runner"
+                        "-d" "src/test/clojure"]}}}
