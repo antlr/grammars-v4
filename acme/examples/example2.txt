@@ -1,0 +1,9 @@
+System xx = {
+Component client = {
+   Port send-request;
+   Properties {
+      Aesop-style : style-id = client-server;
+      UniCon-style : style-id = cs}
+      };
+   }
+
