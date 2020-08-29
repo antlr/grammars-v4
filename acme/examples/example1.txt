@@ -1,0 +1,20 @@
+System simple_cs = {
+  Component client = {
+    Port send-request;
+    Property Aesop-style : style-id = client-server;
+    Property UniCon-style : style-id = client-server;
+    Property source-code : external = "CODE-LIB/client.c";
+  };
+  Component server = {
+    Port receive-request;
+    Property idempotence : boolean = true;
+    Property max-concurrent-clients : integer = 1;
+  };
+  Connector rpc = {
+    Role caller;
+    Role callee;
+    Property asynchronous : boolean = true;
+  };
+  Attachment client.send-request to rpc.caller;
+  Attachment server.receive-request to rpc.callee;
+}
