@@ -148,6 +148,7 @@
 				<module>less</module>
 				<module>logo</module>
 				<module>lolcode</module>
+				<module>loop</module>				
 				<module>lpc</module>
 				<module>lua</module>
 				<module>matlab</module>
