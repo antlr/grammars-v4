@@ -295,7 +295,7 @@ bindingsMapDeclaration
    ;
 
 bindingDeclaration
-   : (IDENTIFIER '.')? IDENTIFIER 'to' (IDENTIFIER '.')? IDENTIFIER ('{' (propertyDeclaration | propertiesBlock)* '}')? ';'
+   : (IDENTIFIER '.')? IDENTIFIER 'to' (IDENTIFIER '.')? IDENTIFIER ('{' (propertyDeclaration | propertiesBlock)* '}')? ';'?
    ;
 
 designAnalysisDeclaration
@@ -485,7 +485,7 @@ ANALYSIS
    ;
 
 AND
-   : 'And'
+   : 'and'
    ;
 
 ANY
@@ -637,7 +637,7 @@ MINUS
    ;
 
 OR
-   : 'Or'
+   : 'or'
    ;
 
 PLUS

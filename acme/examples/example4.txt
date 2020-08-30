@@ -1,0 +1,28 @@
+System simpleCS = {
+
+Component server = {
+Port receiveRequest;
+Representation serverDetails = {
+System serverDetailsSys = {
+Component connectionManager = {
+Ports { externalSocket; securityCheckIntf; dbQueryIntf } }
+Component securityManager = {
+Ports { securityAuthorization; credentialQuery; } }
+Component database = {
+Ports { securityManagementIntf; queryIntf; } }
+Connector SQLQuery = { Roles { caller; callee } }
+Connector clearanceRequest = { Roles { requestor; grantor } }
+Connector securityQuery = {
+Roles { securityManager; requestor } }
+Attachments {
+connectionManager.securityCheckIntf to clearanceRequest.requestor;
+securityManager.securityAuthorization to clearanceRequest.grantor;
+connectionManager.dbQueryIntf to SQLQuery.caller;
+database.queryIntf to SQLQuery.callee;
+securityManager.credentialQuery to securityQuery.securityManager;
+database.securityManagementIntf to securityQuery.requestor; }
+}
+Bindings { connectionManager.externalSocket to server.receiveRequest }
+}
+}
+}

@@ -1,0 +1,9 @@
+System messagePathSystem = {
+
+Connector MessagePath = {
+Roles {source; sink;}
+Property expectedThroughput : float = 512;
+Invariant (queueBufferSize >= 512) and (queueBufferSize <= 4096);
+Heuristic expectedThroughput <= (queueBufferSize / 2);
+}
+}
