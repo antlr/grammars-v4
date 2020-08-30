@@ -18,8 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-						<include>SQLiteLexer.g4</include>
-						<include>SQLiteParser.g4</include>
+						<include>CPP14Lexer.g4</include>
+						<include>CPP14Parser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -39,7 +39,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>translationunit</entryPoint>
+					<entryPoint>translationUnit</entryPoint>
 					<grammarName>CPP14</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
