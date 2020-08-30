@@ -1,4 +1,14 @@
 lexer grammar CPP14Lexer;
+
+Literal:
+	IntegerLiteral
+	| CharacterLiteral
+	| FloatingLiteral
+	| StringLiteral
+	| BooleanLiteral
+	| PointerLiteral
+	| UserDefinedLiteral;
+
 MultiLineMacro:
 	'#' (~[\n]*? '\\' '\r'? '\n')+ ~ [\n]+ -> channel (HIDDEN);
 
@@ -254,7 +264,6 @@ DotStar: '.*';
 
 Ellipsis: '...';
 
-
 fragment Hexquad:
 	HEXADECIMALDIGIT HEXADECIMALDIGIT HEXADECIMALDIGIT HEXADECIMALDIGIT;
 
@@ -274,30 +283,21 @@ fragment NONDIGIT: [a-zA-Z_];
 
 fragment DIGIT: [0-9];
 
-Literal:
-	Integerliteral
-	| Characterliteral
-	| Floatingliteral
-	| Stringliteral
-	| Booleanliteral
-	| Pointerliteral
-	| Userdefinedliteral;
+IntegerLiteral:
+	DecimalLiteral Integersuffix?
+	| OctalLiteral Integersuffix?
+	| HexadecimalLiteral Integersuffix?
+	| BinaryLiteral Integersuffix?;
 
-Integerliteral:
-	Decimalliteral Integersuffix?
-	| Octalliteral Integersuffix?
-	| Hexadecimalliteral Integersuffix?
-	| Binaryliteral Integersuffix?;
+DecimalLiteral: NONZERODIGIT ('\''? DIGIT)*;
 
-Decimalliteral: NONZERODIGIT ('\''? DIGIT)*;
+OctalLiteral: '0' ('\''? OCTALDIGIT)*;
 
-Octalliteral: '0' ('\''? OCTALDIGIT)*;
-
-Hexadecimalliteral: ('0x' | '0X') HEXADECIMALDIGIT (
+HexadecimalLiteral: ('0x' | '0X') HEXADECIMALDIGIT (
 		'\''? HEXADECIMALDIGIT
 	)*;
 
-Binaryliteral: ('0b' | '0B') BINARYDIGIT ('\''? BINARYDIGIT)*;
+BinaryLiteral: ('0b' | '0B') BINARYDIGIT ('\''? BINARYDIGIT)*;
 
 fragment NONZERODIGIT: [1-9];
 
@@ -319,7 +319,7 @@ fragment Longsuffix: [lL];
 
 fragment Longlongsuffix: 'll' | 'LL';
 
-Characterliteral:
+CharacterLiteral:
 	'\'' Cchar+ '\''
 	| 'u' '\'' Cchar+ '\''
 	| 'U' '\'' Cchar+ '\''
@@ -355,7 +355,7 @@ fragment Octalescapesequence:
 
 fragment Hexadecimalescapesequence: '\\x' HEXADECIMALDIGIT+;
 
-Floatingliteral:
+FloatingLiteral:
 	Fractionalconstant Exponentpart? Floatingsuffix?
 	| Digitsequence Exponentpart Floatingsuffix?;
 
@@ -373,7 +373,7 @@ fragment Digitsequence: DIGIT ('\''? DIGIT)*;
 
 fragment Floatingsuffix: [flFL];
 
-Stringliteral:
+StringLiteral:
 	Encodingprefix? '"' Schar* '"'
 	| Encodingprefix? 'R' Rawstring;
 fragment Encodingprefix: 'u8' | 'u' | 'U' | 'L';
@@ -385,29 +385,29 @@ fragment Schar:
 
 fragment Rawstring: '"' .*? '(' .*? ')' .*? '"';
 
-Booleanliteral: False | True;
+BooleanLiteral: False | True;
 
-Pointerliteral: Nullptr;
+PointerLiteral: Nullptr;
 
-Userdefinedliteral:
-	Userdefinedintegerliteral
-	| Userdefinedfloatingliteral
-	| Userdefinedstringliteral
-	| Userdefinedcharacterliteral;
+UserDefinedLiteral:
+	UserDefinedIntegerLiteral
+	| UserDefinedFloatingLiteral
+	| UserDefinedStringLiteral
+	| UserDefinedCharacterLiteral;
 
-Userdefinedintegerliteral:
-	Decimalliteral Udsuffix
-	| Octalliteral Udsuffix
-	| Hexadecimalliteral Udsuffix
-	| Binaryliteral Udsuffix;
+UserDefinedIntegerLiteral:
+	DecimalLiteral Udsuffix
+	| OctalLiteral Udsuffix
+	| HexadecimalLiteral Udsuffix
+	| BinaryLiteral Udsuffix;
 
-Userdefinedfloatingliteral:
+UserDefinedFloatingLiteral:
 	Fractionalconstant Exponentpart? Udsuffix
 	| Digitsequence Exponentpart Udsuffix;
 
-Userdefinedstringliteral: Stringliteral Udsuffix;
+UserDefinedStringLiteral: StringLiteral Udsuffix;
 
-Userdefinedcharacterliteral: Characterliteral Udsuffix;
+UserDefinedCharacterLiteral: CharacterLiteral Udsuffix;
 
 fragment Udsuffix: Identifier;
 

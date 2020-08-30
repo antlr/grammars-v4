@@ -157,61 +157,48 @@ castExpression:
 	| LeftParen theTypeId RightParen castExpression;
 
 pmExpression:
-	castExpression
-	| pmExpression DotStar castExpression
-	| pmExpression ArrowStar castExpression;
+	castExpression ((DotStar | ArrowStar) castExpression)*;
 
 multiplicativeExpression:
-	pmExpression
-	| multiplicativeExpression Star pmExpression
-	| multiplicativeExpression Div pmExpression
-	| multiplicativeExpression Mod pmExpression;
+	pmExpression ((Star | Div | Mod) pmExpression)*;
 
 additiveExpression:
-	multiplicativeExpression
-	| additiveExpression Plus multiplicativeExpression
-	| additiveExpression Minus multiplicativeExpression;
+	multiplicativeExpression (
+		(Plus | Minus) multiplicativeExpression
+	)*;
 
 shiftExpression:
-	additiveExpression
-	| shiftExpression shiftOperator additiveExpression;
+	additiveExpression (shiftOperator additiveExpression)*;
 
 shiftOperator: RightShift | LeftShift;
 
 relationalExpression:
-	shiftExpression
-	| relationalExpression Less shiftExpression
-	| relationalExpression Greater shiftExpression
-	| relationalExpression LessEqual shiftExpression
-	| relationalExpression GreaterEqual shiftExpression;
+	shiftExpression (
+		(Less | Greater | LessEqual | GreaterEqual) shiftExpression
+	)*;
 
 equalityExpression:
-	relationalExpression
-	| equalityExpression Equal relationalExpression
-	| equalityExpression NotEqual relationalExpression;
+	relationalExpression (
+		(Equal | NotEqual) relationalExpression
+	)*;
 
-andExpression:
-	equalityExpression
-	| andExpression And equalityExpression;
+andExpression: equalityExpression (And equalityExpression)*;
 
-exclusiveOrExpression:
-	andExpression
-	| exclusiveOrExpression Caret andExpression;
+exclusiveOrExpression: andExpression (Caret andExpression)*;
 
 inclusiveOrExpression:
-	exclusiveOrExpression
-	| inclusiveOrExpression Or exclusiveOrExpression;
+	exclusiveOrExpression (Or exclusiveOrExpression)*;
 
 logicalAndExpression:
-	inclusiveOrExpression
-	| logicalAndExpression AndAnd inclusiveOrExpression;
+	inclusiveOrExpression (AndAnd inclusiveOrExpression)*;
+
 logicalOrExpression:
-	logicalAndExpression
-	| logicalOrExpression OrOr logicalAndExpression;
+	logicalAndExpression (OrOr logicalAndExpression)*;
 
 conditionalExpression:
-	logicalOrExpression
-	| logicalOrExpression Question expression Colon assignmentExpression;
+	logicalOrExpression (
+		Question expression Colon assignmentExpression
+	)?;
 
 assignmentExpression:
 	conditionalExpression
@@ -327,7 +314,7 @@ simpleDeclaration:
 	| attributeSpecifierSeq declSpecifierSeq? initDeclaratorList Semi;
 
 staticAssertDeclaration:
-	Static_assert LeftParen constantExpression Comma Stringliteral RightParen Semi;
+	Static_assert LeftParen constantExpression Comma StringLiteral RightParen Semi;
 
 emptyDeclaration: Semi;
 
@@ -450,10 +437,10 @@ usingDeclaration:
 usingDirective:
 	attributeSpecifierSeq? Using Namespace nestedNameSpecifier? namespaceName Semi;
 
-asmDefinition: Asm LeftParen Stringliteral RightParen Semi;
+asmDefinition: Asm LeftParen StringLiteral RightParen Semi;
 
 linkageSpecification:
-	Extern Stringliteral (
+	Extern StringLiteral (
 		LeftBrace declarationseq? RightBrace
 		| declaration
 	);
@@ -531,14 +518,13 @@ declaratorid: Ellipsis? idExpression;
 theTypeId: typeSpecifierSeq abstractDeclarator?;
 
 abstractDeclarator:
-	ptrAbstractDeclarator
+	pointerAbstractDeclarator
 	| noPointerAbstractDeclarator? parametersAndQualifiers trailingReturnType
 	| abstractPackDeclarator;
 
-//TODO think this out
-ptrAbstractDeclarator:
+pointerAbstractDeclarator:
 	noPointerAbstractDeclarator
-	| pointerOperator ptrAbstractDeclarator?;
+	| pointerOperator+ noPointerAbstractDeclarator?;
 
 noPointerAbstractDeclarator:
 	noPointerAbstractDeclarator parametersAndQualifiers
@@ -546,7 +532,7 @@ noPointerAbstractDeclarator:
 	| noPointerAbstractDeclarator LeftBracket constantExpression? RightBracket attributeSpecifierSeq
 		?
 	| LeftBracket constantExpression? RightBracket attributeSpecifierSeq?
-	| LeftParen ptrAbstractDeclarator RightParen;
+	| LeftParen pointerAbstractDeclarator RightParen;
 
 abstractPackDeclarator:
 	pointerOperator* noPointerAbstractPackDeclarator;
@@ -639,7 +625,7 @@ virtualSpecifier: Override | Final;
  */
 
 pureSpecifier:
-	Assign val = Octalliteral {if($val.text.compareTo("0")!=0) throw new InputMismatchException(this);
+	Assign val = OctalLiteral {if($val.text.compareTo("0")!=0) throw new InputMismatchException(this);
 		};
 /*Derived classes*/
 
@@ -688,8 +674,8 @@ operatorFunctionId: Operator theOperator;
 
 literalOperatorId:
 	Operator (
-		Stringliteral Identifier
-		| Userdefinedstringliteral
+		StringLiteral Identifier
+		| UserDefinedStringLiteral
 	);
 /*Templates*/
 
