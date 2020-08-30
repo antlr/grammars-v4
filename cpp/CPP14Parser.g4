@@ -191,6 +191,7 @@ inclusiveOrExpression:
 
 logicalAndExpression:
 	inclusiveOrExpression (AndAnd inclusiveOrExpression)*;
+
 logicalOrExpression:
 	logicalAndExpression (OrOr logicalAndExpression)*;
 
@@ -517,14 +518,13 @@ declaratorid: Ellipsis? idExpression;
 theTypeId: typeSpecifierSeq abstractDeclarator?;
 
 abstractDeclarator:
-	ptrAbstractDeclarator
+	pointerAbstractDeclarator
 	| noPointerAbstractDeclarator? parametersAndQualifiers trailingReturnType
 	| abstractPackDeclarator;
 
-//TODO think this out
-ptrAbstractDeclarator:
+pointerAbstractDeclarator:
 	noPointerAbstractDeclarator
-	| pointerOperator ptrAbstractDeclarator?;
+	| pointerOperator+ noPointerAbstractDeclarator?;
 
 noPointerAbstractDeclarator:
 	noPointerAbstractDeclarator parametersAndQualifiers
@@ -532,7 +532,7 @@ noPointerAbstractDeclarator:
 	| noPointerAbstractDeclarator LeftBracket constantExpression? RightBracket attributeSpecifierSeq
 		?
 	| LeftBracket constantExpression? RightBracket attributeSpecifierSeq?
-	| LeftParen ptrAbstractDeclarator RightParen;
+	| LeftParen pointerAbstractDeclarator RightParen;
 
 abstractPackDeclarator:
 	pointerOperator* noPointerAbstractPackDeclarator;
