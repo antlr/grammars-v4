@@ -269,10 +269,6 @@ intervalQualifiers
     | KW_SECOND
     ;
 
-expression
-    : precedenceOrExpression
-    ;
-
 atomExpression
     : constant
     | intervalExpression
@@ -285,10 +281,6 @@ atomExpression
     | function
     | tableOrColumn
     | expressionsInParenthesis
-    ;
-
-precedenceFieldExpression
-    : atomExpression ((LSQUARE expression RSQUARE) | (DOT identifier))*
     ;
 
 precedenceUnaryOperator
@@ -306,23 +298,9 @@ isCondition
     | KW_NOT KW_FALSE
     ;
 
-precedenceUnaryPrefixExpression
-    : precedenceUnaryOperator* precedenceFieldExpression
-    ;
-
-precedenceUnarySuffixExpression
-    : precedenceUnaryPrefixExpression (KW_IS isCondition)?
-    ;
-
-
 precedenceBitwiseXorOperator
     : BITWISEXOR
     ;
-
-precedenceBitwiseXorExpression
-    : precedenceUnarySuffixExpression (precedenceBitwiseXorOperator precedenceUnarySuffixExpression)*
-    ;
-
 
 precedenceStarOperator
     : STAR
@@ -331,45 +309,22 @@ precedenceStarOperator
     | DIV
     ;
 
-precedenceStarExpression
-    : precedenceBitwiseXorExpression (precedenceStarOperator precedenceBitwiseXorExpression)*
-    ;
-
-
 precedencePlusOperator
     : PLUS
     | MINUS
-    ;
-
-precedencePlusExpression
-    : precedenceStarExpression (precedencePlusOperator precedenceStarExpression)*
     ;
 
 precedenceConcatenateOperator
     : CONCATENATE
     ;
 
-precedenceConcatenateExpression
-    : precedencePlusExpression (precedenceConcatenateOperator precedencePlusExpression)*
-    ;
-
 precedenceAmpersandOperator
     : AMPERSAND
     ;
 
-precedenceAmpersandExpression
-    : precedenceConcatenateExpression (precedenceAmpersandOperator precedenceConcatenateExpression)*
-    ;
-
-
 precedenceBitwiseOrOperator
     : BITWISEOR
     ;
-
-precedenceBitwiseOrExpression
-    : precedenceAmpersandExpression (precedenceBitwiseOrOperator precedenceAmpersandExpression)*
-    ;
-
 
 precedenceRegexpOperator
     : KW_LIKE
@@ -385,42 +340,6 @@ precedenceSimilarOperator
     | GREATERTHAN
     ;
 
-subQueryExpression
-    : LPAREN selectStatement RPAREN
-    ;
-
-precedenceSimilarExpression
-    : precedenceSimilarExpressionMain
-    | KW_EXISTS subQueryExpression
-    ;
-
-precedenceSimilarExpressionMain
-    : precedenceBitwiseOrExpression precedenceSimilarExpressionPart?
-    ;
-
-precedenceSimilarExpressionPart
-    : (precedenceSimilarOperator precedenceBitwiseOrExpression)
-    | precedenceSimilarExpressionAtom
-    | (KW_NOT precedenceSimilarExpressionPartNot)
-    ;
-
-precedenceSimilarExpressionAtom
-    : KW_IN precedenceSimilarExpressionIn
-    | KW_BETWEEN precedenceBitwiseOrExpression KW_AND precedenceBitwiseOrExpression
-    | KW_LIKE KW_ANY expressionsInParenthesis
-    | KW_LIKE KW_ALL expressionsInParenthesis
-    ;
-
-precedenceSimilarExpressionIn
-    : subQueryExpression
-    | expressionsInParenthesis
-    ;
-
-precedenceSimilarExpressionPartNot
-    : precedenceRegexpOperator precedenceBitwiseOrExpression
-    | precedenceSimilarExpressionAtom
-    ;
-
 precedenceDistinctOperator
     : KW_IS KW_DISTINCT KW_FROM
     ;
@@ -432,41 +351,78 @@ precedenceEqualOperator
     | KW_IS KW_NOT KW_DISTINCT KW_FROM
     ;
 
-precedenceEqualExpression
-    : precedenceSimilarExpression
-    (
-    precedenceEqualOperator
-    precedenceSimilarExpression | precedenceDistinctOperator
-    precedenceSimilarExpression
-    )*
-    ;
-
 precedenceNotOperator
     : KW_NOT
     ;
-
-precedenceNotExpression
-    : precedenceNotOperator* precedenceEqualExpression
-    ;
-
 
 precedenceAndOperator
     : KW_AND
     ;
 
-precedenceAndExpression
-    : precedenceNotExpression (precedenceAndOperator precedenceNotExpression)*
-    ;
-
-
 precedenceOrOperator
     : KW_OR
     ;
 
-precedenceOrExpression
-    : precedenceAndExpression (precedenceOrOperator precedenceAndExpression)*
+//precedenceFieldExpression
+//precedenceUnaryPrefixExpression
+//precedenceUnarySuffixExpression
+//precedenceBitwiseXorExpression
+//precedenceStarExpression
+//precedencePlusExpression
+//precedenceConcatenateExpression
+//precedenceAmpersandExpression
+//precedenceBitwiseOrExpression
+//precedenceSimilarExpressionMain
+//precedenceSimilarExpression
+//precedenceEqualExpression
+//precedenceNotExpression
+//precedenceAndExpression
+//precedenceOrExpression
+expression
+    : atomExpression ((LSQUARE expression RSQUARE) | (DOT identifier))*
+    | precedenceUnaryOperator expression
+    | expression KW_IS isCondition
+    | expression precedenceBitwiseXorOperator expression
+    | expression precedenceStarOperator expression
+    | expression precedencePlusOperator expression
+    | expression precedenceConcatenateOperator expression
+    | expression precedenceAmpersandOperator expression
+    | expression precedenceBitwiseOrOperator expression
+    | expression precedenceSimilarExpressionPart
+    | KW_EXISTS subQueryExpression
+    | expression (precedenceEqualOperator | precedenceDistinctOperator) expression
+    | precedenceNotOperator expression
+    | expression precedenceAndOperator expression
+    | expression precedenceOrOperator expression
+    | LPAREN expression RPAREN
     ;
 
+subQueryExpression
+    : LPAREN selectStatement RPAREN
+    ;
+
+precedenceSimilarExpressionPart
+    : precedenceSimilarOperator expression
+    | precedenceSimilarExpressionAtom
+    | KW_NOT precedenceSimilarExpressionPartNot
+    ;
+
+precedenceSimilarExpressionAtom
+    : KW_IN precedenceSimilarExpressionIn
+    | KW_BETWEEN expression KW_AND expression
+    | KW_LIKE KW_ANY expressionsInParenthesis
+    | KW_LIKE KW_ALL expressionsInParenthesis
+    ;
+
+precedenceSimilarExpressionIn
+    : subQueryExpression
+    | expressionsInParenthesis
+    ;
+
+precedenceSimilarExpressionPartNot
+    : precedenceRegexpOperator expression
+    | precedenceSimilarExpressionAtom
+    ;
 
 booleanValue
     : KW_TRUE
@@ -590,12 +546,12 @@ nonReserved
     | KW_DATABASES | KW_DATETIME | KW_DBPROPERTIES | KW_DEFERRED | KW_DEFINED | KW_DELIMITED | KW_DEPENDENCY
     | KW_DESC | KW_DIRECTORIES | KW_DIRECTORY | KW_DISABLE | KW_DISTRIBUTE | KW_DOW | KW_ELEM_TYPE
     | KW_ENABLE | KW_ENFORCED | KW_ESCAPED | KW_EXCLUSIVE | KW_EXPLAIN | KW_EXPORT | KW_FIELDS | KW_FILE | KW_FILEFORMAT
-    | KW_FIRST | KW_FORMAT | KW_FORMATTED | KW_FUNCTIONS | KW_HOLD_DDLTIME | KW_HOUR | KW_IDXPROPERTIES | KW_IGNORE
+    | KW_FIRST | KW_FORMAT | KW_FORMATTED | KW_FUNCTIONS | KW_HOUR | KW_IDXPROPERTIES
     | KW_INDEX | KW_INDEXES | KW_INPATH | KW_INPUTDRIVER | KW_INPUTFORMAT | KW_ITEMS | KW_JAR | KW_KILL
     | KW_KEYS | KW_KEY_TYPE | KW_LAST | KW_LIMIT | KW_OFFSET | KW_LINES | KW_LOAD | KW_LOCATION | KW_LOCK | KW_LOCKS | KW_LOGICAL | KW_LONG
-    | KW_MAPJOIN | KW_MATERIALIZED | KW_METADATA | KW_MINUTE | KW_MONTH | KW_MSCK | KW_NOSCAN | KW_NO_DROP | KW_NULLS | KW_OFFLINE
+    | KW_MAPJOIN | KW_MATERIALIZED | KW_METADATA | KW_MINUTE | KW_MONTH | KW_MSCK | KW_NOSCAN | KW_NULLS
     | KW_OPTION | KW_OUTPUTDRIVER | KW_OUTPUTFORMAT | KW_OVERWRITE | KW_OWNER | KW_PARTITIONED | KW_PARTITIONS | KW_PLUS
-    | KW_PRINCIPALS | KW_PROTECTION | KW_PURGE | KW_QUERY | KW_QUARTER | KW_READ | KW_READONLY | KW_REBUILD | KW_RECORDREADER | KW_RECORDWRITER
+    | KW_PRINCIPALS | KW_PURGE | KW_QUERY | KW_QUARTER | KW_READ | KW_REBUILD | KW_RECORDREADER | KW_RECORDWRITER
     | KW_RELOAD | KW_RENAME | KW_REPAIR | KW_REPLACE | KW_REPLICATION | KW_RESTRICT | KW_REWRITE
     | KW_ROLE | KW_ROLES | KW_SCHEMA | KW_SCHEMAS | KW_SECOND | KW_SEMI | KW_SERDE | KW_SERDEPROPERTIES | KW_SERVER | KW_SETS | KW_SHARED
     | KW_SHOW | KW_SHOW_DATABASE | KW_SKEWED | KW_SORT | KW_SORTED | KW_SSL | KW_STATISTICS | KW_STORED
@@ -615,8 +571,8 @@ nonReserved
     | KW_NOVALIDATE
     | KW_KEY
     | KW_MATCHED
-    | KW_REPL | KW_DUMP | KW_BATCH | KW_STATUS
-    | KW_CACHE | KW_DAYOFWEEK | KW_VIEWS
+    | KW_REPL | KW_DUMP | KW_STATUS
+    | KW_CACHE | KW_VIEWS
     | KW_VECTORIZATION
     | KW_SUMMARY
     | KW_OPERATOR
@@ -624,7 +580,6 @@ nonReserved
     | KW_DETAIL
     | KW_WAIT
     | KW_ZONE
-    | KW_TIMESTAMPTZ
     | KW_DEFAULT
     | KW_REOPTIMIZATION
     | KW_RESOURCE | KW_PLAN | KW_PLANS | KW_QUERY_PARALLELISM | KW_ACTIVATE | KW_MOVE | KW_DO

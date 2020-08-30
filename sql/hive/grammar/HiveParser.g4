@@ -1113,14 +1113,14 @@ columnNameColonType
     ;
 
 colType
-    : type
+    : type_db_col
     ;
 
 colTypeList
     : colType (COMMA colType)*
     ;
 
-type
+type_db_col
     : primitiveType
     | listType
     | structType
@@ -1149,7 +1149,7 @@ primitiveType
     ;
 
 listType
-    : KW_ARRAY LESSTHAN type GREATERTHAN
+    : KW_ARRAY LESSTHAN type_db_col GREATERTHAN
     ;
 
 structType
@@ -1157,7 +1157,7 @@ structType
     ;
 
 mapType
-    : KW_MAP LESSTHAN primitiveType COMMA type GREATERTHAN
+    : KW_MAP LESSTHAN primitiveType COMMA type_db_col GREATERTHAN
     ;
 
 unionType
@@ -1215,12 +1215,7 @@ The valuesClause rule below ensures that the parse tree for
 very similar to the tree for "insert into table FOO select a,b from BAR".
 */
 regularBody
-    : insertClause
-    (
-      selectStatement
-      |
-      valuesClause
-    )
+    : insertClause ( selectStatement | valuesClause)
     | selectStatement
     ;
 
@@ -1235,13 +1230,7 @@ atomSelectStatement
     ;
 
 selectStatement
-    : atomSelectStatement
-    setOpSelectStatement?
-    orderByClause?
-    clusterByClause?
-    distributeByClause?
-    sortByClause?
-    limitClause?
+    : atomSelectStatement setOpSelectStatement?  orderByClause?  clusterByClause?  distributeByClause?  sortByClause?  limitClause?
     ;
 
 setOpSelectStatement
@@ -1302,7 +1291,7 @@ deleteStatement
 
 /*SET <columName> = (3 + col2)*/
 columnAssignmentClause
-   : tableOrColumn EQUAL precedencePlusExpression
+   : tableOrColumn EQUAL expression
    ;
 
 /*SET col1 = 5, col2 = (4 + col4), ...*/

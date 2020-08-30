@@ -66,6 +66,7 @@
 			<id>grammarv4</id>
 			<modules>
 				<module>abnf</module>
+				<module>acme</module>
 				<module>agc</module>
 				<module>algol60</module>
 				<module>alpaca</module>
@@ -106,6 +107,7 @@
 				<module>dice</module>
 				<module>dot</module>
 				<module>edif300</module>
+				<module>edn</module>				
 				<module>erlang</module>
 				<module>fasta</module>
 				<module>fen</module>
@@ -147,6 +149,7 @@
 				<module>less</module>
 				<module>logo</module>
 				<module>lolcode</module>
+				<module>loop</module>				
 				<module>lpc</module>
 				<module>lua</module>
 				<module>matlab</module>

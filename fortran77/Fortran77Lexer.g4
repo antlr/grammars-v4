@@ -264,11 +264,6 @@ SEQUENTIAL
    ;
 
 
-ICON
-   : 'ICON' | 'icon'
-   ;
-
-
 LABEL
    : 'LABEL' | 'label'
    ;
@@ -413,10 +408,10 @@ DIV
    : '/'
    ;
 
-
-STAR
+fragment STARCHAR
    : '*'
    ;
+
 
 
 POWER
@@ -620,7 +615,7 @@ fragment FDESC
 
 
 fragment EXPON
-   : ('e' | 'd') (SIGN)? (NUM) +
+   : ('e' | 'E' | 'd' | 'D') (SIGN)? (NUM) +
    ;
 
 
@@ -641,11 +636,13 @@ SCON
    : '\'' ('\'' '\'' | ~ ('\'' | '\n' | '\r') | (('\n' | '\r' ('\n')?) '     ' CONTINUATION) ('\n' | '\r' ('\n')?) '     ' CONTINUATION)* '\''
    ;
 
-
 RCON
-   : '.' (NUM)* (EXPON)?
+   : NUM+ '.' NUM* EXPON?
    ;
 
+ICON
+   : NUM+
+   ;
 
 NAME
    : (('i' | 'f' | 'd' | 'g' | 'e') (NUM) + '.') FDESC | (ALNUM +) (ALNUM)*
@@ -653,7 +650,11 @@ NAME
 
 
 COMMENT
-   : 'c' (~ [\r\n])*
+   : {getCharPositionInLine() == 0}? ('c' | STARCHAR) (~ [\r\n])* EOL
+   ;
+
+STAR
+   : STARCHAR
    ;
 
 
@@ -662,9 +663,13 @@ STRINGLITERAL
    ;
 
 EOL
-   : [\r\n] + 
+   : [\r\n] +
    ;
-    
+
+LINECONT
+   : ((EOL '     $') | (EOL '     +')) -> skip
+   ;
+   
 WS
    : [\t ] + -> skip
    ;

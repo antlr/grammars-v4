@@ -60,11 +60,11 @@ atomjoinSource
     ;
 
 joinSource
-    : atomjoinSource (joinToken joinSourcePart (KW_ON expression {$joinToken.start.getType() != COMMA}? | KW_USING columnParenthesesList {$joinToken.start.getType() != COMMA}?)?)*
+    : atomjoinSource (joinToken joinSourcePart (KW_ON expression | KW_USING columnParenthesesList)?)*
     ;
 
 joinSourcePart
-    : (tableSource | virtualTableSource | subQuerySource | partitionedTableFunction) lateralView
+    : (tableSource | virtualTableSource | subQuerySource | partitionedTableFunction) lateralView*
     ;
 
 uniqueJoinSource
