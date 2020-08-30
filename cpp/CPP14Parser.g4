@@ -100,8 +100,6 @@ postfixExpression:
  add a middle layer to eliminate duplicated function declarations
  */
 
-typeIdOfExpr: Typeid_;
-
 typeIdOfTheTypeId: Typeid_;
 
 expressionList: initializerList;
