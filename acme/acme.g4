@@ -135,7 +135,8 @@ systemStructure
    | portDeclaration
    | portsBlock
    | roleDeclaration
-   | rolesBlock
+   | rolesBlock1
+   | rolesBlock2
    | propertyDeclaration
    | propertiesBlock
    | attachmentsDeclaration
@@ -149,7 +150,7 @@ parse_ElementProtoTypeDescription
    ;
 
 groupDeclaration
-   : GROUP IDENTIFIER (':' lookup_GroupTypeByName (',' lookup_GroupTypeByName)*)? ('=' parse_GroupDescription ';' | ';')
+   : GROUP IDENTIFIER (':' lookup_GroupTypeByName (',' lookup_GroupTypeByName)*)? (('=' parse_GroupDescription ';'?) | ';'?)
    ;
 
 parse_GroupDescription
@@ -157,11 +158,11 @@ parse_GroupDescription
    ;
 
 componentDeclaration
-   : COMPONENT IDENTIFIER (':' lookup_ComponentTypeByName (',' lookup_ComponentTypeByName)*)? ('=' parse_ComponentDescription ';' | ';')
+   : COMPONENT IDENTIFIER (':' lookup_ComponentTypeByName (',' lookup_ComponentTypeByName)*)? (('=' parse_ComponentDescription ';'?) | ';'?)
    ;
 
 componentsBlock
-   : COMPONENTS '{' (IDENTIFIER (':' lookup_ComponentTypeByName (',' lookup_ComponentTypeByName)*)? ('=' parse_ComponentDescription ';' | ';'))* '}' (';')?
+   : COMPONENTS '{' (IDENTIFIER (':' lookup_ComponentTypeByName (',' lookup_ComponentTypeByName)*)? (('=' parse_ComponentDescription ';'?) | ';'?))* '}' (';')?
    ;
 
 parse_ComponentDescription
@@ -169,23 +170,23 @@ parse_ComponentDescription
    ;
 
 connectorDeclaration
-   : CONNECTOR IDENTIFIER (':' lookup_ConnectorTypeByName (',' lookup_ConnectorTypeByName)*)? ('=' parse_ConnectorDescription ';' | ';')
+   : CONNECTOR IDENTIFIER (':' lookup_ConnectorTypeByName (',' lookup_ConnectorTypeByName)*)? (('=' parse_ConnectorDescription ';'?) | ';'?)
    ;
 
 connectorsBlock
-   : CONNECTORS '{' (IDENTIFIER (':' lookup_ConnectorTypeByName (',' lookup_ConnectorTypeByName)*)? ('=' parse_ConnectorDescription ';' | ';'))* '}' (';')?
+   : CONNECTORS '{' (IDENTIFIER (':' lookup_ConnectorTypeByName (',' lookup_ConnectorTypeByName)*)? (('=' parse_ConnectorDescription ';'?) | ';'?))* '}' (';')?
    ;
 
 parse_ConnectorDescription
-   : (NEW lookup_ConnectorTypeByName (',' lookup_ConnectorTypeByName)* | '{' (roleDeclaration | rolesBlock | propertyDeclaration | propertiesBlock | representationDeclaration | parse_DesignRule)* '}') (EXTENDED WITH parse_ConnectorDescription)?
+   : (NEW lookup_ConnectorTypeByName (',' lookup_ConnectorTypeByName)* | '{' (roleDeclaration | rolesBlock1 | rolesBlock2 | propertyDeclaration | propertiesBlock | representationDeclaration | parse_DesignRule)* '}') (EXTENDED WITH parse_ConnectorDescription)?
    ;
 
 portDeclaration
-   : PORT IDENTIFIER (':' lookup_PortTypeByName (',' lookup_PortTypeByName)*)? ('=' parse_PortDescription ';' | ';')
+   : PORT IDENTIFIER (':' lookup_PortTypeByName (',' lookup_PortTypeByName)*)? (('=' parse_PortDescription ';'?) | ';'?)
    ;
 
 portsBlock
-   : PORTS '{' (IDENTIFIER (':' lookup_PortTypeByName (',' lookup_PortTypeByName)*)? ('=' parse_PortDescription ';' | ';'))* '}' (';')?
+   : PORTS '{' (IDENTIFIER (':' lookup_PortTypeByName (',' lookup_PortTypeByName)*)? (('=' parse_PortDescription ';'?) | ';'?))* '}' (';')?
    ;
 
 parse_PortDescription
@@ -193,7 +194,7 @@ parse_PortDescription
    ;
 
 roleDeclaration
-   : ROLE IDENTIFIER (':' lookup_RoleTypeByName (',' lookup_RoleTypeByName)*)? ('=' parse_RoleDescription ';' | ';')
+   : ROLE IDENTIFIER (':' lookup_RoleTypeByName (',' lookup_RoleTypeByName)*)? (('=' parse_RoleDescription ';'?) | ';'?)
    ;
 
 membersBlock
@@ -204,8 +205,12 @@ qualifiedReference
    : IDENTIFIER (('.' IDENTIFIER))*
    ;
 
-rolesBlock
-   : ROLES '{' (IDENTIFIER (':' lookup_RoleTypeByName (',' lookup_RoleTypeByName)*)? ('=' parse_RoleDescription ';' | ';'))* '}' (';')?
+rolesBlock1
+   : ROLES '{' (IDENTIFIER (':' lookup_RoleTypeByName (',' lookup_RoleTypeByName)*)? ('=' parse_RoleDescription ';'? | ';'?))* '}' (';')?
+   ;
+
+rolesBlock2
+   : ROLES '{' (lookup_RoleTypeByName (',' lookup_RoleTypeByName)*)? '}' (';')?
    ;
 
 parse_RoleDescription
@@ -213,7 +218,7 @@ parse_RoleDescription
    ;
 
 attachmentsDeclaration
-   : ((ATTACHMENTS '{' (IDENTIFIER '.' IDENTIFIER 'to' IDENTIFIER '.' IDENTIFIER ('{' (propertyDeclaration | propertiesBlock)* '}')? ';')* '}' (';')?) | (ATTACHMENT IDENTIFIER '.' IDENTIFIER 'to' IDENTIFIER '.' IDENTIFIER ('{' (propertyDeclaration | propertiesBlock)* '}')? ';'))
+   : ((ATTACHMENTS ':'? '{' (IDENTIFIER '.' IDENTIFIER 'to' IDENTIFIER '.' IDENTIFIER ('{' (propertyDeclaration | propertiesBlock)* '}')? ';'?)* '}' (';')?) | (ATTACHMENT IDENTIFIER '.' IDENTIFIER 'to' IDENTIFIER '.' IDENTIFIER ('{' (propertyDeclaration | propertiesBlock)* '}')? ';'))
    ;
 
 propertyDeclaration
