@@ -68,7 +68,7 @@ captureList: capture (Comma capture)* Ellipsis?;
 
 capture: simpleCapture | initcapture;
 
-simpleCapture: Identifier | And Identifier | This;
+simpleCapture: And? Identifier | This;
 
 initcapture: And? Identifier initializer;
 
@@ -78,18 +78,17 @@ lambdaDeclarator:
 
 postfixExpression:
 	primaryExpression
-	| postfixExpression LeftBracket expression RightBracket
-	| postfixExpression LeftBracket bracedInitList RightBracket
+	| postfixExpression LeftBracket (expression | bracedInitList) RightBracket
 	| postfixExpression LeftParen expressionList? RightParen
-	| simpleTypeSpecifier LeftParen expressionList? RightParen
-	| typeNameSpecifier LeftParen expressionList? RightParen
-	| (simpleTypeSpecifier | typeNameSpecifier) bracedInitList
-	| postfixExpression Dot Template? idExpression
-	| postfixExpression Arrow Template? idExpression
-	| postfixExpression Dot pseudoDestructorName
-	| postfixExpression Arrow pseudoDestructorName
-	| postfixExpression PlusPlus
-	| postfixExpression MinusMinus
+	| (simpleTypeSpecifier | typeNameSpecifier) (
+		LeftParen expressionList? RightParen
+		| bracedInitList
+	)
+	| postfixExpression (Dot | Arrow) (
+		Template? idExpression
+		| pseudoDestructorName
+	)
+	| postfixExpression (PlusPlus | MinusMinus)
 	| (
 		Dynamic_cast
 		| Static_cast
@@ -114,12 +113,11 @@ pseudoDestructorName:
 
 unaryExpression:
 	postfixExpression
-	| PlusPlus castExpression
-	| MinusMinus castExpression
-	| unaryOperator castExpression
-	| Sizeof unaryExpression
-	| Sizeof LeftParen theTypeId RightParen
-	| Sizeof Ellipsis LeftParen Identifier RightParen
+	| (PlusPlus | MinusMinus | unaryOperator | Sizeof) unaryExpression
+	| Sizeof (
+		LeftParen theTypeId RightParen
+		| Ellipsis LeftParen Identifier RightParen
+	)
 	| Alignof LeftParen theTypeId RightParen
 	| noExceptExpression
 	| newExpression
@@ -132,6 +130,7 @@ newExpression:
 		newTypeId
 		| (LeftParen theTypeId RightParen)
 	) newInitializer?;
+
 newPlacement: LeftParen expressionList RightParen;
 
 newTypeId: typeSpecifierSeq newDeclarator?;
@@ -150,17 +149,20 @@ newInitializer:
 
 deleteExpression:
 	Doublecolon? Delete (LeftBracket RightBracket)? castExpression;
+
 noExceptExpression: Noexcept LeftParen expression RightParen;
 
 castExpression:
 	unaryExpression
 	| LeftParen theTypeId RightParen castExpression;
 
-pmExpression:
+pointerMemberExpression:
 	castExpression ((DotStar | ArrowStar) castExpression)*;
 
 multiplicativeExpression:
-	pmExpression ((Star | Div | Mod) pmExpression)*;
+	pointerMemberExpression (
+		(Star | Div | Mod) pointerMemberExpression
+	)*;
 
 additiveExpression:
 	multiplicativeExpression (
@@ -262,8 +264,10 @@ condition:
 iterationStatement:
 	While LeftParen condition RightParen statement
 	| Do statement While LeftParen expression RightParen Semi
-	| For LeftParen forInitStatement condition? Semi expression? RightParen statement
-	| For LeftParen forRangeDeclaration Colon forRangeInitializer RightParen statement;
+	| For LeftParen (
+		forInitStatement condition? Semi expression?
+		| forRangeDeclaration Colon forRangeInitializer
+	) RightParen statement;
 
 forInitStatement: expressionStatement | simpleDeclaration;
 
@@ -276,7 +280,7 @@ jumpStatement:
 	(
 		Break
 		| Continue
-		| Return (expression? | bracedInitList)
+		| Return (expression | bracedInitList)?
 		| Goto Identifier
 	) Semi;
 
@@ -328,7 +332,7 @@ declSpecifier:
 	| Typedef
 	| Constexpr;
 
-declSpecifierSeq: (declSpecifier attributeSpecifierSeq?)+;
+declSpecifierSeq: declSpecifier+ attributeSpecifierSeq?;
 
 storageClassSpecifier:
 	Register
@@ -352,10 +356,10 @@ trailingTypeSpecifier:
 	| typeNameSpecifier
 	| cvQualifier;
 
-typeSpecifierSeq: (typeSpecifier attributeSpecifierSeq?)+;
+typeSpecifierSeq: typeSpecifier+ attributeSpecifierSeq?;
 
 trailingTypeSpecifierSeq:
-	(trailingTypeSpecifier attributeSpecifierSeq?)+;
+	trailingTypeSpecifier+ attributeSpecifierSeq?;
 
 simpleTypeSpecifier:
 	nestedNameSpecifier? theTypeName
@@ -383,13 +387,14 @@ theTypeName:
 	| simpleTemplateId;
 
 decltypeSpecifier:
-	Decltype LeftParen expression
-	| Auto RightParen;
+	Decltype LeftParen (expression | Auto) RightParen;
 
 elaboratedTypeSpecifier:
-	classKey attributeSpecifierSeq? nestedNameSpecifier? Identifier
-	| classKey simpleTemplateId
-	| classKey nestedNameSpecifier Template? simpleTemplateId
+	classKey (
+		attributeSpecifierSeq? nestedNameSpecifier? Identifier
+		| simpleTemplateId
+		| nestedNameSpecifier Template? simpleTemplateId
+	)
 	| Enum nestedNameSpecifier? Identifier;
 
 enumName: Identifier;
@@ -405,7 +410,7 @@ enumHead:
 opaqueEnumDeclaration:
 	enumkey attributeSpecifierSeq? Identifier enumbase? Semi;
 
-enumkey: Enum | (Class | Struct)?;
+enumkey: Enum (Class | Struct)?;
 
 enumbase: Colon typeSpecifierSeq;
 
@@ -507,7 +512,7 @@ pointerOperator:
 	(And | AndAnd) attributeSpecifierSeq?
 	| nestedNameSpecifier? Star attributeSpecifierSeq? cvqualifierseq?;
 
-cvqualifierseq: cvQualifier cvqualifierseq?;
+cvqualifierseq: cvQualifier+;
 
 cvQualifier: Const | Volatile;
 
@@ -527,10 +532,12 @@ pointerAbstractDeclarator:
 	| pointerOperator+ noPointerAbstractDeclarator?;
 
 noPointerAbstractDeclarator:
-	noPointerAbstractDeclarator parametersAndQualifiers
+	noPointerAbstractDeclarator (
+		parametersAndQualifiers
+		| noPointerAbstractDeclarator LeftBracket constantExpression? RightBracket
+			attributeSpecifierSeq?
+	)
 	| parametersAndQualifiers
-	| noPointerAbstractDeclarator LeftBracket constantExpression? RightBracket attributeSpecifierSeq
-		?
 	| LeftBracket constantExpression? RightBracket attributeSpecifierSeq?
 	| LeftParen pointerAbstractDeclarator RightParen;
 
@@ -545,16 +552,16 @@ noPointerAbstractPackDeclarator:
 	| Ellipsis;
 
 parameterDeclarationClause:
-	parameterDeclarationList Comma Ellipsis;
+	parameterDeclarationList (Comma? Ellipsis)?;
 
 parameterDeclarationList:
 	parameterDeclaration (Comma parameterDeclaration)*;
 
 parameterDeclaration:
-	| attributeSpecifierSeq? declSpecifierSeq (
-		declarator (Assign initializerClause)?
-		| abstractDeclarator?
-		| abstractDeclarator? Assign initializerClause
+	attributeSpecifierSeq? declSpecifierSeq (
+		(declarator | abstractDeclarator?) (
+			Assign initializerClause
+		)?
 	);
 
 functionDefinition:
@@ -576,7 +583,9 @@ braceOrEqualInitializer:
 initializerClause: assignmentExpression | bracedInitList;
 
 initializerList:
-	initializerClause (Comma initializerClause)* Ellipsis?;
+	initializerClause Ellipsis? (
+		Comma initializerClause Ellipsis?
+	)*;
 
 bracedInitList: LeftBrace (initializerList Comma?)? RightBrace;
 /*Classes*/
@@ -613,8 +622,10 @@ memberDeclaratorList:
 	memberDeclarator (Comma memberDeclarator)*;
 
 memberDeclarator:
-	declarator virtualSpecifierSeq? pureSpecifier?
-	| declarator braceOrEqualInitializer?
+	declarator (
+		virtualSpecifierSeq? pureSpecifier?
+		| braceOrEqualInitializer?
+	)
 	| Identifier? attributeSpecifierSeq? Colon constantExpression;
 
 virtualSpecifierSeq: virtualSpecifier+;
@@ -632,7 +643,7 @@ pureSpecifier:
 baseClause: Colon baseSpecifierList;
 
 baseSpecifierList:
-	baseSpecifier (Comma baseSpecifier)* Ellipsis?;
+	baseSpecifier Ellipsis? (Comma baseSpecifier Ellipsis?)*;
 
 baseSpecifier:
 	attributeSpecifierSeq? (
@@ -659,7 +670,7 @@ conversionDeclarator: pointerOperator conversionDeclarator?;
 constructorInitializer: Colon memInitializerList;
 
 memInitializerList:
-	memInitializer (Comma memInitializer)* Ellipsis?;
+	memInitializer Ellipsis? (Comma memInitializer Ellipsis?)*;
 
 memInitializer:
 	meminitializerid (
@@ -703,13 +714,15 @@ templateId:
 templateName: Identifier;
 
 templateArgumentList:
-	templateArgument (Comma templateArgument)* Ellipsis?;
+	templateArgument Ellipsis? (Comma templateArgument Ellipsis?)*;
 
 templateArgument: theTypeId | constantExpression | idExpression;
 
 typeNameSpecifier:
-	Typename_ nestedNameSpecifier Identifier
-	| Typename_ nestedNameSpecifier Template? simpleTemplateId;
+	Typename_ nestedNameSpecifier (
+		Identifier
+		| Template? simpleTemplateId
+	);
 
 explicitInstantiation: Extern? Template declaration;
 
@@ -729,8 +742,8 @@ handler:
 exceptionDeclaration:
 	attributeSpecifierSeq? typeSpecifierSeq (
 		declarator
-		| abstractDeclarator?
-	)
+		| abstractDeclarator
+	)?
 	| Ellipsis;
 
 throwExpression: Throw assignmentExpression?;
@@ -742,7 +755,7 @@ exceptionSpecification:
 dynamicExceptionSpecification:
 	Throw LeftParen typeIdList? RightParen;
 
-typeIdList: theTypeId (Comma theTypeId)* Ellipsis?;
+typeIdList: theTypeId Ellipsis? (Comma theTypeId Ellipsis?)*;
 
 noeExceptSpecification:
 	Noexcept LeftParen constantExpression RightParen
