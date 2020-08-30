@@ -157,61 +157,47 @@ castExpression:
 	| LeftParen theTypeId RightParen castExpression;
 
 pmExpression:
-	castExpression
-	| pmExpression DotStar castExpression
-	| pmExpression ArrowStar castExpression;
+	castExpression ((DotStar | ArrowStar) castExpression)*;
 
 multiplicativeExpression:
-	pmExpression
-	| multiplicativeExpression Star pmExpression
-	| multiplicativeExpression Div pmExpression
-	| multiplicativeExpression Mod pmExpression;
+	pmExpression ((Star | Div | Mod) pmExpression)*;
 
 additiveExpression:
-	multiplicativeExpression
-	| additiveExpression Plus multiplicativeExpression
-	| additiveExpression Minus multiplicativeExpression;
+	multiplicativeExpression (
+		(Plus | Minus) multiplicativeExpression
+	)*;
 
 shiftExpression:
-	additiveExpression
-	| shiftExpression shiftOperator additiveExpression;
+	additiveExpression (shiftOperator additiveExpression)*;
 
 shiftOperator: RightShift | LeftShift;
 
 relationalExpression:
-	shiftExpression
-	| relationalExpression Less shiftExpression
-	| relationalExpression Greater shiftExpression
-	| relationalExpression LessEqual shiftExpression
-	| relationalExpression GreaterEqual shiftExpression;
+	shiftExpression (
+		(Less | Greater | LessEqual | GreaterEqual) shiftExpression
+	)*;
 
 equalityExpression:
-	relationalExpression
-	| equalityExpression Equal relationalExpression
-	| equalityExpression NotEqual relationalExpression;
+	relationalExpression (
+		(Equal | NotEqual) relationalExpression
+	)*;
 
-andExpression:
-	equalityExpression
-	| andExpression And equalityExpression;
+andExpression: equalityExpression (And equalityExpression)*;
 
-exclusiveOrExpression:
-	andExpression
-	| exclusiveOrExpression Caret andExpression;
+exclusiveOrExpression: andExpression (Caret andExpression)*;
 
 inclusiveOrExpression:
-	exclusiveOrExpression
-	| inclusiveOrExpression Or exclusiveOrExpression;
+	exclusiveOrExpression (Or exclusiveOrExpression)*;
 
 logicalAndExpression:
-	inclusiveOrExpression
-	| logicalAndExpression AndAnd inclusiveOrExpression;
+	inclusiveOrExpression (AndAnd inclusiveOrExpression)*;
 logicalOrExpression:
-	logicalAndExpression
-	| logicalOrExpression OrOr logicalAndExpression;
+	logicalAndExpression (OrOr logicalAndExpression)*;
 
 conditionalExpression:
-	logicalOrExpression
-	| logicalOrExpression Question expression Colon assignmentExpression;
+	logicalOrExpression (
+		Question expression Colon assignmentExpression
+	)?;
 
 assignmentExpression:
 	conditionalExpression
