@@ -1,0 +1,11 @@
+//Global Types
+Property Type returnsValueType = bool;
+Connector Type CallType = {
+    Roles {
+        callerRole;
+        calleeRole;
+    };
+    Property returnsValue : returnsValueType;
+};
+
+
