@@ -145,6 +145,7 @@ CREATE DEFINER=`ctlplane`@`%` TRIGGER `write_key_add` AFTER INSERT ON `sources` 
 BEGIN
 DECLARE i, n INT DEFAULT 0;
 SET n = JSON_LENGTH(CAST(CONVERT(NEW.write_keys USING utf8mb4) AS JSON));
+SET campaign_id = NEW.write_keys->>'$.campaign_id';
 WHILE i < n DO
 INSERT INTO source_id_write_key_mapping (source_id, write_key)
 VALUES (NEW.id, JSON_UNQUOTE(JSON_EXTRACT(CAST(CONVERT(NEW.write_keys USING utf8mb4) AS JSON), CONCAT('$[', i, ']'))))
@@ -199,4 +200,49 @@ RETURN
             SUBSTR(_uuid,  1, 8),
             SUBSTR(_uuid, 20, 4),
             SUBSTR(_uuid, 25) ))
+#end
+#begin
+-- From MariaDB 10.4.3, the JSON_VALID function is automatically used as a CHECK constraint for the JSON data type alias in order to ensure that a valid json document is inserted.
+-- src: https://mariadb.com/kb/en/json_valid/
+CREATE TABLE `global_priv` (
+    `Host` CHAR(60) COLLATE utf8_bin NOT NULL DEFAULT '',
+    `User` CHAR(80) COLLATE utf8_bin NOT NULL DEFAULT '',
+    `Privilege` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '{}' CHECK (json_valid(`Privilege`)),
+    PRIMARY KEY (`Host`,`User`)
+) ENGINE=Aria DEFAULT CHARSET=utf8 COLLATE=utf8_bin PAGE_CHECKSUM=1 COMMENT='Users and global privileges';
+#end
+#begin
+-- https://dev.mysql.com/doc/refman/8.0/en/json-validation-functions.html#json-validation-functions-constraints
+CREATE TABLE geo (
+    coordinate JSON,
+    CHECK(
+        JSON_SCHEMA_VALID(
+           '{
+               "type":"object",
+               "properties":{
+                 "latitude":{"type":"number", "minimum":-90, "maximum":90},
+                 "longitude":{"type":"number", "minimum":-180, "maximum":180}
+               },
+               "required": ["latitude", "longitude"]
+           }',
+           coordinate
+        )
+    )
+);
+#end
+#begin
+CREATE TABLE `tab1` (
+  f4 FLOAT4,
+  f8 FLOAT8,
+  i1 INT1,
+  i2 INT2,
+  i3 INT3,
+  i4 INT4,
+  i8 INT8,
+  lvb LONG VARBINARY,
+  lvc LONG VARCHAR,
+  lvcfull LONG BINARY CHARSET utf8 COLLATE utf8_bin,
+  l LONG,
+  mi MIDDLEINT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 #end
