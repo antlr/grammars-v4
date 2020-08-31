@@ -769,6 +769,9 @@ IDENTIFIER
    : [a-zA-Z] [a-zA-Z0-9_-]*
    ;
 
+COMMENT
+    : '//' ~ [\r\n]* ->skip
+    ;
 WS
    : [ \r\n\t]+ -> skip
    ;
