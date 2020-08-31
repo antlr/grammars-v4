@@ -17,7 +17,16 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>ANTLRv3.g4</grammars>
+					<grammars>ANTLRv3Parser.g4</grammars>
+					<includes>
+						<include>ANTLRv3Lexer.g4</include>
+						<include>ANTLRv3Parser.g4</include>
+					</includes>
+					<arguments>
+						<argument>-package</argument>
+						<argument>org.antlr.parser.antlr4</argument>
+					</arguments>
+					<outputDirectory>${project.build.directory}/generated-sources/antlr4/org/antlr/parser/antlr4</outputDirectory>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -38,6 +47,7 @@
 					<showTree>false</showTree>
 					<entryPoint>grammarDef</entryPoint>
 					<grammarName>ANTLRv3</grammarName>
+					<packageName>org.antlr.parser.antlr4</packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
