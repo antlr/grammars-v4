@@ -66,6 +66,7 @@
 			<id>grammarv4</id>
 			<modules>
 				<module>abnf</module>
+				<module>acme</module>
 				<module>agc</module>
 				<module>algol60</module>
 				<module>alpaca</module>
@@ -107,6 +108,7 @@
 				<module>dice</module>
 				<module>dot</module>
 				<module>edif300</module>
+				<module>edn</module>				
 				<module>erlang</module>
 				<module>fasta</module>
 				<module>fen</module>
@@ -131,13 +133,15 @@
 				<module>inf</module>
 				<module>informix</module>
 				<module>iri</module>
+                <module>iso8601</module>
 				<module>istc</module>
 				<module>janus</module>
                 <module>java</module>
 				<module>javadoc</module>
 				<module>javascript</module>
 				<module>jpa</module>
-				<module>json</module>
+                <module>json</module>
+                <module>json5</module>
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kuka</module>
@@ -146,6 +150,7 @@
 				<module>less</module>
 				<module>logo</module>
 				<module>lolcode</module>
+				<module>loop</module>				
 				<module>lpc</module>
 				<module>lua</module>
 				<module>matlab</module>
