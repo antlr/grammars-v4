@@ -295,7 +295,7 @@ bindingsMapDeclaration
    ;
 
 bindingDeclaration
-   : (IDENTIFIER '.')? IDENTIFIER 'to' (IDENTIFIER '.')? IDENTIFIER ('{' (propertyDeclaration | propertiesBlock)* '}')? ';'
+   : (IDENTIFIER '.')? IDENTIFIER 'to' (IDENTIFIER '.')? IDENTIFIER ('{' (propertyDeclaration | propertiesBlock)* '}')? ';'?
    ;
 
 designAnalysisDeclaration
@@ -481,31 +481,31 @@ sequence
    ;
 
 ANALYSIS
-   : 'Analysis'
+   : A N A L Y S I S
    ;
 
 AND
-   : 'And'
+   : A N D
    ;
 
 ANY
-   : 'Any'
+   : A N Y
    ;
 
 ATTACHMENT
-   : 'Attachment'
+   : A T T A C H M E N T
    ;
 
 ATTACHMENTS
-   : 'Attachments'
+   : A T T A C H M E N T S
    ;
 
 ATTACHEDPORTS
-   : 'AttachedPorts'
+   : A T T A C H E D P O R T S
    ;
 
 ATTACHEDROLES
-   : 'AttachedRoles'
+   : A T T A C H E D R O L E S
    ;
 
 BANG
@@ -513,55 +513,55 @@ BANG
    ;
 
 BINDINGS
-   : 'Bindings'
+   : B I N D I N G S
    ;
 
 COLLECT
-   : 'Collect'
+   : C O L L E C T
    ;
 
 COMPONENT
-   : 'Component'
+   : C O M P O N E N T
    ;
 
 COMPONENTS
-   : 'Components'
+   : C O M P O N E N T S
    ;
 
 CONNECTOR
-   : 'Connector'
+   : C O N N E C T O R
    ;
 
 CONNECTORS
-   : 'Connectors'
+   : C O N N E C T O R S
    ;
 
 DESIGN
-   : 'Design'
+   : D E S I G N
    ;
 
 ELEMENT
-   : 'Element'
+   : E L E M E N T
    ;
 
 ENUM
-   : 'Enum'
+   : E N U M
    ;
 
 EXTENDED
-   : 'Extended'
+   : E X T E N D E D
    ;
 
 EXTENDS
-   : 'Extends'
+   : E X T E N D S
    ;
 
 EXTERNAL
-   : 'External'
+   : E X T E R N A L
    ;
 
 EXISTS
-   : 'Exists'
+   : E X I S T S
    ;
 
 EQ
@@ -569,19 +569,19 @@ EQ
    ;
 
 FAMILY
-   : 'Family'
+   : F A M I L Y
    ;
 
 FORALL
-   : 'Forall'
+   : F O R A L L
    ;
 
 FLOAT
-   : 'Float'
+   : F L O A T
    ;
 
 GROUP
-   : 'Group'
+   : G R O U P
    ;
 
 GE
@@ -589,31 +589,31 @@ GE
    ;
 
 HEURISTIC
-   : 'Heuristic'
+   : H E U R I S T I C
    ;
 
 IFF
-   : 'Iff'
+   : I F F
    ;
 
 IMPORT
-   : 'Import'
+   : I M P O R T
    ;
 
 IN
-   : 'In'
+   : I N
    ;
 
 INT
-   : 'Int'
+   : I N T
    ;
 
 INVARIANT
-   : 'Invariant'
+   : I N V A R I A N T
    ;
 
 IMPLIES
-   : 'Implies'
+   : I M P L I E S
    ;
 
 LE
@@ -625,11 +625,11 @@ NE
    ;
 
 NEW
-   : 'New'
+   : N E W
    ;
 
 MEMBERS
-   : 'Members'
+   : M E M B E R S
    ;
 
 MINUS
@@ -637,7 +637,7 @@ MINUS
    ;
 
 OR
-   : 'Or'
+   : 'or'
    ;
 
 PLUS
@@ -645,67 +645,67 @@ PLUS
    ;
 
 PORT
-   : 'Port'
+   : P O R T
    ;
 
 PORTS
-   : 'Ports'
+   : P O R T S
    ;
 
 PROPERTY
-   : 'Property'
+   : P R O P E R T Y
    ;
 
 PROPERTIES
-   : 'Properties'
+   : P R O P E R T I E S
    ;
 
 PROPBEGIN
-   : 'PropBegin'
+   : P R O P B E G I N
    ;
 
 PROPEND
-   : 'Propend'
+   : P R O P E N D
    ;
 
 RECORD
-   : 'Record'
+   : R E C O R D
    ;
 
 REPRESENTATION
-   : 'Representation'
+   : R E P R E S E N T A T I O N
    ;
 
 REM
-   : 'Rem'
+   : R E M
    ;
 
 REPRESENTATIONS
-   : 'Representations'
+   : R E P R E S E N T A T I O N S
    ;
 
 ROLE
-   : 'Role'
+   : R O L E
    ;
 
 ROLES
-   : 'Roles'
+   : R O L E S
    ;
 
 SEQUENCE
-   : 'Sequence'
+   : S E Q U E N C E
    ;
 
 SELECT
-   : 'Select'
+   : S E L E C T
    ;
 
 SET
-   : 'Set'
+   : S E T
    ;
 
 SET_DECLARE
-   : 'SetDeclare'
+   : S E T '_' D E C L A R E
    ;
 
 SLASH
@@ -717,35 +717,139 @@ STAR
    ;
 
 STRING
-   : 'String'
+   : S T R I N G
    ;
 
 STYLE
-   : 'Style'
+   : S T Y L E
    ;
 
 SYSTEM
-   : 'System'
+   : S Y S T E M
    ;
 
 TYPE
-   : 'Type'
+   : T Y P E
    ;
 
 UNIQUE
-   : 'Unique'
+   : U N I Q U E
    ;
 
 WITH
-   : 'With'
+   : W I T H
    ;
 
 TRUE
-   : 'True'
+   : T R U E
    ;
 
 FALSE
-   : 'False'
+   : F A L S E
+   ;
+
+fragment A
+   : ('a' | 'A')
+   ;
+
+fragment B
+   : ('b' | 'B')
+   ;
+
+fragment C
+   : ('c' | 'C')
+   ;
+
+fragment D
+   : ('d' | 'D')
+   ;
+
+fragment E
+   : ('e' | 'E')
+   ;
+
+fragment F
+   : ('f' | 'F')
+   ;
+
+fragment G
+   : ('g' | 'G')
+   ;
+
+fragment H
+   : ('h' | 'H')
+   ;
+
+fragment I
+   : ('i' | 'I')
+   ;
+
+fragment J
+   : ('j' | 'J')
+   ;
+
+fragment K
+   : ('k' | 'K')
+   ;
+
+fragment L
+   : ('l' | 'L')
+   ;
+
+fragment M
+   : ('m' | 'M')
+   ;
+
+fragment N
+   : ('n' | 'N')
+   ;
+
+fragment O
+   : ('o' | 'O')
+   ;
+
+fragment P
+   : ('p' | 'P')
+   ;
+
+fragment Q
+   : ('q' | 'Q')
+   ;
+
+fragment R
+   : ('r' | 'R')
+   ;
+
+fragment S
+   : ('s' | 'S')
+   ;
+
+fragment T
+   : ('t' | 'T')
+   ;
+
+fragment U
+   : ('u' | 'U')
+   ;
+
+fragment V
+   : ('v' | 'V')
+   ;
+
+fragment W
+   : ('w' | 'W')
+   ;
+
+fragment X
+   : ('x' | 'X')
+   ;
+
+fragment Y
+   : ('y' | 'Y')
+   ;
+
+fragment Z
+   : ('z' | 'Z')
    ;
 
 BOOLEAN
@@ -767,6 +871,10 @@ STRING_LITERAL
 
 IDENTIFIER
    : [a-zA-Z] [a-zA-Z0-9_-]*
+   ;
+
+COMMENT
+   : '//' ~ [\r\n]* -> skip
    ;
 
 WS
