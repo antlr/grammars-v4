@@ -31,453 +31,476 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar acme;
 
-design
-   : (IMPORT (filename ';' | STRING_LITERAL ';'))* (typeDeclaration | familyDeclaration | designAnalysisDeclaration | propertyDeclaration | propertiesBlock | systemDeclaration)* EOF
+acmeCompUnit
+   : (acmeImportDeclaration)* (acmeSystemDeclaration | acmeFamilyDeclaration | acmeDesignDeclaration)+
+   ;
+
+acmeImportDeclaration
+   : IMPORT (filename | stringLiteral) SEMICOLON
+   ;
+
+stringLiteral
+   : STRING_LITERAL
    ;
 
 filename
    : ('$' | '%')? IDENTIFIER ((('.' | ':' | '-' | '+' | '\\' | '\\\\' | '/' | '$' | '%'))+ IDENTIFIER)*
    ;
 
-familyDeclaration
-   : (FAMILY | STYLE) IDENTIFIER (';' | ('=' familyBody (';')?) | (EXTENDS lookup_SystemTypeByName (',' lookup_SystemTypeByName)* WITH familyBody (';')?))
-   ;
-
-familyBody
-   : '{' '}'
-   | '{' (typeDeclaration | systemStructure)+ '}'
-   ;
-
-typeDeclaration
-   : elementTypeDeclaration
-   | propertyTypeDeclaration
-   ;
-
-elementTypeDeclaration
-   : elementProtoTypeDeclaration
-   | componentTypeDeclaration
-   | groupTypeDeclaration
-   | connectorTypeDeclaration
-   | portTypeDeclaration
-   | roleTypeDeclaration
-   ;
-
-elementProtoTypeDeclaration
-   : (ELEMENT TYPE IDENTIFIER ('=' parse_ElementProtoTypeDescription (';')? | ';') | ELEMENT TYPE IDENTIFIER EXTENDS lookup_ComponentTypeByName (',' lookup_ComponentTypeByName)* WITH parse_ElementProtoTypeDescription (';')?)
-   ;
-
-componentTypeDeclaration
-   : (COMPONENT TYPE IDENTIFIER ('=' parse_ComponentDescription (';')? | ';') | COMPONENT TYPE IDENTIFIER EXTENDS lookup_ComponentTypeByName (',' lookup_ComponentTypeByName)* WITH parse_ComponentDescription (';')?)
-   ;
-
-groupTypeDeclaration
-   : (GROUP TYPE IDENTIFIER ('=' parse_GroupDescription (';')? | ';') | GROUP TYPE IDENTIFIER EXTENDS lookup_GroupTypeByName (',' lookup_GroupTypeByName)* WITH parse_GroupDescription (';')?)
-   ;
-
-connectorTypeDeclaration
-   : (CONNECTOR TYPE IDENTIFIER ('=' parse_ConnectorDescription (';')? | ';') | CONNECTOR TYPE IDENTIFIER EXTENDS lookup_ConnectorTypeByName (',' lookup_ConnectorTypeByName)* WITH parse_ConnectorDescription (';')?)
-   ;
-
-portTypeDeclaration
-   : (PORT TYPE IDENTIFIER ('=' parse_PortDescription (';')? | ';') | PORT TYPE IDENTIFIER EXTENDS lookup_PortTypeByName (',' lookup_PortTypeByName)* WITH parse_PortDescription (';')?)
-   ;
-
-roleTypeDeclaration
-   : (ROLE TYPE IDENTIFIER ('=' parse_RoleDescription (';')? | ';') | ROLE TYPE IDENTIFIER EXTENDS lookup_RoleTypeByName (',' lookup_RoleTypeByName)* WITH parse_RoleDescription (';')?)
-   ;
-
-lookup_SystemTypeByName
+identifier
    : IDENTIFIER
    ;
 
-lookup_ComponentTypeByName
-   : (IDENTIFIER '.')? IDENTIFIER
+codeLiteral
+   : STRING_LITERAL
    ;
 
-lookup_GroupTypeByName
-   : (IDENTIFIER '.')? IDENTIFIER
+acmeFamilyDeclaration
+   : (FAMILY | STYLE) identifier (SEMICOLON | (ASSIGN acmeFamilyBody (SEMICOLON)?) | (EXTENDS acmeFamilyRef (COMMA acmeFamilyRef)* (SEMICOLON | (WITH acmeFamilyBody (SEMICOLON)?))))
    ;
 
-lookup_ConnectorTypeByName
-   : (IDENTIFIER '.')? IDENTIFIER
+acmeFamilyBody
+   : LBRACE (((PUBLIC | PRIVATE)? (FINAL | ABSTRACT)? (acmePortTypeDeclaration | acmeRoleTypeDeclaration | acmeComponentTypeDeclaration | acmeConnectorTypeDeclaration | acmeGenericElementTypeDeclaration | acmePropertyTypeDeclaration | acmeGroupTypeDeclaration)) | (acmeDesignAnalysisDeclaration | designRule | acmePortDeclaration | acmeRoleDeclaration | acmeComponentDeclaration | acmeConnectorDeclaration | acmePropertyDeclaration | acmeGroupDeclaration | acmeAttachmentDeclaration))* RBRACE
    ;
 
-lookup_PortTypeByName
-   : (IDENTIFIER '.')? IDENTIFIER
+acmeSystemDeclaration
+   : SYSTEM identifier (COLON acmeFamilyRef (COMMA acmeFamilyRef)*)? ((SEMICOLON) | (ASSIGN ((acmeSystemBody (SEMICOLON)?) | (NEW acmeFamilyInstantiationRef (COMMA acmeFamilyInstantiationRef)* ((SEMICOLON) | (EXTENDED WITH acmeSystemBody (SEMICOLON)?))))))
    ;
 
-lookup_RoleTypeByName
-   : (IDENTIFIER '.')? IDENTIFIER
+acmeSystemBody
+   : LBRACE (acmePropertyDeclaration | acmeComponentDeclaration | acmeConnectorDeclaration | acmeAttachmentDeclaration | acmeGroupDeclaration | designRule)* RBRACE
    ;
 
-lookup_PropertyTypeByName
-   : (IDENTIFIER '.')? IDENTIFIER
+acmeDesignDeclaration
+   : DESIGN
    ;
 
-lookup_arbitraryTypeByName
-   : (propertyTypeDescription | SYSTEM | COMPONENT | GROUP | CONNECTOR | PORT | ROLE | PROPERTY | REPRESENTATION | nonPropertySetTypeExpression)
+acmeComponentTypeRef
+   : identifier (DOT identifier)?
    ;
 
-systemDeclaration
-   : SYSTEM IDENTIFIER (':' lookup_SystemTypeByName (',' lookup_SystemTypeByName)*)? ('=' systemBody (';')? | ';')
+acmeComponentInstantiatedTypeRef
+   : identifier (DOT identifier)?
    ;
 
-systemBody
-   : (NEW lookup_SystemTypeByName (',' lookup_SystemTypeByName)* | '{' '}' | '{' (systemStructure)+ '}') (EXTENDED WITH systemBody)?
+acmeConnectorTypeRef
+   : identifier (DOT identifier)?
    ;
 
-systemStructure
-   : componentDeclaration
-   | componentsBlock
-   | groupDeclaration
-   | connectorDeclaration
-   | connectorsBlock
-   | portDeclaration
-   | portsBlock
-   | roleDeclaration
-   | rolesBlock1
-   | rolesBlock2
-   | propertyDeclaration
-   | propertiesBlock
-   | attachmentsDeclaration
-   | representationDeclaration
-   | designAnalysisDeclaration
-   | parse_DesignRule
+acmeConnectorInstantiatedTypeRef
+   : identifier (DOT identifier)?
    ;
 
-parse_ElementProtoTypeDescription
-   : '{' (propertyDeclaration | propertiesBlock | representationDeclaration)* '}'
+acmePortTypeRef
+   : identifier (DOT identifier)?
    ;
 
-groupDeclaration
-   : GROUP IDENTIFIER (':' lookup_GroupTypeByName (',' lookup_GroupTypeByName)*)? (('=' parse_GroupDescription ';'?) | ';'?)
+acmePortInstantiatedTypeRef
+   : identifier (DOT identifier)?
    ;
 
-parse_GroupDescription
-   : (NEW lookup_GroupTypeByName (',' lookup_GroupTypeByName)* | '{' (membersBlock | propertyDeclaration | propertiesBlock | parse_DesignRule)* '}') (EXTENDED WITH parse_GroupDescription)?
+acmeGroupTypeRef
+   : identifier (DOT identifier)?
    ;
 
-componentDeclaration
-   : COMPONENT IDENTIFIER (':' lookup_ComponentTypeByName (',' lookup_ComponentTypeByName)*)? (('=' parse_ComponentDescription ';'?) | ';'?)
+acmeGroupInstantiatedTypeRef
+   : identifier (DOT identifier)?
    ;
 
-componentsBlock
-   : COMPONENTS '{' (IDENTIFIER (':' lookup_ComponentTypeByName (',' lookup_ComponentTypeByName)*)? (('=' parse_ComponentDescription ';'?) | ';'?))* '}' (';')?
+acmeRoleTypeRef
+   : identifier (DOT identifier)?
    ;
 
-parse_ComponentDescription
-   : (NEW lookup_ComponentTypeByName (',' lookup_ComponentTypeByName)* | '{' (portDeclaration | portsBlock | propertyDeclaration | propertiesBlock | representationDeclaration | parse_DesignRule)* '}') (EXTENDED WITH parse_ComponentDescription)?
+acmeRoleInstantiatedTypeRef
+   : identifier (DOT identifier)?
    ;
 
-connectorDeclaration
-   : CONNECTOR IDENTIFIER (':' lookup_ConnectorTypeByName (',' lookup_ConnectorTypeByName)*)? (('=' parse_ConnectorDescription ';'?) | ';'?)
+acmeViewTypeRef
+   : identifier (DOT identifier)?
    ;
 
-connectorsBlock
-   : CONNECTORS '{' (IDENTIFIER (':' lookup_ConnectorTypeByName (',' lookup_ConnectorTypeByName)*)? (('=' parse_ConnectorDescription ';'?) | ';'?))* '}' (';')?
+acmeViewInstantiatedTypeRef
+   : identifier (DOT identifier)?
    ;
 
-parse_ConnectorDescription
-   : (NEW lookup_ConnectorTypeByName (',' lookup_ConnectorTypeByName)* | '{' (roleDeclaration | rolesBlock1 | rolesBlock2 | propertyDeclaration | propertiesBlock | representationDeclaration | parse_DesignRule)* '}') (EXTENDED WITH parse_ConnectorDescription)?
+acmeFamilyRef
+   : identifier (DOT identifier)?
    ;
 
-portDeclaration
-   : PORT IDENTIFIER (':' lookup_PortTypeByName (',' lookup_PortTypeByName)*)? (('=' parse_PortDescription ';'?) | ';'?)
+acmeFamilyInstantiationRef
+   : identifier
    ;
 
-portsBlock
-   : PORTS '{' (IDENTIFIER (':' lookup_PortTypeByName (',' lookup_PortTypeByName)*)? (('=' parse_PortDescription ';'?) | ';'?))* '}' (';')?
+acmeElementTypeRef
+   : identifier (DOT identifier)?
    ;
 
-parse_PortDescription
-   : (NEW lookup_PortTypeByName (',' lookup_PortTypeByName)* | '{' (propertyDeclaration | propertiesBlock | representationDeclaration | parse_DesignRule)* '}') (EXTENDED WITH parse_PortDescription)?
+acmePropertyTypeDeclarationRef
+   : identifier (DOT identifier)?
    ;
 
-roleDeclaration
-   : ROLE IDENTIFIER (':' lookup_RoleTypeByName (',' lookup_RoleTypeByName)*)? (('=' parse_RoleDescription ';'?) | ';'?)
+acmeInstanceRef
+   : IDENTIFIER (DOT IDENTIFIER)*
    ;
 
-membersBlock
-   : MEMBERS '{' (qualifiedReference (';'))* '}' (';')?
+acmeGenericElementTypeDeclaration
+   : ELEMENT TYPE identifier ((SEMICOLON) | ((ASSIGN acmeGenericElementBody (SEMICOLON)?) | (EXTENDS acmeElementTypeRef (COMMA acmeElementTypeRef)* ((SEMICOLON) | (WITH acmeGenericElementBody (SEMICOLON)?)))))
    ;
 
-qualifiedReference
-   : IDENTIFIER (('.' IDENTIFIER))*
+acmeGenericElementBody
+   : LBRACE (acmePropertyDeclaration | designRule)* RBRACE
    ;
 
-rolesBlock1
-   : ROLES '{' (IDENTIFIER (':' lookup_RoleTypeByName (',' lookup_RoleTypeByName)*)? ('=' parse_RoleDescription ';'? | ';'?))* '}' (';')?
+acmeGroupTypeDeclaration
+   : GROUP TYPE identifier ((SEMICOLON) | ((ASSIGN acmeGroupBody (SEMICOLON)?) | (EXTENDS acmeGroupTypeRef (COMMA acmeGroupTypeRef)* ((SEMICOLON) | (WITH acmeGroupBody (SEMICOLON)?)))))
    ;
 
-rolesBlock2
-   : ROLES '{' (lookup_RoleTypeByName (',' lookup_RoleTypeByName)*)? '}' (';')?
+acmeGroupDeclaration
+   : GROUP identifier (COLON acmeGroupTypeRef (COMMA acmeGroupTypeRef)*)? ((SEMICOLON) | ASSIGN ((acmeGroupBody (SEMICOLON)?) | (NEW acmeGroupInstantiatedTypeRef (COMMA acmeGroupInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmeGroupBody (SEMICOLON)?)))))
    ;
 
-parse_RoleDescription
-   : (NEW lookup_RoleTypeByName (',' lookup_RoleTypeByName)* | '{' (propertyDeclaration | propertiesBlock | representationDeclaration | parse_DesignRule)* '}') (EXTENDED WITH parse_RoleDescription)?
+acmeGroupBody
+   : LBRACE (acmeMembersBlock | acmePropertyDeclaration | designRule)* RBRACE
    ;
 
-attachmentsDeclaration
-   : ((ATTACHMENTS ':'? '{' (IDENTIFIER '.' IDENTIFIER 'to' IDENTIFIER '.' IDENTIFIER ('{' (propertyDeclaration | propertiesBlock)* '}')? ';'?)* '}' (';')?) | (ATTACHMENT IDENTIFIER '.' IDENTIFIER 'to' IDENTIFIER '.' IDENTIFIER ('{' (propertyDeclaration | propertiesBlock)* '}')? ';'))
+acmeMembersBlock
+   : MEMBERS LBRACE (acmeInstanceRef (COMMA acmeInstanceRef)*)? RBRACE (SEMICOLON)?
    ;
 
-propertyDeclaration
-   : PROPERTY parse_PropertyDescription ';'
+acmePortTypeDeclaration
+   : PORT TYPE identifier ((SEMICOLON) | ((ASSIGN acmePortBody (SEMICOLON)?) | (EXTENDS acmePortTypeRef (COMMA acmePortTypeRef)* ((SEMICOLON) | (WITH acmePortBody (SEMICOLON)?)))))
    ;
 
-propertiesBlock
-   : PROPERTIES '{' (parse_PropertyDescription (';' parse_PropertyDescription | ';')*)? '}' (';')?
+acmePortDeclaration
+   : PORT identifier (COLON acmePortTypeRef (COMMA acmePortTypeRef)*)? ((SEMICOLON)? | (ASSIGN ((acmePortBody (SEMICOLON)?) | (NEW acmePortInstantiatedTypeRef (COMMA acmePortInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmePortBody (SEMICOLON)?))))))
    ;
 
-parse_PropertyDescription
-   : (PROPERTY)? IDENTIFIER (':' propertyTypeDescription)? ('=' propertyValueDeclaration)? (PROPBEGIN parse_PropertyDescription (';' parse_PropertyDescription | ';')* PROPEND | PROPBEGIN PROPEND)?
+acmePortBody
+   : LBRACE (acmePropertyDeclaration | designRule | acmeRepresentationDeclaration)* RBRACE
    ;
 
-propertyTypeDeclaration
-   : PROPERTY TYPE IDENTIFIER ('=' (INT ';' | FLOAT ';' | STRING ';' | BOOLEAN ';' | ENUM ('{' IDENTIFIER (',' IDENTIFIER)* '}')? ';' | SET ('{' '}')? ';' | SET '{' propertyTypeDescription '}' ';' | SEQUENCE ('<' '>')? ';' | SEQUENCE '<' propertyTypeDescription '>' ';' | RECORD '[' parse_RecordFieldDescription (';' parse_RecordFieldDescription | ';')* ']' ';' | RECORD ('[' ']')? ';' | IDENTIFIER ';'))
+acmeRoleTypeDeclaration
+   : ROLE TYPE identifier ((SEMICOLON) | ((ASSIGN acmeRoleBody (SEMICOLON)?) | (EXTENDS acmeRoleTypeRef (COMMA acmeRoleTypeRef)* ((SEMICOLON) | (WITH acmeRoleBody (SEMICOLON)?)))))
    ;
 
-propertyTypeDescription
-   : ANY
-   | INT
-   | FLOAT
-   | STRING
-   | BOOLEAN
-   | SET ('{' (propertyTypeDescription)? '}')?
-   | SEQUENCE ('<' (propertyTypeDescription)? '>')?
-   | RECORD '[' parse_RecordFieldDescription (';' parse_RecordFieldDescription | ';')* ']'
-   | RECORD ('[' ']')?
-   | ENUM ('{' IDENTIFIER (',' IDENTIFIER)* '}')?
-   | ENUM ('{' '}')?
-   | lookup_PropertyTypeByName
+acmeRoleDeclaration
+   : ROLE identifier (COLON acmeRoleTypeRef (COMMA acmeRoleTypeRef)*)? ((SEMICOLON) | (ASSIGN ((acmeRoleBody (SEMICOLON)?) | (NEW acmeRoleInstantiatedTypeRef (COMMA acmeRoleInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmeRoleBody (SEMICOLON)?))))))
    ;
 
-parse_RecordFieldDescription
-   : IDENTIFIER (',' IDENTIFIER)* (':' propertyTypeDescription)?
+acmeRoleBody
+   : LBRACE (acmePropertyDeclaration | designRule | acmeRepresentationDeclaration)* RBRACE
    ;
 
-propertyValueDeclaration
+acmeComponentTypeDeclaration
+   : COMPONENT TYPE identifier ((SEMICOLON) | ((ASSIGN acmeComponentBody (SEMICOLON)?) | (EXTENDS acmeComponentTypeRef (COMMA acmeComponentTypeRef)* ((SEMICOLON) | (WITH acmeComponentBody (SEMICOLON)?)))))
+   ;
+
+acmeComponentDeclaration
+   : COMPONENT identifier (COLON acmeComponentTypeRef (COMMA acmeComponentTypeRef)*)? ((SEMICOLON) | (ASSIGN ((acmeComponentBody (SEMICOLON)?) | (NEW acmeComponentInstantiatedTypeRef (COMMA acmeComponentInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmeComponentBody (SEMICOLON)?))))))
+   ;
+
+acmeComponentBody
+   : LBRACE (acmePropertyDeclaration | acmePortDeclaration | designRule | acmeRepresentationDeclaration)* RBRACE
+   ;
+
+acmeConnectorTypeDeclaration
+   : CONNECTOR TYPE identifier ((SEMICOLON) | ((ASSIGN acmeConnectorBody (SEMICOLON)?) | (EXTENDS acmeConnectorTypeRef (COMMA acmeConnectorTypeRef)* ((SEMICOLON) | (WITH acmeConnectorBody (SEMICOLON)?)))))
+   ;
+
+acmeConnectorDeclaration
+   : (CONNECTOR identifier (COLON acmeConnectorTypeRef (COMMA acmeConnectorTypeRef)*)? ((SEMICOLON) | (ASSIGN ((acmeConnectorBody (SEMICOLON)?) | (NEW acmeConnectorInstantiatedTypeRef (COMMA acmeConnectorInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmeConnectorBody (SEMICOLON)?)))))))
+   ;
+
+acmeConnectorBody
+   : LBRACE (acmePropertyDeclaration | acmeRoleDeclaration | designRule | acmeRepresentationDeclaration)* RBRACE
+   ;
+
+acmeRepresentationDeclaration
+   : REPRESENTATION (IDENTIFIER ASSIGN)? LBRACE acmeSystemDeclaration (acmeBindingsMapDeclaration)? RBRACE (SEMICOLON)?
+   ;
+
+acmeBindingsMapDeclaration
+   : BINDINGS LBRACE (acmeBindingDeclaration)* RBRACE (SEMICOLON)?
+   ;
+
+acmeBindingDeclaration
+   : acmeInstanceRef TO acmeInstanceRef (LBRACE acmePropertyDeclaration acmePropertyBlock RBRACE)? SEMICOLON
+   ;
+
+acmeAttachmentDeclaration
+   : ATTACHMENT acmeInstanceRef TO acmeInstanceRef SEMICOLON
+   ;
+
+acmePropertyDeclaration
+   : PROPERTY identifier (COLON acmePropertyTypeRef)? ((ASSIGN acmePropertyValueDeclaration) | (CONTAINASSIGN acmePropertyValueDeclaration))? (acmePropertyBlock)? SEMICOLON
+   ;
+
+acmePropertyValueDeclaration
    : INTEGER_LITERAL
    | FLOATING_POINT_LITERAL
    | STRING_LITERAL
    | FALSE
    | TRUE
-   | acmeSetValue
-   | acmeSequenceValue
-   | acmeRecordValue
-   | IDENTIFIER
+   | acmePropertySet
+   | acmePropertyRecord
+   | acmePropertySequence
+   | enumidentifier
    ;
 
-acmeSetValue
-   : '{' '}'
-   | '{' propertyValueDeclaration (',' propertyValueDeclaration)* '}'
+enumidentifier
+   : IDENTIFIER
    ;
 
-acmeSequenceValue
-   : '<' '>'
-   | '<' propertyValueDeclaration (',' propertyValueDeclaration)* '>'
+acmePropertyElement
+   : ((IDENTIFIER ('.' IDENTIFIER)*) | acmePropertyCompoundElement)
    ;
 
-acmeRecordValue
-   : ('[' recordFieldValue (';' recordFieldValue | ';')* ']' | '[' ']')
+acmePropertyCompoundElement
+   : (acmePropertySet | acmePropertyRecord | acmePropertySequence)
    ;
 
-recordFieldValue
-   : IDENTIFIER (':' propertyTypeDescription)? '=' propertyValueDeclaration
+acmePropertySet
+   : LBRACE (acmePropertyValueDeclaration (COMMA acmePropertyValueDeclaration)*)? RBRACE
    ;
 
-representationDeclaration
-   : REPRESENTATION (IDENTIFIER '=')? '{' systemDeclaration (bindingsMapDeclaration)? '}' (';')?
+acmePropertyRecordEntry
+   : identifier (COLON acmePropertyTypeRef)? ASSIGN acmePropertyValueDeclaration
    ;
 
-bindingsMapDeclaration
-   : BINDINGS '{' (bindingDeclaration)* '}' (';')?
+acmePropertyRecord
+   : LBRACKET (acmePropertyRecordEntry (SEMICOLON acmePropertyRecordEntry)* (SEMICOLON)?)? RBRACKET
    ;
 
-bindingDeclaration
-   : (IDENTIFIER '.')? IDENTIFIER 'to' (IDENTIFIER '.')? IDENTIFIER ('{' (propertyDeclaration | propertiesBlock)* '}')? ';'?
+acmePropertySequence
+   : LANGLE (acmePropertyValueDeclaration (COMMA acmePropertyValueDeclaration)*)? RANGLE
    ;
 
-designAnalysisDeclaration
-   : ((EXTERNAL (DESIGN)? ANALYSIS IDENTIFIER '(' formalParams ')' ':' (propertyTypeDescription | COMPONENT | GROUP | CONNECTOR | PORT | ROLE | SYSTEM | ELEMENT | TYPE) '=' javaMethodCallExpr ';') | ((DESIGN)? ANALYSIS IDENTIFIER '(' formalParams ')' ':' (propertyTypeDescription | COMPONENT | GROUP | CONNECTOR | PORT | ROLE | SYSTEM | ELEMENT | TYPE) '=' designRuleExpression ';'))
+acmePropertyTypeRecord
+   : RECORD LBRACKET (acmePropertyRecordFieldDescription)* RBRACKET
    ;
 
-parse_DesignRule
-   : (DESIGN)? (INVARIANT | HEURISTIC) designRuleExpression (PROPBEGIN parse_PropertyDescription (';' parse_PropertyDescription | ';')* PROPEND)? ';'
+acmePropertyTypeSet
+   : SET LBRACE (acmeTypeRef)? RBRACE
    ;
 
-designRuleExpression
-   : quantifiedExpression
-   | booleanExpression
+acmePropertyTypeSequence
+   : SEQUENCE LANGLE (acmePropertyTypeRef)? RANGLE
    ;
 
-quantifiedExpression
-   : ((FORALL | EXISTS (UNIQUE)?) IDENTIFIER ((':' | SET_DECLARE) (type | lookup_arbitraryTypeByName))? IN (setExpression | reference) '|' designRuleExpression)
+acmePropertyTypeEnum
+   : ENUM LBRACE identifier (COMMA identifier)* RBRACE
    ;
 
-booleanExpression
-   : orExpression (AND orExpression)*
+acmePropertyRecordFieldDescription
+   : identifier COLON acmePropertyTypeRef SEMICOLON
    ;
 
-orExpression
-   : impliesExpression (OR impliesExpression)*
+acmePropertyTypeRef
+   : (acmePropertyTypeStructure | acmePropertyTypeDeclarationRef)
    ;
 
-impliesExpression
-   : iffExpression (IMPLIES iffExpression)*
+acmePropertyTypeStructure
+   : acmePropertyTypeAny
+   | acmePropertyTypeInt
+   | acmePropertyTypeFloat
+   | acmePropertyTypeDouble
+   | acmePropertyTypeString
+   | acmePropertyTypeBoolean
+   | acmePropertyTypeRecord
+   | acmePropertyTypeSet
+   | acmePropertyTypeSequence
+   | acmePropertyTypeEnum
    ;
 
-iffExpression
-   : equalityExpression (IFF equalityExpression)*
+acmePropertyTypeDeclaration
+   : PROPERTY TYPE identifier (SEMICOLON | (ASSIGN (acmePropertyTypeInt | acmePropertyTypeFloat | acmePropertyTypeDouble | acmePropertyTypeString | acmePropertyTypeBoolean | acmePropertyTypeRecord | acmePropertyTypeSet | acmePropertyTypeSequence | acmePropertyTypeEnum | acmePropertyTypeAny) SEMICOLON))
    ;
 
-equalityExpression
-   : relationalExpression (EQ relationalExpression | NE relationalExpression)*
+acmePropertyBlockEntry
+   : identifier (COLON acmePropertyTypeRef)? ((ASSIGN acmePropertyValueDeclaration) | (CONTAINASSIGN acmePropertyValueDeclaration))? SEMICOLON
    ;
 
-relationalExpression
-   : additiveExpression ('<' additiveExpression | '>' additiveExpression | LE additiveExpression | GE additiveExpression)*
+acmePropertyBlock
+   : PROPBEGIN (acmePropertyBlockEntry)+ PROPEND
    ;
 
-additiveExpression
-   : multiplicativeExpression (PLUS multiplicativeExpression | MINUS multiplicativeExpression)*
+acmePropertyTypeInt
+   : INT
    ;
 
-multiplicativeExpression
-   : unaryExpression (STAR unaryExpression | SLASH unaryExpression | REM unaryExpression)*
+acmePropertyTypeAny
+   : ANY
    ;
 
-unaryExpression
-   : BANG unaryExpression
-   | MINUS unaryExpression
-   | primitiveExpression
+acmePropertyTypeFloat
+   : FLOAT
    ;
 
-primitiveExpression
-   : '(' designRuleExpression ')'
-   | literalConstant
-   | reference
-   | setExpression
+acmePropertyTypeDouble
+   : DOUBLE
    ;
 
-reference
-   : IDENTIFIER (('.' IDENTIFIER) | ('.' TYPE) | ('.' COMPONENTS) | ('.' CONNECTORS) | ('.' PORTS) | ('.' ROLES) | ('.' MEMBERS) | ('.' PROPERTIES) | ('.' REPRESENTATIONS) | ('.' ATTACHEDPORTS) | ('.' ATTACHEDROLES))* ('(' actualParams ')')?
+acmePropertyTypeString
+   : STRING
    ;
 
-javaMethodCallExpr
-   : IDENTIFIER ('.' IDENTIFIER)* '(' actualParams ')'
+acmePropertyTypeBoolean
+   : BOOLEAN
    ;
 
-literalConstant
-   : (INTEGER_LITERAL)
-   | (FLOATING_POINT_LITERAL)
-   | (STRING_LITERAL)
-   | (TRUE)
-   | (FALSE)
-   | (COMPONENT)
-   | (GROUP)
-   | (CONNECTOR)
-   | (PORT)
-   | (ROLE)
-   | (SYSTEM)
-   | (ELEMENT)
-   | (PROPERTY)
-   | (INT)
-   | (FLOAT)
-   | (STRING)
-   | (BOOLEAN)
-   | (ENUM)
-   | (SET)
-   | (SEQUENCE)
-   | (RECORD)
+acmeViewDeclaration
+   : VIEW identifier (COLON acmeViewTypeRef)? ((SEMICOLON) | (ASSIGN ((acmeViewBody (SEMICOLON)?) | (NEW acmeViewInstantiatedTypeRef ((SEMICOLON) | (EXTENDED WITH acmeViewBody (SEMICOLON)?))))))
    ;
 
-actualParams
-   : (actualParam (',' actualParam)*)?
+acmeViewTypeDeclaration
+   : VIEW TYPE identifier ((SEMICOLON) | ((ASSIGN acmeViewBody (SEMICOLON)?) | (EXTENDS acmeViewTypeRef ((SEMICOLON) | (WITH acmeViewBody (SEMICOLON)?)))))
    ;
 
-formalParams
-   : (formalParam (',' formalParam)*)?
+acmeViewBody
+   : LBRACE RBRACE
    ;
 
-actualParam
-   : designRuleExpression
+designRule
+   : (DESIGN)? (RULE IDENTIFIER (ASSIGN)?)? (((INVARIANT designRuleExpression) | (HEURISTIC designRuleExpression)))? (acmePropertyBlock)? SEMICOLON
+   ;
+
+acmeDesignAnalysisDeclaration
+   : (((DESIGN)? ANALYSIS IDENTIFIER LPAREN (formalParam (COMMA formalParam)*)? RPAREN COLON acmeTypeRef ASSIGN designRuleExpression (acmePropertyBlock)? SEMICOLON) | (EXTERNAL (DESIGN)? ANALYSIS IDENTIFIER LPAREN (formalParam (COMMA formalParam)*)? RPAREN COLON acmeTypeRef ASSIGN (codeLiteral | (identifier (DOT identifier)*)) SEMICOLON))
    ;
 
 formalParam
-   : IDENTIFIER (',' IDENTIFIER)* ':' (ELEMENT | SYSTEM | COMPONENT | CONNECTOR | PORT | ROLE | TYPE | PROPERTY | REPRESENTATION | ANY | nonPropertySetTypeExpression | propertyTypeDescription)
+   : identifier COLON acmeTypeRef
    ;
 
-nonPropertySetTypeExpression
-   : SET '{' (ELEMENT | SYSTEM | COMPONENT | CONNECTOR | PORT | ROLE | TYPE | PROPERTY | REPRESENTATION | ANY) '}'
+terminatedDesignRuleExpression
+   : designRuleExpression SEMICOLON
+   ;
+
+designRuleExpression
+   : aSTDRImpliesExpression (OR aSTDRImpliesExpression)*
+   ;
+
+aSTDRImpliesExpression
+   : dRIffExpression (IMPLIES dRIffExpression)*
+   ;
+
+dRIffExpression
+   : dRAndExpression (IFF dRAndExpression)*
+   ;
+
+dRAndExpression
+   : dRNegateExpression (AND dRNegateExpression)*
+   ;
+
+dRNegateExpression
+   : ((BANG dRNegateExpression) | (dREqualityExpression))
+   ;
+
+dREqualityExpression
+   : dRRelationalExpression ((EQ dRRelationalExpression) | (NE dRRelationalExpression))*
+   ;
+
+dRRelationalExpression
+   : dRAdditiveExpression ((LANGLE dRAdditiveExpression) | (RANGLE dRAdditiveExpression) | (LE dRAdditiveExpression) | (GE dRAdditiveExpression))*
+   ;
+
+dRAdditiveExpression
+   : dRMultiplicativeExpression ((PLUS dRMultiplicativeExpression) | (MINUS dRMultiplicativeExpression))*
+   ;
+
+dRMultiplicativeExpression
+   : dRNegativeExpression ((STAR dRNegativeExpression) | (SLASH dRNegativeExpression) | (REM dRNegativeExpression) | (POWER dRNegativeExpression))*
+   ;
+
+dRNegativeExpression
+   : ((MINUS dRNegativeExpression) | (primitiveExpression))
+   ;
+
+primitiveExpression
+   : literalConstant
+   | reference
+   | parentheticalExpression
+   | setExpression
+   | literalSequence
+   | literalRecord
+   | quantifiedExpression
+   | sequenceExpression
+   ;
+
+parentheticalExpression
+   : LPAREN designRuleExpression RPAREN
+   ;
+
+reference
+   : identifier (DOT (identifier | (setReference)))* (actualParams)?
+   ;
+
+setReference
+   : ((TYPE) | (COMPONENTS) | (CONNECTORS) | (PORTS) | (ROLES) | (GROUPS) | (MEMBERS) | (PROPERTIES) | (REPRESENTATIONS) | (ATTACHEDPORTS) | (ATTACHEDROLES))
+   ;
+
+actualParams
+   : LPAREN (designRuleExpression (COMMA designRuleExpression)*)? RPAREN
+   ;
+
+literalConstant
+   : ((INTEGER_LITERAL) | (FLOATING_POINT_LITERAL) | (STRING_LITERAL) | (TRUE) | (FALSE) | (COMPONENT) | (GROUP) | (CONNECTOR) | (PORT) | (ROLE) | (SYSTEM) | (ELEMENT) | (PROPERTY) | (INT) | (FLOAT) | (DOUBLE) | (STRING) | (BOOLEAN) | (ENUM) | (SET) | (SEQUENCE) | (RECORD))
+   ;
+
+quantifiedExpression
+   : ((FORALL) | (EXISTS (UNIQUE)?)) variableSetDeclaration (COMMA variableSetDeclaration)* BIT_OR designRuleExpression
+   ;
+
+distinctVariableSetDeclaration
+   : DISTINCT identifier (COMMA identifier)* ((COLON | SET_DECLARE) acmeTypeRef)? IN (setExpression | reference)
+   ;
+
+variableSetDeclaration
+   : (distinctVariableSetDeclaration | (identifier (COMMA identifier)* ((COLON | SET_DECLARE) acmeTypeRef)? IN (setExpression | reference)))
+   ;
+
+sequenceExpression
+   : LANGLE pathExpression RANGLE
    ;
 
 setExpression
-   : (literalSet | setConstructor)
+   : (literalSet | setConstructor | pathExpression)
+   ;
+
+pathExpression
+   : (SLASH reference ((COLON | SET_DECLARE) acmeTypeRef)? (LBRACKET designRuleExpression RBRACKET)? (SLASH pathExpressionContinuation)*)
+   ;
+
+pathExpressionContinuation
+   : ((setReference ((COLON | SET_DECLARE) acmeTypeRef)? (LBRACKET designRuleExpression RBRACKET)? (SLASH pathExpressionContinuation)*) | ((ELLIPSIS)? reference))
    ;
 
 literalSet
-   : ('{' '}' | '{' (literalConstant | reference) (',' (literalConstant | reference))* '}')
+   : (LBRACE RBRACE | LBRACE (literalConstant | reference) (COMMA (literalConstant | reference))* RBRACE)
+   ;
+
+literalSequence
+   : (LANGLE RANGLE | LANGLE (literalConstant | reference) (COMMA (literalConstant | reference))* RANGLE)
+   ;
+
+literalRecordEntry
+   : identifier (COLON acmePropertyTypeRef)? ASSIGN literalConstant
+   ;
+
+literalRecord
+   : LBRACKET (literalRecordEntry (SEMICOLON literalRecordEntry)* (SEMICOLON)?)? RBRACKET
    ;
 
 setConstructor
-   : ('{' SELECT IDENTIFIER (':' lookup_arbitraryTypeByName)? IN (setExpression | reference) '|' designRuleExpression '}' | ('{' COLLECT IDENTIFIER '.' IDENTIFIER ':' lookup_arbitraryTypeByName '.' lookup_arbitraryTypeByName IN (setExpression | reference) '|' designRuleExpression '}'))
+   : (((LBRACE)? SELECT variableSetDeclaration BIT_OR designRuleExpression (RBRACE)?) | ((LBRACE)? COLLECT reference COLON acmeTypeRef IN (setExpression | reference) BIT_OR designRuleExpression (RBRACE)?))
    ;
 
-recordType
-   : RECORD '[' recordItem (',' recordItem)* ']'
+acmeTypeRef
+   : ((SYSTEM) | (COMPONENT) | (GROUP) | (CONNECTOR) | (PORT) | (ROLE) | (PROPERTY) | (ELEMENT) | (TYPE) | (REPRESENTATION) | (reference) | (acmePropertyTypeStructure))
    ;
 
-recordItem
-   : IDENTIFIER ':' type
-   ;
-
-setType
-   : SET '{' type '}'
-   ;
-
-sequenceType
-   : SEQUENCE '{' type '}'
-   ;
-
-signature
-   : type '<->' type
-   ;
-
-type
-   : (IDENTIFIER ('.' IDENTIFIER)*)
-   ;
-
-primitiveType
-   : COMPONENT
-   | GROUP
-   | CONNECTOR
-   | PORT
-   | ROLE
-   | SYSTEM
-   ;
-
-element
-   : (IDENTIFIER ('.' IDENTIFIER)*)
-   | compoundElement
-   ;
-
-compoundElement
-   : set
-   | record
-   | sequence
-   ;
-
-set
-   : '{' element (',' element)* '}'
-   ;
-
-record
-   : '[' IDENTIFIER '=' element (',' IDENTIFIER '=' element)* ']'
-   ;
-
-sequence
-   : '<' element (',' element)* '>'
+ABSTRACT
+   : A B S T R A C T
    ;
 
 ANALYSIS
@@ -490,6 +513,10 @@ AND
 
 ANY
    : A N Y
+   ;
+
+ASSIGN
+   : '='
    ;
 
 ATTACHMENT
@@ -516,6 +543,14 @@ BINDINGS
    : B I N D I N G S
    ;
 
+COLON
+   : ':'
+   ;
+
+COMMA
+   : ','
+   ;
+
 COLLECT
    : C O L L E C T
    ;
@@ -532,12 +567,28 @@ CONNECTOR
    : C O N N E C T O R
    ;
 
+CONTAINASSIGN
+   : C O N T A I N A S S I G N
+   ;
+
 CONNECTORS
    : C O N N E C T O R S
    ;
 
 DESIGN
    : D E S I G N
+   ;
+
+DISTINCT
+   : D I S T I N C T
+   ;
+
+DOT
+   : '.'
+   ;
+
+DOUBLE
+   : D O U B L E
    ;
 
 ELEMENT
@@ -564,12 +615,20 @@ EXISTS
    : E X I S T S
    ;
 
+ELLIPSIS
+   : '...'
+   ;
+
 EQ
-   : '='
+   : '=='
    ;
 
 FAMILY
    : F A M I L Y
+   ;
+
+FINAL
+   : F I N A L
    ;
 
 FORALL
@@ -584,6 +643,10 @@ GROUP
    : G R O U P
    ;
 
+GROUPS
+   : G R O U P S
+   ;
+
 GE
    : '>='
    ;
@@ -593,7 +656,7 @@ HEURISTIC
    ;
 
 IFF
-   : I F F
+   : '<->'
    ;
 
 IMPORT
@@ -605,7 +668,8 @@ IN
    ;
 
 INT
-   : I N T
+   : (I N T)
+   | (I N T E G E R)
    ;
 
 INVARIANT
@@ -613,7 +677,39 @@ INVARIANT
    ;
 
 IMPLIES
-   : I M P L I E S
+   : '->'
+   ;
+
+LBRACE
+   : '{'
+   ;
+
+RBRACE
+   : '}'
+   ;
+
+LBRACKET
+   : '['
+   ;
+
+RBRACKET
+   : ']'
+   ;
+
+LPAREN
+   : '('
+   ;
+
+RPAREN
+   : ')'
+   ;
+
+LANGLE
+   : '<'
+   ;
+
+RANGLE
+   : '>'
    ;
 
 LE
@@ -637,7 +733,23 @@ MINUS
    ;
 
 OR
-   : 'or'
+   : O R
+   ;
+
+PATHSEPARATOR
+   : ('.' | ':' | '-' | '+' | '\\' | '\\\\' | '/' | '$' | '%')
+   ;
+
+PUBLIC
+   : P U B L I C
+   ;
+
+PRIVATE
+   : P R I V A T E
+   ;
+
+POWER
+   : P O W E R
    ;
 
 PLUS
@@ -661,11 +773,11 @@ PROPERTIES
    ;
 
 PROPBEGIN
-   : P R O P B E G I N
+   : '<<'
    ;
 
 PROPEND
-   : P R O P E N D
+   : '>>'
    ;
 
 RECORD
@@ -677,7 +789,7 @@ REPRESENTATION
    ;
 
 REM
-   : R E M
+   : '%'
    ;
 
 REPRESENTATIONS
@@ -688,16 +800,25 @@ ROLE
    : R O L E
    ;
 
+RULE
+   : R U L E
+   ;
+
 ROLES
    : R O L E S
    ;
 
 SEQUENCE
-   : S E Q U E N C E
+   : (S E Q U E N C E)
+   | (S E Q)
    ;
 
 SELECT
    : S E L E C T
+   ;
+
+SEMICOLON
+   : ';'
    ;
 
 SET
@@ -705,7 +826,7 @@ SET
    ;
 
 SET_DECLARE
-   : S E T '_' D E C L A R E
+   : ':!'
    ;
 
 SLASH
@@ -728,6 +849,10 @@ SYSTEM
    : S Y S T E M
    ;
 
+TO
+   : T O
+   ;
+
 TYPE
    : T Y P E
    ;
@@ -738,6 +863,14 @@ UNIQUE
 
 WITH
    : W I T H
+   ;
+
+VIEW
+   : V I E W
+   ;
+
+BIT_OR
+   : '|'
    ;
 
 TRUE
@@ -858,7 +991,7 @@ BOOLEAN
    ;
 
 FLOATING_POINT_LITERAL
-   : [0-9]+ '.' [0-9]+
+   : ('-' | '+')? [0-9]+ '.' [0-9]+
    ;
 
 INTEGER_LITERAL
@@ -873,8 +1006,12 @@ IDENTIFIER
    : [a-zA-Z] [a-zA-Z0-9_-]*
    ;
 
-COMMENT
+LINE_COMMENT
    : '//' ~ [\r\n]* -> skip
+   ;
+
+BLOCK_COMMENT
+   : '/*' .*? '*/' -> skip
    ;
 
 WS
