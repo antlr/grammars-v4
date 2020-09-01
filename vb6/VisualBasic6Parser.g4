@@ -22,19 +22,22 @@ options {
 }
 // module ----------------------------------
 
-startRule: module EOF;
+startRule: module EOF
+         ;
 
 module:
 	WS? NEWLINE* (moduleHeader NEWLINE+)? moduleReferences? NEWLINE* controlProperties? NEWLINE*
 		moduleConfig? NEWLINE* moduleAttributes? NEWLINE* moduleOptions? NEWLINE* moduleBody?
-		NEWLINE* WS?;
+		NEWLINE* WS?
+      ;
 
 moduleReferences: moduleReference+;
 
 moduleReference:
 	OBJECT WS? EQ WS? moduleReferenceValue (
 		SEMICOLON WS? moduleReferenceComponent
-	)? NEWLINE*;
+	)? NEWLINE*
+              ;
 
 moduleReferenceValue: STRINGLITERAL;
 
@@ -55,7 +58,8 @@ moduleOption:
 	OPTION_BASE WS INTEGERLITERAL		# optionBaseStmt
 	| OPTION_COMPARE WS (BINARY | TEXT)	# optionCompareStmt
 	| OPTION_EXPLICIT					# optionExplicitStmt
-	| OPTION_PRIVATE_MODULE				# optionPrivateModuleStmt;
+	| OPTION_PRIVATE_MODULE				# optionPrivateModuleStmt
+    ;
 
 moduleBody: moduleBodyElement (NEWLINE+ moduleBodyElement)*;
 
@@ -71,7 +75,8 @@ moduleBodyElement:
 	| propertySetStmt
 	| propertyLetStmt
 	| subStmt
-	| typeStmt;
+	| typeStmt
+    ;
 
 // controls ----------------------------------
 
@@ -81,14 +86,16 @@ controlProperties:
 cp_Properties:
 	cp_SingleProperty
 	| cp_NestedProperty
-	| controlProperties;
+	| controlProperties
+    ;
 
 cp_SingleProperty:
 	WS? implicitCallStmt_InStmt WS? EQ WS? '$'? cp_PropertyValue FRX_OFFSET? NEWLINE+;
 
 cp_PropertyName: (OBJECT DOT)? ambiguousIdentifier (
 		LPAREN literal RPAREN
-	)? (DOT ambiguousIdentifier (LPAREN literal RPAREN)?)*;
+	)? (DOT ambiguousIdentifier (LPAREN literal RPAREN)?)*
+    ;
 
 cp_PropertyValue:
 	DOLLAR? (
@@ -184,7 +191,8 @@ blockStmt:
 	| widthStmt
 	| withStmt
 	| writeStmt
-	| implicitCallStmt_InBlock;
+	| implicitCallStmt_InBlock
+    ;
 
 // statements ----------------------------------
 
@@ -228,7 +236,8 @@ deftypeStmt: (
 		| DEFSTR
 		| DEFOBJ
 		| DEFVAR
-	) WS letterrange (WS? COMMA WS? letterrange)*;
+	) WS letterrange (WS? COMMA WS? letterrange)*
+    ;
 
 deleteSettingStmt:
 	DELETESETTING WS valueStmt WS? COMMA WS? valueStmt (
@@ -240,7 +249,8 @@ doLoopStmt:
 	| DO WS (WHILE | UNTIL) WS valueStmt NEWLINE+ (
 		block NEWLINE+
 	)? LOOP
-	| DO NEWLINE+ (block NEWLINE+) LOOP WS (WHILE | UNTIL) WS valueStmt;
+	| DO NEWLINE+ (block NEWLINE+) LOOP WS (WHILE | UNTIL) WS valueStmt
+    ;
 
 endStmt: END;
 
@@ -262,7 +272,8 @@ exitStmt:
 	| EXIT_FOR
 	| EXIT_FUNCTION
 	| EXIT_PROPERTY
-	| EXIT_SUB;
+	| EXIT_SUB
+    ;
 
 filecopyStmt: FILECOPY WS valueStmt WS? COMMA WS? valueStmt;
 
@@ -295,7 +306,8 @@ ifThenElseStmt:
 	IF WS ifConditionStmt WS THEN WS blockStmt (
 		WS ELSE WS blockStmt
 	)?															# inlineIfThenElse
-	| ifBlockStmt ifElseIfBlockStmt* ifElseBlockStmt? END_IF	# blockIfThenElse;
+	| ifBlockStmt ifElseIfBlockStmt* ifElseBlockStmt? END_IF	# blockIfThenElse
+    ;
 
 ifBlockStmt:
 	IF WS ifConditionStmt WS THEN NEWLINE+ (block NEWLINE+)?;
@@ -375,7 +387,8 @@ openStmt:
 		| RANDOM
 	) (WS ACCESS WS (READ | WRITE | READ_WRITE))? (
 		WS (SHARED | LOCK_READ | LOCK_WRITE | LOCK_READ_WRITE)
-	)? WS AS WS valueStmt (WS LEN WS? EQ WS? valueStmt)?;
+	)? WS AS WS valueStmt (WS LEN WS? EQ WS? valueStmt)?
+    ;
 
 outputList:
 	outputList_Expression (
@@ -388,7 +401,8 @@ outputList:
 outputList_Expression: (SPC | TAB) (
 		WS? LPAREN WS? argsCall WS? RPAREN
 	)?
-	| valueStmt;
+	| valueStmt
+    ;
 
 printStmt: PRINT WS valueStmt WS? COMMA (WS? outputList)?;
 
@@ -454,12 +468,14 @@ sC_Case:
 // ELSE first, so that it is not interpreted as a variable call
 sC_Cond:
 	ELSE										# caseCondElse
-	| sC_CondExpr (WS? COMMA WS? sC_CondExpr)*	# caseCondExpr;
+	| sC_CondExpr (WS? COMMA WS? sC_CondExpr)*	# caseCondExpr
+    ;
 
 sC_CondExpr:
 	IS WS? comparisonOperator WS? valueStmt	# caseCondExprIs
 	| valueStmt								# caseCondExprValue
-	| valueStmt WS TO WS valueStmt			# caseCondExprTo;
+	| valueStmt WS TO WS valueStmt			# caseCondExprTo
+    ;
 
 sendkeysStmt: SENDKEYS WS valueStmt (WS? COMMA WS? valueStmt)?;
 
@@ -494,39 +510,30 @@ unlockStmt:
 	)?;
 
 // operator precedence is represented by rule order
-valueStmt:
-	literal															# vsLiteral
-	| LPAREN WS? valueStmt (WS? COMMA WS? valueStmt)* WS? RPAREN	# vsStruct
-	| NEW WS valueStmt												# vsNew
-	| typeOfStmt													# vsTypeOf
-	| ADDRESSOF WS valueStmt										# vsAddressOf
-	| implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt				# vsAssign
-	| valueStmt WS? POW WS? valueStmt								# vsPow
-	| MINUS WS? valueStmt											# vsNegation
-	| PLUS WS? valueStmt											# vsPlus
-	| valueStmt WS? DIV WS? valueStmt								# vsDiv
-	| valueStmt WS? MULT WS? valueStmt								# vsMult
-	| valueStmt WS? MOD WS? valueStmt								# vsMod
-	| valueStmt WS? PLUS WS? valueStmt								# vsAdd
-	| valueStmt WS? MINUS WS? valueStmt								# vsMinus
-	| valueStmt WS? AMPERSAND WS? valueStmt							# vsAmp
-	| valueStmt WS? EQ WS? valueStmt								# vsEq
-	| valueStmt WS? NEQ WS? valueStmt								# vsNeq
-	| valueStmt WS? LT WS? valueStmt								# vsLt
-	| valueStmt WS? GT WS? valueStmt								# vsGt
-	| valueStmt WS? LEQ WS? valueStmt								# vsLeq
-	| valueStmt WS? GEQ WS? valueStmt								# vsGeq
-	| valueStmt WS LIKE WS valueStmt								# vsLike
-	| valueStmt WS IS WS valueStmt									# vsIs
-	| NOT (WS valueStmt | LPAREN WS? valueStmt WS? RPAREN)			# vsNot
-	| valueStmt WS? AND WS? valueStmt								# vsAnd
-	| valueStmt WS? OR WS? valueStmt								# vsOr
-	| valueStmt WS? XOR WS? valueStmt								# vsXor
-	| valueStmt WS? EQV WS? valueStmt								# vsEqv
-	| valueStmt WS? IMP WS? valueStmt								# vsImp
-	| implicitCallStmt_InStmt										# vsICS
-	| midStmt														# vsMid;
-
+valueStmt
+    : literal                                                       # vsLiteral
+    | LPAREN WS? valueStmt (WS? COMMA WS? valueStmt)* WS? RPAREN    # vsStruct
+    | NEW WS valueStmt                                              # vsNew
+    | typeOfStmt                                                    # vsTypeOf
+    | ADDRESSOF WS valueStmt                                        # vsAddressOf
+    | implicitCallStmt_InStmt WS? ASSIGN WS? valueStmt              # vsAssign
+    | valueStmt WS? POW WS? valueStmt                               # vsPow
+    | (PLUS | MINUS) WS? valueStmt                                  # vsPlusMinus
+    | valueStmt WS? (MULT | DIV) WS? valueStmt                      # vsMultDiv
+    | valueStmt WS? (IDIV) WS? valueStmt                            # vsIDiv
+    | valueStmt WS? MOD WS? valueStmt                               # vsMod
+    | valueStmt WS? (PLUS | MINUS) WS? valueStmt                    # vsAddSub
+    | valueStmt WS? AMPERSAND WS? valueStmt                         # vsAmp
+    | valueStmt WS? (EQ | NEQ | LT | GT | LEQ | GEQ | LIKE | IS) WS? valueStmt # vsComp
+    | NOT (WS valueStmt | LPAREN WS? valueStmt WS? RPAREN)          # vsNot
+    | valueStmt WS? AND WS? valueStmt                               # vsAnd
+    | valueStmt WS? OR WS? valueStmt                                # vsOr
+    | valueStmt WS? XOR WS? valueStmt                               # vsXor
+    | valueStmt WS? EQV WS? valueStmt                               # vsEqv
+    | valueStmt WS? IMP WS? valueStmt                               # vsImp
+    | implicitCallStmt_InStmt                                       # vsICS
+    | midStmt                                                       # vsMid
+    ;
 variableStmt: (DIM | STATIC | visibility) WS (WITHEVENTS WS)? variableListStmt;
 
 variableListStmt:
@@ -566,7 +573,8 @@ eCS_MemberProcedureCall:
 
 implicitCallStmt_InBlock:
 	iCS_B_ProcedureCall
-	| iCS_B_MemberProcedureCall;
+	| iCS_B_MemberProcedureCall
+    ;
 
 // parantheses are forbidden in case of args variables cannot be called in blocks certainIdentifier
 // instead of ambiguousIdentifier for preventing ambiguity with statement keywords
@@ -651,7 +659,8 @@ baseType:
 	| OBJECT
 	| SINGLE
 	| STRING
-	| VARIANT;
+	| VARIANT
+    ;
 
 certainIdentifier:
 	IDENTIFIER (ambiguousKeyword | IDENTIFIER)*
@@ -679,7 +688,8 @@ literal:
 	| TRUE
 	| FALSE
 	| NOTHING
-	| NULL;
+	| NULL
+    ;
 
 publicPrivateVisibility: PRIVATE | PUBLIC;
 
@@ -693,9 +703,14 @@ typeHint:
 	| DOLLAR
 	| EXCLAMATIONMARK
 	| HASH
-	| PERCENT;
+	| PERCENT
+    ;
 
-visibility: PRIVATE | PUBLIC | FRIEND | GLOBAL;
+visibility: PRIVATE
+          | PUBLIC
+          | FRIEND
+          | GLOBAL
+          ;
 
 // ambiguous keywords
 ambiguousKeyword:
@@ -842,4 +857,5 @@ ambiguousKeyword:
 	| WITH
 	| WITHEVENTS
 	| WRITE
-	| XOR;
+	| XOR
+    ;

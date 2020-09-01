@@ -369,7 +369,8 @@ COLON: ':';
 
 COMMA: ',';
 
-DIV: '\\' | '/';
+IDIV: '\\' ;
+DIV: '/';
 
 DOLLAR: '$';
 
