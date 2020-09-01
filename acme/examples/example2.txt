@@ -4,7 +4,7 @@ System simple_cs = {
 
     Properties { Aesop-style : style-id = client-server;
     UniCon-style : style-id = cs;
-    source-code : external = "CODE-LIB/client.c" }
+    source-code : external_ = "CODE-LIB/client.c" }
     }
 
     Component server = {
@@ -12,7 +12,7 @@ System simple_cs = {
     Properties {
         idempotence : boolean = true;
         max-concurrent-clients : integer = 1;
-        source-code : external = "CODE-LIB/server.c" }
+        source-code : external_ = "CODE-LIB/server.c" }
     }
 
     Connector rpc = {
