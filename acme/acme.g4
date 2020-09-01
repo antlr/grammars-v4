@@ -172,7 +172,7 @@ acmePortTypeDeclaration
    ;
 
 acmePortDeclaration
-   : PORT identifier (COLON acmePortTypeRef (COMMA acmePortTypeRef)*)? ((SEMICOLON) | (ASSIGN ((acmePortBody (SEMICOLON)?) | (NEW acmePortInstantiatedTypeRef (COMMA acmePortInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmePortBody (SEMICOLON)?))))))
+   : PORT identifier (COLON acmePortTypeRef (COMMA acmePortTypeRef)*)? ((SEMICOLON)? | (ASSIGN ((acmePortBody (SEMICOLON)?) | (NEW acmePortInstantiatedTypeRef (COMMA acmePortInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmePortBody (SEMICOLON)?))))))
    ;
 
 acmePortBody
@@ -180,11 +180,11 @@ acmePortBody
    ;
 
 acmeRoleTypeDeclaration
-   : < ROLE > TYPE identifier ((SEMICOLON) | ((ASSIGN acmeRoleBody (SEMICOLON)?) | (EXTENDS acmeRoleTypeRef (COMMA acmeRoleTypeRef)* ((SEMICOLON) | (WITH acmeRoleBody (SEMICOLON)?)))))
+   : ROLE TYPE identifier ((SEMICOLON) | ((ASSIGN acmeRoleBody (SEMICOLON)?) | (EXTENDS acmeRoleTypeRef (COMMA acmeRoleTypeRef)* ((SEMICOLON) | (WITH acmeRoleBody (SEMICOLON)?)))))
    ;
 
 acmeRoleDeclaration
-   : < ROLE > identifier (COLON acmeRoleTypeRef (COMMA acmeRoleTypeRef)*)? ((SEMICOLON) | (ASSIGN ((acmeRoleBody (SEMICOLON)?) | (NEW acmeRoleInstantiatedTypeRef (COMMA acmeRoleInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmeRoleBody (SEMICOLON)?))))))
+   : ROLE identifier (COLON acmeRoleTypeRef (COMMA acmeRoleTypeRef)*)? ((SEMICOLON) | (ASSIGN ((acmeRoleBody (SEMICOLON)?) | (NEW acmeRoleInstantiatedTypeRef (COMMA acmeRoleInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmeRoleBody (SEMICOLON)?))))))
    ;
 
 acmeRoleBody
@@ -192,11 +192,11 @@ acmeRoleBody
    ;
 
 acmeComponentTypeDeclaration
-   : < COMPONENT > TYPE identifier ((SEMICOLON) | ((ASSIGN acmeComponentBody (SEMICOLON)?) | (EXTENDS acmeComponentTypeRef (COMMA acmeComponentTypeRef)* ((SEMICOLON) | (WITH acmeComponentBody (SEMICOLON)?)))))
+   : COMPONENT TYPE identifier ((SEMICOLON) | ((ASSIGN acmeComponentBody (SEMICOLON)?) | (EXTENDS acmeComponentTypeRef (COMMA acmeComponentTypeRef)* ((SEMICOLON) | (WITH acmeComponentBody (SEMICOLON)?)))))
    ;
 
 acmeComponentDeclaration
-   : < COMPONENT > identifier (COLON acmeComponentTypeRef (COMMA acmeComponentTypeRef)*)? ((SEMICOLON) | (ASSIGN ((acmeComponentBody (SEMICOLON)?) | (NEW acmeComponentInstantiatedTypeRef (COMMA acmeComponentInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmeComponentBody (SEMICOLON)?))))))
+   : COMPONENT identifier (COLON acmeComponentTypeRef (COMMA acmeComponentTypeRef)*)? ((SEMICOLON) | (ASSIGN ((acmeComponentBody (SEMICOLON)?) | (NEW acmeComponentInstantiatedTypeRef (COMMA acmeComponentInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmeComponentBody (SEMICOLON)?))))))
    ;
 
 acmeComponentBody
@@ -204,11 +204,11 @@ acmeComponentBody
    ;
 
 acmeConnectorTypeDeclaration
-   : < CONNECTOR > TYPE identifier ((SEMICOLON) | ((ASSIGN acmeConnectorBody (SEMICOLON)?) | (EXTENDS acmeConnectorTypeRef (COMMA acmeConnectorTypeRef)* ((SEMICOLON) | (WITH acmeConnectorBody (SEMICOLON)?)))))
+   : CONNECTOR TYPE identifier ((SEMICOLON) | ((ASSIGN acmeConnectorBody (SEMICOLON)?) | (EXTENDS acmeConnectorTypeRef (COMMA acmeConnectorTypeRef)* ((SEMICOLON) | (WITH acmeConnectorBody (SEMICOLON)?)))))
    ;
 
 acmeConnectorDeclaration
-   : (< CONNECTOR > identifier (COLON acmeConnectorTypeRef (COMMA acmeConnectorTypeRef)*)? ((SEMICOLON) | (ASSIGN ((acmeConnectorBody (SEMICOLON)?) | (NEW acmeConnectorInstantiatedTypeRef (COMMA acmeConnectorInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmeConnectorBody (SEMICOLON)?)))))))
+   : (CONNECTOR identifier (COLON acmeConnectorTypeRef (COMMA acmeConnectorTypeRef)*)? ((SEMICOLON) | (ASSIGN ((acmeConnectorBody (SEMICOLON)?) | (NEW acmeConnectorInstantiatedTypeRef (COMMA acmeConnectorInstantiatedTypeRef)* ((SEMICOLON) | (EXTENDED WITH acmeConnectorBody (SEMICOLON)?)))))))
    ;
 
 acmeConnectorBody
@@ -236,7 +236,15 @@ acmePropertyDeclaration
    ;
 
 acmePropertyValueDeclaration
-   : (INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | FALSE | TRUE | acmePropertySet | acmePropertyRecord | acmePropertySequence | enumidentifier)
+   : INTEGER_LITERAL
+   | FLOATING_POINT_LITERAL
+   | STRING_LITERAL
+   | FALSE
+   | TRUE
+   | acmePropertySet
+   | acmePropertyRecord
+   | acmePropertySequence
+   | enumidentifier
    ;
 
 enumidentifier
@@ -357,7 +365,7 @@ designRule
    ;
 
 acmeDesignAnalysisDeclaration
-   : (((DESIGN)? ANALYSIS IDENTIFIER LPAREN (formalParam (COMMA formalParam)*)? RPAREN COLON acmeTypeRef ASSIGN designRuleExpression (acmePropertyBlock)? SEMICOLON) | (< EXTERNAL > (DESIGN)? ANALYSIS IDENTIFIER LPAREN (formalParam (COMMA formalParam)*)? RPAREN COLON acmeTypeRef ASSIGN (codeLiteral | (identifier (DOT identifier)*)) SEMICOLON))
+   : (((DESIGN)? ANALYSIS IDENTIFIER LPAREN (formalParam (COMMA formalParam)*)? RPAREN COLON acmeTypeRef ASSIGN designRuleExpression (acmePropertyBlock)? SEMICOLON) | (EXTERNAL (DESIGN)? ANALYSIS IDENTIFIER LPAREN (formalParam (COMMA formalParam)*)? RPAREN COLON acmeTypeRef ASSIGN (codeLiteral | (identifier (DOT identifier)*)) SEMICOLON))
    ;
 
 formalParam
@@ -612,7 +620,7 @@ ELLIPSIS
    ;
 
 EQ
-   : '='
+   : '=='
    ;
 
 FAMILY
@@ -648,7 +656,7 @@ HEURISTIC
    ;
 
 IFF
-   : I F F
+   : '<->'
    ;
 
 IMPORT
@@ -660,7 +668,8 @@ IN
    ;
 
 INT
-   : I N T
+   : (I N T)
+   | (I N T E G E R)
    ;
 
 INVARIANT
@@ -668,7 +677,7 @@ INVARIANT
    ;
 
 IMPLIES
-   : I M P L I E S
+   : '->'
    ;
 
 LBRACE
@@ -696,11 +705,11 @@ RPAREN
    ;
 
 LANGLE
-   : '<<'
+   : '<'
    ;
 
 RANGLE
-   : '>>'
+   : '>'
    ;
 
 LE
@@ -724,7 +733,7 @@ MINUS
    ;
 
 OR
-   : 'or'
+   : O R
    ;
 
 PATHSEPARATOR
@@ -764,11 +773,11 @@ PROPERTIES
    ;
 
 PROPBEGIN
-   : P R O P B E G I N
+   : '<<'
    ;
 
 PROPEND
-   : P R O P E N D
+   : '>>'
    ;
 
 RECORD
@@ -780,7 +789,7 @@ REPRESENTATION
    ;
 
 REM
-   : R E M
+   : '%'
    ;
 
 REPRESENTATIONS
@@ -800,7 +809,8 @@ ROLES
    ;
 
 SEQUENCE
-   : S E Q U E N C E
+   : (S E Q U E N C E)
+   | (S E Q)
    ;
 
 SELECT
@@ -816,7 +826,7 @@ SET
    ;
 
 SET_DECLARE
-   : S E T '_' D E C L A R E
+   : ':!'
    ;
 
 SLASH
@@ -981,7 +991,7 @@ BOOLEAN
    ;
 
 FLOATING_POINT_LITERAL
-   : [0-9]+ '.' [0-9]+
+   : ('-' | '+')? [0-9]+ '.' [0-9]+
    ;
 
 INTEGER_LITERAL
