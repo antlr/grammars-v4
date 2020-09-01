@@ -953,9 +953,9 @@ WS : ([ \t] | LINE_CONTINUATION)+;
 IDENTIFIER :  ~[\]()\r\n\t.,'"|!@#$%^&*\-+:=; ]+ | L_SQUARE_BRACKET (~[!\]\r\n])+ R_SQUARE_BRACKET;
 
 // letters
-fragment LETTER : [a-zA-Z_äöüÄÖÜ];
+fragment LETTER : [a-zA-Z_\p{L}];
 fragment DIGIT : [0-9];
-fragment LETTERORDIGIT : [a-zA-Z0-9_äöüÄÖÜ];
+fragment LETTERORDIGIT : [a-zA-Z0-9_\p{L}];
 
 // case insensitive chars
 fragment A:[aA];
