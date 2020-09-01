@@ -508,7 +508,7 @@ ANY
    ;
 
 ASSIGN
-   : ':='
+   : '='
    ;
 
 ATTACHMENT
@@ -696,11 +696,11 @@ RPAREN
    ;
 
 LANGLE
-   : '<'
+   : '<<'
    ;
 
 RANGLE
-   : '>'
+   : '>>'
    ;
 
 LE
@@ -989,15 +989,19 @@ INTEGER_LITERAL
    ;
 
 STRING_LITERAL
-   : '\'' .*? '\''
+   : '"' .*? '"'
    ;
 
 IDENTIFIER
    : [a-zA-Z] [a-zA-Z0-9_-]*
    ;
 
-COMMENT
+LINE_COMMENT
    : '//' ~ [\r\n]* -> skip
+   ;
+
+BLOCK_COMMENT
+   : '/*' .*? '*/' -> skip
    ;
 
 WS
