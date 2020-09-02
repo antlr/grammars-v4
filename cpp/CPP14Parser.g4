@@ -596,13 +596,14 @@ classSpecifier:
 classHead:
 	classKey attributeSpecifierSeq? (
 		classHeadName classVirtSpecifier?
-	)? baseClause?;
+	)? baseClause?
+	| Union attributeSpecifierSeq? (classHeadName classVirtSpecifier?)?;
 
 classHeadName: nestedNameSpecifier? className;
 
 classVirtSpecifier: Final;
 
-classKey: Class | Struct | Union;
+classKey: Class | Struct;
 
 memberSpecification:
 	(memberdeclaration | accessSpecifier Colon)+;
