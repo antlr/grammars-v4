@@ -597,7 +597,9 @@ classHead:
 	classKey attributeSpecifierSeq? (
 		classHeadName classVirtSpecifier?
 	)? baseClause?
-	| Union attributeSpecifierSeq? (classHeadName classVirtSpecifier?)?;
+	| Union attributeSpecifierSeq? (
+		classHeadName classVirtSpecifier?
+	)?;
 
 classHeadName: nestedNameSpecifier? className;
 
@@ -764,10 +766,8 @@ noeExceptSpecification:
 /*Lexer*/
 
 theOperator:
-	New
-	| Delete
-	| New LeftBracket RightBracket
-	| Delete LeftBracket RightBracket
+	New (LeftBracket RightBracket)?
+	| Delete (LeftBracket RightBracket)?
 	| Plus
 	| Minus
 	| Star
