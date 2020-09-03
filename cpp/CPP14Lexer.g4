@@ -222,10 +222,6 @@ AndAssign: '&=';
 
 OrAssign: '|=';
 
-LeftShift: '<<';
-
-RightShift: '>>';
-
 LeftShiftAssign: '<<=';
 
 RightShiftAssign: '>>=';

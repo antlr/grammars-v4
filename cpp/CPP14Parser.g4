@@ -170,7 +170,7 @@ additiveExpression:
 shiftExpression:
 	additiveExpression (shiftOperator additiveExpression)*;
 
-shiftOperator: RightShift | LeftShift;
+shiftOperator: Greater Greater | Less Less;
 
 relationalExpression:
 	shiftExpression (
@@ -789,8 +789,8 @@ theOperator:
 	| XorAssign
 	| AndAssign
 	| OrAssign
-	| LeftShift
-	| RightShift
+	| Greater Greater
+	| Less Less
 	| RightShiftAssign
 	| LeftShiftAssign
 	| Equal
