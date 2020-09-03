@@ -35,7 +35,7 @@ primaryExpression:
 	| idExpression
 	| lambdaExpression;
 
-idExpression: unqualifiedId | qualifiedId;
+idExpression: (nestedNameSpecifier Template?)? unqualifiedId;
 
 unqualifiedId:
 	Identifier
@@ -44,8 +44,6 @@ unqualifiedId:
 	| literalOperatorId
 	| Tilde (className | decltypeSpecifier)
 	| templateId;
-
-qualifiedId: nestedNameSpecifier Template? unqualifiedId;
 
 nestedNameSpecifier:
 	(theTypeName | namespaceName | decltypeSpecifier)? Doublecolon
@@ -225,6 +223,7 @@ constantExpression: conditionalExpression;
 
 statement:
 	labeledStatement
+	| declarationStatement
 	| attributeSpecifierSeq? (
 		expressionStatement
 		| compoundStatement
@@ -233,7 +232,7 @@ statement:
 		| jumpStatement
 		| tryBlock
 	)
-	| declarationStatement;
+    ;
 
 labeledStatement:
 	attributeSpecifierSeq? (
