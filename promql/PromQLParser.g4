@@ -84,8 +84,8 @@ labelMatcherOperator: EQ | NE | RE | NRE;
 matrixSelector: instantSelector TIME_RANGE;
 
 offset
-    : instantSelector OFFSET TIME_RANGE
-    | matrixSelector OFFSET TIME_RANGE
+    : instantSelector OFFSET DURATION
+    | matrixSelector OFFSET DURATION
     ;
 
 // Functions
