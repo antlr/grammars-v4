@@ -567,6 +567,7 @@ memberdeclaration:
 	| functionDefinition
 	| usingDeclaration
 	| staticAssertDeclaration
+    | explicitSpecialization
 	| templateDeclaration
 	| aliasDeclaration
 	| emptyDeclaration;
