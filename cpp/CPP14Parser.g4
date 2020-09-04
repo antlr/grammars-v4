@@ -28,12 +28,6 @@ options {
 translationUnit: declarationseq? EOF;
 /*Expressions*/
 
-primaryExpression:
-	Literal+
-	| This
-	| LeftParen expression RightParen
-	| idExpression
-	| lambdaExpression;
 
 idExpression: (nestedNameSpecifier Template?)? unqualifiedId;
 
@@ -51,8 +45,8 @@ nestedNameSpecifier:
 		Identifier
 		| Template? simpleTemplateId
 	) Doublecolon;
-lambdaExpression:
-	lambdaIntroducer lambdaDeclarator? compoundStatement;
+//lambdaExpression:
+// lambdaIntroducer lambdaDeclarator? compoundStatement;
 
 lambdaIntroducer: LeftBracket lambdaCapture? RightBracket;
 
@@ -74,26 +68,6 @@ lambdaDeclarator:
 	LeftParen parameterDeclarationClause RightParen Mutable? exceptionSpecification?
 		attributeSpecifierSeq? trailingReturnType?;
 
-postfixExpression:
-	primaryExpression
-	| postfixExpression LeftBracket (expression | bracedInitList) RightBracket
-	| postfixExpression LeftParen expressionList? RightParen
-	| (simpleTypeSpecifier | typeNameSpecifier) (
-		LeftParen expressionList? RightParen
-		| bracedInitList
-	)
-	| postfixExpression (Dot | Arrow) (
-		Template? idExpression
-		| pseudoDestructorName
-	)
-	| postfixExpression (PlusPlus | MinusMinus)
-	| (
-		Dynamic_cast
-		| Static_cast
-		| Reinterpret_cast
-		| Const_cast
-	) Less theTypeId Greater LeftParen expression RightParen
-	| typeIdOfTheTypeId LeftParen (expression | theTypeId) RightParen;
 /*
  add a middle layer to eliminate duplicated function declarations
  */
@@ -107,25 +81,7 @@ pseudoDestructorName:
 	| nestedNameSpecifier Template simpleTemplateId Doublecolon Tilde theTypeName
 	| Tilde decltypeSpecifier;
 
-unaryExpression:
-	postfixExpression
-	| (PlusPlus | MinusMinus | unaryOperator | Sizeof) unaryExpression
-	| Sizeof (
-		LeftParen theTypeId RightParen
-		| Ellipsis LeftParen Identifier RightParen
-	)
-	| Alignof LeftParen theTypeId RightParen
-	| noExceptExpression
-	| newExpression
-	| deleteExpression;
-
 unaryOperator: Or | Star | And | Plus | Tilde | Minus | Not;
-
-newExpression:
-	Doublecolon? New newPlacement? (
-		newTypeId
-		| (LeftParen theTypeId RightParen)
-	) newInitializer?;
 
 newPlacement: LeftParen expressionList RightParen;
 
@@ -137,71 +93,15 @@ newDeclarator:
 
 noPointerNewDeclarator:
 	LeftBracket expression RightBracket attributeSpecifierSeq?
-	| noPointerNewDeclarator LeftBracket constantExpression RightBracket attributeSpecifierSeq?;
+	| noPointerNewDeclarator LeftBracket expression RightBracket attributeSpecifierSeq?;
 
 newInitializer:
 	LeftParen expressionList? RightParen
 	| bracedInitList;
 
-deleteExpression:
-	Doublecolon? Delete (LeftBracket RightBracket)? castExpression;
-
-noExceptExpression: Noexcept LeftParen expression RightParen;
-
-castExpression:
-	unaryExpression
-	| LeftParen theTypeId RightParen castExpression;
-
-pointerMemberExpression:
-	castExpression ((DotStar | ArrowStar) castExpression)*;
-
-multiplicativeExpression:
-	pointerMemberExpression (
-		(Star | Div | Mod) pointerMemberExpression
-	)*;
-
-additiveExpression:
-	multiplicativeExpression (
-		(Plus | Minus) multiplicativeExpression
-	)*;
-
-shiftExpression:
-	additiveExpression (shiftOperator additiveExpression)*;
 
 shiftOperator: Greater Greater | Less Less;
 
-relationalExpression:
-	shiftExpression (
-		(Less | Greater | LessEqual | GreaterEqual) shiftExpression
-	)*;
-
-equalityExpression:
-	relationalExpression (
-		(Equal | NotEqual) relationalExpression
-	)*;
-
-andExpression: equalityExpression (And equalityExpression)*;
-
-exclusiveOrExpression: andExpression (Caret andExpression)*;
-
-inclusiveOrExpression:
-	exclusiveOrExpression (Or exclusiveOrExpression)*;
-
-logicalAndExpression:
-	inclusiveOrExpression (AndAnd inclusiveOrExpression)*;
-
-logicalOrExpression:
-	logicalAndExpression (OrOr logicalAndExpression)*;
-
-conditionalExpression:
-	logicalOrExpression (
-		Question expression Colon assignmentExpression
-	)?;
-
-assignmentExpression:
-	conditionalExpression
-	| logicalOrExpression assignmentOperator initializerClause
-	| throwExpression;
 
 assignmentOperator:
 	Assign
@@ -216,14 +116,68 @@ assignmentOperator:
 	| XorAssign
 	| OrAssign;
 
-expression: assignmentExpression (Comma assignmentExpression)*;
+//expression: assignmentExpression (Comma assignmentExpression)*;
 
-constantExpression: conditionalExpression;
+expression:
+	Literal+															# literalExpression
+	| This																# thisExpression
+	| LeftParen expression RightParen									# parenthesisedExpression
+	| idExpression														# idExpressionAlt
+	| lambdaIntroducer lambdaDeclarator? compoundStatement				# lambdaExpression
+	| expression LeftBracket (expression | bracedInitList) RightBracket	# subscriptExpression
+	| expression LeftParen expressionList? RightParen					# UNKNOWN2
+	| (simpleTypeSpecifier | typeNameSpecifier) (
+		LeftParen expressionList? RightParen
+		| bracedInitList
+	) # UNKNOWN
+	| expression (Dot | Arrow) (
+		Template? idExpression
+		| pseudoDestructorName
+	)										# memberAccessExpression
+	| expression (PlusPlus | MinusMinus)	# suffixIncrementDecrementExpression
+	| (
+		Dynamic_cast
+		| Static_cast
+		| Reinterpret_cast
+		| Const_cast
+	) Less theTypeId Greater LeftParen expression RightParen				# castExpression
+	| typeIdOfTheTypeId LeftParen (expression | theTypeId) RightParen		# UNKNOWN3
+	| <assoc = right> (PlusPlus | MinusMinus | unaryOperator) expression	# unaryExpression
+	| <assoc = right> Sizeof (
+		LeftParen theTypeId RightParen
+		| Ellipsis LeftParen Identifier RightParen
+		| expression
+	)															# sizeofExpression
+	| <assoc = right> Alignof LeftParen theTypeId RightParen	# alignExpression
+	| <assoc = right> Noexcept LeftParen expression RightParen	# noExceptExpression
+	| <assoc = right> Doublecolon? New newPlacement? (
+		newTypeId
+		| (LeftParen theTypeId RightParen)
+	) newInitializer? # newExpression
+	| <assoc = right> Doublecolon? Delete (
+		LeftBracket RightBracket
+	)? expression														# deleteExpression
+	| expression (DotStar | ArrowStar) expression						# pointerMemberExpression
+	| expression (Star | Div | Mod) expression							# multiplicativeExpression
+	| expression (Plus | Minus) expression								# additiveExpression
+	| expression shiftOperator expression								# shiftExpression
+	| expression (Less | Greater | LessEqual | GreaterEqual) expression	# relationalExpression
+	| expression (Equal | NotEqual) expression							# equalityExpression
+	| expression And expression											# andExpression
+	| expression Caret expression										# exclusiveOrExpression
+	| expression Or expression											# inclusiveOrExpression
+	| expression AndAnd expression										# logicalAndExpression
+	| expression OrOr expression										# logicalOrExpression
+	| <assoc = right> Throw expression									# throwExpression
+	| <assoc = right> expression Question expression Colon expression	# conditionalExpression
+	| <assoc = right> expression assignmentOperator initializerClause	# assignmentExpression
+	| expression Comma expression										# commaExpression;
+
+//constantExpression: conditionalExpression;
 /*Statements*/
 
 statement:
 	labeledStatement
-	| declarationStatement
 	| attributeSpecifierSeq? (
 		expressionStatement
 		| compoundStatement
@@ -232,12 +186,12 @@ statement:
 		| jumpStatement
 		| tryBlock
 	)
-    ;
+	| declarationStatement;
 
 labeledStatement:
 	attributeSpecifierSeq? (
 		Identifier
-		| Case constantExpression
+		| Case expression
 		| Default
 	) Colon statement;
 
@@ -315,7 +269,7 @@ simpleDeclaration:
 	| attributeSpecifierSeq declSpecifierSeq? initDeclaratorList Semi;
 
 staticAssertDeclaration:
-	Static_assert LeftParen constantExpression Comma StringLiteral RightParen Semi;
+	Static_assert LeftParen expression Comma StringLiteral RightParen Semi;
 
 emptyDeclaration: Semi;
 
@@ -414,7 +368,7 @@ enumbase: Colon typeSpecifierSeq;
 enumeratorList:
 	enumeratorDefinition (Comma enumeratorDefinition)*;
 
-enumeratorDefinition: enumerator (Assign constantExpression)?;
+enumeratorDefinition: enumerator (Assign expression)?;
 
 enumerator: Identifier;
 
@@ -454,7 +408,7 @@ attributeSpecifier:
 	| alignmentspecifier;
 
 alignmentspecifier:
-	Alignas LeftParen (theTypeId | constantExpression) Ellipsis? RightParen;
+	Alignas LeftParen (theTypeId | expression) Ellipsis? RightParen;
 
 attributeList: attribute (Comma attribute)* Ellipsis?;
 
@@ -494,7 +448,7 @@ noPointerDeclarator:
 	declaratorid attributeSpecifierSeq?
 	| noPointerDeclarator (
 		parametersAndQualifiers
-		| LeftBracket constantExpression? RightBracket attributeSpecifierSeq?
+		| LeftBracket expression? RightBracket attributeSpecifierSeq?
 	)
 	| LeftParen pointerDeclarator RightParen;
 
@@ -531,11 +485,10 @@ pointerAbstractDeclarator:
 noPointerAbstractDeclarator:
 	noPointerAbstractDeclarator (
 		parametersAndQualifiers
-		| noPointerAbstractDeclarator LeftBracket constantExpression? RightBracket
-			attributeSpecifierSeq?
+		| noPointerAbstractDeclarator LeftBracket expression? RightBracket attributeSpecifierSeq?
 	)
 	| parametersAndQualifiers
-	| LeftBracket constantExpression? RightBracket attributeSpecifierSeq?
+	| LeftBracket expression? RightBracket attributeSpecifierSeq?
 	| LeftParen pointerAbstractDeclarator RightParen;
 
 abstractPackDeclarator:
@@ -544,7 +497,7 @@ abstractPackDeclarator:
 noPointerAbstractPackDeclarator:
 	noPointerAbstractPackDeclarator (
 		parametersAndQualifiers
-		| LeftBracket constantExpression? RightBracket attributeSpecifierSeq?
+		| LeftBracket expression? RightBracket attributeSpecifierSeq?
 	)
 	| Ellipsis;
 
@@ -577,7 +530,7 @@ braceOrEqualInitializer:
 	Assign initializerClause
 	| bracedInitList;
 
-initializerClause: assignmentExpression | bracedInitList;
+initializerClause: expression | bracedInitList;
 
 initializerList:
 	initializerClause Ellipsis? (
@@ -626,7 +579,7 @@ memberDeclarator:
 		virtualSpecifierSeq? pureSpecifier?
 		| braceOrEqualInitializer?
 	)
-	| Identifier? attributeSpecifierSeq? Colon constantExpression;
+	| Identifier? attributeSpecifierSeq? Colon expression;
 
 virtualSpecifierSeq: virtualSpecifier+;
 
@@ -681,7 +634,7 @@ memInitializer:
 meminitializerid: classOrDeclType | Identifier;
 /*Overloading*/
 
-operatorFunctionId: Operator theOperator;
+operatorFunctionId: Operator operator;
 
 literalOperatorId:
 	Operator (
@@ -716,7 +669,7 @@ templateName: Identifier;
 templateArgumentList:
 	templateArgument Ellipsis? (Comma templateArgument Ellipsis?)*;
 
-templateArgument: theTypeId | constantExpression | idExpression;
+templateArgument: theTypeId | idExpression | expression;
 
 typeNameSpecifier:
 	Typename_ nestedNameSpecifier (
@@ -746,7 +699,7 @@ exceptionDeclaration:
 	)?
 	| Ellipsis;
 
-throwExpression: Throw assignmentExpression?;
+//throwExpression: Throw expression?;
 
 exceptionSpecification:
 	dynamicExceptionSpecification
@@ -758,13 +711,13 @@ dynamicExceptionSpecification:
 typeIdList: theTypeId Ellipsis? (Comma theTypeId Ellipsis?)*;
 
 noeExceptSpecification:
-	Noexcept LeftParen constantExpression RightParen
+	Noexcept LeftParen expression RightParen
 	| Noexcept;
 /*Preprocessing directives*/
 
 /*Lexer*/
 
-theOperator:
+operator:
 	New (LeftBracket RightBracket)?
 	| Delete (LeftBracket RightBracket)?
 	| Plus
