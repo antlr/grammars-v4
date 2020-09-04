@@ -37,7 +37,7 @@ expression: vectorOperation EOF;
 // Unary operations have the same precedence as multiplications
 
 vectorOperation
-    : vector powOp vectorOperation // pow is right-associative
+    : <assoc=right> vectorOperation powOp vectorOperation
     | unaryOp vectorOperation
     | vectorOperation multOp vectorOperation
     | vectorOperation addOp vectorOperation
@@ -72,14 +72,13 @@ parens: LEFT_PAREN vectorOperation RIGHT_PAREN;
 // Selectors
 
 instantSelector
-    : METRIC_NAME LEFT_BRACE labelMatcher (COMMA labelMatcher)* RIGHT_BRACE
-    | METRIC_NAME LEFT_BRACE RIGHT_BRACE
-    | METRIC_NAME
-    | LEFT_BRACE labelMatcher (COMMA labelMatcher)* RIGHT_BRACE
+    : METRIC_NAME (LEFT_BRACE labelMatcherList? RIGHT_BRACE)?
+    | LEFT_BRACE labelMatcherList RIGHT_BRACE
     ;
 
 labelMatcher:         labelName labelMatcherOperator STRING;
 labelMatcherOperator: EQ | NE | RE | NRE;
+labelMatcherList:     labelMatcher (COMMA labelMatcher)*;
 
 matrixSelector: instantSelector TIME_RANGE;
 
@@ -92,11 +91,8 @@ offset
 
 function: FUNCTION LEFT_PAREN parameter (COMMA parameter)* RIGHT_PAREN;
 
-parameter: literal | vector;
-parameterList
-    : LEFT_PAREN parameter (COMMA parameter)* RIGHT_PAREN
-    | LEFT_PAREN RIGHT_PAREN
-    ;
+parameter:     literal | vector;
+parameterList: LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
 
 // Aggregations
 
@@ -118,11 +114,8 @@ groupRight: GROUP_RIGHT labelNameList;
 
 // Label names
 
-labelName: keyword | METRIC_NAME | LABEL_NAME;
-labelNameList
-    : LEFT_PAREN labelName (COMMA labelName)* RIGHT_PAREN
-    | LEFT_PAREN RIGHT_PAREN
-    ;
+labelName:     keyword | METRIC_NAME | LABEL_NAME;
+labelNameList: LEFT_PAREN (labelName (COMMA labelName)*)? RIGHT_PAREN;
 
 keyword
     : AND
