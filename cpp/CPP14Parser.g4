@@ -28,7 +28,6 @@ options {
 translationUnit: declarationseq? EOF;
 /*Expressions*/
 
-
 idExpression: (nestedNameSpecifier Template?)? unqualifiedId;
 
 unqualifiedId:
@@ -45,8 +44,6 @@ nestedNameSpecifier:
 		Identifier
 		| Template? simpleTemplateId
 	) Doublecolon;
-//lambdaExpression:
-// lambdaIntroducer lambdaDeclarator? compoundStatement;
 
 lambdaIntroducer: LeftBracket lambdaCapture? RightBracket;
 
@@ -99,9 +96,7 @@ newInitializer:
 	LeftParen expressionList? RightParen
 	| bracedInitList;
 
-
 shiftOperator: Greater Greater | Less Less;
-
 
 assignmentOperator:
 	Assign
@@ -115,8 +110,6 @@ assignmentOperator:
 	| AndAssign
 	| XorAssign
 	| OrAssign;
-
-//expression: assignmentExpression (Comma assignmentExpression)*;
 
 expression:
 	Literal+															# literalExpression
@@ -173,7 +166,6 @@ expression:
 	| <assoc = right> expression assignmentOperator initializerClause	# assignmentExpression
 	| expression Comma expression										# commaExpression;
 
-//constantExpression: conditionalExpression;
 /*Statements*/
 
 statement:
@@ -253,7 +245,7 @@ declaration:
 
 blockDeclaration:
 	simpleDeclaration
-	| asmDefinition
+	| asmDeclaration
 	| namespaceAliasDefinition
 	| usingDeclaration
 	| usingDirective
@@ -262,7 +254,8 @@ blockDeclaration:
 	| opaqueEnumDeclaration;
 
 aliasDeclaration:
-	Using Identifier attributeSpecifierSeq? Assign theTypeId Semi;
+	(Template Less templateParameterList Greater)? Using Identifier attributeSpecifierSeq? Assign
+		theTypeId Semi;
 
 simpleDeclaration:
 	declSpecifierSeq? initDeclaratorList? Semi
@@ -393,7 +386,7 @@ usingDeclaration:
 usingDirective:
 	attributeSpecifierSeq? Using Namespace nestedNameSpecifier? namespaceName Semi;
 
-asmDefinition: Asm LeftParen StringLiteral RightParen Semi;
+asmDeclaration: Asm LeftParen StringLiteral RightParen Semi;
 
 linkageSpecification:
 	Extern StringLiteral (
@@ -567,7 +560,7 @@ memberdeclaration:
 	| functionDefinition
 	| usingDeclaration
 	| staticAssertDeclaration
-    | explicitSpecialization
+	| explicitSpecialization
 	| templateDeclaration
 	| aliasDeclaration
 	| emptyDeclaration;
@@ -645,16 +638,16 @@ literalOperatorId:
 /*Templates*/
 
 templateDeclaration:
-	Template Less templateparameterList Greater declaration;
+	Template Less templateParameterList Greater declaration;
 
-templateparameterList:
+templateParameterList:
 	templateParameter (Comma templateParameter)*;
 
 templateParameter: typeParameter | parameterDeclaration;
 
 typeParameter:
 	(
-		(Template Less templateparameterList Greater)? Class
+		(Template Less templateParameterList Greater)? Class
 		| Typename_
 	) ((Ellipsis? Identifier?) | (Identifier? Assign theTypeId));
 
