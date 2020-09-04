@@ -103,7 +103,8 @@ grant
    ;
 
 priviledge
-   : (kwAll | kwAllPermissions)
+   : kwAll
+   | kwAllPermissions
    | kwAlter
    | kwAuthorize
    | kwDescibe
@@ -115,13 +116,10 @@ priviledge
    ;
 
 resource
-   : kwAll kwFunctions
-   | kwAll kwFunctions kwIn kwKeyspace keyspace
+   : kwAll (kwFunctions (kwIn kwKeyspace keyspace)? | (kwKeyspaces | kwRoles))
    | kwFunction (keyspace DOT)? function
-   | kwAll kwKeyspaces
    | kwKeyspace keyspace
    | (kwTable)? (keyspace DOT)? table
-   | kwAll kwRoles
    | kwRole role
    ;
 
@@ -162,8 +160,7 @@ columnNotNull
    ;
 
 materializedViewOptions
-   : tableOptions
-   | tableOptions kwAnd clusteringOrder
+   : tableOptions (kwAnd clusteringOrder)?
    | clusteringOrder
    ;
 
@@ -278,7 +275,6 @@ alterTable
 alterTableOperation
    : alterTableAdd
    | alterTableDropColumns
-   | alterTableDropColumns
    | alterTableDropCompactStorage
    | alterTableRename
    | alterTableWith
@@ -322,8 +318,7 @@ roleWith
 
 roleWithOptions
    : kwPassword OPERATOR_EQ stringLiteral
-   | kwLogin OPERATOR_EQ booleanLiteral
-   | kwSuperuser OPERATOR_EQ booleanLiteral
+   | (kwLogin | kwSuperuser) OPERATOR_EQ booleanLiteral
    | kwOptions OPERATOR_EQ optionHash
    ;
 
@@ -388,8 +383,7 @@ tableOptions
    ;
 
 tableOptionItem
-   : tableOptionName OPERATOR_EQ tableOptionValue
-   | tableOptionName OPERATOR_EQ optionHash
+   : tableOptionName OPERATOR_EQ (tableOptionValue | optionHash)
    ;
 
 tableOptionName
@@ -492,8 +486,7 @@ replicationList
    ;
 
 replicationListItem
-   : STRING_LITERAL COLON STRING_LITERAL
-   | STRING_LITERAL COLON DECIMAL_LITERAL
+   : STRING_LITERAL COLON (STRING_LITERAL | DECIMAL_LITERAL)
    ;
 
 durableWrites
@@ -545,8 +538,7 @@ deleteColumnList
    ;
 
 deleteColumnItem
-   : OBJECT_NAME
-   | OBJECT_NAME LS_BRACKET (stringLiteral | decimalLiteral) RS_BRACKET
+   : OBJECT_NAME (LS_BRACKET (stringLiteral | decimalLiteral) RS_BRACKET)?
    ;
 
 update
@@ -570,15 +562,11 @@ assignments
    ;
 
 assignmentElement
-   : OBJECT_NAME OPERATOR_EQ (constant | assignmentMap | assignmentSet | assignmentList)
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) decimalLiteral
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentSet
-   | OBJECT_NAME OPERATOR_EQ assignmentSet (PLUS | MINUS) OBJECT_NAME
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentMap
-   | OBJECT_NAME OPERATOR_EQ assignmentMap (PLUS | MINUS) OBJECT_NAME
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentList
-   | OBJECT_NAME OPERATOR_EQ assignmentList (PLUS | MINUS) OBJECT_NAME
-   | OBJECT_NAME syntaxBracketLs decimalLiteral syntaxBracketRs OPERATOR_EQ constant
+   : OBJECT_NAME
+   ( OPERATOR_EQ ((constant | assignmentMap | assignmentSet | assignmentList)
+                  | OBJECT_NAME (PLUS | MINUS) (decimalLiteral | assignmentSet | assignmentMap | assignmentList)
+                  | (assignmentSet|assignmentMap|assignmentList) (PLUS | MINUS) OBJECT_NAME)
+   | syntaxBracketLs decimalLiteral syntaxBracketRs OPERATOR_EQ constant)
    ;
 
 assignmentSet
@@ -586,7 +574,7 @@ assignmentSet
    ;
 
 assignmentMap
-   : syntaxBracketLc (constant syntaxColon constant) (constant syntaxColon constant)* syntaxBracketRc
+   : syntaxBracketLc (constant syntaxColon constant)+ syntaxBracketRc
    ;
 
 assignmentList
@@ -605,10 +593,7 @@ insert
    ;
 
 usingTtlTimestamp
-   : kwUsing ttl
-   | kwUsing ttl kwAnd timestamp
-   | kwUsing timestamp
-   | kwUsing timestamp kwAnd ttl
+   : kwUsing (ttl (kwAnd timestamp)? | timestamp (kwAnd ttl)?)
    ;
 
 timestamp
@@ -673,8 +658,7 @@ fromSpec
    ;
 
 fromSpecElement
-   : OBJECT_NAME
-   | OBJECT_NAME '.' OBJECT_NAME
+   : OBJECT_NAME ('.' OBJECT_NAME)?
    ;
 
 orderSpec
@@ -698,8 +682,8 @@ selectElements
    ;
 
 selectElement
-   : OBJECT_NAME '.' '*'
-   | OBJECT_NAME (kwAs OBJECT_NAME)?
+   : OBJECT_NAME ('.' '*'
+                 |  (kwAs OBJECT_NAME)?)
    | functionCall (kwAs OBJECT_NAME)?
    ;
 
