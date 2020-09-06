@@ -36,9 +36,9 @@ file
    ;
 
 provider
-  : 'provider' blockbody
+  : 'provider' STRING blockbody
   ;
-  
+
 output
   : 'output' STRING blockbody
   ;
