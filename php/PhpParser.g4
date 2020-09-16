@@ -621,17 +621,9 @@ argumentName
 constantInititalizer
     : constant
     | string
-    | Array '(' (constantArrayItemList ','?)? ')'
-    | '[' (constantArrayItemList ','?)? ']'
-    | ('+'|'-') constantInititalizer
-    ;
-
-constantArrayItemList
-    : constantArrayItem (',' constantArrayItem)*
-    ;
-
-constantArrayItem
-    : constantInititalizer ('=>' constantInititalizer)?
+    | Array '(' (arrayItemList ','?)? ')'
+    | '[' (arrayItemList ','?)? ']'
+    | ('+' | '-') constantInititalizer
     ;
 
 constant
