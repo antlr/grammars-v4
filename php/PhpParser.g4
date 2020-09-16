@@ -106,7 +106,7 @@ useDeclarationContent
     ;
 
 namespaceDeclaration
-    : Namespace (namespaceNameList? OpenCurlyBracket namespaceStatement* '}' | namespaceNameList SemiColon)
+    : Namespace (namespaceNameList? OpenCurlyBracket namespaceStatement* CloseCurlyBracket | namespaceNameList SemiColon)
     ;
 
 namespaceStatement
@@ -125,7 +125,7 @@ classDeclaration
     : attributes Private? modifier? Partial? (
       classEntryType identifier typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)?
     | Interface identifier typeParameterListInBrackets? (Extends interfaceList)? )
-      OpenCurlyBracket classStatement* '}'
+      OpenCurlyBracket classStatement* CloseCurlyBracket
     ;
 
 classEntryType
@@ -218,7 +218,7 @@ emptyStatement
     ;
 
 blockStatement
-    : OpenCurlyBracket innerStatementList '}'
+    : OpenCurlyBracket innerStatementList CloseCurlyBracket
     ;
 
 ifStatement
@@ -263,7 +263,7 @@ forUpdate
     ;
 
 switchStatement
-    : Switch parentheses (OpenCurlyBracket SemiColon? switchBlock* '}' | ':' SemiColon? switchBlock* EndSwitch SemiColon)
+    : Switch parentheses (OpenCurlyBracket SemiColon? switchBlock* CloseCurlyBracket | ':' SemiColon? switchBlock* EndSwitch SemiColon)
     ;
 
 switchBlock
@@ -352,7 +352,7 @@ globalStatement
 globalVar
     : VarName
     | Dollar chain
-    | Dollar OpenCurlyBracket expression '}'
+    | Dollar OpenCurlyBracket expression CloseCurlyBracket
     ;
 
 echoStatement
@@ -373,7 +373,7 @@ classStatement
 
 traitAdaptations
     : SemiColon
-    | OpenCurlyBracket traitAdaptationStatement* '}'
+    | OpenCurlyBracket traitAdaptationStatement* CloseCurlyBracket
     ;
 
 traitAdaptationStatement
@@ -580,7 +580,7 @@ anonymousClass
     : attributes Private? modifier? Partial? (
       classEntryType typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)?
     | Interface identifier typeParameterListInBrackets? (Extends interfaceList)? )
-      OpenCurlyBracket classStatement* '}'
+      OpenCurlyBracket classStatement* CloseCurlyBracket
     ;
 
 indirectTypeRef
@@ -598,7 +598,7 @@ namespaceNameList
 
 namespaceNameTail
     : identifier (As identifier)?
-    | OpenCurlyBracket namespaceNameTail (','namespaceNameTail)* ','? '}'
+    | OpenCurlyBracket namespaceNameTail (','namespaceNameTail)* ','? CloseCurlyBracket
     ;
 
 qualifiedNamespaceNameList
@@ -715,16 +715,16 @@ keyedFieldName
     ;
 
 keyedSimpleFieldName
-    : (identifier | OpenCurlyBracket expression '}') squareCurlyExpression*
+    : (identifier | OpenCurlyBracket expression CloseCurlyBracket) squareCurlyExpression*
     ;
 
 keyedVariable
-    : Dollar* (VarName | Dollar OpenCurlyBracket expression '}') squareCurlyExpression*
+    : Dollar* (VarName | Dollar OpenCurlyBracket expression CloseCurlyBracket) squareCurlyExpression*
     ;
 
 squareCurlyExpression
     : '[' expression? ']'
-    | OpenCurlyBracket expression '}'
+    | OpenCurlyBracket expression CloseCurlyBracket
     ;
 
 assignmentList
