@@ -56,7 +56,7 @@ public abstract class PhpBaseLexer extends Lexer
             }
             popMode(); // exit from PHP mode.
 
-            if (token.getText().equals("</script>"))
+            if ("</script>".equals(token.getText()))
             {
                 _phpScript = false;
                 token.setType(PhpLexer.ScriptClose);
@@ -82,7 +82,7 @@ public abstract class PhpBaseLexer extends Lexer
         }
         else if (token.getType() == PhpLexer.HtmlDoubleQuoteString)
         {
-            if (token.getText().equals("php") && _htmlNameText.equals("language"))
+            if ("php".equals(token.getText()) && "language".equals(_htmlNameText))
             {
                 _phpScript = true;
             }
@@ -94,7 +94,7 @@ public abstract class PhpBaseLexer extends Lexer
             {
                 case PhpLexer.StartHereDoc:
                 case PhpLexer.StartNowDoc:
-                    _heredocIdentifier = token.getText().substring(3).trim().replace("\'","");
+                    _heredocIdentifier = token.getText().substring(3).trim().replace("'","");
                     break;
 
                 case PhpLexer.HereDocText:

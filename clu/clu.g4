@@ -1,18 +1,18 @@
 /*
  BSD License
- 
+
  Copyright (c) 2018, Tom Everett All rights reserved.
- 
+
  Redistribution and use in source and binary forms, with or without modification, are permitted
  provided that the following conditions are met:
- 
+
  1. Redistributions of source code must retain the above copyright notice, this list of conditions
  and the following disclaimer. 2. Redistributions in binary form must reproduce the above copyright
  notice, this list of conditions and the following disclaimer in the documentation and/or other
  materials provided with the distribution. 3. Neither the name of Tom Everett nor the names of its
  contributors may be used to endorse or promote products derived from this software without specific
  prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
@@ -25,198 +25,272 @@
 
 grammar clu;
 
-module: equate* (procedure | iterator | cluster);
+module
+   : equate* (procedure | iterator | cluster)
+   ;
 
-procedure:
-	idn '=' 'proc' parms? args returnz? signals? where? routine_body 'end' idn;
+procedure
+   : idn '=' 'proc' parms? args returnz? signals? where? routine_body 'end' idn
+   ;
 
-iterator:
-	idn '=' 'iter' parms? args yields? signals? where? routine_body 'end' idn;
+iterator
+   : idn '=' 'iter' parms? args yields? signals? where? routine_body 'end' idn
+   ;
 
-cluster:
-	idn '=' 'cluster' parms? 'is' idn_list where? cluster_body 'end' idn;
+cluster
+   : idn '=' 'cluster' parms? 'is' idn_list where? cluster_body 'end' idn
+   ;
 
-parms: param (',' param)*;
+parms
+   : param (',' param)*
+   ;
 
-param: idn_list ':' ('type' | type_spec);
+param
+   : idn_list ':' ('type' | type_spec)
+   ;
 
-args: '(' decl_list? ')';
-decl_list: decl (',' decl)*;
-decl: idn_list ':' type_spec;
+args
+   : '(' decl_list? ')'
+   ;
 
-returnz: 'returns' '(' type_spec_list ')';
+decl_list
+   : decl (',' decl)*
+   ;
 
-yields: 'yields' '(' type_spec_list ')';
+decl
+   : idn_list ':' type_spec
+   ;
 
-signals: 'signals' '(' exception (',' exception)* ')';
+returnz
+   : 'returns' '(' type_spec_list ')'
+   ;
 
-exception: name type_spec_list?;
+yields
+   : 'yields' '(' type_spec_list ')'
+   ;
 
-type_spec_list: type_spec (',' type_spec)*;
+signals
+   : 'signals' '(' exception_ (',' exception_)* ')'
+   ;
 
-where: 'where' restriction (',' restriction)*;
+exception_
+   : name type_spec_list?
+   ;
 
-restriction: idn ('has' oper_decl_list | 'in' type_set);
+type_spec_list
+   : type_spec (',' type_spec)*
+   ;
 
-type_set: (idn | (idn 'has' oper_decl_list equate*))* | idn;
+where
+   : 'where' restriction (',' restriction)*
+   ;
 
-oper_decl_list: oper_decl (',' oper_decl)*;
-oper_decl: op_name_list ':' type_spec;
+restriction
+   : idn ('has' oper_decl_list | 'in' type_set)
+   ;
 
-op_name_list: op_name (',' op_name)*;
+type_set
+   : (idn | idn 'has' oper_decl_list equate*)*
+   | idn
+   ;
 
-op_name: name '[' constant_list? ']';
+oper_decl_list
+   : oper_decl (',' oper_decl)*
+   ;
 
-constant_list: constant (',' constant)*;
+oper_decl
+   : op_name_list ':' type_spec
+   ;
 
-constant: expression | type_spec;
+op_name_list
+   : op_name (',' op_name)*
+   ;
 
-routine_body: equate* own_var* statement*;
+op_name
+   : name '[' constant_list? ']'
+   ;
 
-cluster_body:
-	equate* 'rep' '=' type_spec equate* own_var* 'routine' routine*;
+constant_list
+   : constant (',' constant)*
+   ;
 
-routine: procedure | iterator;
+constant
+   : expression
+   | type_spec
+   ;
 
-equate: idn '=' (constant | type_set);
+routine_body
+   : equate* own_var* statement*
+   ;
 
-own_var:
-	'own' (
-		(decl)
-		| (idn ':' type_spec ':=' expression)
-		| (decl_list ':=' invocation)
-	);
+cluster_body
+   : equate* 'rep' '=' type_spec equate* own_var* 'routine' routine*
+   ;
 
-type_spec:
-	'null'
-	| 'bool'
-	| 'int'
-	| 'real'
-	| 'char'
-	| 'string'
-	| 'any'
-	| 'rep'
-	| 'cvt'
-	| ('array' | 'sequence' type_spec?)
-	| ('record' | 'struct' | 'oneof' | 'variant') field_spec_list?
-	| ('proctype' | 'itertype') field_spec_list? returnz? signals?
-	| (idn (constant_list)?);
+routine
+   : procedure
+   | iterator
+   ;
 
-field_spec_list: (field_spec (',' field_spec)*);
+equate
+   : idn '=' (constant | type_set)
+   ;
 
-field_spec: name_list ':' type_spec;
+own_var
+   : 'own' (decl | idn ':' type_spec ':=' expression | decl_list ':=' invocation)
+   ;
 
-statement:
-	decl
-	| idn ':' type_spec ':=' expression
-	| decl_list ':=' invocation
-	| idn_list ':=' (invocation | expression_list)
-	| primary '.' name ':=' expression
-	| invocation
-	| 'while' expression 'do' body 'end'
-	| 'for' (decl_list | idn_list)? 'in' invocation 'do' body 'end'
-	| (
-		'if' expression 'then' body (
-			'elseif' expression 'then' body
-		)* ('else' body)? 'end'
-	)
-	| ('tagcase' expression tag_arm* ('others' ':' body)? 'end')
-	| (('return' | 'yield') (expression_list)?)
-	| ('signal' name (expression_list)?)
-	| ('exit' name (expression_list)?)
-	| 'break'
-	| ('begin' body 'end')
-	| statement (
-		('resignal' name_list)
-		| ('except' when_handler* others_handler? 'end')
-	);
+type_spec
+   : 'null'
+   | 'bool'
+   | 'int'
+   | 'real'
+   | 'char'
+   | 'string'
+   | 'any'
+   | 'rep'
+   | 'cvt'
+   | 'array'
+   | 'sequence' type_spec?
+   | ('record' | 'struct' | 'oneof' | 'variant') field_spec_list?
+   | ('proctype' | 'itertype') field_spec_list? returnz? signals?
+   | idn constant_list?
+   ;
 
-tag_arm: 'tag' name_list ('(' idn ':' type_spec ')')? ':' body;
+field_spec_list
+   : field_spec (',' field_spec)*
+   ;
 
-when_handler:
-	'when' name_list ('(' '*' ')' | (decl_list)?) ':' body;
+field_spec
+   : name_list ':' type_spec
+   ;
 
-others_handler: 'others' ('(' idn ':' type_spec ')')? ':' body;
+statement
+   : decl
+   | idn ':' type_spec ':=' expression
+   | decl_list ':=' invocation
+   | idn_list ':=' (invocation | expression_list)
+   | primary '.' name ':=' expression
+   | invocation
+   | 'while' expression 'do' body 'end'
+   | 'for' (decl_list | idn_list)? 'in' invocation 'do' body 'end'
+   | 'if' expression 'then' body ('elseif' expression 'then' body)* ('else' body)? 'end'
+   | 'tagcase' expression tag_arm* ('others' ':' body)? 'end'
+   | ('return' | 'yield') expression_list?
+   | 'signal' name expression_list?
+   | 'exit' name expression_list?
+   | 'break'
+   | 'begin' body 'end'
+   | statement ('resignal' name_list | 'except' when_handler* others_handler? 'end')
+   ;
 
-body: equate* statement*;
+tag_arm
+   : 'tag' name_list ('(' idn ':' type_spec ')')? ':' body
+   ;
 
-expression_list: expression (',' expression)*;
+when_handler
+   : 'when' name_list ('(' '*' ')' | decl_list?) ':' body
+   ;
 
-expression:
-	primary
-	| '(' expression ')'
-	| '~' expression
-	| '-' expression
-	| expression '**' expression
-	| expression '//' expression
-	| expression '/' expression
-	| expression '*' expression
-	| expression '||' expression
-	| expression '+' expression
-	| expression '-' expression
-	| expression '<' expression
-	| expression '<=' expression
-	| expression '=' expression
-	| expression '>=' expression
-	| expression '>' expression
-	| expression '~<' expression
-	| expression '~<=' expression
-	| expression '~=' expression
-	| expression '~>=' expression
-	| expression '~>' expression
-	| expression '&' expression
-	| expression 'cand' expression
-	| expression '|' expression
-	| expression 'cor' expression;
-primary:
-	'nil'
-	| 'true'
-	| 'false'
-	| int_literal
-	| real_literal
-	| string_literal
-	| idn (constant_list)?
-	| primary '.' name
-	| primary expression
-	| primary '(' expression_list ')'
-	| type_spec '$' (
-		field_list
-		| (
-			'[' (
-				((expression ':')? expression_list)
-				| constant_list
-			) ']'
-		)
-	)
-	| ('force' type_spec?)
-	| (('up' | 'down') '(' expression ')');
+others_handler
+   : 'others' ('(' idn ':' type_spec ')')? ':' body
+   ;
 
-invocation: primary '(' expression_list ')';
+body
+   : equate* statement*
+   ;
 
-field_list: field (',' field)*;
+expression_list
+   : expression (',' expression)*
+   ;
 
-field: name_list ':' expression;
+expression
+   : primary
+   | '(' expression ')'
+   | ('~' | '-') expression
+   | expression '**' expression
+   | expression ('//' | '/' | '*') expression
+   | expression ('||' | '+' | '-') expression
+   | expression ('<' | '<=' | '=' | '>=' | '>' | '~<' | '~<=' | '~=' | '~>=' | '~>') expression
+   | expression ('&' | 'cand') expression
+   | expression ('|' | 'cor') expression
+   ;
 
-idn_list: idn (',' idn)*;
-idn: STRING;
+primary
+   : 'nil'
+   | 'true'
+   | 'false'
+   | int_literal
+   | real_literal
+   | string_literal
+   | idn constant_list?
+   | primary ('.' name | expression | '(' expression_list? ')') 
+   | type_spec '$' (field_list | '[' (expression ':')? expression_list ']' | name constant_list?)
+   | 'force' type_spec?
+   | ('up' | 'down') '(' expression ')'
+   ;
 
-name_list: name (',' name)*;
-name: STRING;
+invocation
+   : primary '(' expression_list ')'
+   ;
 
-int_literal: INT;
+field_list
+   : field (',' field)*
+   ;
 
-real_literal: FLOAT;
+field
+   : name_list ':' expression
+   ;
 
-string_literal: STRINGLITERAL;
+idn_list
+   : idn (',' idn)*
+   ;
 
-STRINGLITERAL: '"' ~'"'* '"';
+idn
+   : STRING
+   ;
 
-STRING: [a-zA-Z] [a-zA-Z0-9_]*;
+name_list
+   : name (',' name)*
+   ;
 
-INT: [0-9]+;
+name
+   : STRING
+   ;
 
-FLOAT: [0-9]+ '.' [0-9]*;
+int_literal
+   : INT
+   ;
 
-COMMENT: ';' ~ [\r\n]* -> skip;
+real_literal
+   : FLOAT
+   ;
 
-WS: [ \t\r\n] -> skip;
+string_literal
+   : STRINGLITERAL
+   ;
+
+STRINGLITERAL
+   : '"' ~'"'* '"'
+   ;
+
+STRING
+   : [a-zA-Z] [a-zA-Z0-9_]*
+   ;
+
+INT
+   : [0-9]+
+   ;
+
+FLOAT
+   : [0-9]+ '.' [0-9]*
+   ;
+
+COMMENT
+   : '%' ~[\r\n]* -> channel(HIDDEN)
+   ;
+
+WS
+   : [ \t\r\n]+ -> channel(HIDDEN)
+   ;
+
