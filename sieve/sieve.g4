@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2019, Tom Everett
+Copyright (c) 2020, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -123,14 +123,14 @@ TAG
    : ':' IDENTIFIER
    ;
    // a single octet other than NUL, CR, or LF
-   
+
 OCTETNOTCRLF
    : [\u0001-\u0009]
    | [\u000B-\u000C]
    | [\u000E-\u00FF]
    ;
    // a single octet other than NUL,CR, LF, or period
-   
+
 OCTETNOTPERIOD
    : [\u0001-\u0009]
    | [\u000B-\u000C]
@@ -138,7 +138,7 @@ OCTETNOTPERIOD
    | [\u002F-\u00FF]
    ;
    // a single octet other than NUL, CR, LF, double-quote, or backslash
-   
+
 OCTETNOTQSPECIAL
    : [\u0001-\u0009]
    | [\u000B-\u000C]
@@ -147,7 +147,7 @@ OCTETNOTQSPECIAL
    | [\u005D-\u00FF]
    ;
    // either a CRLF pair, OR a single octet other than NUL, CR, LF, or star
-   
+
 NOTSTAR
    : [\u0001-\u0009]
    | [\u000B-\u000C]
@@ -155,7 +155,7 @@ NOTSTAR
    | [\u002B-\u00FF]
    ;
    // either a CRLF pair, OR a single octet  other than NUL, CR, LF, star, or slash
-   
+
 ADDRESSPART
    : ':localpart'
    | ':domain'
