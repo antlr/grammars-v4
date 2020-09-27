@@ -1,9 +1,0 @@
-System simple_cs = {
-    Component client = { Port send-request }
-    Component server = { Port receive-request }
-    Connector rpc = { Roles {caller, callee} }
-    Attachments : {
-        client.send-request to rpc.caller ;
-        server.receive-request to rpc.callee
-        }
-}

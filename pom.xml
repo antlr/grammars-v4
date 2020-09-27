@@ -186,6 +186,7 @@
 				<module>postalcode</module>
 				<module>powerbuilder</module>
 				<module>prolog</module>
+				<module>promql</module>
 				<module>propcalc</module>
 				<module>properties</module>
 				<module>protobuf3</module>
@@ -213,6 +214,7 @@
 				<module>sgf</module>
 				<module>sharc</module>
 				<module>sickbay</module>
+                <module>sieve</module>
 				<module>smalltalk</module>
 			    <module>smiles</module>
 				<module>smtlibv2</module>

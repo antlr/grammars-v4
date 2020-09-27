@@ -27,13 +27,12 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionMode;
 
 import java.io.File;
@@ -204,7 +203,6 @@ class Test {
 		System.out.println("Total lexer+parser time " + time + "ms.");
 
 		System.out.println("finished parsing OK");
-		System.out.println(LexerATNSimulator.match_calls+" lexer match calls");
 //		System.out.println(ParserATNSimulator.predict_calls +" parser predict calls");
 //		System.out.println(ParserATNSimulator.retry_with_context +" retry_with_context after SLL conflict");
 //		System.out.println(ParserATNSimulator.retry_with_context_indicates_no_conflict +" retry sees no conflict");
@@ -258,7 +256,7 @@ class Test {
 		try {
 			if ( !quiet ) System.err.println(f);
 			// Create a scanner that reads from the input stream passed to us
-			Lexer lexer = new Java8Lexer(new ANTLRFileStream(f));
+			Lexer lexer = new Java8Lexer(CharStreams.fromFileName(f));
 
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 //			long start = System.currentTimeMillis();
@@ -275,7 +273,7 @@ class Test {
 			// start parsing at the compilationUnit rule
 			ParserRuleContext t = parser.compilationUnit();
 			if ( notree ) parser.setBuildParseTree(false);
-			if ( gui ) t.inspect(parser);
+//			if ( gui ) t.inspect(parser);
 			if ( printTree ) System.out.println(t.toStringTree(parser));
 		}
 		catch (Exception e) {
