@@ -1,0 +1,99 @@
+﻿/******************************************************************************
+	mb/system/history/MBHistoryScrollPeg.tjs
+	スクロールバーのつまみ
+*******************************************************************************/
+
+
+class MBHistoryScrollPeg extends MBComponentLayer
+{
+	var imagePath = "history/slide_peg";
+	
+	var intMinStartLine = 0;	// 最小開始行
+	var intMaxStartLine;	// 最大開始行
+	
+	var blDragging;	// ドラッグ中フラグ
+	
+	
+	function MBHistoryScrollPeg(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(win, par);
+		
+		init();
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function init()
+	{
+		// イニシャライザ
+		
+		loadImages(%[storage : sysfunc.getPathImage(imagePath)]);
+		setPos(0, 0);
+		
+		hitType      = htMask;
+		hitThreshold = 0;
+		visible      = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setPositionTo(y)
+	{
+		if (y < 0) {
+			y = 0;
+		}
+		else if (y > parent.intMaxPegTop) {
+			y = parent.intMaxPegTop;
+		}
+		
+		top = y;
+	}
+	
+	
+	//==========================================================================
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		if (button == mbLeft) {
+			hint = "";
+			blDragging = true;
+		}
+	}
+	
+	function onMouseUp(x, y, button, shift)
+	{
+		if (button == mbLeft) {
+			blDragging = false;
+		}
+	}
+	
+	function onMouseMove(x, y, shift)
+	{
+		if (!blDragging) {
+			return;
+		}
+		
+		setPositionTo(parent.cursorY - height * 0.5);
+		parent.scrollByBarClick(top);
+	}
+	
+	function onMouseEnter()
+	{
+		cursor = crHandPoint;
+	}
+	
+	function onMouseLeave()
+	{
+		cursor = crDefault;
+		blDragging = false;
+	}
+}

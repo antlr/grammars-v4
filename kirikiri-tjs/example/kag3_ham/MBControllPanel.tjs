@@ -1,0 +1,1150 @@
+/******************************************************************************
+	system_mb/mb/system/userconf/MBControllPanel.tjs
+*******************************************************************************/
+
+class MBControllPanel extends MBComponentLayer
+{
+	var owner;	// オーナー
+	var isNewLayer = true;
+	
+	var bgImage = "userconf/background";	// 背景画像
+	var screenScale = 1;
+	
+	var titleImage = "userconf/title";	// タイトル画像
+	var regularTitlePosition = %[x : 46, y : 18];	// タイトルの標準位置
+	
+	var consoleImage = "userconf/console";	// 操作盤基本画像
+	var consoleImageNoQs = "userconf/console_noqs";	// クイックセーブ無効版画像
+	var regularConsolePosition = %[x : 56, y : 99];	// 操作盤の標準位置
+	var regularConsoleSize = %[width : 0, height : 0];
+	var consolePosition = %[x : 0, y : 0];
+	var consoleSize = %[width : 0, height : 0];
+	var consoleScale = 1;	// 操作盤は画面スケールとは別にスケールを持つ
+	var consoleSeparateLineColor = 0x5e5e5e;	// 操作盤区切り線（幅1px）
+	var consoleMargin = 5;
+	
+	var closeButtonImage = "bt_return_dark";
+	var closeButtonPositionType = "rbMargin";
+	var closeButtonPositionValue = %[x : 20, y : 20];
+	
+	var objSectionSelectorArray = [];	// セクションセレクタ
+	
+	var objBGMVolumeIcon;	// BGM調整パネルのアイコン
+	var objBGMVolumePanel;	// BGM調整パネル
+	var objBGMMuteButton;	// BGMミュート
+	var intBGMMutedVolume;	// ミュート前のボリューム兼フラグ
+	
+	var objSEVolumeIcon;	// SE調整パネルのアイコン
+	var objSEVolumePanel;	// SE調整パネル
+	var objSEMuteButton;	// SEミュート
+	var intSEMutedVolume;	// ミュート前のボリューム兼フラグ
+	
+	var objCharImageLayer;		// キャラクターイメージ（ランダム）
+	var intCharImagePtn = 4;	// キャラのパターン
+	
+	var intCHSButtonWidth   = [11, 16, 17, 16, 17, 14, 13];	// 文字速度ボタンの幅 ad-hock
+	
+	var objCharSpeedButtons = [];	// 既読文字速度ボタンの配列
+	var objCharSpeedChecker;		// 既読文字速度のチェックマーク
+	var intCharSpeed;	// 現在の文字表示速度
+	var objCharSpeedTestLayer;	// テスト文表示領域
+	
+	var objCharSpeed2Buttons = [];	// 未読文字速度ボタンの配列
+	var objCharSpeed2Checker;		// 未読文字速度のチェックマーク
+	var intCharSpeed2;	// 現在の未読文字速度
+	
+	var objAMCharSpeedButtons = [];	// オートモードの表示速度関連
+	var objAMCharSpeedChecker;
+	var intAMCharSpeed;
+	
+	var objAMLineWaitButtons = [];	// オートモードの行待ち速度の配列
+	var objAMLineWaitChecker;
+	var intAMLineWait;
+	
+	var objAMPageWaitButtons = [];	// オートモードの頁待ち速度の配列
+	var objAMPageWaitChecker;
+	var intAMPageWait;
+	
+	var objWinkOffButton;	//  目パチ無効ボタン
+	var objWinkOnButton;	// 目パチ有効ボタン
+	var blWinkEnabled;	// 目パチが有効かどうか
+	
+	var objQsWithDialogButton;	// 保存確認ありボタン
+	var objQsWithoutDialogButton;	// 保存確認なしボタン
+	var blQsWithoutDialog;	// 保存確認を「しない」かどうか
+	
+	var objCursorSnapEnableButton;	// スナップ有効ボタン
+	var objCursorSnapDisableButton;	// スナップ無効ボタン
+	var blSetCursor;		// スナップが有効かどうか
+	
+	var objCloseButton;	// キャンセルボタン
+	
+	var intCursorLevel;	// カーソル深度
+	var objCurrentSectionSelector;	// 現在のセクションのセレクタ
+	
+	var refFocusMember;
+	
+	var timer;
+	var counter;
+	
+	
+	function MBControllPanel(win, par, own)
+	{
+		super.MBComponentLayer(win, par);
+		
+		owner = own;
+		
+		setSize(win.fore.base.width, win.fore.base.height);
+		setPos(0, 0);
+		opacity = 0;
+		name = '環境設定ベースレイヤ';
+		focusable = true;
+		
+		screenScale = sysfunc.getScreenScale();
+		
+		// 背景を描画
+		var lscale = sysfunc.getScreenScale(true);
+		var bmp = new Bitmap(sysfunc.getPathImage(bgImage));
+		operateStretch(
+			0, 0, Math.ceil(bmp.width * lscale), Math.ceil(bmp.height * lscale),
+			bmp,
+			0, 0, bmp.width, bmp.height);
+		
+		// タイトルを描画
+		bmp.load(sysfunc.getPathImage(titleImage));
+		operateStretch(
+			Math.floor(regularTitlePosition.x * screenScale), Math.floor(regularTitlePosition.y * screenScale),
+			Math.ceil(bmp.width * screenScale), Math.ceil(bmp.height * screenScale),
+			bmp,
+			0, 0, bmp.width, bmp.height);
+		
+		// コンソール背景を描画
+		if (MBSystemPref.enableQuickSave) {
+			bmp.load(sysfunc.getPathImage(consoleImage));
+		}
+		else {
+			bmp.load(sysfunc.getPathImage(consoleImageNoQs));
+		}
+		regularConsoleSize = %[width : bmp.width, height : bmp.height];
+		(Dictionary.assignStruct incontextof consolePosition)(regularConsolePosition);
+		(Dictionary.assignStruct incontextof consoleSize)(regularConsoleSize);
+		var defSize = setConsolePosition();
+		var sized = false;
+		var c = 0;
+		do {
+			if (c++ > 9999) {
+				throw new Exception("ループ試行回数の上限を超えました。");
+				break;
+			}
+			
+			var size = setConsolePosition();
+			
+			if (consolePosition.x < consoleMargin) {
+				var nw = window.fore.base.width - consoleMargin * 2;
+				consoleScale = nw / defSize[0];
+				
+				consoleSize.width = Math.floor(regularConsoleSize.width * consoleScale);
+				consoleSize.height = Math.floor(regularConsoleSize.height * consoleScale);
+				continue;
+			}
+			
+			if (consolePosition.y + size[1] > window.fore.base.height - consoleMargin) {
+				var nh = window.fore.base.height - (consolePosition.y + consoleMargin);
+				consoleScale = nh / defSize[1];
+				
+				consoleSize.width = Math.floor(regularConsoleSize.width * consoleScale);
+				consoleSize.height = Math.floor(regularConsoleSize.height * consoleScale);
+				continue;
+			}
+			
+			sized = true;
+		} while (!sized);
+		
+		operateStretch(
+			consolePosition.x, consolePosition.y,
+			consoleSize.width, consoleSize.height,
+			bmp,
+			0, 0, bmp.width, bmp.height);
+		
+		
+		// 現在の設定値を得る
+		intBGMMutedVolume = sf.userconfig.bgmMutedVolume;
+		intSEMutedVolume  = sf.userconfig.seMutedVolume;
+		blWinkEnabled     = sf.userconfig.winkEnabled;
+		blSetCursor       = sf.userconfig.setCursor;
+		intCharSpeed      = sf.userconfig.charSpeed;
+		blQsWithoutDialog = sf.userconfig.qsWithoutDialog;
+		
+		intCharSpeed2 = sf.userconfig.charSpeed2;
+		
+		intAMCharSpeed = sf.userconfig.amCharSpeed;
+		intAMLineWait  = sf.userconfig.amLineWait;
+		intAMPageWait  = sf.userconfig.amPageWait;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setConsolePosition()
+	{
+		var pw = consoleSize.width;
+		var ph = consoleSize.heigh;
+		consolePosition.x = Math.ceil((window.fore.base.width - pw) * 0.5);
+		consolePosition.y = Math.ceil(regularConsolePosition.y * screenScale);
+		
+		return [pw, ph];
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate timer if (timer !== void);
+		
+		SystemManager.fcRemoveStackMember(refFocusMember);
+		SystemManager.blConfigMenuOpened = false;
+		
+		var i;
+		for (i=0; i<objSectionSelectorArray.count; i++) {
+			invalidate objSectionSelectorArray[i] if (objSectionSelectorArray[i] !== void);
+		}
+		
+		invalidate objCharSpeedChecker if (objCharSpeedChecker !== void);
+		invalidate objCharSpeed2Checker if (objCharSpeed2Checker !== void);
+		invalidate objAMLineWaitChecker if (objAMLineWaitChecker !== void);
+		invalidate objAMPageWaitChecker if (objAMPageWaitChecker !== void);
+		invalidate objAMCharSpeedChecker if (objAMCharSpeedChecker !== void);
+		for (i=0; i<objCharSpeedButtons.count; i++) {
+			invalidate objCharSpeedButtons[i] if (objCharSpeedButtons[i] !== void);
+			invalidate objCharSpeed2Buttons[i] if (objCharSpeed2Buttons[i] !== void);
+			invalidate objAMCharSpeedButtons[i] if (objAMCharSpeedButtons[i] !== void);
+			
+			if (i < 5) {
+				invalidate objAMLineWaitButtons[i] if (objAMLineWaitButtons[i] !== void);
+				invalidate objAMPageWaitButtons[i] if (objAMPageWaitButtons[i] !== void);
+			}
+		}
+		
+		invalidate objBGMVolumeIcon  if (objBGMVolumeIcon !== void);
+		invalidate objBGMVolumePanel if (objBGMVolumePanel !== void);
+		invalidate objBGMMuteButton  if (objBGMMuteButton !== void);
+		
+		invalidate objSEVolumeIcon  if (objSEVolumeIcon !== void);
+		invalidate objSEVolumePanel if (objSEVolumePanel !== void);
+		invalidate objSEMuteButton  if (objSEMuteButton !== void);
+		
+		invalidate objCharSpeedTestLayer if (objCharSpeedTestLayer !== void);
+		invalidate objCharImageLayer if (objCharImageLayer !== void);
+		
+		invalidate objWinkOffButton if (objWinkOffButton !== void);
+		invalidate objWinkOnButton if (objWinkOnButton !== void);
+		
+		invalidate objQsWithDialogButton    if (objQsWithDialogButton !== void);
+		invalidate objQsWithoutDialogButton if (objQsWithoutDialogButton !== void);
+		
+		invalidate objCursorSnapEnableButton if (objCursorSnapEnableButton !== void);
+		invalidate objCursorSnapDisableButton if (objCursorSnapDisableButton !== void);
+		
+		invalidate objCloseButton if (objCloseButton !== void);
+		
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+		function show()
+	{
+		// レイヤを表示する
+		
+		SystemManager.acActivateCanceller();
+		
+		visible = true;
+		setMode();
+		focus();
+		
+		timer = new Timer(onTimerShowing, '');
+		timer.interval = 10;
+		timer.enabled = true;
+	}
+	
+	function onTimerShowing()
+	{
+		// タイマーを使ってフェードイン
+		if (++counter > 5) {
+			timer.enabled = false;
+			invalidate timer if (timer !== void);
+			onEndOfShowing();
+			return;
+		}
+		opacity += 255 / 5;
+	}
+	
+	function onEndOfShowing()
+	{
+		counter = 0;
+		opacity = 255;
+		setMenuStack();
+		
+		SystemManager.acDisactivateCanceller();
+		SystemManager.blConfigMenuOpened = true;
+	}
+	
+	function hide()
+	{
+		// レイヤを隠す
+		
+		SystemManager.blConfigMenuOpened = false;
+		SystemManager.acActivateCanceller();
+		
+		saveUserConfig();
+		SystemManager.fcRemoveStackMember(refFocusMember);
+		
+		timer = new Timer(onTimerHiding, '');
+		timer.interval = 10;
+		timer.enabled = true;
+	}
+	
+	function onTimerHiding()
+	{
+		// タイマーを使ってフェードアウト
+		if (++counter > 5) {
+			timer.enabled = false;
+			invalidate timer if (timer !== void);
+			onEndOfHiding();
+			return;
+		}
+		
+		opacity -= 255 / 5;
+	}
+	
+	function onEndOfHiding()
+	{
+		owner.onControllPanelHasGone();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function getControllPanelPosition(x, y)
+	{
+		// コンパネ位置を調整して返す
+		
+		var nx = Math.floor(consolePosition.x + (x - regularConsolePosition.x) * consoleScale);
+		var ny = Math.floor(consolePosition.y + (y - regularConsolePosition.y) * consoleScale);
+		
+		return %[x : nx, y : ny];
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function getFittedSize(w, h)
+	{
+		// コンパネの大きさを調整して返す
+		
+		var nw = Math.floor(w * consoleScale);
+		var nh = Math.floor(h * consoleScale);
+		
+		return %[width : nw, height : nh];
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setControllPanel()
+	{
+		// ボタンを配置
+		
+		// BGM調整
+		objSectionSelectorArray[0] = new MBControllPanelSectionButton(window, this);
+		var pos = getControllPanelPosition(56, 99);
+		objSectionSelectorArray[0].setPos(pos.x, pos.y);
+		
+		objBGMVolumePanel = new MBControllPanelAudioPane(window, this);
+		objBGMVolumePanel.makeBGMFader();
+		pos = getControllPanelPosition(230, 93);
+		objBGMVolumePanel.setPos(pos.x, pos.y);
+		objBGMVolumePanel.visible = true;
+		
+		objBGMVolumeIcon = new MBControllPanelAudioIcons(window, this, objBGMVolumePanel);
+		
+		pos = getControllPanelPosition(213, 100);
+		objBGMVolumeIcon.setPos(pos.x, pos.y);
+		objBGMVolumeIcon.visible = true;
+		
+		// BGMミュート
+		objBGMMuteButton = new MBControllPanelAudioMuteButton(window, this);
+		objBGMMuteButton.strBasicImageName    = sysfunc.getPathImage("userconf/audio_mute");
+		objBGMMuteButton.strSelectedImageName = sysfunc.getPathImage("userconf/audio_mute_checked");
+		pos = getControllPanelPosition(617, 97);
+		objBGMMuteButton.setPos(pos.x, pos.y);
+		objBGMMuteButton.initState();
+		if (intBGMMutedVolume !== void) {
+			objBGMMuteButton.changeState();
+			objBGMVolumePanel.setFaderPosition(intBGMMutedVolume * 3);
+			objBGMVolumePanel.changeState(false);
+		}
+		objBGMMuteButton.enabled = true;
+		objBGMMuteButton.visible = true;
+		
+		objBGMVolumePanel.ptSectionSelector = objSectionSelectorArray[0];
+		objBGMVolumePanel.ptMuteButton      = objBGMMuteButton;
+		objSectionSelectorArray[0].objCurrentChild = objBGMVolumePanel;
+		
+		
+		// SE調整
+		objSectionSelectorArray[1] = new MBControllPanelSectionButton(window, this);
+		pos = getControllPanelPosition(56, 161);
+		objSectionSelectorArray[1].setPos(pos.x, pos.y);
+		
+		objSEVolumePanel = new MBControllPanelAudioPane(window, this);
+		objSEVolumePanel.makeSEFader();
+		pos = getControllPanelPosition(230, 154);
+		objSEVolumePanel.setPos(pos.x, pos.y);
+		objSEVolumePanel.visible = true;
+		
+		objSEVolumeIcon = new MBControllPanelAudioIcons(window, this, objSEVolumePanel);
+		pos = getControllPanelPosition(213, 161);
+		objSEVolumeIcon.setPos(pos.x, pos.y);
+		objSEVolumeIcon.visible = true;
+		
+		// SEミュート
+		objSEMuteButton = new MBControllPanelAudioMuteButton(window, this);
+		objSEMuteButton.setSizeToImageSize();
+		objSEMuteButton.strBasicImageName    = sysfunc.getPathImage('userconf/audio_mute');
+		objSEMuteButton.strSelectedImageName = sysfunc.getPathImage('userconf/audio_mute_checked');
+		pos = getControllPanelPosition(617, 158);
+		objSEMuteButton.setPos(pos.x, pos.y);
+		objSEMuteButton.initState();
+		if (intSEMutedVolume !== void) {
+			objSEMuteButton.changeState();
+			objSEVolumePanel.setFaderPosition(intSEMutedVolume * 3);
+			objSEVolumePanel.changeState(false);
+		}
+		objSEMuteButton.enabled = true;
+		objSEMuteButton.visible = true;
+		
+		objSEVolumePanel.ptSectionSelector = objSectionSelectorArray[1];
+		objSEVolumePanel.ptMuteButton      = objSEMuteButton;
+		objSectionSelectorArray[1].objCurrentChild = objSEVolumePanel;
+		
+		
+		// 「文字速度」セクション
+		objSectionSelectorArray[2] = new MBControllPanelSectionButton(window, this);
+		pos = getControllPanelPosition(56, 220);
+		objSectionSelectorArray[2].setPos(pos.x, pos.y);
+		
+		var i;
+		
+		// 未読速度
+		objCharSpeed2Checker = new global.MBComponentLayer(window, this);
+		objCharSpeed2Checker.loadImages(%[storage : sysfunc.getPathImage('userconf/ch_check')]) ;
+		objCharSpeed2Checker.hitThreshold = 256;
+		for (i=0; i<7; i++) {
+			objCharSpeed2Buttons[i] = new MBControllPanelCheckBox(window, this);
+			//objCharSpeed2Buttons[i].setImageSize(intCHSButtonWidth[i], 17);
+			objCharSpeed2Buttons[i].setSizeToImageSize();
+			objCharSpeed2Buttons[i].strBasicImageName = sysfunc.getPathImage("userconf/%d".sprintf(i + 1));
+			objCharSpeed2Buttons[i].strSelectedImageName = sysfunc.getPathImage("userconf/%d".sprintf(i + 1));
+			pos = getControllPanelPosition(590 - 40 * i + (25 - intCHSButtonWidth[i]) * 0.5, 217);
+			objCharSpeed2Buttons[i].setPos(pos.x, pos.y);
+			if (i > 1) {
+				objCharSpeed2Buttons[i].intOptionValue = window.chSpeeds.fast * 1.5 * i;
+			}
+			else {
+				objCharSpeed2Buttons[i].intOptionValue = window.chSpeeds.fast * i;
+			}
+			objCharSpeed2Buttons[i].initState();
+			if (intCharSpeed2 == objCharSpeed2Buttons[i].intOptionValue) {
+				objCharSpeed2Buttons[i].changeState();
+				objCharSpeed2Checker.setPos(objCharSpeed2Buttons[i].left - (25 - intCHSButtonWidth[i]) * 0.5, objCharSpeed2Buttons[i].top);
+			}
+			objCharSpeed2Buttons[i].enabled = true;
+			objCharSpeed2Buttons[i].visible = true;
+		}
+		objCharSpeed2Checker.absolute = objCharSpeed2Buttons[objCharSpeed2Buttons.count - 1].absolute + 1;
+		objCharSpeed2Checker.visible  = true;
+		
+		// 既読速度
+		objCharSpeedChecker = new global.MBComponentLayer(window, this);
+		objCharSpeedChecker.loadImages(%[storage : sysfunc.getPathImage('userconf/ch_check')]);
+		objCharSpeedChecker.hitThreshold = 256;
+		for (i=0; i<7; i++) {
+			objCharSpeedButtons[i] = new MBControllPanelCheckBox(window, this);
+			objCharSpeedButtons[i].setImageSize(intCHSButtonWidth[i], 17);
+			objCharSpeedButtons[i].setSizeToImageSize();
+			objCharSpeedButtons[i].strBasicImageName = sysfunc.getPathImage("userconf/%d".sprintf(i + 1));
+			objCharSpeedButtons[i].strSelectedImageName = sysfunc.getPathImage("userconf/%d".sprintf(i + 1));
+			pos = getControllPanelPosition(590 - 40 * i + (25 - intCHSButtonWidth[i]) * 0.5, 245);
+			objCharSpeedButtons[i].setPos(pos.x, pos.y);
+			if (i > 1) {
+				objCharSpeedButtons[i].intOptionValue = window.chSpeeds.fast * 1.5 * i;
+			}
+			else {
+				objCharSpeedButtons[i].intOptionValue = window.chSpeeds.fast * i;
+			}
+			objCharSpeedButtons[i].initState();
+			if (intCharSpeed == objCharSpeedButtons[i].intOptionValue) {
+				objCharSpeedButtons[i].changeState();
+				objCharSpeedChecker.setPos(objCharSpeedButtons[i].left - (25 - intCHSButtonWidth[i]) * 0.5, objCharSpeedButtons[i].top);
+			}
+			objCharSpeedButtons[i].enabled = true;
+			objCharSpeedButtons[i].visible = true;
+		}
+		objCharSpeedChecker.absolute = objCharSpeedButtons[objCharSpeedButtons.count - 1].absolute + 1;
+		objCharSpeedChecker.visible  = true;
+		
+		// オートモード表示速度
+		objAMCharSpeedChecker = new global.MBComponentLayer(window, this);
+		objAMCharSpeedChecker.loadImages(%[storage : sysfunc.getPathImage('userconf/ch_check')]) ;
+		objAMCharSpeedChecker.hitThreshold = 256;
+		for (i=0; i<7; i++) {
+			objAMCharSpeedButtons[i] = new MBControllPanelCheckBox(window, this);
+			objAMCharSpeedButtons[i].setImageSize(intCHSButtonWidth[i], 17);
+			objAMCharSpeedButtons[i].setSizeToImageSize();
+			objAMCharSpeedButtons[i].strBasicImageName = sysfunc.getPathImage("userconf/%d".sprintf(i + 1));
+			objAMCharSpeedButtons[i].strSelectedImageName = sysfunc.getPathImage("userconf/%d".sprintf(i + 1));
+			pos = getControllPanelPosition(605 - 40 * i + (25 - intCHSButtonWidth[i]) * 0.5, 291);
+			objAMCharSpeedButtons[i].setPos(pos.x, pos.y);
+			if (i > 1) {
+				objAMCharSpeedButtons[i].intOptionValue = window.chSpeeds.fast * 1.5 * i;
+			}
+			else {
+				objAMCharSpeedButtons[i].intOptionValue = window.chSpeeds.fast * i;
+			}
+			objAMCharSpeedButtons[i].initState();
+			if (intAMCharSpeed == objAMCharSpeedButtons[i].intOptionValue) {
+				objAMCharSpeedButtons[i].changeState();
+				objAMCharSpeedChecker.setPos(objAMCharSpeedButtons[i].left - (25 - intCHSButtonWidth[i]) * 0.5, objAMCharSpeedButtons[i].top);
+			}
+			objAMCharSpeedButtons[i].enabled = true;
+			objAMCharSpeedButtons[i].visible = true;
+		}
+		objAMCharSpeedChecker.absolute = objAMCharSpeedButtons[objAMCharSpeedButtons.count - 1].absolute + 1;
+		objAMCharSpeedChecker.visible  = true;
+		
+		// オートモードの行待ち
+		objAMLineWaitChecker = new global.MBComponentLayer(window, this);
+		objAMLineWaitChecker.loadImages(%[storage : sysfunc.getPathImage('userconf/ch_check')]) ;
+		objAMLineWaitChecker.hitThreshold = 256;
+		for (i=0; i<5; i++) {
+			objAMLineWaitButtons[i] = new MBControllPanelCheckBox(window, this);
+			objAMLineWaitButtons[i].setImageSize(intCHSButtonWidth[i], 17);
+			objAMLineWaitButtons[i].setSizeToImageSize();
+			objAMLineWaitButtons[i].strBasicImageName = sysfunc.getPathImage("userconf/%d".sprintf(i + 1));
+			objAMLineWaitButtons[i].strSelectedImageName = sysfunc.getPathImage("userconf/%d".sprintf(i + 1));
+			pos = getControllPanelPosition(383 - 35 * i + (25 - intCHSButtonWidth[i]) * 0.5, 345);
+			objAMLineWaitButtons[i].setPos(pos.x, pos.y);
+			objAMLineWaitButtons[i].intOptionValue = 60 + 120 * i;
+			objAMLineWaitButtons[i].initState();
+			if (intAMLineWait == objAMLineWaitButtons[i].intOptionValue) {
+				objAMLineWaitButtons[i].changeState();
+				objAMLineWaitChecker.setPos(objAMLineWaitButtons[i].left - (25 - intCHSButtonWidth[i]) * 0.5, objAMLineWaitButtons[i].top);
+			}
+			objAMLineWaitButtons[i].enabled = true;
+			objAMLineWaitButtons[i].visible = true;
+		}
+		objAMLineWaitChecker.absolute = objAMLineWaitButtons[objAMLineWaitButtons.count - 1].absolute + 1;
+		objAMLineWaitChecker.visible  = true;
+		
+		// オートモードのページ待ち
+		objAMPageWaitChecker = new global.MBComponentLayer(window, this);
+		objAMPageWaitChecker.loadImages(%[storage : sysfunc.getPathImage('userconf/ch_check')]) ;
+		objAMPageWaitChecker.hitThreshold = 256;
+		for (i=0; i<5; i++) {
+			objAMPageWaitButtons[i] = new MBControllPanelCheckBox(window, this);
+			objAMPageWaitButtons[i].setImageSize(intCHSButtonWidth[i], 17);
+			objAMPageWaitButtons[i].setSizeToImageSize();
+			objAMPageWaitButtons[i].strBasicImageName = sysfunc.getPathImage("userconf/%d".sprintf(i + 1));
+			objAMPageWaitButtons[i].strSelectedImageName = sysfunc.getPathImage("userconf/%d".sprintf(i + 1));
+			pos = getControllPanelPosition(680 - 35 * i + (25 - intCHSButtonWidth[i]) * 0.5, 345);
+			objAMPageWaitButtons[i].setPos(pos.x, pos.y);
+			objAMPageWaitButtons[i].intOptionValue = 500 + 500 * i;
+			objAMPageWaitButtons[i].initState();
+			if (intAMPageWait == objAMPageWaitButtons[i].intOptionValue) {
+				objAMPageWaitButtons[i].changeState();
+				objAMPageWaitChecker.setPos(objAMPageWaitButtons[i].left - (25 - intCHSButtonWidth[i]) * 0.5, objAMPageWaitButtons[i].top);
+			}
+			objAMPageWaitButtons[i].enabled = true;
+			objAMPageWaitButtons[i].visible = true;
+		}
+		objAMPageWaitChecker.absolute = objAMPageWaitButtons[objAMPageWaitButtons.count - 1].absolute + 1;
+		objAMPageWaitChecker.visible  = true;
+		
+		// 文字表示テストレイヤー
+		objCharSpeedTestLayer = new MBContextMenuCharSpeedTestLayer(window, this);
+		pos = getControllPanelPosition(160, 384);
+		objCharSpeedTestLayer.setPos(pos.x, pos.y);
+		objCharSpeedTestLayer.visible = true;
+		objCharSpeedTestLayer.setSpeedTester(0);
+		
+		/***** クイックセーブ関連 *****/
+		
+		if (MBSystemPref.enableQuickSave) {
+			// 保存確認ありボタン
+			objSectionSelectorArray[3] = new MBControllPanelSectionButton(window, this);
+			pos = getControllPanelPosition(56, 450);
+			objSectionSelectorArray[3].setPos(pos.x, pos.y);
+			
+			objQsWithDialogButton = new MBControllPanelCheckBox(window, this);
+			objQsWithDialogButton.setSizeToImageSize();
+			objQsWithDialogButton.strBasicImageName    = sysfunc.getPathImage('userconf/qs_withdialog');
+			objQsWithDialogButton.strSelectedImageName = sysfunc.getPathImage('userconf/qs_withdialog_checked');
+			pos = getControllPanelPosition(240, 450);
+			objQsWithDialogButton.setPos(pos.x, pos.y);
+			objQsWithDialogButton.intOptionValue = false;
+			objQsWithDialogButton.initState();
+			if (!blQsWithoutDialog) {
+				objQsWithDialogButton.changeState();
+				objSectionSelectorArray[3].objCurrentChild = objQsWithDialogButton;
+			}
+			objQsWithDialogButton.enabled = true;
+			objQsWithDialogButton.visible = true;
+			
+			// 保存確認なしボタン
+			objQsWithoutDialogButton = new MBControllPanelCheckBox(window, this);
+			objQsWithoutDialogButton.setSizeToImageSize();
+			objQsWithoutDialogButton.strBasicImageName    = sysfunc.getPathImage('userconf/qs_withoutdialog');
+			objQsWithoutDialogButton.strSelectedImageName = sysfunc.getPathImage('userconf/qs_withoutdialog_checked');
+			pos = getControllPanelPosition(450, 450);
+			objQsWithoutDialogButton.setPos(pos.x, pos.y);
+			objQsWithoutDialogButton.intOptionValue = false;
+			objQsWithoutDialogButton.initState();
+			if (blQsWithoutDialog) {
+				objQsWithoutDialogButton.changeState();
+				objSectionSelectorArray[3].objCurrentChild = objQsWithoutDialogButton;
+			}
+			objQsWithoutDialogButton.enabled = true;
+			objQsWithoutDialogButton.visible = true;
+		}
+		
+		/***** クイックセーブ関連ここまで *****/
+		
+		// キャンセルボタン
+		if (objCloseButton === void) {
+			objCloseButton = new MBButton(window, this);
+			objCloseButton.loadImages(sysfunc.getPathImage(closeButtonImage));
+			
+			switch (closeButtonPositionType) {
+				case "lbMargin":
+					pos.x = closeButtonPositionValue.x;
+					pos.y = window.fore.base.height - (objCloseButton.height + closeButtonPositionValue.y);
+					break;
+				
+				case "rbMargin":
+					pos.x = window.fore.base.width - (objCloseButton.width + closeButtonPositionValue.x);
+					pos.y = window.fore.base.height - (objCloseButton.height + closeButtonPositionValue.y);
+					break;
+				
+				case "rtMargin":
+					pos.x = window.fore.base.width - (objCloseButton.width + closeButtonPositionValue.x);
+					pos.y = closeButtonPositionValue.y;
+					break;
+				
+				case "ltMargin":
+				case "absolute":
+				default:
+					pos = closeButtonPositionValue;
+			}
+			
+			if (pos.x < consolePosition.x + consoleSize.width && pos.y < consolePosition.y + consoleSize.height) {
+				closeButtonPositionType = "rtMargin";
+				pos.x = window.fore.base.width - (objCloseButton.width + closeButtonPositionValue.x);
+				pos.y = closeButtonPositionValue.y;
+			}
+			
+			objCloseButton.setPos(pos.x, pos.y);
+		}
+		objCloseButton.visible = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setMenuStack()
+	{
+		// メニュースタックを作る
+		
+		var i;
+		for (i=0; i<objSectionSelectorArray.count; i++) {
+			if (i == 0) {
+				objSectionSelectorArray[i].objCursorMapHash.up = objCloseButton;
+			}
+			else {
+				objSectionSelectorArray[i].objCursorMapHash.up = objSectionSelectorArray[i - 1];
+			}
+			if (i >= objSectionSelectorArray.count - 1) {
+				objSectionSelectorArray[i].objCursorMapHash.down = objCloseButton;
+			}
+			else {
+				objSectionSelectorArray[i].objCursorMapHash.down = objSectionSelectorArray[i + 1];
+			}
+		}
+		
+		objCloseButton.objCursorMapHash.up = objSectionSelectorArray[objSectionSelectorArray.count - 1];
+		objCloseButton.objCursorMapHash.down = objSectionSelectorArray[0];
+		
+		// BGM
+		objSectionSelectorArray[0].objCursorMapHash.right    = objBGMVolumeIcon.objSmallIcon;
+		objSectionSelectorArray[0].objCursorMapHash.left     = objBGMMuteButton;
+		objBGMVolumeIcon.objSmallIcon.objCursorMapHash.left  = objSectionSelectorArray[0];
+		objBGMVolumeIcon.objSmallIcon.objCursorMapHash.right = objBGMVolumeIcon.objLargeIcon;
+		objBGMVolumeIcon.objLargeIcon.objCursorMapHash.left  = objBGMVolumeIcon.objSmallIcon;
+		objBGMVolumeIcon.objLargeIcon.objCursorMapHash.right = objBGMMuteButton;
+		objBGMMuteButton.objCursorMapHash.left               = objBGMVolumeIcon.objLargeIcon;
+		objBGMMuteButton.objCursorMapHash.right              = objSectionSelectorArray[0];
+		
+		// SE
+		objSectionSelectorArray[1].objCursorMapHash.right   = objSEVolumeIcon.objSmallIcon;
+		objSectionSelectorArray[1].objCursorMapHash.left    = objSEMuteButton;
+		objSEVolumeIcon.objSmallIcon.objCursorMapHash.left  = objSectionSelectorArray[1];
+		objSEVolumeIcon.objSmallIcon.objCursorMapHash.right = objSEVolumeIcon.objLargeIcon;
+		objSEVolumeIcon.objLargeIcon.objCursorMapHash.left  = objSEVolumeIcon.objSmallIcon;
+		objSEVolumeIcon.objLargeIcon.objCursorMapHash.right = objSEMuteButton;
+		objSEMuteButton.objCursorMapHash.left               = objSEVolumeIcon.objLargeIcon;
+		objSEMuteButton.objCursorMapHash.right              = objSectionSelectorArray[1];
+		
+		// 文字表示速度
+		objSectionSelectorArray[2].objCursorMapHash.right = objCharSpeed2Buttons[objCharSpeed2Buttons.count - 1];
+		objSectionSelectorArray[2].objCursorMapHash.left = objCharSpeed2Buttons[0];
+		
+		var i;
+		for (i=0; i<objCharSpeedButtons.count; i++) {
+			var l = i + 1;
+			var r = i - 1;
+			
+			if (l >= objCharSpeedButtons.count) {
+				l = 0;
+			}
+			if (r < 0) {
+				r = objCharSpeedButtons.count - 1;
+			}
+			
+			var amb;
+			if (i < objAMLineWaitButtons.count) {
+				amb = objAMPageWaitButtons[i];
+			}
+			else {
+				amb = objAMLineWaitButtons[i - objAMPageWaitButtons.count];
+			}
+			
+			// 未読速度
+			objCharSpeed2Buttons[i].setCursorMap(
+				amb,
+				objCharSpeed2Buttons[r],
+				objCharSpeedButtons[i],
+				objCharSpeed2Buttons[l]
+			);
+			
+			// 既読速度
+			objCharSpeedButtons[i].setCursorMap(
+				objCharSpeed2Buttons[i],
+				objCharSpeedButtons[r],
+				objAMCharSpeedButtons[i],
+				objCharSpeedButtons[l]
+			);
+			
+			// オートモード速度
+			objAMCharSpeedButtons[i].setCursorMap(
+				objCharSpeedButtons[i],
+				objAMCharSpeedButtons[r],
+				amb,
+				objAMCharSpeedButtons[l]
+			);
+		}
+		objCharSpeed2Buttons[0].objCursorMapHash.right = objSectionSelectorArray[2];
+		objCharSpeed2Buttons[objCharSpeedButtons.count - 1].objCursorMapHash.left = objSectionSelectorArray[2];
+		
+		for (i=0; i<objAMLineWaitButtons.count; i++) {
+			var l = i + 1;
+			var r = i - 1;
+			
+			var ptb = i + objAMLineWaitButtons.count;
+			if (ptb >= objCharSpeedButtons.count) {
+				ptb = objCharSpeedButtons.count - 1;
+			}
+			
+			var ll, lr, pl, pr;
+			
+			if (l < objAMLineWaitButtons.count) {
+				ll = objAMLineWaitButtons[l];
+				pl = objAMPageWaitButtons[l];
+			}
+			else {
+				ll = objAMPageWaitButtons[0];
+				pl = objAMLineWaitButtons[0];
+			}
+			
+			if (r > -1) {
+				lr = objAMLineWaitButtons[r];
+				pr = objAMPageWaitButtons[r];
+			}
+			else {
+				lr = objAMPageWaitButtons[objAMPageWaitButtons.count - 1];
+				pr = objAMLineWaitButtons[objAMLineWaitButtons.count - 1];
+			}
+			
+			objAMLineWaitButtons[i].setCursorMap(
+				objAMCharSpeedButtons[ptb],
+				lr,
+				objCharSpeed2Buttons[ptb],
+				ll
+			);
+			
+			objAMPageWaitButtons[i].setCursorMap(
+				objAMCharSpeedButtons[i],
+				pr,
+				objCharSpeed2Buttons[i],
+				pl
+			);
+		}
+		
+		// 保存確認
+		if (MBSystemPref.enableQuickSave) {
+			objSectionSelectorArray[3].objCursorMapHash.right = objQsWithDialogButton;
+			objSectionSelectorArray[3].objCursorMapHash.left  = objQsWithoutDialogButton;
+			objQsWithDialogButton.objCursorMapHash.right      = objQsWithoutDialogButton;
+			objQsWithDialogButton.objCursorMapHash.left       = objSectionSelectorArray[3];
+			objQsWithoutDialogButton.objCursorMapHash.right   = objSectionSelectorArray[3];
+			objQsWithoutDialogButton.objCursorMapHash.left    = objQsWithDialogButton;
+		}
+		
+		refFocusMember = SystemManager.fcPushFocusStack(objSectionSelectorArray[0]);
+		SystemManager.fcApplyFocusTargetSearch();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function saveUserConfig()
+	{
+		// 環境設定をシステム変数に記録する
+		sf.userconfig.bgmVolume       = window.scflags.bgm.globalVolume / 1000;
+		sf.userconfig.bgmMutedVolume  = intBGMMutedVolume;
+		sf.userconfig.seVolume        = window.scflags.se[0].globalVolume / 1000;
+		sf.userconfig.seMutedVolume   = intSEMutedVolume;
+		sf.userconfig.charSpeed       = intCharSpeed;
+		sf.userconfig.setCursor       = blSetCursor;
+		sf.userconfig.winkEnabled     = blWinkEnabled;
+		sf.userconfig.qsWithoutDialog = blQsWithoutDialog;
+		
+		sf.userconfig.charSpeed2 = intCharSpeed2;
+		
+		sf.userconfig.amCharSpeed = intAMCharSpeed;
+		sf.userconfig.amLineWait  = intAMLineWait;
+		sf.userconfig.amPageWait  = intAMPageWait;
+		
+		window.saveSystemVariables();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function changeBGMMutedState()
+	{
+		// BGMミュートボタンを押したときのアクション
+		
+		if (intBGMMutedVolume === void) {
+			// ミュート
+			
+			intBGMMutedVolume = window.scflags.bgm.globalVolume / 1000;
+			
+			objBGMVolumePanel.setVolume(0);
+			objBGMVolumePanel.changeState(false);
+		}
+		else {
+			// ミュートから復帰
+			
+			objBGMVolumePanel.setVolume(intBGMMutedVolume);
+			objBGMVolumePanel.changeState(true);
+			
+			intBGMMutedVolume = void;
+		}
+	}
+	
+	function changeSEMutedState()
+	{
+		var i;
+		
+		// SEミュートボタンを押したときのアクション
+		if (intSEMutedVolume === void) {
+			// ミュート
+			
+			intSEMutedVolume = window.scflags.se[0].globalVolume / 1000;
+			
+			objSEVolumePanel.setVolume(0);
+			objSEVolumePanel.changeState(false);
+		}
+		else {
+			// ミュートから復帰
+			
+			objSEVolumePanel.setVolume(intSEMutedVolume);
+			objSEVolumePanel.changeState(true);
+			
+			intSEMutedVolume = void;
+		}
+	}
+	
+	function changeWinkEnabled()
+	{
+		// 目パチモード切替
+		
+		// 目パチ有効なら無効にする
+		if (blWinkEnabled) {
+			blWinkEnabled = false;
+			sf.userconfig.winkEnabled = false;
+			objWinkOnButton.changeState();
+		}
+		
+		// 無効なら有効にする
+		else {
+			blWinkEnabled = true;
+			sf.userconfig.winkEnabled = true;
+			objWinkOffButton.changeState();
+		}
+		
+		GraphicManager.hsUpdateForWink();
+	}
+	
+	function changeQuickSaveDialogState()
+	{
+		// 保存確認ダイアログのモード切替
+		
+		if (blQsWithoutDialog) {
+			blQsWithoutDialog             = false;
+			sf.userconfig.qsWithoutDialog = false;
+			objQsWithoutDialogButton.changeState();
+		}
+		
+		else {
+			blQsWithoutDialog            = true;
+			sf.userconfigqsWithoutDialog = true;
+			objQsWithDialogButton.changeState();
+		}
+	}
+	
+	function changeCursorSnap(enable)
+	{
+		// カーソルモード変更
+		
+		blSetCursor = enable;
+		SystemManager.fcSetCursorAutoFocusState(enable);
+		
+		if (enable == true) {	// スナップ有効
+			objCursorSnapDisableButton.changeState();
+		}
+		else {	// スナップ無効
+			objCursorSnapEnableButton.changeState();
+		}
+	}
+	
+	function changeCharSpeed2(speed)
+	{
+		// 未読文字表示速度変更
+		
+		window.userChSpeed = speed;
+		window.setUserSpeed();
+		intCharSpeed2 = speed;
+		window.saveSystemVariables();
+		
+		var i;
+		for (i=0; i<objCharSpeed2Buttons.count; i++) {
+			if (speed == objCharSpeed2Buttons[i].intOptionValue) {
+				objCharSpeed2Checker.left = objCharSpeed2Buttons[i].left - (25 - intCHSButtonWidth[i]) * 0.5;
+				objCharSpeed2Checker.top  = objCharSpeed2Buttons[i].top;
+			}
+			else {
+				objCharSpeed2Buttons[i].initState();
+			}
+		}
+		
+		objCharSpeedTestLayer.speedTest(speed);
+	}
+	
+	function changeCharSpeed(speed)
+	{
+		// 既読文字表示速度変更
+		
+		window.userCh2ndSpeed = speed;
+		window.setUserSpeed();
+		intCharSpeed = speed;
+		window.saveSystemVariables();
+		
+		var i;
+		for (i=0; i<objCharSpeedButtons.count; i++) {
+			if (speed == objCharSpeedButtons[i].intOptionValue) {
+				objCharSpeedChecker.left = objCharSpeedButtons[i].left - (25 - intCHSButtonWidth[i]) * 0.5;
+				objCharSpeedChecker.top  = objCharSpeedButtons[i].top;
+			}
+			else {
+				objCharSpeedButtons[i].initState();
+			}
+		}
+		
+		objCharSpeedTestLayer.speedTest(speed);
+	}
+	
+	function changeAutoModeCharSpeed(speed)
+	{
+		// オートモードの文字速度変更
+		
+		intAMCharSpeed = speed;
+		window.saveSystemVariables();
+		
+		var i;
+		for (i=0; i<objAMCharSpeedButtons.count; i++) {
+			if (speed == objAMCharSpeedButtons[i].intOptionValue) {
+				objAMCharSpeedChecker.left = objAMCharSpeedButtons[i].left - (25 - intCHSButtonWidth[i]) * 0.5;
+				objAMCharSpeedChecker.top  = objAMCharSpeedButtons[i].top;
+			}
+			else {
+				objAMCharSpeedButtons[i].initState();
+			}
+		}
+		
+		objCharSpeedTestLayer.speedTest(speed);
+	}
+	
+	function changeAutoModeLineWait(value)
+	{
+		// オートモードの行待ち時間変更
+		
+		window.autoModeLineWait = value;
+		intAMLineWait           = value;
+		window.saveSystemVariables();
+		
+		var i;
+		for (i=0; i<objAMLineWaitButtons.count; i++) {
+			if (value == objAMLineWaitButtons[i].intOptionValue) {
+				objAMLineWaitChecker.left = objAMLineWaitButtons[i].left - (25 - intCHSButtonWidth[i]) * 0.5;
+				objAMLineWaitChecker.top  = objAMLineWaitButtons[i].top;
+			}
+			else {
+				objAMLineWaitButtons[i].initState();
+			}
+		}
+		
+		objCharSpeedTestLayer.lineWaitTest(intAMCharSpeed, value, 1);
+	}
+	
+	function changeAutoModePageWait(value)
+	{
+		// オートモードのページ待ち時間変更
+		
+		window.autoModePageWait = value;
+		intAMPageWait           = value;
+		window.saveSystemVariables();
+		
+		var i;
+		for (i=0; i<objAMPageWaitButtons.count; i++) {
+			if (value == objAMPageWaitButtons[i].intOptionValue) {
+				objAMPageWaitChecker.left = objAMPageWaitButtons[i].left - (25 - intCHSButtonWidth[i]) * 0.5;
+				objAMPageWaitChecker.top  = objAMPageWaitButtons[i].top;
+			}
+			else {
+				objAMPageWaitButtons[i].initState();
+			}
+		}
+		
+		objCharSpeedTestLayer.pageWaitTest(intAMCharSpeed, value, 1);
+	}
+	
+	function onSelectedItemClick(sender)
+	{
+		// ボタンが押されたとき
+		switch(sender)
+		{
+			case objCloseButton: // 「閉じる」ボタン
+				sndfunc.seCancel();
+				hide();
+				break;
+			
+			case objBGMMuteButton:	// BGMミュートボタン
+				sndfunc.seDecide();
+				changeBGMMutedState();
+				break;
+			
+			case objSEMuteButton:	// SEミュートボタン
+				sndfunc.seDecide();
+				changeSEMutedState();
+				break;
+			
+			//------------------------------------------------------------------
+			
+			case objQsWithDialogButton:	// 保存確認ありボタン
+			case objQsWithoutDialogButton:	// 保存確認なしボタン
+				sndfunc.seDecide();
+				changeQuickSaveDialogState(sender.intOptionValue);
+				objSectionSelectorArray[3].objCurrentChild = sender;
+				break;
+		}
+		
+		// 未読表示速度
+		if (objCharSpeed2Buttons.find(sender) > -1) {
+			sndfunc.seDecide();
+			changeCharSpeed2(sender.intOptionValue);
+			objSectionSelectorArray[2].objCurrentChild = sender;
+		}
+		
+		// 既読表示速度
+		else if (objCharSpeedButtons.find(sender) > -1) {
+			sndfunc.seDecide();
+			changeCharSpeed(sender.intOptionValue);
+		}
+		
+		// オートモード表示速度
+		else if (objAMCharSpeedButtons.find(sender) > -1) {
+			sndfunc.seDecide();
+			changeAutoModeCharSpeed(sender.intOptionValue);
+		}
+		
+		// オートモード行待ち
+		else if (objAMLineWaitButtons.find(sender) > -1) {
+			sndfunc.seDecide();
+			changeAutoModeLineWait(sender.intOptionValue);
+		}
+		
+		// オートモードページ待ち
+		else if (objAMPageWaitButtons.find(sender) > -1) {
+			sndfunc.seDecide();
+			changeAutoModePageWait(sender.intOptionValue);
+		}
+		
+		saveUserConfig();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onEscapeKeyDown()
+	{
+		// エスケープキーが押されたとき
+		
+		// セクションセレクタからは閉じる
+		if (!intCursorLevel) {
+			onSelectedItemClick(objCloseButton);
+		}
+		
+		// セクションの中にいるときはセクションセレクタに戻る
+		else {
+			intCursorLevel = 0;
+			objCurrentSectionSelector.getCursorFromManager();
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		if (button == mbRight) {
+			onSelectedItemClick(objCloseButton);
+			return;
+		}
+		
+		super.onMouseDown(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onChildrenRightClick()
+	{
+		// 管理下オブジェクトが右クリックされたら閉じる
+		
+		onSelectedItemClick(objCloseButton);
+	}
+}

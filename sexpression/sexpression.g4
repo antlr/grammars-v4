@@ -22,10 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 */
+
 /*
 Port to Antlr4 by Tom Everett
 */
-
 grammar sexpression;
 
 sexpr
@@ -49,47 +49,45 @@ atom
    | DOT
    ;
 
-
 STRING
    : '"' ('\\' . | ~ ('\\' | '"'))* '"'
    ;
 
-
 WHITESPACE
-   : (' ' | '\n' | '\t' | '\r') + -> skip
+   : (' ' | '\n' | '\t' | '\r')+ -> skip
    ;
-
 
 NUMBER
-   : ('+' | '-')? (DIGIT) + ('.' (DIGIT) +)?
+   : ('+' | '-')? (DIGIT)+ ('.' (DIGIT)+)?
    ;
-
 
 SYMBOL
    : SYMBOL_START (SYMBOL_START | DIGIT)*
    ;
 
-
 LPAREN
    : '('
    ;
-
 
 RPAREN
    : ')'
    ;
 
-
 DOT
    : '.'
    ;
 
-
 fragment SYMBOL_START
-   : ('a' .. 'z') | ('A' .. 'Z') | '+' | '-' | '*' | '/' | '.'
+   : ('a' .. 'z')
+   | ('A' .. 'Z')
+   | '+'
+   | '-'
+   | '*'
+   | '/'
+   | '.'
    ;
-
 
 fragment DIGIT
    : ('0' .. '9')
    ;
+

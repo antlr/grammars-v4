@@ -1,0 +1,492 @@
+//
+// $Id: KGridLayout.tjs,v 1.10 2007/09/17 21:05:14 cvs Exp $
+//
+
+
+/*----------------------------------------------------------------------
+ * グリッドレイアウト
+ ----------------------------------------------------------------------*/
+class KGridLayout extends KWidget
+{
+  // 子の更新に反応するかどうか
+  var _respondToChildModification;
+  // 子が更新されたかどうか
+  var _childModified;
+
+  // X方向の要素数, Y方向の要素数
+  var xcount, ycount;
+  // アイテム、逆引き
+  var items, revItems;
+  // 行/列ごとの最大、最小サイズ
+  var minWidthForColumn;
+  var maxWidthForColumn;
+  var minHeightForRow;
+  var maxHeightForRow;
+  var widthForColumn;
+  var heightForRow;
+
+  var marginalWidth, marginalHeight;
+  
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KGridLayout(win, name = "") {
+    // 親呼び出し
+    super.KWidget(win, name);
+    // イメージを持たない
+    hasImage = false;
+
+    // 子の更新に反応する
+    _respondToChildModification = true;
+    // 子はまだ更新されていない
+    _childModified = false;
+
+    // 最初は要素0から。
+    xcount = ycount = 0;
+    items = %[];
+    revItems = %[];
+
+    marginalWidth = marginalHeight = 0;
+  }
+
+  /**------------------------------
+   * グリッドが、子レイヤの更新に合わせて即座にレイアウトを更新するか
+   * どうかを指定します。
+   * 
+   * このプロパティにfalseを指定している間は、
+   * 子に更新を加えてもレイアウトの変更は行なわれません。更新の
+   * 終了後にプロパティをtrueにすることで、まとめて更新が行われます。
+   *
+   * @param v 子の更新に反応するかどうか
+   * @return 子の更新に反応するかどうか
+   ------------------------------*/
+  property respondToChildModification {
+    getter {
+      return _respondToChildModification;
+    }
+    setter(v) {
+      if (v == _respondToChildModification)
+        return;
+      _respondToChildModification = v;
+      if (v
+          && _childModified)
+        invalidateLayout();
+    }
+  }
+
+  // 特定のポジションをあらわす文字列を返す
+  function posExp(x, y) {
+    return "" + x + ":" + y;
+  }
+
+  // 特定のポジションにある子ウィジェットを返す
+  function childAt(x, y) {
+    return items[posExp(x, y)];
+  }
+
+  // 子ウィジェットに対応した位置を返す
+  function posAt(child) {
+    return revItems[child];
+  }
+
+  /*------------------------------
+   * 子ウィジェットを特定のグリッドに配置する
+   *
+   * @param x グリッドX座標(0〜)
+   * @param y グリッドY座標(0〜)
+   * @param child 子ウィジェット
+   * @param colspan カラム結合
+   * @param rowspan ロウ結合
+   ------------------------------*/
+  function add(x, y, child, colspan = 1, rowspan = 1) {
+    xcount = Math.max(x + colspan, xcount);
+    ycount = Math.max(y + rowspan, ycount);
+    items[posExp(x, y)] = child;
+    revItems[child] = [ x, y, colspan, rowspan ];
+    child.parent = this;
+    invalidateLayout();
+  }
+
+  /*------------------------------
+   * 子ウィジェットを取り除く
+   *
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    var pos = revItems[child];
+    delete items[posExp(pos[0], pos[1])];
+    delete revItems[child];
+    child.parent = widgetDepot;
+    xcount = 0;
+    ycount = 0;
+    eachDictionary(revItems, function(key, value) {
+      xcount = Math.max(value[0] + value[2], xcount);
+      ycount = Math.max(value[1] + value[3], ycount);
+    } incontextof(this));
+      
+    invalidateLayout();
+
+    if (doInvalidate)
+      invalidate child;
+  }
+
+  /*------------------------------
+   * 子ウィジェットを全て取り除く
+   *
+   * @param doInvalidate 取り除いた子ウィジェットを無効化するか
+   ------------------------------*/
+  function removeAll(doInvalidate = true)
+  {
+    if(doInvalidate)
+      eachDictionary(items, function(key, value) { invalidate value; } incontextof(this));
+    else
+      eachDictionary(items, function(key, value) { value.parent = widgetDepot; } incontextof(this));
+    (Dictionary.clear incontextof items)();
+    (Dictionary.clear incontextof revItems)();
+    xcount = 0;
+    ycount = 0;
+    invalidateLayout();
+  }
+
+  function onChildMinMaxSizeModified {
+    invalidateLayout();
+  }
+
+  function onChildMarginModified {
+    invalidateLayout();
+  }
+
+  function onChildAlignModified {
+    invalidateLayout();
+  }
+
+  function onChildVisibleModified {
+    invalidateLayout();
+  }
+
+  function onSpaceModified {
+    invalidateLayout();
+  }
+
+  function onParentModified(p) {
+    if (p)
+      invalidateLayout();
+  }
+
+  /**------------------------------
+   * 最低限のサイズを設定する
+   *
+   * リスト項目が少なくても最低限広げられる
+   * 「最低最大サイズ」を決定する。
+   * デフォルト値は100x100
+   *
+   * @param w 幅
+   * @param h 高さ
+   ------------------------------*/
+  function setMarginalSize(w, h) {
+    marginalWidth = w;
+    marginalHeight = h;
+    invalidateLayout();
+  }
+
+  /*------------------------------
+   * レイアウトを計算する
+   ------------------------------*/
+  function calculateLayout {
+    // グリッドの行・列ごとに最大幅、最小幅を計算する。
+    minWidthForColumn = [];
+    maxWidthForColumn = [];
+    minHeightForRow = [];
+    maxHeightForRow = [];
+
+    for (var x = 0; x < xcount; x++)
+      for (var y = 0; y < ycount; y++) {
+        var child = childAt(x, y);
+        if (child === void
+            || ! child.visible)
+          continue;
+        var revItem, colspan, rowspan;
+        revItem = revItems[child], colspan = revItem[2], rowspan = revItem[3];
+        if (colspan == 1) {
+          minWidthForColumn[x] = Math.max(minWidthForColumn[x], child.minWidth + child.marginHorizontal);
+          maxWidthForColumn[x] = Math.max(maxWidthForColumn[x], child.maxWidth + child.marginHorizontal);
+        }
+        if (rowspan == 1) {
+          minHeightForRow[y] =   Math.max(minHeightForRow[y], child.minHeight + child.marginVertical);
+          maxHeightForRow[y] =   Math.max(maxHeightForRow[y], child.maxHeight + child.marginVertical);
+        }
+      }    
+
+    for (var x = 0; x < xcount; x++)
+      for (var y = 0; y < ycount; y++) {
+        var child = childAt(x, y);
+        if (child === void)
+          continue;
+	var revItem, colspan, rowspan;
+	revItem = revItems[child], colspan = revItem[2], rowspan = revItem[3];
+	if (colspan > 1) {
+	  var minW, maxW, w;
+	  minW = Math.max(0, child.minWidth + child.marginHorizontal - spaceHorizontal * (colspan - 1));
+	  w = 0; for (var i = 0; i < colspan; i++) w += minWidthForColumn[x + i];
+	  if (w < minW) for (var i = 0; i < colspan; i++) minWidthForColumn[x + i] += int((minW - w) * (i + 1) / colspan) - int((minW - w) * i / colspan);
+	  maxW = Math.max(0, child.maxWidth + child.marginHorizontal - spaceHorizontal * (colspan - 1));
+	  w = 0; for (var i = 0; i < colspan; i++) w += maxWidthForColumn[x + i];
+	  if (w < maxW) for (var i = 0; i < colspan; i++) maxWidthForColumn[x + i] += int((maxW - w) * (i + 1) / colspan) - int((maxW - w) * i / colspan);
+	}
+	if (rowspan > 1) {
+	  var minH, maxH, h;
+	  minH = Math.max(0, child.minHeight + child.marginVertical - spaceVertical * (rowspan - 1));
+	  h = 0; for (var i = 0; i < rowspan; i++) h += minHeightForRow[y + i];
+	  if (h < minH) for (var i = 0; i < rowspan; i++) minHeightForRow[y + i] += int((minH - h) * (i + 1) / rowspan) - int((minH - h) * i / rowspan);
+	  maxH = Math.max(0, child.maxHeight + child.marginVertical - spaceVertical * (rowspan - 1));
+	  h = 0; for (var i = 0; i < rowspan; i++) h += maxHeightForRow[y + i];
+	  if (h < maxH) for (var i = 0; i < rowspan; i++) maxHeightForRow[y + i] += int((maxH - h) * (i + 1) / rowspan) - int((maxH - h) * i / rowspan);
+	}
+      }    
+
+    // グリッド全体の最大・最小サイズを決定する
+    var minW, minH, maxW, maxH;
+
+    minW = maxW = spaceHorizontal * (xcount - 1);
+    for (var x = 0; x < xcount; x++) {
+      minW += minWidthForColumn[x];
+      maxW += maxWidthForColumn[x];
+    }
+
+    minH = maxH = spaceVertical * (ycount - 1);
+    for (var y = 0; y < ycount; y++) {
+      minH += minHeightForRow[y];
+      maxH += maxHeightForRow[y];
+    }
+
+    // 最大・最小サイズを決定する
+    setMinMaxSize(minW, minH, Math.max(maxW, marginalWidth), Math.max(maxH, marginalHeight));
+  }
+
+  /*------------------------------
+   * レイアウトに従ってウィジェットを配置する
+   ------------------------------*/
+  function locateLayout {
+    // 行、列ごとのサイズを決定する
+    widthForColumn = [];
+    heightForRow = [];
+
+    // 大まかに、minとmaxの比率から幅・高さを決定する
+    var minWidthRatio, maxWidthRatio, minHeightRatio, maxHeightRatio;
+
+    minWidthRatio = (maxWidth - width);
+    maxWidthRatio = (width - minWidth);
+
+    for (var x = 0; x < xcount; x++) {
+      if (maxWidth == minWidth)
+        widthForColumn[x] = minWidthForColumn[x];
+      else
+        widthForColumn[x] = 
+          ((minWidthForColumn[x] * minWidthRatio
+            + maxWidthForColumn[x] * maxWidthRatio) 
+           / (maxWidth - minWidth));
+    }
+
+    minHeightRatio = (maxHeight - height);
+    maxHeightRatio = (height - minHeight);
+
+    for (var y = 0; y < ycount; y++) {
+      if (maxHeight == minHeight)
+        heightForRow[y] = minHeightForRow[y];
+      else
+        heightForRow[y] = 
+          ((minHeightForRow[y] * minHeightRatio
+            + maxHeightForRow[y] * maxHeightRatio) 
+           / (maxHeight - minHeight));
+    }
+
+    var xpos, ypos;
+    xpos = 0;
+
+    for (var x = 0; x < xcount; x++) {
+      ypos = 0;
+      for (var y = 0; y < ycount; y++) {
+        var child = childAt(x, y);
+        if (child) {
+	  var revItem, colspan, rowspan;
+	  revItem = revItems[child], colspan = revItem[2], rowspan = revItem[3];
+	  var w, h;
+	  w = spaceHorizontal * (colspan - 1);
+	  h = spaceVertical * (rowspan - 1);
+	  for (var i = 0; i < colspan; i++)
+	    w += widthForColumn[x + i];
+	  for (var i = 0; i < rowspan; i++)
+	    h += heightForRow[y + i];
+          child.setSize(int(w - child.marginHorizontal), int(h - child.marginVertical));
+
+          switch (child.alignHorizontal) {
+          case ALIGN_LEFT:
+            child.left = int(xpos) + child.marginLeft;
+            break;
+
+          case ALIGN_CENTER:
+            child.left = int(xpos + (w - child.marginIncludeWidth) / 2 + child.marginLeft); 
+            break;
+
+          case ALIGN_RIGHT:
+            child.left = int(xpos + (w - child.width - child.marginRight));
+            break;
+          }
+
+          switch (child.alignVertical) {
+          case ALIGN_TOP:
+            child.top = int(ypos) + child.marginTop;
+            break;
+
+          case ALIGN_CENTER:
+            child.top = int(ypos + (h - child.marginIncludeHeight) / 2 + child.marginTop); 
+            break;
+
+          case ALIGN_BOTTOM:
+            child.top = int(ypos + (h - child.height - child.marginBottom)); 
+            break;
+          }
+        }
+        ypos += heightForRow[y] + spaceVertical;
+      }
+      xpos += widthForColumn[x] + spaceHorizontal;
+    }   
+  }
+
+  /*------------------------------
+   * レイアウトを更新する
+   ------------------------------*/
+  function invalidateLayout {
+    // 子レイヤへの反応がdisableされているか、
+    // まだウィジェットツリーに登録される前なら、後回し
+    if (! _respondToChildModification
+        || ! isInWidgetTree) {
+      _childModified = true;
+      return;
+    }
+    _childModified = false;
+
+    // 幅を記録
+    var oldWidth, oldHeight;
+    oldWidth = width;
+    oldHeight = height;
+
+    // レイアウトの比率を計算
+    calculateLayout();
+
+    // 幅や高さの更新が「無かった」なら、
+    // 強制的にウィジェットの再配置を行う(再配置があった場合は、onSizeModifiedが呼ばれている)
+    if (oldWidth == width
+        && oldHeight == height)
+      locateLayout();
+  }
+
+  /*------------------------------
+   * リサイズ時にレイアウトをやり直す
+   ------------------------------*/
+  function onSizeModified(width, height) {
+    // 子レイヤへの反応がdisableされているか、
+    // まだウィジェットツリーに登録される前なら、後回し
+    if (! _respondToChildModification
+        || ! isInWidgetTree) 
+      return;
+
+    // ウィジェットを配置する
+    locateLayout();
+  }
+};
+
+/**----------------------------------------------------------------------
+ * 横方向 レイアウト
+ ----------------------------------------------------------------------*/
+class KHorizontalBarLayout extends KGridLayout
+{
+  /**------------------------------
+   * 横方向にウィジェットを一直線に並べるレイアウトです。
+   *
+   * @param win ウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KHorizontalBarLayout(win, name = "") {
+    super.KGridLayout(...);
+  }
+
+  /*------------------------------
+   * ウィジェットを追加します
+   *
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function add(child) {
+    super.add(xcount, 0, child);
+  }
+
+  /*-----------------------------
+   * ウィジェットを取り除きます
+   *
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    var pos = revItems[child];
+    var prevItems = items;
+    items = %[];
+    eachDictionary(revItems, function(key, value, pos, prevItems) {
+      var item = prevItems[posExp(value[0], value[1])];
+      if (value[0] > pos[0])
+        value[0] --;
+      items[posExp(value[0], value[1])] = item;
+    } incontextof(this), pos, prevItems);
+    super.remove(child, doInvalidate);
+  }
+}
+
+
+/**----------------------------------------------------------------------
+ * 縦方向 レイアウト
+ ----------------------------------------------------------------------*/
+class KVerticalBarLayout extends KGridLayout
+{
+  /**------------------------------
+   * 縦方向にウィジェットを一直線に並べるレイアウトです。
+   *
+   * @param win ウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KVerticalBarLayout(win, name = "") {
+    super.KGridLayout(...);
+  }
+
+  /*------------------------------
+   * ウィジェットを追加します
+   *
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function add(child) {
+    super.add(0, ycount, child);
+  }
+
+  /*-----------------------------
+   * ウィジェットを取り除きます
+   *
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    var pos = revItems[child];
+    var prevItems = items;
+    var items = %[];
+    eachDictionary(revItems, function(key, value, pos, prevItems) {
+      var item = prevItems[posExp(value[0], value[1])];
+      if (value[1] > pos[1])
+        value[1] --;
+      items[posExp(value[0], value[1])] = item;
+    } incontextof(this), pos, prevItems);
+    super.remove(child, doInvalidate);
+  }
+}
+
+

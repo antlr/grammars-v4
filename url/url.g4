@@ -36,11 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar url;
 
 url
-   : uri
+   : uri EOF
    ;
 
 uri
-   : scheme '://' login? host (':' port)? ('/' path)? query? frag? WS?
+   : scheme '://' login? host (':' port)? ('/' path?)? query? frag? WS?
    ;
 
 scheme
@@ -48,15 +48,16 @@ scheme
    ;
 
 host
-   : '/'? (hostname | hostnumber)
+   : '/'? hostname
    ;
 
 hostname
-   : string ('.' string)*
+   : string ('.' string)*   #DomainNameOrIPv4Host
+   | '[' v6host ']'         #IPv6Host
    ;
 
-hostnumber
-   : DIGITS '.' DIGITS '.' DIGITS '.' DIGITS
+v6host
+   : '::'? (string | DIGITS) ((':'|'::') (string | DIGITS))*
    ;
 
 port
@@ -64,7 +65,7 @@ port
    ;
 
 path
-   : string ('/' string)*
+   : string ('/' string)* '/'?
    ;
 
 user
@@ -72,7 +73,7 @@ user
    ;
 
 login
-   : user ':' password '@'
+   : user (':' password)? '@'
    ;
 
 password
@@ -80,11 +81,11 @@ password
    ;
 
 frag
-   : ('#' string)
+   : '#' (string | DIGITS)
    ;
 
 query
-   : ('?' search)
+   : '?' search
    ;
 
 search
@@ -111,7 +112,7 @@ HEX
 
 
 STRING
-   : ([a-zA-Z~0-9] | HEX) ([a-zA-Z0-9.-] | HEX)*
+   : ([a-zA-Z~0-9] | HEX) ([a-zA-Z0-9.+-] | HEX)*
    ;
 
 
