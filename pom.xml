@@ -65,6 +65,7 @@
 			</activation>
 			<id>grammarv4</id>
 			<modules>
+                <module>abc</module>
 				<module>abnf</module>
 				<module>acme</module>
 				<module>agc</module>
