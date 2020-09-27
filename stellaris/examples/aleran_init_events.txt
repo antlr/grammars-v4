@@ -1,0 +1,409 @@
+namespace = aleran_init
+
+#100s: Basic init
+#200s: Planet init
+#300s: Government init
+#400s: System init
+#500s: Ships init
+#1000s: AI init
+
+### Empire init - add technologies and resources
+country_event = {
+	id = aleran_init.100
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { 
+			limit = { 
+				has_civic = civic_dragon_init
+			}
+			give_technology = { message = no tech = tech_robotic_workers }
+			add_minerals = 200 #start with 200 by default
+		}
+	}
+}
+
+planet_event = { #replace slums
+	id = aleran_init.200
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { limit = { owner = { has_valid_civic = civic_dragon_init } }
+			while = {
+				count = 1
+				random_tile = {
+					limit = {
+						has_blocker = tb_failing_infrastructure
+					}
+					set_blocker = tb_meteor_crater
+				}
+			}
+			every_tile = {
+				limit = {
+					has_blocker = tb_decrepit_dwellings
+				}
+				prev = { 
+					set_planet_flag = tb_animals_at@prev
+				}	
+				set_blocker = tb_animal_yard
+			}
+		}
+	}
+}
+
+planet_event = { #replace farms
+	id = aleran_init.201
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { limit = { owner = { has_country_flag = aleran } }
+			every_tile = {
+				limit = {
+					has_building = building_hydroponics_farm_1
+				}
+				set_building = building_meat_lab_1
+			}
+		}
+	}
+}
+
+planet_event = { #Add a random robot and a mining network for it to use
+	id = aleran_init.202
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { limit = { owner = { has_valid_civic = civic_dragon_init } }
+			while = {
+				count = 1
+				random_tile = {
+					limit = {
+						OR = {
+							has_building = building_mining_network_1
+							AND = {
+								has_building = no
+								has_blocker = no
+								has_resource = { type = minerals amount > 0 } 
+								NOR = {
+									has_resource = { type = energy amount > 0 } 
+									has_resource = { type = food amount > 0 } 
+									has_resource = { type = physics_research amount > 0 } 
+									has_resource = { type = society_research amount > 0 } 
+									has_resource = { type = engineering_research amount > 0 } 
+								}
+							}
+						}
+						has_pop = no
+					}
+					build_pop = {
+						name = buildable_robot_pop_1
+					}
+					set_building = building_mining_network_1
+				}
+			}
+		}
+	}
+}
+
+##DOES NOT WORK
+planet_event = { #Make one "blank" tile, good for a unity building, if one is not already present, by moving its resources elsewhere
+	id = aleran_init.203
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		while = {
+			count = 1
+			random_tile = {
+				limit = { #one mineral and nothing else
+					has_resource = { type = minerals amount > 0 } 
+					has_resource = { type = minerals amount < 2 } 
+					NOR = {
+						has_resource = { type = energy amount > 0 } 
+						has_resource = { type = food amount > 0 } 
+						has_resource = { type = physics_research amount > 0 } 
+						has_resource = { type = society_research amount > 0 } 
+						has_resource = { type = engineering_research amount > 0 } 
+					}
+				}
+				log = "Emptying tile [This.GetName]"
+				set_deposit = d_null_mineral_deposit
+				prev = {set_planet_flag = "cleared_one_tile"}
+			}
+		}
+		
+		if = {
+			limit = {
+				NOT = {has_planet_flag = "cleared_one_tile"}
+			}
+			while = {
+				count = 1
+				random_tile = {
+					limit = { #two mineral and nothing else
+						has_resource = { type = minerals amount > 0 } 
+						has_resource = { type = minerals amount < 3 } 
+						NOR = {
+							has_resource = { type = energy amount > 0 } 
+							has_resource = { type = food amount > 0 } 
+							has_resource = { type = physics_research amount > 0 } 
+							has_resource = { type = society_research amount > 0 } 
+							has_resource = { type = engineering_research amount > 0 } 
+						}
+					}
+					log = "Emptying tile [This.GetName]"
+					set_deposit = d_null_mineral_deposit
+					prev = {set_planet_flag = "cleared_one_tile"}
+				}
+			}
+		}
+		
+		while = {
+			count = 1
+			random_tile = {
+				limit = {
+					has_resource = { type = minerals amount > 0 } 
+					has_resource = { type = minerals amount < 3 } 
+				}
+				log = "Enriching tile [This.GetName]"
+				set_deposit = d_immense_mineral_deposit
+			}
+		}
+	}
+}
+
+planet_event = { #Replace one single-unit of some basic resource with unity
+	id = aleran_init.204
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				owner = { has_country_flag = aleran }
+			}
+			random_tile = {
+				limit = {
+					has_building = no
+					OR = {
+						AND = {
+							has_resource = { type = energy amount > 0 } 
+							has_resource = { type = energy amount < 2 } 
+						}
+						AND = {
+							has_resource = { type = minerals amount > 0 } 
+							has_resource = { type = minerals amount < 2 } 
+						}
+						AND = {
+							has_resource = { type = food amount > 0 } 
+							has_resource = { type = food amount < 2 } 
+						}
+					}
+					NOR = {
+						has_resource = { type = physics_research amount > 0 } 
+						has_resource = { type = society_research amount > 0 } 
+						has_resource = { type = engineering_research amount > 0 } #do not need to check strategics, since they never spawn on starter planets
+					}
+				}
+				log = "Emptying tile [This.GetName]"
+				set_deposit = d_aleran_unity_deposit
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_init.300
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { 
+			limit = { 
+				has_civic = civic_dragon_init
+			}
+			country_government_civic_points_add = 1
+			change_government = {
+				authority = auth_dragon
+				civics = {
+					civic = civic_dragon_gov
+					civic = civic_dragon_tech
+					civic = civic_dragon_research
+				}
+			} 
+		}
+	}
+}
+
+country_event = {
+	id = aleran_init.301
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { 
+			limit = { 
+				has_civic = civic_dragon_gov
+			}
+			#change leader traits
+			FROMFROM = {
+				leader = {
+					remove_trait = trait_ruler_warlike
+					remove_trait = trait_ruler_corvette_focus
+					remove_trait = trait_ruler_destroyer_focus
+					remove_trait = trait_ruler_cruiser_focus
+					remove_trait = trait_ruler_battleship_focus
+					remove_trait = trait_ruler_recruiter
+					remove_trait = trait_ruler_from_the_ranks
+					remove_trait = trait_ruler_fortifier
+					remove_trait = trait_ruler_logistic_understanding
+					remove_trait = trait_ruler_military_pioneer
+					add_trait = trait_ruler_expansionist
+					add_trait = trait_ruler_frontier_spirit
+					add_trait = trait_ruler_space_miner
+					set_age = 29
+				}
+			}		
+		}
+	}
+}
+
+country_event = {
+	id = aleran_init.302
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { 
+			limit = { 
+				has_civic = civic_dragon_gov
+			}
+			set_policy = { policy = slavery option = slavery_not_allowed cooldown = no }
+			set_policy = { policy = purge option = purge_not_allowed cooldown = no }
+			set_policy = { policy = pre_sapients option = pre_sapients_protect cooldown = no }
+			set_policy = { policy = artificial_intelligence_policy option = ai_full_rights cooldown = no }
+			set_policy = { policy = first_contact_protocol option = first_contact_attack_not_allowed cooldown = no }
+			set_policy = { policy = resettlement option = resettlement_allowed cooldown = no }
+			set_policy = { policy = enlightenment option = enlightenment_allowed cooldown = no }
+			set_policy = { policy = orbital_bombardment option = orbital_bombardment_selective cooldown = no }
+		}
+	}
+}
+
+event = {
+	id = aleran_init.400
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_country = {
+			limit = { exists = capital_scope has_civic = civic_dragon_init }
+			capital_scope = {
+				solar_system = {
+					every_system_planet = {
+						if = {
+							limit = { #Evek
+								is_planet_class = pc_molten
+								is_moon = no
+							}
+							add_modifier = {
+								modifier = "extreme_storms"
+								days = -1
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_init.500
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { 
+			limit = { 
+				has_civic = civic_dragon_gov
+			}
+			
+			every_owned_ship = {
+				if = {
+					limit = {
+						is_ship_class = shipclass_corvette
+					}
+					delete_ship = this
+				}
+			}
+			
+			create_fleet = {
+				effect = {
+					set_owner = prev
+					
+					create_ship = {
+						name = random
+						random_existing_design = constructor
+					}
+					
+					set_fleet_stance = evasive
+					set_location = prev.capital_star
+				}
+			}
+			
+			create_fleet = {
+				effect = {
+					set_owner = prev
+
+					create_ship = {
+						name = random
+						random_existing_design = science
+					}
+
+					set_fleet_stance = evasive				
+					#set_location = prev.capital_star
+					set_location = prev.capital_scope.star
+					
+					owner = {
+						create_leader = {
+							type = scientist
+							sub_type = survey
+							name = random
+							species = owner_main_species
+						}
+					}
+					set_leader = last_created_leader
+				}			
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_init.1000
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { 
+			limit = { 
+				OR = {
+					has_civic = civic_dragon_init	
+					and = {
+						has_civic = civic_dragon_gov
+						has_civic = civic_dragon_tech
+						has_civic = civic_dragon_research
+					}
+				}
+				is_ai = yes
+			}
+			add_modifier = {
+				modifier = "aleran_ai_bonus"
+				days = -1
+			}
+		}
+	}
+}

@@ -1,0 +1,13 @@
+Family PerformanceFamily = {
+		Property Type NormalDistribution  = Record [ 
+			mean : float ;
+			stddev : float ; 
+		];
+		Property Type Performance  = Record [ 
+			normalPerformance : NormalDistribution ;
+		];
+		Component Type PerformingComponent = { 
+			Property latency : Performance ;
+		}
+
+}

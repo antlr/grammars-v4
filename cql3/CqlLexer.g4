@@ -357,6 +357,10 @@ K_IS
    : I S | 'IS'
    ;
 
+K_JSON
+   : J S O N | 'JSON'
+   ;
+
 
 K_KEY
    : K E Y | 'KEY'
@@ -954,7 +958,7 @@ fragment HEX_4DIGIT
 
 
 fragment OBJECT_NAME_FRAG
-   : [a-zA-Z] [A-Za-z0-9_$]*
+   : [a-zA-Z] [A-Za-z0-9_$]* | '"' ~'"' + '"'
    ;
 
 

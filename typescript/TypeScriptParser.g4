@@ -32,7 +32,7 @@ parser grammar TypeScriptParser;
 
 options {
     tokenVocab=TypeScriptLexer;
-    superClass=TypeScriptBaseParser;
+    superClass=TypeScriptParserBase;
 }
 
 // SupportSyntax
@@ -113,7 +113,12 @@ predefinedType
     ;
 
 typeReference
-    : typeName ( typeIncludeGeneric | typeGeneric)?
+    : typeName nestedTypeGeneric?
+    ;
+
+nestedTypeGeneric
+    : typeIncludeGeneric 
+    | typeGeneric
     ;
 
 // I tried recursive include, but it's not working.
@@ -199,13 +204,24 @@ callSignature
 
 parameterList
     : restParameter
-    | predefinedType (',' predefinedType)*
-    | optionalParameterList (',' restParameter)?
-    | requiredParameterList (',' (optionalParameterList (',' restParameter)? | restParameter))?
+    | parameter (',' parameter)* (',' restParameter)?
     ;
 
 requiredParameterList
     : requiredParameter (',' requiredParameter)*
+    ;
+
+parameter
+    : requiredParameter
+    | optionalParameter
+    ;
+
+optionalParameter
+    : decoratorList? ( accessibilityModifier? identifierOrPattern ('?' typeAnnotation? | typeAnnotation? initializer))
+    ;
+
+restParameter
+    : '...' singleExpression typeAnnotation?
     ;
 
 requiredParameter
@@ -221,18 +237,6 @@ accessibilityModifier
 identifierOrPattern
     : identifierName
     | bindingPattern
-    ;
-
-optionalParameterList
-    : optionalParameter (',' optionalParameter)*
-    ;
-
-optionalParameter
-    : decoratorList? ( accessibilityModifier? identifierOrPattern ('?' typeAnnotation? | typeAnnotation? initializer))
-    ;
-
-restParameter
-    : '...' singleExpression
     ;
 
 constructSignature
@@ -258,7 +262,7 @@ constructorDeclaration
 // A.5 Interface
 
 interfaceDeclaration
-    : Export? Interface Identifier typeParameters? interfaceExtendsClause? objectType SemiColon?
+    : Export? Declare? Interface Identifier typeParameters? interfaceExtendsClause? objectType SemiColon?
     ;
 
 interfaceExtendsClause
@@ -335,6 +339,7 @@ statement
     | exportStatement
     | emptyStatement
     | abstractDeclaration //ADDED
+    | decoratorList
     | classDeclaration
     | interfaceDeclaration //ADDED
     | namespaceDeclaration //ADDED
@@ -390,6 +395,7 @@ exportStatement
 variableStatement
     : bindingPattern typeAnnotation? initializer SemiColon?
     | accessibilityModifier? varModifier? ReadOnly? variableDeclarationList SemiColon?
+    | Declare varModifier? variableDeclarationList SemiColon?
     ;
 
 variableDeclarationList
@@ -397,7 +403,7 @@ variableDeclarationList
     ;
 
 variableDeclaration
-    : ( Identifier | arrayLiteral | objectLiteral) typeAnnotation? singleExpression? ('=' typeParameters? singleExpression)? // ECMAScript 6: Array & Object Matching
+    : ( identifierOrKeyWord | arrayLiteral | objectLiteral) typeAnnotation? singleExpression? ('=' typeParameters? singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
 emptyStatement
@@ -521,16 +527,16 @@ implementsClause
 // Classes modified
 classElement
     : constructorDeclaration
-    | propertyMemberDeclaration
+    | decoratorList? propertyMemberDeclaration
     | indexMemberDeclaration
     | statement
     ;
 
 propertyMemberDeclaration
-    : propertyMemberBase propertyName typeAnnotation? initializer? SemiColon
-    | propertyMemberBase propertyName callSignature ( ('{' functionBody '}') | SemiColon)
-    | propertyMemberBase (getAccessor | setAccessor)
-    | abstractDeclaration
+    : propertyMemberBase propertyName '?'? typeAnnotation? initializer? SemiColon                   # PropertyDeclarationExpression
+    | propertyMemberBase propertyName callSignature ( ('{' functionBody '}') | SemiColon)           # MethodDeclarationExpression
+    | propertyMemberBase (getAccessor | setAccessor)                                                # GetterSetterDeclarationExpression
+    | abstractDeclaration                                                                           # AbstractMemberDeclaration
     ;
 
 propertyMemberBase
@@ -573,7 +579,7 @@ formalParameterList
     ;
 
 formalParameterArg
-    : accessibilityModifier? Identifier typeAnnotation? ('=' singleExpression)?      // ECMAScript 6: Initialization
+    : decorator? accessibilityModifier? identifierOrKeyWord '?'? typeAnnotation? ('=' singleExpression)?      // ECMAScript 6: Initialization
     ;
 
 lastFormalParameterArg                        // ECMAScript 6: Rest Parameter
@@ -593,12 +599,11 @@ arrayLiteral
     ;
 
 elementList
-    : singleExpression (','+ singleExpression)* (','+ lastElement)?
-    | lastElement
+    : arrayElement (','+ arrayElement)*
     ;
 
-lastElement                      // ECMAScript 6: Spread Operator
-    : Ellipsis (Identifier | singleExpression)
+arrayElement                      // ECMAScript 6: Spread Operator
+    : Ellipsis? (singleExpression | Identifier) ','?
     ;
 
 objectLiteral
@@ -612,7 +617,7 @@ propertyAssignment
     | getAccessor                                             # PropertyGetter
     | setAccessor                                             # PropertySetter
     | generatorMethod                                         # MethodProperty
-    | Identifier                                              # PropertyShorthand
+    | identifierOrKeyWord                                     # PropertyShorthand
     | restParameter                                           # RestParameterInObject
     ;
 
@@ -631,14 +636,15 @@ propertyName
     ;
 
 arguments
-    : '('(
-          singleExpression (',' singleExpression)* (',' lastArgument)? |
-          lastArgument
-       )?')'
+    : '(' (argumentList ','?)? ')'
     ;
 
-lastArgument                                  // ECMAScript 6: Spread Operator
-    : Ellipsis Identifier
+argumentList
+    : argument (',' argument)*
+    ;
+
+argument                      // ECMAScript 6: Spread Operator
+    : Ellipsis? (singleExpression | Identifier)
     ;
 
 expressionSequence
@@ -654,7 +660,7 @@ singleExpression
     | arrowFunctionDeclaration                                               # ArrowFunctionExpression   // ECMAScript 6
     | Class Identifier? classTail                                            # ClassExpression
     | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
-    | singleExpression '.' identifierName                                    # MemberDotExpression
+    | singleExpression '.' identifierName nestedTypeGeneric?                 # MemberDotExpression
     | singleExpression arguments                                             # ArgumentsExpression
     | New singleExpression typeArguments? arguments?                         # NewExpression
     | singleExpression {this.notLineTerminator()}? '++'                      # PostIncrementExpression
@@ -696,6 +702,12 @@ singleExpression
     | objectLiteral                                                          # ObjectLiteralExpression
     | '(' expressionSequence ')'                                             # ParenthesizedExpression
     | typeArguments expressionSequence?                                      # GenericTypes
+    | singleExpression As asExpression                                       # CastAsExpression
+    ;
+
+asExpression
+    : predefinedType ('[' ']')?
+    | singleExpression
     ;
 
 arrowFunctionDeclaration
@@ -748,6 +760,12 @@ identifierName
     | reservedWord
     ;
 
+identifierOrKeyWord
+    : Identifier
+    | TypeAlias
+    | Require
+    ;
+
 reservedWord
     : keyword
     | NullLiteral
@@ -784,7 +802,6 @@ keyword
     | ReadOnly
     | Async
     | From
-
     | Class
     | Enum
     | Extends
@@ -801,14 +818,19 @@ keyword
     | Protected
     | Static
     | Yield
+    | Get
+    | Set
+    | Require
+    | TypeAlias
+    | String
     ;
 
 getter
-    : Identifier{this.p("get")}? propertyName
+    : Get propertyName
     ;
 
 setter
-    : Identifier{this.p("set")}? propertyName
+    : Set propertyName
     ;
 
 eos

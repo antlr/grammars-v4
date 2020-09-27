@@ -1,0 +1,85 @@
+Family PubSubFam = {
+    Port Type p_announce = {
+        // this port isn't dangling
+        heuristic size(self.attachedRoles) >= 1<<label : string = "This port has attachment(s).";errMsg : string = "This port dangles!";>>;
+        
+        // only attach to role of type r_publisher
+        invariant Forall r : role in self.attachedroles | 
+            declaresType(r, r_publisher) <<label : string = "Attached roles have correct type r_publisher.";errMsg : string = "Detected attached role that is NOT of type r_publisher!";>>;
+        
+    }
+    
+    
+    Port Type p_receive = {
+        // this port isn't dangling
+        heuristic size(self.attachedRoles) >= 1<<label : string = "This port has attachment(s).";errMsg : string = "This port dangles!";>>;
+        
+        // only attach to role of type r_subscriber
+        invariant Forall r : role in self.attachedroles | 
+            declaresType(r, r_subscriber) <<label : string = "Attached roles have correct type r_subscriber.";errMsg : string = "Detected attached role that is NOT of type r_subscriber!";>>;
+        
+        // no more than one role is subscriber to this port
+        invariant size({Select r : role in self.attachedRoles | 
+            declaresType(r, r_publisher) }) <= 1<<label : string = "No more than one role is subscriber to this port.";errMsg : string = "Error!  More than one role are subscribers to this port!";>>;
+        
+    }
+    
+    
+    Role Type r_publisher = {
+        // this role is not dangling and attaches to no more than one port
+        invariant size(self.attachedPorts) == 1<<label : string = "This role has exactly one attachment.";errMsg : string = "The role dangles or attaches to more than one port!";>>;
+        
+        // only attach to port of type p_announce
+        invariant Forall p : port in self.attachedports | 
+            declaresType(p, p_announce) <<label : string = "Attached ports have correct type p_announce.";errMsg : string = "Detected attached port that is NOT of type p_announce!";>>;
+        
+    }
+    
+    
+    Role Type r_subscriber = {
+        // this role is not dangling and attaches to no more than one port
+        invariant size(self.attachedPorts) == 1<<label : string = "This role has exactly one attachment.";errMsg : string = "The role dangles or attaches to more than one port!";>>;
+        
+        // only attach to port of type p_receive
+        invariant Forall p : port in self.attachedports | 
+            declaresType(p, p_receive) <<label : string = "Attached ports have correct type p_receive.";errMsg : string = "Detected attached port that is NOT of type p_receive!";>>;
+        
+    }
+    
+    
+    Connector Type EventBusT = {
+        // only roles of publisher and subscriber types are allowed
+        invariant Forall r in self.roles | 
+            Exists t in {r_publisher, r_subscriber} | 
+                declaresType(r, t)  <<label : string = "Roles match the required types.";errMsg : string = "At least a role is not of type r_publisher or r_subscriber!";>>;
+        
+        // although not required, warn if there's no subscriber
+        heuristic Exists r : role in self.roles | 
+            declaresType(r, r_subscriber) <<label : string = "There is at least one subscriber on this event bus.";errMsg : string = "Warning!  No subscriber detected!";>>;
+        
+        // must have at least one publisher
+        invariant Exists r : role in self.roles | 
+            declaresType(r, r_publisher) <<label : string = "There is at least one publisher on this event bus.";errMsg : string = "Error!  No publisher detected!";>>;
+        
+    }
+    
+    
+    Component Type ParticipantT = {
+        // participant should either announce or receive or both
+        heuristic Exists p in self.ports | 
+            Exists t in {p_announce, p_receive} | 
+                declaresType(p, t)  <<label : string = "An announce or receive port is present.";errMsg : string = "Detected NO port of either p_announce or p_receive!";>>;
+        
+    }
+    
+    
+    // warn if any port announces on more than one role of the same bus
+    heuristic Forall comp : component in self.components | 
+        Forall p : p_announce in comp.ports | 
+            (!(Exists r1 : role in p.attachedRoles | 
+                Exists r2 : role in p.attachedRoles | 
+                    r1 != r2 AND (Exists conn : connector in self.connectors | 
+                        isSubset({r1, r2}, conn.roles))  ) )  <<label : string = "All ports announce on one role of any bus.";errMsg : string = "Warning!  Detected a port that announces on TWO roles of the same bus!";>>;
+    
+}
+

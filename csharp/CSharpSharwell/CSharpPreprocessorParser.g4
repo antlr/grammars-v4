@@ -46,6 +46,8 @@ preprocessor_directive returns [bool value]
 	| ENDREGION TEXT? directive_new_line_or_sharp  { $value = conditions.All(c => c); }   #preprocessorRegion
 
 	| PRAGMA TEXT directive_new_line_or_sharp      { $value = conditions.All(c => c); }   #preprocessorPragma
+
+	| NULLABLE TEXT directive_new_line_or_sharp      { $value = conditions.All(c => c); }   #preprocessorNullable
 	;
 
 directive_new_line_or_sharp
