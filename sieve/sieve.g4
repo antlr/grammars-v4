@@ -104,7 +104,7 @@ WS
    ;
 
 QUOTEDSTRING
-   : '"' OCTETNOTQSPECIAL '"'
+   : '"' OCTETNOTQSPECIAL+ '"'
    ;
 
 DIGIT
@@ -122,7 +122,6 @@ IDENTIFIER
 TAG
    : ':' IDENTIFIER
    ;
-
    // a single octet other than NUL, CR, or LF
    
 OCTETNOTCRLF
@@ -157,7 +156,6 @@ NOTSTAR
    ;
    // either a CRLF pair, OR a single octet  other than NUL, CR, LF, star, or slash
    
-
 ADDRESSPART
    : ':localpart'
    | ':domain'
