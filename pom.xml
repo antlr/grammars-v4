@@ -104,6 +104,7 @@
 				<module>dart2</module>
 				<module>databank</module>
 				<module>dcm</module>
+				<module>dgol</module>				
 				<module>dice</module>
 				<module>dot</module>
 				<module>edif300</module>
