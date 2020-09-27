@@ -1,0 +1,52 @@
+/******************************************************************************
+	system_mb/ui/MBSystemClickWaitLayer.tjs
+*******************************************************************************/
+
+class MBSystemClickWaitLayer extends MBComponentLayer
+{
+	var owner;
+	
+	
+	function MBSystemClickWaitLayer(win, own)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(win, win.fore.base);
+		
+		setSize(800, 600);
+		setPos(0, 0);
+		absolute     = MBLayerAbs.sysclickwait;
+		hitType      = htMask;
+		hitThreshold = 0;	// 透過しないこと
+		visible      = false;
+		focusable    = true;
+		
+		fillRect(0, 0, 800, 600, 0x00000000);
+		
+		owner = own;
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	
+	//==========================================================================
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		// とにかくクリックされたことをオーナーに伝える
+		
+		owner.onClickWaitReleased();
+	}
+	
+	function onKeyDown(key, shift, process)
+	{
+		// とにかく（ｒｙ
+		
+		owner.onClickWaitReleased();
+	}
+}

@@ -24,6 +24,10 @@
  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+AB: 13-Apr-19; newExpression conflict , renamed to nayaExpression
+AB: 13-Apr-19; Replaced `type` with `dtype` to fix golang code gen.
+
 */
 
 grammar Dart2;
@@ -44,13 +48,13 @@ declaredIdentifier
   : metadata finalConstVarOrType identifier
   ;
 finalConstVarOrType
-  : 'final' type?
-  | 'const' type?
+  : 'final' dtype?
+  | 'const' dtype?
   | varOrType
   ;
 varOrType
   : 'var'
-  | type
+  | dtype
   ;
 
 initializedVariableDeclaration
@@ -75,7 +79,7 @@ formalParameterPart
   ;
 returnType
   : 'void'
-  | type
+  | dtype
   ;
 
 functionBody
@@ -166,9 +170,9 @@ declaration
   | ('external' 'static'?)? setterSignature
   | 'external'? operatorSignature
   | ('external' 'static'?)? functionSignature
-  | 'static' ('final' | 'const') type? staticFinalDeclarationList
-  | 'final' type? initializedIdentifierList
-  | ('static' | 'covariant')? ('var' | type) initializedIdentifierList
+  | 'static' ('final' | 'const') dtype? staticFinalDeclarationList
+  | 'final' dtype? initializedIdentifierList
+  | ('static' | 'covariant')? ('var' | dtype) initializedIdentifierList
   ;
 
 staticFinalDeclarationList
@@ -230,13 +234,13 @@ factoryConstructorSignature
   ;
 redirectingFactoryConstructorSignature
   : 'const'? 'factory' identifier ('.' identifier)? formalParameterList '='
-    type ('.' identifier)?
+    dtype ('.' identifier)?
   ;
 // 10.6.3 Constant Constructors
 constantConstructorSignature: 'const' qualified formalParameterList;
 
 // 10.9 Supperclasses
-superclass: 'extends' type;
+superclass: 'extends' dtype;
 
 // 10.10 SUperinterfaces
 interfaces: 'implements' typeList;
@@ -245,7 +249,7 @@ interfaces: 'implements' typeList;
 mixinApplicationClass
   : identifier typeParameters? '=' mixinApplication ';';
 mixinApplication
-  : type mixins interfaces?
+  : dtype mixins interfaces?
   ;
 
 // 13 Enums
@@ -260,7 +264,7 @@ enumEntry
 
 // 14 Generics
 typeParameter
-  : metadata identifier ('extends' type)?
+  : metadata identifier ('extends' dtype)?
   ;
 typeParameters
   : '<' typeParameter (',' typeParameter)* '>'
@@ -291,7 +295,7 @@ primary
   | functionExpression
   | literal
   | identifier
-  | newExpression
+  | nayaExpression
   | constObjectExpression
   | '(' expression ')'
   ;
@@ -338,57 +342,49 @@ booleanLiteral
   | 'false'
   ;
 
-//stringLiteral: (MultilineString | SingleLineString)+;
-stringLiteral: SingleLineString;
-//stringLiteral: SingleLineString;
+stringLiteral: (MultiLineString | SingleLineString)+;
+
 SingleLineString
-  : '"' ~["]* '"'
-  | '\'' ~[']* '\''
-//  | 'r\'' (~('\'' | NEWLINE))* '\'' // TODO
-//  | 'r"' (~('\'' | NEWLINE))* '"'
+  : '"' StringContentDQ* '"'
+  | '\'' StringContentSQ* '\''
+  | 'r\'' (~('\'' | '\n' | '\r'))* '\''
+  | 'r"' (~('"' | '\n' | '\r'))* '"'
   ;
 
-//MultilineString
-//  : '"""' StringContentTDQ* '"""'
-//  | '\'\'\'' StringContentTDQ* '\'\'\''
-//  | 'r"""' (~'"""')* '"""' // TODO
-//  | 'r\'\'\'' (~'\'\'\'')* '\'\'\''
-//  ;
-//StringContentSQ: .;// TODO
-//StringContentTDQ: .;// TODO
 fragment
-ESCAPE_SEQUENCE
-  : '\\n'
-  | '\\r'
-  | '\\f'
-  | '\\b'
-  | '\\t'
-  | '\\v'
-  | '\\x' HEX_DIGIT HEX_DIGIT
-  | '\\u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-  | '\\u{' HEX_DIGIT_SEQUENCE '}'
+StringContentDQ
+  : ~('\\' | '"' /*| '$'*/ | '\n' | '\r')
+  | '\\' ~('\n' | '\r')
+  //| stringInterpolation
   ;
+
 fragment
-HEX_DIGIT_SEQUENCE
-  : HEX_DIGIT HEX_DIGIT? HEX_DIGIT?
-    HEX_DIGIT? HEX_DIGIT? HEX_DIGIT?
+StringContentSQ
+  : ~('\\' | '\'' /*| '$'*/ | '\n' | '\r')
+  | '\\' ~('\n' | '\r')
+  //| stringInterpolation
   ;
-/*TODO
-<stringContentDQ> ::= \~{}( `\\' | `"' | `$' | <NEWLINE> )
-  \alt `\\' \~{}( <NEWLINE> )
-  \alt <stringInterpolation>
 
-<stringContentSQ> ::= \~{}( `\\' | `\'' | `$' | <NEWLINE> )
-  \alt `\\' \~{}( <NEWLINE> )
-  \alt <stringInterpolation>
-<stringContentTDQ> ::= \~{}( `\\' | `"""' | `$')
-  \alt `\\' \~{}( <NEWLINE> )
-  \alt <stringInterpolation>
+MultiLineString
+  : '"""' StringContentTDQ* '"""'
+  | '\'\'\'' StringContentTSQ* '\'\'\''
+  | 'r"""' (~'"' | '"' ~'"' | '""' ~'"')* '"""'
+  | 'r\'\'\'' (~'\'' | '\'' ~'\'' | '\'\'' ~'\'')* '\'\'\''
+  ;
 
-<stringContentTSQ> ::= \~{}( `\\' | `\'\'\'' | `$')
-  \alt `\\' \~{}( <NEWLINE> )
-  \alt <stringInterpolation>
-*/
+fragment
+StringContentTDQ
+  : ~('\\' | '"' /*| '$'*/)
+  | '"' ~'"' | '""' ~'"'
+  //| stringInterpolation
+  ;
+
+fragment StringContentTSQ
+  : ~('\\' | '\'' /*| '$'*/)
+  | '\'' ~'\'' | '\'\'' ~'\''
+  //| stringInterpolation
+  ;
+
 NEWLINE
   : '\n'
   | '\r'
@@ -437,13 +433,13 @@ functionExpression
 thisExpression: 'this';
 
 // 16.12.1 New
-newExpression
-  : 'new' type ('.' identifier)? arguments
+nayaExpression
+  : 'new' dtype ('.' identifier)? arguments
   ;
 
 // 16.12.2 Const
 constObjectExpression
-  : 'const' type ('.' identifier)? arguments
+  : 'const' dtype ('.' identifier)? arguments
   ;
 
 // 16.14.1 Actual Argument List Evaluation
@@ -653,7 +649,7 @@ qualified
   ;
 // 16.35 Type Test
 typeTest
-  : isOperator type
+  : isOperator dtype
   ;
 isOperator
   : 'is' '!'?
@@ -661,7 +657,7 @@ isOperator
 
 // 16.36 Type Cast
 typeCast
-  : asOperator type
+  : asOperator dtype
   ;
 asOperator
   : 'as'
@@ -756,7 +752,7 @@ tryStatement
   ;
 onPart
   : catchPart block
-  | 'on' type catchPart? block
+  | 'on' dtype catchPart? block
   ;
 catchPart
   : 'catch' '(' identifier (',' identifier)? ')'
@@ -814,7 +810,7 @@ topLevelDefinition
   | functionSignature functionBody
   | returnType? 'get' identifier functionBody
   | returnType? 'set' identifier formalParameterList functionBody
-  | ('final' | 'const') type? staticFinalDeclarationList ';'
+  | ('final' | 'const') dtype? staticFinalDeclarationList ';'
   | variableDeclaration ';'
   ;
 getOrSet
@@ -888,7 +884,7 @@ uriTest
   ;
 
 // 19.1 Static Types
-type
+dtype
   : typeName typeArguments?
   ;
 typeName
@@ -899,7 +895,7 @@ typeArguments
   : '<' typeList '>'
   ;
 typeList
-  : type (',' type)*
+  : dtype (',' dtype)*
   ;
 
 // 19.3.1 Typedef

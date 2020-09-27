@@ -7,7 +7,7 @@ public class TestSqlite {
 
     private static File [] ok = new File("../sqlite/examples").listFiles(pathname -> pathname.isFile());
 
-    private static File gfiles =  new File("../sqlite/SQLite.g4");
+    private static File gfiles =  new File("../sqlite/").listFiles(pathname -> pathname.endsWith(".g4"));
 
     @Test
     public void test(){

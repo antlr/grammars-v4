@@ -1,0 +1,216 @@
+//
+// $Id: KTextInputSlider.tjs,v 1.6 2007/09/17 12:09:52 m2 Exp $
+//
+
+
+/**----------------------------------------------------------------------
+ * テキストインプットスライダー
+ ----------------------------------------------------------------------*/
+class KTextInputSlider extends KGridLayout
+{
+  var _value;
+  var textInput;
+  var slider;
+  // 辞書
+  var dict;
+
+  /*------------------------------
+   * テキストインプットとスライダーを合成したウィジェットです。
+   *
+   * @param win ウィンドウ
+   * @param w 幅
+   * @param h 高さ
+   * @param minValue 値の最小値
+   * @param maxValue 値の最大値
+   * @param name 名前
+   * @param step 刻み幅
+   ------------------------------*/
+  function KTextInputSlider(win, w, h, leftValue, rightValue, step = 1, name = "") {
+    super.KGridLayout(win, name);
+
+    add(0, 0, (textInput = new KTextInput(win, h * 2, h, step == int(step) ? TEXT_DIGIT : TEXT_REAL, "textInput")));
+    add(1, 0, (slider = new KSlider(win, w == 0 ? 0 : w, h, leftValue, rightValue, step, "slider")));
+
+    _value = leftValue;
+    slider.value = leftValue; 
+    slider.focusable = false;
+    textInput.value = string(leftValue);
+  }
+
+  /*------------------------------
+   * ファイナライザ
+   ------------------------------*/
+  function finalize {
+    if (dict) {
+      dict.set(name, value);
+    }
+    super.finalize(...);
+  }
+
+  /*------------------------------
+   * 永続化辞書を値にバインドする
+   ------------------------------*/
+  function bindPersistentDictionary(dict) {
+    if (name !== void) {
+      this.dict = dict;
+      value = dict.init(name, value);
+    }
+  }
+
+  /**------------------------------
+   * イベントを発生させ強制的に現在の値を通知する。
+   *
+   * 現在の値で onValueModifiedを呼びます。
+   ------------------------------*/
+  function invalidateValue {
+    if (nodeEnabled)
+      onValueModified(value);
+  }
+
+  /**------------------------------
+   * 値を設定する
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property value {
+    getter {
+      return _value;
+    }
+    setter(v) {
+      v = Math.min(maxValue, Math.max(v, minValue));
+      if (step == int(step))
+        v = int(v);
+      if (_value == v)
+        return;
+      _value = v;
+      slider.value = v;
+      textInput.value = string(v);
+    }
+  }
+
+  /*------------------------------
+   * 子孫ウィジェットから特定の名前を持った子ウィジェットを捜す
+   *
+   * 子の「名前」を拾わないようにトラップ。
+   ------------------------------*/
+  function find(name) {
+    if (this.name === name)
+      return this;
+    else
+      return void;
+  }
+
+  function onChildValueModified(child, newValue) {
+    var oldValue = _value;
+    value = newValue;
+    if (oldValue != value)
+      onValueModified(value, oldValue);
+  }
+
+  /**------------------------------
+   * 値の変化量を設定する
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property step {
+    getter {
+      return slider.step;
+    }
+    setter(v) {
+      if(step != v)
+      {
+        var l = leftValue, r = rightValue;
+        slider.step = v;
+        leftValue = l; // step の変化に伴う、再設定
+        rightValue = r;
+        invalidateSliderRange();
+        textInput.type = v == int(v) ? TEXT_DIGIT : TEXT_REAL;
+        value = value; // 値の再設定
+      }
+    }
+  }
+
+  /**------------------------------
+   * スライダーの最少最大範囲を再計算
+   ------------------------------*/
+  function invalidateSliderRange() {
+    slider.minValue = int(Math.min(slider.leftValue, slider.rightValue));
+    slider.maxValue = int(Math.max(slider.leftValue, slider.rightValue));
+  }
+
+  /**------------------------------
+   * 左値を設定する
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property leftValue {
+    getter {
+      return slider.leftValue * step;
+    }
+    setter(v) {
+      slider.leftValue = int(v / step);
+      invalidateSliderRange();
+      value = value; // 値の再設定
+    }
+  }
+
+  /**------------------------------
+   * 右値を設定する
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property rightValue {
+    getter {
+      return slider.rightValue * step;
+    }
+    setter(v) {
+      slider.rightValue = int(v / step);
+      invalidateSliderRange(); 
+      value = value; // 値の再設定
+    }
+  }
+
+  /**------------------------------
+   * 最小値を設定する
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property minValue {
+    getter {
+      return slider.minValue * step;
+    }
+    setter(v) {
+      if (slider.sign > 0)
+        slider.leftValue = int(v / step);
+      else
+        slider.rightValue = int(v / step);
+      invalidateSliderRange();
+      value = value; // 値の再設定
+    }
+  }
+
+  /**------------------------------
+   * 最大値を設定する
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property maxValue {
+    getter {
+      return slider.maxValue * step;
+    }
+    setter(v) {
+      if (slider.sign > 0)
+        slider.rightValue = int(v / step);
+      else
+        slider.leftValue = int(v / step);
+      invalidateSliderRange();
+      value = value; // 値の再設定
+    }
+  }
+};

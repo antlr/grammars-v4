@@ -1,0 +1,57 @@
+global.K_UNDEFINED = "undefined";
+
+function blendColor(c1, c2) {
+  var a = (((c1 >> 24) & 0xff) + ((c2 >> 24) & 0xff)) >> 1;
+  var r = (((c1 >> 16) & 0xff) + ((c2 >> 16) & 0xff)) >> 1;
+  var g = (((c1 >> 8) & 0xff) + ((c2 >> 8) & 0xff)) >> 1;
+  var b = (((c1 >> 0) & 0xff) + ((c2 >> 0) & 0xff)) >> 1;
+  return (a << 24) | (r << 16) | (g << 8) | (b << 0);
+}
+
+global.WIN_BG       = 0xFF000000 | System.toActualColor(clBtnFace);
+global.WIN_DARKEN2  = 0xFF000000 | System.toActualColor(cl3DDkShadow);
+global.WIN_DARKEN1  = blendColor(WIN_BG, WIN_DARKEN2);
+global.WIN_LIGHTEN1  = 0xFF000000 | System.toActualColor(cl3DLight);
+global.WIN_LIGHTEN2  = 0xFF000000 | System.toActualColor(clBtnHighlight);
+global.WIN_SELECTED = 0xFF000000 | System.toActualColor(clHighlight);
+global.WIN_SELECTED_TEXT = 0xFF000000 | System.toActualColor(clHighlightText);
+global.WIN_HIGHLIGHT = 0xFF000000 | System.toActualColor(clBtnHighlight);
+global.WIN_BLACK    = 0xFF000000;
+global.WIN_WHITE    = 0xFFFFFFFF;
+
+global.ALIGN_LEFT   = 0;
+global.ALIGN_CENTER = 1;
+global.ALIGN_RIGHT  = 2;
+global.ALIGN_TOP    = 0;
+global.ALIGN_BOTTOM = 2;
+
+/// フレームの種類
+global.FRAME_FLATTEN = 0; ///< フラットフレーム
+global.FRAME_SUNKEN = 1;  ///< へこんだフレーム
+global.FRAME_RAISED = 2;  ///< でっぱったフレーム
+
+// リストアイテムの機能性マスク
+global.LIST_ITEM_CAPABILITY_MASK_FOCUS       = 1 << 0;
+global.LIST_ITEM_CAPABILITY_MASK_RIGHTCLICK  = 1 << 1;
+global.LIST_ITEM_CAPABILITY_MASK_ICONCLICK   = 1 << 2;
+global.LIST_ITEM_CAPABILITY_MASK_DRAG        = 1 << 3;
+global.LIST_ITEM_CAPABILITY_MASK_DROP        = 1 << 4;
+global.LIST_ITEM_CAPABILITY_MASK_MOUSEDOWN   = 1 << 5;
+
+// シンプルダイアログのウィジェットタイプ
+global.DIALOG_WIDGET_TYPE_CHECKBOX = 0;
+global.DIALOG_WIDGET_TYPE_TEXTINPUT = 1;
+global.DIALOG_WIDGET_TYPE_DROPDOWNLIST = 2;
+global.DIALOG_WIDGET_TYPE_TEXTAREA = 3;
+
+// 問い合わせの答え
+global.DIALOG_RESPONSE_OK = 1 << 0;
+global.DIALOG_RESPONSE_CANCEL = 1 << 1;
+
+
+if (k_kirikiriz) {
+// 吉里吉里Zでは未定義のマウスカーソル定数への対処
+  global.crHSplit = crSizeWE;
+  global.crVSplit = crSizeNS;
+  global.crDrag = "crDrag.cur";
+ }
