@@ -596,13 +596,16 @@ classSpecifier:
 classHead:
 	classKey attributeSpecifierSeq? (
 		classHeadName classVirtSpecifier?
-	)? baseClause?;
+	)? baseClause?
+	| Union attributeSpecifierSeq? (
+		classHeadName classVirtSpecifier?
+	)?;
 
 classHeadName: nestedNameSpecifier? className;
 
 classVirtSpecifier: Final;
 
-classKey: Class | Struct | Union;
+classKey: Class | Struct;
 
 memberSpecification:
 	(memberdeclaration | accessSpecifier Colon)+;
@@ -763,10 +766,8 @@ noeExceptSpecification:
 /*Lexer*/
 
 theOperator:
-	New
-	| Delete
-	| New LeftBracket RightBracket
-	| Delete LeftBracket RightBracket
+	New (LeftBracket RightBracket)?
+	| Delete (LeftBracket RightBracket)?
 	| Plus
 	| Minus
 	| Star

@@ -69,7 +69,8 @@ Export: 'export';
 
 Extern: 'extern';
 
-False: 'false';
+//DO NOT RENAME - PYTHON NEEDS True and False
+False_: 'false';
 
 Final: 'final';
 
@@ -139,7 +140,8 @@ Thread_local: 'thread_local';
 
 Throw: 'throw';
 
-True: 'true';
+//DO NOT RENAME - PYTHON NEEDS True and False
+True_: 'true';
 
 Try: 'try';
 
@@ -385,7 +387,7 @@ fragment Schar:
 
 fragment Rawstring: '"' .*? '(' .*? ')' .*? '"';
 
-BooleanLiteral: False | True;
+BooleanLiteral: False_ | True_;
 
 PointerLiteral: Nullptr;
 
