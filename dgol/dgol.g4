@@ -29,157 +29,87 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-grammar terraform;
-
-file
-   : (local | module | output | provider | variable | block)+
-   ;
-
-provider
-  : 'provider' STRING blockbody
-  ;
-
-output
-  : 'output' STRING blockbody
-  ;
-
-local
-  : 'locals' blockbody
-  ;
+grammar dgol;
 
 module
-  : 'module' STRING blockbody
-  ;
-
-variable
-   : 'variable' STRING blockbody
+   : (usedeclaration | NL)* (subroutinedefinition | NL)* (programdefinition | librarydefinition) NL*
    ;
 
-block
-   : blocktype label* blockbody
+usedeclaration
+   : 'USE' IDENTIFER NL
    ;
 
-blocktype
-   : IDENTIFIER
+subroutinedefinition
+   : 'SUBROUTINE' IDENTIFER '(' (IDENTIFER (',' IDENTIFER)*)? ')' NL statements 'END' IDENTIFER NL
    ;
 
-label
-   : STRING
+programdefinition
+   : 'PROGRAM' IDENTIFER NL statements 'END' IDENTIFER NL
    ;
 
-blockbody
-   : '{' (argument | block)* '}'
+librarydefinition
+   : 'LIBRARY' IDENTIFER (subroutinedeclaration | NL)* 'END' IDENTIFER NL
    ;
 
-argument
-   : identifier '=' expression
+subroutinedeclaration
+   : 'SUBROUTINE' IDENTIFER NL
    ;
 
-identifier
-   : IDENTIFIER
+statements
+   : (statement? NL)*
    ;
 
-expression
-   : section ('.' section)*
+statement
+   : letstatement
+   | ifstatement
+   | dostatement
+   | callstatement
+   | returnstatement
+   | exitstatement
    ;
 
-section
-   : list
-   | map
-   | val
+identifierorzero
+   : IDENTIFER
+   | '0'
    ;
 
-val
-   : NULL
-   | NUMBER
-   | string
-   | BOOL
-   | IDENTIFIER index?
-   | DESCRIPTION
-   | filedecl
-   | functioncall
-   | EOF_
+letstatement
+   : 'LET' IDENTIFER ('=' identifierorzero | '<' IDENTIFER | '>' identifierorzero)
    ;
 
-functioncall
-   : functionname '(' functionarguments ')'
+ifstatement
+   : ifhead ('ELSE' ifhead)* ('ELSE' NL statements)? 'END' 'IF'
    ;
 
-functionname
-   : IDENTIFIER
+ifhead
+   : 'IF' IDENTIFER ('=' | '>') IDENTIFER NL statements
    ;
 
-functionarguments
-   : //no arguments
-   | expression (',' expression)*
+dostatement
+   : 'DO' IDENTIFER ('<' IDENTIFER)? NL statements 'END' 'DO'
    ;
 
-index
-   : '[' expression ']'
+callstatement
+   : 'CALL' IDENTIFER ('.' IDENTIFER)? '(' (identifierorzero (',' identifierorzero)*)? ')'
    ;
 
-filedecl
-   : 'file' '(' expression ')'
+returnstatement
+   : 'RETURN'
    ;
 
-list
-   : '[' expression (',' expression)* ','? ']'
+exitstatement
+   : 'EXIT' IDENTIFER
    ;
 
-map
-   : '{' argument* '}'
+IDENTIFER
+   : [a-zA-Z] [a-zA-Z0-9]*
    ;
 
-string
-   : STRING
-   | MULTILINESTRING
+NL
+   : [\r\n]+
    ;
-
-fragment DIGIT
-   : [0-9]
-   ;
-
-EOF_
-   : '<<EOF' .*? 'EOF'
-   ;
-
-NULL
-   : 'nul'
-   ;
-
-NUMBER
-   : DIGIT+ ('.' DIGIT+)?
-   ;
-
-BOOL
-   : 'true'
-   | 'false'
-   ;
-
-DESCRIPTION
-   : '<<DESCRIPTION' .*? 'DESCRIPTION'
-   ;
-
-MULTILINESTRING
-   : '<<-EOF' .*? 'EOF'
-   ;
-
-STRING
-   : '"' (~ [\r\n"] | '""')* '"'
-   ;
-
-IDENTIFIER
-   : [a-zA-Z] ([a-zA-Z0-9_-])*
-   ;
-
-COMMENT
-  : ('#' | '//') ~ [\r\n]* -> channel(HIDDEN)
-  ;
-
-BLOCKCOMMENT
-  : '/*' .*? '*/' -> channel(HIDDEN)
-  ;
 
 WS
-   : [ \r\n\t]+ -> skip
+   : [ \t\r\n] -> skip
    ;
+
