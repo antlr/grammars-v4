@@ -36,19 +36,19 @@ file
    ;
 
 resource
-   : 'resource' label* blockbody
+   : 'resource' resourcetype name blockbody
    ;
 
 data
-   : 'data' label* blockbody
+   : 'data' resourcetype name blockbody
    ;
 
 provider
-  : 'provider' STRING blockbody
+  : 'provider' resourcetype blockbody
   ;
 
 output
-  : 'output' STRING blockbody
+  : 'output' name blockbody
   ;
 
 local
@@ -56,11 +56,11 @@ local
   ;
 
 module
-  : 'module' STRING blockbody
+  : 'module' name blockbody
   ;
 
 variable
-   : 'variable' STRING blockbody
+   : 'variable' name blockbody
    ;
 
 block
@@ -69,6 +69,14 @@ block
 
 blocktype
    : IDENTIFIER
+   ;
+
+resourcetype
+   : STRING
+   ;
+
+name
+   : STRING
    ;
 
 label
