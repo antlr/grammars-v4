@@ -96,7 +96,6 @@ identifier
    ;
 
 expression
-  // : section ('.' section)*
    : RESOURCEREFERENCE
    | section
    ;
