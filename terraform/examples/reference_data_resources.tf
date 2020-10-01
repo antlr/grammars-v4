@@ -5,7 +5,3 @@ data "aws_ami" "main" {
 resource "aws_instance" "main" {
   ami = data.aws_ami.main.id
 }
-
-locals {
-  a = "a"
-}
