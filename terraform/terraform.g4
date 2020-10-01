@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar terraform;
 
 file
-   : (local | module | output | provider | variable | block)+
+   : (local | module | output | provider | variable | data | resource)+
    ;
 
 resource
@@ -177,7 +177,7 @@ STRING
    ;
 
 IDENTIFIER
-   : [a-zA-Z] ([a-zA-Z0-9_-])*
+   : [a-zA-Z]([a-zA-Z0-9_-])*
    ;
 
 COMMENT
