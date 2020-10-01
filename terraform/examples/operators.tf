@@ -15,4 +15,5 @@ locals {
   n = a && true
   o = true || false || b
   p = -6
+  q = (7 + 5) * c
 }
