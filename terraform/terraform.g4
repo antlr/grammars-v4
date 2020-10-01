@@ -96,7 +96,17 @@ identifier
    ;
 
 expression
-   : section ('.' section)*
+  // : section ('.' section)*
+   : RESOURCEREFERENCE
+   | section
+   ;
+
+RESOURCEREFERENCE
+   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+ 
+   ;
+
+RESOURCEINDEX
+   : '[' [0-9]+ ']'
    ;
 
 section
