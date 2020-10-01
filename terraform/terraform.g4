@@ -98,6 +98,8 @@ identifier
 expression
    : RESOURCEREFERENCE
    | section
+   | expression OPERATOR expression
+   | LPAREN expression RPAREN
    ;
 
 RESOURCEREFERENCE
@@ -116,7 +118,7 @@ section
 
 val
    : NULL
-   | NUMBER
+   | SIGNED_NUMBER
    | string
    | BOOL
    | IDENTIFIER index?
@@ -127,7 +129,7 @@ val
    ;
 
 functioncall
-   : functionname '(' functionarguments ')'
+   : functionname LPAREN functionarguments RPAREN
    ;
 
 functionname
@@ -162,6 +164,36 @@ string
 
 fragment DIGIT
    : [0-9]
+   ;
+
+SIGNED_NUMBER
+   : '+' NUMBER
+   | '-' NUMBER
+   | NUMBER
+   ;
+
+OPERATOR
+   : '*'
+   | '/'
+   | '%'
+   | '+'
+   | '-'
+   | '>'
+   | '>='
+   | '<'
+   | '<='
+   | '=='
+   | '!='
+   | '&&'
+   | '||'
+   ;
+
+LPAREN
+   : '('
+   ;
+
+RPAREN
+   : ')'
    ;
 
 EOF_
