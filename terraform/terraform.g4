@@ -81,6 +81,8 @@ identifier
 
 expression
    : section ('.' section)*
+   | expression OPERATOR expression
+   | '(' expression ')'
    ;
 
 section
@@ -91,7 +93,7 @@ section
 
 val
    : NULL
-   | NUMBER
+   | SIGNED_NUMBER
    | string
    | BOOL
    | IDENTIFIER index?
@@ -137,6 +139,28 @@ string
 
 fragment DIGIT
    : [0-9]
+   ;
+
+SIGNED_NUMBER
+   : '+' NUMBER
+   | '-' NUMBER
+   | NUMBER
+   ;
+
+OPERATOR
+   : '*'
+   | '/'
+   | '%'
+   | '+'
+   | '-'
+   | '>'
+   | '>='
+   | '<'
+   | '<='
+   | '=='
+   | '!='
+   | '&&'
+   | '||'
    ;
 
 EOF_
