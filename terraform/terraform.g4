@@ -32,15 +32,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar terraform;
 
 file
-   : (local | module | output | provider | variable | block)+
+   : (local | module | output | provider | variable | data | resource)+
+   ;
+
+resource
+   : 'resource' resourcetype name blockbody
+   ;
+
+data
+   : 'data' resourcetype name blockbody
    ;
 
 provider
-  : 'provider' STRING blockbody
+  : 'provider' resourcetype blockbody
   ;
 
 output
-  : 'output' STRING blockbody
+  : 'output' name blockbody
   ;
 
 local
@@ -48,11 +56,11 @@ local
   ;
 
 module
-  : 'module' STRING blockbody
+  : 'module' name blockbody
   ;
 
 variable
-   : 'variable' STRING blockbody
+   : 'variable' name blockbody
    ;
 
 block
@@ -61,6 +69,14 @@ block
 
 blocktype
    : IDENTIFIER
+   ;
+
+resourcetype
+   : STRING
+   ;
+
+name
+   : STRING
    ;
 
 label
@@ -80,9 +96,18 @@ identifier
    ;
 
 expression
-   : section ('.' section)*
+   : RESOURCEREFERENCE
+   | section
    | expression OPERATOR expression
    | LPAREN expression RPAREN
+   ;
+
+RESOURCEREFERENCE
+   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+ 
+   ;
+
+RESOURCEINDEX
+   : '[' [0-9]+ ']'
    ;
 
 section
