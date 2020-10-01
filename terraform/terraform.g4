@@ -35,6 +35,14 @@ file
    : (local | module | output | provider | variable | block)+
    ;
 
+resource
+   : 'resource' label* blockbody
+   ;
+
+data
+   : 'data' label* blockbody
+   ;
+
 provider
   : 'provider' STRING blockbody
   ;
