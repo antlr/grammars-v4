@@ -82,7 +82,7 @@ identifier
 expression
    : section ('.' section)*
    | expression OPERATOR expression
-   | '(' expression ')'
+   | LPAREN expression RPAREN
    ;
 
 section
@@ -104,7 +104,7 @@ val
    ;
 
 functioncall
-   : functionname '(' functionarguments ')'
+   : functionname LPAREN functionarguments RPAREN
    ;
 
 functionname
@@ -161,6 +161,14 @@ OPERATOR
    | '!='
    | '&&'
    | '||'
+   ;
+
+LPAREN
+   : '('
+   ;
+
+RPAREN
+   : ')'
    ;
 
 EOF_
