@@ -3,7 +3,7 @@ data "aws_ami" "main" {
 }
 
 resource "aws_instance" "main" {
-  ami = xdata.aws_ami.main.id
+  ami = data.aws_ami.main.id
 }
 
 locals {
