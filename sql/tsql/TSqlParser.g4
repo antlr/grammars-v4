@@ -3285,7 +3285,7 @@ function_call
     | analytic_windowed_function                        #ANALYTIC_WINDOWED_FUNC
     | scalar_function_name '(' expression_list? ')'     #SCALAR_FUNCTION
     | build_in_functions                                #BUILT_IN_FUNC
-    | freetext_function                                #FREE_TEXT
+    | freetext_function                                 #FREE_TEXT
     ;
     
 freetext_function
@@ -3345,6 +3345,7 @@ build_in_functions
     | xml_data_type_methods                             #XML_DATA_TYPE_FUNC
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/logical-functions-iif-transact-sql
     | IIF '(' cond=search_condition ',' left=expression ',' right=expression ')'   #IIF
+    | STRING_AGG '(' expr=expression ',' separator=expression ')' (WITHIN GROUP '(' order_by_clause ')')?  #STRINGAGG
     ;
     
 xml_data_type_methods
