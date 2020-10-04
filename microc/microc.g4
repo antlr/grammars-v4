@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2019, Tom Everett
+Copyright (c) 2020, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,11 +29,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar microc;
 
 program
-   : statement +
+   : statement+
    ;
 
 statement
@@ -42,19 +41,22 @@ statement
    | blockstatement
    | exprstatement
    ;
-   
+
 ifstatement
- :'if' paren_expr statement ('else' statement)?;
+   : 'if' paren_expr statement ('else' statement)?
+   ;
 
 whilestatement
- :'while' paren_expr statement;
+   : 'while' paren_expr statement
+   ;
 
 blockstatement
-:'{' statement* '}';
+   : '{' statement* '}'
+   ;
 
 exprstatement
-: expr ';';
-
+   : expr ';'
+   ;
 
 paren_expr
    : '(' expr ')'
@@ -90,16 +92,15 @@ integer
    : INT
    ;
 
-
 STRING
    : [a-z]+
    ;
 
-
 INT
-   : [0-9] +
+   : [0-9]+
    ;
 
 WS
    : [ \r\n\t] -> skip
    ;
+
