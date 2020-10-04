@@ -65,7 +65,7 @@ namespace cppu
     } // namespace detail
 
     class OInterfaceContainerHelper;
-    class /**/ OInterfaceIteratorHelper
+    class OInterfaceIteratorHelper
     {
     public:
         OInterfaceIteratorHelper(OInterfaceContainerHelper &rCont);
@@ -255,7 +255,7 @@ namespace cppu
 
         OMultiTypeInterfaceContainerHelperVar(const OMultiTypeInterfaceContainerHelperVar &);
         OMultiTypeInterfaceContainerHelperVar &operator=(const OMultiTypeInterfaceContainerHelperVar &);
-    };
+    }
 
     template <class container, class keyType>
     struct OBroadcastHelperVar
@@ -364,6 +364,6 @@ namespace cppu
 
 } // namespace cppu
 
-#endif
+//#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

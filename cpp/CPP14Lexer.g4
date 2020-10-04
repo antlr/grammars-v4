@@ -1,13 +1,5 @@
 lexer grammar CPP14Lexer;
 
-Literal:
-	IntegerLiteral
-	| CharacterLiteral
-	| FloatingLiteral
-	| StringLiteral
-	| BooleanLiteral
-	| PointerLiteral
-	| UserDefinedLiteral;
 
 MultiLineMacro:
 	'#' (~[\n]*? '\\' '\r'? '\n')+ ~ [\n]+ -> channel (HIDDEN);
@@ -222,19 +214,22 @@ AndAssign: '&=';
 
 OrAssign: '|=';
 
-LeftShiftAssign: '<<=';
+LeftShiftAssign: '<' '<' '=';
 
-RightShiftAssign: '>>=';
+RightShiftAssign: '>' '>' '=';
 
 Equal: '==';
 
 NotEqual: '!=';
 
-LessEqual: '<=';
+LessEqual: '<' '=';
 
-GreaterEqual: '>=';
+GreaterEqual: '>' '=';
 
-AndAnd: '&&' | 'and';
+AndAnd: AndOperator | AndKeyword;
+
+AndOperator:'&&';
+AndKeyword: 'and';
 
 OrOr: '||' | 'or';
 
@@ -262,126 +257,110 @@ DotStar: '.*';
 
 Ellipsis: '...';
 
-fragment Hexquad:
-	HEXADECIMALDIGIT HEXADECIMALDIGIT HEXADECIMALDIGIT HEXADECIMALDIGIT;
+fragment HexQuad:
+	HexadecimalDigit HexadecimalDigit HexadecimalDigit HexadecimalDigit;
 
-fragment Universalcharactername:
-	'\\u' Hexquad
-	| '\\U' Hexquad Hexquad;
+fragment UniversalCharacterName:
+	'\\u' HexQuad
+	| '\\U' HexQuad HexQuad;
 
 Identifier:
 	/*
 	 Identifiernondigit | Identifier Identifiernondigit | Identifier DIGIT
 	 */
-	Identifiernondigit (Identifiernondigit | DIGIT)*;
+	Identifiernondigit (Identifiernondigit | Digit)*;
 
-fragment Identifiernondigit: NONDIGIT | Universalcharactername;
+fragment Identifiernondigit: NonDigit | UniversalCharacterName;
 
-fragment NONDIGIT: [a-zA-Z_];
+fragment NonDigit: [a-zA-Z_];
 
-fragment DIGIT: [0-9];
+fragment Digit: [0-9];
 
 IntegerLiteral:
-	DecimalLiteral Integersuffix?
-	| OctalLiteral Integersuffix?
-	| HexadecimalLiteral Integersuffix?
-	| BinaryLiteral Integersuffix?;
+	(
+		DecimalLiteral
+		| OctalLiteral
+		| HexadecimalLiteral
+		| BinaryLiteral
+	) IntegerSuffix?;
 
-DecimalLiteral: NONZERODIGIT ('\''? DIGIT)*;
+DecimalLiteral: NonZeroDigit ('\''? Digit)*;
 
-OctalLiteral: '0' ('\''? OCTALDIGIT)*;
+OctalLiteral: '0' ('\''? OctalDigit)*;
 
-HexadecimalLiteral: ('0x' | '0X') HEXADECIMALDIGIT (
-		'\''? HEXADECIMALDIGIT
+HexadecimalLiteral: ('0x' | '0X') HexadecimalDigit (
+		'\''? HexadecimalDigit
 	)*;
 
-BinaryLiteral: ('0b' | '0B') BINARYDIGIT ('\''? BINARYDIGIT)*;
+BinaryLiteral: ('0b' | '0B') BinaryDigit ('\''? BinaryDigit)*;
 
-fragment NONZERODIGIT: [1-9];
+fragment NonZeroDigit: [1-9];
 
-fragment OCTALDIGIT: [0-7];
+fragment OctalDigit: [0-7];
 
-fragment HEXADECIMALDIGIT: [0-9a-fA-F];
+fragment HexadecimalDigit: [0-9a-fA-F];
 
-fragment BINARYDIGIT: [01];
+fragment BinaryDigit: [01];
 
-Integersuffix:
-	Unsignedsuffix Longsuffix?
-	| Unsignedsuffix Longlongsuffix?
-	| Longsuffix Unsignedsuffix?
-	| Longlongsuffix Unsignedsuffix?;
+IntegerSuffix:
+	UnsignedSuffix LongSuffix?
+	| UnsignedSuffix LongLongSuffix?
+	| LongSuffix UnsignedSuffix?
+	| LongLongSuffix UnsignedSuffix?;
 
-fragment Unsignedsuffix: [uU];
+fragment UnsignedSuffix: [uU];
 
-fragment Longsuffix: [lL];
+fragment LongSuffix: [lL];
 
-fragment Longlongsuffix: 'll' | 'LL';
+fragment LongLongSuffix: 'll' | 'LL';
 
-CharacterLiteral:
-	'\'' Cchar+ '\''
-	| 'u' '\'' Cchar+ '\''
-	| 'U' '\'' Cchar+ '\''
-	| 'L' '\'' Cchar+ '\'';
-
+CharacterLiteral: EncodingPrefix? '\'' Cchar+ '\'';
 fragment Cchar:
 	~ ['\\\r\n]
-	| Escapesequence
-	| Universalcharactername;
+	| EscapeSequence
+	| UniversalCharacterName;
 
-fragment Escapesequence:
-	Simpleescapesequence
-	| Octalescapesequence
-	| Hexadecimalescapesequence;
+fragment EscapeSequence:
+	SimpleEscapeSequence
+	| OctalEscapeSequence
+	| HexadecimalEscapeSequence;
 
-fragment Simpleescapesequence:
-	'\\\''
-	| '\\"'
-	| '\\?'
-	| '\\\\'
-	| '\\a'
-	| '\\b'
-	| '\\f'
-	| '\\n'
-	| '\\r'
-	| '\\t'
-	| '\\v';
+fragment SimpleEscapeSequence: '\\' ['"?\\abfnrtv];
 
-fragment Octalescapesequence:
-	'\\' OCTALDIGIT
-	| '\\' OCTALDIGIT OCTALDIGIT
-	| '\\' OCTALDIGIT OCTALDIGIT OCTALDIGIT;
+fragment OctalEscapeSequence:
+	'\\' OctalDigit OctalDigit? OctalDigit?;
 
-fragment Hexadecimalescapesequence: '\\x' HEXADECIMALDIGIT+;
+fragment HexadecimalEscapeSequence: '\\x' HexadecimalDigit+;
 
 FloatingLiteral:
-	Fractionalconstant Exponentpart? Floatingsuffix?
-	| Digitsequence Exponentpart Floatingsuffix?;
+	(
+		FractionalConstant ExponentPart?
+		| DigitSequence ExponentPart
+	) FloatingSuffix?;
 
-fragment Fractionalconstant:
-	Digitsequence? '.' Digitsequence
-	| Digitsequence '.';
+fragment FractionalConstant:
+	DigitSequence? '.' DigitSequence
+	| DigitSequence '.';
 
-fragment Exponentpart:
-	'e' SIGN? Digitsequence
-	| 'E' SIGN? Digitsequence;
+fragment ExponentPart: [eE] SIGN? DigitSequence;
 
 fragment SIGN: [+-];
 
-fragment Digitsequence: DIGIT ('\''? DIGIT)*;
+fragment DigitSequence: Digit ('\''? Digit)*;
 
-fragment Floatingsuffix: [flFL];
+fragment FloatingSuffix: [flFL];
 
-StringLiteral:
-	Encodingprefix? '"' Schar* '"'
-	| Encodingprefix? 'R' Rawstring;
-fragment Encodingprefix: 'u8' | 'u' | 'U' | 'L';
+StringLiteral: EncodingPrefix? ('"' Schar* '"' | 'R' Rawstring);
+
+fragment EncodingPrefix: 'u8' | 'u' | 'U' | 'L';
 
 fragment Schar:
 	~ ["\\\r\n]
-	| Escapesequence
-	| Universalcharactername;
+	| EscapeSequence
+	| UniversalCharacterName;
 
-fragment Rawstring: '"' .*? '(' .*? ')' .*? '"';
+fragment Rawstring:
+	'"' (~[\\\t\r\n])*? '(' .*? ')' (~[\\\t\r\n])*? '"';
 
 BooleanLiteral: False_ | True_;
 
@@ -394,20 +373,24 @@ UserDefinedLiteral:
 	| UserDefinedCharacterLiteral;
 
 UserDefinedIntegerLiteral:
-	DecimalLiteral Udsuffix
-	| OctalLiteral Udsuffix
-	| HexadecimalLiteral Udsuffix
-	| BinaryLiteral Udsuffix;
+	(
+		DecimalLiteral
+		| OctalLiteral
+		| HexadecimalLiteral
+		| BinaryLiteral
+	) UdSuffix;
 
 UserDefinedFloatingLiteral:
-	Fractionalconstant Exponentpart? Udsuffix
-	| Digitsequence Exponentpart Udsuffix;
+	(
+		FractionalConstant ExponentPart?
+		| DigitSequence ExponentPart
+	) UdSuffix;
 
-UserDefinedStringLiteral: StringLiteral Udsuffix;
+UserDefinedStringLiteral: StringLiteral UdSuffix;
 
-UserDefinedCharacterLiteral: CharacterLiteral Udsuffix;
+UserDefinedCharacterLiteral: CharacterLiteral UdSuffix;
 
-fragment Udsuffix: Identifier;
+fragment UdSuffix: Identifier;
 
 Whitespace: [ \t]+ -> skip;
 
