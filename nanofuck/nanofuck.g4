@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2019, Tom Everett
+Copyright (c) 2020, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar nanofuck;
 
 exp
-   :
-   
-    '*'
-   |  '{' exp '}'
+   : '*'
+   | '{' exp? '}'
    | exp exp
    ;
 
