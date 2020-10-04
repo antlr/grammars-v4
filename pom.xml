@@ -83,6 +83,7 @@
 				<module>basic</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
+                <module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
 				<module>capnproto</module>
