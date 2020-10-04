@@ -105,6 +105,7 @@
 				<module>dart2</module>
 				<module>databank</module>
 				<module>dcm</module>
+				<module>dgol</module>				
 				<module>dice</module>
 				<module>dot</module>
 				<module>edif300</module>
@@ -166,8 +167,9 @@
 				<module>muddb</module>
 				<module>mumath</module>
 				<module>mumps</module>
-				<module>muparser</module>				
-				<module>oberon</module>				
+				<module>muparser</module>
+                <module>nanofuck</module>
+                <module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
 				<module>p</module>
