@@ -43,11 +43,13 @@ mathStatement
 
 expression
    : measurement
+   | identifier IMPORTANT
    | identifier
    | identifier LPAREN values? RPAREN
    | Color
    | StringLiteral
    | url
+   | variableName IMPORTANT
    | variableName
    ;
 
@@ -75,7 +77,16 @@ variableDeclaration
 
 //Imports
 importDeclaration
-   : '@import' referenceUrl mediaTypes? ';'
+   : '@import' (LPAREN (importOption (COMMA importOption)*) RPAREN)? referenceUrl mediaTypes? ';'
+   ;
+
+importOption
+   : REFERENCE
+   | INLINE
+   | LESS
+   | CSS
+   | ONCE
+   | MULTIPLE
    ;
 
 referenceUrl
@@ -118,11 +129,15 @@ selectors
    ;
 
 selector
-   : element + (selectorPrefix element)* attrib* pseudo?
+   : element + attrib* pseudo?
    ;
 
 attrib
    : '[' Identifier (attribRelate (StringLiteral | Identifier))? ']'
+   ;
+
+negation
+   : COLON NOT LPAREN LBRACK? selectors RBRACK? RPAREN
    ;
 
 pseudo
@@ -130,9 +145,11 @@ pseudo
    ;
 
 element
-   : identifier
+   : selectorPrefix identifier
+   | identifier
    | '#' identifier
-   | '.' identifier
+   | pseudo
+   | negation
    | PARENTREF
    | '*'
    ;

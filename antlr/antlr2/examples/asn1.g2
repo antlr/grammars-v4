@@ -1,0 +1,1091 @@
+header {
+package parseasn;
+import parseasn.*;
+import java.lang.* ;
+import java.math.*;
+import java.util.*;
+}
+
+//	Creation of ASN.1 grammar for ANTLR	V2.7.1
+// ===================================================
+//		  TOKENS FOR ASN.1 LEXER DEFINITIONS
+// ===================================================
+
+class ASNLexer extends Lexer;
+options	{
+	k =	11;
+	exportVocab=ASN;
+	charVocabulary = '\3'..'\377';
+	caseSensitive=true;
+	testLiterals = true;
+	codeGenMakeSwitchThreshold = 2;  // Some optimizations
+	codeGenBitsetTestThreshold = 3;
+}
+
+//	ASN1 Tokens 
+
+tokens {
+	
+ABSENT_KW				=	"ABSENT"			;
+ABSTRACT_SYNTAX_KW		=	"ABSTRACT-SYNTAX"	;
+ALL_KW					=	"ALL"				;
+ANY_KW					=	"ANY"				;
+ARGUMENT_KW				=	"ARGUMENT"			;
+APPLICATION_KW			=	"APPLICATION"		;
+AUTOMATIC_KW			=	"AUTOMATIC"			;
+BASED_NUM_KW			=	"BASEDNUM"			;
+BEGIN_KW				=	"BEGIN"				;
+BIT_KW					=	"BIT"				;
+BMP_STRING_KW			=	"BMPString"			;
+BOOLEAN_KW				=	"BOOLEAN"			;
+BY_KW					=	"BY"				;
+CHARACTER_KW			=	"CHARACTER"			;
+CHOICE_KW				=	"CHOICE"			;
+CLASS_KW				=	"CLASS"				;
+COMPONENTS_KW			=	"COMPONENTS"		;
+COMPONENT_KW			=	"COMPONENT"			;
+CONSTRAINED_KW			=	"CONSTRAINED"		;
+DEFAULT_KW				=	"DEFAULT"			;
+DEFINED_KW				=	"DEFINED"			;
+DEFINITIONS_KW			=	"DEFINITIONS"		;
+EMBEDDED_KW				=	"EMBEDDED"			;
+END_KW					=	"END"				;
+ENUMERATED_KW			=	"ENUMERATED"		;
+ERROR_KW				=	"ERROR"				;
+ERRORS_KW				=	"ERRORS"			;
+EXCEPT_KW				=	"EXCEPT"			;
+EXPLICIT_KW				=	"EXPLICIT"			;
+EXPORTS_KW				=	"EXPORTS"			;
+EXTENSIBILITY_KW		=	"EXTENSIBILITY"		;
+EXTERNAL_KW				=	"EXTERNAL"			;
+FALSE_KW				=	"FALSE"				;
+FROM_KW					=	"FROM"				;
+GENERALIZED_TIME_KW		=	"GeneralizedTime"	;
+GENERAL_STR_KW			=	"GeneralString"		;
+GRAPHIC_STR_KW			=	"GraphicString"		;
+IA5_STRING_KW			=	"IA5String"			;
+IDENTIFIER_KW			=	"IDENTIFIER"		;
+IMPLICIT_KW				=	"IMPLICIT"			;
+IMPLIED_KW				=	"IMPLIED"			;
+IMPORTS_KW				=	"IMPORTS"			;
+INCLUDES_KW				=	"INCLUDES"			;
+INSTANCE_KW				=	"INSTANCE"			;
+INTEGER_KW				=	"INTEGER"			;
+INTERSECTION_KW			=	"INTERSECTION"		;
+ISO646STRING_KW			=	"ISO646String"		;
+LINKED_KW				=	"LINKED"			;
+MAX_KW					=	"MAX"				;
+MINUS_INFINITY_KW		=	"MINUSINFINITY"		;
+MIN_KW					=	"MIN"				;
+NULL_KW					=	"NULL"				;
+NUMERIC_STR_KW			=	"NumericString"		;
+OBJECT_DESCRIPTOR_KW 	=	"ObjectDescriptor"	;
+OBJECT_KW				=	"OBJECT"			;
+OCTET_KW				=	"OCTET"				;
+OPERATION_KW			=	"OPERATION"			;
+OF_KW					=	"OF"				;
+OID_KW					=	"OID"				;
+OPTIONAL_KW				=	"OPTIONAL"			;
+PARAMETER_KW			=	"PARAMETER"			;
+PDV_KW					=	"PDV"				;
+PLUS_INFINITY_KW		=	"PLUSINFINITY"		;
+PRESENT_KW				=	"PRESENT"			;
+PRINTABLE_STR_KW		=	"PrintableString"	;
+PRIVATE_KW				=	"PRIVATE"			;
+REAL_KW					=	"REAL"				;
+RELATIVE_KW				=	"RELATIVE"			;
+RESULT_KW				=	"RESULT"			;
+SEQUENCE_KW				=	"SEQUENCE"			;
+SET_KW					=	"SET"				;
+SIZE_KW					=	"SIZE"				;
+STRING_KW				=	"STRING"			;
+TAGS_KW					=	"TAGS"				;
+TELETEX_STR_KW			=	"TeletexString"		;
+TRUE_KW					=	"TRUE"				;
+TYPE_IDENTIFIER_KW		=	"TYPE-IDENTIFIER"	;
+UNION_KW				=	"UNION"				;
+UNIQUE_KW				=	"UNIQUE"			;
+UNIVERSAL_KW			=	"UNIVERSAL"			;
+UNIVERSAL_STR_KW		=	"UniversalString"	;
+UTC_TIME_KW				=	"UTCTime"			;
+UTF8STRING_KW			=	"UTF8String"		;
+VIDEOTEX_STR_KW			=	"VideotexString"	;
+VISIBLE_STR_KW			=	"VisibleString"		;
+WITH_KW					=	"WITH"				;
+}
+
+// Operators
+
+ASSIGN_OP			:	"::="	;
+BAR					:	'|'		;
+COLON				:	':'		;
+COMMA				:	','		;
+COMMENT				:	"--"	;
+DOT					:	'.'		;
+DOTDOT				:	".."	;
+ELLIPSIS			:	"..."	;
+EXCLAMATION			:	'!'		;
+INTERSECTION		:	'^'		;
+LESS				:	'<'		;
+L_BRACE				:	'{'		;
+L_BRACKET			:	'['		;
+L_PAREN				:	'('		;
+MINUS				:	'-'		;
+PLUS				:	'+'		;
+R_BRACE				:	'}'		;
+R_BRACKET			:	']'		;
+R_PAREN				:	')'		;
+SEMI				:	';'		;
+SINGLE_QUOTE		:	"'"		;
+CHARB				:	"'B"	;
+CHARH				:	"'H"	;
+
+// Whitespace -- ignored
+
+WS			
+	:	(	' ' | '\t' | '\f'	|	(	options {generateAmbigWarnings=false;}
+	:	"\r\n"		{ newline(); }// DOS
+	|	'\r'   		{ newline(); }// Macintosh
+	|	'\n'		{ newline(); }// Unix 
+	))+
+	{$setType(Token.SKIP); }
+	;
+
+// Single-line comments
+SL_COMMENT
+	: (options {warnWhenFollowAmbig=false;} 
+	: COMMENT (  { LA(2)!='-' }? '-' 	|	~('-'|'\n'|'\r'))*	( (('\r')? '\n') { newline(); }| COMMENT) )
+		{$setType(Token.SKIP);  }
+	;
+
+NUMBER	:	('0'..'9')+ ;
+
+UPPER	
+options {testLiterals = false;}
+	:   ('A'..'Z') 
+		(options {warnWhenFollowAmbig = false;}
+	:	( 'a'..'z' | 'A'..'Z' |'-' | '0'..'9' ))* 	;
+
+LOWER
+options {testLiterals = false;}
+	:	('a'..'z') 
+		(options {warnWhenFollowAmbig = false;}
+	:	( 'a'..'z' | 'A'..'Z' |'-' | '0'..'9' ))* 	;
+
+
+protected
+BDIG		: ('0'|'1') ;
+protected
+HDIG		:	(options {warnWhenFollowAmbig = false;} :('0'..'9') )
+			|	('A'..'F')
+			|	('a'..'f')
+			;
+
+// Unable to resolve a string like 010101 followed by 'H
+//B_STRING 	: 	SINGLE_QUOTE ({LA(3)!='B'}? BDIG)+  BDIG SINGLE_QUOTE 'B' 	;
+//H_STRING 	: 	SINGLE_QUOTE ({LA(3)!='H'}? HDIG)+  HDIG SINGLE_QUOTE 'H'  ;
+
+B_OR_H_STRING
+	:	(options {warnWhenFollowAmbig = false;} 
+		:(B_STRING)=>B_STRING {$setType(B_STRING);}
+		| H_STRING {$setType(H_STRING);})
+	;
+
+protected
+B_STRING 	: 	SINGLE_QUOTE (BDIG)+ SINGLE_QUOTE 'B' 	;
+protected
+H_STRING 	: 	SINGLE_QUOTE (HDIG)+ SINGLE_QUOTE 'H'  ;
+
+			
+C_STRING 	: 	'"'	(UPPER | LOWER)*  '"' ;
+
+
+//*************************************************************************
+//**********		PARSER DEFINITIONS
+//*************************************************************************
+
+
+class ASNParser	extends	Parser;
+options	{
+	exportVocab=ASN;
+	k=3;
+}
+
+// Grammar Definitions
+
+module_definition[ASNModule module] 	
+{
+	AsnModuleIdentifier mid;
+	String s ;
+	
+}
+	:	(mid = module_identifier
+		{ module.moduleIdentifier = mid; 	})
+		DEFINITIONS_KW 
+		(( e:EXPLICIT_KW {module.tagDefault = e.getText();}
+		  |i:IMPLICIT_KW {module.tagDefault = i.getText();}
+		  |a:AUTOMATIC_KW {module.tagDefault = a.getText();}
+		 ) TAGS_KW {module.tag = true;} |) 
+		(EXTENSIBILITY_KW IMPLIED_KW {module.extensible=true;} | )
+		ASSIGN_OP 
+		BEGIN_KW 
+		module_body[module] 
+		END_KW
+	; 
+
+module_identifier  returns [ AsnModuleIdentifier mid ]
+{mid = new AsnModuleIdentifier();
+AsnOidComponentList cmplst; }
+	:	(( md:UPPER { mid.name = md.getText();}) 
+		 ((cmplst = obj_id_comp_lst { mid.componentList = cmplst; })|) 
+		)
+	;
+
+obj_id_comp_lst	returns [AsnOidComponentList oidcmplst]
+{oidcmplst = new AsnOidComponentList();
+AsnOidComponent oidcmp; AsnDefinedValue defval; }
+	:	L_BRACE 
+		(defval = defined_value {oidcmplst.isDefinitive=true;oidcmplst.defval=defval;})?
+		(oidcmp = obj_id_component {oidcmplst.components.add(oidcmp);})+  
+		R_BRACE 
+	;
+
+obj_id_component returns [AsnOidComponent oidcmp ]
+{oidcmp = new AsnOidComponent(); AsnDefinedValue defval;
+String s,n =""; }
+	: 	((num:NUMBER {s=num.getText();oidcmp.num = new Integer(s); oidcmp.numberForm=true;})
+	|	(LOWER (L_PAREN NUMBER R_PAREN)?)=>((lid:LOWER {oidcmp.name = lid.getText();oidcmp.nameForm=true;}) 
+		( L_PAREN 
+		 (num1:NUMBER {n=num1.getText(); oidcmp.num = new Integer(n);oidcmp.nameAndNumberForm=true;})
+		R_PAREN ) ? )
+	|	(defined_value)=>(defval = defined_value {oidcmp.isDefinedValue=true;oidcmp.defval=defval;}))
+	;
+		
+tag_default returns [String s]
+{ s = ""; }
+	:	(tg:EXPLICIT_KW   {s = tg.getText();})
+	|	(tg1:IMPLICIT_KW  {s = tg1.getText();})
+	|	(tg2:AUTOMATIC_KW {s = tg2.getText();})
+	;
+		
+module_body[ASNModule module] 
+//	:	(exports[module])? (imports[module])? (assignment[module])+
+	:	(exports[module]|) (imports[module]|) ((assignment[module])+ |)
+	;
+
+exports[ASNModule module]		
+{String s; ArrayList syml = new ArrayList();}
+//	:	(EXPORTS_KW {module.exported=true;})   (s = symbol { module.exportList.add(s) ; })
+//		(COMMA (s = symbol {module.exportList.add(s) ;} ) )*  SEMI
+//	;
+	:	EXPORTS_KW {module.exported=true;} 
+		((syml = symbol_list {module.exportSymbolList = syml;} |)
+		|ALL_KW) 
+		SEMI
+	;	
+		
+imports[ASNModule module]
+	:	(IMPORTS_KW (((symbols_from_module[module])+)|)  SEMI)
+		{module.imported=true;}
+	;
+
+symbols_from_module[ASNModule module]
+{SymbolsFromModule sym = new SymbolsFromModule();
+String s = "" ; AsnModuleIdentifier mid; AsnDefinedValue defval;
+ArrayList arl; AsnOidComponentList cmplist;}
+
+	:	((arl= symbol_list {sym.symbolList = arl;}) FROM_KW	
+	    (up:UPPER {sym.modref = up.getText();}
+	     (cmplist = obj_id_comp_lst {sym.isOidValue=true;sym.cmplist = cmplist;}
+	     |(defined_value)=>(defval = defined_value {sym.isDefinedValue=true;sym.defval=defval;})|)))
+	    {module.importSymbolFromModuleList.add(sym);}
+	;
+	
+symbol_list returns[ArrayList symlist]
+{symlist = new ArrayList(); String s=""; }
+	:	((s = symbol {symlist.add(s); })
+		(COMMA (s = symbol {symlist.add(s); }))*) 
+	; 
+
+symbol returns [String s]
+{s="";}			
+	:	up:UPPER  { s = up.getText();}
+	|	lid:LOWER { s = lid.getText();}
+	|	s=macroName   	//To solve the matching of Macro Name with Keyword
+	;
+
+macroName returns [String s]
+{s="";}
+	:	OPERATION_KW 						{ s = "OPERATION";}
+	|	ERROR_KW							{ s = "ERROR";}
+ 	|	"BIND"								{ s = "BIND";}
+ 	|	"UNBIND"							{ s = "UNBIND";}
+ 	|	"APPLICATION-SERVICE-ELEMENT"		{ s = "APPLICATION-SERVICE-ELEMENT";}
+ 	|	"APPLICATION-CONTEXT"				{ s = "APPLICATION-CONTEXT";}
+ 	|	"EXTENSION"							{ s = "EXTENSION";}
+ 	|	"EXTENSIONS"						{ s = "EXTENSIONS";}
+ 	|	"EXTENSION-ATTRIBUTE"				{ s = "EXTENSION-ATTRIBUTE";}
+ 	|	"TOKEN"								{ s = "TOKEN";}
+ 	|	"TOKEN-DATA"						{ s = "TOKEN-DATA";}
+ 	|	"SECURITY-CATEGORY"					{ s = "SECURITY-CATEGORY";}
+ 	|	"OBJECT"							{ s = "OBJECT";}
+ 	|	"PORT"								{ s = "PORT";}
+ 	|	"REFINE"							{ s = "REFINE";}
+ 	|	"ABSTRACT-BIND"						{ s = "ABSTRACT-BIND";}
+ 	|	"ABSTRACT-UNBIND"					{ s = "ABSTRACT-UNBIND";}
+ 	|	"ABSTRACT-OPERATION"				{ s = "ABSTRACT-OPERATION";}
+ 	|	"ABSTRACT-ERROR"					{ s = "ABSTRACT-ERROR";}
+ 	|	"ALGORITHM"							{ s = "ALGORITHM";}
+ 	|	"ENCRYPTED"							{ s = "ENCRYPTED";}
+ 	|	"SIGNED"							{ s = "SIGNED";}
+ 	|	"SIGNATURE"							{ s = "SIGNATURE";}
+ 	|	"PROTECTED"							{ s = "PROTECTED";}
+ 	|	"OBJECT-TYPE"						{ s = "OBJECT-TYPE";}
+ 	;
+
+assignment[ASNModule module]	
+{Object obj ; Object objv; AsnValue val;	}
+
+// Type Assignment Definition
+	:	(up:UPPER ASSIGN_OP	(obj=type) 
+{ 
+		if ((AsnAny.class).isInstance(obj)){	
+			((AsnAny)obj).name = up.getText();
+			module.asnTypes.anys.add((AsnAny)obj);
+		}
+		else if((AsnBitString.class).isInstance(obj)){
+			((AsnBitString)obj).name = up.getText();
+			module.asnTypes.bitStrings.add((AsnBitString)obj);
+		}
+		else if((AsnBoolean.class).isInstance(obj)){	
+			((AsnBoolean)obj).name = up.getText();
+			module.asnTypes.booleans.add((AsnBoolean)obj);
+		}
+		else if((AsnCharacterString.class).isInstance(obj)){	
+			((AsnCharacterString)obj).name = up.getText();	
+			module.asnTypes.characterStrings.add((AsnCharacterString)obj);
+		}
+		else if((AsnChoice.class).isInstance(obj)){	
+			((AsnChoice)obj).name = up.getText();
+			module.asnTypes.choices.add((AsnChoice)obj);
+		}
+		else if((AsnEnum.class).isInstance(obj)){
+			((AsnEnum)obj).name=up.getText();
+			module.asnTypes.enums.add((AsnEnum)obj);
+		}
+		else if((AsnInteger.class).isInstance(obj)){	
+			((AsnInteger)obj).name=up.getText();
+			module.asnTypes.integers.add((AsnInteger)obj);
+		}
+		else if((AsnNull.class).isInstance(obj)){	
+			((AsnNull)obj).name=up.getText();
+			module.asnTypes.nulls.add((AsnNull)obj);
+		}
+		else if((AsnObjectIdentifier.class).isInstance(obj)){	
+			((AsnObjectIdentifier)obj).name=up.getText();
+			module.asnTypes.objectIdentifiers.add((AsnObjectIdentifier)obj);
+		}
+		else if((AsnOctetString.class).isInstance(obj)){	
+			((AsnOctetString)obj).name=up.getText();
+			module.asnTypes.octetStrings.add((AsnOctetString)obj);
+		}
+		else if((AsnReal.class).isInstance(obj)){	
+			((AsnReal)obj).name=up.getText();
+			module.asnTypes.reals.add((AsnReal)obj);
+		}
+		else if((AsnSequenceSet.class).isInstance(obj)){	
+			((AsnSequenceSet)obj).name=up.getText();
+			module.asnTypes.sequenceSets.add((AsnSequenceSet)obj);
+		}
+		else if((AsnSequenceOf.class).isInstance(obj)){	
+			((AsnSequenceOf)obj).name=up.getText();
+			module.asnTypes.sequenceSetsOf.add((AsnSequenceOf)obj);
+		}
+		else if((AsnExternal.class).isInstance(obj)){	
+			((AsnExternal)obj).name=up.getText();
+			module.asnTypes.externals.add((AsnExternal)obj);
+		}
+		else if((AsnSelectionType.class).isInstance(obj)){	
+			((AsnSelectionType)obj).name=up.getText();
+			module.asnTypes.selections.add((AsnSelectionType)obj);
+		}
+		else if((AsnRelativeOid.class).isInstance(obj)){	
+			((AsnRelativeOid)obj).name=up.getText();
+			module.asnTypes.relativeOids.add((AsnRelativeOid)obj);
+		}
+		else if((AsnEmbedded.class).isInstance(obj)){	
+			((AsnEmbedded)obj).name=up.getText();
+			module.asnTypes.embeddeds.add((AsnEmbedded)obj);
+		}
+		else if((AsnTaggedType.class).isInstance(obj)){	
+			((AsnTaggedType)obj).name=up.getText();
+			module.asnTypes.taggeds.add((AsnTaggedType)obj);
+		}
+		else if((AsnDefinedType.class).isInstance(obj)){
+			((AsnDefinedType)obj).name=up.getText();
+			module.asnTypes.defineds.add((AsnDefinedType)obj);
+		}
+		else if((OperationMacro.class).isInstance(obj)){	
+			((OperationMacro)obj).name=up.getText();
+			module.asnTypes.macroOperations.add((OperationMacro)obj);
+		}
+		else if((ErrorMacro.class).isInstance(obj)){	
+			((ErrorMacro)obj).name=up.getText();
+			module.asnTypes.macroErrors.add((ErrorMacro)obj);
+		}
+		else{	
+			System.out.println("Unknown Type" + (obj.getClass().getName()) );
+		} 
+		})
+
+// Value Assignment definition	
+	|	(lid:LOWER (objv = type ) ASSIGN_OP (val = value) 
+		{	
+		if((AsnBoolean.class).isInstance(objv)){	
+			val.name=lid.getText();
+			val.typeName = ((AsnBoolean)objv).BUILTINTYPE;
+			module.asnValues.add(val);
+		}
+		else if((AsnCharacterString.class).isInstance(objv)){	
+			val.name=lid.getText();
+			val.typeName = ((AsnCharacterString)objv).BUILTINTYPE; // Correct it
+			module.asnValues.add(val);
+		}
+		else if((AsnInteger.class).isInstance(objv)){
+			val.name=lid.getText();
+			val.typeName = ((AsnInteger)objv).BUILTINTYPE;
+			module.asnValues.add(val);
+		}
+		else if((AsnOctetString.class).isInstance(objv)){	
+			val.name=lid.getText();
+			val.typeName = ((AsnOctetString)objv).BUILTINTYPE;
+			module.asnValues.add(val);
+		}
+		else if((AsnReal.class).isInstance(objv)){	
+			val.name=lid.getText();
+			val.typeName = ((AsnReal)objv).BUILTINTYPE;
+			module.asnValues.add(val);
+		}
+		else if((AsnDefinedType.class).isInstance(objv)){	
+			val.name=lid.getText();
+			val.typeName = ((AsnDefinedType)objv).typeReference;
+			module.asnValues.add(val);
+		}
+		else if((ObjectType.class).isInstance(objv)){	
+			val.name = lid.getText();
+			val.typeName = ((ObjectType)objv).BUILTINTYPE;
+			module.asnValues.add(val);
+		}
+		else {
+			System.out.println("Value not defined  " + (objv.getClass().getName()));
+		}		
+		})
+// Definition of Macro type. Consume the definitions . No Actions
+
+	|(UPPER "MACRO" ASSIGN_OP BEGIN_KW (~(END_KW) )* END_KW)=>  UPPER "MACRO" ASSIGN_OP BEGIN_KW (~(END_KW))* END_KW
+// ***************************************************
+// Define the following
+// ***************************************************
+//	|XMLValueAssignment 
+//	|ValueSetTypeAssignment 
+//	|ObjectClassAssignment 
+//	|ObjectAssignment 
+//	|ObjectSetAssignment 
+//	|ParameterizedAssignment
+	;
+
+/*TYPES===============================================================*/
+
+type returns [Object obj]		
+{obj = null;}
+	:	(obj = built_in_type)		// Builtin Type
+	|	(obj = defined_type)		// Referenced Type
+//	|	(obj = useful_type)			// Referenced Type OK contained in Character_Str type
+	|	(obj = selection_type ) 		// Referenced Type	// Grammar ok Frames to be created
+//	|	(obj = type_from_Object )		// Referenced Type
+//	|	(obj = value_set_from_objects)	// Referenced Type
+//	|   (obj = type_and_constraint )		// Constrained Type Causing Infinit Recursion. In case of
+// Parsing errors this needs to be built in the assignment itself
+//	|	(obj = type_with_constraint)	// Constrained Type OK in built in types
+	|	(obj = macros_type)
+	;
+
+built_in_type returns [Object obj]
+{obj = null;}
+	:	(obj = any_type)
+	|	(obj = bit_string_type)
+	|	(obj = boolean_type )
+	|	(character_str_type)=> (obj = character_str_type) // Not Correct
+	|	(obj = choice_type)
+	|	(obj = embedded_type) EMBEDDED_KW  PDV_KW		
+	|	(obj = enum_type) 
+	|	(obj = external_type) 
+//	|	INSTANCE_KW OF_KW		
+	|	(obj = integer_type )
+	|	(obj = null_type )
+//	|	ObjectClassFieldType OBJECT_DESCRIPTOR_KW
+	|	(obj = object_identifier_type)
+	|	(obj = octetString_type)
+	|	(obj = real_type )
+	|	(obj = relativeOid_type)
+	|	(obj = sequence_type)
+	|	(obj = sequenceof_type)
+	|	(obj = set_type)
+	|	(obj = setof_type)
+	|	(obj = tagged_type)
+	;
+			
+any_type returns [Object obj]
+{obj = null;AsnAny an = new AsnAny();}
+	: (	ANY_KW  ( DEFINED_KW BY_KW {an.isDefinedBy = true ;} lid:LOWER { an.definedByType = lid.getText();})? )
+		{obj = an ;  an = null;}
+	;
+	
+bit_string_type	returns [Object obj]
+{AsnBitString bstr = new AsnBitString(); 
+AsnNamedNumberList nnlst ; AsnConstraint cnstrnt;obj = null;}
+	:	(BIT_KW STRING_KW (nnlst =namedNumber_list { bstr.namedNumberList = nnlst;})? 
+		(cnstrnt = constraint { bstr.constraint = cnstrnt;} )? )
+		{obj=bstr; nnlst = null ; cnstrnt = null;}
+	;
+
+// Includes Useful types as well
+character_str_type returns [Object obj]
+{AsnCharacterString cstr = new AsnCharacterString();
+String s ; AsnConstraint cnstrnt; obj = null;}
+	:	((CHARACTER_KW STRING_KW {cstr.isUCSType = true;})
+	|	(s = character_set {cstr.stringtype = s;} 
+		(cnstrnt = constraint{cstr.constraint = cnstrnt;})? ))
+		{obj = cstr; cnstrnt = null; cstr = null;}
+	;
+		
+character_set returns [String s]
+{s = "";}
+	:	(s1:BMP_STR_KW 			{s = s1.getText();})
+	|	(s2:GENERALIZED_TIME_KW	{s = s2.getText();})
+	|	(s3:GENERAL_STR_KW		{s = s3.getText();})
+	|	(s4:GRAPHIC_STR_KW		{s = s4.getText();})
+	|	(s5:IA5_STRING_KW		{s = s5.getText();})
+	|	(s6:ISO646_STR_KW		{s = s6.getText();})
+	|	(s7:NUMERIC_STR_KW		{s = s7.getText();})
+	|	(s8:PRINTABLE_STR_KW	{s = s8.getText();})
+	|	(s9:TELETEX_STR_KW		{s = s9.getText();})
+	|	(s10:T61_STR_KW			{s = s10.getText();})
+	|	(s11:UNIVERSAL_STR_KW	{s = s11.getText();})
+	|	(s12:UTF8_STR_KW		{s = s12.getText();})
+	|	(s13:UTC_TIME_KW		{s = s13.getText();})
+	|	(s14:VIDEOTEX_STR_KW	{s = s14.getText();})
+	|	(s15:VISIBLE_STR_KW		{s = s15.getText();})
+	;		
+boolean_type returns [Object obj]
+{obj = null;}
+	: BOOLEAN_KW 
+	  {obj = new AsnBoolean();}
+	;
+				
+choice_type	returns [Object obj]
+{AsnChoice ch = new AsnChoice(); AsnElementTypeList eltplst ; 
+obj = null;}
+	: (	CHOICE_KW L_BRACE (eltplst = elementType_list {ch.elementTypeList = eltplst ;}) R_BRACE ) 
+		{obj = ch; eltplst = null; ch = null;}
+	;
+
+embedded_type returns [Object obj]
+{obj = null;}
+	:	(EMBEDDED_KW  PDV_KW)
+		{obj = new AsnEmbedded();}
+	;
+enum_type returns [Object obj]
+{AsnEnum enumtyp = new AsnEnum() ;
+AsnNamedNumberList nnlst; obj = null;}
+	: ( ENUMERATED_KW (nnlst = namedNumber_list { enumtyp.namedNumberList = nnlst;}) )
+	  {obj = enumtyp ; enumtyp=null;}	
+	;
+		
+external_type returns [Object obj]
+{obj = null; }
+	: EXTERNAL_KW {obj = new AsnExternal();}
+	;
+
+integer_type returns [Object obj]	
+{AsnInteger intgr = new AsnInteger();
+AsnNamedNumberList numlst; AsnConstraint cnstrnt; obj=null;}
+	: (	INTEGER_KW (numlst = namedNumber_list {intgr.namedNumberList = numlst;}
+		| cnstrnt = constraint {intgr.constraint = cnstrnt;})? )
+		{obj = intgr ; numlst = null ; cnstrnt = null; intgr = null; }
+	;
+		
+null_type returns [Object obj]
+{AsnNull nll = new AsnNull(); obj = null;}
+	: NULL_KW
+	  {obj = nll; nll = null ; }
+	;
+
+object_identifier_type returns [Object obj]
+{AsnObjectIdentifier objident = new AsnObjectIdentifier(); obj = null;}
+	: OBJECT_KW IDENTIFIER_KW 
+	  {obj = objident; objident = null;}	
+	; 
+	
+octetString_type returns [Object obj]
+{AsnOctetString oct = new AsnOctetString();
+AsnConstraint cnstrnt ; obj = null;}
+	: (	OCTET_KW STRING_KW (cnstrnt = constraint{oct.constraint = cnstrnt;})? )
+		{obj = oct ; cnstrnt = null;}
+	;
+
+real_type returns [Object obj]
+{AsnReal rl = new AsnReal();obj = null;}
+	: REAL_KW  {obj = rl ; rl = null;}		
+	;
+
+relativeOid_type returns [Object obj]
+{obj = null; }
+	: RELATIVE_KW MINUS OID_KW {obj = new AsnRelativeOid();}
+	;
+		
+sequence_type returns [Object obj]
+{AsnSequenceSet seq = new AsnSequenceSet();
+AsnElementTypeList eltplist ; obj = null;}
+	:  ( SEQUENCE_KW {seq.isSequence = true;} 
+	    L_BRACE 
+	   (eltplist = elementType_list {seq.elementTypeList = eltplist;})? 
+	    R_BRACE )
+		{obj = seq ; eltplist = null; seq =null; }
+	;
+		
+sequenceof_type returns [Object obj]
+{AsnSequenceOf seqof = new AsnSequenceOf();
+AsnConstraint cns; obj = null; Object obj1 ; String s ;}
+	:  ( SEQUENCE_KW {seqof.isSequenceOf = true;}
+	        (SIZE_KW {seqof.isSizeConstraint=true;}(cns = constraint {seqof.constraint = cns ;}))? OF_KW 
+		( obj1 = type 
+		{	if((AsnDefinedType.class).isInstance(obj1)){
+		  		seqof.isDefinedType=true;
+				seqof.typeName = ((AsnDefinedType)obj1).typeReference ; 
+			}
+			else{	
+				seqof.typeReference = obj1 ; 
+			}
+		}) )
+		{obj = seqof;  cns = null; seqof=null;}		
+	;
+	
+set_type returns [Object obj]
+{AsnSequenceSet set = new AsnSequenceSet();
+AsnElementTypeList eltplist ;obj = null;}
+	:  ( SET_KW L_BRACE (eltplist =  elementType_list {set.elementTypeList = eltplist ;})? R_BRACE )
+		{obj = set ; eltplist = null; set = null;}
+	;
+		
+setof_type	returns [Object obj]
+{AsnSequenceOf setof = new AsnSequenceOf();
+AsnConstraint cns; obj = null;
+Object obj1 ; String s;}
+	:	(SET_KW	
+	(SIZE_KW {setof.isSizeConstraint=true;}(cns = constraint {setof.constraint = cns ;}))? OF_KW 
+		(obj1 = type 
+		{	if((AsnDefinedType.class).isInstance(obj1)){
+		  		setof.isDefinedType=true;
+				setof.typeName = ((AsnDefinedType)obj1).typeReference ; 
+			}
+			else{
+				setof.typeReference = obj1;
+			} 
+		}) )
+		{obj = setof; cns = null; obj1=null; setof=null;} 		
+	;
+
+tagged_type returns [Object obj]
+{AsnTaggedType tgtyp = new AsnTaggedType();
+AsnTag tg; Object obj1 = null; String s; obj = null;}
+	:	((tg = tag {tgtyp.tag = tg ;}) 
+		(s = tag_default { tgtyp.tagDefault = s ;})? 
+		(obj1 = type 
+		{	if((AsnDefinedType.class).isInstance(obj1)){
+		  		tgtyp.isDefinedType=true;
+				tgtyp.typeName = ((AsnDefinedType)obj1).typeReference ; 
+			}
+			else{	
+				tgtyp.typeReference = obj1; 
+			} 
+		}))
+		{obj = tgtyp ; tg = null; obj1= null ;tgtyp = null; }
+	;
+
+
+tag	returns [AsnTag tg]	
+{tg = new AsnTag(); String s; AsnClassNumber cnum;} 
+	:	(L_BRACKET (s = clazz {tg.clazz = s ;})? (cnum = class_NUMBER { tg.classNumber = cnum ;}) R_BRACKET )
+	;
+	
+clazz returns [String s]
+{s = ""; }			
+	:	(c1:UNIVERSAL_KW 	{s= c1.getText();})
+	|	(c2:APPLICATION_KW	{s= c2.getText();})
+	|	(c3:PRIVATE_KW		{s= c3.getText();})
+	;
+
+class_NUMBER returns [AsnClassNumber cnum]		
+{cnum = new AsnClassNumber() ; String s; }
+	:	((num:NUMBER {s=num.getText(); cnum.num = new Integer(s);})
+	|	(lid:LOWER  {s=lid.getText(); cnum.name = s ;}) )
+		
+	;
+
+// Useful types
+defined_type returns [Object obj]	
+{AsnDefinedType deftype = new AsnDefinedType();
+AsnConstraint cnstrnt; obj = null;}
+	:	((up:UPPER {deftype.isModuleReference = true ;deftype.moduleReference = up.getText();} 
+			DOT )? 
+		(up1:UPPER {deftype.typeReference = up1.getText();})
+		(cnstrnt = constraint{deftype.constraint = cnstrnt;})? )
+		{obj = deftype; deftype=null ; cnstrnt = null;}
+	;
+// Referenced Type
+selection_type returns [Object obj]
+{AsnSelectionType seltype = new AsnSelectionType();
+obj = null;Object obj1;}
+	:	((lid:LOWER { seltype.selectionID = lid.getText();})
+	 	LESS
+	 	(obj1=type {seltype.type = obj1;}))
+	 	{obj=seltype; seltype=null;}
+	;
+
+//Constrained Type Causes Infinite Recursion
+// Resolved by parsing the constraints along with the types using them.
+//type_and_constraint returns [Object obj]
+//{AsnTypeAndConstraint tpcns = new AsnTypeAndConstraint();
+//obj=null;Object obj1;AsnConstraint cnstrnt;}
+//	:	((obj1 = type { tpcns.type = obj1;})
+//		(cnstrnt = constraint {tpcns.constraint = cnstrnt;}))
+//		{obj=tpcns; tpcns=null;}
+//	;
+
+// Macros Types	
+macros_type	returns [Object obj]
+{obj = null;}
+		:	(obj = operation_macro)
+		|	(obj = error_macro)
+		|	(obj = objecttype_macro)
+		;
+
+operation_macro	returns [Object obj]
+{OperationMacro op = new OperationMacro();
+String s ;obj = null; Object obj1; Object obj2;}
+	: (	"OPERATION"
+		(ARGUMENT_KW (ld1:LOWER {op.argumentTypeIdentifier = ld1.getText();})?
+		((obj2 = type)
+			{op.argumentType = obj2; op.isArgumentName=true;
+				if((AsnDefinedType.class).isInstance(obj2))
+					op.argumentName = ((AsnDefinedType)obj2).typeReference;
+				else
+					op.argumentName = op.argumentTypeIdentifier;
+			}
+		))?
+		(RESULT_KW  {op.isResult=true;} ((SEMI)=>SEMI|((LOWER)? type)=>(ld2:LOWER {op.resultTypeIdentifier = ld2.getText();})?
+		(obj1=type 
+			{op.resultType=obj1;op.isResultName=true;
+				if((AsnDefinedType.class).isInstance(obj1))
+					op.resultName = ((AsnDefinedType)obj1).typeReference;
+				else
+					op.resultName = op.resultTypeIdentifier;
+			}
+		)|))?
+		(ERRORS_KW L_BRACE (operation_errorlist[op]
+				{op.isErrors=true;}|) R_BRACE )?
+		(LINKED_KW L_BRACE (linkedOp_list[op]
+			{op.isLinkedOperation = true ;})?	 R_BRACE )? )
+		{obj = op;}
+	;
+
+operation_errorlist[OperationMacro oper]
+{Object obj;}
+	:	obj = typeorvalue {oper.errorList.add(obj);}
+		(COMMA (obj = typeorvalue {oper.errorList.add(obj);}))*
+	;
+	
+linkedOp_list[OperationMacro oper]
+{Object obj;}
+	:	obj = typeorvalue {oper.linkedOpList.add(obj);}
+		(COMMA (obj = typeorvalue {oper.linkedOpList.add(obj);}))*
+	;
+	
+error_macro	returns [Object obj]
+{ErrorMacro merr = new ErrorMacro();obj = null;
+Object obj1;}
+	:  ( ERROR_KW  (PARAMETER_KW {merr.isParameter = true; }
+		(( lw:LOWER { merr.parameterName = lw.getText(); })? 
+		(obj1 = type 
+		{	if((AsnDefinedType.class).isInstance(obj1)){
+				merr.isDefinedType=true;
+				merr.typeName = ((AsnDefinedType)obj1).typeReference ; 
+			}
+			else{
+				merr.typeReference = obj1 ;
+			}
+		}) ) )? )
+		{obj = merr ; merr = null;}
+	;
+	
+objecttype_macro returns [Object obj]
+{ObjectType objtype = new ObjectType();
+AsnValue val; obj = null; String s; Object typ;} 
+	: ("OBJECT-TYPE" "SYNTAX" (typ = type {objtype.type=typ;} )
+		("ACCESS" lid:LOWER {objtype.accessPart = lid.getText();})
+	  ("STATUS" lid1:LOWER {objtype.statusPart = lid1.getText();}) 
+	  ("DESCRIPTION" CHARACTER_KW STRING_KW)?
+	  ("REFERENCE" CHARACTER_KW STRING_KW)? 
+	  ("INDEX" L_BRACE (typeorvaluelist[objtype]) R_BRACE)? 
+	  ("DEFVAL" L_BRACE ( val = value {objtype.value = val;}) R_BRACE )? )
+	  {obj= objtype; objtype = null;}	
+	;
+
+typeorvaluelist[ObjectType objtype]
+{Object obj; }
+	: ((obj = typeorvalue {objtype.elements.add(obj);})
+	   (COMMA (obj=typeorvalue {objtype.elements.add(obj);})* ))
+	;
+
+typeorvalue returns [Object obj]
+{Object obj1; obj=null;}
+	: ((type)=>(obj1 = type) | obj1 = value)
+	  {obj = obj1; obj1=null;}
+	;
+
+elementType_list returns [AsnElementTypeList elelist]
+{elelist = new AsnElementTypeList(); AsnElementType eletyp; }
+	:	(eletyp = elementType {elelist.elements.add(eletyp); }
+	    (COMMA (eletyp = elementType {elelist.elements.add(eletyp);}))*)
+	;
+
+elementType	returns [AsnElementType eletyp]
+{eletyp = new AsnElementType();AsnValue val; 
+Object obj; AsnTag tg; String s;}
+	: (	(lid:LOWER {eletyp.name = lid.getText();} 
+		(tg = tag {eletyp.isTag = true; eletyp.tag = tg ;})? 
+		(s = tag_default {eletyp.isTagDefault = true; eletyp.typeTagDefault = s ;})? 
+		(obj = type) ( (OPTIONAL_KW {eletyp.isOptional=true;}) 
+		| (DEFAULT_KW { eletyp.isDefault = true;} 
+		 val = value {eletyp.value = val;} ))? )
+	|	COMPONENTS_KW OF_KW {eletyp.isComponentsOf = true;}(obj = type ))
+		{
+			if((AsnDefinedType.class).isInstance(obj)){
+				eletyp.isDefinedType=true;
+				eletyp.typeName = ((AsnDefinedType)obj).typeReference ; 
+			} else{		
+				eletyp.typeReference = obj;
+			}
+		}
+	;
+		
+namedNumber_list returns [AsnNamedNumberList nnlist]
+{nnlist = new AsnNamedNumberList();AsnNamedNumber nnum ; }	
+	: (	L_BRACE (nnum= namedNumber {nnlist.namedNumbers.add(nnum); })
+	   (COMMA (nnum = namedNumber  {nnlist.namedNumbers.add(nnum); }) )*  R_BRACE )
+	;
+
+namedNumber	returns [AsnNamedNumber nnum]
+{nnum = new AsnNamedNumber() ;AsnSignedNumber i; 
+AsnDefinedValue s;	}
+	:	(lid:LOWER {nnum.name = lid.getText();} L_PAREN 
+		(i = signed_number {nnum.signedNumber = i;nnum.isSignedNumber=true;}
+		| (s = defined_value {nnum.definedValue=s;})) R_PAREN	)
+	;
+	
+// Updated Grammar for ASN constraints
+
+constraint returns [AsnConstraint cnstrnt]
+{cnstrnt=new AsnConstraint();}
+	: L_PAREN 
+		(element_set_specs[cnstrnt]{cnstrnt.isElementSetSpecs=true;})? 
+		(exception_spec[cnstrnt])? 
+	  R_PAREN
+	;
+
+exception_spec[AsnConstraint cnstrnt]
+{AsnSignedNumber signum; AsnDefinedValue defval;
+Object typ;AsnValue val;}
+	: (EXCLAMATION 
+	  ( (signed_number)=>(signum=signed_number {cnstrnt.isSignedNumber=true;cnstrnt.signedNumber=signum;})
+	   |(defined_value)=>(defval=defined_value {cnstrnt.isDefinedValue=true;cnstrnt.definedValue=defval;})
+	   |typ=type COLON val=value {cnstrnt.isColonValue=true;cnstrnt.type=typ;cnstrnt.value=val;}))
+	   {cnstrnt.isExceptionSpec=true;}
+	;
+
+element_set_specs[AsnConstraint cnstrnt]
+{ElementSetSpec elemspec;}
+	:	(elemspec=element_set_spec {cnstrnt.elemSetSpec=elemspec;}
+		(COMMA DOTDOTDOT {cnstrnt.isCommaDotDot=true;})? 
+		(COMMA elemspec=element_set_spec {cnstrnt.addElemSetSpec=elemspec;cnstrnt.isAdditionalElementSpec=true;})?)
+	;
+
+element_set_spec returns [ElementSetSpec elemspec]	
+{elemspec = new ElementSetSpec(); Intersection intersect;ConstraintElements cnselem;}
+	:	intersect=intersections {elemspec.intersectionList.add(intersect);}
+		((BAR | UNION_KW ) intersect=intersections {elemspec.intersectionList.add(intersect);})*
+	| 	ALL EXCEPT cnselem=constraint_elements {elemspec.allExceptCnselem=cnselem;elemspec.isAllExcept=true;}
+	;
+
+// Coding is not proper for EXCEPT constraint elements. 
+// One EXCEPT constraint elements should be tied to one Constraint elements
+//(an object of constraint and except list)
+// and not in one single list
+intersections returns [Intersection intersect]
+{intersect = new Intersection();ConstraintElements cnselem;}
+
+	:	cnselem=constraint_elements {intersect.cnsElemList.add(cnselem);}
+	   (EXCEPT {intersect.isExcept=true;} cnselem=constraint_elements {intersect.exceptCnsElem.add(cnselem);})? 
+	   ((INTERSECTION | INTERSECTION_KW) {intersect.isInterSection=true;}
+	   cnselem=constraint_elements {intersect.cnsElemList.add(cnselem);}
+	   (EXCEPT cnselem=constraint_elements {intersect.exceptCnsElem.add(cnselem);})?)*
+	;
+				
+constraint_elements	returns [ConstraintElements cnsElem]
+{ cnsElem = new ConstraintElements(); AsnValue val;
+AsnConstraint cns; ElementSetSpec elespec;Object typ; }
+	:	(value)=>(val = value {cnsElem.isValue=true;cnsElem.value=val;})
+	|	(value_range[cnsElem])=>(value_range[cnsElem]	{cnsElem.isValueRange=true;})
+	|	(SIZE_KW cns=constraint {cnsElem.isSizeConstraint=true;cnsElem.constraint=cns;})
+	|	(FROM_KW cns=constraint {cnsElem.isAlphabetConstraint=true;cnsElem.constraint=cns;})
+	|	(L_PAREN elespec=element_set_spec {cnsElem.isElementSetSpec=true;cnsElem.elespec=elespec;} R_PAREN)
+	|	((INCLUDES {cnsElem.isIncludeType=true;})? typ=type {cnsElem.isTypeConstraint=true;cnsElem.type=typ;})
+	|	(PATTERN_KW val=value {cnsElem.isPatternValue=true;cnsElem.value=val;})
+	|	(WITH_KW 
+		((COMPONENT_KW cns=constraint {cnsElem.isWithComponent=true;cnsElem.constraint=cns;})
+		|	
+		(COMPONENTS_KW {cnsElem.isWithComponents=true;}
+		L_BRACE (DOTDOTDOT COMMA)? type_constraint_list[cnsElem] R_BRACE )))
+	;
+
+value_range[ConstraintElements cnsElem]
+{AsnValue val;}
+	: (val=value {cnsElem.lEndValue=val;} | MIN_KW {cnsElem.isMinKw=true;}) (LESS {cnsElem.isLEndLess=true;})?  // lower end
+	   DOTDOT
+	  (LESS {cnsElem.isUEndLess=true;})? (val=value{cnsElem.uEndValue=val;} | MAX_KW {cnsElem.isMaxKw=true;}) // upper end
+	;
+	
+type_constraint_list[ConstraintElements cnsElem]
+{NamedConstraint namecns;}
+	: namecns=named_constraint {cnsElem.typeConstraintList.add(namecns);}
+	 (COMMA namecns=named_constraint {cnsElem.typeConstraintList.add(namecns);})*
+	;
+
+named_constraint returns [NamedConstraint namecns]
+{namecns = new NamedConstraint(); AsnConstraint cns;}
+	:	lid:LOWER {namecns.name=lid.getText();}
+	    (cns=constraint {namecns.isConstraint=true;namecns.constraint=cns;})? 
+	    (PRESENT_KW {namecns.isPresentKw=true;}
+	     |ABSENT_KW {namecns.isAbsentKw=true;}
+	     | OPTIONAL_KW {namecns.isOptionalKw=true;})?
+	;
+				
+/*-----------VALUES ---------------------------------------*/
+
+value returns [AsnValue value]
+{value = new AsnValue(); AsnSequenceValue seqval;
+AsnDefinedValue defval;String aStr;AsnSignedNumber num; 
+AsnOidComponentList cmplst;}		
+
+	: 	(TRUE_KW)=>(TRUE_KW 				{value.isTrueKW = true; })
+	|	(FALSE_KW)=>(FALSE_KW				{value.isFalseKW = true;})
+	|	(NULL_KW)=>(NULL_KW				{value.isNullKW = true;})
+	|	(C_STRING)=>(c:C_STRING				{value.isCString=true; value.cStr = c.getText();})
+	|	(defined_value)=>(defval = defined_value {value.isDefinedValue = true; value.definedValue = defval;})
+	|	(signed_number)=>(num = signed_number	{value.isSignedNumber=true ; value.signedNumber = num;}) 
+	|	(choice_value[value])=>(choice_value[value]	{value.isChoiceValue = true;})
+	|	(sequence_value)=>(seqval=sequence_value	{value.isSequenceValue=true;value.seqval=seqval;})
+	|	(sequenceof_value[value])=>(sequenceof_value[value] {value.isSequenceOfValue=true;})
+	|	(cstr_value[value])=>(cstr_value[value]		{value.isCStrValue = true;})
+	|	(obj_id_comp_lst)=>(cmplst=obj_id_comp_lst	{value.isAsnOIDValue=true;value.oidval=cmplst;})
+	|	(PLUS_INFINITY_KW)=>(PLUS_INFINITY_KW		{value.isPlusInfinity = true;})
+	|	(MINUS_INFINITY_KW)=>(MINUS_INFINITY_KW		{value.isMinusInfinity = true;})
+	;
+
+cstr_value[AsnValue value]
+{AsnBitOrOctetStringValue bstrval = new AsnBitOrOctetStringValue();
+AsnCharacterStringValue cstrval = new AsnCharacterStringValue();
+AsnSequenceValue seqval;}
+	:  ((H_STRING)=>(h:H_STRING 	{bstrval.isHString=true; bstrval.bhStr = h.getText();})
+	|	(B_STRING)=>(b:B_STRING		{bstrval.isBString=true; bstrval.bhStr = b.getText();})
+	|	(L_BRACE	((id_list[bstrval])=>(id_list[bstrval])
+					|(char_defs_list[cstrval])=>(char_defs_list[cstrval])
+					| tuple_or_quad[cstrval])    R_BRACE))
+		{value.cStrValue=cstrval;value.bStrValue=bstrval;}
+	;
+
+id_list[AsnBitOrOctetStringValue bstrval]
+{String s="";}
+	: (ld:LOWER {s = ld.getText(); bstrval.idlist.add(s);}) 
+	  (COMMA ld1:LOWER {s = ld1.getText();bstrval.idlist.add(s);})*
+	;
+	
+char_defs_list[AsnCharacterStringValue cstrval]
+{CharDef a ;}
+	:a = char_defs {cstrval.isCharDefList = true;cstrval.charDefsList.add(a);} 
+	(COMMA (a = char_defs {cstrval.charDefsList.add(a);}))* 
+	;
+
+tuple_or_quad[AsnCharacterStringValue cstrval]
+{AsnSignedNumber n;}
+	: (n = signed_number {cstrval.tupleQuad.add(n);}) 
+	  COMMA 
+	  (n = signed_number {cstrval.tupleQuad.add(n);}) 
+	  ((R_BRACE {cstrval.isTuple=true;})  |  (COMMA 
+	  (n = signed_number {cstrval.tupleQuad.add(n);}) 
+	  COMMA (n = signed_number {cstrval.tupleQuad.add(n);})))
+	;
+
+char_defs  returns [CharDef chardef]
+{chardef = new CharDef(); 
+AsnSignedNumber n ; AsnDefinedValue defval;}
+	:	(c:C_STRING {chardef.isCString = true;chardef.cStr=c.getText();})
+	|	(L_BRACE (n = signed_number {chardef.tupleQuad.add(n);}) COMMA (n = signed_number {chardef.tupleQuad.add(n);}) 
+		((R_BRACE {chardef.isTuple=true;})
+		|(COMMA (n = signed_number {chardef.tupleQuad.add(n);}) 
+		COMMA (n = signed_number {chardef.tupleQuad.add(n);}) R_BRACE{chardef.isQuadruple=true;})))
+	|	(defval = defined_value {chardef.defval=defval;})
+	;
+
+choice_value[AsnValue value]
+{AsnChoiceValue chval = new AsnChoiceValue(); AsnValue val;}
+	: ((lid:LOWER {chval.name = lid.getText();})
+	   (COLON)?  (val=value {chval.value = val;}))
+	  {value.chval = chval;}
+	;
+
+sequence_value returns [AsnSequenceValue seqval]
+{AsnNamedValue nameval = new AsnNamedValue();
+seqval = new AsnSequenceValue();}
+	:	L_BRACE  ((nameval=named_value {seqval.isValPresent=true;seqval.namedValueList.add(nameval);})?
+		(COMMA nameval=named_value {seqval.namedValueList.add(nameval);})*)   R_BRACE
+	;
+
+sequenceof_value[AsnValue value]
+{AsnValue val;value.seqOfVal = new AsnSequenceOfValue();}
+	: L_BRACE ((val=value {value.seqOfVal.valueList.add(val);})?
+       (COMMA val=value {value.seqOfVal.valueList.add(val);})*) 
+	  R_BRACE
+	;
+
+protected
+defined_value returns [AsnDefinedValue defval]
+{defval = new AsnDefinedValue(); }
+	:	((up:UPPER {defval.moduleIdentifier = up.getText(); } 
+			DOT {defval.isDotPresent=true;})? 
+		lid:LOWER { defval.name = lid.getText();})
+	;
+		
+signed_number returns [AsnSignedNumber i]
+{i = new AsnSignedNumber() ; String s ; }
+	:	((MINUS {i.positive=false;})? 
+		(n:NUMBER  {s = n.getText(); i.num= new BigInteger(s);}) )
+	;
+	
+named_value returns [AsnNamedValue nameval]
+{nameval = new AsnNamedValue(); AsnValue val;}	
+	:	(lid:LOWER	{nameval.name = lid.getText(); } 
+		val=value	{nameval.value = val;})
+	;	
+

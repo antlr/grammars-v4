@@ -1,0 +1,161 @@
+/*----------------------------------------------------------------------
+ * テーブルサンプル
+ ----------------------------------------------------------------------*/
+@set (table_sample_struct_as_array = 0)
+
+//----------------------------------------------------------------------
+// テーブルクラス拡張
+//----------------------------------------------------------------------
+class MyTable extends KTable
+{
+  function MyTable {
+    super.KTable(...);
+  }
+
+  function onSelectionRightClick(point, x, y) {
+    if (point.column.array
+        && point.column.editable) {
+      openArrayContextMenu(point.column, point.row, x);
+    }
+  }
+
+  function openArrayContextMenu(column, row, x) {
+    var menu = new KContextMenu();
+    var index = column.getRowElementIndex(row, x);
+    if (index === void) {
+      menu.addItem("要素を追加する", "", true, funccall(onArrayInsertElement, column, row, column.getRowElementCount(row)));
+    } else {
+      menu.addItem("前に要素を追加する", "", true, funccall(onArrayInsertElement, column, row, index));
+      menu.addItem("後に要素を追加する", "", true, funccall(onArrayInsertElement, column, row, index + 1));
+      menu.addSeparator();
+      menu.addItem("要素を削除する", "", true, funccall(onArrayEraseElement, column, row, index));
+    }
+    menu.show();
+  }
+
+  function onArrayInsertElement(column, row, index) {
+    column.insertRowElement(row, index);
+  }
+
+  function onArrayEraseElement(column, row, index) {
+    column.eraseRowElement(row, index);
+  }
+};
+
+//----------------------------------------------------------------------
+// テーブルサンプル
+//----------------------------------------------------------------------
+class TableSample extends KWindow
+{
+  function TableSample {
+    super.KWindow("tablesample");
+    
+    // ウィンドウ初期設定
+    caption = 'テーブルサンプル';
+    imeMode = imDontCare;
+
+    // デフォルト値
+    defaultFocusable = true;
+
+    // テーブル配置
+    var rand = new Math.RandomGenerator();
+    var date = new Date();
+@if (table_sample_struct_as_array == 0)
+    var structAttrList = [ [ KTextTableColumn, "ラベル", "label", %[ editable: true, fixedWidth: 50 ] ],
+                           [ KIntTableColumn, "数値", "num", %[ editable: true, fixedWidth: 35 ] ],
+                           [ KCheckBoxTableColumn, "チェック", "check", %[ editable: true ] ] ];
+@endif
+@if (table_sample_struct_as_array == 1)
+    var structAttrList = [ [ KTextTableColumn, "ラベル", 0, %[ editable: true, fixedWidth: 50 ] ],
+                           [ KIntTableColumn, "数値", 1, %[ editable: true, fixedWidth: 35 ] ],
+                           [ KCheckBoxTableColumn, "チェック", 2, %[ editable: true ] ] ];
+@endif
+
+    var dropdownItemList = [ "新規", 0, 
+                             "進行中", 1,
+                             "解決", 2,
+                             "フィードバック", 3,
+                             "終了", 4,
+                             "却下", 5 ];
+
+    primaryWidget.add(new MyTable(this, "table",
+                                  [ [ KNumberTableColumn, "インデックス1", "index1" ],
+                                    [ KNumberTableColumn, "インデックス2", "index2" ],
+                                    [ KTextTableColumn, "テキスト1", "text1", %[ editable: true ] ],
+                                    [ KTextTableColumn, "テキスト2", "text2", ],
+                                    [ KTextTableColumn, "テキスト3", "text3" ],
+                                    [ KTextAreaTableColumn, "テキストエリア", "textarea", %[ hint: "改行を含むヒントの表示テスト\nここからさらに空行も含む\n\nどうか？", editable: true ] ],
+                                    [ KCheckBoxTableColumn, "チェック", "check", %[ editable: true ] ],
+                                    [ KDateTableColumn, "日時", "date" ],
+                                    [ KDropDownListTableColumn, "ステータス", "status", %[ editable: true, itemList: dropdownItemList ] ],
+                                    [ KCheckBoxTableColumn, "チェックリスト", "checklist", %[ array: true, editable: true, innerDragSort: true ] ],
+                                    [ KColorTableColumn, "カラー", "color", %[ initialValue: 0xff00ff00, hasAlpha: true, editable: true ] ],
+@if (table_sample_struct_as_array == 0)
+                                    [ KStructTableColumn, "構造体", "struct", %[ attrList: structAttrList, editable: true ] ]
+@endif
+@if (table_sample_struct_as_array == 1)
+                                    [ KStructTableColumn, "構造体", "struct", %[ attrList: structAttrList, editable: true, initialValue: [] ] ]
+@endif
+                                   ]));
+    for (var i = 0; i < 10; i++) {
+      table.addElement(%[ index1: i, index2: rand.random32() % 1000, text1: "Text1", text2: "Text2", text3: "Text3", date: date.getTime(), checklist: [ true, false, true ] ]);
+      table.addElement(%[ index1: i, index2: rand.random32() % 1000, text1: "テキスト1", text2: "テキスト2", text3: "テキスト3", check: true, checklist: [ true, false, false ] ]);
+      table.addElement(%[ index1: i, index2: rand.random32() % 1000, 
+                          checklist: [ true, true ],
+                          status: 1,
+                          text1: "長い長いとてつもなく長い終わりの見えない画面からはみ出しそうなどこまでも冗長な頭痛がしてきそうなテキスト1", 
+                          text2: "長い長いとてつもなく長い終わりの見えない画面からはみ出しそうなどこまでも冗長な頭痛がしてきそうなテキスト2", 
+                          text3: "長い長いとてつもなく長い終わりの見えない画面からはみ出しそうなどこまでも冗長な頭痛がしてきそうなテキスト3",
+                          textarea: "改行を含んだテキスト\r\nどのように表示されるかチェック\r\n\r\nどうですかね？",
+                          color: 0x80ff0000,
+@if (table_sample_struct_as_array == 0)
+                          struct: %[ label: "属性ラベル", num: 256, check: true ]
+@endif
+@if (table_sample_struct_as_array == 1)
+                          struct: [ "属性ラベル", 256, true ]
+@endif
+                      ]);
+    }
+    table.enableColumnKeyRowSort = false;
+    table.multipleSelection = true;
+    table.enableColumnTabOrderExchange = false;
+    table.cellSelection = true;
+    table.showHorizontalGrid = true;
+    table.showVerticalGrid = true;
+    table.resize = true;
+    table.respondToValueModification = true;
+    table.showRowTab = true;
+
+    // 永続化辞書の作成
+    var dict = new KPersistentDictionary(System.dataPath + name + "_dict.txt");
+    add(dict);
+    bindPersistentDictionary(dict);
+  }
+
+  // ウィジェットの値が更新された時に呼ばれるフック関数
+  function onChildValueModified(child, value) {
+    switch (child.name) {
+    default: {
+      // 更新のあったウィジェットの名前と値を表示。
+      Debug.message("child value modified", child.name, typeof(value), value);
+      break;
+    }
+    }
+  }
+}
+
+//----------------------------------------------------------------------
+// サンプル表示・非表示の切り替え
+global.tableSample = void;
+
+function showTableSample
+{
+  if (tableSample === void)
+    tableSample = new TableSample();
+  tableSample.visible = true;
+}
+
+function hideTableSample
+{
+  tableSample.visible = false;
+}

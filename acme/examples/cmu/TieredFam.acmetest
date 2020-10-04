@@ -1,0 +1,133 @@
+Family TieredFam = {
+    // This port does not allow remote role
+    Port Type provideT = {
+        // this port isn't dangling
+        heuristic size(self.attachedRoles) >= 1<<label : string = "This port has attachment(s).";errMsg : string = "This port dangles!";>>;
+        
+    }
+    
+    
+    // This port does not allow remote role
+    Port Type useT = {
+        // this port isn't dangling
+        heuristic size(self.attachedRoles) >= 1<<label : string = "This port has attachment(s).";errMsg : string = "This port dangles!";>>;
+        
+    }
+    
+    
+    // This role does not require its attached port NOT be remote
+    Role Type providerT = {
+        // this role is not dangling
+        invariant size(self.attachedPorts) >= 1<<label : string = "This role has an attachment.";errMsg : string = "The role dangles!";>>;
+        
+        // this role is not attached to more than one port
+        heuristic !(size(self.attachedPorts) > 1)<<label : string = "This role has no more than one attachment.";errMsg : string = "This role is attached to more than one port!";>>;
+        
+    }
+    
+    
+    // This role does not require its attached port NOT be remote
+    Role Type userT = {
+        // this role is not dangling
+        invariant size(self.attachedPorts) >= 1<<label : string = "This role has an attachment.";errMsg : string = "The role dangles!";>>;
+        
+        // this role is not attached to more than one port
+        heuristic !(size(self.attachedPorts) > 1)<<label : string = "This role has no more than one attachment.";errMsg : string = "This role is attached to more than one port! Is this intended?";>>;
+        
+    }
+    
+    
+    Component Type TierNodeT = {
+        Property host : string;
+        
+        Property allowShareHost : boolean << default : boolean = "true";  >>;
+        
+    }
+    
+    
+    Connector Type CallReturnConnT = {
+        Property blocking : boolean << default : boolean = true;  >>;
+        
+        // A call-return connector should have at least two roles
+        invariant size(self.roles) >= 2<<label : string = "The connector has at least two roles.";errMsg : string = "The connector does NOT have two roles!";>>;
+        
+        // A call-return connector with more than two roles may indicate a problem
+        heuristic !(size(self.roles) > 2)<<label : string = "The connector has no more than two roles.";errMsg : string = "The connector has more than two roles! Is this intended?";>>;
+        
+    }
+    
+    
+    Connector Type LocalConnT extends CallReturnConnT with {
+        Role callee : providerT =  new providerT;
+        
+        
+        Role caller : userT =  new userT;
+        
+        
+        invariant Forall r in self.roles | 
+            Exists t in {providerT, userT} | 
+                declaresType(r, t)  <<label : string = "All roles are of types providerT or userT.";errMsg : string = "Detected unexpected role types!";>>;
+        
+    }
+    
+    
+    Connector Type RMIConnT extends CallReturnConnT with {
+        Role callee : remoteProviderT =  new remoteProviderT;
+        
+        
+        Role caller : remoteUserT =  new remoteUserT;
+        
+        
+        invariant Forall r in self.roles | 
+            Exists t in {remoteProviderT, remoteUserT} | 
+                declaresType(r, t)  <<vis-roles : boolean = true;label : string = "All roles are of types remoteProviderT or remoteUserT.";errMsg : string = "Detected unexpected role types!";>>;
+        
+    }
+    
+    
+    Port Type remoteProvideT extends provideT with {
+        // All attached roles must be remote.
+        invariant Forall r : role in self.attachedRoles | 
+            declaresType(r, remoteProviderT) <<label : string = "All attached roles are remote.";errMsg : string = "Detected non-remote attached role(s)!";>>;
+        
+    }
+    
+    
+    Port Type remoteUseT extends useT with {
+        // All attached roles must be remote.
+        invariant Forall r : role in self.attachedRoles | 
+            declaresType(r, remoteUserT) <<label : string = "All attached roles are remote.";errMsg : string = "Detected non-remote attached role(s)!";>>;
+        
+    }
+    
+    
+    Role Type remoteUserT extends userT with {
+        // All attached port must be remote.
+        invariant Forall p : port in self.attachedPorts | 
+            declaresType(p, remoteUseT) <<label : string = "All attached ports are remote.";errMsg : string = "Detected non-remote attached port(s)!";>>;
+        
+    }
+    
+    
+    Role Type remoteProviderT extends providerT with {
+        // All attached port must be remote.
+        invariant Forall p : port in self.attachedPorts | 
+            declaresType(p, remoteProvideT) <<label : string = "All attached ports are remote.";errMsg : string = "Detected non-remote attached port(s)!";>>;
+        
+    }
+    
+    
+    // Two tiers nodes that cannot share the same host must not reside on the same 
+ 
+    // host
+ 
+    invariant Forall t1 : TierNodeT in self.Components | 
+        !t1.allowShareHost -> (Forall t2 : TierNodeT in self.Components | 
+            t1 != t2 -> t1.host != t2.host)  <<label : string = "Tier nodes respect host assignment.";errMsg : string = "One or more tier node does not satisfy host assignment criteria!";>>;
+    
+    // All connectors satisfy CallReturnConnT
+    invariant Forall conn : connector in self.connectors | 
+        declaresType(conn, CallReturnConnT) <<label : string = "All connectors satisfy call-return type.";errMsg : string = "At least one connector is NOT call-return!";>>;
+    
+}
+

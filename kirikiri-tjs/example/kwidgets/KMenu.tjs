@@ -1,0 +1,601 @@
+//
+// $Id: KMenu.tjs,v 1.4 2007/09/22 21:38:39 cvs Exp $
+//
+
+
+/**----------------------------------------------------------------------
+ * メニューアイテム
+ ----------------------------------------------------------------------*/
+class KMenuItem extends MenuItem
+{
+  // 名前
+  var name;
+  // 辞書登録を避けるかどうか
+  var _isAvoidDictionaryRegistration;
+  // ウィジェット
+  var _nameCache = %[];
+  // アイコンレイヤ
+  var iconCheckedLayer = void, iconUncheckedLayer = void;
+  // アイテムの値
+  var value = void;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @window ウィンドウ
+   * @caption キャプション
+   * @name 名前
+   ------------------------------*/
+  function KMenuItem(window, caption, name) {
+    super.MenuItem(window, caption);
+    this.name = name;
+    _isAvoidDictionaryRegistration = false;
+    // missing を有効にする
+    Scripts.setCallMissing(this);
+  }
+
+  /**------------------------------
+   * デストラクタ
+   * 
+   * 自動的に、自分が保持している子アイテムを全てinvalidateする。
+   ------------------------------*/
+  function finalize {
+    // 子レイヤーを全て破棄する
+    discardArray(children);
+    discard(iconCheckedLayer);
+    discard(iconUncheckedLayer);
+    super.finalize(...);
+  }
+
+  /**------------------------------
+   * windowプロパティはルートの意味のある値を返す
+   */
+  property window {
+    getter {
+      return root.window;
+    }
+  }
+
+  /**------------------------------
+   * 親ウィジェット。
+   *
+   * @return ルートメニューの子ならwindowを、それ以外のアイテムならparentを返す
+   ------------------------------*/
+  property parentWidget {
+    getter {
+      if (parent instanceof "KMenuItem")
+        return parent;
+      else
+        return root.window;
+    }
+  }
+
+  /**------------------------------
+   * 子孫ウィジェットから特定の名前を持った子ウィジェットを捜す
+   ------------------------------*/
+  function find(name) {
+    if (this.name === name)
+      return this;
+    for (var i = 0; i < children.count; i++) {
+      var child = children[i];
+      if (child instanceof "KMenuItem") {
+        var widget = child.find(name);
+        if (widget)
+          return widget;
+      }
+    }
+    return void;
+  }
+
+  /**------------------------------
+   * 任意のアイコンを設定する。
+   ------------------------------*/
+  property icon {
+    setter(v) {
+      invalidate iconCheckedLayer;
+      invalidate iconUncheckedLayer;
+      iconCheckedLayer = void;
+      iconUncheckedLayer = void;
+      if (v instanceof "Layer") {
+        iconUncheckedLayer = new global.Layer(root.window, root.window.primaryLayer);
+        iconUncheckedLayer.assignImages(v);
+        iconUncheckedLayer.setSize(v.width, v.height);
+        iconCheckedLayer = new global.Layer(root.window, root.window.primaryLayer);
+        iconCheckedLayer.assignImages(v);
+        iconCheckedLayer.setSize(v.width, v.height);
+        iconCheckedLayer.operateRect((iconCheckedLayer.width - root.window.menuCheckedLayer.width) / 2,
+                                     (iconCheckedLayer.height - root.window.menuCheckedLayer.height) / 2,
+                                     root.window.menuCheckedLayer,
+                                     0, 0, root.window.menuCheckedLayer.width, root.window.menuCheckedLayer.height);
+        root.window.invalidateMenuIcon();
+      } else if (typeof(v) == "String") {
+        iconUncheckedLayer = new global.Layer(root.window, root.window.primaryLayer);
+        iconUncheckedLayer.loadImages(v);
+        iconUncheckedLayer.setSizeToImageSize();
+        iconCheckedLayer = new global.Layer(root.window, root.window.primaryLayer);
+        iconCheckedLayer.assignImages(iconUncheckedLayer);
+        iconCheckedLayer.setSizeToImageSize();
+        iconCheckedLayer.operateRect((iconCheckedLayer.width - root.window.menuCheckedLayer.width) / 2,
+                                     (iconCheckedLayer.height - root.window.menuCheckedLayer.height) / 2,
+                                     root.window.menuCheckedLayer,
+                                     0, 0, root.window.menuCheckedLayer.width, root.window.menuCheckedLayer.height);
+        root.window.invalidateMenuIcon();
+      } else if (typeof(v) == "Integer") {
+        bmpChecked = v;
+        bmpUnchecked = v;
+      }
+    }
+  }
+
+  /**------------------------------
+   * 任意のアイコンを文字で
+   ------------------------------*/
+  property iconChar {
+    setter(v) {
+      var tmpLayer = new global.Layer(root.window, root.window.primaryLayer);
+      var w = System.getSystemMetrics("CYMENUCHECK");
+      tmpLayer.setImageSize(w, w);
+      tmpLayer.setSizeToImageSize();
+      tmpLayer.fillRect(0, 0, w, w, 0);
+      tmpLayer.font.height = w - 2;
+      tmpLayer.drawText((w - tmpLayer.font.getTextWidth(w)) / 2, 1, v, 0);
+      icon = tmpLayer;
+      invalidate tmpLayer;
+    }
+  }
+
+  function add {
+    super.add(...);
+    root.window.invalidateMenuIcon();
+  }
+
+  function insert {
+    super.insert(...);
+    root.window.invalidateMenuIcon();
+  }
+
+  function remove {
+    super.remove(...);
+    root.window.invalidateMenuIcon();
+  }
+
+  function invalidateMenuIcon {
+    if (iconUncheckedLayer) {
+      bmpChecked = iconCheckedLayer;
+      bmpUnchecked = iconUncheckedLayer;
+    }
+    for (var i = 0; i < children.count; i++) {
+      var child = children[i];
+      if (child instanceof "KMenuItem") 
+        child.invalidateMenuIcon();
+    }
+  }
+
+  /**------------------------------
+   * ウィジェットツリーから特定の名前を持った子ウィジェットを捜します
+   *
+   * find関数を経由せずに、オブジェクトのプロパティ扱いで名前を指定して
+   * ウィジェットツリー中のウィジェットを参照することが出来ます。
+   *
+   * パフォーマンスの都合で、グローバルに同名のシンボルが存在する場合は
+   * 優先的にそちらを見に行くという挙動をするので注意。
+   ------------------------------*/
+  function missing(get_or_set, name, value) {
+    if (! get_or_set) {
+      if (typeof(global[name]) != "undefined")
+        return false;
+      if (typeof(_nameCache[name]) != "undefined") {
+        var widget = _nameCache[name];
+        if (widget isvalid
+            && widget.name == name) {
+          *value = widget;
+          return true;
+        } else {
+          delete _nameCache[name];
+        }
+      }
+      var widget = find(name);
+      if (widget) {
+        _nameCache[name] = widget;
+        *value = widget;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**------------------------------
+   * 永続化辞書のバインドを避けるかどうか
+   *
+   * @param v 永続化辞書のバインドを避けるかどうか
+   * @return 永続化辞書のバインドを避けるかどうか
+   ------------------------------*/
+  property isAvoidDictionaryRegistration {
+    getter {
+      return _isAvoidDictionaryRegistration;
+    }
+    setter(v) {
+      _isAvoidDictionaryRegistration = v;
+    }
+  }
+
+  /**------------------------------
+   * 永続化辞書をバインドする
+   *
+   * ウィジェットを KPersistentDictionary クラスのオブジェクトにバインドします。
+   * デフォルトでは、全ての子ウィジェットを探索し、それらの
+   * ウィジェットの bindPersistentDictionary を再帰的に呼び出すという動作をします。
+   *
+   * @param dict バインドする辞書
+   ------------------------------*/
+  function bindPersistentDictionary(dict) {
+    if (_isAvoidDictionaryRegistration)
+      return;
+
+    for (var i = 0; i < children.count; i++) {
+      var child = children[i];
+      if (child instanceof "KMenuItem") 
+        child.bindPersistentDictionary(dict);
+    }
+  }
+
+  /**------------------------------
+   * 「値」が変わった時に呼ばれるフック関数
+   *
+   * 「値」を持つウィジェットで、値が変更された時に呼ばれます。
+   * デフォルトでは、parent の onChildValueModifiedを呼ぶように設定されています。
+   *
+   * @param newValue 新規の値
+   * @param oldValue 変更前の値
+   ------------------------------*/
+  function onValueModified(newValue, oldValue) {
+    parentWidget.onChildValueModified(this, newValue, oldValue);
+  }
+
+  /**------------------------------
+   * 子ウィジェットの「値」が変わった時に呼ばれるフック関数
+   *
+   * 子ウィジェットの「値」値が変更された時に呼ばれます。
+   * デフォルトでは、さらに parent の onChildValueModifiedを呼ぶように設定されています。
+   * どこかのウィジェットが関数をオーバーライドして処理を行わない限り、
+   * 値変更の通知は KWindow まで届きます。
+   *
+   * @param newValue 新規の値
+   * @param oldValue 変更前の値
+   ------------------------------*/
+  function onChildValueModified(child, newValue, oldValue) {
+    parentWidget.onChildValueModified(...);
+  }
+
+  /**------------------------------
+   * イベントを発生させ強制的に現在の値を通知する。
+   *
+   * KMenuItem では常に 値:void でonValueModifiedを呼びます。
+   ------------------------------*/
+  function invalidateValue {
+    if (enabled)
+      onValueModified(value);
+  }
+
+  /*------------------------------
+   * メニューアイテムがクリックされた時に呼ばれる関数
+   * 
+   * デフォルトでは invalidateValueを呼ぶ
+   ------------------------------*/
+  function onClick {
+    invalidateValue();
+  }
+
+  /**------------------------------
+   * アイテムを全てクリアする
+   ------------------------------*/
+  function clearItems {
+    while (children.count) {
+      var child = children[0];
+      remove(child);
+      invalidate child;
+    }
+  }
+
+  /**------------------------------
+   * セパレータを追加
+   ------------------------------*/
+  function addSeparator {
+    return add(new global.MenuItem(window, "-"));
+  }
+
+  /**------------------------------
+   * アイテムを追加
+   *
+   * @param caption キャプション
+   * @param name 名前 
+   * @param enabled 有効かどうか
+   * @param func onValueModified 関数のオーバーライド指定
+   ------------------------------*/
+  function addItem(caption, name = "", enabled = true, func = void) {
+    var item = new global.KMenuItem(window, caption, name);
+
+    item.enabled = enabled;
+    if (func)
+      item.onValueModified = func;
+    add(item);
+    return item;
+  }
+
+  /**------------------------------
+   * 値持ちアイテムを追加
+   *
+   * @param caption キャプション
+   * @param value 値
+   * @param name 名前 
+   * @param enabled 有効かどうか
+   * @param func onValueModified 関数のオーバーライド指定
+   ------------------------------*/
+  function addValueItem(caption, value, name = "", enabled = true, func = void) {
+    var item = new global.KValueMenuItem(window, caption, value, name);
+    item.enabled = enabled;
+    if (func)
+      item.onValueModified = func;
+    add(item);
+    return item;
+  }
+
+  /**------------------------------
+   * トグルアイテムを追加
+   *
+   * @param caption キャプション
+   * @param value トグルの初期値
+   * @param name 名前 
+   * @param enabled 有効かどうか
+   * @param func onValueModified 関数のオーバーライド指定
+   ------------------------------*/
+  function addToggleItem(caption, value = false, name = "", enabled = true, func = void) {
+    var item = new global.KToggleMenuItem(window, caption, name);
+    item.enabled = enabled;
+    item.value = value;
+    if (func)
+      item.onValueModified = func;
+    add(item);
+    return item;
+  }
+
+  /**------------------------------
+   * ラジオアイテムを追加
+   *
+   * @param caption キャプション
+   * @param value アイテムの値
+   * @param name 名前 
+   * @param enabled 有効かどうか
+   * @param func onValueModified 関数のオーバーライド指定
+   ------------------------------*/
+  function addRadioItem(caption, value, name = "", enabled = true, func = void) {
+    var item = new global.KRadioMenuItem(window, caption, value, name);
+    item.enabled = enabled;
+    if (func)
+      item.onValueModified = func;
+    add(item);
+    item.onAddToParent(this);
+    return item;
+  }
+}
+
+/*----------------------------------------------------------------------
+ * 値持ちメニューアイテム
+ ----------------------------------------------------------------------*/
+class KValueMenuItem extends KMenuItem
+{
+  var value;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param window ウィンドウ
+   * @param caption キャプション
+   * @param value 値
+   * @param name 名前
+   ------------------------------*/
+  function KValueMenuItem(window, caption, value, name) {
+    super.KMenuItem(window, caption, name);
+    this.value = value;
+  }
+
+  /**------------------------------
+   * イベントを発生させ強制的に現在の値を通知する。
+   ------------------------------*/
+  function invalidateValue {
+    if (enabled)
+      onValueModified(value);
+  }
+}
+
+
+/*----------------------------------------------------------------------
+ * トグルメニューアイテム
+ ----------------------------------------------------------------------*/
+class KToggleMenuItem extends KMenuItem
+{
+  var dict;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @window ウィンドウ
+   * @caption キャプション
+   * @name 名前
+   ------------------------------*/
+  function KToggleMenuItem(window, caption, name) {
+    super.KMenuItem(...);
+  }
+
+  /*------------------------------
+   * ファイナライザ
+   ------------------------------*/
+  function finalize {
+    if (dict)
+      dict.set(name, value);
+    super.finalize(...);
+  }
+
+  /**------------------------------
+   * 値
+   *
+   * トグルの値。checkboxの値と連動する。
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property value {
+    getter {
+      return checked;
+    }
+    setter(v) {
+      checked = v;
+    }
+  }
+
+  /**------------------------------
+   * イベントを発生させ強制的に現在の値を通知する。
+   *
+   * 現在の値で onValueModifiedを呼びます。
+   ------------------------------*/
+  function invalidateValue {
+    if (enabled)
+      onValueModified(value);
+  }
+
+  /*------------------------------
+   * メニューアイテムがクリックされた時に呼ばれる関数
+   * 
+   * valueを反転し、invalidateValueを呼ぶ
+   ------------------------------*/
+  function onClick {
+    var oldValue = checked;
+    value = ! value;
+    onValueModified(checked, oldValue);
+  }
+
+  /*------------------------------
+   * 永続化辞書を値にバインドする
+   ------------------------------*/
+  function bindPersistentDictionary(dict) {
+    if (isAvoidDictionaryRegistration)
+      return;
+
+    if (name !== void) {
+      this.dict = dict;
+      value = dict.init(name, value);
+    }
+  }
+}
+
+/*----------------------------------------------------------------------
+ * ラジオメニューアイテム
+ ----------------------------------------------------------------------*/
+class KRadioMenuItem extends KMenuItem
+{
+  var dict;
+  var _value;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param window ウィンドウ
+   * @param caption キャプション
+   * @param value 値
+   * @param name 名前
+   ------------------------------*/
+  function KRadioMenuItem(window, caption, value, name) {
+    super.KMenuItem(window, caption, name);
+    _value = value;
+  }
+
+  /*------------------------------
+   * ファイナライザ
+   ------------------------------*/
+  function finalize {
+    if (dict && checked)
+      dict.set(name, _value);
+    super.finalize(...);
+  }
+
+  /*------------------------------
+   * 永続化辞書を値にバインドする
+   ------------------------------*/
+  function bindPersistentDictionary(dict) {
+    super.bindPersistentDictionary(dict);
+    if (isAvoidDictionaryRegistration)
+      return;
+    if (name !== void) {
+      this.dict = dict;
+      if (checked)
+	value = dict.init(name, _value);
+    }
+  }
+
+  /*------------------------------
+   * 親にaddされたら
+   ------------------------------*/
+  function onAddToParent(parent) {
+    var newGroup = 1;
+    
+    for (var i = 0; i < parent.children.count; i++) {
+      var child = parent.children[i];
+      if (child.radio) {
+	if (child.name == name) {
+	  group = child.group;
+	  radio = true;
+	  return;
+	} else {
+	  newGroup = Math.max(newGroup, child.group + 1);
+	}
+      }
+    }
+    
+    group = newGroup;
+    radio = true;
+    checked = true;
+  }
+
+  property value {
+    getter {
+      for (var i = 0; i < parent.children.count; i++) {
+	var child = parent.children[i];
+	if (child.radio
+	    && child.group == group
+	    && child.checked) {
+	  return child._value;
+	}
+      }
+      return void;
+    }
+    setter(v) {
+      for (var i = 0; i < parent.children.count; i++) {
+	var child = parent.children[i];
+	if (child.radio
+	    && child.group == group
+	    && child._value == v) {
+	  child.checked = true;
+	}
+      }
+    }
+  }
+
+  /**------------------------------
+   * イベントを発生させ強制的に現在の値を通知する。
+   ------------------------------*/
+  function invalidateValue {
+    if (enabled)
+      onValueModified(value);
+  }
+  
+  /*------------------------------
+   * メニューアイテムがクリックされた時に呼ばれる関数
+   * 
+   * valueを反転し、invalidateValueを呼ぶ
+   ------------------------------*/
+  function onClick {
+    var oldValue = value;
+    checked = true;
+    onValueModified(_value, oldValue);
+  }
+}
