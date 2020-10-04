@@ -13,7 +13,7 @@ and should be considered during parsing process.
 
 For such complex syntax [actions](https://github.com/antlr/antlr4/blob/master/doc/actions.md) and
 [predicates](https://github.com/antlr/antlr4/blob/master/doc/predicates.md) are
-used. This is a first grammar in repository with attempt to use an **universal**
+used. This is a second grammar in repository with attempt to use an **universal**
 actions and predicates. It works at least for **C#** and **Java** runtimes.
 
 Consider the `getter` rule in grammar:
@@ -27,7 +27,7 @@ getter
 Instruction `p("get")` stands for *get the previous token value and return a boolean
 value as a result of comparison to "get" string*.
 
-For **Java** runtime it described by the following code in [Java/TypeScriptBaseLexer.java](Java/TypeScriptBaseParser.java)
+For **Java** runtime it described by the following code in [Java/TypeScriptLexerBase.java](Java/TypeScriptLexerBase.java)
 
 ```Java
 protected boolean prev(String str) {
@@ -36,12 +36,12 @@ protected boolean prev(String str) {
 ```
 
 For **C#** runtime by Sam Harwell it described by 
-[CSharpSharwell/TypeScriptBaseParser.cs](CSharpSharwell/TypeScriptBaseParser.cs)
+[CSharp/TypeScriptParserBase.cs](CSharp/TypeScriptParserBase.cs)
 
 ```CSharp
 protected bool prev(string str)
 {
-    return _input.Lt(-1).Text.Equals(str);
+    return _input.LT(-1).Text.Equals(str);
 }
 ```
 

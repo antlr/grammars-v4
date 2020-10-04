@@ -3041,7 +3041,7 @@ asterisk
     ;
 
 column_elem
-    : (table_name '.')? (column_name=id | '$' IDENTITY | '$' ROWGUID) as_column_alias?
+    : ((table_name '.')? (column_name=id | '$' IDENTITY | '$' ROWGUID) | NULL) as_column_alias?
     ;
 
 udt_elem
@@ -3703,6 +3703,7 @@ simple_id
     | CRYPTOGRAPHIC
     | CURSOR_CLOSE_ON_COMMIT
     | CURSOR_DEFAULT
+    | DATA
     | DATA_COMPRESSION
     | DATE_CORRELATION_OPTIMIZATION
     | DATEADD
@@ -3971,12 +3972,14 @@ simple_id
     | SECONDARY_ROLE
     | SECONDS
     | SECRET
+    | SECURITY
     | SECURITY_LOG
     | SEEDING_MODE
     | SELF
     | SEMI_SENSITIVE
     | SEND
     | SENT
+    | SEQUENCE
     | SERIALIZABLE
     | SERVER
     | SESSION_TIMEOUT
@@ -4012,6 +4015,7 @@ simple_id
     | SYMMETRIC
     | SYNCHRONOUS_COMMIT
     | SYNONYM
+    | SYSTEM
     | TAKE
     | TARGET
     | TARGET_RECOVERY_TIME

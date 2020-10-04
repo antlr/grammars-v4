@@ -1,0 +1,22 @@
+{
+  /* play with comments
+  {  true, NaN   ] , {}* / aaa{}
+
+
+  // make sure we included all \p{L},
+  yes, json5, and ECMAScript 5+ supports them
+//*/
+  全世界无产者: "联合起来",
+  n1: 1.e2,
+  n2: .2e-4,
+  // May not works in some poor IDE
+  // but works in official parser
+  Infinity: -Infinity,
+  NaN: -NaN,
+  true: true,
+  false: false,
+  // yes, it works in their parser too
+  \u4e00: "Unicode!",
+}
+
+// comment ends with eof

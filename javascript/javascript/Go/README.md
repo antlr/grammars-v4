@@ -14,7 +14,7 @@ manually in order to have no compiler errors.
 
 **The runtime error** is caused by a nil pointer dereference, to fix this go to the generated file
 `javascript_lexer.go` and go to line 623, then remove the pointer `*` that's preceding
-`JavaScriptBaseLexer`.
+`JavaScriptLexerBase`.
 
 The cause for this is that ANTLR4 automatically adds a pointer to the embedded `superClass` inside
 `[GrammarName]Lexer` (`JavaScriptLexer` in this case) for the Go language. This behaviour is expected 

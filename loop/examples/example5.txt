@@ -1,0 +1,4 @@
+xj := 0;
+LOOP xi DO
+  xj := xj + 1
+END

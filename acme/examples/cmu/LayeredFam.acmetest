@@ -1,0 +1,125 @@
+Family LayeredFam = {
+    Property Type requestProtocolT = Enum { PC, RPC, MSG, HTTP, SQL, ODBC }; 
+    
+    Port Type layerPortT = {
+        Property synchronous : boolean << default : boolean = true;  >>;
+        
+        Property protocol : requestProtocolT << default : requestProtocolT = PC;  >>;
+        
+    }
+    
+    
+    Port Type receiveRequestT extends layerPortT with {
+    }
+    
+    
+    Port Type sendRequestT extends layerPortT with {
+    }
+    
+    
+    Component Type layerT = {
+        Port upperPort : receiveRequestT =  new receiveRequestT extended with {
+            Property protocol : requestProtocolT << default : requestProtocolT = PC;  >>;
+            Property synchronous : boolean << default : boolean = true;  >>;
+        };
+        
+        
+        Port lowerPort : sendRequestT =  new sendRequestT extended with {
+            Property protocol : requestProtocolT << default : requestProtocolT = PC;  >>;
+            Property synchronous : boolean << default : boolean = true;  >>;
+        };
+        
+        
+        Property layerLevel : int << default : int = 10;  >>;
+        
+        Property handlesAsynchRequests : boolean << default : boolean = false;  >>;
+        
+        Property multiThreaded : boolean << default : boolean = false;  >>;
+        
+        invariant Forall p : port in self.ports | 
+            declaresType(p, layerPortT) ;
+        
+        invariant Forall p : layerPortT in self.ports | 
+            (p.synchronous == false) -> self.handlesAsynchRequests ;
+        
+    }
+    
+    
+    Role Type interLayerRoleT = {
+        Property synchronous : boolean << default : boolean = true;  >>;
+        
+        Property protocol : requestProtocolT << default : requestProtocolT = PC;  >>;
+        
+    }
+    
+    
+    Role Type upperRoleT extends interLayerRoleT with {
+    }
+    
+    
+    Role Type lowerRoleT extends interLayerRoleT with {
+    }
+    
+    
+    Connector Type interLayerRequestT = {
+        Role requestSender : upperRoleT =  new upperRoleT extended with {
+            Property protocol : requestProtocolT;
+            Property synchronous : boolean << default : boolean = true;  >>;
+        };
+        
+        
+        Role requestReceiver : lowerRoleT =  new lowerRoleT extended with {
+            Property protocol : requestProtocolT;
+            Property synchronous : boolean << default : boolean = true;  >>;
+        };
+        
+        
+        Property synchronous : boolean << default : boolean = true;  >>;
+        
+        invariant size(self.roles) == 2;
+        
+        invariant (synchronous == requestSender.synchronous) AND (synchronous == requestReceiver.synchronous);
+        
+    }
+    
+    
+    Connector Type synchInterLayerRequestT extends interLayerRequestT with {
+        Role requestSender : upperRoleT =  new upperRoleT extended with {
+            Property synchronous : boolean = true;
+        };
+        
+        Role requestReceiver : lowerRoleT =  new lowerRoleT extended with {
+            Property synchronous : boolean = true;
+        };
+
+        Property synchronous : boolean = true;
+    }
+    
+    
+    Connector Type asynchInterLayerRequestT extends interLayerRequestT with {
+        Role requestSender : upperRoleT =  new upperRoleT extended with {
+            Property synchronous : boolean = false;
+        };
+        
+        Role requestReceiver : lowerRoleT =  new lowerRoleT extended with {
+            Property synchronous : boolean = false;
+        };
+
+        Property synchronous : boolean = false;
+    }
+    
+    
+    invariant Forall c : component in self.components | 
+        declaresType(c, layerT) AND satisfiesType(c, layerT) ;
+    
+    invariant Forall c : connector in self.connectors | 
+        declaresType(c, interLayerRequestT) AND satisfiesType(c, interLayerRequestT) ;
+    
+    invariant Forall l : layerT in self.components | 
+        Forall p : layerPortT in l.ports | 
+            Forall i : interLayerRequestT in self.connectors | 
+                Forall r : interLayerRoleT in i.roles | 
+                    attached(p, r) -> (((declaresType(p, receiveRequestT) AND declaresType(r, lowerRoleT)) OR (declaresType(p, sendRequestT) AND declaresType(r, upperRoleT))) AND (p.synchronous == r.synchronous))    ;
+    
+}
+
