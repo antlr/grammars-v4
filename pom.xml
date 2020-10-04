@@ -166,8 +166,9 @@
 				<module>muddb</module>
 				<module>mumath</module>
 				<module>mumps</module>
-				<module>muparser</module>				
-				<module>oberon</module>				
+				<module>muparser</module>
+                <module>nanofuck</module>
+                <module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
 				<module>p</module>
