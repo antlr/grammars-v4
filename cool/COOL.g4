@@ -42,7 +42,7 @@ classDefine
    ;
 
 feature
-   : OBJECTID '(' (formal (',' formal)*)* ')' ':' TYPEID '{' expression '}' # method
+   : OBJECTID '(' (formal (',' formal)*)? ')' ':' TYPEID '{' expression '}' # method
    | OBJECTID ':' TYPEID (ASSIGNMENT expression)? # property
    ;
 
@@ -53,8 +53,8 @@ formal
    
    
 expression
-   : expression ('@' TYPEID)? '.' OBJECTID '(' (expression (',' expression)*)* ')' # methodCall
-   | OBJECTID '(' (expression (',' expression)*)* ')' # ownMethodCall
+   : expression ('@' TYPEID)? '.' OBJECTID '(' (expression (',' expression)*)? ')' # methodCall
+   | OBJECTID '(' (expression (',' expression)*)? ')' # ownMethodCall
    | IF expression THEN expression ELSE expression FI # if
    | WHILE expression LOOP expression POOL # while
    | '{' (expression ';')+ '}' # block

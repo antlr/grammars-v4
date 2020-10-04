@@ -1,23 +1,23 @@
 /*
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2014 by Domagoj Kovačević
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * 
+ *
  * Project : cql-parser; an ANTLR4 grammar for Apache Cassandra CQL  https://github.com/kdcro101cql-parser
  */
 
@@ -170,8 +170,8 @@ materializedViewOptions
 // CREATE MATERIALIZED VIEW [IF NOT EXISTS] [keyspace_name.] view_name
 // AS SELECT column_list
 // FROM [keyspace_name.] base_table_name
-// WHERE column_name IS NOT NULL [AND column_name IS NOT NULL ...] 
-//       [AND relation...] 
+// WHERE column_name IS NOT NULL [AND column_name IS NOT NULL ...]
+//       [AND relation...]
 // PRIMARY KEY ( column_list )
 // [WITH [table_properties]
 //       [AND CLUSTERING ORDER BY (cluster_column_name order_option )]]
@@ -200,7 +200,7 @@ createAggregate
    ;
 
 // paramList
-// : 
+// :
 initCondDefinition
    : constant
    | initCondList
@@ -422,12 +422,12 @@ columnDefinitionList
    : (columnDefinition) (syntaxComma columnDefinition)* (syntaxComma primaryKeyElement)?
    ;
 
-//  
+//
 columnDefinition
    : column dataType primaryKeyColumn?
    ;
 
-// 
+//
 primaryKeyColumn
    : kwPrimary kwKey
    ;
@@ -582,7 +582,7 @@ assignmentElement
    ;
 
 assignmentSet
-   : syntaxBracketLc constant (syntaxComma constant)* syntaxBracketRc
+   : syntaxBracketLc (constant (syntaxComma constant)*)?  syntaxBracketRc
    ;
 
 assignmentMap
@@ -590,11 +590,18 @@ assignmentMap
    ;
 
 assignmentList
-   : syntaxBracketLs constant (syntaxColon constant)* syntaxBracketRs
+   : syntaxBracketLs constant (syntaxComma constant)* syntaxBracketRs
+   ;
+
+assignmentTuple
+   : syntaxBracketLr (
+         constant ((syntaxComma constant)* | (syntaxComma assignmentTuple)*) |
+         assignmentTuple (syntaxComma assignmentTuple)*
+     ) syntaxBracketRr
    ;
 
 insert
-   : (beginBatch |) kwInsert kwInto (keyspace DOT |) table insertColumnSpec insertValuesSpec (ifNotExist |) usingTtlTimestamp?
+   : beginBatch? kwInsert kwInto (keyspace DOT)? table insertColumnSpec? insertValuesSpec ifNotExist? usingTtlTimestamp?
    ;
 
 usingTtlTimestamp
@@ -626,6 +633,7 @@ ifExist
 
 insertValuesSpec
    : kwValues '(' expressionList ')'
+   | kwJson constant
    ;
 
 insertColumnSpec
@@ -637,11 +645,19 @@ columnList
    ;
 
 expressionList
-   : (constant | assignmentMap | assignmentSet | assignmentList) (syntaxComma (constant | assignmentMap | assignmentSet | assignmentList))*
+   : expression (syntaxComma expression)*
+   ;
+
+expression
+   : constant
+   | assignmentMap
+   | assignmentSet
+   | assignmentList
+   | assignmentTuple
    ;
 
 select
-   : kwSelect (distinctSpec |) selectElements fromSpec whereSpec? orderSpec? limitSpec? allowFilteringSpec?
+   : kwSelect distinctSpec? kwJson? selectElements fromSpec whereSpec? orderSpec? limitSpec? allowFilteringSpec?
    ;
 
 allowFilteringSpec
@@ -697,6 +713,8 @@ relationElement
    | functionCall (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) constant
    | functionCall (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) functionCall
    | OBJECT_NAME kwIn '(' functionArgs? ')'
+   | '(' OBJECT_NAME (syntaxComma OBJECT_NAME)* ')' kwIn '(' assignmentTuple (syntaxComma assignmentTuple)* ')'
+   | '(' OBJECT_NAME (syntaxComma OBJECT_NAME)* ')' (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) ( assignmentTuple (syntaxComma assignmentTuple)* )
    | relalationContainsKey
    | relalationContains
    ;
@@ -722,8 +740,10 @@ constant
    : UUID
    | stringLiteral
    | decimalLiteral
+   | floatLiteral
    | hexadecimalLiteral
    | booleanLiteral
+   | codeBlock
    | kwNull
    ;
 
@@ -1029,6 +1049,10 @@ kwInto
 
 kwIs
    : K_IS
+   ;
+
+kwJson
+   : K_JSON
    ;
 
 kwKey

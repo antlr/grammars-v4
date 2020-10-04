@@ -51,11 +51,21 @@ packageStatement
 //
 
 option
-    :   'option' optionName '=' constant ';'
+    :   'option' optionName '=' (constant | optionBody)  ';'
     ;
 
 optionName
-    :   (Ident | '(' fullIdent ')' ) ('.' Ident)*
+    :   (Ident | '(' fullIdent ')' ) ('.' (Ident | reservedWord))*
+    ;
+
+optionBody
+    : '{'
+        (optionBodyVariable)*
+      '}'
+    ;
+
+optionBodyVariable
+    : optionName ':' constant
     ;
 
 //
@@ -65,6 +75,7 @@ optionName
 topLevelDef
    :   message
    |   enumDefinition
+   |   extend
    |   service
    ;
 
@@ -78,6 +89,7 @@ messageBody
     :   '{' (   field
             |   enumDefinition
             |   message
+            |   extend
             |   option
             |   oneof
             |   mapField
@@ -109,6 +121,19 @@ enumValueOption
     :   optionName '=' constant
     ;
 
+// Extend definition
+//
+// NB: not defined in the spec but supported by protoc and covered by protobuf3 tests
+//     see e.g. php/tests/proto/test_import_descriptor_proto.proto
+//     of https://github.com/protocolbuffers/protobuf
+//
+
+extend
+    :   'extend' messageType '{' ( field
+                                 | emptyStatement
+                                 ) '}'
+    ;
+
 // Service definition
 
 service
@@ -135,10 +160,10 @@ reserved
     ;
 
 ranges
-    :   range (',' range)*
+    :   rangeRule (',' rangeRule)*
     ;
 
-    range
+    rangeRule
     :   IntLit
     |   IntLit 'to' IntLit
     ;
@@ -151,7 +176,7 @@ fieldNames
 // Fields
 //
 
-type
+typeRule
     :   (   'double'
         |   'float'
         |   'int32'
@@ -178,7 +203,7 @@ fieldNumber
 // Normal field
 
 field
-    :   'repeated'? type fieldName '=' fieldNumber ('[' fieldOptions ']')? ';'
+    :   'repeated'? typeRule fieldName '=' fieldNumber ('[' fieldOptions ']')? ';'
     ;
 
 fieldOptions
@@ -196,13 +221,13 @@ oneof
     ;
 
 oneofField
-    :   type fieldName '=' fieldNumber ('[' fieldOptions ']')? ';'
+    :   typeRule fieldName '=' fieldNumber ('[' fieldOptions ']')? ';'
     ;
 
 // Map field
 
 mapField
-    :   'map' '<' keyType ',' type '>' mapName '=' fieldNumber ('[' fieldOptions ']')? ';'
+    :   'map' '<' keyType ',' typeRule '>' mapName '=' fieldNumber ('[' fieldOptions ']')? ';'
     ;
 
 keyType
@@ -221,9 +246,11 @@ keyType
     ;
 
 reservedWord
-    :   MESSAGE
+    :   EXTEND
+    |   MESSAGE
     |   OPTION
     |   PACKAGE
+    |   RPC
     |   SERVICE
     |   STREAM
     |   STRING
@@ -240,6 +267,7 @@ BOOL            : 'bool';
 BYTES           : 'bytes';
 DOUBLE          : 'double';
 ENUM            : 'enum';
+EXTEND          : 'extend';
 FIXED32         : 'fixed32';
 FIXED64         : 'fixed64';
 FLOAT           : 'float';
@@ -341,7 +369,7 @@ messageType
     ;
 
 messageOrEnumType
-    :   '.'? (Ident '.')* messageOrEnumName
+    :   '.'? ( (Ident | reservedWord) '.')* messageOrEnumName
     ;
 
 // Integer literals
