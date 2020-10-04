@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar robotalk;
 
 program
-   :  command* method*
+   : command* method*
    ;
 
 command
