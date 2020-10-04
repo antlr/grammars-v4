@@ -301,10 +301,10 @@ public class SwiftSupport {
         int start = tokens.index();
         String text = tokens.getText(Interval.of(start, stop));
         // System.out.println("text: '"+text+"', op: '"+op+"', text.equals(op): '"+text.equals(op)+"'");
-        
-        for (int i = 0; i <= stop; i++) {
-            // System.out.println("token["+i+"] = '"+tokens.getText(Interval.of(i, i))+"'");
-        }
+
+        // for (int i = 0; i <= stop; i++) {
+        //     System.out.println("token["+i+"] = '"+tokens.getText(Interval.of(i, i))+"'");
+        // }
         
         return text.equals(op);
     }
@@ -334,8 +334,8 @@ public class SwiftSupport {
             //System.out.println("to: '" + tokens.getText(Interval.of(indexTo, indexTo))+"', "+tokens.get(indexTo));
             //System.out.println("in_between: '" + tokens.getText(Interval.of(indexFrom, indexTo)));
             
-            if (tokens.getText(Interval.of(indexFrom, indexTo)).indexOf("\n") >= 0
-                || tokens.getText(Interval.of(indexFrom, indexTo)).indexOf(";") >= 0)
+            if (tokens.getText(Interval.of(indexFrom, indexTo)).contains("\n")
+                || tokens.getText(Interval.of(indexFrom, indexTo)).contains(";"))
             {
                 return true;
             } else {

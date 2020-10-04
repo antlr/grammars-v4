@@ -296,9 +296,12 @@ floatLiteral
     ;
 
 // ANNOTATIONS
+altAnnotationQualifiedName
+    : (IDENTIFIER DOT)* '@' IDENTIFIER
+    ;
 
 annotation
-    : '@' qualifiedName ('(' ( elementValuePairs | elementValue )? ')')?
+    : ('@' qualifiedName | altAnnotationQualifiedName) ('(' ( elementValuePairs | elementValue )? ')')?
     ;
 
 elementValuePairs

@@ -17,7 +17,7 @@ public class ZOperatorListener extends ZOperatorParserBaseListener {
 	private static final Map<Integer, Integer> relationMap = createRMap();
 
 	private static Map<Integer, Integer> createRMap() {
-		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>(11);
 		myMap.put(ZLexer.PRE, ZLexer.PREP);
 		myMap.put(ZLexer.POST, ZLexer.POSTP);
 		myMap.put(ZLexer.I, ZLexer.IP);
@@ -35,7 +35,7 @@ public class ZOperatorListener extends ZOperatorParserBaseListener {
 	private static final Map<Integer, Integer> functionMap = createFMap();
 
 	private static Map<Integer, Integer> createFMap() {
-		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>(11);
 		myMap.put(ZLexer.PRE, ZLexer.PRE);
 		myMap.put(ZLexer.POST, ZLexer.POST);
 		myMap.put(ZLexer.I, ZLexer.I);
@@ -53,7 +53,7 @@ public class ZOperatorListener extends ZOperatorParserBaseListener {
 	private static final Map<Integer, Integer> prefixMap = createPreMap();
 
 	private static Map<Integer, Integer> createPreMap() {
-		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>(4);
 		myMap.put(ZLexer.I, ZLexer.PRE);
 		myMap.put(ZLexer.L, ZLexer.L);
 		myMap.put(ZLexer.ER, ZLexer.ERE);
@@ -64,7 +64,7 @@ public class ZOperatorListener extends ZOperatorParserBaseListener {
 	private static final Map<Integer, Integer> postfixMap = createPostMap();
 
 	private static Map<Integer, Integer> createPostMap() {
-		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>(4);
 		myMap.put(ZLexer.I, ZLexer.POST);
 		myMap.put(ZLexer.L, ZLexer.EL);
 		myMap.put(ZLexer.ER, ZLexer.ER);
@@ -75,7 +75,7 @@ public class ZOperatorListener extends ZOperatorParserBaseListener {
 	private static final Map<Integer, Integer> infixMap = createInfixMap();
 
 	private static Map<Integer, Integer> createInfixMap() {
-		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>(4);
 		myMap.put(ZLexer.I, ZLexer.I);
 		myMap.put(ZLexer.L, ZLexer.EL);
 		myMap.put(ZLexer.ER, ZLexer.ERE);
@@ -86,7 +86,7 @@ public class ZOperatorListener extends ZOperatorParserBaseListener {
 	private static final Map<Integer, Integer> nofixMap = createNofixMap();
 
 	private static Map<Integer, Integer> createNofixMap() {
-		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> myMap = new HashMap<Integer, Integer>(4);
 		myMap.put(ZLexer.I, ZLexer.I); // symmetry, not actually used
 		myMap.put(ZLexer.L, ZLexer.L);
 		myMap.put(ZLexer.ER, ZLexer.ER);
@@ -179,7 +179,7 @@ public class ZOperatorListener extends ZOperatorParserBaseListener {
 	
 	@Override
 	public void exitAssoc(ZOperatorParser.AssocContext ctx) {
-		isRightAssoc = ctx.getText().equals("rightassoc");
+		isRightAssoc = "rightassoc".equals(ctx.getText());
 	}
 	
 	@Override

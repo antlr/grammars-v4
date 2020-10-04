@@ -113,6 +113,7 @@ class Rectangle extends Shape {
         super(id, x, y)
         // …
     }
+
     toString () {
         return "Rectangle > " + super.toString()
     }
@@ -135,6 +136,10 @@ class Circle extends Shape {
 
 class Rectangle extends Shape {
     // …
+    static contextTypes = {
+        router: PropTypes.object,
+    };
+
     static defaultRectangle () {
         return new Rectangle("default", 0, 0, 100, 100)
     }

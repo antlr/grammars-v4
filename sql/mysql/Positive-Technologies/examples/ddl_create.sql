@@ -2,6 +2,7 @@
 -- Create Table
 create table new_t  (like t1);
 create table log_table(row varchar(512));
+create table log_table(row character(512));
 create table ships(name varchar(255), class_id int, id int);
 create table ships_guns(guns_id int, ship_id int);
 create table guns(id int, power decimal(7,2), callibr decimal(10,3));
@@ -144,6 +145,7 @@ CREATE DEFINER=`ctlplane`@`%` TRIGGER `write_key_add` AFTER INSERT ON `sources` 
 BEGIN
 DECLARE i, n INT DEFAULT 0;
 SET n = JSON_LENGTH(CAST(CONVERT(NEW.write_keys USING utf8mb4) AS JSON));
+SET campaign_id = NEW.write_keys->>'$.campaign_id';
 WHILE i < n DO
 INSERT INTO source_id_write_key_mapping (source_id, write_key)
 VALUES (NEW.id, JSON_UNQUOTE(JSON_EXTRACT(CAST(CONVERT(NEW.write_keys USING utf8mb4) AS JSON), CONCAT('$[', i, ']'))))
@@ -152,6 +154,21 @@ ON DUPLICATE KEY UPDATE
        write_key  = JSON_UNQUOTE(JSON_EXTRACT(CAST(CONVERT(NEW.write_keys USING utf8mb4) AS JSON), CONCAT('$[', i, ']')));
 SET i = i + 1;
 END WHILE;
+END
+#end
+#begin
+-- Create trigger 5
+CREATE TRIGGER `rtl_trigger_before_update`
+BEFORE UPDATE
+ON all_student_educator FOR EACH ROW
+BEGIN
+    IF NEW.student_words_read_total is not null AND NEW.student_words_read_total >= 3 AND NEW.badge_3_words_read_flag = 0 THEN
+        SET
+        NEW.badge_flag = 1,
+        NEW.badge_student_total = NEW.badge_student_total + 1,
+        NEW.badge_datetime = now();
+        INSERT IGNORE INTO user_platform_badge (platform_badge_id, user_id) VALUES (3, NEW.student_id);
+    END IF;
 END
 #end
 #begin
@@ -183,4 +200,61 @@ RETURN
             SUBSTR(_uuid,  1, 8),
             SUBSTR(_uuid, 20, 4),
             SUBSTR(_uuid, 25) ))
+#end
+#begin
+-- From MariaDB 10.4.3, the JSON_VALID function is automatically used as a CHECK constraint for the JSON data type alias in order to ensure that a valid json document is inserted.
+-- src: https://mariadb.com/kb/en/json_valid/
+CREATE TABLE `global_priv` (
+    `Host` CHAR(60) COLLATE utf8_bin NOT NULL DEFAULT '',
+    `User` CHAR(80) COLLATE utf8_bin NOT NULL DEFAULT '',
+    `Privilege` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '{}' CHECK (json_valid(`Privilege`)),
+    PRIMARY KEY (`Host`,`User`)
+) ENGINE=Aria DEFAULT CHARSET=utf8 COLLATE=utf8_bin PAGE_CHECKSUM=1 COMMENT='Users and global privileges';
+#end
+#begin
+-- https://dev.mysql.com/doc/refman/8.0/en/json-validation-functions.html#json-validation-functions-constraints
+CREATE TABLE geo (
+    coordinate JSON,
+    CHECK(
+        JSON_SCHEMA_VALID(
+           '{
+               "type":"object",
+               "properties":{
+                 "latitude":{"type":"number", "minimum":-90, "maximum":90},
+                 "longitude":{"type":"number", "minimum":-180, "maximum":180}
+               },
+               "required": ["latitude", "longitude"]
+           }',
+           coordinate
+        )
+    )
+);
+#end
+#begin
+CREATE TABLE `tab1` (
+  f4 FLOAT4,
+  f8 FLOAT8,
+  i1 INT1,
+  i2 INT2,
+  i3 INT3,
+  i4 INT4,
+  i8 INT8,
+  lvb LONG VARBINARY,
+  lvc LONG VARCHAR,
+  lvcfull LONG BINARY CHARSET utf8 COLLATE utf8_bin,
+  l LONG,
+  mi MIDDLEINT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+#end
+#begin
+-- Create procedure
+-- The default value for local variables in a DECLARE statement should be an expression
+-- src: https://dev.mysql.com/doc/refman/5.7/en/declare-local-variable.html
+-- delimiter //
+CREATE PROCEDURE procedure1()
+BEGIN
+  DECLARE var1 INT unsigned default 1;
+  DECLARE var2 TIMESTAMP default CURRENT_TIMESTAMP;
+  DECLARE var3 INT unsigned default 2 + var1;
+END -- //-- delimiter ;
 #end
