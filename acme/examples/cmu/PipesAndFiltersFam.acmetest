@@ -1,0 +1,157 @@
+/* PipesAndFilters style to represent systems that have
+ * dataflow between 
+ 
+ 
+filters. 
+ */ 
+Family PipesAndFiltersFam = {
+    // First define the design vocabulary
+    // Define the flowpaths type
+    Property Type flowpathRecT = Record [
+        fromPt : string; 
+        toPt : string; 
+    ];
+    
+    // Define port and role types
+    Port Type inputT = {
+        Property protocol : string = "char input";
+        
+    }
+    
+    
+    Port Type outputT = {
+        Property protocol : string = "char output";
+        
+    }
+    
+    
+    Role Type sourceT = {
+        Property protocol : string = "char source";
+        
+    }
+    
+    
+    Role Type sinkT = {
+        Property protocol : string = "char sink";
+        
+    }
+    
+    
+    // Define component types
+    Component Type Filter = {
+        Port input : inputT =  new inputT extended with {
+            Property protocol : string = "char input";
+        };
+        
+        
+        Port output : outputT =  new outputT extended with {
+            Property protocol : string = "char output";
+        };
+        
+        
+        Property function : string;
+        
+        Property flowPaths : Set{flowpathRecT} << default : Set{flowpathRecT} = {[
+            fromPt : string = "input"; 
+            toPt : string = "output" ]};  >>;
+        
+        // constraint that limits the addition of other ports to input or output ports
+        invariant Forall p : port in self.Ports | 
+            satisfiesType(p, inputT) OR satisfiesType(p, outputT) <<label : string = "Only ports of type inputT or outputT are allowed";>>;
+        
+    }
+    
+    
+    Component Type BinaryFilter extends Filter with {
+        Property binary : string;
+        
+    }
+    
+    
+    Component Type DataSource = {
+        Port output : outputT =  new outputT extended with {
+            Property protocol : string = "char output";
+        };
+        
+        
+    }
+    
+    
+    Component Type DataSink = {
+        Port input : inputT =  new inputT extended with {
+            Property protocol : string = "char input";
+        };
+        
+        
+    }
+    
+    
+    // Define connector types
+    Connector Type Pipe = {
+        Role source : sourceT =  new sourceT extended with {
+            Property protocol : string = "char source";
+        };
+        
+        
+        Role sink : sinkT =  new sinkT extended with {
+            Property protocol : string = "char sink";
+        };
+        
+        
+        Property bufferSize : int << default : int = 0;  >>;
+        
+        Property flowPaths : Set{flowpathRecT} = {[
+            fromPt : string = "source"; 
+            toPt : string = "sink" ]};
+        
+        // invariants require that a Pipe have exactly 2 roles, and a buffer with
+ 
+        // positive capacity.
+ 
+        invariant size(self.roles) == 2<<label : string = "A pipe can only have two roles";>>;
+        
+        invariant self.bufferSize >= 0<<label : string = "The bufferSize is specified	";errMsg : string = "The buffersize must be specified, and be >=0";>>;
+        
+        // No roles should be dangling
+        invariant Forall r : role in self.roles | 
+            size(r.attachedPorts) > 0 <<label : string = "All roles are attached";errMsg : string = "There are dangling roles";>>;
+        
+    }
+    
+    
+    //
+ 
+    // Define abstract style-wide design analyses 
+ 
+    //
+ 
+    // Specify the design invariants and heuristics for systems built in this 
+ 
+    // style.
+ 
+    //
+ 
+    // only attach inputs to sinks and outputs to sources
+ 
+    invariant Forall comp : component in self.components | 
+        Forall conn : connector in self.connectors | 
+            Forall p : port in comp.ports | 
+                Forall r : role in conn.Roles | 
+                    attached(p, r) -> ((satisfiesType(p, outputT) AND satisfiesType(r, sinkT)) OR (satisfiesType(p, inputT) AND satisfiesType(r, sourceT)))    <<label : string = "Only attach ports of type inputT to roles of type sourceT, ports of type outputT to roles of type sinkT";>>;
+    
+    // no dangling roles
+    invariant Forall conn : connector in self.connectors | 
+        Forall r : role in conn.Roles | 
+            Exists comp : component in self.components | 
+                Exists p : port in comp.Ports | 
+                    attached(p, r)    <<label : string = "All roles are attached";errMsg : string = "There are dangling roles";>>;
+    
+    // flag unattached ports
+    heuristic Forall comp : component in self.components | 
+        Forall p : port in comp.Ports | 
+            Exists conn : connector in self.Connectors | 
+                Exists r : role in conn.Roles | 
+                    attached(p, r)    <<label : string = "There are no dangling ports";errMsg : string = "Some ports are unattached";>>;
+    
+}
+

@@ -32,11 +32,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar terraform;
 
 file
-   : (variable | block)+
+   : (local | module | output | provider | variable | data | resource)+
    ;
 
+resource
+   : 'resource' resourcetype name blockbody
+   ;
+
+data
+   : 'data' resourcetype name blockbody
+   ;
+
+provider
+  : 'provider' resourcetype blockbody
+  ;
+
+output
+  : 'output' name blockbody
+  ;
+
+local
+  : 'locals' blockbody
+  ;
+
+module
+  : 'module' name blockbody
+  ;
+
 variable
-   : 'variable' STRING blockbody
+   : 'variable' name blockbody
    ;
 
 block
@@ -45,6 +69,14 @@ block
 
 blocktype
    : IDENTIFIER
+   ;
+
+resourcetype
+   : STRING
+   ;
+
+name
+   : STRING
    ;
 
 label
@@ -64,7 +96,18 @@ identifier
    ;
 
 expression
-   : section ('.' section)*
+   : RESOURCEREFERENCE
+   | section
+   | expression OPERATOR expression
+   | LPAREN expression RPAREN
+   ;
+
+RESOURCEREFERENCE
+   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+ 
+   ;
+
+RESOURCEINDEX
+   : '[' [0-9]+ ']'
    ;
 
 section
@@ -75,13 +118,27 @@ section
 
 val
    : NULL
-   | NUMBER
+   | SIGNED_NUMBER
    | string
    | BOOL
    | IDENTIFIER index?
    | DESCRIPTION
    | filedecl
+   | functioncall
    | EOF_
+   ;
+
+functioncall
+   : functionname LPAREN functionarguments RPAREN
+   ;
+
+functionname
+   : IDENTIFIER
+   ;
+
+functionarguments
+   : //no arguments
+   | expression (',' expression)*
    ;
 
 index
@@ -107,6 +164,36 @@ string
 
 fragment DIGIT
    : [0-9]
+   ;
+
+SIGNED_NUMBER
+   : '+' NUMBER
+   | '-' NUMBER
+   | NUMBER
+   ;
+
+OPERATOR
+   : '*'
+   | '/'
+   | '%'
+   | '+'
+   | '-'
+   | '>'
+   | '>='
+   | '<'
+   | '<='
+   | '=='
+   | '!='
+   | '&&'
+   | '||'
+   ;
+
+LPAREN
+   : '('
+   ;
+
+RPAREN
+   : ')'
    ;
 
 EOF_
@@ -143,10 +230,13 @@ IDENTIFIER
    ;
 
 COMMENT
-   : ('#' | '//') ~ [\r\n]* -> skip
-   ;
+  : ('#' | '//') ~ [\r\n]* -> channel(HIDDEN)
+  ;
+
+BLOCKCOMMENT
+  : '/*' .*? '*/' -> channel(HIDDEN)
+  ;
 
 WS
    : [ \r\n\t]+ -> skip
    ;
-

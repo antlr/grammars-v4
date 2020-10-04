@@ -40,7 +40,7 @@
 					<entryPoint>file</entryPoint>
 					<grammarName>terraform</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
+					<exampleFiles>examples</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>

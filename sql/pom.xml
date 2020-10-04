@@ -13,6 +13,7 @@
     </parent>
 
 	<modules>
+		<module>hive</module>
 		<module>mysql</module>
 	<!--	<module>plsql</module>-->
 		<module>sqlite</module>
