@@ -255,7 +255,7 @@ namespace cppu
 
         OMultiTypeInterfaceContainerHelperVar(const OMultiTypeInterfaceContainerHelperVar &);
         OMultiTypeInterfaceContainerHelperVar &operator=(const OMultiTypeInterfaceContainerHelperVar &);
-    }
+    };
 
     template <class container, class keyType>
     struct OBroadcastHelperVar

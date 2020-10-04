@@ -1,6 +1,5 @@
 lexer grammar CPP14Lexer;
 
-
 MultiLineMacro:
 	'#' (~[\n]*? '\\' '\r'? '\n')+ ~ [\n]+ -> channel (HIDDEN);
 
@@ -62,7 +61,7 @@ Export: 'export';
 Extern: 'extern';
 
 //DO NOT RENAME - PYTHON NEEDS True and False
-False_: 'false';
+fragment FalseKeyword: 'false';
 
 Final: 'final';
 
@@ -133,7 +132,7 @@ Thread_local: 'thread_local';
 Throw: 'throw';
 
 //DO NOT RENAME - PYTHON NEEDS True and False
-True_: 'true';
+fragment TrueKeyword: 'true';
 
 Try: 'try';
 
@@ -214,10 +213,6 @@ AndAssign: '&=';
 
 OrAssign: '|=';
 
-LeftShiftAssign: '<' '<' '=';
-
-RightShiftAssign: '>' '>' '=';
-
 Equal: '==';
 
 NotEqual: '!=';
@@ -229,6 +224,7 @@ GreaterEqual: '>' '=';
 AndAnd: AndOperator | AndKeyword;
 
 AndOperator:'&&';
+
 AndKeyword: 'and';
 
 OrOr: '||' | 'or';
@@ -362,7 +358,7 @@ fragment Schar:
 fragment Rawstring:
 	'"' (~[\\\t\r\n])*? '(' .*? ')' (~[\\\t\r\n])*? '"';
 
-BooleanLiteral: False_ | True_;
+BooleanLiteral: FalseKeyword | TrueKeyword;
 
 PointerLiteral: Nullptr;
 
