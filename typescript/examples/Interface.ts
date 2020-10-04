@@ -11,6 +11,14 @@ interface IEmployee extends IPerson{
     getManagerName(number): string;
 }
 
+declare interface IRouteInfo {
+    path: string;
+    title: string;
+    icon: string;
+    class: string;
+    allowAnonymous: boolean;
+}
+
 
 class Employee implements IEmployee {
     empCode: number;
