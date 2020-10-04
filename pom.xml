@@ -133,7 +133,8 @@
 				<module>idl</module>
 				<module>inf</module>
 				<module>informix</module>
-				<module>iri</module>
+                <module>infosapient</module>
+                <module>iri</module>
                 <module>iso8601</module>
 				<module>istc</module>
 				<module>janus</module>
