@@ -40,19 +40,19 @@ statement
    ;
 
 parenstmt
-   : LPAREN statement? RPAREN
+   : LPAREN statement* RPAREN
    ;
 
 bracestmt
-   : LBRACE statement? RBRACE
+   : LBRACE statement* RBRACE
    ;
 
 bracketstmt
-   : LBRACK statement? RBRACK
+   : LBRACK statement* RBRACK
    ;
 
 gtltstmt
-   : LT statement? GT
+   : LT statement* GT
    ;
 
 LPAREN
