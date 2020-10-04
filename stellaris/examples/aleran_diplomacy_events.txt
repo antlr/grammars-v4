@@ -1,0 +1,1911 @@
+namespace = aleran_diplomacy
+
+country_event = {
+	id = aleran_diplomacy.1
+	#hide_window = yes
+	#is_triggered_only = yes
+	title = "aleran_diplomacy.1.name"
+	desc = "aleran_diplomacy.1.desc"
+	picture = GFX_evt_news_room
+	show_sound = event_default
+	
+	trigger = {
+		NOT = {has_country_flag = aleran_contact}
+		NOR = {
+			has_valid_civic = civic_machine_terminator
+			has_valid_civic = civic_machine_assimilator
+			has_valid_civic = civic_barbaric_despoilers
+			has_valid_civic = civic_hive_devouring_swarm
+			has_valid_civic = civic_fanatic_purifiers
+		}
+		NOT = {has_valid_civic = civic_dragon_gov}
+		is_ai = no
+		
+		any_country = {
+			has_valid_civic = civic_dragon_gov
+			 
+			has_established_contact = from
+				 
+			NOT = {has_casus_belli = {target = from type = cb_dragon}}
+			OR = {
+				is_friendly_to = FROM
+				is_cordial_to = FROM
+				is_protective_to = FROM
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 20
+	}
+	
+	immediate = {
+		set_country_flag = aleran_contact
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			
+		}
+		
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.2
+	#hide_window = yes
+	#is_triggered_only = yes
+	title = "aleran_diplomacy.2.name"
+	desc = "aleran_diplomacy.2.desc"
+	picture = GFX_evt_news_room
+	show_sound = event_default
+	
+	trigger = {
+		NOT = {has_country_flag = aleran_contact}
+		NOT = {has_valid_civic = civic_dragon_gov}
+		is_ai = no
+		
+		any_country = {
+			has_valid_civic = civic_dragon_gov
+			
+			has_established_contact = from
+			
+			has_casus_belli = {target = from type = cb_dragon}
+			NOR = {
+				from = {
+					has_ethic = ethic_fanatic_spiritualist
+				}
+				from = {
+					has_ethic = ethic_fanatic_militarist
+				}
+				from = {
+					has_ethic = ethic_fanatic_xenophobe
+				}
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 20
+	}
+	
+	immediate = {
+		set_country_flag = aleran_contact
+	}
+	
+	option = {
+		name = "aleran_diplomacy.2.click.a"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			set_country_flag = dismissed_aleran_threat
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.2.click.b"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.2.click.c"
+		trigger = {
+			NOR = {
+				has_valid_civic = civic_machine_terminator
+				has_valid_civic = civic_machine_assimilator
+				has_valid_civic = civic_barbaric_despoilers
+				has_valid_civic = civic_hive_devouring_swarm
+				has_valid_civic = civic_fanatic_purifiers
+			}
+		}
+		ai_chance = {
+			factor = 50
+		}
+		owner = {
+			set_country_flag = considering_aleran_ideas
+			add_modifier = {
+				modifier = considering_aleran_ideas
+				days = -1
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.3
+	#hide_window = yes
+	#is_triggered_only = yes
+	title = "aleran_diplomacy.3.name"
+	desc = "aleran_diplomacy.3.desc"
+	picture = GFX_evt_news_room
+	show_sound = event_default
+	
+	trigger = {
+		NOT = {has_country_flag = aleran_contact}
+		NOT = {has_valid_civic = civic_dragon_gov}
+		is_ai = no
+		
+		any_country = {
+			has_valid_civic = civic_dragon_gov
+			 
+			has_established_contact = from
+			
+			NOT = {has_casus_belli = {target = from type = cb_dragon}}
+			NOR = {
+				is_friendly_to = FROM
+				is_cordial_to = FROM
+				is_protective_to = FROM
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 20
+	}
+	
+	immediate = {
+		set_country_flag = aleran_contact
+	}
+	
+	option = {
+		name = "aleran_diplomacy.3.click.a"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			
+		}
+		
+	}
+	
+	option = {
+		name = "aleran_diplomacy.3.click.b"
+		trigger = {
+			owner = {
+				OR = {
+					has_ethic = ethic_militarist
+					has_ethic = ethic_egalitarian
+					has_ethic = ethic_spiritualist
+				}
+			}
+		}
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			set_country_flag = planning_aleran_attack
+		}
+		
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.4
+	#hide_window = yes
+	#is_triggered_only = yes
+	title = "aleran_diplomacy.4.name"
+	desc = "aleran_diplomacy.4.desc"
+	picture = GFX_evt_news_room
+	show_sound = event_default
+	
+	trigger = {
+		NOT = {has_country_flag = aleran_contact}
+		NOT = {has_valid_civic = civic_dragon_gov}
+		is_ai = no
+		
+		any_country = {
+			has_valid_civic = civic_dragon_gov
+			 
+			has_established_contact = from
+				 
+			has_casus_belli = {target = from type = cb_dragon}
+			OR = {
+				from = {
+					has_ethic = ethic_fanatic_spiritualist
+				}
+				from = {
+					has_ethic = ethic_fanatic_militarist
+				}
+				from = {
+					has_ethic = ethic_fanatic_xenophobe
+				}
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 20
+	}
+	
+	immediate = {
+		set_country_flag = aleran_contact
+	}
+	
+	option = {
+		name = "aleran_diplomacy.4.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			set_country_flag = dismissed_aleran_threat
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.100
+	hide_window = yes
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		years_passed >= 40
+		is_ai = yes
+		NOR = {
+			has_country_flag = following_peace_offer
+			has_country_flag = busy_with_khan
+		}
+		NOT = {
+			any_country = {
+				num_fleets > 1
+				OR = {
+					is_country_type = awakened_marauders
+					is_country_type = shroud
+					is_country_type = swarm
+					is_country_type = extradimensional
+					is_country_type = extradimensional_2
+					is_country_type = extradimensional_3
+					is_country_type = feral_prethoryn
+				}
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 600
+	}
+	
+	immediate = {
+		save_event_target_as = alerans
+		random_playable_country = {
+			limit = {
+				is_country_type = default
+				has_communications = root
+				#NOR = {
+				#	has_country_flag = aleran_cb_warning_rejected_l1
+				#	has_country_flag = aleran_cb_warning_rejected_l2
+				#	has_country_flag = aleran_cb_warning_rejected_l3
+				#}
+				NOR = {
+					has_country_flag = aleran_cb_warning_accepted
+					has_country_flag = aleran_war_offer_taken
+					has_country_flag = busy_with_khan
+				}
+				root = {
+					has_casus_belli = {
+						target = prev type = cb_dragon
+					}
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						has_valid_civic = civic_machine_terminator
+						has_valid_civic = civic_machine_assimilator
+						has_valid_civic = civic_barbaric_despoilers
+						has_valid_civic = civic_hive_devouring_swarm
+						has_valid_civic = civic_fanatic_purifiers
+					}
+				}
+				save_event_target_as = evil
+				if = {
+					limit = {
+						relative_power = {
+							who = event_target:alerans
+							category = fleet
+							value < superior
+						}
+					}
+					if = {
+						limit = {
+							has_country_flag = aleran_cb_warning_issued_evil
+							event_target:alerans = {is_at_war = no}
+						}
+						event_target:alerans = {
+							declare_war = {
+								target = prev
+								#name = <optional war name>
+								attacker_war_goal = wg_dragon
+							}
+						}
+						if = {
+							limit = {
+								has_ethic = ethic_gestalt_consciousness
+							}
+							country_event = { id = aleran_diplomacy.202 }
+						}
+						else = {
+							country_event = { id = aleran_diplomacy.201 }
+						}
+					}
+					else_if = {
+						limit = {
+							NOT = {has_country_flag = aleran_cb_warning_issued_evil}
+						}
+						set_country_flag = aleran_cb_warning_issued_evil
+						country_event = { id = aleran_diplomacy.200 }
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					NOR = {
+						has_country_flag = aleran_cb_warning_issued_l1
+						has_country_flag = aleran_cb_warning_issued_l2
+						has_country_flag = aleran_cb_warning_issued_l3
+					}
+				}
+				country_event = { id = aleran_diplomacy.101 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = aleran_cb_warning_issued_l1
+					NOR = {
+						has_country_flag = aleran_cb_warning_issued_l2
+						has_country_flag = aleran_cb_warning_issued_l3
+					}
+				}
+				country_event = { id = aleran_diplomacy.102 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = aleran_cb_warning_issued_l1
+					has_country_flag = aleran_cb_warning_issued_l2
+					NOT = {
+						has_country_flag = aleran_cb_warning_issued_l3
+					}
+					#shares border
+					any_system_within_border = {
+						event_target:alerans = {
+							any_system_within_border = {
+								has_hyperlane_to = prevprev
+							}
+						}
+					}
+				}
+				country_event = { id = aleran_diplomacy.103 }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.101
+	title = "aleran_diplomacy.101.name"
+	desc = "aleran_diplomacy.101.desc"
+	
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+	
+	immediate = {
+		set_country_flag = aleran_cb_warning_issued_l1
+	}
+	
+	option = {
+		name = "aleran_diplomacy.101.click.a"
+		custom_tooltip = aleran_diplomacy.101.a.tooltip
+		ai_chance = {
+			factor = 15
+		}
+		owner = {
+			#add_modifier = {
+			#	modifier = considering_aleran_ideas
+			#	days = -1
+			#}
+			country_event = { id = aleran_diplomacy.104 }
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.101.click.b"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+		
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.101.click.c"
+		custom_tooltip = aleran_diplomacy.101.c.tooltip
+		ai_chance = {
+			factor = 150
+		}
+		trigger = {
+			owner = {is_egalitarian = no}
+			OR = {
+				owner = {has_ethic = ethic_xenophobe}
+				owner = {has_ethic = ethic_fanatic_xenophobe}
+				owner = {has_ethic = ethic_fanatic_militarist}
+			}
+		}
+		owner = {
+			set_country_flag = aleran_cb_warning_rejected_l1
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.102
+	title = "aleran_diplomacy.102.name"
+	desc = "aleran_diplomacy.102.desc"
+	
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+	
+	immediate = {
+		set_country_flag = aleran_cb_warning_issued_l2
+	}
+	
+	option = {
+		name = "aleran_diplomacy.102.click.a"
+		custom_tooltip = aleran_diplomacy.102.a.tooltip
+		ai_chance = {
+			factor = 15
+		}
+		owner = {
+			country_event = { id = aleran_diplomacy.104 }
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.102.click.b"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.102.click.c"
+		custom_tooltip = aleran_diplomacy.102.c.tooltip
+		ai_chance = {
+			factor = 150
+		}
+		trigger = {
+			owner = {is_egalitarian = no}
+			OR = {
+				owner = {has_ethic = ethic_xenophobe}
+				owner = {has_ethic = ethic_fanatic_xenophobe}
+				owner = {has_ethic = ethic_fanatic_militarist}
+			}
+		}
+		owner = {
+			set_country_flag = aleran_cb_warning_rejected_l2
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.103
+	title = "aleran_diplomacy.103.name"
+	desc = "aleran_diplomacy.103.desc"
+	
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+	
+	immediate = {
+		set_country_flag = aleran_cb_warning_issued_l3
+		set_timed_country_flag = { flag = aleran_cb_war_timeout days = 60 } 
+	}
+	
+	option = {
+		name = "aleran_diplomacy.103.click.a"
+		custom_tooltip = aleran_diplomacy.103.a.tooltip
+		ai_chance = {
+			factor = 15
+		}
+		owner = {
+			country_event = { id = aleran_diplomacy.104 }
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.103.click.b"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.103.click.c"
+		custom_tooltip = aleran_diplomacy.103.c.tooltip
+		ai_chance = {
+			factor = 150
+		}
+		trigger = {
+			owner = {is_egalitarian = no}
+			OR = {
+				owner = {has_ethic = ethic_xenophobe}
+				owner = {has_ethic = ethic_fanatic_xenophobe}
+				owner = {has_ethic = ethic_fanatic_militarist}
+			}
+		}
+		owner = {
+			set_country_flag = aleran_cb_warning_rejected_l3
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.104
+	is_triggered_only = yes
+	#title = "aleran_diplomacy.104.name"
+	#desc = "aleran_diplomacy.104.desc"
+	#picture = GFX_evt_arguing_senate
+	#show_sound = event_factions
+	hide_window = yes
+	
+	immediate = {
+		set_country_flag = aleran_cb_warning_accepted
+		remove_country_flag = dismissed_aleran_threat
+		
+		owner = {
+		
+			save_event_target_as = us
+			random_country = {
+				limit = {
+					has_valid_civic = civic_dragon_gov
+				}
+				save_event_target_as = alerans
+			}
+		
+			copy_ethos_and_authority = event_target:alerans
+			change_government = {
+				civics = {
+					civic = civic_dragon_listened
+					civic = civic_free_haven
+				}
+			}
+			#copy Aleran policies
+			set_policy = { policy = slavery option = slavery_not_allowed cooldown = no }
+			set_policy = { policy = purge option = purge_not_allowed cooldown = no }
+			set_policy = { policy = pre_sapients option = pre_sapients_protect cooldown = no }
+			set_policy = { policy = artificial_intelligence_policy option = ai_full_rights cooldown = no }
+			set_policy = { policy = first_contact_protocol option = first_contact_attack_not_allowed cooldown = no }
+			set_policy = { policy = resettlement option = resettlement_allowed cooldown = no }
+			set_policy = { policy = enlightenment option = enlightenment_allowed cooldown = no }
+			set_policy = { policy = orbital_bombardment option = orbital_bombardment_selective cooldown = no }
+			every_owned_pop_species = {
+			 	set_citizenship_type = { country = event_target:us type = citizenship_full cooldown = no } 
+			 	set_slavery_type = { country = event_target:us type = slavery_domestic cooldown = no } 
+			 	set_living_standard = { country = event_target:us type = living_standard_good cooldown = no }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.105
+	hide_window = yes
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_at_war = no
+		is_ai = yes
+		NOR = {
+			has_country_flag = following_peace_offer
+			has_country_flag = busy_with_khan
+		}
+		NOT = {
+			any_country = {
+				num_fleets > 1
+				OR = {
+					is_country_type = awakened_marauders
+					is_country_type = shroud
+					is_country_type = swarm
+					is_country_type = extradimensional
+					is_country_type = extradimensional_2
+					is_country_type = extradimensional_3
+					is_country_type = feral_prethoryn
+				}
+			}
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 100
+	}
+	
+	immediate = {
+		save_event_target_as = alerans
+		random_playable_country = {
+			limit = {
+				is_country_type = default
+				has_communications = root
+				root = {
+					has_casus_belli = {
+						target = prev type = cb_dragon
+					}
+				}
+				NOR = {
+					has_country_flag = aleran_cb_warning_accepted
+					has_country_flag = aleran_cb_war_timeout
+				}
+				NOR = {
+					has_country_flag = aleran_war_offer_taken
+					has_country_flag = aleran_war_khan_offer_taken
+				}
+				#NOT = { is_at_war_with = event_target:alerans }
+				has_country_flag = aleran_cb_warning_issued_l3
+				relative_power = {
+					who = prev
+					category = fleet
+					value <= superior
+				}
+			}
+			random = {
+				chance = 2
+				event_target:alerans = {
+					declare_war = {
+						target = prev
+						#name = <optional war name>
+						attacker_war_goal = wg_dragon
+					}
+				}
+				random_list = {
+					10 = { country_event = { id = aleran_diplomacy.1001 } }
+					10 = { country_event = { id = aleran_diplomacy.1002 } }
+					10 = { country_event = { id = aleran_diplomacy.1003 } }
+					10 = { country_event = { id = aleran_diplomacy.1004 } }
+					10 = { country_event = { id = aleran_diplomacy.1005 } }
+				} 
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.108
+	hide_window = yes
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_at_war = no
+		is_ai = yes
+		#NOT = {has_country_flag = following_peace_offer}
+		NOT = {has_country_flag = busy_with_khan}
+	}
+
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	immediate = {
+		save_event_target_as = alerans
+		capital_scope = {
+			solar_system = {
+				save_event_target_as = aleris
+			}
+		}
+		random_playable_country = {
+			limit = {
+				is_country_type = default
+				is_ai = no
+				has_communications = event_target:alerans
+				NOT = {is_at_war_with = event_target:alerans}
+				any_owned_pop = {
+					NOR = {
+						pop_has_ethic = ethic_gestalt_consciousness
+						pop_has_trait = trait_hive_mind
+						pop_has_trait = trait_machine_unit
+						#pop_has_trait = trait_mechanical
+					}
+					OR = {
+						is_enslaved = yes
+						is_being_purged = yes
+					}
+				}
+			}
+			event_target:alerans = {
+				declare_war = {
+					target = prev
+					#name = <optional war name>
+					attacker_war_goal = wg_dragon
+				}
+			}
+			every_owned_pop = {
+				limit = {
+					OR = {
+						is_enslaved = yes
+						is_being_purged = yes
+					}
+				}
+				planet = {
+					if = {
+						limit = {
+							NOT = {has_planet_flag = aleran_intervention}
+						}
+						set_timed_planet_flag = {flag = aleran_intervention days = 400}
+						
+						create_fleet = {
+							effect = {
+								set_owner = event_target:alerans
+								
+								while = {
+									count = 24
+									create_ship = {
+										name = random
+										random_existing_design = corvette
+									}
+								}
+								
+								while = {
+									count = 12
+									create_ship = {
+										name = random
+										random_existing_design = destroyer
+									}
+								}
+								
+								while = {
+									count = 6
+									create_ship = {
+										name = random
+										random_existing_design = cruiser
+									}
+								}
+								
+								while = {
+									count = 3
+									create_ship = {
+										name = random
+										random_existing_design = battleship
+									}
+								}
+								
+								while = {
+									count = 1
+									create_ship = {
+										name = random
+										random_existing_design = titan
+									}
+								}
+								
+								set_location = event_target:aleris
+								set_fleet_stance = aggressive
+								set_aggro_range_measure_from = self
+								set_aggro_range = 100
+								queue_actions = {
+									repeat = {
+										move_to = prev
+									}
+								}
+							}
+						}
+						
+					}
+				}
+			}
+			country_event = { id = aleran_diplomacy.500 }
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.107
+	hide_window = yes
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_ai = yes
+		is_at_war = no
+		NOT = {has_country_flag = busy_with_khan}
+	}
+
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	immediate = {
+		save_event_target_as = alerans
+		capital_scope = {
+			solar_system = {
+				save_event_target_as = aleris
+			}
+		}
+		random_playable_country = {
+			limit = {
+				is_country_type = default
+				is_ai = no
+				has_communications = event_target:alerans
+				NOT = {is_at_war_with = event_target:alerans}
+				any_owned_pop = {
+					NOR = {
+						pop_has_ethic = ethic_gestalt_consciousness
+						pop_has_trait = trait_hive_mind
+						pop_has_trait = trait_machine_unit
+						#pop_has_trait = trait_mechanical
+					}
+					OR = {
+						is_enslaved = yes
+						is_being_purged = yes
+					}
+				}
+				relative_power = {
+					who = prev
+					category = fleet
+					value < overwhelming
+				}
+			}
+			event_target:alerans = {
+				declare_war = {
+					target = prev
+					#name = <optional war name>
+					attacker_war_goal = wg_dragon
+				}
+			}
+			random_owned_pop = {
+				limit = {
+					NOR = {
+						has_ethic = ethic_gestalt_consciousness
+						pop_has_trait = trait_hive_mind
+						pop_has_trait = trait_machine_unit
+						#pop_has_trait = trait_mechanical
+					}
+					OR = {
+						is_enslaved = yes
+						is_being_purged = yes
+					}
+				}
+				save_event_target_as = sufferer
+				prev = {
+					if = {
+						limit = {
+							has_country_flag = aleran_promised_no_war_crimes
+						}
+						country_event = { id = aleran_diplomacy.501 }
+					}
+					else = {
+						country_event = { id = aleran_diplomacy.500 }
+					}
+				}
+			}
+			#country_event = { id = aleran_diplomacy.500 }
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.200
+	title = "aleran_diplomacy.200.name"
+	desc = "aleran_diplomacy.200.desc"
+	#hide_window = yes
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+	
+	option = {
+		name = "aleran_diplomacy.200.click"
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.201
+	title = "aleran_diplomacy.201.name"
+	desc = "aleran_diplomacy.201.desc"
+	#hide_window = yes
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+	
+	option = {
+		name = "aleran_diplomacy.201.click"
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.202
+	title = "aleran_diplomacy.202.name"
+	desc = "aleran_diplomacy.202.desc"
+	#hide_window = yes
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+	
+	option = {
+		name = "aleran_diplomacy.202.click"
+	}
+}
+
+pop_event = { #This = Pop scope, From = Planet
+	id = aleran_diplomacy.400
+	hide_window = yes
+	is_triggered_only = yes
+	
+	#trigger = {
+	#	has_valid_civic = civic_dragon_gov
+	#	is_at_war = no
+	#}
+
+	#mean_time_to_happen = {
+	#	days = 30
+	#}
+	
+	immediate = {
+		owner = {
+			save_event_target_as = purger
+			random_country = {
+				limit = {
+					is_country_type = default
+					is_ai = yes
+					has_communications = event_target:purger
+					has_valid_civic = civic_dragon_gov
+					#is_at_war = no
+				}
+				save_event_target_as = alerans
+				event_target:alerans = {
+					declare_war = {
+						target = purger
+						#name = <optional war name>
+						attacker_war_goal = wg_dragon
+					}
+				}
+				random_list = {
+					10 = { country_event = { id = aleran_diplomacy.1001 } }
+					10 = { country_event = { id = aleran_diplomacy.1002 } }
+					10 = { country_event = { id = aleran_diplomacy.1003 } }
+					10 = { country_event = { id = aleran_diplomacy.1004 } }
+					10 = { country_event = { id = aleran_diplomacy.1005 } }
+				} 
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1001
+	title = "aleran_diplomacy.1001.name"
+	desc = "aleran_diplomacy.1001.desc"
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = event_target:alerans
+		planet_background = event_target:alerans
+		graphical_culture = event_target:alerans
+		city_level = event_target:alerans
+		room = event_target:alerans.ruler
+	}
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1001.click.a"
+
+		event_target:alerans = {
+			hidden_effect = { 
+				add_modifier = {
+					modifier = aleran_war_anticocky
+					days = 300
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1001.click.b"
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1002
+	title = "aleran_diplomacy.1002.name"
+	desc = "aleran_diplomacy.1002.desc"
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = event_target:alerans
+		planet_background = event_target:alerans
+		graphical_culture = event_target:alerans
+		city_level = event_target:alerans
+		room = event_target:alerans.ruler
+	}
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1002.click.a"
+
+		event_target:alerans = {
+			hidden_effect = { 
+				add_modifier = {
+					modifier = aleran_war_anticocky
+					days = 300
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1002.click.b"
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1003
+	title = "aleran_diplomacy.1003.name"
+	desc = "aleran_diplomacy.1003.desc"
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = event_target:alerans
+		planet_background = event_target:alerans
+		graphical_culture = event_target:alerans
+		city_level = event_target:alerans
+		room = event_target:alerans.ruler
+	}
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1003.click.a"
+
+		event_target:alerans = {
+			hidden_effect = { 
+				add_modifier = {
+					modifier = aleran_war_anticocky
+					days = 300
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1003.click.b"
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1004
+	title = "aleran_diplomacy.1004.name"
+	desc = "aleran_diplomacy.1004.desc"
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = event_target:alerans
+		planet_background = event_target:alerans
+		graphical_culture = event_target:alerans
+		city_level = event_target:alerans
+		room = event_target:alerans.ruler
+	}
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1004.click.a"
+
+		event_target:alerans = {
+			hidden_effect = { 
+				add_modifier = {
+					modifier = aleran_war_anticocky
+					days = 300
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1004.click.b"
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1005
+	title = "aleran_diplomacy.1005.name"
+	desc = "aleran_diplomacy.1005.desc"
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = event_target:alerans
+		planet_background = event_target:alerans
+		graphical_culture = event_target:alerans
+		city_level = event_target:alerans
+		room = event_target:alerans.ruler
+	}
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1005.click.a"
+
+		event_target:alerans = {
+			hidden_effect = { 
+				add_modifier = {
+					modifier = aleran_war_anticocky
+					days = 300
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1005.click.b"
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.500
+	title = "aleran_diplomacy.500.name"
+	desc = "aleran_diplomacy.500.desc"
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = event_target:alerans
+		planet_background = event_target:alerans
+		graphical_culture = event_target:alerans
+		city_level = event_target:alerans
+		room = event_target:alerans.ruler
+	}
+	
+	immediate = {
+		event_target:alerans = {
+			hidden_effect = { 
+				add_modifier = {
+					modifier = aleran_war_anticocky
+					days = 300
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.500.click"
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.501
+	title = "aleran_diplomacy.501.name"
+	desc = "aleran_diplomacy.501.desc"
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = event_target:alerans
+		planet_background = event_target:alerans
+		graphical_culture = event_target:alerans
+		city_level = event_target:alerans
+		room = event_target:alerans.ruler
+	}
+	
+	immediate = {
+		event_target:alerans = {
+			hidden_effect = { 
+				add_modifier = {
+					modifier = aleran_war_anticocky
+					days = 450
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.501.click"
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.800
+	hide_window = yes
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_ai = yes
+	}
+
+	mean_time_to_happen = {
+		days = 90
+	}
+	
+	immediate = {
+		save_event_target_as = alerans
+		random_playable_country = {
+			limit = {
+				NOT = {is_at_war_with = event_target:alerans}
+				is_at_war = yes
+				is_ai = no
+				NOT = {has_country_flag = aleran_war_behavior_warned}
+			}
+			random_country = {
+				limit = {
+					is_at_war_with = prev
+					
+					#not a hated empire
+					NOR = {
+						has_valid_civic = civic_machine_terminator
+						has_valid_civic = civic_machine_assimilator
+						has_valid_civic = civic_barbaric_despoilers
+						has_valid_civic = civic_hive_devouring_swarm
+						has_valid_civic = civic_fanatic_purifiers
+					}
+				}
+				save_event_target_as = defender
+				
+				prev = {
+					set_timed_country_flag = { flag = aleran_war_behavior_warned days = 1200 } 
+					country_event = { id = aleran_diplomacy.801 }	
+				}
+			}		
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.801
+	title = "aleran_diplomacy.801.name"
+	desc = "aleran_diplomacy.801.desc"
+	#hide_window = yes
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+	
+	option = {
+		name = "aleran_diplomacy.801.click.a"
+		owner = {
+			set_timed_country_flag = { flag = aleran_promised_no_war_crimes days = 1200 } 
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.801.click.b"
+		owner = {
+			set_timed_country_flag = { flag = aleran_may_war_crimes days = 1200 }
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1200
+	hide_window = yes
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_at_war = yes
+		is_ai = yes
+		#has_federation = yes
+		is_war_leader = no
+	}
+
+	mean_time_to_happen = {
+		days = 10
+	}
+	
+	immediate = {
+		#log = "Running 1600"
+		save_event_target_as = alerans
+		every_war_attacker = { 
+			limit = {
+				NOT = {is_at_war_with = event_target:alerans}
+			}
+			set_war_goal = { type = wg_humiliate target = event_target:defender enemy = event_target:alerans } 
+			#remove_claims = { who = <country> num_of_claims = x } 
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1210
+	hide_window = yes
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_at_war = yes
+		is_ai = yes
+		NOT = {has_country_flag = following_peace_offer}
+	}
+
+	mean_time_to_happen = {
+		days = 120
+	}
+	
+	immediate = {
+		#log = "Running 1610"
+		save_event_target_as = alerans
+		capital_scope = {
+			save_event_target_as = alera
+			solar_system = {
+				save_event_target_as = aleris
+			}
+		}
+		random_playable_country = {
+			limit = {
+				is_ai = no
+				is_at_war_with = event_target:alerans
+				NOR = {
+					has_valid_civic = civic_machine_terminator
+					has_valid_civic = civic_machine_assimilator
+					has_valid_civic = civic_barbaric_despoilers
+					has_valid_civic = civic_hive_devouring_swarm
+					has_valid_civic = civic_fanatic_purifiers
+				}
+				NOR = {
+					has_country_flag = aleran_war_easy_offer
+					has_country_flag = aleran_war_offer_taken
+					has_country_flag = aleran_war_khan_offer_taken
+				}
+				relative_power = {
+					who = prev
+					category = fleet
+					value < equivalent
+				}
+				def_war_exhaustion_sum >= 0.4
+				count_system_within_border = {
+					count >= 3
+					any_planet = {
+					 	is_occupied_flag = yes
+					}
+				}
+			}
+			#log = "Running 1611 on [this.GetName]"
+			set_timed_country_flag = { flag = aleran_war_easy_offer days = 600 } 
+			country_event = { id = aleran_diplomacy.1211 }
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1211
+	title = "aleran_diplomacy.1211.name"
+	desc = "aleran_diplomacy.1211.desc"
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1211.click.a"
+		custom_tooltip = aleran_diplomacy.1211.a.tooltip
+		hidden_effect = { 
+			owner = {
+				every_system_within_border = {
+					remove_claims = { who = event_target:alerans } 
+				}
+				set_timed_country_flag = { flag = aleran_war_offer_taken days = 15000 }  #50y
+				every_country = {
+					limit = { 	
+						OR = {
+							is_same_value = event_target:alerans
+							is_in_federation_with = event_target:alerans 
+							AND = {
+								is_subject = yes
+								exists = overlord
+								overlord = { is_same_value = event_target:alerans }
+							}
+						}
+					}
+					country_event = { id = aleran_diplomacy.1212 }
+					set_timed_country_flag = { flag = following_peace_offer days = 3000 } 
+				}
+				set_policy = { policy = slavery option = slavery_not_allowed cooldown = no }
+				set_policy = { policy = purge option = purge_not_allowed cooldown = no }
+				set_policy = { policy = pre_sapients option = pre_sapients_protect cooldown = no }
+				set_policy = { policy = artificial_intelligence_policy option = ai_full_rights cooldown = no }
+				set_policy = { policy = first_contact_protocol option = first_contact_attack_not_allowed cooldown = no }
+				set_policy = { policy = resettlement option = resettlement_allowed cooldown = no }
+				set_policy = { policy = enlightenment option = enlightenment_allowed cooldown = no }
+				set_policy = { policy = orbital_bombardment option = orbital_bombardment_selective cooldown = no }
+				every_owned_pop_species = {
+					set_citizenship_type = { country = from type = citizenship_full cooldown = no } 
+					set_slavery_type = { country = from type = slavery_domestic cooldown = no } 
+					set_living_standard = { country = from type = living_standard_good cooldown = no }
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1211.click.b"
+		custom_tooltip = aleran_diplomacy.1211.b.tooltip
+		event_target:alerans = {
+			hidden_effect = { 
+				add_modifier = {
+					modifier = aleran_war_anticocky
+					days = 900
+				}
+			}	
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1213
+	hide_window = yes
+	
+	trigger = {
+		has_country_flag = following_peace_offer
+	}
+
+	mean_time_to_happen = {
+		days = 20
+	}
+	
+	immediate = {
+		capital_scope = {
+			save_event_target_as = alera
+			solar_system = {
+				save_event_target_as = aleris
+			}
+		}
+		country_event = { id = aleran_diplomacy.1212 }
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1212
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		set_war_goal = { type = wg_moralize target = event_target:defender enemy = event_target:alerans }
+		every_owned_fleet = {
+			limit = {
+				any_owned_ship = {
+					is_ship_class = shipclass_military
+				}
+			}
+			#order_forced_return = yes
+			#auto_move_to_planet = { target = event_target:alera clear_auto_move_on_arrival = yes } 
+			queue_actions = {
+				repeat = {
+					find_closest_system = {
+						trigger = {
+							id = "aleran.truce.1"
+							is_same_value = event_target:aleris
+						}
+						found_system = {
+							move_to = THIS
+						}
+					}
+					find_closest_planet = {
+						trigger = {
+							id = "aleran.truce.2"
+							is_same_value = event_target:alera
+						}
+						found_planet = {
+							orbit_planet = THIS
+							wait = {
+								duration = 400
+								random = 150
+							}
+						}
+					}
+				}
+			}
+		}
+		every_owned_army = {
+			#order_forced_return = yes
+			#auto_move_to_planet = { target = event_target:alera clear_auto_move_on_arrival = yes } 
+		}
+		add_static_war_exhaustion = {
+			attacker = event_target:alerans
+			location = event_target:aleris
+			value_for_planet_destruction = 1.0
+		}
+		add_static_war_exhaustion = {
+			attacker = event_target:alerans
+			location = event_target:defender.capital_scope
+			value_for_planet_destruction = 1.0
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1220
+	hide_window = yes
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_at_war = yes
+		is_ai = yes
+		any_country = {
+		 	num_fleets > 1
+			OR = {
+				is_country_type = awakened_marauders
+				is_country_type = shroud
+				is_country_type = swarm
+				is_country_type = extradimensional
+				is_country_type = extradimensional_2
+				is_country_type = extradimensional_3
+				is_country_type = feral_prethoryn
+			}
+		}
+		NOT = {has_country_flag = following_khan_offer}
+	}
+
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	immediate = {
+		#log = "Running 1620"
+		save_event_target_as = alerans
+		capital_scope = {
+			save_event_target_as = alera
+			solar_system = {
+				save_event_target_as = aleris
+			}
+		}
+		random_playable_country = {
+			limit = {
+				is_ai = no
+				is_at_war_with = event_target:alerans
+				NOR = {
+					has_valid_civic = civic_machine_terminator
+					has_valid_civic = civic_machine_assimilator
+					has_valid_civic = civic_barbaric_despoilers
+					has_valid_civic = civic_hive_devouring_swarm
+					has_valid_civic = civic_fanatic_purifiers
+				}
+				NOR = {
+					has_country_flag = aleran_war_khan_offer
+					has_country_flag = aleran_war_khan_offer_taken
+				}
+			}
+			#log = "Running 1621 on [this.GetName]"
+			set_timed_country_flag = { flag = aleran_war_khan_offer days = 1200 } 
+			country_event = { id = aleran_diplomacy.1221 }
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1221
+	title = "aleran_diplomacy.1221.name"
+	desc = "aleran_diplomacy.1221.desc"
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1221.click.a"
+		custom_tooltip = aleran_diplomacy.1221.a.tooltip
+		hidden_effect = { 
+			owner = {
+				every_system_within_border = {
+					remove_claims = { who = event_target:alerans } 
+				}
+				set_timed_country_flag = { flag = aleran_war_khan_offer_taken days = 3000 } 
+				every_country = {
+					limit = { 	
+						OR = {
+							is_same_value = event_target:alerans
+							is_in_federation_with = event_target:alerans 
+							AND = {
+								is_subject = yes
+								exists = overlord
+								overlord = { is_same_value = event_target:alerans }
+							}
+						}
+					}
+					country_event = { id = aleran_diplomacy.1222 }
+					set_timed_country_flag = { flag = following_khan_offer days = 3000 } 
+			
+					add_modifier = {
+						modifier = aleran_dangerfight
+						days = 600
+					}
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1221.click.b"
+		custom_tooltip = aleran_diplomacy.1221.b.tooltip
+		event_target:alerans = {
+			hidden_effect = { 
+				add_modifier = {
+					modifier = aleran_war_anticocky
+					days = 900
+				}
+			}	
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1222
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		set_war_goal = { type = wg_moralize target = event_target:defender enemy = event_target:alerans }
+		every_owned_fleet = {
+			limit = {
+				any_owned_ship = {
+					is_ship_class = shipclass_military
+				}
+			}
+			
+			solar_system = {
+				save_event_target_as = here
+			}
+			clear_fleet_actions = this
+			
+			set_fleet_stance = aggressive
+			set_aggro_range_measure_from = self
+			set_aggro_range = 150
+
+			queue_actions = {
+				repeat = {
+					find_closest_system = {
+						trigger = {
+							id = "aleran.dangerfight.1"
+							NOT = {is_same_value = event_target:here}
+							any_ship_in_system = {
+								space_owner = {
+									OR = {
+										is_country_type = awakened_marauders
+										is_country_type = shroud
+										is_country_type = swarm
+										is_country_type = extradimensional
+										is_country_type = extradimensional_2
+										is_country_type = extradimensional_3
+										is_country_type = feral_prethoryn
+									}
+								}
+							}
+						}
+						found_system = {
+							move_to = THIS
+						}
+					}
+					#find_closest_planet = {
+					#	trigger = {
+					#		id = "pirate.1.trigger.4"
+					#		is_planet = event_target:pirate_home
+					#	}
+					#	found_planet = {
+					#		orbit_planet = THIS
+					#		wait = {
+					#			duration = 200
+					#			random = 150
+					#		}
+					#	}
+					#}
+				}
+			}
+		}
+		every_owned_army = {
+			#order_forced_return = yes
+			#auto_move_to_planet = { target = event_target:alera clear_auto_move_on_arrival = yes } 
+		}
+		add_static_war_exhaustion = {
+			attacker = event_target:alerans
+			location = event_target:aleris
+			value_for_planet_destruction = 1.0
+		}
+		add_static_war_exhaustion = {
+			attacker = event_target:alerans
+			location = event_target:defender.capital_scope
+			value_for_planet_destruction = 1.0
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1223
+	hide_window = yes
+	
+	trigger = {
+		has_country_flag = following_khan_offer
+	}
+
+	mean_time_to_happen = {
+		days = 20
+	}
+	
+	immediate = {
+		country_event = { id = aleran_diplomacy.1222 }
+	}
+}
+
+
+
+country_event = {
+	id = aleran_diplomacy.1230
+	hide_window = yes
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_at_war = no
+		is_ai = yes
+		any_country = {
+		 	num_fleets > 1
+			OR = {
+				is_country_type = awakened_marauders
+				is_country_type = shroud
+				is_country_type = swarm
+				is_country_type = extradimensional
+				is_country_type = extradimensional_2
+				is_country_type = extradimensional_3
+				is_country_type = feral_prethoryn
+			}
+		}
+		NOT = {
+			has_country_flag = busy_with_khan
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 90
+	}
+	
+	immediate = {
+		#log = "Running 1630"
+		save_event_target_as = alerans
+		capital_scope = {
+			save_event_target_as = alera
+			solar_system = {
+				save_event_target_as = aleris
+			}
+		}
+		set_timed_country_flag = { flag = busy_with_khan days = 3000 } 
+		every_country = {
+			limit = {
+				is_country_type = default
+				is_ai = no
+				NOR = {
+					has_valid_civic = civic_machine_terminator
+					has_valid_civic = civic_machine_assimilator
+					has_valid_civic = civic_barbaric_despoilers
+					has_valid_civic = civic_hive_devouring_swarm
+					has_valid_civic = civic_fanatic_purifiers
+				}
+				NOR = {
+					has_country_flag = aleran_war_khan_offer_taken
+					has_country_flag = busy_with_khan
+				}
+			}
+			#log = "Running 1631 on [this.GetName]"
+			set_timed_country_flag = { flag = busy_with_khan days = 3000 } 
+			country_event = { id = aleran_diplomacy.1231 }
+		}
+	}
+}
+
+country_event = {
+	id = aleran_diplomacy.1231
+	title = "aleran_diplomacy.1231.name"
+	desc = "aleran_diplomacy.1231.desc"
+	is_triggered_only = yes
+	diplomatic = yes
+	
+	picture_event_data = {
+		portrait = from
+		planet_background = from
+		graphical_culture = from
+		city_level = from
+		room = from.ruler
+	}
+	
+	option = {
+		name = "aleran_diplomacy.1231.click"
+	}
+}
