@@ -32,7 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar terraform;
 
 file
-   : (local | module | output | provider | variable | data | resource)+
+   : (local | module | output | provider | variable | data | resource | terraform)+
+   ;
+
+terraform
+   : 'terraform' blockbody
    ;
 
 resource
