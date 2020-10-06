@@ -104,6 +104,7 @@ expression
    | section
    | expression OPERATOR expression
    | LPAREN expression RPAREN
+   | expression '?' expression ':' expression
    ;
 
 RESOURCEREFERENCE
