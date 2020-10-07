@@ -105,8 +105,13 @@ expression
    | expression OPERATOR expression
    | LPAREN expression RPAREN
    | expression '?' expression ':' expression
+   | forloop
    ;
 
+forloop
+   : 'for' identifier 'in' expression ':' expression
+   ;
+   
 RESOURCEREFERENCE
    : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+
    ;
