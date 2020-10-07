@@ -105,10 +105,11 @@ expression
    | expression OPERATOR expression
    | LPAREN expression RPAREN
    | expression '?' expression ':' expression
+   | map
    ;
 
 RESOURCEREFERENCE
-   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+ 
+   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+
    ;
 
 RESOURCEINDEX
@@ -159,7 +160,7 @@ list
    ;
 
 map
-   : '{' argument* '}'
+   : '{' argument* (',' argument)* '}'
    ;
 
 string
@@ -191,6 +192,14 @@ OPERATOR
    | '!='
    | '&&'
    | '||'
+   ;
+
+LCURL
+   : '{'
+   ;
+
+RCURL
+   : '}'
    ;
 
 LPAREN
