@@ -156,6 +156,7 @@ filedecl
 
 list
    : '[' expression (',' expression)* ','? ']'
+   | '[' ']'
    ;
 
 map
