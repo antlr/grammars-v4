@@ -105,7 +105,6 @@ expression
    | expression OPERATOR expression
    | LPAREN expression RPAREN
    | expression '?' expression ':' expression
-   | map
    ;
 
 RESOURCEREFERENCE
@@ -160,7 +159,7 @@ list
    ;
 
 map
-   : LCURL argument* (',' argument)* LCURL
+   : LCURL (argument ','?)* RCURL
    ;
 
 string
