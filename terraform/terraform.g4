@@ -88,7 +88,7 @@ label
    ;
 
 blockbody
-   : '{' (argument | block)* '}'
+   : LCURL (argument | block)* RCURL
    ;
 
 argument
@@ -160,7 +160,7 @@ list
    ;
 
 map
-   : '{' argument* (',' argument)* '}'
+   : LCURL argument* (',' argument)* LCURL
    ;
 
 string
