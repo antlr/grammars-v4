@@ -108,7 +108,7 @@ expression
    ;
 
 RESOURCEREFERENCE
-   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+ 
+   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+
    ;
 
 RESOURCEINDEX
@@ -155,8 +155,7 @@ filedecl
    ;
 
 list
-   : '[' expression (',' expression)* ','? ']'
-   | '[' ']'
+   : '[' (expression (',' expression)* ','?)? ']'
    ;
 
 map
