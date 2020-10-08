@@ -16,3 +16,11 @@ resource "aws_vpc_endpoint_service_allowed_principal" "vpce_producer_allowed_con
   vpc_endpoint_service_id = "this is an id"
   principal_arn           = local.vpce_consumer_arns[count.index]
 }
+
+module "a" {
+  source = "./module"
+}
+
+locals {
+  b = module.a.out
+}
