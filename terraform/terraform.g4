@@ -160,7 +160,7 @@ filedecl
    ;
 
 list
-   : '[' expression (',' expression)* ','? ']'
+   : '[' (expression (',' expression)* ','?)? ']'
    ;
 
 map
