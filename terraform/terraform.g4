@@ -95,10 +95,6 @@ argument
    : identifier '=' expression
    ;
 
-identifier
-   : IDENTIFIER
-   ;
-
 expression
    : RESOURCEREFERENCE index?
    | section
@@ -170,6 +166,11 @@ map
 string
    : STRING
    | MULTILINESTRING
+   ;
+
+identifier
+   : IDENTIFIER
+   | 'variable'
    ;
 
 fragment DIGIT
