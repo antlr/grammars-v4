@@ -100,8 +100,7 @@ identifier
    ;
 
 expression
-   : RESOURCEREFERENCE index?
-   | section
+   : section ('.' section)*
    | expression OPERATOR expression
    | LPAREN expression RPAREN
    | expression '?' expression ':' expression
@@ -112,18 +111,13 @@ forloop
    : 'for' identifier 'in' expression ':' expression
    ;
 
-RESOURCEREFERENCE
-   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+
-   ;
-
-RESOURCEINDEX
-   : '[' [0-9]+ ']'
-   ;
-
 section
    : list
    | map
    | val
+   | 'data'
+   | 'module'
+   | '*'
    ;
 
 val
