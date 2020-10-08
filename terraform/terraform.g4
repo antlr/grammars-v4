@@ -88,7 +88,7 @@ label
    ;
 
 blockbody
-   : '{' (argument | block)* '}'
+   : LCURL (argument | block)* RCURL
    ;
 
 argument
@@ -108,7 +108,7 @@ expression
    ;
 
 RESOURCEREFERENCE
-   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+ 
+   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+
    ;
 
 RESOURCEINDEX
@@ -159,7 +159,7 @@ list
    ;
 
 map
-   : '{' argument* '}'
+   : LCURL (argument ','?)* RCURL
    ;
 
 string
@@ -191,6 +191,14 @@ OPERATOR
    | '!='
    | '&&'
    | '||'
+   ;
+
+LCURL
+   : '{'
+   ;
+
+RCURL
+   : '}'
    ;
 
 LPAREN
