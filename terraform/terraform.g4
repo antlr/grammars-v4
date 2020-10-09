@@ -117,7 +117,8 @@ section
    | val
    | 'data'
    | 'module'
-   | '*'
+   | 'in'
+   | '*' -> section
    ;
 
 val
