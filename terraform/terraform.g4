@@ -64,7 +64,7 @@ module
   ;
 
 variable
-   : 'variable' name blockbody
+   : VARIABLE name blockbody
    ;
 
 block
@@ -95,25 +95,25 @@ argument
    : identifier '=' expression
    ;
 
+identifier
+   : (('local' | 'data' | 'var' | 'module') DOT)? identifierchain
+   ;
+
+identifierchain
+   : (IDENTIFIER | IN | VARIABLE) index? (DOT identifierchain)*
+   | STAR (DOT identifierchain)*
+   ;
+
 expression
-   : RESOURCEREFERENCE index?
-   | section
-   | expression OPERATOR expression
+   : section
+   | expression operator expression
    | LPAREN expression RPAREN
    | expression '?' expression ':' expression
    | forloop
    ;
 
 forloop
-   : 'for' identifier 'in' expression ':' expression
-   ;
-
-RESOURCEREFERENCE
-   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+
-   ;
-
-RESOURCEINDEX
-   : '[' [0-9]+ ']'
+   : 'for' identifier IN expression ':' expression
    ;
 
 section
@@ -126,8 +126,8 @@ val
    : NULL
    | SIGNED_NUMBER
    | string
+   | identifier
    | BOOL
-   | IDENTIFIER index?
    | DESCRIPTION
    | filedecl
    | functioncall
@@ -168,11 +168,6 @@ string
    | MULTILINESTRING
    ;
 
-identifier
-   : IDENTIFIER
-   | 'variable'
-   ;
-
 fragment DIGIT
    : [0-9]
    ;
@@ -183,9 +178,25 @@ SIGNED_NUMBER
    | NUMBER
    ;
 
-OPERATOR
+VARIABLE
+   : 'variable'
+   ;
+
+IN
+   : 'in'
+   ;
+
+STAR
    : '*'
-   | '/'
+   ;
+
+DOT
+   : '.'
+   ;
+
+operator
+   : '/'
+   | STAR
    | '%'
    | '+'
    | '-'
@@ -224,7 +235,7 @@ NULL
    ;
 
 NUMBER
-   : DIGIT+ ('.' DIGIT+)?
+   : DIGIT+ (DOT DIGIT+)?
    ;
 
 BOOL
