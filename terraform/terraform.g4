@@ -64,7 +64,7 @@ module
   ;
 
 variable
-   : 'variable' name blockbody
+   : VARIABLE name blockbody
    ;
 
 block
@@ -100,7 +100,7 @@ identifier
    ;
 
 identifierchain
-   : (IDENTIFIER | IN) index? (DOT identifierchain)*
+   : (IDENTIFIER | IN | VARIABLE) index? (DOT identifierchain)*
    | STAR (DOT identifierchain)*
    ;
 
@@ -168,11 +168,6 @@ string
    | MULTILINESTRING
    ;
 
-identifier
-   : IDENTIFIER
-   | 'variable'
-   ;
-
 fragment DIGIT
    : [0-9]
    ;
@@ -181,6 +176,10 @@ SIGNED_NUMBER
    : '+' NUMBER
    | '-' NUMBER
    | NUMBER
+   ;
+
+VARIABLE
+   : 'variable'
    ;
 
 IN
