@@ -168,6 +168,11 @@ string
    | MULTILINESTRING
    ;
 
+identifier
+   : IDENTIFIER
+   | 'variable'
+   ;
+
 fragment DIGIT
    : [0-9]
    ;
