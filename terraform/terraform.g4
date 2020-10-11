@@ -96,37 +96,42 @@ argument
    ;
 
 identifier
-   : IDENTIFIER
+   : (('local', 'data' | 'var' | 'module') DOT)? identifierchain
+   ;
+
+identifierchain
+   : (IDENTIFIER | IN) index? (DOT identifier_1)*
+   | STAR (DOT identifierchain)*
    ;
 
 expression
-   : section ('.' section)*
-   | expression OPERATOR expression
+   : section
+   | expression operator expression
    | LPAREN expression RPAREN
    | expression '?' expression ':' expression
    | forloop
    ;
 
+IN
+   : 'in'
+   ;
+
 forloop
-   : 'for' identifier 'in' expression ':' expression
+   : 'for' identifier IN expression ':' expression
    ;
 
 section
    : list
    | map
    | val
-   | 'data'
-   | 'module'
-   | 'in'
-   | '*' -> section
    ;
 
 val
    : NULL
    | SIGNED_NUMBER
    | string
+   | identifier
    | BOOL
-   | IDENTIFIER index?
    | DESCRIPTION
    | filedecl
    | functioncall
@@ -177,9 +182,17 @@ SIGNED_NUMBER
    | NUMBER
    ;
 
-OPERATOR
+STAR
    : '*'
-   | '/'
+   ;
+
+DOT
+   : '.'
+   ;
+
+operator
+   : '/'
+   | STAR
    | '%'
    | '+'
    | '-'
@@ -218,7 +231,7 @@ NULL
    ;
 
 NUMBER
-   : DIGIT+ ('.' DIGIT+)?
+   : DIGIT+ (DOT DIGIT+)?
    ;
 
 BOOL
