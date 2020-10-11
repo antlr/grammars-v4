@@ -8,6 +8,7 @@ resource "aws_instance" "main" {
 
 locals {
   vpce_consumer_arns = ["1", "2", "3"]
+  star_reference     = aws_vpc_endpoint_service_allowed_principal.vpce_producer_allowed_consumers.*.principal_arn
 }
 
 resource "aws_vpc_endpoint_service_allowed_principal" "vpce_producer_allowed_consumers" {
@@ -15,4 +16,12 @@ resource "aws_vpc_endpoint_service_allowed_principal" "vpce_producer_allowed_con
 
   vpc_endpoint_service_id = "this is an id"
   principal_arn           = local.vpce_consumer_arns[count.index]
+}
+
+module "a" {
+  source = "./module"
+}
+
+locals {
+  b = module.a.out
 }
