@@ -96,11 +96,11 @@ argument
    ;
 
 identifier
-   : (('local', 'data' | 'var' | 'module') DOT)? identifierchain
+   : (('local' | 'data' | 'var' | 'module') DOT)? identifierchain
    ;
 
 identifierchain
-   : (IDENTIFIER | IN) index? (DOT identifier_1)*
+   : (IDENTIFIER | IN) index? (DOT identifierchain)*
    | STAR (DOT identifierchain)*
    ;
 
@@ -110,10 +110,6 @@ expression
    | LPAREN expression RPAREN
    | expression '?' expression ':' expression
    | forloop
-   ;
-
-IN
-   : 'in'
    ;
 
 forloop
@@ -180,6 +176,10 @@ SIGNED_NUMBER
    : '+' NUMBER
    | '-' NUMBER
    | NUMBER
+   ;
+
+IN
+   : 'in'
    ;
 
 STAR
