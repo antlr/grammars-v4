@@ -220,6 +220,7 @@
 				<module>sharc</module>
 				<module>sickbay</module>
                 <module>sieve</module>
+                <module>simula</module>
 				<module>smalltalk</module>
 			    <module>smiles</module>
 				<module>smtlibv2</module>
