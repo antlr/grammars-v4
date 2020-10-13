@@ -35,503 +35,553 @@ LETTER:
  [a-zA-Z];
 DIGIT
 : [0-9];
-space
+SPACE
 : ' ';
 
 identifier
-: letter { letter | digit | _ };
-unsignednumber;
+: LETTER ( LETTER |DIGIT | '_' )*;
+unsignednumber
 
-: decimal-number [ exponent-part ]
-| exponent-part;
-decimal-number
-
-
-: unsigned-integer [ decimal-fraction ]
-| decimal-fraction;
-decimal-fraction
+: decimal_number  exponent_part ?
+| exponent_part;
+decimal_number
 
 
-: . unsigned-integer;
+: unsigned_integer  decimal_fraction ?
+| decimal_fraction;
+decimal_fraction
 
-exponent-part
-: ( & | && ) [ + | - ] unsigned-integer;
 
-unsigned-integer
-: digit { digit | _ }
-| radix R radix-digit { radix-digit | _ };
+: '.' unsigned_integer;
+
+exponent_part
+: ( '&' | '&&' ) ( '+' | '-' )? unsigned_integer;
+
+unsigned_integer
+: DIGIT (DIGIT | '_' )*
+| radix R radix_digit ( radix_digit | '_' )*;
 
 radix
 : '2' | '4' | '8' | '16';
 
-radix-digit
-: digit | 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+radix_digit
+: DIGIT | 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
 
 string
-: simple-string { string-separator simple-string };
+: simple_string ( string_separator simple_string )*;
 
-string-separator
-: token-separator { token-separator };
+string_separator
+: token_separator (token_sesparator )*;
 
-simple-string
-: " { ISO-code | non-quote-character | "" } ";
+simple_string
+: '"' ( ISO_code | non_quote_character | '""' )* '"';
 
-ISO-code
-: ! digit [ digit ] [ digit ] !;
+ISO_code
+: '!' DIGIT  DIGIT?   DIGIT?  '!';
 
-non-quote-character
-: any printing character (incl. space) except the string qoute ".;
+//non_quote_character
+//: any printing character (incl. space) except the string qoute '.;
 
-character-constant
-: '/'' character-designator '/'';
+character_constant
+: '\'' character_designator '\'';
 
-character-designator
-: ISO-code
-| non-quote-character
-| ";
+character_designator
+: ISO_code
+| non_quote_character
+| '"';
 
-format-effector
-: BS | HT | LF | VT | FF | CR;
+format_effector
+: 'BS' | 'HT' | 'LF' | 'VT' | 'FF' | 'CR';
 
-token-separator
-: a direct comment
-| a space (except in simple strings and character constants)
-| a format effector (except as noted for
-;
+//token_separator
+//: a direct comment
+//| a space (except in simple strings and character constants)
+//| a format effector (except as noted for
+//;
 
 type
-: value-type
-| reference-type
-value-type
-: arithmetic-type
-| boolean
-| character
-arithmetic-type
-: integer-type
-| real-type
-integer-type
-: [ short ] integer
-real-type
-: [ long ] real
-reference-type
-: object-reference-type
-| text
-object-reference-type
-: ref "(" qualification ")"
+: value_type
+| reference_type;
+
+
+value_type
+: arithmetic_type
+| 'boolean'
+| 'character';
+
+
+arithmetic_type
+: integer_type
+| real_type;
+
+
+integer_type
+:  'short'? 'integer';
+
+real_type
+:  'long'? 'real';
+
+reference_type
+: object_reference_type
+| 'text';
+
+object_reference_type
+: 'ref' '(' qualification ')';
+
 qualification
-: class-identifier
+: class_identifier;
 
 
 expression
-: value-expression
-| reference-expression
-| designational-expression
-value-expression
-: arithmetic-expression
-| Boolean-expression
-| character-expression
-reference-expression
-: object-expression
-| text-expression
-variable
-: simple-variable-1
-| subscripted-variable
-simple-variable-1
-: identifier-1
-subscripted-variable
-: array-identifier-1 "(" subscript-list ")"
-array-identifier-1
-: identifier-1
-subscript-list
-: subscript-expression { , subscript-expression }
-subscript-expression
-: arithmetic-expression
-function-designator
-: procedure-identifier-1 [ actual-parameter-part ]
-procedure-identifier-1
-: identifier-1
-actual-parameter-part
-: "(" actual-parameter { , actual-parameter } ")"
-actual-parameter
-: expression
-| array-identifier-1
-| switch-identifier
-| procedure-identifier-1
+: value_expression
+| reference_expression
+| designational_expression;
 
-identifier-1
+value_expression
+: arithmetic_expression
+| boolean_expression
+| character_expression;
+
+reference_expression
+: object_expression
+| text_expression;
+
+
+variable
+: simple_variable_1
+| subscripted_variable;
+
+simple_variable_1
+: identifier_1;
+
+
+subscripted_variable
+: array_identifier_1 '(' subscript_list ')';
+
+array_identifier_1
+: identifier_1;
+
+subscript_list
+: subscript_expression ( ',' subscript_expression )*;
+
+subscript_expression
+: arithmetic_expression;
+
+function_designator
+: procedure_identifier_1  actual_parameter_part ?;
+
+procedure_identifier_1
+: identifier_1;
+
+actual_parameter_part
+
+: '(' actual_parameter ( ',' actual_parameter )* ')';
+
+actual_parameter
+: expression
+| array_identifier_1
+| switch_identifier
+| procedure_identifier_1;
+
+identifier_1
 : identifier
-| remote-identifier
-remote-identifier
-: simple-object-expression . attribute-identifier
-| text-primary . attribute-identifier
-attribute-identifier
-: identifier
-Boolean-expression
-: simple-Boolean-expression
-| if-clause simple-Boolean-expression else Boolean-expression
-simple-Boolean-expression
-: Boolean-tertiary { or else Boolean-tertiary }
-Boolean-tertiary
-: equivalence { and then equivalence }
+| remote_identifier;
+
+remote_identifier
+: simple_object_expression . attribute_identifier
+| text_primary . attribute_identifier;
+
+
+attribute_identifier
+: identifier;
+
+boolean_expression
+: simple_boolean_expression
+| if_clause simple_boolean_expression 'else' boolean_expression;
+
+simple_boolean_expression
+: boolean_tertiary ( 'or' 'else' boolean_tertiary )*;
+
+boolean_tertiary
+: equivalence ( 'and' 'then' equivalence )*;
+
 equivalence
-: implication { eqv implication }
+: implication ( 'eqv' implication )*
+;
+
 implication
-: Boolean-term { imp Boolean-term }
-Boolean-term
-: Boolean-factor { or Boolean-factor }
-Boolean-factor
-: Boolean-secondary { and Boolean-secondary }
-Boolean-secondary
-: [ not ] Boolean-primary
-Boolean-primary
-: logical-value
+: boolean_term ( 'imp' boolean_term )*;
+boolean_term
+
+
+: boolean_factor ( 'or' boolean_factor )*;
+boolean_factor
+
+: boolean_secondary ( 'and' boolean_secondary )*;
+boolean_secondary
+:  'not'?  boolean_primary;
+
+boolean_primary
+: logical_value
 | variable
-| function-designator
+| function_designator
 | relation
-| "(" Boolean-expression ")"
+| '(' boolean_expression ')';
+
 relation
-: arithmetic-relation
-| character-relation
-| text-value-relation
-| object-relation
-| object-reference-relation
-| text-reference-relation
-value-relational-operator
-: < | <= | = | >= | > | <>
-reference-comparator
-= == | =/=
-arithmetic-relation
-: simple-arithmetic-expression
-value-relational-operator simple-arithmetic-expression
-character-relation
-: simple-character-expression
-value-relational-operator simple-character-expression
-text-value-relation
-: simple-text-expression
-value-relational-operator simple-text-expression
-object-relation
-: simple-object-expression is class-identifier
-| simple-object-expression in class-identifier
-object-reference-relation
-: simple-object-expression
-reference-comparator simple-object-expression
-text-reference-relation
-: simple-text-expression
-reference-comparator simple-text-expression
-arithmetic-expression
-: simple-arithmetic-expression
-| if-clause simple-arithmetic-expression
-else arithmetic-expression
-simple-arithmetic-expression
-: [ + | - ] term { ( + | - ) term }
+: arithmetic_relation
+| character_relation
+| text_value_relation
+| object_relation
+| object_reference_relation
+| text_reference_relation;
+
+value_relational_operator
+: '<' |' <=' | '=' | '>=' | '>' | '<>';
+reference_scomparator
+: '==' | '=/=';
+
+arithmetic_relation
+: simple_arithmetic_expression
+value_relational_operator simple_arithmetic_expression;
+
+character_relation
+: simple_character_expression
+value_relational_operator simple_character_expression
+;
+text_value_relation
+: simple_text_expression
+value_relational_operator simple_text_expression
+;
+
+object_relation
+: simple_object_expression 'is' class_identifier
+| simple_object_expression 'in' class_identifie
+;
+
+object_reference_relation
+: simple_object_expression
+reference_comparator simple_object_expression
+;
+
+text_reference_relation
+: simple_text_expression
+reference_comparator simple_text_expression
+;
+
+arithmetic_expression
+: simple_arithmetic_expression
+| if_clause simple_arithmetic_expression
+'else' arithmetic_expression
+;
+
+simple_arithmetic_expression
+: ( '+' | '-' )* term ( ( '+' | '-' ) term )*
+;
+
 term
-: factor { ( * | / | // ) factor }
+: factor ( ( '*' | '/' | '//' ) factor )*
+;
+
 factor
 
 
-: primary { ** primary }
-
+: primary ( '**' primary )*
+;
 
 primary
-: unsigned-number
+: unsigned_number
 | variable
-| function-designator
-| "(" arithmetic-expression ")"
-character-expression
-: simple-character-expression
-| if-clause simple-character-expression
-else character-expression
-simple-character-expression
-: character-constant
+| function_designator
+| '(' arithmetic_expression ')'
+;
+
+character_expression
+: simple_character_expression
+| if_clause simple_character_expression
+'else' character_expression
+;
+
+simple_character_expression
+: character_constant
 | variable
-| function-designator
-| "(" character-expression ")"
-text-expression
-: simple-text-expression
-| if-clause simple-text-expression else text-expression
-simple-text-expression
-: text-primary { & text-primary }
-text-primary
-: notext
+| function_designator
+| '(' character_expression ')'
+;
+
+text_expression
+: simple_text_expression
+| if_clause simple_text_expression 'else' text_expression
+;
+
+simple_text_expression
+: text_primary ( '&' text_primary )*
+;
+
+text_primary
+: 'notext'
 | string
 | variable
-| function-designator
-| "(" text-expression ")"
-object-expression
-: simple-object-expression
-| if-clause simple-object-expression else object-expression
-simple-object-expression
-: none
+| function_designator
+| '(' text_expression ')'
+;
+
+object_expression
+: simple_object_expression
+| if_clause simple_object_expression 'else' object_expression
+;
+
+simple_object_expression
+: 'none'
 | variable
-| function-designator
-| object-generator
-| local-object
-| qualified-object
-| "(" object-expression ")"
-object-generator
-: new class-identifier [ actual-parameter-part ]
-local-object
-: this class-identifier
-qualified-object
-: simple-object-expression qua class-identifier
-designational-expression
-: simple-designational-expression
-| if-clause simple-designational-expression
-else designational-expression
-simple-designational-expression
+| function_designator
+| object_generator
+| local_object
+| qualified_object
+| '(' object_expression ')'
+;
+
+object_generator
+: 'new' class_identifier  actual_parameter_part ?
+;
+
+local_object
+: 'this' class_identifier
+;
+
+qualified_object
+: simple_object_expression 'qua' class_identifier
+;
+
+designational_expression
+: simple_designational_expression
+| if_clause simple_designational_expression
+'else' designational_expression
+;
+
+simple_designational_expression
 : label
-| switch-designator
-| "(" designational-expression ")"
-switch-designator
-: switch-identifier "(" subscript-expression ")"
-switch-identifier
+| switch_designator
+| '(' designational_expression ')'
+;
+
+switch_designator
+: switch_identifier '(' subscript_expression ')'
+;
+
+switch_identifier
 : identifier
+;
 label
 : identifier
-
+;
 
 statement
-: { label : } unconditional-statement
-| { label : } conditional-statement
-| { label : } for-statement
-unconditional-statement
-: assignment-statement
-| while-statement
-| goto-statement
+: ( label ':' )* unconditional_statement
+| ( label ':' )* conditional_statement
+| ( label ':' )* for_statement
+;
 
-| procedure-statement
-| object-generator
-| connection-statement
-| compound-statement
+unconditional_statement
+: assignment_statement
+| while_statement
+| goto_statement
+| procedure_statement
+| object_generator
+| connection_statement
+| compound_statement
 | block
-| dummy-statement
-| activation-statement
-assignment-statement
-: value-assignment
-| reference-assignment
-value-assignment
-: value-left-part := value-right-part
-value-left-part
+| dummy_statement
+| activation_statement
+;
+
+assignment_statement
+: value_assignment
+| reference_assignment
+;
+
+value_assignment
+: value_left_part ':=' value_right_part
+;
+
+value_left_part
 : destination
-| simple-text-expression
-value-right-part
-: value-expression
-| text-expression
-| value-assignment
+| simple_text_expression
+;
+
+value_right_part
+: value_expression
+| text_expression
+| value_assignment
+;
+
 destination
-= variable
-| procedure-identifier
-reference-assignment
-= reference-left-part :- reference-right-part
-reference-left-part
-= destination
-reference-right-part
-= reference-expression
-| reference-assignment
-conditional-statement
-= if-clause { label : } unconditional-statement [ else statement ]
-| if-clause { label : } for-statement
-if-clause
-= if Boolean-expression then
-while-statement
-= while Boolean-expression do statement
-for-statement
-= for-clause statement
-for-clause
-= for simple-variable for-right-part do
-simple-variable
-= identifier
-for-right-part
-= := value-for-list-element { , value-for-list-element }
-= :- reference-for-list-element { , reference-for-list-element }
-value-for-list-element
-= value-expression [ while Boolean-expression ]
-| text-expression
-| arithmetic-expression
-step arithmetic-expression until arithmetic-expression
-reference-for-list-element
-= reference-expression [ while Boolean-expression ]
-goto-statement
-= ( goto | go to ) designational-expression
-procedure-statement
-= procedure-identifier-1 [ actual-parameter-part ]
-connection-statement
-= inspect object-expression when-clause { when-clause }
-[ otherwise-clause ]
-| inspect object-expression do connection-block-2
-[ otherwise-clause ]
-when-clause
-= when class-identifier do connection-block-1
-otherwise-clause
-= otherwise statement
-connection-block-1
-= statement
-connection-block-2
-= statement
+: variable
+| procedure_identifier;
 
-compound-statement
-= begin compound-tail
-compound-tail
-= statement { ; statement } end
+reference_assignment
+: reference_left_part ':-' reference_right_part;
+
+reference_left_part
+: destination;
+
+reference_right_part
+: reference_expression
+| reference_assignment;
+
+conditional_statement
+: if_clause ( label ':' )* unconditional_statement ( 'else' statement )?
+| if_clause ( label ':' )* for_statement
+;
+
+if_clause
+: 'if' boolean_expression 'then'
+;
+
+while_statement
+: 'while' boolean_expression 'do' statement
+;
+
+for_statement
+: for_clause statement
+;
+
+for_clause
+: 'for' simple_variable for_right_part 'do'
+;
+
+simple_variable
+: identifier
+;
+
+for_right_part
+: ':=' value_for_list_element ( ',' value_for_list_element )*
+'=' ':-' reference_for_list_element ( ',' reference_for_list_element )*;
+
+value_for_list_element
+: value_expression ( 'while' boolean_expression )?
+| text_expression
+| arithmetic_expression
+'step' arithmetic_expression 'until' arithmetic_expression
+;
+
+reference_for_list_element
+: reference_expression ( 'while' boolean_expression )?
+;
+
+goto_statement
+: ( 'goto' | ('go' 'to') ) designational_expression
+;
+
+procedure_statement
+: procedure_identifier_1 ( actual_parameter_part )?
+;
+
+connection_statement
+: 'inspect' object_expression when_clause  when_clause *
+ otherwise_clause ?
+| 'inspect' object_expression 'do' connection_block_2
+ otherwise_clause ?
+;
+
+when_clause
+: 'when' class_identifier 'do' connection_block_1
+;
+
+otherwise_clause
+: 'otherwise' statement
+;
+connection_block_1
+: statement
+;
+connection_block_2
+: statement
+;
+compound_statement
+: 'begin' compound_tail
+;
+
+compound_tail
+: statement ( ';' statement )* 'end'
+;
+
 block
-= subblock
-| prefixed-block
-subblock
-= block-head ; compound-tail
-block-head
-= begin declaration { ; declaration }
-prefixed-block
-= block-prefix main-block
-block-prefix
-= class-identifier [ actual-parameter-part ]
-main-block
-= block
-| compound-statement
-dummy-statement
-= empty
+: subblock
+| prefixed_block
+;
 
+subblock
+: block_head ';' compound_tail
+;
+
+block_head
+: 'begin' declaration ( ';' declaration )*
+;
+prefixed_block
+: block_prefix main_block
+;
+
+block_prefix
+: class_identifier  actual_parameter_part?
+;
+
+main_block
+: block
+| compound_statement
+
+;dummy_statement
+: 'empty'
+  ;
 
 declaration
-= simple-variable-declaration
-| array-declaration
-| switch-declaration
-| procedure-declaration
-| class-declaration
-| external-declaration
-simple-variable-declaration
-= type type-list
-type-list
-= type-list-element { , type-list-element }
-type-list-element
-= identifier
-| constant-element
-array-declaration
-= [ type ] array array-segment { , array-segment }
-array-segment
-= array-identifier { , array-identifier }
-"(" bound-pair-list ")"
-array-identifier
-= identifier
-bound-pair-list
-= bound-pair { , bound-pair }
-bound-pair
-= arithmetic-expression : arithmetic-expression
-switch-declaration
-= switch switch-identifier := switch-list
-switch-list
-= designational-expression { , designational-expression }
-procedure-declaration
-= [ type ] procedure procedure-heading ; procedure-body
-procedure-heading
-= procedure-identifier
-[ formal-parameter-part ; [ mode-part ] specification-part ]
-procedure-body
-= statement
-procedure-identifier
-= identifier
-formal-parameter-part
-= "(" formal-parameter { , formal-parameter } ")"
-formal-parameter
-= identifier
-specification-part
-= specifier identifier-list ; { specifier identifier-list ; }
-specifier
+: simple_variable_sdeclaration
+| array_declaration
+| switch_declaration
+| procedure_declaration
+| class_declaration
+| external_declaration
+;
 
-= type [ array | procedure ]
-| label
-| switch
-mode-part
-= name-part [ value-part ]
-| value-part [ name-part ]
-name-part
-= name identifier-list ;
-value-part
-= value identifier-list ;
-identifier-list
-= identifier { , identifier }
-class-declaration
-= [ prefix ] main-part
-prefix
-= class-identifier
-main-part
-= class class-identifier
-[ formal-parameter-part ; [ value-part ]
-specification-part ] ;
-[ protection-part ; ] [ virtual-part ; ]
-class-body
-class-identifier
-= identifier
-class-body
-= statement
-| split-body
-split-body
-= initial-operations inner-part final-operations
-initial-operations
-= ( begin | block-head ; ) { statement ; }
-inner-part
-= { label : } inner
-final-operations
-= end
-| ; compound-tail
-virtual-part
-= virtual : virtual-spec ; { virtual-spec ; }
-virtual-spec
-= specifier identifier-list
-| procedure procedure-identifier procedure-specification
-protection-part
-= protection-specification { ; protection-specification }
+simple_variable_sdeclaration
+: type type_list
+;
+type_list
+: type_list_element ( ',' type_list_element )*
+;
 
-protection-specification
-= hidden identifier-list
-| protected identifier-list
-| hidden protected identifier-list
-| protected hidden identifier-list
-constant-element
-= identifier = value-expression
-| identifier = string
+type_list_element
+: identifier
+| constant_element
+;
 
+array_declaration
+:  type?  'array' array_segment ( ',' array_segment )*
+;
 
-SIMULA-source-module
-= [ external-head ]
-( program | procedure-declaration | class-declaration )
-external-head
-= external-declaration ; { external-declaration ; }
-external-declaration
-= external-procedure-declaration
-| external-class-declaration
-program
-= statement
-external-procedure-declaration
-= external [ kind ] [ type ] procedure external-list
-| external kind procedure external-item procedure-specification
-kind
-= identifier
-procedure-specification
-= is procedure-declaration
-external-class-declaration
-= external class external-list
-external-list
-= external-item { , external-item }
-external-item
-= identifier [ = external-identification ]
-external-identification
-= string
+array_segment
+: array_identifier ( ',' array_identifier )*
+'(' bound_pair_list ')'
+;
 
+array_identifier
+: identifier
+;
 
-activation-statement
-= activation-clause [ scheduling-clause ]
-activation-clause
-= activator object-expression
-activator
-= activate
-| reactivate
-scheduling-clause
-= timing-clause
-| ( before | after ) object-expression
-timing-clause
-= simple-timing-clause [ prior ]
-simple-timing-clause
-= ( at | delay ) arithmetic-expression
+bound_pair_list
+: bound_pair ( ',' bound_pair )*
+;
+
+bound_pair
+: arithmetic_expression ':' arithmetic_expression
+;
+
+switch_declaration
+: 'switch' switch_identifier ':=' switch_list
+;
+
+switch_list
+: designational_expression ( ',' designational_expression )*
+procedure_declaration;
 
 WS
    : [ \r\n\t] + -> skip
