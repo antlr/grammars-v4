@@ -108,7 +108,7 @@ identifierchain
 inline_index
    : NATURAL_NUMBER
    ;
-   
+
 expression
    : section
    | expression operator expression
@@ -178,9 +178,7 @@ fragment DIGIT
    ;
 
 signed_number
-   : '+' number
-   | '-' number
-   | number
+   : ('+' | '-')? number
    ;
 
 VARIABLE
