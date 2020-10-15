@@ -102,6 +102,11 @@ identifier
 identifierchain
    : (IDENTIFIER | IN | VARIABLE) index? (DOT identifierchain)*
    | STAR (DOT identifierchain)*
+   | inline_index (DOT identifierchain)*
+   ;
+
+inline_index
+   : NATURAL_NUMBER
    ;
 
 expression
@@ -124,7 +129,7 @@ section
 
 val
    : NULL
-   | SIGNED_NUMBER
+   | signed_number
    | string
    | identifier
    | BOOL
@@ -172,10 +177,8 @@ fragment DIGIT
    : [0-9]
    ;
 
-SIGNED_NUMBER
-   : '+' NUMBER
-   | '-' NUMBER
-   | NUMBER
+signed_number
+   : ('+' | '-')? number
    ;
 
 VARIABLE
@@ -234,8 +237,12 @@ NULL
    : 'nul'
    ;
 
-NUMBER
-   : DIGIT+ (DOT DIGIT+)?
+NATURAL_NUMBER
+   : DIGIT+
+   ;
+
+number
+   : NATURAL_NUMBER (DOT NATURAL_NUMBER)?
    ;
 
 BOOL
