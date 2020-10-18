@@ -32,7 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar terraform;
 
 file
-   : (local | module | output | provider | variable | data | resource)+
+   : (local | module | output | provider | variable | data | resource | terraform)+
+   ;
+
+terraform
+   : 'terraform' blockbody
    ;
 
 resource
@@ -60,7 +64,7 @@ module
   ;
 
 variable
-   : 'variable' name blockbody
+   : VARIABLE name blockbody
    ;
 
 block
@@ -84,7 +88,7 @@ label
    ;
 
 blockbody
-   : '{' (argument | block)* '}'
+   : LCURL (argument | block)* RCURL
    ;
 
 argument
@@ -92,22 +96,29 @@ argument
    ;
 
 identifier
-   : IDENTIFIER
+   : (('local' | 'data' | 'var' | 'module') DOT)? identifierchain
+   ;
+
+identifierchain
+   : (IDENTIFIER | IN | VARIABLE) index? (DOT identifierchain)*
+   | STAR (DOT identifierchain)*
+   | inline_index (DOT identifierchain)*
+   ;
+
+inline_index
+   : NATURAL_NUMBER
    ;
 
 expression
-   : RESOURCEREFERENCE
-   | section
-   | expression OPERATOR expression
+   : section
+   | expression operator expression
    | LPAREN expression RPAREN
+   | expression '?' expression ':' expression
+   | forloop
    ;
 
-RESOURCEREFERENCE
-   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+ 
-   ;
-
-RESOURCEINDEX
-   : '[' [0-9]+ ']'
+forloop
+   : 'for' identifier IN expression ':' expression
    ;
 
 section
@@ -118,10 +129,10 @@ section
 
 val
    : NULL
-   | SIGNED_NUMBER
+   | signed_number
    | string
+   | identifier
    | BOOL
-   | IDENTIFIER index?
    | DESCRIPTION
    | filedecl
    | functioncall
@@ -150,11 +161,11 @@ filedecl
    ;
 
 list
-   : '[' expression (',' expression)* ','? ']'
+   : '[' (expression (',' expression)* ','?)? ']'
    ;
 
 map
-   : '{' argument* '}'
+   : LCURL (argument ','?)* RCURL
    ;
 
 string
@@ -166,15 +177,29 @@ fragment DIGIT
    : [0-9]
    ;
 
-SIGNED_NUMBER
-   : '+' NUMBER
-   | '-' NUMBER
-   | NUMBER
+signed_number
+   : ('+' | '-')? number
    ;
 
-OPERATOR
+VARIABLE
+   : 'variable'
+   ;
+
+IN
+   : 'in'
+   ;
+
+STAR
    : '*'
-   | '/'
+   ;
+
+DOT
+   : '.'
+   ;
+
+operator
+   : '/'
+   | STAR
    | '%'
    | '+'
    | '-'
@@ -186,6 +211,14 @@ OPERATOR
    | '!='
    | '&&'
    | '||'
+   ;
+
+LCURL
+   : '{'
+   ;
+
+RCURL
+   : '}'
    ;
 
 LPAREN
@@ -204,8 +237,12 @@ NULL
    : 'nul'
    ;
 
-NUMBER
-   : DIGIT+ ('.' DIGIT+)?
+NATURAL_NUMBER
+   : DIGIT+
+   ;
+
+number
+   : NATURAL_NUMBER (DOT NATURAL_NUMBER)?
    ;
 
 BOOL
@@ -222,7 +259,7 @@ MULTILINESTRING
    ;
 
 STRING
-   : '"' (~ [\r\n"] | '""')* '"'
+   : '"' (~ [\r\n"] | '""' | '\\"')* '"'
    ;
 
 IDENTIFIER
