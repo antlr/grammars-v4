@@ -359,8 +359,8 @@ create_application_role
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-aggregate-transact-sql
 
 drop_aggregate
-   : DROP AGGREGATE ( IF EXISTS )? ( schema_name=id DOT )? aggregate_name=id
-   ;
+    : DROP AGGREGATE ( IF EXISTS )? ( schema_name=id DOT )? aggregate_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-application-role-transact-sql
 drop_application_role
@@ -502,8 +502,7 @@ drop_assembly
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-asymmetric-key-transact-sql
 
 alter_asymmetric_key
-    :
-    alter_asymmetric_key_start Asym_Key_Name=id (asymmetric_key_option | REMOVE PRIVATE KEY )
+    : alter_asymmetric_key_start Asym_Key_Name=id (asymmetric_key_option | REMOVE PRIVATE KEY )
     ;
 
 alter_asymmetric_key_start
@@ -532,12 +531,12 @@ create_asymmetric_key
        ( FROM (FILE EQUAL STRING |EXECUTABLE_FILE EQUAL STRING|ASSEMBLY Assembly_Name=id | PROVIDER Provider_Name=id) )?
        (WITH (ALGORITHM EQUAL ( RSA_4096 | RSA_3072 | RSA_2048 | RSA_1024 | RSA_512)  |PROVIDER_KEY_NAME EQUAL provider_key_name=STRING | CREATION_DISPOSITION EQUAL (CREATE_NEW|OPEN_EXISTING)  )   )?
        (ENCRYPTION BY PASSWORD EQUAL asymmetric_key_password=STRING )?
-     ;
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-asymmetric-key-transact-sql
 drop_asymmetric_key
-     : DROP ASYMMETRIC KEY key_name=id ( REMOVE PROVIDER KEY )?
-     ;
+    : DROP ASYMMETRIC KEY key_name=id ( REMOVE PROVIDER KEY )?
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-authorization-transact-sql
 
@@ -629,7 +628,7 @@ class_type_for_parallel_dw
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-availability-group-transact-sql
 drop_availability_group
-    :  DROP AVAILABILITY GROUP group_name=id
+    : DROP AVAILABILITY GROUP group_name=id
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-availability-group-transact-sql
@@ -672,8 +671,13 @@ alter_availability_group_options
     | WITH LR_BRACKET DTC_SUPPORT EQUAL PER_DB RR_BRACKET
     ;
 
-ip_v4_failover : IPV4_ADDR | STRING;
-ip_v6_failover : IPV6_ADDR | STRING;
+ip_v4_failover
+    : IPV4_ADDR | STRING
+    ;
+    
+ip_v6_failover
+    : IPV6_ADDR | STRING
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-broker-priority-transact-sql
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-broker-priority-transact-sql
@@ -709,12 +713,12 @@ create_column_encryption_key
            (LR_BRACKET COMMA? COLUMN_MASTER_KEY EQUAL column_master_key_name=id COMMA
            ALGORITHM EQUAL algorithm_name=STRING  COMMA
            ENCRYPTED_VALUE EQUAL encrypted_value=BINARY RR_BRACKET COMMA?)+
-     ;
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-certificate-transact-sql
 drop_certificate
-     : DROP CERTIFICATE certificate_name=id
-     ;
+    : DROP CERTIFICATE certificate_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-column-encryption-key-transact-sql
 drop_column_encryption_key
@@ -812,171 +816,171 @@ drop_event_session
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-fulltext-catalog-transact-sql
 drop_fulltext_catalog
-   : DROP FULLTEXT CATALOG catalog_name=id
-   ;
+    : DROP FULLTEXT CATALOG catalog_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-fulltext-index-transact-sql
 drop_fulltext_index
-   : DROP FULLTEXT INDEX ON (schema=id DOT)? table=id
-   ;
+    : DROP FULLTEXT INDEX ON (schema=id DOT)? table=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-fulltext-stoplist-transact-sql
 drop_fulltext_stoplist
-   : DROP FULLTEXT STOPLIST stoplist_name=id
-   ;
+    : DROP FULLTEXT STOPLIST stoplist_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-login-transact-sql
 drop_login
-     : DROP LOGIN login_name=id
-     ;
+    : DROP LOGIN login_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-master-key-transact-sql
 drop_master_key
-     : DROP MASTER KEY
-     ;
+    : DROP MASTER KEY
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-message-type-transact-sql
 drop_message_type
-     : DROP MESSAGE TYPE message_type_name=id
-     ;
+    : DROP MESSAGE TYPE message_type_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-partition-function-transact-sql
 drop_partition_function
-     : DROP PARTITION FUNCTION partition_function_name=id
-     ;
+    : DROP PARTITION FUNCTION partition_function_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-partition-scheme-transact-sql
 drop_partition_scheme
-     : DROP PARTITION SCHEME partition_scheme_name=id
-     ;
+    : DROP PARTITION SCHEME partition_scheme_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-queue-transact-sql
 drop_queue
-     : DROP QUEUE (database_name=id DOT)? (schema_name=id DOT)? queue_name=id
-     ;
+    : DROP QUEUE (database_name=id DOT)? (schema_name=id DOT)? queue_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-remote-service-binding-transact-sql
 drop_remote_service_binding
-     : DROP REMOTE SERVICE BINDING binding_name=id
-     ;
+    : DROP REMOTE SERVICE BINDING binding_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-resource-pool-transact-sql
 drop_resource_pool
-     : DROP RESOURCE POOL pool_name=id
-     ;
+    : DROP RESOURCE POOL pool_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-role-transact-sql
 drop_db_role
-     : DROP ROLE ( IF EXISTS )? role_name=id
-     ;
+    : DROP ROLE ( IF EXISTS )? role_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-route-transact-sql
 drop_route
-     : DROP ROUTE route_name=id
-     ;
+    : DROP ROUTE route_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-rule-transact-sql
 drop_rule
-     : DROP RULE ( IF EXISTS )? (COMMA? (schema_name=id DOT)? rule_name=id)?
-     ;
+    : DROP RULE ( IF EXISTS )? (COMMA? (schema_name=id DOT)? rule_name=id)?
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-schema-transact-sql
 drop_schema
-     :  DROP SCHEMA  ( IF EXISTS )? schema_name=id
-     ;
+    :  DROP SCHEMA ( IF EXISTS )? schema_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-search-property-list-transact-sql
 drop_search_property_list
-     : DROP SEARCH PROPERTY LIST property_list_name=id
-     ;
+    : DROP SEARCH PROPERTY LIST property_list_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-security-policy-transact-sql
 drop_security_policy
-     : DROP SECURITY POLICY ( IF EXISTS )? (schema_name=id DOT )? security_policy_name=id
-     ;
+    : DROP SECURITY POLICY ( IF EXISTS )? (schema_name=id DOT )? security_policy_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-sequence-transact-sql
 drop_sequence
-     : DROP SEQUENCE ( IF EXISTS )? ( COMMA? (database_name=id DOT)? (schema_name=id DOT)?          sequence_name=id )?
-     ;
+    : DROP SEQUENCE ( IF EXISTS )? ( COMMA? (database_name=id DOT)? (schema_name=id DOT)?          sequence_name=id )?
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-server-audit-transact-sql
 drop_server_audit
-     : DROP SERVER AUDIT audit_name=id
-     ;
+    : DROP SERVER AUDIT audit_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-server-audit-specification-transact-sql
 drop_server_audit_specification
-     : DROP SERVER AUDIT SPECIFICATION audit_specification_name=id
-     ;
+    : DROP SERVER AUDIT SPECIFICATION audit_specification_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-server-role-transact-sql
 drop_server_role
-     : DROP SERVER ROLE role_name=id
-     ;
+    : DROP SERVER ROLE role_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-service-transact-sql
 drop_service
-     : DROP SERVICE dropped_service_name=id
-     ;
+    : DROP SERVICE dropped_service_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-signature-transact-sql
 drop_signature
-     : DROP ( COUNTER )? SIGNATURE FROM (schema_name=id DOT)? module_name=id
-         BY (COMMA?  CERTIFICATE cert_name=id
-            | COMMA? ASYMMETRIC KEY Asym_key_name=id
-            )+
-     ;
+    : DROP ( COUNTER )? SIGNATURE FROM (schema_name=id DOT)? module_name=id
+        BY (COMMA?  CERTIFICATE cert_name=id
+           | COMMA? ASYMMETRIC KEY Asym_key_name=id
+           )+
+    ;
 
 
 drop_statistics_name_azure_dw_and_pdw
-     :  DROP STATISTICS  (schema_name=id DOT)? object_name=id DOT statistics_name=id
-     ;
+    :  DROP STATISTICS  (schema_name=id DOT)? object_name=id DOT statistics_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-symmetric-key-transact-sql
 drop_symmetric_key
-     : DROP SYMMETRIC KEY symmetric_key_name=id (REMOVE PROVIDER KEY)?
-     ;
+    : DROP SYMMETRIC KEY symmetric_key_name=id (REMOVE PROVIDER KEY)?
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-synonym-transact-sql
 drop_synonym
-     : DROP SYNONYM ( IF EXISTS )? ( schema=id DOT )? synonym_name=id
-     ;
+    : DROP SYNONYM ( IF EXISTS )? ( schema=id DOT )? synonym_name=id
+    ;
 
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-user-transact-sql
 drop_user
-     : DROP USER ( IF EXISTS )? user_name=id
-     ;
+    : DROP USER ( IF EXISTS )? user_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-workload-group-transact-sql
 drop_workload_group
-     : DROP WORKLOAD GROUP group_name=id
-     ;
+    : DROP WORKLOAD GROUP group_name=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-xml-schema-collection-transact-sql
 drop_xml_schema_collection
-     : DROP XML SCHEMA COLLECTION ( relational_schema=id DOT )?  sql_identifier=id
-     ;
+    : DROP XML SCHEMA COLLECTION ( relational_schema=id DOT )?  sql_identifier=id
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/disable-trigger-transact-sql
 disable_trigger
-     : DISABLE TRIGGER ( ( COMMA? (schema_name=id DOT)? trigger_name=id )+ | ALL)         ON ((schema_id=id DOT)? object_name=id|DATABASE|ALL SERVER)
-     ;
+    : DISABLE TRIGGER ( ( COMMA? (schema_name=id DOT)? trigger_name=id )+ | ALL)         ON ((schema_id=id DOT)? object_name=id|DATABASE|ALL SERVER)
+    ;
 
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/enable-trigger-transact-sql
 enable_trigger
-     : ENABLE TRIGGER ( ( COMMA? (schema_name=id DOT)? trigger_name=id )+ | ALL)         ON ( (schema_id=id DOT)? object_name=id|DATABASE|ALL SERVER)
-     ;
+    : ENABLE TRIGGER ( ( COMMA? (schema_name=id DOT)? trigger_name=id )+ | ALL)         ON ( (schema_id=id DOT)? object_name=id|DATABASE|ALL SERVER)
+    ;
 
 lock_table
-     : LOCK TABLE table_name IN (SHARE | EXCLUSIVE) MODE (WAIT seconds=DECIMAL | NOWAIT)? ';'?
-     ;
+    : LOCK TABLE table_name IN (SHARE | EXCLUSIVE) MODE (WAIT seconds=DECIMAL | NOWAIT)? ';'?
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/truncate-table-transact-sql
 truncate_table
-     : TRUNCATE TABLE table_name
+    : TRUNCATE TABLE table_name
           ( WITH LR_BRACKET
               PARTITIONS LR_BRACKET
                                 (COMMA? (DECIMAL|DECIMAL TO DECIMAL) )+
@@ -984,16 +988,16 @@ truncate_table
 
                  RR_BRACKET
           )?
-     ;
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-column-master-key-transact-sql
 create_column_master_key
-     : CREATE COLUMN MASTER KEY key_name=id
+    : CREATE COLUMN MASTER KEY key_name=id
          WITH LR_BRACKET
             KEY_STORE_PROVIDER_NAME EQUAL  key_store_provider_name=STRING COMMA
             KEY_PATH EQUAL key_path=STRING
            RR_BRACKET
-      ;
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-credential-transact-sql
 alter_credential
@@ -1066,18 +1070,18 @@ create_or_alter_event_session
     ;
 
 event_session_predicate_expression
-     : ( COMMA? (AND|OR)? NOT? ( event_session_predicate_factor | LR_BRACKET event_session_predicate_expression RR_BRACKET) )+
-     ;
+    : ( COMMA? (AND|OR)? NOT? ( event_session_predicate_factor | LR_BRACKET event_session_predicate_expression RR_BRACKET) )+
+    ;
 
 event_session_predicate_factor
-     : event_session_predicate_leaf
-     | LR_BRACKET event_session_predicate_expression RR_BRACKET
-     ;
+    : event_session_predicate_leaf
+    | LR_BRACKET event_session_predicate_expression RR_BRACKET
+    ;
 
 event_session_predicate_leaf
-     : (event_field_name=id | (event_field_name=id |( (event_module_guid=id DOT)?  event_package_name=id DOT predicate_source_name=id ) ) (EQUAL |(LESS GREATER) | (EXCLAMATION EQUAL) | GREATER  | (GREATER EQUAL)| LESS | LESS EQUAL) (DECIMAL | STRING) )
-     | (event_module_guid=id DOT)?  event_package_name=id DOT predicate_compare_name=id LR_BRACKET (event_field_name=id |( (event_module_guid=id DOT)?  event_package_name=id DOT predicate_source_name=id ) COMMA  (DECIMAL | STRING) ) RR_BRACKET
-     ;
+    : (event_field_name=id | (event_field_name=id |( (event_module_guid=id DOT)?  event_package_name=id DOT predicate_source_name=id ) ) (EQUAL |(LESS GREATER) | (EXCLAMATION EQUAL) | GREATER  | (GREATER EQUAL)| LESS | LESS EQUAL) (DECIMAL | STRING) )
+    | (event_module_guid=id DOT)?  event_package_name=id DOT predicate_compare_name=id LR_BRACKET (event_field_name=id |( (event_module_guid=id DOT)?  event_package_name=id DOT predicate_source_name=id ) COMMA  (DECIMAL | STRING) ) RR_BRACKET
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-data-source-transact-sql
 alter_external_data_source
@@ -1091,13 +1095,13 @@ alter_external_data_source
 alter_external_library
     : ALTER EXTERNAL LIBRARY library_name=id (AUTHORIZATION owner_name=id)?
        (SET|ADD) ( LR_BRACKET CONTENT EQUAL (client_library=STRING | BINARY | NONE) (COMMA PLATFORM EQUAL (WINDOWS|LINUX)? RR_BRACKET) WITH (COMMA? LANGUAGE EQUAL (R|PYTHON) | DATA_SOURCE EQUAL external_data_source_name=id )+ RR_BRACKET )
-   ;
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-external-library-transact-sql
 create_external_library
     : CREATE EXTERNAL LIBRARY library_name=id (AUTHORIZATION owner_name=id)?
        FROM (COMMA? LR_BRACKET?  (CONTENT EQUAL)? (client_library=STRING | BINARY | NONE) (COMMA PLATFORM EQUAL (WINDOWS|LINUX)? RR_BRACKET)? ) ( WITH (COMMA? LANGUAGE EQUAL (R|PYTHON) | DATA_SOURCE EQUAL external_data_source_name=id )+ RR_BRACKET  )?
-   ;
+    ;
 
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-resource-pool-transact-sql
@@ -1187,7 +1191,7 @@ create_login_pdw
           )
         | FROM WINDOWS
         )
-     ;
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-master-key-transact-sql
 alter_master_key_sql_server
@@ -1261,7 +1265,7 @@ create_resource_pool
                (COMMA? MAX_IOPS_PER_VOLUME EQUAL DECIMAL)?
             RR_BRACKET
          )?
-     ;
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-resource-governor-transact-sql
 alter_resource_governor
@@ -1349,7 +1353,7 @@ create_security_policy
                   RR_BRACKET
              )?
              (NOT FOR REPLICATION)?
-     ;
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-sequence-transact-sql
 alter_sequence
@@ -1366,7 +1370,7 @@ create_sequence
         (MAXVALUE DECIMAL? | NO MAXVALUE)?
         (CYCLE|NO CYCLE)?
         (CACHE DECIMAL? | NO CACHE)?
-     ;
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-server-audit-transact-sql
 alter_server_audit
@@ -1593,7 +1597,7 @@ create_user
                           )*
                    | Azure_Active_Directory_principal=id FROM EXTERNAL PROVIDER
                    )
-     | CREATE USER user_name=id
+    | CREATE USER user_name=id
                  ( WITHOUT LOGIN
                    (COMMA? DEFAULT_SCHEMA EQUAL schema_name=id
                    |COMMA? ALLOW_ENCRYPTED_VALUE_MODIFICATIONS EQUAL (ON|OFF)
@@ -1601,8 +1605,8 @@ create_user
                  | (FOR|FROM) CERTIFICATE cert_name=id
                  | (FOR|FROM) ASYMMETRIC KEY asym_key_name=id
                  )
-     | CREATE USER user_name=id
-     ;
+    | CREATE USER user_name=id
+    ;
 
 create_user_azure_sql_dw
     : CREATE USER user_name=id
@@ -1667,7 +1671,7 @@ create_queue
 
 
 queue_settings
-    :WITH
+    : WITH
        (STATUS EQUAL (ON | OFF) COMMA?)?
        (RETENTION EQUAL (ON | OFF) COMMA?)?
        (ACTIVATION
@@ -1875,7 +1879,7 @@ create_index
 create_xml_index
     : CREATE PRIMARY? XML INDEX id ON table_name '(' id ')'
     (USING XML INDEX id (FOR (VALUE | PATH | PROPERTY)?)?)? 
-    (index_options)?
+    index_options?
     ';'?
     ;
     
@@ -1933,31 +1937,31 @@ create_or_alter_function
     ;
 
 func_body_returns_select
-  :RETURNS TABLE
-  (WITH function_option (',' function_option)*)?
-  AS?
-  RETURN ('(' select_statement_standalone ')' | select_statement_standalone)
-  ;
+    : RETURNS TABLE
+        (WITH function_option (',' function_option)*)?
+        AS?
+        RETURN ('(' select_statement_standalone ')' | select_statement_standalone)
+    ;
 
 func_body_returns_table
-  : RETURNS LOCAL_ID table_type_definition
+    : RETURNS LOCAL_ID table_type_definition
         (WITH function_option (',' function_option)*)?
         AS?
         BEGIN
            sql_clauses*
            RETURN ';'?
         END ';'?
-  ;
+    ;
 
 func_body_returns_scalar
-  :RETURNS data_type
-       (WITH function_option (',' function_option)*)?
-       AS?
-       BEGIN
+    : RETURNS data_type
+        (WITH function_option (',' function_option)*)?
+        AS?
+        BEGIN
            sql_clauses*
            RETURN ret=expression ';'?
        END
-       ;
+    ;
 
 procedure_param
     : LOCAL_ID AS? (type_schema=id '.')? data_type VARYING? ('=' default_val=default_value)? (OUT | OUTPUT | READONLY)?
@@ -1994,8 +1998,8 @@ create_table
     ;
 
 table_indices
-    :  INDEX id  (UNIQUE | CLUSTERED | NONCLUSTERED)? '(' column_name_list_with_order ')'
-    (index_options)?
+    : INDEX id  (UNIQUE | CLUSTERED | NONCLUSTERED)? '(' column_name_list_with_order ')'
+    index_options?
     (ON id)?
     ;
 
@@ -2037,63 +2041,61 @@ alter_database
 // https://msdn.microsoft.com/en-us/library/bb522682.aspx
 // Runtime check.
 database_optionspec
-    :  auto_option
-      | change_tracking_option
-      | containment_option
-      | cursor_option
-      | database_mirroring_option
-      | date_correlation_optimization_option
-      | db_encryption_option
-      | db_state_option
-      | db_update_option
-      | db_user_access_option
-      | delayed_durability_option
-      | external_access_option
-      | FILESTREAM database_filestream_option
-      | hadr_options
-      | mixed_page_allocation_option
-      | parameterization_option
-//      | query_store_options
-      | recovery_option
-//      | remote_data_archive_option
-      | service_broker_option
-      | snapshot_option
-      | sql_option
-      | target_recovery_time_option
-      | termination
+    : auto_option
+    | change_tracking_option
+    | containment_option
+    | cursor_option
+    | database_mirroring_option
+    | date_correlation_optimization_option
+    | db_encryption_option
+    | db_state_option
+    | db_update_option
+    | db_user_access_option
+    | delayed_durability_option
+    | external_access_option
+    | FILESTREAM database_filestream_option
+    | hadr_options
+    | mixed_page_allocation_option
+    | parameterization_option
+//  | query_store_options
+    | recovery_option
+//  | remote_data_archive_option
+    | service_broker_option
+    | snapshot_option
+    | sql_option
+    | target_recovery_time_option
+    | termination
     ;
 
-auto_option:
-     AUTO_CLOSE on_off
-      | AUTO_CREATE_STATISTICS  OFF | ON ( INCREMENTAL EQUAL  ON | OFF  )
-      | AUTO_SHRINK  on_off
-      | AUTO_UPDATE_STATISTICS on_off
-      | AUTO_UPDATE_STATISTICS_ASYNC  (ON | OFF )
+auto_option
+    : AUTO_CLOSE on_off
+    | AUTO_CREATE_STATISTICS  OFF | ON ( INCREMENTAL EQUAL  ON | OFF  )
+    | AUTO_SHRINK  on_off
+    | AUTO_UPDATE_STATISTICS on_off
+    | AUTO_UPDATE_STATISTICS_ASYNC  (ON | OFF )
     ;
 
-change_tracking_option:
-    CHANGE_TRACKING  EQUAL ( OFF | ON (change_tracking_option_list (',' change_tracking_option_list)*)*  )
+change_tracking_option
+    : CHANGE_TRACKING  EQUAL ( OFF | ON (change_tracking_option_list (',' change_tracking_option_list)*)*  )
     ;
 
-change_tracking_option_list:
-     AUTO_CLEANUP EQUAL on_off
-     | CHANGE_RETENTION EQUAL ( DAYS | HOURS | MINUTES )
+change_tracking_option_list
+    : AUTO_CLEANUP EQUAL on_off
+    | CHANGE_RETENTION EQUAL ( DAYS | HOURS | MINUTES )
     ;
 
-containment_option:
-     CONTAINMENT EQUAL ( NONE | PARTIAL )
+containment_option
+    : CONTAINMENT EQUAL ( NONE | PARTIAL )
     ;
 
-cursor_option:
-    CURSOR_CLOSE_ON_COMMIT on_off
+cursor_option
+    : CURSOR_CLOSE_ON_COMMIT on_off
     | CURSOR_DEFAULT ( LOCAL | GLOBAL )
-  ;
-
-
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-endpoint-transact-sql
 alter_endpoint
-   : ALTER ENDPOINT endpointname=id (AUTHORIZATION login=id)?
+    : ALTER ENDPOINT endpointname=id (AUTHORIZATION login=id)?
        ( STATE EQUAL ( state=STARTED | state=STOPPED | state=DISABLED ) )?
             AS TCP LR_BRACKET
                LISTENER_PORT EQUAL port=DECIMAL
@@ -2128,7 +2130,7 @@ alter_endpoint
                    COMMA? ROLE EQUAL ( WITNESS | PARTNER | ALL )
                    RR_BRACKET
              )
-   ;
+    ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-endpoint-transact-sql
 // todo: not implemented
@@ -2136,117 +2138,115 @@ alter_endpoint
 /* Will visit later
 */
 database_mirroring_option
-   : mirroring_set_option
-   ;
+    : mirroring_set_option
+    ;
 
 mirroring_set_option
-   : mirroring_partner  partner_option
-   | mirroring_witness  witness_option
-   ;
+    : mirroring_partner  partner_option
+    | mirroring_witness  witness_option
+    ;
 mirroring_partner
-   : PARTNER
-   ;
+    : PARTNER
+    ;
 
 mirroring_witness
-   : WITNESS
-   ;
+    : WITNESS
+    ;
 
 witness_partner_equal
-   : EQUAL
-   ;
+    : EQUAL
+    ;
 
 
 partner_option
-   : witness_partner_equal partner_server
-   | FAILOVER
-   | FORCE_SERVICE_ALLOW_DATA_LOSS
-   | OFF
-   | RESUME
-   | SAFETY (FULL | OFF )
-   | SUSPEND
-   | TIMEOUT DECIMAL
-;
+    : witness_partner_equal partner_server
+    | FAILOVER
+    | FORCE_SERVICE_ALLOW_DATA_LOSS
+    | OFF
+    | RESUME
+    | SAFETY (FULL | OFF )
+    | SUSPEND
+    | TIMEOUT DECIMAL
+    ;
 
 witness_option
-   : witness_partner_equal witness_server
-   | OFF
-;
+    : witness_partner_equal witness_server
+    | OFF
+    ;
 
 witness_server
-   : partner_server
-   ;
+    : partner_server
+    ;
 
 partner_server
-   :
-   partner_server_tcp_prefix host mirroring_host_port_seperator port_number
-   ;
+    : partner_server_tcp_prefix host mirroring_host_port_seperator port_number
+    ;
 
 mirroring_host_port_seperator
-   : COLON
-   ;
+    : COLON
+    ;
 
 partner_server_tcp_prefix
-   : TCP COLON DOUBLE_FORWARD_SLASH
-   ;
+    : TCP COLON DOUBLE_FORWARD_SLASH
+    ;
 port_number
-   :
-   port=DECIMAL
-   ;
+    : port=DECIMAL
+    ;
 
 host
-   : id DOT host
-   | (id DOT |id)
-   ;
-
-date_correlation_optimization_option:
-    DATE_CORRELATION_OPTIMIZATION on_off
+    : id DOT host
+    | (id DOT |id)
     ;
 
-db_encryption_option:
-     ENCRYPTION on_off
-    ;
-db_state_option:
-     ( ONLINE | OFFLINE | EMERGENCY )
+date_correlation_optimization_option
+    : DATE_CORRELATION_OPTIMIZATION on_off
     ;
 
-db_update_option:
-    READ_ONLY | READ_WRITE
+db_encryption_option
+    : ENCRYPTION on_off
+    ;
+db_state_option
+    : ( ONLINE | OFFLINE | EMERGENCY )
     ;
 
-db_user_access_option:
-    ( SINGLE_USER | RESTRICTED_USER | MULTI_USER )
-    ;
-delayed_durability_option:
-     DELAYED_DURABILITY EQUAL ( DISABLED | ALLOWED | FORCED )
+db_update_option
+    : READ_ONLY | READ_WRITE
     ;
 
-external_access_option:
-   DB_CHAINING on_off
-  | TRUSTWORTHY on_off
-  | DEFAULT_LANGUAGE EQUAL ( id | STRING )
-  | DEFAULT_FULLTEXT_LANGUAGE EQUAL ( id | STRING )
-  | NESTED_TRIGGERS EQUAL ( OFF | ON )
-  | TRANSFORM_NOISE_WORDS EQUAL ( OFF | ON )
-  | TWO_DIGIT_YEAR_CUTOFF EQUAL DECIMAL
-  ;
+db_user_access_option
+    : SINGLE_USER | RESTRICTED_USER | MULTI_USER
+    ;
+delayed_durability_option
+    : DELAYED_DURABILITY EQUAL ( DISABLED | ALLOWED | FORCED )
+    ;
+
+external_access_option
+    : DB_CHAINING on_off
+    | TRUSTWORTHY on_off
+    | DEFAULT_LANGUAGE EQUAL ( id | STRING )
+    | DEFAULT_FULLTEXT_LANGUAGE EQUAL ( id | STRING )
+    | NESTED_TRIGGERS EQUAL ( OFF | ON )
+    | TRANSFORM_NOISE_WORDS EQUAL ( OFF | ON )
+    | TWO_DIGIT_YEAR_CUTOFF EQUAL DECIMAL
+    ;
 
 hadr_options
-   : HADR
+    : HADR
       ( ( AVAILABILITY GROUP EQUAL availability_group_name=id | OFF ) |(SUSPEND|RESUME) )
     ;
 
-mixed_page_allocation_option:
-     MIXED_PAGE_ALLOCATION ( OFF | ON )
+mixed_page_allocation_option
+    : MIXED_PAGE_ALLOCATION ( OFF | ON )
     ;
 
-parameterization_option:
-     PARAMETERIZATION ( SIMPLE | FORCED )
+parameterization_option
+    : PARAMETERIZATION ( SIMPLE | FORCED )
     ;
 
-recovery_option:
-     RECOVERY ( FULL | BULK_LOGGED | SIMPLE )
-     | TORN_PAGE_DETECTION on_off
-     | PAGE_VERIFY ( CHECKSUM | TORN_PAGE_DETECTION | NONE )
+recovery_option
+    : RECOVERY ( FULL | BULK_LOGGED | SIMPLE )
+    | TORN_PAGE_DETECTION on_off
+    | PAGE_VERIFY ( CHECKSUM | TORN_PAGE_DETECTION | NONE )
     ;
 
 service_broker_option:
@@ -2255,32 +2255,32 @@ service_broker_option:
     | NEW_BROKER
     | ERROR_BROKER_CONVERSATIONS
     | HONOR_BROKER_PRIORITY on_off
-  ;
-snapshot_option:
-   ALLOW_SNAPSHOT_ISOLATION on_off
-  | READ_COMMITTED_SNAPSHOT (ON | OFF )
-  | MEMORY_OPTIMIZED_ELEVATE_TO_SNAPSHOT = (ON | OFF )
-  ;
-
-sql_option:
-  ANSI_NULL_DEFAULT on_off
-  | ANSI_NULLS on_off
-  | ANSI_PADDING on_off
-  | ANSI_WARNINGS on_off
-  | ARITHABORT on_off
-  | COMPATIBILITY_LEVEL EQUAL DECIMAL
-  | CONCAT_NULL_YIELDS_NULL on_off
-  | NUMERIC_ROUNDABORT on_off
-  | QUOTED_IDENTIFIER on_off
-  | RECURSIVE_TRIGGERS on_off
-  ;
-
-target_recovery_time_option:
-     TARGET_RECOVERY_TIME EQUAL DECIMAL ( SECONDS | MINUTES )
+    ;
+snapshot_option
+    : ALLOW_SNAPSHOT_ISOLATION on_off
+    | READ_COMMITTED_SNAPSHOT (ON | OFF )
+    | MEMORY_OPTIMIZED_ELEVATE_TO_SNAPSHOT = (ON | OFF )
     ;
 
-termination:
-    ROLLBACK AFTER seconds = DECIMAL
+sql_option
+    : ANSI_NULL_DEFAULT on_off
+    | ANSI_NULLS on_off
+    | ANSI_PADDING on_off
+    | ANSI_WARNINGS on_off
+    | ARITHABORT on_off
+    | COMPATIBILITY_LEVEL EQUAL DECIMAL
+    | CONCAT_NULL_YIELDS_NULL on_off
+    | NUMERIC_ROUNDABORT on_off
+    | QUOTED_IDENTIFIER on_off
+    | RECURSIVE_TRIGGERS on_off
+    ;
+
+target_recovery_time_option
+    : TARGET_RECOVERY_TIME EQUAL DECIMAL ( SECONDS | MINUTES )
+    ;
+
+termination
+    : ROLLBACK AFTER seconds = DECIMAL
     | ROLLBACK IMMEDIATE
     | NO_WAIT
     ;
@@ -2549,8 +2549,7 @@ execute_statement
     ;
 
 execute_body_batch
-    :
-    func_proc_name_server_database_schema (execute_statement_arg (',' execute_statement_arg)*)? ';'?
+    : func_proc_name_server_database_schema (execute_statement_arg (',' execute_statement_arg)*)? ';'?
     ;
 
 execute_body
@@ -2762,7 +2761,7 @@ dbcc_clause
     ;
     
 dbcc_command
-    : simple_id | keywords
+    : simple_id | keyword
     ;
 
 dbcc_options
@@ -2852,7 +2851,7 @@ index_options
 // Id runtime checking. Id in (PAD_INDEX, FILLFACTOR, IGNORE_DUP_KEY, STATISTICS_NORECOMPUTE, ALLOW_ROW_LOCKS,
 // ALLOW_PAGE_LOCKS, SORT_IN_TEMPDB, ONLINE, MAXDOP, DATA_COMPRESSION, ONLINE).
 index_option
-    : (simple_id | keywords) '=' (simple_id | keywords | on_off | DECIMAL)
+    : (simple_id | keyword) '=' (simple_id | keyword | on_off | DECIMAL)
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms180169.aspx
@@ -2908,10 +2907,7 @@ constant_LOCAL_ID
 expression
     : primitive_expression
     | function_call
-    | expression '.' value_call
-    | expression '.' query_call
-    | expression '.' exist_call
-    | expression '.' modify_call
+    | expression '.' (value_call | query_call | exist_call | modify_call)
     | expression COLLATE id
     | case_expression
     | full_column_name
@@ -3021,7 +3017,7 @@ query_specification
       (FROM from=table_sources)?
       (WHERE where=search_condition)?
       // https://msdn.microsoft.com/en-us/library/ms177673.aspx
-      (GROUP BY (groupByAll=ALL)? groupBys+=group_by_item (',' groupBys+=group_by_item)*)?
+      (GROUP BY groupByAll=ALL? groupBys+=group_by_item (',' groupBys+=group_by_item)*)?
       (HAVING having=search_condition)?
     ;
 
@@ -3063,7 +3059,7 @@ for_clause
     ;
 
 xml_common_directives
-      : ',' (BINARY_BASE64 | TYPE | ROOT ('(' STRING ')')?)
+    : ',' (BINARY_BASE64 | TYPE | ROOT ('(' STRING ')')?)
     ;
 
 order_by_expression
@@ -3196,7 +3192,7 @@ schema_declaration
     ;
 
 column_declaration
-    : id data_type (STRING)?
+    : id data_type STRING?
     ;
 
 change_table
@@ -3208,7 +3204,7 @@ change_table_changes
     : CHANGETABLE '(' CHANGES changetable=table_name ',' changesid=(NULL | DECIMAL | LOCAL_ID) ')'
     ;
 change_table_version
-    : CHANGETABLE '(' VERSION versiontable=table_name ',' (pk_columns=full_column_name_list) ',' (pk_values=select_list)  ')'
+    : CHANGETABLE '(' VERSION versiontable=table_name ',' pk_columns=full_column_name_list ',' pk_values=select_list  ')'
     ;
     
 // https://msdn.microsoft.com/en-us/library/ms191472.aspx
@@ -3221,9 +3217,7 @@ join_part
     | unpivot
     ;
 join_on
-    :
-    (inner=INNER? |
-       join_type=(LEFT | RIGHT | FULL) outer=OUTER?) (join_hint=(LOOP | HASH | MERGE | REMOTE))?
+    : (inner=INNER? | join_type=(LEFT | RIGHT | FULL) outer=OUTER?) (join_hint=(LOOP | HASH | MERGE | REMOTE))?
        JOIN source=table_source ON cond=search_condition
     ;
 
@@ -3240,7 +3234,7 @@ pivot
     ;
 
 unpivot
-    :     UNPIVOT unpivot_clause as_table_alias
+    : UNPIVOT unpivot_clause as_table_alias
     ;
 
 pivot_clause
@@ -3517,8 +3511,8 @@ window_frame_following
     | DECIMAL FOLLOWING
     ;
 
-create_database_option:
-    FILESTREAM ( database_filestream_option (',' database_filestream_option)* )
+create_database_option
+    : FILESTREAM ( database_filestream_option (',' database_filestream_option)* )
     | DEFAULT_LANGUAGE EQUAL ( id | STRING )
     | DEFAULT_FULLTEXT_LANGUAGE EQUAL ( id | STRING )
     | NESTED_TRIGGERS EQUAL ( OFF | ON )
@@ -3528,8 +3522,8 @@ create_database_option:
     | TRUSTWORTHY ( OFF | ON )
     ;
 
-database_filestream_option:
-     LR_BRACKET
+database_filestream_option
+    : LR_BRACKET
      (
          ( NON_TRANSACTED_ACCESS EQUAL ( OFF | READ_ONLY | FULL ) )
          |
@@ -3538,11 +3532,12 @@ database_filestream_option:
      RR_BRACKET
     ;
 
-database_file_spec:
-    file_group | file_spec;
+database_file_spec
+    : file_group | file_spec
+    ;
 
-file_group:
-     FILEGROUP id
+file_group
+    : FILEGROUP id
      ( CONTAINS FILESTREAM )?
      ( DEFAULT )?
      ( CONTAINS MEMORY_OPTIMIZED_DATA )?
@@ -3561,26 +3556,26 @@ file_spec
 
 // Primitive.
 entity_name
-      : (server=id '.' database=id '.'  schema=id   '.'
-      |              database=id '.' (schema=id)? '.'
-      |                               schema=id   '.')? table=id
+    : (server=id '.' database=id '.'  schema=id   '.'
+    |                database=id '.' (schema=id)? '.'
+    |                                 schema=id   '.')? table=id
     ;
 
 
 entity_name_for_azure_dw
-      : schema=id
-      | schema=id '.' object_name=id
-      ;
+    : schema=id
+    | schema=id '.' object_name=id
+    ;
 
 entity_name_for_parallel_dw
-      : schema_database=id
-      | schema=id '.' object_name=id
-      ;
+    : schema_database=id
+    | schema=id '.' object_name=id
+    ;
 
 full_table_name
     : (server=id '.' database=id '.'  schema=id   '.'
-      |              database=id '.' (schema=id)? '.'
-      |                               schema=id   '.')? table=id
+    |                database=id '.' (schema=id)? '.'
+    |                                 schema=id   '.')? table=id
     ;
 
 table_name
@@ -3610,7 +3605,7 @@ ddl_object
     : full_table_name
     | LOCAL_ID
     ;
-/*  There are some RESERVED WORDS that can be column names */
+
 full_column_name
     : server=id? '.' schema=id? '.' tablename=id? '.' column_name=id
     | schema=id? '.' tablename=id? '.' column_name=id 
@@ -3747,635 +3742,635 @@ sign
     | '-'
     ;
 
-keywords:
-  ABSOLUTE
-| ACCENT_SENSITIVITY
-| ACTION
-| ACTIVATION
-| ACTIVE
-| ADDRESS
-| AES_128
-| AES_192
-| AES_256
-| AFFINITY
-| AFTER
-| AGGREGATE
-| ALGORITHM
-| ALLOW_ENCRYPTED_VALUE_MODIFICATIONS
-| ALLOW_SNAPSHOT_ISOLATION
-| ALLOWED
-| ANSI_NULL_DEFAULT
-| ANSI_NULLS
-| ANSI_PADDING
-| ANSI_WARNINGS
-| APPLICATION_LOG
-| APPLY
-| ARITHABORT
-| ASSEMBLY
-| AT_KEYWORD
-| AUDIT
-| AUDIT_GUID
-| AUTO
-| AUTO_CLEANUP
-| AUTO_CLOSE
-| AUTO_CREATE_STATISTICS
-| AUTO_SHRINK
-| AUTO_UPDATE_STATISTICS
-| AUTO_UPDATE_STATISTICS_ASYNC
-| AVAILABILITY
-| AVG
-| BACKUP_PRIORITY
-| BEGIN_DIALOG
-| BIGINT
-| BINARY_BASE64
-| BINARY_CHECKSUM
-| BINDING
-| BLOB_STORAGE
-| BROKER
-| BROKER_INSTANCE
-| BULK_LOGGED
-| CALLER
-| CAP_CPU_PERCENT
-| CAST
-| CATALOG
-| CATCH
-| CHANGE_RETENTION
-| CHANGE_TRACKING
-| CHECKSUM
-| CHECKSUM_AGG
-| CLEANUP
-| COLLECTION
-| COLUMN_MASTER_KEY
-| COMMITTED
-| COMPATIBILITY_LEVEL
-| CONCAT
-| CONCAT_NULL_YIELDS_NULL
-| CONTENT
-| CONTROL
-| COOKIE
-| COUNT
-| COUNT_BIG
-| COUNTER
-| CPU
-| CREATE_NEW
-| CREATION_DISPOSITION
-| CREDENTIAL
-| CRYPTOGRAPHIC
-| CURSOR_CLOSE_ON_COMMIT
-| CURSOR_DEFAULT
-| DATA
-| DATE_CORRELATION_OPTIMIZATION
-| DATEADD
-| DATEDIFF
-| DATENAME
-| DATEPART
-| DAYS
-| DB_CHAINING
-| DB_FAILOVER
-| DECRYPTION
-| DEFAULT_DOUBLE_QUOTE
-| DEFAULT_FULLTEXT_LANGUAGE
-| DEFAULT_LANGUAGE
-| DELAY
-| DELAYED_DURABILITY
-| DELETED
-| DENSE_RANK
-| DEPENDENTS
-| DES
-| DESCRIPTION
-| DESX
-| DHCP
-| DIALOG
-| DIRECTORY_NAME
-| DISABLE
-| DISABLE_BROKER
-| DISABLED
-| DISK_DRIVE
-| DOCUMENT
-| DYNAMIC
-| ELEMENTS
-| EMERGENCY
-| EMPTY
-| ENABLE
-| ENABLE_BROKER
-| ENCRYPTED_VALUE
-| ENCRYPTION
-| ENDPOINT_URL
-| ERROR_BROKER_CONVERSATIONS
-| EXCLUSIVE
-| EXECUTABLE
-| EXIST
-| EXPAND
-| EXPIRY_DATE
-| EXPLICIT
-| FAIL_OPERATION
-| FAILOVER_MODE
-| FAILURE
-| FAILURE_CONDITION_LEVEL
-| FAST
-| FAST_FORWARD
-| FILEGROUP
-| FILEGROWTH
-| FILEPATH
-| FILESTREAM
-| FILTER
-| FIRST
-| FIRST_VALUE
-| FOLLOWING
-| FORCE
-| FORCE_FAILOVER_ALLOW_DATA_LOSS
-| FORCED
-| FORMAT
-| FORWARD_ONLY
-| FULLSCAN
-| FULLTEXT
-| GB
-| GETDATE
-| GETUTCDATE
-| GLOBAL
-| GO
-| GO_BATCH
-| GROUP_MAX_REQUESTS
-| GROUPING
-| GROUPING_ID
-| HADR
-| HASH
-| HEALTH_CHECK_TIMEOUT
-| HIGH
-| HONOR_BROKER_PRIORITY
-| HOURS
-| IDENTITY_VALUE
-| IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
-| IMMEDIATE
-| IMPERSONATE
-| IMPORTANCE
-| INCLUDE_NULL_VALUES
-| INCREMENTAL
-| INITIATOR
-| INPUT
-| INSENSITIVE
-| INSERTED
-| INT
-| IP
-| ISOLATION
-| JOB
-| JSON
-| KB
-| KEEP
-| KEEPFIXED
-| KEY_SOURCE
-| KEYS
-| KEYSET
-| LAG
-| LAST
-| LAST_VALUE
-| LEAD
-| LEVEL
-| LIST
-| LISTENER
-| LISTENER_URL
-| LOB_COMPACTION
-| LOCAL
-| LOCATION
-| LOCK
-| LOCK_ESCALATION
-| LOGIN
-| LOOP
-| LOW
-| MANUAL
-| MARK
-| MATERIALIZED
-| MAX
-| MAX_CPU_PERCENT
-| MAX_DOP
-| MAX_FILES
-| MAX_IOPS_PER_VOLUME
-| MAX_MEMORY_PERCENT
-| MAX_PROCESSES
-| MAX_QUEUE_READERS
-| MAX_ROLLOVER_FILES
-| MAXDOP
-| MAXRECURSION
-| MAXSIZE
-| MB
-| MEDIUM
-| MEMORY_OPTIMIZED_DATA
-| MESSAGE
-| MIN
-| MIN_ACTIVE_ROWVERSION
-| MIN_CPU_PERCENT
-| MIN_IOPS_PER_VOLUME
-| MIN_MEMORY_PERCENT
-| MINUTES
-| MIRROR_ADDRESS
-| MIXED_PAGE_ALLOCATION
-| MODE
-| MODIFY
-| MOVE
-| MULTI_USER
-| NAME
-| NESTED_TRIGGERS
-| NEW_ACCOUNT
-| NEW_BROKER
-| NEW_PASSWORD
-| NEXT
-| NO
-| NO_TRUNCATE
-| NO_WAIT
-| NOCOUNT
-| NODES
-| NOEXPAND
-| NON_TRANSACTED_ACCESS
-| NORECOMPUTE
-| NORECOVERY
-| NOWAIT
-| NTILE
-| NUMANODE
-| NUMBER
-| NUMERIC_ROUNDABORT
-| OBJECT
-| OFFLINE
-| OFFSET
-| OLD_ACCOUNT
-| ONLINE
-| ONLY
-| OPEN_EXISTING
-| OPENJSON
-| OPTIMISTIC
-| OPTIMIZE
-| OUT
-| OUTPUT
-| OVERRIDE
-| OWNER
-| PAGE_VERIFY
-| PARAMETERIZATION
-| PARTITION
-| PARTITIONS
-| PARTNER
-| PATH
-| POISON_MESSAGE_HANDLING
-| POOL
-| PORT
-| PRECEDING
-| PRIMARY_ROLE
-| PRIOR
-| PRIORITY
-| PRIORITY_LEVEL
-| PRIVATE
-| PRIVATE_KEY
-| PRIVILEGES
-| PROCEDURE_NAME
-| PROPERTY
-| PROVIDER
-| PROVIDER_KEY_NAME
-| QUERY
-| QUEUE
-| QUEUE_DELAY
-| QUOTED_IDENTIFIER
-| RANGE
-| RANK
-| RC2
-| RC4
-| RC4_128
-| READ_COMMITTED_SNAPSHOT
-| READ_ONLY
-| READ_ONLY_ROUTING_LIST
-| READ_WRITE
-| READONLY
-| REBUILD
-| RECEIVE
-| RECOMPILE
-| RECOVERY
-| RECURSIVE_TRIGGERS
-| RELATIVE
-| REMOTE
-| REMOTE_SERVICE_NAME
-| REMOVE
-| REORGANIZE
-| REPEATABLE
-| REPLICA
-| REQUEST_MAX_CPU_TIME_SEC
-| REQUEST_MAX_MEMORY_GRANT_PERCENT
-| REQUEST_MEMORY_GRANT_TIMEOUT_SEC
-| REQUIRED_SYNCHRONIZED_SECONDARIES_TO_COMMIT
-| RESERVE_DISK_SPACE
-| RESOURCE
-| RESOURCE_MANAGER_LOCATION
-| RESTRICTED_USER
-| RETENTION
-| ROBUST
-| ROOT
-| ROUTE
-| ROW
-| ROW_NUMBER
-| ROWGUID
-| ROWS
-| SAMPLE
-| SCHEMABINDING
-| SCOPED
-| SCROLL
-| SCROLL_LOCKS
-| SEARCH
-| SECONDARY
-| SECONDARY_ONLY
-| SECONDARY_ROLE
-| SECONDS
-| SECRET
-| SECURITY
-| SECURITY_LOG
-| SEEDING_MODE
-| SELF
-| SEMI_SENSITIVE
-| SEND
-| SENT
-| SEQUENCE
-| SERIALIZABLE
-| SESSION_TIMEOUT
-| SETERROR
-| SHARE
-| SHOWPLAN
-| SIGNATURE
-| SIMPLE
-| SINGLE_USER
-| SIZE
-| SMALLINT
-| SNAPSHOT
-| SPATIAL_WINDOW_MAX_CELLS
-| STANDBY
-| START_DATE
-| STATIC
-| STATS_STREAM
-| STATUS
-| STATUSONLY
-| STDEV
-| STDEVP
-| STOPLIST
-| STRING_AGG
-| STUFF
-| SUBJECT
-| SUBSCRIPTION
-| SUM
-| SUSPEND
-| SYMMETRIC
-| SYNCHRONOUS_COMMIT
-| SYNONYM
-| SYSTEM
-| TAKE
-| TARGET_RECOVERY_TIME
-| TB
-| TEXTIMAGE_ON
-| THROW
-| TIES
-| TIME
-| TIMEOUT
-| TIMER
-| TINYINT
-| TORN_PAGE_DETECTION
-| TRANSFORM_NOISE_WORDS
-| TRIPLE_DES
-| TRIPLE_DES_3KEY
-| TRUSTWORTHY
-| TRY
-| TSQL
-| TWO_DIGIT_YEAR_CUTOFF
-| TYPE
-| TYPE_WARNING
-| UNBOUNDED
-| UNCOMMITTED
-| UNKNOWN
-| UNLIMITED
-| UOW
-| USING
-| VALID_XML
-| VALIDATION
-| VALUE
-| VAR
-| VARP
-| VIEW_METADATA
-| VIEWS
-| WAIT
-| WELL_FORMED_XML
-| WITHOUT_ARRAY_WRAPPER
-| WORK
-| WORKLOAD
-| XML
-| XMLDATA
-| XMLNAMESPACES
-| XMLSCHEMA
-| XSINIL
-| ABSENT
-| AES
-| ALLOW_CONNECTIONS
-| ALLOW_MULTIPLE_EVENT_LOSS
-| ALLOW_SINGLE_EVENT_LOSS
-| ANONYMOUS
-| APPEND
-| APPLICATION
-| ASYMMETRIC
-| ASYNCHRONOUS_COMMIT
-| AUTHENTICATION
-| AUTOMATED_BACKUP_PREFERENCE
-| AUTOMATIC
-| AVAILABILITY_MODE
-| BEFORE
-| BLOCK
-| BLOCKSIZE
-| BLOCKING_HIERARCHY
-| BUFFER
-| BUFFERCOUNT
-| CACHE
-| CALLED
-| CERTIFICATE
-| CHANGETABLE
-| CHANGES
-| CHECK_POLICY
-| CHECK_EXPIRATION
-| CLASSIFIER_FUNCTION
-| CLUSTER
-| COMPRESSION
-| CONFIGURATION
-| CONTAINMENT
-| CONTEXT
-| CONTINUE_AFTER_ERROR
-| CONTRACT
-| CONTRACT_NAME
-| CONVERSATION
-| COPY_ONLY
-| CUME_DIST
-| CYCLE
-| DATA_COMPRESSION
-| DATA_SOURCE
-| DATABASE_MIRRORING
-| DEFAULT_DATABASE
-| DEFAULT_SCHEMA
-| DIAGNOSTICS
-| DIFFERENTIAL
-| DTC_SUPPORT
-| ENABLED
-| ENDPOINT
-| ERROR
-| EVENT
-| EVENTDATA
-| EVENT_RETENTION_MODE
-| EXECUTABLE_FILE
-| EXPIREDATE
-| EXTENSION
-| EXTERNAL_ACCESS
-| FAILOVER
-| FAILURECONDITIONLEVEL
-| FAN_IN
-| FILE_SNAPSHOT
-| FILENAME
-| FORCESEEK
-| FORCE_SERVICE_ALLOW_DATA_LOSS
-| GET
-| GOVERNOR
-| HASHED
-| HEALTHCHECKTIMEOUT
-| IIF
-| IO
-| INCLUDE
-| INCREMENT
-| INFINITE
-| INIT
-| INSTEAD
-| ISNULL
-| KERBEROS
-| KEY_PATH
-| KEY_STORE_PROVIDER_NAME
-| LANGUAGE
-| LIBRARY
-| LIFETIME
-| LINUX
-| LISTENER_IP
-| LISTENER_PORT
-| LOCAL_SERVICE_NAME
-| LOG
-| MATCHED
-| MASTER
-| MAX_MEMORY
-| MAXTRANSFER
-| MAXVALUE
-| MAX_DISPATCH_LATENCY
-| MAX_EVENT_SIZE
-| MAX_SIZE
-| MAX_OUTSTANDING_IO_PER_VOLUME
-| MEDIADESCRIPTION
-| MEDIANAME
-| MEMBER
-| MEMORY_PARTITION_MODE
-| MESSAGE_FORWARDING
-| MESSAGE_FORWARD_SIZE
-| MINVALUE
-| MIRROR
-| MUST_CHANGE
-| NOFORMAT
-| NOINIT
-| NONE
-| NOREWIND
-| NOSKIP
-| NOUNLOAD
-| NO_CHECKSUM
-| NO_COMPRESSION
-| NO_EVENT_LOSS
-| NOTIFICATION
-| NTLM
-| OLD_PASSWORD
-| ON_FAILURE
-| PAGE
-| PARAM_NODE
-| PARTIAL
-| PASSWORD
-| PERMISSION_SET
-| PER_CPU
-| PER_DB
-| PER_NODE
-| PERCENTILE_CONT
-| PERCENTILE_DISC
-| PERCENT_RANK
-| PERSISTED
-| PLATFORM
-| POLICY
-| PREDICATE
-| PROCESS
-| PROFILE
-| PYTHON
-| R
-| READ_WRITE_FILEGROUPS
-| REGENERATE
-| RELATED_CONVERSATION
-| RELATED_CONVERSATION_GROUP
-| REQUIRED
-| RESET
-| RESTART
-| RESUME
-| RETAINDAYS
-| RETURNS
-| REWIND
-| ROLE
-| RSA_512
-| RSA_1024
-| RSA_2048
-| RSA_3072
-| RSA_4096
-| SAFETY
-| SAFE
-| SCHEDULER
-| SCHEME
-| SERVER
-| SERVICE
-| SERVICE_BROKER
-| SERVICE_NAME
-| SESSION
-| SID
-| SKIP_KEYWORD
-| SOFTNUMA
-| SOURCE
-| SPECIFICATION
-| SPLIT
-| SQLDUMPERFLAGS
-| SQLDUMPERPATH
-| SQLDUMPERTIMEOUT
-| STATE
-| STATS
-| START
-| STARTED
-| STARTUP_STATE
-| STOP
-| STOPPED
-| STOP_ON_ERROR
-| SUPPORTED
-| TAPE
-| TARGET
-| TCP
-| TRACK_CAUSALITY
-| TRANSFER
-| TRY_CAST
-| UNCHECKED
-| UNLOCK
-| UNSAFE
-| URL
-| USED
-| VERBOSELOGGING
-| VISIBILITY
-| WINDOWS
-| WITHOUT
-| WITNESS
-| ZONE
-//Build-ins:
-| VARCHAR
-| NVARCHAR
-| BINARY_KEYWORD
-| VARBINARY_KEYWORD
-| PRECISION //For some reason this is possible to use as ID
-;
+keyword
+    : ABSOLUTE
+    | ACCENT_SENSITIVITY
+    | ACTION
+    | ACTIVATION
+    | ACTIVE
+    | ADDRESS
+    | AES_128
+    | AES_192
+    | AES_256
+    | AFFINITY
+    | AFTER
+    | AGGREGATE
+    | ALGORITHM
+    | ALLOW_ENCRYPTED_VALUE_MODIFICATIONS
+    | ALLOW_SNAPSHOT_ISOLATION
+    | ALLOWED
+    | ANSI_NULL_DEFAULT
+    | ANSI_NULLS
+    | ANSI_PADDING
+    | ANSI_WARNINGS
+    | APPLICATION_LOG
+    | APPLY
+    | ARITHABORT
+    | ASSEMBLY
+    | AT_KEYWORD
+    | AUDIT
+    | AUDIT_GUID
+    | AUTO
+    | AUTO_CLEANUP
+    | AUTO_CLOSE
+    | AUTO_CREATE_STATISTICS
+    | AUTO_SHRINK
+    | AUTO_UPDATE_STATISTICS
+    | AUTO_UPDATE_STATISTICS_ASYNC
+    | AVAILABILITY
+    | AVG
+    | BACKUP_PRIORITY
+    | BEGIN_DIALOG
+    | BIGINT
+    | BINARY_BASE64
+    | BINARY_CHECKSUM
+    | BINDING
+    | BLOB_STORAGE
+    | BROKER
+    | BROKER_INSTANCE
+    | BULK_LOGGED
+    | CALLER
+    | CAP_CPU_PERCENT
+    | CAST
+    | CATALOG
+    | CATCH
+    | CHANGE_RETENTION
+    | CHANGE_TRACKING
+    | CHECKSUM
+    | CHECKSUM_AGG
+    | CLEANUP
+    | COLLECTION
+    | COLUMN_MASTER_KEY
+    | COMMITTED
+    | COMPATIBILITY_LEVEL
+    | CONCAT
+    | CONCAT_NULL_YIELDS_NULL
+    | CONTENT
+    | CONTROL
+    | COOKIE
+    | COUNT
+    | COUNT_BIG
+    | COUNTER
+    | CPU
+    | CREATE_NEW
+    | CREATION_DISPOSITION
+    | CREDENTIAL
+    | CRYPTOGRAPHIC
+    | CURSOR_CLOSE_ON_COMMIT
+    | CURSOR_DEFAULT
+    | DATA
+    | DATE_CORRELATION_OPTIMIZATION
+    | DATEADD
+    | DATEDIFF
+    | DATENAME
+    | DATEPART
+    | DAYS
+    | DB_CHAINING
+    | DB_FAILOVER
+    | DECRYPTION
+    | DEFAULT_DOUBLE_QUOTE
+    | DEFAULT_FULLTEXT_LANGUAGE
+    | DEFAULT_LANGUAGE
+    | DELAY
+    | DELAYED_DURABILITY
+    | DELETED
+    | DENSE_RANK
+    | DEPENDENTS
+    | DES
+    | DESCRIPTION
+    | DESX
+    | DHCP
+    | DIALOG
+    | DIRECTORY_NAME
+    | DISABLE
+    | DISABLE_BROKER
+    | DISABLED
+    | DISK_DRIVE
+    | DOCUMENT
+    | DYNAMIC
+    | ELEMENTS
+    | EMERGENCY
+    | EMPTY
+    | ENABLE
+    | ENABLE_BROKER
+    | ENCRYPTED_VALUE
+    | ENCRYPTION
+    | ENDPOINT_URL
+    | ERROR_BROKER_CONVERSATIONS
+    | EXCLUSIVE
+    | EXECUTABLE
+    | EXIST
+    | EXPAND
+    | EXPIRY_DATE
+    | EXPLICIT
+    | FAIL_OPERATION
+    | FAILOVER_MODE
+    | FAILURE
+    | FAILURE_CONDITION_LEVEL
+    | FAST
+    | FAST_FORWARD
+    | FILEGROUP
+    | FILEGROWTH
+    | FILEPATH
+    | FILESTREAM
+    | FILTER
+    | FIRST
+    | FIRST_VALUE
+    | FOLLOWING
+    | FORCE
+    | FORCE_FAILOVER_ALLOW_DATA_LOSS
+    | FORCED
+    | FORMAT
+    | FORWARD_ONLY
+    | FULLSCAN
+    | FULLTEXT
+    | GB
+    | GETDATE
+    | GETUTCDATE
+    | GLOBAL
+    | GO
+    | GO_BATCH
+    | GROUP_MAX_REQUESTS
+    | GROUPING
+    | GROUPING_ID
+    | HADR
+    | HASH
+    | HEALTH_CHECK_TIMEOUT
+    | HIGH
+    | HONOR_BROKER_PRIORITY
+    | HOURS
+    | IDENTITY_VALUE
+    | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
+    | IMMEDIATE
+    | IMPERSONATE
+    | IMPORTANCE
+    | INCLUDE_NULL_VALUES
+    | INCREMENTAL
+    | INITIATOR
+    | INPUT
+    | INSENSITIVE
+    | INSERTED
+    | INT
+    | IP
+    | ISOLATION
+    | JOB
+    | JSON
+    | KB
+    | KEEP
+    | KEEPFIXED
+    | KEY_SOURCE
+    | KEYS
+    | KEYSET
+    | LAG
+    | LAST
+    | LAST_VALUE
+    | LEAD
+    | LEVEL
+    | LIST
+    | LISTENER
+    | LISTENER_URL
+    | LOB_COMPACTION
+    | LOCAL
+    | LOCATION
+    | LOCK
+    | LOCK_ESCALATION
+    | LOGIN
+    | LOOP
+    | LOW
+    | MANUAL
+    | MARK
+    | MATERIALIZED
+    | MAX
+    | MAX_CPU_PERCENT
+    | MAX_DOP
+    | MAX_FILES
+    | MAX_IOPS_PER_VOLUME
+    | MAX_MEMORY_PERCENT
+    | MAX_PROCESSES
+    | MAX_QUEUE_READERS
+    | MAX_ROLLOVER_FILES
+    | MAXDOP
+    | MAXRECURSION
+    | MAXSIZE
+    | MB
+    | MEDIUM
+    | MEMORY_OPTIMIZED_DATA
+    | MESSAGE
+    | MIN
+    | MIN_ACTIVE_ROWVERSION
+    | MIN_CPU_PERCENT
+    | MIN_IOPS_PER_VOLUME
+    | MIN_MEMORY_PERCENT
+    | MINUTES
+    | MIRROR_ADDRESS
+    | MIXED_PAGE_ALLOCATION
+    | MODE
+    | MODIFY
+    | MOVE
+    | MULTI_USER
+    | NAME
+    | NESTED_TRIGGERS
+    | NEW_ACCOUNT
+    | NEW_BROKER
+    | NEW_PASSWORD
+    | NEXT
+    | NO
+    | NO_TRUNCATE
+    | NO_WAIT
+    | NOCOUNT
+    | NODES
+    | NOEXPAND
+    | NON_TRANSACTED_ACCESS
+    | NORECOMPUTE
+    | NORECOVERY
+    | NOWAIT
+    | NTILE
+    | NUMANODE
+    | NUMBER
+    | NUMERIC_ROUNDABORT
+    | OBJECT
+    | OFFLINE
+    | OFFSET
+    | OLD_ACCOUNT
+    | ONLINE
+    | ONLY
+    | OPEN_EXISTING
+    | OPENJSON
+    | OPTIMISTIC
+    | OPTIMIZE
+    | OUT
+    | OUTPUT
+    | OVERRIDE
+    | OWNER
+    | PAGE_VERIFY
+    | PARAMETERIZATION
+    | PARTITION
+    | PARTITIONS
+    | PARTNER
+    | PATH
+    | POISON_MESSAGE_HANDLING
+    | POOL
+    | PORT
+    | PRECEDING
+    | PRIMARY_ROLE
+    | PRIOR
+    | PRIORITY
+    | PRIORITY_LEVEL
+    | PRIVATE
+    | PRIVATE_KEY
+    | PRIVILEGES
+    | PROCEDURE_NAME
+    | PROPERTY
+    | PROVIDER
+    | PROVIDER_KEY_NAME
+    | QUERY
+    | QUEUE
+    | QUEUE_DELAY
+    | QUOTED_IDENTIFIER
+    | RANGE
+    | RANK
+    | RC2
+    | RC4
+    | RC4_128
+    | READ_COMMITTED_SNAPSHOT
+    | READ_ONLY
+    | READ_ONLY_ROUTING_LIST
+    | READ_WRITE
+    | READONLY
+    | REBUILD
+    | RECEIVE
+    | RECOMPILE
+    | RECOVERY
+    | RECURSIVE_TRIGGERS
+    | RELATIVE
+    | REMOTE
+    | REMOTE_SERVICE_NAME
+    | REMOVE
+    | REORGANIZE
+    | REPEATABLE
+    | REPLICA
+    | REQUEST_MAX_CPU_TIME_SEC
+    | REQUEST_MAX_MEMORY_GRANT_PERCENT
+    | REQUEST_MEMORY_GRANT_TIMEOUT_SEC
+    | REQUIRED_SYNCHRONIZED_SECONDARIES_TO_COMMIT
+    | RESERVE_DISK_SPACE
+    | RESOURCE
+    | RESOURCE_MANAGER_LOCATION
+    | RESTRICTED_USER
+    | RETENTION
+    | ROBUST
+    | ROOT
+    | ROUTE
+    | ROW
+    | ROW_NUMBER
+    | ROWGUID
+    | ROWS
+    | SAMPLE
+    | SCHEMABINDING
+    | SCOPED
+    | SCROLL
+    | SCROLL_LOCKS
+    | SEARCH
+    | SECONDARY
+    | SECONDARY_ONLY
+    | SECONDARY_ROLE
+    | SECONDS
+    | SECRET
+    | SECURITY
+    | SECURITY_LOG
+    | SEEDING_MODE
+    | SELF
+    | SEMI_SENSITIVE
+    | SEND
+    | SENT
+    | SEQUENCE
+    | SERIALIZABLE
+    | SESSION_TIMEOUT
+    | SETERROR
+    | SHARE
+    | SHOWPLAN
+    | SIGNATURE
+    | SIMPLE
+    | SINGLE_USER
+    | SIZE
+    | SMALLINT
+    | SNAPSHOT
+    | SPATIAL_WINDOW_MAX_CELLS
+    | STANDBY
+    | START_DATE
+    | STATIC
+    | STATS_STREAM
+    | STATUS
+    | STATUSONLY
+    | STDEV
+    | STDEVP
+    | STOPLIST
+    | STRING_AGG
+    | STUFF
+    | SUBJECT
+    | SUBSCRIPTION
+    | SUM
+    | SUSPEND
+    | SYMMETRIC
+    | SYNCHRONOUS_COMMIT
+    | SYNONYM
+    | SYSTEM
+    | TAKE
+    | TARGET_RECOVERY_TIME
+    | TB
+    | TEXTIMAGE_ON
+    | THROW
+    | TIES
+    | TIME
+    | TIMEOUT
+    | TIMER
+    | TINYINT
+    | TORN_PAGE_DETECTION
+    | TRANSFORM_NOISE_WORDS
+    | TRIPLE_DES
+    | TRIPLE_DES_3KEY
+    | TRUSTWORTHY
+    | TRY
+    | TSQL
+    | TWO_DIGIT_YEAR_CUTOFF
+    | TYPE
+    | TYPE_WARNING
+    | UNBOUNDED
+    | UNCOMMITTED
+    | UNKNOWN
+    | UNLIMITED
+    | UOW
+    | USING
+    | VALID_XML
+    | VALIDATION
+    | VALUE
+    | VAR
+    | VARP
+    | VIEW_METADATA
+    | VIEWS
+    | WAIT
+    | WELL_FORMED_XML
+    | WITHOUT_ARRAY_WRAPPER
+    | WORK
+    | WORKLOAD
+    | XML
+    | XMLDATA
+    | XMLNAMESPACES
+    | XMLSCHEMA
+    | XSINIL
+    | ABSENT
+    | AES
+    | ALLOW_CONNECTIONS
+    | ALLOW_MULTIPLE_EVENT_LOSS
+    | ALLOW_SINGLE_EVENT_LOSS
+    | ANONYMOUS
+    | APPEND
+    | APPLICATION
+    | ASYMMETRIC
+    | ASYNCHRONOUS_COMMIT
+    | AUTHENTICATION
+    | AUTOMATED_BACKUP_PREFERENCE
+    | AUTOMATIC
+    | AVAILABILITY_MODE
+    | BEFORE
+    | BLOCK
+    | BLOCKSIZE
+    | BLOCKING_HIERARCHY
+    | BUFFER
+    | BUFFERCOUNT
+    | CACHE
+    | CALLED
+    | CERTIFICATE
+    | CHANGETABLE
+    | CHANGES
+    | CHECK_POLICY
+    | CHECK_EXPIRATION
+    | CLASSIFIER_FUNCTION
+    | CLUSTER
+    | COMPRESSION
+    | CONFIGURATION
+    | CONTAINMENT
+    | CONTEXT
+    | CONTINUE_AFTER_ERROR
+    | CONTRACT
+    | CONTRACT_NAME
+    | CONVERSATION
+    | COPY_ONLY
+    | CUME_DIST
+    | CYCLE
+    | DATA_COMPRESSION
+    | DATA_SOURCE
+    | DATABASE_MIRRORING
+    | DEFAULT_DATABASE
+    | DEFAULT_SCHEMA
+    | DIAGNOSTICS
+    | DIFFERENTIAL
+    | DTC_SUPPORT
+    | ENABLED
+    | ENDPOINT
+    | ERROR
+    | EVENT
+    | EVENTDATA
+    | EVENT_RETENTION_MODE
+    | EXECUTABLE_FILE
+    | EXPIREDATE
+    | EXTENSION
+    | EXTERNAL_ACCESS
+    | FAILOVER
+    | FAILURECONDITIONLEVEL
+    | FAN_IN
+    | FILE_SNAPSHOT
+    | FILENAME
+    | FORCESEEK
+    | FORCE_SERVICE_ALLOW_DATA_LOSS
+    | GET
+    | GOVERNOR
+    | HASHED
+    | HEALTHCHECKTIMEOUT
+    | IIF
+    | IO
+    | INCLUDE
+    | INCREMENT
+    | INFINITE
+    | INIT
+    | INSTEAD
+    | ISNULL
+    | KERBEROS
+    | KEY_PATH
+    | KEY_STORE_PROVIDER_NAME
+    | LANGUAGE
+    | LIBRARY
+    | LIFETIME
+    | LINUX
+    | LISTENER_IP
+    | LISTENER_PORT
+    | LOCAL_SERVICE_NAME
+    | LOG
+    | MATCHED
+    | MASTER
+    | MAX_MEMORY
+    | MAXTRANSFER
+    | MAXVALUE
+    | MAX_DISPATCH_LATENCY
+    | MAX_EVENT_SIZE
+    | MAX_SIZE
+    | MAX_OUTSTANDING_IO_PER_VOLUME
+    | MEDIADESCRIPTION
+    | MEDIANAME
+    | MEMBER
+    | MEMORY_PARTITION_MODE
+    | MESSAGE_FORWARDING
+    | MESSAGE_FORWARD_SIZE
+    | MINVALUE
+    | MIRROR
+    | MUST_CHANGE
+    | NOFORMAT
+    | NOINIT
+    | NONE
+    | NOREWIND
+    | NOSKIP
+    | NOUNLOAD
+    | NO_CHECKSUM
+    | NO_COMPRESSION
+    | NO_EVENT_LOSS
+    | NOTIFICATION
+    | NTLM
+    | OLD_PASSWORD
+    | ON_FAILURE
+    | PAGE
+    | PARAM_NODE
+    | PARTIAL
+    | PASSWORD
+    | PERMISSION_SET
+    | PER_CPU
+    | PER_DB
+    | PER_NODE
+    | PERCENTILE_CONT
+    | PERCENTILE_DISC
+    | PERCENT_RANK
+    | PERSISTED
+    | PLATFORM
+    | POLICY
+    | PREDICATE
+    | PROCESS
+    | PROFILE
+    | PYTHON
+    | R
+    | READ_WRITE_FILEGROUPS
+    | REGENERATE
+    | RELATED_CONVERSATION
+    | RELATED_CONVERSATION_GROUP
+    | REQUIRED
+    | RESET
+    | RESTART
+    | RESUME
+    | RETAINDAYS
+    | RETURNS
+    | REWIND
+    | ROLE
+    | RSA_512
+    | RSA_1024
+    | RSA_2048
+    | RSA_3072
+    | RSA_4096
+    | SAFETY
+    | SAFE
+    | SCHEDULER
+    | SCHEME
+    | SERVER
+    | SERVICE
+    | SERVICE_BROKER
+    | SERVICE_NAME
+    | SESSION
+    | SID
+    | SKIP_KEYWORD
+    | SOFTNUMA
+    | SOURCE
+    | SPECIFICATION
+    | SPLIT
+    | SQLDUMPERFLAGS
+    | SQLDUMPERPATH
+    | SQLDUMPERTIMEOUT
+    | STATE
+    | STATS
+    | START
+    | STARTED
+    | STARTUP_STATE
+    | STOP
+    | STOPPED
+    | STOP_ON_ERROR
+    | SUPPORTED
+    | TAPE
+    | TARGET
+    | TCP
+    | TRACK_CAUSALITY
+    | TRANSFER
+    | TRY_CAST
+    | UNCHECKED
+    | UNLOCK
+    | UNSAFE
+    | URL
+    | USED
+    | VERBOSELOGGING
+    | VISIBILITY
+    | WINDOWS
+    | WITHOUT
+    | WITNESS
+    | ZONE
+    //Build-ins:
+    | VARCHAR
+    | NVARCHAR
+    | BINARY_KEYWORD
+    | VARBINARY_KEYWORD
+    | PRECISION //For some reason this is possible to use as ID
+    ;
 
 // https://msdn.microsoft.com/en-us/library/ms175874.aspx
 id
     : ID
     | DOUBLE_QUOTE_ID
     | SQUARE_BRACKET_ID
-    | keywords
+    | keyword
     ;
 
 simple_id
