@@ -672,11 +672,11 @@ alter_availability_group_options
     ;
 
 ip_v4_failover
-    : IPV4_ADDR | STRING
+    : STRING
     ;
     
 ip_v6_failover
-    : IPV6_ADDR | STRING
+    : STRING
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-broker-priority-transact-sql

@@ -117,8 +117,6 @@ INNER:                                 'INNER';
 INSERT:                                'INSERT';
 INTERSECT:                             'INTERSECT';
 INTO:                                  'INTO';
-IPV4_ADDR:                             IPV4_OCTECT DOT IPV4_OCTECT DOT IPV4_OCTECT DOT IPV4_OCTECT;
-IPV6_ADDR:                             IPV6_OCTECT ':' IPV6_OCTECT ':' IPV6_OCTECT ':' IPV6_OCTECT ':' IPV6_OCTECT ':' IPV6_OCTECT ':' IPV6_OCTECT ':' IPV6_OCTECT ':' IPV6_OCTECT;
 IS:                                    'IS';
 JOIN:                                  'JOIN';
 KEY:                                   'KEY';
@@ -898,8 +896,6 @@ BIT_AND:             '&';
 BIT_XOR:             '^';
 
 fragment LETTER:       [A-Z_];
-fragment IPV6_OCTECT:  [0-9A-F]?[0-9A-F]?[0-9A-F]?[0-9A-F]?;
-fragment IPV4_OCTECT:  [0-9]?[0-9]?[0-9];
 fragment DEC_DOT_DEC:  (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DIGIT+);
 fragment HEX_DIGIT:    [0-9A-F];
 fragment DEC_DIGIT:    [0-9];
