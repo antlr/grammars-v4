@@ -83,6 +83,7 @@
 				<module>basic</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
+                <module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
 				<module>capnproto</module>
@@ -104,6 +105,7 @@
 				<module>dart2</module>
 				<module>databank</module>
 				<module>dcm</module>
+				<module>dgol</module>				
 				<module>dice</module>
 				<module>dot</module>
 				<module>edif300</module>
@@ -131,7 +133,8 @@
 				<module>idl</module>
 				<module>inf</module>
 				<module>informix</module>
-				<module>iri</module>
+                <module>infosapient</module>
+                <module>iri</module>
                 <module>iso8601</module>
 				<module>istc</module>
 				<module>janus</module>
@@ -156,6 +159,7 @@
 				<module>mdx</module>
 				<module>memcached_protocol</module>
 				<module>metric</module>
+                <module>microc</module>
 				<module>modelica</module>
 				<module>modula2pim4</module>
 				<module>molecule</module>
@@ -165,8 +169,9 @@
 				<module>muddb</module>
 				<module>mumath</module>
 				<module>mumps</module>
-				<module>muparser</module>				
-				<module>oberon</module>				
+				<module>muparser</module>
+                <module>nanofuck</module>
+                <module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
 				<module>p</module>
@@ -182,6 +187,7 @@
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
 				<module>ply</module>
+                <module>pmmn</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
 				<module>prolog</module>
@@ -213,6 +219,7 @@
 				<module>sgf</module>
 				<module>sharc</module>
 				<module>sickbay</module>
+                <module>sieve</module>
 				<module>smalltalk</module>
 			    <module>smiles</module>
 				<module>smtlibv2</module>
