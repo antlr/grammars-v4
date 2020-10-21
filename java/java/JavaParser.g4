@@ -85,7 +85,7 @@ typeParameters
     ;
 
 typeParameter
-    : annotation* IDENTIFIER (EXTENDS typeBound)?
+    : annotation* IDENTIFIER (EXTENDS annotation* typeBound)?
     ;
 
 typeBound
@@ -246,7 +246,7 @@ classOrInterfaceType
 
 typeArgument
     : typeType
-    | '?' ((EXTENDS | SUPER) typeType)?
+    | annotation* '?' ((EXTENDS | SUPER) typeType)?
     ;
 
 qualifiedNameList
@@ -267,7 +267,7 @@ formalParameter
     ;
 
 lastFormalParameter
-    : variableModifier* typeType '...' variableDeclaratorId
+    : variableModifier* typeType annotation* '...' variableDeclaratorId
     ;
 
 qualifiedName
@@ -481,7 +481,7 @@ expression
     | expression '[' expression ']'
     | methodCall
     | NEW creator
-    | '(' typeType ')' expression
+    | '(' annotation* typeType ')' expression
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
     | prefix=('~'|'!') expression
@@ -585,7 +585,7 @@ typeList
     ;
 
 typeType
-    : annotation? (classOrInterfaceType | primitiveType) ('[' ']')*
+    : annotation* (classOrInterfaceType | primitiveType) (annotation* '[' ']')*
     ;
 
 primitiveType
