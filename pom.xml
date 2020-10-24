@@ -114,6 +114,7 @@
 				<module>fasta</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
+                <module>focal</module>
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
@@ -141,7 +142,8 @@
                 <module>java</module>
 				<module>javadoc</module>
 				<module>javascript</module>
-				<module>jpa</module>
+                <module>joss</module>
+                <module>jpa</module>
                 <module>json</module>
                 <module>json5</module>
 				<module>kirikiri-tjs</module>

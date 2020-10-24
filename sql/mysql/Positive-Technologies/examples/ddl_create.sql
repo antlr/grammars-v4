@@ -66,6 +66,7 @@ create table table_with_character_set (id int, data varchar(50)) character set d
 create table table_with_visible_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC) INVISIBLE VISIBLE);
 create table table_with_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC));
 create table blob_test(id int, col1 blob(45));
+create table žluťoučký (kůň int);
 #end
 #begin
 -- Rename table
