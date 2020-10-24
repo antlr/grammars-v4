@@ -142,7 +142,8 @@
                 <module>java</module>
 				<module>javadoc</module>
 				<module>javascript</module>
-				<module>jpa</module>
+                <module>joss</module>
+                <module>jpa</module>
                 <module>json</module>
                 <module>json5</module>
 				<module>kirikiri-tjs</module>
