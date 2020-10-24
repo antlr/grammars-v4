@@ -56,6 +56,9 @@ command
    | goto_
    | if_
    | type
+   | return_
+   | write_
+   | comment
    ;
 
 ask
@@ -79,7 +82,7 @@ quit
    ;
 
 set
-   : ('SET' | 'S') VARIABLE '=' expression
+   : ('SET' | 'S') VARIABLE '=' expression (';' command)?
    ;
 
 goto_
@@ -100,6 +103,18 @@ typeexpression
    | '#'+
    | STRING_LITERAL
    | ('%' INTEGER '.' INTEGER)
+   ;
+
+return_
+   : 'RETURN'
+   ;
+
+write_
+   : 'WRITE' (grpnum | linenum)?
+   ;
+
+comment
+   : COMMENT
    ;
 
 expression
@@ -178,11 +193,10 @@ BUILTIN
 STRING_LITERAL
    : '"' .*? '"'
    ;
-   //COMMENT
 
-   //  : 'COMMENT' ~ [\r\n]* -> skip
-
-   // ;
+COMMENT
+   : 'COMMENT' ~ [\r\n]*
+   ;
 
 WS
    : [ \r\n\t]+ -> skip
