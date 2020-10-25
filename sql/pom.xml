@@ -15,7 +15,7 @@
 	<modules>
 		<module>hive</module>
 		<module>mysql</module>
-	<!--	<module>plsql</module>-->
+		<module>plsql</module>
 		<module>sqlite</module>
 		<module>tsql</module>
 	</modules>

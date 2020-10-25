@@ -1924,6 +1924,7 @@ tableName
 
 fullColumnName
     : uid (dottedId dottedId? )?
+    | . dottedId dottedId?
     ;
 
 indexColumnName
@@ -2072,12 +2073,12 @@ dataType
     | typeName=(DECIMAL | DEC | FIXED | NUMERIC | FLOAT | FLOAT4 | FLOAT8)
       lengthTwoOptionalDimension? (SIGNED | UNSIGNED)? ZEROFILL?    #dimensionDataType
     | typeName=(
-        DATE | TINYBLOB | BLOB | MEDIUMBLOB | LONGBLOB
+        DATE | TINYBLOB | MEDIUMBLOB | LONGBLOB
         | BOOL | BOOLEAN | SERIAL
       )                                                             #simpleDataType
     | typeName=(
         BIT | TIME | TIMESTAMP | DATETIME | BINARY
-        | VARBINARY | YEAR
+        | VARBINARY | BLOB | YEAR
       )
       lengthOneDimension?                                           #dimensionDataType
     | typeName=(ENUM | SET)
@@ -2157,9 +2158,7 @@ userVariables
 //    Common Expressons
 
 defaultValue
-    : NULL_LITERAL
-    | unaryOperator? constant
-    | currentTimestamp (ON UPDATE currentTimestamp)?
+    : (NULL_LITERAL | unaryOperator? constant | currentTimestamp) (ON UPDATE currentTimestamp)?
     ;
 
 currentTimestamp

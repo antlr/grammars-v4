@@ -84,6 +84,7 @@
 				<module>basic</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
+                <module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
 				<module>capnproto</module>
@@ -114,6 +115,7 @@
 				<module>fasta</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
+                <module>focal</module>
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
@@ -133,14 +135,16 @@
 				<module>idl</module>
 				<module>inf</module>
 				<module>informix</module>
-				<module>iri</module>
+                <module>infosapient</module>
+                <module>iri</module>
                 <module>iso8601</module>
 				<module>istc</module>
 				<module>janus</module>
                 <module>java</module>
 				<module>javadoc</module>
 				<module>javascript</module>
-				<module>jpa</module>
+                <module>joss</module>
+                <module>jpa</module>
                 <module>json</module>
                 <module>json5</module>
 				<module>kirikiri-tjs</module>
@@ -158,6 +162,7 @@
 				<module>mdx</module>
 				<module>memcached_protocol</module>
 				<module>metric</module>
+                <module>microc</module>
 				<module>modelica</module>
 				<module>modula2pim4</module>
 				<module>molecule</module>
@@ -185,6 +190,7 @@
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
 				<module>ply</module>
+                <module>pmmn</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
 				<module>prolog</module>
