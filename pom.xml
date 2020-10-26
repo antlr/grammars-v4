@@ -173,6 +173,7 @@
 				<module>mumps</module>
 				<module>muparser</module>
                 <module>nanofuck</module>
+                <module>newick</module>
                 <module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
