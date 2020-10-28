@@ -1,0 +1,195 @@
+//
+// $Id: KCheckBox.tjs,v 1.9 2007/09/04 19:02:38 cvs Exp $
+//
+
+var image_check_box_on	= "k_check_button_on";
+var image_check_box_off	= "k_check_button_off";
+
+/**----------------------------------------------------------------------
+ * チェックボックス
+ ----------------------------------------------------------------------*/
+class KCheckBox extends KValueWidget
+{
+  // ラベル
+  var _label;
+  // 値
+  var _value;
+  // ボタン表示レイヤ
+  var buttonLayer;
+
+  /*------------------------------
+   * コンストラクタ
+   * 
+   * @param win ウィンドウ
+   * @param label ラベル
+   * @param name 名前<
+   ------------------------------*/
+  function KCheckBox(win, label = "", name = "") {
+    // 親呼び出し
+    super.KWidget(win, name);
+
+    // ボタンレイヤ作成
+    buttonLayer = new global.Layer(win, this);
+    buttonLayer.loadImages(image_off);
+    buttonLayer.visible = true;
+    buttonLayer.hitThreshold = 256;
+    // サイズ設定
+    buttonLayer.setSizeToImageSize();
+    setFixedSize(buttonLayer.width + 2, buttonLayer.height + 2);
+    // デフォルトフォーカス
+    focusable = win.defaultFocusable;
+    // 辺り敷居値
+    hitThreshold = 0;
+    // 値はfalseから
+    _value = false;
+    // ラベルを設定
+    this.label = label;
+  }
+
+  /**------------------------------
+   * ラベルの値
+   *
+   * @return ラベルの値
+   * @param v 新規のラベルの値
+   ------------------------------*/
+  property label {
+    getter {
+      return _label;
+    }
+
+    setter(v) {
+      // 内容が更新されている時だけ処理
+      if (_label == v)
+        return;
+      // 値を更新
+      _label = v;
+      // 再描画
+      drawContent();
+    }
+  }
+
+  // ラベルの内容を描画。サイズを再設定
+  function drawContent {
+    if (_label == "") {
+      // ラベルが無いなら、サイズをボタンのみに合わせ、透明で塗り潰し
+      setFixedSize(buttonLayer.width + 2, buttonLayer.height + 2);
+      fillRect(0, 0, width, height, focused ? WIN_HIGHLIGHT : 0);
+      // ボタンを再配置
+      buttonLayer.setPos(1, 1);
+    } else {
+      // サイズを再設定
+      setFixedSize(font.getTextWidth(_label) + spaceHorizontal + buttonLayer.width + 3, Math.max(font.height, buttonLayer.height + 2));
+      // 透明に塗りつぶし
+      fillRect(0, 0, width, height, focused ? WIN_HIGHLIGHT : 0);
+      // 黒でテキスト描画
+      drawText(2 + buttonLayer.width + spaceHorizontal, (height - font.height) / 2, _label, fontColor);
+      // ボタンを再配置
+      buttonLayer.setPos(1, (height - buttonLayer.height) / 2);
+    }
+  }
+
+  /*------------------------------
+   * 画像をロードする
+   ------------------------------*/
+  function reloadImage {
+    if (_value) 
+      buttonLayer.loadImages(image_on);
+    else
+      buttonLayer.loadImages(image_off);
+  }
+
+  /*------------------------------
+   * マウスボタンに反応する
+   *
+   * マウスボタンを押して値が変わると、 onValueModified が呼ばれます
+   ------------------------------*/
+  function onClick {
+    focus();
+    value = ! value;
+    onValueModified(value, ! value);
+  }
+
+  function onDoubleClick {
+    onClick();
+  }
+
+  /*------------------------------
+   * キーボードに反応する
+   *
+   * キーボードを押して値が変わると、 onValueModified が呼ばれます
+   ------------------------------*/
+  function onKeyDown(key, shift) {
+    if (key == VK_SPACE || key == VK_RETURN) {
+      value = ! value;
+      onValueModified(value, ! value);
+    } else {
+      super.onKeyDown(...);
+    }      
+  }
+
+  /*------------------------------
+   * 値を設定する
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property value {
+    getter {
+      return _value;
+    }
+    setter(v) {
+      // 変更があった場合のみ更新をする
+      if (_value == v)
+        return;
+      // 値を更新
+      _value = v;
+      // イメージを読み直す
+      reloadImage();
+    }
+  }
+
+  // フォントカラーが変更されたらラベルを再描画
+  function onFontColorModified {
+    drawContent();
+  }
+
+  // フォントフェイスが変更されたら再描画
+  function onFontFaceModified {
+    drawContent();
+  }
+
+  // フォントヘイトが変更されたら再描画
+  function onFontHeightModified {
+    drawContent();
+  }
+
+  // スペースが変更されたら再描画
+  function onSpaceModified {
+    drawContent();
+  }
+
+  // フォーカスされたら再描画
+  function onFocus {
+    drawContent();
+  }
+
+  // フォーカスが外れたら再描画
+  function onBlur {
+    drawContent();
+  }
+
+  // enabled==trueならそのまま表示
+  function onNodeEnabled {
+    opacity = 255;
+  }
+
+  // enabled=falseなら半透明で表示
+  function onNodeDisabled {
+    opacity = 64;
+  }
+
+  // 表示画像
+  property image_on	{ getter { return image_check_box_on; } }
+  property image_off{ getter { return image_check_box_off; } }
+}
+

@@ -1,0 +1,10 @@
+GRANT SELECT ON ALL KEYSPACES TO coach;
+GRANT MODIFY ON KEYSPACE field TO manager;
+GRANT ALTER ON KEYSPACE cycling TO coach;
+GRANT ALL PERMISSIONS ON cycling.name TO coach;
+GRANT ALL ON KEYSPACE cycling TO cycling_admin;
+
+
+
+
+

@@ -1,0 +1,38 @@
+/*
+ * model file sample
+ */
+namespace org.sample.owner
+
+abstract concept Address {
+  o String street
+  o String city
+  o String zipcode
+}
+
+@baz(1)
+concept SuburbAddress extends Address {
+  o String suburb optional 
+}
+
+abstract participant Person identified by id {
+  o String id
+  o String name
+  o String firstName default = "Fred" regex=/^[a-zA-Z]*/ optional
+  o DateTime birthDate default = "2000-01-31T23:59:59Z"
+}
+
+participant Relative extends Person {
+  o String relation optional
+}
+
+participant Customer extends Person {
+  o DateTime since default = "2000-01-31T23:59:59.001+05:45"
+}
+
+@foo("arg1", 1)
+@bar("arg2", true, 2)
+participant Owner extends Person{
+  o SuburbAddress address
+  o Relative participant
+  o Integer foo default = 057
+}

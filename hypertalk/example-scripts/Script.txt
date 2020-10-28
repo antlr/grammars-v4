@@ -139,6 +139,57 @@ on testLoops
 end testLoops
 
 --
+-- Part references
+--
+
+on partReferences
+
+    -- Stacks
+    this stack
+    stack
+    stack "Which stack?"
+
+    -- Cards
+    this card
+    card
+    next card
+    any card
+    card id 2
+    card 2
+    card "number 2"
+
+    -- Backgrounds
+    this bg
+    background
+    prev bg
+    bg id 2
+    bkgnd 3
+    background "my background"
+    the last background
+
+    -- Buttons
+    button 3
+    btn id 3
+    button "three"
+    the first button of this card
+    btn id 2 of the prev card
+
+    -- Fields
+    field 3
+    fld id 3
+    field "three"
+    the middle field of this card
+    fld id 2 of the prev card
+
+    -- Message
+    the message
+    the msg window
+    msg box
+    msg
+
+end partReferences
+
+--
 -- Properties
 --
 

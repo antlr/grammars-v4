@@ -1,0 +1,2 @@
+/*Hello World in Powerbuilder-Simple*/
+MessageBox("Hi from Powerbuilder", "Hello World!")

@@ -1,0 +1,480 @@
+//
+// $Id: KTagTextEdit.tjs,v 1.1 2007/09/22 21:38:39 cvs Exp $
+//
+
+/*----------------------------------------------------------------------
+ * タグテキストエディット
+ ----------------------------------------------------------------------*/
+class KTagTextEdit extends KTextEdit
+{
+  var tagList;
+  var tagInfoList;
+  var tagLayerList;
+  var curTagIndex, pointerOnTag;
+  var tagPointerSideLayer;
+  var isPointerOnRightOfTag;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param window
+   * @param name 名前
+   ------------------------------*/
+  function KTagTextEdit(window, name) {
+    // タグのリスト
+    tagList = [];
+    // タグ情報のリスト
+    tagInfoList = [];
+    // タグレイヤのレイスト
+    tagLayerList = [];
+    // 現在のタグ位置
+    curTagIndex = -1;
+    pointerOnTag = false;
+    // 初期化
+    super.KTextEdit(window, name);
+    // タグサイドのレイヤ
+    tagPointerSideLayer = new global.Layer(window, this);
+    isPointerOnRightOfTag = false;
+    tagPointerSideLayer.loadImages("k_tag_pointer_side_left");
+    tagPointerSideLayer.setSizeToImageSize();
+    tagPointerSideLayer.absolute = pointerLayer.absolute + 1;
+    tagPointerSideLayer.visible = true;
+  }
+
+  /**------------------------------
+   * タグの数を参照する
+   *
+   * @return タグの数
+   ------------------------------*/
+  property tagCount {
+    getter {
+      return tagList.count;
+    }
+  }
+
+  /**------------------------------
+   * タグを参照する
+   *
+   * @param index インデックス
+   * @return タグ
+   ------------------------------*/
+  function tagAt(index) {
+    return tagList[index];
+  }
+
+  /**------------------------------
+   * タグ情報を参照する
+   *
+   * @param index インデックス
+   * @return タグ情報
+   ------------------------------*/
+  function tagInfoAt(index) {
+    return tagInfoList[index];
+  }
+
+  /**------------------------------
+   * ポインタ位置にタグがあるか判定する
+   ------------------------------*/
+  property isTagOnPointer {
+    getter {
+      var tagIndex = findTagIndex(pointer.row, pointer.col);
+      return tagIndex >= 0 && tagList[tagIndex].eq(pointer);
+    }
+  }
+
+  /**------------------------------
+   * 特定の位置にタグがあるか判定する
+   ------------------------------*/
+  function isTagOn(row, col) {
+    var point = new KTextEditPoint(row, col);
+    var tagIndex = findTagIndex(point.row, point.col);
+    return tagIndex >= 0 && tagList[tagIndex].eq(point);
+  }
+
+  /**------------------------------
+   * 特定の位置にタグを挿入する
+   *
+   * @param row 行
+   * @param col 列
+   * @param info タグに関連づける追加情報
+   * @param notify 挿入をフック関数に通知するかどうか
+   * @return 挿入されたタグのインデックス
+   ------------------------------*/
+  function insertTag(row, col, info = void, notify = true) {
+    var tag = new KTextEditPoint(row, col);
+    var index = findTagIndex(row, col);
+    // 既存のタグなら、そのインデックスを返す
+    if (index != -1
+	&& tagList[index].eq(tag))
+      return index;
+    // 新規タグを挿入
+    tagList.insert(index + 1, tag);
+    // 新規タグ情報を挿入
+    tagInfoList.insert(index + 1, info);
+    // 再描画
+    redrawTags();
+    if (notify) {
+      onTagInsertAt(index + 1);
+      // 現在参照してるタグを一旦クリア
+      curTagIndex = -1;
+      onPointAt(pointer.row, pointer.col);
+    }
+    
+    return index + 1;
+  }
+
+  /**------------------------------
+   * 現在のポインタ位置にタグを挿入する
+   *
+   * @param info タグに関連づける追加情報
+   * @param notify 挿入をフック関数に通知するかどうか
+   * @return 挿入されたタグのインデックス
+   ------------------------------*/
+  function insertTagAtPointer(info = void, notify = true) {
+    return insertTag(pointer.row, pointer.col, info, notify);
+  }
+
+  /**------------------------------
+   * タグを削除する
+   *
+   * @param notify 削除をフック関数に通知するかどうか
+   * @param index インデックス
+   ------------------------------*/
+  function deleteTag(index, notify = true) {
+    tagList.erase(index);
+    tagInfoList.erase(index);
+    if (notify) {
+      onTagDeleteAt(index);
+      // 現在参照してるタグを一旦クリア
+      curTagIndex = -1;
+      onPointAt(pointer.row, pointer.col);
+    }
+    redrawTags();
+  }
+
+  /**------------------------------
+   * 現在のポインタ位置のタグを削除する
+   *
+   * @param notify 削除をフック関数に通知するかどうか
+   ------------------------------*/
+  function deleteTagAtPointer(notify = true) {
+    deleteTag(findTagIndex(pointer.row, pointer.col), notify);
+  }
+
+  /**------------------------------
+   * 行と列に対応した最小のタグのインデックスを検索する
+   * 指定の位置より前にタグが存在しない時は、-1を返す。
+   *
+   * @param row 行
+   * @param col 列
+   * @param includeCurPos falseを指定すると、指定の位置にあるタグを検索対象に「入れない」。
+   * @return タグのインデックス
+   ------------------------------*/
+  function findTagIndex(row, col, includeCurPos = true) {
+    var val = new KTextEditPoint(row, col);
+    var begin, end, mid, midTag, lop, gop;
+    begin = 0, end = tagList.count;
+    if (includeCurPos) {
+      lop = "le", gop = "gt";
+    } else {
+      lop = "lt", gop = "ge";
+    }
+    while (begin < end) {
+      mid = int((begin + end) / 2);
+      midTag = tagList[mid];
+      if (midTag[lop](val)
+	  && (mid == tagList.count - 1
+	      || tagList[mid + 1][gop](val)))
+	return mid;
+      if (midTag[lop](val))
+	begin = mid + 1;
+      else
+	end = mid;
+    }
+    return -1;
+  }
+
+  /**------------------------------
+   * ポインター位置のタグのインデックスを検索する
+   *
+   * @param includeCurPos falseを指定すると、指定の位置にあるタグを検索対象に「入れない」。
+   * @return タグのインデックス
+   ------------------------------*/
+  function findTagIndexAtPointer(includeCurPos = true) {
+    return findTagIndex(pointer.row, pointer.col, includeCurPos);
+  }
+
+  /**------------------------------
+   * 直前のタグへ移動する
+   ------------------------------*/
+  function backwardTag {
+    var index = findTagIndexAtPointer(false);
+    if (index < 0) 
+      return;
+    var tag = tagAt(index);
+    setPointer(tag.row, tag.col);
+  }
+
+  /**------------------------------
+   * 直後のタグへ移動する
+   ------------------------------*/
+  function forwardTag {
+    var index = findTagIndexAtPointer() + 1;
+    if (index > tagCount - 1) 
+      return;
+    var tag = tagAt(index);
+    setPointer(tag.row, tag.col);
+  }
+
+  /*----------------------------------------------------------------------
+   * 以下、タグ編集に伴って呼び出されるフック関数の口
+   ----------------------------------------------------------------------*/
+  /**------------------------------
+   * タグがピッタリポイントされた時に呼ばれる
+   *
+   * @param index タグのインデックス
+   * @param pointerOnTag ポインタがタグの真上にあるかどうか
+   ------------------------------*/
+  function onTagPointAt(index) {
+  }
+
+  /**------------------------------
+   * タグの領域が変わった時に呼ばれる
+   *
+   * @param index 支配するタグの領域のインデックス
+   ------------------------------*/
+  function onTagRegionAt(index) {
+  }
+
+  /**------------------------------
+   * タグが挿入された時に呼ばれる
+   *
+   * @param index タグのインデックス
+   ------------------------------*/
+  function onTagInsertAt(index) {
+  }
+
+  /**------------------------------
+   * タグが削除された時に呼ばれる
+   *
+   * @param index タグのインデックス
+   ------------------------------*/
+  function onTagDeleteAt(index) {
+  }
+
+  /*----------------------------------------------------------------------
+   * 以下、KTextEditのフック処理
+   ----------------------------------------------------------------------*/
+  // 全テキスト初期化
+  function initAllRows {
+    tagList = [];
+    tagInfoList = [];
+    super.initAllRows(...);
+  }
+
+  // キーバインドをクリアする
+  function clearKeyBind {
+    super.clearKeyBind();
+    // INSキーとポインタサイド切り替えをバインドする
+    bindKey(VK_INSERT, 0, 0, switchPointerSide);
+    // 前のタグ
+    bindKey(VK_LEFT, 1, ssAlt, backwardTag);
+    // 次のタグ
+    bindKey(VK_RIGHT, 1, ssAlt, forwardTag);
+  }
+
+  // タグを再描画する
+  function redrawTags {
+    if (tagLayerList.count < tagList.count) {
+      for (var i = tagList.count - tagLayerList.count; i > 0; i--) {
+	var layer = new global.Layer(window, this);
+	layer.setSize(4, fontHeight);
+	layer.fillRect(0, 0, layer.width, layer.height, 0xFFFF0000);
+	layer.hitThreshold = 256;
+	layer.absolute = 50;
+        layer.opacity = 128;
+	layer.visible = true;
+	tagLayerList.add(layer);
+      }
+    }
+    else if (tagLayerList.count > tagList.count) {
+      for (var i = tagLayerList.count - tagList.count; i > 0; i--) {
+	var layer = tagLayerList[tagLayerList.count - 1];
+	invalidate layer;
+	tagLayerList.erase(tagLayerList.count - 1);
+      }
+    }
+
+    for (var i = 0; i < tagList.count; i++) {
+      var tag = tagList[i];
+      var rowLayer = rowList[tag.row];
+      var pos = rowLayer.pointerPos(tag.col);
+      tagLayerList[i].setPos(pos[0] - tagLayerList[i].width / 2, pos[1]);
+    }
+  }
+
+  // サイドを切り替え
+  function switchPointerSide {
+    isPointerOnRightOfTag = ! isPointerOnRightOfTag;
+    if (isPointerOnRightOfTag)
+      tagPointerSideLayer.loadImages("k_tag_pointer_side_right");
+    else
+      tagPointerSideLayer.loadImages("k_tag_pointer_side_left");
+    locatePointerSide();
+  }
+
+  // サイドを表示
+  function locatePointerSide {
+    if (tagPointerSideLayer === void)
+      return;
+    if (isPointerOnRightOfTag)
+      tagPointerSideLayer.setPos(pointerX, pointerY + fontHeight - tagPointerSideLayer.height + 1);
+    else
+      tagPointerSideLayer.setPos(pointerX - tagPointerSideLayer.width, pointerY + fontHeight - tagPointerSideLayer.height + 1);
+  }
+
+  // ポインタの点滅開始
+  function startPointerBlink {
+    super.startPointerBlink();
+    tagPointerSideLayer.visible = true;
+  }
+
+  // ポインタの点滅終了
+  function stopPointerBlink {
+    super.stopPointerBlink();
+    tagPointerSideLayer.visible = false;
+  }
+
+  // ポインタをタイマーで点滅させる
+  function onPointerTimer {
+    super.onPointerTimer();
+    tagPointerSideLayer.visible = pointerLayer.visible;
+  }
+
+  // ポインタが移動した時に呼ばれる
+  function onPointAt(row, col) {
+    // ポインタ位置から見える最小のタグを検索
+    var index = findTagIndex(row, col);
+    var onTag = (0 <= index && tagList[index].eq(pointer));
+
+    if ((! pointerOnTag	&& onTag)
+        || (onTag && curTagIndex != index)) {
+      onTagPointAt(index, onTag);
+    }
+
+    if (curTagIndex != index)
+      onTagRegionAt(index);
+
+    curTagIndex = index;
+    pointerOnTag = onTag;
+
+    locatePointerSide();
+  }
+
+  // 行が分割された時に呼ばれるフック関数
+  function onSplitAt(row, col) {
+    // カーソルから左の最小タグを検索(自分自身の位置を含まない)
+    var index;
+    if (! isPointerOnRightOfTag)
+      index = findTagIndex(row, col, false) + 1;
+    else
+      index = findTagIndex(row, col, true) + 1;
+    // その一個右のタグから補正計算開始
+    for (;
+	 index < tagList.count;
+	 index++) {
+      if (tagList[index].row == row)
+	tagList[index].col -= col;
+      tagList[index].row ++                 ;
+    }
+  }
+
+  // 行が結合された時に呼ばれるフック関数
+  function onJoinAt(row, col) {
+    // 現在のカーソル以降の最小タグを検索
+    var index = findTagIndex(row, col);
+    // その1個後のタグから補正計算
+    for (var i = index + 1;
+	 i < tagList.count;
+	 i++) {
+      if (tagList[i].row == row + 1) {
+	tagList[i].col += col;
+      }
+      tagList[i].row--;
+    }
+    // 現在地点にタグが重複していたら前者を削除
+    if (index + 1 < tagList.count
+        && tagList[index].eq(tagList[index + 1]))
+      deleteTag(index);
+  }
+
+  // 文字列が挿入された時に呼ばれるフック関数
+  function onInsertAt(row, col, str) {
+    // カーソルから左の最小タグを検索(自分自身の位置を含まない)
+    var index;
+    if (! isPointerOnRightOfTag)
+      index = findTagIndex(row, col, false) + 1;
+    else
+      index = findTagIndex(row, col, true) + 1;
+    // その一個右のタグから補正計算開始
+    for (;
+	 index < tagList.count && tagList[index].row == row;
+	 index++) {
+      tagList[index].col += str.length;
+    }
+  }
+
+  // 文字列が削除された時に呼ばれるフック関数
+  function onDeleteAt(row, col, str) {
+    // 削除左端、右端に対応するタグのインデッススを取得
+    var leftIndex, rightIndex;
+    leftIndex = findTagIndex(row, col, false) + 1;
+    rightIndex = findTagIndex(row, col + str.length);
+    // タグの位置を補正
+    for (var index = rightIndex + 1;
+	 index < tagList.count && tagList[index].row == row;
+	 index++) {
+      tagList[index].col -= str.length;
+    }
+    // 領域内のタグを削除
+    if (leftIndex <= rightIndex) {
+      // 領域内のタグは全部現在位置に設定
+      for (var i = leftIndex; i <= rightIndex; i++) {
+	tagList[i].set(row, col);
+      }
+      // 右端のタグ一個を残してあとは全部削除
+      for (var i = leftIndex; i < rightIndex; i++) {
+	deleteTag(leftIndex);
+      }
+    }
+  }
+
+  // 文字編集の結果、再描画が発生した時に呼ばれる
+  function onRedraw {
+    redrawTags();
+  }
+
+  // フォントの高さが変わったら、タグも大きさ変更ね
+  function onFontHeightModified {
+    for (var i = 0; i < tabLayerList.count; i++) {
+      tabLayerList[i].setSize(4, font.height);
+      tabLayerList[i].fillRect(0, 0, 4, font.height);
+    }
+    super.onFontHeightModified(...);
+  }
+
+  // ノードがイネーブルされたら不透明に
+  function onNodeEnabled {
+    super.onNodeEnabled();
+    for (var i = 0; i < tagLayerList.count; i++)
+      tagLayerList[i].opacity = 128;
+  }
+
+  // ノードがディセーブルされたら半透明に
+  function onNodeDisabled {
+    super.onNodeDisabled();
+    for (var i = 0; i < tagLayerList.count; i++)
+      tagLayerList[i].opacity = 32;
+  }
+}
+ 

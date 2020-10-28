@@ -1,0 +1,1059 @@
+// HistoryLayer.tjs - メッセージ履歴レイヤ
+// Copyright (C)2001-2009, W.Dee and contributors  改変・配布は自由です
+
+class LButtonLayer extends ButtonLayer
+	// parent に onClick イベントを送るようにしたボタンレイヤ
+{
+	function LButtonLayer(window, parent)
+	{
+		super.ButtonLayer(window, parent);
+		focusable = false;
+	}
+
+	function finalize()
+	{
+		super.finalize(...);
+	}
+
+	function onClick()
+	{
+		super.onClick(...);
+	}
+
+	function onExecute(x, y, button, shift)
+	{
+		if(enabled && button == mbLeft)
+			parent.onButtonClick(this);
+		super.onExecute(...);
+	}
+
+}
+
+class HistoryLayer extends Layer
+{
+	var prevPageButton = void;
+	var nextPageButton = void;
+	var closeButton = void;
+
+	var antialiased = true; // アンチエイリアス文字描画を行うか
+	var verticalView = false; // 縦書きかどうか
+	var everypage = false;	// ページ毎の履歴表示を行なうか
+	var autoReturn = true; // 自動的に改行するかどうか
+	var maxLines = 2000; // 最大保持行数
+
+	var data = []; // 行データ ( リングバッファ )
+	var lineStart = []; // 行表示開始位置 ( リングバッファ )
+	var actionInfo = []; // 履歴クリック情報 ( リングバッファ )
+	var dataStart = 0; // データの開始位置
+	var dataLines = 0; // データ中に含まれる行数 < maxLines -1
+	var dataPos = 0; // データ書き込み位置
+
+		// ページ単位での閲覧機能のコードは kiyobee 氏から頂きました。
+		// この場を借りてお礼申し上げます。
+
+	//	"ページ毎"の時は、data, lineStart, actionInfo を2次元に使っている。
+	var maxPages = 100;	//	最大ページ数
+	var dataPages = 0;	//	データ中の有効なページ数
+	var dataPage = 0;//	現在書き込んでいるページ
+
+	var marginL = 12;
+	var marginR = 12;
+	var marginT = 12;
+	var marginB = 12;
+	var fontName = "ＭＳ Ｐ明朝";
+	var fontBold = false;
+	var fontHeight = 24;
+	var lineHeight = 26;
+	var relinePos_org = 0; // 改行位置
+	var limitPos_org = 0; // 画面の端っこ位置
+	var relinePos = 0; // 改行位置
+	var limitPos = 0; // 画面の端っこ位置
+	var indentPos = 0; // インデント位置
+	var repageLine = 0;	//	改ページ行数
+
+	var historyColor = 0xffffff;	//	履歴文字色
+
+	var controlHeight = 20;
+
+	var dispStart = 0;
+	var dispLines = 0;
+	var canScroll = false;
+
+	var currentLine = "";
+
+	var currentAction = void;
+	var currentActionExp = void;
+	var currentActionID = 1;
+
+	var lastHighlightedActionID = 0;
+
+	var lastWheelTick; // 最後にホイールを操作した tick count
+
+	var storeState = false; // 状態を栞に保存するか
+
+	//	禁則文字
+	var wwFollowing = "%),:;]}｡｣ﾞﾟ。，、．：；゛゜ヽヾゝ"
+                "ゞ々’”）〕］｝〉》」』】°′″℃¢％‰"; // 行頭禁則文字
+	var wwFollowingWeak="!.?､･ｧｨｩｪｫｬｭｮｯｰ・？！ーぁぃぅぇぉっゃゅょゎァィ"
+                "ゥェォッャュョヮヵヶ"; // 行頭(弱)禁則文字
+	var wwLeading="\\$([{｢‘“（〔［｛〈《「『【￥＄£"; // 行末禁則文字
+
+	wwFollowing += wwFollowingWeak;
+
+	function HistoryLayer(win, par)
+	{
+		super.Layer(...);
+		(HistoryLayer_config incontextof this)(); // configuration
+		(HistoryLayer_config_override incontextof this)()
+			if typeof global.HistoryLayer_config_override != "undefined";
+
+		name = "メッセージ履歴レイヤ";
+
+		setImageSize(parent.width, parent.height);
+		setSizeToImageSize();
+		hitType = htMask;
+		hitThreshold = 1;
+
+		font.height = fontHeight;
+		font.bold = fontBold;
+		if(verticalView)
+		{
+			font.angle = 2700;
+			font.face = '@' + fontName;
+		}
+		else
+		{
+			font.angle = 0;
+			font.face = fontName;
+		}
+
+		focusable = true;
+
+		cursor = window.cursorDefault;
+
+		clear();
+	}
+
+	function finalize()
+	{
+		invalidate prevPageButton if prevPageButton !== void;
+		invalidate nextPageButton if nextPageButton !== void;
+		invalidate closeButton if closeButton !== void;
+
+		super.finalize(...);
+	}
+
+	function clear()
+	{
+		// 内容のクリア
+		lineStart = [];
+		actionInfo = [];
+		dataStart = 0;
+		dataLines = 0;
+		dataPos = 0;
+		dataPages = 0;
+		dataPage = 0;
+
+		if(everypage)
+		{
+			data[dataPage]	= [];
+			lineStart[dataPage]	= [];
+			actionInfo[dataPage] = [];
+		}
+		else
+			dataLines = 1;
+
+
+		currentLine = "";
+
+		currentAction = void;
+		currentActionExp = void;
+		currentActionID = 1;
+
+		lastHighlightedActionID = 0;
+
+		calcRelinePos();
+	}
+
+	function save() {
+		// 履歴の栞への保存のコードは ゆん氏からいただきました。
+		// この場を借りてお礼申し上げます。
+		if(!storeState) return void;
+		var dic = %[];
+		if(everypage)
+		{
+			dic.lineStart = lineStart;
+			dic.actionInfo = actionInfo;
+			dic.data = data;
+		}
+		else
+		{
+			(dic.lineStart = []).assignStruct(lineStart);
+			(dic.actionInfo = []).assignStruct(actionInfo);
+			(dic.data = []).assignStruct(data);
+		}
+		dic.dataStart = dataStart;
+		dic.dataPos = dataPos;
+		dic.dataPages = dataPages;
+		dic.dataPage = dataPage;
+		dic.dataLines = dataLines;
+		dic.currentLine = currentLine;
+		dic.currentAction = currentAction;
+		dic.currentActionExp = currentActionExp;
+		dic.currentActionID = currentActionID;
+		dic.lastHighlightedActionID = lastHighlightedActionID;
+		return dic;
+	}
+
+	function load(dic) {
+		if(!storeState) return;
+		if(dic === void) return;
+		lineStart.assignStruct(dic.lineStart);
+		actionInfo.assignStruct(dic.actionInfo);
+		data.assignStruct(dic.data);
+		dataStart = dic.dataStart;
+		dataPos = dic.dataPos;
+		dataPages = dic.dataPages;
+		dataPage = dic.dataPage;
+		dataLines = dic.dataLines;
+		currentLine = dic.currentLine;
+		currentAction = dic.currentAction;
+		currentActionExp = dic.currentActionExp;
+		currentActionID = dic.currentActionID;
+		lastHighlightedActionID = dic.lastHighlightedActionID;
+		calcRelinePos();
+	}
+
+	function calcRelinePos()
+	{
+		if(verticalView)
+		{
+			relinePos = relinePos_org = height - marginT - marginB - controlHeight;
+			limitPos =  limitPos_org = height - marginT - controlHeight;
+			repageLine	= (width - marginL - marginR) \ lineHeight;
+		}
+		else
+		{
+			relinePos = relinePos_org = width - marginL - marginR;
+			//	改ページの基準となる行数を計算
+			limitPos = limitPos_org = width - marginL;
+			repageLine	= (height - marginT - marginB - controlHeight) \ lineHeight;
+		}
+	}
+
+	function setOptions(elm)
+	{
+		// オプションを設定
+		if(elm.autoreturn !== void)
+			autoReturn = +elm.autoreturn;
+	}
+
+	function makeButtons()
+	{
+		if(prevPageButton !== void) return; // すでに作成されている
+
+		prevPageButton = new LButtonLayer(window, this);
+		nextPageButton = new LButtonLayer(window, this);
+		closeButton = new LButtonLayer(window, this);
+
+		if(verticalView)
+		{
+			nextPageButton.left    = 0;
+			nextPageButton.top     = 0;
+			nextPageButton.width   = (width-controlHeight) \ 2;
+			nextPageButton.height  = controlHeight-2;
+			nextPageButton.caption = "≪ 次ページ ";
+			nextPageButton.color   = 0x808080;
+			nextPageButton.visible = true;
+
+			prevPageButton.left    = nextPageButton.width;
+			prevPageButton.top     = 0;
+			prevPageButton.width   = nextPageButton.width;
+			prevPageButton.height  = controlHeight-2;
+			prevPageButton.caption = " 前ページ ≫";
+			prevPageButton.color   = 0x808080;
+			prevPageButton.visible = true;
+		}
+		else
+		{
+			prevPageButton.left    = 0;
+			prevPageButton.top     = 0;
+			prevPageButton.width   = (width-controlHeight) \ 2;
+			prevPageButton.height  = controlHeight-2;
+			prevPageButton.caption = "≪ 前ページ ";
+			prevPageButton.color   = 0x808080;
+			prevPageButton.visible = true;
+
+			nextPageButton.left    = prevPageButton.width;
+			nextPageButton.top     = 0;
+			nextPageButton.width   = prevPageButton.width;
+			nextPageButton.height  = controlHeight-2;
+			nextPageButton.caption = " 次ページ ≫";
+			nextPageButton.color   = 0x808080;
+			nextPageButton.visible = true;
+		}
+
+		closeButton.left      = width-controlHeight;
+		closeButton.top       = 0;
+		closeButton.width     = controlHeight;
+		closeButton.height    = controlHeight-2;
+		closeButton.caption   = "×";
+		closeButton.captionColor= 0xffffff;
+		closeButton.color     = 0x707090;
+		closeButton.visible   = true;
+		closeButton.hint      = "メッセージ履歴を閉じる";
+
+	}
+
+	property lastLine
+	{
+		getter
+		{
+			if(everypage)
+				return data[dataPage][dataPos];
+			else
+				return data[dataPos];
+		}
+		
+		setter(line)
+		{
+			if(everypage)
+				data[dataPage][dataPos]	= line;
+			else
+				data[dataPos] = line;
+		}
+	}
+
+	property lastAction
+	{
+		getter
+		{
+			if(everypage)
+				return actionInfo[dataPage][dataPos];
+			else
+				return actionInfo[dataPos];
+		}
+		
+		setter(n)
+		{
+			if(everypage)
+				actionInfo[dataPage][dataPos]	= n;
+			else
+				actionInfo[dataPos] = n;
+		}
+	}
+
+	function getLine(n)
+	{
+		// n 番目の行を得る
+		n += dataStart;
+		if(n >= maxLines) n -= maxLines;
+		return data[n];
+	}
+
+	function getPage(n)
+	{
+		// n 番目のページを得る
+		n += dataStart;
+		if(n >= maxPages) n -= maxPages;
+		return data[n];
+	}
+
+	function getLineStart(n)
+	{
+		// n 番目の行の表示開始位置を得る
+		n += dataStart;
+		if(n >= maxLines) n -= maxLines;
+		return lineStart[n];
+	}
+
+	function getLineStart2(n, m)
+	{
+		// n ページ目の、m 行目の表示開始位置を得る
+		n += dataStart;
+		if(n >= maxPages) n -= maxPages;
+		return lineStart[n][m];
+	}
+
+	function getActionInfo(n)
+	{
+		// n 番目のアクション情報を得る
+		n += dataStart;
+		if(n >= maxLines) n -= maxLines;
+		return actionInfo[n];
+	}
+
+	function getActionInfo2(n, m)
+	{
+		// n ページ目の、m 行目のアクション情報を得る
+		n += dataStart;
+		if(n >= maxPages) n -= maxPages;
+		return actionInfo[n][m];
+	}
+
+	function endAction()
+	{
+		if(currentAction !== void)
+		{
+			// 現在のアクションがすでにある場合
+			var ca = currentAction;
+			var last = ca[ca.count - 1];
+			last.end = font.getTextWidth(currentLine);
+		}
+	}
+
+	function setNewAction(action)
+	{
+		// アクションを新規に設定する
+		if(action == "") action = void;
+		if(action === void) return;
+		endAction();
+		currentActionExp = action;
+		if(currentAction == void) currentAction = [];
+		var last = currentAction[currentAction.count] = %[];
+		last.start = font.getTextWidth(currentLine);
+		last.action = action;
+		last.id = ++currentActionID;
+	}
+
+	function continueAction()
+	{
+		if(currentActionExp === void) return;
+		if(currentAction == void) currentAction = [];
+		var last = currentAction[currentAction.count] = %[];
+		last.start = font.getTextWidth(currentLine);
+		last.action = currentActionExp;
+		last.id = currentActionID;
+	}
+
+	function clearAction()
+	{
+		endAction();
+		currentActionExp = void;
+	}
+
+	function store(ch)
+	{
+		if(!autoReturn)
+		{
+			// 自動改行を行わない場合
+			currentLine += ch;
+		}
+		else
+		{
+			// 自動改行を行う場合
+			var len;
+			if((len = font.getTextWidth(currentLine += ch)) >= relinePos)
+			{
+				var curlen = currentLine.length;
+				var lastch = curlen >= 2 ? currentLine[curlen - 2] : '';
+
+				if(((lastch=='' || wwLeading.indexOf(lastch)==-1) &&
+					wwFollowing.indexOf(ch)==-1) ||
+					(lastch!='' && wwFollowingWeak.indexOf(lastch)!=-1 &&
+						wwFollowingWeak.indexOf(ch)!=-1) || len > limitPos)
+				{
+					// 最後に描画したのが行末禁則文字でない場合
+					// しかもこれから描画するのが行頭禁則文字でない
+					// 場合
+					// または弱禁則文字が連続していない場合
+					// はたまたこれから描画するのが強禁則文字ではなくて、
+					// 確実に 右端を越える場合
+					// ( この場合は余白は考えない )
+					currentLine=
+						currentLine.substring(0, currentLine.length - ch.length);	//	追加した文字を取り除く
+					reline();
+					currentLine = ch;
+				}
+			}
+		}
+	}
+
+	function repage()
+	{
+		//	改ページ
+		if(!everypage) return;
+
+		if(dataPos == 0 && currentLine == "") return; // 何もデータが入っていない場合、なにもしない
+
+		endAction();
+		lastLine	= currentLine;
+		lastAction = currentAction;
+
+		dataPage++;
+		if(dataPage >= maxPages)	dataPage = 0;
+		dataPos	= 0;
+		data[dataPage]	= [];
+		lineStart[dataPage]	= [];
+		lineStart[dataPage][dataPos]	= indentPos;
+		actionInfo[dataPage] = [];
+		actionInfo[dataPage][dataPos] = currentAction;
+		if(dataPage == dataStart)	dataStart++;
+		if(dataStart >= maxPages)	dataStart = 0;
+		if(dataPages < maxPages-1)	dataPages++;
+
+		currentAction = void;
+		currentLine	= '';
+		continueAction();
+	}
+
+	function reline()
+	{
+		// 改行
+
+		if(everypage)
+		{
+			if(dataPos + 1 >= repageLine)
+			{
+				//	改ページすべき行数になったとき
+				repage();
+			}
+			else
+			{
+				endAction();
+				lastLine = currentLine;
+				lastAction = currentAction;
+
+				dataPos++;
+				lineStart[dataPage][dataPos] = indentPos;
+				limitPos = limitPos_org - indentPos;
+				relinePos = relinePos_org - indentPos;
+
+				currentAction = void;
+				currentLine = '';
+				continueAction();
+			}
+		}
+		else
+		{
+			endAction();
+			lastLine = currentLine;
+			lastAction = currentAction;
+
+			dataPos++;
+			if(dataPos >= maxLines) dataPos=0;
+			data[dataPos] = void;
+			lineStart[dataPos] = indentPos;
+			limitPos = limitPos_org - indentPos;
+			relinePos = relinePos_org - indentPos;
+			if(dataPos == dataStart) dataStart++;
+			if(dataStart >= maxLines) dataStart = 0;
+			if(dataLines < maxLines) dataLines++;
+
+			currentAction = void;
+			currentLine = '';
+			continueAction();
+		}
+
+	}
+
+	function beginIndent()
+	{
+		// 現在位置にインデントを設定
+		indentPos = font.getTextWidth(currentLine);
+	}
+
+	function endIndent()
+	{
+		// インデントを解除
+		indentPos = 0;
+	}
+
+	function clearBack(n)
+	{
+		// 背景を塗りつぶす
+		if(n === void)
+		{
+			face = dfAlpha;
+			fillRect(0, 0, width, height, 0xc8000000);
+		}
+		else
+		{
+			face = dfAlpha;
+			if(verticalView)
+				fillRect(width - marginR - (n+1)*lineHeight, controlHeight, lineHeight,
+					height - controlHeight, 0xc8000000);
+			else
+				fillRect(0, n*lineHeight + controlHeight + marginT, width, lineHeight, 0xc8000000);
+		}
+	}
+
+	function dispInit()
+	{
+		// 全部再描画と初期設定
+		makeButtons(); // ボタンを作成
+
+		lastLine = currentLine;
+		endAction();
+		lastAction = currentAction;
+
+		antialiased = window.chDefaultAntialiased;
+		clearBack();
+
+		if(everypage)
+		{
+			if(dataPages>0)
+			{
+				canScroll	= true;
+				dispStart	= dataPages - 1;
+			}
+			else
+			{
+				canScroll	= false;
+				dispStart	= 0;
+			}
+			drawPage();
+		}
+		else
+		{
+			if(verticalView)
+				dispLines = (width - marginR - marginL) \ lineHeight;
+			else
+				dispLines = (height - marginT - marginB - controlHeight) \ lineHeight;
+
+			if(dataLines <= dispLines)
+			{
+				// 表示可能範囲内に収まる
+				canScroll = false;
+				dispStart = 0;
+				var i;
+				for(i= 0; i < dataLines; i++)
+					drawLine(i);
+			}
+			else
+			{
+				// 表示可能範囲内に収まらない
+				canScroll = true;
+				dispStart = dataLines - dispLines;
+				var i;
+				for(i = 0; i < dispLines; i++)
+					drawLine(i);
+			}
+		}
+
+		updateButtonState();
+		visible = true;
+		setMode();
+		focus();
+		lastWheelTick = 0;
+
+		cursor = window.cursorDefault;
+	}
+
+	function dispUninit()
+	{
+		// window から呼ばれる
+		removeMode();
+		visible = false;
+	}
+
+	function drawLine(n)
+	{
+		// 表示行 n を描画する
+		var line = everypage?getPage(dispStart)[n]:getLine(n + dispStart);
+		if(everypage && line=="") return;
+		var linestart = everypage?getLineStart2(dispStart, n):getLineStart(n + dispStart);
+		if(verticalView)
+		{
+			var x = width - marginR - n*lineHeight;
+			drawText(x, marginT + controlHeight + linestart, line, historyColor, 255, antialiased);
+		}
+		else
+		{
+			var y = n*lineHeight + controlHeight + marginT;
+			drawText(marginL + linestart, y, line, historyColor, 255, antialiased);
+		}
+	}
+
+	function drawPage()
+	{
+		var page	= getPage(dispStart);
+		var i;
+		if(verticalView)
+		{
+			var x = width - marginR;
+			for(i = 0; i < repageLine; i++)
+			{
+				if(page[i]!="")
+					drawText(x, marginT + controlHeight + getLineStart2(dispStart, i),
+						page[i], historyColor, 255, antialiased);
+				x -= lineHeight;
+			}
+		}
+		else
+		{
+			var y = controlHeight + marginT;
+			for(i = 0; i < repageLine; i++)
+			{
+				if(page[i]!="")
+					drawText(marginL + getLineStart2(dispStart, i), y, page[i],
+						historyColor, 255, antialiased);
+				y += lineHeight;
+			}
+		}
+	}
+
+	function getActionInfoFromPos(x, y)
+	{
+		// x,y 位置のアクション ID を得る
+		var line;
+		if(verticalView)
+			line = -(x - width + marginR) \ lineHeight;
+		else
+			line = (y - controlHeight - marginT) \ lineHeight;
+		if(line < 0) return void;
+		if(!everypage && dataLines <= dispLines && line >= dataLines) return void; // はみ出ている
+		var ai;
+		if(everypage)
+		{
+			ai = getActionInfo2(dispStart, line);
+		}
+		else
+		{
+			line += dispStart;
+			ai = getActionInfo(line);
+		}
+		if(ai === void) return void; // 情報がない
+		var p = verticalView ? (y - marginT - controlHeight) : (x - marginL);
+		p -= everypage ? getLineStart2(dispStart, line) : getLineStart(line);
+		for(var i = ai.count - 1; i >= 0; i--)
+		{
+			var info = ai[i];
+			if(info.end !== void && info.start < p && p <= info.end) return info;
+		}
+		return void;
+	}
+
+	function highlightAction(id)
+	{
+		// 画面上にある ID で示された ID をすべて ハイライトする
+		lastHighlightedActionID = id;
+		if(id == 0) return;
+		var max = everypage ? repageLine : ((dataLines <= dispLines) ? dataLines : dispLines);
+		for(var i = 0; i < max; i++)
+		{
+			var ai = everypage?getActionInfo2(dispStart, i):getActionInfo(i + dispStart);
+			if(ai === void) continue;
+			for(var ii = ai.count - 1; ii >= 0; ii--)
+			{
+				var info = ai[ii];
+				if(info.end !== void && info.id == id)
+				{
+					var linestart = everypage?getLineStart2(dispStart, i):getLineStart(i + dispStart);
+					if(verticalView)
+					{
+						var x = width - marginR - (i-1)*lineHeight - 1;
+						fillRect(x - lineHeight, info.start + marginT + controlHeight + linestart,
+							1,	info.end - info.start, 0xff000000 | historyColor);
+					}
+					else
+					{
+						var y = i*lineHeight + controlHeight + marginT;
+						fillRect(marginL + linestart + info.start, y + lineHeight - 1,
+							info.end - info.start, 1, 0xff000000 | historyColor);
+					}
+				}
+			}
+		}
+	}
+
+	function clearActionHighlights()
+	{
+		// 画面上にある lastHighlightedActionID で示されたハイライト表示を
+		// すべて消す
+		if(lastHighlightedActionID == 0) return;
+		var max = everypage ? repageLine : ((dataLines <= dispLines) ? dataLines : dispLines);
+		for(var i = 0; i < max; i++)
+		{
+			var ai = everypage?getActionInfo2(dispStart, i):getActionInfo(i + dispStart);
+			if(ai === void) continue;
+			for(var ii = ai.count - 1; ii >= 0; ii--)
+			{
+				var info = ai[ii];
+				if(info.end !== void && info.id == lastHighlightedActionID)
+				{
+					clearBack(i);
+					drawLine(i); // 行を描画しなおす
+				}
+			}
+		}
+		lastHighlightedActionID = 0;
+		cursor = window.cursorDefault;
+	}
+
+	function updateButtonState()
+	{
+		if(!canScroll)
+		{
+			prevPageButton.enabled = canScroll;
+			prevPageButton.captionColor = canScroll?0xff8080:0x808080;
+			nextPageButton.enabled = canScroll;
+			nextPageButton.captionColor = canScroll?0xff8080:0x808080;
+			return;
+		}
+		if(dispStart==0)
+		{
+			prevPageButton.enabled = false;
+			prevPageButton.captionColor = 0x808080;
+		}
+		else
+		{
+			prevPageButton.enabled = true;
+			prevPageButton.captionColor = 0xff8080;
+		}
+		if(  (everypage && dispStart >= dataPages-1) ||
+			(!everypage && dispStart >= dataLines-dispLines))
+		{
+			nextPageButton.enabled = false;
+			nextPageButton.captionColor = 0x808080;
+		}
+		else
+		{
+			nextPageButton.enabled = true;
+			nextPageButton.captionColor = 0xff8080;
+		}
+	}
+
+	function prevPage()
+	{
+		// 前ページに移動
+		if(!canScroll) return;
+		clearActionHighlights();
+		if(everypage)
+		{
+			if(dispStart<1)	return;
+			dispStart--;
+			clearBack();
+			drawPage();
+		}
+		else
+		{
+			clearBack();
+			if(dispStart >= dispLines)
+				dispStart -= dispLines;
+			else
+				dispStart = 0;
+			var i;
+			for(i = 0 ; i < dispLines; i++)
+				drawLine(i);
+		}
+		updateButtonState();
+	}
+	
+	function nextPage()
+	{
+		// 次ページに移動
+		if(!canScroll) return;
+		clearActionHighlights();
+		if(everypage)
+		{
+			if(dispStart>=dataPages-1)	return;
+			dispStart++;
+			clearBack();
+			drawPage();
+		}
+		else
+		{
+			clearBack();
+			if(dispStart < dataLines - dispLines)
+				dispStart += dispLines;
+			if(dispStart > dataLines - dispLines)
+				dispStart = dataLines - dispLines;
+			var i;
+			for(i = 0 ; i < dispLines; i++)
+				drawLine(i);
+		}
+		updateButtonState();
+	}
+
+	function scrollUp()
+	{
+		if(dispStart < dataLines - dispLines)
+		{
+			clearActionHighlights();
+			if(verticalView)
+				copyRect(width - marginR - lineHeight *(dispLines - 1), controlHeight, this,
+					width - marginR - lineHeight *(dispLines), controlHeight,
+						lineHeight * (dispLines-1), height - controlHeight);
+			else
+				copyRect(0, controlHeight + marginT, this,
+					0, controlHeight + lineHeight + marginT, width, lineHeight*(dispLines-1));
+			clearBack(dispLines - 1);
+			dispStart++;
+			drawLine(dispLines - 1);
+			updateButtonState();
+		}
+	}
+	
+	function scrollDown()
+	{
+		if(dispStart!=0)
+		{
+			clearActionHighlights();
+			if(verticalView)
+				copyRect(width - marginR - lineHeight *(dispLines), controlHeight, this,
+					width - marginR - lineHeight *(dispLines-1),
+					controlHeight, lineHeight * (dispLines-1), height - controlHeight);
+			else
+				copyRect(0, controlHeight + lineHeight + marginT, this,
+					0, controlHeight + marginT, width, lineHeight*(dispLines-1));
+			clearBack(0);
+			dispStart--;
+			drawLine(0);
+			updateButtonState();
+		}
+	}
+
+	function hide()
+	{
+		window.hideHistory();
+	}
+
+	function onButtonClick(sender)
+	{
+		if(sender == prevPageButton)
+			prevPage();
+		else if(sender == nextPageButton)
+			nextPage();
+		else if(sender == closeButton)
+			hide();
+	}
+
+	function onMouseDown(x, y, button)
+	{
+		if(button == mbRight) hide();
+		else if(button == mbLeft)
+		{
+			var n = getActionInfoFromPos(x,y);
+			if(n !== void)
+			{
+				Scripts.eval(n.action);
+			}
+		}
+		super.onMouseDown(...);
+	}
+
+	function onMouseMove(x, y, shift)
+	{
+		var n = getActionInfoFromPos(x,y);
+		n = (n === void) ? 0 : n.id;
+		if(lastHighlightedActionID != n)
+		{
+			clearActionHighlights();
+			highlightAction(n);
+			lastHighlightedActionID = n;
+			if(n) cursor = window.cursorPointed;
+		}
+		super.onMouseMove(...);
+	}
+
+	function onMouseLeave()
+	{
+		clearActionHighlights();
+		super.onMouseLeave(...);
+	}
+
+	function onKeyPress(key)
+	{
+		super.onKeyPress(...);
+	}
+
+	function onKeyDown(key)
+	{
+		window.hideMouseCursor();
+		if(canScroll)
+		{
+			if(verticalView)
+			{
+				if(key == VK_DOWN)
+					nextPage();
+				else if(key == VK_UP)
+					prevPage();
+				else if(key == VK_LEFT || key == VK_PRIOR)
+				{
+					if(everypage)
+						nextPage();
+					else
+						scrollUp();
+				}
+				else if(key == VK_RIGHT || key == VK_NEXT)
+				{
+					if(everypage)
+						prevPage();
+					else
+						scrollDown();
+				}
+			}
+			else
+			{
+				if(key == VK_DOWN)
+				{
+					if(everypage)
+						nextPage();
+					else
+						scrollUp();
+				}
+				else if(key == VK_UP)
+				{
+					if(everypage)
+						prevPage();
+					else
+						scrollDown();
+				}
+				else if(key == VK_LEFT || key == VK_PRIOR)
+					prevPage();
+				else if(key == VK_RIGHT || key == VK_NEXT)
+					nextPage();
+			}
+		}
+		if(key == VK_ESCAPE || key == VK_RETURN || key == VK_SPACE)
+		{
+			hide();
+		}
+	}
+
+	function windowMouseWheel(shift, delta, x, y)
+	{
+		// ウィンドウのホイール操作メッセージがここに流される
+		var currenttick = System.getTickCount();
+		delta = delta \ 120;
+		if(delta > 0 )
+		{
+			// 奥
+			while(delta--)
+			{
+				if(everypage)
+					prevPage();
+				else
+					scrollDown();
+			}
+		}
+		else if(delta < 0 )
+		{
+			// 手前
+			if(currenttick - lastWheelTick > 150 &&
+				((everypage && dispStart >= dataPages-1) ||
+				(!everypage && dispStart >= dataLines - dispLines)))
+			{
+				/* くるくる回しているうちにいきなり履歴が閉じたりしないような仕掛け */
+				// 既に最終部分を表示している
+				hide();
+			}
+			else
+			{
+				delta = -delta;
+				while(delta--)
+				{
+					if(everypage)
+						nextPage();
+					else
+						scrollUp();
+				}
+			}
+		}
+		lastWheelTick = currenttick;
+	}
+}
+
+
+

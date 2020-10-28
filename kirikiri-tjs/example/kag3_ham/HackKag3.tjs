@@ -1,0 +1,364 @@
+/******************************************************************************
+	HackKag3.tjs
+	KAG3の機能をいくつか改変します。
+*******************************************************************************/
+
+//------------------------------------------------------------------------------
+// Pタグ書き換え
+// ヒストリレイヤの改行量を倍にする
+TAG.p = function(elm)
+{
+	// ページクリック待ち
+	if (historyWriteEnabled) {
+		historyLayer.reline();
+		historyLayer.reline();
+	}
+	return showPageBreak(elm);
+} incontextof kag;
+
+//------------------------------------------------------------------------------
+// WSタグ書き換え
+// スキップ中は問答無用でcanskipをtrueにする
+
+TAG.ws = function(elm)
+{
+	// 効果音の再生終了待ち
+	
+	// 次の停止までスキップまたは早送り中なら
+	if (skipMode >= 3) {
+		elm.canskip = true;
+	}
+	
+	return waitSEStop(elm);
+} incontextof kag;
+
+//------------------------------------------------------------------------------
+// WBタグ書き換え
+// スキップ中は問答無用でcanskipをtrueにする
+
+TAG.wb = function(elm)
+{
+	// BGM のフェード終了待ち
+	
+	// 次の停止までスキップまたは早送り中なら
+	if (skipMode >= 3) {
+		elm.canskip = true;
+	}
+	
+	return waitBGMFade(elm);
+} incontextof kag;
+
+//------------------------------------------------------------------------------
+// WAITタグ書き換え
+// スキップ中は問答無用でcanskipをtrueにする
+
+TAG.wait = function(elm)
+{
+	// ウェイト
+	
+	// 次の停止までスキップまたは早送り中で、かつ「forde」がtrueでなければ
+	if (skipMode >= 3 && !elm.force) {
+		elm.canskip = true;
+	}
+	
+	return doWait(elm);
+} incontextof kag;
+
+//------------------------------------------------------------------------------
+// processKeysオーバーライド
+// 標準キーバインドを一部変更
+kag.processKeys = function(key, shift)
+{
+	if(checkProceedingKey(key, shift)) return;
+	
+	if (rightClickEnabled && transCount < 1 && conductor == mainConductor) {
+		if(key == #'F')
+		{
+			// メッセージスキップ
+			if (!historyLayer.visible && !messageLayerHiding && !inSleep && nextSkipEnabled) {
+				onSkipToNextStopMenuItemClick();
+				SystemManager.destroyContextMenu();
+			}
+			return;
+		}
+		
+		if(key == #'A')
+		{
+			// 自動読み進め
+			if (!historyLayer.visible && !messageLayerHiding) {
+				hideMouseCursor();
+				onAutoModeMenuItemClick();
+				SystemManager.destroyContextMenu();
+			}
+			return;
+		}
+	
+		if(key == #'R' && historyEnabled)
+		{
+			// メッセージ履歴を表示
+			showHistory();
+			SystemManager.destroyContextMenu();
+			return;
+		}
+	}
+	
+	if (key == #'Q') {
+		// 終了
+		close();
+		SystemManager.destroyContextMenu();
+		return;
+	}
+
+	if(key == VK_ESCAPE || key == VK_APPS)
+	{
+		// メッセージを消す
+		if(typeof this.rightClickMenuItem != "undefined" &&
+			rightClickMenuItem.enabled)
+		{
+			rightClickMenuItem.click(); // クリックをエミュレート
+			return;
+		}
+	}
+} incontextof kag;
+
+//------------------------------------------------------------------------------
+// onHelpAboutMenuItemClickオーバーライド
+// ウィンドウタイトルにゲーム名を使う
+
+kag.onHelpAboutMenuItemClick = function(sender)
+{
+	// 「このソフトについて」ウィンドウを表示
+	var win = new global.KAGWindow(false, aboutWidth, aboutHeight);
+	win.caption = MBSystemPref.title + 'について';
+	win.setPos(left + ((width - win.width)>>1), top + ((height - win.height)>>1));
+	win.process('about.ks' ,,, true); // about.ks を immediate で表示
+	win.showModal(); // モード付きで表示
+	invalidate win;
+} incontextof kag;
+
+//------------------------------------------------------------------------------
+// getBookMarkInfoFromDataオーバーライド
+// セーブデータの書式を独自形式にする
+
+kag.getBookMarkInfoFromData = function(dic, num)
+{
+	var labelname = dic.currentPageName;
+	
+	if(num < numBookMarks)
+	{
+		var i;
+		var maxlength = 28;
+		var hist = historyLayer.data;
+		var str  = "";
+		var tmppos = historyLayer.dataPos - 1;
+		if (tmppos < 0) {
+			tmppos = historyLayer.maxLines - 1;
+		}
+		for (i=tmppos; i>=0; i--) {
+			if (hist[i] == "") {
+				continue;
+			}
+			str = hist[i] + str;
+			if (str.length > maxlength) {
+				break;
+			}
+		}
+		
+		bookMarkNames[num] = str;
+		
+		bookMarkNames[num] += "/" + labelname;
+		bookMarkNames[num] += "/" + SystemManager.ptGetTotalPlayTime();
+		var date = new Date();
+		date.setTime(dic.storeTime);
+		date = "%04d/%02d/%02d %02d:%02d".sprintf(
+			date.getYear(), date.getMonth() + 1, date.getDate(),
+			date.getHours(), date.getMinutes() );
+		bookMarkDates[num] = date;
+		setBookMarkMenuCaptions();
+		saveSystemVariables();
+	}
+} incontextof kag;
+
+//------------------------------------------------------------------------------
+// BGMとSEの音量をセーブデータから読まないようにする
+
+kag.bgm.restore = function(dic)
+{
+	// 辞書配列から現在の状態を復帰
+	
+	tf.bgm_restored = "";
+	
+	stopFade();
+	if(dic.currentStorage != "") {
+		tf.bgm_restored = dic.currentStorage;
+		play(%[ storage : dic.currentStorage, loop : true]);
+	}
+	else {
+		stop();
+	}
+} incontextof kag.bgm;
+
+for(tf.i=0; tf.i<kag.numSEBuffers; tf.i++) {
+	kag.se[tf.i].restore = function(dic)
+	{
+		// 辞書配列から状態を読み出し、復帰する
+		
+		if (dic !== void && isvalid(dic)) {
+			//currentVolume = dic.volume;
+			pan = dic.pan;
+			if(dic.currentStorage != "")
+				play(%[storage : dic.currentStorage, loop : true]);
+			else
+				stop();
+		}
+		else {
+			stop();
+		}
+	} incontextof kag.se[tf.i];
+}
+
+//------------------------------------------------------------------------------
+// フルスクリーンフラグをシステム変数に保存しない
+
+kag.saveSystemVariables = function()
+{
+	// システム変数の保存
+	if(!isMain) return;
+
+	// プラグインを呼ぶ
+	forEachEventHook('onSaveSystemVariables',
+		function(handler, f) { handler(); } incontextof this);
+
+	// フルスクリーン
+	//scflags.fullScreen = fullScreened;
+
+	// 文字表示速度
+	scflags.autoModePageWait = autoModePageWait;
+	scflags.autoModeLineWait = autoModeLineWait;
+	scflags.userChSpeed = userChSpeed;
+	scflags.userCh2ndSpeed = userCh2ndSpeed;
+	scflags.chDefaultAntialiased = chDefaultAntialiased;
+	scflags.chDefaultFace = chDefaultFace;
+	scflags.chNonStopToPageBreak = chNonStopToPageBreak;
+	scflags.ch2ndNonStopToPageBreak = ch2ndNonStopToPageBreak;
+
+	// ブックマーク名
+	scflags.bookMarkNames = bookMarkNames; // (コピーではなくて)参照で十分
+	scflags.bookMarkDates = bookMarkDates;
+	scflags.bookMarkProtectedStates = bookMarkProtectedStates;
+
+	scflags.lastSaveDataNameGlobal = lastSaveDataNameGlobal;
+
+	// ファイルに書き込む
+	if(!readOnlyMode)
+	{
+		var fn = saveDataLocation + "/" + dataName +
+			"sc.ksd";
+		(Dictionary.saveStruct incontextof scflags)(fn, saveDataMode);
+
+		var fn = saveDataLocation + "/" + dataName +
+			"su.ksd";
+		(Dictionary.saveStruct incontextof sflags)(fn, saveDataMode);
+	}
+} incontextof kag;
+
+//------------------------------------------------------------------------------
+// storeタグでクイックセーブの有効無効も切り替えられるようにする
+
+if (MBSystemPref.enableQuickSave) {
+	kag.setStoreEnabled = function(enabled)
+	{
+		// 栞メニューの有効/無効の設定
+		storeEnabled = enabled;
+		restoreEnabled = enabled;
+		
+		// クイックセーブ
+		if (enabled) {
+			_QuickSaves.fore.setActiveness(true);
+			_QuickSaves.back.setActiveness(true);
+		}
+		else {
+			_QuickSaves.fore.setActiveness(false);
+			_QuickSaves.back.setActiveness(false);
+		}
+		
+		setMenuAccessibleAll();
+	} incontextof kag;
+}
+
+
+//------------------------------------------------------------------------------
+// disablestoreタグでクイックセーブの有効無効も切り替えられるようにする
+
+if (MBSystemPref.enableQuickSave) {
+	// 設定時
+	kag.tempDisableStore = function(elm)
+	{
+		// 栞の状態を見ておく
+		tf.currentEnabled = storeEnabled;
+		
+		// 栞を一時的に保存不可能にする
+		storeEnabled = true;
+		if(elm.store === void) {
+			_QuickSaves.fore.setActiveness(false);
+			_QuickSaves.back.setActiveness(false);
+			storeLabelPassed = false;
+		}
+		else {
+			storeLabelPassed = !(+elm.store);
+			_QuickSaves.fore.setActiveness(storeLabelPassed);
+			_QuickSaves.back.setActiveness(storeLabelPassed);
+		}
+		
+		// restore如何はクイックセーブ設定では無視する
+		if(elm.restore == void)
+			restoreEnabled = true;
+		else 
+			restoreEnabled = !(+elm.restore);
+		
+		setMenuAccessibleAll();
+	} incontextof kag;
+	
+	// 復帰時
+	kag.onConductorLabel = function(label, page)
+	{
+		// コンダクタがラベルを通過した
+		if(!usingExtraConductor)
+		{
+			incRecordLabel(true);
+			setRecordLabel(conductor.curStorage, label);
+		}
+		setUserSpeed();
+		if(!usingExtraConductor)
+		{
+			if(!getCurrentRead() && skipMode != 4)
+				cancelSkip(); // 未読なのでスキップを停止
+			currentLabel = label;
+		}
+		if(page !== void && page !== '')
+		{
+			if(page[0] == '&') page = Scripts.eval((page.substring(1)));
+			currentPageName = page;
+		}
+		if(page !== void)
+		{
+			pushHistoryOfStore();
+			stablePosibility = false;
+			dm(conductor.curStorage + " : ラベル/ページ : " + label + "/" + currentPageName);
+			if(usingExtraConductor) throw new Exception("右クリックサブルーチン内/extraCondutor"
+				"サブルーチン内では保存可能なラベルを記述できません");
+			storeFlags(), storeLabelPassed = true, setMenuAccessibleAll();
+			if(recordHistoryOfStore == 1) // 1 : 保存可能なラベルごと
+				setToRecordHistory();
+			
+			if (tf.currentEnabled) {
+				// クイックセーブメニューを復帰
+				_QuickSaves.fore.setActiveness(storeLabelPassed);
+				_QuickSaves.back.setActiveness(storeLabelPassed);
+			}
+			
+			delete tf.currentEnabled;
+		}
+		return true;
+	} incontextof kag;
+}

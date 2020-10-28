@@ -1,7 +1,7 @@
 "** 01-s1.pdf page 14
 " s3
 
-	" search for user (process)
+	" search for user (process) table entry
 	" call:
 	"   jms searchu; worker_routine_addr
 	" worker called with copy of a process table entry in "lu"
@@ -104,7 +104,7 @@ badcal:				" bad (unimplemented) system call
    lac u.dspbuf
    sna				" process using display?
    jmp .+3			"  no
-   law dspbuf			"   yes
+   law dspbuf			"   yes: get default display buffer
    jms movdsp			"   move display
    jms awake
    lac u.ulistp i
@@ -113,36 +113,43 @@ badcal:				" bad (unimplemented) system call
    isz u.ulistp
    dzm u.ulistp i		" clear pid in process table
    jms swap			" find a new process to run
+	" exit falls into "rmes" !!!
 
+	" rmes system call
+	"   sys smes
+	" AC/ sending pid
+	" MQ/ message
 .rmes:
    jms awake
-   lac o100000
-   tad u.ulistp i
+   lac o100000			" mark this process "not ready"
+   tad u.ulistp i		" by incrementing status
    dac u.ulistp i
    law 2
    tad u.ulistp
-   dac 9f+t
+   dac 9f+t			" pointer to msg status in proc table
    -1
-   dac 9f+t i
-   jms swap
+   dac 9f+t i			" set to -1 (waiting for message)
+   jms swap			" switch processes
    law 2
    tad u.ulistp
    dac 9f+t
-   lac 9f+t i
-   cma
-   dac u.ac
-   dzm 9f+t i
+   lac 9f+t i			" get msg status word
+   cma				" complement (get sender pid)
+   dac u.ac			" return in user AC
+   dzm 9f+t i			" clear status word
    isz 9f+t
-   lac 9f+t i
-   dac u.mq
-   dzm 9f+t i
+   lac 9f+t i			" get message
+   dac u.mq			" return in user MQ
+   dzm 9f+t i			" clear message
    jmp sysexit
 t = t+1
 
 "** 01-s1.pdf page 16
 	" smes system call
 	" AC/ pid
+	" MQ/ message
 	"   sys smes
+	" returns with message delivered, or error if process does not exist
 .smes:
    lac u.ac			" get pid from user AC
    sna spa			" >0?
@@ -158,10 +165,10 @@ t = t+1
    sad u.ac			" match?
    skp				"  yes
    jmp 1b i			"   no
-   lac lu+2			" get mailbox
+   lac lu+2			" get mailbox status
    sad dm1			" -1?
    jmp 1f			"  yes
-   lac o100000			" no: increment process status
+   lac o100000			" no: bump our process status (to notready?)
    tad u.ulistp i
    dac u.ulistp i
    law 2
@@ -178,35 +185,36 @@ t = t+1
 1:
    -3
    tad 8
-   dac 9f+t
-   lac o700000
+   dac 9f+t			" pointer to dest process ulist entry
+   lac o700000			" complement process status? marks ready??
    tad 9f+t i
    dac 9f+t i
    isz 9f+t
-   isz 9f+t
-   lac u.pid
-   cma
-   dac 9f+t i
-   isz 9f+t
-   lac u.mq
-   dac 9f+t i
+   isz 9f+t			" point to mailbox word?
+   lac u.pid			" get our pid
+   cma				" complement
+   dac 9f+t i			" store in mailbox??
+   isz 9f+t			" advance to next word
+   lac u.mq			" get user MQ
+   dac 9f+t i			" save as message
    jmp okexit
 t = t+1
 
+	" wake up process hanging on rmes for current process??
 awake: 0
    jms searchu; 1f
    jmp awake i
 1: 0				" searchu worker
    lac u.pid			" get caller pid
-   sad lu+2			" match process table entry?
+   sad lu+2			" match mailbox status?
    skp				"  yes
    jmp 1b i			"   no, return
    -3
-   tad 8			" get pointer to pid in process table??
+   tad 8			" get pointer to process table entry
    dac 9f+t			" save in t0
 "** 01-s1.pdf page 17
-   lac o700000			" set high bits
-   tad 9f+t i
+   lac o700000
+   tad 9f+t i			" complement process status (mark ready)??
    dac 9f+t i
    jmp 1b i			" return from worker
 t = t+1
@@ -222,7 +230,7 @@ sww:
 	" read routine for ttyin special file
 rttyi:
    jms chkint1
-   lac d1
+   lac d1		" ** written d3 ttyin2
    jms getchar
       jmp 1f
    and o177
@@ -249,9 +257,9 @@ wttyo:
    xor o400000
    dac sfiles+1
    lacq
-   tls
-   sad o12
-   jms putcr
+   tls				" load output buffer
+   sad o12			" newline?
+   jms putcr			"  yes, put CR as well
    jmp fallr
 1:
    lacq
@@ -274,11 +282,11 @@ rkbdi:
    lmq
    and o155
    sad o55
-   jmp 1f
+   jmp 1f			" -/=? map to =?-/ ???
    lacq
    and o137
    sad o134
-   skp
+   skp				" \| map to Ll ???
    jmp 2f
 1:
    lacq
@@ -308,8 +316,8 @@ rkbdi:
 wdspo:
    jms chkint1
    jms forall
-   jms dspput
-      jmp fallr
+   jms dspput			" put char (fallr "returns" here)
+      jmp fallr			" go back for next (continuation!)
    jms sleep; sfiles+6
    jms swap
    jmp wdspo
@@ -322,9 +330,9 @@ rppti:
       jmp .+3
    alss 9
    jmp passone
-   lac sfiles+3
-   sma
-   rsa
+   lac sfiles+3			" get sleep word
+   sma				" high bit set?
+   rsa				"  no: reader select alphanumeric mode
 1:
    jms sleep; sfiles+3
    jms swap
@@ -356,12 +364,12 @@ wppto:
    jms swap
    jmp wppto
 
-	" common exit for special file
+	" common exit for special file input
 passone:
-   sad o4000
-   jmp okexit
-   dac u.base i
-   lac d1
+   sad o4000			" CTRL/D?
+   jmp okexit			"  yes: return zero
+   dac u.base i			" no: save for user
+   lac d1			" return 1
    dac u.ac
    jmp sysexit
 

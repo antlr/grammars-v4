@@ -52,7 +52,7 @@ rulelist
    ;
 
 rule_
-   : ID ( '=' | '=/' ) elements
+   : ID '=' '/'? elements
    ;
 
 elements
@@ -64,7 +64,7 @@ alternation
    ;
 
 concatenation
-   : repetition ( repetition )*
+   : repetition +
    ;
 
 repetition
@@ -114,7 +114,7 @@ ProseValue
 
 
 ID
-   : ( 'a' .. 'z' | 'A' .. 'Z' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )*
+   : LETTER ( LETTER | DIGIT | '-' )*
    ;
 
 
@@ -137,6 +137,7 @@ STRING
    : ( '%s' | '%i' )? '"' ( ~ '"' )* '"'
    ;
 
+fragment LETTER : 'a' .. 'z' | 'A' .. 'Z';
 
 fragment BIT
    : '0' .. '1'

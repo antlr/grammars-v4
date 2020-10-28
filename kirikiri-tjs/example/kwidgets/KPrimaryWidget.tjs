@@ -1,0 +1,93 @@
+//
+// $Id: KPrimaryWidget.tjs,v 1.9 2007/09/04 10:29:44 m2 Exp $
+//
+
+
+/**----------------------------------------------------------------------
+ * プライマリウィジェット
+ *
+ * ウィンドウの作成時に自動的に作成される 
+ ----------------------------------------------------------------------*/
+class KPrimaryWidget extends KWidget
+{
+  // 子ウィジェット
+  var child;
+  // ウィジェット一時倉庫。レイアウトにaddされていないウィジェットが一時的に格納される。
+  var widgetDepot;
+
+  /**------------------------------
+   * コンストラクタ
+   * 
+   * KPrimaryWidget は KWindow により自動的に作成され、ユーザーが
+   * 明示的にnewすることは無い
+   ------------------------------*/
+  function KPrimaryWidget(win) {
+    // 親呼び出し
+    super.KWidget(win, "", true);
+    // イメージを持たない
+    hasImage = false;
+    // 子はまだ無し
+    child = void;
+    // BGカラーは灰色
+    neutralColor = WIN_BG;
+
+    // ウィジェットの一時置き場
+    widgetDepot = new global.Layer(win, this);
+  }
+
+  /**------------------------------
+   * 子ウィジェットをはめ込む
+   * 
+   * プライマリウィジェットには1度に1つのウィジェットしか「追加」できない
+   * 
+   * @param 子ウィジェット
+   ------------------------------*/
+  function add(child) {
+    this.child = child;
+    child.parent = this;
+    invalidateLayout();
+  }
+
+  /**------------------------------
+   * 子ウィジェットを取り除く
+   *
+   * @param 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    child.parent = widgetDepot;
+    this.child = void;
+    if (doInvalidate)
+      invalidate child;
+  }
+
+  // 子のマージンが変わったら再配置
+  function onChildMarginModified {
+    invalidateLayout();
+  }
+
+  // 子の最小最大サイズが変わったら再配置
+  function onChildMinMaxSizeModified {
+    invalidateLayout();
+  }
+        
+  // 再配置
+  function invalidateLayout {
+    setMinMaxSize(child.minWidth + child.marginHorizontal,
+                  child.minHeight + child.marginVertical,
+                  child.maxWidth + child.marginHorizontal,
+                  child.maxHeight + child.marginVertical);
+    child.setPos(child.marginLeft, child.marginRight);
+    child.setSize(width - child.marginHorizontal,
+                  height - child.marginVertical);
+  }
+
+  // リサイズが起きたら、子のサイズを更新
+  function onSizeModified(w, h) {
+    if (! child)
+      return;
+
+    child.setSize(w - child.marginHorizontal,
+                  h - child.marginVertical);
+  }
+};

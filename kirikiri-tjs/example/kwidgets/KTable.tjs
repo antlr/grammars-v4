@@ -1,0 +1,5124 @@
+/*
+
+  ○KTableことはじめ
+
+  TJSのデータセットを編集するための表組みクラス。
+
+  行が一個のエレメント
+  列がエレメント中の属性と対応する。
+
+  例えば、すごくざっくり、以下のようなテーブルを作成すると、
+
+    var attrList = 
+      [ 
+        [ KTextTableColumn,     "名前",     "name",   %[ editable: true ] ],
+        [ KIntTableColumn,      "価格",     "price",  %[ editable: true ] ],
+        [ KIntTableColumn,      "個数",     "count",  %[ editable: true ] ],
+        [ KCheckBoxTableColumn, "出荷済み", "shiped", %[ editable: true ] ]
+      ];
+    var table = new KTable(window, "table", attrList);
+
+  以下のようにエレメントの配列を渡す事が出来て、
+
+    table.value = 
+      [ 
+        %[ name: "あんまん", price: 100, count: 10 ],
+        %[ name: "にくまん", price: 120, count: 10 ],
+        %[ name: "ピザまん", price: 110, count: 5, shiped: true ]
+      ];
+
+  こんな感じの見た目の表で編集することが出来る。
+
+    +--------+--------+--------+--------+
+    |名前    |価格    |個数    |出荷済み|
+    +--------+--------+--------+--------+
+    |あんまん|     100|      10|   □   |
+    +--------+--------+--------+--------+
+    |にくまん|     120|      10|   □   |
+    +--------+--------+--------+--------+
+    |ピザまん|     110|       5|   ☑   |
+    +--------+--------+--------+--------+
+
+  エレメントは、辞書形式で無く配列形式の物を編集することも出来る。
+  その場合、以下のように、キーを文字列では無く数字にしてテーブルを作成すると良い。
+
+    var attrList = 
+      [ 
+        [ KTextTableColumn,     "名前",     0, %[ editable: true ] ],
+        [ KIntTableColumn,      "価格",     1, %[ editable: true ] ],
+        [ KIntTableColumn,      "個数",     2, %[ editable: true ] ],
+        [ KCheckBoxTableColumn, "出荷済み", 3, %[ editable: true ] ]
+      ];
+    var table = new KTable(window, "table", attrList);
+    table.value = 
+      [ 
+        [ "あんまん", 100, 10 ],
+        [ "にくまん", 120, 10 ],
+        [ "ピザまん", 110, 5, true ]
+      ];
+
+  GUIとしてのの挙動は、辞書配列の場合と全く同じになる。
+
+  また、全てのカラムに共通するオプションは、以下のようにKTableの第4引数で、デフォルトオプションとして指定することも出来る。
+
+    var attrList = 
+      [ 
+        [ KTextTableColumn,     "名前",     "name"   ],
+        [ KIntTableColumn,      "価格",     "price"  ],
+        [ KIntTableColumn,      "個数",     "count"  ],
+        [ KCheckBoxTableColumn, "出荷済み", "shiped" ]
+      ];
+    var table = new KTable(window, "table", attrList, %[ editable: true ]);
+
+  テーブル のデフォルトオプションと カラムのオプションが両方指定されている場合、カラムのオプション指定が優先される。
+
+  ちなみにエレメントで値を設定していない属性には、自動的に「初期値」があてがわれる。
+  初期値を任意に設定する方法はあとで説明。
+
+
+  ○カラム（列）の定義
+
+  前述のように、KTable には、カラムのセットを属性リストとして渡す。
+  属性定義の構成は、以下のようになっている。
+
+    [ カラムクラス, ラベル, キー, オプション(省略可能) ]
+  
+  カラムクラスは全て KTableColumn クラスの派生クラスとなっている。
+  編集可能な属性によって色々なカラムが用意してある。
+  ラベルで表のカラムタブに表示される属性名、
+  キーでエレメント中の属性のキー、
+  オプションでカラムの挙動を定義する。
+
+  以下、主要なカラムクラスを解説する。
+
+  [KTableColumn]
+  ・解説
+    全てのカラムの基底クラス。
+    このカラム自体を指定しても意味は無い。
+    以下、全てのカラムに共通するオプションを解説する。
+  ・オプション(型: 初期値)
+    visible (bool: true)
+      カラムを表示するかどうか
+    editable (bool: false)
+      カラムを編集可能にするかどうか
+    fixedWidth (int: 64)
+      カラムの初期幅
+    hint (string: "")
+      カラムタブにカーソルを合わせた時に表示されるヒント
+    array (bool: false)
+      カラムを配列化するかどうか
+      カラムを配列化すると、エレメントを型の値そのものでは無く、値の配列で指定出来るようになる。
+      この際、指定のキーのカラムは内部的には KArrayTableColumn に置き換えられる。
+    innerDragSort (bool: false)
+       配列化したカラムのエレメントをD&Dで入れ替え可能にするか
+  ・プロパティ
+    array (bool)
+      カラムが配列かされているかどうか返す
+    visible (bool)
+      カラムを表示するかどうか
+
+  [KTextTableColumn]
+  ・解説
+    文字列を編集するカラム。
+  ・オプション(型: 初期値)
+    initialValue: (string: "")
+      属性省略時の初期値
+    alignment: (int: ALIGN_LEFT )
+      文字列の表示アライメントを、 ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT のいずれかで指定する
+    caseSensitive: (bool: true )
+      ソートの際にケースセンシティブな比較を行なうかどうかを指定する
+    textColor: (int: 0)
+      テキストカラーをRRGGBB形式で指定する。
+      テキストカラーは関数形式で定義することも出来る。
+      その場合、テキストの値が引数で渡されるので、その内容を見てカラーの値を返すとよい。
+
+  [KTextAreaTableColumn]
+  ・解説
+    改行を含んだ文字列「テキストエリア」を編集するカラム。
+  ・オプション(型: 初期値)
+    caseSensitive: (boo: true )
+      ソートの際にケースセンシティブな比較を行なうかどうかを指定する
+    textColor: (int: 0)
+      テキストカラーをRRGGBB形式で指定する。
+      テキストカラーは関数形式で定義することも出来る。
+      その場合、テキストの値が引数で渡されるので、その内容を見てカラーの値を返すとよい。
+
+  [KIntTableColumn]
+  ・解説
+    整数を編集するカラム。
+  ・オプション(型: 初期値)
+    initialValue: (int: 0)
+      属性省略時の初期値
+    alignment: (int: ALIGN_RIGHT )
+      数値の表示アライメントを、 ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT のいずれかで指定する
+    format: (string: "%d")
+      数値を表示する際のフォーマットをprintf形式で指定する
+    textColor: (int: 0)
+      テキストカラーをRRGGBB形式で指定する。
+      テキストカラーは関数形式で定義することも出来る。
+      その場合、テキストの値が引数で渡されるので、その内容を見てカラーの値を返すとよい。
+
+  [KRealTableColumn]
+  ・解説
+    浮動小数点数を編集するカラム。
+  ・オプション(型: 初期値)
+    initialValue: (real: 0)
+      属性省略時の初期値
+    alignment: (int: ALIGN_RIGHT )
+      数値の表示アライメントを、 ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT のいずれかで指定する
+    format: (string: "%f")
+      数値を表示する際のフォーマットをprintf形式で指定する
+    textColor: (int: 0)
+      テキストカラーをRRGGBB形式で指定する。
+      テキストカラーは関数形式で定義することも出来る。
+      その場合、テキストの値が引数で渡されるので、その内容を見てカラーの値を返すとよい。
+
+  [KChexkBoxTableColumn]
+  ・解説
+    bool値を編集するカラム。
+  ・オプション(型: 初期値)
+    initialValue: (bool: false)
+      属性省略時の初期値
+    radio: (bool: false)
+      この値にtrueを指定すると、全ての行の中で1つだけ選択可能なラジオカラムとなる。
+
+  [KDateBoxTableColumn]
+  ・解説
+    日時を表示するカラム。
+    値はUNIX時間をあらわす整数で指定する。
+    まだ編集可能な実装にはなっていない。
+  ・オプション(型: 初期値)
+    initialValue: (int: 0)
+      属性省略時の初期値
+
+  [KDropDownListTableColumn]
+  ・解説
+    ドロップダウンリストから値を選択するカラム。
+  ・関数
+    updateItemList(itemList: [])
+      初期化後にアイテムリストを更新する。
+  ・オプション(型: 初期値)
+    initialValue: (var: void)
+      属性省略時の初期値。
+      省略するとattrListの先頭の値となる。
+    itemList: (array: [])
+      以下のようにラベルと対応する値のセットを配列で指定する。
+        [ "欠席", 0, "出席", 1, "未定", 2 ]
+    spliter: (string: void)
+      ラベルの区切り文字。
+      この値を指定すると、区切り文字ごとに階層化されたメニューを表示するようになる。
+
+   [KColorTableColumn]
+   ・解説
+     ARGBもしくはRGB型で設定されたカラーを選択するカラム。
+   ・オプション(型: 初期値)
+     initialValue: (int: 0)
+       属性省略時の初期値。
+     hasAlpha: (bool: false)
+       falseならRGB、trueならARGBでカラーを指定する。
+     
+   [KStructTableColumn]
+  ・解説
+    複数のカラムを組み合わせた「構造体」を編集するカラム。
+    テーブル自体の属性定義と全く同様の構成の属性定義リストを渡して、
+    複数のカラムの組み合わさったエレメントを対象に編集が行える。
+    テーブル本体と同様に、エレメントとして辞書と配列のどちらでも扱える。
+  ・オプション(型: 初期値)
+    initialValue: (var: %[])
+      属性省略時の初期値。
+      配列形式のエレメントを構成する際は、明示的に [] を指定する必要がある。
+    attrList: (var: [])
+      構造体を構成する属性定義リスト
+
+  [KArrayTableColumn]
+  ・解説
+    カラムを配列化した時にトップレベルで見えるようになるカラム。
+    配列化したカラムは、任意個数のエレメントを持った可変長の配列として扱える。
+    エレメントの挿入や削除を行なうインターフェースをこのクラスが持つ。
+  ・関数
+    getRowElementCount(row);
+      配列中のエレメントの数を数える
+    insertRowElement(row, index, elementValue = void);
+      配列にエレメントを挿入する。
+      elementValueを省略すると基底の初期値が代入される。
+    eraseRowElement(row, index);
+      配列からエレメントを削除する。
+
+
+  ○KTableのプロパティ
+  
+　テーブルクラス KTable の挙動は用途に応じて様々なプロパティでカスタマイズが出来る。
+  以下、主なプロパティの一覧。
+
+  value (var) 
+    全てのエレメントの値の配列
+  enableColumnKeyRowSort (bool: true)
+    カラムタブをクリックしての属性単位での昇順/降順ソートを有効にするかどうか
+  enableColumnTabOrderExchange (bool: false)
+    カラムタブをドラッグしてのカラムの順番の入れ替えを有効にするかどうか
+  showVerticalGrid (bool: true)
+    縦方向のグリッドを表示するかどうか
+  showHorizontalGrid (bool: true)
+    横方向のグリッドを表示するかどうか
+  showColumnTab (bool: true)
+    カラムタブを表示するかどうか
+  showRowTab (bool: false)
+    ロウタブを表示するかどうか
+  rowTabBaseIndex (int: 1)
+    ロウタブに表示する行数のベース値
+  respondToValueModification (bool: false)
+    エレメントの値が変更された時に親の onValueModified に通知するどうか
+  cellSelection (bool: false)
+    範囲選択をセル単位で行なうか、行単位で行なうか。
+  multipleSelection (bool: false)
+    複数領域の範囲選択を行えるようにするかどうか。
+
+
+  ○KTableのイベントハンドリング
+
+  以下、KTableにおいて各種イベントハンドリングを行なうために関連するクラスとそのプロパティの解説を行なう。
+
+  [KTableColumn]
+  ・解説
+    すでにカラムの項でも解説したカラム基底クラス。
+  ・プロパティ
+    pos (int)
+      カラムのX座標
+    size (int)
+      カラムの幅
+
+  [KTableRow]
+  ・解説
+    行クラス。
+    エレメント1つに対応する。
+  ・プロパティ
+    pos (int)
+      ロウのY座標
+    size (int)
+      ロウの幅
+
+   [Point]
+   ・解説
+      表中の選択箇所を示す「ポイント」。
+   ・プロパティ
+      column (KTableColumn)
+        ポイントに対応するカラム
+      row (KTableRow)
+        ポイントに対応するロウ
+
+   [KTable]
+   ・解説
+     Tableクラス本体
+   ・プロパティ、関数
+     value
+       エレメントの配列を設定、取得する
+     findColumnByKery(key)
+       キーを元にカラムを検索する
+     selectedPointList (array of Point)
+       選択中のポイント配列を返す
+     selectedRowList (array of KTableRow)
+       選択中のロウ配列を返す
+     addElement(element);
+       エレメントを一個追加する
+     insertElement(index, element);
+       エレメントを一個位置指定して挿入する
+     clearRows();
+       全ての行をクリアする
+     moveRows(insertionIndex, moveRowList);
+       指定のインデックスへ、行をまとめて移動する。
+     eraseRows(eraseRowList);
+       行をまとめて削除する。
+     onCellValueModifed(column, row, newValue, oldValue);
+       セルの値が更新された時に呼ばれるイベント。
+     onSelectionRightClick(point, x, y, shift);
+       選択範囲を右クリックした時に呼ばれるイベント。
+     onBackgroundRightClick(x, y, shift);
+       背景を右クリックした時に呼ばれるイベント。
+     fnidPoint(x, y);
+       座標に対応するポイントを取得する
+     bool isPointDraggable(point);
+       座標に対応するポイントが内部ドラッグを受け付けているかを判定する。
+     onSelectionDragEnter(x, y, shift);
+       選択範囲のドラッグを開始するイベントハンドラ。
+     onSelectionDragMove(x, y, shift);
+       選択範囲のドラッグを反映するイベントハンドラ。
+     onSelectionDragLeave(x, y, shift);
+       選択範囲のドラッグを終了するイベントハンドラ。
+     isRowPacketAcceptable(index, packet);
+       行間にパケットを受け容れるか判定する関数
+     onRowPacketEnter(index, x, y, packet, shicft);
+       行間パケットの進入を通知するイベントハンドラ
+     onRowPacketMove(index, x, y, packet, shicft);
+       行間パケットの移動を通知するイベントハンドラ
+     onRowPacketLeave(index, x, y, packet, shicft);
+       行間パケットの退出を通知するイベントハンドラ
+     onRowPacketDrop(index, x, y, packet, shicft);
+       行間パケットのドロップを通知するイベントハンドラ
+     
+    
+ */
+
+
+global.K_TABLE_SORT_ORDER_NONE = 0;
+global.K_TABLE_SORT_ORDER_ASCENDING = 1;
+global.K_TABLE_SORT_ORDER_DESCENDING = 2;
+global.K_TABLE_INNER_DRAG_PACKET_NAME = "__dd_ktable_inner__";
+global.K_TABLE_COLUMN_MIN_WIDTH = 64;
+
+/*----------------------------------------------------------------------
+ * リスト項目リネーム時のテキストエディット
+ ----------------------------------------------------------------------*/
+class KTableTextEdit extends KTextInput {
+  var table;
+  var column;
+  var originalValue;
+  var row;
+  var minLabelWidth = 1;
+
+  function KTableTextEdit(column, row, textType, _value = void) {
+    table = column.owner;
+    this.column = column;
+    this.row = row;
+    // リストに収まる範囲の大きさでテキストエディットを作成。
+    var rootRect = table.view.viewingRect;
+    var rect = new KRect(column.pos, row.pos, column.size, column.getRowHeight(row));
+    var w = 10 - table.spaceHorizontal;
+    var h = 8 - table.spaceVertical;
+    rect.left -= w/2;
+    rect.top -= h/2;
+    rect.width += w/2;
+    rect.height += h/2;
+    super.KTextInput(table.window,
+                     rect.width, rect.height,
+                     textType);
+    fontFace = table.view.fontFace;
+
+    parent = table.view;
+    setPos(rect.left, rect.top);
+    if (_value === void)
+      _value = column.getRowValue(row);
+    originalValue = value = _value;
+
+    text.focus();
+    text.onWindowDeactivate = this.onWindowDeactivate;
+  }
+
+  function finalize {
+    super.finalize(...);
+  }
+
+  // フォーカスが外れたらキャンセル扱い
+  function onChildBlur {
+    super.onChildBlur(...);
+    text.cancelValue();
+  }
+
+  // ENTER押したら内容を反映
+  function onEnter {
+    if (! column.isAcceptTextEdit(row, value))
+      return;
+    if (originalValue != value) {
+      column.onResultTextEdit(row, value, originalValue);
+    }
+    asyncCaller.call(column.removeTextEdit);
+  }
+
+  // キャンセルしたら無かったことに
+  function onCancel {
+    asyncCaller.call(column.removeTextEdit);
+  }
+  
+  // スクロールされちゃまずいんでホイールは食う。
+  function onMouseWheel {
+  }
+
+  function onWindowDeactivate {
+    text.cancelValue();
+  }    
+};   
+
+/*----------------------------------------------------------------------
+ * テキストエリア編集用のテキストエディット
+ ----------------------------------------------------------------------*/
+class KTableTextAreaEdit extends KFrameLayout
+{
+  var table;
+  var column;
+  var row;
+  var originalValue;
+  var rect;
+
+  function KTableTextAreaEdit(column, row) {
+    table = column.owner;
+    this.column = column;
+    this.row = row;
+    super.KFrameLayout(table.window, FRAME_SUNKEN, "", "frame");
+    neutralColor = 0xFFFFFFFF;
+    rect = new KRect(column.pos, row.pos, column.size, row.size);
+    add(new KTextEdit(table.window, "textedit"));
+    textedit.setMargin(table.spaceHorizontal / 2 - 2, table.spaceVertical / 2 - 2);
+    setPos(rect.left, rect.top);
+    setSize(rect.width, rect.height);
+    originalValue = textedit.value = column.getRowValue(row);
+    parent = table.view;
+    textedit.tailOfRow();
+    textedit.unbindKey(VK_RETURN);
+    textedit.bindKey(VK_RETURN, 0, ssCtrl, textedit.splitAtPointer);
+    textedit.bindKey(VK_RETURN, 0, 0, onEnter);
+    textedit.bindKey(VK_ESCAPE, 0, 0, onCancel);
+    textedit.onWindowDeactivate = onWindowDeactivate;
+    textedit.focus();
+    redraw();
+  }
+
+  // フォーカスが外れたらキャンセル扱い
+  function onChildBlur {
+    super.onChildBlur(...);
+    onCancel();
+  }
+
+  // ウィンドウがフォーカス外れたらキャンセル
+  function onWindowDeactivate {
+    onCancel();
+  }    
+
+  // 確定
+  function onEnter() {
+    var value = textedit.value;
+    if (! column.isAcceptTextEdit(row, value))
+      return;
+    if (originalValue != value) {
+      column.onResultTextEdit(row, value, originalValue);
+    }
+    asyncCaller.call(column.removeTextEdit);
+  }
+
+  // キャンセル
+  function onCancel() {
+    asyncCaller.call(column.removeTextEdit);
+  }
+
+  // テキストの縦方向のサイズ変更に追随する
+  function setMinMaxSize(minW, minH, maxW, maxH) {
+    var h = Math.max(minH, rect.height);
+    super.setMinMaxSize(minW, h, maxW, h);
+    table.view.minHeight = Math.max(table.lastRow.tail, rect.top + h);
+    table.view.noticeRect(rect.left, rect.top, rect.width, h);
+  }
+
+  // テキストエディットのNoticeを食い取る。
+  function onChildNoticeRect(child, l, t, w, h) {
+  }
+
+  // テキストエディットの値変更を食い取る
+  function onChildValueModified() {
+  }
+};
+
+/*----------------------------------------------------------------------
+ * テーブル用のバーチャルウィジェットの基底クラス（各種ユーティリティ実装）
+ ----------------------------------------------------------------------*/
+class KTableVirtualWidget extends KVirtualWidget
+{
+  var owner;
+  var omitText;
+  var omitTextWidth;
+  
+  function KTableVirtualWidget(window, owner, name) {
+    super.KVirtualWidget(window, name);
+    this.owner = owner;
+    omitText = "...";
+    calcOmitTextWidth();
+  }
+
+  function calcOmitTextWidth() {
+    omitTextWidth = font.getTextWidth(omitText);
+  }
+
+  // 選択中アイテムのフレームを描画する
+  function drawItemFrame(range, pointed = false, focused = false, selected = false, dragging = false) {
+    var fillColor = 0;
+    var edgeColor = 0;
+    var fillAlpha = 0;
+    var edgeAlpha = 0;
+
+    // フレーム・エッジのカラーと不透明度を決定
+    if (focused && selected)
+      fillAlpha = 4;
+    else {
+      if (pointed)
+        fillAlpha += 1;
+      if (selected)
+        fillAlpha += 3;
+    }
+    
+    if (pointed)
+      edgeAlpha = 2;
+    else if (focused || selected)
+      edgeAlpha = 3;
+    
+    if (pointed
+        || owner.focused)
+      fillColor = edgeColor = WIN_SELECTED & 0xFFFFFF;
+    else
+      fillColor = edgeColor = System.toActualColor(clActiveBorder);
+
+    // パケットをドラッグ中なら色を変える
+    if (dragging) {
+      fillColor = edgeColor = 0xFF0000;
+      fillAlpha = 2;
+      edgeAlpha = 2;
+    }
+    // 描画
+    fillAlpha *= 32;
+    edgeAlpha *= 64;
+    colorRect(range.left + 1, range.top, range.width - 2, 1, edgeColor, edgeAlpha);
+    colorRect(range.left + 1, range.bottom - 1, range.width - 2, 1, edgeColor, edgeAlpha);
+    colorRect(range.left + 0, range.top + 1, 1, range.height - 2, edgeColor, edgeAlpha);
+    colorRect(range.right - 1, range.top + 1, 1, range.height - 2, edgeColor, edgeAlpha);
+    colorGradientRectUD(range.left + 1, range.top + 1, range.width - 2, range.height - 2, fillColor, fillColor | (fillAlpha << 24));
+  }
+
+  // マウス選択領域を描画
+  function drawMouseSelection() {
+    if (! inMouseSelection
+        || curMouseSelectionRect === void)
+      return;
+    var range = curMouseSelectionRect;
+    var color = WIN_SELECTED & 0xFFFFFF;
+    var edgeAlpha = 192;
+    var fillAlpha = 64;
+    if (range.width * range.height == 0)
+      return;
+    if (range.width == 1 || range.height == 1) {
+      colorRect(range.left, range.top, range.width, range.height, color, edgeAlpha);
+      return;
+    }
+    colorRect(range.left, range.top, range.width, 1, color, edgeAlpha);
+    colorRect(range.left, range.top + range.height - 1, range.width, 1, color, edgeAlpha);
+    colorRect(range.left, range.top + 1, 1, range.height - 2, color, edgeAlpha);
+    colorRect(range.left + range.width - 1, range.top + 1, 1, range.height - 2, color, edgeAlpha);
+    colorRect(range.left + 1, range.top + 1, range.width - 2, range.height - 2, color, fillAlpha);
+  }
+
+  // 指定範囲に収まるようにテキストを描画する（はみ出る分は省略）
+  function drawTextInRange(x, y, w, text, color, alignment) {
+    var len = table_find_text_range(font, text, w, omitTextWidth);
+    if (len === void) {
+      var tw = font.getTextWidth(text);
+      switch (alignment) {
+      case ALIGN_LEFT: 
+        drawText(x, y, text, color); 
+        break;
+      case ALIGN_CENTER: {
+        drawText(x + (w - tw) / 2, y, text, color); 
+        break;
+      }
+      case ALIGN_RIGHT: {
+        drawText(x + w - tw, y, text, color); 
+        break;
+      }
+      }
+      return tw;
+    } else {
+      drawText(x, y, text.substr(0, len) + omitText, color);
+      return w;
+    }
+  }
+};
+
+/*----------------------------------------------------------------------
+ * カラムタブ
+ ----------------------------------------------------------------------*/
+class KTableLeftTopCorner extends KWidget
+{
+  function KTableLeftTopCorner(window, owner, name) {
+    super.KWidget(window, name);
+    font.bold = true;
+    var w = owner.rowTab.width;
+    var h = owner.columnTab.height;
+    setFixedSize(w, h, w, h);
+    fillRect(0, 0, w, h, 0xFFD0D0D0);
+    fillRect(0, 0, w - 1, h - 1, 0xFFFFFFFF);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * カラムタブ
+ ----------------------------------------------------------------------*/
+class KTableColumnTab extends KTableVirtualWidget
+{
+  var owner;
+  var curPointItem;
+  var curFocusItem;
+  var focusMode;
+  var FOCUS_NONE = 0;
+  var FOCUS_ITEM = 1;
+  var FOCUS_TAIL = 2;
+  var MARGIN = 4;
+  var dragging = false;
+  var beginX;
+  var prevX;
+  var curFocusItemOrigSize;
+  var mouseDownBaseX;
+  var curTargetItem;
+  var ascendingOrderIcon;
+  var descendingOrderIcon;
+  var pressed;
+  var alignedRow;
+
+  function KTableColumnTab(window, owner, name) {
+    super.KTableVirtualWidget(...);
+    font.bold = true;
+    calcOmitTextWidth();
+    ascendingOrderIcon = owner.findIcon("k_sort_order_ascending");
+    descendingOrderIcon = owner.findIcon("k_sort_order_descending");
+    var h = owner.fontHeight + owner.spaceVertical + MARGIN * 2;
+    setMinMaxSize(0, h, owner.marginalWidth, h);
+  }
+
+  // 描画
+  function onDraw(l, t, w, h) {
+    // 背景
+    fillRect(l, t, w, h, WIN_WHITE);
+    var columns = owner.findColumnRange(l, w);
+    for (var i = 0; i < columns.count; i++) {
+      var column = columns[i];
+      var x = column.tail - 1;
+      // 横グリッド
+      fillRect(x, t, 1, h, 0xFFE0E0E0);
+      // 縦グリッド
+      if (owner.showHorizontalGrid)
+        fillRect(column.pos, height - 1, column.size, 1, 0xFFD0D0D0);
+      // カラムラベル
+      drawTextInRange(owner.spaceHorizontal / 2 + column.pos, owner.spaceVertical / 2 + MARGIN, column.size - owner.spaceHorizontal , column.label, 0);
+      // ソートマーカー
+      switch (column.sortOrder) {
+      case K_TABLE_SORT_ORDER_ASCENDING:
+        operateRect(column.pos + column.size / 2 - ascendingOrderIcon.width / 2, -6, ascendingOrderIcon, 0, 0, ascendingOrderIcon.width, ascendingOrderIcon.height);
+        break;
+      case K_TABLE_SORT_ORDER_DESCENDING:
+        operateRect(column.pos + column.size / 2 - descendingOrderIcon.width / 2, -6, descendingOrderIcon, 0, 0, descendingOrderIcon.width, descendingOrderIcon.height);
+        break;
+      }
+      // フレーム
+      if (column == curPointItem)
+        drawItemFrame(new KRect(column.pos, 0, column.size, height), true, false, dragging);
+      if (column == curTargetItem)
+        drawItemFrame(new KRect(column.pos, 0, column.size, height), false, false, false, true);
+    }
+  }
+
+  // マウスダウン
+  function onMouseDown(x, y, button, shift) {
+    owner.cancelEdit();
+    owner.focus();
+
+    // 押下、ドラッグ準備
+    if (button == mbLeft) {
+      pressed = true;
+      dragging = false;
+      mouseDownBaseX = x;
+    }
+    super.onMouseDown(...);
+  }
+
+  function onMouseUp() {
+    super.onMouseUp(...);
+
+    // 押下処理、カラム単位ソート
+    if (pressed) {
+      if (curFocusItem !== void) {
+        if (owner.enableColumnKeyRowSort) {
+          curFocusItem.doSort();
+          owner.view.redrawAll();
+        }
+      }
+    }
+
+    // ドラッグ処理確定
+    if (dragging) {
+      // ドラッグによるカラム入れ替え
+      switch (focusMode) {
+      case FOCUS_ITEM: {
+        if (curTargetItem !== void) {
+          var focusIndex = owner.columnList.find(curFocusItem);
+          var targetIndex = owner.columnList.find(curTargetItem);
+          var elm = owner.columnList[focusIndex];
+          owner.columnList.erase(focusIndex);
+          owner.columnList.insert(targetIndex, elm);
+          for (var i = 0, pos = 0; i < owner.columnList.count; i++) {
+            var column = owner.columnList[i];
+            column.index = i;
+            column.pos = pos;
+            if (column.visible)
+              pos += column.size;
+          }
+          owner.view.redrawAll();
+        }
+        break;
+      }
+      }
+    }
+
+    curTargetItem = void;
+    pressed = false;
+    dragging = false;
+    redrawAll();
+  }
+
+  // マウス移動
+  function onMouseMove(x, y, shift) {
+    super.onMouseMove(...);
+
+    // まだマウス押してない
+    if (! dragging
+        && ! pressed) {
+      curFocusItem = void;
+      focusMode = FOCUS_NONE;
+      var item = owner.findColumnRange(x, 0)[0];
+      if (item !== void) {
+        var h = item.getOpts("hint", "");
+        if (h != "")
+          hint = item.label + ": " + h;
+        else
+          hint = item.label;
+      }
+      else
+        hint = "";
+      
+      // カラムにフォーカス
+      if ((owner.enableColumnKeyRowSort
+           || owner.enableColumnTabOrderExchange)
+          && item !== void) {
+        focusMode = FOCUS_ITEM;
+        curFocusItem = item;
+      }
+      // ポイントの再描画
+      if (item != curPointItem) {
+        var prevPointItem = curPointItem;
+        curPointItem = item;
+        if (prevPointItem !== void) 
+          redrawRect(prevPointItem.pos, 0, prevPointItem.size, height);
+        if (curPointItem !== void) 
+          redrawRect(curPointItem.pos, 0, curPointItem.size, height);
+      }
+ 
+      // カラム末尾にフォーカス
+      item = owner.findColumnRange(x, 8)[0];
+      cursor = crDefault;
+      if (item !== void) {
+        var itemRight = item.pos + item.size;
+        if (itemRight - 8 <= x
+            && x < itemRight)  {
+          cursor = crSizeWE;
+          focusMode = FOCUS_TAIL;
+          curFocusItem = item;
+          curFocusItemOrigSize = item.size;
+        }
+      }
+    } 
+    // マウス押下
+    else if (pressed) {
+      if (Math.abs(x - mouseDownBaseX) >= mouseDragThreshold) {
+        pressed = false;
+        switch (focusMode) {
+          // カラムのドラッグによる入れ替え開始
+        case FOCUS_ITEM:
+          if (! owner.enableColumnTabOrderExchange)
+            break;
+          dragging = true;
+          curTargetItem = void;
+          break;
+          // カラム末尾のドラッグによるカラムサイズ変更開始
+        case FOCUS_TAIL:
+          dragging = true;
+          prevX = beginX = mouseDownBaseX;
+          if (curFocusItem.variableRowSize) {
+            var row = owner.findRowRange(owner.viewScroll.childViewTop, 0)[0];
+            if (row !== void) {
+              if (row.index < owner.rowList.count - 1
+                  && owner.viewScroll.childViewTop >= row.pos + row.size / 2)
+                row = owner.rowList[row.index + 1];
+              alignedRow = row;
+            } else {
+              alignedRow = void;
+            }
+          }
+          break;
+        }
+      }
+    }
+    // ドラッグ中
+    else {
+      switch (focusMode) {
+        // カラムの入れ替え候補位置を表示
+      case FOCUS_ITEM: {
+        var prevTargetItem = curTargetItem;
+        curTargetItem = owner.findColumnRange(x, 0)[0];
+        if (curTargetItem === void)
+          curTargetItem = owner.visibleColumnList[owner.visibleColumnList.count - 1];
+        if (curTargetItem === curFocusItem)
+          curTargetItem = void;
+        if (curTargetItem != prevTargetItem) {
+          if (prevTargetItem !== void) 
+            redrawRect(prevTargetItem.pos, 0, prevTargetItem.size, height);
+          if (curTargetItem !== void) 
+            redrawRect(curTargetItem.pos, 0, curTargetItem.size, height);
+        }
+        break;
+      }
+        // カラムのサイズをリアルタイムに可変させる
+      case FOCUS_TAIL: {
+        var prevOffset = Math.max(-(curFocusItemOrigSize - K_TABLE_COLUMN_MIN_WIDTH), (prevX - beginX));
+        var curOffset = Math.max(-(curFocusItemOrigSize - K_TABLE_COLUMN_MIN_WIDTH), (x - beginX));
+        prevX = x;
+        if (prevOffset != curOffset) {
+          var diffOffset = curOffset - prevOffset;
+          curFocusItem.size += diffOffset;
+          for (var i = owner.columnList.find(curFocusItem) + 1; i < owner.columnList.count; i++)
+            owner.columnList[i].pos += diffOffset;
+          redrawAll();
+          // カラムが可変サイズカラムの場合、ロウのサイズが変わっていないか再計算を試みる
+          if (curFocusItem.variableRowSize
+              && owner.tryCalcVariableRowSize(curFocusItem)) {
+            owner.view.beginRedrawRegion();
+            if (alignedRow) 
+              owner.viewScroll.childViewTop = alignedRow.pos;
+            owner.view.redrawAll();
+            owner.view.endRedrawRegion();
+            owner.rowTab.redrawAll();
+          } 
+          // カラムが固定サイズカラムの場合、後ろのカラムについてはコピペして、ドラッグしてるカラム内だけ再描画する
+          else {
+            if (diffOffset < 0) {
+              owner.view.redrawRect(curFocusItem.pos, owner.view.siteTop, curFocusItem.size, owner.view.siteHeight);
+              if (curFocusItem.pos + curFocusItem.size < owner.view.siteLeft +owner.view.siteWidth) {
+                var to = curFocusItem.pos + curFocusItem.size - owner.view.siteLeft;
+                var from = to - diffOffset;
+                owner.view.canvas.copyRect(to, 0, owner.view.canvas, 
+                                           from, 0, owner.view.canvas.width - from, owner.view.canvas.height);
+                owner.view.redrawRect(owner.view.siteLeft + owner.view.siteWidth + diffOffset, owner.view.siteTop, -diffOffset, owner.view.siteHeight);
+              }
+            } else {
+              if (curFocusItem.pos + curFocusItem.size < owner.view.siteLeft +owner.view.siteWidth) {
+                var to = curFocusItem.pos + curFocusItem.size - owner.view.siteLeft;
+              var from = to - diffOffset;
+              owner.view.canvas.copyRect(to, 0, owner.view.canvas, 
+                                         from, 0, owner.view.canvas.width - from, owner.view.canvas.height);
+              }
+              owner.view.redrawRect(curFocusItem.pos, owner.view.siteTop, curFocusItem.size, owner.view.siteHeight);
+            }
+          }  
+          owner.updateMinMaxSize();
+        }
+        break;
+      }
+      }
+    }
+  }
+
+  // マウス画面内から離れる
+  function onMouseLeave() {
+    super.onMouseLeave(...);
+
+    var prevPointItem = curPointItem;
+    curPointItem = void;
+    if (prevPointItem !== void)
+      redrawRect(prevPointItem.pos, 0, prevPointItem.size, height);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * ロウタブ
+ ----------------------------------------------------------------------*/
+class KTableRowTab extends KTableVirtualWidget
+{
+  var owner;
+  var MARGIN = 2;
+  var curPoint;
+  var inMouseSelection = false;
+  var delayMouseEvent = false;
+  var mouseDownTargetPoint = void;
+  var mouseDownTargetButton, mouseDownTargetShift;
+  var mouseDownTargetSelectedPointList;
+  var mouseSelectionBaseX, mouseSelectionBaseY;
+
+  function KTableRowTab(window, owner, name) {
+    super.KTableVirtualWidget(...);
+    font.bold = true;
+    calcOmitTextWidth();
+    var w = font.getTextWidth("00000") + owner.spaceHorizontal + MARGIN * 2;
+    setMinMaxSize(w, 0, w, owner.marginalHeight);
+  }
+
+  property multipleSelection {
+    getter {
+      return owner.multipleSelection;
+    }
+  }
+
+  property view {
+    getter {
+      return owner.view;
+    }
+  }
+
+  function onDraw(l, t, w, h) {
+    // 背景
+    fillRect(l, t, w, h, WIN_WHITE);
+    var rows = owner.findRowRange(t, h);
+    var baseIndex = owner.rowTabBaseIndex;
+    for (var i = 0; i < rows.count; i++) {
+      var row = rows[i];
+      // 縦グリッド
+      var y = row.tail - 1;
+      fillRect(l, y, w, 1, 0xFFE0E0E0);
+      // 横グリッド
+      if (owner.showVerticalGrid)
+        fillRect(width - 1, row.pos, 1, row.size, 0xFFD0D0D0);
+      var text = "" + (baseIndex + row.index);
+      var w = font.getTextWidth(text);
+      drawText(width - MARGIN - owner.spaceHorizontal / 2 - w, 
+               row.pos + owner.spaceVertical / 2,
+               text);
+      if (curPoint !== void
+          && row === curPoint.row)
+        drawItemFrame(new KRect(0, row.pos, width, row.size),
+                      true);
+    }
+  }
+
+  function drawPoint(point) {
+    if (point === void)
+      return;
+    redrawRect(0, point.row.pos, width, point.row.size);
+  }
+
+  function pressPoint(targetPoint, button, shift) {
+    //　マルチ選択時
+    if (multipleSelection) {
+      if (button == mbLeft) {
+        // Shiftキーを押してる時はアイテムを前のチョイスから範囲選択
+        if (targetPoint !== void
+            && (shift & ssShift)) {
+          if (curPoint === void) {
+            view.clearAllSelection();
+            view.focusPoint(targetPoint);
+            view.selectPoint(targetPoint);
+          } else {
+            if (! view.isValidPoint(view.lastFocusPoint))
+              view.lastFocusPoint = view.curFocusPoint;
+            if (! (shift & ssCtrl))
+              view.clearAllSelection();
+            view.selectPointInRange(view.lastFocusPoint, targetPoint);
+            view.focusPoint(targetPoint);
+          }
+        } 
+        // Ctrlキーを押してる時は選択の反転。
+        else if (targetPoint !== void
+                 && (shift & ssCtrl)) {
+          view.selectPoint(targetPoint, ! view.isSelectedPoint(targetPoint));
+          view.lastFocusPoint = targetPoint;
+          view.focusPoint(targetPoint);
+        } 
+        // ターゲットアイテムがあったら選択とフォーカスを同時に移動。
+        else if (targetPoint !== void) {
+          view.lastFocusPoint = targetPoint;
+          view.clearAllSelection();
+          view.focusPoint(targetPoint);
+          view.selectPoint(targetPoint);
+        }
+        // ターゲットアイテムが無かったら選択をクリア。
+        else {
+          view.clearAllSelection();
+          view.lastFocusPoint = void;
+        }
+      }
+    }   
+    // シングル選択時
+    else {
+      view.focusPoint(targetPoint);
+    }
+  }
+  
+  function onMouseMove(x, y, shift) {
+    super.onMouseMove(...);
+    var row = owner.findRowRange(y, 0)[0];
+    var point = row !== void ? owner.generatePoint(owner.columnList[0], row) : void;
+    if (point !== curPoint) {
+      var prevPoint = curPoint;
+      curPoint = point;
+      drawPoint(prevPoint);
+      drawPoint(curPoint);
+    }
+  }
+
+  function onMouseDown(x, y, button, shift) {
+    owner.cancelEdit();
+    owner.focus();
+
+    if (owner.cellSelection) {
+      super.onMouseDown(...);
+      return;
+    }
+
+    var targetPoint = curPoint;
+    if (multipleSelection) {
+      // マウス選択オフから初め
+      inMouseSelection = false;
+
+      // 範囲選択を始められるか？
+      var selectionAvailable = (button == mbLeft);
+      // セルがドラッグ非対応なら範囲選択を始める
+      if (selectionAvailable) {
+        inMouseSelection = true;
+        delayMouseEvent = true;
+      }
+    } else {
+      // シングルセレクションなら常に遅延処理
+      delayMouseEvent = true;
+    }
+      
+    // マウスダウンイベントの遅延処理
+    if (delayMouseEvent) {
+      mouseDownTargetPoint = targetPoint;
+      mouseDownTargetButton = button;
+      mouseDownTargetShift = shift;
+      mouseDownTargetSelectedPointList = view.selectedPointList;
+      mouseDownTargetSelectedPointList.sort(view.lessPoint);
+      
+      if (targetPoint !== void)
+        view.focusPoint(targetPoint);
+    } else {
+      pressPoint(targetPoint, button, shift);
+    }
+    super.onMouseDown(...);
+  }
+
+  function onMouseUp(x, y, button, shift) {
+    super.onMouseUp(...);
+    // マウスドラッグによる範囲選択を試みて結局
+    // ドラッグされなかった場合、ここでボタン押下動作を実行する。
+    if (delayMouseEvent
+        && button == mouseDownTargetButton) {
+      pressPoint(mouseDownTargetPoint, mouseDownTargetButton, mouseDownTargetShift);
+      delayMouseEvent = false;
+      inMouseSelection = false;
+    }
+   }
+
+  function onMouseLeave() {
+    super.onMouseLeave(...);
+    var prevPoint = curPoint;
+    curPoint = void;
+    drawPoint(prevPoint);
+  }
+
+  function onDragEnter(x, y, shift) {
+    delayMouseEvent = false;
+
+    if (inMouseSelection) {
+      // ラストフォーカスはターゲットアイテムに移す
+      view.lastFocusPoint = mouseDownTargetPoint;
+      mouseSelectionBaseX = x;
+      mouseSelectionBaseY = y;
+    }
+  }
+
+  function onDragMove(x, y, shift) {
+    if (inMouseSelection) {
+      // アイテムが無かったらここまで。
+      if (owner.rowList.count == 0) 
+        return;
+
+      view.beginRedrawRegion();
+
+      var prevSelectionList = view.selectedPointList;
+      prevSelectionList.sort(view.lessPoint);
+      // 選択範囲に含まれるアイテム群を判定
+      var fromY, toY;
+      fromY = Math.min(mouseSelectionBaseY, y);
+      toY = Math.max(mouseSelectionBaseY, y);
+      var pointList = view.getPointListInRect(0, fromY, width, toY - fromY);
+
+      // Shiftを押しながらなら、範囲を追加
+      if (mouseDownTargetShift & ssShift) {
+        prevSelectionList = view.differencePointList(prevSelectionList, mouseDownTargetSelectedPointList);
+        prevSelectionList = view.differencePointList(prevSelectionList, pointList);
+        for (var i = 0; i < prevSelectionList.count; i++)
+          view.selectPoint(prevSelectionList[i], false);
+        for (var i = 0; i < mouseDownTargetSelectedPointList.count; i++)
+          view.selectPoint(mouseDownTargetSelectedPointList[i]);
+        for (var i = 0; i < pointList.count; i++)
+          view.selectPoint(pointList[i]);
+      } 
+      // Ctrlを押しながらなら、範囲を反転
+      else if (mouseDownTargetShift & ssCtrl) {
+        prevSelectionList = view.differencePointList(prevSelectionList, mouseDownTargetSelectedPointList);
+        for (var i = 0; i < prevSelectionList.count; i++)
+          view.selectPoint(prevSelectionList[i], false);
+        for (var i = 0; i < mouseDownTargetSelectedPointList.count; i++)
+          view.selectPoint(mouseDownTargetSelectedPointList[i]);
+        for (var i = 0; i < pointList.count; i++)
+          view.selectPoint(pointList[i], ! view.isSelectedPoint(pointList[i]));
+      } 
+      // 何も押してなければ、新規に範囲を選択
+      else {
+        prevSelectionList = view.differencePointList(prevSelectionList, pointList);
+        for (var i = 0; i < prevSelectionList.count; i++)
+          view.selectPoint(prevSelectionList[i], false);
+        for (var i = 0; i < pointList.count; i++)
+          view.selectPoint(pointList[i]);
+      }        
+      view.endRedrawRegion();
+    }
+  }
+
+  function onDragLeave(x, y, shift) {
+    inMouseSelection = false;
+  }
+};
+
+/*----------------------------------------------------------------------
+ * テーブルビュー
+ ----------------------------------------------------------------------*/
+class KTableView extends KTableVirtualWidget
+{
+  var owner;
+  var curPoint;
+  var curFocusPoint;
+  var lastFocusPoint;
+  var mouseDownTargetPoint = void;
+  var mouseDownTargetX, mouseDownTargetY, mouseDownTargetButton, mouseDownTargetShift;
+  var mouseDownTargetSelectedPointList;
+  var inMouseSelection = false;
+  var pressSelection = false;
+  var delayMouseEvent = false;
+  var mouseSelectionBaseX, mouseSelectionBaseY;
+  var curMouseSelectionRect;
+  var redrawRefCount = 0;
+  var redrawQueue;
+  var DRAG_ACCEPT_TYPE_NONE   = 0;
+  var DRAG_ACCEPT_TYPE_POINT = 1;
+  var DRAG_ACCEPT_TYPE_ROW  = 2;
+  var curDragInfo;
+  var curDragRegion;
+  var confirmedDragTarget;
+  var clipList = [];
+
+  // テーブルビュー
+  function KTableView(window, owner, name) {
+    super.KTableVirtualWidget(...);
+    curDragInfo = %[ acceptType: DRAG_ACCEPT_TYPE_NONE ];
+    curDragRegion = new KRegion();
+    setMinMaxSize(0, 0, owner.marginalWidth, owner.marginalHeight);
+  }
+
+  // セル単位選択か？
+  property cellSelection {
+    getter {
+      return owner.cellSelection;
+    }
+  }
+
+  // 複数領域選択可能か？
+  property multipleSelection {
+    getter {
+      return owner.multipleSelection;
+    }
+  }
+
+  // 末尾のカラム
+  property lastColumn {
+    getter {
+      return owner.lastColumn;
+    }
+  }
+
+  // 末尾のロウ
+  property lastRow {
+    getter {
+      return owner.lastRow;
+    }
+  }
+
+  // カラム配列
+  property columnList {
+    getter {
+      return owner.columnList;
+    }
+  }
+
+  // ロウ配列
+  property rowList {
+    getter {
+      return owner.rowList;
+    }
+  }
+
+  // セルの描画クリッピング設定をスタックにプッシュ（入れ子にできる！のだ！
+  function pushCellClip(column, row) {
+    var clip = new KRect(column.pos, row.pos, column.size, row.size);
+    if (clipList.count > 0)
+      clip.intersectWith(clipList[clipList.count - 1]);
+    clipList.push(clip);
+    setClip(clip.left, clip.top, clip.width, clip.height);
+  }
+
+  // セルの描画クリッピング設定をポップ
+  function popCellClip() {
+    clipList.pop();
+    if (clipList.count > 0) {
+      var clip = clipList[clipList.count - 1];
+      setClip(clip.left, clip.top, clip.width, clip.height);
+    } else {
+      setClip();
+    }
+  }
+
+  // 描画遅延を開始
+  function beginRedrawRegion() {
+    redrawQueue = new KRegion();
+    redrawRefCount++;
+  }
+
+  // 描画遅延を解除し、区間中で発行された描画を一気に処理する
+  function endRedrawRegion() {
+    if (--redrawRefCount > 0)
+      return;
+    var queue = redrawQueue;
+    redrawQueue = void;
+    for (var i = 0; i < queue.rectCount; i++) {
+      var rect = queue.rectAt(i);
+      redrawRect(rect.left, rect.top, rect.width, rect.height);
+    }
+  }
+  
+  // 描画
+  function onDraw(l, t, w, h) {
+    // 描画遅延中なら描画領域を予約するだけで済ませる
+    if (redrawQueue !== void) {
+      redrawQueue.include(new KRect(l, t, w, h));
+      return;
+    }
+    fillRect(l, t, w, h, 0xFFFFFFFF);
+    drawCells(l, t, w, h);
+    drawMouseSelection();
+    drawRowPacketInsertion();
+  }
+
+  // セルの内容を描画する
+  function drawCells(l, t, w, h) {
+    var columns = owner.findColumnRange(l, w);
+    var rows = owner.findRowRange(t, h);
+    for (var i = 0; i < rows.count; i++) {
+      var row = rows[i];
+      for (var j = 0; j < columns.count; j++) {
+        var column = columns[j];
+        // セル描画
+        column.drawCell(this, row);
+        // 縦グリッド
+        if (owner.showVerticalGrid) 
+          fillRect(column.tail - 1, row.pos, 1, row.size, 0xFFE0E0E0);
+        // 横グリッド
+        if (owner.showHorizontalGrid)
+          fillRect(column.pos, row.tail - 1, column.size, 1, 0xFFE0E0E0);
+        // セルセレクション時はセル単位で
+        if (cellSelection) {
+          var point = generatePoint(column, row);
+          // フレーム
+          var dragging = curDragInfo.acceptType == DRAG_ACCEPT_TYPE_POINT && equalPoint(curDragInfo.point, point);
+          drawItemFrame(new KRect(column.pos, row.pos, column.size, row.size), 
+                        equalPoint(curPoint, point) && (curDragInfo.acceptType == DRAG_ACCEPT_TYPE_NONE), 
+                        isFocusedPoint(point), 
+                        isSelectedPoint(point), 
+                        dragging);
+        }
+      }
+      // ! セルセレクション時はロウ単位で
+      if (! cellSelection) {
+        var point = generatePoint(void, row);
+        var lastColumn = owner.columnList[owner.columnList.count - 1];
+        // フレーム
+        var dragging = curDragInfo.acceptType == DRAG_ACCEPT_TYPE_POINT && equalPoint(curDragInfo.point, point);
+        drawItemFrame(new KRect(0, row.pos, lastColumn.pos + lastColumn.size, row.size), 
+                      equalPoint(curPoint, point) && (curDragInfo.acceptType == DRAG_ACCEPT_TYPE_NONE), 
+                      isFocusedPoint(point), 
+                      isSelectedPoint(point), 
+                      dragging);
+      }
+    }
+  }
+
+  // マウス選択領域を描画
+  function drawMouseSelection() {
+    if (! inMouseSelection
+        || curMouseSelectionRect === void)
+      return;
+    var range = curMouseSelectionRect;
+    var color = WIN_SELECTED & 0xFFFFFF;
+    var edgeAlpha = 192;
+    var fillAlpha = 64;
+    if (range.width * range.height == 0)
+      return;
+    if (range.width == 1 || range.height == 1) {
+      colorRect(range.left, range.top, range.width, range.height, color, edgeAlpha);
+      return;
+    }
+    colorRect(range.left, range.top, range.width, 1, color, edgeAlpha);
+    colorRect(range.left, range.top + range.height - 1, range.width, 1, color, edgeAlpha);
+    colorRect(range.left, range.top + 1, 1, range.height - 2, color, edgeAlpha);
+    colorRect(range.left + range.width - 1, range.top + 1, 1, range.height - 2, color, edgeAlpha);
+    colorRect(range.left + 1, range.top + 1, range.width - 2, range.height - 2, color, fillAlpha);
+  }
+
+  // 行間のパケット挿入位置描画
+  function drawRowPacketInsertion() {
+    if (curDragInfo.acceptType != DRAG_ACCEPT_TYPE_ROW)
+      return;
+    var x = 0;
+    var y = getRowInsertionY(curDragInfo.insertionIndex);
+    var edgeColor = 0xFF0000;
+    var edgeAlpha = 2 * 64;
+    colorRect(x + 3, y - 1, width, 2, edgeColor, edgeAlpha);
+    for (var i = 2; i <= 5; i++) 
+      colorRect(x + 3 - (i - 1), y - i, 1, i * 2, edgeColor, edgeAlpha);
+  }
+
+  /*
+  // ダブルクリック反応
+  function onDoubleClick(x, y) {
+    owner.onDoubleClick(curPoint, x, y);
+  } 
+  */                                            
+
+  // ポイントの大小比較（する関数を返すプロパティ）
+  property lessPoint {
+    getter {
+      if (cellSelection) 
+        return function(p1, p2) {
+          if (p1.column.index < p2.column.index)
+            return true;
+          if (p1.column.index > p2.column.index)
+            return false;
+          return p1.row.index < p2.row.index;
+        };
+      else
+        return function(p1, p2) {
+          return p1.row.index < p2.row.index;
+        };
+    }
+  }
+
+  // ポイントの同値比較
+  function equalPoint(p1, p2) {
+    if (p1 === void
+        && p2 === void)
+      return true;
+    if (p1 === void
+        || p2 === void)
+      return false;
+    if (cellSelection) {
+      return p1.column === p2.column
+        && p1.row === p2.row;
+    } else {
+      return p1.row === p2.row;
+    }
+  }
+
+  // ポイント配列の差を取る
+  function differencePointList(p1, p2) {
+    var lessPoint = this.lessPoint;
+    var result = [];
+    var i1, i2;
+    i1 = 0, i2 = 0;
+    while (i1 != p1.count) {
+      if (i2 == p2.count) {
+        while (i1 != p1.count) 
+          result.add(p1[i1++]);
+        break;
+      } 
+      if (lessPoint(p1[i1], p2[i2])) {
+          result.add(p1[i1]);
+          i1++;
+      } else {
+        if (! lessPoint(p2[i2], p1[i1])) {
+          i1++;
+        }
+        i2++;
+      }
+    }
+    return result;
+  }
+
+  // ポイントをフォーカス
+  function focusPoint(point) {
+    if (equalPoint(curFocusPoint, point))
+      return;
+    var prevFocusPoint = curFocusPoint;
+    curFocusPoint = point;
+    drawPoint(prevFocusPoint);
+    drawPoint(curFocusPoint);
+  }
+  
+  // ポイントはフォーカスされているか？
+  function isFocusedPoint(point) {
+    return equalPoint(curFocusPoint, point);
+  }
+
+  // ポイントの選択状態を設定する
+  function selectPoint(point, value = true) {
+    if (! multipleSelection) {
+      if (value)
+        focusPoint(point);
+      else
+        focusPoint(void);
+      return;
+    }
+    if (point === void)
+      return;
+    if (cellSelection) {
+      if (point.row.selected[point.column.key] != value) {
+        if (value)
+          point.row.selected[point.column.key] = value;
+        else 
+          delete point.row.selected[point.column.key];
+        owner.redrawCell(point.column, point.row);
+      }
+    } else {
+      if (point.row.selected["__row__"] != value) {
+        if (value)
+          point.row.selected["__row__"] = value;
+        else
+          delete point.row.selected["__row__"];
+        owner.redrawRow(point.row);
+      }      
+    }
+  }
+  
+  // ポイントは選択状態か？
+  function isSelectedPoint(point) {
+    if (! multipleSelection) 
+      return isFocusedPoint(point);
+    if (point === void)
+      return false;
+    if (cellSelection) {
+      return point.row.selected[point.column.key] == true;
+    } else {
+      return point.row.selected["__row__"] == true;
+    }
+  }
+
+  // 選択状態を全クリア
+  function clearAllSelection() {
+    var rowList = owner.rowList;
+    var empty = %[];
+    for (var i = 0; i < rowList.count; i++) {
+      var row = rowList[i];
+      if (equalStruct(empty, row.selected))
+        continue;
+      row.selected = %[];
+      owner.redrawRow(row);
+    }
+  }
+
+  // 選択状態のポイントの配列
+  property selectedPointList {
+    getter {
+      if (! multipleSelection) {
+        if (curFocusPoint === void)
+          return [];
+        else
+          return [ curFocusPoint ];
+      }
+      var result = [];
+      if (cellSelection) {
+        var columnMap = %[];
+        for (var i = 0; i < owner.columnList.count; i++) {
+          var column = owner.columnList[i];
+          columnMap[column.key] = column;
+        }
+
+        for (var i = 0; i < owner.rowList.count; i++) {
+          var row = owner.rowList[i];
+          var keys = dictionaryKeys(row.selected);
+          for (var j = 0; j < keys.count; j++)
+            result.add(%[ column: columnMap[keys[j]], row: row ]);
+        }
+      } else {
+        for (var i = 0; i < owner.rowList.count; i++) {
+          var empty = %[];
+          var row = owner.rowList[i];
+          if (! equalStruct(empty, row.selected)) {
+            result.add(%[ row: row ]);
+          }
+        }
+      }
+      return result;
+    }
+  }
+
+  // 矩形内にあるポイントの配列
+  function getPointListInRect(x, y, w, h) {
+    var result = [];
+    if (cellSelection) {
+      var columnList = owner.findColumnRange(x, w);
+      var rowList = owner.findRowRange(y, h);
+      for (var i = 0; i < columnList.count; i++) {
+        var column = columnList[i];
+        for (var j = 0; j < rowList.count; j++) {
+          var row = rowList[j];
+          result.add(%[ column: column, row: row ]);
+        }
+      }
+    } else {
+      var rowList = owner.findRowRange(y, h);
+      for (var i = 0; i < rowList.count; i++) {
+          var row = rowList[i];
+          result.add(%[ row: row ]);
+      }
+    }
+    return result;
+  }
+
+  // ふたつのポイントで囲まれるポイントの配列
+  function getPointListInRange(p1, p2) {
+    var result = [];
+    if (cellSelection) {
+      var fromColumn = Math.min(p1.column.index, p2.column.index);
+      var fromRow = Math.min(p1.row.index, p2.row.index);
+      var toColumn = Math.max(p1.column.index, p2.column.index);
+      var toRow = Math.max(p1.row.index, p2.row.index);
+      var columnList = owner.columnList;
+      var rowList = owner.rowList;
+      for (var i = fromColumn; i <= toColumn; i++) {
+        var column = columnList[i];
+        for (var j = fromRow; j <= toRow; j++) {
+          var row = rowList[j];
+          result.add(%[ column: column, row: row ]);
+        }
+      }
+    } else {
+      var fromRow = Math.min(p1.row.index, p2.row.index);
+      var toRow = Math.max(p1.row.index, p2.row.index);
+      var rowList = owner.rowList;
+      for (var i = fromRow; i <= toRow; i++) {
+        var row = rowList[i];
+        result.add(%[ row: row ]);
+      }
+    }
+    return result;
+  }
+
+  // ポイントの配列でポイントを選択状態にする
+  function selectPointList(pointList, value = true) {
+    for (var i = 0; i < pointList.count; i++)
+      selectPoint(pointList[i], value);
+  }
+
+  // ふたつのポイントに挟まれた範囲を全て選択する
+  function selectPointInRange(p1, p2) {
+    var pointList = getPointListInRange(p1, p2);
+    for (var i = 0; i < pointList.count; i++) {
+      selectPoint(pointList[i]);
+    }
+  }
+
+  // ポイントを再描画する
+  function drawPoint(point) {
+    if (point === void)
+      return;
+    // セルセレクションならセルだけ
+    if (cellSelection) {
+      var column = point.column;
+      var row = point.row;
+      redrawRect(column.pos, row.pos, column.size, row.size);
+    } 
+    // ! セルセレクションならロウ単位で
+    else {
+      var lastColumn = owner.columnList[owner.columnList.count - 1];
+      var row = point.row;
+      redrawRect(0, row.pos, lastColumn.pos + lastColumn.size, row.size);
+    }
+  }
+
+  // カラムとロウからポイントを生成する
+  function generatePoint(column, row) {
+    return %[ column: column, 
+              row: row ];
+  }
+
+  // 指定座標に対応するポイントを検索する
+  function findPoint(x, y) {
+    var column = owner.findColumnRange(x, 0)[0];
+    var row = owner.findRowRange(y, 0)[0];
+    if (column === void
+        || row === void)
+      return void;
+    return generatePoint(column, row);
+  }
+
+  // ポイントが現在も有効か判定する
+  function isValidPoint(point) {
+    return point !== void
+      && point.column isvalid
+      && owner.columnList.find(point.column) >= 0
+      && point.row isvalid
+      && owner.rowList.find(point.row) >= 0;
+  }
+        
+  // アイテム一個押下
+  function pressPoint(targetPoint, x, y, button, shift) {
+    //　マルチ選択時
+    if (multipleSelection) {
+      // 左クリック時の挙動
+      if (button == mbLeft) {
+        // Shiftキーを押してる時はアイテムを前のチョイスから範囲選択
+        if (targetPoint !== void
+            && (shift & ssShift)) {
+          if (curFocusPoint === void) {
+            clearAllSelection();
+            focusPoint(targetPoint);
+            selectPoint(targetPoint);
+          } else {
+            if (! isValidPoint(lastFocusPoint))
+              lastFocusPoint = curFocusPoint;
+            if (! (shift & ssCtrl))
+              clearAllSelection();
+            selectPointInRange(lastFocusPoint, targetPoint);
+            focusPoint(targetPoint);
+          }
+        } 
+        // Ctrlキーを押してる時は選択の反転。
+        else if (targetPoint !== void
+                 && (shift & ssCtrl)) {
+          selectPoint(targetPoint, ! isSelectedPoint(targetPoint));
+          lastFocusPoint = targetPoint;
+          focusPoint(targetPoint);
+        } 
+        // ターゲットアイテムがあったら選択とフォーカスを同時に移動。
+        else if (targetPoint !== void) {
+          lastFocusPoint = targetPoint;
+          clearAllSelection();
+          focusPoint(targetPoint);
+          selectPoint(targetPoint);
+          pressSelection = true;
+        }
+        // ターゲットアイテムが無かったら選択をクリア。
+        else {
+          clearAllSelection();
+          lastFocusPoint = void;
+        }
+        // ターゲットアイテムの onMouseDown をコール
+        onPointMouseDown(targetPoint, x, y, button, shift);
+      }
+
+      // 右クリック時の挙動
+      else if (button == mbRight) {
+        // 選択していないターゲットアイテムがあったらそのアイテムのみを選択し、
+        // 選択フラグを立てる
+        if (targetPoint !== void
+            && ! isSelectedPoint(targetPoint)) {
+          lastFocusPoint = targetPoint;
+          clearAllSelection();
+          focusPoint(targetPoint);
+          selectPoint(targetPoint);
+          pressSelection = true;
+        } 
+          // ターゲットアイテムが無かったら選択をクリア。
+        else if (targetPoint === void) {
+          clearAllSelection();
+          lastFocusPoint = void;
+        }
+        // 選択範囲右クリックコールバック
+        if (pressSelection) 
+          owner.onSelectionRightClick(targetPoint, x, y, shift);
+        // バックグラウンド右クリックコールバック
+        else
+          owner.onBackgroundRightClick(x, y, shift);
+      }
+    } 
+    // シングル選択時
+    else {
+      focusPoint(targetPoint);
+      onPointMouseDown(targetPoint, x, y, button, shift);
+    }
+  }
+
+  // ポイントの中がクリック可能な空白かどうか判定する
+  function isPointBlank(point, x, y) {
+    if (point === void)
+      return false;
+    return point.column.isBlank(point.row, x, y);
+  }
+
+  // マウスダウン
+  function onMouseDown(x, y, button, shift) {
+    owner.cancelEdit();
+    owner.focus();
+
+    if (! k_kirikiriz)
+      onMouseMove(x, y);
+
+    var targetPoint = curPoint;
+    if (multipleSelection) {
+      // マウス選択オフから初め
+      inMouseSelection = false;
+      pressSelection = false;
+
+      // 範囲選択を始められるか？
+      var selectionAvailable = (button == mbLeft
+                                && (targetPoint === void
+                                    || (! isSelectedPoint(targetPoint)
+                                        && (owner.instantDrag 
+                                            || isPointBlank(targetPoint, x, y)))));
+      // ドラッグ出来るか？
+      var dragAvailable = owner.isPointDraggable(targetPoint, x, y);
+
+      // セルがドラッグ非対応なら範囲選択を始める
+      if (! dragAvailable
+          && selectionAvailable) {
+        inMouseSelection = true;
+        delayMouseEvent = true;
+      }
+      // 選択中のアイテムをクリックした時は、ドラッグしなかった場合のボタン押下動作は、MouseUp時まで遅延させる。
+      else if (targetPoint !== void
+               && isSelectedPoint(targetPoint))  {
+        pressSelection = true;
+        delayMouseEvent = true;
+      } 
+      // ドラッグ出来るアイテムの場合はマウスイベントを遅延させる
+      else if (dragAvailable) {
+        delayMouseEvent = true;
+      }        
+    } else {
+      // シングルセレクションなら常に遅延処理
+      delayMouseEvent = true;
+    }
+    
+    // マウスダウンイベントの遅延処理
+    if (delayMouseEvent) {
+      mouseDownTargetPoint = targetPoint;
+      mouseDownTargetX = x;
+      mouseDownTargetY = y;
+      mouseDownTargetButton = button;
+      mouseDownTargetShift = shift;
+      mouseDownTargetSelectedPointList = selectedPointList;
+      mouseDownTargetSelectedPointList.sort(lessPoint);
+      
+      if (targetPoint !== void)
+        focusPoint(targetPoint);
+    } else {
+      pressPoint(targetPoint, x, y, button, shift);
+    }
+
+    super.onMouseDown(...);
+  }
+
+  function onMouseUp(x, y, button, shift) {
+    super.onMouseUp(...);
+    // マウスドラッグによる範囲選択を試みて結局
+    // ドラッグされなかった場合、ここでボタン押下動作を実行する。
+    if (delayMouseEvent
+        && button == mouseDownTargetButton) {
+      pressPoint(mouseDownTargetPoint, mouseDownTargetX, mouseDownTargetY, mouseDownTargetButton, mouseDownTargetShift);
+      delayMouseEvent = false;
+      inMouseSelection = false;
+      pressSelection = false;
+      return;
+    }
+  }
+
+  // マウスムーブ
+  function onMouseMove(x, y) {
+    // ポイントの再描画と、マウスイベント処理
+    super.onMouseMove(...);
+    var prevPoint = curPoint;
+    curPoint = findPoint(x, y);
+    if (! equalPoint(prevPoint, curPoint)) {
+      if (prevPoint !== void) {
+        drawPoint(prevPoint);
+        owner.onPointMouseLeave(prevPoint, x, y);
+      }
+      if (curPoint !== void) {
+        drawPoint(curPoint);
+        owner.onPointMouseEnter(curPoint, x, y);
+      }
+    }
+    if (curPoint !== void) {
+      hint = curPoint.column.getRowHint(curPoint.row, x, y);
+      status = curPoint.column.getOpts("hint", "");
+      owner.onPointMouseMove(curPoint, x, y);
+    } else {
+      hint = "";
+      status = "";
+    }
+  }
+
+  // マウスリーブ
+  function onMouseLeave() {
+    // ポイントの再描画とマウスイベント処理
+    var prevPoint = curPoint;
+    curPoint = void;
+    drawPoint(prevPoint);
+    if (prevPoint !== void) 
+      owner.onPointMouseLeave(prevPoint, cursorX, cursorY);
+  }
+
+  // ドラッグ開始
+  function onDragEnter(x, y, shift) {
+    delayMouseEvent = false;
+
+    if (inMouseSelection) {
+      // ラストフォーカスはターゲットアイテムに移す
+      lastFocusPoint = mouseDownTargetPoint;
+      mouseSelectionBaseX = x;
+      mouseSelectionBaseY = y;
+      curMouseSelectionRect = new KRect(x, y, 0, 0);
+    } else if (pressSelection) {
+      owner.onSelectionDragEnter(...);
+    } else {
+      if (curFocusPoint !== void) {
+        owner.onSelectionDragEnter(...);
+      }
+    }
+  }
+
+  // ドラッグ中移動
+  function onDragMove(x, y, shift) {
+    if (inMouseSelection ) {
+      beginRedrawRegion();
+      // マウスドラッグによる範囲選択
+      redrawRect(curMouseSelectionRect.left, curMouseSelectionRect.top, curMouseSelectionRect.width, curMouseSelectionRect.height);
+      curMouseSelectionRect = new KRect(Math.min(mouseSelectionBaseX, x),
+                                        Math.min(mouseSelectionBaseY, y),
+                                        Math.abs(mouseSelectionBaseX - x),
+                                        Math.abs(mouseSelectionBaseY - y));
+      redrawRect(curMouseSelectionRect.left, curMouseSelectionRect.top, curMouseSelectionRect.width, curMouseSelectionRect.height);
+
+      // アイテムが無かったらここまで。
+      if (owner.rowList.count == 0) {
+        endRedrawRegion();
+        return;
+      }
+
+      var prevSelectionList = selectedPointList;
+      prevSelectionList.sort(lessPoint);
+      // 選択範囲に含まれるアイテム群を判定
+      var fromY, toY, fromX, toX;
+      fromX = Math.min(mouseSelectionBaseX, x);
+      toX = Math.max(mouseSelectionBaseX, x);
+      fromY = Math.min(mouseSelectionBaseY, y);
+      toY = Math.max(mouseSelectionBaseY, y);
+      var pointList = getPointListInRect(fromX, fromY, toX - fromX, toY - fromY);
+
+      // Shiftを押しながらなら、範囲を追加
+      if (mouseDownTargetShift & ssShift) {
+        prevSelectionList = differencePointList(prevSelectionList, mouseDownTargetSelectedPointList);
+        prevSelectionList = differencePointList(prevSelectionList, pointList);
+        for (var i = 0; i < prevSelectionList.count; i++)
+          selectPoint(prevSelectionList[i], false);
+        for (var i = 0; i < mouseDownTargetSelectedPointList.count; i++)
+          selectPoint(mouseDownTargetSelectedPointList[i]);
+        for (var i = 0; i < pointList.count; i++)
+          selectPoint(pointList[i]);
+      } 
+      // Ctrlを押しながらなら、範囲を反転
+      else if (mouseDownTargetShift & ssCtrl) {
+        prevSelectionList = differencePointList(prevSelectionList, mouseDownTargetSelectedPointList);
+        for (var i = 0; i < prevSelectionList.count; i++)
+          selectPoint(prevSelectionList[i], false);
+        for (var i = 0; i < mouseDownTargetSelectedPointList.count; i++)
+          selectPoint(mouseDownTargetSelectedPointList[i]);
+        for (var i = 0; i < pointList.count; i++)
+          selectPoint(pointList[i], ! isSelectedPoint(pointList[i]));
+      } 
+      // 何も押してなければ、新規に範囲を選択
+      else {
+        prevSelectionList = differencePointList(prevSelectionList, pointList);
+        for (var i = 0; i < prevSelectionList.count; i++)
+          selectPoint(prevSelectionList[i], false);
+        for (var i = 0; i < pointList.count; i++)
+          selectPoint(pointList[i]);
+      }        
+      endRedrawRegion();
+    }
+    else if (pressSelection) {
+      owner.onSelectionDragMove(...);
+    }
+    else {
+      if (curFocusPoint !== void);
+        owner.onSelectionDragMove(...);
+    }
+  }
+
+  // ドラッグ完了
+  function onDragLeave(x, y, shift) {
+    if (inMouseSelection) {
+      var range = curMouseSelectionRect;
+      curMouseSelectionRect = void;
+      inMouseSelection = false;
+      redrawRect(range.left, range.top, range.width, range.height);
+    } 
+    else if (pressSelection) {
+      owner.onSelectionDragLeave(...);
+    } 
+    else {
+      if (curFocusPoint !== void) {
+        owner.onSelectionDragLeave(...);
+      }
+    }
+  }
+
+  // ポイントへのマウスダウン
+  function onPointMouseDown(point, x, y, button, shift) {
+    if (point === void)
+      return;
+    // テーブル本体を呼ぶ
+    if (point.column.editable)
+      point.column.onMouseDown(point.row, x, y, button, shift);
+  }
+
+
+  // 細かい単位での受け付けを可能にするため、パケット自体は常に受け付けて、Confirmで実際の受け入れ処理をする
+  function isPacketAcceptable(packet) {
+    return true;
+  }
+
+  // ポイントの示す矩形を得る
+  function getPointRect(point) {
+    if (cellSelection) {
+      return new KRect(point.column.pos, point.row.pos, point.column.size, point.row.size);
+    } else {
+      return new KRect(0, point.row.pos, lastColumn.tail, point.row.size);
+    }
+  }
+
+  // 行単位の挿入座標を得る
+  function getRowInsertionY(insertionIndex) {
+    if (insertionIndex < rowList.count) 
+      return rowList[insertionIndex].pos;
+    else 
+      return lastRow.tail;
+  }
+
+  // ドラッグ情報の同値判定
+  function equalDragInfo(d1, d2) {
+    if (d1.acceptType != d2.acceptType)
+      return false;
+    switch (d1.acceptType) {
+    case DRAG_ACCEPT_TYPE_NONE: return true;
+    case DRAG_ACCEPT_TYPE_POINT: return equalPoint(d1.point, d2.point);
+    case DRAG_ACCEPT_TYPE_ROW: return d1.insertionIndex == d2.insertionIndex;
+    }
+  }
+
+  // パケット移動
+  function onPacketMove(x, y, packet, shift) {
+    var prevDragInfo = curDragInfo;
+    var prevDragRegion = curDragRegion;
+    var point;
+    
+    curDragInfo = %[ acceptType: DRAG_ACCEPT_TYPE_NONE ];
+      
+    var ratio = 0.5;
+
+    point = findPoint(x, y);
+    // ポイントがパケット受け容れ可能か？
+    if (point !== void) {
+      if (owner.isPointPacketAcceptable(point, packet)) {
+        curDragInfo = %[ acceptType: DRAG_ACCEPT_TYPE_POINT,
+                         point: point ];
+        ratio = 0.25;
+      }
+    }
+    // 行間がパケット受け容れ可能か？
+    var row = owner.findRowRange(y, 0)[0];
+    if (row !== void) {
+      if ((y - row.pos) < row.size * ratio
+          && owner.isRowPacketAcceptable(row.index, packet)) {
+        curDragInfo = %[ acceptType: DRAG_ACCEPT_TYPE_ROW, 
+                         insertionIndex: row.index ];
+      } else if ((row.tail - y) < row.size * ratio
+                 && owner.isRowPacketAcceptable(row.index + 1, packet)) {
+        curDragInfo = %[ acceptType: DRAG_ACCEPT_TYPE_ROW,
+                         insertionIndex: row.index + 1 ];
+      }
+    } 
+    // 行末がパケット受け容れ可能か？
+    else {
+      row = lastRow;
+      if (owner.isRowPacketAcceptable(row.index + 1, packet)) {
+        curDragInfo = %[ acceptType: DRAG_ACCEPT_TYPE_ROW,
+                         insertionIndex: row.index + 1 ];
+      }
+    }
+
+    // 再描画が必要な描画範囲を計算する
+    curDragRegion = new KRegion();
+    switch(curDragInfo.acceptType) {
+    case DRAG_ACCEPT_TYPE_POINT:
+      curDragRegion.include(getPointRect(point));
+      break;
+    case DRAG_ACCEPT_TYPE_ROW:
+      curDragRegion.include(new KRect(0, getRowInsertionY(curDragInfo.insertionIndex) - 5, width, 10));
+      break;
+    }
+
+    // イベント処理
+    if (! equalDragInfo(curDragInfo, prevDragInfo)) {
+      switch (prevDragInfo.acceptType) {
+      case DRAG_ACCEPT_TYPE_POINT: owner.onPointPacketLeave(prevDragInfo.point, x, y, packet, shift); break;
+      case DRAG_ACCEPT_TYPE_ROW: owner.onRowPacketLeave(prevDragInfo.insertionIndex, x, y, packet, shift); break;
+      }
+      switch (curDragInfo.acceptType) {
+      case DRAG_ACCEPT_TYPE_POINT: owner.onPointPacketEnter(curDragInfo.point, x, y, packet, shift); break;
+      case DRAG_ACCEPT_TYPE_ROW: owner.onRowPacketEnter(curDragInfo.insertionIndex, x, y, packet, shift); break;
+      }
+    }
+    
+    switch (curDragInfo.acceptType) {
+    case DRAG_ACCEPT_TYPE_POINT: owner.onPointPacketMove(curDragInfo.point, x, y, packet, shift); break;
+    case DRAG_ACCEPT_TYPE_ROW: owner.onRowPacketMove(curDragInfo.insertionIndex, x, y, packet, shift); break;
+    }
+    // 再描画実行
+    var drawRegion = new KRegion();
+    drawRegion.include(prevDragRegion);
+    drawRegion.include(curDragRegion);
+    for (var i = 0; i < drawRegion.rectCount; i++) {
+      var rect = drawRegion.rectAt(i);
+      redrawRect(rect.left, rect.top, rect.width, rect.height);
+    }
+  }
+
+  // パケット離脱
+  function onPacketLeave(x, y, packet, shift) {
+    // イベント処理
+    switch (curDragInfo.acceptType) {
+    case DRAG_ACCEPT_TYPE_POINT: owner.onPointPacketEnter(curDragInfo.point, x, y, packet, shift); break;
+    case DRAG_ACCEPT_TYPE_ROW: owner.onRowPacketEnter(curDragInfo.insertionIndex, x, y, packet, shift); break;
+    }
+    // 承認したターゲット情報を記録した上でドラッグ情報をクリア
+    confirmedDragTarget = curDragInfo;
+    curDragInfo = %[ acceptType: DRAG_ACCEPT_TYPE_NONE ];
+    curDragRegion = new KRegion();
+    // 再描画
+    redrawAll();
+  }
+
+  // パケット承認チェック
+  function isPacketConfirmed(x, y, packet, shift) {
+    // 受け入れられるタイプのパケットを選択中か？
+    return curDragInfo.acceptType != DRAG_ACCEPT_TYPE_NONE;
+  }
+
+  // パケット受け入れ
+  function onPacketDrop(x, y, packet, shift) {
+    switch (confirmedDragTarget.acceptType) {
+    case DRAG_ACCEPT_TYPE_POINT: owner.onPointPacketDrop(confirmedDragTarget.point, x, y, packet, shift); break;
+    case DRAG_ACCEPT_TYPE_ROW: owner.onRowPacketDrop(confirmedDragTarget.insertionIndex, x, y, packet, shift); break;
+    }
+  }
+
+  // パケットキャンセル
+  function onPacketCancel(packet) {
+    // 本体のイベント処理
+    owner.onPacketCancel(...);
+  }
+};
+
+
+
+/*----------------------------------------------------------------------
+ * テーブル本体
+ ----------------------------------------------------------------------*/
+class KTable extends KWidget
+{
+  var _enableColumnKeyRowSort = true;
+  var _enableColumnTabOrderExchange = true;
+  var _multipleSelection = true;
+  var _cellSelection = false;
+  var _rowTabBaseIndex = 1;
+  var columnList = [];
+  var rowList = [];
+  var baseGrid;
+  var iconDeposit;
+  var _showVerticalGrid = true;
+  var _showHorizontalGrid = true;
+  var instantDrag = true;
+  var keydownSelectionBaseList;
+  var keydownSelectionBeginPoint;
+  var dragPoint;
+  var marginalWidth, marginalHeight;
+  var respondToValueModification = false;
+  var dict;
+  var defaultOpts;
+
+  /**------------------------------
+   * テーブルビュー
+   *
+   * 行と列から構成される表組みビュー。
+   * 様々なデータセットを編集するために使う。
+   * 
+   * @param window ウィンドウ
+   * @param name 名前
+   * @param attrList 属性定義リスト
+   * @param defaultOpts カラムのデフォルトオプション
+   */
+  function KTable(window, name, attrList = [], defaultOpts = %[]) {
+    super.KWidget(window, name);
+
+    this.defaultOpts = defaultOpts;
+
+    neutralColor = 0xffffffff;
+    fillRect(0, 0, width, height, neutralColor);
+    focusable = true;
+
+    iconDeposit = %[];
+
+    marginalWidth = marginalHeight = 2000;
+
+    // ウィジェットのデフォルトパラメータを一時リセット
+    var defaultMarginLeft, defaultMarginTop, defaultMarginRight, defaultMarginBottom;
+    var defaultAlignVertical, defaultAlignHorizontal;
+    var defaultSpaceHorizontal, defaultSpaceVertical;
+
+    defaultMarginLeft = window.defaultMarginLeft;
+    defaultMarginRight = window.defaultMarginRight;
+    defaultMarginTop = window.defaultMarginTop;
+    defaultMarginBottom = window.defaultMarginBottom;
+    defaultAlignVertical = window.defaultAlignVertical;
+    defaultAlignHorizontal = window.defaultAlignHorizontal;
+    defaultSpaceVertical = window.defaultSpaceVertical;
+    defaultSpaceHorizontal = window.defaultSpaceHorizontal;
+
+    window.defaultMarginLeft = 0;
+    window.defaultMarginRight = 0;
+    window.defaultMarginTop = 0;
+    window.defaultMarginBottom = 0;
+    window.defaultSpaceHorizontal = 0;
+    window.defaultSpaceVertical = 0;
+    window.defaultAlignHorizontal = ALIGN_LEFT;
+    window.defaultAlignVertical = ALIGN_TOP;
+
+    baseGrid = new KGridLayout(window);
+    baseGrid.parent = this;
+
+    spaceHorizontal = 10;
+    spaceVertical = 4;
+
+    baseGrid.add(1, 0, new KScrollLayout(window, true, false, "columnTabScroll"));
+    baseGrid.add(0, 1, new KScrollLayout(window, false, true, "rowTabScroll"));
+    baseGrid.add(1, 1, new KScrollLayout(window, true, true, "viewScroll"), 2, 2);
+    columnTabScroll.add(new KTableColumnTab(window, this, "columnTab"));
+    rowTabScroll.add(new KTableRowTab(window, this, "rowTab"));
+    baseGrid.add(0, 0, new KTableLeftTopCorner(window, this, "leftTopCorner"));
+    viewScroll.add(new KTableView(window, this, "view"));
+    columnTabScroll.hideVerticalBar = true;
+    columnTabScroll.hideHorizontalBar = true;
+    rowTabScroll.hideVerticalBar = true;
+    rowTabScroll.hideHorizontalBar = true;
+
+    baseGrid.add(2, 0, new KSpacer(window, viewScroll.verticalBar.width, 0));
+    baseGrid.add(0, 2, new KSpacer(window, 0, viewScroll.horizontalBar.height));
+
+    viewScroll.onChildViewModified = onViewModified;
+
+    viewScroll.setMarginalSize(0, 0);
+    columnTabScroll.setMarginalSize(0, 0);
+    rowTabScroll.setMarginalSize(0, 0);
+
+    // ウィジェットのデフォルトパラメータ群を復帰。
+    window.defaultMarginLeft =  defaultMarginLeft;
+    window.defaultMarginRight = defaultMarginRight;
+    window.defaultMarginTop =   defaultMarginTop;
+    window.defaultMarginBottom = defaultMarginBottom;
+    window.defaultAlignVertical = defaultAlignVertical;
+    window.defaultAlignHorizontal = defaultAlignHorizontal;
+    window.defaultSpaceVertical = defaultSpaceVertical;
+    window.defaultSpaceHorizontal = defaultSpaceHorizontal;
+
+    this.columnList = [];
+    var ofst = 0;
+    for (var i = 0; i < attrList.count; i++) {
+      var def = attrList[i];
+      var klass = def[0];
+      var label = def[1];
+      var key = def[2];
+      var opts = def[3];
+      if (opts !== void
+          && opts["array"]) {
+        opts["klass"] = klass;
+        klass = KArrayTableColumn;
+      }
+      var column = new klass(this, label, key, opts);
+      column.index = i;
+      column.size = Math.max(K_TABLE_COLUMN_MIN_WIDTH, column.fixedWidth);
+      column.pos = ofst;
+      if (column.visible)
+        ofst += column.size;
+      columnList.add(column);
+    }
+    columnTab.redrawAll();
+    showRowTab = false;
+
+    invalidateLayout();
+  }
+
+  // ファイナライザ
+  function finalize {
+    if (dict !== void) {
+      var orderList = [];
+      for (var i = 0; i < columnList.count; i++) {
+        var column = columnList[i];
+        orderList.add(%[ key: column.key, size: column.size ]);
+      }
+      dict.set(name + "_column_order", orderList);
+    }
+    discard(baseGrid);
+    super.finalize();
+  }
+
+  /**------------------------------
+   * 辞書とバインドする。
+   * KTableはカラムの順番とサイズを辞書に記録する
+   *
+   * @param dict 辞書
+   ------------------------------*/
+  function bindPersistentDictionary(dict) {
+    if (isAvoidDictionaryRegistration)
+      return;
+    this.dict = dict;
+    var orderList = dict.get(name + "_column_order", []);
+    if (orderList === void) 
+      return;
+    
+    var sizeModifiedColumnList = [];
+
+    view.beginRedrawRegion();
+
+    if (enableColumnTabOrderExchange) {
+      var newColumnList = [];
+      for (var i = 0; i < orderList.count; i++) {
+        var order = orderList[i];
+        for (var j = 0; j < columnList.count; j++) {
+          var column = columnList[j];
+          if (column.key == order.key) {
+            newColumnList.add(column);
+            columnList.erase(j);
+            break;
+          }
+        }
+      }
+      for (var i = 0; i < columnList.count; i++)
+        newColumnList.add(columnList[i]);
+      columnList = newColumnList;
+    }
+    
+    for (var i = 0; i < orderList.count; i++) {
+      var order = orderList[i];
+      for (var j = 0; j < columnList.count; j++) {
+        var column = columnList[j];
+        if (column.key == order.key) {
+          if (column.size != order.size) {
+            column.size = order.size;
+            if (column.variableRowSize)
+              sizeModifiedColumnList.add(column);
+          }
+          break;
+        }
+      }
+    }
+    
+    var ofst = 0;
+    for (var i = 0; i < columnList.count; i++) {
+      var column = columnList[i];
+      column.index = i;
+      column.pos = ofst;
+      if (column.visible)
+        ofst += column.size;
+    }
+    for (var i = 0; i < sizeModifiedColumnList.count; i++) {
+      var column = sizeModifiedColumnList[i];
+      tryCalcVariableRowSize(column);
+    }
+    updateMinMaxSize();
+    view.redrawAll();
+    view.endRedrawRegion();
+    columnTab.redrawAll();
+  }
+
+  // カラムを再表示
+  function invalidateColumnVisibility(column) {
+    var ofst = 0;
+    for (var i = 0; i < columnList.count; i++) {
+      var column = columnList[i];
+      column.index = i;
+      column.pos = ofst;
+      if (column.visible)
+        ofst += column.size;
+    }
+    tryCalcVariableRowSize(column);
+    updateMinMaxSize();
+    view.redrawAll();
+    columnTab.redrawAll();
+    rowTab.redrawAll();
+  }
+
+  // 子ウィネットの変更通知をここで食い取る
+  function onChildValueModified() {
+  }
+
+  // 子のサイズ変更をハンドル
+  function onChildMinMaxSizeModified {
+    invalidateLayout();
+  }
+
+  // 子のマージン変更をハンドル
+  function onChildMarginModified {
+    invalidateLayout();
+  }
+
+  // 子のアライメント変更をハンドル
+  function onChildAlignModified {
+    invalidateLayout();
+  }
+
+  // 子のスペース変更をハンドル
+  function onSpaceModified {
+    invalidateLayout();
+  }
+
+  // 親の変更をハンドル
+  function onParentModified(p) {
+    if (p)
+      invalidateLayout();
+  }
+
+  // レイアウトのやり直し
+  function invalidateLayout {
+    baseGrid.setPos(baseGrid.marginLeft, baseGrid.marginTop);
+    setMinMaxSize(baseGrid.minWidth + baseGrid.marginLeft + baseGrid.marginRight,
+                  baseGrid.minHeight + baseGrid.marginTop + baseGrid.marginBottom,
+                  baseGrid.maxWidth + baseGrid.marginLeft + baseGrid.marginRight,
+                  baseGrid.maxHeight + baseGrid.marginTop + baseGrid.marginBottom);
+  }
+  
+  // サイズの変更をハンドル
+  function onSizeModified(width, height) {
+    baseGrid.setSize(width - (baseGrid.marginLeft + baseGrid.marginRight),
+                     height - (baseGrid.marginTop + baseGrid.marginBottom));
+  }
+
+  // ビューの範囲変更をハンドル
+  function onViewModified(childViewLeft, childViewTop, childViewWidth, childViewHeight, childWidth, childHeight) {
+    // カラムタブのスクロールの辻褄合わせ
+    columnTabScroll.setChildViewPos(childViewLeft, columnTabScroll.childViewTop);
+    // ロウタブのスクロールの辻褄合わせ
+    rowTabScroll.setChildViewPos(rowTabScroll.childViewLeft, childViewTop);
+  }
+
+  // MinMaxサイズを整える
+  function updateMinMaxSize() {
+    if (columnList.count == 0
+        || rowList.count == 0) {
+      columnTab.setMinMaxSize(0, columnTab.height, marginalWidth, columnTab.height);
+      rowTab.setMinMaxSize(rowTab.width, 0, rowTab.width, marginalHeight);
+      view.setMinMaxSize(0, 0, marginalWidth, marginalHeight);
+      return;
+    }
+    var minW, minH, maxW, maxH;
+    minW = lastColumn.tail;
+    minH = lastRow.tail;
+    maxW = Math.max(minW, marginalWidth);
+    maxH = Math.max(minH, marginalHeight);
+    columnTab.setMinMaxSize(minW, columnTab.height, maxW, columnTab.height);
+    rowTab.setMinMaxSize(rowTab.width, minH, rowTab.width, maxH);
+    view.setMinMaxSize(minW, minH, maxW, maxH);
+  }
+
+  /**------------------------------
+   * 最低限のサイズを設定する
+   *
+   * リスト項目が少なくても最低限広げられる
+   * 「最低最大サイズ」を決定する。
+   * デフォルト値は2000x2000
+   *
+   * @param w 幅
+   * @param h 高さ
+   ------------------------------*/
+  function setMarginalSize(w, h) {
+    marginalWidth = w;
+    marginalHeight = h;
+    updateMinMaxSize();
+  }
+
+  // アイコンをロードしてキャッシュする
+  function findIcon(filename) {
+    if (typeof(iconDeposit[filename]) == "undefined") {
+      var layer = iconDeposit[filename] = new global.Layer(window, this);
+      layer.loadImages(filename);
+      layer.setSizeToImageSize();
+    }
+    return iconDeposit[filename];
+  }
+
+  // セルの値が更新されたフック
+  function onCellValueModified(column, row, newValue, oldValue) {
+  }
+
+  // 現在の値を通知
+  function notifyValueModification() {
+    if (respondToValueModification)
+      onValueModified(value);
+  }
+
+  /**------------------------------
+   * エレメントを指定して行を追加する
+   *
+   * @param element エレメントの値
+   ------------------------------*/
+  function addElement(element) {
+    insertElement(rowList.count, element);
+  }
+
+  /**------------------------------
+   * エレメントを指定して行を挿入する
+   *
+   * @param index エレメントの挿入位置
+   * @param element エレメントの値
+   ------------------------------*/
+  function insertElement(index, element) {
+    beginRedrawRegion();
+    element = duplicateStruct(element);
+    var row = new KTableRow(this, element);
+    row.index = index;
+    row.size = fontHeight + spaceVertical;;
+    row.pos = (index == 0) ? 0 : rowList[index - 1].tail;
+    row.initialize(columnList);
+    rowList.insert(index, row);
+    var size = row.pos;
+    for (var i = index; i < rowList.count; i++) {
+      var row = rowList[i];
+      row.index = i;
+      row.pos = size;
+      size += row.size;
+    }
+    updateMinMaxSize();
+    view.redrawAll();
+    endRedrawRegion();
+    notifyValueModification();
+    rowTab.redrawAll();
+  }
+
+  /**------------------------------
+   * 行を全てクリアする
+   ------------------------------*/
+  function clearRows() {
+    rowList.clear();
+    updateMinMaxSize();
+    view.redrawAll();
+    rowTab.redrawAll();
+    notifyValueModification();
+  }
+
+  /**------------------------------
+   * 複数行を移動する
+   *
+   * @param insertionIndex 挿入位置のインデックス
+   * @param moveRowList 移動させる行の配列
+   ------------------------------*/
+  function moveRows(insertionIndex, moveRowList) {
+    var tmpList = [];
+    for (var i = moveRowList.count - 1; i >= 0; i--) {
+      var row = moveRowList[i];
+      if (row.index < insertionIndex)
+        insertionIndex--;
+      rowList.erase(row.index);
+    }
+    for (var i = 0; i < moveRowList.count; i++) {
+      rowList.insert(insertionIndex + i, moveRowList[i]);
+    }
+    var size = 0;
+    for (var i = 0; i < rowList.count; i++) {
+      var row = rowList[i];
+      row.index = i;
+      row.pos = size;
+      size += row.size;
+    }
+    view.redrawAll();      
+    rowTab.redrawAll();
+    notifyValueModification();
+  }
+
+  /**------------------------------
+   * 複数行を削除する
+   *
+   * @param eraseRowList 削除する行の配列
+   ------------------------------*/
+  function eraseRows(eraseRowList) {
+    for (var i = eraseRowList.count - 1; i >= 0; i--) {
+      var row = eraseRowList[i];
+      rowList.erase(row.index);
+    }
+    var size = 0;
+    for (var i = 0; i < rowList.count; i++) {
+      var row = rowList[i];
+      row.index = i;
+      row.pos = size;
+      size += row.size;
+    }
+    updateMinMaxSize();
+    view.redrawAll();      
+    rowTab.redrawAll();
+    notifyValueModification();
+  }
+
+  /**------------------------------
+   * テーブルの値。
+   * 全てのエレメントの配列となる
+   ------------------------------*/
+  property value {
+    getter {
+      var result = [];
+      for (var i = 0; i < rowList.count; i++) 
+        result.add(duplicateStruct(rowList[i].value));
+      return result;
+    }
+    setter(v) {
+      var save = respondToValueModification;
+      respondToValueModification = false;
+      view.beginRedrawRegion();
+      clearRows();
+      for (var i = 0; i < v.count; i++)
+        addElement(v[i]);
+      view.redrawAll();
+      view.endRedrawRegion();
+      respondToValueModification = save;
+    }
+  }
+
+  // 可変行サイズカラムのサイズが変わったことによって行のサイズが変更になるかテストする
+  function tryCalcVariableRowSize(column) {
+    var modified = false;
+    var ofst = 0;
+    for (var i = 0; i < rowList.count; i++) {
+      var row = rowList[i];
+      var prevSize = row.size;
+      column.onSizeModified(row);
+      row.calcSize(columnList);
+      row.pos = ofst;
+      ofst += row.size;
+      if (prevSize != row.size)
+        modified = true;
+    }
+    return modified;
+  }
+
+  /**------------------------------
+   * スクロールバーのリサイズハンドルを表示するかどうか
+   ------------------------------*/
+  property resize {
+    getter {
+      return viewScroll.resize;
+    }
+    setter (v) {
+      viewScroll.resize = true;
+    }
+  }
+
+  /**------------------------------
+   * カラムタブをクリックしての属性単位での昇順/降順ソートを有効にするかどうか
+   ------------------------------*/
+  property enableColumnKeyRowSort {
+    getter { return _enableColumnKeyRowSort; }
+    setter (v) {  _enableColumnKeyRowSort = v;}
+  }
+
+  /**------------------------------
+   * カラムタブをドラッグしてのカラムの順番の入れ替えを有効にするかどうか
+   ------------------------------*/
+  property enableColumnTabOrderExchange {
+    getter { return _enableColumnTabOrderExchange; }
+    setter (v) {  _enableColumnTabOrderExchange = v;}
+  }
+
+  /**------------------------------
+   * 複数領域の範囲選択を行えるようにするかどうか。
+   ------------------------------*/
+  property multipleSelection {
+    getter { return _multipleSelection; }
+    setter (v) {  _multipleSelection = v;}
+  }
+
+  /**------------------------------
+   * 範囲選択をセル単位で行なうか、行単位で行なうか。
+   ------------------------------*/
+  property cellSelection {
+    getter { return _cellSelection; }
+    setter (v) { 
+      _cellSelection = v;
+      view.redrawAll(); 
+    }
+  }
+
+  /*------------------------------
+   * カラムタブを表示するかどうか
+   ------------------------------*/
+  property showColumnTab {
+    getter {
+      return columnTabScroll.visible;
+    }
+    setter (v) {
+      baseGrid.respondToValueModification = false;
+      columnTabScroll.visible = v;
+      leftTopCorner.visible = columnTabScroll.visible && rowTabScroll.visible;
+      baseGrid.respondToValueModification = true;
+    }
+  }
+
+  /*------------------------------
+   * ロウタブを表示するかどうか
+   ------------------------------*/
+  property showRowTab {
+    getter {
+      return rowTabScroll.visible;
+    }
+    setter (v) {
+      baseGrid.respondToValueModification = false;
+      rowTabScroll.visible = v;
+      leftTopCorner.visible = columnTabScroll.visible && rowTabScroll.visible;
+      baseGrid.respondToValueModification = true;
+    }
+  }
+
+  /*------------------------------
+   * ロウタブのベースインデックス
+   ------------------------------*/
+   property rowTabBaseIndex {
+     getter {
+       return _rowTabBaseIndex;
+     }
+     setter (v) {
+       if (_rowTabBaseIndex == v)
+         return;
+       _rowTabBaseIndex = v;
+       rowTab.redrawAll();
+     }
+   }
+
+  /**------------------------------
+   * 横方向のグリッドを表示するかどうか
+   ------------------------------*/
+  property showHorizontalGrid {
+    getter {
+      return _showHorizontalGrid;
+    }
+    setter (v) {
+      _showHorizontalGrid = v;
+      view.redrawAll();
+    }
+  }
+
+  /**------------------------------
+   * 縦方向のグリッドを表示するかどうか
+   ------------------------------*/
+  property showVerticalGrid {
+    getter {
+      return _showVerticalGrid;
+    }
+    setter (v) {
+      _showVerticalGrid = v;
+      view.redrawAll();
+    }
+  }
+
+  // 末尾のカラム
+  property lastColumn {
+    getter {
+      if (columnList.count == 0)
+        return void;
+      else
+        return columnList[columnList.count - 1];
+    }
+  }
+
+  // 末尾のロウ
+  property lastRow {
+    getter {
+      if (rowList.count == 0)
+        return void;
+      else
+        return rowList[rowList.count - 1];
+    }
+  }
+
+  // 可視カラムの配列
+  property visibleColumnList {
+    getter {
+      var result = [];
+      for (var i = 0; i < columnList.count; i++) {
+        var column = columnList[i];
+        if (column.visible)
+          result.add(column);
+      }
+      return result;
+    }
+  }
+
+  // 範囲内のロウを検索
+  function findRowRange(pos, size) {
+    return findListRange(rowList, pos, size);
+  }
+  
+  // 範囲内のカラムを検索
+  function findColumnRange(pos, size) {
+    return findListRange(visibleColumnList, pos, size);
+  }
+
+  // 特定のキーを持つカラムを検索
+  function findColumnByKey(key) {
+    for (var i = 0; i < columnList.count; i++) {
+      if (columnList[i].key == key)
+        return columnList[i];
+    }
+    return void;
+  }
+
+  // 配列の範囲内の要素を検索
+  function findListRange(list, pos, size) {
+    return table_find_list_range(list, pos, size);
+
+    if (pos < 0) {
+      size += pos;
+      pos = 0;
+    }
+    if (size < 0)
+      return [];
+
+    var begin, end, mid;
+    begin = 0;
+    end = list.count;
+    while (begin < end) {
+      mid = int((begin + end) / 2);
+      var item = list[mid];
+      if (item.pos <= pos && pos < item.pos + item.size) {
+        var result = [];
+        result.add(item);
+        for (var i = mid + 1; i < list.count; i++) {
+          item = list[i];
+          if (item.pos >= pos + size)
+            break;
+          result.add(item);
+        }
+        return result;
+      }
+      if (pos < item.pos)
+        end = mid;
+      else
+        begin = mid + 1;
+    }
+    return [];
+  }
+
+  // セルを再描画
+  function redrawCell(column, row) {
+    view.redrawRect(column.pos, row.pos, column.size, row.size);
+  }
+
+  // 行を再描画
+  function redrawRow(row) {
+    var lastColumn = columnList[columnList.count - 1];
+    view.redrawRect(0, row.pos, lastColumn.tail, row.size);
+  }
+
+  // 全カラムのエディットをキャンセルする
+  function cancelEdit() {
+    for (var i = 0; i < columnList.count; i++)
+      columnList[i].cancelEdit();
+  }
+
+  /**------------------------------
+   * 選択中のポイント配列
+   ------------------------------*/
+  property selectedPointList {
+    getter {
+      return view.selectedPointList;
+    }
+  }
+
+  /**------------------------------
+   * 選択中の行配列
+   ------------------------------*/
+  property selectedRowList {
+    getter {
+      var result = [];
+      var empty = %[];
+      for (var i = 0; i < rowList.count; i++) {
+        var row = rowList[i];
+        if (! equalStruct(empty, row.selected))
+          result.add(row);
+      }
+      return result;
+    }
+  }
+
+  // ポイントをさがす
+  function findPoint(x, y) {
+    return view.findPoint(...);
+  }
+
+  // 現在のフォーカスポイント
+  property curFocusPoint {
+    getter {
+      return view.curFocusPoint;
+    }
+  }
+
+  // ポイントをフォーカスする
+  function focusPoint(point) {
+    view.focusPoint(point);
+  }
+
+  // ポイントを生成する
+  function generatePoint(column, row) {
+    return view.generatePoint(column, row);
+  }
+
+  // ポイントの同値比較
+  function equalPoint(p1, p2) {
+    return view.equalPoint(p1, p2);
+  }
+
+  // 選択範囲をクリアする
+  function clearAllSelection() {
+    view.clearAllSelection();
+  }
+
+  // 描画遅延開始
+  function beginRedrawRegion() {
+    view.beginRedrawRegion();
+  }
+
+  // 描画遅延終了
+  function endRedrawRegion() {
+    view.endRedrawRegion(); 
+  }
+
+  // ポイント間を選択
+  function selectPointInRange(p1, p2) {
+    view.selectPointInRange(p1, p2);
+  }
+
+  // ポイントを選択
+  function selectPoint(point, value = true) {
+    view.selectPoint(...);
+  }
+
+  // ポイント配列を選択
+  function selectPointList(pointList, value = true) {
+    view.selectPointList(...);
+  }
+
+  // マウスホイール処理
+  function onMouseWheel() {
+    view.onMouseWheel(...);
+  }
+
+  function onFocus {
+    view.redrawAll();
+  }
+
+  function onBlur {
+    view.redrawAll();
+  }
+    
+  // キーダウン
+  function onKeyDown(key, shift) {
+    var prevFocusPoint = curFocusPoint;
+    var nextFocusPoint = prevFocusPoint;
+    // カーソルキーが押されていたらフォーカスを移動
+    if (key == VK_UP
+        && curFocusPoint !== void
+        && curFocusPoint.row.index > 0) {
+      nextFocusPoint = generatePoint(curFocusPoint.column, rowList[curFocusPoint.row.index - 1]);
+    }
+    if (key == VK_DOWN
+        && curFocusPoint !== void
+        && curFocusPoint.row.index < rowList.count - 1) {
+      nextFocusPoint = generatePoint(curFocusPoint.column, rowList[curFocusPoint.row.index + 1]);
+    }
+    if (cellSelection
+        && key == VK_LEFT
+        && curFocusPoint !== void
+        && curFocusPoint.column.index > 0) {
+      nextFocusPoint = generatePoint(columnList[curFocusPoint.column.index - 1], curFocusPoint.row);
+    }
+    if (cellSelection
+        && key == VK_RIGHT
+        && curFocusPoint !== void
+        && curFocusPoint.column.index < columnList.count - 1) {
+      nextFocusPoint = generatePoint(columnList[curFocusPoint.column.index + 1], curFocusPoint.row);
+    }
+    // フォーカスポイントが変更されていたら、選択範囲の拡張処理を行なった上で再描画
+    if (! equalPoint(prevFocusPoint, nextFocusPoint)) {
+      beginRedrawRegion();
+      focusPoint(nextFocusPoint);
+      if (shift & ssShift) {
+        if (keydownSelectionBeginPoint === void) {
+          keydownSelectionBaseList = selectedPointList;
+          keydownSelectionBeginPoint = prevFocusPoint;
+        }
+        clearAllSelection();
+        selectPointList(keydownSelectionBaseList);
+        selectPointInRange(keydownSelectionBeginPoint, curFocusPoint);
+      } else {
+        keydownSelectionBaseList = void;
+        keydownSelectionBeginPoint = void;
+        if (! (shift & ssCtrl)) {
+          clearAllSelection();
+          selectPoint(curFocusPoint);
+        }
+      }
+      endRedrawRegion();
+      view.noticeRect(curFocusPoint.column.pos, curFocusPoint.row.pos,
+                      curFocusPoint.column.size, curFocusPoint.row.size);
+    } else {
+      // セル選択モード時、編集可能なセルへはキーダウンイベントを送出
+      super.onKeyDown(...);
+      if (curFocusPoint !== void) {
+        if (cellSelection) {
+          if (curFocusPoint.column.editable) {
+            curFocusPoint.column.onKeyDown(curFocusPoint.row, key, shift);
+          }
+        }
+      }
+    }
+  }
+
+  // パケットドラッグの開始(viewへ流し込み)
+  function beginDragPacket(packet) {
+    view.beginDragPacket(packet);
+  }
+
+  /**------------------------------
+   * 選択範囲の右クリックイベント
+   * 
+   * @param point クリックされたポイント
+   * @param x X座標
+   * @param y Y座標
+   * @param shift 修飾キー
+   ------------------------------*/
+  function onSelectionRightClick(point, x, y, shift) {
+  }
+
+  /**------------------------------
+   * 背景の右クリックイベント
+   * 
+   * @param x X座標
+   * @param y Y座標
+   * @param shift 修飾キー
+   ------------------------------*/
+  function onBackgroundRightClick(x, y, shift) {
+  }
+
+  /**------------------------------
+   * ポイントがドラッグ可能か判定
+   ------------------------------*/
+  function isPointDraggable(point, x, y) {
+    if (point !== void
+        && point.column.isAcceptDrag(point.row, x, y))
+      return true;
+    else
+      return false;
+  }
+
+  // ポイントのドラッグ開始
+  function tryPointDrag(x, y, shift) {
+    var point = findPoint(x, y);
+    if (point !== void
+        && point.column.isAcceptDrag(point.row, x, y)) {
+      dragPoint = point;
+      point.column.onDragEnter(point.row, x, y, shift);
+      return true;
+    } else
+      return false;
+  }    
+
+  /**------------------------------
+   * 選択範囲ドラッグ開始
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @param shift モディファイア
+   ------------------------------*/
+  function onSelectionDragEnter(x, y, shift) {
+    tryPointDrag(x, y, shift);
+  }
+
+  /**------------------------------
+   * 選択範囲ドラッグ移動
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @param shift モディファイア
+   ------------------------------*/
+  function onSelectionDragMove(x, y, shift) {
+    if (dragPoint !== void) {
+      dragPoint.column.onDragMove(dragPoint.row, x, y, shift);
+    }
+  }
+
+  /**------------------------------
+   * 選択範囲ドラッグ終了
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @param shift モディファイア
+   ------------------------------*/
+  function onSelectionDragLeave(x, y, shift) {
+    if (dragPoint !== void) {
+      dragPoint.column.onDragLeave(dragPoint.row, x, y, shift);
+      dragPoint = void;
+    }
+  }
+
+  // ポイントマウス進入
+  function onPointMouseEnter(point, x, y) {
+    point.column.onMouseEnter(point.row, x, y);
+  }
+
+  // ポイントマウス移動
+  function onPointMouseMove(point, x, y) {
+    point.column.onMouseMove(point.row, x, y);
+  }
+
+  // ポイントマウス退出
+  function onPointMouseLeave(point, x, y) {
+    point.column.onMouseLeave(point.row, x, y);
+  }
+
+  // ポイントのパケット受け付け判定
+  function isPointPacketAcceptable(point, packet) {
+    return point.column.isPacketAcceptable(point.row, packet);
+  }
+
+  // ポイントのパケット進入
+  function onPointPacketEnter(point, x, y, packet, shift) {
+    point.column.onPacketEnter(point.row, x, y, packet, shift);
+  }
+
+  // ポイントのパケット移動
+  function onPointPacketMove(point, x, y, packet, shift) {
+    point.column.onPacketMove(point.row, x, y, packet, shift);
+  }
+
+  // ポイントのパケット退出
+  function onPointPacketLeave(point, x, y, packet, shift) {
+    point.column.onPacketLeave(point.row, x, y, packet, shift);
+  }
+
+  // ポイントのパケットドロップ
+  function onPointPacketDrop(point, x, y, packet, shift) {
+    point.column.onPacketDrop(point.row, x, y, packet, shift);
+  }
+
+  /*------------------------------
+   * 行間にパケットを受け容れるか判定する関数
+   ------------------------------*/
+  function isRowPacketAcceptable(index, packet) {
+    return false;
+  }
+
+  /*------------------------------
+   * 行間パケットのドロップを通知するイベントハンドラ
+   ------------------------------*/
+  function onRowPacketDrop(index, x, y, packet, shicft) {
+  }
+  
+  /*------------------------------
+   * 行間パケットの進入を通知するイベントハンドラ 
+   ------------------------------*/
+  function onRowPacketEnter(index, x, y, packet, shift) {
+  }
+
+  /*------------------------------
+   * 行間パケットの移動を通知するイベントハンドラ
+   ------------------------------*/
+  function onRowPacketMove(index, x, y, packet, shift) {
+  }
+
+  /*------------------------------
+   * 行間パケットの退出を通知するイベントハンドラ
+   ------------------------------*/
+  function onRowPacketLeave(index, x, y, packet, shift) {
+  }
+};
+
+
+/*----------------------------------------------------------------------
+ * テーブルカラム(列)
+ ----------------------------------------------------------------------*/
+class KTableColumn
+{
+  var owner;
+  var _label = "";
+  var _key = "";
+  var index;
+  var pos;
+  var size;
+  var opts;
+  var sortOrder = K_TABLE_SORT_ORDER_NONE;
+  var textEdit;
+  var prevFocused;
+  var fixedWidth = 64;
+  var dragPacketName;
+  var draggable = false;
+  var innerDrag;
+  var variableRowSize = false;
+  var _visible;
+
+  /**
+   * テーブルカラム
+   *
+   * @param owner テーブルへの参照
+   * @param label ラベル
+   * @param key キー
+   * @param opts オプション
+   */
+  function KTableColumn(owner, label, key, opts = %[]) {
+    this.owner = owner;
+    _label = label;
+    _key = key;
+    this.opts = opts;
+    innerDrag = getValue(opts, "innerDrag", false);
+    fixedWidth = getOpts("fixedWidth", fixedWidth);
+    _visible = getOpts("visible", true);
+    if (innerDrag) {
+      draggable = true;
+      dragPacketName = K_TABLE_INNER_DRAG_PACKET_NAME;
+    }
+  }
+
+  // 右端座標
+  property tail {
+    getter {
+      return pos + size;
+    }
+  }
+
+  // 配列化している？
+  property array {
+    getter {
+      return false;
+    }
+  }
+
+  // 可視状態
+  property visible {
+    getter {
+      return _visible;
+    }
+    setter(v) {
+      if (v == _visible)
+        return;
+      _visible = v;
+      owner.invalidateColumnVisibility(this);
+    }
+  }
+
+  // ラベル
+  property label {
+    getter { 
+      return _label;
+    }
+  }
+
+  // キー
+  property key {
+    getter {
+      return _key;
+    }
+  }
+  
+  // 辞書から値を取り出す
+  function getValue(dict, key, initialValue) {
+    if (typeof(dict[key]) == K_UNDEFINED)
+      return initialValue;
+    else
+      return dict[key];
+  }
+
+  // オプションを取得する
+  function getOpts(key, initialValue) {
+    return getValue(opts, key, getValue(owner.defaultOpts, key, initialValue));
+  }
+
+  // 初期値を生成
+  function generateInitialValue() {
+    return duplicateStruct(getValue(opts, "initialValue", defaultInitialValue()));
+  }
+
+  /**
+   * オプションで指定しなかった場合の初期値
+   * 派生クラスで適切に実装する必要がある
+   */
+  function defaultInitialValue() {
+    return void;
+  }
+
+  /**
+   * ロウのエレメントに属性の値を設定する
+   */
+  function getRowValue(row) {
+    return row.getColumnValue(this);
+  }
+
+  /**
+   * ロウのエレメントの属性の値を取得する
+   forceを指定すると同値判定抜きで強制書き込みから更新処理を行なう
+  */
+  function setRowValue(row, value, force = false) {
+    return row.setColumnValue(this, value, force);
+  }
+
+  /**
+   * ロウのエレメントに属性が存在するか判定する
+   */
+  function hasRowValue(row) {
+    return row.hasColumnValue(this);
+  }
+
+  // デフォルト値をロウに適用する
+  function applyDefaultValue(row) {
+    if (! hasRowValue(row))
+      setRowValue(row, generateInitialValue(), true);
+  }
+
+  /**
+   * ロウのエレメントから属性に対応する任意のキャッシュ値を取得する
+   */
+  function getRowCacheValue(row, cacheKey, initialValue) {
+    return row.getColumnCacheValue(this, cacheKey, initialValue);
+  }
+
+  /**
+   * ロウのエレメントに属性に対応する任意のキャッシュ値を設定する
+   */
+  function setRowCacheValue(row, cacheKey, value) {
+    return row.setColumnCacheValue(this, cacheKey, value);
+  }
+
+  /**
+   * 可変ロウサイズのカラムでロウの高さを設定する
+   */
+  function setRowHeight(row, height) {
+    setRowCacheValue(row, "height", height);
+  }
+
+  /**
+   * ロウのサイズを取得する
+   */
+  function getRowHeight(row) {
+    if (! variableRowSize)
+      return owner.fontHeight + owner.spaceVertical;
+    else {
+      return getRowCacheValue(row, "height", 0);
+    }
+  }
+
+  /**
+   * ロウのヒントを取得する
+   */
+  function getRowHint(row, x, y) {
+    var text = getRowCacheValue(row, "hint", getRowCacheValue(row, "notation", getRowValue(row)));
+    return label + ": " + text;
+  }
+
+  // 昇順で比較
+  function compareAscendingOrder(a, b) {
+    return compare(a.getColumnValue(this),
+                   b.getColumnValue(this));
+  }
+
+  /**
+   * 要素の比較関数。
+   * 派生クラスで適切にa<bとなる条件でtrueを返すよう実装する
+   * @param a ロウa
+   * @param b ロウb
+   */
+  function compare(a, b) {
+    return false;
+  }
+
+  // 要素の同値判定
+  function equal(a, b) {
+    return ! compare(a, b) && ! compare(b, a);
+  }
+
+  /**
+   * カラムが編集可能かどうか
+   */
+  property editable {
+    getter {
+      return getOpts("editable", false);
+    }
+  }
+
+  // ドラッグを受け付けるか？
+  function isAcceptDrag(row, x, y) {
+    return draggable && ! isBlank(row, x, y);
+  }
+
+  // カラムのソート状態をリセットする
+  function resetSortOrder() {
+    if (sortOrder == K_TABLE_SORT_ORDER_NONE)
+      return;
+    sortOrder = K_TABLE_SORT_ORDER_NONE;
+    owner.columnTab.redrawAll();
+  }
+
+  // ソートを行なう
+  function doSort() {
+    // 他のカラムのソート状態を解除する
+    for (var i = 0; i < owner.columnList.count; i++)
+      if (owner.columnList[i] !== this)
+        owner.columnList[i].sortOrder = K_TABLE_SORT_ORDER_NONE;
+
+    switch (sortOrder) {
+      // 未ソートなら昇順でソート
+    case K_TABLE_SORT_ORDER_NONE:
+      owner.rowList.sort(compareAscendingOrder, true);
+      sortOrder = K_TABLE_SORT_ORDER_ASCENDING;
+      break;
+      // 昇順でソート済みなら反転して降順へ
+    case K_TABLE_SORT_ORDER_ASCENDING:
+      owner.rowList.reverse();
+      sortOrder = K_TABLE_SORT_ORDER_DESCENDING;
+      break;
+      // 降順でソート済みなら反転して昇順へ
+    case K_TABLE_SORT_ORDER_DESCENDING:
+      owner.rowList.reverse();
+      sortOrder = K_TABLE_SORT_ORDER_ASCENDING;
+      break;
+    }
+    // ロウの座標再計算
+    for (var i = 0, pos = 0; i < owner.rowList.count; i++) {
+      var row = owner.rowList[i];
+      row.index = i;
+      row.pos = pos;
+      pos += row.size;
+    }
+  }
+
+  /**
+   * テキストエディットを開始する
+   */
+  function beginTextEdit(row, textType, value = void) {
+    asyncCaller.call(_beginTextEdit, row, textType, value);
+  }
+
+  function _beginTextEdit(row, textType, value) {
+    prevFocused = owner.focused;
+    owner.view.noticeRect(pos, row.pos, size, row.size);
+    textEdit = new KTableTextEdit(this, row, textType, value);
+  }
+
+  /**
+   * テキストエディットの結果受け容れるかどうか、
+   * 値を見て判定する
+   */
+  function isAcceptTextEdit(row, value) {
+    return true;
+  }
+
+  // テキストエディットの結果コールバック
+  function onResultTextEdit(row, newValue, oldValue) {
+    setRowValue(row, newValue);
+    owner.redrawCell(this, row);
+  }
+
+  // テキストエディットをリムーブする
+  function removeTextEdit() {
+    discard(textEdit);
+    if (prevFocused)
+      owner.focus();
+  }
+
+  // テキストエディットのキャンセルコールバック
+  function cancelEdit() {
+  }
+
+  /** 
+   * 指定座標が空白か判定する
+   */
+  function isBlank(row, x, y) {
+    if (variableRowSize)
+      return false;
+    else
+      return y >= row.pos + owner.fontHeight + owner.spaceVertical;
+  }
+
+  /**
+   * ドロップダウンを描画する
+   */
+  function drawDropDownCell(view, row, value) {
+    var icon = owner.findIcon("k_scroll_down");
+    var margin = icon.width + 4;
+    if (owner.equalPoint(view.curPoint, owner.generatePoint(this, row)))
+      view.colorRect(tail - margin, row.pos, margin, row.size, 0, 32);
+    view.operateRect(tail - margin + 2, row.pos + (row.size - icon.height) / 2, icon, 0, 0, icon.width, icon.height);
+    view.drawTextInRange(pos + view.owner.spaceHorizontal / 2, row.pos + view.owner.spaceVertical / 2, size - view.owner.spaceHorizontal - margin, value, 0, ALIGN_LEFT);
+    view.fillRect(tail - margin, row.pos, 1, row.size, 0xFFD0D0D0);
+  }
+
+  /**
+   * セルの描画イベント。
+   * 派生クラスで適切に実装している必要がある
+   */
+  function drawCell(view, row) {
+  }
+
+  // マウス進入イベント
+  function onMouseEnter(row, x, y) {
+  }
+
+  // マウス移動イベント
+  function onMouseMove(row, x, y) {
+  }
+
+  // マウス退出イベント
+  function onMouseLeave(row, x, y) {
+  }
+
+  /**
+   * マウス押下イベント
+   */
+  function onMouseDown(row, x, y, button, shift) {
+  }
+
+  /**
+   * キーダウンイベント
+   */
+  function onKeyDown(row, key, shift) {
+  }
+
+  /**
+   * ロウの値更新イベント
+   */
+  function onRowValueUpdate(row, value) {
+  }
+
+  // パケット判定
+  function isPacketAcceptable(row, packet) {
+    if (innerDrag) {
+      if (packet.name == dragPacketName
+          && owner.equalPoint(owner.generatePoint(this, row), packet.arg)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // ドラッグ開始イベント
+  function onDragEnter(row, x, y, shift) {
+    owner.beginDragPacket(new KPacket(dragPacketName, owner.generatePoint(this, row)));
+  }
+
+  // ドラッグ移動イベント
+  function onDragMove(row, x, y, shift) {
+  }
+
+  // ドラッグ終了イベント
+  function onDragLeave(row, x, y, shift) {
+  }
+
+  // パケット進入イベント
+  function onPacketEnter(row, x, y, packet, shift) {
+  }
+
+  // パケット移動イベント
+  function onPacketMove(row, x, y, packet, shift) {
+  }
+
+  // パケット退出イベント
+  function onPacketLeave(row, x, y, packet, shift) {
+  }
+
+  // パケットドロップイベント
+  function onPacketDrop(row, x, y, packet, shift) {
+  }
+};
+
+/*----------------------------------------------------------------------
+ * テーブルロウ(行)
+ ----------------------------------------------------------------------*/
+class KTableRow
+{
+  var owner;
+  var _value;
+  var cacheValue;
+  var height;
+  var index;
+  var pos;
+  var size;
+  var selected;
+
+  /**
+   * テーブルロウ
+   */
+  function KTableRow(owner, value) {
+    this.owner = owner;
+    _value = value;
+    cacheValue = %[];
+    selected = %[];
+  }
+
+  // 下端の座標
+  property tail {
+    getter {
+      return pos + size;
+    }
+  }
+
+  // エレメントの値
+  property value {
+    getter {
+      return _value;
+    }
+  }
+
+  // 初期化処理
+  function initialize(columnList) {
+    // 全てのカラムに対して、属性の初期値を適用し、イベントを呼んでキャッシュを初期化する
+    for (var i = 0; i < columnList.count; i++) {
+      var column = columnList[i];
+      column.applyDefaultValue(this);
+      column.onRowValueUpdate(this, getColumnValue(column));
+    }
+    calcSize(columnList);
+  }
+
+  // ロウの高さを計算する
+  function calcSize(columnList) {
+    size = 0;
+    for (var i = 0; i < columnList.count; i++) {
+      var column = columnList[i];
+      if (column.visible)
+        size = int(Math.max(size, column.getRowHeight(this)));
+    }
+  }
+
+  // カラム単位での高さ計算
+  function updateColumnHeight(column) {
+    var prevSize = size;
+    column.onSizeModified(this);
+    calcSize(owner.columnList);
+    if (prevSize == size) {
+      owner.redrawCell(column, this);
+    } else {
+      var ofst = size - prevSize;
+      for (var i = index + 1; i < owner.rowList.count; i++)
+        owner.rowList[i].pos += ofst;
+      owner.view.redrawAll();
+      owner.updateMinMaxSize();
+      owner.rowTab.redrawAll();
+    }
+  }
+
+  // セルの値を持っているか判定
+  function hasColumnValue(column) {
+    return (typeof(_value[column.key]) != K_UNDEFINED
+            && _value[column.key] !== void);
+  }
+
+  // セルの値を取得する
+  function getColumnValue(column) {
+    return _value[column.key];
+  }
+
+  // セルの値を設定する
+  function setColumnValue(column, value, force = false) {
+    if (! force
+        && column.equal(_value[column.key], value)) {
+      return;
+    }
+    var prevValue = _value[column.key];
+    _value[column.key] = value;
+    column.onRowValueUpdate(this, value);
+    column.resetSortOrder();
+    if (! force) {
+      owner.onCellValueModified(column, this, value, prevValue);
+      owner.notifyValueModification();
+    }
+  }
+
+  // キーに対応したキャッシュを取得する
+  function getColumnCache(column) {
+    if (typeof(cacheValue[column.key]) == K_UNDEFINED)
+      cacheValue[column.key] = %[];
+    return cacheValue[column.key];
+  }
+
+  // キャッシュの値を取得する
+  function getColumnCacheValue(column, cacheKey, initialValue) {
+    var cache = getColumnCache(column);
+    if (typeof(cache[cacheKey]) == K_UNDEFINED) 
+      return initialValue;
+    else 
+      return cache[cacheKey];
+  }
+
+  // キャッシュの値を設定する
+  function setColumnCacheValue(column, cacheKey, value) {
+    getColumnCache(column)[cacheKey] = value;
+  }
+};
+
+/*----------------------------------------------------------------------
+ * テキストベースカラム
+ ----------------------------------------------------------------------*/
+class KTextBaseTableColumn extends KTableColumn
+{
+  var defaultAlignment = ALIGN_LEFT;
+  var fixedWidth = 100;
+
+  /**
+   * テキスト表示系のベースカラム
+   */
+  function KTextBaseTableColumn(owner, label, key, opts = %[]) {
+    super.KTableColumn(...);
+  }
+
+  // アライメント
+  property alignment {
+    getter {
+      return getOpts("alignment", defaultAlignment);
+    }
+  }
+
+  /**
+   * テキストを描画する
+   */
+  function drawText(view, row, value) {
+    var textColor = getOpts("textColor", 0);
+    if (textColor instanceof "Function")
+      textColor = textColor(value);
+    var tw = view.drawTextInRange(pos + view.owner.spaceHorizontal / 2, row.pos + view.owner.spaceVertical / 2, size - view.owner.spaceHorizontal, value, textColor, alignment);
+    setRowCacheValue(row, "viewsize", tw);
+  }
+
+  // 空白判定
+  function isBlank(row, x, y) {
+    if (super.isBlank(...))
+      return true;
+    var tw = getRowCacheValue(row, "viewsize", 0);
+    var result;
+    switch (alignment) {
+    case ALIGN_LEFT: result =  x >= pos + tw; break;
+    case ALIGN_CENTER: result = x < pos + (size - tw) / 2 || x >= tail - (size - tw) / 2; break;
+    case ALIGN_RIGHT: result =  x < tail - tw; break;
+    }
+    return result;
+  }
+};
+
+/*----------------------------------------------------------------------
+ * テキストカラム
+ ----------------------------------------------------------------------*/
+class KTextTableColumn extends KTextBaseTableColumn
+{
+  /**
+   * テキストカラム
+   */
+  function KTextTableColumn(owner, label, key, opts = %[]) {
+    super.KTextBaseTableColumn(...);
+  }
+
+  // 初期値
+  function defaultInitialValue() {
+    return "";
+  }
+
+  // 文字列そのまま描画
+  function drawCell(view, row) {
+    drawText(view, row, getRowValue(row));
+  }
+
+  // 比較
+  property compare {
+    // ケースセンシティブかどうかで分岐
+    // 関数内で分岐するのでは無く、
+    // 先に分岐した関数を返すちょっとトリッキーな実装
+    getter {
+      if (getOpts("caseSensitive", true)) 
+        return function(a, b) {
+          return a < b;
+        };
+      else
+        return function(a, b) {
+          return a.toLowerCase() < b.toLowerCase();
+        };
+    }
+  }
+
+  // エディット開始
+  function beginEdit(row) {
+    beginTextEdit(row, TEXT_ANY);
+  }
+
+  // エディットをキャンセル
+  function cancelEdit() {
+    removeTextEdit();
+  }
+
+  // マウスダウン
+  function onMouseDown(row, x, y, button, shift) {
+    // 左ボタンでエディット開始
+    if (button == mbLeft)
+      beginEdit(row);
+  }
+
+  // キーダウン
+  function onKeyDown(row, key, shift) {
+    // RETURNでエディット開始
+    if (key == VK_RETURN)
+      beginEdit(row);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * 数字カラム
+ ----------------------------------------------------------------------*/
+class KNumberTableColumn extends KTextBaseTableColumn
+{
+  var defaultFormat = "%d";
+  /**
+   * 数字のベースカラム
+   */
+  function KNumberTableColumn(owner, label, key, opts = %[]) {
+    super.KTextBaseTableColumn(...);
+    defaultAlignment = ALIGN_RIGHT;
+  }
+
+  // 初期値
+  function defaultInitialValue() {
+    return 0;
+  }
+
+  // セル描画
+  function drawCell(view, row) {
+    var notation = getRowCacheValue(row, "notation", "");
+    drawText(view, row, notation);
+  }
+
+  // 値の更新
+  function onRowValueUpdate(row, value) {
+    // 表記をキャッシュに入れる
+    var notation = getOpts("format", defaultFormat).sprintf(value);
+    setRowCacheValue(row, "notation", notation);
+  }
+
+  // 比較
+  function compare(a, b) {
+    return a < b;
+  }
+};
+
+/*----------------------------------------------------------------------
+ * 整数カラム
+ ----------------------------------------------------------------------*/
+class KIntTableColumn extends KNumberTableColumn
+{
+  /**
+   * 整数カラム
+   */
+  function KIntTableColumn(owner, label, key, opts = %[]) {
+    defaultFormat = "%d";
+    super.KNumberTableColumn(...);
+  }
+
+  // エディット開始
+  function beginEdit(row) {
+    beginTextEdit(row, TEXT_DIGIT);
+  }
+
+  // エディットをキャンセル
+  function cancelEdit() {
+    removeTextEdit();
+  }
+
+  // マウスダウン
+  function onMouseDown(row, x, y, button, shift) {
+    // 左ボタンでエディット開始
+    if (button == mbLeft)
+      beginEdit(row);
+  }
+
+  // キーダウン
+  function onKeyDown(row, key, shift) {
+    // RETURNでエディット開始
+    if (key == VK_RETURN)
+      beginEdit(row);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * 浮動小数点数カラム
+ ----------------------------------------------------------------------*/
+class KRealTableColumn extends KNumberTableColumn
+{
+  /**
+   * 浮動小数点数カラム
+   */
+  function KRealTableColumn(owner, label, key, opts = %[]) {
+    defaultFormat = "%f";
+    super.KNumberTableColumn(...);
+  }
+
+  // エディット開始
+  function beginEdit(row) {
+    beginTextEdit(row, TEXT_REAL);
+  }
+
+  // エディットをキャンセル
+  function cancelEdit() {
+    removeTextEdit();
+  }
+
+  // マウスダウン
+  function onMouseDown(row, x, y, button, shift) {
+    // 左ボタンでエディット開始
+    if (button == mbLeft)
+      beginEdit(row);
+  }
+
+  // キーダウン
+  function onKeyDown(row, key, shift) {
+    // RETURNでエディット開始
+    if (key == VK_RETURN)
+      beginEdit(row);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * チェックボックスカラム
+ ----------------------------------------------------------------------*/
+class KCheckBoxTableColumn extends KTableColumn
+{
+  var icon_on, icon_off;
+
+  /**
+   * チェックボックスカラム
+   */
+  function KCheckBoxTableColumn(owner, label, key, opts = %[]) {
+    super.KTableColumn(...);
+    icon_on = owner.findIcon("k_check_button_on");
+    icon_off = owner.findIcon("k_check_button_off");
+    fixedWidth = icon_on.width + owner.spaceHorizontal;
+  }
+
+  // 初期値
+  function defaultInitialValue() {
+    return false;
+  }
+
+  // 比較
+  function compare(a, b) {
+    return a < b;
+  }
+
+  // ブランク判定
+  function isBlank(row, x, y) {
+    var range = new KRect(pos, row.pos, owner.spaceHorizontal + icon_on.width, owner.spaceVertical + icon_on.height);
+    return ! range.contains(x, y);
+  }  
+
+  // セル描画
+  function drawCell(view, row) {
+    var value = getRowValue(row);
+    var icon = value ? icon_on : icon_off;
+    view.pushCellClip(this, row);
+    view.copyRect(pos + owner.spaceHorizontal / 2, row.pos + owner.spaceVertical / 2, icon, 0, 0, icon.width, icon.height);
+    view.popCellClip();
+    setRowCacheValue(row, "hint", value ? "ON" : "OFF");
+  }
+
+  // マウスダウン
+  function onMouseDown(row, x, y, button, shift) {
+    // 左ボタンでチェック反転
+    if (button != mbLeft)
+      return;
+    var range = new KRect(pos, row.pos, owner.spaceHorizontal + icon_on.width, owner.spaceVertical + icon_on.height);
+    if (range.contains(x, y)) {
+      flipValue(row);
+    }
+  }
+
+  // キーダウン
+  function onKeyDown(row, key, shift) {
+    // RETURNでチェック反転
+    if (key == VK_RETURN) {
+      flipValue(row);
+    }
+  }
+
+  // 値を反転する
+  function flipValue(row) {
+    var curValue = getRowValue(row);
+    if (getOpts("radio", false)) {
+      if (! curValue) {
+        for (var i = 0; i < owner.rowList.count; i++) {
+          var curRow = owner.rowList[i];
+          if (curRow.index == row.index)
+            continue;
+          var aValue = getRowValue(curRow);
+          if (! aValue)
+            continue;
+          setRowValue(curRow, false, true);
+          owner.redrawCell(this, curRow);
+        }
+      }
+    }
+    setRowValue(row, ! curValue);
+    owner.redrawCell(this, row);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * 日時カラム
+ ----------------------------------------------------------------------*/
+class KDateTableColumn extends KTextBaseTableColumn
+{
+  var date;
+  var fixedWidth = 120;
+
+  /**
+   * 日時カラム
+   */
+  function KDateTableColumn(owner, label, key, opts = %[]) {
+    super.KTextBaseTableColumn(...);
+    date = new Date();
+  }
+
+  // 初期値
+  function defaultInitialValue() {
+    return 0;
+  }
+
+  // 比較
+  function compare(a, b) {
+    return a < b;
+  }
+
+  // 値更新
+  function onRowValueUpdate(row, value) {
+    // 日時表記をキャッシュへ
+    date.setTime(value);
+    var notation = "%04d/%02d/%02d %02d:%02d".sprintf(date.getYear(),
+                                                      date.getMonth() + 1,
+                                                      date.getDate(),
+                                                      date.getHours(),
+                                                      date.getMinutes());
+    
+    setRowCacheValue(row, "notation", notation);
+  }
+
+  // セル描画
+  function drawCell(view, row) {
+    var notation = getRowCacheValue(row, "notation", "");
+    drawText(view, row, notation);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * ドロップダウンリストカラム
+ ----------------------------------------------------------------------*/
+class KDropDownListTableColumn extends KTableColumn
+{
+  var fixedWidth = 70;
+  var itemList;
+  var labelList, valueList;
+  var menuDefList;
+
+  /**
+   * ドロップダウンリストカラム
+   */
+  function KDropDownListTableColumn(owner, label, key, opts = %[]) {
+    super.KTableColumn(...);
+    initItemList(getValue(opts, "itemList", []));
+  }
+  
+  function initItemList(itemList) {
+    this.itemList = itemList;
+    initItems();
+    initMenuDef();
+  }
+
+  function initItems() {
+    valueList = [];
+    labelList = [];
+    for (var i = 0; i < itemList.count; i += 2) {
+      var label = itemList[i + 0];
+      var value = itemList[i + 1];
+      if (i == 0
+          && typeof(opts["initialValue"]) === K_UNDEFINED)
+        opts["initialValue"] = value;
+      labelList.add(label);
+      valueList.add(value);
+    }
+  }
+
+  function initMenuDef() {
+    menuDefList = [];
+    var spliter = getOpts("spliter", void);
+    var hierarchy;
+    for (var i = 0; i < labelList.count; i++) {
+      if (spliter === void) {
+        hierarchy = [ labelList[i] ];
+      } else {
+        hierarchy = labelList[i].split(spliter);
+      }
+      buildMenuDef(menuDefList, hierarchy, valueList[i]);
+    }
+  }
+
+  function buildMenuDef(list, hierarchy, value) {
+    if (hierarchy.count == 1) {
+      list.add(%[ label: hierarchy[0], value: value ]);
+    } else {
+      hierarchy = duplicateStruct(hierarchy);
+      var top = hierarchy.shift();
+      var target;
+      for (var i = 0; i < list.count; i++) {
+        if (list[i].label == top
+            && typeof(list[i]["children"]) != K_UNDEFINED) {
+          target = list[i];
+          break;
+        }
+      }
+      if (target === void) {
+        target = %[ label: top, children: [] ];
+        list.add(target);
+      }
+      buildMenuDef(target.children, hierarchy, value);
+    }
+  }            
+
+  function buildMenu(row, menu, list, curValue) {
+    for (var i = 0; i < list.count; i++) {
+      if (typeof(list[i]["children"]) == K_UNDEFINED) {
+        var item = menu.addItem(list[i].label, "", true, funccall(onResultContextMenu, row, list[i].value));
+        if (curValue == list[i].value)
+          item.checked = true;
+      } else {
+        var item = menu.addItem(list[i].label, "", true);
+        buildMenu(row, item, list[i].children, curValue);
+      }
+    }
+  }
+
+  function updateItemList(itemList) {
+    initItemList(itemList);
+    for (var i = 0; i < owner.rowList.count; i++) {
+      var row = owner.rowList[i];
+      onRowValueUpdate(row, getRowValue(row));
+    }
+    if (owner.rowList.count)
+      owner.view.redrawRect(pos, 0, tail, owner.lastRow.tail);
+  }
+
+  // セル描画
+  function drawCell(view, row) {
+    drawDropDownCell(view, row, getRowCacheValue(row, "notation", ""));
+  }
+
+  // 比較
+  function compare(a, b) {
+    return valueList.find(a) < valueList.find(b);
+  }
+
+  // 値の更新
+  function onRowValueUpdate(row, value) {
+    // ラベルを更新
+    var index = valueList.find(value);
+    if (index >= 0)
+      setRowCacheValue(row, "notation", labelList[index]);
+    else
+      setRowCacheValue(row, "notation", "null");
+  }
+
+  // マウスダウン
+  function onMouseDown(row, x, y, button, shift) {
+    // 左ボタンでメニューオープン
+    if (button == mbLeft)
+      openMenu(row);
+  }
+
+  // キーダウン
+  function onKeyDown(row, key, shift) {
+    // RETURNでメニューオープン
+    if (key == VK_RETURN) 
+      openMenu(row);
+  }
+
+  // ドロップダウンメニュー
+  function openMenu(row) {
+    var menu = new KContextMenu();
+    var curValue = getRowValue(row);
+    buildMenu(row, menu, menuDefList, curValue);
+    menu.show(owner.view, pos, row.tail);
+  }
+
+  // メニューの結果処理
+  function onResultContextMenu(row, value) {
+    setRowValue(row, value);
+    owner.redrawCell(this, row);
+  }
+};
+
+
+/*----------------------------------------------------------------------
+ * カラーカラム
+ ----------------------------------------------------------------------*/
+class KColorTableColumn extends KTableColumn
+{
+  var hasAlpha;
+  var pickerName;
+  
+  function KColorTableColumn(owner, label, key, opts) {
+    super.KTableColumn(...);
+    hasAlpha = getOpts("hasAlpha", false);
+    pickerName = "__colorPicker__%s__".sprintf(label);
+  }
+
+  // 初期値
+  function defaultInitialValue() {
+    return 0;
+  }
+
+  // 比較
+  function compare(a, b) {
+    return a < b;
+  }
+
+  // 値の更新
+  function onRowValueUpdate(row, value) {
+    owner.redrawCell(this, row);
+  }
+  
+  // セルの描画
+  function drawCell(view, row) {
+    var value = getRowValue(row);
+    if (hasAlpha) {
+      view.drawChecker(pos, row.pos, size - 1, row.size - 1, row.size < 16 ? int(row.size / 2) : 8);
+      view.colorRect(pos, row.pos, size - 1, row.size - 1, value & 0xffffff, (value >> 24) & 0xff);
+      setRowCacheValue(row, "hint", "#%08x".sprintf(value));
+    } else {
+      view.fillRect(pos, row.pos, size - 1, row.size - 1, 0xff000000 | value);
+      setRowCacheValue(row, "hint", "#%06x".sprintf(value));
+    }
+  }
+
+  // マウスダウン
+  function onMouseDown(row, x, y, button, shift) {
+    // 左ボタンでカラーピッカー
+    if (button != mbLeft)
+      return;
+    queryColor(row);
+  }
+
+  // キーダウン
+  function onKeyDown(row, key, shift) {
+    // RETURNでカラーピッカー
+    if (key == VK_RETURN)
+      queryColor(row);
+  }
+
+  function queryColor(row) {
+    var value = getRowValue(row);
+    Debug.message(owner.dict);
+    var result = queryColorPicker(value, hasAlpha, owner.dict, pickerName);
+    if (result !== void)
+      setRowValue(row, result);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * テキストエリアカラム
+ ----------------------------------------------------------------------*/
+class KTextAreaTableColumn extends KTableColumn
+{
+  var fixedWidth = 100;
+  var caseSensitive;
+  var linefeedPat;
+  var textEdit;
+  var prevFocused;
+
+  /**
+   * テキストエリアカラム
+   */
+  function KTextAreaTableColumn(owner, label, key, opts) {
+    super.KTableColumn(...);
+    variableRowSize = true;
+    linefeedPat = new RegExp("\r\n|\r|\n");
+  }
+
+  // 初期値
+  function defaultInitialValue() {
+    return "";
+  }
+
+  // 比較
+  property compare {
+    getter {
+      if (getOpts("caseSensitive", true)) 
+        return function(a, b) {
+          return a < b;
+        };
+      else
+        return function(a, b) {
+          return a.toLowerCase() < b.toLowerCase();
+        };
+    }
+  }
+
+  // 値の更新
+  function onRowValueUpdate(row, value) {
+    updateNotation(row, value);
+    owner.redrawCell(this, row);
+  }
+
+  // カラムサイズの変更
+  function onSizeModified(row) {
+    updateNotation(row, getRowValue(row));
+  }
+
+  // 表記の更新
+  function updateNotation(row, value) {
+    // サイズに合わせてテキストを改行
+    var text = [];
+    var array = value.split(linefeedPat);
+    var w = size - owner.spaceHorizontal;
+    setRowCacheValue(row, "hint", array.count == 0 ? "" : array[0] + "…");
+    for (var i = 0; i < array.count; i++) {
+      var line = array[i];
+      var len;
+      while ((len = table_find_text_range(owner.view.font, line, w, 0)) !== void) {
+        text.add(line.substr(0, len));
+        line = line.substr(len);
+      }
+      text.add(line);
+    }
+    setRowCacheValue(row, "notation", text);
+    setRowHeight(row, owner.fontHeight * text.count + owner.spaceVertical);
+  }
+
+  // セルの描画
+  function drawCell(view, row) {
+    var x, y;
+    x = pos + owner.spaceHorizontal / 2;
+    y = row.pos + int(owner.spaceVertical / 2);
+    var text = getRowCacheValue(row, "notation", []);
+    var textColor = getOpts("textColor", 0);
+    if (textColor instanceof "Function")
+      textColor = textColor(text);
+    for (var i = 0; i < text.count; i++) {
+      view.drawText(x, y, text[i], textColor);
+      y += owner.fontHeight;
+    }
+  }
+
+  // エディット開始
+  function beginTextEdit(row) {
+    asyncCaller.call(_beginTextEdit, row);
+  }
+
+  function _beginTextEdit(row) {
+    prevFocused = owner.focused;
+    owner.view.noticeRect(pos, row.pos, size, row.size);
+    textEdit = new KTableTextAreaEdit(this, row);
+  }
+ 
+  // テキストエディットの結果
+  function onResultTextEdit(row, newValue, oldValue) {
+    setRowValue(row, newValue);
+    row.updateColumnHeight(this);
+  }
+
+  // テキストエディットを削除
+  function removeTextEdit() {
+    discard(textEdit);
+    if (prevFocused)
+      owner.focus();
+  }
+
+  // エディット開始
+  function beginEdit(row) {
+    beginTextEdit(row, TEXT_ANY);
+  }
+
+  // エディットをキャンセル
+  function cancelEdit() {
+    removeTextEdit();
+  }
+
+  // マウスダウン
+  function onMouseDown(row, x, y, button, shift) {
+    // 左ボタンでエディット開始
+    if (button == mbLeft)
+      beginEdit(row);
+  }
+
+  // キーダウン
+  function onKeyDown(row, key, shift) {
+    // RETURNでエディット開始
+    if (key == VK_RETURN)
+      beginEdit(row);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * 配列化カラム
+ ----------------------------------------------------------------------*/
+class KArrayTableColumn extends KTableColumn
+{
+  var columnProxy, editColumnProxy;
+  var rowProxy, editRowProxy;
+  var dragIndex;
+  var dragRow;
+  var dropIndex;
+  var innerDragSort = false;
+  var dragging = false;
+  var curRow, curRowIndex;
+
+  /**
+   * 配列化カラム
+   */
+  function KArrayTableColumn(owner, label, key, opts = %[]) {
+    var _opts = duplicateStruct(opts);
+    if (owner.defaultOpts["innerDragSort"]
+        || opts["innerDragSort"]) {
+      innerDragSort = true;
+      opts["innerDrag"] = true;
+    }
+    columnProxy = new opts.klass(owner, label, key, _opts);
+    editColumnProxy = new opts.klass(owner, label, key, _opts);
+    rowProxy = new KTableRowArrayProxy();
+    editRowProxy = new KTableRowArrayProxy();
+
+    super.KTableColumn(owner, "[ " + columnProxy.label + " ]", key, opts);
+
+    fixedWidth = int(Math.max(fixedWidth, columnProxy.fixedWidth * 2.7));
+    variableRowSize = columnProxy.variableRowSize;
+  }
+
+  // 配列化しているか？ イエス
+  property array {
+    getter {
+      return true;
+    }
+  }
+
+  // proxyのセットアップ
+  function setupProxy(row, arrayIndex, columnProxy = this.columnProxy, rowProxy = this.rowProxy) {
+    columnProxy.pos = pos + columnProxy.fixedWidth * arrayIndex;
+    columnProxy.size = columnProxy.fixedWidth;
+    rowProxy.arrayIndex = arrayIndex;
+    rowProxy.primaryRow = row;
+    rowProxy.primaryColumn = this;
+  }
+
+  // 初期値
+  function defaultInitialValue() {
+    return [];
+  }
+
+  /**
+   * エレメントの数を得る
+   * @param row ロウ
+   * @return ロウ内のエレメントの数
+   */
+  function getRowElementCount(row) {
+    var values = getRowValue(row);
+    return values.count;
+  }
+
+  /**
+   * 座標に対応したエレメントのインデックスを得る
+   * @param row ロウ
+   * @param x X座標
+   * @param y Y座標
+   * @return インデックス（対応が無ければvoid)
+   */
+  function getRowElementIndex(row, x, y) {
+    var values = getRowValue(row);
+    var arrayIndex = int((x - pos) / columnProxy.fixedWidth);
+    if (0 <= arrayIndex && arrayIndex < values.count)
+      return arrayIndex;
+    else
+      return void;
+  }
+
+  /**
+   * エレメントを挿入する
+   * @param row ロウ
+   * @param index 挿入インデックス
+   * @param element エレメントの値
+   */
+  function insertRowElement(row, index, element = columnProxy.generateInitialValue()) {
+    setupProxy(row, 0);
+    rowProxy.insertElement(index, element);
+    owner.redrawCell(this, row);
+  }
+
+  /**
+   * エレメントを削除する
+   * @param row ロウ
+   * @param index 挿入インデックス
+   */
+  function eraseRowElement(row, index) {
+    setupProxy(row, 0);
+    rowProxy.eraseElement(index);
+    owner.redrawCell(this, row);
+    if (owner.tryCalcVariableRowSize(this))
+      owner.view.redrawAll();
+  }
+
+  // 比較
+  function compare(a, b) {
+    var compareProxy = columnProxy.compare;
+    var count = Math.min(a.count, b.count);
+    for (var i = 0; i < count; i++) {
+      var aVal = a[i], bVal = b[i];
+      if (compareProxy(aVal, bVal))
+        return true;
+      else if (compareProxy(bVal, aVal))
+        return false;
+    }
+    return a.count < b.count;
+  }
+
+  /** 
+   * 指定座標が空白か判定する
+   */
+  function isBlank(row, x, y) {
+    if (super.isBlank(...))
+      return true;
+    var index = int((x - pos) / columnProxy.fixedWidth);
+    var values = getRowValue(row);
+    if (index < 0 || index >= values.count)
+      return true;
+    setupProxy(row, index);
+    return columnProxy.isBlank(rowProxy, x, y);
+  }
+
+  // ロウのヒントを取得
+  function getRowHint(row, x, y) {
+    var index = int((x - pos) / columnProxy.fixedWidth);
+    var values = getRowValue(row);
+    if (index < 0 || index >= values.count)
+      return "";
+    setupProxy(row, index);
+    return columnProxy.getRowHint(rowProxy, x, y);
+  }
+
+  // セル描画
+  function drawCell(view, row) {
+    view.pushCellClip(this, row);
+    // 値を全部描画
+    var values = getRowValue(row);
+    for (var i = 0; i < values.count; i++) {
+      setupProxy(row, i);
+      columnProxy.drawCell(view, rowProxy);
+      // グリッドも描画
+      if (owner.showVerticalGrid) {
+        view.colorGradientRectUD(columnProxy.tail - 1, row.pos + 2, 1, row.size - 4, 0xFFA0A0A0, 0xFFFFFFFF );
+      }
+    }
+    // ポイント箇所のエレメントにアイテムフレーム描画
+    if (! dragging
+        && curRow === row
+        && curRowIndex !== void) {
+      view.drawItemFrame(new KRect(pos + curRowIndex * columnProxy.fixedWidth + 1, row.pos + 1, columnProxy.fixedWidth - 2, row.size - 2), true, false, false, false);
+    }
+    // エレメントをドラッグしてるなら、その箇所を描画
+    if (dragging
+        && dragRow === row ) {
+      view.drawItemFrame(new KRect(pos + dragIndex * columnProxy.fixedWidth + 1, row.pos + 1, columnProxy.fixedWidth - 2, row.size - 2), true, false, false, true);
+      if (dropIndex !== void) {
+        var edgeColor = 0xFF0000;
+        var edgeAlpha = 2 * 64;
+        view.colorRect(pos + dropIndex * columnProxy.fixedWidth - 1, row.pos + 3, 2, row.size, edgeColor, edgeAlpha);
+        for (var i = 2; i <= 5; i++) 
+          view.colorRect(pos + dropIndex * columnProxy.fixedWidth - 1 + 1 - i, row.pos + 3 - (i - 1), i * 2, 1, edgeColor, edgeAlpha);
+        
+      }
+    }
+    view.popCellClip();
+  }
+
+  // 値更新
+  function onRowValueUpdate(row, values) {
+    var newSize = 0;
+    for (var i = 0; i < values.count; i++) {
+      setupProxy(row, i);
+      var value = values[i];
+      columnProxy.onRowValueUpdate(rowProxy, value);
+    }
+    updateSize(row, values);
+  }
+
+  // サイズ更新イベント
+  function onSizeModified(row) {
+    updateSize(row, getRowValue(row));
+  }
+
+  // サイズ更新
+  function updateSize(row, values) {
+    // エレメントが可変サイズカラムで定義されていたら、サイズを再計算する
+    if (! variableRowSize)
+      return;
+    var newSize = owner.fontHeight + owner.spaceVertical;
+    for (var i = 0; i < values.count; i++) {
+      setupProxy(row, i);
+      newSize = int(Math.max(newSize, columnProxy.getRowHeight(rowProxy)));
+    }
+    setRowHeight(row, newSize);
+  }
+
+  // マウス進入
+  function onMouseEnter(row, x, y) {
+    curRow = row;
+    curRowIndex = getRowElementIndex(row, x);
+    owner.redrawCell(this, row);
+  }
+
+  // マウス移動
+  function onMouseMove(row, x, y) {
+    curRowIndex = getRowElementIndex(row, x);
+    owner.redrawCell(this, row);
+  }
+
+  // マウス離脱
+  function onMouseLeave(row, x, y) {
+    curRow = void;
+    curRowIndex = void;
+    owner.redrawCell(this, row);
+  }
+
+  // マウスダウン
+  function onMouseDown(row, x, y, button, shift) {
+    // エレメントへイベントをフォワード
+    var arrayIndex = getRowElementIndex(row, x);
+    if (arrayIndex === void)
+      return;
+    setupProxy(row, arrayIndex, editColumnProxy, editRowProxy);
+    editColumnProxy.onMouseDown(editRowProxy, x, y, button, shift);
+  }
+
+  // ドラッグ開始
+  function onDragEnter(row, x, y, shift) {
+    if (innerDragSort) {
+      var index = getRowElementIndex(row, x);
+      if (index !== void) {
+        super.onDragEnter(...);
+        dragging = true;
+        dragIndex = index;
+        dragRow = row;
+        owner.redrawCell(this, row);
+      }
+    }
+  }
+
+  // ドラッグ終了
+  function onDragLeave(row, x, y, shift) {
+    if (dragging) {
+      dragging = false;
+      owner.redrawCell(this, row);
+    }
+  }
+
+  // パケット進入
+  function onPacketEnter(row, x, y, packet, shift) {
+    if (dragging
+        && isPacketAcceptable(row, packet)) {
+      owner.redrawCell(this, row);
+    }
+  }
+
+  // パケット移動
+  function onPacketMove(row, x, y, packet, shift) {
+    if (dragging
+        && isPacketAcceptable(row, packet)) {
+      x = x - pos + 4;
+      if (x % columnProxy.fixedWidth <= 8) {
+        dropIndex = int(x / columnProxy.fixedWidth);
+        var values = getRowValue(row);
+        if (dropIndex > values.count
+            || dropIndex == dragIndex
+            || dropIndex == dragIndex + 1)
+          dropIndex = void;
+      }
+      else
+        dropIndex = void;
+      owner.redrawCell(this, row);
+    }
+  }
+
+  // パケット離脱
+  function onPacketLeave(row, x, y, packet, shift) {
+    if (dragging
+        && isPacketAcceptable(row, packet)) {
+      dropIndex = void;
+      owner.redrawCell(this, row);
+    }
+  }
+
+  // パケットドロップ
+  function onPacketDrop(row, x, y, packet, shift) {
+    if (innerDragSort
+        && isPacketAcceptable(row, packet)
+        && dropIndex !== void) {
+      setupProxy(row, 0);
+      rowProxy.moveElement(dragIndex, dropIndex);
+      dragIndex = void;
+      owner.redrawCell(this, row);
+    }
+  }
+};
+
+/*----------------------------------------------------------------------
+ * テーブルロウ配列プロクシ
+ ----------------------------------------------------------------------*/
+class KTableRowArrayProxy
+{
+  var primaryColumn;
+  var primaryRow;
+  var arrayIndex;
+
+  function KTableRowArrayProxy() {
+  }
+
+  // 上端
+  property pos {
+    getter {
+      return primaryRow.pos;
+    }
+  }
+
+  // サイズ
+  property size {
+    getter {
+      return primaryRow.size;
+    }
+  }
+
+  // 下端
+  property tail {
+    getter {
+      return primaryRow.tail;
+    }
+  }
+  
+  // カラム高さ更新
+  function updateColumnHeight(column) {
+    column.onSizeModified(this);
+    primaryRow.updateColumnHeight(primaryColumn);
+  }
+  
+  function insertCache(index, element) {
+    var cache = getColumnCacheRoot();
+    if (index < cache.length)
+      cache.insert(index, element);
+    else
+      cache[index] = element;
+  }
+
+  function eraseCache(index) {
+    var cache = getColumnCacheRoot();
+    if (index < cache.length)
+      cache.erase(index);
+  }
+
+  // エレメント挿入
+  function insertElement(index, element) {
+    // キャッシュの辻褄合わせ
+    insertCache(index, %[]);
+    // エレメント挿入
+    var values = primaryRow.getColumnValue(primaryColumn);
+    values = duplicateStruct(values);
+    values.insert(index, element);
+    primaryRow.setColumnValue(primaryColumn, values);
+  }
+
+  // エレメント削除
+  function eraseElement(index) {
+    // キャッシュの辻褄合わせ
+    eraseCache(index);
+    // エレメント削除
+    var values = primaryRow.getColumnValue(primaryColumn);
+    values = duplicateStruct(values);
+    values.erase(index);
+    primaryRow.setColumnValue(primaryColumn, values);
+  }
+
+  // エレメント移動
+  function moveElement(fromIndex, toIndex) {
+    if (toIndex > fromIndex)
+      toIndex--;
+    // キャッシュの辻褄合わせ
+    var cacheValue = getColumnCacheRoot()[fromIndex];
+    eraseCache(fromIndex);
+    insertCache(toIndex, cacheValue);
+    // `エレメント移動
+    var values = primaryRow.getColumnValue(primaryColumn);
+    values = duplicateStruct(values);
+    var value = values[fromIndex];
+    values.erase(fromIndex);
+    values.insert(toIndex, value);
+    primaryRow.setColumnValue(primaryColumn, values);
+  }    
+
+  // セルの値取得
+  function getColumnValue(column) {
+    return primaryRow.getColumnValue(primaryColumn)[arrayIndex];
+  }
+
+  // セルの値設定
+  function setColumnValue(column, value) {
+    var values = primaryRow.getColumnValue(primaryColumn);
+    values = duplicateStruct(values);
+    values[arrayIndex] = value;
+    primaryRow.setColumnValue(primaryColumn, values);
+  }
+
+  function getColumnCacheRoot() {
+    var cache = primaryRow.getColumnCache(primaryColumn);
+    if (typeof(cache["__sub__"]) == K_UNDEFINED)
+      cache["__sub__"] = [];
+    return cache["__sub__"];
+  }
+
+  // キャッシュ取得
+  function getColumnCache() {
+    var cache = getColumnCacheRoot();
+    if (cache[arrayIndex] === void)
+      cache[arrayIndex] = %[];
+    return cache[arrayIndex];
+  }
+  
+  // キャッシュの値取得
+  function getColumnCacheValue(column, cacheKey, initialValue) {
+    var cache = getColumnCache();
+    if (typeof(cache[cacheKey]) == K_UNDEFINED)
+      return initialValue;
+    else 
+      return cache[cacheKey];
+  }
+
+  // キャッシュの値設定
+  function setColumnCacheValue(column, cacheKey, value) {
+    var cache = getColumnCache();
+    cache[cacheKey] = value;
+  }
+};
+
+
+/*----------------------------------------------------------------------
+ * 構造体カラム
+ ----------------------------------------------------------------------*/
+class KStructTableColumn extends KTableColumn
+{
+  var columnProxyList, editColumnProxyList;
+  var rowProxy, editRowProxy;
+  var compareProxyList;
+  var ofstList;
+  var sizeList;
+  var dragIndex;
+  var dragRow;
+  var dropIndex;
+  var attrList = [];
+  var curRow, curRowIndex;
+  var initialValue;
+
+  /**
+   * 構造体カラム
+   */
+  function KStructTableColumn(owner, label, key, opts = %[]) {
+    attrList = getValue(opts, "attrList", []);
+    var labels = [];
+    for (var i = 0; i < attrList.count; i++) 
+      labels.add(attrList[i][1]);
+    label = label + " ( " + labels.join(" : ") + " )";
+
+    super.KTableColumn(owner, label, key, opts);
+
+    ofstList = [];
+    sizeList = [];
+    columnProxyList = [];
+    editColumnProxyList = [];
+    compareProxyList = [];
+    initialValue = getValue(opts, "initialValue", %[]);
+    var ofst = 0;
+    for (var i = 0; i < attrList.count; i++) {
+      var attr = attrList[i];
+      var columnProxy = new attr[0](owner, attr[1], attr[2], attr[3]);
+      var editColumnProxy = new attr[0](owner, attr[1], attr[2], attr[3]);
+      if (typeof(initialValue[columnProxy.key]) === K_UNDEFINED)
+        initialValue[columnProxy.key] = columnProxy.defaultInitialValue();
+      if (columnProxy.variableRowSize)
+        variableRowSize = true;
+      columnProxyList.add(columnProxy);
+      editColumnProxyList.add(editColumnProxy);
+      compareProxyList.add(columnProxy.compare);
+      ofstList.add(ofst);
+      sizeList.add(columnProxy.fixedWidth);
+      ofst += columnProxy.fixedWidth;
+   }
+    fixedWidth = ofst;
+    rowProxy = new KTableRowStructProxy();
+    editRowProxy = new KTableRowStructProxy();
+  }
+
+  // proxyのセットアップ
+  function setupProxy(row, arrayIndex, columnProxyList = this.columnProxyList, rowProxy = this.rowProxy) {
+    var columnProxy = columnProxyList[arrayIndex];
+    columnProxy.pos = pos + ofstList[arrayIndex];
+    columnProxy.size = columnProxy.fixedWidth;
+    rowProxy.arrayIndex = arrayIndex;
+    rowProxy.dictKey = columnProxy.key;
+    rowProxy.primaryRow = row;
+    rowProxy.primaryColumn = this;
+  }
+
+  // 初期値
+  function defaultInitialValue() {
+    return initialValue;
+  }
+
+  // 初期値適用
+  function applyDefaultValue(row) {
+    super.applyDefaultValue(...);
+    for (var i = 0; i < attrList.count; i++) {
+      setupProxy(row, i);
+      columnProxyList[i].applyDefaultValue(rowProxy);
+    }
+  }
+
+  // エレメントのインデックスを取得
+  function getRowElementIndex(row, x) {
+    x -= pos;
+    for (var i = 0; i < ofstList.count; i++) {
+      if (ofstList[i] <= x && x < ofstList[i] + sizeList[i]) {
+        return i;
+      }
+    }
+    return void;
+  }
+
+  // 比較
+  function compare(a, b) {
+    var count = attrList.count;
+    for (var i = 0; i < count; i++) {
+      var key = columnProxyList[i].key;
+      var aVal = a[key], bVal = b[key];
+      if (compareProxyList[i](aVal, bVal))
+        return true;
+      else if (compareProxyList[i](bVal, aVal))
+        return false;
+    }
+    return false;
+  }
+
+  // 空白判定
+  function isBlank(row, x, y) {
+    if (super.isBlank(...))
+      return true;
+    var ofst = x - pos;
+    for (var i = 0; i < attrList.count; i++) {
+      if (ofstList[i] <= ofst && ofst < ofstList[i] + sizeList[i]) {
+        setupProxy(row, i);
+        return columnProxyList[i].isBlank(rowProxy, x, y);
+      }
+    }
+    return true;
+  }
+
+  // ヒントの取得
+  function getRowHint(row, x, y) {
+    var ofst = x - pos;
+    for (var i = 0; i < attrList.count; i++) {
+      if (ofstList[i] <= ofst && ofst < ofstList[i] + sizeList[i]) {
+        setupProxy(row, i);
+        return columnProxyList[i].getRowHint(rowProxy, x, y);
+      }
+    }
+    return "";
+  }
+
+  // セルの描画
+  function drawCell(view, row) {
+    view.pushCellClip(this, row);
+    var values = getRowValue(row);
+    // 全セルの描画
+    for (var i = 0; i < attrList.count; i++) {
+      setupProxy(row, i);
+      columnProxyList[i].drawCell(view, rowProxy);
+      if (owner.showVerticalGrid) 
+        view.colorGradientRectUD(columnProxyList[i].tail - 1, row.pos + 2, 1, row.size - 4, 0xFFA0A0A0, 0xFFFFFFFF );
+      // ポイントしてたらフレームも描画
+      if (curRow === row
+          && curRowIndex === i) {
+        view.drawItemFrame(new KRect(columnProxyList[i].pos + 1, row.pos + 1, columnProxyList[i].fixedWidth - 2, row.size - 2), true, false, false, false);
+      }
+    }
+    view.popCellClip();
+  }
+
+  // 値更新イベント
+  function onRowValueUpdate(row, values) {
+    for (var i = 0; i < columnProxyList.count; i++) {
+      setupProxy(row, i);
+      var value = values[columnProxyList[i].key];
+      columnProxyList[i].onRowValueUpdate(rowProxy, value);
+    }
+    updateSize(row, values);
+  }
+
+  // サイズ更新イベント
+  function onSizeModified(row) {
+    updateSize(row, getRowValue(row));
+  }
+
+  // サイズ更新
+  function updateSize(row, value) {
+    // 可変サイズカラムだったら値を更新する
+    if (! variableRowSize)
+      return;
+    var newSize = owner.fontHeight + owner.spaceVertical;
+    for (var i = 0; i < columnProxyList.count; i++) {
+      setupProxy(row, i);
+      newSize = int(Math.max(newSize, columnProxyList[i].getRowHeight(rowProxy)));
+    }
+    setRowHeight(row, newSize);
+  }
+
+  // マウス進入
+  function onMouseEnter(row, x, y) {
+    curRow = row;
+    curRowIndex = getRowElementIndex(row, x);
+    owner.redrawCell(this, row);
+  }
+
+  // マウス移動
+  function onMouseMove(row, x, y) {
+    curRowIndex = getRowElementIndex(row, x);
+    owner.redrawCell(this, row);
+  }
+
+  // マウス離脱
+  function onMouseLeave(row, x, y) {
+    curRow = void;
+    curRowIndex = void;
+    owner.redrawCell(this, row);
+  }
+
+  // マウスダウン
+  function onMouseDown(row, x, y, button, shift) {
+    // イベントを子要素へ転送する
+    var arrayIndex = getRowElementIndex(row, x);
+    if (arrayIndex === void)
+      return;
+    setupProxy(row, arrayIndex, editColumnProxyList, editRowProxy);
+    if (editColumnProxyList[arrayIndex].editable)
+      editColumnProxyList[arrayIndex].onMouseDown(editRowProxy, x, y, button, shift);
+  }
+};
+
+/*----------------------------------------------------------------------
+ * テーブルロウ構造体プロクシ
+ ----------------------------------------------------------------------*/
+class KTableRowStructProxy
+{
+  var primaryColumn;
+  var primaryRow;
+  var arrayIndex;
+  var dictKey;
+
+  function KTableRowStructProxy() {
+  }
+
+  // 上端
+  property pos {
+    getter {
+      return primaryRow.pos;
+    }
+  }
+
+  // サイズ
+  property size {
+    getter {
+      return primaryRow.size;
+    }
+  }
+
+  // 下端
+  property tail {
+    getter {
+      return primaryRow.tail;
+    }
+  }
+
+  // カラム高さ更新
+  function updateColumnHeight(column) {
+    column.onSizeModified(this);
+    primaryRow.updateColumnHeight(primaryColumn);
+  }
+
+  // 値があるか判定
+  function hasColumnValue(column) {
+    var value = primaryRow.getColumnValue(primaryColumn);
+    return (typeof(value[dictKey]) != K_UNDEFINED
+            && value[dictKey] !== void);
+  }
+
+  // セルの値取得
+  function getColumnValue(column) {
+    return primaryRow.getColumnValue(primaryColumn)[dictKey];
+  }
+
+  // セルの値設定
+  function setColumnValue(column, value) {
+    var values = primaryRow.getColumnValue(primaryColumn);
+    values = duplicateStruct(values);
+    values[dictKey] = value;
+    primaryRow.setColumnValue(primaryColumn, values);
+  }
+
+  // キャッシュ取得
+  function getColumnCache(column) {
+    var cache = primaryRow.getColumnCache(column);
+    if (typeof(cache["__sub__"]) == K_UNDEFINED)
+      cache["__sub__"] = [];
+    if (cache["__sub__"][arrayIndex] === void)
+      cache["__sub__"][arrayIndex] = %[];
+    return cache["__sub__"][arrayIndex];
+  }
+
+  // キャッシュの値取得
+  function getColumnCacheValue(column, cacheKey, initialValue) {
+    var cache = getColumnCache(primaryColumn);
+    if (typeof(cache[cacheKey]) == K_UNDEFINED)
+      return initialValue;
+    else 
+      return cache[cacheKey];
+  }
+
+  // キャッシュの値設定
+  function setColumnCacheValue(column, cacheKey, value) {
+    var cache = getColumnCache(primaryColumn);
+    cache[cacheKey] = value;
+  }
+};

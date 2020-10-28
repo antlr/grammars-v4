@@ -1,0 +1,519 @@
+/******************************************************************************
+	system_mb/mb/MBSystemManager.tjs
+	
+	mb/system/配下のオブジェクトを管理する
+*******************************************************************************/
+
+class MBSystemManager extends MBObject
+{
+	// プロパティ
+	// BackPack関連ステータス
+	var intPlayDataStoragerState = 0;	// 0:無し, 1:saveで起動中, 2:loadで起動中
+	
+	// コンテクストメニュー関連ステータス
+	var blDialogVisible;
+	var blGetBackByContextMenu = false;
+	var strContextMenuBackStorage;
+	var strContextMenuBackLabel;
+	var strContextMenuType = "default";
+	
+	// パッドハンドリングモード
+	var strPadHandlingMode = "system";
+	
+	// 環境設定画面が表示されているかどうか
+	var blConfigMenuOpened = false;
+	
+	// メッセージ枠を隠している最中かどうか
+	var blMsgHidingAsTemp = false;
+	var blMsgHideEnabled  = true;
+	
+	var strLeadingCharID;
+	
+	
+	// クラス変数
+	
+	
+	// 管理オブジェクト
+	var objFocusController;	// フォーカスコントローラ
+	var objActionCanceller;	// アクションキャンセラ
+	var objPlayTimeCounter;	// プレイ時間カウンター
+	var objContextMenu;	// コンテクストメニュー
+	var objClickWaitLayer;	// クリック待ちレイヤ
+	
+	var objBookMarkStore;	// セーブ画面
+	var objBookMarkRestore;	// ロード画面
+	
+	
+	function MBSystemManager(win)
+	{
+		// コンストラクタ
+		
+		super.MBObject(win);
+		
+		objActionCanceller = new MBActionCanceller(window);
+		
+		objFocusController = new MBFocusController(window);
+		objFocusController.ptActionCanceller = objActionCanceller;
+		
+		objPlayTimeCounter = new MBPlayTimeCounter(window);
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate objClickWaitLayer  if (objClickWaitLayer  !== void);
+		invalidate objBookMarkStore   if (objBookMarkStore   !== void);
+		invalidate objBookMarkRestore if (objBookMarkRestore !== void);
+		invalidate objContextMenu     if (objContextMenu     !== void);
+		invalidate objPlayTimeCounter if (objPlayTimeCounter !== void);
+		invalidate objFocusController if (objFocusController !== void);
+		invalidate objActionCanceller if (objActionCanceller !== void);
+		
+		super.finalize(...);
+	}
+	
+	
+	/**************************************************************************
+		汎用
+	***************************************************************************/
+	
+	function resetGraphicCache()
+	{
+		// 画像キャッシュをリセットする
+		
+		System.doCompact();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function hideMessageLayerAsTemp()
+	{
+		// メッセージレイヤを一時的に不可視にする
+		// で、クリックしたら戻ってくる
+		
+		// 隠せるタイミングを限定
+		if (
+			!window.historyWriteEnabled ||
+			window.historyShowing       ||
+			intPlayDataStoragerState    ||
+			blConfigMenuOpened          ||
+			blMsgHidingAsTemp
+		) {
+			return;
+		}
+		
+		acActivateCanceller();
+		
+		tf.msgstate = [];
+		
+		tf.qsstate = _QuickSaves.fore.enabled;
+		_QuickSaves.fore.hide();
+		_QuickSaves.back.hide();
+		
+		var i;
+		for (i=0; i<window.fore.messages.count; i++) {
+			tf.msgstate[i] = window.fore.messages[i].visible;
+			window.fore.messages[i].visible = false;
+		}
+		
+		setMBClickWait();
+		blMsgHidingAsTemp = true;
+		
+		acDisactivateCanceller();
+	}
+	
+	function showMessageLayerAsTemp()
+	{
+		// 戻ってくる処理
+		
+		acActivateCanceller();
+		
+		objClickWaitLayer.visible = false;
+		
+		var i;
+		for (i=0; i<window.fore.messages.count; i++) {
+			window.fore.messages[i].visible = tf.msgstate[i];
+		}
+		
+		// QuickSaveが有効な場合のみ復帰
+		if (tf.qsstate) {
+			_QuickSaves.fore.show();
+			_QuickSaves.back.show();
+		}
+		
+		delete tf.qsstate;
+		delete tf.cinematstate;
+		delete tf.msgstate;
+		
+		blMsgHidingAsTemp = false;
+		
+		acDisactivateCanceller();
+		
+		fireContextMenuEndTrigger();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setMBClickWait()
+	{
+		// 独自のクリック待ちをかける
+		
+		if (objClickWaitLayer === void) {
+			objClickWaitLayer = new MBSystemClickWaitLayer(window, this);
+		}
+		objClickWaitLayer.parent  = window.fore.base;
+		objClickWaitLayer.visible = true;
+		objClickWaitLayer.focus();
+	}
+	
+	function onClickWaitReleased()
+	{
+		// 独自のクリック待ちが解放されたとき
+		// ただしクリック待ち解放のタイミングは処理先に任せること
+		
+		if (blMsgHidingAsTemp) {
+			// 押してすぐ解除を回避する
+			if (!System.getKeyState(VK_H)) {
+				showMessageLayerAsTemp();
+			}
+			return;
+		}
+	}
+	
+	
+	/**************************************************************************
+		プレイタイム関連
+	***************************************************************************/
+	
+	function ptInitTimer()
+	{
+		// プレイ時間カウンターを初期化
+		
+		objPlayTimeCounter.reset(0);
+	}
+	
+	function ptGetTotalPlayTime()
+	{
+		// 総プレイ時間を返す
+		
+		return objPlayTimeCounter.getTotalPlayTime();
+	}
+	
+	function ptStartTimer()
+	{
+		// プレイ時間カウンターをスタート
+		
+		objPlayTimeCounter.timer.enabled = true;
+	}
+	
+	function ptStopTimer()
+	{
+		// プレイ時間カウンターをストップ
+		
+		objPlayTimeCounter.timer.enabled = false;
+	}
+	
+	
+	/**************************************************************************
+		フォーカス関連
+	***************************************************************************/
+	
+	function fcPushFocusStack(obj)
+	{
+		// フォーカススタックにメニューを積む
+		
+		return objFocusController.pushFocusStack(obj);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function fcRemoveStackMember(obj)
+	{
+		// フォーカススタックのメンバを指定して削除
+		
+		objFocusController.removeFocusStackItem(obj);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function fcPopFocusStack()
+	{
+		// フォーカススタックからひとつおろす
+		
+		objFocusController.popFocusStack();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function fcChangeStackPointer(obj)
+	{
+		// フォーカススタックの現在のカーソル位置を変更
+		
+		objFocusController.relFocusStack(obj);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function fcApplyFocusTargetSearch()
+	{
+		// フォーカスの探索を開始する
+		
+		window.fore.base.cursor = crDefault;
+		objFocusController.activateFocusMaker();
+	}
+	
+	function fcSetCursorAutoFocusState(bl)
+	{
+		// ユーザー設定をフォーカスコントローラに反映
+		
+		objFocusController.blUserConfSetCursor = bl;
+	}
+	
+	function fcSetKBOperationState(bl)
+	{
+		// キーボード操作フラグの状態を変更
+		
+		if (bl) {
+			objFocusController.setOperationWithKB(true);
+		}
+		else {
+			objFocusController.setOperationWithKB(false);
+		}
+	}
+	
+	function getAutoFocusState()
+	{
+		// キーボード操作フラグの状態を返す
+		
+		return objFocusController.getAutoFocusState();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function acActivateCanceller(clickable)
+	{
+		// アクションキャンセラを有効にする
+		
+		objActionCanceller.setCancellerState(true, clickable);
+		//window.keyDownHook.insert(0, objActionCanceller.layFore.onKeyDown);
+	}
+	
+	function acDisactivateCanceller()
+	{
+		// アクションキャンセラを無効にする
+		
+		objActionCanceller.setCancellerState(false);
+		//kag.keyDownHook.erase(0);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function startPlayDataStorager(mode)
+	{
+		// BackPack起動
+		
+		switch (mode) {
+			case 'save':
+				intPlayDataStoragerState = 1;
+				if (objBookMarkStore === void || !isvalid(objBookMarkStore)) {
+					objBookMarkStore = new MBBookMarkStore(window, window.fore.base);
+				}
+				else {
+					objBookMarkStore.init();
+				}
+				break;
+			
+			case 'load':
+				intPlayDataStoragerState = 2;
+				if (objBookMarkRestore === void || !isvalid(objBookMarkRestore)) {
+					objBookMarkRestore = new MBBookMarkRestore(window, window.fore.base);
+				}
+				else {
+					objBookMarkRestore.init();
+				}
+				break;
+			
+			default:
+				break;
+		}
+	}
+	
+	function destroyPlayDataStorager()
+	{
+		// BackPackを強制的に破棄する
+		
+		//invalidate objPlayDataStorager if (objPlayDataStorager !== void);
+		intPlayDataStoragerState = 0;
+	}
+	
+	/**************************************************************************
+		コンテクストメニュー関連
+	***************************************************************************/
+	
+	function callContextMenu(type="default")
+	{
+		// コンテクストメニューを呼ぶ
+		
+		if (blDialogVisible) {
+			return;
+		}
+		
+		blDialogVisible = true;
+		
+		blGetBackByContextMenu = false;
+		strContextMenuBackStorage = "";
+		strContextMenuBackLabel   = "";
+		
+		fcSetKBOperationState(true) if (System.getKeyState(VK_ESCAPE));
+		
+		if (objContextMenu !== void && isvalid(objContextMenu)) {
+			objContextMenu.strCurrentContext = type;
+		}
+		else {
+			objContextMenu = new MBContextMenu(window, type);
+		}
+		
+		objContextMenu.open();
+	}
+	
+	function destroyContextMenu()
+	{
+		// コンテクストメニューを破棄
+		
+		blDialogVisible = false;
+		
+		invalidate objContextMenu if (objContextMenu !== void);
+		objActionCanceller.setCancellerState(false);
+	}
+	
+	function fireContextMenuEndTrigger()
+	{
+		// コンテクストメニュー終了時のトリガを引く
+		
+		window.trigger('end_contextmenu');
+	}
+	
+	
+	/**************************************************************************
+		システムフック関連
+	***************************************************************************/
+	
+	function unshiftKeyDownHook(obj)
+	{
+		// キーダウンフックを先頭に追加
+		
+		window.keyDownHook.insert(0, obj);
+		
+		return window.keyDownHook[0];
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function removeKeyDownHook(obj)
+	{
+		// 指定されたフックを消去
+		
+		var num = window.keyDownHook.find(obj);
+		
+		if (num > -1) {
+			window.keyDownHook.erase(num);
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function getPadHandler()
+	{
+		// パッドハンドラの制御をもらう
+		return;
+		
+		strPadHandlingMode = 'mercury';
+		
+		window.padKeyMap = %[];
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function releasePadHandler()
+	{
+		// パッドハンドラの制御を放棄
+		return;
+		
+		strPadHandlingMode = 'system';
+		
+		window.padKeyMap = window.createPadKeyMap();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function convertPadToKey(key)
+	{
+		// パッドボタンをキーに変換
+		
+		switch (key) {
+			case VK_PADLEFT:
+				key = VK_LEFT;
+				break;
+			
+			case VK_PADRIGHT:
+				key = VK_RIGHT;
+				break;
+			
+			case VK_PADUP:
+				key = VK_UP;
+				break;
+			
+			case VK_PADDOWN:
+				key = VK_DOWN;
+				break;
+			
+			case VK_PAD1:
+				key = VK_RETURN;
+				break;
+			
+			case VK_PAD2:
+				key = VK_ESCAPE;
+				break;
+		}
+		
+		return key;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function save()
+	{
+		// セーブ
+		
+		var dict = %[];
+		
+		dict.totalplaytime = objPlayTimeCounter.save();
+		
+		return dict;
+	}
+	
+	function load(dict)
+	{
+		// ロード
+		
+		objPlayTimeCounter.load(dict.totalplaytime);
+		
+		// BookMarkRestoreとBookMarkStoreは非表示にする
+		if (objBookMarkRestore !== void && isvalid(objBookMarkRestore)) {
+			objBookMarkRestore.disactivate();
+		}
+		if (objBookMarkStore !== void && isvalid(objBookMarkStore)) {
+			objBookMarkStore.disactivate();
+		}
+		
+		// コンテクストメニューは常に破棄する
+		destroyContextMenu();
+		
+		objFocusController.initFocusStack();
+		objActionCanceller.setCancellerState(false);
+		
+		// パッドハンドリングモードはsystemにしておく
+		releasePadHandler();
+	}
+}

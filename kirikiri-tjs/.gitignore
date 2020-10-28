@@ -1,0 +1,9 @@
+/TJS*.java
+/TJS*.js
+/TJS*.ts
+/TJS*.cs
+/TJS*.go
+*.tokens
+*.interp
+*.class
+.antlr

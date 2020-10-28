@@ -1,0 +1,1 @@
+(filter ( (filtercomp (not ! (filter ( (filtercomp (item (simple (attr cn) (filtertype =) (value Tim Howes)))) )))) ))

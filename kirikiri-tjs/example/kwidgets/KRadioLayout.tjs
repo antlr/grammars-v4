@@ -1,0 +1,111 @@
+//
+// $Id: KRadioLayout.tjs,v 1.4 2007/09/17 12:09:52 m2 Exp $
+//
+
+
+/*----------------------------------------------------------------------
+ * ラジオレイアウト
+ *
+ * この中に含まれる「値」を持つ全ての子ウィジェットは、常に1つだけが
+ * 「選択」状態になる。子ウィジェットの持つ「名前」がラジオレイアウト
+ * の「値」に対応し、外からはラジオレイアウトが複数の「値」の状態を
+ * 持つ単一のウィジェットに見えるようになる。
+ *
+ * なお、ラジオレイアウトは KGridLayout 継承クラスなので、普通にグリッド調に
+ * ウィジェットを配置してよい
+ * 
+ * @code
+ *  var radioLayout = new KRadioLayout(window, "radio");
+ *  radioLayout.add(0, 0, new KCheckBox("Test1", 1));
+ *  radioLayout.add(0, 1, new KCheckBox("Test2", 2));
+ *  radioLayout.add(0, 2, new KCheckBox("Test3", 3));
+ * @endcode
+ ----------------------------------------------------------------------*/
+class KRadioLayout extends KGridLayout
+{
+  // 値
+  var _value;
+  // 辞書
+  var dict;
+
+  /*------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KRadioLayout(win, name) {
+    super.KGridLayout(...);
+  }
+
+  /*------------------------------
+   * ファイナライザ
+   ------------------------------*/
+  function finalize {
+    if (dict)
+      dict.set(name, value);
+    super.finalize();
+  }
+
+  /**------------------------------
+   * 値
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property value {
+    getter {
+      return _value;
+    }
+    setter(v) {
+      // 値が変わった時のみ更新
+      if (v === _value)
+        return;
+      // 更新
+      _value = v;
+      // 子孫を全て巡回
+      eachArray(descendants, function(i, child) {
+        // valueと子孫ウィジェットのnameが一致したら、そのウィジェットはtrueにする。
+        if (child.name === _value)
+          child.value = true;
+        else
+          child.value = false;
+      } incontextof(this));
+    }
+  }
+
+  /**------------------------------
+   * イベントを発生させ強制的に現在の値を通知する。
+   *
+   * 現在の値で onValueModifiedを呼びます。
+   ------------------------------*/
+  function invalidateValue {
+    if (nodeEnabled)
+      onValueModified(value);
+  }
+
+  /*------------------------------
+   * 永続化辞書をバインドする
+   ------------------------------*/
+  function bindPersistentDictionary(dict) {
+    if (name !== void) {
+      this.dict = dict;
+      value = dict.init(name, value);
+    }
+  }
+
+  /*------------------------------
+   * 子の値の更新通知をトラップする
+   ------------------------------*/
+  function onChildValueModified(child, value) {
+    // 負の値が指定された場合は強制的に真の戻す
+    if (! value) {
+      child.value = true;
+      return;
+    }
+    // 値を更新
+    this.value = child.name;
+    // 値の更新を通知
+    onValueModified(this.value);
+  }
+};

@@ -1,0 +1,370 @@
+/******************************************************************************
+	system_mb/mb/system/bookmark/MBBookMarkSelectPanel.tjs
+*******************************************************************************/
+
+
+class MBBookMarkSelectPanel extends MBSelectItem
+{
+	// プロパティ
+	var bgColor        = 0xcc000000;
+	var bgColorFocused = MBColors.window.background;
+	var textColor      = MBGraphicPref.BookmarkSelectorTextColor;
+	
+	var intMaxHistoryLength = 28;	// 表示する履歴の最大長
+	
+	var intDataNumber;	// 栞番号
+	var isNewLayer = false;	// 新しいレイヤかどうか
+	var isLastUsed = false;	// 最後に使われたパネルかどうか
+	var isAhead    = false;	// リストの先頭かどうか
+	
+	var blHaveContent;	// セーブデータがあるかどうか
+	var blHasSelected;	// 選択状態かどうか
+	
+	var strLastUsedIconFile = 'bookmark/icon_new';
+	
+	var size = %[width : 333, height : 127];
+	var scale = 1;	// 拡縮倍率
+	
+	// 配下オブジェクト
+	var objImageLayer;	// サムネイル表示枠
+	var objLockButton;	// ロックボタン
+	var objLastUsedIcon;	// 最後に使ったかどうかを示すアイコン
+	var objTrashIcon;	// ゴミ箱アイコン
+	var objDialog;	// ダイアログ
+	
+	
+	// その他メンバ変数
+	var objDataLabelHash = %[];	// ラベル情報辞書配列
+	
+	
+	function MBBookMarkSelectPanel(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBSelectItem(win, par);
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		saveComment();
+		
+		invalidate objLastUsedIcon if (objLastUsedIcon  !== void);
+		invalidate objImageLayer   if (objImageLayer    !== void);
+		invalidate objLockButton   if (objLockButton    !== void);
+		invalidate objTrashIcon    if (objTrashIcon     !== void);
+		invalidate objDialog       if (objDialog        !== void);
+		
+		super.finalize(...);
+	}
+	
+	function init(num, lastused=false)
+	{
+		// イニシャライザ
+		
+		intDataNumber = num;
+		isLastUsed    = lastused;
+		isNewLayer    = false;
+		blHaveContent = false;
+		blActive      = false;
+		visible       = false;
+		
+		getDataLabelInfo(window);
+		
+		setSize(size.width, size.height);
+		
+		fillRect(0, 0, width, height, MBColors.window.border);
+		fillRect(1, 1, width - 2, height - 2, bgColor);
+		
+		// サムネイルをロード
+		var iname = sysfunc.getPathImage('bookmark/img_nodata');
+		if (blHaveContent) {
+			iname = "%s/data%d".sprintf(window.saveDataLocation, intDataNumber);
+		}
+		if (objImageLayer === void) {
+			objImageLayer = new global.KAGLayer(window, this);
+			objImageLayer.setPos(10, 10);
+			objImageLayer.name         = 'サムネイル';
+			objImageLayer.hitType      = htMask;
+			objImageLayer.hitThreshold = 256;
+			objImageLayer.opacity      = 255;
+			objImageLayer.visible      = true;
+		}
+		objImageLayer.loadImages(iname);
+		objImageLayer.setSizeToImageSize();
+		
+		// ロックボタンと最終使用アイコン
+		if (blHaveContent) {
+			if (objLockButton === void) {
+				objLockButton = new MBButton(window, this);
+			}
+			updateLockButtonView();
+			objLockButton.setPos(10, height - (objLockButton.height + 10));
+			
+			// ゴミ箱アイコン
+			var otlw = -12;
+			var otlh = 19;
+			var otlt = height - 19;
+			if (MBGraphicPref.BookmarkDeleterEnabled) {
+				if (objTrashIcon === void) {
+					objTrashIcon = new MBButton(window, this);
+					objTrashIcon.loadImages(sysfunc.getPathImage('bookmark/bt_trash'));
+					objTrashIcon.setPos(
+						width - (objTrashIcon.width + 10),
+						height - (objTrashIcon.height + 10)
+					);
+					objTrashIcon.visible = true;
+				}
+				else {
+					objTrashIcon.visible = true;
+				}
+				
+				otlw = objTrashIcon.width;
+				otlh = objTrashIcon.height;
+				otlt = objTrashIcon.top;
+			}
+			
+			// 最終使用表示アイコン
+			if (intDataNumber === sf.backpack_lastused && objLastUsedIcon === void) {
+				objLastUsedIcon = new GraphicLayer(window, this);
+				objLastUsedIcon.loadImages(%[storage : sysfunc.getPathImage(strLastUsedIconFile)]);
+				objLastUsedIcon.setSizeToImageSize();
+				objLastUsedIcon.setPos(
+					width - (otlw + objLastUsedIcon.width + 15),
+					height - (objLastUsedIcon.height + 3)
+				);
+				objLastUsedIcon.hitType      = htMask;
+				objLastUsedIcon.hitThreshold = 256;
+				objLastUsedIcon.visible      = true;
+			}
+			else if (intDataNumber === sf.backpack_lastused) {
+				objLastUsedIcon.visible = true;
+			}
+			else if (objLastUsedIcon !== void && isvalid(objLastUsedIcon)) {
+				objLastUsedIcon.visible = false;
+			}
+		}
+		else {
+			if (objLockButton !== void && isvalid(objLockButton)) {
+				objLockButton.visible = false;
+			}
+			if (objLastUsedIcon !== void && isvalid(objLastUsedIcon)) {
+				objLastUsedIcon.visible = false;
+			}
+			if (objTrashIcon !== void && isvalid(objTrashIcon)) {
+				objTrashIcon.visible = false;
+			}
+		}
+	}
+	
+	
+	//==========================================================================
+	// データアクセス等
+	
+	function getDataLabelInfo(win)
+	{
+		// データラベルを取得
+		
+		// 名前
+		if (win.bookMarkNames[intDataNumber] != "") {
+			var tmpArray = win.bookMarkNames[intDataNumber].split("/");
+			objDataLabelHash.name    = tmpArray[0];
+			objDataLabelHash.chapter = tmpArray[1];
+			objDataLabelHash.time    = tmpArray[2];
+			
+			if (objDataLabelHash.name.length > intMaxHistoryLength) {
+				objDataLabelHash.name = objDataLabelHash.name.substring(
+					objDataLabelHash.name.length - intMaxHistoryLength
+				);
+			}
+		}
+		else {
+			objDataLabelHash.name    = "";
+			objDataLabelHash.chapter = "";
+			objDataLabelHash.time    = "";
+		}
+		
+		// 日付
+		if(win.bookMarkDates[intDataNumber] == '') {
+			objDataLabelHash.date = "----/--/-- --:--";
+			blHaveContent = false;
+		}
+		else {
+			objDataLabelHash.date = win.bookMarkDates[intDataNumber];
+			blHaveContent = true;
+		}
+		
+		// 万が一ファイルが見付からなかったら無いものとみなす
+		if (!Storages.isExistentStorage("%s/data%d.bmp".sprintf(window.saveDataLocation, intDataNumber))) {
+			blHaveContent = false;
+			
+			objDataLabelHash.date    = "----/--/-- --:--";
+			objDataLabelHash.name    = "";	// 28文字
+			objDataLabelHash.chapter = "NO DATA";
+			objDataLabelHash.time    = "";
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function saveComment()
+	{
+		// 特に何もしないけど互換性の（ｒｙ
+	}
+	
+	
+	//==========================================================================
+	// 描画関連
+	
+	function draw_content()
+	{
+		// 中身を描く
+		
+		// 番号と日付と時刻
+		font.height = 14;
+		drawText(140, 10, "No.%d %s".sprintf(intDataNumber + 1, objDataLabelHash.date), textColor);
+		
+		// シーン名
+		drawText(140, 34, "%s".sprintf(objDataLabelHash.chapter), textColor);
+		
+		// 説明文的
+		if (MBGraphicPref.BookmarkSelectorHistoryVisible) {
+			font.height = 12;
+			var str  = objDataLabelHash.name;
+			var note = [];
+			if (str != "") {
+				var hpos = Math.floor(intMaxHistoryLength * 0.5) - 1;
+				note[0] = '...' + str.substring(0, hpos);
+				note[1] = str.substring(hpos);
+			}
+			drawText(140, 58, note[0], textColor);
+			drawText(140, 73, note[1], textColor);
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function drawItemFace(is_lastused)
+	{
+		// 描画
+		
+		blHasSelected = false;
+		
+		fillRect(1, 1, width - 2, height - 2, bgColor);
+		draw_content();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function drawItemFaceFocused()
+	{
+		// 選択状態で描画
+		
+		blHasSelected = true;
+		sndfunc.seSelect();
+		
+		fillRect(1, 1, width - 2, height - 2, bgColorFocused);
+		draw_content();
+	}
+	
+	
+	//==========================================================================
+	// イベント関連
+	
+	function onSelectedItemClick(sender)
+	{
+		// クリック時の動作
+		
+		// ロックボタン
+		if (sender == objLockButton) {
+			var res = window.bookMarkProtectedStates[intDataNumber];
+			window.bookMarkProtectedStates[intDataNumber] = (res) ? false : true;
+			updateLockButtonView();
+		}
+		
+		// 削除ボタン
+		if (sender == objTrashIcon) {
+			invalidate objDialog if (objDialog !== void);
+			
+			if (window.bookMarkProtectedStates[intDataNumber]) {
+				var str = "No.%dはロックされています。".sprintf(intDataNumber + 1);
+				objDialog = new MBPseudyNoticeDialog(window, window.fore.base, str);
+			}
+			else {
+				var str = "No.%dを消去します。\n本当によろしいですか？".sprintf(intDataNumber + 1);
+				objDialog = new MBPseudyYesNoDialog(window, window.fore.base, this, str);
+			}
+			objDialog.show();
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function updateBookMarkComment()
+	{
+		// コメント表示をアップデート
+		
+		if(window.scflags.bookMarkComments !== void) {
+			objCommentEditor.text = window.scflags.bookMarkComments[intDataNumber];
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function updateLockButtonView()
+	{
+		// ロックボタンの表示を切り替える
+		
+		var lockstate = window.bookMarkProtectedStates[intDataNumber];
+		var imagefile = 'bookmark/cbox_lock';
+		
+		if (lockstate) {
+			imagefile = 'bookmark/cbox_lock_checked';
+		}
+		
+		objLockButton.loadImages(sysfunc.getPathImage(imagefile));
+		objLockButton.visible = true;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onYesNoSelected(res)
+	{
+		// 削除
+		
+		if (res) {
+			parent.removeSaveDate(intDataNumber);
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onEscapeKeyDown()
+	{
+		// エスケープキーが押されたら
+		
+		parent.onEscapeKeyDown();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		if (button == mbRight) {
+			onEscapeKeyDown();
+			return;
+		}
+		
+		super.onMouseDown(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onRightClickedOnChild()
+	{
+		// 子オブジェクトで右クリックされたら
+		
+		onEscapeKeyDown();
+	}
+}

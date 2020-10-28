@@ -1,0 +1,154 @@
+//
+// $Id: KPersistentDictionary.tjs,v 1.2 2007/09/17 21:05:14 cvs Exp $
+//
+
+
+
+/**----------------------------------------------------------------------
+ * 永続化辞書
+ ----------------------------------------------------------------------*/
+class KPersistentDictionary
+{
+  // 辞書を記録するファイルパス
+  var filePath;
+  // 辞書の実体
+  var dict;
+  // 仮想
+  var virtual;
+  // 暗号化する？
+  var _crypt = false;
+  // 圧縮する?
+  var _compress = false;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * 永続化辞書を初期化します。
+   * 以前の起動時に辞書に値が保存されていれば、
+   * その値を読み出して初期値とします。
+   *
+   * @param filePath 辞書を保存するファイルパス
+   ------------------------------*/
+  function KPersistentDictionary(filePath, virtual = false) {
+    // ファイルパスを記録
+    this.filePath = filePath;
+    this.virtual = virtual;
+    // 辞書を作成
+    dict = new Dictionary();
+    dict.values = %[];
+    dict.initial_values = %[];
+
+    // 既存の辞書があれば読み込む
+    if (! virtual
+        && Storages.isExistentStorage(filePath)) {
+      dict = Scripts.evalStorage(filePath);
+      // 古いバージョンの辞書なら、新バージョンの辞書に自動変換
+      if (typeof(dict.values) == "undefined") {
+	var keys = dictionaryKeys(dict);
+	keys.remove("initial_values");
+	dict.values = %[];
+	for (var i = 0; i < keys.count; i++) {
+	  dict.values[keys[i]] = dict[keys[i]];
+	  delete dict[keys[i]];
+	}
+      }
+    }
+  }
+
+  /**------------------------------
+   * ファイナライザ
+   *
+   * 辞書の値をファイルに保存します。
+   */
+  function finalize {
+    store();
+  }
+
+  /**------------------------------
+   * ストア
+   *
+   * 辞書の値をファイルに保存します。
+   */
+  function store {
+    if (! virtual) 
+      (Dictionary.saveStruct incontextof dict)(filePath, storeFlag);
+  }
+
+  /**------------------------------
+   * 辞書の中身を初期値にクリアします。
+   ------------------------------*/
+  function clear {
+    dict.values = duplicateStruct(dict.initial_values);
+  }
+
+  /**------------------------------
+   * 辞書の値を初期化します。
+   *
+   * キーが未設定の場合は、指定した値でキーを初期化します。
+   * キーが設定済みの場合は、何も行いません。
+   *
+   * @param キー
+   * @parma キーに対応する値の初期値
+   * @return 値
+   ------------------------------*/
+  function init(key, value) {
+    // 初期値辞書にキーと値のペアを登録
+    dict.initial_values[key] = value;
+    // 未初期化ならキーに値を設定
+    if (dict.values[key] === void)
+      dict.values[key] = value;
+    // 値を返す
+    return dict.values[key];
+  }
+
+  /**------------------------------
+   * 辞書に値を設定します
+   *
+   * @param キー
+   * @param 値
+   * @return 値
+   ------------------------------*/
+  function set(key, value) {
+    dict.values[key] = value;
+    return dict.values[key];
+  }
+
+  /**------------------------------
+   * 辞書から値を所得します
+   *
+   * @param key キー
+   * @return 値
+   ------------------------------*/
+  function get(key) {
+    return dict.values[key];
+  }
+
+  property crypt {
+    getter {
+      return _crypt;
+    }
+    setter(v) {
+      _crypt = v;
+    }
+  }
+
+  property compress {
+    getter {
+      return _compress;
+    }
+    setter(v) {
+      _compress = v;
+    }
+  }
+
+  property storeFlag {
+    getter {
+      if (crypt)
+        return "c";
+      if (compress)
+        return "z";
+      return "";
+    }
+  }
+};
+

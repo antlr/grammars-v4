@@ -1,0 +1,4321 @@
+#0
+Limbo
+You are in a dense mist that seems to go on forever. If you drop an object here, or set its home to be here, you probably won't be able to find it again. For some strange reason, you can sense which way is north here.
+124
+-1
+21
+-1
+-1
+
+
+
+is briefly visible through the mist.
+1
+-35
+112
+
+#1
+Wizard
+You see a shabby old Wizard who appears to be asleep.
+250
+188
+250
+201
+188
+
+
+
+stole a penny from the Wizard.
+1
+8
+27
+potrzebie
+#2
+Beaker
+You see a trusty lab assistant with a worried expression on his face.
+12
+-1
+12
+25
+25
+says "mi-mi mi-mi-mi-mi-mi mi-mi-mi-mi-mi-mi!"
+Beaker says "mi-mi mi-mi-mi-mi-mi mi-mi-mi-mi-mi-mi!"
+
+hits beakers with the club!
+2
+184
+3
+potrzebie
+#3
+The Temple of Arkteks-t'leep
+You are at the top of a very deep fiery pit, into which robed, chanting priests throw offerings. A wide stone staircase descends toward the town square to the south. A small doorway opens north into the temple. You sense that it might be profitable to make a small sacrifice yourself.
+-1
+-1
+268
+-1
+-1
+
+
+
+
+1
+0
+128
+
+#4
+north; n
+You catch a faint glimpse of light through the mist.
+5
+-1
+-1
+-1
+-1
+
+
+
+brushes by you, heading north.
+1
+0
+2
+
+#5
+The Town Square
+You are in the town square. All around you, peasants haggle over their wares as unwashed urchins scramble through the legs of tables topped with smelly produce. There are exits in all directions.
+-1
+26
+11
+-1
+-1
+
+
+
+
+1
+-4
+0
+
+#6
+north; n
+You see a wide stone staircase, covered with congealed blood. At the top is the glittering gold dome of the Temple of Arkteks-t'leep.
+3
+-1
+-1
+-1
+-1
+
+
+
+goes north.
+1
+0
+2
+
+#7
+south;s;exit;out;back;leave;stair;stairs
+You see a wide stone staircase, covered with the congealed blood of the sacrifices. At its base is the town square.
+5
+-1
+-1
+-1
+-1
+
+You go down the stairs.
+
+goes down the stairs.
+1
+0
+2
+
+#8
+sw;buds
+You see Bud's Cafe, an ostentatious eatery.
+204
+-1
+-1
+6
+-1
+
+
+
+
+203
+0
+2
+
+#9
+southeast; se
+You see a caravan readying for a journey across the hot sands to the southeast of town.
+194
+-1
+-1
+8
+-1
+
+
+
+trudges off towards the desert to the southeast.
+121
+0
+2
+
+#10
+up; u
+<four-acre plots still available in heaven>
+0
+-1
+-1
+9
+-1
+
+
+
+
+1
+0
+2
+
+#11
+sideways
+
+12
+-1
+-1
+10
+-1
+
+You slip into the Fourth Dimension!
+
+slips into the Fourth Dimension!
+1
+0
+2
+
+#12
+The Wizard's Secret Laboratory
+You are in the Wizard's private laboratory. To your left is a full-length mirror. To your other left is a closet door. There is something very odd about this place...
+-1
+2
+254
+-1
+-1
+
+
+
+
+1
+-1
+0
+
+#13
+northeast; ne
+
+0
+-1
+-1
+4
+-1
+
+
+
+
+1
+0
+2
+
+#14
+northwest; nw
+
+0
+-1
+-1
+13
+-1
+
+
+
+
+1
+0
+2
+
+#15
+east; e
+
+0
+-1
+-1
+14
+-1
+
+
+
+
+1
+0
+2
+
+#16
+southeast; se
+
+0
+-1
+-1
+15
+-1
+
+
+
+
+1
+0
+2
+
+#17
+south; s
+
+0
+-1
+-1
+16
+-1
+
+
+
+
+1
+0
+2
+
+#18
+southwest; sw
+
+0
+-1
+-1
+17
+-1
+
+
+
+
+1
+0
+2
+
+#19
+west; w
+
+0
+-1
+-1
+18
+-1
+
+
+
+
+1
+0
+2
+
+#20
+up; u
+
+0
+-1
+-1
+19
+-1
+
+
+
+
+1
+0
+2
+
+#21
+down; d
+
+0
+-1
+-1
+20
+-1
+
+
+
+
+1
+0
+2
+
+#22
+mirror;out
+You see an ugly adventurer.
+34
+-1
+-1
+-1
+188
+You bump your nose on the magic mirror. The magic mirror reflects on the foolishness of mortals.
+You walk through the magic mirror.
+bumps into the mirror.
+walks through the magic mirror!
+1
+0
+2
+
+#23
+closet
+You see a closet door, labelled "EMPLOYEES ONLY."
+5
+-1
+-1
+22
+2
+The door is stuck.
+You go into the closet. Hey! There's no floor in here!
+tugs uselessly at the closet door.
+walks into the closet.
+1
+0
+2
+
+#24
+a strange piece of alchemical equipment
+You see a strange piece of alchemical equipment, made up of dozens of twisty little passages, all alike. It stands evenly on five chicken legs, each perpendicular to the other three.
+12
+-1
+12
+-1
+1
+When you try to pick it up, it runs away, laughing hysterically.
+
+tries to pick up the strange piece of alchemical equipment, but it runs away, laughing hysterically, in three different directions.
+
+1
+1
+1
+
+#25
+a big club
+You see a large club. On its side is a label reading: "Employee Wage Negotiation Trans-Frobulator"
+12
+-1
+12
+200
+2
+
+
+
+
+1
+1
+265
+
+#26
+white lamb
+You see an unblemished white lamb, bleating plaintively.
+5
+-1
+5
+-1
+-1
+
+The lamb bleats forlornly as you sling it over your shoulder.
+
+picks up the white lamb. The lamb bleats forlornly.
+1
+6
+1
+
+#27
+north;n;enter;in;door;doorway
+You see a small doorway. On the door is a sign reading "The Cartesian Library of Arkteks-t'leep"
+28
+-1
+-1
+7
+-1
+
+
+
+goes north.
+1
+0
+2
+
+#28
+Library lobby
+You are in the lobby of the library. You see three doors, labeled "1. Reference", "2. Circulating", and "3. Wizardry", plus an exit to the south.
+-1
+-1
+35
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#29
+south;s;exit;out;leave;temple;back
+
+3
+-1
+-1
+-1
+-1
+
+
+
+goes south.
+1
+0
+2
+
+#30
+Reference Room
+You see endless miles of musty books, and doors labeled "Lobby", "1. Oxford English Dictionary of Commands", "2. Encyclopedias", and "3. Archives".
+-1
+117
+262
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#31
+reference; 1
+
+30
+-1
+-1
+29
+-1
+
+
+
+enters the Reference Library.
+1
+0
+2
+
+#32
+Circulating Room
+You see endless miles of musty books, and a door labeled "Lobby". A sign says "Contributions gratefully accepted."
+-1
+249
+37
+-1
+-1
+
+
+
+
+1
+0
+32
+
+#33
+circulating; 2
+
+32
+-1
+-1
+31
+-1
+
+
+
+enters the Circulating Collection.
+1
+0
+2
+
+#34
+Wizard's Room
+You see a few, choice tomes enscribed with weighty runes, a door labeled "Lobby", and a full-length mirror.
+-1
+104
+265
+-1
+1
+Thunderclouds gather over your head. Blazing letters swim before your eyes, saying "Mortal, get thee hence!"
+
+
+
+1
+0
+0
+
+#35
+3;wizardry;wizard;wizard's;wizard's room
+
+34
+-1
+-1
+33
+-1
+We're very sorry, but there are some things that mere mortals were not meant to know.
+
+
+enters the Wizard's Room.
+1
+0
+2
+
+#36
+lobby;out;exit;back;leave
+
+28
+-1
+-1
+-1
+-1
+
+
+
+goes back to the lobby.
+1
+0
+2
+
+#37
+lobby; out; exit; back; leave
+
+28
+-1
+-1
+-1
+-1
+
+
+
+goes back to the lobby.
+1
+0
+2
+
+#38
+out;lobby;leave;exit;back
+
+28
+-1
+-1
+-1
+-1
+
+
+
+goes back to the lobby.
+1
+0
+2
+
+#39
+mirror
+You see an ugly adventurer.
+12
+-1
+-1
+38
+188
+You bump your nose on the magic mirror. The magic mirror reflects on the foolishness of mortals.
+You walk through the magic mirror.
+bumps into the mirror.
+walks through the magic mirror!
+1
+0
+2
+
+#40
+Oxford English Dictionary of Commands, Index
+Commands described in the main volumes are drop, get, give, go, gripe, help, inventory, look, move, password, rob, and say. Other commands are described in the supplements.
+64
+-1
+64
+-1
+1
+A little old lady comes out from behind the Reference desk and twists your ear until you drop the book.
+
+
+
+1
+1
+1
+
+#41
+Oxford English Dictionary of Commands, "@Create"
+Syntax: @create <name> [= <cost>]. Create a thing with the specified name. Creation costs either <cost> pennies or 10 pennies, whichever is greater. The value of a thing is proportional to its cost.
+106
+-1
+106
+42
+1
+A little old lady comes out from behind the Reference Desk and beats you with her cane until you drop the book.
+
+
+
+1
+1
+1
+
+#42
+Oxford English Dictionary of Commands, "@Describe"
+@Syntax: describe <what>=<description>. <what> can be a room, thing, player, or direction. Set the description a player sees when they use the command "look <what>"
+106
+-1
+106
+44
+1
+An indescribable force binds that volume to the floor.
+
+
+
+1
+1
+1
+
+#43
+Oxford English Dictionary of Commands, "@Dig"
+Syntax: @dig <name>. Create a new room with the specified name, and print the room's number.
+106
+-1
+106
+57
+1
+That volume is securely dug in to the floor.
+
+
+
+1
+1
+1
+
+#44
+Oxford English Dictionary of Commands, "@Fail"
+Syntax: @fail <object> [= <message>]. Without a message argument, clear the fail message on object, otherwise set it. The fail message is printed when a player unsuccessfully attempts to use the object.
+106
+-1
+106
+62
+1
+You fail to pick that volume up.
+
+
+
+1
+1
+1
+
+#45
+Oxford English Dictionary of Commands, "Drop"
+Syntax: drop <object>. Drop the specified object.
+64
+-1
+64
+46
+1
+A little old lady comes out from behind the Reference Desk and scolds you until you drop the book.
+
+
+
+1
+1
+1
+
+#46
+Oxford English Dictionary of Commands, "Get"
+Syntax: get <object>. Get the specified object.
+64
+-1
+64
+47
+1
+A little old lady comes out from behind the Reference Desk and kicks you in the shins until you release the book.
+
+
+
+1
+1
+1
+
+#47
+Oxford English Dictionary of Commands, "Give"
+Syntax: give <player>=<amount>. Give <player> the specified number of pennies.
+64
+-1
+64
+48
+1
+That volume is firmly bolted to the floor.
+
+
+
+1
+1
+1
+
+#48
+Oxford English Dictionary of Commands, "Go"
+Syntax: go <direction>, go home. Go in the specified direction. Go home is a special command that returns you to your starting location. If the direction is fully specified, the verb go may be omitted.
+64
+-1
+64
+49
+1
+That volume is too heavy to go anywhere.
+
+
+
+1
+1
+1
+
+#49
+Oxford English Dictionary of Commands, "Gripe"
+Syntax: gripe <message>. Send <message> to the system maintainer.
+64
+-1
+64
+50
+1
+A little old lady comes out from behind the Reference Desk and sticks you with her hairpin.
+
+
+
+1
+1
+1
+
+#50
+Oxford English Dictionary of Commands, "Help"
+Syntax: help. Prints a short help message.
+64
+-1
+64
+52
+1
+You can't help letting that volume slip through your fingers.
+
+
+
+1
+1
+1
+
+#51
+Oxford English Dictionary of Commands, "@Link"
+Syntax: @link <direction>=<room number>. Link exit specified by <direction> to room specified by <room number>. Exit must be unlinked, and you must own the target room if its LINK_OK attribute is not set.
+106
+-1
+106
+68
+1
+That volume is attached to the floor with a chain of thick steel links.
+
+
+
+1
+1
+1
+
+#52
+Oxford English Dictionary of Commands, "Inventory"
+Syntax: inventory. List what you are carrying.
+64
+-1
+64
+56
+1
+A little old lady comes out from behind the Reference Desk and drives her spiked heel through your foot.
+
+
+
+1
+1
+1
+
+#53
+Oxford English Dictionary of Commands, "@Lock"
+Syntax: @lock <object>=<key>, @lock <object>=!<key>. Set a key for an object. First form requires that a player have <key> to use <object>; second form requires that a player not have <key>. If <key> starts with *, lock to named player.
+106
+-1
+106
+51
+1
+That volume is locked to the floor.
+
+
+
+1
+1
+1
+
+#54
+Oxford English Dictionary of Commands, "Move"
+Syntax: move <direction>, move home. See "Go"
+64
+-1
+64
+59
+1
+A little old lady comes out from behind the Reference Desk and sprays tear gas into your face.
+
+
+
+1
+1
+1
+
+#55
+Oxford English Dictionary of Commands, "@Name"
+Syntax: @name <object> = <name>, @name <player> = <name> <password>. Change the name of the specified object. Can also be used to specify a new direction list for an exit (cf. open). For a player, requires player's password.
+106
+-1
+106
+-1
+1
+A little old lady comes out from behind the Reference Desk and hits you with her lead-lined purse.
+
+
+
+1
+1
+1
+
+#56
+Oxford English Dictionary of Commands, "Look"
+Syntax: look <what>. <what> can be a room, thing, player, or direction. Prints a description of <what>.
+64
+-1
+64
+54
+1
+It looks like you won't be able to pick up that volume.
+
+
+
+1
+1
+1
+
+#57
+Oxford English Dictionary of Commands, "@Open"
+Syntax: @open <direction>[;<other-dir>]*. Create an unlinked exit in the specified direction(s). Once created, you (or any other player) may use the "@link" command to specify the room to which the exit leads. See also "@name".
+106
+-1
+106
+55
+1
+You can't open the lock that secures that volume to the floor.
+
+
+
+1
+1
+1
+
+#58
+Oxford English Dictionary of Commands, "@Osuccess"
+Syntax: @osuccess <object> [= <message>]. Without a message argument, clear the osuccess message on object, otherwise set it. The osuccess message, prefixed by the player's name, is shown to others when the player successfully uses <object>.
+106
+-1
+106
+127
+1
+A little old lady comes out from behind the Reference Desk and beats your knuckles with a ruler.
+
+
+
+1
+1
+1
+
+#59
+Oxford English Dictionary of Commands, "@Password"
+Syntax: @password <old>=<new>. Set a new password; you must specify your old password to verify your identity.
+64
+-1
+64
+60
+1
+You don't know the password needed to get this book.
+
+
+
+1
+1
+1
+
+#60
+Oxford English Dictionary of Commands, "Rob"
+Syntax: rob <player>. Attempt to steal a penny from <player>.
+64
+-1
+64
+61
+1
+You can't steal this book!
+
+
+
+1
+1
+1
+
+#61
+Oxford English Dictionary of Commands, "Say"
+Syntax: say <message>. Say <message>.
+64
+-1
+64
+40
+1
+A little old lady comes out from behind the Reference Desk and shouts for the Library Police.
+
+
+
+1
+1
+1
+
+#62
+Oxford English Dictionary of Commands, "@Success"
+Syntax: @success <object> = <message>. Set the success message for <object>. The success message is printed when a player successfully uses <object>.
+106
+-1
+106
+43
+1
+You are unsuccessful in your attempts to lift that volume.
+
+
+
+1
+1
+1
+
+#63
+Oxford English Dictionary of Commands, "@Unlock"
+Syntax: @unlock <object>. Remove the lock on an object.
+106
+-1
+106
+41
+1
+A little old lady comes out from behind the Reference Desk and threatens you with her sawed-off shotgun.
+
+
+
+1
+1
+1
+
+#64
+Oxford English Dictionary Room
+This room contains the main volumes of the Oxford English Dictionary. Further in lie the supplements, and back out is the Reference Room of the Library.
+-1
+267
+105
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#65
+Oxford English Dictionary of Commands; Dictionary; Oxford; Commands; 1; oed
+
+64
+-1
+-1
+36
+-1
+
+
+
+goes to the Dictionary room.
+1
+0
+2
+
+#66
+reference;door;out;back;exit;leave;ref;temple;lobby
+
+30
+-1
+-1
+-1
+-1
+
+
+
+goes back out to the Reference section.
+1
+0
+2
+
+#67
+The Compleat Book of Magical Invocations
+Words of Power: @dump, @shutdown, @teleport [<victim>=] <destination>, @wall <message>, @force <victim> = <command>, @chown <object> = <player>, @toad <player>
+34
+-1
+34
+-1
+1
+Ghostly hands snatch the book from your grasp. The magic mirror booms "FOOLISH MORTAL! SEEK NOT THAT WHICH YOU CAN NEVER HOPE TO COMPREHEND!"
+
+
+
+1
+1
+1
+
+#68
+Oxford English Dictionary of Commands, "@Unlink"
+Syntax: @unlink <direction> Remove the link on the exit in the specified <direction>. The exit may then be relinked by any player using the "@link" command.
+106
+-1
+106
+63
+1
+You cannot unlink the chain binding this volume to the wall.
+
+
+
+1
+1
+1
+
+#69
+Archives; 3
+A sign on the door says "Library Archives. Serious scholars only."
+109
+-1
+-1
+65
+-1
+
+You go through the door labeled "Archives" and follow a long twisty staircase down into the Earth.
+
+wanders down into the Archives.
+1
+0
+2
+
+#70
+Archives
+You are surrounded by dusty library stacks. You can go left, right, or back the way you came.
+-1
+96
+79
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#71
+Archives
+You are surrounded by dusty library stacks. You can go left, right, or back the way you came.
+-1
+103
+82
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#72
+Archives
+You are surrounded by dusty library stacks. You can go left, right, or back the way you came.
+-1
+-1
+85
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#73
+Archives
+You are surrounded by dusty library stacks. You can go left, right, or back the way you came.
+-1
+-1
+88
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#74
+Archives
+You are surrounded by dusty library stacks. You can go left, right, or back the way you came.
+-1
+-1
+91
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#75
+Archives
+You are surrounded by dusty library stacks. You can go left, right, or back the way you came.
+-1
+-1
+94
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#76
+Archives
+You are at a dead end deep in the bowels of the dusty library stacks. From here you can only go back the way you came.
+-1
+102
+95
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#77
+l;left
+
+72
+-1
+-1
+-1
+-1
+
+
+
+
+1
+0
+2
+
+#78
+r;right
+
+70
+-1
+-1
+77
+-1
+
+
+
+
+1
+0
+2
+
+#79
+b;back
+
+71
+-1
+-1
+78
+-1
+
+
+
+
+1
+0
+2
+
+#80
+l;left
+
+70
+-1
+-1
+-1
+-1
+
+
+
+
+1
+0
+2
+
+#81
+r;right
+
+72
+-1
+-1
+80
+-1
+
+
+
+
+1
+0
+2
+
+#82
+b;back
+
+71
+-1
+-1
+81
+-1
+
+
+
+
+1
+0
+2
+
+#83
+r;right
+
+71
+-1
+-1
+-1
+-1
+
+
+
+
+1
+0
+2
+
+#84
+l;left
+
+70
+-1
+-1
+83
+-1
+
+
+
+
+1
+0
+2
+
+#85
+b;back
+
+73
+-1
+-1
+84
+-1
+
+
+
+
+1
+0
+2
+
+#86
+l;left
+
+72
+-1
+-1
+-1
+-1
+
+
+
+
+1
+0
+2
+
+#87
+r;right
+
+74
+-1
+-1
+86
+-1
+
+
+
+
+1
+0
+2
+
+#88
+b;back
+
+70
+-1
+-1
+87
+-1
+
+
+
+
+1
+0
+2
+
+#89
+l;left
+
+70
+-1
+-1
+-1
+-1
+
+
+
+
+1
+0
+2
+
+#90
+r;right
+
+71
+-1
+-1
+89
+-1
+
+
+
+
+1
+0
+2
+
+#91
+b;back
+
+75
+-1
+-1
+90
+-1
+
+
+
+
+1
+0
+2
+
+#92
+l;left
+
+76
+-1
+-1
+-1
+-1
+
+
+
+
+1
+0
+2
+
+#93
+r;right
+
+70
+-1
+-1
+92
+-1
+
+
+
+
+1
+0
+2
+
+#94
+b;back
+
+72
+-1
+-1
+93
+-1
+
+
+
+
+1
+0
+2
+
+#95
+b;back
+
+73
+-1
+-1
+-1
+-1
+
+
+
+
+1
+0
+2
+
+#96
+"No Exit" by Sartre
+One often finds oneself lost in a maze of seemingly-identical options; such a state is not to be feared, but to be seized, as a key to achieving the emotional understanding of Being that is denied the intellect alone.
+70
+-1
+70
+-1
+-1
+
+
+
+
+1
+1
+1
+
+#97
+"Elements" by Euclid
+To begin, we must set forth axioms that are accepted by all. Our first axiom is the following: any object which is not a room, thing, or exit is animate, and capable of free will.
+76
+-1
+76
+100
+-1
+
+
+
+
+1
+1
+1
+
+#98
+"Two Treatises of Government" by John Locke
+Without private property, none are free. And how can property be private when any stranger can carry it away? For this reason we are granted the power to lock our possessions to ourselves, that no other man may take them.
+76
+-1
+76
+101
+-1
+
+
+
+
+1
+1
+1
+
+#99
+"Das Kapital" by Karl Marx
+The bourgeoisie naturally seeks to protect its capital by whatever means are available. By doing so they lock themselves away from society, trapped in a vicious circle of alienation that can end only in open class warfare.
+76
+-1
+76
+-1
+-1
+
+
+
+
+1
+1
+1
+
+#100
+"Tao Te Ching" by Lao-Tzu
+All things are but images of the Tao, and thus all things can be returned to the Tao. It furthers one to accept the necessity of sacrifice.
+76
+-1
+76
+187
+-1
+
+
+
+
+1
+1
+1
+
+#101
+"The Monadology" by Gottfried Leibniz
+Every object is a monad unto itself; it has its place that cannot be shaken by the actions of other monads. Though for a time a monad may appear to be displaced, it cannot be removed forever.
+76
+-1
+76
+120
+-1
+
+
+
+
+1
+1
+1
+
+#102
+"On Alchemy" by Paracelsus
+Every endeavour has four effects, one on the wise man who proceeds effectively, one on the fool who fails to act, one on those whose wisdom is increased by the example of the Alchemist, and one on those who rightly chide the fool.
+76
+-1
+76
+98
+-1
+
+
+
+
+1
+1
+1
+
+#103
+"No Exit" by Sartre
+The key to realizing the existential nature of Being lies in angst, in the feeling of nausea that comes from the recognition of the contingent nature of existence.
+71
+-1
+71
+-1
+-1
+
+
+
+
+1
+1
+1
+
+#104
+The Lost Book of Undocumented Commands
+goto <dir>, take <thing>, read <thing>, @link <object> = <room #> (set home), @link <room> = <room #> (set drop-to), @unlink <room> (remove drop-to), @open <direction>[;<direction>]* = <room #> (combined open and link)
+34
+-1
+34
+67
+1
+The book documents all and only those commands which are not documented. But then it must document no commands, otherwise it contradicts its title! Therefor, you reason, the book must be empty, and not worthing picking up.
+
+
+
+1
+1
+1
+
+#105
+suppl;supplements;sup;supp;in;further;further in
+
+106
+-1
+-1
+66
+-1
+
+
+
+goes further in to the Supplements.
+1
+0
+2
+
+#106
+Oxford English Dictionary Overflow Room
+You are in the overflow room for less-popular volumes of the Oxford English Dictionary. There is a single door in this room, labeled "exit."
+-1
+58
+107
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#107
+exit; out; back; leave
+
+64
+-1
+-1
+-1
+-1
+
+
+
+
+1
+0
+2
+
+#108
+Oxford English Dictionary of Commands, "@Set"
+Syntax: @set <object> = <flag>, @set <object> = !<flag>. Sets (first form) or resets (second form) <flag> on <object>. Current flags are DARK, LINK_OK, STICKY, TEMPLE, and WIZARD.
+106
+-1
+106
+53
+1
+That volume is set firmly into the floor.
+
+
+
+1
+1
+1
+
+#109
+Landing on Stairway
+You are on a landing deep below the Library. From here you can go back up to the Reference room, or continue down on the stairs. The down staircase is covered with dust and in poor repair.
+-1
+-1
+111
+-1
+-1
+
+
+
+
+1
+0
+32
+
+#110
+up;u;back;out;leave;exit
+
+30
+-1
+-1
+-1
+-1
+
+You trudge wearily up the long twisty staircase.
+
+trudges wearily up the stairs.
+1
+0
+2
+
+#111
+down; d
+
+70
+-1
+-1
+110
+-1
+
+You trudge down the staircase for what seems like several hours, brushing aside cobwebs and choking on dust. Suddenly, you notice that there isn't a stair under your foot. You fall...
+
+goes down the stairs.
+1
+0
+2
+
+#112
+Encyclopedias; 2
+
+113
+-1
+-1
+69
+-1
+
+
+
+goes to the Encyclopedia room.
+1
+0
+2
+
+#113
+Encyclopedia Collection
+You are in the room holding the Library's collection of encyclopedias. There is a single door in this room, labeled "Exit."
+-1
+264
+114
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#114
+exit; out; back; leave
+
+30
+-1
+-1
+-1
+-1
+
+
+
+
+1
+0
+2
+
+#115
+Volume One, Control
+There are three rules for determining control: 1. You control anything you own. 2. A wizard controls anything. 3. Anybody controls an unlinked exit (even if it is locked). Builders should watch out for (3).
+113
+-1
+113
+-1
+1
+When you try to pick that up, you suddenly lose control of you balance and drop it.
+
+
+
+1
+1
+1
+
+#116
+desk
+You see a very large, antique oak desk, piled high with more books.
+30
+-1
+30
+-1
+1
+The desk is much too heavy to ever lift. However, while you try, a little old lady comes out from behind the desk and staples a sign reading "Kick me" to your forehead.
+
+
+
+1
+1
+1
+
+#117
+little old lady
+A little old blue-haired prune-faced librarian is sitting quietly behind the desk.
+30
+-1
+30
+116
+1
+The little old lady cries "Get away, you evil masher," scolds, kicks, sticks, spikes, sprays, beats, threatens, and staples you, shouts for the Library Police, crushes your knuckles with a ruler, and hits you with her lead-lined purse.
+
+
+
+1
+1
+1
+
+#118
+Oxford English Dictionary of Commands, "@Ofail"
+Syntax: @ofail <object> [= <message>]. Without a message argument, clear the ofail message on <object>, otherwise set it. The ofail message, prefixed by the player's name, is shown to others when the player fails to use <object>.
+106
+-1
+106
+108
+1
+You fail to pick that volume up.
+
+fails to pick up the volume labeled "Ofail"
+
+1
+1
+1
+
+#119
+Oxford English Dictionary of Commands, "Examine"
+Syntax: examine <name>, examine #<number>. Print a detailed description of object specified by <name> or by <number>. You must control the object to examine it.
+106
+-1
+106
+118
+1
+Upon examining the weighty tome, you notice that it is too heavy to lift.
+
+
+
+1
+1
+1
+
+#120
+"A Treatise Concerning the Principles of Human Knowledge" by Berkeley
+If a tree falls in the forest, and there are none to hear it, has it indeed fallen? To be is to be perceived; thus as the last perceiver leaves, might not what he thought to leave behind leave also?
+76
+-1
+76
+97
+-1
+
+
+
+
+1
+1
+1
+
+#121
+guy
+You see one helluva Guy.
+128
+-1
+128
+-1
+121
+You stole a penny.
+The Leprechaun hit. --MORE--
+is tricked into thinking he has stolen a penny from guy.
+takes a penny out of his pocket, looks at it, and puts it back.
+121
+1519
+3
+potrzebie
+#122
+Oxford English Dictionary of Commands, "Kill"
+Syntax: kill <player> [= <cost>]. Kill the specified player. Killing costs either <cost> pennies or 10 pennies, whichever is greater. The probability of success is proportional to the cost.
+64
+-1
+64
+45
+1
+A little old lady comes out from behind the reference desk and pumps two rounds of buckshot into your chest.
+
+
+
+1
+1
+1
+
+#123
+down;d;jump;pit;sacrifice;leap;jump down;jump pit;offer;offer sacrifice;jump into pit
+You see a fiery pit. It looks like there may be something at the bottom of it, but the flames hide what it is.
+124
+-1
+-1
+27
+-1
+
+You jump into the pit. You fall! Flames lick at your clothing, threatening to set them on fire. Maybe this wasn't such a good idea...
+
+just jumped into the fiery pit!
+1
+0
+2
+
+#124
+Junkpile
+You in a deep underground cave, on top of a large pile of junk. Above you flames come out of fissures in the rock and rush up into a hole cut in the ceiling.
+-1
+-1
+269
+-1
+-1
+
+
+
+
+1
+0
+32
+
+#125
+u;up;fly;out;leave;back
+
+3
+-1
+-1
+-1
+188
+You can't jump that high!
+You float upward through the flames.
+
+floats upward through the flames.
+1
+0
+2
+
+#126
+south; s
+You notice a glimmer of light to the south.
+5
+-1
+-1
+125
+-1
+
+You crawl through a long, dark passageway which twists and turns through the bowels of the Earth. Finally you reach the end: a manhole cover.
+
+crawls into a tunnel to the south.
+1
+0
+2
+
+#127
+Oxford English Dictionary of Commands, "@Find"
+Syntax: @find <name>. Print the name and object number of every room, thing, or player that you control whose name matches <name>. Because the find command is computationally expensive, there is a small charge for using it.
+106
+-1
+106
+119
+1
+You can't seem to find a way to lift that volume.
+
+
+
+1
+1
+1
+
+#128
+1452 Barnsdale Street
+You are on the second floor of a comfortable but messy house in Squirrel hill.
+-1
+121
+242
+-1
+-1
+
+
+
+
+121
+0
+0
+
+#129
+bus; 67 Bus; take bus; town square; town
+
+5
+-1
+-1
+-1
+-1
+
+A 67 F Bus (Trafford) whisks you down Wilkins, letting you off in the Town Square.
+
+says "rags, take bus"
+121
+0
+2
+
+#130
+The grand bazaar
+You are standing in a bazaar, where merchants come to trade their stuff. Don't leave your goods unattended here! Some fields lie to the North, with tents to the East, South and West.
+-1
+-1
+190
+-1
+163
+The tents have signs: "Visit the CRAFTY CAMEL; admission one bushel of wheat."...."Come trade at OMAR's OASIS; admission one goat."...."Browse at the SHOP OF THE DESERT; admission one horse.
+As you step into the bazaar, the rug seems to flutter, even though there is no breeze blowing.
+
+
+121
+0
+0
+
+#131
+In the fields
+You are standing between a corn field and a wheat field. An oasis shimmers to the north, and a group of tents lies to the south of you. You might be able to harvest some of the grain growing here.
+-1
+-1
+259
+-1
+-1
+
+
+
+
+121
+0
+0
+
+#132
+wheat field
+You are in a large wheat field north of the bazaar. There is a corn field to the West.
+-1
+142
+260
+-1
+142
+About a bushel of wheat can be harvested.
+There's not much to be gleaned here.
+
+
+121
+0
+0
+
+#133
+corn field
+You stand in a field of waving corn, north of the bazaar. There is wheat growing to the East.
+-1
+143
+261
+-1
+143
+A bushel of ripe ears are available.
+The pickings are quite slim now.
+
+
+121
+0
+0
+
+#134
+The Crafty Camel
+You are just inside the entrance of the tent of the crafty camel. It seems that the goods sold here are of low quality.
+-1
+-1
+159
+-1
+145
+Jeff has a special today: buy a goat for a bushel of corn.
+Akhbar is offering to sell a vat of yoghurt in exchange for a bushel of corn.
+
+
+121
+0
+0
+
+#135
+Jeff's
+This corner of the tent is owned by Jeff.
+-1
+145
+160
+-1
+-1
+
+
+
+
+121
+0
+0
+
+#136
+Akhbars
+You are in a dilapidated corner of the tent that smells like rancid milk.
+-1
+144
+161
+-1
+-1
+
+
+
+
+121
+0
+0
+
+#137
+bazaar
+
+130
+-1
+-1
+129
+-1
+
+You fall asleep, dreaming that you are in some kind of middle-eastern marketplace...
+
+
+121
+0
+2
+
+#138
+n;north;fields
+
+131
+-1
+-1
+-1
+-1
+
+
+
+
+121
+0
+2
+
+#139
+e;east;visit;camel;crafty camel;crafty;visit crafty camel
+
+134
+-1
+-1
+138
+142
+You can't pay the admission; come back when you have the bread.
+Please leave your admission price by the door.
+
+
+121
+0
+2
+
+#140
+s;south;trade;omar's;omar;oasis;omar's oasis;omars oasis;omars
+
+169
+-1
+-1
+139
+145
+I'm afraid that Omar declines to admit you on credit. You have no goat and you smell bad.
+Remember to surrender your goat before you leave!
+
+
+121
+0
+2
+
+#141
+w;west;browse;shop;desert;shop of the desert
+
+170
+-1
+-1
+140
+146
+You try to sneak in without paying, but a guy in a turban who makes Swartzeneggar look like Pee-Wee Herman tosses you out.
+Don't forget to pay the admission price before you go.
+
+
+121
+0
+2
+
+#142
+a bushel of wheat
+
+132
+-1
+132
+-1
+-1
+
+
+
+
+121
+1
+257
+
+#143
+a bushel of corn
+
+133
+-1
+133
+-1
+-1
+
+
+
+
+121
+1
+257
+
+#144
+a vat of yoghurt
+
+136
+-1
+136
+-1
+-1
+
+
+
+
+121
+1
+257
+
+#145
+a goat
+
+135
+-1
+135
+-1
+-1
+
+
+
+
+121
+1
+257
+
+#146
+a fine Arabian horse
+
+168
+-1
+168
+-1
+-1
+
+
+
+
+121
+1
+257
+
+#147
+out;w;west;leave;exit;bazaar
+
+130
+-1
+-1
+-1
+142
+As you try to leave, the management reminds you that you haven't paid your admission of a bushel of wheat.
+
+
+
+121
+0
+10
+
+#148
+s;south;bazaar
+
+130
+-1
+-1
+-1
+-1
+
+
+
+
+121
+0
+2
+
+#149
+n;north
+
+195
+-1
+-1
+148
+-1
+
+
+
+
+121
+0
+2
+
+#150
+e;east;wheat;harvest wheat
+
+132
+-1
+-1
+149
+142
+There isn't enough new growth to harvest yet.
+
+
+
+121
+0
+10
+
+#151
+w;west;harvest corn;corn
+
+133
+-1
+-1
+150
+143
+The corn is as low as an elephant's toe!
+
+
+
+121
+0
+10
+
+#152
+s;south;bazaar
+
+130
+-1
+-1
+-1
+-1
+
+
+
+
+121
+0
+2
+
+#153
+e;east;n;north
+
+132
+-1
+-1
+152
+-1
+
+
+
+
+121
+0
+2
+
+#154
+corn;corn field;harvest corn;w;west
+
+133
+-1
+-1
+153
+-1
+
+
+
+
+121
+0
+2
+
+#155
+s;south;bazaar
+
+130
+-1
+-1
+-1
+-1
+
+
+
+
+121
+0
+2
+
+#156
+w;west;n;north
+
+133
+-1
+-1
+155
+-1
+
+
+
+
+121
+0
+2
+
+#157
+wheat;wheat field;harvest wheat;e;east
+
+132
+-1
+-1
+156
+-1
+
+
+
+
+121
+0
+2
+
+#158
+akhbar;buy from akhbar;sell to akhbar;buy yoghurt;yoghurt;vat;buy vat
+
+136
+-1
+-1
+147
+143
+No corn, no deal!
+Akhbar shakes your hand warmly, as you approach his corner of the tent.
+
+
+121
+0
+2
+
+#159
+goat;jeff;buy from jeff;sell to jeff;buy goat
+
+135
+-1
+-1
+158
+143
+Jeff just shakes his head, muttering something inaudible.
+'Come to my part of the tent' says Jeff with a greedy glint in his eyes.
+
+
+121
+0
+2
+
+#160
+leave;out;back;exit
+
+134
+-1
+-1
+-1
+143
+As you try to get away, Jeff objects: 'What of our deal, Sahib? You must give me your corn!'
+
+
+
+121
+0
+10
+
+#161
+leave;out;exit;back
+
+134
+-1
+-1
+-1
+143
+Akhbar grabs your hand: `No one leaves Akhbar with paying!'
+
+
+
+121
+0
+10
+
+#162
+a fierce-looking scimitar
+
+167
+-1
+167
+-1
+-1
+
+
+
+
+121
+1
+257
+
+#163
+a handsome Persian rug
+
+171
+-1
+171
+-1
+-1
+
+
+
+
+121
+1
+257
+
+#164
+a gilded scarab
+
+172
+-1
+172
+-1
+-1
+
+
+
+
+121
+50
+257
+
+#165
+jeff's
+
+135
+-1
+-1
+141
+121
+
+
+
+
+121
+0
+2
+
+#166
+akhbar's
+
+136
+-1
+-1
+165
+121
+
+
+
+
+121
+0
+2
+
+#167
+Abdul's
+This is where Abdul plies his trade.
+-1
+162
+176
+-1
+-1
+
+
+
+
+121
+0
+0
+
+#168
+Cleopatra's
+The sultry Cleopatra offers her wares here--she's some piece of asp!
+-1
+146
+177
+-1
+-1
+
+
+
+
+121
+0
+0
+
+#169
+Omar's Oasis
+This tent is less run-down than the Crafty Camel. Omar himself is a short fellow in a fez, with a smile that shows a mouthful of gold teeth.
+-1
+-1
+175
+-1
+146
+In the far corner of the tent, Cleopatra has a horse for sale. Price: a quantity of cultured dairy product.
+Abdul, in one corner of the tent, indicates that he would trade a dangerous-looking scimitar for a vat of tasty yoghurt.
+
+
+121
+0
+0
+
+#170
+The Shop of the Desert.
+This tent is obviously the poshest in the bazaar. Rich furnighings are everywhere, and the smell of American Express Platinum Cards fills the tent.
+-1
+-1
+185
+-1
+164
+Ali Baba, a rug merchant, has a beautiful persian rug on display. His asking price is a scimitar, for he claims magical properties for his rug: "May the beard of my aged grandfather blow away in the wind if I am lying!"
+Samreny catches your eye with an ancient scarab he has for sale. He says he would part with it for a scimitar, and that he couldn't sell it to his own grandmother for less!
+
+
+121
+0
+8
+
+#171
+Ali Baba's
+Ali Baba, the rug merchant, has his goods spread out in this corner of the tent.
+-1
+163
+182
+-1
+-1
+
+
+
+
+121
+0
+0
+
+#172
+Samreny's
+You are now in Samreny's Scarab City. It smells of shish-kebab.
+-1
+164
+186
+-1
+-1
+
+
+
+
+121
+0
+0
+
+#173
+leave;out;exit;bazaar
+
+130
+-1
+-1
+-1
+145
+Omar produces a pistol and insists that you surrender the goat. "It was to be your admission, remember?" he reminds you.
+
+
+
+121
+0
+10
+
+#174
+abdul;abduls;abdul's;buy scimitar;trade yoghurt for scimitar;scimitar
+
+167
+-1
+-1
+173
+144
+"Did you come here to trade, or are you just a stupid tourist?" says Abdul, who points out that you have no yoghurt to offer him.
+Abdul kisses you on both cheeks as he leads you to his corner of the tent.
+
+
+121
+0
+2
+
+#175
+cleopatra;cleopatras;cleopatra's;buy horse;horse
+
+168
+-1
+-1
+174
+144
+Cleopatra hisses at you: "Are you here for a handout? Come back when you have some yoghurt to trade!"
+Cleopatra takes you by the hand to a corner of the tent she has set up as a stable.
+
+
+121
+0
+2
+
+#176
+out;exit;leave;back
+
+169
+-1
+-1
+-1
+144
+"Give up the yoghurt you promised!" shouts Abdul angrily, as he prevents you from leaving.
+"Have a nice day" says Abdul, obsequiously, as you leave his part of the tent.
+
+
+121
+0
+10
+
+#177
+out;exit;leave;back
+
+169
+-1
+-1
+-1
+144
+A dangerous-looking snake bars your exit. It seems that Cleopatra won't let you get away without giving her the yoghurt.
+"It was a pleasure doing business with you" says Cleopatra as you return to the main part of the tent.
+
+
+121
+0
+10
+
+#178
+abdul's
+
+167
+-1
+-1
+166
+121
+
+
+
+
+121
+0
+2
+
+#179
+cleopatra's
+
+168
+-1
+-1
+178
+121
+
+
+
+
+121
+0
+2
+
+#180
+ali baba's
+
+171
+-1
+-1
+179
+121
+
+
+
+
+121
+0
+2
+
+#181
+samreny's
+
+172
+-1
+-1
+180
+121
+
+
+
+
+121
+0
+2
+
+#182
+out;leave;back;exit
+
+170
+-1
+-1
+-1
+162
+Ali Baba refuses to let you out without surrendering the scimitar you promised him.
+
+
+
+121
+0
+10
+
+#183
+out;leave;exit;bazaar
+
+130
+-1
+-1
+-1
+146
+A security guard stops you on you way out and demands that you give up the horse you have with you.
+
+
+
+121
+0
+10
+
+#184
+ali baba;ali baba's;ali babas;ali;baba;alis;ali's;babas;baba's;buy rug;buy carpet
+
+171
+-1
+-1
+183
+162
+"Where's your scimitar?" barks Ali Baba, who unceremoniously sends you away.
+Ali Baba seems very pleased as you approach him.
+
+
+121
+0
+2
+
+#185
+samreny;samrenys;samreny's;buy scarab;scarab
+
+172
+-1
+-1
+184
+162
+Samreny just looks at you like you were from Mars.
+"Good, Good!" exclaims Samreny, as he ushers you toward his little corner of the tent.
+
+
+121
+0
+2
+
+#186
+out;exit;leave;back
+
+170
+-1
+-1
+-1
+162
+"First you must part with your scimitar!" Samreny insists.
+
+
+
+121
+0
+10
+
+#187
+"The Parable of the Ass" by Jean Buridan
+Once there was an ass, placed exactly between two identical piles of hay; lacking the means to decide between them, he starved. How much more fortunate are we, who choose randomly between identical alternatives!
+76
+-1
+76
+99
+-1
+
+
+
+
+1
+1
+1
+
+#188
+The Wizard's Pointy Hat
+You see a pointy hat covered with obscure mystic symbols.
+1
+-1
+250
+-1
+1
+The hat runs away from you when you try to pick it up.
+You put on your hat. Suddenly you feel much better.
+tries to pick up the Wizard's hat, but it runs away.
+puts on his hat.
+1
+1
+257
+
+#189
+Construction Price List
+@dig: 10p. @create: 10p (or more). @open: 1p. @link: 1p, +1p to the previous owner if you didn't already own the exit. Sacrifice value of an object is (cost/5)-1.
+32
+-1
+32
+-1
+-1
+
+
+
+
+1
+1
+257
+
+#190
+fly;ride carpet;ride rug;fly carpet;fly rug;fly magic carpet;up;drop rug;drop carpet
+
+191
+-1
+-1
+181
+163
+
+As you mount the carpet, it ascends high into the air above the bazaar, and begins heading off over the desert. You can see a caravan crossing far below you on the boundless sand. You hit some turbulence, and the carpet sputters. CRASH!
+
+
+121
+0
+2
+
+#191
+The middle of the desert
+You are in the middle of a vast desert with sand as far as the eye can see in all directions. Luckily for you, a large caravan is passing through right now.
+-1
+-1
+193
+-1
+163
+The sheik offers to take you back to town, in exchange for the fine rug you have.
+The sheik thanks you for the fine rug, and offers to take you in to town with him.
+
+
+121
+0
+8
+
+#192
+n;s;e;w;north;south;east;west;ne;nw;se;sw;northeast;northwest;southeast;southwest
+
+191
+-1
+-1
+-1
+-1
+
+It's no use wandering around in the desert. You could be lost for days. Better join the caravan.
+
+
+121
+0
+2
+
+#193
+town;back to town;join caravan;caravan;ride;hitch;hitch ride
+
+5
+-1
+-1
+192
+163
+The sheik insists that you must drop the rug before he will allow you to join his caravan.
+On the short caravan ride back to town square, you enjoy a few minutes of rest. Agriculture and trading can certainly be exhausting!
+
+
+121
+0
+10
+
+#194
+Eastward Ho Caravan Tours
+This is the departure point for Easward Ho Desert Tours. The town lies to the north and west of here. You can join one of their relaxing tours by mounting one of the remaining camels.
+-1
+-1
+199
+-1
+-1
+
+
+
+
+121
+0
+0
+
+#195
+The Oasis
+You are at an Oasis at the edge of a vast desert, which stretches out to the north, east and west. Date palms grow by the blue water here. To the south, you can see some fields of golden grain.
+-1
+-1
+258
+-1
+-1
+
+
+
+
+121
+0
+0
+
+#196
+n;north;e;east;w;west;ne;nw;northeast;northwest
+
+195
+-1
+-1
+-1
+121
+I don't think it would be a good idea to wander off into the desert like that. It goes on for miles, and you would certainly die of thirst.
+
+
+
+121
+0
+2
+
+#197
+s;south;fields;grain
+
+131
+-1
+-1
+196
+-1
+
+
+
+
+121
+0
+2
+
+#198
+join;join tour;mount;mount camel;join caravan;south;s;e;east;southeast;se
+It seems like the desert stretches on forever.
+195
+-1
+-1
+-1
+-1
+
+You mount one of the camels, and begin to travel southeast through the seemingly endless desert. After some time, you arrive at a beautiful oasis, where you debark. The caravan moves on, leaving you alone.
+
+
+121
+0
+2
+
+#199
+n;north;w;west;nw;northwest
+
+5
+-1
+-1
+198
+-1
+
+
+
+
+121
+0
+2
+
+#200
+an owl
+You see a curmudgeonly owl sitting between a perch bolted to the floors.
+12
+-1
+0
+24
+1
+The owl recedes into infinity as you approach, screeching hysterically.
+
+turns into a point and vanishes for a moment.
+
+1
+1
+1
+
+#201
+desk
+You see an ornately-carved antique roll-top desk.
+250
+-1
+250
+-1
+1
+The desk is far too heavy to lift.
+
+strains and heaves at the Wizard's desk, but cannot lift it.
+
+1
+1
+1
+
+#202
+Volume Three, Stickiness
+If a thing is STICKY, it immediately goes home when dropped. If a room is STICKY, its dropto is delayed until the last person leaves the room. Stickiness is not meaningful for players or exits.
+113
+-1
+0
+253
+1
+That volume is stuck to the floor.
+
+
+
+1
+1
+1
+
+#203
+Darooha
+You see one incredibly dude.
+244
+223
+244
+243
+203
+Darooha gives you a penny.
+
+tries to steal a penny from Darooha, but fails
+
+203
+256
+3
+potrzebie
+#204
+buds
+-------- Bud's Cafe, an Ostentatious Eatery -------- (ring bell for service)
+-1
+207
+245
+-1
+-1
+
+
+
+
+203
+0
+8
+
+#205
+exit;ne;town;square;quit;out;town square
+
+5
+-1
+-1
+-1
+-1
+
+
+
+
+203
+0
+2
+
+#206
+black tie
+You see a black tie with a tag on the back reading: "If found, return to Bud's Cafe, Town Square SW."
+204
+-1
+204
+208
+207
+You can't wear two ties at once!
+
+
+
+203
+1
+9
+
+#207
+white tie
+You see a white tie with a tag on the back reading: "If found, return to Bud's Cafe, Town Square SW."
+204
+-1
+204
+209
+206
+You can't wear two ties at once!
+
+
+
+203
+1
+9
+
+#208
+black jacket
+You see a black jacket with a tag inside the collar reading: "If found return to Bud's Cafe, Town Square SW."
+204
+-1
+204
+236
+209
+You can't wear two jackets at once!
+
+
+
+203
+1
+9
+
+#209
+white jacket
+You see a white jacket with a tag inside the collar reading: "If found return to Bud's Cafe, Town Square SW."
+204
+-1
+204
+206
+208
+You can't wear two jackets at the same time!
+
+
+
+203
+1
+9
+
+#210
+white room;white
+
+211
+-1
+-1
+205
+207
+A waiter dressed entirely in white taps you on the shoulder and says "Please sir, in deference to our sensitive guests, we request that you dress appropriately before entering that room."
+good job
+
+
+203
+0
+2
+
+#211
+white room
+You're standing at the entrance of a white dining room. All of the "dinner guests" (as Bud likes to call them) are dressed in white, and are drinking, eating and talking pleasantly.
+-3
+-1
+214
+-1
+-1
+
+On the other side of the room is a door to the rest room. In back of you is the entrance of the cafe.
+
+
+203
+0
+256
+
+#212
+entrance;lobby;exit;back;out
+
+204
+-1
+-1
+-1
+207
+(I don't think it would be wise to proceed back to the entrance without your white tie. You'll probably need it later.)
+
+
+
+203
+0
+2
+
+#213
+rest room
+You're in a small rest room. There are doors here to the punk room the Warhol room, the white room and the black room.
+-3
+-1
+241
+-1
+-1
+
+
+
+
+203
+0
+256
+
+#214
+rest room;rest
+
+213
+-1
+-1
+212
+209
+As you begin to walk across the room the pleasant hum of conversation dies into silence. Everyone in the room is staring at you. You hear the sound of quick inhalations. You retreat in shame.
+
+
+
+203
+0
+2
+
+#215
+white room;white
+
+211
+-1
+-1
+-1
+209
+A waiter calls to you "Sir, you really can't come in here without an appropriate jacket." You return to the rest room.
+
+
+
+203
+0
+2
+
+#216
+black room
+You're standing at the entrance of a black dining room. All of the dinner guests are dressed in black, and are drinking, eating and talking pleasantly.
+-3
+-1
+239
+-1
+-1
+
+Across the room is a door to the rest room. In back of you is the entrance of the cafe.
+
+
+203
+0
+256
+
+#217
+black room;black
+
+216
+-1
+-1
+210
+208
+A waiter dressed entirely in black taps you on the shoulder and says "Please sir, in deference to our sensitive guests, we request that you dress appropriately before entering that room."
+
+
+
+203
+0
+2
+
+#218
+rest room;rest
+
+213
+-1
+-1
+-1
+206
+As you begin to walk across the room the pleasant hum of conversation dies into silence. Everyone in the room is staring at you. You hear the sound of quick inhalations. You retreat in shame.
+
+
+
+203
+0
+2
+
+#219
+black room;black
+
+216
+-1
+-1
+215
+206
+As you step out of the rest room, a waiter grabs you by the shoulders, turns you around, says "you'll have to wear a more appropriate tie to enter the black room", and pushes you back into the rest room.
+
+
+
+203
+0
+2
+
+#220
+punk room
+You're standing at the entrance of the punk dining room. The people (giving the benefit of the doubt) in the room present the most dazzling array of punkdome you've ever seen.
+-3
+-1
+233
+-1
+-1
+
+The pounding-screeching sounds (emanating from eight one meter diameter Ed-209 diesel powered speakers) is to heavy metal as heavy metal is to Mozart. Beyond the punkers, you see a room with a view. In back of you is the rest room.
+
+
+203
+0
+256
+
+#221
+warhol room
+You're standing in the door of the Warhol room. Everybody is smoking and drinking and talking, and making videos of each other, and wearing a black tie and a white jacket. But most peculiar of all, everybody looks exactly like Andy Warhol.
+-3
+-1
+230
+-1
+-1
+
+At the other side of the room is a room with an expansive view of the sea. In back of you is the rest room.
+
+
+203
+0
+256
+
+#222
+punk room;punk
+
+220
+-1
+-1
+219
+207
+A 6 foot 2, 240 pound, pimply-faced, ring-nosed, purple haired, swastika-tattooed punk, with studs surgically embedded around his wrists, blocks you and says "Where the fuck do you think you're going, looking like that?"
+
+
+
+203
+0
+2
+
+#223
+changing room
+
+203
+-1
+-1
+226
+-1
+
+
+
+
+203
+0
+2
+
+#224
+cheat
+
+204
+-1
+-1
+222
+203
+
+
+
+
+203
+0
+2
+
+#225
+rest room;rest
+
+213
+-1
+-1
+-1
+207
+(I suggest that you take your white tie with you.)
+
+
+
+203
+0
+2
+
+#226
+tubular room
+
+203
+-1
+-1
+-1
+-1
+
+
+
+
+203
+0
+2
+
+#227
+warhol room;warhol
+
+221
+-1
+-1
+224
+206
+A man resembling Andy Warhol (on his death bed) blocks your way with a giant red plastic baseball bat.
+
+
+
+203
+0
+2
+
+#228
+rest room;rest
+
+213
+-1
+-1
+-1
+206
+(I suggest that you wear your black tie to the rest room.)
+
+
+
+203
+0
+2
+
+#229
+view room
+You enter a room with an expansive view of the sea. Pungent scent of savory magret de canard a l'orange (your favorite) floats through the room. You enjoy a marvelous dinner, and the waiter offers you any bottles of wine you can find.
+-3
+238
+234
+-1
+-1
+
+
+
+
+203
+0
+256
+
+#230
+view room;view
+
+229
+-1
+-1
+228
+209
+All the Andy Warhols scream simultaneously "you're not sufficiently Warhol. You can't come in here."
+
+
+
+203
+0
+2
+
+#231
+warhol room;warhol
+
+221
+-1
+-1
+-1
+209
+(I suggest you take your white jacket with you.)
+
+
+
+203
+0
+2
+
+#232
+cheat
+
+213
+-1
+-1
+231
+203
+
+
+
+
+203
+0
+2
+
+#233
+view room;view
+
+229
+-1
+-1
+225
+208
+A woman with a rigid purple stellated icosahedron of hair screams at you (through a megaphone, otherwise you couldn't have heard it) "get out of here, you slob."
+
+
+
+203
+0
+2
+
+#234
+punk room;punk
+
+220
+-1
+-1
+232
+208
+(I suggest you take your black jacket with you.)
+
+
+
+203
+0
+2
+
+#235
+cheat
+
+213
+-1
+-1
+217
+203
+
+
+
+
+203
+0
+2
+
+#236
+notice
+The management keeps a supply of two jackets and two ties for the use of our patrons. If you borrow these, please return them to this room before you leave the cafe. Thank you. --The management
+204
+-1
+229
+-1
+203
+
+
+
+
+203
+1
+1
+
+#237
+red wine
+A bottle of Chateau le feet Rothchild, 1954
+229
+-1
+229
+-1
+209
+The waiter whispers in your ear that it would offend some of the patrons if you were to carry such a magnificant bottle of red wine unless you were wearing a white jacket.
+
+
+
+203
+25
+1
+
+#238
+white wine
+A bottle of 1962 Cordon Blu
+229
+-1
+229
+237
+208
+The waiter gently indicates that it is not appropriate to carry such a good bottle of champaign without wearing a black jacket.
+
+
+
+203
+25
+1
+
+#239
+entrance;out;lobby;exit;back
+
+204
+-1
+-1
+218
+208
+(You probably ought to take the black jacket with you.)
+
+
+
+203
+0
+2
+
+#240
+ring;bell;ring bell
+
+204
+-1
+-1
+235
+-1
+
+The maitre d' appears and says "Good evening gentlemen. We'll be serving you supper in our view room tonight. Please make your way there via the white room or the black room."
+
+
+203
+0
+2
+
+#241
+cheatview
+
+229
+-1
+-1
+227
+203
+
+
+
+
+203
+0
+2
+
+#242
+limbo
+
+0
+-1
+-1
+137
+-1
+
+
+
+
+121
+0
+2
+
+#243
+Note to the Wiz
+Ok WIZARD, it's time to get to work on 15-211.. (1) get an andrew account. (2) get a GOOD version of lint working there. (ask doug for advice) (3) check out debugging on andrew (4) check out profiling .
+244
+-1
+5
+-1
+-1
+
+
+
+
+203
+1
+1
+
+#244
+Darooha's Hideout
+
+-1
+203
+246
+-1
+-1
+
+
+
+
+203
+0
+0
+
+#245
+hideout
+
+244
+-1
+-1
+240
+203
+
+
+
+
+203
+0
+2
+
+#246
+out;buds;exit;
+
+204
+-1
+-1
+-1
+-1
+
+
+
+
+203
+0
+2
+
+#247
+a copy of the Hardy Boys book: While the Clock Ticked
+"I wonder who that man is, Frank," whispered blond Joe Hardy, peering curiously from a second-floor window of their home. "He looks worried." His brother glanced down at the stranger departing from the front door. "Let's ask ...
+32
+-1
+32
+189
+-1
+
+
+
+
+121
+1
+1
+
+#248
+The Story of "O", by Pauline Reage
+... "I consent to what you both desire," and lowered her eyes to her hands, which were waiting unclasped in the hollows of her knees, then added in a murmur: "I should like to know whether I shall be whipped..."
+32
+-1
+32
+247
+-1
+
+
+
+
+121
+1
+1
+
+#249
+DIANETICS: The Modern Science of Mental Health, by L. Ron Hubbard
+-- IMPORTANT NOTE -- In studying Dianetics, be very, very certain you never go past a word you do not fully understand. The only reason a person gives up a study or becomes confused is that he has gone past a word that was not understood.
+32
+-1
+32
+248
+-1
+
+
+
+
+121
+1
+1
+
+#250
+The Wizard's Study
+You are in an comfortable study decorated in the Victorian style.
+-3
+1
+252
+-1
+-1
+
+
+
+
+1
+0
+0
+
+#251
+left
+
+250
+-1
+-1
+23
+1
+I don't know which left you mean!
+
+
+
+1
+0
+2
+
+#252
+back;out;leave;left
+
+12
+-1
+-1
+-1
+-1
+
+
+
+
+1
+0
+2
+
+#253
+Volume Two, Linkability
+You can link to a room if you control it, or if the room is set to be LINK_OK. Being able to link to a room means that you can set the homes of objects (or yourself) to that room, and can set the destination of exits to that room. See the OED on "@link" for more info.
+113
+-1
+113
+115
+1
+That volume is linked to the floor, and is not unlinkable.
+
+
+
+1
+1
+1
+
+#254
+sideways
+I don't know which one you mean!
+5
+-1
+-1
+251
+188
+You go eight different directions at once, but all of them take you back to the same place.
+You slip into the Third Dimension!
+suddenly turns eight-dimensional!
+slips into the Third Dimension!
+1
+0
+2
+
+#255
+Volume Five, Dropto's
+When the '@link' command is used on a room, it sets a dropto location for that room. Any object dropped in the room (if it is not STICKY; cf. vol. 3) will go to that location. If the room is set to be STICKY, the effect of the dropto will be delayed until the last player leaves the room. The special location 'home' may be used as a dropto, as in '@link here = home'; in that case objects dropped in the room will go to their homes.
+113
+-1
+0
+263
+1
+You try to pick up volume Five, but drop it immediately.
+
+
+
+1
+1
+1
+
+#256
+eat;date;dates;pick date;pick dates;eat date;eat dates;take date;take dates
+
+195
+-1
+-1
+197
+121
+You sample the tasty dates. What a treat!
+
+
+
+121
+0
+2
+
+#257
+water;swim;swimming;bathe;bath;wash;take bath
+
+195
+-1
+-1
+256
+121
+You splash around for a while in the refreshing water of the Oasis.
+
+
+
+121
+0
+2
+
+#258
+drink;drink water
+
+195
+-1
+-1
+257
+121
+The water is cool and refreshing as you gulp it down.
+
+
+
+121
+0
+2
+
+#259
+harvest;harvest grain;grain;take grain;get grain
+
+131
+-1
+-1
+151
+121
+Which do you mean, the wheat or the corn?
+
+
+
+121
+0
+2
+
+#260
+harvest;pick;harvest wheat;pick wheat
+
+132
+-1
+-1
+154
+121
+All the wheat that was ripe has already been picked.
+
+
+
+121
+0
+2
+
+#261
+harvest;pick;harvest corn;pick corn
+
+133
+-1
+-1
+157
+121
+All the corn that was ripe has already been picked.
+
+
+
+121
+0
+2
+
+#262
+ask;talk lady;talk to lady;ask lady;ask librarian;ask lady for help;ask old lady;burp
+
+30
+-1
+-1
+112
+117
+The little old lady screams "NO TALKING!" at the top of her lungs.
+
+tries to talk to the little old lady, who screams "NO TALKING!" at the top of her lungs.
+
+1
+0
+2
+
+#263
+Volume Four, Homes
+Every thing or player has a home. For things, this is the location the thing returns to when sacrificed, when a player carrying it goes home, or when (if STICKY) it is dropped. For players, this is where the player goes when issuing the 'home' command. Homes may be set using the '@link' command, e.g. '@link donut = <room-number>' or '@link me = <room-number>'. Exits may also be linked to the special location 'home', e.g. '@link north = home'.
+113
+-1
+0
+202
+1
+That volume looks so at home here that you can't bear to disturb it.
+
+
+
+1
+1
+1
+
+#264
+Volume Six, Recycling
+Nothing can be destroyed in TinyMUD. However, it is possible to recycle just about anything. The '@name' command can be used to rename objects, making it easy to turn a silk purse into a sow's ear or vice versa. Extra exits can be unlinked and picked up by their owner using the 'get' command, and dropped like ordinary objects using the 'drop' command in any room controlled by the dropper.
+113
+-1
+113
+255
+1
+
+
+
+
+1
+1
+1
+
+#265
+pray;plugh;xyzzy;atropos;clotho;lacheisis
+
+28
+-1
+-1
+39
+-1
+
+As you being to speak, you suddenly feel a rush of magical forces not under your control, and flee in terror!
+
+Suddenly flees the room!
+1
+0
+2
+
+#266
+jump;jump up
+
+3
+-1
+-1
+126
+188
+You jump up in the air, then come back down again.
+You leap up through the flames!
+jumps up in the air, then comes back down again.
+leaps up through the flames above!
+1
+0
+2
+
+#267
+Oxford English Dictionary of Commands, "Page"
+Syntax: page <player>. Used to inform an active player that you are looking for them. The targeted player will get a message telling them your name and location. Cost: 1 penny.
+64
+-1
+250
+122
+188
+The pages of that volume aren't glued in very well. When you pick it up, they all fall out, and you have to gather them up together again under the scornful eye of the librarian.
+
+
+
+1
+1
+1
+
+#268
+pray
+
+12
+-1
+-1
+123
+188
+You feel that the gods are pleased. A golden glow surrounds you.
+If you can't help yourself, we can't help you either.
+prays. A lightning cloud forms above their head, and you detect a faint smell of ozone.
+prays, and is assumed into Heaven!
+1
+0
+2
+
+#269
+climb;climb up;climb out
+
+3
+-1
+-1
+266
+188
+You try to climb out of the pit, but the walls are too slippery.
+You climb out of the pit.
+makes a feeble attempt to climb the slick walls.
+nimbly walks up the wall and through the flames.
+1
+0
+2
+
+***END OF DUMP***

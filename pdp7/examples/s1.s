@@ -9,7 +9,7 @@ orig:
 . = orig+7
    -1				" only ever set (to -1): never read?!
 
-. = orig+020			" syscall (CAL) processing
+. = orig+020			" syscall (CAL) and user "interrupt" processing
    1f				" addr for "CAL I": store return here on "CAL"
    iof				" interrupts off
    dac u.ac			" save user AC
@@ -19,8 +19,8 @@ orig:
    dac 020			" restore location 20
    lac u.ac			" restore user AC
    jmp 1f+1			" join "CAL I" processing
-   1f
-1: 0
+   1f				" literal to restore location 20
+1: 0				" "CAL I" PC stored here
    iof				" interrupts off
    dac u.ac			" save user AC
    lacq
@@ -64,8 +64,8 @@ sysexit:			" common system call exit code
    jms dskio; 07000		" save to disk?
 1:
    dzm .insys			" clear "in system call" flag
-   jms chkint			" pending interrupt?
-      skp			"  no
+   jms chkint			" pending user interrupt?
+      skp			"  no, return to user
    jmp .save			"   yes: dump core
    jms copy; u.rq+2; 10; 6	" restore auto-index locations 10-15
    lac u.rq+1			" restore auto-index location 9
@@ -77,7 +77,7 @@ sysexit:			" common system call exit code
    lac u.ac			" restore AC register
    jmp u.rq+8 i			" return to user
 
-	" scheduler / idle loop
+	" scheduler / swapper / idle loop
 swap: 0
    ion
 1:
@@ -86,7 +86,7 @@ swap: 0
    jms lookfor; 1 " in/ready
       skp
    jmp 1b			" loop until a process becomes ready
-   dzm maxquant			" here with in/ready (self?)
+   dzm maxquant			" in/ready (self?): come back next tick!
    jmp 3f
 1:				" here with out/ready process
    dac 9f+t			" save process pointer (swapped out) in t0
@@ -97,7 +97,7 @@ swap: 0
    jmp 2f
 1:
    lac swap
-   dac u.swapret		" return to scheduler when swapped back
+   dac u.swapret		" return to caller when swapped back
    iof
    lac o200000			" change status to swapped out
    tad u.ulistp i
@@ -105,13 +105,13 @@ swap: 0
    ion
    jms dskswap; 07000		" swap process out
    lac u.dspbuf
-   sna
-   jmp 2f
-   law dspbuf
+   sna				" process using display??
+   jmp 2f			"  no
+   law dspbuf			" reset to default display buffer
    jms movdsp
 2:
    iof				" disable interrupts
-   lac o600000			" change status (1->7?)
+   lac o600000			" change status (1->7?????)
    tad 9f+t i
    dac 9f+t i
    ion				" enable interrupts
@@ -123,7 +123,7 @@ swap: 0
    lac u.dspbuf
    sza				" using display?
 "** 01-s1.pdf page 4
-   jms movdsp			"  yes.
+   jms movdsp			"  yes. switch to user display bufferx
 3:
    dzm uquant			" no. reset process tick count
    iof
@@ -169,13 +169,15 @@ locsw:			" table of system addresses for sysloc
 locn:
    .-locsw-1
 
-	" check if interrupt for user
+	" check if "interrupt" for current process
 	" checks .int1 and .int2 (contain i-number of interrupt source)
+	" compared against process stdin
+	"
 	" call:
 	" .insys/ 0
 	"   jms chkint
-	"    no: no interrupt, or intflg set (discards interupt)
-	"   yes: PI off, .insys set
+	"    <already ".insys", no interrupt, or intflg set (ignore interrupt)>
+	"   <found user interrupt: PI off, .insys set>
 chkint: 0
    lac .insys
    sza				" in system?

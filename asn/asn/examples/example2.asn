@@ -1,0 +1,27 @@
+MyModule DEFINITIONS ::=
+BEGIN
+
+MyTypes ::= SEQUENCE {
+    myObjectId   OBJECT IDENTIFIER,
+    mySeqOf      SEQUENCE OF MyInt,
+    myBitString  BIT STRING {
+                        muxToken(0), 
+                        modemToken(1)
+                 }
+}
+
+MyInt ::= INTEGER (0..65535)
+
+END
+
+MyModule2 DEFINITIONS ::=
+BEGIN
+
+MyTypes2 ::= SEQUENCE {
+    myBoolean       BOOLEAN,
+    myNull          NULL,
+    myAbsentPresent MyTypes(WITH COMPONENTS{myObjectId ABSENT, mySeqOf PRESENT, ..., myBitString ABSENT}),
+    myBitString2    BIT STRING DEFAULT '0000'B
+}
+
+END

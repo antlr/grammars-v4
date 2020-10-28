@@ -1055,6 +1055,7 @@ package_declaration
 
 package_declarative_item
   : subprogram_declaration
+  | subprogram_body
   | type_declaration
   | subtype_declaration
   | constant_declaration

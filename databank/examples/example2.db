@@ -1,0 +1,72 @@
+"c           VAR 0106      01010 WHEAT   1A 852-891               MD= 1E-37   "
+"c           REF 0106         LOC  915 WIDTH  9             DK  15 COL 35-43  "
+"c                                                 EXP DEC=  1                "
+"c                                                                            "
+"c              WHEAT PRODUCTION                                              "
+"c              ----------------                                              "
+"c                                                                            "
+"c              NBER SERIES:  01010                                           "
+"c              AREA COVERED:  UNITED KINGDOM                                 "
+"c              UNITS:  MILLIONS OF BUSHELS (SIXTY POUND BUSHELS)             "
+"c              ANNUAL COVERAGE:  1852-1891                                   "
+"c              QUARTERLY COVERAGE:  NONE                                     "
+"c              MONTHLY COVERAGE:  NONE                                       "
+"c              SEASONAL ADJUSTMENT:  NONE                                    "
+"c              SOURCE:  J.B. LAWES AND J.K. GILBERT, ON THE HOME PRODUCE,    "
+"c              IMPORTS, CONSUMPTION, AND PRICE OF WHEAT, OVER FORTY HARVEST  "
+"c              YEARS, 1852-3 TO 1891-92; JOURNAL OF THE ROYAL AGRICULTURAL   "
+"c              SOCIETY OF ENGLAND, VOLUME 4, 1893, P. 132.                   "
+"c                                                                            "
+"c              NOTES:  SERIES 01010 IS PRESENTED HERE AS TWO                 "
+"c              VARIABLES--(1)--ORIGINAL DATA, 1852-1891  (2)--ORIGINAL       "
+"c              DATA, 1885-1938.                                              "
+"c                   DATA ARE FOR AMERICAN SIXTY POUND BUSHELS CONVERTED      "
+"c              FROM QUARTERS OF EIGHT SIXTY-ONE POUND BUSHELS BY             "
+"c              MULTIPLYING ORIGINAL DATA BY 8.1333.                          "
+"c                                                                            "
+"c              NOT CHECKED AGAINST ORIGINALS.                                " 
+"c                                                                            "
+"c           ...............................................................  "
+-1
+1852.
+1891.
+94.1000
+85.1000
+142.800
+113.200
+115.400
+140.900
+132.700
+106.800
+90.1000
+99.8000
+113.500
+145.800
+131.900
+113.700
+93.4000
+77.8000
+136.100
+109.100
+114.700
+93.2000
+93.4000
+83.7000
+113.600
+81.5000
+79.2000
+89.2000
+102.900
+48.0000
+76.2000
+72.2000
+82.3000
+77.1000
+82.0000
+78.4000
+70.0000
+68.8000
+72.8000
+76.2000
+79.4000
+71.6000
