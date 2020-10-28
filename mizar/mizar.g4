@@ -88,7 +88,7 @@ textItem
    ;
 
 reservation
-   : 'reserve' reservationSegment (',' ReservationSegment)* ';'
+   : 'reserve' reservationSegment (',' reservationSegment)* ';'
    ;
 
 reservationSegment
@@ -139,7 +139,7 @@ notationDeclaration
    ;
 
 lociDeclaration
-   : 'let' qualifiedVariables ('such' Conditions) ';'
+   : 'let' qualifiedVariables ('such' conditions) ';'
    ;
 
 permissiveAssumption
@@ -159,7 +159,7 @@ redefinition
    ;
 
 structureDefinition
-   : 'struct' ('(' ancestors ')') structureSymbol ('over' Loci) '(#' fields '#)' ';'
+   : 'struct' ('(' ancestors ')') structureSymbol ('over' loci) '(#' fields '#)' ';'
    ;
 
 ancestors
@@ -221,7 +221,7 @@ definiens
    ;
 
 simpleDefiniens
-   : (':' LabelIdentifier ':')? (sentence | termExpression)
+   : (':' labelIdentifier ':')? (sentence | termExpression)
    ;
 
 labelIdentifier
@@ -283,11 +283,11 @@ rightFunctorBracket
    ;
 
 predicateDefinition
-   : 'pred' predicatePattern ('means' Definiens)? ';' correctnessConditions (predicateProperty)*
+   : 'pred' predicatePattern ('means' definiens)? ';' correctnessConditions (predicateProperty)*
    ;
 
 predicatePattern
-   : (Loci)? predicateSymbol (loci)?
+   : (loci)? predicateSymbol (loci)?
    ;
 
 predicateProperty
@@ -572,7 +572,7 @@ iterativeEquality
    ;
 
 diffStatement
-   : (LabelIdentifier ':')? 'now' reasoning 'end' ';'
+   : (labelIdentifier ':')? 'now' reasoning 'end' ';'
    ;
 
 justification
@@ -644,7 +644,7 @@ conditions
    ;
 
 proposition
-   : (LabelIdentifier ':')? sentence
+   : (labelIdentifier ':')? sentence
    ;
 
 sentence
