@@ -79,7 +79,7 @@ floatingstmt
    ;
 
 essentialstmt
-   : LABEL '$e' typecode MATHSYMBOL* '$.'
+   : LABEL '$e' typecode mathsymbol* '$.'
    ;
 
 assertstmt
@@ -88,11 +88,11 @@ assertstmt
    ;
 
 axiomstmt
-   : LABEL '$a' typecode MATHSYMBOL* '$.'
+   : LABEL '$a' typecode mathsymbol* '$.'
    ;
 
 provablestmt
-   : LABEL '$p' typecode MATHSYMBOL* '$=' proof '$.'
+   : LABEL '$p' typecode mathsymbol* '$=' proof '$.'
    ;
 
 proof
@@ -112,36 +112,39 @@ typecode
    : constant
    ;
 
+mathsymbol
+   : (PRINTABLECHARACTER | LPAREN | RPAREN)+
+   ;
+
 filename
-   : MATHSYMBOL
-   ; /* No whitespace or '$' */
-   
-   
+   : mathsymbol
+   ;
+
 constant
-   : MATHSYMBOL
+   : mathsymbol
    ;
 
 variable
-   : MATHSYMBOL
+   : mathsymbol
    ;
 
-PRINTABLESEQUENCE
-   : PRINTABLECHARACTER+
+LPAREN
+   : '('
    ;
 
-MATHSYMBOL
-   : (PRINTABLECHARACTER '$')+
+RPAREN
+   : ')'
    ;
 
 PRINTABLECHARACTER
-   : [\u0021-\u007e]
+   : [\u0021-\u007e]+
    ;
 
 LABEL
    : (LETTERORDIGIT | '.' | '-' | '_')+
    ;
 
-LETTERORDIGIT
+fragment LETTERORDIGIT
    : [A-Za-z0-9]
    ;
 
