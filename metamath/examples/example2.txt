@@ -8,4 +8,3 @@ $( Define "wff" (part 1) $)
     weq $a wff t = r $.
 $( Define "wff" (part 2) $)
     wim $a wff ( P -> Q ) $.
-    
