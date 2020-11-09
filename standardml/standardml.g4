@@ -47,8 +47,8 @@ lab
 exp
    : con
    | 'op'? longid
-   | exp exp
-   | exp id exp
+   | (exp exp)
+   | (exp id exp)
    | '(' exp ')'
    | '(' exp (',' exp)* ')'
    | '{' exprow? '}'
@@ -56,7 +56,7 @@ exp
    | '[' exp (',' exp)* ']'
    | '(' exp (';' exp)* ')'
    | 'let' dec 'in' exp (';' exp)* 'end'
-   | exp ':' typ
+   | exp ':' typ*
    | 'raise' exp
    | exp 'handle' match
    | exp 'andalso' exp
@@ -76,7 +76,7 @@ match
    ;
 
 pat
-   : '::=' con
+   : con
    | '_'
    | 'op'? id
    | 'op'? longid pat?
@@ -85,32 +85,31 @@ pat
    | '(' pat (',' pat)* ')'
    | '{' patrow? '}'
    | '[' pat (',' pat)* ']'
-   | pat ':' typ
-   | 'op'? id (':' typ)? 'as' pat
+   | pat ':' typ*
+   | 'op'? id (':' typ*)? 'as' pat
    ;
 
 patrow
    : '...'
    | lab '=' pat (',' patrow)*
-   | id (':' typ)? ('as' pat)? (',' patrow)?
+   | id (':' typ*)? ('as' pat)? (',' patrow)?
    ;
 
 typ
-   : VAR
-   | typ? longid
-   | '(' typ ')'
+   : var
+   //   | typ? longid
+   | '(' typ* ')'
    | typ '->' typ
-   | typ*
    | '{' typrow? '}'
    ;
 
 typrow
-   : lab ':' typ (',' typrow)?
+   : lab ':' typ* (',' typrow)?
    ;
 
 dec
-   : 'val' VAR? valbind
-   | 'fun' VAR? funbind
+   : 'val' var? valbind
+   | 'fun' var? funbind
    | 'type' typbind
    | 'datatype' datbind ('withtype' typbind)?
    | 'datatype' id '=' 'datatype' longid
@@ -141,11 +140,11 @@ funmatch
    ;
 
 typbind
-   : VAR? id '=' typ ('and' typbind)?
+   : var? id '=' typ* ('and' typbind)?
    ;
 
 datbind
-   : VAR? id '=' conbind ('and' datbind)?
+   : var? id '=' conbind ('and' datbind)?
    ;
 
 conbind
@@ -178,7 +177,7 @@ sig
    ;
 
 typrefin
-   : VAR? longid '=' typ ('and' 'type' typrefin)?
+   : var? longid '=' typ* ('and' 'type' typrefin)?
    ;
 
 spec
@@ -197,15 +196,15 @@ spec
    ;
 
 valdesc
-   : id ':' typ ('and' valdesc)?
+   : id ':' typ* ('and' valdesc)?
    ;
 
 typdesc
-   : VAR? id ('and' typdesc)?
+   : var? id ('and' typdesc)?
    ;
 
 datdesc
-   : VAR? id '=' condesc ('and' datdesc)?
+   : var? id '=' condesc ('and' datdesc)?
    ;
 
 condesc
@@ -220,11 +219,12 @@ strdesc
    : id ':' sig ('and' strdesc)?
    ;
 
+progs
+   : prog (';'? prog)*
+   ;
+
 prog
-   : dec
-   | 'functor' fctbind
-   | 'signature' sigbind
-   | prog ';'? prog
+   : (dec | 'functor' fctbind | 'signature' sigbind) EOF?
    ;
 
 fctbind
@@ -245,7 +245,16 @@ con
    ;
 
 id
-   : LETTER (LETTER | DIGIT | '\'' | '_')* ('!' | '%' | '&' | '$' | '#' | '+' | '-' | '/' | ':' | '<' | '=' | '>' | '?' | '@' | '\\' | '~' | '`' | '^' | '|' | '*')+
+   : IDENTIFIER
+   ;
+
+var
+   : IDENTIFIER
+   ;
+
+IDENTIFIER
+   : (LETTER (LETTER | DIGIT | '_')*)
+   | (('!' | '%' | '&' | '$' | '#' | '+' | '-' | '/' | ':' | '<' | '=' | '>' | '?' | '@' | '\\' | '~' | '`' | '^' | '|' | '*')+)
    ;
 
 INT
@@ -271,30 +280,32 @@ STRING
    : '"' ASCII* '"'
    ;
 
-NUM
-   : DIGIT+
-   ;
-
-HEX
-   : (DIGIT | LETTER)+
-   ;
-
-VAR
-   : ('\'' (LETTER | DIGIT | '\'' | '_')*)
-   | ('\'' '\'' (LETTER | DIGIT | '\'' | '_')*)
-   ;
-
 DIGIT
    : [0-9]
    ;
 
-ASCII
-   : DIGIT
-   | LETTER
+//VAR
+//   : (LETTER | DIGIT | '_')+
+//   ;
+
+fragment NUM
+   : DIGIT+
    ;
 
-LETTER
+fragment HEX
+   : (DIGIT | LETTER)+
+   ;
+
+fragment ASCII
+   : '\u0021' .. '\u007E'
+   ;
+
+fragment LETTER
    : [a-zA-Z]
+   ;
+
+COMMENT
+   : '(*' .*? '*)' -> skip
    ;
 
 WS

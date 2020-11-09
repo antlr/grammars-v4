@@ -35,9 +35,9 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<verbose>false</verbose>
-					<showTree>false</showTree>
-					<entryPoint>prog</entryPoint>
+					<verbose>true</verbose>
+					<showTree>true</showTree>
+					<entryPoint>progs</entryPoint>
 					<grammarName>standardml</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
