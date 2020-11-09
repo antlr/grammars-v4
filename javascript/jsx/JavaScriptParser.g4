@@ -306,7 +306,7 @@ argument
     ;
 
 expressionSequence
-    : singleExpression (',' singleExpression)*
+    : Ellipsis? singleExpression (',' Ellipsis? singleExpression)*  //2020/10/28 add SpreadExpr for htmltag
     ;
 
 singleExpression
@@ -395,7 +395,7 @@ htmlAttribute
 
 htmlAttributeName
     : TagName
-    | Identifier
+    | Identifier ('-' Identifier)*		// 2020/10/28 bugfix: '-' is recognized as MINUS and TagName is splited by '-'.
     ;
 
 htmlChardata
