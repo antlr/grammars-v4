@@ -3613,7 +3613,7 @@ insert_into_clause
     ;
 
 values_clause
-    : VALUES '(' expressions? ')'
+    : VALUES (REGULAR_ID | '(' expressions ')')
     ;
 
 merge_statement
