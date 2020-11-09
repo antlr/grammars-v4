@@ -160,6 +160,7 @@
 				<module>matlab</module>
 				<module>mdx</module>
 				<module>memcached_protocol</module>
+                <module>metamath</module>
 				<module>metric</module>
                 <module>microc</module>
 				<module>modelica</module>
@@ -173,6 +174,7 @@
 				<module>mumps</module>
 				<module>muparser</module>
                 <module>nanofuck</module>
+                <module>newick</module>
                 <module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
