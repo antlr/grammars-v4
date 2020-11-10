@@ -118,7 +118,7 @@ create_table_stmt:
 column_def: column_name type_name? column_constraint*;
 
 type_name:
-	name+ (
+	name+? (
 		'(' signed_number ')'
 		| '(' signed_number ',' signed_number ')'
 	)?;
