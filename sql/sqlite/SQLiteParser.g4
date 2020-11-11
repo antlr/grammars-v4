@@ -108,7 +108,7 @@ create_table_stmt:
 		schema_name '.'
 	)? table_name (
 		(
-			'(' column_def (',' column_def)* (
+			'(' column_def (',' column_def)*? (
 				',' table_constraint
 			)* ')' (WITHOUT rowID = IDENTIFIER)?
 		)
