@@ -619,6 +619,7 @@ alterSpecification
     | MODIFY COLUMN?
       uid columnDefinition (FIRST | AFTER uid)?                     #alterByModifyColumn
     | DROP COLUMN? uid RESTRICT?                                    #alterByDropColumn
+    | DROP (CONSTRAINT | CHECK) uid                                 #alterByDropConstraintCheck
     | DROP PRIMARY KEY                                              #alterByDropPrimaryKey
     | RENAME indexFormat=(INDEX | KEY) uid TO uid                   #alterByRenameIndex
     | ALTER INDEX uid (VISIBLE | INVISIBLE)                         #alterByAlterIndexVisibility
