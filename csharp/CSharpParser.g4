@@ -115,7 +115,7 @@ conditional_expression
 	;
 
 null_coalescing_expression
-	: conditional_or_expression ('??' (null_coalescing_expression | throw_expression))?
+	: conditional_or_expression (OP_COALESCING (null_coalescing_expression | throw_expression))?
 	;
 
 conditional_or_expression
@@ -232,11 +232,11 @@ throw_expression
 	;
 
 member_access
-	: '?'? '.' identifier type_argument_list?
+	: INTERR? '.' identifier type_argument_list?
 	;
 
 bracket_expression
-	: '?'? '[' indexer_argument ( ',' indexer_argument)* ']'
+	: INTERR? '[' indexer_argument ( ',' indexer_argument)* ']'
 	;
 
 indexer_argument
@@ -691,7 +691,7 @@ common_member_declaration
 	| event_declaration
 	| conversion_operator_declarator (body | right_arrow throwable_expression ';') // C# 6
 	| constructor_declaration
-	| VOID method_declaration
+	| method_declaration  // 2020/10/22 add return_type
 	| class_definition
 	| struct_definition
 	| interface_definition
@@ -1186,8 +1186,9 @@ constructor_declaration
 	: identifier OPEN_PARENS formal_parameter_list? CLOSE_PARENS constructor_initializer? body
 	;
 
+// 2020/10/22 add return_type
 method_declaration // lamdas from C# 6
-	: method_member_name type_parameter_list? OPEN_PARENS formal_parameter_list? CLOSE_PARENS
+	: return_type method_member_name type_parameter_list? OPEN_PARENS formal_parameter_list? CLOSE_PARENS
 	    type_parameter_constraints_clauses? (method_body | right_arrow throwable_expression ';')
 	;
 
