@@ -342,7 +342,7 @@ expression
 primary
    : entity
    | call
-   | (primary . name)
+   | (primary '.' name)
    | (primary expression?)
    ;
 
