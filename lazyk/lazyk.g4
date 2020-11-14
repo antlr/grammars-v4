@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2013, Tom Everett
+Copyright (c) 2020, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,41 +29,48 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar lazyk;
 
-program  : ccexpr    ;                 
-
-  ccexpr   :ccexpr expr               
-             | epsilon   ;               
-
-  expr     : 'i'                       
-             | expr1    ;                
-
-  oitaexpr : 'i'                        
-             | expr1   ;                  
-
-  expr1    :'I'                        
-             | 'K' | 'k'                 
-             | 'S' | 's'                  
-             | nonemptygotexpr         
-             | '`' expr1 expr1          
-             | '*' oitaexpr oitaexpr   
-             | '(' ccexpr ')'      ;    
-
-  nonemptygotexpr
-           :jotexpr '0'             
-             | jotexpr '1'        ;      
-
-  jotexpr  : NonemptyJotExpr           
-             | epsilon     ;               
-
-
-EOL
-   : '\r'? '\n'
+program
+   : ccexpr
    ;
 
+ccexpr
+   : ccexpr expr
+   | epsilon
+   ;
+
+expr
+   : 'i'
+   | expr1
+   ;
+
+oitaexpr
+   : 'i'
+   | expr1
+   ;
+
+expr1
+   : 'I'
+   | ('K' | 'k')
+   | ('S' | 's')
+   | nonemptygotexpr
+   | '`' expr expr
+   | '*' oitaexpr oitaexpr
+   | '(' ccexpr ')'
+   ;
+
+nonemptygotexpr
+   : (jotexpr '0')
+   | (jotexpr '1')
+   ;
+
+jotexpr
+   : NonemptyJotExpr
+   | epsilon
+   ;
 
 WS
    : [ \t\r\n] -> skip
    ;
+
