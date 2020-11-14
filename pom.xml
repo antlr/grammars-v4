@@ -267,6 +267,7 @@
 				<module>wavefront</module>
 				<module>webidl</module>
 				<module>wkt</module>
+				<module>wln</module>
 				<module>xml</module>
 				<module>xpath</module>
 				<module>xsd-regex</module>
