@@ -25,12 +25,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar smiles;
 
-smiles 
-    : chain terminator
-    ;
+smiles
+   : chain terminator?
+   ;
 
 atom
    : bracket_atom
@@ -40,163 +39,163 @@ atom
    ;
 
 aliphatic_organic
-   : 'B'
-   | 'C'
-   | 'N'
-   | 'O'
-   | 'S'
-   | 'P'
-   | 'F'
-   | 'Cl'
-   | 'Br'
-   | 'I'
+   : UB
+   | UC
+   | UN
+   | UO
+   | US
+   | UP
+   | UF
+   | (UC LL)
+   | (UB LR)
+   | UI
    ;
 
 aromatic_organic
-   : 'b'
-   | 'c'
-   | 'n'
-   | 'o'
-   | 's'
-   | 'p'
+   : LB
+   | LC
+   | LN
+   | LO
+   | LS
+   | LP
    ;
 
 bracket_atom
    : '[' isotope? symbol chiral? hcount? charge? class_? ']'
    ;
 
+isotope
+   : DIGIT+
+   ;
+
 symbol
    : element_symbols
-   | aromatic_symbols
+   | aromatic_symbol
    | '*'
    ;
 
-isotope
-   : NUMBER
-   ;
-
 element_symbols
-   : 'H'
-   | 'He'
-   | 'Li'
-   | 'Be'
-   | 'B'
-   | 'C'
-   | 'N'
-   | 'O'
-   | 'F'
-   | 'Ne'
-   | 'Na'
-   | 'Mg'
-   | 'Al'
-   | 'Si'
-   | 'P'
-   | 'S'
-   | 'Cl'
-   | 'Ar'
-   | 'K'
-   | 'Ca'
-   | 'Sc'
-   | 'Ti'
-   | 'V'
-   | 'Cr'
-   | 'Mn'
-   | 'Fe'
-   | 'Co'
-   | 'Ni'
-   | 'Cu'
-   | 'Zn'
-   | 'Ga'
-   | 'Ge'
-   | 'As'
-   | 'Se'
-   | 'Br'
-   | 'Kr'
-   | 'Rb'
-   | 'Sr'
-   | 'Y'
-   | 'Zr'
-   | 'Nb'
-   | 'Mo'
-   | 'Tc'
-   | 'Ru'
-   | 'Rh'
-   | 'Pd'
-   | 'Ag'
-   | 'Cd'
-   | 'In'
-   | 'Sn'
-   | 'Sb'
-   | 'Te'
-   | 'I'
-   | 'Xe'
-   | 'Cs'
-   | 'Ba'
-   | 'Hf'
-   | 'Ta'
-   | 'W'
-   | 'Re'
-   | 'Os'
-   | 'Ir'
-   | 'Pt'
-   | 'Au'
-   | 'Hg'
-   | 'Tl'
-   | 'Pb'
-   | 'Bi'
-   | 'Po'
-   | 'At'
-   | 'Rn'
-   | 'Fr'
-   | 'Ra'
-   | 'Rf'
-   | 'Db'
-   | 'Sg'
-   | 'Bh'
-   | 'Hs'
-   | 'Mt'
-   | 'Ds'
-   | 'Rg'
-   | 'La'
-   | 'Ce'
-   | 'Pr'
-   | 'Nd'
-   | 'Pm'
-   | 'Sm'
-   | 'Eu'
-   | 'Gd'
-   | 'Tb'
-   | 'Dy'
-   | 'Ho'
-   | 'Er'
-   | 'Tm'
-   | 'Yb'
-   | 'Lu'
-   | 'Ac'
-   | 'Th'
-   | 'Pa'
-   | 'U'
-   | 'Np'
-   | 'Pu'
-   | 'Am'
-   | 'Cm'
-   | 'Bk'
-   | 'Cf'
-   | 'Es'
-   | 'Fm'
-   | 'Md'
-   | 'No'
-   | 'Lr'
+   : (UH)
+   | (UH LE)
+   | (UL LI)
+   | (UB LE)
+   | (UB)
+   | (UC)
+   | (UN)
+   | (UO)
+   | (UF)
+   | (UN LE)
+   | (UN LA)
+   | (UM LG)
+   | (UA LL)
+   | (US LI)
+   | (UP)
+   | (US)
+   | (UV LL)
+   | (UA LR)
+   | (UK)
+   | (UC LA)
+   | (US LC)
+   | (UT LI)
+   | (UV)
+   | (UC LR)
+   | (UM LN)
+   | (UF LE)
+   | (UC LO)
+   | (UN LI)
+   | (UC LU)
+   | (UZ LN)
+   | (UG LA)
+   | (UG LE)
+   | (UA LA)
+   | (US LE)
+   | (UB LR)
+   | (UK LR)
+   | (UB LB)
+   | (US LR)
+   | (UY)
+   | (UZ LR)
+   | (UN LB)
+   | (UM LO)
+   | (UT LC)
+   | (UR LU)
+   | (UR LH)
+   | (UP LD)
+   | (UA LG)
+   | (UV LD)
+   | (UI LN)
+   | (US LN)
+   | (US LB)
+   | (UT LE)
+   | (UI)
+   | (UX LE)
+   | (UC LS)
+   | (UB LA)
+   | (UH LF)
+   | (UT LA)
+   | (UW)
+   | (UR LE)
+   | (UO LS)
+   | (UI LR)
+   | (UP LT)
+   | (UA LU)
+   | (UH LG)
+   | (UT LL)
+   | (UP LB)
+   | (UB LI)
+   | (UP LO)
+   | (UA LT)
+   | (UR LN)
+   | (UF LR)
+   | (UR LA)
+   | (UR LF)
+   | (UD LB)
+   | (US LG)
+   | (UB LH)
+   | (UH LS)
+   | (UM LT)
+   | (UD LS)
+   | (UR LG)
+   | (UL LA)
+   | (UC LE)
+   | (UP LR)
+   | (UN LD)
+   | (UP LM)
+   | (UP LM)
+   | (UE LU)
+   | (UG LD)
+   | (UT LB)
+   | (UD LY)
+   | (UH LO)
+   | (UE LR)
+   | (UT LM)
+   | (UY LB)
+   | (UL LU)
+   | (UA LC)
+   | (UT LH)
+   | (UP LA)
+   | (UU)
+   | (UN LP)
+   | (UP LU)
+   | (UA LM)
+   | (UC LM)
+   | (UB LK)
+   | (UC LF)
+   | (UE LS)
+   | (UF LM)
+   | (UM LD)
+   | (UN LO)
+   | (UL NR)
    ;
 
-aromatic_symbols
-   : 'c'
-   | 'n'
-   | 'o'
-   | 'p'
-   | 's'
-   | 'se'
-   | 'as'
+aromatic_symbol
+   : LC
+   | LN
+   | LO
+   | LP
+   | LS
+   | (LS LE)
+   | (LA LS)
    ;
 
 chiral
@@ -273,21 +272,21 @@ chiral
    ;
 
 hcount
-   : 'H'
-   | 'H' DIGIT
+   : UH
+   | UH DIGIT
    ;
 
 charge
    : '-'
-   | '-' DIGIT
+   | '-' DIGIT+
    | '+'
-   | '+' DIGIT
+   | '+' DIGIT+
    | '--'
    | '++'
    ;
 
 class_
-   : ':' NUMBER
+   : ':' DIGIT+
    ;
 
 bond
@@ -328,10 +327,217 @@ terminator
    | CARRIAGE_RETURN
    ;
 
+LA
+   : ('a')
+   ;
+
+LB
+   : ('b')
+   ;
+
+LC
+   : ('c')
+   ;
+
+LD
+   : ('d')
+   ;
+
+LE
+   : ('e')
+   ;
+
+LF
+   : ('f')
+   ;
+
+LG
+   : ('g')
+   ;
+
+LH
+   : ('h')
+   ;
+
+LI
+   : ('i')
+   ;
+
+LJ
+   : ('j')
+   ;
+
+LK
+   : ('k')
+   ;
+
+LL
+   : ('l')
+   ;
+
+LM
+   : ('m')
+   ;
+
+LN
+   : ('n')
+   ;
+
+LO
+   : ('o')
+   ;
+
+LP
+   : ('p')
+   ;
+
+LQ
+   : ('q')
+   ;
+
+LR
+   : ('r')
+   ;
+
+LS
+   : ('s')
+   ;
+
+LT
+   : ('t')
+   ;
+
+LU
+   : ('u')
+   ;
+
+LV
+   : ('v')
+   ;
+
+LW
+   : ('w')
+   ;
+
+LX
+   : ('x')
+   ;
+
+LY
+   : ('y')
+   ;
+
+LZ
+   : ('z')
+   ;
+
+UA
+   : ('A')
+   ;
+
+UB
+   : ('B')
+   ;
+
+UC
+   : ('C')
+   ;
+
+UD
+   : ('D')
+   ;
+
+UE
+   : ('E')
+   ;
+
+UF
+   : ('F')
+   ;
+
+UG
+   : ('G')
+   ;
+
+UH
+   : ('H')
+   ;
+
+UI
+   : ('I')
+   ;
+
+UJ
+   : ('J')
+   ;
+
+UK
+   : ('K')
+   ;
+
+UL
+   : ('L')
+   ;
+
+UM
+   : ('M')
+   ;
+
+UN
+   : ('N')
+   ;
+
+UO
+   : ('O')
+   ;
+
+UP
+   : ('P')
+   ;
+
+UQ
+   : ('Q')
+   ;
+
+UR
+   : ('R')
+   ;
+
+US
+   : ('S')
+   ;
+
+UT
+   : ('T')
+   ;
+
+UU
+   : ('U')
+   ;
+
+UV
+   : ('V')
+   ;
+
+UW
+   : ('W')
+   ;
+
+UX
+   : ('X')
+   ;
+
+UY
+   : ('Y')
+   ;
+
+UZ
+   : ('Z')
+   ;
+
 DOT
    : '.'
    ;
-
 
 LINEFEED
    : '\r'
@@ -349,10 +555,7 @@ DIGIT
    : '0' .. '9'
    ;
 
-NUMBER
-   : DIGIT +
-   ;
-
 TAB
    : '\t'
    ;
+
