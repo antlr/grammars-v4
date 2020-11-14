@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2018, Tom Everett
+Copyright (c) 2020, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar edifact;
 
 edifact
@@ -37,52 +36,38 @@ edifact
    ;
 
 interchange
-    : functionalgroup
-    ;
+   : functionalgroup
+   ;
 
 functionalgroup
-    : messageheader
-    ;
+   : messageheader
+   ;
 
 messageheader
-    : userdata+
-    ;
-
+   : userdata+
+   ;
 
 number
    : NUMBER
    ;
 
-comment
-   : COMMENT
-   ;
-
-
 STRINGLITERAL
    : '"' STRING
    ;
-
 
 STRING
    : [a-zA-Z] [a-zA-Z0-9_]*
    ;
 
-
 NUMBER
-   : [0-9] +
+   : [0-9]+
    ;
-
 
 COMMENT
-   : ';' ~ [\r\n]*
+   : ';' ~ [\r\n]* ->skip
    ;
-
-
-EOL
-   : '\r'? '\n'
-   ;
-
 
 WS
    : [ \t\r\n] -> skip
    ;
+
