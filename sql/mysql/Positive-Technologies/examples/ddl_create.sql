@@ -2,6 +2,7 @@
 -- Create Table
 create table new_t  (like t1);
 create table log_table(row varchar(512));
+create table log_table(row character(512));
 create table ships(name varchar(255), class_id int, id int);
 create table ships_guns(guns_id int, ship_id int);
 create table guns(id int, power decimal(7,2), callibr decimal(10,3));
@@ -27,7 +28,20 @@ create table ts_table(
   ts6 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP(),
   ts7 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE NOW(),
   ts8 TIMESTAMP(6) NOT NULL,
-  ts9 TIMESTAMP(6) NOT NULL DEFAULT NOW(6) ON UPDATE NOW(6)
+  ts9 TIMESTAMP(6) NOT NULL DEFAULT NOW(6) ON UPDATE NOW(6),
+  ts10 TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  ts11 TIMESTAMP NOT NULL DEFAULT '2038-01-01 00:00:00' ON UPDATE CURRENT_TIMESTAMP
+);
+create table dt_table(
+  dt1 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  dt2 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIME,
+  dt3 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP,
+  dt4 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(),
+  dt5 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIME(),
+  dt6 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP(),
+  dt7 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE NOW(),
+  dt10 DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  dt11 DATETIME DEFAULT '2038-01-01 00:00:00' ON UPDATE CURRENT_TIMESTAMP
 );
 create table with_check (c1 integer not null,c2 varchar(22),constraint c1 check (c2 in ('a', 'b', 'c')));
 CREATE TABLE genvalue1 (id binary(16) NOT NULL, val char(32) GENERATED ALWAYS AS (hex(id)) STORED, PRIMARY KEY (id));
@@ -51,6 +65,9 @@ create table table_with_character_set_eq (id int, data varchar(50)) character se
 create table table_with_character_set (id int, data varchar(50)) character set default;
 create table table_with_visible_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC) INVISIBLE VISIBLE);
 create table table_with_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC));
+create table blob_test(id int, col1 blob(45));
+create table žluťoučký (kůň int);
+create table column_names_as_aggr_funcs(min varchar(100), max varchar(100), sum varchar(100), count varchar(100));
 #end
 #begin
 -- Rename table
@@ -144,6 +161,7 @@ CREATE DEFINER=`ctlplane`@`%` TRIGGER `write_key_add` AFTER INSERT ON `sources` 
 BEGIN
 DECLARE i, n INT DEFAULT 0;
 SET n = JSON_LENGTH(CAST(CONVERT(NEW.write_keys USING utf8mb4) AS JSON));
+SET campaign_id = NEW.write_keys->>'$.campaign_id';
 WHILE i < n DO
 INSERT INTO source_id_write_key_mapping (source_id, write_key)
 VALUES (NEW.id, JSON_UNQUOTE(JSON_EXTRACT(CAST(CONVERT(NEW.write_keys USING utf8mb4) AS JSON), CONCAT('$[', i, ']'))))
@@ -152,6 +170,21 @@ ON DUPLICATE KEY UPDATE
        write_key  = JSON_UNQUOTE(JSON_EXTRACT(CAST(CONVERT(NEW.write_keys USING utf8mb4) AS JSON), CONCAT('$[', i, ']')));
 SET i = i + 1;
 END WHILE;
+END
+#end
+#begin
+-- Create trigger 5
+CREATE TRIGGER `rtl_trigger_before_update`
+BEFORE UPDATE
+ON all_student_educator FOR EACH ROW
+BEGIN
+    IF NEW.student_words_read_total is not null AND NEW.student_words_read_total >= 3 AND NEW.badge_3_words_read_flag = 0 THEN
+        SET
+        NEW.badge_flag = 1,
+        NEW.badge_student_total = NEW.badge_student_total + 1,
+        NEW.badge_datetime = now();
+        INSERT IGNORE INTO user_platform_badge (platform_badge_id, user_id) VALUES (3, NEW.student_id);
+    END IF;
 END
 #end
 #begin
@@ -183,4 +216,61 @@ RETURN
             SUBSTR(_uuid,  1, 8),
             SUBSTR(_uuid, 20, 4),
             SUBSTR(_uuid, 25) ))
+#end
+#begin
+-- From MariaDB 10.4.3, the JSON_VALID function is automatically used as a CHECK constraint for the JSON data type alias in order to ensure that a valid json document is inserted.
+-- src: https://mariadb.com/kb/en/json_valid/
+CREATE TABLE `global_priv` (
+    `Host` CHAR(60) COLLATE utf8_bin NOT NULL DEFAULT '',
+    `User` CHAR(80) COLLATE utf8_bin NOT NULL DEFAULT '',
+    `Privilege` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '{}' CHECK (json_valid(`Privilege`)),
+    PRIMARY KEY (`Host`,`User`)
+) ENGINE=Aria DEFAULT CHARSET=utf8 COLLATE=utf8_bin PAGE_CHECKSUM=1 COMMENT='Users and global privileges';
+#end
+#begin
+-- https://dev.mysql.com/doc/refman/8.0/en/json-validation-functions.html#json-validation-functions-constraints
+CREATE TABLE geo (
+    coordinate JSON,
+    CHECK(
+        JSON_SCHEMA_VALID(
+           '{
+               "type":"object",
+               "properties":{
+                 "latitude":{"type":"number", "minimum":-90, "maximum":90},
+                 "longitude":{"type":"number", "minimum":-180, "maximum":180}
+               },
+               "required": ["latitude", "longitude"]
+           }',
+           coordinate
+        )
+    )
+);
+#end
+#begin
+CREATE TABLE `tab1` (
+  f4 FLOAT4,
+  f8 FLOAT8,
+  i1 INT1,
+  i2 INT2,
+  i3 INT3,
+  i4 INT4,
+  i8 INT8,
+  lvb LONG VARBINARY,
+  lvc LONG VARCHAR,
+  lvcfull LONG BINARY CHARSET utf8 COLLATE utf8_bin,
+  l LONG,
+  mi MIDDLEINT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+#end
+#begin
+-- Create procedure
+-- The default value for local variables in a DECLARE statement should be an expression
+-- src: https://dev.mysql.com/doc/refman/5.7/en/declare-local-variable.html
+-- delimiter //
+CREATE PROCEDURE procedure1()
+BEGIN
+  DECLARE var1 INT unsigned default 1;
+  DECLARE var2 TIMESTAMP default CURRENT_TIMESTAMP;
+  DECLARE var3 INT unsigned default 2 + var1;
+END -- //-- delimiter ;
 #end

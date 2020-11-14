@@ -1,1 +1,1 @@
-(smiles (chain (branched_atom (atom (bracket_atom [ (symbol (element_symbols U)) ])))) (terminator \n))
+(smiles (chain (branched_atom (atom (bracket_atom [ (symbol (element_symbols U)) ])))))

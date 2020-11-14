@@ -57,6 +57,8 @@ preprocessor_directive returns [boolean value]
 	| ENDREGION TEXT? directive_new_line_or_sharp  { $value = allConditions(); }   #preprocessorRegion
 
 	| PRAGMA TEXT directive_new_line_or_sharp      { $value = allConditions(); }   #preprocessorPragma
+
+	| NULLABLE TEXT directive_new_line_or_sharp      { $value = allConditions(); }   #preprocessorNullable
 	;
 
 directive_new_line_or_sharp
