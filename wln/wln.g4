@@ -28,14 +28,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar wln;
 
 wln
+   : group (SPACE group)* EOF
+   ;
+
+group
    : symbol+
    ;
 
-
-symbol:
+symbol
+   : BROMINE
+   | CHLORINE
+   | IODINE
+   | BENZENE
+   | DOUBLEBOND
+   | CARBONYL
+   | CARBONNON
+   | NITROGEN3PLUS
+   | CARBOSYCLIC
+   | IMINO
+   | NITROGEN4LESS
+   | OXYGEN
+   | HETEROCYCLIC
+   | DIOXO
+   | CARBON4
+   | CARBON3
+   | AMINO
+   | FLOURINE
+   | HYDROGEN
+   | HYDROXYL
+   | SULFER
+   | TRIPLE
+   | DIGIT
+   ;
 
 BROMINE
-   : 'R'
+   : 'E'
    ;
 
 CHLORINE
@@ -122,7 +149,19 @@ TRIPLE
    : 'UU'
    ;
 
+AMP
+   : '&'
+   ;
+
 DIGIT
    : '1' .. '9'
+   ;
+
+SPACE
+   : ' '
+   ;
+
+WS
+   : [\r\n]+ -> skip
    ;
 
