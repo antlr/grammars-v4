@@ -2,7 +2,7 @@
 
    lac 017777 i
    sad d8
-   skp
+     skp
    sys exit
    lac 017777
    tad d5
@@ -12,13 +12,16 @@
    dac fo
    law 017
    sys creat; scrname
-   spa; jms error
+   spa
+     jms error
    dac fso
    sys open; scrname; 0
-   spa; jms error
+   spa
+     jms error
    dac fsi
    sys chdir; dd
-   spa; jms error
+   spa
+     jms error
    lac d1
    sys write; pass1; 1
    law fsobuf
@@ -31,12 +34,14 @@
    dac dirp
    dzm fsloc
    sys open; dotdot; 0
-   spa; jms error
+   spa
+     jms error
    dac fd
    jms readdir; dotdot
    law statbuf
    sys status; dotdot; dotdot
-   spa; jms error
+   spa
+     jms error
    lac statbuf+12 " i index
    dac dirp i
    isz dirp
@@ -75,13 +80,15 @@ loop:
    sys read; scrname; 4
    law statbuf
    sys status; dotdot; scrname
-   spa; jms error
+   spa
+     jms error
    lac statbuf+0 " flags
    and o20
    sna
-   jmp 2f
+     jmp 2f
    sys open; scrname; 0
-   spa; jms error
+   spa
+     jms error
    dac fd
    jms readdir; scrname
    lac ddfilp i
@@ -109,7 +116,7 @@ loop:
    dzm fflg
    law fbuf
    dac i2
-   r1
+   -1
    tad nfiles
    cma
    dac c2
@@ -118,19 +125,19 @@ loop:
    lac c1
    tad d501
    sad i2 i
-   skp
+     skp
    jmp 3f
    -1
    tad i1
    dac i3
-   iac i3 i
+   lac i3 i
    dac c3
    law fbuf
    dac i3
 0:
    lac i3 i
    sad c3
-   jmp 0f
+     jmp 0f
    isz i3
    isz i3
    jmp 0b
@@ -159,14 +166,15 @@ loop:
 
    lac nlinkt
    sad nlinka
-   skp
+     skp
    jms fishy
    dzm nlinka
    law 012
    jms putc
    law statbuf
    sys status; scrname; dd
-   spa; jms error
+   spa
+     jms error
    -1
    tad statbuf+9
    cma
@@ -188,7 +196,7 @@ loop:
    isz i2
    lac i2
    sad i1 i
-   skp
+     skp
    jmp .+3
    isz i1
    isz i1
@@ -199,7 +207,7 @@ loop:
    jmp 1b
    lac nlinkt
    sad nlinka
-   skp
+     skp
    jms fishy
 
    sys chdir; system
@@ -219,14 +227,14 @@ nlinka: 0
 nlinkt: 0
 
 asters: 0
-   -10
+   -10		" Put -10 into c
    dac c
 1:
-   law 052
+   law 052	" Print out a "*"
    jms putc
    isz c
-   jmp 1b
-   jmp asters i
+     jmp 1b	" and loop back until 10 "*" are printed out
+   jmp asters i	" Leave the routine
 
 longout: 0
    lac statbuf+12 " i
@@ -267,9 +275,10 @@ readdir: 0
    jms copyz; buf; 64
    lac fd
    sys read; buf; 64
-   spa; jms error
+   spa
+     jms error
    sna
-   jmp 4f
+     jmp 4f
    -8
    dac c1
    law buf
@@ -277,7 +286,7 @@ readdir: 0
 1:
    lac i1 i
    sna
-   jmp 3f
+     jmp 3f
 
    isz nfiles
    dac filp i
@@ -292,7 +301,8 @@ readdir: 0
    dac .+4
    law statbuf
    sys status; 5:..; ..
-   spa; jms error
+   spa
+     jms error
    jms longout
    lac i1
    tad d1
@@ -316,7 +326,7 @@ readdir: 0
    isz fsopt
    law fsobuf+64
    sad fsopt
-   skp
+     skp
    jmp 3f
    lac fso
    sys write; fsobuf; 64
@@ -353,27 +363,30 @@ putname: 0
    jmp putname i
 
 octal: 0
-   lmq
-   lac d5
-   tad octal i
-   cma
-   dac c
+   lmq			" Move the negative argument into the MQ
+                        " as we will use shifting to deal with the
+                        " number by shifting groups of 3 digits.
+   lac d5		" By adding 5 to the negative count and
+   tad octal i		" complementing it, we set the actual
+   cma			" loop count up to 6 - count. So, if we
+   dac c		" want to print 2 digits, we lose 6 - 2 = 4 digits
 1:
-   llss 3
-   isz c
-   jmp 1b
-   lac octal i
-   dac c
+   llss 3		" Lose top 3 bits of the MQ
+   isz c		" Do we have any more to lose?
+     jmp 1b		" Yes, keep looping
+   lac octal i		" Save the actual number of print digits into c
+   dac c		" as a negative number.
 1:
-   ecla llss 3
-   tad o60
+   cla
+   llss 3		" Shift 3 more bits into AC
+   tad o60		" Add AC to ASCII '0'
+   jms putc		" and print out the digit
+   isz c		" Any more characters to print out?
+     jmp 1b		" Yes, loop back
+   law 040		" Print out a space
    jms putc
-   isz c
-   jmp 1b
-   law 040
-   jms putc
-   isz octal
-   jmp octal i
+   isz octal		" Move return address 1 past the argument
+   jmp octal i		" and return from subroutine
 
 error: 0
    -1
@@ -401,10 +414,10 @@ copyz: 0
 done:
    lac noc
    sna
-   sys exit
+     sys exit
    and d1
    sna cla
-   jmp 1f
+     jmp 1f
    jms putc
    jmp done
 1:
@@ -416,38 +429,40 @@ done:
    sys exit
 
 putc: 0
-   and o177
+   and o177		" Keep the lowest 7 bits and save into 2f+1
    dac 2f+1
-   lac opt
-   dac 2f
-   add o400000
-   dac opt
-   spa
-   jmp 1f
-   lac 2f i
-   xor 2f+1
-   jmp 3f
+   lac opt		" Save the pointer to the empty buffer
+   dac 2f		" position to 2f
+   add o400000		" Flip the msb and save back into opt
+   dac opt		" This also has the effect of incrementing
+			" the opt pointer every second addition!
+   spa			" If the bit was set, we already have one
+     jmp 1f		" character at 2f+1. If no previous character,
+   lac 2f i		" merge the old and new character together
+   xor 2f+1		
+   jmp 3f		" and go to the "save it in buffer" code
 1:
-   lac 2f+1
-   alss 9
+   lac 2f+1		" Move the character up into the top half
+   alss 9	
 3:
-   dac 2f i
-   isz noc
-   lac noc
+   dac 2f i		" Save the word into the buffer
+   isz noc		" Add 1 to the char count, never skipping
+   lac noc		" Have we reached 128 characters, 64 words?
    sad d128
-   skp
-   jmp putc i
-   lac fo
-   sys write; obuf; 64
+     skp
+   jmp putc i		" No, so return (more room still in the buffer)
+   lac fo		" Load fd1 (i.e stdout)
+   sys write; obuf; 64	" and write out the 64 words in the buffer
    lac iopt
-   dac opt
-   dzm noc
-   jmp putc i
-2: 0;0
-opt: obuf
-iopt: obuf
-noc: 0
-fo: 1
+   dac opt		" Set opt pointing back to base of buffer
+   dzm noc		" Set the number of chars in the buffer to 0
+   jmp putc i		" and return
+
+2: 0;0			" Current input and output word pointers
+opt: obuf		" Pointer to the output buffer
+iopt: obuf		" Pointer to the output buffer
+noc: 0			" Number of output characters
+fo: 1			" Output file descriptor, fd 1 is stdout
 
 d1: 1
 o177: 0177
@@ -459,19 +474,19 @@ d8: 8
 o60: 060
 o20: 020
 d501: 501
-
+					" Names of files and directories
 dd:
-   <dd>; 040040; 040040; 040040
-dotdot:
-   056056; 040040; 040040; 040040
+   <dd>; 040040; 040040; 040040		" dd
+dotdot:	
+   056056; 040040; 040040; 040040	" ..
 system:
-   <sy>;<st>;<em>; 040040
+   <sy>;<st>;<em>; 040040		" system
 scrname:
-   <*s>;<rc>;040040;040040
+   <*s>;<rc>;040040;040040		" *src
 pass2:
-   <i
+   <i					" i
 pass1:
-   <i 012
+   <i 012				" i\n
 
 fso: .=.+1
 fsi: .=.+1
@@ -479,7 +494,7 @@ fsloc: .=.+1
 nfiles: .=.+1
 fflg: .=.+1
 buf: .=.+64
-obuf: .=.+64
+obuf: .=.+64		" Output buffer
 fd: .=.+1
 filp: .=.+1
 ddfilp: .=.+1
@@ -498,4 +513,3 @@ fsopt: .=.+1
 fsobuf: .=.+64
 dbuf: .=.+100
 fbuf:
-   

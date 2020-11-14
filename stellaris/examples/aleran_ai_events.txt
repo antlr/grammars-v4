@@ -1,0 +1,273 @@
+namespace = aleran_ai
+
+country_event = {
+	id = aleran_ai.1
+	hide_window = yes
+	#is_triggered_only = yes
+	title = "aleran_ai.1.name"
+	desc = "aleran_ai.1.desc"
+	picture = GFX_evt_unknown_ships
+	show_sound = event_construction
+	
+	trigger = {
+		NOT = {has_country_flag = aleran_ai_init}
+		has_valid_civic = civic_dragon_gov
+		is_ai = yes
+	}
+
+	mean_time_to_happen = {
+		days = 4
+	}
+	
+	immediate = {
+		set_country_flag = aleran_ai_init
+		
+		save_event_target_as = alerans
+		capital_scope = {
+			solar_system = {
+				save_event_target_as = aleris
+			}
+		}
+		
+		every_system = {
+			limit = {
+				has_star_flag = aleran_nearby
+				NOT = { is_inside_border = from }
+				
+				#distance = {
+				#	source = event_target:aleris
+				#	max_distance <= 40
+				#	min_distance >= 5
+				#	type=euclidean
+				#	use_bypasses=no
+				#} 
+			}
+			
+			every_system_planet = {
+				destroy_colony = yes
+				every_tile = {
+					kill_pop = yes
+				}				
+			}
+			
+			create_starbase = {
+				owner = event_target:alerans
+				size = starbase_outpost
+			} 
+			starbase = {
+				set_owner = event_target:alerans
+			}
+			
+			if = {
+				limit = {
+					NOT = {
+						distance = {
+							source = event_target:aleris type=hyperlane use_bypasses=no min_jumps >= 0 max_jumps <= 2
+						}
+					}
+				}
+				add_hyperlane = { from = this to = event_target:aleris } 
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_ai.2
+	hide_window = yes
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_ai = yes
+		
+		NOT = {has_country_flag = aleran_ai_spacealiens}
+	}
+
+	mean_time_to_happen = {
+		days = 20
+	}
+	
+	immediate = {
+		set_country_flag = aleran_ai_spacealiens
+		
+		country_event = { id = story.207 } #crystal pacification
+		country_event = { id = story.107 } #amoeba
+	}
+}
+
+country_event = {
+	id = aleran_ai.50
+	#hide_window = yes
+	#is_triggered_only = yes
+	title = "aleran_ai.50.name"
+	desc = "aleran_ai.50.desc"
+	picture = GFX_evt_unknown_ships
+	show_sound = event_construction
+	
+	trigger = {
+		NOT = {has_country_flag = aleran_ai_bonus}
+		has_valid_civic = civic_dragon_gov
+		is_ai = yes
+	}
+
+	mean_time_to_happen = {
+		days = 1
+	}
+	
+	immediate = {
+		set_country_flag = aleran_ai_bonus
+		
+		leader = {
+			change_leader_portrait = "dgnfemale13"
+		}
+		
+		set_city_graphical_culture = "aleran_04"
+		set_graphical_culture = "plantoid_01"
+		
+		add_minerals = 200
+		add_energy = 100
+		add_influence = 100
+		
+		give_technology = { tech = "tech_biolab_1" message = no }
+		give_technology = { tech = "tech_engineering_lab_1" message = no }
+		give_technology = { tech = "tech_physics_lab_1" message = no }
+		
+		give_technology = { tech = tech_wormhole_stabilization message = no } 
+		give_technology = { tech = tech_jump_drive_1 message = no } 
+		
+		create_fleet = {
+			effect = {
+				set_owner = prev
+
+				create_ship = {
+					name = random
+					random_existing_design = science
+				}
+
+				set_fleet_stance = evasive				
+				#set_location = prev.capital_star
+				set_location = prev.capital_scope.star
+				
+				owner = {
+					create_leader = {
+						type = scientist
+						sub_type = survey
+						name = random
+						species = owner_main_species
+					}
+				}
+				set_leader = last_created_leader
+			}			
+		}
+	}
+	
+	option = {
+		name = "aleran_ai.50.click"
+		ai_chance = {
+			factor = 150
+		}
+		owner = {
+			add_modifier = {
+				modifier = aleran_ai_bonus
+				days = -1
+			}
+		}
+		
+	}
+}
+
+country_event = {
+	id = aleran_ai.100
+	hide_window = yes
+	#is_triggered_only = yes
+	title = "aleran_ai.100.name"
+	desc = "aleran_ai.100.desc"
+	picture = GFX_evt_news_room
+	show_sound = event_default
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_ai = yes
+		
+		NOT = {has_modifier = aleran_ai_catchup}
+		
+		any_country = {
+			NOT = {has_valid_civic = civic_dragon_gov}
+			 
+			has_established_contact = from
+			is_ai = no
+			
+			NOT = {is_country_type = fallen_empire}
+				 
+			from = {has_casus_belli = {target = prev type = cb_dragon}}
+			
+			OR = {
+				relative_power = {
+					who = from
+					category = fleet
+					value > inferior
+				}
+				relative_power = {
+					who = from
+					category = technology
+					value > inferior
+				}
+			}			
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 120
+	}
+	
+	immediate = {
+		owner = {
+			add_modifier = {
+				modifier = aleran_ai_catchup
+				days = 300
+			}
+		}
+	}
+}
+
+country_event = {
+	id = aleran_ai.500
+	hide_window = yes
+	#is_triggered_only = yes
+	#title = "aleran_ai.500.name"
+	#desc = "aleran_ai.500.desc"
+	#picture = GFX_evt_arguing_senate
+	#show_sound = event_factions
+	
+	trigger = {
+		has_valid_civic = civic_dragon_gov
+		is_ai = yes
+	}
+	
+	immediate = {
+		set_federation_leader = this
+		if = {
+			limit = {
+				OR = {
+					
+				}
+			}
+			set_country_flag = already_fe_demanded
+		}
+		remove_modifier = humiliated
+		add_influence = 10
+		#if = {
+		#	limit = {
+		#		has_country_flag = already_fe_demanded
+		#	}		
+			set_country_flag = fe_demand_made
+		#}
+		
+		set_city_graphical_culture = "aleran_04"
+		set_graphical_culture = "plantoid_01"
+	}
+	
+	mean_time_to_happen = {
+		days = 10
+	}
+}

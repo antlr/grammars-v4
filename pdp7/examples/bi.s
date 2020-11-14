@@ -11,7 +11,7 @@ fetch:
    lmq
    and o17777
    dac addr
-   ecla lls 4
+   cla; lls 4    " XXX  replaced for now:  ecla lls 4
    tad .+3
    dac .+1
    jmp .. i

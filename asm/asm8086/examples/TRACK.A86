@@ -1,0 +1,236 @@
+;	* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+;	*							*
+;	*    CP/M-86 Accelerator --  Track Buffering Routines	*
+;	*							*
+;	*	This module, when installed in a CBIOS, causes	*
+;	*	CP/M-86 to perform disk input output on a	*
+;	*	track by track basis, rather than sector by	*
+;	*	sector.						*
+;	*							*
+;	*	This speeds diskette access up, often by a	*
+;	*	factor of four or more times.			*
+;	*							*
+;	*	The actual disk sectors must be a integral	*
+;	*	multiple of 128 bytes, but do not need to be	*
+;	*	a power of two multiple unlike the deblocking	*
+;	*	algorithms supplied with CP/M-86.		*
+;	*							*
+;	* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+;  The following three equates must be set to correspond to the
+; actual disk utilized.
+
+host_sectsiz	equ	1024	; bytes per actual (physical) disk sector
+host_spt	equ	8	; actual sectors per track
+host_fsn	equ	1	; starting sector number (only 0 or 1 allowed)
+
+
+init:
+	call	clear_flags		; Initialize track buffering
+	 .
+	 .
+	 .
+	jmp	CCP_entry
+
+
+seldsk:
+	mov cpm_disk,cl			; save the selected drive
+	test dl,1			; check logged-in bit
+	jnz old_disk			; not first time selected if nz
+
+		; here if CP/M is about to login to the drive being
+		; selected.
+
+old_disk:
+	mov bl,cpm_disk ! mov bh,0
+	mov dl,4 ! shl bx,dl		; times 16
+	add bx,offset dpbase		; gives offset from DPBASE
+	ret				; back to BDOS
+
+setdma:
+	mov	dma_offset,cx		; save DMA offset address
+	ret
+setdma_seg:
+	mov	dma_segment,cx		; save DMA segment address
+	ret
+home:
+	test wr_flag,1 ! jnz home1 ; if the buffer is clean,
+	mov	cur_disk,-1	; insure we read the directory by invalidating
+				;  the track buffer
+home1:
+	mov	cx,0		; home is a settrk zero
+
+settrk:
+	mov	cpm_track,cx	; save track number for next operation
+	ret
+setsec:
+	mov	cpm_sec,cx	; save sector number for next operation
+	ret
+
+sectran:
+	mov	bx,cx		; Put logical sector into dest. reg.
+	test	dx,dx		; see if table address is zero
+	jz	sectran_exit	; yeah, logical = physical
+	add	bx,dx		; else, we need to fetch the
+	mov	bl,[BX]		;  actual sector number from the table
+	mov	bh,0		; zero high byte for good luck
+sectran_exit:
+	ret
+
+read:
+	call	setup
+	push	es			; save the extra segment register
+	mov	si,offset track_buffer	; source segment is systems DS:
+	add	si,ax			; gives the offset into the buffer
+	les	di,dma_longword		; point ES:DI at the users sector
+	rep movsw			; doit
+	pop	es			; restore the extra segment
+	sub	ax,ax			; make a zero return code
+	ret
+
+write:
+	push	cx			; save the write mode from the BDOS
+	call	setup
+	push	ax			; save buffer offset
+	push	ds			; save the data segment
+	push	es			; save the extra segment
+	mov bx,ds ! mov es,bx		; destination is our data segment
+	mov	di,offset track_buffer	; destination is in track buffer
+	add	di,ax			; plus appropriate offset
+	lds	si,dma_longword		; source is users DMA address
+	rep movsw			; move that sector
+	pop	es			; restore the extra segment
+	pop	ds			; and the data segment registers
+	pop	ax			; recover buffer offset
+	mov	cx,host_sectsiz		; setup to divide by host sector size
+	sub	dx,dx			; extend ax to 32 bits
+	div	cx			; find out which host sector we changed
+	mov	bx,ax			; put into index [BX]
+	mov	sec_flags[BX],1		; set the update flag for that sector
+	mov	wr_flag,1		; also set the dirty buffer flag
+	pop	cx			; recover BDOS write code
+	cmp	cl,1			; is this a directory update ?
+	jne	return			; no, we may leave dirty records
+					;	in the buffer
+	call	flush_buffer		; we have a directory write, need to
+					; flush the buffer to insure the
+					; disks integrity
+return:
+	mov	ax,0			; never return BAD SECTOR code
+	ret
+
+
+setup:			; common code for setting up reads and writes
+
+	mov	al,cpm_disk		; see if selected disk is
+	cmp	al,cur_disk		;	the same as last time
+	jne	wrong_track		; no, we have wrong track
+
+	mov	ax,cpm_track		; see if desired track is same as
+	cmp	ax,cur_track		;	the track in the buffer
+	je	correct_track		; same drive and track, we don't need to read
+
+;	Desired operation is on a different track then is in our buffer,
+;	So it will be nessecary to read in the desired track.  First, we
+;	must check to see if any sectors of the current buffer are dirty.
+
+wrong_track:
+	call	flush_buffer		; write any old records, if nessecary
+
+	mov	ax,cpm_track		; get desired track number
+	mov	cur_track,ax		; make in new track
+	mov	al,cpm_disk		; get desired disk number
+	mov	cur_disk,al		; make it current drive
+	mov	cur_dma,offset track_buffer ; point dma offset at track buffer
+	mov	cur_sec,host_fsn	; starting from first sector
+	call	track_read		; load the track
+
+correct_track:
+	mov	ax,cpm_sec		; get the cp/m sector number
+  if (host_fsn ne 0)
+	sub	ax,host_fsn		; correct if we start with sector one
+    endif
+	mov	dl,7			; log2(128)
+	shl	ax,dl			; sector times 128 gives offset
+	mov cx,64 ! cld			; move 64 words forward
+	ret
+
+
+flush_buffer:
+	test	wr_flag,1		; see if we have anything to write
+	jz	no_flush		; no, skip scanning for dirty sectors
+	mov	bx,0			; start at host sector 0
+	mov	cx,host_spt		; for host_spt sectors...
+next_sect:
+	test	sec_flags[BX],1		; see if this sector has been changed
+	jz	not_updated		; no, leave it alone
+	mov	sec_flags[BX],0		; zero the flag for next time
+	push	bx			; save the registers
+	push	cx
+	mov	cur_sec,bx		; save host sector number
+	mov	ax,host_sectsiz
+	mul	bx			; make track buffer offset
+	add	ax,offset track_buffer	; make direct pointer
+	mov	cur_dma,ax		; save for write routine
+	call	sector_write
+	pop	cx
+	pop	bx
+not_updated:
+	inc	bx
+	loop	next_sect
+no_flush:
+	mov	wr_flag,0		; clear the dirty buffer flag
+	ret
+
+clear_flags:	; Clear all variables associated with the track buffer,
+		; so next operation will have to read a track.
+		;  This is involves clearing all write flags and setting
+		;  the old drive code to the invalid -1.
+
+	mov cur_disk,-1 		; insure initial pre-read
+	sub ax,ax			; make a zero
+	mov wr_flag,al			; clear the dirty buffer flag
+	mov di,offset sec_flags		; point to the update flag list
+	mov bx,ds ! mov es,bx		; ES <- DS
+	mov cx,host_spt ! cld		; set length and direction
+	rep stosb			; zero the sector update flags
+	ret
+
+track_read:
+		; read an entire track from the drive "cur_disk",
+		;	the track "cur_track" into "track_buffer".
+
+	ret
+
+sector_write:
+		; write a physical sector to disk "cur_disk",
+		;	track "cur_track", sector "cur_sec" from
+		;	the buffer at DS:"cur_dma".
+
+	ret
+
+
+	dseg
+
+cpm_disk	rb	1
+cpm_track	rw	1
+cpm_sec		rw	1
+
+dma_offset	rw	1
+dma_segment	rw	1
+dma_longword	equ	dword ptr dma_offset
+
+cur_disk	rb	1
+cur_sec		rw	1
+cur_track	rw	1
+cur_dma		rw	1
+
+bdos_wr_code	rb	1	; 1 indicates a directory write
+wr_flag		rb	1	; bit 0 on indicates we have a dirty buffer
+
+sec_flags	rb	host_spt ; bit 0 of each byte on indicates
+				;	corresponding host sector has been
+				;	updated and needs writing.
+
+track_buffer	rb	host_sectsiz * host_spt

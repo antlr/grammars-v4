@@ -1,0 +1,45 @@
+//Scripts.dump();
+
+
+var gvarl = 0;
+
+class withTestClass {
+	var member;
+	var member1;
+	var member2;
+	var member3;
+	function withTestClass() {
+		member = member1 = member2 = member3 = 0;
+	}
+	function method() {
+		if( member == 1 && member1 == 1 && member2 == 2 && member3 == 1 ) {
+		} else {
+			Debug.message( "faild: withTestClass.method" );
+		}
+	}
+	function test() {
+		this.dic = %[];
+		with(this.dic)
+		{
+			.member = 1;
+			this.dic = 0;
+			.member = 2;
+		}
+	}
+}
+var obj = new withTestClass();
+with(obj) .member = 1;
+
+with(obj) {
+	.member1 = 1;
+	.member2 = 2;
+	.member3++;
+	.method();
+}
+obj.test();
+
+.gvarl = 7;
+if( gvarl != 7 ) {
+	Debug.message( "faild: gvarl != 7" );
+}
+

@@ -1,0 +1,68 @@
+//
+// $Id: KImageLabel.tjs,v 1.4 2007/09/03 11:53:51 m2 Exp $
+//
+
+/**----------------------------------------------------------------------
+ * イメージラベル
+ ----------------------------------------------------------------------*/
+class KImageLabel extends KWidget
+{
+  var _label;
+
+  /*------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィンドウ
+   * @param label イメージのファイル名
+   * @param name 名前
+   ------------------------------*/
+  function KImageLabel(win, label, name = "") {
+    // 親クラス呼び出し
+    super.KWidget(win, name);
+    // マウスの当たり判定は透過
+    hitThreshold = 256;
+    // 値を設定
+    this.label = label;
+  }
+
+  /**------------------------------
+   * ラベルの値
+   *
+   * @return ラベルの値
+   * @param v 新規のラベルの値
+   ------------------------------*/
+  property label {
+    getter {
+      return _label;
+    }
+
+    setter(v) {
+      // 値を更新
+      _label = v;
+      // 再描画
+      drawContent();
+    }
+  }
+
+  // ラベルの内容を描画。サイズを再設定
+  function drawContent {
+    if(label != "")
+    {
+      // イメージをロード
+      loadImages(_label);
+      // サイズを設定
+      setFixedSizeToImageSize();
+    }
+  }
+
+  // enabled==trueならそのまま表示
+  function onNodeEnabled {
+    opacity = 255;
+  }
+
+  // enabled=falseなら半透明で表示
+  function onNodeDisabled {
+    opacity = 64;
+  }
+}
+

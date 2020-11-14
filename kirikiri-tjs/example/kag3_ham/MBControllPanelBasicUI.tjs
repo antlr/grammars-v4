@@ -1,0 +1,190 @@
+/******************************************************************************
+	system_mb/mb/system/userconf/MBControllPanelBasicUI.tjs
+*******************************************************************************/
+
+class MBControllPanelSectionButton extends MBButton
+{
+	var objCurrentChild;	// チェックが付いている操作子
+	
+	function MBControllPanelSectionButton(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBButton(win, par);
+		
+		setImageSize(112, 19);
+		setSizeToImageSize();
+		loadImages(sysfunc.getPathImage("userconf/sectionbutton"));
+		visible = true;
+		enabled = true;
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function callParentFunction()
+	{
+		// 親のメソッドは呼ばない
+		
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		if (button == mbRight)
+		{
+			parent.onChildrenRightClick();
+			return;
+		}
+		
+		super.onMouseDown(...);
+	}
+}
+
+//==============================================================================
+
+class MBControllPanelCheckBox extends MBButton
+{
+	var strBasicImageName;	// 通常画像のファイル名
+	var strSelectedImageName;	// 選択状態の画像のファイル名
+	
+	var blSelected;	// 選択状態かどうか
+	var intOptionValue;	// 割り当てられた設定値
+	
+	
+	function MBControllPanelCheckBox(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBButton(win, par);
+		
+		name = "コンパネチェックボックス";
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function initState()
+	{
+		// 状態を初期化する
+		
+		loadImages(strBasicImageName);
+		blSelected = false;
+	}
+	
+	function changeState()
+	{
+		// 状態を変更する。つまり、画像を変更する
+		
+		if (blSelected) {
+			loadImages(strBasicImageName);
+			blSelected = false;
+		}
+		
+		else {
+			loadImages(strSelectedImageName);
+			blSelected = true;
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function getCursorFromManager(lock = true)
+	{
+		// フォーカススタックマネージャから割り当てをもらう
+		
+		super.getCursorFromManager(lock);
+		
+		cursorX = 6;
+		cursorY = cursorY;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function callParentFunction()
+	{
+		// 親のメソッドを呼ぶ
+		
+		if (blSelected) {
+			return;
+		}
+		
+		changeState();
+		execParentFunction();
+	}
+	
+	function execParentFunction()
+	{
+		// 親のメソッドを呼ぶ実体
+		
+		super.callParentFunction();
+	}
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		if (button == mbRight)
+		{
+			parent.onChildrenRightClick();
+			return;
+		}
+		
+		super.onMouseDown(...);
+	}
+}
+
+//==============================================================================
+
+class MBControllPanelCheckButton extends MBButtonLayer
+{
+	var tag;
+
+	function MBControllPanelCheckButtonLayer(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBButton(win, par);
+		
+		name = 'コンパネチェックボタン';
+		
+		visible = true;
+		opacity = 255;
+		focusable = true;
+	}
+
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+
+	function onMouseEnter()
+	{
+		//super.onMouseEnter(...);
+	}
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		if (button == mbRight)
+		{
+			parent.onChildrenRightClick();
+			return;
+		}
+		
+		super.onMouseDown(...);
+	}
+}
+

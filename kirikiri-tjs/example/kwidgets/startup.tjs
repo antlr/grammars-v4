@@ -1,0 +1,171 @@
+//
+// $Id: startup.tjs,v 1.31 2007/09/10 08:37:00 m2 Exp $
+//
+
+// 二重起動回避
+if (! System.createAppLock("kwidgets_sample"))
+  System.exit();
+// デバッグコンソールを表示
+@if (!kirikiriz)
+Debug.console.visible = true;
+@endif
+
+// プラグインをリンク
+Plugins.link("clipboardEx.dll");
+Plugins.link("fstat.dll");
+Plugins.link("json.dll");
+// kwidgetsをロード
+Storages.addAutoPath("kwidgets/");
+Scripts.execStorage("KInitialize.tjs");
+// サンプルリストをロード
+Scripts.execStorage("WidgetSample.tjs");
+Scripts.execStorage("ScrollSample.tjs");
+Scripts.execStorage("DragDropSample.tjs");
+Scripts.execStorage("ListSample.tjs");
+Scripts.execStorage("ListSample2.tjs");
+Scripts.execStorage("TableSample.tjs");
+Scripts.execStorage("TableSample2.tjs");
+Scripts.execStorage("SpiralSample.tjs");
+Scripts.execStorage("TimeLineSample.tjs");
+Scripts.execStorage("TestCase.tjs");
+
+
+//----------------------------------------------------------------------
+// サンプルランチャー
+//----------------------------------------------------------------------
+class SampleLauncher extends KWindow
+{
+  // コンストラクタ
+  function SampleLauncher {
+    super.KWindow("sample_launcher");
+
+    // キャプション等設定
+    borderStyle = bsDialog;
+    System.title = caption = "kwidgetsサンプル";
+
+    // デフォルト値を設定
+    defaultSpace = 2;
+    defaultMargin = 3;
+    defaultAlignHorizontal = ALIGN_CENTER;
+    defaultAlignVertical = ALIGN_CENTER;
+
+    // グリッドを作成、ボタンを配置
+    var grid = new KGridLayout(this);
+    grid.add(0, 0, new KTextToggleButton(this, "ウィジェットサンプル", "widget_sample"));
+    grid.add(0, 1, new KTextToggleButton(this, "スクロールサンプル", "scroll_sample"));
+    grid.add(0, 2, new KTextToggleButton(this, "リストサンプル", "list_sample"));
+    grid.add(0, 3, new KTextToggleButton(this, "リストサンプル2", "list_sample_2"));
+    grid.add(0, 4, new KTextToggleButton(this, "テーブルサンプル", "table_sample"));
+    grid.add(0, 5, new KTextToggleButton(this, "テーブルサンプル2", "table_sample2"));
+    grid.add(0, 6, new KTextToggleButton(this, "ドラッグ＆ドロップサンプル", "dragdrop_sample"));
+    grid.add(0, 7, new KTextToggleButton(this, "スパイラルサンプル", "spiral_sample"));
+    grid.add(0, 8, new KTextToggleButton(this, "タイムラインサンプル", "timeline_sample"));
+
+    //グリッドを配置
+    primaryWidget.add(grid);
+
+    // 永続化辞書の作成
+    var dict = new KPersistentDictionary(System.dataPath + "samlelauncher_dict.txt");
+    // ウィンドウの管理オブジェクトに辞書を追加して、
+    // finalize時に自動的に内容がセーブされるようにする。
+    add(dict);
+    // ウィンドウ内の名前を持っているウィジェットと辞書をバインドする。
+    // これにより、アプリ終了時のウィジェットの値が次回起動時に持ち越される。
+    // ウィンドウ自身のサイズと座標も辞書に記録される。
+    bindPersistentDictionary(dict);
+
+    // 辞書よりロードした値に基き、サンプルの初期表示を行う
+    if (widget_sample.value)
+      showWidgetSample();
+    if (scroll_sample.value)
+      showScrollSample();
+    if (list_sample.value)
+      showListSample();
+    if (list_sample_2.value)
+      showListSample2();
+    if (table_sample.value)
+      showTableSample();
+    if (table_sample2.value)
+      showTableSample2();
+    if (dragdrop_sample.value)
+      showDragDropSample();
+    if (spiral_sample.value)
+      showSpiralSample();
+    if (timeline_sample.value)
+      showTimeLineSample();
+
+    visible = true;
+  }
+
+  // 子の値の変更を検知
+  function onChildValueModified(child, value) {
+    // サンプルの表示状態を切り替える。
+    switch (child.name) {
+
+    case "widget_sample": 
+      if (value)
+        showWidgetSample();
+      else
+        hideWidgetSample();
+      break;
+
+    case "scroll_sample": 
+      if (value)
+        showScrollSample();
+      else
+        hideScrollSample();
+      break;
+
+    case "list_sample": 
+      if (value)
+        showListSample();
+      else
+        hideListSample();
+      break;
+
+    case "list_sample_2": 
+      if (value)
+        showListSample2();
+      else
+        hideListSample2();
+      break;
+
+    case "table_sample": 
+      if (value)
+        showTableSample();
+      else
+        hideTableSample();
+      break;
+
+    case "table_sample2": 
+      if (value)
+        showTableSample2();
+      else
+        hideTableSample2();
+      break;
+
+    case "dragdrop_sample":
+      if (value)
+        showDragDropSample();
+      else
+        hideDragDropSample();
+      break;
+
+    case "spiral_sample":
+      if (value)
+        showSpiralSample();
+      else
+        hideSpiralSample();
+      break;
+
+    case "timeline_sample":
+      if (value)
+        showTimeLineSample();
+      else
+        hideTimeLineSample();
+      break;
+    }
+  }
+}
+
+global.launcher = new SampleLauncher();

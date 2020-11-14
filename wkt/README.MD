@@ -1,0 +1,4 @@
+Well-known text
+===============
+
+Well-known text (WKT) is a text markup language for representing vector geometry objects on a map, spatial reference systems of spatial objects and transformations between spatial reference systems. A binary equivalent, known as well-known binary (WKB), is used to transfer and store the same information on databases. The formats were originally defined by the Open Geospatial Consortium (OGC) and described in their Simple Feature Access and Coordinate Transformation Service specifications. The current standard definition is in the ISO/IEC 13249-3:2016 standard, "Information technology – Database languages – SQL multimedia and application packages – Part 3: Spatial" (SQL/MM) and ISO 19162:2015, "Geographic information – Well-known text representation of coordinate reference systems".

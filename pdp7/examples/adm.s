@@ -54,7 +54,7 @@ floop1:
    tad d4
    dac name
 
-   sys open; name; ..; 0
+   sys open; name: ..; 0
    spa
    jmp ferror
    dac fi
@@ -189,7 +189,7 @@ ferror:
    sys write; 1:..; 4
    lac d1
    sys write; 1f; 1
-   fmp floop1
+   jmp floop1
 1: 077012
 
 hangup:

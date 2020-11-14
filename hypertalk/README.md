@@ -8,7 +8,7 @@ HyperTalk's elegant syntax mimics natural English (`sort the lines of field "Stu
 
 ## Special Considerations
 
-* This grammar is based on HyperCard v2.4.1 (the last commercial release of the product from 1998). That said, not all commands, functions or operators are supported (especially those addressing AppleTalk or multiple stacks). A few grammatical extensions to the syntax are also present.
+* This grammar is based on HyperCard v2.4.1 (the last commercial release of the product from 1998). That said, not all commands, functions or operators are supported (like those addressing AppleTalk, the Finder or Quicktime). A few grammatical extensions to the syntax are also present.
 * HyperTalk is a case-insensitive language, but this grammar assumes keywords in the input stream are all lowercase. Use a lowercasing `ANTLRInputStream` [such as this one](https://gist.github.com/defano/0148bcf5b7619a79a38aa766e12de10a) to provide case insensitivity.   
 * This grammar is somewhat more strict than HyperCard's. HyperCard allowed uncommented, arbitrary text not conforming to the language to appear outside of function/handler definitions; this grammar does not. This grammar also disallows function and handler definitions in scriptlets.
 

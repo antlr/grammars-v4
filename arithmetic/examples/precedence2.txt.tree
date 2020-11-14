@@ -1,1 +1,1 @@
-(equation (expression (term (factor (signedAtom (atom (variable a)))))) (relop =) (expression (term (factor (signedAtom (atom ( (expression (term (factor (signedAtom (atom (scientific 234))) ^ (signedAtom (atom (scientific 4.23)))))) )))) / (factor (signedAtom (atom (scientific 345)))))))
+(equation (expression (atom (variable a))) (relop =) (expression (expression ( (expression (expression (atom (scientific 234))) ^ (expression (atom (scientific 4.23)))) )) / (expression (atom (scientific 345)))))

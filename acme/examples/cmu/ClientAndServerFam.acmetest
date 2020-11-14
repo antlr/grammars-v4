@@ -1,0 +1,92 @@
+// 
+ 
+// ClientAndServerFam style to represent systems that have 
+ 
+// a client component accessing a server component. 
+ 
+// 
+ 
+Family ClientAndServerFam = {
+    Port Type ClientPortT = {
+        // this port isn't dangling
+        heuristic size(self.attachedRoles) >= 1<<label : string = "This port has attachment(s).";errMsg : string = "This port dangles!";>>;
+        
+    }
+    
+    
+    Port Type ServerPortT = {
+        // this port isn't dangling
+        heuristic size(self.attachedRoles) >= 1<<label : string = "This port has attachment(s).";errMsg : string = "This port dangles!";>>;
+        
+    }
+    
+    
+    Role Type clientSideRoleT = {
+        // this role is not dangling
+        invariant size(self.attachedPorts) >= 1<<label : string = "This role has an attachment.";errMsg : string = "The role dangles!";>>;
+        
+    }
+    
+    
+    Role Type serverSideRoleT = {
+        // this role is not dangling
+        invariant size(self.attachedPorts) >= 1<<label : string = "This role has an attachment.";errMsg : string = "The role dangles!";>>;
+        
+    }
+    
+    
+    Component Type ClientT = {
+        Port sendRequest : ClientPortT =  new ClientPortT;
+        
+        
+    }
+    
+    
+    Component Type ServerT = {
+        Port receiveRequest : ServerPortT =  new ServerPortT;
+        
+        
+        Property multiThreaded : boolean << default : boolean = false;  >>;
+        
+        Property max-concurrent-requests : int;
+        
+    }
+    
+    
+    Connector Type CSConnT = {
+        Role clientSide : clientSideRoleT =  new clientSideRoleT;
+        
+        
+        Role serverSide : serverSideRoleT =  new serverSideRoleT;
+        
+        
+        Property blocking : boolean << default : boolean = true;  >>;
+        
+        Property protocol : string << default : string = "";  >>;
+        
+        invariant size(self.roles) == 2;
+        
+    }
+    
+    
+    // If two components are connected, one must be a ClientT and the other ServerT 
+    // 
+ 
+    // 
+ 
+    // 
+ 
+    invariant Forall c1 : component in self.components | 
+        Forall c2 : component in self.components | 
+            connected(c1, c2) -> (declaresType(c1, ClientT) AND declaresType(c2, ServerT)) OR (declaresType(c1, ServerT) AND declaresType(c2, ClientT))  <<label : string = "All pairs of connected components are ClientTwith ServerT.";errMsg : string = "Detected pair(s) of components that falis the ClientT with ServerT constraint!";>>;
+    
+    // All components must be either a ClientT or a ServerT
+    invariant Forall comp : component in self.components | 
+        (declaresType(comp, ClientT) AND satisfiesType(comp, ClientT)) OR (declaresType(comp, ServerT) AND satisfiesType(comp, ServerT)) <<label : string = "All components are either a ClientT or a ServerT.";errMsg : string = "Component(s) detected that is NEITHER a ClientT NOR a ServerT!";>>;
+    
+    // All connectors must be CSConnT
+    invariant Forall conn : connector in self.connectors | 
+        satisfiesType(conn, CSConnT) <<label : string = "All connectors are CSConnT.";errMsg : string = "Connector(s) detected that is NOT a CSConnT!";>>;
+    
+}
+

@@ -1,0 +1,574 @@
+/*----------------------------------------------------------------------------/
+/	KComboBox用のドロップダウンリスト
+/----------------------------------------------------------------------------*/
+
+var DROPDOWNLIST_SEPARATOR	= "--separator--";
+
+class KDropDownList extends Window
+{
+	var	dispCount	= 3;	// 表示状態にする数
+	var	toExit;
+	var	selfunc, unselfunc;
+
+	var	items, scroll;
+
+	function KDropDownList(toExit = true, selfunc = void, unselfunc = void)
+	{
+		super.Window(...);
+
+        if (k_kirikiriz)
+          this.innerSunken = false;
+
+		this.toExit	= toExit;
+		this.selfunc	= selfunc;
+		this.unselfunc	= unselfunc;
+		fullScreen	= false;
+		borderStyle	= bsNone;
+		innerSunken	= false;
+		visible		= false;
+
+		add(new global.Layer(this, null));
+		add(items = new KDropDownListItem(this, primaryLayer));
+		add(scroll = new KDropDownListScrollBar(this, primaryLayer));
+	}
+
+	function clearItems()
+	{
+		items.clear();
+	}
+
+	function addSeparator()
+	{
+		items.add(DROPDOWNLIST_SEPARATOR, null);
+	}
+
+	function addItem() {}
+
+	function addValueItem(caption, value)
+	{
+		items.add(caption, value);
+	}
+
+	function addToggleItem() {}
+	function addRadioItem() {}
+	function addNest() {}
+	function addValueCommand() {}
+
+	function show(baseLayer = void, x = void, y = void)
+	{
+		with(primaryLayer)
+		{
+			items.font.height	= baseLayer.font.height if baseLayer != void;
+			var	w	= baseLayer != void ? baseLayer.width : 100;
+			var	dc;
+			if(dispCount < items.count)
+				dc	= dispCount;
+			else
+				dc	= items.count;
+			var	h	= items.count > 0 ? items.itemHeight * dc : 0;
+			h	+= 2;
+
+			.setImageSize(w, h);
+			.setSizeToImageSize();
+			.fillRect(1, 1, .width-2, .height-2, 0xFFFFFFFF);
+			.fillRect(0, 0, .width, 1, 0xFF000000);
+			.fillRect(0, 1, 1, .height-2, 0xFF000000);
+			.fillRect(.width-1, 1, 1, .height-2, 0xFF000000);
+			.fillRect(0, .height-1, .width, 1, 0xFF000000);
+
+			setInnerSize(.width, .height);
+
+			if(dc < items.count)
+			{
+				scroll.setImageSize(16, .height - 2);
+				scroll.setSizeToImageSize();
+				scroll.setPos(.width - scroll.width - 1, 1);
+
+				items.setImageSize(.width - scroll.width - 2, .height - 2);
+				items.setSizeToImageSize();
+				items.setPos(1, 1);
+
+				scroll.visible = items.visible = true;
+			}
+			else
+			{
+				items.setImageSize(.width - 2, .height - 2);
+				items.setSizeToImageSize();
+				items.setPos(1, 1);
+				items.visible = true;
+			}
+			scroll.total	= items.total;
+			scroll.area		= items.area;
+			scroll.position	= items.position;
+		}
+		if(baseLayer != void)
+		{
+			if(typeof baseLayer.getScreenLeft != "undefined")
+			{
+				x	= baseLayer.getScreenLeft(x);
+				y	= baseLayer.getScreenTop(y);
+			}
+			else
+			{
+				while(!baseLayer.isPrimary)
+				{
+					x	+= baseLayer.left;
+					y	+= baseLayer.top;
+					baseLayer	= baseLayer.parent;
+				}
+				x	+= baseLayer.window.left, y += baseLayer.window.top;
+			}
+		}
+		stayOnTop	= true; focusable	= false;	// 非選択時、onPopupHide が呼ばれるように
+		trapKey	= true;	//	キーは受け取る
+		setPos(x, y);
+		focusable	= true;
+		visible	= true;
+		focusable	= false;
+	}
+
+	function onSelect(v)
+	{
+		selfunc(v) if selfunc != void;
+		closeThis();
+	}
+
+	function onScroll(v)
+	{
+		scroll.position = v;
+		items.position = scroll.position;
+	}
+
+	function onPopupHide()
+	{
+		unselfunc() if unselfunc != void;
+		closeThis();
+	}
+
+	function closeThis()
+	{
+		visible	= false;
+		if(toExit)
+			asyncCaller.call(function(item){invalidate item;}, this);
+	}
+
+	function onMouseEnter()
+	{
+		focusable	= true;
+	}
+
+	function onMouseLeave()
+	{
+		focusable	= false;
+	}
+
+	property value
+	{
+		setter(v)	{ items.value	= v; }
+		getter		{ return items.value; }
+	}
+
+	function onMouseWheel(shift, delta)
+	{
+		onScroll(scroll.position - delta \ 2);
+	}
+}
+
+class KDropDownListItem extends Layer
+{
+	var	_position	= 0;	// 高さ
+
+	var	items;
+
+	var	_curItem;
+
+	var	_value;
+
+	var	separatorHeight	= 3;
+
+	function KDropDownListItem()
+	{
+		super.Layer(...);
+		items	= [];
+
+		focusable	= true;
+	}
+
+	function onMouseUp(x, y, button)
+	{
+		if(items[curItem][0] != DROPDOWNLIST_SEPARATOR)
+			window.onSelect(items[curItem][1]);
+	}
+
+	function onMouseMove(x, y)
+	{
+//		setCurItem((y + position) \ itemHeight);
+		y	+= position;
+		var	t	= 0;
+		for(var i=0; i<items.count; i++)
+		{
+			if(items[i][0] == DROPDOWNLIST_SEPARATOR)
+				t	+= separatorHeight;
+			else
+			{
+				t	+= itemHeight;
+				if(y < t)
+				{
+					setCurItem(i);
+					return;
+				}
+			}
+		}
+		setCurItem(void);
+	}
+
+	function onMouseLeave()
+	{
+		setCurItem();
+	}
+
+	function onKeyDown(key, shift)
+	{
+//		Debug.message("key = "+key+" / shift = "+shift);
+		if(key == VK_UP)
+			curItem--;
+		else if(key == VK_DOWN)
+			curItem++;
+		else if(key == VK_RETURN)
+			window.onSelect(items[curItem][1]);
+	}
+
+	function clear()
+	{
+		items.clear();
+	}
+
+	function add(caption, value)
+	{
+		items.add([caption, value]);
+		if(value === _value)
+			setCurItem(items.count - 1);
+	}
+
+	function getItemValue(no)
+	{
+		if(no !== void && no >= 0 && no < items.count && items[no][0] != DROPDOWNLIST_SEPARATOR)
+			return items[no][1];
+		else
+			return void;
+	}
+
+	property value
+	{
+		setter(v)
+		{
+			_value	= v;	//	一応覚えておく
+			if(v !== void)
+			{
+				for(var i=0; i<items.count; i++)
+				{
+					if(items[i][1] === v)
+					{
+						v	= i;
+						break;
+					}
+				}
+			}
+			setCurItem(v);
+		}
+		getter { return getItemValue(curItem); }
+	}
+
+	property count		{ getter { return items.count; } }
+
+	property curItem
+	{
+		setter(v)	{ setCurItem(v); }
+		getter		{ return _curItem; }
+	}
+
+	function setCurItem(itemno)
+	{
+		// 範囲外なら何もしない
+		if(itemno < 0 || itemno >= items.count)
+			return;
+
+		if(itemno !== curItem)
+		{
+			var	lastItem	= curItem;
+			_curItem	= itemno;
+			if(curItem !== void)
+			{
+				// 選択されたアイテムが表示されるように移動
+				var	y	= curItem * itemHeight;
+//				Debug.message(@"${curItem}: ${y} < ${position} / ${y} > ${position+height-itemHeight}");
+				if(y < position)
+					window.onScroll(y);
+				else if(y > position + (height - itemHeight))
+					window.onScroll(y - (height - itemHeight));
+				drawItem(curItem);
+			}
+			drawItem(lastItem) if lastItem !== void;
+		}
+	}
+
+	function getItemTop(index = items.count)
+	{
+		var	t	= 0;
+		for(var i=0; i<index; i++)
+			t	+= items[i][0] == DROPDOWNLIST_SEPARATOR ? separatorHeight : itemHeight;
+		return t;
+	}
+
+	function drawItem(index)
+	{
+		if(index < 0 || index >= items.count)
+			return;
+
+//		var	t	= index * itemHeight - position;
+		var	t	= getItemTop(index) - position;
+		if(items[index][0] == DROPDOWNLIST_SEPARATOR)
+		{
+			if(t + separatorHeight < 0 || t > height)
+				return;
+
+			fillRect(0, t, width, separatorHeight, 0xFFFFFFFF);
+			fillRect(0, t+((separatorHeight - 1) >> 1), width, 1, 0xFF000000);
+		}
+		else
+		{
+			if(t + itemHeight < 0 || t > height)
+				return;
+
+			var	tc, bc;
+			if(index === curItem)
+				tc = 0xFFFFFF, bc = 0xFF000080;
+			else
+				tc = 0x000000, bc = 0xFFFFFFFF;
+
+//			Debug.message("drawItem("+index+") = drawText(1, "+(t+1)+", "+items[index][0]+")");
+			fillRect(0, t, width, itemHeight, bc);
+			drawText(1, t+1, items[index][0], tc);
+		}
+	}
+
+	function onPaint()
+	{
+		for(var i=0; i<items.count; i++)
+			drawItem(i);
+	}
+
+	property itemHeight	{ getter { return font.height + 2; } }
+
+//	property total		{ getter { return itemHeight * items.count; } }
+	property total		{ getter { return getItemTop(); } }
+	property area		{ getter { return height; } }
+	property position
+	{
+		setter(v)
+		{
+			if(_position !== v)
+			{
+				_position = +v;
+				update();
+			}
+		}
+		getter { return _position; }
+	}
+
+	property visible
+	{
+		setter(v)	{ if(v) { update(); super.visible = v; focus(); } }
+		getter		{ return super.visible; }
+	}
+}
+
+class KDropDownListScrollBar extends Layer
+{
+	var	_position;
+	var	_range, _area;
+
+	var	lightColor	= 0xFFFFFFFF;
+	var	darkColor	= 0xFF808080;
+	var	barColor	= 0xFFD4D0C8;
+	var	baseColor	= 0xFFEAE8E4;
+
+	function KDropDownListScrollBar()
+	{
+		super.Layer(...);
+	}
+
+	var	state;
+	var	clickY, lastMountTop;
+	function onMouseDown(x, y, button)
+	{
+		if(y < buttonHeight)
+		{
+			state	= 1;
+			drawUpperButton();
+		}
+		else if(y >= height - buttonHeight)
+		{
+			state	= 2;
+			drawLowerButton();
+		}
+		else if(y < mountTop)
+			window.onScroll(position - area);
+		else if(y > mountBottom)
+			window.onScroll(position + area);
+		else
+		{
+			state	= 3;
+			clickY	= y;
+			lastMountTop	= mountTop;
+		}
+	}
+
+	function onMouseMove(x, y)
+	{
+		if(state == 3)
+		{
+			var	mt	= lastMountTop - barTop + y - clickY;
+			window.onScroll(int(mt * total / barHeight));
+		}
+	}
+
+	function onMouseUp(x, y, button)
+	{
+		if(state == 1)
+		{
+			window.onScroll(position - 10);
+			drawUpperButton(false);
+		}
+		else if(state == 2)
+		{
+			window.onScroll(position + 10);
+			drawLowerButton(false);
+		}
+		state	= void;
+	}
+
+	property total
+	{
+		setter(v)	{ _range = +v - area; drawBar(); }
+		getter		{ return range + area; }
+	}
+
+	property range
+	{
+		setter(v)	{ _range = +v; drawBar(); }
+		getter		{ return _range; }
+	}
+
+	property area
+	{
+		setter(v)	{ _range += area; _area	= +v; _range -= area; drawBar(); }
+		getter		{ return _area; }
+	}
+
+	property position
+	{
+		setter(v)
+		{
+			v	= +v;
+			v	= 0 if v < 0;
+			v	= range if v > range;
+			_position	= v;
+			drawBar();
+		}
+		getter { return _position; }
+	}
+
+	function onPaint()
+	{
+/*		Debug.message("buttonHeight = "+buttonHeight);
+		Debug.message("barTop = "+barTop);
+		Debug.message("barHeight = "+barHeight);
+		Debug.message("barBottom = "+barBottom);
+		Debug.message("mountTop = "+mountTop);
+		Debug.message("mountBottom = "+mountBottom);
+*/		drawUpperButton();
+		drawBar();
+		drawLowerButton();
+	}
+
+	function drawMount(x, y, w, h, ltc, rbc, bc)
+	{
+//		Debug.message("drawMount("+x+", "+y+", "+w+", "+h+")");
+		fillRect(x, y, w-1, 1, bc);
+		fillRect(x, y+1, 1, h-2, bc);
+		fillRect(x+1, y+1, w-2, 1, ltc);
+		fillRect(x+1, y+2, 1, h-2, ltc);
+		fillRect(x+2, y+2, w-4, h-4, bc);
+		fillRect(x+w-2, y+2, 1, h-4, rbc);
+		fillRect(x+2, y+h-2, w-3, 1, rbc);
+		fillRect(x+w-1, y, 1, h-1, 0xFF404040);
+		fillRect(x, y+h-1, w, 1, 0xFF404040);
+	}
+
+	function drawButton(x, y, w, h, push = false, upper = true)
+	{
+		// 色を決定
+		var	ltc, rbc;
+		if(push)
+			ltc = rbc = barColor;
+		else
+			rbc = darkColor, ltc = lightColor;
+
+		// ベース部分を描画
+		drawMount(x, y, w, h, ltc, rbc, barColor);
+
+		// 三角形を描画
+		var	ah = (h - 2) \ 3, aw = (w - 2) / 4;
+//		Debug.message(@"ah = ${ah}, aw = ${aw}");
+		var	c	= w \ 2 + 1, d = upper ? 0.99 : aw;
+//		Debug.message(@"c = ${c}, d = ${d}");
+		aw	/= ah;
+		var	mv = push ? 1 : 0;
+		for(var i=ah; i<ah*2; i++)
+		{
+//			Debug.message(@"fillRect(${c - d}, ${y + i + 2}, ${d * 2}, 1, 0xFF000000);");
+			fillRect(c - d + mv, y + i + 2 + mv, d * 2, 1, 0xFF000000);
+			d	+= upper ? aw : -aw;
+		}
+	}
+	function drawUpperButton(push = state == 1)	{ drawButton(0, 0, width, buttonHeight, push, true); }
+	function drawLowerButton(push = state == 2)	{ drawButton(0, height - buttonHeight, width, buttonHeight, push, false); }
+
+	property buttonHeight
+	{
+		getter	{ if(height > width * 2) { return width; } else { return height \ 2; } }
+	}
+
+	property barTop		{ getter { return width; } }
+	property barHeight	{ getter { return height - width * 2; } }
+	property barBottom	{ getter { return height - width; } }
+
+	property mountTop	{ getter { return barTop + int(barHeight * position / total); } }
+	property mountBottom{ getter { return barTop + int(barHeight * (position + area) / total); } }
+
+	function drawBar()
+	{
+		if(height <= width * 2)
+			return;
+
+//		Debug.message("mountTop = "+mountTop+" / mountBottom = "+mountBottom);
+		if(mountTop > barTop)
+		{
+//			Debug.message(@"upper hollow = fillRect(0, ${mountTop}, ${width}, ${mountTop - barTop}, baseColor);");
+			fillRect(0, barTop, width, mountTop - barTop, baseColor);
+		}
+		drawMount(0, mountTop, width, mountBottom - mountTop, lightColor, darkColor, barColor);
+		if(mountBottom < barBottom)
+		{
+//			Debug.message(@"lower hollow = fillRect(0, ${mountBottom}, ${width}, ${barBottom - mountBottom}, baseColor);");
+			fillRect(0, mountBottom, width, barBottom - mountBottom, baseColor);
+		}
+	}
+
+	property visible
+	{
+		setter(v)	{ if(v) { update(); super.visible = v; } }
+		getter		{ return super.visible; }
+	}
+}

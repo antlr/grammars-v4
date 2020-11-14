@@ -1,0 +1,4 @@
+[ \clef<"treble"> \key<"D"> \meter<"4/4">
+ a1*1/2 b a/4. g/8 f#/4 g a/2 b a/4. g/8 f#/4 g
+ a/2 a b c#2/4 d c#/2 b1 a/1 ]
+ 

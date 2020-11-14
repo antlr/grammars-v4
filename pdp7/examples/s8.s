@@ -3,16 +3,15 @@
 " s8
 
 " manifests
-mnproc = 10
-dspbsz = 270
-ndskbs = 4
+mnproc = 10			" number of processes
+dspbsz = 270			" display buffer size
+ndskbs = 4			" number of buffers at dskbs
 
 " flags
-	" interupt flags
 .insys: 0			" "in system"
-.int1: 0			" inode for interrupt 1
-.int2: 0			" inode for interrupt 2
-.ac: 0				" saved AC from interrupt
+.int1: 0			" inode for user interrupt 1
+.int2: 0			" inode for user interrupt 2
+.ac: 0				" saved AC from Priotity Interrupt
 .savblk: 0			" set by system call, cleared by disk i/o
 .dsptm: 0			" display restart countdown (10 ticks)
 .dskb: 0			" set on disk interrupt
@@ -34,7 +33,7 @@ q2p: q2
 
 " strings
 initf:
-   <i>n;<i>t;< > ;< > "
+   <in>; <it>; 040040; 040040 " was <i>n;<i>t;< > ;< >  but as.s unhappy!
 
 " constants
 d0: 0
@@ -94,21 +93,32 @@ o777760: 0777760
 dm3: -3
 dm1: -1
 
-9: .=.+t
-c1: .=.+1
-q1: q2;q2+90  "** ?? 98 ??
-   .=.+14
-q2:
+9: .=.+t			" per-routine temp variables
+c1: .=.+1			" not used?
+	" character queues (two words each, head and tail pointers?)
+	"  0: free list
+	"  1: tty input
+	"  2: tty output
+	"  3: display keyboard
+	"  4: paper tape reader
+	"  5: paper tape punch
+q1: q2;q2+98			" queue element free list
+   .=.+14			" room for 7 queues (5 used)
+q2:				" queue elements (and two words padding??)
    .+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0
    .+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0
    .+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0
    .+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0
    .+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;.+2;0;0;0
-dsploc: .=.+1
-dsplno: .=.+1
+dsploc: .=.+1			" pointer into dspbuf
+dsplno: .=.+1			" display current line number
 dspbuf:
-   0065057;0147740;0160000
+   0065057;0147740;0160000	" display commands: see 03-scope.pdf pg 20
+	" PARAM: clear blink, clear light pen, scale=1, intensity=3
+	" X-Y: invisible, no delay, Y=01740 (992)
+	" X-Y: invisible, settling delay, X=0
    .=.+30
+	" Kernel startup (reused for display buffer)
 coldentry:
    dzm 0100 " not re-entrant
    caf				" clear all flags
@@ -117,7 +127,7 @@ coldentry:
    law 3072			" initialize display....
    wcga
    jms dspinit
-   law dspbuf
+   law dspbuf			" set display buffer to default
    jms movdsp
    cla				" read system block from disk
    jms dskio; 06000
@@ -132,31 +142,35 @@ coldentry:
    jmp 4096			" start process 1
    . = dspbuf+dspbsz+3
 dskbuf = 07700
-dskbs: .=.+65+65+65+65
+dskbs: .=.+65+65+65+65		" ndskbs buffers (block number + block)
 edskbsp: .
-uquant: .=.+1
-dspbufp: .=.+1
-pbsflgs: .=.+2
-mode: .=.+1
-nttychar: .=.+1
-npptchar: .=.+1
-ttydelay: .=.+1
-name: .=.+4
-lnkaddr: .=.+1
-char: .=.+1
-dskaddr: .=.+1
+uquant: .=.+1			" number of ticks user has been running
+dspbufp: .=.+1			" pointer to display buffer
+pbsflgs: .=.+2			" buttons on last tick, last button interrupt
+mode: .=.+1			" user access mode: 1 for write, 2 for read
+nttychar: .=.+1			" CR to send next, or zero
+npptchar: .=.+1			" saved PTR char
+ttydelay: .=.+1			" delay count for TTY output
+name: .=.+4			" file name for current sys call
+lnkaddr: .=.+1			" temp for character queue routines
+char: .=.+1			" current char: temp for PI
+dskaddr: .=.+1			" number of block in dskbuf
 uniqpid: 1			" pid generator
 lu: .=.+4			" user (process) table entry copy
 sfiles: .=.+10			" wait addresses for special files
-dpdata:
+		" (bit vectors of waiting processes?)
+		" bit zero (MSB) is special, bit 1 first ulist entry, ....
+		" offsets:	0: ttyin, 1: ttyout, 2: keyboard,
+		"		3: ptr,   4: ptp,    6: display
+dpdata:				" dataphone data
    dpstat: .=.+1
    dpread: .=.+1
    dpwrite: .=.+1
    dpchar: .=.+1
-dspdata:
+dspdata:			" display data
    .dspb: .=.+1
    .lpba: .=.+1	"** 4 written on listing
-crdata:
+crdata:				" card reader data
    crread: .=.+1
    crchar: .=.+1
 sysdata:			" system data 64 words saved to disk
@@ -165,7 +179,7 @@ sysdata:			" system data 64 words saved to disk
    s.fblks: .=.+10		" cached free block numbers
    s.uniq: .=.+1		" next unique value
    s.tim: .=.+2			" (up?)time in 60Hz ticks (low, high)
-	" process table
+	" user (process) table
 	" first word
 	"   bits 0:2 -- status
 	"	0: free slot
@@ -175,8 +189,11 @@ sysdata:			" system data 64 words saved to disk
 	"	4: out/notready??
 	"   bits 3:17 -- disk swap address/8
 	" second word: process pid
-	" third word:  used for smes/rmes
-	" fourth word: ??
+	" third word:  smes/rmes status:
+	"	 0: not waiting
+	"	-1: this process waiting (rmes)
+	"	other: complement of sender pid
+	" fourth word: smes message
 ulist:
    0131000;1;0;0
    0031040;0;0;0
@@ -205,30 +222,30 @@ userdata:			" "ustruct" (swappable)
    u.dspbuf: 0
    u.intflg: 1
       .=userdata+64
-ii: .=.+1			" number of i-node in inode:
+ii: .=.+1			" The current i-node number stored in inode
 inode:				" disk inode in memory:
    i.flags: .=.+1		" inode flags
-				" 400000 free?? (checked/toggled by icreat)
+				" 400000 in use
 				" 200000 large file
-				" 000040 special device (indicated by inum)?
-				" 000020  directory
+				" 000040 special device (indicated by inum)
+				" 000020 directory
 				" 000010 owner read
 				" 000004 owner write
 				" 000002 world read
 				" 000001 world write
-   i.dskps: .=.+7		" disk block pointers (indirect if "large file")
+   i.dskps: .=.+7		" disk block numbers (indirect if "large file")
    i.uid: .=.+1			" owner
-   i.nlks: .=.+1		" link count
-   i.size: .=.+1
+   i.nlks: .=.+1		" link count (negative)
+   i.size: .=.+1		" size (in words)
    i.uniq: .=.+1		" unique number
       .= inode+12
-di: .=.+1
+di: .=.+1			" directory index
 dnode:				" directory entry:
    d.i: .=.+1			" inode number
    d.name: .=.+4		" name (space padded)
    d.uniq: .=.+1		" unique number from directory inode
       . = dnode+8
-fnode:				" open file entry
+fnode:				" open file entry (copied from u.ofiles)
    f.flags: .=.+1		" see below
    f.badd: .=.+1		" offset
    f.i: 0			" file i-number

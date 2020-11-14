@@ -1,0 +1,4 @@
+{ [ \meter<"4/4"> c d e c c d e c e f g/2
+e/4 f g/2 g/8 a g f e/4 c g/8 a g f e/4 c],
+[ \meter<"4/4"> _*8/4 c/4 d e c c d e c e
+f g/2 e/4 f g/2 ] } 

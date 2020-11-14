@@ -1,0 +1,1161 @@
+// Family definition of the MDS style for Nasa JPL. 
+// Invariants are written 
+// according to rules supplied by JPL. 
+// Traceability is achieved via comments 
+// associated with each invariant, both before the invariant, and on the same 
+// line 
+// with the invariant. Search for strings of the form "Rule X.x" or "R-X.x" 
+// 
+// TO-VERIFY 
+// REVISIT 
+Family MDSFam = {
+    analysis mustBeOfType(e : element, types : set {type}) : boolean =
+        Exists t in types | 
+            declaresType(e, t) ;
+    
+    analysis portsOfType(c : component, t : type) : set{} =
+        {Select p : port in c.ports | 
+            declaresType(p, t) };
+    
+    analysis numberOfPorts(c : component, t : type) : int =
+        size(portsOfType(c, t));
+    
+    analysis hasCommandableSubunits(c : component) : boolean =
+        (Exists sys : system in c.Representations | 
+            size(sys.components) > 1) ;
+    
+    // Rule 1.3 (TO-VERIFY): "N2 can be greater than 1 if the actuator has 
+    // separately commandable sub-units, and there is a desire to manage the command 
+    // histories separately." For now, the sub-units clause is captured by checking 
+    // for 
+    // representations, and the "desire" is captured as a boolean property of 
+    // ActuatorT. 
+    analysis R1_3-actuator_has_separatelyCommandableSubunits(a : ActuatorT) : boolean =
+        ((numberOfPorts(a, CommandSubmitProvPortT) > 1) -> (a.manageHistoriesSeparately AND hasCommandableSubunits(a)));
+    
+    // Rule 1.4: "There must be exactly one controller port connected to each 
+    // actuator port." Base on Dan Dvorak's 11-Nov-2002 reply, on a port basis, the 
+    // reverse is also true. However, on a component basis, controller-to-actuator 
+    // is a 
+    // 1-to-many relationship: "1 controller can have connections to multiple 
+    // actuators 
+    // and/or multiple command-submit ports on the same actuator." So the invariant 
+    // should restrict the relationship at only the port level. This rule is 
+    // composed 
+    // from two sets of invariants, one set from the Actuator port perspective, the 
+    // other set from the Controller port perspective. From the Actuator port 
+    // perspective: the first invariant says that at least one Controller port is 
+    // connected to every Actuator port; the second says if two Controllers have 
+    // ports 
+    // connected to an Actuator port, those two Controllers are the same ones; the 
+    // third says that if two ports of a Controller are connected to an Actuator's 
+    // command submit port, then the two ports are the same one, in essence 
+    // capturing 
+    // exactly one. 
+    analysis R1_4-actuatorCmdSub_conn_exactlyOneControllerCmdSub(p : CommandSubmitProvPortT) : boolean =
+        (Exists Unique r in p.attachedRoles | 
+            declaresType(r, CommandSubmitProvRoleT))  AND (size(p.attachedRoles) == 1);
+    
+    analysis R1_4-controllerCmdSub_conn_exactlyOneActuatorCmdSub(p : CommandSubmitReqrPortT) : boolean =
+        (Exists Unique r in p.attachedRoles | 
+            declaresType(r, CommandSubmitReqrRoleT))  AND (size(p.attachedRoles) == 1);
+    
+    // Rule 1A: "If actuator A has more than one Command Submit ports then all such 
+    // ports must be connected to the same controller C. This ensures that control 
+    // of A 
+    // is the responsibility of a single controller C." This invariant says that, 
+    // for 
+    // every actuator, if it has more than one Command Submit port, then for every 
+    // single one of that actuator's Command Submit ports, if any two Controllers 
+    // are 
+    // connected to one of the ports, the two are the same Controller. 
+    analysis R1A-actuatorCmdSubPorts_conn_sameController(sys : system) : boolean =
+        (Forall compA :! ActuatorT in sys.Components | 
+            (numberOfPorts(compA, CommandSubmitProvPortT) > 1) -> (Exists Unique compC :! ControllerT in sys.components | 
+                connected(compA, compC)) ) ;
+    
+    // Rule 2.1a: "Every actuator requires 1 or more Command Notif. ports."
+    analysis R2_1a-actuator_req_atLeastOneCmdNotifPort(a : ActuatorT) : boolean =
+        numberOfPorts(a, CommandNotifReqrPortT) > 0;
+    
+    // Rule 2.1b: "one per Command Submit port." The clause is covered by Rule 2A. 
+    // Rule 2.2: "Every estimator provides 0 or more Command Notif ports; it can be 
+    // 0 if the estimator has no need to be event driven." Only the latter needs to 
+    // be 
+    // captured explicitly as an invariant. This invariant is violated when the 
+    // estimator provides zero Command Notif port and is, at the same time, event 
+    // driven. 
+    analysis R2_2-estimatorNotEventDriven_prov_zeroCmdNotifPort(e : EstimatorT) : boolean =
+        numberOfPorts(e, CommandNotifProvPortT) == 0 -> (!e.eventDriven);
+    
+    // Rule 2.3: "For every actuator Command Notif. Port, there may be 0 or more 
+    // estimators connected to it." Base on Dan Dvorak's 11-Nov-2002 reply, this 
+    // rule 
+    // is intended to mean that only estimators can be attached to Command Notif. 
+    // ports. This invariant says that any component whose port connects to an 
+    // Actuator 
+    // Command Notif. Requirer port must be an Estimator with Command Notif. 
+    // Provider 
+    // port. 
+    analysis R2_3-allActuatorCmdNotifPorts_conn_onlyEstimatorCmdNotif(sys : system) : boolean =
+        (Forall compA :! ActuatorT in sys.Components | 
+            Forall pA :! CommandNotifReqrPortT in compA.Ports | 
+                Forall compX : component in sys.Components | 
+                    Forall pX : port in compX.Ports | 
+                        connected(pA, pX) -> (declaresType(compX, EstimatorT) AND declaresType(pX, CommandNotifProvPortT))   ) ;
+    
+    // Rule 2A: "For any given actuator the number of Command Submit Ports, the 
+    // number of Command Notif ports and the number of Command Query Ports must be 
+    // equal." 
+    analysis R2A-actuator_has_equalCmdPorts(a : ActuatorT) : boolean =
+        (numberOfPorts(a, CommandSubmitProvPortT) == numberOfPorts(a, CommandQueryProvPortT)) AND (numberOfPorts(a, CommandQueryProvPortT) == numberOfPorts(a, CommandNotifReqrPortT));
+    
+    // Rule 2B: "If estimator E has a Command Notification connection with actuator 
+    // A then it must also have a Command Query connection with A *for the same 
+    // command 
+    // history*. (Otherwise it will be getting Command Notifications with no way to 
+    // obtain the commands that were submitted.)" This invariants says that if a 
+    // Command Notif. Prov port on an Estimator is connected to a Command Notif. 
+    // Reqr 
+    // port on an Actuator, then the Estimator also has a Command Query Reqr port, 
+    // and 
+    // on the Actuator a Command Query Prov port, and these two ports are connected. 
+    analysis R2B_estimator_conn_actuatorCmdNotifImpliesCmdQry(sys : system) : boolean =
+        (Forall e :! EstimatorT in sys.components | 
+            (Forall cnp :! CommandNotifProvPortT in e.ports | 
+                (Forall a :! ActuatorT in sys.components | 
+                    (Forall cnr :! CommandNotifReqrPortT in a.ports | 
+                        (connected(cnp, cnr) -> (Exists cqr :! CommandQueryReqrPortT in e.ports | 
+                            Exists cqp :! CommandQueryProvPortT in a.ports | 
+                                connected(cqr, cqp) ) )) ) ) ) ;
+    
+    analysis Estimators_Failing_R2B(sys : system) : set{} =
+        {Select e : EstimatorT in sys.components | 
+            !(Forall cnp :! CommandNotifProvPortT in e.ports | 
+                (Forall a :! ActuatorT in sys.components | 
+                    (Forall cnr :! CommandNotifReqrPortT in a.ports | 
+                        (connected(cnp, cnr) -> (Exists cqr :! CommandQueryReqrPortT in e.ports | 
+                            Exists cqp :! CommandQueryProvPortT in a.ports | 
+                                connected(cqr, cqp) ) )) ) )  };
+    
+    analysis CommanNotifProvPorts_Failing_2B(e : EstimatorT) : set{} =
+        {Select cnp : CommandNotifProvPortT in e.ports | 
+            (Forall a :! ActuatorT in sys.components | 
+                (Forall cnr :! CommandNotifReqrPortT in a.ports | 
+                    (connected(cnp, cnr) -> (Exists cqr :! CommandQueryReqrPortT in e.ports | 
+                        Exists cqp :! CommandQueryProvPortT in a.ports | 
+                            connected(cqr, cqp) ) )) )  };
+    
+    // Rule 3.1: "Every estimator requires 0 or more Command Query ports (N1 = 
+    // 0..*); it can be 0 if there is no command evidence for a particular state." 
+    // This 
+    // invariant says that if the number of Command Query Requirer port (N1) is 
+    // zero, 
+    // then there is no command evidence. If N1 is one or more, or if the state is 
+    // empty (""), then it doesn't imply whether or not there's command evidence. 
+    analysis R3_1-estimatorNoCmdEvidence_req_zeroCmdQryPort(e : EstimatorT) : boolean =
+        (numberOfPorts(e, CommandQueryReqrPortT) == 0 AND e.state != "") -> (!e.hasCommandEvidence);
+    
+    // Rule 3.3: "For each actuator-provided port there can be 0 or more estimators 
+    // connected to it. It can be more than 1 if command submittal is informative to 
+    // more than one estimator. Though unusual, it can be 0 if no estimator chooses 
+    // to 
+    // use command submittal evidence, instead relying on other sources of 
+    // evidence." 
+    analysis R3_3-allActuatorCmdQryPorts_conn_onlyEstimatorCmdQry(sys : system) : boolean =
+        (Forall compA :! ActuatorT in sys.Components | 
+            Forall pA :! CommandQueryProvPortT in compA.Ports | 
+                Forall compX : component in sys.Components | 
+                    Forall pX : port in compX.Ports | 
+                        connected(pA, pX) -> (declaresType(compX, EstimatorT) AND declaresType(pX, CommandQueryReqrPortT))   ) ;
+    
+    // Return the number of actuators connected to an estimator
+    analysis R3_4-numEstimator_actuator_connections(sys : system, est : EstimatorT) : int =
+        size({Select actuator : ActuatorT in sys.components | 
+            connected(actuator, est) });
+    
+    // Informative command submittal is only represented by having estimator 
+    // connected to actuator via 
+    // command query. 
+    analysis R3_4-moreThanOneEstimator_conn_actuator(sys : system) : boolean =
+        true;
+    
+    analysis R3_4-zeroEstimator_conn_actuator(sys : system) : boolean =
+        (Forall est :! EstimatorT in sys.components | 
+            (!est.hasCommandEvidence -> (R3_4-numEstimator_actuator_connections(sys, est) == 0))) ;
+    
+    // Rule 4.1: "Every estimator requires 0 or more Measurement query ports (N1 = 
+    // 0..*). It can be 0 if the estimator does not need/use measurements to make 
+    // estimates." This invariant says that if the number of Measurement Query 
+    // Requirer 
+    // port (N1) is zero, then the estimator does not require measurement. 
+    analysis R4_1-estimatorNoMeasure_req_zeroMeasureQryPort(e : EstimatorT) : boolean =
+        (numberOfPorts(e, MeasurementQueryReqrPortT) == 0) -> (!e.requiresMeasurements);
+    
+    // Rule 4.3: "It can be more than 1 if the sensor has separate sub-sensors and 
+    // there is a desire to manage the measurement histories seperately." 
+    analysis R4_3-sensor_has_separatelyCommandableSubunits(s : SensorT) : boolean =
+        ((numberOfPorts(s, MeasurementQueryProvPortT) > 1) -> (s.manageHistoriesSeparately AND hasCommandableSubunits(s)));
+    
+    analysis numberOfEstimatorsConnectedToMQPPort(sys : system, sensorProvidedPort : MeasurementQueryProvPortT) : int =
+        size({Select c : EstimatorT in sys.components | 
+            size({Select p : MeasurementQueryReqrPortT in c.ports | 
+                connected(p, sensorProvidedPort) }) > 0 });
+    
+    // Rule 4.4: "For each sensor-provided port there can be 0 or more estimators 
+    // connected to it. It can be zero if the measurement is simply raw data to be 
+    // transported, such as science image. It can be more than one if the 
+    // measurements 
+    // are informative in the estimation of more than one state variable." 
+    analysis R4_4-sensorData_rawVsInformative(sys : system) : boolean =
+        Forall sensor :! SensorT in sys.components | 
+            Forall mqp :! MeasurementQueryProvPortT in sensor.ports | 
+                ((numberOfEstimatorsConnectedToMQPPort(sys, mqp) == 0 -> sensor.rawData) AND (numberOfEstimatorsConnectedToMQPPort(sys, mqp) > 1 -> sensor.informative))  ;
+    
+    // Rule 5.2: "Every estimator provides 0 or more measurement Notif. ports (N2 = 
+    // 0..*). It can be 0 if the estimator has no need to be event driven." 
+    analysis R5_2-estimatorNotEventDriven_prov_zeroMeasureNotifPort(e : EstimatorT) : boolean =
+        numberOfPorts(e, MeasurementNotifProvPortT) == 0 -> (!e.eventDriven);
+    
+    // Rule 5.3: "For every sensor port there may be 0 or more estimators connected 
+    // to it." Base on Dan Dvorak's 11-Nov-2002 reply, this rule is intended to mean 
+    // that only estimators can be attached to sensors. This invariant says that any 
+    // component whose port connects to a Sensor Measurement Notif. Requirer port 
+    // must 
+    // be an Estimator with Measurement Notif. Provider port. 
+    analysis R5_3-allSensorMeasureNotifPorts_conn_onlyEstimatorMeasureNotif(sys : system) : boolean =
+        (Forall compS :! SensorT in sys.Components | 
+            (Forall pS :! MeasurementNotifReqrPortT in compS.Ports | 
+                (Forall compX : component in sys.Components | 
+                    (Forall pX : port in compX.Ports | 
+                        (connected(pS, pX) -> (declaresType(compX, EstimatorT) AND declaresType(pX, MeasurementNotifProvPortT)))) ) ) ) ;
+    
+    // Rule 5A: "For any given sensor, the number of Measurement Notification ports 
+    // must be equal to the numver of Measurement Query ports. Note: we need a way 
+    // to 
+    // associate each measurement notification port with it's corresponding 
+    // measurement 
+    // query port [- no way to do this in Armani]." 
+    analysis R5A_1-sensor_has_equalMeasureNotifAndQryPorts(s : SensorT) : boolean =
+        numberOfPorts(s, MeasurementNotifReqrPortT) == numberOfPorts(s, MeasurementQueryProvPortT);
+    
+    // Rule 5A.1: "Note, we need a way to associate each measurement notification 
+    // port with its associated measurement query port 
+    analysis R5A_2-sensor_measurementports_associated(s : SensorT) : boolean =
+        (Forall mqp :! MeasurementQueryProvPortT in s.ports | 
+            Exists Unique mnp :! MeasurementNotifReqrPortT in s.ports | 
+                mnp.msrNotifLabel == mqp.msrQueryLabel )  AND (Forall mnp :! MeasurementNotifReqrPortT in s.ports | 
+            Exists Unique mqp :! MeasurementQueryProvPortT in s.ports | 
+                mnp.msrNotifLabel == mqp.msrQueryLabel ) ;
+    
+    // Rule 5B: "If estimator E has a Measurement Notification connection with 
+    // sensor S, then E must also have a Measurement Query connection with S *for 
+    // the 
+    // same command history*. (Otherwise it will be getting command notifications 
+    // with 
+    // no way to obtain the commands that were submitted.)" This invariants says 
+    // that 
+    // if a Measurement Notif. Prov port on an Estimator is connected to a 
+    // Measurement 
+    // Notif. Reqr port on a Sensor, then the Estimator also has a Measurement Query 
+    // Reqr port, and the Sensor, a Measurement Query Prov port, and these two ports 
+    // are connected. 
+    analysis R5B-estimator_conn_sensorMeasureNotifImpliesMeasureQry(sys : system) : boolean =
+        (Forall e :! EstimatorT in sys.components | 
+            Forall mnp :! MeasurementNotifProvPortT in e.ports | 
+                Forall s :! SensorT in sys.components | 
+                    Forall mnr :! MeasurementNotifReqrPortT in s.ports | 
+                        connected(mnp, mnr) -> (Exists mqr :! MeasurementQueryReqrPortT in e.ports | 
+                            Exists mqp :! MeasurementQueryProvPortT in s.ports | 
+                                connected(mqr, mqp) )    ) ;
+    
+    // Rule 6.1: "Every state variable provides exactly one State Query port (N2 = 
+    // 1)." 
+    analysis R6_1-stateVar_prov_exactlyOneStateQryPort(sv : StateVarT) : boolean =
+        numberOfPorts(sv, StateQueryProvPortT) == 1;
+    
+    analysis numberOfComponentsConnectedTo(sys : system, thruPort : port, discriminatedBy : type) : int =
+        size({Select c : component in sys.components | 
+            ((declaresType(c, discriminatedBy)) AND (Exists p : port in c.ports | 
+                connected(thruPort, p)) ) });
+    
+    // Rule 6.2: "There can be any number of components connected to that port. It 
+    // would be suspicious if there were no connections at all, but it *is* valid 
+    // for 
+    // states that are estimated purely for transport to another deployment." 
+    // (TO-VERIFY: "purely for transport to another deployment" implies "rawData == 
+    // true"??) This heuristic says there should be at least one component connected 
+    // to 
+    // the State Query Provider port of the State Var. 
+    analysis R6_2-stateVarStateQryPort_conn_anyNumComponent(sys : system) : boolean =
+        (Forall statevar : StateVarT in sys.components | 
+            Forall sqp : StateQueryProvPortT in statevar.ports | 
+                numberOfComponentsConnectedTo(sys, sqp, Component) > 0 ) ;
+    
+    // Rule 7.2a: "Every state variable provides exactly one State Update port (N2 = 
+    // 1)..." 
+    analysis R7_2a-stateVar_prov_exactlyOneStateUpdPort(sv : StateVarT) : boolean =
+        numberOfPorts(sv, StateUpdateProvPortT) == 1;
+    
+    // Rule 7.2b: "... and has exactly one estimator connected to it."
+    analysis R7_2b-stateVarStateUpdPort_connOneToOne_estimatorStateUpdPort(p : StateUpdateProvPortT) : boolean =
+        (Exists Unique r in p.attachedRoles | 
+            declaresType(r, StateUpdateProvRoleT))  AND (size(p.attachedRoles) == 1);
+    
+    analysis R7_2b-estimatorStateUpdPort_connOneToOne_stateVarStateUpdPort(p : StateUpdateReqrPortT) : boolean =
+        (Exists Unique r in p.attachedRoles | 
+            declaresType(r, StateUpdateReqrRoleT))  AND (size(p.attachedRoles) == 1);
+    
+    // analysis R7_2b-stateVarStateUpdPort_connOneToOne_estimatorStateUpdPort(sys : 
+    // system) : boolean = 
+    // atLeastOnePort2PortOfType(sys, StateVarT, 
+    // StateUpdateProvPortT, EstimatorT, StateUpdateReqrPortT) AND 
+    // portFromSameComponent2PortOfType(sys, StateVarT, StateUpdateProvPortT, 
+    // EstimatorT, StateUpdateReqrPortT) AND twoPortsAreSame2PortOfType(sys, 
+    // StateVarT, 
+    // StateUpdateProvPortT, EstimatorT, StateUpdateReqrPortT) AND 
+    // atLeastOnePort2PortOfType(sys, EstimatorT, StateUpdateReqrPortT, StateVarT, 
+    // StateUpdateProvPortT) AND portFromSameComponent2PortOfType(sys, EstimatorT, 
+    // StateUpdateReqrPortT, StateVarT, StateUpdateProvPortT) AND 
+    // twoPortsAreSame2PortOfType(sys, EstimatorT, StateUpdateReqrPortT, StateVarT, 
+    // StateUpdateProvPortT); 
+    // Rule 8: "Every state variable requires exactly 1 State 
+    // Notification port (N1 = 1) and can have any number of other components 
+    // connected 
+    // to it." This invariant makes explicit the first half of the sentence. The 
+    // latter 
+    // half of the sentence is reflected in the PubSub nature of the state 
+    // notification 
+    // connector. 
+    analysis R8-stateVar_prov_exactlyOneStateNotifPort(sv : StateVarT) : boolean =
+        numberOfPorts(sv, StateNotifReqrPortT) == 1;
+    
+    // Rule 8A: "If component C has a connection to the State Notification port of 
+    // state variable S, then C must also have a connection to the State Query port 
+    // of 
+    // S. (Otherwise, C will be getting notification with no way to obtain the 
+    // updated 
+    // state.)" This invariants says that if a State Notif. Prov port on a Component 
+    // is 
+    // connected to a State Notif. Reqr port on an State Var, then the Connector 
+    // also 
+    // has a State Query Reqr port, and on the State Var a State Query Prov port, 
+    // and 
+    // these two ports are connected. 
+    analysis R8A_component_conn_stateVarStateNotifImpliesStateQry(sys : system) : boolean =
+        (Forall C : component in sys.components | 
+            Forall S : StateVarT in sys.components | 
+                Forall snr : StateNotifReqrPortT in S.ports | 
+                    Forall snp : StateNotifProvPortT in C.ports | 
+                        (connected(snr, snp) -> (Exists sqr : StateQueryReqrPortT in C.ports | 
+                            Exists sqp : StateQueryProvPortT in S.ports | 
+                                connected(sqr, sqp) ) )   ) ;
+    
+    // Rule 9.1: "Every executable component provides exactly 1 Execute port (N2 = 
+    // 1)." 
+    analysis R9_1-executable_prov_exactlyOneExecPort(e : ExecutableT) : boolean =
+        numberOfPorts(e, ExecuteProvPortT) == 1;
+    
+    // Rule 9.2: "There must be a 1-to-1 association of thread scheduler ports to 
+    // executable component ports." 
+    analysis R9_2-schedulerExecPort_connOneToOne_executableExecPort(p : ExecuteProvPortT) : boolean =
+        (Exists Unique r in p.attachedRoles | 
+            declaresType(r, ExecuteProvRoleT))  AND (size(p.attachedRoles) == 1);
+    
+    analysis R9_2-executableExecPort_connOneToOne_schedulerExecPort(p : ExecuteReqrPortT) : boolean =
+        (Exists Unique r in p.attachedRoles | 
+            declaresType(r, ExecuteReqrRoleT))  AND (size(p.attachedRoles) == 1);
+    
+    // analysis R9_2-schedulerExecPort_connOneToOne_executableExecPort(sys : system) 
+    // : boolean = 
+    // atLeastOnePort2PortOfType(sys, ExecutableT, ExecuteProvPortT, 
+    // SchedulerT, ExecuteReqrPortT) AND portFromSameComponent2PortOfType(sys, 
+    // ExecutableT, ExecuteProvPortT, SchedulerT, ExecuteReqrPortT) AND 
+    // twoPortsAreSame2PortOfType(sys, ExecutableT, ExecuteProvPortT, SchedulerT, 
+    // ExecuteReqrPortT) AND atLeastOnePort2PortOfType(sys, SchedulerT, 
+    // ExecuteReqrPortT, ExecutableT, ExecuteProvPortT) AND 
+    // portFromSameComponent2PortOfType(sys, SchedulerT, ExecuteReqrPortT, 
+    // ExecutableT, 
+    // ExecuteProvPortT) AND twoPortsAreSame2PortOfType(sys, SchedulerT, 
+    // ExecuteReqrPortT, ExecutableT, ExecuteProvPortT); 
+    // Rule 10: "No two ports of a 
+    // component should be connected to the same target port. (This could happen due 
+    // to 
+    // a cut-and-paste error where, say, a controller has two State Query ports 
+    // connected to the same State Variable)." 
+    analysis R10-twoPortOfComponent_notConn_sameTargetPort(sys : system) : boolean =
+        (Forall c1 : component in sys.Components | 
+            Forall c2 : component in sys.Components | 
+                Forall p1C1 : port in c1.Ports | 
+                    Forall p2C1 : port in c1.Ports | 
+                        Forall p3C2 : port in c2.Ports | 
+                            (connected(p1C1, p3C2) AND connected(p2C1, p3C2)) -> p1C1 == p2C1    ) ;
+    
+    Port Type RequirerPortT = {
+    }
+    
+    
+    Port Type ProviderPortT = {
+    }
+    
+    
+    Role Type RequirerRoleT = {
+    }
+    
+    
+    Role Type ProviderRoleT = {
+    }
+    
+    
+    Port Type CommandSubmitReqrPortT extends RequirerPortT with {
+        // empty properties to make "satisfiesType()" work properly on ports
+        Property cmdSubmitLabel : string;
+        
+    }
+    
+    
+    Port Type CommandSubmitProvPortT extends ProviderPortT with {
+        Property cmdSubmitLabel : string;
+        
+    }
+    
+    
+    Port Type CommandNotifReqrPortT extends RequirerPortT with {
+        Property cmdNotifLabel : string;
+        
+    }
+    
+    
+    Port Type CommandNotifProvPortT extends ProviderPortT with {
+        Property cmdNotifLabel : string;
+        
+    }
+    
+    
+    Port Type CommandQueryReqrPortT extends RequirerPortT with {
+        Property cmdQueryLabel : string;
+        
+    }
+    
+    
+    Port Type CommandQueryProvPortT extends ProviderPortT with {
+        Property cmdQueryLabel : string;
+        
+    }
+    
+    
+    Port Type MeasurementQueryReqrPortT extends RequirerPortT with {
+        Property msrQueryLabel : string;
+        
+    }
+    
+    
+    Port Type MeasurementQueryProvPortT extends ProviderPortT with {
+        Property msrQueryLabel : string;
+        
+    }
+    
+    
+    Port Type MeasurementNotifReqrPortT extends RequirerPortT with {
+        Property msrNotifLabel : string;
+        
+    }
+    
+    
+    Port Type MeasurementNotifProvPortT extends ProviderPortT with {
+        Property msrNotifLabel : string;
+        
+    }
+    
+    
+    Port Type StateQueryReqrPortT extends RequirerPortT with {
+        Property stQueryLabel : string;
+        
+    }
+    
+    
+    Port Type StateQueryProvPortT extends ProviderPortT with {
+        Property stQueryLabel : string;
+        
+    }
+    
+    
+    Port Type StateUpdateReqrPortT extends RequirerPortT with {
+        Property stUpdateLabel : string;
+        
+    }
+    
+    
+    Port Type StateUpdateProvPortT extends ProviderPortT with {
+        Property stUpdateLabel : string;
+        
+    }
+    
+    
+    Port Type StateNotifReqrPortT extends RequirerPortT with {
+        Property stNotifLabel : string;
+        
+    }
+    
+    
+    Port Type StateNotifProvPortT extends ProviderPortT with {
+        Property stNotifLabel : string;
+        
+    }
+    
+    
+    Port Type ExecuteReqrPortT extends RequirerPortT with {
+        Property execLabel : string;
+        
+        invariant R9_2-executableExecPort_connOneToOne_schedulerExecPort(self);
+        
+    }
+    
+    
+    Port Type ExecuteProvPortT extends ProviderPortT with {
+        Property execLabel : string;
+        
+        invariant R9_2-schedulerExecPort_connOneToOne_executableExecPort(self);
+        
+    }
+    
+    
+    Port Type ConstraintExecReqrPortT extends RequirerPortT with {
+        Property constraintExecLabel : string;
+        
+    }
+    
+    
+    Port Type ConstraintExecProvPortT extends ProviderPortT with {
+        Property constraintExecLabel : string;
+        
+    }
+    
+    
+    Component Type SchedulerT = {
+        Port execR1 : ExecuteReqrPortT =  new ExecuteReqrPortT extended with {
+            Property execLabel : string;
+        };
+        
+        
+    }
+    
+    
+    Component Type ExecutableT = {
+        Property isExecutable : boolean << default : boolean = true;  >>;
+        
+        invariant R9_1-executable_prov_exactlyOneExecPort(self)<<label : string = "Rule 9.1: An Executable can only have one execute port";>>;
+        
+        Port execP : ExecuteProvPortT =  new ExecuteProvPortT extended with {
+            Property execLabel : string;
+        };
+        
+        
+    }
+    
+    
+    // Apparently corresponds to "Elaborator" in State Framework slides. 
+    // Gets 
+    // input from some external source, and issues constraints to state variable. 
+    Component Type ExecutiveT = {
+        Property isExecutable : boolean << default : boolean = true;  >>;
+        
+        Port constraintExecR : ConstraintExecReqrPortT =  new ConstraintExecReqrPortT extended with {
+            Property constraintExecLabel : string;
+        };
+        
+        
+    }
+    
+    
+    Component Type ControllerT = {
+        Property isExecutable : boolean << default : boolean = true;  >>;
+        
+        invariant Forall p :! CommandSubmitReqrPortT in self.ports | 
+            R1_4-controllerCmdSub_conn_exactlyOneActuatorCmdSub(p) <<label : string = "Rule 1.4: Only one Actuator can be attached to command submit ports.";>>;
+        
+        Port cmdSubR1 : CommandSubmitReqrPortT =  new CommandSubmitReqrPortT extended with {
+            Property cmdSubmitLabel : string;
+        };
+        
+        
+        invariant Forall p in self.ports | 
+            Exists t in {CommandSubmitReqrPortT, ConstraintExecProvPortT, ExecuteProvPortT, StateQueryReqrPortT} | 
+                declaresType(p, t)  <<vis-ports : boolean = true;>>;
+        
+    }
+    
+    
+    Component Type ActuatorT = {
+        Property isExecutable : boolean << default : boolean = true;  >>;
+        
+        //commandHistory : int <<default : int = 0;>>;  // ?for? R-2B
+        // for R-1.3
+        Property manageHistoriesSeparately : boolean << default : boolean = false;  >>;
+        
+        invariant R1_3-actuator_has_separatelyCommandableSubunits(self)<<label : string = "Rule 1.3: Actuator can have more than one command submit port if it manages separate histories and has separately commandable subunits.";>>;
+        
+        invariant R2A-actuator_has_equalCmdPorts(self)<<label : string = "Rule 2A: An Actuator must have an equal number of command submit, query, and notification ports";>>;
+        
+        invariant Forall p :! CommandSubmitProvPortT in self.ports | 
+            R1_4-actuatorCmdSub_conn_exactlyOneControllerCmdSub(p) <<label : string = "Rule 1.4: Command submit ports can only be connected to one controller.";>>;
+        
+        Port cmdSubP1 : CommandSubmitProvPortT =  new CommandSubmitProvPortT extended with {
+            Property cmdSubmitLabel : string;
+        };
+        
+        
+        Port cmdNotifR1 : CommandNotifReqrPortT =  new CommandNotifReqrPortT extended with {
+            Property cmdNotifLabel : string;
+        };
+        
+        
+        Port cmdQryP1 : CommandQueryProvPortT =  new CommandQueryProvPortT extended with {
+            Property cmdQueryLabel : string;
+        };
+        
+        
+        invariant Forall p in self.ports | 
+            Exists t in {CommandNotifReqrPortT, CommandQueryProvPortT, CommandSubmitProvPortT, ExecuteProvPortT} | 
+                declaresType(p, t)  <<vis-ports : boolean = true;>>;
+        
+    }
+    
+    
+    Component Type EstimatorT = {
+        Property isExecutable : boolean << default : boolean = true;  >>;
+        
+        //commandHistory : int;  // ?for? R-2B
+        // for R-2.2 & R-5.2
+        Property eventDriven : boolean << default : boolean = false;  >>;
+        
+        // for R-3.1
+        Property state : string << default : string = "";  >>;
+        
+        // for R3.1
+        Property hasCommandEvidence : boolean << default : boolean = true;  >>;
+        
+        // for R-4.1
+        Property requiresMeasurements : boolean << default : boolean = false;  >>;
+        
+        invariant R2_2-estimatorNotEventDriven_prov_zeroCmdNotifPort(self)<<label : string = "Rule 2.2: An estimator that is not event driven can have no command notification ports";>>;
+        
+        invariant R3_1-estimatorNoCmdEvidence_req_zeroCmdQryPort(self)<<label : string = "Rule 3.1: An estimator that needs no command evidence can have no command query ports";>>;
+        
+        invariant R4_1-estimatorNoMeasure_req_zeroMeasureQryPort(self)<<label : string = "Rule 4.1: An estimator that requires no measurement data can have no measurement query ports";>>;
+        
+        invariant R5_2-estimatorNotEventDriven_prov_zeroMeasureNotifPort(self)<<label : string = "Rule 5.2: An estimator that is not event driven can have no measurement notification ports";>>;
+        
+        invariant Forall p :! StateUpdateReqrPortT in self.ports | 
+            R7_2b-estimatorStateUpdPort_connOneToOne_stateVarStateUpdPort(p) <<label : string = "Rule 7.2: Each estimator state update port must be connected to only one state variable.";>>;
+        
+        invariant Forall p in self.ports | 
+            mustBeOfType(p, {StateUpdateReqrPortT, StateQueryReqrPortT, CommandQueryReqrPortT, CommandNotifProvPortT, MeasurementNotifProvPortT, MeasurementQueryReqrPortT}) <<label : string = "Estimators can only have ports of type StateUpdateReqrPortT, StateQueryReqPortT, CommandQueryReqrPortT, CommandNotifReqrPortT, MeasurementQueryReqrPortT, MeasurementNotifProvPortT";>>;
+        
+        Port stateUpdR1 : StateUpdateReqrPortT =  new StateUpdateReqrPortT extended with {
+            Property stUpdateLabel : string;
+        };
+        
+        
+        invariant Forall p in self.ports | 
+            Exists t in {CommandNotifProvPortT, CommandQueryReqrPortT, ExecuteProvPortT, MeasurementQueryReqrPortT, StateQueryReqrPortT, StateUpdateReqrPortT} | 
+                declaresType(p, t)  <<vis-ports : boolean = true;>>;
+        
+    }
+    
+    
+    Component Type SensorT = {
+        Property isExecutable : boolean << default : boolean = true;  >>;
+        
+        // for R-4.3
+        Property manageHistoriesSeparately : boolean << default : boolean = false;  >>;
+        
+        // for R-4.4
+        Property rawData : boolean << default : boolean = false;  >>;
+        
+        // for R-4.4
+        Property informative : boolean << default : boolean = false;  >>;
+        
+        // for R-4.4
+        invariant !(rawData AND informative)<<label : string = "A sensor cannot be informative and only have raw data";>>;
+        
+        invariant R4_3-sensor_has_separatelyCommandableSubunits(self)<<label : string = "Rule 4.3: A Sensor must provide more than one measurement query port if it has separate subsensors";>>;
+        
+        invariant R5A_1-sensor_has_equalMeasureNotifAndQryPorts(self)<<label : string = "Rule 5A.1: A Sensor must have an equal number of measurement notification and query ports";>>;
+        
+        invariant R5A_2-sensor_measurementports_associated(self)<<label : string = "Rule 5A.2: There must be a one-to-one correspondence between measurement notification and query ports";>>;
+        
+        Port msrQryP1 : MeasurementQueryProvPortT =  new MeasurementQueryProvPortT extended with {
+            Property msrQueryLabel : string;
+        };
+        
+        
+        Port msrNotifR1 : MeasurementNotifReqrPortT =  new MeasurementNotifReqrPortT extended with {
+            Property msrNotifLabel : string;
+        };
+        
+        
+        invariant Forall p in self.ports | 
+            Exists t in {ExecuteProvPortT, MeasurementNotifReqrPortT, MeasurementQueryProvPortT} | 
+                declaresType(p, t)  <<vis-ports : boolean = true;>>;
+        
+    }
+    
+    
+    Component Type StateVarT = {
+        Property isExecutable : boolean << default : boolean = false;  >>;
+        
+        invariant R6_1-stateVar_prov_exactlyOneStateQryPort(self)<<label : string = "Rule 6.1: A State Variable can only provide one state query port";>>;
+        
+        invariant R7_2a-stateVar_prov_exactlyOneStateUpdPort(self)<<label : string = "Rule 7.2: A State Variable must provide EXACTLY ONE State update port";>>;
+        
+        invariant R8-stateVar_prov_exactlyOneStateNotifPort(self)<<label : string = "Rule 8: A State Variable must provide EXACTLY ONE State notification port";>>;
+        
+        Port stateQryP1 : StateQueryProvPortT =  new StateQueryProvPortT extended with {
+            Property stQueryLabel : string;
+        };
+        
+        
+        Port stateUpdP1 : StateUpdateProvPortT =  new StateUpdateProvPortT extended with {
+            Property stUpdateLabel : string;
+        };
+        
+        
+        Port stateNotifR1 : StateNotifReqrPortT =  new StateNotifReqrPortT extended with {
+            Property stNotifLabel : string;
+        };
+        
+        
+        invariant Forall p in self.ports | 
+            Exists t in {ConstraintExecProvPortT, ConstraintExecReqrPortT, StateNotifReqrPortT, StateQueryProvPortT, StateUpdateProvPortT} | 
+                declaresType(p, t)  <<vis-ports : boolean = true;>>;
+        
+    }
+    
+    
+    Component Type HealthStateVarT extends StateVarT with {
+        Property isOk : boolean << default : boolean = false;  >>;
+        
+        invariant Forall p in self.ports | 
+            Exists t in {ConstraintExecProvPortT, ConstraintExecReqrPortT, StateNotifReqrPortT, StateQueryProvPortT, StateUpdateProvPortT} | 
+                declaresType(p, t)  <<vis-ports : boolean = true;>>;
+        
+    }
+    
+    
+    Role Type CommandSubmitReqrRoleT extends RequirerRoleT with {
+        // empty properties to make "satisfiesType()" work properly on ports
+        Property cmdSubmitLabel : string;
+        
+        invariant Forall p : port in self.attachedPorts | 
+            declaresType(p, CommandSubmitReqrPortT) <<label : string = "Role can only be attached to CommandSubmitReqrPortT's";>>;
+        
+        invariant size(self.attachedPorts) == 1<<label : string = "Role must be attached to only one port";>>;
+        
+    }
+    
+    
+    Role Type CommandSubmitProvRoleT extends ProviderRoleT with {
+        Property cmdSubmitLabel : string;
+        
+        invariant Forall p : port in self.attachedPorts | 
+            declaresType(p, CommandSubmitProvPortT) <<label : string = "Role can only be attached to CommandSubmitProvPortT's";>>;
+        
+        invariant size(self.attachedPorts) == 1<<label : string = "Role must be attached to only one port";>>;
+        
+    }
+    
+    
+    Role Type CommandNotifReqrRoleT extends RequirerRoleT with {
+        Property cmdNotifLabel : string;
+        
+        // Role must be attached to only one port
+        invariant size(self.attachedPorts) == 1<<label : string = "Role must be attached to only one port";>>;
+        
+        // That role can only be a commandNotifReqrPortT
+        invariant Forall p in self.attachedPorts | 
+            declaresType(p, CommandNotifReqrPortT) <<label : string = "Role can only be attached to CommandNotifReqrPortT's";>>;
+        
+    }
+    
+    
+    Role Type CommandNotifProvRoleT extends ProviderRoleT with {
+        Property cmdNotifLabel : string;
+        
+        // Role must be attached to only one port
+        invariant size(self.attachedPorts) == 1<<label : string = "Role must be attached to only one port";>>;
+        
+        // That role can only be a commandNotifProvPortT
+        invariant Forall p in self.attachedPorts | 
+            declaresType(p, CommandNotifProvPortT) <<label : string = "Role can only be attached to CommandNotifProvPortT's";>>;
+        
+    }
+    
+    
+    Role Type CommandQueryReqrRoleT extends RequirerRoleT with {
+        Property cmdQueryLabel : string;
+        
+        // Role must be attached to only one port
+        invariant size(self.attachedPorts) == 1<<label : string = "Role must be attached to only one port";>>;
+        
+        // Role can only be attached to CommandQueryReqrPortT's
+        invariant Forall p in self.attachedPorts | 
+            declaresType(p, CommandQueryReqrPortT) <<label : string = "Role can only be attached to CommandQueryReqrPortT";>>;
+        
+    }
+    
+    
+    Role Type CommandQueryProvRoleT extends ProviderRoleT with {
+        Property cmdQueryLabel : string;
+        
+        // Role must be attached to only one port
+        invariant size(self.attachedPorts) == 1<<label : string = "Role must be attached to only one port";>>;
+        
+        // Role can only be attached to CommandQueryProvPortT's
+        invariant Forall p in self.attachedPorts | 
+            declaresType(p, CommandQueryProvPortT) <<label : string = "Role can only be attached to CommandQueryProvPortT's";>>;
+        
+    }
+    
+    
+    Role Type MeasurementQueryReqrRoleT extends RequirerRoleT with {
+        Property msrQueryLabel : string;
+        
+        // Role must be attached to only one port
+        invariant size(self.attachedPorts) == 1<<label : string = "Role must be attached to only one port";>>;
+        
+        // Role can only be attached to MeasurementQueryReqrPortT's
+        invariant Forall p in self.attachedPorts | 
+            declaresType(p, MeasurementQueryReqrPortT) <<label : string = "Role must be attached to MeasurementQueryReqrPortT's";>>;
+        
+    }
+    
+    
+    Role Type MeasurementQueryProvRoleT extends ProviderRoleT with {
+        Property msrQueryLabel : string;
+        
+        // Role must be attached to only one port
+        invariant size(self.attachedPorts) == 1<<label : string = "Role must be attached to only one port";>>;
+        
+        invariant Forall p in self.attachedPorts | 
+            declaresType(p, MeasurementQueryProvPortT) <<label : string = "Role must be attached to MeasurmentQueryProvPortT's";>>;
+        
+    }
+    
+    
+    Role Type MeasurementNotifReqrRoleT extends RequirerRoleT with {
+        Property msrNotifLabel : string;
+        
+    }
+    
+    
+    Role Type MeasurementNotifProvRoleT extends ProviderRoleT with {
+        Property msrNotifLabel : string;
+        
+    }
+    
+    
+    Role Type StateQueryReqrRoleT extends RequirerRoleT with {
+        Property stQueryLabel : string;
+        
+    }
+    
+    
+    Role Type StateQueryProvRoleT extends ProviderRoleT with {
+        Property stQueryLabel : string;
+        
+    }
+    
+    
+    Role Type StateUpdateReqrRoleT extends RequirerRoleT with {
+        Property stUpdateLabel : string;
+        
+        invariant size(self.attachedPorts) == 1<<label : string = "Role can only be attached to one port";>>;
+        
+        invariant Forall p in self.attachedPorts | 
+            declaresType(p, StateUpdateReqrPortT) <<label : string = "Role can only be attached to StateUpdateReqrPortT's";>>;
+        
+    }
+    
+    
+    Role Type StateUpdateProvRoleT extends ProviderRoleT with {
+        Property stUpdateLabel : string;
+        
+        invariant size(self.attachedPorts) == 1<<label : string = "Role can only be attached to one port";>>;
+        
+        invariant Forall p in self.attachedPorts | 
+            declaresType(p, StateUpdateProvPortT) <<label : string = "Role can only be attached to StateUpdateProvProvPortT's";>>;
+        
+    }
+    
+    
+    Role Type StateNotifReqrRoleT extends RequirerRoleT with {
+        Property stNotifLabel : string;
+        
+    }
+    
+    
+    Role Type StateNotifProvRoleT extends ProviderRoleT with {
+        Property stNotifLabel : string;
+        
+    }
+    
+    
+    Role Type ExecuteReqrRoleT extends RequirerRoleT with {
+        Property execLabel : string;
+        
+    }
+    
+    
+    Role Type ExecuteProvRoleT extends ProviderRoleT with {
+        Property execLabel : string;
+        
+    }
+    
+    
+    Role Type ConstraintExecReqrRoleT extends RequirerRoleT with {
+        Property constraintExecLabel : string;
+        
+    }
+    
+    
+    Role Type ConstraintExecProvRoleT extends ProviderRoleT with {
+        Property constraintExecLabel : string;
+        
+    }
+    
+    
+    Connector Type PointToPointConnT = {
+        Property isSynchronous : boolean << default : boolean = true;  >>;
+        
+        invariant size(self.roles) == 2;
+        
+        invariant Forall r : role in self.roles | 
+            satisfiesType(r, RequirerRoleT) OR satisfiesType(r, ProviderRoleT) ;
+        
+        Property purpose : string;
+        
+    }
+    
+    
+    Connector Type PubSubConnT = {
+    }
+    
+    
+    Connector Type CommandSubmitConnT extends PointToPointConnT with {
+        invariant Forall r in self.roles | 
+            mustBeOfType(r, {CommandSubmitReqrRoleT, CommandSubmitProvRoleT}) <<label : string = "Roles can only be of type CommandSubmitReqrRoleT or CommandSubmitProvRoleT";>>;
+        
+        Role prov : CommandSubmitProvRoleT =  new CommandSubmitProvRoleT extended with {
+            Property cmdSubmitLabel : string;
+        };
+        
+        
+        Role reqr : CommandSubmitReqrRoleT =  new CommandSubmitReqrRoleT extended with {
+            Property cmdSubmitLabel : string;
+        };
+        
+        
+        invariant Forall r in self.roles | 
+            Exists t in {CommandSubmitProvRoleT, CommandSubmitReqrRoleT} | 
+                declaresType(r, t)  <<vis-roles : boolean = true;>>;
+        
+    }
+    
+    
+    Connector Type CommandNotifConnT extends PubSubConnT with {
+        invariant Forall r in self.roles | 
+            mustBeOfType(r, {CommandNotifReqrRoleT, CommandNotifProvRoleT}) <<label : string = "Roles can only be of type CommandNotifReqrRoleT or CommandNotifProvRoleT";>>;
+        
+        Role reqr : CommandNotifReqrRoleT =  new CommandNotifReqrRoleT extended with {
+            Property cmdNotifLabel : string;
+        };
+        
+        
+    }
+    
+    
+    Connector Type CommandQueryConnT extends PointToPointConnT with {
+        invariant Forall r in self.roles | 
+            mustBeOfType(r, {CommandQueryReqrRoleT, CommandQueryProvRoleT}) AND (size(r.attachedPorts) > 0) ;
+        
+        Role prov : CommandQueryProvRoleT =  new CommandQueryProvRoleT extended with {
+            Property cmdQueryLabel : string;
+        };
+        
+        
+        Role reqr : CommandQueryReqrRoleT =  new CommandQueryReqrRoleT extended with {
+            Property cmdQueryLabel : string;
+        };
+        
+        
+        invariant Forall r in self.roles | 
+            Exists t in {CommandQueryProvRoleT, CommandQueryReqrRoleT} | 
+                declaresType(r, t)  <<vis-roles : boolean = true;>>;
+        
+    }
+    
+    
+    Connector Type MeasurementQueryConnT extends PointToPointConnT with {
+        invariant Forall r in self.roles | 
+            mustBeOfType(r, {MeasurementQueryReqrRoleT, MeasurementQueryProvRoleT}) ;
+        
+        Role prov : MeasurementQueryProvRoleT =  new MeasurementQueryProvRoleT extended with {
+            Property msrQueryLabel : string;
+        };
+        
+        
+        Role reqr : MeasurementQueryReqrRoleT =  new MeasurementQueryReqrRoleT extended with {
+            Property msrQueryLabel : string;
+        };
+        
+        
+        invariant Forall r in self.roles | 
+            Exists t in {MeasurementQueryProvRoleT, MeasurementQueryReqrRoleT} | 
+                declaresType(r, t)  <<vis-roles : boolean = true;>>;
+        
+    }
+    
+    
+    Connector Type MeasurementNotifConnT extends PubSubConnT with {
+        invariant Forall r in self.roles | 
+            mustBeOfType(r, {MeasurementNotifReqrRoleT, MeasurementNotifProvRoleT}) AND (size(r.attachedPorts) > 0) ;
+        
+        Role reqr : MeasurementNotifReqrRoleT =  new MeasurementNotifReqrRoleT extended with {
+            Property msrNotifLabel : string;
+        };
+        
+        
+    }
+    
+    
+    Connector Type StateQueryConnT extends PointToPointConnT with {
+        // TO-VERIFY:  Is this pub-sub?
+        invariant Forall r in self.roles | 
+            mustBeOfType(r, {StateQueryReqrRoleT, StateQueryProvRoleT}) AND (size(r.attachedPorts) > 0) ;
+        
+        Role prov : StateQueryProvRoleT =  new StateQueryProvRoleT extended with {
+            Property stQueryLabel : string;
+        };
+        
+        
+        Role reqr : StateQueryReqrRoleT =  new StateQueryReqrRoleT extended with {
+            Property stQueryLabel : string;
+        };
+        
+        
+    }
+    
+    
+    Connector Type StateUpdateConnT extends PointToPointConnT with {
+        Property isSynchronous : boolean << default : boolean = false;  >>;
+        
+        invariant Forall r in self.roles | 
+            mustBeOfType(r, {StateUpdateReqrRoleT, StateUpdateProvRoleT}) AND (size(r.attachedPorts) > 0) ;
+        
+        Role prov : StateUpdateProvRoleT =  new StateUpdateProvRoleT extended with {
+            Property stUpdateLabel : string;
+        };
+        
+        
+        Role reqr : StateUpdateReqrRoleT =  new StateUpdateReqrRoleT extended with {
+            Property stUpdateLabel : string;
+        };
+        
+        
+        invariant Forall r in self.roles | 
+            Exists t in {StateUpdateProvRoleT, StateUpdateReqrRoleT} | 
+                declaresType(r, t)  <<vis-roles : boolean = true;>>;
+        
+    }
+    
+    
+    Connector Type StateNotifConnT extends PubSubConnT with {
+        // TO-VERIFY:  Is this pub-sub or async or both? (should be pub-sub)
+        invariant Forall r in self.roles | 
+            mustBeOfType(r, {StateNotifReqrRoleT, StateNotifProvRoleT}) AND (size(r.attachedPorts) > 0) ;
+        
+        Role reqr : StateNotifReqrRoleT =  new StateNotifReqrRoleT extended with {
+            Property stNotifLabel : string;
+        };
+        
+        
+    }
+    
+    
+    Connector Type ExecuteConnT extends PointToPointConnT with {
+        Property isSynchronous : boolean << default : boolean = false;  >>;
+        
+        invariant Forall r in self.roles | 
+            mustBeOfType(r, {ExecuteReqrRoleT, ExecuteProvRoleT}) AND (size(r.attachedPorts) > 0) ;
+        
+        Role prov : ExecuteProvRoleT =  new ExecuteProvRoleT extended with {
+            Property execLabel : string;
+        };
+        
+        
+        Role reqr : ExecuteReqrRoleT =  new ExecuteReqrRoleT extended with {
+            Property execLabel : string;
+        };
+        
+        
+    }
+    
+    
+    Connector Type ConstraintExecConnT extends PointToPointConnT with {
+        Property isSynchronous : boolean << default : boolean = false;  >>;
+        
+        invariant Forall r in self.roles | 
+            mustBeOfType(r, {ConstraintExecReqrRoleT, ConstraintExecProvRoleT}) AND (size(r.attachedPorts) > 0) ;
+        
+        Role prov : ConstraintExecProvRoleT =  new ConstraintExecProvRoleT extended with {
+            Property constraintExecLabel : string;
+        };
+        
+        
+        Role reqr : ConstraintExecReqrRoleT =  new ConstraintExecReqrRoleT extended with {
+            Property constraintExecLabel : string;
+        };
+        
+        
+        invariant Forall r in self.roles | 
+            Exists t in {ConstraintExecProvRoleT, ConstraintExecReqrRoleT} | 
+                declaresType(r, t)  <<vis-roles : boolean = true;>>;
+        
+    }
+    
+    
+    invariant R1A-actuatorCmdSubPorts_conn_sameController(self)<<label : string = "Rule 1A: An actuator can receive commands from only one controller";>>;
+    
+    invariant R2B_estimator_conn_actuatorCmdNotifImpliesCmdQry(self)<<label : string = "Rule 2B: If an actuator notifies an estimator of a command, then that estimator must query the actuator for commands";>>;
+    
+    invariant R3_3-allActuatorCmdQryPorts_conn_onlyEstimatorCmdQry(self)<<label : string = "Rule 3.3: Only estimators can query an actuator's commands";>>;
+    
+    invariant R3_4-moreThanOneEstimator_conn_actuator(self);
+    
+    invariant R5B-estimator_conn_sensorMeasureNotifImpliesMeasureQry(self)<<label : string = "Rule 5B: If an estimator is notified of a measurement from a sensor, then the estimator should also query the sensor for the measurement";>>;
+    
+    invariant R8A_component_conn_stateVarStateNotifImpliesStateQry(self)<<label : string = "Rule 8A: If a component is notified of a state update from a StateVar, then that component should also query the StateVar for the update";>>;
+    
+    invariant R2_3-allActuatorCmdNotifPorts_conn_onlyEstimatorCmdNotif(self)<<label : string = "Rule 2.3: An Actuator may only notify estimators of commands";>>;
+    
+    invariant R3_4-zeroEstimator_conn_actuator(self)<<label : string = "Rule 3.4: An Estimator that does not require command evidence may not be connected to any Actuators";>>;
+    
+    invariant R4_4-sensorData_rawVsInformative(self)<<label : string = "Rule 4.4: A sensor that is not connected to any estimators should specify that it is only raw data; if it is connected to more than one estimator, it should specify that it is informative to more than one";>>;
+    
+    invariant R5_3-allSensorMeasureNotifPorts_conn_onlyEstimatorMeasureNotif(self)<<label : string = "Rule 5.3: Only estimators can be notified of sensor measurements";>>;
+    
+    invariant R10-twoPortOfComponent_notConn_sameTargetPort(self)<<label : string = "Rule 10: No two ports of a component should be connected to the same target port";>>;
+    
+    heuristic R6_2-stateVarStateQryPort_conn_anyNumComponent(self)<<label : string = "Rule 6.2: It is suspicious if a state variable query port not to be connected to anything";>>;
+    
+    invariant size(Estimators_Failing_R2B(self)) == 0;
+    
+    invariant Forall e : EstimatorT in Estimators_Failing_R2B(self) | 
+        size(CommanNotifProvPorts_Failing_2B(e)) == 0 ;
+    
+    Property Type PropT = int;
+    
+}
+
+

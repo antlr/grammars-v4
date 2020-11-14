@@ -1,0 +1,1 @@
+import data.foo[x]

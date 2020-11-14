@@ -1,0 +1,244 @@
+//
+// $Id: KToggleButton.tjs,v 1.6 2007/09/04 19:02:38 cvs Exp $
+//
+
+
+/**----------------------------------------------------------------------
+ * トグルボタン
+ ----------------------------------------------------------------------*/
+class KToggleButton extends KValueWidget
+{
+  // ラベルウィジェット
+  var child;
+  // ボタンイメージ描画用のベースレイヤ
+  var baseLayer;
+  // 値
+  var _value;
+
+  /*------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィンドウ
+   * @param labelWidget ボタンの真ん中に表示するラベルウィジェット
+   * @param name 名前
+   ------------------------------*/
+  function KToggleButton(win, labelWidget, name) {
+    // super
+    super.KWidget(win, name);
+
+    // ベースレイヤをセットアッう
+    baseLayer = new global.KWidget(win);
+    baseLayer.parent = this;
+    baseLayer.hitThreshold = 256;
+
+    // childをセットアップ
+    child = labelWidget;
+    child.parent = this;
+    child.hitThreshold = 256;
+
+    // デフォルトフォーカス
+    focusable = win.defaultFocusable;
+
+    // 辺り判定オール受けつけ
+    hitThreshold = 0;
+
+    // 自分自身はイメージ持たず
+    hasImage = false;
+    // 値はfalseから
+    _value = false;
+
+    // レイアウト再設定
+    invalidateLayout();
+  }
+
+  // レイアウトをやり直す
+  function invalidateLayout {
+    setMinMaxSize(child.minWidth + child.marginHorizontal + 2,
+                  child.minHeight + child.marginVertical + 2,
+                  child.maxWidth +  child.marginHorizontal + 2,
+                  child.maxHeight + child.marginVertical + 2);
+    drawContent();
+  }
+
+  // 内容を描画する
+  function drawContent {
+    if (! _value) {
+      // ベースレイヤに浮き出した枠を描画
+      baseLayer.setFixedSize(width, height);
+      baseLayer.fillRect(0, 0, width, height, focused ? WIN_HIGHLIGHT : 0);
+      baseLayer.drawRaisedFrame(1, 1, width - 2, height - 2);
+      // 子レイヤのサイズ・位置を再設定
+      child.setSize(width - 2 - child.marginHorizontal, height - 2 - child.marginVertical);
+      locateChild(1, 1, width - 2, height - 2, child);
+    } else {
+      // ベースレイヤにひっこんだ枠を描画
+      baseLayer.setFixedSize(width, height);
+      baseLayer.fillRect(0, 0, width, height, focused ? WIN_HIGHLIGHT : 0);
+      baseLayer.drawSunkenFrame(1, 1, width - 2, height - 2);
+      // 子レイヤのサイズ・位置を再設定
+      child.setSize(width - 2 - child.marginHorizontal, height - 2 - child.marginVertical);
+      locateChild(2, 2, width - 2, height - 2, child);
+    }
+  }  
+
+  /*------------------------------
+   * マウスボタンに反応する
+   *
+   * マウスボタンを押して値が変わると、 onValueModified が呼ばれます
+   ------------------------------*/
+  function onClick {
+    focus();
+    value = ! value;
+    onValueModified(value, ! value);
+  }
+
+  function onDoubleClick {
+    onClick();
+  }
+
+  /*------------------------------
+   * キーボードに反応する
+   *
+   * キーボードを押して値が変わると、 onValueModified が呼ばれます
+   ------------------------------*/
+  function onKeyDown(key, shift) {
+    if (key == VK_SPACE || key == VK_RETURN) {
+      value = ! value;
+      onValueModified(value, ! value);
+    } else {
+      super.onKeyDown(...);
+    }      
+  }
+
+  /*------------------------------
+   * 値を設定する
+   *
+   * @param v 値
+   * @return 値
+   ------------------------------*/
+  property value {
+    getter {
+      return _value;
+    }
+    setter(v) {
+      // 変更があった場合のみ更新をする
+      if (_value == v)
+        return;
+      // 値を更新
+      _value = v;
+      // 再描画
+      drawContent();
+    }
+  }
+
+  // 子の最小最大サイズが変わったらレイアウトやり直し
+  function onChildMinMaxSizeModified(child) {
+    if (child == baseLayer)
+      return;
+    invalidateLayout();
+  }
+
+  // 子のマージンが変わったらレイアウトやり直し
+  function onChildMarginModified {
+    invalidateLayout();
+  }
+
+  // サイズが変わったら再描画
+  function onSizeModified {
+    drawContent();
+  }
+
+  // フォーカスされたら再描画
+  function onFocus {
+    drawContent();
+  }
+
+  // フォーカスが外れたら再描画
+  function onBlur {
+    drawContent();
+  }
+  
+  // enabled==trueならそのまま表示
+  function onNodeEnabled {
+    baseLayer.opacity = 255;
+  } 
+
+  // enabled=falseなら半透明で表示
+  function onNodeDisabled {
+    baseLayer.opacity = 64;
+  }
+}  
+
+/*----------------------------------------------------------------------
+ * テキストトグルボタン
+ *
+ * テキストをラベルに持ったトグルボタン。
+ * 内部的に KTextLabel をラベルとして保持しています。
+ ----------------------------------------------------------------------*/
+class KTextToggleButton extends KToggleButton
+{
+  /*------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィンドウ
+   * @param label ラベル
+   * @param name 名前
+   ------------------------------*/
+   function KTextToggleButton(win, label, name) {
+    var labelWidget = new KTextLabel(win, label);
+    labelWidget.setMargin(15, 10);
+    super.KToggleButton(win, labelWidget, name);
+  }
+
+  /**------------------------------
+   * ラベルの値
+   *
+   * @return ラベルの値
+   * @param v 新規のラベルの値
+   ------------------------------*/
+  property label {
+    getter {
+      return child.label;
+    }
+    setter(v) {
+      child.label = v;
+    }
+  }
+}
+
+/*----------------------------------------------------------------------
+ * イメージボタン
+ *
+ * イメージをラベルに持ったボタン。
+ * 内部的に KImageLabel をラベルとして保持しています。
+ ----------------------------------------------------------------------*/
+class KImageToggleButton extends KToggleButton
+{
+  /*------------------------------
+   * コンストラクタ
+   *
+   * @param win ウィンドウ
+   * @param label イメージファイル名
+   * @param name 名前
+   ------------------------------*/
+  function KImageToggleButton(win, label, name) {
+    var labelWidget = new KImageLabel(win, label);
+    labelWidget.margin = 5;
+    super.KToggleButton(win, labelWidget, name);
+  }
+
+  /**------------------------------
+   * ラベルの値
+   *
+   * @return ラベルの値
+   * @param v 新規のラベルの値
+   ------------------------------*/
+  property label {
+    getter {
+      return child.label;
+    }
+    setter(v) {
+      child.label = v;
+    }
+  }
+}

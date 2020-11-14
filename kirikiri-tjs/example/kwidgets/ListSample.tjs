@@ -1,0 +1,241 @@
+//
+// $Id: ListSample.tjs,v 1.3 2007/09/22 21:38:39 cvs Exp $
+//
+
+
+/*----------------------------------------------------------------------
+ * リストサンプル
+ ----------------------------------------------------------------------*/
+
+// D&Dして位置を移動できるリストアイテム
+class DragDropListItem extends KListItem
+{
+  function DragDropListItem(label, name) {
+    super.KListItem(label, name);
+  }
+
+  // "ddlistitem"名義でドラッグ開始
+  function onDragEnter {
+    beginDragPacket(new KPacket("ddlistitem", this));
+  }
+
+  // "ddlistitem"を受け入れる(自分自身の場合は除外)
+  function isPacketAcceptable(packet) {
+    return (packet.name == "ddlistitem"
+	    && packet.arg != this);
+  }
+
+  // ドロップしたリストアイテムのparentをつけかえる。
+  function onPacketDrop(x, y, packet) {
+    var item = packet.arg;
+    item.parent.remove(item, false);
+    parent.insert(index + 1, item);
+  }
+}
+
+//----------------------------------------------------------------------
+// DragDropListItem を childに受け入れ可能なアイテム
+class DragDropTopListItem extends KListItem
+{
+  function DragDropTopListItem(label, name) {
+    super.KListItem(label, name);
+  }
+
+  // "ddlistitem"を受け入れる
+  function isPacketAcceptable(packet) {
+    return (packet.name == "ddlistitem");
+  }
+
+  // ドロップしたリストアイテムを自分のchildにする。
+  function onPacketDrop(x, y, packet) {
+    var item = packet.arg;
+    item.parent.remove(item, false);
+    insert(0, item);
+  }
+}
+
+//----------------------------------------------------------------------
+// コンテキストメニューを表示するリストアイテム
+class ContextMenuListItem extends KListItem
+{
+  var checkValue;
+  var checkValue2;
+
+  function ContextMenuListItem(label, name) {
+    super.KListItem(label, name);
+    // チェック値の初期値
+    checkValue = true;
+    checkValue2 = true;
+  }
+
+  // 右クリック時メニュー。個々のメニューアイテムで処理関数をハンドルする例。
+  function onRightClick {
+    var menu = new KContextMenu();
+    menu.addItem("選択アイテム", "", true, this.onSelectItem);
+    menu.addToggleItem("トグルアイテム", checkValue, "", true, this.onToggleItem);
+    menu.addSeparator();
+    menu.addItem("非選択アイテム", "", false);
+    var nest = menu.addItem("入れ子アイテム");
+    nest.addItem("入れ子の中身その1");
+    nest.addItem("入れ子の中身その2");
+    nest.addItem("入れ子の中身その3");
+    nest.addItem("深いネスト", "deepNestItem");
+    menu.deepNestItem.addItem("深いネストに、名前で直接アクセスの例");
+    menu.show();
+  }
+
+  function onSelectItem {
+    System.inform("選択アイテムをクリック");
+  }
+
+  function onToggleItem(value) {
+    checkValue = value;
+    Debug.message("チェック", value);
+  }
+
+  // 左クリック時メニュー。全メニューアイテムの反応をまとめて一箇所で取る例。
+  function onClick {
+    var menu = new KContextMenu();
+    menu.onChildValueModified = this.onChildValueModified;
+    menu.addItem("項目1", "item1");
+    menu.addItem("項目2", "item2");
+    menu.addValueItem("項目3-値123", 123, "item3");
+    menu.addValueItem("項目3-値456", 456, "item3");
+    menu.addToggleItem("項目4", checkValue2, "item4");
+    menu.show();
+  }
+
+  function onChildValueModified(child, value) {
+    switch (child.name) {
+    case "item1": System.inform("項目1を選択しました"); break;
+    case "item2": System.inform("項目2を選択しました"); break;
+    case "item3": System.inform("項目3を値「" + value + "」で選択しました"); break;
+    case "item4": System.inform("項目4の値が「" + value + "」になりました"); checkValue2 = value; break;
+    }
+  }
+}
+
+//----------------------------------------------------------------------
+// アイコンつきリストアイテム
+class IconListItem extends KListItem
+{
+  function IconListItem(label, name) {
+    super.KListItem(label, name);
+    // アイコンを初期設定
+    icons = [ "k_check_button_on", "gotta_mail" ];
+  }
+
+  // アイコンがクリックされた時の反応
+  function onIconClick(index) {
+    if (index != 0)
+      return;
+    // アイコンを切り替え
+    if (icon == "k_check_button_on")
+      icons= [ "k_check_button_off", "gotta_mail" ];
+    else
+      icons = [ "k_check_button_on", "gotta_mail" ];
+  }
+}
+
+//----------------------------------------------------------------------
+// リストサンプル
+//----------------------------------------------------------------------
+class ListSample extends KWindow
+{
+  function ListSample {
+    super.KWindow("listsample");
+    
+    // ウィンドウ初期設定
+    caption = 'リストサンプル';
+    imeMode = imDontCare;
+
+    // デフォルト値
+    defaultFocusable = true;
+
+    // スクロールレイアウトを作リ、その中にリストを配置
+    primaryWidget.add(new KScrollLayout(this, true, true, "scroll"));
+    scroll.resize = true;
+    scroll.add(new KList(this, "list"));
+
+    // リスト項目を配置しまくる
+    list.spaceVertical = 2;
+    list.add(new DragDropTopListItem("トップ項目1", "listitem1"));
+
+    list.add(new DragDropTopListItem("トップ項目2", "listitem2"));
+    list.add(new KListItem("トップ項目3はちょっと横長に表示しますですよ", "listitem3"));
+    list.add(new KListItem("トップ項目4はF2で名前を編集可能", "listitem4"));
+    list.add(new ContextMenuListItem("トップ項目5は左クリックまたは右クリックでコンテキストメニューが開く"));
+    list.add(new IconListItem("トップ項目6はアイコンつき。アイコンをクリックで切り替え"));
+    list.add(new KListItem("トップ項目7はヒントが設定されている", "listitem7"));
+    listitem7.hint = "こんな風にリストアイテムに対して\nヒントを設定することができる";
+
+    listitem1.add(new DragDropListItem("項目1-1 Ｄ＆Ｄで入れ替え可能"));
+    listitem1.add(new DragDropListItem("項目1-2 Ｄ＆Ｄで入れ替え可能"));
+    listitem1.add(new DragDropListItem("項目1-3 Ｄ＆Ｄで入れ替え可能"));
+    listitem1.add(new DragDropListItem("項目1-4 Ｄ＆Ｄで入れ替え可能"));
+
+    listitem2.add(new DragDropListItem("項目2-1 Ｄ＆Ｄで入れ替え可能"));
+    listitem2.add(new DragDropListItem("項目2-2 Ｄ＆Ｄで入れ替え可能"));
+    listitem2.add(new DragDropListItem("項目2-3 Ｄ＆Ｄで入れ替え可能"));
+    listitem2.add(new DragDropListItem("項目2-4 Ｄ＆Ｄで入れ替え可能"));
+
+    for (var i = 0; i < 50; i++) {
+      var subItem;
+      listitem3.add(subItem = new KListItem("サブ項目"));
+      for (var j = 0; j < 10; j++) {
+	subItem.add(new KListItem("孫項目"));
+      }
+    }
+    listitem4.labelEditable = true;
+    listitem4.labelTextType = TEXT_ANY;
+
+    defaultSpace = 4;
+    defaultMargin = 6;
+    defaultAlignHorizontal = ALIGN_CENTER;
+    defaultAlignVertical = ALIGN_CENTER;
+
+    list.add(new KListItem("ボタンウィジェット", "buttonWidgetHolder", true));
+    buttonWidgetHolder.add(new KFrameLayout(this, FRAME_FLATTEN, "", "buttonFrame"));
+    buttonFrame.add(new KGridLayout(this, "buttonGrid"));
+    buttonGrid.add(0, 0, new KFrameLayout(this, FRAME_FLATTEN, "ノーマルボタン", "normalButtonFrame"));
+    normalButtonFrame.add(new KGridLayout(this, "normalButtonGrid"));
+    normalButtonGrid.add(0, 0, new KTextButton(this, "ボタン", "textbutton"));
+    normalButtonGrid.add(1, 0, new KImageButton(this, "gotta_mail", "imagebutton"));
+    buttonGrid.add(0, 1, new KFrameLayout(this, FRAME_FLATTEN, "ノーマルボタン", "toggleButtonFrame"));
+    toggleButtonFrame.add(new KGridLayout(this, "toggleButtonGrid"));
+    toggleButtonGrid.add(0, 0, new KTextToggleButton(this, "ボタン", "texttogglebutton"));
+    toggleButtonGrid.add(1, 0, new KImageToggleButton(this, "gotta_mail", "imagetogglebutton"));
+
+    // 永続化辞書の作成
+    var dict = new KPersistentDictionary(System.dataPath + name + "_dict.txt");
+    add(dict);
+    bindPersistentDictionary(dict);
+  }
+
+  // ウィジェットの値が更新された時に呼ばれるフック関数
+  function onChildValueModified(child, value) {
+    switch (child.name) {
+    default: {
+      // 更新のあったウィジェットの名前と値を表示。
+      Debug.message("child value modified", child.name, typeof(value), value);
+      break;
+    }
+    }
+  }
+}
+
+//----------------------------------------------------------------------
+// サンプル表示・非表示の切り替え
+global.listSample = void;
+
+function showListSample
+{
+  if (listSample === void)
+    listSample = new ListSample();
+  listSample.visible = true;
+}
+
+function hideListSample
+{
+  listSample.visible = false;
+}

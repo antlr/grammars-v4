@@ -65,7 +65,7 @@ label
    ;
 
 constantDefinitionPart
-   : CONST (constantDefinition SEMI)+
+   : CONST (constantDefinition SEMI) +
    ;
 
 constantDefinition
@@ -95,7 +95,7 @@ unsignedInteger
    ;
 
 unsignedReal
-   : NUM_INT
+   : NUM_REAL
    ;
 
 sign
@@ -103,12 +103,17 @@ sign
    | MINUS
    ;
 
+bool
+   : TRUE
+   | FALSE
+   ;
+
 string
    : STRING_LITERAL
    ;
 
 typeDefinitionPart
-   : TYPE (typeDefinition SEMI)+
+   : TYPE (typeDefinition SEMI) +
    ;
 
 typeDefinition
@@ -187,7 +192,7 @@ recordType
    ;
 
 fieldList
-   : fixedPart (SEMI variantPart)? 
+   : fixedPart (SEMI variantPart)?
    | variantPart
    ;
 
@@ -307,15 +312,39 @@ variable
    ;
 
 expression
-   : simpleExpression ((EQUAL | NOT_EQUAL | LT | LE | GE | GT | IN) simpleExpression)*
+   : simpleExpression (relationaloperator expression)?
+   ;
+
+relationaloperator
+   : EQUAL
+   | NOT_EQUAL
+   | LT
+   | LE
+   | GE
+   | GT
+   | IN
    ;
 
 simpleExpression
-   : term ((PLUS | MINUS | OR) term)*
+   : term (additiveoperator simpleExpression)?
+   ;
+
+additiveoperator
+   : PLUS
+   | MINUS
+   | OR
    ;
 
 term
-   : signedFactor ((STAR | SLASH | DIV | MOD | AND) signedFactor)*
+   : signedFactor (multiplicativeoperator term)?
+   ;
+
+multiplicativeoperator
+   : STAR
+   | SLASH
+   | DIV
+   | MOD
+   | AND
    ;
 
 signedFactor
@@ -329,6 +358,7 @@ factor
    | unsignedConstant
    | set
    | NOT factor
+   | bool
    ;
 
 unsignedConstant
@@ -365,7 +395,11 @@ procedureStatement
    ;
 
 actualParameter
-   : expression
+   : expression parameterwidth*
+   ;
+
+parameterwidth
+   : ':' expression
    ;
 
 gotoStatement
@@ -377,7 +411,8 @@ emptyStatement
    ;
 
 empty
-   :/* empty */
+   :
+   /* empty */
    ;
 
 structuredStatement
@@ -936,6 +971,16 @@ IMPLEMENTATION
    ;
 
 
+TRUE
+   : T R U E
+   ;
+
+
+FALSE
+   : F A L S E
+   ;
+
+
 WS
    : [ \t\r\n] -> skip
    ;
@@ -962,6 +1007,11 @@ STRING_LITERAL
 
 
 NUM_INT
+   : ('0' .. '9') +
+   ;
+
+
+NUM_REAL
    : ('0' .. '9') + (('.' ('0' .. '9') + (EXPONENT)?)? | EXPONENT)
    ;
 
