@@ -3,11 +3,14 @@
 /**/.classpath
 /**/.settings/
 /**/target
+/**/bin
 
-# Visual Studio Code Generated
+# Visual Studio Generated
 .antlr
-
 .fetch_time_cache
+/.vs
+.vscode/
+.gradle/
 
 #IntelliJ Idea project files
 .idea/

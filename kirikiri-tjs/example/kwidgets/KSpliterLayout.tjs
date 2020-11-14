@@ -1,0 +1,387 @@
+//
+// $Id: KSpliterLayout.tjs,v 1.2 2007/09/11 15:40:56 m2 Exp $
+//
+
+/*----------------------------------------------------------------------
+ * スプリッタハンドル
+ ----------------------------------------------------------------------*/
+class KSpliterHandle extends KWidget
+{
+  function KSpliterHandle(window) {
+    super.KWidget(window);
+    hasImage = false;
+    hitThreshold = 0;
+  }
+
+  function onMouseDown(x, y, button, shift) {
+    parent.onMouseDown(x + left, y + top, button, shift);
+  }
+  
+  function onMouseMove(x, y, shift) {
+    parent.onMouseMove(x + left, y + top, shift);
+  }
+
+  function onMouseUp(x, y, button, shift)  {
+    parent.onMouseUp(x + left, y + top, button, shift);
+  }
+}
+  
+
+/**----------------------------------------------------------------------
+ * 水平スプリッター
+ ----------------------------------------------------------------------*/
+class KHorizontalSpliterLayout extends KWidget
+{
+  var HANDLE_SIZE = 4;
+  var childList;
+  var spliterHandle;
+  var redrawn;
+  var childMinW, childMinH, childMaxW, childMaxH;
+  var _splitRatio = 0.5;
+  var _splitAlignment = ALIGN_CENTER;
+  var firstSplit;
+  var dragging;
+  var baseX, curL, curR, curX;
+  var dict;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param window ウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KHorizontalSpliterLayout(window, name) {
+    super.KWidget(window, name);
+    childList = [];
+    spliterHandle = new KSpliterHandle(window, 0, 0);
+    spliterHandle.hitThreshold = 0;
+    spliterHandle.cursor = crHSplit;
+    spliterHandle.parent = this;
+    hasImage = false;
+    hitThreshold = 256;
+  }
+
+  /*------------------------------
+   * ファイナライザ
+   ------------------------------*/
+  function finalize {
+    if (dict) {
+      dict.set(name, _splitRatio);
+    }
+    super.finalize(...);
+  }
+
+  /**------------------------------
+   * 分割率
+   * 
+   * @param v 分割率(0.0〜1.0)
+   * @return 分割率
+   ------------------------------*/
+  property splitRatio {
+    getter {
+      return _splitRatio;
+    }
+    setter(v) {
+      if (_splitRatio == v)
+        return;
+      _splitRatio = v;
+      firstSplit = true;
+      redraw();
+    }
+  }
+
+  /**------------------------------
+   * 分割アライメント
+   *
+   * ウィジェットの拡大縮小時に、どちらのペインをメインに見るか。
+   * ALIGN_LEFT,ALIGN_CENTER,ALIGN_RIGHTのいずれかを指定する。
+   * 
+   * @param アライメント
+   * @return アライメント
+   ------------------------------*/
+  property splitAlignment {
+    getter {
+      return _splitAlignment;
+    }
+    setter(v) {
+      if (_splitAlignment == v)
+        return;
+      _splitAlignment = v;
+    }
+  }
+
+  /**------------------------------
+   * 子ウィジェットを追加する
+   *
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function add(child) {
+    childList.add(child);
+    child.parent = this;
+    firstSplit = true;
+    invalidateLayout();
+  }
+
+  /**------------------------------
+   * 子ウィジェットを解放する
+   * 
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    childList.add(child);
+    child.parent = widgetDepot;
+    invalidateLayout();
+    if (doInvalidate)
+      invalidate child;
+  }
+
+  /*------------------------------
+   * 永続化辞書を値にバインドする
+   ------------------------------*/
+  function bindPersistentDictionary(dict) {
+    if (name !== void) {
+      this.dict = dict;
+      splitRatio = dict.init(name, splitRatio);
+    }
+    super.bindPersistentDictionary(dict);
+  }
+
+  /*------------------------------
+   * こっから、垂直スプリッタと水平スプリッタの差分を吸収するための関数群
+   ------------------------------*/
+  function calcMinMaxSize {
+    var result = [];
+    result[0] = childMinW[0] + HANDLE_SIZE + childMinW[1];
+    result[1] = int(Math.max(childMinH[0], childMinH[1]));
+    result[2] = childMaxW[0] + HANDLE_SIZE + childMaxW[1];
+    result[3] = int(Math.max(childMaxH[0], childMaxH[1]));
+    return result;
+  }
+
+  function myWidth {
+    return width;
+  }
+
+  function myChildMinW(index) {
+    return childMinW[index];
+  }
+
+  function myChildMaxW(index) {
+    return childMaxW[index];
+  }
+
+  function myChildWidth(index) {
+    return childList[index].width;
+  }
+
+  function locate(w0, w1) {
+    childList[0].setSize(w0 - childList[0].marginHorizontal, height - childList[0].marginVertical);
+    locateChild(0, 0, w0, height, childList[0]);
+    spliterHandle.setFixedSize(HANDLE_SIZE, height);
+    spliterHandle.setPos(w0, 0);
+    childList[1].setSize(w1 - childList[1].marginHorizontal, height - childList[1].marginVertical);
+    locateChild(w0 + HANDLE_SIZE, 0, w1, height, childList[1]);
+  }
+
+  /*------------------------------
+   * ここまで。
+   ------------------------------*/
+
+  // レイアウトのやり直し
+  function invalidateLayout {
+    if (childList.count < 2)
+      return;
+
+    childMinW = [];
+    childMinH = [];
+    childMaxW = [];
+    childMaxH = [];
+
+    for (var i = 0; i < 2; i++) {
+      var child = childList[i];
+      childMinW[i] = child.minWidth + child.marginHorizontal;
+      childMinH[i] = child.minHeight + child.marginVertical;
+      childMaxW[i] = child.maxWidth + child.marginHorizontal;
+      childMaxH[i] = child.maxHeight + child.marginVertical;
+    }
+
+    redrawn = false;
+    setMinMaxSize(calcMinMaxSize()*);
+    if (! redrawn)
+      redraw();
+  }
+
+  // 再描画
+  function redraw {
+    if (childList.count < 2)
+      return;
+
+    redrawn = true;
+
+    var w, l, r;
+    w = myWidth() - HANDLE_SIZE;
+    l = int(Math.max(myChildMinW(0), w - myChildMaxW(1)));
+    r = int(Math.min(myChildMaxW(0), w - myChildMinW(1)));
+
+    var w0 = l + int((r - l) * _splitRatio);
+    var w1 = w - w0;
+
+    locate(w0, w1);
+  }
+
+  // サイズが変わった時の呼び出し
+  function onSizeModified(newWidth, newHeight, oldWidth, oldHeight) {
+    if (childList.count < 2)
+      return;
+
+    // アライメントに応じて、スプリッターの位置を補正
+    if (firstSplit) {
+      firstSplit = false;
+    } else {
+      switch (_splitAlignment) {
+      case ALIGN_LEFT: {
+        var w, l, r;
+        w = myWidth() - HANDLE_SIZE;
+        l = int(Math.max(myChildMinW(0), w - myChildMaxW(1)));
+        r = int(Math.min(myChildMaxW(0), w - myChildMinW(1)));
+        if (r != l) {
+          _splitRatio = (myChildWidth(0) - l) / (r - l);
+          _splitRatio = Math.max(0, Math.min(1, _splitRatio));
+        }
+        break;
+      }
+      case ALIGN_RIGHT: {
+        var w, l, r;
+        w = myWidth() - HANDLE_SIZE;
+        l = int(Math.max(myChildMinW(0), w - myChildMaxW(1)));
+        r = int(Math.min(myChildMaxW(0), w - myChildMinW(1)));
+        if (r != l) {
+          _splitRatio = (w - myChildWidth(1) - l) / (r - l);
+          _splitRatio = Math.max(0, Math.min(1, _splitRatio));
+        }
+        break;
+      }
+      }
+    }
+    redraw();
+  }
+
+  // 子のマージン変更を検知
+  function onChildMarginModified {
+    invalidateLayout();
+  }
+
+  // 子のアライン変更を検知
+  function onChildAlignModified {
+    invalidateLayout();
+  }
+
+  // 子のサイズ変更を検知
+  function onChildMinMaxSizeModified(child) {
+    if (child == spliterHandle)
+      return;
+    invalidateLayout();
+  }
+
+
+  // マウスダウンでドラッグ開始
+  function onMouseDown(x, y, button) {
+    if (childList.count < 2)
+      return;
+    
+    if (button != mbLeft)
+      return;
+
+    var w = myWidth() - HANDLE_SIZE;
+    curL = int(Math.max(myChildMinW(0), w - myChildMaxW(1)));
+    curR = int(Math.min(myChildMaxW(0), w - myChildMinW(1)));
+    if (curL == curR)
+      return;
+    baseX = x;
+    curX = myChildWidth(0) - curL;
+    dragging = true;
+  }
+
+  // ドラッグしてスプリッタを移動
+  function onMouseMove(x, y) {
+    if (! dragging)
+      return;
+
+    var diff = x - baseX;
+    _splitRatio = (curX + (x - baseX)) / (curR - curL);
+    _splitRatio = Math.max(0, Math.min(1, _splitRatio));
+    redraw();
+  }
+
+  // ドラッグ終了
+  function onMouseUp {
+    dragging = false;
+  }
+}
+
+
+/**----------------------------------------------------------------------
+ * 垂直スプリッター
+ ----------------------------------------------------------------------*/
+class KVerticalSpliterLayout extends KHorizontalSpliterLayout
+{
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param window ウィンドウ
+   * @param name 名前
+   ------------------------------*/
+  function KVerticalSpliterLayout(window, name) {
+    super.KHorizontalSpliterLayout(window, name);
+    spliterHandle.cursor = crVSplit;
+  }
+
+  function calcMinMaxSize {
+    var result = [];
+    result[0] = int(Math.max(childMinW[0], childMinW[1]));
+    result[1] = childMinH[0] + HANDLE_SIZE + childMinH[1];
+    result[2] = int(Math.max(childMaxW[0], childMaxW[1]));
+    result[3] = childMaxH[0] + HANDLE_SIZE + childMaxH[1];
+    return result;
+  }
+
+  function myWidth {
+    return height;
+  }
+
+  function myChildMinW(index) {
+    return childMinH[index];
+  }
+
+  function myChildMaxW(index) {
+    return childMaxH[index];
+  }
+
+  function myChildWidth(index) {
+    return childList[index].height;
+  }
+
+  function locate(w0, w1) {
+    childList[0].setSize(width - childList[0].marginHorizontal, w0 - childList[0].marginVertical);
+    locateChild(0, 0, width, w0, childList[0]);
+    spliterHandle.setFixedSize(width, HANDLE_SIZE);
+    spliterHandle.setPos(0, w0);
+    childList[1].setSize(width - childList[1].marginHorizontal, w1 - childList[1].marginVertical);
+    locateChild(0, w0 + HANDLE_SIZE, width, w1, childList[1]);
+  }
+
+  function onMouseDown(x, y) {
+    super.onMouseDown(y, x);
+  }
+
+  function onMouseMove(x, y) {
+    super.onMouseMove(y, x);
+  }
+  
+  function onMouseUp(x, y) {
+    super.onMouseUp(y, x);
+  }
+}
+
+

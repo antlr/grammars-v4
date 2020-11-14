@@ -19,7 +19,8 @@ private boolean verbatium;
 BYTE_ORDER_MARK: '\u00EF\u00BB\u00BF';
 
 SINGLE_LINE_DOC_COMMENT: '///' InputCharacter*    -> channel(COMMENTS_CHANNEL);
-DELIMITED_DOC_COMMENT:   '/**' .*? '*/'           -> channel(COMMENTS_CHANNEL);
+EMPTY_DELIMITED_DOC_COMMENT: '/***/'              -> channel(COMMENTS_CHANNEL);
+DELIMITED_DOC_COMMENT:       '/**' ~'/' .*? '*/'  -> channel(COMMENTS_CHANNEL);
 SINGLE_LINE_COMMENT:     '//'  InputCharacter*    -> channel(COMMENTS_CHANNEL);
 DELIMITED_COMMENT:       '/*'  .*? '*/'           -> channel(COMMENTS_CHANNEL);
 
@@ -119,6 +120,7 @@ TYPEOF:        'typeof';
 UINT:          'uint';
 ULONG:         'ulong';
 UNCHECKED:     'unchecked';
+UNMANAGED:     'unmanaged';
 UNSAFE:        'unsafe';
 USHORT:        'ushort';
 USING:         'using';
@@ -138,10 +140,11 @@ IDENTIFIER:          '@'? IdentifierOrKeyword;
 
 //B.1.8 Literals
 // 0.Equals() would be parsed as an invalid real (1. branch) causing a lexer error
-LITERAL_ACCESS:      [0-9]+ IntegerTypeSuffix? '.' '@'? IdentifierOrKeyword;
-INTEGER_LITERAL:     [0-9]+ IntegerTypeSuffix?;
-HEX_INTEGER_LITERAL: '0' [xX] HexDigit+ IntegerTypeSuffix?;
-REAL_LITERAL:        [0-9]* '.' [0-9]+ ExponentPart? [FfDdMm]? | [0-9]+ ([FfDdMm] | ExponentPart [FfDdMm]?);
+LITERAL_ACCESS:      [0-9] ('_'* [0-9])* IntegerTypeSuffix? '.' '@'? IdentifierOrKeyword;
+INTEGER_LITERAL:     [0-9] ('_'* [0-9])* IntegerTypeSuffix?;
+HEX_INTEGER_LITERAL: '0' [xX] ('_'* HexDigit)+ IntegerTypeSuffix?;
+BIN_INTEGER_LITERAL: '0' [bB] ('_'* [01])+ IntegerTypeSuffix?;
+REAL_LITERAL:        ([0-9] ('_'* [0-9])*)? '.' [0-9] ('_'* [0-9])* ExponentPart? [FfDdMm]? | [0-9] ('_'* [0-9])* ([FfDdMm] | ExponentPart [FfDdMm]?);
 
 CHARACTER_LITERAL:                   '\'' (~['\\\r\n\u0085\u2028\u2029] | CommonCharacter) '\'';
 REGULAR_STRING:                      '"'  (~["\\\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';
@@ -234,6 +237,8 @@ OP_OR_ASSIGNMENT:         '|=';
 OP_XOR_ASSIGNMENT:        '^=';
 OP_LEFT_SHIFT:            '<<';
 OP_LEFT_SHIFT_ASSIGNMENT: '<<=';
+OP_COALESCING_ASSIGNMENT: '??=';
+OP_RANGE:                 '..';
 
 // https://msdn.microsoft.com/en-us/library/dn961160.aspx
 mode INTERPOLATION_STRING;
@@ -271,6 +276,7 @@ WARNING:                       'warning' Whitespace+            -> channel(DIREC
 REGION:                        'region' Whitespace*             -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
 ENDREGION:                     'endregion' Whitespace*          -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
 PRAGMA:                        'pragma' Whitespace+             -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
+NULLABLE:                      'nullable' Whitespace+           -> channel(DIRECTIVE), mode(DIRECTIVE_TEXT);
 DIRECTIVE_DEFAULT:             'default'                        -> channel(DIRECTIVE), type(DEFAULT);
 DIRECTIVE_HIDDEN:              'hidden'                         -> channel(DIRECTIVE);
 DIRECTIVE_OPEN_PARENS:         '('                              -> channel(DIRECTIVE), type(OPEN_PARENS);
@@ -303,7 +309,7 @@ fragment NewLineCharacter
 	;
 
 fragment IntegerTypeSuffix:         [lL]? [uU] | [uU]? [lL];
-fragment ExponentPart:              [eE] ('+' | '-')? [0-9]+;
+fragment ExponentPart:              [eE] ('+' | '-')? [0-9] ('_'* [0-9])*;
 
 fragment CommonCharacter
 	: SimpleEscapeSequence

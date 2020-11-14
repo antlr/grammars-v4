@@ -1,0 +1,409 @@
+//
+// $Id$
+//
+
+/*------------------------------
+ * KRect/KRegion は C++化して ksupport.dll に移動した。
+ * 本ソースはドキュメントとしてのみ残っている。
+ ------------------------------*/
+
+/**------------------------------
+ * 矩形
+ ------------------------------*/
+class KRect
+{
+  var left, top, right, bottom;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param l 左端
+   * @param t 上端
+   * @param w 幅
+   * @param h 高さ
+   ------------------------------*/
+  function KRect(l, t, w, h) {
+    left = l;
+    top = t;
+    right = w + l;
+    bottom = h + t;
+  }
+
+  // クラス名
+  property className {
+    getter {
+      return "KRect";
+    }
+  }
+
+  /**------------------------------
+   * 矩形が有効かどうか判定する
+   *
+   * @return 矩形が有効かどうか
+   ------------------------------*/
+  property isValid {
+    getter {
+      return (left <= right && top <= bottom);
+    }
+  }
+
+  /**------------------------------
+   * 幅
+   *
+   * @return 矩形の幅
+   ------------------------------*/
+  property width {
+    getter {
+      return right - left;
+    }
+    setter (v) {
+      right = left + v;
+    }
+  }
+
+  /**------------------------------
+   * 高さ
+   *
+   * @return 矩形の高さ
+   ------------------------------*/
+  property height {
+    getter {
+      return bottom - top;
+    }
+    setter (v) {
+      bottom = top + v;
+    }
+  }
+
+  /**------------------------------
+   * 矩形の複製
+   *
+   * @return 自分自身を複製した矩形
+   ------------------------------*/
+  function dup {
+    return new global.KRect(left, top, width, height);
+  }
+
+  /**------------------------------
+   * 矩形の割り当て
+   * 
+   * @param rect 割り当て元
+   * 
+   * rectの内容を自分自身にコピーする
+   ------------------------------*/
+  function assign(rect) {
+    left = rect.left;
+    top = rect.top;
+    right = rect.right;
+    bottom = rect.bottom;
+  }
+
+  /**------------------------------
+   * 交差判定
+   *
+   * @param rect 矩形
+   * @return 交差しているか？
+   *
+   * rectと自分自身に重なりがあるか判定する
+   ------------------------------*/
+  function intersects(rect) {
+    return ! (rect.right <= left
+              || right <= rect.left
+              || rect.bottom <= top
+              || bottom <= rect.top);
+  }
+
+  /**------------------------------
+   * 包含判定
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @return 包含しているか？
+   *
+   * 矩形が座標(X,Y)を包含しているか判定する
+   ------------------------------*/
+  function contains(x, y) {
+    return left <=x && x < right && top <= y && y <= bottom;
+  }
+
+  /**------------------------------
+   * 交差演算
+   *
+   * @param rect 矩形
+   *
+   * rectと自分自身の重なる部分を、自分自身に割り当て直す
+   ------------------------------*/
+  function intersectWith(rect) {
+    left = left > rect.left ? left : rect.left;
+    top = top > rect.top ? top : rect.top;
+    right = right < rect.right ? right : rect.right;
+    bottom = bottom < rect.bottom ? bottom : rect.bottom;
+  }
+
+  /**------------------------------
+   * 包含演算
+   *
+   * @param rect 矩形
+   *
+   * rectと自分自身の共通矩形分を、自分自身に割り当て直す
+   ------------------------------*/
+  function unionWith(rect) {
+    left = left < rect.left ? left : rect.left;
+    top = top < rect.top ? top : rect.top;
+    right = right > rect.right ? right : rect.right;
+    bottom = bottom > rect.bottom ? bottom : rect.bottom;
+  }
+}
+
+/**----------------------------------------------------------------------
+ * 領域
+ ----------------------------------------------------------------------*/
+class KRegion
+{
+  var rectList;
+
+  /**------------------------------
+   * コンストラクタ
+   ------------------------------*/
+  function KRegion {
+    rectList = [];
+  }
+
+  // クラス名
+  property className {
+    getter {
+      return "KRegion";
+    }
+  }
+
+  /**------------------------------
+   * 内部に含む矩形の数
+   ------------------------------*/
+  property rectCount {
+    getter {
+      return rectList.count;
+    }
+  }
+
+  /**------------------------------
+   * 矩形を直接参照する
+   * 
+   * @param index インデックス
+   * @return 矩形
+   ------------------------------*/
+  function rectAt(index) {
+    return rectList[index];
+  }
+
+  /**------------------------------
+   * 領域は空かどうか判定する
+   *
+   * @return 領域は空か？
+   ------------------------------*/
+  property empty {
+    getter {
+      return rectList.count == 0;
+    }
+  }
+
+  /**------------------------------
+   * 領域を空にする
+   ------------------------------*/
+  function clear {
+    rectList.clear();
+  }
+
+  /**------------------------------
+   * 領域を設定する
+   *
+   * @param r KRectもしくはKRegionオブジェクト
+   ------------------------------*/
+  function assign(r) {
+    switch (r.className) {
+    case "KRect": assignRect(r); break;
+    case "KRegion": assignRegion(r); break;
+    default: throw new Exception("invalid argumen for function"); break;
+    }
+  }
+
+  /**------------------------------
+   * 領域を拡張する
+   *
+   * @param r KRectもしくはKRegionオブジェクト
+   *
+   * 指定した範囲を領域につけ加える
+   ------------------------------*/
+  function include(r) {
+    switch (r.className) {
+    case "KRect": includeRect(r); break;
+    case "KRegion": includeRegion(r); break;
+    default: throw new Exception("invalid argumen for function"); break;
+    }
+  }
+
+  /**------------------------------
+   * 領域を削減する
+   *
+   * @param r KRectもしくはKRegionオブジェクト
+   *
+   * 指定した範囲を領域から取り除く
+   ------------------------------*/
+  function exclude(r) {
+    switch (r.className) {
+    case "KRect": excludeRect(r); break;
+    case "KRegion": excludeRegion(r); break;
+    default: throw new Exception("invalid argumen for function"); break;
+    }
+  }
+
+  /**------------------------------
+   * 交差演算
+   * 
+   * @param r KRectもしくはKRegionオブジェクト
+   *
+   * 指定した範囲をが領域の共通部分だけを残して残りを削除する
+   ------------------------------*/
+  function intersectWith(r) {
+    switch (r.className) {
+    case "KRect": intersectWithRect(r); break;
+    case "KRegion": intersectWithRegion(r); break;
+    default: throw new Exception("invalid argumen for function"); break;
+    }
+  }
+
+  /**------------------------------
+   * 交差判定
+   *
+   * @param rect 矩形
+   * @return 矩形と交差しているか？
+   *
+   * 矩形と交差しているかどうかを判定する
+   ------------------------------*/
+  function intersects(rect) {
+    for (var i = 0; i < rectList.count; i++)
+      if (rectList[i].intersects(rect))
+        return true;
+
+    return false;
+  }
+
+  /**------------------------------
+   * 包含判定
+   *
+   * @param x X座標
+   * @param y Y座標
+   * @return 座標を包含しているか？
+   *
+   * 座標(X,Y)を領域内に包含しているかどうかを判定する
+   ------------------------------*/
+  function contains(x, y) {
+    for (var i = 0; i < rectList.count; i++)
+      if (rectList[i].contains(x, y))
+        return true;
+
+    return false;
+  }
+
+  /*----------------------------------------------------------------------
+   * 以下、内部処理
+   ----------------------------------------------------------------------*/
+  // 矩形割り当て
+  function assignRect(rect) {
+    rectList.clear();
+    rectList.add(rect.dup());
+  }
+
+  // 領域割り当て
+  function assignRegion(region) {
+    rectList.clear();
+    for (var i = 0; i < region.rectList.count; i++)
+      rectList.add(region.rectList[i].dup());
+  }
+
+  // 矩形追加
+  function includeRect(rect) {
+    var r = new global.KRegion();
+    r.assignRect(rect);
+    r.excludeRegion(this);
+    for (var i = 0; i < r.rectList.count; i++)
+      rectList.add(r.rectList[i]);
+  }
+
+  // 領域追加
+  function includeRegion(region) {
+    if (region.empty)
+      return;
+    
+    var r = new global.KRegion();
+    r.assignRegion(region);
+    r.excludeRegion(this);
+    for (var i = 0; i < r.rectList.count; i++)
+      rectList.add(r.rectList[i]);
+  }
+
+  // 矩形除去
+  function excludeRect(rect) {
+    var newRectList = [];
+
+    for (var i = 0; i < rectList.count; i++) {
+      var aRect = rectList[i];
+      if (! aRect.intersects(rect)) {
+        newRectList.add(aRect);
+        continue;
+      }
+      if (rect.top > aRect.top) {
+        newRectList.add(new KRect(aRect.left, aRect.top, aRect.right - aRect.left, rect.top - aRect.top));
+        aRect.top = rect.top;
+      }
+      if (rect.bottom < aRect.bottom) {
+        newRectList.add(new KRect(aRect.left, rect.bottom , aRect.right - aRect.left, aRect.bottom - rect.bottom));
+        aRect.bottom = rect.bottom;
+      }
+      if (rect.left > aRect.left)
+        newRectList.add(new KRect(aRect.left, aRect.top, rect.left - aRect.left, aRect.bottom - aRect.top));
+      if (rect.right < aRect.right)
+        newRectList.add(new KRect(rect.right, aRect.top, aRect.right - rect.right, aRect.bottom - aRect.top));
+    }
+    
+    rectList = newRectList;
+  }
+
+  // 領域除去
+  function excludeRegion(region) {
+    for (var i = 0; i < region.rectList.count; i++)
+      excludeRect(region.rectList[i]);
+  }
+  
+  // 矩形との交差
+  function intersectWithRect(rect) {
+    var newRectList = [];
+
+    for (var i = 0; i < rectList.count; i++) {
+      var iRect = new KRect();
+      iRect.assign(rectList[i]);
+      iRect.intersectWith(rect);
+      if (iRect.isValid)
+        newRectList.add(iRect);
+    }
+
+    rectList = newRectList;
+  }
+
+  // 領域との交差
+  function intersectWithRegion(region) {
+    var newRectList = [];
+
+    for (var i = 0; i < region.rectList.count; i++)
+      for (var j = 0;j < rectList.count; j++) {
+        var iRect = new KRect();
+        iRect.assign(region.rectList[i]);
+        iRect.intersectWith(rectList[j]);
+        if (iRect.isValid)
+          newRectList.add(iRect);
+      }
+    
+    rectList = newRectList;
+  }
+}
+
+

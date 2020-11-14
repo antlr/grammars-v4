@@ -1,0 +1,333 @@
+// DefaultMover.tjs - レイヤ自動移動のデフォルトのハンドラ
+// Copyright (C)2001-2009, W.Dee and contributors  改変・配布は自由です
+
+class LinearMover
+{
+	// 直線補間
+
+	var layer; // レイヤ
+	var path; // 点配列
+	var time; // 点を通過するのに必要な時間
+	var accel; // 加速度的な動きをするかどうか
+	var pointCount; // path.count -1
+	var finalFunction; // 移動終了時に呼ぶ関数
+	var startTick; // 移動開始をしたティック
+	var totalTime; // 全体の時間
+	var delayTimer; // 動作開始時まで待つためのタイマ
+	var moving = false; // 移動中か
+	var first = true; // 初回のハンドラ呼び出しか
+	var nextStop = false; // 次のハンドラ呼び出しで停止するか
+
+	function LinearMover(layer, path, time, accel, finalfunction)
+	{
+		this.layer = layer;
+		this.path = path;
+		this.time = time;
+		this.accel = accel;
+		this.finalFunction = finalfunction;
+		totalTime = (pointCount = (path.count \ 3 - 1)) * time;
+	}
+
+	function finalize()
+	{
+		stopMove();
+		if(delayTimer !== void) invalidate delayTimer;
+	}
+
+	function startMove(delay)
+	{
+		// 移動を開始する
+		if(delay != 0)
+		{
+			delayTimer = new Timer(onDelayTimer, '');
+			delayTimer.interval = delay;
+			delayTimer.enabled = true;
+			moving = true;
+		}
+		else
+		{
+			System.addContinuousHandler(handler); // ContinuousHandlers に追加
+			moving = true;
+		}
+	}
+
+	function onDelayTimer()
+	{
+		// delayTimer が発動した
+		delayTimer.enabled = false;
+		System.addContinuousHandler(handler);
+	}
+
+	function stopMove()
+	{
+		// 移動を終わる
+		if(moving)
+		{
+			// 最終位置に移動
+			if(layer isvalid)
+			{
+				var idx = int(pointCount*3);
+				var p = path;
+				layer.setPos(p[idx], p[idx+1]);
+				layer.opacity = p[idx+2];
+			}
+			System.removeContinuousHandler(handler);
+			moving = false;
+			finalFunction();
+		}
+	}
+
+	function handler(tick)
+	{
+		// 移動中に呼ばれる
+		if(nextStop || !(layer isvalid)) { stopMove();  return; }
+		if(first) startTick = tick, first = false;
+		tick -= startTick;
+		if(tick >= totalTime)
+		{
+			nextStop = true;
+			var idx = int(pointCount*3);
+			var p = path;
+			layer.setPos(p[idx], p[idx+1]);
+			layer.opacity = p[idx+2];
+			return;
+		}
+
+		if(accel < 0)
+		{
+			// 上弦 ( 最初が動きが早く、徐々に遅くなる )
+			tick = 1.0 - tick / totalTime;
+			tick = Math.pow(tick, -accel);
+			tick = int ( (1.0 - tick) * totalTime );
+		}
+		else if(accel > 0)
+		{
+			// 下弦 ( 最初は動きが遅く、徐々に早くなる )
+			tick = tick / totalTime;
+			tick = Math.pow(tick, accel);
+			tick = int ( tick * totalTime );
+		}
+
+		move(tick);
+	}
+
+	function move(tick)
+	{
+		var index = tick \ time * 3;
+		var ratio = tick % time / time;
+		var p = path;
+		var sx = p[index];
+		var sy = p[index+1];
+		var so = p[index+2];
+		var ex = p[index+3];
+		var ey = p[index+4];
+		var eo = p[index+5];
+
+		var l = int((ex-sx)*ratio + sx);
+		var t = int((ey-sy)*ratio + sy);
+		var o = eo >= 256 ? so : int((eo-so)*ratio + so);
+
+		layer.setPos(l, t);
+		layer.opacity = o;
+	}
+}
+
+
+class SplineMover extends LinearMover
+{
+	// スプライン補間
+	var zx = []; // スプラインワーク
+	var zy = []; // スプラインワーク
+
+	function SplineMover(layer, path, time, accel, finalfunction)
+	{
+		super.LinearMover(...);
+
+		if(path.count < 9)
+		{
+			// 3 点以下 ( 指定するのはそのうちの2点 ) は補完できない
+			throw new Exception("2 点以上を指定してください");
+		}
+
+		// スプライン補間に必要なワークを計算
+		var points = path.count \ 3;
+		var tmpx = [], tmpy = [];
+		var tx = zx, ty = zy;
+		tx[0] = 0;
+		ty[0] = 0;
+		tx[points-1] = 0;
+		ty[points-1] = 0;
+
+		for(var i = points-2, pi = path.count-6; i >= 0; i--, pi -= 3)
+		{
+			tmpx[i+1] = (path[pi + 3] - path[pi  ]);
+			tmpy[i+1] = (path[pi + 4] - path[pi+1]);
+		}
+
+		tx[1] = tmpx[2] - tmpx[1] - tx[0];
+		ty[1] = tmpy[2] - tmpy[1] - ty[0];
+
+		tmpx[1] = 4;
+		tmpy[1] = 4;
+
+		var lim = points - 2;
+		for(var i = 1, pi = 3; i < lim; i++, pi += 3)
+		{
+			var x = 1 / tmpx[i];
+			var y = 1 / tmpy[i];
+			tx[i+1] = tmpx[i+2] - tmpx[i+1] - tmpx[i] * x;
+			ty[i+1] = tmpy[i+2] - tmpy[i+1] - tmpy[i] * y;
+			tmpx[i+1] = 4 - x;
+			tmpy[i+1] = 4 - y;
+		}
+
+		tx[points-2] -= tx[points-1];
+		ty[points-2] -= ty[points-1];
+
+		for(var i = points-2, pi = path.count-6; i>0; i--, pi -= 3)
+		{
+			tx[i] = (tx[i] - tx[i+1]) / tmpx[i];
+			ty[i] = (ty[i] - ty[i+1]) / tmpy[i];
+		}
+	}
+
+	function move(tick)
+	{
+		var index;
+		var pindex = (index = tick \ time) * 3;
+		var d = tick % time / time;
+
+		var p = path;
+
+		var l = (((zx[index+1] - zx[index])*d +
+				zx[index]*3)*d +
+				((p[pindex + 3] - p[pindex]) -
+				(zx[index]*2 + zx[index+1]))) * d +
+				p[pindex];
+
+		var t = (((zy[index+1] - zy[index])*d +
+				zy[index]*3)*d +
+				((p[pindex + 4] - p[pindex+1]) -
+				(zy[index]*2 + zy[index+1]))) * d +
+				p[pindex+1];
+
+		var so = p[pindex+2];
+		var eo = p[pindex+5];
+
+		var o = eo >= 256 ? so : int((eo-so)*d + so);
+
+		layer.setPos(l, t);
+		layer.opacity = o;
+	}
+
+}
+
+
+class LinearFrameMover
+{
+	// 直線補間
+	var layer;				// レイヤ
+	var path;				// フレーム配列 -> フレーム番号, x, y, opacity が入っている
+	var fps;				// フレームレート
+	var pointCount;			// path.count -1
+	var finalFunction;		// 移動終了時に呼ぶ関数
+	var startTick;			// 移動開始をしたティック
+	var totalTime;			// 全体の時間
+	var moving = false;		// 移動中か
+	var first = true;		// 初回のハンドラ呼び出しか
+	var nextStop = false;	// 次のハンドラ呼び出しで停止するか
+
+	var offset_x = 0;
+	var offset_y = 0;
+	var curPoint;
+
+	function LinearFrameMover(layer, path, fps, finalfunction, offset_x, offset_y)
+	{
+		this.layer = layer;
+		this.path = path;
+		this.fps = fps;
+		this.finalFunction = finalfunction;
+		this.offset_x = offset_x;
+		this.offset_y = offset_y;
+		pointCount = (path.count \ 4 - 1);
+		totalTime = (path[int(pointCount*4)] * 1000) \ fps;
+	}
+
+	function finalize() {
+		stopMove();
+	}
+
+	function startMove() {
+		first = true;
+		System.addContinuousHandler(handler); // ContinuousHandlers に追加
+		moving = true;
+	}
+
+	function stopMove() {
+		// 移動を終わる
+		if( moving ) {
+			// 最終位置に移動
+			if(layer isvalid) {
+				var idx = int(pointCount*4);
+				var p = path;
+				layer.setPos(offset_x+p[idx+1], offset_y+p[idx+2]);
+				layer.opacity = p[idx+3];
+			}
+			System.removeContinuousHandler(handler);
+			moving = false;
+			finalFunction();
+		}
+	}
+
+	function handler(tick) {
+		// 移動中に呼ばれる
+		if(nextStop || !(layer isvalid)) { stopMove();  return; }
+		if(first) startTick = tick, first = false, curPoint = 0;
+		tick -= startTick;
+		if( tick >= totalTime ) {
+			nextStop = true;
+			var idx = int(pointCount*4);
+			var p = path;
+			layer.setPos(offset_x+p[idx+1], offset_y+p[idx+2]);
+			layer.opacity = p[idx+3];
+			return;
+		}
+		move(tick);
+	}
+
+	function move(tick) {
+		var idx = int(curPoint*4);
+		var p = path;
+		var curTime = (p[idx] * 1000) \ fps;
+		var nextIdx = idx + 4;
+		var nextTime = (p[nextIdx] * 1000) \ fps;
+		if( tick > nextTime ) {
+			curPoint++;
+			idx = int(curPoint*4);
+			curTime = (p[idx] * 1000) \ fps;
+			nextIdx = idx + 4;
+			nextTime = (p[nextIdx] * 1000) \ fps;
+		}
+
+		var duration = nextTime - curTime;
+		var diff = (tick - curTime);
+
+		var ratio = diff / duration;
+		var p = path;
+		var sx = p[idx+1];
+		var sy = p[idx+2];
+		var so = p[idx+3];
+
+		var ex = p[nextIdx+1];
+		var ey = p[nextIdx+2];
+		var eo = p[nextIdx+3];
+
+		var l = int((ex-sx)*ratio + sx);
+		var t = int((ey-sy)*ratio + sy);
+		var o = eo >= 256 ? so : int((eo-so)*ratio + so);
+
+		layer.setPos(offset_x+l, offset_y+t);
+		layer.opacity = o;
+	}
+}
+

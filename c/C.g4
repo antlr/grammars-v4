@@ -29,6 +29,7 @@
 /** C 2011 grammar built from the C11 Spec */
 grammar C;
 
+
 primaryExpression
     :   Identifier
     |   Constant
@@ -896,6 +897,11 @@ ComplexDefine
         -> skip
     ;
          
+IncludeDirective
+    :   '#' Whitespace? 'include' Whitespace? (('"' ~[\r\n]* '"') | ('<' ~[\r\n]* '>' )) Whitespace? Newline
+        -> skip
+    ;
+
 // ignore the following asm blocks:
 /*
     asm

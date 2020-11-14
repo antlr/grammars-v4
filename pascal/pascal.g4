@@ -395,7 +395,11 @@ procedureStatement
    ;
 
 actualParameter
-   : expression
+   : expression parameterwidth*
+   ;
+
+parameterwidth
+   : ':' expression
    ;
 
 gotoStatement

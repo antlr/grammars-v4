@@ -1,0 +1,1 @@
+count_values ('pod', container_cpu_usage_seconds_total) by (node)
