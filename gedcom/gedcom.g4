@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2018, Tom Everett
+Copyright (c) 2020, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,61 +30,112 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// http://user.it.uu.se/~andersa/gedcom/ch1.html
+
 grammar gedcom;
 
 gedcom
-   : (line? EOL) + line?
+   : line+
    ;
 
 line
-   : num cmd parameter*
-   ;
-
-num
-   : NUMBER
-   ;
-
-cmd
-   : STRING
-   ;
-
-id
-   : '@' parameter '@'
-   ;
-
-parameter
-   : STRING
-   | NUMBER
-   | id
+   : level opt_xref_id? tag line_value? EOL
    ;
 
 level
-    : DIGIT | (level+DIGIT);
+   : DIGIT+
+   ;
 
-any_char
-    :ALPHA | DIGIT | otherchar | ' ' | '#' | '@@';
+opt_xref_id
+   : pointer
+   ;
 
-otherchar
-    : [!"$&'()*+-,.]
+tag
+   : alphanum+
+   ;
+
+line_value
+   : line_item+
+   ;
+
+line_item
+   : pointer
+   | escape
+   | anychar
+   ;
+
+escape
+   : '@' '#' escape_text '@' non_at
+   ;
+
+non_at
+   : ALPHA
+   | DIGIT
+   | otherchar
+   | '#'
+   ;
+
+escape_text
+   : anychar+
+   ;
+
+pointer
+   : '@' alphanum pointer_string '@'
+   ;
+
+pointer_string
+   : pointer_char+
+   ;
+
+pointer_char
+   : ALPHA
+   | DIGIT
+   | otherchar
+   | '#'
+   ;
 
 alphanum
-    : ALPHA | DIGIT;
+   : ALPHA
+   | DIGIT
+   ;
+
+anychar
+   : ALPHA
+   | DIGIT
+   | otherchar
+   | '#'
+   | '@@'
+   ;
 
 ALPHA
-   : [a-zA-Z_]+
+   : [a-zA-Z_]
    ;
-
 
 DIGIT
-   : [0-9]+
+   : [0-9]
    ;
 
+otherchar
+   : '!'
+   | '"'
+   | '$'
+   | '&'
+   | '\''
+   | '('
+   | ')'
+   | '*'
+   | '+'
+   | '-'
+   | ','
+   | '.'
+   | '/'
+   ;
 
 EOL
    : [\r\n]+
-       ;
-
+   ;
 
 WS
    : [ \t] -> skip
    ;
+
