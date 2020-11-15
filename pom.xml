@@ -97,7 +97,8 @@
 				<module>cookie</module>
 				<module>cool</module>
 				<module>cpp</module>
-				<module>cql3</module>
+                <module>cql</module>
+                <module>cql3</module>
 				<module>creole</module>
 				<module>csharp</module>
 				<module>css3</module>
