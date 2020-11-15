@@ -222,6 +222,7 @@
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
+                <module>sici</module>
 				<module>sickbay</module>
                 <module>sieve</module>
 				<module>smalltalk</module>
