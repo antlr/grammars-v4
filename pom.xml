@@ -72,7 +72,7 @@
 				<module>alpaca</module>
 				<module>antlr</module>
 				<module>apex</module>
-				<module>apt</module>				
+				<module>apt</module>
 				<module>arithmetic</module>
 				<module>asm</module>
 				<module>asn</module>
@@ -81,10 +81,10 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
-                <module>bibcode</module>
-                <module>bnf</module>
+				<module>bibcode</module>
+				<module>bnf</module>
 				<module>brainfuck</module>
-                <module>brainflak</module>
+				<module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
 				<module>capnproto</module>
@@ -97,8 +97,8 @@
 				<module>cookie</module>
 				<module>cool</module>
 				<module>cpp</module>
-                <module>cql</module>
-                <module>cql3</module>
+				<module>cql</module>
+				<module>cql3</module>
 				<module>creole</module>
 				<module>csharp</module>
 				<module>css3</module>
@@ -107,30 +107,30 @@
 				<module>dart2</module>
 				<module>databank</module>
 				<module>dcm</module>
-				<module>dgol</module>				
+				<module>dgol</module>
 				<module>dice</module>
-                <module>doiurl</module>
+				<module>doiurl</module>
 				<module>dot</module>
 				<module>edif300</module>
-				<module>edn</module>				
+				<module>edn</module>
 				<module>erlang</module>
 				<module>fasta</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
-                <module>focal</module>
+				<module>focal</module>
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
-                <module>gedcom</module>
-                <module>gff3</module>
+				<module>gedcom</module>
+				<module>gff3</module>
 				<module>gml</module>
 				<module>graphql</module>
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
 				<module>guido</module>
-                <module>guitartab</module>
-                <module>haskell</module>
-                <module>html</module>
+				<module>guitartab</module>
+				<module>haskell</module>
+				<module>html</module>
 				<module>http</module>
 				<module>hypertalk</module>
 				<module>icalendar</module>
@@ -138,18 +138,18 @@
 				<module>idl</module>
 				<module>inf</module>
 				<module>informix</module>
-                <module>infosapient</module>
-                <module>iri</module>
-                <module>iso8601</module>
+				<module>infosapient</module>
+				<module>iri</module>
+				<module>iso8601</module>
 				<module>istc</module>
 				<module>janus</module>
-                <module>java</module>
+				<module>java</module>
 				<module>javadoc</module>
 				<module>javascript</module>
-                <module>joss</module>
-                <module>jpa</module>
-                <module>json</module>
-                <module>json5</module>
+				<module>joss</module>
+				<module>jpa</module>
+				<module>json</module>
+				<module>json5</module>
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kuka</module>
@@ -158,15 +158,15 @@
 				<module>less</module>
 				<module>logo</module>
 				<module>lolcode</module>
-				<module>loop</module>				
+				<module>loop</module>
 				<module>lpc</module>
 				<module>lua</module>
 				<module>matlab</module>
 				<module>mdx</module>
 				<module>memcached_protocol</module>
-                <module>metamath</module>
+				<module>metamath</module>
 				<module>metric</module>
-                <module>microc</module>
+				<module>microc</module>
 				<module>modelica</module>
 				<module>modula2pim4</module>
 				<module>molecule</module>
@@ -177,9 +177,9 @@
 				<module>mumath</module>
 				<module>mumps</module>
 				<module>muparser</module>
-                <module>nanofuck</module>
-                <module>newick</module>
-                <module>oberon</module>
+				<module>nanofuck</module>
+				<module>newick</module>
+				<module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
 				<module>p</module>
@@ -192,11 +192,11 @@
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
-                <module>pii</module>
+				<module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
 				<module>ply</module>
-                <module>pmmn</module>
+				<module>pmmn</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
 				<module>prolog</module>
@@ -227,11 +227,11 @@
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
-                <module>sici</module>
+				<module>sici</module>
 				<module>sickbay</module>
-                <module>sieve</module>
+				<module>sieve</module>
 				<module>smalltalk</module>
-			    <module>smiles</module>
+				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
 				<module>solidity</module>
@@ -256,7 +256,7 @@
 				<module>trac</module>
 				<module>tsv</module>
 				<module>ttm</module>
-                <module>turing</module>
+				<module>turing</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
