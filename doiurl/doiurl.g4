@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // https://tools.ietf.org/id/draft-paskin-doi-uri-04.txt
 
-grammar doi;
+grammar doiurl;
 
 doiuri
    : scheme ':' encodeddoi ('?' query)? ('#' fragment_)? EOF?
