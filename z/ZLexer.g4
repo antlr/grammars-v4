@@ -474,15 +474,10 @@ SEQUENCE_TOOLKIT
 	| UPWARDS_HARPOON_WITH_BARB_RIGHTWARDS
 	;
 
+ID : ID0 ID1*;
 
-ID0 : [\p{L}] | '_'             // hand-written rule
-;
-
-ID1 : ID0 | [\p{Nd}]      // hand-written rule
-;
-
-ID : ID0 ID1 *            // hand-written rule
-;
+fragment ID1 : ID0 | [\p{Nd}];
+fragment ID0 : [\p{L}] | '_';
 
 PREP : NAME;
 PRE : NAME;

@@ -1,3 +1,4 @@
+// official compiler report error... modified
 class Layer
 {
 	/**
@@ -5,12 +6,12 @@ class Layer
 	 * @param x レイヤー上でのX座標
 	 * @return スクリーン上でのX座標
 	 */
-	function getScreenLeft(x)
+	function getScreenLeft(x){}
 
 	/**
 	 * このレイヤー上でのY座標が、スクリーン上ではいくつになるかを返す
 	 * @param y レイヤー上でのY座標
 	 * @return スクリーン上でのY座標
 	 */
-	function getScreenTop(y)
+	function getScreenTop(y){}
 }

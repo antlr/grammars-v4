@@ -31,7 +31,12 @@ parser grammar HTMLParser;
 options { tokenVocab=HTMLLexer; }
 
 htmlDocument
-    : (scriptlet | SEA_WS)* xml? (scriptlet | SEA_WS)* dtd? (scriptlet | SEA_WS)* htmlElements*
+    : scriptletOrSeaWs* XML? scriptletOrSeaWs* DTD? scriptletOrSeaWs* htmlElements*
+    ;
+
+scriptletOrSeaWs
+    : SCRIPTLET
+    | SEA_WS
     ;
 
 htmlElements
@@ -39,33 +44,19 @@ htmlElements
     ;
 
 htmlElement
-    : TAG_OPEN htmlTagName htmlAttribute* TAG_CLOSE htmlContent TAG_OPEN TAG_SLASH htmlTagName TAG_CLOSE
-    | TAG_OPEN htmlTagName htmlAttribute* TAG_SLASH_CLOSE
-    | TAG_OPEN htmlTagName htmlAttribute* TAG_CLOSE
-    | scriptlet
+    : TAG_OPEN TAG_NAME htmlAttribute*
+      (TAG_CLOSE (htmlContent TAG_OPEN TAG_SLASH TAG_NAME TAG_CLOSE)? | TAG_SLASH_CLOSE)
+    | SCRIPTLET
     | script
     | style
     ;
 
 htmlContent
-    : htmlChardata? ((htmlElement | xhtmlCDATA | htmlComment) htmlChardata?)*
+    : htmlChardata? ((htmlElement | CDATA | htmlComment) htmlChardata?)*
     ;
 
 htmlAttribute
-    : htmlAttributeName TAG_EQUALS htmlAttributeValue
-    | htmlAttributeName
-    ;
-
-htmlAttributeName
-    : TAG_NAME
-    ;
-
-htmlAttributeValue
-    : ATTVALUE_VALUE
-    ;
-
-htmlTagName
-    : TAG_NAME
+    : TAG_NAME (TAG_EQUALS ATTVALUE_VALUE)?
     ;
 
 htmlChardata
@@ -83,26 +74,10 @@ htmlComment
     | HTML_CONDITIONAL_COMMENT
     ;
 
-xhtmlCDATA
-    : CDATA
-    ;
-
-dtd
-    : DTD
-    ;
-
-xml
-    : XML_DECLARATION
-    ;
-
-scriptlet
-    : SCRIPTLET
-    ;
-
 script
-    : SCRIPT_OPEN ( SCRIPT_BODY | SCRIPT_SHORT_BODY)
+    : SCRIPT_OPEN (SCRIPT_BODY | SCRIPT_SHORT_BODY)
     ;
 
 style
-    : STYLE_OPEN ( STYLE_BODY | STYLE_SHORT_BODY)
+    : STYLE_OPEN (STYLE_BODY | STYLE_SHORT_BODY)
     ;

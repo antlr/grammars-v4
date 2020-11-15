@@ -1,0 +1,3 @@
+/* John Conway's Game of Life, expressed in ALPACA. */
+state Dead  " " to Alive when 3 Alive and 5 Dead;
+state Alive "*" to Dead when 4 Alive or 7 Dead.

@@ -26,10 +26,10 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** 
+/**
  *  An Apexcode grammar derived from Java 1.7 grammar for ANTLR v4.
  *  Uses ANTLR v4's left-recursive expression notation.
- *  
+ *
  *  @maintainer: Andrey Gavrikov
  *
  *  You can test with
@@ -94,7 +94,7 @@ variableModifier
 
 classDeclaration
     :   CLASS Identifier typeParameters?
-        (EXTENDS type)?
+        (EXTENDS type_)?
         (IMPLEMENTS typeList)?
         classBody
     ;
@@ -108,7 +108,7 @@ typeParameter
     ;
 
 typeBound
-    :   type ('&' type)*
+    :   type_ ('&' type_)*
     ;
 
 enumDeclaration
@@ -133,7 +133,7 @@ interfaceDeclaration
     ;
 
 typeList
-    :   type (',' type)*
+    :   type_ (',' type_)*
     ;
 
 classBody
@@ -169,7 +169,7 @@ memberDeclaration
    for invalid return type after parsing.
  */
 methodDeclaration
-    :   OVERRIDE? (type|VOID) Identifier formalParameters ('[' ']')*
+    :   OVERRIDE? (type_|VOID) Identifier formalParameters ('[' ']')*
         (THROWS qualifiedNameList)?
         (   methodBody
         |   ';'
@@ -190,11 +190,11 @@ genericConstructorDeclaration
     ;
 
 fieldDeclaration
-    :   type variableDeclarators ';'
+    :   type_ variableDeclarators ';'
     ;
 
 propertyDeclaration
-    :   type variableDeclarators propertyBodyDeclaration
+    :   type_ variableDeclarators propertyBodyDeclaration
     ;
 
 propertyBodyDeclaration
@@ -217,7 +217,7 @@ interfaceMemberDeclaration
     ;
 
 constDeclaration
-    :   type constantDeclarator (',' constantDeclarator)* ';'
+    :   type_ constantDeclarator (',' constantDeclarator)* ';'
     ;
 
 constantDeclarator
@@ -226,7 +226,7 @@ constantDeclarator
 
 // see matching of [] comment in methodDeclaratorRest
 interfaceMethodDeclaration
-    :   (type|VOID) Identifier formalParameters ('[' ']')*
+    :   (type_|VOID) Identifier formalParameters ('[' ']')*
         (THROWS qualifiedNameList)?
         ';'
     ;
@@ -260,7 +260,7 @@ enumConstantName
     :   Identifier
     ;
 
-type
+type_
     :   classOrInterfaceType ('[' ']')*
     |   primitiveType ('[' ']')*
     ;
@@ -271,14 +271,11 @@ classOrInterfaceType
     ;
 
 primitiveType
-    :   BOOLEAN
-    |   CHAR
+    :   CHAR
     |   BYTE
     |   SHORT
     |   INT
-    |   LONG
     |   FLOAT
-    |   DOUBLE
     ;
 
 typeArguments
@@ -286,8 +283,8 @@ typeArguments
     ;
 
 typeArgument
-    :   type
-    |   '?' ((EXTENDS | SUPER) type)?
+    :   type_
+    |   '?' ((EXTENDS | SUPER) type_)?
     ;
 
 qualifiedNameList
@@ -304,11 +301,11 @@ formalParameterList
     ;
 
 formalParameter
-    :   variableModifier* type variableDeclaratorId
+    :   variableModifier* type_ variableDeclaratorId
     ;
 
 lastFormalParameter
-    :   variableModifier* type '...' variableDeclaratorId
+    :   variableModifier* type_ '...' variableDeclaratorId
     ;
 
 methodBody
@@ -372,7 +369,7 @@ annotationTypeElementDeclaration
     ;
 
 annotationTypeElementRest
-    :   type annotationMethodOrConstantRest ';'
+    :   type_ annotationMethodOrConstantRest ';'
     |   classDeclaration ';'?
     |   interfaceDeclaration ';'?
     |   enumDeclaration ';'?
@@ -413,7 +410,7 @@ localVariableDeclarationStatement
     ;
 
 localVariableDeclaration
-    :   variableModifier* type variableDeclarators
+    :   variableModifier* type_ variableDeclarators
     ;
 
 statement
@@ -422,6 +419,7 @@ statement
     |   FOR '(' forControl ')' statement
     |   WHILE parExpression statement
     |   DO statement WHILE parExpression ';'
+    |   RUNAS '(' expression ')' statement
     |   TRY block (catchClause+ finallyBlock? | finallyBlock)
     |   TRY resourceSpecification block catchClause* finallyBlock?
     |   RETURN expression? ';'
@@ -482,7 +480,7 @@ forInit
     ;
 
 enhancedForControl
-    :   variableModifier* type variableDeclaratorId ':' expression
+    :   variableModifier* type_ variableDeclaratorId ':' expression
     ;
 
 forUpdate
@@ -507,33 +505,35 @@ constantExpression
     :   expression
     ;
 
-apexDbExpressionLong
-    :   DATABASE '.' (DB_INSERT | DB_UPSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) parExpression
+apexDbUpsertExpression
+    :   DB_UPSERT expression (expression)*
     ;
-	
-apexDbExpressionShort
-    :   (DB_INSERT | DB_UPSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) expression
-    ;
-
 
 apexDbExpression
-	: apexDbExpressionLong
-	| apexDbExpressionShort
+	:   (DB_INSERT | DB_UPDATE | DB_DELETE | DB_UNDELETE) expression
+    |   apexDbUpsertExpression
 	;
-	
+
 expression
     :   primary
     |   expression '.' GET '(' expressionList? ')'
     |   expression '.' SET '(' expressionList? ')'
     |   expression '.' Identifier
     |   expression '.' THIS
-    |   expression '.' NEW nonWildcardTypeArguments? innerCreator
+    |   expression '.' NEW
+    |   expression '.'
+        (   DB_INSERT
+        |   DB_UPSERT
+        |   DB_UPDATE
+        |   DB_DELETE
+        |   DB_UNDELETE
+        )
     |   expression '.' SUPER superSuffix
     |   expression '.' explicitGenericInvocation
     |   expression '[' expression ']'
     |   expression '(' expressionList? ')'
     |   NEW creator
-    |   '(' type ')' expression
+    |   '(' type_ ')' expression
     |   expression ('++' | '--')
     |   ('+'|'-'|'++'|'--') expression
     |   ('~'|'!') expression
@@ -541,8 +541,8 @@ expression
     |   expression ('+'|'-') expression
     |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression
     |   expression ('<=' | '>=' | '>' | '<') expression
-    |   expression INSTANCEOF type
-    |   expression ('==' | '!=') expression
+    |   expression INSTANCEOF type_
+    |   expression ('==' | '!=' | '<>') expression
     |   expression '&' expression
     |   expression '^' expression
     |   expression '|' expression
@@ -572,11 +572,10 @@ primary
     |   SUPER
     |   literal
     |   Identifier
-    |   type '.' CLASS
+    |   type_ '.' CLASS
     |   VOID '.' CLASS
     |   nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
     |   SoqlLiteral
-    |   DATABASE
     ;
 
 creator
@@ -602,11 +601,17 @@ arrayCreatorRest
     ;
 
 mapCreatorRest
-    :   '{' ( Identifier | expression ) '=>' ( literal | expression ) (',' (Identifier | expression) '=>' ( literal | expression ) )* '}'
+    :   '{'
+        (   '}'
+        | ( Identifier | expression ) '=>' ( literal | expression ) (',' (Identifier | expression) '=>' ( literal | expression ) )* '}'
+        )
     ;
 
 setCreatorRest
-	: '{' ( literal | expression ) (',' ( literal | expression ))* '}'
+	:   '{'
+        (   '}'
+        | ( literal | expression ) (',' ( literal | expression ))* '}'
+        )
 	;
 
 classCreatorRest
@@ -650,7 +655,7 @@ arguments
 SoqlLiteral
     : '[' WS* SELECT (SelectRestNoInnerBrackets | SelectRestAllowingInnerBrackets)*? ']'
 	;
-	
+
 fragment SelectRestAllowingInnerBrackets
 	:  '[' ~']' .*? ']'
 	|	~'[' .*?
@@ -667,9 +672,7 @@ OVERRIDE      : O V E R R I D E;
 VIRTUAL       : V I R T U A L;
 SET           : S E T;
 GET           : G E T;
-DATABASE      : D A T A B A S E;
 ABSTRACT      : A B S T R A C T;
-BOOLEAN       : B O O L E A N;
 BREAK         : B R E A K;
 BYTE          : B Y T E;
 CATCH         : C A T C H;
@@ -679,7 +682,6 @@ CONST         : C O N S T;
 CONTINUE      : C O N T I N U E;
 DEFAULT       : D E F A U L T;
 DO            : D O;
-DOUBLE        : D O U B L E;
 ELSE          : E L S E;
 ENUM          : E N U M;
 EXTENDS       : E X T E N D S;
@@ -694,7 +696,6 @@ IMPORT        : I M P O R T;
 INSTANCEOF    : I N S T A N C E O F;
 INT           : I N T;
 INTERFACE     : I N T E R F A C E;
-LONG          : L O N G;
 NATIVE        : N A T I V E;
 NEW           : N E W;
 PACKAGE       : P A C K A G E;
@@ -728,6 +729,7 @@ DB_UPDATE     : U P D A T E;
 DB_DELETE     : D E L E T E;
 DB_UNDELETE   : U N D E L E T E;
 TESTMETHOD   : T E S T M E T H O D;
+RUNAS        : S Y S T E M DOT R U N A S;
 
 
 // ?3.10.1 Integer Literals
@@ -766,7 +768,7 @@ IntegerTypeSuffix
 
 fragment
 DecimalNumeral
-    :   '0'
+    :   '0' Digit?
     |   NonZeroDigit (Digits? | Underscores Digits)
     ;
 

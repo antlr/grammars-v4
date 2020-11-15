@@ -11,7 +11,6 @@ Tested on [KAG3](https://github.com/krkrz/kag3), [KAG3-HAM](https://github.com/k
 Only Java Runtime have tested. All other runtime is directly copy-paste-rename without test.
 
 Known issue:
-- OctetLiteral (e.g: `<% 00 a2 f3 45%>`) is a parser rule, not a single token.
 - Now consider `¥`(`\u00a5`,japanese yen) as UnexpectedCharacter insteadof Backslash(`\`,`\u005c`).
 - TJS2 bytecode also use *.tjs extension, this script can't parse them.
 - Need an preprocessor (`preprocessor.js`) to handle preprocess command.

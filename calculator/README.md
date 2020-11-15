@@ -9,5 +9,5 @@ Currently supported are:
 * Basic arithmetic respecting order of operations and parenthesis
 * Variables
 * Scientific numbers with "e" notation
-* A small number of trigometric and logarithmic functions including exponentiation, cos, ln, etc.
+* A small number of trigonometric and logarithmic functions including exponentiation, cos, ln, etc.
 * The constants "e", "pi" and "i"

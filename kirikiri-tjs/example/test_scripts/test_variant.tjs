@@ -329,19 +329,19 @@ function testVariant() {
 	}
 	tmp = -1;
 	tmp >>>= 1;
-	@if(environment > 0) // java
+	/*@if(environment > 0) // java
 	if( tmp != 2147483647 ) {
 		Debug.message("faild:-1 >>>= 1");
 		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
 		isFaild = true;
 	}
-	@endif
-	@if(environment == 0) // windows
+	@endif*/
+	//@if(environment == 0) // windows
 	if( tmp != 9223372036854775807 ) {
 		Debug.message("faild:-1 >>>= 1,"+tmp);
 		isFaild = true;
 	}
-	@endif
+	//@endif
 	tmp = 10;
 	if( int10 == 9 || tmp == 10 ) {
 	} else {
@@ -366,20 +366,20 @@ function testVariant() {
 		isFaild = true;
 	}
 	tmp = -1 >>> 1;
-	@if(environment > 0) // java
+	/*@if(environment > 0) // java
 	if( tmp != 2147483647 ) {
 		Debug.message("faild:-1 >>> 1");
 		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
 		isFaild = true;
 	}
-	@endif
-	@if(environment == 0) // windows
+	@endif*/
+	//@if(environment == 0) // windows
 	if( tmp != 9223372036854775807 ) {
 		Debug.message("faild:-1 >>> 1,"+tmp);
 		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
 		isFaild = true;
 	}
-	@endif
+	//@endif
 	tmp = int5 == 5 ? 1 : 0;
 	if( tmp != 1 ) {
 		Debug.message("faild:tmp = int5 == 5 ? 1 : 0;");
@@ -702,19 +702,19 @@ function testVariant() {
 	}
 	tmp = -1.0;
 	tmp >>>= 1;
-	@if(environment > 0) // java
+	/*@if(environment > 0) // java
 	if( tmp != 2147483647 ) {
 		Debug.message("faild:-1 >>>= 1");
 		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
 		isFaild = true;
 	}
-	@endif
-	@if(environment == 0) // windows
+	@endif*/
+	//@if(environment == 0) // windows
 	if( tmp != 9223372036854775807 ) {
 		Debug.message("faild:-1 >>>= 1,"+tmp);
 		isFaild = true;
 	}
-	@endif
+	//@endif
 	tmp = 10.0;
 	if( real10 == 9.0 || tmp == 10.0 ) {
 	} else {
@@ -739,20 +739,20 @@ function testVariant() {
 		isFaild = true;
 	}
 	tmp = -1.0 >>> 1;
-	@if(environment > 0) // java
+	/*@if(environment > 0) // java
 	if( tmp != 2147483647 ) {
 		Debug.message("faild:-1 >>> 1");
 		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
 		isFaild = true;
 	}
-	@endif
-	@if(environment == 0) // windows
+	@endif*/
+	//@if(environment == 0) // windows
 	if( tmp != 9223372036854775807 ) {
 		Debug.message("faild:-1 >>> 1,"+tmp);
 		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
 		isFaild = true;
 	}
-	@endif
+	//@endif
 	tmp = real5 == 5.0 ? 1.0 : 0.0;
 	if( tmp != 1 ) {
 		Debug.message("faild:tmp = real5 == 5 ? 1 : 0;");
@@ -1037,19 +1037,19 @@ function testVariant() {
 	}
 	tmp = "-1";
 	tmp >>>= 1;
-	@if(environment > 0) // java
+	/*@if(environment > 0) // java
 	if( tmp != 2147483647 ) {
 		Debug.message("faild:-1 >>>= 1");
 		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
 		isFaild = true;
 	}
-	@endif
-	@if(environment == 0) // windows
+	@endif*/
+	//@if(environment == 0) // windows
 	if( tmp != 9223372036854775807 ) {
 		Debug.message("faild:-1 >>>= 1,"+tmp);
 		isFaild = true;
 	}
-	@endif
+	//@endif
 	tmp = "10";
 	if( str10 == 9 || tmp == 10 ) {
 	} else {
@@ -1074,20 +1074,20 @@ function testVariant() {
 		isFaild = true;
 	}
 	tmp = "-1" >>> 1;
-	@if(environment > 0) // java
+	/*@if(environment > 0) // java
 	if( tmp != 2147483647 ) {
 		Debug.message("faild:-1 >>> 1");
 		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
 		isFaild = true;
 	}
-	@endif
-	@if(environment == 0) // windows
+	@endif*/
+	//@if(environment == 0) // windows
 	if( tmp != 9223372036854775807 ) {
 		Debug.message("faild:-1 >>> 1,"+tmp);
 		Debug.message("int型ではこうなるが、longが内部型になるとこのテストは正しくない。値を変えるべき");
 		isFaild = true;
 	}
-	@endif
+	//@endif
 	tmp = str5 == "5" ? 1 : 0;
 	if( tmp != 1 ) {
 		Debug.message("faild:tmp = str5 == 5 ? 1 : 0;");
