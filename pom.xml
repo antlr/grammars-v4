@@ -159,6 +159,7 @@
 				<module>lpc</module>
 				<module>lua</module>
 				<module>matlab</module>
+				<module>mckeeman-form</module>
 				<module>mdx</module>
 				<module>memcached_protocol</module>
                 <module>metamath</module>

@@ -3,7 +3,7 @@
 grammar McKeemanForm;
 
 grammar_
-    : rule (Newline rule)* EOF
+    : rule_ (Newline rule_)* EOF
     ;
 
 Space
@@ -11,7 +11,9 @@ Space
     ;
 
 Newline
-    : '\n'
+    : '\r'
+    | '\n'
+    | '\r\n'
     ;
 
 Name
@@ -22,7 +24,7 @@ Indentation
     : '    '
     ;
 
-rule
+rule_
     : Name Newline nothing? alternative+
     ;
 
