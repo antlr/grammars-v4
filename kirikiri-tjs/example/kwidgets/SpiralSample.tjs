@@ -1,0 +1,158 @@
+//
+// $Id: SpiralSample.tjs,v 1.4 2007/09/10 13:46:28 m2 Exp $
+//
+
+
+/*----------------------------------------------------------------------
+ * サムネイル
+ ----------------------------------------------------------------------*/
+class Thumbnail extends KWidget
+{
+  var cachePath;
+
+  // コンストラクタ
+  function Thumbnail(window, filename, width) {
+    super.KWidget(window);
+
+    // パスと幅から、キャッシュのパスを決める
+    cachePath = "%scache/%s%d.bmp".sprintf(System.dataPath, filename, width);
+    // キャッシュはある？
+    if (Storages.isExistentStorage(cachePath)) {
+      // キャッシュがあればそれをロード
+      loadImages(cachePath);
+      setFixedSizeToImageSize();
+
+    } else {
+      // キャッシュが無かったら、まず一時レイヤに画像をロード
+      var tmpLayer = new global.Layer(window, this);
+      tmpLayer.loadImages(filename);
+      tmpLayer.setSizeToImageSize();
+      // ウィジェットのサイズを決定
+      setFixedSize(width, tmpLayer.height * width / tmpLayer.width);
+      setSize(minWidth, minHeight);
+      // 一時レイヤから画像を縮小しつつコピー
+      stretchCopy(0, 0, width, height,
+                  tmpLayer, 0, 0, tmpLayer.width, tmpLayer.height,
+                  stFastLinear);
+      // 一時レイヤ消去
+      invalidate tmpLayer;
+      // キャッシュに画像を保存
+      saveLayerImage(cachePath, "bmp24");
+    }
+    margin = 5;
+    alignVertical = ALIGN_CENTER;
+  }
+}
+
+  
+/*----------------------------------------------------------------------
+ * スパイラルサンプル
+ ----------------------------------------------------------------------*/
+class SpiralSample extends KWindow
+{
+  function SpiralSample {
+    super.KWindow("spiralsample_window");
+
+    // ウィンドウ初期設定
+    caption = 'スパイラルサンプル';
+    borderStyle = bsDialog;
+
+    // ウィジェットを作成、配置
+    var tabs, scroll, spiral, thumbnail;
+
+    tabs = new KTabLayout(this);
+    tabs.onTabSelected = function(index) {
+      // タブを選択されたらスクロールレイアウトをフォーカスするようにフック
+      var child = childAt(index);
+      child.focus();
+    } incontextof(tabs);
+
+      scroll = new KScrollLayout(this, false, true);
+      scroll.margin = 10;
+      scroll.focusable = true;
+        spiral = new KSpiralLayout(this);
+          for (var i = 0; i < 10; i++) {
+            spiral.add(new Thumbnail(this, "cg01", 50));
+            spiral.add(new Thumbnail(this, "cg02", 50));
+            spiral.add(new Thumbnail(this, "cg03", 50));
+            spiral.add(new Thumbnail(this, "cg04", 50));
+            spiral.add(new Thumbnail(this, "cg05", 50));
+          }
+      scroll.add(spiral);
+    tabs.add("小サムネイル", scroll);
+
+      scroll = new KScrollLayout(this, false, true);
+      scroll.margin = 10;
+      scroll.focusable = true;
+        spiral = new KSpiralLayout(this);
+          for (var i = 0; i < 10; i++) {
+            spiral.add(new Thumbnail(this, "cg01", 100));
+            spiral.add(new Thumbnail(this, "cg02", 100));
+            spiral.add(new Thumbnail(this, "cg03", 100));
+            spiral.add(new Thumbnail(this, "cg04", 100));
+            spiral.add(new Thumbnail(this, "cg05", 100));
+          }
+      scroll.add(spiral);
+    tabs.add("中サムネイル", scroll);
+
+      scroll = new KScrollLayout(this, false, true);
+      scroll.margin = 10;
+      scroll.focusable = true;
+        spiral = new KSpiralLayout(this);
+          for (var i = 0; i < 10; i++) {
+            spiral.add(new Thumbnail(this, "cg01", 200));
+            spiral.add(new Thumbnail(this, "cg02", 200));
+            spiral.add(new Thumbnail(this, "cg03", 200));
+            spiral.add(new Thumbnail(this, "cg04", 200));
+            spiral.add(new Thumbnail(this, "cg05", 200));
+          }
+      scroll.add(spiral);
+    tabs.add("大サムネイル", scroll);
+
+      scroll = new KScrollLayout(this, false, true);
+      scroll.margin = 10;
+      scroll.focusable = true;
+        spiral = new KSpiralLayout(this, "spiral4");
+          for (var i = 0; i < 10; i++) {
+            spiral.add(new Thumbnail(this, "cg01", 50));
+            spiral.add(new Thumbnail(this, "cg02", 75));
+            spiral.add(new Thumbnail(this, "cg03", 100));
+            spiral.add(new Thumbnail(this, "cg04", 150));
+            spiral.add(new Thumbnail(this, "cg05", 200));
+          }
+      scroll.add(spiral);
+    tabs.add("混在", scroll);
+
+    var grid = new KGridLayout(this);
+    grid.add(0, 0, tabs);
+    var resizeHandle = new KWindowResizeHandle(this, 20, 20);
+    resizeHandle.alignHorizontal = ALIGN_RIGHT;
+    grid.add(0, 1, resizeHandle);
+
+    primaryWidget.add(grid);
+
+    // フォーカスを与える
+    tabs.childAt(0).focus();
+
+    // 永続化辞書の作成
+    var dict = new KPersistentDictionary(System.dataPath + "spriralsample_dict.txt");
+    add(dict);
+    bindPersistentDictionary(dict);
+  }
+}
+
+//----------------------------------------------------------------------
+// サンプル表示・非表示の切り替え
+global.spiralSample = void;
+
+function showSpiralSample
+{
+  if (spiralSample === void)
+    spiralSample = new SpiralSample();
+  spiralSample.visible = true;
+}
+
+function hideSpiralSample
+{
+  spiralSample.visible = false;
+}

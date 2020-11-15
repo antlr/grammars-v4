@@ -25,7 +25,6 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 /**
 * <p>http://en.wikipedia.org/wiki/Typographical_Number_Theory</p>
 */
@@ -66,57 +65,47 @@ exists
    : EXISTS variable ':'
    ;
 
-
 ZERO
    : '0'
    ;
-
 
 SUCCESSOR
    : 'S'
    ;
 
-
 A
    : 'a'
    ;
-
 
 B
    : 'b'
    ;
 
-
 C
    : 'c'
    ;
-
 
 D
    : 'd'
    ;
 
-
 E
    : 'e'
    ;
-
 
 PRIME
    : '\''
    ;
 
-
 FOREVERY
    : 'A'
    ;
-
 
 EXISTS
    : 'E'
    ;
 
-
 WS
    : [ \r\t\n] -> skip
    ;
+

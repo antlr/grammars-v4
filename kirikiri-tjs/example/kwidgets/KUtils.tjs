@@ -1,0 +1,313 @@
+// 
+// $Id: KUtils.tjs,v 1.4 2007/09/16 13:36:03 cvs Exp $
+//
+
+// 有効なオブジェを無効化する
+function discard(obj) {
+  invalidate obj if obj !== void && (obj isvalid);
+}
+
+// 配列内のオブジェを全て無効化する
+function discardArray(array) {
+  var i, num;
+  num = array.count;
+  for (i = 0; i < num; i++)
+    discard(array[i]);
+}
+
+// 辞書内のオブジェを全て無効化する
+function discardDictionary(hash) {
+  var a;
+  a = [];
+  a.assign(hash);
+  var i, num;
+  num = a.count;
+  for (i = 1; i < num; i+= 2)
+    discard(a[i]);
+}
+
+//----------------------------------------------------------------------
+// 以下の関数群はC++プラグインへ実装を変更した。
+// 仕様のリファレンスとして記述を残して置く。
+
+@if(0)
+// 配列の全ての要素について関数実行
+function eachArray(array, func, args*) {
+  for (var i = 0; i < array.count; i++)
+    func(i, array[i], args*);
+}
+
+// 辞書の全ての要素について関数実行
+function eachDictionary(dict, func, args*) {
+  var array = [];
+  array.assign(dict);
+  for (var i = 0; i < array.count; i+=2) {
+    if (array[i + 1] !== void)
+      func(array[i], array[i + 1], args*);
+  }
+}
+
+// 辞書のキーを配列にして返す
+function dictionaryKeys(dict) {
+  var array = [], result = [];
+  array.assign(dict);
+  for (var i = 0; i < array.count; i += 2)
+    result.add(array[i]);
+  return result;
+}
+
+// 辞書の要素を配列にして返す
+function dictionaryValues(dict) {
+  var array = [], result = [];
+  array.assign(dict);
+  for (var i = 1; i < array.count; i += 2)
+    result.add(array[i]);
+  return result;
+}
+
+// 配列の要素をキーに持つ辞書を作る
+function arrayHash(array) {
+  var result = %[];
+  for (var i = 0; i < array.count; i++) 
+    result[array[i]] = true;
+  return result;
+}
+
+// 辞書の結合
+function unionDictionary(d1, d2) {
+  var result = %[];
+  eachDictionary(d1, function (key, value, result) { result[key] = value; }, result);
+  eachDictionary(d2, function (key, value, result) { result[key] = value; }, result);
+  return result;
+}
+
+// 和集合(総和)
+function unionSet(a1, a2) {
+  var result = [];
+  result.assign(a1);
+  var a1Hash = arrayHash(a1);
+  for (var i = 0; i < a2.count; i++)
+    if (! a1Hash[a2[i]])
+      result.add(a2[i]);
+  return result;
+}
+ 
+// 積集合(共通部)
+function intersectionSet(a1, a2) {
+  var result = [];
+  var a2Hash = arrayHash(a2);
+  for (var i = 0; i < a1.count; i++)
+    if (a2Hash[a1[i]])
+      result.add(a1[i]);
+  return result;
+}
+
+// 差集合(a1のみにある要素)
+function differenceSet(a1, a2) {
+  var result = [];
+  var a2Hash = arrayHash(a2);
+  for (var i = 0; i < a1.count; i++)
+    if (! a2Hash[a1[i]])
+      result.add(a1[i]);
+  return result;
+}
+
+// 配列の切り出し
+function sliceArray(a1, from, size) {
+  var result = [];
+  for (var i = 0; i < size; i++)
+    result.add(a1[from + i]);
+  return result;
+}
+
+// 構造体の比較
+function equalStruct(s1, s2) {
+  if (! s1 instanceof "Function"
+      && ! s2 instanceof "Function") {
+    if (s1 instanceof "Array" 
+        && s2 instanceof "Array"
+        && s1.count == s2.count) {
+      var i;
+      
+      for (i = 0; i < s1.count; i++) {
+        if (! s1[i] instanceof "Function"
+            && (s1[i] instanceof "Array"
+                || s1[i] instanceof "Dictionary")) {
+          if (! equalStruct(s1[i], s2[i]))
+            return false;
+        } else {
+          if (s1[i] !== s2[i]) {
+            return false;
+          }
+        }
+      }
+      return true;
+    } else if (s1 instanceof "Dictionary"
+               && s2 instanceof "Dictionary") {
+      var key1, key2;
+      (key1 = []).assign(s1);
+      (key2 = []).assign(s2);
+      
+      if (key1.count != key2.count)
+        return false;
+      var i;
+      for (i = 0; i < key1.count; i+= 2) {
+        var key = key1[i];
+        if (! s1[key] instanceof "Function"
+            && (s1[key] instanceof "Array"
+                || s1[key] instanceof "Dictionary")) {
+          if (! equalStruct(s1[key], s2[key]))
+            return false;
+        } else {
+          if (s1[key] !== s2[key]) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+  }
+
+  return s1 === s2;
+}
+@endif
+
+// ディレクトリかどうかの判定
+function isDir(path, filename = void) {
+  if (filename === void) {
+    filename = Storages.extractStorageName(path);
+    path = Storages.extractStoragePath(path);
+  }
+  return getDirList(path).find(filename + "/") != -1;
+}
+
+// カラー表現のテキスト表現への変換
+function convertColorToText(color, hasAlpha = false)
+{
+  if (hasAlpha)
+    return "%08x".sprintf(color);
+  else 
+    return "%06x".sprintf(color);
+
+}
+
+// テキスト表現のカラー表現への変換
+function convertTextToColor(text, hasAlpha = false)
+{
+  return +("0x" + text);
+}
+
+// 構造体の複製
+function duplicateStruct(s) {
+  if (s instanceof "Function") 
+    return s;
+  if (s instanceof "Array") {
+    var result = [];
+    result.assignStruct(s);
+    return result;
+  }
+  if (s instanceof "Dictionary") {
+    var result = %[];
+    (Dictionary.assignStruct incontextof result)(s);
+    return result;
+  }
+  return s;
+}
+
+// クラスのミックスイン
+function mixin(dstClass, srcClass)
+{
+  var elms = [];
+  elms.assign(srcClass);
+  for (var i = 0; i < elms.count; i+=2) {
+    var key = elms[i];
+    var method = &elms[i + 1];
+    dstClass[key] = method incontextof dstClass;
+  }
+}
+
+// ファンクコール
+class FuncCall
+{
+  var func;
+  var args;
+
+  function FuncCall(func, args*) {
+    this.func = func;
+    this.args = args;
+  }
+
+  function call(callArgs*) {
+    for (var i = 0; i < args.count; i++)
+      callArgs.insert(i, args[i]);
+    return func(callArgs*);
+  }
+};
+
+function funccall {
+  var obj = new FuncCall(...);
+  return obj.call;
+}
+
+// 遅延呼出し
+class AsyncCaller 
+{
+  var funcs = [];
+  var trigger;
+
+  function AsyncCaller {
+    trigger = new AsyncTrigger(this);
+  }
+
+  function finalize {
+    invalidate trigger;
+  }
+
+  function call(func, args*) {
+    funcs.add([ func, args ]);
+    trigger.trigger();
+  }
+
+  function callOnce(func, args*) {
+    // 同じ内容の呼び出しが存在すれば、登録しない
+    var pair = [ func, args ];
+    for (var i = 0; i < funcs.count; i++)
+      if (equalStruct(funcs[i], pair))
+        return;
+    call(func, args*);
+  }
+
+  function cancel(func) {
+    for (var i = 0; i < funcs.count; i++)
+      if (equalStruct(funcs[i][0], func)) {
+        funcs.erase(i);
+        i--;
+      }
+  }
+
+  function action {
+    var funcs = this.funcs;
+    this.funcs = [];
+    var func, args;
+    while (funcs.count != 0) {
+      func = funcs[0][0];
+      args = funcs[0][1];
+      funcs.erase(0);
+      try {
+        func(args*);
+      } catch (e) {
+        if (e.message == "オブジェクトはすでに無効化されています"
+            || e.message == "null オブジェクトにアクセスしようとしました")
+          Debug.message("遅延呼び出しを受けたオブジェクトが無効化されていました");
+        else
+          throw e;
+      }          
+    }
+  }
+}
+
+global.asyncCaller = new AsyncCaller();
+
+
+
+

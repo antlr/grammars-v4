@@ -31,8 +31,13 @@ parser grammar Fortran77Parser;
 options
    { tokenVocab = Fortran77Lexer; }
 
+// multi-line comments?
+commentStatement
+    : COMMENT+
+    ;
+    
 program
-   : executableUnit + EOL*
+   : commentStatement* (executableUnit commentStatement*)+ EOL*
    ;
 
 executableUnit
@@ -78,7 +83,7 @@ entryStatement
    ;
 
 functionStatement
-   : (type)? FUNCTION NAME LPAREN (namelist)? RPAREN
+   : type? FUNCTION NAME LPAREN namelist? RPAREN EOL?
    ;
 
 blockdataStatement
@@ -86,7 +91,7 @@ blockdataStatement
    ;
 
 subroutineStatement
-   : SUBROUTINE NAME (LPAREN (namelist)? RPAREN)?
+   : SUBROUTINE NAME (LPAREN namelist? RPAREN)? EOL?
    ;
 
 namelist
@@ -105,17 +110,16 @@ statement
    | dataStatement
    | (statementFunctionStatement) statementFunctionStatement
    | executableStatement
-   | commentStatement
    ;
 
 subprogramBody
-   : wholeStatement + endStatement
+   : commentStatement* (wholeStatement commentStatement*)+ endStatement
    ;
 
 wholeStatement
    : LABEL? statement EOL
    ;
-
+   
 endStatement
    : LABEL? END
    ;
@@ -174,10 +178,6 @@ commonBlock
    : commonName commonItems
    ;
 
-commentStatement
-    : COMMENT
-    ;
-
 typeStatement
    : typename typeStatementNameList
    | characterWithLen typeStatementNameCharList
@@ -205,7 +205,7 @@ typeStatementLenSpec
    ;
 
 typename
-   : (REAL | COMPLEX (STAR ICON?)? | DOUBLE COMPLEX | DOUBLE PRECISION | INTEGER | LOGICAL)
+   : (REAL | COMPLEX (STAR ICON?)? | DOUBLE COMPLEX | DOUBLE PRECISION | INTEGER | LOGICAL | CHARACTER)
    ;
 
 type
@@ -374,19 +374,19 @@ logicalIfStatement
    ;
 
 blockIfStatement
-   : firstIfBlock (: elseIfStatement)* (elseStatement)? endIfStatement
+   : firstIfBlock elseIfStatement* elseStatement? endIfStatement
    ;
 
 firstIfBlock
-   : THEN wholeStatement +
+   : THEN EOL? commentStatement* (wholeStatement commentStatement*)+
    ;
 
 elseIfStatement
-   : (ELSEIF | (ELSE IF)) LPAREN logicalExpression RPAREN THEN wholeStatement +
+   : (ELSEIF | (ELSE IF)) LPAREN logicalExpression RPAREN THEN EOL? wholeStatement+
    ;
 
 elseStatement
-   : ELSE wholeStatement +
+   : ELSE EOL? commentStatement* (wholeStatement commentStatement*)+
    ;
 
 endIfStatement
@@ -402,7 +402,7 @@ doVarArgs
    ;
 
 doWithLabel
-   : lblRef (COMMA)? doVarArgs
+   : lblRef COMMA? doVarArgs EOL? doBody EOL? continueStatement
    ;
 
 doBody
@@ -410,7 +410,7 @@ doBody
    ;
 
 doWithEndDo
-   : doVarArgs doBody enddoStatement
+   : doVarArgs EOL? doBody EOL? enddoStatement
    ;
 
 enddoStatement
@@ -418,7 +418,7 @@ enddoStatement
    ;
 
 continueStatement
-   : CONTINUE
+   : lblRef* CONTINUE
    ;
 
 stopStatement
@@ -747,7 +747,7 @@ aexpr3
    ;
 
 aexpr4
-   : (unsignedArithmeticConstant) unsignedArithmeticConstant
+   : unsignedArithmeticConstant
    | (HOLLERITH | SCON)
    | logicalConstant
    | varRef
@@ -886,4 +886,3 @@ identifier
 to
    : NAME
    ;
-

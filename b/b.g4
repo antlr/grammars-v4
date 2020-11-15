@@ -33,12 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar b;
 
 program
-   : definition
+   : definition*
    ;
 
 definition
    : (name constant? (ival (',' ival)*)* ';')
-   | (name '(' (name (',' name)*)* ')' statement)
+   | (name '(' (name (',' name)*)? ')' statement)
    ;
 
 ival
@@ -57,69 +57,90 @@ statement
    | switchstmt
    | gotostmt
    | returnstmt
-   | functionstmmt
    | expressionstmt
+   | nullstmt
+   ;
+
+nullstmt
+   : ';'
    ;
 
 expressionstmt
-    : expression ';' ;
+   : rvalue ';'
+   ;
 
 blockstmt
    : '{' statement* '}'
    ;
 
 returnstmt
-   : 'return' ('(' expression ')')? ';'
+   : 'return' ('(' rvalue ')')? ';'
    ;
 
 gotostmt
-   : 'goto' expression ';'
+   : 'goto' rvalue ';'
    ;
 
 switchstmt
-   : 'switch' expression statement
+   : 'switch' rvalue statement
    ;
 
 whilestmt
-   : 'while' '(' expression ')' statement
+   : 'while' '(' rvalue ')' statement
    ;
 
 ifstmt
-   : 'if' '(' expression ')' statement ('else' statement)
+   : 'if' '(' rvalue ')' statement ('else' statement)?
    ;
 
 casestmt
    : 'case' constant ':' statement
    ;
 
-externsmt   
+externsmt
    : 'extrn' name (',' name)* ';'
    ;
 
 autosmt
-   : 'auto' name constant? (',' name constant?)* ';' 
-   ;
-
-functionstmmt
-   : name expression ';'
+   : 'auto' name constant? (',' name constant?)* ';'
    ;
 
 rvalue
    : expression
-   | (expression binary expression)
-   | (expression '?' expression ':' expression)
-   | (expression '(' expression (',' expression)* ')')
+   | comparison
+   | ternary
+   | assignment
+   ;
+
+ternary
+   : expression '?' rvalue ':' rvalue
+   ;
+
+comparison
+   : expression binary rvalue
+   ;
+
+assignment
+   : name assign rvalue
    ;
 
 expression
-   : ('(' expression ')')
+   : ('(' rvalue ')')
    | name
    | constant
-   | (name assign expression)
    | (incdec name)
    | (name incdec)
-   | (unary expression)
+   | (unary rvalue)
    | ('&' name)
+   | functioninvocation
+   ;
+
+functioninvocation
+   : name '(' functionparameters? ')'
+   ;
+
+functionparameters
+   : rvalue (',' rvalue)*
    ;
 
 assign
@@ -188,6 +209,11 @@ STRING1
 
 STRING2
    : '\'' ~ ['\r\n]* '\''
+   ;
+
+
+BLOCKCOMMENT
+   : '/*' .*? '*/' -> skip
    ;
 
 

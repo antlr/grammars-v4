@@ -1,6 +1,6 @@
 ## Summary
 
-PHP 5.6 grammar with C# ([Sharwell runtime](https://github.com/tunnelvisionlabs/antlr4cs)) 
+PHP 7.4 grammar with C# ([Sharwell runtime](https://github.com/tunnelvisionlabs/antlr4cs)) 
 and Java runtime by Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 PHP keywords are case-insensitive, but tokens in grammar written in lower case.
 Thus [CaseInsensitiveInputStream](https://gist.github.com/sharwell/9424666) should be used.
