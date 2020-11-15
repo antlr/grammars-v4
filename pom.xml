@@ -81,7 +81,8 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
-				<module>bnf</module>
+                <module>bibcode</module>
+                <module>bnf</module>
 				<module>brainfuck</module>
                 <module>brainflak</module>
 				<module>c</module>
