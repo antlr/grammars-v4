@@ -1,4 +1,4 @@
-# GTIN Grammar
+# DOI Grammar
 
-An ANTLR4 grammar for [GTIN codes](https://en.wikipedia.org/wiki/Global_Trade_Item_Number).
+An ANTLR4 grammar for [DOI](https://en.wikipedia.org/wiki/Digital_object_identifier)
 
