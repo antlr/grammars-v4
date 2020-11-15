@@ -1,0 +1,199 @@
+testMisc();
+function testMisc() {
+	Debug.message("### test syntax ");
+	var int5 = 5;
+	var int10 = 10;
+	var isFaild = false;
+	var isSuccess = false;
+	var tmp;
+
+	// if statement、variant でだいたいテスト済みになっているはず
+	if( int5 == int10 ) {
+		Debug.message("faild: if ");
+	}
+	if( int5 == int10 )
+		Debug.message("faild: if no block");
+
+	if( int5 < int10 )
+		if( int5 == int10 )
+			Debug.message("faild: if nest");
+		else
+			Debug.message("success: if nest");
+	else
+		Debug.message("faild: if nest");
+
+	var i = 0;
+	while( i < 5 ) {
+		i++;
+	}
+	if( i != 5 ) Debug.message("faild: while loop");
+
+	i = 0;
+	while(true) {
+		i++;
+		if( i >= 5 ) break;
+	}
+	if( i != 5 ) Debug.message("faild: while loop-break;");
+
+
+	var j = 0;
+	i = 0;
+	while( i < 5 ) {
+		i++;
+		if( (i%2) ) continue;
+		j++;
+	}
+	if( j != 2 ) Debug.message("faild: while loop-continue");
+
+	var i = 0;
+	do {
+		i++;
+	} while( i < 5 );
+	if( i != 5 ) Debug.message("faild: do while loop");
+
+	j = 0;
+	for( i = 0; i < 5; i++ ) {
+		j++;
+	}
+	if( j != 5 ) Debug.message("faild: for loop");
+
+
+	j = 0;
+	for( i = 0; ; i++ ) {
+		j++;
+		if( i >= 5 ) break;
+	}
+	if( j != 6 ) Debug.message("faild: for loop-break");
+
+	j = 0;
+	for( i = 0; i < 5; i++ ) {
+		if( (i%2) ) continue;
+		j++;
+	}
+	if( j != 3 ) Debug.message("faild: for loop");
+
+	isSuccess = false;
+	i = 2;
+	switch(i) {
+	case 0:
+		Debug.message("faild: switch");
+		break;
+	case 1:
+		Debug.message("faild: switch");
+		break;
+	case 2:
+		Debug.message("success: switch");
+		isSuccess = true;
+		break;
+	default:
+		Debug.message("faild: switch");
+		break;
+	}
+	if( isSuccess == false ) {
+		Debug.message("faild: switch");
+	}
+	isSuccess = false;
+
+	i = "システム";
+	switch(i)  {
+	case "テスト":
+		Debug.message("faild: switch");
+		break;
+	case "アプリ":
+		Debug.message("faild: switch");
+		break;
+	default:
+		Debug.message("success: switch");
+		isSuccess = true;
+		break;
+	}
+
+	if( isSuccess == false ) {
+		Debug.message("faild: switch");
+	}
+	isSuccess = false;
+
+	i = "システム";
+	switch(i)  {
+	case "システム":
+		Debug.message("success: switch");
+		isSuccess = true;
+		break;
+	case "アプリ":
+		Debug.message("faild: switch");
+		break;
+	}
+	if( isSuccess == false ) {
+		Debug.message("faild: switch");
+	}
+	isSuccess = false;
+
+	i = 0;
+	switch(i) {
+	case 0:
+	case 1:
+		Debug.message("success: switch");
+		isSuccess = true;
+		break;
+	default:
+		Debug.message("faild: switch");
+		break;
+	}
+	if( isSuccess == false ) {
+		Debug.message("faild: switch");
+	}
+	isSuccess = false;
+	try {
+		//tmp = 3%0; これは落ちるので使えない
+		var oct5 = <% 5 %>;
+		tmp = <% 10 %> / oct5;
+	} catch(e) {
+		Debug.message(e.message);
+		isSuccess = true;
+	}
+	if( isSuccess == false ) {
+		Debug.message("faild: try-catch");
+	}
+	isFaild = false;
+	try {
+		tmp = 3 / 1;
+	} catch() {
+		isFaild = true;
+	}
+	if( isFaild ) {
+		Debug.message("faild: try-catch");
+	}
+
+	isSuccess = false;
+	tmp = -10;
+	try {
+		if(tmp<0) throw new Exception("負の数は指定できません。");
+	} catch(e) {
+		Debug.message(e.message);
+		isSuccess = true;
+	}
+	if( isSuccess == false ) {
+		Debug.message("faild: try-catch");
+	}
+}
+
+function tryfunc() {
+	var tmp = -10;
+	try {
+		if(tmp<0) throw new Exception("負の数は指定できません。");
+	} catch(e) {
+		throw e; // メッセージを表示はするが、例外を再び投げる
+	}
+}
+function testthrow() {
+	try {
+		tryfunc();
+	} catch {
+		return false;
+	}
+	return true;
+}
+if( testthrow() ) {
+	Debug.message("faild: try-catch");
+}
+

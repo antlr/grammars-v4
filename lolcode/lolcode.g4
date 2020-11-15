@@ -25,10 +25,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 /*
 Adapted from https://github.com/jynnantonix/lolcode/blob/master/BNFGrammar.txt
 */
-
 grammar lolcode;
 
 program
@@ -36,7 +36,7 @@ program
    ;
 
 code_block
-   : statement +
+   : statement+
    ;
 
 statement
@@ -174,25 +174,27 @@ not
    ;
 
 func
-   : LABEL expression + 'MKAY?'
+   : LABEL expression+ 'MKAY?'
    ;
-
 
 LABEL
-   : ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_') +
+   : ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')+
    ;
-
 
 ATOM
-   : 'WIN' | 'FAIL' | 'NOOB' | ('0' .. '9') + | ('0' .. '9')* '.' ('0' .. '9')* | STRING
+   : 'WIN'
+   | 'FAIL'
+   | 'NOOB'
+   | ('0' .. '9')+
+   | ('0' .. '9')* '.' ('0' .. '9')*
+   | STRING
    ;
-
 
 STRING
    : '"' ('\'"' | ~ '"')* '"'
    ;
 
-
 WS
    : [ \r\n] -> skip
    ;
+

@@ -1,0 +1,2976 @@
+//;# MessageLayer.tjs - メッセージレイヤ
+//;# Copyright (C)2001-2009, W.Dee and contributors  改変・配布は自由です
+//;<<'END_OF_TJS_SCRIPT';
+
+// このスクリプトは有効な perl5 スクリプトでもあって、
+// assign/store/restore で実際にコピーする変数のリストを更新するために perl を用い、
+// perl MessgeLayer.tjs
+// で更新を行う
+// ( 処理の内容としては TJS2 でも十分書けるんだけど、あいにく
+//   perl のような実行環境が TJS2 にはないというか作ってない )
+
+class LinkButtonLayer extends ButtonLayer
+{
+	// グラフィカルボタンとして動作するためのレイヤ
+	var linkNum; // リンク番号
+	var onenter; // マウスが入ってきたときに実行するもの
+	var onleave; // マウスが出ていったときに実行するもの
+	var _eventTransparent = false;
+
+	function LinkButtonLayer(win, par)
+	{
+		// コンストラクタ
+		super.ButtonLayer(...);
+		focusable = false; // フォーカスは受け取らない
+		hint = "";
+	}
+
+	function finalize()
+	{
+		super.finalize(...);
+	}
+
+	function onClick()
+	{
+		super.onClick(...);
+	}
+
+	function onExecute(x, y, button, shift)
+	{
+		if(enabled && button == mbLeft && !parent.selProcessLock) parent.onButtonClick(linkNum);
+		if(this isvalid) super.onExecute(...);
+	}
+
+	function onMouseEnter()
+	{
+		parent.keyLink = linkNum;
+		if(!parent.selProcessLock && onenter !== void) Scripts.eval(onenter);
+		super.onMouseEnter(...);
+	}
+
+	function onMouseLeave()
+	{
+		if(!parent.selProcessLock && onleave !== void) Scripts.eval(onleave);
+		super.onMouseLeave(...);
+	}
+
+	function assign(src)
+	{
+		super.assign(src);
+		linkNum = src.linkNum;
+		onenter = src.onenter;
+		onleave = src.onleave;
+		hint = src.hint;
+		eventTransparent = src.eventTransparent;
+	}
+
+	property eventTransparent
+	{
+		// イベントを透過するかどうか
+		setter(x)
+		{
+			if(_eventTransparent != x)
+			{
+				_eventTransparent = x;
+				hitType = x ? htProvince : htMask; 
+					// ボタン画像は領域画像は持っていないので
+					// hitType を htProvince にすると必ず
+					// マウスイベントを透過するようになる
+			}
+		}
+		getter()
+		{
+			return _eventTransparent;
+		}
+	}
+}
+
+class LinkCheckBoxLayer extends CheckBoxLayer
+{
+	// メッセージレイヤに「リンク」として管理されるための
+	// チェックボックス
+	var linkNum; // リンク番号
+	var exp; // 式
+	var vertical; // 縦書きモード
+
+	function LinkCheckBoxLayer(win, par)
+	{
+		// コンストラクタ
+		super.CheckBoxLayer(...);
+		joinFocusChain = false; // フォーカスチェーンには参加しない
+		hint = "";
+	}
+
+	function finalize()
+	{
+		super.finalize(...);
+	}
+
+	function assign(src)
+	{
+		super.assign(src);
+		linkNum = src.linkNum;
+		vertical = src.vertical;
+		hint = src.hint;
+		exp = src.exp;
+	}
+
+	function onKeyDown(key, shift, process)
+	{
+		// 縦書きの時は右と左を入れ替える
+		if(vertical)
+		{
+			if(key == VK_LEFT) key = VK_RIGHT;
+			else if(key == VK_RIGHT) key = VK_LEFT;
+		}
+		super.onKeyDown(key, shift, process);
+	}
+
+	function onSearchPrevFocusable(layer)
+	{
+		super.onSearchPrevFocusable(parent.findPrevFocusable(this, layer));
+	}
+
+	function onSearchNextFocusable(layer)
+	{
+		super.onSearchNextFocusable(parent.findNextFocusable(this, layer));
+	}
+
+	function onFocus(prevfocused, direction)
+	{
+		parent.keyLink = linkNum;
+		super.onFocus(...);
+	}
+
+	function commit()
+	{
+		kag.inputTemp = checked;
+		Scripts.eval(("(" + exp + ") = kag.inputTemp"));
+	}
+}
+
+
+class LinkEditLayer extends EditLayer
+{
+	// メッセージレイヤに「リンク」として管理されるための
+	// 単一行編集レイヤ
+	var linkNum; // リンク番号
+	var exp; // 式
+
+	function LinkEditLayer(win, par)
+	{
+		// コンストラクタ
+		super.EditLayer(...);
+		joinFocusChain = false; // フォーカスチェーンには参加しない
+		hint = "";
+	}
+
+	function finalize()
+	{
+		super.finalize(...);
+	}
+
+	function assign(src)
+	{
+		super.assign(src);
+		linkNum = src.linkNum;
+		exp = src.exp;
+	}
+
+	function onKeyDown(key, shift, process)
+	{
+		// 縦書きの時は右と左を入れ替える
+		if(Edit_vertical)
+		{
+			if(key == VK_LEFT) key = VK_RIGHT;
+			else if(key == VK_RIGHT) key = VK_LEFT;
+		}
+		super.onKeyDown(key, shift, process);
+	}
+
+	function onSearchPrevFocusable(layer)
+	{
+		super.onSearchPrevFocusable(parent.findPrevFocusable(this, layer));
+	}
+
+	function onSearchNextFocusable(layer)
+	{
+		super.onSearchNextFocusable(parent.findNextFocusable(this, layer));
+	}
+
+	function onFocus(prevfocused, direction)
+	{
+		parent.keyLink = linkNum;
+		super.onFocus(...);
+	}
+
+	function commit()
+	{
+		kag.inputTemp = text;
+		Scripts.eval(("(" + exp + ") = kag.inputTemp"));
+	}
+}
+
+class MessageLayer extends KAGLayer
+{
+	var wwFollowing = "%),:;]}｡｣ﾞﾟ。，、．：；゛゜ヽヾゝ"
+                "ゞ々’”）〕］｝〉》」』】°′″℃¢％‰"; // 行頭禁則文字
+	var wwFollowingWeak="!.?､･ｧｨｩｪｫｬｭｮｯｰ・？！ーぁぃぅぇぉっゃゅょゎァィ"
+                "ゥェォッャュョヮヵヶ"; // 行頭(弱)禁則文字
+	var wwLeading="\\$([{｢‘“（〔［｛〈《「『【￥＄£"; // 行末禁則文字
+
+	wwFollowing += wwFollowingWeak;
+
+	var id; // 識別子
+	var comp; // 対応する表/裏メッセージレイヤ
+
+
+	// 以下、/*C*/ の記号のついたものは、assign のときに自動的にコピーされるもの。
+	// /*S*/ の記号のついたものは、store/resto の時に自動的にコピーされるもの。
+	// これらの変数名をいじったり、変数を削除したり、追加する場合はいったんまた
+	// perl スクリプトとしてこのスクリプトを実行する必要があります。
+	// ( 末端の perl スクリプトで処理 )
+
+	var layerType = ltAddAlpha; // レイヤタイプ
+	/*CS*/var frameGraphic = ""; // フレーム画像ファイル名
+	/*CS*/var frameKey = clNone; // フレーム画像キー
+	/*CS*/var frameColor = 0x000000; // フレームの色
+	/*CS*/var frameOpacity = 128; // フレームの不透明度
+	/*CS*/var marginL = 8; // 左マージン
+	/*CS*/var marginT = 8; // 上マージン
+	/*CS*/var marginR = 8; // 右マージン
+	/*CS*/var marginB = 8; // 下マージン
+	/*CS*/var marginRCh = 2; // 右端(縦書きの場合は下端)に確保する禁則処理用余白
+	/*C*/var x;
+	/*C*/var y; // 現在の表示位置
+	/*C*/var relinexpos; // 改行すべき最終右(縦書きの場合は下)位置
+	/*C*/var isLastLine; // ページ最終行を描画中
+	/*C*/var indentxpos; // インデント左(縦書きの場合は上)位置
+	var links = []; // リンク
+	/*C*/var linkFilled; // リンク領域画像を塗りつぶしたかどうか
+	/*C*/var numLinks = 0; // レイヤ内のリンクの数
+
+	var lastLink = -1; // 最後に選択したリンク番号
+	var keyLink = -1; // キーボードで選択したリンク番号
+	var inLink = -1; // リンクを描画中か
+	var highlightLayer; // リンクを強調表示するためのレイヤ
+	/*C*/var selProcessLock = false; // process 後にリンクが操作されるのを防ぐためのフラグ
+	/*C*/var storedSelProcessLock = false; // storeSelProcessLock 時点での状態
+
+	/*CS*/var defaultLinkColor = 0x0080ff; // デフォルトのリンク色
+	/*CS*/var defaultLinkOpacity = 64; // デフォルトのリンクの不透明度
+
+	/*CS*/var defaultFontSize = 24; // デフォルトのフォント高さ
+	/*C*/var fontSize; // フォント高さ
+	/*C*/var _fontSize; // 仮フォント高さ
+	/*CS*/var defaultLineSize = 0; // デフォルトのライン高さ
+	/*C*/var reserveLineSize = 0; // '予約' ライン高さ
+	/*C*/var lineSize; // ライン高さ
+	/*CS*/var defaultRubySize = 10; // デフォルトのルビの高さ
+	/*C*/var rubySize; // ルビ高さ
+	/*C*/var _rubySize; // 仮ルビ高さ
+	/*CS*/var defaultRubyOffset = -2; // デフォルトのルビのオフセット
+	/*C*/var rubyOffset; // ルビのオフセット
+	/*C*/var _rubyOffset; // 仮ルビオフセット
+
+	/*CS*/var defaultLineSpacing = 6; // デフォルトの行間
+	/*C*/var lineSpacing; // 行間
+	/*CS*/var defaultPitch = 0; // デフォルトの字間
+	/*C*/var pitch; // 字間
+	/*CS*/var defaultShadow = true; // デフォルトで影をつけるか
+	/*C*/var shadow; // 影をつけるか
+	/*CS*/var defaultEdge = false; // デフォルトで縁取りをするか
+	/*C*/var edge; // 縁取りをするか
+	/*CS*/var defaultShadowColor = 0x000000; // デフォルトの影の色
+	/*C*/var shadowColor; // 影の色
+	/*CS*/var defaultEdgeColor = 0x0080ff; // デフォルトの縁取りの色
+	/*C*/var edgeColor; // 縁取りの色
+	/*CS*/var defaultBold = true; // デフォルトでボールドで描画するか
+	/*C*/var bold; // ボールドで描画するか
+	/*CS*/var defaultFace = "user"; // デフォルトのフォント
+	/*C*/var userFace = "ＭＳ Ｐ明朝"; // ユーザの選んだフォント
+	/*C*/var fontFace; // フォント
+	/*CS*/var defaultChColor = 0xffffff; // デフォルトの文字色
+	/*C*/var chColor; // 文字色
+	/*C*/var defaultAntialiased = true; // デフォルトでアンチエイリアスを掛けるか
+	/*C*/var antialiased; // アンチエイリアスを掛けるか
+	/*CS*/var vertical = false; // 縦書きモードの時に true
+	/*C*/var currentRuby = ""; // 次の文字に対するルビ
+	/*C*/var lastDrawnCh = ""; // 最後に描画した文字
+
+	/*CS*/var edgeExtent = 1; // 袋文字のふとさ
+	/*CS*/var edgeEmphasis = 512; // 袋文字の強調度
+	/*CS*/var shadowOffsetX = 2; // 影のオフセット
+	/*CS*/var shadowOffsetY = 2; // 影のオフセット
+
+	/*C*/var sizeChanged = false; // フォントサイズが変更されると true
+
+	/*C*/var nextClearFlag = false; // 下端に達したとき、次の文字表示でレイヤをクリアするかどうか
+
+	var lineLayer; // 行描画用のレイヤ
+	/*C*/var lineLayerBase; // ベースライン(横書き:下線位置/縦書き:中央位置)
+	/*C*/var lineLayerPos; // lineLayer 中の文字表示位置
+	/*C*/var lineLayerLength; // lineLayer 中の文字幅
+	/*C*/var lineLayerOriginX; // 表示オフセットX
+	/*C*/var lineLayerOriginY; // 表示オフセットY
+	var lineLayerLinks = []; // lineLayer が管理しているリンク
+
+	/*C*/var align=-1; // -1=左/上そろえ  0=中央揃え   1=右/下そろえ
+	/*CS*/var defaultAutoReturn = true; // デフォルトで自動改行を行うかどうか
+	/*C*/var autoReturn = true; // 自動改行・改ページ処理を行うか
+
+	/*CS*/var lineBreakGlyph = "linebreak"; // 行待ち記号名
+	/*CS*/var lineBreakGlyphKey = clNone; // 行待ち記号のカラーキー
+	/*CS*/var pageBreakGlyph = "pagebreak"; // ページ待ち記号名
+	/*CS*/var pageBreakGlyphKey = clNone; // ページ待ち記号のカラーキー
+	/*CS*/var glyphFixedPosition = false; // 記号を固定箇所に表示するか
+	/*CS*/var glyphFixedLeft = 0; // その位置
+	/*CS*/var glyphFixedTop = 0;
+
+	/*CS*/var draggable = false; // メッセージレイヤをドラッグ可能か
+	var dragging = false; // ドラッグ中か
+	var dragOriginX, dragOriginY; // ドラッグ中、つかんでいる座標
+
+	/*C*/var selClickLock = false; // 連打による誤操作を防ぐためのフラグ
+	/*C*/var lastMouseX;
+	/*C*/var lastMouseY; // リンクを表示したときの最後のマウスカーソルの位置
+
+	var ml, mt, mw, mh; // 初期レイヤサイズ(config用)
+
+	var invisibleByUser = false; // ユーザにより一時的に不可視
+	var visibleBeforeUserInvisible  = false;
+
+	var lastMouseDownX; // 最後にマウスがクリックされた X 座標
+	var lastMouseDownY; // 最後にマウスがクリックされた Y 座標
+
+	// リンクタイプ
+	var ltNormal = 1;
+	var ltButton = 2;
+	var ltEdit = 3;
+	var ltCheckBox = 4;
+
+    // タイムアウト処理用
+    var timeoutTimer;
+    var timeoutTime;
+    var timeoutStorage;
+    var timeoutTarget;
+    var timeoutExp;
+    
+    function clearTimeout() {
+        stopTimeout();
+        timeoutTime    = void;
+        timeoutStorage = void;
+        timeoutTarget  = void;
+        timeoutExp     = void;
+    }
+
+    function timeoutHandler() {
+        if (!selProcessLock) {
+            Scripts.eval(timeoutExp) if timeoutExp != '';
+            if (timeoutStorage != '' || timeoutTarget != '') {
+                window.lockMessageLayerSelProcess(); // 選択をロック
+                window.process(timeoutStorage, timeoutTarget);
+                clearTimeout();
+            }
+        }
+    }
+
+    function addTimeout(elm) {
+        timeoutTime    = elm.time;
+        timeoutStorage = elm.storage;
+        timeoutTarget  = elm.target;
+        timeoutExp = createSoundExpression(elm.exp, elm.se, elm.sebuf);
+        setSelProcessLock(false); // 選択ロック解除
+        //comp.setSelProcessLock(false); // 選択ロック解除
+    }
+
+    function stopTimeout() {
+        if (timeoutTimer !== void) {
+            invalidate timeoutTimer;
+            timeoutTimer = void;
+        }
+    }
+    
+    function startTimeout() {
+        if (timeoutTime > 0 && (timeoutStorage !== void || timeoutTarget !== void || timeoutExp !== void)) {
+            timeoutTimer = new Timer(timeoutHandler, '');
+            timeoutTimer.capacity = 1;
+            timeoutTimer.interval = timeoutTime;
+            timeoutTimer.enabled  = true;
+        }
+    }
+
+    var clickExp;
+    var clickStorage;
+    var clickTarget;
+
+    function clearClick() {
+        clickStorage = void;
+        clickTarget  = void;
+        clickExp     = void;
+    }
+
+    function addClick(elm) {
+        clickStorage = elm.storage;
+        clickTarget  = elm.target;
+        clickExp = createSoundExpression(elm.exp, elm.se, elm.sebuf);
+        focusable = true; // フォーカスを受け取れるように
+        setSelProcessLock(false); // 選択ロック解除
+        //comp.setSelProcessLock(false); // 選択ロック解除
+        selClickLock = false;
+    }
+
+    function hasClick() {
+        return clickExp !== void || clickStorage !== void || clickTarget !== void;
+    }
+    
+    function processClick() {
+        Scripts.eval(clickExp) if clickExp != '';
+        if(clickStorage != '' || clickTarget != '') {
+            window.lockMessageLayerSelProcess(); // 選択をロック
+            if (window.getKeyState(VK_RETURN) || window.getKeyState(VK_SPACE) || window.getKeyState(VK_CONTROL))
+                window.hideMouseCursor();
+            // キーボードによる操作の場合はマウスカーソルを隠す
+            window.process(clickStorage, clickTarget);
+            clearClick();
+        }
+        selClickLock = false;
+    }
+    
+    var wheelExp;
+    var wheelFunc;
+    var wheelStorage;
+    var wheelTarget;
+
+    function clearWheel() {
+        wheelStorage = void;
+        wheelTarget  = void;
+        wheelExp     = void;
+        wheelFunc    = void;
+    }
+
+    function addWheel(elm) {
+        wheelStorage = elm.storage;
+        wheelTarget  = elm.target;
+        wheelFunc    = elm.func;
+        wheelExp = createSoundExpression(elm.exp, elm.se, elm.sebuf);
+        focusable = true; // フォーカスを受け取れるように
+        setSelProcessLock(false); // 選択ロック解除
+        //comp.setSelProcessLock(false); // 選択ロック解除
+    }
+
+    function hasWheel() {
+        return wheelFunc !== void || wheelExp !== void || wheelStorage !== void || wheelTarget !== void;
+    }
+    
+    function processWheel(shift, delta, x, y) {
+        if (!selProcessLock) {
+            Scripts.eval(wheelFunc)(shift, delta, x, y) if wheelFunc != void;
+            Scripts.eval(wheelExp) if wheelExp != '';
+            if(wheelStorage != '' || wheelTarget != '') {
+                window.lockMessageLayerSelProcess(); // 選択をロック
+                window.process(wheelStorage, wheelTarget);
+                clearWheel();
+            }
+        }
+    }
+    
+	function MessageLayer(owner, parent, name, id, do_config)
+	{
+		// MessageLayer コンストラクタ
+		// owner : オーナー KAG Window
+		// parent : 親レイヤ
+		// name 名前
+		// id : 識別子
+		// left, top, width, height : 初期位置
+		// do_config : コンフィギュレーションを行うか
+		super.KAGLayer(...);
+
+
+		this.id = id;
+		this.name = name;
+
+		imageModified = true;
+
+		// コンフィギュレーション
+		if(do_config)
+		{
+			(MessageLayer_config incontextof this)();
+			(MessageLayer_config_override incontextof this)()
+				if typeof global.MessageLayer_config_override != "undefined";
+
+			// 初期サイズは mw mh に入っているので
+			setPos(ml, mt);
+			setImageSize(mw, mh);
+			setSize(mw, mh);
+		}
+		else
+		{
+			// config を行わない場合
+			// サイズはデフォルトで決定する
+			setPos(0, 0);
+			setImageSize(parent.width, parent.height);
+			setSize(parent.width, parent.height);
+		}
+
+		// config 用一時変数の消去
+		delete ml; delete mt; delete mw; delete mh;
+
+		// レイヤタイプの設定
+		type = layerType;
+
+		// 当たり判定初期化
+		hitType = htMask;
+		hitThreshold = 0; // マウスメッセージは全域不透過
+
+		// 行描画用の浮遊レイヤを確保
+		lineLayer = new global.KAGLayer(window, this);
+		lineLayer.hitType = htMask;
+		lineLayer.hitThreshold = 256; // マウスメッセージは全域透過
+		lineLayer.face = dfAuto;
+		lineLayer.type = layerType;
+		lineLayer.name = "行描画用浮遊メッセージレイヤ";
+
+		// リンクをハイライト表示するためのレイヤ
+		highlightLayer = new global.KAGLayer(window, this);
+		highlightLayer.type = layerType;
+		highlightLayer.face = dfAuto;
+		highlightLayer.hitType = htProvince;
+			// 領域画像で当たり判定を行う
+	}
+
+	function finalize()
+	{
+		// invalidateLinkObjects(); // リンクに結びつけられたオブジェクトの無効化
+		invalidateLinkObjects();
+		invalidate highlightLayer;
+		invalidate lineLayer;
+
+
+		super.finalize();
+	}
+
+	function setCompLayer(lay) { comp = lay; }
+
+	function clearLayer()
+	{
+		// レイヤをクリア
+		window.updateBeforeCh = 1;
+
+		cancelDrag();
+
+		if(imageModified)
+		{
+			if(frameGraphic == "")
+			{
+				// フレーム画像が指定されていない場合
+				face = dfAuto;
+				if(type == ltAddAlpha)
+				{
+					fillRect(0, 0, imageWidth, imageHeight, (frameOpacity << 24) +
+						((int)((((frameColor&0xff0000)>>16) * frameOpacity) / 255)<<16 ) +
+						((int)((((frameColor&0x00ff00)>> 8) * frameOpacity) / 255)<< 8 ) +
+						((int)((((frameColor&0x0000ff)    ) * frameOpacity) / 255)     ) );
+				}
+				else
+				{
+					fillRect(0, 0, imageWidth, imageHeight, (frameOpacity << 24) + frameColor);
+				}
+			}
+			else
+			{
+				loadImages(frameGraphic, frameKey);
+				setSizeToImageSize();
+			}
+
+			face = dfProvince;
+			colorRect(0, 0, imageWidth, imageHeight, 0); // 領域もクリア
+			face = dfAuto;
+		}
+
+		imageModified = false;
+
+		invalidateLinkObjects(); // リンクに関連づけられたオブジェクトを無効化
+
+		focusable = false;
+		links.clear();
+		numLinks = 0;
+		inLink = -1;
+		highlightLink(lastLink, false); // ハイライトを消す
+		highlightLayer.visible = false;
+		lastLink = -1;
+		keyLink = -1;
+		linkFilled = false;
+		lastDrawnCh = ""; // 最後に描画した文字
+		isLastLine = false; // 最終行か
+		selClickLock = true;
+		lastMouseX = cursorX;
+		lastMouseY = cursorY;
+		initLineLayer();
+	}
+
+	function setPosition(elm)
+	{
+		// elm に従ってメッセージレイヤのオプションを設定
+		// このタグが position という名前なのは相当初期の KAG
+		// がそうだったのを引きずってるのね(^^;
+		left = elm.left if elm.left !== void;
+		top = elm.top if elm.top !== void;
+		imageWidth = elm.width if elm.width !== void;
+		imageHeight = elm.height if elm.height !== void;
+		setSizeToImageSize();
+
+		frameGraphic = elm.frame if elm.frame !== void;
+		frameKey = elm.framekey if elm.framekey !== void;
+		frameColor = +elm.color if elm.color !== void;
+		frameOpacity = +elm.opacity if elm.opacity !== void;
+		imageModified = true; // 強制的にメッセージレイヤをクリアするために
+		marginL = +elm.marginl if elm.marginl !== void;
+		marginT = +elm.margint if elm.margint !== void;
+		marginR = +elm.marginr if elm.marginr !== void;
+		marginB = +elm.marginb if elm.marginb !== void;
+		vertical = +elm.vertical if elm.vertical !== void;
+		draggable = +elm.draggable if elm.draggable !== void;
+		visible = +elm.visible if elm.visible !== void;
+
+		clear();
+	}
+
+	function clear()
+	{
+		// メッセージレイヤをクリアする
+		clearLayer();
+
+		// 表示位置を初期位置に
+		if(vertical)
+		{
+			x = imageWidth - marginR;
+			y = marginT;
+		}
+		else
+		{
+			x = marginL;
+			y = marginT;
+		}
+
+		// その他リセット
+		indentxpos = 0;
+		resetFont();
+		resetStyle();
+		decideSizeChange();
+		initLineLayer();
+		currentRuby = "";
+
+        clearTimeout();
+        clearClick();
+        clearWheel();
+	}
+
+	function clear2()
+	{
+		// メッセージレイヤをクリアするが
+		// フォントのリセットなどは行わない
+		// メッセージが下端までいって自動的にページ待ち→メッセージレイヤクリア
+		// となるときに呼ばれる
+
+		clearLayer();
+
+		// 表示位置を初期位置に
+		if(vertical)
+		{
+			y = marginT + indentxpos;
+			x = imageWidth - marginR;
+		}
+		else
+		{
+			y = marginT;
+			x = marginL + indentxpos;
+		}
+		initLineLayer();
+	}
+
+	function resetFont()
+	{
+		// フォントのリセット
+		sizeChanged = true;
+
+		// 各デフォルトの設定を書き戻し
+		if(!vertical)
+		{
+			lineLayer.font.face = fontFace = defaultFace == 'user' ? userFace : defaultFace;
+			lineLayer.font.angle = 0;
+		}
+		else
+		{
+			lineLayer.font.face = '@' + (fontFace = defaultFace == 'user' ? userFace : defaultFace);
+			lineLayer.font.angle = 2700;
+		}
+
+		lineLayer.font.bold = bold = defaultBold;
+		lineLayer.font.italic=false;
+		_fontSize = defaultFontSize;
+		antialiased = defaultAntialiased;
+
+		chColor = defaultChColor;
+		_rubySize = defaultRubySize;
+		_rubyOffset = defaultRubyOffset;
+		shadow = defaultShadow;
+		edge = defaultEdge;
+		shadowColor = defaultShadowColor;
+		edgeColor = defaultEdgeColor;
+
+		// 改行位置を計算
+		if(!vertical)
+			relinexpos = imageWidth - marginR - marginRCh * _fontSize;
+		else
+			relinexpos = imageHeight - marginB - marginRCh * _fontSize;
+	}
+
+	function setFont(elm)
+	{
+		// フォントの設定
+		sizeChanged = true;
+
+		if(!vertical)
+		{
+			var elmface = elm.face;
+			if(elmface == 'default')
+			{
+				lineLayer.font.angle = 0;
+				lineLayer.font.face = fontFace =  defaultFace;
+			}
+			else if(elmface == 'user')
+			{
+				lineLayer.font.angle = 0;
+				lineLayer.font.face = fontFace = userFace;
+			}
+			else if(elmface !== void)
+			{
+				lineLayer.font.angle = 0;
+				lineLayer.font.face = fontFace = elmface;
+			}
+		}
+		else
+		{
+			var elmface = elm.face;
+			if(elmface == 'default')
+			{
+				var f = '@' + (fontFace = defaultFace);
+				lineLayer.font.angle = 2700;
+				lineLayer.font.face = f;
+			}
+			else if(elmface == 'user')
+			{
+				var f = '@' + (fontFace = userFace);
+				lineLayer.font.angle = 2700;
+				lineLayer.font.face = f;
+			}
+			else if(elmface !== void)
+			{
+				var f = '@' + (fontFace = elmface);
+				lineLayer.font.angle = 2700;
+				lineLayer.font.face = f;
+			}
+		}
+
+		if(elm.antialiased == 'default')
+			antialiased = defaultAntialiased;
+		else if(elm.antialiased !== void)
+			antialiased = +elm.antialiased;
+
+		if(elm.bold == 'default')
+			lineLayer.font.bold = defaultBold;
+		else if(elm.bold !== void)
+			lineLayer.font.bold = +elm.bold;
+
+		if(elm.italic == 'default')
+			lineLayer.font.italic = false;
+		else if(elm.italic !== void)
+			lineLayer.font.italic = +elm.italic;
+
+		if(elm.size == 'default')
+			_fontSize = defaultFontSize;
+		else if(elm.size !== void)
+			_fontSize = +elm.size;
+		
+		if(elm.color == 'default')
+			chColor = defaultChColor;
+		else if(elm.color !== void)
+			chColor = +elm.color;
+
+		if(elm.rubysize == 'default')
+			_rubySize = defaultRubySize;
+		else if(elm.rubysize !== void)
+			_rubySize = +elm.rubysize;
+
+		if(elm.rubyoffset == 'default')
+			_rubyOffset = defaultRubyOffset;
+		else if(elm.rubyoffset !== void)
+			_rubyOffset = +elm.rubyoffset;
+
+		if(elm.shadow == 'default')
+			shadow = defaultShadow;
+		else if(elm.shadow !== void)
+			shadow = +elm.shadow;
+
+		if(elm.shadowcolor == 'default')
+			shadowColor = defaultShadowColor;
+		else if(elm.shadowcolor !== void)
+			shadowColor = +elm.shadowcolor;
+
+		if(elm.edge == 'default')
+			edge = defaultEdge;
+		else if(elm.edge !== void)
+			edge = +elm.edge;
+
+		if(elm.edgecolor == 'default')
+			edgeColor = defaultEdgeColor;
+		else if(elm.edgecolor !== void)
+			edgeColor = +elm.edgecolor;
+
+		if(!vertical)
+			relinexpos = int(imageWidth-marginR-marginRCh*_fontSize);
+		else
+			relinexpos = int(imageHeight-marginB-marginRCh*_fontSize);
+	}
+
+	function setDefaultFont(elm)
+	{
+		// デフォルトフォントの設定
+		defaultFace = elm.face if elm.face !== void;
+		defaultAntialiased = +elm.antialiased if elm.antialiased !== void;
+		defaultBold = +elm.bold if elm.bold !== void;
+		defaultFontSize = +elm.size if elm.size !== void;
+		defaultChColor = +elm.color if elm.color !== void;
+		defaultRubySize = +elm.rubysize if elm.rubysize !== void;
+		defaultRubyOffset = +elm.rubyoffset if elm.rubyoffset !== void;
+		defaultShadow = +elm.shadow if elm.shadow !== void;
+		defaultShadowColor = +elm.shadowcolor if elm.shadowcolor !== void;
+		defaultEdge = +elm.edge if elm.edge !== void;
+		defaultEdgeColor = +elm.edgecolor if elm.edgecolor !== void;
+	}
+
+	function resetStyle()
+	{
+		// スタイルのリセット
+		reserveLineSize = defaultLineSize;
+		lineSpacing = defaultLineSpacing;
+		pitch = defaultPitch;
+		resetLineSize();
+		align = -1;
+		autoReturn = defaultAutoReturn;
+		adjustAlign();
+	}
+
+	function setStyle(elm)
+	{
+		// スタイルの設定
+		if(elm.linespacing == 'default')
+			lineSpacing = defaultLineSpacing;
+		else if(elm.linespacing !== void)
+			lineSpacing = +elm.linespacing;
+
+		if(elm.pitch == 'default')
+			pitch = defaultPitch;
+		else if(elm.pitch !== void)
+			pitch = +elm.pitch;
+
+		if(elm.linesize == 'default')
+		{
+			reserveLineSize = defaultLineSize;
+		}
+		else if(elm.linesize !== void)
+		{
+			reserveLineSize = +elm.linesize;
+			resetLineSize();
+			sizeChanged  =true;
+		}
+
+		if(elm.align == 'default')
+		{
+			fixLineLayer();
+			align = -1;
+			adjustAlign();
+		}
+		else if(elm.align !== void)
+		{
+			fixLineLayer();
+			if(elm.align == 'left' || elm.align == 'top')
+				align = -1;
+			else if(elm.align == 'center')
+				align = 0;
+			else if(elm.align == 'right' || elm.align == 'bottom')
+				align = 1;
+			adjustAlign();
+		}
+		
+		if(elm.autoreturn == 'default')
+			autoReturn = defaultAutoReturn;
+		else if(elm.autoreturn !== void)
+			autoReturn = +elm.autoreturn;
+	}
+
+	function setDefaultStyle(elm)
+	{
+		// デフォルトのスタイルの設定
+		defaultLineSpacing = +elm.linespacing if elm.linespacing !== void;
+		defaultPitch = +elm.pitch if elm.pitch !== void;
+		defaultLineSize = +elm.linesize if elm.linesize !== void;
+		defaultAutoReturn = +elm.autoreturn if elm.autoreturn !== void;
+	}
+
+
+	function resetLineSize()
+	{
+		// ラインサイズのリセット
+		lineSize = reserveLineSize > fontSize ? reserveLineSize : fontSize;
+	}
+
+	function decideSizeChange()
+	{
+		// 仮に変更されていたフォント・スタイル情報を確定
+		if(!sizeChanged) return;
+		lineLayer.font.height = - _fontSize;
+		fontSize = _fontSize;
+		rubySize = _rubySize;
+		rubyOffset = _rubyOffset;
+		sizeChanged = false;
+	}
+
+	function getLineLayerBaseLine()
+	{
+		// 文字表示用のベースラインを計算して返す
+		// 横書きの場合は文字の下端部分、
+		// 縦書きの場合は文字の中央線
+		if(!vertical)
+			return -getLineLayerTopOffset() + lineSpacing + lineSize;
+		else
+			// 縦書き
+			// 中央線(レイヤ左端からの位置)
+			return 4 + (lineSize>>1);
+	}
+
+	function initLineLayer()
+	{
+		// lineLayer の初期化
+		var ll = lineLayer;
+		resetLineSize();
+		lineLayerLinks.count = 0;
+		lineLayerOriginX = x;
+		lineLayerOriginY = y;
+		if(!vertical)
+			ll.imageWidth = imageWidth + 8;
+		else
+			ll.imageHeight = imageHeight + 8;
+		ll.setSizeToImageSize();
+		changeLineSize(/*forceresize=*/true);
+		lineLayerLength = 0;
+		lineLayerPos = 4;
+		ll.visible = false;
+		ll.face = dfAuto;
+		var lliw = ll.imageWidth;
+		var llih = ll.imageHeight;
+		ll.fillRect(0, 0, lliw, llih, 0);
+			// 完全透明に
+		ll.face = dfProvince;
+		ll.fillRect(0, 0, lliw, llih, 0);
+		ll.face = dfAuto;
+			// 領域をクリア
+	}
+
+	function fixLineLayer()
+	{
+		// lineLayer を現在の表示位置に確定
+		var ll = lineLayer;
+		if(ll.visible == false) return;
+
+		var llox = lineLayerOriginX + getLineLayerLeftOffset();
+		var lloy = lineLayerOriginY + getLineLayerTopOffset();
+
+		face = dfAuto;
+		operateRect(
+			llox,
+			lloy,
+			ll, 0, 0, ll.imageWidth, ll.imageHeight);
+
+		face = dfProvince;
+		var i;
+		var lll = lineLayerLinks;
+		var lllcount = lll.count;
+		for(i = 0; i<lllcount; i++)
+		{
+			var lll_i = lineLayerLinks[i];
+			var n = lll_i.number;
+			var l = lll_i.line;
+			var linkn = links[n];
+			var x = linkn.x[l] += llox;
+			var y = linkn.y[l] += lloy;
+			var w = linkn.w[l];
+			var h = linkn.h[l];
+			linkn.fixed[l] = true; // 固定された
+			colorRect(x, y, w, h, n+1); // このレイヤの該当する部分を塗りつぶす
+		}
+
+		ll.visible = false;
+	}
+
+
+	function changeLineSize(forceresize = false)
+	{
+		// 行サイズが変更されたときに行描画用レイヤのサイズを変更するために
+		// 呼ばれる
+
+		if(inLink!=-1) endLinkLine();
+		decideSizeChange();
+
+		var newlinesize = lineSize;
+		if(fontSize>lineSize) newlinesize = fontSize; // 拡張
+
+		var newlinelayersize = newlinesize + lineSpacing;
+		if(rubySize + rubyOffset > lineSpacing)
+		{
+			// ルビが上の行とかぶる
+			newlinelayersize += rubySize+rubyOffset - lineSpacing;
+		}
+
+		newlinelayersize += 8; // 袋文字・影描画用の余裕
+		if(!vertical)
+		{
+			// 横書きの場合
+			if(forceresize || lineLayer.imageHeight<newlinelayersize)
+			{
+				// 行間拡張
+				lineSize = newlinesize;
+				var oldsize = lineLayer.imageHeight;
+				lineLayer.imageHeight = newlinelayersize;
+				lineLayer.setSizeToImageSize();
+				lineLayerBase = getLineLayerBaseLine();
+				// 内容移動
+				if(!forceresize)
+				{
+					var d = lineLayer.imageHeight - oldsize;
+					lineLayer.face = dfAuto;
+					lineLayer.copyRect(0, d, lineLayer,
+						0, 0, lineLayer.imageWidth, oldsize);
+					lineLayer.fillRect(0, 0, lineLayer.imageWidth, d, 0);
+
+					lineLayer.face = dfProvince;
+					lineLayer.copyRect(0, d, lineLayer,
+						0, 0, lineLayer.imageWidth, oldsize);
+					lineLayer.colorRect(0, 0, lineLayer.imageWidth, d, 0);
+					lineLayer.face = dfAuto;
+				}
+				var i;
+				for(i = 0; i<lineLayerLinks.count; i++)
+				{
+					var n = lineLayerLinks[i].number;
+					var l = lineLayerLinks[i].line;
+					links[n].y[l] += lineLayer.imageHeight - oldsize;
+				}
+				// 位置移動 
+				lineLayer.setPos(lineLayerOriginX + getLineLayerLeftOffset(),
+							lineLayerOriginY + getLineLayerTopOffset());
+			}
+		}
+		else
+		{
+			// 縦書きの場合
+			if(forceresize || lineLayer.imageWidth < newlinelayersize)
+			{
+				// 行間拡張
+				lineSize = newlinesize;
+				var oldbase = lineLayerBase;
+				var oldsize = lineLayer.imageWidth;
+				lineLayer.imageWidth = newlinelayersize;
+				lineLayer.setSizeToImageSize();
+				lineLayerBase = getLineLayerBaseLine();
+				// 内容移動
+				if(!forceresize)
+				{
+					lineLayer.face = dfAuto;
+					// oldbaseline , lineLayerBase を使って
+					// 表示内容を移動
+					lineLayer.copyRect(
+						lineLayerBase - oldbase, 0,
+						lineLayer,
+						0,0,lineLayer.imageWidth, lineLayer.imageHeight);
+					// 左端と右端を消去
+					lineLayer.fillRect(0, 0,
+						lineLayerBase - oldbase, lineLayer.imageHeight, 0);
+					lineLayer.fillRect(
+						lineLayerBase - oldbase+oldsize, 0,
+						lineLayer.imageWidth - (lineLayerBase - oldbase + oldsize),
+						lineLayer.imageHeight, 0);
+
+					lineLayer.face = dfProvince;
+					lineLayer.copyRect(
+						lineLayerBase - oldbase, 0,
+						lineLayer,
+						0, 0, lineLayer.imageWidth, lineLayer.imageHeight);
+					lineLayer.colorRect(0, 0,
+						lineLayerBase - oldbase, lineLayer.imageHeight, 0);
+					lineLayer.colorRect(
+						lineLayerBase - oldbase+oldsize, 0,
+						lineLayer.imageWidth - (lineLayerBase - oldbase + oldsize),
+						lineLayer.imageHeight, 0);
+					lineLayer.face = dfAuto;
+				}
+				var i;
+				for(i = 0; i < lineLayerLinks.count; i++)
+				{
+					var n = lineLayerLinks[i].number;
+					var l = lineLayerLinks[i].line;
+					links[n].x[l] += lineLayerBase - oldbase;
+				}
+				// 位置移動 
+				lineLayer.setPos(lineLayerOriginX + getLineLayerLeftOffset(),
+							lineLayerOriginY + getLineLayerTopOffset());
+			}
+		}
+	}
+
+	function getLineLayerLeftOffset()
+	{
+		// 行描画用レイヤ内での左オフセットを取得
+		if(!vertical)
+		{
+			if(align == -1)
+				return -4;
+			else if(align == 0)
+				return ((imageWidth - marginR - marginL - lineLayerLength)>>1) - 4;
+			else if(align == 1)
+				return imageWidth - marginR - marginL - lineLayerLength - 4;
+		}
+		else
+		{
+			return -lineSize - lineSpacing - 4;
+		}
+	}
+
+	function getLineLayerTopOffset()
+	{
+		// 行描画用レイヤ内での上オフセットを取得
+		if(!vertical)
+		{
+			return -(lineLayer.imageHeight - 4 - lineSize - lineSpacing);
+		}
+		else
+		{
+			if(align == -1)
+				return -4;
+			else if(align == 0)
+				return ((imageHeight - marginB - marginT - lineLayerLength)>>1) - 4;
+			else if(align == 1)
+				return imageHeight - marginB - marginT - lineLayerLength - 4;
+			return -4;
+		}
+	}
+
+	function adjustAlign()
+	{
+		lineLayer.setPos(lineLayerOriginX + getLineLayerLeftOffset(),
+			lineLayerOriginY + getLineLayerTopOffset());
+	}
+
+
+	function reline()
+	{
+		// 改行
+		// ページを越える場合は true, 越えないで改行できる場合は false
+		var condition;
+		if(vertical)
+		{
+			condition= lineLayerOriginX + getLineLayerLeftOffset() - lineSpacing -
+				lineSize <= marginL;
+		}
+		else
+		{
+			condition= lineLayerBase + lineLayerOriginY + getLineLayerTopOffset() +
+				 lineSize >= imageHeight-marginB;
+		}
+
+		if(condition)
+		{
+			// ページを越える!
+			return true;
+		}
+		else
+		{
+			if(inLink != -1) endLinkLine();
+
+			decideSizeChange();
+
+			fixLineLayer();
+
+			if(vertical)
+			{
+				y = marginT + indentxpos;
+				x -= lineSize + lineSpacing;
+			}
+			else
+			{
+				y += lineSize + lineSpacing;
+				x = marginL + indentxpos;
+			}
+
+			var condition;
+			if(vertical)
+				condition= x - lineSize*2 <= marginL;
+			else
+				condition= y + lineSize*2 >= imageHeight-marginB;
+
+			if(condition)
+			{
+				// ページ最終行
+				isLastLine=true;
+			}
+
+			initLineLayer();
+
+//			if(inLink!=-1) beginLinkLine();
+		}
+		return false;
+	}
+
+	function processCh(ch)
+	{
+		// 文字 ch を描画する
+		// 改行が行われ、かつそれがページ末端を越える場合は true を返す
+		// それ以外は false
+		var vert = vertical;
+
+		if((vert ?  y >= relinexpos  : x >= relinexpos ) && autoReturn)
+		{
+			if(((lastDrawnCh=="" || wwLeading.indexOf(lastDrawnCh)==-1) &&
+				wwFollowing.indexOf(ch)==-1) ||
+				(lastDrawnCh!="" && wwFollowingWeak.indexOf(lastDrawnCh)!=-1 &&
+					wwFollowingWeak.indexOf(ch)!=-1))
+			{
+				// 最後に描画したのが行末禁則文字でない場合
+				// しかもこれから描画するのが行頭禁則文字でない
+				// 場合
+				// または弱禁則文字が連続していない場合
+				if(reline()) return autoReturn;
+			}
+			else if(vert ? ( y>imageHeight ) : (x>imageWidth))
+			{
+				// これから描画するのが強禁則文字ではなくて、
+				// 確実に 右端を越える場合
+				// ( この場合は余白は考えない )
+				if(reline()) return autoReturn;
+			}
+		}
+
+		changeLineSize() if sizeChanged;
+
+		var inlink = inLink != -1;
+
+		beginLinkLine() if inlink;
+
+ 		var ll = lineLayer;
+ 		var llfont = ll.font;
+
+		var cw = llfont.getTextWidth(ch);
+
+		var dx , dy;
+
+		if(vert)
+			dx = int(lineLayerBase+(fontSize>>1)), dy = int(lineLayerPos);
+		else
+			dx = int(lineLayerPos), dy = int(lineLayerBase-fontSize);
+
+
+		if(edge)
+			ll.drawText(dx, dy, ch, chColor, 255, antialiased, edgeEmphasis, edgeColor, edgeExtent, 0, 0); // 文字
+		else if(shadow)
+			ll.drawText(dx, dy, ch, chColor, 255, antialiased, 255, shadowColor, 0, shadowOffsetX, shadowOffsetY); // 文字
+		else
+			ll.drawText(dx, dy, ch, chColor, 255, antialiased); // 文字
+
+		if(currentRuby != "")
+		{
+			// ルビがある
+			var cw = llfont.getTextWidth(ch);
+			var orgsize = llfont.height;
+			llfont.height = rubySize;
+			var rw = llfont.getTextWidth(currentRuby);
+			var rx,ry;
+			if(!vert)
+			{
+				rx = int(dx + (cw>>1) - (rw>>1));
+				ry = int(dy - rubySize - rubyOffset);
+			}
+			else
+			{
+				rx = int(dx + rubySize + rubyOffset);
+				ry = int(dy + (cw>>1) - (rw>>1));
+			}
+
+			if(edge)
+				ll.drawText(rx, ry, currentRuby, chColor, 255, antialiased, edgeEmphasis, edgeColor, edgeExtent, 0, 0); // 文字
+			else if(shadow)
+				ll.drawText(rx, ry, currentRuby, chColor, 255, antialiased, 255, shadowColor, 0, shadowOffsetX, shadowOffsetY); // 文字
+			else
+				ll.drawText(rx, ry, currentRuby, chColor, 255, antialiased); // 文字
+
+			llfont.height = orgsize;
+			currentRuby = '';
+		}
+
+		ll.visible = true;
+
+		if(inlink)
+		{
+			// ハイパーリンクでちゅー
+			ll.face = dfProvince;
+			if(!vert)
+				ll.fillRect(lineLayerPos, lineLayerBase - fontSize,
+					cw, fontSize, numLinks + 1);
+			else
+				ll.fillRect(lineLayerBase - (fontSize>>1), lineLayerPos,
+					fontSize, cw, numLinks + 1);
+
+			// 領域画像も塗りつぶしてやる
+			ll.face = dfAuto;
+			linkFilled = true;
+		}
+
+		cw += pitch;
+
+		if(vert) y += cw; else x += cw;
+
+		lineLayerPos += cw;
+		lineLayerLength += cw;
+
+		lastDrawnCh = ch;
+
+		adjustAlign() if(align >= 0);
+
+		return false;
+	}
+
+	function putGraph(storage, key, ischar)
+	{
+		// 画像 storage を描画する
+
+		// テンポラリのレイヤを用意
+		var lay = window.temporaryLayer;
+
+		lay.type = ltTransparent;
+		lay.face = dfAuto;
+		lay.loadImages(storage, key); // 画像読み込み
+		var lw, lh;
+		lw = lay.imageWidth;
+		lh = lay.imageHeight;
+
+		var cw;
+		if(vertical)
+		{
+			if(lw > lineSize) lineSize = lw; // 拡張
+			cw = lh;
+		}
+		else
+		{
+			if(lh > lineSize) lineSize = lh; // 拡張
+			cw = lw;
+		}
+
+		changeLineSize();
+
+		if(inLink != -1) beginLinkLine();
+
+		var repage = false;
+
+		if(autoReturn)
+		{
+			// 改行位置に達している？
+			if(vertical ? ( y > relinexpos ) : (x > relinexpos) )
+			{
+				repage = reline();
+			}
+		}
+
+		if(repage) return true; // 文字は描画しない
+
+
+		// 描画
+		var cx,cy;
+		if(vertical)
+		{
+			cx = lineLayerBase - (lw>>1);
+			cy = lineLayerPos;
+		}
+		else
+		{
+			cx = lineLayerPos;
+			cy = lineLayerBase - lh;
+		}
+
+		if(ischar && (shadow || edge) )
+		{
+			lay.face = dfOpaque;
+			lay.holdAlpha = true;
+				// 影/袋文字の色でメインを塗りつぶす
+
+			if(edge)
+			{
+				// 袋
+				lay.fillRect(0, 0, lw, lh, edgeColor);
+				lineLayer.operateRect(cx+1, cy, lay, 0, 0, lw, lh);
+				lineLayer.operateRect(cx, cy+1, lay, 0, 0, lw, lh);
+				lineLayer.operateRect(cx-1, cy, lay, 0, 0, lw, lh);
+				lineLayer.operateRect(cx, cy-1, lay, 0, 0, lw, lh);
+			}
+			else if(shadow)
+			{
+				// 影
+				lay.fillRect(0, 0, lw, lh, shadowColor);
+				lineLayer.operateRect(cx+2, cy+2, lay, 0, 0, lw, lh);
+			}
+
+		}
+
+		if(ischar)
+		{
+			lay.face = dfOpaque;
+			lay.holdAlpha = true;
+			lay.fillRect(0, 0, lw, lh, chColor);
+				// メインを文字色で塗りつぶす
+		}
+
+		lineLayer.operateRect(cx, cy, lay, 0, 0, lw, lh); // 描画
+
+		// 描画おわり
+		lastDrawnCh="";
+
+		if(inLink!=-1)
+		{
+			// ハイパーリンクでちゅー
+			lineLayer.face = dfProvince;
+			if(vertical)
+				lineLayer.fillRect(lineLayerBase - (fontSize>>1), lineLayerPos,
+					fontSize, cw, numLinks+1);
+			else
+				lineLayer.fillRect(lineLayerPos, lineLayerBase - fontSize,
+					cw, fontSize, numLinks+1);
+			face = dfAuto;
+			lineLayer.face = dfBoth;
+			// 領域画像も塗りつぶしてやる
+			linkFilled=true;
+		}
+
+		if(vertical) y+=cw; else x+=cw;
+
+		lineLayerPos += cw;
+		lineLayerLength += cw;
+
+		lineLayer.visible = true;
+
+		if(align >= 0) adjustAlign();
+
+		return false;
+	}
+
+	function putHorizonCh(text, expand = false)
+	{
+		// 縦中横を描画する
+		if(!vertical) throw new Exception("縦書きモードでないと使用できません");
+
+		// フォントを設定し直す
+		var ll = lineLayer;
+		var lf = ll.font;
+		var orgfont = lf.face;
+		var organgle = lf.angle;
+		lf.face = orgfont.substring(1); // 先頭の @ マークを取り除く
+		lf.angle = 0;
+
+		// 描画する文字の横幅を取得
+		var cw = lf.getTextWidth(text);
+		var ch = fontSize;
+
+		// linesize の拡張
+		if(expand)
+		{
+			if(cw > lineSize) lineSize = cw; // 拡張
+			changeLineSize();
+		}
+
+		// リンク中の場合はリンクを開始
+		if(inLink != -1) beginLinkLine();
+
+		// 改行/改ページ処理
+		var repage = false;
+		if(autoReturn)
+		{
+			// 改行位置に達している？
+			if(y > relinexpos) repage = reline();
+		}
+		if(repage)
+		{
+			// 戻る前にフォントをもとにもどす
+			lf.face = orgfont;
+			lf.angle = organgle;
+			return true; // 文字は描画しない
+		}
+
+		// 描画
+		var dx = lineLayerBase - (cw>>1);
+		var dy = lineLayerPos;
+
+		if(edge)
+			ll.drawText(dx, dy, text, chColor, 255, antialiased, 512, edgeColor, 1, 0, 0); // 文字
+		else if(shadow)
+			ll.drawText(dx, dy, text, chColor, 255, antialiased, 255, shadowColor, 0, shadowOffsetX, shadowOffsetY); // 文字
+		else
+			ll.drawText(dx, dy, text, chColor, 255, antialiased); // 文字
+
+		// 描画おわり
+		lastDrawnCh="";
+
+		// フォントを元に戻す
+		lf.face = orgfont;
+		lf.angle = organgle;
+
+		// ハイパーリンクの処理
+		if(inLink!=-1)
+		{
+			// ハイパーリンクでちゅー
+			ll.face = dfProvince;
+			ll.fillRect(lineLayerBase - (fontSize>>1), lineLayerPos,
+				fontSize, cw, numLinks+1);
+			face = dfAuto;
+			ll.face = dfAuto;
+			linkFilled=true;
+		}
+
+		// 位置更新
+		y += ch;
+		lineLayerPos += ch;
+		lineLayerLength += ch;
+
+		lineLayer.visible = true;
+
+		// アラインの修正
+		if(align >= 0) adjustAlign();
+
+		// 戻る
+		return false;
+	}
+
+
+	function invalidateLinkObjects()
+	{
+		// リンクアイテムにオブジェクトが割り当てられていた場合無効化
+		for(var i = links.count-1; i>=0; i--)
+		{
+			if(links[i].type != ltNormal)
+				invalidate links[i].object;
+			links[i].type = 0;
+		}
+	}
+
+	function beginLinkLine()
+	{
+		// リンク開始
+		// リンク開始のタグ以降で、実際に文字描画などが起こるときに
+		// 呼ばれる(行が次に移ったときも呼ばれる)
+		if(linkFilled) return;
+		var sx, sy;
+		if(!vertical)
+		{
+			sx = lineLayerPos;
+			sy = lineLayerBase - fontSize;
+		}
+		else
+		{
+			sx = lineLayerBase - (fontSize>>1);
+			sy = lineLayerPos;
+		}
+		var n = links[numLinks].lineCount - 1;
+		links[numLinks].fixed[n] = false; // 未固定
+		links[numLinks].x[n] = sx;
+		links[numLinks].y[n] = sy;
+
+		lineLayerLinks[lineLayerLinks.count] = %[number : numLinks, line : n];
+		linkFilled = false;
+	}
+
+	function endLinkLine()
+	{
+		// リンク中にて行が終了したときに呼ばれる
+		if(!linkFilled) return;
+		linkFilled = false;
+		var w, h;
+		var linkn = links[numLinks];
+		var linenum = links[numLinks].lineCount-1;
+		if(!vertical)
+		{
+			w = lineLayerPos - linkn.x[linenum];
+			if(lineLayer.font.italic) w += fontSize>>2; // 斜体の時は一応の余裕を持たせる
+			if(w <= 0) return;
+			h = fontSize;
+		}
+		else
+		{
+			w = fontSize;
+			h = lineLayerPos - linkn.y[linenum];
+			if(lineLayer.font.italic) h += fontSize>>2;
+			if(h <= 0) return;
+		}
+		linkn.w[linenum] = w;
+		linkn.h[linenum] = h;
+		linkn.lineCount ++;
+	}
+
+	function createSoundExpression(exp, storage, buf)
+	{
+		// サウンドを鳴らすための式を作成する
+		// exp になにか式があった場合はカンマでつなぐ
+		// この仕様は後で変更するかも
+		if(storage === void) return exp;
+		if(buf === void) buf = 0;
+		var seexp = "(kag.se["+buf+"].play(%[storage:\"" + storage.escape() +"\"]))";
+		if(exp !== void)
+			exp = seexp + ",("+exp+")";
+		else
+			exp = seexp;
+		return exp;
+	}
+
+	function beginHyperLink(elm)
+	{
+		// 普通のリンクを開始する
+		links[numLinks] = %[ // 辞書配列を作成
+			type :		ltNormal,
+			storage :	elm.storage,
+			target :	elm.target,
+			exp :		createSoundExpression(elm.exp, elm.clickse, elm.clicksebuf),
+			countPage :	(elm.countpage === void) ? true : +elm.countpage,
+			hint :		elm.hint,
+			color :		(elm.color === void) ? defaultLinkColor : +elm.color,
+			opacity :	(elm.opacity === void) ? defaultLinkOpacity : +elm.opacity,
+			onenter :	createSoundExpression(elm.onenter, elm.enterse, elm.entersebuf),
+			onleave :	createSoundExpression(elm.onleave, elm.leavese, elm.leavesebuf),
+			x :			[],
+			y :			[],
+			w :			[],
+			h :			[],
+			fixed :		[],
+			lineCount :	1
+			];
+		inLink = 0;
+	}
+
+	function endHyperLink()
+	{
+		inLink = -1;
+		endLinkLine();
+		links[numLinks].lineCount--;
+		numLinks++;
+		focusable = true; // フォーカスを受け取れるように
+		lastMouseX = cursorX;
+		lastMouseY = cursorY;
+		selClickLock = true;
+		setSelProcessLock(false); // 選択ロック解除
+	}
+
+	function findLink(x,y)
+	{
+		// x, y 位置にあるリンクをさがし、見つかれば そのリンク番号を返す
+
+		if(selClickLock) return -1;
+
+		var i=0;
+		// 領域画像を使った判定
+		if(lineLayer.visible)
+		{
+			if(lineLayer.left <= x && lineLayer.top <= y  &&
+				lineLayer.imageWidth + lineLayer.left > x &&
+				lineLayer.imageHeight + lineLayer.top > y)
+			{
+				i = lineLayer.getProvincePixel(x - lineLayer.left, y - lineLayer.top);
+			}
+		}
+		if(i == 0) i = getProvincePixel(x, y);
+		if(i == -1) return -1;
+		if(i != 0) return i - 1;
+		return -1;
+	}
+
+	function addButton(elm)
+	{
+		// グラフィカルボタンを配置
+		var object = new LinkButtonLayer(window, this);
+		object.loadImages(elm.graphic, elm.graphickey);
+		object.linkNum = numLinks;
+		object.setPos(x, y);
+		object.hint = elm.hint;
+		object.visible = true;
+		object.onenter = createSoundExpression(elm.onenter, elm.enterse, elm.entersebuf);
+		object.onleave = createSoundExpression(elm.onleave, elm.leavese, elm.leavesebuf);
+		object.hitThreshold =
+			(elm.recthit === void || +elm.recthit) ? 0 : 64;
+
+		links[numLinks] = %[
+			type :			ltButton,
+			graphic :		elm.graphic,
+			graphickey :	elm.graphickey,
+			storage :		elm.storage,
+			target :		elm.target,
+			exp :			createSoundExpression(elm.exp, elm.clickse, elm.clicksebuf),
+			countPage :		(elm.countpage === void) ? true : +elm.countpage,
+			object :		object,
+			onenter :		object.onenter,
+			onleave :		object.onleave,
+			x :				[x],
+			y :				[y],
+			w :				[object.width],
+			h :				[object.height],
+			fixed :			[true],
+			lineCount :		1
+			];
+
+		numLinks++;
+		focusable = true; // フォーカスを受け取れるように
+		setSelProcessLock(false); // 選択ロック解除
+	}
+
+	function addEdit(elm)
+	{
+		// 単一行エディットを配置
+		changeLineSize() if sizeChanged;
+		var object = new LinkEditLayer(window, this, vertical);
+		var of = object.font;
+		var lf = lineLayer.font;
+		of.face = lf.face;
+		of.angle = lf.angle;
+		of.bold = lf.bold;
+		of.italic = lf.italic;
+		of.height = lf.height;
+		object.linkNum = numLinks;
+		object.text = Scripts.eval(elm.name);
+		object.exp = elm.name;
+		object.antialiased = antialiased;
+		object.color = elm.bgcolor if elm.bgcolor !== void; // color でない事に注意
+		object.textColor = elm.color if elm.color !== void; // textColor でないことに注意
+		object.maxChars = elm.maxchars if elm.maxchars !== void;
+		object.bgOpacity = elm.opacity if elm.opacity !== void;
+
+		var len = elm.length === void ? 200: +elm.length;
+		if(vertical)
+		{
+			object.setPos(lineLayer.left + lineLayerBase - ((lf.height + 6)>>1),
+				lineLayer.top + lineLayerPos);
+			object.height = len;
+			object.width = lf.height + 6;
+			y += len;
+		}
+		else
+		{
+			object.setPos(lineLayer.left + lineLayerPos,
+					lineLayer.top + lineLayerBase - fontSize - 3);
+			object.width = elm.length === void ? 200: +elm.length;
+			object.height = lf.height + 6;
+			x += len;
+		}
+		object.visible = true;
+		lineLayerPos += len;
+		lineLayerLength += len;
+
+		links[numLinks] = %[
+			type :			ltEdit,
+			exp :			elm.name,
+			object :		object,
+			x :				[object.left],
+			y :				[object.top],
+			w :				[object.width],
+			h :				[object.height],
+			fixed :			[true],
+			lineCount :		1
+			];
+
+		numLinks ++;
+		focusable = true;
+		setSelProcessLock(false); // 選択ロック解除
+	}
+
+	function addCheckBox(elm)
+	{
+		var object = new LinkCheckBoxLayer(window, this, vertical);
+		object.linkNum = numLinks;
+		object.vertical = vertical;
+		object.checked = Scripts.eval(elm.name);
+		object.exp = elm.name;
+		object.color = elm.bgcolor if elm.bgcolor !== void; // color でない事に注意
+		object.glyphColor = elm.color if elm.color !== void; // glyphColor でないことに注意
+		object.bgOpacity = elm.opacity if elm.opacity !== void;
+
+		var cw;
+		var lw = object.width;
+		var lh = object.height;
+		if(vertical)
+		{
+			if(lw > lineSize) lineSize = lw; else lw = object.width = lineSize; // 拡張
+			cw = lh;
+		}
+		else
+		{
+			if(lh > lineSize) lineSize = lh; else lh = object.height = lineSize; // 拡張
+			cw = lw;
+		}
+
+		changeLineSize();
+
+		var cx,cy;
+		if(vertical)
+		{
+			cx = lineLayerBase - (lw>>1);
+			cy = lineLayerPos;
+		}
+		else
+		{
+			cx = lineLayerPos;
+			cy = lineLayerBase - lh;
+		}
+
+		object.setPos(cx + lineLayerOriginX + getLineLayerLeftOffset(),
+					cy + lineLayerOriginY + getLineLayerTopOffset());
+
+		if(vertical) y+=cw; else x+=cw;
+		lineLayerPos += cw;
+		lineLayerLength += cw;
+
+		object.visible = true;
+
+		links[numLinks] = %[
+			type :			ltCheckBox,
+			exp :			elm.name,
+			object :		object,
+			x :				[object.left],
+			y :				[object.top],
+			w :				[object.width],
+			h :				[object.height],
+			fixed :			[true], // 固定!!!
+			lineCount :		1
+			];
+
+		numLinks ++;
+		focusable = true;
+		setSelProcessLock(false); // 選択ロック解除
+	}
+
+	function highlightLink(n, b = false)
+	{
+		// n 番目のリンクを
+		// b : true  : ハイライトする
+		// b : false : ハイライトを消す
+		if(selProcessLock) return;
+		if(b)
+		{
+			if(n < 0 || n >= numLinks) return;
+			var linkn = links[n];
+			if(linkn === void) return;
+			if(linkn.type != ltNormal) return;
+			var xofs = lineLayerOriginX + getLineLayerLeftOffset();
+			var yofs = lineLayerOriginY + getLineLayerTopOffset();
+
+			if(linkn.onenter != '') Scripts.eval(linkn.onenter);
+
+			// ハイライトする
+			if(!vertical)
+			{
+				// 横
+				// 全画面更新をさけるため
+				// 最小と最大の位置を得る
+				var min = linkn.y[0];
+				if(!linkn.fixed[0]) min += yofs; // 固定されていない場合は補正
+				var max = linkn.y[0] + linkn.h[0];
+				if(!linkn.fixed[0]) max += yofs;
+
+				var i;
+				for(i = 0; i < linkn.lineCount; i++)
+				{
+					var m;
+					m = linkn.y[i];
+					if(!linkn.fixed[i]) m += yofs;
+					if(min > m) min = m;
+					m = linkn.y[i] + linkn.h[i];
+					if(!linkn.fixed[i]) m += yofs;
+					if(max < m) max = m;
+				}
+
+				highlightLayer.setPos(0, min);
+				highlightLayer.setImageSize(imageWidth, max - min);
+				highlightLayer.setSizeToImageSize();
+			}
+			else
+			{
+				// 縦
+				var min = linkn.x[0];
+				if(!linkn.fixed[0]) min += xofs;
+				var max = linkn.x[0] + linkn.w[0];
+				if(!linkn.fixed[0]) max += xofs;
+
+				var i;
+				for(i = 0; i < linkn.lineCount; i++)
+				{
+					var m;
+					m = linkn.x[i];
+					if(!linkn.fixed[i]) m += xofs;
+					if(min > m) min = m;
+					m = linkn.x[i] + linkn.w[i];
+					if(!linkn.fixed[i]) m += xofs;
+					if(max < m) max = m;
+				}
+
+				highlightLayer.setPos(min, 0);
+				highlightLayer.setImageSize(max - min, imageHeight);
+				highlightLayer.setSizeToImageSize();
+			}
+
+			highlightLayer.fillRect(0, 0,
+				highlightLayer.imageWidth,
+				highlightLayer.imageHeight, 0);
+			highlightLayer.face = dfProvince;
+			highlightLayer.fillRect(0, 0,
+				highlightLayer.imageWidth,
+				highlightLayer.imageHeight, 0);
+			highlightLayer.face = dfAuto;
+
+			var i;
+			for(i = 0; i < linkn.lineCount; i++)
+			{
+				var x = linkn.x[i];
+				var y = linkn.y[i];
+				if(!linkn.fixed[i]) x += xofs, y += yofs;
+
+				highlightLayer.colorRect(
+					x - highlightLayer.left,
+					y - highlightLayer.top,
+					linkn.w[i], linkn.h[i], linkn.color, linkn.opacity);
+			}
+
+			highlightLayer.visible = true;
+
+			cursor = window.cursorPointed;
+
+			if(parent.isPrimary && comp !== void && left == comp.left && top == comp.top &&
+				width == comp.width && height == comp.height)
+			{
+				// 裏ページレイヤも同様に設定
+				var tl = highlightLayer;
+				var bl = comp.highlightLayer;
+				bl.assignImages(tl);
+				bl.setPos(tl.left, tl.top, tl.width, tl.height);
+				bl.visible = true;
+			}
+
+			// ヒントを設定
+			hint = links[n].hint;
+		}
+		else
+		{
+			if(n >= 0 && n < numLinks)
+			{
+				if(links[n] !== void && links[n].type == ltNormal)
+				{
+					if(links[n].onleave != '') Scripts.eval(links[n].onleave);
+				}
+			}
+
+			highlightLayer.visible = false;
+			cursor = crDefault;
+
+			if(/*parent.isPrimary && */comp !== void)
+				comp.highlightLayer.visible = false;
+
+			showParentHint = false;
+		}
+	}
+
+	function processLink(n)
+	{
+        // タイムアウト処理は停止
+        stopTimeout();
+
+		// リンク番号 n を処理する
+		var ln = links[n];
+		if(ln === void) return;
+
+		// 裏画面のハイライトを非表示
+		if(comp !== void) comp.highlightLayer.visible = false;
+
+		// 実行
+		Scripts.eval(ln.exp) if ln.exp != '';
+
+		if(ln.storage != '' || ln.target != '')
+		{
+			window.lockMessageLayerSelProcess(); // 選択をロック
+			if(window.getKeyState(VK_RETURN) || window.getKeyState(VK_SPACE))
+				window.hideMouseCursor();
+					// キーボードによる操作の場合はマウスカーソルを隠す
+			window.process(ln.storage, ln.target, ln.countPage);
+		}
+	}
+
+	function onButtonClick(num)
+	{
+		// 番号 num のグラフィカルボタンがクリックされた
+		processLink(num);
+	}
+
+
+	function setSelProcessLock(b)
+	{
+		// 選択のロックを設定
+		// 選択のロックを行うのは、いったん選択肢を選択したら
+		// 他の選択肢を選択できないようにするため
+		if(selProcessLock != b)
+		{
+			selProcessLock = b;
+			var lks = links;
+			for(var i = 0; i < numLinks; i++)
+			{
+				var item = lks[i];
+				var type = item.type;
+				if(type == ltButton) item.object.eventTransparent = b;
+				else if(type == ltEdit || type == ltCheckBox) item.object.enabled = !b;
+			}
+		}
+        if (selProcessLock) {
+            focusable = false;
+        } else {
+            if (numLinks > 0 || hasWheel() || hasClick()) {
+                focusable = true;
+            }
+        }
+	}
+
+	function storeSelProcessLock()
+	{
+		// 右クリックサブルーチンに入る前に呼ばれ、
+		// 現在の selProcessLock の状態を退避する
+		storedSelProcessLock = selProcessLock;
+	}
+
+	function restoreSelProcessLock()
+	{
+		// 右クリックルーチンから抜けるときに呼ばれ、
+		// 右クリックルーチンに入る前の selProcessLock の状態を
+		// 取り戻す
+		setSelProcessLock(storedSelProcessLock);
+	}
+
+	function commit()
+	{
+		// フォーム要素の内容をコミット
+		var lks = links;
+		for(var i = 0; i < numLinks; i++)
+		{
+			var item = lks[i];
+			var type = item.type;
+			if(type == ltEdit || type == ltCheckBox) item.object.commit();
+		}
+	}
+
+	function isDragPos(x, y)
+	{
+		// x y の座標が ドラッグでつかむことのできる座標かどうか
+		if(!draggable) return false;
+		if(x >= marginL && y >= marginT && x < imageWidth - marginR && y < imageHeight - marginB)
+			return false;
+		if(x<0 || y<0 || x>=imageWidth || y>=imageHeight) return false;
+		return getMaskPixel(x, y) >= 64;
+	}
+
+	function internalHitTest(x, y)
+	{
+		// onHitTest イベントハンドラ(内部関数)
+ 
+		if(isDragPos(x, y))
+		{
+			cursor = window.cursorDraggable;
+			showParentHint = true;
+			return true; // 不透過
+		}
+
+		if(selProcessLock) return false; // 透過
+
+		if(selClickLock)
+		{
+			// 最後にクリックされた位置からマウスがある程度移動しているかどうか
+			// この判定を行うのは、クリック連打による思わぬ選択肢の選択ミスを
+			// 防ぐため
+			if(lastMouseX-3 > x || lastMouseX+3 < x ||
+				lastMouseY-3 > y || lastMouseY+3 < y)
+			{
+				selClickLock = false;
+			}
+		}
+
+		var n;
+		n = findLink(x, y);
+		if(n == -1)
+		{
+			return hasClick(); // クリック処理がなければ透過
+		}
+		else
+		{
+			cursor = window.cursorPointed;
+			return true; // 透過しない
+		}
+	}
+
+	function onHitTest(x, y, b)
+	{
+		// onHitTest イベントハンドラ
+		var b = internalHitTest(x - imageLeft, y - imageTop);
+		return super.onHitTest(x, y, b);
+	}
+
+	function internalOnMouseDown(x, y, button)
+	{
+		// onMouseDown イベントハンドラ(内部関数)
+		if(button == mbLeft && !selProcessLock)
+		{
+			if(!selClickLock)
+			{
+				var n = findLink(x, y);
+
+				if(n != -1)
+				{
+					processLink(n);
+					return;
+                } else if (hasClick()) {
+                    processClick();
+                    return;
+				}
+			}
+		}
+
+		if(isDragPos(x, y))
+		{
+			// ドラッグ可能位置の場合
+			if(window.inStable)
+			{
+				dragOriginX = x;
+				dragOriginY = y;
+				dragging = true; // ドラッグの開始
+			}
+		}
+	}
+
+	function onMouseDown(x, y, button)
+	{
+		lastMouseDownX = x;
+		lastMouseDownY = y;
+
+		internalOnMouseDown(x - imageLeft, y - imageTop, button);
+
+		super.onMouseDown(...);
+	}
+
+	function onMouseUp(x, y, button)
+	{
+		dragging = false;
+
+		super.onMouseUp(...);
+	}
+
+	function cancelDrag()
+	{
+		// ドラッグのキャンセル
+		dragging = false;
+	}
+
+	function internalMouseMove(x, y)
+	{
+		// onMouseMoveなど から呼ばれる
+		if(dragging)
+		{
+			// ドラッグ中
+			var px = parent.cursorX;
+			var py = parent.cursorY;
+			if(px < 0) px = 0;
+			if(py < 0) py = 0;
+			if(px >= parent.width) px = parent.width -1;
+			if(py >= parent.height) py = parent.height -1;
+			var l = px - dragOriginX;
+			var t = py - dragOriginY;
+			setPos(l, t);
+			return;
+		}
+
+
+		if(selProcessLock)
+		{
+			// 選択ロック中は処理を行わない
+			if(cursor == window.cursorPointed) cursor = crDefault; // なんとなく・・・
+			return;
+		}
+
+		var n = findLink(x, y); // x, y 位置にリンクがあるかみる
+
+		if(n != lastLink)
+		{
+			if(lastLink != -1)
+			{
+				highlightLink(lastLink, false);
+			}
+			if(n != -1)
+			{
+				highlightLink(n, true);
+			}
+			lastLink = n;
+			keyLink = lastLink;
+		}
+	}
+	
+
+	function onMouseMove(x, y)
+	{
+		// onMouseMove イベントハンドラ
+		super.onMouseMove(...);
+
+		internalMouseMove(x - imageLeft, y - imageTop);
+	}
+
+	function onMouseLeave()
+	{
+		// onMouseLeave イベントハンドラ
+		if(lastLink != -1)
+		{
+			highlightLink(lastLink, false);
+			lastLink = -1;
+		}
+		super.onMouseLeave(...);
+	}
+
+	function setFocusToLink(n, force = false)
+	{
+		// マウスカーソルを リンク番号 n の位置に移動させたり、
+		// フォーカスを与えたりする
+		// force=false の場合はキーボード操作が行われた場合のみ
+		// マウスカーソルを移動するが、force=true のばあいはキーボードの状態に
+		// 関わらずマウスカーソルを移動し、フォーカスを設定する
+		var linkn = links[n];
+		if(linkn === void) return;
+		var left = linkn.x[0];
+		var top = linkn.y[0];
+		var width = linkn.w[0];
+		var height = linkn.h[0];
+		var x, y;
+		if(linkn.type == ltEdit)
+		{
+			// カーソルはじゃまなので端っこに置く
+			if(vertical)
+			{
+				x = left + (width>>1);
+				y = top;
+			}
+			else
+			{
+				x = left;
+				y = top + (height>>1);
+			}
+		}
+		else
+		{
+			x = left + (width>>1);
+			y = top + (height>>1);
+		}
+		if(!linkn.fixed[0])
+		{
+			// unfixed
+			x += lineLayerOriginX + getLineLayerLeftOffset();
+			y += lineLayerOriginY + getLineLayerTopOffset();
+		}
+
+		// キーボードで操作が行われた場合にのみカーソルを
+		// 移動させるため、該当するキーが押されているかチェックを行う
+		var sgks = window.getKeyState;
+		var process = force || sgks(VK_LEFT) || sgks(VK_UP) || sgks(VK_RIGHT) ||
+			sgks(VK_DOWN) || sgks(VK_TAB);
+		if(process)
+		{
+			selClickLock = false;
+			cursorX = x;
+			cursorY = y;
+			if(force) keyLink = n; // 一応再設定
+		}
+		if(linkn.type == ltEdit || linkn.type == ltCheckBox)
+		{
+			var obj = linkn.object;
+			if(force) obj.focus();
+			return obj;
+		}
+		if(force) focus();
+		return void;
+	}
+
+	function onKeyDown(key, shift)
+	{
+		// キーが押された
+		if(window.preProcessKeys(key, shift)) return;
+
+		if(!focusable || (!numLinks && !hasClick())) { return super.onKeyDown(...); }
+
+		var l, r;
+		if(vertical)
+		{
+			l=VK_RIGHT;
+			r=VK_LEFT;
+		}
+		else
+		{
+			l=VK_LEFT;
+			r=VK_RIGHT;
+		}
+
+		if(!selProcessLock && ((key == VK_UP && !(shift & ssShift)) || key == l ||
+			(key == VK_TAB && (shift & ssShift))))
+		{
+			selClickLock = false;
+			if(keyLink == -1 || keyLink == 0)
+			{
+				var l = focusPrev();
+				if(l !== null) return;
+				keyLink = numLinks - 1;
+			}
+			else
+			{
+				keyLink--;
+			}
+			var obj = setFocusToLink(keyLink);
+			if(obj !== void) obj.focus();
+		}
+		else if(!selProcessLock && (key == VK_DOWN || key == r || (key == VK_TAB && !(shift & ssShift))))
+		{
+			selClickLock = false;
+			if(keyLink == -1 || keyLink == numLinks -1)
+			{
+				var l = focusNext();
+				if(l !== null) return;
+				keyLink = 0;
+			}
+			else
+			{
+				keyLink ++;
+			}
+			var obj = setFocusToLink(keyLink);
+			if(obj !== void) obj.focus();
+		}
+		else if(key == VK_SPACE || key == VK_RETURN)
+		{
+			if(selProcessLock || keyLink == -1) {
+                if (hasClick()) {
+                    processClick();
+				} else {
+					window.checkProceedingKey(key, shift);
+				}
+			} else
+				processLink(keyLink);
+		}
+		else
+		{
+			window.processKeys(key, shift); // window に処理をまかせる
+		}
+	}
+
+	function findPrevFocusable(control, layer)
+	{
+		if(control.linkNum != 0) return this; else return prevFocusable;
+	}
+
+	function findNextFocusable(control, layer)
+	{
+		if(control.linkNum != numLinks -1) return this; else return layer;
+	}
+
+	function onBeforeFocus(layer, blured, direction)
+	{
+		// フォーカスを得る前に呼ばれる
+		// 最初のリンクまでカーソルを移動させる
+
+		if(!selProcessLock)
+		{
+			// キーボードで操作が行われた場合にのみカーソルを
+			// 移動させるため、該当するキーが押されているかチェックを行う
+			var sgks = window.getKeyState;
+			var process = sgks(VK_LEFT) || sgks(VK_UP) || sgks(VK_RIGHT) ||
+				sgks(VK_DOWN) || sgks(VK_TAB);
+
+			if(process && (blured == null || blured.parent != this))
+			{
+				if(direction)
+				{
+					// forward
+					keyLink = 0;
+				}
+				else
+				{
+					// backward
+					keyLink = numLinks-1;
+				}
+				var obj = setFocusToLink(keyLink);
+				if(obj !== void)
+				{
+					super.onBeforeFocus(obj, blured, direction);
+					return;
+				}
+			}
+
+			if(blured != null && blured.parent == this)
+			{
+				if(direction)
+				{
+					if(keyLink == -1 || keyLink == numLinks -1)
+						keyLink = 0;
+					else
+						keyLink++;
+				}
+				else
+				{
+					if(keyLink == -1 || keyLink == 0)
+						keyLink = numLinks - 1;
+					else
+						keyLink--;
+				}
+
+				var obj = setFocusToLink(keyLink);
+				if(obj !== void)
+				{
+					super.onBeforeFocus(obj, blured, direction);
+					return;
+				}
+			}
+		}
+
+		super.onBeforeFocus(...);
+	}
+
+	function locate(newx, newy)
+	{
+		var dx = +newx + marginL - x;
+		var dy = +newy + marginT - y;
+
+		if(newx !== void)
+			x = +newx + marginL;
+
+		if(newy !== void)
+			y = +newy + marginT;
+
+		if(!vertical && newy === void)
+		{
+			// 横位置のみの変更
+			lineLayerPos += dx;
+			lineLayerLength += dx;
+		}
+		else if(vertical && newx === void)
+		{
+			// 縦位置のみの変更
+			lineLayerPos += dy;
+			lineLayerLength += dy;
+		}
+		else
+		{
+			if(newx === void || newy === void)
+			{
+				if(vertical) y = marginT; else x = marginL;
+			}
+			if(inLink!=-1) endLinkLine();
+			fixLineLayer();
+			decideSizeChange();
+			initLineLayer();
+		}
+	}
+
+	function processReturn()
+	{
+		// 改行を処理する
+		if(reline())
+		{
+			return autoReturn;
+		}
+		return false;
+	}
+
+	function processGraph(elm)
+	{
+		// インライン画像を elm に従って表示する
+		var key = adjustColorKey(elm.key);
+		var char = true;
+		char = +elm.char if elm.char !== void;
+		if(putGraph(elm.storage, key, char)) return autoReturn;
+		return false;
+	}
+
+	function setRuby(text)
+	{
+		// 次の文字に対するルビを設定する
+		currentRuby = text;
+	}
+
+	function showBreakGlyph(glyphobj, storage, key)
+	{
+		// 画面に行待ち/ページ待ち記号を表示する
+		glyphobj.parent = this; // 親を自分にする
+		glyphobj.loadImages(storage, key); // 画像を読み込む
+		glyphobj.bringToFront(); // 最前面に
+
+		if(glyphFixedPosition)
+		{
+			glyphobj.setPos(glyphFixedLeft, glyphFixedTop);
+		}
+		else
+		{
+			if(!vertical)
+			{
+				glyphobj.setPos(lineLayerPos + lineLayerOriginX + getLineLayerLeftOffset(),
+					y + lineSize + lineSpacing - glyphobj.height);
+			}
+			else
+			{
+				glyphobj.setPos(x - lineSpacing-  (lineSize>>1) - (glyphobj.width>>1),
+					lineLayerPos + lineLayerOriginY + getLineLayerTopOffset());
+			}
+		}
+		glyphobj.visible = true;
+	}
+
+	function showLineBreakGlyph(glyphobj)
+	{
+		// 行待ち記号を表示
+		showBreakGlyph(glyphobj, lineBreakGlyph, lineBreakGlyphKey);
+	}
+
+	function showPageBreakGlyph(glyphobj)
+	{
+		// ページ待ち記号を表示
+		showBreakGlyph(glyphobj, pageBreakGlyph, pageBreakGlyphKey);
+	}
+
+	function setGlyph(elm)
+	{
+		// クリック待ち記号を設定
+		if(elm.line !== void)
+		{
+			lineBreakGlyph = elm.line;
+			lineBreakGlyphKey = elm.linekey;
+		}
+		if(elm.page !== void)
+		{
+			pageBreakGlyph = elm.page;
+			pageBreakGlyphKey = elm.pagekey;
+		}
+		glyphFixedPosition = +elm.fix if elm.fix !== void;
+		glyphFixedLeft = +elm.left if elm.left !== void;
+		glyphFixedTop = +elm.top if elm.top !== void;
+	}
+
+	function setIndent()
+	{
+		// インデントを現在位置に設定
+		if(vertical) indentxpos = y - marginT; else indentxpos = x - marginL;
+	}
+
+	function resetIndent()
+	{
+		// インデントを解除
+		indentxpos = 0;
+	}
+
+	function assignComp()
+	{
+		// 対になるレイヤの内容をコピー
+		assign(comp);
+	}
+
+	function beginTransition(elm)
+	{
+		// elm に従ってトランジションを行う
+		super.beginTransition(elm, comp);
+	}
+
+	function internalAssign(src, copyvisiblestate)
+	{
+		// レイヤの情報をコピー
+		// ( コピーする情報が膨大なのでちょっと実行時間がかかる )
+
+		// このレイヤ自身の画像、位置、透明度などのコピー
+		assignImages(src);
+		if(copyvisiblestate)
+			assignVisibleState(src); // assignImages は可視・不可視などの情報はコピーしないため
+
+		focusable = src.focusable;
+
+		// links のコピー
+		{
+			invalidateLinkObjects(); // 一応オブジェクトはすべて無効化
+			var tl = links, sl = src.links;
+			tl.count = sl.count;
+			for(var i = sl.count-1; i>=0; i--)
+			{
+				if(sl[i] === void) continue;
+				var tl_d = (tl[i] = %[]);
+				var sl_d = sl[i];
+				(Dictionary.assign incontextof tl_d)(sl_d);
+				// ただし、x, y, w, h, fixed の各メンバは実際に内容を assign
+				// しないと駄目
+				(tl_d.x = []).assign(sl_d.x);
+				(tl_d.y = []).assign(sl_d.y);
+				(tl_d.w = []).assign(sl_d.w);
+				(tl_d.h = []).assign(sl_d.h);
+				(tl_d.fixed = []).assign(sl_d.fixed);
+
+				// タイプに従って
+				var type = tl_d.type;
+				if(type == ltButton)
+				{
+					// ボタン
+					var sl_d_object = sl_d.object;
+					var object = new LinkButtonLayer(window, this);
+						// object は再作成
+					object.assign(sl_d_object);
+					tl_d.object = object;
+				}
+				else if(type == ltEdit)
+				{
+					// 単一行エディット
+					var sl_d_object = sl_d.object;
+					var object = new LinkEditLayer(window, this);
+						// object は再作成
+					object.assign(sl_d_object);
+					tl_d.object = object;
+				}
+				else if(type == ltCheckBox)
+				{
+					// チェックボックス
+					var sl_d_object = sl_d.object;
+					var object = new LinkCheckBoxLayer(window, this);
+						// object は再作成
+					object.assign(sl_d_object);
+					tl_d.object = object;
+				}
+			}
+		}
+
+
+		// lineLayerLinks のコピー
+		{
+			var tl = lineLayerLinks, sl = src.lineLayerLinks;
+			tl.count = sl.count;
+			for(var i = sl.count-1; i>=0; i--)
+			{
+				(Dictionary.assign incontextof (tl[i] = %[]))(sl[i]);
+			}
+		}
+
+		// lineLayer の位置、サイズ、画像、フォント情報をコピー
+		{
+			var tl = lineLayer, sl = src.lineLayer;
+			tl.assignImages(sl);
+			tl.assignVisibleState(sl);
+			var tf = tl.font, sf = sl.font;
+			tf.face = sf.face;
+			tf.angle = sf.angle;
+			tf.bold = sf.bold;
+			tf.italic = sf.italic;
+			tf.height = sf.height;
+		}
+
+		// そのほか
+		highlightLayer.visible = false;
+		keyLink = -1;
+		imageModified = true;
+
+		// その他の情報のコピー
+		// [start_assign_vars] と [end_assign_vars] の間は
+		// perl によって自動生成されるので、このマークを消したり、
+		// 二つのマークの間を編集したりしないこと。
+		// [start_assign_vars]
+		frameGraphic = src.frameGraphic;
+		frameKey = src.frameKey;
+		frameColor = src.frameColor;
+		frameOpacity = src.frameOpacity;
+		marginL = src.marginL;
+		marginT = src.marginT;
+		marginR = src.marginR;
+		marginB = src.marginB;
+		marginRCh = src.marginRCh;
+		x = src.x;
+		y = src.y;
+		relinexpos = src.relinexpos;
+		isLastLine = src.isLastLine;
+		indentxpos = src.indentxpos;
+		linkFilled = src.linkFilled;
+		numLinks = src.numLinks;
+		selProcessLock = src.selProcessLock;
+		storedSelProcessLock = src.storedSelProcessLock;
+		defaultLinkColor = src.defaultLinkColor;
+		defaultLinkOpacity = src.defaultLinkOpacity;
+		defaultFontSize = src.defaultFontSize;
+		fontSize = src.fontSize;
+		_fontSize = src._fontSize;
+		defaultLineSize = src.defaultLineSize;
+		reserveLineSize = src.reserveLineSize;
+		lineSize = src.lineSize;
+		defaultRubySize = src.defaultRubySize;
+		rubySize = src.rubySize;
+		_rubySize = src._rubySize;
+		defaultRubyOffset = src.defaultRubyOffset;
+		rubyOffset = src.rubyOffset;
+		_rubyOffset = src._rubyOffset;
+		defaultLineSpacing = src.defaultLineSpacing;
+		lineSpacing = src.lineSpacing;
+		defaultPitch = src.defaultPitch;
+		pitch = src.pitch;
+		defaultShadow = src.defaultShadow;
+		shadow = src.shadow;
+		defaultEdge = src.defaultEdge;
+		edge = src.edge;
+		defaultShadowColor = src.defaultShadowColor;
+		shadowColor = src.shadowColor;
+		defaultEdgeColor = src.defaultEdgeColor;
+		edgeColor = src.edgeColor;
+		defaultBold = src.defaultBold;
+		bold = src.bold;
+		defaultFace = src.defaultFace;
+		userFace = src.userFace;
+		fontFace = src.fontFace;
+		defaultChColor = src.defaultChColor;
+		chColor = src.chColor;
+		defaultAntialiased = src.defaultAntialiased;
+		antialiased = src.antialiased;
+		vertical = src.vertical;
+		currentRuby = src.currentRuby;
+		lastDrawnCh = src.lastDrawnCh;
+		edgeExtent = src.edgeExtent;
+		edgeEmphasis = src.edgeEmphasis;
+		shadowOffsetX = src.shadowOffsetX;
+		shadowOffsetY = src.shadowOffsetY;
+		sizeChanged = src.sizeChanged;
+		nextClearFlag = src.nextClearFlag;
+		lineLayerBase = src.lineLayerBase;
+		lineLayerPos = src.lineLayerPos;
+		lineLayerLength = src.lineLayerLength;
+		lineLayerOriginX = src.lineLayerOriginX;
+		lineLayerOriginY = src.lineLayerOriginY;
+		align = src.align;
+		defaultAutoReturn = src.defaultAutoReturn;
+		autoReturn = src.autoReturn;
+		lineBreakGlyph = src.lineBreakGlyph;
+		lineBreakGlyphKey = src.lineBreakGlyphKey;
+		pageBreakGlyph = src.pageBreakGlyph;
+		pageBreakGlyphKey = src.pageBreakGlyphKey;
+		glyphFixedPosition = src.glyphFixedPosition;
+		glyphFixedLeft = src.glyphFixedLeft;
+		glyphFixedTop = src.glyphFixedTop;
+		draggable = src.draggable;
+		selClickLock = src.selClickLock;
+		lastMouseX = src.lastMouseX;
+		lastMouseY = src.lastMouseY;
+		// [end_assign_vars]
+	}
+
+	function assign(src)
+	{
+		internalAssign(src, true);
+	}
+
+	function store()
+	{
+		// 現在の状態を辞書配列に記録し、その辞書配列を返す
+		// [start_store_vars] と [end_store_vars] の間は
+		// (略)
+		var dic = super.store();
+		// [start_store_vars]
+		dic.frameGraphic = frameGraphic;
+		dic.frameKey = frameKey;
+		dic.frameColor = frameColor;
+		dic.frameOpacity = frameOpacity;
+		dic.marginL = marginL;
+		dic.marginT = marginT;
+		dic.marginR = marginR;
+		dic.marginB = marginB;
+		dic.marginRCh = marginRCh;
+		dic.defaultLinkColor = defaultLinkColor;
+		dic.defaultLinkOpacity = defaultLinkOpacity;
+		dic.defaultFontSize = defaultFontSize;
+		dic.defaultLineSize = defaultLineSize;
+		dic.defaultRubySize = defaultRubySize;
+		dic.defaultRubyOffset = defaultRubyOffset;
+		dic.defaultLineSpacing = defaultLineSpacing;
+		dic.defaultPitch = defaultPitch;
+		dic.defaultShadow = defaultShadow;
+		dic.defaultEdge = defaultEdge;
+		dic.defaultShadowColor = defaultShadowColor;
+		dic.defaultEdgeColor = defaultEdgeColor;
+		dic.defaultBold = defaultBold;
+		dic.defaultFace = defaultFace;
+		dic.defaultChColor = defaultChColor;
+		dic.vertical = vertical;
+		dic.edgeExtent = edgeExtent;
+		dic.edgeEmphasis = edgeEmphasis;
+		dic.shadowOffsetX = shadowOffsetX;
+		dic.shadowOffsetY = shadowOffsetY;
+		dic.defaultAutoReturn = defaultAutoReturn;
+		dic.lineBreakGlyph = lineBreakGlyph;
+		dic.lineBreakGlyphKey = lineBreakGlyphKey;
+		dic.pageBreakGlyph = pageBreakGlyph;
+		dic.pageBreakGlyphKey = pageBreakGlyphKey;
+		dic.glyphFixedPosition = glyphFixedPosition;
+		dic.glyphFixedLeft = glyphFixedLeft;
+		dic.glyphFixedTop = glyphFixedTop;
+		dic.draggable = draggable;
+		// [end_store_vars]
+		return dic;
+	}
+
+	function restore(dic)
+	{
+		imageModified = true;
+		// 状態を dic から読み出す
+		// [start_restore_vars] と [end_restore_vars] の間は
+		// (略)
+		// [start_restore_vars]
+		frameGraphic = dic.frameGraphic if dic.frameGraphic !== void;
+		frameKey = dic.frameKey if dic.frameKey !== void;
+		frameColor = dic.frameColor if dic.frameColor !== void;
+		frameOpacity = dic.frameOpacity if dic.frameOpacity !== void;
+		marginL = dic.marginL if dic.marginL !== void;
+		marginT = dic.marginT if dic.marginT !== void;
+		marginR = dic.marginR if dic.marginR !== void;
+		marginB = dic.marginB if dic.marginB !== void;
+		marginRCh = dic.marginRCh if dic.marginRCh !== void;
+		defaultLinkColor = dic.defaultLinkColor if dic.defaultLinkColor !== void;
+		defaultLinkOpacity = dic.defaultLinkOpacity if dic.defaultLinkOpacity !== void;
+		defaultFontSize = dic.defaultFontSize if dic.defaultFontSize !== void;
+		defaultLineSize = dic.defaultLineSize if dic.defaultLineSize !== void;
+		defaultRubySize = dic.defaultRubySize if dic.defaultRubySize !== void;
+		defaultRubyOffset = dic.defaultRubyOffset if dic.defaultRubyOffset !== void;
+		defaultLineSpacing = dic.defaultLineSpacing if dic.defaultLineSpacing !== void;
+		defaultPitch = dic.defaultPitch if dic.defaultPitch !== void;
+		defaultShadow = dic.defaultShadow if dic.defaultShadow !== void;
+		defaultEdge = dic.defaultEdge if dic.defaultEdge !== void;
+		defaultShadowColor = dic.defaultShadowColor if dic.defaultShadowColor !== void;
+		defaultEdgeColor = dic.defaultEdgeColor if dic.defaultEdgeColor !== void;
+		defaultBold = dic.defaultBold if dic.defaultBold !== void;
+		defaultFace = dic.defaultFace if dic.defaultFace !== void;
+		defaultChColor = dic.defaultChColor if dic.defaultChColor !== void;
+		vertical = dic.vertical if dic.vertical !== void;
+		edgeExtent = dic.edgeExtent if dic.edgeExtent !== void;
+		edgeEmphasis = dic.edgeEmphasis if dic.edgeEmphasis !== void;
+		shadowOffsetX = dic.shadowOffsetX if dic.shadowOffsetX !== void;
+		shadowOffsetY = dic.shadowOffsetY if dic.shadowOffsetY !== void;
+		defaultAutoReturn = dic.defaultAutoReturn if dic.defaultAutoReturn !== void;
+		lineBreakGlyph = dic.lineBreakGlyph if dic.lineBreakGlyph !== void;
+		lineBreakGlyphKey = dic.lineBreakGlyphKey if dic.lineBreakGlyphKey !== void;
+		pageBreakGlyph = dic.pageBreakGlyph if dic.pageBreakGlyph !== void;
+		pageBreakGlyphKey = dic.pageBreakGlyphKey if dic.pageBreakGlyphKey !== void;
+		glyphFixedPosition = dic.glyphFixedPosition if dic.glyphFixedPosition !== void;
+		glyphFixedLeft = dic.glyphFixedLeft if dic.glyphFixedLeft !== void;
+		glyphFixedTop = dic.glyphFixedTop if dic.glyphFixedTop !== void;
+		draggable = dic.draggable if dic.draggable !== void;
+		// [end_restore_vars]
+		super.restore(dic);
+	}
+
+	function atEndOfTransition(src, withchildren, exchange)
+	{
+		// atEndOfTransition オーバーライド
+		super.atEndOfTransition(...);
+		if(src == null)
+		{
+			//・メッセージレイヤ、前景レイヤが、srcなしでトランジション (children=true)
+			//　何もしなくてよいが、終了後それらの子レイヤは自動的に非表示になる。
+		}
+		else
+		{
+			//・メッセージレイヤ、前景レイヤが、srcありでトランジション (children=true)
+			//　重要な情報をトランジション元と交換、exchange=false の場合はさらに
+			//　トランジション元の情報をトランジション先にコピー。ただし、このコピーの際に
+			//　ウィンドウの可視・不可視の情報はコピーしない。
+			assign(src, false);
+			exchangeInfo();
+			window.swapMessageLayer(id);
+		}
+	}
+
+	function assignTransSrc()
+	{
+		// トランジションもとをコピーする
+		assign(comp, true);
+	}
+
+	function exchangeInfo()
+	{
+		// comp と情報を取り替える
+		// すでに 画像の内容、ツリー構造は取り変わっているので
+		// 名前などを取り替える
+		// また、ウィンドウの管理情報も更新するようにする
+		var src = comp;
+		var tmp = src.name;
+		src.name = name;
+		name = tmp;
+	}
+
+	function setHiddenStateByUser(b)
+	{
+		// ユーザが右クリックなどでメッセージレイヤを一時的に隠すときに
+		// 呼ばれる
+		if(b)
+		{
+			visibleBeforeUserInvisible = visible;
+			invisibleByUser = true; // ユーザにより一時的に不可視
+			visible = false;
+		}
+		else
+		{
+			invisibleByUser = false; // 可視
+			visible = visibleBeforeUserInvisible;
+		}
+	}
+
+}
+
+
+// TJS スクリプトはここで終わり
+"
+END_OF_TJS_SCRIPT
+# "; /*
+
+# assign/store/restore でコピーすべき変数の再生成を行う perl スクリプト
+
+open FH, "MessageLayer.tjs" or die;
+undef($/);
+$content = <FH>;
+
+$list_assign = '';
+$list_store = '';
+$list_restore = '';
+while($content =~ /\/\*(\w+)\*\/var\s+(\w+)/gs)
+{
+	$a = $1;
+	$v = $2;
+	if($a =~ /C/)
+	{ $list_assign .= "\t\t$v = src.$v;\n"; }
+	if($a =~ /S/)
+	{
+		$list_store .= "\t\tdic.$v = $v;\n";
+		$list_restore .= "\t\t$v = dic.$v if dic.$v !== void;\n";
+	}
+}
+
+$content =~
+s/\t\t\/\/ \[start_assign_vars\]\n.*?\t\t\/\/ \[end_assign_vars\]/\t\t\/\/ \[start_assign_vars\]\n$list_assign\t\t\/\/ \[end_assign_vars\]/s;
+$content =~
+s/\t\t\/\/ \[start_store_vars\]\n.*?\t\t\/\/ \[end_store_vars\]/\t\t\/\/ \[start_store_vars\]\n$list_store\t\t\/\/ \[end_store_vars\]/s;
+$content =~
+s/\t\t\/\/ \[start_restore_vars\]\n.*?\t\t\/\/ \[end_restore_vars\]/\t\t\/\/ \[start_restore_vars\]\n$list_restore\t\t\/\/ \[end_restore_vars\]/s;
+
+open FH, ">MessageLayer.tjs" or die;
+print FH $content;
+
+
+# */

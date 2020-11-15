@@ -1,0 +1,223 @@
+//
+// $Id: DragDropSample.tjs,v 1.1 2007/09/03 11:53:51 m2 Exp $
+//
+
+
+/*----------------------------------------------------------------------
+ * ボックス
+ * 
+ * ボールを一個含んだ「ボックス」
+ *
+ * 他のボックスにボールをＤ＆Ｄできる。
+ *
+ * 外部ファイルを explorer からＤ＆Ｄすると、
+ * そのボックスにボールが一個増える。
+ ----------------------------------------------------------------------*/
+class Box extends KWidget
+{
+  var ball;
+
+  //------------------------------
+  // コンストラクタ
+  //------------------------------
+  function Box(window, cm = 1, rm = 1) {
+    // ウィジェット初期化
+    super.KWidget(window, "");
+    setMinMaxSize(30, 30, 200 * cm, 200 * rm);
+
+    // ボックスの中に表示するボールのレイヤを作成。
+    // 初期状態では非表示
+    ball = new global.KWidget(window);
+    ball.loadImages("ball");
+    ball.setFixedSizeToImageSize();
+    ball.parent = this;
+    ball.visible = false;
+    ball.hitThreshold = 256;
+  }
+
+  //------------------------------
+  // サイズ変更通知
+  //------------------------------
+  function onSizeModified(w, h) {
+    // ボックスの再描画
+    fillRect(0, 0, w, h, 0xFFFF0000);
+    fillRect(2, 2, w - 4, h - 4, 0xFFFFFFFF);
+    // ボールが表示状態なら、ボックス内に収まるように再配置
+    if (ball.visible)
+      locateBall(ball.left + ball.width / 2,
+		 ball.top + ball.height / 2);
+  }
+
+  //------------------------------
+  // ボールがボックス内に収まるように配置する
+  //------------------------------
+  function locateBall(x, y) {
+    x = int(Math.max(2, Math.min(width - ball.width - 4, x - ball.width / 2)));
+    y = int(Math.max(2, Math.min(height - ball.height - 4, y - ball.height / 2)));
+    ball.setPos(x, y);
+  }
+
+  //------------------------------
+  // ファイルドロップ通知
+  //------------------------------
+  function onFileDrop(x, y) {
+    // ボールが非表示なら、表示状態にする
+    // (ファイルドロップで新規ボールを追加)
+    if (! ball.visible) {
+      // ボール表示
+      ball.visible = true;
+      ball.opacity = 255;
+      // カーソル位置に配置
+      locateBall(x, y);
+    }
+  }
+
+  //------------------------------
+  // ドラッグ開始通知
+  //------------------------------
+  function onDragEnter(x, y) {
+    // ドラッグ開始した座標がボールの中にあれば、
+    // パケットのドラッグ開始
+    if (ball.visible
+	&& x >= ball.left
+	&& x < ball.left + ball.width
+	&& y >= ball.top
+	&& y < ball.top + ball.height) {
+      // ボールを非表示状態にする
+      ball.visible = false;
+      // 名前が"box"、引数に自分自身へのリファレンスを格納した
+      // パケットをドラッグ開始する
+      beginDragPacket(new KPacket("box", this));
+    }
+  }
+
+  //------------------------------
+  // ボールが非表示の時に限り、
+  // 名前が「box」のパケットを受け付ける
+  //------------------------------
+  function isPacketAcceptable(packet) {
+    return packet.name == "box" && ! ball.visible;
+  }
+
+  //------------------------------
+  // パケット侵入
+  //------------------------------
+  function onPacketEnter(x, y) {
+    // ボールを透明度128で表示
+    ball.visible = true;
+    ball.opacity = 128;
+    // ボールをマウス座標に表示
+    locateBall(x, y);
+  }
+
+  //------------------------------
+  // パケット移動
+  //------------------------------
+  function onPacketMove(x, y) {
+    // ボールをマウス座標に表示
+    locateBall(x, y);
+  }
+
+  //------------------------------
+  // パケット離脱
+  //------------------------------
+  function onPacketLeave(x, y) {
+    // ボールを非表示に
+    ball.visible = false;
+  }
+
+  //------------------------------
+  // パケットがドロップ
+  //------------------------------
+  function onPacketDrop(x, y) {
+    // ボールを表示状態で確定
+    ball.visible = true;
+    ball.opacity = 255;
+    // ボールをマウス座標に表示
+    locateBall(x, y);
+  }
+
+  //------------------------------
+  // パケットがキャンセル
+  //------------------------------
+  function onPacketCancel {
+    // ボールを表示状態で確定
+    ball.visible = true;
+    ball.opacity = 255;
+  }
+};
+
+// ボックスウィンドウ
+class DragDropSample extends KWindow {
+  // コンストラクタ
+  function DragDropSample(name) {
+    super.KWindow(name);
+
+    // ウィンドウ初期設定
+    caption = "ドラッグ＆ドロップサンプル";
+    imeMode = imDontCare;
+
+    // ウィンドウ内のウィジェットの初期値を設定
+    defaultSpace = 2;
+    defaultMargin = 3;
+
+    // ボールを作成、配置
+    var ballGrid = new KGridLayout(this, "ballgrid");
+    ballGrid.add(0, 0, new Box(this));
+    ballGrid.add(0, 1, new Box(this));
+    ballGrid.add(0, 2, new Box(this));
+    ballGrid.add(0, 3, new Box(this));
+    ballGrid.add(1, 0, new Box(this));
+    ballGrid.add(1, 3, new Box(this));
+    ballGrid.add(2, 0, new Box(this));
+    ballGrid.add(2, 3, new Box(this));
+    ballGrid.add(3, 0, new Box(this));
+    ballGrid.add(3, 1, new Box(this));
+    ballGrid.add(3, 2, new Box(this));
+    ballGrid.add(3, 3, new Box(this));
+    ballGrid.add(1, 1, new Box(this, 2, 2), 2, 2);
+
+    defaultSpace = 0;
+    defaultMargin = 0;
+    defaultAlignHorizontal = ALIGN_RIGHT;
+
+    // グリッドを作成、ボールグリッドとリサイズハンドルを配置
+    var grid = new KGridLayout(this);
+    grid.add(0, 0, ballGrid);
+    grid.add(0, 1, new KWindowResizeHandle(this, 20, 20));
+
+    // グリッドを配置
+    primaryWidget.add(grid);
+
+    // 永続化辞書の作成
+    var dict = new KPersistentDictionary(System.dataPath + name + "_dict.txt");
+    add(dict);
+    bindPersistentDictionary(dict);
+  }
+}
+
+//----------------------------------------------------------------------
+// サンプル表示・非表示の切り替え
+global.dragDropSample = [];
+
+function showDragDropSample
+{
+  if (dragDropSample.count == 0) {
+    // ウィンドウを3つ作成
+    dragDropSample.add(new DragDropSample("dragdrop1"));
+    dragDropSample.add(new DragDropSample("dragdrop2"));
+    dragDropSample.add(new DragDropSample("dragdrop3"));
+    // 最初の1個のボールを表示する
+    dragDropSample[0].ballgrid.childAt(0, 0).ball.visible = true;
+    dragDropSample[0].ballgrid.childAt(0, 0).locateBall(0, 0);
+  }
+
+  for (var i = 0; i < dragDropSample.count; i++)
+    dragDropSample[i].visible = true;
+}
+
+function hideDragDropSample
+{
+  for (var i = 0; i < dragDropSample.count; i++)
+    dragDropSample[i].visible = false;
+}

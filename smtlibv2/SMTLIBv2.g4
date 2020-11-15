@@ -473,9 +473,12 @@ PK_Version
     : ':version'
     ;
 
+RS_Model //  for model responses
+    : 'model'
+    ;
+
 UndefinedSymbol:
     Sym (Digit | Sym)*;
-
 
 
 // Parser Rules Start
@@ -483,11 +486,10 @@ UndefinedSymbol:
 // Starting rule(s)
 
 start
-    : script EOF
-    ;
-
-response
-    : general_response EOF
+    : logic EOF
+    | theory_decl EOF
+    | script EOF
+    | general_response EOF
     ;
 
 generalReservedWord
@@ -504,6 +506,7 @@ generalReservedWord
     | GRW_Numeral
     | GRW_Par
     | GRW_String
+    | RS_Model
     ;
 
 
@@ -792,7 +795,7 @@ script
     ;
 
 cmd_assert
-    : CMD_Assert
+    : CMD_Assert term
     ;
 
 cmd_checkSat
@@ -800,47 +803,49 @@ cmd_checkSat
     ;
 
 cmd_checkSatAssuming
-    : CMD_CheckSatAssuming
+    : CMD_CheckSatAssuming ParOpen prop_literal* ParClose
     ;
 
 cmd_declareConst
-    : CMD_DeclareConst
+    : CMD_DeclareConst symbol sort
     ;
 
 cmd_declareDatatype
-    : CMD_DeclareDatatype
+    : CMD_DeclareDatatype symbol datatype_dec
     ;
 
 cmd_declareDatatypes
-    : CMD_DeclareDatatypes
+    // cardinalitiees for sort_dec and datatype_dec have to be n+1
+    : CMD_DeclareDatatypes ParOpen sort_dec+ ParClose ParOpen datatype_dec+ ParClose
     ;
 
 cmd_declareFun
-    : CMD_DeclareFun
+    : CMD_DeclareFun symbol ParOpen sort* ParClose sort
     ;
 
 cmd_declareSort
-    : CMD_DeclareSort
+    : CMD_DeclareSort symbol numeral
     ;
 
 cmd_defineFun
-    : CMD_DefineFun
+    : CMD_DefineFun function_def
     ;
 
 cmd_defineFunRec
-    : CMD_DefineFunRec
+    : CMD_DefineFunRec function_def
     ;
 
 cmd_defineFunsRec
-    : CMD_DefineFunsRec
+    // cardinalitiees for function_dec and term have to be n+1
+    : CMD_DefineFunsRec ParOpen function_dec+ ParClose ParOpen term+ ParClose
     ;
 
 cmd_defineSort
-    : CMD_DefineSort
+    : CMD_DefineSort symbol ParOpen symbol* ParClose sort
     ;
 
 cmd_echo
-    : CMD_Echo
+    : CMD_Echo string
     ;
 
 cmd_exit
@@ -856,7 +861,7 @@ cmd_getAssignment
     ;
 
 cmd_getInfo
-    : CMD_GetInfo
+    : CMD_GetInfo info_flag
     ;
 
 cmd_getModel
@@ -864,7 +869,7 @@ cmd_getModel
     ;
 
 cmd_getOption
-    : CMD_GetOption
+    : CMD_GetOption keyword
     ;
 
 cmd_getProof
@@ -880,15 +885,15 @@ cmd_getUnsatCore
     ;
 
 cmd_getValue
-    : CMD_GetValue
+    : CMD_GetValue ParOpen term+ ParClose
     ;
 
 cmd_pop
-    : CMD_Pop
+    : CMD_Pop numeral
     ;
 
 cmd_push
-    : CMD_Push
+    : CMD_Push numeral
     ;
 
 cmd_reset
@@ -900,52 +905,48 @@ cmd_resetAssertions
     ;
 
 cmd_setInfo
-    : CMD_SetInfo
+    : CMD_SetInfo attribute
     ;
 
 cmd_setLogic
-    : CMD_SetLogic
+    : CMD_SetLogic symbol
     ;
 
 cmd_setOption
-    : CMD_SetOption
+    : CMD_SetOption option
     ;
 
 command
-    : ParOpen cmd_assert term ParClose
+    : ParOpen cmd_assert ParClose
     | ParOpen cmd_checkSat ParClose
     | ParOpen cmd_checkSatAssuming ParClose
-    | ParOpen cmd_declareConst symbol sort ParClose
-    | ParOpen cmd_declareDatatype symbol datatype_dec ParClose
-    // cardinalitiees for sort_dec and datatype_dec have to be n+1
-    | ParOpen cmd_declareDatatypes ParOpen sort_dec+ ParClose ParOpen
-    datatype_dec+ ParClose ParClose
-    | ParOpen cmd_declareFun symbol ParOpen sort* ParClose sort ParClose
-    | ParOpen cmd_declareSort symbol numeral ParClose
-    | ParOpen cmd_defineFun function_def ParClose
-    | ParOpen cmd_defineFunRec function_def ParClose
-    // cardinalitiees for function_dec and term have to be n+1
-    | ParOpen cmd_defineFunsRec ParOpen function_dec+ ParClose
-    ParOpen term+ ParClose ParClose
-    | ParOpen cmd_defineSort symbol ParOpen symbol* ParClose sort ParClose
-    | ParOpen cmd_echo string ParClose
+    | ParOpen cmd_declareConst ParClose
+    | ParOpen cmd_declareDatatype ParClose
+    | ParOpen cmd_declareDatatypes ParClose
+    | ParOpen cmd_declareFun ParClose
+    | ParOpen cmd_declareSort ParClose
+    | ParOpen cmd_defineFun ParClose
+    | ParOpen cmd_defineFunRec ParClose
+    | ParOpen cmd_defineFunsRec ParClose
+    | ParOpen cmd_defineSort ParClose
+    | ParOpen cmd_echo ParClose
     | ParOpen cmd_exit ParClose
     | ParOpen cmd_getAssertions ParClose
     | ParOpen cmd_getAssignment ParClose
-    | ParOpen cmd_getInfo info_flag ParClose
+    | ParOpen cmd_getInfo ParClose
     | ParOpen cmd_getModel ParClose
-    | ParOpen cmd_getOption keyword ParClose
+    | ParOpen cmd_getOption ParClose
     | ParOpen cmd_getProof ParClose
     | ParOpen cmd_getUnsatAssumptions ParClose
     | ParOpen cmd_getUnsatCore ParClose
-    | ParOpen cmd_getValue ParOpen term+ ParClose ParClose
-    | ParOpen cmd_pop numeral ParClose
-    | ParOpen cmd_push numeral ParClose
+    | ParOpen cmd_getValue ParClose
+    | ParOpen cmd_pop ParClose
+    | ParOpen cmd_push ParClose
     | ParOpen cmd_reset ParClose
     | ParOpen cmd_resetAssertions ParClose
-    | ParOpen cmd_setInfo attribute ParClose
-    | ParOpen cmd_setLogic symbol ParClose
-    | ParOpen cmd_setOption option ParClose
+    | ParOpen cmd_setInfo ParClose
+    | ParOpen cmd_setLogic ParClose
+    | ParOpen cmd_setOption ParClose
     ;
 
 
@@ -997,11 +998,9 @@ reason_unknown
     ;
 
 model_response
-    : ParOpen CMD_DefineFun function_def ParClose
-    | ParOpen CMD_DefineFunRec function_def ParClose
-    // cardinalitiees for function_dec and term have to be n+1
-    | ParOpen CMD_DefineFunsRec ParOpen function_dec+ ParClose ParOpen term+
-    ParClose ParClose
+    : ParOpen cmd_defineFun ParClose
+    | ParOpen cmd_defineFunRec ParClose
+    | ParOpen cmd_defineFunsRec ParClose
     ;
 
 info_response
@@ -1045,7 +1044,8 @@ get_info_response
     ;
 
 get_model_response
-    : ParOpen model_response* ParClose
+    : ParOpen RS_Model model_response* ParClose
+    | ParOpen model_response* ParClose
     ;
 
 get_option_response

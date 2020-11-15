@@ -1,0 +1,120 @@
+/******************************************************************************
+	system_mb/ui/MBSelectItemForFile.tjs
+*******************************************************************************/
+
+
+class MBSelectItemForFile extends MBSelectItem
+{
+	var intItemID;	// アイテムID
+	var strItemType;	// アイテム種別
+	var objIconLayer;	// アイコン表示用レイヤ
+	
+	var intLabelLeft = 18;
+	
+	
+	function MBSelectItemForFile(win, par, type, id)
+	{
+		// コンストラクタ
+		
+		var str = setInfo(type, id);
+		
+		super.MBSelectItem(win, par, str);
+		
+		width = font.getTextWidth(strItemLabel) + intHorizontalMargin * 2 + intLabelLeft;
+		drawItemFace();
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate objIconLayer if (objIconLayer !== void);
+		
+		super.finalize(...);
+	}
+	
+	function setInfo(type, id)
+	{
+		// 情報をセット
+		
+		strItemType = type;
+		intItemID = id;
+		
+		var obj = MBTable[type][id];
+		
+		if (typeof(obj) != 'Object') {
+			throw new Exception('アイテムの指定が正しくありません。');
+			return;
+		}
+		
+		return obj.name;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function drawItemFace()
+	{
+		// 通常のリンク文字を描く
+		
+		setIcon();
+		
+		fillRect(0, 0, width, height, bgColor);
+		drawText(intLabelLeft, intVerticalMargin, strItemLabel, fontColor);
+		
+		blActive = true;
+	}
+	
+	function drawItemFaceFocused()
+	{
+		// 選択状態リンク文字を描く
+		
+		if (parent.isNewLayer) {
+			parent.isNewLayer = false;
+		}
+		else {
+			sndfunc.seSelect();
+		}
+		
+		setIcon();
+		
+		fillRect(0, 0, width, height, bgColorFocused);
+		drawText(intLabelLeft, intVerticalMargin, strItemLabel, fontColor);
+	}
+	
+	function drawItemFaceDisabled()
+	{
+		// 選択不可のリンク文字を描く
+		
+		setIcon();
+		
+		fillRect(0, 0, width, height, bgColor);
+		drawText(intLabelLeft, intVerticalMargin, strItemLabel, fontColorDisabled);
+		blActive = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function setIcon()
+	{
+		// アイコンをセット
+		
+		if (objIconLayer !== void && isvalid(objIconLayer)) {
+			return;
+		}
+		
+		var fname = MBTable[strItemType][intItemID].icon;
+		
+		if (fname == "") {
+			fname = 'item';
+		}
+		
+		objIconLayer = new GraphicLayer(window, this);
+		objIconLayer.loadImages(%[storage : sysfunc.getPathImage("itemicon/%s".sprintf(fname))]);
+		objIconLayer.setSizeToImageSize();
+		objIconLayer.setPos(0, 0);
+		objIconLayer.hitType = htMask;
+		objIconLayer.hitThreshold = 256;	// 全域透過
+		objIconLayer.opacity = 255;
+		objIconLayer.visible = true;
+	}
+}
