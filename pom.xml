@@ -188,6 +188,7 @@
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
+                <module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
 				<module>ply</module>
