@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar bibcode;
 
 bibcode
-   : year publish volume section page author EOF
+   : year publish volume pagesection author EOF
    ;
 
 year
@@ -40,31 +40,48 @@ year
    ;
 
 publish
-   : (LETTER | DIGIT | DOT) (LETTER | DIGIT | DOT) (LETTER | DIGIT | DOT) (LETTER | DIGIT | DOT) (LETTER | DIGIT | DOT)
+   : (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT)
    ;
 
 volume
-   : (DIGIT | DOT) (DIGIT | DOT) (DIGIT | DOT) (DIGIT | DOT)
+   : (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT) (letter | digit | DOT)
+   ;
+
+pagesection
+   : section? page
    ;
 
 section
-   : LETTER
+   : letter
    ;
 
 page
-   : (DIGIT | DOT)+
+   : (digit | DOT)+
    ;
 
 author
-   : LETTER
+   : letter
    ;
 
 DOT
    : '.'
    ;
 
-LETTER
-   : [a-zA-Z]
+letter
+   : UPPERLETTER
+   | LOWERLETTER
+   ;
+
+digit
+   : DIGIT
+   ;
+
+UPPERLETTER
+   : [A-Z]
+   ;
+
+LOWERLETTER
+   : [a-z]
    ;
 
 DIGIT
