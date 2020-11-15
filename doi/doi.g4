@@ -30,35 +30,93 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*
+// https://www.doi.org
 
-https://www.doi.org
 
-*/
+// https://tools.ietf.org/id/draft-paskin-doi-uri-04.txt
+
 grammar doi;
 
-doi
-   : prefix '/' suffix EOF
+doiuri
+   : scheme ':' encodeddoi ('?' query)? ('#' fragment_)? EOF?
+   ;
+
+scheme
+   : 'doi'
+   ;
+
+encodeddoi
+   : prefix '/' suffix
    ;
 
 prefix
-   : directory ('.' registrant_code)+
-   ;
-
-directory
-   : TEXT
-   ;
-
-registrant_code
-   : TEXT
+   : segment
    ;
 
 suffix
-   : TEXT
+   : segment ('/' segment)*
    ;
 
-TEXT
-   : ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')+
+segment
+   : PCHAR+
+   ;
+
+query
+   : (PCHAR | '/' | '?')*
+   ;
+
+fragment_
+   : (PCHAR | '/' | '?')*
+   ;
+
+PCHAR
+   : UNRESERVED
+   | ESCAPED
+   | ';'
+   | ':'
+   | '@'
+   | '&'
+   | '='
+   | '+'
+   | '$'
+   | ','
+   ;
+
+UNRESERVED
+   : ALPHA
+   | DIGIT
+   | MARK
+   ;
+
+ESCAPED
+   : '%' HEXDIG HEXDIG
+   ;
+
+MARK
+   : '-'
+   | '_'
+   | '.'
+   | '!'
+   | '~'
+   | '*'
+   | '\''
+   | '('
+   | ')'
+   ;
+   // https://tools.ietf.org/html/rfc2234
+   
+ALPHA
+   : [a-zA-Z]
+   ;
+   // https://tools.ietf.org/html/rfc2234
+   
+DIGIT
+   : [0-9]
+   ;
+   // https:tools.ietf.org/html/rfc2234
+   
+HEXDIG
+   : [0-9A-F]
    ;
 
 WS
