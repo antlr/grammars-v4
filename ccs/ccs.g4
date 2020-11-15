@@ -50,19 +50,11 @@ lit
    | NONE
    ;
 
-exp1
-   : exp PLUS exp
-   | exp SUB exp
-   ;
-
-exp2
-   : exp STAR exp
-   | exp DIV exp
-   ;
-
 exp
-   : exp2
-   | exp1
+   : exp STAR exp
+   | exp PLUS exp
+   | exp SUB exp
+   | exp DIV exp
    | lit
    | var
    ;
@@ -102,7 +94,7 @@ stylize
    ;
 
 trigger
-   : style_type COLON rule
+   : style_type COLON rule_
    | style_type COLON body
    ;
 
@@ -112,25 +104,95 @@ line
    ;
 
 body
-   : OBRACE
-   {line} CBRACE
+   : OBRACE line* CBRACE
    ;
 
-rule
+rule_
    : selector body
    ;
 
 stmt
-   : rule
-   | NAME ASSGN rule
+   : rule_
+   | NAME ASSGN rule_
    | NAME ASSGN body
    | NAME ASSGN exp
    | NAME
    ;
 
 stmts
-   :
-   {stmt SEMI}
+   : (stmt SEMI)*
+   ;
+
+SEMI
+   : ';'
+   ;
+
+PLUS
+   : '+'
+   ;
+
+SUB
+   : '-'
+   ;
+
+CARET
+   : '^'
+   ;
+
+OPAREN
+   : '('
+   ;
+
+CPAREN
+   : ')'
+   ;
+
+OBRACE
+   : '{'
+   ;
+
+CBRACE
+   : '}'
+   ;
+
+DOT
+   : '.'
+   ;
+
+HASH
+   : '#'
+   ;
+
+PERCENT
+   : '%'
+   ;
+
+COMMA
+   : ','
+   ;
+
+STAR
+   : '*'
+   ;
+
+DIV
+   : '/'
+   ;
+
+COLON
+   : ':'
+   ;
+
+ASSGN
+   : '='
+   ;
+
+NUM
+   : DIGIT+
+   ;
+
+NAME
+   : LETTER+
    ;
 
 DIGIT
