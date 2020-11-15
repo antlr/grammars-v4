@@ -11,7 +11,7 @@
 		<target.jvm>1.7</target.jvm>
 		<antlr.version>4.8-1</antlr.version>
 		<antlr4test-maven-plugin.version>1.14</antlr4test-maven-plugin.version>
-		<junit.version>4.12</junit.version>
+		<junit.version>4.13.1</junit.version>
 	</properties>
 	<prerequisites>
 		<maven>3.1.0</maven>
@@ -50,7 +50,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
+				<version>3.8.1</version>
 				<configuration>
 					<source>${target.jvm}</source>
 					<target>${target.jvm}</target>
@@ -81,8 +81,10 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
-				<module>bnf</module>
+                <module>bibcode</module>
+                <module>bnf</module>
 				<module>brainfuck</module>
+                <module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
 				<module>capnproto</module>
@@ -95,7 +97,8 @@
 				<module>cookie</module>
 				<module>cool</module>
 				<module>cpp</module>
-				<module>cql3</module>
+                <module>cql</module>
+                <module>cql3</module>
 				<module>creole</module>
 				<module>csharp</module>
 				<module>css3</module>
@@ -106,6 +109,7 @@
 				<module>dcm</module>
 				<module>dgol</module>				
 				<module>dice</module>
+                <module>doiurl</module>
 				<module>dot</module>
 				<module>edif300</module>
 				<module>edn</module>				
@@ -113,6 +117,7 @@
 				<module>fasta</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
+                <module>focal</module>
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
@@ -132,14 +137,16 @@
 				<module>idl</module>
 				<module>inf</module>
 				<module>informix</module>
-				<module>iri</module>
+                <module>infosapient</module>
+                <module>iri</module>
                 <module>iso8601</module>
 				<module>istc</module>
 				<module>janus</module>
                 <module>java</module>
 				<module>javadoc</module>
 				<module>javascript</module>
-				<module>jpa</module>
+                <module>joss</module>
+                <module>jpa</module>
                 <module>json</module>
                 <module>json5</module>
 				<module>kirikiri-tjs</module>
@@ -156,7 +163,9 @@
 				<module>matlab</module>
 				<module>mdx</module>
 				<module>memcached_protocol</module>
+                <module>metamath</module>
 				<module>metric</module>
+                <module>microc</module>
 				<module>modelica</module>
 				<module>modula2pim4</module>
 				<module>molecule</module>
@@ -168,6 +177,7 @@
 				<module>mumps</module>
 				<module>muparser</module>
                 <module>nanofuck</module>
+                <module>newick</module>
                 <module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
@@ -181,9 +191,11 @@
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
+                <module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
 				<module>ply</module>
+                <module>pmmn</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
 				<module>prolog</module>
@@ -214,6 +226,7 @@
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
+                <module>sici</module>
 				<module>sickbay</module>
                 <module>sieve</module>
 				<module>smalltalk</module>
@@ -259,6 +272,7 @@
 				<module>wavefront</module>
 				<module>webidl</module>
 				<module>wkt</module>
+				<module>wln</module>
 				<module>xml</module>
 				<module>xpath</module>
 				<module>xsd-regex</module>
@@ -273,7 +287,7 @@
 				<plugins>
 					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.1.0</version>
+						<version>3.3.0</version>
 						<configuration>
 							<descriptors>
 								<descriptor>${maven.multiModuleProjectDirectory}/assembly.xml</descriptor>
@@ -303,7 +317,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.0.1</version>
+						<version>3.2.1</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -316,7 +330,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.0.1	</version>
+						<version>3.2.0	</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>

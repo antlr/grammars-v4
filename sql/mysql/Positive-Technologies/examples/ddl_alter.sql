@@ -6,6 +6,7 @@ alter table t3 alter index t3_i1 invisible;
 alter table t3 alter index t3_i1 visible;
 alter table t3 rename index t3_i1 to t3_i2;
 alter table t2 add constraint t2_pk_constraint primary key (1c), alter column `_` set default 1;
+alter table t2 drop constraint t2_pk_constraint;
 alter table ship_class change column somecol col_for_del tinyint first;
 alter table t5 rename column old to new;
 alter table ship_class drop col_for_del;
