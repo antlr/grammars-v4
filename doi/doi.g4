@@ -82,17 +82,17 @@ PCHAR
    | ','
    ;
 
-UNRESERVED
+fragment UNRESERVED
    : ALPHA
    | DIGIT
    | MARK
    ;
 
-ESCAPED
+fragment ESCAPED
    : '%' HEXDIG HEXDIG
    ;
 
-MARK
+fragment MARK
    : '-'
    | '_'
    | '.'
@@ -104,18 +104,18 @@ MARK
    | ')'
    ;
    // https://tools.ietf.org/html/rfc2234
-   
-ALPHA
+
+fragment ALPHA
    : [a-zA-Z]
    ;
    // https://tools.ietf.org/html/rfc2234
-   
-DIGIT
+
+fragment DIGIT
    : [0-9]
    ;
    // https:tools.ietf.org/html/rfc2234
-   
-HEXDIG
+
+fragment HEXDIG
    : [0-9A-F]
    ;
 
