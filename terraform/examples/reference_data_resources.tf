@@ -25,3 +25,28 @@ module "a" {
 locals {
   b = module.a.out
 }
+
+resource "aws_acm_certificate" "ecs_certificate" {
+  domain_name               = "abc.de"
+  subject_alternative_names = ["*.abc.de"]
+  validation_method         = "DNS"
+
+  tags = {}
+
+  options {
+    certificate_transparency_logging_preference = "ENABLED"
+  }
+
+  lifecycle {
+    //due to AWS service limits we are not allowed to issue more than x certifactes
+    prevent_destroy = true
+  }
+}
+
+resource "aws_route53_record" "cert_validation_record" {
+  name     = aws_acm_certificate.ecs_certificate.domain_validation_options.0.resource_record_name
+  type     = aws_acm_certificate.ecs_certificate.domain_validation_options.0.resource_record_type
+  zone_id  = "4711"
+  records  = [aws_acm_certificate.ecs_certificate.domain_validation_options.0.resource_record_value]
+  ttl      = 60
+}

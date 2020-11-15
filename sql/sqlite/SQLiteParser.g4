@@ -125,7 +125,7 @@ type_name:
 
 column_constraint: (CONSTRAINT name)? (
 		(PRIMARY KEY asc_desc? conflict_clause? AUTOINCREMENT?)
-		| ((NOT NULL) | UNIQUE) conflict_clause?
+		| ((NOT NULL_) | UNIQUE) conflict_clause?
 		| CHECK '(' expr ')'
 		| DEFAULT (
 			signed_number
@@ -157,7 +157,7 @@ foreign_key_clause:
 	)? (
 		(
 			ON (DELETE | UPDATE) (
-				(SET (NULL | DEFAULT))
+				(SET (NULL_ | DEFAULT))
 				| CASCADE
 				| RESTRICT
 				| (NO ACTION)
@@ -252,7 +252,7 @@ expr:
 	| CAST '(' expr AS type_name ')'
 	| expr COLLATE collation_name
 	| expr NOT? (LIKE | GLOB | REGEXP | MATCH) expr (ESCAPE expr)?
-	| expr ( ISNULL | NOTNULL | (NOT NULL))
+	| expr ( ISNULL | NOTNULL | (NOT NULL_))
 	| expr IS NOT? expr
 	| expr NOT? BETWEEN expr AND expr
 	| expr NOT? IN (
@@ -278,9 +278,9 @@ literal_value:
 	NUMERIC_LITERAL
 	| STRING_LITERAL
 	| BLOB_LITERAL
-	| NULL
-	| TRUE
-	| FALSE
+	| NULL_
+	| TRUE_
+	| FALSE_
 	| CURRENT_TIME
 	| CURRENT_DATE
 	| CURRENT_TIMESTAMP;
@@ -629,7 +629,7 @@ keyword:
 	| NO
 	| NOT
 	| NOTNULL
-	| NULL
+	| NULL_
 	| OF
 	| OFFSET
 	| ON
@@ -696,8 +696,8 @@ keyword:
 	| GENERATED
 	| ALWAYS
 	| STORED
-	| TRUE
-	| FALSE
+	| TRUE_
+	| FALSE_
 	| WINDOW
 	| NULLS
 	| FIRST
