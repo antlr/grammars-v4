@@ -691,7 +691,7 @@ common_member_declaration
 	| event_declaration
 	| conversion_operator_declarator (body | right_arrow throwable_expression ';') // C# 6
 	| constructor_declaration
-	| method_declaration  // 2020/10/22 add return_type
+	| method_declaration
 	| class_definition
 	| struct_definition
 	| interface_definition
@@ -1186,7 +1186,6 @@ constructor_declaration
 	: identifier OPEN_PARENS formal_parameter_list? CLOSE_PARENS constructor_initializer? body
 	;
 
-// 2020/10/22 add return_type
 method_declaration // lamdas from C# 6
 	: return_type method_member_name type_parameter_list? OPEN_PARENS formal_parameter_list? CLOSE_PARENS
 	    type_parameter_constraints_clauses? (method_body | right_arrow throwable_expression ';')
