@@ -10,7 +10,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.7</target.jvm>
 		<antlr.version>4.8-1</antlr.version>
-		<antlr4test-maven-plugin.version>1.15-SNAPSHOT</antlr4test-maven-plugin.version>
+		<antlr4test-maven-plugin.version>1.15</antlr4test-maven-plugin.version>
 		<junit.version>4.13.1</junit.version>
 	</properties>
 	<prerequisites>
@@ -244,7 +244,6 @@
 				<module>suokif</module>
 				<module>swift</module>
 				<module>swift-fin</module>
-                <module>tcp</module>
 				<module>telephone</module>
 				<module>terraform</module>
 				<module>thrift</module>
