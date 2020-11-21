@@ -31,10 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar tcp;
 
-segment
-   : segmentheader EOF
-   ;
-
 segmentheader
    : sourceport destinationport sequencenumber acknumber flags windowsize checksum urgent
    ;

@@ -35,12 +35,14 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<verbose>false</verbose>
-					<showTree>false</showTree>
-					<entryPoint>segment</entryPoint>
+					<verbose>true</verbose>
+					<showTree>true</showTree>
+					<entryPoint>segmentheader</entryPoint>
 					<grammarName>tcp</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+                    <fileEncoding>ISO_8859_1</fileEncoding>
+                    <binary>true</binary>
 				</configuration>
 				<executions>
 					<execution>
