@@ -1,0 +1,9 @@
+in(alan, R) ←
+teaches(alan, cs322) ∧
+in(cs322, R).
+grandf ather(william, X) ←
+f ather(william, Y ) ∧
+parent(Y, X).
+slithy(toves) ←
+mimsy ∧ borogroves ∧
+outgrabe(mome, Raths).
