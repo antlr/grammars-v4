@@ -779,7 +779,7 @@ theOperator:
 	| Tilde
 	| Not
 	| Assign
-    | Greater
+	| Greater
 	| Less
 	| GreaterEqual
 	| PlusAssign
