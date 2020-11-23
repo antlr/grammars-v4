@@ -790,8 +790,8 @@ theOperator:
 	| XorAssign
 	| AndAssign
 	| OrAssign
-	| (Less Less)
-	| (Greater Greater)
+	| Less Less
+	| Greater Greater
 	| RightShiftAssign
 	| LeftShiftAssign
 	| Equal
