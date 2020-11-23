@@ -170,7 +170,7 @@ additiveExpression:
 shiftExpression:
 	additiveExpression (shiftOperator additiveExpression)*;
 
-shiftOperator: (Greater Greater) | (Less Less);
+shiftOperator: Greater Greater | Less Less;
 
 relationalExpression:
 	shiftExpression (
