@@ -381,7 +381,7 @@ fragment Schar:
 	| Escapesequence
 	| Universalcharactername;
 
-fragment Rawstring: '"' (~[\r\n])*? '(' (~[\r\n])*? ')' (~[\r\n])*? '"';
+fragment Rawstring: '"' ~[\r\n(]* '(' ~[\r\n)]* ')' ~[\r\n"]* '"';
 
 UserDefinedIntegerLiteral:
 	DecimalLiteral Udsuffix
