@@ -349,7 +349,7 @@ fragment Simpleescapesequence:
 	| '\\f'
 	| '\\n'
 	| '\\r'
-    | ('\\' ('\r' '\n'? | '\n'))
+	| ('\\' ('\r' '\n'? | '\n'))
 	| '\\t'
 	| '\\v';
 
