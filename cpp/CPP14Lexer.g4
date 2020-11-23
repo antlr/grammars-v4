@@ -7,10 +7,7 @@ IntegerLiteral:
 	| BinaryLiteral Integersuffix?;
 
 CharacterLiteral:
-	'\'' Cchar+ '\''
-	| 'u' '\'' Cchar+ '\''
-	| 'U' '\'' Cchar+ '\''
-	| 'L' '\'' Cchar+ '\'';
+	('u' | 'U' | 'L')? '\'' Cchar+ '\'';
 
 FloatingLiteral:
 	Fractionalconstant Exponentpart? Floatingsuffix?
