@@ -69,6 +69,7 @@
 				<module>acme</module>
 				<module>agc</module>
 				<module>algol60</module>
+				<module>alm</module>
 				<module>alpaca</module>
 				<module>antlr</module>
 				<module>apex</module>
