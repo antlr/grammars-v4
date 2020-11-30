@@ -376,6 +376,7 @@ typeHint
     : qualifiedStaticTypeRef
     | Callable
     | primitiveType
+    | typeHint '|' typeHint
     ;
 
 globalStatement
