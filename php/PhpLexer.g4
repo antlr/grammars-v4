@@ -111,6 +111,8 @@ MultiLineComment:   '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:  '//' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
 ShellStyleComment:  '#' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
 
+AttributeStart:     '#[';
+
 Abstract:           'abstract';
 Array:              'array';
 As:                 'as';

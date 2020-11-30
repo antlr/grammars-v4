@@ -169,10 +169,20 @@ genericDynamicArgs
 
 attributes
     : attributesGroup*
+    | attributeV2*
     ;
 
 attributesGroup
     : '[' (identifier ':')? attribute (',' attribute)* ']'
+    ;
+
+attributeV2
+    : AttributeStart attributeV2Item (',' attributeV2Item)* ','? ']'
+    ;
+
+attributeV2Item
+    : functionCall
+    | identifier
     ;
 
 attribute
@@ -512,8 +522,8 @@ expression
     | expression op='??' expression                             #NullCoalescingExpression
     | expression op='<=>' expression                            #SpaceshipExpression
 
-    | assignable assignmentOperator expression     #AssignmentExpression
-    | assignable Eq '&' (chain | newExpr)          #AssignmentExpression
+    | assignable assignmentOperator attributeV2? expression     #AssignmentExpression
+    | assignable Eq attributeV2? '&' (chain | newExpr)          #AssignmentExpression
 
     | expression op=LogicalAnd expression                       #LogicalExpression
     | expression op=LogicalXor expression                       #LogicalExpression
