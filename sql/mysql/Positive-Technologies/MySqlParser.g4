@@ -1085,7 +1085,7 @@ limitClause
     ;
 
 limitClauseAtom
-	: decimalLiteral | mysqlVariable
+	: decimalLiteral | mysqlVariable | simpleId
 	;
 
 
