@@ -131,3 +131,5 @@ select CONVERT( LEFT( CONVERT( '自動' USING binary ), 6 ) USING utf8 ) AS x_0;
 select  t.*, tt.* FROM wptests_terms AS t  INNER JOIN wptests_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN ('category') AND t.name IN ('远征手记') ORDER BY t.name ASC;
 #end
 SELECT trigger.num FROM test `trigger`;
+-- Valid when SELECT is in stored procedure
+SELECT * FROM test LIMIT LIMIT1,LIMIT2;
