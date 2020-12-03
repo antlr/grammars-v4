@@ -37,7 +37,7 @@
 lexer grammar ANTLRv4Lexer;
 
 
-options { superClass = Antlr2BGF.AntlrParser.LexerAdaptor; }
+options { superClass = GrammarGrammar.LexerAdaptor; }
 import LexBasic;
 // Standard set of fragments
 tokens { TOKEN_REF , RULE_REF , LEXER_CHAR_SET }
