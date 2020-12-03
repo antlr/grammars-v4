@@ -103,7 +103,7 @@ namespace Antlr2BGF.AntlrParser
             if (InsideOptionsBlock)
             {
                 CurrentRuleType = ANTLRv4Lexer.BEGIN_ACTION;
-                PushMode(ANTLRv4Lexer.CodeAction);
+                PushMode(ANTLRv4Lexer.TargetLanguageAction);
             }
             else
             {
