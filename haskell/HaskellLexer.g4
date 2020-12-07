@@ -42,6 +42,155 @@ WS : [\u0020\u00a0\u1680\u2000\u200a\u202f\u205f\u3000]+ {
     this.processWSToken();
 } ;
 
+AS            : 'as'               ;
+CASE          : 'case'             ;
+CLASS         : 'class'            ;
+DATA          : 'data'             ;
+DEFAULT       : 'default'          ;
+DERIVING      : 'deriving'         ;
+DO            : 'do'               ;
+ELSE          : 'else'             ;
+HIDING        : 'hiding'           ;
+IF            : 'if'               ;
+IMPORT        : 'import'           ;
+IN            : 'in'               ;
+INFIX         : 'infix'            ;
+INFIXL        : 'infixl'           ;
+INFIXR        : 'infixr'           ;
+INSTANCE      : 'instance'         ;
+LET           : 'let'              ;
+MODULE        : 'module'           ;
+NEWTYPE       : 'newtype'          ;
+OF            : 'of'               ;
+QUALIFIED     : 'qualified'        ;
+THEN          : 'then'             ;
+TYPE          : 'type'             ;
+WHERE         : 'where'            ;
+WILDCARD      : '_'                ;
+
+FORALL        : 'forall'           ;
+FOREIGN       : 'foreign'          ;
+EXPORT        : 'export'           ;
+SAFE          : 'safe'             ;
+INTERRUPTIBLE : 'interruptible'    ;
+UNSAFE        : 'unsafe'           ;
+MDO           : 'mdo'              ;
+FAMILY        : 'family'           ;
+ROLE          : 'role'             ;
+STDCALL       : 'stdcall'          ;
+CCALL         : 'ccall'            ;
+CAPI          : 'capi'             ;
+CPPCALL       : 'cplusplus'        ;
+JSCALL        : 'javascript'       ;
+REC           : 'rec'              ;
+GROUP         : 'group'            ;
+BY            : 'by'               ;
+USING         : 'using'            ;
+PATTERN       : 'pattern'          ;
+STOCK         : 'stock'            ;
+ANYCLASS      : 'anyclass'         ;
+VIA           : 'via'              ;
+
+LANGUAGE      : 'LANGUAGE'         ;
+OPTIONS_GHC   : 'OPTIONS_GHC'      ;
+OPTIONS       : 'OPTIONS'          ;
+INLINE        : 'INLINE'           ;
+NOINLINE      : 'NOINLINE'         ;
+SPECIALISE    : 'SPECIALISE'       ;
+SPECINLINE    : 'SPECIALISE_INLINE';
+SOURCE        : 'SOURCE'           ;
+RULES         : 'RULES'            ;
+SCC           : 'SCC'              ;
+DEPRECATED    : 'DEPRECATED'       ;
+WARNING       : 'WARNING'          ;
+UNPACK        : 'UNPACK'           ;
+NOUNPACK      : 'NOUNPACK'         ;
+ANN           : 'ANN'              ;
+MINIMAL       : 'MINIMAL'          ;
+CTYPE         : 'CTYPE'            ;
+OVERLAPPING   : 'OVERLAPPING'      ;
+OVERLAPPABLE  : 'OVERLAPPABLE'     ;
+OVERLAPS      : 'OVERLAPS'         ;
+INCOHERENT    : 'INCOHERENT'       ;
+COMPLETE      : 'COMPLETE'         ;
+
+
+LCASE       : '\\' (NEWLINE | WS)* 'case'   ;
+
+fragment SYMBOL : ASCSYMBOL | UNISYMBOL;
+DoubleArrow        : '=>'  ;
+DoubleColon        : '::'  ;
+Arrow              : '->'  ;
+Revarrow           : '<-'  ;
+LarrowTail         : '-<'  ;
+RarrowTail         : '>-'  ;
+LLarrowTail        : '-<<' ;
+RRarrowTail        : '>>-' ;
+Hash               : '#'   ;
+Less               : '<'   ;
+Greater            : '>'   ;
+Ampersand          : '&'   ;
+Pipe               : '|'   ;
+Bang               : '!'   ;
+Caret              : '^'   ;
+Plus               : '+'   ;
+Minus              : '-'   ;
+Asterisk           : '*'   ;
+Percent            : '%'   ;
+Divide             : '/'   ;
+Tilde              : '~'   ;
+Atsign             : '@'   ;
+DDollar            : '$$'  ;
+Dollar             : '$'   ;
+DoubleDot          : '..'  ;
+Dot                : '.'   ;
+Semi               : ';'   ;
+QuestionMark       : '?'   ;
+Comma              : ','   ;
+Colon              : ':'   ;
+Eq                 : '='   ;
+Quote              : '\''  ;
+DoubleQuote        : '\'\'';
+ReverseSlash       : '\\'  ;
+BackQuote          : '`'   ;
+AopenParen         :'(|' WS;
+AcloseParen        :WS '|)';
+TopenTexpQuote     : '[||' ;
+TcloseTExpQoute    : '||]' ;
+TopenExpQuote      : '[|'  ;
+TopenPatQuote      : '[p|' ;
+TopenTypQoute      : '[t|' ;
+TopenDecQoute      : '[d|' ;
+TcloseQoute        : '|]'  ;
+OpenBoxParen       : '(#'  ;
+CloseBoxParen      : '#)'  ;
+OpenRoundBracket   : '('   ;
+CloseRoundBracket  : ')'   ;
+OpenSquareBracket  : '['   ;
+CloseSquareBracket : ']'   ;
+
+
+CHAR : '\'' (' ' | DECIMAL | SMALL | LARGE
+              | SYMBOL | DIGIT | ',' | ';' | '(' | ')'
+              | '[' | ']' | '`' | '"') '\'';
+
+STRING : '"' (' ' | DECIMAL | SMALL | LARGE
+              | SYMBOL | DIGIT | ',' | ';' | '(' | ')'
+              | '[' | ']' | '`' | '\'')* '"';
+
+VARID : SMALL (SMALL | LARGE | DIGIT | '\'' )* '#'*;
+CONID : LARGE (SMALL | LARGE | DIGIT | '\'' )* '#'*;
+
+OpenPragmaBracket : '{-#';
+ClosePragmaBracket: '#-}';
+
+// For CPP extension
+// read about
+// https://medium.com/swiftify/parsing-preprocessor-directives-in-objective-c-714a3dde570
+// directives are skip now
+// MultiLineMacro : '#' (~ [\n]*? '\\' '\r'? '\n')+ ~ [\n]+ -> skip;
+// Directive : '#' ~ [\n]* -> skip;
+
 COMMENT  : '--' (~[\r\n])* -> skip;
 NCOMMENT : '{-'~[#] .*? '-}' -> skip;
 
@@ -51,95 +200,7 @@ VOCURLY : 'VOCURLY' { setChannel(HIDDEN); };
 VCCURLY : 'VCCURLY' { setChannel(HIDDEN); };
 SEMI    : 'SEMI'    { setChannel(HIDDEN); };
 
-CASE     : 'case'    ;
-CLASS    : 'class'   ;
-DATA     : 'data'    ;
-DEFAULT  : 'default' ;
-DERIVING : 'deriving';
-DO       : 'do'      ;
-ELSE     : 'else'    ;
-EXPORT   : 'export'  ;
-FOREIGN  : 'foreign' ;
-IF       : 'if'      ;
-IMPORT   : 'import'  ;
-IN       : 'in'      ;
-INFIX    : 'infix'   ;
-INFIXL   : 'infixl'  ;
-INFIXR   : 'infixr'  ;
-INSTANCE : 'instance';
-LET      : 'let'     ;
-MODULE   : 'module'  ;
-NEWTYPE  : 'newtype' ;
-OF       : 'of'      ;
-THEN     : 'then'    ;
-TYPE     : 'type'    ;
-WHERE    : 'where'   ;
-WILDCARD : '_'       ;
-QUALIFIED: 'qualified';
 
-AS     : 'as';
-HIDING : 'hiding';
-
-LANGUAGE  : 'LANGUAGE';
-INLINE    : 'INLINE';
-NOINLINE  : 'NOINLINE';
-SPECIALIZE: 'SPECIALIZE';
-
-CCALL     : 'ccall';
-STDCALL   : 'stdcall';
-CPPCALL   : 'cplusplus';
-JVMCALL   : 'jvm';
-DOTNETCALL: 'dotnet';
-
-SAFE  : 'safe';
-UNSAFE: 'unsafe';
-
-DoubleArrow        : '=>';
-DoubleColon        : '::';
-Arrow              : '->';
-Revarrow           : '<-';
-Hash               : '#';
-Less               : '<';
-Greater            : '>';
-Ampersand          : '&';
-Pipe               : '|';
-Bang               : '!';
-Caret              : '^';
-Plus               : '+';
-Minus              : '-';
-Asterisk           : '*';
-Percent            : '%';
-Divide             : '/';
-Tilde              : '~';
-Atsign             : '@';
-Dollar             : '$';
-Dot                : '.';
-Semi               : ';';
-DoubleDot          :  '..';
-QuestionMark       : '?';
-OpenRoundBracket   :   '(';
-CloseRoundBracket  :  ')';
-OpenSquareBracket  :  '[';
-CloseSquareBracket : ']';
-OpenCommentBracket : '{-#';
-CloseCommentBracket: '#-}';
-Comma              : ',';
-Colon              : ':';
-Eq                 : '=';
-Quote              : '\'';
-DoubleQuote        : '\\';
-BackQuote          :'`';
-
-CHAR : '\'' (' ' | DECIMAL | SMALL | LARGE
-              | ASCSYMBOL | DIGIT | ',' | ';' | '(' | ')'
-              | '[' | ']' | '`' | '"') '\'';
-
-STRING : '"' (' ' | DECIMAL | SMALL | LARGE
-              | ASCSYMBOL | DIGIT | ',' | ';' | '(' | ')'
-              | '[' | ']' | '`' | '\'')* '"';
-
-VARID : SMALL (SMALL | LARGE | DIGIT | '\'' )*;
-CONID : LARGE (SMALL | LARGE | DIGIT | '\'' )*;
 
 DECIMAL 	: DIGIT+;
 OCTAL   	: '0' [oO] OCTIT+;
@@ -1396,13 +1457,16 @@ fragment UNISMALL
     | '\uff41'..'\uff5a'       // Halfwidth_and_Fullwidth_Forms
 ;
 
-ASCSYMBOL : '!' | '#' | '$' | '%' | '&' | '*' | '+'
+
+
+fragment ASCSYMBOL : '!' | '#' | '$' | '%' | '&' | '*' | '+'
         | '.' | '/' | '<' | '=' | '>' | '?' | '@'
         | '\\' | '^' | '|' | '-' | '~' | ':' ;
 
-UNISYMBOL :
+fragment UNISYMBOL
+    :
     CLASSIFY_Sc | CLASSIFY_Sk | CLASSIFY_Sm | CLASSIFY_So
-;
+    ;
 
 fragment CLASSIFY_Sc:
       '\u0024'                 // Basic_Latin

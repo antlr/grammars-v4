@@ -1,14 +1,40 @@
-﻿using System;
-using System.Reflection;
-namespace GrammarGrammar
+/*
+ [The "BSD licence"]
+ Copyright (c) 2005-2007 Terence Parr
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+namespace LexerAdaptor
 {
+    using System;
     using System.IO;
+    using System.Reflection;
     using Antlr4.Runtime;
     using Antlr4.Runtime.Misc;
 
-#pragma warning disable CA1012 // Abstract types should not have constructors
     public abstract class LexerAdaptor : Lexer
-#pragma warning restore CA1012 // But Lexer demands it - old 
     {
         // I copy a reference to the stream, so It can be used as a Char Stream, not as a IISStream
         readonly ICharStream stream;
@@ -39,6 +65,8 @@ namespace GrammarGrammar
          */
         private int CurrentRuleType { get; set; } = TokenConstants.InvalidType;
 
+        private bool InsideOptionsBlock { get; set; } = false;
+
         protected void handleBeginArgument()
         {
             if (InLexerRule)
@@ -67,6 +95,20 @@ namespace GrammarGrammar
             if (ModeStack.Count > 0)
             {
                 CurrentRuleType = (ANTLRv4Lexer.ACTION_CONTENT);
+            }
+        }
+
+        protected void handleOptionsLBrace()
+        {
+            if (InsideOptionsBlock)
+            {
+                CurrentRuleType = ANTLRv4Lexer.BEGIN_ACTION;
+                PushMode(ANTLRv4Lexer.TargetLanguageAction);
+            }
+            else
+            {
+                CurrentRuleType = ANTLRv4Lexer.LBRACE;
+                InsideOptionsBlock = true;
             }
         }
 
@@ -106,6 +148,6 @@ namespace GrammarGrammar
 
 
         private bool InParserRule => CurrentRuleType == ANTLRv4Lexer.RULE_REF;
-
+        
     }
 }

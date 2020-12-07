@@ -1,3 +1,30 @@
+/*
+ [The "BSD licence"]
+ Copyright (c) 2005-2007 Terence Parr
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 package org.antlr.parser.antlr4;
 
 import org.antlr.v4.runtime.CharStream;
@@ -7,8 +34,10 @@ import org.antlr.v4.runtime.misc.Interval;
 
 public abstract class LexerAdaptor extends Lexer {
 
-	// Generic type for OPTIONS, TOKENS and CHANNELS
-	private static int PREQUEL_CONSTRUCT = -10;
+    /**
+     *  Generic type for OPTIONS, TOKENS and CHANNELS
+     */
+	private static final int PREQUEL_CONSTRUCT = -10;
 
 	public LexerAdaptor(CharStream input) {
 		super(input);
@@ -58,7 +87,7 @@ public abstract class LexerAdaptor extends Lexer {
 	    int oldMode = _mode;
         int newMode = popMode();
         boolean isActionWithinAction = _modeStack.size() > 0
-            && newMode == ANTLRv4Lexer.Action
+            && newMode == ANTLRv4Lexer.TargetLanguageAction
             && oldMode == newMode;
 
 		if (isActionWithinAction) {
@@ -69,7 +98,7 @@ public abstract class LexerAdaptor extends Lexer {
 	protected void handleOptionsLBrace() {
 		if (insideOptionsBlock) {
 			setType(ANTLRv4Lexer.BEGIN_ACTION);
-			pushMode(ANTLRv4Lexer.Action);
+			pushMode(ANTLRv4Lexer.TargetLanguageAction);
 		} else {
 			setType(ANTLRv4Lexer.LBRACE);
 			insideOptionsBlock = true;

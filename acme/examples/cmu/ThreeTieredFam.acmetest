@@ -1,0 +1,29 @@
+import TieredFam.acme;
+Family ThreeTieredFam extends TieredFam with {
+    Property Type TierPropT = Enum { client, logic, data }; 
+    
+    Component Type ClientNodeT extends TierNodeT with {
+        Property tier : TierPropT = client;
+        
+    }
+    
+    
+    Component Type LogicNodeT extends TierNodeT with {
+        Property tier : TierPropT = logic;
+        
+    }
+    
+    
+    Component Type DataNodeT extends TierNodeT with {
+        Property tier : TierPropT = data;
+        
+    }
+    
+    
+    // For every two connected component, one of them must be a logic tier node.
+    invariant Forall n1 : TierNodeT in self.components | 
+        Forall n2 : TierNodeT in self.components | 
+            connected(n1, n2) -> (n1.tier == logic OR n2.tier == logic)  <<label : string = "One in every two connected tier component is in the logic tier.";errMsg : string = "Detected two connected tier components neither of which is in the logic tier!";>>;
+    
+}
+
