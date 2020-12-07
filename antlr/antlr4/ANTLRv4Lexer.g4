@@ -92,10 +92,10 @@ BEGIN_ARGUMENT
    { handleBeginArgument(); }
    ;
    // -------------------------
-   // Actions
+   // Target Language Actions
 
 BEGIN_ACTION
-   : LBrace -> pushMode (Action)
+   : LBrace -> pushMode (TargetLanguageAction)
    ;
    // -------------------------
    // Keywords
@@ -330,7 +330,7 @@ ARGUMENT_CONTENT
    : .
    ;
    // -------------------------
-   // Actions
+   // Target Language Actions
    //
    // Many language targets use {} as block delimiters and so we
    // must recursively match {} delimited blocks to balance the
@@ -339,9 +339,9 @@ ARGUMENT_CONTENT
    // that they are delimited by ' or " and so consume these
    // in their own alts so as not to inadvertantly match {}.
 
-mode Action;
+mode TargetLanguageAction;
 NESTED_ACTION
-   : LBrace -> type (ACTION_CONTENT) , pushMode (Action)
+   : LBrace -> type (ACTION_CONTENT) , pushMode (TargetLanguageAction)
    ;
 
 ACTION_ESCAPE
