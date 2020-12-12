@@ -133,3 +133,6 @@ select  t.*, tt.* FROM wptests_terms AS t  INNER JOIN wptests_term_taxonomy AS t
 SELECT trigger.num FROM test `trigger`;
 -- Valid when SELECT is in stored procedure
 SELECT * FROM test LIMIT LIMIT1,LIMIT2;
+-- SCHEMA as a function name
+SELECT SCHEMA();
+SELECT * FROM TEST WHERE TB_SCHEMA = SCHEMA();
