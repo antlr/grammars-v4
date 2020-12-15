@@ -113,7 +113,7 @@ fragment INT
    ;
 
 fragment EXP
-   : [Ee] SYMBOL? INT
+   : [Ee] SYMBOL? [0-9]*
    ;
 
 IDENTIFIER
@@ -146,5 +146,5 @@ fragment NEWLINE
    ;
 
 WS
-   : [ \t\n\r] + -> skip
+   : [ \t\n\r\u00A0\uFEFF\u2003] + -> skip
    ;
