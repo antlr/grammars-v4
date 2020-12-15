@@ -53,9 +53,10 @@ grammarDecl
 grammarType
    : (LEXER GRAMMAR | PARSER GRAMMAR | GRAMMAR)
    ;
-   // This is the list of all constructs that can be declared before
-   // the set of rules that compose the grammar, and is invoked 0..n
-   // times by the grammarPrequel rule.
+
+// This is the list of all constructs that can be declared before
+// the set of rules that compose the grammar, and is invoked 0..n
+// times by the grammarPrequel rule.
 
 prequelConstruct
    : optionsSpec
@@ -64,8 +65,9 @@ prequelConstruct
    | channelsSpec
    | action_
    ;
-   // ------------
-   // Options - things that affect analysis and/or code generation
+
+// ------------
+// Options - things that affect analysis and/or code generation
 
 optionsSpec
    : OPTIONS LBRACE (option SEMI)* RBRACE
@@ -81,8 +83,9 @@ optionValue
    | actionBlock
    | INT
    ;
-   // ------------
-   // Delegates
+
+// ------------
+// Delegates
 
 delegateGrammars
    : IMPORT delegateGrammar (COMMA delegateGrammar)* SEMI
@@ -92,8 +95,9 @@ delegateGrammar
    : identifier ASSIGN identifier
    | identifier
    ;
-   // ------------
-   // Tokens & Channels
+
+// ------------
+// Tokens & Channels
 
 tokensSpec
    : TOKENS LBRACE idList? RBRACE
@@ -106,12 +110,14 @@ channelsSpec
 idList
    : identifier (COMMA identifier)* COMMA?
    ;
-   // Match stuff like @parser::members {int i;}
+
+// Match stuff like @parser::members {int i;}
 
 action_
    : AT (actionScopeName COLONCOLON)? identifier actionBlock
    ;
-   // Scope names could collide with keywords; allow them as ids for action scopes
+
+// Scope names could collide with keywords; allow them as ids for action scopes
 
 actionScopeName
    : identifier
@@ -164,8 +170,9 @@ rulePrequel
 ruleReturns
    : RETURNS argActionBlock
    ;
-   // --------------
-   // Exception spec
+
+// --------------
+// Exception spec
 
 throwsSpec
    : THROWS identifier (COMMA identifier)*
@@ -182,12 +189,13 @@ localsSpec
 ruleModifiers
    : ruleModifier+
    ;
-   // An individual access modifier for a rule. The 'fragment' modifier
-   // is an internal indication for lexer rules that they do not match
-   // from the input but are like subroutines for other lexer rules to
-   // reuse for certain lexical patterns. The other modifiers are passed
-   // to the code generation templates and may be ignored by the template
-   // if they are of no use in that language.
+
+// An individual access modifier for a rule. The 'fragment' modifier
+// is an internal indication for lexer rules that they do not match
+// from the input but are like subroutines for other lexer rules to
+// reuse for certain lexical patterns. The other modifiers are passed
+// to the code generation templates and may be ignored by the template
+// if they are of no use in that language.
 
 ruleModifier
    : PUBLIC
@@ -207,8 +215,9 @@ ruleAltList
 labeledAlt
    : alternative (POUND identifier)?
    ;
-   // --------------------
-   // Lexer rules
+
+// --------------------
+// Lexer rules
 
 lexerRuleSpec
    : DOC_COMMENT* FRAGMENT? TOKEN_REF COLON lexerRuleBlock SEMI
@@ -224,12 +233,12 @@ lexerAltList
 
 lexerAlt
    : lexerElements lexerCommands?
-   |
-   // explicitly allow empty alts
+   | // empty alt
    ;
 
 lexerElements
    : lexerElement+
+   | // empty alt
    ;
 
 lexerElement
@@ -238,7 +247,8 @@ lexerElement
    | lexerBlock ebnfSuffix?
    | actionBlock QUESTION?
    ;
-   // but preds can be anywhere
+
+// but preds can be anywhere
 
 labeledLexerElement
    : identifier (ASSIGN | PLUS_ASSIGN) (lexerAtom | lexerBlock)
@@ -247,7 +257,8 @@ labeledLexerElement
 lexerBlock
    : LPAREN lexerAltList RPAREN
    ;
-   // E.g., channel(HIDDEN), skip, more, mode(INSIDE), push(INSIDE), pop
+
+// E.g., channel(HIDDEN), skip, more, mode(INSIDE), push(INSIDE), pop
 
 lexerCommands
    : RARROW lexerCommand (COMMA lexerCommand)*
@@ -267,8 +278,9 @@ lexerCommandExpr
    : identifier
    | INT
    ;
-   // --------------------
-   // Rule Alts
+
+// --------------------
+// Rule Alts
 
 altList
    : alternative (OR alternative)*
@@ -290,8 +302,9 @@ element
 labeledElement
    : identifier (ASSIGN | PLUS_ASSIGN) (atom | block)
    ;
-   // --------------------
-   // EBNF and blocks
+
+// --------------------
+// EBNF and blocks
 
 ebnf
    : block blockSuffix?
@@ -321,8 +334,9 @@ atom
    | notSet
    | DOT elementOptions?
    ;
-   // --------------------
-   // Inverted element set
+
+// --------------------
+// Inverted element set
 
 notSet
    : NOT setElement
@@ -339,20 +353,23 @@ setElement
    | characterRange
    | LEXER_CHAR_SET
    ;
-   // -------------
-   // Grammar Block
+
+// -------------
+// Grammar Block
 
 block
    : LPAREN (optionsSpec? ruleAction* COLON)? altList RPAREN
    ;
-   // ----------------
-   // Parser rule ref
+
+// ----------------
+// Parser rule ref
 
 ruleref
    : RULE_REF argActionBlock? elementOptions?
    ;
-   // ---------------
-   // Character Range
+
+// ---------------
+// Character Range
 
 characterRange
    : STRING_LITERAL RANGE STRING_LITERAL
@@ -362,8 +379,9 @@ terminal
    : TOKEN_REF elementOptions?
    | STRING_LITERAL elementOptions?
    ;
-   // Terminals may be adorned with certain options when
-   // reference in the grammar: TOK<,,,>
+
+// Terminals may be adorned with certain options when
+// reference in the grammar: TOK<,,,>
 
 elementOptions
    : LT elementOption (COMMA elementOption)* GT
