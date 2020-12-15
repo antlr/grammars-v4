@@ -24,11 +24,12 @@ key
    : STRING
    | IDENTIFIER
    | LITERAL
+   | NUMERIC_LITERAL
    ;
 
 value
    : STRING
-   | NUMBER
+   | number
    | obj
    | arr
    | LITERAL
@@ -37,6 +38,13 @@ value
 arr
    : '[' value (',' value)* ','? ']'
    | '[' ']'
+   ;
+
+number
+   : SYMBOL?
+      ( NUMERIC_LITERAL
+      | NUMBER
+      )
    ;
 
 // Lexer
@@ -81,6 +89,33 @@ fragment ESCAPE_SEQUENCE
    )
    ;
 
+NUMBER
+   : INT ('.' [0-9]*)? EXP? // +1.e2, 1234, 1234.5
+   | '.' [0-9]+ EXP?        // -.2e3
+   | '0' [xX] HEX+          // 0x12345678
+   ;
+
+NUMERIC_LITERAL
+   : 'Infinity'
+   | 'NaN'
+   ;
+
+SYMBOL
+   : '+' | '-'
+   ;
+
+fragment HEX
+   : [0-9a-fA-F]
+   ;
+
+fragment INT
+   : '0' | [1-9] [0-9]*
+   ;
+
+fragment EXP
+   : [Ee] SYMBOL? INT
+   ;
+
 IDENTIFIER
    : IDENTIFIER_START IDENTIFIER_PART*
    ;
@@ -103,32 +138,6 @@ fragment IDENTIFIER_PART
 
 fragment UNICODE_SEQUENCE
    : 'u' HEX HEX HEX HEX
-   ;
-
-NUMBER
-   : SYMBOL
-   ( INT ('.' [0-9]*)? EXP? // +1.e2, 1234, 1234.5
-   | '.' [0-9]+ EXP?        // -.2e3
-   | '0' [xX] HEX+          // 0x12345678
-   | 'Infinity'
-   | 'NaN'
-   )
-   ;
-
-fragment SYMBOL
-   : ('+' | '-')?
-   ;
-
-fragment HEX
-   : [0-9a-fA-F]
-   ;
-
-fragment INT
-   : '0' | [1-9] [0-9]*
-   ;
-
-fragment EXP
-   : [Ee] SYMBOL INT
    ;
 
 fragment NEWLINE
