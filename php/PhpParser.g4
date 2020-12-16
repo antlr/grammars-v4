@@ -176,22 +176,7 @@ attributesGroup
     ;
 
 attribute
-    : qualifiedNamespaceName
-    | qualifiedNamespaceName '(' attributeArgList? ')'
-    | qualifiedNamespaceName '(' attributeNamedArgList ')'
-    | qualifiedNamespaceName '(' attributeArgList ',' attributeNamedArgList ')'
-    ;
-
-attributeArgList
-    : expression (',' expression)*
-    ;
-
-attributeNamedArgList
-    : attributeNamedArg (',' attributeNamedArg)*
-    ;
-
-attributeNamedArg
-    : VarName '=>' expression
+    : qualifiedNamespaceName arguments?
     ;
 
 innerStatementList
