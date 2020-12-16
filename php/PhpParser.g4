@@ -118,11 +118,11 @@ namespaceStatement
     ;
 
 functionDeclaration
-    : attributes Function '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' QuestionMark? typeHint)? blockStatement
+    : attributes? Function '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' QuestionMark? typeHint)? blockStatement
     ;
 
 classDeclaration
-    : attributes Private? modifier? Partial? (
+    : attributes? Private? modifier? Partial? (
       classEntryType identifier typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)?
     | Interface identifier typeParameterListInBrackets? (Extends interfaceList)? )
       OpenCurlyBracket classStatement* CloseCurlyBracket
@@ -152,11 +152,11 @@ typeParameterWithDefaultsList
     ;
 
 typeParameterDecl
-    : attributes identifier
+    : attributes? identifier
     ;
 
 typeParameterWithDefaultDecl
-    : attributes identifier Eq (qualifiedStaticTypeRef | primitiveType)
+    : attributes? identifier Eq (qualifiedStaticTypeRef | primitiveType)
     ;
 
 genericDynamicArgs
@@ -164,10 +164,6 @@ genericDynamicArgs
     ;
 
 attributes
-    : attributesGroup*
-    ;
-
-attributesGroup
     : AttributeStart (identifier ':')? attribute (',' attribute)* ']'
     ;
 
@@ -335,7 +331,7 @@ formalParameterList
     ;
 
 formalParameter
-    : attributes memberModifier? QuestionMark? typeHint? '&'? '...'? variableInitializer
+    : attributes? memberModifier? QuestionMark? typeHint? '&'? '...'? variableInitializer
     ;
 
 typeHint
@@ -364,10 +360,10 @@ staticVariableStatement
     ;
 
 classStatement
-    : attributes propertyModifiers typeHint? variableInitializer (',' variableInitializer)* SemiColon
-    | attributes memberModifiers? Const typeHint? identifierInitializer (',' identifierInitializer)* SemiColon
-    | attributes memberModifiers? Function '&'? identifier
-          typeParameterListInBrackets? '(' formalParameterList ')' baseCtorCall? methodBody
+    : attributes? ( propertyModifiers typeHint? variableInitializer (',' variableInitializer)* SemiColon
+                  | memberModifiers? ( Const typeHint? identifierInitializer (',' identifierInitializer)* SemiColon
+                                     | Function '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
+                                       baseCtorCall? methodBody))
     | Use qualifiedNamespaceNameList traitAdaptations
     ;
 
@@ -420,7 +416,7 @@ identifierInitializer
     ;
 
 globalConstantDeclaration
-    : attributes Const identifierInitializer (',' identifierInitializer)* SemiColon
+    : attributes? Const identifierInitializer (',' identifierInitializer)* SemiColon
     ;
 
 expressionList
@@ -577,7 +573,7 @@ typeRef
     ;
 
 anonymousClass
-    : attributes Private? modifier? Partial? (
+    : attributes? Private? modifier? Partial? (
       classEntryType typeParameterListInBrackets? (Extends qualifiedStaticTypeRef)? (Implements interfaceList)?
     | Interface identifier typeParameterListInBrackets? (Extends interfaceList)? )
       OpenCurlyBracket classStatement* CloseCurlyBracket
