@@ -169,25 +169,15 @@ genericDynamicArgs
 
 attributes
     : attributesGroup*
-    | attributeV2*
     ;
 
 attributesGroup
-    : '[' (identifier ':')? attribute (',' attribute)* ']'
-    ;
-
-attributeV2
-    : AttributeStart attributeV2Item (',' attributeV2Item)* ','? ']'
-    ;
-
-attributeV2Item
-    : functionCall
-    | identifier
+    : AttributeStart (identifier ':')? attribute (',' attribute)* ']'
     ;
 
 attribute
     : qualifiedNamespaceName
-    | qualifiedNamespaceName '(' attributeArgList ')'
+    | qualifiedNamespaceName '(' attributeArgList? ')'
     | qualifiedNamespaceName '(' attributeNamedArgList ')'
     | qualifiedNamespaceName '(' attributeArgList ',' attributeNamedArgList ')'
     ;
