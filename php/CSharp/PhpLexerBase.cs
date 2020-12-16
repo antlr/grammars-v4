@@ -60,7 +60,7 @@ public abstract class PhpLexerBase : Lexer
             if (string.Equals(token.Text, "</script>", System.StringComparison.Ordinal))
             {
                 _phpScript = false;
-                token.Type = ScriptClose;
+                token.Type = HtmlScriptClose;
             }
             else
             {

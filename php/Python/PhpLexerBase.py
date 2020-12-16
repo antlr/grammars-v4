@@ -50,7 +50,7 @@ class PhpLexerBase(Lexer):
 
             if token.text == "</script>":
                 self._phpScript = False
-                token.type = self.ScriptClose
+                token.type = self.HtmlScriptClose
             else:
                 # Add semicolon to the end of statement if it is absent.
                 # For example: <?php echo "Hello world" ?>

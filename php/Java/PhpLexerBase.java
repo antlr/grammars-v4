@@ -59,7 +59,7 @@ public abstract class PhpLexerBase extends Lexer
             if ("</script>".equals(token.getText()))
             {
                 _phpScript = false;
-                token.setType(PhpLexer.ScriptClose);
+                token.setType(PhpLexer.HtmlScriptClose);
             }
             else
             {

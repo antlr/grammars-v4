@@ -658,8 +658,8 @@ stringConstant
     ;
 
 string
-    : StartHereDoc HereDocText* HereDocEnd
-    | StartNowDoc HereDocText* HereDocEnd
+    : StartHereDoc HereDocText+
+    | StartNowDoc HereDocText+
     | SingleQuoteString
     | DoubleQuote interpolatedStringPart* DoubleQuote
     ;
