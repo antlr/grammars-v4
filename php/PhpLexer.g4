@@ -173,6 +173,7 @@ List:               'list';
 LogicalAnd:         'and';
 LogicalOr:          'or';
 LogicalXor:         'xor';
+Match:              'match';
 Namespace:          'namespace';
 New:                'new';
 Null:               'null';

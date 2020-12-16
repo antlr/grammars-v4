@@ -492,6 +492,7 @@ expression
     | (Require | RequireOnce) expression                        #SpecialWordExpression
 
     | lambdaFunctionExpr                                        #LambdaFunctionExpression
+    | matchExpr                                                 #MatchExpression
 
     | <assoc=right> expression op='**' expression               #ArithmeticExpression
     | expression InstanceOf typeRef                             #InstanceOfExpression
@@ -513,8 +514,10 @@ expression
     | expression op='??' expression                             #NullCoalescingExpression
     | expression op='<=>' expression                            #SpaceshipExpression
 
-    | assignable assignmentOperator attributeV2? expression     #AssignmentExpression
-    | assignable Eq attributeV2? '&' (chain | newExpr)          #AssignmentExpression
+    | Throw expression                                          #SpecialWordExpression
+
+    | assignable assignmentOperator attributes? expression     #AssignmentExpression
+    | assignable Eq attributes? '&' (chain | newExpr)          #AssignmentExpression
 
     | expression op=LogicalAnd expression                       #LogicalExpression
     | expression op=LogicalXor expression                       #LogicalExpression
@@ -533,6 +536,14 @@ arrayCreation
 lambdaFunctionExpr
     : Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? (':' typeHint)? blockStatement
     | LambdaFn '(' formalParameterList')' '=>' expression
+    ;
+
+matchExpr
+    : Match '(' expression ')' OpenCurlyBracket matchItem (',' matchItem)* ','? CloseCurlyBracket
+    ;
+
+matchItem
+    : expression (',' expression)* '=>' expression
     ;
 
 newExpr
