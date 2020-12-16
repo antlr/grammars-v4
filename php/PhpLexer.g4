@@ -111,6 +111,8 @@ MultiLineComment:   '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:  '//' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
 ShellStyleComment:  '#' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
 
+AttributeStart:     '#[';
+
 Abstract:           'abstract';
 Array:              'array';
 As:                 'as';
@@ -171,6 +173,7 @@ List:               'list';
 LogicalAnd:         'and';
 LogicalOr:          'or';
 LogicalXor:         'xor';
+Match:              'match';
 Namespace:          'namespace';
 New:                'new';
 Null:               'null';
