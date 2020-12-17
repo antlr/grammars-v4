@@ -164,6 +164,10 @@ genericDynamicArgs
     ;
 
 attributes
+    : attributeGroup+
+    ;
+
+attributeGroup
     : AttributeStart (identifier ':')? attribute (',' attribute)* ']'
     ;
 
