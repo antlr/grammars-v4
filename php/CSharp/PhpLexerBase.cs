@@ -27,7 +27,7 @@ using Antlr4.Runtime;
 // Replace PhpParser with its fully qualified name below
 //using static PhpLexer;
 
-public abstract class PhpBaseLexer : Lexer
+public abstract class PhpLexerBase : Lexer
 {
     protected bool AspTags = true;
     protected bool _scriptTag;
@@ -38,7 +38,7 @@ public abstract class PhpBaseLexer : Lexer
     protected bool _phpScript;
     protected bool _insideString;
 
-    public PhpBaseLexer(ICharStream input)
+    protected PhpLexerBase(ICharStream input)
         : base(input)
     {
     }
@@ -60,7 +60,7 @@ public abstract class PhpBaseLexer : Lexer
             if (string.Equals(token.Text, "</script>", System.StringComparison.Ordinal))
             {
                 _phpScript = false;
-                token.Type = ScriptClose;
+                token.Type = HtmlScriptClose;
             }
             else
             {

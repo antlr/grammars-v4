@@ -28,7 +28,7 @@ from antlr4 import *
 from antlr4.Token import CommonToken
 
 
-class PhpBaseLexer(Lexer):
+class PhpLexerBase(Lexer):
     AspTags = True
     _scriptTag = False
     _styleTag = False
@@ -39,7 +39,7 @@ class PhpBaseLexer(Lexer):
     _insideString = False
 
     def nextToken(self):
-        token = super(PhpBaseLexer, self).nextToken()
+        token = super(PhpLexerBase, self).nextToken()
 
         if token.type == self.PHPEnd or token.type == self.PHPEndSingleLineComment:
             if self._mode == self.SingleLineCommentMode:
@@ -50,7 +50,7 @@ class PhpBaseLexer(Lexer):
 
             if token.text == "</script>":
                 self._phpScript = False
-                token.type = self.ScriptClose
+                token.type = self.HtmlScriptClose
             else:
                 # Add semicolon to the end of statement if it is absent.
                 # For example: <?php echo "Hello world" ?>
@@ -58,7 +58,7 @@ class PhpBaseLexer(Lexer):
                         self._prevTokenType == self.Colon or \
                         self._prevTokenType == self.OpenCurlyBracket or \
                         self._prevTokenType == self.CloseCurlyBracket:
-                    token = super(PhpBaseLexer, self).nextToken()
+                    token = super(PhpLexerBase, self).nextToken()
                 else:
                     token = CommonToken(type=self.SemiColon)
                     token.text = ';'
@@ -80,7 +80,7 @@ class PhpBaseLexer(Lexer):
                         token = CommonToken(type=self.SemiColon)
                         token.text = text
                     else:
-                        token = super(PhpBaseLexer, self).nextToken()
+                        token = super(PhpLexerBase, self).nextToken()
                         token.text = heredoc_identifier + "\n;"
         elif self._mode == self.PHP:
             if self._channel == self.HIDDEN:

@@ -1,4 +1,4 @@
-﻿/*
+/*
  [The "BSD licence"]
  Copyright (c) 2005-2007 Terence Parr
  All rights reserved.
@@ -25,17 +25,16 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-using System;
-using System.Reflection;
-namespace GrammarGrammar
+
+namespace LexerAdaptor
 {
+    using System;
     using System.IO;
+    using System.Reflection;
     using Antlr4.Runtime;
     using Antlr4.Runtime.Misc;
 
-#pragma warning disable CA1012 // Abstract types should not have constructors
     public abstract class LexerAdaptor : Lexer
-#pragma warning restore CA1012 // But Lexer demands it - old 
     {
         // I copy a reference to the stream, so It can be used as a Char Stream, not as a IISStream
         readonly ICharStream stream;
@@ -66,6 +65,8 @@ namespace GrammarGrammar
          */
         private int CurrentRuleType { get; set; } = TokenConstants.InvalidType;
 
+        private bool InsideOptionsBlock { get; set; } = false;
+
         protected void handleBeginArgument()
         {
             if (InLexerRule)
@@ -94,6 +95,20 @@ namespace GrammarGrammar
             if (ModeStack.Count > 0)
             {
                 CurrentRuleType = (ANTLRv4Lexer.ACTION_CONTENT);
+            }
+        }
+
+        protected void handleOptionsLBrace()
+        {
+            if (InsideOptionsBlock)
+            {
+                CurrentRuleType = ANTLRv4Lexer.BEGIN_ACTION;
+                PushMode(ANTLRv4Lexer.TargetLanguageAction);
+            }
+            else
+            {
+                CurrentRuleType = ANTLRv4Lexer.LBRACE;
+                InsideOptionsBlock = true;
             }
         }
 
@@ -133,6 +148,6 @@ namespace GrammarGrammar
 
 
         private bool InParserRule => CurrentRuleType == ANTLRv4Lexer.RULE_REF;
-
+        
     }
 }

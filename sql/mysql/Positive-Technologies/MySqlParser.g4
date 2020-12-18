@@ -1085,7 +1085,7 @@ limitClause
     ;
 
 limitClauseAtom
-	: decimalLiteral | mysqlVariable
+	: decimalLiteral | mysqlVariable | simpleId
 	;
 
 
@@ -2053,6 +2053,7 @@ dataType
       CHAR | CHARACTER | VARCHAR | TINYTEXT | TEXT | MEDIUMTEXT | LONGTEXT
        | NCHAR | NVARCHAR | LONG
       )
+      VARYING?
       lengthOneDimension? BINARY?
       ((CHARACTER SET | CHARSET) charsetName)?
       (COLLATE collationName | BINARY)?                             #stringDataType
@@ -2556,7 +2557,7 @@ functionNameBase
     | POSITION| POW | POWER | QUARTER | QUOTE | RADIANS | RAND
     | RANDOM_BYTES | RELEASE_LOCK | REVERSE | RIGHT | ROUND
     | ROW_COUNT | RPAD | RTRIM | SECOND | SEC_TO_TIME
-    | SESSION_USER | SESSION_VARIABLES_ADMIN
+    | SCHEMA | SESSION_USER | SESSION_VARIABLES_ADMIN
     | SHA | SHA1 | SHA2 | SIGN | SIN | SLEEP
     | SOUNDEX | SQL_THREAD_WAIT_AFTER_GTIDS | SQRT | SRID
     | STARTPOINT | STRCMP | STR_TO_DATE | ST_AREA | ST_ASBINARY
