@@ -68,34 +68,42 @@ KW_STATICLIFETIME: '\'static';
 
 NON_KEYWORD_IDENTIFIER: [a-zA-Z][a-zA-Z0-9_]* | '_' [a-zA-Z0-9_]+;
 
-// comments https://doc.rust-lang.org/reference/comments.html TODO: remove xxx_DOC?
-LINE_COMMENT: '//' (~[/!] | '//') ~[\n]* | '//';
+// comments https://doc.rust-lang.org/reference/comments.html
+LINE_COMMENT: ('//' (~[/!] | '//') ~[\n]* | '//') -> channel (HIDDEN);
 
 BLOCK_COMMENT
-   : '/*' (~[*!] | '**' | BLOCK_COMMENT_OR_DOC) (BLOCK_COMMENT_OR_DOC | ~[*])*? '*/'
-   | '/**/'
-   | '/***/'
+   :
+   (
+      '/*' (~[*!] | '**' | BLOCK_COMMENT_OR_DOC) (BLOCK_COMMENT_OR_DOC | ~[*])*? '*/'
+      | '/**/'
+      | '/***/'
+   ) -> channel (HIDDEN)
    ;
 
-INNER_LINE_DOC: '//!' ~[\n\r]*; // isolated cr
+INNER_LINE_DOC: '//!' ~[\n\r]* -> channel (HIDDEN); // isolated cr
 
-INNER_BLOCK_DOC: '/*!' (BLOCK_COMMENT_OR_DOC | ~[*])*? '*/';
+INNER_BLOCK_DOC
+   : '/*!' (BLOCK_COMMENT_OR_DOC | ~[*])*? '*/' -> channel (HIDDEN)
+   ;
 
-OUTER_LINE_DOC: '///' (~[/] ~[\n\r]*)?; // isolated cr
+OUTER_LINE_DOC: '///' (~[/] ~[\n\r]*)? -> channel (HIDDEN); // isolated cr
 
 OUTER_BLOCK_DOC
-   : '/**' (~[*] | BLOCK_COMMENT_OR_DOC) (BLOCK_COMMENT_OR_DOC | ~[*])*? '*/'
+   : '/**' (~[*] | BLOCK_COMMENT_OR_DOC) (BLOCK_COMMENT_OR_DOC | ~[*])*? '*/' -> channel (HIDDEN)
    ;
 
-BLOCK_COMMENT_OR_DOC: BLOCK_COMMENT | INNER_BLOCK_DOC | OUTER_BLOCK_DOC;
+BLOCK_COMMENT_OR_DOC
+   : (BLOCK_COMMENT | INNER_BLOCK_DOC | OUTER_BLOCK_DOC) -> channel (HIDDEN)
+   ;
 
 //ISOLATED_CR
 // : '\r' // not followed with \n ;
 
 // whitespace https://doc.rust-lang.org/reference/whitespace.html
 WHITESPACE: [\p{Zs}] -> channel(HIDDEN);
+NEWLINE: [\r\n] -> channel(HIDDEN);
 
-// tokens char and string TODO: needn't so much detail, it's just token at all
+// tokens char and string
 CHAR_LITERAL
    : '\'' (~['\\\n\r\t] | QUOTE_ESCAPE | ASCII_ESCAPE | UNICODE_ESCAPE) '\''
    ;
@@ -172,16 +180,14 @@ fragment DEC_DIGIT: [0-9];
 
 fragment HEX_DIGIT: [0-9a-fA-F];
 
-// bool
-BOOLEAN_LITERAL: 'true' | 'false';
-
-SHEBANG
-   : '#!' ~'\n' // TODO
-   ;
+//SHEBANG
+//   : '#!' ~'\n' // TODO
+//   ;
 
 LIFETIME_OR_LABEL: '\'' NON_KEYWORD_IDENTIFIER;
 
-emmmm: EOF;
+// entry point
+crate: innerAttribute* item* EOF;
 
 identifierOrKeyword
    : // only ascii
@@ -256,7 +262,7 @@ simplePath: '::'? simplePathSegment ( '::' simplePathSegment)*;
 
 simplePathSegment: identifier | 'super' | 'self' | 'crate' | '$crate';
 
-pathInExpression: '::'? pathExprSegment ('::' pathExprSegment);
+pathInExpression: '::'? pathExprSegment ('::' pathExprSegment)*;
 
 pathExprSegment: pathIdentSegment ('::' genericArgs)?;
 
@@ -337,32 +343,21 @@ macroFragSpec
    ;
 
 macroRepSep
-   : '::' //TODO: Tokenexcept delimiters and repetition operators
+   : '::' //TODO: Token except delimiters and repetition operators
    ;
 
 macroRepOp: '*' | '+' | '?';
 
 macroTranscriber: delimTokenTree;
 
-crate: innerAttribute* item*;
+//configurationPredicate
+// : configurationOption | configurationAll | configurationAny | configurationNot ; configurationOption: identifier (
+// '=' (STRING_LITERAL | RAW_STRING_LITERAL))?; configurationAll: 'all' '(' configurationPredicateList? ')';
+// configurationAny: 'any' '(' configurationPredicateList? ')'; configurationNot: 'not' '(' configurationPredicate ')';
 
-configurationPredicate
-   : configurationOption
-   | configurationAll
-   | configurationAny
-   | configurationNot
-   ;
-configurationOption: identifier ( '=' (STRING_LITERAL | RAW_STRING_LITERAL))?;
-configurationAll: 'all' '(' configurationPredicateList? ')';
-configurationAny: 'any' '(' configurationPredicateList? ')';
-configurationNot: 'not' '(' configurationPredicate ')';
-
-configurationPredicateList
-   : configurationPredicate (',' configurationPredicate)* ','?
-   ;
-cfgAttribute: 'cfg' '(' configurationPredicate ')';
-cfgAttrAttribute: 'cfg_attr' '(' configurationPredicate ',' cfgAttrs? ')';
-cfgAttrs: attr (',' attr)* ','?;
+//configurationPredicateList
+// : configurationPredicate (',' configurationPredicate)* ','? ; cfgAttribute: 'cfg' '(' configurationPredicate ')';
+// cfgAttrAttribute: 'cfg_attr' '(' configurationPredicate ',' cfgAttrs? ')'; cfgAttrs: attr (',' attr)* ','?;
 
 item: outerAttribute* visItem | macroItem;
 visItem
@@ -391,7 +386,7 @@ externCrate: 'extern' 'crate' crateRef asClause? ';';
 crateRef: identifier | 'self';
 asClause: 'as' (identifier | '_');
 
-useDeclaration: 'use' useTree;
+useDeclaration: 'use' useTree';';
 useTree
    : (simplePath? '::')? '*'
    | (simplePath? '::')? '{' ( useTree (',' useTree)* ','?)? '}'
@@ -399,7 +394,7 @@ useTree
    ;
 
 function
-   : functionQualifiers 'fn' identifier generics? '(' functionParameters? ')' functionReturnType? whereClause '?'
+   : functionQualifiers 'fn' identifier generics? '(' functionParameters? ')' functionReturnType? whereClause?
       blockExpression
    ;
 
@@ -497,7 +492,7 @@ traitImplItem
    : outerAttribute*
    (
       macroInvocationSemi
-      | (visibility? ( typeAlias | constantItem | function | method))
+      | (visibility? ( typeAlias | constantItem | method | function))
    )
    ;
 
@@ -552,14 +547,14 @@ typeBoundWhereClauseItem: forLifetimes? type ':' typeParamBounds?;
 forLifetimes: 'for' '<' lifetimeParams '>';
 
 method
-   : functionQualifiers 'fn' identifier generics?
+   : functionQualifiers 'fn' identifier generics? '(' selfParam
    (
-      selfParam ( ',' functionParam)* ','?
-   ) functionReturnType? whereClause? blockExpression
+      ',' functionParam
+   )* ','? ')' functionReturnType? whereClause? blockExpression
    ;
 
 selfParam: outerAttribute* (shorthandSelf | typedSelf);
-shorthandSelf: ('&' | '&' lifetime)? 'mut'? 'self';
+shorthandSelf: ('&' lifetime?)? 'mut'? 'self';
 typedSelf: 'mut'? 'self' ':' type;
 
 visibility: 'pub' ( '(' ( 'crate' | 'self' | 'super' | 'in' simplePath) ')')?;
@@ -569,23 +564,23 @@ outerAttribute: '#' '[' attr ']';
 attr: simplePath attrInput?;
 attrInput: delimTokenTree | '=' literalExpression; // w/o suffix
 
-metaItem
-   : simplePath
-   (
-      '=' literalExpression //w
-      | '(' metaSeq ')'
-   )?
-   ;
-metaSeq: metaItemInner (',' metaItemInner)* ','?;
-metaItemInner: metaItem | literalExpression; // w
+//metaItem
+//   : simplePath
+//   (
+//      '=' literalExpression //w
+//      | '(' metaSeq ')'
+//   )?
+//   ;
+//metaSeq: metaItemInner (',' metaItemInner)* ','?;
+//metaItemInner: metaItem | literalExpression; // w
 
-metaWord: identifier;
-metaNameValueStr: identifier '=' ( STRING_LITERAL | RAW_STRING_LITERAL);
-metaListPaths: identifier '(' ( simplePath (',' simplePath)* ','?)? ')';
-metaListIdents: identifier '(' ( identifier (',' identifier)* ','?)? ')';
-metaListNameValueStr
-   : identifier '(' (metaNameValueStr ( ',' metaNameValueStr)* ','?)? ')'
-   ;
+//metaWord: identifier;
+//metaNameValueStr: identifier '=' ( STRING_LITERAL | RAW_STRING_LITERAL);
+//metaListPaths: identifier '(' ( simplePath (',' simplePath)* ','?)? ')';
+//metaListIdents: identifier '(' ( identifier (',' identifier)* ','?)? ')';
+//metaListNameValueStr
+//   : identifier '(' (metaNameValueStr ( ',' metaNameValueStr)* ','?)? ')'
+//   ;
 
 statement
    : ';'
@@ -666,7 +661,8 @@ literalExpression
    | RAW_BYTE_STRING_LITERAL
    | INTEGER_LITERAL
    | FLOAT_LITERAL
-   | BOOLEAN_LITERAL
+   | KW_TRUE
+   | KW_FALSE
    ;
 
 pathExpression: pathInExpression | qualifiedPathInExpression;
@@ -773,6 +769,7 @@ patternWithoutRange
    | referencePattern
    | structPattern
    | tupleStructPattern
+   |tuplePattern
    | groupedPattern
    | slicePattern
    | pathPattern
@@ -780,7 +777,8 @@ patternWithoutRange
    ;
 
 literalPattern
-   : BOOLEAN_LITERAL
+   : KW_TRUE
+   | KW_FALSE
    | CHAR_LITERAL
    | BYTE_LITERAL
    | STRING_LITERAL
