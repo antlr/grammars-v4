@@ -68,6 +68,7 @@ create table table_with_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQ
 create table blob_test(id int, col1 blob(45));
 create table žluťoučký (kůň int);
 create table column_names_as_aggr_funcs(min varchar(100), max varchar(100), sum varchar(100), count varchar(100));
+CREATE TABLE char_table (c1 CHAR VARYING(10), c2 CHARACTER VARYING(10), c3 NCHAR VARYING(10));
 #end
 #begin
 -- Rename table

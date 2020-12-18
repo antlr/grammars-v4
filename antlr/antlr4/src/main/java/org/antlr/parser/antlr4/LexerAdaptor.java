@@ -87,7 +87,7 @@ public abstract class LexerAdaptor extends Lexer {
 	    int oldMode = _mode;
         int newMode = popMode();
         boolean isActionWithinAction = _modeStack.size() > 0
-            && newMode == ANTLRv4Lexer.Action
+            && newMode == ANTLRv4Lexer.TargetLanguageAction
             && oldMode == newMode;
 
 		if (isActionWithinAction) {
@@ -98,7 +98,7 @@ public abstract class LexerAdaptor extends Lexer {
 	protected void handleOptionsLBrace() {
 		if (insideOptionsBlock) {
 			setType(ANTLRv4Lexer.BEGIN_ACTION);
-			pushMode(ANTLRv4Lexer.Action);
+			pushMode(ANTLRv4Lexer.TargetLanguageAction);
 		} else {
 			setType(ANTLRv4Lexer.LBRACE);
 			insideOptionsBlock = true;
