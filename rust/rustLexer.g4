@@ -1,20 +1,19 @@
 /*
-Copyright (c) 2010 The Rust Project Developers
-Copyright (c) 2020 Student Main
+ Copyright (c) 2010 The Rust Project Developers Copyright (c) 2020 Student Main
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-persons to whom the Software is furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or
-substantial portions of the Software.
+ The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or
+ substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 lexer grammar rustLexer
    ;
@@ -165,15 +164,15 @@ INTEGER_LITERAL
 
 DEC_LITERAL: DEC_DIGIT (DEC_DIGIT | '_')*;
 
-HEX_LITERAL: [+-]? '0x' '_'* HEX_DIGIT (HEX_DIGIT | '_')*;
+HEX_LITERAL: '0x' '_'* HEX_DIGIT (HEX_DIGIT | '_')*;
 
-OCT_LITERAL: [+-]? '0o' '_'* OCT_DIGIT (OCT_DIGIT | '_')*;
+OCT_LITERAL: '0o' '_'* OCT_DIGIT (OCT_DIGIT | '_')*;
 
-BIN_LITERAL: [+-]? '0b' '_'* [01] [01_]*;
+BIN_LITERAL: '0b' '_'* [01] [01_]*;
 
 FLOAT_LITERAL
-   : //DEC_LITERAL '.' // TODO: next is not '.'
-    DEC_LITERAL ('.' DEC_LITERAL)? FLOAT_EXPONENT? FLOAT_SUFFIX?
+   : DEC_LITERAL '.' { _input.LA(1) != '.'}?
+   | DEC_LITERAL ('.' DEC_LITERAL)? FLOAT_EXPONENT? FLOAT_SUFFIX?
    ;
 
 fragment INTEGER_SUFFIX
@@ -217,8 +216,7 @@ AND: '&';
 OR: '|';
 ANDAND: '&&';
 OROR: '||';
-SHL: '<<';
-SHR: '>>';
+//SHL: '<<'; SHR: '>>'; removed to avoid confusion in type parameter
 PLUSEQ: '+=';
 MINUSEQ: '-=';
 STAREQ: '*=';

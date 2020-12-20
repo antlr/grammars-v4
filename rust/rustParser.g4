@@ -1,20 +1,19 @@
 /*
-Copyright (c) 2010 The Rust Project Developers
-Copyright (c) 2020 Student Main
+ Copyright (c) 2010 The Rust Project Developers Copyright (c) 2020 Student Main
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-persons to whom the Software is furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or
-substantial portions of the Software.
+ The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or
+ substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 parser grammar rustParser
    ;
@@ -33,8 +32,6 @@ pathInExpression: '::'? pathExprSegment ('::' pathExprSegment)*;
 pathExprSegment: pathIdentSegment ('::' genericArgs)?;
 pathIdentSegment: identifier | 'super' | 'self' | 'Self' | 'crate' | '$crate';
 
-
-// TODO: nested A<B<C>>
 genericArgs
    : '<' '>'
    | '<' genericArgsLifetimes (',' genericArgsTypes)? (',' genericArgsBindings)? ','? '>'
@@ -57,11 +54,14 @@ typePathInputs: type (',' type)* ','?;
 
 macroInvocation: simplePath '!' delimTokenTree;
 delimTokenTree: '(' tokenTree* ')' | '[' tokenTree* ']' | '{' tokenTree* '}';
-tokenTree
-   : tokenTreeToken+
-   | delimTokenTree
+tokenTree: tokenTreeToken+ | delimTokenTree;
+tokenTreeToken
+   : macroIdentifierLikeToken
+   | macroLiteralToken
+   | macroPunctuationToken
+   | macroRepOp
+   | '$'
    ;
-tokenTreeToken: macroIdentifierLikeToken | macroLiteralToken | macroPunctuationToken | macroRepOp | '$';
 
 macroInvocationSemi
    : simplePath '!' '(' tokenTree* ')' ';'
@@ -84,12 +84,20 @@ macroMatch
    | '$' identifier ':' macroFragSpec
    | '$' '(' macroMatch+ ')' macroRepSep? macroRepOp
    ;
-macroMatchToken : macroIdentifierLikeToken | macroLiteralToken | macroPunctuationToken | macroRepOp;
+macroMatchToken
+   : macroIdentifierLikeToken
+   | macroLiteralToken
+   | macroPunctuationToken
+   | macroRepOp
+   ;
 macroFragSpec
    : identifier // do validate here is wasting token
    ;
 macroRepSep
-   : macroIdentifierLikeToken | macroLiteralToken | macroPunctuationToken | '$'
+   : macroIdentifierLikeToken
+   | macroLiteralToken
+   | macroPunctuationToken
+   | '$'
    ;
 macroRepOp: '*' | '+' | '?';
 macroTranscriber: delimTokenTree;
@@ -305,18 +313,18 @@ letStatement: outerAttribute* 'let' pattern (':' type)? ( '=' expression)? ';';
 
 expressionStatement: expression ';'?;
 expression
-   : outerAttribute+ expression                                                          # AttributedExpression // technical, remove left recursive
-   | literalExpression                                                                   # LiteralExpression_
-   | pathExpression                                                                      # PathExpression_
-   | ('&' | '&&') 'mut'? expression                                                      # BorrowExpression
-   | '*' expression                                                                      # DereferenceExpression
-   | expression '?'                                                                      # ErrorPropagationExpression
-   | ('-' | '!') expression                                                              # NegationExpression
-   | expression ('+' | '-' | '*' | '/' | '%' | '&' | '|' | '^' | '<<' | '>>') expression # ArithmeticOrLogicalExpression
-   | expression ('==' | '!=' | '>' | '<' | '>=' | '<=') expression                       # ComparisonExpression
-   | expression ('||' | '&&') expression                                                 # LazyBooleanExpression
-   | expression 'as' expression                                                          # TypeCastExpression
-   | expression '=' expression                                                           # AssignmentExpression
+   : outerAttribute+ expression                                                        # AttributedExpression // technical, remove left recursive
+   | literalExpression                                                                 # LiteralExpression_
+   | pathExpression                                                                    # PathExpression_
+   | ('&' | '&&') 'mut'? expression                                                    # BorrowExpression
+   | '*' expression                                                                    # DereferenceExpression
+   | expression '?'                                                                    # ErrorPropagationExpression
+   | ('-' | '!') expression                                                            # NegationExpression
+   | expression ('+' | '-' | '*' | '/' | '%' | '&' | '|' | '^' | shl | shr) expression # ArithmeticOrLogicalExpression
+   | expression ('==' | '!=' | '>' | '<' | '>=' | '<=') expression                     # ComparisonExpression
+   | expression ('||' | '&&') expression                                               # LazyBooleanExpression
+   | expression 'as' expression                                                        # TypeCastExpression
+   | expression '=' expression                                                         # AssignmentExpression
    | expression
    (
       '+='
@@ -396,7 +404,9 @@ structExprFields
    : structExprField (',' structExprField)* (',' structBase | ','?)
    ;
 // outerAttribute here is not in doc
-structExprField: outerAttribute* (identifier | (identifier | tupleIndex) ':' expression);
+structExprField
+   : outerAttribute* (identifier | (identifier | tupleIndex) ':' expression)
+   ;
 structBase: '..' expression;
 structExprTuple
    : pathInExpression '(' innerAttribute* (expression ( ',' expression)* ','?)? ')'
@@ -653,8 +663,7 @@ macroLiteralToken: literalExpression;
 // macroDelimiterToken: '{' | '}' | '[' | ']' | '(' | ')';
 macroPunctuationToken
    : '-'
-   //| '+'
-   //| '*'
+   //| '+' | '*'
    | '/'
    | '%'
    | '^'
@@ -663,8 +672,8 @@ macroPunctuationToken
    | '|'
    | '&&'
    | '||'
-   | '<<'
-   | '>>'
+   | shl
+   | shr
    | '+='
    | '-='
    | '*='
@@ -695,6 +704,11 @@ macroPunctuationToken
    | '->'
    | '=>'
    | '#'
-   //| '$'
-   //| '?'
+   //| '$' | '?'
    ;
+
+// LA can be removed, legal rust code still pass but the cost is `let c = a < < b` will pass... i hope antlr5 can add
+// some new syntax? dsl? for these stuff so i needn't write it in (at least) 5 language
+
+shl: '<' {_input.LA(1)=='<'}? '<';
+shr: '>' {_input.LA(1)=='>'}? '>';
