@@ -1,3 +1,21 @@
+/*
+Copyright (c) 2010 The Rust Project Developers
+Copyright (c) 2020 Student Main
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 parser grammar rustParser
    ;
 
@@ -8,96 +26,22 @@ options
 // entry point
 crate: innerAttribute* item* EOF;
 
-identifierOrKeyword
-   : // only ascii
-   NON_KEYWORD_IDENTIFIER
-   | keyword
-   ;
-
-keyword
-   : KW_AS
-   | KW_BREAK
-   | KW_CONST
-   | KW_CONTINUE
-   | KW_CRATE
-   | KW_ELSE
-   | KW_ENUM
-   | KW_EXTERN
-   | KW_FALSE
-   | KW_FN
-   | KW_FOR
-   | KW_IF
-   | KW_IMPL
-   | KW_IN
-   | KW_LET
-   | KW_LOOP
-   | KW_MATCH
-   | KW_MOD
-   | KW_MOVE
-   | KW_MUT
-   | KW_PUB
-   | KW_REF
-   | KW_RETURN
-   | KW_SELFVALUE
-   | KW_SELFTYPE
-   | KW_STATIC
-   | KW_STRUCT
-   | KW_SUPER
-   | KW_TRAIT
-   | KW_TRUE
-   | KW_TYPE
-   | KW_UNSAFE
-   | KW_USE
-   | KW_WHERE
-   | KW_WHILE
-
-   // 2018+
-   | KW_ASYNC
-   | KW_AWAIT
-   | KW_DYN
-   // reserved
-   | KW_ABSTRACT
-   | KW_BECOME
-   | KW_BOX
-   | KW_DO
-   | KW_FINAL
-   | KW_MACRO
-   | KW_OVERRIDE
-   | KW_PRIV
-   | KW_TYPEOF
-   | KW_UNSIZED
-   | KW_VIRTUAL
-   | KW_YIELD
-   | KW_TRY
-   | KW_UNION
-   | KW_STATICLIFETIME
-
-   |KW_MACRORULES
-   |KW_UNDERLINELIFETIME
-   |KW_DOLLARCRATE
-   ;
-
-identifier: NON_KEYWORD_IDENTIFIER | RAW_IDENTIFIER;
-
 simplePath: '::'? simplePathSegment ( '::' simplePathSegment)*;
-
 simplePathSegment: identifier | 'super' | 'self' | 'crate' | '$crate';
 
 pathInExpression: '::'? pathExprSegment ('::' pathExprSegment)*;
-
 pathExprSegment: pathIdentSegment ('::' genericArgs)?;
-
 pathIdentSegment: identifier | 'super' | 'self' | 'Self' | 'crate' | '$crate';
 
+
+// TODO: nested A<B<C>>
 genericArgs
    : '<' '>'
    | '<' genericArgsLifetimes (',' genericArgsTypes)? (',' genericArgsBindings)? ','? '>'
    | '<' genericArgsTypes (',' genericArgsBindings)? ','? '>'
    | '<' genericArgsBindings ','? '>'
    ;
-
 genericArgsLifetimes: lifetime (',' lifetime)*;
-
 genericArgsTypes: type (',' type)*;
 genericArgsBindings: genericArgsBinding (',' genericArgsBinding)*;
 genericArgsBinding: identifier '=' type;
@@ -108,18 +52,16 @@ qualifiedPathInType: qualifiedPathType ('::' typePathSegment)+;
 
 typePath: '::'? typePathSegment ('::' typePathSegment)*;
 typePathSegment: pathIdentSegment '::'? ( genericArgs | typePathFn)?;
-
 typePathFn: '(' typePathInputs? ')' ( '->' type)?;
 typePathInputs: type (',' type)* ','?;
 
 macroInvocation: simplePath '!' delimTokenTree;
-
 delimTokenTree: '(' tokenTree* ')' | '[' tokenTree* ']' | '{' tokenTree* '}';
-
 tokenTree
-   : '::' // TODO: test, put all token except delim here...
+   : tokenTreeToken+
    | delimTokenTree
    ;
+tokenTreeToken: macroIdentifierLikeToken | macroLiteralToken | macroPunctuationToken | macroRepOp | '$';
 
 macroInvocationSemi
    : simplePath '!' '(' tokenTree* ')' ';'
@@ -128,35 +70,28 @@ macroInvocationSemi
    ;
 
 macroRulesDefinition: 'macro_rules' '!' identifier macroRulesDef;
-
 macroRulesDef
    : '(' macroRules ')' ';'
    | '[' macroRules ']' ';'
    | '{' macroRules '}'
    ;
-
 macroRules: macroRule (';' macroRule)* ';'?;
 macroRule: macroMatcher '=>' macroTranscriber;
-
 macroMatcher: '(' macroMatch* ')' | '[' macroMatch* ']' | '{' macroMatch* '}';
-
 macroMatch
-   : '::' // TODO: token except $ and delim
+   : macroMatchToken+
    | macroMatcher
    | '$' identifier ':' macroFragSpec
    | '$' '(' macroMatch+ ')' macroRepSep? macroRepOp
    ;
-
+macroMatchToken : macroIdentifierLikeToken | macroLiteralToken | macroPunctuationToken | macroRepOp;
 macroFragSpec
    : identifier // do validate here is wasting token
    ;
-
 macroRepSep
-   : '::' //TODO: Token except delimiters and repetition operators
+   : macroIdentifierLikeToken | macroLiteralToken | macroPunctuationToken | '$'
    ;
-
 macroRepOp: '*' | '+' | '?';
-
 macroTranscriber: delimTokenTree;
 
 //configurationPredicate
@@ -206,13 +141,9 @@ function
    : functionQualifiers 'fn' identifier generics? '(' functionParameters? ')' functionReturnType? whereClause?
       blockExpression
    ;
-
 functionQualifiers: asyncConstQualifiers? 'unsafe'? ('extern' abi?)?;
-
 asyncConstQualifiers: 'async' | 'const';
-
 abi: STRING_LITERAL | RAW_STRING_LITERAL;
-
 functionParameters: functionParam (',' functionParam)* ','?;
 functionParam: outerAttribute* pattern ':' type;
 functionReturnType: '->' type;
@@ -247,13 +178,12 @@ enumItemDiscriminant: '=' expression;
 
 union: 'union' identifier generics? whereClause? '{' structFields '}';
 
-constantItem: 'const' (identifier | '_') ':' type '=' expression;
+constantItem: 'const' (identifier | '_') ':' type '=' expression ';';
 staticItem: 'static' 'mut'? identifier ':' type '=' expression;
 
 trait
    : 'unsafe'? 'trait' identifier generics? (':' typeParamBounds?)? whereClause? '{' innerAttribute* traitItem* '}'
    ;
-
 traitItem
    : outerAttribute* visibility?
    (
@@ -277,7 +207,6 @@ traitMethodDecl
    ;
 traitFunctionParameters: traitFunctionParam (',' traitFunctionParam)* ','?;
 traitFunctionParam: outerAttribute* (pattern ':')? type;
-
 traitConst: 'const' identifier ':' type ('=' expression)? ';';
 traitType: 'type' identifier (':' typeParamBounds?)? ';';
 
@@ -292,11 +221,9 @@ inherentImplItem
       | ( visibility? ( constantItem | function | method))
    )
    ;
-
 traitImpl
    : 'unsafe'? 'impl' generics? '!'? typePath 'for' type whereClause? '{' innerAttribute* traitImplItem* '}'
    ;
-
 traitImplItem
    : outerAttribute*
    (
@@ -306,7 +233,6 @@ traitImplItem
    ;
 
 externBlock: 'extern' abi? '{' innerAttribute* externalItem* '}';
-
 externalItem
    : outerAttribute*
    (
@@ -314,9 +240,7 @@ externalItem
       | ( visibility? ( externalStaticItem | externalFunctionItem))
    )
    ;
-
 externalStaticItem: 'static' 'mut'? identifier ':' type ';';
-
 externalFunctionItem
    : 'fn' identifier generics? '('
    (
@@ -324,35 +248,23 @@ externalFunctionItem
       | namedFunctionParametersWithVariadics
    )? ')' functionReturnType? whereClause? ';'
    ;
-
 namedFunctionParameters: namedFunctionParam (',' namedFunctionParam)* ','?;
-
 namedFunctionParam: outerAttribute* (identifier | '_') ':' type;
-
 namedFunctionParametersWithVariadics
    : (namedFunctionParam ',')* namedFunctionParam ',' outerAttribute* '...'
    ;
 
 generics: '<' genericParams '>';
-
 genericParams: lifetimeParams | ( lifetimeParam ',')* typeParams;
-
 lifetimeParams: (lifetimeParam ',')* lifetimeParam?;
-
 lifetimeParam: outerAttribute? LIFETIME_OR_LABEL ( ':' lifetimeBounds)?;
-
 typeParams: ( typeParam ',')* typeParam?;
-
 typeParam: outerAttribute? identifier ( ':' typeParamBounds?)? ('=' type)?;
 
 whereClause: 'where' (whereClauseItem ',')* whereClauseItem?;
-
 whereClauseItem: lifetimeWhereClauseItem | typeBoundWhereClauseItem;
-
 lifetimeWhereClauseItem: lifetime ':' lifetimeBounds;
-
 typeBoundWhereClauseItem: forLifetimes? type ':' typeParamBounds?;
-
 forLifetimes: 'for' '<' lifetimeParams '>';
 
 method
@@ -361,14 +273,13 @@ method
       ',' functionParam
    )* ','? ')' functionReturnType? whereClause? blockExpression
    ;
-
 selfParam: outerAttribute* (shorthandSelf | typedSelf);
 shorthandSelf: ('&' lifetime?)? 'mut'? 'self';
 typedSelf: 'mut'? 'self' ':' type;
 
 visibility: 'pub' ( '(' ( 'crate' | 'self' | 'super' | 'in' simplePath) ')')?;
-innerAttribute: '#' '!' '[' attr ']';
 
+innerAttribute: '#' '!' '[' attr ']';
 outerAttribute: '#' '[' attr ']';
 attr: simplePath attrInput?;
 attrInput: delimTokenTree | '=' literalExpression; // w/o suffix
@@ -422,7 +333,6 @@ expression
    | '(' innerAttribute* expression ')'                 # GroupedExpression
    | '[' innerAttribute* arrayElements? ']'             # ArrayExpression
    | expression '.' 'await'                             # AwaitExpression
-   | expression '[' expression ']'                      # IndexExpression
    | '(' innerAttribute* tupleElements? ')'             # TupleExpression
    | expression '.' tupleIndex                          # TupleIndexingExpression
    | structExpression                                   # StructExpression_
@@ -437,6 +347,7 @@ expression
    | '..' expression?                                   # RangeExpression
    | '..=' expression                                   # RangeExpression
    | expression '..=' expression                        # RangeExpression
+   | expression '[' expression ']'                      # IndexExpression
    | 'return' expression?                               # ReturnExpression
    | macroInvocation                                    # MacroInvocationAsExpression
    | expressionWithBlock                                # ExpressionWithBlock_
@@ -468,7 +379,6 @@ literalExpression
 pathExpression: pathInExpression | qualifiedPathInExpression;
 
 blockExpression: '{' innerAttribute* statements? '}';
-
 statements: statement+ expression? | expression;
 
 asyncBlockExpression: 'async' 'move'? blockExpression;
@@ -485,12 +395,12 @@ structExprStruct
 structExprFields
    : structExprField (',' structExprField)* (',' structBase | ','?)
    ;
-structExprField: identifier | (identifier | tupleIndex) ':' expression;
+// outerAttribute here is not in doc
+structExprField: outerAttribute* (identifier | (identifier | tupleIndex) ':' expression);
 structBase: '..' expression;
 structExprTuple
    : pathInExpression '(' innerAttribute* (expression ( ',' expression)* ','?)? ')'
    ;
-
 structExprUnit: pathInExpression;
 
 enumerationVariantExpression
@@ -499,7 +409,6 @@ enumerationVariantExpression
    | enumExprFieldless
    ;
 enumExprStruct: pathInExpression '{' enumExprFields? '}';
-
 enumExprFields: enumExprField (',' enumExprField)* ','?;
 enumExprField: identifier | (identifier | tupleIndex) ':' expression;
 enumExprTuple: pathInExpression '(' ( expression (',' expression)* ','?)? ')';
@@ -526,7 +435,6 @@ loopExpression
       | iteratorLoopExpression
    )
    ;
-
 infiniteLoopExpression: 'loop' blockExpression;
 predicateLoopExpression
    : 'while' expression /*except structExpression*/ blockExpression
@@ -535,7 +443,6 @@ predicatePatternLoopExpression
    : 'while' 'let' matchArmPatterns '=' expression blockExpression
    ;
 iteratorLoopExpression: 'for' pattern 'in' expression blockExpression;
-
 loopLabel: LIFETIME_OR_LABEL ':';
 
 ifExpression
@@ -544,7 +451,6 @@ ifExpression
       'else' (blockExpression | ifExpression | ifLetExpression)
    )?
    ;
-
 ifLetExpression
    : 'if' 'let' matchArmPatterns '=' expression blockExpression
    (
@@ -554,7 +460,6 @@ ifLetExpression
 
 matchExpression: 'match' expression '{' innerAttribute* matchArms? '}';
 matchArms: (matchArm '=>' ( expression ','?))* matchArm '=>' expression ','?;
-
 matchArm: outerAttribute* matchArmPatterns matchArmGuard?;
 matchArmPatterns: '|'? pattern ('|' pattern)*;
 matchArmGuard: 'if' expression;
@@ -676,3 +581,120 @@ typeParamBound: lifetime | traitBound;
 traitBound: '?'? forLifetimes? typePath | '(' '?'? forLifetimes? typePath ')';
 lifetimeBounds: (lifetime '+')* lifetime?;
 lifetime: LIFETIME_OR_LABEL | '\'static' | '\'_';
+
+identifier: NON_KEYWORD_IDENTIFIER | RAW_IDENTIFIER;
+keyword
+   : KW_AS
+   | KW_BREAK
+   | KW_CONST
+   | KW_CONTINUE
+   | KW_CRATE
+   | KW_ELSE
+   | KW_ENUM
+   | KW_EXTERN
+   | KW_FALSE
+   | KW_FN
+   | KW_FOR
+   | KW_IF
+   | KW_IMPL
+   | KW_IN
+   | KW_LET
+   | KW_LOOP
+   | KW_MATCH
+   | KW_MOD
+   | KW_MOVE
+   | KW_MUT
+   | KW_PUB
+   | KW_REF
+   | KW_RETURN
+   | KW_SELFVALUE
+   | KW_SELFTYPE
+   | KW_STATIC
+   | KW_STRUCT
+   | KW_SUPER
+   | KW_TRAIT
+   | KW_TRUE
+   | KW_TYPE
+   | KW_UNSAFE
+   | KW_USE
+   | KW_WHERE
+   | KW_WHILE
+
+   // 2018+
+   | KW_ASYNC
+   | KW_AWAIT
+   | KW_DYN
+   // reserved
+   | KW_ABSTRACT
+   | KW_BECOME
+   | KW_BOX
+   | KW_DO
+   | KW_FINAL
+   | KW_MACRO
+   | KW_OVERRIDE
+   | KW_PRIV
+   | KW_TYPEOF
+   | KW_UNSIZED
+   | KW_VIRTUAL
+   | KW_YIELD
+   | KW_TRY
+   | KW_UNION
+   | KW_STATICLIFETIME
+   ;
+macroIdentifierLikeToken
+   : keyword
+   | identifier
+   | KW_MACRORULES
+   | KW_UNDERLINELIFETIME
+   | KW_DOLLARCRATE
+   | LIFETIME_OR_LABEL
+   ;
+macroLiteralToken: literalExpression;
+// macroDelimiterToken: '{' | '}' | '[' | ']' | '(' | ')';
+macroPunctuationToken
+   : '-'
+   //| '+'
+   //| '*'
+   | '/'
+   | '%'
+   | '^'
+   | '!'
+   | '&'
+   | '|'
+   | '&&'
+   | '||'
+   | '<<'
+   | '>>'
+   | '+='
+   | '-='
+   | '*='
+   | '/='
+   | '%='
+   | '^='
+   | '&='
+   | '|='
+   | '<<='
+   | '>>='
+   | '='
+   | '=='
+   | '!='
+   | '>'
+   | '<'
+   | '>='
+   | '<='
+   | '@'
+   | '_'
+   | '.'
+   | '..'
+   | '...'
+   | '..='
+   | ','
+   | ';'
+   | ':'
+   | '::'
+   | '->'
+   | '=>'
+   | '#'
+   //| '$'
+   //| '?'
+   ;
