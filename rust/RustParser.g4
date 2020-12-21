@@ -15,12 +15,12 @@
  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-parser grammar rustParser
+parser grammar RustParser
    ;
 
 options
 {
-   tokenVocab = rustLexer;
+   tokenVocab = RustLexer;
 }
 // entry point
 crate: innerAttribute* item* EOF;
@@ -311,7 +311,7 @@ statement
 
 letStatement: outerAttribute* 'let' pattern (':' type)? ( '=' expression)? ';';
 
-expressionStatement: expression ';'?;
+expressionStatement: expression ';'?; // ';' optional for block expr
 expression
    : outerAttribute+ expression                                                        # AttributedExpression // technical, remove left recursive
    | literalExpression                                                                 # LiteralExpression_
@@ -469,7 +469,7 @@ ifLetExpression
    ;
 
 matchExpression: 'match' expression '{' innerAttribute* matchArms? '}';
-matchArms: (matchArm '=>' ( expression ','?))* matchArm '=>' expression ','?;
+matchArms: (matchArm '=>' ( expression ','?))* matchArm '=>' expression ','?;// ',' optional for expr with block
 matchArm: outerAttribute* matchArmPatterns matchArmGuard?;
 matchArmPatterns: '|'? pattern ('|' pattern)*;
 matchArmGuard: 'if' expression;

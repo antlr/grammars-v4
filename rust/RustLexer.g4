@@ -15,7 +15,7 @@
  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-lexer grammar rustLexer
+lexer grammar RustLexer
    ;
 
 // https://doc.rust-lang.org/reference/keywords.html strict
@@ -89,7 +89,7 @@ KW_DOLLARCRATE: '$crate';
 NON_KEYWORD_IDENTIFIER: [a-zA-Z][a-zA-Z0-9_]* | '_' [a-zA-Z0-9_]+;
 RAW_IDENTIFIER: 'r#' NON_KEYWORD_IDENTIFIER;
 // comments https://doc.rust-lang.org/reference/comments.html
-LINE_COMMENT: ('//' (~[/!] | '//') ~[\n]* | '//') -> channel (HIDDEN);
+LINE_COMMENT: ('//' (~[/!] | '//') ~[\r\n]* | '//') -> channel (HIDDEN);
 
 BLOCK_COMMENT
    :
@@ -116,12 +116,14 @@ BLOCK_COMMENT_OR_DOC
    : (BLOCK_COMMENT | INNER_BLOCK_DOC | OUTER_BLOCK_DOC) -> channel (HIDDEN)
    ;
 
+SHEBANG: {_input.LA(-1)<=0}? '\ufeff'? '#!' ~[\r\n]* -> channel(HIDDEN);
+
 //ISOLATED_CR
-// : '\r' // not followed with \n ;
+// : '\r' {_input.LA(1)!='\n'}// not followed with \n ;
 
 // whitespace https://doc.rust-lang.org/reference/whitespace.html
 WHITESPACE: [\p{Zs}] -> channel(HIDDEN);
-NEWLINE: [\r\n] -> channel(HIDDEN);
+NEWLINE: ('\r\n' | [\r\n]) -> channel(HIDDEN);
 
 // tokens char and string
 CHAR_LITERAL
@@ -199,9 +201,6 @@ fragment OCT_DIGIT: [0-7];
 fragment DEC_DIGIT: [0-9];
 
 fragment HEX_DIGIT: [0-9a-fA-F];
-
-//SHEBANG
-// : '#!' ~'\n' // TODO ;
 
 LIFETIME_OR_LABEL: '\'' NON_KEYWORD_IDENTIFIER;
 
