@@ -33,6 +33,7 @@ pathInExpression: '::'? pathExprSegment ('::' pathExprSegment)*;
 pathExprSegment: pathIdentSegment ('::' genericArgs)?;
 pathIdentSegment: identifier | 'super' | 'self' | 'Self' | 'crate' | '$crate';
 
+//TODO: let x : T<_>=something;
 genericArgs
    : '<' '>'
    | '<' genericArgsLifetimes (',' genericArgsTypes)? (',' genericArgsBindings)? ','? '>'
@@ -82,7 +83,7 @@ macroMatcher: '(' macroMatch* ')' | '[' macroMatch* ']' | '{' macroMatch* '}';
 macroMatch
    : macroMatchToken+
    | macroMatcher
-   | '$' identifier ':' macroFragSpec
+   | '$' (identifier | 'self') ':' macroFragSpec
    | '$' '(' macroMatch+ ')' macroRepSep? macroRepOp
    ;
 macroMatchToken
@@ -112,7 +113,7 @@ macroTranscriber: delimTokenTree;
 // : configurationPredicate (',' configurationPredicate)* ','? ; cfgAttribute: 'cfg' '(' configurationPredicate ')';
 // cfgAttrAttribute: 'cfg_attr' '(' configurationPredicate ',' cfgAttrs? ')'; cfgAttrs: attr (',' attr)* ','?;
 
-item: outerAttribute* visItem | macroItem;
+item: outerAttribute* (visItem | macroItem);
 visItem
    : visibility?
    (
@@ -188,7 +189,7 @@ enumItemDiscriminant: '=' expression;
 union: 'union' identifier generics? whereClause? '{' structFields '}';
 
 constantItem: 'const' (identifier | '_') ':' type '=' expression ';';
-staticItem: 'static' 'mut'? identifier ':' type '=' expression;
+staticItem: 'static' 'mut'? identifier ':' type '=' expression ';';
 
 trait
    : 'unsafe'? 'trait' identifier generics? (':' typeParamBounds?)? whereClause? '{' innerAttribute* traitItem* '}'
@@ -324,7 +325,7 @@ expression
    | expression ('+' | '-' | '*' | '/' | '%' | '&' | '|' | '^' | shl | shr) expression # ArithmeticOrLogicalExpression
    | expression ('==' | '!=' | '>' | '<' | '>=' | '<=') expression                     # ComparisonExpression
    | expression ('||' | '&&') expression                                               # LazyBooleanExpression
-   | expression 'as' expression                                                        # TypeCastExpression
+   | expression 'as' typeNoBounds                                                      # TypeCastExpression
    | expression '=' expression                                                         # AssignmentExpression
    | expression
    (
@@ -471,9 +472,7 @@ ifLetExpression
    ;
 
 matchExpression: 'match' expression '{' innerAttribute* matchArms? '}';
-matchArms
-   : (matchArm '=>' ( matchArmExpression ','?))* matchArm '=>' matchArmExpression ','?
-   ;
+matchArms: (matchArm '=>' matchArmExpression)* matchArm '=>' expression ','?;
 matchArmExpression: expression ',' | expressionWithBlock ','?;
 matchArm: outerAttribute* matchArmPatterns matchArmGuard?;
 matchArmPatterns: '|'? pattern ('|' pattern)*;
@@ -566,7 +565,7 @@ typeNoBounds
    ;
 parenthesizedType: '(' type ')';
 neverType: '!';
-tupleType: '(' ( (type ',')+ type?) ')';
+tupleType: '(' ( (type ',')+ type?)? ')';
 arrayType: '[' type ';' expression ']';
 sliceType: '[' type ']';
 referenceType: '&' lifetime? 'mut'? typeNoBounds;
@@ -597,7 +596,7 @@ traitBound: '?'? forLifetimes? typePath | '(' '?'? forLifetimes? typePath ')';
 lifetimeBounds: (lifetime '+')* lifetime?;
 lifetime: LIFETIME_OR_LABEL | '\'static' | '\'_';
 
-identifier: NON_KEYWORD_IDENTIFIER | RAW_IDENTIFIER;
+identifier: NON_KEYWORD_IDENTIFIER | RAW_IDENTIFIER | 'macro_rules';
 keyword
    : KW_AS
    | KW_BREAK
@@ -677,8 +676,7 @@ macroPunctuationToken
    | '|'
    | '&&'
    | '||'
-   | shl
-   | shr
+   // already covered by '<' and '>' in macro | shl | shr
    | '+='
    | '-='
    | '*='
