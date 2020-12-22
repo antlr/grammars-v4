@@ -315,52 +315,61 @@ letStatement: outerAttribute* 'let' pattern (':' type)? ( '=' expression)? ';';
 
 expressionStatement: expression ';' | expressionWithBlock ';'?;
 expression
-   : outerAttribute+ expression                                                        # AttributedExpression // technical, remove left recursive
-   | literalExpression                                                                 # LiteralExpression_
-   | pathExpression                                                                    # PathExpression_
-   | ('&' | '&&') 'mut'? expression                                                    # BorrowExpression
-   | '*' expression                                                                    # DereferenceExpression
-   | expression '?'                                                                    # ErrorPropagationExpression
-   | ('-' | '!') expression                                                            # NegationExpression
-   | expression ('+' | '-' | '*' | '/' | '%' | '&' | '|' | '^' | shl | shr) expression # ArithmeticOrLogicalExpression
-   | expression ('==' | '!=' | '>' | '<' | '>=' | '<=') expression                     # ComparisonExpression
-   | expression ('||' | '&&') expression                                               # LazyBooleanExpression
-   | expression 'as' typeNoBounds                                                      # TypeCastExpression
-   | expression '=' expression                                                         # AssignmentExpression
-   | expression
-   (
-      '+='
-      | '-='
-      | '*='
-      | '/='
-      | '%='
-      | '&='
-      | '|='
-      | '^='
-      | '<<='
-      | '>>='
-   ) expression                                         # CompoundAssignmentExpression
-   | '(' innerAttribute* expression ')'                 # GroupedExpression
-   | '[' innerAttribute* arrayElements? ']'             # ArrayExpression
-   | expression '.' 'await'                             # AwaitExpression
-   | '(' innerAttribute* tupleElements? ')'             # TupleExpression
-   | expression '.' tupleIndex                          # TupleIndexingExpression
-   | structExpression                                   # StructExpression_
-   | enumerationVariantExpression                       # EnumerationVariantExpression_
-   | expression '(' callParams? ')'                     # CallExpression
+   : outerAttribute+ expression                         # AttributedExpression // technical, remove left recursive
+   | literalExpression                                  # LiteralExpression_
+   | pathExpression                                     # PathExpression_
    | expression '.' pathExprSegment '(' callParams? ')' # MethodCallExpression
    | expression '.' identifier                          # FieldExpression
-   | closureExpression                                  # ClosureExpression_
-   | 'continue' LIFETIME_OR_LABEL? expression?          # ContinueExpression
-   | 'break' LIFETIME_OR_LABEL? expression?             # BreakExpression
+   | expression '.' tupleIndex                          # TupleIndexingExpression
+   | expression '.' 'await'                             # AwaitExpression
+   | expression '(' callParams? ')'                     # CallExpression
+   | expression '[' expression ']'                      # IndexExpression
+   | expression '?'                                     # ErrorPropagationExpression
+   | ('&' | '&&') 'mut'? expression                     # BorrowExpression
+   | '*' expression                                     # DereferenceExpression
+   | ('-' | '!') expression                             # NegationExpression
+   | expression 'as' typeNoBounds                       # TypeCastExpression
+   | expression ('*' | '/' | '%') expression            # ArithmeticOrLogicalExpression
+   | expression ('+' | '-') expression                  # ArithmeticOrLogicalExpression
+   | expression (shl | shr) expression                  # ArithmeticOrLogicalExpression
+   | expression '&' expression                          # ArithmeticOrLogicalExpression
+   | expression '^' expression                          # ArithmeticOrLogicalExpression
+   | expression '|' expression                          # ArithmeticOrLogicalExpression
+   | expression comparisonOperator expression           # ComparisonExpression
+   | expression '&&' expression                         # LazyBooleanExpression
+   | expression '||' expression                         # LazyBooleanExpression
    | expression '..' expression?                        # RangeExpression
    | '..' expression?                                   # RangeExpression
    | '..=' expression                                   # RangeExpression
    | expression '..=' expression                        # RangeExpression
-   | expression '[' expression ']'                      # IndexExpression
+   | expression '=' expression                          # AssignmentExpression
+   | expression compoundAssignOperator expression       # CompoundAssignmentExpression
+   | 'continue' LIFETIME_OR_LABEL? expression?          # ContinueExpression
+   | 'break' LIFETIME_OR_LABEL? expression?             # BreakExpression
    | 'return' expression?                               # ReturnExpression
-   | macroInvocation                                    # MacroInvocationAsExpression
+   | '(' innerAttribute* expression ')'                 # GroupedExpression
+   | '[' innerAttribute* arrayElements? ']'             # ArrayExpression
+   | '(' innerAttribute* tupleElements? ')'             # TupleExpression
+   | structExpression                                   # StructExpression_
+   | enumerationVariantExpression                       # EnumerationVariantExpression_
+   | closureExpression                                  # ClosureExpression_
    | expressionWithBlock                                # ExpressionWithBlock_
+   | macroInvocation                                    # MacroInvocationAsExpression
+   ;
+
+comparisonOperator: '==' | '!=' | '>' | '<' | '>=' | '<=';
+
+compoundAssignOperator
+   : '+='
+   | '-='
+   | '*='
+   | '/='
+   | '%='
+   | '&='
+   | '|='
+   | '^='
+   | '<<='
+   | '>>='
    ;
 
 expressionWithBlock
