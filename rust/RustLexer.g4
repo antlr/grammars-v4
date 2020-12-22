@@ -18,6 +18,10 @@
 lexer grammar RustLexer
    ;
 
+options {
+   superClass=RustLexerBase;
+}
+
 // https://doc.rust-lang.org/reference/keywords.html strict
 KW_AS: 'as';
 KW_BREAK: 'break';
@@ -116,7 +120,7 @@ BLOCK_COMMENT_OR_DOC
    : (BLOCK_COMMENT | INNER_BLOCK_DOC | OUTER_BLOCK_DOC) -> channel (HIDDEN)
    ;
 
-SHEBANG: {_input.LA(-1)<=0}? '\ufeff'? '#!' ~[\r\n]* -> channel(HIDDEN);
+SHEBANG: {this.SOF()}? '\ufeff'? '#!' ~[\r\n]* -> channel(HIDDEN);
 
 //ISOLATED_CR
 // : '\r' {_input.LA(1)!='\n'}// not followed with \n ;
@@ -173,7 +177,7 @@ OCT_LITERAL: '0o' '_'* OCT_DIGIT (OCT_DIGIT | '_')*;
 BIN_LITERAL: '0b' '_'* [01] [01_]*;
 
 FLOAT_LITERAL
-   : DEC_LITERAL '.' { _input.LA(1) != '.'}?
+   : DEC_LITERAL '.' {!this.next('.')}?
    | DEC_LITERAL ('.' DEC_LITERAL)? FLOAT_EXPONENT? FLOAT_SUFFIX?
    ;
 

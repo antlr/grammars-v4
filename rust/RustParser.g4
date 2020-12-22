@@ -21,6 +21,7 @@ parser grammar RustParser
 options
 {
    tokenVocab = RustLexer;
+   superClass = RustParserBase;
 }
 // entry point
 crate: innerAttribute* item* EOF;
@@ -311,7 +312,7 @@ statement
 
 letStatement: outerAttribute* 'let' pattern (':' type)? ( '=' expression)? ';';
 
-expressionStatement: expression ';'?; // ';' optional for block expr
+expressionStatement: expression ';' | expressionWithBlock ';'?;
 expression
    : outerAttribute+ expression                                                        # AttributedExpression // technical, remove left recursive
    | literalExpression                                                                 # LiteralExpression_
@@ -362,7 +363,8 @@ expression
    ;
 
 expressionWithBlock
-   : blockExpression
+   : outerAttribute+ expressionWithBlock // technical
+   | blockExpression
    | asyncBlockExpression
    | unsafeBlockExpression
    | loopExpression
@@ -469,7 +471,10 @@ ifLetExpression
    ;
 
 matchExpression: 'match' expression '{' innerAttribute* matchArms? '}';
-matchArms: (matchArm '=>' ( expression ','?))* matchArm '=>' expression ','?;// ',' optional for expr with block
+matchArms
+   : (matchArm '=>' ( matchArmExpression ','?))* matchArm '=>' matchArmExpression ','?
+   ;
+matchArmExpression: expression ',' | expressionWithBlock ','?;
 matchArm: outerAttribute* matchArmPatterns matchArmGuard?;
 matchArmPatterns: '|'? pattern ('|' pattern)*;
 matchArmGuard: 'if' expression;
@@ -710,5 +715,5 @@ macroPunctuationToken
 // LA can be removed, legal rust code still pass but the cost is `let c = a < < b` will pass... i hope antlr5 can add
 // some new syntax? dsl? for these stuff so i needn't write it in (at least) 5 language
 
-shl: '<' {_input.LA(1)=='<'}? '<';
-shr: '>' {_input.LA(1)=='>'}? '>';
+shl: '<' {this.next('<')}? '<';
+shr: '>' {this.next('>')}? '>';
