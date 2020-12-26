@@ -18,8 +18,9 @@
 lexer grammar RustLexer
    ;
 
-options {
-   superClass=RustLexerBase;
+options
+{
+   superClass = RustLexerBase;
 }
 
 // https://doc.rust-lang.org/reference/keywords.html strict
@@ -98,7 +99,16 @@ LINE_COMMENT: ('//' (~[/!] | '//') ~[\r\n]* | '//') -> channel (HIDDEN);
 BLOCK_COMMENT
    :
    (
-      '/*' (~[*!] | '**' | BLOCK_COMMENT_OR_DOC) (BLOCK_COMMENT_OR_DOC | ~[*])*? '*/'
+      '/*'
+      (
+         ~[*!]
+         | '**'
+         | BLOCK_COMMENT_OR_DOC
+      )
+      (
+         BLOCK_COMMENT_OR_DOC
+         | ~[*]
+      )*? '*/'
       | '/**/'
       | '/***/'
    ) -> channel (HIDDEN)
@@ -107,17 +117,34 @@ BLOCK_COMMENT
 INNER_LINE_DOC: '//!' ~[\n\r]* -> channel (HIDDEN); // isolated cr
 
 INNER_BLOCK_DOC
-   : '/*!' (BLOCK_COMMENT_OR_DOC | ~[*])*? '*/' -> channel (HIDDEN)
+   : '/*!'
+   (
+      BLOCK_COMMENT_OR_DOC
+      | ~[*]
+   )*? '*/' -> channel (HIDDEN)
    ;
 
 OUTER_LINE_DOC: '///' (~[/] ~[\n\r]*)? -> channel (HIDDEN); // isolated cr
 
 OUTER_BLOCK_DOC
-   : '/**' (~[*] | BLOCK_COMMENT_OR_DOC) (BLOCK_COMMENT_OR_DOC | ~[*])*? '*/' -> channel (HIDDEN)
+   : '/**'
+   (
+      ~[*]
+      | BLOCK_COMMENT_OR_DOC
+   )
+   (
+      BLOCK_COMMENT_OR_DOC
+      | ~[*]
+   )*? '*/' -> channel (HIDDEN)
    ;
 
 BLOCK_COMMENT_OR_DOC
-   : (BLOCK_COMMENT | INNER_BLOCK_DOC | OUTER_BLOCK_DOC) -> channel (HIDDEN)
+   :
+   (
+      BLOCK_COMMENT
+      | INNER_BLOCK_DOC
+      | OUTER_BLOCK_DOC
+   ) -> channel (HIDDEN)
    ;
 
 SHEBANG: {this.SOF()}? '\ufeff'? '#!' ~[\r\n]* -> channel(HIDDEN);
@@ -131,11 +158,24 @@ NEWLINE: ('\r\n' | [\r\n]) -> channel(HIDDEN);
 
 // tokens char and string
 CHAR_LITERAL
-   : '\'' (~['\\\n\r\t] | QUOTE_ESCAPE | ASCII_ESCAPE | UNICODE_ESCAPE) '\''
+   : '\''
+   (
+      ~['\\\n\r\t]
+      | QUOTE_ESCAPE
+      | ASCII_ESCAPE
+      | UNICODE_ESCAPE
+   ) '\''
    ;
 
 STRING_LITERAL
-   : '"' (~["] | QUOTE_ESCAPE | ASCII_ESCAPE | UNICODE_ESCAPE | ESC_NEWLINE)* '"'
+   : '"'
+   (
+      ~["]
+      | QUOTE_ESCAPE
+      | ASCII_ESCAPE
+      | UNICODE_ESCAPE
+      | ESC_NEWLINE
+   )* '"'
    ;
 
 RAW_STRING_LITERAL: 'r' RAW_STRING_CONTENT;
@@ -165,7 +205,13 @@ fragment ESC_NEWLINE: '\\' '\n';
 // number
 
 INTEGER_LITERAL
-   : (DEC_LITERAL | BIN_LITERAL | OCT_LITERAL | HEX_LITERAL) INTEGER_SUFFIX?
+   :
+   (
+      DEC_LITERAL
+      | BIN_LITERAL
+      | OCT_LITERAL
+      | HEX_LITERAL
+   ) INTEGER_SUFFIX?
    ;
 
 DEC_LITERAL: DEC_DIGIT (DEC_DIGIT | '_')*;
@@ -178,7 +224,10 @@ BIN_LITERAL: '0b' '_'* [01] [01_]*;
 
 FLOAT_LITERAL
    : DEC_LITERAL '.' {this.floatDotPossible()}?
-   | DEC_LITERAL ('.' DEC_LITERAL)? FLOAT_EXPONENT? FLOAT_SUFFIX?
+   | DEC_LITERAL
+   (
+      '.' DEC_LITERAL
+   )? FLOAT_EXPONENT? FLOAT_SUFFIX?
    ;
 
 fragment INTEGER_SUFFIX
