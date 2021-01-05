@@ -302,7 +302,7 @@ Quote:              '\'';
 BackQuote:          '`';
 
 VarName:            '$' NameString;
-Label:              [a-z_][a-z_0-9]*;
+Label:              [a-zA-Z_][a-zA-Z_0-9]*;
 Octal:              '0' [0-7]+;
 Decimal:            '0' | NonZeroDigit Digit*;
 Real:               (Digit+ '.' Digit* | '.' Digit+) ExponentPart?
