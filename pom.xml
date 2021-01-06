@@ -9,8 +9,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<target.jvm>1.7</target.jvm>
-		<antlr.version>4.9</antlr.version>
-		<antlr4test-maven-plugin.version>1.16</antlr4test-maven-plugin.version>
+		<antlr.version>4.9.1</antlr.version>
+		<antlr4test-maven-plugin.version>1.17</antlr4test-maven-plugin.version>
 		<junit.version>4.13.1</junit.version>
 	</properties>
 	<prerequisites>
