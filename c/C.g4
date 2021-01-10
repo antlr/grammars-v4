@@ -893,7 +893,7 @@ SChar
     ;
 
 ComplexDefine
-    :   '#' Whitespace? 'define'  ~[#]*
+    :   '#' Whitespace? 'define'  ~[#\r\n]*
         -> skip
     ;
          
