@@ -208,8 +208,7 @@ macroItem
    ;
 
 module
-   : 'mod' identifier ';'
-   | 'mod' identifier '{' innerAttribute* item* '}'
+   : 'unsafe'? 'mod' identifier (';' | '{' innerAttribute* item* '}')
    ;
 
 externCrate
