@@ -3,12 +3,12 @@ parser grammar abbParser;
 options { tokenVocab = abbLexer; }
 
 /*
-    This grammar is still in development. 
-    In the current state, it is only able to parse .sys-files and read the given declarations. 
+    This grammar is still in development.
+    In the current state, it is only able to parse .sys-files and read the given declarations.
 */
 /*
     This file is the grammar for the ABB RAPID Robot Language.
-    
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,12 +32,13 @@ module
 
 moduleData
     : MODULE moduleName NEWLINE
-      dataList 
+      dataList
       NEWLINE*
+      ENDMODULE
     ;
 
 moduleName
-    : IDENTIFIER 
+    : IDENTIFIER
     | procCall
     ;
 
