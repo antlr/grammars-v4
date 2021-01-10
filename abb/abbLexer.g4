@@ -1,6 +1,7 @@
 lexer grammar abbLexer;
 
 MODULE : 'module' ;
+ENDMODULE : 'endmodule' ;
 PROC : P R O C ;
 ENDPROC : E N D P R O C;
 LOCAL : L O C A L ;
