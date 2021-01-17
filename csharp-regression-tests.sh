@@ -1,15 +1,19 @@
 #!/bin/bash
 
-# CSharp grammar regression tests.
+# This script tests Antlr grammars for the C# target. It searches
+# pom.xml files for grammars, generates a driver, builds, and tests the
+# parser on input files. The code only runs on Linux-type boxes.
+# It requires Bash, rm, pwd, echo, cat, xml2, grep, sed, awk, find, and
+# the NET SDK.
 #
-# This script tests Antlr grammars by generating a driver, compiling,
-# it and running the generate parse on input. Most grammars are target
-# independent, i.e., they do not include actions. These grammars
-# compile and parse fine. However, there are about a third which
-# currently are written for a particular target. These grammars are
-# manually removed from testing with the "do_not_do_list". If you
-# adjust the variable value (see the code below), then make sure there
-# is a space after each test name, before the backslash.
+# Most grammars in this directory are target independent. However,
+# there is a large number that, currently, are for a specific target.
+# These grammars are skipped from testing by inclusion of the name of
+# the grammar (path from the top-level directory of the repository) in
+# the "do_not_do_list". If you add a new grammar with a pom.xml file
+# that includes testing, then the grammar will be tested for the C#
+# target. If your grammar is target specific, adjust the list
+# below.
 
 # List<string> do_not_do_list = ...;
 do_not_do_list=" \
@@ -26,6 +30,22 @@ scss sharc sql/hive sql/mysql sql/plsql sql/sqlite sql/tsql \
 stringtemplate swift/swift2 swift/swift3 swift-fin thrift tnsnames \
 turtle-doc v vb6 wat xml xpath/xpath31 xsd-regex z \
 "
+
+# Sanity checks for required environment.
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+echo ${machine}
+if [[ "$machine" != "Linux" && "$machine" != "Mac" ]]
+then
+    echo "This script runs only in a Linux environment. Skipping."
+    exit 0
+fi
 
 # List<string> failed = new List<string>();
 failed=""
