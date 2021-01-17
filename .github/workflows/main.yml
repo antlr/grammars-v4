@@ -24,4 +24,6 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Test C# target
-      run: bash csharp-regression-tests.sh
+      run: |
+        sudo apt-get install xml2
+        bash csharp-regression-tests.sh
