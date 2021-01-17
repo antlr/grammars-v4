@@ -29,5 +29,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: Test C# target
       run: |
-	sudo apt-get install xml2
-	bash csharp-regression-tests.sh
+        sudo apt-get install xml2
+        bash csharp-regression-tests.sh
