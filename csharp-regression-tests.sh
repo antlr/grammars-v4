@@ -47,6 +47,8 @@ then
     exit 0
 fi
 
+date
+
 # List<string> failed = new List<string>();
 failed=""
 
@@ -179,6 +181,9 @@ recurse "$prefix"
 echo "Grammars that succeeded: $succeeded" | fmt
 echo "Grammars that failed: $failed" | fmt
 echo "Grammars skipped: $skipped" | fmt
+
+date
+
 if [[ "$failed" == "" ]]
 then
     exit 0
