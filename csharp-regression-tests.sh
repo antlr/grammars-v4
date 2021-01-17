@@ -81,7 +81,7 @@ recurse()
     # Assert(cwd is valid)
     if [[ $? != "0" ]]
     then
-	exit 1
+        exit 1
     fi
     testname=${x#"$prefix/"}
     # In the current working directory, extract sub-modules from the pom.xml.
@@ -101,10 +101,9 @@ recurse()
         then
             echo "No entry point for grammar specified in pom.xml -- skipping."
             skipped=`add "$skipped" "$testname"`
-	else
+        else
             rm -rf Generated
-            echo dotnet /mnt/c/Users/kenne/Documents/Antlr4BuildTasks/dotnet-antlr/bin/Debug/net5.0/dotnet_antlr.dll -s $s
-            dotnet /mnt/c/Users/kenne/Documents/Antlr4BuildTasks/dotnet-antlr/bin/Debug/net5.0/dotnet_antlr.dll -s $s
+            dotnet-antlr -s $s
             dotnet build Generated/Test.csproj
             if [[ "$?" != "0" ]]
             then
@@ -146,13 +145,14 @@ recurse()
     else
         for i in $d
         do
-	    newd="$x/$i"
+            newd="$x/$i"
             recurse "$newd"
         done
     fi
 }
 
 # Main
+dotnet tool install -g dotnet-antlr
 echo "These grammars will not be tested for the CSharp target:"
 echo $do_not_do_list | fmt
 recurse "$prefix"
