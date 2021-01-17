@@ -12,78 +12,18 @@
 # is a space after each test name, before the backslash.
 
 do_not_do_list=" \
-idl \
-iri \
-molecule \
-rfc1035 \
-rfc1960 \
-tcpheader \
-unicode/graphemes \
-abb \
+idl iri molecule rfc1035 rfc1960 tcpheader unicode/graphemes abb \
 ======== \
-antlr/antlr2 \
-antlr/antlr3 \
-antlr/antlr4 \
-apex \
-asm/masm \
-asn/asn_3gpp \
-cobol85 \
-cpp \
-cql3 \
-csharp \
-cto \
-dice \
-fortran77 \
-fusion-tables \
-graphstream-dgs \
-haskell \
-html \
-java/java \
-java/java8 \
-java/java9 \
-javadoc \
-javascript/ecmascript \
-kirikiri-tjs \
-kotlin/kotlin-formal \
-less \
-logo/ucb-logo \
-lpc \
-mckeeman-form \
-muparser \
-oncrpc \
-pgn \
-php \
-powerbuilder \
-promql \
-prov-n \
-python/python3 \
-python/python3alt \
-r \
-rego \
-rexx \
-rfc822/rfc822-datetime \
-rfc822/rfc822-emailaddress \
-scss \
-sharc \
-sql/hive \
-sql/mysql \
-sql/plsql \
-sql/sqlite \
-sql/tsql \
-stringtemplate \
-swift/swift2 \
-swift/swift3 \
-swift-fin \
-thrift \
-tnsnames \
-turtle-doc \
-v \
-vb6 \
-wat \
-xml \
-xpath/xpath31 \
-xsd-regex \
-z \
+antlr/antlr2 antlr/antlr3 antlr/antlr4 apex asm/masm asn/asn_3gpp \
+cobol85 cpp cql3 csharp cto dice fortran77 fusion-tables \
+graphstream-dgs haskell html java/java java/java8 java/java9 \
+javadoc javascript/ecmascript kirikiri-tjs kotlin/kotlin-formal \
+less logo/ucb-logo lpc mckeeman-form muparser oncrpc pgn php \
+powerbuilder promql prov-n python/python3 python/python3alt \
+r rego rexx rfc822/rfc822-datetime rfc822/rfc822-emailaddress \
+scss sharc sql/hive sql/mysql sql/plsql sql/sqlite sql/tsql \
+stringtemplate swift/swift2 swift/swift3 swift-fin thrift tnsnames \
+turtle-doc v vb6 wat xml xpath/xpath31 xsd-regex z \
 "
 echo "These grammars will not be tested for the CSharp target:"
 echo $do_not_do_list | fmt
@@ -103,29 +43,13 @@ contains() {
 }
 
 # This function sets the variable "failed" with the give named test.
-# Duplicates are avoided.
-update_failed() {
-    if [[ `contains "$failed" "$1"` == "no" ]]
+# List<string> add(List<string>, string), without duplicates.
+add() {
+    if [[ `contains "$1" "$2"` == "no" ]]
     then
-        failed="$failed $1"
-    fi
-}
-
-# This function sets the variable "succeeded" with the give named test.
-# Duplicates are avoided.
-update_succeeded() {
-    if [[ `contains "$succeeded" "$1"` == "no" ]]
-    then
-        succeeded="$succeeded $1"
-    fi
-}
-
-# This function sets the variable "skipped" with the give named test.
-# Duplicates are avoided.
-update_skipped() {
-    if [[ `contains "$skipped" "$1"` == "no" ]]
-    then
-        skipped="$skipped $1"
+        echo "$1 $2"
+    else
+        echo "$1"
     fi
 }
 
@@ -151,19 +75,19 @@ recurse()
         if [[ "$filtered" == "yes" ]]
         then
             echo "On do_not_do_list -- skipping."
-            update_skipped "$testname"
+            skipped=`add "$skipped" "$testname"`
         elif [[ "$s" == "" ]]
         then
             echo "No entry point for grammar specified in pom.xml -- skipping."
-            update_skipped "$testname"
-        else
+            skipped=`add "$skipped" "$testname"`
+	else
             rm -rf Generated
             echo dotnet /mnt/c/Users/kenne/Documents/Antlr4BuildTasks/dotnet-antlr/bin/Debug/net5.0/dotnet_antlr.dll -s $s
             dotnet /mnt/c/Users/kenne/Documents/Antlr4BuildTasks/dotnet-antlr/bin/Debug/net5.0/dotnet_antlr.dll -s $s
             dotnet build Generated/Test.csproj
             if [[ "$?" != "0" ]]
             then
-                update_failed "$testname"
+                failed=`add "$failed" "$testname"`
             fi
             examples=`cat pom.xml | xml2 | grep configuration/exampleFiles= | sed 's/=/ /' | awk '{print $2}'`
             if [[ "$examples" == "" ]]
@@ -182,19 +106,19 @@ recurse()
                         then
                             echo "(Expected failed parse => OK)"
                         else
-                            update_failed "$testname"
+                            failed=`add "$failed" "$testname"`
                         fi
                     else
                         if [[ "$pass" -ne "0" ]]
                         then
-                            update_failed "$testname"
+                            failed=`add "$failed" "$testname"`
                         fi
                     fi
                 done
             fi
             if [[ `contains "$failed" "$testname"` == "no" ]]
             then
-                update_succeeded "$testname"
+                succeeded=`add "$succeeded" "$testname"`
             fi
             rm -rf Generated
         fi
