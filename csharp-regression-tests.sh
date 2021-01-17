@@ -11,6 +11,7 @@
 # adjust the variable value (see the code below), then make sure there
 # is a space after each test name, before the backslash.
 
+# List<string> do_not_do_list = ...;
 do_not_do_list=" \
 idl iri molecule rfc1035 rfc1960 tcpheader unicode/graphemes abb \
 ======== \
@@ -25,14 +26,21 @@ scss sharc sql/hive sql/mysql sql/plsql sql/sqlite sql/tsql \
 stringtemplate swift/swift2 swift/swift3 swift-fin thrift tnsnames \
 turtle-doc v vb6 wat xml xpath/xpath31 xsd-regex z \
 "
-echo "These grammars will not be tested for the CSharp target:"
-echo $do_not_do_list | fmt
 
+# List<string> failed = new List<string>();
 failed=""
+
+# List<string> succeeded = new List<string>();
 succeeded=""
+
+# List<string> skipped = new List<string>();
 skipped=""
 
-# This function outputs "yes" if "foo" exists in $list, otherwise "no".
+# string prefix = current working directory.
+prefix=`pwd`
+
+# string contains(List<string> list, string item)
+# If "list" contains the "item", return "yes" else return "no".
 contains() {
     if [[ " $1 " =~ " $2 " ]]
     then
@@ -42,8 +50,8 @@ contains() {
     fi
 }
 
-# This function sets the variable "failed" with the give named test.
-# List<string> add(List<string>, string), without duplicates.
+# List<string> add(List<string> list, string name), without duplicates.
+# This function returns a new list by adding "name" to "list".
 add() {
     if [[ `contains "$1" "$2"` == "no" ]]
     then
@@ -53,20 +61,33 @@ add() {
     fi
 }
 
-prefix=`pwd`
-prefix="$prefix"/
-
 # Uncomment this line to remove the temporary directories.
 # rm -rf `find . -name Generated`
 
+# void recurse(string cwd)
 recurse()
 {
+    local x="$1"
+    local d
+    local examples
+    local files
+    local filtered
+    local i
+    local newd
+    local pass
+    local s
+    local testname
+    cd "$x"
+    # Assert(cwd is valid)
+    if [[ $? != "0" ]]
+    then
+	exit 1
+    fi
+    testname=${x#"$prefix/"}
     # In the current working directory, extract sub-modules from the pom.xml.
     d=`cat pom.xml | xml2 | grep modules/module= | sed 's/=/ /' | awk '{print $2}'`
     if [[ "$d" == "" ]]
     then
-        x=`pwd`
-        testname=${x#"$prefix"}
         echo "===================================================="
         echo Testing CSharp parsing for $testname
         echo ""
@@ -125,19 +146,19 @@ recurse()
     else
         for i in $d
         do
-            cd $i
-            recurse
-            cd ..
+	    newd="$x/$i"
+            recurse "$newd"
         done
     fi
 }
 
-recurse
-
+# Main
+echo "These grammars will not be tested for the CSharp target:"
+echo $do_not_do_list | fmt
+recurse "$prefix"
 echo "Grammars that succeeded: $succeeded" | fmt
 echo "Grammars that failed: $failed" | fmt
 echo "Grammars skipped: $skipped" | fmt
-
 if [[ "$failed" == "" ]]
 then
     exit 0
