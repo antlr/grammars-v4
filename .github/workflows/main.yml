@@ -24,4 +24,4 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Test C# target
-      run: ./csharp-regression-tests.sh
+      run: bash csharp-regression-tests.sh

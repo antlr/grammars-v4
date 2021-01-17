@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 # This script tests Antlr grammars for the C# target. It searches
 # pom.xml files for grammars, generates a driver, builds, and tests the
