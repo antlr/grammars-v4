@@ -16,8 +16,10 @@
 # below.
 
 # List<string> do_not_do_list = ...;
+# idl iri molecule rfc1035 rfc1960 tcpheader unicode/graphemes abb
+
 do_not_do_list=" \
-idl iri molecule rfc1035 rfc1960 tcpheader unicode/graphemes abb \
+idl modecule tcpheader unicode/graphemes \
 ======== \
 antlr/antlr2 antlr/antlr3 antlr/antlr4 apex asm/masm asn/asn_3gpp \
 cobol85 cpp cql3 csharp cto dice fortran77 fusion-tables \
@@ -174,7 +176,7 @@ recurse()
 }
 
 # Main
-dotnet tool install -g dotnet-antlr
+dotnet tool install -g dotnet-antlr --version 1.1.0
 echo "These grammars will not be tested for the CSharp target:"
 echo $do_not_do_list | fmt
 recurse "$prefix"
