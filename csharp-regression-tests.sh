@@ -19,7 +19,7 @@
 # idl iri molecule rfc1035 rfc1960 tcpheader unicode/graphemes abb 
 
 do_not_do_list=" \
-idl modecule tcpheader unicode/graphemes \
+idl molecule tcpheader unicode/graphemes \
 ======== \
 antlr/antlr2 antlr/antlr3 antlr/antlr4 apex asm/masm asn/asn_3gpp \
 cobol85 cpp cql3 csharp cto dice fortran77 fusion-tables \
