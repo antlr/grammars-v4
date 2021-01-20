@@ -291,11 +291,11 @@ WS
 // parser. This means that the parser to deal with the gramamr file anyway
 // but we will not try to analyse or code generate from a file with lexical
 // errors.
-//
+
 // Comment this rule out to allow the error to be propagated to the parser
-// ERRCHAR
-//    : . -> channel (HIDDEN)
-//    ;
+ERRCHAR
+   : . -> channel (HIDDEN)
+   ;
 
 // ======================================================
 // Lexer modes
@@ -324,7 +324,7 @@ END_ARGUMENT
    { handleEndArgument(); }
    ;
 
-   // added this to return non-EOF token type here. EOF does something weird
+// added this to return non-EOF token type here. EOF does something weird
 UNTERMINATED_ARGUMENT
    : EOF -> popMode
    ;
@@ -383,8 +383,8 @@ UNTERMINATED_ACTION
 ACTION_CONTENT
    : .
    ;
-   // -------------------------
 
+// -------------------------
 mode Options;
 OPT_DOC_COMMENT
    : DocComment -> type (DOC_COMMENT) , channel (COMMENT)
@@ -438,8 +438,8 @@ OPT_SEMI
 OPT_WS
    : Ws+ -> type (WS) , channel (OFF_CHANNEL)
    ;
-   // -------------------------
 
+// -------------------------
 mode Tokens;
 TOK_DOC_COMMENT
    : DocComment -> type (DOC_COMMENT) , channel (COMMENT)
@@ -476,8 +476,8 @@ TOK_COMMA
 TOK_WS
    : Ws+ -> type (WS) , channel (OFF_CHANNEL)
    ;
-   // -------------------------
 
+// -------------------------
 mode Channels;
 // currently same as Tokens mode; distinguished by keyword
 CHN_DOC_COMMENT
@@ -515,8 +515,8 @@ CHN_COMMA
 CHN_WS
    : Ws+ -> type (WS) , channel (OFF_CHANNEL)
    ;
-   // -------------------------
 
+// -------------------------
 mode LexerCharSet;
 LEXER_CHAR_SET_BODY
    : (~ [\]\\] | EscAny)+ -> more
@@ -529,9 +529,9 @@ LEXER_CHAR_SET
 UNTERMINATED_CHAR_SET
    : EOF -> popMode
    ;
-   // ------------------------------------------------------------------------------
-   // Grammar specific Keywords, Punctuation, etc.
 
+// ------------------------------------------------------------------------------
+// Grammar specific Keywords, Punctuation, etc.
 fragment Id
    : NameStartChar NameChar*
    ;
