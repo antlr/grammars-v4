@@ -26,7 +26,7 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-namespace Antlr2BGF.AntlrParser
+namespace LexerAdaptor
 {
     using System;
     using System.IO;
