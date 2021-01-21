@@ -8,6 +8,10 @@ Entry rule is `crate`, you need run test via command line at the moment: `grun R
 
 Last updated for rust v1.49.0
 
+## Maven build
+
+Install the parser into the local Maven repository with `mvn install`.
+
 ## Known limitation
 
 - Only v2018+ stable feature is implemented.
