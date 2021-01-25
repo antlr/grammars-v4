@@ -87,7 +87,7 @@ cell_props
    ;
 
 cell_property_list
-   : cell_property COMMA cell_property*
+   : cell_property (COMMA cell_property)*
    ;
 
 cell_property
