@@ -43,7 +43,7 @@
 					<showTree>false</showTree>
 					<grammarName>Kotlin</grammarName>
 					<caseInsensitive>true</caseInsensitive>
-					<packageName></packageName>
+					<packageName>org.antlr.grammars</packageName>
 				</configuration>
 				<executions>
 					<execution>
