@@ -16,3 +16,6 @@
 .idea/
 *.iml
 /**/gen
+
+# Ignore C# regression temporaries.
+**/Generated/
