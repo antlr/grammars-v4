@@ -186,10 +186,15 @@ exprs
    ;
 
 argumentExprs
-   : '(' exprs? ')'
-   | '(' (exprs ',')? postfixExpr ':' '_' '*' ')'
-   | NL? blockExpr
-   ;
+    : '(' args ')'
+    | '{' args '}'
+    | NL? blockExpr
+    ;
+
+args
+    : exprs?
+    | (exprs ',')? postfixExpr ':' '_' '*' // should be (':' | '_' | '*') ?
+    ;
 
 blockExpr
    : '{' caseClauses '}'
@@ -1341,7 +1346,7 @@ WS
    ;
 
 COMMENT
-   :   '/*' .*? '*/' -> skip
+   :   '/*' (COMMENT | .)* '*/' -> skip
    ;
 
 
