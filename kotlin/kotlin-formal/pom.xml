@@ -44,7 +44,7 @@
 					<entryPoint>kotlinFile</entryPoint>
 					<grammarName>Kotlin</grammarName>
 					<caseInsensitive>true</caseInsensitive>
-					<packageName></packageName>
+					<packageName>org.antlr.grammars</packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

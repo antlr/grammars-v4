@@ -4,6 +4,10 @@
 
 lexer grammar UnicodeClasses;
 
+@ header {
+    package org.antlr.grammars;
+}
+
 UNICODE_CLASS_LL:
 	'\u0061'..'\u007A' |
 	'\u00B5' |
