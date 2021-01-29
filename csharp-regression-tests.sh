@@ -24,7 +24,7 @@ idl molecule tcpheader unicode/graphemes \
 antlr/antlr2 antlr/antlr3 antlr/antlr4 apex asm/masm asn/asn_3gpp \
 cobol85 cpp cql3 csharp cto dice fortran77 fusion-tables \
 graphstream-dgs haskell html java/java java/java8 java/java9 \
-javadoc javascript/ecmascript kirikiri-tjs kotlin/kotlin-formal \
+javadoc javascript/ecmascript kirikiri-tjs kotlin/kotlin kotlin/kotlin-formal \
 less logo/ucb-logo lpc mckeeman-form muparser oncrpc pgn php \
 powerbuilder promql prov-n python/python3 python/python3alt \
 r rego rexx rfc822/rfc822-datetime rfc822/rfc822-emailaddress \
