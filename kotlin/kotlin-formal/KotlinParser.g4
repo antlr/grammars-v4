@@ -12,10 +12,6 @@
 
 parser grammar KotlinParser;
 
-@ header {
-    package org.antlr.grammars;
-}
-
 options { tokenVocab = KotlinLexer; }
 
 kotlinFile
