@@ -193,7 +193,7 @@ argumentExprs
 
 args
     : exprs?
-    | (exprs ',')? postfixExpr ':' '_' '*' // should be (':' | '_' | '*') ?
+    | (exprs ',')? postfixExpr (':' | '_' | '*') ?
     ;
 
 blockExpr
