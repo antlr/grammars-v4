@@ -279,3 +279,13 @@ BEGIN
   DECLARE var3 INT unsigned default 2 + var1;
 END -- //-- delimiter ;
 #end
+-- Create procedure
+-- delimiter //
+CREATE PROCEDURE makesignal(p1 INT)
+BEGIN
+  DECLARE error_text VARCHAR(255);
+  IF (error_text != 'OK') THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_text;
+  END IF;
+END -- //-- delimiter ;
+#end
