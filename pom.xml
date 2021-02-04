@@ -223,6 +223,7 @@
 				<module>romannumerals</module>
 				<module>rpn</module>
 				<module>ruby</module>
+				<module>rust</module>
 				<module>scala</module>
 				<module>scotty</module>
 				<module>scss</module>
