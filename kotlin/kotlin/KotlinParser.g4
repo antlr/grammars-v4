@@ -108,7 +108,7 @@ classMemberDeclaration
     | propertyDeclaration
     | anonymousInitializer
     | secondaryConstructor
-    | typeAlias) anysemi*
+    | typeAlias) anysemi+
     ;
 
 anonymousInitializer
@@ -116,7 +116,7 @@ anonymousInitializer
     ;
 
 secondaryConstructor
-    : modifierList? CONSTRUCTOR NL* functionValueParameters (NL* COLON NL* constructorDelegationCall)? NL* block
+    : modifierList? CONSTRUCTOR NL* functionValueParameters (NL* COLON NL* constructorDelegationCall)? NL* block?
     ;
 
 constructorDelegationCall
@@ -632,7 +632,7 @@ postfixUnaryOperation
 memberAccessOperator
     : DOT | QUEST DOT
     ;
-    
+
 modifierList
     : (annotations | modifier)+
     ;
