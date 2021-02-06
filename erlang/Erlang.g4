@@ -26,7 +26,7 @@ grammar Erlang;
 
 forms : form+ EOF ;
 
-form : (attribute | function | ruleClauses) '.' ;
+form : (attribute | function_ | ruleClauses) '.' ;
 
 /// Tokens
 
@@ -164,7 +164,7 @@ attrVal :     expr
         |     expr ',' exprs
         | '(' expr ',' exprs ')' ;
 
-function : functionClause (';' functionClause)* ;
+function_ : functionClause (';' functionClause)* ;
 
 functionClause : tokAtom clauseArgs clauseGuard clauseBody ;
 

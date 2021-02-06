@@ -103,7 +103,7 @@ statement
    ;
 
 vardecl
-   : var (LPAREN exprlist RPAREN)*
+   : var_ (LPAREN exprlist RPAREN)*
    ;
 
 printstmt1
@@ -247,7 +247,7 @@ drawstmt
    ;
 
 defstmt
-   : DEF FN? var LPAREN var RPAREN EQ expression
+   : DEF FN? var_ LPAREN var_ RPAREN EQ expression
    ;
 
 tabstmt
@@ -396,7 +396,7 @@ expression
    ;
 
 // lists
-var
+var_
    : varname varsuffix?
    ;
 
@@ -478,7 +478,7 @@ strfunc
    ;
 
 fnfunc
-   : FN var LPAREN expression RPAREN
+   : FN var_ LPAREN expression RPAREN
    ;
 
 valfunc

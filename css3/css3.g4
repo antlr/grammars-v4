@@ -193,16 +193,16 @@ term
     | String ws              # knownTerm
     | UnicodeRange ws        # knownTerm
     | ident ws               # knownTerm
-    | var                    # knownTerm
+    | var_                   # knownTerm
     | Uri ws                 # knownTerm
     | hexcolor               # knownTerm
     | calc                   # knownTerm
-    | function               # knownTerm
+    | function_              # knownTerm
     | unknownDimension ws    # unknownTerm
     | dxImageTransform       # badTerm
     ;
 
-function
+function_
     : Function ws expr ')' ws
     ;
 
@@ -328,7 +328,7 @@ generalEnclosed
 
 // Variable
 // https://www.w3.org/TR/css-variables-1
-var
+var_
     : Var ws Variable ws ')' ws
     ;
 

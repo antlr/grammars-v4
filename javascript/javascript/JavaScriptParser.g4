@@ -155,7 +155,7 @@ iterationStatement
 
 varModifier  // let, const - ECMAScript 6
     : Var
-    | let
+    | let_
     | Const
     ;
 
@@ -484,7 +484,7 @@ keyword
     | Export
     | Import
     | Implements
-    | let
+    | let_
     | Private
     | Public
     | Interface
@@ -498,7 +498,7 @@ keyword
     | As
     ;
 
-let
+let_
     : NonStrictLet
     | StrictLet
     ;
