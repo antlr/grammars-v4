@@ -313,10 +313,10 @@ assignment
 value
    : NUMBER
    | variable
-   | function
+   | function_
    ;
 
-function
+function_
    : funcSqrt
    | funcLog
    | funcExp

@@ -30,4 +30,4 @@ jobs:
     - name: Test C# target
       run: |
         sudo apt-get install xml2
-        bash csharp-regression-tests.sh
+        bash _scripts/csharp-regression-tests.sh

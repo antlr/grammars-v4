@@ -176,14 +176,15 @@ recurse()
 }
 
 # Main
-dotnet tool install -g dotnet-antlr --version 1.1.0
+dotnet tool install -g dotnet-antlr --version 1.4.0
 echo "These grammars will not be tested for the CSharp target:"
 echo $do_not_do_list | fmt
 recurse "$prefix"
 echo "Grammars that succeeded: $succeeded" | fmt
-echo "Grammars that failed: $failed" | fmt
 echo "Grammars skipped: $skipped" | fmt
-
+echo "================"
+echo "Grammars that failed: $failed" | fmt
+echo "================"
 date
 
 if [[ "$failed" == "" ]]

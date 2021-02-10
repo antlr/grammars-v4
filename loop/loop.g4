@@ -46,18 +46,18 @@ statement
    ;
 
 assignstmt
-   : var ':=' number ';'
+   : var_ ':=' number ';'
    ;
 
 incrementstmt
-   : var ':=' var ('+' | '-') number
+   : var_ ':=' var_ ('+' | '-') number
    ;
 
 loopstmt
-   : 'LOOP' var 'DO' statementlist 'END'
+   : 'LOOP' var_ 'DO' statementlist 'END'
    ;
 
-var
+var_
    : ID
    ;
 
