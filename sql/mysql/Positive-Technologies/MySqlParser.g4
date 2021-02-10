@@ -2378,8 +2378,8 @@ expressionAtom
     | BINARY expressionAtom                                         #binaryExpressionAtom
     | '(' expression (',' expression)* ')'                          #nestedExpressionAtom
     | ROW '(' expression (',' expression)+ ')'                      #nestedRowExpressionAtom
-    | EXISTS '(' selectStatement ')'                                #existsExpessionAtom
-    | '(' selectStatement ')'                                       #subqueryExpessionAtom
+    | EXISTS '(' selectStatement ')'                                #existsExpressionAtom
+    | '(' selectStatement ')'                                       #subqueryExpressionAtom
     | INTERVAL expression intervalType                              #intervalExpressionAtom
     | left=expressionAtom bitOperator right=expressionAtom          #bitExpressionAtom
     | left=expressionAtom mathOperator right=expressionAtom         #mathExpressionAtom
