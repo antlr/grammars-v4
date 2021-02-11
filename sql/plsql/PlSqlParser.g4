@@ -3154,7 +3154,7 @@ exception_handler
     ;
 
 trigger_block
-    : (DECLARE? declare_spec+)? body
+    : (DECLARE declare_spec*)? body
     ;
 
 block
@@ -3785,6 +3785,7 @@ between_elements
 concatenation
     : model_expression
         (AT (LOCAL | TIME ZONE concatenation) | interval_expression)?
+        (ON OVERFLOW (TRUNCATE | ERROR))?
     | concatenation op=(ASTERISK | SOLIDUS) concatenation
     | concatenation op=(PLUS_SIGN | MINUS_SIGN) concatenation
     | concatenation BAR BAR concatenation
@@ -4588,7 +4589,8 @@ numeric_negative
     ;
 
 quoted_string
-    : CHAR_STRING
+    : variable_name
+    | CHAR_STRING
     //| CHAR_STRING_PERL
     | NATIONAL_CHAR_STRING_LIT
     ;
