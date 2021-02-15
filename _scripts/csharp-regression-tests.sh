@@ -128,9 +128,6 @@ recurse()
         else
             rm -rf Generated
             dotnet-antlr -s $s
-            if [[ -d "CSharpIncludes" ]]; then
-                cp CSharpIncludes/*.cs Generated
-            fi
             dotnet build Generated/Test.csproj
             if [[ "$?" != "0" ]]
             then
