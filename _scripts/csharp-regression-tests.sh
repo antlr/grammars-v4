@@ -27,7 +27,7 @@ graphstream-dgs haskell html java/java java/java8 java/java9 \
 javadoc javascript/ecmascript kirikiri-tjs kotlin/kotlin kotlin/kotlin-formal \
 less logo/ucb-logo lpc mckeeman-form muparser oncrpc pgn php \
 powerbuilder promql prov-n python/python3 python/python3alt \
-r rego rexx rfc822/rfc822-datetime rfc822/rfc822-emailaddress rust \
+r rego rexx rfc822/rfc822-datetime rfc822/rfc822-emailaddress \
 scss sharc sql/hive sql/mysql sql/plsql sql/sqlite sql/tsql \
 stringtemplate swift/swift2 swift/swift3 swift-fin thrift tnsnames \
 turtle-doc v vb6 wat xml xpath/xpath31 xsd-regex z \
@@ -128,6 +128,9 @@ recurse()
         else
             rm -rf Generated
             dotnet-antlr -s $s
+            if [[ -d "CSharpIncludes" ]]; then
+                cp CSharpIncludes/*.cs Generated
+            fi
             dotnet build Generated/Test.csproj
             if [[ "$?" != "0" ]]
             then
