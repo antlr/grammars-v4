@@ -334,7 +334,6 @@ sourceElement
 
 statement
     : block
-    | variableStatement
     | importStatement
     | exportStatement
     | emptyStatement
@@ -358,6 +357,7 @@ statement
     | functionDeclaration
     | arrowFunctionDeclaration
     | generatorFunctionDeclaration
+    | variableStatement
     | typeAliasDeclaration //ADDED
     | enumDeclaration      //ADDED
     | expressionStatement
