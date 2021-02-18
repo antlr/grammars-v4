@@ -232,7 +232,7 @@ selectors
 	;
 
 selector
-	: element+ (selectorPrefix element)* attrib* pseudo?
+	: element+ (selectorPrefix element)* attrib*
 	;
 
 selectorPrefix
@@ -245,11 +245,12 @@ element
   | '.' identifier
   | '&'
   | '*'
+  | pseudo
 	;
 
 pseudo
-	: (COLON|COLONCOLON) Identifier
-	| (COLON|COLONCOLON) functionCall
+  : COLON COLON? Identifier
+  | COLON COLON? functionCall
 	;
 
 attrib

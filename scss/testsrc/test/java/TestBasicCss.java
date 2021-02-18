@@ -349,6 +349,47 @@ public class TestBasicCss extends TestBase
 
   }
 
+  @Test
+  public void testPseudoClassAtEndOfSelector()
+  {
+    String [] lines = {
+        "h1:hover { color: blue; }"
+    };
+
+    ScssParser.SelectorsContext context = getSelector(lines);
+    Assert.assertEquals(context.selector(0).element(0).getText(), "h1");
+    Assert.assertEquals(context.selector(0).element(1).pseudo().getText(), ":hover");
+  }
+
+  @Test
+  public void testPseudoElementAndPseudoClass()
+  {
+    // After is a pseudo-element and hover is a pseduo-class.
+    // After is supported with 1 or 2 colons.
+    String [] lines = {
+        "h1:after:hover, h2:hover::after { color: blue; }"
+    };
+
+    ScssParser.SelectorsContext context = getSelector(lines);
+    Assert.assertEquals(context.selector(0).element(0).getText(), "h1");
+    Assert.assertEquals(context.selector(0).element(1).pseudo().getText(), ":after");
+    Assert.assertEquals(context.selector(0).element(2).pseudo().getText(), ":hover");
+    Assert.assertEquals(context.selector(1).element(0).getText(), "h2");
+    Assert.assertEquals(context.selector(1).element(1).pseudo().getText(), ":hover");
+    Assert.assertEquals(context.selector(1).element(2).pseudo().getText(), "::after");
+  }
+
+  @Test
+  public void testStandAlonePseudoElement()
+  {
+    String [] lines = {
+        "::placeholder { color: blue; }"
+    };
+
+    ScssParser.SelectorsContext context = getSelector(lines);
+    Assert.assertEquals(context.selector(0).element(0).pseudo().getText(), "::placeholder");
+  }
+
   private ScssParser.SelectorsContext getSelector( String ... lines)
   {
     ScssParser.StylesheetContext context = parse(lines);
