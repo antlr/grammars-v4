@@ -41,8 +41,6 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.testng.Assert;
@@ -85,48 +83,48 @@ public class TestBase
   private class FailOnErrorListener implements ANTLRErrorListener
   {
     @Override
-    public void syntaxError(@NotNull Recognizer<?, ?> recognizer,
-                            @Nullable Object o,
+    public void syntaxError(Recognizer<?, ?> recognizer,
+                            Object o,
                             int i,
                             int i2,
-                            @NotNull String s,
-                            @Nullable RecognitionException e)
+                            String s,
+                            RecognitionException e)
     {
       Assert.fail("Syntax error in detection.");
     }
 
     @Override
-    public void reportAmbiguity(@NotNull Parser parser,
-                                @NotNull DFA dfa,
+    public void reportAmbiguity(Parser parser,
+                                DFA dfa,
                                 int i,
                                 int i2,
                                 boolean b,
-                                @Nullable BitSet bitSet,
-                                @NotNull ATNConfigSet atnConfigs)
+                                BitSet bitSet,
+                                ATNConfigSet atnConfigs)
     {
       Assert.fail("Ambiguity error in detection.");
 
     }
 
     @Override
-    public void reportAttemptingFullContext(@NotNull Parser parser,
-                                            @NotNull DFA dfa,
+    public void reportAttemptingFullContext(Parser parser,
+                                            DFA dfa,
                                             int i,
                                             int i2,
-                                            @Nullable BitSet bitSet,
-                                            @NotNull ATNConfigSet atnConfigs)
+                                            BitSet bitSet,
+                                            ATNConfigSet atnConfigs)
     {
       Assert.fail("Attempting full context error in detection.");
 
     }
 
     @Override
-    public void reportContextSensitivity(@NotNull Parser parser,
-                                         @NotNull DFA dfa,
+    public void reportContextSensitivity(Parser parser,
+                                         DFA dfa,
                                          int i,
                                          int i2,
                                          int i3,
-                                         @NotNull ATNConfigSet atnConfigs)
+                                         ATNConfigSet atnConfigs)
     {
       Assert.fail("Context sensitivity error in detection.");
 
