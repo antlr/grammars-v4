@@ -232,7 +232,7 @@ selectors
 	;
 
 selector
-	: element+ (selectorPrefix element)* pseudo?
+	: element+ (selectorPrefix element)*
 	;
 
 selectorPrefix
@@ -246,6 +246,7 @@ element
   | '&'
   | '*'
   | attrib
+  | pseudo
 	;
 
 pseudo

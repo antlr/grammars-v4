@@ -64,7 +64,6 @@ DOLLAR          : '$';
 AT              : '@';
 AND             : '&';
 HASH            : '#';
-COLONCOLON      : '::';
 PLUS            : '+';
 TIMES           : '*';
 DIV             : '/';
