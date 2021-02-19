@@ -328,12 +328,12 @@ public class TestBasicCss extends TestBase
     String [] lines = {
         "p.#{$name} > select2 {}"
     };
-    ScssParser.StylesheetContext context = parse(lines);
-    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(0).identifier().getText(), "p");
-    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(1)
-                            .identifier().identifierVariableName().getText(), "$name");
+    ScssParser.SelectorsContext context = getSelector(lines);
+    Assert.assertEquals(context.selector(0).element(0).identifier().getText(), "p");
+    Assert.assertEquals(
+        context.selector(0).element(1).identifier().identifierVariableName().getText(), "$name");
 
-    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(2).getText(), "select2");
+    Assert.assertEquals(context.selector(0).element(2).getText(), "select2");
   }
 
   @Test
@@ -342,11 +342,41 @@ public class TestBasicCss extends TestBase
     String [] lines = {
         "p #{$name} {}"
     };
-    ScssParser.StylesheetContext context = parse(lines);
-    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(0).identifier().getText(), "p");
-    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(1)
-                            .identifier().identifierVariableName().getText(), "$name");
+    ScssParser.SelectorsContext context = getSelector(lines);
+    Assert.assertEquals(context.selector(0).element(0).identifier().getText(), "p");
+    Assert.assertEquals(
+        context.selector(0).element(1).identifier().identifierVariableName().getText(), "$name");
 
+  }
+
+  @Test
+  public void testPseudoClassWithClassParameter() {
+    String[] lines = {":host(.fullscreen) {}"};
+
+    ScssParser.SelectorsContext context = getSelector(lines);
+    Assert.assertEquals(context.selector(0).element(0).pseudo().getText(), ":host(.fullscreen)");
+    Assert.assertEquals(
+        context.selector(0).element(0).pseudo().selector().getText(), ".fullscreen");
+  }
+
+  @Test
+  public void testPseudoClassWithAttributeParameter() {
+    String[] lines = {"button:not([disabled]) {}"};
+
+    ScssParser.SelectorsContext context = getSelector(lines);
+    Assert.assertEquals(context.selector(0).element(0).identifier().getText(), "button");
+    Assert.assertEquals(context.selector(0).element(1).pseudo().getText(), ":not([disabled])");
+    Assert.assertEquals(context.selector(0).element(1).pseudo().selector().getText(), "[disabled]");
+  }
+
+  @Test
+  public void testPseudoClassWithNumberParameter() {
+    String[] lines = {"button:nth-child(4) {}"};
+
+    ScssParser.SelectorsContext context = getSelector(lines);
+    Assert.assertEquals(context.selector(0).element(0).identifier().getText(), "button");
+    Assert.assertEquals(context.selector(0).element(1).pseudo().getText(), ":nth-child(4)");
+    Assert.assertEquals(context.selector(0).element(1).pseudo().values().getText(), "4");
   }
 
   private ScssParser.SelectorsContext getSelector( String ... lines)
