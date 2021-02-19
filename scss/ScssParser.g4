@@ -232,7 +232,7 @@ selectors
 	;
 
 selector
-	: element+ (selectorPrefix element)* attrib* pseudo?
+	: element+ (selectorPrefix element)* pseudo?
 	;
 
 selectorPrefix
@@ -245,6 +245,7 @@ element
   | '.' identifier
   | '&'
   | '*'
+  | attrib
 	;
 
 pseudo
@@ -253,13 +254,13 @@ pseudo
 	;
 
 attrib
-	: '[' Identifier (attribRelate (StringLiteral | Identifier))? ']'
+	: LBRACK Identifier (attribRelate (StringLiteral | Identifier))? RBRACK
 	;
 
 attribRelate
-	: '='
-	| '~='
-	| '|='
+  : EQ
+  | PIPE_EQ
+  | TILD_EQ
 	;
 
 identifier

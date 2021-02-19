@@ -379,6 +379,33 @@ public class TestBasicCss extends TestBase
     Assert.assertEquals(context.selector(0).element(1).pseudo().values().getText(), "4");
   }
 
+  @Test
+  public void testAttributeSelector()
+  {
+    String [] lines = {
+        "input[type=number] {}"
+    };
+
+    ScssParser.SelectorsContext context = getSelector(lines);
+    Assert.assertEquals(context.selector(0).element(0).getText(), "input");
+    Assert.assertEquals(context.selector(0).element(1).attrib().getText(), "[type=number]");
+    Assert.assertEquals(context.selector(0).element(1).attrib().Identifier(0).getText(), "type");
+    Assert.assertEquals(context.selector(0).element(1).attrib().attribRelate().getText(), "=");
+    Assert.assertEquals(context.selector(0).element(1).attrib().Identifier(1).getText(), "number");
+  }
+
+  @Test
+  public void testStandAloneAttributeSelector()
+  {
+    String [] lines = {
+        "[disabled] {}"
+    };
+
+    ScssParser.SelectorsContext context = getSelector(lines);
+    Assert.assertEquals(context.selector(0).element(0).attrib().getText(), "[disabled]");
+    Assert.assertEquals(context.selector(0).element(0).attrib().Identifier(0).getText(), "disabled");
+  }
+
   private ScssParser.SelectorsContext getSelector( String ... lines)
   {
     ScssParser.StylesheetContext context = parse(lines);
