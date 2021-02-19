@@ -29,7 +29,6 @@
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-
 public class TestBasicCss extends TestBase
 {
 
@@ -276,8 +275,6 @@ public class TestBasicCss extends TestBase
     Assert.assertEquals(exp.functionCall().values().commandStatement(0).mathStatement().mathCharacter().getText(), "/");
     Assert.assertEquals(exp.functionCall().values().commandStatement(0).mathStatement().commandStatement().expression(0)
                             .measurement().Number().getText(), "3");
-
-
   }
 
   @Test
@@ -294,7 +291,6 @@ public class TestBasicCss extends TestBase
         .mathStatement().commandStatement().expression(0).measurement();
     Assert.assertEquals(measure.Number().getText(), "80");
     Assert.assertEquals(measure.Unit().getText(), "px");
-
   }
 
 
@@ -309,7 +305,6 @@ public class TestBasicCss extends TestBase
     Assert.assertEquals(exp.functionCall().values().commandStatement(0).mathStatement().mathCharacter().getText(), "-");
 
     Assert.assertEquals(exp.functionCall().values().commandStatement(0).mathStatement().commandStatement().expression(0).variableName().getText(), "$var");
-
   }
 
   @Test
@@ -319,7 +314,36 @@ public class TestBasicCss extends TestBase
     Assert.assertEquals(exp.functionCall().Identifier().getText(), "calc");
     Assert.assertEquals(exp.functionCall().values().commandStatement(0).commandStatement().commandStatement()
                             .expression(0).measurement().Number().getText(), "100");
+  }
 
+  @Test
+  public void testPropertyWithNegatedMathValue()
+  {
+    String [] lines = {
+        "h1 { p1: -$my-var; }"
+    };
+
+    ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
+    Assert.assertEquals(context.property(0).identifier().getText(), "p1");
+    Assert.assertEquals(context.property(0).values().commandStatement(0).getText(), "-$my-var");
+    Assert.assertEquals(context.property(0).values().commandStatement(0).MINUS().getText(), "-");
+    Assert.assertEquals(context.property(0).values().commandStatement(0).expression(0).getText(), "$my-var");
+  }
+
+  @Test
+  public void testPropertyWithPlusPrefix()
+  {
+    String [] lines = {
+        "h1 { p1: +(400px - 200px); }"
+    };
+
+    ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
+    Assert.assertEquals(context.property(0).identifier().getText(), "p1");
+    Assert.assertEquals(context.property(0).values().commandStatement(0).getText(), "+(400px-200px)");
+    Assert.assertEquals(context.property(0).values().commandStatement(0).PLUS().getText(), "+");
+    Assert.assertEquals(context.property(0).values().commandStatement(0).commandStatement().expression(0).getText(), "400px");
+    Assert.assertEquals(context.property(0).values().commandStatement(0).commandStatement().mathStatement().mathCharacter().MINUS().getText(), "-");
+    Assert.assertEquals(context.property(0).values().commandStatement(0).commandStatement().mathStatement().commandStatement().expression(0).getText(), "200px");
   }
 
   @Test

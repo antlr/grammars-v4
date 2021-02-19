@@ -97,7 +97,7 @@ functionStatement
 
 
 commandStatement
-  : (expression+ | '(' commandStatement ')') mathStatement?
+  : (PLUS | MINUS)? (expression+ | '(' commandStatement ')') mathStatement?
   ;
 
 mathCharacter
