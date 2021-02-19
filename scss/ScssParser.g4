@@ -97,7 +97,7 @@ functionStatement
 
 
 commandStatement
-  : (expression+ | '(' commandStatement ')') mathStatement?
+  : (PLUS | MINUS)? (expression+ | '(' commandStatement ')') mathStatement?
   ;
 
 mathCharacter
@@ -232,7 +232,7 @@ selectors
 	;
 
 selector
-	: element+ (selectorPrefix element)* attrib*
+	: element+ (selectorPrefix element)*
 	;
 
 selectorPrefix
@@ -245,22 +245,23 @@ element
   | '.' identifier
   | '&'
   | '*'
+  | attrib
   | pseudo
 	;
 
 pseudo
-  : COLON COLON? Identifier
-  | COLON COLON? functionCall
+	: (COLON|COLONCOLON) Identifier
+	| (COLON|COLONCOLON) Identifier LPAREN (selector | values) RPAREN
 	;
 
 attrib
-	: '[' Identifier (attribRelate (StringLiteral | Identifier))? ']'
+	: LBRACK Identifier (attribRelate (StringLiteral | Identifier))? RBRACK
 	;
 
 attribRelate
-	: '='
-	| '~='
-	| '|='
+  : EQ
+  | PIPE_EQ
+  | TILD_EQ
 	;
 
 identifier
