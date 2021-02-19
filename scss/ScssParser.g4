@@ -249,7 +249,7 @@ element
 
 pseudo
 	: (COLON|COLONCOLON) Identifier
-	| (COLON|COLONCOLON) functionCall
+	| (COLON|COLONCOLON) Identifier LPAREN (selector | values) RPAREN
 	;
 
 attrib
