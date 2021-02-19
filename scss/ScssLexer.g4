@@ -64,7 +64,6 @@ DOLLAR          : '$';
 AT              : '@';
 AND             : '&';
 HASH            : '#';
-COLONCOLON      : '::';
 PLUS            : '+';
 TIMES           : '*';
 DIV             : '/';
@@ -165,19 +164,18 @@ DOLLAR_ID              : DOLLAR -> type(DOLLAR);
 
 InterpolationStartAfter  : InterpolationStart;
 InterpolationEnd_ID    : BlockEnd -> type(BlockEnd);
-
 IdentifierAfter        : Identifier;
-Ellipsis_ID            : Ellipsis -> popMode, type(Ellipsis);
-DOT_ID                 : DOT -> popMode, type(DOT);
 
+// All tokens that can signal the end of identifiers
+Ellipsis_ID               : Ellipsis -> popMode, type(Ellipsis);
+DOT_ID                    : DOT -> popMode, type(DOT);
+LBRACK_ID                 : LBRACK -> popMode, type(LBRACK);
+RBRACK_ID                 : RBRACK -> popMode, type(RBRACK);
 LPAREN_ID                 : LPAREN -> popMode, type(LPAREN);
 RPAREN_ID                 : RPAREN -> popMode, type(RPAREN);
-
 COLON_ID                  : COLON -> popMode, type(COLON);
 COMMA_ID                  : COMMA -> popMode, type(COMMA);
-SEMI_ID                  : SEMI -> popMode, type(SEMI);
-
-
-
-
-
+SEMI_ID                   : SEMI -> popMode, type(SEMI);
+EQ_ID                     : EQ -> popMode, type(EQ);
+PIPE_EQ_ID                : PIPE_EQ -> popMode, type(PIPE_EQ);
+TILD_EQ_ID                : TILD_EQ -> popMode, type(TILD_EQ);
