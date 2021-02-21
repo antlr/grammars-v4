@@ -18,7 +18,9 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>IRI.g4</grammars>
+					<includes>
+					   <include>IRI.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>v
 				</configuration>

@@ -18,7 +18,9 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>Protobuf3.g4</grammars>
+					<includes>
+					   <include>Protobuf3.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

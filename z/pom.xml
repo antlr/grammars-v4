@@ -18,7 +18,6 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>ZParser.g4</grammars>
 					<includes>
 						<include>ZLexer.g4</include>
 						<include>ZParser.g4</include>

@@ -37,7 +37,10 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>RustParser.g4</grammars>
+					<includes>
+					   <include>RustLexer.g4</include>
+					   <include>RustParser.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

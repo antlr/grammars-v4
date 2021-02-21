@@ -18,7 +18,6 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>tnsnamesParser.g4</grammars>
 					<includes>
 						<include>tnsnamesLexer.g4</include>
 						<include>tnsnamesParser.g4</include>
