@@ -18,7 +18,6 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>JavadocParser.g4</grammars>
 					<includes>
 						<include>JavadocLexer.g4</include>
 						<include>JavadocParser.g4</include>

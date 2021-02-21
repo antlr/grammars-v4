@@ -18,7 +18,9 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>Python2.g4</grammars>
+					<includes>
+					   <include>Python2.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

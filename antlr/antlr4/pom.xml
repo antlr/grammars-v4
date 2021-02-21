@@ -17,7 +17,6 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>ANTLRv4Parser.g4</grammars>
 					<includes>
 						<include>ANTLRv4Lexer.g4</include>
 						<include>ANTLRv4Parser.g4</include>

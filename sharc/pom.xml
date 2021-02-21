@@ -18,7 +18,6 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>SHARCParser.g4</grammars>
 					<includes>
 						<include>SHARCLexer.g4</include>
 						<include>SHARCParser.g4</include>

@@ -18,7 +18,9 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>moo.g4</grammars>
+					<includes>
+					   <include>moo.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>

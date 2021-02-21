@@ -18,7 +18,6 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>DGSParser.g4</grammars>
 					<includes>
 						<include>DGSLexer.g4</include>
 						<include>DGSParser.g4</include>
