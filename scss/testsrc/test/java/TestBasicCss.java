@@ -121,8 +121,8 @@ public class TestBasicCss extends TestBase
 
     Assert.assertEquals(context.selector(2).element(0).getText(), ".cls4");
 
-    Assert.assertEquals(context.selector(2).selectorPrefix(0).getText(), ">");
-    Assert.assertEquals(context.selector(2).element(1).getText(), ".cls5");
+    Assert.assertEquals(context.selector(2).element(1).combinator().getText(), ">");
+    Assert.assertEquals(context.selector(2).element(2).getText(), ".cls5");
 
   }
 
@@ -142,7 +142,20 @@ public class TestBasicCss extends TestBase
     ScssParser.StylesheetContext innerSheet = context.statement(0).nested().stylesheet();
     Assert.assertEquals(innerSheet.statement(0).ruleset().selectors().selector(0).getText(), "body");
     Assert.assertEquals(innerSheet.statement(0).ruleset().selectors().selector(1).getText(), "head");
+  }
 
+  @Test
+  public void testNestingWithCombinatorAtStartOfLine()
+  {
+    String [] lines = {
+      "p {",
+      "  > p {}",
+      "}",
+    };
+    ScssParser.StylesheetContext context = parse(lines);
+    Assert.assertEquals(context.statement(0).ruleset().selectors().selector(0).element(0).getText(), "p");
+    Assert.assertEquals(context.statement(0).ruleset().block().statement(0).ruleset().selectors().selector(0).element(0).combinator().getText(), ">");
+    Assert.assertEquals(context.statement(0).ruleset().block().statement(0).ruleset().selectors().selector(0).element(1).getText(), "p");
   }
 
   @Test
@@ -357,7 +370,8 @@ public class TestBasicCss extends TestBase
     Assert.assertEquals(
         context.selector(0).element(1).identifier().identifierVariableName().getText(), "$name");
 
-    Assert.assertEquals(context.selector(0).element(2).getText(), "select2");
+    Assert.assertEquals(context.selector(0).element(2).getText(), ">");
+    Assert.assertEquals(context.selector(0).element(3).getText(), "select2");
   }
 
   @Test
