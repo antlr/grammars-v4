@@ -174,7 +174,7 @@ public class TestMixins extends TestBase
     Assert.assertEquals(context.block().statement(0).ruleset().selectors()
                             .selector(0).element(0).getText(), "&");
     Assert.assertEquals(context.block().statement(0).ruleset().selectors()
-                            .selector(0).pseudo().Identifier().getText(), "after");
+                            .selector(0).element(1).pseudo().Identifier().getText(), "after");
 
 
     Assert.assertEquals(context.block().statement(1).ruleset().selectors()

@@ -232,12 +232,8 @@ selectors
 	;
 
 selector
-	: element+ (selectorPrefix element)*
+	: element+
 	;
-
-selectorPrefix
-  : (GT | PLUS | TIL)
-  ;
 
 element
 	: identifier
@@ -245,13 +241,18 @@ element
   | '.' identifier
   | '&'
   | '*'
+  | combinator
   | attrib
   | pseudo
 	;
 
+combinator
+  : (GT | PLUS | TIL)
+  ;
+
 pseudo
-	: (COLON|COLONCOLON) Identifier
-	| (COLON|COLONCOLON) Identifier LPAREN (selector | values) RPAREN
+	: COLON COLON? Identifier
+	| COLON COLON? Identifier LPAREN (selector | values) RPAREN
 	;
 
 attrib
