@@ -18,7 +18,6 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>LessParser.g4</grammars>
 					<includes>
 						<include>LessLexer.g4</include>
 						<include>LessParser.g4</include>

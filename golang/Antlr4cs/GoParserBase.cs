@@ -10,11 +10,6 @@ using Antlr4.Runtime;
         {
         }
 
-        protected GoParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
-            : base(input, output, errorOutput)
-        {
-        }
-
         /// <summary>
         /// Returns `true` if on the current index of the parser's
         /// token stream a token exists on the `HIDDEN` channel which
@@ -38,13 +33,13 @@ using Antlr4.Runtime;
                 return false;
             }
 
-            if (ahead.Type == GoLexer.TERMINATOR)
+            if (ahead.Type == TERMINATOR)
             {
                 // There is definitely a line terminator ahead.
                 return true;
             }
 
-            if (ahead.Type == GoLexer.WS)
+            if (ahead.Type == WS)
             {
                 // Get the token ahead of the current whitespaces.
                 possibleIndexEosToken = CurrentToken.TokenIndex - 2;
@@ -62,8 +57,8 @@ using Antlr4.Runtime;
             int type = ahead.Type;
 
             // Check if the token is, or contains a line terminator.
-            return type == GoLexer.COMMENT && (text.Contains("\r") || text.Contains("\n")) ||
-                   type == GoLexer.TERMINATOR;
+            return type == COMMENT && (text.Contains("\r") || text.Contains("\n")) ||
+                   type == TERMINATOR;
         }
 
         /// <summary>
@@ -100,7 +95,7 @@ using Antlr4.Runtime;
             int leftParams = 1;
             int rightParams = 0;
 
-            if (LT(stream, tokenOffset).Type == GoLexer.L_PAREN)
+            if (LT(stream, tokenOffset).Type == L_PAREN)
             {
                 // Scan past parameters
                 while (leftParams != rightParams)
@@ -108,11 +103,11 @@ using Antlr4.Runtime;
                     tokenOffset++;
                     int tokenType = LT(stream, tokenOffset).Type;
 
-                    if (tokenType == GoLexer.L_PAREN)
+                    if (tokenType == L_PAREN)
                     {
                         leftParams++;
                     }
-                    else if (tokenType == GoLexer.R_PAREN)
+                    else if (tokenType == R_PAREN)
                     {
                         rightParams++;
                     }
@@ -132,14 +127,14 @@ using Antlr4.Runtime;
 
         private IToken LT(ITokenStream stream, int k)
         {
-            return stream.LT(k);
+            return stream.Lt(k);
         }
 
         private ITokenStream tokenStream
         {
             get
             {
-                return TokenStream;
+                return _input;
             }
         }
     }

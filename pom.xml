@@ -125,6 +125,7 @@
 				<module>gedcom</module>
 				<module>gff3</module>
 				<module>gml</module>
+				<module>golang</module>
 				<module>graphql</module>
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
