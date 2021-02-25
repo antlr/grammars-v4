@@ -26,114 +26,145 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import static com.google.common.truth.Truth.assertThat;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class TestInclude extends TestBase
-{
+@RunWith(JUnit4.class)
+public class TestInclude extends TestBase {
   @Test
-  public void testInclude()
-  {
-    String [] lines = {
-        "@include large-text;"
-    };
+  public void testInclude() {
+    String[] lines = {"@include large-text;"};
     ScssParser.StylesheetContext context = parse(lines);
-    Assert.assertEquals(context.statement(0).includeDeclaration().Identifier().getText(), "large-text");
+    assertThat(context.statement(0).includeDeclaration().Identifier().getText())
+        .isEqualTo("large-text");
   }
 
   @Test
-  public void testIncludeInBlock()
-  {
-    String [] lines = {
-        ".test {",
-        "  @include large-text;",
-        "}"
-    };
+  public void testIncludeInBlock() {
+    String[] lines = {".test {", "  @include large-text;", "}"};
     ScssParser.StylesheetContext context = parse(lines);
-    Assert.assertEquals(context.statement(0).ruleset().block().statement(0).includeDeclaration().Identifier().getText(), "large-text");
+    assertThat(
+            context
+                .statement(0)
+                .ruleset()
+                .block()
+                .statement(0)
+                .includeDeclaration()
+                .Identifier()
+                .getText())
+        .isEqualTo("large-text");
   }
 
   @Test
-  public void testMultipleIncludes()
-  {
-    String [] lines = {
-        "@include large-text;",
-        "@include large-button;",
-
+  public void testMultipleIncludes() {
+    String[] lines = {
+      "@include large-text;", "@include large-button;",
     };
     ScssParser.StylesheetContext context = parse(lines);
-    Assert.assertEquals(context.statement(0).includeDeclaration().Identifier().getText(), "large-text");
-    Assert.assertEquals(context.statement(1).includeDeclaration().Identifier().getText(), "large-button");
-
+    assertThat(context.statement(0).includeDeclaration().Identifier().getText())
+        .isEqualTo("large-text");
+    assertThat(context.statement(1).includeDeclaration().Identifier().getText())
+        .isEqualTo("large-button");
   }
 
   @Test
-  public void testIncludesInMixin()
-  {
-    String [] lines = {
-        "@mixin large-text {",
-        "   @include large-button;",
-        "}"
+  public void testIncludesInMixin() {
+    String[] lines = {"@mixin large-text {", "   @include large-button;", "}"};
 
-    };
     ScssParser.StylesheetContext context = parse(lines);
-    Assert.assertEquals(context.statement(0).mixinDeclaration().Identifier().getText(), "large-text");
-    Assert.assertEquals(context.statement(0).mixinDeclaration().block().statement(0)
-                            .includeDeclaration().Identifier().getText(), "large-button");
-
-  }
-
-
-  @Test
-  public void testIncludesWithParams()
-  {
-    String [] lines = {
-        "@include large-button(blue, $var);"
-
-    };
-    ScssParser.StylesheetContext context = parse(lines);
-    Assert.assertEquals(context.statement(0).includeDeclaration().Identifier().getText(), "large-button");
-    Assert.assertEquals(context.statement(0).includeDeclaration().values()
-                            .commandStatement(0).expression(0).identifier().getText(), "blue");
-    Assert.assertEquals(context.statement(0).includeDeclaration().values()
-                            .commandStatement(1).expression(0).variableName().getText(), "$var");
-
+    assertThat(context.statement(0).mixinDeclaration().Identifier().getText())
+        .isEqualTo("large-text");
+    assertThat(
+            context
+                .statement(0)
+                .mixinDeclaration()
+                .block()
+                .statement(0)
+                .includeDeclaration()
+                .Identifier()
+                .getText())
+        .isEqualTo("large-button");
   }
 
   @Test
-  public void testIncludesWithBody()
-  {
-    String [] lines = {
-        "@include large-button {",
-        "  color: black",
-        "}"
+  public void testIncludesWithParams() {
+    String[] lines = {"@include large-button(blue, $var);"};
 
-    };
     ScssParser.StylesheetContext context = parse(lines);
-    Assert.assertEquals(context.statement(0).includeDeclaration().Identifier().getText(), "large-button");
-    Assert.assertEquals(context.statement(0).includeDeclaration().block().property(0).identifier().getText(), "color");
-    Assert.assertEquals(context.statement(0).includeDeclaration().block().property(0)
-                            .values().commandStatement(0).expression(0).identifier().getText(), "black");
-
-
+    assertThat(context.statement(0).includeDeclaration().Identifier().getText())
+        .isEqualTo("large-button");
+    assertThat(
+            context
+                .statement(0)
+                .includeDeclaration()
+                .values()
+                .commandStatement(0)
+                .expression(0)
+                .identifier()
+                .getText())
+        .isEqualTo("blue");
+    assertThat(
+            context
+                .statement(0)
+                .includeDeclaration()
+                .values()
+                .commandStatement(1)
+                .expression(0)
+                .variableName()
+                .getText())
+        .isEqualTo("$var");
   }
 
   @Test
-  public void testIncludesWithInterpolation()
-  {
-    String [] lines = {
-        "@include large-button (#{$var1}) {",
-        "  color-#{$var2}: black",
-        "}"
+  public void testIncludesWithBody() {
+    String[] lines = {"@include large-button {", "  color: black", "}"};
 
-    };
+    ScssParser.StylesheetContext context = parse(lines);
+    assertThat(context.statement(0).includeDeclaration().Identifier().getText())
+        .isEqualTo("large-button");
+    assertThat(context.statement(0).includeDeclaration().block().property(0).identifier().getText())
+        .isEqualTo("color");
+    assertThat(
+            context
+                .statement(0)
+                .includeDeclaration()
+                .block()
+                .property(0)
+                .values()
+                .commandStatement(0)
+                .expression(0)
+                .identifier()
+                .getText())
+        .isEqualTo("black");
+  }
+
+  @Test
+  public void testIncludesWithInterpolation() {
+    String[] lines = {"@include large-button (#{$var1}) {", "  color-#{$var2}: black", "}"};
+
     ScssParser.IncludeDeclarationContext context = parse(lines).statement(0).includeDeclaration();
 
-    Assert.assertEquals(context.values().commandStatement(0).expression(0).identifier().identifierVariableName().getText(), "$var1");
-    Assert.assertEquals(context.block().property(0).identifier().Identifier().getText(), "color-");
-    Assert.assertEquals(context.block().property(0).identifier().identifierPart(0).identifierVariableName().getText(), "$var2");
-
+    assertThat(
+            context
+                .values()
+                .commandStatement(0)
+                .expression(0)
+                .identifier()
+                .identifierVariableName()
+                .getText())
+        .isEqualTo("$var1");
+    assertThat(context.block().property(0).identifier().Identifier().getText()).isEqualTo("color-");
+    assertThat(
+            context
+                .block()
+                .property(0)
+                .identifier()
+                .identifierPart(0)
+                .identifierVariableName()
+                .getText())
+        .isEqualTo("$var2");
   }
-
 }
