@@ -99,10 +99,14 @@ AT_EACH         : '@each';
 INCLUDE         : '@include';
 IMPORT          : '@import';
 RETURN          : '@return';
+MEDIA           : '@media';
 
 FROM            : 'from';
 THROUGH         : 'through';
 POUND_DEFAULT   : '!default';
+ONLY            : 'only';
+NOT             : 'not';
+AND_WORD        : 'and';
 
 
 Identifier

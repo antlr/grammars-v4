@@ -36,7 +36,7 @@ stylesheet
 
 statement
   : importDeclaration
-  | nested
+  | mediaDeclaration
   | ruleset
   | mixinDeclaration
   | functionDeclaration
@@ -189,8 +189,8 @@ identifierValue
 
 //Imports
 importDeclaration
-	: '@import' referenceUrl mediaTypes? ';'
-	;
+  : '@import' referenceUrl ';'
+  ;
 
 referenceUrl
     : StringLiteral
@@ -198,24 +198,34 @@ referenceUrl
     ;
 
 
-mediaTypes
-  : (Identifier (COMMA Identifier)*)
+// Media
+mediaDeclaration
+  : '@media' mediaQueryList block
   ;
 
+mediaQueryList
+  : (mediaQuery (COMMA mediaQuery)* )?
+  ;
 
+mediaQuery
+  : ('only' | 'not')? mediaType ('and' mediaExpression)*
+  | mediaExpression ('and' mediaExpression)*
+  ;
 
+// Typically only 'all', 'print', 'screen', and 'speech', but there are some
+// deprecated values too.
+mediaType
+  : Identifier
+  ;
 
-//Nested (stylesheets, etc)
-nested
- 	: '@' nest selectors BlockStart stylesheet BlockEnd
-	;
+mediaExpression
+  : '(' mediaFeature (':' commandStatement)? ')'
+  ;
 
-nest
-	: (Identifier | '&') Identifier* pseudo*
-	;
-
-
-
+// Typically 'max-width', 'hover', 'orientation', etc. Many possible values.
+mediaFeature
+  : Identifier
+  ;
 
 
 //Rules
@@ -251,9 +261,9 @@ combinator
   ;
 
 pseudo
-	: COLON COLON? Identifier
-	| COLON COLON? Identifier LPAREN (selector | values) RPAREN
-	;
+  : COLON COLON? identifier
+  | COLON COLON? identifier LPAREN (selector | values) RPAREN
+  ;
 
 attrib
 	: LBRACK Identifier (attribRelate (StringLiteral | Identifier))? RBRACK
@@ -268,6 +278,12 @@ attribRelate
 identifier
   : Identifier identifierPart*
   | InterpolationStart identifierVariableName BlockEnd identifierPart*
+  // These are keywords in some contexts, but can be used as identifiers too.
+  | FROM
+  | THROUGH
+  | ONLY
+  | NOT
+  | AND_WORD
   ;
 
 identifierPart

@@ -119,25 +119,6 @@ public class TestBasicCss extends TestBase {
   }
 
   @Test
-  public void testNesting() {
-    String[] lines = {
-      "@media hello,world {", "  body, head {}", "}",
-    };
-    ScssParser.StylesheetContext context = parse(lines);
-    assertThat(context.statement(0).nested().nest().Identifier(0).getText()).isEqualTo("media");
-    assertThat(context.statement(0).nested().selectors().selector(0).element(0).getText())
-        .isEqualTo("hello");
-    assertThat(context.statement(0).nested().selectors().selector(1).element(0).getText())
-        .isEqualTo("world");
-
-    ScssParser.StylesheetContext innerSheet = context.statement(0).nested().stylesheet();
-    assertThat(innerSheet.statement(0).ruleset().selectors().selector(0).getText())
-        .isEqualTo("body");
-    assertThat(innerSheet.statement(0).ruleset().selectors().selector(1).getText())
-        .isEqualTo("head");
-  }
-
-  @Test
   public void testNestingWithCombinatorAtStartOfLine() {
     String[] lines = {
       "p {", "  > p {}", "}",
