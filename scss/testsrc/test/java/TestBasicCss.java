@@ -570,6 +570,28 @@ public class TestBasicCss extends TestBase {
     assertThat(context.selector(0).element(0).pseudo().getText()).isEqualTo("::placeholder");
   }
 
+  @Test
+  public void testDefaultVariableDeclartion() {
+    String[] lines = {
+      "$black: #000 !default;", "$white: #fff;",
+    };
+
+    ScssParser.StylesheetContext context = parse(lines);
+    assertThat(context.statement(0).variableDeclaration().POUND_DEFAULT()).isNotNull();
+    assertThat(context.statement(1).variableDeclaration().POUND_DEFAULT()).isNull();
+  }
+
+  @Test
+  public void testImportant() {
+    String[] lines = {
+      "p {", "  color: blue;", "  background-color: red !important;", "}",
+    };
+
+    ScssParser.StylesheetContext context = parse(lines);
+    assertThat(context.statement(0).ruleset().block().property(0).IMPORTANT()).isNull();
+    assertThat(context.statement(0).ruleset().block().property(1).IMPORTANT()).isNotNull();
+  }
+
   private ScssParser.SelectorsContext getSelector(String... lines) {
     ScssParser.StylesheetContext context = parse(lines);
     return context.statement(0).ruleset().selectors();

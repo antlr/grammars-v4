@@ -103,6 +103,7 @@ RETURN          : '@return';
 FROM            : 'from';
 THROUGH         : 'through';
 POUND_DEFAULT   : '!default';
+IMPORTANT       : '!important';
 
 
 Identifier
