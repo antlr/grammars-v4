@@ -86,6 +86,7 @@ unit_statement
     | drop_trigger
     | drop_type
     | data_manipulation_language_statements
+    | truncate_table
     | drop_table
     | drop_view
     | drop_index
@@ -2130,6 +2131,10 @@ records_per_block_clause
 upgrade_table_clause
     : UPGRADE (NOT? INCLUDING DATA) column_properties
     ;
+    
+truncate_table
+    : TRUNCATE TABLE tableview_name PURGE? SEMICOLON
+    ;
 
 drop_table
     : DROP TABLE tableview_name PURGE? SEMICOLON
@@ -3638,7 +3643,7 @@ merge_update_delete_part
 
 merge_insert_clause
     : WHEN NOT MATCHED THEN INSERT paren_column_list?
-      VALUES '(' expressions? ')' where_clause?
+      values_clause where_clause?
     ;
 
 selected_tableview
@@ -3872,7 +3877,7 @@ atom
     ;
 
 quantified_expression
-    : (SOME | EXISTS | ALL | ANY) ('(' subquery ')' | '(' expression ')')
+    : (SOME | EXISTS | ALL | ANY) ('(' select_only_statement ')' | '(' expression ')')
     ;
 
 string_function
