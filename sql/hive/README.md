@@ -12,4 +12,5 @@ As SQL grammar are normally not case sensitive but this grammar implementation i
 
 You could find more information [here](https://github.com/antlr/antlr4/blob/master/doc/case-insensitive-lexing.md#custom-character-streams-approach) with implementations for various target languages.
 
-
+## Previous Hive versions
+See [this page](v2/) for the case insensitive Hive 2.x.x grammar
