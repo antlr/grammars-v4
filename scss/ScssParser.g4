@@ -295,8 +295,8 @@ identifierVariableName
   ;
 
 property
-	: identifier COLON values
-	;
+  : identifier COLON values '!important'?
+  ;
 
 values
 	: commandStatement (COMMA commandStatement)*

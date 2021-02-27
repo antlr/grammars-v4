@@ -104,6 +104,7 @@ MEDIA           : '@media';
 FROM            : 'from';
 THROUGH         : 'through';
 POUND_DEFAULT   : '!default';
+IMPORTANT       : '!important';
 ONLY            : 'only';
 NOT             : 'not';
 AND_WORD        : 'and';
