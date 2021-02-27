@@ -215,7 +215,7 @@ public class TestMixins extends TestBase {
                 .selector(0)
                 .element(1)
                 .pseudo()
-                .Identifier()
+                .identifier()
                 .getText())
         .isEqualTo("after");
 
