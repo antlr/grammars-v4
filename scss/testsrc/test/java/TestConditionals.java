@@ -117,8 +117,8 @@ public class TestConditionals extends TestBase {
 
     ScssParser.ElseStatementContext context =
         parse(lines).statement(0).ifDeclaration().elseStatement();
-    assertThat(context.block().property(0).identifier().getText()).isEqualTo("color");
-    assertThat(context.block().property(0).values().getText()).isEqualTo("red");
+    assertThat(context.block().lastProperty().identifier().getText()).isEqualTo("color");
+    assertThat(context.block().lastProperty().values().getText()).isEqualTo("red");
   }
 
   @Test

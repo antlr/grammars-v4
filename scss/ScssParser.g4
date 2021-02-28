@@ -31,8 +31,8 @@ parser grammar ScssParser;
 options { tokenVocab=ScssLexer; }
 
 stylesheet
-	: statement*
-	;
+  : statement*
+  ;
 
 statement
   : importDeclaration
@@ -116,9 +116,9 @@ expression
   | StringLiteral
   | NULL
   | url
-	| variableName
-	| functionCall
-	;
+  | variableName
+  | functionCall
+  ;
 
 
 
@@ -198,7 +198,6 @@ referenceUrl
     ;
 
 
-// Media
 mediaDeclaration
   : '@media' mediaQueryList block
   ;
@@ -230,23 +229,23 @@ mediaFeature
 
 //Rules
 ruleset
- 	: selectors block
-	;
+  : selectors block
+  ;
 
 block
-  : BlockStart (property ';' | statement)* property? BlockEnd
+  : BlockStart (property | statement)* lastProperty? BlockEnd
   ;
 
 selectors
-	: selector (COMMA selector)*
-	;
+  : selector (COMMA selector)*
+  ;
 
 selector
-	: element+
-	;
+  : element+
+  ;
 
 element
-	: identifier
+  : identifier
   | '#' identifier
   | '.' identifier
   | '&'
@@ -254,26 +253,26 @@ element
   | combinator
   | attrib
   | pseudo
-	;
+  ;
 
 combinator
   : (GT | PLUS | TIL)
   ;
 
 pseudo
-  : COLON COLON? identifier
-  | COLON COLON? identifier LPAREN (selector | values) RPAREN
+  : pseudoIdentifier
+  | pseudoIdentifier LPAREN (selector | values) RPAREN
   ;
 
 attrib
-	: LBRACK Identifier (attribRelate (StringLiteral | Identifier))? RBRACK
-	;
+  : LBRACK Identifier (attribRelate (StringLiteral | Identifier))? RBRACK
+  ;
 
 attribRelate
   : EQ
   | PIPE_EQ
   | TILD_EQ
-	;
+  ;
 
 identifier
   : Identifier identifierPart*
@@ -286,6 +285,10 @@ identifier
   | AND_WORD
   ;
 
+pseudoIdentifier
+  : PseudoIdentifier identifierPart*
+  ;
+
 identifierPart
   : InterpolationStartAfter identifierVariableName BlockEnd
   | IdentifierAfter
@@ -295,12 +298,18 @@ identifierVariableName
   ;
 
 property
-  : identifier COLON values '!important'?
+  : identifier COLON values IMPORTANT? SEMI
+  | identifier COLON block IMPORTANT?
+  | identifier COLON values block IMPORTANT?
+  ;
+
+lastProperty
+  : identifier COLON values IMPORTANT?
   ;
 
 values
-	: commandStatement (COMMA commandStatement)*
-	;
+  : commandStatement (COMMA commandStatement)*
+  ;
 
 url
   : UrlStart Url UrlEnd
@@ -312,5 +321,5 @@ measurement
 
 
 functionCall
-	: Identifier LPAREN values? RPAREN
-	;
+  : Identifier LPAREN values? RPAREN
+  ;

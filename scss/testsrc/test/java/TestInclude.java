@@ -125,14 +125,15 @@ public class TestInclude extends TestBase {
     ScssParser.StylesheetContext context = parse(lines);
     assertThat(context.statement(0).includeDeclaration().Identifier().getText())
         .isEqualTo("large-button");
-    assertThat(context.statement(0).includeDeclaration().block().property(0).identifier().getText())
+    assertThat(
+            context.statement(0).includeDeclaration().block().lastProperty().identifier().getText())
         .isEqualTo("color");
     assertThat(
             context
                 .statement(0)
                 .includeDeclaration()
                 .block()
-                .property(0)
+                .lastProperty()
                 .values()
                 .commandStatement(0)
                 .expression(0)
@@ -156,11 +157,12 @@ public class TestInclude extends TestBase {
                 .identifierVariableName()
                 .getText())
         .isEqualTo("$var1");
-    assertThat(context.block().property(0).identifier().Identifier().getText()).isEqualTo("color-");
+    assertThat(context.block().lastProperty().identifier().Identifier().getText())
+        .isEqualTo("color-");
     assertThat(
             context
                 .block()
-                .property(0)
+                .lastProperty()
                 .identifier()
                 .identifierPart(0)
                 .identifierVariableName()
