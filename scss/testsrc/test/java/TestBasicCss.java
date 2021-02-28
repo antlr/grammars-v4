@@ -262,7 +262,7 @@ public class TestBasicCss extends TestBase {
   @Test
   public void testPropertyFunctionMath() {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% / 3);");
-    assertThat(exp.functionCall().Identifier().getText()).isEqualTo("calc");
+    assertThat(exp.functionCall().Identifier(0).getText()).isEqualTo("calc");
     assertThat(exp.functionCall().values().commandStatement(0).expression(0).getText())
         .isEqualTo("100%");
     assertThat(
@@ -289,7 +289,7 @@ public class TestBasicCss extends TestBase {
   @Test
   public void testPropertyFunctionMathMinus() {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% - 80px);");
-    assertThat(exp.functionCall().Identifier().getText()).isEqualTo("calc");
+    assertThat(exp.functionCall().Identifier(0).getText()).isEqualTo("calc");
     assertThat(
             exp.functionCall()
                 .values()
@@ -333,7 +333,7 @@ public class TestBasicCss extends TestBase {
   @Test
   public void testPropertyFunctionMathVar() {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% - $var);");
-    assertThat(exp.functionCall().Identifier().getText()).isEqualTo("calc");
+    assertThat(exp.functionCall().Identifier(0).getText()).isEqualTo("calc");
     assertThat(
             exp.functionCall()
                 .values()
@@ -377,7 +377,7 @@ public class TestBasicCss extends TestBase {
   @Test
   public void testPropertyFunctionMathParen() {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(((100%)));");
-    assertThat(exp.functionCall().Identifier().getText()).isEqualTo("calc");
+    assertThat(exp.functionCall().Identifier(0).getText()).isEqualTo("calc");
     assertThat(
             exp.functionCall()
                 .values()

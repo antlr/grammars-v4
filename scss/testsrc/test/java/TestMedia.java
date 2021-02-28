@@ -30,6 +30,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+/**
+ * Most tests taken from here
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries
+ */
 @RunWith(JUnit4.class)
 public class TestMedia extends TestBase {
   @Test
