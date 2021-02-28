@@ -45,7 +45,7 @@ options {
 import LexBasic;	// Standard set of fragments
 
 @header {
-from LexerAdaptor import LexerAdaptor
+//from LexerAdaptor import LexerAdaptor
 }
 
 tokens {

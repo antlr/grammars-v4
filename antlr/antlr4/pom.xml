@@ -11,6 +11,25 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>Java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
@@ -19,12 +38,7 @@
 					<includes>
 						<include>ANTLRv4Lexer.g4</include>
 						<include>ANTLRv4Parser.g4</include>
-					</includes>		
-					<arguments>
-						<argument>-package</argument>
-						<argument>org.antlr.parser.antlr4</argument>
-					</arguments>
-					<outputDirectory>${project.build.directory}/generated-sources/antlr4/org/antlr/parser/antlr4</outputDirectory>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -45,7 +59,7 @@
 					<showTree>false</showTree>
 					<entryPoint>grammarSpec</entryPoint>
 					<grammarName>ANTLRv4</grammarName>
-					<packageName>org.antlr.parser.antlr4</packageName>
+					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
