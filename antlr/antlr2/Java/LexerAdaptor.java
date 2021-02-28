@@ -25,7 +25,6 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.parser.antlr4;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
@@ -54,7 +53,16 @@ public abstract class LexerAdaptor extends Lexer {
 	 * can only occur in lexical rules and arg actions cannot occur.
 	 */
     private static int PREQUEL_CONSTRUCT = -10;
+
     private int _currentRuleType = Token.INVALID_TYPE;
+
+    public int getCurrentRuleType() {
+	return _currentRuleType;
+    }
+
+    public void setCurrentRuleType(int ruleType) {
+	this._currentRuleType = ruleType;
+    }
 
     protected void handleBeginArgument()
     {
@@ -86,32 +94,18 @@ public abstract class LexerAdaptor extends Lexer {
     }
 
     protected void handleOptionsLBrace() {
-//	    if (insideOptionsBlock) {
-//		setType(ANTLRv3Lexer.BEGIN_ACTION);
-//		pushMode(ANTLRv3Lexer.Actionx);
-//	    } else {
 	setType(ANTLRv2Lexer.LBRACE);
-//		insideOptionsBlock = true;
-//	    }
     }
-
-//	public int getCurrentRuleType() {
-//		return _currentRuleType;
-//	}
-
-//	public void setCurrentRuleType(int ruleType) {
-//		this._currentRuleType = ruleType;
-//	}
 
     @Override
     public Token emit() {
 	if ((_type == ANTLRv2Lexer.OPTIONS || _type == ANTLRv2Lexer.TOKENS)
-	      && _currentRuleType == Token.INVALID_TYPE) { // enter prequel construct ending with an RBRACE
-	    _currentRuleType = PREQUEL_CONSTRUCT;
-	} else if (_type == ANTLRv2Lexer.RBRACE && _currentRuleType == PREQUEL_CONSTRUCT) { // exit prequel construct
-	    _currentRuleType = Token.INVALID_TYPE;
-	} else if (_type == ANTLRv2Lexer.AT && _currentRuleType == Token.INVALID_TYPE) { // enter action
-	    _currentRuleType = ANTLRv2Lexer.AT;
+	      && getCurrentRuleType() == Token.INVALID_TYPE) { // enter prequel construct ending with an RBRACE
+	    setCurrentRuleType(PREQUEL_CONSTRUCT);
+	} else if (_type == ANTLRv2Lexer.RBRACE && getCurrentRuleType() == PREQUEL_CONSTRUCT) { // exit prequel construct
+	    setCurrentRuleType(Token.INVALID_TYPE);
+	} else if (_type == ANTLRv2Lexer.AT && getCurrentRuleType() == Token.INVALID_TYPE) { // enter action
+	    setCurrentRuleType(ANTLRv2Lexer.AT);
 	} else if (_type == ANTLRv2Lexer.ID) {
 	    String firstChar = _input.getText(Interval.of(_tokenStartCharIndex, _tokenStartCharIndex));
 	    if (Character.isUpperCase(firstChar.charAt(0))) {
@@ -120,22 +114,28 @@ public abstract class LexerAdaptor extends Lexer {
 		_type = ANTLRv2Lexer.RULE_REF;
 	    }
 
-	    if (_currentRuleType == Token.INVALID_TYPE) { // if outside of rule def
-		_currentRuleType = _type; // set to inside lexer or parser rule
+	    if (getCurrentRuleType() == Token.INVALID_TYPE) { // if outside of rule def
+		setCurrentRuleType(_type); // set to inside lexer or parser rule
 	    }
 	} else if (_type == ANTLRv2Lexer.SEMI) { // exit rule def
-	    _currentRuleType = Token.INVALID_TYPE;
+	    setCurrentRuleType(Token.INVALID_TYPE);
 	}
 
 	return super.emit();
     }
 
     private boolean inLexerRule() {
-	return _currentRuleType == ANTLRv2Lexer.TOKEN_REF;
+	return getCurrentRuleType() == ANTLRv2Lexer.TOKEN_REF;
     }
 
     @SuppressWarnings("unused")
     private boolean inParserRule() { // not used, but added for clarity
-	return _currentRuleType == ANTLRv2Lexer.RULE_REF;
+	return getCurrentRuleType() == ANTLRv2Lexer.RULE_REF;
     }
+
+    @Override
+    public void reset() {
+	setCurrentRuleType(Token.INVALID_TYPE);
+	super.reset();
+    }   
 }

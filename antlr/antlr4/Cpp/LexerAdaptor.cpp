@@ -29,7 +29,7 @@
 #include "ANTLRv4Lexer.h"
 #include "ctype.h"
 
-using namespace antlr4;
+//using namespace antlr4;
 
 LexerAdaptor::LexerAdaptor(CharStream *input) : Lexer(input) {}
 
