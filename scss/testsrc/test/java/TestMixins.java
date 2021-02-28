@@ -215,9 +215,9 @@ public class TestMixins extends TestBase {
                 .selector(0)
                 .element(1)
                 .pseudo()
-                .identifier()
+                .pseudoIdentifier()
                 .getText())
-        .isEqualTo("after");
+        .isEqualTo(":after");
 
     assertThat(context.block().statement(1).ruleset().selectors().selector(0).element(0).getText())
         .isEqualTo("*");
@@ -235,7 +235,7 @@ public class TestMixins extends TestBase {
     assertThat(context.block().statement(1).ruleset().selectors().selector(0).element(2).getText())
         .isEqualTo("&");
 
-    assertThat(context.block().statement(1).ruleset().block().property(0).identifier().getText())
+    assertThat(context.block().statement(1).ruleset().block().lastProperty().identifier().getText())
         .isEqualTo("height");
     assertThat(
             context
@@ -243,7 +243,7 @@ public class TestMixins extends TestBase {
                 .statement(1)
                 .ruleset()
                 .block()
-                .property(0)
+                .lastProperty()
                 .values()
                 .commandStatement(0)
                 .expression(0)

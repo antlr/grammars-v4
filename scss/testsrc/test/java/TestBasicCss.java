@@ -159,8 +159,8 @@ public class TestBasicCss extends TestBase {
       "h1 {", "  display: block", "}",
     };
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
-    assertThat(context.property(0).identifier().getText()).isEqualTo("display");
-    assertThat(context.property(0).values().commandStatement(0).getText()).isEqualTo("block");
+    assertThat(context.lastProperty().identifier().getText()).isEqualTo("display");
+    assertThat(context.lastProperty().values().commandStatement(0).getText()).isEqualTo("block");
   }
 
   @Test
@@ -169,9 +169,9 @@ public class TestBasicCss extends TestBase {
       "h1 {", "  background: url('a'), 1px 2px", "}",
     };
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
-    assertThat(context.property(0).identifier().getText()).isEqualTo("background");
+    assertThat(context.lastProperty().identifier().getText()).isEqualTo("background");
 
-    ScssParser.ValuesContext val = context.property(0).values();
+    ScssParser.ValuesContext val = context.lastProperty().values();
     assertThat(val.commandStatement(0).expression(0).url().Url().getText()).isEqualTo("'a'");
     assertThat(val.commandStatement(1).expression(0).measurement().Number().getText())
         .isEqualTo("1");
@@ -198,8 +198,8 @@ public class TestBasicCss extends TestBase {
     assertThat(val.commandStatement(0).expression(0).measurement().Unit().getText())
         .isEqualTo("px");
 
-    assertThat(context.property(1).identifier().getText()).isEqualTo("font-size");
-    val = context.property(1).values();
+    assertThat(context.lastProperty().identifier().getText()).isEqualTo("font-size");
+    val = context.lastProperty().values();
     assertThat(val.commandStatement(0).expression(0).Color().getText()).isEqualTo("#fff");
   }
 
@@ -571,6 +571,87 @@ public class TestBasicCss extends TestBase {
     ScssParser.StylesheetContext context = parse(lines);
     assertThat(context.statement(0).ruleset().block().property(0).IMPORTANT()).isNull();
     assertThat(context.statement(0).ruleset().block().property(1).IMPORTANT()).isNotNull();
+  }
+
+  @Test
+  public void nestedPropertyDeclaration() {
+    String[] lines = {
+      ".enlarge {",
+      "  font-size: 14px;",
+      "  transition: {",
+      "    property: font-size;",
+      "    duration: 4s;",
+      "    delay: 2s;",
+      "  }",
+      "",
+      "  &:hover { font-size: 36px; }",
+      "}",
+    };
+
+    ScssParser.StylesheetContext context = parse(lines);
+    assertThat(context.statement(0).ruleset().block().property(1).identifier().getText())
+        .isEqualTo("transition");
+    assertThat(context.statement(0).ruleset().block().property(1).values()).isNull();
+    assertThat(context.statement(0).ruleset().block().property(1).block().property(0).getText())
+        .isEqualTo("property:font-size;");
+    assertThat(context.statement(0).ruleset().block().property(1).block().property(1).getText())
+        .isEqualTo("duration:4s;");
+    assertThat(context.statement(0).ruleset().block().property(1).block().property(2).getText())
+        .isEqualTo("delay:2s;");
+  }
+
+  @Test
+  public void nestedPropertyDeclarationWithShorthandValue() {
+    String[] lines = {
+      ".info-page {", "  margin: auto {", "    bottom: 10px;", "    top: 2px;", "  }", "}",
+    };
+
+    ScssParser.StylesheetContext context = parse(lines);
+    assertThat(context.statement(0).ruleset().block().property(0).identifier().getText())
+        .isEqualTo("margin");
+    assertThat(context.statement(0).ruleset().block().property(0).values().getText())
+        .isEqualTo("auto");
+    assertThat(context.statement(0).ruleset().block().property(0).block().property(0).getText())
+        .isEqualTo("bottom:10px;");
+    assertThat(context.statement(0).ruleset().block().property(0).block().property(1).getText())
+        .isEqualTo("top:2px;");
+  }
+
+  @Test
+  public void nestedPropertyDeclarationWithMixin() {
+    // Compiles to:
+    // .info-page {
+    //   margin-bottom: 10px;
+    //   margin-top: 2px;
+    // }
+    String[] lines = {
+      "@mixin my-margin {",
+      "  bottom: 10px;",
+      "  top: 2px;",
+      "}",
+      ".info-page {",
+      "  margin: {",
+      "    @include my-margin;",
+      "  }",
+      "}",
+    };
+
+    ScssParser.StylesheetContext context = parse(lines);
+    assertThat(context.statement(1).ruleset().block().property(0).identifier().getText())
+        .isEqualTo("margin");
+    assertThat(context.statement(1).ruleset().block().property(0).values()).isNull();
+    assertThat(
+            context
+                .statement(1)
+                .ruleset()
+                .block()
+                .property(0)
+                .block()
+                .statement(0)
+                .includeDeclaration()
+                .Identifier()
+                .getText())
+        .isEqualTo("my-margin");
   }
 
   private ScssParser.SelectorsContext getSelector(String... lines) {
