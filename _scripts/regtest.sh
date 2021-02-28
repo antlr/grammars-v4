@@ -198,7 +198,7 @@ test()
 # Main
 # 0) Set up.
 dotnet tool install -g dotnet-antlr --version 2.1.0
-dotnet tool install -g csxml2
+dotnet tool install -g csxml2 --version 1.0.0
 # 1) Generate driver source code from poms.
 echo "These grammars will not be tested:"
 echo $do_not_do_list | fmt
