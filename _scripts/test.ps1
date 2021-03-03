@@ -1,4 +1,5 @@
 function Test-Grammar {
+    # TODO: fix it
     param (
         $Directory,
         $Target = "CSharp"
@@ -8,11 +9,6 @@ function Test-Grammar {
     Set-Location $Directory
     dotnet-antlr -m -t $Target
 
-    #$Generated = Join-Path $Directory 'Generated'
-    #if (!(Test-Path $Generated)) {
-    #    Write-Error "${Directory} is not a valid directory"
-    #    return false
-    #}
     Set-Location 'Generated'
 
     $start = Get-Date
@@ -46,15 +42,15 @@ function Get-Grammars {
     [xml]$xml = Get-Content -Path $pom
 
     $module = $xml.project.modules.module
-    if(!$module){
+    if (!$module) {
         $module = $xml.project.profiles.profile.modules.module
     }
 
-    if($module){
+    if ($module) {
         $ret = @()
         foreach ($m in $module) {
             $s = Join-Path $Directory $m
-            if(!(Test-Path $s)){
+            if (!(Test-Path $s)) {
                 continue
             }
             $grammars = Get-Grammars $s
@@ -64,15 +60,44 @@ function Get-Grammars {
         }
         return $ret
     }
-    if($xml.project.build.plugins.plugin){
-        $conf = $xml.project.build.plugins | where-object -FilterScript {$_.plugin.groupId -eq "org.antlr"}
-        if($conf){
+    if ($xml.project.build.plugins.plugin) {
+        $conf = $xml.project.build.plugins | where-object -FilterScript { $_.plugin.groupId -eq "org.antlr" }
+        if ($conf) {
             return @($Directory)
         }
         return @()
     }
 }
 
-Get-Grammars | Resolve-Path -Relative
+function Get-GitChangedDirectories {
+    param (
+        $PreviousCommit,
+        $CurrentCommit = "HEAD"
+    )
+    $diff = git diff $PreviousCommit $CurrentCommit --name-only
+    $dirs = @()
+    foreach ($item in $diff) {
+        $dirs += Join-Path "." $item
+    }
+    return $dirs | Split-Path | Get-Unique
+}
 
-Test-Grammar "./rust"
+function Get-ChangedGrammars {
+    param (
+        $PreviousCommit,
+        $CurrentCommit = "HEAD"
+    )
+    $diff = Get-GitChangedDirectories $PreviousCommit $CurrentCommit
+    $grammars = Get-Grammars | Resolve-Path -Relative
+    $changed = @()
+    foreach ($g in $grammars) {
+        foreach ($d in $diff) {
+            if ($g.StartsWith($d)) {
+                $changed += $g
+            } 
+        }
+    }
+    return $changed | Get-Unique
+}
+
+Get-ChangedGrammars a7cff
