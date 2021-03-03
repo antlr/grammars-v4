@@ -39,6 +39,7 @@ statement
   | mediaDeclaration
   | ruleset
   | mixinDeclaration
+  | contentDeclaration
   | functionDeclaration
   | variableDeclaration
   | includeDeclaration
@@ -49,13 +50,12 @@ statement
   ;
 
 
-
-//Params to mixins, includes, etc
-params
-  : param (COMMA param)* Ellipsis?
+// Params declared by rules such as @mixin and @function.
+declaredParams
+  : declaredParam (COMMA declaredParam)* Ellipsis?
   ;
 
-param
+declaredParam
   : variableName paramOptionalValue?
   ;
 
@@ -67,20 +67,34 @@ paramOptionalValue
   : COLON expression+
   ;
 
+// Params passed to rules such as @include and @content.
+passedParams
+  : passedParam (COMMA passedParam)* (COMMA|Ellipsis)?
+  ;
 
-//MIXINS
+passedParam
+  : (variableName COLON)? commandStatement
+  ;
+
+// MIXINS and related rules
 mixinDeclaration
-  : '@mixin' Identifier (LPAREN params? RPAREN)? block
+  : MIXIN Identifier (LPAREN declaredParams? RPAREN)? block
   ;
 
-//Includes
+contentDeclaration
+  : CONTENT (LPAREN passedParams? RPAREN)? SEMI
+  ;
+
 includeDeclaration
-  : INCLUDE Identifier (';' | (LPAREN values? RPAREN ';'?)? block?)
+  : INCLUDE Identifier (LPAREN passedParams? RPAREN)?
+    (SEMI | (USING LPAREN declaredParams RPAREN)? block)?
   ;
 
-//FUNCTIONS
+
+
+// FUNCTIONS
 functionDeclaration
-  : '@function' Identifier LPAREN params? RPAREN BlockStart functionBody? BlockEnd
+  : FUNCTION Identifier LPAREN declaredParams? RPAREN BlockStart functionBody? BlockEnd
   ;
 
 functionBody
@@ -153,14 +167,16 @@ variableDeclaration
 
 //for
 forDeclaration
-  : AT_FOR variableName 'from' fromNumber 'through' throughNumber block
+  : AT_FOR variableName 'from' fromNumber ('to'|'through') throughNumber block
   ;
 
 fromNumber
   : Number
   ;
+
 throughNumber
   : Number
+  | functionCall
   ;
 
 //while
@@ -174,8 +190,10 @@ eachDeclaration
   ;
 
 eachValueList
-  :  Identifier (COMMA Identifier)*
-  |  identifierListOrMap (COMMA identifierListOrMap)*
+  : Identifier (COMMA Identifier)*
+  | identifierListOrMap (COMMA identifierListOrMap)*
+  | functionCall
+  | variableName
   ;
 
 identifierListOrMap
@@ -283,6 +301,7 @@ identifier
   | ONLY
   | NOT
   | AND_WORD
+  | USING
   ;
 
 pseudoIdentifier
@@ -321,5 +340,5 @@ measurement
 
 
 functionCall
-  : Identifier LPAREN values? RPAREN
+  : Identifier (DOT Identifier)* LPAREN values? RPAREN
   ;

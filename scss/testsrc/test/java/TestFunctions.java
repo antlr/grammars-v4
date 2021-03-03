@@ -41,7 +41,7 @@ public class TestFunctions extends TestBase {
     String[] lines = {"@function grid-width($n) {", "  @return ($n - 1) * $gutter-width;", "}"};
     ScssParser.FunctionDeclarationContext context = parse(lines).statement(0).functionDeclaration();
     assertThat(context.Identifier().getText()).isEqualTo("grid-width");
-    assertThat(context.params().param(0).variableName().getText()).isEqualTo("$n");
+    assertThat(context.declaredParams().declaredParam(0).variableName().getText()).isEqualTo("$n");
 
     ScssParser.FunctionReturnContext funcContext = context.functionBody().functionReturn();
     assertThat(funcContext.commandStatement().commandStatement().expression(0).getText())
@@ -89,7 +89,7 @@ public class TestFunctions extends TestBase {
     };
     ScssParser.FunctionDeclarationContext context = parse(lines).statement(0).functionDeclaration();
     assertThat(context.Identifier().getText()).isEqualTo("grid-width");
-    assertThat(context.params().param(0).variableName().getText()).isEqualTo("$a");
+    assertThat(context.declaredParams().declaredParam(0).variableName().getText()).isEqualTo("$a");
 
     ScssParser.FunctionStatementContext funcContext = context.functionBody().functionStatement(0);
     assertThat(funcContext.statement().functionDeclaration().Identifier().getText())
@@ -98,8 +98,8 @@ public class TestFunctions extends TestBase {
             funcContext
                 .statement()
                 .functionDeclaration()
-                .params()
-                .param(0)
+                .declaredParams()
+                .declaredParam(0)
                 .variableName()
                 .getText())
         .isEqualTo("$b");
