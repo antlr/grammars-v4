@@ -69,8 +69,9 @@ public class TestBase {
         int charPositionInLine,
         String msg,
         RecognitionException e) {
-      // We don't care about this particular error.
-      if (msg.startsWith("reportAttemptingFullContext")) {
+      // These two messages don't indicate problems.
+      if (msg.startsWith("reportAttemptingFullContext")
+          || msg.startsWith("reportContextSensitivity")) {
         return;
       }
 

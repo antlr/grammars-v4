@@ -123,6 +123,10 @@ PseudoIdentifier
   : COLON COLON? Identifier -> pushMode(IDENTIFY)
   ;
 
+FunctionIdentifier
+    : Identifier LPAREN
+    ;
+
 fragment STRING
   	:	'"' (~('"'|'\n'|'\r'))* '"'
   	|	'\'' (~('\''|'\n'|'\r'))* '\''

@@ -24,8 +24,6 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package com.google.thirdparty.antlr4grammars.scss;
-
 import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.Test;
@@ -73,12 +71,12 @@ public final class TestMixinAndInclude extends TestBase {
     ScssParser.IncludeDeclarationContext include1 =
         context.statement(1).mixinDeclaration().block().statement(0).includeDeclaration();
     assertThat(include1.Identifier().getText()).isEqualTo("reset-list");
-    assertThat(include1.passedParams()).isNull();
+    assertThat(include1.functionCall()).isNull();
 
     ScssParser.IncludeDeclarationContext include2 =
         context.statement(2).ruleset().block().statement(0).includeDeclaration();
     assertThat(include2.Identifier().getText()).isEqualTo("horizontal-list");
-    assertThat(include2.passedParams()).isNull();
+    assertThat(include2.functionCall()).isNull();
   }
 
   @Test
@@ -107,9 +105,9 @@ public final class TestMixinAndInclude extends TestBase {
 
     ScssParser.IncludeDeclarationContext include =
         context.statement(1).ruleset().block().statement(0).includeDeclaration();
-    assertThat(include.passedParams().passedParam(0).getText()).isEqualTo("float");
-    assertThat(include.passedParams().passedParam(1).getText()).isEqualTo("left");
-    assertThat(include.passedParams().passedParam(2).getText()).isEqualTo("right");
+    assertThat(include.functionCall().passedParams().passedParam(0).getText()).isEqualTo("float");
+    assertThat(include.functionCall().passedParams().passedParam(1).getText()).isEqualTo("left");
+    assertThat(include.functionCall().passedParams().passedParam(2).getText()).isEqualTo("right");
   }
 
   @Test
@@ -147,11 +145,11 @@ public final class TestMixinAndInclude extends TestBase {
 
     ScssParser.IncludeDeclarationContext include =
         context.statement(1).ruleset().block().statement(0).includeDeclaration();
-    assertThat(include.passedParams().Ellipsis()).isNull();
-    assertThat(include.passedParams().passedParam()).hasSize(2);
-    assertThat(include.passedParams().passedParam(0).getText())
+    assertThat(include.functionCall().passedParams().Ellipsis()).isNull();
+    assertThat(include.functionCall().passedParams().passedParam()).hasSize(2);
+    assertThat(include.functionCall().passedParams().passedParam(0).getText())
         .isEqualTo("url(\"/images/mail.svg\")");
-    assertThat(include.passedParams().passedParam(1).getText()).isEqualTo("0");
+    assertThat(include.functionCall().passedParams().passedParam(1).getText()).isEqualTo("0");
   }
 
   @Test
@@ -174,11 +172,13 @@ public final class TestMixinAndInclude extends TestBase {
     ScssParser.StylesheetContext context = parse(lines);
     ScssParser.IncludeDeclarationContext include =
         context.statement(1).ruleset().block().statement(0).includeDeclaration();
-    assertThat(include.passedParams().passedParam(0).variableName()).isNull();
-    assertThat(include.passedParams().passedParam(0).commandStatement().getText())
+    assertThat(include.functionCall().passedParams().passedParam(0).variableName()).isNull();
+    assertThat(include.functionCall().passedParams().passedParam(0).commandStatement().getText())
         .isEqualTo("100px");
-    assertThat(include.passedParams().passedParam(1).variableName().getText()).isEqualTo("$radius");
-    assertThat(include.passedParams().passedParam(1).commandStatement().getText()).isEqualTo("4px");
+    assertThat(include.functionCall().passedParams().passedParam(1).variableName().getText())
+        .isEqualTo("$radius");
+    assertThat(include.functionCall().passedParams().passedParam(1).commandStatement().getText())
+        .isEqualTo("4px");
   }
 
   @Test
@@ -201,7 +201,9 @@ public final class TestMixinAndInclude extends TestBase {
     ScssParser.StylesheetContext context = parse(lines);
     assertThat(context.statement(0).mixinDeclaration().declaredParams().declaredParam()).hasSize(2);
     assertThat(context.statement(0).mixinDeclaration().declaredParams().Ellipsis()).isNotNull();
-    assertThat(context.statement(1).includeDeclaration().passedParams().passedParam()).hasSize(4);
+    assertThat(
+            context.statement(1).includeDeclaration().functionCall().passedParams().passedParam())
+        .hasSize(4);
   }
 
   @Test
@@ -226,11 +228,32 @@ public final class TestMixinAndInclude extends TestBase {
     assertThat(context.statement(0).mixinDeclaration().declaredParams().declaredParam(0).getText())
         .isEqualTo("$args");
     assertThat(context.statement(0).mixinDeclaration().declaredParams().Ellipsis()).isNotNull();
-    assertThat(context.statement(1).includeDeclaration().passedParams().passedParam(0).getText())
+    assertThat(
+            context
+                .statement(1)
+                .includeDeclaration()
+                .functionCall()
+                .passedParams()
+                .passedParam(0)
+                .getText())
         .isEqualTo("$string:#080");
-    assertThat(context.statement(1).includeDeclaration().passedParams().passedParam(1).getText())
+    assertThat(
+            context
+                .statement(1)
+                .includeDeclaration()
+                .functionCall()
+                .passedParams()
+                .passedParam(1)
+                .getText())
         .isEqualTo("$comment:#800");
-    assertThat(context.statement(1).includeDeclaration().passedParams().passedParam(2).getText())
+    assertThat(
+            context
+                .statement(1)
+                .includeDeclaration()
+                .functionCall()
+                .passedParams()
+                .passedParam(2)
+                .getText())
         .isEqualTo("$variable:#60b");
   }
 
@@ -245,9 +268,12 @@ public final class TestMixinAndInclude extends TestBase {
     ScssParser.StylesheetContext context = parse(lines);
     assertThat(context.statement(0).variableDeclaration().variableName().getText())
         .isEqualTo("$form-selectors");
-    assertThat(context.statement(0).variableDeclaration().values().commandStatement()).hasSize(3);
-    assertThat(context.statement(1).includeDeclaration().passedParams().passedParam()).hasSize(2);
-    assertThat(context.statement(1).includeDeclaration().passedParams().Ellipsis()).isNotNull();
+    assertThat(context.statement(0).variableDeclaration().list().listElement()).hasSize(3);
+    assertThat(
+            context.statement(1).includeDeclaration().functionCall().passedParams().passedParam())
+        .hasSize(2);
+    assertThat(context.statement(1).includeDeclaration().functionCall().passedParams().Ellipsis())
+        .isNotNull();
   }
 
   @Test
@@ -283,7 +309,7 @@ public final class TestMixinAndInclude extends TestBase {
     ScssParser.IncludeDeclarationContext include =
         context.statement(1).ruleset().block().statement(0).includeDeclaration();
     assertThat(include.Identifier().getText()).isEqualTo("hover");
-    assertThat(include.passedParams()).isNull();
+    assertThat(include.functionCall()).isNull();
     assertThat(include.block().property(0).getText()).isEqualTo("border-width:2px;");
   }
 
@@ -326,4 +352,3 @@ public final class TestMixinAndInclude extends TestBase {
     assertThat(include.declaredParams().declaredParam(0).getText()).isEqualTo("$type");
   }
 }
-

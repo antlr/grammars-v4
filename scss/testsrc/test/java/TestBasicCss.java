@@ -160,28 +160,55 @@ public class TestBasicCss extends TestBase {
     };
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
     assertThat(context.lastProperty().identifier().getText()).isEqualTo("display");
-    assertThat(context.lastProperty().values().commandStatement(0).getText()).isEqualTo("block");
+    assertThat(context.lastProperty().propertyValue().commandStatement(0).getText())
+        .isEqualTo("block");
   }
 
   @Test
-  public void testPropertiesMultivalues() {
+  public void testPropertyValuesSpaceSeparated() {
+    String[] lines = {"h1 {border: 2px solid black}"};
+
+    ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
+    assertThat(context.lastProperty().identifier().getText()).isEqualTo("border");
+
+    ScssParser.PropertyValueContext val = context.lastProperty().propertyValue();
+    assertThat(val.commandStatement(0).expression().measurement().Number().getText())
+        .isEqualTo("2");
+    assertThat(val.commandStatement(0).expression().measurement().Unit().getText()).isEqualTo("px");
+    assertThat(val.commandStatement(1).expression().identifier().getText()).isEqualTo("solid");
+    assertThat(val.commandStatement(2).expression().identifier().getText()).isEqualTo("black");
+  }
+
+  @Test
+  public void testPropertyValuesCommaSeparated() {
+    String[] lines = {"h1 {font-family: 'Roboto', Arial, sans-serif}"};
+
+    ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
+    assertThat(context.lastProperty().identifier().getText()).isEqualTo("font-family");
+
+    ScssParser.PropertyValueContext val = context.lastProperty().propertyValue();
+    assertThat(val.commandStatement(0).expression().StringLiteral().getText()).isEqualTo("'Roboto'");
+    assertThat(val.commandStatement(1).expression().identifier().getText()).isEqualTo("Arial");
+    assertThat(val.commandStatement(2).expression().identifier().getText()).isEqualTo("sans-serif");
+  }
+
+  @Test
+  public void testPropertiesValuesMixedSeparators() {
     String[] lines = {
       "h1 {", "  background: url('a'), 1px 2px", "}",
     };
+
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
     assertThat(context.lastProperty().identifier().getText()).isEqualTo("background");
 
-    ScssParser.ValuesContext val = context.lastProperty().values();
-    assertThat(val.commandStatement(0).expression(0).url().Url().getText()).isEqualTo("'a'");
-    assertThat(val.commandStatement(1).expression(0).measurement().Number().getText())
+    ScssParser.PropertyValueContext val = context.lastProperty().propertyValue();
+    assertThat(val.commandStatement(0).expression().url().Url().getText()).isEqualTo("'a'");
+    assertThat(val.commandStatement(1).expression().measurement().Number().getText())
         .isEqualTo("1");
-    assertThat(val.commandStatement(1).expression(0).measurement().Unit().getText())
-        .isEqualTo("px");
-
-    assertThat(val.commandStatement(1).expression(1).measurement().Number().getText())
+    assertThat(val.commandStatement(1).expression().measurement().Unit().getText()).isEqualTo("px");
+    assertThat(val.commandStatement(2).expression().measurement().Number().getText())
         .isEqualTo("2");
-    assertThat(val.commandStatement(1).expression(1).measurement().Unit().getText())
-        .isEqualTo("px");
+    assertThat(val.commandStatement(2).expression().measurement().Unit().getText()).isEqualTo("px");
   }
 
   @Test
@@ -192,15 +219,14 @@ public class TestBasicCss extends TestBase {
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
 
     assertThat(context.property(0).identifier().getText()).isEqualTo("color");
-    ScssParser.ValuesContext val = context.property(0).values();
-    assertThat(val.commandStatement(0).expression(0).measurement().Number().getText())
+    ScssParser.PropertyValueContext val = context.property(0).propertyValue();
+    assertThat(val.commandStatement(0).expression().measurement().Number().getText())
         .isEqualTo("1");
-    assertThat(val.commandStatement(0).expression(0).measurement().Unit().getText())
-        .isEqualTo("px");
+    assertThat(val.commandStatement(0).expression().measurement().Unit().getText()).isEqualTo("px");
 
     assertThat(context.lastProperty().identifier().getText()).isEqualTo("font-size");
-    val = context.lastProperty().values();
-    assertThat(val.commandStatement(0).expression(0).Color().getText()).isEqualTo("#fff");
+    val = context.lastProperty().propertyValue();
+    assertThat(val.commandStatement(0).expression().Color().getText()).isEqualTo("#fff");
   }
 
   @Test
@@ -262,24 +288,32 @@ public class TestBasicCss extends TestBase {
   @Test
   public void testPropertyFunctionMath() {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% / 3);");
-    assertThat(exp.functionCall().Identifier(0).getText()).isEqualTo("calc");
-    assertThat(exp.functionCall().values().commandStatement(0).expression(0).getText())
+    assertThat(exp.functionCall().FunctionIdentifier().getText()).isEqualTo("calc(");
+    assertThat(
+            exp.functionCall()
+                .passedParams()
+                .passedParam(0)
+                .commandStatement()
+                .expression()
+                .getText())
         .isEqualTo("100%");
     assertThat(
             exp.functionCall()
-                .values()
-                .commandStatement(0)
+                .passedParams()
+                .passedParam(0)
+                .commandStatement()
                 .mathStatement()
                 .mathCharacter()
                 .getText())
         .isEqualTo("/");
     assertThat(
             exp.functionCall()
-                .values()
-                .commandStatement(0)
+                .passedParams()
+                .passedParam(0)
+                .commandStatement()
                 .mathStatement()
                 .commandStatement()
-                .expression(0)
+                .expression()
                 .measurement()
                 .Number()
                 .getText())
@@ -289,21 +323,23 @@ public class TestBasicCss extends TestBase {
   @Test
   public void testPropertyFunctionMathMinus() {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% - 80px);");
-    assertThat(exp.functionCall().Identifier(0).getText()).isEqualTo("calc");
+    assertThat(exp.functionCall().FunctionIdentifier().getText()).isEqualTo("calc(");
     assertThat(
             exp.functionCall()
-                .values()
-                .commandStatement(0)
-                .expression(0)
+                .passedParams()
+                .passedParam(0)
+                .commandStatement()
+                .expression()
                 .measurement()
                 .Number()
                 .getText())
         .isEqualTo("100");
     assertThat(
             exp.functionCall()
-                .values()
-                .commandStatement(0)
-                .expression(0)
+                .passedParams()
+                .passedParam(0)
+                .commandStatement()
+                .expression()
                 .measurement()
                 .Unit()
                 .getText())
@@ -311,8 +347,9 @@ public class TestBasicCss extends TestBase {
 
     assertThat(
             exp.functionCall()
-                .values()
-                .commandStatement(0)
+                .passedParams()
+                .passedParam(0)
+                .commandStatement()
                 .mathStatement()
                 .mathCharacter()
                 .getText())
@@ -320,11 +357,12 @@ public class TestBasicCss extends TestBase {
 
     ScssParser.MeasurementContext measure =
         exp.functionCall()
-            .values()
-            .commandStatement(0)
+            .passedParams()
+            .passedParam(0)
+            .commandStatement()
             .mathStatement()
             .commandStatement()
-            .expression(0)
+            .expression()
             .measurement();
     assertThat(measure.Number().getText()).isEqualTo("80");
     assertThat(measure.Unit().getText()).isEqualTo("px");
@@ -333,21 +371,23 @@ public class TestBasicCss extends TestBase {
   @Test
   public void testPropertyFunctionMathVar() {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% - $var);");
-    assertThat(exp.functionCall().Identifier(0).getText()).isEqualTo("calc");
+    assertThat(exp.functionCall().FunctionIdentifier().getText()).isEqualTo("calc(");
     assertThat(
             exp.functionCall()
-                .values()
-                .commandStatement(0)
-                .expression(0)
+                .passedParams()
+                .passedParam(0)
+                .commandStatement()
+                .expression()
                 .measurement()
                 .Number()
                 .getText())
         .isEqualTo("100");
     assertThat(
             exp.functionCall()
-                .values()
-                .commandStatement(0)
-                .expression(0)
+                .passedParams()
+                .passedParam(0)
+                .commandStatement()
+                .expression()
                 .measurement()
                 .Unit()
                 .getText())
@@ -355,8 +395,9 @@ public class TestBasicCss extends TestBase {
 
     assertThat(
             exp.functionCall()
-                .values()
-                .commandStatement(0)
+                .passedParams()
+                .passedParam(0)
+                .commandStatement()
                 .mathStatement()
                 .mathCharacter()
                 .getText())
@@ -364,11 +405,12 @@ public class TestBasicCss extends TestBase {
 
     assertThat(
             exp.functionCall()
-                .values()
-                .commandStatement(0)
+                .passedParams()
+                .passedParam(0)
+                .commandStatement()
                 .mathStatement()
                 .commandStatement()
-                .expression(0)
+                .expression()
                 .variableName()
                 .getText())
         .isEqualTo("$var");
@@ -377,14 +419,15 @@ public class TestBasicCss extends TestBase {
   @Test
   public void testPropertyFunctionMathParen() {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(((100%)));");
-    assertThat(exp.functionCall().Identifier(0).getText()).isEqualTo("calc");
+    assertThat(exp.functionCall().FunctionIdentifier().getText()).isEqualTo("calc(");
     assertThat(
             exp.functionCall()
-                .values()
-                .commandStatement(0)
+                .passedParams()
+                .passedParam(0)
                 .commandStatement()
                 .commandStatement()
-                .expression(0)
+                .commandStatement()
+                .expression()
                 .measurement()
                 .Number()
                 .getText())
@@ -397,9 +440,11 @@ public class TestBasicCss extends TestBase {
 
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
     assertThat(context.property(0).identifier().getText()).isEqualTo("p1");
-    assertThat(context.property(0).values().commandStatement(0).getText()).isEqualTo("-$my-var");
-    assertThat(context.property(0).values().commandStatement(0).MINUS().getText()).isEqualTo("-");
-    assertThat(context.property(0).values().commandStatement(0).expression(0).getText())
+    assertThat(context.property(0).propertyValue().commandStatement(0).getText())
+        .isEqualTo("-$my-var");
+    assertThat(context.property(0).propertyValue().commandStatement(0).MINUS().getText())
+        .isEqualTo("-");
+    assertThat(context.property(0).propertyValue().commandStatement(0).expression().getText())
         .isEqualTo("$my-var");
   }
 
@@ -409,22 +454,23 @@ public class TestBasicCss extends TestBase {
 
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
     assertThat(context.property(0).identifier().getText()).isEqualTo("p1");
-    assertThat(context.property(0).values().commandStatement(0).getText())
+    assertThat(context.property(0).propertyValue().commandStatement(0).getText())
         .isEqualTo("+(400px-200px)");
-    assertThat(context.property(0).values().commandStatement(0).PLUS().getText()).isEqualTo("+");
+    assertThat(context.property(0).propertyValue().commandStatement(0).PLUS().getText())
+        .isEqualTo("+");
     assertThat(
             context
                 .property(0)
-                .values()
+                .propertyValue()
                 .commandStatement(0)
                 .commandStatement()
-                .expression(0)
+                .expression()
                 .getText())
         .isEqualTo("400px");
     assertThat(
             context
                 .property(0)
-                .values()
+                .propertyValue()
                 .commandStatement(0)
                 .commandStatement()
                 .mathStatement()
@@ -435,12 +481,12 @@ public class TestBasicCss extends TestBase {
     assertThat(
             context
                 .property(0)
-                .values()
+                .propertyValue()
                 .commandStatement(0)
                 .commandStatement()
                 .mathStatement()
                 .commandStatement()
-                .expression(0)
+                .expression()
                 .getText())
         .isEqualTo("200px");
   }
@@ -494,7 +540,7 @@ public class TestBasicCss extends TestBase {
     ScssParser.SelectorsContext context = getSelector(lines);
     assertThat(context.selector(0).element(0).identifier().getText()).isEqualTo("button");
     assertThat(context.selector(0).element(1).pseudo().getText()).isEqualTo(":nth-child(4)");
-    assertThat(context.selector(0).element(1).pseudo().values().getText()).isEqualTo("4");
+    assertThat(context.selector(0).element(1).pseudo().commandStatement().getText()).isEqualTo("4");
   }
 
   @Test
@@ -591,7 +637,7 @@ public class TestBasicCss extends TestBase {
     ScssParser.StylesheetContext context = parse(lines);
     assertThat(context.statement(0).ruleset().block().property(1).identifier().getText())
         .isEqualTo("transition");
-    assertThat(context.statement(0).ruleset().block().property(1).values()).isNull();
+    assertThat(context.statement(0).ruleset().block().property(1).propertyValue()).isNull();
     assertThat(context.statement(0).ruleset().block().property(1).block().property(0).getText())
         .isEqualTo("property:font-size;");
     assertThat(context.statement(0).ruleset().block().property(1).block().property(1).getText())
@@ -609,7 +655,7 @@ public class TestBasicCss extends TestBase {
     ScssParser.StylesheetContext context = parse(lines);
     assertThat(context.statement(0).ruleset().block().property(0).identifier().getText())
         .isEqualTo("margin");
-    assertThat(context.statement(0).ruleset().block().property(0).values().getText())
+    assertThat(context.statement(0).ruleset().block().property(0).propertyValue().getText())
         .isEqualTo("auto");
     assertThat(context.statement(0).ruleset().block().property(0).block().property(0).getText())
         .isEqualTo("bottom:10px;");
@@ -639,7 +685,7 @@ public class TestBasicCss extends TestBase {
     ScssParser.StylesheetContext context = parse(lines);
     assertThat(context.statement(1).ruleset().block().property(0).identifier().getText())
         .isEqualTo("margin");
-    assertThat(context.statement(1).ruleset().block().property(0).values()).isNull();
+    assertThat(context.statement(1).ruleset().block().property(0).propertyValue()).isNull();
     assertThat(
             context
                 .statement(1)
@@ -667,6 +713,6 @@ public class TestBasicCss extends TestBase {
 
     ScssParser.StylesheetContext styleContext = parse(all);
     ScssParser.BlockContext context = styleContext.statement(0).ruleset().block();
-    return context.property(0).values().commandStatement(0).expression(0);
+    return context.property(0).propertyValue().commandStatement(0).expression();
   }
 }
