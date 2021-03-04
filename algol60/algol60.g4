@@ -66,7 +66,6 @@ Plus_ : '+' ;
 Rb_ : ']' ;
 Rp_ : ')' ;
 Semi_ : ';' ;
-Times_ : '×' | '*' ;
 Underscore_ : '_' ;
 
 // 2.1
@@ -89,7 +88,7 @@ Logical_value : Logical_value_f ;
 // 2.3
 fragment Delimiter : Operator | Separator | Bracket | Declarator | Specificator ;
 fragment Operator : Arithmetic_operator | Relational_operator_f | Logical_operator | Sequential_operator ;
-fragment Arithmetic_operator : Plus_ | Minus_ | Times_ | Divide_ | Exp_ ;
+fragment Arithmetic_operator : Plus_ | Minus_ | Mult_ | Divide_ | Exp_ ;
 fragment Relational_operator_f : Lt_ | Le_ | Eq_ | Ne_ | Gt_ | Ge_ ;
 Relational_operator : Relational_operator_f ;
 fragment Logical_operator : Equiv_ | Includes_ | Or_ | And_ | Not_ ;
@@ -117,11 +116,12 @@ Unsigned_number : Decimal_number | Exponential_part | Decimal_number Exponential
 number : Unsigned_number | Plus_ Unsigned_number | Minus_ Unsigned_number ;
 
 // 2.6.1
-fragment Proper_string : (~('\u231C' | '\u231D'))+ ;
-// rewritten to avoid MLR.
-fragment Open_string : Proper_string? (ULCorner Open_string URCorner)+ ;
+fragment Proper_string : (~('\u231C' | '\u231D'))* ;
+fragment Open_string : Proper_string | Proper_string Closed_string Open_string ;
 fragment Closed_string : ULCorner Open_string URCorner ;
-String : Closed_string+ | '"' ~'"'* '"' | '`' ~'\''* '\'' ;
+fragment StdString : Closed_string | Closed_string StdString ;
+String : StdString // String according to spec.
+   | '"' ~'"'* '"' | '`' ~'\''* '\'' ; // Additional non-standard strings used in examples.
 
 // 3
 expression : arithmetic_expression | boolean_expression | designational_expression ;
