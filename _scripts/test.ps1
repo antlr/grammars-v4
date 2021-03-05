@@ -116,9 +116,10 @@ function Test-GrammarTestCases {
 
         $errorFile = "$case.errors"
         $shouldFail = Test-Path $errorFile
-        Write-Host "--- Testing file $item ---"
-        if ( $Target -eq "CSharp") {
-            dotnet Test.dll -tree -file $case >output.txt 2>error.txt
+        Write-Host "--- Testing file $item $Target ---"
+        if ($Target -eq "CSharp") {
+            $stdout = (dotnet Test.dll -tree -file $case 2>error.txt)
+            $stderr = Get-Content error.txt
         }
         else {
             make run -file $case
@@ -132,12 +133,6 @@ function Test-GrammarTestCases {
                 $failedList += $case
                 continue
             }
-            #$expectError = Get-Content $errorFile
-            #$actualError = Get-Content error.txt
-            #if ($expectError -ne $actualError) {
-            #    $success = $false
-            #    continue
-            #}
         }
         elseif (!$ok) { 
             Write-Host (Get-Content -Path "error.txt")
@@ -145,15 +140,6 @@ function Test-GrammarTestCases {
             $failedList += $case
             continue
         }
-        #$treeFile = "$case.tree"
-        #if (Test-Path $treeFile) {
-        #    $expectTree = Get-Content $treeFile
-        #    $actualTree = Get-Content output.txt
-        #    if ($expectTree -ne $actualTree) {
-        #        $success = $false
-        #        continue
-        #    }
-        #}
     }
     return $failedList
 }
@@ -297,7 +283,8 @@ function Test-AllGrammars {
     }
     else {
         Write-Error "Failed grammars: $([String]::Join(' ', $failedGrammars))"
-        exit 1
+        Start-Sleep 5
+        exit 42
     }
 }
 
