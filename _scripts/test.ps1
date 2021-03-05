@@ -118,7 +118,7 @@ function Test-GrammarTestCases {
         $shouldFail = Test-Path $errorFile
         Write-Host "--- Testing file $item ---"
         if ( $Target -eq "CSharp") {
-            dotnet Test.dll -tree -file $case >output.txt 2>error.txt
+            dotnet Test.dll -file $case
         }
         else {
             make run -file $case
@@ -132,12 +132,6 @@ function Test-GrammarTestCases {
                 $failedList += $case
                 continue
             }
-            #$expectError = Get-Content $errorFile
-            #$actualError = Get-Content error.txt
-            #if ($expectError -ne $actualError) {
-            #    $success = $false
-            #    continue
-            #}
         }
         elseif (!$ok) { 
             Write-Host (Get-Content -Path "error.txt")
@@ -145,15 +139,6 @@ function Test-GrammarTestCases {
             $failedList += $case
             continue
         }
-        #$treeFile = "$case.tree"
-        #if (Test-Path $treeFile) {
-        #    $expectTree = Get-Content $treeFile
-        #    $actualTree = Get-Content output.txt
-        #    if ($expectTree -ne $actualTree) {
-        #        $success = $false
-        #        continue
-        #    }
-        #}
     }
     return $failedList
 }
