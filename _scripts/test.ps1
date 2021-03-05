@@ -134,7 +134,6 @@ function Test-GrammarTestCases {
             }
         }
         elseif (!$ok) { 
-            Write-Host (Get-Content -Path "error.txt")
             Write-Host "$Directory test $case failed" -ForegroundColor Red
             $failedList += $case
             continue
@@ -282,6 +281,7 @@ function Test-AllGrammars {
     }
     else {
         Write-Error "Failed grammars: $([String]::Join(' ', $failedGrammars))"
+        Write-Error "Failed cases: $([String]::Join(' ', $failedCases))"
         exit 1
     }
 }
