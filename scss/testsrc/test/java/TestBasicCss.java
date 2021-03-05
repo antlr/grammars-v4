@@ -699,6 +699,29 @@ public class TestBasicCss extends TestBase {
         .isEqualTo("my-margin");
   }
 
+  @Test
+  public void toKeywordAsAnIdentifier() {
+    String[] lines = {
+      "background-image: linear-gradient(",
+      "  to bottom right,",
+      "  rgba(200, 200, 200, 0.3) 0%,",
+      "  rgba(200, 200, 200, 0.5) 50%,",
+      "  rgba(200, 200, 200, 0.7) 100%",
+      ");",
+    };
+
+    ScssParser.ExpressionContext context = createProperty(lines);
+    assertThat(context.functionCall().FunctionIdentifier().getText()).isEqualTo("linear-gradient(");
+    ScssParser.ListSpaceSeparatedContext list =
+        context.functionCall().passedParams().passedParam(0).listSpaceSeparated();
+    assertThat(list.listElement(0).commandStatement().expression().identifier().getText())
+        .isEqualTo("to");
+    assertThat(list.listElement(1).commandStatement().expression().identifier().getText())
+        .isEqualTo("bottom");
+    assertThat(list.listElement(2).commandStatement().expression().identifier().getText())
+        .isEqualTo("right");
+  }
+
   private ScssParser.SelectorsContext getSelector(String... lines) {
     ScssParser.StylesheetContext context = parse(lines);
     return context.statement(0).ruleset().selectors();
