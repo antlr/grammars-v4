@@ -36,15 +36,13 @@ import org.junit.runners.JUnit4;
 public class TestFunctions extends TestBase {
   @Test
   public void testFunction() {
-    // TODO: make it work with parans in the math.
-    // ($n - 1) * $gutter-width;
     String[] lines = {"@function grid-width($n) {", "  @return ($n - 1) * $gutter-width;", "}"};
     ScssParser.FunctionDeclarationContext context = parse(lines).statement(0).functionDeclaration();
-    assertThat(context.Identifier().getText()).isEqualTo("grid-width");
+    assertThat(context.FunctionIdentifier().getText()).isEqualTo("grid-width(");
     assertThat(context.declaredParams().declaredParam(0).variableName().getText()).isEqualTo("$n");
 
     ScssParser.FunctionReturnContext funcContext = context.functionBody().functionReturn();
-    assertThat(funcContext.commandStatement().commandStatement().expression(0).getText())
+    assertThat(funcContext.commandStatement().commandStatement().expression().getText())
         .isEqualTo("$n");
     assertThat(
             funcContext
@@ -63,18 +61,23 @@ public class TestFunctions extends TestBase {
 
   @Test
   public void testFunctionMultiLine() {
-    // TODO: make it work with parans in the math.
-    // ($n - 1) * $gutter-width;
     String[] lines = {"@function grid-width () {", "  $color: red;", "  @return $color;", "}"};
     ScssParser.FunctionDeclarationContext context = parse(lines).statement(0).functionDeclaration();
 
     ScssParser.FunctionStatementContext funcContext = context.functionBody().functionStatement(0);
     assertThat(funcContext.statement().variableDeclaration().variableName().getText())
         .isEqualTo("$color");
-    assertThat(funcContext.statement().variableDeclaration().values().getText()).isEqualTo("red");
+    assertThat(
+            funcContext
+                .statement()
+                .variableDeclaration()
+                .propertyValue()
+                .commandStatement(0)
+                .getText())
+        .isEqualTo("red");
 
     ScssParser.FunctionReturnContext returnContext = context.functionBody().functionReturn();
-    assertThat(returnContext.commandStatement().expression(0).getText()).isEqualTo("$color");
+    assertThat(returnContext.commandStatement().expression().getText()).isEqualTo("$color");
   }
 
   @Test
@@ -88,12 +91,14 @@ public class TestFunctions extends TestBase {
       "}"
     };
     ScssParser.FunctionDeclarationContext context = parse(lines).statement(0).functionDeclaration();
+    // With space before the paren
     assertThat(context.Identifier().getText()).isEqualTo("grid-width");
     assertThat(context.declaredParams().declaredParam(0).variableName().getText()).isEqualTo("$a");
 
     ScssParser.FunctionStatementContext funcContext = context.functionBody().functionStatement(0);
-    assertThat(funcContext.statement().functionDeclaration().Identifier().getText())
-        .isEqualTo("grid-height");
+    // Without space before the paren
+    assertThat(funcContext.statement().functionDeclaration().FunctionIdentifier().getText())
+        .isEqualTo("grid-height(");
     assertThat(
             funcContext
                 .statement()
@@ -111,12 +116,30 @@ public class TestFunctions extends TestBase {
                 .functionBody()
                 .functionReturn()
                 .commandStatement()
-                .expression(0)
+                .expression()
                 .variableName()
                 .getText())
         .isEqualTo("$color");
 
     ScssParser.FunctionReturnContext returnContext = context.functionBody().functionReturn();
-    assertThat(returnContext.commandStatement().expression(0).getText()).isEqualTo("$world");
+    assertThat(returnContext.commandStatement().expression().getText()).isEqualTo("$world");
+  }
+
+  @Test
+  public void namespacedFunctionCall() {
+    String[] lines = {"$helvetica: map.deep-merge($helvetica-light, $helvetica-heavy);"};
+
+    ScssParser.StylesheetContext context = parse(lines);
+    ScssParser.FunctionCallContext function =
+        context
+            .statement(0)
+            .variableDeclaration()
+            .propertyValue()
+            .commandStatement(0)
+            .expression()
+            .functionCall();
+    assertThat(function.functionNamespace().getText()).isEqualTo("map.");
+    assertThat(function.functionNamespace().Identifier(0).getText()).isEqualTo("map");
+    assertThat(function.FunctionIdentifier().getText()).isEqualTo("deep-merge(");
   }
 }

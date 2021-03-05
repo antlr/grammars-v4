@@ -220,9 +220,9 @@ public class TestMedia extends TestBase {
             innerMedia
                 .block()
                 .property(0)
-                .values()
+                .propertyValue()
                 .commandStatement(0)
-                .expression(0)
+                .expression()
                 .Color()
                 .getText())
         .isEqualTo("#036");
