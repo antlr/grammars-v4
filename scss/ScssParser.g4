@@ -60,7 +60,7 @@ declaredParam
   ;
 
 variableName
-  : DOLLAR Identifier
+  : (DOLLAR | MINUS_DOLLAR | PLUS_DOLLAR) Identifier
   ;
 
 paramOptionalValue
@@ -73,7 +73,7 @@ passedParams
   ;
 
 passedParam
-  : (variableName COLON)? (commandStatement | bracketedList | map)
+  : (variableName COLON)? (commandStatement | listSpaceSeparated | listBracketed | map)
   ;
 
 // MIXINS and related rules
@@ -112,7 +112,9 @@ functionStatement
 
 
 commandStatement
-  : (PLUS | MINUS)? (expression | '(' commandStatement ')') mathStatement?
+  : (expression
+      | (LPAREN | MINUS_LPAREN | PLUS_LPAREN) commandStatement RPAREN
+    ) mathStatement?
   ;
 
 mathCharacter
@@ -161,7 +163,7 @@ condition
 
 
 variableDeclaration
-  : variableName COLON (commandStatement | list | map) '!default'? ';'
+  : variableName COLON (propertyValue | listBracketed | map) '!default'? ';'
   ;
 
 
@@ -338,15 +340,22 @@ functionNamespace
   ;
 
 
-// Lists can be space or comma separated as long as it's consistent.
-// Lists can be optionally wrapped in brackets.
 list
-  : listElement (listElement+ | (COMMA listElement)+ COMMA?)
-  | bracketedList
+  : listCommaSeparated
+  | listSpaceSeparated
+  | listBracketed
   ;
 
-bracketedList
-  : LBRACK listElement (listElement+ | (COMMA listElement)+) RBRACK
+listCommaSeparated
+  : listElement (COMMA listElement)+ COMMA?
+  ;
+
+listSpaceSeparated
+  : listElement listElement+
+  ;
+
+listBracketed
+  : LBRACK (listCommaSeparated | listSpaceSeparated) RBRACK
   ;
 
 listElement

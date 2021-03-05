@@ -156,14 +156,11 @@ public class TestConditionals extends TestBase {
 
     ScssParser.EachDeclarationContext context = parse(lines).statement(0).eachDeclaration();
     assertThat(context.variableName(0).getText()).isEqualTo("$animal");
-    assertThat(context.eachValueList().list().listElement(0).commandStatement().getText())
-        .isEqualTo("puma");
-    assertThat(context.eachValueList().list().listElement(1).commandStatement().getText())
-        .isEqualTo("sea-slug");
-    assertThat(context.eachValueList().list().listElement(2).commandStatement().getText())
-        .isEqualTo("egret");
-    assertThat(context.eachValueList().list().listElement(3).commandStatement().getText())
-        .isEqualTo("salamander");
+    ScssParser.ListCommaSeparatedContext list = context.eachValueList().list().listCommaSeparated();
+    assertThat(list.listElement(0).commandStatement().getText()).isEqualTo("puma");
+    assertThat(list.listElement(1).commandStatement().getText()).isEqualTo("sea-slug");
+    assertThat(list.listElement(2).commandStatement().getText()).isEqualTo("egret");
+    assertThat(list.listElement(3).commandStatement().getText()).isEqualTo("salamander");
   }
 
   @Test
@@ -176,12 +173,26 @@ public class TestConditionals extends TestBase {
     assertThat(context.variableName(1).getText()).isEqualTo("$color");
     assertThat(context.variableName(2).getText()).isEqualTo("$cursor");
 
-    ScssParser.ListContext list1 = context.eachValueList().list().listElement(0).list();
+    ScssParser.ListCommaSeparatedContext list1 =
+        context
+            .eachValueList()
+            .list()
+            .listCommaSeparated()
+            .listElement(0)
+            .list()
+            .listCommaSeparated();
     assertThat(list1.listElement(0).commandStatement().getText()).isEqualTo("puma");
     assertThat(list1.listElement(1).commandStatement().getText()).isEqualTo("black");
     assertThat(list1.listElement(2).commandStatement().getText()).isEqualTo("default");
 
-    ScssParser.ListContext list2 = context.eachValueList().list().listElement(1).list();
+    ScssParser.ListCommaSeparatedContext list2 =
+        context
+            .eachValueList()
+            .list()
+            .listCommaSeparated()
+            .listElement(1)
+            .list()
+            .listCommaSeparated();
     assertThat(list2.listElement(0).commandStatement().getText()).isEqualTo("sea-slug");
     assertThat(list2.listElement(1).commandStatement().getText()).isEqualTo("blue");
     assertThat(list2.listElement(2).commandStatement().getText()).isEqualTo("pointer");

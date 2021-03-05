@@ -268,7 +268,8 @@ public final class TestMixinAndInclude extends TestBase {
     ScssParser.StylesheetContext context = parse(lines);
     assertThat(context.statement(0).variableDeclaration().variableName().getText())
         .isEqualTo("$form-selectors");
-    assertThat(context.statement(0).variableDeclaration().list().listElement()).hasSize(3);
+    assertThat(context.statement(0).variableDeclaration().propertyValue().commandStatement())
+        .hasSize(3);
     assertThat(
             context.statement(1).includeDeclaration().functionCall().passedParams().passedParam())
         .hasSize(2);

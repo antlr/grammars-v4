@@ -187,7 +187,8 @@ public class TestBasicCss extends TestBase {
     assertThat(context.lastProperty().identifier().getText()).isEqualTo("font-family");
 
     ScssParser.PropertyValueContext val = context.lastProperty().propertyValue();
-    assertThat(val.commandStatement(0).expression().StringLiteral().getText()).isEqualTo("'Roboto'");
+    assertThat(val.commandStatement(0).expression().StringLiteral().getText())
+        .isEqualTo("'Roboto'");
     assertThat(val.commandStatement(1).expression().identifier().getText()).isEqualTo("Arial");
     assertThat(val.commandStatement(2).expression().identifier().getText()).isEqualTo("sans-serif");
   }
@@ -440,12 +441,11 @@ public class TestBasicCss extends TestBase {
 
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
     assertThat(context.property(0).identifier().getText()).isEqualTo("p1");
-    assertThat(context.property(0).propertyValue().commandStatement(0).getText())
-        .isEqualTo("-$my-var");
-    assertThat(context.property(0).propertyValue().commandStatement(0).MINUS().getText())
-        .isEqualTo("-");
-    assertThat(context.property(0).propertyValue().commandStatement(0).expression().getText())
-        .isEqualTo("$my-var");
+    ScssParser.ExpressionContext expression =
+        context.property(0).propertyValue().commandStatement(0).expression();
+    assertThat(expression.getText()).isEqualTo("-$my-var");
+    assertThat(expression.variableName().MINUS_DOLLAR()).isNotNull();
+    assertThat(expression.variableName().Identifier().getText()).isEqualTo("my-var");
   }
 
   @Test
@@ -456,8 +456,7 @@ public class TestBasicCss extends TestBase {
     assertThat(context.property(0).identifier().getText()).isEqualTo("p1");
     assertThat(context.property(0).propertyValue().commandStatement(0).getText())
         .isEqualTo("+(400px-200px)");
-    assertThat(context.property(0).propertyValue().commandStatement(0).PLUS().getText())
-        .isEqualTo("+");
+    assertThat(context.property(0).propertyValue().commandStatement(0).PLUS_LPAREN()).isNotNull();
     assertThat(
             context
                 .property(0)

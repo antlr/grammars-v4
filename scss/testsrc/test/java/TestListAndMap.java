@@ -35,11 +35,20 @@ public final class TestListAndMap extends TestBase {
   @Test
   public void listSpaceSeparated() {
     String[] lines = {
-      "$var: 10px 1em 0 -5px;",
+      "$var: list.nth(10px 1em 0 -5px, 2);",
     };
 
-    ScssParser.StylesheetContext context = parse(lines);
-    ScssParser.ListContext list = context.statement(0).variableDeclaration().list();
+    ScssParser.ListSpaceSeparatedContext list =
+        parse(lines)
+            .statement(0)
+            .variableDeclaration()
+            .propertyValue()
+            .commandStatement(0)
+            .expression()
+            .functionCall()
+            .passedParams()
+            .passedParam(0)
+            .listSpaceSeparated();
     assertThat(list.listElement()).hasSize(4);
     assertThat(list.listElement(0).commandStatement().getText()).isEqualTo("10px");
     assertThat(list.listElement(1).commandStatement().getText()).isEqualTo("1em");
@@ -50,11 +59,11 @@ public final class TestListAndMap extends TestBase {
   @Test
   public void listCommaSeparated() {
     String[] lines = {
-      "$var: red, blue, yellow;",
+      "@each $var in red, blue, yellow {}",
     };
 
-    ScssParser.StylesheetContext context = parse(lines);
-    ScssParser.ListContext list = context.statement(0).variableDeclaration().list();
+    ScssParser.ListCommaSeparatedContext list =
+        parse(lines).statement(0).eachDeclaration().eachValueList().list().listCommaSeparated();
     assertThat(list.listElement()).hasSize(3);
     assertThat(list.listElement(0).commandStatement().getText()).isEqualTo("red");
     assertThat(list.listElement(1).commandStatement().getText()).isEqualTo("blue");
@@ -62,28 +71,26 @@ public final class TestListAndMap extends TestBase {
   }
 
   @Test
-  public void bracketedListSpaceSeparated() {
+  public void listBracketedSpaceSeparated() {
     String[] lines = {
       "$var: [$a $b];",
     };
 
-    ScssParser.StylesheetContext context = parse(lines);
-    ScssParser.BracketedListContext list =
-        context.statement(0).variableDeclaration().list().bracketedList();
+    ScssParser.ListSpaceSeparatedContext list =
+        parse(lines).statement(0).variableDeclaration().listBracketed().listSpaceSeparated();
     assertThat(list.listElement()).hasSize(2);
     assertThat(list.listElement(0).commandStatement().getText()).isEqualTo("$a");
     assertThat(list.listElement(1).commandStatement().getText()).isEqualTo("$b");
   }
 
   @Test
-  public void bracketedListCommaSeparated() {
+  public void listBracketedCommaSeparated() {
     String[] lines = {
       "$var: [1 + 2, 3 / 4];",
     };
 
-    ScssParser.StylesheetContext context = parse(lines);
-    ScssParser.BracketedListContext list =
-        context.statement(0).variableDeclaration().list().bracketedList();
+    ScssParser.ListCommaSeparatedContext list =
+        parse(lines).statement(0).variableDeclaration().listBracketed().listCommaSeparated();
     assertThat(list.listElement()).hasSize(2);
     assertThat(list.listElement(0).commandStatement().getText()).isEqualTo("1+2");
     assertThat(list.listElement(1).commandStatement().getText()).isEqualTo("3/4");
@@ -92,22 +99,30 @@ public final class TestListAndMap extends TestBase {
   @Test
   public void nestedList() {
     String[] lines = {
-      "$var: (a b) (c, (d e f), g, h);",
+      "$var: [(a b) (c, (d e f), g, h)];",
     };
 
-    ScssParser.StylesheetContext context = parse(lines);
-    ScssParser.ListContext outerList = context.statement(0).variableDeclaration().list();
-    assertThat(outerList.listElement(0).list().listElement()).hasSize(2);
-    assertThat(outerList.listElement(1).list().listElement()).hasSize(4);
-    assertThat(outerList.listElement(1).list().listElement(1).list().listElement()).hasSize(3);
+    ScssParser.ListSpaceSeparatedContext outerList =
+        parse(lines).statement(0).variableDeclaration().listBracketed().listSpaceSeparated();
+    assertThat(outerList.listElement(0).list().listSpaceSeparated().listElement()).hasSize(2);
+    assertThat(outerList.listElement(1).list().listCommaSeparated().listElement()).hasSize(4);
+    assertThat(
+            outerList
+                .listElement(1)
+                .list()
+                .listCommaSeparated()
+                .listElement(1)
+                .list()
+                .listSpaceSeparated()
+                .listElement())
+        .hasSize(3);
   }
 
   @Test
   public void map() {
     String[] lines = {"$font-weights: (\"regular\": 400, \"medium\": 500, \"bold\": 700);"};
 
-    ScssParser.StylesheetContext context = parse(lines);
-    ScssParser.MapContext map = context.statement(0).variableDeclaration().map();
+    ScssParser.MapContext map = parse(lines).statement(0).variableDeclaration().map();
     assertThat(map.mapEntry()).hasSize(3);
     assertThat(map.mapEntry(0).mapKey().commandStatement().getText()).isEqualTo("\"regular\"");
     assertThat(map.mapEntry(0).mapValue().commandStatement().getText()).isEqualTo("400");
@@ -117,8 +132,7 @@ public final class TestListAndMap extends TestBase {
   public void mapUnquotedKeys() {
     String[] lines = {"$var: (1: 2, a: b, red: blue);"};
 
-    ScssParser.StylesheetContext context = parse(lines);
-    ScssParser.MapContext map = context.statement(0).variableDeclaration().map();
+    ScssParser.MapContext map = parse(lines).statement(0).variableDeclaration().map();
     assertThat(map.mapEntry()).hasSize(3);
     assertThat(map.mapEntry(2).mapKey().commandStatement().getText()).isEqualTo("red");
     assertThat(map.mapEntry(2).mapValue().commandStatement().getText()).isEqualTo("blue");
@@ -136,31 +150,31 @@ public final class TestListAndMap extends TestBase {
       ");",
     };
 
-    ScssParser.StylesheetContext context = parse(lines);
     ScssParser.MapContext map =
-        context
+        parse(lines)
             .statement(0)
             .variableDeclaration()
-            .commandStatement()
+            .propertyValue()
+            .commandStatement(0)
             .expression()
             .functionCall()
             .passedParams()
             .passedParam(1)
             .map();
     assertThat(map.mapEntry()).hasSize(2);
-    assertThat(map.mapEntry(1).mapValue().list().listElement()).hasSize(3);
-    assertThat(map.mapEntry(1).mapValue().list().listElement(0).getText()).isEqualTo("1px");
-    assertThat(map.mapEntry(1).mapValue().list().listElement(1).getText()).isEqualTo("solid");
-    assertThat(map.mapEntry(1).mapValue().list().listElement(2).getText())
-        .isEqualTo("$borderColor");
+    ScssParser.ListSpaceSeparatedContext list =
+        map.mapEntry(1).mapValue().list().listSpaceSeparated();
+    assertThat(list.listElement()).hasSize(3);
+    assertThat(list.listElement(0).getText()).isEqualTo("1px");
+    assertThat(list.listElement(1).getText()).isEqualTo("solid");
+    assertThat(list.listElement(2).getText()).isEqualTo("$borderColor");
   }
 
   @Test
   public void nestedMap() {
     String[] lines = {"$config: (a: (b: (c: d)));"};
 
-    ScssParser.StylesheetContext context = parse(lines);
-    ScssParser.MapContext map = context.statement(0).variableDeclaration().map();
+    ScssParser.MapContext map = parse(lines).statement(0).variableDeclaration().map();
     assertThat(
             map.mapEntry(0)
                 .mapValue()

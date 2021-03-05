@@ -70,6 +70,13 @@ DIV             : '/';
 MINUS           : '-';
 PERC            : '%';
 
+// When a variable or parenthesized statement is negated, there cannot be a
+// space after the - or +.
+MINUS_DOLLAR    : MINUS DOLLAR;
+PLUS_DOLLAR     : PLUS DOLLAR;
+MINUS_LPAREN    : MINUS LPAREN;
+PLUS_LPAREN     : PLUS LPAREN;
+
 
 UrlStart
   : 'url' LPAREN -> pushMode(URL_STARTED)

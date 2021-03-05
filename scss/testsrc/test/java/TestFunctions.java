@@ -67,7 +67,13 @@ public class TestFunctions extends TestBase {
     ScssParser.FunctionStatementContext funcContext = context.functionBody().functionStatement(0);
     assertThat(funcContext.statement().variableDeclaration().variableName().getText())
         .isEqualTo("$color");
-    assertThat(funcContext.statement().variableDeclaration().commandStatement().getText())
+    assertThat(
+            funcContext
+                .statement()
+                .variableDeclaration()
+                .propertyValue()
+                .commandStatement(0)
+                .getText())
         .isEqualTo("red");
 
     ScssParser.FunctionReturnContext returnContext = context.functionBody().functionReturn();
@@ -125,7 +131,13 @@ public class TestFunctions extends TestBase {
 
     ScssParser.StylesheetContext context = parse(lines);
     ScssParser.FunctionCallContext function =
-        context.statement(0).variableDeclaration().commandStatement().expression().functionCall();
+        context
+            .statement(0)
+            .variableDeclaration()
+            .propertyValue()
+            .commandStatement(0)
+            .expression()
+            .functionCall();
     assertThat(function.functionNamespace().getText()).isEqualTo("map.");
     assertThat(function.functionNamespace().Identifier(0).getText()).isEqualTo("map");
     assertThat(function.FunctionIdentifier().getText()).isEqualTo("deep-merge(");
