@@ -288,11 +288,12 @@ identifier
   : Identifier identifierPart*
   | InterpolationStart identifierVariableName BlockEnd identifierPart*
   // These are keywords in some contexts, but can be used as identifiers too.
-  | FROM
-  | THROUGH
-  | ONLY
-  | NOT
   | AND_WORD
+  | FROM
+  | NOT
+  | ONLY
+  | THROUGH
+  | TO
   | USING
   ;
 
