@@ -48,40 +48,54 @@ function Get-GrammarSkipList {
 }
 
 function Test-Grammar {
-    # TODO: fix it
     param (
         $Directory,
         $Target = "CSharp"
     )
-    Write-Host "---------- Testing grammar $Directory ----------"
+    Write-Host "---------- Testing grammar $Directory ----------" -ForegroundColor Green
     $cwd = Get-Location
     Set-Location $Directory
     $hasTest = Test-Path "./examples"
     if ($hasTest) {
         $testDir = Resolve-Path "./examples"
     }
-    dotnet-antlr -m -t $Target
-
-    Set-Location 'Generated'
-
+    
     $start = Get-Date
-
+    Write-Host "Building"
+    Write-Host (dotnet-antlr -m -t $Target)
+    if ($LASTEXITCODE -ne 0) {
+        $success = $false
+        $hasTest = $false
+        Write-Host "Code generation failed" -ForegroundColor Red
+    }
+    Set-Location 'Generated'
     $success = $true
     if ( $Target -eq "CSharp") {
-        dotnet build -o "CSharp"
+        Write-Host (dotnet build -o "CSharp") -Separator ([Environment]::NewLine)
         if ($LASTEXITCODE -ne 0) {
             $success = $false
             $hasTest = $false
+            Write-Host "Build failed" -ForegroundColor Red
         }
         Set-Location "CSharp"
     }
+    Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
+
+    $start2 = Get-Date
+    Write-Host "Testing"
+    $failedList = @()
     if ($hasTest) {
-        $success = Test-GrammarTestCases -Target $Target -TestDirectory $testDir
+        $failedList = Test-GrammarTestCases -Target $Target -TestDirectory $testDir
+        if ($failedList.Length -gt 0) {
+            $success = $false
+        }
     }
-    $duration = (Get-Date) - $start
-    Write-Host "$Directory Duration: $duration"
+    Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
     Set-Location $cwd
-    return $success
+    return @{
+        Success     = $success
+        FailedCases = $failedList
+    }
 }
 
 function Test-GrammarTestCases {
@@ -89,15 +103,14 @@ function Test-GrammarTestCases {
         $TestDirectory,
         $Target = "CSharp"
     )
-    $success = $true
-    :forCases foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
+    $failedList = @()
+    foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
         $case = $item #Join-Path $TestDirectory $item
         $ext = $case.Extension
         if (($ext -eq ".errors") -or ($ext -eq ".tree")) {
             continue
         }
         if (Test-Path $case -PathType Container) {
-            #    Test-GrammarTestCases -TestDirectory $case -Target $Target
             continue
         }
 
@@ -114,7 +127,9 @@ function Test-GrammarTestCases {
 
         if ($shouldFail) {
             if ($ok) {
-                $success = $false
+                Write-Host "Text case should return error"
+                Write-Host "$Directory test $case failed" -ForegroundColor Red
+                $failedList += $case
                 continue
             }
             #$expectError = Get-Content $errorFile
@@ -126,8 +141,8 @@ function Test-GrammarTestCases {
         }
         elseif (!$ok) { 
             Write-Host (Get-Content -Path "error.txt")
-            Write-Host "$Directory test $case failed"
-            $success = $false
+            Write-Host "$Directory test $case failed" -ForegroundColor Red
+            $failedList += $case
             continue
         }
         #$treeFile = "$case.tree"
@@ -140,7 +155,7 @@ function Test-GrammarTestCases {
         #    }
         #}
     }
-    return $success
+    return $failedList
 }
 
 function Get-Grammars {
@@ -179,7 +194,7 @@ function Get-Grammars {
         return $ret
     }
     if ($xml.project.build.plugins.plugin) {
-        $conf = $xml.project.build.plugins | Where-Object -FilterScript { $_.plugin.groupId -eq "org.antlr" }
+        $conf = $xml.project.build.plugins | Where-Object { $_.plugin.groupId -eq "org.antlr" }
         if ($conf) {
             return @($Directory)
         }
@@ -264,17 +279,24 @@ function Test-AllGrammars {
     Write-Host "$grammars"
 
     $success = $true
+    $t = Get-Date
+    $failedGrammars = @()
+    $failedCases = @()
     foreach ($g in $grammars) {
         $state = Test-Grammar -Directory $g -Target $Target
-        if (!$state) {
+        if (!$state.Success) {
             $success = $false
-            Write-Host "$g failed"
+            $failedGrammars += $g
+            $failedCases += $state.FailedCases
+            Write-Host "$g failed" -ForegroundColor Red
         }        
     }
+    Write-Host "finished in $((Get-Date)-$t)" -ForegroundColor Yellow
     if ($success) {
         exit 0
     }
     else {
+        Write-Error "Failed grammars: $([String]::Join(' ', $failedGrammars))"
         exit 1
     }
 }
@@ -282,12 +304,11 @@ function Test-AllGrammars {
 $t = $args[0]
 $pc = $args[1]
 $cc = $args[2]
-
+    
 $diff = $true
 if (!$t) {
     $t = "CSharp"
 }
-
 if (!$pc) {
     $diff = $false
 }
