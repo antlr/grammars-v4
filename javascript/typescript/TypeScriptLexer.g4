@@ -1,40 +1,12 @@
-/*
- * The MIT License (MIT)
- *
- * Copyright (c) 2014 by Bart Kiers (original author) and Alexandre Vitorelli (contributor -> ported to CSharp)
- * Copyright (c) 2017-2020 by Ivan Kochurkin (Positive Technologies):
-    added ECMAScript 6 support, cleared and transformed to the universal grammar.
- * Copyright (c) 2018 by Juan Alvarez (contributor -> ported to Go)
- * Copyright (c) 2019 by Student Main (contributor -> ES2020)
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- */
-lexer grammar JavaScriptLexer;
+lexer grammar TypeScriptLexer;
 
 channels { ERROR }
 
-options { superClass=JavaScriptLexerBase; }
+options {
+    superClass=TypeScriptLexerBase;
+}
 
-HashBangLine:                   { this.IsStartOfFile()}? '#!' ~[\r\n\u2028\u2029]*; // only allowed at start
+
 MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
 SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
 RegularExpressionLiteral:       '/' RegularExpressionFirstChar RegularExpressionChar* {this.IsRegexPossible()}? '/' IdentifierPart*;
@@ -61,9 +33,6 @@ Not:                            '!';
 Multiply:                       '*';
 Divide:                         '/';
 Modulus:                        '%';
-Power:                          '**';
-NullCoalesce:                   '??';
-Hashtag:                        '#';
 RightShiftArithmetic:           '>>';
 LeftShiftArithmetic:            '<<';
 RightShiftLogical:              '>>>';
@@ -91,7 +60,6 @@ RightShiftLogicalAssign:        '>>>=';
 BitAndAssign:                   '&=';
 BitXorAssign:                   '^=';
 BitOrAssign:                    '|=';
-PowerAssign:                    '**=';
 ARROW:                          '=>';
 
 /// Null Literals
@@ -105,22 +73,17 @@ BooleanLiteral:                 'true'
 
 /// Numeric Literals
 
-DecimalLiteral:                 DecimalIntegerLiteral '.' [0-9] [0-9_]* ExponentPart?
-              |                 '.' [0-9] [0-9_]* ExponentPart?
+DecimalLiteral:                 DecimalIntegerLiteral '.' [0-9]* ExponentPart?
+              |                 '.' [0-9]+ ExponentPart?
               |                 DecimalIntegerLiteral ExponentPart?
               ;
 
 /// Numeric Literals
 
-HexIntegerLiteral:              '0' [xX] [0-9a-fA-F] HexDigit*;
+HexIntegerLiteral:              '0' [xX] HexDigit+;
 OctalIntegerLiteral:            '0' [0-7]+ {!this.IsStrictMode()}?;
-OctalIntegerLiteral2:           '0' [oO] [0-7] [_0-7]*;
-BinaryIntegerLiteral:           '0' [bB] [01] [_01]*;
-
-BigHexIntegerLiteral:           '0' [xX] [0-9a-fA-F] HexDigit* 'n';
-BigOctalIntegerLiteral:         '0' [oO] [0-7] [_0-7]* 'n';
-BigBinaryIntegerLiteral:        '0' [bB] [01] [_01]* 'n';
-BigDecimalIntegerLiteral:       DecimalIntegerLiteral 'n';
+OctalIntegerLiteral2:           '0' [oO] [0-7]+;
+BinaryIntegerLiteral:           '0' [bB] [01]+;
 
 /// Keywords
 
@@ -152,6 +115,8 @@ In:                             'in';
 Try:                            'try';
 As:                             'as';
 From:                           'from';
+ReadOnly:                       'readonly';
+Async:                          'async';
 
 /// Future Reserved Words
 
@@ -163,32 +128,57 @@ Const:                          'const';
 Export:                         'export';
 Import:                         'import';
 
-Async:                          'async';
-Await:                          'await';
-
 /// The following tokens are also considered to be FutureReservedWords
 /// when parsing strict mode
 
-Implements:                     'implements' {this.IsStrictMode()}?;
-StrictLet:                      'let' {this.IsStrictMode()}?;
-NonStrictLet:                   'let' {!this.IsStrictMode()}?;
-Private:                        'private' {this.IsStrictMode()}?;
-Public:                         'public' {this.IsStrictMode()}?;
-Interface:                      'interface' {this.IsStrictMode()}?;
-Package:                        'package' {this.IsStrictMode()}?;
-Protected:                      'protected' {this.IsStrictMode()}?;
-Static:                         'static' {this.IsStrictMode()}?;
-Yield:                          'yield' {this.IsStrictMode()}?;
+Implements:                     'implements' ;
+Let:                            'let' ;
+Private:                        'private' ;
+Public:                         'public' ;
+Interface:                      'interface' ;
+Package:                        'package' ;
+Protected:                      'protected' ;
+Static:                         'static' ;
+Yield:                          'yield' ;
+
+//keywords:
+
+Any : 'any';
+Number: 'number';
+Boolean: 'boolean';
+String: 'string';
+Symbol: 'symbol';
+
+
+TypeAlias : 'type';
+
+Get: 'get';
+Set: 'set';
+
+Constructor: 'constructor';
+Namespace: 'namespace';
+Require: 'require';
+Module: 'module';
+Declare: 'declare';
+
+Abstract: 'abstract';
+
+Is: 'is';
+
+//
+// Ext.2 Additions to 1.8: Decorators
+//
+At: '@';
 
 /// Identifier Names and Identifiers
 
 Identifier:                     IdentifierStart IdentifierPart*;
+
 /// String Literals
 StringLiteral:                 ('"' DoubleStringCharacter* '"'
              |                  '\'' SingleStringCharacter* '\'') {this.ProcessStringLiteral();}
              ;
 
-// TODO: `${`tmp`}`
 TemplateStringLiteral:          '`' ('\\`' | ~'`')* '`';
 
 WhiteSpaces:                    [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN);
@@ -235,7 +225,6 @@ fragment HexEscapeSequence
 
 fragment UnicodeEscapeSequence
     : 'u' HexDigit HexDigit HexDigit HexDigit
-    | 'u' '{' HexDigit HexDigit+ '}'
     ;
 
 fragment ExtendedUnicodeEscapeSequence
@@ -261,16 +250,16 @@ fragment LineContinuation
     ;
 
 fragment HexDigit
-    : [_0-9a-fA-F]
+    : [0-9a-fA-F]
     ;
 
 fragment DecimalIntegerLiteral
     : '0'
-    | [1-9] [0-9_]*
+    | [1-9] [0-9]*
     ;
 
 fragment ExponentPart
-    : [eE] [+-]? [0-9_]+
+    : [eE] [+-]? [0-9]+
     ;
 
 fragment IdentifierPart
@@ -308,3 +297,4 @@ fragment RegularExpressionClassChar
 fragment RegularExpressionBackslashSequence
     : '\\' ~[\r\n\u2028\u2029]
     ;
+
