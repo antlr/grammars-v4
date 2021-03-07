@@ -15,7 +15,7 @@ function Get-GrammarSkipList {
                 "graphql", "gtin",
                 "haskell", "html", "http", "hypertalk",
                 "idl", "infosapient",
-                "java/java9", "javadoc", "javascript/ecmascript", "joss",
+                "java/java9", "javadoc", "javascript/ecmascript", "javascript/jsx", "joss",
                 "kirikiri-tjs", "kotlin/kotlin",
                 "logo/logo", "logo/ucb-logo", "lpc",
                 "molecule", "morsecode",
