@@ -20,13 +20,13 @@ options {
 	//superClass = MultiChannelBaseParser;
 }
 
-compilationUnit: (includeDeclarationModule* componentDeclaration)? (
-		includeDeclarationConfiguration* componentDeclaration EOF
-	);
+compilationUnit:
+	includeDeclarationModule* componentDeclaration? includeDeclarationConfiguration*
+		componentDeclaration EOF;
 
-includeDeclarationModule: '#' INCLUDE qualifiedName;
+includeDeclarationModule: HASHTAG INCLUDE qualifiedName;
 
-includeDeclarationConfiguration: '#' INCLUDE qualifiedName;
+includeDeclarationConfiguration: HASHTAG INCLUDE qualifiedName;
 
 qualifiedName: singleLine;
 
@@ -40,21 +40,23 @@ componentDeclaration:
 
 moduleDeclaration: moduleSignature moduleImplementation;
 moduleSignature:
-	MODULE moduleName '('? ')'? moduleSignatureBody;
+	MODULE moduleName OPAR? CPAR? moduleSignatureBody;
 
 moduleName: singleLine;
 
-moduleSignatureBody: '{' usesOrProvides* '}';
+moduleSignatureBody: OBRACE usesOrProvides* CBRACE;
 
 usesOrProvides: usesState | providesState;
 
 usesState:
-	USES INTERFACE usesInterfaceDescription* ';'
-	| USES '{' (INTERFACE usesInterfaceDescription ';')* '}';
+	USES INTERFACE usesInterfaceDescription* SCOL
+	| USES OBRACE (INTERFACE usesInterfaceDescription SCOL)* CBRACE;
 
 providesState:
-	PROVIDES INTERFACE providesInterfaceDescription* ';'
-	| PROVIDES '{' (INTERFACE providesInterfaceDescription ';')* '}';
+	PROVIDES INTERFACE providesInterfaceDescription* SCOL
+	| PROVIDES OBRACE (
+		INTERFACE providesInterfaceDescription SCOL
+	)* CBRACE;
 
 usesInterfaceDescription: interfaceNameAs | interfaceName;
 
@@ -65,7 +67,7 @@ interfaceNameAs: interfaceName AS interfaceName;
 interfaceName: singleLine;
 
 moduleImplementation:
-	IMPLEMENTATION '{' moduleImplementationBody '}';
+	IMPLEMENTATION OBRACE moduleImplementationBody CBRACE;
 
 moduleImplementationBody: block;
 
@@ -96,7 +98,7 @@ call_stat: CALL common_name call_condition_block SCOL?;
 call_condition_block: OPAR expr? CPAR;
 
 define_stat:
-	'#' DEFINE common_name singleLine OBRACE statement CBRACE statement;
+	HASHTAG DEFINE common_name singleLine OBRACE statement CBRACE statement;
 
 statement: anystatement SCOL? | expr SCOL;
 
@@ -140,7 +142,7 @@ other_condition_block: OPAR expr? CPAR;
 
 other_stat_block: OBRACE block CBRACE;
 
-enum_stat: ENUM OBRACE ( expr ','?)* CBRACE ';';
+enum_stat: ENUM OBRACE ( expr COMMA?)* CBRACE SCOL;
 
 common_name: singleLine | name_or_reserved;
 
@@ -150,9 +152,11 @@ if_stat:
 	)?;
 
 if_condition_block:
-	OPAR (name_or_reserved* | expr*)? CPAR if_stat_block
+	OPAR (name_or_reserved* | expr*) CPAR if_stat_block
+    | OPAR CPAR if_stat_block
 	| OPAR expr CPAR if_stat_block
-	| OPAR symbol CPAR if_stat_block;
+	| OPAR symbol CPAR if_stat_block
+    ;
 
 if_stat_block: OBRACE block CBRACE | stat;
 
@@ -161,7 +165,7 @@ while_stat: WHILE OPAR expr CPAR while_stat_block;
 while_stat_block: OBRACE block CBRACE | stat;
 
 for_stat:
-	FOR OPAR ((expr | anystatement) ';'?)+ CPAR for_stat_block;
+	FOR OPAR ((expr | anystatement) SCOL?)+ CPAR for_stat_block;
 
 for_stat_block: OBRACE block CBRACE | stat;
 
@@ -171,8 +175,8 @@ switch_stat:
 switch_condition_block: OPAR expr CPAR | OPAR symbol CPAR;
 
 switch_stat_block:
-	CASE (expr | anystatement) ':' stat* BREAK ';'
-	| DEFAULT ':' stat* BREAK ';';
+	CASE (expr | anystatement) COLON stat* BREAK SCOL
+	| DEFAULT COLON stat* BREAK SCOL;
 
 atomic_stat: ATOMIC atomic_stat_block;
 
@@ -205,7 +209,9 @@ symbol: OTHER # otherchar;
 
 singleDoubleArray: OBRACE arrayElement* CBRACE;
 
-arrayElement: atom ','? | (OBRACE atom ',' atom CBRACE) ','?;
+arrayElement:
+	atom COMMA?
+	| (OBRACE atom COMMA atom CBRACE) COMMA?;
 
 chars: (
 		OPAR
@@ -260,7 +266,7 @@ reservedwords: (
 	);
 
 singleLine: (atom | symbol | chars) (
-		'.'? (atom | symbol | chars)
+		DOT? (atom | symbol | chars)
 	)*
 	| (atom | symbol | chars | reservedwords) (
 		atom
@@ -278,7 +284,7 @@ name_or_reserved: (atom | symbol | chars | reservedwords) (
 		| reservedwords
 	)*;
 
-name_with_char: (atom) ('.'? (chars | symbol | atom))*;
+name_with_char: (atom) (DOT? (chars | symbol | atom))*;
 
 configurationDeclaration:
 	configurationSignature configurationImplementation;
@@ -303,16 +309,16 @@ configurationImplementationDescription: (
 		| platformDefinition
 	)*;
 platformDefinition:
-	'#' 'if' platformDefinitionDescription* '#' 'endif';
+	HASHTAG IF platformDefinitionDescription* HASHTAG ENDIF;
 platformDefinitionDescription:
 	DEFINED? singleLine componentsDefinition
-	| '#' 'elif' DEFINED? singleLine componentsDefinition
-	| '#' 'else' '#' 'error' singleLine;
+	| HASHTAG ELIF DEFINED? singleLine componentsDefinition
+	| HASHTAG ELSE HASHTAG ERROR singleLine;
 
 componentsDefinition:
 	COMPONENTS componentsDefinitionDetails SCOL;
 
-componentsDefinitionDetails: (componentsDefinitionName ','?)*;
+componentsDefinitionDetails: (componentsDefinitionName COMMA?)*;
 
 componentsDefinitionName: componentsName;
 
@@ -320,7 +326,8 @@ componentsWiring: wiring SCOL;
 
 wiring: wiringName;
 
-wiringName: componentsName ('->' | '<-') componentsName;
+wiringName:
+	componentsName (FORWARDARROW | BACKARROW) componentsName;
 
 componentsName:
 	atom
