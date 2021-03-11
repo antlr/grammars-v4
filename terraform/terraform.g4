@@ -48,7 +48,7 @@ data
    ;
 
 provider
-  : 'provider' resourcetype blockbody
+  : PROVIDER resourcetype blockbody
   ;
 
 output
@@ -100,7 +100,7 @@ identifier
    ;
 
 identifierchain
-   : (IDENTIFIER | IN | VARIABLE) index? (DOT identifierchain)*
+   : (IDENTIFIER | IN | VARIABLE | PROVIDER) index? (DOT identifierchain)*
    | STAR (DOT identifierchain)*
    | inline_index (DOT identifierchain)*
    ;
@@ -185,6 +185,10 @@ VARIABLE
    : 'variable'
    ;
 
+PROVIDER
+   : 'provider'
+   ;
+   
 IN
    : 'in'
    ;
