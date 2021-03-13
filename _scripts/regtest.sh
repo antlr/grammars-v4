@@ -137,26 +137,20 @@ build()
     pushd "$x/Generated"
     if [[ $? != "0" ]]
     then
-	    echo "$1 is not a valid directory"
+        echo "$1 is not a valid directory"
         exit 1
     fi
     date1=$(date +"%s")
-	if [[ "$target" == "CSharp" ]]
-	then
-	    dotnet build Test.csproj
-		status="$?"
-	else
-		make
-		status="$?"
-	fi
-	date2=$(date +"%s")
+    make
+    status="$?"
+    date2=$(date +"%s")
     DIFF=$(($date2-$date1))
     echo "Duration: $(($DIFF / 3600 )) hours $((($DIFF % 3600) / 60)) minutes $(($DIFF % 60)) seconds"
     if [[ "$status" != "0" ]]
     then
         failed=`add "$failed" "$testname"`
     fi
-	popd
+    popd
 }
 
 test()
@@ -171,81 +165,87 @@ test()
     pushd "$x/Generated"
     if [[ $? != "0" ]]
     then
-	    echo "$1 is not a valid directory"
+        echo "$1 is not a valid directory"
         exit 1
     fi
     date1=$(date +"%s")
-	if [[ "$target" == "CSharp" ]]
-	then
-	    dotnet build Test.csproj -t:Test
-		status="$?"
-	else
-		make test
-		status="$?"
-	fi
+    make test
+    status="$?"
     date2=$(date +"%s")
     DIFF=$(($date2-$date1))
     echo "Duration: $(($DIFF / 3600 )) hours $((($DIFF % 3600) / 60)) minutes $(($DIFF % 60)) seconds"
     if [[ "$status" != "0" ]]
     then
         failed=`add "$failed" "$testname"`
-	else
-		succeeded=`add "$succeeded" "$testname"`
+    else
+        succeeded=`add "$succeeded" "$testname"`
     fi
-	popd
+    popd
 }
 
 # Main
 # 0) Set up.
-dotnet tool install -g dotnet-antlr --version 2.1.0
-dotnet tool install -g csxml2 --version 1.0.0
-# 1) Generate driver source code from poms.
-echo "These grammars will not be tested:"
-echo $do_not_do_list | fmt
-rm -rf `find . -name Generated -type d`
+part1()
+{
+	dotnet tool install -g dotnet-antlr --version 3.0.2
+	dotnet tool install -g csxml2 --version 1.0.0
+	# 1) Generate driver source code from poms.
+	echo "These grammars will not be tested:"
+	echo $do_not_do_list | fmt
+	rm -rf `find . -name Generated -type d`
+	echo "Generating drivers."
+	bad=`dotnet-antlr -m true -k "$do_not_do_list" -t "$target" --template-sources-directory _scripts/templates/`
+	for i in $bad; do failed=`add "$failed" "$i"`; done
+}
+
+part2()
+{
+	# 2) Build driver code.
+	echo "Building."
+	case "$target" in
+	    CSharp) build_file_type="Test.csproj" ;;
+	    *) build_file_type="makefile" ;;
+	esac
+	echo prefix $prefix
+	echo bft $build_file_type
+	build_files=`find $prefix -type f -name $build_file_type | grep Generated`
+	echo bf $build_files
+	for build_file in $build_files
+	do
+	    p1="$(dirname "${build_file}")"
+	    p2=${p1#"$prefix/"}
+	    testname="$(dirname "${p2}")"
+	    con=`contains "$failed" "$testname"`
+	    if [[ "$con" == "no" ]]
+	    then
+	        build "$testname"
+	    fi
+	done
+}
+
+part3()
+{
+	# 3) Test generated parser on examples.
+	echo "Parsing."
+	build_files=`find $prefix -type f -name $build_file_type | grep Generated`
+	echo bf $build_files
+	for build_file in $build_files
+	do
+	    p1="$(dirname "${build_file}")"
+	    p2=${p1#"$prefix/"}
+	    testname="$(dirname "${p2}")"
+	    con=`contains "$failed" "$testname"`
+	    if [[ "$con" == "no" ]]
+	    then
+	        test "$testname"
+	    fi
+	done
+}
+
 date
-echo "Generating drivers."
-bad=`dotnet-antlr -m -k "$do_not_do_list" -t "$target"`
-for i in $bad; do failed=`add "$failed" "$i"`; done
-
-# 2) Build driver code.
-echo "Building."
-case "$target" in
-    CSharp) build_file_type="Test.csproj" ;;
-    *) build_file_type="makefile" ;;
-esac
-echo prefix $prefix
-echo bft $build_file_type
-build_files=`find $prefix -type f -name $build_file_type | grep Generated`
-echo bf $build_files
-for build_file in $build_files
-do
-    p1="$(dirname "${build_file}")"
-    p2=${p1#"$prefix/"}
-    testname="$(dirname "${p2}")"
-    con=`contains "$failed" "$testname"`
-	if [[ "$con" == "no" ]]
-	then
-        build "$testname"
-	fi
-done
-
-# 3) Test generated parser on examples.
-echo "Parsing."
-build_files=`find $prefix -type f -name $build_file_type | grep Generated`
-echo bf $build_files
-for build_file in $build_files
-do
-    p1="$(dirname "${build_file}")"
-    p2=${p1#"$prefix/"}
-    testname="$(dirname "${p2}")"
-    con=`contains "$failed" "$testname"`
-	if [[ "$con" == "no" ]]
-	then
-	    test "$testname"
-	fi
-done
-
+part1
+part2
+part3
 echo "Grammars that succeeded: $succeeded" | fmt
 echo "================"
 echo "Grammars that failed: $failed" | fmt
