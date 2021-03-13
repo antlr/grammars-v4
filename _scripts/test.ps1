@@ -296,7 +296,7 @@ function Test-AllGrammars {
 $Dir = Get-Location
 $templates = Join-Path $Dir "/_scripts/templates/"
 dotnet tool uninstall -g dotnet-antlr
-dotnet tool install -g dotnet-antlr --version 3.0.2    
+dotnet tool install -g dotnet-antlr --version 3.0.4
 
 $t = $args[0]
 $pc = $args[1]
