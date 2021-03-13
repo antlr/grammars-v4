@@ -52,5 +52,4 @@ jobs:
             $Before = "${{ github.event.before }}"
             $After = "${{ github.event.after }}"
         }
-        dotnet tool install -g dotnet-antlr --version 2.1.0
         _scripts/test.ps1 CSharp $Before $After

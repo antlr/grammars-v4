@@ -62,7 +62,8 @@ function Test-Grammar {
     
     $start = Get-Date
     Write-Host "Building"
-    Write-Host (dotnet-antlr -m -t $Target)
+    Write-Host "dotnet-antlr -m true -t $Target --template-sources-directory $templates"
+    Write-Host (dotnet-antlr -m true -t $Target --template-sources-directory $templates)
     if ($LASTEXITCODE -ne 0) {
         $success = $false
         $hasTest = $false
@@ -77,7 +78,7 @@ function Test-Grammar {
             $hasTest = $false
             Write-Host "Build failed" -ForegroundColor Red
         }
-        Set-Location "CSharp"
+#        Set-Location "CSharp"
     }
     Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
 
@@ -104,8 +105,12 @@ function Test-GrammarTestCases {
         $Target = "CSharp"
     )
     $failedList = @()
+    Write-Host "Test cases here: $TestDirectory"
     foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
-        $case = $item #Join-Path $TestDirectory $item
+
+    Write-Host "Test case: $item"
+
+        $case = Join-Path $TestDirectory $item
         $ext = $case.Extension
         if (($ext -eq ".errors") -or ($ext -eq ".tree")) {
             continue
@@ -118,7 +123,7 @@ function Test-GrammarTestCases {
         $shouldFail = Test-Path $errorFile
         Write-Host "--- Testing file $item ---"
         if ( $Target -eq "CSharp") {
-            dotnet Test.dll -file $case
+            dotnet "CSharp/Test.dll" -file $case
         }
         else {
             make run -file $case
@@ -286,10 +291,17 @@ function Test-AllGrammars {
     }
 }
 
+# This has to be inserted somewhere. This script requires
+# the dotnet-antlr tool to instantiate drivers from templates.
+$Dir = Get-Location
+$templates = Join-Path $Dir "/_scripts/templates/"
+dotnet tool uninstall -g dotnet-antlr
+dotnet tool install -g dotnet-antlr --version 3.0.4
+
 $t = $args[0]
 $pc = $args[1]
 $cc = $args[2]
-    
+
 $diff = $true
 if (!$t) {
     $t = "CSharp"
