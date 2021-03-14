@@ -35,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [macos-latest, windows-latest]
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -53,5 +53,4 @@ jobs:
             $After = "${{ github.event.after }}"
         }
         dotnet tool install -g dotnet-antlr --version 3.0.6
-        [System.Environment]::SetEnvironmentVariable("Path", [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::Machine) + ";$($env:HOME)\.dotnet\tools")
         _scripts/test.ps1 CSharp $Before $After
