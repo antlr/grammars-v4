@@ -186,7 +186,7 @@ test()
 part1()
 {
 	dotnet tool uninstall -g dotnet-antlr
-	dotnet tool install -g dotnet-antlr --version 3.0.5
+	dotnet tool install -g dotnet-antlr --version 3.0.6
 	dotnet tool uninstall -g csxml2
 	dotnet tool install -g csxml2 --version 1.0.0
 	# 1) Generate driver source code from poms.

@@ -110,9 +110,9 @@ function Test-GrammarTestCases {
     Write-Host "Test cases here: $TestDirectory"
     foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
 
-    Write-Host "Test case: $item"
+	Write-Host "Test case: $item"
 
-        $case = Join-Path $TestDirectory $item
+        $case = $item
         $ext = $case.Extension
         if (($ext -eq ".errors") -or ($ext -eq ".tree")) {
             continue
