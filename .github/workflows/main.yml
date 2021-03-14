@@ -35,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -53,4 +53,6 @@ jobs:
             $After = "${{ github.event.after }}"
         }
         dotnet tool install -g dotnet-antlr --version 3.0.6
+        Get-Childitem "/home" -Recurse -force -Filter 'dotnet-a*'
+        echo "$env:PATH"
         _scripts/test.ps1 CSharp $Before $After
