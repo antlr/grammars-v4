@@ -295,8 +295,6 @@ function Test-AllGrammars {
 # the dotnet-antlr tool to instantiate drivers from templates.
 $Dir = Get-Location
 $templates = Join-Path $Dir "/_scripts/templates/"
-dotnet tool uninstall -g dotnet-antlr
-dotnet tool install -g dotnet-antlr --version 3.0.5
 
 $t = $args[0]
 $pc = $args[1]
