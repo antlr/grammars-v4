@@ -60,6 +60,8 @@ function Test-Grammar {
         $testDir = Resolve-Path "./examples"
     }
     
+    # Do rehash
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
     $start = Get-Date
     Write-Host "Building"
     Write-Host "dotnet-antlr -m true -t $Target --template-sources-directory $templates"
