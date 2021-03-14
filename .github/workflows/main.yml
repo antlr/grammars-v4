@@ -53,4 +53,5 @@ jobs:
             $After = "${{ github.event.after }}"
         }
         dotnet tool install -g dotnet-antlr --version 3.0.6
+        [System.Environment]::SetEnvironmentVariable("Path", [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::Machine) + ";$($env:HOME)\.dotnet\tools")
         _scripts/test.ps1 CSharp $Before $After
