@@ -26,9 +26,9 @@ fi
 case "$target" in
     CSharp)
         do_not_do_list=" \
-_grammar-test acme algol60 antlr/antlr2 apex apt \
+_grammar-test acme apex apt \
 arithmetic asm/masm asn/asn_3gpp atl \
-basic bcpl \
+basic \
 calculator capnproto cpp csharp cto \
 dcm dgol dice \
 erlang \
@@ -58,13 +58,11 @@ z \
 
     Java)
         do_not_do_list=" \
-        bcpl \
         "
         ;;
 
     JavaScript)
         do_not_do_list=" \
-        bcpl \
         "
         ;;
 
@@ -188,7 +186,7 @@ test()
 part1()
 {
 	dotnet tool uninstall -g dotnet-antlr
-	dotnet tool install -g dotnet-antlr --version 3.0.4
+	dotnet tool install -g dotnet-antlr --version 3.0.5
 	dotnet tool uninstall -g csxml2
 	dotnet tool install -g csxml2 --version 1.0.0
 	# 1) Generate driver source code from poms.

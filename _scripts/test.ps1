@@ -6,8 +6,8 @@ function Get-GrammarSkipList {
         "CSharp" {
             return @(
                 "_grammar-test",
-                "acme", "algol60", "antlr/antlr2", "apex", "apt", "arithmetic", "asm/masm", "asn/asn_3gpp", "atl",
-                "basic", "bcpl",
+                "acme", "apex", "apt", "arithmetic", "asm/masm", "asn/asn_3gpp", "atl",
+                "basic",
                 "calculator", "capnproto", "cpp", "csharp", "cto",
                 "dcm", "dgol", "dice",
                 "erlang",
@@ -34,10 +34,10 @@ function Get-GrammarSkipList {
                 "z")
         }
         "Java" {
-            return @("bcpl")
+            return @("")
         }
         "JavaScript" {
-            return @("bcpl")
+            return @("")
         }
         Default {
             Write-Error "Unknown target $Target"
@@ -296,7 +296,7 @@ function Test-AllGrammars {
 $Dir = Get-Location
 $templates = Join-Path $Dir "/_scripts/templates/"
 dotnet tool uninstall -g dotnet-antlr
-dotnet tool install -g dotnet-antlr --version 3.0.4
+dotnet tool install -g dotnet-antlr --version 3.0.5
 
 $t = $args[0]
 $pc = $args[1]
