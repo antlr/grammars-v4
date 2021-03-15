@@ -61,12 +61,12 @@ function Test-Grammar {
     }
     
     # Try adding to path for Ubuntu.
-    echo "$env:PATH"
+    Write-Host "PATH is $env:PATH"
     $env:PATH += ";/home/runner/.dotnet/tools"
-    echo "$env:PATH"
-    echo "$env:Path"
+    Write-Host "PATH after update is $env:PATH"
+    Write-Host "Path is $env:Path"
     $env:Path += ";/home/runner/.dotnet/tools"
-    echo "$env:Path"
+    Write-Host "Path after update is $env:Path"
     $start = Get-Date
     Write-Host "Building"
     Write-Host "dotnet-antlr -m true -t $Target --template-sources-directory $templates"
