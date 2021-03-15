@@ -6,8 +6,8 @@ function Get-GrammarSkipList {
         "CSharp" {
             return @(
                 "_grammar-test",
-                "acme", "algol60", "antlr/antlr2", "apex", "apt", "arithmetic", "asm/masm", "asn/asn_3gpp", "atl",
-                "basic", "bcpl",
+                "acme", "apex", "apt", "arithmetic", "asm/masm", "asn/asn_3gpp", "atl",
+                "basic",
                 "calculator", "capnproto", "cpp", "csharp", "cto",
                 "dcm", "dgol", "dice",
                 "erlang",
@@ -34,10 +34,10 @@ function Get-GrammarSkipList {
                 "z")
         }
         "Java" {
-            return @("bcpl")
+            return @("")
         }
         "JavaScript" {
-            return @("bcpl")
+            return @("")
         }
         Default {
             Write-Error "Unknown target $Target"
@@ -108,9 +108,9 @@ function Test-GrammarTestCases {
     Write-Host "Test cases here: $TestDirectory"
     foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
 
-    Write-Host "Test case: $item"
+	Write-Host "Test case: $item"
 
-        $case = Join-Path $TestDirectory $item
+        $case = $item
         $ext = $case.Extension
         if (($ext -eq ".errors") -or ($ext -eq ".tree")) {
             continue
@@ -266,6 +266,10 @@ function Test-AllGrammars {
     
     Write-Host "Grammars to be tested with $Target target:"
     Write-Host "$grammars"
+    # Try adding to path for Ubuntu.
+    Write-Host "PATH is $env:PATH"
+    $env:PATH += ":/home/runner/.dotnet/tools"
+    Write-Host "PATH after update is $env:PATH"
 
     $success = $true
     $t = Get-Date
@@ -295,8 +299,6 @@ function Test-AllGrammars {
 # the dotnet-antlr tool to instantiate drivers from templates.
 $Dir = Get-Location
 $templates = Join-Path $Dir "/_scripts/templates/"
-dotnet tool uninstall -g dotnet-antlr
-dotnet tool install -g dotnet-antlr --version 3.0.4
 
 $t = $args[0]
 $pc = $args[1]

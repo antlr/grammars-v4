@@ -24,12 +24,12 @@ name : identifier ;
 address_op : '@' | '!' ;
 mult_op : '*' | '/' | 'REM' ;
 add_op : '+' | '-' ;
-rel_op : '=' | 'ï¿½=' | '<=' | '>=' | '<' | '>' ;
+rel_op : '=' | '¬=' | '<=' | '>=' | '<' | '>' ;
 shift_op : '<<' | '>>' ;
 and_op : '&' ;
 or_op : '|' ;
 eqv_op : 'EQV' | 'NEQV' ;
-not_op : 'ï¿½' ;
+not_op : '¬' ;
 
 // 8.8.3 Expressions
 element : character_constant | string_constant | number | identifier | 'TRUE' | 'FALSE' ;
@@ -86,7 +86,7 @@ goto_command : 'GOTO' expression ;
 routine_command : primary_E '(' expression_list ')' | primary_E '(' ')' ;
 resultis_command : 'RESULTIS' expression ;
 switchon_command : 'SWITCHON' expression 'INTO' compound_command ;
-repeatable_command : assignment | simple_command | goto_command | routine_command | resultis_command | repeatable_command 'REPEAT' | repeatable_command 'REPEATUNTIL' expression | repeatable_command 'REPEATWHILE' expression | switchon_command | compound_command | block ;
+repeatable_command : assignment | simple_command | goto_command | routine_command | resultis_command | repeated_command | switchon_command | compound_command | block ;
 repeated_command : repeatable_command 'REPEAT' | repeatable_command 'REPEATUNTIL' expression | repeatable_command 'REPEATWHILE' expression ;
 until_command : 'UNTIL' expression 'DO' command ;
 while_command : 'WHILE' expression 'DO' command ;
