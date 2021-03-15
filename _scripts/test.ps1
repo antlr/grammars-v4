@@ -60,8 +60,13 @@ function Test-Grammar {
         $testDir = Resolve-Path "./examples"
     }
     
-    # Do rehash
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    # Try adding to path for Ubuntu.
+    echo "$env:PATH"
+    $env:PATH += ";/home/runner/.dotnet/tools"
+    echo "$env:PATH"
+    echo "$env:Path"
+    $env:Path += ";/home/runner/.dotnet/tools"
+    echo "$env:Path"
     $start = Get-Date
     Write-Host "Building"
     Write-Host "dotnet-antlr -m true -t $Target --template-sources-directory $templates"

@@ -54,10 +54,6 @@ jobs:
         }
         dotnet tool install -g dotnet-antlr --version 3.0.6
         Get-Childitem "/home/runner/.dotnet/tools" -Recurse -force -Filter 'dotnet-a*'
-        echo "$env:PATH"
-        $env:PATH += ";/home/runner/.dotnet/tools"
-        $env:Path += ";/home/runner/.dotnet/tools"
-        echo "$env:PATH"
         _scripts/test.ps1 CSharp $Before $After
   build-csharp-pwsh-ok:
     runs-on: ${{ matrix.os }}
