@@ -188,7 +188,7 @@ VARIABLE
 PROVIDER
    : 'provider'
    ;
-   
+
 IN
    : 'in'
    ;
@@ -263,7 +263,7 @@ MULTILINESTRING
    ;
 
 STRING
-   : '"' (~ [\r\n"] | '""' | '\\"')* '"'
+   : '"' ( '\\"' | ~["\r\n] )* '"'
    ;
 
 IDENTIFIER
