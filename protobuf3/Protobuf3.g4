@@ -1,4 +1,4 @@
-// SDPX-License-Ientifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0
 /**
  * A Protocol Buffers 3 grammar
  *
