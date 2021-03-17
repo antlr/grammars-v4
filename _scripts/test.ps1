@@ -6,27 +6,23 @@ function Get-GrammarSkipList {
         "CSharp" {
             return @(
                 "_grammar-test",
-                "acme", "apex", "apt", "arithmetic", "asm/masm", "asn/asn_3gpp", "atl",
-                "basic",
-                "calculator", "capnproto", "cpp", "csharp", "cto",
-                "dcm", "dgol", "dice",
-                "erlang",
+                "apex", "asm/masm", "asn/asn_3gpp",
+                "bcpl",
+                "cpp", "csharp",
                 "fortran77",
-                "graphql", "gtin",
-                "haskell", "html", "http", "hypertalk",
-                "idl", "infosapient",
-                "java/java9", "javadoc", "javascript/ecmascript", "javascript/jsx", "joss",
+                "haskell", "html", "hypertalk",
+                "idl",
+                "java/java9", "javadoc", "javascript/ecmascript",
                 "kirikiri-tjs", "kotlin/kotlin",
-                "logo/logo", "logo/ucb-logo", "lpc",
-                "molecule", "morsecode",
+                "logo/ucb-logo", "lpc",
                 "objc",
-                "pddl", "pgn", "php", "pike", "pmmn", "powerbuilder", "python/python2", "python/python2-js",
+                "pgn", "php", "pike", "powerbuilder", "python/python2", "python/python2-js",
                 "python/python3", "python/python3-js", "python/python3-py", "python/python3-ts",
                 "python/python3-without-actions", "python/python3alt", "python/tiny-python",
-                "rcs", "rego", "restructuredtext", "rexx", "rfc1035", "rfc1960", "rfc3080",
-                "sharc", "smiles", "sql/hive", "sql/mysql", "sql/plsql", "sql/sqlite", "sql/tsql",
-                "stacktrace", "stringtemplate", "swift-fin", "swift/swift2", "swift/swift3",
-                "tcpheader", "terraform", "thrift",
+                "rego", "rexx",
+                "sql/hive", "sql/plsql", "sql/sqlite", "sql/tsql",
+                "stringtemplate", "swift-fin", "swift/swift2", "swift/swift3",
+                "tcpheader", "thrift",
                 "unicode/unicode16",
                 "v",
                 "wat",
@@ -34,17 +30,124 @@ function Get-GrammarSkipList {
                 "z")
         }
         "Java" {
-            return @("")
+            return @(
+                "antlr/antlr4", "asm/masm", "bcpl", "cobol85", "csharp", 
+                "html", "hypertalk", "kotlin/kotlin", "kotlin/kotlin-formal", "lambda", "less", "metric", "molecule",
+                "p", "php", "powerbuilder",
+                "python/python2", "python/python3-js", "python/python3-py", "python/python3-ts", "python/python3-without-actions", "python/tiny-python", 
+                "scss", "sql/hive", "sql/plsql", "sql/tsql", "stringtemplate", "swift/swift2", "swift-fin", "tcpheader",
+                "wat"
+            )
         }
         "JavaScript" {
-            return @("")
+            return @("antlr/antlr4", "apex", "asm/masm", "asn/asn_3gpp", "bcpl", "cql3", "csharp", "fortran77", "golang",
+                "haskell", "html", "hypertalk", "idl", "java/java9", "javadoc", "javascript/ecmascript", "kotlin/kotlin", "lambda", "less", "logo/ucb-logo",
+                "metric", "molecule", "p", "pgn", "php", "pike", "powerbuilder", "promql",
+                "python/python2", "python/python3", "python/python3-js", "python/python3-py", "python/python3-ts", "python/python3-without-actions", "python/tiny-python"
+                "rego", "rexx", "rust",
+                "sql/hive", "sql/plsql", "sql/tsql", "stringtemplate", "swift/swift2", "swift/swift3", "swift-fin", "tcpheader", "thrift"
+                "v", "wat", "xpath/xpath31", "z")
+        }
+        "Go" {
+            return @("abb", "algol60",
+                "antlr/antlr2", "antlr/antlr3", "antlr/antlr4",
+                "apex",
+                "asm/asm6502", "asm/asm8080", "asm/asm8086", "asm/asmMASM", "asm/asmZ80", "asm/masm", "asm/pdp7",
+                "asn/asn_3gpp",
+                "basic", "bcpl",
+                "calculator", "capnproto", "clojure", "cobol85", "cpp", "cql3", "csharp", "css3",
+                "edif300", "edn", "erlang",
+                "flatbuffers", "focal", "fortran77",
+                "gff3", "golang", "guitartab",
+                "haskell", "html", "hypertalk",
+                "icalendar", "inf", "informix",
+                "java/java", "java/java8", "java/java9", "javadoc", "javascript/ecmascript", "joss",
+                "kirikiri-tjs", "kotlin/kotlin", "kotlin/kotlin-formal", "kuka",
+                "lambda", "logo/logo", "logo/ucb-logo", "lolcode", "lpc", "lua",
+                "mckeeman-form", "metric", "modula2pim4", "molecule", "moo", "muddb",
+                "oberon", "oncrpc",
+                "p", "pascal", "pddl", "pdn", "pgn", "php", "ply", "powerbuilder",
+                "python/python2", "python/python3", "python/python3-js", "python/python3-py", "python/python3-ts",
+                "python/python3-without-actions", "python/python3alt", "python/tiny-python",
+                "quakemap",
+                "r", "rego", "rexx", "rust",
+                "scala", "scss", "sgf", "sieve", "smalltalk", "smtlibv2", "sparql",
+                "sql/hive", "sql/plsql", "sql/sqlite", "sql/tsql",
+                "stringtemplate", "swift/swift2", "swift/swift3", "swift-fin",
+                "tcpheader", "terraform", "thrift", "tinymud", "toml", "trac", "ttm", "turing", "turtle", "turtle-doc",
+                "url",
+                "v", "vb6", "vba", "verilog/verilog",
+                "wat", "webidl",
+                "xpath/xpath1", "xpath/xpath31",
+                "z")
+        }
+        "Python3" {
+            return @("abb", "algol60", "antlr/antlr2", "antlr/antlr3", "antlr/antlr4", "apex", "arithmetic",
+                "asm/asmMASM", "asm/masm", "asn/asn", "asn/asn_3gpp",
+                "bcpl", "bnf", "brainfuck", "brainflak",
+                "capnproto", "clojure", "cmake", "cpp", "cql3", "csharp", "css3",
+                "dot",
+                "edif300", "edn", "erlang",
+                "flatbuffers", "focal", "fortran77",
+                "gff3", "gml", "golang",
+                "haskell", "html", "hypertalk",
+                "icalendar", "idl", "informix", "infosapient",
+                "java/java9", "javadoc", "javascript/ecmascript", "joss",
+                "kotlin/kotlin", "kotlin/kotlin-formal", "kuka",
+                "lambda", "less", "logo/logo", "logo/ucb-logo", "lolcode",
+                "mckeeman-form", "mdx", "metric", "microc", "modula2pim4", "molecule", "moo", "muddb", "mumath", "oberon",
+                "p", "parkingsign", "pascal", "pddl", "peoplecode", "pgn", "php", "pl0", "ply", "powerbuilder",
+                "python/python2", "python/python3", "python/python3-js", "python/python3-py", "python/python3-ts", "python/python3-without-actions",
+                "python/python3alt", "python/tiny-python",
+                "quakemap",
+                "redcode", "rego", "rexx", "rfc1960", "ruby", "rust",
+                "scala", "scss", "sexpression", "sgf", "smalltalk", "sparql", "sql/hive", "sql/plsql", "sql/sqlite", "sql/tsql",
+                "stellaris", "stringtemplate", "swift/swift2", "swift/swift3", "swift-fin",
+                "tcpheader", "terraform", "tinyc", "tinymud", "toml", "turing", "turtle", "turtle-doc",
+                "v", "vb6", "vba",
+                "wavefront", "webidl",
+                "xpath/xpath31",
+                "z")
+        }
+        "Dart" {
+            return @("antlr/antlr2", "antlr/antlr3", "antlr/antlr4", "apex", "asm/masm", "asn/asn_3gpp", "atl",
+                "bcpl", "bnf",
+                "clif", "clojure", "creole", "csharp", "css3",
+                "dart2", "dice",
+                "edif300", "edn", "erlang",
+                "focal", "fortran77", "fusion-tables",
+                "gff3", "golang",
+                "haskell", "html", "hypertalk",
+                "icalendar", "idl", "infosapient",
+                "java/java9", "javadoc", "javascript/ecmascript",
+                "kirikiri-tjs", "kotlin/kotlin", "kotlin/kotlin-formal",
+                "lambda", "logo/logo", "logo/ucb-logo", "lpc",
+                "metric", "modula2pim4", "molecule",
+                "oberon",
+                "pascal", "pdn", "pgn", "php", "powerbuilder", "prolog", "promql", "protobuf3",
+                "python/python2", "python/python3", "python/python3-js", "python/python3-py", "python/python3-ts",
+                "python/python3-without-actions", "python/python3alt", "python/tiny-python", "quakemap",
+                "rego", "restructuredtext", "rexx", "ruby", "rust",
+                "sql/hive", "sql/plsql", "sql/sqlite", "sql/tsql", "stringtemplate", "swift/swift2", "swift/swift3", "swift-fin",
+                "tcpheader", "terraform", "thrift", "tinymud",
+                "v", "vb6",
+                "wat", "webidl",
+                "xpath/xpath31",
+                "z")
         }
         Default {
-            Write-Error "Unknown target $Target"
-            exit 1
+            #    Write-Error "Unknown target $Target"
+            #    exit 1
         }
     }
     
+}
+
+enum FailStage {
+    Success
+    CodeGeneration
+    Compile
+    Test
 }
 
 function Test-Grammar {
@@ -55,60 +158,85 @@ function Test-Grammar {
     Write-Host "---------- Testing grammar $Directory ----------" -ForegroundColor Green
     $cwd = Get-Location
     Set-Location $Directory
+
+    $failStage = [FailStage]::Success
     $hasTest = Test-Path "./examples"
     if ($hasTest) {
         $testDir = Resolve-Path "./examples"
     }
     
+    $success = $true
     $start = Get-Date
     Write-Host "Building"
+    # codegen
     Write-Host "dotnet-antlr -m true -t $Target --template-sources-directory $templates"
-    Write-Host (dotnet-antlr -m true -t $Target --template-sources-directory $templates)
+    dotnet-antlr -m true -t $Target --template-sources-directory $templates | Write-Host
     if ($LASTEXITCODE -ne 0) {
-        $success = $false
-        $hasTest = $false
-        Write-Host "Code generation failed" -ForegroundColor Red
+        $failStage = [FailStage]::CodeGeneration
+        Write-Host "dotnet-antlr failed" -ForegroundColor Red
     }
-    Set-Location 'Generated'
-    $success = $true
-    if ( $Target -eq "CSharp") {
-        Write-Host (dotnet build -o "CSharp") -Separator ([Environment]::NewLine)
-        if ($LASTEXITCODE -ne 0) {
-            $success = $false
-            $hasTest = $false
-            Write-Host "Build failed" -ForegroundColor Red
+    if (Test-Path 'Generated') {
+        Set-Location 'Generated'
+    }
+    else {
+        $failStage = [FailStage]::CodeGeneration
+        Write-Host "No code generated" -ForegroundColor Red
+    }
+    if ($failStage -ne [FailStage]::Success) {
+        return @{
+            Success     = $false
+            Stage       = $failStage
+            FailedCases = @()
         }
-#        Set-Location "CSharp"
     }
-    Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
 
+    # build
+
+    # see _scripts/templates/*/tester.psm1
+    Import-Module ./tester.psm1
+
+    Build-Grammar
+
+    Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
+    if ($failStage -ne [FailStage]::Success) {
+        return @{
+            Success     = $false
+            Stage       = $failStage
+            FailedCases = @()
+        }
+    }
+
+    # test
     $start2 = Get-Date
     Write-Host "Testing"
     $failedList = @()
     if ($hasTest) {
-        $failedList = Test-GrammarTestCases -Target $Target -TestDirectory $testDir
+        $failedList = Test-GrammarTestCases -TestDirectory $testDir
         if ($failedList.Length -gt 0) {
             $success = $false
+            $failStage = [FailStage]::Test
         }
     }
+
+    Remove-Module tester
     Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
     Set-Location $cwd
     return @{
         Success     = $success
+        Stage       = $failStage
         FailedCases = $failedList
     }
 }
 
 function Test-GrammarTestCases {
     param (
-        $TestDirectory,
-        $Target = "CSharp"
+        $TestDirectory
     )
     $failedList = @()
     Write-Host "Test cases here: $TestDirectory"
     foreach ($item in Get-ChildItem $TestDirectory -Recurse) {
 
-	Write-Host "Test case: $item"
+        Write-Host "Test case: $item"
 
         $case = $item
         $ext = $case.Extension
@@ -121,27 +249,24 @@ function Test-GrammarTestCases {
 
         $errorFile = "$case.errors"
         $shouldFail = Test-Path $errorFile
+        if (!$shouldFail) {
+            $errorFile = ""
+        }
         Write-Host "--- Testing file $item ---"
-        if ( $Target -eq "CSharp") {
-            dotnet "CSharp/Test.dll" -file $case
-        }
-        else {
-            make run -file $case
-        }
-        $ok = $LASTEXITCODE -eq 0
+        $ok = Test-Case -InputFile $case -ErrorFile $errorFile
 
-        if ($shouldFail) {
-            if ($ok) {
+        if (!$ok) {
+            if ($shouldFail) {
                 Write-Host "Text case should return error"
                 Write-Host "$Directory test $case failed" -ForegroundColor Red
                 $failedList += $case
                 continue
             }
-        }
-        elseif (!$ok) { 
-            Write-Host "$Directory test $case failed" -ForegroundColor Red
-            $failedList += $case
-            continue
+            else { 
+                Write-Host "$Directory test $case failed" -ForegroundColor Red
+                $failedList += $case
+                continue
+            }
         }
     }
     return $failedList
@@ -201,10 +326,21 @@ function Get-GitChangedDirectories {
         exit 1
     }
     $diff = git diff $PreviousCommit $CurrentCommit --name-only
+    $treatAsRootDir = @(".github/", "_scripts/")
+    foreach ($item in $diff) {
+        foreach ($j in $treatAsRootDir){
+            if ($item.StartsWith($j)){
+                $diff += "README.md"
+                break;
+            }
+        }
+    }
+
     $dirs = @()
     foreach ($item in $diff) {
         $dirs += Join-Path "." $item
     }
+    
     return $dirs | Split-Path | Get-Unique
 }
 
@@ -267,9 +403,9 @@ function Test-AllGrammars {
     Write-Host "Grammars to be tested with $Target target:"
     Write-Host "$grammars"
     # Try adding to path for Ubuntu.
-    Write-Host "PATH is $env:PATH"
-    $env:PATH += ":/home/runner/.dotnet/tools"
-    Write-Host "PATH after update is $env:PATH"
+    # Write-Host "PATH is $env:PATH"
+    # $env:PATH += ":/home/runner/.dotnet/tools"
+    # Write-Host "PATH after update is $env:PATH"
 
     $success = $true
     $t = Get-Date
@@ -292,6 +428,22 @@ function Test-AllGrammars {
         Write-Error "Failed grammars: $([String]::Join(' ', $failedGrammars))"
         Write-Error "Failed cases: $([String]::Join(' ', $failedCases))"
         exit 1
+    }
+}
+
+# Setup ANTLR
+if ($env:ANTLR_JAR_PATH) {
+    $sep = ':';
+    if ($IsWindows) {
+        $sep = ';'
+    }
+    $cps = ('.', $env:ANTLR_JAR_PATH)
+    if ($env:CLASSPATH) {
+        $cps += $env:CLASSPATH
+    }
+    $env:CLASSPATH = [String]::Join($sep, $cps)
+    function global:antlr {
+        java -jar $env:ANTLR_JAR_PATH $args
     }
 }
 
