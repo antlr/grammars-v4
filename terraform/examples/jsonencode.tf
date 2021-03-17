@@ -22,6 +22,6 @@ resource "aws_s3_bucket_policy" "b" {
   })
 }
 
-resource "aws_s3_bucket" "a" {
+resource "aws_s3_bucket" "d" {
   bucket = "test_bucket"
 }
