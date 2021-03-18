@@ -183,6 +183,7 @@ function Test-Grammar {
         Write-Host "No code generated" -ForegroundColor Red
     }
     if ($failStage -ne [FailStage]::Success) {
+        Set-Location $cwd
         return @{
             Success     = $false
             Stage       = $failStage
@@ -195,10 +196,18 @@ function Test-Grammar {
     # see _scripts/templates/*/tester.psm1
     Import-Module ./tester.psm1
 
-    Build-Grammar
+    $buildResult = Build-Grammar
+
+    if (!$buildResult.Success) {
+        $failStage = [FailStage]::Compile
+        Write-Host "Build failed" -ForegroundColor Red
+        Write-Host $buildResult.Message
+    }
 
     Write-Host "Build completed, time: $((Get-Date) - $start)" -ForegroundColor Yellow
     if ($failStage -ne [FailStage]::Success) {
+        Remove-Module tester
+        Set-Location $cwd
         return @{
             Success     = $false
             Stage       = $failStage
@@ -218,8 +227,8 @@ function Test-Grammar {
         }
     }
 
-    Remove-Module tester
     Write-Host "Test completed, time: $((Get-Date) - $start2)" -ForegroundColor Yellow
+    Remove-Module tester
     Set-Location $cwd
     return @{
         Success     = $success
@@ -328,8 +337,8 @@ function Get-GitChangedDirectories {
     $diff = git diff $PreviousCommit $CurrentCommit --name-only
     $treatAsRootDir = @(".github/", "_scripts/")
     foreach ($item in $diff) {
-        foreach ($j in $treatAsRootDir){
-            if ($item.StartsWith($j)){
+        foreach ($j in $treatAsRootDir) {
+            if ($item.StartsWith($j)) {
                 $diff += "README.md"
                 break;
             }

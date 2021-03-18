@@ -86,16 +86,14 @@ jobs:
         Invoke-WebRequest https://www.antlr.org/download/antlr-4.9.1-complete.jar -OutFile antlr-4.9.1-complete.jar
         $antlrPath=Resolve-Path antlr-4.9.1-complete.jar
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
-
-    - name: Download ANTLR
-      shell: pwsh
-      run: |
-        Invoke-WebRequest https://www.antlr.org/download/antlr-4.9.1-complete.jar -OutFile antlr-4.9.1-complete.jar
-        $antlrPath=Resolve-Path antlr-4.9.1-complete.jar
-        echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
     - name: Install dotnet-antlr
       shell: pwsh
-      run: dotnet tool install -g dotnet-antlr --version 3.0.6
+      run: |
+        dotnet tool install -g dotnet-antlr --version 3.0.6
+        if ("${{ matrix.os }}" -eq "ubuntu-latest") {
+            echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
+        }
+
     - name: Test
       shell: pwsh
       run: |
@@ -109,3 +107,20 @@ jobs:
         }
         $env:ANTLR_JAR_PATH="${{ env.antlr_path }}"
         _scripts/test.ps1 ${{ matrix.language }} $Before $After
+
+  demo:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Demo
+      shell: pwsh
+      run: |
+        cd abb/
+        dotnet tool install dotnet-antlr --global
+        dotnet-antlr -m true -t CSharp
+        ls
