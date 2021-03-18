@@ -6,13 +6,13 @@ function Get-GrammarSkipList {
         "CSharp" {
             return @(
                 "_grammar-test",
-                "apex", "asm/masm", "asn/asn_3gpp",
+                "apex", "arithmetic", "asm/masm", "asn/asn_3gpp",
                 "bcpl",
                 "cpp", "csharp",
                 "fortran77",
                 "haskell", "html", "hypertalk",
                 "idl",
-                "java/java9", "javadoc", "javascript/ecmascript",
+                "java/java9", "javadoc", "javascript/ecmascript", "javascript/jsx",
                 "kirikiri-tjs", "kotlin/kotlin",
                 "logo/ucb-logo", "lpc",
                 "objc",
@@ -32,7 +32,7 @@ function Get-GrammarSkipList {
         "Java" {
             return @(
                 "antlr/antlr4", "asm/masm", "bcpl", "cobol85", "csharp", 
-                "html", "hypertalk", "kotlin/kotlin", "kotlin/kotlin-formal", "lambda", "less", "metric", "molecule",
+                "html", "hypertalk", "javascript/ecmascript", "kotlin/kotlin", "kotlin/kotlin-formal", "lambda", "less", "metric", "molecule",
                 "p", "php", "powerbuilder",
                 "python/python2", "python/python3-js", "python/python3-py", "python/python3-ts", "python/python3-without-actions", "python/tiny-python", 
                 "scss", "sql/hive", "sql/plsql", "sql/tsql", "stringtemplate", "swift/swift2", "swift-fin", "tcpheader",
@@ -51,7 +51,7 @@ function Get-GrammarSkipList {
         "Go" {
             return @("abb", "algol60",
                 "antlr/antlr2", "antlr/antlr3", "antlr/antlr4",
-                "apex",
+                "apex", "arithmetic",
                 "asm/asm6502", "asm/asm8080", "asm/asm8086", "asm/asmMASM", "asm/asmZ80", "asm/masm", "asm/pdp7",
                 "asn/asn_3gpp",
                 "basic", "bcpl",
@@ -61,7 +61,7 @@ function Get-GrammarSkipList {
                 "gff3", "golang", "guitartab",
                 "haskell", "html", "hypertalk",
                 "icalendar", "inf", "informix",
-                "java/java", "java/java8", "java/java9", "javadoc", "javascript/ecmascript", "joss",
+                "java/java", "java/java8", "java/java9", "javadoc", "javascript/ecmascript", "javascript/javascript", "javascript/jsx", "javascript/typescript", "joss",
                 "kirikiri-tjs", "kotlin/kotlin", "kotlin/kotlin-formal", "kuka",
                 "lambda", "logo/logo", "logo/ucb-logo", "lolcode", "lpc", "lua",
                 "mckeeman-form", "metric", "modula2pim4", "molecule", "moo", "muddb",
@@ -92,7 +92,7 @@ function Get-GrammarSkipList {
                 "gff3", "gml", "golang",
                 "haskell", "html", "hypertalk",
                 "icalendar", "idl", "informix", "infosapient",
-                "java/java9", "javadoc", "javascript/ecmascript", "joss",
+                "java/java9", "javadoc", "javascript/ecmascript", "javascript/javascript", "javascript/jsx", "javascript/typescript", "joss",
                 "kotlin/kotlin", "kotlin/kotlin-formal", "kuka",
                 "lambda", "less", "logo/logo", "logo/ucb-logo", "lolcode",
                 "mckeeman-form", "mdx", "metric", "microc", "modula2pim4", "molecule", "moo", "muddb", "mumath", "oberon",
@@ -105,12 +105,12 @@ function Get-GrammarSkipList {
                 "stellaris", "stringtemplate", "swift/swift2", "swift/swift3", "swift-fin",
                 "tcpheader", "terraform", "tinyc", "tinymud", "toml", "turing", "turtle", "turtle-doc",
                 "v", "vb6", "vba",
-                "wavefront", "webidl",
+                "wat", "wavefront", "webidl",
                 "xpath/xpath31",
                 "z")
         }
         "Dart" {
-            return @("antlr/antlr2", "antlr/antlr3", "antlr/antlr4", "apex", "asm/masm", "asn/asn_3gpp", "atl",
+            return @("antlr/antlr2", "antlr/antlr3", "antlr/antlr4", "apex", "arithmetic", "asm/masm", "asn/asn_3gpp", "atl",
                 "bcpl", "bnf",
                 "clif", "clojure", "creole", "csharp", "css3",
                 "dart2", "dice",
@@ -119,7 +119,7 @@ function Get-GrammarSkipList {
                 "gff3", "golang",
                 "haskell", "html", "hypertalk",
                 "icalendar", "idl", "infosapient",
-                "java/java9", "javadoc", "javascript/ecmascript",
+                "java/java9", "javadoc", "javascript/ecmascript", "javascript/javascript", "javascript/jsx", "javascript/typescript", 
                 "kirikiri-tjs", "kotlin/kotlin", "kotlin/kotlin-formal",
                 "lambda", "logo/logo", "logo/ucb-logo", "lpc",
                 "metric", "modula2pim4", "molecule",
