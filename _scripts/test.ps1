@@ -41,11 +41,12 @@ function Get-GrammarSkipList {
         }
         "JavaScript" {
             return @(
-                "antlr/antlr2", "antlr/antlr4", "apex", "asm/masm", "asn/asn_3gpp", "bcpl", "c", "cql3", "csharp", "fortran77", "golang",
-                "haskell", "html", "hypertalk", "idl", "java/java9", "javadoc", "javascript/ecmascript", "kotlin/kotlin", "lambda", "less", "logo/ucb-logo",
-                "metric", "molecule", "p", "pcre", "pgn", "php", "pike", "powerbuilder", "promql",
+                "antlr/antlr2", "antlr/antlr4", "apex", "arithmetic", "asm/masm", "asn/asn_3gpp", "basic", "bcpl", "c", "cql3", "csharp", "dice", "fortran77", "golang",
+                "haskell", "html", "hypertalk", "idl", "java/java", "java/java9", "javadoc", "javascript/ecmascript", "javascript/javascript", "javascript/jsx", "javascript/typescript",
+                "kotlin/kotlin", "lambda", "less", "logo/ucb-logo", "lua",
+                "matlab", "metric", "molecule", "p", "pcre", "pgn", "php", "pike", "powerbuilder", "promql",
                 "python/python2", "python/python3", "python/python3-js", "python/python3-py", "python/python3-ts", "python/python3-without-actions", "python/tiny-python"
-                "rego", "rexx", "rust",
+                "rego", "rexx", "ruby", "rust",
                 "sql/hive", "sql/plsql", "sql/tsql", "stringtemplate", "swift/swift2", "swift/swift3", "swift-fin", "tcpheader", "thrift"
                 "v", "wat", "xpath/xpath31", "z")
         }
