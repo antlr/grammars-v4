@@ -8,7 +8,7 @@ function Get-GrammarSkipList {
                 "_grammar-test",
                 "apex", "arithmetic", "asm/masm", "asn/asn_3gpp",
                 "bcpl",
-                "cpp", "csharp",
+                "cpp", "csharp", "dice",
                 "fortran77",
                 "haskell", "html", "hypertalk",
                 "idl",
@@ -31,7 +31,7 @@ function Get-GrammarSkipList {
         }
         "Java" {
             return @(
-                "antlr/antlr4", "asm/masm", "bcpl", "cobol85", "csharp", 
+                "antlr/antlr4", "arithmetic", "asm/masm", "bcpl", "cobol85", "csharp", "dice",
                 "html", "hypertalk", "javascript/ecmascript", "kotlin/kotlin", "kotlin/kotlin-formal", "lambda", "less", "metric", "molecule",
                 "p", "php", "powerbuilder",
                 "python/python2", "python/python3-js", "python/python3-py", "python/python3-ts", "python/python3-without-actions", "python/tiny-python", 
@@ -40,22 +40,25 @@ function Get-GrammarSkipList {
             )
         }
         "JavaScript" {
-            return @("antlr/antlr4", "apex", "asm/masm", "asn/asn_3gpp", "bcpl", "cql3", "csharp", "fortran77", "golang",
+            return @(
+                "antlr/antlr2", "antlr/antlr4", "apex", "asm/masm", "asn/asn_3gpp", "bcpl", "c", "cql3", "csharp", "fortran77", "golang",
                 "haskell", "html", "hypertalk", "idl", "java/java9", "javadoc", "javascript/ecmascript", "kotlin/kotlin", "lambda", "less", "logo/ucb-logo",
-                "metric", "molecule", "p", "pgn", "php", "pike", "powerbuilder", "promql",
+                "metric", "molecule", "p", "pcre", "pgn", "php", "pike", "powerbuilder", "promql",
                 "python/python2", "python/python3", "python/python3-js", "python/python3-py", "python/python3-ts", "python/python3-without-actions", "python/tiny-python"
                 "rego", "rexx", "rust",
                 "sql/hive", "sql/plsql", "sql/tsql", "stringtemplate", "swift/swift2", "swift/swift3", "swift-fin", "tcpheader", "thrift"
                 "v", "wat", "xpath/xpath31", "z")
         }
         "Go" {
-            return @("abb", "algol60",
+            return @(
+                "abb", "algol60",
                 "antlr/antlr2", "antlr/antlr3", "antlr/antlr4",
                 "apex", "arithmetic",
                 "asm/asm6502", "asm/asm8080", "asm/asm8086", "asm/asmMASM", "asm/asmZ80", "asm/masm", "asm/pdp7",
                 "asn/asn_3gpp",
                 "basic", "bcpl",
                 "calculator", "capnproto", "clojure", "cobol85", "cpp", "cql3", "csharp", "css3",
+                "dice",
                 "edif300", "edn", "erlang",
                 "flatbuffers", "focal", "fortran77",
                 "gff3", "golang", "guitartab",
@@ -66,7 +69,7 @@ function Get-GrammarSkipList {
                 "lambda", "logo/logo", "logo/ucb-logo", "lolcode", "lpc", "lua",
                 "mckeeman-form", "metric", "modula2pim4", "molecule", "moo", "muddb",
                 "oberon", "oncrpc",
-                "p", "pascal", "pddl", "pdn", "pgn", "php", "ply", "powerbuilder",
+                "p", "pascal", "pddl", "pdn", "pgn", "php", "ply", "powerbuilder", "protobuf3",
                 "python/python2", "python/python3", "python/python3-js", "python/python3-py", "python/python3-ts",
                 "python/python3-without-actions", "python/python3alt", "python/tiny-python",
                 "quakemap",
@@ -86,7 +89,7 @@ function Get-GrammarSkipList {
                 "asm/asmMASM", "asm/masm", "asn/asn", "asn/asn_3gpp",
                 "bcpl", "bnf", "brainfuck", "brainflak",
                 "capnproto", "clojure", "cmake", "cpp", "cql3", "csharp", "css3",
-                "dot",
+                "dice", "dot",
                 "edif300", "edn", "erlang",
                 "flatbuffers", "focal", "fortran77",
                 "gff3", "gml", "golang",
@@ -96,7 +99,7 @@ function Get-GrammarSkipList {
                 "kotlin/kotlin", "kotlin/kotlin-formal", "kuka",
                 "lambda", "less", "logo/logo", "logo/ucb-logo", "lolcode",
                 "mckeeman-form", "mdx", "metric", "microc", "modula2pim4", "molecule", "moo", "muddb", "mumath", "oberon",
-                "p", "parkingsign", "pascal", "pddl", "peoplecode", "pgn", "php", "pl0", "ply", "powerbuilder",
+                "p", "parkingsign", "pascal", "pddl", "peoplecode", "pgn", "php", "pl0", "ply", "powerbuilder", "protobuf3",
                 "python/python2", "python/python3", "python/python3-js", "python/python3-py", "python/python3-ts", "python/python3-without-actions",
                 "python/python3alt", "python/tiny-python",
                 "quakemap",
