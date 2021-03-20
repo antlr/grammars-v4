@@ -1,6 +1,6 @@
-from antlr4 import *
+from antlr4 import Parser
 
-class PlSqlBaseParser(Parser):
+class pyPlSqlParserBase(Parser):
 
     _isVersion10 = False
     _isVersion12 = True
