@@ -3888,7 +3888,7 @@ string_function
     | CHR '(' concatenation USING NCHAR_CS ')'
     | NVL '(' expression ',' expression ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
-    | TO_DATE '(' expression (',' quoted_string)? ')'
+    | TO_DATE '(' (table_element | standard_function | expression) (',' quoted_string)? ')'
     ;
 
 standard_function
