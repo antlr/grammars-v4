@@ -224,7 +224,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Async? Function '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : Async? Function '*'? identifier '(' formalParameterList? ')' functionBody
     ;
 
 classDeclaration
@@ -242,9 +242,9 @@ classElement
     ;
 
 methodDefinition
-    : '*'? '#'? propertyName '(' formalParameterList? ')' '{' functionBody '}'
-    | '*'? '#'? getter '(' ')' '{' functionBody '}'
-    | '*'? '#'? setter '(' formalParameterList? ')' '{' functionBody '}'
+    : '*'? '#'? propertyName '(' formalParameterList? ')' functionBody
+    | '*'? '#'? getter '(' ')' functionBody
+    | '*'? '#'? setter '(' formalParameterList? ')' functionBody
     ;
 
 formalParameterList
@@ -261,7 +261,7 @@ lastFormalParameterArg                        // ECMAScript 6: Rest Parameter
     ;
 
 functionBody
-    : sourceElements?
+    : '{' sourceElements? '}'
     ;
 
 sourceElements
@@ -283,9 +283,9 @@ arrayElement
 propertyAssignment
     : propertyName ':' singleExpression                                             # PropertyExpressionAssignment
     | '[' singleExpression ']' ':' singleExpression                                 # ComputedPropertyExpressionAssignment
-    | Async? '*'? propertyName '(' formalParameterList?  ')'  '{' functionBody '}'  # FunctionProperty
-    | getter '(' ')' '{' functionBody '}'                                           # PropertyGetter
-    | setter '(' formalParameterArg ')' '{' functionBody '}'                        # PropertySetter
+    | Async? '*'? propertyName '(' formalParameterList?  ')'  functionBody  # FunctionProperty
+    | getter '(' ')' functionBody                                           # PropertyGetter
+    | setter '(' formalParameterArg ')' functionBody                        # PropertySetter
     | Ellipsis? singleExpression                                                    # PropertyShorthand
     ;
 
@@ -369,7 +369,7 @@ objectLiteral
 
 anoymousFunction
     : functionDeclaration                                                       # FunctionDecl
-    | Async? Function '*'? '(' formalParameterList? ')' '{' functionBody '}'    # AnoymousFunctionDecl
+    | Async? Function '*'? '(' formalParameterList? ')' functionBody    # AnoymousFunctionDecl
     | Async? arrowFunctionParameters '=>' arrowFunctionBody                     # ArrowFunction
     ;
 
@@ -380,7 +380,7 @@ arrowFunctionParameters
 
 arrowFunctionBody
     : singleExpression
-    | '{' functionBody '}'
+    | functionBody
     ;
 
 assignmentOperator
