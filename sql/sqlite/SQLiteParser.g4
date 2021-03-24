@@ -120,7 +120,7 @@ create_table_stmt:
     CREATE_SYM (TEMP_SYM | TEMPORARY_SYM)? TABLE_SYM (IF_SYM NOT_SYM EXISTS_SYM)? (
         schema_name DOT
     )? table_name (
-        OPEN_PAR column_def (COMMA column_def)* (COMMA table_constraint)* CLOSE_PAR (
+        OPEN_PAR column_def (COMMA column_def)*? (COMMA table_constraint)* CLOSE_PAR (
             WITHOUT_SYM row_SYMROW_SYMID = IDENTIFIER
         )?
         | AS_SYM select_stmt
@@ -132,7 +132,7 @@ column_def:
 ;
 
 type_name:
-    name+ (
+    name+? (
         OPEN_PAR signed_number CLOSE_PAR
         | OPEN_PAR signed_number COMMA signed_number CLOSE_PAR
     )?
