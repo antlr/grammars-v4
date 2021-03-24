@@ -264,7 +264,7 @@ MULTILINESTRING
    ;
 
 STRING
-   : '"' (~ [\r\n"] | '""' | '\\"')* '"'
+   : '"' ( '\\"' | ~["\r\n] )* '"'
    ;
 
 IDENTIFIER
