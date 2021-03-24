@@ -9,8 +9,7 @@ SOURCES = $(GENERATED) \
     Program.py
 default: classes
 classes: $(SOURCES)
-	pip install antlr4-python3-runtime
-	pip install readchar
+	pip install -r requirements.txt
 clean:
 	rm -f *.tokens *.interp
 	rm -f *.interp

@@ -30,18 +30,55 @@ jobs:
     - name: Test C# target
       run: |
         bash _scripts/regtest.sh CSharp
-  build-csharp-pwsh-problem-child:
+  build-pwsh:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        language: [CSharp, Java, JavaScript, Go, Python3, Dart]
     steps:
     - name: Checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Test C# target with PowerShell
+
+    - name: Install Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: '11'
+    - name: Install Dart
+      if: ${{ matrix.language == 'Dart' }}
+      uses: dart-lang/setup-dart@v1
+    - name: Install Python
+      if: ${{ matrix.language == 'Python3' }}
+      uses: actions/setup-python@v2.2.1
+      with:
+        python-version: '3.8'
+
+    - name: Download ANTLR
+      shell: pwsh
+      run: |
+        $resp = Invoke-WebRequest https://www.antlr.org/download/
+        if($resp.StatusCode -ne 200) {
+            Write-Error "Get download list failed"
+            return -1
+        }
+        $latest = (Select-String "antlr-([.0-9]+)-complete.jar" -input $resp.Content -AllMatches | ForEach-Object {$_.matches} | ForEach-Object {[System.Version]$_.Groups[1].Value} | Sort-Object -Descending)[0].ToString()
+        $latestJar = "antlr-$latest-complete.jar"
+        echo $latestJar
+        Invoke-WebRequest https://www.antlr.org/download/$latestJar -OutFile $latestJar
+        $antlrPath=Resolve-Path $latestJar
+        echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
+    - name: Install dotnet-antlr
+      shell: pwsh
+      run: |
+        dotnet tool install -g dotnet-antlr --version 3.0.7
+        if ("${{ matrix.os }}" -eq "ubuntu-latest") {
+            echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
+        }
+
+    - name: Test
       shell: pwsh
       run: |
         if ("${{ github.event_name }}" -eq "pull_request") {
@@ -52,29 +89,5 @@ jobs:
             $Before = "${{ github.event.before }}"
             $After = "${{ github.event.after }}"
         }
-        dotnet tool install -g dotnet-antlr --version 3.0.6
-        _scripts/test.ps1 CSharp $Before $After
-  build-csharp-pwsh-ok:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest, windows-latest]
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Test C# target with PowerShell
-      shell: pwsh
-      run: |
-        if ("${{ github.event_name }}" -eq "pull_request") {
-            $Before = "${{ github.event.pull_request.base.sha }}"
-            $After = "${{ github.event.pull_request.head.sha }}"
-        }
-        else {
-            $Before = "${{ github.event.before }}"
-            $After = "${{ github.event.after }}"
-        }
-        dotnet tool install -g dotnet-antlr --version 3.0.6
-        _scripts/test.ps1 CSharp $Before $After
+        $env:ANTLR_JAR_PATH="${{ env.antlr_path }}"
+        _scripts/test.ps1 ${{ matrix.language }} $Before $After
