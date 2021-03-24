@@ -787,7 +787,7 @@ constant
     | ('+' | '-')? FLOATING_POINT_LITERAL
     | CHARACTER_LITERAL
     | NIL
-    | NULL
+    | NULL_
     | YES
     | NO
     | TRUE

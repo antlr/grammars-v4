@@ -64,7 +64,7 @@ assemblerdirective
    | group
    | label_
    | assume
-   | extern
+   | extern_
    | (type expressionlist +)
    ;
 
@@ -140,7 +140,7 @@ equ
    : EQU expression
    ;
 
-extern
+extern_
    : EXTERN expression
    ;
 

@@ -78,7 +78,7 @@ ON:                 'ON';
 TO:                 'TO';
 FROM:               'FROM';
 REF:                'REF';
-NULL:               'NULL';
+NULL_:              'NULL';
 UPDATE:             'UPDATE';
 CASE:               'CASE';
 DYNAMIC:            'DYNAMIC';
