@@ -60,7 +60,7 @@ cql
    | createTrigger
    | createType
    | createUser
-   | delete
+   | delete_
    | dropAggregate
    | dropFunction
    | dropIndex
@@ -536,7 +536,7 @@ indexFullSpec
    : kwFull syntaxBracketLr OBJECT_NAME syntaxBracketRr
    ;
 
-delete
+delete_
    : beginBatch? kwDelete deleteColumnList? fromSpec usingTimestampSpec? whereSpec (ifExist | ifSpec)?
    ;
 

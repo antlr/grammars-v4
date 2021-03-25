@@ -131,7 +131,7 @@ expression
   | identifier
   | Color
   | StringLiteral
-  | NULL
+  | NULL_
   | url
   | variableName
   | functionCall
@@ -153,7 +153,7 @@ elseStatement
 
 conditions
   : condition (COMBINE_COMPARE conditions)?
-  | NULL
+  | NULL_
   ;
 
 condition
