@@ -311,8 +311,8 @@ identifierVariableName
 
 property
   : identifier COLON propertyValue IMPORTANT? SEMI
-  | identifier COLON block IMPORTANT?
-  | identifier COLON propertyValue block IMPORTANT?
+  | identifier COLON block
+  | identifier COLON propertyValue IMPORTANT? block
   ;
 
 lastProperty
