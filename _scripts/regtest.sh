@@ -66,6 +66,12 @@ z \
         "
         ;;
 
+    Cpp)
+        do_not_do_list=" \
+kirikiri-tjs \
+        "
+        ;;
+
     *)          echo "Unknown target"; exit 1;;
 esac
 do_not_do_list=`echo $do_not_do_list | sed 's/^ //g' | sed 's/ /,/g'`
@@ -120,8 +126,7 @@ add() {
     fi
 }
 
-# Uncomment this line to remove the temporary directories.
-# rm -rf `find . -name Generated`
+rm -rf `find . -name Generated -type d`
 
 build()
 {
@@ -185,8 +190,9 @@ test()
 # 0) Set up.
 part1()
 {
+	date
 	dotnet tool uninstall -g dotnet-antlr
-	dotnet tool install -g dotnet-antlr --version 3.0.6
+	dotnet tool install -g dotnet-antlr --version 3.0.11
 	dotnet tool uninstall -g csxml2
 	dotnet tool install -g csxml2 --version 1.0.0
 	# 1) Generate driver source code from poms.
@@ -194,14 +200,16 @@ part1()
 	echo $do_not_do_list | fmt
 	rm -rf `find . -name Generated -type d`
 	echo "Generating drivers."
-	bad=`dotnet-antlr -m true -k "$do_not_do_list" -t "$target" --template-sources-directory _scripts/templates/`
+	bad=`dotnet-antlr -m true -k "$do_not_do_list" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.2-complete.jar`
 	for i in $bad; do failed=`add "$failed" "$i"`; done
+	date
 }
 
 part2()
 {
 	# 2) Build driver code.
 	echo "Building."
+	date
 	case "$target" in
 	    CSharp) build_file_type="Test.csproj" ;;
 	    *) build_file_type="makefile" ;;
@@ -221,12 +229,14 @@ part2()
 	        build "$testname"
 	    fi
 	done
+	date
 }
 
 part3()
 {
 	# 3) Test generated parser on examples.
 	echo "Parsing."
+	date
 	build_files=`find $prefix -type f -name $build_file_type | grep Generated`
 	echo bf $build_files
 	for build_file in $build_files
@@ -240,9 +250,9 @@ part3()
 	        test "$testname"
 	    fi
 	done
+	date
 }
 
-date
 part1
 part2
 part3
@@ -250,7 +260,6 @@ echo "Grammars that succeeded: $succeeded" | fmt
 echo "================"
 echo "Grammars that failed: $failed" | fmt
 echo "================"
-date
 
 if [[ "$failed" == "" ]]
 then
