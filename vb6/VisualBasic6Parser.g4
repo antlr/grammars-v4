@@ -688,7 +688,7 @@ literal:
 	| TRUE
 	| FALSE
 	| NOTHING
-	| NULL
+	| NULL_
     ;
 
 publicPrivateVisibility: PRIVATE | PUBLIC;
@@ -799,7 +799,7 @@ ambiguousKeyword:
 	| NEW
 	| NOT
 	| NOTHING
-	| NULL
+	| NULL_
 	| OBJECT
 	| ON
 	| OPEN

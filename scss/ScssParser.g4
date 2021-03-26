@@ -131,7 +131,7 @@ expression
   | identifier
   | Color
   | StringLiteral
-  | NULL
+  | NULL_
   | url
   | variableName
   | functionCall
@@ -153,7 +153,7 @@ elseStatement
 
 conditions
   : condition (COMBINE_COMPARE conditions)?
-  | NULL
+  | NULL_
   ;
 
 condition
@@ -311,8 +311,8 @@ identifierVariableName
 
 property
   : identifier COLON propertyValue IMPORTANT? SEMI
-  | identifier COLON block IMPORTANT?
-  | identifier COLON propertyValue block IMPORTANT?
+  | identifier COLON block
+  | identifier COLON propertyValue IMPORTANT? block
   ;
 
 lastProperty

@@ -4,7 +4,7 @@ grammar CapnProto;
 // parser rules
 
 document :
-	file_identifier using_import* namespace? document_content* EOF	;
+	file_identifier using_import* namespace_? document_content* EOF	;
 
 file_identifier :
 	FILE_ID ';' ;
@@ -12,7 +12,7 @@ file_identifier :
 using_import :
 	'using' ( NAME '=' )? 'import' TEXT ( '.' NAME )? ';' ;
 	
-namespace :
+namespace_ :
 	'$' NAME '.namespace' '(' TEXT ')' ';' ;
 
 document_content :

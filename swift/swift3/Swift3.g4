@@ -320,8 +320,8 @@ generic_argument_list : generic_argument (',' generic_argument)* ;
 generic_argument : type ;
 
 // context-sensitive. Allow < as pre, post, or binary op
-//lt : {_input.LT(1).getText().equals("<")}? operator ;
-//gt : {_input.LT(1).getText().equals(">")}? operator ;
+//lt : {_input.LT(1).getText().equals("<")}? operator_ ;
+//gt : {_input.LT(1).getText().equals(">")}? operator_ ;
 // Declarations
 
 // GRAMMAR OF A DECLARATION
@@ -361,7 +361,7 @@ code_block : '{' statements? '}' ;
 import_declaration : attributes? 'import' import_kind? import_path  ;
 import_kind : 'typealias' | 'struct' | 'class' | 'enum' | 'protocol' | 'var' | 'func'  ;
 import_path : import_path_identifier ('.' import_path_identifier)*  ;
-import_path_identifier : declaration_identifier | operator  ;
+import_path_identifier : declaration_identifier | operator_  ;
 
 // GRAMMAR OF A CONSTANT DECLARATION
 
@@ -413,7 +413,7 @@ function_declaration : function_head function_name generic_parameter_clause? fun
  
 function_head : attributes? declaration_modifiers? 'func' ;
 
-function_name : declaration_identifier | operator ;
+function_name : declaration_identifier | operator_ ;
 
 function_signature
  : parameter_clause 'throws'? function_result?
@@ -586,9 +586,9 @@ subscript_result : arrow_operator attributes? type ;
 
 operator_declaration : prefix_operator_declaration | postfix_operator_declaration | infix_operator_declaration ;
 
-prefix_operator_declaration : 'prefix' 'operator' operator ;
-postfix_operator_declaration : 'postfix' 'operator' operator ;
-infix_operator_declaration : 'infix' 'operator' operator infix_operator_group? ;
+prefix_operator_declaration : 'prefix' 'operator' operator_ ;
+postfix_operator_declaration : 'postfix' 'operator' operator_ ;
+infix_operator_declaration : 'infix' 'operator' operator_ infix_operator_group? ;
 
 infix_operator_group : ':' precedence_group_name ;
 
@@ -728,7 +728,7 @@ balanced_token
  | '{' balanced_tokens '}'
  | label_identifier
  | literal 
- | operator
+ | operator_
  | Platform_name_platform_version // there is a kludge, see Platform_name_platform_version; it is a token
  | any_punctuation_for_balanced_token
  ;
@@ -1002,8 +1002,8 @@ function_call_argument_list : function_call_argument ( ',' function_call_argumen
 function_call_argument
  : expression
  | label_identifier ':' expression
- | operator
- | label_identifier ':' operator
+ | operator_
+ | label_identifier ':' operator_
  ;
 
 trailing_closure : closure_expression ;
@@ -1462,14 +1462,14 @@ same_type_equals: {SwiftSupport.isOperator(_input,"==")}? '=' '=' ;
  it is treated as a binary operator. As an example, the + operator in a+b
   and a + b is treated as a binary operator."
 */
-binary_operator : {SwiftSupport.isBinaryOp(_input)}? operator ;
+binary_operator : {SwiftSupport.isBinaryOp(_input)}? operator_ ;
 
 /**
  "If an operator has whitespace on the left side only, it is treated as a
  prefix unary operator. As an example, the ++ operator in a ++b is treated
  as a prefix unary operator."
 */
-prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator ;
+prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator_ ;
 
 /**
  "If an operator has whitespace on the right side only, it is treated as a
@@ -1481,9 +1481,9 @@ prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator ;
  the ++ operator in a++.b is treated as a postfix unary operator (a++ .b
  rather than a ++ .b)."
  */
-postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator ;
+postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator_ ;
 
-operator
+operator_
   : operator_head     ({_input.get(_input.index()-1).getType()!=WS}? operator_character)*
   | dot_operator_head ({_input.get(_input.index()-1).getType()!=WS}? dot_operator_character)*
   ;

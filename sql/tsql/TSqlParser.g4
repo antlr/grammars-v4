@@ -1269,7 +1269,7 @@ create_resource_pool
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-resource-governor-transact-sql
 alter_resource_governor
-    : ALTER RESOURCE GOVERNOR ( (DISABLE | RECONFIGURE) | WITH LR_BRACKET CLASSIFIER_FUNCTION EQUAL ( schema_name=id DOT function_name=id | NULL ) RR_BRACKET | RESET STATISTICS | WITH LR_BRACKET MAX_OUTSTANDING_IO_PER_VOLUME EQUAL max_outstanding_io_per_volume=DECIMAL RR_BRACKET )
+    : ALTER RESOURCE GOVERNOR ( (DISABLE | RECONFIGURE) | WITH LR_BRACKET CLASSIFIER_FUNCTION EQUAL ( schema_name=id DOT function_name=id | NULL_ ) RR_BRACKET | RESET STATISTICS | WITH LR_BRACKET MAX_OUTSTANDING_IO_PER_VOLUME EQUAL max_outstanding_io_per_volume=DECIMAL RR_BRACKET )
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-role-transact-sql
@@ -1566,7 +1566,7 @@ create_synonym
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-user-transact-sql
 alter_user
-    : ALTER USER username=id WITH (COMMA? NAME EQUAL newusername=id | COMMA? DEFAULT_SCHEMA EQUAL ( schema_name=id |NULL ) | COMMA? LOGIN EQUAL loginame=id | COMMA? PASSWORD EQUAL STRING (OLD_PASSWORD EQUAL STRING)+ | COMMA? DEFAULT_LANGUAGE EQUAL (NONE| lcid=DECIMAL| language_name_or_alias=id) | COMMA? ALLOW_ENCRYPTED_VALUE_MODIFICATIONS EQUAL (ON|OFF) )+
+    : ALTER USER username=id WITH (COMMA? NAME EQUAL newusername=id | COMMA? DEFAULT_SCHEMA EQUAL ( schema_name=id |NULL_ ) | COMMA? LOGIN EQUAL loginame=id | COMMA? PASSWORD EQUAL STRING (OLD_PASSWORD EQUAL STRING)+ | COMMA? DEFAULT_LANGUAGE EQUAL (NONE| lcid=DECIMAL| language_name_or_alias=id) | COMMA? ALLOW_ENCRYPTED_VALUE_MODIFICATIONS EQUAL (ON|OFF) )+
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-user-transact-sql
@@ -1976,8 +1976,8 @@ procedure_option
 function_option
     : ENCRYPTION
     | SCHEMABINDING
-    | RETURNS NULL ON NULL INPUT
-    | CALLED ON NULL INPUT
+    | RETURNS NULL_ ON NULL_ INPUT
+    | CALLED ON NULL_ INPUT
     | execute_clause
     ;
 
@@ -2573,7 +2573,7 @@ execute_statement_arg_unnamed
     ;
 
 execute_parameter
-    : (constant | LOCAL_ID (OUTPUT | OUT)? | id | DEFAULT | NULL)
+    : (constant | LOCAL_ID (OUTPUT | OUT)? | id | DEFAULT | NULL_)
     ;
 
 execute_var_string
@@ -2836,11 +2836,11 @@ table_constraint
     ;
 
 on_delete
-    : ON DELETE (NO ACTION | CASCADE | SET NULL | SET DEFAULT)
+    : ON DELETE (NO ACTION | CASCADE | SET NULL_ | SET DEFAULT)
     ;
 
 on_update
-    : ON UPDATE (NO ACTION | CASCADE | SET NULL | SET DEFAULT)
+    : ON UPDATE (NO ACTION | CASCADE | SET NULL_ | SET DEFAULT)
     ;
 
 index_options
@@ -2924,7 +2924,7 @@ time_zone
     ;
     
 primitive_expression
-    : DEFAULT | NULL | LOCAL_ID | constant
+    : DEFAULT | NULL_ | LOCAL_ID | constant
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/case-transact-sql
@@ -2943,7 +2943,7 @@ bracket_expression
     ;
 
 constant_expression
-    : NULL
+    : NULL_
     | constant
     // system functions: https://msdn.microsoft.com/en-us/library/ms187786.aspx
     | function_call
@@ -3100,7 +3100,7 @@ option
     ;
 
 optimize_for_arg
-    : LOCAL_ID (UNKNOWN | '=' (constant | NULL))
+    : LOCAL_ID (UNKNOWN | '=' (constant | NULL_))
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms176104.aspx
@@ -3118,7 +3118,7 @@ asterisk
     ;
 
 column_elem
-    : (full_column_name | '$' IDENTITY | '$' ROWGUID | NULL) as_column_alias?
+    : (full_column_name | '$' IDENTITY | '$' ROWGUID | NULL_) as_column_alias?
     ;
 
 udt_elem
@@ -3201,7 +3201,7 @@ change_table
     ;
 
 change_table_changes
-    : CHANGETABLE '(' CHANGES changetable=table_name ',' changesid=(NULL | DECIMAL | LOCAL_ID) ')'
+    : CHANGETABLE '(' CHANGES changetable=table_name ',' changesid=(NULL_ | DECIMAL | LOCAL_ID) ')'
     ;
 change_table_version
     : CHANGETABLE '(' VERSION versiontable=table_name ',' pk_columns=full_column_name_list ',' pk_values=select_list  ')'
@@ -3646,7 +3646,7 @@ clustered
     ;
 
 null_notnull
-    : NOT? NULL
+    : NOT? NULL_
     ;
 
 null_or_default
@@ -3723,7 +3723,7 @@ data_type
     ;
 
 default_value
-    : NULL
+    : NULL_
     | DEFAULT
     | constant
     ;

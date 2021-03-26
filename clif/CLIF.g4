@@ -65,11 +65,11 @@ name
 //A.2.3.3 Term
 term
 	:	name
-	|	OPEN operator termseq CLOSE
+	|	OPEN operator_ termseq CLOSE
 	|	OPEN 'cl-comment' QUOTEDSTRING term CLOSE
 	;
 	
-operator
+operator_
 	:	term
 	;
 	
