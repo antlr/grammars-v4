@@ -41,7 +41,7 @@ for file in `find $SRC -name '*.erl'`; do
     if [ $? -eq 0 ]; then
 
         ## Syntax
-        java org.antlr.v4.runtime.misc.TestRig Erlang forms -encoding utf8 $pped 1>$O 2>>$O
+        java org.antlr.v4.gui.TestRig Erlang forms -encoding utf8 $pped 1>$O 2>>$O
 
         if [ -s $O ]; then # $O is not empty
             printf "%s \033[0;33m%s\033[00m\033[0;31m%$(($COLUMNS - ${#file} -${#j} -1))s\033[00m\n" $j $pped ERROR
