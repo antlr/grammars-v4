@@ -30,21 +30,32 @@ form : (attribute | function_ | ruleClauses) '.' ;
 
 /// Tokens
 
+fragment DIGIT : [0-9] ;
+
+fragment LOWERCASE : [a-z]
+                   | '\u00df'..'\u00f6'
+                   | '\u00f8'..'\u00ff' ;
+
+
+fragment UPPERCASE : [A-Z]
+                   | '\u00c0'..'\u00d6'
+                   | '\u00d8'..'\u00de' ;
+
 tokAtom : TokAtom ;
-TokAtom : [a-z@][0-9a-zA-Z_@]*
+TokAtom : LOWERCASE (DIGIT | LOWERCASE | UPPERCASE | '_' | '@')*
         | '\'' ( '\\' (~'\\'|'\\') | ~[\\'] )* '\'' ;
 
 tokVar : TokVar ;
-TokVar : [A-Z_][0-9a-zA-Z_]* ;
+TokVar : (UPPERCASE | '_') (DIGIT | LOWERCASE | UPPERCASE | '_' | '@')* ;
 
 tokFloat : TokFloat ;
-TokFloat : '-'? [0-9]+ '.' [0-9]+  ([Ee] [+-]? [0-9]+)? ;
+TokFloat : '-'? DIGIT+ '.' DIGIT+  ([Ee] [+-]? DIGIT+)? ;
 
 tokInteger : TokInteger ;
-TokInteger : '-'? [0-9]+ ('#' [0-9a-zA-Z]+)? ;
+TokInteger : '-'? DIGIT+ ('#' (DIGIT | [a-zA-Z])+)? ;
 
 tokChar : TokChar ;
-TokChar : '$' ('\\'? ~[\r\n] | '\\' [0-9] [0-9] [0-9]) ;
+TokChar : '$' ('\\'? ~[\r\n] | '\\' DIGIT DIGIT DIGIT) ;
 
 tokString : TokString ;
 TokString : '"' ( '\\' (~'\\'|'\\') | ~[\\"] )* '"' ;
@@ -54,7 +65,7 @@ AttrName : '-' ('spec' | 'callback') ;
 
 Comment : '%' ~[\r\n]* '\r'? '\n' -> skip ;
 
-WS : [ \t\r\n]+ -> skip ;
+WS : [\u0000-\u0020\u0080-\u00a0]+ -> skip ;
 
 
 
