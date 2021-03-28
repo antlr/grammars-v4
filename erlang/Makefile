@@ -14,4 +14,4 @@ clean:
 	rm -f *.class
 
 distclean: clean
-	rm -f *.java *.tokens
+	rm -f *.java *.tokens *.interp
