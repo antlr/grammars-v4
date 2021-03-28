@@ -1,4 +1,4 @@
--file("examples/fac.erl", 1).
+-file("src/fac.erl", 1).
 
 -module(fac).
 

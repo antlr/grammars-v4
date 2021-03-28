@@ -1,4 +1,4 @@
--file("examples/map.erl", 1).
+-file("src/map.erl", 1).
 
 -module(map).
 

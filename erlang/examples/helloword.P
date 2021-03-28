@@ -1,4 +1,4 @@
--file("examples/helloword.erl", 1).
+-file("src/helloword.erl", 1).
 
 -module(hello).
 

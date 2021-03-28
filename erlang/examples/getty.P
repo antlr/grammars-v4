@@ -1,4 +1,4 @@
--file("examples/getty.erl", 1).
+-file("src/getty.erl", 1).
 
 -module(getty).
 

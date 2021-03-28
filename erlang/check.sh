@@ -18,6 +18,8 @@ get() {
 
 
 SRC="$1"
+PPED="$2"
+PPED=${PPED:="${SRC}/preprocessed"}
 
 [[ ! -d $SRC/ ]] && get 'https://codeload.github.com/erlang/otp/zip/maint' $SRC
 
@@ -34,7 +36,7 @@ for file in `find $SRC -name '*.erl'`; do
     #sed -i 's///g' $file
     COLUMNS=$(tput cols)
     dir=`dirname $file`
-    ppdir=${dir}/preprocessed
+    ppdir=$PPED
     mkdir -p $ppdir
 
     pped=$ppdir/`basename ${file%.erl}.P`
