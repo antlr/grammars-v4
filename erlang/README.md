@@ -37,6 +37,13 @@ make debug
 ^D
 ```
 
+Check Erlang.g4 against examples/ and generate preprocessed files:
+
+```
+:::bash
+./check.sh examples
+```
+
 Check Erlang.g4 against the whole Erlang/OTP's `.erl` sources:
 
 ```

@@ -41,7 +41,7 @@
 					<entryPoint>forms</entryPoint>
 					<grammarName>Erlang</grammarName>
 					<packageName></packageName>
-					<exampleFiles>examples/</exampleFiles>
+					<exampleFiles>examples/preprocessed/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>
