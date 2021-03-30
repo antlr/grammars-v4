@@ -77,7 +77,6 @@ jobs:
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
-
     - name: Test
       shell: pwsh
       run: |
