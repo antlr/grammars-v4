@@ -31,8 +31,7 @@ kirikiri-tjs \
         ;;
 
     CSharp)
-        do_not_do_list=" \
-_grammar-test acme apex apt \
+        do_not_do_list="_grammar-test acme apex apt \
 arithmetic asm/masm asn/asn_3gpp atl \
 basic \
 calculator capnproto cpp csharp cto \
@@ -60,7 +59,7 @@ wat \
 xpath/xpath31 \
 z \
         "
-	todo_pattern="(?!.*(`echo $do_not_do_list | sed 's/\n\r/ /' | sed 's/  / /g' | sed 's/ /|/g'`)/\$)"
+	todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n\r/ /' | sed 's/  / /g' | sed 's/ /|/g'`)/\$)"
 	echo $todo_pattern
         ;;
 
@@ -211,7 +210,7 @@ part1()
 {
 	date
 	dotnet tool uninstall -g dotnet-antlr
-	dotnet tool install -g dotnet-antlr --version 3.1.0
+	dotnet tool install -g dotnet-antlr --version 3.1.1
 	dotnet tool uninstall -g csxml2
 	dotnet tool install -g csxml2 --version 1.0.0
 	# 1) Generate driver source code from poms.
