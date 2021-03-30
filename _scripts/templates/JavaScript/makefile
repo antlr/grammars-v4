@@ -18,7 +18,7 @@ clean:
 run:
 	node index.js $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
-	java -jar $(JAR) -Dlanguage=JavaScript $\<
+	java -jar $(JAR) -Dlanguage=JavaScript <antlr_tool_args:{y | <y> } > $\<
 } >
 test:
 	bash test.sh

@@ -73,7 +73,7 @@ jobs:
     - name: Install dotnet-antlr
       shell: pwsh
       run: |
-        dotnet tool install -g dotnet-antlr --version 3.0.12
+        dotnet tool install -g dotnet-antlr --version 3.1.0
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }

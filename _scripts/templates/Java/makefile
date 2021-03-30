@@ -9,6 +9,9 @@ ANTLRGRAMMARS ?= $(wildcard *.g4)
 GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
 SOURCES = $(GENERATED) \
     Program.java \
+<if (case_insensitive_type)>
+    CaseChangingCharStream.java \
+<endif>
     ErrorListener.java
 default: classes
 classes: $(GENERATED) $(SOURCES:.java=.class)

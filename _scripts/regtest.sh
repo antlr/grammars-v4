@@ -24,6 +24,12 @@ then
     target="CSharp"
 fi
 case "$target" in
+    Cpp)
+        do_not_do_list=" \
+kirikiri-tjs \
+        "
+        ;;
+
     CSharp)
         do_not_do_list=" \
 _grammar-test acme apex apt \
@@ -54,6 +60,19 @@ wat \
 xpath/xpath31 \
 z \
         "
+	todo_pattern="(?!.*(`echo $do_not_do_list | sed 's/\n\r/ /' | sed 's/  / /g' | sed 's/ /|/g'`)/\$)"
+	echo $todo_pattern
+        ;;
+
+    Dart)
+	todo_pattern="(.*(abb|sql/mysql))/\$"
+	echo $todo_pattern
+        ;;
+
+    Go)
+        do_not_do_list=" \
+kirikiri-tjs \
+        "
         ;;
 
     Java)
@@ -66,7 +85,7 @@ z \
         "
         ;;
 
-    Cpp)
+    Python)
         do_not_do_list=" \
 kirikiri-tjs \
         "
@@ -192,15 +211,13 @@ part1()
 {
 	date
 	dotnet tool uninstall -g dotnet-antlr
-	dotnet tool install -g dotnet-antlr --version 3.0.12
+	dotnet tool install -g dotnet-antlr --version 3.1.0
 	dotnet tool uninstall -g csxml2
 	dotnet tool install -g csxml2 --version 1.0.0
 	# 1) Generate driver source code from poms.
-	echo "These grammars will not be tested:"
-	echo $do_not_do_list | fmt
 	rm -rf `find . -name Generated -type d`
 	echo "Generating drivers."
-	bad=`dotnet-antlr -m true -k "$do_not_do_list" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.2-complete.jar`
+	bad=`dotnet-antlr -m true --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.2-complete.jar`
 	for i in $bad; do failed=`add "$failed" "$i"`; done
 	date
 }
