@@ -17,7 +17,7 @@ clean:
 run:
 	go run Program.go $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
-	java -jar $(JAR) -Dlanguage=Go -o parser <antlr_tool_args:{y | <y> } > $\<
+	java -jar $(JAR) -Dlanguage=Go <antlr_tool_args:{y | <y> } > $\<
 } >
 test:
 	bash test.sh
