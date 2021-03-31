@@ -17,7 +17,7 @@ clean:
 run:
 	dart run cli.dart $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
-	java -jar $(JAR) -Dlanguage=Dart $\<
+	java -jar $(JAR) -Dlanguage=Dart <antlr_tool_args:{y | <y> } > $\<
 } >
 test:
 	bash test.sh

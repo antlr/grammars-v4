@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-
+ 
 # This script tests Antlr grammars for the C# target. It searches
 # pom.xml files for grammars, generates a driver, builds, and tests the
 # parser on input files. The code only runs on Linux-type boxes.
@@ -24,9 +24,14 @@ then
     target="CSharp"
 fi
 case "$target" in
-    CSharp)
+    Cpp)
         do_not_do_list=" \
-_grammar-test acme apex apt \
+kirikiri-tjs \
+        "
+        ;;
+
+    CSharp)
+        do_not_do_list="_grammar-test acme apex apt \
 arithmetic asm/masm asn/asn_3gpp atl \
 basic \
 calculator capnproto cpp csharp cto \
@@ -54,6 +59,19 @@ wat \
 xpath/xpath31 \
 z \
         "
+	todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n\r/ /' | sed 's/  / /g' | sed 's/ /|/g'`)/\$)"
+	echo $todo_pattern
+        ;;
+
+    Dart)
+	todo_pattern="(.*(abb|sql/mysql))/\$"
+	echo $todo_pattern
+        ;;
+
+    Go)
+        do_not_do_list=" \
+kirikiri-tjs \
+        "
         ;;
 
     Java)
@@ -63,6 +81,12 @@ z \
 
     JavaScript)
         do_not_do_list=" \
+        "
+        ;;
+
+    Python)
+        do_not_do_list=" \
+kirikiri-tjs \
         "
         ;;
 
@@ -120,8 +144,7 @@ add() {
     fi
 }
 
-# Uncomment this line to remove the temporary directories.
-# rm -rf `find . -name Generated`
+rm -rf `find . -name Generated -type d`
 
 build()
 {
@@ -185,23 +208,24 @@ test()
 # 0) Set up.
 part1()
 {
+	date
 	dotnet tool uninstall -g dotnet-antlr
-	dotnet tool install -g dotnet-antlr --version 3.0.6
+	dotnet tool install -g dotnet-antlr --version 3.1.3
 	dotnet tool uninstall -g csxml2
 	dotnet tool install -g csxml2 --version 1.0.0
 	# 1) Generate driver source code from poms.
-	echo "These grammars will not be tested:"
-	echo $do_not_do_list | fmt
 	rm -rf `find . -name Generated -type d`
 	echo "Generating drivers."
-	bad=`dotnet-antlr -m true -k "$do_not_do_list" -t "$target" --template-sources-directory _scripts/templates/`
+	bad=`dotnet-antlr -m true --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.2-complete.jar`
 	for i in $bad; do failed=`add "$failed" "$i"`; done
+	date
 }
 
 part2()
 {
 	# 2) Build driver code.
 	echo "Building."
+	date
 	case "$target" in
 	    CSharp) build_file_type="Test.csproj" ;;
 	    *) build_file_type="makefile" ;;
@@ -221,12 +245,14 @@ part2()
 	        build "$testname"
 	    fi
 	done
+	date
 }
 
 part3()
 {
 	# 3) Test generated parser on examples.
 	echo "Parsing."
+	date
 	build_files=`find $prefix -type f -name $build_file_type | grep Generated`
 	echo bf $build_files
 	for build_file in $build_files
@@ -240,9 +266,9 @@ part3()
 	        test "$testname"
 	    fi
 	done
+	date
 }
 
-date
 part1
 part2
 part3
@@ -250,7 +276,6 @@ echo "Grammars that succeeded: $succeeded" | fmt
 echo "================"
 echo "Grammars that failed: $failed" | fmt
 echo "================"
-date
 
 if [[ "$failed" == "" ]]
 then

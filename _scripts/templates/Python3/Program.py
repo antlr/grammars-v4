@@ -6,6 +6,7 @@ from antlr4.error.ErrorListener import ErrorListener
 from readchar import readchar
 from <lexer_name> import <lexer_name>;
 from <parser_name> import <parser_name>;
+from CaseChangingStream import *;
 
 def getChar():
     xx = readchar()
@@ -58,7 +59,9 @@ def main(argv):
         str = InputStream(input);
     elif (file_name != None):
         str = FileStream(file_name, 'utf8');
-
+<if (case_insensitive_type)>
+    str = CaseChangingStream(str, "<case_insensitive_type>" == "Upper")
+<endif>
     lexer = <lexer_name>(str);
     lexer.removeErrorListeners()
     l_listener = MyErrorListener()

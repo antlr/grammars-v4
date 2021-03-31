@@ -63,7 +63,7 @@ classParameters
     ;
 
 classParameter
-    : modifiers? ('val' | 'var')? NL* simpleIdentifier ':' NL* type (NL* '=' NL* expression)?
+    : modifiers? ('val' | 'var')? NL* simpleIdentifier ':' NL* type_ (NL* '=' NL* expression)?
     ;
 
 delegationSpecifiers
@@ -133,7 +133,7 @@ functionDeclaration
     : modifiers?
     'fun' (NL* typeParameters)? (NL* receiverType NL* '.')? NL* simpleIdentifier
     NL* functionValueParameters
-    (NL* ':' NL* type)?
+    (NL* ':' NL* type_)?
     (NL* typeConstraints)?
     (NL* functionBody)?
     ;
@@ -147,11 +147,11 @@ functionValueParameter
     ;
 
 parameter
-    : simpleIdentifier NL* ':' NL* type
+    : simpleIdentifier NL* ':' NL* type_
     ;
 
 setterParameter
-    : simpleIdentifier NL* (':' NL* type)?
+    : simpleIdentifier NL* (':' NL* type_)?
     ;
 
 functionBody
@@ -193,7 +193,7 @@ multiVariableDeclaration
     ;
 
 variableDeclaration
-    : annotation* NL* simpleIdentifier (NL* ':' NL* type)?
+    : annotation* NL* simpleIdentifier (NL* ':' NL* type_)?
     ;
 
 propertyDelegate
@@ -202,16 +202,16 @@ propertyDelegate
 
 getter
     : modifiers? 'get'
-    | modifiers? 'get' NL* '(' NL* ')' (NL* ':' NL* type)? NL* functionBody
+    | modifiers? 'get' NL* '(' NL* ')' (NL* ':' NL* type_)? NL* functionBody
     ;
 
 setter
     : modifiers? 'set'
-    | modifiers? 'set' NL* '(' (annotation | parameterModifier)* setterParameter ')' (NL* ':' NL* type)? NL* functionBody
+    | modifiers? 'set' NL* '(' (annotation | parameterModifier)* setterParameter ')' (NL* ':' NL* type_)? NL* functionBody
     ;
 
 typeAlias
-    : modifiers? 'typealias' NL* simpleIdentifier (NL* typeParameters)? NL* '=' NL* type
+    : modifiers? 'typealias' NL* simpleIdentifier (NL* typeParameters)? NL* '=' NL* type_
     ;
 
 typeParameters
@@ -219,7 +219,7 @@ typeParameters
     ;
 
 typeParameter
-    : typeParameterModifiers? NL* simpleIdentifier (NL* ':' NL* type)?
+    : typeParameterModifiers? NL* simpleIdentifier (NL* ':' NL* type_)?
     ;
 
 typeParameterModifiers
@@ -232,7 +232,7 @@ typeParameterModifier
     | annotation
     ;
 
-type
+type_
     : typeModifiers?
     ( parenthesizedType
     | nullableType
@@ -249,7 +249,7 @@ typeModifier
     ;
 
 parenthesizedType
-    : '(' NL* type NL* ')'
+    : '(' NL* type_ NL* ')'
     ;
 
 nullableType
@@ -262,7 +262,7 @@ typeReference
     ;
 
 functionType
-    : (receiverType NL* '.' NL*)? functionTypeParameters NL* '->' NL* type
+    : (receiverType NL* '.' NL*)? functionTypeParameters NL* '->' NL* type_
     ;
 
 receiverType
@@ -286,7 +286,7 @@ simpleUserType
     ;
 
 functionTypeParameters
-    : '(' NL* (parameter | type)? (NL* ',' NL* (parameter | type))* NL* ')'
+    : '(' NL* (parameter | type_)? (NL* ',' NL* (parameter | type_))* NL* ')'
     ;
 
 typeConstraints
@@ -294,7 +294,7 @@ typeConstraints
     ;
 
 typeConstraint
-    : annotation* simpleIdentifier NL* ':' NL* type
+    : annotation* simpleIdentifier NL* ':' NL* type_
     ;
 
 block
@@ -347,7 +347,7 @@ comparison
     ;
 
 infixOperation
-    : elvisExpression (/* NO NL! */ inOperator NL* elvisExpression | isOperator NL* type)*
+    : elvisExpression (/* NO NL! */ inOperator NL* elvisExpression | isOperator NL* type_)*
     ;
 
 elvisExpression
@@ -371,7 +371,7 @@ multiplicativeExpression
     ;
 
 asExpression
-    : prefixUnaryExpression (NL* asOperator NL* type)?
+    : prefixUnaryExpression (NL* asOperator NL* type_)?
     ;
 
 prefixUnaryExpression
@@ -439,7 +439,7 @@ typeArguments
     ;
 
 typeProjection
-    : typeProjectionModifiers? type | '*'
+    : typeProjectionModifiers? type_ | '*'
     ;
 
 typeProjectionModifiers
@@ -536,14 +536,14 @@ lambdaParameters
 
 lambdaParameter
     : variableDeclaration
-    | multiVariableDeclaration (NL* COLON NL* type)?
+    | multiVariableDeclaration (NL* COLON NL* type_)?
     ;
 
 anonymousFunction
     : 'fun'
-    (NL* type NL* '.')?
+    (NL* type_ NL* '.')?
     NL* functionValueParameters
-    (NL* ':' NL* type)?
+    (NL* ':' NL* type_)?
     (NL* typeConstraints)?
     (NL* functionBody)?
     ;
@@ -564,7 +564,7 @@ thisExpression
     ;
 
 superExpression
-    : 'super' ('<' NL* type NL* '>')? ('@' simpleIdentifier)?
+    : 'super' ('<' NL* type_ NL* '>')? ('@' simpleIdentifier)?
     | SUPER_AT
     ;
 
@@ -598,7 +598,7 @@ rangeTest
     ;
 
 typeTest
-    : isOperator NL* type
+    : isOperator NL* type_
     ;
 
 tryExpression

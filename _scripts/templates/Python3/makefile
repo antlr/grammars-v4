@@ -18,7 +18,7 @@ clean:
 run:
 	python Program.py $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
-	java -jar $(JAR) -Dlanguage=Python3 $\<
+	java -jar $(JAR) -Dlanguage=Python3 <antlr_tool_args:{y | <y> } > $\<
 } >
 test:
 	bash test.sh

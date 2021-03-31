@@ -6,6 +6,103 @@ import 'package:antlr4/antlr4.dart';
 import 'dart:io';
 import 'dart:convert';
 
+<if (case_insensitive_type)>
+
+class CaseChangingCharStream extends CharStream {
+        CharStream stream;
+        bool upper;
+
+	CaseChangingCharStream(CharStream str, bool up)
+	{
+		stream = str;
+		upper = up;
+	}
+
+	@override
+	int get index {
+		return stream.index;
+	}
+
+	@override
+	int get size {
+		return stream.size;
+	}
+
+//	@override
+//	void reset() {
+//		stream.reset();
+//	}
+
+	@override
+	void consume() {
+		stream.consume();
+	}
+
+	@override
+	int LA(int offset) {
+            int c = stream.LA(offset);
+
+            if (c \<= 0)
+            {
+                return c;
+            }
+
+            int o = c;
+            if (upper)
+            {
+                // Dart extremely painful--there is no simple function that
+                // maps a single character to upper-/lower- case. Do this the
+                // old fashion way to just get some damn thing working. I am
+                // not an expert at pouring over 1000's of web pages to find the
+                // function and SO has nothing.
+                if (97 \<= o && o \<= 122)
+                    o = o + (65 - 97);
+                return o;
+            }
+            else {
+                if (65 \<= o && o \<= 90)
+                    o = o + (97 - 65);
+                return o;
+            }
+	}
+
+	@override
+	int mark() {
+		return stream.mark();
+	}
+
+	@override
+	void release(int marker) {
+		stream.release(marker);
+	}
+
+	@override
+	void seek(int _index) {
+		stream.seek(_index);
+	}
+
+//	String getText(Interval interval)
+//	{
+//		this.stream.getText(interval);
+//	}
+
+	@override
+	String toString() {
+		return this.stream.toString();
+	}
+
+	@override
+	String get sourceName {
+		return stream.sourceName;
+	}
+
+@override
+    noSuchMethod(Invocation msg) => "got ${msg.memberName} "
+                      "with arguments ${msg.positionalArguments}";
+}
+
+<endif>
+
 void main(List\<String> args) async {
     var show_tree = false;
     var show_tokens = false;
@@ -48,6 +145,9 @@ void main(List\<String> args) async {
     {
         str = await InputStream.fromPath(file_name);        
     }
+<if (case_insensitive_type)>
+    str = CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
+<endif>
     var lexer = <lexer_name>(str);
     if (show_tokens)
     {

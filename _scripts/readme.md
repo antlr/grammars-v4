@@ -1,8 +1,59 @@
+# Testing Scripts
+
+This directory contains scripts for CI testing.
+
+* regtest.sh -- This script is a Bash-based script to test any target. To
+run, make sure you are at the root directory of grammar-vs/, then type `bash regtest.sh <target>` where `<target>` is CSharp, Java, Cpp, Dart, Go, or one
+of the other targets.
+
+* test.ps1 -- this is a Powershell script for testing, similar to regtest.sh.
+
+Both scripts use dotnet-antlr to generate a program from the pom.xml file
+in the grammar source. The tool generates a parser program for one of the target
+langauges, currently CSharp, Java, Cpp, Dart, Go, and Python. The generated
+code contains makefiles and Powershell files to present an idealized interface
+to build and run the parse with the examples, so you do not need to memorize how
+to build and run the parser for the given target.
+
+To build and run the parser using the makefiles, you must be in an environment
+that provides make and Bash. Ubuntu provides that out of the box; for Windows,
+you must use MinGW64, pacman install [make](https://packages.msys2.org/package/mingw-w64-x86_64-make)
+and provide a symbolic link to "make" once installed. I don't know why,
+but the package doesn't define just a plain old "make.exe" like a sane person would.
+
+    cd to a grammar directory, e.g., `cd abnf`.
+    dotnet-antlr -m true -t CSharp
+    make
+    make test
+
+You can look at the generated makefile to see what is exactly done.
+Makefiles are human readable, easy to understand, but only work on
+MinGW64 for Windows, or in a shell in Ubuntu. The makefiles do not set
+up your environment; you will need to do that yourself.
+
+For Windows or Ubuntu, you are very likely going to need to provide
+a "~/.dotnet-antlr.rc" file. For Windows, you will need to provide a full
+Windows path name for the Antlr jar file:
+
+	{
+	"antlr_tool_path" : "c:/users/kenne/downloads/antlr-4.9.2-complete.jar"
+	}
+
 # Templates for CI testing
 
-These are the templates for testing the grammars, which are used by
-[dotnet-antlr](https://github.com/kaby76/Antlr4BuildTasks/tree/master/dotnet-antlr)
-during the generation process.
+These are the templates for testing the grammars, which are used by the
+above scripts and
+[dotnet-antlr](https://github.com/kaby76/Antlr4BuildTasks/tree/master/dotnet-antlr).
+
+If you add or delete any files from the templates/ directory you should regenerate
+the file templates/files using `cd templates/; find . -type f > files`. Otherwise,
+the dotnet-antlr tool may not add the new template files into your generated code.
+
+## What version of dotnet-antlr do I use?
+
+You should take care to specify a version when installing the dotnet-antlr tool.
+I change the tool often, and there may be regressions. Currently version 3.0.10
+works well.
 
 ## Structure
 
@@ -61,17 +112,23 @@ Dotnet-antlr will construct and pass to the template evaluator the following att
 
 | Attribute | Type | Default |
 | ----- | ----- | ----- |
+| additional_sources | list<string> | This is a list of input files with the suffix for the target, e.g., all .cpp files for Cpp. |
 | antlr_tool_path | string | Ubuntu: "~/Downloads/antlr-4.9.1-complete.jar" Win: Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads/antlr-4.9.1-complete.jar" |
 | cap_start_symbol | string | same as `start_symbol`, but first letter capitalized |
 | cli_bash | bool | Ubuntu: true; Win: false |
 | cli_cmd | bool | Ubuntu: false; Win: true |
+| cmake_target | string | Win: '-G "MSYS Makefile"'; Ubuntu: '' |
+| exec_name | string | Ubuntu: Test; Win: Test.exe |
 | has_name_space | bool | only true if the pom.xml has non-empty `<packageName>` specified |
+| is_combined_grammar | bool | true if the grammar is a combined grammar. |
+| lexer_grammar_name | string | the name of the grammar file file, or just the combined grammar file name. |
 | lexer_name | string | from pom.xml `<grammarName>` + "Lexer" |
 | name_space | string | value in pom.xml `<packageName>` |
 | parser_name | string | from pom.xml `<grammarName>` + "Parser" |
 | path_sep_colon | bool | Ubuntu: true; Win: false |
 | path_sep_semi | bool | Ubuntu: false; Win: true |
 | start_symbol | string | from pom.xml `<entryPoint>` |
+| temp_dir | string | Win: c:/temp; Ubuntu: /tmp. This is used for the Cpp target |
 | tool_grammar_files | List<string> | computed; names of grammar files with relative path from output directory |
 | tool_grammar_tuples | { string GrammarFileName, string GeneratedFileName, string GrammarAutomName } | computed from `tool_grammar_files`, `parser_name`, `lexer_name`. Example: [{ "abbLexer.g4", "abbLexer.cs", "abbLexer" }, ...] |
 | version | string | version number of dotnet-antlr |
@@ -81,7 +138,7 @@ Dotnet-antlr will construct and pass to the template evaluator the following att
 To generate the driver code from templates for a grammar, you will need
 to have the NET SDK installed. Afterwards, install `dotnet-antlr`:
 
-    dotnet tool install -g dotnet-antlr --version 3.0.2
+    dotnet tool install -g dotnet-antlr --version 3.0.10
 
 To create a driver program:
 
