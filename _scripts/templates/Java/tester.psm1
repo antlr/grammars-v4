@@ -1,6 +1,6 @@
 function Build-Grammar {
 <tool_grammar_files:{x |
-    $g = antlr <x> -Dlanguage=Java
+    $g = antlr <x> -Dlanguage=Java <antlr_tool_args:{y | <y> } >
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g
