@@ -60,8 +60,11 @@ jobs:
       shell: pwsh
       run: |
         $resp = Invoke-WebRequest -MaximumRetryCount 5 -RetryIntervalSec 20 https://www.antlr.org/download/
+        if ($resp -eq $null -or $resp -eq "") {
+            Write-Error "Download of Antlr JAR list from https://www.antlr.org/download/ failed. Unknown reason."
+        }
         if($resp.StatusCode -ne 200) {
-            Write-Error "Get download list from https://www.antlr.org/download/ failed"
+            Write-Error "Download of Antlr JAR list from https://www.antlr.org/download/ failed"
             Write-Error "Error code $resp.StatusCode"
             return -1
         }
@@ -69,10 +72,8 @@ jobs:
         $latestJar = "antlr-$latest-complete.jar"
         echo $latestJar
         $resp = Invoke-WebRequest -MaximumRetryCount 5 -RetryIntervalSec 20 https://www.antlr.org/download/$latestJar -OutFile $latestJar
-        if($resp.StatusCode -ne 200) {
-            Write-Error "Get download of https://www.antlr.org/download/$latestJar failed"
-            Write-Error "Error code $resp.StatusCode"
-            return -1
+        if (-not ($resp -eq $null -or $resp -eq "")) {
+            Write-Error "Download of Antlr Jar failed. Unknown reason."
         }
         $antlrPath=Resolve-Path $latestJar
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
