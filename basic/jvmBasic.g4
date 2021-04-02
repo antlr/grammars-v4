@@ -335,7 +335,7 @@ number
    :  ('+' | '-')? (NUMBER | FLOAT)
    ;
 
-func
+func_
    : STRINGLITERAL
    | number
    | tabfunc
@@ -371,7 +371,7 @@ func
    ;
 
 signExpression
-   : NOT? (PLUS | MINUS)? func
+   : NOT? (PLUS | MINUS)? func_
    ;
 
 exponentExpression
@@ -391,7 +391,7 @@ relationalExpression
    ;
 
 expression
-   : func
+   : func_
    | (relationalExpression ((AND | OR) relationalExpression)*)
    ;
 
