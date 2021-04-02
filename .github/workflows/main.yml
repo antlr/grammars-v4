@@ -59,7 +59,7 @@ jobs:
     - name: Download ANTLR
       shell: pwsh
       run: |
-        $resp = Invoke-WebRequest https://www.antlr.org/download/
+        $resp = Invoke-WebRequest -MaximumRetryCount 5 -RetryIntervalSec 20 https://www.antlr.org/download/
         if($resp.StatusCode -ne 200) {
             Write-Error "Get download list failed"
             return -1
@@ -67,7 +67,11 @@ jobs:
         $latest = (Select-String "antlr-([.0-9]+)-complete.jar" -input $resp.Content -AllMatches | ForEach-Object {$_.matches} | ForEach-Object {[System.Version]$_.Groups[1].Value} | Sort-Object -Descending)[0].ToString()
         $latestJar = "antlr-$latest-complete.jar"
         echo $latestJar
-        Invoke-WebRequest https://www.antlr.org/download/$latestJar -OutFile $latestJar
+        $resp = Invoke-WebRequest -MaximumRetryCount 5 -RetryIntervalSec 20 https://www.antlr.org/download/$latestJar -OutFile $latestJar
+        if($resp.StatusCode -ne 200) {
+            Write-Error "Get Antlr JAR download failed"
+            return -1
+        }
         $antlrPath=Resolve-Path $latestJar
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
     - name: Install dotnet-antlr
