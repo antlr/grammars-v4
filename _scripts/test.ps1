@@ -7,7 +7,8 @@ function Get-GrammarSkipList {
             return @(
                 "_grammar-test",
                 "apex", "arithmetic", "asm/masm", "asn/asn_3gpp",
-                "calculator", "cpp", "csharp", "dice",
+                "calculator", "clif", "cpp", "csharp",
+		"dice",
                 "fortran77",
                 "haskell", "html", "hypertalk",
                 "idl",
@@ -31,6 +32,7 @@ function Get-GrammarSkipList {
         "Java" {
             return @(
                 "_grammar-test",
+		"clif",
                 "dice",
                 "html", "hypertalk", "javascript/ecmascript", "kotlin/kotlin", "kotlin/kotlin-formal", "lambda", "less", "metric", "molecule",
                 "p", "php", "powerbuilder",
@@ -42,7 +44,8 @@ function Get-GrammarSkipList {
         "JavaScript" {
             return @(
                 "_grammar-test",
-                "antlr/antlr2", "apex", "arithmetic", "asm/masm", "asn/asn_3gpp", "basic", "c", "cql3", "csharp", "dice", "fortran77", "golang",
+                "antlr/antlr2", "apex", "arithmetic", "asm/masm", "asn/asn_3gpp",
+		"basic", "c", "cql3", "clif", "csharp", "dice", "fortran77", "golang",
                 "haskell", "html", "hypertalk", "idl", "java/java", "java/java9", "javadoc", "javascript/ecmascript", "javascript/javascript", "javascript/jsx", "javascript/typescript",
                 "kotlin/kotlin", "lambda", "less", "logo/ucb-logo", "lua",
                 "matlab", "metric", "molecule", "p", "pcre", "pgn", "php", "pike", "powerbuilder", "promql",
@@ -59,6 +62,7 @@ function Get-GrammarSkipList {
                 "apex", "arithmetic",
                 "asm/asmMASM", "asm/asmZ80", "asm/masm", "asm/pdp7",
                 "asn/asn_3gpp",
+		"clif",
                 "cpp", "csharp",
                 "dice",
                 "edif300", "edn", "erlang",
@@ -93,6 +97,7 @@ function Get-GrammarSkipList {
 		"apex",
                 "asm/asmMASM", "asm/masm",
 		"asn/asn_3gpp",
+		"clif",
                 "cpp", "cql3", "csharp", "css3",
                 "dice", "dot",
                 "edif300", "edn", "erlang",
@@ -124,6 +129,7 @@ function Get-GrammarSkipList {
 		"apex",
 		"asm/masm", "asn/asn_3gpp",
 		"atl",
+		"clif",
 		"csharp",
                 "dart2",
 		"dice",

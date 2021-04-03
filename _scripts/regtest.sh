@@ -27,6 +27,7 @@ case "$target" in
     Cpp)
         do_not_do_list=" \
 kirikiri-tjs \
+clif \
         "
         ;;
 
@@ -34,6 +35,7 @@ kirikiri-tjs \
         do_not_do_list="_grammar-test apex \
 arithmetic asm/masm asn/asn_3gpp \
 calculator cpp csharp \
+clif \
 dcm dgol dice \
 erlang \
 fortran77 \
@@ -66,6 +68,7 @@ z \
         do_not_do_list="_grammar-test \
 antlr/antlr2 antlr/antlr3 antlr/antlr4 \
 apex asm/masm asn/asn_3gpp \
+clif \
 csharp \
 dcm dgol dice \
 erlang \
@@ -97,23 +100,27 @@ z \
 
     Go)
         do_not_do_list=" \
+clif \
 kirikiri-tjs \
         "
         ;;
 
     Java)
         do_not_do_list=" \
+clif \
         "
         ;;
 
     JavaScript)
         do_not_do_list=" \
+clif \
 antlr/antlr2 apex arithmetic asm/masm asn/asn_3gpp basic c cql3 csharp \
 	"
         ;;
 
     Python)
         do_not_do_list=" \
+clif \
 antlr/antlr2 antlr/antlr3 antlr/antlr4 apex asm/asmMASM asm/masm asn/asn_3gpp cpp csharp kirikiri-tjs \
         "
         ;;
@@ -238,7 +245,7 @@ part1()
 {
 	date
 	dotnet tool uninstall -g dotnet-antlr
-	dotnet tool install -g dotnet-antlr --version 3.1.3
+	dotnet tool install -g dotnet-antlr --version 3.1.4
 	dotnet tool uninstall -g csxml2
 	dotnet tool install -g csxml2 --version 1.0.0
 	# 1) Generate driver source code from poms.
