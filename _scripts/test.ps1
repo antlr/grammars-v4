@@ -7,8 +7,7 @@ function Get-GrammarSkipList {
             return @(
                 "_grammar-test",
                 "apex", "arithmetic", "asm/masm", "asn/asn_3gpp",
-                "bcpl",
-                "cpp", "csharp", "dice",
+                "calculator", "cpp", "csharp", "dice",
                 "fortran77",
                 "haskell", "html", "hypertalk",
                 "idl",
@@ -31,7 +30,8 @@ function Get-GrammarSkipList {
         }
         "Java" {
             return @(
-                "antlr/antlr4", "arithmetic", "asm/masm", "bcpl", "cobol85", "csharp", "dice",
+                "_grammar-test",
+                "dice",
                 "html", "hypertalk", "javascript/ecmascript", "kotlin/kotlin", "kotlin/kotlin-formal", "lambda", "less", "metric", "molecule",
                 "p", "php", "powerbuilder",
                 "python/python2", "python/python3-js", "python/python3-py", "python/python3-ts", "python/python3-without-actions", "python/tiny-python", 
@@ -41,7 +41,8 @@ function Get-GrammarSkipList {
         }
         "JavaScript" {
             return @(
-                "antlr/antlr2", "antlr/antlr4", "apex", "arithmetic", "asm/masm", "asn/asn_3gpp", "basic", "bcpl", "c", "cql3", "csharp", "dice", "fortran77", "golang",
+                "_grammar-test",
+                "antlr/antlr2", "apex", "arithmetic", "asm/masm", "asn/asn_3gpp", "basic", "c", "cql3", "csharp", "dice", "fortran77", "golang",
                 "haskell", "html", "hypertalk", "idl", "java/java", "java/java9", "javadoc", "javascript/ecmascript", "javascript/javascript", "javascript/jsx", "javascript/typescript",
                 "kotlin/kotlin", "lambda", "less", "logo/ucb-logo", "lua",
                 "matlab", "metric", "molecule", "p", "pcre", "pgn", "php", "pike", "powerbuilder", "promql",
@@ -52,13 +53,13 @@ function Get-GrammarSkipList {
         }
         "Go" {
             return @(
-                "abb", "algol60",
+                "_grammar-test",
+		"algol60",
                 "antlr/antlr2", "antlr/antlr3", "antlr/antlr4",
                 "apex", "arithmetic",
-                "asm/asm6502", "asm/asm8080", "asm/asm8086", "asm/asmMASM", "asm/asmZ80", "asm/masm", "asm/pdp7",
+                "asm/asmMASM", "asm/asmZ80", "asm/masm", "asm/pdp7",
                 "asn/asn_3gpp",
-                "basic", "bcpl",
-                "calculator", "capnproto", "clojure", "cobol85", "cpp", "cql3", "csharp", "css3",
+                "cpp", "csharp",
                 "dice",
                 "edif300", "edn", "erlang",
                 "flatbuffers", "focal", "fortran77",
@@ -86,10 +87,13 @@ function Get-GrammarSkipList {
                 "z")
         }
         "Python3" {
-            return @("abb", "algol60", "antlr/antlr2", "antlr/antlr3", "antlr/antlr4", "apex", "arithmetic",
-                "asm/asmMASM", "asm/masm", "asn/asn", "asn/asn_3gpp",
-                "bcpl", "bnf", "brainfuck", "brainflak",
-                "capnproto", "clojure", "cmake", "cpp", "cql3", "csharp", "css3",
+            return @(
+                "_grammar-test",
+		"antlr/antlr2", "antlr/antlr3", "antlr/antlr4",
+		"apex",
+                "asm/asmMASM", "asm/masm",
+		"asn/asn_3gpp",
+                "cpp", "cql3", "csharp", "css3",
                 "dice", "dot",
                 "edif300", "edn", "erlang",
                 "flatbuffers", "focal", "fortran77",
@@ -114,10 +118,15 @@ function Get-GrammarSkipList {
                 "z")
         }
         "Dart" {
-            return @("antlr/antlr2", "antlr/antlr3", "antlr/antlr4", "apex", "arithmetic", "asm/masm", "asn/asn_3gpp", "atl",
-                "bcpl", "bnf",
-                "clif", "clojure", "creole", "csharp", "css3",
-                "dart2", "dice",
+            return @(
+                "_grammar-test",
+		"antlr/antlr2", "antlr/antlr3", "antlr/antlr4",
+		"apex",
+		"asm/masm", "asn/asn_3gpp",
+		"atl",
+		"csharp",
+                "dart2",
+		"dice",
                 "edif300", "edn", "erlang",
                 "focal", "fortran77", "fusion-tables",
                 "gff3", "golang",
