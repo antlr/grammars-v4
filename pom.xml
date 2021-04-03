@@ -90,7 +90,6 @@
 				<module>calculator</module>
 				<module>capnproto</module>
 				<module>clf</module>
-				<module>clif</module>
 				<module>clojure</module>
 				<module>clu</module>
 				<module>cmake</module>
