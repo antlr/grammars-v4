@@ -994,14 +994,14 @@ queryExpressionNointo
 
 querySpecification
     : SELECT selectSpec* selectElements selectIntoExpression?
-      fromClause? orderByClause? limitClause?
+      fromClause? groupByClause? havingClause? orderByClause? limitClause?
     | SELECT selectSpec* selectElements
-    fromClause? orderByClause? limitClause? selectIntoExpression?
+    fromClause? groupByClause? havingClause? orderByClause? limitClause? selectIntoExpression?
     ;
 
 querySpecificationNointo
     : SELECT selectSpec* selectElements
-      fromClause? orderByClause? limitClause?
+      fromClause? groupByClause? havingClause? orderByClause? limitClause?
     ;
 
 unionParenthesis
@@ -1064,12 +1064,16 @@ selectLinesInto
 fromClause
     : FROM tableSources
       (WHERE whereExpr=expression)?
-      (
-        GROUP BY
+    ;
+
+groupByClause
+    :  GROUP BY
         groupByItem (',' groupByItem)*
         (WITH ROLLUP)?
-      )?
-      (HAVING havingExpr=expression)?
+    ;
+
+havingClause
+    :  HAVING havingExpr=expression
     ;
 
 groupByItem

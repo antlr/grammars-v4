@@ -20,11 +20,11 @@ public class Program
     public static IParseTree Parse(string input)
     {
         var str = new AntlrInputStream(input);
-        var lexer = new <lexer_name>(str);
+        var lexer = new Test.<lexer_name>(str);
         Lexer = lexer;
         var tokens = new CommonTokenStream(lexer);
         TokenStream = tokens;
-        var parser = new <parser_name>(tokens);
+        var parser = new Test.<parser_name>(tokens);
         Parser = parser;
         var tree = parser.<start_symbol>();
         Tree = tree;
@@ -76,7 +76,10 @@ public class Program
             FileStream fs = new FileStream(file_name, FileMode.Open);
             str = new Antlr4.Runtime.AntlrInputStream(fs);
         }
-        var lexer = new <lexer_name>(str);
+<if (case_insensitive_type)>
+        str = new Antlr4.Runtime.CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
+< endif >
+        var lexer = new Test.<lexer_name>(str);
         if (show_tokens)
         {
             StringBuilder new_s = new StringBuilder();
@@ -93,7 +96,7 @@ public class Program
             lexer.Reset();
         }
         var tokens = new CommonTokenStream(lexer);
-        var parser = new <parser_name>(tokens);
+        var parser = new Test.<parser_name>(tokens);
         DateTime before = DateTime.Now;
         var tree = parser.<start_symbol>();
         DateTime after = DateTime.Now;

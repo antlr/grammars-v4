@@ -5,6 +5,7 @@ const require = createRequire(import.meta.url);
 const antlr4 = require('antlr4');
 <tool_grammar_tuples: {x | import <x.GrammarAutomName> from './<x.GeneratedFileName>';
 } >
+import CaseChangingStream from './CaseChangingStream.js';
 const strops = require('typescript-string-operations');
 let fs = require('fs-extra')
 
@@ -66,6 +67,9 @@ if (input == null && file_name == null)
     str = antlr4.CharStreams.fromPathSync(file_name, 'utf8');
 }
 var num_errors = 0;
+<if (case_insensitive_type) >
+str = new CaseChangingStream(str, "<case_insensitive_type>" === "Upper");
+<endif>
 const lexer = new <lexer_name>(str);
 lexer.strictMode = false;
 const tokens = new antlr4.CommonTokenStream(lexer);

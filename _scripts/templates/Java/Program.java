@@ -40,6 +40,9 @@ public class Program {
         {
             str = CharStreams.fromFileName(file_name);
         }
+<if (case_insensitive_type)>
+        str = new CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
+<endif>
         <lexer_name> lexer = new <lexer_name>(str);
         if (show_tokens)
         {

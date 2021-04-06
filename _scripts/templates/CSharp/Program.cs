@@ -62,6 +62,9 @@ public class Program
         {
             str = CharStreams.fromPath(file_name);
         }
+<if (case_insensitive_type)>
+        str = new Antlr4.Runtime.CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
+<endif>
         var lexer = new <lexer_name>(str);
         if (show_tokens)
         {

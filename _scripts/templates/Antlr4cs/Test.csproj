@@ -28,7 +28,7 @@
     -->
     \<MyTester>\<![CDATA[
 err=0
-for g in ../examples/*
+for g in `find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
 do
   file=$g
   x1="${g##*.}"
@@ -63,7 +63,7 @@ exit $err
     -->
     \<MyTester>\<![CDATA[
 set ERR=0
-for %%G in (..\examples\*) do (
+for %%G in (..\\<example_files_win>\*) do (
   setlocal EnableDelayedExpansion
   set FILE=%%G
   set X1=%%~xG

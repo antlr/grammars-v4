@@ -9,4 +9,4 @@ clean:
 	dotnet clean
 	rm -rf bin obj
 test:
-	dotnet run -t:test
+	dotnet build -t:test
