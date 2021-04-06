@@ -124,8 +124,8 @@ WS : [ \r\n] -> channel(HIDDEN) ;
 Rem : 'REM' ;
 Eqv : 'EQV' ;
 Neqv : 'NEQV' ;
-True : 'TRUE' ;
-False : 'FALSE' ;
+True_ : 'TRUE' ;
+False_ : 'FALSE' ;
 Table : 'TABLE' ;
 
 Left_dollar_open : '$(' ;

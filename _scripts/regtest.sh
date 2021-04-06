@@ -27,14 +27,15 @@ case "$target" in
     Cpp)
         do_not_do_list=" \
 kirikiri-tjs \
+clif \
         "
         ;;
 
     CSharp)
-        do_not_do_list="_grammar-test acme apex apt \
-arithmetic asm/masm asn/asn_3gpp atl \
-basic \
-calculator capnproto cpp csharp cto \
+        do_not_do_list="_grammar-test apex \
+arithmetic asm/masm asn/asn_3gpp \
+calculator cpp csharp \
+clif \
 dcm dgol dice \
 erlang \
 fortran77 \
@@ -64,29 +65,63 @@ z \
         ;;
 
     Dart)
-	todo_pattern="(.*(abb|sql/mysql))/\$"
+        do_not_do_list="_grammar-test \
+antlr/antlr2 antlr/antlr3 antlr/antlr4 \
+apex asm/masm asn/asn_3gpp \
+clif \
+csharp \
+dcm dgol dice \
+erlang \
+fortran77 \
+graphql gtin \
+haskell html http hypertalk \
+idl infosapient \
+java/java9 javadoc javascript/ecmascript javascript/jsx joss \
+kirikiri-tjs kotlin/kotlin \
+logo/logo logo/ucb-logo lpc \
+molecule morsecode \
+objc \
+pddl pgn php pike pmmn powerbuilder python/python2 python/python2-js \
+python/python3 python/python3-js python/python3-py python/python3-ts \
+python/python3-without-actions python/python3alt python/tiny-python \
+rcs rego restructuredtext rexx rfc1035 rfc1960 rfc3080 \
+sharc smiles sql/hive sql/mysql sql/plsql sql/sqlite sql/tsql \
+stacktrace stringtemplate swift-fin swift/swift2 swift/swift3 \
+tcpheader terraform thrift \
+unicode/unicode16 \
+v \
+wat \
+xpath/xpath31 \
+z \
+        "
+	todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n\r/ /' | sed 's/  / /g' | sed 's/ /|/g'`)/\$)"
 	echo $todo_pattern
         ;;
 
     Go)
         do_not_do_list=" \
+clif \
 kirikiri-tjs \
         "
         ;;
 
     Java)
         do_not_do_list=" \
+clif \
         "
         ;;
 
     JavaScript)
         do_not_do_list=" \
-        "
+clif \
+antlr/antlr2 apex arithmetic asm/masm asn/asn_3gpp basic c cql3 csharp \
+	"
         ;;
 
     Python)
         do_not_do_list=" \
-kirikiri-tjs \
+clif \
+antlr/antlr2 antlr/antlr3 antlr/antlr4 apex asm/asmMASM asm/masm asn/asn_3gpp cpp csharp kirikiri-tjs \
         "
         ;;
 
@@ -210,7 +245,7 @@ part1()
 {
 	date
 	dotnet tool uninstall -g dotnet-antlr
-	dotnet tool install -g dotnet-antlr --version 3.1.3
+	dotnet tool install -g dotnet-antlr --version 3.1.5
 	dotnet tool uninstall -g csxml2
 	dotnet tool install -g csxml2 --version 1.0.0
 	# 1) Generate driver source code from poms.

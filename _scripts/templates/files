@@ -2,6 +2,7 @@
 ./Antlr4cs/makefile
 ./Antlr4cs/Program.cs
 ./Antlr4cs/Test.csproj
+./Antlr4cs/test.sh
 ./Arithmetic.g4
 ./Cpp/CaseChangingCharStream.cpp
 ./Cpp/CaseChangingCharStream.h
@@ -23,6 +24,7 @@
 ./CSharp/makefile
 ./CSharp/Program.cs
 ./CSharp/Test.csproj
+./CSharp/test.sh
 ./CSharp/tester.psm1
 ./Dart/analysis_options.yaml
 ./Dart/cli.dart
@@ -35,16 +37,19 @@
 ./Go/makefile
 ./Go/Program.go
 ./Go/test.sh
+./Go/tester.psm1
 ./Java/CaseChangingCharStream.java
 ./Java/ErrorListener.java
 ./Java/makefile
 ./Java/Program.java
 ./Java/test.sh
+./Java/tester.psm1
 ./JavaScript/CaseChangingStream.js
 ./JavaScript/index.js
 ./JavaScript/makefile
 ./JavaScript/package.json
 ./JavaScript/test.sh
+./JavaScript/tester.psm1
 ./Python3/CaseChangingStream.py
 ./Python3/makefile
 ./Python3/Program.py
