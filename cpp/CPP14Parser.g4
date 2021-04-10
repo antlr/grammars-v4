@@ -329,8 +329,13 @@ declSpecifier:
 	| Friend
 	| Typedef
 	| Constexpr;
-
+	
+paramDeclSpecifier:
+	typeSpecifier;
+	
 declSpecifierSeq: declSpecifier+ attributeSpecifierSeq?;
+
+paramDeclSpecifierSeq: cvqualifierseq? paramDeclSpecifier attributeSpecifierSeq?;
 
 storageClassSpecifier:
 	Register
@@ -556,7 +561,7 @@ parameterDeclarationList:
 	parameterDeclaration (Comma parameterDeclaration)*;
 
 parameterDeclaration:
-	attributeSpecifierSeq? declSpecifierSeq (
+	attributeSpecifierSeq? paramDeclSpecifierSeq (
 		(declarator | abstractDeclarator?) (
 			Assign initializerClause
 		)?
@@ -816,3 +821,4 @@ literal:
 	| BooleanLiteral
 	| PointerLiteral
 	| UserDefinedLiteral;
+	
