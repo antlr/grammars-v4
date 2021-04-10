@@ -364,21 +364,27 @@ typeSpecifierSeq: typeSpecifier+ attributeSpecifierSeq?;
 trailingTypeSpecifierSeq:
 	trailingTypeSpecifier+ attributeSpecifierSeq?;
 
+simpleTypeLengthModifier:
+	Short
+	| Long;
+	
+simpleTypeSignednessModifier:
+	Unsigned
+	| Signed;
+
 simpleTypeSpecifier:
 	nestedNameSpecifier? theTypeName
 	| nestedNameSpecifier Template simpleTemplateId
+	| simpleTypeSignednessModifier
+	| simpleTypeSignednessModifier? simpleTypeLengthModifier+
 	| Char
 	| Char16
 	| Char32
 	| Wchar
 	| Bool
-	| Short
-	| Int
-	| Long
-	| Signed
-	| Unsigned
+	| simpleTypeSignednessModifier? simpleTypeLengthModifier* Int
 	| Float
-	| Double
+	| simpleTypeLengthModifier? Double
 	| Void
 	| Auto
 	| decltypeSpecifier;
