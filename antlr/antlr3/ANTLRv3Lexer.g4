@@ -134,7 +134,7 @@ fragment XDIGIT
 
 BEGIN_ARGUMENT
    : LBrack
-   { handleBeginArgument(); }
+   { this.handleBeginArgument(); }
    ;
 
 // -------------------------
@@ -415,7 +415,7 @@ ARGUMENT_CHAR_LITERAL
 
 END_ARGUMENT
    : RBrack
-   { handleEndArgument(); }
+   { this.handleEndArgument(); }
    ;
    // added this to return non-EOF token type here. EOF does something weird
 
@@ -468,7 +468,7 @@ ACTION_LINE_COMMENT
 
 END_ACTION
    : RBrace
-   { handleEndAction(); }
+   { this.handleEndAction(); }
    ;
 
 UNTERMINATED_ACTION
@@ -496,7 +496,7 @@ OPT_LINE_COMMENT
 
 OPT_LBRACE
    : LBrace
-   { handleOptionsLBrace(); }
+   { this.handleOptionsLBrace(); }
    ;
 
 OPT_RBRACE

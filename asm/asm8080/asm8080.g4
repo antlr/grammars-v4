@@ -88,7 +88,7 @@ argument
    | register_
    | dollar
    | name
-   | string
+   | string_
    | ('(' expression ')')
    ;
 
@@ -96,7 +96,7 @@ dollar
    : '$'
    ;
 
-string
+string_
    : STRING
    ;
 

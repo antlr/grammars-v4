@@ -179,7 +179,7 @@ commonBlock
    ;
 
 typeStatement
-   : typename typeStatementNameList
+   : typename_ typeStatementNameList
    | characterWithLen typeStatementNameCharList
    ;
 
@@ -204,12 +204,12 @@ typeStatementLenSpec
    : STAR lenSpecification
    ;
 
-typename
+typename_
    : (REAL | COMPLEX (STAR ICON?)? | DOUBLE COMPLEX | DOUBLE PRECISION | INTEGER | LOGICAL | CHARACTER)
    ;
 
 type
-   : typename
+   : typename_
    | characterWithLen
    ;
 

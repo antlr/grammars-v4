@@ -8,10 +8,11 @@
 	<name>ANTLR4 grammars</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<target.jvm>1.7</target.jvm>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
 		<antlr.version>4.9.1</antlr.version>
 		<antlr4test-maven-plugin.version>1.17</antlr4test-maven-plugin.version>
-		<junit.version>4.13.1</junit.version>
+		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
 		<maven>3.1.0</maven>
@@ -46,17 +47,15 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>${target.jvm}</source>
-					<target>${target.jvm}</target>
-				</configuration>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<profiles>
 		<profile>
@@ -82,6 +81,7 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
+				<module>bcpl</module>
 				<module>bibcode</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
@@ -90,7 +90,6 @@
 				<module>calculator</module>
 				<module>capnproto</module>
 				<module>clf</module>
-				<module>clif</module>
 				<module>clojure</module>
 				<module>clu</module>
 				<module>cmake</module>
@@ -126,6 +125,7 @@
 				<module>gedcom</module>
 				<module>gff3</module>
 				<module>gml</module>
+				<module>golang</module>
 				<module>graphql</module>
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
@@ -191,7 +191,6 @@
 				<module>pcre</module>
 				<module>pddl</module>
 				<module>pdn</module>
-				<module>pdp7</module>
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
@@ -224,6 +223,7 @@
 				<module>romannumerals</module>
 				<module>rpn</module>
 				<module>ruby</module>
+				<module>rust</module>
 				<module>scala</module>
 				<module>scotty</module>
 				<module>scss</module>

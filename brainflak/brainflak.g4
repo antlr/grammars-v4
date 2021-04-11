@@ -28,7 +28,7 @@
 */
 grammar brainflak;
 
-file
+file_
    : statement+
    ;
 

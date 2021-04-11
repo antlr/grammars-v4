@@ -32,10 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar ttm;
 
 program
-   : function* EOF?
+   : function_* EOF?
    ;
 
-function
+function_
    : active
    | neutral
    ;
@@ -53,8 +53,8 @@ arglist
    ;
 
 arg
-   : function
-   | ('<' function '>')
+   : function_
+   | ('<' function_ '>')
    | string
    ;
 

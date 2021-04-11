@@ -1,6 +1,7 @@
 using Antlr4.Runtime;
 using System.Collections.Generic;
-using static JavaScriptParseTree.JavaScriptParser;
+using System.IO;
+using static JavaScriptParser;
 
 /// <summary>
 /// All lexer methods that used in grammar (IsStrictMode)
@@ -30,6 +31,10 @@ public abstract class JavaScriptLexerBase : Lexer
 
     public JavaScriptLexerBase(ICharStream input)
         : base(input)
+    {
+    }
+
+    public JavaScriptLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput) : this(input)
     {
     }
 

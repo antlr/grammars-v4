@@ -54,7 +54,7 @@ prefixDecl
     ;
 
 selectQuery
-    : 'SELECT' ( 'DISTINCT' | 'REDUCED' )? ( var+ | '*' ) datasetClause* whereClause solutionModifier
+    : 'SELECT' ( 'DISTINCT' | 'REDUCED' )? ( var_+ | '*' ) datasetClause* whereClause solutionModifier
     ;
 
 constructQuery
@@ -103,7 +103,7 @@ orderClause
 
 orderCondition
     : ( ( 'ASC' | 'DESC' ) brackettedExpression )
-    | ( constraint | var )
+    | ( constraint | var_ )
     ;
 
 limitClause
@@ -205,15 +205,15 @@ graphNode
     ;
 
 varOrTerm
-    : var
+    : var_
     | graphTerm
     ;
 
 varOrIRIref
-    : var | iriRef
+    : var_ | iriRef
     ;
 
-var
+var_
     : VAR1
     | VAR2
     ;
@@ -267,7 +267,7 @@ unaryExpression
     ;
 
 primaryExpression
-    : brackettedExpression | builtInCall | iriRefOrFunction | rdfLiteral | numericLiteral | booleanLiteral | var
+    : brackettedExpression | builtInCall | iriRefOrFunction | rdfLiteral | numericLiteral | booleanLiteral | var_
     ;
 
 brackettedExpression
@@ -279,7 +279,7 @@ builtInCall
     | 'LANG' '(' expression ')'
     | 'LANGMATCHES' '(' expression ',' expression ')'
     | 'DATATYPE' '(' expression ')'
-    | 'BOUND' '(' var ')'
+    | 'BOUND' '(' var_ ')'
     | 'sameTerm' '(' expression ',' expression ')'
     | 'isIRI' '(' expression ')'
     | 'isURI' '(' expression ')'
