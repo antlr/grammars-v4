@@ -59,7 +59,7 @@ primaryConstructor
     ;
 
 classParameters
-    : '(' NL* (classParameter (NL* ',' NL* classParameter)*)? NL* ')'
+    : '(' NL* (classParameter (NL* ',' NL* classParameter)*)? NL* ','? ')'
     ;
 
 classParameter
@@ -139,7 +139,7 @@ functionDeclaration
     ;
 
 functionValueParameters
-    : '(' NL* (functionValueParameter (NL* ',' NL* functionValueParameter)*)? NL* ')'
+    : '(' NL* (functionValueParameter (NL* ',' NL* functionValueParameter)*)? NL* ','? ')'
     ;
 
 functionValueParameter
@@ -215,7 +215,7 @@ typeAlias
     ;
 
 typeParameters
-    : '<' NL* typeParameter (NL* ',' NL* typeParameter)* NL* '>'
+    : '<' NL* typeParameter (NL* ',' NL* typeParameter)* NL* ','? '>'
     ;
 
 typeParameter
@@ -431,11 +431,11 @@ annotatedLambda
 
 valueArguments
     : '(' NL* ')'
-    | '(' NL* valueArgument (NL* ',' NL* valueArgument)* NL* ')'
+    | '(' NL* valueArgument (NL* ',' NL* valueArgument)* NL* ','? ')'
     ;
 
 typeArguments
-    : '<' NL* typeProjection (NL* ',' NL* typeProjection)* NL* '>'
+    : '<' NL* typeProjection (NL* ',' NL* typeProjection)* NL* ','? '>'
     ;
 
 typeProjection
@@ -477,7 +477,7 @@ parenthesizedExpression
     ;
 
 collectionLiteral
-    : '[' NL* expression (NL* ',' NL* expression)* NL* ']'
+    : '[' NL* expression (NL* ',' NL* expression)* NL* ','? ']'
     | '[' NL* ']'
     ;
 
@@ -531,7 +531,7 @@ lambdaLiteral // anonymous functions?
     ;
 
 lambdaParameters
-    : lambdaParameter (NL* COMMA NL* lambdaParameter)*
+    : lambdaParameter (NL* COMMA NL* lambdaParameter)* COMMA?
     ;
 
 lambdaParameter
