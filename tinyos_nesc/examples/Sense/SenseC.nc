@@ -42,6 +42,7 @@
  * @author Jan Hauer
  */
 
+
 #include "Timer.h"
 
 module SenseC
