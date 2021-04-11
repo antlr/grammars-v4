@@ -130,3 +130,12 @@ select CONVERT( LEFT( CONVERT( '自動下書き' USING binary ), 100 ) USING utf
 select CONVERT( LEFT( CONVERT( '自動' USING binary ), 6 ) USING utf8 ) AS x_0;
 select  t.*, tt.* FROM wptests_terms AS t  INNER JOIN wptests_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN ('category') AND t.name IN ('远征手记') ORDER BY t.name ASC;
 #end
+SELECT trigger.num FROM test `trigger`;
+-- Valid when SELECT is in stored procedure
+SELECT * FROM test LIMIT LIMIT1,LIMIT2;
+-- SCHEMA as a function name
+SELECT SCHEMA();
+-- Functions
+SELECT mod(3,2);SELECT * FROM TEST WHERE TB_SCHEMA = SCHEMA();
+-- Group By with computed column
+SELECT 1 AS col1, t1.Id FROM t1 GROUP BY col1;

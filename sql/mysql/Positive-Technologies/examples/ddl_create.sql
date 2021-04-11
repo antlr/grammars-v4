@@ -28,7 +28,20 @@ create table ts_table(
   ts6 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP(),
   ts7 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE NOW(),
   ts8 TIMESTAMP(6) NOT NULL,
-  ts9 TIMESTAMP(6) NOT NULL DEFAULT NOW(6) ON UPDATE NOW(6)
+  ts9 TIMESTAMP(6) NOT NULL DEFAULT NOW(6) ON UPDATE NOW(6),
+  ts10 TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  ts11 TIMESTAMP NOT NULL DEFAULT '2038-01-01 00:00:00' ON UPDATE CURRENT_TIMESTAMP
+);
+create table dt_table(
+  dt1 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  dt2 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIME,
+  dt3 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP,
+  dt4 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(),
+  dt5 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIME(),
+  dt6 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE LOCALTIMESTAMP(),
+  dt7 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE NOW(),
+  dt10 DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  dt11 DATETIME DEFAULT '2038-01-01 00:00:00' ON UPDATE CURRENT_TIMESTAMP
 );
 create table with_check (c1 integer not null,c2 varchar(22),constraint c1 check (c2 in ('a', 'b', 'c')));
 CREATE TABLE genvalue1 (id binary(16) NOT NULL, val char(32) GENERATED ALWAYS AS (hex(id)) STORED, PRIMARY KEY (id));
@@ -52,6 +65,12 @@ create table table_with_character_set_eq (id int, data varchar(50)) character se
 create table table_with_character_set (id int, data varchar(50)) character set default;
 create table table_with_visible_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC) INVISIBLE VISIBLE);
 create table table_with_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQUE` (`data` ASC));
+create table blob_test(id int, col1 blob(45));
+create table žluťoučký (kůň int);
+create table column_names_as_aggr_funcs(min varchar(100), max varchar(100), sum varchar(100), count varchar(100));
+CREATE TABLE char_table (c1 CHAR VARYING(10), c2 CHARACTER VARYING(10), c3 NCHAR VARYING(10));
+create table rack_shelf_bin ( id int unsigned not null auto_increment unique primary key, bin_volume decimal(20, 4) default (bin_len * bin_width * bin_height));
+CREATE TABLE `tblSRCHjob_desc` (`description_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT, `description` mediumtext NOT NULL, PRIMARY KEY (`description_id`)) ENGINE=TokuDB AUTO_INCREMENT=4095997820 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=TOKUDB_QUICKLZ;
 #end
 #begin
 -- Rename table
@@ -246,6 +265,9 @@ CREATE TABLE `tab1` (
   mi MIDDLEINT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 #end
+-- Comments
+-- SELECT V_PAYABLE_AMT, DIS_ADJUST_TOTAL_PAYABLE;
+--	SELECT V_PAYABLE_AMT, DIS_ADJUST_TOTAL_PAYABLE;
 #begin
 -- Create procedure
 -- The default value for local variables in a DECLARE statement should be an expression
@@ -256,5 +278,15 @@ BEGIN
   DECLARE var1 INT unsigned default 1;
   DECLARE var2 TIMESTAMP default CURRENT_TIMESTAMP;
   DECLARE var3 INT unsigned default 2 + var1;
+END -- //-- delimiter ;
+#end
+-- Create procedure
+-- delimiter //
+CREATE PROCEDURE makesignal(p1 INT)
+BEGIN
+  DECLARE error_text VARCHAR(255);
+  IF (error_text != 'OK') THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_text;
+  END IF;
 END -- //-- delimiter ;
 #end

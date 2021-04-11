@@ -32,21 +32,21 @@ filter
    ;
 
 filtercomp
-   : and
-   | or
-   | not
+   : and_
+   | or_
+   | not_
    | item
    ;
 
-and
+and_
    : '&' filterlist
    ;
 
-or
+or_
    : '|' filterlist
    ;
 
-not
+not_
    : '!' filter
    ;
 
