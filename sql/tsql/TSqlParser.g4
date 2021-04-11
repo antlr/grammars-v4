@@ -3280,6 +3280,11 @@ function_call
     | scalar_function_name '(' expression_list? ')'     #SCALAR_FUNCTION
     | build_in_functions                                #BUILT_IN_FUNC
     | freetext_function                                 #FREE_TEXT
+    | partition_function                                #PARTITION_FUNC
+    ;
+
+partition_function
+    : (database=id '.')? DOLLAR_PARTITION '.' func_name=id '(' expression ')'
     ;
     
 freetext_function
