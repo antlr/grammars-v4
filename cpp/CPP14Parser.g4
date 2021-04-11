@@ -377,10 +377,10 @@ simpleTypeSpecifier:
 	| nestedNameSpecifier Template simpleTemplateId
 	| simpleTypeSignednessModifier
 	| simpleTypeSignednessModifier? simpleTypeLengthModifier+
-	| Char
-	| Char16
-	| Char32
-	| Wchar
+	| simpleTypeSignednessModifier? Char
+	| simpleTypeSignednessModifier? Char16
+	| simpleTypeSignednessModifier? Char32
+	| simpleTypeSignednessModifier? Wchar
 	| Bool
 	| simpleTypeSignednessModifier? simpleTypeLengthModifier* Int
 	| Float
