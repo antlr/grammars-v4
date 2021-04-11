@@ -103,7 +103,7 @@ sign
    | MINUS
    ;
 
-bool
+bool_
    : TRUE
    | FALSE
    ;
@@ -358,7 +358,7 @@ factor
    | unsignedConstant
    | set
    | NOT factor
-   | bool
+   | bool_
    ;
 
 unsignedConstant

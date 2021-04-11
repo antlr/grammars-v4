@@ -1,5 +1,3 @@
-package GoParseTree;
-
 import java.util.List;
 import org.antlr.v4.runtime.*;
 

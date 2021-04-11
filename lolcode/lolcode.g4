@@ -107,7 +107,7 @@ expression
    | either
    | all
    | any
-   | not
+   | not_
    | func
    | LABEL
    | ATOM
@@ -169,7 +169,7 @@ any
    : 'ANY OF' expression ('AN' expression)* 'MKAY?'
    ;
 
-not
+not_
    : 'NOT' expression
    ;
 

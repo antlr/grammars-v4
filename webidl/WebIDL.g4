@@ -56,7 +56,7 @@ definition
 	| partial
 	| dictionary
 	| enum_
-	| typedef
+	| typedef_
 	| implementsStatement
 ;
 
@@ -175,7 +175,7 @@ callbackRest
 	: IDENTIFIER_WEBIDL '=' returnType '(' argumentList ')' ';'
 ;
 
-typedef
+typedef_
 	: 'typedef' type IDENTIFIER_WEBIDL ';'
 ;
 

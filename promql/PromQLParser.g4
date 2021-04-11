@@ -91,7 +91,7 @@ offset
 
 function: FUNCTION LEFT_PAREN parameter (COMMA parameter)* RIGHT_PAREN;
 
-parameter:     literal | vector;
+parameter:     literal | vectorOperation;
 parameterList: LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
 
 // Aggregations

@@ -430,7 +430,7 @@ tableOption
     | ROW_FORMAT '='?
         rowFormat=(
           DEFAULT | DYNAMIC | FIXED | COMPRESSED
-          | REDUNDANT | COMPACT
+          | REDUNDANT | COMPACT | ID
         )                                                           #tableOptionRowFormat
     | STATS_AUTO_RECALC '='? extBoolValue=(DEFAULT | '0' | '1')     #tableOptionRecalculation
     | STATS_PERSISTENT '='? extBoolValue=(DEFAULT | '0' | '1')      #tableOptionPersistent
@@ -994,14 +994,14 @@ queryExpressionNointo
 
 querySpecification
     : SELECT selectSpec* selectElements selectIntoExpression?
-      fromClause? orderByClause? limitClause?
+      fromClause? groupByClause? havingClause? orderByClause? limitClause?
     | SELECT selectSpec* selectElements
-    fromClause? orderByClause? limitClause? selectIntoExpression?
+    fromClause? groupByClause? havingClause? orderByClause? limitClause? selectIntoExpression?
     ;
 
 querySpecificationNointo
     : SELECT selectSpec* selectElements
-      fromClause? orderByClause? limitClause?
+      fromClause? groupByClause? havingClause? orderByClause? limitClause?
     ;
 
 unionParenthesis
@@ -1064,12 +1064,16 @@ selectLinesInto
 fromClause
     : FROM tableSources
       (WHERE whereExpr=expression)?
-      (
-        GROUP BY
+    ;
+
+groupByClause
+    :  GROUP BY
         groupByItem (',' groupByItem)*
         (WITH ROLLUP)?
-      )?
-      (HAVING havingExpr=expression)?
+    ;
+
+havingClause
+    :  HAVING havingExpr=expression
     ;
 
 groupByItem
@@ -1085,7 +1089,7 @@ limitClause
     ;
 
 limitClauseAtom
-	: decimalLiteral | mysqlVariable
+	: decimalLiteral | mysqlVariable | simpleId
 	;
 
 
@@ -1627,7 +1631,7 @@ checksumTable
 
 optimizeTable
     : OPTIMIZE actionOption=(NO_WRITE_TO_BINLOG | LOCAL)?
-      TABLE tables
+      (TABLE | TABLES) tables
     ;
 
 repairTable
@@ -1874,7 +1878,7 @@ signalConditionInformation
           | TABLE_NAME
           | COLUMN_NAME
           | CURSOR_NAME
-        ) '=' ( stringLiteral | DECIMAL_LITERAL )
+        ) '=' ( stringLiteral | DECIMAL_LITERAL | mysqlVariable | simpleId )
     ;
 
 diagnosticsStatement
@@ -2053,9 +2057,10 @@ dataType
       CHAR | CHARACTER | VARCHAR | TINYTEXT | TEXT | MEDIUMTEXT | LONGTEXT
        | NCHAR | NVARCHAR | LONG
       )
+      VARYING?
       lengthOneDimension? BINARY?
       ((CHARACTER SET | CHARSET) charsetName)?
-      (COLLATE collationName)?                                      #stringDataType
+      (COLLATE collationName | BINARY)?                             #stringDataType
     | NATIONAL typeName=(VARCHAR | CHARACTER)
       lengthOneDimension? BINARY?                                   #nationalStringDataType
     | NCHAR typeName=VARCHAR
@@ -2159,7 +2164,7 @@ userVariables
 //    Common Expressons
 
 defaultValue
-    : (NULL_LITERAL | unaryOperator? constant | currentTimestamp) (ON UPDATE currentTimestamp)?
+    : (NULL_LITERAL | unaryOperator? constant | currentTimestamp | '(' expression ')') (ON UPDATE currentTimestamp)?
     ;
 
 currentTimestamp
@@ -2195,7 +2200,7 @@ specificFunction
     : (
       CURRENT_DATE | CURRENT_TIME | CURRENT_TIMESTAMP
       | CURRENT_USER | LOCALTIME
-      )                                                             #simpleFunctionCall
+      ) ('(' ')')?                                                  #simpleFunctionCall
     | CONVERT '(' expression separator=',' convertedDataType ')'    #dataTypeFunctionCall
     | CONVERT '(' expression USING charsetName ')'                  #dataTypeFunctionCall
     | CAST '(' expression AS convertedDataType ')'                  #dataTypeFunctionCall
@@ -2377,8 +2382,8 @@ expressionAtom
     | BINARY expressionAtom                                         #binaryExpressionAtom
     | '(' expression (',' expression)* ')'                          #nestedExpressionAtom
     | ROW '(' expression (',' expression)+ ')'                      #nestedRowExpressionAtom
-    | EXISTS '(' selectStatement ')'                                #existsExpessionAtom
-    | '(' selectStatement ')'                                       #subqueryExpessionAtom
+    | EXISTS '(' selectStatement ')'                                #existsExpressionAtom
+    | '(' selectStatement ')'                                       #subqueryExpressionAtom
     | INTERVAL expression intervalType                              #intervalExpressionAtom
     | left=expressionAtom bitOperator right=expressionAtom          #bitExpressionAtom
     | left=expressionAtom mathOperator right=expressionAtom         #mathExpressionAtom
@@ -2480,7 +2485,7 @@ keywordsCanBeId
     | MIN | MIN_ROWS | MODE | MODIFY | MUTEX | MYSQL | MYSQL_ERRNO | NAME | NAMES
     | NCHAR | NDB_STORED_USER | NEVER | NEXT | NO | NODEGROUP | NONE | NUMBER | OFFLINE | OFFSET
     | OF | OJ | OLD_PASSWORD | ONE | ONLINE | ONLY | OPEN | OPTIMIZER_COSTS
-    | OPTIONS | OWNER | PACK_KEYS | PAGE | PARSER | PARTIAL
+    | OPTIONS | ORDER | OWNER | PACK_KEYS | PAGE | PARSER | PARTIAL
     | PARTITIONING | PARTITIONS | PASSWORD | PERSIST_RO_VARIABLES_ADMIN | PHASE | PLUGINS
     | PLUGIN_DIR | PLUGIN | PORT | PRECEDES | PREPARE | PRESERVE | PREV
     | PROCESSLIST | PROFILE | PROFILES | PROXY | QUERY | QUICK
@@ -2543,7 +2548,7 @@ functionNameBase
     | LTRIM | MAKEDATE | MAKETIME | MAKE_SET | MASTER_POS_WAIT
     | MBRCONTAINS | MBRDISJOINT | MBREQUAL | MBRINTERSECTS
     | MBROVERLAPS | MBRTOUCHES | MBRWITHIN | MD5 | MICROSECOND
-    | MINUTE | MLINEFROMTEXT | MLINEFROMWKB | MONTH | MONTHNAME
+    | MINUTE | MLINEFROMTEXT | MLINEFROMWKB | MOD| MONTH | MONTHNAME
     | MPOINTFROMTEXT | MPOINTFROMWKB | MPOLYFROMTEXT
     | MPOLYFROMWKB | MULTILINESTRING | MULTILINESTRINGFROMTEXT
     | MULTILINESTRINGFROMWKB | MULTIPOINT | MULTIPOINTFROMTEXT
@@ -2556,7 +2561,7 @@ functionNameBase
     | POSITION| POW | POWER | QUARTER | QUOTE | RADIANS | RAND
     | RANDOM_BYTES | RELEASE_LOCK | REVERSE | RIGHT | ROUND
     | ROW_COUNT | RPAD | RTRIM | SECOND | SEC_TO_TIME
-    | SESSION_USER | SESSION_VARIABLES_ADMIN
+    | SCHEMA | SESSION_USER | SESSION_VARIABLES_ADMIN
     | SHA | SHA1 | SHA2 | SIGN | SIN | SLEEP
     | SOUNDEX | SQL_THREAD_WAIT_AFTER_GTIDS | SQRT | SRID
     | STARTPOINT | STRCMP | STR_TO_DATE | ST_AREA | ST_ASBINARY

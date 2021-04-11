@@ -1,0 +1,11 @@
+max without (revision) (
+  kube_statefulset_status_current_revision{job="kube-state-metrics"}
+    unless
+  kube_statefulset_status_update_revision{job="kube-state-metrics"}
+)
+  *
+(
+  kube_statefulset_replicas{job="kube-state-metrics"}
+    !=
+  kube_statefulset_status_replicas_updated{job="kube-state-metrics"}
+)

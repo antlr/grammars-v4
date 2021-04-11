@@ -6,14 +6,10 @@
         <artifactId>grammarsv4</artifactId>
         <groupId>org.antlr.grammars</groupId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
-        <java.version.source>1.8</java.version.source>
-        <java.version.target>1.8</java.version.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
@@ -50,14 +46,6 @@
                 <configuration>
                     <!-- Travis build workaround -->
                     <argLine>-Xms1024m -Xmx2048m</argLine>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
                 </configuration>
             </plugin>
         </plugins>

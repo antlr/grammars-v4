@@ -37,7 +37,7 @@ rule_
     ;
 
 lhs
-    : id
+    : id_
     ;
 
 rhs
@@ -56,8 +56,8 @@ element
     : optional
     | zeroormore
     | oneormore
-    | text
-    | id
+    | text_
+    | id_
     ;
 
 optional
@@ -72,11 +72,11 @@ oneormore
     : RPAREN alternatives LPAREN
     ;
 
-text
+text_
     : ID
     ;
 
-id
+id_
     : LT ruleid GT
     ;
 

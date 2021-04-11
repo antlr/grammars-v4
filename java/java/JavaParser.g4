@@ -198,8 +198,10 @@ constantDeclarator
     : IDENTIFIER ('[' ']')* '=' variableInitializer
     ;
 
-// see matching of [] comment in methodDeclaratorRest
-// methodBody from Java8
+// Early versions of Java allows brackets after the method name, eg.
+// public int[] return2DArray() [] { ... }
+// is the same as
+// public int[][] return2DArray() { ... }
 interfaceMethodDeclaration
     : interfaceMethodModifier* (typeTypeOrVoid | typeParameters annotation* typeTypeOrVoid)
       IDENTIFIER formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody

@@ -69,7 +69,7 @@ next
    ;
 
 key
-   : bool
+   : bool_
    ;
 
 fail_message
@@ -112,7 +112,7 @@ ref
    : NUM? EOL
    ;
 
-bool
+bool_
    : NUM? EOL
    ;
 

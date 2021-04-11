@@ -920,7 +920,7 @@ b_end
    ;
 
 // 3.3.2
-bool
+bool_
    : k_true
    | k_false
    ;

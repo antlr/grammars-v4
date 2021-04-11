@@ -81,6 +81,11 @@ BEGIN
 END
 GO
 
+-- Drop Columns
+ALTER TABLE dbo.TestTable
+  DROP COLUMN Name, Value
+GO
+
 -- Drop Index Using Fully Qualified Name
 DROP INDEX dbo.TestTable.UIX_TestTable_Name_Value
 GO

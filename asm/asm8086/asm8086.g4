@@ -136,7 +136,7 @@ org
    ;
 
 title
-   : TITLE string
+   : TITLE string_
    ;
 
 include
@@ -164,7 +164,7 @@ argument
    | dollar
    | register_
    | name
-   | string
+   | string_
    | ('(' expression ')')
    | ((number | name)? '[' expression ']')
    | ptr expression
@@ -186,7 +186,7 @@ register_
    : REGISTER
    ;
 
-string
+string_
    : STRING
    ;
 
