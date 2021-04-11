@@ -44,9 +44,10 @@ jobs:
         fetch-depth: 0
 
     - name: Install Java
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
         java-version: '11'
+        distribution: 'zulu'
     - name: Install Dart
       if: ${{ matrix.language == 'Dart' }}
       uses: dart-lang/setup-dart@v1
