@@ -179,7 +179,7 @@ dayToDay
    ;
 
 dayAndDay
-   : day and day
+   : day and_ day
    ;
 
 dayRange
@@ -202,7 +202,7 @@ to
    | THRU
    ;
 
-and
+and_
    : AND
    | AMPERSAND
    ;

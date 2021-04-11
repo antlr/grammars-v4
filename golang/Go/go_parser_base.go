@@ -1,4 +1,3 @@
-package GoParseTree
 
 import (
 	"strings"

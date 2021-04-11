@@ -135,4 +135,7 @@ SELECT trigger.num FROM test `trigger`;
 SELECT * FROM test LIMIT LIMIT1,LIMIT2;
 -- SCHEMA as a function name
 SELECT SCHEMA();
-SELECT * FROM TEST WHERE TB_SCHEMA = SCHEMA();
+-- Functions
+SELECT mod(3,2);SELECT * FROM TEST WHERE TB_SCHEMA = SCHEMA();
+-- Group By with computed column
+SELECT 1 AS col1, t1.Id FROM t1 GROUP BY col1;

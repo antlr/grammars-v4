@@ -26,7 +26,7 @@ single_instruction          :   assignment
                             |   keyword_instruction
                             |   command_
                             ;
-  assignment                :   ( VAR_SYMBOL | SPECIAL_VAR | CONST_SYMBOL ) EQ expression ;
+  assignment                :   ( VAR_SYMBOL | SPECIAL_VAR | CONST_SYMBOL ) EQ expression? ;
   keyword_instruction       :   address_
                             |   arg_
                             |   call_

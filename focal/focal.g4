@@ -136,17 +136,17 @@ term
    ;
 
 number
-   : mantissa ('e' signed)?
+   : mantissa ('e' signed_)?
    ;
 
 mantissa
-   : signed
-   | (signed '.')
-   | ('.' signed)
-   | (signed '.' signed)
+   : signed_
+   | (signed_ '.')
+   | ('.' signed_)
+   | (signed_ '.' signed_)
    ;
 
-signed
+signed_
    : PLUSMIN? INTEGER
    ;
 

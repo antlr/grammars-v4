@@ -45,7 +45,7 @@ consequent
 
 clause
    : '(' clause ')'
-   | ((expr | attribClause) operator (expr | attribClause) (operator (expr | attribClause))*)
+   | ((expr | attribClause) operator_ (expr | attribClause) (operator_ (expr | attribClause))*)
    ;
 
 expr
@@ -69,7 +69,7 @@ hedge
    : ('about' | 'above' | 'after' | 'around' | 'before' | 'below' | 'closeTo' | 'definitely' | 'extremely' | 'generally' | 'mostly' | 'must' | 'near' | ('negative' | 'negatively') | 'not' | ('positive' | 'positively') | 'roughly' | 'should' | 'slightly' | 'somewhat' | 'very' | 'inVicinityOf')
    ;
 
-operator
+operator_
    : ('and' | 'boundedAnd' | 'cosineNot' | 'meanAnd' | 'meanOr' | 'or' | 'productAnd' | 'productOr' | 'sugenoNot' | 'thresholdNot' | 'yagerAnd' | 'yagerNot' | 'yagerOr')
    ;
 

@@ -193,9 +193,9 @@ visItem
       | useDeclaration
       | function
       | typeAlias
-      | struct
+      | struct_
       | enumeration
-      | union
+      | union_
       | constantItem
       | staticItem
       | trait
@@ -260,7 +260,7 @@ typeAlias
    : 'type' identifier generics? whereClause? '=' type ';'
    ;
 
-struct
+struct_
    : structStruct
    | tupleStruct
    ;
@@ -307,7 +307,7 @@ enumItemDiscriminant
    : '=' expression
    ;
 
-union
+union_
    : 'union' identifier generics? whereClause? '{' structFields '}'
    ;
 

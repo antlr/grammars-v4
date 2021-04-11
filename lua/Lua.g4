@@ -95,7 +95,7 @@ funcname
     ;
 
 varlist
-    : var (',' var)*
+    : var_ (',' var_)*
     ;
 
 namelist
@@ -134,10 +134,10 @@ functioncall
     ;
 
 varOrExp
-    : var | '(' exp ')'
+    : var_ | '(' exp ')'
     ;
 
-var
+var_
     : (NAME | '(' exp ')' varSuffix) varSuffix*
     ;
 
@@ -150,12 +150,12 @@ nameAndArgs
     ;
 
 /*
-var
+var_
     : NAME | prefixexp '[' exp ']' | prefixexp '.' NAME
     ;
 
 prefixexp
-    : var | functioncall | '(' exp ')'
+    : var_ | functioncall | '(' exp ')'
     ;
 
 functioncall

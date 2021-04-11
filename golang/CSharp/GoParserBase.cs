@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Antlr4.Runtime;
-using static GoParseTree.GoLexer;
 
-namespace GoParseTree
-{
     public abstract class GoParserBase : Parser
     {
         protected GoParserBase(ITokenStream input)
@@ -13,12 +10,10 @@ namespace GoParseTree
         {
         }
 
-    #if ANTLR_STANDARD
         protected GoParserBase(ITokenStream input, TextWriter output, TextWriter errorOutput)
             : base(input, output, errorOutput)
         {
         }
-    #endif
 
         /// <summary>
         /// Returns `true` if on the current index of the parser's
@@ -43,13 +38,13 @@ namespace GoParseTree
                 return false;
             }
 
-            if (ahead.Type == TERMINATOR)
+            if (ahead.Type == GoLexer.TERMINATOR)
             {
                 // There is definitely a line terminator ahead.
                 return true;
             }
 
-            if (ahead.Type == WS)
+            if (ahead.Type == GoLexer.WS)
             {
                 // Get the token ahead of the current whitespaces.
                 possibleIndexEosToken = CurrentToken.TokenIndex - 2;
@@ -67,8 +62,8 @@ namespace GoParseTree
             int type = ahead.Type;
 
             // Check if the token is, or contains a line terminator.
-            return type == COMMENT && (text.Contains("\r") || text.Contains("\n")) ||
-                   type == TERMINATOR;
+            return type == GoLexer.COMMENT && (text.Contains("\r") || text.Contains("\n")) ||
+                   type == GoLexer.TERMINATOR;
         }
 
         /// <summary>
@@ -105,7 +100,7 @@ namespace GoParseTree
             int leftParams = 1;
             int rightParams = 0;
 
-            if (LT(stream, tokenOffset).Type == L_PAREN)
+            if (LT(stream, tokenOffset).Type == GoLexer.L_PAREN)
             {
                 // Scan past parameters
                 while (leftParams != rightParams)
@@ -113,11 +108,11 @@ namespace GoParseTree
                     tokenOffset++;
                     int tokenType = LT(stream, tokenOffset).Type;
 
-                    if (tokenType == L_PAREN)
+                    if (tokenType == GoLexer.L_PAREN)
                     {
                         leftParams++;
                     }
-                    else if (tokenType == R_PAREN)
+                    else if (tokenType == GoLexer.R_PAREN)
                     {
                         rightParams++;
                     }
@@ -137,23 +132,14 @@ namespace GoParseTree
 
         private IToken LT(ITokenStream stream, int k)
         {
-        #if ANTLR_STANDARD
             return stream.LT(k);
-        #else
-            return stream.Lt(k);
-        #endif
         }
 
         private ITokenStream tokenStream
         {
             get
             {
-            #if ANTLR_STANDARD
                 return TokenStream;
-            #else
-                return _input;
-            #endif
             }
         }
     }
-}

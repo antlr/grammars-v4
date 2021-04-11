@@ -78,10 +78,10 @@ functionParameter
     ;
 
 declaration
-    : init type IDENTIFIER (EQUALS expression)? SEMICOLON
+    : init type_ IDENTIFIER (EQUALS expression)? SEMICOLON
     ;
 
-type
+type_
     : ( TOOLDATA | WOBJDATA | SPEEDDATA | ZONEDATA | CLOCK | BOOL )
     ;
 

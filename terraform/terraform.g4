@@ -48,7 +48,7 @@ data
    ;
 
 provider
-  : 'provider' resourcetype blockbody
+  : PROVIDER resourcetype blockbody
   ;
 
 output
@@ -100,7 +100,7 @@ identifier
    ;
 
 identifierchain
-   : (IDENTIFIER | IN | VARIABLE) index? (DOT identifierchain)*
+   : (IDENTIFIER | IN | VARIABLE | PROVIDER) index? (DOT identifierchain)*
    | STAR (DOT identifierchain)*
    | inline_index (DOT identifierchain)*
    ;
@@ -111,7 +111,7 @@ inline_index
 
 expression
    : section
-   | expression operator expression
+   | expression operator_ expression
    | LPAREN expression RPAREN
    | expression '?' expression ':' expression
    | forloop
@@ -128,7 +128,7 @@ section
    ;
 
 val
-   : NULL
+   : NULL_
    | signed_number
    | string
    | identifier
@@ -141,6 +141,7 @@ val
 
 functioncall
    : functionname LPAREN functionarguments RPAREN
+   | 'jsonencode' LPAREN (.)*? RPAREN
    ;
 
 functionname
@@ -185,6 +186,10 @@ VARIABLE
    : 'variable'
    ;
 
+PROVIDER
+   : 'provider'
+   ;
+
 IN
    : 'in'
    ;
@@ -197,7 +202,7 @@ DOT
    : '.'
    ;
 
-operator
+operator_
    : '/'
    | STAR
    | '%'
@@ -233,7 +238,7 @@ EOF_
    : '<<EOF' .*? 'EOF'
    ;
 
-NULL
+NULL_
    : 'nul'
    ;
 
@@ -259,7 +264,7 @@ MULTILINESTRING
    ;
 
 STRING
-   : '"' (~ [\r\n"] | '""' | '\\"')* '"'
+   : '"' ( '\\"' | ~["\r\n] )* '"'
    ;
 
 IDENTIFIER
