@@ -1,4 +1,4 @@
-
+package golang
 import (
 	"strings"
 
@@ -15,33 +15,38 @@ type GoParserBase struct {
 // either is a line terminator, or is a multi line comment that
 // contains a line terminator.
 func (p *GoParserBase) lineTerminatorAhead() bool {
-	// Get the token ahead of the current index.
-	possibleIndexEosToken := p.GetCurrentToken().GetTokenIndex() - 1
-	ahead := p.GetTokenStream().Get(possibleIndexEosToken)
+	 // Get the token ahead of the current index.
+	possibleIndexEosToken := p.GetCurrentToken().GetTokenIndex() - 1;
+	offset :=1;
 
-	if ahead.GetChannel() != antlr.LexerHidden {
-		// We're only interested in tokens on the HIDDEN channel.
-		return true
-	}
+	 if possibleIndexEosToken == -1 {
+		 return true;
+	 }
 
-	if ahead.GetTokenType() == GoParserTERMINATOR {
-		// There is definitely a line terminator ahead.
-		return true
-	}
+	 ahead := p.GetTokenStream().Get(possibleIndexEosToken);
 
-	if ahead.GetTokenType() == GoParserWS {
-		// Get the token ahead of the current whitespaces.
-		possibleIndexEosToken = p.GetCurrentToken().GetTokenIndex() - 2
-		ahead = p.GetTokenStream().Get(possibleIndexEosToken)
-	}
+	 for ahead.GetChannel() == antlr.LexerHidden {
+		 if ahead.getTokenType() == GoLexerTERMINATOR {
+			 return true;
+		 }
+		 if ahead.getTokenType() == GoParserWS {
+			 offset++;
+			 possibleIndexEosToken = p.GetCurrentToken().GetTokenIndex() - offset;
+			 ahead = p.GetTokenStream().Get(possibleIndexEosToken);
+		 }
+		 if ahead.getTokenType() == GoParerCOMMENT {
+			 if ahead.GetText().Contains("\r") || ahead.GetText().Contains("\n") {
+				 return true;
+			 }
+			 else{
+				 offset++;
+				 possibleIndexEosToken = p.GetCurrentToken().GetTokenIndex() - offset;
+				 ahead = p.GetTokenStream().Get(possibleIndexEosToken);
+			 }
+		 }
+	 }
 
-	// Get the token's text and type.
-	text := ahead.GetText()
-	_type := ahead.GetTokenType()
-
-	// Check if the token is, or contains a line terminator.
-	return (_type == GoParserCOMMENT && (strings.Contains(text, "\r") || strings.Contains(text, "\n"))) ||
-		(_type == GoParserTERMINATOR)
+	 return false;
 }
 
 func (p *GoParserBase) noTerminatorBetween(tokenOffset int) bool {

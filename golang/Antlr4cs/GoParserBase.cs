@@ -17,49 +17,45 @@ using Antlr4.Runtime;
         /// contains a line terminator.
         /// </summary>
         protected bool lineTerminatorAhead()
+    {
+        // Get the token ahead of the current index.
+        int offset = 1;
+        int possibleIndexEosToken = CurrentToken.TokenIndex - offset;
+
+        if (possibleIndexEosToken == -1)
         {
-            // Get the token ahead of the current index.
-            int possibleIndexEosToken = CurrentToken.TokenIndex - 1;
+            return true;
+        }
 
-            if (possibleIndexEosToken == -1)
+        IToken ahead = tokenStream.Get(possibleIndexEosToken);
+
+        while (ahead.Channel == Lexer.HIDDEN)
+        {
+            if (ahead.Type == GoLexer.TERMINATOR)
             {
                 return true;
             }
-
-            IToken ahead = tokenStream.Get(possibleIndexEosToken);
-            if (ahead.Channel != Lexer.Hidden)
+            else if (ahead.Type == GoLexer.WS)
             {
-                // We're only interested in tokens on the HIDDEN channel.
-                return false;
+                possibleIndexEosToken = this.CurrentToken.TokenIndex - ++offset;
+                ahead = tokenStream.Get(possibleIndexEosToken);
             }
-
-            if (ahead.Type == TERMINATOR)
+            else if (ahead.Type == GoLexer.COMMENT)
             {
-                // There is definitely a line terminator ahead.
-                return true;
-            }
-
-            if (ahead.Type == WS)
-            {
-                // Get the token ahead of the current whitespaces.
-                possibleIndexEosToken = CurrentToken.TokenIndex - 2;
-
-                if (possibleIndexEosToken == -1)
+                if (ahead.Text.Contains("\r") || ahead.Text.Contains("\n"))
                 {
                     return true;
                 }
-
-                ahead = tokenStream.Get(possibleIndexEosToken);
+                else
+                {
+                    possibleIndexEosToken = this.CurrentToken.TokenIndex - ++offset;
+                    ahead = tokenStream.Get(possibleIndexEosToken);
+                }
             }
-
-            // Get the token's text and type.
-            String text = ahead.Text;
-            int type = ahead.Type;
-
-            // Check if the token is, or contains a line terminator.
-            return type == COMMENT && (text.Contains("\r") || text.Contains("\n")) ||
-                   type == TERMINATOR;
         }
+
+        return false;
+    }
 
         /// <summary>
         /// Returns `true` if no line terminator exists between the specified
