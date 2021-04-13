@@ -65,6 +65,12 @@ SELECT
 FROM [Production].[Product]
 GO
 
+-- Superfluous parentheses.
+-- Not 100% this matches Microsoft's grammar, but SQL Server 2019 parses it /shrug.
+SELECT * FROM ((A INNER JOIN B ON 1 = 1))
+SELECT * FROM (A INNER JOIN B ON 1 = 1) LEFT JOIN C ON 1 = 1
+SELECT * FROM ((A INNER JOIN B ON 1 = 1) LEFT JOIN C ON 1 = 1)
+
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Using SELECT with column headings and calculations
 

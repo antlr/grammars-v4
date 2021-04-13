@@ -3143,14 +3143,15 @@ table_sources
     : source+=table_source (',' source+=table_source)*
     ;
 
-// https://msdn.microsoft.com/en-us/library/ms177634.aspx
+// https://docs.microsoft.com/en-us/sql/t-sql/queries/from-transact-sql
 table_source
     : table_source_item_joined
-    | '(' table_source_item_joined ')'
+    | '(' table_source ')'
     ;
 
 table_source_item_joined
     : table_source_item joins+=join_part*
+    | '(' table_source_item_joined ')' joins+=join_part*
     ;
 
 table_source_item
