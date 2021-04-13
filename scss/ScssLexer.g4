@@ -28,7 +28,7 @@
 
 lexer grammar ScssLexer;
 
-NULL              : 'null';
+NULL_              : 'null';
 
 
 IN              : 'in';

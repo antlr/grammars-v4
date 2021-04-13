@@ -131,7 +131,7 @@ NEGOTIATE:                             'NEGOTIATE';
 NOCHECK:                               'NOCHECK';
 NONCLUSTERED:                          'NONCLUSTERED';
 NOT:                                   'NOT';
-NULL:                                  'NULL';
+NULL_:                                 'NULL';
 NULLIF:                                'NULLIF';
 OF:                                    'OF';
 OFF:                                   'OFF';

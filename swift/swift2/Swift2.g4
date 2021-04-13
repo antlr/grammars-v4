@@ -278,8 +278,8 @@ generic_argument_list : generic_argument (',' generic_argument)* ;
 generic_argument : type ;
 
 // context-sensitive. Allow < as pre, post, or binary op
-//lt : {_input.LT(1).getText().equals("<")}? operator ;
-//gt : {_input.LT(1).getText().equals(">")}? operator ;
+//lt : {_input.LT(1).getText().equals("<")}? operator_ ;
+//gt : {_input.LT(1).getText().equals(">")}? operator_ ;
 // Declarations
 
 // GRAMMAR OF A DECLARATION
@@ -317,7 +317,7 @@ code_block : '{' statements? '}' ;
 import_declaration : attributes? 'import' import_kind? import_path  ;
 import_kind : 'typealias' | 'struct' | 'class' | 'enum' | 'protocol' | 'var' | 'func'  ;
 import_path : import_path_identifier | import_path_identifier '.' import_path  ;
-import_path_identifier : identifier | operator  ;
+import_path_identifier : identifier | operator_  ;
 
 // GRAMMAR OF A CONSTANT DECLARATION
 
@@ -372,7 +372,7 @@ function_declaration
    function_body?
  ;
 function_head : attributes? declaration_modifiers? 'func'  ;
-function_name : identifier |  operator  ;
+function_name : identifier |  operator_  ;
 function_signature
  : parameter_clauses 'throws'? function_result?
  | parameter_clauses 'rethrows' function_result?
@@ -503,9 +503,9 @@ subscript_result : arrow_operator attributes? type  ;
 // GRAMMAR OF AN OPERATOR DECLARATION
 
 operator_declaration : prefix_operator_declaration | postfix_operator_declaration | infix_operator_declaration  ;
-prefix_operator_declaration : 'prefix' 'operator' operator '{' '}'  ;
-postfix_operator_declaration : 'postfix' 'operator' operator '{' '}'  ;
-infix_operator_declaration : 'infix' 'operator' operator '{' infix_operator_attributes '}' ; // Note: infix_operator_attributes is optional by definition so no ? needed
+prefix_operator_declaration : 'prefix' 'operator' operator_ '{' '}'  ;
+postfix_operator_declaration : 'postfix' 'operator' operator_ '{' '}'  ;
+infix_operator_declaration : 'infix' 'operator' operator_ '{' infix_operator_attributes '}' ; // Note: infix_operator_attributes is optional by definition so no ? needed
 infix_operator_attributes : precedence_clause? associativity_clause? ;
 precedence_clause : 'precedence' precedence_level ;
 precedence_level : integer_literal ;
@@ -590,7 +590,7 @@ balanced_token
  : '('  balanced_tokens? ')'
  | '[' balanced_tokens? ']'
  | '{' balanced_tokens? '}'
- | identifier | expression | context_sensitive_keyword | literal | operator
+ | identifier | expression | context_sensitive_keyword | literal | operator_
 // | Any punctuation except ( ,  ')' , '[' , ']' , { , or } TODO add?
  ;
 
@@ -1001,14 +1001,14 @@ same_type_equals: {SwiftSupport.isOperator(_input,"==")}? '=' '=' ;
  it is treated as a binary operator. As an example, the + operator in a+b
   and a + b is treated as a binary operator."
 */
-binary_operator : {SwiftSupport.isBinaryOp(_input)}? operator ;
+binary_operator : {SwiftSupport.isBinaryOp(_input)}? operator_ ;
 
 /**
  "If an operator has whitespace on the left side only, it is treated as a
  prefix unary operator. As an example, the ++ operator in a ++b is treated
  as a prefix unary operator."
 */
-prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator ;
+prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator_ ;
 
 /**
  "If an operator has whitespace on the right side only, it is treated as a
@@ -1020,9 +1020,9 @@ prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator ;
  the ++ operator in a++.b is treated as a postfix unary operator (a++ .b
  rather than a ++ .b)."
  */
-postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator ;
+postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator_ ;
 
-operator
+operator_
   : operator_head     ({_input.get(_input.index()-1).getType()!=WS}? operator_character)*
   | dot_operator_head ({_input.get(_input.index()-1).getType()!=WS}? dot_operator_character)*
   ;

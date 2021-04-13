@@ -76,7 +76,7 @@ object
 literal
    : rDFLiteral
    | numericLiteral
-   | bool
+   | bool_
    ;
 
 blankNodePropertyList
@@ -97,7 +97,7 @@ rDFLiteral
    : string (LangTag | ('^^' iri))?
    ;
 
-bool
+bool_
    : TrueKeyword
    | FalseKeyword
    ;

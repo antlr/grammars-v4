@@ -11,7 +11,7 @@
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<antlr.version>4.9.1</antlr.version>
-		<antlr4test-maven-plugin.version>1.17</antlr4test-maven-plugin.version>
+		<antlr4test-maven-plugin.version>1.18</antlr4test-maven-plugin.version>
 		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
@@ -81,6 +81,7 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
+				<module>bcpl</module>
 				<module>bibcode</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
@@ -89,7 +90,6 @@
 				<module>calculator</module>
 				<module>capnproto</module>
 				<module>clf</module>
-				<module>clif</module>
 				<module>clojure</module>
 				<module>clu</module>
 				<module>cmake</module>

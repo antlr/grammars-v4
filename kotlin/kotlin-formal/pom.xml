@@ -18,7 +18,6 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-						<include>UnicodeClasses.g4</include>
 						<include>KotlinLexer.g4</include>
 						<include>KotlinParser.g4</include>
 					</includes>

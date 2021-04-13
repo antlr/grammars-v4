@@ -230,9 +230,9 @@ declaration : type_declaration | array_declaration | switch_declaration | proced
 
 // 5.1.1
 type_list : simple_variable | simple_variable Comma_ type_list ;
-type : Real_ | Integer_ | Boolean_ ;
+type_ : Real_ | Integer_ | Boolean_ ;
 local_or_own : empty | Own_ ;
-type_declaration : local_or_own type type_list ;
+type_declaration : local_or_own type_ type_list ;
 
 // 5.2.1
 lower_bound : arithmetic_expression ;
@@ -241,7 +241,7 @@ bound_pair : lower_bound Colon_ upper_bound ;
 bound_pair_list : bound_pair | bound_pair_list Comma_ bound_pair ;
 array_segment : array_identifier Lb_ bound_pair_list Rb_ | array_identifier Comma_ array_segment ;
 array_list : array_segment | array_list Comma_ array_segment ;
-array_declarer : type Array_ | Array_ ;
+array_declarer : type_ Array_ | Array_ ;
 array_declaration : local_or_own array_declarer array_list ;
 
 // 5.3.1
@@ -254,11 +254,11 @@ formal_parameter_list : formal_parameter | formal_parameter_list parameter_delim
 formal_parameter_part : empty | LP_ formal_parameter_list Rp_ ;
 identifier_list : Identifier | identifier_list Comma_ Identifier ;
 value_part : Value_ identifier_list Semi_ | empty ;
-specifier : String_ | type | Array_ | type Array_ | Label_ | Switch_ | Procedure_ | type Procedure_ ;
+specifier : String_ | type_ | Array_ | type_ Array_ | Label_ | Switch_ | Procedure_ | type_ Procedure_ ;
 specification_part : empty | specifier identifier_list Semi_ | specification_part specifier identifier_list ;
 procedure_heading : procedure_identifier formal_parameter_part Semi_ value_part specification_part ;
 procedure_body : statement | code ;
-procedure_declaration : Procedure_ procedure_heading procedure_body | type Procedure_ procedure_heading procedure_body ;
+procedure_declaration : Procedure_ procedure_heading procedure_body | type_ Procedure_ procedure_heading procedure_body ;
 
 WS : Ws -> channel(HIDDEN) ;
 fragment Ws : [ \r\n\t]+ ;
