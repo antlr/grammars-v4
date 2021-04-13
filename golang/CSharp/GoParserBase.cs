@@ -34,7 +34,7 @@ public abstract class GoParserBase : Parser
 
         IToken ahead = tokenStream.Get(possibleIndexEosToken);
 
-        while (ahead.Channel == Lexer.HIDDEN)
+        while (ahead.Channel == Lexer.Hidden)
         {
             if (ahead.Type == GoLexer.TERMINATOR)
             {

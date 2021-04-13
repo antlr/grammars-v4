@@ -29,7 +29,7 @@ using Antlr4.Runtime;
 
         IToken ahead = tokenStream.Get(possibleIndexEosToken);
 
-        while (ahead.Channel == Lexer.HIDDEN)
+        while (ahead.Channel == Lexer.Hidden)
         {
             if (ahead.Type == GoLexer.TERMINATOR)
             {
