@@ -44,9 +44,10 @@ isotope: DIGIT+;
 symbol: element_symbols | aromatic_symbol | '*';
 
 element_symbols: (UH)
-	| (UH LE)
-	| (UL LI)
-	| (UB LE)
+	| UH LE
+	| UL LI
+	| UB LE
+	...
 	| (UB)
 	| (UC)
 	| (UN)
@@ -366,4 +367,3 @@ SPACE: ' ';
 DIGIT: '0' .. '9';
 
 TAB: '\t';
-
