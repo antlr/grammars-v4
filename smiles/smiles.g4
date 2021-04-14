@@ -30,8 +30,8 @@ aliphatic_organic:
 	| US
 	| UP
 	| UF
-	| (UC LL)
-	| (UB LR)
+	| UC LL
+	| UB LR
 	| UI;
 
 aromatic_organic: LB | LC | LN | LO | LS | LP;
@@ -43,123 +43,122 @@ isotope: DIGIT+;
 
 symbol: element_symbols | aromatic_symbol | '*';
 
-element_symbols: (UH)
+element_symbols: UH
 	| UH LE
 	| UL LI
 	| UB LE
-	...
-	| (UB)
-	| (UC)
-	| (UN)
-	| (UO)
-	| (UF)
-	| (UN LE)
-	| (UN LA)
-	| (UM LG)
-	| (UA LL)
-	| (US LI)
-	| (UP)
-	| (US)
-	| (UC LL)
-	| (UA LR)
-	| (UK)
-	| (UC LA)
-	| (US LC)
-	| (UT LI)
-	| (UV)
-	| (UC LR)
-	| (UM LN)
-	| (UF LE)
-	| (UC LO)
-	| (UN LI)
-	| (UC LU)
-	| (UZ LN)
-	| (UG LA)
-	| (UG LE)
-	| (UA LS)
-	| (US LE)
-	| (UB LR)
-	| (UK LR)
-	| (UR LB)
-	| (US LR)
-	| (UY)
-	| (UZ LR)
-	| (UN LB)
-	| (UM LO)
-	| (UT LC)
-	| (UR LU)
-	| (UR LH)
-	| (UP LD)
-	| (UA LG)
-	| (UC LD)
-	| (UI LN)
-	| (US LN)
-	| (US LB)
-	| (UT LE)
-	| (UI)
-	| (UX LE)
-	| (UC LS)
-	| (UB LA)
-	| (UH LF)
-	| (UT LA)
-	| (UW)
-	| (UR LE)
-	| (UO LS)
-	| (UI LR)
-	| (UP LT)
-	| (UA LU)
-	| (UH LG)
-	| (UT LL)
-	| (UP LB)
-	| (UB LI)
-	| (UP LO)
-	| (UA LT)
-	| (UR LN)
-	| (UF LR)
-	| (UR LA)
-	| (UR LF)
-	| (UD LB)
-	| (US LG)
-	| (UB LH)
-	| (UH LS)
-	| (UM LT)
-	| (UD LS)
-	| (UR LG)
-	| (UC LN)
-	| (UF LL)
-	| (UL LV)
-	| (UL LA)
-	| (UC LE)
-	| (UP LR)
-	| (UN LD)
-	| (UP LM)
-	| (US LM)
-	| (UE LU)
-	| (UG LD)
-	| (UT LB)
-	| (UD LY)
-	| (UH LO)
-	| (UE LR)
-	| (UT LM)
-	| (UY LB)
-	| (UL LU)
-	| (UA LC)
-	| (UT LH)
-	| (UP LA)
-	| (UU)
-	| (UN LP)
-	| (UP LU)
-	| (UA LM)
-	| (UC LM)
-	| (UB LK)
-	| (UC LF)
-	| (UE LS)
-	| (UF LM)
-	| (UM LD)
-	| (UN LO)
-	| (UL LR);
+	| UB
+	| UC
+	| UN
+	| UO
+	| UF
+	| UN LE
+	| UN LA
+	| UM LG
+	| UA LL
+	| US LI
+	| UP
+	| US
+	| UC LL
+	| UA LR
+	| UK
+	| UC LA
+	| US LC
+	| UT LI
+	| UV
+	| UC LR
+	| UM LN
+	| UF LE
+	| UC LO
+	| UN LI
+	| UC LU
+	| UZ LN
+	| UG LA
+	| UG LE
+	| UA LS
+	| US LE
+	| UB LR
+	| UK LR
+	| UR LB
+	| US LR
+	| UY
+	| UZ LR
+	| UN LB
+	| UM LO
+	| UT LC
+	| UR LU
+	| UR LH
+	| UP LD
+	| UA LG
+	| UC LD
+	| UI LN
+	| US LN
+	| US LB
+	| UT LE
+	| UI
+	| UX LE
+	| UC LS
+	| UB LA
+	| UH LF
+	| UT LA
+	| UW
+	| UR LE
+	| UO LS
+	| UI LR
+	| UP LT
+	| UA LU
+	| UH LG
+	| UT LL
+	| UP LB
+	| UB LI
+	| UP LO
+	| UA LT
+	| UR LN
+	| UF LR
+	| UR LA
+	| UR LF
+	| UD LB
+	| US LG
+	| UB LH
+	| UH LS
+	| UM LT
+	| UD LS
+	| UR LG
+	| UC LN
+	| UF LL
+	| UL LV
+	| UL LA
+	| UC LE
+	| UP LR
+	| UN LD
+	| UP LM
+	| US LM
+	| UE LU
+	| UG LD
+	| UT LB
+	| UD LY
+	| UH LO
+	| UE LR
+	| UT LM
+	| UY LB
+	| UL LU
+	| UA LC
+	| UT LH
+	| UP LA
+	| UU
+	| UN LP
+	| UP LU
+	| UA LM
+	| UC LM
+	| UB LK
+	| UC LF
+	| UE LS
+	| UF LM
+	| UM LD
+	| UN LO
+	| UL LR;
 
-aromatic_symbol: LC | LN | LO | LP | LS | (LS LE) | (LA LS);
+aromatic_symbol: LC | LN | LO | LP | LS | LS LE | LA LS;
 
 chiral:
 	'@'
@@ -254,107 +253,107 @@ terminator: SPACE TAB | LINEFEED | CARRIAGE_RETURN;
 
 LA: 'a';
 
-LB: ('b');
+LB: 'b';
 
-LC: ('c');
+LC: 'c';
 
-LD: ('d');
+LD: 'd';
 
-LE: ('e');
+LE: 'e';
 
-LF: ('f');
+LF: 'f';
 
-LG: ('g');
+LG: 'g';
 
-LH: ('h');
+LH: 'h';
 
-LI: ('i');
+LI: 'i';
 
-LJ: ('j');
+LJ: 'j';
 
-LK: ('k');
+LK: 'k';
 
-LL: ('l');
+LL: 'l';
 
-LM: ('m');
+LM: 'm';
 
-LN: ('n');
+LN: 'n';
 
-LO: ('o');
+LO: 'o';
 
-LP: ('p');
+LP: 'p';
 
-LQ: ('q');
+LQ: 'q';
 
-LR: ('r');
+LR: 'r';
 
-LS: ('s');
+LS: 's';
 
-LT: ('t');
+LT: 't';
 
-LU: ('u');
+LU: 'u';
 
-LV: ('v');
+LV: 'v';
 
-LW: ('w');
+LW: 'w';
 
-LX: ('x');
+LX: 'x';
 
-LY: ('y');
+LY: 'y';
 
-LZ: ('z');
+LZ: 'z';
 
-UA: ('A');
+UA: 'A';
 
-UB: ('B');
+UB: 'B';
 
-UC: ('C');
+UC: 'C';
 
-UD: ('D');
+UD: 'D';
 
-UE: ('E');
+UE: 'E';
 
-UF: ('F');
+UF: 'F';
 
-UG: ('G');
+UG: 'G';
 
-UH: ('H');
+UH: 'H';
 
-UI: ('I');
+UI: 'I';
 
-UJ: ('J');
+UJ: 'J';
 
-UK: ('K');
+UK: 'K';
 
-UL: ('L');
+UL: 'L';
 
-UM: ('M');
+UM: 'M';
 
-UN: ('N');
+UN: 'N';
 
-UO: ('O');
+UO: 'O';
 
-UP: ('P');
+UP: 'P';
 
-UQ: ('Q');
+UQ: 'Q';
 
-UR: ('R');
+UR: 'R';
 
-US: ('S');
+US: 'S';
 
-UT: ('T');
+UT: 'T';
 
-UU: ('U');
+UU: 'U';
 
-UV: ('V');
+UV: 'V';
 
-UW: ('W');
+UW: 'W';
 
-UX: ('X');
+UX: 'X';
 
-UY: ('Y');
+UY: 'Y';
 
-UZ: ('Z');
+UZ: 'Z';
 
 DOT: '.';
 
