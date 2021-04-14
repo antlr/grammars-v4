@@ -252,7 +252,7 @@ chain: branched_atom ( (bond | DOT)? branched_atom)*;
 
 terminator: SPACE TAB | LINEFEED | CARRIAGE_RETURN;
 
-LA: ('a');
+LA: 'a';
 
 LB: ('b');
 
