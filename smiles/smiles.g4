@@ -241,7 +241,7 @@ class_: ':' DIGIT+;
 
 bond: '-' | '=' | '#' | '$' | ':' | '/' | '\\';
 
-ringbond: bond? DIGIT | bond? '%' DIGIT DIGIT;
+ringbond: bond? (DIGIT | '%' DIGIT DIGIT);
 
 branched_atom: atom ringbond* branch*;
 
