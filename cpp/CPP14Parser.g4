@@ -329,8 +329,8 @@ declSpecifier:
 	| Friend
 	| Typedef
 	| Constexpr;
-
-declSpecifierSeq: declSpecifier+ attributeSpecifierSeq?;
+	
+declSpecifierSeq: declSpecifier+? attributeSpecifierSeq?;
 
 storageClassSpecifier:
 	Register
@@ -359,21 +359,27 @@ typeSpecifierSeq: typeSpecifier+ attributeSpecifierSeq?;
 trailingTypeSpecifierSeq:
 	trailingTypeSpecifier+ attributeSpecifierSeq?;
 
+simpleTypeLengthModifier:
+	Short
+	| Long;
+	
+simpleTypeSignednessModifier:
+	Unsigned
+	| Signed;
+
 simpleTypeSpecifier:
 	nestedNameSpecifier? theTypeName
 	| nestedNameSpecifier Template simpleTemplateId
-	| Char
-	| Char16
-	| Char32
-	| Wchar
+	| simpleTypeSignednessModifier
+	| simpleTypeSignednessModifier? simpleTypeLengthModifier+
+	| simpleTypeSignednessModifier? Char
+	| simpleTypeSignednessModifier? Char16
+	| simpleTypeSignednessModifier? Char32
+	| simpleTypeSignednessModifier? Wchar
 	| Bool
-	| Short
-	| Int
-	| Long
-	| Signed
-	| Unsigned
+	| simpleTypeSignednessModifier? simpleTypeLengthModifier* Int
 	| Float
-	| Double
+	| simpleTypeLengthModifier? Double
 	| Void
 	| Auto
 	| decltypeSpecifier;
@@ -816,3 +822,4 @@ literal:
 	| BooleanLiteral
 	| PointerLiteral
 	| UserDefinedLiteral;
+	
