@@ -3277,8 +3277,8 @@ function_call
     : ranking_windowed_function                         #RANKING_WINDOWED_FUNC
     | aggregate_windowed_function                       #AGGREGATE_WINDOWED_FUNC
     | analytic_windowed_function                        #ANALYTIC_WINDOWED_FUNC
+    | built_in_functions                                #BUILT_IN_FUNC
     | scalar_function_name '(' expression_list? ')'     #SCALAR_FUNCTION
-    | build_in_functions                                #BUILT_IN_FUNC
     | freetext_function                                 #FREE_TEXT
     | partition_function                                #PARTITION_FUNC
     ;
@@ -3297,7 +3297,7 @@ freetext_predicate
     : CONTAINS '(' (full_column_name | '(' full_column_name (',' full_column_name)* ')' | '*' | PROPERTY '(' full_column_name ',' expression ')') ',' expression ')'
     | FREETEXT '(' table_name ',' (full_column_name | '(' full_column_name (',' full_column_name)* ')' | '*' ) ',' expression  (',' LANGUAGE expression)? ')'
     ;
-build_in_functions
+built_in_functions
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
     : BINARY_CHECKSUM '(' '*' ')'                       #BINARY_CHECKSUM
     // https://msdn.microsoft.com/en-us/library/hh231076.aspx
