@@ -24,7 +24,7 @@ public abstract class GoParserBase extends Parser
      */
     protected boolean lineTerminatorAhead() {
         // Get the token ahead of the current index.
-        int offset =1;
+        int offset = 1;
         int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - offset;
 
         if (possibleIndexEosToken == -1)
@@ -93,13 +93,12 @@ public abstract class GoParserBase extends Parser
         BufferedTokenStream stream = (BufferedTokenStream)_input;
         int leftParams = 1;
         int rightParams = 0;
-        int valueType;
 
         if (stream.LT(tokenOffset).getType() == GoLexer.L_PAREN) {
             // Scan past parameters
             while (leftParams != rightParams) {
                 tokenOffset++;
-                valueType = stream.LT(tokenOffset).getType();
+                int valueType = stream.LT(tokenOffset).getType();
 
                 if (valueType == GoLexer.L_PAREN){
                     leftParams++;

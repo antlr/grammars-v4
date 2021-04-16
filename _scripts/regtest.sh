@@ -32,28 +32,56 @@ clif \
         ;;
 
     CSharp)
-        do_not_do_list="_grammar-test apex \
-arithmetic asm/masm asn/asn_3gpp \
-calculator cpp csharp \
+        do_not_do_list="
+_grammar-test \
+apex \
+arithmetic \
+asm/masm \
+asn/asn_3gpp \
+calculator \
 clif \
-dcm dgol dice \
-erlang \
+cpp \
+csharp \
+dice \
 fortran77 \
-graphql gtin \
-haskell html http hypertalk \
-idl infosapient \
-java/java9 javadoc javascript/ecmascript javascript/jsx joss \
-kirikiri-tjs kotlin/kotlin \
-logo/logo logo/ucb-logo lpc \
-molecule morsecode \
+haskell \
+html \
+hypertalk \
+idl \
+java/java9 \
+javadoc \
+javascript/ecmascript \
+javascript/jsx \
+kirikiri-tjs \
+kotlin/kotlin \
+logo/ucb-logo \
+lpc \
 objc \
-pddl pgn php pike pmmn powerbuilder python/python2 python/python2-js \
-python/python3 python/python3-js python/python3-py python/python3-ts \
-python/python3-without-actions python/python3alt python/tiny-python \
-rcs rego restructuredtext rexx rfc1035 rfc1960 rfc3080 \
-sharc smiles sql/hive sql/mysql sql/plsql sql/sqlite sql/tsql \
-stacktrace stringtemplate swift-fin swift/swift2 swift/swift3 \
-tcpheader terraform thrift \
+pgn \
+php \
+pike \
+powerbuilder \
+python/python2 \
+python/python2-js \
+python/python3 \
+python/python3-js \
+python/python3-py \
+python/python3-ts \
+python/python3-without-actions \
+python/python3alt \
+python/tiny-python \
+rego \
+rexx \
+sql/hive \
+sql/plsql \
+sql/sqlite \
+sql/tsql \
+stringtemplate \
+swift-fin \
+swift/swift2 \
+swift/swift3 \
+tcpheader \
+thrift \
 unicode/unicode16 \
 v \
 wat \
@@ -65,32 +93,88 @@ z \
         ;;
 
     Dart)
-        do_not_do_list="_grammar-test \
-antlr/antlr2 antlr/antlr3 antlr/antlr4 \
-apex asm/masm asn/asn_3gpp \
+        do_not_do_list="
+_grammar-test \
+antlr/antlr2 \
+antlr/antlr3 \
+antlr/antlr4 \
+apex \
+asm/masm \
+asn/asn_3gpp \
+atl \
 clif \
 csharp \
-dcm dgol dice \
+dart2 \
+dice \
+edif300 \
+edn \
 erlang \
+focal \
 fortran77 \
-graphql gtin \
-haskell html http hypertalk \
-idl infosapient \
-java/java9 javadoc javascript/ecmascript javascript/jsx joss \
-kirikiri-tjs kotlin/kotlin \
-logo/logo logo/ucb-logo lpc \
-molecule morsecode \
-objc \
-pddl pgn php pike pmmn powerbuilder python/python2 python/python2-js \
-python/python3 python/python3-js python/python3-py python/python3-ts \
-python/python3-without-actions python/python3alt python/tiny-python \
-rcs rego restructuredtext rexx rfc1035 rfc1960 rfc3080 \
-sharc smiles sql/hive sql/mysql sql/plsql sql/sqlite sql/tsql \
-stacktrace stringtemplate swift-fin swift/swift2 swift/swift3 \
-tcpheader terraform thrift \
-unicode/unicode16 \
+fusion-tables \
+gff3 \
+golang \
+haskell \
+html \
+hypertalk \
+icalendar \
+idl \
+infosapient \
+java/java9 \
+javadoc \
+javascript/ecmascript \
+javascript/javascript \
+javascript/jsx \
+javascript/typescript \
+kirikiri-tjs \
+kotlin/kotlin \
+kotlin/kotlin-formal \
+lambda \
+logo/logo \
+logo/ucb-logo \
+lpc \
+metric \
+modula2pim4 \
+molecule \
+oberon \
+pascal \
+pdn \
+pgn \
+php \
+powerbuilder \
+prolog \
+promql \
+protobuf3 \
+python/python2 \
+python/python3 \
+python/python3-js \
+python/python3-py \
+python/python3-ts \
+python/python3-without-actions \
+python/python3alt \
+python/tiny-python \
+quakemap \
+rego \
+restructuredtext \
+rexx \
+ruby \
+rust \
+sql/hive \
+sql/plsql \
+sql/sqlite \
+sql/tsql \
+stringtemplate \
+swift-fin \
+swift/swift2 \
+swift/swift3 \
+tcpheader \
+terraform \
+thrift \
+tinymud \
 v \
+vb6 \
 wat \
+webidl \
 xpath/xpath31 \
 z \
         "
@@ -100,29 +184,352 @@ z \
 
     Go)
         do_not_do_list=" \
+_grammar-test \
+algol60 \
+antlr/antlr2 \
+antlr/antlr3 \
+antlr/antlr4 \
+apex \
+arithmetic \
+asm/asmMASM \
+asm/asmZ80 \
+asm/masm \
+asm/pdp7 \
+asn/asn_3gpp \
 clif \
+cpp \
+csharp \
+dice \
+edif300 \
+edn \
+erlang \
+flatbuffers \
+focal \
+fortran77 \
+gff3 \
+golang \
+guitartab \
+haskell \
+html \
+hypertalk \
+icalendar \
+inf \
+informix \
+java/java \
+java/java8 \
+java/java9 \
+javadoc \
+javascript/ecmascript \
+javascript/javascript \
+javascript/jsx \
+javascript/typescript \
+joss \
 kirikiri-tjs \
+kotlin/kotlin \
+kotlin/kotlin-formal \
+kuka \
+lambda \
+logo/logo \
+logo/ucb-logo \
+lolcode \
+lpc \
+lua \
+mckeeman-form \
+metric \
+modula2pim4 \
+molecule \
+moo \
+muddb \
+oberon \
+oncrpc \
+p \
+pascal \
+pddl \
+pdn \
+pgn \
+php \
+ply \
+powerbuilder \
+protobuf3 \
+python/python2 \
+python/python3 \
+python/python3-js \
+python/python3-py \
+python/python3-ts \
+python/python3-without-actions \
+python/python3alt \
+python/tiny-python \
+quakemap \
+r \
+rego \
+rexx \
+rust \
+scala \
+scss \
+sgf \
+sieve \
+smalltalk \
+smtlibv2 \
+sparql \
+sql/hive \
+sql/plsql \
+sql/sqlite \
+sql/tsql \
+stringtemplate \
+swift-fin \
+swift/swift2 \
+swift/swift3 \
+tcpheader \
+terraform \
+thrift \
+tinymud \
+toml \
+trac \
+ttm \
+turing \
+turtle \
+turtle-doc \
+url \
+v \
+vb6 \
+vba \
+verilog/verilog \
+wat \
+webidl \
+xpath/xpath1 \
+xpath/xpath31 \
+z \
         "
+	todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n\r/ /' | sed 's/  / /g' | sed 's/ /|/g'`)/\$)"
+	echo $todo_pattern
         ;;
 
     Java)
         do_not_do_list=" \
+_grammar-test \
 clif \
+dice \
+html \
+hypertalk \
+javascript/ecmascript \
+kotlin/kotlin \
+kotlin/kotlin-formal \
+lambda \
+less \
+metric \
+molecule \
+p \
+php \
+powerbuilder \
+python/python2 \
+python/python3-js \
+python/python3-py \
+python/python3-ts \
+python/python3-without-actions \
+python/tiny-python \
+scss \
+sql/hive \
+sql/plsql \
+sql/tsql \
+stringtemplate \
+swift-fin \
+swift/swift2 \
+tcpheader \
+wat \
         "
+	todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n\r/ /' | sed 's/  / /g' | sed 's/ /|/g'`)/\$)"
+	echo $todo_pattern
         ;;
 
     JavaScript)
         do_not_do_list=" \
+_grammar-test \
+antlr/antlr2 \
+apex \
+arithmetic \
+asm/masm \
+asn/asn_3gpp \
+basic \
+c \
 clif \
-antlr/antlr2 apex arithmetic asm/masm asn/asn_3gpp basic c cql3 csharp \
-	"
-        ;;
+cql3 \
+csharp \
+dice \
+fortran77 \
+golang \
+haskell \
+html \
+hypertalk \
+idl \
+java/java \
+java/java9 \
+javadoc \
+javascript/ecmascript \
+javascript/javascript \
+javascript/jsx \
+javascript/typescript \
+kotlin/kotlin \
+lambda \
+less \
+logo/ucb-logo \
+lua \
+matlab \
+metric \
+molecule \
+p \
+pcre \
+pgn \
+php \
+pike \
+powerbuilder \
+promql \
+python/python2 \
+python/python3 \
+python/python3-js \
+python/python3-py \
+python/python3-ts \
+python/python3-without-actions \
+python/tiny-python \
+rego \
+rexx \
+ruby \
+rust \
+sql/hive \
+sql/plsql \
+sql/tsql \
+stringtemplate \
+swift-fin \
+swift/swift2 \
+swift/swift3 \
+tcpheader \
+thrift \
+v \
+wat \
+xpath/xpath31 \
+z \
+"
+	todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n\r/ /' | sed 's/  / /g' | sed 's/ /|/g'`)/\$)"
+	echo $todo_pattern
+	;;
 
-    Python)
+    Python3)
         do_not_do_list=" \
+_grammar-test \
+antlr/antlr2 \
+antlr/antlr3 \
+antlr/antlr4 \
+apex \
+asm/asmMASM \
+asm/masm \
+asn/asn_3gpp \
 clif \
-antlr/antlr2 antlr/antlr3 antlr/antlr4 apex asm/asmMASM asm/masm asn/asn_3gpp cpp csharp kirikiri-tjs \
+cpp \
+cql3 \
+csharp \
+css3 \
+dice \
+dot \
+edif300 \
+edn \
+erlang \
+flatbuffers \
+focal \
+fortran77 \
+gff3 \
+gml \
+golang \
+haskell \
+html \
+hypertalk \
+icalendar \
+idl \
+informix \
+infosapient \
+java/java9 \
+javadoc \
+javascript/ecmascript \
+javascript/javascript \
+javascript/jsx \
+javascript/typescript \
+joss \
+kotlin/kotlin \
+kotlin/kotlin-formal \
+kuka \
+lambda \
+less \
+logo/logo \
+logo/ucb-logo \
+lolcode \
+mckeeman-form \
+mdx \
+metric \
+microc \
+modula2pim4 \
+molecule \
+moo \
+muddb \
+mumath \
+oberon \
+p \
+parkingsign \
+pascal \
+pddl \
+peoplecode \
+pgn \
+php \
+pl0 \
+ply \
+powerbuilder \
+protobuf3 \
+python/python2 \
+python/python3 \
+python/python3-js \
+python/python3-py \
+python/python3-ts \
+python/python3-without-actions \
+python/python3alt \
+python/tiny-python \
+quakemap \
+redcode \
+rego \
+rexx \
+rfc1960 \
+ruby \
+rust \
+scala \
+scss \
+sexpression \
+sgf \
+smalltalk \
+sparql \
+sql/hive \
+sql/plsql \
+sql/sqlite \
+sql/tsql \
+stellaris \
+stringtemplate \
+swift-fin \
+swift/swift2 \
+swift/swift3 \
+tcpheader \
+terraform \
+tinyc \
+tinymud \
+toml \
+turing \
+turtle \
+turtle-doc \
+v \
+vb6 \
+vba \
+wat \
+wavefront \
+webidl \
+xpath/xpath31 \
+z \
         "
+	todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n\r/ /' | sed 's/  / /g' | sed 's/ /|/g'`)/\$)"
+	echo $todo_pattern
         ;;
 
     *)          echo "Unknown target"; exit 1;;
@@ -244,14 +651,14 @@ test()
 part1()
 {
 	date
-	dotnet tool uninstall -g dotnet-antlr
-	dotnet tool install -g dotnet-antlr --version 3.1.5
-	dotnet tool uninstall -g csxml2
-	dotnet tool install -g csxml2 --version 1.0.0
+	dotnet tool uninstall -g trgen
+	dotnet tool install -g trgen --version 0.5.3
+	dotnet tool uninstall -g trxml2
+	dotnet tool install -g trxml2 --version 0.5.0
 	# 1) Generate driver source code from poms.
 	rm -rf `find . -name Generated -type d`
 	echo "Generating drivers."
-	bad=`dotnet-antlr -m true --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.2-complete.jar`
+	bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.2-complete.jar`
 	for i in $bad; do failed=`add "$failed" "$i"`; done
 	date
 }

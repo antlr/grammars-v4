@@ -92,7 +92,7 @@ public abstract class GoParserBase : Parser
     /// </summary>
     protected bool noTerminatorAfterParams(int tokenOffset)
     {
-        BufferedTokenStream stream = (BufferedTokenStream)tokenStream;
+        BufferedTokenStream stream = (BufferedTokenStream) tokenStream;
         int leftParams = 1;
         int rightParams = 0;
 
