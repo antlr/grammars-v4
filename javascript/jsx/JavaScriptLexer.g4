@@ -185,7 +185,7 @@ StringLiteral:                 ('"' DoubleStringCharacter* '"'
              |                  '\'' SingleStringCharacter* '\'') {this.ProcessStringLiteral();}
              ;
 
-LinkLiteral: .*? ':' '//'[a-zA-Z0-9./?=]+;
+LinkLiteral: ('http' | 'https' | 'ftp' | 'file') '://' [a-zA-Z0-9./?=]+; // TODO Could be more precise
 
 // TODO: `${`tmp`}`
 TemplateStringLiteral:          '`' ('\\`' | ~'`')* '`';
