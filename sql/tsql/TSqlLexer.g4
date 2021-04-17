@@ -216,6 +216,7 @@ WHILE:                                 'WHILE';
 WITH:                                  'WITH';
 WITHIN:                                'WITHIN';
 WRITETEXT:                             'WRITETEXT';
+DOLLAR_PARTITION:                      '$PARTITION';
 
 //Keywords that can exist in ID etc
 ABSOLUTE:                              'ABSOLUTE';
