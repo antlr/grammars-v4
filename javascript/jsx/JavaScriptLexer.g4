@@ -35,10 +35,6 @@ channels { ERROR }
 options { superClass=JavaScriptLexerBase; }
 
 HashBangLine:                   { this.IsStartOfFile()}? '#!' ~[\r\n\u2028\u2029]*; // only allowed at start
-JsxComment:                     '{/*' .*? '*/}'           -> channel(HIDDEN);
-MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
-SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
-RegularExpressionLiteral:       '/' RegularExpressionFirstChar RegularExpressionChar* {this.IsRegexPossible()}? '/' IdentifierPart*;
 
 OpenBracket:                    '[';
 CloseBracket:                   ']';
@@ -197,6 +193,11 @@ WhiteSpaces:                    [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN)
 LineTerminator:                 [\r\n\u2028\u2029] -> channel(HIDDEN);
 
 /// Comments
+
+JsxComment:                     '{/*' .*? '*/}'           -> channel(HIDDEN);
+MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
+SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
+RegularExpressionLiteral:       '/' RegularExpressionFirstChar RegularExpressionChar* {this.IsRegexPossible()}? '/' IdentifierPart*;
 
 
 HtmlComment:                    '<!--' .*? '-->' -> channel(HIDDEN);
