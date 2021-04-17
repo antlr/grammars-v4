@@ -185,6 +185,8 @@ StringLiteral:                 ('"' DoubleStringCharacter* '"'
              |                  '\'' SingleStringCharacter* '\'') {this.ProcessStringLiteral();}
              ;
 
+LinkLiteral: .*? ':' '//'[a-zA-Z0-9./?=]+;
+
 // TODO: `${`tmp`}`
 TemplateStringLiteral:          '`' ('\\`' | ~'`')* '`';
 
