@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using Antlr4.Runtime;
 
-    public abstract class GoParserBase : Parser
+public abstract class GoParserBase : Parser
+{
+    protected GoParserBase(ITokenStream input)
+        : base(input)
     {
-        protected GoParserBase(ITokenStream input)
-            : base(input)
-        {
-        }
+    }
 
-        /// <summary>
-        /// Returns `true` if on the current index of the parser's
-        /// token stream a token exists on the `HIDDEN` channel which
-        /// either is a line terminator, or is a multi line comment that
-        /// contains a line terminator.
-        /// </summary>
-        protected bool lineTerminatorAhead()
+    /// <summary>
+    /// Returns `true` if on the current index of the parser's
+    /// token stream a token exists on the `HIDDEN` channel which
+    /// either is a line terminator, or is a multi line comment that
+    /// contains a line terminator.
+    /// </summary>
+    protected bool lineTerminatorAhead()
     {
         // Get the token ahead of the current index.
         int offset = 1;
@@ -57,80 +57,80 @@ using Antlr4.Runtime;
         return false;
     }
 
-        /// <summary>
-        /// Returns `true` if no line terminator exists between the specified
-        /// token offset and the prior one on the `HIDDEN` channel.
-        /// </summary>
-        protected bool noTerminatorBetween(int tokenOffset)
+    /// <summary>
+    /// Returns `true` if no line terminator exists between the specified
+    /// token offset and the prior one on the `HIDDEN` channel.
+    /// </summary>
+    protected bool noTerminatorBetween(int tokenOffset)
+    {
+        BufferedTokenStream stream = (BufferedTokenStream)tokenStream;
+        IList<IToken> tokens = stream.GetHiddenTokensToLeft(LT(stream, tokenOffset).TokenIndex);
+
+        if (tokens == null)
         {
-            BufferedTokenStream stream = (BufferedTokenStream)tokenStream;
-            IList<IToken> tokens = stream.GetHiddenTokensToLeft(LT(stream, tokenOffset).TokenIndex);
-
-            if (tokens == null)
-            {
-                return true;
-            }
-
-            foreach (IToken token in tokens)
-            {
-                if (token.Text.Contains("\n"))
-                    return false;
-            }
-
             return true;
         }
 
-        /// <summary>
-        /// Returns `true` if no line terminator exists after any encountered
-        /// parameters beyond the specified token offset and the next on the
-        /// `HIDDEN` channel.
-        /// </summary>
-        protected bool noTerminatorAfterParams(int tokenOffset)
+        foreach (IToken token in tokens)
         {
-            BufferedTokenStream stream = (BufferedTokenStream) tokenStream;
-            int leftParams = 1;
-            int rightParams = 0;
+            if (token.Text.Contains("\n"))
+                return false;
+        }
 
-            if (LT(stream, tokenOffset).Type == L_PAREN)
+        return true;
+    }
+
+    /// <summary>
+    /// Returns `true` if no line terminator exists after any encountered
+    /// parameters beyond the specified token offset and the next on the
+    /// `HIDDEN` channel.
+    /// </summary>
+    protected bool noTerminatorAfterParams(int tokenOffset)
+    {
+        BufferedTokenStream stream = (BufferedTokenStream) tokenStream;
+        int leftParams = 1;
+        int rightParams = 0;
+
+        if (LT(stream, tokenOffset).Type == GoLexer.L_PAREN)
+        {
+            // Scan past parameters
+            while (leftParams != rightParams)
             {
-                // Scan past parameters
-                while (leftParams != rightParams)
-                {
-                    tokenOffset++;
-                    int tokenType = LT(stream, tokenOffset).Type;
-
-                    if (tokenType == L_PAREN)
-                    {
-                        leftParams++;
-                    }
-                    else if (tokenType == R_PAREN)
-                    {
-                        rightParams++;
-                    }
-                }
-
                 tokenOffset++;
-                return noTerminatorBetween(tokenOffset);
+                int tokenType = LT(stream, tokenOffset).Type;
+
+                if (tokenType == GoLexer.L_PAREN)
+                {
+                    leftParams++;
+                }
+                else if (tokenType == GoLexer.R_PAREN)
+                {
+                    rightParams++;
+                }
             }
 
-            return true;
+            tokenOffset++;
+            return noTerminatorBetween(tokenOffset);
         }
 
-        protected bool checkPreviousTokenText(string text)
-        {
-            return LT(tokenStream, 1).Text?.Equals(text) ?? false;
-        }
+        return true;
+    }
 
-        private IToken LT(ITokenStream stream, int k)
-        {
-            return stream.Lt(k);
-        }
+    protected bool checkPreviousTokenText(string text)
+    {
+        return LT(tokenStream, 1).Text?.Equals(text) ?? false;
+    }
 
-        private ITokenStream tokenStream
+    private IToken LT(ITokenStream stream, int k)
+    {
+        return stream.Lt(k);
+    }
+
+    private ITokenStream tokenStream
+    {
+        get
         {
-            get
-            {
-                return _input;
-            }
+            return _input;
         }
     }
+}
