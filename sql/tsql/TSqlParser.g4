@@ -674,7 +674,7 @@ alter_availability_group_options
 ip_v4_failover
     : STRING
     ;
-    
+
 ip_v6_failover
     : STRING
     ;
@@ -760,7 +760,7 @@ drop_database_audit_specification
 drop_database_encryption_key
     : DROP DATABASE ENCRYPTION KEY
     ;
-    
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-database-scoped-credential-transact-sql
 drop_database_scoped_credential
    : DROP DATABASE SCOPED CREDENTIAL credential_name=id
@@ -1878,11 +1878,11 @@ create_index
 
 create_xml_index
     : CREATE PRIMARY? XML INDEX id ON table_name '(' id ')'
-    (USING XML INDEX id (FOR (VALUE | PATH | PROPERTY)?)?)? 
+    (USING XML INDEX id (FOR (VALUE | PATH | PROPERTY)?)?)?
     index_options?
     ';'?
     ;
-    
+
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
 create_or_alter_procedure
     : ((CREATE (OR ALTER)?) | ALTER) proc=(PROC | PROCEDURE) procName=func_proc_name_schema (';' DECIMAL)?
@@ -2377,7 +2377,7 @@ declare_statement
     | DECLARE LOCAL_ID AS? xml_type_definition ';'?
     | WITH XMLNAMESPACES '(' xml_dec+=xml_declaration (',' xml_dec+=xml_declaration)* ')' ';'?
     ;
-    
+
 xml_declaration
     : xml_namespace_uri=STRING AS id
     | DEFAULT STRING
@@ -2558,12 +2558,12 @@ execute_body
     ;
 
 execute_statement_arg
-    : 
+    :
     execute_statement_arg_unnamed (',' execute_statement_arg) *    //Unnamed params can continue unnamed
-    | 
+    |
     execute_statement_arg_named (',' execute_statement_arg_named)* //Named can only be continued by unnamed
     ;
-    
+
 execute_statement_arg_named
     : name=LOCAL_ID '=' value=execute_parameter
     ;
@@ -2728,7 +2728,7 @@ go_batch_statement
     : GO_BATCH (count=DECIMAL)?
     ;
 
-go_statement    
+go_statement
     : GO (count=DECIMAL)?
     ;
 
@@ -2753,13 +2753,13 @@ shutdown_statement
 
 //These are dbcc commands with strange syntax that doesn't fit the regular dbcc syntax
 dbcc_special
-    : DBCC SHRINKLOG ('(' SIZE '='  (constant_expression| id | DEFAULT) ')')? ';'? 
+    : DBCC SHRINKLOG ('(' SIZE '='  (constant_expression| id | DEFAULT) ')')? ';'?
     ;
-    
+
 dbcc_clause
     : DBCC name=dbcc_command ('(' expression_list ')')? (WITH dbcc_options)? ';'?
     ;
-    
+
 dbcc_command
     : simple_id | keyword
     ;
@@ -2922,7 +2922,7 @@ expression
 time_zone
     : AT_KEYWORD TIME ZONE expression
     ;
-    
+
 primitive_expression
     : DEFAULT | NULL_ | LOCAL_ID | constant
     ;
@@ -2977,15 +2977,13 @@ update_elem_merge
     //| full_column_name '.' WRITE (expression, )
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/queries/search-condition-transact-sql
 search_condition
-    : pred+=predicate_br (log=(OR | AND) pred+=predicate_br)*
+    : NOT* (predicate | '(' search_condition ')')
+    | search_condition AND search_condition // AND takes precedence over OR
+    | search_condition OR search_condition
     ;
 
-predicate_br
-    : NOT* predicate
-    | NOT* '(' search_condition ')'
-    ;
-    
 predicate
     : EXISTS '(' subquery ')'
     | freetext_predicate
@@ -3207,7 +3205,7 @@ change_table_changes
 change_table_version
     : CHANGETABLE '(' VERSION versiontable=table_name ',' pk_columns=full_column_name_list ',' pk_values=select_list  ')'
     ;
-    
+
 // https://msdn.microsoft.com/en-us/library/ms191472.aspx
 join_part
     // https://msdn.microsoft.com/en-us/library/ms173815(v=sql.120).aspx
@@ -3287,7 +3285,7 @@ function_call
 partition_function
     : (database=id '.')? DOLLAR_PARTITION '.' func_name=id '(' expression ')'
     ;
-    
+
 freetext_function
     : (CONTAINSTABLE | FREETEXTTABLE) '(' table_name ',' (full_column_name | '(' full_column_name (',' full_column_name)* ')' | '*' ) ',' expression  (',' LANGUAGE expression)? (',' expression)? ')'
     | (SEMANTICSIMILARITYTABLE | SEMANTICKEYPHRASETABLE) '(' table_name ',' (full_column_name | '(' full_column_name (',' full_column_name)* ')' | '*' ) ',' expression ')'
@@ -3347,7 +3345,7 @@ built_in_functions
     | IIF '(' cond=search_condition ',' left=expression ',' right=expression ')'   #IIF
     | STRING_AGG '(' expr=expression ',' separator=expression ')' (WITHIN GROUP '(' order_by_clause ')')?  #STRINGAGG
     ;
-    
+
 xml_data_type_methods
     : value_method
     | query_method
@@ -3358,7 +3356,7 @@ xml_data_type_methods
 value_method
     : (loc_id=LOCAL_ID | value_id=id | eventdata=EVENTDATA | query=query_method | '(' subquery ')') '.' call=value_call
     ;
-    
+
 value_call
     :  VALUE '(' xquery=STRING ',' sqltype=STRING ')'
     ;
@@ -3370,7 +3368,7 @@ query_method
 query_call
     : QUERY '(' xquery=STRING ')'
     ;
-    
+
 exist_method
     : (loc_id=LOCAL_ID | value_id=id | '(' subquery ')') '.' call=exist_call
     ;
@@ -3378,7 +3376,7 @@ exist_method
 exist_call
     : EXIST '(' xquery=STRING ')'
     ;
-    
+
 modify_method
     : (loc_id=LOCAL_ID | value_id=id | '(' subquery ')') '.' call=modify_call
     ;
@@ -3614,7 +3612,7 @@ ddl_object
 
 full_column_name
     : server=id? '.' schema=id? '.' tablename=id? '.' column_name=id
-    | schema=id? '.' tablename=id? '.' column_name=id 
+    | schema=id? '.' tablename=id? '.' column_name=id
     | tablename=id? '.' column_name=id
     | column_name=id
     ;
@@ -3725,7 +3723,7 @@ data_type
     | ext_type=id '(' scale=DECIMAL ')'
     | ext_type=id IDENTITY ('(' seed=DECIMAL ',' inc=DECIMAL ')')?
     | double_prec=DOUBLE PRECISION?
-    | unscaled_type=id 
+    | unscaled_type=id
     ;
 
 default_value
