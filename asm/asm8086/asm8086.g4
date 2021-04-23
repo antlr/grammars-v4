@@ -52,7 +52,7 @@ assemblerdirective
    : org
    | end
    | if_
-   | endif
+   | endif_
    | equ
    | db
    | dw
@@ -60,7 +60,7 @@ assemblerdirective
    | dd
    | dseg
    | title
-   | include
+   | include_
    | rw
    | rb
    | rs
@@ -123,7 +123,7 @@ assemblerterm
    | (NOT assemblerterm)
    ;
 
-endif
+endif_
    : ENDIF
    ;
 
@@ -139,7 +139,7 @@ title
    : TITLE string_
    ;
 
-include
+include_
    : INCLUDE name
    ;
 

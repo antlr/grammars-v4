@@ -48,8 +48,8 @@ declaration
    ;
 
 constantDeclaration
-   : ('const' id ':=' expn)
-   | ('const' id (':' typeSpec)? ':=' initializingValue)
+   : ('const' id_ ':=' expn)
+   | ('const' id_ (':' typeSpec)? ':=' initializingValue)
    ;
 
 initializingValue
@@ -57,12 +57,12 @@ initializingValue
    ;
 
 variableDeclaration
-   : ('var' id (',' id)* ':=' expn)
-   | ('var' id (',' id)* ':' typeSpec (':=' initializingValue)?)
+   : ('var' id_ (',' id_)* ':=' expn)
+   | ('var' id_ (',' id_)* ':' typeSpec (':=' initializingValue)?)
    ;
 
 typeDeclaration
-   : 'type' id ':' typeSpec
+   : 'type' id_ ':' typeSpec
    ;
 
 typeSpec
@@ -94,11 +94,11 @@ indexType
    ;
 
 recordType
-   : 'record' id (',' id)* ':' typeSpec (id (',' id)* ':' typeSpec)* 'end' 'record'
+   : 'record' id_ (',' id_)* ':' typeSpec (id_ (',' id_)* ':' typeSpec)* 'end' 'record'
    ;
 
 namedType
-   : id
+   : id_
    ;
 
 subprogramDeclaration
@@ -106,11 +106,11 @@ subprogramDeclaration
    ;
 
 subprogramHeader
-   : 'procedure' id ('(' parameterDeclaration (',' parameterDeclaration)* ')')? 'function' id ('(' parameterDeclaration (',' parameterDeclaration)* ')')? ':' typeSpec
+   : 'procedure' id_ ('(' parameterDeclaration (',' parameterDeclaration)* ')')? 'function' id_ ('(' parameterDeclaration (',' parameterDeclaration)* ')')? ':' typeSpec
    ;
 
 parameterDeclaration
-   : 'var'? id (',' id)* ':' parameterType
+   : 'var'? id_ (',' id_)* ':' parameterType
    ;
 
 parameterType
@@ -121,7 +121,7 @@ parameterType
    ;
 
 subprogramBody
-   : declarationsAndStatements 'end' id
+   : declarationsAndStatements 'end' id_
    ;
 
 declarationsAndStatements
@@ -166,8 +166,8 @@ caseStatement
    ;
 
 forStatement
-   : ('for' id ':' expn '..' expn ('by' expn)? declarationsAndStatements 'end' 'for')
-   | ('for' 'decreasing' id ':' expn '..' expn ('by' expn)? declarationsAndStatements 'end' 'for')
+   : ('for' id_ ':' expn '..' expn ('by' expn)? declarationsAndStatements 'end' 'for')
+   | ('for' 'decreasing' id_ ':' expn '..' expn ('by' expn)? declarationsAndStatements 'end' 'for')
    ;
 
 putStatement
@@ -227,7 +227,7 @@ variableReference
    ;
 
 reference
-   : id reference_2
+   : id_ reference_2
    ;
 
 reference_2
@@ -236,7 +236,7 @@ reference_2
 
 componentSelector
    : '(' expn (',' expn)* ')'
-   | '.' id
+   | '.' id_
    ;
 
 booleanExpn
@@ -299,7 +299,7 @@ substringPosition
    : expn ('*' ('–' expn))
    ;
 
-id
+id_
    : IDENTIFIER
    ;
 

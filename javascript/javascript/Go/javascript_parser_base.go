@@ -37,7 +37,7 @@ func (p *JavaScriptParserBase) notLineTerminator() bool {
 
 func (p *JavaScriptParserBase) notOpenBraceAndNotFunction() bool {
 	nextTokenType := p.GetTokenStream().LT(1).GetTokenType()
-	return nextTokenType != JavaScriptParserOpenBrace && nextTokenType != JavaScriptParserFunction
+	return nextTokenType != JavaScriptParserOpenBrace && nextTokenType != JavaScriptParserFunction_
 }
 
 func (p *JavaScriptParserBase) closeBrace() bool {

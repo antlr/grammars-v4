@@ -141,7 +141,7 @@ For:                            'for';
 Switch:                         'switch';
 While:                          'while';
 Debugger:                       'debugger';
-Function:                       'function';
+Function_:                       'function';
 This:                           'this';
 With:                           'with';
 Default:                        'default';

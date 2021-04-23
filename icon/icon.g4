@@ -302,11 +302,11 @@ expression_list
    ;
 
 subscript_list
-   : subscript
-   | subscript_list ',' subscript
+   : subscript_
+   | subscript_list ',' subscript_
    ;
 
-subscript
+subscript_
    : expression
    | expression ':' expression
    | expression '+:' expression

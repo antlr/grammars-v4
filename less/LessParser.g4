@@ -53,7 +53,7 @@ expression
    | variableName
    ;
 
-function
+function_
    : FUNCTION_NAME LPAREN values? RPAREN
    ;
 
@@ -104,7 +104,7 @@ ruleset
    ;
 
 block
-   : BlockStart (property ';' | statement | mixinReference)* property? BlockEnd
+   : BlockStart (property_ ';' | statement | mixinReference)* property_? BlockEnd
    ;
 
 mixinDefinition
@@ -178,7 +178,7 @@ identifierVariableName
    : (Identifier | IdentifierAfter)
    ;
 
-property
+property_
    : identifier COLON values
    ;
 

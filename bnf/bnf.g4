@@ -53,14 +53,14 @@ alternative
     ;
 
 element
-    : optional
+    : optional_
     | zeroormore
     | oneormore
     | text_
     | id_
     ;
 
-optional
+optional_
     : REND alternatives LEND
     ;
 
