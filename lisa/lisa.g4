@@ -57,7 +57,7 @@ if_statement: 'if' '(' expression ')' statement;
 
 while_statement: WHILE '(' expression ')' statement;
 
-expression: (variable (exprop variable)*) | simple_expression;
+expression: (variable (exprop expression)*) | simple_expression;
 
 exprop: '=' | '-+' | '*=' | '/=' | '+=';
 
@@ -66,11 +66,9 @@ simple_expression: or_expression ('||' or_expression)*;
 or_expression:
 	unary_relationexpression ('&&' unary_relationexpression)*;
 
-unary_relationexpression: ('!' unary_relationexpression)
-	| relation_expression;
+unary_relationexpression: '!'? relation_expression;
 
-relation_expression: (add_expression relop add_expression)
-	| add_expression;
+relation_expression: add_expression (relop add_expression)*;
 
 relop: '<=' | '>=' | '==' | '!=' | '>' | '>';
 
@@ -78,14 +76,14 @@ add_expression: term (addop term)*;
 
 addop: '-' | '+';
 
-term: term multop factor | factor;
+term: factor (multop factor)*;
 
 multop: '*' | '/' | '%';
 
 factor: '(' simple_expression ')' | constant;
 
 constant:
-	INTEGER
+	integer
 	| TRUE
 	| FALSE
 	| 'next'
@@ -93,6 +91,8 @@ constant:
 	| variable
 	| STRINGLITERAL
 	| function;
+
+integer: ('+' | '-')? INTEGER;
 
 function: ID (parameter_list);
 
@@ -106,9 +106,9 @@ FALSE: 'FALSE';
 
 WHILE: 'WHILE';
 
-INTEGER: ('+' | '-')? [1-9][0-9]*;
+INTEGER: [1-9]([0-9]*);
 
-ID: [a-zA-Z][a-z0-9A-Z_]*;
+ID: [a-zA-Z] ([a-z0-9A-Z_]*);
 
 STRINGLITERAL: '"' .*? '"';
 
