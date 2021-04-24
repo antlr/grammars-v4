@@ -68,7 +68,7 @@ prequelConstruct
    // Options - things that affect analysis and/or code generation
 
 optionsSpec
-   : OPTIONS LBRACE (option SEMI)* RBRACE
+   : OPTIONS (option SEMI)* RBRACE
    ;
 
 option
@@ -96,11 +96,11 @@ delegateGrammar
    // Tokens & Channels
 
 tokensSpec
-   : TOKENS LBRACE idList? RBRACE
+   : TOKENS idList? RBRACE
    ;
 
 channelsSpec
-   : CHANNELS LBRACE idList? RBRACE
+   : CHANNELS idList? RBRACE
    ;
 
 idList

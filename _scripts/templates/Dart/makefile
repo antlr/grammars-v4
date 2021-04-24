@@ -10,6 +10,7 @@ SOURCES = $(GENERATED) \
 default: classes
 classes: $(SOURCES)
 	dart pub get
+	dart compile exe cli.dart
 clean:
 	rm -f *.tokens *.interp
 	rm -f $(GENERATED)

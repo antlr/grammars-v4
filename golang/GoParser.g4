@@ -271,7 +271,7 @@ primaryExpr:
 	| primaryExpr (
 		(DOT IDENTIFIER)
 		| index
-		| slice
+		| slice_
 		| typeAssertion
 		| arguments
 	);
@@ -349,7 +349,7 @@ functionLit: FUNC signature block; // function
 
 index: L_BRACKET expression R_BRACKET;
 
-slice:
+slice_:
 	L_BRACKET (
 		expression? COLON expression?
 		| expression? COLON expression COLON expression

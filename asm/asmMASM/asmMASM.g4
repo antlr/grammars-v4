@@ -51,7 +51,7 @@ lbl
 assemblerdirective
    : org
    | if_
-   | endif
+   | endif_
    | equ
    | db
    | dw
@@ -65,7 +65,7 @@ assemblerdirective
    | label_
    | assume
    | extern_
-   | (type expressionlist +)
+   | (type_ expressionlist +)
    ;
 
 masmdirectives
@@ -81,10 +81,10 @@ assume
    ;
 
 label_
-   : name LABEL type
+   : name LABEL type_
    ;
 
-type
+type_
    : BYTE
    | SBYTE
    | WORD
@@ -148,7 +148,7 @@ if_
    : IF expression
    ;
 
-endif
+endif_
    : ENDIF
    ;
 

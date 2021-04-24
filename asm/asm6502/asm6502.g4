@@ -68,11 +68,11 @@ label
    ;
 
 argument
-   : prefix? (number | name | string_ | '*') (('+' | '-') number)?
+   : prefix_? (number | name | string_ | '*') (('+' | '-') number)?
    | '(' argument ')'
    ;
 
-prefix
+prefix_
    : '#'
    ;
 

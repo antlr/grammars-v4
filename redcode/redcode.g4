@@ -28,7 +28,7 @@
 
 grammar redcode;
 
-file
+file_
    : line +
    ;
 

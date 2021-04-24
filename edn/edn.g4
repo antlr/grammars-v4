@@ -35,10 +35,10 @@ value:
 	| keyword
 	| Symbol
 	| tag
-	| list
+	| list_
 	| vector
-	| map
-	| set;
+	| map_
+	| set_;
 
 //maybe add more tags here? did not get a lot of info from the spec
 tag: Hash Symbol;
@@ -51,10 +51,10 @@ keyword:
 		| BooleanLiteral
 		// maybe a character literal here?
 	);
-list: LeftParenthesis value* RightParenthesis;
+list_: LeftParenthesis value* RightParenthesis;
 vector: LeftBracket value* RightBracket;
-map: LeftBrace (value value)* RightBrace;
-set: HashedLeftBrace value* RightBrace;
+map_: LeftBrace (value value)* RightBrace;
+set_: HashedLeftBrace value* RightBrace;
 
 NilLiteral: 'nil';
 

@@ -57,7 +57,7 @@ optionName
 // Normal Field
 
 field
-  : ( REPEATED )? type fieldName EQ fieldNumber ( LB fieldOptions RB )? SEMI
+  : ( REPEATED )? type_ fieldName EQ fieldNumber ( LB fieldOptions RB )? SEMI
   ;
 
 fieldOptions
@@ -79,13 +79,13 @@ oneof
   ;
 
 oneofField
-  : type fieldName EQ fieldNumber ( LB fieldOptions RB )? SEMI
+  : type_ fieldName EQ fieldNumber ( LB fieldOptions RB )? SEMI
   ;
 
 // Map field
 
 mapField
-  : MAP LT keyType COMMA type GT mapName
+  : MAP LT keyType COMMA type_ GT mapName
         EQ fieldNumber ( LB fieldOptions RB )? SEMI
   ;
 keyType
@@ -105,7 +105,7 @@ keyType
 
 // field types
 
-type
+type_
   : DOUBLE
   | FLOAT
   | INT32
@@ -132,10 +132,10 @@ reserved
   ;
 
 ranges
-  : range ( COMMA range )*
+  : range_ ( COMMA range_ )*
   ;
 
-range
+range_
   : intLit ( TO ( intLit | MAX ) )?
   ;
 

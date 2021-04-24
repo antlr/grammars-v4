@@ -58,7 +58,7 @@ cqlQuery
    ;
 
 prefixAssignment
-   : '>' prefix '=' uri
+   : '>' prefix_ '=' uri
    | '>' uri
    ;
 
@@ -116,7 +116,7 @@ modifier
    : '/' modifierName (comparitorSymbol modifierValue)?
    ;
 
-prefix
+prefix_
    : term
    ;
 

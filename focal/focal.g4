@@ -51,11 +51,11 @@ command
    : ask
    | do_
    | for_
-   | set
+   | set_
    | quit
    | goto_
    | if_
-   | type
+   | type_
    | return_
    | write_
    | comment
@@ -81,7 +81,7 @@ quit
    : 'QUIT'
    ;
 
-set
+set_
    : ('SET' | 'S') VARIABLE '=' expression (';' command)?
    ;
 
@@ -93,7 +93,7 @@ if_
    : ('IF') expression linenum (',' linenum) (',' linenum) (';' command)?
    ;
 
-type
+type_
    : ('TYPE' | 'T') typeexpression (',' typeexpression)* (';' command)?
    ;
 
