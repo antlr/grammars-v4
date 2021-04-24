@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>apex.g4</include>
+					   <include>apexLexer.g4</include>
+					   <include>apexParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
