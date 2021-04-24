@@ -111,7 +111,7 @@ unuary_exp5
    ;
 
 binary_exp10
-   : in register_ Separator (register_ | Integer)
+   : in_ register_ Separator (register_ | Integer)
    ;
 
 binary_exp11
@@ -384,7 +384,7 @@ interruption
    | RETF
    ;
 
-in
+in_
    : IN
    ;
 

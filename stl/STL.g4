@@ -1,5 +1,5 @@
 grammar STL;
-file: header triangle* footer EOF;
+file_: header triangle* footer EOF;
 triangle:
 	'facet' 'normal' n = triple 'outer' 'loop' vertex vertex vertex 'endloop' 'endfacet';
 vertex: 'vertex' triple;

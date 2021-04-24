@@ -42,7 +42,7 @@ line
    ;
 
 dataline
-   : seqid '\t' source '\t' type '\t' start '\t' end '\t' score '\t' strand '\t' phase '\t' attributes? EOL
+   : seqid '\t' source '\t' type_ '\t' start '\t' end '\t' score '\t' strand '\t' phase '\t' attributes? EOL
    ;
 
 attributes
@@ -61,7 +61,7 @@ source
    : TEXT
    ;
 
-type
+type_
    : TEXT
    ;
 

@@ -48,7 +48,7 @@ predicateObjectList
    ;
 
 objectList
-   : object (Coma object)*
+   : object_ (Coma object_)*
    ;
 
 predicateObject
@@ -65,7 +65,7 @@ predicate
    : iri
    ;
 
-object
+object_
    : iri
    | blankNode
    | collection
@@ -84,7 +84,7 @@ blankNodePropertyList
    ;
 
 collection
-   : LParen object* RParen
+   : LParen object_* RParen
    ;
 
 numericLiteral

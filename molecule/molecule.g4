@@ -33,10 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar molecule;
 
 molecule
-   : part ('·' part)*
+   : part_ ('·' part_)*
    ;
 
-part
+part_
     : (count? structure)+;
 
 structure

@@ -39,7 +39,7 @@ options {
 	tokenVocab=STLexer;
 }
 
-template
+template_
 	: elements EOF
 	;
 
@@ -153,12 +153,12 @@ primary
 	| TRUE
 	| FALSE
 	| subtemplate
-	| list
+	| list_
 	| LPAREN conditional RPAREN
 	| LPAREN mapExpr RPAREN ( LPAREN argExprList? RPAREN )?
 	;
 
-list
+list_
 	: LBRACK argExprList? RBRACK
 	;
 

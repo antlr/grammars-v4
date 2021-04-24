@@ -10,7 +10,7 @@ grammar algol60;
 // TBD
 
 // 1.1
-empty : ;
+empty_ : ;
 fragment Basic_symbol : Letter | Digit | Logical_value_f | Delimiter ;
 
 // The alphabet can be extended in any way.
@@ -198,7 +198,7 @@ assignment_statement : left_part_list arithmetic_expression | left_part_list boo
 go_to_statement : Goto_ designational_expression ;
 
 // 4.4.1
-dummy_statement : empty ;
+dummy_statement : empty_ ;
 
 // 4.5.1
 // dup if_clause
@@ -219,7 +219,7 @@ for_statement : for_clause statement | label Colon_ for_statement ;
 // dup letter_string
 // dup parameter_delimiter
 // dup actual_parameter_list
-actual_parameter_part : empty | LP_ actual_parameter_list Rp_ ;
+actual_parameter_part : empty_ | LP_ actual_parameter_list Rp_ ;
 procedure_statement : procedure_identifier actual_parameter_part ;
 
 // 4.7.8
@@ -231,7 +231,7 @@ declaration : type_declaration | array_declaration | switch_declaration | proced
 // 5.1.1
 type_list : simple_variable | simple_variable Comma_ type_list ;
 type_ : Real_ | Integer_ | Boolean_ ;
-local_or_own : empty | Own_ ;
+local_or_own : empty_ | Own_ ;
 type_declaration : local_or_own type_ type_list ;
 
 // 5.2.1
@@ -251,11 +251,11 @@ switch_declaration : Switch_ switch_identifier Assign_ switch_list ;
 // 5.4.1
 formal_parameter : Identifier ;
 formal_parameter_list : formal_parameter | formal_parameter_list parameter_delimiter formal_parameter ;
-formal_parameter_part : empty | LP_ formal_parameter_list Rp_ ;
+formal_parameter_part : empty_ | LP_ formal_parameter_list Rp_ ;
 identifier_list : Identifier | identifier_list Comma_ Identifier ;
-value_part : Value_ identifier_list Semi_ | empty ;
+value_part : Value_ identifier_list Semi_ | empty_ ;
 specifier : String_ | type_ | Array_ | type_ Array_ | Label_ | Switch_ | Procedure_ | type_ Procedure_ ;
-specification_part : empty | specifier identifier_list Semi_ | specification_part specifier identifier_list ;
+specification_part : empty_ | specifier identifier_list Semi_ | specification_part specifier identifier_list ;
 procedure_heading : procedure_identifier formal_parameter_part Semi_ value_part specification_part ;
 procedure_body : statement | code ;
 procedure_declaration : Procedure_ procedure_heading procedure_body | type_ Procedure_ procedure_heading procedure_body ;
