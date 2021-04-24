@@ -30,7 +30,7 @@ declaration_block: 'declare' '{' declaration_statements '}';
 
 declaration_statements: declaration_statement+;
 
-declaration_statement: type ID;
+declaration_statement: type ID ';';
 
 type: 'int' | 'dfa' | 'nfa' | 'regex' | 'bool' | 'string';
 
@@ -47,7 +47,7 @@ statement:
 	| ('continue' ';');
 
 generating_statement:
-	'generate' '(' generator_type ',' INT ',' INT ')' statement;
+	'generate' '(' generator_type ',' 'int' ',' 'int' ')' statement;
 
 generator_type: 'random' | 'enumerate';
 
@@ -57,7 +57,7 @@ if_statement: 'if' '(' expression ')' statement;
 
 while_statement: WHILE '(' expression ')' statement;
 
-expression: variable exprop expression | simple_expression;
+expression: (variable (exprop variable)*) | simple_expression;
 
 exprop: '=' | '-+' | '*=' | '/=' | '+=';
 
@@ -76,7 +76,7 @@ relop: '<=' | '>=' | '==' | '!=' | '>' | '>';
 
 add_expression: term (addop term)*;
 
-addop: '=' | '+';
+addop: '-' | '+';
 
 term: term multop factor | factor;
 
@@ -106,13 +106,13 @@ FALSE: 'FALSE';
 
 WHILE: 'WHILE';
 
-INT: [0-9]+;
+INTEGER: ('+' | '-')? [1-9][0-9]*;
 
-INTEGER: INT;
-
-ID: [a-zA-Z]+;
+ID: [a-zA-Z][a-z0-9A-Z_]*;
 
 STRINGLITERAL: '"' .*? '"';
+
+COMMENT: '//' ~[\r\n]* -> skip;
 
 WS: [ \r\n\t]+ -> skip;
 
