@@ -90,11 +90,12 @@ constant:
 	| 'hasnext'
 	| variable
 	| STRINGLITERAL
-	| function;
+	| function
+	| type;
 
 integer: ('+' | '-')? INTEGER;
 
-function: ID (parameter_list);
+function: ID '(' parameter_list ')';
 
 parameter_list: simple_expression (',' simple_expression)*;
 
