@@ -197,6 +197,7 @@
 				<module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
+                <module>plucid</module>
 				<module>ply</module>
 				<module>pmmn</module>
 				<module>postalcode</module>
