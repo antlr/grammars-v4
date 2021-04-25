@@ -133,6 +133,7 @@
 				<module>haskell</module>
 				<module>html</module>
 				<module>http</module>
+                <module>hume</module>
 				<module>hypertalk</module>
 				<module>icalendar</module>
 				<module>icon</module>
