@@ -53,9 +53,9 @@ expression
    | function_call
    ;
    //   | where_clause
-   
+
    //  ;
-   
+
 constant
    : numeric_constant
    | word_constant
@@ -208,7 +208,7 @@ function_definition
 
 formals_list
    : identifier
-   | identifier ',' formals_list
+   | (identifier ',' formals_list)
    ;
 
 N_SIGN
