@@ -158,6 +158,7 @@
 				<module>lambda</module>
 				<module>lcc</module>
 				<module>less</module>
+				<module>lisa</module>
 				<module>logo</module>
 				<module>lolcode</module>
 				<module>loop</module>
