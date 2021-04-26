@@ -72,9 +72,9 @@ iodes
    ;
 
 fundecl
-   : varid '::' type
-   | varid args '=' expr
-   | patt op patt '=' expr
+   : (varid '::' type)
+   | (varid args '=' expr)
+   |( patt op patt '=' expr)
    ;
 
 args
@@ -114,7 +114,7 @@ type
    | ('(' type (',' type)+ ')')
    | ('[' types ']')
    | (typeid type+)
-   | type '-' type
+   | type '->' type
    | '(' type ')'
    ;
 
@@ -127,7 +127,7 @@ basetype
    | 'nat' size
    | 'bool'
    | 'char'
-   | 'STRING' NATCONST?
+   | 'string' NATCONST?
    | 'word' size
    | 'float' size
    ;
@@ -239,7 +239,7 @@ boxmatches
    ;
 
 handler
-   : hpatt '-' cexpr
+   : hpatt '->' cexpr
    ;
 
 hpatt
