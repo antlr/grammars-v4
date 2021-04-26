@@ -178,7 +178,7 @@ matches
    ;
 
 match
-   : patt '-' expr
+   : patt '->' expr
    ;
 
 constant
@@ -312,7 +312,7 @@ linkprop
    ;
 
 id
-   : (modid '.')? localid
+   : (modid '.')? LOCALID
    ;
 
 idlist
@@ -352,7 +352,7 @@ typeid
    ;
 
 modid
-   : localid
+   : LOCALID
    ;
 
 streamid
@@ -389,25 +389,29 @@ wireid
    | '{' id '}'
    ;
 
-localid
+op
+   : OP
+   ;
+
+LOCALID
    : ('_' | LETTER) (LETTER | DIGIT)*
    ;
 
-op
-   : ('+' | '-' | '*' | '/')*
+OP
+   : ('+' | '-' | '*' | '/')+
+   ;
+
+NATCONST
+   : DIGIT+
    ;
 
 HEXDIGIT
-   : [0-9A_F]
+   : [0-9A-F]
    ;
 
 INTCONST
    : NATCONST
    | '(-' NATCONST ')'
-   ;
-
-NATCONST
-   : DIGIT+
    ;
 
 FLOATCONST
@@ -425,11 +429,11 @@ BOOLCONST
    ;
 
 CHARCONST
-   : '’' CHAR '’'
+   : '\'' CHAR '\''
    ;
 
 STRINGCONST
-   : '\''* .? '\''
+   : '"' *.? '"'
    ;
 
 WORDCONST
@@ -469,16 +473,16 @@ LETTER
    ;
 
 CHAR
-   : [A-Z]
-   | ' '
-   | '\t'
-   | '\n'
+   : [A-Za-z]
    | '\\'
    | '\\\\' DIGIT+
    | '0x' HEXDIGIT+
    ;
 
+COMMENT
+   : '--' ~ [\r\n]* -> skip
+   ;
+
 WS
    : [ \r\n\t]+ -> skip
    ;
-
