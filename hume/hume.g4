@@ -44,7 +44,7 @@ decls
    ;
 
 decl
-   : 'import' modid[ idlist ]
+   : 'import' modid idlist?
    | 'export' idlist
    | 'exception' exnid '::' type
    | 'data' typeid varids '=' constrs
@@ -152,7 +152,7 @@ expr
    | expr '::' type
    | expr 'as' type
    | 'raise' exnid expr
-   | expr 'within' constraint[ 'raise' exnid ]
+   | expr 'within' constraint ('raise' exnid)*
    | 'profile' expr
    | 'verify' expr
    | 'trace' expr expr
@@ -247,13 +247,13 @@ hpatt
    ;
 
 wiringdecl
-   : 'replicate' wireid 'as' wireid[ '*' NATCONST ]
-   | 'instantiate' wireid 'as' boxid[ '*' NATCONST ]
+   : 'replicate' wireid 'as' wireid ('*' NATCONST)?
+   | 'instantiate' wireid 'as' boxid ('*' NATCONST)?
    //| 'macro' mid id+ '=' expr
    | 'initial' wireid inits
    | templatedecl
    | wiredecl
-   | 'for' id '=' expr 'to' expr[ 'except' excepts ] wiringdecl
+   | 'for' id '=' expr 'to' expr ('except' excepts)? wiringdecl
    ;
 
 inits
@@ -335,7 +335,10 @@ exnid
    : id
    ;
 
-templateid:id;
+templateid
+   : id
+   ;
+
 varid
    : id
    ;
