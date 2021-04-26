@@ -56,7 +56,7 @@ decl
    | 'interrupt' iodes
    | 'fifo' iodes
    | foreigndecl
-   | 'operation' boxid 'as' STRING '::' type
+   | 'operation' boxid 'as' STRINGCONST '::' type
    | 'expression' expr
    | boxdecl
    | wiringdecl
@@ -68,7 +68,7 @@ constrs
    ;
 
 iodes
-   : ioid ('from' | 'to') STRING (('timeout' | 'within') TIMECONST ('raise' exnid)?)?
+   : ioid ('from' | 'to') STRINGCONST (('timeout' | 'within') TIMECONST ('raise' exnid)?)?
    ;
 
 fundecl
@@ -91,7 +91,7 @@ vardecls
    ;
 
 foreigndecl
-   : 'foreign' 'import' callconv safety? STRING? id '::' type
+   : 'foreign' 'import' callconv safety? STRINGCONST? id '::' type
    ;
 
 safety
@@ -139,7 +139,7 @@ size
 expr
    : constant
    | varid
-   | (expr op expr)
+   //  | (expr op expr)
    | (varid expr+)
    | (conid expr+)
    | ('[' exprs ']')
@@ -186,7 +186,7 @@ constant
    | FLOATCONST
    | BOOLCONST
    | CHARCONST
-   | STRINGconst
+   | STRINGCONST
    | WORDCONST
    ;
 
@@ -432,7 +432,7 @@ STRINGCONST
    : '\''* .? '\''
    ;
 
-WORKCONST
+WORDCONST
    : '0x' HEXDIGIT+
    | '(-0x' HEXDIGIT+ ')'
    ;
@@ -475,7 +475,7 @@ CHAR
    | '\n'
    | '\\'
    | '\\\\' DIGIT+
-   | '\0x' HEXDIGIT+
+   | '0x' HEXDIGIT+
    ;
 
 WS
