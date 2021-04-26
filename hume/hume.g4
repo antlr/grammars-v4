@@ -479,7 +479,9 @@ CHAR
    | '0x' HEXDIGIT+
    ;
 
-COMMENT
+BLOCKCOMMENT:'{-' .*? ('-}' | EOF) -> skip;
+
+LINECOMMENT
    : '--' ~ [\r\n]* -> skip
    ;
 
