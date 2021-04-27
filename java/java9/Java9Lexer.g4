@@ -64,11 +64,6 @@ Total lexer+parser time 2497ms.
  */
 lexer grammar Java9Lexer;
 
-options
-{
-   superClass = Java9LexerBase;
-}
-
 // LEXER
 
 // §3.9 Keywords
@@ -479,27 +474,39 @@ Identifier
 	:	JavaLetter JavaLetterOrDigit*
 	;
 
-fragment
-JavaLetter
-	:	[a-zA-Z$_] // these are the "java letters" below 0x7F
-	|	// covers all characters above 0x7F which are not a surrogate
-		~[\u0000-\u007F\uD800-\uDBFF]
-		{ Check1() }?
-	|	// covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-		[\uD800-\uDBFF] [\uDC00-\uDFFF]
-		{ Check2() }?
-	;
+// The next JavaLetter and JavaLetterOrDigit rules were derived from
+// the Java Spec https://docs.oracle.com/javase/specs/jls/se16/html/jls-3.html#jls-3.8
+// and the OpenJDK version 11.04. The sets here were derived by
+// query of the behavior of Character.isJavaIdentifierStart(int)
+// and Character.isJavaIdentifierPart(int).
+fragment JavaLetter
+    : [\p{Lu}]
+    | [\p{Ll}]
+    | [\p{Lt}]
+    | [\p{Lm}]
+    | [\p{Lo}]
+    | [\p{Nl}]
+    | [\p{Pc}]
+    | [\p{Sc}]
+    ;
 
-fragment
-JavaLetterOrDigit
-	:	[a-zA-Z0-9$_] // these are the "java letters or digits" below 0x7F
-	|	// covers all characters above 0x7F which are not a surrogate
-		~[\u0000-\u007F\uD800-\uDBFF]
-		{ Check3() }?
-	|	// covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-		[\uD800-\uDBFF] [\uDC00-\uDFFF]
-		{ Check4() }?
-	;
+fragment JavaLetterOrDigit
+    : [\p{Lu}]
+    | [\p{Ll}]
+    | [\p{Lt}]
+    | [\p{Lm}]
+    | [\p{Lo}]
+    | [\p{Mn}]
+    | [\p{Mc}]
+    | [\p{Nd}]
+    | [\p{Nl}]
+    | [\p{Cf}]
+    | [\p{Pc}]
+    | [\p{Sc}]
+    | [\u{00000000}-\u{00000008}]
+    | [\u{0000000E}-\u{0000001B}]
+    | [\u{0000007F}-\u{0000009F}]
+    ;
 
 //
 // Whitespace and comments

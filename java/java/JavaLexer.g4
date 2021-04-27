@@ -173,7 +173,7 @@ LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
 
 // Identifiers
 
-IDENTIFIER:         Letter LetterOrDigit*;
+IDENTIFIER:         JavaLetter JavaLetterOrDigit*;
 
 // Fragment rules
 
@@ -199,13 +199,36 @@ fragment Digits
     : [0-9] ([0-9_]* [0-9])?
     ;
 
-fragment LetterOrDigit
-    : Letter
-    | [0-9]
+// The next JavaLetter and JavaLetterOrDigit rules were derived from
+// the Java Spec https://docs.oracle.com/javase/specs/jls/se16/html/jls-3.html#jls-3.8
+// and the OpenJDK version 11.04. The sets here were derived by
+// query of the behavior of Character.isJavaIdentifierStart(int)
+// and Character.isJavaIdentifierPart(int).
+fragment JavaLetter
+    : [\p{Lu}]
+    | [\p{Ll}]
+    | [\p{Lt}]
+    | [\p{Lm}]
+    | [\p{Lo}]
+    | [\p{Nl}]
+    | [\p{Pc}]
+    | [\p{Sc}]
     ;
 
-fragment Letter
-    : [a-zA-Z$_] // these are the "java letters" below 0x7F
-    | ~[\u0000-\u007F\uD800-\uDBFF] // covers all characters above 0x7F which are not a surrogate
-    | [\uD800-\uDBFF] [\uDC00-\uDFFF] // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+fragment JavaLetterOrDigit
+    : [\p{Lu}]
+    | [\p{Ll}]
+    | [\p{Lt}]
+    | [\p{Lm}]
+    | [\p{Lo}]
+    | [\p{Mn}]
+    | [\p{Mc}]
+    | [\p{Nd}]
+    | [\p{Nl}]
+    | [\p{Cf}]
+    | [\p{Pc}]
+    | [\p{Sc}]
+    | [\u{00000000}-\u{00000008}]
+    | [\u{0000000E}-\u{0000001B}]
+    | [\u{0000007F}-\u{0000009F}]
     ;
