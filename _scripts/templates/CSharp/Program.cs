@@ -34,6 +34,7 @@ public class Program
         bool show_tokens = false;
         string file_name = null;
         string input = null;
+        System.Text.Encoding encoding = null;
         for (int i = 0; i \< args.Length; ++i)
         {
             if (args[i].Equals("-tokens"))
@@ -50,6 +51,17 @@ public class Program
                 input = args[++i];
             else if (args[i].Equals("-file"))
                 file_name = args[++i];
+            else if (args[i].Equals("-encoding"))
+            {
+                ++i;
+                if (args[i].ToLower().Equals("utf-8"))
+                    encoding = Encoding.UTF8;
+                else if (args[i].ToLower().Equals("utf-16"))
+                    encoding = Encoding.Unicode;
+                else if (args[i].ToLower().Equals("utf-32"))
+                    encoding = Encoding.UTF32;
+                else throw new Exception("Unknown encoding. Must be utf-8, utf-16, or utf-32.");
+            }
         }
         ICharStream str = null;
         if (input == null && file_name == null)
@@ -60,7 +72,10 @@ public class Program
             str = CharStreams.fromString(input);
         } else if (file_name != null)
         {
-            str = CharStreams.fromPath(file_name);
+            if (encoding == null)
+                str = CharStreams.fromPath(file_name);
+            else
+                str = CharStreams.fromPath(file_name, encoding);
         }
 <if (case_insensitive_type)>
         str = new Antlr4.Runtime.CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
