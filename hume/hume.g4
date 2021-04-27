@@ -74,7 +74,7 @@ iodes
 fundecl
    : (varid '::' type)
    | (varid args '=' expr)
-   |( patt op patt '=' expr)
+   | (patt op patt '=' expr)
    ;
 
 args
@@ -87,7 +87,7 @@ vardecl
    ;
 
 vardecls
-   : (vardecl+) ';'+
+   : vardecl+ ';'
    ;
 
 foreigndecl
@@ -433,7 +433,7 @@ CHARCONST
    ;
 
 STRINGCONST
-   : '"' *.? '"'
+   : '"' ~ '"'* '"'
    ;
 
 WORDCONST
@@ -469,17 +469,19 @@ DIGIT
    ;
 
 LETTER
-   : [A-Za-z]
+   : [A-Za-z']
    ;
 
 CHAR
    : [A-Za-z]
-   | '\\'
    | '\\\\' DIGIT+
-   | '0x' HEXDIGIT+
+   | ('\\' DIGIT+)
+   | ('0x' HEXDIGIT+)
    ;
 
-BLOCKCOMMENT:'{-' .*? ('-}' | EOF) -> skip;
+BLOCKCOMMENT
+   : '{-' .*? ('-}' | EOF) -> skip
+   ;
 
 LINECOMMENT
    : '--' ~ [\r\n]* -> skip
@@ -488,3 +490,4 @@ LINECOMMENT
 WS
    : [ \r\n\t]+ -> skip
    ;
+
