@@ -175,7 +175,7 @@ expression2
    ;
 
 expression3
-   : expression4 '?' expression3 ':' expression3
+   : expression4 ('?' expression3 ':' expression3)?
    ;
 
 expression4
