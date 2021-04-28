@@ -148,7 +148,6 @@ ddl_clause
     | create_server_role
     | create_service
     | create_statistics
-    | create_symmetric_key
     | create_synonym
     | create_table
     | create_type
@@ -1532,27 +1531,6 @@ alter_service_master_key
 
 alter_symmetric_key
     : ALTER SYMMETRIC KEY key_name=id_ ( (ADD|DROP) ENCRYPTION BY (CERTIFICATE certificate_name=id_ | PASSWORD EQUAL password=STRING | SYMMETRIC KEY symmetric_key_name=id_ | ASYMMETRIC KEY Asym_key_name=id_  ) )
-    ;
-
-// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-symmetric-key-transact-sql
-create_symmetric_key
-    :  ALTER SYMMETRIC KEY key_name=id_
-           (AUTHORIZATION owner_name=id_)?
-           (FROM PROVIDER provider_name=id_)?
-           (WITH ( (KEY_SOURCE EQUAL key_pass_phrase=STRING
-                   | ALGORITHM EQUAL (DES | TRIPLE_DES | TRIPLE_DES_3KEY | RC2 | RC4 | RC4_128  | DESX | AES_128 | AES_192 | AES_256)
-                   | IDENTITY_VALUE EQUAL identity_phrase=STRING
-                   | PROVIDER_KEY_NAME EQUAL provider_key_name=STRING
-                   | CREATION_DISPOSITION EQUAL (CREATE_NEW|OPEN_EXISTING)
-                   )
-                 | ENCRYPTION BY
-                     ( CERTIFICATE certificate_name=id_
-                     | PASSWORD EQUAL password=STRING
-                     | SYMMETRIC KEY symmetric_key_name=id_
-                     | ASYMMETRIC KEY asym_key_name=id_
-                     )
-                 )
-            )
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-synonym-transact-sql
