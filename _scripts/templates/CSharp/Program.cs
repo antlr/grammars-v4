@@ -54,13 +54,12 @@ public class Program
             else if (args[i].Equals("-encoding"))
             {
                 ++i;
-                if (args[i].ToLower().Equals("utf-8"))
-                    encoding = Encoding.UTF8;
-                else if (args[i].ToLower().Equals("utf-16"))
-                    encoding = Encoding.Unicode;
-                else if (args[i].ToLower().Equals("utf-32"))
-                    encoding = Encoding.UTF32;
-                else throw new Exception("Unknown encoding. Must be utf-8, utf-16, or utf-32.");
+                encoding = Encoding.GetEncoding(
+                    args[i],
+                    new EncoderReplacementFallback("(unknown)"),
+                    new DecoderReplacementFallback("(error)"));
+                if (encoding == null)
+                    throw new Exception(@"Unknown encoding. Must be an Internet Assigned Numbers Authority (IANA) code page name. https://www.iana.org/assignments/character-sets/character-sets.xhtml");
             }
         }
         ICharStream str = null;
