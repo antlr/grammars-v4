@@ -1866,7 +1866,11 @@ create_or_alter_procedure
     : ((CREATE (OR ALTER)?) | ALTER) proc=(PROC | PROCEDURE) procName=func_proc_name_schema (';' DECIMAL)?
       ('('? procedure_param (',' procedure_param)* ')'?)?
       (WITH procedure_option (',' procedure_option)*)?
-      (FOR REPLICATION)? AS sql_clauses*
+      (FOR REPLICATION)? AS (as_external_name | sql_clauses*)
+    ;
+
+as_external_name
+    : EXTERNAL NAME assembly_name = id_ '.' class_name = id_ '.' method_name = id_
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql
