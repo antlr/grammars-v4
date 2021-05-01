@@ -2005,8 +2005,22 @@ alter_table
                              | WITH CHECK ADD CONSTRAINT constraint=id_ FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
                              | CHECK CONSTRAINT constraint=id_
                              | (ENABLE | DISABLE) TRIGGER id_?
-                             | REBUILD table_options)
+                             | REBUILD table_options
+                             | SWITCH switch_partition)
                              ';'?
+    ;
+
+switch_partition
+    : (PARTITION? source_partition_number_expression=expression)?
+      TO target_table=table_name
+      (PARTITION target_partition_number_expression=expression)?
+      (WITH low_priority_lock_wait)?
+    ;
+
+low_priority_lock_wait
+    : WAIT_AT_LOW_PRIORITY '('
+      MAX_DURATION '=' max_duration=time MINUTES? ','
+      ABORT_AFTER_WAIT '=' abort_after_wait=(NONE | SELF | BLOCKERS) ')'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174269.aspx
