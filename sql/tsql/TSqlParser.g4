@@ -1824,12 +1824,7 @@ output_clause
     ;
 
 output_dml_list_elem
-    : (output_column_name | expression) as_column_alias?  // TODO: scalar_expression
-    ;
-
-output_column_name
-    : (DELETED | INSERTED | table_name) '.' ('*' | id_)
-    | DOLLAR_ACTION
+    : (expression | asterisk) as_column_alias?
     ;
 
 // DDL
@@ -2895,6 +2890,7 @@ expression
     | expression op=('+' | '-' | '&' | '^' | '|' | '||') expression
     | expression time_zone
     | over_clause
+    | DOLLAR_ACTION
     ;
 
 time_zone
@@ -3091,6 +3087,7 @@ udt_method_arguments
 // https://docs.microsoft.com/ru-ru/sql/t-sql/queries/select-clause-transact-sql
 asterisk
     : (table_name '.')? '*'
+    | (INSERTED | DELETED) '.' '*'
     ;
 
 column_elem
@@ -3589,7 +3586,8 @@ ddl_object
     ;
 
 full_column_name
-    : server=id_? '.' schema=id_? '.' tablename=id_? '.' column_name=id_
+    : (DELETED | INSERTED) '.' column_name=id_
+    | server=id_? '.' schema=id_? '.' tablename=id_? '.' column_name=id_
     | schema=id_? '.' tablename=id_? '.' column_name=id_
     | tablename=id_? '.' column_name=id_
     | column_name=id_
