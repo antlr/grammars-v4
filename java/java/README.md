@@ -1,4 +1,4 @@
-# Java Antlr Grammar
+# The optimized Java Antlr grammar
 
 Based on the previous optimized [Java7](../java) grammar by Terence Parr and Sam Harwell
 with the same BSD license. This grammar does not exactly corresponds to the formal
@@ -91,3 +91,5 @@ modifier
     | 'volatile'
     ;
 ```
+
+May 3, 2021
