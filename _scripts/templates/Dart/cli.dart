@@ -12,34 +12,34 @@ class CaseChangingCharStream extends CharStream {
         CharStream stream;
         bool upper;
 
-	CaseChangingCharStream(CharStream str, bool up)
-	{
-		stream = str;
-		upper = up;
-	}
+        CaseChangingCharStream(CharStream str, bool up)
+        {
+                stream = str;
+                upper = up;
+        }
 
-	@override
-	int get index {
-		return stream.index;
-	}
+        @override
+        int get index {
+                return stream.index;
+        }
 
-	@override
-	int get size {
-		return stream.size;
-	}
+        @override
+        int get size {
+                return stream.size;
+        }
 
-//	@override
-//	void reset() {
-//		stream.reset();
-//	}
+//      @override
+//      void reset() {
+//              stream.reset();
+//      }
 
-	@override
-	void consume() {
-		stream.consume();
-	}
+        @override
+        void consume() {
+                stream.consume();
+        }
 
-	@override
-	int LA(int offset) {
+        @override
+        int LA(int offset) {
             int c = stream.LA(offset);
 
             if (c \<= 0)
@@ -64,37 +64,37 @@ class CaseChangingCharStream extends CharStream {
                     o = o + (97 - 65);
                 return o;
             }
-	}
+        }
 
-	@override
-	int mark() {
-		return stream.mark();
-	}
+        @override
+        int mark() {
+                return stream.mark();
+        }
 
-	@override
-	void release(int marker) {
-		stream.release(marker);
-	}
+        @override
+        void release(int marker) {
+                stream.release(marker);
+        }
 
-	@override
-	void seek(int _index) {
-		stream.seek(_index);
-	}
+        @override
+        void seek(int _index) {
+                stream.seek(_index);
+        }
 
-//	String getText(Interval interval)
-//	{
-//		this.stream.getText(interval);
-//	}
+//      String getText(Interval interval)
+//      {
+//              this.stream.getText(interval);
+//      }
 
-	@override
-	String toString() {
-		return this.stream.toString();
-	}
+        @override
+        String toString() {
+                return this.stream.toString();
+        }
 
-	@override
-	String get sourceName {
-		return stream.sourceName;
-	}
+        @override
+        String get sourceName {
+                return stream.sourceName;
+        }
 
 @override
     noSuchMethod(Invocation msg) => "got ${msg.memberName} "
@@ -109,6 +109,7 @@ void main(List\<String> args) async {
     var file_name = null;
     var input = null;
     var str = null;
+    var encoding = null;
     for (int i = 0; i \< args.length; ++i)
     {
         if (args[i] == "-tokens")
@@ -125,25 +126,32 @@ void main(List\<String> args) async {
             input = args[++i];
         else if (args[i] == "-file")
             file_name = args[++i];
+        else if (args[i] == "-encoding")
+        {
+            encoding = Encoding.getByName(args[++i]);
+        }
     }
     <tool_grammar_tuples:{x|<x.GrammarAutomName>.checkVersion();
     }>
     if (input == null && file_name == null)
     {
-	    final List\<int> bytes = \<int>[];
-	    int byte = stdin.readByteSync();
-	    while (byte >= 0) {
-		    bytes.add(byte);
-		    byte = stdin.readByteSync();
-	    }
-	    input = utf8.decode(bytes);
+            final List\<int> bytes = \<int>[];
+            int byte = stdin.readByteSync();
+            while (byte >= 0) {
+                    bytes.add(byte);
+                    byte = stdin.readByteSync();
+            }
+            input = utf8.decode(bytes);
         str = await InputStream.fromString(input);
     } else if (input != null)
     {
         str = await InputStream.fromString(input);
     } else if (file_name != null)
     {
-        str = await InputStream.fromPath(file_name);        
+        //if (encoding == null)
+            str = await InputStream.fromPath(file_name);
+        //else
+        //    str = await InputStream.fromPath(file_name, encoding);
     }
 <if (case_insensitive_type)>
     str = CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
@@ -154,7 +162,7 @@ void main(List\<String> args) async {
         for (int i = 0; ; ++i)
         {
             var token = lexer.nextToken();
-	        print(token.toString());
+                print(token.toString());
             if (token.type == -1)
                 break;
         }
