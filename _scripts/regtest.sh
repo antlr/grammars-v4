@@ -153,9 +153,9 @@ part1()
 {
     date
     dotnet tool uninstall -g trgen
-    dotnet tool install -g trgen --version 0.5.3
+    dotnet tool install -g trgen --version 0.6.0
     dotnet tool uninstall -g trxml2
-    dotnet tool install -g trxml2 --version 0.5.0
+    dotnet tool install -g trxml2 --version 0.6.0
     # 1) Generate driver source code from poms.
     rm -rf `find . -name Generated -type d`
     echo "Generating drivers."
