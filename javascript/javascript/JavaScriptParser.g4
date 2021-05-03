@@ -309,7 +309,7 @@ expressionSequence
     ;
 
 singleExpression
-    : anoymousFunction                                                      # FunctionExpression
+    : anonymousFunction                                                      # FunctionExpression
     | Class identifier? classTail                                           # ClassExpression
     | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
@@ -367,9 +367,9 @@ objectLiteral
     : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
     ;
 
-anoymousFunction
+anonymousFunction
     : functionDeclaration                                                       # FunctionDecl
-    | Async? Function_ '*'? '(' formalParameterList? ')' functionBody    # AnoymousFunctionDecl
+    | Async? Function_ '*'? '(' formalParameterList? ')' functionBody    # AnonymousFunctionDecl
     | Async? arrowFunctionParameters '=>' arrowFunctionBody                     # ArrowFunction
     ;
 
