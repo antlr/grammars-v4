@@ -66,7 +66,7 @@ jobs:
     - name: Install trgen
       shell: pwsh
       run: |
-        dotnet tool install -g trgen --version 0.6.2
+        dotnet tool install -g trgen --version 0.6.3
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
