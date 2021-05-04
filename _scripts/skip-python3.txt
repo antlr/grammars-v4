@@ -2,7 +2,6 @@ _grammar-test
 antlr/antlr2
 antlr/antlr3
 antlr/antlr4
-apex
 asm/asmMASM
 asm/masm
 asn/asn_3gpp
@@ -29,7 +28,6 @@ icalendar
 idl
 informix
 infosapient
-java/java9
 javadoc
 javascript/ecmascript
 javascript/javascript

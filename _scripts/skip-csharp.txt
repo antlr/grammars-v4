@@ -1,5 +1,4 @@
 _grammar-test
-apex
 asm/masm
 asn/asn_3gpp
 clif

@@ -153,7 +153,7 @@ part1()
 {
     date
     dotnet tool uninstall -g trgen
-    dotnet tool install -g trgen --version 0.6.1
+    dotnet tool install -g trgen --version 0.6.2
     dotnet tool uninstall -g trxml2
     dotnet tool install -g trxml2 --version 0.6.0
     # 1) Generate driver source code from poms.

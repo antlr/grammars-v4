@@ -3,7 +3,6 @@ algol60
 antlr/antlr2
 antlr/antlr3
 antlr/antlr4
-apex
 asm/asmMASM
 asm/masm
 asm/pdp7
@@ -20,9 +19,6 @@ hypertalk
 icalendar
 inf
 informix
-java/java
-java/java8
-java/java9
 javadoc
 javascript/ecmascript
 javascript/javascript
