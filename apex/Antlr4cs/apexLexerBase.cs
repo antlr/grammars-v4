@@ -37,8 +37,6 @@ using System.Text.RegularExpressions;
 
 public abstract class apexLexerBase : Lexer
 {
-    private readonly ICharStream _input;
-
     protected apexLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput)
         : base(input)
     {
@@ -51,7 +49,7 @@ public abstract class apexLexerBase : Lexer
         _input = input;
     }
 
-    private class Character
+    public class Character
     {
         public static bool isJavaIdentifierPart(int c)
         {

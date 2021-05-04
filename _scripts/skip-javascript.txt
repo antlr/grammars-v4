@@ -1,6 +1,5 @@
 _grammar-test
 antlr/antlr2
-apex
 arithmetic
 asm/masm
 asn/asn_3gpp
@@ -16,8 +15,6 @@ haskell
 html
 hypertalk
 idl
-java/java
-java/java9
 javadoc
 javascript/ecmascript
 javascript/javascript
