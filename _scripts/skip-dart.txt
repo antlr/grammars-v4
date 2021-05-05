@@ -51,6 +51,7 @@ stringtemplate
 swift-fin
 swift/swift2
 swift/swift3
+swift/swift5
 tcpheader
 thrift
 tinymud
