@@ -1,27 +1,28 @@
+import { Parser } from "antlr4";
 
-var Parser = require('antlr4/index').Parser;
+export default class PlSqlParserBase extends Parser {
+  _isVersion10;
+  _isVersion12;
 
-function PlSqlBaseParser(...args) {
-    Parser.call(this, ...args);
+  constructor(input) {
+    super(input);
     this._isVersion10 = false;
     this._isVersion12 = true;
-    return this;
-}
+  }
 
-PlSqlBaseParser.prototype = Object.create(Parser.prototype);
-PlSqlBaseParser.prototype.constructor = PlSqlBaseParser;
-
-PlSqlBaseParser.prototype.isVersion10 = function () {
+  isVersion10() {
     return this._isVersion10;
-}
-PlSqlBaseParser.prototype.isVersion12 = function () {
-    return this._isVersion12;
-}
-PlSqlBaseParser.prototype.setVersion10 = function (value) {
-    this._isVersion10 = value;
-}
-PlSqlBaseParser.prototype.setVersion12 = function (value) {
-    this._isVersion12 = value;
-}
+  }
 
-exports.PlSqlBaseParser = PlSqlBaseParser;
+  isVersion12() {
+    return this._isVersion12;
+  }
+
+  setVersion10(value) {
+    this._isVersion10 = value;
+  }
+
+  setVersion12(value) {
+    this._isVersion12 = value;
+  }
+}
