@@ -92,11 +92,17 @@ modifier
     ;
 ```
 
-NB: This grammar uses the [Antlr4 tool and runtime](https://www.antlr.org/download.html)
+## Notes
+
+* This grammar uses the [Antlr4 tool and runtime](https://www.antlr.org/download.html)
 for full Unicode code points and general categories.
 Harwell's Antlr4cs alternative tool
 and runtime for Antlr4 is an older version of Antlr4 that
 does not support the Unicode feature. An older version of the grammar
 is provided for back support.
+
+* The Go target fails with an "out of memory" condition for ManyStringsConcat.java.
+Consequently, although the parser works for simple examples, it is currently
+skipped in CI builds.
 
 May 3, 2021

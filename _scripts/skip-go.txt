@@ -19,6 +19,9 @@ hypertalk
 icalendar
 inf
 informix
+java/java
+java/java8
+java/java9
 javadoc
 javascript/ecmascript
 javascript/javascript
