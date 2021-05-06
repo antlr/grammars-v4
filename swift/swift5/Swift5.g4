@@ -281,12 +281,10 @@ variable_declaration:
 		| variable_name (
 			initializer willSet_didSet_block
 			| type_annotation (
-				code_block
-				| (
-					getter_setter_block
-					| getter_setter_keyword_block
-					| initializer? willSet_didSet_block
-				)
+				getter_setter_block
+				| getter_setter_keyword_block
+				| initializer? willSet_didSet_block
+				| code_block
 			)
 		)
 	);
