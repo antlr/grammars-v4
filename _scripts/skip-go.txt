@@ -20,6 +20,9 @@ icalendar
 inf
 informix
 javadoc
+java/java
+java/java8
+java/java9
 javascript/ecmascript
 javascript/javascript
 javascript/jsx
