@@ -190,9 +190,9 @@ availability_condition: '#available' '(' availability_arguments ')';
 
 availability_arguments: availability_argument (',' availability_argument)*;
 
-availability_argument: Platform_name Platform_version | '*';
+availability_argument: platform_name platform_version | '*';
 
-fragment Platform_name:
+platform_name:
 	'iOS'
 	| 'iOSApplicationExtension'
 	| 'macOS'
@@ -202,7 +202,7 @@ fragment Platform_name:
 	| 'watchOS'
 	| 'tvOS';
 
-fragment Platform_version:
+platform_version:
 	Decimal_digits
 	| Decimal_digits '.' Decimal_digits
 	| Decimal_digits '.' Decimal_digits '.' Decimal_digits;
@@ -557,7 +557,7 @@ access_level_modifier:
 
 mutation_modifier: 'mutating' | 'nonmutating';
 
-// Patterns 
+// Patterns
 
 //The following sets of rules are mutually left-recursive [pattern, Type-Casting], to avoid this they were integrated into the same rule.
 pattern:
@@ -584,7 +584,7 @@ tuple_pattern_element_list:
 	tuple_pattern_element (',' tuple_pattern_element)*;
 tuple_pattern_element: (identifier ':')? pattern;
 
-// Enumeration Case Pattern 
+// Enumeration Case Pattern
 enum_case_pattern: type_identifier? '.' enum_case_name tuple_pattern?;
 
 // Optional Pattern
@@ -821,7 +821,7 @@ labeled_trailing_closures: labeled_trailing_closure+;
 
 labeled_trailing_closure: identifier ':' closure_expression;
 
-// Initializer Expression 
+// Initializer Expression
 initializer_expression:
 	primary_expression inner_postfix_expression* '.' 'init' (
 		'(' argument_names ')'
@@ -1323,7 +1323,7 @@ Static_string_literal:
 	'"' Quoted_text? '"'
 	| '"""' [\r\n] Multiline_quoted_text? [\r\n] '"""';
 
-fragment Extended_string_literal_delimiter: '#';
+Extended_string_literal_delimiter: '#';
 
 fragment Quoted_text: Quoted_text_item+;
 fragment Quoted_text_item: Escaped_character | ~["\n\r\\];
