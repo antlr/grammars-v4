@@ -16,7 +16,7 @@ clean:
 	rm -f *.tokens
 	rm -f $(GENERATED)
 run:
-	python Program.py $(RUNARGS)
+	trwdog python Program.py $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
 	java -jar $(JAR) -Dlanguage=Python3 <antlr_tool_args:{y | <y> } > $\<
 } >
