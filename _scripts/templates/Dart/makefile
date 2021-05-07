@@ -16,7 +16,7 @@ clean:
 	rm -f $(GENERATED)
 	rm -f pubspec.lock
 run:
-	trwdog dart run cli.dart $(RUNARGS)
+	trwdog <if(os_win)>dart.bat<else>dart<endif> run cli.dart $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
 	java -jar $(JAR) -Dlanguage=Dart <antlr_tool_args:{y | <y> } > $\<
 } >
