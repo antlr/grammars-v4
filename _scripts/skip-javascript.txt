@@ -1,6 +1,5 @@
 _grammar-test
 antlr/antlr2
-apex
 arithmetic
 asm/masm
 asn/asn_3gpp

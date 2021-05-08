@@ -3,7 +3,6 @@ algol60
 antlr/antlr2
 antlr/antlr3
 antlr/antlr4
-apex
 asm/asmMASM
 asm/masm
 asm/pdp7
