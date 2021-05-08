@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar filter;
 
-filter
+filter_
    : '(' filtercomp ')'
    ;
 
@@ -47,12 +47,12 @@ or_
    ;
 
 not_
-   : '!' filter
+   : '!' filter_
    ;
 
 filterlist
-   : filter
-   | filter filterlist
+   : filter_
+   | filter_ filterlist
    ;
 
 item
@@ -93,14 +93,14 @@ present
    ;
 
 substring
-   : attr '=' initial? any final_?
+   : attr '=' initial? any_ final_?
    ;
 
 initial
    : value
    ;
 
-any
+any_
    : '*' starval?
    ;
 

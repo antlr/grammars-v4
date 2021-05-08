@@ -66,20 +66,20 @@ genericArgsLifetimes
    : lifetime (',' lifetime)*
    ;
 genericArgsTypes
-   : type (',' type)*
+   : type_ (',' type_)*
    ;
 genericArgsBindings
    : genericArgsBinding (',' genericArgsBinding)*
    ;
 genericArgsBinding
-   : identifier '=' type
+   : identifier '=' type_
    ;
 
 qualifiedPathInExpression
    : qualifiedPathType ('::' pathExprSegment)+
    ;
 qualifiedPathType
-   : '<' type ('as' typePath)? '>'
+   : '<' type_ ('as' typePath)? '>'
    ;
 qualifiedPathInType
    : qualifiedPathType ('::' typePathSegment)+
@@ -92,10 +92,10 @@ typePathSegment
    : pathIdentSegment '::'? (genericArgs | typePathFn)?
    ;
 typePathFn
-   : '(' typePathInputs? ')' ('->' type)?
+   : '(' typePathInputs? ')' ('->' type_)?
    ;
 typePathInputs
-   : type (',' type)* ','?
+   : type_ (',' type_)* ','?
    ;
 
 macroInvocation
@@ -191,14 +191,14 @@ visItem
       module
       | externCrate
       | useDeclaration
-      | function
+      | function_
       | typeAlias
       | struct_
       | enumeration
       | union_
       | constantItem
       | staticItem
-      | trait
+      | trait_
       | implementation
       | externBlock
    )
@@ -231,7 +231,7 @@ useTree
    | simplePath ('as' (identifier | '_'))?
    ;
 
-function
+function_
    : functionQualifiers 'fn' identifier generics? '(' functionParameters? ')' functionReturnType? whereClause?
       blockExpression
    ;
@@ -250,14 +250,14 @@ functionParameters
    : functionParam (',' functionParam)* ','?
    ;
 functionParam
-   : outerAttribute* pattern ':' type
+   : outerAttribute* pattern ':' type_
    ;
 functionReturnType
-   : '->' type
+   : '->' type_
    ;
 
 typeAlias
-   : 'type' identifier generics? whereClause? '=' type ';'
+   : 'type' identifier generics? whereClause? '=' type_ ';'
    ;
 
 struct_
@@ -274,13 +274,13 @@ structFields
    : structField (',' structField)* ','?
    ;
 structField
-   : outerAttribute* visibility? identifier ':' type
+   : outerAttribute* visibility? identifier ':' type_
    ;
 tupleFields
    : tupleField (',' tupleField)* ','?
    ;
 tupleField
-   : outerAttribute* visibility? type
+   : outerAttribute* visibility? type_
    ;
 
 enumeration
@@ -312,13 +312,13 @@ union_
    ;
 
 constantItem
-   : 'const' (identifier | '_') ':' type '=' expression ';'
+   : 'const' (identifier | '_') ':' type_ '=' expression ';'
    ;
 staticItem
-   : 'static' 'mut'? identifier ':' type '=' expression ';'
+   : 'static' 'mut'? identifier ':' type_ '=' expression ';'
    ;
 
-trait
+trait_
    : 'unsafe'? 'trait' identifier generics? (':' typeParamBounds?)? whereClause? '{' innerAttribute* traitItem* '}'
    ;
 traitItem
@@ -350,10 +350,10 @@ traitFunctionParameters
    : traitFunctionParam (',' traitFunctionParam)* ','?
    ;
 traitFunctionParam
-   : outerAttribute* (pattern ':')? type
+   : outerAttribute* (pattern ':')? type_
    ;
 traitConst
-   : 'const' identifier ':' type ('=' expression)? ';'
+   : 'const' identifier ':' type_ ('=' expression)? ';'
    ;
 traitType
    : 'type' identifier (':' typeParamBounds?)? ';'
@@ -364,23 +364,23 @@ implementation
    | traitImpl
    ;
 inherentImpl
-   : 'impl' generics? type whereClause? '{' innerAttribute* inherentImplItem* '}'
+   : 'impl' generics? type_ whereClause? '{' innerAttribute* inherentImplItem* '}'
    ;
 inherentImplItem
    : outerAttribute*
    (
       macroInvocationSemi
-      | visibility? ( constantItem | function | method)
+      | visibility? ( constantItem | function_ | method)
    )
    ;
 traitImpl
-   : 'unsafe'? 'impl' generics? '!'? typePath 'for' type whereClause? '{' innerAttribute* traitImplItem* '}'
+   : 'unsafe'? 'impl' generics? '!'? typePath 'for' type_ whereClause? '{' innerAttribute* traitImplItem* '}'
    ;
 traitImplItem
    : outerAttribute*
    (
       macroInvocationSemi
-      | visibility? ( typeAlias | constantItem | method | function)
+      | visibility? ( typeAlias | constantItem | method | function_)
    )
    ;
 
@@ -395,7 +395,7 @@ externalItem
    )
    ;
 externalStaticItem
-   : 'static' 'mut'? identifier ':' type ';'
+   : 'static' 'mut'? identifier ':' type_ ';'
    ;
 externalFunctionItem
    : 'fn' identifier generics? '('
@@ -408,7 +408,7 @@ namedFunctionParameters
    : namedFunctionParam (',' namedFunctionParam)* ','?
    ;
 namedFunctionParam
-   : outerAttribute* (identifier | '_') ':' type
+   : outerAttribute* (identifier | '_') ':' type_
    ;
 namedFunctionParametersWithVariadics
    : (namedFunctionParam ',')* namedFunctionParam ',' outerAttribute* '...'
@@ -431,7 +431,7 @@ typeParams
    : (typeParam ',')* typeParam?
    ;
 typeParam
-   : outerAttribute? identifier (':' typeParamBounds?)? ('=' type)?
+   : outerAttribute? identifier (':' typeParamBounds?)? ('=' type_)?
    ;
 
 whereClause
@@ -445,7 +445,7 @@ lifetimeWhereClauseItem
    : lifetime ':' lifetimeBounds
    ;
 typeBoundWhereClauseItem
-   : forLifetimes? type ':' typeParamBounds?
+   : forLifetimes? type_ ':' typeParamBounds?
    ;
 forLifetimes
    : 'for' '<' lifetimeParams '>'
@@ -464,7 +464,7 @@ shorthandSelf
    : ('&' lifetime?)? 'mut'? 'self'
    ;
 typedSelf
-   : 'mut'? 'self' ':' type
+   : 'mut'? 'self' ':' type_
    ;
 
 visibility
@@ -503,7 +503,7 @@ statement
    ;
 
 letStatement
-   : outerAttribute* 'let' pattern (':' type)? ('=' expression)? ';'
+   : outerAttribute* 'let' pattern (':' type_)? ('=' expression)? ';'
    ;
 
 expressionStatement
@@ -692,7 +692,7 @@ closureParameters
    : closureParam (',' closureParam)* ','?
    ;
 closureParam
-   : outerAttribute* pattern (':' type)?
+   : outerAttribute* pattern (':' type_)?
    ;
 
 loopExpression
@@ -861,7 +861,7 @@ pathPattern
    | qualifiedPathInExpression
    ;
 
-type
+type_
    : typeNoBounds
    | implTraitType
    | traitObjectType
@@ -883,19 +883,19 @@ typeNoBounds
    | macroInvocation
    ;
 parenthesizedType
-   : '(' type ')'
+   : '(' type_ ')'
    ;
 neverType
    : '!'
    ;
 tupleType
-   : '(' ((type ',')+ type?)? ')'
+   : '(' ((type_ ',')+ type_?)? ')'
    ;
 arrayType
-   : '[' type ';' expression ']'
+   : '[' type_ ';' expression ']'
    ;
 sliceType
-   : '[' type ']'
+   : '[' type_ ']'
    ;
 referenceType
    : '&' lifetime? 'mut'? typeNoBounds
@@ -918,7 +918,7 @@ maybeNamedFunctionParameters
    : maybeNamedParam (',' maybeNamedParam)* ','?
    ;
 maybeNamedParam
-   : outerAttribute* ((identifier | '_') ':')? type
+   : outerAttribute* ((identifier | '_') ':')? type_
    ;
 maybeNamedFunctionParametersVariadic
    : (maybeNamedParam ',')* maybeNamedParam ',' outerAttribute* '...'

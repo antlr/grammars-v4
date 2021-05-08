@@ -14,5 +14,6 @@
 	<modules>
 		<module>swift2</module>
 		<module>swift3</module>
+		<module>swift5</module>
 	</modules>
 </project>

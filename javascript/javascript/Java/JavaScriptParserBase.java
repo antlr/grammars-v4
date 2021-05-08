@@ -44,7 +44,7 @@ public abstract class JavaScriptParserBase extends Parser
 
     protected boolean notOpenBraceAndNotFunction() {
         int nextTokenType = _input.LT(1).getType();
-        return nextTokenType != JavaScriptParser.OpenBrace && nextTokenType != JavaScriptParser.Function;
+        return nextTokenType != JavaScriptParser.OpenBrace && nextTokenType != JavaScriptParser.Function_;
     }
 
     protected boolean closeBrace() {

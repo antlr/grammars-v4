@@ -474,24 +474,24 @@ partitionDefinition
           partitionDefinerAtom (',' partitionDefinerAtom)*
       ')'
       partitionOption*
-      (subpartitionDefinition (',' subpartitionDefinition)*)?       #partitionComparision
+      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionComparision
     | PARTITION uid VALUES LESS THAN
       partitionDefinerAtom partitionOption*
-      (subpartitionDefinition (',' subpartitionDefinition)*)?       #partitionComparision
+      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionComparision
     | PARTITION uid VALUES IN
       '('
           partitionDefinerAtom (',' partitionDefinerAtom)*
       ')'
       partitionOption*
-      (subpartitionDefinition (',' subpartitionDefinition)*)?       #partitionListAtom
+      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionListAtom
     | PARTITION uid VALUES IN
       '('
           partitionDefinerVector (',' partitionDefinerVector)*
       ')'
       partitionOption*
-      (subpartitionDefinition (',' subpartitionDefinition)*)?       #partitionListVector
+      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionListVector
     | PARTITION uid partitionOption*
-      (subpartitionDefinition (',' subpartitionDefinition)*)?       #partitionSimple
+      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionSimple
     ;
 
 partitionDefinerAtom
@@ -1593,12 +1593,14 @@ privilege
     | SELECT
     | SHOW (VIEW | DATABASES)
     | SHUTDOWN | SUPER | TRIGGER | UPDATE | USAGE
-    | AUDIT_ADMIN | BACKUP_ADMIN | BINLOG_ADMIN | BINLOG_ENCRYPTION_ADMIN | CLONE_ADMIN
-    | CONNECTION_ADMIN | ENCRYPTION_KEY_ADMIN | FIREWALL_ADMIN | FIREWALL_USER | GROUP_REPLICATION_ADMIN
-    | INNODB_REDO_LOG_ARCHIVE | NDB_STORED_USER | PERSIST_RO_VARIABLES_ADMIN | REPLICATION_APPLIER
+    | APPLICATION_PASSWORD_ADMIN | AUDIT_ADMIN | BACKUP_ADMIN | BINLOG_ADMIN | BINLOG_ENCRYPTION_ADMIN | CLONE_ADMIN
+    | CONNECTION_ADMIN | ENCRYPTION_KEY_ADMIN | FIREWALL_ADMIN | FIREWALL_USER | FLUSH_OPTIMIZER_COSTS
+    | FLUSH_STATUS | FLUSH_TABLES | FLUSH_USER_RESOURCES | GROUP_REPLICATION_ADMIN
+    | INNODB_REDO_LOG_ARCHIVE | INNODB_REDO_LOG_ENABLE | NDB_STORED_USER | PERSIST_RO_VARIABLES_ADMIN | REPLICATION_APPLIER
     | REPLICATION_SLAVE_ADMIN | RESOURCE_GROUP_ADMIN | RESOURCE_GROUP_USER | ROLE_ADMIN
-    | SESSION_VARIABLES_ADMIN | SET_USER_ID | SHOW_ROUTINE | SYSTEM_VARIABLES_ADMIN | TABLE_ENCRYPTION_ADMIN
-    | VERSION_TOKEN_ADMIN | XA_RECOVER_ADMIN
+    | SERVICE_CONNECTION_ADMIN
+    | SESSION_VARIABLES_ADMIN | SET_USER_ID | SHOW_ROUTINE | SYSTEM_USER | SYSTEM_VARIABLES_ADMIN
+    | TABLE_ENCRYPTION_ADMIN | VERSION_TOKEN_ADMIN | XA_RECOVER_ADMIN
     ;
 
 privilegeLevel
@@ -2464,7 +2466,7 @@ keywordsCanBeId
     | ERROR | ERRORS | ESCAPE | EVEN | EVENT | EVENTS | EVERY
     | EXCHANGE | EXCLUSIVE | EXPIRE | EXPORT | EXTENDED | EXTENT_SIZE | FAST | FAULTS
     | FIELDS | FILE_BLOCK_SIZE | FILTER | FIREWALL_ADMIN | FIREWALL_USER | FIRST | FIXED | FLUSH
-    | FOLLOWS | FOUND | FULL | FUNCTION | GENERAL | GLOBAL | GRANTS | GROUP_CONCAT
+    | FOLLOWS | FOUND | FULL | FUNCTION | GENERAL | GLOBAL | GRANTS | GROUP | GROUP_CONCAT
     | GROUP_REPLICATION | GROUP_REPLICATION_ADMIN | HANDLER | HASH | HELP | HOST | HOSTS | IDENTIFIED
     | IGNORE_SERVER_IDS | IMPORT | INDEXES | INITIAL_SIZE | INNODB_REDO_LOG_ARCHIVE
     | INPLACE | INSERT_METHOD | INSTALL | INSTANCE | INTERNAL | INVOKER | IO

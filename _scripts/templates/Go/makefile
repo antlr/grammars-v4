@@ -14,9 +14,10 @@ clean:
 	rm -f *.tokens *.interp
 	rm -f $(GENERATED)
 run:
-	go run Program.go $(RUNARGS)
+	export GO111MODULE=auto; go run Program.go $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
 	java -jar $(JAR) -Dlanguage=Go <antlr_tool_args:{y | <y> } > $\<
 } >
+	export GO111MODULE=auto; go build Program.go
 test:
 	bash test.sh

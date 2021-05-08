@@ -156,7 +156,7 @@ Finally:            'finally';
 FloatCast:          'float';
 For:                'for';
 Foreach:            'foreach';
-Function:           'function';
+Function_:           'function';
 Global:             'global';
 Goto:               'goto';
 If:                 'if';
