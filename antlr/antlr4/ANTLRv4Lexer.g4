@@ -104,20 +104,15 @@ BEGIN_ACTION
 // -------------------------
 // Keywords
 //
-// Keywords may not be used as labels for rules or in any other context where
-// they would be ambiguous with the keyword vs some other identifier.  OPTIONS,
-// TOKENS, & CHANNELS blocks are handled idiomatically in dedicated lexical modes.
-OPTIONS
-   : 'options' -> pushMode (Options)
-   ;
+// 'options', 'tokens', and 'channels' are considered keywords
+// but only when followed by '{', and considered as a single token.
+// Otherwise, the symbols are tokenized as RULE_REF and allowed as
+// an identifier in a labeledElement.
+OPTIONS      : 'options'  WSNLCHARS* '{'  ;
+TOKENS       : 'tokens'   WSNLCHARS* '{'  ;
+CHANNELS     : 'channels' WSNLCHARS* '{'  ;
 
-TOKENS
-   : 'tokens' -> pushMode (Tokens)
-   ;
-
-CHANNELS
-   : 'channels' -> pushMode (Channels)
-   ;
+fragment WSNLCHARS : ' ' | '\t' | '\f' | '\n' | '\r' ;
 
 IMPORT
    : 'import'
@@ -382,138 +377,6 @@ UNTERMINATED_ACTION
 
 ACTION_CONTENT
    : .
-   ;
-
-// -------------------------
-mode Options;
-OPT_DOC_COMMENT
-   : DocComment -> type (DOC_COMMENT) , channel (COMMENT)
-   ;
-
-OPT_BLOCK_COMMENT
-   : BlockComment -> type (BLOCK_COMMENT) , channel (COMMENT)
-   ;
-
-OPT_LINE_COMMENT
-   : LineComment -> type (LINE_COMMENT) , channel (COMMENT)
-   ;
-
-OPT_LBRACE
-   : LBrace
-   { this.handleOptionsLBrace(); }
-   ;
-
-OPT_RBRACE
-   : RBrace -> type (RBRACE) , popMode
-   ;
-
-OPT_ID
-   : Id -> type (ID)
-   ;
-
-OPT_DOT
-   : Dot -> type (DOT)
-   ;
-
-OPT_ASSIGN
-   : Equal -> type (ASSIGN)
-   ;
-
-OPT_STRING_LITERAL
-   : SQuoteLiteral -> type (STRING_LITERAL)
-   ;
-
-OPT_INT
-   : DecimalNumeral -> type (INT)
-   ;
-
-OPT_STAR
-   : Star -> type (STAR)
-   ;
-
-OPT_SEMI
-   : Semi -> type (SEMI)
-   ;
-
-OPT_WS
-   : Ws+ -> type (WS) , channel (OFF_CHANNEL)
-   ;
-
-// -------------------------
-mode Tokens;
-TOK_DOC_COMMENT
-   : DocComment -> type (DOC_COMMENT) , channel (COMMENT)
-   ;
-
-TOK_BLOCK_COMMENT
-   : BlockComment -> type (BLOCK_COMMENT) , channel (COMMENT)
-   ;
-
-TOK_LINE_COMMENT
-   : LineComment -> type (LINE_COMMENT) , channel (COMMENT)
-   ;
-
-TOK_LBRACE
-   : LBrace -> type (LBRACE)
-   ;
-
-TOK_RBRACE
-   : RBrace -> type (RBRACE) , popMode
-   ;
-
-TOK_ID
-   : Id -> type (ID)
-   ;
-
-TOK_DOT
-   : Dot -> type (DOT)
-   ;
-
-TOK_COMMA
-   : Comma -> type (COMMA)
-   ;
-
-TOK_WS
-   : Ws+ -> type (WS) , channel (OFF_CHANNEL)
-   ;
-
-// -------------------------
-mode Channels;
-// currently same as Tokens mode; distinguished by keyword
-CHN_DOC_COMMENT
-   : DocComment -> type (DOC_COMMENT) , channel (COMMENT)
-   ;
-
-CHN_BLOCK_COMMENT
-   : BlockComment -> type (BLOCK_COMMENT) , channel (COMMENT)
-   ;
-
-CHN_LINE_COMMENT
-   : LineComment -> type (LINE_COMMENT) , channel (COMMENT)
-   ;
-
-CHN_LBRACE
-   : LBrace -> type (LBRACE)
-   ;
-
-CHN_RBRACE
-   : RBrace -> type (RBRACE) , popMode
-   ;
-
-CHN_ID
-   : Id -> type (ID)
-   ;
-
-CHN_DOT
-   : Dot -> type (DOT)
-   ;
-
-CHN_COMMA
-   : Comma -> type (COMMA)
-   ;
-
-CHN_WS
-   : Ws+ -> type (WS) , channel (OFF_CHANNEL)
    ;
 
 // -------------------------

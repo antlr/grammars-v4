@@ -5,10 +5,10 @@ document
     ;
 
 header
-    : include | namespace_ | cpp_include
+    : include_ | namespace_ | cpp_include
     ;
 
-include
+include_
     : 'include' LITERAL
     ;
 
@@ -61,7 +61,7 @@ exception
     ;
 
 service
-    : 'service' IDENTIFIER ('extends' IDENTIFIER)? '{' function* '}' type_annotations?
+    : 'service' IDENTIFIER ('extends' IDENTIFIER)? '{' function_* '}' type_annotations?
     ;
 
 field
@@ -77,7 +77,7 @@ field_req
     | 'optional'
     ;
 
-function
+function_
     : oneway? function_type IDENTIFIER '(' field* ')' throws_list? type_annotations? list_separator?
     ;
 

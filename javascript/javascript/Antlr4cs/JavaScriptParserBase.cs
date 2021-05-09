@@ -49,7 +49,7 @@ public abstract class JavaScriptParserBase : Parser
     protected bool notOpenBraceAndNotFunction()
     {
         int nextTokenType = _input.Lt(1).Type;
-        return nextTokenType != OpenBrace && nextTokenType != Function;
+        return nextTokenType != OpenBrace && nextTokenType != Function_;
     }
 
     protected bool closeBrace()
