@@ -791,7 +791,6 @@ theOperator:
 	| PlusAssign
 	| MinusAssign
 	| StarAssign
-	| Assign
 	| ModAssign
 	| XorAssign
 	| AndAssign
