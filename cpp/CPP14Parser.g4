@@ -802,7 +802,6 @@ theOperator:
 	| Equal
 	| NotEqual
 	| LessEqual
-	| GreaterEqual
 	| AndAnd
 	| OrOr
 	| PlusPlus
