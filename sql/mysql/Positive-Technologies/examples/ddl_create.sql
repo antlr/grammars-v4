@@ -68,6 +68,34 @@ create table table_with_index (id int, data varchar(50), UNIQUE INDEX `data_UNIQ
 create table blob_test(id int, col1 blob(45));
 create table žluťoučký (kůň int);
 create table column_names_as_aggr_funcs(min varchar(100), max varchar(100), sum varchar(100), count varchar(100));
+CREATE TABLE char_table (c1 CHAR VARYING(10), c2 CHARACTER VARYING(10), c3 NCHAR VARYING(10));
+create table rack_shelf_bin ( id int unsigned not null auto_increment unique primary key, bin_volume decimal(20, 4) default (bin_len * bin_width * bin_height));
+CREATE TABLE `tblSRCHjob_desc` (`description_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT, `description` mediumtext NOT NULL, PRIMARY KEY (`description_id`)) ENGINE=TokuDB AUTO_INCREMENT=4095997820 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=TOKUDB_QUICKLZ;
+CREATE TABLE table_items (id INT, purchased DATE)
+    PARTITION BY RANGE( YEAR(purchased) )
+        SUBPARTITION BY HASH( TO_DAYS(purchased) )
+        SUBPARTITIONS 2 (
+        PARTITION p0 VALUES LESS THAN (1990),
+        PARTITION p1 VALUES LESS THAN (2000),
+        PARTITION p2 VALUES LESS THAN MAXVALUE
+    );
+
+CREATE TABLE table_items_with_subpartitions (id INT, purchased DATE)
+    PARTITION BY RANGE( YEAR(purchased) )
+        SUBPARTITION BY HASH( TO_DAYS(purchased) ) (
+        PARTITION p0 VALUES LESS THAN (1990) (
+            SUBPARTITION s0,
+            SUBPARTITION s1
+        ),
+        PARTITION p1 VALUES LESS THAN (2000) (
+            SUBPARTITION s2,
+            SUBPARTITION s3
+        ),
+        PARTITION p2 VALUES LESS THAN MAXVALUE (
+            SUBPARTITION s4,
+            SUBPARTITION s5
+        )
+    );
 #end
 #begin
 -- Rename table
@@ -262,6 +290,9 @@ CREATE TABLE `tab1` (
   mi MIDDLEINT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 #end
+-- Comments
+-- SELECT V_PAYABLE_AMT, DIS_ADJUST_TOTAL_PAYABLE;
+--	SELECT V_PAYABLE_AMT, DIS_ADJUST_TOTAL_PAYABLE;
 #begin
 -- Create procedure
 -- The default value for local variables in a DECLARE statement should be an expression
@@ -272,5 +303,15 @@ BEGIN
   DECLARE var1 INT unsigned default 1;
   DECLARE var2 TIMESTAMP default CURRENT_TIMESTAMP;
   DECLARE var3 INT unsigned default 2 + var1;
+END -- //-- delimiter ;
+#end
+-- Create procedure
+-- delimiter //
+CREATE PROCEDURE makesignal(p1 INT)
+BEGIN
+  DECLARE error_text VARCHAR(255);
+  IF (error_text != 'OK') THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_text;
+  END IF;
 END -- //-- delimiter ;
 #end

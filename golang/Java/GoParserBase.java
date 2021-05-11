@@ -1,5 +1,3 @@
-package GoParseTree;
-
 import java.util.List;
 import org.antlr.v4.runtime.*;
 
@@ -26,7 +24,8 @@ public abstract class GoParserBase extends Parser
      */
     protected boolean lineTerminatorAhead() {
         // Get the token ahead of the current index.
-        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
+        int offset = 1;
+        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - offset;
 
         if (possibleIndexEosToken == -1)
         {
@@ -34,29 +33,28 @@ public abstract class GoParserBase extends Parser
         }
 
         Token ahead = _input.get(possibleIndexEosToken);
-        if (ahead.getChannel() != Lexer.HIDDEN) {
-            // We're only interested in tokens on the HIDDEN channel.
-            return false;
+
+        while(ahead.getChannel() == Lexer.HIDDEN )
+        {
+            if(ahead.getType() == GoLexer.TERMINATOR){
+                return true;
+            }
+            else if(ahead.getType() == GoLexer.WS){
+                possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - ++offset;
+                ahead = _input.get(possibleIndexEosToken);
+            }
+            else if(ahead.getType() == GoLexer.COMMENT){
+                if(ahead.getText().contains("\r") || ahead.getText().contains("\n")){
+                    return true;
+                }
+                else{
+                    possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - ++offset;
+                    ahead = _input.get(possibleIndexEosToken);
+                }
+            }
         }
 
-        if (ahead.getType() == GoLexer.TERMINATOR) {
-            // There is definitely a line terminator ahead.
-            return true;
-        }
-
-        if (ahead.getType() == GoLexer.WS) {
-            // Get the token ahead of the current whitespaces.
-            possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 2;
-            ahead = _input.get(possibleIndexEosToken);
-        }
-
-        // Get the token's text and type.
-        String text = ahead.getText();
-        int type = ahead.getType();
-
-        // Check if the token is, or contains a line terminator.
-        return (type == GoLexer.COMMENT && (text.contains("\r") || text.contains("\n"))) ||
-                (type == GoLexer.TERMINATOR);
+        return false;
     }
 
      /**
@@ -95,13 +93,12 @@ public abstract class GoParserBase extends Parser
         BufferedTokenStream stream = (BufferedTokenStream)_input;
         int leftParams = 1;
         int rightParams = 0;
-        int valueType;
 
         if (stream.LT(tokenOffset).getType() == GoLexer.L_PAREN) {
             // Scan past parameters
             while (leftParams != rightParams) {
                 tokenOffset++;
-                valueType = stream.LT(tokenOffset).getType();
+                int valueType = stream.LT(tokenOffset).getType();
 
                 if (valueType == GoLexer.L_PAREN){
                     leftParams++;

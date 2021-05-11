@@ -98,13 +98,13 @@ public abstract class JavaScriptLexerBase extends Lexer
      * Returns {@code true} if the lexer can match a regex literal.
      */
     protected boolean IsRegexPossible() {
-                                       
+
         if (this.lastToken == null) {
             // No token has been produced yet: at the start of the input,
             // no division is possible, so a regex literal _is_ possible.
             return true;
         }
-        
+
         switch (this.lastToken.getType()) {
             case JavaScriptLexer.Identifier:
             case JavaScriptLexer.NullLiteral:

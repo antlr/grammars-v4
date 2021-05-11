@@ -9,7 +9,6 @@
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
 		<version>1.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
     </parent>
 
 	<modules>
@@ -19,5 +18,6 @@
 		<module>asmMASM</module>
 		<module>asmZ80</module>
 		<module>masm</module>
+		<module>pdp7</module>
 	</modules>
 </project>

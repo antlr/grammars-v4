@@ -83,7 +83,7 @@ entryStatement
    ;
 
 functionStatement
-   : type? FUNCTION NAME LPAREN namelist? RPAREN EOL?
+   : type_? FUNCTION NAME LPAREN namelist? RPAREN EOL?
    ;
 
 blockdataStatement
@@ -179,7 +179,7 @@ commonBlock
    ;
 
 typeStatement
-   : typename typeStatementNameList
+   : typename_ typeStatementNameList
    | characterWithLen typeStatementNameCharList
    ;
 
@@ -204,12 +204,12 @@ typeStatementLenSpec
    : STAR lenSpecification
    ;
 
-typename
+typename_
    : (REAL | COMPLEX (STAR ICON?)? | DOUBLE COMPLEX | DOUBLE PRECISION | INTEGER | LOGICAL | CHARACTER)
    ;
 
-type
-   : typename
+type_
+   : typename_
    | characterWithLen
    ;
 
@@ -230,7 +230,7 @@ implicitStatement
    ;
 
 implicitSpec
-   : type LPAREN implicitLetters RPAREN
+   : type_ LPAREN implicitLetters RPAREN
    ;
 
 implicitSpecs

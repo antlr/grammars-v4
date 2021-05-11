@@ -372,7 +372,7 @@ yield_stmt
 /// raise_stmt: 'raise' [test ['from' test]]
 raise_stmt
  : RAISE ( test ( FROM test )? )?
- | RAISE NAME ',' str
+ | RAISE NAME ',' str_
  {
  	if (this.getStrictPython3Parsing()) {
 		Token raiseToken = ((org.antlr.v4.runtime.tree.TerminalNodeImpl)this._ctx.children.get(0)).getSymbol();
@@ -678,7 +678,7 @@ atom
  }
     NAME
  | number 
- | str+ 
+ | str_+ 
  | '...' 
  | NONE
  | TRUE
@@ -716,11 +716,11 @@ trailer
 
 /// subscriptlist: subscript (',' subscript)* [',']
 subscriptlist
- : subscript ( ',' subscript )* ','?
+ : subscript_ ( ',' subscript_ )* ','?
  ;
 
 /// subscript: test | [test] ':' [test] [sliceop]
-subscript
+subscript_
  : test 
  | test? ':' test? sliceop?
  ;
@@ -801,7 +801,7 @@ yield_arg
  | testlist
  ;
 
-str
+str_
  : STRING_LITERAL
  | BYTES_LITERAL
  ;

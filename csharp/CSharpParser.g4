@@ -1008,7 +1008,7 @@ literal
 	| BIN_INTEGER_LITERAL
 	| REAL_LITERAL
 	| CHARACTER_LITERAL
-	| NULL
+	| NULL_
 	;
 
 boolean_literal
@@ -1093,7 +1093,7 @@ keyword
 	| LONG
 	| NAMESPACE
 	| NEW
-	| NULL
+	| NULL_
 	| OBJECT
 	| OPERATOR
 	| OUT

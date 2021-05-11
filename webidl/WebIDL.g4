@@ -56,7 +56,7 @@ definition
 	| partial
 	| dictionary
 	| enum_
-	| typedef
+	| typedef_
 	| implementsStatement
 ;
 
@@ -76,7 +76,7 @@ interface_
 ;
 
 class_
-    : 'class' IDENTIFIER_WEBIDL extension '{' interfaceMembers '}' ';'
+    : 'class' IDENTIFIER_WEBIDL extension_ '{' interfaceMembers '}' ';'
 ;
 
 partial
@@ -120,10 +120,10 @@ dictionaryMembers
 ;
 
 dictionaryMember
-	: required type IDENTIFIER_WEBIDL default_ ';'
+	: required_ type_ IDENTIFIER_WEBIDL default_ ';'
 ;
 
-required
+required_
 	: 'required'
 	| /* empty */
 ;
@@ -148,7 +148,7 @@ inheritance
 	| /* empty */
 ;
 
-extension
+extension_
     : 'extends' IDENTIFIER_WEBIDL
     | /* empty */
 ;
@@ -175,8 +175,8 @@ callbackRest
 	: IDENTIFIER_WEBIDL '=' returnType '(' argumentList ')' ';'
 ;
 
-typedef
-	: 'typedef' type IDENTIFIER_WEBIDL ';'
+typedef_
+	: 'typedef' type_ IDENTIFIER_WEBIDL ';'
 ;
 
 implementsStatement
@@ -270,7 +270,7 @@ readWriteAttribute
 ;
 
 attributeRest
-	: 'attribute' type attributeName ';'
+	: 'attribute' type_ attributeName ';'
 ;
 
 attributeName
@@ -337,8 +337,8 @@ argument
 ;
 
 optionalOrRequiredArgument
-	: 'optional' type argumentName default_
-	| type ellipsis argumentName
+	: 'optional' type_ argumentName default_
+	| type_ ellipsis argumentName
 ;
 
 argumentName
@@ -352,11 +352,11 @@ ellipsis
 ;
 
 iterable
-	: 'iterable' '<' type optionalType '>' ';'
+	: 'iterable' '<' type_ optionalType '>' ';'
 ;
 
 optionalType
-	: ',' type
+	: ',' type_
 	| /* empty */
 ;
 
@@ -369,11 +369,11 @@ readWriteSetlike
 ;
 
 maplikeRest
-	: 'maplike' '<' type ',' type '>' ';'
+	: 'maplike' '<' type_ ',' type_ '>' ';'
 ;
 
 setlikeRest
-	: 'setlike' '<' type '>' ';'
+	: 'setlike' '<' type_ '>' ';'
 ;
 
 extendedAttributeList
@@ -480,7 +480,7 @@ otherOrComma
 	| ','
 ;
 
-type
+type_
 	: singleType
 	| unionType null_
 ;
@@ -511,12 +511,12 @@ nonAnyType
 	| 'DOMString'  null_
 	| 'USVString'  null_
 	| IDENTIFIER_WEBIDL  null_
-	| 'sequence' '<' type '>' null_
+	| 'sequence' '<' type_ '>' null_
 	| 'object'  null_
 	| 'RegExp'  null_
 	| 'DOMException'  null_
 	| bufferRelatedType  null_
-	| 'FrozenArray' '<' type '>' null_
+	| 'FrozenArray' '<' type_ '>' null_
 ;
 
 bufferRelatedType
@@ -581,7 +581,7 @@ null_
 ;
 
 returnType
-	: type
+	: type_
 	| 'void'
 ;
 

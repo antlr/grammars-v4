@@ -3,9 +3,9 @@ grammar FlatBuffers ;
 
 // Parser rules
 
-schema : include* ( namespace_decl | type_decl | enum_decl | root_decl | file_extension_decl | file_identifier_decl | attribute_decl | rpc_decl | object )* ;
+schema : include_* ( namespace_decl | type_decl | enum_decl | root_decl | file_extension_decl | file_identifier_decl | attribute_decl | rpc_decl | object_ )* ;
 
-include : 'include' STRING_CONSTANT ';' ;
+include_ : 'include' STRING_CONSTANT ';' ;
 
 namespace_decl : 'namespace' IDENT ( '.' IDENT )* ';' ;
 
@@ -13,18 +13,18 @@ attribute_decl : 'attribute' STRING_CONSTANT ';' ;
 
 type_decl : ( 'table' | 'struct' ) IDENT metadata '{' ( field_decl )* '}' ;
 
-enum_decl : ( 'enum' IDENT ( ':' type )? | 'union' IDENT ) metadata '{' commasep_enumval_decl '}' ;
+enum_decl : ( 'enum' IDENT ( ':' type_ )? | 'union' IDENT ) metadata '{' commasep_enumval_decl '}' ;
 
 root_decl : 'root_type' IDENT ';' ;
 
-field_decl : IDENT ':' type ( '=' scalar )? metadata ';' ;
+field_decl : IDENT ':' type_ ( '=' scalar )? metadata ';' ;
 
 rpc_decl : 'rpc_service' IDENT '{' rpc_method+ '}' ;
 
 rpc_method : IDENT '(' IDENT ')' ':' IDENT metadata ';' ;
 
 // fixed original grammar: allow namespaces for IDENTs
-type : '[' type ']' | BASE_TYPE_NAME | ns_ident ;
+type_ : '[' type_ ']' | BASE_TYPE_NAME | ns_ident ;
 
 enumval_decl : ns_ident ( '=' integer_const )? ;
 
@@ -39,7 +39,7 @@ metadata : ( '(' commasep_ident_with_opt_single_value ')' )? ;
 // fix original grammar: enum values (IDENT) are allowed as well
 scalar : INTEGER_CONSTANT | HEX_INTEGER_CONSTANT | FLOAT_CONSTANT | IDENT ;
 
-object : '{' commasep_ident_with_value '}' ;
+object_ : '{' commasep_ident_with_value '}' ;
 
 ident_with_value : IDENT ':' value ;
 
@@ -47,7 +47,7 @@ commasep_ident_with_value : ident_with_value ( ',' ident_with_value )* ','? ;
 
 single_value : scalar | STRING_CONSTANT ;
 
-value : single_value | object | '[' commasep_value ']' ;
+value : single_value | object_ | '[' commasep_value ']' ;
 
 commasep_value : value( ',' value )* ','? ;
 

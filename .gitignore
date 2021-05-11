@@ -8,7 +8,7 @@
 # Visual Studio Generated
 .antlr
 .fetch_time_cache
-/.vs
+.vs/
 .vscode/
 .gradle/
 
@@ -16,3 +16,6 @@
 .idea/
 *.iml
 /**/gen
+
+# Ignore C# regression temporaries.
+**/Generated/

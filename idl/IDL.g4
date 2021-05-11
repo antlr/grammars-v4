@@ -85,10 +85,10 @@ interface_header
    ;
 
 interface_body
-   : export*
+   : export_*
    ;
 
-export
+export_
    : annapps
      ( type_decl SEMICOLON
      | const_decl SEMICOLON
@@ -131,7 +131,7 @@ value_box_decl
    ;
 
 value_abs_decl
-   : KW_ABSTRACT KW_VALUETYPE identifier value_inheritance_spec LEFT_BRACE export* RIGHT_BRACE
+   : KW_ABSTRACT KW_VALUETYPE identifier value_inheritance_spec LEFT_BRACE export_* RIGHT_BRACE
    ;
 
 value_decl
@@ -151,7 +151,7 @@ value_name
    ;
 
 value_element
-   : (export | state_member | init_decl)
+   : (export_ | state_member | init_decl)
    ;
 
 state_member
@@ -761,7 +761,7 @@ home_body
    ;
 
 home_export
-   : export
+   : export_
    | annapps
      ( factory_decl
      | finder_decl
@@ -786,7 +786,7 @@ event_forward_decl
    ;
 
 event_abs_decl
-   : KW_ABSTRACT KW_EVENTTYPE identifier value_inheritance_spec LEFT_BRACE export* RIGHT_BRACE
+   : KW_ABSTRACT KW_EVENTTYPE identifier value_inheritance_spec LEFT_BRACE export_* RIGHT_BRACE
    ;
 
 event_decl

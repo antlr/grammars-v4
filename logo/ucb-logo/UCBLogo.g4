@@ -615,8 +615,8 @@ expression
  | procedure_call_extra_input    #procedureCallExtraInput
  | procedure_call                #procedureCallExpression
  | '(' expression ')'            #parensExpression
- | array                         #arrayExpression
- | list                          #listExpression
+ | array_                         #arrayExpression
+ | list_                          #listExpression
  | WORD                          #wordExpression
  | QUOTED_WORD                   #quotedWordExpression
  | NUMBER                        #numberExpression
@@ -634,12 +634,12 @@ expression
  | expression '<>' expression    #notEqualsExpressionExpression
  ;
 
-array
- : '{' ( ~( '{' | '}' ) | array )* '}'
+array_
+ : '{' ( ~( '{' | '}' ) | array_ )* '}'
  ;
 
-list
- : '[' ( ~( '[' | ']' ) | list )* ']'
+list_
+ : '[' ( ~( '[' | ']' ) | list_ )* ']'
  ;
 
 TO    : T O;

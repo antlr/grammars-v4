@@ -155,7 +155,7 @@ iterationStatement
 
 varModifier  // let, const - ECMAScript 6
     : Var
-    | let
+    | let_
     | Const
     ;
 
@@ -224,7 +224,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Async? Function '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : Async? Function_ '*'? identifier '(' formalParameterList? ')' functionBody
     ;
 
 classDeclaration
@@ -242,9 +242,9 @@ classElement
     ;
 
 methodDefinition
-    : '*'? '#'? propertyName '(' formalParameterList? ')' '{' functionBody '}'
-    | '*'? '#'? getter '(' ')' '{' functionBody '}'
-    | '*'? '#'? setter '(' formalParameterList? ')' '{' functionBody '}'
+    : '*'? '#'? propertyName '(' formalParameterList? ')' functionBody
+    | '*'? '#'? getter '(' ')' functionBody
+    | '*'? '#'? setter '(' formalParameterList? ')' functionBody
     ;
 
 formalParameterList
@@ -261,7 +261,7 @@ lastFormalParameterArg                        // ECMAScript 6: Rest Parameter
     ;
 
 functionBody
-    : sourceElements?
+    : '{' sourceElements? '}'
     ;
 
 sourceElements
@@ -283,9 +283,9 @@ arrayElement
 propertyAssignment
     : propertyName ':' singleExpression                                             # PropertyExpressionAssignment
     | '[' singleExpression ']' ':' singleExpression                                 # ComputedPropertyExpressionAssignment
-    | Async? '*'? propertyName '(' formalParameterList?  ')'  '{' functionBody '}'  # FunctionProperty
-    | getter '(' ')' '{' functionBody '}'                                           # PropertyGetter
-    | setter '(' formalParameterArg ')' '{' functionBody '}'                        # PropertySetter
+    | Async? '*'? propertyName '(' formalParameterList?  ')'  functionBody  # FunctionProperty
+    | getter '(' ')' functionBody                                           # PropertyGetter
+    | setter '(' formalParameterArg ')' functionBody                        # PropertySetter
     | Ellipsis? singleExpression                                                    # PropertyShorthand
     ;
 
@@ -309,7 +309,7 @@ expressionSequence
     ;
 
 singleExpression
-    : anoymousFunction                                                      # FunctionExpression
+    : anonymousFunction                                                      # FunctionExpression
     | Class identifier? classTail                                           # ClassExpression
     | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
@@ -367,9 +367,9 @@ objectLiteral
     : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
     ;
 
-anoymousFunction
+anonymousFunction
     : functionDeclaration                                                       # FunctionDecl
-    | Async? Function '*'? '(' formalParameterList? ')' '{' functionBody '}'    # AnoymousFunctionDecl
+    | Async? Function_ '*'? '(' formalParameterList? ')' functionBody    # AnonymousFunctionDecl
     | Async? arrowFunctionParameters '=>' arrowFunctionBody                     # ArrowFunction
     ;
 
@@ -380,7 +380,7 @@ arrowFunctionParameters
 
 arrowFunctionBody
     : singleExpression
-    | '{' functionBody '}'
+    | functionBody
     ;
 
 assignmentOperator
@@ -466,7 +466,7 @@ keyword
     | Switch
     | While
     | Debugger
-    | Function
+    | Function_
     | This
     | With
     | Default
@@ -484,7 +484,7 @@ keyword
     | Export
     | Import
     | Implements
-    | let
+    | let_
     | Private
     | Public
     | Interface
@@ -498,7 +498,7 @@ keyword
     | As
     ;
 
-let
+let_
     : NonStrictLet
     | StrictLet
     ;

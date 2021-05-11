@@ -14,11 +14,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   @author Canwei He
+   @author wyruweso
+   based on the Hive 3.1.2 grammar by Canwei He
 */
 parser grammar HiveParser;
 
-import SelectClauseParser, FromClauseParser, IdentifiersParser, ResourcePlanParser;
+import SelectClauseParser, FromClauseParser, IdentifiersParser;
 
 options
 {
@@ -26,9 +27,21 @@ options
 }
 
 // starting rule
+statements
+   : (statement statementSeparator | empty_)* EOF
+   ;
+
+statementSeparator
+   : SEMICOLON
+   ;
+
+empty_
+   : statementSeparator
+   ;
+
 statement
-	: explainStatement EOF
-	| execStatement EOF
+	: explainStatement
+	| execStatement
 	;
 
 explainStatement
@@ -167,7 +180,8 @@ ddlStatement
     | showCurrentRole
     | abortTransactionStatement
     | killQueryStatement
-    | resourcePlanDdlStatements
+    | createIndexStatement
+    | dropIndexStatement
     ;
 
 ifExists
@@ -269,6 +283,7 @@ alterStatement
     | KW_ALTER KW_VIEW tableName KW_AS? alterViewStatementSuffix
     | KW_ALTER KW_MATERIALIZED KW_VIEW tableName alterMaterializedViewStatementSuffix
     | KW_ALTER (KW_DATABASE|KW_SCHEMA) alterDatabaseStatementSuffix
+    | KW_ALTER KW_INDEX alterIndexStatementSuffix
     ;
 
 alterTableStatementSuffix
@@ -302,7 +317,6 @@ alterTblPartitionStatementSuffix
   | alterStatementSuffixUpdateStats
   | alterStatementSuffixRenameCol
   | alterStatementSuffixAddCol
-  | alterStatementSuffixUpdateColumns
   ;
 
 alterStatementPartitionKeyType
@@ -351,10 +365,6 @@ alterStatementSuffixAddCol
 alterStatementSuffixAddConstraint
    :  KW_ADD (alterForeignKeyWithName | alterConstraintWithName)
    ;
-
-alterStatementSuffixUpdateColumns
-    : KW_UPDATE KW_COLUMNS restrictOrCascade?
-    ;
 
 alterStatementSuffixDropConstraint
    : KW_DROP KW_CONSTRAINT identifier
@@ -427,9 +437,10 @@ alterStatementSuffixSerdeProperties
     | KW_SET KW_SERDEPROPERTIES tableProperties
     ;
 
-tablePartitionPrefix
-  : tableName partitionSpec?
-  ;
+alterIndexStatementSuffix
+    : identifier KW_ON tableName
+    partitionSpec?
+    KW_REBUILD;
 
 alterStatementSuffixFileFormat
 	: KW_SET KW_FILEFORMAT fileFormat
@@ -487,6 +498,28 @@ alterStatementSuffixMergeFiles
 alterStatementSuffixBucketNum
     : KW_INTO Number KW_BUCKETS
     ;
+
+createIndexStatement
+    : KW_CREATE KW_INDEX identifier KW_ON KW_TABLE tableName columnParenthesesList KW_AS StringLiteral
+    (KW_WITH KW_DEFERRED KW_REBUILD)?
+    (KW_IDXPROPERTIES tableProperties)?
+    (KW_IN KW_TABLE tableName)?
+    (KW_PARTITIONED KW_BY columnParenthesesList)?
+    (tableRowFormat? tableFileFormat)?
+    (KW_LOCATION locationPath)?
+    tablePropertiesPrefixed?
+    tableComment?;
+
+locationPath
+    : identifier (DOT identifier)*
+    ;
+
+dropIndexStatement
+    : KW_DROP KW_INDEX identifier KW_ON tableName;
+
+tablePartitionPrefix
+  : tableName partitionSpec?
+  ;
 
 blocking
   : KW_AND KW_WAIT
@@ -958,24 +991,15 @@ relySpecification
     ;
 
 createConstraint
-    : (KW_CONSTRAINT identifier)? tableLevelConstraint constraintOptsCreate?
+    : (KW_CONSTRAINT identifier)? pkConstraint constraintOptsCreate?
     ;
 
 alterConstraintWithName
-    : KW_CONSTRAINT identifier tableLevelConstraint constraintOptsAlter?
+    : KW_CONSTRAINT identifier pkConstraint constraintOptsAlter?
     ;
 
-tableLevelConstraint
-    : pkUkConstraint
-    | checkConstraint
-    ;
-
-pkUkConstraint
-    : tableConstraintType pkCols=columnParenthesesList
-    ;
-
-checkConstraint
-    : KW_CHECK expression
+pkConstraint
+    : tableConstraintPrimaryKey pkCols=columnParenthesesList
     ;
 
 createForeignKey
@@ -1066,7 +1090,7 @@ foreignKeyConstraint
     ;
 
 colConstraint
-    : (KW_CONSTRAINT identifier)? columnConstraintType constraintOptsCreate?
+    : (KW_CONSTRAINT identifier)? tableConstraintPrimaryKey constraintOptsCreate?
     ;
 
 alterColumnConstraint
@@ -1079,25 +1103,11 @@ alterForeignKeyConstraint
     ;
 
 alterColConstraint
-    : (KW_CONSTRAINT identifier)? columnConstraintType constraintOptsAlter?
+    : (KW_CONSTRAINT identifier)? tableConstraintPrimaryKey constraintOptsAlter?
     ;
 
-columnConstraintType
-    : KW_NOT KW_NULL
-    | KW_DEFAULT defaultVal
-    | checkConstraint
-    | tableConstraintType
-    ;
-
-defaultVal
-    : constant
-    | function
-    | castExpression
-    ;
-
-tableConstraintType
+tableConstraintPrimaryKey
     : KW_PRIMARY KW_KEY
-    | KW_UNIQUE
     ;
 
 constraintOptsCreate

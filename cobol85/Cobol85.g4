@@ -2307,7 +2307,7 @@ conditionNameReference
    ;
 
 conditionNameSubscriptReference
-   : LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR
+   : LPARENCHAR subscript_ (COMMACHAR? subscript_)* RPARENCHAR
    ;
 
 // relation ----------------------------------
@@ -2347,7 +2347,7 @@ identifier
    ;
 
 tableCall
-   : qualifiedDataName (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
+   : qualifiedDataName (LPARENCHAR subscript_ (COMMACHAR? subscript_)* RPARENCHAR)* referenceModifier?
    ;
 
 functionCall
@@ -2366,7 +2366,7 @@ length
    : arithmeticExpression
    ;
 
-subscript
+subscript_
    : ALL | integerLiteral | qualifiedDataName integerLiteral? | indexName integerLiteral? | arithmeticExpression
    ;
 
@@ -2597,7 +2597,7 @@ cicsDfhValueLiteral
 // keywords ----------------------------------
 
 figurativeConstant
-   : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZERO | ZEROS | ZEROES
+   : ALL literal | HIGH_VALUE | HIGH_VALUES | LOW_VALUE | LOW_VALUES | NULL_ | NULLS | QUOTE | QUOTES | SPACE | SPACES | ZERO | ZEROS | ZEROES
    ;
 
 specialRegister
@@ -2932,7 +2932,7 @@ NEXT : N E X T;
 NO : N O;
 NO_ECHO : N O MINUSCHAR E C H O;
 NOT : N O T;
-NULL : N U L L;
+NULL_ : N U L L;
 NULLS : N U L L S;
 NUMBER : N U M B E R;
 NUMERIC : N U M E R I C;
