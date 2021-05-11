@@ -34,7 +34,7 @@ bool TypeScriptParserBase::notLineTerminator()
 bool TypeScriptParserBase::notOpenBraceAndNotFunction()
 {
     int nextTokenType = _input->LT(1)->getType();
-    return nextTokenType != TypeScriptParser::OpenBrace && nextTokenType != TypeScriptParser::Function;
+    return nextTokenType != TypeScriptParser::OpenBrace && nextTokenType != TypeScriptParser::Function_;
 
 }
 
