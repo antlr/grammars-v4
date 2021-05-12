@@ -791,7 +791,6 @@ theOperator:
 	| PlusAssign
 	| MinusAssign
 	| StarAssign
-	| Assign
 	| ModAssign
 	| XorAssign
 	| AndAssign
@@ -803,7 +802,6 @@ theOperator:
 	| Equal
 	| NotEqual
 	| LessEqual
-	| GreaterEqual
 	| AndAnd
 	| OrOr
 	| PlusPlus
