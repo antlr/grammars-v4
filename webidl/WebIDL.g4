@@ -200,8 +200,6 @@ constValue
 	: booleanLiteral
 	| floatLiteral
 	| INTEGER_WEBIDL
-	| 'null'    //TODO: webidl grammar doesn't include null in constValue, but
-	            // the docs seem to imply that its valid
 ;
 
 booleanLiteral
