@@ -39,7 +39,10 @@ Web IDL grammar derived from:
  */
 grammar WebIDL;
 
-// Note: Replaced keywords: const, default, enum, interface, null.
+/* Note: appended underscore to keywords for CPP compat:
+    const, default, enum, namespace, null
+    see github.com/antlr/grammars-v4/issues/2099 for more info
+*/
 // Note: Added "wrapper" rule webIDL with EOF token.
 
 webIDL
@@ -54,7 +57,7 @@ definitions
 
 definition
 	: callbackOrInterfaceOrMixin
-	| namespace
+	| namespace_
 	| partial
 	| dictionary
 	| enum_
@@ -111,7 +114,7 @@ partial
 partialDefinition
 	: 'interface' partialInterfaceOrPartialMixin
 	| partialDictionary
-	| namespace
+	| namespace_
 ;
 
 partialInterfaceOrPartialMixin
@@ -387,7 +390,7 @@ setlikeRest
 	: 'setlike' '<' typeWithExtendedAttributes '>' ';'
 ;
 
-namespace
+namespace_
     : 'namespace' IDENTIFIER_WEBIDL '{' namespaceMembers '}' ';'
 ;
 
