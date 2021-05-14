@@ -69,9 +69,9 @@ public class Program {
         lexer.addErrorListener(lexer_listener);
         ParseTree tree = parser.<start_symbol>();
         if (listener.had_error || lexer_listener.had_error)
-            System.out.println("Parse failed.");
+            System.err.println("Parse failed.");
         else
-            System.out.println("Parse succeeded.");
+            System.err.println("Parse succeeded.");
         if (show_tree)
         {
             System.out.println(tree.toStringTree(parser));
