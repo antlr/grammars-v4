@@ -156,6 +156,8 @@ ddl_clause
     | create_workload_group
     | create_xml_index
     | create_xml_schema_collection
+    | create_partition_function
+    | create_partition_scheme
     | drop_aggregate
     | drop_application_role
     | drop_assembly
@@ -1640,6 +1642,20 @@ create_workload_group
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-xml-schema-collection-transact-sql
 create_xml_schema_collection
     : CREATE XML SCHEMA COLLECTION (relational_schema=id_ DOT)? sql_identifier=id_ AS  (STRING|id_|LOCAL_ID)
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-partition-function-transact-sql?view=sql-server-ver15
+create_partition_function
+    : CREATE PARTITION FUNCTION partition_function_name=id_ '(' input_parameter_type=data_type ')'
+      AS RANGE ( LEFT | RIGHT )?
+      FOR VALUES '(' boundary_values=expression_list ')'
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-partition-scheme-transact-sql?view=sql-server-ver15
+create_partition_scheme
+    : CREATE PARTITION SCHEME partition_scheme_name=id_
+      AS PARTITION partition_function_name=id_
+      ALL? TO '(' file_group_names+=id_ (',' file_group_names+=id_)* ')'
     ;
 
 create_queue
