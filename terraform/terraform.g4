@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar terraform;
 
-file
+file_
    : (local | module | output | provider | variable | data | resource | terraform)+
    ;
 
@@ -122,8 +122,8 @@ forloop
    ;
 
 section
-   : list
-   | map
+   : list_
+   | map_
    | val
    ;
 
@@ -161,11 +161,11 @@ filedecl
    : 'file' '(' expression ')'
    ;
 
-list
+list_
    : '[' (expression (',' expression)* ','?)? ']'
    ;
 
-map
+map_
    : LCURL (argument ','?)* RCURL
    ;
 

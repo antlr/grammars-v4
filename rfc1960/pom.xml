@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>true</showTree>
-					<entryPoint>filter</entryPoint>
+					<entryPoint>filter_</entryPoint>
 					<grammarName>filter</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

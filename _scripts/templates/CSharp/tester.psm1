@@ -13,7 +13,7 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    $o = dotnet CSharp/Test.dll -file $InputFile
+    $o = trwdog dotnet CSharp/Test.dll -file $InputFile
     $failed = $LASTEXITCODE -ne 0
     if ($failed -and $errorFile) {
         return $true

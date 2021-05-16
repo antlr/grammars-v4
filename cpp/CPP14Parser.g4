@@ -225,6 +225,7 @@ constantExpression: conditionalExpression;
 
 statement:
 	labeledStatement
+	| declarationStatement
 	| attributeSpecifierSeq? (
 		expressionStatement
 		| compoundStatement
@@ -232,8 +233,7 @@ statement:
 		| iterationStatement
 		| jumpStatement
 		| tryBlock
-	)
-	| declarationStatement;
+	);
 
 labeledStatement:
 	attributeSpecifierSeq? (
@@ -329,8 +329,8 @@ declSpecifier:
 	| Friend
 	| Typedef
 	| Constexpr;
-
-declSpecifierSeq: declSpecifier+ attributeSpecifierSeq?;
+	
+declSpecifierSeq: declSpecifier+? attributeSpecifierSeq?;
 
 storageClassSpecifier:
 	Register
@@ -359,21 +359,27 @@ typeSpecifierSeq: typeSpecifier+ attributeSpecifierSeq?;
 trailingTypeSpecifierSeq:
 	trailingTypeSpecifier+ attributeSpecifierSeq?;
 
+simpleTypeLengthModifier:
+	Short
+	| Long;
+	
+simpleTypeSignednessModifier:
+	Unsigned
+	| Signed;
+
 simpleTypeSpecifier:
 	nestedNameSpecifier? theTypeName
 	| nestedNameSpecifier Template simpleTemplateId
-	| Char
-	| Char16
-	| Char32
-	| Wchar
+	| simpleTypeSignednessModifier
+	| simpleTypeSignednessModifier? simpleTypeLengthModifier+
+	| simpleTypeSignednessModifier? Char
+	| simpleTypeSignednessModifier? Char16
+	| simpleTypeSignednessModifier? Char32
+	| simpleTypeSignednessModifier? Wchar
 	| Bool
-	| Short
-	| Int
-	| Long
-	| Signed
-	| Unsigned
+	| simpleTypeSignednessModifier? simpleTypeLengthModifier* Int
 	| Float
-	| Double
+	| simpleTypeLengthModifier? Double
 	| Void
 	| Auto
 	| decltypeSpecifier;
@@ -785,7 +791,6 @@ theOperator:
 	| PlusAssign
 	| MinusAssign
 	| StarAssign
-	| Assign
 	| ModAssign
 	| XorAssign
 	| AndAssign
@@ -797,7 +802,6 @@ theOperator:
 	| Equal
 	| NotEqual
 	| LessEqual
-	| GreaterEqual
 	| AndAnd
 	| OrOr
 	| PlusPlus
@@ -816,3 +820,4 @@ literal:
 	| BooleanLiteral
 	| PointerLiteral
 	| UserDefinedLiteral;
+	

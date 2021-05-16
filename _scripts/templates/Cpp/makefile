@@ -2,7 +2,7 @@
 default:
 	rm -rf build; mkdir build; cd build; cmake .. <cmake_target>; $(MAKE)
 run:
-	cd build; ./<exec_name> $(RUNARGS)
+	cd build; trwdog ./<exec_name> $(RUNARGS)
 clean:
 	rm -rf build
 test:

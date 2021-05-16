@@ -4361,7 +4361,7 @@ datatype
     ;
 
 precision_part
-    : '(' (numeric | ASTERISK) (',' numeric)? (CHAR | BYTE)? ')'
+    : '(' (numeric | ASTERISK) (',' (numeric | numeric_negative))? (CHAR | BYTE)? ')'
     ;
 
 native_datatype_element

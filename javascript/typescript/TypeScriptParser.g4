@@ -500,7 +500,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Function Identifier callSignature ( ('{' functionBody '}') | SemiColon)
+    : Function_ Identifier callSignature ( ('{' functionBody '}') | SemiColon)
     ;
 
 //Ovveride ECMA
@@ -552,7 +552,7 @@ generatorMethod
     ;
 
 generatorFunctionDeclaration
-    : Function '*' Identifier? '(' formalParameterList? ')' '{' functionBody '}'
+    : Function_ '*' Identifier? '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 generatorBlock
@@ -652,7 +652,7 @@ expressionSequence
     ;
 
 functionExpressionDeclaration
-    : Function Identifier? '(' formalParameterList? ')' typeAnnotation? '{' functionBody '}'
+    : Function_ Identifier? '(' formalParameterList? ')' typeAnnotation? '{' functionBody '}'
     ;
 
 singleExpression
@@ -790,7 +790,7 @@ keyword
     | Switch
     | While
     | Debugger
-    | Function
+    | Function_
     | This
     | With
     | Default

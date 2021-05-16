@@ -77,6 +77,18 @@ public interface RouterFunction<T extends ServerResponse> {
     }
 }
 
+//Instanceof
+class InstanceOf{
+    public static void main(String[] args){
+        if(args instanceof String[]){
+
+        }
+        if(args instanceof a.String[]){
+
+        }
+    }
+}
+
 // Unicode
 class Unicode {
     public static void main(String[] args) {

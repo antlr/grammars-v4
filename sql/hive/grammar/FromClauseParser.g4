@@ -91,8 +91,8 @@ joinToken
     ;
 
 lateralView
-	: KW_LATERAL KW_VIEW KW_OUTER function tableAlias (KW_AS identifier (COMMA identifier)*)?
-	| COMMA? KW_LATERAL KW_VIEW function tableAlias (KW_AS identifier (COMMA identifier)*)?
+	: KW_LATERAL KW_VIEW KW_OUTER function_ tableAlias (KW_AS identifier (COMMA identifier)*)?
+	| COMMA? KW_LATERAL KW_VIEW function_ tableAlias (KW_AS identifier (COMMA identifier)*)?
     | COMMA? KW_LATERAL KW_TABLE LPAREN valuesClause RPAREN KW_AS? tableAlias (LPAREN identifier (COMMA identifier)* RPAREN)?
 	;
 

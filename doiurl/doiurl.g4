@@ -46,10 +46,10 @@ scheme
    ;
 
 encodeddoi
-   : prefix '/' suffix
+   : prefix_ '/' suffix
    ;
 
-prefix
+prefix_
    : segment
    ;
 

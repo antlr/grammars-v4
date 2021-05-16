@@ -29,7 +29,7 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    $o = ./cli.exe -file $InputFile
+    $o = trwdog ./cli.exe -file $InputFile
     $failed = $LASTEXITCODE -ne 0
     if ($failed -and $errorFile) {
         return $true
