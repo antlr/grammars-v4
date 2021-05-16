@@ -2042,7 +2042,50 @@ low_priority_lock_wait
 // https://msdn.microsoft.com/en-us/library/ms174269.aspx
 alter_database
     : ALTER DATABASE (database=id_ | CURRENT)
-      (MODIFY NAME '=' new_name=id_ | COLLATE collation=id_ | SET database_optionspec (WITH termination)? ) ';'?
+      (MODIFY NAME '=' new_name=id_
+      | COLLATE collation=id_
+      | SET database_optionspec (WITH termination)?
+      | add_or_modify_files
+      | add_or_modify_filegroups
+      ) ';'?
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-database-transact-sql-file-and-filegroup-options?view=sql-server-ver15
+add_or_modify_files
+    : ADD FILE filespec (',' filespec)* (TO FILEGROUP filegroup_name=id_)?
+    | ADD LOG FILE filespec (',' filespec)*
+    | REMOVE FILE logical_file_name=id_
+    | MODIFY FILE filespec
+    ;
+
+filespec
+    : '('      NAME       '=' name=id_or_string
+          (',' NEWNAME    '=' new_name=id_or_string )?
+          (',' FILENAME   '=' file_name=STRING )?
+          (',' SIZE       '=' size=file_size )?
+          (',' MAXSIZE    '=' (max_size=file_size) | UNLIMITED )?
+          (',' FILEGROWTH '=' growth_increment=file_size )?
+          (',' OFFLINE )?
+      ')'
+    ;
+
+add_or_modify_filegroups
+    : ADD FILEGROUP filegroup_name=id_ (CONTAINS FILESTREAM | CONTAINS MEMORY_OPTIMIZED_DATA)?
+    | REMOVE FILEGROUP filegrou_name=id_
+    | MODIFY FILEGROUP filegrou_name=id_ (
+          filegroup_updatability_option
+        | DEFAULT
+        | NAME '=' new_filegroup_name=id_
+        | AUTOGROW_SINGLE_FILE
+        | AUTOGROW_ALL_FILES
+      )
+    ;
+
+filegroup_updatability_option
+    : READONLY
+    | READWRITE
+    | READ_ONLY
+    | READ_WRITE
     ;
 
 // https://msdn.microsoft.com/en-us/library/bb522682.aspx
@@ -4389,6 +4432,11 @@ id_
 
 simple_id
     : ID
+    ;
+
+id_or_string
+    : id_
+    | STRING
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188074.aspx
