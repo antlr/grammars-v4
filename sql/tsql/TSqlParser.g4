@@ -148,7 +148,6 @@ ddl_clause
     | create_server_role
     | create_service
     | create_statistics
-    | create_symmetric_key
     | create_synonym
     | create_table
     | create_type
@@ -157,6 +156,8 @@ ddl_clause
     | create_workload_group
     | create_xml_index
     | create_xml_schema_collection
+    | create_partition_function
+    | create_partition_scheme
     | drop_aggregate
     | drop_application_role
     | drop_assembly
@@ -1534,27 +1535,6 @@ alter_symmetric_key
     : ALTER SYMMETRIC KEY key_name=id_ ( (ADD|DROP) ENCRYPTION BY (CERTIFICATE certificate_name=id_ | PASSWORD EQUAL password=STRING | SYMMETRIC KEY symmetric_key_name=id_ | ASYMMETRIC KEY Asym_key_name=id_  ) )
     ;
 
-// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-symmetric-key-transact-sql
-create_symmetric_key
-    :  ALTER SYMMETRIC KEY key_name=id_
-           (AUTHORIZATION owner_name=id_)?
-           (FROM PROVIDER provider_name=id_)?
-           (WITH ( (KEY_SOURCE EQUAL key_pass_phrase=STRING
-                   | ALGORITHM EQUAL (DES | TRIPLE_DES | TRIPLE_DES_3KEY | RC2 | RC4 | RC4_128  | DESX | AES_128 | AES_192 | AES_256)
-                   | IDENTITY_VALUE EQUAL identity_phrase=STRING
-                   | PROVIDER_KEY_NAME EQUAL provider_key_name=STRING
-                   | CREATION_DISPOSITION EQUAL (CREATE_NEW|OPEN_EXISTING)
-                   )
-                 | ENCRYPTION BY
-                     ( CERTIFICATE certificate_name=id_
-                     | PASSWORD EQUAL password=STRING
-                     | SYMMETRIC KEY symmetric_key_name=id_
-                     | ASYMMETRIC KEY asym_key_name=id_
-                     )
-                 )
-            )
-    ;
-
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-synonym-transact-sql
 create_synonym
     : CREATE SYNONYM (schema_name_1=id_ DOT )? synonym_name=id_
@@ -1662,6 +1642,20 @@ create_workload_group
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-xml-schema-collection-transact-sql
 create_xml_schema_collection
     : CREATE XML SCHEMA COLLECTION (relational_schema=id_ DOT)? sql_identifier=id_ AS  (STRING|id_|LOCAL_ID)
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-partition-function-transact-sql?view=sql-server-ver15
+create_partition_function
+    : CREATE PARTITION FUNCTION partition_function_name=id_ '(' input_parameter_type=data_type ')'
+      AS RANGE ( LEFT | RIGHT )?
+      FOR VALUES '(' boundary_values=expression_list ')'
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-partition-scheme-transact-sql?view=sql-server-ver15
+create_partition_scheme
+    : CREATE PARTITION SCHEME partition_scheme_name=id_
+      AS PARTITION partition_function_name=id_
+      ALL? TO '(' file_group_names+=id_ (',' file_group_names+=id_)* ')'
     ;
 
 create_queue
@@ -1846,12 +1840,7 @@ output_clause
     ;
 
 output_dml_list_elem
-    : (output_column_name | expression) as_column_alias?  // TODO: scalar_expression
-    ;
-
-output_column_name
-    : (DELETED | INSERTED | table_name) '.' ('*' | id_)
-    | DOLLAR_ACTION
+    : (expression | asterisk) as_column_alias?
     ;
 
 // DDL
@@ -1888,7 +1877,11 @@ create_or_alter_procedure
     : ((CREATE (OR ALTER)?) | ALTER) proc=(PROC | PROCEDURE) procName=func_proc_name_schema (';' DECIMAL)?
       ('('? procedure_param (',' procedure_param)* ')'?)?
       (WITH procedure_option (',' procedure_option)*)?
-      (FOR REPLICATION)? AS sql_clauses*
+      (FOR REPLICATION)? AS (as_external_name | sql_clauses*)
+    ;
+
+as_external_name
+    : EXTERNAL NAME assembly_name = id_ '.' class_name = id_ '.' method_name = id_
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql
@@ -2028,8 +2021,22 @@ alter_table
                              | WITH CHECK ADD CONSTRAINT constraint=id_ FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
                              | CHECK CONSTRAINT constraint=id_
                              | (ENABLE | DISABLE) TRIGGER id_?
-                             | REBUILD table_options)
+                             | REBUILD table_options
+                             | SWITCH switch_partition)
                              ';'?
+    ;
+
+switch_partition
+    : (PARTITION? source_partition_number_expression=expression)?
+      TO target_table=table_name
+      (PARTITION target_partition_number_expression=expression)?
+      (WITH low_priority_lock_wait)?
+    ;
+
+low_priority_lock_wait
+    : WAIT_AT_LOW_PRIORITY '('
+      MAX_DURATION '=' max_duration=time MINUTES? ','
+      ABORT_AFTER_WAIT '=' abort_after_wait=(NONE | SELF | BLOCKERS) ')'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174269.aspx
@@ -2917,6 +2924,7 @@ expression
     | expression op=('+' | '-' | '&' | '^' | '|' | '||') expression
     | expression time_zone
     | over_clause
+    | DOLLAR_ACTION
     ;
 
 time_zone
@@ -3113,6 +3121,7 @@ udt_method_arguments
 // https://docs.microsoft.com/ru-ru/sql/t-sql/queries/select-clause-transact-sql
 asterisk
     : (table_name '.')? '*'
+    | (INSERTED | DELETED) '.' '*'
     ;
 
 column_elem
@@ -3611,7 +3620,8 @@ ddl_object
     ;
 
 full_column_name
-    : server=id_? '.' schema=id_? '.' tablename=id_? '.' column_name=id_
+    : (DELETED | INSERTED) '.' column_name=id_
+    | server=id_? '.' schema=id_? '.' tablename=id_? '.' column_name=id_
     | schema=id_? '.' tablename=id_? '.' column_name=id_
     | tablename=id_? '.' column_name=id_
     | column_name=id_

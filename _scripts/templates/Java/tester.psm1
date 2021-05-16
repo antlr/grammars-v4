@@ -22,7 +22,7 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    $o = java Program -file $InputFile
+    $o = trwdog java Program -file $InputFile
     $failed = $LASTEXITCODE -ne 0
     if ($failed -and $errorFile) {
         return $true

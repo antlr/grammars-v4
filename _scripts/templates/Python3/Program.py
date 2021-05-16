@@ -87,10 +87,10 @@ def main(argv):
     if (show_tree):
         print(tree.toStringTree(recog=parser))
     if p_listener.num_errors > 0 or l_listener.num_errors > 0:
-        print('Parse failed.');
+        print('Parse failed.', file=sys.stderr);
         sys.exit(1)
     else:
-        print('Parse succeeded.');
+        print('Parse succeeded.', file=sys.stderr);
         sys.exit(0)
 
 if __name__ == '__main__':

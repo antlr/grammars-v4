@@ -91,17 +91,17 @@ int TryParse(std::vector\<std::string>& args)
     auto duration = std::chrono::duration_cast\<std::chrono::microseconds>(after - before);
     if (listener_parser->had_error || listener_lexer->had_error)
     {
-        std::cout \<\< "Parse failed." \<\< std::endl;
+        std::cerr \<\< "Parse failed." \<\< std::endl;
     }
     else
     {
-        std::cout \<\< "Parse succeeded." \<\< std::endl;
+        std::cerr \<\< "Parse succeeded." \<\< std::endl;
     }
     if (show_tree)
     {
 //        System.Console.Error.WriteLine(tree.ToStringTree(parser));
     }
-    std::cout \<\< "Time: " \<\< formatDuration(duration.count()) \<\< std::endl;
+    std::cerr \<\< "Time: " \<\< formatDuration(duration.count()) \<\< std::endl;
     return 0;
 }
 

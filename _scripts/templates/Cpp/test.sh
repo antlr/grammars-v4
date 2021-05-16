@@ -8,7 +8,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo "$file"
-    ./build/<exec_name> -file "$file"
+    trwdog ./build/<exec_name> -file "$file"
     status="$?"
     if [ -f "$file".errors ]
     then
