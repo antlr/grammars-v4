@@ -591,6 +591,8 @@ extendedAttribute
     | extendedAttributeNamedArgList
     | extendedAttributeIdent
     | extendedAttributeIdentList
+    | extendedAttributeString
+    | extendedAttributeStringList
 ;
 
 /*
@@ -697,6 +699,26 @@ extendedAttributeIdentList
 
 extendedAttributeNamedArgList
 	: IDENTIFIER_WEBIDL '=' IDENTIFIER_WEBIDL '(' argumentList ')'
+;
+
+/* Chromium IDL also allows string literals in extendedAttributes
+https://chromium.googlesource.com/chromium/src/+/refs/heads/main/third_party/blink/renderer/bindings/IDLExtendedAttributes.md
+*/
+extendedAttributeString
+    : IDENTIFIER_WEBIDL '=' STRING_WEBIDL
+;
+
+extendedAttributeStringList
+    : IDENTIFIER_WEBIDL '=' '(' stringList ')'
+;
+
+stringList
+    : STRING_WEBIDL strings
+;
+
+strings
+    : ',' STRING_WEBIDL strings
+    | /* empty */
 ;
 
 INTEGER_WEBIDL
