@@ -13,15 +13,15 @@ keyval:
    ;
 
 key: 
-   id | attrib
+   id_ | attrib
    ;
 
 val: 
-   id | attrib | group
+   id_ | attrib | group
    ;
 
 attrib: 
-   id accessor (attrib| id)
+   id_ accessor (attrib| id_)
    ;
 
 accessor: 
@@ -29,10 +29,10 @@ accessor:
    ;
 
 group: 
-   '{' (expr* | id) '}'
+   '{' (expr* | id_) '}'
    ;
 
-id: 
+id_: 
    IDENTIFIER | STRING | INTEGER
    ;
 

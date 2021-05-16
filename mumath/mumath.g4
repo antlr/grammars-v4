@@ -15,12 +15,12 @@ assignment
    : (ID COLON) + expression
    ;
 
-list
+list_
    : LPAREN (RPAREN | ID (COMMA ID)* RPAREN)
    ;
 
 functionDefinition
-   : FUNCTION ID list COMMA statments (COMMA)? ENDFUN
+   : FUNCTION ID list_ COMMA statments (COMMA)? ENDFUN
    ;
 
 actualParameter
