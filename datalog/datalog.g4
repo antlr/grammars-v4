@@ -32,15 +32,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar datalog;
 
 program
-   : fact program
-   | rule program
+   : (fact | rule_) program
    ;
 
 fact
    : relation '(' constantlist ').'
    ;
 
-rule
+rule_
    : atom ':-' atomlist '.'
    ;
 
@@ -49,8 +48,7 @@ atom
    ;
 
 atomlist
-   : atom
-   | atom ',' atomlist
+   : atom (',' atom)*
    ;
 
 term
@@ -59,14 +57,12 @@ term
    ;
 
 termlist
-   : term
-   | term ',' termlist
+   : term (',' term)*
    ;
 
 constantlist
-   : constant
-   | constant ',' constantlist
-   ;
+   : constant (',' constant)*
+    ;
 
 constant
    : CONSTANT
