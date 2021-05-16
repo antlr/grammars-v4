@@ -508,7 +508,7 @@ typeStmt :
 
 typeStmt_Element : ambiguousIdentifier (WS? LPAREN (WS? subscripts)? WS? RPAREN)? (WS asTypeClause)? endOfStatement;
 
-typeOfStmt : TYPEOF WS valueStmt (WS IS WS type)?;
+typeOfStmt : TYPEOF WS valueStmt (WS IS WS type_)?;
 
 unloadStmt : UNLOAD WS valueStmt;
 
@@ -567,7 +567,7 @@ whileWendStmt :
 widthStmt : WIDTH WS fileNumber WS? ',' WS? valueStmt;
 
 withStmt :
-	WITH WS (implicitCallStmt_InStmt | (NEW WS type)) endOfStatement
+	WITH WS (implicitCallStmt_InStmt | (NEW WS type_)) endOfStatement
 	block?
 	END_WITH
 ;
@@ -643,9 +643,9 @@ arg : (OPTIONAL WS)? ((BYVAL | BYREF) WS)? (PARAMARRAY WS)? ambiguousIdentifier 
 
 argDefaultValue : EQ WS? valueStmt;
 
-subscripts : subscript (WS? ',' WS? subscript)*;
+subscripts : subscript_ (WS? ',' WS? subscript_)*;
 
-subscript : (valueStmt WS TO WS)? valueStmt;
+subscript_ : (valueStmt WS TO WS)? valueStmt;
 
 
 // atomic rules ----------------------------------
@@ -654,7 +654,7 @@ ambiguousIdentifier :
 	(IDENTIFIER | ambiguousKeyword)+
 ;
 
-asTypeClause : AS WS? (NEW WS)? type (WS? fieldLength)?;
+asTypeClause : AS WS? (NEW WS)? type_ (WS? fieldLength)?;
 
 baseType : BOOLEAN | BYTE | COLLECTION | DATE | DOUBLE | INTEGER | LONG | SINGLE | STRING (WS? MULT WS? valueStmt)? | VARIANT;
 
@@ -675,7 +675,7 @@ lineLabel : ambiguousIdentifier ':';
 
 literal : HEXLITERAL | OCTLITERAL | DATELITERAL | DOUBLELITERAL | INTEGERLITERAL | SHORTLITERAL | STRINGLITERAL | TRUE | FALSE | NOTHING | NULL_;
 
-type : (baseType | complexType) (WS? LPAREN WS? RPAREN)?;
+type_ : (baseType | complexType) (WS? LPAREN WS? RPAREN)?;
 
 typeHint : '&' | '%' | '#' | '!' | '@' | '$';
 

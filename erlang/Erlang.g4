@@ -123,9 +123,9 @@ type300 : type300 addOp type400
 type400 : type400 multOp type500
         |                type500 ;
 
-type500 : prefixOp? type ;
+type500 : prefixOp? type_ ;
 
-type : '(' topType ')'
+type_ : '(' topType ')'
      | tokVar
      | tokAtom
      | tokAtom             '('          ')'
@@ -166,9 +166,9 @@ binaryType : '<<'                             '>>'
            | '<<' binBaseType ',' binUnitType '>>'
            ;
 
-binBaseType : tokVar ':'            type ;
+binBaseType : tokVar ':'            type_ ;
 
-binUnitType : tokVar ':' tokVar '*' type ;
+binUnitType : tokVar ':' tokVar '*' type_ ;
 
 
 
@@ -186,7 +186,7 @@ functionClause : tokAtom clauseArgs clauseGuard clauseBody ;
 
 clauseArgs : patArgumentList ;
 
-clauseGuard : ('when' guard)? ;
+clauseGuard : ('when' guard_)? ;
 
 clauseBody : '->' exprs ;
 
@@ -222,11 +222,11 @@ expr800 : exprMax (':' exprMax)? ;
 
 exprMax : tokVar
         | atomic
-        | list
+        | list_
         | binary
         | listComprehension
         | binaryComprehension
-        | tuple
+        | tuple_
         | '(' expr ')'
         | 'begin' exprs 'end'
         | ifExpr
@@ -261,9 +261,9 @@ patExpr800 : patExprMax ;
 
 patExprMax : tokVar
            | atomic
-           | list
+           | list_
            | binary
-           | tuple
+           | tuple_
            | '(' patExpr ')'
            ;
 
@@ -272,7 +272,7 @@ mapPatExpr : patExprMax? '#' mapTuple
 
 recordPatExpr : '#' tokAtom ('.' tokAtom | recordTuple) ;
 
-list : '['      ']'
+list_ : '['      ']'
      | '[' expr tail
      ;
 tail :          ']'
@@ -311,7 +311,7 @@ lcExpr : expr
        | binary '<=' expr
        ;
 
-tuple : '{' exprs? '}' ;
+tuple_ : '{' exprs? '}' ;
 
 mapExpr : exprMax? '#' mapTuple
         | mapExpr  '#' mapTuple ;
@@ -354,7 +354,7 @@ ifExpr : 'if' ifClauses 'end' ;
 
 ifClauses : ifClause (';' ifClause)* ;
 
-ifClause : guard clauseBody ;
+ifClause : guard_ clauseBody ;
 
 
 caseExpr : 'case' expr 'of' crClauses 'end' ;
@@ -407,7 +407,7 @@ exprs : expr (',' expr)* ;
 
 patExprs : patExpr (',' patExpr)* ;
 
-guard : exprs (';' exprs)* ;
+guard_ : exprs (';' exprs)* ;
 
 atomic : tokChar
        | tokInteger

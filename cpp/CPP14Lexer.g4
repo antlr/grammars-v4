@@ -14,8 +14,9 @@ FloatingLiteral:
 	| Digitsequence Exponentpart Floatingsuffix?;
 
 StringLiteral:
-	Encodingprefix? '"' Schar* '"'
-	| Encodingprefix? 'R' Rawstring;
+	Encodingprefix?
+    (Rawstring
+	|'"' Schar* '"');
 
 BooleanLiteral: False_ | True_;
 
@@ -381,7 +382,7 @@ fragment Schar:
 	| Escapesequence
 	| Universalcharactername;
 
-fragment Rawstring: '"' ~[\r\n(]* '(' ~[\r\n)]* ')' ~[\r\n"]* '"';
+fragment Rawstring: 'R"' (( '\\' ["()] )|~[\r\n (])*? '(' ~[)]*? ')'  (( '\\' ["()]) | ~[\r\n "])*? '"';
 
 UserDefinedIntegerLiteral:
 	DecimalLiteral Udsuffix

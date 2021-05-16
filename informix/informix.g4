@@ -60,11 +60,11 @@ typeDeclaration
    ;
 
 variableDeclaration
-   : constantIdentifier (COMMA constantIdentifier)* type
-   | constantIdentifier type (COMMA constantIdentifier type)*
+   : constantIdentifier (COMMA constantIdentifier)* type_
+   | constantIdentifier type_ (COMMA constantIdentifier type_)*
    ;
 
-type
+type_
    : typeIdentifier
    | indirectType
    | largeType
@@ -818,7 +818,7 @@ cursorName
    ;
 
 dataType
-   : type
+   : type_
    ;
 
 columnItem

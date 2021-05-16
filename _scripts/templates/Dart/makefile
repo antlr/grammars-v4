@@ -10,12 +10,13 @@ SOURCES = $(GENERATED) \
 default: classes
 classes: $(SOURCES)
 	dart pub get
+	dart compile exe cli.dart
 clean:
 	rm -f *.tokens *.interp
 	rm -f $(GENERATED)
 	rm -f pubspec.lock
 run:
-	dart run cli.dart $(RUNARGS)
+	trwdog <if(os_win)>dart.bat<else>dart<endif> run cli.dart $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
 	java -jar $(JAR) -Dlanguage=Dart <antlr_tool_args:{y | <y> } > $\<
 } >

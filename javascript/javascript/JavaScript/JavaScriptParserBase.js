@@ -36,7 +36,7 @@ export default class JavaScriptLexerBase extends antlr4.Parser {
         const nextTokenType = this._input.LT(1).type;
         return (
                 nextTokenType !== JavaScriptParser.OpenBrace &&
-                nextTokenType !== JavaScriptParser.Function
+                nextTokenType !== JavaScriptParser.Function_
                );
     }
 

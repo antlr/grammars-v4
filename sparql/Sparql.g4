@@ -115,7 +115,7 @@ offsetClause
     ;
 
 groupGraphPattern
-    : '{' triplesBlock? ( ( graphPatternNotTriples | filter ) '.'? triplesBlock? )* '}'
+    : '{' triplesBlock? ( ( graphPatternNotTriples | filter_ ) '.'? triplesBlock? )* '}'
     ;
 
 triplesBlock
@@ -138,7 +138,7 @@ groupOrUnionGraphPattern
     : groupGraphPattern ( 'UNION' groupGraphPattern )*
     ;
 
-filter
+filter_
     : 'FILTER' constraint
     ;
 
@@ -175,10 +175,10 @@ propertyList
     ;
 
 objectList
-    : object ( ',' object )*
+    : object_ ( ',' object_ )*
     ;
 
-object
+object_
     : graphNode
     ;
 

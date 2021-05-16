@@ -21,7 +21,7 @@ clean:
 	rm -f *.tokens
 	rm -f $(GENERATED)
 run:
-	java -classpath $(CLASSPATH) Program $(RUNARGS)
+	trwdog java -classpath $(CLASSPATH) Program $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
 	java -jar $(JAR) <antlr_tool_args:{y | <y> } > $\<
 } >

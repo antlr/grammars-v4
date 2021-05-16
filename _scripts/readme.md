@@ -2,13 +2,17 @@
 
 This directory contains scripts for CI testing.
 
-* regtest.sh -- This script is a Bash-based script to test any target. To
-run, make sure you are at the root directory of grammar-vs/, then type `bash regtest.sh <target>` where `<target>` is CSharp, Java, Cpp, Dart, Go, or one
-of the other targets.
+* regtest.sh -- This is a Bash-based script to test any target. To
+run, cd to grammar-vs/, then type `bash regtest.sh <target>` where `<target>` is CSharp, Java, Cpp, Dart, Go, or one
+of the other targets. To test the target, you will need the NET SDK installed,
+access to the internet, and to toolchain for the target you want to test.
+For CSharp, it will download the Antlr4 tool and runtime. For the other
+targets, you will need to download the Antlr4 tool antlr-4.9.2-complete.jar and
+place it in /tmp.
 
 * test.ps1 -- this is a Powershell script for testing, similar to regtest.sh.
 
-Both scripts use dotnet-antlr to generate a program from the pom.xml file
+Both scripts use trgen to generate a program from the pom.xml file
 in the grammar source. The tool generates a parser program for one of the target
 langauges, currently CSharp, Java, Cpp, Dart, Go, and Python. The generated
 code contains makefiles and Powershell files to present an idealized interface
@@ -16,50 +20,63 @@ to build and run the parse with the examples, so you do not need to memorize how
 to build and run the parser for the given target.
 
 To build and run the parser using the makefiles, you must be in an environment
-that provides make and Bash. Ubuntu provides that out of the box; for Windows,
-you must use MinGW64, pacman install [make](https://packages.msys2.org/package/mingw-w64-x86_64-make)
-and provide a symbolic link to "make" once installed. I don't know why,
-but the package doesn't define just a plain old "make.exe" like a sane person would.
+that provides make and Bash. Ubuntu provides that out of the box. For Windows,
+you must use MinGW64, then "pacman install [make](https://packages.msys2.org/package/mingw-w64-x86_64-make)"
+and provide a symbolic linked file for "make" once installed. I don't know why,
+but the package doesn't define just a plain old "make.exe".
 
     cd to a grammar directory, e.g., `cd abnf`.
-    dotnet-antlr -m true -t CSharp
+    trgen -t CSharp --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.2-complete.jar
     make
     make test
 
-You can look at the generated makefile to see what is exactly done.
-Makefiles are human readable, easy to understand, but only work on
-MinGW64 for Windows, or in a shell in Ubuntu. The makefiles do not set
-up your environment; you will need to do that yourself.
+Please note the parameters to trgen: "--template-sources-directory" is used
+to say where to find the templates used in this repo for the driver programs.
+By default, trgen has a collection of generic templates, and while they are
+generic, you might want to test the grammars in this repo with the templates
+used in CI builds.
 
-For Windows or Ubuntu, you are very likely going to need to provide
-a "~/.dotnet-antlr.rc" file. For Windows, you will need to provide a full
-Windows path name for the Antlr jar file:
+For Windows or Ubuntu, you may want to provide
+a "~/.trgen.rc" file to override defaults for that program.
+For example,
 
-	{
-	"antlr_tool_path" : "c:/users/kenne/downloads/antlr-4.9.2-complete.jar"
-	}
+    {
+        "antlr_tool_path" : "c:/users/kenne/downloads/antlr-4.9.2-complete.jar"
+    }
+
+For the trwdog tool, you may want to override the default 5 minute timeout
+for parse tests to complete, e.g., if you are on a slow machine. To do that,
+create a "~/.trwdog.rc" file.
+
+    {
+        "Timeout" : 2
+    }
+
+
+The home directory is computed via the C# runtime:
+`Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)`.
 
 # Templates for CI testing
 
 These are the templates for testing the grammars, which are used by the
 above scripts and
-[dotnet-antlr](https://github.com/kaby76/Antlr4BuildTasks/tree/master/dotnet-antlr).
+[trgen](https://github.com/kaby76/Domemtech.Trash/tree/main/trgen).
 
 If you add or delete any files from the templates/ directory you should regenerate
 the file templates/files using `cd templates/; find . -type f > files`. Otherwise,
-the dotnet-antlr tool may not add the new template files into your generated code.
+the trgen tool may not add the new template files into your generated code.
 
-## What version of dotnet-antlr do I use?
+## What version of trgen do I use?
 
-You should take care to specify a version when installing the dotnet-antlr tool.
-I change the tool often, and there may be regressions. Currently version 3.0.10
+You should take care to specify a version when installing the trgen tool.
+I change the tool often, and there may be regressions. Currently version 0.7.0
 works well.
 
 ## Structure
 
 All the templates are in the "per-target directory" standard:
 * A template directory contains files that are instantiated in the generated output directory.
-* Contained in the template directory are sub-directories named after the target, e.g., CSharp, Java, JavaScript, etc. Those files are copied to the generated output directory, but only for the specified target for dotnet-antlr.
+* Contained in the template directory are sub-directories named after the target, e.g., CSharp, Java, JavaScript, etc. Those files are copied to the generated output directory, but only for the specified target for trgen.
 
 Here is the structure of the default templates:
 
@@ -96,7 +113,7 @@ Here is the structure of the default templates:
         files
         Arithmetic.g4
  
-Driver code is generated by merging the code containing the grammar and sources in grammars-v4 with the template source code. For example, for `dotnet-antlr -m true -t CSharp` in grammars-v4/abb/, the tool will extract from the pom.xml file details about the grammar, copy the source files from grammars-v4/abb/ to Generated/, then copy the template files from templates/CSharp to Generated/. The end result is:
+Driver code is generated by merging the code containing the grammar and sources in grammars-v4 with the template source code. For example, for `trgen -t CSharp` in grammars-v4/abb/, the tool will extract from the pom.xml file details about the grammar, copy the source files from grammars-v4/abb/ to Generated/, then copy the template files from templates/CSharp to Generated/. The end result is:
 
     Generated/
         abbParser.g4       (from the source abb/abbParser.g4)
@@ -106,9 +123,9 @@ Driver code is generated by merging the code containing the grammar and sources 
         Program.cs   (from the source templates/CSharp/Program.cs)
         Test.csproj   (from the source templates/CSharp/Test.csproj)
 
-All files in templates/ are [StringTemplate](https://github.com/antlr/stringtemplate4/blob/master/doc/introduction.md) files. To see how it is used, I suggest looking at the default set of templates for the tool [here](https://github.com/kaby76/Antlr4BuildTasks/tree/master/dotnet-antlr/templates). Look closely for template attribute references, which begin with '<' and end with '>'. (To avoid template attribute replacement, escape '<' with a backslash, e.g., '\<'. You only need to do the '<', not the closing '>' symbol.)
+All files in templates/ are [StringTemplate](https://github.com/antlr/stringtemplate4/blob/master/doc/introduction.md) files. To see how it is used, I suggest looking at the default set of templates for the tool [here](https://github.com/kaby76/Domemtech.Trash/tree/main/trgen/templates). Look closely for template attribute references, which begin with '<' and end with '>'. (To avoid template attribute replacement, escape '<' with a backslash, e.g., '\<'. You only need to do the '<', not the closing '>' symbol.)
 
-Dotnet-antlr will construct and pass to the template evaluator the following attributes:
+Trgen will construct and pass to the template evaluator the following attributes:
 
 | Attribute | Type | Default |
 | ----- | ----- | ----- |
@@ -131,27 +148,26 @@ Dotnet-antlr will construct and pass to the template evaluator the following att
 | temp_dir | string | Win: c:/temp; Ubuntu: /tmp. This is used for the Cpp target |
 | tool_grammar_files | List<string> | computed; names of grammar files with relative path from output directory |
 | tool_grammar_tuples | { string GrammarFileName, string GeneratedFileName, string GrammarAutomName } | computed from `tool_grammar_files`, `parser_name`, `lexer_name`. Example: [{ "abbLexer.g4", "abbLexer.cs", "abbLexer" }, ...] |
-| version | string | version number of dotnet-antlr |
+| version | string | version number of trgen |
 
 ## How template code is instantiated
 
 To generate the driver code from templates for a grammar, you will need
-to have the NET SDK installed. Afterwards, install `dotnet-antlr`:
+to have the NET SDK installed. Afterwards, install `trgen`:
 
-    dotnet tool install -g dotnet-antlr --version 3.0.10
+    dotnet tool install -g trgen --version 0.5.3
 
 To create a driver program:
 
 1) Change directory to __grammar__ directory, e.g., `cd abb`.
-2) `dotnet-antlr -m true -t Java --template-sources-directory ../_scripts/templates/`
+2) `trgen -t Java --template-sources-directory ../_scripts/templates/`
 
-You will need to pass to dotnet-antlr `-m true`
-to indicate to use the pom.xml in the grammar
-directory code to determine default information about the grammar, and
+You will need to pass to trgen
 `--template-sources-directory ../_scripts/templates/` to indicate the path
 to the templates. If you do not pass the --template-sources-directory option,
 the tool will use the default templates contained with the tool. You can
-generate a different target using `-t`. Acceptable targets are CSharp, Java,
-JavaScript, Python3, Dart, or Go. The "files" directory in the templates
+generate a different target using `-t`. Acceptable targets are
+Antlr4cs, Cpp, CSharp, Dart, Go, Java, JavaScript, Python3.
+The "files" directory in the templates
 directory indicates what files are included in generation, and obtained
 via "find . -type f > files".

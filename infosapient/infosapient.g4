@@ -54,7 +54,7 @@ expr
    ;
 
 attribClause
-   : id ('s' | 'are') (hedgeCollection)? (nLiteral | id | restrictionHedge)
+   : id_ ('s' | 'are') (hedgeCollection)? (nLiteral | id_ | restrictionHedge)
    ;
 
 hedgeCollection
@@ -77,7 +77,7 @@ nLiteral
    : FP_LITERAL
    ;
 
-id
+id_
    : IDENTIFIER
    ;
 
