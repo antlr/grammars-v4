@@ -8,7 +8,7 @@ import (
 
 // JavaScriptParserBase implementation.
 type JavaScriptParserBase struct {
-	*antlr.ParserBase
+	*antlr.BaseParser
 }
 
 // Short for p.prev(str string)
