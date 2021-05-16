@@ -101,8 +101,8 @@ unlabelled_command : repeatable_command | repetitive_command | test_command | if
 label_prefix : identifier ':' ;
 case_prefix : 'CASE' constant_expression ':' ;
 default_prefix : 'DEFAULT' ':' ;
-prefix : label_prefix | case_prefix | default_prefix ;
-command : unlabelled_command | prefix command | prefix ;
+prefix_ : label_prefix | case_prefix | default_prefix ;
+command : unlabelled_command | prefix_ command | prefix_ ;
 
 // 8.8.10 Blocks and compound commands
 command_list : command (';' command)* ;

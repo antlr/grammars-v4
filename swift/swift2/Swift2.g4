@@ -269,13 +269,13 @@ requirement_list : requirement | requirement ',' requirement_list  ;
 requirement : conformance_requirement | same_type_requirement  ;
 
 conformance_requirement : type_identifier ':' type_identifier | type_identifier ':' protocol_composition_type  ;
-same_type_requirement : type_identifier same_type_equals type  ;
+same_type_requirement : type_identifier same_type_equals type_  ;
 
 // GRAMMAR OF A GENERIC ARGUMENT CLAUSE
 
 generic_argument_clause : '<' generic_argument_list '>'  ;
 generic_argument_list : generic_argument (',' generic_argument)* ;
-generic_argument : type ;
+generic_argument : type_ ;
 
 // context-sensitive. Allow < as pre, post, or binary op
 //lt : {_input.LT(1).getText().equals("<")}? operator_ ;
@@ -363,7 +363,7 @@ didSet_clause : attributes? 'didSet' setter_name? code_block  ;
 typealias_declaration : typealias_head typealias_assignment  ;
 typealias_head : attributes? access_level_modifier? 'typealias' typealias_name  ;
 typealias_name : identifier  ;
-typealias_assignment : assignment_operator type  ;
+typealias_assignment : assignment_operator type_  ;
 
 // GRAMMAR OF A FUNCTION DECLARATION
 // NOTE: Swift Grammar Spec indicates that a function_body is optional
@@ -377,7 +377,7 @@ function_signature
  : parameter_clauses 'throws'? function_result?
  | parameter_clauses 'rethrows' function_result?
  ;
-function_result : arrow_operator attributes? type  ;
+function_result : arrow_operator attributes? type_  ;
 function_body : code_block  ;
 parameter_clauses : parameter_clause parameter_clauses? ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
@@ -498,7 +498,7 @@ subscript_declaration
  ;
 
 subscript_head : attributes? declaration_modifiers? 'subscript' parameter_clause  ;
-subscript_result : arrow_operator attributes? type  ;
+subscript_result : arrow_operator attributes? type_  ;
 
 // GRAMMAR OF AN OPERATOR DECLARATION
 
@@ -509,8 +509,8 @@ infix_operator_declaration : 'infix' 'operator' operator_ '{' infix_operator_att
 infix_operator_attributes : precedence_clause? associativity_clause? ;
 precedence_clause : 'precedence' precedence_level ;
 precedence_level : integer_literal ;
-associativity_clause : 'associativity' associativity ;
-associativity : 'left' | 'right' | 'none' ;
+associativity_clause : 'associativity' associativity_ ;
+associativity_ : 'left' | 'right' | 'none' ;
 
 // GRAMMAR OF A DECLARATION MODIFIER
 declaration_modifier
@@ -536,8 +536,8 @@ pattern
  | tuple_pattern type_annotation?
  | enum_case_pattern
  | optional_pattern
- | 'is' type
- | pattern 'as' type
+ | 'is' type_
+ | pattern 'as' type_
  | expression_pattern
  ;
 
@@ -636,10 +636,10 @@ conditional_operator : '?' try_operator? expression ':' ;
 // GRAMMAR OF A TYPE_CASTING OPERATOR
 
 type_casting_operator
-  : 'is' type
-  | 'as' type
-  | 'as' '?' type
-  | 'as' '!' type
+  : 'is' type_
+  | 'as' type_
+  | 'as' '?' type_
+  | 'as' '!' type_
   ;
 
 // GRAMMAR OF A PRIMARY EXPRESSION
@@ -776,23 +776,23 @@ trailing_closure : closure_expression ;
 
 // GRAMMAR OF A TYPE
 
-type
- : '[' type ']'
- | '[' type ':' type ']'
- | type 'throws'? arrow_operator type
- | type 'rethrows' arrow_operator type
+type_
+ : '[' type_ ']'
+ | '[' type_ ':' type_ ']'
+ | type_ 'throws'? arrow_operator type_
+ | type_ 'rethrows' arrow_operator type_
  | type_identifier
  | tuple_type
- | type '?'
- | type '!'
+ | type_ '?'
+ | type_ '!'
  | protocol_composition_type
- | type '.' 'Type'
- | type '.' 'Protocol'
+ | type_ '.' 'Type'
+ | type_ '.' 'Protocol'
  ;
 
 // GRAMMAR OF A TYPE ANNOTATION
 
-type_annotation : ':' attributes? type  ;
+type_annotation : ':' attributes? type_  ;
 
 // GRAMMAR OF A TYPE IDENTIFIER
 
@@ -808,7 +808,7 @@ type_name : identifier ;
 tuple_type : '(' tuple_type_body? ')'  ;
 tuple_type_body : tuple_type_element_list range_operator? ;
 tuple_type_element_list : tuple_type_element | tuple_type_element ',' tuple_type_element_list  ;
-tuple_type_element : attributes? 'inout'? type | 'inout'? element_name type_annotation ;
+tuple_type_element : attributes? 'inout'? type_ | 'inout'? element_name type_annotation ;
 element_name : identifier ;
 
 // GRAMMAR OF A FUNCTION TYPE

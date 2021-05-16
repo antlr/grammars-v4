@@ -69,8 +69,8 @@ public class Program
         }
         else if (input != null)
         {
-	    str = new Antlr4.Runtime.AntlrInputStream(
-		    new MemoryStream(Encoding.UTF8.GetBytes(input ?? "")));
+            str = new Antlr4.Runtime.AntlrInputStream(
+                    new MemoryStream(Encoding.UTF8.GetBytes(input ?? "")));
         } else if (file_name != null)
         {
             FileStream fs = new FileStream(file_name, FileMode.Open);

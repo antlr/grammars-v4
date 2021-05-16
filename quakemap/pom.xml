@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>map</entryPoint>
+					<entryPoint>map_</entryPoint>
 					<grammarName>quakemap</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

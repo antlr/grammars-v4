@@ -39,7 +39,7 @@ alternative
 item
     : Name
     | Singleton
-    | range exclude?
+    | range_ exclude?
     | String
     ;
 
@@ -57,12 +57,12 @@ fragment Hex
     : [0-9a-fA-F]
     ;
 
-range
+range_
     : Singleton Space '.' Space Singleton
     ;
 
 exclude
-    : Space '-' Space (Singleton | range) exclude?
+    : Space '-' Space (Singleton | range_) exclude?
     ;
 
 String

@@ -250,17 +250,17 @@ expressionList
 //Function     = Signature FunctionBody .
 //FunctionBody = Block .
 functionDecl
-    : 'fn' IDENTIFIER ( function | signature )
+    : 'fn' IDENTIFIER ( function_ | signature )
     ;
 
-function
+function_
     : signature block
     ;
 
 //MethodDecl   = "fn" Receiver MethodName ( Function | Signature ) .
 //Receiver     = Parameters .
 methodDecl
-    : 'fn' receiver IDENTIFIER ( function | signature )
+    : 'fn' receiver IDENTIFIER ( function_ | signature )
     ;
 
 receiver
@@ -491,7 +491,7 @@ inClause
 
 
 //Type      = TypeName | TypeLit .
-type
+type_
     : typeName
     | typeLit
 //    | '(' type ')'                //TODO: V语言目前也不支持用类型名多重定义
@@ -524,7 +524,7 @@ arrayLength
     ;
 
 elementType
-    : type
+    : type_
     ;
 
 //PointerType = "*" BaseType .
@@ -544,7 +544,7 @@ interfaceType
 //MapType     = "map" "[" KeyType "]" ElementType .
 //KeyType     = Type .
 mapType
-    : 'map' '[' type ']' elementType
+    : 'map' '[' type_ ']' elementType
     ;
 
 //SliceType = "[" "]" ElementType .
@@ -581,7 +581,7 @@ signature
 
 result
     : parameters
-    | type
+    | type_
     ;
 
 parameters
@@ -593,7 +593,7 @@ parameterList
     ;
 
 parameterDecl
-    : identifierList? type
+    : identifierList? type_
     ;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -696,7 +696,7 @@ structDecl
     ;
 
 fieldDecl
-    : ({noTerminatorBetween(2)}? identifierList type | anonymousField) STRING_LIT?
+    : ({noTerminatorBetween(2)}? identifierList type_ | anonymousField) STRING_LIT?
     | ('pub' ('mut' 'mut'?)? | 'mut') ':'
     ;
 
@@ -706,7 +706,7 @@ anonymousField
 
 //FunctionLit = "fn" Function .
 functionLit
-    : 'fn' function
+    : 'fn' function_
     ;
 
 //PrimaryExpr =
@@ -748,7 +748,7 @@ index
 //    ;
 
 arguments
-    : '(' ( ( expressionList | type ( ',' expressionList )? ) ','? )? ')'
+    : '(' ( ( expressionList | type_ ( ',' expressionList )? ) ','? )? ')'
     ;
 
 //MethodExpr    = ReceiverType "." MethodName .
@@ -779,7 +779,7 @@ unaryExpr
 
 //Conversion = Type "(" Expression [ "," ] ")" .
 conversion
-    : type '(' expression ')'
+    : type_ '(' expression ')'
     ;
 
 eos

@@ -1,7 +1,7 @@
 parser grammar RexxParser;
 options { tokenVocab=RexxLexer; }
 
-file                        :   program_ EOF ;
+file_                        :   program_ EOF ;
 
 program_                    :   ncl? instruction_list? ;
   ncl                       :   null_clause+ ;

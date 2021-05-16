@@ -73,7 +73,7 @@ passedParams
   ;
 
 passedParam
-  : (variableName COLON)? (commandStatement | listSpaceSeparated | listBracketed | map)
+  : (variableName COLON)? (commandStatement | listSpaceSeparated | listBracketed | map_)
   ;
 
 // MIXINS and related rules
@@ -163,7 +163,7 @@ condition
 
 
 variableDeclaration
-  : variableName COLON (propertyValue | listBracketed | map) '!default'? ';'
+  : variableName COLON (propertyValue | listBracketed | map_) '!default'? ';'
   ;
 
 
@@ -193,8 +193,8 @@ eachDeclaration
 
 eachValueList
   : commandStatement
-  | list
-  | map
+  | list_
+  | map_
   ;
 
 //Imports
@@ -243,7 +243,7 @@ ruleset
   ;
 
 block
-  : BlockStart (property | statement)* lastProperty? BlockEnd
+  : BlockStart (property_ | statement)* lastProperty? BlockEnd
   ;
 
 selectors
@@ -309,7 +309,7 @@ identifierVariableName
   : DOLLAR (Identifier | IdentifierAfter)
   ;
 
-property
+property_
   : identifier COLON propertyValue IMPORTANT? SEMI
   | identifier COLON block
   | identifier COLON propertyValue IMPORTANT? block
@@ -341,7 +341,7 @@ functionNamespace
   ;
 
 
-list
+list_
   : listCommaSeparated
   | listSpaceSeparated
   | listBracketed
@@ -361,11 +361,11 @@ listBracketed
 
 listElement
   : commandStatement
-  | LPAREN list RPAREN
+  | LPAREN list_ RPAREN
   ;
 
 
-map
+map_
   : LPAREN mapEntry (COMMA mapEntry)* COMMA? RPAREN
   ;
 
@@ -374,12 +374,12 @@ mapEntry
 
 mapKey
   : commandStatement
-  | list
-  | map
+  | list_
+  | map_
   ;
 
 mapValue
   : commandStatement
-  | list
-  | map
+  | list_
+  | map_
   ;

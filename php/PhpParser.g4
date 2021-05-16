@@ -94,7 +94,7 @@ topStatement
     ;
 
 useDeclaration
-    : Use (Function | Const)? useDeclarationContentList SemiColon
+    : Use (Function_ | Const)? useDeclarationContentList SemiColon
     ;
 
 useDeclarationContentList
@@ -118,7 +118,7 @@ namespaceStatement
     ;
 
 functionDeclaration
-    : attributes? Function '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' QuestionMark? typeHint)? blockStatement
+    : attributes? Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')' (':' QuestionMark? typeHint)? blockStatement
     ;
 
 classDeclaration
@@ -366,7 +366,7 @@ staticVariableStatement
 classStatement
     : attributes? ( propertyModifiers typeHint? variableInitializer (',' variableInitializer)* SemiColon
                   | memberModifiers? ( Const typeHint? identifierInitializer (',' identifierInitializer)* SemiColon
-                                     | Function '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
+                                     | Function_ '&'? identifier typeParameterListInBrackets? '(' formalParameterList ')'
                                        baseCtorCall? methodBody))
     | Use qualifiedNamespaceNameList traitAdaptations
     ;
@@ -510,7 +510,7 @@ arrayCreation
     ;
 
 lambdaFunctionExpr
-    : Static? Function '&'? '(' formalParameterList ')' lambdaFunctionUseVars? (':' typeHint)? blockStatement
+    : Static? Function_ '&'? '(' formalParameterList ')' lambdaFunctionUseVars? (':' typeHint)? blockStatement
     | LambdaFn '(' formalParameterList')' '=>' expression
     ;
 
@@ -782,7 +782,7 @@ identifier
     | FloatCast
     | For
     | Foreach
-    | Function
+    | Function_
     | Global
     | Goto
     | If

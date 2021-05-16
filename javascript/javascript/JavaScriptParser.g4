@@ -224,7 +224,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Async? Function '*'? identifier '(' formalParameterList? ')' functionBody
+    : Async? Function_ '*'? identifier '(' formalParameterList? ')' functionBody
     ;
 
 classDeclaration
@@ -309,7 +309,7 @@ expressionSequence
     ;
 
 singleExpression
-    : anoymousFunction                                                      # FunctionExpression
+    : anonymousFunction                                                      # FunctionExpression
     | Class identifier? classTail                                           # ClassExpression
     | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
@@ -367,9 +367,9 @@ objectLiteral
     : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
     ;
 
-anoymousFunction
+anonymousFunction
     : functionDeclaration                                                       # FunctionDecl
-    | Async? Function '*'? '(' formalParameterList? ')' functionBody    # AnoymousFunctionDecl
+    | Async? Function_ '*'? '(' formalParameterList? ')' functionBody    # AnonymousFunctionDecl
     | Async? arrowFunctionParameters '=>' arrowFunctionBody                     # ArrowFunction
     ;
 
@@ -466,7 +466,7 @@ keyword
     | Switch
     | While
     | Debugger
-    | Function
+    | Function_
     | This
     | With
     | Default

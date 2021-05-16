@@ -139,8 +139,8 @@ atom: ('(' (yield_expr|testlist_comp)? ')' |
        NAME | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False');
 testlist_comp: (test|star_expr) ( comp_for | (',' (test|star_expr))* (',')? );
 trailer: '(' (arglist)? ')' | '[' subscriptlist ']' | '.' NAME;
-subscriptlist: subscript (',' subscript)* (',')?;
-subscript: test | (test)? ':' (test)? (sliceop)?;
+subscriptlist: subscript_ (',' subscript_)* (',')?;
+subscript_: test | (test)? ':' (test)? (sliceop)?;
 sliceop: ':' (test)?;
 exprlist: (expr|star_expr) (',' (expr|star_expr))* (',')?;
 testlist: test (',' test)* (',')?;

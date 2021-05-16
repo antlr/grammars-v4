@@ -8,7 +8,7 @@ start
    ;
 
 line
-   : ( vertex | face | mtllib | object | use_material | group ) ( '\r' )? '\n'
+   : ( vertex | face | mtllib | object_ | use_material | group ) ( '\r' )? '\n'
    ;
 
 face
@@ -24,7 +24,7 @@ mtllib
    : MATERIAL_LIBRARY a = NAME '.mtl' 
    ;
 
-object
+object_
    : OBJECT_NAME NAME
    ;
 

@@ -2307,7 +2307,7 @@ conditionNameReference
    ;
 
 conditionNameSubscriptReference
-   : LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR
+   : LPARENCHAR subscript_ (COMMACHAR? subscript_)* RPARENCHAR
    ;
 
 // relation ----------------------------------
@@ -2347,7 +2347,7 @@ identifier
    ;
 
 tableCall
-   : qualifiedDataName (LPARENCHAR subscript (COMMACHAR? subscript)* RPARENCHAR)* referenceModifier?
+   : qualifiedDataName (LPARENCHAR subscript_ (COMMACHAR? subscript_)* RPARENCHAR)* referenceModifier?
    ;
 
 functionCall
@@ -2366,7 +2366,7 @@ length
    : arithmeticExpression
    ;
 
-subscript
+subscript_
    : ALL | integerLiteral | qualifiedDataName integerLiteral? | indexName integerLiteral? | arithmeticExpression
    ;
 

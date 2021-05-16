@@ -49,7 +49,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>template</entryPoint>
+					<entryPoint>template_</entryPoint>
 					<grammarName>ST</grammarName>
 					<packageName>org.antlr.parser.st4</packageName>
 					<exampleFiles>examples/</exampleFiles>

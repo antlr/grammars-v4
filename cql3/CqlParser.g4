@@ -31,14 +31,14 @@ root
    ;
 
 cqls
-   : (cql MINUSMINUS? statementSeparator | empty)* (cql (MINUSMINUS? statementSeparator)? | empty)
+   : (cql MINUSMINUS? statementSeparator | empty_)* (cql (MINUSMINUS? statementSeparator)? | empty_)
    ;
 
 statementSeparator
    : SEMI
    ;
 
-empty
+empty_
    : statementSeparator
    ;
 
@@ -79,7 +79,7 @@ cql
    | select_
    | truncate
    | update
-   | use
+   | use_
    ;
 
 revoke
@@ -500,7 +500,7 @@ durableWrites
    : kwDurableWrites OPERATOR_EQ booleanLiteral
    ;
 
-use
+use_
    : kwUse keyspace
    ;
 

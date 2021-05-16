@@ -34,11 +34,11 @@ sexpr
 
 item
    : atom
-   | list
+   | list_
    | LPAREN item DOT item RPAREN
    ;
 
-list
+list_
    : LPAREN item* RPAREN
    ;
 
