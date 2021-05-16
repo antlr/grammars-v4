@@ -8,7 +8,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo "$file"
-    node index.js -file "$file"
+    trwdog node index.js -file "$file"
     status="$?"
     if [ -f "$file".errors ]
     then

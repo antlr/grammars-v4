@@ -225,6 +225,7 @@ constantExpression: conditionalExpression;
 
 statement:
 	labeledStatement
+	| declarationStatement
 	| attributeSpecifierSeq? (
 		expressionStatement
 		| compoundStatement
@@ -232,8 +233,7 @@ statement:
 		| iterationStatement
 		| jumpStatement
 		| tryBlock
-	)
-	| declarationStatement;
+	);
 
 labeledStatement:
 	attributeSpecifierSeq? (
@@ -791,7 +791,6 @@ theOperator:
 	| PlusAssign
 	| MinusAssign
 	| StarAssign
-	| Assign
 	| ModAssign
 	| XorAssign
 	| AndAssign
@@ -803,7 +802,6 @@ theOperator:
 	| Equal
 	| NotEqual
 	| LessEqual
-	| GreaterEqual
 	| AndAnd
 	| OrOr
 	| PlusPlus

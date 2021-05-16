@@ -3,6 +3,7 @@
 ./Antlr4cs/Program.cs
 ./Antlr4cs/Test.csproj
 ./Antlr4cs/test.sh
+./Antlr4cs/tester.psm1
 ./Arithmetic.g4
 ./Cpp/CaseChangingCharStream.cpp
 ./Cpp/CaseChangingCharStream.h
