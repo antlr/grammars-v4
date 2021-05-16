@@ -626,6 +626,69 @@ class_type_for_parallel_dw
     | OBJECT
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/grant-transact-sql?view=sql-server-ver15
+// SELECT DISTINCT '| ' + CLASS_DESC
+// FROM sys.dm_audit_actions
+// ORDER BY 1
+class_type_for_grant
+    : APPLICATION ROLE
+    | ASSEMBLY
+    | ASYMMETRIC KEY
+    | AUDIT
+    | AVAILABILITY GROUP
+    | BROKER PRIORITY
+    | CERTIFICATE
+    | COLUMN ENCRYPTION KEY
+    | COLUMN MASTER KEY
+    | CONTRACT
+    | CREDENTIAL
+    | CRYPTOGRAPHIC PROVIDER
+    | DATABASE
+    | DATABASE AUDIT SPECIFICATION
+    | DATABASE ENCRYPTION KEY
+    | DATABASE EVENT SESSION
+    | DATABASE SCOPED CONFIGURATION
+    | DATABASE SCOPED CREDENTIAL
+    | DATABASE SCOPED RESOURCE GOVERNOR
+    | ENDPOINT
+    | EVENT NOTIFICATION DATABASE
+    | EVENT NOTIFICATION OBJECT
+    | EVENT NOTIFICATION SERVER
+    | EVENT SESSION
+    | EXTERNAL DATA SOURCE
+    | EXTERNAL FILE FORMAT
+    | EXTERNAL LIBRARY
+    | EXTERNAL RESOURCE POOL
+    | EXTERNAL TABLE
+    | FULLTEXT CATALOG
+    | FULLTEXT STOPLIST
+    | LOGIN
+    | MASTER KEY
+    | MESSAGE TYPE
+    | OBJECT
+    | PARTITION FUNCTION
+    | PARTITION SCHEME
+    | REMOTE SERVICE BINDING
+    | RESOURCE GOVERNOR
+    | ROLE
+    | ROUTE
+    | SCHEMA
+    | SEARCH PROPERTY LIST
+    | SERVER
+    | SERVER AUDIT
+    | SERVER AUDIT SPECIFICATION
+    | SERVER ROLE
+    | SERVICE
+    | SQL LOGIN
+    | SYMMETRIC KEY
+    | TRIGGER DATABASE
+    | TRIGGER SERVER
+    | TYPE
+    | USER
+    | XML SCHEMA COLLECTION
+    ;
+
+
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-availability-group-transact-sql
 drop_availability_group
@@ -2593,7 +2656,7 @@ security_statement
     // https://msdn.microsoft.com/en-us/library/ms188354.aspx
     : execute_clause ';'?
     // https://msdn.microsoft.com/en-us/library/ms187965.aspx
-    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO to_principal+=principal_id (',' to_principal+=principal_id)* (WITH GRANT OPTION)? (AS as_principal=principal_id)? ';'?
+    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON (class=class_type_for_grant '::')? on_id=table_name)? TO to_principal+=principal_id (',' to_principal+=principal_id)* (WITH GRANT OPTION)? (AS as_principal=principal_id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
     | open_key
@@ -2685,18 +2748,128 @@ decryption_mechanism
     | PASSWORD EQUAL STRING
     ;
 
+// https://docs.microsoft.com/en-us/sql/relational-databases/system-functions/sys-fn-builtin-permissions-transact-sql?view=sql-server-ver15
+// SELECT DISTINCT '| ' + permission_name
+// FROM sys.fn_builtin_permissions (DEFAULT)
+// ORDER BY 1
 grant_permission
-    : EXECUTE
-    | VIEW id_ // DEFINITION
-    | TAKE id_ // OWNERSHIP
-    | CONTROL id_? // SERVER
-    | CREATE (TABLE | VIEW)
-    | SHOWPLAN
+    : ADMINISTER BULK OPERATIONS
+    | ADMINISTER DATABASE BULK OPERATIONS
+    | ALTER
+    | ALTER ANY APPLICATION ROLE
+    | ALTER ANY ASSEMBLY
+    | ALTER ANY ASYMMETRIC KEY
+    | ALTER ANY AVAILABILITY GROUP
+    | ALTER ANY CERTIFICATE
+    | ALTER ANY COLUMN ENCRYPTION KEY
+    | ALTER ANY COLUMN MASTER KEY
+    | ALTER ANY CONNECTION
+    | ALTER ANY CONTRACT
+    | ALTER ANY CREDENTIAL
+    | ALTER ANY DATABASE
+    | ALTER ANY DATABASE AUDIT
+    | ALTER ANY DATABASE DDL TRIGGER
+    | ALTER ANY DATABASE EVENT NOTIFICATION
+    | ALTER ANY DATABASE EVENT SESSION
+    | ALTER ANY DATABASE SCOPED CONFIGURATION
+    | ALTER ANY DATASPACE
+    | ALTER ANY ENDPOINT
+    | ALTER ANY EVENT NOTIFICATION
+    | ALTER ANY EVENT SESSION
+    | ALTER ANY EXTERNAL DATA SOURCE
+    | ALTER ANY EXTERNAL FILE FORMAT
+    | ALTER ANY EXTERNAL LIBRARY
+    | ALTER ANY FULLTEXT CATALOG
+    | ALTER ANY LINKED SERVER
+    | ALTER ANY LOGIN
+    | ALTER ANY MASK
+    | ALTER ANY MESSAGE TYPE
+    | ALTER ANY REMOTE SERVICE BINDING
+    | ALTER ANY ROLE
+    | ALTER ANY ROUTE
+    | ALTER ANY SCHEMA
+    | ALTER ANY SECURITY POLICY
+    | ALTER ANY SERVER AUDIT
+    | ALTER ANY SERVER ROLE
+    | ALTER ANY SERVICE
+    | ALTER ANY SYMMETRIC KEY
+    | ALTER ANY USER
+    | ALTER RESOURCES
+    | ALTER SERVER STATE
+    | ALTER SETTINGS
+    | ALTER TRACE
+    | AUTHENTICATE
+    | AUTHENTICATE SERVER
+    | BACKUP DATABASE
+    | BACKUP LOG
+    | CHECKPOINT
+    | CONNECT
+    | CONNECT ANY DATABASE
+    | CONNECT REPLICATION
+    | CONNECT SQL
+    | CONTROL
+    | CONTROL SERVER
+    | CREATE AGGREGATE
+    | CREATE ANY DATABASE
+    | CREATE ASSEMBLY
+    | CREATE ASYMMETRIC KEY
+    | CREATE AVAILABILITY GROUP
+    | CREATE CERTIFICATE
+    | CREATE CONTRACT
+    | CREATE DATABASE
+    | CREATE DATABASE DDL EVENT NOTIFICATION
+    | CREATE DDL EVENT NOTIFICATION
+    | CREATE DEFAULT
+    | CREATE ENDPOINT
+    | CREATE EXTERNAL LIBRARY
+    | CREATE FULLTEXT CATALOG
+    | CREATE FUNCTION
+    | CREATE MESSAGE TYPE
+    | CREATE PROCEDURE
+    | CREATE QUEUE
+    | CREATE REMOTE SERVICE BINDING
+    | CREATE ROLE
+    | CREATE ROUTE
+    | CREATE RULE
+    | CREATE SCHEMA
+    | CREATE SEQUENCE
+    | CREATE SERVER ROLE
+    | CREATE SERVICE
+    | CREATE SYMMETRIC KEY
+    | CREATE SYNONYM
+    | CREATE TABLE
+    | CREATE TRACE EVENT NOTIFICATION
+    | CREATE TYPE
+    | CREATE VIEW
+    | CREATE XML SCHEMA COLLECTION
+    | DELETE
+    | EXECUTE
+    | EXECUTE ANY EXTERNAL SCRIPT
+    | EXTERNAL ACCESS ASSEMBLY
     | IMPERSONATE
-    | SELECT
-    | REFERENCES
+    | IMPERSONATE ANY LOGIN
     | INSERT
-    | ALTER (ANY? (id_ | DATABASE))?
+    | KILL DATABASE CONNECTION
+    | RECEIVE
+    | REFERENCES
+    | SELECT
+    | SELECT ALL USER SECURABLES
+    | SEND
+    | SHOWPLAN
+    | SHUTDOWN
+    | SUBSCRIBE QUERY NOTIFICATIONS
+    | TAKE OWNERSHIP
+    | UNMASK
+    | UNSAFE ASSEMBLY
+    | UPDATE
+    | VIEW ANY COLUMN ENCRYPTION KEY DEFINITION
+    | VIEW ANY COLUMN MASTER KEY DEFINITION
+    | VIEW ANY DATABASE
+    | VIEW ANY DEFINITION
+    | VIEW CHANGE TRACKING
+    | VIEW DATABASE STATE
+    | VIEW DEFINITION
+    | VIEW SERVER STATE
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms190356.aspx
