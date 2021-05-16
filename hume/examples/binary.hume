@@ -1,0 +1,17 @@
+-- binary negation, counting executions
+
+program
+
+stream output to "std_out";
+
+type integer = int 64;
+
+box negate
+in (din::integer,countin::integer)
+out (dout::integer,dold::(integer,integer,char),countout::integer)
+match
+ (1,c) -> (0,(1,c,"\n"),c+1) |
+ (0,c) -> (1,(0,c,"\n"),c+1);
+
+wire negate (negate.dout initially 0,negate.countout initially 0)
+            (negate.din,output,negate.countin);
