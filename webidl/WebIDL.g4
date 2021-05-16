@@ -578,6 +578,25 @@ extendedAttributes
 	| /* empty */
 ;
 
+/* https://heycam.github.io/webidl/#idl-extended-attributes
+   "The ExtendedAttribute grammar symbol matches nearly any sequence of tokens,
+   however the extended attributes defined in this document only accept a more
+   restricted syntax."
+   I use the more restrictive syntax here because it will be more useful for
+   parsing things in the real world.
+*/
+extendedAttribute
+    : extendedAttributeNoArgs
+    | extendedAttributeArgList
+    | extendedAttributeNamedArgList
+    | extendedAttributeIdent
+    | extendedAttributeIdentList
+;
+
+/*
+Here is the extendedAttribute grammar as defined in the spec
+(https://heycam.github.io/webidl/#prod-ExtendedAttribute):
+
 extendedAttribute
 	: '(' extendedAttributeInner ')' extendedAttributeRest
 	| '[' extendedAttributeInner ']' extendedAttributeRest
@@ -587,7 +606,7 @@ extendedAttribute
 
 extendedAttributeRest
 	: extendedAttribute
-	| /* empty */
+	| // empty
 ;
 
 extendedAttributeInner
@@ -595,8 +614,8 @@ extendedAttributeInner
 	| '[' extendedAttributeInner ']' extendedAttributeInner
 	| '{' extendedAttributeInner '}' extendedAttributeInner
 	| otherOrComma extendedAttributeInner
-	| /* empty */
-;
+	| // empty
+*/
 
 other
 	: INTEGER_WEBIDL
