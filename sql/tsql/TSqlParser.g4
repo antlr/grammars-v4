@@ -650,7 +650,8 @@ class_type_for_grant
                         | RESOURCE GOVERNOR )
                )?
     | ENDPOINT
-    | EVENT SESSION | ( NOTIFICATION (DATABASE | OBJECT | SERVER ) )
+    | EVENT SESSION
+    | NOTIFICATION (DATABASE | OBJECT | SERVER)
     | EXTERNAL ( DATA SOURCE
                | FILE FORMAT
                | LIBRARY
