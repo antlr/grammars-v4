@@ -555,7 +555,7 @@ entity_to
     ;
 
 colon_colon
-    : COLON COLON
+    : DOUBLE_COLON
     ;
 
 alter_authorization_start
