@@ -3279,7 +3279,7 @@ column_elem
 
 udt_elem
     : udt_column_name=id_ '.' non_static_attr=id_ udt_method_arguments as_column_alias?
-    | udt_column_name=id_ ':' ':' static_attr=id_ udt_method_arguments? as_column_alias?
+    | udt_column_name=id_ DOUBLE_COLON static_attr=id_ udt_method_arguments? as_column_alias?
     ;
 
 expression_elem
@@ -3322,7 +3322,7 @@ table_source_item
     | loc_id_call=LOCAL_ID '.' loc_fcall=function_call (as_table_alias column_alias_list?)?
     | open_xml
     | open_json
-    | ':' ':' oldstyle_fcall=function_call       as_table_alias? // Build-in function (old syntax)
+    | DOUBLE_COLON oldstyle_fcall=function_call       as_table_alias? // Build-in function (old syntax)
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
