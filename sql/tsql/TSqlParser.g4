@@ -1361,7 +1361,7 @@ create_rule
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-schema-transact-sql
 alter_schema_sql
-    : ALTER SCHEMA schema_name=id_ TRANSFER ((OBJECT|TYPE|XML SCHEMA COLLECTION) COLON COLON )? id_ (DOT id_)?
+    : ALTER SCHEMA schema_name=id_ TRANSFER ((OBJECT|TYPE|XML SCHEMA COLLECTION) DOUBLE_COLON )? id_ (DOT id_)?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-schema-transact-sql
@@ -1373,8 +1373,8 @@ create_schema
         )
         (create_table
          |create_view
-         | (GRANT|DENY) (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA COLON COLON)? object_name=id_ TO owner_name=id_
-         | REVOKE (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA COLON COLON)? object_name=id_ FROM owner_name=id_
+         | (GRANT|DENY) (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA DOUBLE_COLON)? object_name=id_ TO owner_name=id_
+         | REVOKE (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA DOUBLE_COLON)? object_name=id_ FROM owner_name=id_
         )*
     ;
 
@@ -1384,7 +1384,7 @@ CREATE SCHEMA schema_name=id_ (AUTHORIZATION owner_name=id_ )?
     ;
 
 alter_schema_azure_sql_dw_and_pdw
-    : ALTER SCHEMA schema_name=id_ TRANSFER (OBJECT COLON COLON )? id_ (DOT ID)?
+    : ALTER SCHEMA schema_name=id_ TRANSFER (OBJECT DOUBLE_COLON )? id_ (DOT ID)?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-search-property-list-transact-sql
