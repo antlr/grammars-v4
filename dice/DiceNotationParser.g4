@@ -19,7 +19,7 @@
  * 
  * This is the notation which RPGs and other tabletop games use to represent operations with dice.
  */
-grammar DiceNotation;
+parser grammar DiceNotationParser;
 
 options { tokenVocab=DiceNotationLexer; }
 
