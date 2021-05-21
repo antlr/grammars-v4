@@ -555,7 +555,7 @@ entity_to
     ;
 
 colon_colon
-    : COLON COLON
+    : DOUBLE_COLON
     ;
 
 alter_authorization_start
@@ -625,6 +625,62 @@ class_type_for_parallel_dw
     | SCHEMA
     | OBJECT
     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/grant-transact-sql?view=sql-server-ver15
+// SELECT DISTINCT '| ' + CLASS_DESC
+// FROM sys.dm_audit_actions
+// ORDER BY 1
+class_type_for_grant
+    : APPLICATION ROLE
+    | ASSEMBLY
+    | ASYMMETRIC KEY
+    | AUDIT
+    | AVAILABILITY GROUP
+    | BROKER PRIORITY
+    | CERTIFICATE
+    | COLUMN ( ENCRYPTION | MASTER ) KEY
+    | CONTRACT
+    | CREDENTIAL
+    | CRYPTOGRAPHIC PROVIDER
+    | DATABASE ( AUDIT SPECIFICATION
+               | ENCRYPTION KEY
+               | EVENT SESSION
+               | SCOPED ( CONFIGURATION
+                        | CREDENTIAL
+                        | RESOURCE GOVERNOR )
+               )?
+    | ENDPOINT
+    | EVENT SESSION
+    | NOTIFICATION (DATABASE | OBJECT | SERVER)
+    | EXTERNAL ( DATA SOURCE
+               | FILE FORMAT
+               | LIBRARY
+               | RESOURCE POOL
+               | TABLE
+               | CATALOG
+               | STOPLIST
+               )
+    | LOGIN
+    | MASTER KEY
+    | MESSAGE TYPE
+    | OBJECT
+    | PARTITION ( FUNCTION | SCHEME)
+    | REMOTE SERVICE BINDING
+    | RESOURCE GOVERNOR
+    | ROLE
+    | ROUTE
+    | SCHEMA
+    | SEARCH PROPERTY LIST
+    | SERVER ( ( AUDIT SPECIFICATION? ) | ROLE )?
+    | SERVICE
+    | SQL LOGIN
+    | SYMMETRIC KEY
+    | TRIGGER ( DATABASE | SERVER)
+    | TYPE
+    | USER
+    | XML SCHEMA COLLECTION
+    ;
+
 
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-availability-group-transact-sql
@@ -1305,7 +1361,7 @@ create_rule
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-schema-transact-sql
 alter_schema_sql
-    : ALTER SCHEMA schema_name=id_ TRANSFER ((OBJECT|TYPE|XML SCHEMA COLLECTION) COLON COLON )? id_ (DOT id_)?
+    : ALTER SCHEMA schema_name=id_ TRANSFER ((OBJECT|TYPE|XML SCHEMA COLLECTION) DOUBLE_COLON )? id_ (DOT id_)?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-schema-transact-sql
@@ -1317,8 +1373,8 @@ create_schema
         )
         (create_table
          |create_view
-         | (GRANT|DENY) (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA COLON COLON)? object_name=id_ TO owner_name=id_
-         | REVOKE (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA COLON COLON)? object_name=id_ FROM owner_name=id_
+         | (GRANT|DENY) (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA DOUBLE_COLON)? object_name=id_ TO owner_name=id_
+         | REVOKE (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA DOUBLE_COLON)? object_name=id_ FROM owner_name=id_
         )*
     ;
 
@@ -1328,7 +1384,7 @@ CREATE SCHEMA schema_name=id_ (AUTHORIZATION owner_name=id_ )?
     ;
 
 alter_schema_azure_sql_dw_and_pdw
-    : ALTER SCHEMA schema_name=id_ TRANSFER (OBJECT COLON COLON )? id_ (DOT ID)?
+    : ALTER SCHEMA schema_name=id_ TRANSFER (OBJECT DOUBLE_COLON )? id_ (DOT ID)?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-search-property-list-transact-sql
@@ -2636,7 +2692,7 @@ security_statement
     // https://msdn.microsoft.com/en-us/library/ms188354.aspx
     : execute_clause ';'?
     // https://msdn.microsoft.com/en-us/library/ms187965.aspx
-    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO to_principal+=principal_id (',' to_principal+=principal_id)* (WITH GRANT OPTION)? (AS as_principal=principal_id)? ';'?
+    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON (class_type_for_grant '::')? on_id=table_name)? TO to_principal+=principal_id (',' to_principal+=principal_id)* (WITH GRANT OPTION)? (AS as_principal=principal_id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
     | open_key
@@ -2728,18 +2784,111 @@ decryption_mechanism
     | PASSWORD EQUAL STRING
     ;
 
+// https://docs.microsoft.com/en-us/sql/relational-databases/system-functions/sys-fn-builtin-permissions-transact-sql?view=sql-server-ver15
+// SELECT DISTINCT '| ' + permission_name
+// FROM sys.fn_builtin_permissions (DEFAULT)
+// ORDER BY 1
 grant_permission
-    : EXECUTE
-    | VIEW id_ // DEFINITION
-    | TAKE id_ // OWNERSHIP
-    | CONTROL id_? // SERVER
-    | CREATE (TABLE | VIEW)
-    | SHOWPLAN
-    | IMPERSONATE
-    | SELECT
-    | REFERENCES
+    : ADMINISTER ( BULK OPERATIONS | DATABASE BULK OPERATIONS)
+    | ALTER ( ANY ( APPLICATION ROLE
+                  | ASSEMBLY
+                  | ASYMMETRIC KEY
+                  | AVAILABILITY GROUP
+                  | CERTIFICATE
+                  | COLUMN ( ENCRYPTION KEY | MASTER KEY )
+                  | CONNECTION
+                  | CONTRACT
+                  | CREDENTIAL
+                  | DATABASE ( AUDIT
+                             | DDL TRIGGER
+                             | EVENT ( NOTIFICATION | SESSION )
+                             | SCOPED CONFIGURATION
+                             )?
+                  | DATASPACE
+                  | ENDPOINT
+                  | EVENT ( NOTIFICATION | SESSION )
+                  | EXTERNAL ( DATA SOURCE | FILE FORMAT | LIBRARY)
+                  | FULLTEXT CATALOG
+                  | LINKED SERVER
+                  | LOGIN
+                  | MASK
+                  | MESSAGE TYPE
+                  | REMOTE SERVICE BINDING
+                  | ROLE
+                  | ROUTE
+                  | SCHEMA
+                  | SECURITY POLICY
+                  | SERVER ( AUDIT | ROLE )
+                  | SERVICE
+                  | SYMMETRIC KEY
+                  | USER
+                  )
+            | RESOURCES
+            | SERVER STATE
+            | SETTINGS
+            | TRACE
+            )?
+    | AUTHENTICATE SERVER?
+    | BACKUP ( DATABASE | LOG )
+    | CHECKPOINT
+    | CONNECT ( ANY DATABASE | REPLICATION | SQL )?
+    | CONTROL SERVER?
+    | CREATE ( AGGREGATE
+             | ANY DATABASE
+             | ASSEMBLY
+             | ASYMMETRIC KEY
+             | AVAILABILITY GROUP
+             | CERTIFICATE
+             | CONTRACT
+             | DATABASE (DDL EVENT NOTIFICATION)?
+             | DDL EVENT NOTIFICATION
+             | DEFAULT
+             | ENDPOINT
+             | EXTERNAL LIBRARY
+             | FULLTEXT CATALOG
+             | FUNCTION
+             | MESSAGE TYPE
+             | PROCEDURE
+             | QUEUE
+             | REMOTE SERVICE BINDING
+             | ROLE
+             | ROUTE
+             | RULE
+             | SCHEMA
+             | SEQUENCE
+             | SERVER ROLE
+             | SERVICE
+             | SYMMETRIC KEY
+             | SYNONYM
+             | TABLE
+             | TRACE EVENT NOTIFICATION
+             | TYPE
+             | VIEW
+             | XML SCHEMA COLLECTION
+             )
+    | DELETE
+    | EXECUTE ( ANY EXTERNAL SCRIPT )?
+    | EXTERNAL ACCESS ASSEMBLY
+    | IMPERSONATE ( ANY LOGIN )?
     | INSERT
-    | ALTER (ANY? (id_ | DATABASE))?
+    | KILL DATABASE CONNECTION
+    | RECEIVE
+    | REFERENCES
+    | SELECT ( ALL USER SECURABLES )?
+    | SEND
+    | SHOWPLAN
+    | SHUTDOWN
+    | SUBSCRIBE QUERY NOTIFICATIONS
+    | TAKE OWNERSHIP
+    | UNMASK
+    | UNSAFE ASSEMBLY
+    | UPDATE
+    | VIEW ( ANY ( DATABASE | DEFINITION | COLUMN ( ENCRYPTION | MASTER ) KEY DEFINITION )
+           | CHANGE TRACKING
+           | DATABASE STATE
+           | DEFINITION
+           | SERVER STATE
+           )
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms190356.aspx
@@ -3173,7 +3322,7 @@ column_elem
 
 udt_elem
     : udt_column_name=id_ '.' non_static_attr=id_ udt_method_arguments as_column_alias?
-    | udt_column_name=id_ ':' ':' static_attr=id_ udt_method_arguments? as_column_alias?
+    | udt_column_name=id_ DOUBLE_COLON static_attr=id_ udt_method_arguments? as_column_alias?
     ;
 
 expression_elem
@@ -3216,7 +3365,7 @@ table_source_item
     | loc_id_call=LOCAL_ID '.' loc_fcall=function_call (as_table_alias column_alias_list?)?
     | open_xml
     | open_json
-    | ':' ':' oldstyle_fcall=function_call       as_table_alias? // Build-in function (old syntax)
+    | DOUBLE_COLON oldstyle_fcall=function_call       as_table_alias? // Build-in function (old syntax)
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
