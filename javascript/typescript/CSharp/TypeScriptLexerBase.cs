@@ -67,7 +67,7 @@ public abstract class TypeScriptLexerBase : Lexer
         return _useStrictCurrent;
     }
 
-    public boolean IsInTemplateString()
+    public bool IsInTemplateString()
     {
         return _templateDepth > 0;
     }
