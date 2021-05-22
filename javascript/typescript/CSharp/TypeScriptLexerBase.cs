@@ -67,7 +67,7 @@ public abstract class TypeScriptLexerBase : Lexer
         return _useStrictCurrent;
     }
 
-    protected boolean IsInTemplateString()
+    public boolean IsInTemplateString()
     {
         return _templateDepth > 0;
     }
@@ -125,12 +125,12 @@ public abstract class TypeScriptLexerBase : Lexer
         }
     }
 
-    protected void IncreaseTemplateDepth()
+    public void IncreaseTemplateDepth()
     {
         _templateDepth++;
     }
 
-    protected void DecreaseTemplateDepth()
+    public void DecreaseTemplateDepth()
     {
         _templateDepth--;
     }
