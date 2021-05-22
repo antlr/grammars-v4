@@ -67,6 +67,11 @@ public abstract class TypeScriptLexerBase : Lexer
         return _useStrictCurrent;
     }
 
+    protected boolean IsInTemplateString()
+    {
+        return _templateDepth > 0;
+    }
+
     /// <summary>
     /// Return the next token from the character stream and records this last
     /// token in case it resides on the default channel. This recorded token
