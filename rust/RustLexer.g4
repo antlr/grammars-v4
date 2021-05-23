@@ -256,6 +256,8 @@ fragment DEC_DIGIT: [0-9];
 
 fragment HEX_DIGIT: [0-9a-fA-F];
 
+// LIFETIME_TOKEN: '\'' IDENTIFIER_OR_KEYWORD | '\'_';
+
 LIFETIME_OR_LABEL: '\'' NON_KEYWORD_IDENTIFIER;
 
 PLUS: '+';

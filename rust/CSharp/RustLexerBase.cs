@@ -53,36 +53,36 @@ public abstract class RustLexerBase : Lexer {
 
     public bool floatLiteralPossible(){
         if(lt1 == null || lt2 == null) return true;
-        if(lt1.Type != DOT) return true;
+        if(lt1.Type != RustLexer.DOT) return true;
         switch (lt2.Type){
-            case CHAR_LITERAL:
-            case STRING_LITERAL:
-            case RAW_STRING_LITERAL:
-            case BYTE_LITERAL:
-            case BYTE_STRING_LITERAL:
-            case RAW_BYTE_STRING_LITERAL:
-            case INTEGER_LITERAL:
-            case DEC_LITERAL:
-            case HEX_LITERAL:
-            case OCT_LITERAL:
-            case BIN_LITERAL:
+            case RustLexer.CHAR_LITERAL:
+            case RustLexer.STRING_LITERAL:
+            case RustLexer.RAW_STRING_LITERAL:
+            case RustLexer.BYTE_LITERAL:
+            case RustLexer.BYTE_STRING_LITERAL:
+            case RustLexer.RAW_BYTE_STRING_LITERAL:
+            case RustLexer.INTEGER_LITERAL:
+            case RustLexer.DEC_LITERAL:
+            case RustLexer.HEX_LITERAL:
+            case RustLexer.OCT_LITERAL:
+            case RustLexer.BIN_LITERAL:
 
-            case KW_SUPER:
-            case KW_SELFVALUE:
-            case KW_SELFTYPE:
-            case KW_CRATE:
-            case KW_DOLLARCRATE:
+            case RustLexer.KW_SUPER:
+            case RustLexer.KW_SELFVALUE:
+            case RustLexer.KW_SELFTYPE:
+            case RustLexer.KW_CRATE:
+            case RustLexer.KW_DOLLARCRATE:
 
-            case GT:
-            case RCURLYBRACE:
-            case RSQUAREBRACKET:
-            case RPAREN:
+            case RustLexer.GT:
+            case RustLexer.RCURLYBRACE:
+            case RustLexer.RSQUAREBRACKET:
+            case RustLexer.RPAREN:
 
-            case KW_AWAIT:
+            case RustLexer.KW_AWAIT:
 
-            case NON_KEYWORD_IDENTIFIER:
-            case RAW_IDENTIFIER:
-            case KW_MACRORULES:
+            case RustLexer.NON_KEYWORD_IDENTIFIER:
+            case RustLexer.RAW_IDENTIFIER:
+            case RustLexer.KW_MACRORULES:
                 return false;
             default:
                 return true;

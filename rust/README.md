@@ -6,7 +6,7 @@ Licensed under MIT
 
 Entry rule is `crate`.
 
-Last updated for rust v1.49.0
+Last updated for rust v1.52.1
 
 ## Maven build
 
