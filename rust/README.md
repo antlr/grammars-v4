@@ -4,7 +4,7 @@ This grammar is based on official language reference.
 
 Licensed under MIT
 
-Entry rule is `crate`, you need run test via command line at the moment: `grun Rust crate examples/*.rs`.
+Entry rule is `crate`.
 
 Last updated for rust v1.49.0
 

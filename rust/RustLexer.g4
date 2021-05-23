@@ -224,11 +224,11 @@ OCT_LITERAL: '0o' '_'* OCT_DIGIT (OCT_DIGIT | '_')*;
 BIN_LITERAL: '0b' '_'* [01] [01_]*;
 
 FLOAT_LITERAL
-   : DEC_LITERAL '.' {this.floatDotPossible()}?
+   : {this.floatLiteralPossible()}? (DEC_LITERAL '.' {this.floatDotPossible()}?
    | DEC_LITERAL
    (
       '.' DEC_LITERAL
-   )? FLOAT_EXPONENT? FLOAT_SUFFIX?
+   )? FLOAT_EXPONENT? FLOAT_SUFFIX?)
    ;
 
 fragment INTEGER_SUFFIX
