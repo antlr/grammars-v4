@@ -1,41 +1,35 @@
-using Antlr4.Runtime;
-using System.IO;
+import org.antlr.v4.runtime.*;
 
-public abstract class RustLexerBase : Lexer {
-    private readonly ICharStream _input;
-
-    protected RustLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput)
-        : base(input, output, errorOutput) {
-            _input = input;
+public abstract class RustLexerBase extends Lexer{
+    public RustLexerBase(CharStream input){
+        super(input);
     }
 
-    IToken lt1;
-    IToken lt2;
+    Token lt1;
+    Token lt2;
 
-    public override IToken NextToken()
-    {
-        // Get the next token.
-        IToken next = base.NextToken();
+    @Override
+    public Token nextToken() {
+        Token next = super.nextToken();
 
-        if (next.Channel == DefaultTokenChannel)
-        {
+        if (next.getChannel() == Token.DEFAULT_CHANNEL) {
             // Keep track of the last token on the default channel.
-            lt2 = lt1;
-            lt1 = next;
+            this.lt2 = this.lt1;
+            this.lt1 = next;
         }
 
         return next;
     }
 
-    public bool SOF(){
+    public boolean SOF(){
         return _input.LA(-1) <=0;
     }
-
-    public bool next(char expect){
+    
+    public boolean next(char expect){
         return _input.LA(1) == expect;
     }
 
-    public bool floatDotPossible(){
+    public boolean floatDotPossible(){
         int next = _input.LA(1);
         // only block . _ identifier after float
         if(next == '.' || next =='_') return false;
@@ -51,10 +45,10 @@ public abstract class RustLexerBase : Lexer {
         return true;
     }
 
-    public bool floatLiteralPossible(){
-        if(lt1 == null || lt2 == null) return true;
-        if(lt1.Type != RustLexer.DOT) return true;
-        switch (lt2.Type){
+    public boolean floatLiteralPossible(){
+        if(this.lt1 == null || this.lt2 == null) return true;
+        if(this.lt1.getType() != RustLexer.DOT) return true;
+        switch (this.lt2.getType()){
             case RustLexer.CHAR_LITERAL:
             case RustLexer.STRING_LITERAL:
             case RustLexer.RAW_STRING_LITERAL:
