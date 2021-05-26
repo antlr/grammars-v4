@@ -474,10 +474,10 @@ partitionDefinition
           partitionDefinerAtom (',' partitionDefinerAtom)*
       ')'
       partitionOption*
-      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionComparision
+      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionComparison
     | PARTITION uid VALUES LESS THAN
       partitionDefinerAtom partitionOption*
-      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionComparision
+      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionComparison
     | PARTITION uid VALUES IN
       '('
           partitionDefinerAtom (',' partitionDefinerAtom)*
