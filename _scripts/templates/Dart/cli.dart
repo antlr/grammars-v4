@@ -12,34 +12,34 @@ class CaseChangingCharStream extends CharStream {
         CharStream stream;
         bool upper;
 
-	CaseChangingCharStream(CharStream str, bool up)
-	{
-		stream = str;
-		upper = up;
-	}
+    CaseChangingCharStream(CharStream str, bool up)
+    {
+        stream = str;
+        upper = up;
+    }
 
-	@override
-	int get index {
-		return stream.index;
-	}
+    @override
+    int get index {
+        return stream.index;
+    }
 
-	@override
-	int get size {
-		return stream.size;
-	}
+    @override
+    int get size {
+        return stream.size;
+    }
 
-//	@override
-//	void reset() {
-//		stream.reset();
-//	}
+//  @override
+//  void reset() {
+//      stream.reset();
+//  }
 
-	@override
-	void consume() {
-		stream.consume();
-	}
+    @override
+    void consume() {
+        stream.consume();
+    }
 
-	@override
-	int LA(int offset) {
+    @override
+    int LA(int offset) {
             int c = stream.LA(offset);
 
             if (c \<= 0)
@@ -64,37 +64,37 @@ class CaseChangingCharStream extends CharStream {
                     o = o + (97 - 65);
                 return o;
             }
-	}
+    }
 
-	@override
-	int mark() {
-		return stream.mark();
-	}
+    @override
+    int mark() {
+        return stream.mark();
+    }
 
-	@override
-	void release(int marker) {
-		stream.release(marker);
-	}
+    @override
+    void release(int marker) {
+        stream.release(marker);
+    }
 
-	@override
-	void seek(int _index) {
-		stream.seek(_index);
-	}
+    @override
+    void seek(int _index) {
+        stream.seek(_index);
+    }
 
-//	String getText(Interval interval)
-//	{
-//		this.stream.getText(interval);
-//	}
+//  String getText(Interval interval)
+//  {
+//      this.stream.getText(interval);
+//  }
 
-	@override
-	String toString() {
-		return this.stream.toString();
-	}
+    @override
+    String toString() {
+        return this.stream.toString();
+    }
 
-	@override
-	String get sourceName {
-		return stream.sourceName;
-	}
+    @override
+    String get sourceName {
+        return stream.sourceName;
+    }
 
 @override
     noSuchMethod(Invocation msg) => "got ${msg.memberName} "
@@ -130,13 +130,13 @@ void main(List\<String> args) async {
     }>
     if (input == null && file_name == null)
     {
-	    final List\<int> bytes = \<int>[];
-	    int byte = stdin.readByteSync();
-	    while (byte >= 0) {
-		    bytes.add(byte);
-		    byte = stdin.readByteSync();
-	    }
-	    input = utf8.decode(bytes);
+        final List\<int> bytes = \<int>[];
+        int byte = stdin.readByteSync();
+        while (byte >= 0) {
+            bytes.add(byte);
+            byte = stdin.readByteSync();
+        }
+        input = utf8.decode(bytes);
         str = await InputStream.fromString(input);
     } else if (input != null)
     {
@@ -154,7 +154,7 @@ void main(List\<String> args) async {
         for (int i = 0; ; ++i)
         {
             var token = lexer.nextToken();
-	        print(token.toString());
+            print(token.toString());
             if (token.type == -1)
                 break;
         }
@@ -169,11 +169,11 @@ void main(List\<String> args) async {
     var tree = parser.<start_symbol>();
     if (parser.numberOfSyntaxErrors > 0)
     {
-        print("Parse failed.");
+        stderr.writeln("Parse failed.");
     }
     else
     {
-        print("Parse succeeded.");
+        stderr.writeln("Parse succeeded.");
     }
     if (show_tree)
     {
