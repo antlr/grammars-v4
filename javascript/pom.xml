@@ -13,6 +13,8 @@
 
 	<modules>
 		<module>ecmascript</module>
-	<!--	<module>javascript</module>-->
+        <module>javascript</module>
+        <module>jsx</module>
+        <module>typescript</module>
 	</modules>
 </project>

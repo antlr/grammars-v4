@@ -42,6 +42,7 @@
 					<grammarName>algol60</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension>.a60</testFileExtension>
 				</configuration>
 				<executions>
 					<execution>

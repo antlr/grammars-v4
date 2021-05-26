@@ -155,7 +155,7 @@ iterationStatement
 
 varModifier  // let, const - ECMAScript 6
     : Var
-    | let
+    | let_
     | Const
     ;
 
@@ -225,7 +225,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Async? Function '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : Async? Function_ '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 classDeclaration
@@ -347,7 +347,7 @@ singleExpression
     | <assoc=right> singleExpression '=' singleExpression                   # AssignmentExpression
     | <assoc=right> singleExpression assignmentOperator singleExpression    # AssignmentOperatorExpression
     | Import '(' singleExpression ')'                                       # ImportExpression
-    | singleExpression TemplateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
+    | singleExpression templateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
     | yieldStatement                                                        # YieldExpression // ECMAScript 6
     | This                                                                  # ThisExpression
     | identifier                                                            # IdentifierExpression
@@ -424,7 +424,7 @@ objectExpressionSequence
 
 anoymousFunction
     : functionDeclaration                                                       # FunctionDecl
-    | Async? Function '*'? '(' formalParameterList? ')' '{' functionBody '}'    # AnoymousFunctionDecl
+    | Async? Function_ '*'? '(' formalParameterList? ')' '{' functionBody '}'    # AnoymousFunctionDecl
     | Async? arrowFunctionParameters '=>' arrowFunctionBody                     # ArrowFunction
     ;
 
@@ -457,10 +457,19 @@ literal
     : NullLiteral
     | BooleanLiteral
     | StringLiteral
-    | TemplateStringLiteral
+    | templateStringLiteral
     | RegularExpressionLiteral
     | numericLiteral
     | bigintLiteral
+    ;
+
+templateStringLiteral
+    : BackTick templateStringAtom* BackTick
+    ;
+
+templateStringAtom
+    : TemplateStringAtom
+    | TemplateStringStartExpression singleExpression TemplateCloseBrace
     ;
 
 numericLiteral
@@ -521,7 +530,7 @@ keyword
     | Switch
     | While
     | Debugger
-    | Function
+    | Function_
     | This
     | With
     | Default
@@ -539,7 +548,7 @@ keyword
     | Export
     | Import
     | Implements
-    | let
+    | let_
     | Private
     | Public
     | Interface
@@ -553,7 +562,7 @@ keyword
     | As
     ;
 
-let
+let_
     : NonStrictLet
     | StrictLet
     ;

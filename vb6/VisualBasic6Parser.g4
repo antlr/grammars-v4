@@ -500,7 +500,7 @@ typeStmt_Element:
 		WS asTypeClause
 	)? NEWLINE+;
 
-typeOfStmt: TYPEOF WS valueStmt (WS IS WS type)?;
+typeOfStmt: TYPEOF WS valueStmt (WS IS WS type_)?;
 
 unloadStmt: UNLOAD WS valueStmt;
 
@@ -637,16 +637,16 @@ arg: (OPTIONAL WS)? ((BYVAL | BYREF) WS)? (PARAMARRAY WS)? ambiguousIdentifier t
 
 argDefaultValue: EQ WS? valueStmt;
 
-subscripts: subscript (WS? COMMA WS? subscript)*;
+subscripts: subscript_ (WS? COMMA WS? subscript_)*;
 
-subscript: (valueStmt WS TO WS)? valueStmt;
+subscript_: (valueStmt WS TO WS)? valueStmt;
 
 // atomic rules ----------------------------------
 
 ambiguousIdentifier: (IDENTIFIER | ambiguousKeyword)+
 	| L_SQUARE_BRACKET (IDENTIFIER | ambiguousKeyword)+ R_SQUARE_BRACKET;
 
-asTypeClause: AS WS (NEW WS)? type (WS fieldLength)?;
+asTypeClause: AS WS (NEW WS)? type_ (WS fieldLength)?;
 
 baseType:
 	BOOLEAN
@@ -688,14 +688,14 @@ literal:
 	| TRUE
 	| FALSE
 	| NOTHING
-	| NULL
+	| NULL_
     ;
 
 publicPrivateVisibility: PRIVATE | PUBLIC;
 
 publicPrivateGlobalVisibility: PRIVATE | PUBLIC | GLOBAL;
 
-type: (baseType | complexType) (WS? LPAREN WS? RPAREN)?;
+type_: (baseType | complexType) (WS? LPAREN WS? RPAREN)?;
 
 typeHint:
 	AMPERSAND
@@ -799,7 +799,7 @@ ambiguousKeyword:
 	| NEW
 	| NOT
 	| NOTHING
-	| NULL
+	| NULL_
 	| OBJECT
 	| ON
 	| OPEN

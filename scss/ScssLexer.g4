@@ -28,7 +28,7 @@
 
 lexer grammar ScssLexer;
 
-NULL              : 'null';
+NULL_              : 'null';
 
 
 IN              : 'in';
@@ -69,6 +69,13 @@ TIMES           : '*';
 DIV             : '/';
 MINUS           : '-';
 PERC            : '%';
+
+// When a variable or parenthesized statement is negated, there cannot be a
+// space after the - or +.
+MINUS_DOLLAR    : MINUS DOLLAR;
+PLUS_DOLLAR     : PLUS DOLLAR;
+MINUS_LPAREN    : MINUS LPAREN;
+PLUS_LPAREN     : PLUS LPAREN;
 
 
 UrlStart
@@ -122,6 +129,10 @@ Identifier
 PseudoIdentifier
   : COLON COLON? Identifier -> pushMode(IDENTIFY)
   ;
+
+FunctionIdentifier
+    : Identifier LPAREN
+    ;
 
 fragment STRING
   	:	'"' (~('"'|'\n'|'\r'))* '"'

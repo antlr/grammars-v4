@@ -78,22 +78,22 @@ functionParameter
     ;
 
 declaration
-    : init type IDENTIFIER (EQUALS expression)? SEMICOLON
+    : init_ type_ IDENTIFIER (EQUALS expression)? SEMICOLON
     ;
 
-type
+type_
     : ( TOOLDATA | WOBJDATA | SPEEDDATA | ZONEDATA | CLOCK | BOOL )
     ;
 
-init
+init_
     : LOCAL? ( CONST | PERS | VAR )
     ;
 
 expression
-    : array | primitive
+    : array_ | primitive
     ;
 
-array
+array_
     : SQUARE_OPEN (expression COMMA)* expression SQUARE_CLOSE
     ;
 

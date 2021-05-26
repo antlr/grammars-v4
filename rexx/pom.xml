@@ -39,7 +39,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>file</entryPoint>
+					<entryPoint>file_</entryPoint>
 					<grammarName>Rexx</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

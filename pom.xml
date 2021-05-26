@@ -10,8 +10,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<maven.compiler.source>1.7</maven.compiler.source>
-		<antlr.version>4.9.1</antlr.version>
-		<antlr4test-maven-plugin.version>1.17</antlr4test-maven-plugin.version>
+		<antlr.version>4.9.2</antlr.version>
+		<antlr4test-maven-plugin.version>1.18</antlr4test-maven-plugin.version>
 		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
@@ -64,7 +64,7 @@
 			</activation>
 			<id>grammarv4</id>
 			<modules>
-                <module>abb</module>
+				<module>abb</module>
 				<module>abnf</module>
 				<module>acme</module>
 				<module>agc</module>
@@ -81,6 +81,7 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
+				<module>bcpl</module>
 				<module>bibcode</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
@@ -89,7 +90,6 @@
 				<module>calculator</module>
 				<module>capnproto</module>
 				<module>clf</module>
-				<module>clif</module>
 				<module>clojure</module>
 				<module>clu</module>
 				<module>cmake</module>
@@ -151,12 +151,14 @@
 				<module>jpa</module>
 				<module>json</module>
 				<module>json5</module>
+				<module>karel</module>
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kuka</module>
 				<module>lambda</module>
 				<module>lcc</module>
 				<module>less</module>
+				<module>lisa</module>
 				<module>logo</module>
 				<module>lolcode</module>
 				<module>loop</module>
@@ -190,13 +192,13 @@
 				<module>pcre</module>
 				<module>pddl</module>
 				<module>pdn</module>
-				<module>pdp7</module>
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
 				<module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
+                <module>plucid</module>
 				<module>ply</module>
 				<module>pmmn</module>
 				<module>postalcode</module>
@@ -335,7 +337,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.2.0	</version>
+						<version>3.3.0	</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -351,7 +353,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
+						<version>3.0.1</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>

@@ -63,10 +63,10 @@ dim_props
    ;
 
 property_list
-   : property (COMMA property)*
+   : property_ (COMMA property_)*
    ;
 
-property
+property_
    : compound_id
    ;
 

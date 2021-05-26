@@ -60,7 +60,7 @@ declaredParam
   ;
 
 variableName
-  : DOLLAR Identifier
+  : (DOLLAR | MINUS_DOLLAR | PLUS_DOLLAR) Identifier
   ;
 
 paramOptionalValue
@@ -73,12 +73,13 @@ passedParams
   ;
 
 passedParam
-  : (variableName COLON)? commandStatement
+  : (variableName COLON)? (commandStatement | listSpaceSeparated | listBracketed | map_)
   ;
 
 // MIXINS and related rules
 mixinDeclaration
-  : MIXIN Identifier (LPAREN declaredParams? RPAREN)? block
+  : MIXIN (FunctionIdentifier declaredParams? RPAREN |
+           Identifier (LPAREN declaredParams? RPAREN)?) block
   ;
 
 contentDeclaration
@@ -86,15 +87,15 @@ contentDeclaration
   ;
 
 includeDeclaration
-  : INCLUDE Identifier (LPAREN passedParams? RPAREN)?
+  : INCLUDE (Identifier | functionCall)
     (SEMI | (USING LPAREN declaredParams RPAREN)? block)?
   ;
 
 
-
 // FUNCTIONS
 functionDeclaration
-  : FUNCTION Identifier LPAREN declaredParams? RPAREN BlockStart functionBody? BlockEnd
+  : FUNCTION (FunctionIdentifier | Identifier LPAREN) declaredParams? RPAREN
+    BlockStart functionBody? BlockEnd
   ;
 
 functionBody
@@ -111,7 +112,9 @@ functionStatement
 
 
 commandStatement
-  : (PLUS | MINUS)? (expression+ | '(' commandStatement ')') mathStatement?
+  : (expression
+      | (LPAREN | MINUS_LPAREN | PLUS_LPAREN) commandStatement RPAREN
+    ) mathStatement?
   ;
 
 mathCharacter
@@ -128,13 +131,11 @@ expression
   | identifier
   | Color
   | StringLiteral
-  | NULL
+  | NULL_
   | url
   | variableName
   | functionCall
   ;
-
-
 
 
 //If statement
@@ -152,7 +153,7 @@ elseStatement
 
 conditions
   : condition (COMBINE_COMPARE conditions)?
-  | NULL
+  | NULL_
   ;
 
 condition
@@ -160,8 +161,9 @@ condition
   | LPAREN conditions ')'
   ;
 
+
 variableDeclaration
-  : variableName COLON values '!default'? ';'
+  : variableName COLON (propertyValue | listBracketed | map_) '!default'? ';'
   ;
 
 
@@ -190,20 +192,10 @@ eachDeclaration
   ;
 
 eachValueList
-  : Identifier (COMMA Identifier)*
-  | identifierListOrMap (COMMA identifierListOrMap)*
-  | functionCall
-  | variableName
+  : commandStatement
+  | list_
+  | map_
   ;
-
-identifierListOrMap
-  : LPAREN identifierValue (COMMA identifierValue)* RPAREN
-  ;
-
-identifierValue
-  : identifier (COLON values)?
-  ;
-
 
 //Imports
 importDeclaration
@@ -215,7 +207,7 @@ referenceUrl
     | UrlStart Url UrlEnd
     ;
 
-
+// MEDIA
 mediaDeclaration
   : '@media' mediaQueryList block
   ;
@@ -251,7 +243,7 @@ ruleset
   ;
 
 block
-  : BlockStart (property | statement)* lastProperty? BlockEnd
+  : BlockStart (property_ | statement)* lastProperty? BlockEnd
   ;
 
 selectors
@@ -279,7 +271,7 @@ combinator
 
 pseudo
   : pseudoIdentifier
-  | pseudoIdentifier LPAREN (selector | values) RPAREN
+  | pseudoIdentifier LPAREN (selector | commandStatement) RPAREN
   ;
 
 attrib
@@ -296,11 +288,12 @@ identifier
   : Identifier identifierPart*
   | InterpolationStart identifierVariableName BlockEnd identifierPart*
   // These are keywords in some contexts, but can be used as identifiers too.
-  | FROM
-  | THROUGH
-  | ONLY
-  | NOT
   | AND_WORD
+  | FROM
+  | NOT
+  | ONLY
+  | THROUGH
+  | TO
   | USING
   ;
 
@@ -316,18 +309,18 @@ identifierVariableName
   : DOLLAR (Identifier | IdentifierAfter)
   ;
 
-property
-  : identifier COLON values IMPORTANT? SEMI
-  | identifier COLON block IMPORTANT?
-  | identifier COLON values block IMPORTANT?
+property_
+  : identifier COLON propertyValue IMPORTANT? SEMI
+  | identifier COLON block
+  | identifier COLON propertyValue IMPORTANT? block
   ;
 
 lastProperty
-  : identifier COLON values IMPORTANT?
+  : identifier COLON propertyValue IMPORTANT?
   ;
 
-values
-  : commandStatement (COMMA commandStatement)*
+propertyValue
+  : commandStatement (COMMA? commandStatement)*
   ;
 
 url
@@ -340,5 +333,53 @@ measurement
 
 
 functionCall
-  : Identifier (DOT Identifier)* LPAREN values? RPAREN
+  : functionNamespace? FunctionIdentifier passedParams? RPAREN
+  ;
+
+functionNamespace
+  : (Identifier DOT)+
+  ;
+
+
+list_
+  : listCommaSeparated
+  | listSpaceSeparated
+  | listBracketed
+  ;
+
+listCommaSeparated
+  : listElement (COMMA listElement)+ COMMA?
+  ;
+
+listSpaceSeparated
+  : listElement listElement+
+  ;
+
+listBracketed
+  : LBRACK (listCommaSeparated | listSpaceSeparated) RBRACK
+  ;
+
+listElement
+  : commandStatement
+  | LPAREN list_ RPAREN
+  ;
+
+
+map_
+  : LPAREN mapEntry (COMMA mapEntry)* COMMA? RPAREN
+  ;
+
+mapEntry
+  : mapKey COLON mapValue;
+
+mapKey
+  : commandStatement
+  | list_
+  | map_
+  ;
+
+mapValue
+  : commandStatement
+  | list_
+  | map_
   ;
