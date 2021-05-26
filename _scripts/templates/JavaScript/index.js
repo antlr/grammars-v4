@@ -10,19 +10,19 @@ const strops = require('typescript-string-operations');
 let fs = require('fs-extra')
 
 function getChar() {
-	let buffer = Buffer.alloc(1);
-	var xx = fs.readSync(0, buffer, 0, 1);
-	if (xx === 0) {
-		return '';
-	}
+    let buffer = Buffer.alloc(1);
+    var xx = fs.readSync(0, buffer, 0, 1);
+    if (xx === 0) {
+        return '';
+    }
     return buffer.toString('utf8');
 }
 
 class MyErrorListener extends antlr4.error.ErrorListener {
-	syntaxError(recognizer, offendingSymbol, line, column, msg, err) {
-		num_errors++;
-		console.error(`${offendingSymbol} line ${line}, col ${column}: ${msg}`);
-	}
+    syntaxError(recognizer, offendingSymbol, line, column, msg, err) {
+        num_errors++;
+        console.error(`${offendingSymbol} line ${line}, col ${column}: ${msg}`);
+    }
 }
 
 var show_tokens = false;
@@ -98,11 +98,11 @@ if (show_tree)
 }
 if (num_errors > 0)
 {
-    console.log('Parse failed.');
+    console.error('Parse failed.');
     process.exitCode = 1;
 }
 else
 {
-    console.log('Parse succeeded.');
+    console.error('Parse succeeded.');
     process.exitCode = 0;
 }
