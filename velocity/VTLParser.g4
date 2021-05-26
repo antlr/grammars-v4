@@ -69,63 +69,63 @@ expressions
  ;
 
 set_directive
- : HASH SET expression ASSIGN expression CPAR
+ : SET expression ASSIGN expression CPAR
  ;
 
 if_directive
- : HASH IF expression CPAR block elseif_directive* else_directive? end
+ : IF expression CPAR block elseif_directive* else_directive? end
  ;
 
 elseif_directive
- : HASH ELSEIF expression CPAR block
+ : ELSEIF expression CPAR block
  ;
 
 else_directive
- : HASH ELSE block
+ : ELSE block
  ;
 
 foreach_directive
- : HASH FOREACH variable K_IN expression CPAR block end
+ : FOREACH variable K_IN expression CPAR block end
  ;
 
 break_directive
- : HASH BREAK
+ : BREAK
  ;
 
 stop_directive
- : HASH STOP
+ : STOP
  ;
 
 custom_directive
- : HASH ID ( expression* CPAR )? ( block end )?
+ : ID ( expression* CPAR )? ( block end )?
  ;
 
 macro_directive
- : HASH MACRO expression* CPAR block end
+ : MACRO expression* CPAR block end
  ;
 
 parse_directive
- : HASH PARSE expression CPAR
+ : PARSE expression CPAR
  ;
 
 define_directive
- : HASH DEFINE expression CPAR block end
+ : DEFINE expression CPAR block end
  ;
 
 include_directive
- : HASH INCLUDE expressions CPAR
+ : INCLUDE expressions CPAR
  ;
 
 evaluate_directive
- : HASH EVALUATE expression CPAR
+ : EVALUATE expression CPAR
  ;
 
 macro_call_directive
- : HASH MACRO_ID expression* CPAR block end
+ : MACRO_ID expression* CPAR block end
  ;
 
 end
- : HASH END
+ : END
  ;
 
 // Operator precedence is as v2.0 defined it:
