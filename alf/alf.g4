@@ -137,7 +137,7 @@ term
 
 functionterm
    : (funcname '(' termList ')')
-   | (term? funcatom term?)
+ //  | (term? funcatom term?)
    | ('(' functionterm ')')
    ;
 
