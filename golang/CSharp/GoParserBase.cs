@@ -45,7 +45,7 @@ public abstract class GoParserBase : Parser
                 possibleIndexEosToken = this.CurrentToken.TokenIndex - ++offset;
                 ahead = tokenStream.Get(possibleIndexEosToken);
             }
-            else if (ahead.Type == GoLexer.COMMENT)
+            else if (ahead.Type == GoLexer.COMMENT || ahead.Type == GoLexer.LINE_COMMENT )
             {
                 if (ahead.Text.Contains("\r") || ahead.Text.Contains("\n"))
                 {
