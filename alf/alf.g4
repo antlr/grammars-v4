@@ -128,7 +128,7 @@ termList
    ;
 
 term
-   : Number
+   : number
    | variable
    | String
    | functionterm
@@ -142,7 +142,7 @@ functionterm
    ;
 
 variable
-   : Uppercase (Letter | Digit | '_')*
+   : Uppercase (Uppercase | Lowercase | Digit | '_')*
    | ('_' Letter | Digit | '_')*
    ;
 
@@ -194,16 +194,16 @@ symbolList
    ;
 
 symbol
-   : funcatom ('/' Number)?
-   | predatom ('/' Number)?
+   : (funcatom ('/' number)?)
+   | (predatom ('/' number)?)
    ;
 
 precedence
-   : Number
+   : number
    ;
 
-String
-   : '"' Character* '"'
+number
+   : Digit+
    ;
 
 atom
@@ -213,11 +213,23 @@ atom
    ;
 
 ident
-   : Lowercase (Letter | Digit | '_')*
+   : Lowercase (Uppercase |  Lowercase | Digit | '_')*
+   ;
+
+Uppercase
+   : [A-Z]
+   ;
+
+Lowercase
+   : [a-z]
+   ;
+
+String
+   : '"' Character* '"'
    ;
 
 Character
-   : [a-zA-Z0-9]
+   : Lowercase | Uppercase | Digit
    ;
 
 SpecialCharacters
@@ -245,35 +257,8 @@ SpecialCharacter
    | '~'
    ;
 
-Number
-   : Digit+
-   ;
-
 Digit
-   : '0'
-   | '1'
-   | '2'
-   | '3'
-   | '4'
-   | '5'
-   | '6'
-   | '7'
-   | '8'
-   | '9'
-   ;
-
-Letter
-   : Uppercase
-   | Lowercase
-   ;
-
-Uppercase
-   : [A-Z]
-   ;
-
-Lowercase
-   : [a-z]
-   ;
+   : [0-9];
 
 WS
    : [ \r\n\t]+ -> skip
