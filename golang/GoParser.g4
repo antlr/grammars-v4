@@ -132,7 +132,7 @@ shortVarDecl: identifierList DECLARE_ASSIGN expressionList;
 
 emptyStmt: SEMI;
 
-labeledStmt: IDENTIFIER COLON statement;
+labeledStmt: IDENTIFIER COLON statement?;
 
 returnStmt: RETURN expressionList?;
 

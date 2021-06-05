@@ -43,7 +43,7 @@ public abstract class GoParserBase extends Parser
                 possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - ++offset;
                 ahead = _input.get(possibleIndexEosToken);
             }
-            else if(ahead.getType() == GoLexer.COMMENT){
+            else if(ahead.getType() == GoLexer.COMMENT || ahead.getType() == GoLexer.LINE_COMMENT ){
                 if(ahead.getText().contains("\r") || ahead.getText().contains("\n")){
                     return true;
                 }

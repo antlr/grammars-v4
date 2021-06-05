@@ -661,8 +661,10 @@ singleExpression
     | Class Identifier? classTail                                            # ClassExpression
     | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
     | singleExpression '.' identifierName nestedTypeGeneric?                 # MemberDotExpression
+    // Split to try `new Date()` first, then `new Date`.
+    | New singleExpression typeArguments? arguments                          # NewExpression
+    | New singleExpression typeArguments?                                    # NewExpression
     | singleExpression arguments                                             # ArgumentsExpression
-    | New singleExpression typeArguments? arguments?                         # NewExpression
     | singleExpression {this.notLineTerminator()}? '++'                      # PostIncrementExpression
     | singleExpression {this.notLineTerminator()}? '--'                      # PostDecreaseExpression
     | Delete singleExpression                                                # DeleteExpression
