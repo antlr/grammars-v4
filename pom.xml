@@ -239,7 +239,8 @@
 				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
-				<module>solidity</module>
+                <module>snowball</module>
+                <module>solidity</module>
 				<module>sparql</module>
 				<module>sql</module>
 				<module>stacktrace</module>
