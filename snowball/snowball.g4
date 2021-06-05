@@ -187,7 +187,7 @@ PLUS_OR_MINUS
    ;
 
 NAME
-   : LETTER (LETTER | DIGIT | '_ ')*
+   : LETTER (LETTER | DIGIT | '_')*
    ;
 
 fragment LETTER
