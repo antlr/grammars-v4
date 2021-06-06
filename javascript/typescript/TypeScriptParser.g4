@@ -117,7 +117,7 @@ typeReference
     ;
 
 nestedTypeGeneric
-    : typeIncludeGeneric 
+    : typeIncludeGeneric
     | typeGeneric
     ;
 
@@ -661,8 +661,10 @@ singleExpression
     | Class Identifier? classTail                                            # ClassExpression
     | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
     | singleExpression '.' identifierName nestedTypeGeneric?                 # MemberDotExpression
+    // Split to try `new Date()` first, then `new Date`.
+    | New singleExpression typeArguments? arguments                          # NewExpression
+    | New singleExpression typeArguments?                                    # NewExpression
     | singleExpression arguments                                             # ArgumentsExpression
-    | New singleExpression typeArguments? arguments?                         # NewExpression
     | singleExpression {this.notLineTerminator()}? '++'                      # PostIncrementExpression
     | singleExpression {this.notLineTerminator()}? '--'                      # PostDecreaseExpression
     | Delete singleExpression                                                # DeleteExpression
@@ -689,7 +691,7 @@ singleExpression
     | singleExpression '?' singleExpression ':' singleExpression             # TernaryExpression
     | singleExpression '=' singleExpression                                  # AssignmentExpression
     | singleExpression assignmentOperator singleExpression                   # AssignmentOperatorExpression
-    | singleExpression TemplateStringLiteral                                 # TemplateStringExpression  // ECMAScript 6
+    | singleExpression templateStringLiteral                                 # TemplateStringExpression  // ECMAScript 6
     | iteratorBlock                                                          # IteratorsExpression // ECMAScript 6
     | generatorBlock                                                         # GeneratorsExpression // ECMAScript 6
     | generatorFunctionDeclaration                                           # GeneratorsFunctionExpression // ECMAScript 6
@@ -742,9 +744,18 @@ literal
     : NullLiteral
     | BooleanLiteral
     | StringLiteral
-    | TemplateStringLiteral
+    | templateStringLiteral
     | RegularExpressionLiteral
     | numericLiteral
+    ;
+
+templateStringLiteral
+    : BackTick templateStringAtom* BackTick
+    ;
+
+templateStringAtom
+    : TemplateStringAtom
+    | TemplateStringStartExpression singleExpression TemplateCloseBrace
     ;
 
 numericLiteral

@@ -85,6 +85,7 @@ turtle
 turtle-doc
 url
 v
+velocity
 verilog/verilog
 wat
 xpath/xpath1
