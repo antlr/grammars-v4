@@ -49,7 +49,7 @@ moduleInterface
    ;
 
 moduleDeclaration
-   : ('datatype' datatypeDeclaration (';' datatypeDeclaration) '.'*)
+   : ('datatype' datatypeDeclaration (';' datatypeDeclaration)* '.' )
    | ('func' functionDeclaration (';' functionDeclaration)* '.')
    | ('pred' predicateDeclaration (';' predicateDeclaration)* '.')
    ;
@@ -63,8 +63,8 @@ renamings
    ;
 
 datatypeDeclaration
-   : ident
-   | (ident '=' 'f' constructorDeclaration (';' constructorDeclaration)* 'g')
+   : IDENT
+   | (IDENT '=' '{' constructorDeclaration (';' constructorDeclaration)* '}')
    ;
 
 constructorDeclaration
@@ -128,26 +128,21 @@ termList
    ;
 
 term
-   : number
-   | variable
-   | String
+   : NUMBER
+   | VARIABLE
+   | DOUBLE_QUOTE_STRING
    | functionterm
    | '(' term ')'
    ;
 
 functionterm
    : (funcname '(' termList ')')
- //  | (term? funcatom term?)
+  //   | (term? funcatom term?)
    | ('(' functionterm ')')
    ;
 
-variable
-   : Uppercase (Uppercase | Lowercase | Digit | '_')*
-   | ('_' Letter | Digit | '_')*
-   ;
-
 parameter
-   : ident
+   : IDENT
    | ('(' 'func' functionDeclaration ')')
    | ('(' 'pred' predicateDeclaration ')')
    ;
@@ -157,12 +152,12 @@ name
    ;
 
 modulename
-   : ident
-   | ('\'' pathname '/' ident '\'')
+   : IDENT
+   | ('\'' pathname '/' IDENT '\'')
    ;
 
 pathname
-   : Character*
+   : CHARACTER*
    ;
 
 predname
@@ -186,7 +181,7 @@ sortList
    ;
 
 sort
-   : (modulename '.')? ident
+   : (modulename '.')? IDENT
    ;
 
 symbolList
@@ -194,49 +189,63 @@ symbolList
    ;
 
 symbol
-   : (funcatom ('/' number)?)
-   | (predatom ('/' number)?)
+   : (funcatom ('/' NUMBER)?)
+   | (predatom ('/' NUMBER)?)
    ;
 
 precedence
-   : number
-   ;
-
-number
-   : Digit+
+   : NUMBER
    ;
 
 atom
-   : ident
-   | SpecialCharacters
-   | '\'' Character* '\''
+   : IDENT
+   | SPECIALCHARACTERS
+   | SINGLE_QUOTE_STRING
    ;
 
-ident
-   : Lowercase (Uppercase |  Lowercase | Digit | '_')*
+VARIABLE
+   : (UPPERCASE | '_') (UPPERCASE | LOWERCASE | DIGIT | '_')*
    ;
 
-Uppercase
+IDENT
+   : LOWERCASE (UPPERCASE | LOWERCASE | DIGIT | '_')*
+   ;
+
+fragment UPPERCASE
    : [A-Z]
    ;
 
-Lowercase
+fragment LOWERCASE
    : [a-z]
    ;
 
-String
-   : '"' Character* '"'
+fragment DIGIT
+   : [0-9]
    ;
 
-Character
-   : Lowercase | Uppercase | Digit
+DOUBLE_QUOTE_STRING
+   : '"' CHARACTER* '"'
    ;
 
-SpecialCharacters
-   : SpecialCharacter+
+SINGLE_QUOTE_STRING
+   : '\'' CHARACTER* '\''
    ;
 
-SpecialCharacter
+NUMBER
+   : DIGIT+
+   ;
+
+CHARACTER
+   : LOWERCASE
+   | UPPERCASE
+   | DIGIT
+   ;
+
+SPECIALCHARACTERS
+   : SPECIALCHARACTER+
+   ;
+
+fragment SPECIALCHARACTER
    : '+'
    | '-'
    | '*'
@@ -256,9 +265,6 @@ SpecialCharacter
    | '^'
    | '~'
    ;
-
-Digit
-   : [0-9];
 
 WS
    : [ \r\n\t]+ -> skip
