@@ -189,8 +189,7 @@ symbolList
    ;
 
 symbol
-   : (funcatom ('/' NUMBER)?)
-   | (predatom ('/' NUMBER)?)
+   : (funcatom |predatom)  ('/' NUMBER)?
    ;
 
 precedence
