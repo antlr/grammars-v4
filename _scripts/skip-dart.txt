@@ -45,6 +45,7 @@ rego
 restructuredtext
 rexx
 rust
+sql/plsql
 sql/tsql
 stringtemplate
 swift-fin
