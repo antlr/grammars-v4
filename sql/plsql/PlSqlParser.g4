@@ -1078,7 +1078,7 @@ storage_table_clause
 
 // https://docs.oracle.com/database/121/SQLRF/statements_4008.htm#SQLRF56110
 unified_auditing
-    : {isVersion12()}?
+    : {self.isVersion12()}?
       AUDIT (POLICY policy_name ((BY | EXCEPT) audit_user (',' audit_user)* )?
                                 (WHENEVER NOT? SUCCESSFUL)?
             | CONTEXT NAMESPACE oracle_namespace
@@ -1106,11 +1106,11 @@ audit_traditional
     ;
 
 audit_direct_path
-    : {isVersion12()}? DIRECT_PATH auditing_by_clause
+    : {self.isVersion12()}? DIRECT_PATH auditing_by_clause
     ;
 
 audit_container_clause
-    : {isVersion12()}? (CONTAINER EQUALS_OP (CURRENT | ALL))
+    : {self.isVersion12()}? (CONTAINER EQUALS_OP (CURRENT | ALL))
     ;
 
 audit_operation_clause
@@ -1152,7 +1152,7 @@ auditing_on_clause
     : ON ( object_name
          | DIRECTORY regular_id
          | MINING MODEL model_name
-         | {isVersion12()}? SQL TRANSLATION PROFILE profile_name
+         | {self.isVersion12()}? SQL TRANSLATION PROFILE profile_name
          | DEFAULT
          )
     ;
@@ -1180,7 +1180,7 @@ sql_statement_shortcut
     | MATERIALIZED VIEW
     | NOT EXISTS
     | OUTLINE
-    | {isVersion12()}? PLUGGABLE DATABASE
+    | {self.isVersion12()}? PLUGGABLE DATABASE
     | PROCEDURE
     | PROFILE
     | PUBLIC DATABASE LINK
@@ -1267,11 +1267,11 @@ alter_library
     ;
 
 library_editionable
-    : {isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
+    : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
 library_debug
-    : {isVersion12()}? DEBUG
+    : {self.isVersion12()}? DEBUG
     ;
 
 
@@ -1305,7 +1305,7 @@ alter_view
     ;
 
 alter_view_editionable
-    : {isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
+    : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
 create_view
@@ -2257,7 +2257,7 @@ partial_database_recovery
     ;
 
 partial_database_recovery_10g
-    : {isVersion10()}? STANDBY
+    : {self.isVersion10()}? STANDBY
       ( TABLESPACE tablespace (',' tablespace)*
       | DATAFILE CHAR_STRING | filenumber (',' CHAR_STRING | filenumber)*
       )
@@ -2768,7 +2768,7 @@ column_properties
     ;
 
 period_definition
-    : {isVersion12()}? PERIOD FOR column_name
+    : {self.isVersion12()}? PERIOD FOR column_name
         ( '(' start_time_column ',' end_time_column ')' )?
     ;
 
@@ -2933,11 +2933,11 @@ c_spec
     ;
 
 c_agent_in_clause
-    : AGENT IN '(' expressions ')'
+    : AGENT IN '(' expressions_ ')'
     ;
 
 c_parameters_clause
-    : PARAMETERS '(' (expressions | '.' '.' '.') ')'
+    : PARAMETERS '(' (expressions_ | '.' '.' '.') ')'
     ;
 
 parameter
@@ -3100,7 +3100,7 @@ loop_statement
 
 cursor_loop_param
     : index_name IN REVERSE? lower_bound range_separator='..' upper_bound
-    | record_name IN (cursor_name ('(' expressions? ')')? | '(' select_statement ')')
+    | record_name IN (cursor_name ('(' expressions_? ')')? | '(' select_statement ')')
     ;
 
 forall_statement
@@ -3211,7 +3211,7 @@ close_statement
     ;
 
 open_statement
-    : OPEN cursor_name ('(' expressions? ')')?
+    : OPEN cursor_name ('(' expressions_? ')')?
     ;
 
 fetch_statement
@@ -3387,7 +3387,7 @@ outer_join_type
     ;
 
 query_partition_clause
-    : PARTITION BY (('(' (subquery | expressions)? ')') | expressions)
+    : PARTITION BY (('(' (subquery | expressions_)? ')') | expressions_)
     ;
 
 flashback_query_clause
@@ -3417,7 +3417,7 @@ pivot_in_clause_element
 
 pivot_in_clause_elements
     : expression
-    | '(' expressions? ')'
+    | '(' expressions_? ')'
     ;
 
 unpivot_clause
@@ -3464,7 +3464,7 @@ grouping_sets_clause
 
 grouping_sets_elements
     : rollup_cube_clause
-    | '(' expressions? ')'
+    | '(' expressions_? ')'
     | expression
     ;
 
@@ -3618,7 +3618,7 @@ insert_into_clause
     ;
 
 values_clause
-    : VALUES (REGULAR_ID | '(' expressions ')')
+    : VALUES (REGULAR_ID | '(' expressions_ ')')
     ;
 
 merge_statement
@@ -3680,7 +3680,7 @@ general_table_ref
     ;
 
 static_returning_clause
-    : (RETURNING | RETURN) expressions into_clause
+    : (RETURNING | RETURN) expressions_ into_clause
     ;
 
 error_logging_clause
@@ -3723,7 +3723,7 @@ condition
     : expression
     ;
 
-expressions
+expressions_
     : expression (',' expression)*
     ;
 
@@ -3813,14 +3813,14 @@ model_expression_element
 
 single_column_for_loop
     : FOR column_name
-       ( IN '(' expressions? ')'
+       ( IN '(' expressions_? ')'
        | (LIKE expression)? FROM fromExpr=expression TO toExpr=expression
          action_type=(INCREMENT | DECREMENT) action_expr=expression)
     ;
 
 multi_column_for_loop
     : FOR paren_column_list
-      IN  '(' (subquery | '(' expressions? ')') ')'
+      IN  '(' (subquery | '(' expressions_? ')') ')'
     ;
 
 unary_expression
@@ -3873,7 +3873,7 @@ atom
     | constant
     | general_element
     | '(' subquery ')' subquery_operation_part*
-    | '(' expressions ')'
+    | '(' expressions_ ')'
     ;
 
 quantified_expression
@@ -3884,7 +3884,7 @@ string_function
     : SUBSTR '(' expression ',' expression (',' expression)? ')'
     | TO_CHAR '(' (table_element | standard_function | expression)
                   (',' quoted_string)? (',' quoted_string)? ')'
-    | DECODE '(' expressions  ')'
+    | DECODE '(' expressions_  ')'
     | CHR '(' concatenation USING NCHAR_CS ')'
     | NVL '(' expression ',' expression ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
@@ -3914,8 +3914,8 @@ numeric_function
    | ROUND '(' expression (',' UNSIGNED_INTEGER)?  ')'
    | AVG '(' (DISTINCT | ALL)? expression ')'
    | MAX '(' (DISTINCT | ALL)? expression ')'
-   | LEAST '(' expressions ')'
-   | GREATEST '(' expressions ')'
+   | LEAST '(' expressions_ ')'
+   | GREATEST '(' expressions_ ')'
    ;
 
 other_function
@@ -3931,7 +3931,7 @@ other_function
     | EXTRACT '(' regular_id FROM concatenation ')'
     | (FIRST_VALUE | LAST_VALUE) function_argument_analytic respect_or_ignore_nulls? over_clause
     | standard_prediction_function_keyword
-      '(' expressions cost_matrix_clause? using_clause? ')'
+      '(' expressions_ cost_matrix_clause? using_clause? ')'
     | TRANSLATE '(' expression (USING (CHAR_CS | NCHAR_CS))? (',' expression)* ')'
     | TREAT '(' expression AS REF? type_spec ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
@@ -4033,7 +4033,7 @@ within_or_over_part
     ;
 
 cost_matrix_clause
-    : COST (MODEL AUTO? | '(' cost_class_name (',' cost_class_name)* ')' VALUES '(' expressions? ')')
+    : COST (MODEL AUTO? | '(' cost_class_name (',' cost_class_name)* ')' VALUES '(' expressions_? ')')
     ;
 
 xml_passing_clause
@@ -4110,7 +4110,7 @@ set_command
 // Common
 
 partition_extension_clause
-    : (SUBPARTITION | PARTITION) FOR? '(' expressions? ')'
+    : (SUBPARTITION | PARTITION) FOR? '(' expressions_? ')'
     ;
 
 column_alias
