@@ -1,4 +1,4 @@
-    from antlr4 import *
+from antlr4 import *
 
 class PlSqlLexerBase(Lexer):
 
