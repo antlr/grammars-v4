@@ -240,7 +240,8 @@
 				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
-				<module>solidity</module>
+                <module>snowball</module>
+                <module>solidity</module>
 				<module>sparql</module>
 				<module>sql</module>
 				<module>stacktrace</module>
@@ -273,6 +274,7 @@
 				<module>v</module>
 				<module>vb6</module>
 				<module>vba</module>
+				<module>velocity</module>
 				<module>verilog</module>
 				<module>vhdl</module>
 				<module>vmf</module>
@@ -338,7 +340,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.2.0	</version>
+						<version>3.3.0	</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>

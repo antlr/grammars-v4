@@ -60,6 +60,7 @@ swift/swift5
 tcpheader
 thrift
 v
+velocity
 wat
 xpath/xpath31
 z

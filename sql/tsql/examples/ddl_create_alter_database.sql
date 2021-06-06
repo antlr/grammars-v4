@@ -138,4 +138,96 @@ LOG ON
     ,MAXSIZE = 25MB  
     ,FILEGROWTH = 5MB  
     )
-GO  
+GO
+
+-- https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-database-transact-sql-file-and-filegroup-options?view=sql-server-ver15
+ALTER DATABASE AdventureWorks2012
+ADD FILE
+(
+    NAME = Test1dat2,
+    FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\DATA\t1dat2.ndf',
+    SIZE = 5MB,
+    MAXSIZE = 100MB,
+    FILEGROWTH = 5MB
+);
+GO
+
+ALTER DATABASE AdventureWorks2012
+ADD FILEGROUP Test1FG1;
+GO
+
+ALTER DATABASE AdventureWorks2012
+ADD FILE
+(
+    NAME = test1dat3,
+    FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\DATA\t1dat3.ndf',
+    SIZE = 5MB,
+    MAXSIZE = 100MB,
+    FILEGROWTH = 5MB
+),  
+(  
+    NAME = test1dat4,
+    FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\DATA\t1dat4.ndf',
+    SIZE = 5MB,
+    MAXSIZE = 100MB,
+    FILEGROWTH = 5MB
+)  
+TO FILEGROUP Test1FG1;
+GO
+
+ALTER DATABASE AdventureWorks2012
+ADD LOG FILE
+(
+    NAME = test1log2,
+    FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\DATA\test2log.ldf',
+    SIZE = 5MB,
+    MAXSIZE = 100MB,
+    FILEGROWTH = 5MB
+),
+(
+    NAME = test1log3,
+    FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\DATA\test3log.ldf',
+    SIZE = 5MB,
+    MAXSIZE = 100MB,
+    FILEGROWTH = 5MB
+);
+GO
+
+ALTER DATABASE AdventureWorks2012
+REMOVE FILE test1dat4;
+GO
+
+ALTER DATABASE AdventureWorks2012
+MODIFY FILE (NAME = test1dat3, SIZE = 200MB);
+GO
+
+ALTER DATABASE AdventureWorks2012
+MODIFY FILE
+(
+    NAME = Test1dat2,
+    FILENAME = N'c:\t1dat2.ndf'
+);
+GO
+
+ALTER DATABASE AdventureWorks2012
+MODIFY FILEGROUP Test1FG1 DEFAULT;
+GO
+
+ALTER DATABASE AdventureWorks2012
+MODIFY FILEGROUP [PRIMARY] DEFAULT;
+GO
+
+ALTER DATABASE xtp_db
+ADD FILEGROUP xtp_fg
+CONTAINS MEMORY_OPTIMIZED_DATA;
+GO
+
+--Add a file for storing memory optimized data to FILEGROUP
+ALTER DATABASE xtp_db
+ADD FILE
+(
+  NAME='xtp_mod',
+  FILENAME='d:\data\xtp_mod'
+)
+TO FILEGROUP xtp_fg;
+GO
