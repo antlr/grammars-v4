@@ -1,0 +1,4 @@
+PROC main()
+  WriteF('My first program')
+ENDPROC
+
