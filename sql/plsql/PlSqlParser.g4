@@ -4128,7 +4128,7 @@ where_clause
     ;
 
 into_clause
-    : (BULK COLLECT)? INTO variable_name (',' variable_name)*
+    : (BULK COLLECT)? INTO (general_element | bind_variable) (',' (general_element | bind_variable))*
     ;
 
 // Common Named Elements
