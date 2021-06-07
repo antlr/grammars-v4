@@ -214,7 +214,8 @@ term
    ;
 
 term1
-   : prefix (term1 | term2)
+   : (prefix term1)
+   | term2
    ;
 
 term2
@@ -248,7 +249,7 @@ list
    ;
 
 tuple
-   : term '(' term ',' term (',' term)* ')'
+   : '(' term ',' term (',' term)* ')'
    ;
 
 listform
