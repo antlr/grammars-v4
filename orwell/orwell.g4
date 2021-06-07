@@ -214,12 +214,12 @@ term
    ;
 
 term1
-   : prefix term1
-   | term2
+   : prefix (term1 | term2)
    ;
 
 term2
-   : primary primaryname primary*
+   : primary
+   | (primaryname primary*)
    ;
 
 primaryname
@@ -275,7 +275,7 @@ fliteral
 
 literal
    : INTEGER
-   | CHARACTER
+   | CHAR
    | STRING
    ;
 
@@ -363,7 +363,7 @@ fragment LETTER
    : [a-zA-Z]
    ;
 
-fragment DIGIT
+DIGIT
    : [0-9]
    ;
 
