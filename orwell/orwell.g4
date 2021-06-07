@@ -40,11 +40,11 @@ decl
    | condecl
    | typedecl
    | opdecl
-   | def
+   | def_
    ;
 
 syndecl
-   : tylhs '==' type
+   : tylhs '==' type_
    ;
 
 condecl
@@ -52,11 +52,11 @@ condecl
    ;
 
 typedecl
-   : name (',' name)* '::' type
+   : name (',' name)* '::' type_
    ;
 
 name
-   : var '(' (var prefix | infix) ')'
+   : var_ '(' (var_ prefix | infix) ')'
    ;
 
 tylhs
@@ -80,8 +80,8 @@ tylhssection
    | (tyvar infix)
    ;
 
-type
-   : tyterm1 (infix type)?
+type_
+   : tyterm1 (infix type_)?
    ;
 
 tyterm1
@@ -96,7 +96,7 @@ tyterm2
 
 typrimaryname
    : tyname
-   | '(' (type | tysection) ')'
+   | '(' (type_ | tysection) ')'
    ;
 
 typrimary
@@ -112,11 +112,11 @@ tysection
    ;
 
 tylist
-   : '[' type ']'
+   : '[' type_ ']'
    ;
 
 tytuple
-   : '(' type (',' type)* ')'
+   : '(' type_ (',' type_)* ')'
    ;
 
 construct
@@ -144,7 +144,7 @@ assoc
    | '%noncon'
    ;
 
-def
+def_
    : pat '=' rhs ('%else'? pat '=' rhs)*
    ;
 
@@ -165,7 +165,7 @@ otherpart
    ;
 
 wherepart
-   : 'where' def+
+   : 'where' def_+
    ;
 
 pat
@@ -183,7 +183,7 @@ pat2
    ;
 
 patprimaryname
-   : var
+   : var_
    | ('(' (pat | patsection) ')')
    ;
 
@@ -224,14 +224,14 @@ term2
    ;
 
 primaryname
-   : var
+   : var_
    | '(' (term | section) ')'
    ;
 
 primary
    : primaryname
    | fliteral
-   | tuple
+   | tuple_
    | list
    ;
 
@@ -248,7 +248,7 @@ list
    | comp
    ;
 
-tuple
+tuple_
    : '(' term ',' term (',' term)* ')'
    ;
 
@@ -300,7 +300,7 @@ con
    : ID
    ;
 
-var
+var_
    : ID
    ;
 
