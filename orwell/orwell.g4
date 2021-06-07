@@ -133,7 +133,6 @@ opkind
    : (assoc DIGIT)
    | '%prefix'
    | '%prefixcon'
-   |
    ;
 
 assoc
@@ -162,7 +161,7 @@ ifpart
    ;
 
 otherpart
-   : term 'otherwise'
+   : term ',' 'otherwise'
    ;
 
 wherepart
@@ -174,7 +173,8 @@ pat
    ;
 
 pat1
-   : prefix pat1 pat2
+   : prefix pat1
+   | pat2
    ;
 
 pat2
@@ -364,7 +364,7 @@ fragment LETTER
    ;
 
 DIGIT
-   : [0-9]
+   : '0' .. '9'
    ;
 
 CHAR
