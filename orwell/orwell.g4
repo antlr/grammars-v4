@@ -1,0 +1,292 @@
+/*
+BSD License
+
+Copyright (c) 2021, Tom Everett
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. Neither the name of Tom Everett nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+grammar orwell;
+
+program
+: decl+;
+decl
+:
+syndecl
+|
+condecl | typedecl
+opdecl | def;
+
+syndecl
+:
+tylhs '=='
+type;
+
+condecl
+:
+tylhs ':=='
+construct ('|' construct)*
+;
+
+typedecl
+:
+name (',' name)*
+ '::' type;
+
+name
+:
+var
+'(' (var
+prefix | infix) ')';
+
+tylhs
+:
+(tyvar infix tyvar)|
+(prefix tyvar) | tylhs1;
+
+tylhs1
+:
+tylhsprimary tyvar*;
+
+tylhsprimary
+:
+tyname
+'(' (tylhs | tylhssection) ')';
+
+tylhssection
+:
+prefix|
+infix |( infix tyvar)
+|
+(tyvar infix);
+
+type
+:
+tyterm1 (infix type)?
+;
+
+tyterm1:
+prefix tyterm1 |
+tyterm2;
+
+tyterm2:
+typrimary |
+typrimaryname typrimary*;
+
+typrimaryname
+:
+tyname| '(' (type|
+tysection)
+')';
+
+typrimary:
+typrimaryname | tyvar
+tytuple | tylist;
+
+tysection:
+prefix
+infix | (infix tyterm1)
+|
+(tyterm1 infix);
+
+tylist:
+'[' type ']';
+
+tytuple:
+'(' type (',' type)*  ')';
+
+construct
+: (con typrimary*)
+| (
+typrimary infix typrimary)
+| (prefix typrimary);
+
+opdecl
+:
+opkind OP+;
+
+opkind
+:
+(assoc DIGIT)
+|'%prefix'|
+'%prefixcon'|;
+
+assoc
+:
+'%left'|
+'%right'|
+'%non'|
+'%leftcon' | '%rightcon'|
+'%noncon';
+
+def
+:
+pat
+'=' rhs ('%else'? pat '=' rhs)*;
+
+rhs
+:
+(term|
+conditional) wherepart?;
+
+conditional:
+ifpart ('=' ifpart)* ('=' otherpart)?;
+
+ifpart:
+term
+',' 'if' term;
+
+otherpart
+:term
+'otherwise';
+
+wherepart:
+'where' def+;
+
+pat
+: pat1 (infix pat)?;
+
+pat1
+:
+prefix pat1
+pat2;
+
+pat2:
+patprimary |
+(patprimaryname patprimary*);
+
+patprimaryname:
+var |(
+'(' (pat |
+patsection) ')');
+
+
+patprimary
+: patprimaryname |
+literal|
+pattuple|
+patlist;
+
+patsection
+: prefix |
+infix|
+(infix pat1) | (pat1 infix);
+
+pattuple:
+'(' pat ','
+pat
+(','
+pat)* ')';
+
+patlist
+: '[' ( pat (',' pat)*)?
+ ']';
+
+
+term
+:
+term1 (infix term)?;
+term1:
+prefix term1 | term2;
+
+term2:
+primary
+primaryname primary*;
+
+primaryname:
+var | '(' (term|
+section) ')';
+
+primary:
+primaryname | fliteral | tuple|
+list;
+
+section:
+prefix|
+infix | (infix term1)|
+(term1 infix);
+
+list:
+listform|
+upto|
+comp;
+
+tuple:
+term '(' term ',' term (',' term)* ')';
+
+listform:'[' (term (',' term)* )?']';
+
+upto: '[' term (',' term)? '..' term? ']';
+comp: '[' term '|' (qualifier (';' qualifier)*)? ']';
+
+qualifier:
+ term|
+pat
+'<-' term;
+
+
+fliteral
+:
+FLOAT
+|
+literal;
+
+literal:
+INTEGER | CHARACTER | STRING;
+
+infix
+:OP;
+prefix
+:
+OP;
+
+tyname: ID;
+tyvar: ID;
+
+
+con:
+ID;
+var
+:
+ID;
+
+
+INTEGER : DIGIT+;
+
+FLOAT:  INTEGER '.' INTEGER ('e' '—'? INTEGER)?;
+STRING : '"' ~'"'* '"';
+
+ESCCHAR : '\\' (char | DIGIT (DIGIT DIGIT?)?);
+PRAGMA: '%' ID;
+OP: symbol+ | '$' ID;
+ID: LETTER (LETTER | symbol | DIGIT|'\''|'_')*;
+fragment LETTER:[a-zA-Z];
+fragment DIGIT:[0-9];
+
+WS
+   : [ \r\n\t] + -> skip
+   ;
