@@ -36,7 +36,7 @@ graph
    : kv +
    ;
 
-list
+list_
    : '[' kv + ']'
    ;
 
@@ -48,8 +48,8 @@ value
    : integer
    | realnum
    | stringliteral
-   | str
-   | list
+   | str_
+   | list_
    ;
 
 key
@@ -64,7 +64,7 @@ realnum
    : REAL
    ;
 
-str
+str_
    : VALUE
    ;
 

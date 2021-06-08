@@ -43,15 +43,17 @@ mathStatement
 
 expression
    : measurement
+   | identifier IMPORTANT
    | identifier
    | identifier LPAREN values? RPAREN
    | Color
    | StringLiteral
    | url
+   | variableName IMPORTANT
    | variableName
    ;
 
-function
+function_
    : FUNCTION_NAME LPAREN values? RPAREN
    ;
 
@@ -75,7 +77,16 @@ variableDeclaration
 
 //Imports
 importDeclaration
-   : '@import' referenceUrl mediaTypes? ';'
+   : '@import' (LPAREN (importOption (COMMA importOption)*) RPAREN)? referenceUrl mediaTypes? ';'
+   ;
+
+importOption
+   : REFERENCE
+   | INLINE
+   | LESS
+   | CSS
+   | ONCE
+   | MULTIPLE
    ;
 
 referenceUrl
@@ -93,7 +104,7 @@ ruleset
    ;
 
 block
-   : BlockStart (property ';' | statement | mixinReference)* property? BlockEnd
+   : BlockStart (property_ ';' | statement | mixinReference)* property_? BlockEnd
    ;
 
 mixinDefinition
@@ -118,11 +129,15 @@ selectors
    ;
 
 selector
-   : element + (selectorPrefix element)* attrib* pseudo?
+   : element + attrib* pseudo?
    ;
 
 attrib
    : '[' Identifier (attribRelate (StringLiteral | Identifier))? ']'
+   ;
+
+negation
+   : COLON NOT LPAREN LBRACK? selectors RBRACK? RPAREN
    ;
 
 pseudo
@@ -130,9 +145,11 @@ pseudo
    ;
 
 element
-   : identifier
+   : selectorPrefix identifier
+   | identifier
    | '#' identifier
-   | '.' identifier
+   | pseudo
+   | negation
    | PARENTREF
    | '*'
    ;
@@ -161,7 +178,7 @@ identifierVariableName
    : (Identifier | IdentifierAfter)
    ;
 
-property
+property_
    : identifier COLON values
    ;
 

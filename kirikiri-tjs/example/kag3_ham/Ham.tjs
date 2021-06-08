@@ -1,0 +1,142 @@
+/******************************************************************************
+	Ham.tjs
+	
+	Ham拡張の組み込みを開始するスクリプト。
+	Ham拡張を使用するかしないかはConfig.tjsで指定できます。
+*******************************************************************************/
+
+var MBVersion = "1.0b";
+var MBBasePath = "system/Ham/";
+
+dm("");
+dm("HamExtention for KAG3 version " + MBVersion);
+
+// 設定用の辞書を用意する
+var MBSystemPref = %[];
+var MBGraphicPref = %[];
+var MBLayerAbs = %[];
+var MBColors = %[window : %[], font : %[label : %[]]];
+var MBFontStyle = %[size : %[], face : %[]];
+
+// 設定ファイルを読み込む
+Scripts.execStorage(MBBasePath + "Preferences.tjs");
+
+// ゲーム名を拾っておく
+MBSystemPref.title = System.title;
+
+// タグハンドラ参照を拾っておく
+var TAG = kag.tagHandlers;
+
+
+//==============================================================================
+// 使用する吉里吉里拡張プラグイン
+
+// セーブ選択消去用 by bolero-MURAKAMI
+if (MBGraphicPref.BookmarkDeleterEnabled) {
+	Plugins.link("ktl_local_files.dll");
+}
+
+
+//==============================================================================
+// 環境設定用の変数を準備する
+
+// 環境設定用辞書配列を作成（初回起動時のみ）
+if (sf.userconfig === void) {
+	sf.userconfig = %[
+		bgmVolume : 100,		// BGMのボリューム
+		bgmMutedVolume : void,	// BGMのミュート時のボリューム保存場所
+		seVolume : 100,		// SEのボリューム
+		seMutedVolume : void,	// SEのミュート時のボリューム保存場所
+		charSpeed : 45,	// 文字表示速度
+		setCursor : false,	// とりあえずカーソル合わせはOFFにしておく
+		isFullScreen : false,	// フルスクリーンかどうか
+		
+		// 未読文字速度
+		charSpeed2 : 45,
+		
+		// オートモード関連
+		amCharSpeed : 60,
+		amLineWait  : 300,
+		amPageWait  : 1500
+	];
+	
+	// キーボードによるカーソルセット動作の有無
+	sf.setCursorByKB = false;
+}
+
+// 念のためBGMとSEの大域ボリュームを設定
+TAG.bgmopt(%[gvolume : sf.userconfig.bgmVolume]);
+for (tf.i=0; tf.i<kag.se.count; tf.i++) {
+	TAG.seopt(%[buf : tf.i, gvolume : sf.userconfig.seVolume]);
+}
+
+// プレイ時間関連
+f.playtime = %[
+	current_start : 0,
+	total : 0
+];
+
+// メッセージスキップフラグ
+global.statMsgSkip = false;
+
+// メッセージスキップが可能かどうか
+global.canMsgSkip = true;
+
+//==============================================================================
+
+var parseStartTick = System.getTickCount();
+
+KAGLoadScript(MBBasePath + "Base/HackKag3.tjs");
+KAGLoadScript(MBBasePath + "Base/Util.tjs");
+
+// コアと基底オブジェクト
+KAGLoadScript(MBBasePath + "Base/MercuryBlue.tjs");
+KAGLoadScript(MBBasePath + "Base/MBObject.tjs");
+
+// UI基礎部品
+KAGLoadScript(MBBasePath + "Base/ui/MBSystemLayer.tjs");
+KAGLoadScript(MBBasePath + "Base/ui/MBComponentLayer.tjs");
+KAGLoadScript(MBBasePath + "Base/ui/MBSelectItem.tjs");
+KAGLoadScript(MBBasePath + "Base/ui/MBSelectItemForFile.tjs");
+KAGLoadScript(MBBasePath + "Base/ui/MBButton.tjs");
+KAGLoadScript(MBBasePath + "Base/ui/MBAnimationButton.tjs");
+KAGLoadScript(MBBasePath + "Base/ui/MBWindows.tjs");
+KAGLoadScript(MBBasePath + "Base/ui/MBScrollButtons.tjs");
+KAGLoadScript(MBBasePath + "Base/ui/MBPagingUnit.tjs");
+KAGLoadScript(MBBasePath + "Base/ui/MBEditLayer.tjs");
+KAGLoadScript(MBBasePath + "Base/ui/MBToolManualLayer.tjs");
+KAGLoadScript(MBBasePath + "Base/ui/MBSystemClickWaitLayer.tjs");
+
+// 管理系
+KAGLoadScript(MBBasePath + "Base/modules/MBSystemManager.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/MBFocusController.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/MBActionCanceller.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/MBBookMarkRestore.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/MBBookMarkStore.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/bookmark/MBBookMarkSelectPanel.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/bookmark/MBSaveSlotButton.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/MBPlayTimeCounter.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/MBContextMenu.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/cmenu/MBContextMenuItem.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/cmenu/MBContextMenuButton.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/cmenu/MBContextUnderLayer.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/cmenu/MBDefaultContextMenu.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/cmenu/MBContextMenuCaller.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/MBControlPanelContainer.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/userconf/MBControllPanel.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/userconf/MBControllPanelBasicUI.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/userconf/MBAudioControllPanel.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/userconf/MBCharSpeedTestLayer.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/MBQuickSave.tjs");
+
+// ヒストリレイヤ
+KAGLoadScript(MBBasePath + "Base/modules/system/MBHistoryLayer.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/history/MBHistoryScrollPane.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/history/MBHistoryScrollBar.tjs");
+KAGLoadScript(MBBasePath + "Base/modules/system/history/MBHistoryScrollPeg.tjs");
+
+KAGLoadScript(MBBasePath + "Base/StandBy.tjs");
+
+dm("HamExtentionの組み込みに%d msecかかりました。".sprintf(System.getTickCount() - parseStartTick));
+
+delete parseStartTick;

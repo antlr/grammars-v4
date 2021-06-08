@@ -1,0 +1,332 @@
+/******************************************************************************
+	system_mb/ui/MBSelectItem
+	
+	カーソル移動情報を持った選択肢クラス
+*******************************************************************************/
+
+class MBSelectItem extends KAGLayer
+{
+	var strItemLabel;	// 表示する文字列
+	
+	var fontSize = MBFontStyle.size.label;	// 文字サイズ
+	var fontFace = MBFontStyle.face.normal;	// フォント
+	var fontColor = MBColors.font.label.normal;	// 文字色
+	var fontColorDisabled = MBColors.font.label.disabled;	// 選択不可色
+	var bgColor = MBColors.font.label.bg_notmal;	// 通常時背景色
+	var bgColorFocused = MBColors.font.label.bg_selected;	// フォーカス時背景色
+	
+	var intHorizontalMargin = 2;	// 横マージン
+	var intVerticalMargin = 1;	// 縦マージン
+	
+	var isSelected = false;
+	var objCursorMapHash = %[
+		up : false,
+		down : false,
+		right : false,
+		left : false,
+		prevGroup : false,
+		nextGroup : false
+	];
+	
+	var ptFocusController;	// フォーカスコントローラ参照
+	var ptActionCanceller;	// アクションキャンセラ参照
+	
+	var fltHorizontalFocusPoint = 0.25;	// フォーカスするポイント（横幅に対する割合）
+	var fltVerticalFocusPoint = 0.5;	// フォーカスするポイント（縦幅に対する割合）
+	
+	var blKeyLock;	// 二重押下防止
+	var blActive;	// アクティブかどうか
+	
+	
+	function MBSelectItem(win, par, str)
+	{
+		// コンストラクタ
+		
+		super.KAGLayer(win, par);
+		
+		ptFocusController = SystemManager.objFocusController;
+		ptActionCanceller = SystemManager.objActionCanceller;
+		strItemLabel = str;
+		
+		name = '選択肢';
+		face = dfBoth;
+		hitType = htMask;
+		hitThreshold = 0;
+		focusable = true;
+		
+		font.height = fontSize;
+		font.face = fontFace;
+		
+		setSize(font.getTextWidth(strItemLabel) + intHorizontalMargin * 2, fontSize + intVerticalMargin * 2);
+		
+		drawItemFace();
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function drawItemFace()
+	{
+		// 通常のリンク文字を描く
+		
+		fillRect(0, 0, width, height, bgColor);
+		drawText(intHorizontalMargin, intVerticalMargin, strItemLabel, fontColor);
+		
+		blActive = true;
+	}
+	
+	function drawItemFaceFocused()
+	{
+		// 選択状態リンク文字を描く
+		
+		if (parent.isNewLayer) {
+			parent.isNewLayer = false;
+		}
+		else {
+			sndfunc.seSelect();
+		}
+		
+		fillRect(0, 0, width, height, bgColorFocused);
+		drawText(intHorizontalMargin, intVerticalMargin, strItemLabel, fontColor);
+	}
+	
+	function drawItemFaceDisabled()
+	{
+		// 選択不可のリンク文字を描く
+		
+		fillRect(0, 0, width, height, bgColor);
+		drawText(intHorizontalMargin, intVerticalMargin, strItemLabel, fontColorDisabled);
+		blActive = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function getCursorFromManager(lock = true)
+	{
+		// フォーカススタックマネージャから割り当てをもらう
+		
+		blKeyLock = lock;
+		cursorX = width * fltHorizontalFocusPoint;
+		cursorY = height * fltVerticalFocusPoint;
+		focus();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function callParentFunction()
+	{
+		// 親のメソッドを呼ぶ
+		
+		if (!blActive) {
+			return;
+		}
+		
+		if (
+			ptActionCanceller.getCancellerState() ||
+			!parent.enabled
+		) {
+			// アクションキャンセラがアクティブか、親レイヤが非アクティブなら
+			// 何もしない
+			return;
+		}
+		
+		cursor = crDefault;
+		parent.isNewLayer = true;
+		parent.onSelectedItemClick(this);
+	}
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		// クリック動作
+		
+		super.onMouseDown(...);
+		if (button == mbLeft) {
+			if(blActive) {
+				SystemManager.fcSetKBOperationState(false);
+				ptFocusController.isActive = false;
+				ptFocusController.relFocusStack(this);
+				callParentFunction();
+			}
+		}
+	}
+	
+	function onMouseEnter()
+	{
+		// マウスカーソル突入動作
+		
+		super.onMouseEnter(...);
+		
+		if (blActive) {
+			drawItemFaceFocused();
+		}
+		parent.isNewLayer = false;
+		
+		ptFocusController.isActive = true;
+		cursor = crHandPoint;
+		focus();
+		
+		SystemManager.getPadHandler();
+	}
+	
+	function onMouseLeave()
+	{
+		// マウスカーソル脱出動作
+		
+		super.onMouseLeave(...);
+		
+		SystemManager.releasePadHandler();
+		
+		if (blActive) {
+			drawItemFace();
+		}
+		
+		ptFocusController.isActive = false;
+		cursor = crDefault;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onCallFromFocusStackManager(key, shift)
+	{
+		// キーボード押下動作フック
+		key = SystemManager.convertPadToKey(key);
+		
+		switch (key) {
+			case VK_PADLEFT:
+				key = VK_LEFT;
+				break;
+			
+			case VK_PADRIGHT:
+				key = VK_RIGHT;
+				break;
+			
+			case VK_PADUP:
+				key = VK_UP;
+				break;
+			
+			case VK_PADDOWN:
+				key = VK_DOWN;
+				break;
+			
+			case VK_PAD1:
+				key = VK_RETURN;
+				break;
+			
+			case VK_PAD2:
+				key = VK_ESCAPE;
+				break;
+		}
+		
+		switch(key) {
+			// 決定
+			case VK_RETURN:
+			case VK_SPACE:
+				callParentFunction(this);
+				break;
+			
+			// キャンセル
+			case VK_ESCAPE:
+				parent.onEscapeKeyDown();
+				break;
+			
+			// 矢印キー
+			case VK_UP:
+			case VK_DOWN:
+			case VK_RIGHT:
+			case VK_LEFT:
+				passFocusToNextObject(key);
+				break;
+			
+			// TAB
+			case VK_TAB:
+				
+				break;
+		}
+	}
+	
+	function onKeyDown(key, shift)
+	{
+		// 標準のキー操作を無効にしておく
+		
+		if (blKeyLock) {
+			if (!shift) {
+				return;
+			}
+		}
+		
+		blKeyLock = true;
+		onCallFromFocusStackManager(...);
+	}
+	
+	function onKeyUp(key, shift)
+	{
+		// キーが離されたらロックを解除
+		
+		blKeyLock = false;
+	}
+	
+	function onBlur()
+	{
+		// フォーカスを失ってもロック解除
+		
+		blKeyLock = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function passFocusToNextObject(dir)
+	{
+		// フォーカスを渡す
+		
+		if (
+			ptActionCanceller.getCancellerState() ||
+			!parent.enabled
+		) {
+			// アクションキャンセラがアクティブか、親レイヤが非アクティブなら
+			// 何もしない
+			return;
+		}
+		
+		// カーソルが自分の外にある場合は自分にフォーカス
+		if (cursorX < 0 || cursorX > width || cursorY < 0 || cursorY > height) {
+			getCursorFromManager();
+			return;
+		}
+		
+		var res;
+		
+		SystemManager.fcSetKBOperationState(true);
+		
+		switch (dir) {
+			case VK_UP:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.up);
+				break;
+			
+			case VK_DOWN:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.down);
+				break;
+			
+			case VK_LEFT:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.left);
+				break;
+			
+			case VK_RIGHT:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.right);
+				break;
+			
+			default:
+				break;
+		}
+		
+		if (res) {
+			ptFocusController.setCursorToTarget();
+		}
+	}
+}
+

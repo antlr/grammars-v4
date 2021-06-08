@@ -74,7 +74,7 @@ variable_names
    ;
 
 variable_name
-   : '*'? IDENTIFIER ('=' expression2)?
+   : '*'* IDENTIFIER ('=' expression2)?
    ;
 
 constant
@@ -93,7 +93,7 @@ class_def
    : modifiers? 'class' ';'?
    ;
 
-class
+class_implementation
    : 'class' IDENTIFIER? '{' program '}'
    ;
 
@@ -113,16 +113,16 @@ block
 statement
    : expression2 ';'
    | cond
-   | while
-   | do_while
-   | for
-   | switch
-   | case
-   | default
+   | while_stmt
+   | do_while_stmt
+   | for_stmt
+   | switch_stmt
+   | case_stmt
+   | default_stmt
    | block
-   | foreach
-   | break
-   | continue
+   | foreach_stmt
+   | break_stmt
+   | continue_stmt
    | ';'
    ;
 
@@ -130,39 +130,39 @@ cond
    : 'if' statement ('else' statement)?
    ;
 
-while
-   : 'while' '(' expression ')' statement
+while_stmt
+   : 'while''(' expression ')' statement
    ;
 
-do_while
-   : 'do' statement 'while' '(' expression ')' ';'
+do_while_stmt
+   : 'do' statement while_stmt '(' expression ')' ';'
    ;
 
-for
+for_stmt
    : 'for' '(' expression? ';' expression? ';' expression? ')' statement
    ;
 
-switch
+switch_stmt
    : 'switch' '(' expression ')' block
    ;
 
-case
+case_stmt
    : 'case' expression ('..' expression)? ':'
    ;
 
-default
+default_stmt
    : 'default' ':'
    ;
 
-foreach
+foreach_stmt
    : 'foreach' '(' expression ':' expression6 ')' statement
    ;
 
-break
+break_stmt
    : 'break' ';'
    ;
 
-continue
+continue_stmt
    : 'continue' ';'
    ;
 
@@ -175,7 +175,7 @@ expression2
    ;
 
 expression3
-   : expression4 '?' expression3 ':' expression3
+   : expression4 ('?' expression3 ':' expression3)?
    ;
 
 expression4
@@ -194,22 +194,27 @@ expression5
    ;
 
 expression6
-   : STRING
+   :
+   ( STRING
    | NUMBER
    | FLOAT
    | catch_
    | gauge
    | sscanf
    | lambda
-   | class
+   | class_implementation
    | constant_identifier
-   | call
-   | index
    | mapping
    | multiset
    | array
    | parenthesis
-   | arrow
+   ) extension*
+   ;
+
+extension
+   : '(' expression_list ')'
+   | '->' IDENTIFIER
+   | '[' expression ('..' expression)? ']'
    ;
 
 catch_
@@ -237,13 +242,6 @@ constant_identifier
    : IDENTIFIER ('.' IDENTIFIER)*
    ;
 
-call
-   : expression6 '(' expression_list ')'
-   ;
-
-index
-   : expression6 '[' expression ('..' expression)? ']'
-   ;
 
 array
    : '({' expression_list '})'
@@ -257,9 +255,6 @@ mapping
    : '([' (expression ':' expression (',' expression ':' expression)*)? ','? '])'
    ;
 
-arrow
-   : expression6 '->' IDENTIFIER
-   ;
 
 program_specifier
    :

@@ -83,8 +83,8 @@ ENDIF		: 'endif'		;
 SUPER		: 'super'		;
 END			: '@end'		;
 
-TRUE		: True			;
-FALSE		: False			;
+TRUE		: True_			;
+FALSE		: False_			;
 
 AT			: At			;
 ELLIPSIS	: Ellipsis		;

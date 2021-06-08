@@ -60,11 +60,11 @@ typeDeclaration
    ;
 
 variableDeclaration
-   : constantIdentifier (COMMA constantIdentifier)* type
-   | constantIdentifier type (COMMA constantIdentifier type)*
+   : constantIdentifier (COMMA constantIdentifier)* type_
+   | constantIdentifier type_ (COMMA constantIdentifier type_)*
    ;
 
-type
+type_
    : typeIdentifier
    | indirectType
    | largeType
@@ -255,7 +255,7 @@ logicalFactor
    // condition in a connect_clause. (sqlExpression NOT? IN) sqlExpression NOT? IN expressionSet
    | (sqlExpression NOT? LIKE) sqlExpression NOT? LIKE sqlExpression (ESC QUOTED_STRING)?
    | (sqlExpression NOT? BETWEEN) sqlExpression NOT? BETWEEN sqlExpression AND sqlExpression
-   | (sqlExpression IS NOT? NULL) sqlExpression IS NOT? NULL
+   | (sqlExpression IS NOT? NULL_) sqlExpression IS NOT? NULL_
    | quantifiedFactor quantifiedFactor
    | (NOT condition) NOT condition
    | LPAREN condition RPAREN
@@ -312,7 +312,7 @@ sqlExpressionList
    ;
 
 sqlLiteral
-   : unsignedConstant | string | NULL | FALSE | TRUE
+   : unsignedConstant | string | NULL_ | FALSE | TRUE
    ;
 
 sqlVariable
@@ -384,7 +384,7 @@ expression
 ifLogicalFactor
    :
    // Added "prior" to a comparison expression to support use of a
-   // condition in a connect_clause. (simpleExpression IS NOT? NULL) simpleExpression IS NOT? NULL
+   // condition in a connect_clause. (simpleExpression IS NOT? NULL_) simpleExpression IS NOT? NULL_
    | (NOT ifCondition) NOT ifCondition
    | LPAREN ifCondition RPAREN
    | simpleExpression simpleExpression
@@ -427,7 +427,7 @@ unsignedConstant
    : unsignedNumber
    | string
    | constantIdentifier
-   | NULL
+   | NULL_
    ;
 
 constant
@@ -581,7 +581,7 @@ otherStorageStatement
    | DEALLOCATE ARRAY identifier
    | RESIZE ARRAY identifier arrayIndexer
    | FREE variable (COMMA variable)*
-   | INITIALIZE variable (COMMA variable)* (TO NULL | LIKE expression (COMMA expression)*)
+   | INITIALIZE variable (COMMA variable)* (TO NULL_ | LIKE expression (COMMA expression)*)
    | VALIDATE variable (COMMA variable)* LIKE expression (COMMA expression)*
    ;
 
@@ -818,11 +818,11 @@ cursorName
    ;
 
 dataType
-   : type
+   : type_
    ;
 
 columnItem
-   : constantIdentifier (dataType | (BYTE | TEXT) (IN (TABLE | constantIdentifier))?) (NOT NULL)?
+   : constantIdentifier (dataType | (BYTE | TEXT) (IN (TABLE | constantIdentifier))?) (NOT NULL_)?
    | UNIQUE LPAREN (constantIdentifier (COMMA constantIdentifier)*)? RPAREN (CONSTRAINT constantIdentifier)?
    ;
 
@@ -1022,7 +1022,7 @@ sign
    ;
 
 constantIdentifier
-   : (ACCEPT | ASCII | COUNT | CURRENT | FALSE | FIRST | FOUND | GROUP | HIDE | INDEX | INT_FLAG | INTERRUPT | LAST | LENGTH | LINENO | MDY | NO | NOT | NOTFOUND | NULL | PAGENO | REAL | SIZE | SQL | STATUS | TEMP | TIME | TODAY | TRUE | USER | WAIT | WEEKDAY | WORK)
+   : (ACCEPT | ASCII | COUNT | CURRENT | FALSE | FIRST | FOUND | GROUP | HIDE | INDEX | INT_FLAG | INTERRUPT | LAST | LENGTH | LINENO | MDY | NO | NOT | NOTFOUND | NULL_ | PAGENO | REAL | SIZE | SQL | STATUS | TEMP | TIME | TODAY | TRUE | USER | WAIT | WEEKDAY | WORK)
    | identifier
    ;
 
@@ -2141,7 +2141,7 @@ NUMERIC
    ;
 
 
-NULL
+NULL_
    : N U L L
    ;
 

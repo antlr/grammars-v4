@@ -200,7 +200,7 @@ cell : '(cell'
 	')';
 
 cellHeader : '(cellHeader'
-	(  documentation  |  nameInformation  |  property  |  status  )*
+	(  documentation  |  nameInformation  |  property_  |  status  )*
 
 	')';
 
@@ -264,7 +264,7 @@ cluster : '(cluster'
 clusterConfiguration : '(clusterConfiguration'
 	clusterConfigurationNameDef
 	( viewRef | leaf | unconfigured )
-	(  comment  |  frameConfiguration  |  globalPortScope  | nameInformation | instanceConfiguration  |  property  |  userData  )*
+	(  comment  |  frameConfiguration  |  globalPortScope  | nameInformation | instanceConfiguration  |  property_  |  userData  )*
 	')';
 
 clusterConfigurationNameCaseSensitive : '(clusterConfigurationNameCaseSensitive'
@@ -280,7 +280,7 @@ clusterConfigurationRef : '(clusterConfigurationRef'
 	')';
 
 clusterHeader : '(clusterHeader'
-	(  documentation  |  nameInformation  |  property  |  status  )*
+	(  documentation  |  nameInformation  |  property_  |  status  )*
 	')';
 
 clusterNameCaseSensitive : '(clusterNameCaseSensitive'
@@ -466,7 +466,7 @@ connectivityView : '(connectivityView'
 
 connectivityViewHeader : '(connectivityViewHeader'
 	connectivityUnits
-	(  derivedFrom  |  documentation  |  nameInformation  |  previousVersion  |  property  |  status  )*
+	(  derivedFrom  |  documentation  |  nameInformation  |  previousVersion  |  property_  |  status  )*
 	')';
 
 constantNameDef : nameDef;
@@ -495,7 +495,7 @@ copyrightDisplay : '(copyrightDisplay'
 	')';
 
 cornerType : '(cornerType'
-	( truncate | round | extend )
+	( truncate | round_ | extend )
 	')';
 
 coulomb : '(coulomb'
@@ -588,7 +588,7 @@ delay : '(delay'
 
 denominator : integerValue;
 
-derivation : ( calculated  | measured | required );
+derivation : ( calculated  | measured | required_ );
 
 derivedFrom : '(derivedFrom'
 	viewRef
@@ -612,7 +612,7 @@ designatorDisplay : '(designatorDisplay'
 
 designHeader : '(designHeader'
 	designUnits
-	(  documentation  |  nameInformation  |  property  |  status  )*
+	(  documentation  |  nameInformation  |  property_  |  status  )*
 	')';
 
 designHierarchy : '(designHierarchy'
@@ -624,7 +624,7 @@ designHierarchy : '(designHierarchy'
 	')';
 
 designHierarchyHeader : '(designHierarchyHeader'
-	(  booleanParameterAssign  |  integerParameterAssign  |  nameInformation | numberParameterAssign  |  property  |  stringParameterAssign  )*	
+	(  booleanParameterAssign  |  integerParameterAssign  |  nameInformation | numberParameterAssign  |  property_  |  stringParameterAssign  )*	
 	')';
 
 designHierarchyNameCaseSensitive : '(designHierarchyNameCaseSensitive'
@@ -744,7 +744,7 @@ edif : '(edif'
 	edifNameDef
 	edifVersion
 	edifHeader
-	(  library | design  | comment  |  external  |  userData  )*
+	(  library_ | design  | comment  |  external_  |  userData  )*
 	')';
 
 edifHeader : '(edifHeader'
@@ -753,7 +753,7 @@ edifHeader : '(edifHeader'
 	unitDefinitions
 	fontDefinitions
 	physicalDefaults
-	(  characterEncoding  |  constantValues  |  documentation  |  globalPortDefinitions  |  nameCaseSensitivity  |  nameInformation  |  physicalScaling  |  property  |  status  )*
+	(  characterEncoding  |  constantValues  |  documentation  |  globalPortDefinitions  |  nameCaseSensitivity  |  nameInformation  |  physicalScaling  |  property_  |  status  )*
 	')';
 
 edifLevel : '(edifLevel'
@@ -774,7 +774,7 @@ edifVersion : '(edifVersion'
 endPoint : pointValue;
 
 endType : '(endType'
-	( truncate | round | extend )
+	( truncate | round_ | extend )
 	')';
 
 engineeringDate : '(engineeringDate'
@@ -817,7 +817,7 @@ extendSignalGroupDef : signalGroupNameRef;
 
 extendSignalMemberDef : signalMemberRef;
 
-external : '(external'
+external_ : '(external'
 	libraryNameDef
 	libraryHeader
 	(  cell  |  comment  |  geometryMacro  |  pageBorderTemplate  |  pageTitleBlockTemplate  |  schematicFigureMacro  |  schematicForFrameBorderTemplate  |  schematicGlobalPortTemplate  |  schematicIfFrameBorderTemplate  |  schematicInterconnectTerminatorTemplate  |  schematicJunctionTemplate  |  schematicMasterPortTemplate  |  schematicOffPageConnectorTemplate  |  schematicOnPageConnectorTemplate  |  schematicOtherwiseFrameBorderTemplate  |  schematicRipperTemplate  |  schematicSymbolBorderTemplate  |  schematicSymbolPortTemplate  |  userData  )*
@@ -841,7 +841,7 @@ figure : '(figure'
 
 figureGroup : '(figureGroup'
 	figureGroupNameDef
-	(  comment  |  cornerType  |  displayAttributes  |  endType  |  nameInformation  |  pathWidth  |  property  |  userData  )*
+	(  comment  |  cornerType  |  displayAttributes  |  endType  |  nameInformation  |  pathWidth  |  property_  |  userData  )*
 	')';
 
 figureGroupNameCaseSensitive : '(figureGroupNameCaseSensitive'
@@ -876,7 +876,7 @@ font : '(font'
 	fontNameDef
 	typeface
 	fontProportions
-	(  boldStyle  |  italicStyle  |  property  |  proportionalFont  |  userData  )*
+	(  boldStyle  |  italicStyle  |  property_  |  proportionalFont  |  userData  )*
 	')';
 
 fontCapitalHeight : '(fontCapitalHeight'
@@ -931,7 +931,7 @@ forFrame : '(forFrame'
 	repetitionCount
 	forFrameIndex
 	logicalConnectivity
-	(  comment  |  documentation  |  nameInformation  |  property  |  userData  )*
+	(  comment  |  documentation  |  nameInformation  |  property_  |  userData  )*
 	')';
 
 forFrameAnnotate : '(forFrameAnnotate'
@@ -1009,7 +1009,7 @@ geometryMacro : '(geometryMacro'
 
 geometryMacroHeader : '(geometryMacroHeader'
 	geometryMacroUnits
-	(  backgroundColor  |  documentation  |  nameInformation  |  originalBoundingBox  |  property  |  status  )*
+	(  backgroundColor  |  documentation  |  nameInformation  |  originalBoundingBox  |  property_  |  status  )*
 	')';
 
 geometryMacroRef : '(geometryMacroRef'
@@ -1023,13 +1023,13 @@ geometryMacroUnits : '(geometryMacroUnits'
 
 globalPort : '(globalPort'
 	globalPortNameDef
-	(  comment  |  nameInformation  |  property  |  schematicGlobalPortAttributes  |  userData  )*
+	(  comment  |  nameInformation  |  property_  |  schematicGlobalPortAttributes  |  userData  )*
 	')';
 
 globalPortBundle : '(globalPortBundle'
 	globalPortNameDef
 	globalPortList
-	(  comment  |  nameInformation | property  |  userData  )*
+	(  comment  |  nameInformation | property_  |  userData  )*
 	')';
 
 globalPortDefinitions : '(globalPortDefinitions'
@@ -1122,7 +1122,7 @@ ifFrame : '(ifFrame'
 	frameNameDef
 	condition
 	logicalConnectivity
-	(  comment  |  nameInformation | documentation  |  property  |  userData  )*
+	(  comment  |  nameInformation | documentation  |  property_  |  userData  )*
 	')';
 
 ifFrameAnnotate : '(ifFrameAnnotate'
@@ -1185,7 +1185,7 @@ indexValue : '(indexValue'
 	integerToken
 	')';
 
-input : '(input'
+input_ : '(input'
 	')';
 
 inputPort : '(inputPort'
@@ -1199,7 +1199,7 @@ inputPortAttributes : '(inputPortAttributes'
 instance : '(instance'
 	instanceNameDef
 	clusterRef
-	(  booleanParameterAssign  |  cellPropertyOverride  |  clusterPropertyOverride  |  comment  |  designator  |  instanceNameGenerator  |  instancePortAttributes  |  instanceWidth  |  integerParameterAssign  |  nameInformation  |  numberParameterAssign  |  property  |  stringParameterAssign  |  timing  |  userData  )*
+	(  booleanParameterAssign  |  cellPropertyOverride  |  clusterPropertyOverride  |  comment  |  designator  |  instanceNameGenerator  |  instancePortAttributes  |  instanceWidth  |  integerParameterAssign  |  nameInformation  |  numberParameterAssign  |  property_  |  stringParameterAssign  |  timing  |  userData  )*
 	')';
 
 instanceConfiguration : '(instanceConfiguration'
@@ -1243,7 +1243,7 @@ instancePortAttributeDisplay : '(instancePortAttributeDisplay'
 
 instancePortAttributes : '(instancePortAttributes'
 	extendPortDef
-	(  acLoad  |  comment  |  connectedSignalIndexGenerator  |  designator  |  directionalPortAttributeOverride  |  portDelay  |  portDelayOverride  |  portLoadDelay  |  portLoadDelayOverride  |  portPropertyOverride  |  property  |  unused  )*
+	(  acLoad  |  comment  |  connectedSignalIndexGenerator  |  designator  |  directionalPortAttributeOverride  |  portDelay  |  portDelayOverride  |  portLoadDelay  |  portLoadDelayOverride  |  portPropertyOverride  |  property_  |  unused  )*
 	')';
 
 instancePropertyDisplay : '(instancePropertyDisplay'
@@ -1332,7 +1332,7 @@ integerValue : integerToken;
 
 interconnectAnnotate : '(interconnectAnnotate'
 	extendInterconnectDef
-	(  comment  |  interconnectAnnotate  |  criticality | interconnectDelay  |  property  |  propertyOverride  )*
+	(  comment  |  interconnectAnnotate  |  criticality | interconnectDelay  |  property_  |  propertyOverride  )*
 	')';
 
 interconnectAttachedText : '(interconnectAttachedText'
@@ -1357,7 +1357,7 @@ interconnectDelayNameDef : nameDef;
 interconnectDelayNameRef : nameRef;
 
 interconnectHeader : '(interconnectHeader'
-	(  criticality  |  documentation  |  interconnectDelay  |  nameInformation  |  property  )*
+	(  criticality  |  documentation  |  interconnectDelay  |  nameInformation  |  property_  )*
 	')';
 
 interconnectNameCaseSensitive : '(interconnectNameCaseSensitive'
@@ -1549,7 +1549,7 @@ leaf : '(leaf'
 
 leafOccurrenceAnnotate : '(leafOccurrenceAnnotate'
 	( extendInstanceDef | extendInstanceMemberDef )
-	(  cellPropertyOverride  |  clusterPropertyOverride  |  comment | designator |  instancePropertyOverride  |  portAnnotate  |  property  )*
+	(  cellPropertyOverride  |  clusterPropertyOverride  |  comment | designator |  instancePropertyOverride  |  portAnnotate  |  property_  )*
 	')';
 
 leftJustify : '(leftJustify'
@@ -1565,7 +1565,7 @@ lessThanOrEqual : '(lessThanOrEqual'
 	(  integerExpression  )*
 	')';
 
-library : '(library'
+library_ : '(library'
 	libraryNameDef
 	libraryHeader
 	( cell | schematicInterconnectTerminatorTemplate | schematicJunctionTemplate |  schematicGlobalPortTemplate  |   schematicMasterPortTemplate  |  schematicOffPageConnectorTemplate  | schematicOnPageConnectorTemplate  | schematicRipperTemplate |  schematicSymbolBorderTemplate  |  schematicSymbolPortTemplate  | pageBorderTemplate | pageTitleBlockTemplate | comment  |  geometryMacro  |  schematicFigureMacro  |  schematicForFrameBorderTemplate  |  schematicIfFrameBorderTemplate | schematicOtherwiseFrameBorderTemplate  | userData )*
@@ -1575,7 +1575,7 @@ libraryHeader : '(libraryHeader'
 	edifLevel
 	nameCaseSensitivity
 	technology
-	(  backgroundColor  |  documentation  |  nameInformation  |  property  |  status  )*
+	(  backgroundColor  |  documentation  |  nameInformation  |  property_  |  status  )*
 	')';
 
 libraryNameCaseSensitive : '(libraryNameCaseSensitive'
@@ -1606,7 +1606,7 @@ loadDelay : '(loadDelay'
 localPortGroup : '(localPortGroup'
 	localPortGroupNameDef
 	portList
-	(  comment  | nameInformation | property  |  userData  )*	
+	(  comment  | nameInformation | property_  |  userData  )*	
 	')';
 
 localPortGroupNameCaseSensitive : '(localPortGroupNameCaseSensitive'
@@ -1667,7 +1667,7 @@ logicRef : '(logicRef'
 
 logicValue : '(logicValue'
 	logicNameDef
-	(  booleanMap  |  comment  |  compound  |  currentMap  |  dominates  |  isolated  |  logicMapInput  |  logicMapOutput  |  nameInformation  |  property  |  resolves  |  strong  |  voltageMap  |  weak  )*
+	(  booleanMap  |  comment  |  compound  |  currentMap  |  dominates  |  isolated  |  logicMapInput  |  logicMapOutput  |  nameInformation  |  property_  |  resolves  |  strong  |  voltageMap  |  weak_  )*
 	')';
 
 lsbToMsb : '(lsbToMsb'
@@ -1829,7 +1829,7 @@ numerator : integerValue;
 
 occurrenceAnnotate : '(occurrenceAnnotate'
 	( extendInstanceDef | extendInstanceMemberDef )
-	(  cellPropertyOverride  |  clusterPropertyOverride  |  comment | designator |  forFrameAnnotate  |  ifFrameAnnotate  |  instancePropertyOverride  |  interconnectAnnotate  |  leafOccurrenceAnnotate  |  occurrenceAnnotate  |  otherwiseFrameAnnotate  |  pageAnnotate  |  portAnnotate  |  property  |  signalAnnotate  |  signalGroupAnnotate  |  timing  |  viewPropertyOverride  )*	  
+	(  cellPropertyOverride  |  clusterPropertyOverride  |  comment | designator |  forFrameAnnotate  |  ifFrameAnnotate  |  instancePropertyOverride  |  interconnectAnnotate  |  leafOccurrenceAnnotate  |  occurrenceAnnotate  |  otherwiseFrameAnnotate  |  pageAnnotate  |  portAnnotate  |  property_  |  signalAnnotate  |  signalGroupAnnotate  |  timing  |  viewPropertyOverride  )*	  
 	')';
 
 occurrenceHierarchyAnnotate : '(occurrenceHierarchyAnnotate'
@@ -1875,7 +1875,7 @@ otherwiseFrame : '(otherwiseFrame'
 	frameNameDef
 	ifFrameSet
 	logicalConnectivity
-	(  comment  |  documentation  | nameInformation | property  |  userData  )*
+	(  comment  |  documentation  | nameInformation | property_  |  userData  )*
 	')';
 
 otherwiseFrameAnnotate : '(otherwiseFrameAnnotate'
@@ -1936,7 +1936,7 @@ pageCommentGraphics : '(pageCommentGraphics'
 	')';
 
 pageHeader : '(pageHeader'
-	(  backgroundColor  |  documentation  |  nameInformation  |  originalBoundingBox  |  pageBorder  |  pageSize  |  property  |  status  )*
+	(  backgroundColor  |  documentation  |  nameInformation  |  originalBoundingBox  |  pageBorder  |  pageSize  |  property_  |  status  )*
 	')';
 
 pageIdentification : '(pageIdentification'
@@ -1976,7 +1976,7 @@ pageTitleBlock : '(pageTitleBlock'
 	implementationNameDef
 	pageTitleBlockTemplateRef
 	transform
-	(  nameInformation  |  pagePropertyDisplay  |  pageTitleBlockAttributeDisplay  |  pageTitleBlockAttributes  |  property  |  propertyDisplay  |  propertyDisplayOverride  |  propertyOverride  )*
+	(  nameInformation  |  pagePropertyDisplay  |  pageTitleBlockAttributeDisplay  |  pageTitleBlockAttributes  |  property_  |  propertyDisplay  |  propertyDisplayOverride  |  propertyOverride  )*
 	')';
 
 pageTitleBlockAttributeDisplay : '(pageTitleBlockAttributeDisplay'
@@ -2080,12 +2080,12 @@ polygon : '(polygon'
 port : '(port'
 	portNameDef?
 	portDirection?
-	(  acLoad  |  comment  |  defaultConnection  |  designator  |  nameInformation  |  portDelay  |  portLoadDelay  |  portNameGenerator  |  portWidth  |  property  |  schematicPortAttributes  |  unused  |  userData  )*
+	(  acLoad  |  comment  |  defaultConnection  |  designator  |  nameInformation  |  portDelay  |  portLoadDelay  |  portNameGenerator  |  portWidth  |  property_  |  schematicPortAttributes  |  unused  |  userData  )*
 	')';
 
 portAnnotate : '(portAnnotate'
 	( extendPortDef | extendPortMemberDef )
-	(  acLoad  |  comment  |  designator  |  directionalPortAttributeOverride  |  portDelay  |  portDelayOverride  |  portLoadDelay  |  portLoadDelayOverride  |  portPropertyOverride  |  property  )*
+	(  acLoad  |  comment  |  designator  |  directionalPortAttributeOverride  |  portDelay  |  portDelayOverride  |  portLoadDelay  |  portLoadDelayOverride  |  portPropertyOverride  |  property_  )*
 	')';
 
 portAttributeDisplay : '(portAttributeDisplay'
@@ -2095,7 +2095,7 @@ portAttributeDisplay : '(portAttributeDisplay'
 portBundle : '(portBundle'
 	portNameDef
 	portList
-	(  comment  | nameInformation | property  |  userData  | designator)*
+	(  comment  | nameInformation | property_  |  userData  | designator)*
 	')';
 
 portDelay : '(portDelay'
@@ -2123,7 +2123,7 @@ portDelayOverride : '(portDelayOverride'
 
 portDirection : ( inputPort  | outputPort | bidirectionalPort | unspecifiedDirectionPort );
 
-portDirectionIndicator : ( input  | output | bidirectional | unspecified | unrestricted | mixedDirection );
+portDirectionIndicator : ( input_  | output | bidirectional | unspecified | unrestricted | mixedDirection );
 
 portIndexValue : '(portIndexValue'
 	')';
@@ -2237,10 +2237,10 @@ program : '(program'
 	(  version  )?
 	')';
 
-property : '(property'
+property_ : '(property'
 	propertyNameDef
 	( typedValue | untyped )
-	(  comment  |  nameInformation  |  owner  |  property  |  propertyInheritanceControl  |  unitRef  )*
+	(  comment  |  nameInformation  |  owner  |  property_  |  propertyInheritanceControl  |  unitRef  )*
 	')';
 
 propertyDisplay : '(propertyDisplay'
@@ -2318,7 +2318,7 @@ replaceDisplay : '(replaceDisplay'
 	(  display  )*
 	')';
 
-required : '(required'
+required_ : '(required'
 	')';
 
 resolves : '(resolves'
@@ -2350,7 +2350,7 @@ rotation : '(rotation'
 	angleValue
 	')';
 
-round : '(round'
+round_ : '(round'
 	')';
 
 rowSize : integerToken;
@@ -2524,7 +2524,7 @@ schematicInterconnectAttributeDisplay : '(schematicInterconnectAttributeDisplay'
 	')';
 
 schematicInterconnectHeader : '(schematicInterconnectHeader'
-	(  criticality  |  documentation  |  interconnectDelay  |  nameInformation  |  property  |  schematicInterconnectTerminatorImplementation  |  schematicJunctionImplementation  |  schematicWireStyle  )*
+	(  criticality  |  documentation  |  interconnectDelay  |  nameInformation  |  property_  |  schematicInterconnectTerminatorImplementation  |  schematicJunctionImplementation  |  schematicWireStyle  )*
 	')';
 
 schematicInterconnectTerminatorImplementation : '(schematicInterconnectTerminatorImplementation'
@@ -2631,7 +2631,7 @@ schematicOffPageConnectorImplementation : '(schematicOffPageConnectorImplementat
 	implementationNameDef
 	schematicOffPageConnectorTemplateRef
 	transform
-	(  associatedInterconnectNameDisplay  |  implementationNameDisplay  |  nameInformation  |  property  |  propertyDisplay  |  propertyDisplayOverride  |  propertyOverride  )*
+	(  associatedInterconnectNameDisplay  |  implementationNameDisplay  |  nameInformation  |  property_  |  propertyDisplay  |  propertyDisplayOverride  |  propertyOverride  )*
 	')';
 
 schematicOffPageConnectorImplementationRef : '(schematicOffPageConnectorImplementationRef'
@@ -2654,7 +2654,7 @@ schematicOnPageConnectorImplementation : '(schematicOnPageConnectorImplementatio
 	implementationNameDef
 	schematicOnPageConnectorTemplateRef
 	transform
-	(  associatedInterconnectNameDisplay  |  implementationNameDisplay  |  nameInformation  |  property  |  propertyDisplay  |  propertyDisplayOverride  |  propertyOverride  )*
+	(  associatedInterconnectNameDisplay  |  implementationNameDisplay  |  nameInformation  |  property_  |  propertyDisplay  |  propertyDisplayOverride  |  propertyOverride  )*
 	')';
 
 schematicOnPageConnectorImplementationRef : '(schematicOnPageConnectorImplementationRef'
@@ -2774,7 +2774,7 @@ schematicRipperImplementation : '(schematicRipperImplementation'
 	implementationNameDef
 	schematicRipperTemplateRef
 	transform
-	(  implementationNameDisplay  |  nameInformation  |  property  |  propertyDisplay  |  propertyDisplayOverride  |  propertyOverride  )*
+	(  implementationNameDisplay  |  nameInformation  |  property_  |  propertyDisplay  |  propertyDisplayOverride  |  propertyOverride  )*
 	')';
 
 schematicRipperImplementationRef : '(schematicRipperImplementationRef'
@@ -2804,7 +2804,7 @@ schematicSubBusSet : '(schematicSubBusSet'
 	')';
 
 schematicSubInterconnectHeader : '(schematicSubInterconnectHeader'
-	(  criticality  |  documentation  |  interconnectDelay  |  nameInformation  |  property  )*
+	(  criticality  |  documentation  |  interconnectDelay  |  nameInformation  |  property_  )*
 	')';
 
 schematicSubNet : '(schematicSubNet'
@@ -2844,7 +2844,7 @@ schematicSymbolBorderTemplateRef : '(schematicSymbolBorderTemplateRef'
 
 schematicSymbolHeader : '(schematicSymbolHeader'
 	schematicUnits
-	(  backgroundColor  |  derivedFrom  |  documentation  |  nameInformation  |  originalBoundingBox  |  pageSize  |  previousVersion  |  property  |  schematicSymbolBorder  |  status  )*
+	(  backgroundColor  |  derivedFrom  |  documentation  |  nameInformation  |  originalBoundingBox  |  pageSize  |  previousVersion  |  property_  |  schematicSymbolBorder  |  status  )*
 	')';
 
 schematicSymbolPortImplementation : '(schematicSymbolPortImplementation'
@@ -2879,7 +2879,7 @@ schematicSymbolRef : '(schematicSymbolRef'
 
 schematicTemplateHeader : '(schematicTemplateHeader'
 	schematicUnits
-	(  backgroundColor  |  documentation  |  nameInformation  |  originalBoundingBox  |  property  |  status  )*
+	(  backgroundColor  |  documentation  |  nameInformation  |  originalBoundingBox  |  property_  |  status  )*
 	')';
 
 schematicUnits : '(schematicUnits'
@@ -2896,7 +2896,7 @@ schematicView : '(schematicView'
 
 schematicViewHeader : '(schematicViewHeader'
 	schematicUnits
-	(  derivedFrom  |  documentation  |  nameInformation  |  previousVersion  |  property  |  status  )*
+	(  derivedFrom  |  documentation  |  nameInformation  |  previousVersion  |  property_  |  status  )*
 	')';
 
 schematicWireAffinity : '(schematicWireAffinity'
@@ -2974,23 +2974,23 @@ siemens : '(siemens'
 signal : '(signal'
 	signalNameDef
 	signalJoined
-	(  connectivityTagGenerator  |  nameInformation  |  property  |  signalWidth  )*
+	(  connectivityTagGenerator  |  nameInformation  |  property_  |  signalWidth  )*
 	')';
 
 signalAnnotate : '(signalAnnotate'
 	( extendSignalDef | extendSignalMemberDef )
-	(  comment  |  property  |  propertyOverride  )*
+	(  comment  |  property_  |  propertyOverride  )*
 	')';
 
 signalGroup : '(signalGroup'
 	signalGroupNameDef
 	signalList
-	(  property | nameInformation )*
+	(  property_ | nameInformation )*
 	')';
 
 signalGroupAnnotate : '(signalGroupAnnotate'
 	extendSignalGroupDef
-	(  comment  |  property  |  propertyOverride  )*
+	(  comment  |  property_  |  propertyOverride  )*
 	')';
 
 signalGroupNameCaseSensitive : '(signalGroupNameCaseSensitive'
@@ -3170,7 +3170,7 @@ timeValue : miNoMaxValue;
 timing : '(timing'
 	timingNameDef
 	derivation
-	(  comment  |  forbiddenEvent  |  pathDelay  |  property  |  userData  )*
+	(  comment  |  forbiddenEvent  |  pathDelay  |  property_  |  userData  )*
 	')';
 
 timingDisplay : '(timingDisplay'
@@ -3292,7 +3292,7 @@ viewGroup : '(viewGroup'
 	')';
 
 viewGroupHeader : '(viewGroupHeader'
-	(  documentation  |  nameInformation  |  property  |  reason  )*
+	(  documentation  |  nameInformation  |  property_  |  reason  )*
 	')';
 
 viewGroupNameCaseSensitive : '(viewGroupNameCaseSensitive'
@@ -3353,7 +3353,7 @@ watt : '(watt'
 	unitExponent
 	')';
 
-weak : '(weak'
+weak_ : '(weak'
 	logicNameRef
 	')';
 

@@ -1,0 +1,323 @@
+/******************************************************************************
+	system_mb/ui/MBButton.tjs
+	
+	カーソル移動情報を持ったボタンクラス
+*******************************************************************************/
+
+class MBButton extends ButtonLayer
+{
+	var grpButtonImage;	// ボタン画像
+	var grpButtonActiveImage;	// ボタン使用中イメージ
+	var grpButtonDisabledImage;	// ボタン使用不可画像
+	
+	var objCursorMapHash = %[
+		up : false,
+		down : false,
+		right : false,
+		left : false,
+		prevGroup : false,
+		nextGroup : false
+	];
+	var ptFocusController;	// フォーカスコントローラ参照
+	var ptActionCanceller;	// アクションキャンセラ参照
+	
+	var fltHorizontalFocusPoint = 0.5;	// フォーカスするポイント（横幅に対する割合）
+	var fltVerticalFocusPoint = 0.5;	// フォーカスするポイント（縦幅に対する割合）
+	
+	var blKeyLock;	// 二重押下防止
+	
+	var blMouseHoldable;	// マウスでホールドできるかどうか
+	var isHolded;
+	var intHoldWaitTime      = 500;	// ホールド後に繰り返し処理に入るまでの時間
+	var intHoldActionFreq    = 50; // 繰り返し処理の周期
+	var intHoldActionMinFreq = 10;
+	var objHoldTimer;	// ホールド処理のためのタイマー
+	var holdActionCount;
+	
+	
+	function MBButton(win, par)
+	{
+		// コンストラクタ
+		
+		super.ButtonLayer(win, par);
+		
+		ptFocusController = SystemManager.objFocusController;
+		ptActionCanceller = SystemManager.objActionCanceller;
+		name = 'ボタン';
+		focusable = false;
+	}
+
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate objHoldTimer if (objHoldTimer !== void);
+		
+		super.finalize(...);
+	}
+	
+	//==========================================================================
+	
+	function setCursorMap(up, right, down, left, pg, ng)
+	{
+		// カーソルマップを割り当てる
+		// 見てのとおり基本的にCSSの方向と同じ。最後に余計なのを付ける
+		// いらない分はvoidを渡すこと
+		
+		objCursorMapHash.up    = up;
+		objCursorMapHash.down  = down;
+		objCursorMapHash.left  = left;
+		objCursorMapHash.right = right;
+		
+		objCursorMapHash.prevGroup = pg;
+		objCursorMapHash.nextGroup = ng;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function getCursorFromManager(lock = true)
+	{
+		// フォーカススタックマネージャから割り当てをもらう
+		
+		blKeyLock = lock;
+		cursorX = width * fltHorizontalFocusPoint;
+		cursorY = height * fltVerticalFocusPoint;
+		focusable = true;
+		focus();
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function callParentFunction()
+	{
+		// 親のメソッドを呼ぶ
+		
+		if (
+			ptActionCanceller.getCancellerState() ||
+			!parent.enabled
+		) {
+			// アクションキャンセラがアクティブか、親レイヤが非アクティブなら
+			// 何もしない
+			return;
+		}
+		
+		cursor = crDefault;
+		parent.isNewLayer = true;
+		parent.onSelectedItemClick(this);
+	}
+	
+	function onMouseDown(x, y, button, shift)
+	{
+		// クリック動作
+		
+		super.onMouseDown(...);
+		
+		if (button == mbLeft) {
+			if(enabled) {
+				SystemManager.fcSetKBOperationState(false);
+				ptFocusController.isActive = false;
+				ptFocusController.relFocusStack(this);
+				
+				// ホールド可能な場合は繰り返し処理待ちへ
+				if (blMouseHoldable) {
+					isHolded = true;
+					invalidate objHoldTimer if (objHoldTimer !== void);
+					objHoldTimer = new Timer(onTimerHoldWait, '');
+					objHoldTimer.interval = intHoldWaitTime;
+					objHoldTimer.enabled  = true;
+				}
+				
+				callParentFunction();
+			}
+		}
+		else if (button == mbRight)
+		{
+			parent.onRightClickedOnChild();
+			return;
+		}
+	}
+	
+	function onTimerHoldWait()
+	{
+		// 繰り返し処理を待つ
+		
+		if (isHolded) {
+			holdActionCount = 0;
+			invalidate objHoldTimer if (objHoldTimer !== void);
+			objHoldTimer = new Timer(onTimerHoldAction, '');
+			objHoldTimer.interval = intHoldActionFreq;
+			objHoldTimer.enabled  = true;
+		}
+	}
+	
+	function onTimerHoldAction()
+	{
+		// 繰り返し処理
+		// 一定時間ごとに親の処理を呼ぶだけ
+		
+		if (holdActionCount++ % 10 == 0 && objHoldTimer.interval > intHoldActionMinFreq) {
+			objHoldTimer.interval -= 5;
+		}
+		
+		callParentFunction();
+	}
+	
+	function onMouseUp(x, y, button, shift)
+	{
+		super.onMouseUp(...);
+		
+		if (button == mbLeft) {
+			holdActionCount = 0;
+			invalidate objHoldTimer if (objHoldTimer !== void);
+			isHolded = false;
+		}
+	}
+	
+	function onMouseEnter()
+	{
+		// マウスカーソル突入動作
+		
+		super.onMouseEnter(...);
+		
+		if (parent.isNewLayer) {
+			parent.isNewLayer = false;
+		}
+		else {
+			sndfunc.seSelect();
+		}
+		ptFocusController.isActive = true;
+		cursor = crHandPoint;
+		focusable = true;
+		focus();
+		
+		SystemManager.getPadHandler();
+	}
+	
+	function onMouseLeave()
+	{
+		// マウスカーソル脱出動作
+		
+		super.onMouseLeave(...);
+		
+		SystemManager.releasePadHandler();
+		ptFocusController.isActive = false;
+		cursor = crDefault;
+		focusable = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function onCallFromFocusStackManager(key, shift)
+	{
+		// キーボード押下動作フック
+		
+		key = SystemManager.convertPadToKey(key);
+		
+		switch(key) {
+			// 決定
+			case VK_RETURN:
+			case VK_SPACE:
+				callParentFunction(this);
+				break;
+			
+			// キャンセル
+			case VK_ESCAPE:
+				try { parent.onEscapeKeyDown(); }
+				catch(e) {}
+				break;
+			
+			// 矢印キー
+			case VK_UP:
+			case VK_DOWN:
+			case VK_RIGHT:
+			case VK_LEFT:
+				passFocusToNextObject(key);
+				break;
+			
+			// TAB
+			case VK_TAB:
+				
+				break;
+		}
+	}
+	
+	function onKeyDown(key, shift)
+	{
+		// 標準のキー操作を無効にしておく
+		
+		if (blKeyLock) {
+			if (!shift) {
+				return;
+			}
+		}
+		
+		blKeyLock = true;
+		onCallFromFocusStackManager(...);
+	}
+	
+	function onKeyUp(key, shift)
+	{
+		// キーが離されたらロックを解除
+		
+		blKeyLock = false;
+	}
+	
+	function onBlur()
+	{
+		// フォーカスを失ってもロック解除
+		
+		blKeyLock = false;
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function passFocusToNextObject(dir)
+	{
+		// フォーカスを渡す
+
+		if (
+			ptActionCanceller.getCancellerState() ||
+			!parent.enabled
+		) {
+			// アクションキャンセラがアクティブか、親レイヤが非アクティブなら
+			// 何もしない
+			return;
+		}
+		
+		// カーソルが自分の外にある場合は自分にフォーカス
+		if (cursorX < 0 || cursorX > width || cursorY < 0 || cursorY > height) {
+			getCursorFromManager();
+			return;
+		}
+				
+		var res;
+		
+		SystemManager.fcSetKBOperationState(true);
+		
+		switch (dir) {
+			case VK_UP:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.up);
+				break;
+			
+			case VK_DOWN:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.down);
+				break;
+			
+			case VK_LEFT:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.left);
+				break;
+			
+			case VK_RIGHT:
+				res = ptFocusController.changeCursorStay(objCursorMapHash.right);
+				break;
+			
+			default:
+				break;
+		}
+		
+		if (res) {
+			ptFocusController.setCursorToTarget();
+		}
+	}
+}
+

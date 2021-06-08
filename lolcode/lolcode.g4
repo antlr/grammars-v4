@@ -25,10 +25,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 /*
 Adapted from https://github.com/jynnantonix/lolcode/blob/master/BNFGrammar.txt
 */
-
 grammar lolcode;
 
 program
@@ -36,7 +36,7 @@ program
    ;
 
 code_block
-   : statement +
+   : statement+
    ;
 
 statement
@@ -105,10 +105,10 @@ expression
    | mod
    | cast
    | either
-   | all
-   | any
-   | not
-   | func
+   | all_
+   | any_
+   | not_
+   | func_
    | LABEL
    | ATOM
    ;
@@ -161,38 +161,40 @@ cast
    : 'MAEK' expression 'A' < type >
    ;
 
-all
+all_
    : 'ALL OF' expression ('AN' expression)* 'MKAY?'
    ;
 
-any
+any_
    : 'ANY OF' expression ('AN' expression)* 'MKAY?'
    ;
 
-not
+not_
    : 'NOT' expression
    ;
 
-func
-   : LABEL expression + 'MKAY?'
+func_
+   : LABEL expression+ 'MKAY?'
    ;
-
 
 LABEL
    : ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')+
    ;
 
-
 ATOM
-   : 'WIN' | 'FAIL' | 'NOOB' | ('0' .. '9')+ | ('0' .. '9')* '.' ('0' .. '9')* | STRING
+   : 'WIN'
+   | 'FAIL'
+   | 'NOOB'
+   | ('0' .. '9')+
+   | ('0' .. '9')* '.' ('0' .. '9')*
+   | STRING
    ;
-
 
 STRING
-   : '"' ('\'"' | ~'"')* '"'
+   : '"' ('\'"' | ~ '"')* '"'
    ;
-
 
 WS
    : [ \r\n] -> skip
    ;
+

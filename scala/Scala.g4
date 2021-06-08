@@ -51,16 +51,17 @@ ids
    ;
 
 stableId
-   : (Id | (Id '.')? 'this') '.' Id
-   | (Id '.')? 'super' classQualifier? '.' Id
+   : Id
+   | stableId '.' Id
+   | (Id '.')? ('this' | 'super' classQualifier? '.' Id)
    ;
 
 classQualifier
    : '[' Id ']'
    ;
 
-type
-   : functionArgTypes '=>' type
+type_
+   : functionArgTypes '=>' type_
    | infixType existentialClause?
    ;
 
@@ -70,7 +71,7 @@ functionArgTypes
    ;
 
 existentialClause
-   : 'forSome' '{' existentialDcl (Sep existentialDcl)* '}'
+   : 'forSome' '{' existentialDcl+ '}'
    ;
 
 existentialDcl
@@ -94,8 +95,7 @@ annotType
 simpleType
    : simpleType typeArgs
    | simpleType '#' Id
-   | stableId
-   | (stableId | (Id '.')? 'this') '.' 'type'
+   | stableId ('.' 'type')?
    | '(' types ')'
    ;
 
@@ -104,21 +104,20 @@ typeArgs
    ;
 
 types
-   : type (',' type)*
+   : type_ (',' type_)*
    ;
 
 refinement
-   : '{' refineStat (Sep refineStat)* '}'
+   : NL? '{' refineStat+ '}'
    ;
 
 refineStat
    : dcl
    | 'type' typeDef
-   |
    ;
 
 typePat
-   : type
+   : type_
    ;
 
 ascription
@@ -133,41 +132,52 @@ expr
    ;
 
 expr1
-   : 'if' '(' expr ')' expr (Semi? 'else' expr)?
-   | 'while' '(' expr ')' expr
-   | 'try' ('{' block '}' | expr) ('catch' '{' caseClauses '}')? ('finally' expr)?
-   | 'do' expr Semi? 'while' '(' expr ')'
+   : 'if' '(' expr ')' NL* expr ('else' expr)?
+   | 'while' '(' expr ')' NL* expr
+   | 'try' expr ('catch' expr)? ('finally' expr)?
+   | 'do' expr 'while' '(' expr ')'
    | 'for' ('(' enumerators ')' | '{' enumerators '}') 'yield'? expr
    | 'throw' expr
    | 'return' expr?
-   | (('new' (classTemplate | templateBody) | blockExpr | simpleExpr1 '_'?) '.') Id '=' expr
+   | ((simpleExpr | simpleExpr1 '_'?) '.')? Id '=' expr
    | simpleExpr1 argumentExprs '=' expr
-   | postfixExpr
-   | postfixExpr ascription
+   | postfixExpr ascription?
    | postfixExpr 'match' '{' caseClauses '}'
    ;
 
+prefixDef
+   : '-' | '+' | '~' | '!'
+   ;
+
 postfixExpr
-   : infixExpr (Id)?
+   : infixExpr Id? (prefixDef simpleExpr1)* NL?
    ;
 
 infixExpr
    : prefixExpr
-   | infixExpr Id infixExpr
+   | infixExpr Id NL? infixExpr
    ;
 
 prefixExpr
-   : ('-' | '+' | '~' | '!')? ('new' (classTemplate | templateBody) | blockExpr | simpleExpr1 '_'?)
+   : prefixDef? (simpleExpr | simpleExpr1 '_'?)
    ;
 
+simpleExpr
+   : 'new' (classTemplate | templateBody)
+   | blockExpr
+   ;
+
+// Dublicate lines to prevent left-recursive code.
+// can't use (simpleExpr|simpleExpr1) '.' Id
 simpleExpr1
    : literal
    | stableId
-   | (Id '.')? 'this'
    | '_'
    | '(' exprs? ')'
-   | ('new' (classTemplate | templateBody) | blockExpr) '.' Id
-   | ('new' (classTemplate | templateBody) | blockExpr) typeArgs
+   | simpleExpr '.' Id
+   | simpleExpr1 '_'?  '.' Id
+   | simpleExpr  typeArgs
+   | simpleExpr1 '_'? typeArgs
    | simpleExpr1 argumentExprs
    ;
 
@@ -176,10 +186,15 @@ exprs
    ;
 
 argumentExprs
-   : '(' exprs? ')'
-   | '(' (exprs ',')? postfixExpr ':' '_' '*' ')'
-   | blockExpr
-   ;
+    : '(' args ')'
+    | '{' args '}'
+    | NL? blockExpr
+    ;
+
+args
+    : exprs?
+    | (exprs ',')? postfixExpr (':' | '_' | '*') ?
+    ;
 
 blockExpr
    : '{' caseClauses '}'
@@ -187,15 +202,14 @@ blockExpr
    ;
 
 block
-   : blockStat (Sep blockStat)* resultExpr?
+   : blockStat+ resultExpr?
    ;
 
 blockStat
    : import_
-   | annotation* ('implicit' | 'lazy')? def
+   | annotation* ('implicit' | 'lazy')? def_
    | annotation* localModifier* tmplDef
    | expr1
-   |
    ;
 
 resultExpr
@@ -204,11 +218,11 @@ resultExpr
    ;
 
 enumerators
-   : generator (Sep generator)*
+   : generator+
    ;
 
 generator
-   : pattern1 '<-' expr (Semi? guard | Semi pattern1 '=' expr)*
+   : pattern1 '<-' expr (guard_ | pattern1 '=' expr)*
    ;
 
 caseClauses
@@ -216,10 +230,10 @@ caseClauses
    ;
 
 caseClause
-   : 'case' pattern guard? '=>' block
+   : 'case' pattern guard_? '=>' block
    ;
 
-guard
+guard_
    : 'if' postfixExpr
    ;
 
@@ -228,19 +242,18 @@ pattern
    ;
 
 pattern1
-   : Varid ':' typePat
-   | '_' ':' typePat
+   : (BoundVarid| '_' | Id) ':' typePat
    | pattern2
    ;
 
 pattern2
-   : Varid ('@' pattern3)?
+   : Id ('@' pattern3)?
    | pattern3
    ;
 
 pattern3
    : simplePattern
-   | simplePattern (Id simplePattern)*
+   | simplePattern (Id NL? simplePattern)*
    ;
 
 simplePattern
@@ -248,13 +261,13 @@ simplePattern
    | Varid
    | literal
    | stableId ('(' patterns? ')')?
-   | stableId '(' (patterns? ',')? (Varid '@')? '_' '*' ')'
+   | stableId '(' (patterns ',')? (Id '@')? '_' '*' ')'
    | '(' patterns? ')'
    ;
 
 patterns
-   : pattern (',' pattern)*
-   | '_'+
+   : pattern (',' patterns)?
+   | '_' '*'
    ;
 
 typeParamClause
@@ -266,19 +279,19 @@ funTypeParamClause
    ;
 
 variantTypeParam
-   : annotation? ('+' | '-')? typeParam
+   : annotation* ('+' | '-')? typeParam
    ;
 
 typeParam
-   : (Id | '_') typeParamClause? ('>:' type)? ('<:' type)? ('<%' type)* (':' type)*
+   : (Id | '_') typeParamClause? ('>:' type_)? ('<:' type_)? ('<%' type_)* (':' type_)*
    ;
 
 paramClauses
-   : paramClause* ('(' 'implicit' params ')')?
+   : paramClause* (NL? '(' 'implicit' params ')')?
    ;
 
 paramClause
-   : '(' params? ')'
+   : NL? '(' params? ')'
    ;
 
 params
@@ -290,17 +303,17 @@ param
    ;
 
 paramType
-   : type
-   | '=>' type
-   | type '*'
+   : type_
+   | '=>' type_
+   | type_ '*'
    ;
 
 classParamClauses
-   : classParamClause* ('(' 'implicit' classParams ')')?
+   : classParamClause* (NL? '(' 'implicit' classParams ')')?
    ;
 
 classParamClause
-   : '(' classParams? ')'
+   : NL? '(' classParams? ')'
    ;
 
 classParams
@@ -316,7 +329,7 @@ bindings
    ;
 
 binding
-   : (Id | '_') (':' type)?
+   : (Id | '_') (':' type_)?
    ;
 
 modifier
@@ -350,20 +363,19 @@ constrAnnotation
    ;
 
 templateBody
-   : NL? '{' selfType? templateStat (Sep templateStat)* '}'
+   : NL? '{' selfType? templateStat+ '}'
    ;
 
 templateStat
    : import_
-   | (annotation)* modifier* def
-   | (annotation)* modifier* dcl
+   | (annotation NL?)* modifier* def_
+   | (annotation NL?)* modifier* dcl
    | expr
-   |
    ;
 
 selfType
-   : Id (':' type)? '=>'
-   | 'this' ':' type '=>'
+   : Id (':' type_)? '=>'
+   | 'this' ':' type_ '=>'
    ;
 
 import_
@@ -371,7 +383,7 @@ import_
    ;
 
 importExpr
-   : stableId '.' (Id | '_' | importSelectors)
+   : stableId ('.' (Id | '_' | importSelectors))?
    ;
 
 importSelectors
@@ -379,26 +391,26 @@ importSelectors
    ;
 
 importSelector
-   : Id ('=>' Id | '=>' '_')
+   : Id ('=>' (Id | '_'))?
    ;
 
 dcl
    : 'val' valDcl
    | 'var' varDcl
    | 'def' funDcl
-   | 'type' typeDcl
+   | 'type' NL* typeDcl
    ;
 
 valDcl
-   : ids ':' type
+   : ids ':' type_
    ;
 
 varDcl
-   : ids ':' type
+   : ids ':' type_
    ;
 
 funDcl
-   : funSig (':' type)?
+   : funSig (':' type_)?
    ;
 
 funSig
@@ -406,7 +418,7 @@ funSig
    ;
 
 typeDcl
-   : Id typeParamClause? ('>:' type)? ('<:' type)?
+   : Id typeParamClause? ('>:' type_)? ('<:' type_)?
    ;
 
 patVarDef
@@ -414,30 +426,30 @@ patVarDef
    | 'var' varDef
    ;
 
-def
+def_
    : patVarDef
    | 'def' funDef
-   | 'type' typeDef
+   | 'type' NL* typeDef
    | tmplDef
    ;
 
 patDef
-   : pattern2 (',' pattern2)* (':' type)* '=' expr
+   : pattern2 (',' pattern2)* (':' type_)? '=' expr
    ;
 
 varDef
    : patDef
-   | ids ':' type '=' '_'
+   | ids ':' type_ '=' '_'
    ;
 
 funDef
-   : funSig (':' type)? '=' expr
-   | funSig '{' block '}'
-   | 'this' paramClause paramClauses ('=' constrExpr | constrBlock)
+   : funSig (':' type_)? '=' expr
+   | funSig NL? '{' block '}'
+   | 'this' paramClause paramClauses ('=' constrExpr | NL? constrBlock)
    ;
 
 typeDef
-   : Id typeParamClause? '=' type
+   : Id typeParamClause? '=' type_
    ;
 
 tmplDef
@@ -489,11 +501,11 @@ constr
    ;
 
 earlyDefs
-   : '{' (earlyDef (Sep earlyDef)*)? '}' 'with'
+   : '{' earlyDef+ '}' 'with'
    ;
 
 earlyDef
-   : (annotation)* modifier* patVarDef
+   : (annotation NL?)* modifier* patVarDef
    ;
 
 constrExpr
@@ -502,7 +514,7 @@ constrExpr
    ;
 
 constrBlock
-   : '{' selfInvocation (Semi blockStat)* '}'
+   : '{' selfInvocation (blockStat)* '}'
    ;
 
 selfInvocation
@@ -510,19 +522,18 @@ selfInvocation
    ;
 
 topStatSeq
-   : topStat (Sep topStat)*
+   : topStat+
    ;
 
 topStat
-   : (annotation)* modifier* tmplDef
+   : (annotation NL?)* modifier* tmplDef
    | import_
    | packaging
    | packageObject
-   |
    ;
 
 packaging
-   : 'package' qualId '{' topStatSeq '}'
+   : 'package' qualId  NL? '{' topStatSeq '}'
    ;
 
 packageObject
@@ -531,7 +542,7 @@ packageObject
 
 
 compilationUnit
-   : ('package' qualId Sep?)* topStatSeq
+   : ('package' qualId)* topStatSeq
    ;
 
 // Lexer
@@ -559,14 +570,13 @@ SymbolLiteral
 
 
 IntegerLiteral
-   : (DecimalNumeral | HexNumeral) ('L' | 'l')
+   : (DecimalNumeral | HexNumeral) ('L' | 'l')?
    ;
 
 
 StringLiteral
    : '"' StringElement* '"' | '"""' MultiLineChars '"""'
    ;
-
 
 FloatingPointLiteral
    : Digit + '.' Digit + ExponentPart? FloatType? | '.' Digit + ExponentPart? FloatType? | Digit ExponentPart FloatType? | Digit + ExponentPart? FloatType
@@ -577,7 +587,10 @@ Varid
    : Lower Idrest
    ;
 
-
+BoundVarid
+   : Varid
+   | '`' Varid '`'
+   ;
 Paren
    : '(' | ')' | '[' | ']' | '{' | '}'
    ;
@@ -585,6 +598,15 @@ Paren
 
 Delim
    : '`' | '\'' | '"' | '.' | ';' | ','
+   ;
+
+Semi
+   : (';' | (NL)+) -> skip
+   ;
+
+NL
+   : '\n'
+   | '\r' '\n'?
    ;
 
 
@@ -627,7 +649,7 @@ fragment StringElement
 
 
 fragment MultiLineChars
-   : ('"'? '"'? .*?)* '"'*
+   : (StringElement | NL) *
    ;
 
 
@@ -1315,34 +1337,16 @@ fragment UnicodeDigit // UnicodeClass_ND
 //
 // Whitespace and comments
 //
-
-
 NEWLINE
    : NL+ -> skip
    ;
-
-
-Sep
-   : (Semi | NL)+ ;
-
-
-Semi
-   : ';'
-   ;
-
 
 WS
    :  WhiteSpace+ -> skip
    ;
 
-
-NL
-   : '\n'
-   ;
-
-
 COMMENT
-   :   '/*' .*? '*/' -> skip
+   :   '/*' (COMMENT | .)* '*/' -> skip
    ;
 
 

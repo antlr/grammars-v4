@@ -1,0 +1,38 @@
+﻿/******************************************************************************
+	mb/system/history/MBHistoryScrollBar.tjs
+*******************************************************************************/
+
+
+class MBHistoryScrollBar extends MBComponentLayer
+{
+	var imagePath = "history/slide_bar";
+	
+	function MBHistoryScrollBar(win, par)
+	{
+		// コンストラクタ
+		
+		super.MBComponentLayer(win, par);
+		
+		init();
+	}
+	
+	function finalize()
+	{
+		// ファイナライザ
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function init()
+	{
+		// イニシャライザ
+		
+		loadImages(%[storage : sysfunc.getPathImage(imagePath)]);
+		//setPos(18, 0);
+		hitType      = htMask;
+		hitThreshold = 256;	// 透過
+		visible      = true;
+	}
+}

@@ -1,0 +1,1 @@
+import input.foo[0]
