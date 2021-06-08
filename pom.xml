@@ -187,6 +187,7 @@
 				<module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
+                <module>orwell</module>
 				<module>p</module>
 				<module>parkingsign</module>
 				<module>pascal</module>
