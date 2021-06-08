@@ -313,7 +313,7 @@ opbinding
 expression
    : primary
    | call '@' primary
-   | (expression)
+   | '('expression')'
    | '~' expression
    | '−' expression
    | expression '**' expression
@@ -347,7 +347,7 @@ primary
    ;
 
 call
-   : primary ((expression (',' expression)*)*)
+   : primary ((expression (',' expression)*)?)
    ;
 
 entity
