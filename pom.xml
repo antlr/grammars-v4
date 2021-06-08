@@ -8,10 +8,11 @@
 	<name>ANTLR4 grammars</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<target.jvm>1.7</target.jvm>
-		<antlr.version>4.8-1</antlr.version>
-		<antlr4test-maven-plugin.version>1.14</antlr4test-maven-plugin.version>
-		<junit.version>4.12</junit.version>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<antlr.version>4.9.2</antlr.version>
+		<antlr4test-maven-plugin.version>1.18</antlr4test-maven-plugin.version>
+		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
 		<maven>3.1.0</maven>
@@ -46,17 +47,15 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<source>${target.jvm}</source>
-					<target>${target.jvm}</target>
-				</configuration>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<profiles>
 		<profile>
@@ -65,6 +64,7 @@
 			</activation>
 			<id>grammarv4</id>
 			<modules>
+				<module>abb</module>
 				<module>abnf</module>
 				<module>acme</module>
 				<module>agc</module>
@@ -73,7 +73,6 @@
 				<module>antlr</module>
 				<module>apex</module>
 				<module>apt</module>
-				<module>argus</module>			
 				<module>arithmetic</module>
 				<module>asm</module>
 				<module>asn</module>
@@ -82,14 +81,15 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
+				<module>bcpl</module>
+				<module>bibcode</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
-                <module>brainflak</module>
+				<module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
 				<module>capnproto</module>
 				<module>clf</module>
-				<module>clif</module>
 				<module>clojure</module>
 				<module>clu</module>
 				<module>cmake</module>
@@ -97,6 +97,7 @@
 				<module>cookie</module>
 				<module>cool</module>
 				<module>cpp</module>
+				<module>cql</module>
 				<module>cql3</module>
 				<module>creole</module>
 				<module>csharp</module>
@@ -106,28 +107,31 @@
 				<module>dart2</module>
 				<module>databank</module>
 				<module>dcm</module>
-				<module>dgol</module>				
+				<module>dgol</module>
 				<module>dice</module>
+				<module>doiurl</module>
 				<module>dot</module>
 				<module>edif300</module>
-				<module>edn</module>				
+				<module>edn</module>
 				<module>erlang</module>
 				<module>fasta</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
-                <module>focal</module>
+				<module>focal</module>
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
+				<module>gedcom</module>
 				<module>gff3</module>
 				<module>gml</module>
+				<module>golang</module>
 				<module>graphql</module>
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
 				<module>guido</module>
-                <module>guitartab</module>
-                <module>haskell</module>
-                <module>html</module>
+				<module>guitartab</module>
+				<module>haskell</module>
+				<module>html</module>
 				<module>http</module>
 				<module>hypertalk</module>
 				<module>icalendar</module>
@@ -135,35 +139,38 @@
 				<module>idl</module>
 				<module>inf</module>
 				<module>informix</module>
-                <module>infosapient</module>
-                <module>iri</module>
-                <module>iso8601</module>
+				<module>infosapient</module>
+				<module>iri</module>
+				<module>iso8601</module>
 				<module>istc</module>
 				<module>janus</module>
-                <module>java</module>
+				<module>java</module>
 				<module>javadoc</module>
 				<module>javascript</module>
-                <module>joss</module>
-                <module>jpa</module>
-                <module>json</module>
-                <module>json5</module>
+				<module>joss</module>
+				<module>jpa</module>
+				<module>json</module>
+				<module>json5</module>
+				<module>karel</module>
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kuka</module>
 				<module>lambda</module>
 				<module>lcc</module>
 				<module>less</module>
+				<module>lisa</module>
 				<module>logo</module>
 				<module>lolcode</module>
-				<module>loop</module>				
+				<module>loop</module>
 				<module>lpc</module>
 				<module>lua</module>
 				<module>matlab</module>
+				<module>mckeeman-form</module>
 				<module>mdx</module>
 				<module>memcached_protocol</module>
-                <module>metamath</module>
+				<module>metamath</module>
 				<module>metric</module>
-                <module>microc</module>
+				<module>microc</module>
 				<module>modelica</module>
 				<module>modula2pim4</module>
 				<module>molecule</module>
@@ -174,9 +181,9 @@
 				<module>mumath</module>
 				<module>mumps</module>
 				<module>muparser</module>
-                <module>nanofuck</module>
-                <module>newick</module>
-                <module>oberon</module>
+				<module>nanofuck</module>
+				<module>newick</module>
+				<module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
 				<module>p</module>
@@ -185,14 +192,15 @@
 				<module>pcre</module>
 				<module>pddl</module>
 				<module>pdn</module>
-				<module>pdp7</module>
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
+				<module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
+                <module>plucid</module>
 				<module>ply</module>
-                <module>pmmn</module>
+				<module>pmmn</module>
 				<module>postalcode</module>
 				<module>powerbuilder</module>
 				<module>prolog</module>
@@ -217,19 +225,22 @@
 				<module>romannumerals</module>
 				<module>rpn</module>
 				<module>ruby</module>
+				<module>rust</module>
 				<module>scala</module>
 				<module>scotty</module>
 				<module>scss</module>
 				<module>sexpression</module>
 				<module>sgf</module>
 				<module>sharc</module>
+				<module>sici</module>
 				<module>sickbay</module>
-                <module>sieve</module>
+				<module>sieve</module>
 				<module>smalltalk</module>
-			    <module>smiles</module>
+				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
-				<module>solidity</module>
+                <module>snowball</module>
+                <module>solidity</module>
 				<module>sparql</module>
 				<module>sql</module>
 				<module>stacktrace</module>
@@ -238,6 +249,7 @@
 				<module>suokif</module>
 				<module>swift</module>
 				<module>swift-fin</module>
+				<module>tcpheader</module>
 				<module>telephone</module>
 				<module>terraform</module>
 				<module>thrift</module>
@@ -251,7 +263,7 @@
 				<module>trac</module>
 				<module>tsv</module>
 				<module>ttm</module>
-                <module>turing</module>
+				<module>turing</module>
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
@@ -261,6 +273,7 @@
 				<module>v</module>
 				<module>vb6</module>
 				<module>vba</module>
+				<module>velocity</module>
 				<module>verilog</module>
 				<module>vhdl</module>
 				<module>vmf</module>
@@ -268,6 +281,7 @@
 				<module>wavefront</module>
 				<module>webidl</module>
 				<module>wkt</module>
+				<module>wln</module>
 				<module>xml</module>
 				<module>xpath</module>
 				<module>xsd-regex</module>
@@ -282,7 +296,7 @@
 				<plugins>
 					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.1.0</version>
+						<version>3.3.0</version>
 						<configuration>
 							<descriptors>
 								<descriptor>${maven.multiModuleProjectDirectory}/assembly.xml</descriptor>
@@ -312,7 +326,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.0.1</version>
+						<version>3.2.1</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -325,7 +339,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.0.1	</version>
+						<version>3.3.0	</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -341,7 +355,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
+						<version>3.0.1</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>

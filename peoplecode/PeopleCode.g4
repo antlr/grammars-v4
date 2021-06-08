@@ -59,9 +59,9 @@ stmt  : appClassImport          # StmtAppClassImport
 expr  : '(' expr ')'                              # ExprParenthesized
       | '@' expr                                  # ExprDynamicReference
       | literal                                   # ExprLiteral
-      | id                                        # ExprId
+      | id_                                        # ExprId
       | createInvocation                          # ExprCreate
-      | expr '.' id                               # ExprDotAccess
+      | expr '.' id_                               # ExprDotAccess
       | expr '[' exprList ']'                     # ExprArrayIndex // &array[&i, &j] is shorthand for &array[&i][&j]
       | expr '(' exprList? ')'                    # ExprFnOrIdxCall
       | '-' expr                                  # ExprNegate
@@ -99,10 +99,10 @@ event           : 'FieldFormula' | 'FieldChange' ;
 
 classDeclaration  : 'class' GENERIC_ID classBlock* 'end-class' ;
 classBlock        : aLvl='private'? (classBlockStmt ';'*)+ ;
-classBlockStmt    : method | constant | property | instance ;
+classBlockStmt    : method | constant | property_ | instance ;
 method            : 'method' GENERIC_ID formalParamList returnType? ;
 constant          : 'Constant' VAR_ID '=' expr ;
-property          : 'property' varType GENERIC_ID g='get'? s='set'? r='readonly'? ;
+property_          : 'property' varType GENERIC_ID g='get'? s='set'? r='readonly'? ;
 instance          : 'instance' varType VAR_ID (',' VAR_ID)* ;
 
 methodImpl  : 'method' GENERIC_ID stmtList endmethod='end-method' ;
@@ -136,7 +136,7 @@ literal : DecimalLiteral
         | BoolLiteral
         ;
 
-id  : SYS_VAR_ID | VAR_ID | GENERIC_ID ;
+id_  : SYS_VAR_ID | VAR_ID | GENERIC_ID ;
 
 //*******************************************************//
 // Lexer Rules                                           //

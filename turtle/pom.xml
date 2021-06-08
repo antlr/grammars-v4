@@ -8,7 +8,6 @@
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
 		<version>1.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
 	</parent>
 	
 	 <licenses>
@@ -25,7 +24,9 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
-					<grammars>TURTLE.g4</grammars>
+					<includes>
+					   <include>TURTLE.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 					<sourceDirectory>${basedir}</sourceDirectory>

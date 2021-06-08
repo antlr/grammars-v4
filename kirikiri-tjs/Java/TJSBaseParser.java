@@ -12,7 +12,7 @@ public abstract class TJSBaseParser extends Parser
 
     protected boolean notOpenBraceAndNotFunction() {
         int nextTokenType = _input.LT(1).getType();
-        return nextTokenType != TJSParser.OpenBrace && nextTokenType != TJSParser.Function;
+        return nextTokenType != TJSParser.OpenBrace && nextTokenType != TJSParser.Function_;
     }
 
     protected boolean closeBrace() {

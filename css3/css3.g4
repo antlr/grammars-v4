@@ -6,26 +6,26 @@ grammar css3;
 // IE and vendor specific rules are added for real world usage
 
 stylesheet
-    : ws ( charset ( Comment | Space | Cdo | Cdc )* )* ( imports ( Comment | Space | Cdo | Cdc )* )* ( namespace ( Comment | Space | Cdo | Cdc )* )* ( nestedStatement ( Comment | Space | Cdo | Cdc )* )*
+    : ws ( charset ( Comment | Space | Cdo | Cdc )* )* ( imports ( Comment | Space | Cdo | Cdc )* )* ( namespace_ ( Comment | Space | Cdo | Cdc )* )* ( nestedStatement ( Comment | Space | Cdo | Cdc )* )*
     ;
 
 charset
-    : Charset ws String ws ';' ws    # goodCharset
-    | Charset ws String ws           # badCharset
+    : Charset ws String_ ws ';' ws    # goodCharset
+    | Charset ws String_ ws           # badCharset
     ;
 
 imports
-    : Import ws ( String | Uri ) ws mediaQueryList ';' ws     # goodImport
-    | Import ws ( String | Uri ) ws ';' ws                    # goodImport
-    | Import ws ( String | Uri ) ws mediaQueryList            # badImport
-    | Import ws ( String | Uri ) ws                           # badImport
+    : Import ws ( String_ | Uri ) ws mediaQueryList ';' ws     # goodImport
+    | Import ws ( String_ | Uri ) ws ';' ws                    # goodImport
+    | Import ws ( String_ | Uri ) ws mediaQueryList            # badImport
+    | Import ws ( String_ | Uri ) ws                           # badImport
     ;
 
 // Namespaces
 // https://www.w3.org/TR/css-namespaces-3/
-namespace
-    : Namespace ws (namespacePrefix ws)? ( String | Uri ) ws ';' ws    # goodNamespace
-    | Namespace ws (namespacePrefix ws)? ( String | Uri ) ws           # badNamespace
+namespace_
+    : Namespace ws (namespacePrefix ws)? ( String_ | Uri ) ws ';' ws    # goodNamespace
+    | Namespace ws (namespacePrefix ws)? ( String_ | Uri ) ws           # badNamespace
     ;
 
 namespacePrefix
@@ -111,7 +111,7 @@ className
     ;
 
 attrib
-    : '[' ws typeNamespacePrefix? ident ws ( ( PrefixMatch | SuffixMatch | SubstringMatch | '=' | Includes | DashMatch ) ws ( ident | String ) ws )? ']'
+    : '[' ws typeNamespacePrefix? ident ws ( ( PrefixMatch | SuffixMatch | SubstringMatch | '=' | Includes | DashMatch ) ws ( ident | String_ ) ws )? ']'
     ;
 
 pseudo
@@ -123,13 +123,13 @@ pseudo
     ;
 
 functionalPseudo
-    : Function ws expression ')'
+    : Function_ ws expression ')'
     ;
 
 expression
     /* In CSS3, the expressions are identifiers, strings, */
     /* or of the form "an+b" */
-    : ( ( Plus | Minus | Dimension | UnknownDimension | Number | String | ident ) ws )+
+    : ( ( Plus | Minus | Dimension | UnknownDimension | Number | String_ | ident ) ws )+
     ;
 
 negation
@@ -146,14 +146,14 @@ negationArg
     ;
 
 // Rules
-operator
+operator_
     : '/' ws      # goodOperator
     | Comma ws    # goodOperator
     | Space ws    # goodOperator
     | '=' ws      # badOperator  // IE filter and DXImageTransform function
     ;
 
-property
+property_
     : ident ws       # goodProperty
     | Variable ws    # goodProperty
     | '*' ident      # badProperty  // IE hacks
@@ -162,7 +162,7 @@ property
 
 ruleset
     : selectorGroup '{' ws declarationList? '}' ws    # knownRuleset
-    | any* '{' ws declarationList? '}' ws             # unknownRuleset
+    | any_* '{' ws declarationList? '}' ws             # unknownRuleset
     ;
 
 declarationList
@@ -170,8 +170,8 @@ declarationList
     ;
 
 declaration
-    : property ':' ws expr prio?    # knownDeclaration
-    | property ':' ws value         # unknownDeclaration
+    : property_ ':' ws expr prio?    # knownDeclaration
+    | property_ ':' ws value         # unknownDeclaration
     ;
 
 prio
@@ -179,31 +179,31 @@ prio
     ;
 
 value
-    : ( any | block | atKeyword ws )+
+    : ( any_ | block | atKeyword ws )+
     ;
 
 expr
-    : term ( operator? term )*
+    : term ( operator_? term )*
     ;
 
 term
     : number ws              # knownTerm
     | percentage ws          # knownTerm
     | dimension ws           # knownTerm
-    | String ws              # knownTerm
+    | String_ ws              # knownTerm
     | UnicodeRange ws        # knownTerm
     | ident ws               # knownTerm
-    | var                    # knownTerm
+    | var_                   # knownTerm
     | Uri ws                 # knownTerm
     | hexcolor               # knownTerm
     | calc                   # knownTerm
-    | function               # knownTerm
+    | function_              # knownTerm
     | unknownDimension ws    # unknownTerm
     | dxImageTransform       # badTerm
     ;
 
-function
-    : Function ws expr ')' ws
+function_
+    : Function_ ws expr ')' ws
     ;
 
 dxImageTransform
@@ -231,13 +231,13 @@ unknownDimension
     ;
 
 // Error handling
-any
+any_
     : ident ws
     | number ws
     | percentage ws
     | dimension ws
     | unknownDimension ws
-    | String ws
+    | String_ ws
     //| Delim ws    // Not implemented yet
     | Uri ws
     | Hash ws
@@ -245,13 +245,13 @@ any
     | Includes ws
     | DashMatch ws
     | ':' ws
-    | Function ws ( any | unused )* ')' ws
-    | '(' ws ( any | unused )* ')' ws
-    | '[' ws ( any | unused )* ']' ws
+    | Function_ ws ( any_ | unused )* ')' ws
+    | '(' ws ( any_ | unused )* ')' ws
+    | '[' ws ( any_ | unused )* ']' ws
     ;
 
 atRule
-    : atKeyword ws any* ( block | ';' ws )    # unknownAtRule
+    : atKeyword ws any_* ( block | ';' ws )    # unknownAtRule
     ;
 
 atKeyword
@@ -267,7 +267,7 @@ unused
     ;
 
 block
-    : '{' ws (  declarationList | nestedStatement | any | block | atKeyword ws | ';' ws )* '}' ws
+    : '{' ws (  declarationList | nestedStatement | any_ | block | atKeyword ws | ';' ws )* '}' ws
     ;
 
 // Conditional
@@ -323,12 +323,12 @@ supportsDeclarationCondition
     ;
 
 generalEnclosed
-    : ( Function | '(' ) ( any | unused )* ')'
+    : ( Function_ | '(' ) ( any_ | unused )* ')'
     ;
 
 // Variable
 // https://www.w3.org/TR/css-variables-1
-var
+var_
     : Var ws Variable ws ')' ws
     ;
 
@@ -361,8 +361,8 @@ fontFaceRule
     ;
 
 fontFaceDeclaration
-    : property ':' ws expr     # knownFontFaceDeclaration
-    | property ':' ws value    # unknownFontFaceDeclaration
+    : property_ ':' ws expr     # knownFontFaceDeclaration
+    | property_ ':' ws value    # unknownFontFaceDeclaration
     ;
 
 // Animations
@@ -402,7 +402,7 @@ fontFamilyNameList
     ;
 
 fontFamilyName
-    : String
+    : String_
     | ident ( ws ident )*
     ;
 
@@ -793,7 +793,7 @@ Percentage
     ;
 
 Uri
-    : U R L '(' Whitespace String Whitespace ')'
+    : U R L '(' Whitespace String_ Whitespace ')'
     | U R L '(' Whitespace Url Whitespace ')'
     ;
 
@@ -877,7 +877,7 @@ Number
     | [0-9]* '.' [0-9]+
     ;
 
-String
+String_
     : '"' ( ~[\n\r\f\\"] | '\\' Newline | Nonascii | Escape )* '"'
     | '\'' ( ~[\n\r\f\\'] | '\\' Newline | Nonascii | Escape )* '\''
     ;
@@ -949,7 +949,7 @@ FontFeatureValues
 
 // https://msdn.microsoft.com/en-us/library/ms532847.aspx
 DxImageTransform
-    : 'progid:DXImageTransform.Microsoft.' Function
+    : 'progid:DXImageTransform.Microsoft.' Function_
     ;
 
 // Variables
@@ -967,6 +967,6 @@ Ident
     : '-'? Nmstart Nmchar*
     ;
 
-Function
+Function_
     : Ident '('
     ;

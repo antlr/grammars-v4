@@ -4,7 +4,7 @@ grammar CapnProto;
 // parser rules
 
 document :
-	file_identifier using_import* namespace? document_content* EOF	;
+	file_identifier using_import* namespace_? document_content* EOF	;
 
 file_identifier :
 	FILE_ID ';' ;
@@ -12,14 +12,14 @@ file_identifier :
 using_import :
 	'using' ( NAME '=' )? 'import' TEXT ( '.' NAME )? ';' ;
 	
-namespace :
+namespace_ :
 	'$' NAME '.namespace' '(' TEXT ')' ';' ;
 
 document_content :
 	struct_def | interface_def | function_def | annotation_def | const_def | enum_def ;
 
 struct_def :
-	'struct' type annotation_reference? '{' struct_content* '}' ;
+	'struct' type_ annotation_reference? '{' struct_content* '}' ;
 
 struct_content : 
 	field_def | enum_def | named_union_def 
@@ -27,7 +27,7 @@ struct_content :
 	| struct_def | group_def | const_def | inner_using ;
 
 interface_def :
-	'interface' type ( 'extends' '(' type ')' )? '{' interface_content* '}' ;
+	'interface' type_ ( 'extends' '(' type_ ')' )? '{' interface_content* '}' ;
 
 interface_content : 
 	field_def | enum_def | named_union_def 
@@ -35,21 +35,21 @@ interface_content :
 	| struct_def | function_def ;
 
 field_def :	
-	NAME LOCATOR ':' type ( '=' const_value )? ';' ;
+	NAME LOCATOR ':' type_ ( '=' const_value )? ';' ;
 
-type :
+type_ :
 	NAME 
 	inner_type?
-	( '.' type )? ;
+	( '.' type_ )? ;
 
 inner_type :
-	'(' type inner_type? ( ',' type inner_type? )* ')' ;
+	'(' type_ inner_type? ( ',' type_ inner_type? )* ')' ;
 	
 enum_def :
 	'enum' NAME annotation_reference? '{' enum_content* '}' ;
 
 annotation_reference :
-	'$' type '.ann'? '(' TEXT ')' ;
+	'$' type_ '.ann'? '(' TEXT ')' ;
 	
 enum_content :
 	NAME LOCATOR annotation_reference? ';' ;
@@ -70,8 +70,8 @@ group_content :
 	field_def | unnamed_union_def | named_union_def ;
 	
 function_def :
-	NAME LOCATOR? generic_type_parameters? ( function_parameters | type )
-	( '->' ( function_parameters | type ) )?
+	NAME LOCATOR? generic_type_parameters? ( function_parameters | type_ )
+	( '->' ( function_parameters | type_ ) )?
 	';' ;
 
 generic_type_parameters :
@@ -81,19 +81,19 @@ generic_type_parameters :
 	
 function_parameters :
 	'(' 
-		( NAME ':' type ( '=' const_value )?
-			( ',' NAME ':' type ( '=' const_value )? )*
+		( NAME ':' type_ ( '=' const_value )?
+			( ',' NAME ':' type_ ( '=' const_value )? )*
 		)?
 	')' ;
 	
 annotation_def :
-	'annotation' type annotation_parameters? ':' type ';' ;
+	'annotation' type_ annotation_parameters? ':' type_ ';' ;
 
 annotation_parameters :
 	'(' 'struct' ')' ;
 	
 const_def :
-	'const' NAME ':' type '=' const_value ';' ;
+	'const' NAME ':' type_ '=' const_value ';' ;
 	
 const_value :
 	'-'? '.'? NAME ( '.' NAME )? | INTEGER | FLOAT 
@@ -114,7 +114,7 @@ union_mapping :
 
 inner_using :
 	'using' NAME ( '.' NAME )*
-	( '=' type )?
+	( '=' type_ )?
 	';' ;
 	
 	

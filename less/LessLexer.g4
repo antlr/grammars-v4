@@ -7,7 +7,7 @@
 lexer grammar LessLexer;
 
 
-NULL
+NULL_
    : 'null'
    ;
 

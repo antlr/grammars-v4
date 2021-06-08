@@ -1,0 +1,34 @@
+
+begin
+
+procedure euler (fct,sum,eps,tim); value eps,tim; integer tim;
+real procedure fct; real sum,eps;
+comment euler computes the sum of fct(i) for i from zero up to
+infinity by means of a suitably refined euler transformation. The
+summation is stopped as soon as tim times in succession the absolute
+value of the terms of the transformed series are found to be less than
+eps. Hence, one should provide a function fct with one integer argument,
+an upper bound eps, and an integer tim. The output is the sum sum. euler
+is particularly efficient in the case of a slowly convergent or
+divergent alternating series;
+begin integer i,k,n,t; array m[0:15]; real mn,mp,ds;
+i:=n:=t:=0; m[0]:=fct(0); sum:=m[0]/2;
+nextterm: i:=i+1; mn:=fct(i);
+        for k:=0 step 1 until n do
+            begin mp:=(mn+m[k])/2; m[k]:=mn;
+                mn:=mp end;
+        if (abs(mn)<abs(m[n])) & (n<15) then
+            begin ds:=mn/2; n:=n+1; m[n]:=mn end
+        else ds:=mn;
+        sum:=sum+ds;
+        if abs(ds)<eps then t:=t+1 else t:=0;
+        if t<tim then goto nextterm
+end;
+
+procedure inv(v) ; inv := 1.0/((v+1)^2);
+
+real result;
+euler(inv, result, 0.00005, 10);
+printnln(result);
+
+end

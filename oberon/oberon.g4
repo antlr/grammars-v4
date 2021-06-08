@@ -74,10 +74,10 @@ constExpression
    ;
 
 typeDeclaration
-   : identdef '=' type
+   : identdef '=' type_
    ;
 
-type
+type_
    : qualident
    | arrayType
    | recordType
@@ -86,7 +86,7 @@ type
    ;
 
 arrayType
-   : ARRAY length (',' length)* OF type
+   : ARRAY length (',' length)* OF type_
    ;
 
 length
@@ -106,7 +106,7 @@ fieldListSequence
    ;
 
 fieldList
-   : identList ':' type
+   : identList ':' type_
    ;
 
 identList
@@ -114,7 +114,7 @@ identList
    ;
 
 pointerType
-   : POINTER TO type
+   : POINTER TO type_
    ;
 
 procedureType
@@ -122,7 +122,7 @@ procedureType
    ;
 
 variableDeclaration
-   : identList ':' type
+   : identList ':' type_
    ;
 
 expression
@@ -168,7 +168,7 @@ factor
    | NIL
    | TRUE
    | FALSE
-   | set
+   | set_
    | designator (actualParameters)?
    | '(' expression ')'
    | '~' factor
@@ -185,7 +185,7 @@ selector
    | '(' qualident ')'
    ;
 
-set
+set_
    : '{' (element (',' element)*)? '}'
    ;
 

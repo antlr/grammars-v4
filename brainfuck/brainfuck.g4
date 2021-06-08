@@ -28,7 +28,7 @@
 */
 grammar brainfuck;
 
-file
+file_
    : statement*
    ;
 
