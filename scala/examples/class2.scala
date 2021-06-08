@@ -1,5 +1,6 @@
 package xxx.yyy.zzz.aaa.bbbb.commons.transformation
 import java.math.BigDecimal
+import a._
 import xxx.yyy.zzz.aaa.bbbb.commons.constants.Fields
 import xxx.yyy.zzz.aaa.bbbb.commons.utils.Functions._
 import xxx.yyy.zzz.aaa.bbbb.configuration.SparktacusTransformation
@@ -8,7 +9,7 @@ import xxx.yyy.zzz.aaa.bbbb.transformation.TransformationTrait
 import org.apache.spark.sql.{DataFrame, Row, functions}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{Decimal, DecimalType, StringType, StructField, StructType}
-class CapComer(val transformation: SparktacusTransformation) extends TransformationTrait{
+class CapComer(val transformation: SparktacusTransformation) extends TransformationTrait  {
   def runTransformation: DataFrame = {
     val previousDF = ProcessStatus.components(transformation.previous.get(0))
     val outPutDataframe = capComer(previousDF)

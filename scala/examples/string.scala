@@ -13,6 +13,8 @@ object CreateTable extends CreateTableInterface {
       |Test
       |Test
       |""".stripMargin
+  val c = a""" dsada ${2+2}"""
+  val d = b""" dsada $a"""
   def execute (hiveContext: HiveContext) = {
     hiveContext.sql("""asd""")
   }
