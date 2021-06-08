@@ -19,8 +19,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-						<include>RegoLexer.g4</include>
-						<include>RegoParser.g4</include>
+						<include>ScalaLexer.g4</include>
+						<include>ScalaParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
