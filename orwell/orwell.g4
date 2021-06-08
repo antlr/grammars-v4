@@ -232,7 +232,7 @@ primary
    : primaryname
    | fliteral
    | tuple_
-   | list
+   | list_
    ;
 
 section
@@ -242,7 +242,7 @@ section
    | (term1 infix)
    ;
 
-list
+list_
    : listform
    | upto
    | comp
