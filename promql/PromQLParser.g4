@@ -58,7 +58,7 @@ andUnlessOp: (AND | UNLESS) grouping?;
 orOp:        OR grouping?;
 
 vector
-    : function
+    : function_
     | aggregation
     | instantSelector
     | matrixSelector
@@ -89,9 +89,9 @@ offset
 
 // Functions
 
-function: FUNCTION LEFT_PAREN parameter (COMMA parameter)* RIGHT_PAREN;
+function_: FUNCTION LEFT_PAREN parameter (COMMA parameter)* RIGHT_PAREN;
 
-parameter:     literal | vector;
+parameter:     literal | vectorOperation;
 parameterList: LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
 
 // Aggregations
@@ -106,8 +106,8 @@ without: WITHOUT labelNameList;
 
 // Vector one-to-one/one-to-many joins
 
-grouping:   (on | ignoring) (groupLeft | groupRight)?;
-on:         ON labelNameList;
+grouping:   (on_ | ignoring) (groupLeft | groupRight)?;
+on_:         ON labelNameList;
 ignoring:   IGNORING labelNameList;
 groupLeft:  GROUP_LEFT labelNameList;
 groupRight: GROUP_RIGHT labelNameList;

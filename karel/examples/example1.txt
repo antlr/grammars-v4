@@ -1,0 +1,17 @@
+BEGINNING-OF-PROGRAM
+
+ DEFINE turnright AS
+ BEGIN
+   turnleft
+   turnleft
+   turnleft
+ END
+
+ BEGINNING-OF-EXECUTION
+   ITERATE 3 TIMES
+     turnright
+
+   turnoff
+ END-OF-EXECUTION
+
+END-OF-PROGRAM

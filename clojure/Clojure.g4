@@ -25,32 +25,32 @@
 
 grammar Clojure;
 
-file: form * EOF;
+file_: form * EOF;
 
 form: literal
-    | list
+    | list_
     | vector
-    | map
+    | map_
     | reader_macro
     ;
 
 forms: form* ;
 
-list: '(' forms ')' ;
+list_: '(' forms ')' ;
 
 vector: '[' forms ']' ;
 
-map: '{' (form form)* '}' ;
+map_: '{' (form form)* '}' ;
 
-set: '#{' forms '}' ;
+set_: '#{' forms '}' ;
 
 reader_macro
-    : lambda
+    : lambda_
     | meta_data
     | regex
     | var_quote
     | host_expr
-    | set
+    | set_
     | tag
     | discard
     | dispatch
@@ -91,12 +91,12 @@ gensym
     : SYMBOL '#'
     ;
 
-lambda
+lambda_
     : '#(' form* ')'
     ;
 
 meta_data
-    : '#^' (map form | form)
+    : '#^' (map_ form | form)
     ;
 
 var_quote
@@ -116,28 +116,28 @@ dispatch
     ;
 
 regex
-    : '#' string
+    : '#' string_
     ;
 
 literal
-    : string
+    : string_
     | number
     | character
-    | nil
+    | nil_
     | BOOLEAN
     | keyword
     | symbol
     | param_name
     ;
 
-string: STRING;
-hex: HEX;
-bin: BIN;
+string_: STRING;
+hex_: HEX;
+bin_: BIN;
 bign: BIGN;
 number
     : FLOAT
-    | hex
-    | bin
+    | hex_
+    | bin_
     | bign
     | LONG
     ;
@@ -151,7 +151,7 @@ named_char: CHAR_NAMED ;
 any_char: CHAR_ANY ;
 u_hex_quad: CHAR_U ;
 
-nil: NIL;
+nil_: NIL;
 
 keyword: macro_keyword | simple_keyword;
 simple_keyword: ':' symbol;

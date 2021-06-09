@@ -63,7 +63,7 @@ predicateObjectList
    ;
 
 objectList
-   : object (',' object)*
+   : object_ (',' object_)*
    ;
 
 verb
@@ -81,7 +81,7 @@ predicate
    : iri
    ;
 
-object
+object_
    : iri
    | BlankNode
    | collection
@@ -100,7 +100,7 @@ blankNodePropertyList
    ;
 
 collection
-   : '(' object* ')'
+   : '(' object_* ')'
    ;
 
 

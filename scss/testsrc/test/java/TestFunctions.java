@@ -26,86 +26,120 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import static com.google.common.truth.Truth.assertThat;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class TestFunctions extends TestBase
-{
+@RunWith(JUnit4.class)
+public class TestFunctions extends TestBase {
   @Test
-  public void testFunction()
-  {
-    //TODO: make it work with parans in the math.
-    //($n - 1) * $gutter-width;
-    String [] lines = {
-        "@function grid-width($n) {",
-        "  @return ($n - 1) * $gutter-width;",
-        "}"
-    };
+  public void testFunction() {
+    String[] lines = {"@function grid-width($n) {", "  @return ($n - 1) * $gutter-width;", "}"};
     ScssParser.FunctionDeclarationContext context = parse(lines).statement(0).functionDeclaration();
-    Assert.assertEquals(context.Identifier().getText(), "grid-width");
-    Assert.assertEquals(context.params().param(0).variableName().getText(), "$n");
+    assertThat(context.FunctionIdentifier().getText()).isEqualTo("grid-width(");
+    assertThat(context.declaredParams().declaredParam(0).variableName().getText()).isEqualTo("$n");
 
     ScssParser.FunctionReturnContext funcContext = context.functionBody().functionReturn();
-    Assert.assertEquals(funcContext.commandStatement().commandStatement().expression(0).getText(), "$n");
-    Assert.assertEquals(funcContext.commandStatement().commandStatement().mathStatement().commandStatement().getText(), "1");
+    assertThat(funcContext.commandStatement().commandStatement().expression().getText())
+        .isEqualTo("$n");
+    assertThat(
+            funcContext
+                .commandStatement()
+                .commandStatement()
+                .mathStatement()
+                .commandStatement()
+                .getText())
+        .isEqualTo("1");
 
-
-    Assert.assertEquals(funcContext.commandStatement().mathStatement().mathCharacter().getText(), "*");
-    Assert.assertEquals(funcContext.commandStatement().mathStatement().commandStatement().getText(), "$gutter-width");
-
-
+    assertThat(funcContext.commandStatement().mathStatement().mathCharacter().getText())
+        .isEqualTo("*");
+    assertThat(funcContext.commandStatement().mathStatement().commandStatement().getText())
+        .isEqualTo("$gutter-width");
   }
 
- @Test
- public void testFunctionMultiLine()
- {
-   //TODO: make it work with parans in the math.
-   //($n - 1) * $gutter-width;
-   String [] lines = {
-       "@function grid-width () {",
-       "  $color: red;",
-       "  @return $color;",
-       "}"
-   };
-   ScssParser.FunctionDeclarationContext context = parse(lines).statement(0).functionDeclaration();
-
-   ScssParser.FunctionStatementContext funcContext = context.functionBody().functionStatement(0);
-   Assert.assertEquals(funcContext.statement().variableDeclaration().variableName().getText(), "$color");
-   Assert.assertEquals(funcContext.statement().variableDeclaration().values().getText(), "red");
-
-
-
-   ScssParser.FunctionReturnContext returnContext = context.functionBody().functionReturn();
-   Assert.assertEquals(returnContext.commandStatement().expression(0).getText(), "$color");
- }
-
   @Test
-  public void testNestedFunctions()
-  {
-    String [] lines = {
-        "@function grid-width ($a) {",
-        "  @function grid-height($b) {",
-        "    @return $color;",
-        "  }",
-        "  @return $world;",
-        "}"
-    };
+  public void testFunctionMultiLine() {
+    String[] lines = {"@function grid-width () {", "  $color: red;", "  @return $color;", "}"};
     ScssParser.FunctionDeclarationContext context = parse(lines).statement(0).functionDeclaration();
-    Assert.assertEquals(context.Identifier().getText(), "grid-width");
-    Assert.assertEquals(context.params().param(0).variableName().getText(), "$a");
 
     ScssParser.FunctionStatementContext funcContext = context.functionBody().functionStatement(0);
-    Assert.assertEquals(funcContext.statement().functionDeclaration().Identifier().getText(), "grid-height");
-    Assert.assertEquals(funcContext.statement().functionDeclaration().params().param(0).variableName().getText(), "$b");
-
-    Assert.assertEquals(funcContext.statement().functionDeclaration().functionBody().functionReturn()
-                            .commandStatement().expression(0).variableName().getText(), "$color");
-
+    assertThat(funcContext.statement().variableDeclaration().variableName().getText())
+        .isEqualTo("$color");
+    assertThat(
+            funcContext
+                .statement()
+                .variableDeclaration()
+                .propertyValue()
+                .commandStatement(0)
+                .getText())
+        .isEqualTo("red");
 
     ScssParser.FunctionReturnContext returnContext = context.functionBody().functionReturn();
-    Assert.assertEquals(returnContext.commandStatement().expression(0).getText(), "$world");
+    assertThat(returnContext.commandStatement().expression().getText()).isEqualTo("$color");
+  }
 
+  @Test
+  public void testNestedFunctions() {
+    String[] lines = {
+      "@function grid-width ($a) {",
+      "  @function grid-height($b) {",
+      "    @return $color;",
+      "  }",
+      "  @return $world;",
+      "}"
+    };
+    ScssParser.FunctionDeclarationContext context = parse(lines).statement(0).functionDeclaration();
+    // With space before the paren
+    assertThat(context.Identifier().getText()).isEqualTo("grid-width");
+    assertThat(context.declaredParams().declaredParam(0).variableName().getText()).isEqualTo("$a");
 
+    ScssParser.FunctionStatementContext funcContext = context.functionBody().functionStatement(0);
+    // Without space before the paren
+    assertThat(funcContext.statement().functionDeclaration().FunctionIdentifier().getText())
+        .isEqualTo("grid-height(");
+    assertThat(
+            funcContext
+                .statement()
+                .functionDeclaration()
+                .declaredParams()
+                .declaredParam(0)
+                .variableName()
+                .getText())
+        .isEqualTo("$b");
+
+    assertThat(
+            funcContext
+                .statement()
+                .functionDeclaration()
+                .functionBody()
+                .functionReturn()
+                .commandStatement()
+                .expression()
+                .variableName()
+                .getText())
+        .isEqualTo("$color");
+
+    ScssParser.FunctionReturnContext returnContext = context.functionBody().functionReturn();
+    assertThat(returnContext.commandStatement().expression().getText()).isEqualTo("$world");
+  }
+
+  @Test
+  public void namespacedFunctionCall() {
+    String[] lines = {"$helvetica: map.deep-merge($helvetica-light, $helvetica-heavy);"};
+
+    ScssParser.StylesheetContext context = parse(lines);
+    ScssParser.FunctionCallContext function =
+        context
+            .statement(0)
+            .variableDeclaration()
+            .propertyValue()
+            .commandStatement(0)
+            .expression()
+            .functionCall();
+    assertThat(function.functionNamespace().getText()).isEqualTo("map.");
+    assertThat(function.functionNamespace().Identifier(0).getText()).isEqualTo("map");
+    assertThat(function.FunctionIdentifier().getText()).isEqualTo("deep-merge(");
   }
 }
