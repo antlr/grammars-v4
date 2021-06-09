@@ -35,7 +35,7 @@ class JavaScriptParserBase(Parser):
         JavaScriptParser = self.parser()
 
         nextTokenType = self._input.LT(1).type
-        return nextTokenType != JavaScriptParser.OpenBrace and nextTokenType != JavaScriptParser.Function
+        return nextTokenType != JavaScriptParser.OpenBrace and nextTokenType != JavaScriptParser.Function_
 
     def closeBrace(self) -> bool:
         JavaScriptParser = self.parser()

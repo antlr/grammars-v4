@@ -77,8 +77,8 @@ RPAREN		: RParen		;
 LBRACK		: LBrack		;
 RBRACK		: RBrack		;
 AT			: At			;
-TRUE		: True			;
-FALSE		: False			;
+TRUE		: True_			;
+FALSE		: False_			;
 ELLIPSIS	: Ellipsis		;
 
 // -----------------------------------

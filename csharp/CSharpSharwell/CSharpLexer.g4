@@ -83,7 +83,7 @@ LONG:          'long';
 NAMEOF:        'nameof';
 NAMESPACE:     'namespace';
 NEW:           'new';
-NULL:          'null';
+NULL_:         'null';
 OBJECT:        'object';
 ON:            'on';
 OPERATOR:      'operator';

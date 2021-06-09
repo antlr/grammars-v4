@@ -125,7 +125,7 @@ fragment BinaryDigit	: [01]			;
 // -----------------------------------
 // Literals
 
-fragment BoolLiteral	: True | False								;
+fragment BoolLiteral	: True_ | False_								;
 
 fragment CharLiteral	: SQuote ( EscSeq | ~['\r\n\\] )  SQuote	;
 fragment SQuoteLiteral	: SQuote ( EscSeq | ~['\r\n\\] )* SQuote	;
@@ -220,8 +220,8 @@ fragment Char			: 'char'	;
 fragment Float			: 'float'	;
 fragment Double 		: 'double'	;
 
-fragment True		 	: 'true'	;
-fragment False			: 'false'	;
+fragment True_		 	: 'true'	;
+fragment False_			: 'false'	;
 
 
 // -----------------------------------

@@ -83,7 +83,7 @@ IN:                       'in';
 INOUT:                    'inout';
 NIL:                      'nil';
 NO:                       'NO';
-NULL:                     'NULL';
+NULL_:                    'NULL';
 ONEWAY:                   'oneway';
 OUT:                      'out';
 PROTOCOL_:                'Protocol';
