@@ -43,7 +43,7 @@ options {
 
 group
 	: delimiters? imports?
-	( template | dict )+
+	( template_ | dict_ )+
 	EOF
 	;
 
@@ -55,7 +55,7 @@ imports
 	: ( IMPORT STRING )+
 	;
 
-template
+template_
 	: ( AT ID DOT ID LPAREN RPAREN
 	  | ID LPAREN formalArgs? RPAREN
 	  )
@@ -80,7 +80,7 @@ formalArg
 			)?
 	;
 
-dict
+dict_
 	: ID TMPL_ASSIGN LBRACK dictPairs RBRACK
 	;
 

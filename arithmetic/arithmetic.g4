@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar arithmetic;
 
-file : equation* EOF;
+file_ : equation* EOF;
 
 equation
    : expression relop expression

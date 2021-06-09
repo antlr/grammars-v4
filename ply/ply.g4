@@ -37,14 +37,14 @@ ply
    ;
 
 header
-   : plydeclaration format (element | property)* end_header
+   : plydeclaration format_ (element | property_)* end_header
    ;
 
 end_header
    : 'end_header' EOL
    ;
 
-format
+format_
    : 'format' 'ascii 1.0' EOL
    ;
 
@@ -52,20 +52,20 @@ element
    : 'element' string number EOL
    ;
 
-property
+property_
    : scalarproperty
    | listproperty
    ;
 
 scalarproperty
-   : 'property' type string EOL
+   : 'property' type_ string EOL
    ;
 
 listproperty
-   : 'property' 'list' type type string EOL
+   : 'property' 'list' type_ type_ string EOL
    ;
 
-type
+type_
    : 'char'
    | 'uchar'
    | 'short'

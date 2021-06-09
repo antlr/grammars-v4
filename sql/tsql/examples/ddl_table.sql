@@ -81,6 +81,11 @@ BEGIN
 END
 GO
 
+-- Drop Columns
+ALTER TABLE dbo.TestTable
+  DROP COLUMN Name, Value
+GO
+
 -- Drop Index Using Fully Qualified Name
 DROP INDEX dbo.TestTable.UIX_TestTable_Name_Value
 GO
@@ -109,3 +114,12 @@ ALTER TABLE dbo.TestTable
   DEFAULT('NONE_' + CONVERT(NVARCHAR(40),NEWID())) 
   FOR Name
 GO
+
+-- Alter Table Switch Partition
+ALTER TABLE Source SWITCH PARTITION 1 TO Target PARTITION 1
+GO
+ALTER TABLE Source SWITCH TO Target PARTITION 1
+GO
+ALTER TABLE Source SWITCH PARTITION 1 TO Target WITH WAIT_AT_LOW_PRIORITY ( MAX_DURATION = 0 minutes, ABORT_AFTER_WAIT = NONE)
+GO
+ALTER TABLE Source SWITCH TO Target PARTITION $PARTITION.PF_TEST_DT( '20121201' )

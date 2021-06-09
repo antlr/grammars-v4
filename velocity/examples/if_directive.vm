@@ -1,0 +1,46 @@
+#if($foo == $bar)#end           ## Exception
+#if ($foo)#end                  ## False
+#if ( ! $foo)#end               ## True
+#if ($foo && $foo.bar)#end      ## False and $foo.bar will not be evaluated
+#if ($foo && $foo == "bar")#end ## False and $foo == "bar" wil not be evaluated
+#if ($foo1 || $foo2)#end        ## False $foo1 and $foo2 are not defined
+
+#if( $foo )
+<strong>Velocity!</strong>
+#end
+
+#if( $foo < 10 )
+**Go North**
+#elseif( $foo == 10 )
+**Go East**
+#elseif( $bar == 6 )
+**Go South**
+#else
+**Go West**
+#end
+
+#set ($foo = "deoxyribonucleic acid")
+#set ($bar = "ribonucleic acid")
+
+#if ($foo == $bar)
+In this case it's clear they aren't equivalent. So...
+#else
+They are not equivalent and this will be the output.
+#end
+
+## logical AND
+#if( $foo && $bar )
+** This AND that**
+#end
+
+## logical OR
+#if( $foo || $bar )
+**This OR That**
+#end
+
+##logical NOT
+#if( !$foo )
+**NOT that**
+#end
+
+#if( $foo == $bar)it's true!#{else}it's not!#end

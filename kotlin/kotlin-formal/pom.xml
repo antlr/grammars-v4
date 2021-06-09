@@ -8,7 +8,6 @@
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>kotlinparent</artifactId>
 		<version>1.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<build>
 		<plugins>
@@ -19,12 +18,15 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-						<include>UnicodeClasses.g4</include>
 						<include>KotlinLexer.g4</include>
 						<include>KotlinParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
+					<arguments>
+					  <argument>-package</argument>
+					  <argument>org.antlr.grammars</argument>
+					</arguments>
 				</configuration>
 				<executions>
 					<execution>
@@ -44,7 +46,7 @@
 					<entryPoint>kotlinFile</entryPoint>
 					<grammarName>Kotlin</grammarName>
 					<caseInsensitive>true</caseInsensitive>
-					<packageName></packageName>
+					<packageName>org.antlr.grammars</packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

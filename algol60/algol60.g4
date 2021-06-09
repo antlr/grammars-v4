@@ -1,534 +1,264 @@
 grammar algol60;
 
-/*
-[The "BSD licence"]
-Copyright (c) 2018 Tom Everett
-All rights reserved.
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-1. Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-3. The name of the author may not be used to endorse or promote products
-derived from this software without specific prior written permission.
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-program
-   : (block | compound_statement) EOF
-   ;
-
-block
-   : (label ':')? block_head compound_tail
-   ;
-
-block_head
-   : 'begin' (declaration ';')+
-   ;
-
-compound_statement
-   : (label ':')? 'begin' compound_tail
-   ;
-
-compound_tail
-   : (statement ';')* statement 'end'
-   ;
-
-declaration
-   : type_declaration
-   | array_declaration
-   | switch_declaration
-   | procedure_declaration
-   ;
-
-type_declaration
-   : local_or_own_type type_list
-   ;
-
-local_or_own_type
-   : 'own'? type
-   ;
-
-type
-   : 'real'
-   | 'integer'
-   | 'boolean'
-   ;
-
-type_list
-   : simple_variable (',' simple_variable)*
-   ;
-
-array_declaration
-   : local_or_own_type? 'array' array_list
-   ;
-
-array_list
-   : array_segment (',' array_segment)*
-   ;
-
-array_segment
-   : (array_identifier ',')* array_identifier bound_pair_list
-   ;
-
-array_identifier
-   : identifier
-   ;
-
-bound_pair_list
-   : bound_pair (',' bound_pair)*
-   ;
-
-bound_pair
-   : lower_bound ':' upper_bound
-   ;
-
-upper_bound
-   : arithmetic_expression
-   ;
-
-lower_bound
-   : arithmetic_expression
-   ;
-
-switch_declaration
-   : 'switch' switch_identifier ':=' switch_list
-   ;
-
-switch_identifier
-   : identifier
-   ;
-
-switch_list
-   : designational_expression (',' designational_expression)*
-   ;
-
-procedure_declaration
-   :  type? 'procedure' procedure_heading procedure_body
-   ;
-
-procedure_heading
-   : procedure_identifier formal_parameter_part? ';' value_part? specification_part?
-   ;
-
-procedure_identifier
-   : identifier
-   ;
-
-formal_parameter_part
-   : formal_parameter_list
-   ;
-
-formal_parameter_list
-   : '(' formal_parameter (parameter_delimiter formal_parameter)* ')'
-   ;
-
-formal_parameter
-   : identifier
-   ;
-
-value_part
-   : 'value' identifier_list ';'
-   ;
-
-specification_part
-   : specifier identifier_list (';' specifier identifier_list)*
-   ;
-
-specifier
-   : STRING
-   | type
-   | type? 'array'
-   | 'label'
-   | 'switch'
-   | type? 'procedure'
-   ;
-
-identifier_list
-   : identifier (',' identifier)*
-   ;
-
-procedure_body
-   : statement
-   ;
-
-statement
-   : unconditional_statement
-   | conditional_statement
-   | for_statement
-   ;
-
-unconditional_statement
-   : basic_statement
-   | compound_statement
-   | block
-   ;
-
-basic_statement
-   : (label ':')* unlabelled_basic_statement?
-   ;
-
-label
-   : identifier
-   | unsigned_integer
-   ;
-
-unlabelled_basic_statement
-   : assignment_statement
-   | go_to_statement
-   | procedure_statement
-   ;
-
-assignment_statement
-   : left_part_list (arithmetic_expression | boolean_expression)
-   ;
-
-left_part_list
-   : left_part+
-   ;
-
-left_part
-   : (variable | procedure_identifier) ':='
-   ;
-
-go_to_statement
-   : 'goto' designational_expression
-   ;
-
-designational_expression
-   : label
-   | switch_designator
-   | if_clause designational_expression 'else' designational_expression
-   ;
-
-switch_designator
-   : switch_identifier subscript_expression?
-   ;
-
-procedure_statement
-   : procedure_identifier actual_parameter_part?
-   ;
-
-actual_parameter_part
-   : actual_parameter_list
-   ;
-
-actual_parameter_list
-   : actual_parameter (parameter_delimiter actual_parameter)*
-   ;
-
-parameter_delimiter
-   : ','
-   | ')' letter_string ':' '('
-   ;
-
-actual_parameter
-   : STRING
-   | expression
-   | array_identifier
-   | switch_identifier
-   | procedure_identifier
-   ;
-
-conditional_statement
-   : (label ':')* ((if_statement ('else' statement)?) | (if_clause for_statement)) 
-   ;
-
-if_statement
-   : if_clause unconditional_statement
-   ;
-
-if_clause
-   : 'if' boolean_expression 'then'
-   ;
-
-for_statement
-   : (label ':')* for_clause statement
-   ;
-
-for_clause
-   : 'for' variable ':=' for_list 'do'
-   ;
-
-for_list
-   : for_list_element (',' for_list_element)*
-   ;
-
-for_list_element
-   : arithmetic_expression?
-   ;
-
-arithmetic_expression
-   : 'step' arithmetic_expression 'until' arithmetic_expression
-   | arithmetic_expression 'while' boolean_expression
-   ;
-
-expression
-   : arithmetic_expression
-   | boolean_expression
-   | designational_expression
-   ;
-
-arithmetic_expression2
-   : simple_arithmetic_expression
-   | if_clause simple_arithmetic_expression 'else' arithmetic_expression
-   ;
-
-simple_arithmetic_expression
-   : adding_operator? term (adding_operator term)*
-   ;
-
-adding_operator
-   : '+'
-   | ' –'
-   ;
-
-term
-   : factor (multiplying_operator factor)*
-   ;
-
-multiplying_operator
-   : '×'
-   | '/'
-   | '÷'
-   ;
-
-factor
-   : primary ('↑' primary)*
-   ;
-
-primary
-   : unsigned_number
-   | variable
-   | function_designator
-   | '(' arithmetic_expression ')'
-   ;
-
-unsigned_number
-   : decimal_number
-   | exponential_part
-   | decimal_number exponential_part
-   ;
-
-decimal_number
-   : unsigned_integer
-   | decimal_fraction
-   | unsigned_integer decimal_fraction
-   ;
-
-unsigned_integer
-   : DIGIT+
-   ;
-
-decimal_fraction
-   : '.' unsigned_integer
-   ;
-
-exponential_part
-   : '10' integer
-   ;
-
-integer
-   : ('+' |'–')? unsigned_integer
-   ;
-
-boolean_expression:
-   if_clause boolean_expression 'else' boolean_expression
-   | boolean_expression '≣' boolean_expression
-   | boolean_expression '⊃' boolean_expression
-   | boolean_expression '⋁' boolean_expression
-   | boolean_expression '⋀' boolean_expression
-   | '¬' boolean_expression
-   | logical_value
-   | variable
-   | function_designator
-   | relation
-   | '(' boolean_expression ')'
-   ;
-
-
-relation
-   : simple_arithmetic_expression relational_operator simple_arithmetic_expression
-   ;
-
-relational_operator
-   : '<'
-   | '≤'
-   | '='
-   | '≠'
-   | '>'
-   | '≥'
-   ;
-
-function_designator
-   : procedure_identifier actual_parameter_part
-   ;
-
-variable
-   : simple_variable
-   | subscripted_variable
-   ;
-
-simple_variable
-   : variable_identifier
-   ;
-
-variable_identifier
-   : identifier
-   ;
-
-subscripted_variable
-   : array_identifier '[' subscript_list ']'
-   ;
-
-subscript_list
-   : subscript_expression (',' subscript_expression)*
-   ;
-
-subscript_expression
-   : arithmetic_expression
-   ;
-
-STRING
-   :  '"' ~ ["\r\n]* '"'
-   ;
-
-open_string
-   : proper_string? STRING (proper_string? STRING)+
-   ;
-
-proper_string
-   : STRING
-   ;
-
-letter_string
-   : LETTER+
-   ;
-
-identifier
-   : LETTER (LETTER | DIGIT)*
-   ;
-
-basic_symbol
-   : LETTER
-   | DIGIT
-   | logical_value
-   | delimiter
-   ;
-
-LETTER
-   : 'a' .. 'z'
-   | 'A' .. 'Z'
-   ;
-
-DIGIT
-   : '0' .. '9'
-   ;
-
-logical_value
-   : 'true'
-   | 'false'
-   ;
-
-delimiter
-   : operator
-   | SEPARATOR
-   | bracket
-   | DECLARATOR
-   | specificator
-   ;
-
-operator
-   : ARITHMETIC_OPERATOR
-   | RELATIONAL_OPERATOR
-   | LOGICAL_OPERATOR
-   | SEQUENTIAL_OPERATOR
-   ;
-
-ARITHMETIC_OPERATOR
-   : '+'
-   | '–'
-   | '×'
-   | '/'
-   | '÷'
-   | '↑'
-   ;
-
-
-RELATIONAL_OPERATOR
-   : '<' | '≤' | '=' | '≠' | '>' | '≥'
-   ;
-
-LOGICAL_OPERATOR
-   : '≣'
-   | '⊃'
-   | '⋁'
-   | '⋀'
-   | '¬'
-   ;
-
-SEQUENTIAL_OPERATOR
-   : 'goto'
-   | 'if'
-   | 'then'
-   | 'else'
-   | 'for'
-   | 'do'
-   ;
-
-SEPARATOR
-   : ','
-   | '.'
-   | '10'
-   | ':'
-   | ';'
-   | ':='
-   | '_'
-   | 'step'
-   | 'until'
-   | 'while'
-   | 'comment'
-   ;
-
-bracket
-   : '('
-   | ')'
-   | '['
-   | ']'
-   | '`'
-   | '\''
-   | 'begin'
-   | 'end'
-   ;
-
-DECLARATOR
-   : 'own'
-   | 'boolean'
-   | 'integer'
-   | 'real'
-   | 'array'
-   | 'switch'
-   | 'procedure'
-   ;
-
-specificator
-   : 'string'
-   | 'label'
-   | 'value'
-   ;
-
-
-WS
-   : [ \r\n\t] + -> skip
-   ;
+// Derived from the authoratitive source ISO 1538
+// You can download a free copy at:
+// http://www.softwarepreservation.org/projects/ALGOL/report/ISO1538.pdf
+
+// The spec, typical for most grammars at the time, do not distinguish
+// BNF between the lexer and parser. The rules are divided here as:
+//
+// TBD
+
+// 1.1
+empty_ : ;
+fragment Basic_symbol : Letter | Digit | Logical_value_f | Delimiter ;
+
+// The alphabet can be extended in any way.
+// If memory serves me, I recall no case sensitivity.
+Array_ : [aA] [rR] [rR] [aA] [yY] ;
+Begin_ : [bB] [eE] [gG] [iI] [nN] ;
+Boolean_ : [bB] [oO] [oO] [lL] [eE] [aA] [nN] ;
+Comment_ : [cC] [oO] [mM] [mM] [eE] [nN] [tT] ;
+Do_ : [dD] [oO] ;
+Else_ : [eE] [lL] [sS] [eE] ;
+End_ : [eE] [nN] [dD] ;
+False_ : [fF] [aA] [lL] [sS] [eE] ;
+For_ : [fF] [oO] [rR] ;
+Goto_ : [gG] [oO] Ws* [tT] [oO] ;
+If_ : [iI] [fF] ;
+Integer_ : [iI] [nN] [tT] [eE] [gG] [eE] [rR] ;
+Label_ : [lL] [aA] [bB] [eE] [lL] ;
+Own_ : [oO] [wW] [nN] ;
+Procedure_ : [pP] [rR] [oO] [cC] [eE] [dD] [uU] [rR] [eE] ;
+Real_ : [rR] [eE] [aA] [lL] ;
+Step_ : [sS] [tT] [eE] [pP] ;
+String_ : [sS] [tT] [rR] [iI] [nN] [gG] ;
+Switch_ : [sS] [wW] [iI] [tT] [cC] [hH] ;
+Then_ : [tT] [hH] [eE] [nN] ;
+True_ : [tT] [rR] [uU] [eE] ;
+Until_ : [uU] [nN] [tT] [iI] [lL] ;
+Value_ : [vV] [aA] [lL] [uU] [eE] ;
+While_ : [wW] [hH] [iI] [lL] [eE] ;
+
+And_ : '⋀' | '&' ; //  '⊃' | ∧ | '⋀' 
+Assign_ : ':=' ;
+Colon_ : ':' ;
+Comma_ : ',' ;
+Dot_ : '.' ;
+Divide_ : '/' | '÷' ;
+Eor_ : '^=' ;
+Eq_ : '=' ;
+Equiv_ : '≡' ;
+Exp_ : '↑' | '^' ;
+Gt_ : '>' ;
+Ge_ : '≥' | '>=' ;
+Includes_ : '⊃' ;
+Lb_ : '[' ;
+Le_ : '<=' | '≤' ;
+LP_ : '(' ;
+Lt_ : '<' ;
+Minus_ : '-' | '–';
+Mult_ : '×' | '*' ;
+Ne_ : '≠' | '!=' ;
+Not_ : '¬' | '!' ;
+Or_ : '⋁' | '|' ;
+Plus_ : '+' ;
+Rb_ : ']' ;
+Rp_ : ')' ;
+Semi_ : ';' ;
+Underscore_ : '_' ;
+
+// 2.1
+fragment Letter : 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' | 
+   'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' 
+   | '_' // an extension.
+   ;
+
+// 2.2.1
+fragment Digit : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
+fragment ULCorner_f : '\u231C' ;
+ULCorner : ULCorner_f ;
+fragment URCorner_f : '\u231D' ;
+URCorner : URCorner_f ;
+
+// 2.2.2
+fragment Logical_value_f : True_ | False_ ;
+Logical_value : Logical_value_f ;
+
+// 2.3
+fragment Delimiter : Operator | Separator | Bracket | Declarator | Specificator ;
+fragment Operator : Arithmetic_operator | Relational_operator_f | Logical_operator | Sequential_operator ;
+fragment Arithmetic_operator : Plus_ | Minus_ | Mult_ | Divide_ | Exp_ ;
+fragment Relational_operator_f : Lt_ | Le_ | Eq_ | Ne_ | Gt_ | Ge_ ;
+Relational_operator : Relational_operator_f ;
+fragment Logical_operator : Equiv_ | Includes_ | Or_ | And_ | Not_ ;
+fragment Sequential_operator : Goto_ | If_ | Then_ | Else_ | For_ | Do_ ;
+fragment Separator : Comma_ | Dot_ | '10' | Colon_ | Semi_ | Assign_ | Underscore_ | Step_ | Until_ | While_ | Comment_ ;
+fragment Bracket : LP_ | Rp_ | Lb_ | Rb_ | '⌈' | '⌝' | Begin_ | End_ ;
+fragment Declarator : Own_ | Boolean_ | Integer_ | Real_ | Array_ | Switch_ | Procedure_ ;
+fragment Specificator : String_ | Label_ | Value_ ;
+// Antlr restriction cannot use ~Semi_.
+Comment : Comment_ (~';')+ Semi_ -> channel(HIDDEN) ;
+
+// 2.4.1
+// rewritten to avoid MLR.
+Identifier : (Letter | Digit)+ ;
+
+// 2.5.1
+// rewritten to avoid MLR.
+Unsigned_integer : Digit+ ;
+integer : Unsigned_integer | Plus_ Unsigned_integer | Minus_ Unsigned_integer ;
+Decimal_fraction : Dot_ Unsigned_integer ;
+// unfold
+Exponential_part : '10' (Unsigned_integer | Plus_ Unsigned_integer | Minus_ Unsigned_integer) ;
+Decimal_number : Unsigned_integer | Decimal_fraction | Unsigned_integer Decimal_fraction ;
+Unsigned_number : Decimal_number | Exponential_part | Decimal_number Exponential_part ;
+number : Unsigned_number | Plus_ Unsigned_number | Minus_ Unsigned_number ;
+
+// 2.6.1
+fragment Proper_string : (~('\u231C' | '\u231D'))* ;
+fragment Open_string : Proper_string | Proper_string Closed_string Open_string ;
+fragment Closed_string : ULCorner Open_string URCorner ;
+fragment StdString : Closed_string | Closed_string StdString ;
+String : StdString // String according to spec.
+   | '"' ~'"'* '"' | '`' ~'\''* '\'' ; // Additional non-standard strings used in examples.
+
+// 3
+expression : arithmetic_expression | boolean_expression | designational_expression ;
+
+// 3.1
+variable_identifier : Identifier ;
+simple_variable : variable_identifier ;
+subscript_expression : arithmetic_expression ;
+subscript_list : subscript_expression | subscript_list Comma_ subscript_expression ;
+array_identifier : Identifier ;
+subscripted_variable : array_identifier Lb_ subscript_list Rb_ ;
+variable : simple_variable | subscripted_variable ;
+
+// 3.2.1
+procedure_identifier : Identifier ;
+// The following rules replaced because there is no context sensitive lexing.
+//letter_string : letter | letter_string letter ;
+//parameter_delimiter : Comma_ | Rp_ letter_string Colon_ LP_ ;
+parameter_delimiter : Comma_ | Rp_ Identifier Colon_ LP_ ;
+actual_parameter : String | expression | array_identifier | switch_identifier | procedure_identifier ;
+actual_parameter_list : actual_parameter | actual_parameter_list parameter_delimiter actual_parameter ;
+function_designator : procedure_identifier actual_parameter_part ;
+
+// 3.3.1
+adding_operator : Plus_ | Minus_ ;
+multiplying_operator : Mult_ | Divide_ ;
+primary : Unsigned_number | variable | function_designator | LP_ arithmetic_expression Rp_ ;
+factor : primary | factor Exp_ primary ;
+term : factor | term multiplying_operator factor ;
+simple_arithmetic_expression : term
+  | adding_operator term
+  | simple_arithmetic_expression adding_operator term ;
+if_clause : If_ boolean_expression Then_ ;
+arithmetic_expression : simple_arithmetic_expression | if_clause simple_arithmetic_expression Else_ arithmetic_expression ;
+
+// 3.4.1
+// dup relational_operator.
+relation : simple_arithmetic_expression Relational_operator simple_arithmetic_expression ;
+boolean_primary : Logical_value | variable | function_designator | relation | LP_ boolean_expression Rp_ ;
+boolean_secondary : boolean_primary | Not_ boolean_primary ;
+boolean_factor : boolean_secondary | boolean_factor And_ boolean_secondary ;
+boolean_term : boolean_factor | boolean_term Or_ boolean_factor ;
+implication : boolean_term | implication Includes_ boolean_term ;
+simple_boolean : implication | simple_boolean Equiv_ implication ;
+boolean_expression : simple_boolean | if_clause simple_boolean Else_ boolean_expression ;
+
+// 3.5.1
+label : Identifier | Unsigned_integer ;
+switch_identifier : Identifier ;
+switch_designator : switch_identifier Lb_ subscript_expression Rb_ ;
+simple_designational_expression : label | switch_designator | LP_ designational_expression Rp_ ;
+designational_expression : simple_designational_expression | if_clause simple_designational_expression Else_ designational_expression ;
+
+// 4.1.1
+unlabelled_basic_statement : assignment_statement | go_to_statement | dummy_statement | procedure_statement ;
+basic_statement : unlabelled_basic_statement | label Colon_ basic_statement ;
+unconditional_statement : basic_statement | compound_statement | block ;
+statement : unconditional_statement | conditional_statement | for_statement ;
+compound_tail : statement End_ | statement Semi_ compound_tail ;
+block_head : Begin_ declaration | block_head Semi_ declaration ;
+unlabelled_compound : Begin_ compound_tail ;
+unlabelled_block : block_head Semi_ compound_tail ;
+compound_statement : unlabelled_compound | label Colon_ compound_statement ;
+block : unlabelled_block | label Colon_ block ;
+program : (block | compound_statement) EOF ;
+
+// 4.2.1
+destination : variable | procedure_identifier ;
+left_part : variable Assign_ | procedure_identifier Assign_ ;
+left_part_list : left_part | left_part_list left_part ;
+assignment_statement : left_part_list arithmetic_expression | left_part_list boolean_expression ;
+
+// 4.3.1
+go_to_statement : Goto_ designational_expression ;
+
+// 4.4.1
+dummy_statement : empty_ ;
+
+// 4.5.1
+// dup if_clause
+// dup unconditional statement
+if_statement : if_clause unconditional_statement ;
+conditional_statement : if_statement | if_statement Else_ statement | if_clause for_statement | label Colon_ conditional_statement ;
+
+// 4.6.1
+for_list_element : arithmetic_expression
+  | arithmetic_expression Step_ arithmetic_expression Until_ arithmetic_expression
+  | arithmetic_expression While_ boolean_expression ;
+for_list : for_list_element | for_list Comma_ for_list_element ;
+for_clause : For_ variable Assign_ for_list Do_ ;
+for_statement : for_clause statement | label Colon_ for_statement ;
+
+// 4.7.1
+// dup actual_parameter
+// dup letter_string
+// dup parameter_delimiter
+// dup actual_parameter_list
+actual_parameter_part : empty_ | LP_ actual_parameter_list Rp_ ;
+procedure_statement : procedure_identifier actual_parameter_part ;
+
+// 4.7.8
+code : .* ; // match anything.
+
+// 5
+declaration : type_declaration | array_declaration | switch_declaration | procedure_declaration ;
+
+// 5.1.1
+type_list : simple_variable | simple_variable Comma_ type_list ;
+type_ : Real_ | Integer_ | Boolean_ ;
+local_or_own : empty_ | Own_ ;
+type_declaration : local_or_own type_ type_list ;
+
+// 5.2.1
+lower_bound : arithmetic_expression ;
+upper_bound : arithmetic_expression ;
+bound_pair : lower_bound Colon_ upper_bound ;
+bound_pair_list : bound_pair | bound_pair_list Comma_ bound_pair ;
+array_segment : array_identifier Lb_ bound_pair_list Rb_ | array_identifier Comma_ array_segment ;
+array_list : array_segment | array_list Comma_ array_segment ;
+array_declarer : type_ Array_ | Array_ ;
+array_declaration : local_or_own array_declarer array_list ;
+
+// 5.3.1
+switch_list : designational_expression | switch_list Comma_ designational_expression ;
+switch_declaration : Switch_ switch_identifier Assign_ switch_list ;
+
+// 5.4.1
+formal_parameter : Identifier ;
+formal_parameter_list : formal_parameter | formal_parameter_list parameter_delimiter formal_parameter ;
+formal_parameter_part : empty_ | LP_ formal_parameter_list Rp_ ;
+identifier_list : Identifier | identifier_list Comma_ Identifier ;
+value_part : Value_ identifier_list Semi_ | empty_ ;
+specifier : String_ | type_ | Array_ | type_ Array_ | Label_ | Switch_ | Procedure_ | type_ Procedure_ ;
+specification_part : empty_ | specifier identifier_list Semi_ | specification_part specifier identifier_list ;
+procedure_heading : procedure_identifier formal_parameter_part Semi_ value_part specification_part ;
+procedure_body : statement | code ;
+procedure_declaration : Procedure_ procedure_heading procedure_body | type_ Procedure_ procedure_heading procedure_body ;
+
+WS : Ws -> channel(HIDDEN) ;
+fragment Ws : [ \r\n\t]+ ;

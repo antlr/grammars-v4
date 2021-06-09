@@ -31,8 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar terraform;
 
-file
-   : (local | module | output | provider | variable | data | resource)+
+file_
+   : (local | module | output | provider | variable | data | resource | terraform)+
+   ;
+
+terraform
+   : 'terraform' blockbody
    ;
 
 resource
@@ -44,7 +48,7 @@ data
    ;
 
 provider
-  : 'provider' resourcetype blockbody
+  : PROVIDER resourcetype blockbody
   ;
 
 output
@@ -60,7 +64,7 @@ module
   ;
 
 variable
-   : 'variable' name blockbody
+   : VARIABLE name blockbody
    ;
 
 block
@@ -84,7 +88,7 @@ label
    ;
 
 blockbody
-   : '{' (argument | block)* '}'
+   : LCURL (argument | block)* RCURL
    ;
 
 argument
@@ -92,36 +96,43 @@ argument
    ;
 
 identifier
-   : IDENTIFIER
+   : (('local' | 'data' | 'var' | 'module') DOT)? identifierchain
+   ;
+
+identifierchain
+   : (IDENTIFIER | IN | VARIABLE | PROVIDER) index? (DOT identifierchain)*
+   | STAR (DOT identifierchain)*
+   | inline_index (DOT identifierchain)*
+   ;
+
+inline_index
+   : NATURAL_NUMBER
    ;
 
 expression
-   : RESOURCEREFERENCE
-   | section
-   | expression OPERATOR expression
+   : section
+   | expression operator_ expression
    | LPAREN expression RPAREN
+   | expression '?' expression ':' expression
+   | forloop
    ;
 
-RESOURCEREFERENCE
-   : [a-zA-Z] [a-zA-Z0-9_-]* RESOURCEINDEX? '.' ([a-zA-Z0-9_.-] RESOURCEINDEX?)+ 
-   ;
-
-RESOURCEINDEX
-   : '[' [0-9]+ ']'
+forloop
+   : 'for' identifier IN expression ':' expression
    ;
 
 section
-   : list
-   | map
+   : list_
+   | map_
    | val
    ;
 
 val
-   : NULL
-   | SIGNED_NUMBER
+   : NULL_
+   | signed_number
    | string
+   | identifier
    | BOOL
-   | IDENTIFIER index?
    | DESCRIPTION
    | filedecl
    | functioncall
@@ -130,6 +141,7 @@ val
 
 functioncall
    : functionname LPAREN functionarguments RPAREN
+   | 'jsonencode' LPAREN (.)*? RPAREN
    ;
 
 functionname
@@ -149,12 +161,12 @@ filedecl
    : 'file' '(' expression ')'
    ;
 
-list
-   : '[' expression (',' expression)* ','? ']'
+list_
+   : '[' (expression (',' expression)* ','?)? ']'
    ;
 
-map
-   : '{' argument* '}'
+map_
+   : LCURL (argument ','?)* RCURL
    ;
 
 string
@@ -166,15 +178,33 @@ fragment DIGIT
    : [0-9]
    ;
 
-SIGNED_NUMBER
-   : '+' NUMBER
-   | '-' NUMBER
-   | NUMBER
+signed_number
+   : ('+' | '-')? number
    ;
 
-OPERATOR
+VARIABLE
+   : 'variable'
+   ;
+
+PROVIDER
+   : 'provider'
+   ;
+
+IN
+   : 'in'
+   ;
+
+STAR
    : '*'
-   | '/'
+   ;
+
+DOT
+   : '.'
+   ;
+
+operator_
+   : '/'
+   | STAR
    | '%'
    | '+'
    | '-'
@@ -186,6 +216,14 @@ OPERATOR
    | '!='
    | '&&'
    | '||'
+   ;
+
+LCURL
+   : '{'
+   ;
+
+RCURL
+   : '}'
    ;
 
 LPAREN
@@ -200,12 +238,16 @@ EOF_
    : '<<EOF' .*? 'EOF'
    ;
 
-NULL
+NULL_
    : 'nul'
    ;
 
-NUMBER
-   : DIGIT+ ('.' DIGIT+)?
+NATURAL_NUMBER
+   : DIGIT+
+   ;
+
+number
+   : NATURAL_NUMBER (DOT NATURAL_NUMBER)?
    ;
 
 BOOL
@@ -222,7 +264,7 @@ MULTILINESTRING
    ;
 
 STRING
-   : '"' (~ [\r\n"] | '""')* '"'
+   : '"' ( '\\"' | ~["\r\n] )* '"'
    ;
 
 IDENTIFIER

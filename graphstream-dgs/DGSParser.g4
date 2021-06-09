@@ -59,9 +59,9 @@ cl : CL;
 attributes : attribute*;
 attribute : (PLUS|MINUS)? identifier ( assign value ( COMMA value )* )? ;
 
-value : STRING | INT| REAL | COLOR | array | a_map | identifier;
+value : STRING | INT| REAL | COLOR | array_ | a_map | identifier;
 
-array : LBRACE ( value ( COMMA value )* )? RBRACE;
+array_ : LBRACE ( value ( COMMA value )* )? RBRACE;
 a_map : LBRACK ( mapping ( COMMA mapping )* )? RBRACK;
 mapping : identifier assign value;
 direction : LANGLE | RANGLE ;

@@ -74,7 +74,7 @@ memory_type
   ;
 
 type_use
-  : LPAR TYPE var RPAR
+  : LPAR TYPE var_ RPAR
   ;
 
 /* Immediates */
@@ -83,7 +83,7 @@ literal
   : NAT | INT | FLOAT
   ;
 
-var
+var_
   : NAT | VAR
   ;
 
@@ -105,16 +105,16 @@ plain_instr
   | NOP
   | DROP
   | SELECT
-  | BR var
-  | BR_IF var
-  | BR_TABLE var+
+  | BR var_
+  | BR_IF var_
+  | BR_TABLE var_+
   | RETURN
-  | CALL var
-  | LOCAL_GET var
-  | LOCAL_SET var
-  | LOCAL_TEE var
-  | GLOBAL_GET var
-  | GLOBAL_SET var
+  | CALL var_
+  | LOCAL_GET var_
+  | LOCAL_SET var_
+  | LOCAL_TEE var_
+  | GLOBAL_GET var_
+  | GLOBAL_SET var_
   | LOAD OFFSET_EQ_NAT? ALIGN_EQ_NAT?
   | STORE OFFSET_EQ_NAT? ALIGN_EQ_NAT?
   | MEMORY_SIZE
@@ -199,7 +199,7 @@ const_expr
 
 /* Functions */
 
-func
+func_
   : LPAR FUNC bind_var? func_fields RPAR
   ;
 
@@ -237,7 +237,7 @@ offset
   ;
 
 elem
-  : LPAR ELEM var? offset var* RPAR
+  : LPAR ELEM var_? offset var_* RPAR
   ;
 
 table
@@ -248,11 +248,11 @@ table_fields
   : table_type
   | inline_import table_type
   | inline_export table_fields
-  | elem_type LPAR ELEM var* RPAR
+  | elem_type LPAR ELEM var_* RPAR
   ;
 
 data
-  : LPAR DATA var? offset STRING* RPAR
+  : LPAR DATA var_? offset STRING* RPAR
   ;
 
 memory
@@ -295,13 +295,13 @@ inline_import
   ;
 
 export_desc
-  : LPAR FUNC var RPAR
-  | LPAR TABLE var RPAR
-  | LPAR MEMORY var RPAR
-  | LPAR GLOBAL var RPAR
+  : LPAR FUNC var_ RPAR
+  | LPAR TABLE var_ RPAR
+  | LPAR MEMORY var_ RPAR
+  | LPAR GLOBAL var_ RPAR
   ;
 
-export
+export_
   : LPAR EXPORT name export_desc RPAR
   ;
 
@@ -320,7 +320,7 @@ type_def
   ;
 
 start
-  : LPAR START var RPAR
+  : LPAR START var_ RPAR
   ;
 
 module_field
@@ -328,12 +328,12 @@ module_field
   | sglobal
   | table
   | memory
-  | func
+  | func_
   | elem
   | data
   | start
   | simport
-  | export
+  | export_
   ;
 
 module_

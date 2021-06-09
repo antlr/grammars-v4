@@ -26,61 +26,52 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import static com.google.common.truth.Truth.assertThat;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class TestImports extends TestBase
-{
+@RunWith(JUnit4.class)
+public class TestImports extends TestBase {
   @Test
-  public void testImport()
-  {
+  public void testImport() {
     ScssParser.ReferenceUrlContext context = parseImport("@import \"hello\";");
-    Assert.assertEquals(context.StringLiteral().getText(), "\"hello\"");
+    assertThat(context.StringLiteral().getText()).isEqualTo("\"hello\"");
   }
 
   @Test
-  public void testImportUrlString()
-  {
+  public void testImportUrlString() {
     ScssParser.ReferenceUrlContext context = parseImport("@import url(\"hello\");");
-    Assert.assertEquals(context.Url().getText(), "\"hello\"");
+    assertThat(context.Url().getText()).isEqualTo("\"hello\"");
   }
 
   @Test
-  public void testImportUrlNonStrings()
-  {
+  public void testImportUrlNonStrings() {
     ScssParser.ReferenceUrlContext context = parseImport("@import url(hello);");
-    Assert.assertEquals(context.Url().getText(), "hello");
+    assertThat(context.Url().getText()).isEqualTo("hello");
   }
 
   @Test
-  public void testImportUrlNonStringsSpace()
-  {
+  public void testImportUrlNonStringsSpace() {
     ScssParser.ReferenceUrlContext context = parseImport("@import url(hello world);");
-    Assert.assertEquals(context.Url().getText(), "hello world");
+    assertThat(context.Url().getText()).isEqualTo("hello world");
   }
 
   @Test
-  public void testMultipleImports()
-  {
-    String [] lines = {
-        "@import url(hello world);",
-        "@import url(\"foobar\");",
-        "@import \"hi\";"
+  public void testMultipleImports() {
+    String[] lines = {"@import url(hello world);", "@import url(\"foobar\");", "@import \"hi\";"};
 
-    };
     ScssParser.StylesheetContext context = parse(lines);
-    Assert.assertEquals(context.statement(0).importDeclaration()
-                            .referenceUrl().Url().getText(), "hello world");
-    Assert.assertEquals(context.statement(1).importDeclaration()
-                            .referenceUrl().Url().getText(), "\"foobar\"");
-    Assert.assertEquals(context.statement(2).importDeclaration()
-                            .referenceUrl().StringLiteral().getText(), "\"hi\"");
+    assertThat(context.statement(0).importDeclaration().referenceUrl().Url().getText())
+        .isEqualTo("hello world");
+    assertThat(context.statement(1).importDeclaration().referenceUrl().Url().getText())
+        .isEqualTo("\"foobar\"");
+    assertThat(context.statement(2).importDeclaration().referenceUrl().StringLiteral().getText())
+        .isEqualTo("\"hi\"");
   }
 
-
-  private ScssParser.ReferenceUrlContext parseImport(String ... lines)
-  {
+  private ScssParser.ReferenceUrlContext parseImport(String... lines) {
     ScssParser.StylesheetContext context = parse(lines);
     return context.statement(0).importDeclaration().referenceUrl();
   }

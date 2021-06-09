@@ -218,7 +218,7 @@ NOT: N O T;
 
 NOTHING: N O T H I N G;
 
-NULL: N U L L;
+NULL_: N U L L;
 
 OBJECT: O B J E C T;
 

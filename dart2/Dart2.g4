@@ -184,9 +184,9 @@ staticFinalDeclaration
 
 // 10.1.1 Operators
 operatorSignature
-  : returnType? 'operator' operator formalParameterList
+  : returnType? 'operator' operator_ formalParameterList
   ;
-operator
+operator_
   : '~' | binaryOperator | '[]' | '[]='
   ;
 
@@ -400,7 +400,7 @@ stringInterpolation
 
 // 16.6 Symbols
 symbolLiteral
-  : '#' (operator | (identifier (',' identifier)*))
+  : '#' (operator_ | (identifier (',' identifier)*))
   ;
 // 16.7 Lists
 listLiteral

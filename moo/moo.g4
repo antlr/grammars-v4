@@ -78,7 +78,7 @@ verbname
    ;
 
 propertydecl
-   : ('@property' | '@prop') property '='? expression? permissions?
+   : ('@property' | '@prop') property_ '='? expression? permissions?
    ;
 
 rmpropertydecl
@@ -86,11 +86,11 @@ rmpropertydecl
    ;
 
 setpropertydecl
-   : '@set' property 'to' expression
+   : '@set' property_ 'to' expression
    ;
 
 displaypropertydecl
-   : ('@display' | '@disp') property
+   : ('@display' | '@disp') property_
    ;
 
 kidsdecl
@@ -102,7 +102,7 @@ parentdecl
    ;
 
 describedecl
-   : '@describe' property 'as' expression
+   : '@describe' property_ 'as' expression
    ;
 
 contentsdecl
@@ -110,7 +110,7 @@ contentsdecl
    ;
 
 noteditdecl
-   : '@notedit' property
+   : '@notedit' property_
    ;
 
 createdecl
@@ -118,7 +118,7 @@ createdecl
    ;
 
 editdecl
-   : '@edit' property
+   : '@edit' property_
    ;
 
 addaliasdecl
@@ -152,11 +152,11 @@ forblock
    ;
 
 tryblock
-   : 'try' statement + 'except' property statement + 'endtry'
+   : 'try' statement + 'except' property_ statement + 'endtry'
    ;
 
 assignblock
-   : property ASSIGN expression SEMICOLON
+   : property_ ASSIGN expression SEMICOLON
    ;
 
 condition
@@ -200,10 +200,10 @@ atom
    : stringliteral
    | functioninvocation
    | verbinvocation
-   | property
+   | property_
    | integer
    | real
-   | list
+   | list_
    | objref
    | '(' expression ')'
    | ('!' expression)
@@ -227,14 +227,14 @@ returncommand
    ;
 
 verbinvocation
-   : property ':' verb
+   : property_ ':' verb
    ;
 
 verb
    : name ('(' expressionlist? ')')?
    ;
 
-property
+property_
    : propertyname (('.' name) | '[' expression ']')*
    ;
 
@@ -243,7 +243,7 @@ propertyname
    | stringliteral
    ;
 
-list
+list_
    : '{' expressionlist? '}'
    ;
 

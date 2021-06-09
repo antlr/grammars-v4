@@ -126,7 +126,7 @@ sortByClause
     ;
 
 // fun(par1, par2, par3)
-function
+function_
     : functionName
     LPAREN
       (
@@ -278,7 +278,7 @@ atomExpression
     | caseExpression
     | whenExpression
     | subQueryExpression
-    | function
+    | function_
     | tableOrColumn
     | expressionsInParenthesis
     ;
