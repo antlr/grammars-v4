@@ -168,7 +168,7 @@ flowStmt
     ;
 
 assignmentStmt
-    : subscription ('='|'+='|'-='|'*='|'/='|'%='|'&='|'|='|'^=') expression stmtEnd
+    : expression ('='|'+='|'-='|'*='|'/='|'%='|'&='|'|='|'^=') expression stmtEnd
     ;
 varDeclStmt
     : 'var' IDENTIFIER ('=' expression)? stmtEnd
@@ -183,85 +183,41 @@ yieldStmt
 preloadStmt
     : 'preload' '(' CONSTANT ')'
     ;
-// This expression grammar encodes precedence. Items later in the list have
-// higher precedence than the ones before.
+
 exprStmt
     : expression stmtEnd
     ;
 expression
-    : cast ('[' expression ']')?
-    ;
-cast
-    : ternaryExpr ('as' typeHint)?
-    ;
-ternaryExpr
-    : logicOr ('if' logicOr 'else' logicOr)?
-    ;
-logicOr
-    : logicAnd (('or' | '||') logicAnd)*
-    ;
-logicAnd
-    : logicNot (('and' | '&&') logicNot)*
-    ;
-logicNot
-    : ('!' | 'not') logicNot | in
-    ;
-in
-    : comparison ('in' comparison)*
-    ;
-comparison
-    : bitOr (('<' | '>' | '<=' | '>=' | '==' | '!=' )bitOr)*
-    ;
-bitOr
-    : bitXor ('|' bitXor)*
-    ;
-bitXor
-    : bitAnd ('^' bitAnd)*
-    ;
-bitAnd
-    : bitShift ('&' bitShift)*
-    ;
-bitShift
-    : minus (('<<'|'>>')minus)*
-    ;
-minus
-    : plus ('-' plus)*
-    ;
-plus
-    : factor ('+' factor)*
-    ;
-factor
-    : sign (('*'|'/'|'%') sign)*
-    ;
-sign
-    : ('-'|'+') sign | bitNot
-    ;
-bitNot
-    : '~' bitNot | is
-    ;
-is
-    : call ('is' (IDENTIFIER | BUILTINTYPE))?
-    ;
-call
-    : attribute ( '(' argList? ')')?
-    | '.' IDENTIFIER ( '(' argList? ')')?
-    | getNode
-    ;
-attribute
-    : subscription ('.' IDENTIFIER)*
-    ;
-subscription
-    : primary ('[' expression ']')?
-    ;
-primary
-    : 'true'
-    | 'false'
-    | 'null'
-    | 'self'
-    | literal
-    | arrayDecl
-    | dictDecl
-    | '(' expression ')'
+    : expression '[' expression ']' #subscription
+    | expression 'as' typeHint #cast
+    | expression 'if' expression 'else' expression #ternacyExpr
+    | expression ('or'|'||')expression #logicOr
+    | expression ('and'|'&&')expression #logicAnd
+    | ('!'|'not') expression #logicNot
+    | expression 'in' expression #in
+    | expression ('<' | '>' | '<=' | '>=' | '==' | '!=' ) expression #comparison
+    | expression '|' expression #bitOr
+    | expression '^' expression #bitXor
+    | expression '&' expression #bitAnd
+    | expression ('<<'|'>>') expression #bitShift
+    | expression '-' expression #minus
+    | expression '+' expression #plus
+    | expression ('*'|'/'|'%') expression #factor
+    | ('-'|'+') expression #sign
+    | '~' expression #bitNot
+    | expression 'is' (IDENTIFIER|BUILTINTYPE) #is
+    | expression '(' argList? ')' #call
+    | '.' IDENTIFIER '(' argList? ')' #call
+    | '$' (STRING | IDENTIFIER ('/' IDENTIFIER)*) #getNode
+    | expression '.' IDENTIFIER #attribute
+    | 'true' #primary
+    | 'false' #primary
+    | 'null' #primary
+    | 'self' #primary
+    | literal #primary
+    | '[' (expression (',' expression)*)? ']' #arrayDecl
+    | '{' (keyValue (',' keyValue)*)? '}' #dictDecl
+    | '(' expression ')' #primary
     ;
 
 literal
@@ -272,17 +228,8 @@ literal
     | BUILTINTYPE
     | CONSTANT
     ;
-arrayDecl
-    : '[' (expression (',' expression)*)? ']'
-    ;
-dictDecl
-    : '{' (keyValue (',' keyValue)*)? '}'
-    ;
+    
 keyValue
     : expression ':' expression
     | IDENTIFIER '=' expression
-    ;
-
-getNode
-    : '$' (STRING | IDENTIFIER ('/' IDENTIFIER)*)
     ;
