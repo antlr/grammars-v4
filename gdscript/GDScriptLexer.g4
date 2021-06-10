@@ -1,9 +1,13 @@
-lexer grammar GDScriptLexer;
+lexer grammar GDScriptLexer
+	;
 
-tokens { INDENT, DEDENT }
+tokens {
+	INDENT,
+	DEDENT
+}
 
 options {
-    superClass=GDScriptLexerBase;
+	superClass = GDScriptLexerBase;
 }
 
 EXTENDS: 'extends';
@@ -51,82 +55,83 @@ SELF: 'self';
 TOOL: 'tool';
 
 NEWLINE
-    :
-    (
-        {atStartOfInput()}? SPACE
-        | ( '\r'? '\n' | '\r' | '\f' ) SPACE?
-    ) {onNewLine();}
-    ;
+	: (
+		{atStartOfInput()}? SPACE
+		| ( '\r'? '\n' | '\r' | '\f') SPACE?
+	) {onNewLine();}
+	;
 
-IDENTIFIER: [_a-zA-Z][_0-9a-zA-Z]*;
+IDENTIFIER
+	: [_a-zA-Z][_0-9a-zA-Z]*
+	;
 BUILTINTYPE
-    : 'bool'
-    | 'int'
-    | 'float'
-    | 'String'
-    | 'Vector2'
-    | 'Vector2i'
-    | 'Rect2'
-    | 'Rect2i'
-    | 'Transform2D'
-    | 'Vector3'
-    | 'Vector3i'
-    | 'AABB'
-    | 'Plane'
-    | 'Quat'
-    | 'Basis'
-    | 'Transform'
-    | 'Color'
-    | 'RID'
-    | 'Object'
-    | 'StringName'
-    | 'NodePath'
-    | 'Dictionary'
-    | 'Callable'
-    | 'Signal'
-    | 'Array'
-    | 'PackedByteArray'
-    | 'PackedInt32Array'
-    | 'PackedInt64Array'
-    | 'PackedFloat32Array'
-    | 'PackedFloat64Array'
-    | 'PackedStringArray'
-    | 'PackedVector2Array'
-    | 'PackedVector3Array'
-    | 'PackedColorArray'
-    ;
+	: 'bool'
+	| 'int'
+	| 'float'
+	| 'String'
+	| 'Vector2'
+	| 'Vector2i'
+	| 'Rect2'
+	| 'Rect2i'
+	| 'Transform2D'
+	| 'Vector3'
+	| 'Vector3i'
+	| 'AABB'
+	| 'Plane'
+	| 'Quat'
+	| 'Basis'
+	| 'Transform'
+	| 'Color'
+	| 'RID'
+	| 'Object'
+	| 'StringName'
+	| 'NodePath'
+	| 'Dictionary'
+	| 'Callable'
+	| 'Signal'
+	| 'Array'
+	| 'PackedByteArray'
+	| 'PackedInt32Array'
+	| 'PackedInt64Array'
+	| 'PackedFloat32Array'
+	| 'PackedFloat64Array'
+	| 'PackedStringArray'
+	| 'PackedVector2Array'
+	| 'PackedVector3Array'
+	| 'PackedColorArray'
+	;
 CONSTANT // TODO: really?
-    : 'PI'
-    | 'TAU'
-    | 'INF'
-    | 'NAN'
-    ;
+	: 'PI'
+	| 'TAU'
+	| 'INF'
+	| 'NAN'
+	;
 
 STRING
-    : '"' STRING_CONTENT* '"'
-    | '\'' STRING_CONTENT* '\''
-    ;
+	: '"' STRING_CONTENT* '"'
+	| '\'' STRING_CONTENT* '\''
+	;
 fragment STRING_CONTENT
-    : ~[\\\r\n'"]
-    | '\\' [abfnrtv'"\\]
-    | '\\u' HEX HEX HEX HEX
-    ;
+	: ~[\\\r\n'"]
+	| '\\' [abfnrtv'"\\]
+	| '\\u' HEX HEX HEX HEX
+	;
 
 INTEGER
-    : '0' [xX] HEX+
-    | DEC+
-    | '0' [bB] [01]+
-    ;
+	: '0' [xX] HEX+
+	| DEC+
+	| '0' [bB] [01]+
+	;
 fragment DEC
-    : [0-9]
-    ;
+	: [0-9]
+	;
 fragment HEX
-    : [0-9a-fA-F]
-    ;
+	: [0-9a-fA-F]
+	;
 FLOAT
-    : DEC? '.' DEC ([eE] [+-] DEC)?
-    | DEC [eE] [+-] DEC
-    ;
+	: DEC? '.' DEC ([eE] [+-] DEC)?
+	| DEC [eE] [+-] DEC
+	;
 
 DOT: '.';
 COMMA: ',';
@@ -134,13 +139,13 @@ COLON: ':';
 ASSIGN: '=';
 COLON_ASSIGN: ':=';
 ADD_ASSIGN: '+=';
-MINUS_ASSIGN : '-=';
-MUL_ASSIGN : '*=';
-DIV_ASSIGN : '/=';
-MOD_ASSIGN : '%=';
-AND_ASSIGN : '&=';
-OR_ASSIGN : '|=';
-XOR_ASSIGN : '^=';
+MINUS_ASSIGN: '-=';
+MUL_ASSIGN: '*=';
+DIV_ASSIGN: '/=';
+MOD_ASSIGN: '%=';
+AND_ASSIGN: '&=';
+OR_ASSIGN: '|=';
+XOR_ASSIGN: '^=';
 OPEN_PAREN: '(' {openBrace();};
 CLOSE_PAREN: ')' {closeBrace();};
 OPEN_BRACE: '{' {openBrace();};
@@ -160,31 +165,31 @@ EQUALS: '==';
 GT_EQ: '>=';
 LT_EQ: '<=';
 NOT_EQ: '!=';
-OR_OP : '|';
-XOR : '^';
-AND_OP : '&';
-LEFT_SHIFT : '<<';
-RIGHT_SHIFT : '>>';
-ADD : '+';
-MINUS : '-';
-STAR : '*';
-DIV : '/';
-MOD : '%';
-NOT_OP : '~';
-DOLLAR : '$';
+OR_OP: '|';
+XOR: '^';
+AND_OP: '&';
+LEFT_SHIFT: '<<';
+RIGHT_SHIFT: '>>';
+ADD: '+';
+MINUS: '-';
+STAR: '*';
+DIV: '/';
+MOD: '%';
+NOT_OP: '~';
+DOLLAR: '$';
 
 SKIP_
-    : ( SPACE | COMMENT | LINE_JOINING ) -> skip
-    ;
+	: (SPACE | COMMENT | LINE_JOINING) -> skip
+	;
 
 fragment SPACE
-    : [ \t]+
-    ;
+	: [ \t]+
+	;
 
 fragment COMMENT
-    : '#' ~[\r\n]*
-    ;
+	: '#' ~[\r\n]*
+	;
 
 fragment LINE_JOINING
-    : '\\' SPACE? ('\r\n'|[\r\n])
-    ;
+	: '\\' SPACE? ('\r\n' | [\r\n])
+	;
