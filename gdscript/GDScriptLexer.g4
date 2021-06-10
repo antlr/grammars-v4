@@ -171,6 +171,7 @@ STAR : '*';
 DIV : '/';
 MOD : '%';
 NOT_OP : '~';
+DOLLAR : '$';
 
 SKIP_
     : ( SPACE | COMMENT | LINE_JOINING ) -> skip

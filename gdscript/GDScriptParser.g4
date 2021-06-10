@@ -171,7 +171,7 @@ assignmentStmt
     : subscription ('='|'+='|'-='|'*='|'/='|'%='|'&='|'|='|'^=') expression stmtEnd
     ;
 varDeclStmt
-    : 'var' IDENTIFIER ('=' expression) stmtEnd
+    : 'var' IDENTIFIER ('=' expression)? stmtEnd
     ;
 
 assertStmt
@@ -245,6 +245,7 @@ is
 call
     : attribute ( '(' argList? ')')?
     | '.' IDENTIFIER ( '(' argList? ')')?
+    | getNode
     ;
 attribute
     : subscription ('.' IDENTIFIER)*
@@ -280,4 +281,8 @@ dictDecl
 keyValue
     : expression ':' expression
     | IDENTIFIER '=' expression
+    ;
+
+getNode
+    : '$' (STRING | IDENTIFIER ('/' IDENTIFIER)*)
     ;
