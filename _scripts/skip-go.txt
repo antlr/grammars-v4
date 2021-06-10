@@ -13,6 +13,7 @@ cpp
 csharp
 edif300
 fortran77
+gdscript
 guitartab
 haskell
 html
