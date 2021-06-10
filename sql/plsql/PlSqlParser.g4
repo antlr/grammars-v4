@@ -2933,11 +2933,11 @@ c_spec
     ;
 
 c_agent_in_clause
-    : AGENT IN '(' expressions_ ')'
+    : AGENT IN '(' expressions ')'
     ;
 
 c_parameters_clause
-    : PARAMETERS '(' (expressions_ | '.' '.' '.') ')'
+    : PARAMETERS '(' (expressions | '.' '.' '.') ')'
     ;
 
 parameter
@@ -3100,7 +3100,7 @@ loop_statement
 
 cursor_loop_param
     : index_name IN REVERSE? lower_bound range_separator='..' upper_bound
-    | record_name IN (cursor_name ('(' expressions_? ')')? | '(' select_statement ')')
+    | record_name IN (cursor_name ('(' expressions? ')')? | '(' select_statement ')')
     ;
 
 forall_statement
@@ -3211,7 +3211,7 @@ close_statement
     ;
 
 open_statement
-    : OPEN cursor_name ('(' expressions_? ')')?
+    : OPEN cursor_name ('(' expressions? ')')?
     ;
 
 fetch_statement
@@ -3387,7 +3387,7 @@ outer_join_type
     ;
 
 query_partition_clause
-    : PARTITION BY (('(' (subquery | expressions_)? ')') | expressions_)
+    : PARTITION BY (('(' (subquery | expressions)? ')') | expressions)
     ;
 
 flashback_query_clause
@@ -3417,7 +3417,7 @@ pivot_in_clause_element
 
 pivot_in_clause_elements
     : expression
-    | '(' expressions_? ')'
+    | '(' expressions? ')'
     ;
 
 unpivot_clause
@@ -3464,7 +3464,7 @@ grouping_sets_clause
 
 grouping_sets_elements
     : rollup_cube_clause
-    | '(' expressions_? ')'
+    | '(' expressions? ')'
     | expression
     ;
 
@@ -3618,7 +3618,7 @@ insert_into_clause
     ;
 
 values_clause
-    : VALUES (REGULAR_ID | '(' expressions_ ')')
+    : VALUES (REGULAR_ID | '(' expressions ')')
     ;
 
 merge_statement
@@ -3680,7 +3680,7 @@ general_table_ref
     ;
 
 static_returning_clause
-    : (RETURNING | RETURN) expressions_ into_clause
+    : (RETURNING | RETURN) expressions into_clause
     ;
 
 error_logging_clause
@@ -3723,7 +3723,7 @@ condition
     : expression
     ;
 
-expressions_
+expressions
     : expression (',' expression)*
     ;
 
@@ -3813,14 +3813,14 @@ model_expression_element
 
 single_column_for_loop
     : FOR column_name
-       ( IN '(' expressions_? ')'
+       ( IN '(' expressions? ')'
        | (LIKE expression)? FROM fromExpr=expression TO toExpr=expression
          action_type=(INCREMENT | DECREMENT) action_expr=expression)
     ;
 
 multi_column_for_loop
     : FOR paren_column_list
-      IN  '(' (subquery | '(' expressions_? ')') ')'
+      IN  '(' (subquery | '(' expressions? ')') ')'
     ;
 
 unary_expression
@@ -3873,7 +3873,7 @@ atom
     | constant
     | general_element
     | '(' subquery ')' subquery_operation_part*
-    | '(' expressions_ ')'
+    | '(' expressions ')'
     ;
 
 quantified_expression
@@ -3884,7 +3884,7 @@ string_function
     : SUBSTR '(' expression ',' expression (',' expression)? ')'
     | TO_CHAR '(' (table_element | standard_function | expression)
                   (',' quoted_string)? (',' quoted_string)? ')'
-    | DECODE '(' expressions_  ')'
+    | DECODE '(' expressions  ')'
     | CHR '(' concatenation USING NCHAR_CS ')'
     | NVL '(' expression ',' expression ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
@@ -3914,8 +3914,8 @@ numeric_function
    | ROUND '(' expression (',' UNSIGNED_INTEGER)?  ')'
    | AVG '(' (DISTINCT | ALL)? expression ')'
    | MAX '(' (DISTINCT | ALL)? expression ')'
-   | LEAST '(' expressions_ ')'
-   | GREATEST '(' expressions_ ')'
+   | LEAST '(' expressions ')'
+   | GREATEST '(' expressions ')'
    ;
 
 other_function
@@ -3931,7 +3931,7 @@ other_function
     | EXTRACT '(' regular_id FROM concatenation ')'
     | (FIRST_VALUE | LAST_VALUE) function_argument_analytic respect_or_ignore_nulls? over_clause
     | standard_prediction_function_keyword
-      '(' expressions_ cost_matrix_clause? using_clause? ')'
+      '(' expressions cost_matrix_clause? using_clause? ')'
     | TRANSLATE '(' expression (USING (CHAR_CS | NCHAR_CS))? (',' expression)* ')'
     | TREAT '(' expression AS REF? type_spec ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
@@ -4033,7 +4033,7 @@ within_or_over_part
     ;
 
 cost_matrix_clause
-    : COST (MODEL AUTO? | '(' cost_class_name (',' cost_class_name)* ')' VALUES '(' expressions_? ')')
+    : COST (MODEL AUTO? | '(' cost_class_name (',' cost_class_name)* ')' VALUES '(' expressions? ')')
     ;
 
 xml_passing_clause
@@ -4110,7 +4110,7 @@ set_command
 // Common
 
 partition_extension_clause
-    : (SUBPARTITION | PARTITION) FOR? '(' expressions_? ')'
+    : (SUBPARTITION | PARTITION) FOR? '(' expressions? ')'
     ;
 
 column_alias
