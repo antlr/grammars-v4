@@ -122,6 +122,7 @@
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
+				<module>gdscript</module>
 				<module>gedcom</module>
 				<module>gff3</module>
 				<module>gml</module>
