@@ -30,15 +30,15 @@ module
    ;
 
 procedure
-   : idn '=' 'proc' parms? args returnz? signals? where? routine_body 'end' idn
+   : idn '=' 'proc' parms? args returnz? signals? where_? routine_body 'end' idn
    ;
 
 iterator
-   : idn '=' 'iter' parms? args yields? signals? where? routine_body 'end' idn
+   : idn '=' 'iter' parms? args yields? signals? where_? routine_body 'end' idn
    ;
 
 cluster
-   : idn '=' 'cluster' parms? 'is' idn_list where? cluster_body 'end' idn
+   : idn '=' 'cluster' parms? 'is' idn_list where_? cluster_body 'end' idn
    ;
 
 parms
@@ -81,7 +81,7 @@ type_spec_list
    : type_spec (',' type_spec)*
    ;
 
-where
+where_
    : 'where' restriction (',' restriction)*
    ;
 

@@ -171,7 +171,7 @@ parameterizedAssignment :
 	)
 )
 |( definedObjectClass ASSIGN_OP
-	( object
+	( object_
 		|	objectClass
 		|	objectSet
 	)
@@ -242,7 +242,7 @@ fieldSpec :
 	  typeOptionalitySpec?
   	| asnType (valueSetOptionalitySpec?  | UNIQUE_LITERAL? valueOptionalitySpec? )
 	| fieldName (OPTIONAL_LITERAL | (DEFAULT_LITERAL (valueSet | value)))?
-	| definedObjectClass (OPTIONAL_LITERAL | (DEFAULT_LITERAL (objectSet | object)))?
+	| definedObjectClass (OPTIONAL_LITERAL | (DEFAULT_LITERAL (objectSet | object_)))?
 
 	)
 
@@ -273,7 +273,7 @@ fixedTypeValueSetFieldSpec : AMPERSAND IDENTIFIER   asnType valueSetOptionalityS
 valueSetOptionalitySpec : OPTIONAL_LITERAL | DEFAULT_LITERAL valueSet
 ;
 
-object : definedObject /*| objectDefn | objectFromObject */|  parameterizedObject
+object_ : definedObject /*| objectDefn | objectFromObject */|  parameterizedObject
 ;
 parameterizedObject : definedObject actualParameterList
 ;
@@ -320,7 +320,7 @@ elements  : subtypeElements
 // |  L_PARAN elementSetSpec R_PARAN
 ;
 objectSetElements :
-    object | definedObject /*| objectSetFromObjects | parameterizedObjectSet      */
+    object_ | definedObject /*| objectSetFromObjects | parameterizedObjectSet      */
 ;
 
 
@@ -338,7 +338,7 @@ variableTypeValueSetFieldSpec : AMPERSAND IDENTIFIER    fieldName valueSetOption
 ;
 objectFieldSpec : AMPERSAND IDENTIFIER definedObjectClass objectOptionalitySpec?
 ;
-objectOptionalitySpec : OPTIONAL_LITERAL | DEFAULT_LITERAL object
+objectOptionalitySpec : OPTIONAL_LITERAL | DEFAULT_LITERAL object_
 ;
 objectSetFieldSpec : AMPERSAND IDENTIFIER definedObjectClass objectSetOptionalitySpec ?
 ;
@@ -410,7 +410,7 @@ userDefinedConstraintParameter :
 	governor (COLON
  		value
  		| valueSet
- 		| object
+ 		| object_
  		| objectSet
  		)?
 ;
@@ -524,7 +524,7 @@ simpleDefinedValue : IDENTIFIER (DOT IDENTIFIER)?
 
 actualParameterList : L_BRACE actualParameter (COMMA actualParameter)* R_BRACE
 ;
-actualParameter : asnType | value /*| valueSet | definedObjectClass | object | objectSet*/
+actualParameter : asnType | value /*| valueSet | definedObjectClass | object_ | objectSet*/
 ;
 exceptionSpec : EXCLAM  exceptionIdentification
 ;

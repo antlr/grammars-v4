@@ -287,7 +287,7 @@ alarmprop
    | summary
    | attendee
    | duration
-   | repeat
+   | repeat_
    | attach
    | x_prop
    | iana_prop
@@ -674,7 +674,7 @@ actionvalue
    ;
 
 // 3.8.6.2 - Repeat Count
-repeat
+repeat_
    : k_repeat (SCOL other_param)* COL integer CRLF
    ;
 
@@ -920,7 +920,7 @@ b_end
    ;
 
 // 3.3.2
-bool
+bool_
    : k_true
    | k_false
    ;

@@ -10,7 +10,7 @@ https://cmake.org/cmake/help/v3.12/manual/cmake-language.7.html
 
 grammar CMake;
 
-file
+file_
 	: command_invocation* EOF
 	;
 

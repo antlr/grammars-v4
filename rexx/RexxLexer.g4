@@ -254,7 +254,7 @@ fragment Extra_letter           :   Hash_
                                 |   Dollar_
                                 ;
 // Const
-fragment Const_symbol_          :   Digit_ Var_symbol_char* ;
+fragment Const_symbol_          :   ( Digit_ | Stop_ ) Var_symbol_char* ;
 fragment Digit_                 :   [0-9] ;
 // Number
 fragment Number_                :   Plain_number Exponent_? ;

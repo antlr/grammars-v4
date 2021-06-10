@@ -1,0 +1,1034 @@
+
+The BCPL Grammar
+This is the formal syntax of BCPL (Richards & Whitby-Strevens 1980:161-165). The grammar is written in ISO/IEC 14977 EBNF notation (ISO/IEC 1996).
+
+Grammar | The goal symbol program | Index
+Grammar
+letter =
+'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' ;
+
+octal digit =
+'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' ;
+
+hex digit =
+'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' ;
+
+digit =
+'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
+
+string constant =
+'"', ? 255 or fewer characters ?, '"' ;
+
+character constant =
+"'", ? one character ?, "'" ;
+
+octal number =
+'#', octal digit, {octal digit} ;
+
+hex number =
+'#X', hex digit, {hex digit} ;
+
+number =
+octal number | hex number | digit, {digit} ;
+
+identifier =
+letter, {letter | digit | '.'} ;
+
+address op =
+'@' | '!' ;
+
+mult op =
+'*' | '/' | 'REM' ;
+
+add op =
+'+' | '-' ;
+
+rel op =
+'=' | '¬=' | '<=' | '>=' | '<' | '>' ;
+
+shift op =
+'<<' | '>>' ;
+
+and op =
+'&' ;
+
+or op =
+'|' ;
+
+eqv op =
+'EQV' | 'NEQV' ;
+
+not op =
+'¬' ;
+
+element =
+character constant | string constant | number | identifier | 'TRUE' | 'FALSE' ;
+
+primary E =
+primary E, '(', expression list, ')' | primary E, '(', ')' | '(', expression, ')' | element ;
+
+vector E =
+vector E, '!', primary E | primary E ;
+
+address E =
+address op, address E | vector E ;
+
+mult E =
+mult E, mult op, address E | address E ;
+
+add E =
+add E, add op, mult E | add op, mult E | mult E ;
+
+rel E =
+add E, {rel op, add E} ;
+
+shift E =
+shift E, shift op, add E | rel E ;
+
+not E =
+not op, shift E | shift E ;
+
+and E =
+not E, {and op, not E} ;
+
+or E =
+and E, {or op, and E} ;
+
+eqv E =
+or E, {eqv op, or E} ;
+
+conditional E =
+eqv E, '->', conditional E, ',', conditional E | eqv E ;
+
+expression =
+conditional E | 'TABLE', constant expression, {',', constant expression} | 'VALOF', command ;
+
+c element =
+character constant | number | identifier | 'TRUE' | 'FALSE' | '(', constant expression, ')' ;
+
+c mult E =
+c mult E, mult op, c element | c element ;
+
+c add E =
+c add E, add op, c mult E | add op, c mult E | c mult E ;
+
+c shift E =
+c shift E, shift op, c add E | c add E ;
+
+c and E =
+c and E, and op, c shift E | c shift E ;
+
+constant expression =
+constant expression, or op, c and E | c and E ;
+
+expression list =
+expression, {',', expression} ;
+
+name list =
+name, {',', name} ;
+
+manifest item =
+identifier, '=', constant expression ;
+
+manifest list =
+manifest item, {';', manifest item} ;
+
+manifest declaration =
+'MANIFEST', '$(', manifest list, '$)' ;
+
+static declaration =
+'STATIC', '$(', manifest list, '$)' ;
+
+global item =
+identifier, ':', constant expression ;
+
+global list =
+global item, {';', global item} ;
+
+global declaration =
+'GLOBAL', '$(', global list, '$)' ;
+
+simple definition =
+name list, '=', expression list ;
+
+vector definition =
+identifier, '=', 'VEC', constant expression ;
+
+function definition =
+identifier, '(', name list, ')', '=', expression | identifier, '(', ')', '=', expression ;
+
+routine definition =
+identifier, '(', name list, ')', 'BE', command | identifier, '(', ')', 'BE', command ;
+
+definition =
+simple definition | vector definition | function definition | routine definition ;
+
+simultaneous declaration =
+'LET', definition, {'AND', definition} ;
+
+declaration =
+simultaneous declaration | manifest declaration | static declaration | global declaration ;
+
+lhse =
+identifier | vector E, '!', primary E | '!', primary E ;
+
+left hand side list =
+lhse, {',', lhse} ;
+
+assignment =
+left hand side list, ':=', expression list ;
+
+simple command =
+'BREAK' | 'LOOP' | 'ENDCASE' | 'RETURN' | 'FINISH' ;
+
+goto command =
+'GOTO', expression ;
+
+routine command =
+primary E, '(', expression list, ')' | primary E, '(', ')' ;
+
+resultis command =
+'RESULTIS', expression ;
+
+switchon command =
+'SWITCHON', expression, 'INTO', compound command ;
+
+repeatable command =
+assignment | simple command | goto command | routine command | resultis command | repeated command | switchon command | compound command | block ;
+
+repeated command =
+repeatable command, 'REAPEAT' | repeatable command, 'REPEATUNTIL', expression | repeatable command, 'REPEATWHILE', expression ;
+
+until command =
+'UNTIL', expression, 'DO', command ;
+
+while command =
+'WHILE', expression, 'DO', command ;
+
+for command =
+'FOR', identifier, '=', expression, 'TO', expression, 'BY', constant expression, 'DO', command | 'FOR', identifier, '=', expression, 'TO', expression, 'DO', command ;
+
+repetitive command =
+repeated command | until command | while command | for command ;
+
+test command =
+'TEST', expression, 'THEN', command, 'ELSE', command ;
+
+if command =
+'IF', expression, 'THEN', command ;
+
+unless command =
+'UNLESS', expression, 'THEN', command ;
+
+unlabelled command =
+repeatable command | repetitive command | test command | if command ;
+
+label prefix =
+identifier, ':' ;
+
+case prefix =
+'CASE', constant expression, ':' ;
+
+default prefix =
+'DEFAULT', ':' ;
+
+prefix =
+label prefix | case prefix | default prefix ;
+
+command =
+unlabelled command | prefix, command | prefix ;
+
+command list =
+command, {';', command} ;
+
+declaration part =
+declaration, {';', declaration} ;
+
+block =
+'$(', declaration part, ';', command list, '$)' ;
+
+compound command =
+'$(', command list, '$)' ;
+
+program =
+declaration part ;
+
+Index
+'!'
+address op
+lhse
+vector E
+
+'#'
+octal number
+
+'#X'
+hex number
+
+'$('
+block
+compound command
+global declaration
+manifest declaration
+static declaration
+
+'$)'
+block
+compound command
+global declaration
+manifest declaration
+static declaration
+
+'&'
+and op
+
+'¬'
+not op
+
+'¬='
+rel op
+
+"'"
+character constant
+
+'('
+c element
+function definition
+primary E
+routine command
+routine definition
+
+')'
+c element
+function definition
+primary E
+routine command
+routine definition
+
+'"'
+string constant
+
+'*'
+mult op
+
+'+'
+add op
+
+','
+conditional E
+expression list
+expression
+left hand side list
+name list
+
+'-'
+add op
+
+'->'
+conditional E
+
+'.'
+identifier
+
+'/'
+mult op
+
+'0'
+digit
+hex digit
+octal digit
+
+'1'
+digit
+hex digit
+octal digit
+
+'2'
+digit
+hex digit
+octal digit
+
+? 255 or fewer characters ?
+string constant
+
+'3'
+digit
+hex digit
+octal digit
+
+'4'
+digit
+hex digit
+octal digit
+
+'5'
+digit
+hex digit
+octal digit
+
+'6'
+digit
+hex digit
+octal digit
+
+'7'
+digit
+hex digit
+octal digit
+
+'8'
+digit
+hex digit
+
+'9'
+digit
+hex digit
+
+':'
+case prefix
+default prefix
+global item
+label prefix
+
+':='
+assignment
+
+';'
+block
+command list
+declaration part
+global list
+manifest list
+
+'<'
+rel op
+
+'<<'
+shift op
+
+'<='
+rel op
+
+'='
+for command
+function definition
+manifest item
+rel op
+simple definition
+vector definition
+
+'>'
+rel op
+
+'>='
+rel op
+
+'>>'
+shift op
+
+'@'
+address op
+
+'A'
+hex digit
+letter
+
+'AND'
+simultaneous declaration
+
+'B'
+hex digit
+letter
+
+'BE'
+routine definition
+
+'BREAK'
+simple command
+
+'BY'
+for command
+
+'C'
+hex digit
+letter
+
+'CASE'
+case prefix
+
+'D'
+hex digit
+letter
+
+'DEFAULT'
+default prefix
+
+'DO'
+for command
+until command
+while command
+
+'E'
+hex digit
+letter
+
+'ELSE'
+test command
+
+'ENDCASE'
+simple command
+
+'EQV'
+eqv op
+
+'F'
+hex digit
+letter
+
+'FALSE'
+c element
+element
+
+'FINISH'
+simple command
+
+'FOR'
+for command
+
+'G'
+letter
+
+'GLOBAL'
+global declaration
+
+'GOTO'
+goto command
+
+'H'
+letter
+
+'I'
+letter
+
+'IF'
+if command
+
+'INTO'
+switchon command
+
+'J'
+letter
+
+'K'
+letter
+
+'L'
+letter
+
+'LET'
+simultaneous declaration
+
+'LOOP'
+simple command
+
+'M'
+letter
+
+'MANIFEST'
+manifest declaration
+
+'N'
+letter
+
+'NEQV'
+eqv op
+
+'O'
+letter
+
+'P'
+letter
+
+'Q'
+letter
+
+'R'
+letter
+
+'REAPEAT'
+repeated command
+
+'REM'
+mult op
+
+'REPEATUNTIL'
+repeated command
+
+'REPEATWHILE'
+repeated command
+
+'RESULTIS'
+resultis command
+
+'RETURN'
+simple command
+
+'S'
+letter
+
+'STATIC'
+static declaration
+
+'SWITCHON'
+switchon command
+
+'T'
+letter
+
+'TABLE'
+expression
+
+'TEST'
+test command
+
+'THEN'
+if command
+test command
+unless command
+
+'TO'
+for command
+
+'TRUE'
+c element
+element
+
+'U'
+letter
+
+'UNLESS'
+unless command
+
+'UNTIL'
+until command
+
+'V'
+letter
+
+'VALOF'
+expression
+
+'VEC'
+vector definition
+
+'W'
+letter
+
+'WHILE'
+while command
+
+'X'
+letter
+
+'Y'
+letter
+
+'Z'
+letter
+
+add E
+add E
+rel E
+shift E
+
+add op
+add E
+add op
+c add E
+
+address E
+address E
+mult E
+
+address op
+address E
+address op
+
+and E
+and E
+or E
+
+and op
+and E
+and op
+c and E
+
+assignment
+assignment
+repeatable command
+
+block
+block
+repeatable command
+
+c add E
+c add E
+c shift E
+
+c and E
+c and E
+constant expression
+
+c element
+c element
+c mult E
+
+c mult E
+c add E
+c mult E
+
+c shift E
+c and E
+c shift E
+
+case prefix
+case prefix
+prefix
+
+character constant
+c element
+character constant
+element
+
+command list
+block
+command list
+compound command
+
+command
+command list
+command
+expression
+for command
+if command
+routine definition
+test command
+unless command
+until command
+while command
+
+compound command
+compound command
+repeatable command
+switchon command
+
+conditional E
+conditional E
+expression
+
+constant expression
+c element
+case prefix
+constant expression
+expression
+for command
+global item
+manifest item
+vector definition
+
+declaration part
+block
+declaration part
+program
+
+declaration
+declaration part
+declaration
+
+default prefix
+default prefix
+prefix
+
+definition
+definition
+simultaneous declaration
+
+digit
+digit
+identifier
+number
+
+element
+element
+primary E
+
+eqv E
+conditional E
+eqv E
+
+eqv op
+eqv E
+eqv op
+
+expression list
+assignment
+expression list
+primary E
+routine command
+simple definition
+
+expression
+expression list
+expression
+for command
+function definition
+goto command
+if command
+primary E
+repeated command
+resultis command
+switchon command
+test command
+unless command
+until command
+while command
+
+for command
+for command
+repetitive command
+
+function definition
+definition
+function definition
+
+global declaration
+declaration
+global declaration
+
+global item
+global item
+global list
+
+global list
+global declaration
+global list
+
+goto command
+goto command
+repeatable command
+
+hex digit
+hex digit
+hex number
+
+hex number
+hex number
+number
+
+identifier
+c element
+element
+for command
+function definition
+global item
+identifier
+label prefix
+lhse
+manifest item
+routine definition
+vector definition
+
+if command
+if command
+unlabelled command
+
+label prefix
+label prefix
+prefix
+
+left hand side list
+assignment
+left hand side list
+
+letter
+identifier
+letter
+
+lhse
+left hand side list
+lhse
+
+manifest declaration
+declaration
+manifest declaration
+
+manifest item
+manifest item
+manifest list
+
+manifest list
+manifest declaration
+manifest list
+static declaration
+
+mult E
+add E
+mult E
+
+mult op
+c mult E
+mult E
+mult op
+
+name list
+function definition
+name list
+routine definition
+simple definition
+
+name
+name list
+
+not E
+and E
+not E
+
+not op
+not E
+not op
+
+number
+c element
+element
+number
+
+octal digit
+octal digit
+octal number
+
+octal number
+number
+octal number
+
+? one character ?
+character constant
+
+or E
+eqv E
+or E
+
+or op
+constant expression
+or E
+or op
+
+prefix
+command
+prefix
+
+primary E
+lhse
+primary E
+routine command
+vector E
+
+program
+program
+
+rel E
+rel E
+shift E
+
+rel op
+rel E
+rel op
+
+repeatable command
+repeatable command
+repeated command
+unlabelled command
+
+repeated command
+repeatable command
+repeated command
+repetitive command
+
+repetitive command
+repetitive command
+unlabelled command
+
+resultis command
+repeatable command
+resultis command
+
+routine command
+repeatable command
+routine command
+
+routine definition
+definition
+routine definition
+
+shift E
+not E
+shift E
+
+shift op
+c shift E
+shift E
+shift op
+
+simple command
+repeatable command
+simple command
+
+simple definition
+definition
+simple definition
+
+simultaneous declaration
+declaration
+simultaneous declaration
+
+static declaration
+declaration
+static declaration
+
+string constant
+element
+string constant
+
+switchon command
+repeatable command
+switchon command
+
+test command
+test command
+unlabelled command
+
+unlabelled command
+command
+unlabelled command
+
+unless command
+unless command
+
+until command
+repetitive command
+until command
+
+vector E
+address E
+lhse
+vector E
+
+vector definition
+definition
+vector definition
+
+while command
+repetitive command
+while command
+
+'|'
+or op

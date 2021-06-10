@@ -31,14 +31,15 @@ parser grammar ScssParser;
 options { tokenVocab=ScssLexer; }
 
 stylesheet
-	: statement*
-	;
+  : statement*
+  ;
 
 statement
   : importDeclaration
-  | nested
+  | mediaDeclaration
   | ruleset
   | mixinDeclaration
+  | contentDeclaration
   | functionDeclaration
   | variableDeclaration
   | includeDeclaration
@@ -49,38 +50,52 @@ statement
   ;
 
 
-
-//Params to mixins, includes, etc
-params
-  : param (COMMA param)* Ellipsis?
+// Params declared by rules such as @mixin and @function.
+declaredParams
+  : declaredParam (COMMA declaredParam)* Ellipsis?
   ;
 
-param
+declaredParam
   : variableName paramOptionalValue?
   ;
 
 variableName
-  : DOLLAR Identifier
+  : (DOLLAR | MINUS_DOLLAR | PLUS_DOLLAR) Identifier
   ;
 
 paramOptionalValue
   : COLON expression+
   ;
 
+// Params passed to rules such as @include and @content.
+passedParams
+  : passedParam (COMMA passedParam)* (COMMA|Ellipsis)?
+  ;
 
-//MIXINS
+passedParam
+  : (variableName COLON)? (commandStatement | listSpaceSeparated | listBracketed | map_)
+  ;
+
+// MIXINS and related rules
 mixinDeclaration
-  : '@mixin' Identifier (LPAREN params? RPAREN)? block
+  : MIXIN (FunctionIdentifier declaredParams? RPAREN |
+           Identifier (LPAREN declaredParams? RPAREN)?) block
   ;
 
-//Includes
+contentDeclaration
+  : CONTENT (LPAREN passedParams? RPAREN)? SEMI
+  ;
+
 includeDeclaration
-  : INCLUDE Identifier (';' | (LPAREN values? RPAREN ';'?)? block?)
+  : INCLUDE (Identifier | functionCall)
+    (SEMI | (USING LPAREN declaredParams RPAREN)? block)?
   ;
 
-//FUNCTIONS
+
+// FUNCTIONS
 functionDeclaration
-  : '@function' Identifier LPAREN params? RPAREN BlockStart functionBody? BlockEnd
+  : FUNCTION (FunctionIdentifier | Identifier LPAREN) declaredParams? RPAREN
+    BlockStart functionBody? BlockEnd
   ;
 
 functionBody
@@ -97,7 +112,9 @@ functionStatement
 
 
 commandStatement
-  : (expression+ | '(' commandStatement ')') mathStatement?
+  : (expression
+      | (LPAREN | MINUS_LPAREN | PLUS_LPAREN) commandStatement RPAREN
+    ) mathStatement?
   ;
 
 mathCharacter
@@ -114,13 +131,11 @@ expression
   | identifier
   | Color
   | StringLiteral
-  | NULL
+  | NULL_
   | url
-	| variableName
-	| functionCall
-	;
-
-
+  | variableName
+  | functionCall
+  ;
 
 
 //If statement
@@ -138,7 +153,7 @@ elseStatement
 
 conditions
   : condition (COMBINE_COMPARE conditions)?
-  | NULL
+  | NULL_
   ;
 
 condition
@@ -146,21 +161,24 @@ condition
   | LPAREN conditions ')'
   ;
 
+
 variableDeclaration
-  : variableName COLON values '!default'? ';'
+  : variableName COLON (propertyValue | listBracketed | map_) '!default'? ';'
   ;
 
 
 //for
 forDeclaration
-  : AT_FOR variableName 'from' fromNumber 'through' throughNumber block
+  : AT_FOR variableName 'from' fromNumber ('to'|'through') throughNumber block
   ;
 
 fromNumber
   : Number
   ;
+
 throughNumber
   : Number
+  | functionCall
   ;
 
 //while
@@ -174,97 +192,113 @@ eachDeclaration
   ;
 
 eachValueList
-  :  Identifier (COMMA Identifier)*
-  |  identifierListOrMap (COMMA identifierListOrMap)*
+  : commandStatement
+  | list_
+  | map_
   ;
-
-identifierListOrMap
-  : LPAREN identifierValue (COMMA identifierValue)* RPAREN
-  ;
-
-identifierValue
-  : identifier (COLON values)?
-  ;
-
 
 //Imports
 importDeclaration
-	: '@import' referenceUrl mediaTypes? ';'
-	;
+  : '@import' referenceUrl ';'
+  ;
 
 referenceUrl
     : StringLiteral
     | UrlStart Url UrlEnd
     ;
 
-
-mediaTypes
-  : (Identifier (COMMA Identifier)*)
+// MEDIA
+mediaDeclaration
+  : '@media' mediaQueryList block
   ;
 
+mediaQueryList
+  : (mediaQuery (COMMA mediaQuery)* )?
+  ;
 
+mediaQuery
+  : ('only' | 'not')? mediaType ('and' mediaExpression)*
+  | mediaExpression ('and' mediaExpression)*
+  ;
 
+// Typically only 'all', 'print', 'screen', and 'speech', but there are some
+// deprecated values too.
+mediaType
+  : Identifier
+  ;
 
-//Nested (stylesheets, etc)
-nested
- 	: '@' nest selectors BlockStart stylesheet BlockEnd
-	;
+mediaExpression
+  : '(' mediaFeature (':' commandStatement)? ')'
+  ;
 
-nest
-	: (Identifier | '&') Identifier* pseudo*
-	;
-
-
-
+// Typically 'max-width', 'hover', 'orientation', etc. Many possible values.
+mediaFeature
+  : Identifier
+  ;
 
 
 //Rules
 ruleset
- 	: selectors block
-	;
+  : selectors block
+  ;
 
 block
-  : BlockStart (property ';' | statement)* property? BlockEnd
+  : BlockStart (property_ | statement)* lastProperty? BlockEnd
   ;
 
 selectors
-	: selector (COMMA selector)*
-	;
+  : selector (COMMA selector)*
+  ;
 
 selector
-	: element+ (selectorPrefix element)* attrib* pseudo?
-	;
-
-selectorPrefix
-  : (GT | PLUS | TIL)
+  : element+
   ;
 
 element
-	: identifier
+  : identifier
   | '#' identifier
   | '.' identifier
   | '&'
   | '*'
-	;
+  | combinator
+  | attrib
+  | pseudo
+  ;
+
+combinator
+  : (GT | PLUS | TIL)
+  ;
 
 pseudo
-	: (COLON|COLONCOLON) Identifier
-	| (COLON|COLONCOLON) functionCall
-	;
+  : pseudoIdentifier
+  | pseudoIdentifier LPAREN (selector | commandStatement) RPAREN
+  ;
 
 attrib
-	: '[' Identifier (attribRelate (StringLiteral | Identifier))? ']'
-	;
+  : LBRACK Identifier (attribRelate (StringLiteral | Identifier))? RBRACK
+  ;
 
 attribRelate
-	: '='
-	| '~='
-	| '|='
-	;
+  : EQ
+  | PIPE_EQ
+  | TILD_EQ
+  ;
 
 identifier
   : Identifier identifierPart*
   | InterpolationStart identifierVariableName BlockEnd identifierPart*
+  // These are keywords in some contexts, but can be used as identifiers too.
+  | AND_WORD
+  | FROM
+  | NOT
+  | ONLY
+  | THROUGH
+  | TO
+  | USING
+  ;
+
+pseudoIdentifier
+  : PseudoIdentifier identifierPart*
   ;
 
 identifierPart
@@ -275,13 +309,19 @@ identifierVariableName
   : DOLLAR (Identifier | IdentifierAfter)
   ;
 
-property
-	: identifier COLON values
-	;
+property_
+  : identifier COLON propertyValue IMPORTANT? SEMI
+  | identifier COLON block
+  | identifier COLON propertyValue IMPORTANT? block
+  ;
 
-values
-	: commandStatement (COMMA commandStatement)*
-	;
+lastProperty
+  : identifier COLON propertyValue IMPORTANT?
+  ;
+
+propertyValue
+  : commandStatement (COMMA? commandStatement)*
+  ;
 
 url
   : UrlStart Url UrlEnd
@@ -293,5 +333,53 @@ measurement
 
 
 functionCall
-	: Identifier LPAREN values? RPAREN
-	;
+  : functionNamespace? FunctionIdentifier passedParams? RPAREN
+  ;
+
+functionNamespace
+  : (Identifier DOT)+
+  ;
+
+
+list_
+  : listCommaSeparated
+  | listSpaceSeparated
+  | listBracketed
+  ;
+
+listCommaSeparated
+  : listElement (COMMA listElement)+ COMMA?
+  ;
+
+listSpaceSeparated
+  : listElement listElement+
+  ;
+
+listBracketed
+  : LBRACK (listCommaSeparated | listSpaceSeparated) RBRACK
+  ;
+
+listElement
+  : commandStatement
+  | LPAREN list_ RPAREN
+  ;
+
+
+map_
+  : LPAREN mapEntry (COMMA mapEntry)* COMMA? RPAREN
+  ;
+
+mapEntry
+  : mapKey COLON mapValue;
+
+mapKey
+  : commandStatement
+  | list_
+  | map_
+  ;
+
+mapValue
+  : commandStatement
+  | list_
+  | map_
+  ;
