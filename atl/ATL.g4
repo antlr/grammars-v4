@@ -23,7 +23,7 @@ grammar ATL;
  */
 unit
    : module
-   | library
+   | library_
    | query
    ;
 
@@ -45,7 +45,7 @@ transformationMode
    | 'from'
    ;
 
-library
+library_
    : 'library' (STRING | IDENTIFIER) ';' libraryRef* helper*
    ;
 

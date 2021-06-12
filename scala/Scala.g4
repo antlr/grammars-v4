@@ -186,10 +186,15 @@ exprs
    ;
 
 argumentExprs
-   : '(' exprs? ')'
-   | '(' (exprs ',')? postfixExpr ':' '_' '*' ')'
-   | NL? blockExpr
-   ;
+    : '(' args ')'
+    | '{' args '}'
+    | NL? blockExpr
+    ;
+
+args
+    : exprs?
+    | (exprs ',')? postfixExpr (':' | '_' | '*') ?
+    ;
 
 blockExpr
    : '{' caseClauses '}'
@@ -202,7 +207,7 @@ block
 
 blockStat
    : import_
-   | annotation* ('implicit' | 'lazy')? def
+   | annotation* ('implicit' | 'lazy')? def_
    | annotation* localModifier* tmplDef
    | expr1
    ;
@@ -217,7 +222,7 @@ enumerators
    ;
 
 generator
-   : pattern1 '<-' expr (guard | pattern1 '=' expr)*
+   : pattern1 '<-' expr (guard_ | pattern1 '=' expr)*
    ;
 
 caseClauses
@@ -225,10 +230,10 @@ caseClauses
    ;
 
 caseClause
-   : 'case' pattern guard? '=>' block
+   : 'case' pattern guard_? '=>' block
    ;
 
-guard
+guard_
    : 'if' postfixExpr
    ;
 
@@ -363,7 +368,7 @@ templateBody
 
 templateStat
    : import_
-   | (annotation NL?)* modifier* def
+   | (annotation NL?)* modifier* def_
    | (annotation NL?)* modifier* dcl
    | expr
    ;
@@ -421,7 +426,7 @@ patVarDef
    | 'var' varDef
    ;
 
-def
+def_
    : patVarDef
    | 'def' funDef
    | 'type' NL* typeDef
@@ -1341,7 +1346,7 @@ WS
    ;
 
 COMMENT
-   :   '/*' .*? '*/' -> skip
+   :   '/*' (COMMENT | .)* '*/' -> skip
    ;
 
 

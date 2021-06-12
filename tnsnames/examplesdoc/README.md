@@ -24,7 +24,7 @@ Follow the instructions on the [Getting Started page](https://github.com/antlr/a
 export ANTLR4="/where/downloaded/to/antlr-4.x.x-complete.jar"
 export CLASSPATH=".:${CLASSPATH}:${ANTLR4}"
 alias antlr4='java org.antlr.v4.Tool'
-alias grun='java org.antlr.v4.runtime.misc.TestRig'
+alias grun='java org.antlr.v4.gui.TestRig'
 alias jar='${JAVA_HOME}/bin/jar'
 alias java='${JAVA_HOME}/bin/java'
 alias javac='${JAVA_HOME}/bin/javac'

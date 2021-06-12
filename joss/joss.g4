@@ -37,7 +37,7 @@ prog
 
 statement
    : direct '.'
-   | indirect '.'
+   | indirect_ '.'
    | formCMD
    | assignment
    ;
@@ -49,7 +49,7 @@ direct
    | arbitraryCMD
    ;
 
-indirect
+indirect_
    : STEPNUMBER indirectCMD
    ;
 
@@ -273,10 +273,10 @@ boolComp
    ;
 
 for_
-   : 'for' range
+   : 'for' range_
    ;
 
-range
+range_
    : variable '=' rangeExp
    ;
 
@@ -313,10 +313,10 @@ assignment
 value
    : NUMBER
    | variable
-   | function
+   | function_
    ;
 
-function
+function_
    : funcSqrt
    | funcLog
    | funcExp
