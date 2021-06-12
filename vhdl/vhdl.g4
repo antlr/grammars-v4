@@ -73,7 +73,7 @@ NEXT : N E X T;
 NOISE : N O I S E;
 NOR : N O R;
 NOT : N O T;
-NULL : N U L L;
+NULL_ : N U L L;
 OF : O F;
 ON : O N;
 OPEN : O P E N;
@@ -898,7 +898,7 @@ library_unit
   ;
 
 literal
-  : NULL
+  : NULL_
   | BIT_STRING_LITERAL
   | STRING_LITERAL
   | enumeration_literal
@@ -1300,7 +1300,7 @@ sequential_statement
   | next_statement
   | exit_statement
   | return_statement
-  | ( label_colon )? NULL SEMI
+  | ( label_colon )? NULL_ SEMI
   | break_statement
   | procedure_call_statement
   ;
@@ -1386,7 +1386,7 @@ simultaneous_statement
   | simultaneous_if_statement
   | simultaneous_case_statement
   | simultaneous_procedural_statement
-  | ( label_colon )? NULL SEMI
+  | ( label_colon )? NULL_ SEMI
   ;
 
 simultaneous_statement_part

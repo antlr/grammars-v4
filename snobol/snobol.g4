@@ -97,7 +97,7 @@ command
    | replace
    | size
    | trim
-   | array
+   | array_
    | sort
    | table
    | break_
@@ -199,7 +199,7 @@ trim
    : 'trim' LPAREN expression RPAREN
    ;
 
-array
+array_
    : 'array' LPAREN expression COMMA expression RPAREN
    ;
 

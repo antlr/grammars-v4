@@ -149,7 +149,7 @@ declaration
 	;
 	
 operatorTemplate
-	: RELATION template
+	: RELATION template_
 	| FUNCTION categoryTemplate
 	| GENERIC categoryTemplate
 	;
@@ -171,7 +171,7 @@ assoc
 	| RIGHTASSOC
 	;
 
-template
+template_
 	: prefixTemplate
 	| postfixTemplate
 	| infixTemplate
