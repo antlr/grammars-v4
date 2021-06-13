@@ -61,8 +61,7 @@ block_
    ;
 
 sentence
-   : left_side conditions '=' right_side
-   | left_side conditions ',' block_ending
+   : left_side conditions ('=' right_side | ',' block_ending)
    ;
 
 left_side
