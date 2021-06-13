@@ -38,8 +38,7 @@ program
    ;
 
 f_definition
-   : f_name '{' block_ '}'
-   | '$ENTRY' f_name '{' block_ '}'
+   : '$ENTRY'? f_name '{' block_ '}'
    ;
 
 external_decl
