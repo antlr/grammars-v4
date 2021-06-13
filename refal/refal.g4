@@ -157,6 +157,15 @@ CHAR
    | '\\x' [0-9] [0-9]
    ;
 
+LINE_COMMENT
+   : '*' ~ [\r\n]* -> skip
+   ;
+
+BLOCK_COMMENT
+   : '/*' .*? '*/' -> skip
+   ;
+
 WS
    : [ \r\n\t]+ -> skip
    ;
+
