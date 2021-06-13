@@ -47,8 +47,7 @@ external_decl
    ;
 
 f_name_list
-   : f_name
-   | f_name ',' f_name_list ';'
+   : f_name (',' f_name_list ';')?
    ;
 
 f_name
