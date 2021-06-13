@@ -43,9 +43,7 @@ f_definition
    ;
 
 external_decl
-   : '$EXTERNAL' f_name_list
-   | '$EXTERN' f_name_list
-   | '$EXTRN' f_name_list
+   : ('$EXTERNAL' | '$EXTERN' | '$EXTRN') f_name_list
    ;
 
 f_name_list
@@ -167,4 +165,3 @@ CHAR
 WS
    : [ \r\n\t]+ -> skip
    ;
-
