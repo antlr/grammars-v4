@@ -55,9 +55,7 @@ f_name
    ;
 
 block_
-   : sentence
-   | sentence ';'
-   | sentence ';' block_
+   : sentence (';' block_?)?
    ;
 
 sentence
