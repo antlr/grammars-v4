@@ -64,8 +64,8 @@ ztname
    ;
 
 adtfunc
-   : TYPENAME '.' name
-   | indsp TYPENAME '.' name
+   : typename '.' name
+   | indsp typename '.' name
    ;
 
 typespec
@@ -77,7 +77,7 @@ typespec
 
 ztag
    : name
-   | TYPENAME
+   | typename
    ;
 
 zpolytype
@@ -108,7 +108,7 @@ memberlist
    ;
 
 vardecllist
-   : ivardecl (',' vardecllist)*
+   : ivardecl (',' ivardecl)*
    ;
 
 ivardecl
@@ -334,14 +334,13 @@ ztelist
    : telist
    ;
 
+telist
+   : tcomp (',' tcomp)*
+   ;
+
 tcomp
    : expr
    | '{' ztelist? '}'
-   ;
-
-telist
-   : tcomp
-   | telist ',' tcomp
    ;
 
 term
@@ -350,7 +349,7 @@ term
    | term '(' zarlist? ')'
    | term '[' expr ']'
    | term '.' stag
-   | '.' TYPENAME '.' stag
+   | '.' typename '.' stag
    | term '->' stag
    | term '--'
    | term '++'
@@ -359,14 +358,15 @@ term
    | '.' '.' '.'
    | ARITHMETIC_CONST
    | NIL
-   | ENUM_MEMBER
+   | CONSTANT
+   | enum_member
    | STRING_CONST
    | '$' STRING_CONST
    ;
 
 stag
    : IDENTIFIER
-   | TYPENAME
+   | typename
    ;
 
 zarlist
@@ -402,8 +402,8 @@ xtname
    | BYTE
    | FLOAT
    | VOID
-   | TYPENAME
-   | TYPENAME '[' variant ']'
+   | typename
+   | typename '[' variant ']'
    | CHAN '(' variant ')' bufdim?
    ;
 
@@ -415,6 +415,14 @@ sclass
    : EXTERN
    | INTERN
    | PRIVATE
+   ;
+
+typename
+   : IDENTIFIER
+   ;
+
+enum_member
+   : IDENTIFIER
    ;
 
 ADT
@@ -595,14 +603,6 @@ ZEROX
 
 PRIVATE
    : 'private'
-   ;
-
-TYPENAME
-   : IDENTIFIER
-   ;
-
-ENUM_MEMBER
-   : IDENTIFIER
    ;
 
 IDENTIFIER
