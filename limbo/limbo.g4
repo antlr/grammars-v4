@@ -305,7 +305,6 @@ lvalue_expression
    | term '.' IDENTIFIER
    | '(' lvalue_expression_list ')'
    | '*' monadic_expression
-   |
    ;
 
 lvalue_expression_list
@@ -341,11 +340,6 @@ real_constant
 
 string_constant
    : STRING
-   ;
-
-initlist
-   : element
-   | initlist ',' element
    ;
 
 element
