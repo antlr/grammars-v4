@@ -95,7 +95,7 @@ setlist
    ;
 
 sname
-   : name ('=' expr)?
+   : name ('=' expr_)?
    ;
 
 name
@@ -121,10 +121,10 @@ zinit
 
 zelist
    : zexpr?
-   | '[' expr ']' expr
-   | '.' stag expr
+   | '[' expr_ ']' expr_
+   | '.' stag expr_
    | '{' zelist '}'
-   | '[' expr ']' '{' zelist '}'
+   | '[' expr_ ']' '{' zelist '}'
    | zelist ',' zelist
    ;
 
@@ -209,7 +209,7 @@ clist
    ;
 
 case_
-   : CASE expr ':' slist?
+   : CASE expr_ ':' slist?
    | DEFAULT ':' slist?
    ;
 
@@ -234,7 +234,7 @@ info
 nlstmnt
    : zexpr? ';'
    | block
-   | CHECK expr info? ';'
+   | CHECK expr_ info? ';'
    | ALLOC elist ';'
    | UNALLOC elist ';'
    | RESCUE rbody
@@ -242,17 +242,17 @@ nlstmnt
    | GOTO IDENTIFIER ';'
    | PROC elist ';'
    | TASK elist ';'
-   | BECOME expr ';'
+   | BECOME expr_ ';'
    | ALT cbody
    | RETURN zexpr? ';'
    | FOR '(' zexpr? ';' zexpr? ';' zexpr? ')' stmnt
-   | WHILE '(' expr ')' stmnt
-   | DO stmnt WHILE '(' expr ')'
-   | IF '(' expr ')' stmnt
-   | IF '(' expr ')' stmnt ELSE stmnt
+   | WHILE '(' expr_ ')' stmnt
+   | DO stmnt WHILE '(' expr_ ')'
+   | IF '(' expr_ ')' stmnt
+   | IF '(' expr_ ')' stmnt ELSE stmnt
    | PAR block
-   | SWITCH expr cbody
-   | TYPEOF expr tbody
+   | SWITCH expr_ cbody
+   | TYPEOF expr_ tbody
    | CONTINUE zconst? ';'
    | BREAK zconst? ';'
    ;
@@ -262,43 +262,43 @@ zconst
    ;
 
 zexpr
-   : expr
+   : expr_
    ;
 
-expr
+expr_
    : castexpr
-   | expr '*' expr
-   | expr '/' expr
-   | expr '%' expr
-   | expr '+' expr
-   | expr '-' expr
-   | expr '>>' expr
-   | expr '<<' expr
-   | expr '<' expr
-   | expr '>' expr
-   | expr '<=' expr
-   | expr '>=' expr
-   | expr '==' expr
-   | expr '!=' expr
-   | expr '&' expr
-   | expr '^' expr
-   | expr '|' expr
-   | expr '&&' expr
-   | expr '||' expr
-   | expr '=' expr
-   | expr ':=' expr
-   | expr '<-' '=' expr
-   | expr '+=' expr
-   | expr '-=' expr
-   | expr '*=' expr
-   | expr '/=' expr
-   | expr '%=' expr
-   | expr '>>=' expr
-   | expr '<<=' expr
-   | expr '&=' expr
-   | expr '|=' expr
-   | expr '^=' expr
-   | expr '::' expr
+   | expr_ '*' expr_
+   | expr_ '/' expr_
+   | expr_ '%' expr_
+   | expr_ '+' expr_
+   | expr_ '-' expr_
+   | expr_ '>>' expr_
+   | expr_ '<<' expr_
+   | expr_ '<' expr_
+   | expr_ '>' expr_
+   | expr_ '<=' expr_
+   | expr_ '>=' expr_
+   | expr_ '==' expr_
+   | expr_ '!=' expr_
+   | expr_ '&' expr_
+   | expr_ '^' expr_
+   | expr_ '|' expr_
+   | expr_ '&&' expr_
+   | expr_ '||' expr_
+   | expr_ '=' expr_
+   | expr_ ':=' expr_
+   | expr_ '<-' '=' expr_
+   | expr_ '+=' expr_
+   | expr_ '-=' expr_
+   | expr_ '*=' expr_
+   | expr_ '/=' expr_
+   | expr_ '%=' expr_
+   | expr_ '>>=' expr_
+   | expr_ '<<=' expr_
+   | expr_ '&=' expr_
+   | expr_ '|=' expr_
+   | expr_ '^=' expr_
+   | expr_ '::' expr_
    ;
 
 castexpr
@@ -315,7 +315,7 @@ typecast
    ;
 
 monexpr
-   : term
+   : term_
    | '*' castexpr
    | '&' castexpr
    | '+' castexpr
@@ -339,21 +339,21 @@ telist
    ;
 
 tcomp
-   : expr
+   : expr_
    | '{' ztelist? '}'
    ;
 
-term
+term_
    : '(' telist ')'
    | SIZEOF '(' typecast ')'
-   | term '(' zarlist? ')'
-   | term '[' expr ']'
-   | term '.' stag
+   | term_ '(' zarlist? ')'
+   | term_ '[' expr_ ']'
+   | term_ '.' stag
    | '.' typename '.' stag
-   | term '->' stag
-   | term '--'
-   | term '++'
-   | term '?'
+   | term_ '->' stag
+   | term_ '--'
+   | term_ '++'
+   | term_ '?'
    | name
    | '.' '.' '.'
    | ARITHMETIC_CONST
@@ -374,8 +374,8 @@ zarlist
    ;
 
 elist
-   : expr
-   | elist ',' expr
+   : expr_
+   | elist ',' expr_
    ;
 
 tlist
@@ -408,7 +408,7 @@ xtname
    ;
 
 bufdim
-   : '[' expr ']'
+   : '[' expr_ ']'
    ;
 
 sclass
