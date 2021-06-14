@@ -144,11 +144,13 @@ indsp
    ;
 
 arglist
+   : arglistp* ',' arg
+   ;
+
+arglistp
    : arg
    | '*' xtname
    | '.' xtname
-   //  | arglist? ',' arg
-   
    ;
 
 arg
