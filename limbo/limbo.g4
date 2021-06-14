@@ -36,8 +36,7 @@ program
    ;
 
 top_declaration_sequence
-   : top_declaration
-   | top_declaration_sequence top_declaration
+   : top_declaration+
    ;
 
 top_declaration
@@ -65,8 +64,7 @@ identifier_list
    ;
 
 expression_list
-   : expression
-   | expression_list ',' expression
+   : expression+
    ;
 
 type
@@ -116,8 +114,7 @@ tuple_type
    ;
 
 data_type_list
-   : data_type
-   | data_type_list ',' data_type
+   : data_type (',' data_type)*
    ;
 
 adt_type
@@ -147,8 +144,7 @@ function_arg_ret
    ;
 
 formal_arg_list
-   : formal_arg
-   | formal_arg_list ',' formal_arg
+   : formal_arg (',' formal_arg)*
    ;
 
 formal_arg
@@ -159,8 +155,7 @@ formal_arg
    ;
 
 nil_or_D_list
-   : nil_or_D
-   | nil_or_D_list ',' nil_or_D
+   : nil_or_D (',' nil_or_D)*
    ;
 
 nil_or_D
@@ -173,8 +168,7 @@ module_declaration
    ;
 
 mod_member_list
-   : mod_member
-   | mod_member_list mod_member
+   : mod_member+
    ;
 
 mod_member
@@ -208,8 +202,7 @@ pick_member_list
    ;
 
 pick_tag_list
-   : IDENTIFIER
-   | pick_tag_list 'or' IDENTIFIER
+   : IDENTIFIER ('or' IDENTIFIER)*
    ;
 
 function_definition
@@ -217,8 +210,7 @@ function_definition
    ;
 
 function_name_part
-   : IDENTIFIER
-   | function_name_part '.' IDENTIFIER
+   : IDENTIFIER ('.' IDENTIFIER)*
    ;
 
 statements
@@ -256,8 +248,7 @@ qual_statement_sequence
    ;
 
 qual_list
-   : qualifier
-   | qual_list 'or' qualifier
+   : qualifier ('or' qualifier)*
    ;
 
 qualifier
@@ -274,8 +265,7 @@ pqual_statement_sequence
    ;
 
 pqual_list
-   : pqualifier
-   | pqual_list 'or' pqualifier
+   : pqualifier ('or' pqualifier)*
    ;
 
 pqualifier
@@ -308,13 +298,11 @@ lvalue_expression
    ;
 
 lvalue_expression_list
-   : lvalue_expression
-   | lvalue_expression_list ',' lvalue_expression
+   : lvalue_expression (',' lvalue_expression)*
    ;
 
 init_list
-   : element
-   | init_list ',' element
+   : element (',' element)*
    ;
 
 term
@@ -409,12 +397,11 @@ BINARY_OPERATOR
    | '<<'
    | '>>'
    | '<'
-   | '">'
+   | '>'
    | '<='
    | '>='
    | '=='
-   | '!'
-   | '='
+   | '!='
    | '&'
    | '^'
    | '|'
