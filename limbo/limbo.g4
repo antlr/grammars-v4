@@ -42,7 +42,7 @@ top_declaration_sequence
 top_declaration
    : declaration
    | identifier_list ':=' expression ';'
-   | identifier_list '=' expression ';'
+   | identifier_list ASSIGN expression ';'
    | '(' identifier_list ')' ':=' expression ';'
    | module_declaration
    | function_definition
@@ -51,7 +51,7 @@ top_declaration
 
 declaration
    : identifier_list ':' type ';'
-   | identifier_list ':' type '=' expression ';'
+   | identifier_list ':' type ASSIGN expression ';'
    | identifier_list ':' 'con' expression ';'
    | identifier_list ':' 'import' IDENTIFIER ';'
    | identifier_list ':' 'type' type ';'
@@ -276,7 +276,7 @@ pqualifier
 expression
    : binary_expression
    | lvalue_expression ASSIGNMENT_OPERATOR expression
-   | '(' lvalue_expression_list ')' '=' expression
+   | '(' lvalue_expression_list ')' ASSIGN expression
    | send_expression
    | declare_expression
    | load_expression
@@ -337,7 +337,7 @@ element
    ;
 
 send_expression
-   : lvalue_expression '<-' '=' expression
+   : lvalue_expression '<-' ASSIGN expression
    ;
 
 declare_expression
@@ -375,7 +375,7 @@ INT
    ;
 
 ASSIGNMENT_OPERATOR
-   : '='
+   : ASSIGN
    | '&='
    | '|='
    | '^='
@@ -388,12 +388,16 @@ ASSIGNMENT_OPERATOR
    | '%='
    ;
 
+ASSIGN
+   : '='
+   ;
+
 BINARY_OPERATOR
-   : '*'
+   : MULT
    | '/'
    | '%'
-   | '+'
-   | '-'
+   | PLUS
+   | MINUS
    | '<<'
    | '>>'
    | '<'
@@ -411,12 +415,12 @@ BINARY_OPERATOR
    ;
 
 MONADICOPERATOR
-   : '+'
-   | '-'
+   : PLUS
+   | MINUS
    | '!'
    | '~'
    | 'ref'
-   | '*'
+   | MULT
    | '++'
    | '--'
    | '<-'
@@ -424,6 +428,18 @@ MONADICOPERATOR
    | 'tl'
    | 'len'
    | 'tagof'
+   ;
+
+MULT
+   : '*'
+   ;
+
+PLUS
+   : '+'
+   ;
+
+MINUS
+   : '-'
    ;
 
 COMMENT
