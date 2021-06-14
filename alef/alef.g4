@@ -35,27 +35,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar alef;
 
 program
-   : decllist
+   : decllist?
    ;
 
 decllist
-   :
-    decl*
+   : decl+
    ;
 
 decl
-   : tname vardecllist ';'
-   | tname vardecl '(' arglist ')' block
-   | tname adtfunc '(' arglist ')' block
-   | tname vardecl '(' arglist ')' ';'
+   : tname vardecllist? ';'
+   | tname vardecl '(' arglist? ')' block
+   | tname adtfunc '(' arglist? ')' block
+   | tname vardecl '(' arglist? ')' ';'
    | typespec ';'
-   | TYPEDEF ztname vardecl zargs ';'
+   | TYPEDEF ztname vardecl zargs? ';'
    | TYPEDEF IDENTIFIER ';'
    ;
 
 zargs
-   :
-    '(' arglist ')'
+   : '(' arglist? ')'
    ;
 
 ztname
@@ -71,21 +69,19 @@ adtfunc
    ;
 
 typespec
-   : AGGR ztag '{' memberlist '}' ztag
-   | UNION ztag '{' memberlist '}' ztag
-   | ADT ztag zpolytype '{' memberlist '}' ztag
-   | ENUM ztag '{' setlist '}'
+   : AGGR ztag? '{' memberlist '}' ztag?
+   | UNION ztag? '{' memberlist '}' ztag?
+   | ADT ztag? zpolytype? '{' memberlist '}' ztag?
+   | ENUM ztag? '{' setlist '}'
    ;
 
 ztag
-   :
-   | name
+   : name
    | TYPENAME
    ;
 
 zpolytype
-   :
-    '[' polytype ']'
+   : '[' polytype ']'
    ;
 
 polytype
@@ -94,14 +90,12 @@ polytype
    ;
 
 setlist
-   : sname
+   : sname?
    | setlist ',' setlist
    ;
 
 sname
-   :
-
-    name ('=' expr)?
+   : name ('=' expr)?
    ;
 
 name
@@ -114,22 +108,19 @@ memberlist
    ;
 
 vardecllist
-   :
-
-     ivardecl (',' vardecllist )*
+   : ivardecl (',' vardecllist)*
    ;
 
 ivardecl
-   : vardecl zinit
+   : vardecl zinit?
    ;
 
 zinit
-   :
-    '=' zelist
+   : '=' zelist
    ;
 
 zelist
-   : zexpr
+   : zexpr?
    | '[' expr ']' expr
    | '.' stag expr
    | '{' zelist '}'
@@ -138,15 +129,14 @@ zelist
    ;
 
 vardecl
-   : IDENTIFIER arrayspec
-   | indsp IDENTIFIER arrayspec
-   | '(' indsp IDENTIFIER arrayspec ')' '(' arglist ')'
-   | indsp '(' indsp IDENTIFIER arrayspec ')' '(' arglist ')'
+   : IDENTIFIER arrayspec?
+   | indsp IDENTIFIER arrayspec?
+   | '(' indsp IDENTIFIER arrayspec? ')' '(' arglist? ')'
+   | indsp '(' indsp IDENTIFIER arrayspec? ')' '(' arglist? ')'
    ;
 
 arrayspec
-   :
-     ('[' zexpr ']')+
+   : ('[' zexpr? ']')+
    ;
 
 indsp
@@ -154,18 +144,18 @@ indsp
    ;
 
 arglist
-   :
-   | arg
+   : arg
    | '*' xtname
    | '.' xtname
-   | arglist ',' arg
+   //  | arglist? ',' arg
+   
    ;
 
 arg
    : xtname
-   | xtname indsp arrayspec
-   | xtname '(' indsp ')' '(' arglist ')'
-   | xtname indsp '(' indsp ')' '(' arglist ')'
+   | xtname indsp arrayspec?
+   | xtname '(' indsp ')' '(' arglist? ')'
+   | xtname indsp '(' indsp ')' '(' arglist? ')'
    | TUPLE tuplearg
    | xtname vardecl
    | '.' '.' '.'
@@ -173,58 +163,54 @@ arg
 
 tuplearg
    : tname
-   | tname '(' indsp ')' '(' arglist ')'
+   | tname '(' indsp ')' '(' arglist? ')'
    | tname vardecl
    ;
 
 autolist
-   :
-     autodecl+
+   : autodecl+
    ;
 
 autodecl
-   : xtname vardecllist ';'
-   | TUPLE tname vardecllist ';'
+   : xtname vardecllist? ';'
+   | TUPLE tname vardecllist? ';'
    ;
 
 block
-   : '{' autolist slist '}'
-   | '!' '{' autolist slist '}'
+   : '{' autolist? slist? '}'
+   | '!' '{' autolist? slist? '}'
    ;
 
 slist
-   :
-     stmnt+
+   : stmnt+
    ;
 
 tbody
-   : '{' ctlist '}'
-   | '!' '{' clist '}'
+   : '{' ctlist? '}'
+   | '!' '{' clist? '}'
    ;
 
 ctlist
-   :
-    tcase+
+   : tcase+
    ;
 
 tcase
-   : CASE typecast ':' slist
-   | DEFAULT ':' slist
+   : CASE typecast ':' slist?
+   | DEFAULT ':' slist?
    ;
 
 cbody
-   : '{' clist '}'
-   | '!' '{' clist '}'
+   : '{' clist? '}'
+   | '!' '{' clist? '}'
    ;
 
 clist
-   :
-    case_+
+   : case_+
    ;
 
 case_
-   : CASE expr ':' slist
-   | DEFAULT ':' slist
+   : CASE expr ':' slist?
+   | DEFAULT ':' slist?
    ;
 
 rbody
@@ -233,8 +219,7 @@ rbody
    ;
 
 zlab
-   :
-    IDENTIFIER
+   : IDENTIFIER
    ;
 
 stmnt
@@ -243,25 +228,24 @@ stmnt
    ;
 
 info
-   :
-    ',' STRING_CONST
+   : ',' STRING_CONST
    ;
 
 nlstmnt
-   : zexpr ';'
+   : zexpr? ';'
    | block
-   | CHECK expr info ';'
+   | CHECK expr info? ';'
    | ALLOC elist ';'
    | UNALLOC elist ';'
    | RESCUE rbody
-   | RAISE zlab ';'
+   | RAISE zlab? ';'
    | GOTO IDENTIFIER ';'
    | PROC elist ';'
    | TASK elist ';'
    | BECOME expr ';'
    | ALT cbody
-   | RETURN zexpr ';'
-   | FOR '(' zexpr ';' zexpr ';' zexpr ')' stmnt
+   | RETURN zexpr? ';'
+   | FOR '(' zexpr? ';' zexpr? ';' zexpr? ')' stmnt
    | WHILE '(' expr ')' stmnt
    | DO stmnt WHILE '(' expr ')'
    | IF '(' expr ')' stmnt
@@ -269,18 +253,16 @@ nlstmnt
    | PAR block
    | SWITCH expr cbody
    | TYPEOF expr tbody
-   | CONTINUE zconst ';'
-   | BREAK zconst ';'
+   | CONTINUE zconst? ';'
+   | BREAK zconst? ';'
    ;
 
 zconst
-   :
-    CONSTANT
+   : CONSTANT
    ;
 
 zexpr
-   :
-    expr
+   : expr
    ;
 
 expr
@@ -328,7 +310,7 @@ castexpr
 typecast
    : xtname
    | xtname indsp
-   | xtname '(' indsp ')' '(' arglist ')'
+   | xtname '(' indsp ')' '(' arglist? ')'
    | TUPLE tname
    ;
 
@@ -349,13 +331,12 @@ monexpr
    ;
 
 ztelist
-   :
-    telist
+   : telist
    ;
 
 tcomp
    : expr
-   | '{' ztelist '}'
+   | '{' ztelist? '}'
    ;
 
 telist
@@ -366,7 +347,7 @@ telist
 term
    : '(' telist ')'
    | SIZEOF '(' typecast ')'
-   | term '(' zarlist ')'
+   | term '(' zarlist? ')'
    | term '[' expr ']'
    | term '.' stag
    | '.' TYPENAME '.' stag
@@ -389,8 +370,7 @@ stag
    ;
 
 zarlist
-   :
-    elist
+   : elist
    ;
 
 elist
@@ -404,9 +384,9 @@ tlist
    ;
 
 tname
-   : sclass xtname
-   | sclass TUPLE '(' tlist ')'
-   | sclass '(' tlist ')'
+   : sclass? xtname
+   | sclass? TUPLE '(' tlist ')'
+   | sclass? '(' tlist ')'
    ;
 
 variant
@@ -424,17 +404,15 @@ xtname
    | VOID
    | TYPENAME
    | TYPENAME '[' variant ']'
-   | CHAN '(' variant ')' bufdim
+   | CHAN '(' variant ')' bufdim?
    ;
 
 bufdim
-   :
-    '[' expr ']'
+   : '[' expr ']'
    ;
 
 sclass
-   :
-   | EXTERN
+   : EXTERN
    | INTERN
    | PRIVATE
    ;
