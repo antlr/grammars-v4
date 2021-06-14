@@ -89,6 +89,7 @@
 				<module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
+                <module>callable</module>
 				<module>capnproto</module>
 				<module>clf</module>
 				<module>clojure</module>
@@ -122,6 +123,7 @@
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
+				<module>gdscript</module>
 				<module>gedcom</module>
 				<module>gff3</module>
 				<module>gml</module>
@@ -187,6 +189,7 @@
 				<module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
+                <module>orwell</module>
 				<module>p</module>
 				<module>parkingsign</module>
 				<module>pascal</module>
@@ -215,7 +218,8 @@
 				<module>r</module>
 				<module>rcs</module>
 				<module>redcode</module>
-				<module>rego</module>
+                <module>refal</module>
+                <module>rego</module>
 				<module>restructuredtext</module>
 				<module>rexx</module>
 				<module>rfc822</module>
