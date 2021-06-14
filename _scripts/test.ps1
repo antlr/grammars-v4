@@ -4,28 +4,28 @@ function Get-GrammarSkipList {
     )
     switch ($Target) {
         "CSharp" {
-		$lines = Get-Content -Path _scripts\skip-csharp.txt
-		return $lines
+            $lines = Get-Content -Path _scripts\skip-csharp.txt
+            return $lines
         }
         "Java" {
-		$lines = Get-Content -Path _scripts\skip-java.txt
-		return $lines
+            $lines = Get-Content -Path _scripts\skip-java.txt
+            return $lines
         }
         "JavaScript" {
-		$lines = Get-Content -Path _scripts\skip-javascript.txt
-		return $lines
+            $lines = Get-Content -Path _scripts\skip-javascript.txt
+            return $lines
         }
         "Go" {
-		$lines = Get-Content -Path _scripts\skip-go.txt
-		return $lines
+            $lines = Get-Content -Path _scripts\skip-go.txt
+            return $lines
         }
         "Python3" {
-		$lines = Get-Content -Path _scripts\skip-python3.txt
-		return $lines
+            $lines = Get-Content -Path _scripts\skip-python3.txt
+            return $lines
         }
         "Dart" {
-		$lines = Get-Content -Path _scripts\skip-dart.txt
-		return $lines
+            $lines = Get-Content -Path _scripts\skip-dart.txt
+            return $lines
         }
         Default {
             #    Write-Error "Unknown target $Target"
@@ -61,6 +61,14 @@ function Test-Grammar {
     $start = Get-Date
     Write-Host "Building"
     # codegen
+    $l = $Target
+    if ($l -eq "Go") {
+        $l = "Golang"
+    }
+    foreach ($item in Get-ChildItem *.g4) {
+        Write-Host $item
+        translate-g4 -i $item -o $item -l $l
+    }
     Write-Host "trgen -t $Target --template-sources-directory $templates"
     trgen -t $Target --template-sources-directory $templates | Write-Host
     if ($LASTEXITCODE -ne 0) {
@@ -84,7 +92,6 @@ function Test-Grammar {
     }
 
     # build
-
     # see _scripts/templates/*/tester.psm1
     Import-Module ./tester.psm1
 
