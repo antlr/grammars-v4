@@ -50,11 +50,11 @@ top_declaration
    ;
 
 declaration
-   : identifier_list ':' type ';'
-   | identifier_list ':' type ASSIGN expression ';'
+   : identifier_list ':' type_ ';'
+   | identifier_list ':' type_ ASSIGN expression ';'
    | identifier_list ':' 'con' expression ';'
    | identifier_list ':' 'import' IDENTIFIER ';'
-   | identifier_list ':' 'type' type ';'
+   | identifier_list ':' 'type' type_ ';'
    | 'include' string_constant ';'
    ;
 
@@ -67,7 +67,7 @@ expression_list
    : expression+
    ;
 
-type
+type_
    : data_type
    | function_type
    ;
@@ -148,7 +148,7 @@ formal_arg_list
    ;
 
 formal_arg
-   : nil_or_D_list ':' type
+   : nil_or_D_list ':' type_
    | nil_or_D ':' 'self' 'refopt' IDENTIFIER
    | nil_or_D ':' 'self' IDENTIFIER
    | '*'
@@ -176,7 +176,7 @@ mod_member
    | identifier_list ':' data_type ';'
    | adt_declaration ';'
    | identifier_list ':' 'con' expression ';'
-   | identifier_list ':' 'type' type ';'
+   | identifier_list ':' 'type' type_ ';'
    ;
 
 adt_declaration
