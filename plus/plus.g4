@@ -115,7 +115,7 @@ macro_head
    ;
 
 macro_parameters
-   : (parameter 'is' id_list)?
+   : ('parameter' 'is' id_list)?
    ;
 
 macro_body
@@ -260,8 +260,8 @@ variant_list
    ;
 
 variant_head
-   : variant 'identifier' 'of' type 'from'
-   | variant type 'from'
+   : 'variant' identifier 'of' type 'from'
+   | 'variant' type 'from'
    ;
 
 variant_element
