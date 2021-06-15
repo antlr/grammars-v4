@@ -22,7 +22,7 @@ quoted_key :  BASIC_STRING | LITERAL_STRING ;
 
 dotted_key : simple_key ('.' simple_key)+ ;
 
-value : string | integer | floating_point | bool | date_time | array | inline_table ;
+value : string | integer | floating_point | bool_ | date_time | array_ | inline_table ;
 
 string : BASIC_STRING | ML_BASIC_STRING | LITERAL_STRING | ML_LITERAL_STRING ;
 
@@ -30,11 +30,11 @@ integer : DEC_INT | HEX_INT | OCT_INT | BIN_INT ;
 
 floating_point : FLOAT | INF | NAN ;
 
-bool : BOOLEAN ;
+bool_ : BOOLEAN ;
 
 date_time : OFFSET_DATE_TIME | LOCAL_DATE_TIME | LOCAL_DATE | LOCAL_TIME ;
 
-array : '[' array_values? comment_or_nl ']' ;
+array_ : '[' array_values? comment_or_nl ']' ;
 
 array_values : (comment_or_nl value ',' array_values comment_or_nl) | comment_or_nl value ','? ;
 

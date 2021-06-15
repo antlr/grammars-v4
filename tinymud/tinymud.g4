@@ -75,7 +75,7 @@ bootcommand
    ;
 
 chowncommand
-   : '@chown' object '=' player
+   : '@chown' object_ '=' player
    ;
 
 createcommand
@@ -83,7 +83,7 @@ createcommand
    ;
 
 describecommand
-   : ('@describe' | '@desc') object ('=' description)?
+   : ('@describe' | '@desc') object_ ('=' description)?
    ;
 
 digcommand
@@ -107,15 +107,15 @@ forcecommand
    ;
 
 linkcommand
-   : '@link' object '=' (number | dir | room)
+   : '@link' object_ '=' (number | dir_ | room)
    ;
 
 lockcommand
-   : '@lock' object '=' key
+   : '@lock' object_ '=' key
    ;
 
 namecommand
-   : '@name' object '=' name password?
+   : '@name' object_ '=' name password?
    ;
 
 newpassswordcommand
@@ -123,15 +123,15 @@ newpassswordcommand
    ;
 
 ofailcommand
-   : '@ofail' object ('=' message)?
+   : '@ofail' object_ ('=' message)?
    ;
 
 opencommand
-   : '@open' dir (';' dir)* ('=' number)?
+   : '@open' dir_ (';' dir_)* ('=' number)?
    ;
 
 osuccesscommand
-   : ('@osuccess' | '@osucc') object ('=' message)?
+   : ('@osuccess' | '@osucc') object_ ('=' message)?
    ;
 
 passwordcommand
@@ -143,7 +143,7 @@ pcreatecommand
    ;
 
 setcommand
-   : '@set' object '=' '!'? flag
+   : '@set' object_ '=' '!'? flag
    ;
 
 shutdowncommand
@@ -155,11 +155,11 @@ statscommand
    ;
 
 successcommand
-   : ('@success' | '@succ') object ('=' message)?
+   : ('@success' | '@succ') object_ ('=' message)?
    ;
 
 teleportcommand
-   : '@teleport' (object '=')? room
+   : '@teleport' (object_ '=')? room
    ;
 
 toadcommand
@@ -167,11 +167,11 @@ toadcommand
    ;
 
 unlinkcommand
-   : '@unlink' dir
+   : '@unlink' dir_
    ;
 
 unlockcommand
-   : '@unlock' object
+   : '@unlock' object_
    ;
 
 wallcommand
@@ -200,15 +200,15 @@ action
    ;
 
 dropaction
-   : ('drop' | 'throw') object
+   : ('drop' | 'throw') object_
    ;
 
 examineaction
-   : 'examine' object
+   : 'examine' object_
    ;
 
 getaction
-   : ('get' | 'take') object
+   : ('get' | 'take') object_
    ;
 
 giveaction
@@ -237,7 +237,7 @@ killaction
    ;
 
 lookaction
-   : ('look' | 'read') object
+   : ('look' | 'read') object_
    ;
 
 newsaction
@@ -272,7 +272,7 @@ whoaction
    : 'who' player?
    ;
 
-object
+object_
    : STRING
    ;
 
@@ -304,7 +304,7 @@ message
    : STRING
    ;
 
-dir
+dir_
    : STRING
    ;
 

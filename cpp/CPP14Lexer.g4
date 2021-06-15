@@ -1,13 +1,32 @@
 lexer grammar CPP14Lexer;
 
-Literal:
-	IntegerLiteral
-	| CharacterLiteral
-	| FloatingLiteral
-	| StringLiteral
-	| BooleanLiteral
-	| PointerLiteral
-	| UserDefinedLiteral;
+IntegerLiteral:
+	DecimalLiteral Integersuffix?
+	| OctalLiteral Integersuffix?
+	| HexadecimalLiteral Integersuffix?
+	| BinaryLiteral Integersuffix?;
+
+CharacterLiteral:
+	('u' | 'U' | 'L')? '\'' Cchar+ '\'';
+
+FloatingLiteral:
+	Fractionalconstant Exponentpart? Floatingsuffix?
+	| Digitsequence Exponentpart Floatingsuffix?;
+
+StringLiteral:
+	Encodingprefix?
+    (Rawstring
+	|'"' Schar* '"');
+
+BooleanLiteral: False_ | True_;
+
+PointerLiteral: Nullptr;
+
+UserDefinedLiteral:
+	UserDefinedIntegerLiteral
+	| UserDefinedFloatingLiteral
+	| UserDefinedStringLiteral
+	| UserDefinedCharacterLiteral;
 
 MultiLineMacro:
 	'#' (~[\n]*? '\\' '\r'? '\n')+ ~ [\n]+ -> channel (HIDDEN);
@@ -69,7 +88,8 @@ Export: 'export';
 
 Extern: 'extern';
 
-False: 'false';
+//DO NOT RENAME - PYTHON NEEDS True and False
+False_: 'false';
 
 Final: 'final';
 
@@ -139,7 +159,8 @@ Thread_local: 'thread_local';
 
 Throw: 'throw';
 
-True: 'true';
+//DO NOT RENAME - PYTHON NEEDS True and False
+True_: 'true';
 
 Try: 'try';
 
@@ -220,10 +241,6 @@ AndAssign: '&=';
 
 OrAssign: '|=';
 
-LeftShift: '<<';
-
-RightShift: '>>';
-
 LeftShiftAssign: '<<=';
 
 RightShiftAssign: '>>=';
@@ -283,12 +300,6 @@ fragment NONDIGIT: [a-zA-Z_];
 
 fragment DIGIT: [0-9];
 
-IntegerLiteral:
-	DecimalLiteral Integersuffix?
-	| OctalLiteral Integersuffix?
-	| HexadecimalLiteral Integersuffix?
-	| BinaryLiteral Integersuffix?;
-
 DecimalLiteral: NONZERODIGIT ('\''? DIGIT)*;
 
 OctalLiteral: '0' ('\''? OCTALDIGIT)*;
@@ -319,12 +330,6 @@ fragment Longsuffix: [lL];
 
 fragment Longlongsuffix: 'll' | 'LL';
 
-CharacterLiteral:
-	'\'' Cchar+ '\''
-	| 'u' '\'' Cchar+ '\''
-	| 'U' '\'' Cchar+ '\''
-	| 'L' '\'' Cchar+ '\'';
-
 fragment Cchar:
 	~ ['\\\r\n]
 	| Escapesequence
@@ -345,6 +350,7 @@ fragment Simpleescapesequence:
 	| '\\f'
 	| '\\n'
 	| '\\r'
+	| ('\\' ('\r' '\n'? | '\n'))
 	| '\\t'
 	| '\\v';
 
@@ -354,10 +360,6 @@ fragment Octalescapesequence:
 	| '\\' OCTALDIGIT OCTALDIGIT OCTALDIGIT;
 
 fragment Hexadecimalescapesequence: '\\x' HEXADECIMALDIGIT+;
-
-FloatingLiteral:
-	Fractionalconstant Exponentpart? Floatingsuffix?
-	| Digitsequence Exponentpart Floatingsuffix?;
 
 fragment Fractionalconstant:
 	Digitsequence? '.' Digitsequence
@@ -373,9 +375,6 @@ fragment Digitsequence: DIGIT ('\''? DIGIT)*;
 
 fragment Floatingsuffix: [flFL];
 
-StringLiteral:
-	Encodingprefix? '"' Schar* '"'
-	| Encodingprefix? 'R' Rawstring;
 fragment Encodingprefix: 'u8' | 'u' | 'U' | 'L';
 
 fragment Schar:
@@ -383,17 +382,7 @@ fragment Schar:
 	| Escapesequence
 	| Universalcharactername;
 
-fragment Rawstring: '"' .*? '(' .*? ')' .*? '"';
-
-BooleanLiteral: False | True;
-
-PointerLiteral: Nullptr;
-
-UserDefinedLiteral:
-	UserDefinedIntegerLiteral
-	| UserDefinedFloatingLiteral
-	| UserDefinedStringLiteral
-	| UserDefinedCharacterLiteral;
+fragment Rawstring: 'R"' (( '\\' ["()] )|~[\r\n (])*? '(' ~[)]*? ')'  (( '\\' ["()]) | ~[\r\n "])*? '"';
 
 UserDefinedIntegerLiteral:
 	DecimalLiteral Udsuffix

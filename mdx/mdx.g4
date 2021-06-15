@@ -63,10 +63,10 @@ dim_props
    ;
 
 property_list
-   : property (COMMA property)*
+   : property_ (COMMA property_)*
    ;
 
-property
+property_
    : compound_id
    ;
 
@@ -87,7 +87,7 @@ cell_props
    ;
 
 cell_property_list
-   : cell_property COMMA cell_property*
+   : cell_property (COMMA cell_property)*
    ;
 
 cell_property
@@ -148,16 +148,16 @@ factor
    | value_expression_primary
    ;
 
-function
+function_
    : identifier LPAREN (exp_list)? RPAREN
    ;
 
 value_expression_primary
-   : value_expression_primary0 (DOT (unquoted_identifier | quoted_identifier | amp_quoted_identifier | function))*
+   : value_expression_primary0 (DOT (unquoted_identifier | quoted_identifier | amp_quoted_identifier | function_))*
    ;
 
 value_expression_primary0
-   : function
+   : function_
    | (LPAREN exp_list RPAREN)
    | (LBRACE (exp_list)? RBRACE)
    | case_expression

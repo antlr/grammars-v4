@@ -480,3 +480,7 @@ GO
 -- Specifying the STUFF function
 SELECT STUFF('abcdef', 2, 3, 'ijklmn');
 GO
+
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--Function with default values
+SELECT * FROM fn_builtin_permissions(default);

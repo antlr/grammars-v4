@@ -6,6 +6,7 @@ alter table t3 alter index t3_i1 invisible;
 alter table t3 alter index t3_i1 visible;
 alter table t3 rename index t3_i1 to t3_i2;
 alter table t2 add constraint t2_pk_constraint primary key (1c), alter column `_` set default 1;
+alter table t2 drop constraint t2_pk_constraint;
 alter table ship_class change column somecol col_for_del tinyint first;
 alter table t5 rename column old to new;
 alter table ship_class drop col_for_del;
@@ -16,6 +17,9 @@ alter table t3 rename to table3column;
 alter table db2.t3 rename to db2.table3column;
 alter table childtable add constraint `fk1` foreign key (idParent) references parenttable(id) on delete restrict on update cascade;
 alter table table3column default character set = cp1251;
+alter table `test` change `id` `id` varchar(10) character set utf8mb4 collate utf8mb4_bin not null;
+alter table `test` change `id` `id` varchar(10) character set utf8mb4 binary not null;
+alter table `test` change `id` `id` varchar(10) character set utf8mb4 binary null default null;
 alter table with_check add constraint check (c1 in (1, 2, 3, 4));
 alter table with_check add constraint c2 check (c1 in (1, 2, 3, 4));
 alter table with_check add check (c1 in (1, 2, 3, 4));
@@ -76,4 +80,6 @@ alter algorithm = merge view my_view2(col1, col2) as select * from t2 with check
 alter definer = 'ivan'@'%' view my_view3 as select count(*) from t3;
 alter definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2) 
 	as select * from  (t1 as tt1, t2 as tt2) inner join t1 on t1.col1 = tt1.col1;
+-- Alter user
+rename user user1@100.200.1.1 to user2@100.200.1.2;
 #end
