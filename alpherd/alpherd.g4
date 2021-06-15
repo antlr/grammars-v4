@@ -227,7 +227,7 @@ formal_id_list
    : identifier_list ':'
    ;
 
-obj_format
+obj_formal
    : formal_id_list type_description
    ;
 
@@ -346,7 +346,7 @@ alphanumeric
    | DIGIT
    ;
    //special_symbol: BASIC_SYMBOL|operator;
-   
+
 identifier
    : IDENTIFIER
    ;
@@ -426,7 +426,7 @@ operator
    | binary_operator
    ;
    //?
-   
+
 radix
    : alphanumeric+
    ;
