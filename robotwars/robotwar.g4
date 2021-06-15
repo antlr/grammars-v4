@@ -68,7 +68,7 @@ gotostatement
    ;
 
 tostatement
-   : expression? ('TO' register) +
+   : expression? ('TO' register_) +
    ;
 
 endsubstatement
@@ -105,11 +105,11 @@ comparison
 
 argument
    : number
-   | register
+   | register_
    | DATA
    ;
 
-register
+register_
    : A
    | B
    | C

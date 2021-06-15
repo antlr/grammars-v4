@@ -1,9 +1,9 @@
 /*
 PHP grammar.
 The MIT License (MIT).
-Copyright (c) 2015-2019, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
+Copyright (c) 2015-2020, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
 Copyright (c) 2019, Thierry Marianne (thierry.marianne@weaving-the-web.org)
-Copyright (c) 2019, Student Main for php7 support.
+Copyright (c) 2019-2020, Student Main for php7, php8 support.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,30 +29,30 @@ lexer grammar PhpLexer;
 channels { PhpComments, ErrorLexem, SkipChannel }
 
 options {
-    superClass=PhpBaseLexer;
+    superClass=PhpLexerBase;
 }
 
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);
 HtmlText:       ~[<#]+;
-XmlStart:       '<' '?' 'xml' -> pushMode(XML);
+XmlStart:       '<?xml' -> pushMode(XML);
 PHPStartEcho:   PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStart:       PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
-HtmlScriptOpen: '<' 'script' { _scriptTag = true; } -> pushMode(INSIDE);
-HtmlStyleOpen:  '<' 'style' { _styleTag = true; } -> pushMode(INSIDE);
-HtmlComment:    '<' '!' '--' .*? '-->' -> channel(HIDDEN);
-HtmlDtd:        '<' '!' .*? '>';
+HtmlScriptOpen: '<script' { _scriptTag = true; } -> pushMode(INSIDE);
+HtmlStyleOpen:  '<style' { _styleTag = true; } -> pushMode(INSIDE);
+HtmlComment:    '<!' '--' .*? '-->' -> channel(HIDDEN);
+HtmlDtd:        '<!' .*? '>';
 HtmlOpen:       '<' -> pushMode(INSIDE);
 Shebang
     : '#' { this.IsNewLineOrStart(-2) }? '!' ~[\r\n]*
     ;
-NumberSign:     '#' ~[<]* -> more;
+NumberSign:     '#' ~'<'* -> more;
 Error:          .         -> channel(ErrorLexem);
 
 // TODO: parse xml attributes.
 mode XML;
 
-XmlText:                  ~[?]+;
-XmlClose:                 '?' '>' -> popMode;
+XmlText:                  ~'?'+;
+XmlClose:                 '?>' -> popMode;
 XmlText2:                 '?' -> type(XmlText);
 
 mode INSIDE;
@@ -69,7 +69,7 @@ HtmlStartDoubleQuoteString: '\\'? '"'  -> pushMode(HtmlDoubleQuoteStringMode);
 HtmlHex:                    '#' HexDigit+ ;
 HtmlDecimal:                Digit+;
 HtmlSpace:                  [ \t\r\n]+ -> channel(HIDDEN);
-HtmlName:                   NameStartChar NameChar*;
+HtmlName:                   HtmlNameStartChar HtmlNameChar*;
 ErrorInside:                .          -> channel(ErrorLexem);
 
 mode HtmlQuoteStringMode;
@@ -88,12 +88,15 @@ HtmlEndDoubleQuoteString:      '"' '"'? -> popMode;
 HtmlDoubleQuoteString:         ~[<"]+;
 ErrorHtmlDoubleQuote:          .          -> channel(ErrorLexem);
 
-// Parse JavaScript with https://github.com/antlr/grammars-v4/tree/master/ecmascript if necessary.
+// Parse JavaScript with https://github.com/antlr/grammars-v4/tree/master/javascript if necessary.
 // Php blocks can exist inside Script blocks too.
 mode SCRIPT;
 
-ScriptText:               ~[<]+;
-ScriptClose:             '<' '/' 'script'? '>' -> popMode;
+ScriptText:               ~'<'+;
+// TODO: handle JS strings, but handle <?php tags inside them
+//ScriptString:             '"' (~'"' | '\\' ('\r'? '\n' | .))* '"' -> type(ScriptText);
+//ScriptString2:            '\'' (~'\'' | '\\' ('\r'? '\n' | .))* '\'' -> type(ScriptText);
+HtmlScriptClose:          '</' 'script'? '>' -> popMode;
 PHPStartInsideScriptEcho: PhpStartEchoFragment -> type(Echo), pushMode(PHP);
 PHPStartInsideScript:     PhpStartFragment -> channel(SkipChannel), pushMode(PHP);
 ScriptText2:              '<' -> type(ScriptText);
@@ -110,6 +113,8 @@ Whitespace:         [ \t\r\n]+ -> channel(SkipChannel);
 MultiLineComment:   '/*' .*? '*/' -> channel(PhpComments);
 SingleLineComment:  '//' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
 ShellStyleComment:  '#' -> channel(SkipChannel), pushMode(SingleLineCommentMode);
+
+AttributeStart:     '#[';
 
 Abstract:           'abstract';
 Array:              'array';
@@ -151,7 +156,7 @@ Finally:            'finally';
 FloatCast:          'float';
 For:                'for';
 Foreach:            'foreach';
-Function:           'function';
+Function_:           'function';
 Global:             'global';
 Goto:               'goto';
 If:                 'if';
@@ -171,6 +176,7 @@ List:               'list';
 LogicalAnd:         'and';
 LogicalOr:          'or';
 LogicalXor:         'xor';
+Match:              'match';
 Namespace:          'namespace';
 New:                'new';
 Null:               'null';
@@ -295,8 +301,8 @@ Eq:                 '=';
 Quote:              '\'';
 BackQuote:          '`';
 
-VarName:            '$' [a-zA-Z_][a-zA-Z_0-9]*;
-Label:              [a-zA-Z_][a-zA-Z_0-9]*;
+VarName:            '$' NameString;
+Label:              [a-z_][a-z_0-9]*;
 Octal:              '0' [0-7]+;
 Decimal:            '0' | NonZeroDigit Digit*;
 Real:               (Digit+ '.' Digit* | '.' Digit+) ExponentPart?
@@ -309,22 +315,22 @@ SingleQuoteString: '\'' (~('\'' | '\\') | '\\' . )* '\'';
 DoubleQuote:       '"' -> pushMode(InterpolationString);
 
 StartNowDoc
-    : '<<<' [ \t]* '\'' [a-zA-Z_][a-zA-Z_0-9]* '\''  { this.ShouldPushHereDocMode(1) }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* '\'' NameString '\''  { this.ShouldPushHereDocMode(1) }? -> pushMode(HereDoc)
     ;
 StartHereDoc
-    : '<<<' [ \t]* [a-zA-Z_][a-zA-Z_0-9]* { this.ShouldPushHereDocMode(1) }? -> pushMode(HereDoc)
+    : '<<<' [ \t]* NameString { this.ShouldPushHereDocMode(1) }? -> pushMode(HereDoc)
     ;
 ErrorPhp:                   .          -> channel(ErrorLexem);
 
 mode InterpolationString;
 
-VarNameInInterpolation:     '$' [a-zA-Z_][a-zA-Z_0-9]*                          -> type(VarName); // TODO: fix such cases: "$people->john"
+VarNameInInterpolation:     '$' NameString                                      -> type(VarName); // TODO: fix such cases: "$people->john"
 DollarString:               '$'                                                 -> type(StringPart);
 CurlyDollar:                '{' { this.IsCurlyDollar(1) }? { this.SetInsideString(); }  -> channel(SkipChannel), pushMode(PHP);
 CurlyString:                '{'                                                 -> type(StringPart);
 EscapedChar:                '\\' .                                              -> type(StringPart);
 DoubleQuoteInInterpolation: '"'                                                 -> type(DoubleQuote), popMode;
-UnicodeEscape:              '\\u{' [a-zA-Z0-9] [a-zA-Z0-9]+ '}';
+UnicodeEscape:              '\\u{' [a-zA-Z0-9][a-zA-Z0-9]+ '}';
 StringPart:                 ~[${\\"]+;
 
 mode SingleLineCommentMode;
@@ -343,8 +349,9 @@ HereDocText: ~[\r\n]*? ('\r'? '\n' | '\r');
 // '<?= "Hello world"; ?>' will be transformed to '<?php echo "Hello world"; ?>'
 fragment PhpStartEchoFragment: '<' ('?' '=' | { this.HasAspTags() }? '%' '=');
 fragment PhpStartFragment:     '<' ('?' 'php'? | { this.HasAspTags() }? '%');
-fragment NameChar
-    : NameStartChar
+fragment NameString: [a-zA-Z_\u0080-\ufffe][a-zA-Z0-9_\u0080-\ufffe]*;
+fragment HtmlNameChar
+    : HtmlNameStartChar
     | '-'
     | '_'
     | '.'
@@ -353,8 +360,8 @@ fragment NameChar
     | '\u0300'..'\u036F'
     | '\u203F'..'\u2040'
     ;
-fragment NameStartChar
-    : [:a-zA-Z]
+fragment HtmlNameStartChar
+    : [:a-z]
     | '\u2070'..'\u218F'
     | '\u2C00'..'\u2FEF'
     | '\u3001'..'\uD7FF'
@@ -364,4 +371,4 @@ fragment NameStartChar
 fragment ExponentPart:         'e' [+-]? Digit+;
 fragment NonZeroDigit:         [1-9_];
 fragment Digit:                [0-9_];
-fragment HexDigit:             [a-fA-F0-9_];
+fragment HexDigit:             [a-f0-9_];

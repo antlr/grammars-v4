@@ -43,10 +43,10 @@ defaultNamespaceDeclaration
 
 */
 namespaceDeclaration
-   : 'prefix' PREFX namespace
+   : 'prefix' PREFX namespace_
    ;
 
-namespace
+namespace_
    : IRI_REF
    ;
 

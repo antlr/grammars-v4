@@ -123,11 +123,11 @@ constFactor
    ;
 
 setOrQualident
-   : set
-   | qualident set?
+   : set_
+   | qualident set_?
    ;
 
-set
+set_
    : '{' (element (',' element)*)? '}'
    ;
 
@@ -136,10 +136,10 @@ element
    ;
 
 typeDeclaration
-   : ident '=' type
+   : ident '=' type_
    ;
 
-type
+type_
    : simpleType
    | arrayType
    | recordType
@@ -167,7 +167,7 @@ subrangeType
    ;
 
 arrayType
-   : ARRAY simpleType (',' simpleType)* OF type
+   : ARRAY simpleType (',' simpleType)* OF type_
    ;
 
 recordType
@@ -179,7 +179,7 @@ fieldListSequence
    ;
 
 fieldList
-   : (identList ':' type | CASE ident ((':' | '.' {       }) qualident)? OF variant ('|' variant)* (ELSE fieldListSequence)? END)?
+   : (identList ':' type_ | CASE ident ((':' | '.' {       }) qualident)? OF variant ('|' variant)* (ELSE fieldListSequence)? END)?
    ;
 
 variant
@@ -199,7 +199,7 @@ setType
    ;
 
 pointerType
-   : POINTER TO type
+   : POINTER TO type_
    ;
 
 procedureType
@@ -211,7 +211,7 @@ formalTypeList
    ;
 
 variableDeclaration
-   : identList ':' type
+   : identList ':' type_
    ;
 
 designator
@@ -247,8 +247,8 @@ factor
    ;
 
 setOrDesignatorOrProcCall
-   : set
-   | qualident (set | designatorTail? actualParameters?)
+   : set_
+   | qualident (set_ | designatorTail? actualParameters?)
    ;
 
 actualParameters
@@ -353,7 +353,7 @@ definitionModule
 
 definition
    : CONST (constantDeclaration ';')*
-   | TYPE (ident ('=' type)? ';')*
+   | TYPE (ident ('=' type_)? ';')*
    | VAR (variableDeclaration ';')*
    | procedureHeading ';'
    ;

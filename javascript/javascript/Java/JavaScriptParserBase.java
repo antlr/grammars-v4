@@ -44,13 +44,13 @@ public abstract class JavaScriptParserBase extends Parser
 
     protected boolean notOpenBraceAndNotFunction() {
         int nextTokenType = _input.LT(1).getType();
-        return nextTokenType != JavaScriptParser.OpenBrace && nextTokenType != JavaScriptParser.Function;
+        return nextTokenType != JavaScriptParser.OpenBrace && nextTokenType != JavaScriptParser.Function_;
     }
 
     protected boolean closeBrace() {
         return _input.LT(1).getType() == JavaScriptParser.CloseBrace;
     }
-    
+
     /**
      * Returns {@code true} iff on the current index of the parser's
      * token stream a token of the given {@code type} exists on the
@@ -74,7 +74,7 @@ public abstract class JavaScriptParserBase extends Parser
         // provided type.
         return (ahead.getChannel() == Lexer.HIDDEN) && (ahead.getType() == type);
     }
-    
+
     /**
      * Returns {@code true} iff on the current index of the parser's
      * token stream a token exists on the {@code HIDDEN} channel which

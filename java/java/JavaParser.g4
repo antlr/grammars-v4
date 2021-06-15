@@ -85,7 +85,7 @@ typeParameters
     ;
 
 typeParameter
-    : annotation* IDENTIFIER (EXTENDS typeBound)?
+    : annotation* IDENTIFIER (EXTENDS annotation* typeBound)?
     ;
 
 typeBound
@@ -198,8 +198,10 @@ constantDeclarator
     : IDENTIFIER ('[' ']')* '=' variableInitializer
     ;
 
-// see matching of [] comment in methodDeclaratorRest
-// methodBody from Java8
+// Early versions of Java allows brackets after the method name, eg.
+// public int[] return2DArray() [] { ... }
+// is the same as
+// public int[][] return2DArray() { ... }
 interfaceMethodDeclaration
     : interfaceMethodModifier* (typeTypeOrVoid | typeParameters annotation* typeTypeOrVoid)
       IDENTIFIER formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
@@ -246,7 +248,7 @@ classOrInterfaceType
 
 typeArgument
     : typeType
-    | '?' ((EXTENDS | SUPER) typeType)?
+    | annotation* '?' ((EXTENDS | SUPER) typeType)?
     ;
 
 qualifiedNameList
@@ -267,7 +269,7 @@ formalParameter
     ;
 
 lastFormalParameter
-    : variableModifier* typeType '...' variableDeclaratorId
+    : variableModifier* typeType annotation* '...' variableDeclaratorId
     ;
 
 qualifiedName
@@ -296,9 +298,12 @@ floatLiteral
     ;
 
 // ANNOTATIONS
+altAnnotationQualifiedName
+    : (IDENTIFIER DOT)* '@' IDENTIFIER
+    ;
 
 annotation
-    : '@' qualifiedName ('(' ( elementValuePairs | elementValue )? ')')?
+    : ('@' qualifiedName | altAnnotationQualifiedName) ('(' ( elementValuePairs | elementValue )? ')')?
     ;
 
 elementValuePairs
@@ -478,7 +483,7 @@ expression
     | expression '[' expression ']'
     | methodCall
     | NEW creator
-    | '(' typeType ')' expression
+    | '(' annotation* typeType ')' expression
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
     | prefix=('~'|'!') expression
@@ -582,7 +587,7 @@ typeList
     ;
 
 typeType
-    : annotation? (classOrInterfaceType | primitiveType) ('[' ']')*
+    : annotation* (classOrInterfaceType | primitiveType) (annotation* '[' ']')*
     ;
 
 primitiveType

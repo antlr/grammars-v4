@@ -43,7 +43,7 @@ parser grammar ANTLRv4Parser;
 options { tokenVocab = ANTLRv4Lexer; }
 // The main entry point for parsing a v4 grammar.
 grammarSpec
-   : DOC_COMMENT* grammarDecl prequelConstruct* rules modeSpec* EOF
+   : grammarDecl prequelConstruct* rules modeSpec* EOF
    ;
 
 grammarDecl
@@ -68,7 +68,7 @@ prequelConstruct
    // Options - things that affect analysis and/or code generation
 
 optionsSpec
-   : OPTIONS LBRACE (option SEMI)* RBRACE
+   : OPTIONS (option SEMI)* RBRACE
    ;
 
 option
@@ -96,11 +96,11 @@ delegateGrammar
    // Tokens & Channels
 
 tokensSpec
-   : TOKENS LBRACE idList? RBRACE
+   : TOKENS idList? RBRACE
    ;
 
 channelsSpec
-   : CHANNELS LBRACE idList? RBRACE
+   : CHANNELS idList? RBRACE
    ;
 
 idList
@@ -141,7 +141,7 @@ ruleSpec
    ;
 
 parserRuleSpec
-   : DOC_COMMENT* ruleModifiers? RULE_REF argActionBlock? ruleReturns? throwsSpec? localsSpec? rulePrequel* COLON ruleBlock SEMI exceptionGroup
+   : ruleModifiers? RULE_REF argActionBlock? ruleReturns? throwsSpec? localsSpec? rulePrequel* COLON ruleBlock SEMI exceptionGroup
    ;
 
 exceptionGroup
@@ -164,9 +164,9 @@ rulePrequel
 ruleReturns
    : RETURNS argActionBlock
    ;
-   // --------------
-   // Exception spec
 
+// --------------
+// Exception spec
 throwsSpec
    : THROWS identifier (COMMA identifier)*
    ;
@@ -175,7 +175,8 @@ localsSpec
    : LOCALS argActionBlock
    ;
 
-/** Match stuff like @init {int i;} */ ruleAction
+/** Match stuff like @init {int i;} */
+ruleAction
    : AT identifier actionBlock
    ;
 
@@ -211,7 +212,7 @@ labeledAlt
    // Lexer rules
 
 lexerRuleSpec
-   : DOC_COMMENT* FRAGMENT? TOKEN_REF COLON lexerRuleBlock SEMI
+   : FRAGMENT? TOKEN_REF COLON lexerRuleBlock SEMI
    ;
 
 lexerRuleBlock
@@ -230,6 +231,7 @@ lexerAlt
 
 lexerElements
    : lexerElement+
+   |
    ;
 
 lexerElement
@@ -321,9 +323,9 @@ atom
    | notSet
    | DOT elementOptions?
    ;
-   // --------------------
-   // Inverted element set
 
+// --------------------
+// Inverted element set
 notSet
    : NOT setElement
    | NOT blockSet
@@ -339,21 +341,21 @@ setElement
    | characterRange
    | LEXER_CHAR_SET
    ;
-   // -------------
-   // Grammar Block
 
+// -------------
+// Grammar Block
 block
    : LPAREN (optionsSpec? ruleAction* COLON)? altList RPAREN
    ;
-   // ----------------
-   // Parser rule ref
 
+// ----------------
+// Parser rule ref
 ruleref
    : RULE_REF argActionBlock? elementOptions?
    ;
-   // ---------------
-   // Character Range
 
+// ---------------
+// Character Range
 characterRange
    : STRING_LITERAL RANGE STRING_LITERAL
    ;
@@ -362,9 +364,9 @@ terminal
    : TOKEN_REF elementOptions?
    | STRING_LITERAL elementOptions?
    ;
-   // Terminals may be adorned with certain options when
-   // reference in the grammar: TOK<,,,>
 
+// Terminals may be adorned with certain options when
+// reference in the grammar: TOK<,,,>
 elementOptions
    : LT elementOption (COMMA elementOption)* GT
    ;
@@ -378,4 +380,4 @@ identifier
    : RULE_REF
    | TOKEN_REF
    ;
-
+   

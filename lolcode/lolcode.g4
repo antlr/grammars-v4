@@ -105,10 +105,10 @@ expression
    | mod
    | cast
    | either
-   | all
-   | any
-   | not
-   | func
+   | all_
+   | any_
+   | not_
+   | func_
    | LABEL
    | ATOM
    ;
@@ -161,19 +161,19 @@ cast
    : 'MAEK' expression 'A' < type >
    ;
 
-all
+all_
    : 'ALL OF' expression ('AN' expression)* 'MKAY?'
    ;
 
-any
+any_
    : 'ANY OF' expression ('AN' expression)* 'MKAY?'
    ;
 
-not
+not_
    : 'NOT' expression
    ;
 
-func
+func_
    : LABEL expression+ 'MKAY?'
    ;
 
