@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2018, Tom Everett
+Copyright (c) 2021, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -46,15 +46,17 @@ SKIP
     : 'SKIP'
     ;
 
-PREFIX
-    : '->'
+ARROW
+    : '\u8594'
     ;
+
+BOX: '\u9633';
 
 EXTERNALCHOICE
     : '[]'
     ;
 
-INDETER
+
 
 WS
    : [ \t\r\n] -> skip
