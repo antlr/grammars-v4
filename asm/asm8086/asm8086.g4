@@ -52,7 +52,7 @@ assemblerdirective
    : org
    | end
    | if_
-   | endif
+   | endif_
    | equ
    | db
    | dw
@@ -60,7 +60,7 @@ assemblerdirective
    | dd
    | dseg
    | title
-   | include
+   | include_
    | rw
    | rb
    | rs
@@ -123,7 +123,7 @@ assemblerterm
    | (NOT assemblerterm)
    ;
 
-endif
+endif_
    : ENDIF
    ;
 
@@ -136,10 +136,10 @@ org
    ;
 
 title
-   : TITLE string
+   : TITLE string_
    ;
 
-include
+include_
    : INCLUDE name
    ;
 
@@ -164,7 +164,7 @@ argument
    | dollar
    | register_
    | name
-   | string
+   | string_
    | ('(' expression ')')
    | ((number | name)? '[' expression ']')
    | ptr expression
@@ -186,7 +186,7 @@ register_
    : REGISTER
    ;
 
-string
+string_
    : STRING
    ;
 

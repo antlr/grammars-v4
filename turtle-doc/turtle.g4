@@ -48,7 +48,7 @@ predicateObjectList
    ;
 
 objectList
-   : object (Coma object)*
+   : object_ (Coma object_)*
    ;
 
 predicateObject
@@ -65,7 +65,7 @@ predicate
    : iri
    ;
 
-object
+object_
    : iri
    | blankNode
    | collection
@@ -76,7 +76,7 @@ object
 literal
    : rDFLiteral
    | numericLiteral
-   | bool
+   | bool_
    ;
 
 blankNodePropertyList
@@ -84,7 +84,7 @@ blankNodePropertyList
    ;
 
 collection
-   : LParen object* RParen
+   : LParen object_* RParen
    ;
 
 numericLiteral
@@ -97,7 +97,7 @@ rDFLiteral
    : string (LangTag | ('^^' iri))?
    ;
 
-bool
+bool_
    : TrueKeyword
    | FalseKeyword
    ;

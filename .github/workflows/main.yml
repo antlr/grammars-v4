@@ -11,15 +11,76 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        java: [ 9.0.x, 12 ]
+        java: [11, 12 ]
       fail-fast: false
-
     steps:
-    - uses: actions/checkout@v2
-
+    - uses: actions/checkout@v2.3.4
     - name: Set up JDK
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
+        distribution: 'zulu'
         java-version: ${{ matrix.java }}
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+  build-csharp:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v2.3.4
+    - name: Test C# target
+      run: |
+        bash _scripts/regtest.sh CSharp
+  build-pwsh:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        language: [CSharp, Java, Go, Python3, Dart]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.3.4
+      with:
+        fetch-depth: 0
+
+    - name: Install Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'zulu'
+    - name: Install Dart
+      if: ${{ matrix.language == 'Dart' }}
+      uses: dart-lang/setup-dart@v1
+    - name: Install Python
+      if: ${{ matrix.language == 'Python3' }}
+      uses: actions/setup-python@v2.2.2
+      with:
+        python-version: '3.8'
+
+    - name: Download ANTLR
+      shell: pwsh
+      run: |
+        $antlrPath = _scripts/get-antlr.ps1 latest
+        echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
+    - name: Install trgen
+      shell: pwsh
+      run: |
+        dotnet tool install -g trgen --version 0.7.0
+        dotnet tool install -g trwdog --version 0.7.0
+        if ("${{ matrix.os }}" -eq "ubuntu-latest") {
+            echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
+        }
+    - name: Test
+      shell: pwsh
+      run: |
+        if ("${{ github.event_name }}" -eq "pull_request") {
+            $Before = "${{ github.event.pull_request.base.sha }}"
+            $After = "${{ github.event.pull_request.head.sha }}"
+        }
+        else {
+            $Before = "${{ github.event.before }}"
+            $After = "${{ github.event.after }}"
+        }
+        $env:ANTLR_JAR_PATH="${{ env.antlr_path }}"
+        _scripts/test.ps1 ${{ matrix.language }} $Before $After

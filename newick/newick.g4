@@ -48,14 +48,14 @@ rootInternal
 
 subtree
    : leaf
-   | internal
+   | internal_
    ;
 
 leaf
    : name
    ;
 
-internal
+internal_
    : '(' branchSet ')' name
    ;
 

@@ -77,7 +77,7 @@ function_definition_header : DEF function_name crlf
                            ;
 
 function_name : id_function
-              | id
+              | id_
               ;
 
 function_definition_params : LEFT_RBRACKET RIGHT_RBRACKET
@@ -89,7 +89,7 @@ function_definition_params_list : function_definition_param_id
                                 | function_definition_params_list COMMA function_definition_param_id
                                 ;
 
-function_definition_param_id : id;
+function_definition_param_id : id_;
 
 return_statement : RETURN all_result;
 
@@ -108,7 +108,7 @@ function_param : ( function_unnamed_param | function_named_param );
 
 function_unnamed_param : ( int_result | float_result | string_result | dynamic_result );
 
-function_named_param : id op=ASSIGN ( int_result | float_result | string_result | dynamic_result );
+function_named_param : id_ op=ASSIGN ( int_result | float_result | string_result | dynamic_result );
 
 function_call_assignment : function_call;
 
@@ -193,7 +193,7 @@ array_definition_elements : ( int_result | dynamic_result )
                           | array_definition_elements COMMA ( int_result | dynamic_result )
                           ;
 
-array_selector : id LEFT_SBRACKET ( int_result | dynamic_result ) RIGHT_SBRACKET
+array_selector : id_ LEFT_SBRACKET ( int_result | dynamic_result ) RIGHT_SBRACKET
                | id_global LEFT_SBRACKET ( int_result | dynamic_result ) RIGHT_SBRACKET
                ;
 
@@ -210,10 +210,10 @@ dynamic_result : dynamic_result op=( MUL | DIV | MOD ) int_result
                | float_result op=( PLUS | MINUS )  dynamic_result
                | dynamic_result op=( PLUS | MINUS ) dynamic_result
                | LEFT_RBRACKET dynamic_result RIGHT_RBRACKET
-               | dynamic
+               | dynamic_
                ;
 
-dynamic : id
+dynamic_ : id_
         | function_call_assignment
         | array_selector
         ;
@@ -254,10 +254,10 @@ comparison : left=comp_var op=( LESS | GREATER | LESS_EQUAL | GREATER_EQUAL ) ri
 
 comp_var : all_result
          | array_selector
-         | id
+         | id_
          ;
 
-lvalue : id
+lvalue : id_
        //| id_global
        ;
 
@@ -321,7 +321,7 @@ bool_t : TRUE
 
 nil_t : NIL;
 
-id : ID;
+id_ : ID;
 
 id_global : ID_GLOBAL;
 

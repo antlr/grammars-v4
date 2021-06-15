@@ -351,10 +351,10 @@ expression_list
    ;
 
 array_subscripts
-   : '[' subscript (',' subscript)* ']'
+   : '[' subscript_ (',' subscript_)* ']'
    ;
 
-subscript
+subscript_
    : ':'
    | expression
    ;

@@ -105,7 +105,7 @@ OS X
 <span class="dollar">$</span> <span class="cmd">sudo curl</span> -O http://www.antlr.org/download/antlr-4.2.2-complete.jar
 <span class="dollar">$</span> <span class="cmd">export</span> <span class="equals">CLASSPATH=</span><span class="path">".:/usr/local/lib/antlr-4.2.2-complete.jar:$CLASSPATH"</span>
 <span class="dollar">$</span> <span class="cmd">alias</span> <span class="equals">antlr4=</span><span class="path">'java -jar /usr/local/lib/antlr-4.2.2-complete.jar'</span>
-<span class="dollar">$</span> <span class="cmd">alias</span> <span class="equals">grun=</span><span class="path">'java org.antlr.v4.runtime.misc.TestRig'</span>
+<span class="dollar">$</span> <span class="cmd">alias</span> <span class="equals">grun=</span><span class="path">'java org.antlr.v4.gui.TestRig'</span>
 </pre>
 	</div>
 	
@@ -116,7 +116,7 @@ LINUX
 <span class="dollar">$</span> <span class="cmd">wget</span> http://antlr.org/download/antlr-4.2.2-complete.jar
 <span class="dollar">$</span> <span class="cmd">export</span> <span class="equals">CLASSPATH=</span><span class="path">".:/usr/local/lib/antlr-4.2.2-complete.jar:$CLASSPATH"</span>
 <span class="dollar">$</span> <span class="cmd">alias</span> <span class="equals">antlr4=</span><span class="path">'java -jar /usr/local/lib/antlr-4.2.2-complete.jar'</span>
-<span class="dollar">$</span> <span class="cmd">alias</span> <span class="equals">grun=</span><span class="path">'java org.antlr.v4.runtime.misc.TestRig'</span>
+<span class="dollar">$</span> <span class="cmd">alias</span> <span class="equals">grun=</span><span class="path">'java org.antlr.v4.gui.TestRig'</span>
 </pre>
 </div>
 
@@ -137,7 +137,7 @@ SET CLASSPATH=.;C:\Javalib\antlr4-complete.jar;%CLASSPATH%
 <li>Create batch commands for ANTLR Tool, TestRig in dir in PATH
 <pre>
  antlr4.bat: java org.antlr.v4.Tool %*
- grun.bat:   java org.antlr.v4.runtime.misc.TestRig %*
+ grun.bat:   java org.antlr.v4.gui.TestRig %*
 </pre>
 </ol>
 </div>
