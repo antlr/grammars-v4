@@ -206,21 +206,21 @@ pick_tag_list
    ;
 
 function_definition
-   : function_name_part function_arg_ret '{' statements '}'
+   : function_name_part function_arg_ret '{' statements_ '}'
    ;
 
 function_name_part
    : IDENTIFIER ('.' IDENTIFIER)*
    ;
 
-statements
+statements_
    : (declaration | statement)*
    ;
 
 statement
    : expression ';'
    | ';'
-   | '{' statements '}'
+   | '{' statements_ '}'
    | 'if' '(' expression ')' statement
    | 'if' '(' expression ')' statement 'else' statement
    | label? 'while' '(' expression? ')' statement
