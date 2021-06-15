@@ -1,0 +1,17 @@
+$foo
+$mudSlinger
+$mud-slinger
+$mud_slinger
+$mudSlinger1
+
+#set( $size = "Big" )
+#set( $name = "Ben" )
+
+The clock is $size$name.
+
+#set( $size = "Big" )
+#set( $name = "Ben" )
+
+#set($clock = "${size}Tall$name" )
+
+The clock is $clock.

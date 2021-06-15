@@ -1,0 +1,522 @@
+//
+// $Id: KTabLayout.tjs,v 1.8 2007/09/17 10:03:45 m2 Exp $
+//
+
+
+/**----------------------------------------------------------------------
+ * タブボタン
+ ----------------------------------------------------------------------*/
+class KTab extends KWidget
+{
+  var _label;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * ユーザーが直接newするクラスでは無い。
+   * KTabLayout で add() した際に内部的に勝手に作られる。
+   * KTabLayout.tabAt() で参照可能。
+   ------------------------------*/
+  function KTab(window, label) {
+    super.KWidget(window);
+    _label = label;
+    hitThreshold = 0;
+    mouseDragThreshold = 8;
+  }
+
+  /**------------------------------
+   * ラベル
+   *
+   * @param v ラベル
+   * @return ラベル
+   ------------------------------*/
+  property label {
+    getter {
+      return _label;
+    }
+    setter(v) {
+      if (v == _label)
+        return;
+      _label = v;
+      invalidateLayout();
+    }
+  }
+
+  /**------------------------------
+   * このタブを選択する
+   ------------------------------*/
+  function select {
+    parent.tabIndex = this.index;
+  }
+
+  property index {
+    getter {
+      return parent.tabList.find(this);
+    }
+  }
+
+  function onParentModified(parent) {
+    _fontColor = parent.fontColor;
+    font.height = parent.fontHeight;
+    font.face = parent.fontFace;
+    invalidateLayout();
+  }
+
+  function invalidateLayout {
+    setFixedSize(fontHeight + font.getTextWidth(label),
+                 fontHeight * 2);
+  }
+
+  function onSizeModified {
+    redraw();
+  }
+
+  function redraw {
+    var selected = parent.tabIndex == index;
+    drawFrame(parent.type, 0, 0, width, height + 2, parent.neutralColor);
+    drawText(fontHeight / 2, fontHeight / 2 + (selected ? -1 : 1), label, fontColor, selected ? 255 : 128);
+  }
+
+  function onClick {
+    select();
+    parent.onTabClick(this.index);
+  }
+
+  function onDoubleClick {
+    parent.onTabDoubleClick(this.index);
+  }
+
+  function onRightClick {
+    parent.onTabRightClick(this.index);
+  }
+
+  function onDragEnter {
+    parent.onTabDragEnter(this.index);
+  }
+
+  function onPacketCancel(packet) {
+    parent.onTabPacketCancel(this.index, packet);
+  }
+}
+
+
+/**----------------------------------------------------------------------
+ * タブレイアウト
+ ----------------------------------------------------------------------*/
+class KTabLayout extends KWidget
+{
+  var frameLayer;
+  var childList;
+  var tabList;
+  var _tabIndex;
+  var _type;
+  var tabW, tabH;
+  var boxMinW, boxMinH, boxMaxW, boxMaxH;
+  var redrawn;
+  var _tabWrapping;
+
+  /**------------------------------
+   * コンストラクタ
+   *
+   * @param window ウィンドウ
+   * @param type フレームタイプ。FRAME_FLATTEN, FRAME_SUNKEN, FRAME_RAISEDのいずれかを選択する。
+   * @param name 名前
+   ------------------------------*/
+  function KTabLayout(window, type = FRAME_RAISED, name = "") {
+    super.KWidget(window, name);
+    frameLayer = new global.KWidget(window);
+    frameLayer.parent = this;
+    _type = type;
+    childList = [];
+    tabList = [];
+    _tabIndex = -1;
+    _tabWrapping = false;
+    focusable = window.defaultFocusable;
+    hasImage = false;
+    hitThreshold = 0;
+  }
+
+  /**------------------------------
+   * フレームタイプ
+   *
+   * @param v フレームタイプ
+   * @return フレームタイプ
+   ------------------------------*/
+  property type {
+    getter {
+      return _type;
+    }
+    setter(v) {
+      if (_type == v)
+        return;
+      _type = v;
+      redraw();
+      redrawAllTabs();
+    }
+  }
+
+  /**------------------------------
+   * タブを折り返すかどうか
+   * 
+   * @param v タブを折り返すかどうか
+   * @return タブを折り返すかどうか
+   ------------------------------*/
+  property tabWrapping {
+    getter {
+      return _tabWrapping;
+    }
+    setter (v) {
+      if (_tabWrapping == v)
+	return;
+      _tabWrapping = v;
+      invalidateLayout();
+    }
+  }
+
+  /**------------------------------
+   * 子ウィジェットを登録する
+   * 
+   * @param tabName タブの名前
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function add(tabName, child) {
+    child.tabName = tabName;
+    child.parent = this;
+    childList.add(child);
+    var tab = new KTab(window, tabName);
+    tabList.add(tab);
+    tab.parent = this;
+  }
+
+  /**------------------------------
+   * 子ウィジェットを登録する
+   * 
+   * @param index インデックス
+   * @param tabName タブの名前
+   * @param child 子ウィジェット
+   ------------------------------*/
+  function insert(index, tabName, child) {
+    if (_tabIndex >= index)
+      _tabIndex++;
+    child.tabName = tabName;
+    child.parent = this;
+    childList.insert(index, child);
+    var tab = new KTab(window, tabName);
+    tabList.insert(index, tab);
+    tab.parent = this;
+  }
+
+  /**------------------------------
+   * 子ウィジェットを解放する
+   *
+   * @param child 子ウィジェット
+   * @param doInvalidate invalidateするかどうか
+   ------------------------------*/
+  function remove(child, doInvalidate = true) {
+    var index = childList.find(child);
+    if (_tabIndex == index)
+      _tabIndex = -1;
+    else if (_tabIndex > index)
+      _tabIndex--;
+    childList.erase(index);
+    invalidate tabList[index];
+    tabList.erase(index);
+    child.parent = widgetDepot;
+    invalidateLayout();
+    if (doInvalidate)
+      invalidate child;
+  }
+
+  /**------------------------------
+   * 子アイテムをカウントする
+   * 
+   * @return 子アイテム数
+   ------------------------------*/
+  property childCount {
+    getter {
+      return childList.count;
+    }
+  }
+
+  /**------------------------------
+   * 子ウィジェットを参照する
+   *
+   * @param index インデックス
+   * @return 子ウィジェット
+   ------------------------------*/
+  function childAt(index) {
+    return childList[index];
+  }
+
+  /**------------------------------
+   * タブを参照する
+   *
+   * @param index インデックス
+   * @return タブ
+   ------------------------------*/
+  function tabAt(index) {
+    return tabList[index];
+  }
+
+  /**------------------------------
+   * タブインデックス
+   *
+   * @param v  タブインデックス
+   * @return タブインデックス
+   ------------------------------*/
+  property tabIndex {
+    getter {
+      return _tabIndex;
+    }
+    setter(v) {
+      if (v == _tabIndex)
+        return;
+      _tabIndex = v;
+      redraw();
+      redrawAllTabs();
+      onTabSelected(_tabIndex);
+    }
+  }
+
+  /**------------------------------
+   * タブがクリックされた時に呼ばれるフック関数
+   *
+   * @param index インデックス
+   ------------------------------*/
+  function onTabClick(index) {
+  }
+
+  /**------------------------------
+   * タブがダブルクリックされた時に呼ばれるフック関数
+   *
+   * @param index インデックス
+   ------------------------------*/
+  function onTabDoubleClick(index) {
+  }
+
+  /**------------------------------
+   * タブが右クリックされた時に呼ばれるフック関数
+   *
+   * @param index インデックス
+   ------------------------------*/
+  function onTabRightClick(index) {
+  }
+
+  /**------------------------------
+   * タブがドラッグ開始された時に呼ばれるフック関数
+   *
+   * @param index インデックス
+   ------------------------------*/
+  function onTabDragEnter(index) {
+  }
+
+  /**------------------------------
+   * タブのパケットドラッグがキャンセルされた時に呼ばれるフック関数
+   *
+   * @param index インデックス
+   * @param packet パケット
+   ------------------------------*/
+  function onTabPacketCancel(packet) {
+  }
+
+  /**------------------------------
+   * タブが選択された時に呼ばれるフック関数
+   *
+   * @param index インデックス
+   ------------------------------*/
+  function onTabSelected(index) {
+  }
+
+  // フォーカス時のキー反応。
+  // 左右でタブを切り替え
+  function onKeyDown(key, shift) {
+    switch (key) {
+    default:
+      super.onKeyDown(...);
+      break;
+    case  VK_RIGHT: 
+      tabIndex = (tabIndex + 1) % tabList.count;
+      break;
+    case VK_LEFT:
+      tabIndex = (tabIndex - 1 + tabList.count) % tabList.count;
+      break;
+    } 
+  }
+
+  // レイアウトのやり直し
+  function invalidateLayout {
+    if (childList.count == 0)
+      return;
+
+    boxMinW = boxMinH = boxMaxW = boxMaxH = 0;
+    tabW = tabH = 0;
+    var tabMinW = 0;
+
+    for (var i = 0; i < tabList.count; i++) {
+      var tab = tabList[i];
+      tabMinW = Math.max(tabMinW, tab.minWidth);
+      tabW += tab.minWidth;
+      tabH = Math.max(tabH, tab.minHeight);
+    }
+    for (var i = 0; i < childList.count; i++) {
+      var child = childList[i];
+      boxMinW = Math.max(boxMinW, child.minWidth + child.marginHorizontal);
+      boxMinH = Math.max(boxMinH, child.minHeight + child.marginVertical);
+      boxMaxW = Math.max(boxMaxW, child.maxWidth + child.marginHorizontal);
+      boxMaxH = Math.max(boxMaxH, child.maxHeight + child.marginVertical);
+    }
+
+    var minW, minH, maxW, maxH;
+    if (tabWrapping)
+      minW = int(Math.max(tabMinW, boxMinW + 4));
+    else
+      minW = int(Math.max(tabW, boxMinW + 4));
+    minH = boxMinH + tabH + 4;
+    maxW = int(Math.max(tabW, boxMaxW + 4));
+    maxH = boxMaxH + tabH + 4;
+
+    var x = 0;
+    for (var i = 0; i < tabList.count; i++) {
+      var tab = tabList[i];
+      tab.setSize(tab.minWidth, tab.minHeight);
+      tab.setPos(x, tabH - tab.height);
+      x += tab.width;
+    }
+
+    redrawn = false;
+    setMinMaxSize(minW, minH, maxW, maxH);
+    if (! redrawn)
+      redraw();
+  }
+
+  // タブを全て再描画
+  function redrawAllTabs {
+    for (var i = 0; i < tabList.count; i++)
+      tabList[i].redraw();
+  }
+
+  // フレームの再描画
+  function redraw {
+    if (childList.count == 0) {
+      return;
+    }
+
+    redrawn = true;
+
+    if (tabIndex == -1) {
+      tabIndex = 0;
+    }
+    if (tabIndex >= tabList.count) {
+      tabIndex = tabList.count - 1;
+    }
+
+    if (tabWrapping) {
+      var tabRowList;
+      var curIndexRowCount;
+      var x, y, row;
+      x = y = 0;
+      tabRowList = [];
+      row = 0;
+      for (var i = 0; i < tabList.count; i++) {
+	var tab = tabList[i];
+	if (x + tab.width > width) {
+	  x = 0;
+	  row ++;
+	  y += tab.height;
+	}
+	tabRowList.add([ x, y, row ]);
+	x += tab.width;
+	if (i == tabIndex)
+	  curIndexRowCount = row;
+      }
+      y += tabAt(0).height;
+
+      if (tabH != y) {
+	tabH = y;
+	var minH, maxH;
+	minH = boxMinH + tabH + 4;
+	maxH = boxMaxH + tabH + 4;
+	setMinMaxSize(minWidth, minH, maxWidth, maxH);
+      }
+
+      for (var i = 0; i < tabList.count; i++) {
+	var tab = tabList[i];
+	var x, y, row;
+	x = tabRowList[i][0];
+	y = tabRowList[i][1];
+	row = tabRowList[i][2];
+@if(0)
+	if (row == curIndexRowCount)
+	  y = tabH - tab.height;
+	else if (row > curIndexRowCount)
+	  y = y - tab.height;
+@endif
+	tab.setPos(x, y);
+      }
+    }
+
+    frameLayer.setFixedSize(width, height);
+    frameLayer.fillRect(0, 0, width, tabH, 0);
+    frameLayer.drawFrame(type, 0, tabH, width, height - tabH, neutralColor);
+    var tab = tabAt(tabIndex);
+    if (tab.top + tab.height == tabH)
+      frameLayer.fillRect(tab.left + 2, tabH, tab.width - 4, 2, neutralColor);
+    
+    for (var i = 0; i < childList.count; i++) {
+      var child = childList[i];
+      if (i != tabIndex) {
+        child.visible = false;
+        child.setSize(width - 4 - child.marginHorizontal,
+                      height - tabH - 4 - child.marginVertical);
+        continue;
+      }
+      child.visible = true;
+      child.setSize(width - 4 - child.marginHorizontal,
+                    height - tabH - 4 - child.marginVertical);
+      locateChild(2, tabH + 2, width - 4, height - tabH - 4, child);
+    }
+  }
+
+  // 子の最小最大サイズ更新を検知
+  function onChildMinMaxSizeModified {
+    invalidateLayout();
+  }
+
+  // 子のマージン変更を検知
+  function onChildMarginModified {
+    invalidateLayout();
+  }
+
+  // 子のアライメント変更を検知
+  function onChildAlignModified {
+    redraw();
+  }
+
+  function onSizeModified {
+    redraw();
+  }
+
+  // フォーカスを検知
+  function onFocus {
+    redrawAllTabs();
+  }
+
+  // フォーカスロストを検知
+  function onBlur {
+    redrawAllTabs();
+  }
+
+  // enabled==trueならそのまま表示
+  function onNodeEnabled {
+    for (var i = 0; i < tabList.count; i++)
+      tabList[i].opacity = 255;
+    frameLayer.opacity = 255;
+  }
+
+  // enabled=falseなら半透明で表示
+  function onNodeDisabled {
+    for (var i = 0; i < tabList.count; i++)
+      tabList[i].opacity = 64;
+    frameLayer.opacity = 64;
+  }
+}

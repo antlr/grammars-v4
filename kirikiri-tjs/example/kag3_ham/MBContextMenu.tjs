@@ -1,0 +1,52 @@
+/******************************************************************************
+	system_xmb/xmb/system/MBContextMenu.tjs
+*******************************************************************************/
+
+
+class MBContextMenu extends MBObject
+{
+	var objMenuLayer; // メニューレイヤ
+	var objUnderLayer;	// 下敷きレイヤ
+	
+	var strCurrentContext = "default";	// どれを呼ぶか（obsolete）
+	
+	
+	function MBContextMenu(win, mod='default')
+	{
+		// コンストラクタ
+		
+		super.MBObject(win);
+		
+		strCurrentContext = mod;
+	}
+
+	function finalize()
+	{
+		// ファイナライザ
+		
+		invalidate objUnderLayer if (objUnderLayer !== void);
+		invalidate objMenuLayer if (objMenuLayer !== void);
+		
+		super.finalize(...);
+	}
+	
+	//--------------------------------------------------------------------------
+	
+	function open()
+	{
+		// メニューを開く
+		
+		objUnderLayer = new MBContextUnderLayer(window, window.fore.base, this);
+		
+		objMenuLayer = new MBDefaultContextMenu(window, objUnderLayer, this);
+		objMenuLayer.show();
+	}
+
+	function close()
+	{
+		// メニューを閉じる
+		
+		objMenuLayer.hide();
+	}
+}
+

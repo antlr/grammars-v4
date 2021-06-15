@@ -1,0 +1,8 @@
+GET "libhdr"
+
+LET start() = VALOF
+{ FOR i = 0 TO 16 DO writef("%n! = %n*n", i, factorial(i))
+  RESULTIS 0
+}
+
+AND factorial(n) = n=0 -> 1, n*factorial(n-1)
