@@ -1,3 +1,4 @@
+gdscript
 kirikiri-tjs
 clif
 swift/swift5

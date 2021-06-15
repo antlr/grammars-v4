@@ -6,6 +6,7 @@ clif
 cpp
 csharp
 fortran77
+gdscript
 haskell
 html
 hypertalk

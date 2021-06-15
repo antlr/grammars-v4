@@ -19,6 +19,7 @@ erlang
 flatbuffers
 focal
 fortran77
+gdscript
 gff3
 gml
 golang

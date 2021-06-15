@@ -68,6 +68,7 @@
 				<module>abnf</module>
 				<module>acme</module>
 				<module>agc</module>
+                <module>alef</module>
 				<module>algol60</module>
 				<module>alpaca</module>
 				<module>antlr</module>
@@ -88,6 +89,7 @@
 				<module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
+                <module>callable</module>
 				<module>capnproto</module>
 				<module>clf</module>
 				<module>clojure</module>
@@ -121,6 +123,7 @@
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
+				<module>gdscript</module>
 				<module>gedcom</module>
 				<module>gff3</module>
 				<module>gml</module>
@@ -158,6 +161,7 @@
 				<module>lambda</module>
 				<module>lcc</module>
 				<module>less</module>
+                <module>limbo</module>
 				<module>lisa</module>
 				<module>logo</module>
 				<module>lolcode</module>
@@ -215,7 +219,8 @@
 				<module>r</module>
 				<module>rcs</module>
 				<module>redcode</module>
-				<module>rego</module>
+                <module>refal</module>
+                <module>rego</module>
 				<module>restructuredtext</module>
 				<module>rexx</module>
 				<module>rfc822</module>
