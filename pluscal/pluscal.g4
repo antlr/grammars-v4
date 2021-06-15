@@ -32,12 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar pluscal;
 
 algorithm
-   : ('--algorithm' |'--fair algorithm') name '{' varDecls? definitions? macro* procedure* (compoundStmt | process+) '}'
+   : ('--' 'algorithm' | '--fair' 'algorithm') name '{' varDecls? definitions? macro* procedure* (compoundStmt | process+) '}'
    ;
 
 definitions
-  : 'define' '{' ~'}'* '}' ';'?
- ;
+   : 'define' '{' ~ '}'* '}' ';'?
+   ;
 
 macro
    : 'macro' name '(' (pVarDecl (',' pVarDecl)*)? ')' compoundStmt ';'?
@@ -55,19 +55,17 @@ varDecls
    : ('variable' | 'variables') varDecl+
    ;
 
-varDecl: variable ((EQ | IN) expr)? (';' | ',');
+varDecl
+   : variable ((EQ | IN) expr)? (';' | ',')
+   ;
 
 pVarDecls
    : ('variable' | 'variables') (pVarDecl (';' | ','))+
    ;
 
-pVarDecl: variable (EQ expr)? ';';
-
-
-
-
-
-
+pVarDecl
+   : variable (EQ expr)? ';'
+   ;
 
 compoundStmt
    : '{' stmt (';' stmt)* ';'? '}'
@@ -133,10 +131,12 @@ gotostmt
    ;
 
 callstmt
-   : 'call'?  macrocall
+   : 'call'? macrocall
    ;
 
-macrocall: name '(' (expr (',' expr)*)? ')';
+macrocall
+   : name '(' (expr (',' expr)*)? ')'
+   ;
 
 expr
    : atom ((AND | OR) atom)*
@@ -163,12 +163,21 @@ numb
    ;
 
 bool
-   : 'TRUE' | 'FALSE'
+   : 'TRUE'
+   | 'FALSE'
    ;
 
-label: ID;
-variable: ID;
-name: ID;
+label
+   : ID
+   ;
+
+variable
+   : ID
+   ;
+
+name
+   : ID
+   ;
 
 AND
    : '/\\'
@@ -181,6 +190,7 @@ OR
 ASSIGN
    : ':='
    ;
+
 EQ
    : '='
    ;
@@ -199,6 +209,10 @@ ID
 
 COMMENT
    : ';' ~ [\r\n]*
+   ;
+
+COMMENT2
+   : '\\*' ~ [\r\n]*
    ;
 
 WS
