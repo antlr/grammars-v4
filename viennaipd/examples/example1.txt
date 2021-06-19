@@ -1,0 +1,7 @@
+some_float = 3.3 ;
+key some_text = "some Text" ;
+ext x = 32;
+ext y = 4;
+aux a = sqrt( x * x + y *  ) ;
+ex = x / a ;
+ey = y / a ;
