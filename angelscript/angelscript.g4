@@ -236,8 +236,8 @@ BITOP
    ;
 
 MATHOP
-   : '+'
-   | '-'
+   : PLUS
+   | MINUS
    | '*'
    | '/'
    | '\''
@@ -302,13 +302,21 @@ FUNCATTR
    ;
 
 EXPRPREOP
-   : '-'
-   | '+'
+   : MINUS
+   | PLUS
    | '!'
    | '++'
    | '--'
    | '~'
    | '@'
+   ;
+
+fragment PLUS
+   : '+'
+   ;
+
+fragment MINUS
+   : '-'
    ;
 
 LITERAL
