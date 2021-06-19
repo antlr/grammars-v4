@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar angelscript;
 
 script
-   : (import_ | enum_ | typdef | class_ | mixin | interface_ | funcdef | virtprop | var | func | namespace | ';')*
+   : (import_ | enum_ | typdef | class_ | mixin | interface_ | funcdef | virtprop | var | func | namespace | ';')+
    ;
 
 class_
@@ -48,7 +48,7 @@ namespace
    ;
 
 func
-   : ('shared' | 'external')* ('private' | 'protected')? (((type_ '&'?) | '~'))? IDENTIFIER paramlist 'const'? FUNCATTR (';' | statblock)
+   : ('shared' | 'external')* ('private' | 'protected')? (((type_ '&'?) | '~'))? IDENTIFIER paramlist 'const'? FUNCATTR? (';' | statblock)
    ;
 
 interface_
@@ -88,7 +88,7 @@ statblock
    ;
 
 paramlist
-   : '(' ('void' | (type_ typemod IDENTIFIER? ('=' expr)? (',' type_ typemod IDENTIFIER? ('=' expr)?)*))? ')'
+   : '(' (VOID | (type_ typemod IDENTIFIER? ('=' expr)? (',' type_ typemod IDENTIFIER? ('=' expr)?)*))? ')'
    ;
 
 typemod
@@ -169,7 +169,7 @@ exprterm
    ;
 
 exprvalue
-   : 'void'
+   : VOID
    | constructcall
    | funccall
    | varaccess
@@ -281,7 +281,7 @@ ASSIGNOP
    ;
 
 PRIMTYPE
-   : 'void'
+   : VOID
    | 'int'
    | 'int8'
    | 'int16'
@@ -309,6 +309,10 @@ EXPRPREOP
    | '--'
    | '~'
    | '@'
+   ;
+
+VOID
+   : 'void'
    ;
 
 fragment PLUS
@@ -343,6 +347,10 @@ STRING
 
 BITS
    : (('0b' | '0o' | '0d' | '0x' | '0B' | '0O' | '0D' | '0X') [0-9a-z])
+   ;
+
+COMMENT
+   : '//' ~ [\r\n]* -> skip
    ;
 
 WS

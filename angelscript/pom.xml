@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>program</entryPoint>
+					<entryPoint>script</entryPoint>
 					<grammarName>angelscript</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
