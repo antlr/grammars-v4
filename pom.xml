@@ -71,7 +71,8 @@
                 <module>alef</module>
 				<module>algol60</module>
 				<module>alpaca</module>
-				<module>antlr</module>
+                <module>angelscript</module>
+                <module>antlr</module>
 				<module>apex</module>
 				<module>apt</module>
 				<module>arithmetic</module>
