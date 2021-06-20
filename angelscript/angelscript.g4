@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar angelscript;
 
 script
-   : (import_ | enum_ | typdef | class_ | mixin | interface_ | funcdef | virtprop | var_ | func_ | namespace | ';')+
+   : (import_ | enum_ | typdef | class_ | mixin_ | interface_ | funcdef | virtprop | var_ | func_ | namespace | ';')+
    ;
 
 class_
@@ -75,7 +75,7 @@ virtprop
    : ('private' | 'protected')? type_ '&'? IDENTIFIER '{' (('get' | 'set') 'const'? FUNCATTR (statblock | ';'))* '}'
    ;
 
-mixin
+mixin_
    : 'mixin' class_
    ;
 
