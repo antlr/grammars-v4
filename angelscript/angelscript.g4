@@ -32,11 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar angelscript;
 
 script
-   : (import_ | enum_ | typdef | class_ | mixin | interface_ | funcdef | virtprop | var | func | namespace | ';')+
+   : (import_ | enum_ | typdef | class_ | mixin_ | interface_ | funcdef | virtprop | var_ | func_ | namespace | ';')+
    ;
 
 class_
-   : ('shared' | 'abstract' | 'final' | 'external')* 'class' IDENTIFIER (';' | ((':' IDENTIFIER (',' IDENTIFIER)*)? '{' (virtprop | func | var | funcdef)* '}'))
+   : ('shared' | 'abstract' | 'final' | 'external')* 'class' IDENTIFIER (';' | ((':' IDENTIFIER (',' IDENTIFIER)*)? '{' (virtprop | func_ | var_ | funcdef)* '}'))
    ;
 
 typdef
@@ -47,7 +47,7 @@ namespace
    : 'namespace' IDENTIFIER '{' script '}'
    ;
 
-func
+func_
    : ('shared' | 'external')* ('private' | 'protected')? (((type_ '&'?) | '~'))? IDENTIFIER paramlist 'const'? FUNCATTR? (';' | statblock)
    ;
 
@@ -55,7 +55,7 @@ interface_
    : ('external' | 'shared')* 'interface' IDENTIFIER (';' | ((':' IDENTIFIER (',' IDENTIFIER)*)? '{' (virtprop | intfmthd)* '}'))
    ;
 
-var
+var_
    : ('private' | 'protected')? type_ IDENTIFIER (('=' (initlist | expr)) | arglist)? (',' IDENTIFIER (('=' (initlist | expr)) | arglist)?)* ';'
    ;
 
@@ -75,7 +75,7 @@ virtprop
    : ('private' | 'protected')? type_ '&'? IDENTIFIER '{' (('get' | 'set') 'const'? FUNCATTR (statblock | ';'))* '}'
    ;
 
-mixin
+mixin_
    : 'mixin' class_
    ;
 
@@ -84,7 +84,7 @@ intfmthd
    ;
 
 statblock
-   : '{' (var | statement)* '}'
+   : '{' (var_ | statement)* '}'
    ;
 
 paramlist
@@ -124,7 +124,7 @@ break_
    ;
 
 for_
-   : 'for' '(' (var | exprstat) exprstat (assign (',' assign)*)? ')' statement
+   : 'for' '(' (var_ | exprstat) exprstat (assign (',' assign)*)? ')' statement
    ;
 
 while_
@@ -176,7 +176,7 @@ exprvalue
    | cast
    | LITERAL
    | '(' assign ')'
-   | lambda
+   | lambda_
    ;
 
 constructcall
@@ -195,7 +195,7 @@ cast
    : 'cast' '<' type_ '>' '(' assign ')'
    ;
 
-lambda
+lambda_
    : 'function' '(' ((type_ typemod)? IDENTIFIER (',' (type_ typemod)? IDENTIFIER)*)? ')' statblock
    ;
 
@@ -356,4 +356,3 @@ COMMENT
 WS
    : [ \r\n\t]+ -> skip
    ;
-
