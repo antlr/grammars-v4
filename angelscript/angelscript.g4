@@ -356,4 +356,3 @@ COMMENT
 WS
    : [ \r\n\t]+ -> skip
    ;
-
