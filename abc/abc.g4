@@ -33,10 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar abc;
 
 abc
-   : header body
+   : headers body
    ;
 
-header
+headers
    : pair +
    ;
 
@@ -69,13 +69,8 @@ string
    ;
 
 number
-   : NUMBER
+   : NUMBER | NOTE
    ;
-
-comment
-   : COMMENT
-   ;
-
 
 NOTE
    : [a-gA-G1-9\]] +
@@ -93,7 +88,7 @@ NUMBER
 
 
 COMMENT
-   : '%' ~ [\r\n]*
+   : '%' ~ [\r\n]* ->skip
    ;
 
 
