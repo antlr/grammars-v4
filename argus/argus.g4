@@ -63,19 +63,19 @@ routine
    ;
 
 procedure
-   : idn '=' 'proc' parms? args returnz? signals? where? routine body 'end' idn
+   : idn '=' 'proc' parms? args returnz? signals? where? routine_body 'end' idn
    ;
 
 iterator
-   : idn '=' 'iter' parms? args yields? signals? where? routine body 'end' idn
+   : idn '=' 'iter' parms? args yields? signals? where? routine_body 'end' idn
    ;
 
 creator
-   : idn '=' 'creator' args returnz? signals? routine body 'end' idn
+   : idn '=' 'creator' args returnz? signals? routine_body 'end' idn
    ;
 
 handler
-   : idn '=' 'handler' args returnz? signals? routine body 'end' idn
+   : idn '=' 'handler' args returnz? signals? routine_body 'end' idn
    ;
 
 routine_body
@@ -160,18 +160,18 @@ equate
 own_var
    : 'own' decl
    | 'own' idn ':' type_spec ':=' expression
-   | 'own' decl (',' decl)* ':=' call ('@' primary)?
+   | 'own' decl (',' decl)* ':=' call ('@' primaries)?
    ;
 
 statement
    : decl
    | idn ':' type_spec ':=' expression
-   | decl (',' decl)* ':=' call ('@' primary)?
-   | idn (',' idn)* ':=' call ('@' primary)?
+   | decl (',' decl)* ':=' call ('@' primaries)?
+   | idn (',' idn)* ':=' call ('@' primaries)?
    | idn (',' idn)* ':=' expression (',' expression)*
-   | primary '.' name ':=' expression
-   | primary expression? ':=' expression
-   | call ('@' primary)?
+   | primaries '.' name ':=' expression
+   | primaries expression? ':=' expression
+   | call ('@' primaries)?
    | 'fork' call
    | 'seize' expression 'do' body 'end'
    | 'pause'
@@ -307,13 +307,13 @@ type_actual
    ;
 
 opbinding
-   : name (',' name)* ':' primary
+   : name (',' name)* ':' primaries
    ;
 
 expression
-   : primary
-   | call '@' primary
-   | '('expression')'
+   : primaries
+   | call '@' primaries
+   | '(' expression ')'
    | '~' expression
    | '−' expression
    | expression '**' expression
@@ -339,15 +339,20 @@ expression
    | expression 'cor' expression
    ;
 
+primaries
+   : primary (('.' name) | expression (',' expression)*)*
+   ;
+
 primary
-   : entity
-   | call
-   | (primary '.' name)
-   | (primary expression?)
+   : entities
    ;
 
 call
-   : primary ((expression (',' expression)*)?)
+   : primaries '(' ((expression (',' expression)*))? ')'
+   ;
+
+entities
+   : entity (('.' name) | expression)*
    ;
 
 entity
@@ -360,9 +365,7 @@ entity
    | string_literal
    | 'self'
    | reference
-   | (entity '.' name)
-   | (entity expression?)
-   | 'bind' entity ((bind_arg (',' bind_arg)*)?)
+   | 'bind' entities ((bind_arg (',' bind_arg)*)?)
    | type_spec '$' (field (',' field)*)*
    | type_spec '$' ((expression ':')? (expression (',' expression)*)?)?
    | type_spec '$' name ((actual_parm (',' actual_parm)*)?)?
