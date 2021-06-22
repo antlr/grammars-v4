@@ -45,7 +45,7 @@ markup
    | href
    | title
    | hline
-   | text
+   | text_
    | listitem
    | image
    | tablerow
@@ -53,8 +53,8 @@ markup
    | nowiki
    ;
 
-text
-   : (TEXT | RSLASH) + ('\\\\' text)*
+text_
+   : (TEXT | RSLASH) + ('\\\\' text_)*
    ;
 
 bold
@@ -66,12 +66,12 @@ italics
    ;
 
 href
-   : LBRACKET text ('|' markup +)? RBRACKET
-   | LBRACE text '|' markup + RBRACE
+   : LBRACKET text_ ('|' markup +)? RBRACKET
+   | LBRACE text_ '|' markup + RBRACE
    ;
 
 image
-   : LBRACE text RBRACE
+   : LBRACE text_ RBRACE
    ;
 
 hline

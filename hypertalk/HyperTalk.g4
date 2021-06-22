@@ -29,7 +29,7 @@ grammar HyperTalk;
 // expressions that are not inside of a handler or function block.
 script
     : handler script
-    | function script
+    | function_ script
     | NEWLINE script
     | EOF
     ;
@@ -53,7 +53,7 @@ handler
     | 'on' handlerName parameterList NEWLINE+ statementList? 'end' handlerName
     ;
 
-function
+function_
     : 'function' ID NEWLINE+ statementList? 'end' ID
     | 'function' ID parameterList NEWLINE+ statementList? 'end' ID
     ;

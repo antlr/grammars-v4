@@ -55,8 +55,8 @@ term
     | '-'? FLOAT        # float
     // structure / compound term
     | atom '(' termlist ')'     # compound_term
-    |<assoc=right> term operator term        # binary_operator
-    | operator term             # unary_operator
+    |<assoc=right> term operator_ term        # binary_operator
+    | operator_ term             # unary_operator
     | '[' termlist ( '|' term )? ']' # list_term
     | '{' termlist '}'          # curly_bracketed_term
 
@@ -66,7 +66,7 @@ term
 //TODO: operator priority, associativity, arity. Filter valid priority ranges for e.g. [list] syntax
 //TODO: modifying operator table
 
-operator
+operator_
     : ':-' | '-->'
     | '?-'
     | 'dynamic' | 'multifile' | 'discontiguous' | 'public' //TODO: move operators used in directives to "built-in" definition of dialect

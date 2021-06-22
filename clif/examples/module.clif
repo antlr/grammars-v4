@@ -1,0 +1,48 @@
+/*******************************************************************************
+ * Copyright (c) University of Toronto and others. All rights reserved.
+ * The content of this file is licensed under the Creative Commons Attribution-
+ * ShareAlike 4.0 Unported license. The legal text of this license can be
+ * found at http://creativecommons.org/licenses/by-sa/4.0/legalcode.
+ *
+ * Contributors:
+ *    Michael Gruninger - initial implementation
+ *******************************************************************************/
+ 
+ (cl-text http://colore.oor.net/algebra/module.clif
+
+(cl-module ring (cl-imports http://colore.oor.net/ringoids/ring.clif))
+
+(cl-module magma (cl-imports http://colore.oor.net/magma/abelian_group.clif))
+
+(forall (x)
+        (if     (magma x)
+                (not (ring x))))
+
+(forall (x r)
+	(if	(and	(ring r)
+			(magma x))
+		(magma (mult r x))))
+
+(forall (r x y)
+	(if	(and	(ring r)
+			(magma x)
+			(magma y))
+		(= (mult r (op x y)) (op (mult r x) (mult r y)))))
+
+(forall (r s x)
+	(if	(and	(ring r)
+			(ring s)
+			(magma x))
+		(= (mult (sum r s) x) (op (mult r x) (mult s x)))))
+
+(forall (r s x)
+	(if	(and	(ring r)
+			(ring s)
+			(magma x))
+	(= (mult (prod r s) x) (mult r (mult s x)))))
+
+(forall (x)
+	(if	(magma x)
+		(= x (mult one x))))
+
+)
