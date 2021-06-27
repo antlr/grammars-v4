@@ -160,6 +160,7 @@
 				<module>kotlin</module>
 				<module>kuka</module>
 				<module>lambda</module>
+				<module>lark</module>
 				<module>lcc</module>
 				<module>less</module>
                 <module>limbo</module>
