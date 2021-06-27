@@ -1,0 +1,7 @@
+start: X startab Y
+
+X: "x"
+Y: "y"
+
+%import .grammars.ab.startab
+
