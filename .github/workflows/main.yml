@@ -63,11 +63,12 @@ jobs:
       run: |
         $antlrPath = _scripts/get-antlr.ps1 latest
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
-    - name: Install trgen
+    - name: Install trgen and SempredTranslation
       shell: pwsh
       run: |
         dotnet tool install -g trgen --version 0.7.0
         dotnet tool install -g trwdog --version 0.7.0
+        dotnet tool install --global SempredTranslation --version 0.1.0-alpha
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
