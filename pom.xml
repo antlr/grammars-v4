@@ -92,6 +92,7 @@
 				<module>calculator</module>
                 <module>callable</module>
 				<module>capnproto</module>
+                <module>cayenne</module>
 				<module>clf</module>
 				<module>clojure</module>
 				<module>clu</module>
