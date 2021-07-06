@@ -10,6 +10,7 @@ csharp
 dice
 erlang
 fortran77
+gdscript
 gff3
 golang
 haskell
