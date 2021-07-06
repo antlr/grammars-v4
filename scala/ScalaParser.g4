@@ -1,6 +1,6 @@
 /*
- [The "BSD licence"] Copyright (c) 2014 Leonardo Lucena Copyright (c) 2018 Andrey Stolyarov All
- rights reserved.
+ [The "BSD licence"] Copyright (c) 2014 Leonardo Lucena Copyright (c) 2018 Andrey Stolyarov
+ Copyright (c) 2021 Martin Mirchev All rights reserved.
 
  Redistribution and use in source and binary forms, with or without modification, are permitted
  provided that the following conditions are met: 1. Redistributions of source code must retain the
@@ -22,11 +22,13 @@
 /*
  Derived from https://github.com/scala/scala/blob/2.12.x/spec/13-syntax-summary.md
  */
-//TODO XML
 parser grammar ScalaParser;
 
 @parser::header {
 import java.util.Stack;
+import java.util.Set;
+import java.util.TreeSet;
+
 }
 
 options {
@@ -49,9 +51,9 @@ ids: identifier (Comma identifier)*;
 path: stableId | (identifier Dot)? This;
 
 stableId:
-	identifier (Dot identifier)*
+	identifier (NL? Dot identifier)*
 	| (identifier Dot)? (This | Super classQualifier?) (
-		Dot identifier
+		NL? Dot identifier
 	)+;
 
 classQualifier: LBracket identifier RBracket;
@@ -62,7 +64,7 @@ type_:
 
 functionArgTypes:
 	infixType
-	| LParen (paramType (Comma paramType)*)? RParen;
+	| LParen (paramType (Comma paramType)* Comma?)? RParen;
 
 existentialClause:
 	ForSome LBrace existentialDcl (semi existentialDcl)* RBrace;
@@ -86,7 +88,7 @@ simpleType:
 
 typeArgs: LBracket types RBracket;
 
-types: type_ (Comma type_)*;
+types: type_ (Comma type_)* Comma?;
 
 refinement: NL? LBrace refineStat? (semi refineStat?)* RBrace;
 
@@ -107,12 +109,15 @@ expr1:
 	| Throw expr																	# throwExpr
 	| Return expr?																	# returnExpr
 	| (simpleExpr Dot)? identifier Eq expr											# assignmentExpr
-	| simpleExpr1 argumentExprs Eq expr												# TODOExpr
+	| simpleExpr1 argumentExprs Eq expr												# destructuringExpr
 	| postfixExpr (ascription | Match LBrace caseClauses RBrace)?					# Todo2Expr;
 
 postfixExpr: infixExpr (identifier NL?)?;
 
-infixExpr: prefixExpr | infixExpr identifier typeParamClause? NL? infixExpr;
+infixExpr:
+	prefixExpr
+	| infixExpr NL? operator NL? typeParamClause? infixExpr // special case
+	| infixExpr identifier NL? typeParamClause? infixExpr;
 
 prefixDef: Minus | Plus | Tilde | Exclamation;
 
@@ -126,18 +131,22 @@ simpleExpr:
 simpleExpr1:
 	(
 		literal
-		// operator
 		| path
 		| UnderScore
-		| LParen exprs? RParen
+		| parenthesisExprs
 		| (New (classTemplate | templateBody) | blockExpr) (
-			Dot identifier
+			NL? Dot identifier
 			| typeArgs
 		)
 		| xmlExpr
-	) (argumentExprs | UnderScore? (Dot identifier | typeArgs))*;
+	) (simpleExpr1Suffix (NL? simpleExpr1Suffix)*)?;
 
-//
+parenthesisExprs: LParen exprs? RParen;
+
+simpleExpr1Suffix:
+	argumentExprs
+	| UnderScore? (Dot identifier | typeArgs);
+
 xmlExpr: xmlContent element*;
 
 element: emptyElemTag | sTag content? eTag;
@@ -148,38 +157,33 @@ eTag: XMLClosingNodeTag Name? XMLCloseTag;
 content: (CharData | content1)+;
 content1: xmlContent | reference | scalaExpr;
 reference: EntityRef | CharRef;
-xmlContent: element | cdSect /* | PI*/;
-cdSect: CDataChunk;
+xmlContent: element | cdSect | PI | PIDefault;
+cdSect: CDataChunk | CDataChunkDefault;
 attribute: Name EQUALS attValue;
 attValue: XMLString | scalaExpr;
 
 scalaExpr: LBraceXML block RBraceXML | LBrace block RBrace;
 
-//charData:;
 xmlPattern: elementPattern;
 
 elementPattern: emptyElemTagP | sTagP contentP? eTagP;
 
-emptyElemTagP: XMLOpenTag Name XMLAutoClose;
-sTagP: XMLOpenTag Name XMLCloseTag;
-eTagP: XMLClosingNodeTag Name XMLCloseTag;
+emptyElemTagP: XMLOpenTag Name? XMLAutoClose;
+sTagP: XMLOpenTag Name? XMLCloseTag;
+eTagP: XMLClosingNodeTag Name? XMLCloseTag;
 
 contentP: ( contentP1 | CharData)+;
 
-contentP1:
-	elementPattern
-	| cdSect
-	//| PI
-	| scalaPatterns;
+contentP1: elementPattern | cdSect | PI | scalaPatterns;
 
-scalaPatterns: LBrace patterns RBrace;
+scalaPatterns: LBraceXML patterns RBraceXML;
 
 //
 
 exprs: expr (Comma expr)* Comma?;
 
 argumentExprs:
-	LParen exprs? RParen
+	parenthesisExprs
 	| LParen (exprs Comma)? postfixExpr Colon UnderScore Star RParen
 	| NL? blockExpr;
 
@@ -189,7 +193,10 @@ block: blockStat? ( semi blockStat?)* resultExpr?;
 
 blockStat:
 	import_
-	| (annotation NL?)* (Implicit? Lazy? def | localModifier* tmplDef)
+	| (annotation NL?)* (
+		Implicit? Lazy? def
+		| localModifier* tmplDef
+	)
 	| expr1;
 
 resultExpr:
@@ -234,17 +241,18 @@ simplePattern:
 	| LParen patterns? RParen
 	| xmlPattern;
 
-patterns: pattern (Comma patterns)? | UnderScore Star;
+patterns: pattern (Comma patterns)? Comma? | UnderScore Star;
 
 typeParamClause:
-	LBracket variantTypeParam (Comma variantTypeParam)* RBracket;
+	LBracket variantTypeParam (Comma variantTypeParam)* Comma? RBracket;
 
 funTypeParamClause:
-	LBracket typeParam (Comma typeParam)* RBracket;
+	LBracket typeParam (Comma typeParam)* Comma? RBracket;
 
 variantTypeParam: annotation* (Plus | Minus)? typeParam;
 
-typeParam: annotation* (identifier | UnderScore) typeParamClause? (
+typeParam:
+	annotation* (identifier | UnderScore) typeParamClause? (
 		LowerType type_
 	)? (UpperType type_)? (ViewBound type_)* (Colon type_)*;
 
@@ -263,7 +271,7 @@ classParamClauses:
 
 classParamClause: NL? LParen classParams? RParen;
 
-classParams: classParam (Comma classParam)*;
+classParams: classParam (Comma classParam)* Comma?;
 
 classParam:
 	annotation* (modifier NL?)* (Val | Var)? identifier
@@ -272,7 +280,7 @@ classParam:
 	//)?
 	(Eq expr)?;
 
-bindings: LParen (binding (Comma binding)*)? RParen;
+bindings: LParen (binding (Comma binding)* Comma?)? RParen;
 
 binding: (identifier | UnderScore) (Colon type_)?;
 
@@ -298,23 +306,26 @@ templateStat:
 
 selfType: (identifier (Colon type_)? | This Colon type_) Arrow;
 
-import_: Import importExpr (Comma importExpr)*;
+import_: Import importExpr (Comma importExpr)* Comma?;
 
 importExpr:
 	stableId Dot (identifier | UnderScore | importSelectors);
 
 importSelectors:
-	LBrace NL* (importSelector Comma NL*)* (importSelector | UnderScore)? NL* RBrace;
+	LBrace NL* (importSelector Comma NL*)* (
+		importSelector
+		| UnderScore
+	)? NL* RBrace;
 
 importSelector: identifier (Arrow (identifier | UnderScore))?;
 
 dcl: Val valDcl | Var varDcl | Def funDcl | Type NL* typeDcl;
 
-valDcl: ids Colon type_;
+valDcl: ids Colon NL? type_;
 
-varDcl: ids Colon type_;
+varDcl: ids Colon NL? type_;
 
-funDcl: funSig (Colon type_)?;
+funDcl: funSig (Colon NL? type_)?;
 
 funSig: identifier funTypeParamClause? paramClauses;
 
@@ -327,12 +338,19 @@ patVarDef: Val patDef | Var varDef;
 
 def: patVarDef | Def funDef | Type NL* typeDef | tmplDef;
 
-patDef: pattern2 (Comma pattern2)* (Colon type_)? Eq expr;
+patDef:
+	pattern2 (Comma pattern2)* (Colon NL? type_)? NL? Eq expr;
 
 varDef: patDef | ids Colon type_ Eq UnderScore;
 
 funDef:
-	funSig ((Colon type_)? Eq (expr | Macro qualId funTypeParamClause?) | NL? LBrace block RBrace)
+	funSig (
+		(Colon NL? type_)? Eq (
+			Macro? expr
+			| Macro qualId funTypeParamClause?
+		)
+		| NL? LBrace block RBrace
+	)
 	| This paramClause paramClauses (
 		Eq constrExpr
 		| NL? constrBlock
@@ -345,28 +363,26 @@ tmplDef:
 	| Trait traitDef;
 
 classDef:
-	identifier typeParamClause? constrAnnotation* accessModifier? classParamClauses classTemplateOpt
-		?;
+	identifier typeParamClause? constrAnnotation* accessModifier? classParamClauses NL?
+		classTemplateOpt?;
 
 traitDef: identifier typeParamClause? traitTemplateOpt?;
 
 objectDef: identifier classTemplateOpt?;
 
-classTemplateOpt: (Extends (templateBody | classTemplate))
-	| templateBody;
+classTemplateOpt: Extends? (templateBody | classTemplate);
 
-traitTemplateOpt: (Extends (templateBody | traitTemplate))
-	| templateBody;
+traitTemplateOpt: Extends? (templateBody | traitTemplate);
 
 classTemplate: earlyDefs? classParents templateBody?;
 
 traitTemplate: earlyDefs? traitParents templateBody?;
 
-classParents: constr (With annotType)*;
+classParents: With? constr (With annotType)*;
 
-traitParents: annotType (With annotType)*;
+traitParents: With? annotType (With annotType)*;
 
-constr: annotType (LParen exprs? RParen)*;
+constr: annotType parenthesisExprs*;
 
 earlyDefs: LBrace (earlyDef (semi earlyDef)*)? RBrace With;
 
@@ -378,7 +394,7 @@ constrBlock: LBrace selfInvocation (semi blockStat?)* RBrace;
 
 selfInvocation: This argumentExprs+;
 
-topStatSeq: topStat ( semi topStat)*;
+topStatSeq: topStat ( semi+ topStat)* semi?;
 
 topStatFile: topStat EOF;
 
@@ -387,14 +403,11 @@ topStat: (annotation NL?)* (modifier NL?)* tmplDef
 	| packageObject
 	| packaging;
 
-packaging: Package qualId NL? LBrace topStatSeq RBrace;
+packaging: Package qualId NL? LBrace NL* topStatSeq? RBrace;
 
 packageObject: Package Object objectDef;
 
-compilationUnit: (Package qualId semi)* topStatSeq? (
-		SemiColon
-		| NL+
-	)* EOF;
+compilationUnit: (Package qualId semi)* topStatSeq? semi* EOF;
 
 // Inspired from the logic of CSharp's grammar
 interpolatedString:
@@ -405,6 +418,7 @@ interpolatedStringSingleLine:
 		StringSingle
 		| EscapeSingle
 		| DoubleDollarSingle
+		| EscapedQuoteSingle
 		| escape
 	)* DoubleQuoteSingle;
 
@@ -414,6 +428,7 @@ interpolatedStringMultiLine:
 			StringMulti
 			| EscapeMulti
 			| DoubleDollarMulti
+			| EscapedQuoteMulti
 			| escape
 		)
 	)* TripleDoubleQuoteMulti;
@@ -427,7 +442,49 @@ escape:
 
 identifier: plainId | BackTickId | UnderScore;
 
-symbolLiteral: Quote plainId;
+symbolLiteral:
+	Quote (
+		plainId
+		| Null
+		| This
+		| Super
+		| ForSome
+		| Type
+		| Val
+		| Var
+		| Def
+		| With
+		| Implicit
+		| If
+		| While
+		| Do
+		| Else
+		| Match
+		| Case
+		| For
+		| Try
+		| Catch
+		| Throw
+		| Return
+		| Finally
+		| Yield
+		| New
+		| Lazy
+		| Extends
+		| Class
+		| Trait
+		| Abstract
+		| Final
+		| Private
+		| Protected
+		| Public
+		| Package
+		| Object
+		| Import
+		| Override
+		| Sealed
+		| Macro
+	);
 
 plainId: AlphaId | VarId | operator;
 operator:
@@ -439,6 +496,7 @@ operator:
 		| Colon
 		| At
 		| Or
+		| Dollar
 		| Tilde
 		| Star
 		| Eq
@@ -446,6 +504,7 @@ operator:
 		| LowerType
 		| UpperType
 		| ViewBound
+		| LShift
 		| UnderScore
 		| Arrow
 	)+;

@@ -125,6 +125,9 @@ Override: 'override';
 Sealed: 'sealed';
 Macro: 'macro';
 
+
+PIDefault: '<?' .*? '?>';
+CDataChunkDefault: '<![CDATA[' .*? ']]>';
 XMLOpenTag: (NL | WhiteSpace)? '<' (XNameStart | '!' | '?') {startXMLMode();};
 fragment XNameStart:
 	[a-zA-Z]
@@ -147,13 +150,14 @@ RBrace: '}' { onRBrace(); };
 Hash: '#';
 SemiColon: ';';
 Colon: ':';
-UnderScore: '_';
+UnderScore: '_' { popModeForIdentifier();};
 Star: '*';
 Arrow: '=>';
 Eq: '=';
 Plus: '+';
 Tilde: '~';
 Exclamation: '!';
+LShift: '<<';
 Assign: '<-';
 Or: '|';
 At: '@';
@@ -183,14 +187,17 @@ LINE_COMMENT: '//' (~[\r\n])* -> channel(HIDDEN);
 BackTickId:
 	BackTick (CharNoBackQuoteOrNewline | EscapeSeq)* BackTick { popModeForIdentifier();};
 
-AlphaId: Upper IdRest {!getText().endsWith("$") || interpolatedStringLevel == 0 }?  { popModeForIdentifier();};
+AlphaId:
+	Upper IdRest {!getText().endsWith("$") || interpolatedStringLevel == 0 }? { popModeForIdentifier();
+		};
 
-VarId: Lower IdRest { !getText().endsWith("$") || interpolatedStringLevel == 0 }? { popModeForIdentifier();};
+VarId:
+	Lower IdRest { !getText().endsWith("$") || interpolatedStringLevel == 0 }? { popModeForIdentifier();
+		};
 
 fragment EscapeSeq: UnicodeEscape | CharEscapeSeq;
 
-CharacterLiteral:
-	Quote (CharNoQuoteOrNewline | EscapeSeq) Quote;
+CharacterLiteral: Quote ( ~['\n\r] | EscapeSeq) Quote;
 
 IntegerLiteral: (DecimalNumeral | HexNumeral) [Ll]?;
 
@@ -232,15 +239,13 @@ fragment Op: (
 		| Or
 		| Tilde
 		| Star
+		| LShift
 		| Eq
 	)+;
 
 fragment IdRest: (Letter | Digit)* (UnderScore Op)?;
 
-fragment StringElement:
-	[\u0020\u0021\u0023-\u005B\u005D-\u007F\p{So}\p{Sm}\p{Blk=Latin_1_Sup}\p{Symbol}]
-	| UnicodeLetter
-	| EscapeSeq;
+fragment StringElement: ~["\r\n\\] | UnicodeLetter | EscapeSeq;
 
 fragment MultiLineChars: (
 		DoubleQuote? DoubleQuote? StringElement
@@ -253,9 +258,9 @@ fragment FloatType: [FfDd];
 
 fragment Upper: [A-Z$\p{Lu}\p{Lt}\p{Nl}];
 
-fragment Lower: [a-z_\p{LL}];
+fragment Lower: [a-z_\p{LL}\p{Lo}];
 
-fragment Letter: Upper | Lower | [\p{Lo}\p{Lt}];
+fragment Letter: Upper | Lower | [\p{Lm}\p{Lt}];
 
 fragment ExponentPart: [Ee] [+-]? Digit+;
 
@@ -273,11 +278,11 @@ fragment PrintableCharExceptQuoteDollar:
 fragment PrintableCharExceptWhitespaceQuoteDollar:
 	[\u0021\u0023\u0025-\u007F];
 
-CharEscapeSeq: '\\' [btnfr\\"'];
+fragment CharEscapeSeq: '\\' [btnfr\\'"dDSs];
 
-fragment DecimalNumeral: '0' | NonZeroDigit Digit*;
+fragment DecimalNumeral: '0' | NonZeroDigit ('_' | Digit)*;
 
-fragment HexNumeral: '0' 'x' HexDigit HexDigit*;
+fragment HexNumeral: '0' 'x' HexDigit ('_' | HexDigit)*;
 
 fragment Digit: '0' | NonZeroDigit;
 
@@ -290,13 +295,15 @@ fragment UnicodeLetter: [\p{Lu}\p{LT}\p{LM}\p{LO}];
 
 fragment LineEnding: '\n' | '\r' '\n'?;
 
-NL: LineEnding (WhiteSpace* LineEnding)*;
+NL: LineEnding (WhiteSpace* LineEnding)?;
 
-WS: WhiteSpace+ -> skip;
+WS: WhiteSpace+ -> channel(HIDDEN);
 
 mode InterpolationStringSingleLine;
 
 DoubleDollarSingle: '$$';
+
+EscapedQuoteSingle: '$"';
 
 DollarInsideSingle:
 	'$' { curlyLevels.push(0); } -> pushMode(DEFAULT_MODE);
@@ -304,11 +311,13 @@ DollarInsideSingle:
 DoubleQuoteSingle: '"' { interpolatedStringLevel--; } -> popMode;
 
 EscapeSingle: EscapeSeq;
-StringSingle: ~('$' | '"')+;
+StringSingle: ~('$' | '\\' | '"')+;
 
 mode InterpolationStringMultiLine;
 
 DoubleDollarMulti: '$$';
+
+EscapedQuoteMulti: '$"';
 
 DollarInsideMulti:
 	'$' { curlyLevels.push(0); } -> pushMode(DEFAULT_MODE);
@@ -327,6 +336,10 @@ CharRef: '&#' DIGIT+ ';' | '&#x' HEXDIGIT+ ';';
 
 XMLCommentOutside:
 	'<!--' .*? '-->' {setType(XMLComment);} -> channel(HIDDEN);
+
+PI:
+	'<?' .*? '?>';
+
 CDataChunk: '<![CDATA[' .*? ']]>';
 
 LBraceEscaped: '{{' {setType(CharData);};

@@ -2,27 +2,24 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 import static ScalaLexer.*;
 
 public class ScalaTokenStream extends CommonTokenStream {
-    private static final Set<Integer> nonStarters = Set.of(Catch, Else, Extends, Finally, ForSome, Match, With,
+    private static final Set<Integer> nonStarters =  new HashSet<>(Arrays.asList(Catch, Else, Extends, Finally, ForSome, Match, With,
             Yield, Comma, Dot, Colon, SemiColon, Eq, Arrow, Assign, LowerType, ViewBound, UpperType, Hash, LBracket,
             RParen, RBracket, RBrace, /* per spec */
-            DoubleQuoteSingle, TripleDoubleQuoteMulti, EOF /* custom cases */
-    );
-    private static final Set<Integer> terminators = Set.of(This, Null, BooleanLiteral, Return, Type, RParen,
+            DoubleQuoteSingle, TripleDoubleQuoteMulti /* custom cases */
+    ));
+    private static final Set<Integer> terminators = new HashSet<>(Arrays.asList(This, Null, BooleanLiteral, Return, Type, RParen,
             RBracket, RBrace, UnderScore, IntegerLiteral, FloatingPointLiteral, StringLiteral, CharacterLiteral,
             /* Id equivalents */ AlphaId, VarId, BackTickId,
             /* Tokens that are part of the operator token */ OpChar, Hash, Colon, Or,
             /* Tokens that are part of the operator token */ Exclamation, Plus, Minus, Tilde, Star, ViewBound,
             /* XML Terminators */ XMLCloseTag, XMLAutoClose,
             /* Custom tokens for interpolated strings */ DoubleQuoteSingle, TripleDoubleQuoteMulti
-            /*SymbolLiteral was removed*/);
+            /*SymbolLiteral was removed*/));
     Stack<Boolean> newLineEnables = new Stack<>();
     int lastIndex = -1;
     private boolean inCase = false;
@@ -63,10 +60,6 @@ public class ScalaTokenStream extends CommonTokenStream {
             if (!canEmitNLToken) {
                 super.consume();// skip the NL token
                 return this.LT(1);
-            } else {
-                if (t.getText().lines().count() >= 2) {
-                    //System.out.printf("LT %s%n", t);
-                }
             }
         }
         return t;
