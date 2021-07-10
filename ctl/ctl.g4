@@ -37,20 +37,38 @@ grammar ctl;
 proposition
    : CTL_DOWNTACK
    | CTL_UPTACK
-   | 'p'
-   | '(' CTL_NOT CTL_PROPOSITION ')'
-   | '(' CTL_PROPOSITION CTL_AND CTL_PROPOSITION ')'
-   | '(' CTL_PROPOSITION CTL_OR CTL_PROPOSITION ')'
-   | '(' CTL_PROPOSITION CTL_RIGHTWARDS_DOUBLE_ARROW CTL_PROPOSITION ')'
-   | '(' CTL_PROPOSITION CTL_LEFT_RIGHT_DOUBLE_ARROW CTL_PROPOSITION ')'
-   | 'A' 'X' CTL_PROPOSITION
-   | 'E' 'X' CTL_PROPOSITION
-   | 'A' 'X' CTL_PROPOSITION
-   | 'A' 'F' CTL_PROPOSITION
-   | 'A' 'G' CTL_PROPOSITION
-   | 'E' 'G' CTL_PROPOSITION
-   | 'A' '[' CTL_PROPOSITION 'U' CTL_PROPOSITION ']'
-   | 'E' '[' CTL_PROPOSITION 'U' CTL_PROPOSITION ']'
+   | ATOMIC
+   | logical
+   | CTL_INEVITABLE 'X' proposition
+   | CTL_EXISTS 'X' proposition
+   | CTL_INEVITABLE 'X' proposition
+   | CTL_INEVITABLE 'F' proposition
+   | CTL_EXISTS 'F' proposition
+   | CTL_INEVITABLE 'G' proposition
+   | CTL_EXISTS 'G' proposition
+   | CTL_INEVITABLE '[' proposition 'U' proposition ']'
+   | CTL_EXISTS '[' proposition 'U' proposition ']'
+   | '(' proposition ')'
+   ;
+
+logical
+   : '(' CTL_NOT proposition ')'
+   | '(' proposition CTL_AND proposition ')'
+   | '(' proposition CTL_OR proposition ')'
+   | '(' proposition CTL_RIGHTWARDS_DOUBLE_ARROW proposition ')'
+   | '(' proposition CTL_LEFT_RIGHT_DOUBLE_ARROW proposition ')'
+   ;
+
+ATOMIC
+   : [a-z]+
+   ;
+
+CTL_INEVITABLE
+   : 'A'
+   ;
+
+CTL_EXISTS
+   : 'E'
    ;
 
 CTL_PROPOSITION
