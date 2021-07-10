@@ -39,15 +39,10 @@ proposition
    | CTL_UPTACK
    | ATOMIC
    | logical
-   | CTL_INEVITABLE 'X' proposition
-   | CTL_EXISTS 'X' proposition
-   | CTL_INEVITABLE 'X' proposition
-   | CTL_INEVITABLE 'F' proposition
-   | CTL_EXISTS 'F' proposition
-   | CTL_INEVITABLE 'G' proposition
-   | CTL_EXISTS 'G' proposition
-   | CTL_INEVITABLE '[' proposition 'U' proposition ']'
-   | CTL_EXISTS '[' proposition 'U' proposition ']'
+   | CTL_INEVITABLE (CTL_NEXT | CTL_FINALLY | CTL_GLOBALLY) proposition
+   | CTL_EXISTS (CTL_NEXT | CTL_FINALLY | CTL_GLOBALLY) proposition
+   | CTL_INEVITABLE '[' proposition CTL_UNTIL proposition ']'
+   | CTL_EXISTS '[' proposition CTL_UNTIL proposition ']'
    | '(' proposition ')'
    ;
 
@@ -61,6 +56,22 @@ logical
 
 ATOMIC
    : [a-z]+
+   ;
+
+CTL_UNTIL
+   : 'U'
+   ;
+
+CTL_GLOBALLY
+   : 'G'
+   ;
+
+CTL_FINALLY
+   : 'F'
+   ;
+
+CTL_NEXT
+   : 'X'
    ;
 
 CTL_INEVITABLE
@@ -78,8 +89,7 @@ CTL_PROPOSITION
 CTL_LEFT_RIGHT_DOUBLE_ARROW
    : '\u21d4'
    ;
-   //CTL_LEFTWARDS_DOUBLE_ARROW: '\u021d0';
-   
+
 CTL_RIGHTWARDS_DOUBLE_ARROW
    : '\u021d2'
    ;
