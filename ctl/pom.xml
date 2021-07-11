@@ -37,12 +37,13 @@
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>false</showTree>
+					<showTree>true</showTree>
 					<entryPoint>proposition</entryPoint>
 					<grammarName>ctl</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
-				</configuration>
+                    <fileEncoding>UTF-8</fileEncoding>
+                </configuration>
 				<executions>
 					<execution>
 						<goals>
