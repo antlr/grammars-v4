@@ -170,7 +170,8 @@
 				<module>lolcode</module>
 				<module>loop</module>
 				<module>lpc</module>
-				<module>lua</module>
+                <module>ltl</module>
+                <module>lua</module>
 				<module>matlab</module>
 				<module>mckeeman-form</module>
 				<module>mdx</module>
