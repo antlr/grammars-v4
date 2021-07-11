@@ -106,6 +106,7 @@
 				<module>csharp</module>
 				<module>css3</module>
 				<module>csv</module>
+                <module>ctl</module>
 				<module>cto</module>
 				<module>dart2</module>
 				<module>databank</module>
