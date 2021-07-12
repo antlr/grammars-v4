@@ -267,6 +267,7 @@
 				<module>tinybasic</module>
 				<module>tinyc</module>
 				<module>tinymud</module>
+                <module>tl</module>
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>
