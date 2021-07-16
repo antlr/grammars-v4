@@ -11,6 +11,7 @@ cql3
 csharp
 dice
 fortran77
+gdscript
 golang
 haskell
 html
@@ -60,6 +61,7 @@ swift/swift5
 tcpheader
 thrift
 v
+velocity
 wat
 xpath/xpath31
 z

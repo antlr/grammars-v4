@@ -8,7 +8,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo "$file"
-    go run Program.go -file "$file"
+    trwdog go run Program.go -file "$file"
     status="$?"
     if [ -f "$file".errors ]
     then

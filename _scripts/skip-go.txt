@@ -13,6 +13,7 @@ cpp
 csharp
 edif300
 fortran77
+gdscript
 guitartab
 haskell
 html
@@ -85,6 +86,7 @@ turtle
 turtle-doc
 url
 v
+velocity
 verilog/verilog
 wat
 xpath/xpath1

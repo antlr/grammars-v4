@@ -10,6 +10,7 @@ csharp
 dice
 erlang
 fortran77
+gdscript
 gff3
 golang
 haskell
@@ -57,6 +58,7 @@ thrift
 tinymud
 v
 vb6
+velocity
 wat
 webidl
 xpath/xpath31

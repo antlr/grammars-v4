@@ -1,1 +1,0 @@
-grun Rust crate .\examples\*.rs

@@ -16,6 +16,7 @@
 .idea/
 *.iml
 /**/gen
+*.tokens
 
 # Ignore C# regression temporaries.
 **/Generated/

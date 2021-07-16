@@ -8,7 +8,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo "$file"
-    python Program.py -file "$file"
+    trwdog python Program.py -file "$file"
     status="$?"
     if [ -f "$file".errors ]
     then
