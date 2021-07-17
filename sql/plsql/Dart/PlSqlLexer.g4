@@ -24,6 +24,10 @@ options {
     superClass=PlSqlLexerBase;
 }
 
+@lexer::header{
+	import 'PlSqlLexerBase.dart';
+}
+
 @lexer::postinclude {
 #include <PlSqlLexerBase.h>
 }

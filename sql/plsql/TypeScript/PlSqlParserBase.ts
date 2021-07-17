@@ -4,11 +4,13 @@ export abstract class PlSqlParserBase extends Parser {
 
   _isVersion10: boolean;
   _isVersion12: boolean;
+  self: PlSqlParserBase;
 
   constructor(input: TokenStream) {
     super(input);
     this._isVersion10 = false;
     this._isVersion12 = true;
+    this.self = this;
   }
 
   isVersion10(): boolean {
