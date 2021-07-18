@@ -218,6 +218,7 @@
 				<module>properties</module>
 				<module>protobuf3</module>
 				<module>prov-n</module>
+                <module>puredata</module>
 				<module>python</module>
 				<module>quakemap</module>
 				<module>r</module>
