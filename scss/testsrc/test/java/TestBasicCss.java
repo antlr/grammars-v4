@@ -287,6 +287,14 @@ public class TestBasicCss extends TestBase {
   }
 
   @Test
+  public void testPropertyNamespacedVariable() {
+    ScssParser.ExpressionContext exp = createProperty("p1: mat.$hello;");
+    assertThat(exp.variableName().Identifier().getText()).isEqualTo("hello");
+    assertThat(exp.variableName().namespace().getText()).isEqualTo("mat.");
+    assertThat(exp.variableName().namespace().Identifier(0).getText()).isEqualTo("mat");
+  }
+
+  @Test
   public void testPropertyFunctionMath() {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% / 3);");
     assertThat(exp.functionCall().FunctionIdentifier().getText()).isEqualTo("calc(");
@@ -608,7 +616,7 @@ public class TestBasicCss extends TestBase {
   }
 
   @Test
-  public void testImportant() {
+  public void important() {
     String[] lines = {
       "p {", "  color: blue;", "  background-color: red !important;", "}",
     };
@@ -616,6 +624,26 @@ public class TestBasicCss extends TestBase {
     ScssParser.StylesheetContext context = parse(lines);
     assertThat(context.statement(0).ruleset().block().property(0).IMPORTANT()).isNull();
     assertThat(context.statement(0).ruleset().block().property(1).IMPORTANT()).isNotNull();
+  }
+
+  @Test
+  public void importantWithBlockProperty() {
+    String[] lines = {
+      "h {",
+      "  margin: 5px !important {",
+      "    top: 2px;",
+      "    bottom: 2px !important",
+      "  }",
+      "}",
+    };
+
+    ScssParser.StylesheetContext context = parse(lines);
+    assertThat(context.statement(0).ruleset().block().property(0).IMPORTANT()).isNotNull();
+    assertThat(context.statement(0).ruleset().block().property(0).block().property(0).IMPORTANT())
+        .isNull();
+    assertThat(
+            context.statement(0).ruleset().block().property(0).block().lastProperty().IMPORTANT())
+        .isNotNull();
   }
 
   @Test

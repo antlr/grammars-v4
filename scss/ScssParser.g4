@@ -60,7 +60,7 @@ declaredParam
   ;
 
 variableName
-  : (DOLLAR | MINUS_DOLLAR | PLUS_DOLLAR) Identifier
+  : namespace? (DOLLAR | MINUS_DOLLAR | PLUS_DOLLAR) Identifier
   ;
 
 paramOptionalValue
@@ -131,7 +131,7 @@ expression
   | identifier
   | Color
   | StringLiteral
-  | NULL
+  | NULL_
   | url
   | variableName
   | functionCall
@@ -153,7 +153,7 @@ elseStatement
 
 conditions
   : condition (COMBINE_COMPARE conditions)?
-  | NULL
+  | NULL_
   ;
 
 condition
@@ -200,12 +200,25 @@ eachValueList
 //Imports
 importDeclaration
   : '@import' referenceUrl ';'
+  | '@use' referenceUrl asClause? withClause? ';'
   ;
 
 referenceUrl
     : StringLiteral
     | UrlStart Url UrlEnd
     ;
+
+asClause
+  : 'as' ('*' | identifier)
+  ;
+
+withClause
+  : 'with' LPAREN keywordArgument (COMMA keywordArgument)* COMMA? RPAREN
+  ;
+
+keywordArgument
+  : identifierVariableName ':' expression
+  ;
 
 // MEDIA
 mediaDeclaration
@@ -311,8 +324,8 @@ identifierVariableName
 
 property
   : identifier COLON propertyValue IMPORTANT? SEMI
-  | identifier COLON block IMPORTANT?
-  | identifier COLON propertyValue block IMPORTANT?
+  | identifier COLON block
+  | identifier COLON propertyValue IMPORTANT? block
   ;
 
 lastProperty
@@ -333,10 +346,10 @@ measurement
 
 
 functionCall
-  : functionNamespace? FunctionIdentifier passedParams? RPAREN
+  : namespace? FunctionIdentifier passedParams? RPAREN
   ;
 
-functionNamespace
+namespace
   : (Identifier DOT)+
   ;
 
