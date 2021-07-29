@@ -165,10 +165,10 @@ create_package_body
 
 package_obj_spec
     : pragma_declaration
+    | exception_declaration
     | variable_declaration
     | subtype_declaration
     | cursor_declaration
-    | exception_declaration
     | type_declaration
     | procedure_spec
     | function_spec
@@ -184,10 +184,10 @@ function_spec
     ;
 
 package_obj_body
-    : variable_declaration
+    : exception_declaration
     | subtype_declaration
     | cursor_declaration
-    | exception_declaration
+    | variable_declaration
     | type_declaration
     | procedure_body
     | function_body
@@ -2956,10 +2956,10 @@ seq_of_declare_specs
 
 declare_spec
     : pragma_declaration
+    | exception_declaration
     | variable_declaration
     | subtype_declaration
     | cursor_declaration
-    | exception_declaration
     | type_declaration
     | procedure_spec
     | function_spec
