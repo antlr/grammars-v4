@@ -513,10 +513,13 @@ AND
 
 ANY
    : A N Y
+<<<<<<< HEAD
    ;
 
 ASSIGN
    : '='
+=======
+>>>>>>> a0517977 (updates)
    ;
 
 ATTACHMENT
@@ -541,6 +544,7 @@ BANG
 
 BINDINGS
    : B I N D I N G S
+<<<<<<< HEAD
    ;
 
 COLON
@@ -549,6 +553,8 @@ COLON
 
 COMMA
    : ','
+=======
+>>>>>>> a0517977 (updates)
    ;
 
 COLLECT
@@ -565,10 +571,13 @@ COMPONENTS
 
 CONNECTOR
    : C O N N E C T O R
+<<<<<<< HEAD
    ;
 
 CONTAINASSIGN
    : C O N T A I N A S S I G N
+=======
+>>>>>>> a0517977 (updates)
    ;
 
 CONNECTORS
@@ -577,6 +586,7 @@ CONNECTORS
 
 DESIGN
    : D E S I G N
+<<<<<<< HEAD
    ;
 
 DISTINCT
@@ -589,6 +599,8 @@ DOT
 
 DOUBLE
    : D O U B L E
+=======
+>>>>>>> a0517977 (updates)
    ;
 
 ELEMENT
@@ -613,10 +625,13 @@ EXTERNAL
 
 EXISTS
    : E X I S T S
+<<<<<<< HEAD
    ;
 
 ELLIPSIS
    : '...'
+=======
+>>>>>>> a0517977 (updates)
    ;
 
 EQ
@@ -625,10 +640,13 @@ EQ
 
 FAMILY
    : F A M I L Y
+<<<<<<< HEAD
    ;
 
 FINAL
    : F I N A L
+=======
+>>>>>>> a0517977 (updates)
    ;
 
 FORALL
@@ -641,10 +659,13 @@ FLOAT
 
 GROUP
    : G R O U P
+<<<<<<< HEAD
    ;
 
 GROUPS
    : G R O U P S
+=======
+>>>>>>> a0517977 (updates)
    ;
 
 GE
@@ -656,7 +677,11 @@ HEURISTIC
    ;
 
 IFF
+<<<<<<< HEAD
    : '<->'
+=======
+   : I F F
+>>>>>>> a0517977 (updates)
    ;
 
 IMPORT
@@ -668,8 +693,12 @@ IN
    ;
 
 INT
+<<<<<<< HEAD
    : (I N T)
    | (I N T E G E R)
+=======
+   : I N T
+>>>>>>> a0517977 (updates)
    ;
 
 INVARIANT
@@ -677,6 +706,7 @@ INVARIANT
    ;
 
 IMPLIES
+<<<<<<< HEAD
    : '->'
    ;
 
@@ -710,6 +740,9 @@ LANGLE
 
 RANGLE
    : '>'
+=======
+   : I M P L I E S
+>>>>>>> a0517977 (updates)
    ;
 
 LE
@@ -773,11 +806,19 @@ PROPERTIES
    ;
 
 PROPBEGIN
+<<<<<<< HEAD
    : '<<'
    ;
 
 PROPEND
    : '>>'
+=======
+   : P R O P B E G I N
+   ;
+
+PROPEND
+   : P R O P E N D
+>>>>>>> a0517977 (updates)
    ;
 
 RECORD
@@ -789,7 +830,11 @@ REPRESENTATION
    ;
 
 REM
+<<<<<<< HEAD
    : '%'
+=======
+   : R E M
+>>>>>>> a0517977 (updates)
    ;
 
 REPRESENTATIONS
@@ -798,10 +843,13 @@ REPRESENTATIONS
 
 ROLE
    : R O L E
+<<<<<<< HEAD
    ;
 
 RULE
    : R U L E
+=======
+>>>>>>> a0517977 (updates)
    ;
 
 ROLES
@@ -809,16 +857,23 @@ ROLES
    ;
 
 SEQUENCE
+<<<<<<< HEAD
    : (S E Q U E N C E)
    | (S E Q)
+=======
+   : S E Q U E N C E
+>>>>>>> a0517977 (updates)
    ;
 
 SELECT
    : S E L E C T
+<<<<<<< HEAD
    ;
 
 SEMICOLON
    : ';'
+=======
+>>>>>>> a0517977 (updates)
    ;
 
 SET
@@ -826,7 +881,11 @@ SET
    ;
 
 SET_DECLARE
+<<<<<<< HEAD
    : ':!'
+=======
+   : S E T '_' D E C L A R E
+>>>>>>> a0517977 (updates)
    ;
 
 SLASH
@@ -847,10 +906,13 @@ STYLE
 
 SYSTEM
    : S Y S T E M
+<<<<<<< HEAD
    ;
 
 TO
    : T O
+=======
+>>>>>>> a0517977 (updates)
    ;
 
 TYPE
@@ -863,6 +925,7 @@ UNIQUE
 
 WITH
    : W I T H
+<<<<<<< HEAD
    ;
 
 VIEW
@@ -871,6 +934,8 @@ VIEW
 
 BIT_OR
    : '|'
+=======
+>>>>>>> a0517977 (updates)
    ;
 
 TRUE
@@ -1006,6 +1071,7 @@ IDENTIFIER
    : [a-zA-Z] [a-zA-Z0-9_-]*
    ;
 
+<<<<<<< HEAD
 LINE_COMMENT
    : '//' ~ [\r\n]* -> skip
    ;
@@ -1014,6 +1080,12 @@ BLOCK_COMMENT
    : '/*' .*? '*/' -> skip
    ;
 
+=======
+COMMENT
+   : '//' ~ [\r\n]* -> skip
+   ;
+
+>>>>>>> a0517977 (updates)
 WS
    : [ \r\n\t]+ -> skip
    ;
