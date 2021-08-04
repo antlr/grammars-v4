@@ -96,6 +96,7 @@ TILD_EQ         : '~=';
 
 
 MIXIN           : '@mixin';
+FORWARD         : '@forward';
 FUNCTION        : '@function';
 AT_ELSE         : '@else';
 IF              : 'if';
