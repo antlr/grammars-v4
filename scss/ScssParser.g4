@@ -200,6 +200,7 @@ eachValueList
 //Imports
 importDeclaration
   : '@import' referenceUrl ';'
+  | '@forward' referenceUrl ';'
   | '@use' referenceUrl asClause? withClause? ';'
   ;
 
