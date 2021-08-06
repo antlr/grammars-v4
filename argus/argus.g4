@@ -185,8 +185,8 @@ statement
    | tagcase_stmt
    | tagtest_stmt
    | tagwait_stmt
-   | 'abort' 'return' (expression (',' expression)*)?
-   | 'yield' (expression (',' expression)*)*
+   | 'abort'? 'return' (expression (',' expression)*)?
+   | 'yield' (expression (',' expression)*)?
    | 'abort'? 'signal' name (expression (',' expression)*)?
    | 'abort'? 'exit' name (expression (',' expression)*)?
    | 'abort'? 'break'
@@ -212,8 +212,8 @@ armtag
    ;
 
 for_stmt
-   : 'for' (decl (',' decl)*)? 'in' call 'do' body 'end'
-   | 'for' (idn (',' idn)*)? 'in' call 'do' body 'end'
+   : 'for' decl (',' decl)* 'in' call 'do' body 'end'
+   | 'for' idn (',' idn)* 'in' call 'do' body 'end'
    ;
 
 if_stmt
@@ -407,10 +407,10 @@ STRING_LITERAL
    ;
 
 IDENTIFIER
-   : [a-zA-Z] [a-zA-Z0-9]+
+   : [a-zA-Z] [a-zA-Z0-9]*
    ;
 
-DIGIT
+fragment DIGIT
    : [0-9]
    ;
 
