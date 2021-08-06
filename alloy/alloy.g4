@@ -2,7 +2,7 @@
  [The "BSD licence"]
  Copyright (c) 2020 Tom Everett
  All rights reserved.
- 
+
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -13,7 +13,7 @@
     documentation and/or other materials provided with the distribution.
  3. The name of the author may not be used to endorse or promote products
     derived from this software without specific prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -87,8 +87,7 @@ paraDecls
 assertDecl
    : 'assert' name? block
    ;
-   // qualname | bloclk should be optional
-   
+
 cmdDecl
    : (name ':')? ('run' | 'check')? (qualName | block) scope?
    ;
@@ -111,7 +110,7 @@ expr
    | expr binOp expr
    | expr arrowOp expr
    | expr '[' (',' expr)+ ']'
-   | expr ('!' | 'not') compareOp expr
+   | expr ('!' | 'not')? compareOp expr
    | expr ('=>' | 'implies') expr 'else' expr
    | 'let' letDecl (',' letDecl)* blockOrBar
    | quant decl (',' decl)* blockOrBar
@@ -180,11 +179,7 @@ block
 
 blockOrBar
    : block
-   | bar expr
-   ;
-
-bar
-   : '|'
+   | BAR expr
    ;
 
 quant
@@ -206,12 +201,16 @@ number
    : DIGIT+
    ;
 
+BAR
+   : '|'
+   ;
+
 DIGIT
    : '0' .. '9'
    ;
 
 IDENTIFIER
-   : ('a' .. 'z' | 'A' .. 'Z') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9')*
+   : ('a' .. 'z' | 'A' .. 'Z') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')*
    ;
 
 COMMENT
