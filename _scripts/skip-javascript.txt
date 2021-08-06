@@ -11,6 +11,7 @@ cql3
 csharp
 dice
 fortran77
+gdscript
 golang
 haskell
 html

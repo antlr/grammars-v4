@@ -1,15 +1,15 @@
 using Antlr4.Runtime;
 
-namespace PlSqlParseTree
-{
     public abstract class PlSqlParserBase : Parser
     {
         private bool _isVersion10 = false;
         private bool _isVersion12 = true;
-
+        public PlSqlParserBase self;
+    
         protected PlSqlParserBase(ITokenStream input)
             : base(input)
         {
+            self = this;
         }
 
         public bool isVersion10() => _isVersion10;
@@ -20,4 +20,3 @@ namespace PlSqlParseTree
 
         public bool setVersion12(bool value) => _isVersion12 = value;
     }
-}
