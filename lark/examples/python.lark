@@ -1,0 +1,19 @@
+// Python terminals
+
+NAME: /[a-zA-Z_]\w*/
+COMMENT: /#[^\n]*/
+
+STRING : /[ubf]?r?("(?!"").*?(?<!\\)(\\\\)*?"|'(?!'').*?(?<!\\)(\\\\)*?')/i
+LONG_STRING: /[ubf]?r?(""".*?(?<!\\)(\\\\)*?"""|'''.*?(?<!\\)(\\\\)*?''')/is
+
+DEC_NUMBER: /0|[1-9][\d_]*/i
+HEX_NUMBER.2: /0x[\da-f]*/i
+OCT_NUMBER.2: /0o[0-7]*/i
+BIN_NUMBER.2 : /0b[0-1]*/i
+FLOAT_NUMBER.2: /((\d+\.[\d_]*|\.[\d_]+)(e[-+]?\d+)?|\d+(e[-+]?\d+))/i
+IMAG_NUMBER.2: /\d+j/i | FLOAT_NUMBER "j"i
+
+
+// Comma-separated list (with an optional trailing comma)
+cs_list{item}: item ("," item)* ","?
+_cs_list{item}: item ("," item)* ","?
