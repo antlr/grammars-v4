@@ -83,12 +83,12 @@ routine_body
    ;
 
 parms
-   : (parm (',' parm)*)
+   : parm (',' parm)*
    ;
 
 parm
-   : (idn ',' idn)* ':' 'type'
-   | (idn ',' idn)* ':' type_spec
+   : idn (',' idn)* ':' 'type'
+   | idn (',' idn)* ':' type_spec
    ;
 
 args
@@ -96,7 +96,7 @@ args
    ;
 
 decl
-   : (idn ',' idn)* ':' type_spec
+   : idn (',' idn)* ':' type_spec
    ;
 
 returnz
@@ -270,21 +270,21 @@ type_spec
    | 'image'
    | 'rep'
    | 'cvt'
-   | 'sequence' type_actual?
-   | 'array' type_actual?
-   | 'atomic_array' type_actual?
-   | 'struct' (field_spec (',' field_spec)*)?
-   | 'record' (field_spec (',' field_spec)*)?
-   | 'atomic_record' (field_spec (',' field_spec)*)?
-   | 'oneof' (field_spec (',' field_spec)*)?
-   | 'variant' (field_spec (',' field_spec)*)?
-   | 'atomic_variant' (field_spec (',' field_spec)*)?
+   | 'sequence' '[' type_actual ']'
+   | 'array' '[' type_actual ']'
+   | 'atomic_array' '[' type_actual ']'
+   | 'struct' '[' field_spec (',' field_spec)* ']'
+   | 'record' '[' field_spec (',' field_spec)* ']'
+   | 'atomic_record' '[' field_spec (',' field_spec)* ']'
+   | 'oneof' '[' field_spec (',' field_spec)* ']'
+   | 'variant' '[' field_spec (',' field_spec)* ']'
+   | 'atomic_variant' '[' field_spec (',' field_spec)* ']'
    | 'proctype' ((type_spec (',' type_spec)*)?) returnz? signals?
    | 'itertype' ((type_spec (',' type_spec)*)?) yields? signals?
    | 'creatortype' ((type_spec (',' type_spec)*)?) returnz? signals?
    | 'handlertype' ((type_spec (',' type_spec)*)?) returnz? signals?
-   | 'mutex' type_actual?
-   | 'reference'
+   | 'mutex' '[' type_actual ']'
+   | reference
    ;
 
 field_spec
@@ -303,7 +303,7 @@ actual_parm
    ;
 
 type_actual
-   : type_spec ('with' (opbinding (',' opbinding)*)*)?
+   : type_spec ('with' (opbinding (',' opbinding)*)?)?
    ;
 
 opbinding
@@ -412,6 +412,10 @@ IDENTIFIER
 
 DIGIT
    : [0-9]
+   ;
+
+COMMENT
+   : '%' ~ [\r\n]* -> skip
    ;
 
 WS
