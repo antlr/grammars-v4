@@ -105,6 +105,7 @@ AT_WHILE        : '@while';
 AT_EACH         : '@each';
 INCLUDE         : '@include';
 IMPORT          : '@import';
+USE             : '@use';
 RETURN          : '@return';
 MEDIA           : '@media';
 CONTENT         : '@content';
@@ -118,13 +119,15 @@ ONLY            : 'only';
 NOT             : 'not';
 AND_WORD        : 'and';
 USING           : 'using';
+AS              : 'as';
+WITH            : 'with';
 
 Identifier
-	:	(('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
-		('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*
-	|	'-' ('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
-		('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*) -> pushMode(IDENTIFY)
-	;
+  : (('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
+    ('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*
+  | '-' ('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
+    ('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*) -> pushMode(IDENTIFY)
+  ;
 
 PseudoIdentifier
   : COLON COLON? Identifier -> pushMode(IDENTIFY)
@@ -135,24 +138,24 @@ FunctionIdentifier
     ;
 
 fragment STRING
-  	:	'"' (~('"'|'\n'|'\r'))* '"'
-  	|	'\'' (~('\''|'\n'|'\r'))* '\''
-  	;
+    : '"' (~('"'|'\n'|'\r'))* '"'
+    | '\'' (~('\''|'\n'|'\r'))* '\''
+    ;
 
 // string literals
 StringLiteral
-	:	STRING
-	;
+  : STRING
+  ;
 
 
 Number
-	:	'-' (('0'..'9')* '.')? ('0'..'9')+
-	|	(('0'..'9')* '.')? ('0'..'9')+
-	;
+  : '-' (('0'..'9')* '.')? ('0'..'9')+
+  | (('0'..'9')* '.')? ('0'..'9')+
+  ;
 
 Color
-	:	'#' ('0'..'9'|'a'..'f'|'A'..'F')+
-	;
+  : '#' ('0'..'9'|'a'..'f'|'A'..'F')+
+  ;
 
 
 // Whitespace -- ignored
@@ -162,19 +165,19 @@ WS
 
 // Single-line comments
 SL_COMMENT
-	:	'//'
-		(~('\n'|'\r'))* ('\n'|'\r'('\n')?) -> skip
-	;
+  : '//'
+    (~('\n'|'\r'))* ('\n'|'\r'('\n')?) -> skip
+  ;
 
 
 // multiple-line comments
 COMMENT
-	:	'/*' .*? '*/' -> skip
-	;
+  : '/*' .*? '*/' -> skip
+  ;
 
 mode URL_STARTED;
 UrlEnd                 : RPAREN -> popMode;
-Url                    :	STRING | (~(')' | '\n' | '\r' | ';'))+;
+Url                    :  STRING | (~(')' | '\n' | '\r' | ';'))+;
 
 mode IDENTIFY;
 BlockStart_ID          : BlockStart -> popMode, type(BlockStart);
