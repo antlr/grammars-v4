@@ -106,6 +106,7 @@
 				<module>csharp</module>
 				<module>css3</module>
 				<module>csv</module>
+                <module>ctl</module>
 				<module>cto</module>
 				<module>dart2</module>
 				<module>databank</module>
@@ -160,6 +161,7 @@
 				<module>kotlin</module>
 				<module>kuka</module>
 				<module>lambda</module>
+				<module>lark</module>
 				<module>lcc</module>
 				<module>less</module>
                 <module>limbo</module>
@@ -168,7 +170,8 @@
 				<module>lolcode</module>
 				<module>loop</module>
 				<module>lpc</module>
-				<module>lua</module>
+                <module>ltl</module>
+                <module>lua</module>
 				<module>matlab</module>
 				<module>mckeeman-form</module>
 				<module>mdx</module>
@@ -218,6 +221,8 @@
 				<module>python</module>
 				<module>quakemap</module>
 				<module>r</module>
+				<module>racket-bsl</module>
+				<module>racket-isl</module>
 				<module>rcs</module>
 				<module>redcode</module>
                 <module>refal</module>
@@ -264,6 +269,7 @@
 				<module>tinybasic</module>
 				<module>tinyc</module>
 				<module>tinymud</module>
+                <module>tl</module>
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>

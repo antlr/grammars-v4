@@ -24,6 +24,25 @@ public class Lambdas {
         Arrays.sort(copy, (a, b) -> a.compareTo(b));
         printNames("Names sorted with lambda expression:", copy);
      }
+
+}
+
+class LambdaAndCastWithBounds{
+
+    interface I1<T> {
+        void fn();
+    }
+
+    interface I2 {
+        void fn();
+    }
+
+    I1<Byte> i1 = (I1<Byte> & Serializable & Cloneable) () -> {
+    };
+
+    I2 i2 = (I2 & Serializable & Cloneable) () -> {
+    };
+
 }
 
 // Default interface method
