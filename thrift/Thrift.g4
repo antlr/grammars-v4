@@ -5,14 +5,14 @@ document
     ;
 
 header
-    : include | namespace | cpp_include
+    : include_ | namespace_ | cpp_include
     ;
 
-include
+include_
     : 'include' LITERAL
     ;
 
-namespace
+namespace_
     : 'namespace' '*' (IDENTIFIER | LITERAL)
     | 'namespace' IDENTIFIER (IDENTIFIER | LITERAL)
     | 'cpp_namespace' IDENTIFIER
@@ -25,14 +25,14 @@ cpp_include
 
 
 definition
-    : const_rule | typedef | enum_rule | senum | struct | union | exception | service
+    : const_rule | typedef_ | enum_rule | senum | struct_ | union_ | exception | service
     ;
 
 const_rule
     : 'const' field_type IDENTIFIER ( '=' const_value )? list_separator?
     ;
 
-typedef
+typedef_
     : 'typedef' field_type IDENTIFIER type_annotations?
     ;
 
@@ -48,11 +48,11 @@ senum
     : 'senum' IDENTIFIER '{' (LITERAL list_separator?)* '}' type_annotations?
     ;
 
-struct
+struct_
     : 'struct' IDENTIFIER '{' field* '}' type_annotations?
     ;
 
-union
+union_
     : 'union' IDENTIFIER '{' field* '}' type_annotations?
     ;
 
@@ -61,7 +61,7 @@ exception
     ;
 
 service
-    : 'service' IDENTIFIER ('extends' IDENTIFIER)? '{' function* '}' type_annotations?
+    : 'service' IDENTIFIER ('extends' IDENTIFIER)? '{' function_* '}' type_annotations?
     ;
 
 field
@@ -77,7 +77,7 @@ field_req
     | 'optional'
     ;
 
-function
+function_
     : oneway? function_type IDENTIFIER '(' field* ')' throws_list? type_annotations? list_separator?
     ;
 

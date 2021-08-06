@@ -86,8 +86,12 @@ unit_statement
     | drop_trigger
     | drop_type
     | data_manipulation_language_statements
+    | truncate_table
     | drop_table
+    | drop_view
     | drop_index
+
+    | rename_object
 
     | comment_on_column
     | comment_on_table
@@ -161,10 +165,10 @@ create_package_body
 
 package_obj_spec
     : pragma_declaration
+    | exception_declaration
     | variable_declaration
     | subtype_declaration
     | cursor_declaration
-    | exception_declaration
     | type_declaration
     | procedure_spec
     | function_spec
@@ -176,14 +180,14 @@ procedure_spec
 
 function_spec
     : FUNCTION identifier ('(' parameter ( ',' parameter)* ')')?
-      RETURN type_spec (DETERMINISTIC)? (RESULT_CACHE)? ';'
+      RETURN type_spec PIPELINED? DETERMINISTIC? (RESULT_CACHE)? ';'
     ;
 
 package_obj_body
-    : variable_declaration
+    : exception_declaration
     | subtype_declaration
     | cursor_declaration
-    | exception_declaration
+    | variable_declaration
     | type_declaration
     | procedure_body
     | function_body
@@ -204,7 +208,7 @@ alter_procedure
 function_body
     : FUNCTION identifier ('(' parameter (',' parameter)* ')')?
       RETURN type_spec (invoker_rights_clause | parallel_enable_clause | result_cache_clause | DETERMINISTIC)*
-      ((PIPELINED? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
+      ((PIPELINED? DETERMINISTIC? (IS | AS) (DECLARE? seq_of_declare_specs? body | call_spec)) | (PIPELINED | AGGREGATE) USING implementation_type_name) ';'
     ;
 
 procedure_body
@@ -393,7 +397,7 @@ create_type
 // Create Type Specific Clauses
 
 type_definition
-    : type_name (OID CHAR_STRING)? object_type_def?
+    : type_name (OID CHAR_STRING)? FORCE? object_type_def?
     ;
 
 object_type_def
@@ -1074,7 +1078,7 @@ storage_table_clause
 
 // https://docs.oracle.com/database/121/SQLRF/statements_4008.htm#SQLRF56110
 unified_auditing
-    : {isVersion12()}?
+    : {self.isVersion12()}?
       AUDIT (POLICY policy_name ((BY | EXCEPT) audit_user (',' audit_user)* )?
                                 (WHENEVER NOT? SUCCESSFUL)?
             | CONTEXT NAMESPACE oracle_namespace
@@ -1102,11 +1106,11 @@ audit_traditional
     ;
 
 audit_direct_path
-    : {isVersion12()}? DIRECT_PATH auditing_by_clause
+    : {self.isVersion12()}? DIRECT_PATH auditing_by_clause
     ;
 
 audit_container_clause
-    : {isVersion12()}? (CONTAINER EQUALS_OP (CURRENT | ALL))
+    : {self.isVersion12()}? (CONTAINER EQUALS_OP (CURRENT | ALL))
     ;
 
 audit_operation_clause
@@ -1148,7 +1152,7 @@ auditing_on_clause
     : ON ( object_name
          | DIRECTORY regular_id
          | MINING MODEL model_name
-         | {isVersion12()}? SQL TRANSLATION PROFILE profile_name
+         | {self.isVersion12()}? SQL TRANSLATION PROFILE profile_name
          | DEFAULT
          )
     ;
@@ -1176,7 +1180,7 @@ sql_statement_shortcut
     | MATERIALIZED VIEW
     | NOT EXISTS
     | OUTLINE
-    | {isVersion12()}? PLUGGABLE DATABASE
+    | {self.isVersion12()}? PLUGGABLE DATABASE
     | PROCEDURE
     | PROFILE
     | PUBLIC DATABASE LINK
@@ -1213,6 +1217,10 @@ sql_statement_shortcut
 
 drop_index
     : DROP INDEX index_name ';'
+    ;
+
+rename_object
+    : RENAME object_name TO object_name ';'
     ;
 
 grant_statement
@@ -1259,11 +1267,11 @@ alter_library
     ;
 
 library_editionable
-    : {isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
+    : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
 library_debug
-    : {isVersion12()}? DEBUG
+    : {self.isVersion12()}? DEBUG
     ;
 
 
@@ -1297,13 +1305,13 @@ alter_view
     ;
 
 alter_view_editionable
-    : {isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
+    : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
 create_view
-    : CREATE (OR REPLACE)? (OR? FORCE)? EDITIONING? VIEW
+    : CREATE (OR REPLACE)? (OR? FORCE)? EDITIONABLE? EDITIONING? VIEW
       tableview_name view_options?
-      AS subquery subquery_restriction_clause?
+      AS select_only_statement subquery_restriction_clause?
     ;
 
 view_options
@@ -1685,7 +1693,7 @@ create_materialized_view
         create_mv_refresh?
         (FOR UPDATE)?
         ( (DISABLE | ENABLE) QUERY REWRITE )?
-        AS subquery
+        AS select_only_statement
         ';'
     ;
 
@@ -1733,7 +1741,7 @@ create_cluster
 
 create_table
     : CREATE (GLOBAL TEMPORARY)? TABLE tableview_name
-        (relational_table | object_table | xmltype_table) (AS select_statement)?
+        (relational_table | object_table | xmltype_table) (AS select_only_statement)?
       ';'
     ;
 
@@ -2124,8 +2132,16 @@ upgrade_table_clause
     : UPGRADE (NOT? INCLUDING DATA) column_properties
     ;
 
+truncate_table
+    : TRUNCATE TABLE tableview_name PURGE? SEMICOLON
+    ;
+
 drop_table
     : DROP TABLE tableview_name PURGE? SEMICOLON
+    ;
+
+drop_view
+    : DROP VIEW tableview_name (CASCADE CONSTRAINT)? SEMICOLON
     ;
 
 comment_on_column
@@ -2241,7 +2257,7 @@ partial_database_recovery
     ;
 
 partial_database_recovery_10g
-    : {isVersion10()}? STANDBY
+    : {self.isVersion10()}? STANDBY
       ( TABLESPACE tablespace (',' tablespace)*
       | DATAFILE CHAR_STRING | filenumber (',' CHAR_STRING | filenumber)*
       )
@@ -2752,7 +2768,7 @@ column_properties
     ;
 
 period_definition
-    : {isVersion12()}? PERIOD FOR column_name
+    : {self.isVersion12()}? PERIOD FOR column_name
         ( '(' start_time_column ',' end_time_column ')' )?
     ;
 
@@ -2770,8 +2786,12 @@ column_definition
     ;
 
 virtual_column_definition
-    : column_name datatype? (GENERATED ALWAYS)? AS '(' expression ')'
+    : column_name datatype? autogenerated_sequence_definition?
         VIRTUAL? inline_constraint*
+    ;
+
+autogenerated_sequence_definition
+    : GENERATED (ALWAYS | BY DEFAULT (ON NULL_)?)? AS IDENTITY ( '(' (sequence_start_clause | sequence_spec)* ')' )?
     ;
 
 out_of_line_part_storage
@@ -2936,10 +2956,10 @@ seq_of_declare_specs
 
 declare_spec
     : pragma_declaration
+    | exception_declaration
     | variable_declaration
     | subtype_declaration
     | cursor_declaration
-    | exception_declaration
     | type_declaration
     | procedure_spec
     | function_spec
@@ -3139,7 +3159,7 @@ exception_handler
     ;
 
 trigger_block
-    : (DECLARE? declare_spec+)? body
+    : (DECLARE declare_spec*)? body
     ;
 
 block
@@ -3195,7 +3215,7 @@ open_statement
     ;
 
 fetch_statement
-    : FETCH cursor_name (it1=INTO variable_name (',' variable_name)* | BULK COLLECT INTO variable_name (',' variable_name)*)
+    : FETCH cursor_name (it1=INTO variable_name (',' variable_name)* | BULK COLLECT INTO variable_name (',' variable_name)* (LIMIT (numeric | variable_name))?)
     ;
 
 open_for_statement
@@ -3266,8 +3286,12 @@ explain_statement
       FOR (select_statement | update_statement | delete_statement | insert_statement | merge_statement)
     ;
 
+select_only_statement
+    : subquery_factoring_clause? subquery
+    ;
+
 select_statement
-    : subquery_factoring_clause? subquery (for_update_clause | order_by_clause | offset_clause | fetch_clause)*
+    : select_only_statement (for_update_clause | order_by_clause | offset_clause | fetch_clause)*
     ;
 
 // Select Specific Clauses
@@ -3305,7 +3329,7 @@ subquery_operation_part
 
 query_block
     : SELECT (DISTINCT | UNIQUE | ALL)? selected_list
-      into_clause? from_clause where_clause? hierarchical_query_clause? group_by_clause? model_clause?
+      into_clause? from_clause where_clause? hierarchical_query_clause? group_by_clause? model_clause? order_by_clause? fetch_clause?
     ;
 
 selected_list
@@ -3594,7 +3618,7 @@ insert_into_clause
     ;
 
 values_clause
-    : VALUES '(' expressions? ')'
+    : VALUES (REGULAR_ID | '(' expressions ')')
     ;
 
 merge_statement
@@ -3619,7 +3643,7 @@ merge_update_delete_part
 
 merge_insert_clause
     : WHEN NOT MATCHED THEN INSERT paren_column_list?
-      VALUES '(' expressions? ')' where_clause?
+      values_clause where_clause?
     ;
 
 selected_tableview
@@ -3766,6 +3790,7 @@ between_elements
 concatenation
     : model_expression
         (AT (LOCAL | TIME ZONE concatenation) | interval_expression)?
+        (ON OVERFLOW (TRUNCATE | ERROR))?
     | concatenation op=(ASTERISK | SOLIDUS) concatenation
     | concatenation op=(PLUS_SIGN | MINUS_SIGN) concatenation
     | concatenation BAR BAR concatenation
@@ -3852,7 +3877,7 @@ atom
     ;
 
 quantified_expression
-    : (SOME | EXISTS | ALL | ANY) ('(' subquery ')' | '(' expression ')')
+    : (SOME | EXISTS | ALL | ANY) ('(' select_only_statement ')' | '(' expression ')')
     ;
 
 string_function
@@ -3863,7 +3888,7 @@ string_function
     | CHR '(' concatenation USING NCHAR_CS ')'
     | NVL '(' expression ',' expression ')'
     | TRIM '(' ((LEADING | TRAILING | BOTH)? quoted_string? FROM)? concatenation ')'
-    | TO_DATE '(' expression (',' quoted_string)? ')'
+    | TO_DATE '(' (table_element | standard_function | expression) (',' quoted_string)? ')'
     ;
 
 standard_function
@@ -4103,7 +4128,7 @@ where_clause
     ;
 
 into_clause
-    : (BULK COLLECT)? INTO variable_name (',' variable_name)*
+    : (BULK COLLECT)? INTO (general_element | bind_variable) (',' (general_element | bind_variable))*
     ;
 
 // Common Named Elements
@@ -4247,7 +4272,7 @@ column_name
 
 tableview_name
     : identifier ('.' id_expression)?
-          ('@' link_name | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
+          (AT_SIGN link_name (PERIOD link_name)? | /*TODO{!(input.LA(2) == BY)}?*/ partition_extension_clause)?
     | xmltable outer_join_sign?
     ;
 
@@ -4336,7 +4361,7 @@ datatype
     ;
 
 precision_part
-    : '(' (numeric | ASTERISK) (',' numeric)? (CHAR | BYTE)? ')'
+    : '(' (numeric | ASTERISK) (',' (numeric | numeric_negative))? (CHAR | BYTE)? ')'
     ;
 
 native_datatype_element
@@ -4569,7 +4594,8 @@ numeric_negative
     ;
 
 quoted_string
-    : CHAR_STRING
+    : variable_name
+    | CHAR_STRING
     //| CHAR_STRING_PERL
     | NATIONAL_CHAR_STRING_LIT
     ;
@@ -4612,6 +4638,7 @@ regular_id
     | EXCEPTION
     | EXCEPTION_INIT
     | EXCEPTIONS
+    | EXISTS
     | EXIT
     | FLOAT
     | FORALL
@@ -4867,6 +4894,7 @@ non_reserved_keywords_in_12c
     | PATTERN
     | PER
     | PERIOD
+    | PERIOD_KEYWORD
     | PERMUTE
     | PLUGGABLE
     | POOL_16K

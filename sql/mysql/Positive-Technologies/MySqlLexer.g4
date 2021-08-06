@@ -33,8 +33,8 @@ SPACE:                               [ \t\r\n]+    -> channel(HIDDEN);
 SPEC_MYSQL_COMMENT:                  '/*!' .+? '*/' -> channel(MYSQLCOMMENT);
 COMMENT_INPUT:                       '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT:                        (
-                                       ('-- ' | '#') ~[\r\n]* ('\r'? '\n' | EOF) 
-                                       | '--' ('\r'? '\n' | EOF) 
+                                       ('--' [ \t] | '#') ~[\r\n]* ('\r'? '\n' | EOF)
+                                       | '--' ('\r'? '\n' | EOF)
                                      ) -> channel(HIDDEN);
 
 
@@ -68,6 +68,7 @@ CONTINUE:                            'CONTINUE';
 CONVERT:                             'CONVERT';
 CREATE:                              'CREATE';
 CROSS:                               'CROSS';
+CURRENT:                             'CURRENT';
 CURRENT_USER:                        'CURRENT_USER';
 CURSOR:                              'CURSOR';
 DATABASE:                            'DATABASE';
@@ -79,12 +80,14 @@ DELETE:                              'DELETE';
 DESC:                                'DESC';
 DESCRIBE:                            'DESCRIBE';
 DETERMINISTIC:                       'DETERMINISTIC';
+DIAGNOSTICS:                         'DIAGNOSTICS';
 DISTINCT:                            'DISTINCT';
 DISTINCTROW:                         'DISTINCTROW';
 DROP:                                'DROP';
 EACH:                                'EACH';
 ELSE:                                'ELSE';
 ELSEIF:                              'ELSEIF';
+EMPTY:                               'EMPTY';
 ENCLOSED:                            'ENCLOSED';
 ESCAPED:                             'ESCAPED';
 EXISTS:                              'EXISTS';
@@ -98,6 +101,7 @@ FOREIGN:                             'FOREIGN';
 FROM:                                'FROM';
 FULLTEXT:                            'FULLTEXT';
 GENERATED:                           'GENERATED';
+GET:                                 'GET';
 GRANT:                               'GRANT';
 GROUP:                               'GROUP';
 HAVING:                              'HAVING';
@@ -138,6 +142,7 @@ NATURAL:                             'NATURAL';
 NOT:                                 'NOT';
 NO_WRITE_TO_BINLOG:                  'NO_WRITE_TO_BINLOG';
 NULL_LITERAL:                        'NULL';
+NUMBER:                              'NUMBER';
 ON:                                  'ON';
 OPTIMIZE:                            'OPTIMIZE';
 OPTION:                              'OPTION';
@@ -161,6 +166,7 @@ RENAME:                              'RENAME';
 REPEAT:                              'REPEAT';
 REPLACE:                             'REPLACE';
 REQUIRE:                             'REQUIRE';
+RESIGNAL:                            'RESIGNAL';
 RESTRICT:                            'RESTRICT';
 RETURN:                              'RETURN';
 REVOKE:                              'REVOKE';
@@ -182,6 +188,7 @@ SQL_BIG_RESULT:                      'SQL_BIG_RESULT';
 SQL_CALC_FOUND_ROWS:                 'SQL_CALC_FOUND_ROWS';
 SQL_SMALL_RESULT:                    'SQL_SMALL_RESULT';
 SSL:                                 'SSL';
+STACKED:                             'STACKED';
 STARTING:                            'STARTING';
 STRAIGHT_JOIN:                       'STRAIGHT_JOIN';
 TABLE:                               'TABLE';
@@ -215,13 +222,21 @@ ZEROFILL:                            'ZEROFILL';
 TINYINT:                             'TINYINT';
 SMALLINT:                            'SMALLINT';
 MEDIUMINT:                           'MEDIUMINT';
+MIDDLEINT:                           'MIDDLEINT';
 INT:                                 'INT';
+INT1:                                'INT1';
+INT2:                                'INT2';
+INT3:                                'INT3';
+INT4:                                'INT4';
+INT8:                                'INT8';
 INTEGER:                             'INTEGER';
 BIGINT:                              'BIGINT';
 REAL:                                'REAL';
 DOUBLE:                              'DOUBLE';
 PRECISION:                           'PRECISION';
 FLOAT:                               'FLOAT';
+FLOAT4:                              'FLOAT4';
+FLOAT8:                              'FLOAT8';
 DECIMAL:                             'DECIMAL';
 DEC:                                 'DEC';
 NUMERIC:                             'NUMERIC';
@@ -239,6 +254,7 @@ VARBINARY:                           'VARBINARY';
 TINYBLOB:                            'TINYBLOB';
 BLOB:                                'BLOB';
 MEDIUMBLOB:                          'MEDIUMBLOB';
+LONG:                                'LONG';
 LONGBLOB:                            'LONGBLOB';
 TINYTEXT:                            'TINYTEXT';
 TEXT:                                'TEXT';
@@ -257,12 +273,45 @@ DAY_MINUTE:                          'DAY_MINUTE';
 DAY_SECOND:                          'DAY_SECOND';
 HOUR_MINUTE:                         'HOUR_MINUTE';
 HOUR_SECOND:                         'HOUR_SECOND';
-MINUTE_SECOND:                       'MINUTE_SECOND'; 
+MINUTE_SECOND:                       'MINUTE_SECOND';
 SECOND_MICROSECOND:                  'SECOND_MICROSECOND';
 MINUTE_MICROSECOND:                  'MINUTE_MICROSECOND';
 HOUR_MICROSECOND:                    'HOUR_MICROSECOND';
 DAY_MICROSECOND:                     'DAY_MICROSECOND';
 
+// JSON keywords
+JSON_ARRAY:                          'JSON_ARRAY';
+JSON_OBJECT:                         'JSON_OBJECT';
+JSON_QUOTE:                          'JSON_QUOTE';
+JSON_CONTAINS:                       'JSON_CONTAINS';
+JSON_CONTAINS_PATH:                  'JSON_CONTAINS_PATH';
+JSON_EXTRACT:                        'JSON_EXTRACT';
+JSON_KEYS:                           'JSON_KEYS';
+JSON_OVERLAPS:                       'JSON_OVERLAPS';
+JSON_SEARCH:                         'JSON_SEARCH';
+JSON_VALUE:                          'JSON_VALUE';
+JSON_ARRAY_APPEND:                   'JSON_ARRAY_APPEND';
+JSON_ARRAY_INSERT:                   'JSON_ARRAY_INSERT';
+JSON_INSERT:                         'JSON_INSERT';
+JSON_MERGE:                          'JSON_MERGE';
+JSON_MERGE_PATCH:                    'JSON_MERGE_PATCH';
+JSON_MERGE_PRESERVE:                 'JSON_MERGE_PRESERVE';
+JSON_REMOVE:                         'JSON_REMOVE';
+JSON_REPLACE:                        'JSON_REPLACE';
+JSON_SET:                            'JSON_SET';
+JSON_UNQUOTE:                        'JSON_UNQUOTE';
+JSON_DEPTH:                          'JSON_DEPTH';
+JSON_LENGTH:                         'JSON_LENGTH';
+JSON_TYPE:                           'JSON_TYPE';
+JSON_VALID:                          'JSON_VALID';
+JSON_TABLE:                          'JSON_TABLE';
+JSON_SCHEMA_VALID:                   'JSON_SCHEMA_VALID';
+JSON_SCHEMA_VALIDATION_REPORT:       'JSON_SCHEMA_VALIDATION_REPORT';
+JSON_PRETTY:                         'JSON_PRETTY';
+JSON_STORAGE_FREE:                   'JSON_STORAGE_FREE';
+JSON_STORAGE_SIZE:                   'JSON_STORAGE_SIZE';
+JSON_ARRAYAGG:                       'JSON_ARRAYAGG';
+JSON_OBJECTAGG:                      'JSON_OBJECTAGG';
 
 // Group function Keywords
 
@@ -282,7 +331,6 @@ SUM:                                 'SUM';
 VAR_POP:                             'VAR_POP';
 VAR_SAMP:                            'VAR_SAMP';
 VARIANCE:                            'VARIANCE';
-
 
 // Common function Keywords
 
@@ -305,8 +353,6 @@ TRIM:                                'TRIM';
 UTC_DATE:                            'UTC_DATE';
 UTC_TIME:                            'UTC_TIME';
 UTC_TIMESTAMP:                       'UTC_TIMESTAMP';
-
-
 
 // Keywords, but can be ID
 // Common Keywords, but can be ID
@@ -353,6 +399,7 @@ COMPLETION:                          'COMPLETION';
 COMPRESSED:                          'COMPRESSED';
 COMPRESSION:                         'COMPRESSION';
 CONCURRENT:                          'CONCURRENT';
+CONNECT:                             'CONNECT';
 CONNECTION:                          'CONNECTION';
 CONSISTENT:                          'CONSISTENT';
 CONSTRAINT_CATALOG:                  'CONSTRAINT_CATALOG';
@@ -363,6 +410,7 @@ CONTEXT:                             'CONTEXT';
 CONTRIBUTORS:                        'CONTRIBUTORS';
 COPY:                                'COPY';
 CPU:                                 'CPU';
+CURSOR_NAME:                         'CURSOR_NAME';
 DATA:                                'DATA';
 DATAFILE:                            'DATAFILE';
 DEALLOCATE:                          'DEALLOCATE';
@@ -473,6 +521,7 @@ MAX_SIZE:                            'MAX_SIZE';
 MAX_UPDATES_PER_HOUR:                'MAX_UPDATES_PER_HOUR';
 MAX_USER_CONNECTIONS:                'MAX_USER_CONNECTIONS';
 MEDIUM:                              'MEDIUM';
+MEMBER:                              'MEMBER';
 MERGE:                               'MERGE';
 MESSAGE_TEXT:                        'MESSAGE_TEXT';
 MID:                                 'MID';
@@ -491,8 +540,10 @@ NEXT:                                'NEXT';
 NO:                                  'NO';
 NODEGROUP:                           'NODEGROUP';
 NONE:                                'NONE';
+ODBC:                                'ODBC';
 OFFLINE:                             'OFFLINE';
 OFFSET:                              'OFFSET';
+OF:                                  'OF';
 OJ:                                  'OJ';
 OLD_PASSWORD:                        'OLD_PASSWORD';
 ONE:                                 'ONE';
@@ -545,7 +596,10 @@ REPLICATE_WILD_IGNORE_TABLE:         'REPLICATE_WILD_IGNORE_TABLE';
 REPLICATION:                         'REPLICATION';
 RESET:                               'RESET';
 RESUME:                              'RESUME';
+RETURNED_SQLSTATE:                   'RETURNED_SQLSTATE';
+RETURNING:                           'RETURNING';
 RETURNS:                             'RETURNS';
+ROLE:                                'ROLE';
 ROLLBACK:                            'ROLLBACK';
 ROLLUP:                              'ROLLUP';
 ROTATE:                              'ROTATE';
@@ -595,11 +649,13 @@ SWAPS:                               'SWAPS';
 SWITCHES:                            'SWITCHES';
 TABLE_NAME:                          'TABLE_NAME';
 TABLESPACE:                          'TABLESPACE';
+TABLE_TYPE:                          'TABLE_TYPE';
 TEMPORARY:                           'TEMPORARY';
 TEMPTABLE:                           'TEMPTABLE';
 THAN:                                'THAN';
 TRADITIONAL:                         'TRADITIONAL';
 TRANSACTION:                         'TRANSACTION';
+TRANSACTIONAL:                       'TRANSACTIONAL';
 TRIGGERS:                            'TRIGGERS';
 TRUNCATE:                            'TRUNCATE';
 UNDEFINED:                           'UNDEFINED';
@@ -660,7 +716,38 @@ RELOAD:                              'RELOAD';
 SHUTDOWN:                            'SHUTDOWN';
 SUPER:                               'SUPER';
 PRIVILEGES:                          'PRIVILEGES';
+APPLICATION_PASSWORD_ADMIN:          'APPLICATION_PASSWORD_ADMIN';
+AUDIT_ADMIN:                         'AUDIT_ADMIN';
+BACKUP_ADMIN:                        'BACKUP_ADMIN';
+BINLOG_ADMIN:                        'BINLOG_ADMIN';
+BINLOG_ENCRYPTION_ADMIN:             'BINLOG_ENCRYPTION_ADMIN';
+CLONE_ADMIN:                         'CLONE_ADMIN';
+CONNECTION_ADMIN:                    'CONNECTION_ADMIN';
+ENCRYPTION_KEY_ADMIN:                'ENCRYPTION_KEY_ADMIN';
+FIREWALL_ADMIN:                      'FIREWALL_ADMIN';
+FIREWALL_USER:                       'FIREWALL_USER';
+FLUSH_OPTIMIZER_COSTS:               'FLUSH_OPTIMIZER_COSTS';
+FLUSH_STATUS:                        'FLUSH_STATUS';
+FLUSH_TABLES:                        'FLUSH_TABLES';
+FLUSH_USER_RESOURCES:                'FLUSH_USER_RESOURCES';
+GROUP_REPLICATION_ADMIN:             'GROUP_REPLICATION_ADMIN';
+INNODB_REDO_LOG_ARCHIVE:             'INNODB_REDO_LOG_ARCHIVE';
+INNODB_REDO_LOG_ENABLE:              'INNODB_REDO_LOG_ENABLE';
+NDB_STORED_USER:                     'NDB_STORED_USER';
+PERSIST_RO_VARIABLES_ADMIN:          'PERSIST_RO_VARIABLES_ADMIN';
+REPLICATION_APPLIER:                 'REPLICATION_APPLIER';
+REPLICATION_SLAVE_ADMIN:             'REPLICATION_SLAVE_ADMIN';
+RESOURCE_GROUP_ADMIN:                'RESOURCE_GROUP_ADMIN';
+RESOURCE_GROUP_USER:                 'RESOURCE_GROUP_USER';
+ROLE_ADMIN:                          'ROLE_ADMIN';
+SERVICE_CONNECTION_ADMIN:            'SERVICE_CONNECTION_ADMIN';
 SESSION_VARIABLES_ADMIN:             QUOTE_SYMB? 'SESSION_VARIABLES_ADMIN' QUOTE_SYMB?;
+SET_USER_ID:                         'SET_USER_ID';
+SHOW_ROUTINE:                        'SHOW_ROUTINE';
+SYSTEM_VARIABLES_ADMIN:              'SYSTEM_VARIABLES_ADMIN';
+TABLE_ENCRYPTION_ADMIN:              'TABLE_ENCRYPTION_ADMIN';
+VERSION_TOKEN_ADMIN:                 'VERSION_TOKEN_ADMIN';
+XA_RECOVER_ADMIN:                    'XA_RECOVER_ADMIN';
 
 
 // Charsets
@@ -1152,41 +1239,46 @@ ID:                                  ID_LITERAL;
 // DOUBLE_QUOTE_ID:                  '"' ~'"'+ '"';
 REVERSE_QUOTE_ID:                    '`' ~'`'+ '`';
 STRING_USER_NAME:                    (
-                                       SQUOTA_STRING | DQUOTA_STRING 
+                                       SQUOTA_STRING | DQUOTA_STRING
                                        | BQUOTA_STRING | ID_LITERAL
-                                     ) '@' 
+                                     ) '@'
                                      (
-                                       SQUOTA_STRING | DQUOTA_STRING 
+                                       SQUOTA_STRING | DQUOTA_STRING
                                        | BQUOTA_STRING | ID_LITERAL
+                                       | IP_ADDRESS
+                                     );
+IP_ADDRESS:                          (
+                                       [0-9]+ '.' [0-9.]+
+                                       | [0-9A-F:]+ ':' [0-9A-F:]+
                                      );
 LOCAL_ID:                            '@'
                                 (
-                                  [A-Z0-9._$]+ 
+                                  [A-Z0-9._$]+
                                   | SQUOTA_STRING
                                   | DQUOTA_STRING
                                   | BQUOTA_STRING
                                 );
-GLOBAL_ID:                           '@' '@' 
+GLOBAL_ID:                           '@' '@'
                                 (
-                                  [A-Z0-9._$]+ 
+                                  [A-Z0-9._$]+
                                   | BQUOTA_STRING
                                 );
 
 
 // Fragments for Literal primitives
 
-fragment CHARSET_NAME:               ARMSCII8 | ASCII | BIG5 | BINARY | CP1250 
-                                     | CP1251 | CP1256 | CP1257 | CP850 
-                                     | CP852 | CP866 | CP932 | DEC8 | EUCJPMS 
-                                     | EUCKR | GB2312 | GBK | GEOSTD8 | GREEK 
-                                     | HEBREW | HP8 | KEYBCS2 | KOI8R | KOI8U 
-                                     | LATIN1 | LATIN2 | LATIN5 | LATIN7 
-                                     | MACCE | MACROMAN | SJIS | SWE7 | TIS620 
-                                     | UCS2 | UJIS | UTF16 | UTF16LE | UTF32 
+fragment CHARSET_NAME:               ARMSCII8 | ASCII | BIG5 | BINARY | CP1250
+                                     | CP1251 | CP1256 | CP1257 | CP850
+                                     | CP852 | CP866 | CP932 | DEC8 | EUCJPMS
+                                     | EUCKR | GB2312 | GBK | GEOSTD8 | GREEK
+                                     | HEBREW | HP8 | KEYBCS2 | KOI8R | KOI8U
+                                     | LATIN1 | LATIN2 | LATIN5 | LATIN7
+                                     | MACCE | MACROMAN | SJIS | SWE7 | TIS620
+                                     | UCS2 | UJIS | UTF16 | UTF16LE | UTF32
                                      | UTF8 | UTF8MB3 | UTF8MB4;
 
 fragment EXPONENT_NUM_PART:          'E' [-+]? DEC_DIGIT+;
-fragment ID_LITERAL:                 [A-Z_$0-9]*?[A-Z_$]+?[A-Z_$0-9]*;
+fragment ID_LITERAL:                 [A-Z_$0-9\u0080-\uFFFF]*?[A-Z_$\u0080-\uFFFF]+?[A-Z_$0-9\u0080-\uFFFF]*;
 fragment DQUOTA_STRING:              '"' ( '\\'. | '""' | ~('"'| '\\') )* '"';
 fragment SQUOTA_STRING:              '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
 fragment BQUOTA_STRING:              '`' ( '\\'. | '``' | ~('`'|'\\'))* '`';

@@ -11,7 +11,7 @@ TJSBaseParser.prototype.notOpenBraceAndNotFunction = function () {
     const nextTokenType = this._input.LT(1).type;
     return (
         nextTokenType !== TJSParser.OpenBrace &&
-        nextTokenType !== TJSParser.Function
+        nextTokenType !== TJSParser.Function_
     );
 };
 

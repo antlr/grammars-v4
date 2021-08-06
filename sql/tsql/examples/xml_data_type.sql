@@ -172,3 +172,6 @@ declare namespace MI="http://schemas.microsoft.com/sqlserver/2004/07/adventure-w
 /MI:root/MI:Location') as T(C)
 WHERE ProductModelID=7
 GO;
+
+-- Expression xml methods
+SELECT	CAST(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(MAX)')

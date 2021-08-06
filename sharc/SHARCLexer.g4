@@ -2135,7 +2135,7 @@ VALUE_EXP
    ;
 
 
-NULL
+NULL_
    : 'NULL'
    ;
 

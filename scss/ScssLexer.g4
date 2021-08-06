@@ -28,7 +28,7 @@
 
 lexer grammar ScssLexer;
 
-NULL              : 'null';
+NULL_              : 'null';
 
 
 IN              : 'in';
@@ -64,12 +64,18 @@ DOLLAR          : '$';
 AT              : '@';
 AND             : '&';
 HASH            : '#';
-COLONCOLON      : '::';
 PLUS            : '+';
 TIMES           : '*';
 DIV             : '/';
 MINUS           : '-';
 PERC            : '%';
+
+// When a variable or parenthesized statement is negated, there cannot be a
+// space after the - or +.
+MINUS_DOLLAR    : MINUS DOLLAR;
+PLUS_DOLLAR     : PLUS DOLLAR;
+MINUS_LPAREN    : MINUS LPAREN;
+PLUS_LPAREN     : PLUS LPAREN;
 
 
 UrlStart
@@ -99,41 +105,57 @@ AT_WHILE        : '@while';
 AT_EACH         : '@each';
 INCLUDE         : '@include';
 IMPORT          : '@import';
+USE             : '@use';
 RETURN          : '@return';
+MEDIA           : '@media';
+CONTENT         : '@content';
 
 FROM            : 'from';
+TO              : 'to';
 THROUGH         : 'through';
 POUND_DEFAULT   : '!default';
-
+IMPORTANT       : '!important';
+ONLY            : 'only';
+NOT             : 'not';
+AND_WORD        : 'and';
+USING           : 'using';
+AS              : 'as';
+WITH            : 'with';
 
 Identifier
-	:	(('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
-		('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*
-	|	'-' ('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
-		('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*) -> pushMode(IDENTIFY)
-	;
+  : (('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
+    ('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*
+  | '-' ('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
+    ('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*) -> pushMode(IDENTIFY)
+  ;
 
+PseudoIdentifier
+  : COLON COLON? Identifier -> pushMode(IDENTIFY)
+  ;
 
+FunctionIdentifier
+    : Identifier LPAREN
+    ;
 
 fragment STRING
-  	:	'"' (~('"'|'\n'|'\r'))* '"'
-  	|	'\'' (~('\''|'\n'|'\r'))* '\''
-  	;
+    : '"' (~('"'|'\n'|'\r'))* '"'
+    | '\'' (~('\''|'\n'|'\r'))* '\''
+    ;
 
 // string literals
 StringLiteral
-	:	STRING
-	;
+  : STRING
+  ;
 
 
 Number
-	:	'-' (('0'..'9')* '.')? ('0'..'9')+
-	|	(('0'..'9')* '.')? ('0'..'9')+
-	;
+  : '-' (('0'..'9')* '.')? ('0'..'9')+
+  | (('0'..'9')* '.')? ('0'..'9')+
+  ;
 
 Color
-	:	'#' ('0'..'9'|'a'..'f'|'A'..'F')+
-	;
+  : '#' ('0'..'9'|'a'..'f'|'A'..'F')+
+  ;
 
 
 // Whitespace -- ignored
@@ -143,19 +165,19 @@ WS
 
 // Single-line comments
 SL_COMMENT
-	:	'//'
-		(~('\n'|'\r'))* ('\n'|'\r'('\n')?) -> skip
-	;
+  : '//'
+    (~('\n'|'\r'))* ('\n'|'\r'('\n')?) -> skip
+  ;
 
 
 // multiple-line comments
 COMMENT
-	:	'/*' .*? '*/' -> skip
-	;
+  : '/*' .*? '*/' -> skip
+  ;
 
 mode URL_STARTED;
 UrlEnd                 : RPAREN -> popMode;
-Url                    :	STRING | (~(')' | '\n' | '\r' | ';'))+;
+Url                    :  STRING | (~(')' | '\n' | '\r' | ';'))+;
 
 mode IDENTIFY;
 BlockStart_ID          : BlockStart -> popMode, type(BlockStart);
@@ -165,19 +187,19 @@ DOLLAR_ID              : DOLLAR -> type(DOLLAR);
 
 InterpolationStartAfter  : InterpolationStart;
 InterpolationEnd_ID    : BlockEnd -> type(BlockEnd);
-
 IdentifierAfter        : Identifier;
-Ellipsis_ID            : Ellipsis -> popMode, type(Ellipsis);
-DOT_ID                 : DOT -> popMode, type(DOT);
 
+// All tokens that can signal the end of identifiers
+Ellipsis_ID               : Ellipsis -> popMode, type(Ellipsis);
+DOT_ID                    : DOT -> popMode, type(DOT);
+LBRACK_ID                 : LBRACK -> popMode, type(LBRACK);
+RBRACK_ID                 : RBRACK -> popMode, type(RBRACK);
 LPAREN_ID                 : LPAREN -> popMode, type(LPAREN);
 RPAREN_ID                 : RPAREN -> popMode, type(RPAREN);
-
 COLON_ID                  : COLON -> popMode, type(COLON);
 COMMA_ID                  : COMMA -> popMode, type(COMMA);
-SEMI_ID                  : SEMI -> popMode, type(SEMI);
-
-
-
-
-
+SEMI_ID                   : SEMI -> popMode, type(SEMI);
+EQ_ID                     : EQ -> popMode, type(EQ);
+PIPE_EQ_ID                : PIPE_EQ -> popMode, type(PIPE_EQ);
+TILD_EQ_ID                : TILD_EQ -> popMode, type(TILD_EQ);
+PseudoIdentifier_ID       : PseudoIdentifier -> popMode, type(PseudoIdentifier);

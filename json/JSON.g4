@@ -17,7 +17,7 @@ pair
    : STRING ':' value
    ;
 
-array
+arr
    : '[' value (',' value)* ']'
    | '[' ']'
    ;
@@ -26,7 +26,7 @@ value
    : STRING
    | NUMBER
    | obj
-   | array
+   | arr
    | 'true'
    | 'false'
    | 'null'
