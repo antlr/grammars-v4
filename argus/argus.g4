@@ -40,7 +40,7 @@ module
    ;
 
 equates
-   : idn '=' 'equates' (parms where?)? equate equate* 'end' idn
+   : idn '=' 'equates' (parms where?)? equate* 'end' idn
    ;
 
 guardian
@@ -83,7 +83,7 @@ routine_body
    ;
 
 parms
-   : (parm (',' parm)*)?
+   : (parm (',' parm)*)
    ;
 
 parm
@@ -359,16 +359,16 @@ entity
    : 'nil'
    | 'true'
    | 'false'
-   | int_literal
-   | real_literal
-   | char_literal
-   | string_literal
+   | INT_LITERAL
+   | REAL_LITERAL
+   | CHAR_LITERAL
+   | STRING_LITERAL
    | 'self'
    | reference
    | 'bind' entities ((bind_arg (',' bind_arg)*)?)
    | type_spec '$' (field (',' field)*)*
-   | type_spec '$' ((expression ':')? (expression (',' expression)*)?)?
-   | type_spec '$' name ((actual_parm (',' actual_parm)*)?)?
+   | type_spec '$' ((expression ':')? (expression (',' expression)*)?)
+   | type_spec '$' name ((actual_parm (',' actual_parm)*)?)
    | 'up' '(' expression ')'
    | 'down' '(' expression ')'
    ;
@@ -382,22 +382,6 @@ bind_arg
    | expression
    ;
 
-real_literal
-   : DIGIT+ '.' DIGIT+
-   ;
-
-char_literal
-   : 'a'
-   ;
-
-string_literal
-   : STRING
-   ;
-
-STRING
-   : '"' .*? '"'
-   ;
-
 name
    : IDENTIFIER
    ;
@@ -406,12 +390,24 @@ idn
    : IDENTIFIER
    ;
 
-IDENTIFIER
-   : [a-zA-Z] [a-zA-Z0-9]+
+INT_LITERAL
+   : DIGIT+
    ;
 
-int_literal
-   : DIGIT+
+REAL_LITERAL
+   : DIGIT+ '.' DIGIT+
+   ;
+
+CHAR_LITERAL
+   : '\'' .*? '\''
+   ;
+
+STRING_LITERAL
+   : '"' .*? '"'
+   ;
+
+IDENTIFIER
+   : [a-zA-Z] [a-zA-Z0-9]+
    ;
 
 DIGIT
