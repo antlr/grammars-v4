@@ -111,7 +111,7 @@ expr
    | expr arrowOp expr
    | expr '[' (',' expr)+ ']'
    | expr ('!' | 'not')? compareOp expr
-   | expr ('=>' | 'implies') expr 'else' expr
+   | expr ('=>' | 'implies')? expr 'else' expr
    | 'let' letDecl (',' letDecl)* blockOrBar
    | quant decl (',' decl)* blockOrBar
    | '{' decl (',' decl)* blockOrBar '}'
