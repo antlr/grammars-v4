@@ -1,0 +1,4 @@
+start: "[" sep{NUMBER, ","} "]"
+NUMBER: /\d+/
+%ignore " "
+%import .grammars.templates.sep

@@ -483,7 +483,7 @@ expression
     | expression '[' expression ']'
     | methodCall
     | NEW creator
-    | '(' annotation* typeType ')' expression
+    | '(' annotation* typeType ('&' typeType)* ')' expression
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
     | prefix=('~'|'!') expression
