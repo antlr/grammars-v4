@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2021, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -567,8 +567,8 @@ primary
    : unary_op primary
    | storage_reference
    | number
-   | bit_string
-   | string
+ //  | bit_string
+   | STRING
    | parenthesized_expression
    | set '}'
    | '{' '}'
@@ -592,10 +592,20 @@ unary_op
    ;
 
 identifier
-   : INDENTIFIER
+   : IDENTIFIER
    ;
 
-INDENTIFIER
+number:
+    ('+' | '-') NUMBER ('.' NUMBER)?;
+
+STRING:
+    '"' ~'"'* '"';
+
+NUMBER:
+    [0-9]+;
+
+
+IDENTIFIER
    : [a-zA-Z] [a-zA-Z0-9]*
    ;
 
