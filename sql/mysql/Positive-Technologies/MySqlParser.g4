@@ -2304,8 +2304,8 @@ specificFunction
       '(' expression
        ',' expression
          (RETURNING convertedDataType)?
-         ((NULL | ERROR | (DEFAULT defaultValue)) ON EMPTY)?
-         ((NULL | ERROR | (DEFAULT defaultValue)) ON ERROR)?
+         ((NULL_LITERAL | ERROR | (DEFAULT defaultValue)) ON EMPTY)?
+         ((NULL_LITERAL | ERROR | (DEFAULT defaultValue)) ON ERROR)?
        ')'                                                          #jsonValueFunctionCall
     ;
 
