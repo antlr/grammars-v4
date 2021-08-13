@@ -1970,7 +1970,7 @@ create_or_alter_ddl_trigger
     : ((CREATE (OR ALTER)?) | ALTER) TRIGGER simple_name
       ON (ALL SERVER | DATABASE)
       (WITH dml_trigger_option (',' dml_trigger_option)* )?
-      (FOR | AFTER) ddl_trigger_operation (',' dml_trigger_operation)*
+      (FOR | AFTER) ddl_trigger_operation (',' ddl_trigger_operation)*
       AS sql_clauses+
     ;
 
