@@ -2074,7 +2074,7 @@ alter_table
                              | ALTER COLUMN column_definition
                              | DROP COLUMN id_ (',' id_)*
                              | DROP CONSTRAINT constraint=id_
-                             | WITH CHECK ADD CONSTRAINT constraint=id_ FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
+                             | WITH (CHECK | NOCHECK) ADD CONSTRAINT constraint=id_ FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
                              | CHECK CONSTRAINT constraint=id_
                              | (ENABLE | DISABLE) TRIGGER id_?
                              | REBUILD table_options
