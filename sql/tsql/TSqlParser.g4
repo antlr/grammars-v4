@@ -1423,8 +1423,8 @@ create_sequence
         (AS data_type  )?
         (START WITH DECIMAL)?
         (INCREMENT BY MINUS? DECIMAL)?
-        (MINVALUE DECIMAL? | NO MINVALUE)?
-        (MAXVALUE DECIMAL? | NO MAXVALUE)?
+        (MINVALUE (MINUS? DECIMAL)? | NO MINVALUE)?
+        (MAXVALUE (MINUS? DECIMAL)? | NO MAXVALUE)?
         (CYCLE|NO CYCLE)?
         (CACHE DECIMAL? | NO CACHE)?
     ;
