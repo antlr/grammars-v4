@@ -120,6 +120,9 @@ REFERENCES dbo.TableState (ID)
 ON DELETE CASCADE
 GO
 
+ALTER TABLE [dbo].[TestTable] ADD  CONSTRAINT [constraintName]  DEFAULT (NEXT VALUE FOR [dbo].[sequence]) FOR [ID]
+GO
+
 -- Alter Table Switch Partition
 ALTER TABLE Source SWITCH PARTITION 1 TO Target PARTITION 1
 GO
