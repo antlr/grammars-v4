@@ -90,6 +90,7 @@ ELSEIF:                              'ELSEIF';
 EMPTY:                               'EMPTY';
 ENCLOSED:                            'ENCLOSED';
 ESCAPED:                             'ESCAPED';
+EXCEPT:                              'EXCEPT';
 EXISTS:                              'EXISTS';
 EXIT:                                'EXIT';
 EXPLAIN:                             'EXPLAIN';
