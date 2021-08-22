@@ -869,6 +869,7 @@ WAIT_AT_LOW_PRIORITY:                  'WAIT_AT_LOW_PRIORITY';
 WINDOWS:                               'WINDOWS';
 WITHOUT:                               'WITHOUT';
 WITNESS:                               'WITNESS';
+XACT_ABORT:                            'XACT_ABORT';
 
 //Build-ins:
 VARCHAR:                               'VARCHAR';
