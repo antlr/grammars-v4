@@ -3078,6 +3078,21 @@ fetch_cursor
     : FETCH ((NEXT | PRIOR | FIRST | LAST | (ABSOLUTE | RELATIVE) expression)? FROM)?
       GLOBAL? cursor_name (INTO LOCAL_ID (',' LOCAL_ID)*)? ';'?
     ;
+
+// https://msdn.microsoft.com/en-us/library/ms190356.aspx
+// Runtime check.
+set_special
+    : SET id_ (id_ | constant_LOCAL_ID | on_off) ';'?
+    | SET STATISTICS (IO | TIME | XML | PROFILE) on_off ';'?
+    | SET ROWCOUNT (LOCAL_ID | DECIMAL) ';'?
+    // https://msdn.microsoft.com/en-us/library/ms173763.aspx
+    | SET TRANSACTION ISOLATION LEVEL
+      (READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SNAPSHOT | SERIALIZABLE | DECIMAL) ';'?
+    // https://msdn.microsoft.com/en-us/library/ms188059.aspx
+    | SET IDENTITY_INSERT table_name on_off ';'?
+    | SET special_list (',' special_list)* on_off
+    | SET modify_method
+    ;
     
 special_list
     : ANSI_NULLS 
@@ -3103,21 +3118,6 @@ special_list
     | SHOWPLAN_TEXT 
     | SHOWPLAN_XML 
     | XACT_ABORT
-    ;
-
-// https://msdn.microsoft.com/en-us/library/ms190356.aspx
-// Runtime check.
-set_special
-    : SET id_ (id_ | constant_LOCAL_ID | on_off) ';'?
-    | SET STATISTICS (IO | TIME | XML | PROFILE) on_off ';'?
-    | SET ROWCOUNT (LOCAL_ID | DECIMAL) ';'?
-    // https://msdn.microsoft.com/en-us/library/ms173763.aspx
-    | SET TRANSACTION ISOLATION LEVEL
-      (READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SNAPSHOT | SERIALIZABLE | DECIMAL) ';'?
-    // https://msdn.microsoft.com/en-us/library/ms188059.aspx
-    | SET IDENTITY_INSERT table_name on_off ';'?
-    | SET special_list (',' special_list)* on_off
-    | SET modify_method
     ;
 
 constant_LOCAL_ID
