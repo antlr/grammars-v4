@@ -3078,6 +3078,32 @@ fetch_cursor
     : FETCH ((NEXT | PRIOR | FIRST | LAST | (ABSOLUTE | RELATIVE) expression)? FROM)?
       GLOBAL? cursor_name (INTO LOCAL_ID (',' LOCAL_ID)*)? ';'?
     ;
+    
+special_list
+    : ANSI_NULLS 
+    | QUOTED_IDENTIFIER 
+    | ANSI_PADDING 
+    | ANSI_WARNINGS 
+    | ANSI_DEFAULTS 
+    | ANSI_NULL_DFLT_OFF 
+    | ANSI_NULL_DFLT_ON 
+    | ARITHABORT 
+    | ARITHIGNORE 
+    | CONCAT_NULL_YIELDS_NULL 
+    | CURSOR_CLOSE_ON_COMMIT 
+    | FMTONLY 
+    | FORCEPLAN 
+    | IMPLICIT_TRANSACTIONS 
+    | NOCOUNT 
+    | NOEXEol 
+    | NUMERIC_ROUNDABORT 
+    | PARSEONLY 
+    | REMOTE_PROC_TRANSACTIONS 
+    | SHOWPLAN_ALL 
+    | SHOWPLAN_TEXT 
+    | SHOWPLAN_XML 
+    | XACT_ABORT
+    ;
 
 // https://msdn.microsoft.com/en-us/library/ms190356.aspx
 // Runtime check.
@@ -3090,7 +3116,7 @@ set_special
       (READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SNAPSHOT | SERIALIZABLE | DECIMAL) ';'?
     // https://msdn.microsoft.com/en-us/library/ms188059.aspx
     | SET IDENTITY_INSERT table_name on_off ';'?
-    | SET (ANSI_NULLS | QUOTED_IDENTIFIER | ANSI_PADDING | ANSI_WARNINGS | ANSI_DEFAULTS | ANSI_NULL_DFLT_OFF | ANSI_NULL_DFLT_ON | ARITHABORT | ARITHIGNORE | CONCAT_NULL_YIELDS_NULL | CURSOR_CLOSE_ON_COMMIT | FMTONLY | FORCEPLAN | IMPLICIT_TRANSACTIONS | NOCOUNT | NOEXEC | NUMERIC_ROUNDABORT | PARSEONLY | REMOTE_PROC_TRANSACTIONS | SHOWPLAN_ALL | SHOWPLAN_TEXT | SHOWPLAN_XML | XACT_ABORT) on_off
+    | SET special_list (',' special_list)* on_off
     | SET modify_method
     ;
 
