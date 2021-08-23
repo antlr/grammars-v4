@@ -346,9 +346,10 @@ another_statement
     | setuser_statement
     | reconfigure_statement
     | shutdown_statement
+    | checkpoint_statement
     ;
+    
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
-
 alter_application_role
     : ALTER APPLICATION ROLE appliction_role=id_ WITH  (COMMA? NAME EQUAL new_application_role_name=id_)? (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id_)?
     ;
@@ -2949,6 +2950,10 @@ reconfigure_statement
 shutdown_statement
     : SHUTDOWN (WITH NOWAIT)?
     ;
+    
+checkpoint_statement
+    : CHECKPOINT (checkPointDuration=DECIMAL)?
+    ;
 
 //These are dbcc commands with strange syntax that doesn't fit the regular dbcc syntax
 dbcc_special
@@ -2983,7 +2988,6 @@ table_type_indices
     :  (((PRIMARY KEY | INDEX id_) (CLUSTERED | NONCLUSTERED)?) | UNIQUE) '(' column_name_list_with_order ')'
     | CHECK '(' search_condition ')'
     ;
-
 
 xml_type_definition
     : XML '(' ( CONTENT | DOCUMENT )? xml_schema_collection ')'
