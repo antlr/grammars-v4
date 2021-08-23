@@ -283,6 +283,7 @@ CHECKSUM_AGG:                          'CHECKSUM_AGG';
 CLEANUP:                               'CLEANUP';
 COLLECTION:                            'COLLECTION';
 COLUMN_MASTER_KEY:                     'COLUMN_MASTER_KEY';
+COLUMNSTORE:                           'COLUMNSTORE';
 COMMITTED:                             'COMMITTED';
 COMPATIBILITY_LEVEL:                   'COMPATIBILITY_LEVEL';
 CONCAT:                                'CONCAT';
