@@ -2498,7 +2498,7 @@ opendatasource
 
 // https://msdn.microsoft.com/en-us/library/ms188927.aspx
 declare_statement
-    : DECLARE LOCAL_ID AS? table_type_definition ';'?
+    : DECLARE LOCAL_ID AS? (table_type_definition | table_name) ';'?
     | DECLARE loc+=declare_local (',' loc+=declare_local)* ';'?
     | DECLARE LOCAL_ID AS? xml_type_definition ';'?
     | WITH XMLNAMESPACES '(' xml_dec+=xml_declaration (',' xml_dec+=xml_declaration)* ')' ';'?
