@@ -128,6 +128,8 @@ ddl_clause
     | create_fulltext_catalog
     | create_fulltext_stoplist
     | create_index
+    | create_columnstore_index
+    | create_nonclustered_columnstore_index
     | create_login_azure_sql
     | create_login_pdw
     | create_login_sql_server
@@ -1921,6 +1923,23 @@ create_index
     (ON id_)?
     ';'?
     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
+create_columnstore_index
+    : CREATE (CLUSTERED | NONCLUSTERED?) COLUMNSTORE INDEX id_ ON table_name  
+    index_options?  
+    (ON id_)? 
+    ';'?
+    ;
+  
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
+create_nonclustered_columnstore_index
+    : CREATE NONCLUSTERED? COLUMNSTORE INDEX id_ ON table_name '(' column_name_list_with_order ')'
+    (WHERE search_condition)?
+    index_options?
+    (ON id_)?
+    ';'?
+    ;   
 
 create_xml_index
     : CREATE PRIMARY? XML INDEX id_ ON table_name '(' id_ ')'
@@ -4109,6 +4128,7 @@ keyword
     | FILEGROWTH
     | FILEPATH
     | FILESTREAM
+    | FILLFACTOR
     | FILTER
     | FIRST
     | FIRST_VALUE
