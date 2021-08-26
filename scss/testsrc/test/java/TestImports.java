@@ -36,25 +36,26 @@ import org.junit.runners.JUnit4;
 public class TestImports extends TestBase {
   @Test
   public void testImport() {
-    ScssParser.ReferenceUrlContext context = parseImport("@import \"hello\";");
+    ScssParser.ReferenceUrlContext context = parseImport("@import \"hello\";").referenceUrl();
     assertThat(context.StringLiteral().getText()).isEqualTo("\"hello\"");
   }
 
   @Test
   public void testImportUrlString() {
-    ScssParser.ReferenceUrlContext context = parseImport("@import url(\"hello\");");
+    ScssParser.ReferenceUrlContext context = parseImport("@import url(\"hello\");").referenceUrl();
     assertThat(context.Url().getText()).isEqualTo("\"hello\"");
   }
 
   @Test
   public void testImportUrlNonStrings() {
-    ScssParser.ReferenceUrlContext context = parseImport("@import url(hello);");
+    ScssParser.ReferenceUrlContext context = parseImport("@import url(hello);").referenceUrl();
     assertThat(context.Url().getText()).isEqualTo("hello");
   }
 
   @Test
   public void testImportUrlNonStringsSpace() {
-    ScssParser.ReferenceUrlContext context = parseImport("@import url(hello world);");
+    ScssParser.ReferenceUrlContext context =
+        parseImport("@import url(hello world);").referenceUrl();
     assertThat(context.Url().getText()).isEqualTo("hello world");
   }
 
@@ -71,8 +72,42 @@ public class TestImports extends TestBase {
         .isEqualTo("\"hi\"");
   }
 
-  private ScssParser.ReferenceUrlContext parseImport(String... lines) {
+  @Test
+  public void testUse() {
+    ScssParser.ImportDeclarationContext context = parseImport("@use \"sass:color\";");
+
+    assertThat(context.referenceUrl().StringLiteral().getText()).isEqualTo("\"sass:color\"");
+  }
+
+  @Test
+  public void testUseAs() {
+    ScssParser.ImportDeclarationContext context =
+        parseImport("@use 'third_party/javascript/angular2/material' as mat;");
+
+    assertThat(context.referenceUrl().StringLiteral().getText())
+        .isEqualTo("'third_party/javascript/angular2/material'");
+    assertThat(context.asClause().identifier().getText()).isEqualTo("mat");
+  }
+
+  @Test
+  public void testUseWith() {
+    String[] lines = {
+      "@use \"library\" with (",
+      "  $base-color: $base-color,",
+      "  $secondary-color: color.scale($base-color, $lightness: -10%),",
+      ");"
+    };
+    ScssParser.ImportDeclarationContext context = parseImport(lines);
+
+    assertThat(context.referenceUrl().StringLiteral().getText()).isEqualTo("\"library\"");
+    assertThat(context.withClause().keywordArgument(0).getText())
+        .isEqualTo("$base-color:$base-color");
+    assertThat(context.withClause().keywordArgument(1).getText())
+        .isEqualTo("$secondary-color:color.scale($base-color,$lightness:-10%)");
+  }
+
+  private ScssParser.ImportDeclarationContext parseImport(String... lines) {
     ScssParser.StylesheetContext context = parse(lines);
-    return context.statement(0).importDeclaration().referenceUrl();
+    return context.statement(0).importDeclaration();
   }
 }

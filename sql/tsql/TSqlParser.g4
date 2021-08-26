@@ -128,6 +128,8 @@ ddl_clause
     | create_fulltext_catalog
     | create_fulltext_stoplist
     | create_index
+    | create_columnstore_index
+    | create_nonclustered_columnstore_index
     | create_login_azure_sql
     | create_login_pdw
     | create_login_sql_server
@@ -346,9 +348,10 @@ another_statement
     | setuser_statement
     | reconfigure_statement
     | shutdown_statement
+    | checkpoint_statement
     ;
+    
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
-
 alter_application_role
     : ALTER APPLICATION ROLE appliction_role=id_ WITH  (COMMA? NAME EQUAL new_application_role_name=id_)? (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id_)?
     ;
@@ -1423,8 +1426,8 @@ create_sequence
         (AS data_type  )?
         (START WITH DECIMAL)?
         (INCREMENT BY MINUS? DECIMAL)?
-        (MINVALUE DECIMAL? | NO MINVALUE)?
-        (MAXVALUE DECIMAL? | NO MAXVALUE)?
+        (MINVALUE (MINUS? DECIMAL)? | NO MINVALUE)?
+        (MAXVALUE (MINUS? DECIMAL)? | NO MAXVALUE)?
         (CYCLE|NO CYCLE)?
         (CACHE DECIMAL? | NO CACHE)?
     ;
@@ -1921,6 +1924,23 @@ create_index
     ';'?
     ;
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
+create_columnstore_index
+    : CREATE (CLUSTERED | NONCLUSTERED?) COLUMNSTORE INDEX id_ ON table_name  
+    index_options?  
+    (ON id_)? 
+    ';'?
+    ;
+  
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
+create_nonclustered_columnstore_index
+    : CREATE NONCLUSTERED? COLUMNSTORE INDEX id_ ON table_name '(' column_name_list_with_order ')'
+    (WHERE search_condition)?
+    index_options?
+    (ON id_)?
+    ';'?
+    ;   
+
 create_xml_index
     : CREATE PRIMARY? XML INDEX id_ ON table_name '(' id_ ')'
     (USING XML INDEX id_ (FOR (VALUE | PATH | PROPERTY)?)?)?
@@ -1970,7 +1990,7 @@ create_or_alter_ddl_trigger
     : ((CREATE (OR ALTER)?) | ALTER) TRIGGER simple_name
       ON (ALL SERVER | DATABASE)
       (WITH dml_trigger_option (',' dml_trigger_option)* )?
-      (FOR | AFTER) ddl_trigger_operation (',' dml_trigger_operation)*
+      (FOR | AFTER) ddl_trigger_operation (',' ddl_trigger_operation)*
       AS sql_clauses+
     ;
 
@@ -2074,7 +2094,9 @@ alter_table
                              | ALTER COLUMN column_definition
                              | DROP COLUMN id_ (',' id_)*
                              | DROP CONSTRAINT constraint=id_
-                             | WITH CHECK ADD CONSTRAINT constraint=id_ FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
+                             | WITH (CHECK | NOCHECK) ADD CONSTRAINT constraint=id_
+                                ( FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update? 
+                                | CHECK '(' search_condition ')' )
                              | CHECK CONSTRAINT constraint=id_
                              | (ENABLE | DISABLE) TRIGGER id_?
                              | REBUILD table_options
@@ -2478,7 +2500,7 @@ opendatasource
 
 // https://msdn.microsoft.com/en-us/library/ms188927.aspx
 declare_statement
-    : DECLARE LOCAL_ID AS? table_type_definition ';'?
+    : DECLARE LOCAL_ID AS? (table_type_definition | table_name) ';'?
     | DECLARE loc+=declare_local (',' loc+=declare_local)* ';'?
     | DECLARE LOCAL_ID AS? xml_type_definition ';'?
     | WITH XMLNAMESPACES '(' xml_dec+=xml_declaration (',' xml_dec+=xml_declaration)* ')' ';'?
@@ -2949,6 +2971,10 @@ reconfigure_statement
 shutdown_statement
     : SHUTDOWN (WITH NOWAIT)?
     ;
+    
+checkpoint_statement
+    : CHECKPOINT (checkPointDuration=DECIMAL)?
+    ;
 
 //These are dbcc commands with strange syntax that doesn't fit the regular dbcc syntax
 dbcc_special
@@ -2983,7 +3009,6 @@ table_type_indices
     :  (((PRIMARY KEY | INDEX id_) (CLUSTERED | NONCLUSTERED)?) | UNIQUE) '(' column_name_list_with_order ')'
     | CHECK '(' search_condition ')'
     ;
-
 
 xml_type_definition
     : XML '(' ( CONTENT | DOCUMENT )? xml_schema_collection ')'
@@ -3030,7 +3055,7 @@ table_constraint
     : (CONSTRAINT constraint=id_)?
        ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list_with_order ')' index_options? (ON id_)?
          | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
-         | DEFAULT '('?  (STRING | PLUS | function_call | DECIMAL)+ ')'? FOR id_
+         | DEFAULT '('?  ((STRING | PLUS | function_call | DECIMAL)+ | NEXT VALUE FOR table_name) ')'? FOR id_
          | FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name ('(' pk = column_name_list')')? on_delete? on_update?)
     ;
 
@@ -3090,8 +3115,34 @@ set_special
       (READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SNAPSHOT | SERIALIZABLE | DECIMAL) ';'?
     // https://msdn.microsoft.com/en-us/library/ms188059.aspx
     | SET IDENTITY_INSERT table_name on_off ';'?
-    | SET (ANSI_NULLS | QUOTED_IDENTIFIER | ANSI_PADDING | ANSI_WARNINGS | ANSI_DEFAULTS | ANSI_NULL_DFLT_OFF | ANSI_NULL_DFLT_ON | ARITHABORT | ARITHIGNORE | CONCAT_NULL_YIELDS_NULL | CURSOR_CLOSE_ON_COMMIT | FMTONLY | FORCEPLAN | IMPLICIT_TRANSACTIONS | NOCOUNT | NOEXEC | NUMERIC_ROUNDABORT | PARSEONLY | REMOTE_PROC_TRANSACTIONS | SHOWPLAN_ALL | SHOWPLAN_TEXT | SHOWPLAN_XML | XACT_ABORT) on_off
+    | SET special_list (',' special_list)* on_off
     | SET modify_method
+    ;
+    
+special_list
+    : ANSI_NULLS 
+    | QUOTED_IDENTIFIER 
+    | ANSI_PADDING 
+    | ANSI_WARNINGS 
+    | ANSI_DEFAULTS 
+    | ANSI_NULL_DFLT_OFF 
+    | ANSI_NULL_DFLT_ON 
+    | ARITHABORT 
+    | ARITHIGNORE 
+    | CONCAT_NULL_YIELDS_NULL 
+    | CURSOR_CLOSE_ON_COMMIT 
+    | FMTONLY 
+    | FORCEPLAN 
+    | IMPLICIT_TRANSACTIONS 
+    | NOCOUNT 
+    | NOEXEol 
+    | NUMERIC_ROUNDABORT 
+    | PARSEONLY 
+    | REMOTE_PROC_TRANSACTIONS 
+    | SHOWPLAN_ALL 
+    | SHOWPLAN_TEXT 
+    | SHOWPLAN_XML 
+    | XACT_ABORT
     ;
 
 constant_LOCAL_ID
@@ -4079,6 +4130,7 @@ keyword
     | FILEGROWTH
     | FILEPATH
     | FILESTREAM
+    | FILLFACTOR
     | FILTER
     | FIRST
     | FIRST_VALUE

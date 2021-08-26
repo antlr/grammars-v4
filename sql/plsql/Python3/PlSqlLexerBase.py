@@ -1,6 +1,6 @@
 from antlr4 import *
 
-class PlSqlBaseLexer(Lexer):
+class PlSqlLexerBase(Lexer):
 
     def IsNewlineAtPos(self, pos):
         la = self._input.LA(pos)

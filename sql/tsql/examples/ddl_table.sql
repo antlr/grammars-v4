@@ -115,6 +115,17 @@ ALTER TABLE dbo.TestTable
   FOR Name
 GO
 
+ALTER TABLE dbo.TestTable  WITH NOCHECK ADD  CONSTRAINT [FK_NAME] FOREIGN KEY([StateId])
+REFERENCES dbo.TableState (ID)
+ON DELETE CASCADE
+GO
+
+ALTER TABLE [dbo].[TestTable] ADD  CONSTRAINT [constraintName]  DEFAULT (NEXT VALUE FOR [dbo].[sequence]) FOR [ID]
+GO
+
+ALTER TABLE [dbo].[TestTable]  WITH CHECK ADD  CONSTRAINT [constraintName] CHECK  ([StartDate] < [EndDate])
+GO
+
 -- Alter Table Switch Partition
 ALTER TABLE Source SWITCH PARTITION 1 TO Target PARTITION 1
 GO

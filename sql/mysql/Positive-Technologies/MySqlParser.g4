@@ -350,6 +350,8 @@ columnDefinition
 columnConstraint
     : nullNotnull                                                   #nullColumnConstraint
     | DEFAULT defaultValue                                          #defaultColumnConstraint
+    | VISIBLE                                                       #visibilityColumnConstraint
+    | INVISIBLE                                                     #visibilityColumnConstraint
     | (AUTO_INCREMENT | ON UPDATE currentTimestamp)                 #autoIncrementColumnConstraint
     | PRIMARY? KEY                                                  #primaryKeyColumnConstraint
     | UNIQUE KEY?                                                   #uniqueKeyColumnConstraint
@@ -512,7 +514,7 @@ subpartitionDefinition
     ;
 
 partitionOption
-    : STORAGE? ENGINE '='? engineName                               #partitionOptionEngine
+    : DEFAULT? STORAGE? ENGINE '='? engineName                      #partitionOptionEngine
     | COMMENT '='? comment=STRING_LITERAL                           #partitionOptionComment
     | DATA DIRECTORY '='? dataDirectory=STRING_LITERAL              #partitionOptionDataDirectory
     | INDEX DIRECTORY '='? indexDirectory=STRING_LITERAL            #partitionOptionIndexDirectory
@@ -1506,9 +1508,17 @@ grantStatement
           (tlsNone=NONE | tlsOption (AND? tlsOption)* )
         )?
       (WITH (GRANT OPTION | userResourceOption)* )?
+      (AS userName WITH ROLE roleOption)?
     | GRANT uid (',' uid)*
       TO (userName | uid) (',' (userName | uid))*
       (WITH ADMIN OPTION)?
+    ;
+
+roleOption
+    : DEFAULT
+    | NONE
+    | ALL (EXCEPT userName (',' userName)*)?
+    | userName (',' userName)*
     ;
 
 grantProxy
@@ -2302,8 +2312,8 @@ specificFunction
       '(' expression
        ',' expression
          (RETURNING convertedDataType)?
-         ((NULL | ERROR | (DEFAULT defaultValue)) ON EMPTY)?
-         ((NULL | ERROR | (DEFAULT defaultValue)) ON ERROR)?
+         ((NULL_LITERAL | ERROR | (DEFAULT defaultValue)) ON EMPTY)?
+         ((NULL_LITERAL | ERROR | (DEFAULT defaultValue)) ON ERROR)?
        ')'                                                          #jsonValueFunctionCall
     ;
 
@@ -2481,7 +2491,7 @@ keywordsCanBeId
     | DEFAULT_AUTH | DEFINER | DELAY_KEY_WRITE | DES_KEY_FILE | DIAGNOSTICS | DIRECTORY
     | DISABLE | DISCARD | DISK | DO | DUMPFILE | DUPLICATE
     | DYNAMIC | ENABLE | ENCRYPTION | ENCRYPTION_KEY_ADMIN | END | ENDS | ENGINE | ENGINES
-    | ERROR | ERRORS | ESCAPE | EVEN | EVENT | EVENTS | EVERY
+    | ERROR | ERRORS | ESCAPE | EVEN | EVENT | EVENTS | EVERY | EXCEPT
     | EXCHANGE | EXCLUSIVE | EXPIRE | EXPORT | EXTENDED | EXTENT_SIZE | FAST | FAULTS
     | FIELDS | FILE_BLOCK_SIZE | FILTER | FIREWALL_ADMIN | FIREWALL_USER | FIRST | FIXED | FLUSH
     | FOLLOWS | FOUND | FULL | FUNCTION | GENERAL | GLOBAL | GRANTS | GROUP | GROUP_CONCAT

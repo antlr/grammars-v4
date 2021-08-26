@@ -566,3 +566,6 @@ GO;
 -- Moving queue internal table to another filegroup
 ALTER QUEUE ExpenseQueue MOVE TO [NewFilegroup]
 GO;
+
+DECLARE @var AS dbo.tableType
+GO
