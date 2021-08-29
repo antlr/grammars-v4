@@ -30,11 +30,11 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
     }
 
     getCurrentToken() {
-        return nextToken.call(this);
+        return this.nextToken();
     }
 
     nextToken() {
-        var next = super.nextToken.call(this);
+        var next = super.nextToken();
 
         if (next.channel === antlr4.Token.DEFAULT_CHANNEL) {
             this.lastToken = next;
