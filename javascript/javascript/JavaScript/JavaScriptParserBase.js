@@ -1,5 +1,4 @@
 import antlr4 from 'antlr4';
-import JavaScriptLexer from './JavaScriptLexer.js';
 import JavaScriptParser from './JavaScriptParser.js';
 
 export default class JavaScriptLexerBase extends antlr4.Parser {
