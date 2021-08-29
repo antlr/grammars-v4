@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar janus;
 
 program
-   : (IDENT ('[' NUM ']')?)* ('PROCEDURE' IDENT statements)*
+   : (IDENT (LBRACE_K NUM LBRACE_K)?)* (PROCEDURE IDENT statements)*
    ;
 
 statements
@@ -49,24 +49,24 @@ statement
    ;
 
 ifstmt
-   : 'IF' expression ('THEN' statements)? ('ELSE' statements)? 'FI' expression
+   : IF expression (THEN statements)? (ELSE statements)? FI expression
    ;
 
 dostmt
-   : 'FROM' expression ('DO' statements)? ('LOOP' statements)? 'UNTIL' expression
+   : FROM expression (DO statements)? (LOOP statements)? UNTIL expression
    ;
 
 callstmt
-   : 'CALL' IDENT
-   | 'UNCALL' IDENT
+   : CALL IDENT
+   | UNCALL IDENT
    ;
 
 readstmt
-   : 'READ' IDENT
+   : READ IDENT
    ;
 
 writestmt
-   : 'WRITE' IDENT
+   : WRITE IDENT
    ;
 
 lvalstmt
@@ -75,61 +75,188 @@ lvalstmt
    ;
 
 modstmt
-   : '+=' expression
-   | '-=' expression
-   | '!=' expression
-   | '<=>' expression
+   : PLUS_EQUAL expression
+   | MINUS_EQUAL expression
+   | NOT_EQUAL expression
+   | LEG expression
    ;
 
 swapstmt
-   : ':' lvalue
+   : COLON lvalue
    ;
 
 expression
    : minexp
-   | minexp BINOP expression
+   | minexp binop expression
    ;
 
 minexp
-   : '(' expression ')'
-   | '-' expression
-   | '~' expression
+   : LBRACE expression LBRACE
+   | MINUS expression
+   | TILDE expression
    | lvalue
    | constant
    ;
 
 lvalue
    : IDENT
-   | IDENT '[' expression ']'
+   | IDENT LBRACE_K expression RBRACE_K
    ;
 
 constant
    : NUM
    ;
 
-BINOP
-   : '+'
-   | '-'
-   | '!'
-   | '<'
-   | '>'
+DO 
+   : 'DO'
+   ;
+
+IF
+   : 'IF'
+   ;
+
+UNTIL
+   : 'UNTIL'
+   ;
+
+LOOP
+   : 'LOOP'
+   ;
+
+THEN 
+   : 'THEN'
+   ;
+
+ELSE
+   : 'ELSE'
+   ;
+
+FI
+   : 'FI'
+   ;
+
+READ
+   : 'READ'
+   ;
+
+WRITE
+   : 'WRITE'
+   ;
+
+CALL
+   : 'CALL'
+   ;
+
+UNCALL
+   : 'UNCALL'
+   ;
+
+FROM
+   : 'FROM'
+   ;
+
+PROCEDURE
+   : 'PROCEDURE'
+   ;
+
+binop
+   : PLUS
+   | MINUS
+   | NOT
+   | LOW
+   | GREATE
    | '&'
    | '|'
-   | '='
+   | EQUAL
    | '#'
-   | '<='
-   | '>='
+   | LE
+   | GE
    | '*'
    | '/'
    | '\\'
    ;
 
-IDENT
-   : [a-zA-Z] [a-zA-Z0-9]*
+LBRACE
+   : '('
    ;
+
+RBRACE
+   : ')'
+   ;
+
+LBRACE_K
+   : '['
+   ;
+
+RBRACE_K
+   : ']'
+   ;
+
+COLON
+   : ':'
+   ;
+
+MINUS
+   : '-'
+   ;
+
+PLUS
+   : '+'
+   ;
+
+NOT
+   : '!'
+   ;
+
+EQUAL
+   : '='
+   ;
+
+PLUS_EQUAL
+   : '+='
+   ;
+
+MINUS_EQUAL
+   : '-='
+   ;
+
+GREATE
+   : '>'
+   ;
+
+LOW
+   : '<'
+   ;
+
+
+GE 
+   : '>='
+   ;
+
+LE 
+   : '<='
+   ;
+
+NOT_EQUAL
+   : '!='
+   ;
+
+LEG
+   : '<=>'
+   ;
+
+TILDE
+   : '~'
+   ;
+
+
 
 NUM
    : [0-9]
+   ;
+
+IDENT
+   : [a-zA-Z] [a-zA-Z0-9]*
    ;
 
 COMMENT
