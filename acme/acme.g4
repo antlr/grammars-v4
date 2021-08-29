@@ -239,8 +239,7 @@ acmePropertyValueDeclaration
    : INTEGER_LITERAL
    | FLOATING_POINT_LITERAL
    | STRING_LITERAL
-   | FALSE
-   | TRUE
+   | BOOLEAN
    | acmePropertySet
    | acmePropertyRecord
    | acmePropertySequence
@@ -444,7 +443,7 @@ actualParams
    ;
 
 literalConstant
-   : ((INTEGER_LITERAL) | (FLOATING_POINT_LITERAL) | (STRING_LITERAL) | (TRUE) | (FALSE) | (COMPONENT) | (GROUP) | (CONNECTOR) | (PORT) | (ROLE) | (SYSTEM) | (ELEMENT) | (PROPERTY) | (INT) | (FLOAT) | (DOUBLE) | (STRING) | (BOOLEAN) | (ENUM) | (SET) | (SEQUENCE) | (RECORD))
+   : ((INTEGER_LITERAL) | (FLOATING_POINT_LITERAL) | (STRING_LITERAL) | (COMPONENT) | (GROUP) | (CONNECTOR) | (PORT) | (ROLE) | (SYSTEM) | (ELEMENT) | (PROPERTY) | (INT) | (FLOAT) | (DOUBLE) | (STRING) | (BOOLEAN) | (ENUM) | (SET) | (SEQUENCE) | (RECORD))
    ;
 
 quantifiedExpression
@@ -736,10 +735,6 @@ OR
    : O R
    ;
 
-PATHSEPARATOR
-   : ('.' | ':' | '-' | '+' | '\\' | '\\\\' | '/' | '$' | '%')
-   ;
-
 PUBLIC
    : P U B L I C
    ;
@@ -836,6 +831,12 @@ SLASH
 STAR
    : '*'
    ;
+
+BOOLEAN
+   : TRUE
+   | FALSE
+   ;
+
 
 STRING
    : S T R I N G
@@ -985,10 +986,6 @@ fragment Z
    : ('z' | 'Z')
    ;
 
-BOOLEAN
-   : TRUE
-   | FALSE
-   ;
 
 FLOATING_POINT_LITERAL
    : ('-' | '+')? [0-9]+ '.' [0-9]+
