@@ -264,9 +264,16 @@ NAME
 
 
 NUMBER
-   : '$'? [0-9a-fA-F] + ('H' | 'h')?
+   : '$'? (DECIMAL | HEXADECIMAL)
    ;
 
+DECIMAL
+   : [0-9]+
+   ;
+
+HEXADECIMAL
+   : [0-9a-fA-F]+ ('H' | 'h')
+   ;
 
 COMMENT
    : ';' ~ [\r\n]* -> skip
