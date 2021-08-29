@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar istc;
 
 istc
-   : 'ISTC' ' ' registration SEP year SEP work SEP check EOF
+   : 'ISTC' SPACE registration sep year sep work sep check EOF
    ;
 
 registration
@@ -52,9 +52,18 @@ check
    : CHAR
    ;
 
-SEP
-   : '-' | ' '
+sep
+   : DASH | SPACE
    ;
+
+SPACE
+   : ' '
+   ;
+
+DASH
+   : '-'
+   ;
+
 
 CHAR
    : ('A' .. 'F' | '0' .. '9')
