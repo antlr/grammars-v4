@@ -9,6 +9,7 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
         this.lastToken = null;
         this.useStrictDefault = false;
         this.useStrictCurrent = false;
+        this.templateDepth = 0;
     }
 
     getStrictDefault() {
@@ -22,6 +23,10 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
 
     IsStrictMode() {
         return this.useStrictCurrent;
+    }
+
+    IsInTemplateString() {
+        return this.templateDepth > 0;
     }
 
     getCurrentToken() {
@@ -67,6 +72,14 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
                 this.scopeStrictModes.push(this.useStrictCurrent);
             }
         }
+    }
+
+    IncreaseTemplateDepth() {
+        this.templateDepth++;
+    }
+
+    DecreaseTemplateDepth() {
+        this.templateDepth--;
     }
 
     IsRegexPossible() {
