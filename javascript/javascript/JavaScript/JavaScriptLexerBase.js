@@ -44,7 +44,7 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
 
     ProcessOpenBrace() {
         this.useStrictCurrent =
-            this.scopeStrictModes.length > 0 && this.scopeStrictModes[0]
+            this.scopeStrictModes.length > 0 && this.scopeStrictModes[this.scopeStrictModes.length - 1]
                 ? true
                 : this.useStrictDefault;
         this.scopeStrictModes.push(this.useStrictCurrent);
@@ -58,13 +58,9 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
     }
 
     ProcessStringLiteral() {
-        if (
-            this.lastToken !== undefined &&
-            (this.lastToken === null ||
-                this.lastToken.type === JavaScriptLexer.OpenBrace)
-        ) {
-            const text = this._input.strdata.slice(0, "use strict".length);
-            if (text === '"use strict"' || text === "'use strict'") {
+        if (this.lastToken === null ||
+                this.lastToken.type === JavaScriptLexer.OpenBrace) {
+            if (super.text === '"use strict"' || super.text === "'use strict'") {
                 if (this.scopeStrictModes.length > 0) {
                     this.scopeStrictModes.pop();
                 }
