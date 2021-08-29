@@ -19,7 +19,7 @@ export default class JavaScriptLexerBase extends antlr4.Parser {
     // Short form for next(String str)
     n(str)
     {
-        return next(str);
+        return this.next(str);
     }
 
     // Whether the next token value equals to @param str
