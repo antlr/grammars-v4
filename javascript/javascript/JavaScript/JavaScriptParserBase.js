@@ -1,7 +1,7 @@
 import antlr4 from 'antlr4';
 import JavaScriptParser from './JavaScriptParser.js';
 
-export default class JavaScriptLexerBase extends antlr4.Parser {
+export default class JavaScriptParserBase extends antlr4.Parser {
 
     constructor(input) {
         super(input);
