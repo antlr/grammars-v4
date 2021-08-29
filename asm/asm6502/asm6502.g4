@@ -158,7 +158,7 @@ opcode
 
 
 ASSEMBLER_INSTRUCTION
-   : 'ORG' | 'EQU' | 'ASC' | 'DS' | 'DFC' | '='
+   : ORG | EQU | ASC | DS | DFC | '='
    ;
 
 
@@ -190,7 +190,6 @@ fragment E
 fragment F
    : ('f' | 'F')
    ;
-
 
 fragment G
    : ('g' | 'G')
@@ -599,14 +598,37 @@ TYA
    : T Y A
    ;
 
+ORG
+   : O R G
+   ;
 
-NAME
-   : [a-zA-Z] [a-zA-Z0-9."]*
+EQU
+   : E Q U
+   ;
+
+ASC
+   : A S C
+   ;
+
+DS
+   : D S
+   ;
+
+DFC
+   : D F C
    ;
 
 
 NUMBER
    : '$'? [0-9a-fA-F] +
+   ;
+
+NAME
+   : [a-zA-Z] [a-zA-Z0-9."]*
+   ;
+
+EOL
+   : [\r\n] +
    ;
 
 
@@ -618,12 +640,6 @@ COMMENT
 STRING
    : '"' ~ ["]* '"'
    ;
-
-
-EOL
-   : [\r\n] +
-   ;
-
 
 WS
    : [ \t] -> skip
