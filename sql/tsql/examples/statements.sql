@@ -569,3 +569,7 @@ GO;
 
 DECLARE @var AS dbo.tableType
 GO
+
+--Execute statement
+EXECUTE ( 'Operation', @var OUTPUT) AT linkedServerName
+GO
