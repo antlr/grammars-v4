@@ -2680,9 +2680,10 @@ execute_body_batch
     : func_proc_name_server_database_schema (execute_statement_arg (',' execute_statement_arg)*)? ';'?
     ;
 
+//https://docs.microsoft.com/it-it/sql/t-sql/language-elements/execute-transact-sql?view=sql-server-ver15
 execute_body
     : (return_status=LOCAL_ID '=')? (func_proc_name_server_database_schema | execute_var_string)  execute_statement_arg?
-    | '(' execute_var_string ('+' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)?
+    | '(' execute_var_string (',' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? (AT_KEYWORD linkedServer=id_)?
     ;
 
 execute_statement_arg
@@ -2705,7 +2706,7 @@ execute_parameter
     ;
 
 execute_var_string
-    : LOCAL_ID
+    : LOCAL_ID (OUTPUT | OUT)?
     | STRING
     ;
 
@@ -3829,9 +3830,10 @@ entity_name_for_parallel_dw
     ;
 
 full_table_name
-    : (server=id_ '.' database=id_ '.'  schema=id_   '.'
-    |                database=id_ '.' (schema=id_)? '.'
-    |                                 schema=id_   '.')? table=id_
+    : (linkedServer=id_ '.' '.' schema=id_   '.'    
+    |                       server=id_    '.' database=id_ '.'  schema=id_   '.'
+    |                                         database=id_ '.' (schema=id_)? '.'
+    |                                                           schema=id_    '.')? table=id_
     ;
 
 table_name
