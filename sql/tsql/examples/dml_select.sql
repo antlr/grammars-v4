@@ -637,6 +637,10 @@ SET ANSI_WARNINGS OFF;
 SELECT id FROM tbl;
 GO
 
+--Select with linked server
+SELECT * FROM [linkedServerName]..[schema].[table] tbl
+GO
+
 -- Select with full table name
 SELECT * FROM ServerName.DBName.do.TestTable TestTable
 
