@@ -638,13 +638,13 @@ SELECT id FROM tbl;
 GO
 
 -- Select on sequence
-SELECT @var = NEXT VALUE FOR schema.sequence
+SELECT @var = NEXT VALUE FOR [dbo].[sequenceName]
 GO
 
-SELECT NEXT VALUE FOR schema.sequence as nextValueSequence	
+SELECT NEXT VALUE FOR [dbo].[sequenceName] as nextValueSequence	
 GO
 
-SELECT NEXT VALUE FOR schema.sequence
+SELECT NEXT VALUE FOR [dbo].[sequenceName]
 GO
 
 --Select with linked server
