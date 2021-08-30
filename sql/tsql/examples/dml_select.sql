@@ -637,6 +637,16 @@ SET ANSI_WARNINGS OFF;
 SELECT id FROM tbl;
 GO
 
+-- Select on sequence
+SELECT @var = NEXT VALUE FOR schema.sequence
+GO
+
+SELECT NEXT VALUE FOR schema.sequence as nextValueSequence	
+GO
+
+SELECT NEXT VALUE FOR schema.sequence
+GO
+
 --Select with linked server
 SELECT * FROM [linkedServerName]..[schema].[table] tbl
 GO
