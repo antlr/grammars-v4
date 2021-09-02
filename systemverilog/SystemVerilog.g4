@@ -526,7 +526,7 @@ solve_before_list
 	;
 
 constraint_primary
-	: ((implicit_class_handle '.') | class_scope)? hierarchical_identifier select
+	: ((implicit_class_handle '.') | class_scope)? hierarchical_identifier select_
 	;
 
 constraint_expression
@@ -2078,7 +2078,7 @@ final_construct
 blocking_assignment
 	: variable_lvalue '=' delay_or_event_control expression
 	| nonrange_variable_lvalue '=' dynamic_array_new
-	| ((implicit_class_handle '.') | class_scope | package_scope)? hierarchical_variable_identifier select '=' class_new
+	| ((implicit_class_handle '.') | class_scope | package_scope)? hierarchical_variable_identifier select_ '=' class_new
 	| operator_assignment
 	;
 
@@ -2545,7 +2545,7 @@ clockvar
 	;
 
 clockvar_expression
-	: clockvar select
+	: clockvar select_
 	;
 
 // A.6.12 Randsequence
@@ -3246,7 +3246,7 @@ constant_primary
 */
 primary
 	: primary_literal
-	| (class_qualifier | package_scope)? hierarchical_identifier select
+	| (class_qualifier | package_scope)? hierarchical_identifier select_
 	| empty_unpacked_array_concatenation
 	| concatenation ('[' range_expression ']')?
 	| multiple_concatenation ('[' range_expression ']')?
@@ -3288,7 +3288,8 @@ bit_select
 	: ('[' expression ']')*
 	;
 
-select
+// renamed 'select' to 'select_' because of a conflict with the Go language
+select_
 	: (('.' member_identifier bit_select)* '.' member_identifier)? bit_select ('[' part_select_range ']')?
 	;
 
@@ -3325,7 +3326,7 @@ net_lvalue
 	;
 
 variable_lvalue
-	: ((implicit_class_handle '.') | package_scope)? hierarchical_variable_identifier select
+	: ((implicit_class_handle '.') | package_scope)? hierarchical_variable_identifier select_
 	| '{' variable_lvalue (',' variable_lvalue)* '}'
 	| (assignment_pattern_expression_type)? assignment_pattern_variable_lvalue
 	| streaming_concatenation

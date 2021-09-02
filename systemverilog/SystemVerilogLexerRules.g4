@@ -434,7 +434,6 @@ STRING_LITERAL
 
 // A.9.2 Comments
 
-// commented out the following rule so that no token is generated for comments
 /*COMMENT
 	: ONE_LINE_COMMENT
 	| BLOCK_COMMENT
