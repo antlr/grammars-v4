@@ -991,8 +991,7 @@ function_prototype
 	;
 
 dpi_import_export
-	: 'import' dpi_spec_string dpi_function_import_property? (c_identifier '=')? dpi_function_proto ';'
-	| 'import' dpi_spec_string dpi_task_import_property? (c_identifier '=')? dpi_task_proto ';'
+	: 'import' dpi_spec_string (dpi_function_import_property? (c_identifier '=')? dpi_function_proto | dpi_task_import_property? (c_identifier '=')? dpi_task_proto) ';'
 	| 'export' dpi_spec_string (c_identifier '=')? ('function' function_identifier | 'task' task_identifier) ';'
 	;
 
@@ -1355,8 +1354,7 @@ bins_or_empty
 
 bins_or_options
 	: coverage_option
-	| 'wildcard'? bins_keyword bin_identifier ('[' covergroup_expression? ']')? '=' ('{' covergroup_range_list '}' ('with' '(' with_covergroup_expression ')')? | cover_point_identifier 'with' '(' with_covergroup_expression ')' | set_covergroup_expression) ('iff' '(' expression ')')?
-	| 'wildcard'? bins_keyword bin_identifier ('[' ']')? '=' trans_list ('iff' '(' expression ')')?
+	| 'wildcard'? bins_keyword bin_identifier (('[' covergroup_expression? ']')? '=' ('{' covergroup_range_list '}' ('with' '(' with_covergroup_expression ')')? | cover_point_identifier 'with' '(' with_covergroup_expression ')' | set_covergroup_expression) | ('[' ']')? '=' trans_list) ('iff' '(' expression ')')?
 	| bins_keyword bin_identifier (('[' covergroup_expression? ']')? '=' 'default' | '=' 'default' 'sequence') ('iff' '(' expression ')')?
 	;
 
@@ -2315,18 +2313,15 @@ simple_immediate_cover_statement
 	;
 
 deferred_immediate_assert_statement
-	: 'assert' '#' '0' '(' expression ')' action_block
-	| 'assert' 'final' '(' expression ')' action_block
+	: 'assert' ('#' '0' | 'final') '(' expression ')' action_block
 	;
 
 deferred_immediate_assume_statement
-	: 'assume' '#' '0' '(' expression ')' action_block
-	| 'assume' 'final' '(' expression ')' action_block
+	: 'assume' ('#' '0' | 'final') '(' expression ')' action_block
 	;
 
 deferred_immediate_cover_statement
-	: 'cover' '#' '0' '(' expression ')' statement_or_null
-	| 'cover' 'final' '(' expression ')' statement_or_null
+	: 'cover' ('#' '0' | 'final') '(' expression ')' statement_or_null
 	;
 */
 // A.6.11 Clocking block
@@ -2996,10 +2991,10 @@ mintypmax_expression
 	: expression (':' expression ':' expression)?
 	;
 
-module_path_conditional_expression
+/*module_path_conditional_expression
 	: module_path_expression '?' attribute_instance* module_path_expression ':' module_path_expression
 	;
-
+*/
 module_path_expression
 	: (unary_module_path_operator attribute_instance*)? module_path_primary
 	| module_path_expression binary_module_path_operator attribute_instance* module_path_expression
