@@ -120,6 +120,10 @@ REFERENCES dbo.TableState (ID)
 ON DELETE CASCADE
 GO
 
+ALTER TABLE [dbo].[TestTable] WITH CHECK ADD FOREIGN KEY([StateId])
+REFERENCES [dbo].[TableState] ([Id])
+GO
+
 ALTER TABLE [dbo].[TestTable] ADD  CONSTRAINT [constraintName]  DEFAULT (NEXT VALUE FOR [dbo].[sequence]) FOR [ID]
 GO
 
