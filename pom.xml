@@ -262,6 +262,7 @@
 				<module>suokif</module>
 				<module>swift</module>
 				<module>swift-fin</module>
+				<module>systemverilog</module>
 				<module>tcpheader</module>
 				<module>telephone</module>
 				<module>terraform</module>
