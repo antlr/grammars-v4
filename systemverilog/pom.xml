@@ -18,8 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>SystemVerilog.g4</include>
-					   <include>SystemVerilogLexerRules.g4</include>
+					   <include>SystemVerilogParser.g4</include>
+					   <include>SystemVerilogLexer.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -40,7 +40,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>source_text</entryPoint>
-					<grammarName>SystemVerilog</grammarName>
+					<grammarName>SystemVerilogParser</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

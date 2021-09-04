@@ -1,11 +1,7 @@
 // Author: Mustafa Said Ağca
 // License: MIT
 
-lexer grammar SystemVerilogLexerRules;
-
-/******************
-	LEXER RULES
-******************/
+lexer grammar SystemVerilogLexer;
 
 // 22. Compiler directives
 
@@ -62,7 +58,7 @@ INTEGRAL_NUMBER
 fragment
 DECIMAL_NUMBER
 	: UNSIGNED_NUMBER
-	| SIZE? DECIMAL_BASE (UNSIGNED_NUMBER | ((X_DIGIT | Z_DIGIT) '_'*))
+	| SIZE? DECIMAL_BASE (UNSIGNED_NUMBER | (X_DIGIT | Z_DIGIT) '_'*)
 	;
 
 fragment
@@ -204,11 +200,11 @@ STRING_LITERAL
 // A.9.2 Comments
 
 ONE_LINE_COMMENT
-	: '//' .*? '\r'? '\n' -> skip
+	: '//' .*? '\r'? '\n' -> channel(HIDDEN)
 	;
 
 BLOCK_COMMENT
-	: '/*' .*? '*/' -> skip
+	: '/*' .*? '*/' -> channel(HIDDEN)
 	;
 
 // A.9.3 Identifiers
@@ -224,5 +220,5 @@ SYSTEM_TF_IDENTIFIER
 // A.9.4 White space
 
 WHITE_SPACE
-	: [ \t\n\r]+ -> skip
+	: [ \t\n\r]+ -> channel(HIDDEN)
 	;

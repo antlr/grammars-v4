@@ -1,12 +1,8 @@
 // Author: Mustafa Said Ağca
 // License: MIT
 
-grammar SystemVerilog;
-import SystemVerilogLexerRules;
-
-/*******************
-	PARSER RULES
-*******************/
+grammar SystemVerilogParser;
+import SystemVerilogLexer;
 
 // A.1.1 Library source text
 
@@ -41,8 +37,7 @@ description
 	| interface_declaration
 	| program_declaration
 	| package_declaration
-	| attribute_instance* package_item
-	| attribute_instance* bind_directive
+	| attribute_instance* (package_item | bind_directive)
 	| config_declaration
 	;
 
@@ -115,9 +110,7 @@ interface_class_declaration
 interface_class_item
 	: type_declaration
 	| attribute_instance* interface_class_method
-	| local_parameter_declaration ';'
-	| parameter_declaration ';'
-	| ';'
+	| (local_parameter_declaration | parameter_declaration)? ';'
 	;
 
 interface_class_method
@@ -129,8 +122,8 @@ package_declaration
 	;
 
 timeunits_declaration
-	: 'timeunit' TIME_LITERAL (('/' TIME_LITERAL)? | (';' 'timeprecision' TIME_LITERAL)) ';'
-	| 'timeprecision' TIME_LITERAL ';' ('timeunit' TIME_LITERAL ';')
+	: 'timeunit' TIME_LITERAL (('/' TIME_LITERAL)? | ';' 'timeprecision' TIME_LITERAL) ';'
+	| 'timeprecision' TIME_LITERAL ';' ('timeunit' TIME_LITERAL ';')?
 	;
 
 // A.1.3 Module parameters and ports
@@ -240,7 +233,7 @@ module_or_generate_item_declaration
 	: package_or_generate_item_declaration
 	| genvar_declaration
 	| clocking_declaration
-	| 'default' (('clocking' clocking_identifier) | ('disable' 'iff' expression_or_dist)) ';'
+	| 'default' ('clocking' clocking_identifier | 'disable' 'iff' expression_or_dist) ';'
 	;
 
 non_port_module_item
@@ -259,7 +252,7 @@ parameter_override
 	;
 
 bind_directive
-	: 'bind' ((bind_target_scope (':' bind_target_instance_list)?) | bind_target_instance) bind_instantiation ';'
+	: 'bind' (bind_target_scope (':' bind_target_instance_list)? | bind_target_instance) bind_instantiation ';'
 	;
 
 bind_target_scope
@@ -318,7 +311,7 @@ liblist_clause
 	;
 
 use_clause
-	: 'use' (library_identifier '.')? cell_identifier (named_parameter_assignment (',' named_parameter_assignment))? (':' 'config')?
+	: 'use' (library_identifier '.')? cell_identifier (named_parameter_assignment (',' named_parameter_assignment)*)? (':' 'config')?
 	| 'use' named_parameter_assignment (',' named_parameter_assignment)* (':' 'config')?
 	;
 
@@ -329,7 +322,7 @@ interface_or_generate_item
 	;
 
 extern_tf_declaration
-	: 'extern' (method_prototype | ('forkjoin' task_prototype)) ';'
+	: 'extern' (method_prototype | 'forkjoin' task_prototype) ';'
 	;
 
 interface_item
@@ -399,7 +392,7 @@ checker_or_generate_item_declaration
 	| covergroup_declaration
 	| genvar_declaration
 	| clocking_declaration
-	| ('default' (('clocking' clocking_identifier) | ('disable' 'iff' expression_or_dist)))? ';'
+	| ('default' ('clocking' clocking_identifier | 'disable' 'iff' expression_or_dist))? ';'
 	;
 
 checker_generate_item
@@ -424,7 +417,7 @@ class_property
 class_method
 	: method_qualifier* (task_declaration | function_declaration | class_constructor_declaration)
 	| 'pure' 'virtual' class_item_qualifier* method_prototype ';'
-	| 'extern' method_qualifier* ((method_prototype ';') | class_constructor_prototype)
+	| 'extern' method_qualifier* (method_prototype ';' | class_constructor_prototype)
 	;
 
 class_constructor_prototype
@@ -486,7 +479,7 @@ solve_before_list
 	;
 
 constraint_primary
-	: ((implicit_class_handle '.') | class_scope)? hierarchical_identifier select_
+	: (implicit_class_handle '.' | class_scope)? hierarchical_identifier select_
 	;
 
 constraint_expression
@@ -576,11 +569,11 @@ anonymous_program_item
 // A.2.1.1 Module parameter declarations
 
 local_parameter_declaration
-	: 'localparam' ((data_type_or_implicit list_of_param_assignments) | ('type' list_of_type_assignments))
+	: 'localparam' (data_type_or_implicit list_of_param_assignments | 'type' list_of_type_assignments)
 	;
 
 parameter_declaration
-	: 'parameter' ((data_type_or_implicit list_of_param_assignments) | ('type' list_of_type_assignments))
+	: 'parameter' (data_type_or_implicit list_of_param_assignments | 'type' list_of_type_assignments)
 	;
 
 specparam_declaration
@@ -594,11 +587,11 @@ inout_declaration
 	;
 
 input_declaration
-	: 'input' ((net_port_type list_of_port_identifiers) | (variable_port_type list_of_variable_identifiers))
+	: 'input' (net_port_type list_of_port_identifiers | variable_port_type list_of_variable_identifiers)
 	;
 
 output_declaration
-	: 'output' ((net_port_type list_of_port_identifiers) | (variable_port_type list_of_variable_port_identifiers))
+	: 'output' (net_port_type list_of_port_identifiers | variable_port_type list_of_variable_port_identifiers)
 	;
 
 interface_port_declaration
@@ -627,7 +620,7 @@ package_import_item
 	;
 
 package_export_declaration
-	: 'export' ('*::*' | (package_import_item (',' package_import_item)*)) ';'
+	: 'export' ('*::*' | package_import_item (',' package_import_item)*) ';'
 	;
 
 genvar_declaration
@@ -643,7 +636,7 @@ net_declaration
 type_declaration
 	: 'typedef' data_type type_identifier variable_dimension* ';'
 	| 'typedef' interface_instance_identifier constant_bit_select '.' type_identifier type_identifier ';'
-	| 'typedef' ('enum' | 'struct' | 'union' | 'class' | ('interface' 'class'))? type_identifier ';'
+	| 'typedef' ('enum' | 'struct' | 'union' | 'class' | 'interface' 'class')? type_identifier ';'
 	;
 
 net_type_declaration
@@ -825,11 +818,11 @@ charge_strength
 // A.2.2.3 Delays
 
 delay3
-	: '#' (delay_value | ('(' mintypmax_expression (',' mintypmax_expression (',' mintypmax_expression)?)? ')'))
+	: '#' (delay_value | '(' mintypmax_expression (',' mintypmax_expression (',' mintypmax_expression)?)? ')')
 	;
 
 delay2
-	: '#' (delay_value | ('(' mintypmax_expression (',' mintypmax_expression)? ')'))
+	: '#' (delay_value | '(' mintypmax_expression (',' mintypmax_expression)? ')')
 	;
 
 delay_value
@@ -990,7 +983,7 @@ function_declaration
 	;
 
 function_body_declaration
-	: function_data_type_or_implicit ((interface_identifier '.') | class_scope)? function_identifier ((';' tf_item_declaration*) | ('(' tf_port_list? ')' ';' block_item_declaration*)) function_statement_or_null* 'endfunction' (':' function_identifier)?
+	: function_data_type_or_implicit (interface_identifier '.' | class_scope)? function_identifier (';' tf_item_declaration* | '(' tf_port_list? ')' ';' block_item_declaration*) function_statement_or_null* 'endfunction' (':' function_identifier)?
 	;
 
 function_prototype 
@@ -1000,7 +993,7 @@ function_prototype
 dpi_import_export
 	: 'import' dpi_spec_string dpi_function_import_property? (c_identifier '=')? dpi_function_proto ';'
 	| 'import' dpi_spec_string dpi_task_import_property? (c_identifier '=')? dpi_task_proto ';'
-	| 'export' dpi_spec_string (c_identifier '=')? (('function' function_identifier) | ('task' task_identifier)) ';'
+	| 'export' dpi_spec_string (c_identifier '=')? ('function' function_identifier | 'task' task_identifier) ';'
 	;
 
 dpi_spec_string
@@ -1032,7 +1025,7 @@ task_declaration
 	;
 
 task_body_declaration
-	: ((interface_identifier '.') | class_scope)? task_identifier ((';' tf_item_declaration*) | ('(' tf_port_list? ')' ';' block_item_declaration*)) statement_or_null* 'endtask' (':' task_identifier)?
+	: (interface_identifier '.' | class_scope)? task_identifier (';' tf_item_declaration* | '(' tf_port_list? ')' ';' block_item_declaration*) statement_or_null* 'endtask' (':' task_identifier)?
 	;
 
 tf_item_declaration
@@ -1153,8 +1146,7 @@ property_instance
 	;
 
 property_list_of_arguments
-	: property_actual_arg? (',' property_actual_arg?)* (',' '.' identifier '(' property_actual_arg? ')')*
-	| '.' identifier '(' property_actual_arg? ')' (',' '.' identifier '(' property_actual_arg? ')')*
+	: (property_actual_arg? (',' property_actual_arg?)* | '.' identifier '(' property_actual_arg? ')') (',' '.' identifier '(' property_actual_arg? ')')*
 	;
 
 property_actual_arg
@@ -1241,7 +1233,7 @@ sequence_formal_type
 sequence_expr
 	: cycle_delay_range sequence_expr (cycle_delay_range sequence_expr)*
 	| sequence_expr cycle_delay_range sequence_expr (cycle_delay_range sequence_expr)*
-	| expression_or_dist (boolean_abbrev? | ('throughout' sequence_expr))
+	| expression_or_dist (boolean_abbrev? | 'throughout' sequence_expr)
 	| sequence_instance sequence_abbrev?
 	| '(' sequence_expr (',' sequence_match_item)* ')' sequence_abbrev?
 	| sequence_expr ('and' | 'intersect' | 'or' | 'within') sequence_expr
@@ -1250,7 +1242,7 @@ sequence_expr
 	;
 
 cycle_delay_range
-	: '##' (constant_primary | ('[' (cycle_delay_const_range_expression | '*' | '+') ']'))
+	: '##' (constant_primary | '[' (cycle_delay_const_range_expression | '*' | '+') ']')
 	;
 
 sequence_method_call
@@ -1268,7 +1260,7 @@ sequence_instance
 	;
 
 sequence_list_of_arguments
-	: ((sequence_actual_arg? (',' sequence_actual_arg?)*) | ('.' identifier '(' sequence_actual_arg? ')')) (',' '.' identifier '(' sequence_actual_arg? ')')*
+	: (sequence_actual_arg? (',' sequence_actual_arg?)* | '.' identifier '(' sequence_actual_arg? ')') (',' '.' identifier '(' sequence_actual_arg? ')')*
 	;
 
 sequence_actual_arg
@@ -1287,7 +1279,7 @@ sequence_abbrev
 	;
 
 consecutive_repetition
-	: '[' (('*' const_or_range_expression) | '*' | '+') ']'
+	: '[' ('*' const_or_range_expression | '*' | '+') ']'
 	;
 
 non_consecutive_repetition
@@ -1322,7 +1314,7 @@ covergroup_declaration
 	;
 
 coverage_spec_or_option
-	: attribute_instance* (coverage_spec | (coverage_option ';'))
+	: attribute_instance* (coverage_spec | coverage_option ';')
 	;
 
 coverage_option
@@ -1349,7 +1341,7 @@ block_event_expression
 hierarchical_btf_identifier
 	: hierarchical_tf_identifier
 	| hierarchical_block_identifier
-	| ((hierarchical_identifier '.') | class_scope)? method_identifier
+	| (hierarchical_identifier '.' | class_scope)? method_identifier
 	;
 
 cover_point
@@ -1363,9 +1355,9 @@ bins_or_empty
 
 bins_or_options
 	: coverage_option
-	| 'wildcard'? bins_keyword bin_identifier ('[' covergroup_expression? ']')? '=' (('{' covergroup_range_list '}' ('with' '(' with_covergroup_expression ')')?) | (cover_point_identifier 'with' '(' with_covergroup_expression ')') | set_covergroup_expression) ('iff' '(' expression ')')?
+	| 'wildcard'? bins_keyword bin_identifier ('[' covergroup_expression? ']')? '=' ('{' covergroup_range_list '}' ('with' '(' with_covergroup_expression ')')? | cover_point_identifier 'with' '(' with_covergroup_expression ')' | set_covergroup_expression) ('iff' '(' expression ')')?
 	| 'wildcard'? bins_keyword bin_identifier ('[' ']')? '=' trans_list ('iff' '(' expression ')')?
-	| bins_keyword bin_identifier ((('[' covergroup_expression? ']')? '=' 'default') | ('=' 'default' 'sequence')) ('iff' '(' expression ')')?
+	| bins_keyword bin_identifier (('[' covergroup_expression? ']')? '=' 'default' | '=' 'default' 'sequence') ('iff' '(' expression ')')?
 	;
 
 bins_keyword
@@ -1500,7 +1492,7 @@ let_expression
 	;
 
 let_list_of_arguments
-	: ((let_actual_arg? (',' let_actual_arg?)*) | ('.' identifier '(' let_actual_arg? ')')) (',' '.' identifier '(' let_actual_arg? ')')*
+	: (let_actual_arg? (',' let_actual_arg?)* | '.' identifier '(' let_actual_arg? ')') (',' '.' identifier '(' let_actual_arg? ')')*
 	;
 
 let_actual_arg
@@ -1679,7 +1671,7 @@ ordered_port_connection
 	;
 
 named_port_connection
-	: attribute_instance* (('.' port_identifier ('(' expression? ')')?) | '.*')
+	: attribute_instance* ('.' port_identifier ('(' expression? ')')? | '.*')
 	;
 
 // A.4.1.2 Interface instantiation
@@ -1710,7 +1702,7 @@ ordered_checker_port_connection
 	;
 
 named_checker_port_connection
-	: attribute_instance* (('.' formal_port_identifier ('(' property_actual_arg? ')')?) | '.*')
+	: attribute_instance* ('.' formal_port_identifier ('(' property_actual_arg? ')')? | '.*')
 	;
 
 // A.4.2 Generated instantiation
@@ -1794,7 +1786,7 @@ udp_port_declaration
 	;
 
 udp_output_declaration
-	: attribute_instance* 'output' (port_identifier | ('reg' port_identifier ('=' constant_expression)?))
+	: attribute_instance* 'output' (port_identifier | 'reg' port_identifier ('=' constant_expression)?)
 	;
 
 udp_input_declaration
@@ -1858,7 +1850,7 @@ edge_input_list
 	;
 
 edge_indicator
-	: ('(' level_symbol level_symbol ')')
+	: '(' level_symbol level_symbol ')'
 	| edge_symbol
 	;
 
@@ -1913,7 +1905,7 @@ udp_instance
 // A.6.1 Continuous assignment and net alias statements
 
 continuous_assign
-	: 'assign' ((drive_strength? delay3? list_of_net_assignments ';') | (delay_control? list_of_variable_assignments ';'))
+	: 'assign' (drive_strength? delay3? list_of_net_assignments ';' | delay_control? list_of_variable_assignments ';')
 	;
 
 list_of_net_assignments
@@ -1956,7 +1948,7 @@ final_construct
 blocking_assignment
 	: variable_lvalue '=' delay_or_event_control expression
 	| nonrange_variable_lvalue '=' dynamic_array_new
-	| ((implicit_class_handle '.') | class_scope | package_scope)? hierarchical_variable_identifier select_ '=' class_new
+	| (implicit_class_handle '.' | class_scope | package_scope)? hierarchical_variable_identifier select_ '=' class_new
 	| operator_assignment
 	;
 
@@ -2071,15 +2063,15 @@ delay_or_event_control
 	;
 
 delay_control
-	: '#' (delay_value | ('(' mintypmax_expression ')'))
+	: '#' (delay_value | '(' mintypmax_expression ')')
 	;
 
 event_control
-	: '@' ((hierarchical_event_identifier | ps_or_hierarchical_sequence_identifier | '*') | ('(' (event_expression | '*') ')'))
+	: '@' (hierarchical_event_identifier | ps_or_hierarchical_sequence_identifier | '*' | '(' (event_expression | '*') ')')
 	;
 
 event_expression
-	: ((edge_identifier? expression) | sequence_instance) ('iff' expression)?
+	: (edge_identifier? expression | sequence_instance) ('iff' expression)?
 	| event_expression ('or' | ',') event_expression
 	| '(' event_expression ')'
 	;
@@ -2091,16 +2083,16 @@ procedural_timing_control
 	;
 
 jump_statement
-	: (('return' expression?) | 'break' | 'continue') ';'
+	: ('return' expression? | 'break' | 'continue') ';'
 	;
 
 wait_statement
-	: 'wait' (('(' expression ')' statement_or_null) | ('fork' ';'))
+	: 'wait' ('(' expression ')' statement_or_null | 'fork' ';')
 	| 'wait_order' '(' hierarchical_identifier (',' hierarchical_identifier)* ')' action_block
 	;
 
 event_trigger
-	: ('->' | ('->>' delay_or_event_control?)) hierarchical_event_identifier ';'
+	: ('->' | '->>' delay_or_event_control?) hierarchical_event_identifier ';'
 	;
 
 disable_statement
@@ -2135,7 +2127,7 @@ cond_pattern
 // A.6.7 Case statements
 
 case_statement
-	: unique_priority? case_keyword '(' case_expression ')' ((case_item case_item*) | ('matches' case_pattern_item case_pattern_item*)) 'endcase'
+	: unique_priority? case_keyword '(' case_expression ')' (case_item case_item* | 'matches' case_pattern_item case_pattern_item*) 'endcase'
 	| unique_priority? 'case' '(' case_expression ')' 'inside' case_inside_item case_inside_item* 'endcase'
 	;
 
@@ -2191,11 +2183,11 @@ pattern
 	| '.*'
 	| constant_expression
 	| 'tagged' member_identifier pattern?
-	| '\'' '{' ((pattern (',' pattern)*) | (member_identifier ':' pattern (',' member_identifier ':' pattern)*)) '}'
+	| '\'' '{' (pattern (',' pattern)* | member_identifier ':' pattern (',' member_identifier ':' pattern)*) '}'
 	;
 
 assignment_pattern
-	: '\'' '{' ((expression (',' expression)*) | (structure_pattern_key ':' expression (',' structure_pattern_key ':' expression)*) | (array_pattern_key ':' expression (',' array_pattern_key ':' expression)*) | (constant_expression (expression (',' expression)*)*)) '}'
+	: '\'' '{' (expression (',' expression)* | structure_pattern_key ':' expression (',' structure_pattern_key ':' expression)* | array_pattern_key ':' expression (',' array_pattern_key ':' expression)* | constant_expression '{' expression (',' expression)* '}') '}'
 	;
 
 structure_pattern_key
@@ -2345,7 +2337,7 @@ clocking_declaration
 	;
 
 clocking_event
-	: '@' (identifier | ('(' event_expression ')'))
+	: '@' (identifier | '(' event_expression ')')
 	;
 
 clocking_item
@@ -2383,7 +2375,7 @@ clocking_drive
 	;
 
 cycle_delay
-	: '##' (INTEGRAL_NUMBER | identifier | ('(' expression ')'))
+	: '##' (INTEGRAL_NUMBER | identifier | '(' expression ')')
 	;
 
 clockvar
@@ -2790,7 +2782,7 @@ timing_check_condition
 	;
 
 scalar_timing_check_condition
-	: ('~')? expression
+	: '~'? expression
 	| expression ('==' | '===' | '!=' | '!==') scalar_constant
 	;
 
@@ -2874,7 +2866,7 @@ tf_call
 	;
 
 system_tf_call
-	: SYSTEM_TF_IDENTIFIER ((('(' list_of_arguments ')')?) | ('(' ((data_type (',' expression)?) | (expression (',' expression?)* (',' clocking_event?)?)) ')'))
+	: SYSTEM_TF_IDENTIFIER (('(' list_of_arguments ')')? | '(' (data_type (',' expression)? | expression (',' expression?)* (',' clocking_event?)?) ')')
 	;
 
 subroutine_call
@@ -2889,7 +2881,7 @@ function_subroutine_call
 	;
 
 list_of_arguments
-	: ((expression? (',' expression?)*) | ('.' identifier '(' expression? ')')) (',' '.' identifier '(' expression? ')')*
+	: (expression? (',' expression?)* | '.' identifier '(' expression? ')') (',' '.' identifier '(' expression? ')')*
 	;
 
 /*method_call
@@ -2940,7 +2932,7 @@ inc_or_dec_expression
 */
 constant_expression
 	: (unary_operator attribute_instance*)? constant_primary
-	| constant_expression ((binary_operator attribute_instance*) | ('?' attribute_instance* constant_expression ':')) constant_expression
+	| constant_expression (binary_operator attribute_instance* | '?' attribute_instance* constant_expression ':') constant_expression
 	;
 
 constant_mintypmax_expression
@@ -3076,7 +3068,7 @@ primary
 	;
 
 class_qualifier
-	: ('local' '::')? ((implicit_class_handle '.') | class_scope)?
+	: ('local' '::')? (implicit_class_handle '.' | class_scope)?
 	;
 
 range_expression
@@ -3137,14 +3129,14 @@ net_lvalue
 	;
 
 variable_lvalue
-	: ((implicit_class_handle '.') | package_scope)? hierarchical_variable_identifier select_
+	: (implicit_class_handle '.' | package_scope)? hierarchical_variable_identifier select_
 	| '{' variable_lvalue (',' variable_lvalue)* '}'
 	| assignment_pattern_expression_type? assignment_pattern_variable_lvalue
 	| streaming_concatenation
 	;
 
 nonrange_variable_lvalue
-	: ((implicit_class_handle '.') | package_scope)? hierarchical_variable_identifier nonrange_select
+	: (implicit_class_handle '.' | package_scope)? hierarchical_variable_identifier nonrange_select
 	;
 
 // A.8.6 Operators
@@ -3486,11 +3478,12 @@ ps_identifier
 	;
 
 ps_or_hierarchical_array_identifier
-	: ((implicit_class_handle '.') | class_scope | package_scope)? hierarchical_array_identifier
+	: (implicit_class_handle '.' | class_scope | package_scope)? hierarchical_array_identifier
 	;
 
 ps_or_hierarchical_net_identifier
-	: package_scope? net_identifier | hierarchical_net_identifier
+	: package_scope? net_identifier
+	| hierarchical_net_identifier
 	;
 
 ps_or_hierarchical_property_identifier
@@ -3514,7 +3507,7 @@ ps_parameter_identifier
 	;
 
 ps_type_identifier
-	: (('local' '::') | package_scope | class_scope)? type_identifier
+	: ('local' '::' | package_scope | class_scope)? type_identifier
 	;
 
 sequence_identifier
