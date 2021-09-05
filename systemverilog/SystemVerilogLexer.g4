@@ -182,7 +182,7 @@ Z_DIGIT
 // A.8.8 Strings
 
 STRING_LITERAL
-	: '"' ~[\n\r]* '"'
+	: '"' ~["\n\r]* '"'
 	;
 
 // A.9.2 Comments
