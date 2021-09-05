@@ -864,7 +864,7 @@ list_of_udp_port_identifiers
 	;
 
 list_of_specparam_assignments
-	: specparam_assignment (',' specparam_assignment)
+	: specparam_assignment (',' specparam_assignment)*
 	;
 
 list_of_tf_variable_identifiers
@@ -2668,7 +2668,7 @@ recrem_timing_check
 	;
 
 skew_timing_check
-	: '$skew' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?) ')' ';'
+	: '$skew' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?)? ')' ';'
 	;
 
 timeskew_timing_check
