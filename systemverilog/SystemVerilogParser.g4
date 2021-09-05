@@ -664,7 +664,7 @@ data_type
 	| integer_atom_type signing?
 	| non_integer_type
 	| struct_union ('packed' signing?)? '{' struct_union_member struct_union_member* '}' packed_dimension*
-	| 'enum' enum_base_type? '{' enum_name_declaration (',' enum_name_declaration) '}' packed_dimension*
+	| 'enum' enum_base_type? '{' enum_name_declaration (',' enum_name_declaration)* '}' packed_dimension*
 	| 'string'
 	| 'chandle'
 	| 'virtual' 'interface'? interface_identifier parameter_value_assignment? ('.' modport_identifier)?
