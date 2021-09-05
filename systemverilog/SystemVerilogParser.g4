@@ -1328,7 +1328,7 @@ coverage_spec
 
 coverage_event
 	: clocking_event
-	| 'with' 'function' 'sample' '(' tf_port_list? ')'
+	//| 'with' 'function' 'sample' '(' tf_port_list? ')'
 	| '@@' '(' block_event_expression ')'
 	;
 
@@ -2871,7 +2871,7 @@ system_tf_call
 subroutine_call
 	: tf_call
 	| system_tf_call
-	| ((class_qualifier | package_scope)? hierarchical_identifier select_ | implicit_class_handle) '.' method_call_body // ~= method_call
+	| ( primary_literal | (class_qualifier | package_scope)? hierarchical_identifier select_ | empty_unpacked_array_concatenation | concatenation ('[' range_expression ']')? | multiple_concatenation ('[' range_expression ']')? | let_expression | '(' mintypmax_expression ')' | assignment_pattern_expression | streaming_concatenation | sequence_method_call | 'this' | '$' | 'null' | implicit_class_handle) '.' method_call_body // ~= method_call
 	| ('std' '::')? randomize_call
 	;
 
