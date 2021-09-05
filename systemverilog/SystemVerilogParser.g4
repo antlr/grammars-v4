@@ -487,7 +487,7 @@ constraint_expression
 	| uniqueness_constraint ';'
 	| expression '–>' constraint_set
 	| 'if' '(' expression ')' constraint_set ('else' constraint_set)?
-	| 'foreach' '(' ps_or_hierarchical_array_identifier loop_variables? ')' constraint_set
+	| 'foreach' '(' ps_or_hierarchical_array_identifier '[' loop_variables ']' ')' constraint_set
 	| 'disable' 'soft' constraint_primary ';'
 	;
 
@@ -664,7 +664,7 @@ data_type
 	| integer_atom_type signing?
 	| non_integer_type
 	| struct_union ('packed' signing?)? '{' struct_union_member struct_union_member* '}' packed_dimension*
-	| 'enum' enum_base_type? '{' enum_name_declaration (',' enum_name_declaration) '}' packed_dimension*
+	| 'enum' enum_base_type? '{' enum_name_declaration (',' enum_name_declaration)* '}' packed_dimension*
 	| 'string'
 	| 'chandle'
 	| 'virtual' 'interface'? interface_identifier parameter_value_assignment? ('.' modport_identifier)?
@@ -691,7 +691,7 @@ enum_base_type
 	;
 
 enum_name_declaration
-	: enum_identifier ('[' INTEGRAL_NUMBER (':' INTEGRAL_NUMBER)? ']')? ('=' constant_expression)?
+	: enum_identifier ('[' (DECIMAL_NUMBER | UNSIGNED_NUMBER | OCTAL_NUMBER | BINARY_NUMBER | HEX_NUMBER) (':' (DECIMAL_NUMBER | UNSIGNED_NUMBER | OCTAL_NUMBER | BINARY_NUMBER | HEX_NUMBER))? ']')? ('=' constant_expression)?
 	;
 
 class_scope
@@ -864,7 +864,7 @@ list_of_udp_port_identifiers
 	;
 
 list_of_specparam_assignments
-	: specparam_assignment (',' specparam_assignment)
+	: specparam_assignment (',' specparam_assignment)*
 	;
 
 list_of_tf_variable_identifiers
@@ -911,7 +911,7 @@ type_assignment
 	;
 
 pulse_control_specparam
-	: 'PATHPULSE$' /*(specify_input_terminal_descriptor '$' specify_output_terminal_descriptor)?*/ '=' '(' reject_limit_value (',' error_limit_value)? ')'
+	: 'PATHPULSE$' (specify_input_terminal_descriptor '$' specify_output_terminal_descriptor)? '=' '(' reject_limit_value (',' error_limit_value)? ')'
 	;
 
 error_limit_value
@@ -2233,7 +2233,7 @@ loop_statement
 	| ('repeat' | 'while') '(' expression ')' statement_or_null
 	| 'for' '(' for_initialization? ';' expression? ';' for_step? ')' statement_or_null
 	| 'do' statement_or_null 'while' '(' expression ')' ';'
-	| 'foreach' '(' ps_or_hierarchical_array_identifier loop_variables? ')' statement
+	| 'foreach' '(' ps_or_hierarchical_array_identifier '[' loop_variables ']' ')' statement
 	;
 
 for_initialization
@@ -2270,13 +2270,13 @@ subroutine_call_statement
 
 assertion_item
 	: concurrent_assertion_item
-	//| deferred_immediate_assertion_item
+	| deferred_immediate_assertion_item
 	;
 
-/*deferred_immediate_assertion_item
+deferred_immediate_assertion_item
 	: (block_identifier ':')? deferred_immediate_assertion_statement
 	;
-*/
+
 procedural_assertion_statement
 	: concurrent_assertion_statement
 	| immediate_assertion_statement
@@ -2285,7 +2285,7 @@ procedural_assertion_statement
 
 immediate_assertion_statement
 	: simple_immediate_assertion_statement
-	//| deferred_immediate_assertion_statement
+	| deferred_immediate_assertion_statement
 	;
 
 simple_immediate_assertion_statement
@@ -2306,24 +2306,24 @@ simple_immediate_cover_statement
 	: 'cover' '(' expression ')' statement_or_null
 	;
 
-/*deferred_immediate_assertion_statement
+deferred_immediate_assertion_statement
 	: deferred_immediate_assert_statement
 	| deferred_immediate_assume_statement
 	| deferred_immediate_cover_statement
 	;
 
 deferred_immediate_assert_statement
-	: 'assert' ('#' '0' | 'final') '(' expression ')' action_block
+	: 'assert' ('#0' | 'final') '(' expression ')' action_block
 	;
 
 deferred_immediate_assume_statement
-	: 'assume' ('#' '0' | 'final') '(' expression ')' action_block
+	: 'assume' ('#0' | 'final') '(' expression ')' action_block
 	;
 
 deferred_immediate_cover_statement
-	: 'cover' ('#' '0' | 'final') '(' expression ')' statement_or_null
+	: 'cover' ('#0' | 'final') '(' expression ')' statement_or_null
 	;
-*/
+
 // A.6.11 Clocking block
 
 clocking_declaration
@@ -2370,7 +2370,7 @@ clocking_drive
 	;
 
 cycle_delay
-	: '##' (INTEGRAL_NUMBER | identifier | '(' expression ')')
+	: '##' (DECIMAL_NUMBER | UNSIGNED_NUMBER | OCTAL_NUMBER | BINARY_NUMBER | HEX_NUMBER | identifier | '(' expression ')')
 	;
 
 clockvar
@@ -2401,7 +2401,11 @@ rs_production_list
 	;
 
 weight_specification
-	: INTEGRAL_NUMBER
+	: DECIMAL_NUMBER
+	| UNSIGNED_NUMBER
+	| OCTAL_NUMBER
+	| BINARY_NUMBER
+	| HEX_NUMBER
 	| ps_identifier
 	| '(' expression ')'
 	;
@@ -2664,7 +2668,7 @@ recrem_timing_check
 	;
 
 skew_timing_check
-	: '$skew' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?) ')' ';'
+	: '$skew' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?)? ')' ';'
 	;
 
 timeskew_timing_check
@@ -2867,7 +2871,7 @@ system_tf_call
 subroutine_call
 	: tf_call
 	| system_tf_call
-	| (primary_literal | (class_qualifier | package_scope)? hierarchical_identifier select_ | empty_unpacked_array_concatenation | concatenation ('[' range_expression ']')? | multiple_concatenation ('[' range_expression ']')? | let_expression | '(' mintypmax_expression ')' | assignment_pattern_expression | streaming_concatenation | sequence_method_call | 'this' | '$' | 'null' | implicit_class_handle) '.' method_call_body // ~= method_call
+	| ((class_qualifier | package_scope)? hierarchical_identifier select_ | implicit_class_handle) '.' method_call_body // ~= method_call
 	| ('std' '::')? randomize_call
 	;
 
@@ -3216,7 +3220,11 @@ binary_module_path_operator
 // A.8.7 Numbers
 
 number
-	: INTEGRAL_NUMBER
+	: DECIMAL_NUMBER
+	| UNSIGNED_NUMBER
+	| OCTAL_NUMBER
+	| BINARY_NUMBER
+	| HEX_NUMBER
 	| REAL_NUMBER
 	;
 
