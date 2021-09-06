@@ -1,7 +1,7 @@
-parser grammar pggrammar;
+parser grammar PostgreSQLParser;
 
 options {
-	tokenVocab =pglexer;
+	tokenVocab =PostgreSQLLexer;
 	language = CSharp;
 }
 
@@ -13,7 +13,7 @@ using System.Linq;
 @members {
 	    private IParseTree GetParsedSqlTree(string script,int line = 0)
 	    {
-	        var ph = getpggrammar(script);
+	        var ph = getPostgreSQLParser(script);
 	        var result = ph.root();
 	        foreach (var err in ph.ParseErrors)
 	        {
@@ -36,7 +36,7 @@ using System.Linq;
             var txt = GetRoutineBodyString(func_as.func_as().sconst(0));
             var line = func_as.func_as()
                 .sconst(0).Start.Line;
-            var ph = getpggrammar(txt);
+            var ph = getPostgreSQLParser(txt);
             switch (lang)
             {
                 case "plpgsql":
@@ -88,22 +88,22 @@ using System.Linq;
 	            return result;
 	        }
 
-	    public static pggrammar getpggrammar(string script)
+	    public static PostgreSQLParser getPostgreSQLParser(string script)
 	    {
 	       var CharStream = CharStreams.fromString(script);
-	       var Lexer = new pglexer(CharStream);
+	       var Lexer = new PostgreSQLLexer(CharStream);
 	       var Tokens = new CommonTokenStream(Lexer);
-	       var Parser = new pggrammar(Tokens);
-	       var ErrorListener = new pggrammarErrorListener();
+	       var Parser = new PostgreSQLParser(Tokens);
+	       var ErrorListener = new PostgreSQLParserErrorListener();
 	       ErrorListener.grammar = Parser;
 	       Parser.AddErrorListener(ErrorListener);
 	       return Parser;
 	    }
 
-	    internal class pggrammarErrorListener : BaseErrorListener
+	    internal class PostgreSQLParserErrorListener : BaseErrorListener
         {
-            internal pggrammar grammar;
-	        public pggrammarErrorListener()
+            internal PostgreSQLParser grammar;
+	        public PostgreSQLParserErrorListener()
 	        {
 	        }
 	        public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
@@ -1662,7 +1662,7 @@ opt_or_replace: OR REPLACE
         //| AS 'definition'
         def=sconst {
 /*				                        var txt =  GetString(_localctx.sconst(0));
-				                        var ph = getpggrammar(txt);
+				                        var ph = getPostgreSQLParser(txt);
 				                        _localctx.Definition = ph.plsqlroot();
 				                        foreach (var err in ph.ParseErrors)
 				                        {
