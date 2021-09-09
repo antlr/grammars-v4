@@ -73,6 +73,7 @@ create table rack_shelf_bin ( id int unsigned not null auto_increment unique pri
 CREATE TABLE `tblSRCHjob_desc` (`description_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT, `description` mediumtext NOT NULL, PRIMARY KEY (`description_id`)) ENGINE=TokuDB AUTO_INCREMENT=4095997820 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=TOKUDB_QUICKLZ;
 create table invisible_column_test(id int, col1 int INVISIBLE);
 create table visible_column_test(id int, col1 int VISIBLE);
+CREATE TABLE foo (c1 decimal(19), c2 decimal(19.5), c3 decimal(0.0), c4 decimal(0.2), c5 decimal(19,2));
 CREATE TABLE table_items (id INT, purchased DATE)
     PARTITION BY RANGE( YEAR(purchased) )
         SUBPARTITION BY HASH( TO_DAYS(purchased) )
