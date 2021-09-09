@@ -6,7 +6,7 @@ lexer grammar SystemVerilogLexer;
 // 22. Compiler directives
 
 COMPILER_DIRECTIVE
-	: '`' SIMPLE_IDENTIFIER .*? '\r'? '\n' -> skip
+	: '`' .*? '\r'? '\n' -> skip
 	;
 
 // 33.3.1 Specifying libraries—the library map file
