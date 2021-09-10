@@ -2,15 +2,10 @@
 // License: MIT
 package ip_pkg;
   class ipv4_header;
-    localparam VERSION = 4;
-    localparam IHL = 5;
-    localparam DSCP = 0;
-    localparam ECN = 0;
-    localparam MTU_SIZE = 1500;
-    const static bit [3:0] version = VERSION;
-    const static bit [3:0] ihl = IHL;
-    const static bit [5:0] dscp = DSCP;
-    const static bit [1:0] ecn = ECN;
+    const static bit [3:0] version = 4;
+    const static bit [3:0] ihl = 5;
+    const static bit [5:0] dscp = 2;
+    const static bit [1:0] ecn = 2;
     rand bit [15:0] total_length;
     rand bit [15:0] identification;
     rand bit [2:0] flags;
@@ -23,11 +18,9 @@ package ip_pkg;
     constraint c_length {
       if (flags == 3'b100) {(total_length - 20) % 8 == 0;}
       total_length > 20;
-      total_length <= MTU_SIZE;
     }
     constraint c_flags {flags inside {3'b000, 3'b010, 3'b100};}
     constraint c_offset {if (flags == 3'b010) {fragment_offset == 0;}}
-    constraint c_protocol {protocol inside {8'h11};}
     virtual function automatic void calculate_checksum;
       bit [16:0] checksum;
       checksum = 0;
