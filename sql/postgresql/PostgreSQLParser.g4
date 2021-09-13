@@ -2342,6 +2342,7 @@ with_clause: WITH cte_list
  cte_list: common_table_expr
          | cte_list COMMA common_table_expr
 ;
+
  common_table_expr: name opt_name_list AS opt_materialized OPEN_PAREN preparablestmt CLOSE_PAREN;
 
  opt_materialized: MATERIALIZED
@@ -2747,41 +2748,35 @@ character: characterWithLength
  interval_second: SECOND_P
                 | SECOND_P OPEN_PAREN iconst CLOSE_PAREN
 ;
+//precendence accroding to Table 4.2. Operator Precedence (highest to lowest)
+//https://www.postgresql.org/docs/12/sql-syntax-lexical.html#SQL-PRECEDENCE
  a_expr: c_expr
+        //::	left	PostgreSQL-style typecast
        | a_expr TYPECAST typename
        | a_expr COLLATE any_name
        | a_expr AT TIME ZONE a_expr
+
+       //right	unary plus, unary minus
        | PLUS a_expr
        | MINUS a_expr
 
+        //left	exponentiation
+       | a_expr CARET a_expr
+
+        //left	multiplication, division, modulo
        | a_expr STAR a_expr
        | a_expr SLASH a_expr
        | a_expr PERCENT a_expr
-       | a_expr CARET a_expr
-       | a_expr qual_op a_expr
 
+        //left	addition, subtraction
        | a_expr PLUS a_expr
        | a_expr MINUS a_expr
 
-
-       | a_expr LT a_expr
-       | a_expr GT a_expr
-
-       | a_expr LESS_LESS a_expr
-       | a_expr GREATER_GREATER a_expr
-
-       | a_expr EQUAL a_expr
-       | a_expr LESS_EQUALS a_expr
-       | a_expr GREATER_EQUALS a_expr
-       | a_expr NOT_EQUALS a_expr
-
+        //left	all other native and user-defined operators
+       | a_expr qual_op a_expr
        | qual_op a_expr
-       | a_expr qual_op
 
-       | a_expr AND a_expr
-       | a_expr OR a_expr
-       | NOT a_expr
-       | not_la a_expr
+        //range containment, set membership, string matching BETWEEN IN LIKE ILIKE SIMILAR
        | a_expr LIKE a_expr
        | a_expr LIKE a_expr ESCAPE a_expr
        | a_expr not_la LIKE a_expr
@@ -2794,6 +2789,20 @@ character: characterWithLength
        | a_expr SIMILAR TO a_expr ESCAPE a_expr
        | a_expr not_la SIMILAR TO a_expr
        | a_expr not_la SIMILAR TO a_expr ESCAPE a_expr
+       | a_expr BETWEEN opt_asymmetric b_expr AND a_expr
+       | a_expr not_la BETWEEN opt_asymmetric b_expr AND a_expr
+       | a_expr BETWEEN SYMMETRIC b_expr AND a_expr
+       | a_expr not_la BETWEEN SYMMETRIC b_expr AND a_expr
+
+        //< > = <= >= <>	 	comparison operators
+       | a_expr LT a_expr
+       | a_expr GT a_expr
+       | a_expr EQUAL a_expr
+       | a_expr LESS_EQUALS a_expr
+       | a_expr GREATER_EQUALS a_expr
+       | a_expr NOT_EQUALS a_expr
+
+       //IS ISNULL NOTNULL	 	IS TRUE, IS FALSE, IS NULL, IS DISTINCT FROM, etc
        | a_expr IS NULL_P
        | a_expr ISNULL
        | a_expr IS NOT NULL_P
@@ -2809,22 +2818,34 @@ character: characterWithLength
        | a_expr IS NOT DISTINCT FROM a_expr
        | a_expr IS OF OPEN_PAREN type_list CLOSE_PAREN
        | a_expr IS NOT OF OPEN_PAREN type_list CLOSE_PAREN
-       | a_expr BETWEEN opt_asymmetric b_expr AND a_expr
-       | a_expr not_la BETWEEN opt_asymmetric b_expr AND a_expr
-       | a_expr BETWEEN SYMMETRIC b_expr AND a_expr
-       | a_expr not_la BETWEEN SYMMETRIC b_expr AND a_expr
-       | a_expr IN_P in_expr
-       | a_expr not_la IN_P in_expr
-       | a_expr subquery_Op sub_type select_with_parens
-       | a_expr subquery_Op sub_type OPEN_PAREN a_expr CLOSE_PAREN
-       | UNIQUE select_with_parens
        | a_expr IS DOCUMENT_P
        | a_expr IS NOT DOCUMENT_P
        | a_expr IS NORMALIZED
        | a_expr IS unicode_normal_form NORMALIZED
        | a_expr IS NOT NORMALIZED
        | a_expr IS NOT unicode_normal_form NORMALIZED
+
+       //NOT	right	logical negation
+       | NOT a_expr
+       | not_la a_expr
+
+        //AND	left	logical conjunction
+       | a_expr AND a_expr
+
+        //OR	left	logical disjunction
+       | a_expr OR a_expr
+
+       | a_expr LESS_LESS a_expr
+       | a_expr GREATER_GREATER a_expr
+
+       | a_expr qual_op
+       | a_expr IN_P in_expr
+       | a_expr not_la IN_P in_expr
+       | a_expr subquery_Op sub_type select_with_parens
+       | a_expr subquery_Op sub_type OPEN_PAREN a_expr CLOSE_PAREN
+       | UNIQUE select_with_parens
        | DEFAULT
+
 ;
 //todo: placeholder for NOT_LA;
 not_la: NOT;
@@ -2832,28 +2853,36 @@ not_la: NOT;
  b_expr: c_expr
        | b_expr TYPECAST typename
 
+        //right	unary plus, unary minus
        | PLUS b_expr
        | MINUS b_expr
 
+        //^	left	exponentiation
+       | b_expr CARET b_expr
+
+        //* / %	left	multiplication, division, modulo
        | b_expr STAR b_expr
        | b_expr SLASH b_expr
        | b_expr PERCENT b_expr
-       | b_expr CARET b_expr
 
-
+        //+ -	left	addition, subtraction
        | b_expr PLUS b_expr
        | b_expr MINUS b_expr
+       //(any other operator)	left	all other native and user-defined operators
+       | b_expr qual_op b_expr
 
-
+        //< > = <= >= <>	 	comparison operators
        | b_expr LT b_expr
        | b_expr GT b_expr
        | b_expr EQUAL b_expr
        | b_expr LESS_EQUALS b_expr
        | b_expr GREATER_EQUALS b_expr
        | b_expr NOT_EQUALS b_expr
-       | b_expr qual_op b_expr
+
        | qual_op b_expr
        | b_expr qual_op
+
+       //S ISNULL NOTNULL	 	IS TRUE, IS FALSE, IS NULL, IS DISTINCT FROM, etc
        | b_expr IS DISTINCT FROM b_expr
        | b_expr IS NOT DISTINCT FROM b_expr
        | b_expr IS OF OPEN_PAREN type_list CLOSE_PAREN
