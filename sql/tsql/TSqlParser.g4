@@ -88,6 +88,7 @@ ddl_clause
     | alter_external_resource_pool
     | alter_fulltext_catalog
     | alter_fulltext_stoplist
+    | alter_index
     | alter_login_azure_sql
     | alter_login_azure_sql_dw_and_pdw
     | alter_login_sql_server
@@ -1922,6 +1923,10 @@ create_index
     (index_options)?
     (ON id_)?
     ';'?
+    ;
+    
+alter_index
+    : ALTER INDEX id_ ON table_name (DISABLE | PAUSE | ABORT)
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
