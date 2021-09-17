@@ -2013,28 +2013,27 @@ create_or_alter_function
 func_body_returns_select
     : RETURNS TABLE
         (WITH function_option (',' function_option)*)?
-        AS?
-        RETURN ('(' select_statement_standalone ')' | select_statement_standalone)
+        AS? (as_external_name | RETURN ('(' select_statement_standalone ')' | select_statement_standalone))
     ;
 
 func_body_returns_table
     : RETURNS LOCAL_ID table_type_definition
         (WITH function_option (',' function_option)*)?
-        AS?
+        AS? (as_external_name | 
         BEGIN
            sql_clauses*
            RETURN ';'?
-        END ';'?
+        END ';'?)
     ;
 
 func_body_returns_scalar
     : RETURNS data_type
         (WITH function_option (',' function_option)*)?
-        AS?
+        AS? (as_external_name | 
         BEGIN
            sql_clauses*
            RETURN ret=expression ';'?
-       END
+       END)
     ;
 
 procedure_param
