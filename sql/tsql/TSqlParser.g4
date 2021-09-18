@@ -3526,7 +3526,7 @@ bulk_option
 
 derived_table
     : subquery
-    | '(' subquery ')'
+    | '(' subquery (UNION ALL subquery)* ')' 
     | table_value_constructor
     | '(' table_value_constructor ')'
     ;
