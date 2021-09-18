@@ -2102,7 +2102,7 @@ alter_table
                              | WITH (CHECK | NOCHECK) ADD (CONSTRAINT constraint=id_)?
                                 ( FOREIGN KEY '(' fk=column_name_list ')' REFERENCES table_name ('(' pk=column_name_list')')? (on_delete | on_update)*
                                 | CHECK '(' search_condition ')' )
-                             | CHECK CONSTRAINT constraint=id_
+                             | (NOCHECK | CHECK) CONSTRAINT constraint=id_
                              | (ENABLE | DISABLE) TRIGGER id_?
                              | REBUILD table_options
                              | SWITCH switch_partition)
