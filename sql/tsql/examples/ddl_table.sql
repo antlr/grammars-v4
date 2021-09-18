@@ -131,6 +131,9 @@ GO
 ALTER TABLE [dbo].[TestTable]  WITH CHECK ADD  CONSTRAINT [constraintName] CHECK  ([StartDate] < [EndDate])
 GO
 
+ALTER TABLE [dbo].[TestTable] NOCHECK CONSTRAINT [constraintName]
+GO
+
 -- Alter Table Switch Partition
 ALTER TABLE Source SWITCH PARTITION 1 TO Target PARTITION 1
 GO
