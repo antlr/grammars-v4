@@ -2712,7 +2712,7 @@ execute_parameter
 
 execute_var_string
     : LOCAL_ID (OUTPUT | OUT)?
-    | STRING
+    | STRING ('+' LOCAL_ID ('+' execute_var_string)?)?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ff848791.aspx
