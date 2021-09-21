@@ -2699,15 +2699,12 @@ alias_clause: AS colid OPEN_PAREN name_list CLOSE_PAREN
 
  bitwithoutlength: BIT opt_varying;
 
-character: characterWithLength
-          | characterWithoutLength
+ character: character_c (OPEN_PAREN iconst CLOSE_PAREN)?
 ;
- constcharacter: characterWithLength
-               | characterWithoutLength
-;
- characterWithLength: character_c OPEN_PAREN iconst CLOSE_PAREN;
 
- characterWithoutLength: character_c;
+ constcharacter: character_c (OPEN_PAREN iconst CLOSE_PAREN)?
+;
+
 
  character_c: CHARACTER opt_varying
           | CHAR_P opt_varying
@@ -2890,14 +2887,19 @@ not_la: NOT;
 ;
 plsqlvariablename:PLSQLVARIABLENAME
 ;
- func_application: func_name OPEN_PAREN CLOSE_PAREN
-                 | func_name OPEN_PAREN func_arg_list opt_sort_clause CLOSE_PAREN
-                 | func_name OPEN_PAREN VARIADIC func_arg_expr opt_sort_clause CLOSE_PAREN
-                 | func_name OPEN_PAREN func_arg_list COMMA VARIADIC func_arg_expr opt_sort_clause CLOSE_PAREN
-                 | func_name OPEN_PAREN ALL func_arg_list opt_sort_clause CLOSE_PAREN
-                 | func_name OPEN_PAREN DISTINCT func_arg_list opt_sort_clause CLOSE_PAREN
-                 | func_name OPEN_PAREN STAR CLOSE_PAREN
+
+ func_application: func_name
+                    OPEN_PAREN
+                        (
+                              func_arg_list (COMMA VARIADIC func_arg_expr)? opt_sort_clause
+                             |VARIADIC func_arg_expr opt_sort_clause
+                             |(ALL|DISTINCT) func_arg_list opt_sort_clause
+                             |STAR
+                             |
+                         )
+                    CLOSE_PAREN
 ;
+
  func_expr: func_application within_group_clause filter_clause over_clause
           | func_expr_common_subexpr
 ;
@@ -3069,8 +3071,7 @@ plsqlvariablename:PLSQLVARIABLENAME
             | ILIKE
             | NOT ILIKE
 ;
- expr_list: a_expr
-          | expr_list COMMA a_expr
+ expr_list: a_expr (COMMA a_expr)*
 ;
  func_arg_list: func_arg_expr
               | func_arg_list COMMA func_arg_expr
