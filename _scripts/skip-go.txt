@@ -70,6 +70,7 @@ smtlibv2
 sparql
 sql/hive
 sql/plsql
+sql/postgresql
 stringtemplate
 swift-fin
 swift/swift2
