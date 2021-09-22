@@ -2776,42 +2776,25 @@ opt_escape:
        | qual_op a_expr
 
         //range containment, set membership, string matching BETWEEN IN LIKE ILIKE SIMILAR
-       | a_expr LIKE a_expr opt_escape
-       | a_expr not_la LIKE a_expr opt_escape
-       | a_expr ILIKE a_expr opt_escape
-       | a_expr not_la ILIKE a_expr opt_escape
-       | a_expr SIMILAR TO a_expr opt_escape
-       | a_expr not_la SIMILAR TO a_expr opt_escape
-       | a_expr BETWEEN opt_asymmetric b_expr AND a_expr
-       | a_expr not_la BETWEEN opt_asymmetric b_expr AND a_expr
-       | a_expr BETWEEN SYMMETRIC b_expr AND a_expr
-       | a_expr not_la BETWEEN SYMMETRIC b_expr AND a_expr
-
+       | a_expr not_la? (LIKE|ILIKE|SIMILAR TO|(BETWEEN SYMMETRIC?)) a_expr opt_escape
         //< > = <= >= <>	 	comparison operators
        | a_expr (LT | GT | EQUAL | LESS_EQUALS | GREATER_EQUALS | NOT_EQUALS) a_expr
-
        //IS ISNULL NOTNULL	 	IS TRUE, IS FALSE, IS NULL, IS DISTINCT FROM, etc
-       | a_expr IS NULL_P
+       | a_expr IS NOT?
+            (
+                NULL_P
+                |TRUE_P
+                |FALSE_P
+                |UNKNOWN
+                |DISTINCT FROM a_expr
+                |OF OPEN_PAREN type_list CLOSE_PAREN
+                |DOCUMENT_P
+                |unicode_normal_form? NORMALIZED
+            )
+
        | a_expr ISNULL
-       | a_expr IS NOT NULL_P
        | a_expr NOTNULL
        | row OVERLAPS row
-       | a_expr IS TRUE_P
-       | a_expr IS NOT TRUE_P
-       | a_expr IS FALSE_P
-       | a_expr IS NOT FALSE_P
-       | a_expr IS UNKNOWN
-       | a_expr IS NOT UNKNOWN
-       | a_expr IS DISTINCT FROM a_expr
-       | a_expr IS NOT DISTINCT FROM a_expr
-       | a_expr IS OF OPEN_PAREN type_list CLOSE_PAREN
-       | a_expr IS NOT OF OPEN_PAREN type_list CLOSE_PAREN
-       | a_expr IS DOCUMENT_P
-       | a_expr IS NOT DOCUMENT_P
-       | a_expr IS NORMALIZED
-       | a_expr IS unicode_normal_form NORMALIZED
-       | a_expr IS NOT NORMALIZED
-       | a_expr IS NOT unicode_normal_form NORMALIZED
 
        //NOT	right	logical negation
        | NOT a_expr
@@ -2827,10 +2810,8 @@ opt_escape:
        | a_expr GREATER_GREATER a_expr
 
        | a_expr qual_op
-       | a_expr IN_P in_expr
-       | a_expr not_la IN_P in_expr
-       | a_expr subquery_Op sub_type select_with_parens
-       | a_expr subquery_Op sub_type OPEN_PAREN a_expr CLOSE_PAREN
+       | a_expr not_la? IN_P in_expr
+       | a_expr subquery_Op sub_type (select_with_parens|OPEN_PAREN a_expr CLOSE_PAREN)
        | UNIQUE select_with_parens
        | DEFAULT
 
