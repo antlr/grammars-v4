@@ -2910,16 +2910,13 @@ plsqlvariablename:PLSQLVARIABLENAME
  func_expr_windowless: func_application
                      | func_expr_common_subexpr
 ;
+
  func_expr_common_subexpr: COLLATION FOR OPEN_PAREN a_expr CLOSE_PAREN
                          | CURRENT_DATE
-                         | CURRENT_TIME
-                         | CURRENT_TIME OPEN_PAREN iconst CLOSE_PAREN
-                         | CURRENT_TIMESTAMP
-                         | CURRENT_TIMESTAMP OPEN_PAREN iconst CLOSE_PAREN
-                         | LOCALTIME
-                         | LOCALTIME OPEN_PAREN iconst CLOSE_PAREN
-                         | LOCALTIMESTAMP
-                         | LOCALTIMESTAMP OPEN_PAREN iconst CLOSE_PAREN
+                         | CURRENT_TIME (OPEN_PAREN iconst CLOSE_PAREN)?
+                         | CURRENT_TIMESTAMP (OPEN_PAREN iconst CLOSE_PAREN)?
+                         | LOCALTIME (OPEN_PAREN iconst CLOSE_PAREN)?
+                         | LOCALTIMESTAMP (OPEN_PAREN iconst CLOSE_PAREN)?
                          | CURRENT_ROLE
                          | CURRENT_USER
                          | SESSION_USER
@@ -2928,33 +2925,26 @@ plsqlvariablename:PLSQLVARIABLENAME
                          | CURRENT_SCHEMA
                          | CAST OPEN_PAREN a_expr AS typename CLOSE_PAREN
                          | EXTRACT OPEN_PAREN extract_list CLOSE_PAREN
-                         | NORMALIZE OPEN_PAREN a_expr CLOSE_PAREN
-                         | NORMALIZE OPEN_PAREN a_expr COMMA unicode_normal_form CLOSE_PAREN
+                         | NORMALIZE OPEN_PAREN a_expr (COMMA unicode_normal_form)? CLOSE_PAREN
                          | OVERLAY OPEN_PAREN overlay_list CLOSE_PAREN
                          | POSITION OPEN_PAREN position_list CLOSE_PAREN
                          | SUBSTRING OPEN_PAREN substr_list CLOSE_PAREN
                          | TREAT OPEN_PAREN a_expr AS typename CLOSE_PAREN
-                         | TRIM OPEN_PAREN BOTH trim_list CLOSE_PAREN
-                         | TRIM OPEN_PAREN LEADING trim_list CLOSE_PAREN
-                         | TRIM OPEN_PAREN TRAILING trim_list CLOSE_PAREN
-                         | TRIM OPEN_PAREN trim_list CLOSE_PAREN
+                         | TRIM OPEN_PAREN (BOTH|LEADING|TRAILING)? trim_list CLOSE_PAREN
                          | NULLIF OPEN_PAREN a_expr COMMA a_expr CLOSE_PAREN
                          | COALESCE OPEN_PAREN expr_list CLOSE_PAREN
                          | GREATEST OPEN_PAREN expr_list CLOSE_PAREN
                          | LEAST OPEN_PAREN expr_list CLOSE_PAREN
                          | XMLCONCAT OPEN_PAREN expr_list CLOSE_PAREN
-                         | XMLELEMENT OPEN_PAREN NAME_P collabel CLOSE_PAREN
-                         | XMLELEMENT OPEN_PAREN NAME_P collabel COMMA xml_attributes CLOSE_PAREN
-                         | XMLELEMENT OPEN_PAREN NAME_P collabel COMMA expr_list CLOSE_PAREN
-                         | XMLELEMENT OPEN_PAREN NAME_P collabel COMMA xml_attributes COMMA expr_list CLOSE_PAREN
+                         | XMLELEMENT OPEN_PAREN NAME_P collabel (COMMA (xml_attributes | expr_list))? CLOSE_PAREN
                          | XMLEXISTS OPEN_PAREN c_expr xmlexists_argument CLOSE_PAREN
                          | XMLFOREST OPEN_PAREN xml_attribute_list CLOSE_PAREN
                          | XMLPARSE OPEN_PAREN document_or_content a_expr xml_whitespace_option CLOSE_PAREN
-                         | XMLPI OPEN_PAREN NAME_P collabel CLOSE_PAREN
-                         | XMLPI OPEN_PAREN NAME_P collabel COMMA a_expr CLOSE_PAREN
+                         | XMLPI OPEN_PAREN NAME_P collabel (COMMA a_expr)? CLOSE_PAREN
                          | XMLROOT OPEN_PAREN XML_P a_expr COMMA xml_root_version opt_xml_root_standalone CLOSE_PAREN
                          | XMLSERIALIZE OPEN_PAREN document_or_content a_expr AS simpletypename CLOSE_PAREN
 ;
+
  xml_root_version: VERSION_P a_expr
                  | VERSION_P NO VALUE_P
 ;
