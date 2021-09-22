@@ -2289,14 +2289,16 @@ opt_or_replace: OR REPLACE
                    | OPEN_PAREN select_with_parens CLOSE_PAREN
 ;
 
- select_no_parens: simple_select
-                 | select_clause sort_clause
-                 | select_clause opt_sort_clause for_locking_clause opt_select_limit
-                 | select_clause opt_sort_clause select_limit opt_for_locking_clause
-                 | with_clause select_clause
-                 | with_clause select_clause sort_clause
-                 | with_clause select_clause opt_sort_clause for_locking_clause opt_select_limit
-                 | with_clause select_clause opt_sort_clause select_limit opt_for_locking_clause
+ select_no_parens:select_clause opt_sort_clause
+                            (for_locking_clause opt_select_limit
+                            |
+                            select_limit opt_for_locking_clause
+                            )?
+                  |with_clause select_clause opt_sort_clause
+                             (for_locking_clause opt_select_limit
+                             |
+                             select_limit opt_for_locking_clause
+                             )?
 ;
 
  select_clause: simple_select
@@ -2642,17 +2644,19 @@ alias_clause: AS colid OPEN_PAREN name_list CLOSE_PAREN
  xml_namespace_el: b_expr AS collabel
                  | DEFAULT b_expr
 ;
- typename: simpletypename opt_array_bounds
-         | SETOF simpletypename opt_array_bounds
-         | simpletypename ARRAY OPEN_BRACKET iconst CLOSE_BRACKET
-         | SETOF simpletypename ARRAY OPEN_BRACKET iconst CLOSE_BRACKET
-         | simpletypename ARRAY
-         | SETOF simpletypename ARRAY
-         | qualified_name PERCENT ROWTYPE
-         | qualified_name PERCENT TYPE_P
+ typename: simpletypename
+                    (
+                       opt_array_bounds
+                       |(ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?)
+                    )
+         | SETOF simpletypename
+                    (
+                        opt_array_bounds
+                        |(ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?)
+                    )
+         | qualified_name PERCENT (ROWTYPE|TYPE_P)
 ;
- opt_array_bounds: opt_array_bounds OPEN_BRACKET CLOSE_BRACKET
-                 | opt_array_bounds OPEN_BRACKET iconst CLOSE_BRACKET
+ opt_array_bounds: opt_array_bounds OPEN_BRACKET iconst? CLOSE_BRACKET
                  |
 ;
  simpletypename: generictype
