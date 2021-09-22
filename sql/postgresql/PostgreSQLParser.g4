@@ -2710,12 +2710,9 @@ alias_clause: AS colid OPEN_PAREN name_list CLOSE_PAREN
 ;
 
 
- character_c: CHARACTER opt_varying
-          | CHAR_P opt_varying
+ character_c: (CHARACTER|CHAR_P|NCHAR) opt_varying
           | VARCHAR
-          | NATIONAL CHARACTER opt_varying
-          | NATIONAL CHAR_P opt_varying
-          | NCHAR opt_varying
+          | NATIONAL (CHARACTER|CHAR_P) opt_varying
 ;
  opt_varying: VARYING
             |
