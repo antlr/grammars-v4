@@ -576,3 +576,6 @@ GO
 
 exec('selectSELECT * FROM ' + @SCHEMA + '.' + @TABLE + ' where ID = ' + @ID)
 GO
+
+EXEC(@sql + @where)
+GO

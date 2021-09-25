@@ -2710,7 +2710,7 @@ execute_parameter
     ;
 
 execute_var_string
-    : LOCAL_ID (OUTPUT | OUT)?
+    : LOCAL_ID (OUTPUT | OUT)? ('+' LOCAL_ID ('+' execute_var_string)?)?
     | STRING ('+' LOCAL_ID ('+' execute_var_string)?)?
     ;
 
