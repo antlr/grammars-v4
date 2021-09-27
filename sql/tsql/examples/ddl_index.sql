@@ -38,3 +38,6 @@ GO
 ALTER INDEX [indexname] ON [schema].[tableName] DISABLE
 GO
 
+ALTER INDEX [indexName] ON [dbo].[tbl] REBUILD PARTITION = ALL
+GO
+

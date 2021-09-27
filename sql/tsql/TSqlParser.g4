@@ -1926,7 +1926,11 @@ create_index
     ;
     
 alter_index
-    : ALTER INDEX id_ ON table_name (DISABLE | PAUSE | ABORT)
+    : ALTER INDEX id_ ON table_name (DISABLE | PAUSE | ABORT | rebuild_partition)
+    ;
+
+rebuild_partition
+    : REBUILD (PARTITION '=' ALL)? index_options?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
