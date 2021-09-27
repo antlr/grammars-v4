@@ -3255,7 +3255,7 @@ predicate
 
 query_expression
     : (query_specification | '(' query_expression ')' (UNION ALL? query_expression)? )
-    |  query_specification order_by_clause? (unions+=sql_union)* //if using top, order by can be on the "top" side of union :/
+    |  query_specification order_by_clause? unions+=sql_union* //if using top, order by can be on the "top" side of union :/
     ;
 
 sql_union
