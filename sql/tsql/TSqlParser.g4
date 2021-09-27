@@ -1926,7 +1926,7 @@ create_index
     ;
     
 alter_index
-    : ALTER INDEX id_ ON table_name (DISABLE | PAUSE | ABORT | rebuild_partition )
+    : ALTER INDEX id_ ON table_name (DISABLE | PAUSE | ABORT | rebuild_partition)
     ;
 
 rebuild_partition
