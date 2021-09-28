@@ -30,6 +30,27 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>com.khubla.antlr</groupId>
+				<artifactId>antlr4test-maven-plugin</artifactId>
+				<version>${antlr4test-maven-plugin.version}</version>
+				<configuration>
+					<verbose>false</verbose>
+					<showTree>false</showTree>
+					<entryPoint>root</entryPoint>
+					<grammarName>PostgreSQL</grammarName>
+					<packageName></packageName>
+					<caseInsensitiveType>None</caseInsensitiveType>
+					<exampleFiles>examples</exampleFiles>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>

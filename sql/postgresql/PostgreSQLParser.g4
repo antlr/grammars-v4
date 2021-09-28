@@ -146,11 +146,8 @@ stmtblock:
 	;
 
 stmtmulti:
-	(stmt (
-		SEMI
-		| plsqlconsolecommand
-	))+
-	;
+	(stmt  SEMI?)*
+;
 stmt:
 	altereventtrigstmt
 	| altercollationstmt
@@ -275,9 +272,7 @@ stmt:
 	| variablesetstmt
 	| variableshowstmt
 	| viewstmt
-	| plsqlconsolecommand
-	//| pl_block
-	|
+    | plsqlconsolecommand
 	;
 
 plsqlconsolecommand:MetaCommand EndMetaCommand?
@@ -3929,7 +3924,7 @@ stmt_foreach_a: opt_loop_label FOREACH for_variable foreach_slice IN_P ARRAY a_e
 foreach_slice:
              | SLICE iconst
 ;
-stmt_exit: exit_type opt_label opt_exitcond
+stmt_exit: exit_type opt_label opt_exitcond SEMI
 ;
 exit_type: EXIT
          | CONTINUE_P
@@ -4035,7 +4030,7 @@ opt_execute_into:
 //OPEN bound_cursorvar [ ( [ argument_name := ] argument_value [, ...] ) ];
 
 stmt_open:
-        OPEN colid
+        OPEN colid SEMI
         |OPEN cursor_variable opt_scroll_option FOR selectstmt SEMI
         |OPEN cursor_variable opt_scroll_option FOR EXECUTE sql_expression opt_open_using SEMI
         |OPEN colid OPEN_PAREN opt_open_bound_list CLOSE_PAREN  SEMI
@@ -4152,8 +4147,8 @@ opt_loop_label:
 opt_label:
          | any_identifier
 ;
-opt_exitcond: SEMI
-            | WHEN expr_until_semi
+opt_exitcond: WHEN expr_until_semi
+            |
 ;
 any_identifier: colid
               | plsql_unreserved_keyword
