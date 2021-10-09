@@ -351,7 +351,7 @@ another_statement
     | shutdown_statement
     | checkpoint_statement
     ;
-    
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
 alter_application_role
     : ALTER APPLICATION ROLE appliction_role=id_ WITH  (COMMA? NAME EQUAL new_application_role_name=id_)? (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id_)?
@@ -1924,7 +1924,7 @@ create_index
     (ON id_)?
     ';'?
     ;
-    
+
 alter_index
     : ALTER INDEX id_ ON table_name (DISABLE | PAUSE | ABORT | rebuild_partition)
     ;
@@ -1935,12 +1935,12 @@ rebuild_partition
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
 create_columnstore_index
-    : CREATE (CLUSTERED | NONCLUSTERED?) COLUMNSTORE INDEX id_ ON table_name  
-    index_options?  
-    (ON id_)? 
+    : CREATE (CLUSTERED | NONCLUSTERED?) COLUMNSTORE INDEX id_ ON table_name
+    index_options?
+    (ON id_)?
     ';'?
     ;
-  
+
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
 create_nonclustered_columnstore_index
     : CREATE NONCLUSTERED? COLUMNSTORE INDEX id_ ON table_name '(' column_name_list_with_order ')'
@@ -1948,7 +1948,7 @@ create_nonclustered_columnstore_index
     index_options?
     (ON id_)?
     ';'?
-    ;   
+    ;
 
 create_xml_index
     : CREATE PRIMARY? XML INDEX id_ ON table_name '(' id_ ')'
@@ -2023,7 +2023,7 @@ func_body_returns_select
 func_body_returns_table
     : RETURNS LOCAL_ID table_type_definition
         (WITH function_option (',' function_option)*)?
-        AS? (as_external_name | 
+        AS? (as_external_name |
         BEGIN
            sql_clauses*
            RETURN ';'?
@@ -2033,7 +2033,7 @@ func_body_returns_table
 func_body_returns_scalar
     : RETURNS data_type
         (WITH function_option (',' function_option)*)?
-        AS? (as_external_name | 
+        AS? (as_external_name |
         BEGIN
            sql_clauses*
            RETURN ret=expression ';'?
@@ -2980,7 +2980,7 @@ reconfigure_statement
 shutdown_statement
     : SHUTDOWN (WITH NOWAIT)?
     ;
-    
+
 checkpoint_statement
     : CHECKPOINT (checkPointDuration=DECIMAL)?
     ;
@@ -3127,30 +3127,30 @@ set_special
     | SET special_list (',' special_list)* on_off
     | SET modify_method
     ;
-    
+
 special_list
-    : ANSI_NULLS 
-    | QUOTED_IDENTIFIER 
-    | ANSI_PADDING 
-    | ANSI_WARNINGS 
-    | ANSI_DEFAULTS 
-    | ANSI_NULL_DFLT_OFF 
-    | ANSI_NULL_DFLT_ON 
-    | ARITHABORT 
-    | ARITHIGNORE 
-    | CONCAT_NULL_YIELDS_NULL 
-    | CURSOR_CLOSE_ON_COMMIT 
-    | FMTONLY 
-    | FORCEPLAN 
-    | IMPLICIT_TRANSACTIONS 
-    | NOCOUNT 
-    | NOEXEol 
-    | NUMERIC_ROUNDABORT 
-    | PARSEONLY 
-    | REMOTE_PROC_TRANSACTIONS 
-    | SHOWPLAN_ALL 
-    | SHOWPLAN_TEXT 
-    | SHOWPLAN_XML 
+    : ANSI_NULLS
+    | QUOTED_IDENTIFIER
+    | ANSI_PADDING
+    | ANSI_WARNINGS
+    | ANSI_DEFAULTS
+    | ANSI_NULL_DFLT_OFF
+    | ANSI_NULL_DFLT_ON
+    | ARITHABORT
+    | ARITHIGNORE
+    | CONCAT_NULL_YIELDS_NULL
+    | CURSOR_CLOSE_ON_COMMIT
+    | FMTONLY
+    | FORCEPLAN
+    | IMPLICIT_TRANSACTIONS
+    | NOCOUNT
+    | NOEXEol
+    | NUMERIC_ROUNDABORT
+    | PARSEONLY
+    | REMOTE_PROC_TRANSACTIONS
+    | SHOWPLAN_ALL
+    | SHOWPLAN_TEXT
+    | SHOWPLAN_XML
     | XACT_ABORT
     ;
 
@@ -3529,7 +3529,7 @@ bulk_option
 
 derived_table
     : subquery
-    | '(' subquery (UNION ALL subquery)* ')' 
+    | '(' subquery (UNION ALL subquery)* ')'
     | table_value_constructor
     | '(' table_value_constructor ')'
     ;
@@ -3839,7 +3839,7 @@ entity_name_for_parallel_dw
     ;
 
 full_table_name
-    : (linkedServer=id_ '.' '.' schema=id_   '.'    
+    : (linkedServer=id_ '.' '.' schema=id_   '.'
     |                       server=id_    '.' database=id_ '.'  schema=id_   '.'
     |                                         database=id_ '.' (schema=id_)? '.'
     |                                                           schema=id_    '.')? table=id_
@@ -4016,6 +4016,7 @@ keyword
     | ACTION
     | ACTIVATION
     | ACTIVE
+    | ADD
     | ADDRESS
     | AES_128
     | AES_192
