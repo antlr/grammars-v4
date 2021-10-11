@@ -2301,9 +2301,13 @@ opt_or_replace: OR REPLACE
 
 ;
 simple_select:
-	  SELECT  opt_all_clause into_clause/*??? unable to find in doc syntax like select  into sysrec * from system where name = new.sysname; - got from plpgsql.sql test script*/
-	            opt_target_list into_clause from_clause where_clause group_clause  having_clause window_clause # simple_select_select
-	| SELECT  distinct_clause target_list     into_clause from_clause where_clause group_clause  having_clause window_clause # simple_select_select
+    /*??? unable to find in doc syntax like select  into sysrec * from system where name = new.sysname; - got from plpgsql.sql test script*/
+	  SELECT
+	        (
+	            opt_all_clause  into_clause  opt_target_list
+	            |distinct_clause target_list
+	        )
+	        into_clause from_clause where_clause group_clause  having_clause window_clause # simple_select_select
 	| values_clause # simple_select_values
 	| TABLE relation_expr # simple_select_table
 	/*this replacement solves mutual left-recursive problem betwee simple_select and select_clause */
@@ -2504,31 +2508,34 @@ joined_table:
 	;
 */
 
- table_ref: relation_expr opt_alias_clause # table_ref_simple
-          | relation_expr opt_alias_clause tablesample_clause # table_ref_simple
+ table_ref:
+           relation_expr opt_alias_clause tablesample_clause? # table_ref_simple
           | func_table func_alias_clause # table_ref_simple
-          | LATERAL_P func_table func_alias_clause # table_ref_simple
           | xmltable opt_alias_clause # table_ref_simple
-          | LATERAL_P xmltable opt_alias_clause # table_ref_simple
           | select_with_parens opt_alias_clause # table_ref_simple
-          | LATERAL_P select_with_parens opt_alias_clause # table_ref_simple
+          | LATERAL_P
+                (
+                    xmltable opt_alias_clause
+                    |func_table func_alias_clause
+                    |select_with_parens opt_alias_clause
+                )# table_ref_simple
 //todo: joined_table was inlined to (partially) solve left-recursion problem;
 //          | joined_table
-          | table_ref CROSS JOIN table_ref # table_ref_joined_tables
-          | table_ref join_type JOIN table_ref join_qual # table_ref_joined_tables
-          | table_ref JOIN table_ref join_qual # table_ref_joined_tables
-          | table_ref NATURAL join_type JOIN table_ref # table_ref_joined_tables
-          | table_ref NATURAL JOIN table_ref # table_ref_joined_tables
-          | OPEN_PAREN table_ref CLOSE_PAREN opt_alias_clause  # table_ref_simple
+
+          | table_ref
+                    (
+                         CROSS              JOIN table_ref
+                        |NATURAL join_type? JOIN table_ref
+                        |        join_type? JOIN table_ref join_qual
+                    )   # table_ref_joined_tables
+
           | OPEN_PAREN
-                (
-                        //table_ref
-                          table_ref CROSS JOIN table_ref
-                        | table_ref join_type JOIN table_ref join_qual
-                        | table_ref JOIN table_ref join_qual
-                        | table_ref NATURAL join_type JOIN table_ref
-                        | table_ref NATURAL JOIN table_ref
-                )
+                    table_ref
+                    (
+                         CROSS              JOIN table_ref
+                        |NATURAL join_type? JOIN table_ref
+                        |        join_type? JOIN table_ref join_qual
+                    )?
           CLOSE_PAREN opt_alias_clause # table_ref_joined_tables
 ;
 
@@ -2557,14 +2564,9 @@ alias_clause: AS colid OPEN_PAREN name_list CLOSE_PAREN
                   | colid OPEN_PAREN tablefuncelementlist CLOSE_PAREN
                   |
 ;
- join_type: FULL join_outer
-          | LEFT join_outer
-          | RIGHT join_outer
-          | INNER_P
+ join_type: (FULL|LEFT|RIGHT|INNER_P) OUTER_P?
 ;
- join_outer: OUTER_P
-           |
-;
+
  join_qual: USING OPEN_PAREN name_list CLOSE_PAREN
           | ON a_expr
 ;
@@ -2787,8 +2789,7 @@ opt_escape:
                 |unicode_normal_form? NORMALIZED
             )
 
-       | a_expr ISNULL
-       | a_expr NOTNULL
+       | a_expr (ISNULL|NOTNULL)
        | row OVERLAPS row
 
        //NOT	right	logical negation
@@ -2801,8 +2802,7 @@ opt_escape:
         //OR	left	logical disjunction
        | a_expr OR a_expr
 
-       | a_expr LESS_LESS a_expr
-       | a_expr GREATER_GREATER a_expr
+       | a_expr (LESS_LESS|GREATER_GREATER) a_expr
 
        | a_expr qual_op
        | a_expr not_la? IN_P in_expr
@@ -3123,9 +3123,7 @@ plsqlvariablename:PLSQLVARIABLENAME
  opt_indirection:
                 | opt_indirection indirection_el
 ;
- opt_asymmetric: ASYMMETRIC
-               |
-;
+
  opt_target_list: target_list
                 |
 ;
@@ -4047,10 +4045,6 @@ opt_open_bound_list:
 
 opt_open_using:
             |USING expr_list
-;
-sql_expression_list:
-    sql_expression
-    (COMMA sql_expression)*
 ;
 
 opt_scroll_option:
