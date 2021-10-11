@@ -2773,7 +2773,7 @@ opt_escape:
        | qual_op a_expr
 
         //range containment, set membership, string matching BETWEEN IN LIKE ILIKE SIMILAR
-       | a_expr not_la? (LIKE|ILIKE|SIMILAR TO|(BETWEEN SYMMETRIC?)) a_expr opt_escape
+       | a_expr NOT? (LIKE|ILIKE|SIMILAR TO|(BETWEEN SYMMETRIC?)) a_expr opt_escape
         //< > = <= >= <>	 	comparison operators
        | a_expr (LT | GT | EQUAL | LESS_EQUALS | GREATER_EQUALS | NOT_EQUALS) a_expr
        //IS ISNULL NOTNULL	 	IS TRUE, IS FALSE, IS NULL, IS DISTINCT FROM, etc
@@ -2794,7 +2794,6 @@ opt_escape:
 
        //NOT	right	logical negation
        | NOT a_expr
-       | not_la a_expr
 
         //AND	left	logical conjunction
        | a_expr AND a_expr
@@ -2805,14 +2804,12 @@ opt_escape:
        | a_expr (LESS_LESS|GREATER_GREATER) a_expr
 
        | a_expr qual_op
-       | a_expr not_la? IN_P in_expr
+       | a_expr NOT? IN_P in_expr
        | a_expr subquery_Op sub_type (select_with_parens|OPEN_PAREN a_expr CLOSE_PAREN)
        | UNIQUE select_with_parens
        | DEFAULT
 
 ;
-//todo: placeholder for NOT_LA;
-not_la: NOT;
 
  b_expr: c_expr
        | b_expr TYPECAST typename
