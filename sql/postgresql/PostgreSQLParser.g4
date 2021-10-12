@@ -2617,8 +2617,10 @@ alias_clause: AS colid OPEN_PAREN name_list CLOSE_PAREN
 ;
  tablefuncelement: colid typename opt_collate_clause;
 
- xmltable: XMLTABLE OPEN_PAREN c_expr xmlexists_argument COLUMNS xmltable_column_list CLOSE_PAREN
-         | XMLTABLE OPEN_PAREN XMLNAMESPACES OPEN_PAREN xml_namespace_list CLOSE_PAREN COMMA c_expr xmlexists_argument COLUMNS xmltable_column_list CLOSE_PAREN
+ xmltable: XMLTABLE OPEN_PAREN
+                        c_expr xmlexists_argument COLUMNS xmltable_column_list
+                        | XMLNAMESPACES OPEN_PAREN xml_namespace_list CLOSE_PAREN COMMA c_expr xmlexists_argument COLUMNS xmltable_column_list
+                    CLOSE_PAREN
 ;
  xmltable_column_list: xmltable_column_el
                      | xmltable_column_list COMMA xmltable_column_el
@@ -3148,8 +3150,7 @@ while v1 allows single item in list
  qualified_name_list: qualified_name
                     | qualified_name_list COMMA qualified_name
 ;
- qualified_name: colid
-               | colid indirection
+ qualified_name: colid indirection?
 ;
  name_list: name
           | name_list COMMA name
