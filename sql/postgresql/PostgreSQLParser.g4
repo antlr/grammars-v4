@@ -3115,8 +3115,7 @@ while v1 allows single item in list
  case_arg: a_expr
          |
 ;
- columnref: colid
-          | colid indirection
+ columnref: colid indirection?
 ;
  indirection_el: DOT (attr_name|STAR)
                | OPEN_BRACKET (a_expr|opt_slice_bound COLON opt_slice_bound) CLOSE_BRACKET
