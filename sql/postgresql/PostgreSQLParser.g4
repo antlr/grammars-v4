@@ -2994,10 +2994,22 @@ plsqlvariablename:PLSQLVARIABLENAME
     | ROW OPEN_PAREN CLOSE_PAREN
     | OPEN_PAREN expr_list COMMA a_expr CLOSE_PAREN
 ;
- explicit_row: ROW OPEN_PAREN expr_list CLOSE_PAREN
-             | ROW OPEN_PAREN CLOSE_PAREN
+
+ explicit_row: ROW OPEN_PAREN expr_list? CLOSE_PAREN
 ;
+
+/*
+TODO:
+for some reason v1
+implicit_row: OPEN_PAREN expr_list COMMA a_expr CLOSE_PAREN;
+works better than v2
+implicit_row: OPEN_PAREN expr_list  CLOSE_PAREN;
+while looks like they are almost the same, except v2 requieres at least 2 items in list
+while v1 allows single item in list
+*/
  implicit_row: OPEN_PAREN expr_list COMMA a_expr CLOSE_PAREN;
+
+
 
  sub_type: ANY
          | SOME
@@ -3106,10 +3118,8 @@ plsqlvariablename:PLSQLVARIABLENAME
  columnref: colid
           | colid indirection
 ;
- indirection_el: DOT attr_name
-               | DOT STAR
-               | OPEN_BRACKET a_expr CLOSE_BRACKET
-               | OPEN_BRACKET opt_slice_bound COLON opt_slice_bound CLOSE_BRACKET
+ indirection_el: DOT (attr_name|STAR)
+               | OPEN_BRACKET (a_expr|opt_slice_bound COLON opt_slice_bound) CLOSE_BRACKET
 ;
  opt_slice_bound: a_expr
                 |
@@ -3159,11 +3169,9 @@ plsqlvariablename:PLSQLVARIABLENAME
            | sconst
            | bconst
            | xconst
-           | func_name sconst
-           | func_name OPEN_PAREN func_arg_list opt_sort_clause CLOSE_PAREN sconst
+           | func_name (sconst|OPEN_PAREN func_arg_list opt_sort_clause CLOSE_PAREN sconst)
            | consttypename sconst
-           | constinterval sconst opt_interval
-           | constinterval OPEN_PAREN iconst CLOSE_PAREN sconst
+           | constinterval (sconst opt_interval|OPEN_PAREN iconst CLOSE_PAREN sconst)
            | TRUE_P
            | FALSE_P
            | NULL_P
