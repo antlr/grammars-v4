@@ -2625,9 +2625,7 @@ alias_clause: AS colid OPEN_PAREN name_list CLOSE_PAREN
  xmltable_column_list: xmltable_column_el
                      | xmltable_column_list COMMA xmltable_column_el
 ;
- xmltable_column_el: colid typename
-                   | colid typename xmltable_column_option_list
-                   | colid FOR ORDINALITY
+ xmltable_column_el: colid (typename xmltable_column_option_list?|FOR ORDINALITY)
 ;
  xmltable_column_option_list: xmltable_column_option_el
                             | xmltable_column_option_list xmltable_column_option_el
@@ -2671,8 +2669,7 @@ alias_clause: AS colid OPEN_PAREN name_list CLOSE_PAREN
               | constcharacter
               | constdatetime
 ;
- generictype: type_function_name opt_type_modifiers
-            | type_function_name attrs opt_type_modifiers
+ generictype: type_function_name attrs? opt_type_modifiers
 ;
  opt_type_modifiers: OPEN_PAREN expr_list CLOSE_PAREN
                    |
