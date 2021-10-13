@@ -2277,6 +2277,15 @@ opt_or_replace: OR REPLACE
          | WITH HOLD
          | WITHOUT HOLD
 ;
+
+/*
+TODO: why select_with_parens alternative is needed at all?
+i guess it because original byson grammar can choose selectstmt(2)->select_with_parens on only OPEN_PARENT/SELECT kewords at the begining of statement;
+(select * from tab);
+parse can go through selectstmt( )->select_no_parens(1)->select_clause(2)->select_with_parens(1)->select_no_parens(1)->select_clause(1)->simple_select
+instead of           selectstmt(1)->select_no_parens(1)->select_clause(2)->select_with_parens(1)->select_no_parens(1)->select_clause(1)->simple_select
+all standard tests passed on both variants
+*/
  selectstmt: select_no_parens
            | select_with_parens
 ;
