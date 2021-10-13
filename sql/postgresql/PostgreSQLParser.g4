@@ -2844,12 +2844,12 @@ opt_escape:
        | b_expr qual_op
 
        //S ISNULL NOTNULL	 	IS TRUE, IS FALSE, IS NULL, IS DISTINCT FROM, etc
-       | b_expr IS DISTINCT FROM b_expr
-       | b_expr IS NOT DISTINCT FROM b_expr
-       | b_expr IS OF OPEN_PAREN type_list CLOSE_PAREN
-       | b_expr IS NOT OF OPEN_PAREN type_list CLOSE_PAREN
-       | b_expr IS DOCUMENT_P
-       | b_expr IS NOT DOCUMENT_P
+       | b_expr IS NOT?
+                (
+                    DISTINCT FROM b_expr
+                    |OF OPEN_PAREN type_list CLOSE_PAREN
+                    |DOCUMENT_P
+                )
 ;
  c_expr: columnref # c_expr_expr
        | aexprconst# c_expr_expr
@@ -3145,12 +3145,10 @@ while v1 allows single item in list
 ;
  target_el: a_expr
                 (
-                    AS collabel //#target_as_label
-                    |identifier //#target_label
+                    AS collabel
+                    |identifier
                     |
-                )#target_label
-//          | a_expr identifier? #target_label
-//          | a_expr             #target_expr
+                ) #target_label
           | STAR                #target_star
 ;
  qualified_name_list: qualified_name
