@@ -295,10 +295,8 @@ alteroptrolelist: alteroptrolelist alteroptroleelem
                 |
                 ;
 
-alteroptroleelem: PASSWORD sconst
-                | PASSWORD NULL_P
-                | ENCRYPTED PASSWORD sconst
-                | UNENCRYPTED PASSWORD sconst
+alteroptroleelem: PASSWORD (sconst|NULL_P)
+                | (ENCRYPTED|UNENCRYPTED) PASSWORD sconst
                 | INHERIT
                 | CONNECTION LIMIT signediconst
                 | VALID UNTIL sconst
@@ -309,29 +307,20 @@ createoptroleelem: alteroptroleelem
                  | SYSID iconst
                  | ADMIN role_list
                  | ROLE role_list
-                 | IN_P ROLE role_list
-                 | IN_P GROUP_P role_list
+                 | IN_P (ROLE|GROUP_P) role_list
 ;
 createuserstmt: CREATE USER roleid opt_with optrolelist;
 
-alterrolestmt: ALTER ROLE rolespec opt_with alteroptrolelist
-             | ALTER USER rolespec opt_with alteroptrolelist
+alterrolestmt: ALTER (ROLE|USER) rolespec opt_with alteroptrolelist
 ;
 opt_in_database:
                | IN_P DATABASE name
 ;
-alterrolesetstmt: ALTER ROLE rolespec opt_in_database setresetclause
-                | ALTER ROLE ALL opt_in_database setresetclause
-                | ALTER USER rolespec opt_in_database setresetclause
-                | ALTER USER ALL opt_in_database setresetclause
+alterrolesetstmt: ALTER (ROLE|USER) ALL? rolespec opt_in_database setresetclause
 ;
-droprolestmt: DROP ROLE role_list
-            | DROP ROLE IF_P EXISTS role_list
-            | DROP USER role_list
-            | DROP USER IF_P EXISTS role_list
-            | DROP GROUP_P role_list
-            | DROP GROUP_P IF_P EXISTS role_list
+droprolestmt: DROP (ROLE|USER|GROUP_P) (IF_P EXISTS)?  role_list
 ;
+
 creategroupstmt: CREATE GROUP_P roleid opt_with optrolelist;
 
 altergroupstmt: ALTER GROUP_P rolespec add_drop USER role_list;
@@ -340,10 +329,7 @@ add_drop: ADD_P
         | DROP
 ;
 
-createschemastmt: CREATE SCHEMA optschemaname AUTHORIZATION rolespec optschemaeltlist
-                | CREATE SCHEMA colid optschemaeltlist
-                | CREATE SCHEMA IF_P NOT EXISTS optschemaname AUTHORIZATION rolespec optschemaeltlist
-                | CREATE SCHEMA IF_P NOT EXISTS colid optschemaeltlist
+createschemastmt: CREATE SCHEMA (IF_P NOT EXISTS)? (optschemaname AUTHORIZATION rolespec|colid) optschemaeltlist
 ;
 optschemaname: colid
              |
@@ -359,9 +345,7 @@ schema_stmt: createstmt
            | grantstmt
            | viewstmt
 ;
-variablesetstmt: SET set_rest
-               | SET LOCAL set_rest
-               | SET SESSION set_rest
+variablesetstmt: SET (LOCAL|SESSION)? set_rest
 ;
 set_rest: TRANSACTION transaction_mode_list
         | SESSION CHARACTERISTICS AS TRANSACTION transaction_mode_list
