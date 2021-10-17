@@ -2560,8 +2560,10 @@ alias_clause: AS colid OPEN_PAREN name_list CLOSE_PAREN
  tablefuncelement: colid typename opt_collate_clause;
 
  xmltable: XMLTABLE OPEN_PAREN
-                        c_expr xmlexists_argument COLUMNS xmltable_column_list
-                        | XMLNAMESPACES OPEN_PAREN xml_namespace_list CLOSE_PAREN COMMA c_expr xmlexists_argument COLUMNS xmltable_column_list
+                        (c_expr xmlexists_argument COLUMNS xmltable_column_list
+                        |
+                        XMLNAMESPACES OPEN_PAREN xml_namespace_list CLOSE_PAREN COMMA c_expr xmlexists_argument COLUMNS xmltable_column_list
+                        )
                     CLOSE_PAREN
 ;
  xmltable_column_list: xmltable_column_el
@@ -2569,11 +2571,11 @@ alias_clause: AS colid OPEN_PAREN name_list CLOSE_PAREN
 ;
  xmltable_column_el: colid (typename xmltable_column_option_list?|FOR ORDINALITY)
 ;
- xmltable_column_option_list: xmltable_column_option_el
-                            | xmltable_column_option_list xmltable_column_option_el
+ xmltable_column_option_list: xmltable_column_option_el+
 ;
- xmltable_column_option_el: identifier b_expr
-                          | DEFAULT b_expr
+ xmltable_column_option_el:
+                           DEFAULT a_expr
+                          |identifier a_expr
                           | NOT NULL_P
                           | NULL_P
 ;
@@ -3574,7 +3576,7 @@ plsqlidentifier:PLSQLIDENTIFIER
                  | CURRENT_TIME
                  | CURRENT_TIMESTAMP
                  | CURRENT_USER
-                 | DEFAULT
+//                 | DEFAULT
                  | DEFERRABLE
                  | DESC
                  | DISTINCT
