@@ -171,3 +171,6 @@ SELECT SCHEMA();
 SELECT mod(3,2);SELECT * FROM TEST WHERE TB_SCHEMA = SCHEMA();
 -- Group By with computed column
 SELECT 1 AS col1, t1.Id FROM t1 GROUP BY col1;
+-- Non Aggregate Functions
+SELECT pk, LEAD(pk) OVER (ORDER BY pk) AS l;
+SELECT COALESCE(LAG(last_eq.end_variation) OVER (PARTITION BY eq.account_id, eq.execution_name_id, eq.currency ORDER BY eq.start_date), 0) AS start_variation FROM t1;
