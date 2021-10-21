@@ -2214,6 +2214,7 @@ ifNotExists
 functionCall
     : specificFunction                                              #specificFunctionCall
     | aggregateWindowedFunction                                     #aggregateFunctionCall
+    | nonAggregateWindowedFunction                                  #nonAggregateFunctionCall
     | scalarFunctionName '(' functionArgs? ')'                      #scalarFunctionCall
     | fullId '(' functionArgs? ')'                                  #udfFunctionCall
     | passwordFunctionClause                                        #passwordFunctionCall
@@ -2348,6 +2349,14 @@ aggregateWindowedFunction
           orderByExpression (',' orderByExpression)*
         )? (SEPARATOR separator=STRING_LITERAL)?
       ')'
+    ;
+
+nonAggregateWindowedFunction
+    : (LAG | LEAD | FIRST_VALUE | LAST_VALUE) '(' functionArg ')'
+        OVER ( '('
+          ( PARTITION BY expression (',' expression)* )?
+          ( ORDER BY orderByExpression (',' orderByExpression)* )?
+        ')' )?
     ;
 
 scalarFunctionName
