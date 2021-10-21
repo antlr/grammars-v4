@@ -2382,6 +2382,7 @@ parameterization_option
 recovery_option
     : RECOVERY ( FULL | BULK_LOGGED | SIMPLE )
     | TORN_PAGE_DETECTION on_off
+    | ACCELERATED_DATABASE_RECOVERY '=' on_off
     | PAGE_VERIFY ( CHECKSUM | TORN_PAGE_DETECTION | NONE )
     ;
 
