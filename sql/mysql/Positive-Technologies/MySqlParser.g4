@@ -1641,6 +1641,8 @@ renameUserClause
 analyzeTable
     : ANALYZE actionOption=(NO_WRITE_TO_BINLOG | LOCAL)?
        TABLE tables
+       ( UPDATE HISTOGRAM ON fullColumnName (',' fullColumnName)* (WITH decimalLiteral BUCKETS)? )?
+       ( DROP HISTOGRAM ON fullColumnName (',' fullColumnName)* )?
     ;
 
 checkTable
