@@ -3,8 +3,8 @@
 
 grammar Verilog;
 
-// 1 Source text
-// 1.1 Library source text
+// A.1 Source text
+// A.1.1 Library source text
 
 library_text
 	: library_description*
@@ -24,11 +24,7 @@ include_statement
 	: 'include' FILE_PATH_SPEC ';'
 	;
 
-FILE_PATH_SPEC
-	: ([/~] | './') ~[ \r\t\n]*?
-	;
-
-// 1.2 Verilog source text
+// A.1.2 Verilog source text
 // START SYMBOL
 source_text
 	: description* EOF
@@ -41,8 +37,8 @@ description
 	;
 
 module_declaration
-	: attribute_instance* module_keyword module_identifier module_parameter_port_list? list_of_ports ';' module_item* 'endmodule'
-	| attribute_instance* module_keyword module_identifier module_parameter_port_list? list_of_port_declarations? ';' non_port_module_item* 'endmodule'
+	: (attribute_instance | pre_module_compiler_directive)* module_keyword module_identifier module_parameter_port_list? list_of_ports ';' module_item* 'endmodule' post_module_compiler_directive*
+	| (attribute_instance | pre_module_compiler_directive)* module_keyword module_identifier module_parameter_port_list? list_of_port_declarations? ';' non_port_module_item* 'endmodule' post_module_compiler_directive*
 	;
 
 module_keyword
@@ -50,7 +46,7 @@ module_keyword
 	| 'macromodule'
 	;
 
-// 1.3 Module parameters and ports
+// A.1.3 Module parameters and ports
 
 module_parameter_port_list
 	: '#' '(' parameter_declaration (',' parameter_declaration)* ')'
@@ -85,7 +81,7 @@ port_declaration
 	| attribute_instance* output_declaration
 	;
 
-// 1.4 Module items
+// A.1.4 Module items
 
 module_item
 	: port_declaration ';'
@@ -131,7 +127,7 @@ parameter_override
 	: 'defparam' list_of_param_assignments ';'
 	;
 
-// 1.5 Configuration source text
+// A.1.5 Configuration source text
 
 config_declaration
 	: 'config' config_identifier ';' design_statement config_rule_statement* 'endconfig'
@@ -173,13 +169,13 @@ use_clause
 	: 'use' (library_identifier '.')? cell_identifier ':config'?
 	;
 
-// 2 Declarations
-// 2.1 Declaration types
-// 2.1.1 Module parameter declarations
+// A.2 Declarations
+// A.2.1 Declaration types
+// A.2.1.1 Module parameter declarations
 
 local_parameter_declaration
-	: 'localparam' 'signed'? range_? list_of_param_assignments ';'
-	| 'localparam' parameter_type list_of_param_assignments ';'
+	: 'localparam' 'signed'? range_? list_of_param_assignments
+	| 'localparam' parameter_type list_of_param_assignments
 	;
 
 parameter_declaration
@@ -198,7 +194,7 @@ parameter_type
 	| 'time'
 	;
 
-// 2.1.2 Port declarations
+// A.2.1.2 Port declarations
 
 inout_declaration
 	: 'inout' net_type? 'signed'? range_? list_of_port_identifiers
@@ -214,7 +210,7 @@ output_declaration
 	| 'output' output_variable_type list_of_variable_port_identifiers
 	;
 
-// 2.1.3 Type declarations
+// A.2.1.3 Type declarations
 
 event_declaration
 	: 'event' list_of_event_identifiers ';'
@@ -251,8 +247,8 @@ time_declaration
 	: 'time' list_of_variable_identifiers ';'
 	;
 
-// 2.2 Declaration data types
-// 2.2.1 Net and variable types
+// A.2.2 Declaration data types
+// A.2.2.1 Net and variable types
 
 net_type
 	: 'supply0'
@@ -282,7 +278,7 @@ variable_type
 	| variable_identifier '=' constant_expression
 	;
 
-// 2.2.2 Strengths
+// A.2.2.2 Strengths
 
 drive_strength
 	: '(' strength0 ',' strength1 ')'
@@ -313,7 +309,7 @@ charge_strength
 	| '(' 'large' ')'
 	;
 
-// 2.2.3 Delays
+// A.2.2.3 Delays
 
 delay3
 	: '#' delay_value
@@ -331,7 +327,7 @@ delay_value
 	| identifier
 	;
 
-// 2.3 Declaration lists
+// A.2.3 Declaration lists
 
 list_of_defparam_assignments
 	: defparam_assignment (',' defparam_assignment)*
@@ -373,7 +369,7 @@ list_of_variable_port_identifiers
 	: port_identifier ('=' constant_expression)? (',' port_identifier ('=' constant_expression)?)*
 	;
 
-// 2.4 Declaration assignments
+// A.2.4 Declaration assignments
 
 defparam_assignment
 	: hierarchical_parameter_identifier '=' constant_mintypmax_expression
@@ -409,7 +405,7 @@ limit_value
 	: constant_mintypmax_expression
 	;
 
-// 2.5 Declaration ranges
+// A.2.5 Declaration ranges
 
 dimension
 	: '[' dimension_constant_expression ':' dimension_constant_expression ']'
@@ -419,7 +415,7 @@ range_
 	: '[' msb_constant_expression ':' lsb_constant_expression ']'
 	;
 
-// 2.6 Function declarations
+// A.2.6 Function declarations
 
 function_declaration
 	: 'function' 'automatic'? function_range_or_type? function_identifier ';' function_item_declaration function_item_declaration* function_statement 'endfunction'
@@ -443,7 +439,7 @@ function_range_or_type
 	| 'time'
 	;
 
-// 2.7 Task declarations
+// A.2.7 Task declarations
 
 task_declaration
 	: 'task' 'automatic'? task_identifier ';' task_item_declaration* statement_or_null 'endtask'
@@ -489,7 +485,7 @@ task_port_type
 	| 'time'
 	;
 
-// 2.8 Block item declarations
+// A.2.8 Block item declarations
 
 block_item_declaration
 	: attribute_instance* 'reg' 'signed'? range_? list_of_block_variable_identifiers ';'
@@ -518,8 +514,8 @@ block_real_type
 	: real_identifier dimension*
 	;
 
-// 3 Primitive instances
-// 3.1 Primitive instantiation and instances
+// A.3 Primitive instances
+// A.3.1 Primitive instantiation and instances
 
 gate_instantiation
 	: cmos_switchtype delay3? cmos_switch_instance (',' cmos_switch_instance)* ';'
@@ -569,7 +565,7 @@ name_of_gate_instance
 	: gate_instance_identifier range_?
 	;
 
-// 3.2 Primitive strengths
+// A.3.2 Primitive strengths
 
 pulldown_strength
 	: '(' strength0 ',' strength1 ')'
@@ -583,7 +579,7 @@ pullup_strength
 	| '(' strength1 ')'
 	;
 
-// 3.3 Primitive terminals
+// A.3.3 Primitive terminals
 
 enable_terminal
 	: expression
@@ -609,7 +605,7 @@ pcontrol_terminal
 	: expression
 	;
 
-// 3.4 Primitive gate and switch types
+// A.3.4 Primitive gate and switch types
 
 cmos_switchtype
 	: 'cmos'
@@ -656,8 +652,8 @@ pass_switchtype
 	| 'rtran'
 	;
 
-// 4 Module instantiation and generate construct
-// 4.1 Module instantiation
+// A.4 Module instantiation and generate construct
+// A.4.1 Module instantiation
 
 module_instantiation
 	: module_identifier parameter_value_assignment? module_instance (',' module_instance)* ';'
@@ -701,7 +697,7 @@ named_port_connection
 	: attribute_instance* '.' port_identifier '(' expression? ')'
 	;
 
-// 4.2 Generate construct
+// A.4.2 Generate construct
 
 generate_region
 	: 'generate' module_or_generate_item* 'endgenerate'
@@ -763,15 +759,15 @@ generate_block_or_null
 	| ';'
 	;
 
-// 5 UDP declaration and instantiation
-// 5.1 UDP declaration
+// A.5 UDP declaration and instantiation
+// A.5.1 UDP declaration
 /*
 udp_declaration
 	: attribute_instance* 'primitive' udp_identifier '(' udp_port_list ')' ';' udp_port_declaration udp_port_declaration* udp_body 'endprimitive'
 	| attribute_instance* 'primitive' udp_identifier '(' udp_declaration_port_list ')' ';' udp_body 'endprimitive'
 	;
 */
-// 5.2 UDP ports
+// A.5.2 UDP ports
 /*
 udp_port_list
 	: output_port_identifier ',' input_port_identifier (',' input_port_identifier)*
@@ -800,7 +796,7 @@ udp_reg_declaration
 	: attribute_instance* 'reg' variable_identifier
 	;
 */
-// 5.3 UDP body
+// A.5.3 UDP body
 /*
 udp_body
 	: combinational_body
@@ -840,46 +836,55 @@ SEQUENTIAL_ENTRY
 	: SEQ_INPUT_LIST WHITE_SPACE? ':' WHITE_SPACE? CURRENT_STATE WHITE_SPACE? ':' WHITE_SPACE? NEXT_STATE WHITE_SPACE? ';'
 	;
 
-fragment SEQ_INPUT_LIST
+fragment
+SEQ_INPUT_LIST
 	: LEVEL_INPUT_LIST
 	| EDGE_INPUT_LIST
 	;
 
-fragment LEVEL_INPUT_LIST
+fragment
+LEVEL_INPUT_LIST
 	: LEVEL_SYMBOL+
 	;
 
-fragment EDGE_INPUT_LIST
+fragment
+EDGE_INPUT_LIST
 	: LEVEL_SYMBOL* EDGE_INDICATOR LEVEL_SYMBOL*
 	;
 
-fragment EDGE_INDICATOR
+fragment
+EDGE_INDICATOR
 	: '(' LEVEL_SYMBOL LEVEL_SYMBOL ')'
 	| EDGE_SYMBOL
 	;
 
-fragment CURRENT_STATE
+fragment
+CURRENT_STATE
 	: LEVEL_SYMBOL
 	;
 
-fragment NEXT_STATE
+fragment
+NEXT_STATE
 	: OUTPUT_SYMBOL
 	| '-'
 	;
 
-fragment OUTPUT_SYMBOL
+fragment
+OUTPUT_SYMBOL
 	: [01xX]
 	;
 
-fragment LEVEL_SYMBOL
+fragment
+LEVEL_SYMBOL
 	: [01xX?bB]
 	;
 
-fragment EDGE_SYMBOL
+fragment
+EDGE_SYMBOL
 	: [rRfFpPnN*]
 	;
 */
-// 5.4 UDP instantiation
+// A.5.4 UDP instantiation
 /*
 udp_instantiation
 	: udp_identifier drive_strength? delay2? udp_instance (',' udp_instance)* ';'
@@ -893,8 +898,8 @@ name_of_udp_instance
 	: udp_instance_identifier range_?
 	;
 */
-// 6 Behavioral statements
-// 6.1 Continuous assignment statements
+// A.6 Behavioral statements
+// A.6.1 Continuous assignment statements
 
 continuous_assign
 	: 'assign' drive_strength? delay3? list_of_net_assignments ';'
@@ -908,7 +913,7 @@ net_assignment
 	: net_lvalue '=' expression
 	;
 
-// 6.2 Procedural blocks and assignments
+// A.6.2 Procedural blocks and assignments
 
 initial_construct
 	: 'initial' statement
@@ -939,7 +944,7 @@ variable_assignment
 	: variable_lvalue '=' expression
 	;
 
-// 6.3 Parallel and sequential blocks
+// A.6.3 Parallel and sequential blocks
 
 par_block
 	: 'fork' (':' block_identifier block_item_declaration*)? statement* 'join'
@@ -949,7 +954,7 @@ seq_block
 	: 'begin' (':' block_identifier block_item_declaration*)? statement* 'end'
 	;
 
-// 6.4 Statements
+// A.6.4 Statements
 
 statement
 	: attribute_instance* blocking_assignment ';'
@@ -977,7 +982,7 @@ function_statement
 	: statement
 	;
 
-// 6.5 Timing control statements
+// A.6.5 Timing control statements
 
 delay_control
 	: '#' delay_value
@@ -1031,18 +1036,13 @@ wait_statement
 	: 'wait' '(' expression ')' statement_or_null
 	;
 
-// 6.6 Conditional statements
+// A.6.6 Conditional statements
 
 conditional_statement
-	: 'if' '(' expression ')' statement_or_null ('else' statement_or_null)?
-	| if_else_if_statement
-	;
-
-if_else_if_statement
 	: 'if' '(' expression ')' statement_or_null ('else' 'if' '(' expression ')' statement_or_null)* ('else' statement_or_null)?
 	;
 
-// 6.7 Case statements
+// A.6.7 Case statements
 
 case_statement
 	: 'case' '(' expression ')' case_item case_item* 'endcase'
@@ -1055,7 +1055,7 @@ case_item
 	| 'default' ':'? statement_or_null
 	;
 
-// 6.8 Looping statements
+// A.6.8 Looping statements
 
 loop_statement
 	: 'forever' statement
@@ -1064,7 +1064,7 @@ loop_statement
 	| 'for' '(' variable_assignment ';' expression ';' variable_assignment ')' statement
 	;
 
-// 6.9 Task enable statements
+// A.6.9 Task enable statements
 
 system_task_enable
 	: system_task_identifier ('(' expression? (',' expression?)* ')')? ';'
@@ -1074,8 +1074,8 @@ task_enable
 	: hierarchical_task_identifier ('(' expression (',' expression)* ')')? ';'
 	;
 
-// 7 Specify section
-// 7.1 Specify block declaration
+// A.7 Specify section
+// A.7.1 Specify block declaration
 
 specify_block
 	: 'specify' specify_item* 'endspecify'
@@ -1099,7 +1099,7 @@ showcancelled_declaration
 	| 'noshowcancelled' list_of_path_outputs ';'
 	;
 
-// 7.2 Specify path declarations
+// A.7.2 Specify path declarations
 
 path_declaration
 	: simple_path_declaration ';'
@@ -1128,7 +1128,7 @@ list_of_path_outputs
 	: specify_output_terminal_descriptor (',' specify_output_terminal_descriptor)*
 	;
 
-// 7.3 Specify block terminals
+// A.7.3 Specify block terminals
 
 specify_input_terminal_descriptor
 	: input_identifier ('[' constant_range_expression ']')?
@@ -1148,7 +1148,7 @@ output_identifier
 	| inout_port_identifier
 	;
 
-// 7.4 Specify path delays
+// A.7.4 Specify path delays
 
 path_delay_value
 	: list_of_path_delay_expressions
@@ -1264,8 +1264,8 @@ polarity_operator
 	| '-'
 	;
 
-// 7.5 System timing checks
-// 7.5.1 System timing check commands
+// A.7.5 System timing checks
+// A.7.5.1 System timing check commands
 /*
 system_timing_check
 	: setup_timing_check
@@ -1330,7 +1330,7 @@ nochange_timing_check
 	: '$nochange' '(' reference_event ',' data_event ',' start_edge_offset ',' end_edge_offset (',' notifier?)? ')' ';'
 	;
 */
-// 7.5.2 System timing check command arguments
+// A.7.5.2 System timing check command arguments
 /*
 checktime_condition
 	: mintypmax_expression
@@ -1390,7 +1390,7 @@ timing_check_limit
 	: expression
 	;
 */
-// 7.5.3 System timing check event definitions
+// A.7.5.3 System timing check event definitions
 /*
 timing_check_event
 	: timing_check_event_control? specify_terminal_descriptor ('&&&' timing_check_condition)?
@@ -1415,7 +1415,8 @@ edge_control_specifier
 	: 'edge' '[' EDGE_DESCRIPTOR (',' EDGE_DESCRIPTOR)* ']'
 	;
 
-fragment EDGE_DESCRIPTOR
+fragment
+EDGE_DESCRIPTOR
 	: '01'
 	| '10'
 	| [xXzZ] [01]
@@ -1449,8 +1450,8 @@ SCALAR_CONSTANT
 	| '0'
 	;
 */
-// 8 Expressions
-// 8.1 Concatenations
+// A.8 Expressions
+// A.8.1 Concatenations
 
 concatenation
 	: '{' expression (',' expression)* '}'
@@ -1476,7 +1477,7 @@ multiple_concatenation
 	: '{' constant_expression concatenation '}'
 	;
 
-// 8.2 Function calls
+// A.8.2 Function calls
 
 constant_function_call
 	: function_identifier attribute_instance* '(' constant_expression (',' constant_expression)* ')'
@@ -1494,7 +1495,7 @@ system_function_call
 	: system_function_identifier ('(' expression (',' expression)* ')')?
 	;
 
-// 8.3 Expressions
+// A.8.3 Expressions
 
 base_expression
 	: expression
@@ -1578,7 +1579,7 @@ width_constant_expression
 	: constant_expression
 	;
 
-// 8.4 Primaries
+// A.8.4 Primaries
 
 constant_primary
 	: number
@@ -1613,7 +1614,7 @@ primary
 	| STRING
 	;
 
-// 8.5 Expression left-side values
+// A.8.5 Expression left-side values
 
 net_lvalue
 	: hierarchical_net_identifier (('[' constant_expression ']')* '[' constant_range_expression ']')?
@@ -1625,7 +1626,7 @@ variable_lvalue
 	| '{' variable_lvalue (',' variable_lvalue) '}'
 	;
 
-// 8.6 Operators
+// A.8.6 Operators
 
 unary_operator
 	: '+'
@@ -1693,7 +1694,7 @@ binary_module_path_operator
 	| '~^'
 	;
 
-// 8.7 Numbers
+// A.8.7 Numbers
 
 number
 	: DECIMAL_NUMBER
@@ -1708,7 +1709,8 @@ REAL_NUMBER
 	| UNSIGNED_NUMBER ('.' UNSIGNED_NUMBER)? EXP SIGN? UNSIGNED_NUMBER
 	;
 
-fragment EXP
+fragment
+EXP
 	: [eE]
 	;
 
@@ -1731,15 +1733,18 @@ HEX_NUMBER
 	: SIZE? HEX_BASE HEX_VALUE
 	;
 
-fragment SIGN
+fragment
+SIGN
 	: [+-]
 	;
 
-fragment SIZE
+fragment
+SIZE
 	: NON_ZERO_UNSIGNED_NUMBER
 	;
 
-fragment NON_ZERO_UNSIGNED_NUMBER
+fragment
+NON_ZERO_UNSIGNED_NUMBER
 	: NON_ZERO_DECIMAL_DIGIT ('_' | DECIMAL_DIGIT)*
 	;
 
@@ -1747,70 +1752,84 @@ UNSIGNED_NUMBER
 	: DECIMAL_DIGIT ('_' | DECIMAL_DIGIT)*
 	;
 
-fragment BINARY_VALUE
+fragment
+BINARY_VALUE
 	: BINARY_DIGIT ('_' | BINARY_DIGIT)*
 	;
 
-fragment OCTAL_VALUE
+fragment
+OCTAL_VALUE
 	: OCTAL_DIGIT ('_' | OCTAL_DIGIT)*
 	;
 
-fragment HEX_VALUE
+fragment
+HEX_VALUE
 	: HEX_DIGIT ('_' | HEX_DIGIT)*
 	;
 
-fragment DECIMAL_BASE
+fragment
+DECIMAL_BASE
 	: '\'' [sS]? [dD]
 	;
 
-fragment BINARY_BASE
+fragment
+BINARY_BASE
 	: '\'' [sS]? [bB]
 	;
 
-fragment OCTAL_BASE
+fragment
+OCTAL_BASE
 	: '\'' [sS]? [oO]
 	;
 
-fragment HEX_BASE
+fragment
+HEX_BASE
 	: '\'' [sS]? [hH]
 	;
 
-fragment NON_ZERO_DECIMAL_DIGIT
+fragment
+NON_ZERO_DECIMAL_DIGIT
 	: [1-9]
 	;
 
-fragment DECIMAL_DIGIT
+fragment
+DECIMAL_DIGIT
 	: [0-9]
 	;
 
-fragment BINARY_DIGIT
+fragment
+BINARY_DIGIT
 	: X_DIGIT | Z_DIGIT | [01]
 	;
 
-fragment OCTAL_DIGIT
+fragment
+OCTAL_DIGIT
 	: X_DIGIT | Z_DIGIT | [0-7]
 	;
 
-fragment HEX_DIGIT
+fragment
+HEX_DIGIT
 	: X_DIGIT | Z_DIGIT | [0-9a-fA-F]
 	;
 
-fragment X_DIGIT
+fragment
+X_DIGIT
 	: [xX]
 	;
 
-fragment Z_DIGIT
+fragment
+Z_DIGIT
 	: [zZ?]
 	;
 
-// 8.8 Strings
+// A.8.8 Strings
 
 STRING
 	: '"' ~["\n\r]* '"'
 	;
 
-// 9 General
-// 9.1 Attributes
+// A.9 General
+// A.9.1 Attributes
 
 attribute_instance
 	: '(' '*' attr_spec (',' attr_spec)* '*' ')'
@@ -1824,7 +1843,7 @@ attr_name
 	: identifier
 	;
 
-// 9.2 Comments
+// A.9.2 Comments
 
 ONE_LINE_COMMENT
 	: '//' .*? '\r'? '\n' -> channel (HIDDEN)
@@ -1834,7 +1853,7 @@ BLOCK_COMMENT
 	: '/*' .*? '*/' -> channel (HIDDEN)
 	;
 
-// 9.3 Identifiers
+// A.9.3 Identifiers
 
 block_identifier
 	: identifier
@@ -2001,14 +2020,234 @@ variable_identifier
 	: identifier
 	;
 
-// 9.5 White space
+// A.9.5 White space
 
 WHITE_SPACE
-	: [ \t\n\r] + -> channel (HIDDEN)
+	: [ \t\n\r]+ -> channel (HIDDEN)
 	;
 
-// Compiler directives
+// 13.2.1 Specifying libraries—the library map file
 
-COMPILER_DIRECTIVE
-	: '`' .*? '\r'? '\n' -> channel (HIDDEN)
+FILE_PATH_SPEC
+	: ([/~] | './') ~[ \r\t\n]*?
+	;
+
+// 19. Compiler directives
+
+COMPILER_DIRECTIVE_IDENTIFIER
+	: '`' (SIMPLE_IDENTIFIER | ESCAPED_IDENTIFIER)
+	;
+
+// limit where compiler directives can be placed in the source text
+pre_module_compiler_directive
+	: celldefine_compiler_directive
+	| default_nettype_compiler_directive
+	//| text_macro_definition
+	| conditional_compilation_directive
+	| include_compiler_directive
+	| resetall_compiler_directive
+	//| line_compiler_directive
+	| timescale_compiler_directive
+	| unconnected_drive_compiler_directive
+	| keywords_directive
+	| endkeywords_directive
+	;
+
+post_module_compiler_directive
+	: endcelldefine_compiler_directive
+	| default_nettype_compiler_directive
+	| undefine_compiler_directive
+	| resetall_compiler_directive
+	| nounconnected_drive_compiler_directive
+	;
+
+// 19.1 `celldefine and `endcelldefine
+
+celldefine_compiler_directive
+	: '`celldefine'
+	;
+
+endcelldefine_compiler_directive
+	: '`endcelldefine'
+	;
+
+// 19.2 `default_nettype
+
+default_nettype_compiler_directive
+	: '`default_nettype' default_nettype_value
+	;
+
+default_nettype_value
+	: 'wire'
+	| 'tri'
+	| 'tri0'
+	| 'tri1'
+	| 'wand'
+	| 'triand'
+	| 'wor'
+	| 'trior'
+	| 'trireg'
+	| 'uwire'
+	| 'none'
+	;
+
+// 19.3 `define and `undef
+// 19.3.1 `define
+/*
+text_macro_definition
+	: '`define' text_macro_name MACRO_TEXT
+	;
+
+text_macro_name
+	: text_macro_identifier ('(' list_of_formal_arguments ')')?
+	;
+
+// we need to handle MACRO_TEXT in a separate Lexer mode
+// this requires splitting the grammar into Lexer and Parser grammars
+MACRO_TEXT
+	: 
+	;
+
+list_of_formal_arguments
+	: formal_argument_identifier (',' formal_argument_identifier)*
+	;
+
+formal_argument_identifier
+	: SIMPLE_IDENTIFIER
+	;
+
+text_macro_usage
+	: '`' text_macro_identifier ('(' list_of_actual_arguments ')')?
+	;
+
+list_of_actual_arguments
+	: actual_argument (',' actual_argument)*
+	;
+
+actual_argument
+	: expression
+	;
+*/
+// 19.3.2 `undef
+
+undefine_compiler_directive
+	: '`undef' text_macro_identifier
+	;
+
+// 19.4 `ifdef, `else, `elsif, `endif , `ifndef
+
+conditional_compilation_directive
+	: ifdef_directive
+	| ifndef_directive
+	;
+
+ifdef_directive
+	: '`ifdef' text_macro_identifier ifdef_group_of_lines ('`elsif' text_macro_identifier elsif_group_of_lines)* ('`else' else_group_of_lines)? '`endif'
+	;
+
+ifndef_directive
+	: '`ifndef' text_macro_identifier ifndef_group_of_lines ('`elsif' text_macro_identifier elsif_group_of_lines)* ('`else' else_group_of_lines)? '`endif'
+	;
+
+ifdef_group_of_lines
+	: non_port_module_item*
+	;
+
+ifndef_group_of_lines
+	: non_port_module_item*
+	;
+
+elsif_group_of_lines
+	: non_port_module_item*
+	;
+
+else_group_of_lines
+	: non_port_module_item*
+	;
+
+// 19.5 `include
+
+include_compiler_directive
+	: '`include' FILE_PATH_SPEC
+	;
+
+// 19.6 `resetall
+
+resetall_compiler_directive
+	: '`resetall'
+	;
+
+// 19.7 `line
+/*
+line_compiler_directive
+	: '`line' number STRING ('0' | '1' | '2')
+	;
+*/
+// 19.8 `timescale
+
+timescale_compiler_directive
+	: '`timescale' TIME_LITERAL '/' TIME_LITERAL
+	;
+
+TIME_LITERAL
+	: UNSIGNED_NUMBER TIME_UNIT
+	;
+
+fragment
+TIME_UNIT
+	: [mnpf]? 's'
+	;
+
+// 19.9 `unconnected_drive and `nounconnected_drive
+
+unconnected_drive_compiler_directive
+	: '`unconnected_drive' ('pull0' | 'pull1')
+	;
+
+nounconnected_drive_compiler_directive
+	: '`nounconnected_drive'
+	;
+
+// 19.10 `pragma
+
+pragma
+	: '`pragma' pragma_name (pragma_expression (',' pragma_expression )*)?
+	;
+
+pragma_name
+	: SIMPLE_IDENTIFIER
+	;
+
+pragma_expression
+	: pragma_keyword
+	| pragma_keyword '=' pragma_value
+	| pragma_value
+	;
+
+pragma_value
+	: '(' pragma_expression (',' pragma_expression)* ')'
+	| number
+	| STRING
+	| identifier
+	;
+
+pragma_keyword
+	: SIMPLE_IDENTIFIER
+	;
+
+// 19.11 `begin_keywords, `end_keywords
+
+keywords_directive
+	: '`begin_keywords' '"' version_specifier '"'
+	;
+
+version_specifier
+	: '1364-1995'
+	| '1364-2001'
+	| '1364-2001-noconfig'
+	| '1364-2005'
+	;
+
+endkeywords_directive
+	: '`end_keywords'
 	;
