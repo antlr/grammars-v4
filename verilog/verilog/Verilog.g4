@@ -121,6 +121,7 @@ non_port_module_item
 	| specify_block
 	| attribute_instance* parameter_declaration ';'
 	| attribute_instance* specparam_declaration
+	| in_module_compiler_directive
 	;
 
 parameter_override
@@ -971,6 +972,7 @@ statement
 	| attribute_instance* system_task_enable
 	| attribute_instance* task_enable
 	| attribute_instance* wait_statement
+	| in_module_compiler_directive
 	;
 
 statement_or_null
@@ -2053,12 +2055,21 @@ pre_module_compiler_directive
 	| endkeywords_directive
 	;
 
+in_module_compiler_directive
+	:/* text_macro_definition
+	| text_macro_usage
+	|*/ conditional_compilation_directive
+	;
+
 post_module_compiler_directive
 	: endcelldefine_compiler_directive
 	| default_nettype_compiler_directive
+	| conditional_compilation_directive
 	| undefine_compiler_directive
 	| resetall_compiler_directive
 	| nounconnected_drive_compiler_directive
+	| keywords_directive
+	| endkeywords_directive
 	;
 
 // 19.1 `celldefine and `endcelldefine
@@ -2150,19 +2161,19 @@ ifndef_directive
 	;
 
 ifdef_group_of_lines
-	: non_port_module_item*
+	: (non_port_module_item | statement | conditional_compilation_directive)*
 	;
 
 ifndef_group_of_lines
-	: non_port_module_item*
+	: (non_port_module_item | statement | conditional_compilation_directive)*
 	;
 
 elsif_group_of_lines
-	: non_port_module_item*
+	: (non_port_module_item | statement | conditional_compilation_directive)*
 	;
 
 else_group_of_lines
-	: non_port_module_item*
+	: (non_port_module_item | statement | conditional_compilation_directive)*
 	;
 
 // 19.5 `include
