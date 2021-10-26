@@ -33,7 +33,6 @@ source_text
 
 description
 	: module_declaration
-	//| udp_declaration
 	| interface_declaration
 	| program_declaration
 	| package_declaration
@@ -194,16 +193,10 @@ ansi_port_declaration
 // A.1.4 Module items
 
 elaboration_system_task
-	: '$fatal' ('(' /*finish_number*/ (/*','*/ list_of_arguments)? ')')? ';'
+	: '$fatal' ('(' /*FINISH_NUMBER*/ (/*','*/ list_of_arguments)? ')')? ';'
 	| ('$error' | '$warning' | '$info') ('(' list_of_arguments? ')')? ';'
 	;
 
-/*finish_number
-	: '0'
-	| '1'
-	| '2'
-	;
-*/
 module_common_item
 	: module_or_generate_item_declaration
 	| interface_instantiation
@@ -226,7 +219,7 @@ module_item
 	;
 
 module_or_generate_item
-	: attribute_instance* (parameter_override | gate_instantiation /*| udp_instantiation*/ | module_instantiation | module_common_item)
+	: attribute_instance* (parameter_override | gate_instantiation | module_instantiation | module_common_item)
 	;
 
 module_or_generate_item_declaration
@@ -1752,154 +1745,6 @@ generate_item
 	| checker_or_generate_item
 	;
 
-// A.5.1 UDP declaration
-
-/*udp_nonansi_declaration
-	: attribute_instance* 'primitive' udp_identifier '(' udp_port_list ')' ';'
-	;
-
-udp_ansi_declaration
-	: attribute_instance* 'primitive' udp_identifier '(' udp_declaration_port_list ')' ';'
-	;
-
-udp_declaration
-	: udp_nonansi_declaration udp_port_declaration udp_port_declaration* udp_body 'endprimitive' (':' udp_identifier)?
-	| udp_ansi_declaration udp_body 'endprimitive' (':' udp_identifier)?
-	| 'extern' (udp_nonansi_declaration | udp_ansi_declaration)
-	| attribute_instance* 'primitive' udp_identifier '(' '.*' ')' ';' udp_port_declaration* udp_body 'endprimitive' (':' udp_identifier)?
-	;
-*/
-// A.5.2 UDP ports
-
-/*udp_port_list
-	: output_port_identifier ',' input_port_identifier (',' input_port_identifier)*
-	;
-
-udp_declaration_port_list
-	: udp_output_declaration ',' udp_input_declaration (',' udp_input_declaration)*
-	;
-
-udp_port_declaration
-	: (udp_output_declaration | udp_input_declaration | udp_reg_declaration) ';'
-	;
-
-udp_output_declaration
-	: attribute_instance* 'output' (port_identifier | 'reg' port_identifier ('=' constant_expression)?)
-	;
-
-udp_input_declaration
-	: attribute_instance* 'input' list_of_udp_port_identifiers
-	;
-
-udp_reg_declaration
-	: attribute_instance* 'reg' variable_identifier
-	;
-*/
-// A.5.3 UDP body
-
-/*udp_body
-	: combinational_body
-	| sequential_body
-	;
-
-combinational_body
-	: 'table' combinational_entry combinational_entry* 'endtable'
-	;
-
-combinational_entry
-	: level_input_list ':' output_symbol ';'
-	;
-
-sequential_body
-	: udp_initial_statement? 'table' sequential_entry sequential_entry* 'endtable'
-	;
-
-udp_initial_statement
-	: 'initial' output_port_identifier '=' init_val ';'
-	;
-
-init_val
-	: '1\'b0'
-	| '1\'b1'
-	| '1\'bx'
-	| '1\'bX'
-	| '1\'B0'
-	| '1\'B1'
-	| '1\'Bx'
-	| '1\'BX'
-	| '1'
-	| '0'
-	;
-
-sequential_entry
-	: seq_input_list ':' current_state ':' next_state ';'
-	;
-
-seq_input_list
-	: level_input_list '|' edge_input_list
-	;
-
-level_input_list
-	: level_symbol level_symbol*
-	;
-
-edge_input_list
-	: level_symbol* edge_indicator level_symbol*
-	;
-
-edge_indicator
-	: '(' level_symbol level_symbol ')'
-	| edge_symbol
-	;
-
-current_state
-	: level_symbol
-	;
-
-next_state
-	: output_symbol
-	| '-'
-	;
-
-output_symbol
-	: '0'
-	| '1'
-	| 'x'
-	| 'X'
-	;
-
-level_symbol
-	: '0'
-	| '1'
-	| 'x'
-	| 'X'
-	| '?'
-	| 'b'
-	| 'B'
-	;
-
-edge_symbol
-	: 'r'
-	| 'R'
-	| 'f'
-	| 'F'
-	| 'p'
-	| 'P'
-	| 'n'
-	| 'N'
-	| '*'
-	;
-*/
-// A.5.4 UDP instantiation
-
-/*udp_instantiation
-	: udp_identifier drive_strength? delay2? udp_instance (',' udp_instance)* ';'
-	;
-
-udp_instance
-	: name_of_instance? '(' output_terminal ',' input_terminal (',' input_terminal)* ')'
-	;
-*/
 // A.6.1 Continuous assignment and net alias statements
 
 continuous_assign
@@ -2454,7 +2299,6 @@ specify_item
 	| pulsestyle_declaration
 	| showcancelled_declaration
 	| path_declaration
-	//| system_timing_check
 	;
 
 pulsestyle_declaration
@@ -2626,178 +2470,6 @@ polarity_operator
 	| '-'
 	;
 
-// A.7.5.1 System timing check commands
-
-/*system_timing_check
-	: setup_timing_check
-	| hold_timing_check
-	| setuphold_timing_check
-	| recovery_timing_check
-	| removal_timing_check
-	| recrem_timing_check
-	| skew_timing_check
-	| timeskew_timing_check
-	| fullskew_timing_check
-	| period_timing_check
-	| width_timing_check
-	| nochange_timing_check
-	;
-
-setup_timing_check
-	: '$setup' '(' data_event ',' reference_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-hold_timing_check
-	: '$hold' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-setuphold_timing_check
-	: '$setuphold' '(' reference_event ',' data_event ',' timing_check_limit ',' timing_check_limit (',' notifier? (',' timestamp_condition? (',' timecheck_condition? (',' delayed_reference? (',' delayed_data?)?)?)?)?)? ')' ';'
-	;
-
-recovery_timing_check
-	: '$recovery' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-removal_timing_check
-	: '$removal' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-recrem_timing_check
-	: '$recrem' '(' reference_event ',' data_event ',' timing_check_limit ',' timing_check_limit (',' notifier? (',' timestamp_condition? (',' timecheck_condition? (',' delayed_reference? (',' delayed_data?)?)?)?)?)? ')' ';'
-	;
-
-skew_timing_check
-	: '$skew' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-timeskew_timing_check
-	: '$timeskew' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier? (',' event_based_flag? (',' remain_active_flag?)?)?)? ')' ';'
-	;
-
-fullskew_timing_check
-	: '$fullskew' '(' reference_event ',' data_event ',' timing_check_limit ',' timing_check_limit (',' notifier? (',' event_based_flag? (',' remain_active_flag?)?)?)? ')' ';'
-	;
-
-period_timing_check
-	: '$period' '(' controlled_reference_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-width_timing_check
-	: '$width' '(' controlled_reference_event ',' timing_check_limit ',' threshold (',' notifier?)? ')' ';'
-	;
-
-nochange_timing_check
-	: '$nochange' '(' reference_event ',' data_event ',' start_edge_offset ',' end_edge_offset (',' notifier?)? ')' ';'
-	;
-*/
-// A.7.5.2 System timing check command arguments
-
-/*timecheck_condition
-	: mintypmax_expression
-	;
-
-controlled_reference_event
-	: controlled_timing_check_event
-	;
-
-data_event
-	: timing_check_event
-	;
-
-delayed_data
-	: terminal_identifier ('[' constant_mintypmax_expression ']')?
-	;
-
-delayed_reference
-	: terminal_identifier ('[' constant_mintypmax_expression ']')?
-	;
-
-end_edge_offset
-	: mintypmax_expression
-	;
-
-event_based_flag
-	: constant_expression
-	;
-
-notifier
-	: variable_identifier
-	;
-
-reference_event
-	: timing_check_event
-	;
-
-remain_active_flag
-	: constant_mintypmax_expression
-	;
-
-timestamp_condition
-	: mintypmax_expression
-	;
-
-start_edge_offset
-	: mintypmax_expression
-	;
-
-threshold
-	: constant_expression
-	;
-
-timing_check_limit
-	: expression
-	;
-*/
-// A.7.5.3 System timing check event definitions
-
-/*timing_check_event
-	: timing_check_event_control? specify_terminal_descriptor ('&&&' timing_check_condition)?
-	;
-
-controlled_timing_check_event
-	: timing_check_event_control specify_terminal_descriptor ('&&&' timing_check_condition)?
-	;
-
-timing_check_event_control
-	: 'posedge'
-	| 'negedge'
-	| 'edge'
-	| edge_control_specifier
-	;
-
-specify_terminal_descriptor
-	: specify_input_terminal_descriptor
-	| specify_output_terminal_descriptor
-	;
-
-edge_control_specifier
-	: 'edge' '[' EDGE_DESCRIPTOR (',' EDGE_DESCRIPTOR)* ']'
-	;
-
-timing_check_condition
-	: scalar_timing_check_condition
-	| '(' scalar_timing_check_condition ')'
-	;
-
-scalar_timing_check_condition
-	: '~'? expression
-	| expression ('==' | '===' | '!=' | '!==') scalar_constant
-	;
-
-scalar_constant
-	: '1\'b0'
-	| '1\'b1'
-	| '1\'B0'
-	| '1\'B1'
-	| '\'b0'
-	| '\'b1'
-	| '\'B0'
-	| '\'B1'
-	| '1'
-	| '0'
-	;
-*/
 // A.8.1 Concatenations
 
 concatenation
@@ -2882,8 +2554,8 @@ function_subroutine_call
 list_of_arguments
 	: (expression? (',' expression?)* | '.' identifier '(' expression? ')') (',' '.' identifier '(' expression? ')')*
 	;
-
-/*method_call
+/*
+method_call
 	: method_call_root '.' method_call_body
 	;
 */
@@ -2904,8 +2576,8 @@ array_manipulation_call
 randomize_call
 	: 'randomize' attribute_instance* ('(' (variable_identifier_list | 'null')? ')')? ('with' ('(' identifier_list? ')')? constraint_block)?
 	;
-
-/*method_call_root
+/*
+method_call_root
 	: primary
 	| implicit_class_handle
 	;
@@ -2924,8 +2596,8 @@ inc_or_dec_expression
 	: inc_or_dec_operator attribute_instance* variable_lvalue
 	| variable_lvalue attribute_instance* inc_or_dec_operator
 	;
-
-/*conditional_expression
+/*
+conditional_expression
 	: cond_predicate '?' attribute_instance* expression ':' expression
 	;
 */
@@ -2977,8 +2649,8 @@ expression
 	| expression 'inside' open_range_list* // = inside_expression
 	| 'tagged' member_identifier expression? // = tagged_union_expression
 	;
-
-/*tagged_union_expression
+/*
+tagged_union_expression
 	: 'tagged' member_identifier expression?
 	;
 
@@ -2994,8 +2666,8 @@ value_range
 mintypmax_expression
 	: expression (':' expression ':' expression)?
 	;
-
-/*module_path_conditional_expression
+/*
+module_path_conditional_expression
 	: module_path_expression '?' attribute_instance* module_path_expression ':' module_path_expression
 	;
 */
@@ -3106,8 +2778,8 @@ constant_bit_select
 constant_select
 	: (('.' member_identifier constant_bit_select)* '.' member_identifier)? constant_bit_select ('[' constant_part_select_range ']')?
 	;
-
-/*constant_cast
+/*
+constant_cast
 	: casting_type '\'' '(' constant_expression ')'
 	;
 */
@@ -3378,6 +3050,7 @@ hierarchical_variable_identifier
 
 identifier
 	: SIMPLE_IDENTIFIER
+	| ESCAPED_IDENTIFIER
 	;
 
 index_variable_identifier
@@ -3533,10 +3206,6 @@ tf_identifier
 	: identifier
 	;
 
-/*terminal_identifier
-	: identifier
-	;
-*/
 topmodule_identifier
 	: identifier
 	;
@@ -3545,10 +3214,6 @@ type_identifier
 	: identifier
 	;
 
-/*udp_identifier
-	: identifier
-	;
-*/
 variable_identifier
 	: identifier
 	;

@@ -3,35 +3,12 @@
 
 lexer grammar SystemVerilogLexer;
 
-// 22. Compiler directives
-
-COMPILER_DIRECTIVE
-	: '`' .*? '\r'? '\n' -> skip
-	;
-
-// 33.3.1 Specifying libraries—the library map file
-
-FILE_PATH_SPEC
-	: ([/~] | './') ~[ \r\t\n]*?
-	;
-
-// A.7.5.3 System timing check event definitions
-
-/*EDGE_DESCRIPTOR
-	: '01'
-	| '10'
-	| Z_OR_X ZERO_OR_ONE
-	| ZERO_OR_ONE Z_OR_X
-	;
-
-fragment
-ZERO_OR_ONE
-	: [01]
-	;
-
-fragment
-Z_OR_X
-	: [xXzZ]
+// A.1.4 Module items
+/*
+FINISH_NUMBER
+	: '0'
+	| '1'
+	| '2'
 	;
 */
 // A.8.4 Primaries
@@ -172,8 +149,8 @@ fragment
 Z_DIGIT
 	: [zZ?]
 	;
-
-/*UNBASED_UNSIZED_LITERAL
+/*
+UNBASED_UNSIZED_LITERAL
 	: '\'0'
 	| '\'1'
 	| '\'' Z_OR_X
@@ -197,6 +174,10 @@ BLOCK_COMMENT
 
 // A.9.3 Identifiers
 
+ESCAPED_IDENTIFIER
+	: '\\' ('\u0021'..'\u007E')+ ~[ \r\t\n]*
+	;
+
 SIMPLE_IDENTIFIER
 	: [a-zA-Z_] [a-zA-Z0-9_$]*
 	;
@@ -209,4 +190,16 @@ SYSTEM_TF_IDENTIFIER
 
 WHITE_SPACE
 	: [ \t\n\r]+ -> channel(HIDDEN)
+	;
+
+// 22. Compiler directives
+
+COMPILER_DIRECTIVE
+	: '`' .*? '\r'? '\n' -> skip
+	;
+
+// 33.3.1 Specifying libraries—the library map file
+
+FILE_PATH_SPEC
+	: ([/~] | './') ~[ \r\t\n]*?
 	;

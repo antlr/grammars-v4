@@ -1,7 +1,7 @@
 // Author: Mustafa Said Ağca
 // License: MIT
 
-grammar Verilog;
+grammar VerilogParser;
 
 // A.1 Source text
 // A.1.1 Library source text
@@ -32,13 +32,12 @@ source_text
 
 description
 	: module_declaration
-	//| udp_declaration
 	| config_declaration
 	;
 
 module_declaration
-	: (attribute_instance | pre_module_compiler_directive)* module_keyword module_identifier module_parameter_port_list? list_of_ports ';' module_item* 'endmodule' post_module_compiler_directive*
-	| (attribute_instance | pre_module_compiler_directive)* module_keyword module_identifier module_parameter_port_list? list_of_port_declarations? ';' non_port_module_item* 'endmodule' post_module_compiler_directive*
+	: attribute_instance* module_keyword module_identifier module_parameter_port_list? list_of_ports ';' module_item* 'endmodule'
+	| attribute_instance* module_keyword module_identifier module_parameter_port_list? list_of_port_declarations? ';' non_port_module_item* 'endmodule'
 	;
 
 module_keyword
@@ -94,7 +93,6 @@ module_or_generate_item
 	| attribute_instance* parameter_override
 	| attribute_instance* continuous_assign
 	| attribute_instance* gate_instantiation
-	//| attribute_instance* udp_instantiation
 	| attribute_instance* module_instantiation
 	| attribute_instance* initial_construct
 	| attribute_instance* always_construct
@@ -121,7 +119,6 @@ non_port_module_item
 	| specify_block
 	| attribute_instance* parameter_declaration ';'
 	| attribute_instance* specparam_declaration
-	| in_module_compiler_directive
 	;
 
 parameter_override
@@ -760,145 +757,6 @@ generate_block_or_null
 	| ';'
 	;
 
-// A.5 UDP declaration and instantiation
-// A.5.1 UDP declaration
-/*
-udp_declaration
-	: attribute_instance* 'primitive' udp_identifier '(' udp_port_list ')' ';' udp_port_declaration udp_port_declaration* udp_body 'endprimitive'
-	| attribute_instance* 'primitive' udp_identifier '(' udp_declaration_port_list ')' ';' udp_body 'endprimitive'
-	;
-*/
-// A.5.2 UDP ports
-/*
-udp_port_list
-	: output_port_identifier ',' input_port_identifier (',' input_port_identifier)*
-	;
-
-udp_declaration_port_list
-	: udp_output_declaration ',' udp_input_declaration (',' udp_input_declaration)*
-	;
-
-udp_port_declaration
-	: udp_output_declaration ';'
-	| udp_input_declaration ';'
-	| udp_reg_declaration ';'
-	;
-
-udp_output_declaration
-	: attribute_instance* 'output' port_identifier
-	| attribute_instance* 'output' 'reg' port_identifier ('=' constant_expression)?
-	;
-
-udp_input_declaration
-	: attribute_instance* 'input' list_of_port_identifiers
-	;
-
-udp_reg_declaration
-	: attribute_instance* 'reg' variable_identifier
-	;
-*/
-// A.5.3 UDP body
-/*
-udp_body
-	: combinational_body
-	| sequential_body
-	;
-
-combinational_body
-	: 'table' COMBINATIONAL_ENTRY+ 'endtable'
-	;
-
-COMBINATIONAL_ENTRY
-	: LEVEL_INPUT_LIST WHITE_SPACE? ':' WHITE_SPACE? OUTPUT_SYMBOL WHITE_SPACE? ';'
-	;
-
-sequential_body
-	: udp_initial_statement? 'table' SEQUENTIAL_ENTRY+ 'endtable'
-	;
-
-udp_initial_statement
-	: 'initial' output_port_identifier '=' INIT_VAL ';'
-	;
-
-INIT_VAL
-	: '1\'b0'
-	| '1\'b1'
-	| '1\'bx'
-	| '1\'bX'
-	| '1\'B0'
-	| '1\'B1'
-	| '1\'Bx'
-	| '1\'BX'
-	| '1'
-	| '0'
-	;
-
-SEQUENTIAL_ENTRY
-	: SEQ_INPUT_LIST WHITE_SPACE? ':' WHITE_SPACE? CURRENT_STATE WHITE_SPACE? ':' WHITE_SPACE? NEXT_STATE WHITE_SPACE? ';'
-	;
-
-fragment
-SEQ_INPUT_LIST
-	: LEVEL_INPUT_LIST
-	| EDGE_INPUT_LIST
-	;
-
-fragment
-LEVEL_INPUT_LIST
-	: LEVEL_SYMBOL+
-	;
-
-fragment
-EDGE_INPUT_LIST
-	: LEVEL_SYMBOL* EDGE_INDICATOR LEVEL_SYMBOL*
-	;
-
-fragment
-EDGE_INDICATOR
-	: '(' LEVEL_SYMBOL LEVEL_SYMBOL ')'
-	| EDGE_SYMBOL
-	;
-
-fragment
-CURRENT_STATE
-	: LEVEL_SYMBOL
-	;
-
-fragment
-NEXT_STATE
-	: OUTPUT_SYMBOL
-	| '-'
-	;
-
-fragment
-OUTPUT_SYMBOL
-	: [01xX]
-	;
-
-fragment
-LEVEL_SYMBOL
-	: [01xX?bB]
-	;
-
-fragment
-EDGE_SYMBOL
-	: [rRfFpPnN*]
-	;
-*/
-// A.5.4 UDP instantiation
-/*
-udp_instantiation
-	: udp_identifier drive_strength? delay2? udp_instance (',' udp_instance)* ';'
-	;
-
-udp_instance
-	: name_of_udp_instance? '(' output_terminal ',' input_terminal (',' input_terminal)* ')'
-	;
-
-name_of_udp_instance
-	: udp_instance_identifier range_?
-	;
-*/
 // A.6 Behavioral statements
 // A.6.1 Continuous assignment statements
 
@@ -972,7 +830,6 @@ statement
 	| attribute_instance* system_task_enable
 	| attribute_instance* task_enable
 	| attribute_instance* wait_statement
-	| in_module_compiler_directive
 	;
 
 statement_or_null
@@ -1088,7 +945,6 @@ specify_item
 	| pulsestyle_declaration
 	| showcancelled_declaration
 	| path_declaration
-	//| system_timing_check
 	;
 
 pulsestyle_declaration
@@ -1266,192 +1122,6 @@ polarity_operator
 	| '-'
 	;
 
-// A.7.5 System timing checks
-// A.7.5.1 System timing check commands
-/*
-system_timing_check
-	: setup_timing_check
-	| hold_timing_check
-	| setuphold_timing_check
-	| recovery_timing_check
-	| removal_timing_check
-	| recrem_timing_check
-	| skew_timing_check
-	| timeskew_timing_check
-	| fullskew_timing_check
-	| period_timing_check
-	| width_timing_check
-	| nochange_timing_check
-	;
-
-setup_timing_check
-	: '$setup' '(' data_event ',' reference_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-hold_timing_check
-	: '$hold' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-setuphold_timing_check
-	: '$setuphold' '(' reference_event ',' data_event ',' timing_check_limit ',' timing_check_limit (',' notifier? (',' stamptime_condition? (',' checktime_condition? (',' delayed_reference? (',' delayed_data?)?)?)?)?)? ')' ';'
-	;
-
-recovery_timing_check
-	: '$recovery' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-removal_timing_check
-	: '$removal' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-recrem_timing_check
-	: '$recrem' '(' reference_event ',' data_event ',' timing_check_limit ',' timing_check_limit (',' notifier? (',' stamptime_condition? (',' checktime_condition? (',' delayed_reference? (',' delayed_data?)?)?)?)?)? ')' ';'
-	;
-
-skew_timing_check
-	: '$skew' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-timeskew_timing_check
-	: '$timeskew' '(' reference_event ',' data_event ',' timing_check_limit (',' notifier? (',' event_based_flag? (',' remain_active_flag?)?)?)? ')' ';'
-	;
-
-fullskew_timing_check
-	: '$fullskew' '(' reference_event ',' data_event ',' timing_check_limit ',' timing_check_limit (',' notifier? (',' event_based_flag? (',' remain_active_flag?)?)?)? ')' ';'
-	;
-
-period_timing_check
-	: '$period' '(' controlled_reference_event ',' timing_check_limit (',' notifier?)? ')' ';'
-	;
-
-width_timing_check
-	: '$width' '(' controlled_reference_event ',' timing_check_limit ',' threshold (',' notifier?)? ')' ';'
-	;
-
-nochange_timing_check
-	: '$nochange' '(' reference_event ',' data_event ',' start_edge_offset ',' end_edge_offset (',' notifier?)? ')' ';'
-	;
-*/
-// A.7.5.2 System timing check command arguments
-/*
-checktime_condition
-	: mintypmax_expression
-	;
-
-controlled_reference_event
-	: controlled_timing_check_event
-	;
-
-data_event
-	: timing_check_event
-	;
-
-delayed_data
-	: terminal_identifier
-	| terminal_identifier '[' constant_mintypmax_expression ']'
-	;
-
-delayed_reference
-	: terminal_identifier
-	| terminal_identifier '[' constant_mintypmax_expression ']'
-	;
-
-end_edge_offset
-	: mintypmax_expression
-	;
-
-event_based_flag
-	: constant_expression
-	;
-
-notifier
-	: variable_identifier
-	;
-
-reference_event
-	: timing_check_event
-	;
-
-remain_active_flag
-	: constant_expression
-	;
-
-stamptime_condition
-	: mintypmax_expression
-	;
-
-start_edge_offset
-	: mintypmax_expression
-	;
-
-threshold
-	: constant_expression
-	;
-
-timing_check_limit
-	: expression
-	;
-*/
-// A.7.5.3 System timing check event definitions
-/*
-timing_check_event
-	: timing_check_event_control? specify_terminal_descriptor ('&&&' timing_check_condition)?
-	;
-
-controlled_timing_check_event
-	: timing_check_event_control specify_terminal_descriptor ('&&&' timing_check_condition)?
-	;
-
-timing_check_event_control
-	: 'posedge'
-	| 'negedge'
-	| edge_control_specifier
-	;
-
-specify_terminal_descriptor
-	: specify_input_terminal_descriptor
-	| specify_output_terminal_descriptor
-	;
-
-edge_control_specifier
-	: 'edge' '[' EDGE_DESCRIPTOR (',' EDGE_DESCRIPTOR)* ']'
-	;
-
-fragment
-EDGE_DESCRIPTOR
-	: '01'
-	| '10'
-	| [xXzZ] [01]
-	| [01] [xXzZ]
-	;
-
-timing_check_condition
-	: scalar_timing_check_condition
-	| '(' scalar_timing_check_condition ')'
-	;
-
-scalar_timing_check_condition
-	: expression
-	| '~' expression
-	| expression '==' SCALAR_CONSTANT
-	| expression '===' SCALAR_CONSTANT
-	| expression '!=' SCALAR_CONSTANT
-	| expression '!==' SCALAR_CONSTANT
-	;
-
-SCALAR_CONSTANT
-	: '1\'b0'
-	| '1\'b1'
-	| '1\'B0'
-	| '1\'B1'
-	| 'b0'
-	| 'b1'
-	| 'B0'
-	| 'B1'
-	| '1'
-	| '0'
-	;
-*/
 // A.8 Expressions
 // A.8.1 Concatenations
 
@@ -1706,130 +1376,6 @@ number
 	| REAL_NUMBER
 	;
 
-REAL_NUMBER
-	: UNSIGNED_NUMBER '.' UNSIGNED_NUMBER
-	| UNSIGNED_NUMBER ('.' UNSIGNED_NUMBER)? EXP SIGN? UNSIGNED_NUMBER
-	;
-
-fragment
-EXP
-	: [eE]
-	;
-
-DECIMAL_NUMBER
-	: UNSIGNED_NUMBER
-	| SIZE? DECIMAL_BASE UNSIGNED_NUMBER
-	| SIZE? DECIMAL_BASE X_DIGIT '_'*
-	| SIZE? DECIMAL_BASE Z_DIGIT '_'*
-	;
-
-BINARY_NUMBER
-	: SIZE? BINARY_BASE BINARY_VALUE
-	;
-
-OCTAL_NUMBER
-	: SIZE? OCTAL_BASE OCTAL_VALUE
-	;
-
-HEX_NUMBER
-	: SIZE? HEX_BASE HEX_VALUE
-	;
-
-fragment
-SIGN
-	: [+-]
-	;
-
-fragment
-SIZE
-	: NON_ZERO_UNSIGNED_NUMBER
-	;
-
-fragment
-NON_ZERO_UNSIGNED_NUMBER
-	: NON_ZERO_DECIMAL_DIGIT ('_' | DECIMAL_DIGIT)*
-	;
-
-UNSIGNED_NUMBER
-	: DECIMAL_DIGIT ('_' | DECIMAL_DIGIT)*
-	;
-
-fragment
-BINARY_VALUE
-	: BINARY_DIGIT ('_' | BINARY_DIGIT)*
-	;
-
-fragment
-OCTAL_VALUE
-	: OCTAL_DIGIT ('_' | OCTAL_DIGIT)*
-	;
-
-fragment
-HEX_VALUE
-	: HEX_DIGIT ('_' | HEX_DIGIT)*
-	;
-
-fragment
-DECIMAL_BASE
-	: '\'' [sS]? [dD]
-	;
-
-fragment
-BINARY_BASE
-	: '\'' [sS]? [bB]
-	;
-
-fragment
-OCTAL_BASE
-	: '\'' [sS]? [oO]
-	;
-
-fragment
-HEX_BASE
-	: '\'' [sS]? [hH]
-	;
-
-fragment
-NON_ZERO_DECIMAL_DIGIT
-	: [1-9]
-	;
-
-fragment
-DECIMAL_DIGIT
-	: [0-9]
-	;
-
-fragment
-BINARY_DIGIT
-	: X_DIGIT | Z_DIGIT | [01]
-	;
-
-fragment
-OCTAL_DIGIT
-	: X_DIGIT | Z_DIGIT | [0-7]
-	;
-
-fragment
-HEX_DIGIT
-	: X_DIGIT | Z_DIGIT | [0-9a-fA-F]
-	;
-
-fragment
-X_DIGIT
-	: [xX]
-	;
-
-fragment
-Z_DIGIT
-	: [zZ?]
-	;
-
-// A.8.8 Strings
-
-STRING
-	: '"' ~["\n\r]* '"'
-	;
-
 // A.9 General
 // A.9.1 Attributes
 
@@ -1845,16 +1391,6 @@ attr_name
 	: identifier
 	;
 
-// A.9.2 Comments
-
-ONE_LINE_COMMENT
-	: '//' .*? '\r'? '\n' -> channel (HIDDEN)
-	;
-
-BLOCK_COMMENT
-	: '/*' .*? '*/' -> channel (HIDDEN)
-	;
-
 // A.9.3 Identifiers
 
 block_identifier
@@ -1867,10 +1403,6 @@ cell_identifier
 
 config_identifier
 	: identifier
-	;
-
-ESCAPED_IDENTIFIER
-	: '\\' ('\u0021'..'\u007E')+ ~[ \r\t\n]*
 	;
 
 event_identifier
@@ -1974,35 +1506,19 @@ real_identifier
 	: identifier
 	;
 
-SIMPLE_IDENTIFIER
-	: [a-zA-Z_] [a-zA-Z0-9_$]*
-	;
-
 specparam_identifier
 	: identifier
 	;
 
-DOLLAR_IDENTIFIER
-	: '$' [a-zA-Z0-9_$] [a-zA-Z0-9_$]*
-	;
-
 system_function_identifier
-	: DOLLAR_IDENTIFIER
+	: SYSTEM_TF_IDENTIFIER
 	;
 
 system_task_identifier
-	: DOLLAR_IDENTIFIER
+	: SYSTEM_TF_IDENTIFIER
 	;
 
 task_identifier
-	: identifier
-	;
-
-terminal_identifier
-	: identifier
-	;
-
-text_macro_identifier
 	: identifier
 	;
 
@@ -2010,255 +1526,6 @@ topmodule_identifier
 	: identifier
 	;
 
-udp_identifier
-	: identifier
-	;
-
-udp_instance_identifier
-	: identifier
-	;
-
 variable_identifier
 	: identifier
-	;
-
-// A.9.5 White space
-
-WHITE_SPACE
-	: [ \t\n\r]+ -> channel (HIDDEN)
-	;
-
-// 13.2.1 Specifying libraries—the library map file
-
-FILE_PATH_SPEC
-	: ([/~] | './') ~[ \r\t\n]*?
-	;
-
-// 19. Compiler directives
-
-COMPILER_DIRECTIVE_IDENTIFIER
-	: '`' (SIMPLE_IDENTIFIER | ESCAPED_IDENTIFIER)
-	;
-
-// limit where compiler directives can be placed in the source text
-pre_module_compiler_directive
-	: celldefine_compiler_directive
-	| default_nettype_compiler_directive
-	//| text_macro_definition
-	| conditional_compilation_directive
-	| include_compiler_directive
-	| resetall_compiler_directive
-	//| line_compiler_directive
-	| timescale_compiler_directive
-	| unconnected_drive_compiler_directive
-	| keywords_directive
-	| endkeywords_directive
-	;
-
-in_module_compiler_directive
-	:/* text_macro_definition
-	| text_macro_usage
-	|*/ conditional_compilation_directive
-	;
-
-post_module_compiler_directive
-	: endcelldefine_compiler_directive
-	| default_nettype_compiler_directive
-	| conditional_compilation_directive
-	| undefine_compiler_directive
-	| resetall_compiler_directive
-	| nounconnected_drive_compiler_directive
-	| keywords_directive
-	| endkeywords_directive
-	;
-
-// 19.1 `celldefine and `endcelldefine
-
-celldefine_compiler_directive
-	: '`celldefine'
-	;
-
-endcelldefine_compiler_directive
-	: '`endcelldefine'
-	;
-
-// 19.2 `default_nettype
-
-default_nettype_compiler_directive
-	: '`default_nettype' default_nettype_value
-	;
-
-default_nettype_value
-	: 'wire'
-	| 'tri'
-	| 'tri0'
-	| 'tri1'
-	| 'wand'
-	| 'triand'
-	| 'wor'
-	| 'trior'
-	| 'trireg'
-	| 'uwire'
-	| 'none'
-	;
-
-// 19.3 `define and `undef
-// 19.3.1 `define
-/*
-text_macro_definition
-	: '`define' text_macro_name MACRO_TEXT
-	;
-
-text_macro_name
-	: text_macro_identifier ('(' list_of_formal_arguments ')')?
-	;
-
-// we need to handle MACRO_TEXT in a separate Lexer mode
-// this requires splitting the grammar into Lexer and Parser grammars
-MACRO_TEXT
-	: 
-	;
-
-list_of_formal_arguments
-	: formal_argument_identifier (',' formal_argument_identifier)*
-	;
-
-formal_argument_identifier
-	: SIMPLE_IDENTIFIER
-	;
-
-text_macro_usage
-	: '`' text_macro_identifier ('(' list_of_actual_arguments ')')?
-	;
-
-list_of_actual_arguments
-	: actual_argument (',' actual_argument)*
-	;
-
-actual_argument
-	: expression
-	;
-*/
-// 19.3.2 `undef
-
-undefine_compiler_directive
-	: '`undef' text_macro_identifier
-	;
-
-// 19.4 `ifdef, `else, `elsif, `endif , `ifndef
-
-conditional_compilation_directive
-	: ifdef_directive
-	| ifndef_directive
-	;
-
-ifdef_directive
-	: '`ifdef' text_macro_identifier ifdef_group_of_lines ('`elsif' text_macro_identifier elsif_group_of_lines)* ('`else' else_group_of_lines)? '`endif'
-	;
-
-ifndef_directive
-	: '`ifndef' text_macro_identifier ifndef_group_of_lines ('`elsif' text_macro_identifier elsif_group_of_lines)* ('`else' else_group_of_lines)? '`endif'
-	;
-
-ifdef_group_of_lines
-	: (non_port_module_item | statement | conditional_compilation_directive)*
-	;
-
-ifndef_group_of_lines
-	: (non_port_module_item | statement | conditional_compilation_directive)*
-	;
-
-elsif_group_of_lines
-	: (non_port_module_item | statement | conditional_compilation_directive)*
-	;
-
-else_group_of_lines
-	: (non_port_module_item | statement | conditional_compilation_directive)*
-	;
-
-// 19.5 `include
-
-include_compiler_directive
-	: '`include' FILE_PATH_SPEC
-	;
-
-// 19.6 `resetall
-
-resetall_compiler_directive
-	: '`resetall'
-	;
-
-// 19.7 `line
-/*
-line_compiler_directive
-	: '`line' number STRING ('0' | '1' | '2')
-	;
-*/
-// 19.8 `timescale
-
-timescale_compiler_directive
-	: '`timescale' TIME_LITERAL '/' TIME_LITERAL
-	;
-
-TIME_LITERAL
-	: UNSIGNED_NUMBER TIME_UNIT
-	;
-
-fragment
-TIME_UNIT
-	: [mnpf]? 's'
-	;
-
-// 19.9 `unconnected_drive and `nounconnected_drive
-
-unconnected_drive_compiler_directive
-	: '`unconnected_drive' ('pull0' | 'pull1')
-	;
-
-nounconnected_drive_compiler_directive
-	: '`nounconnected_drive'
-	;
-
-// 19.10 `pragma
-
-pragma
-	: '`pragma' pragma_name (pragma_expression (',' pragma_expression )*)?
-	;
-
-pragma_name
-	: SIMPLE_IDENTIFIER
-	;
-
-pragma_expression
-	: pragma_keyword
-	| pragma_keyword '=' pragma_value
-	| pragma_value
-	;
-
-pragma_value
-	: '(' pragma_expression (',' pragma_expression)* ')'
-	| number
-	| STRING
-	| identifier
-	;
-
-pragma_keyword
-	: SIMPLE_IDENTIFIER
-	;
-
-// 19.11 `begin_keywords, `end_keywords
-
-keywords_directive
-	: '`begin_keywords' '"' version_specifier '"'
-	;
-
-version_specifier
-	: '1364-1995'
-	| '1364-2001'
-	| '1364-2001-noconfig'
-	| '1364-2005'
-	;
-
-endkeywords_directive
-	: '`end_keywords'
 	;
