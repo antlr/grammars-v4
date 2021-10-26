@@ -33,6 +33,7 @@ kirikiri-tjs
 kotlin/kotlin
 kotlin/kotlin-formal
 lambda
+less
 logo/logo
 logo/ucb-logo
 lpc
@@ -64,6 +65,7 @@ rego
 rexx
 rust
 scala
+scss
 sieve
 smalltalk
 smtlibv2
