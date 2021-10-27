@@ -69,7 +69,7 @@ inline_table_keyvals : inline_table_keyvals_non_empty? ;
 
 inline_table_keyvals_non_empty : key '=' value (',' inline_table_keyvals_non_empty)? ;
 
-array_table : '[[' key ']]' ;
+array_table : '[' '[' key ']' ']' ;
 
 /*
  * Lexer Rules
