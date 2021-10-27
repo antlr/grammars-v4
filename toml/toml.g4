@@ -108,7 +108,7 @@ fragment DIGIT_0_7 : [0-7] ;
 fragment DIGIT_0_1 : [0-1] ;
 DEC_INT : [+-]? (DIGIT | (DIGIT_1_9 (DIGIT | '_' DIGIT)+)) ;
 HEX_INT : '0x' HEX_DIGIT (HEX_DIGIT | '_' HEX_DIGIT)* ;
-OCT_INT : '0o' DIGIT_0_7 (DIGIT_0_7 | '_' DIGIT_0_7) ;
+OCT_INT : '0o' DIGIT_0_7 (DIGIT_0_7 | '_' DIGIT_0_7)* ;
 BIN_INT : '0b' DIGIT_0_1 (DIGIT_0_1 | '_' DIGIT_0_1)* ;
 // dates
 fragment YEAR : DIGIT DIGIT DIGIT DIGIT ;
