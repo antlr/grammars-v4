@@ -95,7 +95,7 @@ ML_BASIC_STRING : '"""' (ML_ESC | ~["\\])*? '"""' ;
 LITERAL_STRING : '\'' (~['\n])*? '\'' ;
 ML_LITERAL_STRING : '\'\'\'' (.)*? '\'\'\'';
 // floating point numbers
-fragment EXP : ('e' | 'E') DEC_INT ;
+fragment EXP : ('e' | 'E') [+-]? ZERO_PREFIXABLE_INT ;
 fragment ZERO_PREFIXABLE_INT : DIGIT (DIGIT | '_' DIGIT)* ;
 fragment FRAC : '.' ZERO_PREFIXABLE_INT ;
 FLOAT : DEC_INT ( EXP | FRAC EXP?) ;
