@@ -102,7 +102,7 @@ FLOAT : DEC_INT ( EXP | FRAC EXP?) ;
 INF : [+-]? 'inf' ;
 NAN : [+-]? 'nan' ;
 // integers
-fragment HEX_DIGIT : [A-F] | DIGIT ;
+fragment HEX_DIGIT : [A-Fa-f] | DIGIT ;
 fragment DIGIT_1_9 : [1-9] ;
 fragment DIGIT_0_7 : [0-7] ;
 fragment DIGIT_0_1 : [0-1] ;
