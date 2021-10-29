@@ -23,7 +23,7 @@ grammar toml;
  * Parser Rules
  */
 
-document : expression (NL expression)* ;
+document : expression (NL expression)* EOF ;
 
 expression : key_value comment | table comment | comment ;
 
