@@ -55,9 +55,10 @@ date_time : OFFSET_DATE_TIME | LOCAL_DATE_TIME | LOCAL_DATE | LOCAL_TIME ;
 
 array_ : '[' array_values? comment_or_nl ']' ;
 
-array_values : (comment_or_nl value ',' array_values comment_or_nl) | comment_or_nl value ','? ;
+array_values : (comment_or_nl value nl_or_comment ',' array_values comment_or_nl) | comment_or_nl value nl_or_comment ','? ;
 
 comment_or_nl : (COMMENT? NL)* ;
+nl_or_comment : (NL COMMENT?)* ;
 
 table : standard_table | array_table ;
 
