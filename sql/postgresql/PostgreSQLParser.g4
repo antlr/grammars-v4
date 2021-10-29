@@ -3112,12 +3112,12 @@ selectstmt
    ;
 
 select_with_parens
-   : OPEN_PAREN select_no_parens CLOSE_PAREN
+   : OPEN_PAREN select_no_parens   CLOSE_PAREN
    | OPEN_PAREN select_with_parens CLOSE_PAREN
    ;
 
 select_no_parens
-   : select_clause opt_sort_clause (for_locking_clause opt_select_limit | select_limit opt_for_locking_clause)?
+   :             select_clause opt_sort_clause (for_locking_clause opt_select_limit | select_limit opt_for_locking_clause)?
    | with_clause select_clause opt_sort_clause (for_locking_clause opt_select_limit | select_limit opt_for_locking_clause)?
    ;
 
@@ -3156,16 +3156,11 @@ set_operator_with_all_or_distinct
    ;
 
 with_clause
-   : WITH cte_list
-   //TODO
-
-   //            | WITH_LA cte_list
-   | WITH RECURSIVE cte_list
+   : WITH RECURSIVE? cte_list
    ;
 
 cte_list
-   : common_table_expr
-   | cte_list COMMA common_table_expr
+   : common_table_expr (COMMA common_table_expr)*
    ;
 
 common_table_expr
@@ -3184,8 +3179,7 @@ opt_with_clause
    ;
 
 into_clause
-   : INTO opt_strict opttempTableName
-   | INTO into_target
+   : INTO (opt_strict opttempTableName|into_target)
    |
    ;
 
@@ -3195,12 +3189,9 @@ opt_strict
    ;
 
 opttempTableName
-   : TEMPORARY opt_table qualified_name
-   | TEMP opt_table qualified_name
-   | LOCAL TEMPORARY opt_table qualified_name
-   | LOCAL TEMP opt_table qualified_name
-   | GLOBAL TEMPORARY opt_table qualified_name
-   | GLOBAL TEMP opt_table qualified_name
+   : (TEMPORARY|TEMP) opt_table qualified_name
+   | LOCAL (TEMPORARY|TEMP) opt_table qualified_name
+   | GLOBAL (TEMPORARY|TEMP) opt_table qualified_name
    | UNLOGGED opt_table qualified_name
    | TABLE qualified_name
    | qualified_name
@@ -3218,8 +3209,7 @@ all_or_distinct
    ;
 
 distinct_clause
-   : DISTINCT
-   | DISTINCT ON OPEN_PAREN expr_list CLOSE_PAREN
+   : DISTINCT (ON OPEN_PAREN expr_list CLOSE_PAREN)?
    ;
 
 opt_all_clause
@@ -3238,20 +3228,15 @@ sort_clause
 
 sortby_list
    : sortby (COMMA sortby)*
-   //            | sortby_list COMMA sortby
-
    ;
 
 sortby
-   : a_expr USING qual_all_op opt_nulls_order
-   | a_expr opt_asc_desc opt_nulls_order
+   : a_expr (USING qual_all_op |opt_asc_desc) opt_nulls_order
    ;
 
 select_limit
-   : limit_clause offset_clause
-   | offset_clause limit_clause
-   | limit_clause
-   | offset_clause
+   : limit_clause offset_clause?
+   | offset_clause limit_clause?
    ;
 
 opt_select_limit
@@ -3260,17 +3245,16 @@ opt_select_limit
    ;
 
 limit_clause
-   : LIMIT select_limit_value
-   | LIMIT select_limit_value COMMA select_offset_value
-   | FETCH first_or_next select_fetch_first_value row_or_rows ONLY
-   | FETCH first_or_next select_fetch_first_value row_or_rows WITH TIES
-   | FETCH first_or_next row_or_rows ONLY
-   | FETCH first_or_next row_or_rows WITH TIES
+   : LIMIT select_limit_value (COMMA select_offset_value)?
+   | FETCH first_or_next
+        (
+             select_fetch_first_value row_or_rows (ONLY|WITH TIES)
+            |row_or_rows (ONLY|WITH TIES)
+        )
    ;
 
 offset_clause
-   : OFFSET select_offset_value
-   | OFFSET select_fetch_first_value row_or_rows
+   : OFFSET (select_offset_value|select_fetch_first_value row_or_rows)
    ;
 
 select_limit_value
@@ -3309,8 +3293,7 @@ group_clause
    ;
 
 group_by_list
-   : group_by_item
-   | group_by_list COMMA group_by_item
+   : group_by_item (COMMA group_by_item)*
    ;
 
 group_by_item
@@ -3353,8 +3336,7 @@ opt_for_locking_clause
    ;
 
 for_locking_items
-   : for_locking_item
-   | for_locking_items for_locking_item
+   : for_locking_item+
    ;
 
 for_locking_item
@@ -3362,10 +3344,7 @@ for_locking_item
    ;
 
 for_locking_strength
-   : FOR UPDATE
-   | FOR NO KEY UPDATE
-   | FOR SHARE
-   | FOR KEY SHARE
+   : FOR (UPDATE|NO KEY UPDATE|SHARE|KEY SHARE)
    ;
 
 locked_rels_list
@@ -3374,8 +3353,7 @@ locked_rels_list
    ;
 
 values_clause
-   : VALUES OPEN_PAREN expr_list CLOSE_PAREN
-   | values_clause COMMA OPEN_PAREN expr_list CLOSE_PAREN
+   : VALUES OPEN_PAREN expr_list CLOSE_PAREN (COMMA OPEN_PAREN expr_list CLOSE_PAREN)*
    ;
 
 from_clause
@@ -3443,10 +3421,9 @@ table_ref
 
 
 alias_clause
-   : AS colid OPEN_PAREN name_list CLOSE_PAREN
-   | AS colid
-   | colid OPEN_PAREN name_list CLOSE_PAREN
-   | colid
+   :
+    AS colid (OPEN_PAREN name_list CLOSE_PAREN)?
+   | colid (OPEN_PAREN name_list CLOSE_PAREN)?
    ;
 
 opt_alias_clause
@@ -3456,8 +3433,7 @@ opt_alias_clause
 
 func_alias_clause
    : alias_clause
-   | AS OPEN_PAREN tablefuncelementlist CLOSE_PAREN
-   | AS colid OPEN_PAREN tablefuncelementlist CLOSE_PAREN
+   | AS colid? OPEN_PAREN tablefuncelementlist CLOSE_PAREN
    | colid OPEN_PAREN tablefuncelementlist CLOSE_PAREN
    |
    ;
@@ -3472,21 +3448,16 @@ join_qual
    ;
 
 relation_expr
-   : qualified_name
-   | qualified_name STAR
-   | ONLY qualified_name
-   | ONLY OPEN_PAREN qualified_name CLOSE_PAREN
+   :  qualified_name STAR?
+   | ONLY (qualified_name|OPEN_PAREN qualified_name CLOSE_PAREN)
    ;
 
 relation_expr_list
-   : relation_expr
-   | relation_expr_list COMMA relation_expr
+   : relation_expr (COMMA relation_expr)*
    ;
 
 relation_expr_opt_alias
-   : relation_expr
-   | relation_expr colid
-   | relation_expr AS colid
+   : relation_expr (AS? colid)?
    ;
 
 tablesample_clause
@@ -3508,8 +3479,7 @@ rowsfrom_item
    ;
 
 rowsfrom_list
-   : rowsfrom_item
-   | rowsfrom_list COMMA rowsfrom_item
+   : rowsfrom_item (COMMA rowsfrom_item)*
    ;
 
 opt_col_def_list
@@ -3529,8 +3499,7 @@ where_clause
    ;
 
 where_or_current_clause
-   : WHERE a_expr
-   | WHERE CURRENT_P OF cursor_name
+   : WHERE (CURRENT_P OF cursor_name | a_expr)
    |
    ;
 
@@ -3540,8 +3509,7 @@ opttablefuncelementlist
    ;
 
 tablefuncelementlist
-   : tablefuncelement
-   | tablefuncelementlist COMMA tablefuncelement
+   : tablefuncelement (COMMA tablefuncelement)*
    ;
 
 tablefuncelement
@@ -3553,8 +3521,7 @@ xmltable
    ;
 
 xmltable_column_list
-   : xmltable_column_el
-   | xmltable_column_list COMMA xmltable_column_el
+   : xmltable_column_el (COMMA xmltable_column_el)*
    ;
 
 xmltable_column_el
@@ -3573,8 +3540,7 @@ xmltable_column_option_el
    ;
 
 xml_namespace_list
-   : xml_namespace_el
-   | xml_namespace_list COMMA xml_namespace_el
+   : xml_namespace_el (COMMA xml_namespace_el)*
    ;
 
 xml_namespace_el
@@ -3599,8 +3565,7 @@ simpletypename
    | bit
    | character
    | constdatetime
-   | constinterval opt_interval
-   | constinterval OPEN_PAREN iconst CLOSE_PAREN
+   | constinterval (opt_interval|OPEN_PAREN iconst CLOSE_PAREN)
    ;
 
 consttypename
@@ -3638,6 +3603,7 @@ opt_float
    |
    ;
 
+//todo: merge alts
 bit
    : bitwithlength
    | bitwithoutlength
@@ -3676,10 +3642,8 @@ opt_varying
    ;
 
 constdatetime
-   : TIMESTAMP OPEN_PAREN iconst CLOSE_PAREN opt_timezone
-   | TIMESTAMP opt_timezone
-   | TIME OPEN_PAREN iconst CLOSE_PAREN opt_timezone
-   | TIME opt_timezone
+   : TIMESTAMP (OPEN_PAREN iconst CLOSE_PAREN)? opt_timezone
+   | TIME (OPEN_PAREN iconst CLOSE_PAREN)? opt_timezone
    ;
 
 constinterval
@@ -3701,18 +3665,14 @@ opt_interval
    | MINUTE_P
    | interval_second
    | YEAR_P TO MONTH_P
-   | DAY_P TO HOUR_P
-   | DAY_P TO MINUTE_P
-   | DAY_P TO interval_second
-   | HOUR_P TO MINUTE_P
-   | HOUR_P TO interval_second
+   | DAY_P TO (HOUR_P|MINUTE_P|interval_second)
+   | HOUR_P TO (MINUTE_P|interval_second)
    | MINUTE_P TO interval_second
    |
    ;
 
 interval_second
-   : SECOND_P
-   | SECOND_P OPEN_PAREN iconst CLOSE_PAREN
+   : SECOND_P (OPEN_PAREN iconst CLOSE_PAREN)?
    ;
 
 opt_escape
