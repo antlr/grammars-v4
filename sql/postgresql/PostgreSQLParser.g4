@@ -387,9 +387,7 @@ set_rest
    ;
 
 generic_set
-   : var_name (TO | EQUAL) (var_list /*|DEFAULT - it is under var_list-var_value_opt_boolean_or_string-nonreservedwprd_or_const-nonreservedword-identifier-plsql_unreserved_word*/
-
-   )
+   : var_name (TO | EQUAL)var_list
    ;
 
 set_rest_more
@@ -3585,8 +3583,8 @@ xml_namespace_el
    ;
 
 typename
-   : simpletypename (opt_array_bounds | (ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?))
-   | SETOF simpletypename (opt_array_bounds | (ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?))
+   : simpletypename (opt_array_bounds |ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?)
+   | SETOF simpletypename (opt_array_bounds |ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?)
    | qualified_name PERCENT (ROWTYPE | TYPE_P)
    ;
 
@@ -3743,7 +3741,7 @@ a_expr
    | a_expr qual_op a_expr
    | qual_op a_expr
    //range containment, set membership, string matching BETWEEN IN LIKE ILIKE SIMILAR
-   | a_expr NOT? (LIKE | ILIKE | SIMILAR TO | (BETWEEN SYMMETRIC?)) a_expr opt_escape
+   | a_expr NOT? (LIKE | ILIKE | SIMILAR TO |BETWEEN SYMMETRIC?) a_expr opt_escape
    //< > = <= >= <>	 	comparison operators
    | a_expr (LT | GT | EQUAL | LESS_EQUALS | GREATER_EQUALS | NOT_EQUALS) a_expr
    //IS ISNULL NOTNULL	 	IS TRUE, IS FALSE, IS NULL, IS DISTINCT FROM, etc
