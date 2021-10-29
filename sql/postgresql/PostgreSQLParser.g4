@@ -2969,15 +2969,13 @@ insertstmt
    ;
 
 insert_target
-   : qualified_name
-   | qualified_name AS colid
+   : qualified_name (AS colid)?
    ;
 
 insert_rest
    : selectstmt
    | OVERRIDING override_kind VALUE_P selectstmt
-   | OPEN_PAREN insert_column_list CLOSE_PAREN selectstmt
-   | OPEN_PAREN insert_column_list CLOSE_PAREN OVERRIDING override_kind VALUE_P selectstmt
+   | OPEN_PAREN insert_column_list CLOSE_PAREN (OVERRIDING override_kind VALUE_P)? selectstmt
    | DEFAULT VALUES
    ;
 
@@ -2987,8 +2985,7 @@ override_kind
    ;
 
 insert_column_list
-   : insert_column_item
-   | insert_column_list COMMA insert_column_item
+   : insert_column_item (COMMA insert_column_item)*
    ;
 
 insert_column_item
@@ -2996,8 +2993,7 @@ insert_column_item
    ;
 
 opt_on_conflict
-   : ON CONFLICT opt_conf_expr DO UPDATE SET set_clause_list where_clause
-   | ON CONFLICT opt_conf_expr DO NOTHING
+   : ON CONFLICT opt_conf_expr DO (UPDATE SET set_clause_list where_clause|NOTHING)
    |
    ;
 
@@ -3030,16 +3026,15 @@ opt_lock
    |
    ;
 
-lock_type
    : ACCESS SHARE
    | ROW SHARE
-   | ROW EXCLUSIVE
-   | SHARE UPDATE EXCLUSIVE
-   | SHARE
    | SHARE ROW EXCLUSIVE
    | EXCLUSIVE
    | ACCESS EXCLUSIVE
-   ;
+          | ROW (SHARE|EXCLUSIVE)
+          | SHARE (UPDATE EXCLUSIVE|ROW EXCLUSIVE|)
+          | EXCLUSIVE
+;
 
 opt_nowait
    : NOWAIT
