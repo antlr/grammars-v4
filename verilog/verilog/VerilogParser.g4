@@ -1,7 +1,494 @@
 // Author: Mustafa Said Ağca
 // License: MIT
 
-grammar VerilogParser;
+parser grammar VerilogParser;
+
+options {
+	tokenVocab = VerilogLexer;
+}
+
+// 17. System tasks and functions
+// 17.1 Display system tasks
+// 17.1.1 The display and write tasks
+
+display_tasks
+	: display_task_name (LEFT_PARENTHESIS list_of_arguments RIGHT_PARENTHESIS)?
+	;
+
+display_task_name
+	: DISPLAY
+	| DISPLAYB
+	| DISPLAYO
+	| DISPLAYH
+	| WRITE
+	| WRITEB
+	| WRITEO
+	| WRITEH
+	;
+
+list_of_arguments
+	: argument? (COMMA argument)*
+	;
+
+argument
+	: STRING
+	| expression
+	;
+
+// 17.1.2 Strobed monitoring
+
+strobe_tasks
+	: strobe_task_name (LEFT_PARENTHESIS list_of_arguments RIGHT_PARENTHESIS)?
+	;
+
+strobe_task_name
+	: STROBE
+	| STROBEB
+	| STROBEO
+	| STROBEH
+	;
+
+// 17.1.3 Continuous monitoring
+
+monitor_tasks
+	: monitor_task_name (LEFT_PARENTHESIS list_of_arguments RIGHT_PARENTHESIS)? SEMICOLON
+	| MONITORON SEMICOLON
+	| MONITOROFF SEMICOLON
+	;
+
+monitor_task_name
+	: MONITOR
+	| MONITORB
+	| MONITORO
+	| MONITORH
+	;
+
+// 17.2 File input-output system tasks and functions
+// 17.2.1 Opening and closing files
+
+file_open_function
+	: multi_channel_descriptor EQUAL FOPEN LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE RIGHT_PARENTHESIS SEMICOLON
+	| fd EQUAL FOPEN LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA TYPE RIGHT_PARENTHESIS SEMICOLON
+	;
+
+file_close_task
+	: FCLOSE LEFT_PARENTHESIS multi_channel_descriptor RIGHT_PARENTHESIS SEMICOLON
+	| FCLOSE LEFT_PARENTHESIS fd RIGHT_PARENTHESIS SEMICOLON
+	;
+
+multi_channel_descriptor
+	: variable_identifier
+	;
+
+fd
+	: variable_identifier
+	;
+
+// 17.2.2 File output system tasks
+
+file_output_tasks
+	: file_output_task_name LEFT_PARENTHESIS multi_channel_descriptor (COMMA list_of_arguments)? RIGHT_PARENTHESIS SEMICOLON
+	| file_output_task_name LEFT_PARENTHESIS fd (COMMA list_of_arguments)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+file_output_task_name
+	: FDISPLAY
+	| FDISPLAYB
+	| FDISPLAYH
+	| FDISPLAYO
+	| FWRITE
+	| FWRITEB
+	| FWRITEH
+	| FWRITEO
+	| FSTROBE
+	| FSTROBEB
+	| FSTROBEH
+	| FSTROBEO
+	| FMONITOR
+	| FMONITORB
+	| FMONITORH
+	| FMONITORO
+	;
+
+// 17.2.3 Formatting data to a string
+
+string_output_tasks
+	: string_output_task_name LEFT_PARENTHESIS output_reg COMMA list_of_arguments RIGHT_PARENTHESIS
+	;
+
+string_output_task_name
+	: SWRITE
+	| SWRITEB
+	| SWRITEH
+	| SWRITEO
+	;
+
+variable_format_string_output_task
+	: SFORMAT LEFT_PARENTHESIS output_reg COMMA format_string COMMA list_of_arguments RIGHT_PARENTHESIS
+	;
+
+output_reg
+	: variable_identifier
+	;
+
+format_string
+	: STRING // incomplete
+	;
+
+// 17.2.9 Loading memory data from a file
+
+load_memory_tasks
+	: READMEMB LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA memory_name (COMMA start_addr (COMMA finish_addr)?)? RIGHT_PARENTHESIS SEMICOLON
+	| READMEMH LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA memory_name (COMMA start_addr (COMMA finish_addr)?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+memory_name
+	: variable_identifier
+	;
+
+start_addr
+	: UNSIGNED_NUMBER
+	;
+
+finish_addr
+	: UNSIGNED_NUMBER
+	;
+
+// 17.2.10 Loading timing data from an SDF file
+
+sdf_annotate_task
+	: SDF_ANNOTATE LEFT_PARENTHESIS DOUBLE_QUOTE sdf_file DOUBLE_QUOTE (COMMA (DOUBLE_QUOTE module_instance_identifier DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE config_file DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE log_file DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE MTM_SPEC DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE scale_factors)? (COMMA (DOUBLE_QUOTE SCALE_TYPE DOUBLE_QUOTE)?)?)?)?)?)?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+sdf_file
+	: STRING
+	| identifier
+	;
+
+config_file
+	: FILE_NAME
+	;
+
+log_file
+	: FILE_NAME
+	;
+
+scale_factors
+	: real_number SEMICOLON real_number SEMICOLON real_number
+	;
+
+// 17.3 Timescale system tasks
+// 17.3.1 $printtimescale
+
+printtimescale_task
+	: PRINTTIMESCALE (LEFT_PARENTHESIS hierarchical_identifier RIGHT_PARENTHESIS)? SEMICOLON
+	;
+
+// 17.3.2 $timeformat
+
+timeformat_task
+	: TIMEFORMAT (LEFT_PARENTHESIS UNITS_NUMBER COMMA precision_number COMMA suffix_string COMMA minimum_field_width RIGHT_PARENTHESIS)? SEMICOLON
+	;
+
+precision_number
+	: UNSIGNED_NUMBER
+	;
+
+suffix_string
+	: STRING
+	;
+
+minimum_field_width
+	: UNSIGNED_NUMBER
+	;
+
+// 17.4 Simulation control system tasks
+// 17.4.1 $finish
+
+finish_task
+	: FINISH (LEFT_PARENTHESIS FINISH_NUMBER RIGHT_PARENTHESIS)? SEMICOLON
+	;
+
+// 17.4.2 $stop
+
+stop_task
+	: STOP (LEFT_PARENTHESIS FINISH_NUMBER RIGHT_PARENTHESIS)? SEMICOLON
+	;
+
+// 17.5 Programmable logic array (PLA) modeling system tasks
+
+pla_system_task
+	: (ASYNC_AND_ARRAY | ASYNC_NAND_ARRAY | ASYNC_OR_ARRAY | ASYNC_NOR_ARRAY | SYNC_AND_ARRAY | SYNC_NAND_ARRAY | SYNC_OR_ARRAY | SYNC_NOR_ARRAY | ASYNC_AND_PLANE | ASYNC_NAND_PLANE | ASYNC_OR_PLANE | ASYNC_NOR_PLANE | SYNC_AND_PLANE | SYNC_NAND_PLANE | SYNC_OR_PLANE | SYNC_NOR_PLANE) LEFT_PARENTHESIS memory_identifier COMMA input_terms COMMA output_terms RIGHT_PARENTHESIS SEMICOLON
+	;
+
+memory_identifier
+	: identifier
+	;
+
+input_terms
+	: expression
+	;
+
+output_terms
+	: variable_lvalue
+	;
+
+// 17.7 Simulation time system functions
+
+time_function
+	: TIME
+	;
+
+// 17.7.2 $stime
+
+stime_function
+	: STIME
+	;
+
+// 17.7.3 $realtime
+
+realtime_function
+	: REALTIME
+	;
+
+// 17.9 Probabilistic distribution functions
+// 17.9.1 $random function
+
+random_function
+	: RANDOM (LEFT_PARENTHESIS seed RIGHT_PARENTHESIS)?
+	;
+
+seed
+	: UNSIGNED_NUMBER
+	| variable_identifier
+	;
+
+// 17.9.2 $dist_ functions
+
+dist_functions
+	: DIST_UNIFORM LEFT_PARENTHESIS seed COMMA start COMMA end RIGHT_PARENTHESIS
+	| DIST_NORMAL LEFT_PARENTHESIS seed COMMA mean COMMA standard_deviation RIGHT_PARENTHESIS
+	| DIST_EXPONENTIAL LEFT_PARENTHESIS seed COMMA mean RIGHT_PARENTHESIS
+	| DIST_POISSON LEFT_PARENTHESIS seed COMMA mean RIGHT_PARENTHESIS
+	| DIST_CHI_SQUARE LEFT_PARENTHESIS seed COMMA degree_of_freedom RIGHT_PARENTHESIS
+	| DIST_T LEFT_PARENTHESIS seed COMMA degree_of_freedom RIGHT_PARENTHESIS
+	| DIST_ERLANG LEFT_PARENTHESIS seed COMMA k_stage COMMA mean RIGHT_PARENTHESIS
+	;
+
+start
+	: UNSIGNED_NUMBER
+	;
+
+end
+	: UNSIGNED_NUMBER
+	;
+
+mean
+	: UNSIGNED_NUMBER
+	;
+
+standard_deviation
+	: UNSIGNED_NUMBER
+	;
+
+degree_of_freedom
+	: UNSIGNED_NUMBER
+	;
+
+k_stage
+	: UNSIGNED_NUMBER
+	;
+
+// 19. Compiler directives
+// 19.1 `celldefine and `endcelldefine
+
+celldefine_compiler_directive
+	: CELLDEFINE
+	;
+
+endcelldefine_compiler_directive
+	: ENDCELLDEFINE
+	;
+
+// 19.2 `default_nettype
+
+default_nettype_compiler_directive
+	: DEFAULT_NETTYPE default_nettype_value
+	;
+
+default_nettype_value
+	: WIRE
+	| TRI
+	| TRI0
+	| TRI1
+	| WAND
+	| TRIAND
+	| WOR
+	| TRIOR
+	| TRIREG
+	| UWIRE
+	| NONE
+	;
+
+// 19.3 `define and `undef
+// 19.3.1 `define
+
+text_macro_definition
+	: DEFINE text_macro_name macro_text
+	;
+
+text_macro_name
+	: text_macro_identifier (LEFT_PARENTHESIS list_of_formal_arguments RIGHT_PARENTHESIS)?
+	;
+
+macro_text
+	: TEXT
+	;
+
+list_of_formal_arguments
+	: formal_argument_identifier (COMMA formal_argument_identifier)*
+	;
+
+formal_argument_identifier
+	: simple_identifier
+	;
+
+text_macro_usage
+	: GRAVE_ACCENT text_macro_identifier (LEFT_PARENTHESIS list_of_actual_arguments RIGHT_PARENTHESIS)?
+	;
+
+list_of_actual_arguments
+	: actual_argument (COMMA actual_argument)*
+	;
+
+actual_argument
+	: expression
+	;
+
+// 19.3.2 `undef
+
+undefine_compiler_directive
+	: UNDEF text_macro_identifier
+	;
+
+// 19.4 `ifdef, `else, `elsif, `endif , `ifndef
+
+ifdef_directive
+	: IFDEF text_macro_identifier ifdef_group_of_lines (ELSIF text_macro_identifier elsif_group_of_lines)* (ELSE else_group_of_lines)? ENDIF
+	;
+
+ifndef_directive
+	: IFNDEF text_macro_identifier ifndef_group_of_lines (ELSIF text_macro_identifier elsif_group_of_lines)* (ELSE else_group_of_lines)? ENDIF
+	;
+
+ifdef_group_of_lines
+	: group_of_lines
+	;
+
+ifndef_group_of_lines
+	: group_of_lines
+	;
+
+elsif_group_of_lines
+	: group_of_lines
+	;
+
+else_group_of_lines
+	: group_of_lines
+	;
+
+group_of_lines
+	: non_port_module_item
+	| statement
+	| celldefine_compiler_directive
+	| endcelldefine_compiler_directive
+	| default_nettype_compiler_directive
+	| text_macro_definition
+	| text_macro_usage
+	| undefine_compiler_directive
+	| ifdef_directive
+	| ifndef_directive
+	| include_compiler_directive
+	| resetall_compiler_directive
+	| line_compiler_directive
+	| timescale_compiler_directive
+	| unconnected_drive_compiler_directive
+	| nounconnected_drive_compiler_directive
+	| pragma
+	| keywords_directive
+	| endkeywords_directive
+	;
+
+// 19.5 `include
+
+include_compiler_directive
+	: INCLUDE FILE_NAME
+	;
+
+// 19.6 `resetall
+
+resetall_compiler_directive
+	: RESETALL
+	;
+
+// 19.7 `line
+
+line_compiler_directive
+	: LINE number STRING LEVEL
+	;
+
+// 19.8 `timescale
+
+timescale_compiler_directive
+	: TIMESCALE TIME_LITERAL SLASH TIME_LITERAL
+	;
+
+// 19.9 `unconnected_drive and `nounconnected_drive
+
+unconnected_drive_compiler_directive
+	: UNCONNECTED_DRIVE (PULL0 | PULL1)
+	;
+
+nounconnected_drive_compiler_directive
+	: NOUNCONNECTED_DRIVE
+	;
+
+// 19.10 `pragma
+
+pragma
+	: PRAGMA pragma_name (pragma_expression (COMMA pragma_expression )*)?
+	;
+
+pragma_name
+	: simple_identifier
+	;
+
+pragma_expression
+	: pragma_keyword
+	| pragma_keyword EQUAL pragma_value
+	| pragma_value
+	;
+
+pragma_value
+	: LEFT_PARENTHESIS pragma_expression (COMMA pragma_expression)* RIGHT_PARENTHESIS
+	| number
+	| STRING
+	| identifier
+	;
+
+pragma_keyword
+	: simple_identifier
+	;
+
+// 19.11 `begin_keywords, `end_keywords
+
+keywords_directive
+	: BEGIN_KEYWORDS DOUBLE_QUOTE VERSION_SPECIFIER DOUBLE_QUOTE
+	;
+
+endkeywords_directive
+	: END_KEYWORDS
+	;
 
 // A.1 Source text
 // A.1.1 Library source text
@@ -17,11 +504,11 @@ library_description
 	;
 
 library_declaration
-	: 'library' library_identifier FILE_PATH_SPEC ((',' FILE_PATH_SPEC)*)? ('-incdir' FILE_PATH_SPEC (',' FILE_PATH_SPEC)*)? ';'
+	: LIBRARY library_identifier FILE_PATH_SPEC (COMMA FILE_PATH_SPEC)* (MINUS_INCDIR FILE_PATH_SPEC (COMMA FILE_PATH_SPEC)*)? SEMICOLON
 	;
 
 include_statement
-	: 'include' FILE_PATH_SPEC ';'
+	: INCLUDE FILE_PATH_SPEC SEMICOLON
 	;
 
 // A.1.2 Verilog source text
@@ -36,42 +523,42 @@ description
 	;
 
 module_declaration
-	: attribute_instance* module_keyword module_identifier module_parameter_port_list? list_of_ports ';' module_item* 'endmodule'
-	| attribute_instance* module_keyword module_identifier module_parameter_port_list? list_of_port_declarations? ';' non_port_module_item* 'endmodule'
+	: attribute_instance* module_keyword module_identifier module_parameter_port_list? list_of_ports SEMICOLON module_item* ENDMODULE
+	| attribute_instance* module_keyword module_identifier module_parameter_port_list? list_of_port_declarations? SEMICOLON non_port_module_item* ENDMODULE
 	;
 
 module_keyword
-	: 'module'
-	| 'macromodule'
+	: MODULE
+	| MACROMODULE
 	;
 
 // A.1.3 Module parameters and ports
 
 module_parameter_port_list
-	: '#' '(' parameter_declaration (',' parameter_declaration)* ')'
+	: HASH LEFT_PARENTHESIS parameter_declaration (COMMA parameter_declaration)* RIGHT_PARENTHESIS
 	;
 
 list_of_ports
-	: '(' port (',' port)* ')'
+	: LEFT_PARENTHESIS port (COMMA port)* RIGHT_PARENTHESIS
 	;
 
 list_of_port_declarations
-	: '(' port_declaration (',' port_declaration)* ')'
-	| '(' ')'
+	: LEFT_PARENTHESIS port_declaration (COMMA port_declaration)* RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS RIGHT_PARENTHESIS
 	;
 
 port
 	: port_expression?
-	| '.' port_identifier '(' port_expression? ')'
+	| DOT port_identifier LEFT_PARENTHESIS port_expression? RIGHT_PARENTHESIS
 	;
 
 port_expression
 	: port_reference
-	| '{' port_reference (',' port_reference)* '}'
+	| LEFT_BRACE port_reference (COMMA port_reference)* RIGHT_BRACE
 	;
 
 port_reference
-	: port_identifier ('[' constant_range_expression ']')?
+	: port_identifier (LEFT_BRACKET constant_range_expression RIGHT_BRACKET)?
 	;
 
 port_declaration
@@ -83,13 +570,13 @@ port_declaration
 // A.1.4 Module items
 
 module_item
-	: port_declaration ';'
+	: port_declaration SEMICOLON
 	| non_port_module_item
 	;
 
 module_or_generate_item
 	: attribute_instance* module_or_generate_item_declaration
-	| attribute_instance* local_parameter_declaration ';'
+	| attribute_instance* local_parameter_declaration SEMICOLON
 	| attribute_instance* parameter_override
 	| attribute_instance* continuous_assign
 	| attribute_instance* gate_instantiation
@@ -117,22 +604,22 @@ non_port_module_item
 	: module_or_generate_item
 	| generate_region
 	| specify_block
-	| attribute_instance* parameter_declaration ';'
+	| attribute_instance* parameter_declaration SEMICOLON
 	| attribute_instance* specparam_declaration
 	;
 
 parameter_override
-	: 'defparam' list_of_param_assignments ';'
+	: DEFPARAM list_of_param_assignments SEMICOLON
 	;
 
 // A.1.5 Configuration source text
 
 config_declaration
-	: 'config' config_identifier ';' design_statement config_rule_statement* 'endconfig'
+	: CONFIG config_identifier SEMICOLON design_statement config_rule_statement* ENDCONFIG
 	;
 
 design_statement
-	: 'design' ((library_identifier '.')? cell_identifier)* ';'
+	: DESIGN ((library_identifier DOT)? cell_identifier)* SEMICOLON
 	;
 
 config_rule_statement
@@ -144,27 +631,27 @@ config_rule_statement
 	;
 
 default_clause
-	: 'default'
+	: DEFAULT
 	;
 
 inst_clause
-	: 'instance' inst_name
+	: INSTANCE inst_name
 	;
 
 inst_name
-	: topmodule_identifier ('.' instance_identifier)*
+	: topmodule_identifier (DOT instance_identifier)*
 	;
 
 cell_clause
-	: 'cell' (library_identifier '.')? cell_identifier
+	: CELL (library_identifier DOT)? cell_identifier
 	;
 
 liblist_clause
-	: 'liblist' library_identifier*
+	: LIBLIST library_identifier*
 	;
 
 use_clause
-	: 'use' (library_identifier '.')? cell_identifier ':config'?
+	: USE (library_identifier DOT)? cell_identifier COLON_CONFIG?
 	;
 
 // A.2 Declarations
@@ -172,223 +659,223 @@ use_clause
 // A.2.1.1 Module parameter declarations
 
 local_parameter_declaration
-	: 'localparam' 'signed'? range_? list_of_param_assignments
-	| 'localparam' parameter_type list_of_param_assignments
+	: LOCALPARAM SIGNED? range_? list_of_param_assignments
+	| LOCALPARAM parameter_type list_of_param_assignments
 	;
 
 parameter_declaration
-	: 'parameter' 'signed'? range_? list_of_param_assignments
-	| 'parameter' parameter_type list_of_param_assignments
+	: PARAMETER SIGNED? range_? list_of_param_assignments
+	| PARAMETER parameter_type list_of_param_assignments
 	;
 
 specparam_declaration
-	: 'specparam' range_? list_of_specparam_assignments ';'
+	: SPECPARAM range_? list_of_specparam_assignments SEMICOLON
 	;
 
 parameter_type
-	: 'integer'
-	| 'real'
-	| 'realtime'
-	| 'time'
+	: INTEGER
+	| REAL
+	| REALTIME
+	| TIME
 	;
 
 // A.2.1.2 Port declarations
 
 inout_declaration
-	: 'inout' net_type? 'signed'? range_? list_of_port_identifiers
+	: INOUT net_type? SIGNED? range_? list_of_port_identifiers
 	;
 
 input_declaration
-	: 'input' net_type? 'signed'? range_? list_of_port_identifiers
+	: INPUT net_type? SIGNED? range_? list_of_port_identifiers
 	;
 
 output_declaration
-	: 'output' net_type? 'signed'? range_? list_of_port_identifiers
-	| 'output' 'reg' 'signed'? range_? list_of_variable_port_identifiers
-	| 'output' output_variable_type list_of_variable_port_identifiers
+	: OUTPUT net_type? SIGNED? range_? list_of_port_identifiers
+	| OUTPUT REG SIGNED? range_? list_of_variable_port_identifiers
+	| OUTPUT output_variable_type list_of_variable_port_identifiers
 	;
 
 // A.2.1.3 Type declarations
 
 event_declaration
-	: 'event' list_of_event_identifiers ';'
+	: EVENT list_of_event_identifiers SEMICOLON
 	;
 
 integer_declaration
-	: 'integer' list_of_variable_identifiers ';'
+	: INTEGER list_of_variable_identifiers SEMICOLON
 	;
 
 net_declaration
-	: net_type 'signed'? delay3? list_of_net_identifiers ';'
-	| net_type drive_strength? 'signed'? delay3? list_of_net_decl_assignments ';'
-	| net_type ('vectored' | 'scalared')? 'signed'? range_ delay3? list_of_net_identifiers ';'
-	| net_type drive_strength? ('vectored' | 'scalared')? 'signed'? range_ delay3? list_of_net_decl_assignments ';'
-	| 'trireg' charge_strength? 'signed'? delay3? list_of_net_identifiers ';'
-	| 'trireg' drive_strength? 'signed'? delay3? list_of_net_decl_assignments ';'
-	| 'trireg' charge_strength? ('vectored' | 'scalared')? 'signed'? range_ delay3? list_of_net_identifiers ';'
-	| 'trireg' drive_strength? ('vectored' | 'scalared')? 'signed'? range_ delay3? list_of_net_decl_assignments ';'
+	: net_type SIGNED? delay3? list_of_net_identifiers SEMICOLON
+	| net_type drive_strength? SIGNED? delay3? list_of_net_decl_assignments SEMICOLON
+	| net_type (VECTORED | SCALARED)? SIGNED? range_ delay3? list_of_net_identifiers SEMICOLON
+	| net_type drive_strength? (VECTORED | SCALARED)? SIGNED? range_ delay3? list_of_net_decl_assignments SEMICOLON
+	| TRIREG charge_strength? SIGNED? delay3? list_of_net_identifiers SEMICOLON
+	| TRIREG drive_strength? SIGNED? delay3? list_of_net_decl_assignments SEMICOLON
+	| TRIREG charge_strength? (VECTORED | SCALARED)? SIGNED? range_ delay3? list_of_net_identifiers SEMICOLON
+	| TRIREG drive_strength? (VECTORED | SCALARED)? SIGNED? range_ delay3? list_of_net_decl_assignments SEMICOLON
 	;
 
 real_declaration
-	: 'real' list_of_real_identifiers ';'
+	: REAL list_of_real_identifiers SEMICOLON
 	;
 
 realtime_declaration
-	: 'realtime' list_of_real_identifiers ';'
+	: REALTIME list_of_real_identifiers SEMICOLON
 	;
 
 reg_declaration
-	: 'reg' 'signed'? range_? list_of_variable_identifiers ';'
+	: REG SIGNED? range_? list_of_variable_identifiers SEMICOLON
 	;
 
 time_declaration
-	: 'time' list_of_variable_identifiers ';'
+	: TIME list_of_variable_identifiers SEMICOLON
 	;
 
 // A.2.2 Declaration data types
 // A.2.2.1 Net and variable types
 
 net_type
-	: 'supply0'
-	| 'supply1'
-	| 'tri'
-	| 'triand'
-	| 'trior'
-	| 'tri0'
-	| 'tri1'
-	| 'wire'
-	| 'wand'
-	| 'wor'
+	: SUPPLY0
+	| SUPPLY1
+	| TRI
+	| TRIAND
+	| TRIOR
+	| TRI0
+	| TRI1
+	| WIRE
+	| WAND
+	| WOR
 	;
 
 output_variable_type
-	: 'integer'
-	| 'time'
+	: INTEGER
+	| TIME
 	;
 
 real_type
 	: real_identifier dimension*
-	| real_identifier '=' constant_expression
+	| real_identifier EQUAL constant_expression
 	;
 
 variable_type
 	: variable_identifier dimension*
-	| variable_identifier '=' constant_expression
+	| variable_identifier EQUAL constant_expression
 	;
 
 // A.2.2.2 Strengths
 
 drive_strength
-	: '(' strength0 ',' strength1 ')'
-	| '(' strength1 ',' strength0 ')'
-	| '(' strength0 ',' 'highz1' ')'
-	| '(' strength1 ',' 'highz0' ')'
-	| '(' 'highz0' ',' strength1 ')'
-	| '(' 'highz1' ',' strength0 ')'
+	: LEFT_PARENTHESIS strength0 COMMA strength1 RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS strength1 COMMA strength0 RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS strength0 COMMA HIGHZ1 RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS strength1 COMMA HIGHZ0 RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS HIGHZ0 COMMA strength1 RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS HIGHZ1 COMMA strength0 RIGHT_PARENTHESIS
 	;
 
 strength0
-	: 'supply0'
-	| 'strong0'
-	| 'pull0'
-	| 'weak0'
+	: SUPPLY0
+	| STRONG0
+	| PULL0
+	| WEAK0
 	;
 
 strength1
-	: 'supply1'
-	| 'strong1'
-	| 'pull1'
-	| 'weak1'
+	: SUPPLY1
+	| STRONG1
+	| PULL1
+	| WEAK1
 	;
 
 charge_strength
-	: '(' 'small' ')'
-	| '(' 'medium' ')'
-	| '(' 'large' ')'
+	: LEFT_PARENTHESIS SMALL RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS MEDIUM RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS LARGE RIGHT_PARENTHESIS
 	;
 
 // A.2.2.3 Delays
 
 delay3
-	: '#' delay_value
-	| '#' '(' mintypmax_expression (',' mintypmax_expression (',' mintypmax_expression)?)? ')'
+	: HASH delay_value
+	| HASH LEFT_PARENTHESIS mintypmax_expression (COMMA mintypmax_expression (COMMA mintypmax_expression)?)? RIGHT_PARENTHESIS
 	;
 
 delay2
-	: '#' delay_value
-	| '#' '(' mintypmax_expression (',' mintypmax_expression)? ')'
+	: HASH delay_value
+	| HASH LEFT_PARENTHESIS mintypmax_expression (COMMA mintypmax_expression)? RIGHT_PARENTHESIS
 	;
 
 delay_value
 	: UNSIGNED_NUMBER
-	| REAL_NUMBER
+	| real_number
 	| identifier
 	;
 
 // A.2.3 Declaration lists
 
 list_of_defparam_assignments
-	: defparam_assignment (',' defparam_assignment)*
+	: defparam_assignment (COMMA defparam_assignment)*
 	;
 
 list_of_event_identifiers
-	: event_identifier dimension*? (',' event_identifier dimension*?)*
+	: event_identifier dimension*? (COMMA event_identifier dimension*?)*
 	;
 
 list_of_net_decl_assignments
-	: net_decl_assignment (',' net_decl_assignment)*
+	: net_decl_assignment (COMMA net_decl_assignment)*
 	;
 
 list_of_net_identifiers
-	: net_identifier dimension*? (',' net_identifier dimension*?)*
+	: net_identifier dimension*? (COMMA net_identifier dimension*?)*
 	;
 
 list_of_param_assignments
-	: param_assignment (',' param_assignment)*
+	: param_assignment (COMMA param_assignment)*
 	;
 
 list_of_port_identifiers
-	: port_identifier (',' port_identifier)*
+	: port_identifier (COMMA port_identifier)*
 	;
 
 list_of_real_identifiers
-	: real_type (',' real_type)*
+	: real_type (COMMA real_type)*
 	;
 
 list_of_specparam_assignments
-	: specparam_assignment (',' specparam_assignment)*
+	: specparam_assignment (COMMA specparam_assignment)*
 	;
 
 list_of_variable_identifiers
-	: variable_type (',' variable_type)*
+	: variable_type (COMMA variable_type)*
 	;
 
 list_of_variable_port_identifiers
-	: port_identifier ('=' constant_expression)? (',' port_identifier ('=' constant_expression)?)*
+	: port_identifier (EQUAL constant_expression)? (COMMA port_identifier (EQUAL constant_expression)?)*
 	;
 
 // A.2.4 Declaration assignments
 
 defparam_assignment
-	: hierarchical_parameter_identifier '=' constant_mintypmax_expression
+	: hierarchical_parameter_identifier EQUAL constant_mintypmax_expression
 	;
 
 net_decl_assignment
-	: net_identifier '=' expression
+	: net_identifier EQUAL expression
 	;
 
 param_assignment
-	: parameter_identifier '=' constant_mintypmax_expression
+	: parameter_identifier EQUAL constant_mintypmax_expression
 	;
 
 specparam_assignment
-	: specparam_identifier '=' constant_mintypmax_expression
+	: specparam_identifier EQUAL constant_mintypmax_expression
 	| pulse_control_specparam
 	;
 
 pulse_control_specparam
-	: 'PATHPULSE$' '=' '(' reject_limit_value (',' error_limit_value)? ')'
-	| 'PATHPULSE$' specify_input_terminal_descriptor '$' specify_output_terminal_descriptor '=' '(' reject_limit_value (',' error_limit_value)? ')'
+	: PATHPULSE EQUAL LEFT_PARENTHESIS reject_limit_value (COMMA error_limit_value)? RIGHT_PARENTHESIS
+	| PATHPULSE specify_input_terminal_descriptor DOT specify_output_terminal_descriptor EQUAL LEFT_PARENTHESIS reject_limit_value (COMMA error_limit_value)? RIGHT_PARENTHESIS
 	;
 
 error_limit_value
@@ -406,53 +893,53 @@ limit_value
 // A.2.5 Declaration ranges
 
 dimension
-	: '[' dimension_constant_expression ':' dimension_constant_expression ']'
+	: LEFT_BRACKET dimension_constant_expression COLON dimension_constant_expression RIGHT_BRACKET
 	;
 
 range_
-	: '[' msb_constant_expression ':' lsb_constant_expression ']'
+	: LEFT_BRACKET msb_constant_expression COLON lsb_constant_expression RIGHT_BRACKET
 	;
 
 // A.2.6 Function declarations
 
 function_declaration
-	: 'function' 'automatic'? function_range_or_type? function_identifier ';' function_item_declaration function_item_declaration* function_statement 'endfunction'
-	| 'function' 'automatic'? function_range_or_type? function_identifier '(' function_port_list ')' ';' block_item_declaration* function_statement 'endfunction'
+	: FUNCTION AUTOMATIC? function_range_or_type? function_identifier SEMICOLON function_item_declaration function_item_declaration* function_statement ENDFUNCTION
+	| FUNCTION AUTOMATIC? function_range_or_type? function_identifier LEFT_PARENTHESIS function_port_list RIGHT_PARENTHESIS SEMICOLON block_item_declaration* function_statement ENDFUNCTION
 	;
 
 function_item_declaration
 	: block_item_declaration
-	| attribute_instance* tf_input_declaration ';'
+	| attribute_instance* tf_input_declaration SEMICOLON
 	;
 
 function_port_list
-	: attribute_instance* tf_input_declaration (',' attribute_instance* tf_input_declaration)*
+	: attribute_instance* tf_input_declaration (COMMA attribute_instance* tf_input_declaration)*
 	;
 
 function_range_or_type
-	: 'signed'? range_
-	| 'integer'
-	| 'real'
-	| 'realtime'
-	| 'time'
+	: SIGNED? range_
+	| INTEGER
+	| REAL
+	| REALTIME
+	| TIME
 	;
 
 // A.2.7 Task declarations
 
 task_declaration
-	: 'task' 'automatic'? task_identifier ';' task_item_declaration* statement_or_null 'endtask'
-	| 'task' 'automatic'? task_identifier '(' task_port_list? ')' ';' block_item_declaration* statement_or_null 'endtask'
+	: TASK AUTOMATIC? task_identifier SEMICOLON task_item_declaration* statement_or_null ENDTASK
+	| TASK AUTOMATIC? task_identifier LEFT_PARENTHESIS task_port_list? RIGHT_PARENTHESIS SEMICOLON block_item_declaration* statement_or_null ENDTASK
 	;
 
 task_item_declaration
 	: block_item_declaration
-	| attribute_instance* tf_input_declaration ';'
-	| attribute_instance* tf_output_declaration ';'
-	| attribute_instance* tf_inout_declaration ';'
+	| attribute_instance* tf_input_declaration SEMICOLON
+	| attribute_instance* tf_output_declaration SEMICOLON
+	| attribute_instance* tf_inout_declaration SEMICOLON
 	;
 
 task_port_list
-	: task_port_item (',' task_port_item)*
+	: task_port_item (COMMA task_port_item)*
 	;
 
 task_port_item
@@ -462,46 +949,46 @@ task_port_item
 	;
 
 tf_input_declaration
-	: 'input' 'reg'? 'signed'? range_? list_of_port_identifiers
-	| 'input' task_port_type list_of_port_identifiers
+	: INPUT REG? SIGNED? range_? list_of_port_identifiers
+	| INPUT task_port_type list_of_port_identifiers
 	;
 
 tf_output_declaration
-	: 'output' 'reg'? 'signed'? range_? list_of_port_identifiers
-	| 'output' task_port_type list_of_port_identifiers
+	: OUTPUT REG? SIGNED? range_? list_of_port_identifiers
+	| OUTPUT task_port_type list_of_port_identifiers
 	;
 
 tf_inout_declaration
-	: 'inout' 'reg'? 'signed'? range_? list_of_port_identifiers
-	| 'inout' task_port_type list_of_port_identifiers
+	: INOUT REG? SIGNED? range_? list_of_port_identifiers
+	| INOUT task_port_type list_of_port_identifiers
 	;
 
 task_port_type
-	: 'integer'
-	| 'real'
-	| 'realtime'
-	| 'time'
+	: INTEGER
+	| REAL
+	| REALTIME
+	| TIME
 	;
 
 // A.2.8 Block item declarations
 
 block_item_declaration
-	: attribute_instance* 'reg' 'signed'? range_? list_of_block_variable_identifiers ';'
-	| attribute_instance* 'integer' list_of_block_variable_identifiers ';'
-	| attribute_instance* 'time' list_of_block_variable_identifiers ';'
-	| attribute_instance* 'real' list_of_block_real_identifiers ';'
-	| attribute_instance* 'realtime' list_of_block_real_identifiers ';'
+	: attribute_instance* REG SIGNED? range_? list_of_block_variable_identifiers SEMICOLON
+	| attribute_instance* INTEGER list_of_block_variable_identifiers SEMICOLON
+	| attribute_instance* TIME list_of_block_variable_identifiers SEMICOLON
+	| attribute_instance* REAL list_of_block_real_identifiers SEMICOLON
+	| attribute_instance* REALTIME list_of_block_real_identifiers SEMICOLON
 	| attribute_instance* event_declaration
-	| attribute_instance* local_parameter_declaration ';'
-	| attribute_instance* parameter_declaration ';'
+	| attribute_instance* local_parameter_declaration SEMICOLON
+	| attribute_instance* parameter_declaration SEMICOLON
 	;
 
 list_of_block_variable_identifiers
-	: block_variable_type (',' block_variable_type)*
+	: block_variable_type (COMMA block_variable_type)*
 	;
 
 list_of_block_real_identifiers
-	: block_real_type (',' block_real_type)*
+	: block_real_type (COMMA block_real_type)*
 	;
 
 block_variable_type
@@ -516,47 +1003,47 @@ block_real_type
 // A.3.1 Primitive instantiation and instances
 
 gate_instantiation
-	: cmos_switchtype delay3? cmos_switch_instance (',' cmos_switch_instance)* ';'
-	| enable_gatetype drive_strength? delay3? enable_gate_instance (',' enable_gate_instance)* ';'
-	| mos_switchtype delay3? mos_switch_instance (',' mos_switch_instance)* ';'
-	| n_input_gatetype drive_strength? delay2? n_input_gate_instance (',' n_input_gate_instance)* ';'
-	| n_output_gatetype drive_strength? delay2? n_output_gate_instance (',' n_output_gate_instance)* ';'
-	| pass_en_switchtype delay2? pass_enable_switch_instance (',' pass_enable_switch_instance)* ';'
-	| pass_switchtype pass_switch_instance (',' pass_switch_instance)* ';'
-	| 'pulldown' pulldown_strength? pull_gate_instance (',' pull_gate_instance)* ';'
-	| 'pullup' pullup_strength? pull_gate_instance (',' pull_gate_instance)* ';'
+	: cmos_switchtype delay3? cmos_switch_instance (COMMA cmos_switch_instance)* SEMICOLON
+	| enable_gatetype drive_strength? delay3? enable_gate_instance (COMMA enable_gate_instance)* SEMICOLON
+	| mos_switchtype delay3? mos_switch_instance (COMMA mos_switch_instance)* SEMICOLON
+	| n_input_gatetype drive_strength? delay2? n_input_gate_instance (COMMA n_input_gate_instance)* SEMICOLON
+	| n_output_gatetype drive_strength? delay2? n_output_gate_instance (COMMA n_output_gate_instance)* SEMICOLON
+	| pass_en_switchtype delay2? pass_enable_switch_instance (COMMA pass_enable_switch_instance)* SEMICOLON
+	| pass_switchtype pass_switch_instance (COMMA pass_switch_instance)* SEMICOLON
+	| PULLDOWN pulldown_strength? pull_gate_instance (COMMA pull_gate_instance)* SEMICOLON
+	| PULLUP pullup_strength? pull_gate_instance (COMMA pull_gate_instance)* SEMICOLON
 	;
 
 cmos_switch_instance
-	: name_of_gate_instance? '(' output_terminal ',' input_terminal ',' ncontrol_terminal ',' pcontrol_terminal ')'
+	: name_of_gate_instance? LEFT_PARENTHESIS output_terminal COMMA input_terminal COMMA ncontrol_terminal COMMA pcontrol_terminal RIGHT_PARENTHESIS
 	;
 
 enable_gate_instance
-	: name_of_gate_instance? '(' output_terminal ',' input_terminal ',' enable_terminal ')'
+	: name_of_gate_instance? LEFT_PARENTHESIS output_terminal COMMA input_terminal COMMA enable_terminal RIGHT_PARENTHESIS
 	;
 
 mos_switch_instance
-	: name_of_gate_instance? '(' output_terminal ',' input_terminal ',' enable_terminal ')'
+	: name_of_gate_instance? LEFT_PARENTHESIS output_terminal COMMA input_terminal COMMA enable_terminal RIGHT_PARENTHESIS
 	;
 
 n_input_gate_instance
-	: name_of_gate_instance? '(' output_terminal ',' input_terminal (',' input_terminal)* ')'
+	: name_of_gate_instance? LEFT_PARENTHESIS output_terminal COMMA input_terminal (COMMA input_terminal)* RIGHT_PARENTHESIS
 	;
 
 n_output_gate_instance
-	: name_of_gate_instance? '(' output_terminal (',' output_terminal)* ',' input_terminal ')'
+	: name_of_gate_instance? LEFT_PARENTHESIS output_terminal (COMMA output_terminal)* COMMA input_terminal RIGHT_PARENTHESIS
 	;
 
 pass_switch_instance
-	: name_of_gate_instance? '(' inout_terminal ',' inout_terminal ')'
+	: name_of_gate_instance? LEFT_PARENTHESIS inout_terminal COMMA inout_terminal RIGHT_PARENTHESIS
 	;
 
 pass_enable_switch_instance
-	: name_of_gate_instance? '(' inout_terminal ',' inout_terminal ',' enable_terminal ')'
+	: name_of_gate_instance? LEFT_PARENTHESIS inout_terminal COMMA inout_terminal COMMA enable_terminal RIGHT_PARENTHESIS
 	;
 
 pull_gate_instance
-	: name_of_gate_instance? '(' output_terminal ')'
+	: name_of_gate_instance? LEFT_PARENTHESIS output_terminal RIGHT_PARENTHESIS
 	;
 
 name_of_gate_instance
@@ -566,15 +1053,15 @@ name_of_gate_instance
 // A.3.2 Primitive strengths
 
 pulldown_strength
-	: '(' strength0 ',' strength1 ')'
-	| '(' strength1 ',' strength0 ')'
-	| '(' strength0 ')'
+	: LEFT_PARENTHESIS strength0 COMMA strength1 RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS strength1 COMMA strength0 RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS strength0 RIGHT_PARENTHESIS
 	;
 
 pullup_strength
-	: '(' strength0 ',' strength1 ')'
-	| '(' strength1 ',' strength0 ')'
-	| '(' strength1 ')'
+	: LEFT_PARENTHESIS strength0 COMMA strength1 RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS strength1 COMMA strength0 RIGHT_PARENTHESIS
+	| LEFT_PARENTHESIS strength1 RIGHT_PARENTHESIS
 	;
 
 // A.3.3 Primitive terminals
@@ -606,64 +1093,64 @@ pcontrol_terminal
 // A.3.4 Primitive gate and switch types
 
 cmos_switchtype
-	: 'cmos'
-	| 'rcmos'
+	: CMOS
+	| RCMOS
 	;
 
 enable_gatetype
-	: 'bufif0'
-	| 'bufif1'
-	| 'notif0'
-	| 'notif1'
+	: BUFIF0
+	| BUFIF1
+	| NOTIF0
+	| NOTIF1
 	;
 
 mos_switchtype
-	: 'nmos'
-	| 'pmos'
-	| 'rnmos'
-	| 'rpmos'
+	: NMOS
+	| PMOS
+	| RNMOS
+	| RPMOS
 	;
 
 n_input_gatetype
-	: 'and'
-	| 'nand'
-	| 'or'
-	| 'nor'
-	| 'xor'
-	| 'xnor'
+	: AND
+	| NAND
+	| OR
+	| NOR
+	| XOR
+	| XNOR
 	;
 
 n_output_gatetype
-	: 'buf'
-	| 'not'
+	: BUF
+	| NOT
 	;
 
 pass_en_switchtype
-	: 'tranif0'
-	| 'tranif1'
-	| 'rtranif1'
-	| 'rtranif0'
+	: TRANIF0
+	| TRANIF1
+	| RTRANIF1
+	| RTRANIF0
 	;
 
 pass_switchtype
-	: 'tran'
-	| 'rtran'
+	: TRAN
+	| RTRAN
 	;
 
 // A.4 Module instantiation and generate construct
 // A.4.1 Module instantiation
 
 module_instantiation
-	: module_identifier parameter_value_assignment? module_instance (',' module_instance)* ';'
+	: module_identifier parameter_value_assignment? module_instance (COMMA module_instance)* SEMICOLON
 	;
 
 parameter_value_assignment
-	: '#' '(' list_of_parameter_assignments ')'
+	: HASH LEFT_PARENTHESIS list_of_parameter_assignments RIGHT_PARENTHESIS
 	;
 
 list_of_parameter_assignments
-	: ordered_parameter_assignment (',' ordered_parameter_assignment)*
-	| named_parameter_assignment (',' named_parameter_assignment)*
+	: ordered_parameter_assignment (COMMA ordered_parameter_assignment)*
+	| named_parameter_assignment (COMMA named_parameter_assignment)*
 	;
 
 ordered_parameter_assignment
@@ -671,11 +1158,11 @@ ordered_parameter_assignment
 	;
 
 named_parameter_assignment
-	: '.' parameter_identifier '(' mintypmax_expression? ')'
+	: DOT parameter_identifier LEFT_PARENTHESIS mintypmax_expression? RIGHT_PARENTHESIS
 	;
 
 module_instance
-	: name_of_module_instance '(' list_of_port_connections ')'
+	: name_of_module_instance LEFT_PARENTHESIS list_of_port_connections RIGHT_PARENTHESIS
 	;
 
 name_of_module_instance
@@ -683,8 +1170,8 @@ name_of_module_instance
 	;
 
 list_of_port_connections
-	: ordered_port_connection (',' ordered_port_connection)*
-	| named_port_connection (',' named_port_connection)*
+	: ordered_port_connection (COMMA ordered_port_connection)*
+	| named_port_connection (COMMA named_port_connection)*
 	;
 
 ordered_port_connection
@@ -692,40 +1179,40 @@ ordered_port_connection
 	;
 
 named_port_connection
-	: attribute_instance* '.' port_identifier '(' expression? ')'
+	: attribute_instance* DOT port_identifier LEFT_PARENTHESIS expression? RIGHT_PARENTHESIS
 	;
 
 // A.4.2 Generate construct
 
 generate_region
-	: 'generate' module_or_generate_item* 'endgenerate'
+	: GENERATE module_or_generate_item* ENDGENERATE
 	;
 
 genvar_declaration
-	: 'genvar' list_of_genvar_identifiers ';'
+	: GENVAR list_of_genvar_identifiers SEMICOLON
 	;
 
 list_of_genvar_identifiers
-	: genvar_identifier (',' genvar_identifier)*
+	: genvar_identifier (COMMA genvar_identifier)*
 	;
 
 loop_generate_construct
-	: 'for' '(' genvar_initialization ';' genvar_expression ';' genvar_iteration ')' generate_block
+	: FOR LEFT_PARENTHESIS genvar_initialization SEMICOLON genvar_expression SEMICOLON genvar_iteration RIGHT_PARENTHESIS generate_block
 	;
 
 genvar_initialization
-	: genvar_identifier '=' constant_expression
+	: genvar_identifier EQUAL constant_expression
 	;
 
 genvar_expression
 	: genvar_primary
 	| unary_operator attribute_instance* genvar_primary
 	| genvar_expression binary_operator attribute_instance* genvar_expression
-	| genvar_expression '?' attribute_instance* genvar_expression ':' genvar_expression
+	| genvar_expression QUESTION_MARK attribute_instance* genvar_expression COLON genvar_expression
 	;
 
 genvar_iteration
-	: genvar_identifier '=' genvar_expression
+	: genvar_identifier EQUAL genvar_expression
 	;
 
 genvar_primary
@@ -739,92 +1226,197 @@ conditional_generate_construct
 	;
 
 if_generate_construct
-	: 'if' '(' constant_expression ')' generate_block_or_null ('else' generate_block_or_null)?
+	: IF LEFT_PARENTHESIS constant_expression RIGHT_PARENTHESIS generate_block_or_null (ELSE generate_block_or_null)?
 	;
 
 case_generate_construct
-	: constant_expression (',' constant_expression)* ':' generate_block_or_null
-	| 'default' ':'? generate_block_or_null
+	: constant_expression (COMMA constant_expression)* COLON generate_block_or_null
+	| DEFAULT COLON? generate_block_or_null
 	;
 
 generate_block
 	: module_or_generate_item
-	| 'begin' (':' generate_block_identifier)? module_or_generate_item* 'end'
+	| BEGIN (COLON generate_block_identifier)? module_or_generate_item* END
 	;
 
 generate_block_or_null
 	: generate_block
-	| ';'
+	| SEMICOLON
+	;
+
+// A.5 UDP declaration and instantiation
+// A.5.1 UDP declaration
+
+udp_declaration
+	: attribute_instance* PRIMITIVE udp_identifier LEFT_PARENTHESIS udp_port_list RIGHT_PARENTHESIS SEMICOLON udp_port_declaration udp_port_declaration* udp_body ENDPRIMITIVE
+	| attribute_instance* PRIMITIVE udp_identifier LEFT_PARENTHESIS udp_declaration_port_list RIGHT_PARENTHESIS SEMICOLON udp_body ENDPRIMITIVE
+	;
+
+// A.5.2 UDP ports
+
+udp_port_list
+	: output_port_identifier COMMA input_port_identifier (COMMA input_port_identifier)*
+	;
+
+udp_declaration_port_list
+	: udp_output_declaration COMMA udp_input_declaration (COMMA udp_input_declaration)*
+	;
+
+udp_port_declaration
+	: udp_output_declaration SEMICOLON
+	| udp_input_declaration SEMICOLON
+	| udp_reg_declaration SEMICOLON
+	;
+
+udp_output_declaration
+	: attribute_instance* OUTPUT port_identifier
+	| attribute_instance* OUTPUT REG port_identifier (EQUAL constant_expression)?
+	;
+
+udp_input_declaration
+	: attribute_instance* INPUT list_of_port_identifiers
+	;
+
+udp_reg_declaration
+	: attribute_instance* REG variable_identifier
+	;
+
+// A.5.3 UDP body
+
+udp_body
+	: combinational_body
+	| sequential_body
+	;
+
+combinational_body
+	: TABLE combinational_entry combinational_entry* ENDTABLE
+	;
+
+combinational_entry
+	: level_input_list COLON OUTPUT_SYMBOL SEMICOLON
+	;
+
+sequential_body
+	: udp_initial_statement? TABLE sequential_entry sequential_entry* ENDTABLE
+	;
+
+udp_initial_statement
+	: INITIAL output_port_identifier EQUAL INIT_VAL SEMICOLON
+	;
+
+sequential_entry
+	: seq_input_list COLON current_state COLON next_state SEMICOLON
+	;
+
+seq_input_list
+	: level_input_list
+	| edge_input_list
+	;
+
+level_input_list
+	: LEVEL_SYMBOL LEVEL_SYMBOL*
+	;
+
+edge_input_list
+	: LEVEL_SYMBOL* edge_indicator LEVEL_SYMBOL*
+	;
+
+edge_indicator
+	: LEFT_PARENTHESIS LEVEL_SYMBOL LEVEL_SYMBOL RIGHT_PARENTHESIS
+	| EDGE_SYMBOL
+	;
+
+current_state
+	: LEVEL_SYMBOL
+	;
+
+next_state
+	: OUTPUT_SYMBOL
+	| MINUS
+	;
+
+// A.5.4 UDP instantiation
+
+udp_instantiation
+	: udp_identifier drive_strength? delay2? udp_instance (COMMA udp_instance)* SEMICOLON
+	;
+
+udp_instance
+	: name_of_udp_instance? LEFT_PARENTHESIS output_terminal COMMA input_terminal (COMMA input_terminal)* RIGHT_PARENTHESIS
+	;
+
+name_of_udp_instance
+	: udp_instance_identifier range_?
 	;
 
 // A.6 Behavioral statements
 // A.6.1 Continuous assignment statements
 
 continuous_assign
-	: 'assign' drive_strength? delay3? list_of_net_assignments ';'
+	: ASSIGN drive_strength? delay3? list_of_net_assignments SEMICOLON
 	;
 
 list_of_net_assignments
-	: net_assignment (',' net_assignment)*
+	: net_assignment (COMMA net_assignment)*
 	;
 
 net_assignment
-	: net_lvalue '=' expression
+	: net_lvalue EQUAL expression
 	;
 
 // A.6.2 Procedural blocks and assignments
 
 initial_construct
-	: 'initial' statement
+	: INITIAL statement
 	;
 
 always_construct
-	: 'always' statement
+	: ALWAYS statement
 	;
 
 blocking_assignment
-	: variable_lvalue '=' delay_or_event_control? expression
+	: variable_lvalue EQUAL delay_or_event_control? expression
 	;
 
 nonblocking_assignment
-	: variable_lvalue '<=' delay_or_event_control? expression
+	: variable_lvalue LESS_THAN_EQUAL delay_or_event_control? expression
 	;
 
 procedural_continuous_assignments
-	: 'assign' variable_assignment
-	| 'deassign' variable_lvalue
-	| 'force' variable_assignment
-	| 'force' net_assignment
-	| 'release' variable_lvalue
-	| 'release' net_lvalue
+	: ASSIGN variable_assignment
+	| DEASSIGN variable_lvalue
+	| FORCE variable_assignment
+	| FORCE net_assignment
+	| RELEASE variable_lvalue
+	| RELEASE net_lvalue
 	;
 
 variable_assignment
-	: variable_lvalue '=' expression
+	: variable_lvalue EQUAL expression
 	;
 
 // A.6.3 Parallel and sequential blocks
 
 par_block
-	: 'fork' (':' block_identifier block_item_declaration*)? statement* 'join'
+	: FORK (COLON block_identifier block_item_declaration*)? statement* JOIN
 	;
 
 seq_block
-	: 'begin' (':' block_identifier block_item_declaration*)? statement* 'end'
+	: BEGIN (COLON block_identifier block_item_declaration*)? statement* END
 	;
 
 // A.6.4 Statements
 
 statement
-	: attribute_instance* blocking_assignment ';'
+	: attribute_instance* blocking_assignment SEMICOLON
 	| attribute_instance* case_statement
 	| attribute_instance* conditional_statement
 	| attribute_instance* disable_statement
 	| attribute_instance* event_trigger
 	| attribute_instance* loop_statement
-	| attribute_instance* nonblocking_assignment ';'
+	| attribute_instance* nonblocking_assignment SEMICOLON
 	| attribute_instance* par_block
-	| attribute_instance* procedural_continuous_assignments ';'
+	| attribute_instance* procedural_continuous_assignments SEMICOLON
 	| attribute_instance* procedural_timing_control_statement
 	| attribute_instance* seq_block
 	| attribute_instance* system_task_enable
@@ -834,7 +1426,7 @@ statement
 
 statement_or_null
 	: statement
-	| attribute_instance* ';'
+	| attribute_instance* SEMICOLON
 	;
 
 function_statement
@@ -844,42 +1436,44 @@ function_statement
 // A.6.5 Timing control statements
 
 delay_control
-	: '#' delay_value
-	| '#' '(' mintypmax_expression ')'
+	: HASH delay_value
+	| HASH LEFT_PARENTHESIS mintypmax_expression RIGHT_PARENTHESIS
 	;
 
 delay_or_event_control
 	: delay_control
 	| event_control
-	| 'repeat' '(' expression ')' event_control
+	| REPEAT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS event_control
 	;
 
 disable_statement
-	: 'disable' hierarchical_task_identifier ';'
-	| 'disable' hierarchical_block_identifier ';'
+	: DISABLE hierarchical_task_identifier SEMICOLON
+	| DISABLE hierarchical_block_identifier SEMICOLON
 	;
 
 event_control
-	: '@' hierarchical_event_identifier
-	| '@' '(' event_expression ')'
-	| '@' '*'
-	| '@' '(' '*' ')'
+	: DOT hierarchical_event_identifier
+	| DOT LEFT_PARENTHESIS event_expression RIGHT_PARENTHESIS
+	| DOT ASTERISK
+	| DOT LEFT_PARENTHESIS ASTERISK RIGHT_PARENTHESIS
 	;
 
 event_trigger
-	: '->' hierarchical_event_identifier expression* ';'
+	: MINUS_GREATER_THAN hierarchical_event_identifier expression* SEMICOLON
 	;
 
 event_expression
 	: expression
-	| 'posedge' expression
-	| 'negedge' expression
-	| event_expression 'or' event_expression
-	| event_expression ',' event_expression
+	| POSEDGE expression
+	| NEGEDGE expression
+	| event_expression OR event_expression
+	| event_expression COMMA event_expression
 	;
 
 event_primary
-	: (expression | 'posedge' expression | 'negedge' expression)
+	: expression
+	| POSEDGE expression
+	| NEGEDGE expression
 	;
 
 procedural_timing_control
@@ -892,52 +1486,52 @@ procedural_timing_control_statement
 	;
 
 wait_statement
-	: 'wait' '(' expression ')' statement_or_null
+	: WAIT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS statement_or_null
 	;
 
 // A.6.6 Conditional statements
 
 conditional_statement
-	: 'if' '(' expression ')' statement_or_null ('else' 'if' '(' expression ')' statement_or_null)* ('else' statement_or_null)?
+	: IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS statement_or_null (ELSE IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS statement_or_null)* (ELSE statement_or_null)?
 	;
 
 // A.6.7 Case statements
 
 case_statement
-	: 'case' '(' expression ')' case_item case_item* 'endcase'
-	| 'casez' '(' expression ')' case_item case_item* 'endcase'
-	| 'casex' '(' expression ')' case_item case_item* 'endcase'
+	: CASE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS case_item case_item* ENDCASE
+	| CASEZ LEFT_PARENTHESIS expression RIGHT_PARENTHESIS case_item case_item* ENDCASE
+	| CASEX LEFT_PARENTHESIS expression RIGHT_PARENTHESIS case_item case_item* ENDCASE
 	;
 
 case_item
-	: expression (',' expression)* ':' statement_or_null
-	| 'default' ':'? statement_or_null
+	: expression (COMMA expression)* COLON statement_or_null
+	| DEFAULT COLON? statement_or_null
 	;
 
 // A.6.8 Looping statements
 
 loop_statement
-	: 'forever' statement
-	| 'repeat' '(' expression ')' statement
-	| 'while' '(' expression ')' statement
-	| 'for' '(' variable_assignment ';' expression ';' variable_assignment ')' statement
+	: FOREVER statement
+	| REPEAT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS statement
+	| WHILE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS statement
+	| FOR LEFT_PARENTHESIS variable_assignment SEMICOLON expression SEMICOLON variable_assignment RIGHT_PARENTHESIS statement
 	;
 
 // A.6.9 Task enable statements
 
 system_task_enable
-	: system_task_identifier ('(' expression? (',' expression?)* ')')? ';'
+	: system_task_identifier (LEFT_PARENTHESIS expression? (COMMA expression?)* RIGHT_PARENTHESIS)? SEMICOLON
 	;
 
 task_enable
-	: hierarchical_task_identifier ('(' expression (',' expression)* ')')? ';'
+	: hierarchical_task_identifier (LEFT_PARENTHESIS expression (COMMA expression)* RIGHT_PARENTHESIS)? SEMICOLON
 	;
 
 // A.7 Specify section
 // A.7.1 Specify block declaration
 
 specify_block
-	: 'specify' specify_item* 'endspecify'
+	: SPECIFY specify_item* ENDSPECIFY
 	;
 
 specify_item
@@ -948,52 +1542,52 @@ specify_item
 	;
 
 pulsestyle_declaration
-	: 'pulsestyle_onevent' list_of_path_outputs ';'
-	| 'pulsestyle_ondetect' list_of_path_outputs ';'
+	: PULSESTYLE_ONEVENT list_of_path_outputs SEMICOLON
+	| PULSESTYLE_ONDETECT list_of_path_outputs SEMICOLON
 	;
 
 showcancelled_declaration
-	: 'showcancelled' list_of_path_outputs ';'
-	| 'noshowcancelled' list_of_path_outputs ';'
+	: SHOWCANCELLED list_of_path_outputs SEMICOLON
+	| NOSHOWCANCELLED list_of_path_outputs SEMICOLON
 	;
 
 // A.7.2 Specify path declarations
 
 path_declaration
-	: simple_path_declaration ';'
-	| edge_sensitive_path_declaration ';'
-	| state_dependent_path_declaration ';'
+	: simple_path_declaration SEMICOLON
+	| edge_sensitive_path_declaration SEMICOLON
+	| state_dependent_path_declaration SEMICOLON
 	;
 
 simple_path_declaration
-	: parallel_path_description '=' path_delay_value
-	| full_path_description '=' path_delay_value
+	: parallel_path_description EQUAL path_delay_value
+	| full_path_description EQUAL path_delay_value
 	;
 
 parallel_path_description
-	: '(' specify_input_terminal_descriptor polarity_operator? '=>' specify_output_terminal_descriptor ')'
+	: LEFT_PARENTHESIS specify_input_terminal_descriptor polarity_operator? EQUAL_GREATER_THAN specify_output_terminal_descriptor RIGHT_PARENTHESIS
 	;
 
 full_path_description
-	: '(' list_of_path_inputs polarity_operator? '*>' list_of_path_outputs ')'
+	: LEFT_PARENTHESIS list_of_path_inputs polarity_operator? ASTERISK_GREATER_THAN list_of_path_outputs RIGHT_PARENTHESIS
 	;
 
 list_of_path_inputs
-	: specify_input_terminal_descriptor (',' specify_input_terminal_descriptor)*
+	: specify_input_terminal_descriptor (COMMA specify_input_terminal_descriptor)*
 	;
 
 list_of_path_outputs
-	: specify_output_terminal_descriptor (',' specify_output_terminal_descriptor)*
+	: specify_output_terminal_descriptor (COMMA specify_output_terminal_descriptor)*
 	;
 
 // A.7.3 Specify block terminals
 
 specify_input_terminal_descriptor
-	: input_identifier ('[' constant_range_expression ']')?
+	: input_identifier (LEFT_BRACKET constant_range_expression RIGHT_BRACKET)?
 	;
 
 specify_output_terminal_descriptor
-	: output_identifier ('[' constant_range_expression ']')?
+	: output_identifier (LEFT_BRACKET constant_range_expression RIGHT_BRACKET)?
 	;
 
 input_identifier
@@ -1010,15 +1604,15 @@ output_identifier
 
 path_delay_value
 	: list_of_path_delay_expressions
-	| '(' list_of_path_delay_expressions ')'
+	| LEFT_PARENTHESIS list_of_path_delay_expressions RIGHT_PARENTHESIS
 	;
 
 list_of_path_delay_expressions
 	: t_path_delay_expression
-	| trise_path_delay_expression ',' tfall_path_delay_expression
-	| trise_path_delay_expression ',' tfall_path_delay_expression ',' tz_path_delay_expression
-	| t01_path_delay_expression ',' t10_path_delay_expression ',' t0z_path_delay_expression ',' tz1_path_delay_expression ',' t1z_path_delay_expression ',' tz0_path_delay_expression
-	| t01_path_delay_expression ',' t10_path_delay_expression ',' t0z_path_delay_expression ',' tz1_path_delay_expression ',' t1z_path_delay_expression ',' tz0_path_delay_expression ',' t0x_path_delay_expression ',' tx1_path_delay_expression ',' t1x_path_delay_expression ',' tx0_path_delay_expression ',' txz_path_delay_expression ',' tzx_path_delay_expression
+	| trise_path_delay_expression COMMA tfall_path_delay_expression
+	| trise_path_delay_expression COMMA tfall_path_delay_expression COMMA tz_path_delay_expression
+	| t01_path_delay_expression COMMA t10_path_delay_expression COMMA t0z_path_delay_expression COMMA tz1_path_delay_expression COMMA t1z_path_delay_expression COMMA tz0_path_delay_expression
+	| t01_path_delay_expression COMMA t10_path_delay_expression COMMA t0z_path_delay_expression COMMA tz1_path_delay_expression COMMA t1z_path_delay_expression COMMA tz0_path_delay_expression COMMA t0x_path_delay_expression COMMA tx1_path_delay_expression COMMA t1x_path_delay_expression COMMA tx0_path_delay_expression COMMA txz_path_delay_expression COMMA tzx_path_delay_expression
 	;
 
 t_path_delay_expression
@@ -1090,16 +1684,16 @@ path_delay_expression
 	;
 
 edge_sensitive_path_declaration
-	: parallel_edge_sensitive_path_description '=' path_delay_value
-	| full_edge_sensitive_path_description '=' path_delay_value
+	: parallel_edge_sensitive_path_description EQUAL path_delay_value
+	| full_edge_sensitive_path_description EQUAL path_delay_value
 	;
 
 parallel_edge_sensitive_path_description
-	: '(' edge_identifier? specify_input_terminal_descriptor '=>' '(' specify_output_terminal_descriptor polarity_operator? ':' data_source_expression ')' ')'
+	: LEFT_PARENTHESIS edge_identifier? specify_input_terminal_descriptor EQUAL_GREATER_THAN LEFT_PARENTHESIS specify_output_terminal_descriptor polarity_operator? COLON data_source_expression RIGHT_PARENTHESIS RIGHT_PARENTHESIS
 	;
 
 full_edge_sensitive_path_description
-	: '(' edge_identifier? list_of_path_inputs '*>' '(' list_of_path_outputs polarity_operator? ':' data_source_expression ')' ')'
+	: LEFT_PARENTHESIS edge_identifier? list_of_path_inputs ASTERISK_GREATER_THAN LEFT_PARENTHESIS list_of_path_outputs polarity_operator? COLON data_source_expression RIGHT_PARENTHESIS RIGHT_PARENTHESIS
 	;
 
 data_source_expression
@@ -1107,64 +1701,224 @@ data_source_expression
 	;
 
 edge_identifier
-	: 'posedge'
-	| 'negedge'
+	: POSEDGE
+	| NEGEDGE
 	;
 
 state_dependent_path_declaration
-	: 'if' '(' module_path_expression ')' simple_path_declaration
-	| 'if' '(' module_path_expression ')' edge_sensitive_path_declaration
-	| 'ifnone' simple_path_declaration
+	: IF LEFT_PARENTHESIS module_path_expression RIGHT_PARENTHESIS simple_path_declaration
+	| IF LEFT_PARENTHESIS module_path_expression RIGHT_PARENTHESIS edge_sensitive_path_declaration
+	| IFNONE simple_path_declaration
 	;
 
 polarity_operator
-	: '+'
-	| '-'
+	: PLUS
+	| MINUS
+	;
+
+// A.7.5 System timing checks
+// A.7.5.1 System timing check commands
+
+system_timing_check
+	: setup_timing_check
+	| hold_timing_check
+	| setuphold_timing_check
+	| recovery_timing_check
+	| removal_timing_check
+	| recrem_timing_check
+	| skew_timing_check
+	| timeskew_timing_check
+	| fullskew_timing_check
+	| period_timing_check
+	| width_timing_check
+	| nochange_timing_check
+	;
+
+setup_timing_check
+	: SETUP LEFT_PARENTHESIS data_event COMMA reference_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+hold_timing_check
+	: HOLD LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+setuphold_timing_check
+	: SETUPHOLD LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit COMMA timing_check_limit (COMMA notifier? (COMMA timestamp_condition? (COMMA timecheck_condition? (COMMA delayed_reference? (COMMA delayed_data?)?)?)?)?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+recovery_timing_check
+	: RECOVERY LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+removal_timing_check
+	: REMOVAL LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+recrem_timing_check
+	: RECREM LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit COMMA timing_check_limit (COMMA notifier? (COMMA timestamp_condition? (COMMA timecheck_condition? (COMMA delayed_reference? (COMMA delayed_data?)?)?)?)?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+skew_timing_check
+	: SKEW LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+timeskew_timing_check
+	: TIMESKEW LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier? (COMMA event_based_flag? (COMMA remain_active_flag?)?)?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+fullskew_timing_check
+	: FULLSKEW LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit COMMA timing_check_limit (COMMA notifier? (COMMA event_based_flag? (COMMA remain_active_flag?)?)?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+period_timing_check
+	: PERIOD LEFT_PARENTHESIS controlled_reference_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+width_timing_check
+	: WIDTH LEFT_PARENTHESIS controlled_reference_event COMMA timing_check_limit COMMA threshold (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+nochange_timing_check
+	: NOCHANGE LEFT_PARENTHESIS reference_event COMMA data_event COMMA start_edge_offset COMMA end_edge_offset (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+// A.7.5.2 System timing check command arguments
+
+timecheck_condition
+	: mintypmax_expression
+	;
+
+controlled_reference_event
+	: controlled_timing_check_event
+	;
+
+data_event
+	: timing_check_event
+	;
+
+delayed_data
+	: terminal_identifier (LEFT_BRACKET constant_mintypmax_expression RIGHT_BRACKET)?
+	;
+
+delayed_reference
+	: terminal_identifier (LEFT_BRACKET constant_mintypmax_expression RIGHT_BRACKET)?
+	;
+
+end_edge_offset
+	: mintypmax_expression
+	;
+
+event_based_flag
+	: constant_expression
+	;
+
+notifier
+	: variable_identifier
+	;
+
+reference_event
+	: timing_check_event
+	;
+
+remain_active_flag
+	: constant_mintypmax_expression
+	;
+
+timestamp_condition
+	: mintypmax_expression
+	;
+
+start_edge_offset
+	: mintypmax_expression
+	;
+
+threshold
+	: constant_expression
+	;
+
+timing_check_limit
+	: expression
+	;
+
+// A.7.5.3 System timing check event definitions
+
+timing_check_event
+	: timing_check_event_control? specify_terminal_descriptor (TRIPLE_AMPERSAND timing_check_condition)?
+	;
+
+controlled_timing_check_event
+	: timing_check_event_control specify_terminal_descriptor (TRIPLE_AMPERSAND timing_check_condition)?
+	;
+
+timing_check_event_control
+	: POSEDGE
+	| NEGEDGE
+	| EDGE
+	| edge_control_specifier
+	;
+
+specify_terminal_descriptor
+	: specify_input_terminal_descriptor
+	| specify_output_terminal_descriptor
+	;
+
+edge_control_specifier
+	: EDGE LEFT_BRACKET EDGE_DESCRIPTOR (COMMA EDGE_DESCRIPTOR)* RIGHT_BRACKET
+	;
+
+timing_check_condition
+	: scalar_timing_check_condition
+	| LEFT_PARENTHESIS scalar_timing_check_condition RIGHT_PARENTHESIS
+	;
+
+scalar_timing_check_condition
+	: TILDE? expression
+	| expression (DOUBLE_EQUAL | TRIPLE_EQUAL | EXCLAMATION_MARK_EQUAL | EXCLAMATION_MARK_DOUBLE_EQUAL) SCALAR_CONSTANT
 	;
 
 // A.8 Expressions
 // A.8.1 Concatenations
 
 concatenation
-	: '{' expression (',' expression)* '}'
+	: LEFT_BRACE expression (COMMA expression)* RIGHT_BRACE
 	;
 
 constant_concatenation
-	: '{' constant_expression (',' constant_expression)* '}'
+	: LEFT_BRACE constant_expression (COMMA constant_expression)* RIGHT_BRACE
 	;
 
 constant_multiple_concatenation
-	: '{' constant_expression constant_concatenation '}'
+	: LEFT_BRACE constant_expression constant_concatenation RIGHT_BRACE
 	;
 
 module_path_concatenation
-	: '{' module_path_expression (',' module_path_expression)* '}'
+	: LEFT_BRACE module_path_expression (COMMA module_path_expression)* RIGHT_BRACE
 	;
 
 module_path_multiple_concatenation
-	: '{' constant_expression module_path_concatenation '}'
+	: LEFT_BRACE constant_expression module_path_concatenation RIGHT_BRACE
 	;
 
 multiple_concatenation
-	: '{' constant_expression concatenation '}'
+	: LEFT_BRACE constant_expression concatenation RIGHT_BRACE
 	;
 
 // A.8.2 Function calls
 
 constant_function_call
-	: function_identifier attribute_instance* '(' constant_expression (',' constant_expression)* ')'
+	: function_identifier attribute_instance* LEFT_PARENTHESIS constant_expression (COMMA constant_expression)* RIGHT_PARENTHESIS
 	;
 
 constant_system_function_call
-	: system_function_identifier '(' constant_expression (',' constant_expression)* ')'
+	: system_function_identifier LEFT_PARENTHESIS constant_expression (COMMA constant_expression)* RIGHT_PARENTHESIS
 	;
 
 function_call
-	: hierarchical_function_identifier attribute_instance* '(' expression (',' expression)* ')'
+	: hierarchical_function_identifier attribute_instance* LEFT_PARENTHESIS expression (COMMA expression)* RIGHT_PARENTHESIS
 	;
 
 system_function_call
-	: system_function_identifier ('(' expression (',' expression)* ')')?
+	: system_function_identifier (LEFT_PARENTHESIS expression (COMMA expression)* RIGHT_PARENTHESIS)?
 	;
 
 // A.8.3 Expressions
@@ -1174,7 +1928,7 @@ base_expression
 	;
 /*
 conditional_expression
-	: expression '?' attribute_instance* expression ':' expression
+	: expression QUESTION_MARK attribute_instance* expression COLON expression
 	;
 */
 constant_base_expression
@@ -1185,19 +1939,19 @@ constant_expression
 	: constant_primary
 	| unary_operator attribute_instance* constant_primary
 	| constant_expression binary_operator attribute_instance* constant_expression
-	| constant_expression '?' attribute_instance* constant_expression ':' constant_expression
+	| constant_expression QUESTION_MARK attribute_instance* constant_expression COLON constant_expression
 	;
 
 constant_mintypmax_expression
 	: constant_expression
-	| constant_expression ':' constant_expression ':' constant_expression
+	| constant_expression COLON constant_expression COLON constant_expression
 	;
 
 constant_range_expression
 	: constant_expression
-	| msb_constant_expression ':' lsb_constant_expression
-	| constant_base_expression '+:' width_constant_expression
-	| constant_base_expression '-:' width_constant_expression
+	| msb_constant_expression COLON lsb_constant_expression
+	| constant_base_expression PLUS_COLON width_constant_expression
+	| constant_base_expression MINUS_COLON width_constant_expression
 	;
 
 dimension_constant_expression
@@ -1208,7 +1962,7 @@ expression
 	: primary
 	| unary_operator attribute_instance* primary
 	| expression binary_operator attribute_instance* expression
-	| expression '?' attribute_instance* expression ':' expression // = conditional_expression
+	| expression QUESTION_MARK attribute_instance* expression COLON expression // = conditional_expression
 	;
 
 lsb_constant_expression
@@ -1217,23 +1971,23 @@ lsb_constant_expression
 
 mintypmax_expression
 	: expression
-	| expression ':' expression ':' expression
+	| expression COLON expression COLON expression
 	;
 /*
 module_path_conditional_expression
-	: module_path_expression '?' attribute_instance* module_path_expression ':' module_path_expression
+	: module_path_expression QUESTION_MARK attribute_instance* module_path_expression COLON module_path_expression
 	;
 */
 module_path_expression
 	: module_path_primary
 	| unary_module_path_operator attribute_instance* module_path_primary
 	| module_path_expression binary_module_path_operator attribute_instance* module_path_expression
-	| module_path_expression '?' attribute_instance* module_path_expression ':' module_path_expression // = module_path_conditional_expression
+	| module_path_expression QUESTION_MARK attribute_instance* module_path_expression COLON module_path_expression // = module_path_conditional_expression
 	;
 
 module_path_mintypmax_expression
 	: module_path_expression
-	| module_path_expression ':' module_path_expression ':' module_path_expression
+	| module_path_expression COLON module_path_expression COLON module_path_expression
 	;
 
 msb_constant_expression
@@ -1242,9 +1996,9 @@ msb_constant_expression
 
 range_expression
 	: expression
-	| msb_constant_expression ':' lsb_constant_expression
-	| base_expression '+:' width_constant_expression
-	| base_expression '-:' width_constant_expression
+	| msb_constant_expression COLON lsb_constant_expression
+	| base_expression PLUS_COLON width_constant_expression
+	| base_expression MINUS_COLON width_constant_expression
 	;
 
 width_constant_expression
@@ -1255,13 +2009,13 @@ width_constant_expression
 
 constant_primary
 	: number
-	| parameter_identifier ('[' constant_range_expression ']')?
-	| specparam_identifier ('[' constant_range_expression ']')?
+	| parameter_identifier (LEFT_BRACKET constant_range_expression RIGHT_BRACKET)?
+	| specparam_identifier (LEFT_BRACKET constant_range_expression RIGHT_BRACKET)?
 	| constant_concatenation
 	| constant_multiple_concatenation
 	| constant_function_call
 	| constant_system_function_call
-	| '(' constant_mintypmax_expression ')'
+	| LEFT_PARENTHESIS constant_mintypmax_expression RIGHT_PARENTHESIS
 	| STRING
 	;
 
@@ -1272,119 +2026,141 @@ module_path_primary
 	| module_path_multiple_concatenation
 	| function_call
 	| system_function_call
-	| '(' module_path_mintypmax_expression ')'
+	| LEFT_PARENTHESIS module_path_mintypmax_expression RIGHT_PARENTHESIS
 	;
 
 primary
 	: number
-	| hierarchical_identifier (('[' expression ']')* '[' range_expression ']')?
+	| hierarchical_identifier ((LEFT_BRACKET expression RIGHT_BRACKET)* LEFT_BRACKET range_expression RIGHT_BRACKET)?
 	| concatenation
 	| multiple_concatenation
 	| function_call
 	| system_function_call
-	| '(' mintypmax_expression ')'
+	| LEFT_PARENTHESIS mintypmax_expression RIGHT_PARENTHESIS
 	| STRING
 	;
 
 // A.8.5 Expression left-side values
 
 net_lvalue
-	: hierarchical_net_identifier (('[' constant_expression ']')* '[' constant_range_expression ']')?
-	| '{' net_lvalue (',' net_lvalue) '}'
+	: hierarchical_net_identifier ((LEFT_BRACKET constant_expression RIGHT_BRACKET)* LEFT_BRACKET constant_range_expression RIGHT_BRACKET)?
+	| LEFT_BRACE net_lvalue (COMMA net_lvalue) RIGHT_BRACE
 	;
 
 variable_lvalue
-	: hierarchical_variable_identifier (('[' expression ']')* '[' range_expression ']')?
-	| '{' variable_lvalue (',' variable_lvalue) '}'
+	: hierarchical_variable_identifier ((LEFT_BRACKET expression RIGHT_BRACKET)* LEFT_BRACKET range_expression RIGHT_BRACKET)?
+	| LEFT_BRACE variable_lvalue (COMMA variable_lvalue) RIGHT_BRACE
 	;
 
 // A.8.6 Operators
 
 unary_operator
-	: '+'
-	| '-'
-	| '!'
-	| '~'
-	| '&'
-	| '~&'
-	| '|'
-	| '~|'
-	| '^'
-	| '~^'
-	| '^~'
+	: PLUS
+	| MINUS
+	| EXCLAMATION_MARK
+	| TILDE
+	| AMPERSAND
+	| TILDE_AMPERSAND
+	| VERTICAL_BAR
+	| TILDE_VERTICAL_BAR
+	| CARET
+	| TILDE_CARET
+	| CARET_TILDE
 	;
 
 binary_operator
-	: '+'
-	| '-'
-	| '*'
-	| '/'
-	| '%'
-	| '=='
-	| '!='
-	| '==='
-	| '!=='
-	| '&&'
-	| '||'
-	| '**'
-	| '<'
-	| '<='
-	| '>'
-	| '>='
-	| '&'
-	| '|'
-	| '^'
-	| '^~'
-	| '~^'
-	| '>>'
-	| '<<'
-	| '>>>'
-	| '<<<'
+	: PLUS
+	| MINUS
+	| ASTERISK
+	| SLASH
+	| PERCENT
+	| DOUBLE_EQUAL
+	| EXCLAMATION_MARK_EQUAL
+	| TRIPLE_EQUAL
+	| EXCLAMATION_MARK_DOUBLE_EQUAL
+	| DOUBLE_AMPERSAND
+	| DOUBLE_VERTICAL_BAR
+	| DOUBLE_ASTERISK
+	| LESS_THAN
+	| LESS_THAN_EQUAL
+	| GREATER_THAN
+	| GREATER_THAN_EQUAL
+	| AMPERSAND
+	| VERTICAL_BAR
+	| CARET
+	| CARET_TILDE
+	| TILDE_CARET
+	| DOUBLE_GREATER_THAN
+	| DOUBLE_LESS_THAN
+	| TRIPLE_GREATER_THAN
+	| TRIPLE_LESS_THAN
 	;
 
 unary_module_path_operator
-	: '!'
-	| '~'
-	| '&'
-	| '~&'
-	| '|'
-	| '~|'
-	| '^'
-	| '~^'
-	| '^~'
+	: EXCLAMATION_MARK
+	| TILDE
+	| AMPERSAND
+	| TILDE_AMPERSAND
+	| VERTICAL_BAR
+	| TILDE_VERTICAL_BAR
+	| CARET
+	| TILDE_CARET
+	| CARET_TILDE
 	;
 
 binary_module_path_operator
-	: '=='
-	| '!='
-	| '&&'
-	| '||'
-	| '&'
-	| '|'
-	| '^'
-	| '^~'
-	| '~^'
+	: DOUBLE_EQUAL
+	| EXCLAMATION_MARK_EQUAL
+	| DOUBLE_AMPERSAND
+	| DOUBLE_VERTICAL_BAR
+	| AMPERSAND
+	| VERTICAL_BAR
+	| CARET
+	| TILDE_CARET
+	| CARET_TILDE
 	;
 
 // A.8.7 Numbers
 
 number
-	: DECIMAL_NUMBER
-	| OCTAL_NUMBER
-	| BINARY_NUMBER
-	| HEX_NUMBER
-	| REAL_NUMBER
+	: decimal_number
+	| octal_number
+	| binary_number
+	| hex_number
+	| real_number
+	;
+
+real_number
+	: UNSIGNED_NUMBER DOT UNSIGNED_NUMBER
+	| UNSIGNED_NUMBER (DOT UNSIGNED_NUMBER)? EXP SIGN? UNSIGNED_NUMBER
+	;
+
+decimal_number
+	: UNSIGNED_NUMBER
+	| SIZE? DECIMAL_BASE DECIMAL_VALUE
+	;
+
+binary_number
+	: SIZE? BINARY_BASE BINARY_VALUE
+	;
+
+octal_number
+	: SIZE? OCTAL_BASE OCTAL_VALUE
+	;
+
+hex_number
+	: SIZE? HEX_BASE HEX_VALUE
 	;
 
 // A.9 General
 // A.9.1 Attributes
 
 attribute_instance
-	: '(' '*' attr_spec (',' attr_spec)* '*' ')'
+	: LEFT_PARENTHESIS ASTERISK attr_spec (COMMA attr_spec)* ASTERISK RIGHT_PARENTHESIS
 	;
 
 attr_spec
-	: attr_name ('=' constant_expression)?
+	: attr_name (EQUAL constant_expression)?
 	;
 
 attr_name
@@ -1403,6 +2179,10 @@ cell_identifier
 
 config_identifier
 	: identifier
+	;
+
+escaped_identifier
+	: ESCAPED_IDENTIFIER
 	;
 
 event_identifier
@@ -1438,7 +2218,7 @@ hierarchical_function_identifier
 	;
 
 hierarchical_identifier
-	: (identifier ('[' constant_expression ']')? '.')* identifier
+	: (identifier (LEFT_BRACKET constant_expression RIGHT_BRACKET)? DOT)* identifier
 	;
 
 hierarchical_net_identifier
@@ -1458,8 +2238,8 @@ hierarchical_task_identifier
 	;
 
 identifier
-	: SIMPLE_IDENTIFIER
-	| ESCAPED_IDENTIFIER
+	: simple_identifier
+	| escaped_identifier
 	;
 
 inout_port_identifier
@@ -1506,6 +2286,10 @@ real_identifier
 	: identifier
 	;
 
+simple_identifier
+	: SIMPLE_IDENTIFIER
+	;
+
 specparam_identifier
 	: identifier
 	;
@@ -1522,7 +2306,23 @@ task_identifier
 	: identifier
 	;
 
+terminal_identifier
+	: identifier
+	;
+
+text_macro_identifier
+	: identifier
+	;
+
 topmodule_identifier
+	: identifier
+	;
+
+udp_identifier
+	: identifier
+	;
+
+udp_instance_identifier
 	: identifier
 	;
 
