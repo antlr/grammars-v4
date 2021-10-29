@@ -3048,8 +3048,7 @@ updatestmt
    ;
 
 set_clause_list
-   : set_clause
-   | set_clause_list COMMA set_clause
+   : set_clause (COMMA set_clause)*
    ;
 
 set_clause
@@ -3062,8 +3061,7 @@ set_target
    ;
 
 set_target_list
-   : set_target
-   | set_target_list COMMA set_target
+   : set_target (COMMA set_target)*
    ;
 
 declarecursorstmt
@@ -3075,11 +3073,7 @@ cursor_name
    ;
 
 cursor_options
-   :
-   | cursor_options NO SCROLL
-   | cursor_options SCROLL
-   | cursor_options BINARY
-   | cursor_options INSENSITIVE
+   : (NO SCROLL|SCROLL|BINARY|INSENSITIVE)*
    ;
 
 opt_hold
