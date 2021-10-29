@@ -16,14 +16,14 @@ display_tasks
 	;
 
 display_task_name
-	: DISPLAY
-	| DISPLAYB
-	| DISPLAYO
-	| DISPLAYH
-	| WRITE
-	| WRITEB
-	| WRITEO
-	| WRITEH
+	: DOLLAR_DISPLAY
+	| DOLLAR_DISPLAYB
+	| DOLLAR_DISPLAYO
+	| DOLLAR_DISPLAYH
+	| DOLLAR_WRITE
+	| DOLLAR_WRITEB
+	| DOLLAR_WRITEO
+	| DOLLAR_WRITEH
 	;
 
 list_of_arguments
@@ -42,38 +42,38 @@ strobe_tasks
 	;
 
 strobe_task_name
-	: STROBE
-	| STROBEB
-	| STROBEO
-	| STROBEH
+	: DOLLAR_STROBE
+	| DOLLAR_STROBEB
+	| DOLLAR_STROBEO
+	| DOLLAR_STROBEH
 	;
 
 // 17.1.3 Continuous monitoring
 
 monitor_tasks
 	: monitor_task_name (LEFT_PARENTHESIS list_of_arguments RIGHT_PARENTHESIS)? SEMICOLON
-	| MONITORON SEMICOLON
-	| MONITOROFF SEMICOLON
+	| DOLLAR_MONITORON SEMICOLON
+	| DOLLAR_MONITOROFF SEMICOLON
 	;
 
 monitor_task_name
-	: MONITOR
-	| MONITORB
-	| MONITORO
-	| MONITORH
+	: DOLLAR_MONITOR
+	| DOLLAR_MONITORB
+	| DOLLAR_MONITORO
+	| DOLLAR_MONITORH
 	;
 
 // 17.2 File input-output system tasks and functions
 // 17.2.1 Opening and closing files
 
 file_open_function
-	: multi_channel_descriptor EQUAL FOPEN LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE RIGHT_PARENTHESIS SEMICOLON
-	| fd EQUAL FOPEN LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA TYPE RIGHT_PARENTHESIS SEMICOLON
+	: multi_channel_descriptor EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE RIGHT_PARENTHESIS SEMICOLON
+	| fd EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA TYPE RIGHT_PARENTHESIS SEMICOLON
 	;
 
 file_close_task
-	: FCLOSE LEFT_PARENTHESIS multi_channel_descriptor RIGHT_PARENTHESIS SEMICOLON
-	| FCLOSE LEFT_PARENTHESIS fd RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_FCLOSE LEFT_PARENTHESIS multi_channel_descriptor RIGHT_PARENTHESIS SEMICOLON
+	| DOLLAR_FCLOSE LEFT_PARENTHESIS fd RIGHT_PARENTHESIS SEMICOLON
 	;
 
 multi_channel_descriptor
@@ -92,22 +92,22 @@ file_output_tasks
 	;
 
 file_output_task_name
-	: FDISPLAY
-	| FDISPLAYB
-	| FDISPLAYH
-	| FDISPLAYO
-	| FWRITE
-	| FWRITEB
-	| FWRITEH
-	| FWRITEO
-	| FSTROBE
-	| FSTROBEB
-	| FSTROBEH
-	| FSTROBEO
-	| FMONITOR
-	| FMONITORB
-	| FMONITORH
-	| FMONITORO
+	: DOLLAR_FDISPLAY
+	| DOLLAR_FDISPLAYB
+	| DOLLAR_FDISPLAYH
+	| DOLLAR_FDISPLAYO
+	| DOLLAR_FWRITE
+	| DOLLAR_FWRITEB
+	| DOLLAR_FWRITEH
+	| DOLLAR_FWRITEO
+	| DOLLAR_FSTROBE
+	| DOLLAR_FSTROBEB
+	| DOLLAR_FSTROBEH
+	| DOLLAR_FSTROBEO
+	| DOLLAR_FMONITOR
+	| DOLLAR_FMONITORB
+	| DOLLAR_FMONITORH
+	| DOLLAR_FMONITORO
 	;
 
 // 17.2.3 Formatting data to a string
@@ -117,14 +117,14 @@ string_output_tasks
 	;
 
 string_output_task_name
-	: SWRITE
-	| SWRITEB
-	| SWRITEH
-	| SWRITEO
+	: DOLLAR_SWRITE
+	| DOLLAR_SWRITEB
+	| DOLLAR_SWRITEH
+	| DOLLAR_SWRITEO
 	;
 
 variable_format_string_output_task
-	: SFORMAT LEFT_PARENTHESIS output_reg COMMA format_string COMMA list_of_arguments RIGHT_PARENTHESIS
+	: DOLLAR_SFORMAT LEFT_PARENTHESIS output_reg COMMA format_string COMMA list_of_arguments RIGHT_PARENTHESIS
 	;
 
 output_reg
@@ -138,8 +138,8 @@ format_string
 // 17.2.9 Loading memory data from a file
 
 load_memory_tasks
-	: READMEMB LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA memory_name (COMMA start_addr (COMMA finish_addr)?)? RIGHT_PARENTHESIS SEMICOLON
-	| READMEMH LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA memory_name (COMMA start_addr (COMMA finish_addr)?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_READMEMB LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA memory_name (COMMA start_addr (COMMA finish_addr)?)? RIGHT_PARENTHESIS SEMICOLON
+	| DOLLAR_READMEMH LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA memory_name (COMMA start_addr (COMMA finish_addr)?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 memory_name
@@ -157,7 +157,7 @@ finish_addr
 // 17.2.10 Loading timing data from an SDF file
 
 sdf_annotate_task
-	: SDF_ANNOTATE LEFT_PARENTHESIS DOUBLE_QUOTE sdf_file DOUBLE_QUOTE (COMMA (DOUBLE_QUOTE module_instance_identifier DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE config_file DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE log_file DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE MTM_SPEC DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE scale_factors)? (COMMA (DOUBLE_QUOTE SCALE_TYPE DOUBLE_QUOTE)?)?)?)?)?)?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_SDF_ANNOTATE LEFT_PARENTHESIS DOUBLE_QUOTE sdf_file DOUBLE_QUOTE (COMMA (DOUBLE_QUOTE module_instance_identifier DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE config_file DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE log_file DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE MTM_SPEC DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE scale_factors)? (COMMA (DOUBLE_QUOTE SCALE_TYPE DOUBLE_QUOTE)?)?)?)?)?)?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 sdf_file
@@ -181,13 +181,13 @@ scale_factors
 // 17.3.1 $printtimescale
 
 printtimescale_task
-	: PRINTTIMESCALE (LEFT_PARENTHESIS hierarchical_identifier RIGHT_PARENTHESIS)? SEMICOLON
+	: DOLLAR_PRINTTIMESCALE (LEFT_PARENTHESIS hierarchical_identifier RIGHT_PARENTHESIS)? SEMICOLON
 	;
 
 // 17.3.2 $timeformat
 
 timeformat_task
-	: TIMEFORMAT (LEFT_PARENTHESIS UNITS_NUMBER COMMA precision_number COMMA suffix_string COMMA minimum_field_width RIGHT_PARENTHESIS)? SEMICOLON
+	: DOLLAR_TIMEFORMAT (LEFT_PARENTHESIS UNITS_NUMBER COMMA precision_number COMMA suffix_string COMMA minimum_field_width RIGHT_PARENTHESIS)? SEMICOLON
 	;
 
 precision_number
@@ -206,19 +206,19 @@ minimum_field_width
 // 17.4.1 $finish
 
 finish_task
-	: FINISH (LEFT_PARENTHESIS FINISH_NUMBER RIGHT_PARENTHESIS)? SEMICOLON
+	: DOLLAR_FINISH (LEFT_PARENTHESIS FINISH_NUMBER RIGHT_PARENTHESIS)? SEMICOLON
 	;
 
 // 17.4.2 $stop
 
 stop_task
-	: STOP (LEFT_PARENTHESIS FINISH_NUMBER RIGHT_PARENTHESIS)? SEMICOLON
+	: DOLLAR_STOP (LEFT_PARENTHESIS FINISH_NUMBER RIGHT_PARENTHESIS)? SEMICOLON
 	;
 
 // 17.5 Programmable logic array (PLA) modeling system tasks
 
 pla_system_task
-	: (ASYNC_AND_ARRAY | ASYNC_NAND_ARRAY | ASYNC_OR_ARRAY | ASYNC_NOR_ARRAY | SYNC_AND_ARRAY | SYNC_NAND_ARRAY | SYNC_OR_ARRAY | SYNC_NOR_ARRAY | ASYNC_AND_PLANE | ASYNC_NAND_PLANE | ASYNC_OR_PLANE | ASYNC_NOR_PLANE | SYNC_AND_PLANE | SYNC_NAND_PLANE | SYNC_OR_PLANE | SYNC_NOR_PLANE) LEFT_PARENTHESIS memory_identifier COMMA input_terms COMMA output_terms RIGHT_PARENTHESIS SEMICOLON
+	: (DOLLAR_ASYNC_AND_ARRAY | DOLLAR_ASYNC_NAND_ARRAY | DOLLAR_ASYNC_OR_ARRAY | DOLLAR_ASYNC_NOR_ARRAY | DOLLAR_SYNC_AND_ARRAY | DOLLAR_SYNC_NAND_ARRAY | DOLLAR_SYNC_OR_ARRAY | DOLLAR_SYNC_NOR_ARRAY | DOLLAR_ASYNC_AND_PLANE | DOLLAR_ASYNC_NAND_PLANE | DOLLAR_ASYNC_OR_PLANE | DOLLAR_ASYNC_NOR_PLANE | DOLLAR_SYNC_AND_PLANE | DOLLAR_SYNC_NAND_PLANE | DOLLAR_SYNC_OR_PLANE | DOLLAR_SYNC_NOR_PLANE) LEFT_PARENTHESIS memory_identifier COMMA input_terms COMMA output_terms RIGHT_PARENTHESIS SEMICOLON
 	;
 
 memory_identifier
@@ -242,7 +242,7 @@ time_function
 // 17.7.2 $stime
 
 stime_function
-	: STIME
+	: DOLLAR_STIME
 	;
 
 // 17.7.3 $realtime
@@ -255,7 +255,7 @@ realtime_function
 // 17.9.1 $random function
 
 random_function
-	: RANDOM (LEFT_PARENTHESIS seed RIGHT_PARENTHESIS)?
+	: DOLLAR_RANDOM (LEFT_PARENTHESIS seed RIGHT_PARENTHESIS)?
 	;
 
 seed
@@ -266,13 +266,13 @@ seed
 // 17.9.2 $dist_ functions
 
 dist_functions
-	: DIST_UNIFORM LEFT_PARENTHESIS seed COMMA start COMMA end RIGHT_PARENTHESIS
-	| DIST_NORMAL LEFT_PARENTHESIS seed COMMA mean COMMA standard_deviation RIGHT_PARENTHESIS
-	| DIST_EXPONENTIAL LEFT_PARENTHESIS seed COMMA mean RIGHT_PARENTHESIS
-	| DIST_POISSON LEFT_PARENTHESIS seed COMMA mean RIGHT_PARENTHESIS
-	| DIST_CHI_SQUARE LEFT_PARENTHESIS seed COMMA degree_of_freedom RIGHT_PARENTHESIS
-	| DIST_T LEFT_PARENTHESIS seed COMMA degree_of_freedom RIGHT_PARENTHESIS
-	| DIST_ERLANG LEFT_PARENTHESIS seed COMMA k_stage COMMA mean RIGHT_PARENTHESIS
+	: DOLLAR_DIST_UNIFORM LEFT_PARENTHESIS seed COMMA start COMMA end RIGHT_PARENTHESIS
+	| DOLLAR_DIST_NORMAL LEFT_PARENTHESIS seed COMMA mean COMMA standard_deviation RIGHT_PARENTHESIS
+	| DOLLAR_DIST_EXPONENTIAL LEFT_PARENTHESIS seed COMMA mean RIGHT_PARENTHESIS
+	| DOLLAR_DIST_POISSON LEFT_PARENTHESIS seed COMMA mean RIGHT_PARENTHESIS
+	| DOLLAR_DIST_CHI_SQUARE LEFT_PARENTHESIS seed COMMA degree_of_freedom RIGHT_PARENTHESIS
+	| DOLLAR_DIST_T LEFT_PARENTHESIS seed COMMA degree_of_freedom RIGHT_PARENTHESIS
+	| DOLLAR_DIST_ERLANG LEFT_PARENTHESIS seed COMMA k_stage COMMA mean RIGHT_PARENTHESIS
 	;
 
 start
@@ -303,17 +303,17 @@ k_stage
 // 19.1 `celldefine and `endcelldefine
 
 celldefine_compiler_directive
-	: CELLDEFINE
+	: GRAVE_CELLDEFINE
 	;
 
 endcelldefine_compiler_directive
-	: ENDCELLDEFINE
+	: GRAVE_ENDCELLDEFINE
 	;
 
 // 19.2 `default_nettype
 
 default_nettype_compiler_directive
-	: DEFAULT_NETTYPE default_nettype_value
+	: GRAVE_DEFAULT_NETTYPE default_nettype_value
 	;
 
 default_nettype_value
@@ -334,7 +334,7 @@ default_nettype_value
 // 19.3.1 `define
 
 text_macro_definition
-	: DEFINE text_macro_name macro_text
+	: GRAVE_DEFINE text_macro_name macro_text
 	;
 
 text_macro_name
@@ -368,17 +368,17 @@ actual_argument
 // 19.3.2 `undef
 
 undefine_compiler_directive
-	: UNDEF text_macro_identifier
+	: GRAVE_UNDEF text_macro_identifier
 	;
 
 // 19.4 `ifdef, `else, `elsif, `endif , `ifndef
 
 ifdef_directive
-	: IFDEF text_macro_identifier ifdef_group_of_lines (ELSIF text_macro_identifier elsif_group_of_lines)* (ELSE else_group_of_lines)? ENDIF
+	: GRAVE_IFDEF text_macro_identifier ifdef_group_of_lines (GRAVE_ELSIF text_macro_identifier elsif_group_of_lines)* (ELSE else_group_of_lines)? GRAVE_ENDIF
 	;
 
 ifndef_directive
-	: IFNDEF text_macro_identifier ifndef_group_of_lines (ELSIF text_macro_identifier elsif_group_of_lines)* (ELSE else_group_of_lines)? ENDIF
+	: GRAVE_IFNDEF text_macro_identifier ifndef_group_of_lines (GRAVE_ELSIF text_macro_identifier elsif_group_of_lines)* (ELSE else_group_of_lines)? GRAVE_ENDIF
 	;
 
 ifdef_group_of_lines
@@ -428,35 +428,35 @@ include_compiler_directive
 // 19.6 `resetall
 
 resetall_compiler_directive
-	: RESETALL
+	: GRAVE_RESETALL
 	;
 
 // 19.7 `line
 
 line_compiler_directive
-	: LINE number STRING LEVEL
+	: GRAVE_LINE number STRING LEVEL
 	;
 
 // 19.8 `timescale
 
 timescale_compiler_directive
-	: TIMESCALE TIME_LITERAL SLASH TIME_LITERAL
+	: GRAVE_TIMESCALE TIME_LITERAL SLASH TIME_LITERAL
 	;
 
 // 19.9 `unconnected_drive and `nounconnected_drive
 
 unconnected_drive_compiler_directive
-	: UNCONNECTED_DRIVE (PULL0 | PULL1)
+	: GRAVE_UNCONNECTED_DRIVE (PULL0 | PULL1)
 	;
 
 nounconnected_drive_compiler_directive
-	: NOUNCONNECTED_DRIVE
+	: GRAVE_NOUNCONNECTED_DRIVE
 	;
 
 // 19.10 `pragma
 
 pragma
-	: PRAGMA pragma_name (pragma_expression (COMMA pragma_expression )*)?
+	: GRAVE_PRAGMA pragma_name (pragma_expression (COMMA pragma_expression )*)?
 	;
 
 pragma_name
@@ -483,11 +483,11 @@ pragma_keyword
 // 19.11 `begin_keywords, `end_keywords
 
 keywords_directive
-	: BEGIN_KEYWORDS DOUBLE_QUOTE VERSION_SPECIFIER DOUBLE_QUOTE
+	: GRAVE_BEGIN_KEYWORDS DOUBLE_QUOTE VERSION_SPECIFIER DOUBLE_QUOTE
 	;
 
 endkeywords_directive
-	: END_KEYWORDS
+	: GRAVE_END_KEYWORDS
 	;
 
 // A.1 Source text
@@ -1735,51 +1735,51 @@ system_timing_check
 	;
 
 setup_timing_check
-	: SETUP LEFT_PARENTHESIS data_event COMMA reference_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_SETUP LEFT_PARENTHESIS data_event COMMA reference_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 hold_timing_check
-	: HOLD LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_HOLD LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 setuphold_timing_check
-	: SETUPHOLD LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit COMMA timing_check_limit (COMMA notifier? (COMMA timestamp_condition? (COMMA timecheck_condition? (COMMA delayed_reference? (COMMA delayed_data?)?)?)?)?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_SETUPHOLD LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit COMMA timing_check_limit (COMMA notifier? (COMMA timestamp_condition? (COMMA timecheck_condition? (COMMA delayed_reference? (COMMA delayed_data?)?)?)?)?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 recovery_timing_check
-	: RECOVERY LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_RECOVERY LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 removal_timing_check
-	: REMOVAL LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_REMOVAL LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 recrem_timing_check
-	: RECREM LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit COMMA timing_check_limit (COMMA notifier? (COMMA timestamp_condition? (COMMA timecheck_condition? (COMMA delayed_reference? (COMMA delayed_data?)?)?)?)?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_RECREM LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit COMMA timing_check_limit (COMMA notifier? (COMMA timestamp_condition? (COMMA timecheck_condition? (COMMA delayed_reference? (COMMA delayed_data?)?)?)?)?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 skew_timing_check
-	: SKEW LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_SKEW LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 timeskew_timing_check
-	: TIMESKEW LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier? (COMMA event_based_flag? (COMMA remain_active_flag?)?)?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_TIMESKEW LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit (COMMA notifier? (COMMA event_based_flag? (COMMA remain_active_flag?)?)?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 fullskew_timing_check
-	: FULLSKEW LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit COMMA timing_check_limit (COMMA notifier? (COMMA event_based_flag? (COMMA remain_active_flag?)?)?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_FULLSKEW LEFT_PARENTHESIS reference_event COMMA data_event COMMA timing_check_limit COMMA timing_check_limit (COMMA notifier? (COMMA event_based_flag? (COMMA remain_active_flag?)?)?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 period_timing_check
-	: PERIOD LEFT_PARENTHESIS controlled_reference_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_PERIOD LEFT_PARENTHESIS controlled_reference_event COMMA timing_check_limit (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 width_timing_check
-	: WIDTH LEFT_PARENTHESIS controlled_reference_event COMMA timing_check_limit COMMA threshold (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_WIDTH LEFT_PARENTHESIS controlled_reference_event COMMA timing_check_limit COMMA threshold (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 nochange_timing_check
-	: NOCHANGE LEFT_PARENTHESIS reference_event COMMA data_event COMMA start_edge_offset COMMA end_edge_offset (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_NOCHANGE LEFT_PARENTHESIS reference_event COMMA data_event COMMA start_edge_offset COMMA end_edge_offset (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 // A.7.5.2 System timing check command arguments
