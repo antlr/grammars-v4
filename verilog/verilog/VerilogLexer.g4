@@ -49,7 +49,7 @@ HIGHZ1 : 'highz1' ;
 IF : 'if' ;
 IFNONE : 'ifnone' ;
 INCDIR : 'incdir' ;
-INCLUDE : 'include' ;
+INCLUDE : 'include' -> mode(FILE_PATH_MODE) ;
 INITIAL : 'initial' ;
 INOUT : 'inout' ;
 INPUT : 'input' ;
@@ -58,7 +58,7 @@ INTEGER : 'integer' ;
 JOIN : 'join' ;
 LARGE : 'large' ;
 LIBLIST : 'liblist' ;
-LIBRARY : 'library' ;
+LIBRARY : 'library' -> mode(FILE_PATH_MODE) ;
 LOCALPARAM : 'localparam' ;
 MACROMODULE : 'macromodule' ;
 MEDIUM : 'medium' ;
@@ -99,12 +99,12 @@ SHOWCANCELLED : 'showcancelled' ;
 SIGNED : 'signed' ;
 SMALL : 'small' ;
 SPECIFY : 'specify' ;
-SPECPARAM : 'specparam' ;
+SPECPARAM : 'specparam' -> mode(SPECPARAM_MODE) ;
 STRONG0 : 'strong0' ;
 STRONG1 : 'strong1' ;
 SUPPLY0 : 'supply0' ;
 SUPPLY1 : 'supply1' ;
-TABLE : 'table' ;
+TABLE : 'table' -> mode(TABLE_MODE) ;
 TASK : 'task' ;
 TIME : 'time' ;
 TRAN : 'tran' ;
@@ -117,7 +117,7 @@ TRIAND : 'triand' ;
 TRIOR : 'trior' ;
 TRIREG : 'trireg' ;
 UNSIGNED : 'unsigned' ;
-USE : 'use' ;
+USE : 'use' -> mode(USE_CLAUSE_MODE) ;
 UWIRE : 'uwire' ;
 VECTORED : 'vectored' ;
 WAIT : 'wait' ;
@@ -168,8 +168,8 @@ DOLLAR_FREAD : '$fread' ;
 DOLLAR_FSEEK : '$fseek' ;
 DOLLAR_FFLUSH : '$fflush' ;
 DOLLAR_FEOF : '$feof' ;
-DOLLAR_SDF_ANNOTATE : '$sdf_annotate' ;
-DOLLAR_FOPEN : '$fopen' ;
+DOLLAR_SDF_ANNOTATE : '$sdf_annotate' -> mode(FILE_READ_MODE) ;
+DOLLAR_FOPEN : '$fopen' -> mode(FILE_READ_MODE);
 DOLLAR_FWRITE : '$fwrite' ;
 DOLLAR_FWRITEB : '$fwriteb' ;
 DOLLAR_FWRITEH : '$fwriteh' ;
@@ -186,12 +186,12 @@ DOLLAR_SSCANF : '$sscanf' ;
 DOLLAR_REWIND : '$rewind' ;
 DOLLAR_FTELL : '$ftell' ;
 DOLLAR_FERROR : '$ferror' ;
-DOLLAR_READMEMB : '$readmemb' ;
-DOLLAR_READMEMH : '$readmemh' ;
+DOLLAR_READMEMB : '$readmemb' -> mode(FILE_READ_MODE) ;
+DOLLAR_READMEMH : '$readmemh' -> mode(FILE_READ_MODE) ;
 DOLLAR_PRINTTIMESCALE : '$printtimescale' ;
-DOLLAR_TIMEFORMAT : '$timeformat' ;
-DOLLAR_FINISH : '$finish' ;
-DOLLAR_STOP : '$stop' ;
+DOLLAR_TIMEFORMAT : '$timeformat' -> mode(TIME_FORMAT_MODE) ;
+DOLLAR_FINISH : '$finish' -> mode(SIMULATION_CONTROL_MODE) ;
+DOLLAR_STOP : '$stop' -> mode(SIMULATION_CONTROL_MODE) ;
 DOLLAR_ASYNC_AND_ARRAY : '$async$and$array' ;
 DOLLAR_ASYNC_NAND_ARRAY : '$async$nand$array' ;
 DOLLAR_ASYNC_OR_ARRAY : '$async$or$array' ;
@@ -257,25 +257,25 @@ DOLLAR_ATANH : '$atanh' ;
 
 // System timing check commands
 
-DOLLAR_SETUP : '$setup' ;
-DOLLAR_HOLD : '$hold' ;
-DOLLAR_SETUPHOLD : '$setuphold' ;
-DOLLAR_RECOVERY : '$recovery' ;
-DOLLAR_REMOVAL : '$removal' ;
-DOLLAR_RECREM : '$recrem' ;
-DOLLAR_SKEW : '$skew' ;
-DOLLAR_TIMESKEW : '$timeskew' ;
-DOLLAR_FULLSKEW : '$fullskew' ;
-DOLLAR_PERIOD : '$period' ;
-DOLLAR_WIDTH : '$width' ;
-DOLLAR_NOCHANGE : '$nochange' ;
+DOLLAR_SETUP : '$setup' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_HOLD : '$hold' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_SETUPHOLD : '$setuphold' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_RECOVERY : '$recovery' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_REMOVAL : '$removal' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_RECREM : '$recrem' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_SKEW : '$skew' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_TIMESKEW : '$timeskew' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_FULLSKEW : '$fullskew' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_PERIOD : '$period' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_WIDTH : '$width' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_NOCHANGE : '$nochange' -> mode(TIMING_CHECK_MODE) ;
 
 // Compiler directives
 
-GRAVE_BEGIN_KEYWORDS : '`begin_keywords' ;
+GRAVE_BEGIN_KEYWORDS : '`begin_keywords' -> mode(BEGIN_KEYWORDS_MODE) ;
 GRAVE_CELLDEFINE : '`celldefine' ;
-GRAVE_DEFAULT_NETTYPE : '`default_nettype' ;
-GRAVE_DEFINE : '`define' ;
+GRAVE_DEFAULT_NETTYPE : '`default_nettype' -> mode(DEFAULT_NETTYPE_MODE) ;
+GRAVE_DEFINE : '`define' -> mode(DEFINE_MODE) ;
 GRAVE_ELSE : '`else' ;
 GRAVE_ELSIF : '`elsif' ;
 GRAVE_END_KEYWORDS : '`end_keywords' ;
@@ -283,12 +283,12 @@ GRAVE_ENDCELLDEFINE : '`endcelldefine' ;
 GRAVE_ENDIF : '`endif' ;
 GRAVE_IFDEF : '`ifdef' ;
 GRAVE_IFNDEF : '`ifndef' ;
-GRAVE_INCLUDE : '`include' ;
-GRAVE_LINE : '`line' ;
+GRAVE_INCLUDE : '`include' -> mode(FILE_READ_MODE) ;
+GRAVE_LINE : '`line' -> mode(LINE_MODE) ;
 GRAVE_NOUNCONNECTED_DRIVE : '`nounconnected_drive' ;
 GRAVE_PRAGMA : '`pragma' ;
 GRAVE_RESETALL : '`resetall' ;
-GRAVE_TIMESCALE : '`timescale' ;
+GRAVE_TIMESCALE : '`timescale' -> mode(TIMESCALE_MODE) ;
 GRAVE_UNCONNECTED_DRIVE : '`unconnected_drive' ;
 GRAVE_UNDEF : '`undef' ;
 
@@ -406,46 +406,72 @@ EQUAL_GREATER_THAN : '=>' ;
 ASTERISK_GREATER_THAN : '*>' ;
 TRIPLE_AMPERSAND : '&&&' ;
 
-// Context-sensitive rules (special lexical modes are required to handle these exceptions)
+// Context-sensitive rules
 
+mode FILE_READ_MODE;
 // 17.2 File input-output system tasks and functions | 19.5 `include
-FILE_NAME : ~[/\\?%':|"<>,;=]+ ;
-TYPE : 'r' | 'rb' | 'w' | 'wb' | 'a' | 'ab' | 'r+' | 'r+b' | 'rb+' | 'w+' | 'w+b' | 'wb+' | 'a+' | 'a+b' | 'ab+' ;
+FILE_NAME : ~[/\\?%':|"<>,;=]+ -> mode(DEFAULT_MODE) ;
+// 17.2.1 Opening and closing files
+TYPE : ('r' | 'rb' | 'w' | 'wb' | 'a' | 'ab' | 'r+' | 'r+b' | 'rb+' | 'w+' | 'w+b' | 'wb+' | 'a+' | 'a+b' | 'ab+') -> mode(DEFAULT_MODE) ;
 // 17.2.10 Loading timing data from an SDF file
-MTM_SPEC : 'MAXIMUM' | 'MINIMUM' | 'TOOL_CONTROL' | 'TYPICAL' ;
-SCALE_TYPE : 'FROM_MAXIMUM' | 'FROM_MINIMUM' | 'FROM_MTM' | 'FROM_TYPICAL' ;
+MTM_SPEC : ('MAXIMUM' | 'MINIMUM' | 'TOOL_CONTROL' | 'TYPICAL') -> mode(DEFAULT_MODE) ;
+SCALE_TYPE : ('FROM_MAXIMUM' | 'FROM_MINIMUM' | 'FROM_MTM' | 'FROM_TYPICAL') -> mode(DEFAULT_MODE) ;
+
+mode TIME_FORMAT_MODE;
 // 17.3.2 $timeformat
-UNITS_NUMBER : '0' | MINUS [1-15] ;
+UNITS_NUMBER : ('0' | MINUS [1-15]) -> mode(DEFAULT_MODE) ;
+
+mode SIMULATION_CONTROL_MODE;
 // 17.4 Simulation control system tasks
-FINISH_NUMBER : [0-2] ;
+FINISH_NUMBER : [0-2] -> mode(DEFAULT_MODE) ;
+
+mode DEFAULT_NETTYPE_MODE;
 // 19.2 `default_nettype
-NONE : 'none' ;
+NONE : 'none' -> mode(DEFAULT_MODE) ;
+
+mode DEFINE_MODE;
 // 19.3 `define and `undef
-TEXT : MATCH_EVERYTHING_NON_GREEDY ~'\\' NEWLINE ;
+TEXT : MATCH_EVERYTHING_NON_GREEDY ~'\\' NEWLINE -> mode(DEFAULT_MODE) ;
+
+mode LINE_MODE;
 // 19.7 `line
-LEVEL : [0-2] ;
+LEVEL : [0-2] -> mode(DEFAULT_MODE) ;
+
+mode TIMESCALE_MODE;
 // 19.8 `timescale
-TIME_LITERAL : UNSIGNED_NUMBER TIME_UNIT ;
+TIME_LITERAL : UNSIGNED_NUMBER TIME_UNIT -> mode(DEFAULT_MODE) ;
 fragment TIME_UNIT : [mnpf]? 's' ;
+
+mode BEGIN_KEYWORDS_MODE;
 // 19.11 `begin_keywords, `end_keywords
-VERSION_SPECIFIER : '1364-1995' | '1364-2001' | '1364-2001-noconfig' | '1364-2005' ;
+VERSION_SPECIFIER : ('1364-1995' | '1364-2001' | '1364-2001-noconfig' | '1364-2005') -> mode(DEFAULT_MODE) ;
+
+mode FILE_PATH_MODE;
 // A.1.1 Library source text
-FILE_PATH_SPEC : ~[ \t\r\n]+ ;
-MINUS_INCDIR : '-incdir' ;
+FILE_PATH_SPEC : ~[ \t\r\n]+ -> mode(DEFAULT_MODE) ;
+MINUS_INCDIR : '-incdir' -> mode(DEFAULT_MODE) ;
+
+mode USE_CLAUSE_MODE;
 // A.1.5 Configuration source text
-COLON_CONFIG : ':config' ;
+COLON_CONFIG : ':config' -> mode(DEFAULT_MODE) ;
+
+mode SPECPARAM_MODE;
 // A.2.4 Declaration assignments
-PATHPULSE : 'PATHPULSE$' ;
+PATHPULSE : 'PATHPULSE$' -> mode(DEFAULT_MODE) ;
+
+mode TABLE_MODE;
 // A.5.3 UDP body
-INIT_VAL : '1' APOSTROPHE B (ZERO_OR_ONE | X) | ZERO_OR_ONE ;
-OUTPUT_SYMBOL : [01xX] ;
-LEVEL_SYMBOL : [01xX?bB] ;
-EDGE_SYMBOL : [rRfFpPnN*] ;
+INIT_VAL : ('1' APOSTROPHE B (ZERO_OR_ONE | X) | ZERO_OR_ONE) -> mode(DEFAULT_MODE) ;
+OUTPUT_SYMBOL : [01xX] -> mode(DEFAULT_MODE) ;
+LEVEL_SYMBOL : [01xX?bB] -> mode(DEFAULT_MODE) ;
+EDGE_SYMBOL : [rRfFpPnN*] -> mode(DEFAULT_MODE) ;
+
+mode TIMING_CHECK_MODE;
 // A.7.5.3 System timing check event definitions
-EDGE_DESCRIPTOR : '01' | '10' | Z_OR_X ZERO_OR_ONE | ZERO_OR_ONE Z_OR_X ;
+EDGE_DESCRIPTOR : ('01' | '10' | Z_OR_X ZERO_OR_ONE | ZERO_OR_ONE Z_OR_X) -> mode(DEFAULT_MODE) ;
 fragment ZERO_OR_ONE : [01] ;
 fragment Z_OR_X : X | Z ;
-SCALAR_CONSTANT : '1' APOSTROPHE B ZERO_OR_ONE | ZERO_OR_ONE ;
+SCALAR_CONSTANT : ('1' APOSTROPHE B ZERO_OR_ONE | ZERO_OR_ONE) -> mode(DEFAULT_MODE) ;
 
 // Letters
 
