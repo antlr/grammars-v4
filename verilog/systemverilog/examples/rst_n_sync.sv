@@ -1,6 +1,5 @@
 // Author: Mustafa Said Ağca
 // License: MIT
-`default_nettype none
 module rst_n_sync #(
     parameter RESET_WIDTH = 1
 ) (
@@ -17,4 +16,3 @@ module rst_n_sync #(
     end
   end
 endmodule : rst_n_sync
-`default_nettype wire
