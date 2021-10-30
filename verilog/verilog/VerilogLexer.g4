@@ -49,7 +49,7 @@ HIGHZ1 : 'highz1' ;
 IF : 'if' ;
 IFNONE : 'ifnone' ;
 INCDIR : 'incdir' ;
-INCLUDE : 'include' -> mode(FILE_PATH_MODE) ;
+INCLUDE : 'include' ;
 INITIAL : 'initial' ;
 INOUT : 'inout' ;
 INPUT : 'input' ;
@@ -58,7 +58,7 @@ INTEGER : 'integer' ;
 JOIN : 'join' ;
 LARGE : 'large' ;
 LIBLIST : 'liblist' ;
-LIBRARY : 'library' -> mode(FILE_PATH_MODE) ;
+LIBRARY : 'library' ;
 LOCALPARAM : 'localparam' ;
 MACROMODULE : 'macromodule' ;
 MEDIUM : 'medium' ;
@@ -99,12 +99,12 @@ SHOWCANCELLED : 'showcancelled' ;
 SIGNED : 'signed' ;
 SMALL : 'small' ;
 SPECIFY : 'specify' ;
-SPECPARAM : 'specparam' -> mode(SPECPARAM_MODE) ;
+SPECPARAM : 'specparam' ;
 STRONG0 : 'strong0' ;
 STRONG1 : 'strong1' ;
 SUPPLY0 : 'supply0' ;
 SUPPLY1 : 'supply1' ;
-TABLE : 'table' -> mode(TABLE_MODE) ;
+TABLE : 'table' ;
 TASK : 'task' ;
 TIME : 'time' ;
 TRAN : 'tran' ;
@@ -117,7 +117,7 @@ TRIAND : 'triand' ;
 TRIOR : 'trior' ;
 TRIREG : 'trireg' ;
 UNSIGNED : 'unsigned' ;
-USE : 'use' -> mode(USE_CLAUSE_MODE) ;
+USE : 'use' ;
 UWIRE : 'uwire' ;
 VECTORED : 'vectored' ;
 WAIT : 'wait' ;
@@ -131,7 +131,7 @@ XNOR : 'xnor' ;
 XOR : 'xor' ;
 
 // System tasks and functions
-
+// Display tasks
 DOLLAR_DISPLAY : '$display' ;
 DOLLAR_DISPLAYB : '$displayb' ;
 DOLLAR_DISPLAYH : '$displayh' ;
@@ -150,6 +150,7 @@ DOLLAR_MONITORH : '$monitorh' ;
 DOLLAR_MONITORO : '$monitoro' ;
 DOLLAR_MONITOROFF : '$monitoroff' ;
 DOLLAR_MONITORON : '$monitoron' ;
+// File I/O tasks
 DOLLAR_FCLOSE : '$fclose' ;
 DOLLAR_FDISPLAY : '$fdisplay' ;
 DOLLAR_FDISPLAYB : '$fdisplayb' ;
@@ -168,8 +169,8 @@ DOLLAR_FREAD : '$fread' ;
 DOLLAR_FSEEK : '$fseek' ;
 DOLLAR_FFLUSH : '$fflush' ;
 DOLLAR_FEOF : '$feof' ;
-DOLLAR_SDF_ANNOTATE : '$sdf_annotate' -> mode(FILE_READ_MODE) ;
-DOLLAR_FOPEN : '$fopen' -> mode(FILE_READ_MODE);
+DOLLAR_SDF_ANNOTATE : '$sdf_annotate' ;
+DOLLAR_FOPEN : '$fopen' ;
 DOLLAR_FWRITE : '$fwrite' ;
 DOLLAR_FWRITEB : '$fwriteb' ;
 DOLLAR_FWRITEH : '$fwriteh' ;
@@ -186,12 +187,15 @@ DOLLAR_SSCANF : '$sscanf' ;
 DOLLAR_REWIND : '$rewind' ;
 DOLLAR_FTELL : '$ftell' ;
 DOLLAR_FERROR : '$ferror' ;
-DOLLAR_READMEMB : '$readmemb' -> mode(FILE_READ_MODE) ;
-DOLLAR_READMEMH : '$readmemh' -> mode(FILE_READ_MODE) ;
+DOLLAR_READMEMB : '$readmemb' ;
+DOLLAR_READMEMH : '$readmemh' ;
+// Timescale tasks
 DOLLAR_PRINTTIMESCALE : '$printtimescale' ;
-DOLLAR_TIMEFORMAT : '$timeformat' -> mode(TIME_FORMAT_MODE) ;
-DOLLAR_FINISH : '$finish' -> mode(SIMULATION_CONTROL_MODE) ;
-DOLLAR_STOP : '$stop' -> mode(SIMULATION_CONTROL_MODE) ;
+DOLLAR_TIMEFORMAT : '$timeformat' ;
+// Simulation control tasks
+DOLLAR_FINISH : '$finish' ;
+DOLLAR_STOP : '$stop' ;
+// PLA modeling tasks
 DOLLAR_ASYNC_AND_ARRAY : '$async$and$array' ;
 DOLLAR_ASYNC_NAND_ARRAY : '$async$nand$array' ;
 DOLLAR_ASYNC_OR_ARRAY : '$async$or$array' ;
@@ -208,20 +212,24 @@ DOLLAR_SYNC_AND_PLANE : '$sync$and$plane' ;
 DOLLAR_SYNC_NAND_PLANE : '$sync$nand$plane' ;
 DOLLAR_SYNC_OR_PLANE : '$sync$or$plane' ;
 DOLLAR_SYNC_NOR_PLANE : '$sync$nor$plane' ;
+// Stochastic analysis tasks
 DOLLAR_Q_INITIALIZE : '$q_initialize' ;
 DOLLAR_Q_REMOVE : '$q_remove' ;
 DOLLAR_Q_EXAM : '$q_exam' ;
 DOLLAR_Q_ADD : '$q_add' ;
 DOLLAR_Q_FULL : '$q_full' ;
+// Simulation time functions
 DOLLAR_REALTIME : '$realtime' ;
 DOLLAR_TIME : '$time' ;
 DOLLAR_STIME : '$stime' ;
+// Conversion functions
 DOLLAR_BITSTOREAL : '$bitstoreal' ;
 DOLLAR_ITOR : '$itor' ;
 DOLLAR_SIGNED : '$signed' ;
 DOLLAR_REALTOBITS : '$realtobits' ;
 DOLLAR_RTOI : '$rtoi' ;
 DOLLAR_UNSIGNED : '$unsigned' ;
+// Probabilistic distribution functions
 DOLLAR_RANDOM : '$random' ;
 DOLLAR_DIST_ERLANG : '$dist_erlang' ;
 DOLLAR_DIST_NORMAL : '$dist_normal' ;
@@ -230,8 +238,10 @@ DOLLAR_DIST_CHI_SQUARE : '$dist_chi_square' ;
 DOLLAR_DIST_EXPONENTIAL : '$dist_exponential' ;
 DOLLAR_DIST_POISSON : '$dist_poisson' ;
 DOLLAR_DIST_UNIFORM : '$dist_uniform' ;
+// Command line input
 DOLLAR_TEST_PLUSARGS : '$test$plusargs' ;
 DOLLAR_VALUE_PLUSARGS : '$value$plusargs' ;
+// Math functions
 DOLLAR_CLOG2 : '$clog2' ;
 DOLLAR_LN : '$ln' ;
 DOLLAR_LOG10 : '$log10' ;
@@ -254,28 +264,52 @@ DOLLAR_TANH : '$tanh' ;
 DOLLAR_ASINH : '$asinh' ;
 DOLLAR_ACOSH : '$acosh' ;
 DOLLAR_ATANH : '$atanh' ;
+// Value change dump (VCD) functions
+DOLLAR_DUMPFILE : '$dumpfile' ;
+DOLLAR_DUMPVARS : '$dumpvars' ;
+DOLLAR_DUMPOFF : '$dumpoff' ;
+DOLLAR_DUMPON : '$dumpon' ;
+DOLLAR_DUMPALL : '$dumpall' ;
+DOLLAR_DUMPLIMIT : '$dumplimit' ;
+DOLLAR_DUMPFLUSH : '$dumpflush' ;
+DOLLAR_END : '$end' ;
+DOLLAR_COMMENT : '$comment' ;
+DOLLAR_DATE : '$date' ;
+DOLLAR_ENDDEFINITIONS : '$enddefinitions' ;
+DOLLAR_SCOPE : '$scope' ;
+DOLLAR_TIMESCALE : '$timescale' ;
+DOLLAR_UPSCOPE : '$upscope' ;
+DOLLAR_VAR : '$var' ;
+DOLLAR_VERSION : '$version' ;
+DOLLAR_DUMPPORTS : '$dumpports' ;
+DOLLAR_DUMPPORTSOFF : '$dumpportsoff' ;
+DOLLAR_DUMPPORTSON : '$dumpportson' ;
+DOLLAR_DUMPPORTSALL : '$dumpportsall' ;
+DOLLAR_DUMPPORTSLIMIT : '$dumpportslimit' ;
+DOLLAR_DUMPPORTSFLUSH : '$dumpportsflush' ;
+DOLLAR_VCDCLOSE : '$vcdclose' ;
 
 // System timing check commands
 
-DOLLAR_SETUP : '$setup' -> mode(TIMING_CHECK_MODE) ;
-DOLLAR_HOLD : '$hold' -> mode(TIMING_CHECK_MODE) ;
-DOLLAR_SETUPHOLD : '$setuphold' -> mode(TIMING_CHECK_MODE) ;
-DOLLAR_RECOVERY : '$recovery' -> mode(TIMING_CHECK_MODE) ;
-DOLLAR_REMOVAL : '$removal' -> mode(TIMING_CHECK_MODE) ;
-DOLLAR_RECREM : '$recrem' -> mode(TIMING_CHECK_MODE) ;
-DOLLAR_SKEW : '$skew' -> mode(TIMING_CHECK_MODE) ;
-DOLLAR_TIMESKEW : '$timeskew' -> mode(TIMING_CHECK_MODE) ;
-DOLLAR_FULLSKEW : '$fullskew' -> mode(TIMING_CHECK_MODE) ;
-DOLLAR_PERIOD : '$period' -> mode(TIMING_CHECK_MODE) ;
-DOLLAR_WIDTH : '$width' -> mode(TIMING_CHECK_MODE) ;
-DOLLAR_NOCHANGE : '$nochange' -> mode(TIMING_CHECK_MODE) ;
+DOLLAR_SETUP : '$setup' ;
+DOLLAR_HOLD : '$hold' ;
+DOLLAR_SETUPHOLD : '$setuphold' ;
+DOLLAR_RECOVERY : '$recovery' ;
+DOLLAR_REMOVAL : '$removal' ;
+DOLLAR_RECREM : '$recrem' ;
+DOLLAR_SKEW : '$skew' ;
+DOLLAR_TIMESKEW : '$timeskew' ;
+DOLLAR_FULLSKEW : '$fullskew' ;
+DOLLAR_PERIOD : '$period' ;
+DOLLAR_WIDTH : '$width' ;
+DOLLAR_NOCHANGE : '$nochange' ;
 
 // Compiler directives
 
-GRAVE_BEGIN_KEYWORDS : '`begin_keywords' -> mode(BEGIN_KEYWORDS_MODE) ;
+GRAVE_BEGIN_KEYWORDS : '`begin_keywords' ;
 GRAVE_CELLDEFINE : '`celldefine' ;
-GRAVE_DEFAULT_NETTYPE : '`default_nettype' -> mode(DEFAULT_NETTYPE_MODE) ;
-GRAVE_DEFINE : '`define' -> mode(DEFINE_MODE) ;
+GRAVE_DEFAULT_NETTYPE : '`default_nettype' ;
+GRAVE_DEFINE : '`define' ;
 GRAVE_ELSE : '`else' ;
 GRAVE_ELSIF : '`elsif' ;
 GRAVE_END_KEYWORDS : '`end_keywords' ;
@@ -283,36 +317,41 @@ GRAVE_ENDCELLDEFINE : '`endcelldefine' ;
 GRAVE_ENDIF : '`endif' ;
 GRAVE_IFDEF : '`ifdef' ;
 GRAVE_IFNDEF : '`ifndef' ;
-GRAVE_INCLUDE : '`include' -> mode(FILE_READ_MODE) ;
-GRAVE_LINE : '`line' -> mode(LINE_MODE) ;
+GRAVE_INCLUDE : '`include' ;
+GRAVE_LINE : '`line' ;
 GRAVE_NOUNCONNECTED_DRIVE : '`nounconnected_drive' ;
 GRAVE_PRAGMA : '`pragma' ;
 GRAVE_RESETALL : '`resetall' ;
-GRAVE_TIMESCALE : '`timescale' -> mode(TIMESCALE_MODE) ;
+GRAVE_TIMESCALE : '`timescale' ;
 GRAVE_UNCONNECTED_DRIVE : '`unconnected_drive' ;
 GRAVE_UNDEF : '`undef' ;
 
 // Numbers
 
-EXP : E ;
-SIGN : PLUS | MINUS ;
-SIZE : NON_ZERO_UNSIGNED_NUMBER ;
+REAL_NUMBER : UNSIGNED_NUMBER DOT UNSIGNED_NUMBER | UNSIGNED_NUMBER (DOT UNSIGNED_NUMBER)? EXP SIGN? UNSIGNED_NUMBER ;
+fragment EXP : [eE] ;
+DECIMAL_NUMBER : UNSIGNED_NUMBER | SIZE? DECIMAL_BASE DECIMAL_VALUE ;
+BINARY_NUMBER : SIZE? BINARY_BASE BINARY_VALUE ;
+OCTAL_NUMBER : SIZE? OCTAL_BASE OCTAL_VALUE ;
+HEX_NUMBER : SIZE? HEX_BASE HEX_VALUE ;
+fragment SIGN : PLUS | MINUS ;
+fragment SIZE : NON_ZERO_UNSIGNED_NUMBER ;
 fragment NON_ZERO_UNSIGNED_NUMBER : NON_ZERO_DECIMAL_DIGIT (UNDERSCORE | DECIMAL_DIGIT)* ;
 UNSIGNED_NUMBER : DECIMAL_DIGIT (UNDERSCORE | DECIMAL_DIGIT)* ;
-DECIMAL_VALUE : UNSIGNED_NUMBER | (X_DIGIT | Z_DIGIT) UNDERSCORE* ;
-BINARY_VALUE : BINARY_DIGIT (UNDERSCORE | BINARY_DIGIT)* ;
-OCTAL_VALUE : OCTAL_DIGIT (UNDERSCORE | OCTAL_DIGIT)* ;
-HEX_VALUE : HEX_DIGIT (UNDERSCORE | HEX_DIGIT)* ;
-DECIMAL_BASE : APOSTROPHE S? D ;
-BINARY_BASE : APOSTROPHE S? B ;
-OCTAL_BASE : APOSTROPHE S? O ;
-HEX_BASE : APOSTROPHE S? H ;
+fragment DECIMAL_VALUE : UNSIGNED_NUMBER | (X_DIGIT | Z_DIGIT) UNDERSCORE* ;
+fragment BINARY_VALUE : BINARY_DIGIT (UNDERSCORE | BINARY_DIGIT)* ;
+fragment OCTAL_VALUE : OCTAL_DIGIT (UNDERSCORE | OCTAL_DIGIT)* ;
+fragment HEX_VALUE : HEX_DIGIT (UNDERSCORE | HEX_DIGIT)* ;
+fragment DECIMAL_BASE : APOSTROPHE [sS]? [dD] ;
+fragment BINARY_BASE : APOSTROPHE [sS]? [bB] ;
+fragment OCTAL_BASE : APOSTROPHE [sS]? [oO] ;
+fragment HEX_BASE : APOSTROPHE [sS]? [hH] ;
 fragment NON_ZERO_DECIMAL_DIGIT : [1-9] ;
 fragment DECIMAL_DIGIT : [0-9] ;
 fragment BINARY_DIGIT : X_DIGIT | Z_DIGIT | [01] ;
 fragment OCTAL_DIGIT : X_DIGIT | Z_DIGIT | [0-7] ;
 fragment HEX_DIGIT : X_DIGIT | Z_DIGIT | [0-9a-fA-F] ;
-fragment X_DIGIT : X ;
+fragment X_DIGIT : [xX] ;
 fragment Z_DIGIT : [zZ?] ;
 fragment APOSTROPHE : '\'' ;
 
@@ -323,8 +362,10 @@ DOUBLE_QUOTE : '"' ;
 
 // Comments
 
-ONE_LINE_COMMENT : DOUBLE_SLASH MATCH_EVERYTHING_NON_GREEDY NEWLINE -> channel(HIDDEN) ;
-BLOCK_COMMENT : SLASH_ASTERISK MATCH_EVERYTHING_NON_GREEDY ASTERISK_SLASH -> channel(HIDDEN) ;
+ONE_LINE_COMMENT : DOUBLE_SLASH COMMENT_TEXT NEWLINE -> channel(HIDDEN) ;
+BLOCK_COMMENT : SLASH_ASTERISK COMMENT_TEXT ASTERISK_SLASH -> channel(HIDDEN) ;
+fragment COMMENT_TEXT : ASCII_ANY ;
+fragment ASCII_ANY : [\u0000-\u007f] ;
 fragment DOUBLE_SLASH : '//' ;
 fragment SLASH_ASTERISK : '/*' ;
 fragment ASTERISK_SLASH : '*/' ;
@@ -332,12 +373,14 @@ fragment NEWLINE : CARRIAGE_RETURN? LINE_FEED ;
 
 // Identifiers
 
-ESCAPED_IDENTIFIER : BACKSLASH ('\u0021'..'\u007E')+ ~[ \t\r\n]* ;
+ESCAPED_IDENTIFIER : BACKSLASH ASCII_PRINTABLE_EXCEPT_WHITE_SPACE+ WHITE_SPACE ;
 SIMPLE_IDENTIFIER : (LETTER | UNDERSCORE) (LETTER | UNDERSCORE | DECIMAL_DIGIT | DOLLAR_SIGN)* ;
 SYSTEM_TF_IDENTIFIER : DOLLAR_SIGN (LETTER | UNDERSCORE | DECIMAL_DIGIT | DOLLAR_SIGN) (LETTER | UNDERSCORE | DECIMAL_DIGIT | DOLLAR_SIGN)* ;
-UNDERSCORE : '_' ;
-DOLLAR_SIGN : '$' ;
+fragment ASCII_PRINTABLE_EXCEPT_WHITE_SPACE : [\u0021-\u007e] ;
+fragment UNDERSCORE : '_' ;
+fragment DOLLAR_SIGN : '$' ;
 fragment BACKSLASH : '\\' ;
+fragment LETTER : [a-zA-Z] ;
 
 // White space
 
@@ -397,6 +440,7 @@ SEMICOLON : ';' ;
 SLASH : '/' ;
 EQUAL : '=' ;
 QUESTION_MARK : '?' ;
+AT_SIGN : '@' ;
 HASH : '#' ;
 GRAVE_ACCENT : '`' ;
 PLUS_COLON : '+:' ;
@@ -407,102 +451,54 @@ ASTERISK_GREATER_THAN : '*>' ;
 TRIPLE_AMPERSAND : '&&&' ;
 
 // Context-sensitive rules
-
-mode FILE_READ_MODE;
-// 17.2 File input-output system tasks and functions | 19.5 `include
-FILE_NAME : ~[/\\?%':|"<>,;=]+ -> mode(DEFAULT_MODE) ;
+/*
 // 17.2.1 Opening and closing files
-TYPE : ('r' | 'rb' | 'w' | 'wb' | 'a' | 'ab' | 'r+' | 'r+b' | 'rb+' | 'w+' | 'w+b' | 'wb+' | 'a+' | 'a+b' | 'ab+') -> mode(DEFAULT_MODE) ;
-// 17.2.10 Loading timing data from an SDF file
-MTM_SPEC : ('MAXIMUM' | 'MINIMUM' | 'TOOL_CONTROL' | 'TYPICAL') -> mode(DEFAULT_MODE) ;
-SCALE_TYPE : ('FROM_MAXIMUM' | 'FROM_MINIMUM' | 'FROM_MTM' | 'FROM_TYPICAL') -> mode(DEFAULT_MODE) ;
+TYPE : DOUBLE_QUOTE ('r' | 'rb' | 'w' | 'wb' | 'a' | 'ab' | 'r+' | 'r+b' | 'rb+' | 'w+' | 'w+b' | 'wb+' | 'a+' | 'a+b' | 'ab+') DOUBLE_QUOTE ;
 
-mode TIME_FORMAT_MODE;
-// 17.3.2 $timeformat
-UNITS_NUMBER : ('0' | MINUS [1-15]) -> mode(DEFAULT_MODE) ;
-
-mode SIMULATION_CONTROL_MODE;
 // 17.4 Simulation control system tasks
-FINISH_NUMBER : [0-2] -> mode(DEFAULT_MODE) ;
+FINISH_NUMBER : [0-2] ;
 
-mode DEFAULT_NETTYPE_MODE;
+// 18. Value change dump (VCD) files
+VCD_TEXT : ASCII_ANY ;
+
+// 18.2.1 Syntax of four-state VCD file
+SCALAR_VALUE_CHANGE : VALUE IDENTIFIER_CODE ;
+VECTOR_VALUE_CHANGE : ([bB] BINARY_NUMBER | [rR] REAL_NUMBER) IDENTIFIER_CODE ;
+IDENTIFIER_CODE : ASCII_PRINTABLE_EXCEPT_WHITE_SPACE* ;
+fragment VALUE : [01xXzZ] ;
+
 // 19.2 `default_nettype
-NONE : 'none' -> mode(DEFAULT_MODE) ;
+NONE : 'none' ;
 
-mode DEFINE_MODE;
 // 19.3 `define and `undef
-TEXT : MATCH_EVERYTHING_NON_GREEDY ~'\\' NEWLINE -> mode(DEFAULT_MODE) ;
+MACRO_TEXT : ASCII_ANY ~'\\' NEWLINE ;
 
-mode LINE_MODE;
 // 19.7 `line
-LEVEL : [0-2] -> mode(DEFAULT_MODE) ;
+LEVEL : [0-2] ;
 
-mode TIMESCALE_MODE;
 // 19.8 `timescale
-TIME_LITERAL : UNSIGNED_NUMBER TIME_UNIT -> mode(DEFAULT_MODE) ;
+TIME_LITERAL : TIME_NUMBER TIME_UNIT ;
+fragment TIME_NUMBER : '1' | '10' | '100' ;
 fragment TIME_UNIT : [mnpf]? 's' ;
 
-mode BEGIN_KEYWORDS_MODE;
 // 19.11 `begin_keywords, `end_keywords
-VERSION_SPECIFIER : ('1364-1995' | '1364-2001' | '1364-2001-noconfig' | '1364-2005') -> mode(DEFAULT_MODE) ;
+VERSION_SPECIFIER : '1364-1995' | '1364-2001' | '1364-2001-noconfig' | '1364-2005' ;
 
-mode FILE_PATH_MODE;
 // A.1.1 Library source text
-FILE_PATH_SPEC : ~[ \t\r\n]+ -> mode(DEFAULT_MODE) ;
-MINUS_INCDIR : '-incdir' -> mode(DEFAULT_MODE) ;
+FILE_PATH_SPEC : ~[ \t\r\n]+ ;
+MINUS_INCDIR : '-incdir' ;
+*/
 
-mode USE_CLAUSE_MODE;
-// A.1.5 Configuration source text
-COLON_CONFIG : ':config' -> mode(DEFAULT_MODE) ;
-
-mode SPECPARAM_MODE;
 // A.2.4 Declaration assignments
-PATHPULSE : 'PATHPULSE$' -> mode(DEFAULT_MODE) ;
-
-mode TABLE_MODE;
+PATHPULSE_DOLLAR : 'PATHPULSE$' ;
+/*
 // A.5.3 UDP body
-INIT_VAL : ('1' APOSTROPHE B (ZERO_OR_ONE | X) | ZERO_OR_ONE) -> mode(DEFAULT_MODE) ;
-OUTPUT_SYMBOL : [01xX] -> mode(DEFAULT_MODE) ;
-LEVEL_SYMBOL : [01xX?bB] -> mode(DEFAULT_MODE) ;
-EDGE_SYMBOL : [rRfFpPnN*] -> mode(DEFAULT_MODE) ;
+INIT_VAL : '1' APOSTROPHE [bB] [01xX] | [01] ;
+OUTPUT_SYMBOL : [01xX] ;
+LEVEL_SYMBOL : [01xX?bB] ;
+EDGE_SYMBOL : [rRfFpPnN*] ;
 
-mode TIMING_CHECK_MODE;
 // A.7.5.3 System timing check event definitions
-EDGE_DESCRIPTOR : ('01' | '10' | Z_OR_X ZERO_OR_ONE | ZERO_OR_ONE Z_OR_X) -> mode(DEFAULT_MODE) ;
-fragment ZERO_OR_ONE : [01] ;
-fragment Z_OR_X : X | Z ;
-SCALAR_CONSTANT : ('1' APOSTROPHE B ZERO_OR_ONE | ZERO_OR_ONE) -> mode(DEFAULT_MODE) ;
-
-// Letters
-
-fragment LETTER : [a-zA-Z] ;
-fragment A : [aA] ;
-fragment B : [bB] ;
-fragment C : [cC] ;
-fragment D : [dD] ;
-fragment E : [eE] ;
-fragment F : [fF] ;
-fragment G : [gG] ;
-fragment H : [hH] ;
-fragment I : [iI] ;
-fragment J : [jJ] ;
-fragment K : [kK] ;
-fragment L : [lL] ;
-fragment M : [mM] ;
-fragment N : [nN] ;
-fragment O : [oO] ;
-fragment P : [pP] ;
-fragment Q : [qQ] ;
-fragment R : [rR] ;
-fragment S : [sS] ;
-fragment T : [tT] ;
-fragment U : [uU] ;
-fragment V : [vV] ;
-fragment W : [wW] ;
-fragment X : [xX] ;
-fragment Y : [yY] ;
-fragment Z : [zZ] ;
-
-// Other fragments
-
-fragment MATCH_EVERYTHING_NON_GREEDY : .*? ;
+EDGE_DESCRIPTOR : '01' | '10' | [xXzZ] [01] | [01] [xXzZ] ;
+SCALAR_CONSTANT : '1' APOSTROPHE [bB] [01] | [01] ;
+*/

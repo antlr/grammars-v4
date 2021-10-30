@@ -1,12 +1,12 @@
 // Author: Mustafa Said Ağca
 // License: MIT
 
-parser grammar VerilogParser;
-
-options {
+/*parser*/ grammar VerilogParser;
+import VerilogLexer;
+/*options {
 	tokenVocab = VerilogLexer;
-}
-
+}*/
+/*
 // 17. System tasks and functions
 // 17.1 Display system tasks
 // 17.1.1 The display and write tasks
@@ -31,8 +31,7 @@ list_of_arguments
 	;
 
 argument
-	: STRING
-	| expression
+	: expression
 	;
 
 // 17.1.2 Strobed monitoring
@@ -67,8 +66,8 @@ monitor_task_name
 // 17.2.1 Opening and closing files
 
 file_open_function
-	: multi_channel_descriptor EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE RIGHT_PARENTHESIS SEMICOLON
-	| fd EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA TYPE RIGHT_PARENTHESIS SEMICOLON
+	: multi_channel_descriptor EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS filename RIGHT_PARENTHESIS SEMICOLON
+	| fd EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS filename COMMA TYPE RIGHT_PARENTHESIS SEMICOLON
 	;
 
 file_close_task
@@ -82,6 +81,10 @@ multi_channel_descriptor
 
 fd
 	: variable_identifier
+	;
+
+filename
+	: STRING
 	;
 
 // 17.2.2 File output system tasks
@@ -110,36 +113,11 @@ file_output_task_name
 	| DOLLAR_FMONITORO
 	;
 
-// 17.2.3 Formatting data to a string
-
-string_output_tasks
-	: string_output_task_name LEFT_PARENTHESIS output_reg COMMA list_of_arguments RIGHT_PARENTHESIS
-	;
-
-string_output_task_name
-	: DOLLAR_SWRITE
-	| DOLLAR_SWRITEB
-	| DOLLAR_SWRITEH
-	| DOLLAR_SWRITEO
-	;
-
-variable_format_string_output_task
-	: DOLLAR_SFORMAT LEFT_PARENTHESIS output_reg COMMA format_string COMMA list_of_arguments RIGHT_PARENTHESIS
-	;
-
-output_reg
-	: variable_identifier
-	;
-
-format_string
-	: STRING // incomplete
-	;
-
 // 17.2.9 Loading memory data from a file
 
 load_memory_tasks
-	: DOLLAR_READMEMB LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA memory_name (COMMA start_addr (COMMA finish_addr)?)? RIGHT_PARENTHESIS SEMICOLON
-	| DOLLAR_READMEMH LEFT_PARENTHESIS DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE COMMA memory_name (COMMA start_addr (COMMA finish_addr)?)? RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_READMEMB LEFT_PARENTHESIS filename COMMA memory_name (COMMA start_addr (COMMA finish_addr)?)? RIGHT_PARENTHESIS SEMICOLON
+	| DOLLAR_READMEMH LEFT_PARENTHESIS filename COMMA memory_name (COMMA start_addr (COMMA finish_addr)?)? RIGHT_PARENTHESIS SEMICOLON
 	;
 
 memory_name
@@ -154,54 +132,6 @@ finish_addr
 	: UNSIGNED_NUMBER
 	;
 
-// 17.2.10 Loading timing data from an SDF file
-
-sdf_annotate_task
-	: DOLLAR_SDF_ANNOTATE LEFT_PARENTHESIS DOUBLE_QUOTE sdf_file DOUBLE_QUOTE (COMMA (DOUBLE_QUOTE module_instance_identifier DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE config_file DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE log_file DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE MTM_SPEC DOUBLE_QUOTE)? (COMMA (DOUBLE_QUOTE scale_factors)? (COMMA (DOUBLE_QUOTE SCALE_TYPE DOUBLE_QUOTE)?)?)?)?)?)?)? RIGHT_PARENTHESIS SEMICOLON
-	;
-
-sdf_file
-	: STRING
-	| identifier
-	;
-
-config_file
-	: FILE_NAME
-	;
-
-log_file
-	: FILE_NAME
-	;
-
-scale_factors
-	: real_number SEMICOLON real_number SEMICOLON real_number
-	;
-
-// 17.3 Timescale system tasks
-// 17.3.1 $printtimescale
-
-printtimescale_task
-	: DOLLAR_PRINTTIMESCALE (LEFT_PARENTHESIS hierarchical_identifier RIGHT_PARENTHESIS)? SEMICOLON
-	;
-
-// 17.3.2 $timeformat
-
-timeformat_task
-	: DOLLAR_TIMEFORMAT (LEFT_PARENTHESIS UNITS_NUMBER COMMA precision_number COMMA suffix_string COMMA minimum_field_width RIGHT_PARENTHESIS)? SEMICOLON
-	;
-
-precision_number
-	: UNSIGNED_NUMBER
-	;
-
-suffix_string
-	: STRING
-	;
-
-minimum_field_width
-	: UNSIGNED_NUMBER
-	;
-
 // 17.4 Simulation control system tasks
 // 17.4.1 $finish
 
@@ -213,24 +143,6 @@ finish_task
 
 stop_task
 	: DOLLAR_STOP (LEFT_PARENTHESIS FINISH_NUMBER RIGHT_PARENTHESIS)? SEMICOLON
-	;
-
-// 17.5 Programmable logic array (PLA) modeling system tasks
-
-pla_system_task
-	: (DOLLAR_ASYNC_AND_ARRAY | DOLLAR_ASYNC_NAND_ARRAY | DOLLAR_ASYNC_OR_ARRAY | DOLLAR_ASYNC_NOR_ARRAY | DOLLAR_SYNC_AND_ARRAY | DOLLAR_SYNC_NAND_ARRAY | DOLLAR_SYNC_OR_ARRAY | DOLLAR_SYNC_NOR_ARRAY | DOLLAR_ASYNC_AND_PLANE | DOLLAR_ASYNC_NAND_PLANE | DOLLAR_ASYNC_OR_PLANE | DOLLAR_ASYNC_NOR_PLANE | DOLLAR_SYNC_AND_PLANE | DOLLAR_SYNC_NAND_PLANE | DOLLAR_SYNC_OR_PLANE | DOLLAR_SYNC_NOR_PLANE) LEFT_PARENTHESIS memory_identifier COMMA input_terms COMMA output_terms RIGHT_PARENTHESIS SEMICOLON
-	;
-
-memory_identifier
-	: identifier
-	;
-
-input_terms
-	: expression
-	;
-
-output_terms
-	: variable_lvalue
 	;
 
 // 17.7 Simulation time system functions
@@ -259,8 +171,7 @@ random_function
 	;
 
 seed
-	: UNSIGNED_NUMBER
-	| variable_identifier
+	: variable_identifier
 	;
 
 // 17.9.2 $dist_ functions
@@ -297,6 +208,364 @@ degree_of_freedom
 
 k_stage
 	: UNSIGNED_NUMBER
+	;
+
+// 17.11 Math functions
+
+single_argument_math_function
+	: single_argument_math_function_identifier LEFT_PARENTHESIS argument RIGHT_PARENTHESIS
+	;
+
+two_argument_math_function
+	: two_argument_math_function_identifier LEFT_PARENTHESIS argument COMMA argument RIGHT_PARENTHESIS
+	;
+
+single_argument_math_function_identifier
+	: DOLLAR_CLOG2
+	| DOLLAR_LN
+	| DOLLAR_LOG10
+	| DOLLAR_EXP
+	| DOLLAR_SQRT
+	| DOLLAR_FLOOR
+	| DOLLAR_CEIL
+	| DOLLAR_SIN
+	| DOLLAR_COS
+	| DOLLAR_TAN
+	| DOLLAR_ASIN
+	| DOLLAR_ACOS
+	| DOLLAR_ATAN
+	| DOLLAR_SINH
+	| DOLLAR_COSH
+	| DOLLAR_TANH
+	| DOLLAR_ASINH
+	| DOLLAR_ACOSH
+	| DOLLAR_ATANH
+	;
+
+two_argument_math_function_identifier
+	: DOLLAR_POW
+	| DOLLAR_ATAN2
+	| DOLLAR_HYPOT
+	;
+
+// 18. Value change dump (VCD) files
+// 18.1 Creating four-state VCD file
+
+dumpfile_task
+	: DOLLAR_DUMPFILE LEFT_PARENTHESIS filename RIGHT_PARENTHESIS SEMICOLON
+	;
+
+// 18.1.2 Specifying variables to be dumped ($dumpvars)
+
+dumpvars_task
+	: DOLLAR_DUMPVARS SEMICOLON
+	| DOLLAR_DUMPVARS LEFT_PARENTHESIS levels (COMMA list_of_modules_or_variables)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+list_of_modules_or_variables
+	: module_or_variable (COMMA module_or_variable)*
+	;
+
+module_or_variable
+	: module_identifier
+	| variable_identifier
+	;
+
+levels
+	: UNSIGNED_NUMBER
+	;
+
+// 18.1.3 Stopping and resuming the dump ($dumpoff/$dumpon)
+
+dumpoff_task
+	: DOLLAR_DUMPOFF SEMICOLON
+	;
+
+dumpon_task
+	: DOLLAR_DUMPON SEMICOLON
+	;
+
+// 18.1.4 Generating a checkpoint ($dumpall)
+
+dumpall_task
+	: DOLLAR_DUMPALL SEMICOLON
+	;
+
+// 18.1.5 Limiting size of dump file ($dumplimit)
+
+dumplimit_task
+	: DOLLAR_DUMPLIMIT LEFT_PARENTHESIS filesize RIGHT_PARENTHESIS SEMICOLON
+	;
+
+filesize
+	: UNSIGNED_NUMBER
+	;
+
+// 18.1.6 Reading dump file during simulation ($dumpflush)
+
+dumpflush_task
+	: DOLLAR_DUMPFLUSH SEMICOLON
+	;
+
+// 18.2 Format of four-state VCD file
+// 18.2.1 Syntax of four-state VCD file
+
+value_change_dump_definitions
+	: declaration_command* simulation_command*
+	;
+
+declaration_command
+	: declaration_keyword command_text? DOLLAR_END
+	;
+
+simulation_command
+	: simulation_keyword value_change* DOLLAR_END
+	| DOLLAR_COMMENT comment_text? DOLLAR_END
+	| simulation_time
+	| value_change
+	;
+
+declaration_keyword
+	: DOLLAR_COMMENT
+	| DOLLAR_DATE
+	| DOLLAR_ENDDEFINITIONS
+	| DOLLAR_SCOPE
+	| DOLLAR_TIMESCALE
+	| DOLLAR_UPSCOPE
+	| DOLLAR_VAR
+	| DOLLAR_VERSION
+	;
+
+simulation_keyword
+	: DOLLAR_DUMPALL
+	| DOLLAR_DUMPOFF
+	| DOLLAR_DUMPON
+	| DOLLAR_DUMPVARS
+	;
+
+simulation_time
+	: HASH DECIMAL_NUMBER
+	;
+
+value_change
+	: SCALAR_VALUE_CHANGE
+	| VECTOR_VALUE_CHANGE
+	;
+
+command_text
+	: VCD_TEXT
+	;
+
+comment_text
+	: VCD_TEXT
+	;
+
+// 18.2.3 Description of keyword commands
+// 18.2.3.1 $comment
+
+vcd_declaration_comment
+	: DOLLAR_COMMENT comment_text DOLLAR_END
+	;
+
+// 18.2.3.2 $date
+
+vcd_declaration_date
+	: DOLLAR_DATE date_text DOLLAR_END
+	;
+
+date_text
+	: VCD_TEXT
+	;
+
+// 18.2.3.3 $enddefinitions
+
+vcd_declaration_enddefinitions
+	: DOLLAR_ENDDEFINITIONS DOLLAR_END
+	;
+
+// 18.2.3.4 $scope
+
+vcd_declaration_scope
+	: DOLLAR_SCOPE scope_type scope_identifier DOLLAR_END
+	;
+
+scope_type
+	: BEGIN
+	| FORK
+	| FUNCTION
+	| MODULE
+	| TASK
+	;
+
+scope_identifier
+	: identifier
+	;
+
+// 18.2.3.5 $timescale
+
+vcd_declaration_timescale
+	: DOLLAR_TIMESCALE TIME_LITERAL DOLLAR_END
+	;
+
+// 18.2.3.6 $upscope
+
+vcd_declaration_upscope
+	: DOLLAR_UPSCOPE DOLLAR_END
+	;
+
+// 18.2.3.7 $var
+
+vcd_declaration_vars
+	: DOLLAR_VAR var_type size IDENTIFIER_CODE reference DOLLAR_END
+	;
+
+var_type
+	: EVENT
+	| INTEGER
+	| PARAMETER
+	| REAL
+	| REALTIME
+	| REG
+	| SUPPLY0
+	| SUPPLY1
+	| TIME
+	| TRI
+	| TRIAND
+	| TRIOR
+	| TRIREG
+	| TRI0
+	| TRI1
+	| WAND
+	| WIRE
+	| WOR
+	;
+
+size
+	: DECIMAL_NUMBER
+	;
+
+reference
+	: identifier
+	| identifier LEFT_BRACKET bit_select_index RIGHT_BRACKET
+	| identifier LEFT_BRACKET msb_index COLON lsb_index RIGHT_BRACKET
+	;
+
+bit_select_index
+	: index
+	;
+
+msb_index
+	: index
+	;
+
+lsb_index
+	: index
+	;
+
+index
+	: DECIMAL_NUMBER
+	;
+
+// 18.2.3.8 $version
+
+vcd_declaration_version
+	: DOLLAR_VERSION version_text system_task DOLLAR_END
+	;
+
+version_text
+	: VCD_TEXT
+	;
+
+system_task
+	: dumpfile_task
+	| dumpvars_task
+	| dumpoff_task
+	| dumpon_task
+	| dumpall_task
+	| dumplimit_task
+	| dumpflush_task
+	;
+
+// 18.2.3.9 $dumpall
+
+vcd_simulation_dumpall
+	: DOLLAR_DUMPALL value_changes* DOLLAR_END
+	;
+
+value_changes
+	: VCD_TEXT
+	;
+
+// 18.2.3.10 $dumpoff
+
+vcd_simulation_dumpoff
+	: DOLLAR_DUMPOFF value_changes* DOLLAR_END
+	;
+
+// 18.2.3.11 $dumpon
+
+vcd_simulation_dumpon
+	: DOLLAR_DUMPON value_changes* DOLLAR_END
+	;
+
+// 18.2.3.12 $dumpvars
+
+vcd_simulation_dumpvars
+	: DOLLAR_DUMPVARS value_changes* DOLLAR_END
+	;
+
+// 18.3 Creating extended VCD file
+// 18.3.1 Specifying dump file name and ports to be dumped ($dumpports)
+
+dumpports_task
+	: DOLLAR_DUMPPORTS LEFT_PARENTHESIS scope_list COMMA file_pathname RIGHT_PARENTHESIS SEMICOLON
+	;
+
+scope_list
+	: module_identifier (COMMA module_identifier)*
+	;
+
+file_pathname
+	: filename
+	;
+
+// 18.3.2 Stopping and resuming the dump ($dumpportsoff/$dumpportson)
+
+dumpportsoff_task
+	: DOLLAR_DUMPPORTSOFF LEFT_PARENTHESIS file_pathname RIGHT_PARENTHESIS SEMICOLON
+	;
+
+dumpportson_task
+	: DOLLAR_DUMPPORTSON LEFT_PARENTHESIS file_pathname RIGHT_PARENTHESIS SEMICOLON
+	;
+
+// 18.3.3 Generating a checkpoint ($dumpportsall)
+
+dumpportsall_task
+	: DOLLAR_DUMPPORTSALL LEFT_PARENTHESIS file_pathname RIGHT_PARENTHESIS SEMICOLON
+	;
+
+// 18.3.4 Limiting size of dump file ($dumpportslimit)
+
+dumpportslimit_task
+	: DOLLAR_DUMPPORTSLIMIT LEFT_PARENTHESIS filesize COMMA file_pathname RIGHT_PARENTHESIS SEMICOLON
+	;
+
+// 18.3.5 Reading dump file during simulation ($dumpportsflush)
+
+dumpportsflush_task
+	: DOLLAR_DUMPPORTSFLUSH LEFT_PARENTHESIS file_pathname RIGHT_PARENTHESIS SEMICOLON
+	;
+
+// 18.3.6 Description of keyword commands
+// 18.3.6.1 $vcdclose
+
+vcdclose_task
+	: DOLLAR_VCDCLOSE final_simulation_time DOLLAR_END
+	;
+
+final_simulation_time
+	: HASH UNSIGNED_NUMBER
 	;
 
 // 19. Compiler directives
@@ -342,7 +611,7 @@ text_macro_name
 	;
 
 macro_text
-	: TEXT
+	: MACRO_TEXT
 	;
 
 list_of_formal_arguments
@@ -422,7 +691,7 @@ group_of_lines
 // 19.5 `include
 
 include_compiler_directive
-	: INCLUDE DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE
+	: INCLUDE DOUBLE_QUOTE filename DOUBLE_QUOTE
 	;
 
 // 19.6 `resetall
@@ -510,7 +779,7 @@ library_declaration
 include_statement
 	: INCLUDE FILE_PATH_SPEC SEMICOLON
 	;
-
+*/
 // A.1.2 Verilog source text
 // START SYMBOL
 source_text
@@ -651,7 +920,7 @@ liblist_clause
 	;
 
 use_clause
-	: USE (library_identifier DOT)? cell_identifier COLON_CONFIG?
+	: USE (library_identifier DOT)? cell_identifier (COLON CONFIG)?
 	;
 
 // A.2 Declarations
@@ -808,7 +1077,7 @@ delay2
 
 delay_value
 	: UNSIGNED_NUMBER
-	| real_number
+	| REAL_NUMBER
 	| identifier
 	;
 
@@ -874,8 +1143,8 @@ specparam_assignment
 	;
 
 pulse_control_specparam
-	: PATHPULSE EQUAL LEFT_PARENTHESIS reject_limit_value (COMMA error_limit_value)? RIGHT_PARENTHESIS
-	| PATHPULSE specify_input_terminal_descriptor DOT specify_output_terminal_descriptor EQUAL LEFT_PARENTHESIS reject_limit_value (COMMA error_limit_value)? RIGHT_PARENTHESIS
+	: PATHPULSE_DOLLAR EQUAL LEFT_PARENTHESIS reject_limit_value (COMMA error_limit_value)? RIGHT_PARENTHESIS
+	| PATHPULSE_DOLLAR specify_input_terminal_descriptor DOT specify_output_terminal_descriptor EQUAL LEFT_PARENTHESIS reject_limit_value (COMMA error_limit_value)? RIGHT_PARENTHESIS
 	;
 
 error_limit_value
@@ -1243,7 +1512,7 @@ generate_block_or_null
 	: generate_block
 	| SEMICOLON
 	;
-
+/*
 // A.5 UDP declaration and instantiation
 // A.5.1 UDP declaration
 
@@ -1348,7 +1617,7 @@ udp_instance
 name_of_udp_instance
 	: udp_instance_identifier range_?
 	;
-
+*/
 // A.6 Behavioral statements
 // A.6.1 Continuous assignment statements
 
@@ -1452,10 +1721,10 @@ disable_statement
 	;
 
 event_control
-	: DOT hierarchical_event_identifier
-	| DOT LEFT_PARENTHESIS event_expression RIGHT_PARENTHESIS
-	| DOT ASTERISK
-	| DOT LEFT_PARENTHESIS ASTERISK RIGHT_PARENTHESIS
+	: AT_SIGN hierarchical_event_identifier
+	| AT_SIGN LEFT_PARENTHESIS event_expression RIGHT_PARENTHESIS
+	| AT_SIGN ASTERISK
+	| AT_SIGN LEFT_PARENTHESIS ASTERISK RIGHT_PARENTHESIS
 	;
 
 event_trigger
@@ -1715,7 +1984,7 @@ polarity_operator
 	: PLUS
 	| MINUS
 	;
-
+/*
 // A.7.5 System timing checks
 // A.7.5.1 System timing check commands
 
@@ -1875,7 +2144,7 @@ scalar_timing_check_condition
 	: TILDE? expression
 	| expression (DOUBLE_EQUAL | TRIPLE_EQUAL | EXCLAMATION_MARK_EQUAL | EXCLAMATION_MARK_DOUBLE_EQUAL) SCALAR_CONSTANT
 	;
-
+*/
 // A.8 Expressions
 // A.8.1 Concatenations
 
@@ -2123,33 +2392,11 @@ binary_module_path_operator
 // A.8.7 Numbers
 
 number
-	: decimal_number
-	| octal_number
-	| binary_number
-	| hex_number
-	| real_number
-	;
-
-real_number
-	: UNSIGNED_NUMBER DOT UNSIGNED_NUMBER
-	| UNSIGNED_NUMBER (DOT UNSIGNED_NUMBER)? EXP SIGN? UNSIGNED_NUMBER
-	;
-
-decimal_number
-	: UNSIGNED_NUMBER
-	| SIZE? DECIMAL_BASE DECIMAL_VALUE
-	;
-
-binary_number
-	: SIZE? BINARY_BASE BINARY_VALUE
-	;
-
-octal_number
-	: SIZE? OCTAL_BASE OCTAL_VALUE
-	;
-
-hex_number
-	: SIZE? HEX_BASE HEX_VALUE
+	: DECIMAL_NUMBER
+	| OCTAL_NUMBER
+	| BINARY_NUMBER
+	| HEX_NUMBER
+	| REAL_NUMBER
 	;
 
 // A.9 General

@@ -3,203 +3,75 @@
 
 lexer grammar SystemVerilogLexer;
 
-// A.1.4 Module items
-/*
-FINISH_NUMBER
-	: '0'
-	| '1'
-	| '2'
-	;
-*/
-// A.8.4 Primaries
+// Numbers
 
-TIME_LITERAL
-	: UNSIGNED_NUMBER TIME_UNIT
-	| FIXED_POINT_NUMBER TIME_UNIT
-	;
+REAL_NUMBER : UNSIGNED_NUMBER DOT UNSIGNED_NUMBER | UNSIGNED_NUMBER (DOT UNSIGNED_NUMBER)? EXP SIGN? UNSIGNED_NUMBER ;
+fragment EXP : [eE] ;
+DECIMAL_NUMBER : UNSIGNED_NUMBER | SIZE? DECIMAL_BASE DECIMAL_VALUE ;
+BINARY_NUMBER : SIZE? BINARY_BASE BINARY_VALUE ;
+OCTAL_NUMBER : SIZE? OCTAL_BASE OCTAL_VALUE ;
+HEX_NUMBER : SIZE? HEX_BASE HEX_VALUE ;
+fragment SIGN : [-+] ;
+fragment SIZE : NON_ZERO_UNSIGNED_NUMBER ;
+fragment NON_ZERO_UNSIGNED_NUMBER : NON_ZERO_DECIMAL_DIGIT (UNDERSCORE | DECIMAL_DIGIT)* ;
+UNSIGNED_NUMBER : DECIMAL_DIGIT (UNDERSCORE | DECIMAL_DIGIT)* ;
+fragment DECIMAL_VALUE : UNSIGNED_NUMBER | (X_DIGIT | Z_DIGIT) UNDERSCORE* ;
+fragment BINARY_VALUE : BINARY_DIGIT (UNDERSCORE | BINARY_DIGIT)* ;
+fragment OCTAL_VALUE : OCTAL_DIGIT (UNDERSCORE | OCTAL_DIGIT)* ;
+fragment HEX_VALUE : HEX_DIGIT (UNDERSCORE | HEX_DIGIT)* ;
+fragment DECIMAL_BASE : APOSTROPHE [sS]? [dD] ;
+fragment BINARY_BASE : APOSTROPHE [sS]? [bB] ;
+fragment OCTAL_BASE : APOSTROPHE [sS]? [oO] ;
+fragment HEX_BASE : APOSTROPHE [sS]? [hH] ;
+fragment NON_ZERO_DECIMAL_DIGIT : [1-9] ;
+fragment DECIMAL_DIGIT : [0-9] ;
+fragment BINARY_DIGIT : X_DIGIT | Z_DIGIT | [01] ;
+fragment OCTAL_DIGIT : X_DIGIT | Z_DIGIT | [0-7] ;
+fragment HEX_DIGIT : X_DIGIT | Z_DIGIT | [0-9a-fA-F] ;
+fragment X_DIGIT : [xX] ;
+fragment Z_DIGIT : [zZ?] ;
+//UNBASED_UNSIZED_LITERAL : APOSTROPHE [01xXzZ] ;
+fragment DOT : '.' ;
+fragment APOSTROPHE : '\'' ;
 
-fragment
-TIME_UNIT
-	: [mnpf]? 's'
-	;
+// Strings
 
-// A.8.7 Numbers
+STRING_LITERAL : DOUBLE_QUOTE ~["\r\n]* DOUBLE_QUOTE ;
+fragment DOUBLE_QUOTE : '"' ;
 
-DECIMAL_NUMBER
-	: SIZE? DECIMAL_BASE (UNSIGNED_NUMBER | (X_DIGIT | Z_DIGIT) '_'*)
-	;
+// Comments
 
-BINARY_NUMBER
-	: SIZE? BINARY_BASE BINARY_VALUE
-	;
+ONE_LINE_COMMENT : DOUBLE_SLASH COMMENT_TEXT NEWLINE -> channel(HIDDEN) ;
+BLOCK_COMMENT : SLASH_ASTERISK COMMENT_TEXT ASTERISK_SLASH -> channel(HIDDEN) ;
+fragment COMMENT_TEXT : ASCII_ANY ;
+fragment ASCII_ANY : [\u0000-\u007f] ;
+fragment DOUBLE_SLASH : '//' ;
+fragment SLASH_ASTERISK : '/*' ;
+fragment ASTERISK_SLASH : '*/' ;
+fragment NEWLINE : CARRIAGE_RETURN? LINE_FEED ;
 
-OCTAL_NUMBER
-	: SIZE? OCTAL_BASE OCTAL_VALUE
-	;
+// Identifiers
 
-HEX_NUMBER
-	: SIZE? HEX_BASE HEX_VALUE
-	;
+ESCAPED_IDENTIFIER : BACKSLASH ASCII_PRINTABLE_EXCEPT_WHITE_SPACE+ WHITE_SPACE ;
+SIMPLE_IDENTIFIER : (LETTER | UNDERSCORE) (LETTER | UNDERSCORE | DECIMAL_DIGIT | DOLLAR_SIGN)* ;
+SYSTEM_TF_IDENTIFIER : DOLLAR_SIGN (LETTER | UNDERSCORE | DECIMAL_DIGIT | DOLLAR_SIGN) (LETTER | UNDERSCORE | DECIMAL_DIGIT | DOLLAR_SIGN)* ;
+fragment ASCII_PRINTABLE_EXCEPT_WHITE_SPACE : [\u0021-\u007e] ;
+fragment UNDERSCORE : '_' ;
+fragment DOLLAR_SIGN : '$' ;
+fragment BACKSLASH : '\\' ;
+fragment LETTER : [a-zA-Z] ;
 
-fragment
-SIGN
-	: [+-]
-	;
+// White space
 
-fragment
-SIZE
-	: NON_ZERO_UNSIGNED_NUMBER
-	;
+WHITE_SPACE_REGION : WHITE_SPACE+ -> channel(HIDDEN) ;
+fragment WHITE_SPACE : SPACE | TAB | CARRIAGE_RETURN | LINE_FEED ;
+fragment SPACE : ' ' ;
+fragment TAB : '\t' ;
+fragment CARRIAGE_RETURN : '\r' ;
+fragment LINE_FEED : '\n' ;
 
-fragment
-NON_ZERO_UNSIGNED_NUMBER
-	: NON_ZERO_DECIMAL_DIGIT ('_' | DECIMAL_DIGIT)*
-	;
+// Time literal
 
-REAL_NUMBER
-	: FIXED_POINT_NUMBER
-	;
-
-fragment
-FIXED_POINT_NUMBER
-	: UNSIGNED_NUMBER '.' UNSIGNED_NUMBER
-	;
-
-fragment
-EXP
-	: [eE]
-	;
-
-UNSIGNED_NUMBER
-	: DECIMAL_DIGIT ('_' | DECIMAL_DIGIT)*
-	;
-
-fragment
-BINARY_VALUE
-	: BINARY_DIGIT ('_' | BINARY_DIGIT)*
-	;
-
-fragment
-OCTAL_VALUE
-	: OCTAL_DIGIT ('_' | OCTAL_DIGIT)*
-	;
-
-fragment
-HEX_VALUE
-	: HEX_DIGIT ('_' | HEX_DIGIT)*
-	;
-
-fragment
-DECIMAL_BASE
-	: '\'' [sS]? [dD]
-	;
-
-fragment
-BINARY_BASE
-	: '\'' [sS]? [bB]
-	;
-
-fragment
-OCTAL_BASE
-	: '\'' [sS]? [oO]
-	;
-
-fragment
-HEX_BASE
-	: '\'' [sS]? [hH]
-	;
-
-fragment
-NON_ZERO_DECIMAL_DIGIT
-	: [1-9]
-	;
-
-fragment
-DECIMAL_DIGIT
-	: [0-9]
-	;
-
-fragment
-BINARY_DIGIT
-	: X_DIGIT
-	| Z_DIGIT
-	| [01]
-	;
-
-fragment
-OCTAL_DIGIT
-	: X_DIGIT
-	| Z_DIGIT
-	| [0-7]
-	;
-
-fragment
-HEX_DIGIT
-	: X_DIGIT
-	| Z_DIGIT
-	| [0-9a-fA-F]
-	;
-
-fragment
-X_DIGIT
-	: [xX]
-	;
-
-fragment
-Z_DIGIT
-	: [zZ?]
-	;
-/*
-UNBASED_UNSIZED_LITERAL
-	: '\'0'
-	| '\'1'
-	| '\'' Z_OR_X
-	;
-*/
-// A.8.8 Strings
-
-STRING_LITERAL
-	: '"' ~["\n\r]* '"'
-	;
-
-// A.9.2 Comments
-
-ONE_LINE_COMMENT
-	: '//' .*? '\r'? '\n' -> channel(HIDDEN)
-	;
-
-BLOCK_COMMENT
-	: '/*' .*? '*/' -> channel(HIDDEN)
-	;
-
-// A.9.3 Identifiers
-
-ESCAPED_IDENTIFIER
-	: '\\' ('\u0021'..'\u007E')+ ~[ \r\t\n]*
-	;
-
-SIMPLE_IDENTIFIER
-	: [a-zA-Z_] [a-zA-Z0-9_$]*
-	;
-
-SYSTEM_TF_IDENTIFIER
-	: '$' [a-zA-Z0-9_$] [a-zA-Z0-9_$]*
-	;
-
-// A.9.4 White space
-
-WHITE_SPACE
-	: [ \t\n\r]+ -> channel(HIDDEN)
-	;
-
-// 22. Compiler directives
-
-COMPILER_DIRECTIVE
-	: '`' .*? '\r'? '\n' -> skip
-	;
-
-// 33.3.1 Specifying libraries—the library map file
-
-FILE_PATH_SPEC
-	: ([/~] | './') ~[ \r\t\n]*?
-	;
+TIME_LITERAL : TIME_NUMBER TIME_UNIT ;
+fragment TIME_NUMBER : '1' | '10' | '100' ;
+fragment TIME_UNIT : [mnpf]? 's' ;
