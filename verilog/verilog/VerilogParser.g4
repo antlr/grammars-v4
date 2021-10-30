@@ -350,7 +350,7 @@ list_of_formal_arguments
 	;
 
 formal_argument_identifier
-	: simple_identifier
+	: SIMPLE_IDENTIFIER
 	;
 
 text_macro_usage
@@ -422,7 +422,7 @@ group_of_lines
 // 19.5 `include
 
 include_compiler_directive
-	: INCLUDE FILE_NAME
+	: INCLUDE DOUBLE_QUOTE FILE_NAME DOUBLE_QUOTE
 	;
 
 // 19.6 `resetall
@@ -460,7 +460,7 @@ pragma
 	;
 
 pragma_name
-	: simple_identifier
+	: SIMPLE_IDENTIFIER
 	;
 
 pragma_expression
@@ -477,7 +477,7 @@ pragma_value
 	;
 
 pragma_keyword
-	: simple_identifier
+	: SIMPLE_IDENTIFIER
 	;
 
 // 19.11 `begin_keywords, `end_keywords
@@ -2181,10 +2181,6 @@ config_identifier
 	: identifier
 	;
 
-escaped_identifier
-	: ESCAPED_IDENTIFIER
-	;
-
 event_identifier
 	: identifier
 	;
@@ -2238,8 +2234,8 @@ hierarchical_task_identifier
 	;
 
 identifier
-	: simple_identifier
-	| escaped_identifier
+	: SIMPLE_IDENTIFIER
+	| ESCAPED_IDENTIFIER
 	;
 
 inout_port_identifier
@@ -2284,10 +2280,6 @@ port_identifier
 
 real_identifier
 	: identifier
-	;
-
-simple_identifier
-	: SIMPLE_IDENTIFIER
 	;
 
 specparam_identifier

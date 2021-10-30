@@ -323,11 +323,12 @@ DOUBLE_QUOTE : '"' ;
 
 // Comments
 
-ONE_LINE_COMMENT : DOUBLE_SLASH MATCH_EVERYTHING_NON_GREEDY CARRIAGE_RETURN? LINE_FEED -> channel(HIDDEN) ;
+ONE_LINE_COMMENT : DOUBLE_SLASH MATCH_EVERYTHING_NON_GREEDY NEWLINE -> channel(HIDDEN) ;
 BLOCK_COMMENT : SLASH_ASTERISK MATCH_EVERYTHING_NON_GREEDY ASTERISK_SLASH -> channel(HIDDEN) ;
 fragment DOUBLE_SLASH : '//' ;
 fragment SLASH_ASTERISK : '/*' ;
 fragment ASTERISK_SLASH : '*/' ;
+fragment NEWLINE : CARRIAGE_RETURN? LINE_FEED ;
 
 // Identifiers
 
@@ -336,11 +337,16 @@ SIMPLE_IDENTIFIER : (LETTER | UNDERSCORE) (LETTER | UNDERSCORE | DECIMAL_DIGIT |
 SYSTEM_TF_IDENTIFIER : DOLLAR_SIGN (LETTER | UNDERSCORE | DECIMAL_DIGIT | DOLLAR_SIGN) (LETTER | UNDERSCORE | DECIMAL_DIGIT | DOLLAR_SIGN)* ;
 UNDERSCORE : '_' ;
 DOLLAR_SIGN : '$' ;
+fragment BACKSLASH : '\\' ;
 
 // White space
 
 WHITE_SPACE_REGION : WHITE_SPACE+ -> channel(HIDDEN) ;
 fragment WHITE_SPACE : SPACE | TAB | CARRIAGE_RETURN | LINE_FEED ;
+fragment SPACE : ' ' ;
+fragment TAB : '\t' ;
+fragment CARRIAGE_RETURN : '\r' ;
+fragment LINE_FEED : '\n' ;
 
 // Separators
 
@@ -402,39 +408,44 @@ TRIPLE_AMPERSAND : '&&&' ;
 
 // Context-sensitive rules (special lexical modes are required to handle these exceptions)
 
-FILE_PATH_SPEC : ~[ \t\r\n]+ ;
+// 17.2 File input-output system tasks and functions | 19.5 `include
 FILE_NAME : ~[/\\?%':|"<>,;=]+ ;
+TYPE : 'r' | 'rb' | 'w' | 'wb' | 'a' | 'ab' | 'r+' | 'r+b' | 'rb+' | 'w+' | 'w+b' | 'wb+' | 'a+' | 'a+b' | 'ab+' ;
+// 17.2.10 Loading timing data from an SDF file
 MTM_SPEC : 'MAXIMUM' | 'MINIMUM' | 'TOOL_CONTROL' | 'TYPICAL' ;
 SCALE_TYPE : 'FROM_MAXIMUM' | 'FROM_MINIMUM' | 'FROM_MTM' | 'FROM_TYPICAL' ;
+// 17.3.2 $timeformat
 UNITS_NUMBER : '0' | MINUS [1-15] ;
+// 17.4 Simulation control system tasks
 FINISH_NUMBER : [0-2] ;
+// 19.2 `default_nettype
 NONE : 'none' ;
+// 19.3 `define and `undef
+TEXT : MATCH_EVERYTHING_NON_GREEDY ~'\\' NEWLINE ;
+// 19.7 `line
+LEVEL : [0-2] ;
+// 19.8 `timescale
 TIME_LITERAL : UNSIGNED_NUMBER TIME_UNIT ;
 fragment TIME_UNIT : [mnpf]? 's' ;
-TEXT : MATCH_EVERYTHING_NON_GREEDY ~'\\' NEWLINE ;
-TYPE : 'r' | 'rb' | 'w' | 'wb' | 'a' | 'ab' | 'r+' | 'r+b' | 'rb+' | 'w+' | 'w+b' | 'wb+' | 'a+' | 'a+b' | 'ab+' ;
-LEVEL : [0-2] ;
+// 19.11 `begin_keywords, `end_keywords
 VERSION_SPECIFIER : '1364-1995' | '1364-2001' | '1364-2001-noconfig' | '1364-2005' ;
+// A.1.1 Library source text
+FILE_PATH_SPEC : ~[ \t\r\n]+ ;
 MINUS_INCDIR : '-incdir' ;
+// A.1.5 Configuration source text
 COLON_CONFIG : ':config' ;
+// A.2.4 Declaration assignments
 PATHPULSE : 'PATHPULSE$' ;
+// A.5.3 UDP body
 INIT_VAL : '1' APOSTROPHE B (ZERO_OR_ONE | X) | ZERO_OR_ONE ;
 OUTPUT_SYMBOL : [01xX] ;
 LEVEL_SYMBOL : [01xX?bB] ;
 EDGE_SYMBOL : [rRfFpPnN*] ;
+// A.7.5.3 System timing check event definitions
 EDGE_DESCRIPTOR : '01' | '10' | Z_OR_X ZERO_OR_ONE | ZERO_OR_ONE Z_OR_X ;
 fragment ZERO_OR_ONE : [01] ;
 fragment Z_OR_X : X | Z ;
 SCALAR_CONSTANT : '1' APOSTROPHE B ZERO_OR_ONE | ZERO_OR_ONE ;
-
-// Escape sequences
-
-fragment NEWLINE : CARRIAGE_RETURN? LINE_FEED ;
-fragment SPACE : ' ' ;
-fragment TAB : '\t' ;
-fragment CARRIAGE_RETURN : '\r' ;
-fragment LINE_FEED : '\n' ;
-fragment BACKSLASH : '\\' ;
 
 // Letters
 
