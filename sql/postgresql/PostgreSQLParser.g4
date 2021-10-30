@@ -2746,8 +2746,7 @@ analyzestmt
    ;
 
 vac_analyze_option_list
-   : vac_analyze_option_elem
-   | vac_analyze_option_list COMMA vac_analyze_option_elem
+   : vac_analyze_option_elem (COMMA vac_analyze_option_elem)*
    ;
 
 analyze_keyword
@@ -2800,8 +2799,7 @@ vacuum_relation
    ;
 
 vacuum_relation_list
-   : vacuum_relation
-   | vacuum_relation_list COMMA vacuum_relation
+   : vacuum_relation (COMMA vacuum_relation)*
    ;
 
 opt_vacuum_relation_list
@@ -2829,8 +2827,7 @@ explainablestmt
    ;
 
 explain_option_list
-   : explain_option_elem
-   | explain_option_list COMMA explain_option_elem
+   : explain_option_elem (COMMA explain_option_elem)*
    ;
 
 explain_option_elem
@@ -3887,13 +3884,11 @@ xml_attributes
    ;
 
 xml_attribute_list
-   : xml_attribute_el
-   | xml_attribute_list COMMA xml_attribute_el
+   : xml_attribute_el (COMMA xml_attribute_el)*
    ;
 
 xml_attribute_el
-   : a_expr AS collabel
-   | a_expr
+   : a_expr (AS collabel)?
    ;
 
 document_or_content
@@ -3915,8 +3910,7 @@ xmlexists_argument
    ;
 
 xml_passing_mech
-   : BY REF
-   | BY VALUE_P
+   : BY (REF | VALUE_P)
    ;
 
 within_group_clause
@@ -3935,8 +3929,7 @@ window_clause
    ;
 
 window_definition_list
-   : window_definition
-   | window_definition_list COMMA window_definition
+   : window_definition (COMMA window_definition)*
    ;
 
 window_definition
@@ -3944,8 +3937,7 @@ window_definition
    ;
 
 over_clause
-   : OVER window_specification
-   | OVER colid
+   : OVER (window_specification | colid)
    |
    ;
 
@@ -3976,24 +3968,19 @@ frame_extent
    ;
 
 frame_bound
-   : UNBOUNDED PRECEDING
-   | UNBOUNDED FOLLOWING
+   : UNBOUNDED (PRECEDING | FOLLOWING)
    | CURRENT_P ROW
    | a_expr PRECEDING
    | a_expr FOLLOWING
    ;
 
 opt_window_exclusion_clause
-   : EXCLUDE CURRENT_P ROW
-   | EXCLUDE GROUP_P
-   | EXCLUDE TIES
-   | EXCLUDE NO OTHERS
+   : EXCLUDE (CURRENT_P ROW | GROUP_P | TIES | NO OTHERS)
    |
    ;
 
 row
-   : ROW OPEN_PAREN expr_list CLOSE_PAREN
-   | ROW OPEN_PAREN CLOSE_PAREN
+   : ROW OPEN_PAREN expr_list? CLOSE_PAREN
    | OPEN_PAREN expr_list COMMA a_expr CLOSE_PAREN
    ;
 
@@ -4065,30 +4052,24 @@ expr_list
    ;
 
 func_arg_list
-   : func_arg_expr
-   | func_arg_list COMMA func_arg_expr
+   : func_arg_expr (COMMA func_arg_expr)*
    ;
 
 func_arg_expr
    : a_expr
-   | param_name COLON_EQUALS a_expr
-   | param_name EQUALS_GREATER a_expr
+   | param_name (COLON_EQUALS | EQUALS_GREATER) a_expr
    ;
 
 type_list
-   : typename
-   | type_list COMMA typename
+   : typename (COMMA typename)*
    ;
 
 array_expr
-   : OPEN_BRACKET expr_list CLOSE_BRACKET
-   | OPEN_BRACKET array_expr_list CLOSE_BRACKET
-   | OPEN_BRACKET CLOSE_BRACKET
+   : OPEN_BRACKET (expr_list | array_expr_list)? CLOSE_BRACKET
    ;
 
 array_expr_list
-   : array_expr
-   | array_expr_list COMMA array_expr
+   : array_expr (COMMA array_expr)*
    ;
 
 extract_list
@@ -4115,8 +4096,7 @@ unicode_normal_form
    ;
 
 overlay_list
-   : a_expr PLACING a_expr FROM a_expr FOR a_expr
-   | a_expr PLACING a_expr FROM a_expr
+   : a_expr PLACING a_expr FROM a_expr (FOR a_expr)?
    ;
 
 position_list
@@ -4150,8 +4130,7 @@ case_expr
    ;
 
 when_clause_list
-   : when_clause
-   | when_clause_list when_clause
+   : when_clause+
    ;
 
 when_clause
@@ -4183,8 +4162,7 @@ opt_slice_bound
    ;
 
 indirection
-   : indirection_el
-   | indirection indirection_el
+   : indirection_el+
    ;
 
 opt_indirection
@@ -4207,8 +4185,7 @@ target_el
    ;
 
 qualified_name_list
-   : qualified_name
-   | qualified_name_list COMMA qualified_name
+   : qualified_name (COMMA qualified_name)*
    ;
 
 qualified_name
@@ -4216,8 +4193,7 @@ qualified_name
    ;
 
 name_list
-   : name
-   | name_list COMMA name
+   : name (COMMA name)*
    ;
 
 name
@@ -4861,9 +4837,7 @@ pl_block
    ;
 
 decl_sect
-   : opt_block_label
-   | opt_block_label decl_start
-   | opt_block_label decl_start decl_stmts
+   : opt_block_label (decl_start decl_stmts?)?
    ;
 
 decl_start
@@ -4871,8 +4845,7 @@ decl_start
    ;
 
 decl_stmts
-   : decl_stmts decl_stmt
-   | decl_stmt
+   : decl_stmt+
    ;
 
 label_decl
@@ -4886,9 +4859,7 @@ decl_stmt
    ;
 
 decl_statement
-   : decl_varname ALIAS FOR decl_aliasitem SEMI
-   | decl_varname decl_const decl_datatype decl_collate decl_notnull decl_defval SEMI
-   | decl_varname opt_scrollable CURSOR decl_cursor_args decl_is_for decl_cursor_query SEMI
+   : decl_varname (ALIAS FOR decl_aliasitem | decl_const decl_datatype decl_collate decl_notnull decl_defval | opt_scrollable CURSOR decl_cursor_args decl_is_for decl_cursor_query) SEMI
    ;
 
 opt_scrollable
@@ -4907,8 +4878,7 @@ decl_cursor_args
    ;
 
 decl_cursor_arglist
-   : decl_cursor_arg
-   | decl_cursor_arglist COMMA decl_cursor_arg
+   : decl_cursor_arg (COMMA decl_cursor_arg)*
    ;
 
 decl_cursor_arg
@@ -5025,8 +4995,7 @@ getdiag_area_opt
    ;
 
 getdiag_list
-   : getdiag_list COMMA getdiag_list_item
-   | getdiag_list_item
+   : getdiag_list_item (COMMA getdiag_list_item)*
    ;
 
 getdiag_list_item
@@ -5071,8 +5040,7 @@ opt_expr_until_when
    ;
 
 case_when_list
-   : case_when_list case_when
-   | case_when
+   : case_when+
    ;
 
 case_when
@@ -5098,13 +5066,7 @@ stmt_for
    //TODO: rewrite using read_sql_expression logic?
 
 for_control
-   : for_variable IN_P opt_reverse a_expr DOT_DOT a_expr opt_by_expression
-/* this rule covers  */
-
-   | for_variable IN_P cursor_name opt_cursor_parameters
-   | for_variable IN_P selectstmt
-   | for_variable IN_P EXECUTE a_expr opt_for_using_expression
-   | for_variable IN_P explainstmt
+   : for_variable IN_P (cursor_name opt_cursor_parameters | selectstmt | explainstmt | EXECUTE a_expr opt_for_using_expression | opt_reverse a_expr DOT_DOT a_expr opt_by_expression)
    ;
 
 opt_for_using_expression
@@ -5151,10 +5113,7 @@ exit_type
    //todo implement RETURN statement according to initial grammar line 1754
 
 stmt_return
-   : RETURN NEXT sql_expression SEMI
-   | RETURN QUERY EXECUTE a_expr opt_for_using_expression SEMI
-   | RETURN QUERY selectstmt SEMI
-   | RETURN opt_return_result SEMI
+   : RETURN (NEXT sql_expression | QUERY (EXECUTE a_expr opt_for_using_expression | selectstmt) | opt_return_result) SEMI
    ;
 
 opt_return_result
@@ -5194,8 +5153,7 @@ opt_stmt_raise_level
 
 opt_raise_list
    :
-   | COMMA a_expr
-   | opt_raise_list COMMA a_expr
+   | COMMA a_expr (COMMA a_expr)*
    ;
 
 opt_raise_using
@@ -5208,8 +5166,7 @@ opt_raise_using_elem
    ;
 
 opt_raise_using_elem_list
-   : opt_raise_using_elem
-   | opt_raise_using_elem COMMA opt_raise_using_elem_list
+   : opt_raise_using_elem (COMMA opt_raise_using_elem)*
    ;
    //todo imnplement
 
@@ -5256,14 +5213,12 @@ opt_execute_using
    ;
 
 opt_execute_using_list
-   : a_expr
-   | opt_execute_using_list COMMA a_expr
+   : a_expr (COMMA a_expr)*
    ;
 
 opt_execute_into
    :
-   | INTO STRICT_P into_target
-   | INTO into_target
+   | INTO STRICT_P? into_target
    ;
    //https://www.postgresql.org/docs/current/plpgsql-cursors.html#PLPGSQL-CURSOR-OPENING
 
@@ -5276,10 +5231,7 @@ opt_execute_into
    //OPEN bound_cursorvar [ ( [ argument_name := ] argument_value [, ...] ) ];
 
 stmt_open
-   : OPEN colid SEMI
-   | OPEN cursor_variable opt_scroll_option FOR selectstmt SEMI
-   | OPEN cursor_variable opt_scroll_option FOR EXECUTE sql_expression opt_open_using SEMI
-   | OPEN colid OPEN_PAREN opt_open_bound_list CLOSE_PAREN SEMI
+   : OPEN (cursor_variable opt_scroll_option FOR (selectstmt | EXECUTE sql_expression opt_open_using) | colid (OPEN_PAREN opt_open_bound_list CLOSE_PAREN)?) SEMI
    ;
 
 opt_open_bound_list_item
@@ -5288,8 +5240,7 @@ opt_open_bound_list_item
    ;
 
 opt_open_bound_list
-   : opt_open_bound_list_item
-   | opt_open_bound_list COMMA opt_open_bound_list_item
+   : opt_open_bound_list_item (COMMA opt_open_bound_list_item)*
    ;
 
 opt_open_using
@@ -5335,12 +5286,8 @@ opt_fetch_direction
    | RELATIVE_P a_expr
    | a_expr
    | ALL
-   | FORWARD
-   | FORWARD a_expr
-   | FORWARD ALL
-   | BACKWARD
-   | BACKWARD a_expr
-   | BACKWARD ALL
+   | FORWARD (| a_expr | ALL)
+   | BACKWARD (| a_expr | ALL)
    ;
    //https://www.postgresql.org/docs/current/plpgsql-cursors.html#PLPGSQL-CURSOR-OPENING
 
@@ -5367,15 +5314,13 @@ stmt_rollback
    ;
 
 plsql_opt_transaction_chain
-   : AND CHAIN
-   | AND NO CHAIN
+   : AND (CHAIN | NO CHAIN)
    |
    ;
 
 stmt_set
    : SET any_name TO DEFAULT SEMI
-   | RESET any_name SEMI
-   | RESET ALL SEMI
+   | RESET (any_name | ALL) SEMI
    ;
 
 cursor_variable
@@ -5389,8 +5334,7 @@ exception_sect
    ;
 
 proc_exceptions
-   : proc_exceptions proc_exception
-   | proc_exception
+   : proc_exception+
    ;
 
 proc_exception
@@ -5398,8 +5342,7 @@ proc_exception
    ;
 
 proc_conditions
-   : proc_conditions OR proc_condition
-   | proc_condition
+   : proc_condition (OR proc_condition)*
    ;
 
 proc_condition
