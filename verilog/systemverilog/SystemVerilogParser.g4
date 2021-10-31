@@ -38,7 +38,8 @@ description
 	| interface_declaration
 	| program_declaration
 	| package_declaration
-	| attribute_instance* (package_item | bind_directive)
+	| attribute_instance* package_item
+	| attribute_instance* bind_directive
 	| config_declaration
 	;
 
@@ -54,7 +55,8 @@ module_declaration
 	: module_nonansi_header timeunits_declaration? module_item* 'endmodule' (':' module_identifier)?
 	| module_ansi_header timeunits_declaration? non_port_module_item* 'endmodule' (':' module_identifier)?
 	| attribute_instance* module_keyword lifetime? module_identifier '(' '.*' ')' ';' timeunits_declaration? module_item* 'endmodule' (':' module_identifier)?
-	| 'extern' (module_nonansi_header | module_ansi_header)
+	| 'extern' module_nonansi_header
+	| 'extern' module_ansi_header
 	;
 
 module_keyword
@@ -66,7 +68,8 @@ interface_declaration
 	: interface_nonansi_header timeunits_declaration? interface_item* 'endinterface' (':' interface_identifier)?
 	| interface_ansi_header timeunits_declaration? non_port_interface_item* 'endinterface' (':' interface_identifier)?
 	| attribute_instance* 'interface' interface_identifier '(' '.*' ')' ';' timeunits_declaration? interface_item* 'endinterface' (':' interface_identifier)?
-	| 'extern' (interface_nonansi_header | interface_ansi_header)
+	| 'extern' interface_nonansi_header
+	| 'extern' interface_ansi_header
 	;
 
 interface_nonansi_header
@@ -81,7 +84,8 @@ program_declaration
 	: program_nonansi_header timeunits_declaration? program_item* 'endprogram' (':' program_identifier)?
 	| program_ansi_header timeunits_declaration? non_port_program_item* 'endprogram' (':' program_identifier)?
 	| attribute_instance* 'program' program_identifier '(' '.*' ')' ';' timeunits_declaration? program_item* 'endprogram' (':' program_identifier)?
-	| 'extern' (program_nonansi_header | program_ansi_header)
+	| 'extern' program_nonansi_header
+	| 'extern' program_ansi_header
 	;
 
 program_nonansi_header
@@ -111,7 +115,9 @@ interface_class_declaration
 interface_class_item
 	: type_declaration
 	| attribute_instance* interface_class_method
-	| (local_parameter_declaration | parameter_declaration)? ';'
+	| local_parameter_declaration ';'
+	| parameter_declaration ';'
+	| ';'
 	;
 
 interface_class_method
@@ -123,8 +129,10 @@ package_declaration
 	;
 
 timeunits_declaration
-	: 'timeunit' TIME_LITERAL (('/' TIME_LITERAL)? | ';' 'timeprecision' TIME_LITERAL) ';'
-	| 'timeprecision' TIME_LITERAL ';' ('timeunit' TIME_LITERAL ';')?
+	: 'timeunit' TIME_LITERAL ('/' TIME_LITERAL)? ';'
+	| 'timeprecision' TIME_LITERAL ';'
+	| 'timeunit' TIME_LITERAL ';' 'timeprecision' TIME_LITERAL ';'
+	| 'timeprecision' TIME_LITERAL ';' 'timeunit' TIME_LITERAL ';'
 	;
 
 // A.1.3 Module parameters and ports
@@ -149,7 +157,11 @@ list_of_port_declarations
 	;
 
 port_declaration
-	: attribute_instance* (inout_declaration | input_declaration | output_declaration | ref_declaration | interface_port_declaration)
+	: attribute_instance* inout_declaration
+	| attribute_instance* input_declaration
+	| attribute_instance* output_declaration
+	| attribute_instance* ref_declaration
+	| attribute_instance* interface_port_declaration
 	;
 
 port
@@ -196,7 +208,9 @@ ansi_port_declaration
 
 elaboration_system_task
 	: '$fatal' ('(' /*finish_number*/ (/*','*/ list_of_arguments)? ')')? ';'
-	| ('$error' | '$warning' | '$info') ('(' list_of_arguments? ')')? ';'
+	| '$error' ('(' list_of_arguments? ')')? ';'
+	| '$warning' ('(' list_of_arguments? ')')? ';'
+	| '$info' ('(' list_of_arguments? ')')? ';'
 	;
 /*
 finish_number
@@ -225,14 +239,19 @@ module_item
 	;
 
 module_or_generate_item
-	: attribute_instance* (parameter_override | gate_instantiation | /*udp_instantiation |*/ module_instantiation | module_common_item)
+	: attribute_instance* parameter_override
+	| attribute_instance* gate_instantiation
+	//| attribute_instance* udp_instantiation
+	| attribute_instance* module_instantiation
+	| attribute_instance* module_common_item
 	;
 
 module_or_generate_item_declaration
 	: package_or_generate_item_declaration
 	| genvar_declaration
 	| clocking_declaration
-	| 'default' ('clocking' clocking_identifier | 'disable' 'iff' expression_or_dist) ';'
+	| 'default' 'clocking' clocking_identifier ';'
+	| 'default' 'disable' 'iff' expression_or_dist ';'
 	;
 
 non_port_module_item
@@ -251,7 +270,8 @@ parameter_override
 	;
 
 bind_directive
-	: 'bind' (bind_target_scope (':' bind_target_instance_list)? | bind_target_instance) bind_instantiation ';'
+	: 'bind' bind_target_scope (':' bind_target_instance_list)? bind_instantiation ';'
+	| 'bind' bind_target_instance bind_instantiation ';'
 	;
 
 bind_target_scope
@@ -285,8 +305,11 @@ design_statement
 	;
 
 config_rule_statement
-	: (default_clause | inst_clause | cell_clause) liblist_clause ';'
-	| (inst_clause | cell_clause) use_clause ';'
+	: default_clause liblist_clause ';'
+	| inst_clause liblist_clause ';'
+	| inst_clause use_clause ';'
+	| cell_clause liblist_clause ';'
+	| cell_clause use_clause ';'
 	;
 
 default_clause
@@ -321,7 +344,8 @@ interface_or_generate_item
 	;
 
 extern_tf_declaration
-	: 'extern' (method_prototype | 'forkjoin' task_prototype) ';'
+	: 'extern' method_prototype ';'
+	| 'extern' 'forkjoin' task_prototype ';'
 	;
 
 interface_item
@@ -346,7 +370,11 @@ program_item
 	;
 
 non_port_program_item
-	: attribute_instance* (continuous_assign | module_or_generate_item_declaration | initial_construct | final_construct | concurrent_assertion_item)
+	: attribute_instance* continuous_assign
+	| attribute_instance* module_or_generate_item_declaration
+	| attribute_instance* initial_construct
+	| attribute_instance* final_construct
+	| attribute_instance* concurrent_assertion_item
 	| timeunits_declaration
 	| program_generate_item
 	;
@@ -391,7 +419,9 @@ checker_or_generate_item_declaration
 	| covergroup_declaration
 	| genvar_declaration
 	| clocking_declaration
-	| ('default' ('clocking' clocking_identifier | 'disable' 'iff' expression_or_dist))? ';'
+	| 'default' 'clocking' clocking_identifier ';'
+	| 'default' 'disable' 'iff' expression_or_dist ';'
+	| ';'
 	;
 
 checker_generate_item
@@ -404,8 +434,14 @@ checker_generate_item
 // A.1.9 Class items
 
 class_item
-	: attribute_instance* (class_property | class_method | class_constraint | class_declaration | covergroup_declaration)
-	| (local_parameter_declaration | parameter_declaration)? ';'
+	: attribute_instance* class_property
+	| attribute_instance* class_method
+	| attribute_instance* class_constraint
+	| attribute_instance* class_declaration
+	| attribute_instance* covergroup_declaration
+	| local_parameter_declaration ';'
+	| parameter_declaration ';'
+	| ';'
 	;
 
 class_property
@@ -414,9 +450,12 @@ class_property
 	;
 
 class_method
-	: method_qualifier* (task_declaration | function_declaration | class_constructor_declaration)
+	: method_qualifier* task_declaration
+	| method_qualifier* function_declaration
 	| 'pure' 'virtual' class_item_qualifier* method_prototype ';'
-	| 'extern' method_qualifier* (method_prototype ';' | class_constructor_prototype)
+	| 'extern' method_qualifier* method_prototype ';'
+	| method_qualifier* class_constructor_declaration
+	| 'extern' method_qualifier* class_constructor_prototype
 	;
 
 class_constructor_prototype
@@ -508,7 +547,8 @@ dist_item
 	;
 
 dist_weight
-	: (':=' | ':/') expression
+	: ':=' expression
+	| ':/' expression
 	;
 
 constraint_prototype
@@ -547,9 +587,11 @@ package_or_generate_item_declaration
 	| extern_constraint_declaration
 	| class_declaration
 	| class_constructor_declaration
-	| (local_parameter_declaration | parameter_declaration)? ';'
+	| local_parameter_declaration ';'
+	| parameter_declaration ';'
 	| covergroup_declaration
 	| assertion_item_declaration
+	| ';'
 	;
 
 anonymous_program
@@ -570,11 +612,13 @@ anonymous_program_item
 // A.2.1.1 Module parameter declarations
 
 local_parameter_declaration
-	: 'localparam' (data_type_or_implicit list_of_param_assignments | 'type' list_of_type_assignments)
+	: 'localparam' data_type_or_implicit list_of_param_assignments
+	| 'localparam' 'type' list_of_type_assignments
 	;
 
 parameter_declaration
-	: 'parameter' (data_type_or_implicit list_of_param_assignments | 'type' list_of_type_assignments)
+	: 'parameter' data_type_or_implicit list_of_param_assignments
+	| 'parameter' 'type' list_of_type_assignments
 	;
 
 specparam_declaration
@@ -588,15 +632,18 @@ inout_declaration
 	;
 
 input_declaration
-	: 'input' (net_port_type list_of_port_identifiers | variable_port_type list_of_variable_identifiers)
+	: 'input' net_port_type list_of_port_identifiers
+	| 'input' variable_port_type list_of_variable_identifiers
 	;
 
 output_declaration
-	: 'output' (net_port_type list_of_port_identifiers | variable_port_type list_of_variable_port_identifiers)
+	: 'output' net_port_type list_of_port_identifiers
+	| 'output' variable_port_type list_of_variable_port_identifiers
 	;
 
 interface_port_declaration
-	: interface_identifier ('.' modport_identifier)? list_of_interface_identifiers
+	: interface_identifier list_of_interface_identifiers
+	| interface_identifier '.' modport_identifier list_of_interface_identifiers
 	;
 
 ref_declaration
@@ -617,11 +664,13 @@ package_import_declaration
 	;
 
 package_import_item
-	: package_identifier '::' (identifier | '*')
+	: package_identifier '::' identifier
+	| package_identifier '::' '*'
 	;
 
 package_export_declaration
-	: 'export' ('*::*' | package_import_item (',' package_import_item)*) ';'
+	: 'export' '*::*' ';'
+	| 'export' package_import_item (',' package_import_item)* ';'
 	;
 
 genvar_declaration
@@ -793,8 +842,10 @@ type_reference
 // A.2.2.2 Strengths
 
 drive_strength
-	: '(' strength0 ',' (strength1 | 'highz1') ')'
-	| '(' strength1 ',' (strength0 | 'highz0') ')'
+	: '(' strength0 ',' strength1 ')'
+	| '(' strength1 ',' strength0 ')'
+	| '(' strength0 ',' 'highz1' ')'
+	| '(' strength1 ',' 'highz0' ')'
 	| '(' 'highz0' ',' strength1 ')'
 	| '(' 'highz1' ',' strength0 ')'
 	;
@@ -913,7 +964,8 @@ type_assignment
 	;
 
 pulse_control_specparam
-	: 'PATHPULSE$' (specify_input_terminal_descriptor '$' specify_output_terminal_descriptor)? '=' '(' reject_limit_value (',' error_limit_value)? ')'
+	: 'PATHPULSE$' '=' '(' reject_limit_value (',' error_limit_value)? ')'
+	| 'PATHPULSE$' specify_input_terminal_descriptor '$' specify_output_terminal_descriptor '=' '(' reject_limit_value (',' error_limit_value)? ')'
 	;
 
 error_limit_value
@@ -955,7 +1007,8 @@ packed_dimension
 	;
 
 associative_dimension
-	: '[' (data_type | '*') ']'
+	: '[' data_type ']'
+	| '[' '*' ']'
 	;
 
 variable_dimension
@@ -993,8 +1046,10 @@ function_prototype
 	;
 
 dpi_import_export
-	: 'import' dpi_spec_string (dpi_function_import_property? (c_identifier '=')? dpi_function_proto | dpi_task_import_property? (c_identifier '=')? dpi_task_proto) ';'
-	| 'export' dpi_spec_string (c_identifier '=')? ('function' function_identifier | 'task' task_identifier) ';'
+	: 'import' dpi_spec_string dpi_function_import_property? (c_identifier '=')? dpi_function_proto ';'
+	| 'import' dpi_spec_string dpi_task_import_property? (c_identifier '=')? dpi_task_proto ';'
+	| 'export' dpi_spec_string (c_identifier '=')? 'function' function_identifier ';'
+	| 'export' dpi_spec_string (c_identifier '=')? 'task' task_identifier ';'
 	;
 
 dpi_spec_string
@@ -1026,7 +1081,8 @@ task_declaration
 	;
 
 task_body_declaration
-	: (interface_identifier '.' | class_scope)? task_identifier (';' tf_item_declaration* | '(' tf_port_list? ')' ';' block_item_declaration*) statement_or_null* 'endtask' (':' task_identifier)?
+	: (interface_identifier '.' | class_scope)? task_identifier ';' tf_item_declaration* statement_or_null* 'endtask' (':' task_identifier)?
+	| (interface_identifier '.' | class_scope)? task_identifier '(' tf_port_list? ')' ';' block_item_declaration* statement_or_null* 'endtask' (':' task_identifier)?
 	;
 
 tf_item_declaration
@@ -1058,8 +1114,10 @@ task_prototype
 // A.2.8 Block item declarations
 
 block_item_declaration
-	: attribute_instance* (data_declaration | let_declaration)
-	| attribute_instance* (local_parameter_declaration | parameter_declaration) ';'
+	: attribute_instance* data_declaration
+	| attribute_instance* local_parameter_declaration ';'
+	| attribute_instance* parameter_declaration ';'
+	| attribute_instance* let_declaration
 	;
 
 // A.2.9 Interface declarations
@@ -1073,7 +1131,9 @@ modport_item
 	;
 
 modport_ports_declaration
-	: attribute_instance* (modport_simple_ports_declaration | modport_tf_ports_declaration | modport_clocking_declaration)
+	: attribute_instance* modport_simple_ports_declaration
+	| attribute_instance* modport_tf_ports_declaration
+	| attribute_instance* modport_clocking_declaration
 	;
 
 modport_clocking_declaration
@@ -1243,7 +1303,10 @@ sequence_expr
 	;
 
 cycle_delay_range
-	: '##' (constant_primary | '[' (cycle_delay_const_range_expression | '*' | '+') ']')
+	: '##' constant_primary
+	| '##' '[' cycle_delay_const_range_expression ']'
+	| '##' '[' '*' ']'
+	| '##' '[' '+' ']'
 	;
 
 sequence_method_call
@@ -1261,7 +1324,8 @@ sequence_instance
 	;
 
 sequence_list_of_arguments
-	: (sequence_actual_arg? (',' sequence_actual_arg?)* | '.' identifier '(' sequence_actual_arg? ')') (',' '.' identifier '(' sequence_actual_arg? ')')*
+	: sequence_actual_arg? (',' sequence_actual_arg?)* (',' '.' identifier '(' sequence_actual_arg? ')')*
+	| '.' identifier '(' sequence_actual_arg? ')' (',' '.' identifier '(' sequence_actual_arg? ')')*
 	;
 
 sequence_actual_arg
@@ -1336,7 +1400,8 @@ coverage_event
 
 block_event_expression
 	: block_event_expression 'or' block_event_expression
-	| ('begin' | 'end') hierarchical_btf_identifier
+	| 'begin' hierarchical_btf_identifier
+	| 'end' hierarchical_btf_identifier
 	;
 
 hierarchical_btf_identifier
@@ -1356,8 +1421,12 @@ bins_or_empty
 
 bins_or_options
 	: coverage_option
-	| 'wildcard'? bins_keyword bin_identifier (('[' covergroup_expression? ']')? '=' ('{' covergroup_range_list '}' ('with' '(' with_covergroup_expression ')')? | cover_point_identifier 'with' '(' with_covergroup_expression ')' | set_covergroup_expression) | ('[' ']')? '=' trans_list) ('iff' '(' expression ')')?
-	| bins_keyword bin_identifier (('[' covergroup_expression? ']')? '=' 'default' | '=' 'default' 'sequence') ('iff' '(' expression ')')?
+	| 'wildcard'? bins_keyword bin_identifier ('[' covergroup_expression? ']')? '=' '{' covergroup_range_list '}' ('with' '(' with_covergroup_expression ')')? ('iff' '(' expression ')')?
+	| 'wildcard'? bins_keyword bin_identifier ('[' covergroup_expression? ']')? '=' cover_point_identifier 'with' '(' with_covergroup_expression ')' ('iff' '(' expression ')')?
+	| 'wildcard'? bins_keyword bin_identifier ('[' covergroup_expression? ']')? '=' set_covergroup_expression ('iff' '(' expression ')')?
+	| 'wildcard'? bins_keyword bin_identifier ('[' ']')? '=' trans_list ('iff' '(' expression ')')?
+	| bins_keyword bin_identifier ('[' covergroup_expression? ']')? '=' 'default' ('iff' '(' expression ')')?
+	| bins_keyword bin_identifier '=' 'default' 'sequence' ('iff' '(' expression ')')?
 	;
 
 bins_keyword
@@ -1492,7 +1561,8 @@ let_expression
 	;
 
 let_list_of_arguments
-	: (let_actual_arg? (',' let_actual_arg?)* | '.' identifier '(' let_actual_arg? ')') (',' '.' identifier '(' let_actual_arg? ')')*
+	: let_actual_arg? (',' let_actual_arg?)* (',' '.' identifier '(' let_actual_arg? ')')*
+	| '.' identifier '(' let_actual_arg? ')' (',' '.' identifier '(' let_actual_arg? ')')*
 	;
 
 let_actual_arg
@@ -1674,7 +1744,8 @@ ordered_port_connection
 	;
 
 named_port_connection
-	: attribute_instance* ('.' port_identifier ('(' expression? ')')? | '.*')
+	: attribute_instance* '.' port_identifier ('(' expression? ')')?
+	| attribute_instance* '.*'
 	;
 
 // A.4.1.2 Interface instantiation
@@ -1705,7 +1776,8 @@ ordered_checker_port_connection
 	;
 
 named_checker_port_connection
-	: attribute_instance* ('.' formal_port_identifier ('(' property_actual_arg? ')')? | '.*')
+	: attribute_instance* '.' formal_port_identifier ('(' property_actual_arg? ')')?
+	| attribute_instance* '.*'
 	;
 
 // A.4.2 Generated instantiation
@@ -1908,7 +1980,8 @@ name_of_udp_instance
 // A.6.1 Continuous assignment and net alias statements
 
 continuous_assign
-	: 'assign' (drive_strength? delay3? list_of_net_assignments ';' | delay_control? list_of_variable_assignments ';')
+	: 'assign' drive_strength? delay3? list_of_net_assignments ';'
+	| 'assign' delay_control? list_of_variable_assignments ';'
 	;
 
 list_of_net_assignments
@@ -2022,9 +2095,13 @@ statement
 	;
 
 statement_item
-	: (blocking_assignment | nonblocking_assignment | procedural_continuous_assignment | inc_or_dec_expression | clocking_drive) ';'
+	: blocking_assignment ';'
+	| nonblocking_assignment ';'
+	| procedural_continuous_assignment ';'
+	| clocking_drive ';'
 	| case_statement
 	| conditional_statement
+	| inc_or_dec_expression ';'
 	| subroutine_call_statement
 	| disable_statement
 	| event_trigger
@@ -2066,15 +2143,18 @@ delay_or_event_control
 	;
 
 delay_control
-	: '#' (delay_value | '(' mintypmax_expression ')')
+	: '#' delay_value
+	| '#' '(' mintypmax_expression ')'
 	;
 
 event_control
-	: '@' (hierarchical_event_identifier | ps_or_hierarchical_sequence_identifier | '*' | '(' (event_expression | '*') ')')
+	: '@' (hierarchical_event_identifier | ps_or_hierarchical_sequence_identifier | '*' )
+	| '@' '(' (event_expression | '*') ')'
 	;
 
 event_expression
-	: (edge_identifier? expression | sequence_instance) ('iff' expression)?
+	: edge_identifier? expression ('iff' expression)?
+	| sequence_instance ('iff' expression)?
 	| event_expression ('or' | ',') event_expression
 	| '(' event_expression ')'
 	;
@@ -2090,12 +2170,14 @@ jump_statement
 	;
 
 wait_statement
-	: 'wait' ('(' expression ')' statement_or_null | 'fork' ';')
+	: 'wait' '(' expression ')' statement_or_null
+	| 'wait' 'fork' ';'
 	| 'wait_order' '(' hierarchical_identifier (',' hierarchical_identifier)* ')' action_block
 	;
 
 event_trigger
-	: ('->' | '->>' delay_or_event_control?) hierarchical_event_identifier ';'
+	: '->' hierarchical_event_identifier ';'
+	| '->>' delay_or_event_control? hierarchical_event_identifier ';'
 	;
 
 disable_statement
@@ -2130,7 +2212,8 @@ cond_pattern
 // A.6.7 Case statements
 
 case_statement
-	: unique_priority? case_keyword '(' case_expression ')' (case_item case_item* | 'matches' case_pattern_item case_pattern_item*) 'endcase'
+	: unique_priority? case_keyword '(' case_expression ')' case_item case_item* 'endcase'
+	| unique_priority? case_keyword '(' case_expression ')' 'matches' case_pattern_item case_pattern_item* 'endcase'
 	| unique_priority? 'case' '(' case_expression ')' 'inside' case_inside_item case_inside_item* 'endcase'
 	;
 
@@ -2186,11 +2269,15 @@ pattern
 	| '.*'
 	| constant_expression
 	| 'tagged' member_identifier pattern?
-	| '\'' '{' (pattern (',' pattern)* | member_identifier ':' pattern (',' member_identifier ':' pattern)*) '}'
+	| '\'' '{' pattern (',' pattern)* '}'
+	| '\'' '{' member_identifier ':' pattern (',' member_identifier ':' pattern)* '}'
 	;
 
 assignment_pattern
-	: '\'' '{' (expression (',' expression)* | structure_pattern_key ':' expression (',' structure_pattern_key ':' expression)* | array_pattern_key ':' expression (',' array_pattern_key ':' expression)* | constant_expression '{' expression (',' expression)* '}') '}'
+	: '\'' '{' expression (',' expression)* '}'
+	| '\'' '{' structure_pattern_key ':' expression (',' structure_pattern_key ':' expression)* '}'
+	| '\'' '{' array_pattern_key ':' expression (',' array_pattern_key ':' expression)* '}'
+	| '\'' '{' constant_expression '{' expression (',' expression)* '}' '}'
 	;
 
 structure_pattern_key
@@ -2337,7 +2424,8 @@ clocking_declaration
 	;
 
 clocking_event
-	: '@' (identifier | '(' event_expression ')')
+	: '@' identifier
+	| '@' '(' event_expression ')'
 	;
 
 clocking_item
@@ -2375,7 +2463,8 @@ clocking_drive
 	;
 
 cycle_delay
-	: '##' (DECIMAL_NUMBER | UNSIGNED_NUMBER | OCTAL_NUMBER | BINARY_NUMBER | HEX_NUMBER | identifier | '(' expression ')')
+	: '##' (DECIMAL_NUMBER | UNSIGNED_NUMBER | OCTAL_NUMBER | BINARY_NUMBER | HEX_NUMBER | identifier)
+	| '##' '(' expression ')'
 	;
 
 clockvar
@@ -2892,7 +2981,9 @@ tf_call
 	;
 
 system_tf_call
-	: SYSTEM_TF_IDENTIFIER (('(' list_of_arguments ')')? | '(' (data_type (',' expression)? | expression (',' expression?)* (',' clocking_event?)?) ')')
+	: SYSTEM_TF_IDENTIFIER ('(' list_of_arguments ')')?
+	| SYSTEM_TF_IDENTIFIER '(' data_type (',' expression)? ')'
+	| SYSTEM_TF_IDENTIFIER '(' expression (',' expression?)* (',' clocking_event?)? ')'
 	;
 
 subroutine_call
@@ -2907,7 +2998,8 @@ function_subroutine_call
 	;
 
 list_of_arguments
-	: (expression? (',' expression?)* | '.' identifier '(' expression? ')') (',' '.' identifier '(' expression? ')')*
+	: expression? (',' expression?)* (',' '.' identifier '(' expression? ')')*
+	| '.' identifier '(' expression? ')' (',' '.' identifier '(' expression? ')')*
 	;
 /*
 method_call
@@ -2957,8 +3049,10 @@ conditional_expression
 	;
 */
 constant_expression
-	: (unary_operator attribute_instance*)? constant_primary
-	| constant_expression (binary_operator attribute_instance* | '?' attribute_instance* constant_expression ':') constant_expression
+	: constant_primary
+	| unary_operator attribute_instance* constant_primary
+	| constant_expression binary_operator attribute_instance* constant_expression
+	| constant_expression '?' attribute_instance* constant_expression ':' constant_expression
 	;
 
 constant_mintypmax_expression
@@ -3053,10 +3147,13 @@ genvar_expression
 
 constant_primary
 	: primary_literal
-	| (ps_parameter_identifier | formal_port_identifier) constant_select
-	| (specparam_identifier | constant_concatenation | constant_multiple_concatenation) ('[' constant_range_expression ']')?
+	| ps_parameter_identifier constant_select
+	| specparam_identifier ('[' constant_range_expression ']')?
 	| genvar_identifier
+	| formal_port_identifier constant_select
 	| (package_scope | class_scope)? enum_identifier
+	| constant_concatenation ('[' constant_range_expression ']')?
+	| constant_multiple_concatenation ('[' constant_range_expression ']')?
 	| constant_function_call
 	| constant_let_expression
 	| '(' constant_mintypmax_expression ')'

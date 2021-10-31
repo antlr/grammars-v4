@@ -74,3 +74,7 @@ fragment LINE_FEED : '\n' ;
 TIME_LITERAL : TIME_NUMBER TIME_UNIT ;
 fragment TIME_NUMBER : '1' | '10' | '100' ;
 fragment TIME_UNIT : [mnpf]? 's' ;
+
+// File path
+
+//FILE_PATH_SPEC : ~[ \t\r\n]+ ;
