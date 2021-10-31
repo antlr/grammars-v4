@@ -5,7 +5,7 @@ https://github.com/tunnelvisionlabs/antlr4-grammar-postgresql/blob/master/src/co
 
 /*
  * [The "MIT license"]
- * Copyright ? 2014 Sam Harwell, Tunnel Vision Laboratories, LLC
+ * Copyright (C) 2014 Sam Harwell, Tunnel Vision Laboratories, LLC
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -101,7 +101,7 @@ DOT
    : '.'
    ;
    //NamedArgument	: ':=';
-   
+
 PLUS
    : '+'
    ;
@@ -170,13 +170,13 @@ PARAM
    : '$' ([0-9])+
    ;
    //
-   
-   // OPERATORS (?4.1.3)
-   
+
+   // OPERATORS (4.1.3)
+
    //
-   
+
    // this rule does not allow + or - at the end of a multi-character operator
-   
+
 Operator
    : ((OperatorCharacter | ('+' | '-'
    {InputStream.LA(1) != '-'}?)+ (OperatorCharacter | '/'
@@ -184,7 +184,7 @@ Operator
    {InputStream.LA(1) != '*'}?)+ | // special handling for the single-character operators + and -
    [+-])
    //TODO somehow rewrite this part without using Actions
-   
+
    {
 		    if(Text=="<<") Type = LESS_LESS;
 		    if(Text==">>") Type = GREATER_GREATER;
@@ -200,8 +200,8 @@ Operator
  *      sub-token.
  *   4. A suffix sequence of + and - characters.
  */
-   
-   
+
+
 OperatorEndingWithPlusMinus
    : (OperatorCharacterNotAllowPlusMinusAtEnd | '-'
    {InputStream.LA(1) != '-'}? | '/'
@@ -209,28 +209,28 @@ OperatorEndingWithPlusMinus
    {InputStream.LA(1) != '-'}?)+ -> type (Operator)
    ;
    // Each of the following fragment rules omits the +, -, and / characters, which must always be handled in a special way
-   
+
    // by the operator rules above.
-   
+
 fragment OperatorCharacter
    : [*<>=~!@%^&|`?#]
    ;
    // these are the operator characters that don't count towards one ending with + or -
-   
+
 fragment OperatorCharacterNotAllowPlusMinusAtEnd
    : [*<>=+]
    ;
    // an operator may end with + or - if it contains one of these characters
-   
+
 fragment OperatorCharacterAllowPlusMinusAtEnd
    : [~!@%^&|`?#]
    ;
    //
-   
+
    // KEYWORDS (Appendix C)
-   
+
    //
-   
+
 fragment A
    : [aA]
    ;
@@ -335,11 +335,11 @@ fragment Z
    : [zZ]
    ;
    //
-   
+
    // reserved keywords
-   
+
    //
-   
+
 ALL
    : A L L
    ;
@@ -409,27 +409,27 @@ CREATE
    ;
 
 CURRENT_CATALOG
-   : C U R R E N T [_] C A T A L O G
+   : C U R R E N T '_' C A T A L O G
    ;
 
 CURRENT_DATE
-   : C U R R E N T [_] D A T E
+   : C U R R E N T '_' D A T E
    ;
 
 CURRENT_ROLE
-   : C U R R E N T [_] R O L E
+   : C U R R E N T '_' R O L E
    ;
 
 CURRENT_TIME
-   : C U R R E N T [_] T I M E
+   : C U R R E N T '_' T I M E
    ;
 
 CURRENT_TIMESTAMP
-   : C U R R E N T [_] T I M E S T A M P
+   : C U R R E N T '_' T I M E S T A M P
    ;
 
 CURRENT_USER
-   : C U R R E N T [_] U S E R
+   : C U R R E N T '_' U S E R
    ;
 
 DEFAULT
@@ -577,7 +577,7 @@ SELECT
    ;
 
 SESSION_USER
-   : S E S S I O N [_] U S E R
+   : S E S S I O N '_' U S E R
    ;
 
 SOME
@@ -644,11 +644,11 @@ WITH
    : W I T H
    ;
    //
-   
+
    // reserved keywords (can be function or type)
-   
+
    //
-   
+
 AUTHORIZATION
    : A U T H O R I Z A T I O N
    ;
@@ -670,7 +670,7 @@ CROSS
    ;
 
 CURRENT_SCHEMA
-   : C U R R E N T [_] S C H E M A
+   : C U R R E N T '_' S C H E M A
    ;
 
 FREEZE
@@ -741,11 +741,11 @@ VERBOSE
    : V E R B O S E
    ;
    //
-   
+
    // non-reserved keywords
-   
+
    //
-   
+
 ABORT_P
    : A B O R T
    ;
@@ -1193,10 +1193,10 @@ LARGE_P
 LAST_P
    : L A S T
    ;
-   //LC_COLLATE			: L C [_]C O L L A T E ;
-   
-   //LC_CTYPE			: L C [_]C T Y P E ;
-   
+   //LC_COLLATE			: L C '_'C O L L A T E ;
+
+   //LC_CTYPE			: L C '_'C T Y P E ;
+
 LEAKPROOF
    : L E A K P R O O F
    ;
@@ -1693,7 +1693,7 @@ VALIDATOR
    : V A L I D A T O R
    ;
    //VALUE				: V A L U E ;
-   
+
 VARYING
    : V A R Y I N G
    ;
@@ -1746,11 +1746,11 @@ ZONE
    : Z O N E
    ;
    //
-   
+
    // non-reserved keywords (cannot be function or type)
-   
+
    //
-   
+
 BETWEEN
    : B E T W E E N
    ;
@@ -1935,7 +1935,7 @@ XMLSERIALIZE
    : X M L S E R I A L I Z E
    ;
    //MISSED
-   
+
 CALL
    : C A L L
    ;
@@ -2173,11 +2173,11 @@ DUMP
    ;
 
 PRINT_STRICT_PARAMS
-   : P R I N T [_] S T R I C T [_] P A R A M S
+   : P R I N T '_' S T R I C T '_' P A R A M S
    ;
 
 VARIABLE_CONFLICT
-   : V A R I A B L E [_] C O N F L I C T
+   : V A R I A B L E '_' C O N F L I C T
    ;
 
 ERROR
@@ -2185,11 +2185,11 @@ ERROR
    ;
 
 USE_VARIABLE
-   : U S E [_] V A R I A B L E
+   : U S E '_' V A R I A B L E
    ;
 
 USE_COLUMN
-   : U S E [_] C O L U M N
+   : U S E '_' C O L U M N
    ;
 
 ALIAS
@@ -2292,11 +2292,11 @@ OPEN
    : O P E N
    ;
    //
-   
-   // IDENTIFIERS (?4.1.1)
-   
+
+   // IDENTIFIERS (4.1.1)
+
    //
-   
+
 Identifier
    : IdentifierStartChar IdentifierChar*
    ;
@@ -2328,23 +2328,23 @@ fragment StrictIdentifierChar
  *   These are divided into four separate tokens, allowing distinction of valid quoted identifiers from invalid quoted
  *   identifiers without sacrificing the ability of the lexer to reliably recover from lexical errors in the input.
  */
-   
-   
+
+
 QuotedIdentifier
    : UnterminatedQuotedIdentifier '"'
    ;
    // This is a quoted identifier which only contains valid characters but is not terminated
-   
+
 UnterminatedQuotedIdentifier
    : '"' ('""' | ~ [\u0000"])*
    ;
    // This is a quoted identifier which is terminated but contains a \u0000 character
-   
+
 InvalidQuotedIdentifier
    : InvalidUnterminatedQuotedIdentifier '"'
    ;
    // This is a quoted identifier which is unterminated and contains a \u0000 character
-   
+
 InvalidUnterminatedQuotedIdentifier
    : '"' ('""' | ~ '"')*
    ;
@@ -2357,34 +2357,34 @@ InvalidUnterminatedQuotedIdentifier
  *
  * TODO: these rules assume "" is still a valid escape sequence within a Unicode quoted identifier.
  */
-   
-   
+
+
 UnicodeQuotedIdentifier
    : U '&' QuotedIdentifier
    ;
    // This is a Unicode quoted identifier which only contains valid characters but is not terminated
-   
+
 UnterminatedUnicodeQuotedIdentifier
    : U '&' UnterminatedQuotedIdentifier
    ;
    // This is a Unicode quoted identifier which is terminated but contains a \u0000 character
-   
+
 InvalidUnicodeQuotedIdentifier
    : U '&' InvalidQuotedIdentifier
    ;
    // This is a Unicode quoted identifier which is unterminated and contains a \u0000 character
-   
+
 InvalidUnterminatedUnicodeQuotedIdentifier
    : U '&' InvalidUnterminatedQuotedIdentifier
    ;
    //
-   
-   // CONSTANTS (?4.1.2)
-   
+
+   // CONSTANTS (4.1.2)
+
    //
-   
-   // String Constants (?4.1.2.1)
-   
+
+   // String Constants (4.1.2.1)
+
 StringConstant
    : UnterminatedStringConstant '\''
    ;
@@ -2392,23 +2392,23 @@ StringConstant
 UnterminatedStringConstant
    : '\'' ('\'\'' | ~ '\'')*
    ;
-   // String Constants with C-style Escapes (?4.1.2.2)
-   
+   // String Constants with C-style Escapes (4.1.2.2)
+
 BeginEscapeStringConstant
    : E '\'' -> more , pushMode (EscapeStringConstantMode)
    ;
-   // String Constants with Unicode Escapes (?4.1.2.3)
-   
+   // String Constants with Unicode Escapes (4.1.2.3)
+
    //
-   
+
    //   Note that escape sequences are never checked as part of this token due to the ability of users to change the escape
-   
+
    //   character with a UESCAPE clause following the Unicode string constant.
-   
+
    //
-   
+
    // TODO: these rules assume '' is still a valid escape sequence within a Unicode string constant.
-   
+
 UnicodeEscapeStringConstant
    : UnterminatedUnicodeEscapeStringConstant '\''
    ;
@@ -2416,8 +2416,8 @@ UnicodeEscapeStringConstant
 UnterminatedUnicodeEscapeStringConstant
    : U '&' UnterminatedStringConstant
    ;
-   // Dollar-quoted String Constants (?4.1.2.4)
-   
+   // Dollar-quoted String Constants (4.1.2.4)
+
 BeginDollarStringConstant
    : '$' Tag? '$'
    {_tags.Push(this.Text);} -> pushMode (DollarQuotedStringMode)
@@ -2425,13 +2425,13 @@ BeginDollarStringConstant
 /* "The tag, if any, of a dollar-quoted string follows the same rules as an
  * unquoted identifier, except that it cannot contain a dollar sign."
  */
-   
-   
+
+
 fragment Tag
    : IdentifierStartChar StrictIdentifierChar*
    ;
-   // Bit-strings Constants (?4.1.2.5)
-   
+   // Bit-strings Constants (4.1.2.5)
+
 BinaryStringConstant
    : UnterminatedBinaryStringConstant '\''
    ;
@@ -2463,8 +2463,8 @@ InvalidHexadecimalStringConstant
 InvalidUnterminatedHexadecimalStringConstant
    : X UnterminatedStringConstant
    ;
-   // Numeric Constants (?4.1.2.6)
-   
+   // Numeric Constants (4.1.2.6)
+
 Integral
    : Digits
    ;
@@ -2476,7 +2476,7 @@ NumericFail
 
 Numeric
    : Digits '.' Digits? /*? replaced with + to solve problem with DOT_DOT .. but this surely must be rewriten */
-   
+
    (E [+-]? Digits)?
    | '.' Digits (E [+-]? Digits)?
    | Digits E [+-]? Digits
@@ -2494,11 +2494,11 @@ PLSQLIDENTIFIER
    : ':"' ('\\' . | '""' | ~ ('"' | '\\'))* '"'
    ;
    //
-   
-   // WHITESPACE (?4.1?)
-   
+
+   // WHITESPACE (4.1)
+
    //
-   
+
 Whitespace
    : [ \t]+ -> channel (HIDDEN)
    ;
@@ -2507,11 +2507,11 @@ Newline
    : ('\r' '\n'? | '\n') -> channel (HIDDEN)
    ;
    //
-   
-   // COMMENTS (?4.1.5)
-   
+
+   // COMMENTS (4.1.5)
+
    //
-   
+
 LineComment
    : '--' ~ [\r\n]* -> channel (HIDDEN)
    ;
@@ -2527,19 +2527,19 @@ UnterminatedBlockComment
    // Handle the case of / or * characters at the end of the file, or a nested unterminated block comment
    ('/'+ | '*'+ | '/'* UnterminatedBlockComment)?
    // Optional assertion to make sure this rule is working as intended
-   
+
    {
 		    Debug.Assert( InputStream.LA(1) == -1 /*EOF*/);
 		}
    ;
    //
-   
+
    // META-COMMANDS
-   
+
    //
-   
+
    // http://www.postgresql.org/docs/9.3/static/app-psql.html
-   
+
 MetaCommand
    : '\\' (~ [\r\n\\"] | '"' ~ [\r\n"]* '"')* ('"' ~ [\r\n"]*)?
    ;
@@ -2548,17 +2548,17 @@ EndMetaCommand
    : '\\\\'
    ;
    //
-   
+
    // ERROR
-   
+
    //
-   
+
    // Any character which does not match one of the above rules will appear in the token stream as an ErrorCharacter token.
-   
+
    // This ensures the lexer itself will never encounter a syntax error, so all error handling may be performed by the
-   
+
    // parser.
-   
+
 ErrorCharacter
    : .
    ;
@@ -2577,7 +2577,7 @@ UnterminatedEscapeStringConstant
 fragment EscapeStringText
    : ('\'\'' | '\\' ( // two-digit hex escapes are still valid when treated as single-digit escapes
    'x' [0-9a-fA-F] | 'u' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] | 'U' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] | // Any character other than the Unicode escapes can follow a backslash. Some have special meaning,
-   
+
    // but that doesn't affect the syntax.
    ~ [xuU]) | ~ ['\\])*
    ;
@@ -2635,7 +2635,7 @@ DollarText
    : ~ '$'+
    //| '$'([0-9])+
    | // this alternative improves the efficiency of handling $ characters within a dollar-quoted string which are
-   
+
    // not part of the ending tag.
    '$' ~ '$'*
    ;

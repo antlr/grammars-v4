@@ -23,7 +23,7 @@ grammar toml;
  * Parser Rules
  */
 
-document : expression (NL expression)* ;
+document : expression (NL expression)* EOF ;
 
 expression : key_value comment | table comment | comment ;
 
@@ -55,9 +55,10 @@ date_time : OFFSET_DATE_TIME | LOCAL_DATE_TIME | LOCAL_DATE | LOCAL_TIME ;
 
 array_ : '[' array_values? comment_or_nl ']' ;
 
-array_values : (comment_or_nl value ',' array_values comment_or_nl) | comment_or_nl value ','? ;
+array_values : (comment_or_nl value nl_or_comment ',' array_values comment_or_nl) | comment_or_nl value nl_or_comment ','? ;
 
 comment_or_nl : (COMMENT? NL)* ;
+nl_or_comment : (NL COMMENT?)* ;
 
 table : standard_table | array_table ;
 
@@ -114,7 +115,7 @@ BIN_INT : '0b' DIGIT_0_1 (DIGIT_0_1 | '_' DIGIT_0_1)* ;
 fragment YEAR : DIGIT DIGIT DIGIT DIGIT ;
 fragment MONTH : DIGIT DIGIT ;
 fragment DAY : DIGIT DIGIT ;
-fragment DELIM : 'T' | 't' ;
+fragment DELIM : 'T' | 't' | ' ' ;
 fragment HOUR : DIGIT DIGIT ;
 fragment MINUTE : DIGIT DIGIT ;
 fragment SECOND : DIGIT DIGIT ;

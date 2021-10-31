@@ -173,6 +173,7 @@ REPLACE:                             'REPLACE';
 REQUIRE:                             'REQUIRE';
 RESIGNAL:                            'RESIGNAL';
 RESTRICT:                            'RESTRICT';
+RETAIN:                              'RETAIN';
 RETURN:                              'RETURN';
 REVOKE:                              'REVOKE';
 RIGHT:                               'RIGHT';

@@ -2,11 +2,11 @@ parser grammar PostgreSQLParser;
 
 
 options { tokenVocab = PostgreSQLLexer; language = CSharp; }
-@ header
+@header
 {
 using System.Linq;
 }
-@ members
+@members
 {
 	    private IParseTree GetParsedSqlTree(string script,int line = 0)
 	    {

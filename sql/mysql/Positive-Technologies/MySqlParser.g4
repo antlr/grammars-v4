@@ -1567,7 +1567,8 @@ userSpecification
 userAuthOption
     : userName IDENTIFIED BY PASSWORD hashed=STRING_LITERAL         #passwordAuthOption
     | userName
-      IDENTIFIED (WITH authPlugin)? BY STRING_LITERAL               #stringAuthOption
+      IDENTIFIED (WITH authPlugin)? BY STRING_LITERAL
+      (RETAIN CURRENT PASSWORD)?                                    #stringAuthOption
     | userName
       IDENTIFIED WITH authPlugin
       (AS STRING_LITERAL)?                                          #hashAuthOption
