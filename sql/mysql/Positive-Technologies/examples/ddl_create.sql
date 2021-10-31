@@ -142,6 +142,14 @@ CREATE TABLE tbl (
     INDEX idx2 ((CAST(JSON_EXTRACT(data, _utf8mb4'$') AS UNSIGNED ARRAY))),
     INDEX ((CAST(data->>'$.name' AS CHAR(30))))
 );
+
+CREATE TABLE keywords (
+    eur VARCHAR(100),
+    iso VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+    usa VARCHAR(100),
+    jis VARCHAR(100),
+    internal INT
+);
 #end
 #begin
 -- Rename table
