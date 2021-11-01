@@ -2944,7 +2944,7 @@ opt_lock
 lock_type
    : ACCESS (SHARE | EXCLUSIVE)
    | ROW (SHARE | EXCLUSIVE)
-   | SHARE (UPDATE EXCLUSIVE | ROW EXCLUSIVE |)
+   | SHARE (UPDATE EXCLUSIVE | ROW EXCLUSIVE)?
    | EXCLUSIVE
    ;
 
@@ -3329,8 +3329,7 @@ opt_alias_clause
 
 func_alias_clause
    : alias_clause
-   | AS colid? OPEN_PAREN tablefuncelementlist CLOSE_PAREN
-   | colid OPEN_PAREN tablefuncelementlist CLOSE_PAREN
+   | (AS colid? | colid) OPEN_PAREN tablefuncelementlist CLOSE_PAREN
    |
    ;
 
@@ -3538,8 +3537,7 @@ opt_varying
    ;
 
 constdatetime
-   : TIMESTAMP (OPEN_PAREN iconst CLOSE_PAREN)? opt_timezone
-   | TIME (OPEN_PAREN iconst CLOSE_PAREN)? opt_timezone
+   : (TIMESTAMP | TIME) (OPEN_PAREN iconst CLOSE_PAREN)? opt_timezone
    ;
 
 constinterval
@@ -3712,7 +3710,7 @@ a_expr_compare
 
 
 a_expr_like
-   : a_expr_qual_op (NOT? (LIKE | ILIKE | SIMILAR TO | (BETWEEN SYMMETRIC?)) a_expr_qual_op opt_escape)?
+   : a_expr_qual_op (NOT? (LIKE | ILIKE | SIMILAR TO | BETWEEN SYMMETRIC?) a_expr_qual_op opt_escape)?
    ;
 /* 8*/
 
@@ -5153,7 +5151,7 @@ opt_stmt_raise_level
 
 opt_raise_list
    :
-   | COMMA a_expr (COMMA a_expr)*
+   | (COMMA a_expr)+
    ;
 
 opt_raise_using
@@ -5286,8 +5284,7 @@ opt_fetch_direction
    | RELATIVE_P a_expr
    | a_expr
    | ALL
-   | FORWARD (| a_expr | ALL)
-   | BACKWARD (| a_expr | ALL)
+   | (FORWARD | BACKWARD) (a_expr | ALL)?
    ;
    //https://www.postgresql.org/docs/current/plpgsql-cursors.html#PLPGSQL-CURSOR-OPENING
 
@@ -5314,7 +5311,7 @@ stmt_rollback
    ;
 
 plsql_opt_transaction_chain
-   : AND (CHAIN | NO CHAIN)
+   : AND (NO? CHAIN)
    |
    ;
 
