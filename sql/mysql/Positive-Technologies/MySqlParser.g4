@@ -31,12 +31,12 @@ options { tokenVocab=MySqlLexer; }
 // Top Level Description
 
 root
-    : sqlStatements? MINUSMINUS? EOF
+    : sqlStatements? (MINUS MINUS)? EOF
     ;
 
 sqlStatements
-    : (sqlStatement MINUSMINUS? SEMI? | emptyStatement)*
-    (sqlStatement (MINUSMINUS? SEMI)? | emptyStatement)
+    : (sqlStatement (MINUS MINUS)? SEMI? | emptyStatement)*
+    (sqlStatement ((MINUS MINUS)? SEMI)? | emptyStatement)
     ;
 
 sqlStatement
@@ -350,6 +350,8 @@ columnDefinition
 columnConstraint
     : nullNotnull                                                   #nullColumnConstraint
     | DEFAULT defaultValue                                          #defaultColumnConstraint
+    | VISIBLE                                                       #visibilityColumnConstraint
+    | INVISIBLE                                                     #visibilityColumnConstraint
     | (AUTO_INCREMENT | ON UPDATE currentTimestamp)                 #autoIncrementColumnConstraint
     | PRIMARY? KEY                                                  #primaryKeyColumnConstraint
     | UNIQUE KEY?                                                   #uniqueKeyColumnConstraint
@@ -408,7 +410,7 @@ indexColumnDefinition
     ;
 
 tableOption
-    : ENGINE '='? engineName                                        #tableOptionEngine
+    : ENGINE '='? engineName?                                       #tableOptionEngine
     | AUTO_INCREMENT '='? decimalLiteral                            #tableOptionAutoIncrement
     | AVG_ROW_LENGTH '='? decimalLiteral                            #tableOptionAverage
     | DEFAULT? (CHARACTER SET | CHARSET) '='? (charsetName|DEFAULT) #tableOptionCharset
@@ -436,8 +438,13 @@ tableOption
     | STATS_PERSISTENT '='? extBoolValue=(DEFAULT | '0' | '1')      #tableOptionPersistent
     | STATS_SAMPLE_PAGES '='? decimalLiteral                        #tableOptionSamplePage
     | TABLESPACE uid tablespaceStorage?                             #tableOptionTablespace
+    | TABLE_TYPE '=' tableType                                      #tableOptionTableType
     | tablespaceStorage                                             #tableOptionTablespace
     | UNION '='? '(' tables ')'                                     #tableOptionUnion
+    ;
+
+tableType
+    : MYSQL | ODBC
     ;
 
 tablespaceStorage
@@ -474,10 +481,10 @@ partitionDefinition
           partitionDefinerAtom (',' partitionDefinerAtom)*
       ')'
       partitionOption*
-      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionComparision
+      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionComparison
     | PARTITION uid VALUES LESS THAN
       partitionDefinerAtom partitionOption*
-      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionComparision
+      ( '(' subpartitionDefinition (',' subpartitionDefinition)* ')' )?       #partitionComparison
     | PARTITION uid VALUES IN
       '('
           partitionDefinerAtom (',' partitionDefinerAtom)*
@@ -507,7 +514,7 @@ subpartitionDefinition
     ;
 
 partitionOption
-    : STORAGE? ENGINE '='? engineName                               #partitionOptionEngine
+    : DEFAULT? STORAGE? ENGINE '='? engineName                      #partitionOptionEngine
     | COMMENT '='? comment=STRING_LITERAL                           #partitionOptionComment
     | DATA DIRECTORY '='? dataDirectory=STRING_LITERAL              #partitionOptionDataDirectory
     | INDEX DIRECTORY '='? indexDirectory=STRING_LITERAL            #partitionOptionIndexDirectory
@@ -994,14 +1001,14 @@ queryExpressionNointo
 
 querySpecification
     : SELECT selectSpec* selectElements selectIntoExpression?
-      fromClause? groupByClause? havingClause? orderByClause? limitClause?
+      fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause?
     | SELECT selectSpec* selectElements
-    fromClause? groupByClause? havingClause? orderByClause? limitClause? selectIntoExpression?
+    fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause? selectIntoExpression?
     ;
 
 querySpecificationNointo
     : SELECT selectSpec* selectElements
-      fromClause? groupByClause? havingClause? orderByClause? limitClause?
+      fromClause? groupByClause? havingClause? windowClause? orderByClause? limitClause?
     ;
 
 unionParenthesis
@@ -1074,6 +1081,10 @@ groupByClause
 
 havingClause
     :  HAVING havingExpr=expression
+    ;
+
+windowClause
+    :  WINDOW windowName AS '(' windowSpec ')' (',' windowName AS '(' windowSpec ')')*
     ;
 
 groupByItem
@@ -1501,6 +1512,17 @@ grantStatement
           (tlsNone=NONE | tlsOption (AND? tlsOption)* )
         )?
       (WITH (GRANT OPTION | userResourceOption)* )?
+      (AS userName WITH ROLE roleOption)?
+    | GRANT uid (',' uid)*
+      TO (userName | uid) (',' (userName | uid))*
+      (WITH ADMIN OPTION)?
+    ;
+
+roleOption
+    : DEFAULT
+    | NONE
+    | ALL (EXCEPT userName (',' userName)*)?
+    | userName (',' userName)*
     ;
 
 grantProxy
@@ -1522,6 +1544,8 @@ revokeStatement
       FROM userName (',' userName)*                                 #detailRevoke
     | REVOKE ALL PRIVILEGES? ',' GRANT OPTION
       FROM userName (',' userName)*                                 #shortRevoke
+    | REVOKE uid (',' uid)*
+      FROM (userName | uid) (',' (userName | uid))*                 #roleRevoke
     ;
 
 revokeProxy
@@ -1543,7 +1567,8 @@ userSpecification
 userAuthOption
     : userName IDENTIFIED BY PASSWORD hashed=STRING_LITERAL         #passwordAuthOption
     | userName
-      IDENTIFIED (WITH authPlugin)? BY STRING_LITERAL               #stringAuthOption
+      IDENTIFIED (WITH authPlugin)? BY STRING_LITERAL
+      (RETAIN CURRENT PASSWORD)?                                    #stringAuthOption
     | userName
       IDENTIFIED WITH authPlugin
       (AS STRING_LITERAL)?                                          #hashAuthOption
@@ -1621,6 +1646,8 @@ renameUserClause
 analyzeTable
     : ANALYZE actionOption=(NO_WRITE_TO_BINLOG | LOCAL)?
        TABLE tables
+       ( UPDATE HISTOGRAM ON fullColumnName (',' fullColumnName)* (WITH decimalLiteral BUCKETS)? )?
+       ( DROP HISTOGRAM ON fullColumnName (',' fullColumnName)* )?
     ;
 
 checkTable
@@ -1935,7 +1962,7 @@ fullColumnName
     ;
 
 indexColumnName
-    : (uid | STRING_LITERAL) ('(' decimalLiteral ')')? sortType=(ASC | DESC)?
+    : ((uid | STRING_LITERAL) ('(' decimalLiteral ')')? | expression) sortType=(ASC | DESC)?
     ;
 
 userName
@@ -1962,6 +1989,7 @@ engineName
     | TOKUDB
     | ID
     | STRING_LITERAL | REVERSE_QUOTE_ID
+    | CONNECT
     ;
 
 uuidSet
@@ -2016,7 +2044,7 @@ dottedId
 //    Literals
 
 decimalLiteral
-    : DECIMAL_LITERAL | ZERO_DECIMAL | ONE_DECIMAL | TWO_DECIMAL
+    : DECIMAL_LITERAL | ZERO_DECIMAL | ONE_DECIMAL | TWO_DECIMAL | REAL_LITERAL
     ;
 
 fileSizeLiteral
@@ -2113,6 +2141,7 @@ convertedDataType
     | typeName=(DATE | DATETIME | TIME | JSON)
     | typeName=DECIMAL lengthTwoDimension?
     | (SIGNED | UNSIGNED) INTEGER?
+    | UNSIGNED ARRAY
     ;
 
 lengthOneDimension
@@ -2193,6 +2222,7 @@ ifNotExists
 functionCall
     : specificFunction                                              #specificFunctionCall
     | aggregateWindowedFunction                                     #aggregateFunctionCall
+    | nonAggregateWindowedFunction                                  #nonAggregateFunctionCall
     | scalarFunctionName '(' functionArgs? ')'                      #scalarFunctionCall
     | fullId '(' functionArgs? ')'                                  #udfFunctionCall
     | passwordFunctionClause                                        #passwordFunctionCall
@@ -2208,7 +2238,7 @@ specificFunction
     | CAST '(' expression AS convertedDataType ')'                  #dataTypeFunctionCall
     | VALUES '(' fullColumnName ')'                                 #valuesFunctionCall
     | CASE expression caseFuncAlternative+
-      (ELSE elseArg=functionArg)? END                               #caseFunctionCall
+      (ELSE elseArg=functionArg)? END                               #caseExpressionFunctionCall
     | CASE caseFuncAlternative+
       (ELSE elseArg=functionArg)? END                               #caseFunctionCall
     | CHAR '(' functionArgs  (USING charsetName)? ')'               #charFunctionCall
@@ -2287,6 +2317,13 @@ specificFunction
         datetimeFormat=(DATE | TIME | DATETIME)
         ',' stringLiteral
       ')'                                                           #getFormatFunctionCall
+    | JSON_VALUE
+      '(' expression
+       ',' expression
+         (RETURNING convertedDataType)?
+         ((NULL_LITERAL | ERROR | (DEFAULT defaultValue)) ON EMPTY)?
+         ((NULL_LITERAL | ERROR | (DEFAULT defaultValue)) ON ERROR)?
+       ')'                                                          #jsonValueFunctionCall
     ;
 
 caseFuncAlternative
@@ -2307,19 +2344,66 @@ levelInWeightListElement
 
 aggregateWindowedFunction
     : (AVG | MAX | MIN | SUM)
-      '(' aggregator=(ALL | DISTINCT)? functionArg ')'
-    | COUNT '(' (starArg='*' | aggregator=ALL? functionArg) ')'
-    | COUNT '(' aggregator=DISTINCT functionArgs ')'
+      '(' aggregator=(ALL | DISTINCT)? functionArg ')' overClause?
+    | COUNT '(' (starArg='*' | aggregator=ALL? functionArg | aggregator=DISTINCT functionArgs) ')' overClause?
     | (
         BIT_AND | BIT_OR | BIT_XOR | STD | STDDEV | STDDEV_POP
         | STDDEV_SAMP | VAR_POP | VAR_SAMP | VARIANCE
-      ) '(' aggregator=ALL? functionArg ')'
+      ) '(' aggregator=ALL? functionArg ')' overClause?
     | GROUP_CONCAT '('
         aggregator=DISTINCT? functionArgs
         (ORDER BY
           orderByExpression (',' orderByExpression)*
         )? (SEPARATOR separator=STRING_LITERAL)?
       ')'
+    ;
+
+nonAggregateWindowedFunction
+    : (LAG | LEAD) '(' expression (',' decimalLiteral)? (',' decimalLiteral)? ')' overClause
+    | (FIRST_VALUE | LAST_VALUE) '(' expression ')' overClause
+    | (CUME_DIST | DENSE_RANK | PERCENT_RANK | RANK | ROW_NUMBER) '('')' overClause
+    | NTH_VALUE '(' expression ',' decimalLiteral ')' overClause
+    | NTILE '(' decimalLiteral ')' overClause
+    ;
+
+overClause
+    : OVER ('(' windowSpec? ')' | windowName)
+    ;
+
+windowSpec
+    : windowName? partitionClause? orderByClause? frameClause?
+    ;
+
+windowName
+    : uid
+    ;
+
+frameClause
+    : frameUnits frameExtent
+    ;
+
+frameUnits
+    : ROWS
+    | RANGE
+    ;
+
+frameExtent
+    : frameRange
+    | frameBetween
+    ;
+
+frameBetween
+    : BETWEEN frameRange AND frameRange
+    ;
+
+frameRange
+    : CURRENT ROW
+    | UNBOUNDED (PRECEDING | FOLLOWING)
+    | expression (PRECEDING | FOLLOWING)
+    ;
+
+partitionClause
+    : PARTITION BY expression (',' expression)*
     ;
 
 scalarFunctionName
@@ -2361,9 +2445,9 @@ expression
 predicate
     : predicate NOT? IN '(' (selectStatement | expressions) ')'     #inPredicate
     | predicate IS nullNotnull                                      #isNullPredicate
-    | left=predicate comparisonOperator right=predicate             #binaryComparasionPredicate
+    | left=predicate comparisonOperator right=predicate             #binaryComparisonPredicate
     | predicate comparisonOperator
-      quantifier=(ALL | ANY | SOME) '(' selectStatement ')'         #subqueryComparasionPredicate
+      quantifier=(ALL | ANY | SOME) '(' selectStatement ')'         #subqueryComparisonPredicate
     | predicate NOT? BETWEEN predicate AND predicate                #betweenPredicate
     | predicate SOUNDS LIKE predicate                               #soundsLikePredicate
     | predicate NOT? LIKE predicate (ESCAPE STRING_LITERAL)?        #likePredicate
@@ -2410,7 +2494,7 @@ bitOperator
     ;
 
 mathOperator
-    : '*' | '/' | '%' | DIV | MOD | '+' | '-' | '--'
+    : '*' | '/' | '%' | DIV | MOD | '+' | '-'
     ;
 
 jsonOperator
@@ -2455,7 +2539,7 @@ keywordsCanBeId
     | CHANNEL | CHECKSUM | PAGE_CHECKSUM | CATALOG_NAME | CIPHER
     | CLASS_ORIGIN | CLIENT | CLONE_ADMIN | CLOSE | COALESCE | CODE
     | COLUMNS | COLUMN_FORMAT | COLUMN_NAME | COMMENT | COMMIT | COMPACT
-    | COMPLETION | COMPRESSED | COMPRESSION | CONCURRENT
+    | COMPLETION | COMPRESSED | COMPRESSION | CONCURRENT | CONNECT
     | CONNECTION | CONNECTION_ADMIN | CONSISTENT | CONSTRAINT_CATALOG | CONSTRAINT_NAME
     | CONSTRAINT_SCHEMA | CONTAINS | CONTEXT
     | CONTRIBUTORS | COPY | COUNT | CPU | CURRENT | CURSOR_NAME
@@ -2463,14 +2547,14 @@ keywordsCanBeId
     | DEFAULT_AUTH | DEFINER | DELAY_KEY_WRITE | DES_KEY_FILE | DIAGNOSTICS | DIRECTORY
     | DISABLE | DISCARD | DISK | DO | DUMPFILE | DUPLICATE
     | DYNAMIC | ENABLE | ENCRYPTION | ENCRYPTION_KEY_ADMIN | END | ENDS | ENGINE | ENGINES
-    | ERROR | ERRORS | ESCAPE | EVEN | EVENT | EVENTS | EVERY
+    | ERROR | ERRORS | ESCAPE | EUR | EVEN | EVENT | EVENTS | EVERY | EXCEPT
     | EXCHANGE | EXCLUSIVE | EXPIRE | EXPORT | EXTENDED | EXTENT_SIZE | FAST | FAULTS
     | FIELDS | FILE_BLOCK_SIZE | FILTER | FIREWALL_ADMIN | FIREWALL_USER | FIRST | FIXED | FLUSH
     | FOLLOWS | FOUND | FULL | FUNCTION | GENERAL | GLOBAL | GRANTS | GROUP | GROUP_CONCAT
     | GROUP_REPLICATION | GROUP_REPLICATION_ADMIN | HANDLER | HASH | HELP | HOST | HOSTS | IDENTIFIED
     | IGNORE_SERVER_IDS | IMPORT | INDEXES | INITIAL_SIZE | INNODB_REDO_LOG_ARCHIVE
     | INPLACE | INSERT_METHOD | INSTALL | INSTANCE | INTERNAL | INVOKER | IO
-    | IO_THREAD | IPC | ISOLATION | ISSUER | JSON | KEY_BLOCK_SIZE
+    | IO_THREAD | IPC | ISO | ISOLATION | ISSUER | JIS | JSON | KEY_BLOCK_SIZE
     | LANGUAGE | LAST | LEAVES | LESS | LEVEL | LIST | LOCAL
     | LOGFILE | LOGS | MASTER | MASTER_AUTO_POSITION
     | MASTER_CONNECT_RETRY | MASTER_DELAY
@@ -2485,9 +2569,9 @@ keywordsCanBeId
     | MAX_USER_CONNECTIONS | MEDIUM | MEMBER | MEMORY | MERGE | MESSAGE_TEXT
     | MID | MIGRATE
     | MIN | MIN_ROWS | MODE | MODIFY | MUTEX | MYSQL | MYSQL_ERRNO | NAME | NAMES
-    | NCHAR | NDB_STORED_USER | NEVER | NEXT | NO | NODEGROUP | NONE | NUMBER | OFFLINE | OFFSET
+    | NCHAR | NDB_STORED_USER | NEVER | NEXT | NO | NODEGROUP | NONE | NUMBER | OFFLINE | ODBC | OFFSET
     | OF | OJ | OLD_PASSWORD | ONE | ONLINE | ONLY | OPEN | OPTIMIZER_COSTS
-    | OPTIONS | ORDER | OWNER | PACK_KEYS | PAGE | PARSER | PARTIAL
+    | OPTIONAL | OPTIONS | ORDER | OWNER | PACK_KEYS | PAGE | PARSER | PARTIAL
     | PARTITIONING | PARTITIONS | PASSWORD | PERSIST_RO_VARIABLES_ADMIN | PHASE | PLUGINS
     | PLUGIN_DIR | PLUGIN | PORT | PRECEDES | PREPARE | PRESERVE | PREV
     | PROCESSLIST | PROFILE | PROFILES | PROXY | QUERY | QUICK
@@ -2510,7 +2594,7 @@ keywordsCanBeId
     | SWITCHES | SYSTEM_VARIABLES_ADMIN | TABLE_NAME | TABLESPACE | TABLE_ENCRYPTION_ADMIN
     | TEMPORARY | TEMPTABLE | THAN | TRADITIONAL
     | TRANSACTION | TRANSACTIONAL | TRIGGERS | TRUNCATE | UNDEFINED | UNDOFILE
-    | UNDO_BUFFER_SIZE | UNINSTALL | UNKNOWN | UNTIL | UPGRADE | USER | USE_FRM | USER_RESOURCES
+    | UNDO_BUFFER_SIZE | UNINSTALL | UNKNOWN | UNTIL | UPGRADE | USA | USER | USE_FRM | USER_RESOURCES
     | VALIDATION | VALUE | VAR_POP | VAR_SAMP | VARIABLES | VARIANCE | VERSION_TOKEN_ADMIN | VIEW | WAIT | WARNINGS | WITHOUT
     | WORK | WRAPPER | X509 | XA | XA_RECOVER_ADMIN | XML
     ;
@@ -2594,5 +2678,13 @@ functionNameBase
     | VALIDATE_PASSWORD_STRENGTH | VERSION | VISIBLE
     | WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS | WEEK | WEEKDAY
     | WEEKOFYEAR | WEIGHT_STRING | WITHIN | YEAR | YEARWEEK
-    | Y_FUNCTION | X_FUNCTION | JSON_VALID | JSON_SCHEMA_VALID
+    | Y_FUNCTION | X_FUNCTION
+    | JSON_ARRAY | JSON_OBJECT | JSON_QUOTE | JSON_CONTAINS | JSON_CONTAINS_PATH
+    | JSON_EXTRACT | JSON_KEYS | JSON_OVERLAPS | JSON_SEARCH | JSON_VALUE
+    | JSON_ARRAY_APPEND | JSON_ARRAY_INSERT | JSON_INSERT | JSON_MERGE
+    | JSON_MERGE_PATCH | JSON_MERGE_PRESERVE | JSON_REMOVE | JSON_REPLACE
+    | JSON_SET | JSON_UNQUOTE | JSON_DEPTH | JSON_LENGTH | JSON_TYPE
+    | JSON_VALID | JSON_TABLE | JSON_SCHEMA_VALID | JSON_SCHEMA_VALIDATION_REPORT
+    | JSON_PRETTY | JSON_STORAGE_FREE | JSON_STORAGE_SIZE | JSON_ARRAYAGG
+    | JSON_OBJECTAGG
     ;

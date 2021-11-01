@@ -11,6 +11,7 @@ cql3
 csharp
 dice
 fortran77
+gdscript
 golang
 haskell
 html
@@ -51,6 +52,7 @@ ruby
 rust
 sql/hive
 sql/plsql
+sql/postgresql
 sql/tsql
 stringtemplate
 swift-fin
@@ -60,6 +62,7 @@ swift/swift5
 tcpheader
 thrift
 v
+velocity
 wat
 xpath/xpath31
 z

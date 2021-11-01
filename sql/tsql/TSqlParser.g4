@@ -88,6 +88,7 @@ ddl_clause
     | alter_external_resource_pool
     | alter_fulltext_catalog
     | alter_fulltext_stoplist
+    | alter_index
     | alter_login_azure_sql
     | alter_login_azure_sql_dw_and_pdw
     | alter_login_sql_server
@@ -128,6 +129,8 @@ ddl_clause
     | create_fulltext_catalog
     | create_fulltext_stoplist
     | create_index
+    | create_columnstore_index
+    | create_nonclustered_columnstore_index
     | create_login_azure_sql
     | create_login_pdw
     | create_login_sql_server
@@ -346,9 +349,10 @@ another_statement
     | setuser_statement
     | reconfigure_statement
     | shutdown_statement
+    | checkpoint_statement
     ;
-// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
 
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-application-role-transact-sql
 alter_application_role
     : ALTER APPLICATION ROLE appliction_role=id_ WITH  (COMMA? NAME EQUAL new_application_role_name=id_)? (COMMA? PASSWORD EQUAL application_role_password=STRING)? (COMMA? DEFAULT_SCHEMA EQUAL app_role_default_schema=id_)?
     ;
@@ -555,7 +559,7 @@ entity_to
     ;
 
 colon_colon
-    : COLON COLON
+    : DOUBLE_COLON
     ;
 
 alter_authorization_start
@@ -625,6 +629,62 @@ class_type_for_parallel_dw
     | SCHEMA
     | OBJECT
     ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/grant-transact-sql?view=sql-server-ver15
+// SELECT DISTINCT '| ' + CLASS_DESC
+// FROM sys.dm_audit_actions
+// ORDER BY 1
+class_type_for_grant
+    : APPLICATION ROLE
+    | ASSEMBLY
+    | ASYMMETRIC KEY
+    | AUDIT
+    | AVAILABILITY GROUP
+    | BROKER PRIORITY
+    | CERTIFICATE
+    | COLUMN ( ENCRYPTION | MASTER ) KEY
+    | CONTRACT
+    | CREDENTIAL
+    | CRYPTOGRAPHIC PROVIDER
+    | DATABASE ( AUDIT SPECIFICATION
+               | ENCRYPTION KEY
+               | EVENT SESSION
+               | SCOPED ( CONFIGURATION
+                        | CREDENTIAL
+                        | RESOURCE GOVERNOR )
+               )?
+    | ENDPOINT
+    | EVENT SESSION
+    | NOTIFICATION (DATABASE | OBJECT | SERVER)
+    | EXTERNAL ( DATA SOURCE
+               | FILE FORMAT
+               | LIBRARY
+               | RESOURCE POOL
+               | TABLE
+               | CATALOG
+               | STOPLIST
+               )
+    | LOGIN
+    | MASTER KEY
+    | MESSAGE TYPE
+    | OBJECT
+    | PARTITION ( FUNCTION | SCHEME)
+    | REMOTE SERVICE BINDING
+    | RESOURCE GOVERNOR
+    | ROLE
+    | ROUTE
+    | SCHEMA
+    | SEARCH PROPERTY LIST
+    | SERVER ( ( AUDIT SPECIFICATION? ) | ROLE )?
+    | SERVICE
+    | SQL LOGIN
+    | SYMMETRIC KEY
+    | TRIGGER ( DATABASE | SERVER)
+    | TYPE
+    | USER
+    | XML SCHEMA COLLECTION
+    ;
+
 
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/drop-availability-group-transact-sql
@@ -1305,7 +1365,7 @@ create_rule
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-schema-transact-sql
 alter_schema_sql
-    : ALTER SCHEMA schema_name=id_ TRANSFER ((OBJECT|TYPE|XML SCHEMA COLLECTION) COLON COLON )? id_ (DOT id_)?
+    : ALTER SCHEMA schema_name=id_ TRANSFER ((OBJECT|TYPE|XML SCHEMA COLLECTION) DOUBLE_COLON )? id_ (DOT id_)?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-schema-transact-sql
@@ -1317,8 +1377,8 @@ create_schema
         )
         (create_table
          |create_view
-         | (GRANT|DENY) (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA COLON COLON)? object_name=id_ TO owner_name=id_
-         | REVOKE (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA COLON COLON)? object_name=id_ FROM owner_name=id_
+         | (GRANT|DENY) (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA DOUBLE_COLON)? object_name=id_ TO owner_name=id_
+         | REVOKE (SELECT|INSERT|DELETE|UPDATE) ON (SCHEMA DOUBLE_COLON)? object_name=id_ FROM owner_name=id_
         )*
     ;
 
@@ -1328,7 +1388,7 @@ CREATE SCHEMA schema_name=id_ (AUTHORIZATION owner_name=id_ )?
     ;
 
 alter_schema_azure_sql_dw_and_pdw
-    : ALTER SCHEMA schema_name=id_ TRANSFER (OBJECT COLON COLON )? id_ (DOT ID)?
+    : ALTER SCHEMA schema_name=id_ TRANSFER (OBJECT DOUBLE_COLON )? id_ (DOT ID)?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-search-property-list-transact-sql
@@ -1367,8 +1427,8 @@ create_sequence
         (AS data_type  )?
         (START WITH DECIMAL)?
         (INCREMENT BY MINUS? DECIMAL)?
-        (MINVALUE DECIMAL? | NO MINVALUE)?
-        (MAXVALUE DECIMAL? | NO MAXVALUE)?
+        (MINVALUE (MINUS? DECIMAL)? | NO MINVALUE)?
+        (MAXVALUE (MINUS? DECIMAL)? | NO MAXVALUE)?
         (CYCLE|NO CYCLE)?
         (CACHE DECIMAL? | NO CACHE)?
     ;
@@ -1865,6 +1925,31 @@ create_index
     ';'?
     ;
 
+alter_index
+    : ALTER INDEX id_ ON table_name (DISABLE | PAUSE | ABORT | rebuild_partition)
+    ;
+
+rebuild_partition
+    : REBUILD (PARTITION '=' ALL)? index_options?
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
+create_columnstore_index
+    : CREATE (CLUSTERED | NONCLUSTERED?) COLUMNSTORE INDEX id_ ON table_name
+    index_options?
+    (ON id_)?
+    ';'?
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
+create_nonclustered_columnstore_index
+    : CREATE NONCLUSTERED? COLUMNSTORE INDEX id_ ON table_name '(' column_name_list_with_order ')'
+    (WHERE search_condition)?
+    index_options?
+    (ON id_)?
+    ';'?
+    ;
+
 create_xml_index
     : CREATE PRIMARY? XML INDEX id_ ON table_name '(' id_ ')'
     (USING XML INDEX id_ (FOR (VALUE | PATH | PROPERTY)?)?)?
@@ -1914,7 +1999,7 @@ create_or_alter_ddl_trigger
     : ((CREATE (OR ALTER)?) | ALTER) TRIGGER simple_name
       ON (ALL SERVER | DATABASE)
       (WITH dml_trigger_option (',' dml_trigger_option)* )?
-      (FOR | AFTER) ddl_trigger_operation (',' dml_trigger_operation)*
+      (FOR | AFTER) ddl_trigger_operation (',' ddl_trigger_operation)*
       AS sql_clauses+
     ;
 
@@ -1932,28 +2017,27 @@ create_or_alter_function
 func_body_returns_select
     : RETURNS TABLE
         (WITH function_option (',' function_option)*)?
-        AS?
-        RETURN ('(' select_statement_standalone ')' | select_statement_standalone)
+        AS? (as_external_name | RETURN ('(' select_statement_standalone ')' | select_statement_standalone))
     ;
 
 func_body_returns_table
     : RETURNS LOCAL_ID table_type_definition
         (WITH function_option (',' function_option)*)?
-        AS?
+        AS? (as_external_name |
         BEGIN
            sql_clauses*
            RETURN ';'?
-        END ';'?
+        END ';'?)
     ;
 
 func_body_returns_scalar
     : RETURNS data_type
         (WITH function_option (',' function_option)*)?
-        AS?
+        AS? (as_external_name |
         BEGIN
            sql_clauses*
            RETURN ret=expression ';'?
-       END
+       END)
     ;
 
 procedure_param
@@ -2018,8 +2102,10 @@ alter_table
                              | ALTER COLUMN column_definition
                              | DROP COLUMN id_ (',' id_)*
                              | DROP CONSTRAINT constraint=id_
-                             | WITH CHECK ADD CONSTRAINT constraint=id_ FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name '(' pk = column_name_list')'
-                             | CHECK CONSTRAINT constraint=id_
+                             | WITH (CHECK | NOCHECK) ADD (CONSTRAINT constraint=id_)?
+                                ( FOREIGN KEY '(' fk=column_name_list ')' REFERENCES table_name ('(' pk=column_name_list')')? (on_delete | on_update)*
+                                | CHECK '(' search_condition ')' )
+                             | (NOCHECK | CHECK) CONSTRAINT constraint=id_
                              | (ENABLE | DISABLE) TRIGGER id_?
                              | REBUILD table_options
                              | SWITCH switch_partition)
@@ -2296,6 +2382,7 @@ parameterization_option
 recovery_option
     : RECOVERY ( FULL | BULK_LOGGED | SIMPLE )
     | TORN_PAGE_DETECTION on_off
+    | ACCELERATED_DATABASE_RECOVERY '=' on_off
     | PAGE_VERIFY ( CHECKSUM | TORN_PAGE_DETECTION | NONE )
     ;
 
@@ -2422,7 +2509,7 @@ opendatasource
 
 // https://msdn.microsoft.com/en-us/library/ms188927.aspx
 declare_statement
-    : DECLARE LOCAL_ID AS? table_type_definition ';'?
+    : DECLARE LOCAL_ID AS? (table_type_definition | table_name) ';'?
     | DECLARE loc+=declare_local (',' loc+=declare_local)* ';'?
     | DECLARE LOCAL_ID AS? xml_type_definition ';'?
     | WITH XMLNAMESPACES '(' xml_dec+=xml_declaration (',' xml_dec+=xml_declaration)* ')' ';'?
@@ -2602,9 +2689,10 @@ execute_body_batch
     : func_proc_name_server_database_schema (execute_statement_arg (',' execute_statement_arg)*)? ';'?
     ;
 
+//https://docs.microsoft.com/it-it/sql/t-sql/language-elements/execute-transact-sql?view=sql-server-ver15
 execute_body
     : (return_status=LOCAL_ID '=')? (func_proc_name_server_database_schema | execute_var_string)  execute_statement_arg?
-    | '(' execute_var_string ('+' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)?
+    | '(' execute_var_string (',' execute_var_string)* ')' (AS? (LOGIN | USER) '=' STRING)? (AT_KEYWORD linkedServer=id_)?
     ;
 
 execute_statement_arg
@@ -2627,8 +2715,8 @@ execute_parameter
     ;
 
 execute_var_string
-    : LOCAL_ID
-    | STRING
+    : LOCAL_ID (OUTPUT | OUT)? ('+' LOCAL_ID ('+' execute_var_string)?)?
+    | STRING ('+' LOCAL_ID ('+' execute_var_string)?)?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ff848791.aspx
@@ -2636,7 +2724,7 @@ security_statement
     // https://msdn.microsoft.com/en-us/library/ms188354.aspx
     : execute_clause ';'?
     // https://msdn.microsoft.com/en-us/library/ms187965.aspx
-    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON on_id=table_name)? TO to_principal+=principal_id (',' to_principal+=principal_id)* (WITH GRANT OPTION)? (AS as_principal=principal_id)? ';'?
+    | GRANT (ALL PRIVILEGES? | grant_permission ('(' column_name_list ')')?) (ON (class_type_for_grant '::')? on_id=table_name)? TO to_principal+=principal_id (',' to_principal+=principal_id)* (WITH GRANT OPTION)? (AS as_principal=principal_id)? ';'?
     // https://msdn.microsoft.com/en-us/library/ms178632.aspx
     | REVERT ('(' WITH COOKIE '=' LOCAL_ID ')')? ';'?
     | open_key
@@ -2728,18 +2816,111 @@ decryption_mechanism
     | PASSWORD EQUAL STRING
     ;
 
+// https://docs.microsoft.com/en-us/sql/relational-databases/system-functions/sys-fn-builtin-permissions-transact-sql?view=sql-server-ver15
+// SELECT DISTINCT '| ' + permission_name
+// FROM sys.fn_builtin_permissions (DEFAULT)
+// ORDER BY 1
 grant_permission
-    : EXECUTE
-    | VIEW id_ // DEFINITION
-    | TAKE id_ // OWNERSHIP
-    | CONTROL id_? // SERVER
-    | CREATE (TABLE | VIEW)
-    | SHOWPLAN
-    | IMPERSONATE
-    | SELECT
-    | REFERENCES
+    : ADMINISTER ( BULK OPERATIONS | DATABASE BULK OPERATIONS)
+    | ALTER ( ANY ( APPLICATION ROLE
+                  | ASSEMBLY
+                  | ASYMMETRIC KEY
+                  | AVAILABILITY GROUP
+                  | CERTIFICATE
+                  | COLUMN ( ENCRYPTION KEY | MASTER KEY )
+                  | CONNECTION
+                  | CONTRACT
+                  | CREDENTIAL
+                  | DATABASE ( AUDIT
+                             | DDL TRIGGER
+                             | EVENT ( NOTIFICATION | SESSION )
+                             | SCOPED CONFIGURATION
+                             )?
+                  | DATASPACE
+                  | ENDPOINT
+                  | EVENT ( NOTIFICATION | SESSION )
+                  | EXTERNAL ( DATA SOURCE | FILE FORMAT | LIBRARY)
+                  | FULLTEXT CATALOG
+                  | LINKED SERVER
+                  | LOGIN
+                  | MASK
+                  | MESSAGE TYPE
+                  | REMOTE SERVICE BINDING
+                  | ROLE
+                  | ROUTE
+                  | SCHEMA
+                  | SECURITY POLICY
+                  | SERVER ( AUDIT | ROLE )
+                  | SERVICE
+                  | SYMMETRIC KEY
+                  | USER
+                  )
+            | RESOURCES
+            | SERVER STATE
+            | SETTINGS
+            | TRACE
+            )?
+    | AUTHENTICATE SERVER?
+    | BACKUP ( DATABASE | LOG )
+    | CHECKPOINT
+    | CONNECT ( ANY DATABASE | REPLICATION | SQL )?
+    | CONTROL SERVER?
+    | CREATE ( AGGREGATE
+             | ANY DATABASE
+             | ASSEMBLY
+             | ASYMMETRIC KEY
+             | AVAILABILITY GROUP
+             | CERTIFICATE
+             | CONTRACT
+             | DATABASE (DDL EVENT NOTIFICATION)?
+             | DDL EVENT NOTIFICATION
+             | DEFAULT
+             | ENDPOINT
+             | EXTERNAL LIBRARY
+             | FULLTEXT CATALOG
+             | FUNCTION
+             | MESSAGE TYPE
+             | PROCEDURE
+             | QUEUE
+             | REMOTE SERVICE BINDING
+             | ROLE
+             | ROUTE
+             | RULE
+             | SCHEMA
+             | SEQUENCE
+             | SERVER ROLE
+             | SERVICE
+             | SYMMETRIC KEY
+             | SYNONYM
+             | TABLE
+             | TRACE EVENT NOTIFICATION
+             | TYPE
+             | VIEW
+             | XML SCHEMA COLLECTION
+             )
+    | DELETE
+    | EXECUTE ( ANY EXTERNAL SCRIPT )?
+    | EXTERNAL ACCESS ASSEMBLY
+    | IMPERSONATE ( ANY LOGIN )?
     | INSERT
-    | ALTER (ANY? (id_ | DATABASE))?
+    | KILL DATABASE CONNECTION
+    | RECEIVE
+    | REFERENCES
+    | SELECT ( ALL USER SECURABLES )?
+    | SEND
+    | SHOWPLAN
+    | SHUTDOWN
+    | SUBSCRIBE QUERY NOTIFICATIONS
+    | TAKE OWNERSHIP
+    | UNMASK
+    | UNSAFE ASSEMBLY
+    | UPDATE
+    | VIEW ( ANY ( DATABASE | DEFINITION | COLUMN ( ENCRYPTION | MASTER ) KEY DEFINITION )
+           | CHANGE TRACKING
+           | DATABASE STATE
+           | DEFINITION
+           | SERVER STATE
+           )
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms190356.aspx
@@ -2801,6 +2982,10 @@ shutdown_statement
     : SHUTDOWN (WITH NOWAIT)?
     ;
 
+checkpoint_statement
+    : CHECKPOINT (checkPointDuration=DECIMAL)?
+    ;
+
 //These are dbcc commands with strange syntax that doesn't fit the regular dbcc syntax
 dbcc_special
     : DBCC SHRINKLOG ('(' SIZE '='  (constant_expression| id_ | DEFAULT) ')')? ';'?
@@ -2834,7 +3019,6 @@ table_type_indices
     :  (((PRIMARY KEY | INDEX id_) (CLUSTERED | NONCLUSTERED)?) | UNIQUE) '(' column_name_list_with_order ')'
     | CHECK '(' search_condition ')'
     ;
-
 
 xml_type_definition
     : XML '(' ( CONTENT | DOCUMENT )? xml_schema_collection ')'
@@ -2881,7 +3065,7 @@ table_constraint
     : (CONSTRAINT constraint=id_)?
        ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list_with_order ')' index_options? (ON id_)?
          | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
-         | DEFAULT '('?  (STRING | PLUS | function_call | DECIMAL)+ ')'? FOR id_
+         | DEFAULT '('?  ((STRING | PLUS | function_call | DECIMAL)+ | NEXT VALUE FOR table_name) ')'? FOR id_
          | FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name ('(' pk = column_name_list')')? on_delete? on_update?)
     ;
 
@@ -2941,8 +3125,34 @@ set_special
       (READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SNAPSHOT | SERIALIZABLE | DECIMAL) ';'?
     // https://msdn.microsoft.com/en-us/library/ms188059.aspx
     | SET IDENTITY_INSERT table_name on_off ';'?
-    | SET (ANSI_NULLS | QUOTED_IDENTIFIER | ANSI_PADDING | ANSI_WARNINGS | ANSI_DEFAULTS | ANSI_NULL_DFLT_OFF | ANSI_NULL_DFLT_ON | ARITHABORT | ARITHIGNORE | CONCAT_NULL_YIELDS_NULL | CURSOR_CLOSE_ON_COMMIT | FMTONLY | FORCEPLAN | IMPLICIT_TRANSACTIONS | NOCOUNT | NOEXEC | NUMERIC_ROUNDABORT | PARSEONLY | REMOTE_PROC_TRANSACTIONS | SHOWPLAN_ALL | SHOWPLAN_TEXT | SHOWPLAN_XML | XACT_ABORT) on_off
+    | SET special_list (',' special_list)* on_off
     | SET modify_method
+    ;
+
+special_list
+    : ANSI_NULLS
+    | QUOTED_IDENTIFIER
+    | ANSI_PADDING
+    | ANSI_WARNINGS
+    | ANSI_DEFAULTS
+    | ANSI_NULL_DFLT_OFF
+    | ANSI_NULL_DFLT_ON
+    | ARITHABORT
+    | ARITHIGNORE
+    | CONCAT_NULL_YIELDS_NULL
+    | CURSOR_CLOSE_ON_COMMIT
+    | FMTONLY
+    | FORCEPLAN
+    | IMPLICIT_TRANSACTIONS
+    | NOCOUNT
+    | NOEXEol
+    | NUMERIC_ROUNDABORT
+    | PARSEONLY
+    | REMOTE_PROC_TRANSACTIONS
+    | SHOWPLAN_ALL
+    | SHOWPLAN_TEXT
+    | SHOWPLAN_XML
+    | XACT_ABORT
     ;
 
 constant_LOCAL_ID
@@ -3049,8 +3259,8 @@ predicate
 // Changed union rule to sql_union to avoid union construct with C++ target.  Issue reported by person who generates into C++.  This individual reports change causes generated code to work
 
 query_expression
-    : (query_specification | '(' query_expression ')')
-    |  query_specification order_by_clause? unions+=sql_union+ //if using top, order by can be on the "top" side of union :/
+    : (query_specification | '(' query_expression ')' (UNION ALL? query_expression)? )
+    |  query_specification order_by_clause? unions+=sql_union* //if using top, order by can be on the "top" side of union :/
     ;
 
 sql_union
@@ -3173,7 +3383,7 @@ column_elem
 
 udt_elem
     : udt_column_name=id_ '.' non_static_attr=id_ udt_method_arguments as_column_alias?
-    | udt_column_name=id_ ':' ':' static_attr=id_ udt_method_arguments? as_column_alias?
+    | udt_column_name=id_ DOUBLE_COLON static_attr=id_ udt_method_arguments? as_column_alias?
     ;
 
 expression_elem
@@ -3185,8 +3395,9 @@ select_list_elem
     : asterisk
     | column_elem
     | udt_elem
-    | LOCAL_ID (assignment_operator | '=') expression
+    | LOCAL_ID (assignment_operator | '=') ( expression | NEXT VALUE FOR table_name)
     | expression_elem
+    | NEXT VALUE FOR table_name as_column_alias?
     ;
 
 table_sources
@@ -3216,7 +3427,7 @@ table_source_item
     | loc_id_call=LOCAL_ID '.' loc_fcall=function_call (as_table_alias column_alias_list?)?
     | open_xml
     | open_json
-    | ':' ':' oldstyle_fcall=function_call       as_table_alias? // Build-in function (old syntax)
+    | DOUBLE_COLON oldstyle_fcall=function_call       as_table_alias? // Build-in function (old syntax)
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/functions/openxml-transact-sql
@@ -3319,7 +3530,7 @@ bulk_option
 
 derived_table
     : subquery
-    | '(' subquery ')'
+    | '(' subquery (UNION ALL subquery)* ')'
     | table_value_constructor
     | '(' table_value_constructor ')'
     ;
@@ -3629,9 +3840,10 @@ entity_name_for_parallel_dw
     ;
 
 full_table_name
-    : (server=id_ '.' database=id_ '.'  schema=id_   '.'
-    |                database=id_ '.' (schema=id_)? '.'
-    |                                 schema=id_   '.')? table=id_
+    : (linkedServer=id_ '.' '.' schema=id_   '.'
+    |                       server=id_    '.' database=id_ '.'  schema=id_   '.'
+    |                                         database=id_ '.' (schema=id_)? '.'
+    |                                                           schema=id_    '.')? table=id_
     ;
 
 table_name
@@ -3805,6 +4017,7 @@ keyword
     | ACTION
     | ACTIVATION
     | ACTIVE
+    | ADD
     | ADDRESS
     | AES_128
     | AES_192
@@ -3930,6 +4143,7 @@ keyword
     | FILEGROWTH
     | FILEPATH
     | FILESTREAM
+    | FILLFACTOR
     | FILTER
     | FIRST
     | FIRST_VALUE

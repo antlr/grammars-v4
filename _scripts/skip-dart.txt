@@ -10,6 +10,7 @@ csharp
 dice
 erlang
 fortran77
+gdscript
 gff3
 golang
 haskell
@@ -46,6 +47,7 @@ restructuredtext
 rexx
 rust
 sql/plsql
+sql/postgresql
 sql/tsql
 stringtemplate
 swift-fin
@@ -57,6 +59,7 @@ thrift
 tinymud
 v
 vb6
+velocity
 wat
 webidl
 xpath/xpath31

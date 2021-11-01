@@ -309,12 +309,14 @@ expressionSequence
     ;
 
 singleExpression
-    : anonymousFunction                                                      # FunctionExpression
+    : anonymousFunction                                                     # FunctionExpression
     | Class identifier? classTail                                           # ClassExpression
     | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
+    // Split to try `new Date()` first, then `new Date`.
+    | New singleExpression arguments                                        # NewExpression
+    | New singleExpression                                                  # NewExpression
     | singleExpression arguments                                            # ArgumentsExpression
-    | New singleExpression arguments?                                       # NewExpression
     | New '.' identifier                                                    # MetaExpression // new.target
     | singleExpression {this.notLineTerminator()}? '++'                     # PostIncrementExpression
     | singleExpression {this.notLineTerminator()}? '--'                     # PostDecreaseExpression
@@ -346,7 +348,7 @@ singleExpression
     | <assoc=right> singleExpression '=' singleExpression                   # AssignmentExpression
     | <assoc=right> singleExpression assignmentOperator singleExpression    # AssignmentOperatorExpression
     | Import '(' singleExpression ')'                                       # ImportExpression
-    | singleExpression TemplateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
+    | singleExpression templateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
     | yieldStatement                                                        # YieldExpression // ECMAScript 6
     | This                                                                  # ThisExpression
     | identifier                                                            # IdentifierExpression
@@ -364,7 +366,7 @@ assignable
     ;
 
 objectLiteral
-    : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
+    : '{' (propertyAssignment (',' propertyAssignment)* ','?)? '}'
     ;
 
 anonymousFunction
@@ -402,10 +404,19 @@ literal
     : NullLiteral
     | BooleanLiteral
     | StringLiteral
-    | TemplateStringLiteral
+    | templateStringLiteral
     | RegularExpressionLiteral
     | numericLiteral
     | bigintLiteral
+    ;
+
+templateStringLiteral
+    : BackTick templateStringAtom* BackTick
+    ;
+
+templateStringAtom
+    : TemplateStringAtom
+    | TemplateStringStartExpression singleExpression TemplateCloseBrace
     ;
 
 numericLiteral

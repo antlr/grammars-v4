@@ -1,0 +1,228 @@
+/*
+ * Copyright (C) 2006, 2007, 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2007 Samuel Weinig <sam@webkit.org>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public License
+ * along with this library; see the file COPYING.LIB.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
+ */
+
+// https://html.spec.whatwg.org/C/#the-document-object
+enum DocumentReadyState { "loading", "interactive", "complete" };
+
+// https://w3c.github.io/page-visibility/#visibilitystate-enum
+enum VisibilityState { "hidden", "visible" };
+
+// https://wicg.github.io/cors-rfc1918/#feature-detect
+enum AddressSpace { "local", "private", "public" };
+
+typedef (HTMLScriptElement or SVGScriptElement) HTMLOrSVGScriptElement;
+
+// https://dom.spec.whatwg.org/#interface-document
+// https://html.spec.whatwg.org/C/#documents
+
+[
+    Exposed=Window
+] interface Document : Node {
+    [CallWith=Document] constructor();
+    [SameObject] readonly attribute DOMImplementation implementation;
+    [ImplementedAs=urlForBinding] readonly attribute USVString URL;
+    // FIXME: documentURI should not be nullable.
+    [ImplementedAs=urlForBinding] readonly attribute USVString? documentURI;
+    readonly attribute DOMString compatMode;
+
+    readonly attribute DOMString characterSet;
+    [ImplementedAs=characterSet] readonly attribute DOMString charset; // legacy alias of .characterSet
+    [ImplementedAs=characterSet] readonly attribute DOMString inputEncoding; // legacy alias of .characterSet
+    readonly attribute DOMString contentType;
+
+    readonly attribute DocumentType? doctype;
+    [Affects=Nothing] readonly attribute Element? documentElement;
+    [Affects=Nothing] HTMLCollection getElementsByTagName(DOMString localName);
+    [Affects=Nothing] HTMLCollection getElementsByTagNameNS(DOMString? namespaceURI, DOMString localName);
+    [Affects=Nothing] HTMLCollection getElementsByClassName(DOMString classNames);
+
+    [NewObject, DoNotTestNewObject, PerWorldBindings, RaisesException, ImplementedAs=CreateElementForBinding] Element createElement(DOMString localName);
+    [NewObject, DoNotTestNewObject, RaisesException] Element createElementNS(DOMString? namespaceURI, DOMString qualifiedName);
+    [NewObject] DocumentFragment createDocumentFragment();
+    [NewObject] Text createTextNode(DOMString data);
+    [NewObject, RaisesException] CDATASection createCDATASection(DOMString data);
+    [NewObject] Comment createComment(DOMString data);
+    [NewObject, RaisesException] ProcessingInstruction createProcessingInstruction(DOMString target, DOMString data);
+
+    [NewObject, DoNotTestNewObject, CEReactions, RaisesException] Node importNode(Node node, optional boolean deep = false);
+    [RaisesException, CEReactions] Node adoptNode(Node node);
+
+    [NewObject, RaisesException, MeasureAs=DocumentCreateAttribute] Attr createAttribute(DOMString localName);
+    [NewObject, RaisesException, MeasureAs=DocumentCreateAttributeNS] Attr createAttributeNS(DOMString? namespaceURI, DOMString qualifiedName);
+
+    [NewObject, RaisesException, CallWith=ScriptState] Event createEvent(DOMString eventType);
+
+    [NewObject] Range createRange();
+
+    // NodeFilter.SHOW_ALL = 0xFFFFFFFF
+    [NewObject] NodeIterator createNodeIterator(Node root, optional unsigned long whatToShow = 0xFFFFFFFF, optional NodeFilter? filter = null);
+    [NewObject] TreeWalker createTreeWalker(Node root, optional unsigned long whatToShow = 0xFFFFFFFF, optional NodeFilter? filter = null);
+
+    // FIXME: xmlEncoding/xmlVersion/xmlStandalone have been removed from the spec.
+    [MeasureAs=DocumentXMLEncoding] readonly attribute DOMString? xmlEncoding;
+    [RaisesException=Setter, MeasureAs=DocumentXMLVersion] attribute DOMString? xmlVersion;
+    [RaisesException=Setter, MeasureAs=DocumentXMLStandalone] attribute boolean xmlStandalone;
+
+    // HTML
+    // https://html.spec.whatwg.org/C/#the-document-object
+
+    // resource metadata management
+
+    [Affects=Nothing, PutForwards=href, LegacyUnforgeable] readonly attribute Location? location;
+    [Affects=Nothing, RaisesException=Setter] attribute USVString domain;
+    [Affects=Nothing] readonly attribute USVString referrer;
+    [Affects=Nothing, RaisesException, RuntimeCallStatsCounter=DocumentCookie] attribute DOMString cookie;
+    readonly attribute DOMString lastModified;
+    readonly attribute DocumentReadyState readyState;
+
+    // DOM tree accessors
+    // Named getter is implemented without IDL code generation for better
+    // performance. See local_window_proxy.cc.
+    // getter object (DOMString name);
+    [Affects=Nothing, CEReactions] attribute DOMString title;
+    [CEReactions] attribute DOMString dir;
+    [Affects=Nothing, CEReactions, RaisesException=Setter, PerWorldBindings] attribute HTMLElement? body;
+    [Affects=Nothing] readonly attribute HTMLHeadElement? head;
+    [SameObject, Measure] readonly attribute HTMLCollection images;
+    [SameObject, Measure] readonly attribute HTMLCollection embeds;
+    [SameObject, ImplementedAs=embeds, Measure] readonly attribute HTMLCollection plugins;
+    [SameObject, Measure] readonly attribute HTMLCollection links;
+    [SameObject, Measure] readonly attribute HTMLCollection forms;
+    [SameObject, Measure] readonly attribute HTMLCollection scripts;
+    [Affects=Nothing, PerWorldBindings] NodeList getElementsByName(DOMString elementName);
+    [ImplementedAs=currentScriptForBinding] readonly attribute HTMLOrSVGScriptElement? currentScript;
+
+    // dynamic markup insertion
+    [CallWith=Isolate, CEReactions, RaisesException, MeasureAs=DocumentOpenTwoArgs] Document open(optional DOMString type = "text/html", optional DOMString replace = "");
+    [CallWith=Isolate, RaisesException, MeasureAs=DocumentOpenThreeArgs] Window open(USVString url, DOMString name, DOMString features);
+    [CEReactions, RaisesException] void close();
+    [CallWith=Isolate, CEReactions, RaisesException] void write(DOMString... text);
+    [CallWith=Isolate, CEReactions, RaisesException] void writeln(DOMString... text);
+
+    // TrustedTypes variants of the above.
+    // Note: This should be gated on [RuntimeEnabled=TrustedDOMTypes], but
+    // since RuntimeEnabled isn't compatible with overloaded methods, we're
+    // handling these unconditionally.
+    [CallWith=Isolate, CEReactions, RaisesException] void write(TrustedHTML text);
+    [CallWith=Isolate, CEReactions, RaisesException] void writeln(TrustedHTML text);
+
+    // user interaction
+    [Affects=Nothing] readonly attribute Window? defaultView;
+    [Affects=Nothing] boolean hasFocus();
+    [CEReactions, MeasureAs=DocumentDesignMode] attribute DOMString designMode;
+    [CEReactions, RaisesException] boolean execCommand(DOMString commandId, optional boolean showUI = false, optional DOMString value = "");
+    [RaisesException] boolean queryCommandEnabled(DOMString commandId);
+    [RaisesException] boolean queryCommandIndeterm(DOMString commandId);
+    [RaisesException] boolean queryCommandState(DOMString commandId);
+    [RaisesException] boolean queryCommandSupported(DOMString commandId);
+    [RaisesException] DOMString queryCommandValue(DOMString commandId);
+
+    [LegacyLenientThis] attribute EventHandler onreadystatechange;
+
+    // HTML obsolete features
+    // https://html.spec.whatwg.org/C/#Document-partial
+
+    [Measure] readonly attribute HTMLCollection anchors;
+    [Measure] readonly attribute HTMLCollection applets;
+
+    [CEReactions] attribute [TreatNullAs=EmptyString] DOMString fgColor;
+    [CEReactions] attribute [TreatNullAs=EmptyString] DOMString linkColor;
+    [CEReactions] attribute [TreatNullAs=EmptyString] DOMString vlinkColor;
+    [CEReactions] attribute [TreatNullAs=EmptyString] DOMString alinkColor;
+    [CEReactions] attribute [TreatNullAs=EmptyString] DOMString bgColor;
+
+    [MeasureAs=DocumentClear] void clear();
+    [MeasureAs=DocumentCaptureEvents] void captureEvents();
+    [MeasureAs=DocumentReleaseEvents] void releaseEvents();
+
+    [SameObject, MeasureAs=DocumentAll] readonly attribute HTMLAllCollection all;
+
+    [Affects=Nothing] readonly attribute Element? scrollingElement;
+
+    // Pointer Lock
+    // https://w3c.github.io/pointerlock/#extensions-to-the-document-interface
+    attribute EventHandler onpointerlockchange;
+    attribute EventHandler onpointerlockerror;
+    [MeasureAs=DocumentExitPointerLock] void exitPointerLock();
+
+    // Custom Elements
+    // https://w3c.github.io/webcomponents/spec/custom/#extensions-to-document-interface-to-register
+    // https://w3c.github.io/webcomponents/spec/custom/#extensions-to-document-interface-to-instantiate
+    [PerWorldBindings, RaisesException, ImplementedAs=CreateElementForBinding] Element createElement(DOMString localName, (DOMString or ElementCreationOptions) options);
+    [RaisesException] Element createElementNS(DOMString? namespaceURI, DOMString qualifiedName, (DOMString or ElementCreationOptions) options);
+
+    // Page Visibility
+    // https://w3c.github.io/page-visibility/#extensions-to-the-document-interface
+    readonly attribute boolean hidden;
+    readonly attribute VisibilityState visibilityState;
+    readonly attribute boolean wasDiscarded;
+
+    // https://jeremyroman.github.io/alternate-loading-modes/#dom-document-prerendering
+    [RuntimeEnabled=Prerender2] readonly attribute boolean prerendering;
+
+    // CORS and RFC1918
+    // https://wicg.github.io/cors-rfc1918/#feature-detect
+    [CallWith=ScriptState, RuntimeEnabled=AddressSpace, ImplementedAs=addressSpaceForBindings] readonly attribute AddressSpace addressSpace;
+
+    // Non-standard APIs
+    [MeasureAs=DocumentCaretRangeFromPoint] Range caretRangeFromPoint(optional long x = 0, optional long y = 0);
+
+    // Storage Access API
+    [CallWith=ScriptState, NewObject, RuntimeEnabled=StorageAccessAPI, MeasureAs=StorageAccessAPI_HasStorageAccess_Method] Promise<boolean> hasStorageAccess();
+    [CallWith=ScriptState, NewObject, RuntimeEnabled=StorageAccessAPI, MeasureAs=StorageAccessAPI_requestStorageAccess_Method] Promise<void> requestStorageAccess();
+
+    // Interest Cohort API
+    // TODO(yaoxia): Add web tests. http://crbug/1130074.
+    [CallWith=ScriptState, RaisesException, NewObject, SecureContext, RuntimeEnabled=InterestCohortAPI, MeasureAs=InterestCohortAPI_interestCohort_Method] Promise<InterestCohort> interestCohort();
+
+    // Text fragment directive API
+    // https://wicg.github.io/scroll-to-text-fragment/#feature-detectability
+    [SameObject, Measure, RuntimeEnabled=TextFragmentIdentifiers] readonly attribute FragmentDirective fragmentDirective;
+
+    // https://w3c.github.io/webappsec-feature-policy/#the-policy-object
+    readonly attribute FeaturePolicy featurePolicy;
+
+    // Deprecated prefixed page visibility API.
+    // TODO(davidben): This is a property so attaching a deprecation warning results in false positives when outputting
+    // document in the console. It's possible https://crbug.com/43394 will resolve this.
+    [MeasureAs=PrefixedPageVisibility, ImplementedAs=visibilityState] readonly attribute DOMString webkitVisibilityState;
+    [MeasureAs=PrefixedPageVisibility, ImplementedAs=hidden] readonly attribute boolean webkitHidden;
+
+    // Trust Token API (https://github.com/wicg/trust-token-api)
+    [CallWith=ScriptState, Measure, RaisesException, NewObject, SecureContext, RuntimeEnabled=TrustTokens] Promise<boolean> hasTrustToken(USVString issuer);
+
+    // Event handler attributes
+    attribute EventHandler onbeforecopy;
+    attribute EventHandler onbeforecut;
+    attribute EventHandler onbeforepaste;
+    attribute EventHandler onfreeze;
+    [RuntimeEnabled=Prerender2] attribute EventHandler onprerenderingchange;
+    attribute EventHandler onresume;
+    attribute EventHandler onsearch;
+    attribute EventHandler onsecuritypolicyviolation;
+    attribute EventHandler onvisibilitychange;
+};
+
+Document includes GlobalEventHandlers;
+Document includes DocumentAndElementEventHandlers;
+Document includes ParentNode;
+Document includes NonElementParentNode;
+Document includes DocumentOrShadowRoot;
+Document includes FontFaceSource;

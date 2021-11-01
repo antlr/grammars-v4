@@ -68,9 +68,12 @@
 				<module>abnf</module>
 				<module>acme</module>
 				<module>agc</module>
+                <module>alef</module>
 				<module>algol60</module>
+				<module>alloy</module>
 				<module>alpaca</module>
-				<module>antlr</module>
+                <module>angelscript</module>
+                <module>antlr</module>
 				<module>apex</module>
 				<module>apt</module>
 				<module>arithmetic</module>
@@ -88,6 +91,7 @@
 				<module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
+                <module>callable</module>
 				<module>capnproto</module>
 				<module>clf</module>
 				<module>clojure</module>
@@ -103,6 +107,7 @@
 				<module>csharp</module>
 				<module>css3</module>
 				<module>csv</module>
+                <module>ctl</module>
 				<module>cto</module>
 				<module>dart2</module>
 				<module>databank</module>
@@ -121,6 +126,7 @@
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
+				<module>gdscript</module>
 				<module>gedcom</module>
 				<module>gff3</module>
 				<module>gml</module>
@@ -156,14 +162,17 @@
 				<module>kotlin</module>
 				<module>kuka</module>
 				<module>lambda</module>
+				<module>lark</module>
 				<module>lcc</module>
 				<module>less</module>
+                <module>limbo</module>
 				<module>lisa</module>
 				<module>logo</module>
 				<module>lolcode</module>
 				<module>loop</module>
 				<module>lpc</module>
-				<module>lua</module>
+                <module>ltl</module>
+                <module>lua</module>
 				<module>matlab</module>
 				<module>mckeeman-form</module>
 				<module>mdx</module>
@@ -186,6 +195,7 @@
 				<module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
+                <module>orwell</module>
 				<module>p</module>
 				<module>parkingsign</module>
 				<module>pascal</module>
@@ -212,9 +222,12 @@
 				<module>python</module>
 				<module>quakemap</module>
 				<module>r</module>
+				<module>racket-bsl</module>
+				<module>racket-isl</module>
 				<module>rcs</module>
 				<module>redcode</module>
-				<module>rego</module>
+                <module>refal</module>
+                <module>rego</module>
 				<module>restructuredtext</module>
 				<module>rexx</module>
 				<module>rfc822</module>
@@ -239,7 +252,8 @@
 				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
-				<module>solidity</module>
+                <module>snowball</module>
+                <module>solidity</module>
 				<module>sparql</module>
 				<module>sql</module>
 				<module>stacktrace</module>
@@ -256,6 +270,7 @@
 				<module>tinybasic</module>
 				<module>tinyc</module>
 				<module>tinymud</module>
+                <module>tl</module>
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>
@@ -272,6 +287,7 @@
 				<module>v</module>
 				<module>vb6</module>
 				<module>vba</module>
+				<module>velocity</module>
 				<module>verilog</module>
 				<module>vhdl</module>
 				<module>vmf</module>
@@ -337,7 +353,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.2.0	</version>
+						<version>3.3.1	</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>

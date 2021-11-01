@@ -19,6 +19,7 @@ erlang
 flatbuffers
 focal
 fortran77
+gdscript
 gff3
 gml
 golang
@@ -87,8 +88,8 @@ sgf
 smalltalk
 sparql
 sql/hive
-sql/plsql
 sql/sqlite
+sql/postgresql
 sql/tsql
 stellaris
 stringtemplate
@@ -107,6 +108,7 @@ turtle-doc
 v
 vb6
 vba
+velocity
 wat
 wavefront
 webidl

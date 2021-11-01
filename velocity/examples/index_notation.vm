@@ -1,0 +1,7 @@
+$foo[0]       ## $foo takes in an Integer look up
+$foo[$i]      ## Using another reference as the index
+$foo["bar"]   ## Passing a string where $foo may be a Map
+
+$foo.bar[1].junk
+$foo.callMethod()[1]
+$foo["apple"][4]

@@ -13,6 +13,7 @@ cpp
 csharp
 edif300
 fortran77
+gdscript
 guitartab
 haskell
 html
@@ -32,6 +33,7 @@ kirikiri-tjs
 kotlin/kotlin
 kotlin/kotlin-formal
 lambda
+less
 logo/logo
 logo/ucb-logo
 lpc
@@ -63,12 +65,14 @@ rego
 rexx
 rust
 scala
+scss
 sieve
 smalltalk
 smtlibv2
 sparql
 sql/hive
 sql/plsql
+sql/postgresql
 stringtemplate
 swift-fin
 swift/swift2
@@ -85,6 +89,7 @@ turtle
 turtle-doc
 url
 v
+velocity
 verilog/verilog
 wat
 xpath/xpath1
