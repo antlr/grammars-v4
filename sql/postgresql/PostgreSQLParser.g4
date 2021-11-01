@@ -3968,8 +3968,7 @@ frame_extent
 frame_bound
    : UNBOUNDED (PRECEDING | FOLLOWING)
    | CURRENT_P ROW
-   | a_expr PRECEDING
-   | a_expr FOLLOWING
+   | a_expr (PRECEDING | FOLLOWING)
    ;
 
 opt_window_exclusion_clause
