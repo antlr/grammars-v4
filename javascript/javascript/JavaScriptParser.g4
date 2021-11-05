@@ -366,7 +366,7 @@ assignable
     ;
 
 objectLiteral
-    : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
+    : '{' (propertyAssignment (',' propertyAssignment)* ','?)? '}'
     ;
 
 anonymousFunction

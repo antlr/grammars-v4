@@ -31,6 +31,7 @@ python/python3alt
 python/tiny-python
 rego
 rexx
+sql/postgresql
 stringtemplate
 swift-fin
 swift/swift2

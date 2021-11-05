@@ -73,6 +73,7 @@ create table rack_shelf_bin ( id int unsigned not null auto_increment unique pri
 CREATE TABLE `tblSRCHjob_desc` (`description_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT, `description` mediumtext NOT NULL, PRIMARY KEY (`description_id`)) ENGINE=TokuDB AUTO_INCREMENT=4095997820 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=TOKUDB_QUICKLZ;
 create table invisible_column_test(id int, col1 int INVISIBLE);
 create table visible_column_test(id int, col1 int VISIBLE);
+CREATE TABLE foo (c1 decimal(19), c2 decimal(19.5), c3 decimal(0.0), c4 decimal(0.2), c5 decimal(19,2));
 CREATE TABLE table_items (id INT, purchased DATE)
     PARTITION BY RANGE( YEAR(purchased) )
         SUBPARTITION BY HASH( TO_DAYS(purchased) )
@@ -133,6 +134,22 @@ CREATE TABLE CustomerTable (
     Address varchar(60),
     Phone varchar(24)
  ) ENGINE = CONNECT TABLE_TYPE = ODBC;
+
+CREATE TABLE tbl (
+    col1 LONGTEXT,
+    data JSON,
+    INDEX idx1 ((SUBSTRING(col1, 1, 10))),
+    INDEX idx2 ((CAST(JSON_EXTRACT(data, _utf8mb4'$') AS UNSIGNED ARRAY))),
+    INDEX ((CAST(data->>'$.name' AS CHAR(30))))
+);
+
+CREATE TABLE keywords (
+    eur VARCHAR(100),
+    iso VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+    usa VARCHAR(100),
+    jis VARCHAR(100),
+    internal INT
+);
 #end
 #begin
 -- Rename table
@@ -341,6 +358,16 @@ BEGIN
   DECLARE var2 TIMESTAMP default CURRENT_TIMESTAMP;
   DECLARE var3 INT unsigned default 2 + var1;
 END -- //-- delimiter ;
+#end
+#begin
+CREATE DEFINER=`system_user`@`%` PROCEDURE `update_order`(IN orderID bigint(11))
+BEGIN  insert into order_config(order_id, attribute, value, performer)
+       SELECT orderID, 'first_attr', 'true', 'AppConfig'
+       WHERE NOT EXISTS (select 1 from inventory.order_config t1 where t1.order_id = orderID and t1.attribute = 'first_attr') OR
+             EXISTS (select 1 from inventory.order_config p2 where p2.order_id = orderID and p2.attribute = 'first_attr' and p2.performer = 'AppConfig')
+       ON DUPLICATE KEY UPDATE value = 'true',
+                            performer = 'AppConfig'; -- Enable second_attr for order
+END
 #end
 -- Create procedure
 -- delimiter //

@@ -607,7 +607,7 @@ arrayElement                      // ECMAScript 6: Spread Operator
     ;
 
 objectLiteral
-    : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
+    : '{' (propertyAssignment (',' propertyAssignment)* ','?)? '}'
     ;
 
 // MODIFIED
