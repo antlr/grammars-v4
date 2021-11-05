@@ -89,6 +89,7 @@ smalltalk
 sparql
 sql/hive
 sql/sqlite
+sql/postgresql
 sql/tsql
 stellaris
 stringtemplate

@@ -417,7 +417,7 @@ assignable
     ;
 
 objectLiteral
-    : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
+    : '{' (propertyAssignment (',' propertyAssignment)* ','?)? '}'
     ;
 
 objectExpressionSequence
