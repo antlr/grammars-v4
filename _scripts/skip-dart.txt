@@ -47,6 +47,7 @@ restructuredtext
 rexx
 rust
 sql/plsql
+sql/postgresql
 sql/tsql
 stringtemplate
 swift-fin
