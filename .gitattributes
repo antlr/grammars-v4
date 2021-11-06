@@ -84,6 +84,8 @@ access_log text
 # Currently the /vb6/**/*.cls and *.frm file need this, otherwise the grammar fails. 
 *.cls text eol=crlf
 *.frm text eol=crlf
+# Ensure that the same errors are output in windows, macOS and linux.
+/golang/examples/bad_string_lit.go text eol=crlf
 
 # Denote all files that are truly binary and should not be modified.
 *.pdf binary
