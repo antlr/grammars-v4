@@ -166,7 +166,7 @@ BIG_U_VALUE: '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGI
 // String literals
 
 RAW_STRING_LIT         : '`' ~'`'*                      '`';
-INTERPRETED_STRING_LIT : '"' (~["\\] | ESCAPED_VALUE)*  '"';
+INTERPRETED_STRING_LIT : '"' (~["\\\r\n] | ESCAPED_VALUE)*  '"';
 
 // Hidden tokens
 
