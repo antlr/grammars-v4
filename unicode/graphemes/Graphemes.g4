@@ -12,7 +12,7 @@ fragment TextPresentationSequence: EmojiPresentationCharacter VS15;
 fragment EmojiPresentationSequence: TextPresentationCharacter VS16;
 fragment EmojiCharacter: [\p{Emoji}];
 fragment EmojiModifierSequence:
-    . [\p{Grapheme_Cluster_Break=E_Modifier}];
+    EmojiCharacter [\p{Grapheme_Cluster_Break=E_Modifier}];
 fragment EmojiFlagSequence:
     [\p{Grapheme_Cluster_Break=Regional_Indicator}] [\p{Grapheme_Cluster_Break=Regional_Indicator}];
 fragment ExtendedPictographic: [\p{Extended_Pictographic}];
