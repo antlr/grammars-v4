@@ -1983,7 +1983,11 @@ opt_nulls_order
    ;
 
 createfunctionstmt
-   : CREATE opt_or_replace (FUNCTION | PROCEDURE) func_name func_args_with_defaults (RETURNS (func_return | TABLE OPEN_PAREN table_func_column_list CLOSE_PAREN))? createfunc_opt_list
+   : CREATE opt_or_replace (FUNCTION | PROCEDURE) func_name func_args_with_defaults
+     (
+        RETURNS (func_return | TABLE OPEN_PAREN table_func_column_list CLOSE_PAREN)
+     )?
+     createfunc_opt_list
    ;
 
 opt_or_replace
@@ -2591,7 +2595,12 @@ opt_transaction_chain
    ;
 
 viewstmt
-   : CREATE (OR REPLACE)? opttemp (VIEW qualified_name opt_column_list opt_reloptions | RECURSIVE VIEW qualified_name OPEN_PAREN columnlist CLOSE_PAREN opt_reloptions) AS selectstmt opt_check_option
+   : CREATE (OR REPLACE)? opttemp
+    (
+          VIEW qualified_name opt_column_list opt_reloptions
+        | RECURSIVE VIEW qualified_name OPEN_PAREN columnlist CLOSE_PAREN opt_reloptions
+    )
+     AS selectstmt opt_check_option
    ;
 
 opt_check_option
@@ -3063,9 +3072,7 @@ opt_strict
    ;
 
 opttempTableName
-   : (TEMPORARY | TEMP) opt_table qualified_name
-   | LOCAL (TEMPORARY | TEMP) opt_table qualified_name
-   | GLOBAL (TEMPORARY | TEMP) opt_table qualified_name
+   : (LOCAL|GLOBAL)? (TEMPORARY | TEMP) opt_table qualified_name
    | UNLOGGED opt_table qualified_name
    | TABLE qualified_name
    | qualified_name
@@ -3214,7 +3221,7 @@ for_locking_item
    ;
 
 for_locking_strength
-   : FOR (UPDATE | NO KEY UPDATE | SHARE | KEY SHARE)
+   : FOR ((NO KEY)? UPDATE | KEY? SHARE)
    ;
 
 locked_rels_list
@@ -3255,8 +3262,7 @@ table_ref
    ;
 
 alias_clause
-   : AS colid (OPEN_PAREN name_list CLOSE_PAREN)?
-   | colid (OPEN_PAREN name_list CLOSE_PAREN)?
+   : AS? colid (OPEN_PAREN name_list CLOSE_PAREN)?
    ;
 
 opt_alias_clause
@@ -3381,8 +3387,7 @@ xml_namespace_el
    ;
 
 typename
-   : simpletypename (opt_array_bounds | ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?)
-   | SETOF simpletypename (opt_array_bounds | ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?)
+   : SETOF? simpletypename (opt_array_bounds | ARRAY (OPEN_BRACKET iconst CLOSE_BRACKET)?)
    | qualified_name PERCENT (ROWTYPE | TYPE_P)
    ;
 
@@ -4789,7 +4794,12 @@ decl_stmt
    ;
 
 decl_statement
-   : decl_varname (ALIAS FOR decl_aliasitem | decl_const decl_datatype decl_collate decl_notnull decl_defval | opt_scrollable CURSOR decl_cursor_args decl_is_for decl_cursor_query) SEMI
+   : decl_varname
+     (
+          ALIAS FOR decl_aliasitem
+        | decl_const decl_datatype decl_collate decl_notnull decl_defval
+        | opt_scrollable CURSOR decl_cursor_args decl_is_for decl_cursor_query
+     ) SEMI
    ;
 
 opt_scrollable
@@ -4992,7 +5002,14 @@ stmt_for
    //TODO: rewrite using read_sql_expression logic?
 
 for_control
-   : for_variable IN_P (cursor_name opt_cursor_parameters | selectstmt | explainstmt | EXECUTE a_expr opt_for_using_expression | opt_reverse a_expr DOT_DOT a_expr opt_by_expression)
+   : for_variable IN_P
+     (
+          cursor_name opt_cursor_parameters
+        | selectstmt
+        | explainstmt
+        | EXECUTE a_expr opt_for_using_expression
+        | opt_reverse a_expr DOT_DOT a_expr opt_by_expression
+     )
    ;
 
 opt_for_using_expression
@@ -5157,7 +5174,11 @@ opt_execute_into
    //OPEN bound_cursorvar [ ( [ argument_name := ] argument_value [, ...] ) ];
 
 stmt_open
-   : OPEN (cursor_variable opt_scroll_option FOR (selectstmt | EXECUTE sql_expression opt_open_using) | colid (OPEN_PAREN opt_open_bound_list CLOSE_PAREN)?) SEMI
+   : OPEN
+     (
+          cursor_variable opt_scroll_option FOR (selectstmt | EXECUTE sql_expression opt_open_using)
+        | colid (OPEN_PAREN opt_open_bound_list CLOSE_PAREN)?
+     ) SEMI
    ;
 
 opt_open_bound_list_item
