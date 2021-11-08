@@ -292,13 +292,11 @@ opt_with
    ;
 
 optrolelist
-   : optrolelist createoptroleelem
-   |
+   : createoptroleelem*
    ;
 
 alteroptrolelist
-   : alteroptrolelist alteroptroleelem
-   |
+   : alteroptroleelem*
    ;
 
 alteroptroleelem
@@ -363,8 +361,7 @@ optschemaname
    ;
 
 optschemaeltlist
-   : optschemaeltlist schema_stmt
-   |
+   : schema_stmt*
    ;
 
 schema_stmt
@@ -811,8 +808,7 @@ columnOptions
    ;
 
 colquallist
-   : colquallist colconstraint
-   |
+   : colconstraint*
    ;
 
 colconstraint
@@ -849,8 +845,7 @@ tablelikeclause
    ;
 
 tablelikeoptionlist
-   : tablelikeoptionlist (INCLUDING | EXCLUDING) tablelikeoption
-   |
+   : ((INCLUDING | EXCLUDING) tablelikeoption)*
    ;
 
 tablelikeoption
@@ -1053,8 +1048,7 @@ optparenthesizedseqoptlist
    ;
 
 seqoptlist
-   : seqoptelem
-   | seqoptlist seqoptelem
+   : seqoptelem+
    ;
 
 seqoptelem
@@ -1138,8 +1132,7 @@ createextensionstmt
    ;
 
 create_extension_opt_list
-   : create_extension_opt_list create_extension_opt_item
-   |
+   : create_extension_opt_item*
    ;
 
 create_extension_opt_item
@@ -1154,8 +1147,7 @@ alterextensionstmt
    ;
 
 alter_extension_opt_list
-   : alter_extension_opt_list alter_extension_opt_item
-   |
+   : alter_extension_opt_item*
    ;
 
 alter_extension_opt_item
@@ -1190,8 +1182,7 @@ fdw_option
    ;
 
 fdw_options
-   : fdw_option
-   | fdw_options fdw_option
+   : fdw_option+
    ;
 
 opt_fdw_options
@@ -1370,8 +1361,7 @@ triggeractiontime
    ;
 
 triggerevents
-   : triggeroneevent
-   | triggerevents OR triggeroneevent
+   : triggeroneevent (OR triggeroneevent)*
    ;
 
 triggeroneevent
@@ -1388,8 +1378,7 @@ triggerreferencing
    ;
 
 triggertransitions
-   : triggertransition
-   | triggertransitions triggertransition
+   : triggertransition+
    ;
 
 triggertransition
@@ -1436,9 +1425,7 @@ function_or_procedure
    ;
 
 triggerfuncargs
-   : triggerfuncarg
-   | triggerfuncargs COMMA triggerfuncarg
-   |
+   : (triggerfuncarg |) (COMMA triggerfuncarg)*
    ;
 
 triggerfuncarg
@@ -1454,8 +1441,7 @@ optconstrfromtable
    ;
 
 constraintattributespec
-   :
-   | constraintattributespec constraintattributeElem
+   : constraintattributeElem*
    ;
 
 constraintattributeElem
@@ -1710,13 +1696,11 @@ any_name
    ;
 
 attrs
-   : DOT attr_name
-   | attrs DOT attr_name
+   :DOT attr_name+
    ;
 
 type_name_list
-   : typename
-   | type_name_list COMMA typename
+   : typename (COMMA typename)*
    ;
 
 truncatestmt
@@ -1830,8 +1814,7 @@ privileges
    ;
 
 privilege_list
-   : privilege
-   | privilege_list COMMA privilege
+   : privilege (COMMA privilege)*
    ;
 
 privilege
@@ -1902,8 +1885,7 @@ alterdefaultprivilegesstmt
    ;
 
 defacloptionlist
-   : defacloptionlist defacloption
-   |
+   : defacloption*
    ;
 
 defacloption
@@ -1954,8 +1936,7 @@ access_method_clause
    ;
 
 index_params
-   : index_elem
-   | index_params COMMA index_elem
+   : index_elem (COMMA index_elem)*
    ;
 
 index_elem_options
@@ -1975,8 +1956,7 @@ opt_include
    ;
 
 index_including_params
-   : index_elem
-   | index_including_params COMMA index_elem
+   : index_elem (COMMA index_elem)*
    ;
 
 opt_collate
@@ -2149,8 +2129,7 @@ func_as locals[IParseTree Definition]
    ;
 
 transform_type_list
-   : FOR TYPE_P typename
-   | transform_type_list COMMA FOR TYPE_P typename
+   :FOR TYPE_P typename (COMMA FOR TYPE_P typename)*
    ;
 
 opt_definition
@@ -2206,8 +2185,7 @@ oper_argtypes
    ;
 
 any_operator
-   : all_op
-   | colid DOT any_operator
+   : (colid DOT)* all_op
    ;
 
 operator_with_argtypes_list
@@ -2520,8 +2498,7 @@ ruleactionlist
    ;
 
 ruleactionmulti
-   : ruleactionmulti SEMI ruleactionstmtOrEmpty
-   | ruleactionstmtOrEmpty
+   : ruleactionstmtOrEmpty (SEMI ruleactionstmtOrEmpty)*
    ;
 
 ruleactionstmt
@@ -3028,22 +3005,18 @@ select_clause
    ;
 
 simple_select
-   :
-/*??? unable to find in doc syntax like select  into sysrec * from system where name = new.sysname; - got from plpgsql.sql test script*/
-
-   SELECT (opt_all_clause into_clause opt_target_list | distinct_clause target_list) into_clause from_clause where_clause group_clause having_clause window_clause # simple_select_select
-   | values_clause # simple_select_values
-   | TABLE relation_expr # simple_select_table
-/*this replacement solves mutual left-recursive problem betwee simple_select and select_clause */
-
-   | simple_select set_operator_with_all_or_distinct (simple_select | select_with_parens) # simple_select_union_except_intersect
-   | select_with_parens set_operator_with_all_or_distinct (simple_select | select_with_parens) # simple_select_union_except_intersect
-   //this is replaced by rules above ^^^
-
-   //| select_clause UNION all_or_distinct select_clause | select_clause INTERSECT all_or_distinct
-
-   // select_clause | select_clause EXCEPT all_or_distinct select_clause
-
+   : ( SELECT (opt_all_clause into_clause opt_target_list | distinct_clause target_list)
+           into_clause
+           from_clause
+           where_clause
+           group_clause
+           having_clause
+           window_clause
+       | values_clause
+       | TABLE relation_expr
+       | select_with_parens set_operator_with_all_or_distinct (simple_select | select_with_parens)
+     )
+        (set_operator_with_all_or_distinct (simple_select | select_with_parens))*
    ;
 
 set_operator
@@ -3260,62 +3233,26 @@ from_clause
 
 from_list
    : table_ref (COMMA table_ref)*
-   //          | from_list COMMA table_ref
-
    ;
-/*
-table_ref:
-	table_ref_proxy
-	| joined_table
-	| OPEN_PAREN joined_table CLOSE_PAREN alias_clause
-	;
-
-table_ref_proxy:
-	relation_expr opt_alias_clause
-	| relation_expr opt_alias_clause tablesample_clause
-	| func_table func_alias_clause
-	| LATERAL_P func_table func_alias_clause
-	| xmltable opt_alias_clause
-	| LATERAL_P xmltable opt_alias_clause
-	| select_with_parens opt_alias_clause
-	| LATERAL_P select_with_parens opt_alias_clause
-	;
-joined_table:
-	OPEN_PAREN joined_table CLOSE_PAREN table_ref_proxy CROSS JOIN table_ref_proxy
-	| table_ref_proxy join_type JOIN table_ref_proxy join_qual
-	| table_ref_proxy JOIN table_ref_proxy join_qual
-	| table_ref_proxy NATURAL join_type JOIN table_ref_proxy
-	| table_ref_proxy NATURAL JOIN table_ref_proxy
-	;
-*/
-
 
 table_ref
-   : relation_expr opt_alias_clause tablesample_clause? # table_ref_simple
-   | func_table func_alias_clause # table_ref_simple
-   | xmltable opt_alias_clause # table_ref_simple
-   | select_with_parens opt_alias_clause # table_ref_simple
-   | LATERAL_P (xmltable opt_alias_clause | func_table func_alias_clause | select_with_parens opt_alias_clause) # table_ref_simple
-   //todo: joined_table was inlined to (partially) solve left-recursion problem;
-
-   //          | joined_table
-   | table_ref (CROSS JOIN table_ref | NATURAL join_type? JOIN table_ref | join_type? JOIN table_ref join_qual) # table_ref_joined_tables
-   | OPEN_PAREN table_ref (CROSS JOIN table_ref | NATURAL join_type? JOIN table_ref | join_type? JOIN table_ref join_qual)? CLOSE_PAREN opt_alias_clause # table_ref_joined_tables
+   : (relation_expr opt_alias_clause tablesample_clause?
+      | func_table func_alias_clause
+      | xmltable opt_alias_clause
+      | select_with_parens opt_alias_clause
+      | LATERAL_P (
+                    xmltable opt_alias_clause
+                    | func_table func_alias_clause
+                    | select_with_parens opt_alias_clause
+                  )
+      | OPEN_PAREN table_ref (
+                                CROSS JOIN table_ref
+                                | NATURAL join_type? JOIN table_ref
+                                | join_type? JOIN table_ref join_qual
+                             )? CLOSE_PAREN opt_alias_clause
+     )
+        (CROSS JOIN table_ref | NATURAL join_type? JOIN table_ref | join_type? JOIN table_ref join_qual)*
    ;
-   //TODO: this syntax is not supported due to left-recursion, need to be solve
-
-   //          | OPEN_PAREN joined_table CLOSE_PAREN alias_clause
-
-/*
- joined_table: OPEN_PAREN joined_table CLOSE_PAREN
-             | table_ref CROSS JOIN table_ref
-             | table_ref join_type JOIN table_ref join_qual
-             | table_ref JOIN table_ref join_qual
-             | table_ref NATURAL join_type JOIN table_ref
-             | table_ref NATURAL JOIN table_ref
-;
-*/
-
 
 alias_clause
    : AS colid (OPEN_PAREN name_list CLOSE_PAREN)?
@@ -3450,8 +3387,7 @@ typename
    ;
 
 opt_array_bounds
-   : opt_array_bounds OPEN_BRACKET iconst? CLOSE_BRACKET
-   |
+   : (OPEN_BRACKET iconst? CLOSE_BRACKET)*
    ;
 
 simpletypename
@@ -3702,7 +3638,7 @@ a_expr_is_not
 
 
 a_expr_compare
-   : a_expr_like ((LT | GT | EQUAL | LESS_EQUALS | GREATER_EQUALS | NOT_EQUALS) a_expr_like | (subquery_Op sub_type (select_with_parens | OPEN_PAREN a_expr CLOSE_PAREN)) /*21*/
+   : a_expr_like ((LT | GT | EQUAL | LESS_EQUALS | GREATER_EQUALS | NOT_EQUALS) a_expr_like |subquery_Op sub_type (select_with_parens | OPEN_PAREN a_expr CLOSE_PAREN) /*21*/
 
    )?
    ;
@@ -4163,8 +4099,7 @@ indirection
    ;
 
 opt_indirection
-   :
-   | opt_indirection indirection_el
+   : indirection_el*
    ;
 
 opt_target_list
@@ -4273,8 +4208,7 @@ rolespec
    ;
 
 role_list
-   : rolespec
-   | role_list COMMA rolespec
+   : rolespec (COMMA rolespec)*
    ;
 
 colid
@@ -4800,8 +4734,7 @@ from pl_gram.y, line ~2982
    ;
 
 comp_options
-   :
-   | comp_options comp_option
+   : comp_option*
    ;
 
 comp_option
@@ -4931,8 +4864,7 @@ assign_operator
    ;
 
 proc_sect
-   :
-   | proc_sect proc_stmt
+   : proc_stmt*
    ;
 
 proc_stmt
@@ -5008,9 +4940,7 @@ getdiag_target
    ;
 
 assign_var
-   : any_name
-   | PARAM
-   | assign_var OPEN_BRACKET expr_until_rightbracket CLOSE_BRACKET
+   : (any_name | PARAM) (OPEN_BRACKET expr_until_rightbracket CLOSE_BRACKET)*
    ;
 
 stmt_if
@@ -5018,8 +4948,7 @@ stmt_if
    ;
 
 stmt_elsifs
-   :
-   | stmt_elsifs ELSIF a_expr THEN proc_sect
+   : (ELSIF a_expr THEN proc_sect)*
    ;
 
 stmt_else
@@ -5310,7 +5239,7 @@ stmt_rollback
    ;
 
 plsql_opt_transaction_chain
-   : AND (NO? CHAIN)
+   : AND NO? CHAIN
    |
    ;
 
