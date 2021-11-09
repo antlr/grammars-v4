@@ -9,8 +9,8 @@ import 'dart:convert';
 <if (case_insensitive_type)>
 
 class CaseChangingCharStream extends CharStream {
-        CharStream stream;
-        bool upper;
+    CharStream stream = InputStream.fromString('');
+    bool upper = false;
 
     CaseChangingCharStream(CharStream str, bool up)
     {
@@ -40,7 +40,7 @@ class CaseChangingCharStream extends CharStream {
 
     @override
     int LA(int offset) {
-            int c = stream.LA(offset);
+            int c = stream.LA(offset)!;
 
             if (c \<= 0)
             {
