@@ -33,9 +33,14 @@ case "$target" in
     Python3) do_not_do_list=`cat _scripts/skip-python3.txt` ;;
     *) echo "Unknown target"; exit 1;;
 esac
-todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
-echo $todo_pattern
-do_not_do_list=`echo $do_not_do_list | sed 's/^ //g' | sed 's/  / /g' | sed 's/ /,/g'`
+invert="$2"
+if [[ "$invert" == "" ]]
+then
+    todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
+else
+    todo_pattern="^(.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
+fi
+echo To do list pattern = $todo_pattern
 
 # Sanity checks for required environment.
 unameOut="$(uname -s)"

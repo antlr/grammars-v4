@@ -37,7 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [CSharp, Java, Go, Python3, Dart]
+        language: [CSharp, Java, JavaScript, Go, Python3, Dart]
     steps:
     - name: Checkout
       uses: actions/checkout@v2.4.0
