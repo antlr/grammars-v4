@@ -161,7 +161,7 @@ part1()
     # 1) Generate driver source code from poms.
     rm -rf `find . -name Generated -type d`
     echo "Generating drivers."
-    bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.2-complete.jar`
+    bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.3-complete.jar`
     for i in $bad; do failed=`add "$failed" "$i"`; done
     date
 }
