@@ -176,6 +176,7 @@ create database super_cs default charset utf8 collate = utf8_bin character set u
 create database db_with_character_set_eq character set = default;
 create database db_with_character_set character set default;
 create database `ymsun_test1` charset gb18030 collate gb18030_bin;
+create database `test` charset binary collate binary;
 #end
 #begin
 -- Create event 1
