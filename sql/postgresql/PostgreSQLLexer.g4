@@ -35,17 +35,17 @@ lexer grammar PostgreSQLLexer;
 
 
 
-options { language = CSharp; }
+options {
+superClass = PostgreSQLLexerBase;
+}
+
 @ header
 {
-using System.Collections.Generic;
-using System.Diagnostics;
 }
 @ members
 {
 /* This field stores the tags which are used to detect the end of a dollar-quoted string literal.
  */
-private readonly Stack<String> _tags = new Stack<String>();
 }
 //
 
@@ -2420,7 +2420,7 @@ UnterminatedUnicodeEscapeStringConstant
 
 BeginDollarStringConstant
    : '$' Tag? '$'
-   {_tags.Push(this.Text);} -> pushMode (DollarQuotedStringMode)
+   {pushTag();} -> pushMode (DollarQuotedStringMode)
    ;
 /* "The tag, if any, of a dollar-quoted string follows the same rules as an
  * unquoted identifier, except that it cannot contain a dollar sign."
@@ -2529,8 +2529,8 @@ UnterminatedBlockComment
    // Optional assertion to make sure this rule is working as intended
 
    {
-		    Debug.Assert( InputStream.LA(1) == -1 /*EOF*/);
-		}
+            UnterminatedBlockCommentDebugAssert();
+   }
    ;
    //
 
@@ -2642,7 +2642,7 @@ DollarText
 
 EndDollarStringConstant
    : ('$' Tag? '$')
-   {this.Text.Equals(_tags.Peek())}?
-   {_tags.Pop();} -> popMode
+   {isTag()}?
+   {popTag();} -> popMode
    ;
 
