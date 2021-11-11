@@ -22,7 +22,6 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    node --version
     $o = trwdog node index.js -file $InputFile
     $failed = $LASTEXITCODE -ne 0
     if ($failed -and $errorFile) {
