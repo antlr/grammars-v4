@@ -381,12 +381,12 @@ insert into dropcol(key, drop1, keep1, drop2, keep2) values(1, 2, '2', '2', 2) o
     where excluded.drop1 is not null and excluded.keep1 is not null and excluded.drop2 is not null and excluded.keep2 is not null
           and dropcol.drop1 is not null and dropcol.keep1 is not null and dropcol.drop2 is not null and dropcol.keep2 is not null
     returning *;
-;
+
 -- set using existing table
 insert into dropcol(key, drop1, keep1, drop2, keep2) values(1, 3, '3', '3', 3) on conflict(key)
     do update set drop1 = dropcol.drop1, keep1 = dropcol.keep1, drop2 = dropcol.drop2, keep2 = dropcol.keep2
     returning *;
-;
+
 alter table dropcol drop column drop1, drop column drop2;
 -- set using excluded
 insert into dropcol(key, keep1, keep2) values(1, '4', 4) on conflict(key)
@@ -394,12 +394,12 @@ insert into dropcol(key, keep1, keep2) values(1, '4', 4) on conflict(key)
     where excluded.keep1 is not null and excluded.keep2 is not null
           and dropcol.keep1 is not null and dropcol.keep2 is not null
     returning *;
-;
+
 -- set using existing table
 insert into dropcol(key, keep1, keep2) values(1, '5', 5) on conflict(key)
     do update set keep1 = dropcol.keep1, keep2 = dropcol.keep2
     returning *;
-;
+
 
 DROP TABLE dropcol;
 

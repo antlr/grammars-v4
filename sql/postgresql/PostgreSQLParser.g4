@@ -1957,7 +1957,7 @@ aggregate_with_argtypes_list
 createfunc_opt_list
    : createfunc_opt_item+
    {
-                /* TODO ParseRoutineBody(_localctx);*/
+                ParseRoutineBody(_localctx);
             }
    //                    | createfunc_opt_list createfunc_opt_item
 
@@ -1996,7 +1996,7 @@ createfunc_opt_item
 
    //    | AS 'obj_file', 'link_symbol'
 
-func_as /*locals[IParseTree Definition]*/
+func_as locals[ParserRuleContext Definition]
    :
    /* |AS 'definition'*/
    def = sconst
