@@ -37,30 +37,30 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 
-                <configuration>
-                    <scenarios>
-                        <scenario>
-                            <scenarioName>FBX</scenarioName>
-                            <verbose>false</verbose>
-                            <showTree>false</showTree>
-                            <entryPoint>start</entryPoint>
-                            <grammarName>FBX</grammarName>
-                            <packageName></packageName>
-                            <testFileExtension>.fbx</testFileExtension>
-                            <exampleFiles>examples/</exampleFiles>
-                        </scenario>
-                        <scenario>
-                            <scenarioName>FBXSemantic</scenarioName>
-                            <verbose>false</verbose>
-                            <showTree>false</showTree>
-                            <entryPoint>start</entryPoint>
-                            <grammarName>FBXSemantic</grammarName>
-                            <packageName></packageName>
-                            <testFileExtension>.fbx</testFileExtension>
-                            <exampleFiles>examples/</exampleFiles>
-                        </scenario>
-                    </scenarios>
-                </configuration>
+				<configuration>
+					<scenarios>
+						<scenario>
+							<scenarioName>FBX</scenarioName>
+							<verbose>false</verbose>
+							<showTree>false</showTree>
+							<entryPoint>start</entryPoint>
+							<grammarName>FBX</grammarName>
+							<packageName></packageName>
+							<testFileExtension>.fbx</testFileExtension>
+							<exampleFiles>examples/</exampleFiles>
+						</scenario>
+						<scenario>
+							<scenarioName>FBXSemantic</scenarioName>
+							<verbose>false</verbose>
+							<showTree>false</showTree>
+							<entryPoint>start</entryPoint>
+							<grammarName>FBXSemantic</grammarName>
+							<packageName></packageName>
+							<testFileExtension>.fbx</testFileExtension>
+							<exampleFiles>examples/</exampleFiles>
+						</scenario>
+					</scenarios>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
