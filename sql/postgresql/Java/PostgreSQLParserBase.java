@@ -3,7 +3,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.BaseErrorListener;
 
 
 public abstract class PostgreSQLParserBase extends Parser {
@@ -15,6 +14,15 @@ public abstract class PostgreSQLParserBase extends Parser {
     public PostgreSQLParserBase(TokenStream input) {
         super(input);
         self = this;
+    }
+
+    ParserRuleContext GetParsedSqlTree(String script, int line) {
+        PostgreSQLParser ph = getPostgreSQLParser(script);
+        ParserRuleContext result = ph.root();
+        for (PostgreSQLParseError err : ph.ParseErrors) {
+            ParseErrors.add(new PostgreSQLParseError(err.Number, err.Offset, err.Line + line, err.Column, err.Message));
+        }
+        return result;
     }
 
     public void ParseRoutineBody(PostgreSQLParser.Createfunc_opt_listContext _localctx) {
@@ -32,15 +40,7 @@ public abstract class PostgreSQLParserBase extends Parser {
                             }
             }
         }
-        if(null==lang) return;
-/*         lang =
-                _localctx
-                        .createfunc_opt_item()
-                        .FirstOrDefault(coi => coi.LANGUAGE() != null)
-                ?.nonreservedword_or_sconst()?.nonreservedword()?.identifier()?
-                .Identifier()?.GetText();
-
- */
+        if (null == lang) return;
         PostgreSQLParser.Createfunc_opt_itemContext func_as = null;
         for (PostgreSQLParser.Createfunc_opt_itemContext a : _localctx.createfunc_opt_item()) {
             if (a.func_as() != null) {
@@ -67,17 +67,6 @@ public abstract class PostgreSQLParserBase extends Parser {
             }
         }
 
-    }
-
-    public static PostgreSQLParser getPostgreSQLParser(String script) {
-        CharStream charStream = CharStreams.fromString(script);
-        Lexer lexer = new PostgreSQLLexer(charStream);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        PostgreSQLParser parser = new PostgreSQLParser(tokens);
-        PostgreSQLParserErrorListener errorListener = new PostgreSQLParserErrorListener();
-        errorListener.grammar = parser;
-        parser.addErrorListener(errorListener);
-        return parser;
     }
 
     private static String TrimQuotes(String s) {
@@ -113,14 +102,14 @@ public abstract class PostgreSQLParserBase extends Parser {
         return result;
     }
 
-    ParserRuleContext GetParsedSqlTree(String script, int line) {
-        PostgreSQLParser ph = getPostgreSQLParser(script);
-        ParserRuleContext result = ph.root();
-        for (PostgreSQLParseError err : ph.ParseErrors) {
-            ParseErrors.add(new PostgreSQLParseError(err.Number, err.Offset, err.Line + line, err.Column, err.Message));
-        }
-        return result;
+    public static PostgreSQLParser getPostgreSQLParser(String script) {
+        CharStream charStream = CharStreams.fromString(script);
+        Lexer lexer = new PostgreSQLLexer(charStream);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        PostgreSQLParser parser = new PostgreSQLParser(tokens);
+        PostgreSQLParserErrorListener errorListener = new PostgreSQLParserErrorListener();
+        errorListener.grammar = parser;
+        parser.addErrorListener(errorListener);
+        return parser;
     }
-
-
 }
