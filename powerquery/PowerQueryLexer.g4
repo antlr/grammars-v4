@@ -1,13 +1,9 @@
 lexer grammar PowerQueryLexer;
 
-//@lexer::header {using System.Collections.Generic;}
-
-//@lexer::members {private HashSet<string> keyword_set = new HashSet<string>{"and","as","each","else","error","false","if","in","is","let","meta","not","null","or","otherwise","section","shared","then","true","try","type","#binary","#date","#datetime","#datetimezone","#duration","#infinity","#nan","#sections","#shared","#table","#time"};
-//	}
 fragment LEXICAL_UNIT: LEXICAL_ELEMENTS;
 fragment LEXICAL_ELEMENTS: LEXICAL_ELEMENT LEXICAL_ELEMENTS?;
 fragment LEXICAL_ELEMENT: WHITESPACE | TOKEN COMMENT;
-//WHITESPACE: ' ' -> skip;
+
 WHITESPACE:(
 	[\p{White_Space}]
 	| [\u0009\u000B\u000C]
@@ -172,7 +168,6 @@ REGULAR_IDENTIFIER:
 	AVAILABLE_IDENTIFIER
 	| AVAILABLE_IDENTIFIER '.' REGULAR_IDENTIFIER;
 AVAILABLE_IDENTIFIER: KEYWORD_OR_IDENTIFIER;
-	//{!keywords_set.Contains()}? KEYWORD_OR_IDENTIFIER;
 fragment IDENTIFIER_START_CHAR: LETTER_CHAR | '_';
 KEYWORD_OR_IDENTIFIER:
 	LETTER_CHAR

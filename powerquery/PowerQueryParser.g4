@@ -98,7 +98,6 @@ section_access_expression: IDENTIFIER BANG IDENTIFIER;
 
 parenthesized_expression: OPEN_PAREN expression CLOSE_PAREN;
 not_implemented_expression: ELLIPSES;
-//invoke_expression: primary_expression OPEN_PAREN argument_list? CLOSE_PAREN;
 argument_list: expression | expression COMMA argument_list;
 list_expression: OPEN_BRACE item_list? CLOSE_BRACE;
 item_list: item | item COMMA item_list;
@@ -108,14 +107,8 @@ record_expression: OPEN_BRACKET field_list? CLOSE_BRACKET;
 field_list: field | field COMMA field_list;
 field: field_name EQUALS expression;
 field_name: IDENTIFIER;
-
-//item_access_expression: item_selection | optional_item_selection; item_selection:
-// primary_expression OPEN_BRACE item_selector CLOSE_BRACE; optional_item_selection:
-// primary_expression OPEN_BRACE item_selector CLOSE_BRACE OPTIONAL;
 item_selector: expression;
 
-//field_access_expression: field_selection | implicit_target_field_selection| projection |
-// implicit_target_projection; field_selection: primary_expression field_selector;
 field_selector:
 	required_field_selector
 	| optional_field_selector;
@@ -123,7 +116,6 @@ required_field_selector: OPEN_BRACKET field_name CLOSE_BRACKET;
 optional_field_selector:
 	OPEN_BRACKET field_name CLOSE_BRACKET OPTIONAL;
 implicit_target_field_selection: field_selector;
-//projection: primary_expression required_projection | primary_expression optional_projection;
 required_projection:
 	OPEN_BRACKET required_selector_list CLOSE_BRACKET;
 optional_projection:
