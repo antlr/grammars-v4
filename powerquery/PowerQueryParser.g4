@@ -161,7 +161,7 @@ true_expression: expression;
 false_expression: expression;
 
 type_expression: primary_expression | TYPE primary_type;
-type: parenthesized_expression | primary_type;
+type_expr: parenthesized_expression | primary_type;
 primary_type:
 	primitive_type
 	| record_type
@@ -197,10 +197,10 @@ field_specification_list:
 field_specification:
 	OPTIONAL_TEXT? field_name field_type_specification?;
 field_type_specification: EQUALS field_type;
-field_type: type;
+field_type: type_expr;
 open_record_marker: ELLIPSES;
 list_type: OPEN_BRACE item_type CLOSE_BRACE;
-item_type: type;
+item_type: type_expr;
 function_type:
 	FUNCTION_START parameter_specification_list? CLOSE_PAREN return_type;
 parameter_specification_list:
@@ -219,7 +219,7 @@ optional_parameter_specification:
 parameter_specification: parameter_name parameter_type;
 table_type: TABLE row_type;
 row_type: OPEN_BRACKET field_specification_list CLOSE_BRACKET;
-nullable_type: NULLABLE type;
+nullable_type: NULLABLE type_expr;
 
 error_raising_expression: ERROR expression;
 error_handling_expression:
