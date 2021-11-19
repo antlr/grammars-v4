@@ -37,7 +37,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>start_rule</entryPoint>
+					<entryPoint>document</entryPoint>
 					<grammarName>PowerQuery</grammarName>
 					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<packageName></packageName>
