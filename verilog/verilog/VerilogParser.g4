@@ -1,11 +1,11 @@
 // Author: Mustafa Said Ağca
 // License: MIT
 
-/*parser*/ grammar VerilogParser;
-import VerilogLexer;
-/*options {
+parser grammar VerilogParser;
+
+options {
 	tokenVocab = VerilogLexer;
-}*/
+}
 /*
 // 17. System tasks and functions
 // 17.1 Display system tasks
