@@ -6,7 +6,7 @@ parser grammar VerilogParser;
 options {
 	tokenVocab = VerilogLexer;
 }
-/*
+
 // 17. System tasks and functions
 // 17.1 Display system tasks
 // 17.1.1 The display and write tasks
@@ -315,32 +315,14 @@ value_change_dump_definitions
 	;
 
 declaration_command
-	: declaration_keyword command_text? DOLLAR_END
+	: DECLARATION_KEYWORD COMMAND_TEXT? DOLLAR_END
 	;
 
 simulation_command
-	: simulation_keyword value_change* DOLLAR_END
-	| DOLLAR_COMMENT comment_text? DOLLAR_END
+	: SIMULATION_KEYWORD value_change* DOLLAR_END
+	| DOLLAR_COMMENT COMMENT_TEXT? DOLLAR_END
 	| simulation_time
 	| value_change
-	;
-
-declaration_keyword
-	: DOLLAR_COMMENT
-	| DOLLAR_DATE
-	| DOLLAR_ENDDEFINITIONS
-	| DOLLAR_SCOPE
-	| DOLLAR_TIMESCALE
-	| DOLLAR_UPSCOPE
-	| DOLLAR_VAR
-	| DOLLAR_VERSION
-	;
-
-simulation_keyword
-	: DOLLAR_DUMPALL
-	| DOLLAR_DUMPOFF
-	| DOLLAR_DUMPON
-	| DOLLAR_DUMPVARS
 	;
 
 simulation_time
@@ -352,29 +334,17 @@ value_change
 	| VECTOR_VALUE_CHANGE
 	;
 
-command_text
-	: VCD_TEXT
-	;
-
-comment_text
-	: VCD_TEXT
-	;
-
 // 18.2.3 Description of keyword commands
 // 18.2.3.1 $comment
 
 vcd_declaration_comment
-	: DOLLAR_COMMENT comment_text DOLLAR_END
+	: DOLLAR_COMMENT COMMENT_TEXT DOLLAR_END
 	;
 
 // 18.2.3.2 $date
 
 vcd_declaration_date
-	: DOLLAR_DATE date_text DOLLAR_END
-	;
-
-date_text
-	: VCD_TEXT
+	: DOLLAR_DATE DATE_TEXT DOLLAR_END
 	;
 
 // 18.2.3.3 $enddefinitions
@@ -416,7 +386,7 @@ vcd_declaration_upscope
 // 18.2.3.7 $var
 
 vcd_declaration_vars
-	: DOLLAR_VAR var_type size IDENTIFIER_CODE reference DOLLAR_END
+	: DOLLAR_VAR var_type size IDENTIFIER_CODE? reference DOLLAR_END
 	;
 
 var_type
@@ -473,7 +443,7 @@ vcd_declaration_version
 	;
 
 version_text
-	: VCD_TEXT
+	: version_identifier
 	;
 
 system_task
@@ -489,29 +459,25 @@ system_task
 // 18.2.3.9 $dumpall
 
 vcd_simulation_dumpall
-	: DOLLAR_DUMPALL value_changes* DOLLAR_END
-	;
-
-value_changes
-	: VCD_TEXT
+	: DOLLAR_DUMPALL VALUE_CHANGES* DOLLAR_END
 	;
 
 // 18.2.3.10 $dumpoff
 
 vcd_simulation_dumpoff
-	: DOLLAR_DUMPOFF value_changes* DOLLAR_END
+	: DOLLAR_DUMPOFF VALUE_CHANGES* DOLLAR_END
 	;
 
 // 18.2.3.11 $dumpon
 
 vcd_simulation_dumpon
-	: DOLLAR_DUMPON value_changes* DOLLAR_END
+	: DOLLAR_DUMPON VALUE_CHANGES* DOLLAR_END
 	;
 
 // 18.2.3.12 $dumpvars
 
 vcd_simulation_dumpvars
-	: DOLLAR_DUMPVARS value_changes* DOLLAR_END
+	: DOLLAR_DUMPVARS VALUE_CHANGES* DOLLAR_END
 	;
 
 // 18.3 Creating extended VCD file
@@ -643,49 +609,27 @@ undefine_compiler_directive
 // 19.4 `ifdef, `else, `elsif, `endif , `ifndef
 
 ifdef_directive
-	: GRAVE_IFDEF text_macro_identifier ifdef_group_of_lines (GRAVE_ELSIF text_macro_identifier elsif_group_of_lines)* (ELSE else_group_of_lines)? GRAVE_ENDIF
+	: GRAVE_IFDEF text_macro_identifier ifdef_group_of_lines (GRAVE_ELSIF text_macro_identifier elsif_group_of_lines)* (GRAVE_ELSE else_group_of_lines)? GRAVE_ENDIF
 	;
 
 ifndef_directive
-	: GRAVE_IFNDEF text_macro_identifier ifndef_group_of_lines (GRAVE_ELSIF text_macro_identifier elsif_group_of_lines)* (ELSE else_group_of_lines)? GRAVE_ENDIF
+	: GRAVE_IFNDEF text_macro_identifier ifndef_group_of_lines (GRAVE_ELSIF text_macro_identifier elsif_group_of_lines)* (GRAVE_ELSE else_group_of_lines)? GRAVE_ENDIF
 	;
 
 ifdef_group_of_lines
-	: group_of_lines
+	: MACRO_TEXT
 	;
 
 ifndef_group_of_lines
-	: group_of_lines
+	: MACRO_TEXT
 	;
 
 elsif_group_of_lines
-	: group_of_lines
+	: MACRO_TEXT
 	;
 
 else_group_of_lines
-	: group_of_lines
-	;
-
-group_of_lines
-	: non_port_module_item
-	| statement
-	| celldefine_compiler_directive
-	| endcelldefine_compiler_directive
-	| default_nettype_compiler_directive
-	| text_macro_definition
-	| text_macro_usage
-	| undefine_compiler_directive
-	| ifdef_directive
-	| ifndef_directive
-	| include_compiler_directive
-	| resetall_compiler_directive
-	| line_compiler_directive
-	| timescale_compiler_directive
-	| unconnected_drive_compiler_directive
-	| nounconnected_drive_compiler_directive
-	| pragma
-	| keywords_directive
-	| endkeywords_directive
+	: MACRO_TEXT
 	;
 
 // 19.5 `include
@@ -779,7 +723,7 @@ library_declaration
 include_statement
 	: INCLUDE FILE_PATH_SPEC SEMICOLON
 	;
-*/
+
 // A.1.2 Verilog source text
 // START SYMBOL
 source_text
@@ -1512,7 +1456,7 @@ generate_block_or_null
 	: generate_block
 	| SEMICOLON
 	;
-/*
+
 // A.5 UDP declaration and instantiation
 // A.5.1 UDP declaration
 
@@ -1617,7 +1561,7 @@ udp_instance
 name_of_udp_instance
 	: udp_instance_identifier range_?
 	;
-*/
+
 // A.6 Behavioral statements
 // A.6.1 Continuous assignment statements
 
@@ -1984,7 +1928,7 @@ polarity_operator
 	: PLUS
 	| MINUS
 	;
-/*
+
 // A.7.5 System timing checks
 // A.7.5.1 System timing check commands
 
@@ -2144,7 +2088,7 @@ scalar_timing_check_condition
 	: TILDE? expression
 	| expression (DOUBLE_EQUAL | TRIPLE_EQUAL | EXCLAMATION_MARK_EQUAL | EXCLAMATION_MARK_DOUBLE_EQUAL) SCALAR_CONSTANT
 	;
-*/
+
 // A.8 Expressions
 // A.8.1 Concatenations
 
@@ -2566,5 +2510,9 @@ udp_instance_identifier
 	;
 
 variable_identifier
+	: identifier
+	;
+
+version_identifier
 	: identifier
 	;
