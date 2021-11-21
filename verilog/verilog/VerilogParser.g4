@@ -32,6 +32,7 @@ list_of_arguments
 
 argument
 	: expression
+	| constant_expression
 	;
 
 // 17.1.2 Strobed monitoring
@@ -163,6 +164,21 @@ realtime_function
 	: REALTIME
 	;
 
+// 17.8 Conversion functions
+
+conversion_functions
+	: conversion_function_name LEFT_PARENTHESIS argument RIGHT_PARENTHESIS
+	;
+
+conversion_function_name
+	: DOLLAR_RTOI
+	| DOLLAR_ITOR
+	| DOLLAR_REALTOBITS
+	| DOLLAR_BITSTOREAL
+	| DOLLAR_SIGNED
+	| DOLLAR_UNSIGNED
+	;
+
 // 17.9 Probabilistic distribution functions
 // 17.9.1 $random function
 
@@ -212,17 +228,22 @@ k_stage
 
 // 17.11 Math functions
 
-single_argument_math_function
-	: single_argument_math_function_identifier LEFT_PARENTHESIS argument RIGHT_PARENTHESIS
+math_functions
+	: integer_math_functions
+	| real_math_functions
 	;
 
-two_argument_math_function
-	: two_argument_math_function_identifier LEFT_PARENTHESIS argument COMMA argument RIGHT_PARENTHESIS
+integer_math_functions
+	: DOLLAR_CLOG2 LEFT_PARENTHESIS argument RIGHT_PARENTHESIS
 	;
 
-single_argument_math_function_identifier
-	: DOLLAR_CLOG2
-	| DOLLAR_LN
+real_math_functions
+	: single_argument_real_math_function_name LEFT_PARENTHESIS argument RIGHT_PARENTHESIS
+	| double_argument_real_math_function_name LEFT_PARENTHESIS argument COMMA argument RIGHT_PARENTHESIS
+	;
+
+single_argument_real_math_function_name
+	: DOLLAR_LN
 	| DOLLAR_LOG10
 	| DOLLAR_EXP
 	| DOLLAR_SQRT
@@ -242,244 +263,13 @@ single_argument_math_function_identifier
 	| DOLLAR_ATANH
 	;
 
-two_argument_math_function_identifier
+double_argument_real_math_function_name
 	: DOLLAR_POW
 	| DOLLAR_ATAN2
 	| DOLLAR_HYPOT
 	;
 
 // 18. Value change dump (VCD) files
-// 18.1 Creating four-state VCD file
-
-dumpfile_task
-	: DOLLAR_DUMPFILE LEFT_PARENTHESIS filename RIGHT_PARENTHESIS SEMICOLON
-	;
-
-// 18.1.2 Specifying variables to be dumped ($dumpvars)
-
-dumpvars_task
-	: DOLLAR_DUMPVARS SEMICOLON
-	| DOLLAR_DUMPVARS LEFT_PARENTHESIS levels (COMMA list_of_modules_or_variables)? RIGHT_PARENTHESIS SEMICOLON
-	;
-
-list_of_modules_or_variables
-	: module_or_variable (COMMA module_or_variable)*
-	;
-
-module_or_variable
-	: module_identifier
-	| variable_identifier
-	;
-
-levels
-	: UNSIGNED_NUMBER
-	;
-
-// 18.1.3 Stopping and resuming the dump ($dumpoff/$dumpon)
-
-dumpoff_task
-	: DOLLAR_DUMPOFF SEMICOLON
-	;
-
-dumpon_task
-	: DOLLAR_DUMPON SEMICOLON
-	;
-
-// 18.1.4 Generating a checkpoint ($dumpall)
-
-dumpall_task
-	: DOLLAR_DUMPALL SEMICOLON
-	;
-
-// 18.1.5 Limiting size of dump file ($dumplimit)
-
-dumplimit_task
-	: DOLLAR_DUMPLIMIT LEFT_PARENTHESIS filesize RIGHT_PARENTHESIS SEMICOLON
-	;
-
-filesize
-	: UNSIGNED_NUMBER
-	;
-
-// 18.1.6 Reading dump file during simulation ($dumpflush)
-
-dumpflush_task
-	: DOLLAR_DUMPFLUSH SEMICOLON
-	;
-
-// 18.2 Format of four-state VCD file
-// 18.2.1 Syntax of four-state VCD file
-
-value_change_dump_definitions
-	: declaration_command* simulation_command*
-	;
-
-declaration_command
-	: DECLARATION_KEYWORD COMMAND_TEXT? DOLLAR_END
-	;
-
-simulation_command
-	: SIMULATION_KEYWORD value_change* DOLLAR_END
-	| DOLLAR_COMMENT COMMENT_TEXT? DOLLAR_END
-	| simulation_time
-	| value_change
-	;
-
-simulation_time
-	: HASH DECIMAL_NUMBER
-	;
-
-value_change
-	: SCALAR_VALUE_CHANGE
-	| VECTOR_VALUE_CHANGE
-	;
-
-// 18.2.3 Description of keyword commands
-// 18.2.3.1 $comment
-
-vcd_declaration_comment
-	: DOLLAR_COMMENT COMMENT_TEXT DOLLAR_END
-	;
-
-// 18.2.3.2 $date
-
-vcd_declaration_date
-	: DOLLAR_DATE DATE_TEXT DOLLAR_END
-	;
-
-// 18.2.3.3 $enddefinitions
-
-vcd_declaration_enddefinitions
-	: DOLLAR_ENDDEFINITIONS DOLLAR_END
-	;
-
-// 18.2.3.4 $scope
-
-vcd_declaration_scope
-	: DOLLAR_SCOPE scope_type scope_identifier DOLLAR_END
-	;
-
-scope_type
-	: BEGIN
-	| FORK
-	| FUNCTION
-	| MODULE
-	| TASK
-	;
-
-scope_identifier
-	: identifier
-	;
-
-// 18.2.3.5 $timescale
-
-vcd_declaration_timescale
-	: DOLLAR_TIMESCALE TIME_LITERAL DOLLAR_END
-	;
-
-// 18.2.3.6 $upscope
-
-vcd_declaration_upscope
-	: DOLLAR_UPSCOPE DOLLAR_END
-	;
-
-// 18.2.3.7 $var
-
-vcd_declaration_vars
-	: DOLLAR_VAR var_type size IDENTIFIER_CODE? reference DOLLAR_END
-	;
-
-var_type
-	: EVENT
-	| INTEGER
-	| PARAMETER
-	| REAL
-	| REALTIME
-	| REG
-	| SUPPLY0
-	| SUPPLY1
-	| TIME
-	| TRI
-	| TRIAND
-	| TRIOR
-	| TRIREG
-	| TRI0
-	| TRI1
-	| WAND
-	| WIRE
-	| WOR
-	;
-
-size
-	: DECIMAL_NUMBER
-	;
-
-reference
-	: identifier
-	| identifier LEFT_BRACKET bit_select_index RIGHT_BRACKET
-	| identifier LEFT_BRACKET msb_index COLON lsb_index RIGHT_BRACKET
-	;
-
-bit_select_index
-	: index
-	;
-
-msb_index
-	: index
-	;
-
-lsb_index
-	: index
-	;
-
-index
-	: DECIMAL_NUMBER
-	;
-
-// 18.2.3.8 $version
-
-vcd_declaration_version
-	: DOLLAR_VERSION version_text system_task DOLLAR_END
-	;
-
-version_text
-	: version_identifier
-	;
-
-system_task
-	: dumpfile_task
-	| dumpvars_task
-	| dumpoff_task
-	| dumpon_task
-	| dumpall_task
-	| dumplimit_task
-	| dumpflush_task
-	;
-
-// 18.2.3.9 $dumpall
-
-vcd_simulation_dumpall
-	: DOLLAR_DUMPALL VALUE_CHANGES* DOLLAR_END
-	;
-
-// 18.2.3.10 $dumpoff
-
-vcd_simulation_dumpoff
-	: DOLLAR_DUMPOFF VALUE_CHANGES* DOLLAR_END
-	;
-
-// 18.2.3.11 $dumpon
-
-vcd_simulation_dumpon
-	: DOLLAR_DUMPON VALUE_CHANGES* DOLLAR_END
-	;
-
-// 18.2.3.12 $dumpvars
-
-vcd_simulation_dumpvars
-	: DOLLAR_DUMPVARS VALUE_CHANGES* DOLLAR_END
-	;
-
 // 18.3 Creating extended VCD file
 // 18.3.1 Specifying dump file name and ports to be dumped ($dumpports)
 
@@ -514,7 +304,11 @@ dumpportsall_task
 // 18.3.4 Limiting size of dump file ($dumpportslimit)
 
 dumpportslimit_task
-	: DOLLAR_DUMPPORTSLIMIT LEFT_PARENTHESIS filesize COMMA file_pathname RIGHT_PARENTHESIS SEMICOLON
+	: DOLLAR_DUMPPORTSLIMIT LEFT_PARENTHESIS file_size COMMA file_pathname RIGHT_PARENTHESIS SEMICOLON
+	;
+
+file_size
+	: DECIMAL_NUMBER
 	;
 
 // 18.3.5 Reading dump file during simulation ($dumpportsflush)
@@ -523,184 +317,38 @@ dumpportsflush_task
 	: DOLLAR_DUMPPORTSFLUSH LEFT_PARENTHESIS file_pathname RIGHT_PARENTHESIS SEMICOLON
 	;
 
-// 18.3.6 Description of keyword commands
-// 18.3.6.1 $vcdclose
+// 18.4 Format of extended VCD file
+// 18.4.1 Syntax of extended VCD file
 
-vcdclose_task
-	: DOLLAR_VCDCLOSE final_simulation_time DOLLAR_END
+value_change_dump_definitions
+	: declaration_command* simulation_command*
 	;
 
-final_simulation_time
-	: HASH UNSIGNED_NUMBER
+declaration_command
+	: declaration_keyword COMMAND_TEXT? DOLLAR_END
 	;
 
-// 19. Compiler directives
-// 19.1 `celldefine and `endcelldefine
-
-celldefine_compiler_directive
-	: GRAVE_CELLDEFINE
+simulation_command
+	: simulation_keyword VALUE_CHANGE* DOLLAR_END
 	;
 
-endcelldefine_compiler_directive
-	: GRAVE_ENDCELLDEFINE
+declaration_keyword
+	: DOLLAR_COMMENT
+	| DOLLAR_DATE
+	| DOLLAR_ENDDEFINITIONS
+	| DOLLAR_SCOPE
+	| DOLLAR_TIMESCALE
+	| DOLLAR_UPSCOPE
+	| DOLLAR_VAR
+	| DOLLAR_VCDCLOSE
+	| DOLLAR_VERSION
 	;
 
-// 19.2 `default_nettype
-
-default_nettype_compiler_directive
-	: GRAVE_DEFAULT_NETTYPE default_nettype_value
-	;
-
-default_nettype_value
-	: WIRE
-	| TRI
-	| TRI0
-	| TRI1
-	| WAND
-	| TRIAND
-	| WOR
-	| TRIOR
-	| TRIREG
-	| UWIRE
-	| NONE
-	;
-
-// 19.3 `define and `undef
-// 19.3.1 `define
-
-text_macro_definition
-	: GRAVE_DEFINE text_macro_name macro_text
-	;
-
-text_macro_name
-	: text_macro_identifier (LEFT_PARENTHESIS list_of_formal_arguments RIGHT_PARENTHESIS)?
-	;
-
-macro_text
-	: MACRO_TEXT
-	;
-
-list_of_formal_arguments
-	: formal_argument_identifier (COMMA formal_argument_identifier)*
-	;
-
-formal_argument_identifier
-	: SIMPLE_IDENTIFIER
-	;
-
-text_macro_usage
-	: GRAVE_ACCENT text_macro_identifier (LEFT_PARENTHESIS list_of_actual_arguments RIGHT_PARENTHESIS)?
-	;
-
-list_of_actual_arguments
-	: actual_argument (COMMA actual_argument)*
-	;
-
-actual_argument
-	: expression
-	;
-
-// 19.3.2 `undef
-
-undefine_compiler_directive
-	: GRAVE_UNDEF text_macro_identifier
-	;
-
-// 19.4 `ifdef, `else, `elsif, `endif , `ifndef
-
-ifdef_directive
-	: GRAVE_IFDEF text_macro_identifier ifdef_group_of_lines (GRAVE_ELSIF text_macro_identifier elsif_group_of_lines)* (GRAVE_ELSE else_group_of_lines)? GRAVE_ENDIF
-	;
-
-ifndef_directive
-	: GRAVE_IFNDEF text_macro_identifier ifndef_group_of_lines (GRAVE_ELSIF text_macro_identifier elsif_group_of_lines)* (GRAVE_ELSE else_group_of_lines)? GRAVE_ENDIF
-	;
-
-ifdef_group_of_lines
-	: MACRO_TEXT
-	;
-
-ifndef_group_of_lines
-	: MACRO_TEXT
-	;
-
-elsif_group_of_lines
-	: MACRO_TEXT
-	;
-
-else_group_of_lines
-	: MACRO_TEXT
-	;
-
-// 19.5 `include
-
-include_compiler_directive
-	: INCLUDE DOUBLE_QUOTE filename DOUBLE_QUOTE
-	;
-
-// 19.6 `resetall
-
-resetall_compiler_directive
-	: GRAVE_RESETALL
-	;
-
-// 19.7 `line
-
-line_compiler_directive
-	: GRAVE_LINE number STRING LEVEL
-	;
-
-// 19.8 `timescale
-
-timescale_compiler_directive
-	: GRAVE_TIMESCALE TIME_LITERAL SLASH TIME_LITERAL
-	;
-
-// 19.9 `unconnected_drive and `nounconnected_drive
-
-unconnected_drive_compiler_directive
-	: GRAVE_UNCONNECTED_DRIVE (PULL0 | PULL1)
-	;
-
-nounconnected_drive_compiler_directive
-	: GRAVE_NOUNCONNECTED_DRIVE
-	;
-
-// 19.10 `pragma
-
-pragma
-	: GRAVE_PRAGMA pragma_name (pragma_expression (COMMA pragma_expression )*)?
-	;
-
-pragma_name
-	: SIMPLE_IDENTIFIER
-	;
-
-pragma_expression
-	: pragma_keyword
-	| pragma_keyword EQUAL pragma_value
-	| pragma_value
-	;
-
-pragma_value
-	: LEFT_PARENTHESIS pragma_expression (COMMA pragma_expression)* RIGHT_PARENTHESIS
-	| number
-	| STRING
-	| identifier
-	;
-
-pragma_keyword
-	: SIMPLE_IDENTIFIER
-	;
-
-// 19.11 `begin_keywords, `end_keywords
-
-keywords_directive
-	: GRAVE_BEGIN_KEYWORDS DOUBLE_QUOTE VERSION_SPECIFIER DOUBLE_QUOTE
-	;
-
-endkeywords_directive
-	: GRAVE_END_KEYWORDS
+simulation_keyword
+	: DOLLAR_DUMPPORTS
+	| DOLLAR_DUMPPORTSOFF
+	| DOLLAR_DUMPPORTSON
+	| DOLLAR_DUMPPORTSALL
 	;
 
 // A.1 Source text
@@ -1665,10 +1313,10 @@ disable_statement
 	;
 
 event_control
-	: AT_SIGN hierarchical_event_identifier
-	| AT_SIGN LEFT_PARENTHESIS event_expression RIGHT_PARENTHESIS
-	| AT_SIGN ASTERISK
-	| AT_SIGN LEFT_PARENTHESIS ASTERISK RIGHT_PARENTHESIS
+	: AT hierarchical_event_identifier
+	| AT LEFT_PARENTHESIS event_expression RIGHT_PARENTHESIS
+	| AT ASTERISK
+	| AT LEFT_PARENTHESIS ASTERISK RIGHT_PARENTHESIS
 	;
 
 event_trigger
@@ -2493,10 +2141,6 @@ terminal_identifier
 	: identifier
 	;
 
-text_macro_identifier
-	: identifier
-	;
-
 topmodule_identifier
 	: identifier
 	;
@@ -2510,9 +2154,5 @@ udp_instance_identifier
 	;
 
 variable_identifier
-	: identifier
-	;
-
-version_identifier
 	: identifier
 	;

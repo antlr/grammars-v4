@@ -273,21 +273,21 @@ DOLLAR_DUMPALL : '$dumpall' ;
 DOLLAR_DUMPLIMIT : '$dumplimit' ;
 DOLLAR_DUMPFLUSH : '$dumpflush' ;
 DOLLAR_END : '$end' -> mode(DEFAULT_MODE) ;
-DOLLAR_COMMENT : '$comment' ;
-DOLLAR_DATE : '$date' ;
-DOLLAR_ENDDEFINITIONS : '$enddefinitions' ;
-DOLLAR_SCOPE : '$scope' ;
-DOLLAR_TIMESCALE : '$timescale' ;
-DOLLAR_UPSCOPE : '$upscope' ;
-DOLLAR_VAR : '$var' ;
-DOLLAR_VERSION : '$version' ;
-DOLLAR_DUMPPORTS : '$dumpports' ;
-DOLLAR_DUMPPORTSOFF : '$dumpportsoff' ;
-DOLLAR_DUMPPORTSON : '$dumpportson' ;
-DOLLAR_DUMPPORTSALL : '$dumpportsall' ;
+DOLLAR_COMMENT : '$comment' -> mode(VCD_MODE) ;
+DOLLAR_DATE : '$date' -> mode(VCD_MODE) ;
+DOLLAR_ENDDEFINITIONS : '$enddefinitions' -> mode(VCD_MODE) ;
+DOLLAR_SCOPE : '$scope' -> mode(VCD_MODE) ;
+DOLLAR_TIMESCALE : '$timescale' -> mode(VCD_MODE) ;
+DOLLAR_UPSCOPE : '$upscope' -> mode(VCD_MODE) ;
+DOLLAR_VAR : '$var' -> mode(VCD_MODE) ;
+DOLLAR_VERSION : '$version' -> mode(VCD_MODE) ;
+DOLLAR_DUMPPORTS : '$dumpports' -> mode(VCD_MODE) ;
+DOLLAR_DUMPPORTSOFF : '$dumpportsoff' -> mode(VCD_MODE) ;
+DOLLAR_DUMPPORTSON : '$dumpportson' -> mode(VCD_MODE) ;
+DOLLAR_DUMPPORTSALL : '$dumpportsall' -> mode(VCD_MODE) ;
 DOLLAR_DUMPPORTSLIMIT : '$dumpportslimit' ;
 DOLLAR_DUMPPORTSFLUSH : '$dumpportsflush' ;
-DOLLAR_VCDCLOSE : '$vcdclose' ;
+DOLLAR_VCDCLOSE : '$vcdclose' -> mode(VCD_MODE) ;
 
 // System timing check commands
 
@@ -309,14 +309,14 @@ DOLLAR_NOCHANGE : '$nochange' ;
 GRAVE_BEGIN_KEYWORDS : '`begin_keywords' ;
 GRAVE_CELLDEFINE : '`celldefine' ;
 GRAVE_DEFAULT_NETTYPE : '`default_nettype' ;
-GRAVE_DEFINE : '`define' -> mode(TEXT_MACRO_MODE) ;
-GRAVE_ELSE : '`else' -> mode(TEXT_MACRO_MODE) ;
-GRAVE_ELSIF : '`elsif' -> mode(TEXT_MACRO_MODE) ;
+GRAVE_DEFINE : '`define' -> mode(DEFINE_DIRECTIVE_MODE) ;
+GRAVE_ELSE : '`else' -> mode(CONDITIONAL_DIRECTIVE_MODE) ;
+GRAVE_ELSIF : '`elsif' -> mode(CONDITIONAL_DIRECTIVE_MODE) ;
 GRAVE_END_KEYWORDS : '`end_keywords' ;
 GRAVE_ENDCELLDEFINE : '`endcelldefine' ;
 GRAVE_ENDIF : '`endif' -> mode(DEFAULT_MODE) ;
-GRAVE_IFDEF : '`ifdef' -> mode(TEXT_MACRO_MODE) ;
-GRAVE_IFNDEF : '`ifndef' -> mode(TEXT_MACRO_MODE) ;
+GRAVE_IFDEF : '`ifdef' -> mode(CONDITIONAL_DIRECTIVE_MODE) ;
+GRAVE_IFNDEF : '`ifndef' -> mode(CONDITIONAL_DIRECTIVE_MODE) ;
 GRAVE_INCLUDE : '`include' ;
 GRAVE_LINE : '`line' -> mode(LINE_DIRECTIVE_MODE) ;
 GRAVE_NOUNCONNECTED_DRIVE : '`nounconnected_drive' ;
@@ -439,9 +439,9 @@ SEMICOLON : ';' -> mode(DEFAULT_MODE) ;
 SLASH : '/' ;
 EQUAL : '=' ;
 QUESTION_MARK : '?' ;
-AT_SIGN : '@' ;
+AT : '@' ;
 HASH : '#' ;
-GRAVE_ACCENT : '`' ;
+GRAVE_ACCENT : '`' -> mode(MACRO_USAGE_MODE) ;
 PLUS_COLON : '+:' ;
 MINUS_COLON : '-:' ;
 MINUS_GREATER_THAN : '->' ;
@@ -449,13 +449,12 @@ EQUAL_GREATER_THAN : '=>' ;
 ASTERISK_GREATER_THAN : '*>' ;
 TRIPLE_AMPERSAND : '&&&' ;
 
-// 18.2.1 Syntax of four-state VCD file
-DECLARATION_KEYWORD : (DOLLAR_COMMENT | DOLLAR_DATE | DOLLAR_ENDDEFINITIONS | DOLLAR_SCOPE | DOLLAR_TIMESCALE | DOLLAR_UPSCOPE | DOLLAR_VAR | DOLLAR_VERSION) -> mode(DECLARATION_KEYWORD_MODE) ;
-SIMULATION_KEYWORD : (DOLLAR_DUMPALL | DOLLAR_DUMPOFF | DOLLAR_DUMPON | DOLLAR_DUMPVARS) -> mode(SIMULATION_KEYWORD_MODE) ;
 // 19.2 `default_nettype
 NONE : 'none' ;
+// 19.8 `timescale
+TIME_LITERAL : TIME_NUMBER TIME_UNIT ;
 // 19.11 `begin_keywords, `end_keywords
-VERSION_SPECIFIER : '1364-1995' | '1364-2001' | '1364-2001-noconfig' | '1364-2005' ;
+VERSION_SPECIFIER : VERSION_IDENTIFIER ;
 // A.1.1 Library source text
 MINUS_INCDIR : '-incdir' ;
 // A.2.4 Declaration assignments
@@ -469,14 +468,23 @@ mode SIMULATION_CONTROL_TASK_MODE;
 // 17.4 Simulation control system tasks
 FINISH_NUMBER : [0-2] ;
 
-mode DECLARATION_KEYWORD_MODE;
-// 18.2.1 Syntax of four-state VCD file
-COMMAND_TEXT : ASCII_ANY+ ;
-// 18.2.3.1 $comment
-COMMENT_TEXT : ASCII_ANY+ ;
+mode VCD_MODE;
+// 18.4 Format of extended VCD file
+COMMAND_TEXT : COMMENT_TEXT | CLOSE_TEXT | DATE_SECTION | SCOPE_SECTION | TIMESCALE_SECTION | VAR_SECTION | VERSION_SECTION ;
+fragment SIMULATION_TIME : HASH DECIMAL_NUMBER ;
+VALUE_CHANGE : VALUE IDENTIFIER_CODE ;
+fragment VALUE : PORT_VALUE | STRENGTH_COMPONENT ;
+fragment PORT_VALUE : INPUT_VALUE | OUTPUT_VALUE | UNKNOWN_DIRECTION_VALUE ;
+fragment INPUT_VALUE : [dDNuUZ] ;
+fragment OUTPUT_VALUE : [HlLTX] ;
+fragment UNKNOWN_DIRECTION_VALUE : [01?aAbBcCfF] ;
+fragment STRENGTH_COMPONENT : [0-7] ;
+fragment IDENTIFIER_CODE : IDENTIFIER ;
+fragment COMMENT_TEXT : ASCII_ANY+ ;
 fragment ASCII_ANY : [\u0000-\u007f] ;
-// 18.2.3.2 $date
-DATE_TEXT : (DAY MONTH COMMA? YEAR | YEAR COMMA? MONTH DAY | MONTH DAY COMMA? YEAR) HOUR COLON MINUTE COLON SECOND ;
+fragment CLOSE_TEXT : SIMULATION_TIME ;
+fragment DATE_SECTION : DATE_TEXT ;
+fragment DATE_TEXT : (DAY MONTH COMMA? YEAR | YEAR COMMA? MONTH DAY | MONTH DAY COMMA? YEAR) HOUR COLON MINUTE COLON SECOND ;
 fragment DAY : DECIMAL_DIGIT DECIMAL_DIGIT? ;
 fragment MONTH : MONTH_FULL | MONTH_ABBREVIATION ;
 fragment MONTH_FULL : 'January' | 'February' | 'March' | 'April' | 'May' | 'June' | 'July' | 'August' | 'September' | 'October' | 'November' | 'December';
@@ -485,27 +493,39 @@ fragment YEAR : DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT ;
 fragment HOUR : DECIMAL_DIGIT DECIMAL_DIGIT ;
 fragment MINUTE : DECIMAL_DIGIT DECIMAL_DIGIT ;
 fragment SECOND : DECIMAL_DIGIT DECIMAL_DIGIT ;
-// 18.2.3.5 $timescale
-TIME_LITERAL : TIME_NUMBER TIME_UNIT ;
+fragment SCOPE_SECTION : SCOPE_TYPE SCOPE_IDENTIFIER ;
+fragment SCOPE_TYPE : MODULE ;
+fragment SCOPE_IDENTIFIER : IDENTIFIER ;
+fragment TIMESCALE_SECTION : TIME_NUMBER TIME_UNIT ;
 fragment TIME_NUMBER : '1' | '10' | '100' ;
 fragment TIME_UNIT : [mnpf]? 's' ;
-// 18.2.3.7 $var
-IDENTIFIER_CODE : ASCII_PRINTABLE_EXCEPT_SPACE+ ;
+fragment VAR_SECTION : VAR_TYPE VAR_SIZE IDENTIFIER_CODE REFERENCE ;
+fragment VAR_TYPE : 'port' ;
+fragment VAR_SIZE : '1' | VECTOR_INDEX ;
+fragment VECTOR_INDEX : LEFT_BRACKET INDEX COLON INDEX RIGHT_BRACKET ;
+fragment INDEX : DECIMAL_NUMBER ;
+fragment REFERENCE : IDENTIFIER ;
+fragment IDENTIFIER : ASCII_PRINTABLE_EXCEPT_SPACE+ ;
+fragment VERSION_SECTION : VERSION_TEXT ;
+fragment VERSION_TEXT : VERSION_IDENTIFIER ;
+fragment VERSION_IDENTIFIER : '1364-1995' | '1364-2001' | '1364-2001-noconfig' | '1364-2005' ;
 
-mode SIMULATION_KEYWORD_MODE;
-// 18.2.1 Syntax of four-state VCD file
-SCALAR_VALUE_CHANGE : VALUE IDENTIFIER_CODE -> mode(DEFAULT_MODE) ;
-VECTOR_VALUE_CHANGE : ([bB] BINARY_NUMBER | [rR] REAL_NUMBER) IDENTIFIER_CODE -> mode(DEFAULT_MODE) ;
-VALUE_CHANGES : ASCII_PRINTABLE_EXCEPT_SPACE+ ;
-fragment VALUE : [01xXzZ] ;
+mode DEFINE_DIRECTIVE_MODE;
+// 19.3.1 `define
+MACRO_TEXT : TEXT ~'\\' NEWLINE -> mode(DEFAULT_MODE) ;
 
-mode TEXT_MACRO_MODE;
-// 19.3 `define and `undef
-MACRO_TEXT : TEXT ~'\\' NEWLINE ;
+mode MACRO_USAGE_MODE;
+// 19.3.1 `define
+LIST_OF_ACTUAL_ARGUMENTS : ACTUAL_ARGUMENT (COMMA ACTUAL_ARGUMENT)* -> mode(DEFAULT_MODE) ;
+fragment ACTUAL_ARGUMENT : TEXT ;
+
+mode CONDITIONAL_DIRECTIVE_MODE;
+// 19.4 `ifdef, `else, `elsif, `endif , `ifndef
+GROUP_OF_LINES : TEXT -> mode(DEFAULT_MODE) ;
 
 mode LINE_DIRECTIVE_MODE;
 // 19.7 `line
-LEVEL : [0-2] ;
+LEVEL : [0-2] -> mode(DEFAULT_MODE) ;
 
 mode LIBRARY_SOURCE_TEXT_MODE;
 // A.1.1 Library source text
