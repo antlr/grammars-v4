@@ -2162,7 +2162,7 @@ allow_or_disallow
 create_synonym
     // Synonym's schema cannot be specified for public synonyms
     : CREATE (OR REPLACE)? PUBLIC SYNONYM synonym_name FOR (schema_name PERIOD)? schema_object_name (AT_SIGN link_name)?
-    | CREATE (OR REPLACE)? SYNONYM (schema_name PERIOD)? synonym_name FOR (schema_name PERIOD)? schema_object_name (AT_SIGN link_name)?
+    | CREATE (OR REPLACE)? SYNONYM (schema_name PERIOD)? synonym_name FOR (schema_name PERIOD)? schema_object_name (AT_SIGN (schema_name PERIOD)? link_name)?
     ;
 
 comment_on_table
@@ -5460,6 +5460,7 @@ regular_id
    //|YMINTERVAL_UNCONSTRAINED
    | ZONE
    | SUM
+   | SECOND
    ;
 
 
