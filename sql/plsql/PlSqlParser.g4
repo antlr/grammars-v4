@@ -5459,6 +5459,7 @@ regular_id
    | YES
    //|YMINTERVAL_UNCONSTRAINED
    | ZONE
+   | SUM
    ;
 
 
