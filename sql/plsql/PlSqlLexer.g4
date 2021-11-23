@@ -1011,17 +1011,17 @@ MLSLABEL                                          :M L S L A B E L ;
 // Rule #358 <NATIONAL_CHAR_STRING_LIT> - subtoken typecast in <REGULAR_ID>, it also incorporates <character_representation>
 //  Lowercase 'n' is a usual addition to the standard
 
-NATIONAL_CHAR_STRING_LIT: 'N' '\'' (~('\'' | '\r' | '\n' ) | '\'' '\'' | NEWLINE)* '\'';
+NATIONAL_CHAR_STRING_LIT: ('N'|'n') '\'' (~('\'' | '\r' | '\n' ) | '\'' '\'' | NEWLINE)* '\'';
 
 //  Rule #040 <BIT_STRING_LIT> - subtoken typecast in <REGULAR_ID>
 //  Lowercase 'b' is a usual addition to the standard
 
-BIT_STRING_LIT: 'B' ('\'' [01]* '\'')+;
+BIT_STRING_LIT: ('B'|'b') ('\'' [01]* '\'')+;
 
 //  Rule #284 <HEX_STRING_LIT> - subtoken typecast in <REGULAR_ID>
 //  Lowercase 'x' is a usual addition to the standard
 
-HEX_STRING_LIT: 'X' ('\'' [A-F0-9]* '\'')+;
+HEX_STRING_LIT: ('X'|'x') ('\'' [A-F0-9]* '\'')+;
 DOUBLE_PERIOD:  '..';
 PERIOD:         '.';
 
@@ -1042,7 +1042,7 @@ PERIOD:         '.';
     ;*/
 
 UNSIGNED_INTEGER:    [0-9]+;
-APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT ('E' ('+'|'-')? (FLOAT_FRAGMENT | [0-9]+))? ('D' | 'F')?;
+APPROXIMATE_NUM_LIT: FLOAT_FRAGMENT (('E'|'e') ('+'|'-')? (FLOAT_FRAGMENT | [0-9]+))? ('D' | 'F' | 'd' | 'f')?;
 
 // Rule #--- <CHAR_STRING> is a base for Rule #065 <char_string_lit> , it incorporates <character_representation>
 // and a superfluous subtoken typecasting of the "QUOTE"
@@ -1050,7 +1050,7 @@ CHAR_STRING: '\''  (~('\'' | '\r' | '\n') | '\'' '\'' | NEWLINE)* '\'';
 
 // See https://livesql.oracle.com/apex/livesql/file/content_CIREYU9EA54EOKQ7LAMZKRF6P.html
 // TODO: context sensitive string quotes (any characted after quote)
-CHAR_STRING_PERL    : 'Q' '\'' (QS_ANGLE | QS_BRACE | QS_BRACK | QS_PAREN | QS_EXCLAM | QS_SHARP | QS_QUOTE | QS_DQUOTE) '\'' -> type(CHAR_STRING);
+CHAR_STRING_PERL    : ('Q'|'q') '\'' (QS_ANGLE | QS_BRACE | QS_BRACK | QS_PAREN | QS_EXCLAM | QS_SHARP | QS_QUOTE | QS_DQUOTE) '\'' -> type(CHAR_STRING);
 fragment QS_ANGLE   : '<' .*? '>';
 fragment QS_BRACE   : '{' .*? '}';
 fragment QS_BRACK   : '[' .*? ']';
@@ -1108,10 +1108,10 @@ INTRODUCER: '_';
 SINGLE_LINE_COMMENT: '--' ~('\r' | '\n')* NEWLINE_EOF                 -> channel(HIDDEN);
 MULTI_LINE_COMMENT:  '/*' .*? '*/'                                    -> channel(HIDDEN);
 // https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve034.htm#SQPUG054
-REMARK_COMMENT:      'REM' {self.IsNewlineAtPos(-4)}? 'ARK'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF -> channel(HIDDEN);
+REMARK_COMMENT:      (R E M) {self.IsNewlineAtPos(-4)}? (A R K)? (' ' ~('\r' | '\n')*)? NEWLINE_EOF -> channel(HIDDEN);
 
 // https://docs.oracle.com/cd/E11882_01/server.112/e16604/ch_twelve032.htm#SQPUG052
-PROMPT_MESSAGE:      'PRO' {self.IsNewlineAtPos(-4)}? 'MPT'? (' ' ~('\r' | '\n')*)? NEWLINE_EOF;
+PROMPT_MESSAGE:      (P R O) {self.IsNewlineAtPos(-4)}? (M P T)? (' ' ~('\r' | '\n')*)? NEWLINE_EOF;
 
 // TODO: should starts with newline
 START_CMD
