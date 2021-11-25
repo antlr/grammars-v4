@@ -1,8 +1,7 @@
 // Author: Mustafa Said Ağca
 // License: MIT
 
-grammar SystemVerilogParser;
-import SystemVerilogLexer;
+grammar SystemVerilog;
 
 // A.1 Source text
 // A.1.1 Library source text
@@ -25,6 +24,8 @@ library_declaration
 include_statement
 	: 'include' FILE_PATH_SPEC ';'
 	;
+
+FILE_PATH_SPEC : ([/~] | './') ~[ \r\t\n]*? ;
 */
 // A.1.2 SystemVerilog source text
 
@@ -207,10 +208,10 @@ ansi_port_declaration
 // A.1.4 Module items
 
 elaboration_system_task
-	: '$fatal' ('(' /*finish_number*/ (/*','*/ list_of_arguments)? ')')? ';'
-	| '$error' ('(' list_of_arguments? ')')? ';'
-	| '$warning' ('(' list_of_arguments? ')')? ';'
-	| '$info' ('(' list_of_arguments? ')')? ';'
+	: '$fatal' ('(' /*finish_number*/ (/*','*/ list_of_arguments) ')')? ';'
+	| '$error' ('(' list_of_arguments ')')? ';'
+	| '$warning' ('(' list_of_arguments ')')? ';'
+	| '$info' ('(' list_of_arguments ')')? ';'
 	;
 /*
 finish_number
@@ -459,7 +460,7 @@ class_method
 	;
 
 class_constructor_prototype
-	: 'function' 'new' ('(' tf_port_list? ')')? ';'
+	: 'function' 'new' ('(' tf_port_list ')')? ';'
 	;
 
 class_constraint
@@ -494,7 +495,7 @@ method_prototype
 	;
 
 class_constructor_declaration
-	: 'function' class_scope? 'new' ('(' tf_port_list? ')')? ';' block_item_declaration* ('super' '.' 'new' ('(' list_of_arguments ')')? ';')? function_statement_or_null* 'endfunction' (':' 'new')?
+	: 'function' class_scope? 'new' ('(' tf_port_list ')')? ';' block_item_declaration* ('super' '.' 'new' ('(' list_of_arguments ')')? ';')? function_statement_or_null* 'endfunction' (':' 'new')?
 	;
 
 // A.1.10 Constraints
@@ -1038,11 +1039,11 @@ function_declaration
 	;
 
 function_body_declaration
-	: function_data_type_or_implicit (interface_identifier '.' | class_scope)? function_identifier (';' tf_item_declaration* | '(' tf_port_list? ')' ';' block_item_declaration*) function_statement_or_null* 'endfunction' (':' function_identifier)?
+	: function_data_type_or_implicit (interface_identifier '.' | class_scope)? function_identifier (';' tf_item_declaration* | '(' tf_port_list ')' ';' block_item_declaration*) function_statement_or_null* 'endfunction' (':' function_identifier)?
 	;
 
 function_prototype 
-	: 'function' data_type_or_void function_identifier ('(' tf_port_list? ')')?
+	: 'function' data_type_or_void function_identifier ('(' tf_port_list ')')?
 	;
 
 dpi_import_export
@@ -1082,7 +1083,7 @@ task_declaration
 
 task_body_declaration
 	: (interface_identifier '.' | class_scope)? task_identifier ';' tf_item_declaration* statement_or_null* 'endtask' (':' task_identifier)?
-	| (interface_identifier '.' | class_scope)? task_identifier '(' tf_port_list? ')' ';' block_item_declaration* statement_or_null* 'endtask' (':' task_identifier)?
+	| (interface_identifier '.' | class_scope)? task_identifier '(' tf_port_list ')' ';' block_item_declaration* statement_or_null* 'endtask' (':' task_identifier)?
 	;
 
 tf_item_declaration
@@ -1108,7 +1109,7 @@ tf_port_declaration
 	;
 
 task_prototype
-	: 'task' task_identifier ('(' tf_port_list? ')')?
+	: 'task' task_identifier ('(' tf_port_list ')')?
 	;
 
 // A.2.8 Block item declarations
@@ -1203,11 +1204,12 @@ restrict_property_statement
 	;
 
 property_instance
-	: ps_or_hierarchical_property_identifier ('(' property_list_of_arguments? ')')?
+	: ps_or_hierarchical_property_identifier ('(' property_list_of_arguments ')')?
 	;
 
 property_list_of_arguments
-	: (property_actual_arg? (',' property_actual_arg?)* | '.' identifier '(' property_actual_arg? ')') (',' '.' identifier '(' property_actual_arg? ')')*
+	: property_actual_arg? (',' property_actual_arg?)* (',' '.' identifier '(' property_actual_arg? ')')*
+	| '.' identifier '(' property_actual_arg? ')' (',' '.' identifier '(' property_actual_arg? ')')*
 	;
 
 property_actual_arg
@@ -1320,7 +1322,7 @@ sequence_match_item
 	;
 
 sequence_instance
-	: ps_or_hierarchical_sequence_identifier ('(' sequence_list_of_arguments? ')')?
+	: ps_or_hierarchical_sequence_identifier ('(' sequence_list_of_arguments ')')?
 	;
 
 sequence_list_of_arguments
@@ -1375,7 +1377,7 @@ assertion_variable_declaration
 // A.2.11 Covergroup declarations
 
 covergroup_declaration
-	: 'covergroup' covergroup_identifier ('(' tf_port_list? ')')? coverage_event? ';' coverage_spec_or_option* 'endgroup' (':' covergroup_identifier)?
+	: 'covergroup' covergroup_identifier ('(' tf_port_list ')')? coverage_event? ';' coverage_spec_or_option* 'endgroup' (':' covergroup_identifier)?
 	;
 
 coverage_spec_or_option
@@ -1394,7 +1396,7 @@ coverage_spec
 
 coverage_event
 	: clocking_event
-	| 'with' 'function' 'sample' '(' tf_port_list? ')'
+	| 'with' 'function' 'sample' '(' tf_port_list ')'
 	| '@@' '(' block_event_expression ')'
 	;
 
@@ -1411,7 +1413,7 @@ hierarchical_btf_identifier
 	;
 
 cover_point
-	: (data_type_or_implicit? cover_point_identifier ':')? 'coverpoint' expression ('iff' '(' expression ')')? bins_or_empty
+	: (data_type_or_implicit cover_point_identifier ':')? 'coverpoint' expression ('iff' '(' expression ')')? bins_or_empty
 	;
 
 bins_or_empty
@@ -1557,12 +1559,12 @@ let_formal_type
 	;
 
 let_expression
-	: package_scope? let_identifier ('(' let_list_of_arguments? ')')?
+	: package_scope? let_identifier ('(' let_list_of_arguments ')')?
 	;
 
 let_list_of_arguments
 	: let_actual_arg? (',' let_actual_arg?)* (',' '.' identifier '(' let_actual_arg? ')')*
-	| '.' identifier '(' let_actual_arg? ')' (',' '.' identifier '(' let_actual_arg? ')')*
+	| ('.' identifier '(' let_actual_arg? ')' (',' '.' identifier '(' let_actual_arg? ')')*)?
 	;
 
 let_actual_arg
@@ -1727,7 +1729,7 @@ named_parameter_assignment
 	;
 
 hierarchical_instance
-	: name_of_instance '(' list_of_port_connections? ')'
+	: name_of_instance '(' list_of_port_connections ')'
 	;
 
 name_of_instance
@@ -1744,7 +1746,7 @@ ordered_port_connection
 	;
 
 named_port_connection
-	: attribute_instance* '.' port_identifier ('(' expression? ')')?
+	: attribute_instance* ('.' port_identifier ('(' expression? ')')?)?
 	| attribute_instance* '.*'
 	;
 
@@ -1763,7 +1765,7 @@ program_instantiation
 // A.4.1.4 Checker instantiation
 
 checker_instantiation
-	: ps_checker_identifier name_of_instance '(' list_of_checker_port_connections? ')' ';'
+	: ps_checker_identifier name_of_instance '(' list_of_checker_port_connections ')' ';'
 	;
 
 list_of_checker_port_connections
@@ -1776,7 +1778,7 @@ ordered_checker_port_connection
 	;
 
 named_checker_port_connection
-	: attribute_instance* '.' formal_port_identifier ('(' property_actual_arg? ')')?
+	: attribute_instance* ('.' formal_port_identifier ('(' property_actual_arg? ')')?)?
 	| attribute_instance* '.*'
 	;
 
@@ -3206,6 +3208,10 @@ primary_literal
 	| STRING_LITERAL
 	;
 
+TIME_LITERAL : TIME_NUMBER TIME_UNIT ;
+fragment TIME_NUMBER : '1' | '10' | '100' ;
+fragment TIME_UNIT : [mnpf]? 's' ;
+
 implicit_class_handle
 	: 'this' ('.' 'super')?
 	| 'super'
@@ -3352,6 +3358,37 @@ number
 	| REAL_NUMBER
 	;
 
+REAL_NUMBER : UNSIGNED_NUMBER '.' UNSIGNED_NUMBER | UNSIGNED_NUMBER ('.' UNSIGNED_NUMBER)? EXP SIGN? UNSIGNED_NUMBER ;
+fragment EXP : [eE] ;
+DECIMAL_NUMBER : UNSIGNED_NUMBER | SIZE? DECIMAL_BASE DECIMAL_VALUE ;
+BINARY_NUMBER : SIZE? BINARY_BASE BINARY_VALUE ;
+OCTAL_NUMBER : SIZE? OCTAL_BASE OCTAL_VALUE ;
+HEX_NUMBER : SIZE? HEX_BASE HEX_VALUE ;
+fragment SIGN : [-+] ;
+fragment SIZE : NON_ZERO_UNSIGNED_NUMBER ;
+fragment NON_ZERO_UNSIGNED_NUMBER : NON_ZERO_DECIMAL_DIGIT ('_' | DECIMAL_DIGIT)* ;
+UNSIGNED_NUMBER : DECIMAL_DIGIT ('_' | DECIMAL_DIGIT)* ;
+fragment DECIMAL_VALUE : UNSIGNED_NUMBER | (X_DIGIT | Z_DIGIT) '_'* ;
+fragment BINARY_VALUE : BINARY_DIGIT ('_' | BINARY_DIGIT)* ;
+fragment OCTAL_VALUE : OCTAL_DIGIT ('_' | OCTAL_DIGIT)* ;
+fragment HEX_VALUE : HEX_DIGIT ('_' | HEX_DIGIT)* ;
+fragment DECIMAL_BASE : '\'' [sS]? [dD] ;
+fragment BINARY_BASE : '\'' [sS]? [bB] ;
+fragment OCTAL_BASE : '\'' [sS]? [oO] ;
+fragment HEX_BASE : '\'' [sS]? [hH] ;
+fragment NON_ZERO_DECIMAL_DIGIT : [1-9] ;
+fragment DECIMAL_DIGIT : [0-9] ;
+fragment BINARY_DIGIT : X_DIGIT | Z_DIGIT | [01] ;
+fragment OCTAL_DIGIT : X_DIGIT | Z_DIGIT | [0-7] ;
+fragment HEX_DIGIT : X_DIGIT | Z_DIGIT | [0-9a-fA-F] ;
+fragment X_DIGIT : [xX] ;
+fragment Z_DIGIT : [zZ?] ;
+//UNBASED_UNSIZED_LITERAL : '\'' [01xXzZ] ;
+
+// A.8.8 Strings
+
+STRING_LITERAL : '"' ~["\r\n]* '"' ;
+
 // A.9 General
 // A.9.1 Attributes
 
@@ -3366,6 +3403,13 @@ attr_spec
 attr_name
 	: identifier
 	;
+
+// A.9.2 Comments
+
+ONE_LINE_COMMENT : '//' COMMENT_TEXT NEWLINE -> channel(HIDDEN) ;
+BLOCK_COMMENT : '/*' COMMENT_TEXT '*/' -> channel(HIDDEN) ;
+fragment COMMENT_TEXT : .*? ;
+fragment NEWLINE : CARRIAGE_RETURN? LINE_FEED ;
 
 // A.9.3 Identifiers
 
@@ -3670,3 +3714,18 @@ type_identifier
 variable_identifier
 	: identifier
 	;
+
+ESCAPED_IDENTIFIER : '\\' ASCII_PRINTABLE_EXCEPT_SPACE+ WHITE_SPACE ;
+SIMPLE_IDENTIFIER : (LETTER | '_') (LETTER | '_' | DECIMAL_DIGIT | '$')* ;
+SYSTEM_TF_IDENTIFIER : '$' (LETTER | '_' | DECIMAL_DIGIT | '$') (LETTER | '_' | DECIMAL_DIGIT | '$')* ;
+fragment ASCII_PRINTABLE_EXCEPT_SPACE : [\u0021-\u007e] ;
+fragment LETTER : [a-zA-Z] ;
+
+// A.9.4 White space
+
+WHITE_SPACE_REGION : WHITE_SPACE+ -> channel(HIDDEN) ;
+fragment WHITE_SPACE : SPACE | TAB | CARRIAGE_RETURN | LINE_FEED ;
+fragment SPACE : ' ' ;
+fragment TAB : '\t' ;
+fragment CARRIAGE_RETURN : '\r' ;
+fragment LINE_FEED : '\n' ;
