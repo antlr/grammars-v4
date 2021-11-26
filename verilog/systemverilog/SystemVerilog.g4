@@ -1,8 +1,8 @@
 // Author: Mustafa Said Ağca
 // License: MIT
 
-grammar SystemVerilogParser;
-import SystemVerilogLexer;
+grammar SystemVerilog;
+import Includes;
 
 // A.1.1 Library source text
 

@@ -1,7 +1,7 @@
 // Author: Mustafa Said Ağca
 // License: MIT
 
-lexer grammar SystemVerilogLexer;
+grammar Includes;
 
 // 22. Compiler directives
 
