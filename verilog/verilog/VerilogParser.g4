@@ -6,7 +6,7 @@ parser grammar VerilogParser;
 options {
 	tokenVocab = VerilogLexer;
 }
-
+/*
 // 17. System tasks and functions
 // 17.1 Display system tasks
 // 17.1.1 The display and write tasks
@@ -350,10 +350,10 @@ simulation_keyword
 	| DOLLAR_DUMPPORTSON
 	| DOLLAR_DUMPPORTSALL
 	;
-
+*/
 // A.1 Source text
 // A.1.1 Library source text
-
+/*
 library_text
 	: library_description*
 	;
@@ -371,7 +371,7 @@ library_declaration
 include_statement
 	: INCLUDE FILE_PATH_SPEC SEMICOLON
 	;
-
+*/
 // A.1.2 Verilog source text
 // START SYMBOL
 source_text
@@ -1107,14 +1107,14 @@ generate_block_or_null
 
 // A.5 UDP declaration and instantiation
 // A.5.1 UDP declaration
-
+/*
 udp_declaration
 	: attribute_instance* PRIMITIVE udp_identifier LEFT_PARENTHESIS udp_port_list RIGHT_PARENTHESIS SEMICOLON udp_port_declaration udp_port_declaration* udp_body ENDPRIMITIVE
 	| attribute_instance* PRIMITIVE udp_identifier LEFT_PARENTHESIS udp_declaration_port_list RIGHT_PARENTHESIS SEMICOLON udp_body ENDPRIMITIVE
 	;
-
+*/
 // A.5.2 UDP ports
-
+/*
 udp_port_list
 	: output_port_identifier COMMA input_port_identifier (COMMA input_port_identifier)*
 	;
@@ -1141,9 +1141,9 @@ udp_input_declaration
 udp_reg_declaration
 	: attribute_instance* REG variable_identifier
 	;
-
+*/
 // A.5.3 UDP body
-
+/*
 udp_body
 	: combinational_body
 	| sequential_body
@@ -1195,9 +1195,9 @@ next_state
 	: OUTPUT_SYMBOL
 	| MINUS
 	;
-
+*/
 // A.5.4 UDP instantiation
-
+/*
 udp_instantiation
 	: udp_identifier drive_strength? delay2? udp_instance (COMMA udp_instance)* SEMICOLON
 	;
@@ -1209,7 +1209,7 @@ udp_instance
 name_of_udp_instance
 	: udp_instance_identifier range_?
 	;
-
+*/
 // A.6 Behavioral statements
 // A.6.1 Continuous assignment statements
 
@@ -1579,7 +1579,7 @@ polarity_operator
 
 // A.7.5 System timing checks
 // A.7.5.1 System timing check commands
-
+/*
 system_timing_check
 	: setup_timing_check
 	| hold_timing_check
@@ -1642,9 +1642,9 @@ width_timing_check
 nochange_timing_check
 	: DOLLAR_NOCHANGE LEFT_PARENTHESIS reference_event COMMA data_event COMMA start_edge_offset COMMA end_edge_offset (COMMA notifier?)? RIGHT_PARENTHESIS SEMICOLON
 	;
-
+*/
 // A.7.5.2 System timing check command arguments
-
+/*
 timecheck_condition
 	: mintypmax_expression
 	;
@@ -1700,9 +1700,9 @@ threshold
 timing_check_limit
 	: expression
 	;
-
+*/
 // A.7.5.3 System timing check event definitions
-
+/*
 timing_check_event
 	: timing_check_event_control? specify_terminal_descriptor (TRIPLE_AMPERSAND timing_check_condition)?
 	;
@@ -1736,7 +1736,7 @@ scalar_timing_check_condition
 	: TILDE? expression
 	| expression (DOUBLE_EQUAL | TRIPLE_EQUAL | EXCLAMATION_MARK_EQUAL | EXCLAMATION_MARK_DOUBLE_EQUAL) SCALAR_CONSTANT
 	;
-
+*/
 // A.8 Expressions
 // A.8.1 Concatenations
 

@@ -3,6 +3,10 @@
 
 lexer grammar VerilogLexer;
 
+channels {
+    DIRECTIVE_CHANNEL
+}
+
 // Keywords
 
 ALWAYS : 'always' ;
@@ -24,7 +28,7 @@ DEFAULT : 'default' ;
 DEFPARAM : 'defparam' ;
 DESIGN : 'design' ;
 DISABLE : 'disable' ;
-EDGE : 'edge' -> mode(EDGE_CONTROL_SPECIFIER_MODE) ;
+EDGE : 'edge' ;
 ELSE : 'else' ;
 END : 'end' ;
 ENDCASE : 'endcase' ;
@@ -32,7 +36,7 @@ ENDCONFIG : 'endconfig' ;
 ENDFUNCTION : 'endfunction' ;
 ENDGENERATE : 'endgenerate' ;
 ENDMODULE : 'endmodule' ;
-ENDPRIMITIVE : 'endprimitive' -> mode(DEFAULT_MODE) ;
+ENDPRIMITIVE : 'endprimitive' ;
 ENDSPECIFY : 'endspecify' ;
 ENDTABLE : 'endtable' ;
 ENDTASK : 'endtask' ;
@@ -49,7 +53,7 @@ HIGHZ1 : 'highz1' ;
 IF : 'if' ;
 IFNONE : 'ifnone' ;
 INCDIR : 'incdir' ;
-INCLUDE : 'include' -> mode(LIBRARY_SOURCE_TEXT_MODE) ;
+INCLUDE : 'include' ;
 INITIAL : 'initial' ;
 INOUT : 'inout' ;
 INPUT : 'input' ;
@@ -58,7 +62,7 @@ INTEGER : 'integer' ;
 JOIN : 'join' ;
 LARGE : 'large' ;
 LIBLIST : 'liblist' ;
-LIBRARY : 'library' -> mode(LIBRARY_SOURCE_TEXT_MODE) ;
+LIBRARY : 'library' ;
 LOCALPARAM : 'localparam' ;
 MACROMODULE : 'macromodule' ;
 MEDIUM : 'medium' ;
@@ -76,7 +80,7 @@ OUTPUT : 'output' ;
 PARAMETER : 'parameter' ;
 PMOS : 'pmos' ;
 POSEDGE : 'posedge' ;
-PRIMITIVE : 'primitive' -> mode(UDP_MODE) ;
+PRIMITIVE : 'primitive' ;
 PULL0 : 'pull0' ;
 PULL1 : 'pull1' ;
 PULLDOWN : 'pulldown' ;
@@ -170,7 +174,7 @@ DOLLAR_FSEEK : '$fseek' ;
 DOLLAR_FFLUSH : '$fflush' ;
 DOLLAR_FEOF : '$feof' ;
 DOLLAR_SDF_ANNOTATE : '$sdf_annotate' ;
-DOLLAR_FOPEN : '$fopen' -> mode(FOPEN_TASK_MODE) ;
+DOLLAR_FOPEN : '$fopen' ;
 DOLLAR_FWRITE : '$fwrite' ;
 DOLLAR_FWRITEB : '$fwriteb' ;
 DOLLAR_FWRITEH : '$fwriteh' ;
@@ -193,8 +197,8 @@ DOLLAR_READMEMH : '$readmemh' ;
 DOLLAR_PRINTTIMESCALE : '$printtimescale' ;
 DOLLAR_TIMEFORMAT : '$timeformat' ;
 // Simulation control tasks
-DOLLAR_FINISH : '$finish' -> mode(SIMULATION_CONTROL_TASK_MODE) ;
-DOLLAR_STOP : '$stop' -> mode(SIMULATION_CONTROL_TASK_MODE) ;
+DOLLAR_FINISH : '$finish' ;
+DOLLAR_STOP : '$stop' ;
 // PLA modeling tasks
 DOLLAR_ASYNC_AND_ARRAY : '$async$and$array' ;
 DOLLAR_ASYNC_NAND_ARRAY : '$async$nand$array' ;
@@ -272,22 +276,22 @@ DOLLAR_DUMPON : '$dumpon' ;
 DOLLAR_DUMPALL : '$dumpall' ;
 DOLLAR_DUMPLIMIT : '$dumplimit' ;
 DOLLAR_DUMPFLUSH : '$dumpflush' ;
-DOLLAR_END : '$end' -> mode(DEFAULT_MODE) ;
-DOLLAR_COMMENT : '$comment' -> mode(VCD_MODE) ;
-DOLLAR_DATE : '$date' -> mode(VCD_MODE) ;
-DOLLAR_ENDDEFINITIONS : '$enddefinitions' -> mode(VCD_MODE) ;
-DOLLAR_SCOPE : '$scope' -> mode(VCD_MODE) ;
-DOLLAR_TIMESCALE : '$timescale' -> mode(VCD_MODE) ;
-DOLLAR_UPSCOPE : '$upscope' -> mode(VCD_MODE) ;
-DOLLAR_VAR : '$var' -> mode(VCD_MODE) ;
-DOLLAR_VERSION : '$version' -> mode(VCD_MODE) ;
-DOLLAR_DUMPPORTS : '$dumpports' -> mode(VCD_MODE) ;
-DOLLAR_DUMPPORTSOFF : '$dumpportsoff' -> mode(VCD_MODE) ;
-DOLLAR_DUMPPORTSON : '$dumpportson' -> mode(VCD_MODE) ;
-DOLLAR_DUMPPORTSALL : '$dumpportsall' -> mode(VCD_MODE) ;
+DOLLAR_END : '$end' ;
+DOLLAR_COMMENT : '$comment' ;
+DOLLAR_DATE : '$date' ;
+DOLLAR_ENDDEFINITIONS : '$enddefinitions' ;
+DOLLAR_SCOPE : '$scope' ;
+DOLLAR_TIMESCALE : '$timescale' ;
+DOLLAR_UPSCOPE : '$upscope' ;
+DOLLAR_VAR : '$var' ;
+DOLLAR_VERSION : '$version' ;
+DOLLAR_DUMPPORTS : '$dumpports' ;
+DOLLAR_DUMPPORTSOFF : '$dumpportsoff' ;
+DOLLAR_DUMPPORTSON : '$dumpportson' ;
+DOLLAR_DUMPPORTSALL : '$dumpportsall' ;
 DOLLAR_DUMPPORTSLIMIT : '$dumpportslimit' ;
 DOLLAR_DUMPPORTSFLUSH : '$dumpportsflush' ;
-DOLLAR_VCDCLOSE : '$vcdclose' -> mode(VCD_MODE) ;
+DOLLAR_VCDCLOSE : '$vcdclose' ;
 
 // System timing check commands
 
@@ -303,28 +307,6 @@ DOLLAR_FULLSKEW : '$fullskew' ;
 DOLLAR_PERIOD : '$period' ;
 DOLLAR_WIDTH : '$width' ;
 DOLLAR_NOCHANGE : '$nochange' ;
-
-// Compiler directives
-
-GRAVE_BEGIN_KEYWORDS : '`begin_keywords' ;
-GRAVE_CELLDEFINE : '`celldefine' ;
-GRAVE_DEFAULT_NETTYPE : '`default_nettype' ;
-GRAVE_DEFINE : '`define' -> mode(DEFINE_DIRECTIVE_MODE) ;
-GRAVE_ELSE : '`else' -> mode(CONDITIONAL_DIRECTIVE_MODE) ;
-GRAVE_ELSIF : '`elsif' -> mode(CONDITIONAL_DIRECTIVE_MODE) ;
-GRAVE_END_KEYWORDS : '`end_keywords' ;
-GRAVE_ENDCELLDEFINE : '`endcelldefine' ;
-GRAVE_ENDIF : '`endif' -> mode(DEFAULT_MODE) ;
-GRAVE_IFDEF : '`ifdef' -> mode(CONDITIONAL_DIRECTIVE_MODE) ;
-GRAVE_IFNDEF : '`ifndef' -> mode(CONDITIONAL_DIRECTIVE_MODE) ;
-GRAVE_INCLUDE : '`include' ;
-GRAVE_LINE : '`line' -> mode(LINE_DIRECTIVE_MODE) ;
-GRAVE_NOUNCONNECTED_DRIVE : '`nounconnected_drive' ;
-GRAVE_PRAGMA : '`pragma' ;
-GRAVE_RESETALL : '`resetall' ;
-GRAVE_TIMESCALE : '`timescale' ;
-GRAVE_UNCONNECTED_DRIVE : '`unconnected_drive' ;
-GRAVE_UNDEF : '`undef' ;
 
 // Numbers
 
@@ -435,13 +417,13 @@ TRIPLE_LESS_THAN : '<<<' ;
 DOT : '.' ;
 COMMA : ',' ;
 COLON : ':' ;
-SEMICOLON : ';' -> mode(DEFAULT_MODE) ;
+SEMICOLON : ';' ;
 SLASH : '/' ;
 EQUAL : '=' ;
 QUESTION_MARK : '?' ;
 AT : '@' ;
 HASH : '#' ;
-GRAVE_ACCENT : '`' -> mode(MACRO_USAGE_MODE) ;
+GRAVE_ACCENT : '`' -> channel(DIRECTIVE_CHANNEL), mode(DIRECTIVE_MODE) ;
 PLUS_COLON : '+:' ;
 MINUS_COLON : '-:' ;
 MINUS_GREATER_THAN : '->' ;
@@ -449,96 +431,59 @@ EQUAL_GREATER_THAN : '=>' ;
 ASTERISK_GREATER_THAN : '*>' ;
 TRIPLE_AMPERSAND : '&&&' ;
 
-// 19.2 `default_nettype
-NONE : 'none' ;
-// 19.8 `timescale
-TIME_LITERAL : TIME_NUMBER TIME_UNIT ;
-// 19.11 `begin_keywords, `end_keywords
-VERSION_SPECIFIER : VERSION_IDENTIFIER ;
-// A.1.1 Library source text
-MINUS_INCDIR : '-incdir' ;
 // A.2.4 Declaration assignments
 PATHPULSE_DOLLAR : 'PATHPULSE$' ;
 
-mode FOPEN_TASK_MODE;
-// 17.2.1 Opening and closing files
-TYPE : DOUBLE_QUOTE ('r' | 'rb' | 'w' | 'wb' | 'a' | 'ab' | 'r+' | 'r+b' | 'rb+' | 'w+' | 'w+b' | 'wb+' | 'a+' | 'a+b' | 'ab+') DOUBLE_QUOTE ;
-
-mode SIMULATION_CONTROL_TASK_MODE;
-// 17.4 Simulation control system tasks
-FINISH_NUMBER : [0-2] ;
-
-mode VCD_MODE;
-// 18.4 Format of extended VCD file
-COMMAND_TEXT : COMMENT_TEXT | CLOSE_TEXT | DATE_SECTION | SCOPE_SECTION | TIMESCALE_SECTION | VAR_SECTION | VERSION_SECTION ;
-fragment SIMULATION_TIME : HASH DECIMAL_NUMBER ;
-VALUE_CHANGE : VALUE IDENTIFIER_CODE ;
-fragment VALUE : PORT_VALUE | STRENGTH_COMPONENT ;
-fragment PORT_VALUE : INPUT_VALUE | OUTPUT_VALUE | UNKNOWN_DIRECTION_VALUE ;
-fragment INPUT_VALUE : [dDNuUZ] ;
-fragment OUTPUT_VALUE : [HlLTX] ;
-fragment UNKNOWN_DIRECTION_VALUE : [01?aAbBcCfF] ;
-fragment STRENGTH_COMPONENT : [0-7] ;
-fragment IDENTIFIER_CODE : IDENTIFIER ;
-fragment COMMENT_TEXT : ASCII_ANY+ ;
-fragment ASCII_ANY : [\u0000-\u007f] ;
-fragment CLOSE_TEXT : SIMULATION_TIME ;
-fragment DATE_SECTION : DATE_TEXT ;
-fragment DATE_TEXT : (DAY MONTH COMMA? YEAR | YEAR COMMA? MONTH DAY | MONTH DAY COMMA? YEAR) HOUR COLON MINUTE COLON SECOND ;
-fragment DAY : DECIMAL_DIGIT DECIMAL_DIGIT? ;
-fragment MONTH : MONTH_FULL | MONTH_ABBREVIATION ;
-fragment MONTH_FULL : 'January' | 'February' | 'March' | 'April' | 'May' | 'June' | 'July' | 'August' | 'September' | 'October' | 'November' | 'December';
-fragment MONTH_ABBREVIATION : 'Jan' | 'Feb' | 'Mar' | 'Apr' | 'May' | 'Jun' | 'Jul' | 'Aug' | 'Sep' | 'Oct' | 'Nov' | 'Dec' ;
-fragment YEAR : DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT DECIMAL_DIGIT ;
-fragment HOUR : DECIMAL_DIGIT DECIMAL_DIGIT ;
-fragment MINUTE : DECIMAL_DIGIT DECIMAL_DIGIT ;
-fragment SECOND : DECIMAL_DIGIT DECIMAL_DIGIT ;
-fragment SCOPE_SECTION : SCOPE_TYPE SCOPE_IDENTIFIER ;
-fragment SCOPE_TYPE : MODULE ;
-fragment SCOPE_IDENTIFIER : IDENTIFIER ;
-fragment TIMESCALE_SECTION : TIME_NUMBER TIME_UNIT ;
-fragment TIME_NUMBER : '1' | '10' | '100' ;
-fragment TIME_UNIT : [mnpf]? 's' ;
-fragment VAR_SECTION : VAR_TYPE VAR_SIZE IDENTIFIER_CODE REFERENCE ;
-fragment VAR_TYPE : 'port' ;
-fragment VAR_SIZE : '1' | VECTOR_INDEX ;
-fragment VECTOR_INDEX : LEFT_BRACKET INDEX COLON INDEX RIGHT_BRACKET ;
-fragment INDEX : DECIMAL_NUMBER ;
-fragment REFERENCE : IDENTIFIER ;
-fragment IDENTIFIER : ASCII_PRINTABLE_EXCEPT_SPACE+ ;
-fragment VERSION_SECTION : VERSION_TEXT ;
-fragment VERSION_TEXT : VERSION_IDENTIFIER ;
-fragment VERSION_IDENTIFIER : '1364-1995' | '1364-2001' | '1364-2001-noconfig' | '1364-2005' ;
-
-mode DEFINE_DIRECTIVE_MODE;
-// 19.3.1 `define
-MACRO_TEXT : TEXT ~'\\' NEWLINE -> mode(DEFAULT_MODE) ;
-
-mode MACRO_USAGE_MODE;
-// 19.3.1 `define
-LIST_OF_ACTUAL_ARGUMENTS : ACTUAL_ARGUMENT (COMMA ACTUAL_ARGUMENT)* -> mode(DEFAULT_MODE) ;
-fragment ACTUAL_ARGUMENT : TEXT ;
-
-mode CONDITIONAL_DIRECTIVE_MODE;
-// 19.4 `ifdef, `else, `elsif, `endif , `ifndef
-GROUP_OF_LINES : TEXT -> mode(DEFAULT_MODE) ;
-
-mode LINE_DIRECTIVE_MODE;
-// 19.7 `line
-LEVEL : [0-2] -> mode(DEFAULT_MODE) ;
-
-mode LIBRARY_SOURCE_TEXT_MODE;
+// Context-specific rules
+/*
 // A.1.1 Library source text
 FILE_PATH_SPEC : ~[ \t\r\n]+ ;
-
-mode UDP_MODE;
+MINUS_INCDIR : '-incdir' ;
 // A.5.3 UDP body
 INIT_VAL : '1' APOSTROPHE [bB] [01xX] | [01] ;
 OUTPUT_SYMBOL : [01xX] ;
 LEVEL_SYMBOL : [01xX?bB] ;
 EDGE_SYMBOL : [rRfFpPnN*] ;
-
-mode EDGE_CONTROL_SPECIFIER_MODE;
 // A.7.5.3 System timing check event definitions
 EDGE_DESCRIPTOR : '01' | '10' | [xXzZ] [01] | [01] [xXzZ] ;
 SCALAR_CONSTANT : '1' APOSTROPHE [bB] [01] | [01] ;
+*/
+
+mode DIRECTIVE_MODE;
+// Compiler directives
+DIRECTIVE_BEGIN_KEYWORDS : 'begin_keywords' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_CELLDEFINE : 'celldefine' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_DEFAULT_NETTYPE : 'default_nettype' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_DEFINE : 'define' -> channel(DIRECTIVE_CHANNEL), mode(DIRECTIVE_TEXT_MODE) ;
+DIRECTIVE_ELSE : 'else' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_ELSIF : 'elsif' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_END_KEYWORDS : 'end_keywords' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_ENDCELLDEFINE : 'endcelldefine' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_ENDIF : 'endif' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_IFDEF : 'ifdef' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_IFNDEF : 'ifndef' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_INCLUDE : 'include' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_LINE : 'line' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_NOUNCONNECTED_DRIVE : 'nounconnected_drive' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_PRAGMA : 'pragma' -> channel(DIRECTIVE_CHANNEL), mode(DIRECTIVE_TEXT_MODE) ;
+DIRECTIVE_RESETALL : 'resetall' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_TIMESCALE : 'timescale' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_UNCONNECTED_DRIVE : 'unconnected_drive' -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_UNDEF : 'undef' -> channel(DIRECTIVE_CHANNEL) ;
+// Other symbols
+DIRECTIVE_NEWLINE : NEWLINE -> channel(HIDDEN), mode(DEFAULT_MODE) ;
+DIRECTIVE_LIST_OF_ARGUMENTS : '(' ~[\r\n\\]+ ')' -> channel(DIRECTIVE_CHANNEL), mode(DEFAULT_MODE) ; // macro usage
+DIRECTIVE_ONE_LINE_COMMENT : DOUBLE_SLASH TEXT NEWLINE -> channel(HIDDEN) ;
+DIRECTIVE_BLOCK_COMMENT : SLASH_ASTERISK TEXT ASTERISK_SLASH -> channel(HIDDEN) ;
+DIRECTIVE_WHITE_SPACE_REGION : WHITE_SPACE+ -> channel(HIDDEN) ;
+DIRECTIVE_STRING : '"' ~["\r\n]* '"' ;
+DIRECTIVE_UNSIGNED_NUMBER : DECIMAL_DIGIT (UNDERSCORE | DECIMAL_DIGIT)* -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_SIMPLE_IDENTIFIER : (LETTER | UNDERSCORE) (LETTER | UNDERSCORE | DECIMAL_DIGIT | DOLLAR_SIGN)* -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_SLASH : '/' -> channel(DIRECTIVE_CHANNEL) ;
+
+mode DIRECTIVE_TEXT_MODE;
+DIRECTIVE_TEXT_NEWLINE : NEWLINE -> channel(HIDDEN), mode(DEFAULT_MODE) ;
+DIRECTIVE_TEXT : ~[\r\n\\]+ -> channel(DIRECTIVE_CHANNEL) ; // also contains the macro_identifier, will separate them later
+DIRECTIVE_TEXT_BACKSLASH_NEWLINE : BACKSLASH NEWLINE -> channel(DIRECTIVE_CHANNEL) ;
+DIRECTIVE_TEXT_ONE_LINE_COMMENT : DOUBLE_SLASH TEXT NEWLINE -> channel(HIDDEN) ;
+DIRECTIVE_TEXT_BLOCK_COMMENT : SLASH_ASTERISK TEXT ASTERISK_SLASH -> channel(HIDDEN) ;
