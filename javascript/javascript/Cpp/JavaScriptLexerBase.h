@@ -21,7 +21,6 @@ public:
     bool getStrictDefault();
     void setUseStrictDefault(bool value);
     bool IsStrictMode();
-    bool IsNotStrictMode();
     bool IsInTemplateString();
     virtual std::unique_ptr<antlr4::Token> nextToken() override;
     void ProcessOpenBrace();

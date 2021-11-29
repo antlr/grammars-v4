@@ -36,9 +36,6 @@ class JavaScriptLexerBase(Lexer):
     def IsStrictMode(self):
         return self.useStrictCurrent
 
-    def IsNotStrictMode(self):
-        return not self.useStrictCurrent
-
     def IsInTemplateString(self) -> bool:
         return self.templateDepth > 0;
 

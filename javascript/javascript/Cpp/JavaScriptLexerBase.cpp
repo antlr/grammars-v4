@@ -24,11 +24,6 @@ bool JavaScriptLexerBase::IsStrictMode()
     return useStrictCurrent;
 }
 
-bool JavaScriptLexerBase::IsNotStrictMode()
-{
-	return ! useStrictCurrent;
-}
-
 bool JavaScriptLexerBase::IsInTemplateString()
 {
 	return _templateDepth > 0;
