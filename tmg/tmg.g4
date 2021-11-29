@@ -57,7 +57,9 @@ parg: pname | NUMBER | '(' prule ')' | LITERAL | CHARCL;
 
 expr: lv ASSIGN expr | rv;
 
-rv: (rv '?' rv ':')? primary (INFIX primary)?;
+rv: (rv '?' rv ':')? rv2;
+
+rv2: primary (INFIX primary)?;
 
 primary:
 	lv INCDEC?
