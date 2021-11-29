@@ -22,103 +22,181 @@
  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 grammar tmg;
 
-program: statement*;
+program
+   : statement*
+   ;
 
-statement: label+ tail ';';
+statement
+   : label+ tail ';'
+   ;
 
-label: NAME ':';
+label
+   : NAME ':'
+   ;
 
-tail:
-	proc? prule (label prule)*
-	| trule
-	| CHARCL
-	| NUMBER ( ';' NUMBER)*;
+tail
+   : proc? prule (label prule)*
+   | trule
+   | CHARCL
+   | NUMBER (';' NUMBER)*
+   ;
 
-proc: 'proc' '(' names? ( ';' names?)? ')';
+proc
+   : 'proc' '(' names? (';' names?)? ')'
+   ;
 
-prule: ( disj ( '|' disj)?)?;
+prule
+   : (disj ('|' disj)?)?
+   ;
 
-disj: pelem ( '.' NAME?)?;
+disj
+   : pelem ('.' NAME?)?
+   ;
 
-pelem: pprime ( ('\\' | '/') pname)? | '(' prule ')';
+pelem
+   : pprime (('\\' | '/') pname)?
+   | '(' prule ')'
+   ;
 
-pprime:
-	pname '.'? ('(' parg ( '.' parg)* ')')?
-	| expr '?'?
-	| LITERAL
-	| '=' NAME
-	| '=' trule;
+pprime
+   : pname '.'? ('(' parg ('.' parg)* ')')?
+   | expr '?'?
+   | LITERAL
+   | '=' NAME
+   | '=' trule
+   ;
 
-pname: NAME | '$' NUMBER;
+pname
+   : NAME
+   | '$' NUMBER
+   ;
 
-parg: pname | NUMBER | '(' prule ')' | LITERAL | CHARCL;
+parg
+   : pname
+   | NUMBER
+   | '(' prule ')'
+   | LITERAL
+   | CHARCL
+   ;
 
-expr: lv ASSIGN expr | rv;
+expr
+   : lv ASSIGN expr
+   | rv
+   ;
 
-rv: ( rv '?' rv ':')? primary ( INFIX primary)?;
+rv
+   : (rv '?' rv ':')? primary (INFIX primary)?
+   ;
 
-primary:
-	lv INCDEC?
-	| INCDEC lv
-	| lv
-	| '(' expr ')'
-	| UNARY primary
-	| NUMBER;
+primary
+   : lv INCDEC?
+   | INCDEC lv
+   | lv
+   | '(' expr ')'
+   | UNARY primary
+   | NUMBER
+   ;
 
-lv: pname | '*' primary | '(' lv ')' | lv expr*;
+lv
+   : pname
+   | '*' primary
+   | '(' lv ')'
+   | lv expr*
+   ;
 
-UNARY: '-' | '!' | '-';
+trule
+   : ('(' (NUMBER | names) ')')? tbody
+   ;
 
-ASSIGN: '=' INFIX?;
+tbody
+   : '{' telem? '}'
+   ;
 
-INCDEC: '++' | '--';
+telem
+   : NAME
+   | LITERAL
+   | '$' NUMBER
+   | bundleref ('(' targ ('.' targ)* ')')?
+   ;
 
-INFIX:
-	'+'
-	| '-'
-	| '*'
-	| '/'
-	| '%'
-	| '&'
-	| '^'
-	| '<<'
-	| '>>'
-	| '=='
-	| '!='
-	| '<'
-	| '>'
-	| '<='
-	| '>=';
+bundleref
+   : (NAME | NUMBER) ('.' targ)*
+   ;
 
-trule: ( '(' ( NUMBER | names) ')')? tbody;
+targ
+   : NAME
+   | tbody
+   ;
 
-tbody: '{' telem? '}';
+names
+   : NAME (',' NAME)*
+   ;
 
-telem:
-	NAME
-	| LITERAL
-	| '$' NUMBER
-	| bundleref ( '(' targ ( '.' targ)* ')')?;
+ASSIGN
+   : '=' INFIX?
+   ;
 
-bundleref: ( NAME | NUMBER) ( '.' targ)*;
+INCDEC
+   : '++'
+   | '--'
+   ;
 
-targ: NAME | tbody;
+LITERAL
+   : STAR
+   | CHAR+
+   ;
 
-names: NAME ( ',' NAME)*;
+UNARY
+   : '-'
+   | '!'
+   | '_'
+   ;
 
-LITERAL: CHAR+ | '*';
+INFIX
+   : '+'
+   | '-'
+   | STAR
+   | '/'
+   | '%'
+   | '&'
+   | '^'
+   | '<<'
+   | '>>'
+   | '=='
+   | '!='
+   | '<'
+   | '>'
+   | '<='
+   | '>='
+   ;
 
-CHARCL: '!'? ('<<' CHAR* '>>')+;
+fragment STAR
+   : '*'
+   ;
 
-NAME: [a-zA-Z][a-zA-Z0-9]*;
+CHARCL
+   : '!'? ('<<' CHAR* '>>')+
+   ;
 
-NUMBER: [0-7]+;
+NAME
+   : [a-zA-Z] [a-zA-Z0-9]*
+   ;
 
-fragment CHAR: [a-zA-Z0-9];
+NUMBER
+   : [0-7]+
+   ;
 
-COMMENT: '/*' .*? '*/' -> skip;
+fragment CHAR
+   : [a-zA-Z0-9]
+   ;
 
-WS: [ \r\n\t]+ -> skip;
+COMMENT
+   : '/*' .*? '*/' -> skip
+   ;
+
+WS
+   : [ \r\n\t]+ -> skip
+   ;
+
