@@ -24,179 +24,103 @@
  */
 grammar tmg;
 
-program
-   : statement*
-   ;
+program: statement*;
 
-statement
-   : label+ tail ';'
-   ;
+statement: label+ tail ';';
 
-label
-   : NAME ':'
-   ;
+label: NAME ':';
 
-tail
-   : proc? prule (label prule)*
-   | trule
-   | CHARCL
-   | NUMBER (';' NUMBER)*
-   ;
+tail:
+	proc? prule (label prule)*
+	| trule
+	| CHARCL
+	| NUMBER (';' NUMBER)*;
 
-proc
-   : 'proc' '(' names? (';' names?)? ')'
-   ;
+proc: 'proc' '(' names? (';' names?)? ')';
 
-prule
-   : (disj ('|' disj)?)?
-   ;
+prule: (disj ('|' disj)?)?;
 
-disj
-   : pelem ('.' NAME?)?
-   ;
+disj: pelem ('.' NAME?)?;
 
-pelem
-   : pprime (('\\' | '/') pname)?
-   | '(' prule ')'
-   ;
+pelem: pprime (('\\' | '/') pname)? | '(' prule ')';
 
-pprime
-   : pname '.'? ('(' parg ('.' parg)* ')')?
-   | expr '?'?
-   | LITERAL
-   | '=' NAME
-   | '=' trule
-   ;
+pprime:
+	pname '.'? ('(' parg ('.' parg)* ')')?
+	| expr '?'?
+	| LITERAL
+	| '=' NAME
+	| '=' trule;
 
-pname
-   : NAME
-   | '$' NUMBER
-   ;
+pname: NAME | '$' NUMBER;
 
-parg
-   : pname
-   | NUMBER
-   | '(' prule ')'
-   | LITERAL
-   | CHARCL
-   ;
+parg: pname | NUMBER | '(' prule ')' | LITERAL | CHARCL;
 
-expr
-   : lv ASSIGN expr
-   | rv
-   ;
+expr: lv ASSIGN expr | rv;
 
-rv
-   : (rv '?' rv ':')? primary (INFIX primary)?
-   ;
+rv: (rv '?' rv ':')? primary (INFIX primary)?;
 
-primary
-   : lv INCDEC?
-   | INCDEC lv
-   | lv
-   | '(' expr ')'
-   | UNARY primary
-   | NUMBER
-   ;
+primary:
+	lv INCDEC?
+	| INCDEC lv
+	| lv
+	| '(' expr ')'
+	| UNARY primary
+	| NUMBER;
 
-lv
-   : pname
-   | '*' primary
-   | '(' lv ')'
-   | lv expr*
-   ;
+lv: pname | '*' primary | '(' lv ')' | lv expr+;
 
-trule
-   : ('(' (NUMBER | names) ')')? tbody
-   ;
+trule: ('(' (NUMBER | names) ')')? tbody;
 
-tbody
-   : '{' telem? '}'
-   ;
+tbody: '{' telem? '}';
 
-telem
-   : NAME
-   | LITERAL
-   | '$' NUMBER
-   | bundleref ('(' targ ('.' targ)* ')')?
-   ;
+telem:
+	NAME
+	| LITERAL
+	| '$' NUMBER
+	| bundleref ('(' targ ('.' targ)* ')')?;
 
-bundleref
-   : (NAME | NUMBER) ('.' targ)*
-   ;
+bundleref: (NAME | NUMBER) ('.' targ)*;
 
-targ
-   : NAME
-   | tbody
-   ;
+targ: NAME | tbody;
 
-names
-   : NAME (',' NAME)*
-   ;
+names: NAME (',' NAME)*;
 
-ASSIGN
-   : '=' INFIX?
-   ;
+ASSIGN: '=' INFIX?;
 
-INCDEC
-   : '++'
-   | '--'
-   ;
+INCDEC: '++' | '--';
 
-LITERAL
-   : STAR
-   | CHAR+
-   ;
+LITERAL: STAR | CHAR+;
 
-UNARY
-   : '-'
-   | '!'
-   | '_'
-   ;
+UNARY: '-' | '!' | '_';
 
-INFIX
-   : '+'
-   | '-'
-   | STAR
-   | '/'
-   | '%'
-   | '&'
-   | '^'
-   | '<<'
-   | '>>'
-   | '=='
-   | '!='
-   | '<'
-   | '>'
-   | '<='
-   | '>='
-   ;
+INFIX:
+	'+'
+	| '-'
+	| STAR
+	| '/'
+	| '%'
+	| '&'
+	| '^'
+	| '<<'
+	| '>>'
+	| '=='
+	| '!='
+	| '<'
+	| '>'
+	| '<='
+	| '>=';
 
-fragment STAR
-   : '*'
-   ;
+fragment STAR: '*';
 
-CHARCL
-   : '!'? ('<<' CHAR* '>>')+
-   ;
+CHARCL: '!'? ('<<' CHAR* '>>')+;
 
-NAME
-   : [a-zA-Z] [a-zA-Z0-9]*
-   ;
+NAME: [a-zA-Z] [a-zA-Z0-9]*;
 
-NUMBER
-   : [0-7]+
-   ;
+NUMBER: [0-7]+;
 
-fragment CHAR
-   : [a-zA-Z0-9]
-   ;
+fragment CHAR: [a-zA-Z0-9];
 
-COMMENT
-   : '/*' .*? '*/' -> skip
-   ;
+COMMENT: '/*' .*? '*/' -> skip;
 
-WS
-   : [ \r\n\t]+ -> skip
-   ;
+WS: [ \r\n\t]+ -> skip;
 
