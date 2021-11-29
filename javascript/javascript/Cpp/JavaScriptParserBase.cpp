@@ -2,10 +2,6 @@
 
 using namespace antlr4;
 
-JavaScriptParserBase::JavaScriptParserBase(TokenStream *input) : Parser(input)
-{
-}
-
 bool JavaScriptParserBase::p(std::string str)
 {
     return prev(str);

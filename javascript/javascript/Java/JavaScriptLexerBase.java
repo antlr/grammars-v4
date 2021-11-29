@@ -57,6 +57,10 @@ public abstract class JavaScriptLexerBase extends Lexer
         return useStrictCurrent;
     }
 
+    public boolean IsNotStrictMode() {
+        return ! useStrictCurrent;
+    }
+
     public boolean IsInTemplateString() {
         return this.templateDepth > 0;
     }

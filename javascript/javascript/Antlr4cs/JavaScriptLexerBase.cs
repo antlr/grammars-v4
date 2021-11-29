@@ -44,6 +44,10 @@ public abstract class JavaScriptLexerBase : Lexer
     {
     }
 
+    public JavaScriptLexerBase(ICharStream input, TextWriter output, TextWriter errorOutput) : this(input)
+    {
+    }
+
     public bool IsStartOfFile(){
         return _lastToken == null;
     }
@@ -64,6 +68,11 @@ public abstract class JavaScriptLexerBase : Lexer
     public bool IsStrictMode()
     {
         return _useStrictCurrent;
+    }
+
+    public bool IsNotStrictMode()
+    {
+        return ! _useStrictCurrent;
     }
 
     public bool IsInTemplateString()
