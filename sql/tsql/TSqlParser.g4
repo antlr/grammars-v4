@@ -1155,13 +1155,13 @@ alter_external_data_source
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-external-library-transact-sql
 alter_external_library
     : ALTER EXTERNAL LIBRARY library_name=id_ (AUTHORIZATION owner_name=id_)?
-       (SET|ADD) ( LR_BRACKET CONTENT EQUAL (client_library=STRING | BINARY | NONE) (COMMA PLATFORM EQUAL (WINDOWS|LINUX)? RR_BRACKET) WITH (COMMA? LANGUAGE EQUAL (R|PYTHON) | DATA_SOURCE EQUAL external_data_source_name=id_ )+ RR_BRACKET )
+       (SET|ADD) ( LR_BRACKET CONTENT EQUAL (client_library=STRING | BINARY | NONE) (COMMA PLATFORM EQUAL (WINDOWS|LINUX)? RR_BRACKET) WITH (COMMA? LANGUAGE EQUAL (R_|PYTHON) | DATA_SOURCE EQUAL external_data_source_name=id_ )+ RR_BRACKET )
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-external-library-transact-sql
 create_external_library
     : CREATE EXTERNAL LIBRARY library_name=id_ (AUTHORIZATION owner_name=id_)?
-       FROM (COMMA? LR_BRACKET?  (CONTENT EQUAL)? (client_library=STRING | BINARY | NONE) (COMMA PLATFORM EQUAL (WINDOWS|LINUX)? RR_BRACKET)? ) ( WITH (COMMA? LANGUAGE EQUAL (R|PYTHON) | DATA_SOURCE EQUAL external_data_source_name=id_ )+ RR_BRACKET  )?
+       FROM (COMMA? LR_BRACKET?  (CONTENT EQUAL)? (client_library=STRING | BINARY | NONE) (COMMA PLATFORM EQUAL (WINDOWS|LINUX)? RR_BRACKET)? ) ( WITH (COMMA? LANGUAGE EQUAL (R_|PYTHON) | DATA_SOURCE EQUAL external_data_source_name=id_ )+ RR_BRACKET  )?
     ;
 
 
@@ -1275,7 +1275,7 @@ create_master_key_azure_sql
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-message-type-transact-sql
 alter_message_type
-    : ALTER MESSAGE TYPE message_type_name=id_ VALIDATION EQUAL (NONE | EMPTY | WELL_FORMED_XML | VALID_XML WITH SCHEMA COLLECTION schema_collection_name=id_)
+    : ALTER MESSAGE TYPE message_type_name=id_ VALIDATION EQUAL (NONE | EMPTY_ | WELL_FORMED_XML | VALID_XML WITH SCHEMA COLLECTION schema_collection_name=id_)
     ;
 
 
@@ -1783,7 +1783,7 @@ message_statement
     : CREATE MESSAGE TYPE message_type_name=id_
       (AUTHORIZATION owner_name=id_)?
       (VALIDATION EQUAL (NONE
-      | EMPTY
+      | EMPTY_
       | WELL_FORMED_XML
       | VALID_XML WITH SCHEMA COLLECTION schema_collection_name=id_))
     ;
@@ -3566,6 +3566,7 @@ built_in_functions
     // https://msdn.microsoft.com/en-us/library/ms187928.aspx
     | CAST '(' expression AS data_type ')'              #CAST
     | TRY_CAST '(' expression AS data_type ')'          #TRY_CAST
+    | TRY_PARSE '(' expression AS data_type ( USING STRING )? ')' #TRY_PARSE
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
     // https://msdn.microsoft.com/en-us/library/ms189788.aspx
     | CHECKSUM '(' '*' ')'                              #CHECKSUM
@@ -4120,7 +4121,7 @@ keyword
     | DYNAMIC
     | ELEMENTS
     | EMERGENCY
-    | EMPTY
+    | EMPTY_
     | ENABLE
     | ENABLE_BROKER
     | ENCRYPTED_VALUE
@@ -4566,7 +4567,7 @@ keyword
     | PROCESS
     | PROFILE
     | PYTHON
-    | R
+    | R_
     | READ_WRITE_FILEGROUPS
     | REGENERATE
     | RELATED_CONVERSATION
@@ -4634,6 +4635,7 @@ keyword
     | BINARY_KEYWORD
     | VARBINARY_KEYWORD
     | PRECISION //For some reason this is possible to use as ID
+    | VERSION
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms175874.aspx
