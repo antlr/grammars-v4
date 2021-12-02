@@ -37,7 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [CSharp, Java, Go, Python3, Dart]
+        language: [CSharp, Java, JavaScript, Go, Python3, Dart]
     steps:
     - name: Checkout
       uses: actions/checkout@v2.4.0
@@ -54,9 +54,13 @@ jobs:
       uses: dart-lang/setup-dart@v1
     - name: Install Python
       if: ${{ matrix.language == 'Python3' }}
-      uses: actions/setup-python@v2.2.2
+      uses: actions/setup-python@v2.3.0
       with:
         python-version: '3.8'
+    - name: Install Nodejs
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16.13.0'
 
     - name: Download ANTLR
       shell: pwsh
