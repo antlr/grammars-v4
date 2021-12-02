@@ -1921,6 +1921,10 @@ primary
 	| system_function_call
 	| LEFT_PARENTHESIS mintypmax_expression RIGHT_PARENTHESIS
 	| STRING
+	| conversion_functions
+	| random_function
+	| dist_functions
+	| math_functions
 	;
 
 // A.8.5 Expression left-side values

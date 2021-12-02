@@ -3,9 +3,7 @@
 
 parser grammar VerilogPreprocessorParser;
 
-options {
-	tokenVocab = VerilogLexer;
-}
+options { tokenVocab = VerilogLexer; }
 
 // 19. Compiler directives
 
