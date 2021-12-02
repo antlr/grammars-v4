@@ -41,6 +41,7 @@
 					<grammarName>PowerBuilder</grammarName>
 					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<packageName></packageName>
+                    <exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>

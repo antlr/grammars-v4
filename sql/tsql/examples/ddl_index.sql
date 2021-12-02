@@ -34,3 +34,10 @@ CREATE NONCLUSTERED INDEX [indexName] ON [dbo].[table]
 )
 INCLUDE ([ColumnName2],[ColumnName3]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, FILLFACTOR = 95) ON [filegroup_name]
 GO
+
+ALTER INDEX [indexname] ON [schema].[tableName] DISABLE
+GO
+
+ALTER INDEX [indexName] ON [dbo].[tbl] REBUILD PARTITION = ALL
+GO
+

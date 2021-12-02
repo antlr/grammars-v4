@@ -35,6 +35,7 @@ ANY:                                   'ANY';
 AS:                                    'AS';
 ASC:                                   'ASC';
 AUTHORIZATION:                         'AUTHORIZATION';
+ACCELERATED_DATABASE_RECOVERY:         'ACCELERATED_DATABASE_RECOVERY';
 BACKSLASH:                             '\\';
 BACKUP:                                'BACKUP';
 BEGIN:                                 'BEGIN';

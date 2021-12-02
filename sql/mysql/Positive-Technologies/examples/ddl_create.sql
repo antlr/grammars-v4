@@ -134,6 +134,32 @@ CREATE TABLE CustomerTable (
     Address varchar(60),
     Phone varchar(24)
  ) ENGINE = CONNECT TABLE_TYPE = ODBC;
+
+CREATE TABLE tbl (
+    col1 LONGTEXT,
+    data JSON,
+    INDEX idx1 ((SUBSTRING(col1, 1, 10))),
+    INDEX idx2 ((CAST(JSON_EXTRACT(data, _utf8mb4'$') AS UNSIGNED ARRAY))),
+    INDEX ((CAST(data->>'$.name' AS CHAR(30))))
+);
+
+CREATE TABLE `orders_json_2` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `reward` json DEFAULT NULL,
+  `additional_info` json DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_order_codes` ((cast(json_extract(`additional_info`,_utf8mb4'$.order_codes') as char(17) array)))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE keywords (
+    eur VARCHAR(100),
+    iso VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+    usa VARCHAR(100),
+    jis VARCHAR(100),
+    internal INT
+);
 #end
 #begin
 -- Rename table
@@ -159,6 +185,8 @@ create database super default character set utf8 collate = utf8_bin character se
 create database super_cs default charset utf8 collate = utf8_bin character set utf8 collate utf8_bin;
 create database db_with_character_set_eq character set = default;
 create database db_with_character_set character set default;
+create database `ymsun_test1` charset gb18030 collate gb18030_bin;
+create database `test` charset binary collate binary;
 #end
 #begin
 -- Create event 1
@@ -342,6 +370,16 @@ BEGIN
   DECLARE var2 TIMESTAMP default CURRENT_TIMESTAMP;
   DECLARE var3 INT unsigned default 2 + var1;
 END -- //-- delimiter ;
+#end
+#begin
+CREATE DEFINER=`system_user`@`%` PROCEDURE `update_order`(IN orderID bigint(11))
+BEGIN  insert into order_config(order_id, attribute, value, performer)
+       SELECT orderID, 'first_attr', 'true', 'AppConfig'
+       WHERE NOT EXISTS (select 1 from inventory.order_config t1 where t1.order_id = orderID and t1.attribute = 'first_attr') OR
+             EXISTS (select 1 from inventory.order_config p2 where p2.order_id = orderID and p2.attribute = 'first_attr' and p2.performer = 'AppConfig')
+       ON DUPLICATE KEY UPDATE value = 'true',
+                            performer = 'AppConfig'; -- Enable second_attr for order
+END
 #end
 -- Create procedure
 -- delimiter //

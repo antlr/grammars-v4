@@ -9,7 +9,7 @@ SOURCES = $(GENERATED) Program.go
 default: classes
 classes: $(SOURCES)
 	@if [ "$(GOPATH)" = "" ]; then echo "GOPATH must be defined, usually c:/users/youruserid/."; exit 1; fi
-	export GO111MODULE=auto; go get github.com/antlr/antlr4/runtime/Go/antlr
+	GO111MODULE=on go get -u github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
 clean:
 	rm -f *.tokens *.interp
 	rm -f $(GENERATED)

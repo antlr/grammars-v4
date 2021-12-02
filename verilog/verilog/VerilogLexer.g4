@@ -53,7 +53,7 @@ HIGHZ1 : 'highz1' ;
 IF : 'if' ;
 IFNONE : 'ifnone' ;
 INCDIR : 'incdir' ;
-INCLUDE : 'include' ;
+INCLUDE : 'include' -> mode(LIBRARY_SOURCE_TEXT_MODE) ;
 INITIAL : 'initial' ;
 INOUT : 'inout' ;
 INPUT : 'input' ;
@@ -62,7 +62,7 @@ INTEGER : 'integer' ;
 JOIN : 'join' ;
 LARGE : 'large' ;
 LIBLIST : 'liblist' ;
-LIBRARY : 'library' ;
+LIBRARY : 'library' -> mode(LIBRARY_SOURCE_TEXT_MODE) ;
 LOCALPARAM : 'localparam' ;
 MACROMODULE : 'macromodule' ;
 MEDIUM : 'medium' ;
@@ -174,7 +174,7 @@ DOLLAR_FSEEK : '$fseek' ;
 DOLLAR_FFLUSH : '$fflush' ;
 DOLLAR_FEOF : '$feof' ;
 DOLLAR_SDF_ANNOTATE : '$sdf_annotate' ;
-DOLLAR_FOPEN : '$fopen' ;
+DOLLAR_FOPEN : '$fopen' -> mode(FILE_OPEN_FUNCTION_MODE) ;
 DOLLAR_FWRITE : '$fwrite' ;
 DOLLAR_FWRITEB : '$fwriteb' ;
 DOLLAR_FWRITEH : '$fwriteh' ;
@@ -197,8 +197,8 @@ DOLLAR_READMEMH : '$readmemh' ;
 DOLLAR_PRINTTIMESCALE : '$printtimescale' ;
 DOLLAR_TIMEFORMAT : '$timeformat' ;
 // Simulation control tasks
-DOLLAR_FINISH : '$finish' ;
-DOLLAR_STOP : '$stop' ;
+DOLLAR_FINISH : '$finish' -> mode(SIMULATION_CONTROL_TASK_MODE) ;
+DOLLAR_STOP : '$stop' -> mode(SIMULATION_CONTROL_TASK_MODE) ;
 // PLA modeling tasks
 DOLLAR_ASYNC_AND_ARRAY : '$async$and$array' ;
 DOLLAR_ASYNC_NAND_ARRAY : '$async$nand$array' ;
@@ -436,9 +436,6 @@ PATHPULSE_DOLLAR : 'PATHPULSE$' ;
 
 // Context-specific rules
 /*
-// A.1.1 Library source text
-FILE_PATH_SPEC : ~[ \t\r\n]+ ;
-MINUS_INCDIR : '-incdir' ;
 // A.5.3 UDP body
 INIT_VAL : '1' APOSTROPHE [bB] [01xX] | [01] ;
 OUTPUT_SYMBOL : [01xX] ;
@@ -448,6 +445,30 @@ EDGE_SYMBOL : [rRfFpPnN*] ;
 EDGE_DESCRIPTOR : '01' | '10' | [xXzZ] [01] | [01] [xXzZ] ;
 SCALAR_CONSTANT : '1' APOSTROPHE [bB] [01] | [01] ;
 */
+
+mode LIBRARY_SOURCE_TEXT_MODE;
+LIBRARY_IDENTIFIER : (LETTER | UNDERSCORE) (LETTER | UNDERSCORE | DECIMAL_DIGIT | DOLLAR_SIGN)* ;
+LIBRARY_WHITE_SPACE : WHITE_SPACE+ -> channel(HIDDEN) ;
+FILE_PATH_SPEC : ~[ \t\r\n,;]+ ;
+MINUS_INCDIR : '-incdir' ;
+LIBRARY_COMMA : ',' ;
+LIBRARY_SEMICOLON : ';' -> mode(DEFAULT_MODE) ;
+
+mode FILE_OPEN_FUNCTION_MODE;
+TYPE : 'r' | 'rb' | 'w' | 'wb' | 'a' | 'ab' | 'r+' | 'r+b' | 'rb+' | 'w+' | 'w+b' | 'wb+' | 'a+' | 'a+b' | 'ab+' ;
+FILE_OPEN_STRING : '"' ~["\r\n]* '"' ;
+FILE_OPEN_WHITE_SPACE : WHITE_SPACE+ -> channel(HIDDEN) ;
+FILE_OPEN_LEFT_PARENTHESIS : '(' ;
+FILE_OPEN_RIGHT_PARENTHESIS : ')' ;
+FILE_OPEN_COMMA : ',' ;
+FILE_OPEN_SEMICOLON : ';' -> mode(DEFAULT_MODE) ;
+
+mode SIMULATION_CONTROL_TASK_MODE;
+FINISH_NUMBER : [0-2] ;
+SIMULATION_CONTROL_WHITE_SPACE : WHITE_SPACE+ -> channel(HIDDEN) ;
+SIMULATION_CONTROL_LEFT_PARENTHESIS : '(' ;
+SIMULATION_CONTROL_RIGHT_PARENTHESIS : ')' ;
+SIMULATION_CONTROL_SEMICOLON : ';' -> mode(DEFAULT_MODE) ;
 
 mode DIRECTIVE_MODE;
 // Compiler directives

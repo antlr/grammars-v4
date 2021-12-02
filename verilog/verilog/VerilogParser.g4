@@ -3,10 +3,8 @@
 
 parser grammar VerilogParser;
 
-options {
-	tokenVocab = VerilogLexer;
-}
-/*
+options { tokenVocab = VerilogLexer; }
+
 // 17. System tasks and functions
 // 17.1 Display system tasks
 // 17.1.1 The display and write tasks
@@ -33,6 +31,9 @@ list_of_arguments
 argument
 	: expression
 	| constant_expression
+	| time_function
+	| stime_function
+	| realtime_function
 	;
 
 // 17.1.2 Strobed monitoring
@@ -67,8 +68,8 @@ monitor_task_name
 // 17.2.1 Opening and closing files
 
 file_open_function
-	: multi_channel_descriptor EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS filename RIGHT_PARENTHESIS SEMICOLON
-	| fd EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS filename COMMA TYPE RIGHT_PARENTHESIS SEMICOLON
+	: multi_channel_descriptor EQUAL DOLLAR_FOPEN FILE_OPEN_LEFT_PARENTHESIS file_name FILE_OPEN_RIGHT_PARENTHESIS FILE_OPEN_SEMICOLON
+	| fd EQUAL DOLLAR_FOPEN FILE_OPEN_LEFT_PARENTHESIS file_name FILE_OPEN_COMMA TYPE FILE_OPEN_RIGHT_PARENTHESIS FILE_OPEN_SEMICOLON
 	;
 
 file_close_task
@@ -84,8 +85,8 @@ fd
 	: variable_identifier
 	;
 
-filename
-	: STRING
+file_name
+	: FILE_OPEN_STRING
 	;
 
 // 17.2.2 File output system tasks
@@ -133,17 +134,21 @@ finish_addr
 	: UNSIGNED_NUMBER
 	;
 
+filename
+	: STRING
+	;
+
 // 17.4 Simulation control system tasks
 // 17.4.1 $finish
 
 finish_task
-	: DOLLAR_FINISH (LEFT_PARENTHESIS FINISH_NUMBER RIGHT_PARENTHESIS)? SEMICOLON
+	: DOLLAR_FINISH (SIMULATION_CONTROL_LEFT_PARENTHESIS FINISH_NUMBER SIMULATION_CONTROL_RIGHT_PARENTHESIS)? SIMULATION_CONTROL_SEMICOLON
 	;
 
 // 17.4.2 $stop
 
 stop_task
-	: DOLLAR_STOP (LEFT_PARENTHESIS FINISH_NUMBER RIGHT_PARENTHESIS)? SEMICOLON
+	: DOLLAR_STOP (SIMULATION_CONTROL_LEFT_PARENTHESIS FINISH_NUMBER SIMULATION_CONTROL_RIGHT_PARENTHESIS)? SIMULATION_CONTROL_SEMICOLON
 	;
 
 // 17.7 Simulation time system functions
@@ -167,7 +172,7 @@ realtime_function
 // 17.8 Conversion functions
 
 conversion_functions
-	: conversion_function_name LEFT_PARENTHESIS argument RIGHT_PARENTHESIS
+	: conversion_function_name LEFT_PARENTHESIS constant_argument RIGHT_PARENTHESIS
 	;
 
 conversion_function_name
@@ -177,6 +182,10 @@ conversion_function_name
 	| DOLLAR_BITSTOREAL
 	| DOLLAR_SIGNED
 	| DOLLAR_UNSIGNED
+	;
+
+constant_argument
+	: constant_expression
 	;
 
 // 17.9 Probabilistic distribution functions
@@ -234,12 +243,12 @@ math_functions
 	;
 
 integer_math_functions
-	: DOLLAR_CLOG2 LEFT_PARENTHESIS argument RIGHT_PARENTHESIS
+	: DOLLAR_CLOG2 LEFT_PARENTHESIS constant_argument RIGHT_PARENTHESIS
 	;
 
 real_math_functions
-	: single_argument_real_math_function_name LEFT_PARENTHESIS argument RIGHT_PARENTHESIS
-	| double_argument_real_math_function_name LEFT_PARENTHESIS argument COMMA argument RIGHT_PARENTHESIS
+	: single_argument_real_math_function_name LEFT_PARENTHESIS constant_argument RIGHT_PARENTHESIS
+	| double_argument_real_math_function_name LEFT_PARENTHESIS constant_argument COMMA argument RIGHT_PARENTHESIS
 	;
 
 single_argument_real_math_function_name
@@ -268,7 +277,7 @@ double_argument_real_math_function_name
 	| DOLLAR_ATAN2
 	| DOLLAR_HYPOT
 	;
-
+/*
 // 18. Value change dump (VCD) files
 // 18.3 Creating extended VCD file
 // 18.3.1 Specifying dump file name and ports to be dumped ($dumpports)
@@ -353,7 +362,7 @@ simulation_keyword
 */
 // A.1 Source text
 // A.1.1 Library source text
-/*
+
 library_text
 	: library_description*
 	;
@@ -365,13 +374,13 @@ library_description
 	;
 
 library_declaration
-	: LIBRARY library_identifier FILE_PATH_SPEC (COMMA FILE_PATH_SPEC)* (MINUS_INCDIR FILE_PATH_SPEC (COMMA FILE_PATH_SPEC)*)? SEMICOLON
+	: LIBRARY LIBRARY_IDENTIFIER FILE_PATH_SPEC (LIBRARY_COMMA FILE_PATH_SPEC)* (MINUS_INCDIR FILE_PATH_SPEC (LIBRARY_COMMA FILE_PATH_SPEC)*)? LIBRARY_SEMICOLON
 	;
 
 include_statement
-	: INCLUDE FILE_PATH_SPEC SEMICOLON
+	: INCLUDE FILE_PATH_SPEC LIBRARY_SEMICOLON
 	;
-*/
+
 // A.1.2 Verilog source text
 // START SYMBOL
 source_text
@@ -1283,6 +1292,15 @@ statement
 	| attribute_instance* system_task_enable
 	| attribute_instance* task_enable
 	| attribute_instance* wait_statement
+	| display_tasks
+	| strobe_tasks
+	| monitor_tasks
+	| file_open_function
+	| file_close_task
+	| file_output_tasks
+	| load_memory_tasks
+	| finish_task
+	| stop_task
 	;
 
 statement_or_null
@@ -1878,6 +1896,10 @@ constant_primary
 	| constant_system_function_call
 	| LEFT_PARENTHESIS constant_mintypmax_expression RIGHT_PARENTHESIS
 	| STRING
+	| conversion_functions
+	| random_function
+	| dist_functions
+	| math_functions
 	;
 
 module_path_primary

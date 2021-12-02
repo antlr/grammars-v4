@@ -33,9 +33,14 @@ case "$target" in
     Python3) do_not_do_list=`cat _scripts/skip-python3.txt` ;;
     *) echo "Unknown target"; exit 1;;
 esac
-todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
-echo $todo_pattern
-do_not_do_list=`echo $do_not_do_list | sed 's/^ //g' | sed 's/  / /g' | sed 's/ /,/g'`
+invert="$2"
+if [[ "$invert" == "" ]]
+then
+    todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
+else
+    todo_pattern="^(.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
+fi
+echo To do list pattern = $todo_pattern
 
 # Sanity checks for required environment.
 unameOut="$(uname -s)"
@@ -161,7 +166,7 @@ part1()
     # 1) Generate driver source code from poms.
     rm -rf `find . -name Generated -type d`
     echo "Generating drivers."
-    bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.2-complete.jar`
+    bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.3-complete.jar`
     for i in $bad; do failed=`add "$failed" "$i"`; done
     date
 }
