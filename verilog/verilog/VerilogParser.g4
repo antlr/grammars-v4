@@ -127,11 +127,11 @@ memory_name
 	;
 
 start_addr
-	: UNSIGNED_NUMBER
+	: DECIMAL_NUMBER
 	;
 
 finish_addr
-	: UNSIGNED_NUMBER
+	: DECIMAL_NUMBER
 	;
 
 filename
@@ -213,27 +213,27 @@ dist_functions
 	;
 
 start
-	: UNSIGNED_NUMBER
+	: DECIMAL_NUMBER
 	;
 
 end
-	: UNSIGNED_NUMBER
+	: DECIMAL_NUMBER
 	;
 
 mean
-	: UNSIGNED_NUMBER
+	: DECIMAL_NUMBER
 	;
 
 standard_deviation
-	: UNSIGNED_NUMBER
+	: DECIMAL_NUMBER
 	;
 
 degree_of_freedom
-	: UNSIGNED_NUMBER
+	: DECIMAL_NUMBER
 	;
 
 k_stage
-	: UNSIGNED_NUMBER
+	: DECIMAL_NUMBER
 	;
 
 // 17.11 Math functions
@@ -304,7 +304,7 @@ module_or_variable
 	;
 
 levels
-	: UNSIGNED_NUMBER
+	: DECIMAL_NUMBER
 	;
 
 // 18.1.3 Stopping and resuming the dump ($dumpoff/$dumpon)
@@ -330,7 +330,7 @@ dumplimit_task
 	;
 
 file_size
-	: UNSIGNED_NUMBER
+	: DECIMAL_NUMBER
 	;
 
 // 18.1.6 Reading dump file during simulation ($dumpflush)
@@ -701,7 +701,7 @@ delay2
 	;
 
 delay_value
-	: UNSIGNED_NUMBER
+	: DECIMAL_NUMBER
 	| REAL_NUMBER
 	| identifier
 	;
