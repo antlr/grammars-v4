@@ -10,7 +10,7 @@ options { tokenVocab = VerilogLexer; }
 // 17.1.1 The display and write tasks
 
 display_tasks
-	: display_task_name (LEFT_PARENTHESIS list_of_arguments RIGHT_PARENTHESIS)?
+	: display_task_name (LEFT_PARENTHESIS list_of_arguments RIGHT_PARENTHESIS)? SEMICOLON
 	;
 
 display_task_name
@@ -39,7 +39,7 @@ argument
 // 17.1.2 Strobed monitoring
 
 strobe_tasks
-	: strobe_task_name (LEFT_PARENTHESIS list_of_arguments RIGHT_PARENTHESIS)?
+	: strobe_task_name (LEFT_PARENTHESIS list_of_arguments RIGHT_PARENTHESIS)? SEMICOLON
 	;
 
 strobe_task_name
