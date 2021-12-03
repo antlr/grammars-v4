@@ -1973,7 +1973,7 @@ net_lvalue
 
 variable_lvalue
 	: hierarchical_variable_identifier ((LEFT_BRACKET expression RIGHT_BRACKET)* LEFT_BRACKET range_expression RIGHT_BRACKET)?
-	| LEFT_BRACE variable_lvalue (COMMA variable_lvalue) RIGHT_BRACE
+	| LEFT_BRACE variable_lvalue (COMMA variable_lvalue)* RIGHT_BRACE
 	;
 
 // A.8.6 Operators
