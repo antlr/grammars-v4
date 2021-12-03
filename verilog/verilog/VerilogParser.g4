@@ -1968,7 +1968,7 @@ primary
 
 net_lvalue
 	: hierarchical_net_identifier ((LEFT_BRACKET constant_expression RIGHT_BRACKET)* LEFT_BRACKET constant_range_expression RIGHT_BRACKET)?
-	| LEFT_BRACE net_lvalue (COMMA net_lvalue) RIGHT_BRACE
+	| LEFT_BRACE net_lvalue (COMMA net_lvalue)* RIGHT_BRACE
 	;
 
 variable_lvalue
