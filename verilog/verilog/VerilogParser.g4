@@ -136,6 +136,7 @@ finish_addr
 
 filename
 	: STRING
+	| variable_identifier
 	;
 
 // 17.4 Simulation control system tasks
@@ -277,8 +278,67 @@ double_argument_real_math_function_name
 	| DOLLAR_ATAN2
 	| DOLLAR_HYPOT
 	;
-/*
+
 // 18. Value change dump (VCD) files
+// 18.1 Creating four-state VCD file
+// 18.1.1 Specifying name of dump file ($dumpfile)
+
+dumpfile_task
+	: DOLLAR_DUMPFILE LEFT_PARENTHESIS filename RIGHT_PARENTHESIS SEMICOLON
+	;
+
+// 18.1.2 Specifying variables to be dumped ($dumpvars)
+
+dumpvars_task
+	: DOLLAR_DUMPVARS SEMICOLON
+	| DOLLAR_DUMPVARS LEFT_PARENTHESIS levels (COMMA list_of_modules_or_variables)? RIGHT_PARENTHESIS SEMICOLON
+	;
+
+list_of_modules_or_variables
+	: module_or_variable (COMMA module_or_variable)*
+	;
+
+module_or_variable
+	: module_identifier
+	| variable_identifier
+	;
+
+levels
+	: UNSIGNED_NUMBER
+	;
+
+// 18.1.3 Stopping and resuming the dump ($dumpoff/$dumpon)
+
+dumpoff_task
+	: DOLLAR_DUMPOFF SEMICOLON
+	;
+
+dumpon_task
+	: DOLLAR_DUMPON SEMICOLON
+	;
+
+// 18.1.4 Generating a checkpoint ($dumpall)
+
+dumpall_task
+	: DOLLAR_DUMPALL SEMICOLON
+	;
+
+// 18.1.5 Limiting size of dump file ($dumplimit)
+
+dumplimit_task
+	: DOLLAR_DUMPLIMIT LEFT_PARENTHESIS file_size RIGHT_PARENTHESIS SEMICOLON
+	;
+
+file_size
+	: UNSIGNED_NUMBER
+	;
+
+// 18.1.6 Reading dump file during simulation ($dumpflush)
+
+dumpflush_task
+	: DOLLAR_DUMPFLUSH SEMICOLON
+	;
+
 // 18.3 Creating extended VCD file
 // 18.3.1 Specifying dump file name and ports to be dumped ($dumpports)
 
@@ -291,7 +351,9 @@ scope_list
 	;
 
 file_pathname
-	: filename
+	: STRING
+	| variable_identifier
+	| expression
 	;
 
 // 18.3.2 Stopping and resuming the dump ($dumpportsoff/$dumpportson)
@@ -316,50 +378,12 @@ dumpportslimit_task
 	: DOLLAR_DUMPPORTSLIMIT LEFT_PARENTHESIS file_size COMMA file_pathname RIGHT_PARENTHESIS SEMICOLON
 	;
 
-file_size
-	: DECIMAL_NUMBER
-	;
-
 // 18.3.5 Reading dump file during simulation ($dumpportsflush)
 
 dumpportsflush_task
 	: DOLLAR_DUMPPORTSFLUSH LEFT_PARENTHESIS file_pathname RIGHT_PARENTHESIS SEMICOLON
 	;
 
-// 18.4 Format of extended VCD file
-// 18.4.1 Syntax of extended VCD file
-
-value_change_dump_definitions
-	: declaration_command* simulation_command*
-	;
-
-declaration_command
-	: declaration_keyword COMMAND_TEXT? DOLLAR_END
-	;
-
-simulation_command
-	: simulation_keyword VALUE_CHANGE* DOLLAR_END
-	;
-
-declaration_keyword
-	: DOLLAR_COMMENT
-	| DOLLAR_DATE
-	| DOLLAR_ENDDEFINITIONS
-	| DOLLAR_SCOPE
-	| DOLLAR_TIMESCALE
-	| DOLLAR_UPSCOPE
-	| DOLLAR_VAR
-	| DOLLAR_VCDCLOSE
-	| DOLLAR_VERSION
-	;
-
-simulation_keyword
-	: DOLLAR_DUMPPORTS
-	| DOLLAR_DUMPPORTSOFF
-	| DOLLAR_DUMPPORTSON
-	| DOLLAR_DUMPPORTSALL
-	;
-*/
 // A.1 Source text
 // A.1.1 Library source text
 
@@ -1301,6 +1325,19 @@ statement
 	| load_memory_tasks
 	| finish_task
 	| stop_task
+	| dumpall_task
+	| dumpfile_task
+	| dumpflush_task
+	| dumplimit_task
+	| dumpoff_task
+	| dumpon_task
+	| dumpports_task
+	| dumpportsall_task
+	| dumpportsflush_task
+	| dumpportslimit_task
+	| dumpportsoff_task
+	| dumpportson_task
+	| dumpvars_task
 	;
 
 statement_or_null
