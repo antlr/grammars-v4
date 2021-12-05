@@ -5,6 +5,11 @@ parser grammar VerilogPreprocessorParser;
 
 options { tokenVocab = VerilogLexer; }
 
+// START SYMBOL
+source_text
+	: compiler_directive*
+	;
+
 // 19. Compiler directives
 
 compiler_directive
@@ -47,7 +52,7 @@ default_nettype_compiler_directive
 // 19.3.1 `define
 
 text_macro_definition
-	: GRAVE_ACCENT DIRECTIVE_DEFINE TEXT_MACRO_NAME (MACRO_TEXT | MACRO_TEXT_BACKSLASH_NEWLINE)+
+	: GRAVE_ACCENT DIRECTIVE_DEFINE TEXT_MACRO_NAME (MACRO_TEXT | MACRO_TEXT_BACKSLASH_NEWLINE)*
 	;
 
 text_macro_usage
@@ -63,11 +68,23 @@ undefine_compiler_directive
 // 19.4 `ifdef, `else, `elsif, `endif , `ifndef
 
 ifdef_directive
-	: GRAVE_ACCENT DIRECTIVE_IFDEF CONDITIONAL_DIRECTIVE_IDENTIFIER VERILOG_TEXT
+	: GRAVE_ACCENT DIRECTIVE_IFDEF CONDITIONAL_DIRECTIVE_IDENTIFIER VERILOG_TEXT elsif_directive* else_directive? endif_directive
 	;
 
 ifndef_directive
-	: GRAVE_ACCENT DIRECTIVE_IFNDEF CONDITIONAL_DIRECTIVE_IDENTIFIER VERILOG_TEXT
+	: GRAVE_ACCENT DIRECTIVE_IFNDEF CONDITIONAL_DIRECTIVE_IDENTIFIER VERILOG_TEXT elsif_directive* else_directive? endif_directive
+	;
+
+elsif_directive
+	: GRAVE_ACCENT DIRECTIVE_ELSIF CONDITIONAL_DIRECTIVE_IDENTIFIER VERILOG_TEXT
+	;
+
+else_directive
+	: GRAVE_ACCENT DIRECTIVE_ELSE VERILOG_TEXT
+	;
+
+endif_directive
+	: GRAVE_ACCENT DIRECTIVE_ENDIF
 	;
 
 // 19.5 `include
@@ -91,7 +108,7 @@ line_compiler_directive
 // 19.8 `timescale
 
 timescale_compiler_directive
-	: GRAVE_ACCENT DIRECTIVE_TIMESCALE TIME_NUMBER TIME_UNIT TIMESCALE_SLASH TIME_NUMBER TIME_UNIT
+	: GRAVE_ACCENT DIRECTIVE_TIMESCALE TIMESCALE_ARGUMENTS
 	;
 
 // 19.9 `unconnected_drive and `nounconnected_drive
