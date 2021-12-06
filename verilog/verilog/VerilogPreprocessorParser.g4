@@ -10,6 +10,11 @@ source_text
 	: compiler_directive*
 	;
 
+grave_accent
+	: GRAVE_ACCENT
+	| SOURCE_GRAVE_ACCENT
+	;
+
 // 19. Compiler directives
 
 compiler_directive
@@ -35,17 +40,17 @@ compiler_directive
 // 19.1 `celldefine and `endcelldefine
 
 celldefine_compiler_directive
-	: GRAVE_ACCENT DIRECTIVE_CELLDEFINE
+	: grave_accent DIRECTIVE_CELLDEFINE
 	;
 
 endcelldefine_compiler_directive
-	: GRAVE_ACCENT DIRECTIVE_ENDCELLDEFINE
+	: grave_accent DIRECTIVE_ENDCELLDEFINE
 	;
 
 // 19.2 `default_nettype
 
 default_nettype_compiler_directive
-	: GRAVE_ACCENT DIRECTIVE_DEFAULT_NETTYPE default_nettype_value
+	: grave_accent DIRECTIVE_DEFAULT_NETTYPE default_nettype_value
 	;
 
 default_nettype_value
@@ -56,65 +61,51 @@ default_nettype_value
 // 19.3.1 `define
 
 text_macro_definition
-	: GRAVE_ACCENT DIRECTIVE_DEFINE text_macro_identifier (DIRECTIVE_LEFT_PARENTHESIS list_of_formal_arguments DIRECTIVE_RIGHT_PARENTHESIS)? (MACRO_TEXT | MACRO_TEXT_BACKSLASH_NEWLINE)*
-	;
-
-list_of_formal_arguments
-	: formal_argument_identifier (DIRECTIVE_COMMA formal_argument_identifier)*
-	;
-
-formal_argument_identifier
-	: DIRECTIVE_IDENTIFIER
-	;
-
-text_macro_identifier
-	: DIRECTIVE_IDENTIFIER
+	: grave_accent DIRECTIVE_DEFINE text_macro_identifier (MACRO_TEXT | MACRO_BACKSLASH_NEWLINE)*
 	;
 
 text_macro_usage
-	: GRAVE_ACCENT text_macro_identifier (DIRECTIVE_LEFT_PARENTHESIS list_of_actual_arguments DIRECTIVE_RIGHT_PARENTHESIS)?
+	: grave_accent text_macro_identifier DIRECTIVE_LIST_OF_ARGUMENTS?
 	;
 
-list_of_actual_arguments
-	: actual_argument (DIRECTIVE_COMMA actual_argument)*
-	;
-
-actual_argument
-	: DIRECTIVE_IDENTIFIER
+text_macro_identifier
+	: TEXT_MACRO_NAME
+	| DIRECTIVE_IDENTIFIER
+	| CONDITIONAL_MACRO_NAME
 	;
 
 // 19.3.2 `undef
 
 undefine_compiler_directive
-	: GRAVE_ACCENT DIRECTIVE_UNDEF text_macro_identifier
+	: grave_accent DIRECTIVE_UNDEF text_macro_identifier
 	;
 
 // 19.4 `ifdef, `else, `elsif, `endif , `ifndef
 
 ifdef_directive
-	: GRAVE_ACCENT DIRECTIVE_IFDEF text_macro_identifier VERILOG_TEXT elsif_directive* else_directive? endif_directive
+	: grave_accent DIRECTIVE_IFDEF text_macro_identifier SOURCE_TEXT elsif_directive* else_directive? endif_directive
 	;
 
 ifndef_directive
-	: GRAVE_ACCENT DIRECTIVE_IFNDEF text_macro_identifier VERILOG_TEXT elsif_directive* else_directive? endif_directive
+	: grave_accent DIRECTIVE_IFNDEF text_macro_identifier SOURCE_TEXT elsif_directive* else_directive? endif_directive
 	;
 
 elsif_directive
-	: GRAVE_ACCENT DIRECTIVE_ELSIF text_macro_identifier VERILOG_TEXT
+	: grave_accent DIRECTIVE_ELSIF text_macro_identifier SOURCE_TEXT
 	;
 
 else_directive
-	: GRAVE_ACCENT DIRECTIVE_ELSE VERILOG_TEXT
+	: grave_accent DIRECTIVE_ELSE SOURCE_TEXT
 	;
 
 endif_directive
-	: GRAVE_ACCENT DIRECTIVE_ENDIF
+	: grave_accent DIRECTIVE_ENDIF
 	;
 
 // 19.5 `include
 
 include_compiler_directive
-	: GRAVE_ACCENT DIRECTIVE_INCLUDE filename
+	: grave_accent DIRECTIVE_INCLUDE filename
 	;
 
 filename
@@ -124,13 +115,13 @@ filename
 // 19.6 `resetall
 
 resetall_compiler_directive
-	: GRAVE_ACCENT DIRECTIVE_RESETALL
+	: grave_accent DIRECTIVE_RESETALL
 	;
 
 // 19.7 `line
 
 line_compiler_directive
-	: GRAVE_ACCENT DIRECTIVE_LINE line_number filename line_level
+	: grave_accent DIRECTIVE_LINE line_number filename line_level
 	;
 
 line_number
@@ -144,7 +135,7 @@ line_level
 // 19.8 `timescale
 
 timescale_compiler_directive
-	: GRAVE_ACCENT DIRECTIVE_TIMESCALE time_literal DIRECTIVE_SLASH time_literal
+	: grave_accent DIRECTIVE_TIMESCALE time_literal DIRECTIVE_SLASH time_literal
 	;
 
 time_literal
@@ -162,7 +153,7 @@ time_unit
 // 19.9 `unconnected_drive and `nounconnected_drive
 
 unconnected_drive_compiler_directive
-	: GRAVE_ACCENT DIRECTIVE_UNCONNECTED_DRIVE unconnected_drive_value
+	: grave_accent DIRECTIVE_UNCONNECTED_DRIVE unconnected_drive_value
 	;
 
 unconnected_drive_value
@@ -170,13 +161,13 @@ unconnected_drive_value
 	;
 
 nounconnected_drive_compiler_directive
-	: GRAVE_ACCENT DIRECTIVE_NOUNCONNECTED_DRIVE
+	: grave_accent DIRECTIVE_NOUNCONNECTED_DRIVE
 	;
 
 // 19.10 `pragma
 
 pragma
-	: GRAVE_ACCENT DIRECTIVE_PRAGMA pragma_name (pragma_expression (DIRECTIVE_COMMA pragma_expression)*)?
+	: grave_accent DIRECTIVE_PRAGMA pragma_name (pragma_expression (DIRECTIVE_COMMA pragma_expression)*)?
 	;
 
 pragma_name
@@ -201,7 +192,7 @@ pragma_keyword
 // 19.11 `begin_keywords, `end_keywords
 
 keywords_directive
-	: GRAVE_ACCENT DIRECTIVE_BEGIN_KEYWORDS version_specifier
+	: grave_accent DIRECTIVE_BEGIN_KEYWORDS version_specifier
 	;
 
 version_specifier
@@ -209,5 +200,5 @@ version_specifier
 	;
 
 endkeywords_directive
-	: GRAVE_ACCENT DIRECTIVE_END_KEYWORDS
+	: grave_accent DIRECTIVE_END_KEYWORDS
 	;
