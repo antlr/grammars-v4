@@ -3,7 +3,7 @@
 
 parser grammar VerilogParser;
 
-options { tokenVocab = VerilogLexer; }
+options { tokenVocab=VerilogLexer; }
 
 // 17. System tasks and functions
 // 17.1 Display system tasks

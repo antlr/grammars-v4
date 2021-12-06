@@ -1,7 +1,9 @@
 `timescale 1ns / 10ps
 `line 1 "compiler_directives.v" 1
-`resetall `default_nettype none
+`resetall
+`default_nettype none
 `unconnected_drive pull1
+`begin_keywords "1364-2005"
 module top (
     x,
     y
@@ -14,7 +16,6 @@ module top (
   `unconnected_drive pull0
   wire z;
   wire [`SIGNAL_WIDTH_ (z)-1:0] w;
-  `begin_keywords "1364-2005"
 `ifdef SOME_MACRO
   always @(posedge x) w <= y ^ z;
 `else
@@ -36,8 +37,8 @@ module top (
 `endif
   `define _INVERT_(a, b)\
 assign b = ~a;\
-// comment inside macro_text \
-`end_keywords // this is also inside macro text
+// comment inside macro text \
+// this is also inside macro text
   `_INVERT_(x, y)  // macro usage
   `undef _INVERT_
   NOT u1 (
@@ -46,5 +47,6 @@ assign b = ~a;\
   );
   `pragma _PRAGMA_NAME_ prgm_kywrd0, prgm_kywrd1 = "prgm_val1", prgm_id
 endmodule
+`end_keywords
 `endcelldefine
 `default_nettype wire

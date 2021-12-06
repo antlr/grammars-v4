@@ -39,7 +39,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>source_text</entryPoint>
-					<grammarName>VerilogParser</grammarName>
+					<grammarName>Verilog</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
