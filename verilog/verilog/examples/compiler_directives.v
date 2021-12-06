@@ -4,6 +4,7 @@
 `unconnected_drive pull1
 module top (x, y);`celldefine
   `include "verilog_header.vh"
+  'define ASD_
   input x;
   output y;
   `unconnected_drive pull0
