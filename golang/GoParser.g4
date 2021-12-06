@@ -372,5 +372,6 @@ eos:
 	SEMI
 	| EOF
 	| {lineTerminatorAhead()}?
-	| {checkPreviousTokenText("}")}?;
+	| {checkPreviousTokenText("}")}?
+	| {checkPreviousTokenText(")")}?;
 
