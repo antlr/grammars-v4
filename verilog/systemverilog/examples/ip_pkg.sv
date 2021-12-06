@@ -21,20 +21,12 @@ package ip_pkg;
     }
     constraint c_flags {flags inside {3'b000, 3'b010, 3'b100};}
     constraint c_offset {if (flags == 3'b010) {fragment_offset == 0;}}
-    virtual function automatic void calculate_checksum;
-      bit [16:0] checksum;
-      checksum = 0;
-      checksum = checksum[15:0] + {version, ihl, dscp, ecn};
-      checksum = checksum[15:0] + total_length + checksum[16];
-      checksum = checksum[15:0] + identification + checksum[16];
-      checksum = checksum[15:0] + {flags, fragment_offset} + checksum[16];
-      checksum = checksum[15:0] + {ttl, protocol} + checksum[16];
-      checksum = checksum[15:0] + 16'd0 + checksum[16];
-      checksum = checksum[15:0] + source_address[31:16] + checksum[16];
-      checksum = checksum[15:0] + source_address[15:0] + checksum[16];
-      checksum = checksum[15:0] + destination_address[31:16] + checksum[16];
-      checksum = checksum[15:0] + destination_address[15:0] + checksum[16];
-      header_checksum = ~checksum[15:0];
+    virtual function automatic void calculate_checksum();
+      bit [4:0] carry;
+      {carry, header_checksum} = {version, ihl, dscp, ecn} + total_length + identification + {flags, fragment_offset} + {ttl, protocol} + source_address[31:16] + source_address[15:0] + destination_address[31:16] + destination_address[15:0];
+      {carry, header_checksum} = header_checksum + carry;
+      header_checksum = header_checksum + carry;
+      header_checksum = ~header_checksum;
     endfunction : calculate_checksum
     function void post_randomize;
       calculate_checksum();
