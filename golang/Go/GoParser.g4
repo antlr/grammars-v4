@@ -372,5 +372,6 @@ eos:
 	SEMI
 	| EOF
 	| { p.lineTerminatorAhead() }?
-	| { p.checkPreviousTokenText("}") }?;
+	| { p.checkPreviousTokenText("}") }?
+	| { p.checkPreviousTokenText(")") }?;
 
