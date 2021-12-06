@@ -3,7 +3,7 @@
 
 parser grammar VerilogPreprocessorParser;
 
-options { tokenVocab = VerilogLexer; }
+options { tokenVocab=VerilogLexer; }
 
 // START SYMBOL
 source_text
