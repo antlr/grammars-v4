@@ -155,21 +155,21 @@ fallthroughStmt: FALLTHROUGH;
 deferStmt: DEFER expression;
 
 ifStmt:
-	IF (terminatedSimpleStmt)? expression block (
+	IF terminatedSimpleStmt? expression block (
 		ELSE (ifStmt | block)
 	)?;
 
 switchStmt: exprSwitchStmt | typeSwitchStmt;
 
 exprSwitchStmt:
-	SWITCH (terminatedSimpleStmt)? expression? L_CURLY exprCaseClause* R_CURLY;
+	SWITCH terminatedSimpleStmt? expression? L_CURLY exprCaseClause* R_CURLY;
 
 exprCaseClause: exprSwitchCase COLON statementList?;
 
 exprSwitchCase: CASE expressionList | DEFAULT;
 
 typeSwitchStmt:
-	SWITCH (terminatedSimpleStmt)? typeSwitchGuard L_CURLY typeCaseClause* R_CURLY;
+	SWITCH terminatedSimpleStmt? typeSwitchGuard L_CURLY typeCaseClause* R_CURLY;
 
 typeSwitchGuard: (IDENTIFIER DECLARE_ASSIGN)? primaryExpr DOT L_PAREN TYPE R_PAREN;
 
