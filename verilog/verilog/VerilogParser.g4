@@ -69,7 +69,7 @@ monitor_task_name
 
 file_open_function
 	: multi_channel_descriptor EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS file_name RIGHT_PARENTHESIS SEMICOLON
-	| fd EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS file_name COMMA type RIGHT_PARENTHESIS SEMICOLON
+	| fd EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS file_name COMMA type_ RIGHT_PARENTHESIS SEMICOLON
 	;
 
 file_close_task
@@ -89,7 +89,7 @@ file_name
 	: STRING
 	;
 
-type
+type_
 	: STRING
 	| variable_identifier
 	;
