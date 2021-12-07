@@ -190,7 +190,7 @@ recvStmt: (expressionList ASSIGN | identifierList DECLARE_ASSIGN)? recvExpr = ex
 forStmt: FOR (expression | forClause | rangeClause)? block;
 
 forClause:
-	initStmt = simpleStmt? SEMI expression? SEMI postStmt = simpleStmt?;
+	initStmt = terminatedSimpleStmt expression? SEMI postStmt = simpleStmt?;
 
 rangeClause: (
 		expressionList ASSIGN
