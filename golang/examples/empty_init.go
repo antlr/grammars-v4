@@ -5,11 +5,11 @@ import (
 )
 
 func main() {
-	if  true {
+  if ; true {
     fmt.Print("Hello")
   }
 
-	x := 1
+  x := 1
 
   switch ; x {
   default: fmt.Print(" ") 
