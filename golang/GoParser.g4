@@ -106,6 +106,14 @@ simpleStmt:
 	| shortVarDecl
 	| emptyStmt;
 
+terminatedSimpleStmt:
+	sendStmt SEMI
+	| incDecStmt SEMI
+	| assignment SEMI
+	| expressionStmt SEMI
+	| shortVarDecl SEMI
+	| emptyStmt;
+
 expressionStmt: expression;
 
 sendStmt: channel = expression RECEIVE expression;
@@ -147,21 +155,21 @@ fallthroughStmt: FALLTHROUGH;
 deferStmt: DEFER expression;
 
 ifStmt:
-	IF (simpleStmt SEMI)? expression block (
+	IF (terminatedSimpleStmt)? expression block (
 		ELSE (ifStmt | block)
 	)?;
 
 switchStmt: exprSwitchStmt | typeSwitchStmt;
 
 exprSwitchStmt:
-	SWITCH (simpleStmt SEMI)? expression? L_CURLY exprCaseClause* R_CURLY;
+	SWITCH (terminatedSimpleStmt)? expression? L_CURLY exprCaseClause* R_CURLY;
 
 exprCaseClause: exprSwitchCase COLON statementList?;
 
 exprSwitchCase: CASE expressionList | DEFAULT;
 
 typeSwitchStmt:
-	SWITCH (simpleStmt SEMI)? typeSwitchGuard L_CURLY typeCaseClause* R_CURLY;
+	SWITCH (terminatedSimpleStmt)? typeSwitchGuard L_CURLY typeCaseClause* R_CURLY;
 
 typeSwitchGuard: (IDENTIFIER DECLARE_ASSIGN)? primaryExpr DOT L_PAREN TYPE R_PAREN;
 
