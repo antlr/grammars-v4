@@ -181,7 +181,7 @@ sourceElement
 statement
  : block
  | variableStatement
- | emptyStatement
+ | emptyStatement_
  | {this._input.LA(1).type != ECMAScriptParser.OpenBrace}? expressionStatement
  | ifStatement
  | iterationStatement
@@ -236,7 +236,7 @@ initialiser
 
 /// EmptyStatement :
 ///     ;
-emptyStatement
+emptyStatement_
  : SemiColon
  ;
 
