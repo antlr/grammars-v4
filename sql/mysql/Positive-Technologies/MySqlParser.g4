@@ -35,8 +35,8 @@ root
     ;
 
 sqlStatements
-    : (sqlStatement (MINUS MINUS)? SEMI? | emptyStatement)*
-    (sqlStatement ((MINUS MINUS)? SEMI)? | emptyStatement)
+    : (sqlStatement (MINUS MINUS)? SEMI? | emptyStatement_)*
+    (sqlStatement ((MINUS MINUS)? SEMI)? | emptyStatement_)
     ;
 
 sqlStatement
@@ -45,7 +45,7 @@ sqlStatement
     | administrationStatement | utilityStatement
     ;
 
-emptyStatement
+emptyStatement_
     : SEMI
     ;
 
@@ -247,8 +247,14 @@ createView
 // details
 
 createDatabaseOption
-    : DEFAULT? (CHARACTER SET | CHARSET) '='? (charsetName | DEFAULT)
+    : DEFAULT? charSet '='? (charsetName | DEFAULT)
     | DEFAULT? COLLATE '='? collationName
+    ;
+
+charSet
+    : CHARACTER SET
+    | CHARSET
+    | CHAR SET
     ;
 
 ownerStatement
@@ -410,37 +416,37 @@ indexColumnDefinition
     ;
 
 tableOption
-    : ENGINE '='? engineName?                                       #tableOptionEngine
-    | AUTO_INCREMENT '='? decimalLiteral                            #tableOptionAutoIncrement
-    | AVG_ROW_LENGTH '='? decimalLiteral                            #tableOptionAverage
-    | DEFAULT? (CHARACTER SET | CHARSET) '='? (charsetName|DEFAULT) #tableOptionCharset
-    | (CHECKSUM | PAGE_CHECKSUM) '='? boolValue=('0' | '1')         #tableOptionChecksum
-    | DEFAULT? COLLATE '='? collationName                           #tableOptionCollate
-    | COMMENT '='? STRING_LITERAL                                   #tableOptionComment
-    | COMPRESSION '='? (STRING_LITERAL | ID)                        #tableOptionCompression
-    | CONNECTION '='? STRING_LITERAL                                #tableOptionConnection
-    | DATA DIRECTORY '='? STRING_LITERAL                            #tableOptionDataDirectory
-    | DELAY_KEY_WRITE '='? boolValue=('0' | '1')                    #tableOptionDelay
-    | ENCRYPTION '='? STRING_LITERAL                                #tableOptionEncryption
-    | INDEX DIRECTORY '='? STRING_LITERAL                           #tableOptionIndexDirectory
-    | INSERT_METHOD '='? insertMethod=(NO | FIRST | LAST)           #tableOptionInsertMethod
-    | KEY_BLOCK_SIZE '='? fileSizeLiteral                           #tableOptionKeyBlockSize
-    | MAX_ROWS '='? decimalLiteral                                  #tableOptionMaxRows
-    | MIN_ROWS '='? decimalLiteral                                  #tableOptionMinRows
-    | PACK_KEYS '='? extBoolValue=('0' | '1' | DEFAULT)             #tableOptionPackKeys
-    | PASSWORD '='? STRING_LITERAL                                  #tableOptionPassword
+    : ENGINE '='? engineName?                                                       #tableOptionEngine
+    | AUTO_INCREMENT '='? decimalLiteral                                            #tableOptionAutoIncrement
+    | AVG_ROW_LENGTH '='? decimalLiteral                                            #tableOptionAverage
+    | DEFAULT? charSet '='? (charsetName|DEFAULT)                                   #tableOptionCharset
+    | (CHECKSUM | PAGE_CHECKSUM) '='? boolValue=('0' | '1')                         #tableOptionChecksum
+    | DEFAULT? COLLATE '='? collationName                                           #tableOptionCollate
+    | COMMENT '='? STRING_LITERAL                                                   #tableOptionComment
+    | COMPRESSION '='? (STRING_LITERAL | ID)                                        #tableOptionCompression
+    | CONNECTION '='? STRING_LITERAL                                                #tableOptionConnection
+    | DATA DIRECTORY '='? STRING_LITERAL                                            #tableOptionDataDirectory
+    | DELAY_KEY_WRITE '='? boolValue=('0' | '1')                                    #tableOptionDelay
+    | ENCRYPTION '='? STRING_LITERAL                                                #tableOptionEncryption
+    | INDEX DIRECTORY '='? STRING_LITERAL                                           #tableOptionIndexDirectory
+    | INSERT_METHOD '='? insertMethod=(NO | FIRST | LAST)                           #tableOptionInsertMethod
+    | KEY_BLOCK_SIZE '='? fileSizeLiteral                                           #tableOptionKeyBlockSize
+    | MAX_ROWS '='? decimalLiteral                                                  #tableOptionMaxRows
+    | MIN_ROWS '='? decimalLiteral                                                  #tableOptionMinRows
+    | PACK_KEYS '='? extBoolValue=('0' | '1' | DEFAULT)                             #tableOptionPackKeys
+    | PASSWORD '='? STRING_LITERAL                                                  #tableOptionPassword
     | ROW_FORMAT '='?
         rowFormat=(
           DEFAULT | DYNAMIC | FIXED | COMPRESSED
           | REDUNDANT | COMPACT | ID
-        )                                                           #tableOptionRowFormat
-    | STATS_AUTO_RECALC '='? extBoolValue=(DEFAULT | '0' | '1')     #tableOptionRecalculation
-    | STATS_PERSISTENT '='? extBoolValue=(DEFAULT | '0' | '1')      #tableOptionPersistent
-    | STATS_SAMPLE_PAGES '='? decimalLiteral                        #tableOptionSamplePage
-    | TABLESPACE uid tablespaceStorage?                             #tableOptionTablespace
-    | TABLE_TYPE '=' tableType                                      #tableOptionTableType
-    | tablespaceStorage                                             #tableOptionTablespace
-    | UNION '='? '(' tables ')'                                     #tableOptionUnion
+        )                                                                           #tableOptionRowFormat
+    | STATS_AUTO_RECALC '='? extBoolValue=(DEFAULT | '0' | '1')                     #tableOptionRecalculation
+    | STATS_PERSISTENT '='? extBoolValue=(DEFAULT | '0' | '1')                      #tableOptionPersistent
+    | STATS_SAMPLE_PAGES '='? decimalLiteral                                        #tableOptionSamplePage
+    | TABLESPACE uid tablespaceStorage?                                             #tableOptionTablespace
+    | TABLE_TYPE '=' tableType                                                      #tableOptionTableType
+    | tablespaceStorage                                                             #tableOptionTablespace
+    | UNION '='? '(' tables ')'                                                     #tableOptionUnion
     ;
 
 tableType
@@ -1697,15 +1703,15 @@ uninstallPlugin
 
 setStatement
     : SET variableClause ('=' | ':=') expression
-      (',' variableClause ('=' | ':=') expression)*                 #setVariable
-    | SET (CHARACTER SET | CHARSET) (charsetName | DEFAULT)         #setCharset
+      (',' variableClause ('=' | ':=') expression)*                             #setVariable
+    | SET charSet (charsetName | DEFAULT)          #setCharset
     | SET NAMES
-        (charsetName (COLLATE collationName)? | DEFAULT)            #setNames
-    | setPasswordStatement                                          #setPassword
-    | setTransactionStatement                                       #setTransaction
-    | setAutocommitStatement                                        #setAutocommit
+        (charsetName (COLLATE collationName)? | DEFAULT)                        #setNames
+    | setPasswordStatement                                                      #setPassword
+    | setTransactionStatement                                                   #setTransaction
+    | setAutocommitStatement                                                    #setAutocommit
     | SET fullId ('=' | ':=') expression
-      (',' fullId ('=' | ':=') expression)*                         #setNewValueInsideTrigger
+      (',' fullId ('=' | ':=') expression)*                                     #setNewValueInsideTrigger
     ;
 
 showStatement
@@ -2089,7 +2095,7 @@ dataType
       )
       VARYING?
       lengthOneDimension? BINARY?
-      ((CHARACTER SET | CHARSET) charsetName)?
+      (charSet charsetName)?
       (COLLATE collationName | BINARY)?                             #stringDataType
     | NATIONAL typeName=(VARCHAR | CHARACTER)
       lengthOneDimension? BINARY?                                   #nationalStringDataType
@@ -2119,14 +2125,14 @@ dataType
       lengthOneDimension?                                           #dimensionDataType
     | typeName=(ENUM | SET)
       collectionOptions BINARY?
-      ((CHARACTER SET | CHARSET) charsetName)?                      #collectionDataType
+      (charSet charsetName)?                                        #collectionDataType
     | typeName=(
         GEOMETRYCOLLECTION | GEOMCOLLECTION | LINESTRING | MULTILINESTRING
         | MULTIPOINT | MULTIPOLYGON | POINT | POLYGON | JSON | GEOMETRY
       )                                                             #spatialDataType
     | typeName=LONG VARCHAR?
       BINARY?
-      ((CHARACTER SET | CHARSET) charsetName)?
+      (charSet charsetName)?
       (COLLATE collationName)?                                      #longVarcharDataType    // LONG VARCHAR is the same as LONG
     | LONG VARBINARY                                                #longVarbinaryDataType
     ;
@@ -2139,7 +2145,7 @@ convertedDataType
     :
     (
       typeName=(BINARY| NCHAR) lengthOneDimension?
-      | typeName=CHAR lengthOneDimension? ((CHARACTER SET | CHARSET) charsetName)?
+      | typeName=CHAR lengthOneDimension? (charSet charsetName)?
       | typeName=(DATE | DATETIME | TIME | JSON | INT | INTEGER)
       | typeName=DECIMAL lengthTwoOptionalDimension?
       | (SIGNED | UNSIGNED) INTEGER?
