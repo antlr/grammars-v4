@@ -49,23 +49,26 @@ default_nettype_compiler_directive
 	;
 
 default_nettype_value
-	: DIRECTIVE_SIMPLE_IDENTIFIER
+	: DEFAULT_NETTYPE_VALUE
 	;
 
 // 19.3 `define and `undef
 // 19.3.1 `define
 
 text_macro_definition
-	: GRAVE_ACCENT DIRECTIVE_DEFINE text_macro_identifier (MACRO_TEXT | MACRO_BACKSLASH_NEWLINE)*
+	: GRAVE_ACCENT DIRECTIVE_DEFINE text_macro_identifier (MACRO_TEXT | MACRO_TEXT_BACKSLASH_NEWLINE)*
 	;
 
 text_macro_usage
-	: GRAVE_ACCENT text_macro_identifier DIRECTIVE_LIST_OF_ARGUMENTS?
+	: GRAVE_ACCENT text_macro_identifier macro_list_of_actual_arguments?
+	;
+
+macro_list_of_actual_arguments
+	: DIRECTIVE_LIST_OF_ARGUMENTS
 	;
 
 text_macro_identifier
-	: DIRECTIVE_SIMPLE_IDENTIFIER
-	| DIRECTIVE_ESCAPED_IDENTIFIER
+	: DIRECTIVE_IDENTIFIER
 	;
 
 // 19.3.2 `undef
@@ -141,7 +144,7 @@ time_number
 	;
 
 time_unit
-	: DIRECTIVE_SIMPLE_IDENTIFIER
+	: TIME_UNIT
 	;
 
 // 19.9 `unconnected_drive and `nounconnected_drive
@@ -151,7 +154,7 @@ unconnected_drive_compiler_directive
 	;
 
 unconnected_drive_value
-	: DIRECTIVE_SIMPLE_IDENTIFIER
+	: UNCONNECTED_DRIVE_VALUE
 	;
 
 nounconnected_drive_compiler_directive
@@ -165,8 +168,7 @@ pragma
 	;
 
 pragma_name
-	: DIRECTIVE_SIMPLE_IDENTIFIER
-	| DIRECTIVE_ESCAPED_IDENTIFIER
+	: DIRECTIVE_IDENTIFIER
 	;
 
 pragma_expression
@@ -175,15 +177,13 @@ pragma_expression
 	;
 
 pragma_value
-	: DIRECTIVE_SIMPLE_IDENTIFIER
-	| DIRECTIVE_ESCAPED_IDENTIFIER
+	: DIRECTIVE_IDENTIFIER
 	| DIRECTIVE_NUMBER
 	| DIRECTIVE_STRING
 	;
 
 pragma_keyword
-	: DIRECTIVE_SIMPLE_IDENTIFIER
-	| DIRECTIVE_ESCAPED_IDENTIFIER
+	: DIRECTIVE_IDENTIFIER
 	;
 */
 // 19.11 `begin_keywords, `end_keywords
