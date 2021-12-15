@@ -37,6 +37,11 @@ public abstract class HaskellBaseLexer extends Lexer {
         super(input);
     }
 
+    protected void SetHidden()
+    {
+        setChannel(HIDDEN);
+    }
+
     public class Pair<L,R> {
         private final L left;
         private final R right;
