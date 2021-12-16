@@ -6,7 +6,6 @@ clif
 cpp
 csharp
 fortran77
-haskell
 html
 hypertalk
 javadoc
