@@ -1,3 +1,9 @@
+/*
+Part of CEDAR: the Common Event Driven Application Runtime project.
+Copyright 2021 Ultra Electronics Limited, trading as Precision Control Systems (dpmai@ultra-pcs.com)
+SPDX-License-Identifier: GPL-3.0-or-later
+*/
+
 grammar ASL;
 
 /*
