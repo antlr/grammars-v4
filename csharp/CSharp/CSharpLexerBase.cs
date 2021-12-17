@@ -25,21 +25,21 @@ public abstract class CSharpLexerBase : Lexer
     protected Stack<int> curlyLevels = new Stack<int>();
     protected bool verbatium;
 
-    protected void Action1()
+    protected void OnInterpolatedRegularStringStart()
     {
         interpolatedStringLevel++;
         interpolatedVerbatiums.Push(false);
         verbatium = false;
     }
 
-    protected void Action2()
+    protected void OnInterpolatedVerbatiumStringStart()
     {
         interpolatedStringLevel++;
         interpolatedVerbatiums.Push(true);
         verbatium = true;
     }
 
-    protected void Action3()
+    protected void OnOpenBrace()
     {
         if (interpolatedStringLevel > 0)
         {
@@ -47,9 +47,8 @@ public abstract class CSharpLexerBase : Lexer
         }
     }
 
-    protected void Action4()
+    protected void OnCloseBrace()
     {
-
         if (interpolatedStringLevel > 0)
         {
             curlyLevels.Push(curlyLevels.Pop() - 1);
@@ -62,7 +61,7 @@ public abstract class CSharpLexerBase : Lexer
         }
     }
 
-    protected void Action5()
+    protected void OnColon()
     {
 
         if (interpolatedStringLevel > 0)
@@ -85,29 +84,29 @@ public abstract class CSharpLexerBase : Lexer
         }
     }
 
-    protected void Action6()
+    protected void OpenBraceInside()
     {
         curlyLevels.Push(1);
     }
 
-    protected void Action7()
+    protected void OnDoubleQuoteInside()
     {
         interpolatedStringLevel--;
         interpolatedVerbatiums.Pop();
         verbatium = (interpolatedVerbatiums.Count() > 0 ? interpolatedVerbatiums.Peek() : false);
     }
 
-    protected void Action8()
+    protected void OnCloseBraceInside()
     {
         curlyLevels.Pop();
     }
 
-    protected bool Pred1()
+    protected bool IsRegularCharInside()
     {
         return !verbatium;
     }
 
-    protected bool Pred2()
+    protected bool IsVerbatiumDoubleQuoteInside()
     {
         return verbatium;
     }

@@ -8,7 +8,7 @@ public abstract class CSharpParserBase extends Parser
 	super(input);
     }
 
-    protected boolean VerifyVar()
+    protected boolean IsLocalVariableDeclaration()
     {
 	CSharpParser.Local_variable_declarationContext local_var_decl = (CSharpParser.Local_variable_declarationContext)this._ctx;
 	if (local_var_decl == null) return true;

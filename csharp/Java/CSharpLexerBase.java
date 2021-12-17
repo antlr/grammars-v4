@@ -13,21 +13,21 @@ abstract class CSharpLexerBase extends Lexer
     protected Stack<Integer> curlyLevels = new Stack<Integer>();
     protected boolean verbatium;
 
-    protected void Action1()
+    protected void OnInterpolatedRegularStringStart()
     {
         interpolatedStringLevel++;
         interpolatedVerbatiums.push(false);
         verbatium = false;
     }
 
-    protected void Action2()
+    protected void OnInterpolatedVerbatiumStringStart()
     {
         interpolatedStringLevel++;
         interpolatedVerbatiums.push(true);
         verbatium = true;
     }
 
-    protected void Action3()
+    protected void OnOpenBrace()
     {
         if (interpolatedStringLevel > 0)
         {
@@ -35,7 +35,7 @@ abstract class CSharpLexerBase extends Lexer
         }
     }
 
-    protected void Action4()
+    protected void OnCloseBrace()
     {
 
         if (interpolatedStringLevel > 0)
@@ -50,7 +50,7 @@ abstract class CSharpLexerBase extends Lexer
         }
     }
 
-    protected void Action5()
+    protected void OnColon()
     {
 
         if (interpolatedStringLevel > 0)
@@ -73,29 +73,29 @@ abstract class CSharpLexerBase extends Lexer
         }
     }
 
-    protected void Action6()
+    protected void OpenBraceInside()
     {
         curlyLevels.push(1);
     }
 
-    protected void Action7()
+    protected void OnDoubleQuoteInside()
     {
         interpolatedStringLevel--;
         interpolatedVerbatiums.pop();
         verbatium = (interpolatedVerbatiums.size() > 0 ? interpolatedVerbatiums.peek() : false);
     }
 
-    protected void Action8()
+    protected void OnCloseBraceInside()
     {
         curlyLevels.pop();
     }
 
-    protected boolean Pred1()
+    protected boolean IsRegularCharInside()
     {
         return !verbatium;
     }
 
-    protected boolean Pred2()
+    protected boolean IsVerbatiumDoubleQuoteInside()
     {
         return verbatium;
     }

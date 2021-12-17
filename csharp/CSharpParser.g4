@@ -473,7 +473,7 @@ block
 	;
 
 local_variable_declaration
-	: (USING | REF | REF READONLY)? local_variable_type local_variable_declarator ( ','  local_variable_declarator { this.VerifyVar() }? )*
+	: (USING | REF | REF READONLY)? local_variable_type local_variable_declarator ( ','  local_variable_declarator { this.IsLocalVariableDeclaration() }? )*
 	| FIXED pointer_type fixed_pointer_declarators
 	;
 

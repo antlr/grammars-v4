@@ -15,7 +15,7 @@ public abstract class CSharpParserBase : Parser
     {
     }
 
-    protected bool VerifyVar()
+    protected bool IsLocalVariableDeclaration()
     {
         var local_var_decl = this.Context as CSharpParser.Local_variable_declarationContext;
         if (local_var_decl == null) return true;
