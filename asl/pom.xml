@@ -39,7 +39,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>asl</entryPoint>
-					<grammarName>C</grammarName>
+					<grammarName>ASL</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
