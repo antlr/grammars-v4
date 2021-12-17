@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+
 public abstract class CSharpLexerBase : Lexer
 {
     public CSharpLexerBase(ICharStream input)
