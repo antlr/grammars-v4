@@ -15,7 +15,7 @@ EMPTY_DELIMITED_DOC_COMMENT: '/***/'              -> channel(COMMENTS_CHANNEL);
 DELIMITED_DOC_COMMENT:       '/**' ~'/' .*? '*/'  -> channel(COMMENTS_CHANNEL);
 SINGLE_LINE_COMMENT:     '//'  InputCharacter*    -> channel(COMMENTS_CHANNEL);
 DELIMITED_COMMENT:       '/*'  .*? '*/'           -> channel(COMMENTS_CHANNEL);
-
+Directive: '#' ~ [\n]* -> channel (HIDDEN);
 WHITESPACES:   (Whitespace | NewLine)+            -> channel(HIDDEN);
 SHARP:         '#'                                -> mode(DIRECTIVE_MODE);
 
@@ -1057,3 +1057,4 @@ fragment UnicodeClassND
 	| '\uabf0'..'\uabf9'
 	| '\uff10'..'\uff19'
 	;
+
