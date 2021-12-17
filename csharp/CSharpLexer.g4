@@ -4,17 +4,9 @@
 
 lexer grammar CSharpLexer;
 
-@lexer::header
-{import java.util.Stack;}
-
 channels { COMMENTS_CHANNEL, DIRECTIVE }
 
-@lexer::members
-{private int interpolatedStringLevel;
-private Stack<Boolean> interpolatedVerbatiums = new Stack<Boolean>();
-private Stack<Integer> curlyLevels = new Stack<Integer>();
-private boolean verbatium;
-}
+options { superClass = CSharpLexerBase; }
 
 BYTE_ORDER_MARK: '\u00EF\u00BB\u00BF';
 
@@ -149,58 +141,19 @@ REAL_LITERAL:        ([0-9] ('_'* [0-9])*)? '.' [0-9] ('_'* [0-9])* ExponentPart
 CHARACTER_LITERAL:                   '\'' (~['\\\r\n\u0085\u2028\u2029] | CommonCharacter) '\'';
 REGULAR_STRING:                      '"'  (~["\\\r\n\u0085\u2028\u2029] | CommonCharacter)* '"';
 VERBATIUM_STRING:                    '@"' (~'"' | '""')* '"';
-INTERPOLATED_REGULAR_STRING_START:   '$"'
-    { interpolatedStringLevel++; interpolatedVerbatiums.push(false); verbatium = false; } -> pushMode(INTERPOLATION_STRING);
-INTERPOLATED_VERBATIUM_STRING_START: '$@"'
-    { interpolatedStringLevel++; interpolatedVerbatiums.push(true); verbatium = true; }  -> pushMode(INTERPOLATION_STRING);
+INTERPOLATED_REGULAR_STRING_START:   '$"' { this.Action1(); } -> pushMode(INTERPOLATION_STRING);
+INTERPOLATED_VERBATIUM_STRING_START: '$@"'  { this.Action2(); }  -> pushMode(INTERPOLATION_STRING);
 
 //B.1.9 Operators And Punctuators
-OPEN_BRACE:               '{'
-{
-if (interpolatedStringLevel > 0)
-{
-    curlyLevels.push(curlyLevels.pop() + 1);
-}};
-CLOSE_BRACE:              '}'
-{
-if (interpolatedStringLevel > 0)
-{
-    curlyLevels.push(curlyLevels.pop() - 1);
-    if (curlyLevels.peek() == 0)
-    {
-        curlyLevels.pop();
-        skip();
-        popMode();
-    }
-}
-};
+OPEN_BRACE:               '{' { this.Action3(); };
+CLOSE_BRACE:              '}' { this.Action4(); };
 OPEN_BRACKET:             '[';
 CLOSE_BRACKET:            ']';
 OPEN_PARENS:              '(';
 CLOSE_PARENS:             ')';
 DOT:                      '.';
 COMMA:                    ',';
-COLON:                    ':'
-{
-if (interpolatedStringLevel > 0)
-{
-    int ind = 1;
-    boolean switchToFormatString = true;
-    while ((char)_input.LA(ind) != '}')
-    {
-        if (_input.LA(ind) == ':' || _input.LA(ind) == ')')
-        {
-            switchToFormatString = false;
-            break;
-        }
-        ind++;
-    }
-    if (switchToFormatString)
-    {
-        mode(INTERPOLATION_FORMAT);
-    }
-}
-};
+COLON:                    ':' { this.Action5(); };
 SEMICOLON:                ';';
 PLUS:                     '+';
 MINUS:                    '-';
@@ -244,18 +197,17 @@ OP_RANGE:                 '..';
 mode INTERPOLATION_STRING;
 
 DOUBLE_CURLY_INSIDE:           '{{';
-OPEN_BRACE_INSIDE:             '{' { curlyLevels.push(1); } -> skip, pushMode(DEFAULT_MODE);
-REGULAR_CHAR_INSIDE:           { !verbatium }? SimpleEscapeSequence;
-VERBATIUM_DOUBLE_QUOTE_INSIDE: {  verbatium }? '""';
-DOUBLE_QUOTE_INSIDE:           '"' { interpolatedStringLevel--; interpolatedVerbatiums.pop();
-    verbatium = (interpolatedVerbatiums.size() > 0 ? interpolatedVerbatiums.peek() : false); } -> popMode;
-REGULAR_STRING_INSIDE:         { !verbatium }? ~('{' | '\\' | '"')+;
-VERBATIUM_INSIDE_STRING:       {  verbatium }? ~('{' | '"')+;
+OPEN_BRACE_INSIDE:             '{' { this.Action6(); } -> skip, pushMode(DEFAULT_MODE);
+REGULAR_CHAR_INSIDE:           { this.Pred1() }? SimpleEscapeSequence;
+VERBATIUM_DOUBLE_QUOTE_INSIDE: { this.Pred2() }? '""';
+DOUBLE_QUOTE_INSIDE:           '"' { this.Action7(); } -> popMode;
+REGULAR_STRING_INSIDE:         { this.Pred1() }? ~('{' | '\\' | '"')+;
+VERBATIUM_INSIDE_STRING:       { this.Pred2() }? ~('{' | '"')+;
 
 mode INTERPOLATION_FORMAT;
 
 DOUBLE_CURLY_CLOSE_INSIDE:      '}}' -> type(FORMAT_STRING);
-CLOSE_BRACE_INSIDE:             '}' { curlyLevels.pop(); }   -> skip, popMode;
+CLOSE_BRACE_INSIDE:             '}' { this.Action8(); }   -> skip, popMode;
 FORMAT_STRING:                  ~'}'+;
 
 mode DIRECTIVE_MODE;
