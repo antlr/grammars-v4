@@ -122,21 +122,21 @@ struct_definition           : DEFINE STRUCTURE struct_type NEWLINE
                               ENDDEFINE ;
 member_name                 : (LOWERCASE_ID | LOWERCASE_NUMBER_ID) ;
 member_type                 : (INTEGER | REAL | BOOLEAN | TEXT | DATE | TIME | struct_type | user_defined_type) ;
-struct_instantiation        : struct IS struct_type ;
-struct_assembly             : APPEND '[' value_list ']' TO struct ((ORDERED_BY | REVERSE_ORDERED_BY) member_name)? ;
-struct_for_loop             : FOR '[' variable_list ']' IN struct DO NEWLINE
+struct_instantiation        : struct_ IS struct_type ;
+struct_assembly             : APPEND '[' value_list ']' TO struct_ ((ORDERED_BY | REVERSE_ORDERED_BY) member_name)? ;
+struct_for_loop             : FOR '[' variable_list ']' IN struct_ DO NEWLINE
                               statement*
                               (break_statement statement*)?
                               ENDFOR ;
-order_struct                : struct '=' struct (ORDERED_BY | REVERSE_ORDERED_BY) member_name ;
-struct_subset               : struct '=' struct WHERE struct_condition ;
+order_struct                : struct_ '=' struct_ (ORDERED_BY | REVERSE_ORDERED_BY) member_name ;
+struct_subset               : struct_ '=' struct_ WHERE struct_condition ;
 struct_condition            : (member_name logical_operator component) ( (AND | OR | '&' | '|') struct_condition)* ;
 
-struct                       : '{' (LOWERCASE_ID | LOWERCASE_NUMBER_ID) '}' ;
+struct_                     : '{' (LOWERCASE_ID | LOWERCASE_NUMBER_ID) '}' ;
 struct_type                 : (LOWERCASE_ID | LOWERCASE_NUMBER_ID | (LEADING_FIRST_UPPERCASE_ID '.' LOWERCASE_ID)) ;
 value_list                  : struct_value (',' struct_value)* ;
-struct_value                : (variable | set_variable | constant | object_attribute | struct) ;
-variable_list               : (variable | struct) (',' (variable | struct))* ;
+struct_value                : (variable | set_variable | constant | object_attribute | struct_) ;
+variable_list               : (variable | struct_) (',' (variable | struct_))* ;
 
 switch_statement            : SWITCH (variable | object_attribute) NEWLINE
                               (CASE constant NEWLINE
