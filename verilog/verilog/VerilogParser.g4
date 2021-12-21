@@ -68,8 +68,8 @@ monitor_task_name
 // 17.2.1 Opening and closing files
 
 file_open_function
-	: multi_channel_descriptor EQUAL DOLLAR_FOPEN FILE_OPEN_LEFT_PARENTHESIS file_name FILE_OPEN_RIGHT_PARENTHESIS FILE_OPEN_SEMICOLON
-	| fd EQUAL DOLLAR_FOPEN FILE_OPEN_LEFT_PARENTHESIS file_name FILE_OPEN_COMMA TYPE FILE_OPEN_RIGHT_PARENTHESIS FILE_OPEN_SEMICOLON
+	: multi_channel_descriptor EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS file_name RIGHT_PARENTHESIS SEMICOLON
+	| fd EQUAL DOLLAR_FOPEN LEFT_PARENTHESIS file_name COMMA type_ RIGHT_PARENTHESIS SEMICOLON
 	;
 
 file_close_task
@@ -86,7 +86,12 @@ fd
 	;
 
 file_name
-	: FILE_OPEN_STRING
+	: STRING
+	;
+
+type_
+	: STRING
+	| variable_identifier
 	;
 
 // 17.2.2 File output system tasks
@@ -143,13 +148,17 @@ filename
 // 17.4.1 $finish
 
 finish_task
-	: DOLLAR_FINISH (SIMULATION_CONTROL_LEFT_PARENTHESIS FINISH_NUMBER SIMULATION_CONTROL_RIGHT_PARENTHESIS)? SIMULATION_CONTROL_SEMICOLON
+	: DOLLAR_FINISH (LEFT_PARENTHESIS finish_number RIGHT_PARENTHESIS)? SEMICOLON
+	;
+
+finish_number
+	: DECIMAL_NUMBER
 	;
 
 // 17.4.2 $stop
 
 stop_task
-	: DOLLAR_STOP (SIMULATION_CONTROL_LEFT_PARENTHESIS FINISH_NUMBER SIMULATION_CONTROL_RIGHT_PARENTHESIS)? SIMULATION_CONTROL_SEMICOLON
+	: DOLLAR_STOP (LEFT_PARENTHESIS finish_number RIGHT_PARENTHESIS)? SEMICOLON
 	;
 
 // 17.7 Simulation time system functions
@@ -249,7 +258,7 @@ integer_math_functions
 
 real_math_functions
 	: single_argument_real_math_function_name LEFT_PARENTHESIS constant_argument RIGHT_PARENTHESIS
-	| double_argument_real_math_function_name LEFT_PARENTHESIS constant_argument COMMA argument RIGHT_PARENTHESIS
+	| double_argument_real_math_function_name LEFT_PARENTHESIS constant_argument COMMA constant_argument RIGHT_PARENTHESIS
 	;
 
 single_argument_real_math_function_name
@@ -398,11 +407,11 @@ library_description
 	;
 
 library_declaration
-	: LIBRARY LIBRARY_IDENTIFIER FILE_PATH_SPEC (LIBRARY_COMMA FILE_PATH_SPEC)* (MINUS_INCDIR FILE_PATH_SPEC (LIBRARY_COMMA FILE_PATH_SPEC)*)? LIBRARY_SEMICOLON
+	: LIBRARY library_identifier FILE_PATH_SPEC (COMMA FILE_PATH_SPEC)* (MINUS_INCDIR FILE_PATH_SPEC (COMMA FILE_PATH_SPEC)*)? SEMICOLON
 	;
 
 include_statement
-	: INCLUDE FILE_PATH_SPEC LIBRARY_SEMICOLON
+	: INCLUDE FILE_PATH_SPEC SEMICOLON
 	;
 
 // A.1.2 Verilog source text

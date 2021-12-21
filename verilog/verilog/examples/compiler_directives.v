@@ -22,7 +22,7 @@ module top (
   always @(*) w = y + z;
   `define __SOMETHING 1
 `ifdef ASD_
-  genvar g;
+  genvar gg;
   generate
     for (gg = 0; gg < 5; gg = gg + 1) assign a[gg] = b[4-gg];
   endgenerate
@@ -37,15 +37,13 @@ module top (
 `endif
   `define _INVERT_(a, b)\
 assign b = ~a;\
-// comment inside macro text \
-// this is also inside macro text
+// comment inside macro text
   `_INVERT_(x, y)  // macro usage
   `undef _INVERT_
   NOT u1 (
       z,
       y
   );
-  `pragma _PRAGMA_NAME_ prgm_kywrd0, prgm_kywrd1 = "prgm_val1", prgm_id
 endmodule
 `end_keywords
 `endcelldefine
