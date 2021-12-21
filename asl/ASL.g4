@@ -95,7 +95,7 @@ timer_deletion              : '[' ']' '=' DELETE_TIMER '[' timer_id ']' ;
 set_relative_timer          : GENERATE TIM1 '(' time_to_fire ',' return_event ',' target_instance ')' ';' TO timer_id ;
 set_absolute_timer          : GENERATE TIM10 '(' fire_year ',' fire_month ',' fire_date ',' fire_hour ',' fire_minute ',' fire_second
                                 ',' return_event ',' target_instance ')' ';' TO timer_id ;
-set_recurring_timer         : GENERATE TIM3 '(' start ',' period ',' return_event ',' target_instance ')' ';' TO timer_id ; 
+set_recurring_timer         : GENERATE TIM3 '(' start_time ',' period ',' return_event ',' target_instance ')' ';' TO timer_id ; 
 timer_reset                 : GENERATE TIM2 '(' ')' ';' TO timer_id ;
 timer_id                    : (variable | object_attribute) ;
 time_to_fire                : (variable | object_attribute | INTEGER_VALUE) ;
@@ -107,7 +107,7 @@ fire_date                   : (variable | object_attribute | INTEGER_VALUE) ;
 fire_hour                   : (variable | object_attribute | INTEGER_VALUE) ;
 fire_minute                 : (variable | object_attribute | INTEGER_VALUE) ;
 fire_second                 : (variable | object_attribute | INTEGER_VALUE) ;
-start                       : (variable | object_attribute | INTEGER_VALUE) ;
+start_time                  : (variable | object_attribute | INTEGER_VALUE) ;
 period                      : (variable | object_attribute | INTEGER_VALUE) ;
 
 set_operation               : (unique_set | set_combination | set_difference) ;
