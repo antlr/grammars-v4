@@ -8,6 +8,7 @@ function Build-Grammar {
         \}
     \}
 }>
+    $env:GO111MODULE = "on"
     $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
     if($LASTEXITCODE -ne 0){
         return @{
