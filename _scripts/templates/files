@@ -21,6 +21,7 @@
 ./Cpp/readme.md
 ./Cpp/test.sh
 ./CSharp/CaseChangingCharStream.cs
+./CSharp/Encodings.cs
 ./CSharp/ErrorListener.cs
 ./CSharp/makefile
 ./CSharp/Program.cs

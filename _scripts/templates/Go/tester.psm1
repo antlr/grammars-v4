@@ -1,3 +1,4 @@
+# Template generated code from trgen <version>
 function Build-Grammar {
 <tool_grammar_files:{x |
     $g = antlr <x> -Dlanguage=Go <antlr_tool_args:{y | <y> } >

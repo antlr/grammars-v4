@@ -1,5 +1,4 @@
-# Generated code from Antlr4BuildTasks.dotnet-antlr v <version>
-# Makefile for Arithmetic.g4
+# Template generated code from trgen <version>
 JAR = <antlr_tool_path>
 CLASSPATH = $(JAR)<if(path_sep_semi)>\;<else>:<endif>.
 .SUFFIXES: .g4 .go
@@ -16,7 +15,7 @@ clean:
 run:
 	export GO111MODULE=auto; trwdog go run Program.go $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
-	java -jar $(JAR) -Dlanguage=Go <antlr_tool_args:{y | <y> } > $\<
+	java -jar $(JAR) -encoding <antlr_encoding> -Dlanguage=Go <antlr_tool_args:{y | <y> } > $\<
 } >
 	export GO111MODULE=auto; go build Program.go
 test:

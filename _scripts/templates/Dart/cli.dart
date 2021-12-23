@@ -1,4 +1,4 @@
-// Template generated code from Antlr4BuildTasks.dotnet-antlr v <version>
+// Template generated code from trgen <version>
 
 import 'package:antlr4/antlr4.dart';
 <tool_grammar_tuples:{x | import '<x.GeneratedFileName>';
@@ -110,7 +110,7 @@ void main(List\<String> args) async {
         str = await InputStream.fromString(input);
     } else if (file_name != null)
     {
-        str = await InputStream.fromPath(file_name);        
+        str = await InputStream.fromPath(file_name);
     }
 <if (case_insensitive_type)>
     str = CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");

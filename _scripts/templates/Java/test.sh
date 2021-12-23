@@ -1,3 +1,4 @@
+# Template generated code from trgen <version>
 JAR=<antlr_tool_path>
 CLASSPATH=$JAR<if(path_sep_semi)>\;<else>:<endif>.
 err=0

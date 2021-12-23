@@ -27,6 +27,7 @@ python/python3-ts
 python/python3-without-actions
 python/python3alt
 python/tiny-python
+r
 rego
 rexx
 sql/postgresql
