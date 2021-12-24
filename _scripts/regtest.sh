@@ -36,11 +36,12 @@ esac
 invert="$2"
 if [[ "$invert" == "" ]]
 then
-    todo_pattern="^(.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
+    skip_pattern="^(.*/(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g' | sed 's/-/\\-/g'`))/\$"
+    echo Skip list pattern = $skip_pattern
 else
-    todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
+    todo_pattern="^(.*/(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'| sed 's/-/\\-/g'`))/\$"
+    echo To do list pattern = $todo_pattern
 fi
-echo To do list pattern = $todo_pattern
 
 # Sanity checks for required environment.
 unameOut="$(uname -s)"
@@ -166,7 +167,12 @@ part1()
     # 1) Generate driver source code from poms.
     rm -rf `find . -name Generated -type d`
     echo "Generating drivers."
-    bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.3-complete.jar`
+    if [[ "$invert" == "" ]]
+    then
+        bad=`trgen --skip-pattern "$skip_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.3-complete.jar`
+    else
+        bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.3-complete.jar`
+    fi
     for i in $bad; do failed=`add "$failed" "$i"`; done
     date
 }
