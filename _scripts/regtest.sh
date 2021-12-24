@@ -158,6 +158,7 @@ test()
 setupdeps()
 {
     date
+    echo "Setting up trgen and antlr jar."
     dotnet tool uninstall -g trgen
     dotnet tool install -g trgen --version 0.13.2
     dotnet tool uninstall -g trxml2
@@ -165,12 +166,14 @@ setupdeps()
     dotnet tool uninstall -g trwdog
     dotnet tool install -g trwdog --version 0.13.2
 	case "${unameOut}" in
-		Linux*)     curl 'https://search.maven.org/remotecontent?filepath=org/antlr/antlr4-runtime/4.9.3/antlr4-runtime-4.9.3.jar' --output /tmp/antlr4-runtime-4.9.3.jar;;
-		Darwin*)    curl 'https://search.maven.org/remotecontent?filepath=org/antlr/antlr4-runtime/4.9.3/antlr4-runtime-4.9.3.jar' --output /tmp/antlr4-runtime-4.9.3.jar;;
-		CYGWIN*)    curl 'https://search.maven.org/remotecontent?filepath=org/antlr/antlr4-runtime/4.9.3/antlr4-runtime-4.9.3.jar' --output /tmp/antlr4-runtime-4.9.3.jar;;
-		MINGW*)     curl 'https://search.maven.org/remotecontent?filepath=org/antlr/antlr4-runtime/4.9.3/antlr4-runtime-4.9.3.jar' --output /tmp/antlr4-runtime-4.9.3.jar;;
-		*)          machine="UNKNOWN:${unameOut}"
+		Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.9.3/antlr4-4.9.3-complete.jar' -o /tmp/antlr-4.9.3-complete.jar;;
+		Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.9.3/antlr4-4.9.3-complete.jar' -o /tmp/antlr-4.9.3-complete.jar;;
+		CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.9.3/antlr4-4.9.3-complete.jar' -o /tmp/antlr-4.9.3-complete.jar;;
+		MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.9.3/antlr4-4.9.3-complete.jar' -o /tmp/antlr-4.9.3-complete.jar;;
+		*)          echo 'unknown machine'
 	esac
+	ls -l /tmp/antlr4-runtime-4.9.3.jar
+    echo "Done setting up."
     date
 }
 

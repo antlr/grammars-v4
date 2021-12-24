@@ -37,7 +37,7 @@
 ./files
 ./Go/antlr_resource/case_changing_stream.go
 ./Go/makefile
-./Go/Program.go
+./Go/Test.go
 ./Go/test.sh
 ./Go/tester.psm1
 ./Java/CaseChangingCharStream.java
