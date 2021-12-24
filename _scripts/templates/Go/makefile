@@ -10,12 +10,12 @@ classes: setup $(SOURCES) program
 setup:
 	export GO111MODULE=on; go get -u github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
 program:
-	export GO111MODULE=auto; go build Program.go
+	export GO111MODULE=off; go build Program.go
 clean:
 	rm -f *.tokens *.interp
 	rm -f $(GENERATED)
 run:
-	export GO111MODULE=auto; trwdog go run Program.go $(RUNARGS)
+	export GO111MODULE=off; trwdog go run Program.go $(RUNARGS)
 test:
 	bash test.sh
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
