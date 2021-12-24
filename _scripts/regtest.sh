@@ -155,7 +155,7 @@ test()
 
 # Main
 # 0) Set up.
-part1()
+setupdeps()
 {
     date
     dotnet tool uninstall -g trgen
@@ -164,6 +164,19 @@ part1()
     dotnet tool install -g trxml2 --version 0.13.2
     dotnet tool uninstall -g trwdog
     dotnet tool install -g trwdog --version 0.13.2
+	case "${unameOut}" in
+		Linux*)     curl 'https://search.maven.org/remotecontent?filepath=org/antlr/antlr4-runtime/4.9.3/antlr4-runtime-4.9.3.jar' --output /tmp/antlr4-runtime-4.9.3.jar;;
+		Darwin*)    curl 'https://search.maven.org/remotecontent?filepath=org/antlr/antlr4-runtime/4.9.3/antlr4-runtime-4.9.3.jar' --output /tmp/antlr4-runtime-4.9.3.jar;;
+		CYGWIN*)    curl 'https://search.maven.org/remotecontent?filepath=org/antlr/antlr4-runtime/4.9.3/antlr4-runtime-4.9.3.jar' --output /tmp/antlr4-runtime-4.9.3.jar;;
+		MINGW*)     curl 'https://search.maven.org/remotecontent?filepath=org/antlr/antlr4-runtime/4.9.3/antlr4-runtime-4.9.3.jar' --output /tmp/antlr4-runtime-4.9.3.jar;;
+		*)          machine="UNKNOWN:${unameOut}"
+	esac
+    date
+}
+
+part1()
+{
+    date
     # 1) Generate driver source code from poms.
     rm -rf `find . -name Generated -type d`
     echo "Generating drivers."
@@ -225,6 +238,7 @@ part3()
     date
 }
 
+setupdeps
 part1
 part2
 part3
