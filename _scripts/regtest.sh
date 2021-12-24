@@ -36,9 +36,9 @@ esac
 invert="$2"
 if [[ "$invert" == "" ]]
 then
-    todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
-else
     todo_pattern="^(.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
+else
+    todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
 fi
 echo To do list pattern = $todo_pattern
 
@@ -158,11 +158,11 @@ part1()
 {
     date
     dotnet tool uninstall -g trgen
-    dotnet tool install -g trgen --version 0.13.1
+    dotnet tool install -g trgen --version 0.13.2
     dotnet tool uninstall -g trxml2
-    dotnet tool install -g trxml2 --version 0.13.1
+    dotnet tool install -g trxml2 --version 0.13.2
     dotnet tool uninstall -g trwdog
-    dotnet tool install -g trwdog --version 0.13.1
+    dotnet tool install -g trwdog --version 0.13.2
     # 1) Generate driver source code from poms.
     rm -rf `find . -name Generated -type d`
     echo "Generating drivers."
