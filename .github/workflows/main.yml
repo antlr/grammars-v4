@@ -6,32 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        java: [11, 17 ]
-      fail-fast: false
-    steps:
-    - uses: actions/checkout@v2.4.0
-    - name: Set up JDK
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'zulu'
-        java-version: ${{ matrix.java }}
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
-  build-csharp:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-    - uses: actions/checkout@v2.4.0
-    - name: Test C# target
-      run: |
-        bash _scripts/regtest.sh CSharp
-
   build-cpp:
     runs-on: ubuntu-latest
     strategy:
@@ -53,63 +27,19 @@ jobs:
         CC:   gcc-10
         CXX:  g++-10
 
-  build-pwsh:
-    runs-on: ${{ matrix.os }}
+  build-go:
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [CSharp, Java, JavaScript, Go, Python3, Dart]
     steps:
     - name: Checkout
       uses: actions/checkout@v2.4.0
       with:
         fetch-depth: 0
-    - name: Install Dart
-      if: ${{ matrix.language == 'Dart' }}
-      uses: dart-lang/setup-dart@v1
     - name: Install Go
-      if: ${{ matrix.language == 'Go' }}
       uses: actions/setup-go@v2
       with:
         go-version: '1.16'
-    - name: Install Java
-      uses: actions/setup-java@v2
-      with:
-        java-version: '11'
-        distribution: 'zulu'
-    - name: Install Nodejs
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16.13.0'
-    - name: Install Python
-      if: ${{ matrix.language == 'Python3' }}
-      uses: actions/setup-python@v2.3.1
-      with:
-        python-version: '3.8'
-    - name: Download ANTLR
-      shell: pwsh
+    - name: Test Go target
       run: |
-        $antlrPath = _scripts/get-antlr.ps1 latest
-        echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
-    - name: Install trgen
-      shell: pwsh
-      run: |
-        dotnet tool install -g trgen --version 0.13.2
-        dotnet tool install -g trwdog --version 0.13.2
-        if ("${{ matrix.os }}" -eq "ubuntu-latest") {
-            echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
-        }
-    - name: Test
-      shell: pwsh
-      run: |
-        if ("${{ github.event_name }}" -eq "pull_request") {
-            $Before = "${{ github.event.pull_request.base.sha }}"
-            $After = "${{ github.event.pull_request.head.sha }}"
-        }
-        else {
-            $Before = "${{ github.event.before }}"
-            $After = "${{ github.event.after }}"
-        }
-        $env:ANTLR_JAR_PATH="${{ env.antlr_path }}"
-        _scripts/test.ps1 ${{ matrix.language }} $Before $After
+        bash _scripts/regtest.sh Go
