@@ -1,7 +1,6 @@
 acme
 agc
 alef
-algol60
 alloy
 alpaca
 angelscript
@@ -23,12 +22,10 @@ asn/asn_3gpp
 atl
 b
 basic
-bcpl
 bibcode
 bnf
 brainflak
 brainfuck
-c
 calculator
 callable
 capnproto
@@ -49,7 +46,6 @@ css3
 csv
 ctl
 cto
-dart2
 databank
 dcm
 dgol
@@ -58,13 +54,11 @@ doiurl
 dot
 edif300
 edn
-erlang
 fasta
 fen
 flatbuffers
 focal
 fol
-fortran77
 fusion-tables
 gdscript
 gedcom
@@ -90,8 +84,6 @@ iri
 iso8601
 istc
 janus
-java/java
-java/java8
 java/java9
 javadoc
 javascript/ecmascript
@@ -105,7 +97,6 @@ json5
 karel
 kirikiri-tjs
 kotlin/kotlin
-kotlin/kotlin-formal
 kuka
 lambda
 lark
@@ -269,7 +260,6 @@ webidl
 wkt
 wln
 xml
-xpath/xpath1
 xpath/xpath31
 xsd-regex
 z
