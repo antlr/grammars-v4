@@ -6,9 +6,9 @@ import (
     "os"
     "io"
     "github.com/antlr/antlr4/runtime/Go/antlr"
-    "./parser"
+    "example.com/myparser/parser"
 <if (case_insensitive_type)>
-    "./antlr_resource"
+    "example.com/myparser/antlr_resource"
 <endif>
 )
 type CustomErrorListener struct {
