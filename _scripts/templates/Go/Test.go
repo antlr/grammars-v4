@@ -5,6 +5,7 @@ import (
     "fmt"
     "os"
     "io"
+    "time"
     "github.com/antlr/antlr4/runtime/Go/antlr"
     "example.com/myparser/parser"
 <if (case_insensitive_type)>
@@ -109,12 +110,15 @@ func main() {
     parser.AddErrorListener(parserErrors)
 
     // mutated name--not lowercase.
+    start := time.Now()
     var tree = parser.<cap_start_symbol>()
-    // missing
+    elapsed := time.Since(start)
+    fmt.Printf("Time: %.3f s", elapsed.Seconds())
+    fmt.Println()
     if parserErrors.errors > 0 || lexerErrors.errors > 0 {
-        os.Stderr.WriteString("Parse failed.");
+        fmt.Println("Parse failed.");
     } else {
-        os.Stderr.WriteString("Parse succeeded.")
+        fmt.Println("Parse succeeded.")
     }
     if show_tree {
         ss := tree.ToStringTree(parser.RuleNames, parser)
