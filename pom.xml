@@ -77,6 +77,7 @@
 				<module>apex</module>
 				<module>apt</module>
 				<module>arithmetic</module>
+				<module>asl</module>
 				<module>asm</module>
 				<module>asn</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
