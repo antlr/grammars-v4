@@ -36,6 +36,7 @@
 ./Dart/tester.psm1
 ./files
 ./Go/antlr_resource/case_changing_stream.go
+./Go/go.mod
 ./Go/makefile
 ./Go/Test.go
 ./Go/test.sh
