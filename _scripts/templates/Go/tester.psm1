@@ -9,14 +9,14 @@ function Build-Grammar {
         \}
     \}
 }>
-    $env:GO111MODULE='on'; $g = go get github.com/antlr/antlr4/runtime/Go/antlr; Remove-Item Env:\GO111MODULE
+    Remove-Item Env:\GOPATH; $env:GO111MODULE='on'; $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3; Remove-Item Env:\GO111MODULE
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g
             Success = $false
         }
     }
-    $env:GO111MODULE='off'; $msg = go build Test.go; Remove-Item Env:\GO111MODULE
+    Remove-Item Env:\GOPATH; $env:GO111MODULE='off'; $msg = go build Test.go; Remove-Item Env:\GO111MODULE
     return @{
         Message = $msg
         Success = $LASTEXITCODE -eq 0
