@@ -17,7 +17,7 @@ function Build-Grammar {
             Success = $false
         }
     }
-    Remove-Item Env:\GOPATH; $env:GO111MODULE='off'; $msg = go build Test.go; Remove-Item Env:\GO111MODULE
+    $msg = go build Test.go
     return @{
         Message = $msg
         Success = $LASTEXITCODE -eq 0
