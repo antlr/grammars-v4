@@ -30,6 +30,7 @@ python/python3-py
 python/python3-ts
 python/python3-without-actions
 python/tiny-python
+r
 rego
 rexx
 rust
