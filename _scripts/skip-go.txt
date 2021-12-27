@@ -9,6 +9,7 @@ asm/masm
 asm/pdp7
 asn/asn_3gpp
 clif
+cobol85
 cpp
 csharp
 edif300
@@ -59,6 +60,7 @@ python/python3-ts
 python/python3-without-actions
 python/tiny-python
 quakemap
+r
 rego
 rexx
 rust
@@ -69,6 +71,7 @@ smalltalk
 smtlibv2
 sparql
 sql/hive
+sql/mysql
 sql/plsql
 sql/postgresql
 stringtemplate
@@ -88,6 +91,7 @@ turtle-doc
 url
 v
 velocity
+verilog/verilog
 wat
 xpath/xpath1
 xpath/xpath31

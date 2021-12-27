@@ -1,3 +1,4 @@
+# Template generated code from trgen <version>
 function Build-Grammar {
 <tool_grammar_files:{x |
     $g = antlr <x> -Dlanguage=Go <antlr_tool_args:{y | <y> } >
@@ -16,7 +17,7 @@ function Build-Grammar {
             Success = $false
         }
     }
-    $msg = go build Program.go
+    $msg = go build Test.go
     return @{
         Message = $msg
         Success = $LASTEXITCODE -eq 0
@@ -30,7 +31,7 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    $o = trwdog ./Program -file $InputFile
+    $o = trwdog ./Test -file $InputFile
     $failed = $LASTEXITCODE -ne 0
     if ($failed -and $errorFile) {
         return $true
