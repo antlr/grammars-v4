@@ -6,7 +6,7 @@ parser grammar CSharpPreprocessorParser;
 
 options { tokenVocab=CSharpLexer; superClass=CSharpPreprocessorParserBase; }
 
-preprocessor_directive returns [Boolean value]
+preprocessor_directive returns [bool value]
 	: DEFINE CONDITIONAL_SYMBOL directive_new_line_or_sharp { this.OnPreprocessorDirectiveDefine(); }  #preprocessorDeclaration
 	| UNDEF CONDITIONAL_SYMBOL directive_new_line_or_sharp { this.OnPreprocessorDirectiveUndef(); } #preprocessorDeclaration
 	| IF expr=preprocessor_expression directive_new_line_or_sharp { this.OnPreprocessorDirectiveIf(); }	  #preprocessorConditional
@@ -27,7 +27,7 @@ directive_new_line_or_sharp
     | EOF
     ;
 
-preprocessor_expression returns [String value]
+preprocessor_expression returns [string value]
 	: TRUE { this.OnPreprocessorExpressionTrue(); }
 	| FALSE { this.OnPreprocessorExpressionFalse(); }
 	| CONDITIONAL_SYMBOL { this.OnPreprocessorExpressionConditionalSymbol(); }
