@@ -23,38 +23,28 @@
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-grammar lil;
+lexer grammar lilLexer;
 
-prog: line* EOF;
-
-line: watchcmd | setcmd | func | printcmd |foreachcmd | localcmd;
-
-watchcmd: 'watch' identifier+ '{' line* '}';
-
-printcmd: 'print' (identifier| QUOTED)+;
-
-foreachcmd: 'foreach' identifier  identifierlist block;
-
-setcmd: 'set' arg arg;
-
-localcmd: 'local' arg;
-
-func: 'func' identifier identifierlist block;
-
-identifierlist: '{' identifier* '}' ;
-
-block:'{' line* '}';
-
-arg: NUMBER | identifier | QUOTED;
-
-identifier: '$'? IDENTIFIER;
+PRINT: 'print';
+WATCH: 'watch';
+FOREACH: 'foreach';
+LOCAL: 'local';
+SET: 'set';
+FUNC: 'func';
+LBRACE: '{';
+RBRACE: '}';
+DOLLAR: '$';
+PRINTSTMT: PRINT -> mode(PRINT_MODE);
 
 QUOTED: '`' .*? '`';
 
 IDENTIFIER: [a-zA-Z][a-zA-Z0-9-]*;
 
 NUMBER: [0-9]+;
-
 LINE_COMMENT: '#' ~[\r\n]* -> skip;
 
 WS: [ \r\n\t]+ -> skip;
+
+mode PRINT_MODE;
+PRINTSTR: [a-zA-Z0-9- ]+ ;
+NEWLINE: [\r\n\t]+ -> skip, mode(DEFAULT_MODE);

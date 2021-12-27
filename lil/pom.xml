@@ -17,7 +17,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-						<include>lil.g4</include>
+						<include>lilParser.g4</include>
+                        <include>lilLexer.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -35,7 +36,7 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<verbose>false</verbose>
+					<verbose>true</verbose>
 					<showTree>false</showTree>
 					<entryPoint>prog</entryPoint>
 					<grammarName>lil</grammarName>
