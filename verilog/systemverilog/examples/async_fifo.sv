@@ -1,6 +1,5 @@
 // Author: Mustafa Said Ağca
 // License: MIT
-`default_nettype none
 module async_fifo #(
     parameter DATA_WIDTH = 8,
     parameter ADDR_WIDTH = 3,
@@ -181,4 +180,3 @@ module async_fifo #(
     underflow <= read && empty;
   end
 endmodule : async_fifo
-`default_nettype wire

@@ -70,8 +70,8 @@ jobs:
     - name: Install trgen
       shell: pwsh
       run: |
-        dotnet tool install -g trgen --version 0.7.0
-        dotnet tool install -g trwdog --version 0.7.0
+        dotnet tool install -g trgen --version 0.13.2
+        dotnet tool install -g trwdog --version 0.13.2
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
@@ -88,3 +88,23 @@ jobs:
         }
         $env:ANTLR_JAR_PATH="${{ env.antlr_path }}"
         _scripts/test.ps1 ${{ matrix.language }} $Before $After
+  build-cpp:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.4.0
+      with:
+        fetch-depth: 0
+    - name: Setup Cpp
+      run: |
+         sudo apt update
+         sudo apt install gcc-10 g++-10
+      shell: bash
+    - name: Test Cpp target
+      run: |
+        bash _scripts/regtest.sh Cpp
+      env:
+        CC:   gcc-10
+        CXX:  g++-10

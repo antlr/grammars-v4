@@ -1,3 +1,4 @@
+# Template generated code from trgen <version>
 err=0
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")

@@ -201,7 +201,7 @@ sourceElement
 statement
  : block
  | variableStatement
- | emptyStatement
+ | emptyStatement_
  | {this.InputStream.LA(1) != OpenBrace}? expressionStatement
  | ifStatement
  | iterationStatement
@@ -256,7 +256,7 @@ initialiser
 
 /// EmptyStatement :
 ///     ;
-emptyStatement
+emptyStatement_
  : SemiColon
  ;
 

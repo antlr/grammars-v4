@@ -2,7 +2,7 @@
 import org.antlr.v4.runtime.*;
 
 
-// copy pasted from Python3LexerBase.java
+// based on Python3LexerBase.java with modification
 abstract class GDScriptLexerBase extends Lexer {
     protected GDScriptLexerBase(CharStream input) {
         super(input);
@@ -117,6 +117,8 @@ abstract class GDScriptLexerBase extends Lexer {
             skip();
         }
         else {
+            // gdscript: avoid emit NEWLINE at start of file
+            // gdscript program rule can't accept NEWLINE as first token
             if(lastToken!=null){
                 emit(commonToken(GDScriptLexer.NEWLINE, newLine));
             }

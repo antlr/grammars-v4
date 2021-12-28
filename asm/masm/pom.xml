@@ -40,7 +40,7 @@
 					<showTree>false</showTree>
 					<entryPoint>compilationUnit</entryPoint>
 					<grammarName>MASM</grammarName>
-					<packageName>com.Ostermiller.Syntax</packageName>
+					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

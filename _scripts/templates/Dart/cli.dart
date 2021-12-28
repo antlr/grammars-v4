@@ -1,4 +1,4 @@
-// Template generated code from Antlr4BuildTasks.dotnet-antlr v <version>
+// Template generated code from trgen <version>
 
 import 'package:antlr4/antlr4.dart';
 <tool_grammar_tuples:{x | import '<x.GeneratedFileName>';

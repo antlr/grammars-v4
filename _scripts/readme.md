@@ -69,7 +69,7 @@ the trgen tool may not add the new template files into your generated code.
 ## What version of trgen do I use?
 
 You should take care to specify a version when installing the trgen tool.
-I change the tool often, and there may be regressions. Currently version 0.7.0
+I change the tool often, and there may be regressions. Currently version 0.13.2
 works well.
 
 ## Structure
