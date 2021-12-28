@@ -61,7 +61,7 @@ DOLLAR
    ;
 
 PRINTSTMT
-   : PRINT -> mode (PRINT_MODE)
+   : PRINT -> pushMode(PRINT_MODE)
    ;
 
 QUOTED
@@ -86,10 +86,10 @@ WS
 
 mode PRINT_MODE;
 PRINTSTR
-   : [a-zA-Z0-9- ]+
+   :  ~[\r\n\t]*
    ;
 
 NEWLINE
-   : [\r\n\t]+ -> skip , mode (DEFAULT_MODE)
+   : [\r\n\t]+ -> skip , popMode
    ;
 

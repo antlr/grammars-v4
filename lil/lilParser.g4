@@ -24,7 +24,6 @@
  */
 parser grammar lilParser;
 
-
 options { tokenVocab = lilLexer; }
 prog
    : line* EOF
@@ -44,7 +43,7 @@ watchcmd
    ;
 
 printcmd
-   : PRINTSTMT
+   : PRINT PRINTSTMT
    ;
 
 foreachcmd
