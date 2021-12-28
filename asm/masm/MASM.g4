@@ -10,9 +10,6 @@ to provide the necessary tokens for the parser.
     Ported to Antlr4 by Tom Everett <tom@khubla.com>
 */
 grammar MASM;
-@ header{ 
- 	 package com.Ostermiller.Syntax;
- 	 }
 compilationUnit
    : (segments | directive_exp1)* 'end' Identifier
    ;

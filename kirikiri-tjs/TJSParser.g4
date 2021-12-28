@@ -12,7 +12,7 @@ program
 statement
     : block 
     | variableStatement
-    | emptyStatement
+    | emptyStatement_
     | classDeclaration
     | expressionStatement
     | ifStatement
@@ -45,7 +45,7 @@ variable
     : Identifier ('=' expression)?
     ;
 
-emptyStatement
+emptyStatement_
     : SemiColon
     ;
 

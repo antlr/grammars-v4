@@ -586,7 +586,7 @@ assignmentSet
    ;
 
 assignmentMap
-   : syntaxBracketLc (constant syntaxColon constant) (constant syntaxColon constant)* syntaxBracketRc
+   : syntaxBracketLc (constant syntaxColon constant) (syntaxComma constant syntaxColon constant)* syntaxBracketRc
    ;
 
 assignmentList

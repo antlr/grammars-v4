@@ -42,11 +42,13 @@ python/python3-ts
 python/python3-without-actions
 python/tiny-python
 quakemap
+r
 rego
 restructuredtext
 rexx
 rust
 sql/plsql
+sql/postgresql
 sql/tsql
 stringtemplate
 swift-fin
