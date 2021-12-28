@@ -167,6 +167,12 @@ public class Annos {
         return (@Dummy1 @Dummy2 T[] @Dummy1 @Dummy2 []) null;
     }
 
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE_USE, ElementType.METHOD})
+    public @interface TM1{
+    }
+
     class Gen<T> {    }
     class A<@Dummy1 T extends @Dummy1 Gen<@Dummy1 T> >{}
 
@@ -179,6 +185,11 @@ public class Annos {
 
     public static @Dummy3 <@Dummy3 T extends @Dummy3 Gen<@Dummy1 ? super @Dummy1 T>> @Dummy3 T @Dummy3 [] f(@Dummy3 T @Dummy3 ... t) {
         return (@Dummy3 T @Dummy3 []) null;
+    }
+
+    interface TI1{
+        public @TM1 void im01();
+        public <@Dummy3 T> @TM1 @TM2 T gim01(@TM1 T t);
     }
 
 }
