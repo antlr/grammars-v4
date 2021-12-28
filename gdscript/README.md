@@ -6,4 +6,4 @@
 
 Entry rule is `program`.
 
-Last updated at 2021-06-10, Godot 3.3.2
+Last updated at 2021-12-15, Godot 3.3.4

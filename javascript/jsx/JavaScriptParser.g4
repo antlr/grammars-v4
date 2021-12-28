@@ -48,7 +48,7 @@ statement
     | variableStatement
     | importStatement
     | exportStatement
-    | emptyStatement
+    | emptyStatement_
     | classDeclaration
     | expressionStatement
     | ifStatement
@@ -131,7 +131,7 @@ variableDeclaration
     : assignable ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
-emptyStatement
+emptyStatement_
     : SemiColon
     ;
 
@@ -238,7 +238,7 @@ classTail
 
 classElement
     : (Static | {this.n("static")}? identifier | Async)* (methodDefinition | assignable '=' objectLiteral ';')
-    | emptyStatement
+    | emptyStatement_
     | '#'? propertyName '=' singleExpression
     ;
 
@@ -417,7 +417,7 @@ assignable
     ;
 
 objectLiteral
-    : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
+    : '{' (propertyAssignment (',' propertyAssignment)* ','?)? '}'
     ;
 
 objectExpressionSequence

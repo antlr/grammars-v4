@@ -37,6 +37,13 @@ AS
 
    RETURN
 END
+GO
+
+CREATE FUNCTION [dbo].[functionName](@par [nvarchar](10))
+RETURNS [bit] WITH EXECUTE AS CALLER, RETURNS NULL ON NULL INPUT
+AS 
+EXTERNAL NAME [assembly_name].[class_name].[method_name]
+GO
 
 --drop Function, you can drop multiple at same time
 Drop function Func1 

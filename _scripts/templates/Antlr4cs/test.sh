@@ -1,3 +1,4 @@
+# Template generated code from trgen <version>
 err=0
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
@@ -8,7 +9,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo "$file"
-    cat "$file" | trwdog ./bin/Debug/net5.0/<exec_name>
+    trwdog ./bin/Debug/net5.0/<exec_name> -file "$file"
     status="$?"
     if [ -f "$file".errors ]
     then

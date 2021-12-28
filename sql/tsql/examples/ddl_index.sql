@@ -26,3 +26,18 @@ DROP INDEX tbl.idx_tbl_col;
 DROP INDEX IX_ProductVendor_BusinessEntityID
     ON Purchasing.ProductVendor;
 GO
+CREATE CLUSTERED COLUMNSTORE INDEX [indexName] ON [dbo].[table] WITH (DROP_EXISTING = OFF) ON [filegroup_name]
+GO
+CREATE NONCLUSTERED INDEX [indexName] ON [dbo].[table]
+(
+	[Column1] ASC
+)
+INCLUDE ([ColumnName2],[ColumnName3]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, FILLFACTOR = 95) ON [filegroup_name]
+GO
+
+ALTER INDEX [indexname] ON [schema].[tableName] DISABLE
+GO
+
+ALTER INDEX [indexName] ON [dbo].[tbl] REBUILD PARTITION = ALL
+GO
+
