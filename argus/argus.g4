@@ -32,14 +32,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar argus;
 
 module
-   : equate* equates
+   : equate* equates_
    | equate* guardian
    | equate* procedure
    | equate* iterator
    | equate* cluster
    ;
 
-equates
+equates_
    : idn '=' 'equates' (parms where?)? equate* 'end' idn
    ;
 
@@ -108,10 +108,10 @@ yields
    ;
 
 signals
-   : 'signals' '(' exception (',' exception)* ')'
+   : 'signals' '(' exception_ (',' exception_)* ')'
    ;
 
-exception
+exception_
    : name (type_spec (',' type_spec)*)?
    ;
 
