@@ -76,6 +76,7 @@
 				<module>antlr</module>
 				<module>apex</module>
 				<module>apt</module>
+                <module>argus</module>
 				<module>arithmetic</module>
 				<module>asl</module>
 				<module>asm</module>
