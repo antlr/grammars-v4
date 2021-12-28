@@ -24,30 +24,60 @@
  */
 parser grammar lilParser;
 
-options { tokenVocab=lilLexer; }
 
-prog: line* EOF;
+options { tokenVocab = lilLexer; }
+prog
+   : line* EOF
+   ;
 
-line: watchcmd | setcmd | func | printcmd | foreachcmd | localcmd;
+line
+   : watchcmd
+   | setcmd
+   | func
+   | printcmd
+   | foreachcmd
+   | localcmd
+   ;
 
-watchcmd: WATCH identifier+ LBRACE line* RBRACE;
+watchcmd
+   : WATCH identifier+ LBRACE line* RBRACE
+   ;
 
-printcmd: PRINTSTMT;
+printcmd
+   : PRINTSTMT
+   ;
 
-foreachcmd: FOREACH identifier  identifierlist block;
+foreachcmd
+   : FOREACH identifier identifierlist block
+   ;
 
-setcmd: SET arg arg;
+setcmd
+   : SET arg arg
+   ;
 
-localcmd: LOCAL arg;
+localcmd
+   : LOCAL arg
+   ;
 
-func: FUNC identifier identifierlist block;
+func
+   : FUNC identifier identifierlist block
+   ;
 
-identifierlist: LBRACE identifier* RBRACE ;
+identifierlist
+   : LBRACE identifier* RBRACE
+   ;
 
-block:LBRACE line* RBRACE;
+block
+   : LBRACE line* RBRACE
+   ;
 
-arg: NUMBER | identifier | QUOTED;
+arg
+   : NUMBER
+   | identifier
+   | QUOTED
+   ;
 
-identifier: DOLLAR? IDENTIFIER;
-
+identifier
+   : DOLLAR? IDENTIFIER
+   ;
 

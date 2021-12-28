@@ -22,29 +22,74 @@
  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 lexer grammar lilLexer;
 
-PRINT: 'print';
-WATCH: 'watch';
-FOREACH: 'foreach';
-LOCAL: 'local';
-SET: 'set';
-FUNC: 'func';
-LBRACE: '{';
-RBRACE: '}';
-DOLLAR: '$';
-PRINTSTMT: PRINT -> mode(PRINT_MODE);
+PRINT
+   : 'print'
+   ;
 
-QUOTED: '`' .*? '`';
+WATCH
+   : 'watch'
+   ;
 
-IDENTIFIER: [a-zA-Z][a-zA-Z0-9-]*;
+FOREACH
+   : 'foreach'
+   ;
 
-NUMBER: [0-9]+;
-LINE_COMMENT: '#' ~[\r\n]* -> skip;
+LOCAL
+   : 'local'
+   ;
 
-WS: [ \r\n\t]+ -> skip;
+SET
+   : 'set'
+   ;
+
+FUNC
+   : 'func'
+   ;
+
+LBRACE
+   : '{'
+   ;
+
+RBRACE
+   : '}'
+   ;
+
+DOLLAR
+   : '$'
+   ;
+
+PRINTSTMT
+   : PRINT -> mode (PRINT_MODE)
+   ;
+
+QUOTED
+   : '`' .*? '`'
+   ;
+
+IDENTIFIER
+   : [a-zA-Z] [a-zA-Z0-9-]*
+   ;
+
+NUMBER
+   : [0-9]+
+   ;
+
+LINE_COMMENT
+   : '#' ~ [\r\n]* -> skip
+   ;
+
+WS
+   : [ \r\n\t]+ -> skip
+   ;
 
 mode PRINT_MODE;
-PRINTSTR: [a-zA-Z0-9- ]+ ;
-NEWLINE: [\r\n\t]+ -> skip, mode(DEFAULT_MODE);
+PRINTSTR
+   : [a-zA-Z0-9- ]+
+   ;
+
+NEWLINE
+   : [\r\n\t]+ -> skip , mode (DEFAULT_MODE)
+   ;
+
