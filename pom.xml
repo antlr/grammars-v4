@@ -86,6 +86,7 @@
 				<module>b</module>
 				<module>basic</module>
 				<module>bcpl</module>
+                <module>bdf</module>
 				<module>bibcode</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
