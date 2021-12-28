@@ -61,7 +61,7 @@ data
 
 datum
    : directive
-   | string
+   | string_
    | numeric
    ;
 
@@ -69,7 +69,7 @@ directive
    : pair ('BOT' | 'EOD')
    ;
 
-string
+string_
    : pair STRING
    ;
 
