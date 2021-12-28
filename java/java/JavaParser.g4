@@ -203,7 +203,7 @@ constantDeclarator
 // is the same as
 // public int[][] return2DArray() { ... }
 interfaceMethodDeclaration
-    : interfaceMethodModifier* (typeTypeOrVoid | typeParameters annotation* typeTypeOrVoid)
+    : interfaceMethodModifier* (annotation* typeTypeOrVoid)
       IDENTIFIER formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
     ;
 
@@ -218,7 +218,8 @@ interfaceMethodModifier
     ;
 
 genericInterfaceMethodDeclaration
-    : typeParameters interfaceMethodDeclaration
+    : interfaceMethodModifier* typeParameters (annotation* typeTypeOrVoid)
+      IDENTIFIER formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
     ;
 
 variableDeclarators
