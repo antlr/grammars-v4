@@ -4,7 +4,7 @@
 
 parser grammar CSharpParser;
 
-options { tokenVocab=CSharpLexer; }
+options { tokenVocab=CSharpLexer; superClass = CSharpParserBase; }
 
 // entry point
 compilation_unit
@@ -473,7 +473,7 @@ block
 	;
 
 local_variable_declaration
-	: (USING | REF | REF READONLY)? local_variable_type local_variable_declarator ( ','  local_variable_declarator)*
+	: (USING | REF | REF READONLY)? local_variable_type local_variable_declarator ( ','  local_variable_declarator { this.IsLocalVariableDeclaration() }? )*
 	| FIXED pointer_type fixed_pointer_declarators
 	;
 
@@ -483,7 +483,7 @@ local_variable_type
 	;
 
 local_variable_declarator
-	: identifier ('=' REF? local_variable_initializer)?
+	: identifier ('=' REF? local_variable_initializer )?
 	;
 
 local_variable_initializer

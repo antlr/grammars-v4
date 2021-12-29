@@ -12,7 +12,7 @@ fragment TextPresentationSequence: EmojiPresentationCharacter VS15;
 fragment EmojiPresentationSequence: TextPresentationCharacter VS16;
 fragment EmojiCharacter: [\p{Emoji}];
 fragment EmojiModifierSequence:
-    [\p{Grapheme_Cluster_Break=E_Base}\p{Grapheme_Cluster_Break=E_Base_GAZ}] [\p{Grapheme_Cluster_Break=E_Modifier}];
+    EmojiCharacter ('\u{1F3FB}' | '\u{1F3FC}' | '\u{1F3FD}' | '\u{1F3FE}' | '\u{1F3FF}');
 fragment EmojiFlagSequence:
     [\p{Grapheme_Cluster_Break=Regional_Indicator}] [\p{Grapheme_Cluster_Break=Regional_Indicator}];
 fragment ExtendedPictographic: [\p{Extended_Pictographic}];

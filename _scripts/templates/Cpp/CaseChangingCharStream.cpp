@@ -1,4 +1,4 @@
-﻿// Template generated code from Antlr4BuildTasks.dotnet-antlr <version>
+﻿// Template generated code from trgen <version>
 
 #include \<string>
 #include \<iostream>
