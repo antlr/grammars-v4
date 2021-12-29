@@ -46,7 +46,7 @@ recordtype
    ;
 
 date
-   : D TEXT
+   : D DATE
    ;
 
 total

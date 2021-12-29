@@ -90,11 +90,13 @@ WS
 
 mode LINETEXT;
 
-//DATE
-//   : 'D' [0-9]+ '/' [0-9]+ '/' [0-9]+
- //  ;
+DATE
+   :  [0-9]+ '/' [0-9]+ '/' [0-9]+
+   ;
 
-TEXT:  ~[\r\n]* [\r\n]+->popMode;
+TEXT:  ~[\r\n]+;
+
+ EOL: [\r\n]+-> skip, popMode;
 
 
 
