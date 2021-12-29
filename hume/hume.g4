@@ -139,7 +139,7 @@ size
 expr
    : constant
    | varid
-   //  | (expr op expr)
+   | expr op expr
    | (varid expr+)
    | (conid expr+)
    | ('[' exprs ']')
