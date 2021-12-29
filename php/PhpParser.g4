@@ -209,11 +209,11 @@ statement
     | throwStatement
     | gotoStatement
     | declareStatement
-    | emptyStatement
+    | emptyStatement_
     | inlineHtmlStatement
     ;
 
-emptyStatement
+emptyStatement_
     : SemiColon
     ;
 
