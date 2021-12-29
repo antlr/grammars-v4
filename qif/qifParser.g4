@@ -37,7 +37,7 @@ qif
    ;
 
 record
-   : (recordtype | date | total | check | state | memo | payee | accountorcategory)* eor
+   : (recordtype | date | total | check | state_ | memo | payee | accountorcategory)* eor
    ;
 
 recordtype
@@ -56,7 +56,7 @@ check
    : N NUM
    ;
 
-state
+state_
    : C STATE
    ;
 
