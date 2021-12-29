@@ -2,7 +2,7 @@
  [The "BSD licence"]
  Copyright (c) 2013 Terence Parr, Sam Harwell
  Copyright (c) 2017 Ivan Kochurkin (upgrade to Java 8)
- Copyright (c) 2022 Michal Lorek (upgrade to Java 11)
+ Copyright (c) 2021 Michal Lorek (upgrade to Java 11)
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,8 @@ parser grammar JavaParser;
 options { tokenVocab=JavaLexer; }
 
 compilationUnit
-    : (packageDeclaration? importDeclaration* typeDeclaration*) | moduleDeclaration EOF
+    : (packageDeclaration? importDeclaration* typeDeclaration*)
+    | moduleDeclaration EOF
     ;
 
 moduleDeclaration
@@ -45,16 +46,16 @@ moduleBody
     ;
 
 moduleDirective
-	:	REQUIRES requiresModifier* qualifiedName ';'
-	|	EXPORTS qualifiedName (TO qualifiedName)? ';'
-	|	OPENS qualifiedName (TO qualifiedName)? ';'
-	|	USES qualifiedName ';'
-	|	PROVIDES qualifiedName WITH qualifiedName ';'
+	: REQUIRES requiresModifier* qualifiedName ';'
+	| EXPORTS qualifiedName (TO qualifiedName)? ';'
+	| OPENS qualifiedName (TO qualifiedName)? ';'
+	| USES qualifiedName ';'
+	| PROVIDES qualifiedName WITH qualifiedName ';'
 	;
 
 requiresModifier
-	:	TRANSITIVE
-	|	STATIC
+	: TRANSITIVE
+	| STATIC
 	;
 
 packageDeclaration
@@ -243,7 +244,7 @@ genericInterfaceMethodDeclaration
     ;
 
 interfaceCommonBodyDeclaration
-    : (annotation* typeTypeOrVoid) identifier formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
+    : annotation* typeTypeOrVoid identifier formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
     ;
 
 variableDeclarators
@@ -409,12 +410,21 @@ blockStatement
     ;
 
 localVariableDeclaration
-    : variableModifier* typeType variableDeclarators
-    | variableModifier* VAR identifier '=' expression
+    : variableModifier* (typeType variableDeclarators | VAR identifier '=' expression)
     ;
 
 identifier
     : IDENTIFIER
+    | MODULE
+    | OPEN
+    | REQUIRES
+    | EXPORTS
+    | OPENS
+    | TO
+    | USES
+    | PROVIDES
+    | WITH
+    | TRANSITIVE
     | VAR
     ;
 
@@ -465,7 +475,8 @@ resources
     ;
 
 resource
-    : (variableModifier* ( (classOrInterfaceType variableDeclaratorId) | (VAR identifier) ) '=' expression) | identifier
+    : (variableModifier* ( classOrInterfaceType variableDeclaratorId | VAR identifier ) '=' expression)
+    | identifier
     ;
 
 /** Matches cases then statements, both of which are mandatory.

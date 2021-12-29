@@ -117,6 +117,20 @@ class Tests {
         PF.sp = c;
     }
 
+    {
+        var var = "var";
+        var module = "module";
+        var open = "open";
+        var requires = "requires";
+        var exports = "exports";
+        var opens = "opens";
+        var to = "to";
+        var uses = "uses";
+        var provides = "provides";
+        var with = "with";
+        var transitive = "transitive";
+    }
+
     void foo() {
         var f = 1;
     }
