@@ -11,10 +11,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        java: [11, 12 ]
+        java: [11, 17 ]
       fail-fast: false
     steps:
-    - uses: actions/checkout@v2.3.4
+    - uses: actions/checkout@v2.4.0
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-    - uses: actions/checkout@v2.3.4
+    - uses: actions/checkout@v2.4.0
     - name: Test C# target
       run: |
         bash _scripts/regtest.sh CSharp
@@ -37,10 +37,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [CSharp, Java, Go, Python3, Dart]
+        language: [CSharp, Java, JavaScript, Go, Python3, Dart]
     steps:
     - name: Checkout
-      uses: actions/checkout@v2.3.4
+      uses: actions/checkout@v2.4.0
       with:
         fetch-depth: 0
 
@@ -54,9 +54,13 @@ jobs:
       uses: dart-lang/setup-dart@v1
     - name: Install Python
       if: ${{ matrix.language == 'Python3' }}
-      uses: actions/setup-python@v2.2.2
+      uses: actions/setup-python@v2.3.1
       with:
         python-version: '3.8'
+    - name: Install Nodejs
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16.13.0'
 
     - name: Download ANTLR
       shell: pwsh
@@ -66,8 +70,8 @@ jobs:
     - name: Install trgen
       shell: pwsh
       run: |
-        dotnet tool install -g trgen --version 0.7.0
-        dotnet tool install -g trwdog --version 0.7.0
+        dotnet tool install -g trgen --version 0.13.2
+        dotnet tool install -g trwdog --version 0.13.2
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
@@ -84,3 +88,23 @@ jobs:
         }
         $env:ANTLR_JAR_PATH="${{ env.antlr_path }}"
         _scripts/test.ps1 ${{ matrix.language }} $Before $After
+  build-cpp:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.4.0
+      with:
+        fetch-depth: 0
+    - name: Setup Cpp
+      run: |
+         sudo apt update
+         sudo apt install gcc-10 g++-10
+      shell: bash
+    - name: Test Cpp target
+      run: |
+        bash _scripts/regtest.sh Cpp
+      env:
+        CC:   gcc-10
+        CXX:  g++-10
