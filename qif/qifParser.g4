@@ -31,13 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 parser grammar qifParser;
 
+
 options { tokenVocab = qifLexer; }
 qif
    : record* EOF
    ;
 
 record
-   : recordtype date total check state memo payee accountorcategory eor
+   : (recordtype | date | total | check | state | memo | payee | accountorcategory)* eor
    ;
 
 recordtype
