@@ -110,7 +110,6 @@ v
 vb6
 vba
 velocity
-wat
 wavefront
 webidl
 xpath/xpath31

@@ -254,7 +254,6 @@ verilog/systemverilog
 verilog/verilog
 vhdl
 vmf
-wat
 wavefront
 webidl
 wkt
