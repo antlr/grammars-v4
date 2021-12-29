@@ -2,6 +2,7 @@
  [The "BSD licence"]
  Copyright (c) 2013 Terence Parr, Sam Harwell
  Copyright (c) 2017 Ivan Kochurkin (upgrade to Java 8)
+ Copyright (c) 2022 Michal Lorek (upgrade to Java 11)
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -32,8 +33,29 @@ parser grammar JavaParser;
 options { tokenVocab=JavaLexer; }
 
 compilationUnit
-    : packageDeclaration? importDeclaration* typeDeclaration* EOF
+    : (packageDeclaration? importDeclaration* typeDeclaration*) | moduleDeclaration EOF
     ;
+
+moduleDeclaration
+    : OPEN? MODULE qualifiedName moduleBody
+    ;
+
+moduleBody
+    : '{' moduleDirective* '}'
+    ;
+
+moduleDirective
+	:	REQUIRES requiresModifier* qualifiedName ';'
+	|	EXPORTS qualifiedName (TO qualifiedName)? ';'
+	|	OPENS qualifiedName (TO qualifiedName)? ';'
+	|	USES qualifiedName ';'
+	|	PROVIDES qualifiedName WITH qualifiedName ';'
+	;
+
+requiresModifier
+	:	TRANSITIVE
+	|	STATIC
+	;
 
 packageDeclaration
     : annotation* PACKAGE qualifiedName ';'
@@ -101,7 +123,7 @@ enumConstants
     ;
 
 enumConstant
-    : annotation* IDENTIFIER arguments? classBody?
+    : annotation* identifier arguments? classBody?
     ;
 
 enumBodyDeclarations
@@ -144,7 +166,7 @@ memberDeclaration
    for invalid return type after parsing.
  */
 methodDeclaration
-    : typeTypeOrVoid IDENTIFIER formalParameters ('[' ']')*
+    : typeTypeOrVoid identifier formalParameters ('[' ']')*
       (THROWS qualifiedNameList)?
       methodBody
     ;
@@ -195,7 +217,7 @@ constDeclaration
     ;
 
 constantDeclarator
-    : IDENTIFIER ('[' ']')* '=' variableInitializer
+    : identifier ('[' ']')* '=' variableInitializer
     ;
 
 // Early versions of Java allows brackets after the method name, eg.
@@ -203,8 +225,7 @@ constantDeclarator
 // is the same as
 // public int[][] return2DArray() { ... }
 interfaceMethodDeclaration
-    : interfaceMethodModifier* (annotation* typeTypeOrVoid)
-      IDENTIFIER formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
+    : interfaceMethodModifier* interfaceCommonBodyDeclaration
     ;
 
 // Java8
@@ -218,8 +239,11 @@ interfaceMethodModifier
     ;
 
 genericInterfaceMethodDeclaration
-    : interfaceMethodModifier* typeParameters (annotation* typeTypeOrVoid)
-      IDENTIFIER formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
+    : interfaceMethodModifier* typeParameters interfaceCommonBodyDeclaration
+    ;
+
+interfaceCommonBodyDeclaration
+    : (annotation* typeTypeOrVoid) identifier formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
     ;
 
 variableDeclarators
@@ -231,7 +255,7 @@ variableDeclarator
     ;
 
 variableDeclaratorId
-    : IDENTIFIER ('[' ']')*
+    : identifier ('[' ']')*
     ;
 
 variableInitializer
@@ -244,7 +268,7 @@ arrayInitializer
     ;
 
 classOrInterfaceType
-    : IDENTIFIER typeArguments? ('.' IDENTIFIER typeArguments?)*
+    : identifier typeArguments? ('.' identifier typeArguments?)*
     ;
 
 typeArgument
@@ -273,8 +297,17 @@ lastFormalParameter
     : variableModifier* typeType annotation* '...' variableDeclaratorId
     ;
 
+// local variable type inference
+lambdaLVTIList
+    : lambdaLVTIParameter (',' lambdaLVTIParameter)*
+    ;
+
+lambdaLVTIParameter
+    : variableModifier* VAR identifier
+    ;
+
 qualifiedName
-    : IDENTIFIER ('.' IDENTIFIER)*
+    : identifier ('.' identifier)*
     ;
 
 literal
@@ -300,7 +333,7 @@ floatLiteral
 
 // ANNOTATIONS
 altAnnotationQualifiedName
-    : (IDENTIFIER DOT)* '@' IDENTIFIER
+    : (identifier DOT)* '@' identifier
     ;
 
 annotation
@@ -312,7 +345,7 @@ elementValuePairs
     ;
 
 elementValuePair
-    : IDENTIFIER '=' elementValue
+    : identifier '=' elementValue
     ;
 
 elementValue
@@ -352,7 +385,7 @@ annotationMethodOrConstantRest
     ;
 
 annotationMethodRest
-    : IDENTIFIER '(' ')' defaultValue?
+    : identifier '(' ')' defaultValue?
     ;
 
 annotationConstantRest
@@ -377,6 +410,12 @@ blockStatement
 
 localVariableDeclaration
     : variableModifier* typeType variableDeclarators
+    | variableModifier* VAR identifier '=' expression
+    ;
+
+identifier
+    : IDENTIFIER
+    | VAR
     ;
 
 localTypeDeclaration
@@ -398,11 +437,11 @@ statement
     | SYNCHRONIZED parExpression block
     | RETURN expression? ';'
     | THROW expression ';'
-    | BREAK IDENTIFIER? ';'
-    | CONTINUE IDENTIFIER? ';'
+    | BREAK identifier? ';'
+    | CONTINUE identifier? ';'
     | SEMI
     | statementExpression=expression ';'
-    | identifierLabel=IDENTIFIER ':' statement
+    | identifierLabel=identifier ':' statement
     ;
 
 catchClause
@@ -426,7 +465,7 @@ resources
     ;
 
 resource
-    : variableModifier* classOrInterfaceType variableDeclaratorId '=' expression
+    : (variableModifier* ( (classOrInterfaceType variableDeclaratorId) | (VAR identifier) ) '=' expression) | identifier
     ;
 
 /** Matches cases then statements, both of which are mandatory.
@@ -452,7 +491,7 @@ forInit
     ;
 
 enhancedForControl
-    : variableModifier* typeType variableDeclaratorId ':' expression
+    : variableModifier* (typeType | VAR) variableDeclaratorId ':' expression
     ;
 
 // EXPRESSIONS
@@ -466,7 +505,7 @@ expressionList
     ;
 
 methodCall
-    : IDENTIFIER '(' expressionList? ')'
+    : identifier '(' expressionList? ')'
     | THIS '(' expressionList? ')'
     | SUPER '(' expressionList? ')'
     ;
@@ -474,12 +513,13 @@ methodCall
 expression
     : primary
     | expression bop='.'
-      ( IDENTIFIER
-      | methodCall
-      | THIS
-      | NEW nonWildcardTypeArguments? innerCreator
-      | SUPER superSuffix
-      | explicitGenericInvocation
+      (
+         identifier
+       | methodCall
+       | THIS
+       | NEW nonWildcardTypeArguments? innerCreator
+       | SUPER superSuffix
+       | explicitGenericInvocation
       )
     | expression '[' expression ']'
     | methodCall
@@ -506,8 +546,8 @@ expression
     | lambdaExpression // Java8
 
     // Java 8 methodReference
-    | expression '::' typeArguments? IDENTIFIER
-    | typeType '::' (typeArguments? IDENTIFIER | NEW)
+    | expression '::' typeArguments? identifier
+    | typeType '::' (typeArguments? identifier | NEW)
     | classType '::' typeArguments? NEW
     ;
 
@@ -518,9 +558,10 @@ lambdaExpression
 
 // Java8
 lambdaParameters
-    : IDENTIFIER
+    : identifier
     | '(' formalParameterList? ')'
     | '(' IDENTIFIER (',' IDENTIFIER)* ')'
+    | '(' lambdaLVTIList? ')'
     ;
 
 // Java8
@@ -534,7 +575,7 @@ primary
     | THIS
     | SUPER
     | literal
-    | IDENTIFIER
+    | identifier
     | typeTypeOrVoid '.' CLASS
     | nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
     ;
@@ -608,7 +649,7 @@ typeArguments
 
 superSuffix
     : arguments
-    | '.' typeArguments? IDENTIFIER arguments?
+    | '.' typeArguments? identifier arguments?
     ;
 
 explicitGenericInvocationSuffix
