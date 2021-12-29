@@ -2,10 +2,6 @@
 
 using namespace antlr4;
 
-JavaScriptLexerBase::JavaScriptLexerBase(CharStream *input) : Lexer(input)
-{
-}
-
 bool JavaScriptLexerBase::getStrictDefault()
 {
     return useStrictDefault;
@@ -26,6 +22,11 @@ void JavaScriptLexerBase::setUseStrictDefault(bool value)
 bool JavaScriptLexerBase::IsStrictMode()
 {
     return useStrictCurrent;
+}
+
+bool JavaScriptLexerBase::IsInTemplateString()
+{
+	return _templateDepth > 0;
 }
 
 std::unique_ptr<antlr4::Token> JavaScriptLexerBase::nextToken() {
@@ -69,6 +70,16 @@ void JavaScriptLexerBase::ProcessStringLiteral()
             scopeStrictModes.push(useStrictCurrent);
         }
     }
+}
+
+void JavaScriptLexerBase::IncreaseTemplateDepth()
+{
+	_templateDepth++;
+}
+
+void JavaScriptLexerBase::DecreaseTemplateDepth()
+{
+	_templateDepth--;
 }
 
 bool JavaScriptLexerBase::IsRegexPossible()

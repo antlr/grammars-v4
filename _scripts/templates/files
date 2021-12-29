@@ -21,6 +21,7 @@
 ./Cpp/readme.md
 ./Cpp/test.sh
 ./CSharp/CaseChangingCharStream.cs
+./CSharp/Encodings.cs
 ./CSharp/ErrorListener.cs
 ./CSharp/makefile
 ./CSharp/Program.cs
@@ -35,8 +36,9 @@
 ./Dart/tester.psm1
 ./files
 ./Go/antlr_resource/case_changing_stream.go
+./Go/go.mod
 ./Go/makefile
-./Go/Program.go
+./Go/Test.go
 ./Go/test.sh
 ./Go/tester.psm1
 ./Java/CaseChangingCharStream.java

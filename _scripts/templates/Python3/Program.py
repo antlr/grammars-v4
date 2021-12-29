@@ -1,4 +1,4 @@
-# Template generated code from Antlr4BuildTasks.dotnet-antlr v 2.2
+# Template generated code from trgen <version>
 
 import sys
 from antlr4 import *
@@ -31,6 +31,7 @@ def main(argv):
     input = None
     file_name = None
     i = 1
+    encoding = "utf-8"
     while i \< len(argv):
         arg = argv[i]
         if arg in ("-tokens"):
@@ -43,6 +44,9 @@ def main(argv):
         elif arg in ("-file"):
             i = i + 1
             file_name = argv[i]
+        elif arg in ("-encoding"):
+            i = i + 1
+            encoding = argv[i]
         else:
             print("unknown")
         i = i + 1
@@ -58,7 +62,7 @@ def main(argv):
     elif (input != None):
         str = InputStream(input);
     elif (file_name != None):
-        str = FileStream(file_name, 'utf8');
+        str = FileStream(file_name, encoding);
 <if (case_insensitive_type)>
     str = CaseChangingStream(str, "<case_insensitive_type>" == "Upper")
 <endif>

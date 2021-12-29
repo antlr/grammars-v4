@@ -300,7 +300,7 @@ simpleStatement
    : assignmentStatement
    | procedureStatement
    | gotoStatement
-   | emptyStatement
+   | emptyStatement_
    ;
 
 assignmentStatement
@@ -406,7 +406,7 @@ gotoStatement
    : GOTO label
    ;
 
-emptyStatement
+emptyStatement_
    :
    ;
 

@@ -231,6 +231,7 @@ genericsSpecifier
 
 typeSpecifierWithPrefixes
     : typePrefix* typeSpecifier
+    | typeName
     ;
 
 dictionaryExpression
