@@ -29,8 +29,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-grammar qif;
+parser grammar qifParser;
 
+options { tokenVocab = qifLexer; }
 qif
    : record* EOF
    ;
@@ -40,7 +41,7 @@ record
    ;
 
 recordtype
-   : '!' 'Type' ':' typename
+   : TYPE typename
    ;
 
 typename
@@ -52,32 +53,32 @@ date
    ;
 
 total
-   : 'T' NUM
+   : T NUM
    ;
 
 check
-   : 'N' NUM
+   : N NUM
    ;
 
 state
-   : 'C' ('X' | 'x' | '*')
+   : C STATE
    ;
 
 memo
-   : 'M'
+   : M
    ;
 
 payee
-   : 'P'
+   : P
    ;
 
 accountorcategory
-   : 'L' account
+   : L account
    | category
    ;
 
 account
-   : '[' ID ']'
+   : LB ID RB
    ;
 
 category
@@ -86,25 +87,5 @@ category
 
 eor
    : EOR
-   ;
-
-EOR
-   : '^'
-   ;
-
-DATE
-   : 'D' [0-9]+ '/' [0-9]+ '/' [0-9]+
-   ;
-
-NUM
-   : '-'? [0-9]+ ('.' [0-9]+)?
-   ;
-
-ID
-   : [a-zA-Z] [a-zA-Z0-9]*
-   ;
-
-WS
-   : [ \r\n\t]+ -> skip
    ;
 
