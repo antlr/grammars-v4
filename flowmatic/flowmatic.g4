@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar flowmatic;
 
 flowmatic
-   : line* '(' 'END' ')' EOF
+   : line* END EOF
    ;
 
 line
@@ -60,31 +60,31 @@ input_statement
    ;
 
 jumpto_statement
-   : 'JUMP' 'TO' 'OPERATION' NUM
+   : 'JUMP' 'TO' operation
    ;
 
 readitem_statement
-   : 'READ-ITEM' var
+   : 'READ-ITEM' fileletter
    ;
 
 writeitem_statement
-   : 'WRITE-ITEM' var
+   : 'WRITE-ITEM' fileletter
    ;
 
 transfer_statement
-   : 'TRANSFER' var 'TO' var
+   : 'TRANSFER' fileletter 'TO' fileletter
    ;
 
 if_statement
-   : 'IF' op GOTO 'OPERATION' NUM
+   : 'IF' op GOTO operation
    ;
 
 otherwise_statement
-   : 'OTHERWISE' GOTO 'OPERATION' NUM
+   : 'OTHERWISE' GOTO operation
    ;
 
 rewind_statement
-   : 'REWIND' var
+   : 'REWIND' fileletter
    ;
 
 stop_statement
@@ -92,23 +92,28 @@ stop_statement
    ;
 
 compare_statement
-   : 'COMPARE' var '(' ID ')' 'WITH' var '(' ID ')'
+   : 'COMPARE' fieldname '(' fileletter ')' 'WITH' fieldname '(' fileletter ')'
    ;
 
 move_statement
-   : 'MOVE' var '(' ID ')' 'TO' var '(' ID ')'
+   : 'MOVE' fieldname '(' fileletter ')' 'TO' fieldname '(' fileletter ')'
    ;
 
 set_statement
-   : 'SET' 'OPERATION' NUM 'TO' GOTO 'OPERATION' NUM
+   : 'SET' operation 'TO' GOTO operation
    ;
 
 test_statement
-   : 'TEST' var '(' ID ')' 'AGAINST'
+   : 'TEST' fieldname '(' fileletter ')' 'AGAINST' num
    ;
 
 closeout_statement
    : 'CLOSE-OUT' 'FILES' fileletter (';' fileletter)*
+   ;
+
+num
+   : NUM
+   | ZERO
    ;
 
 filename
@@ -119,14 +124,26 @@ fileletter
    : ID
    ;
 
-var
+fieldname
    : ID
+   ;
+
+operation
+   : 'OPERATION' NUM
    ;
 
 op
    : 'EQUAL'
    | 'GREATER'
    | EOD
+   ;
+
+END
+   : '(' 'END' ')'
+   ;
+
+ZERO
+   : 'Z'+
    ;
 
 GOTO
