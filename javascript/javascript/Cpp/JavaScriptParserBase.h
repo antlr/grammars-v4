@@ -4,7 +4,7 @@
 
 class JavaScriptParserBase : public antlr4::Parser {
 public:
-    JavaScriptParserBase(antlr4::TokenStream *input);
+    JavaScriptParserBase(antlr4::TokenStream *input) : Parser(input) { }
     bool p(std::string str);
     bool prev(std::string str);
     bool n(std::string str);

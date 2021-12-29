@@ -1,4 +1,4 @@
-// Template generated code from Antlr4BuildTasks.dotnet-antlr v <version>
+// Template generated code from trgen <version>
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
@@ -14,6 +14,8 @@ public class Program
     public static Lexer Lexer { get; set; }
     public static ITokenStream TokenStream { get; set; }
     public static IParseTree Tree { get; set; }
+    public static string StartSymbol { get; set; } = "<start_symbol>";
+    public static string Input { get; set; }
     public static IParseTree Parse(string input)
     {
         var str = new AntlrInputStream(input);
@@ -24,6 +26,8 @@ public class Program
         var parser = new <parser_name>(tokens);
         Parser = parser;
         var tree = parser.<start_symbol>();
+        Input = lexer.InputStream.ToString();
+        TokenStream = parser.TokenStream;
         Tree = tree;
         return tree;
     }
@@ -32,13 +36,26 @@ public class Program
     {
         bool show_tree = false;
         bool show_tokens = false;
+        bool old = false;
+        bool two_byte = false;
         string file_name = null;
         string input = null;
+        System.Text.Encoding encoding = null;
         for (int i = 0; i \< args.Length; ++i)
         {
             if (args[i].Equals("-tokens"))
             {
                 show_tokens = true;
+                continue;
+            }
+            else if (args[i].Equals("-two-byte"))
+            {
+                two_byte = true;
+                continue;
+            }
+            else if (args[i].Equals("-old"))
+            {
+                old = true;
                 continue;
             }
             else if (args[i].Equals("-tree"))
@@ -50,6 +67,16 @@ public class Program
                 input = args[++i];
             else if (args[i].Equals("-file"))
                 file_name = args[++i];
+            else if (args[i].Equals("-encoding"))
+            {
+                ++i;
+                encoding = Encoding.GetEncoding(
+                    args[i],
+                    new EncoderReplacementFallback("(unknown)"),
+                    new DecoderReplacementFallback("(error)"));
+                if (encoding == null)
+                    throw new Exception(@"Unknown encoding. Must be an Internet Assigned Numbers Authority (IANA) code page name. https://www.iana.org/assignments/character-sets/character-sets.xhtml");
+            }
         }
         ICharStream str = null;
         if (input == null && file_name == null)
@@ -60,7 +87,17 @@ public class Program
             str = CharStreams.fromString(input);
         } else if (file_name != null)
         {
+            if (two_byte)
+                str = new TwoByteCharStream(file_name);
+            else if (old)
+            {
+                FileStream fs = new FileStream(file_name, FileMode.Open);
+                str = new Antlr4.Runtime.AntlrInputStream(fs);
+            }
+            else if (encoding == null)
             str = CharStreams.fromPath(file_name);
+            else
+                str = CharStreams.fromPath(file_name, encoding);
         }
 <if (case_insensitive_type)>
         str = new Antlr4.Runtime.CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
