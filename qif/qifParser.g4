@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 parser grammar qifParser;
 
-
 options { tokenVocab = qifLexer; }
 qif
    : record* EOF
@@ -70,16 +69,15 @@ payee
    ;
 
 accountorcategory
-   : L account
-   | category
+   : L (account | category)
    ;
 
 account
-   : LB ID RB
+   : LB ACCNTCATNAME RB
    ;
 
 category
-   : ID
+   : ACCNTCATNAME
    ;
 
 eor

@@ -32,11 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 lexer grammar qifLexer;
 
 TYPE
-   : '!Type:' -> pushMode(LINETEXT)
+   : '!Type:' -> pushMode (LINETEXT)
    ;
 
 T
-   : 'T'
+   : 'T' -> pushMode (LINETEXT)
    ;
 
 C
@@ -44,30 +44,23 @@ C
    ;
 
 N
-   : 'N'
+   : 'N' -> pushMode (LINETEXT)
    ;
 
 M
-   : 'M' -> pushMode(LINETEXT)
+   : 'M' -> pushMode (LINETEXT)
    ;
 
 P
-   : 'P' -> pushMode(LINETEXT)
+   : 'P' -> pushMode (LINETEXT)
    ;
 
 L
-   : 'L'
+   : 'L' -> pushMode (ACCTCATE)
    ;
 
-D: 'D' -> pushMode(LINETEXT)
-;
-
-LB
-   : '['
-   ;
-
-RB
-   : ']'
+D
+   : 'D' -> pushMode (LINETEXT)
    ;
 
 STATE
@@ -78,25 +71,41 @@ EOR
    : '^'
    ;
 
-
-
-NUM
-   : '-'? [0-9]+ ('.' [0-9]+)?
-   ;
-
 WS
    : [ \r\n\t]+ -> skip
    ;
 
 mode LINETEXT;
-
 DATE
-   :  [0-9]+ '/' [0-9]+ '/' [0-9]+
+   : [0-9]+ '/' [0-9]+ '/' [0-9]+
    ;
 
-TEXT:  ~[\r\n]+;
+NUM
+   : '-'? [0-9,]+ ('.' [0-9]+)?
+   ;
 
- EOL: [\r\n]+-> skip, popMode;
+TEXT
+   : ~ [\r\n]+
+   ;
 
+EOL
+   : [\r\n]+ -> skip , popMode
+   ;
 
+mode ACCTCATE;
+LB
+   : '['
+   ;
+
+ACCNTCATNAME
+   : [a-zA-Z0-9 ]+
+   ;
+
+RB
+   : ']'
+   ;
+
+EOL2
+   : [\r\n]+ -> skip , popMode
+   ;
 
