@@ -4,12 +4,13 @@
 
 #include "antlr4-runtime.h"
 
-class TypeScriptLexerBase : public antlr4::Lexer {
+class TypeScriptLexerBase : public antlr4::Lexer
+{
 public:
     TypeScriptLexerBase(antlr4::CharStream *input);
 
     std::stack<bool> scopeStrictModes;
-    
+
     bool lastToken = false;
     size_t lastTokenType = 0;
 
@@ -24,4 +25,10 @@ public:
     void ProcessCloseBrace();
     void ProcessStringLiteral();
     bool IsRegexPossible();
+    bool IsInTemplateString();
+    void IncreaseTemplateDepth();
+    void DecreaseTemplateDepth();
+
+private:
+    int templateDepth = 0;
 };

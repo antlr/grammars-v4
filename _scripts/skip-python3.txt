@@ -75,6 +75,7 @@ python/python3-without-actions
 python/python3alt
 python/tiny-python
 quakemap
+r
 redcode
 rego
 rexx
@@ -89,6 +90,7 @@ smalltalk
 sparql
 sql/hive
 sql/sqlite
+sql/postgresql
 sql/tsql
 stellaris
 stringtemplate

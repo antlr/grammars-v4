@@ -1,3 +1,4 @@
+# Template generated code from trgen <version>
 function Build-Grammar {
     $msg = dotnet build -o CSharp
     return @{
