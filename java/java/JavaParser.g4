@@ -33,7 +33,7 @@ parser grammar JavaParser;
 options { tokenVocab=JavaLexer; }
 
 compilationUnit
-    : (packageDeclaration? importDeclaration* typeDeclaration*)
+    : packageDeclaration? importDeclaration* typeDeclaration*
     | moduleDeclaration EOF
     ;
 
@@ -475,7 +475,7 @@ resources
     ;
 
 resource
-    : (variableModifier* ( classOrInterfaceType variableDeclaratorId | VAR identifier ) '=' expression)
+    : variableModifier* ( classOrInterfaceType variableDeclaratorId | VAR identifier ) '=' expression
     | identifier
     ;
 

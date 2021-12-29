@@ -254,4 +254,16 @@ class Tests {
             InnerAnnotation var() default @InnerAnnotation(var = 1);
         }
     }
+
+    static class TH{
+
+        void var(){}
+        int var = 1;
+
+        TH(){
+            this.var();
+            this.var = 1;
+            System.out.println(var);
+        }
+    }
 }
