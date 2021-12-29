@@ -608,7 +608,7 @@ typeArguments
 
 superSuffix
     : arguments
-    | '.' IDENTIFIER arguments?
+    | '.' typeArguments? IDENTIFIER arguments?
     ;
 
 explicitGenericInvocationSuffix
