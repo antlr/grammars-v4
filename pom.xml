@@ -117,6 +117,7 @@
 				<module>dcm</module>
 				<module>dgol</module>
 				<module>dice</module>
+                <module>dif</module>
 				<module>doiurl</module>
 				<module>dot</module>
 				<module>edif300</module>
