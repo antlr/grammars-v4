@@ -151,6 +151,7 @@
 				<module>iri</module>
 				<module>iso8601</module>
 				<module>istc</module>
+                <module>itn</module>
 				<module>janus</module>
 				<module>java</module>
 				<module>javadoc</module>
