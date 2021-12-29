@@ -192,4 +192,23 @@ public class Annos {
         public <@Dummy3 T> @TM1 @TM2 T gim01(@TM1 T t);
     }
 
+    static class Issue2454 {
+        interface I {
+            default <T> void fn1() {
+            }
+
+            default <T, S, U> void fn2() {
+            }
+        }
+
+        class C implements I {
+
+            public void test() {
+                I.super.<Long>fn1(); // fix #2454
+                I.super.fn1(); //ok
+                I.super.<List<Integer>, Byte, Map<Long, String>>fn2(); // fix #2454
+                I.super.fn2(); //ok
+            }
+        }
+    }
 }
