@@ -54,9 +54,9 @@ value : single_value | object_ | LB commasep_value RB ;
 
 commasep_value : value( COMMA value )* COMMA? ;
 
-file_extension_decl : FILE_EXTENSION STRING_CONSTANT ;
+file_extension_decl : FILE_EXTENSION STRING_CONSTANT SEMI ;
 
-file_identifier_decl : FILE_IDENTIFIER STRING_CONSTANT ;
+file_identifier_decl : FILE_IDENTIFIER STRING_CONSTANT SEMI ;
 
 ns_ident : identifier ( DOT identifier )* ;
 
@@ -159,11 +159,11 @@ SCHAR
 
 BASE_TYPE_NAME : 'bool' | 'byte' | 'ubyte' | 'short' | 'ushort' | 'int' | 'uint' | 'float' | 'long' | 'ulong' | 'double' | 'int8' | 'uint8' | 'int16' | 'uint16' | 'int32' | 'uint32' | 'int64' | 'uint64' | 'float32' | 'float64' | 'string' ;
 
+INTEGER_CONSTANT : [-+]? DECIMAL_DIGIT+ | 'true' | 'false' ;
+
 IDENT : [a-zA-Z_] [a-zA-Z0-9_]* ;
 
 HEX_INTEGER_CONSTANT : [-+]? '0' [xX] HEXADECIMAL_DIGIT+ ;
-
-INTEGER_CONSTANT : [-+]? DECIMAL_DIGIT+ | 'true' | 'false' ;
 
 FLOAT_CONSTANT : (PLUS|MINUS)? FLOATLIT ;
 

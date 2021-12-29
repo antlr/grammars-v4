@@ -20,7 +20,6 @@
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
 						<include>oncrpcv2.g4</include>
-						<include>xdr.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>

@@ -138,8 +138,8 @@ public class TestFunctions extends TestBase {
             .commandStatement(0)
             .expression()
             .functionCall();
-    assertThat(function.functionNamespace().getText()).isEqualTo("map.");
-    assertThat(function.functionNamespace().Identifier(0).getText()).isEqualTo("map");
+    assertThat(function.namespace().getText()).isEqualTo("map.");
+    assertThat(function.namespace().Identifier(0).getText()).isEqualTo("map");
     assertThat(function.FunctionIdentifier().getText()).isEqualTo("deep-merge(");
   }
 }

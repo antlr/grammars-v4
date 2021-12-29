@@ -1,4 +1,4 @@
-// Template generated code from Antlr4BuildTasks.dotnet-antlr v <version>
+// Template generated code from trgen <version>
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
@@ -17,24 +17,15 @@ public class Program
     public static Lexer Lexer { get; set; }
     public static ITokenStream TokenStream { get; set; }
     public static IParseTree Tree { get; set; }
-    public static IParseTree Parse(string input)
-    {
-        var str = new AntlrInputStream(input);
-        var lexer = new Test.<lexer_name>(str);
-        Lexer = lexer;
-        var tokens = new CommonTokenStream(lexer);
-        TokenStream = tokens;
-        var parser = new Test.<parser_name>(tokens);
-        Parser = parser;
-        var tree = parser.<start_symbol>();
-        Tree = tree;
-        return tree;
-    }
+    public static string StartSymbol { get; set; } = "<start_symbol>";
+    public static string Input { get; set; }
 
     static void Main(string[] args)
     {
         bool show_tree = false;
         bool show_tokens = false;
+        bool old = false;
+        bool two_byte = false;
         string file_name = null;
         string input = null;
         for (int i = 0; i \< args.Length; ++i)
@@ -42,6 +33,16 @@ public class Program
             if (args[i].Equals("-tokens"))
             {
                 show_tokens = true;
+                continue;
+            }
+            else if (args[i].Equals("-two-byte"))
+            {
+                two_byte = true;
+                continue;
+            }
+            else if (args[i].Equals("-old"))
+            {
+                old = true;
                 continue;
             }
             else if (args[i].Equals("-tree"))

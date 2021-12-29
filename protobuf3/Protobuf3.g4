@@ -21,7 +21,7 @@ proto
       | packageStatement
       | optionStatement
       | topLevelDef
-      | emptyStatement
+      | emptyStatement_
     )*
   ;
 
@@ -75,7 +75,7 @@ fieldNumber
 // Oneof and oneof field
 
 oneof
-  : ONEOF oneofName LC ( optionStatement | oneofField | emptyStatement )* RC
+  : ONEOF oneofName LC ( optionStatement | oneofField | emptyStatement_ )* RC
   ;
 
 oneofField
@@ -164,7 +164,7 @@ enumBody
 enumElement
   : optionStatement
   | enumField
-  | emptyStatement
+  | emptyStatement_
   ;
 
 enumField
@@ -197,7 +197,7 @@ messageElement
   | oneof
   | mapField
   | reserved
-  | emptyStatement
+  | emptyStatement_
   ;
 
 // service
@@ -209,13 +209,13 @@ serviceDef
 serviceElement
   : optionStatement
   | rpc
-  | emptyStatement
+  | emptyStatement_
   ;
 
 rpc
   : RPC rpcName LP ( STREAM )? messageType RP
         RETURNS LP ( STREAM )? messageType RP
-        (LC ( optionStatement | emptyStatement )* RC | SEMI)
+        (LC ( optionStatement | emptyStatement_ )* RC | SEMI)
   ;
 
 // lexical
@@ -234,7 +234,7 @@ blockLit
   : LC ( ident COLON constant )* RC
   ;
 
-emptyStatement: SEMI;
+emptyStatement_: SEMI;
 
 // Lexical elements
 

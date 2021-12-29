@@ -1,4 +1,5 @@
-﻿class CaseChangingStream():
+﻿# Template generated code from trgen <version>
+class CaseChangingStream():
 	def __init__(self, stream, upper):
 		self._stream = stream
 		self._upper = upper

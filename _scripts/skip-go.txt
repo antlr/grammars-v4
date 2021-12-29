@@ -9,6 +9,7 @@ asm/masm
 asm/pdp7
 asn/asn_3gpp
 clif
+cobol85
 cpp
 csharp
 edif300
@@ -21,8 +22,6 @@ hypertalk
 icalendar
 inf
 informix
-java/java
-java/java8
 java/java9
 javadoc
 javascript/ecmascript
@@ -33,6 +32,7 @@ kirikiri-tjs
 kotlin/kotlin
 kotlin/kotlin-formal
 lambda
+less
 logo/logo
 logo/ucb-logo
 lpc
@@ -60,16 +60,20 @@ python/python3-ts
 python/python3-without-actions
 python/tiny-python
 quakemap
+r
 rego
 rexx
 rust
 scala
+scss
 sieve
 smalltalk
 smtlibv2
 sparql
 sql/hive
+sql/mysql
 sql/plsql
+sql/postgresql
 stringtemplate
 swift-fin
 swift/swift2

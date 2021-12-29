@@ -6,8 +6,6 @@ clif
 cpp
 csharp
 fortran77
-gdscript
-haskell
 html
 hypertalk
 javadoc
@@ -29,8 +27,10 @@ python/python3-ts
 python/python3-without-actions
 python/python3alt
 python/tiny-python
+r
 rego
 rexx
+sql/postgresql
 stringtemplate
 swift-fin
 swift/swift2

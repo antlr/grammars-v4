@@ -197,7 +197,7 @@ typeExtension : scalarTypeExtension
 scalarTypeDefinition: description? 'scalar' name directives?;
 
 //https://spec.graphql.org/June2018/#sec-Scalar-Extensions
-scalarTypeExtension:  'extends' 'scalar' name directives;
+scalarTypeExtension:  'extend' 'scalar' name directives;
 
 // https://graphql.github.io/graphql-spec/June2018/#sec-Objects
 objectTypeDefinition :

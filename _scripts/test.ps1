@@ -227,6 +227,9 @@ function Get-GitChangedDirectories {
         exit 1
     }
     $diff = git diff $PreviousCommit $CurrentCommit --name-only
+    if ($diff -is "string") {
+        $diff = @($diff)
+    }
     $treatAsRootDir = @(".github/", "_scripts/")
     foreach ($item in $diff) {
         foreach ($j in $treatAsRootDir) {
