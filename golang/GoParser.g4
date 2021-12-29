@@ -106,6 +106,14 @@ simpleStmt:
 	| shortVarDecl
 	| emptyStmt;
 
+terminatedSimpleStmt:
+	sendStmt SEMI
+	| incDecStmt SEMI
+	| assignment SEMI
+	| expressionStmt SEMI
+	| shortVarDecl SEMI
+	| emptyStmt;
+
 expressionStmt: expression;
 
 sendStmt: channel = expression RECEIVE expression;
@@ -132,7 +140,7 @@ shortVarDecl: identifierList DECLARE_ASSIGN expressionList;
 
 emptyStmt: SEMI;
 
-labeledStmt: IDENTIFIER COLON statement;
+labeledStmt: IDENTIFIER COLON statement?;
 
 returnStmt: RETURN expressionList?;
 
@@ -147,21 +155,21 @@ fallthroughStmt: FALLTHROUGH;
 deferStmt: DEFER expression;
 
 ifStmt:
-	IF (simpleStmt SEMI)? expression block (
+	IF terminatedSimpleStmt? expression block (
 		ELSE (ifStmt | block)
 	)?;
 
 switchStmt: exprSwitchStmt | typeSwitchStmt;
 
 exprSwitchStmt:
-	SWITCH (simpleStmt SEMI)? expression? L_CURLY exprCaseClause* R_CURLY;
+	SWITCH terminatedSimpleStmt? expression? L_CURLY exprCaseClause* R_CURLY;
 
 exprCaseClause: exprSwitchCase COLON statementList?;
 
 exprSwitchCase: CASE expressionList | DEFAULT;
 
 typeSwitchStmt:
-	SWITCH (simpleStmt SEMI)? typeSwitchGuard L_CURLY typeCaseClause* R_CURLY;
+	SWITCH terminatedSimpleStmt? typeSwitchGuard L_CURLY typeCaseClause* R_CURLY;
 
 typeSwitchGuard: (IDENTIFIER DECLARE_ASSIGN)? primaryExpr DOT L_PAREN TYPE R_PAREN;
 
@@ -182,7 +190,7 @@ recvStmt: (expressionList ASSIGN | identifierList DECLARE_ASSIGN)? recvExpr = ex
 forStmt: FOR (expression | forClause | rangeClause)? block;
 
 forClause:
-	initStmt = simpleStmt? SEMI expression? SEMI postStmt = simpleStmt?;
+	initStmt = terminatedSimpleStmt expression? SEMI postStmt = simpleStmt?;
 
 rangeClause: (
 		expressionList ASSIGN
@@ -372,5 +380,6 @@ eos:
 	SEMI
 	| EOF
 	| {lineTerminatorAhead()}?
-	| {checkPreviousTokenText("}")}?;
+	| {checkPreviousTokenText("}")}?
+	| {checkPreviousTokenText(")")}?;
 

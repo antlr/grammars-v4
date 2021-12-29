@@ -41,6 +41,7 @@ CloseBracket:                   ']';
 OpenParen:                      '(';
 CloseParen:                     ')';
 OpenBrace:                      '{' {this.ProcessOpenBrace();};
+TemplateCloseBrace:             {this.IsInTemplateString()}? '}' -> popMode;
 CloseBrace:                     '}' {this.ProcessCloseBrace();};
 SemiColon:                      ';';
 Comma:                          ',';
@@ -187,8 +188,7 @@ StringLiteral:                 ('"' DoubleStringCharacter* '"'
 
 LinkLiteral: ('http' 's'? | 'ftp' | 'file') '://' [a-zA-Z0-9./?=]+; // TODO Could be more precise
 
-// TODO: `${`tmp`}`
-TemplateStringLiteral:          '`' ('\\`' | ~'`')* '`';
+BackTick:                       '`' {this.IncreaseTemplateDepth();} -> pushMode(TEMPLATE);
 
 WhiteSpaces:                    [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN);
 
@@ -206,6 +206,12 @@ HtmlComment:                    '<!--' .*? '-->' -> channel(HIDDEN);
 CDataComment:                   '<![CDATA[' .*? ']]>' -> channel(HIDDEN);
 UnexpectedCharacter:            . -> channel(ERROR);
 CDATA:                          '<![CDATA[' .*? ']]>' -> channel(HIDDEN);
+
+mode TEMPLATE;
+
+BackTickInside:                 '`' {this.DecreaseTemplateDepth();} -> type(BackTick), popMode;
+TemplateStringStartExpression:  '${' -> pushMode(DEFAULT_MODE);
+TemplateStringAtom:             ~[`];
 
 //
 // html tag declarations

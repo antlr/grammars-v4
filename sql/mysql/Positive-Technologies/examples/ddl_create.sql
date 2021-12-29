@@ -71,6 +71,9 @@ create table column_names_as_aggr_funcs(min varchar(100), max varchar(100), sum 
 CREATE TABLE char_table (c1 CHAR VARYING(10), c2 CHARACTER VARYING(10), c3 NCHAR VARYING(10));
 create table rack_shelf_bin ( id int unsigned not null auto_increment unique primary key, bin_volume decimal(20, 4) default (bin_len * bin_width * bin_height));
 CREATE TABLE `tblSRCHjob_desc` (`description_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT, `description` mediumtext NOT NULL, PRIMARY KEY (`description_id`)) ENGINE=TokuDB AUTO_INCREMENT=4095997820 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=TOKUDB_QUICKLZ;
+create table invisible_column_test(id int, col1 int INVISIBLE);
+create table visible_column_test(id int, col1 int VISIBLE);
+CREATE TABLE foo (c1 decimal(19), c2 decimal(19.5), c3 decimal(0.0), c4 decimal(0.2), c5 decimal(19,2));
 CREATE TABLE table_items (id INT, purchased DATE)
     PARTITION BY RANGE( YEAR(purchased) )
         SUBPARTITION BY HASH( TO_DAYS(purchased) )
@@ -96,6 +99,86 @@ CREATE TABLE table_items_with_subpartitions (id INT, purchased DATE)
             SUBPARTITION s5
         )
     );
+
+CREATE TABLE positions_rollover (
+    id bigint(20) NOT NULL AUTO_INCREMENT,
+    time datetime NOT NULL,
+    partition_index int(10) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (id,partition_index),
+    KEY time (time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+PARTITION BY LIST (partition_index) (
+    PARTITION positions_rollover_partition VALUES IN (0) ENGINE = InnoDB,
+    PARTITION default_positions_rollover_partition DEFAULT ENGINE = InnoDB
+);
+
+CREATE TABLE `tab_with_json_value` (
+   `col0` JSON NOT NULL,
+   `col1` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
+      JSON_VALUE(`col0`, _utf8mb4'$._field1' RETURNING CHAR(36) CHARACTER SET latin1)
+   ) STORED NOT NULL,
+   `col2` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
+      JSON_VALUE(`col0`, _utf8mb4'$._field1' ERROR ON EMPTY)
+   ) STORED NOT NULL,
+   `col3` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
+      JSON_VALUE(`col0`, _utf8mb4'$._field1' DEFAULT 'xx' ON ERROR)
+   ) STORED NOT NULL,
+   `col4` JSON NOT NULL,
+   PRIMARY KEY (`col1`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = COMPRESSED;
+
+CREATE TABLE CustomerTable (
+    CustomerID varchar(5),
+    CompanyName varchar(40),
+    ContactName varchar(30),
+    Address varchar(60),
+    Phone varchar(24)
+ ) ENGINE = CONNECT TABLE_TYPE = ODBC;
+
+CREATE TABLE tbl (
+    col1 LONGTEXT,
+    data JSON,
+    INDEX idx1 ((SUBSTRING(col1, 1, 10))),
+    INDEX idx2 ((CAST(JSON_EXTRACT(data, _utf8mb4'$') AS UNSIGNED ARRAY))),
+    INDEX ((CAST(data->>'$.name' AS CHAR(30))))
+);
+
+CREATE TABLE `orders_json_2` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `reward` json DEFAULT NULL,
+  `additional_info` json DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_order_codes` ((cast(json_extract(`additional_info`,_utf8mb4'$.order_codes') as char(17) array)))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE keywords (
+    eur VARCHAR(100),
+    iso VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+    usa VARCHAR(100),
+    jis VARCHAR(100),
+    internal INT
+);
+
+create table if not exists tbl_signed_unsigned(
+  `id` bigint(20) ZEROFILL signed UNSIGNED signed ZEROFILL unsigned ZEROFILL NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  c1 int signed unsigned,
+  c2 decimal(10, 2) SIGNED UNSIGNED ZEROFILL,
+  c3 float SIGNED ZEROFILL,
+  c4 double precision(18, 4) UNSIGNED SIGNED ZEROFILL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `daily_intelligences`(
+`id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '',
+`partner_code` varchar(32) DEFAULT NULL COMMENT '',
+`text` LONGTEXT DEFAULT NULL COMMENT '',
+`monitor_time` TIMESTAMP DEFAULT NULL COMMENT '',
+`gmt_modify` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '',
+`gmt_create` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '',
+PRIMARY KEY (`id`)
+) ENGINE=innodb DEFAULT CHAR SET=utf8 COMMENT '';
 #end
 #begin
 -- Rename table
@@ -121,6 +204,8 @@ create database super default character set utf8 collate = utf8_bin character se
 create database super_cs default charset utf8 collate = utf8_bin character set utf8 collate utf8_bin;
 create database db_with_character_set_eq character set = default;
 create database db_with_character_set character set default;
+create database `ymsun_test1` charset gb18030 collate gb18030_bin;
+create database `test` charset binary collate binary;
 #end
 #begin
 -- Create event 1
@@ -304,6 +389,16 @@ BEGIN
   DECLARE var2 TIMESTAMP default CURRENT_TIMESTAMP;
   DECLARE var3 INT unsigned default 2 + var1;
 END -- //-- delimiter ;
+#end
+#begin
+CREATE DEFINER=`system_user`@`%` PROCEDURE `update_order`(IN orderID bigint(11))
+BEGIN  insert into order_config(order_id, attribute, value, performer)
+       SELECT orderID, 'first_attr', 'true', 'AppConfig'
+       WHERE NOT EXISTS (select 1 from inventory.order_config t1 where t1.order_id = orderID and t1.attribute = 'first_attr') OR
+             EXISTS (select 1 from inventory.order_config p2 where p2.order_id = orderID and p2.attribute = 'first_attr' and p2.performer = 'AppConfig')
+       ON DUPLICATE KEY UPDATE value = 'true',
+                            performer = 'AppConfig'; -- Enable second_attr for order
+END
 #end
 -- Create procedure
 -- delimiter //

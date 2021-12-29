@@ -1,4 +1,4 @@
-// Template generated code from Antlr4BuildTasks.dotnet-antlr v <version>
+// Template generated code from trgen <version>
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,6 +12,7 @@ public class Program {
         boolean show_tokens = false;
         String file_name = null;
         String input = null;
+        java.nio.charset.Charset charset = null;
         for (int i = 0; i \< args.length; ++i)
         {
             if (args[i].equals("-tokens"))
@@ -28,6 +29,10 @@ public class Program {
                 input = args[++i];
             else if (args[i].equals("-file"))
                 file_name = args[++i];
+            else if (args[i].equals("-encoding"))
+            {
+                charset = java.nio.charset.Charset.forName(args[++i]);
+            }
         }
         CharStream str = null;
         if (input == null && file_name == null)
@@ -38,7 +43,10 @@ public class Program {
             str = CharStreams.fromString(input);
         } else if (file_name != null)
         {
+            if (charset == null)
             str = CharStreams.fromFileName(file_name);
+            else
+                str = CharStreams.fromFileName(file_name, charset);
         }
 <if (case_insensitive_type)>
         str = new CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");

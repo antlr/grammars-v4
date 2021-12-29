@@ -1,0 +1,32 @@
+\$email
+
+\\$email
+
+\\\$email
+
+#set( $D = '$' )
+${D}{my:invalid:non:reference}
+
+## #include( "a.txt" ) renders as <contents of a.txt>
+#include( "a.txt" )
+
+## \#include( "a.txt" ) renders as #include( "a.txt" )
+\#include( "a.txt" )
+
+## \\#include ( "a.txt" ) renders as \<contents of a.txt>
+\\#include ( "a.txt" )
+
+v\\#if( $jazz )
+Vyacheslav Ganelin
+\\#end
+
+#set( $foo = "bar" )
+$\!foo
+$\!{foo}
+$\\!foo
+$\\\!foo
+
+\$foo
+\$!foo
+\$!{foo}
+\\$!{foo}
