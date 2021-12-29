@@ -10,8 +10,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<maven.compiler.source>1.7</maven.compiler.source>
-		<antlr.version>4.9.2</antlr.version>
-		<antlr4test-maven-plugin.version>1.18</antlr4test-maven-plugin.version>
+		<antlr.version>4.9.3</antlr.version>
+		<antlr4test-maven-plugin.version>1.19</antlr4test-maven-plugin.version>
 		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
@@ -68,15 +68,16 @@
 				<module>abnf</module>
 				<module>acme</module>
 				<module>agc</module>
-                <module>alef</module>
+				<module>alef</module>
 				<module>algol60</module>
 				<module>alloy</module>
 				<module>alpaca</module>
-                <module>angelscript</module>
-                <module>antlr</module>
+				<module>angelscript</module>
+				<module>antlr</module>
 				<module>apex</module>
 				<module>apt</module>
 				<module>arithmetic</module>
+				<module>asl</module>
 				<module>asm</module>
 				<module>asn</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
@@ -85,13 +86,14 @@
 				<module>b</module>
 				<module>basic</module>
 				<module>bcpl</module>
+                <module>bdf</module>
 				<module>bibcode</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
 				<module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
-                <module>callable</module>
+				<module>callable</module>
 				<module>capnproto</module>
 				<module>clf</module>
 				<module>clojure</module>
@@ -107,7 +109,7 @@
 				<module>csharp</module>
 				<module>css3</module>
 				<module>csv</module>
-                <module>ctl</module>
+				<module>ctl</module>
 				<module>cto</module>
 				<module>dart2</module>
 				<module>databank</module>
@@ -150,6 +152,7 @@
 				<module>iri</module>
 				<module>iso8601</module>
 				<module>istc</module>
+                <module>itn</module>
 				<module>janus</module>
 				<module>java</module>
 				<module>javadoc</module>
@@ -166,14 +169,14 @@
 				<module>lark</module>
 				<module>lcc</module>
 				<module>less</module>
-                <module>limbo</module>
+				<module>limbo</module>
 				<module>lisa</module>
 				<module>logo</module>
 				<module>lolcode</module>
 				<module>loop</module>
 				<module>lpc</module>
-                <module>ltl</module>
-                <module>lua</module>
+				<module>ltl</module>
+				<module>lua</module>
 				<module>matlab</module>
 				<module>mckeeman-form</module>
 				<module>mdx</module>
@@ -186,6 +189,7 @@
 				<module>molecule</module>
 				<module>moo</module>
 				<module>morsecode</module>
+				<module>powerquery</module>
 				<module>mps</module>
 				<module>muddb</module>
 				<module>mumath</module>
@@ -196,7 +200,7 @@
 				<module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
-                <module>orwell</module>
+				<module>orwell</module>
 				<module>p</module>
 				<module>parkingsign</module>
 				<module>pascal</module>
@@ -209,7 +213,7 @@
 				<module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
-                <module>plucid</module>
+				<module>plucid</module>
 				<module>ply</module>
 				<module>pmmn</module>
 				<module>postalcode</module>
@@ -227,8 +231,8 @@
 				<module>racket-isl</module>
 				<module>rcs</module>
 				<module>redcode</module>
-                <module>refal</module>
-                <module>rego</module>
+				<module>refal</module>
+				<module>rego</module>
 				<module>restructuredtext</module>
 				<module>rexx</module>
 				<module>rfc822</module>
@@ -253,8 +257,8 @@
 				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
-                <module>snowball</module>
-                <module>solidity</module>
+				<module>snowball</module>
+				<module>solidity</module>
 				<module>sparql</module>
 				<module>sql</module>
 				<module>stacktrace</module>
@@ -271,7 +275,7 @@
 				<module>tinybasic</module>
 				<module>tinyc</module>
 				<module>tinymud</module>
-                <module>tl</module>
+				<module>tl</module>
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>

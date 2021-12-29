@@ -75,6 +75,7 @@ python/python3-without-actions
 python/python3alt
 python/tiny-python
 quakemap
+r
 redcode
 rego
 rexx

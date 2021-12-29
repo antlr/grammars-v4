@@ -61,7 +61,6 @@
 					<showTree>false</showTree>
 					<entryPoint>crate</entryPoint>
 					<grammarName>Rust</grammarName>
-					<caseInsensitive>true</caseInsensitive>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

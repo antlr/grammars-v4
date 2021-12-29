@@ -1,3 +1,4 @@
+# Template generated code from trgen <version>
 err=0
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
@@ -8,8 +9,8 @@ do
   if [ "$x1" != "errors" ]
   then
     echo "$file"
-    trwdog node index.js -file "$file"
-    status="$?"
+    trwdog node index.js -file "$file" 2>&1 | head -55
+    status="${PIPESTATUS[0]}"
     if [ -f "$file".errors ]
     then
       if [ "$stat" = "0" ]
