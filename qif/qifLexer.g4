@@ -94,6 +94,7 @@ mode LINETEXT;
 //   : 'D' [0-9]+ '/' [0-9]+ '/' [0-9]+
  //  ;
 
-TEXT: .*? [\r\n]->popMode;
+TEXT:  ~[\r\n]* [\r\n]+->popMode;
 
-EOL: [\r\n]+ ->popMode;
+
+
