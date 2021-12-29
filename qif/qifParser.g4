@@ -42,15 +42,11 @@ record
    ;
 
 recordtype
-   : TYPE typename
-   ;
-
-typename
-   : ID
+   : TYPE TEXT
    ;
 
 date
-   : DATE
+   : D TEXT
    ;
 
 total
@@ -66,11 +62,11 @@ state
    ;
 
 memo
-   : M
+   : M TEXT
    ;
 
 payee
-   : P
+   : P TEXT
    ;
 
 accountorcategory

@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 lexer grammar qifLexer;
 
 TYPE
-   : '!Type:'
+   : '!Type:' -> pushMode(LINETEXT)
    ;
 
 T
@@ -48,16 +48,19 @@ N
    ;
 
 M
-   : 'M' .*? [\r\n]
+   : 'M' -> pushMode(LINETEXT)
    ;
 
 P
-   : 'P' .*? [\r\n]
+   : 'P' -> pushMode(LINETEXT)
    ;
 
 L
    : 'L'
    ;
+
+D: 'D' -> pushMode(LINETEXT)
+;
 
 LB
    : '['
@@ -75,19 +78,22 @@ EOR
    : '^'
    ;
 
-DATE
-   : 'D' [0-9]+ '/' [0-9]+ '/' [0-9]+
-   ;
+
 
 NUM
    : '-'? [0-9]+ ('.' [0-9]+)?
-   ;
-
-ID
-   : [a-zA-Z] [a-zA-Z0-9]*
    ;
 
 WS
    : [ \r\n\t]+ -> skip
    ;
 
+mode LINETEXT;
+
+//DATE
+//   : 'D' [0-9]+ '/' [0-9]+ '/' [0-9]+
+ //  ;
+
+TEXT: .*? [\r\n]->popMode;
+
+EOL: [\r\n]+ ->popMode;

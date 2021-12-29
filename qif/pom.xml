@@ -37,7 +37,7 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<verbose>false</verbose>
+					<verbose>true</verbose>
 					<showTree>false</showTree>
 					<entryPoint>qif</entryPoint>
 					<grammarName>qif</grammarName>
