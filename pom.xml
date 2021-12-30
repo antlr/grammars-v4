@@ -86,6 +86,7 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
+                <module>bcl</module>
 				<module>bcpl</module>
                 <module>bdf</module>
 				<module>bibcode</module>
