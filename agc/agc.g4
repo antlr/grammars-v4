@@ -120,7 +120,7 @@ atom
    | decimal
    | variable
    | label
-   | register
+   | register_
    ;
 
 inte
@@ -131,7 +131,7 @@ decimal
    : ('+' | '-')? DECIMAL
    ;
 
-register
+register_
    : 'A'
    | 'L'
    | 'Q'

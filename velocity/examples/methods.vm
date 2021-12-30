@@ -1,0 +1,32 @@
+$customer.getAddress()
+$purchase.getTotal()
+$page.setTitle( "My Home Page" )
+$person.setAttributes( ["Strange", "Weird", "Excited"] )
+
+$sun.getPlanets()
+$annelid.getDirt()
+$album.getPhoto()
+
+$sun.getPlanet( ["Earth", "Mars", "Neptune"] )
+## Can't pass a parameter list with $sun.Planets
+
+$sisyphus.pushRock()
+## Velocity assumes I mean $sisyphus.getRock()
+
+$book.setTitle( "Homage to Catalonia" )
+## Can't pass a parameter
+
+$myarray.isEmpty()
+
+$myarray.size()
+
+$myarray.get(2)
+
+$myarray.set(1, 'test')
+
+$sun.setPlanets('Earth', 'Mars', 'Neptune')
+
+$sun.setPlanets('Mercury')
+
+$sun.setPlanets()
+## Will just pass in an empty, zero-length array

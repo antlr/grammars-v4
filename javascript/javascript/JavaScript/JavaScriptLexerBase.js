@@ -1,102 +1,108 @@
-const antlr4 = require("antlr4/index");
-const JavaScriptLexer = require("./JavaScriptLexer");
+import antlr4 from 'antlr4';
+import JavaScriptLexer from './JavaScriptLexer.js';
 
-function JavaScriptLexerBase(input) {
-    antlr4.Lexer.call(this, input);
+export default class JavaScriptLexerBase extends antlr4.Lexer {
 
-    this.scopeStrictModes = new Array();
-    this.lastToken = null;
-    this.useStrictDefault = false;
-    this.useStrictCurrent = false;
-}
-
-JavaScriptLexerBase.prototype = Object.create(antlr4.Lexer.prototype);
-
-JavaScriptLexerBase.prototype.getStrictDefault = function() {
-    return this.useStrictDefault;
-};
-
-JavaScriptLexerBase.prototype.setUseStrictDefault = function(value) {
-    this.useStrictDefault = value;
-    this.useStrictCurrent = value;
-};
-
-JavaScriptLexerBase.prototype.IsStrictMode = function() {
-    return this.useStrictCurrent;
-};
-
-JavaScriptLexerBase.prototype.getCurrentToken = function() {
-    return antlr4.Lexer.prototype.nextToken.call(this);
-};
-
-JavaScriptLexerBase.prototype.nextToken = function() {
-    var next = antlr4.Lexer.prototype.nextToken.call(this);
-
-    if (next.channel === antlr4.Token.DEFAULT_CHANNEL) {
-        this.lastToken = next;
+    constructor(input) {
+        super(input);
+        this.scopeStrictModes = new Array();
+        this.lastToken = null;
+        this.useStrictDefault = false;
+        this.useStrictCurrent = false;
+        this.templateDepth = 0;
     }
-    return next;
-};
 
-JavaScriptLexerBase.prototype.ProcessOpenBrace = function() {
-    this.useStrictCurrent =
-        this.scopeStrictModes.length > 0 && this.scopeStrictModes[0]
-            ? true
-            : this.useStrictDefault;
-    this.scopeStrictModes.push(this.useStrictCurrent);
-};
+    getStrictDefault() {
+        return this.useStrictDefault;
+    }
 
-JavaScriptLexerBase.prototype.ProcessCloseBrace = function() {
-    this.useStrictCurrent =
-        this.scopeStrictModes.length > 0
-            ? this.scopeStrictModes.pop()
-            : this.useStrictDefault;
-};
+    setUseStrictDefault(value) {
+        this.useStrictDefault = value;
+        this.useStrictCurrent = value;
+    }
 
-JavaScriptLexerBase.prototype.ProcessStringLiteral = function() {
-    if (
-        this.lastToken !== undefined &&
-        (this.lastToken === null ||
-            this.lastToken.type === JavaScriptLexer.OpenBrace)
-    ) {
-        const text = this._input.strdata.slice(0, "use strict".length);
-        if (text === '"use strict"' || text === "'use strict'") {
-            if (this.scopeStrictModes.length > 0) {
-                this.scopeStrictModes.pop();
+    IsStrictMode() {
+        return this.useStrictCurrent;
+    }
+
+    IsInTemplateString() {
+        return this.templateDepth > 0;
+    }
+
+    getCurrentToken() {
+        return this.nextToken();
+    }
+
+    nextToken() {
+        var next = super.nextToken();
+
+        if (next.channel === antlr4.Token.DEFAULT_CHANNEL) {
+            this.lastToken = next;
+        }
+        return next;
+    }
+
+    ProcessOpenBrace() {
+        this.useStrictCurrent =
+            this.scopeStrictModes.length > 0 && this.scopeStrictModes[this.scopeStrictModes.length - 1]
+                ? true
+                : this.useStrictDefault;
+        this.scopeStrictModes.push(this.useStrictCurrent);
+    }
+
+    ProcessCloseBrace() {
+        this.useStrictCurrent =
+            this.scopeStrictModes.length > 0
+                ? this.scopeStrictModes.pop()
+                : this.useStrictDefault;
+    }
+
+    ProcessStringLiteral() {
+        if (this.lastToken === null ||
+                this.lastToken.type === JavaScriptLexer.OpenBrace) {
+            if (super.text === '"use strict"' || super.text === "'use strict'") {
+                if (this.scopeStrictModes.length > 0) {
+                    this.scopeStrictModes.pop();
+                }
+                this.useStrictCurrent = true;
+                this.scopeStrictModes.push(this.useStrictCurrent);
             }
-            this.useStrictCurrent = true;
-            this.scopeStrictModes.push(this.useStrictCurrent);
         }
     }
-};
 
-JavaScriptLexerBase.prototype.IsRegexPossible = function() {
-    if (this.lastToken === null) {
-        return true;
+    IncreaseTemplateDepth() {
+        this.templateDepth++;
     }
 
-    switch (this.lastToken.type) {
-        case JavaScriptLexer.Identifier:
-        case JavaScriptLexer.NullLiteral:
-        case JavaScriptLexer.BooleanLiteral:
-        case JavaScriptLexer.This:
-        case JavaScriptLexer.CloseBracket:
-        case JavaScriptLexer.CloseParen:
-        case JavaScriptLexer.OctalIntegerLiteral:
-        case JavaScriptLexer.DecimalLiteral:
-        case JavaScriptLexer.HexIntegerLiteral:
-        case JavaScriptLexer.StringLiteral:
-        case JavaScriptLexer.PlusPlus:
-        case JavaScriptLexer.MinusMinus:
-            return false;
-        default:
+    DecreaseTemplateDepth() {
+        this.templateDepth--;
+    }
+
+    IsRegexPossible() {
+        if (this.lastToken === null) {
             return true;
+        }
+
+        switch (this.lastToken.type) {
+            case JavaScriptLexer.Identifier:
+            case JavaScriptLexer.NullLiteral:
+            case JavaScriptLexer.BooleanLiteral:
+            case JavaScriptLexer.This:
+            case JavaScriptLexer.CloseBracket:
+            case JavaScriptLexer.CloseParen:
+            case JavaScriptLexer.OctalIntegerLiteral:
+            case JavaScriptLexer.DecimalLiteral:
+            case JavaScriptLexer.HexIntegerLiteral:
+            case JavaScriptLexer.StringLiteral:
+            case JavaScriptLexer.PlusPlus:
+            case JavaScriptLexer.MinusMinus:
+                return false;
+            default:
+                return true;
+        }
     }
-};
 
-JavaScriptLexerBase.prototype.IsStartOfFile = function() {
-    return this.lastToken === null;
-};
-
-
-module.exports.JavaScriptLexerBase = JavaScriptLexerBase;
+    IsStartOfFile() {
+        return this.lastToken === null;
+    }
+}

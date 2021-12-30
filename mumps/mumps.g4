@@ -105,7 +105,7 @@ expression
 
 term
    : variable
-   | function
+   | function_
    | NUMBER
    | LPAREN expression RPAREN
    ;
@@ -123,7 +123,7 @@ variable
    : (CARAT | AMPERSAND)* identifier
    ;
 
-function
+function_
     : DOLLAR identifier (LPAREN arglist RPAREN)?
     ;
 

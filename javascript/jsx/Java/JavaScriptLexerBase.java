@@ -26,6 +26,16 @@ public abstract class JavaScriptLexerBase extends Lexer
      * Can be defined during parsing, see StringFunctions.js and StringGlobal.js samples
      */
     private boolean useStrictCurrent = false;
+    /**
+     * Keeps track of the the current depth of nested template string backticks.
+     * E.g. after the X in:
+     *
+     * `${a ? `${X
+     *
+     * templateDepth will be 2. This variable is needed to determine if a `}` is a
+     * plain CloseBrace, or one that closes an expression inside a template string.
+     */
+    private int templateDepth = 0;
 
     public JavaScriptLexerBase(CharStream input) {
         super(input);
@@ -46,6 +56,10 @@ public abstract class JavaScriptLexerBase extends Lexer
 
     public boolean IsStrictMode() {
         return useStrictCurrent;
+    }
+
+    public boolean IsInTemplateString() {
+        return this.templateDepth > 0;
     }
 
     /**
@@ -93,6 +107,14 @@ public abstract class JavaScriptLexerBase extends Lexer
                 scopeStrictModes.push(useStrictCurrent);
             }
         }
+    }
+
+    public void IncreaseTemplateDepth() {
+        this.templateDepth++;
+    }
+
+    public void DecreaseTemplateDepth() {
+        this.templateDepth--;
     }
 
     /**
