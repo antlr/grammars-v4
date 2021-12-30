@@ -226,6 +226,7 @@
 				<module>protobuf3</module>
 				<module>prov-n</module>
 				<module>python</module>
+                <module>qif</module>
 				<module>quakemap</module>
 				<module>r</module>
 				<module>racket-bsl</module>
