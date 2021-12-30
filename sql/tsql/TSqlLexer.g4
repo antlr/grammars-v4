@@ -35,6 +35,7 @@ ANY:                                   'ANY';
 AS:                                    'AS';
 ASC:                                   'ASC';
 AUTHORIZATION:                         'AUTHORIZATION';
+ACCELERATED_DATABASE_RECOVERY:         'ACCELERATED_DATABASE_RECOVERY';
 BACKSLASH:                             '\\';
 BACKUP:                                'BACKUP';
 BEGIN:                                 'BEGIN';
@@ -283,6 +284,7 @@ CHECKSUM_AGG:                          'CHECKSUM_AGG';
 CLEANUP:                               'CLEANUP';
 COLLECTION:                            'COLLECTION';
 COLUMN_MASTER_KEY:                     'COLUMN_MASTER_KEY';
+COLUMNSTORE:                           'COLUMNSTORE';
 COMMITTED:                             'COMMITTED';
 COMPATIBILITY_LEVEL:                   'COMPATIBILITY_LEVEL';
 CONCAT:                                'CONCAT';
@@ -869,6 +871,7 @@ WAIT_AT_LOW_PRIORITY:                  'WAIT_AT_LOW_PRIORITY';
 WINDOWS:                               'WINDOWS';
 WITHOUT:                               'WITHOUT';
 WITNESS:                               'WITNESS';
+XACT_ABORT:                            'XACT_ABORT';
 
 //Build-ins:
 VARCHAR:                               'VARCHAR';

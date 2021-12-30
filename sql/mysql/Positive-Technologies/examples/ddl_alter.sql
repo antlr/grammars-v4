@@ -82,4 +82,5 @@ alter definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2)
 	as select * from  (t1 as tt1, t2 as tt2) inner join t1 on t1.col1 = tt1.col1;
 -- Alter user
 rename user user1@100.200.1.1 to user2@100.200.1.2;
+alter user 'user'@'%' IDENTIFIED BY 'newpassword' RETAIN CURRENT PASSWORD;
 #end

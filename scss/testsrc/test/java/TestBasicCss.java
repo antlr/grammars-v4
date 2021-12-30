@@ -287,6 +287,14 @@ public class TestBasicCss extends TestBase {
   }
 
   @Test
+  public void testPropertyNamespacedVariable() {
+    ScssParser.ExpressionContext exp = createProperty("p1: mat.$hello;");
+    assertThat(exp.variableName().Identifier().getText()).isEqualTo("hello");
+    assertThat(exp.variableName().namespace().getText()).isEqualTo("mat.");
+    assertThat(exp.variableName().namespace().Identifier(0).getText()).isEqualTo("mat");
+  }
+
+  @Test
   public void testPropertyFunctionMath() {
     ScssParser.ExpressionContext exp = createProperty("p1: calc(100% / 3);");
     assertThat(exp.functionCall().FunctionIdentifier().getText()).isEqualTo("calc(");
