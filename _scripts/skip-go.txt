@@ -9,6 +9,7 @@ asm/masm
 asm/pdp7
 asn/asn_3gpp
 clif
+cobol85
 cpp
 csharp
 edif300
@@ -21,8 +22,6 @@ hypertalk
 icalendar
 inf
 informix
-java/java
-java/java8
 java/java9
 javadoc
 javascript/ecmascript
@@ -61,6 +60,7 @@ python/python3-ts
 python/python3-without-actions
 python/tiny-python
 quakemap
+r
 rego
 rexx
 rust
@@ -71,6 +71,7 @@ smalltalk
 smtlibv2
 sparql
 sql/hive
+sql/mysql
 sql/plsql
 sql/postgresql
 stringtemplate

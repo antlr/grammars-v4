@@ -336,7 +336,7 @@ statement
     : block
     | importStatement
     | exportStatement
-    | emptyStatement
+    | emptyStatement_
     | abstractDeclaration //ADDED
     | decoratorList
     | classDeclaration
@@ -406,7 +406,7 @@ variableDeclaration
     : ( identifierOrKeyWord | arrayLiteral | objectLiteral) typeAnnotation? singleExpression? ('=' typeParameters? singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
-emptyStatement
+emptyStatement_
     : SemiColon
     ;
 

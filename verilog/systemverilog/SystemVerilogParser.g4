@@ -1,8 +1,9 @@
 // Author: Mustafa Said Ağca
 // License: MIT
 
-grammar SystemVerilogParser;
-import SystemVerilogLexer;
+parser grammar SystemVerilogParser;
+
+options { tokenVocab=SystemVerilogLexer; }
 
 // A.1.1 Library source text
 
@@ -485,7 +486,7 @@ constraint_primary
 constraint_expression
 	: 'soft'? expression_or_dist ';'
 	| uniqueness_constraint ';'
-	| expression '–>' constraint_set
+	| expression '->' constraint_set
 	| 'if' '(' expression ')' constraint_set ('else' constraint_set)?
 	| 'foreach' '(' ps_or_hierarchical_array_identifier '[' loop_variables ']' ')' constraint_set
 	| 'disable' 'soft' constraint_primary ';'
