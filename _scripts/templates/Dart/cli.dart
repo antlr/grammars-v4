@@ -1,4 +1,4 @@
-// Template generated code from Antlr4BuildTasks.dotnet-antlr v <version>
+// Template generated code from trgen <version>
 
 import 'package:antlr4/antlr4.dart';
 <tool_grammar_tuples:{x | import '<x.GeneratedFileName>';
@@ -8,97 +8,64 @@ import 'dart:convert';
 
 <if (case_insensitive_type)>
 
+/// This class supports case-insensitive lexing by wrapping an existing
+/// {@link CharStream} and forcing the lexer to see either upper or
+/// lowercase characters. Grammar literals should then be either upper or
+/// lower case such as 'BEGIN' or 'begin'. The text of the character
+/// stream is unaffected. Example: input 'BeGiN' would match lexer rule
+/// 'BEGIN' if constructor parameter upper=true but getText() would return
+/// 'BeGiN'.
 class CaseChangingCharStream extends CharStream {
-        CharStream stream;
-        bool upper;
+  final CharStream stream;
+  final bool upper;
 
-    CaseChangingCharStream(CharStream str, bool up)
-    {
-        stream = str;
-        upper = up;
+  /// Constructs a new CaseChangingCharStream wrapping the given [stream] forcing
+  /// all characters to upper case or lower case depending on [upper].
+  CaseChangingCharStream(this.stream, this.upper);
+
+  @override
+  int? LA(int i) {
+    int? c = stream.LA(i);
+    if (c == null || c \<= 0) {
+      return c;
     }
-
-    @override
-    int get index {
-        return stream.index;
+    String newCaseStr;
+    if (upper) {
+      newCaseStr = String.fromCharCode(c).toUpperCase();
+    } else {
+      newCaseStr = String.fromCharCode(c).toLowerCase();
     }
-
-    @override
-    int get size {
-        return stream.size;
+    // Skip changing case if length changes (e.g., ß -> SS).
+    if (newCaseStr.length != 1) {
+      return c;
+    } else {
+      return newCaseStr.codeUnitAt(0);
     }
+  }
 
-//  @override
-//  void reset() {
-//      stream.reset();
-//  }
+  @override
+  String get sourceName => stream.sourceName;
 
-    @override
-    void consume() {
-        stream.consume();
-    }
+  @override
+  void consume() => stream.consume();
 
-    @override
-    int LA(int offset) {
-            int c = stream.LA(offset);
+  @override
+  String getText(Interval interval) => stream.getText(interval);
 
-            if (c \<= 0)
-            {
-                return c;
-            }
+  @override
+  int get index => stream.index;
 
-            int o = c;
-            if (upper)
-            {
-                // Dart extremely painful--there is no simple function that
-                // maps a single character to upper-/lower- case. Do this the
-                // old fashion way to just get some damn thing working. I am
-                // not an expert at pouring over 1000's of web pages to find the
-                // function and SO has nothing.
-                if (97 \<= o && o \<= 122)
-                    o = o + (65 - 97);
-                return o;
-            }
-            else {
-                if (65 \<= o && o \<= 90)
-                    o = o + (97 - 65);
-                return o;
-            }
-    }
+  @override
+  int mark() => stream.mark();
 
-    @override
-    int mark() {
-        return stream.mark();
-    }
+  @override
+  void release(int marker) => stream.release(marker);
 
-    @override
-    void release(int marker) {
-        stream.release(marker);
-    }
+  @override
+  void seek(int index) => stream.seek(index);
 
-    @override
-    void seek(int _index) {
-        stream.seek(_index);
-    }
-
-//  String getText(Interval interval)
-//  {
-//      this.stream.getText(interval);
-//  }
-
-    @override
-    String toString() {
-        return this.stream.toString();
-    }
-
-    @override
-    String get sourceName {
-        return stream.sourceName;
-    }
-
-@override
-    noSuchMethod(Invocation msg) => "got ${msg.memberName} "
-                      "with arguments ${msg.positionalArguments}";
+  @override
+  int get size => stream.size;
 }
 
 <endif>

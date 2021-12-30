@@ -10,6 +10,7 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<build>
+		<sourceDirectory>Java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -60,7 +61,6 @@
 					<showTree>false</showTree>
 					<entryPoint>crate</entryPoint>
 					<grammarName>Rust</grammarName>
-					<caseInsensitive>true</caseInsensitive>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

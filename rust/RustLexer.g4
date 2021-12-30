@@ -185,7 +185,7 @@ fragment RAW_STRING_CONTENT: '#' RAW_STRING_CONTENT '#' | '"' .*? '"';
 
 BYTE_LITERAL: 'b\'' (. | QUOTE_ESCAPE | BYTE_ESCAPE) '\'';
 
-BYTE_STRING_LITERAL: 'b"' (. | QUOTE_ESCAPE | BYTE_ESCAPE)*? '"';
+BYTE_STRING_LITERAL: 'b"' (~["] | QUOTE_ESCAPE | BYTE_ESCAPE)* '"';
 
 RAW_BYTE_STRING_LITERAL: 'br' RAW_STRING_CONTENT;
 
@@ -224,11 +224,11 @@ OCT_LITERAL: '0o' '_'* OCT_DIGIT (OCT_DIGIT | '_')*;
 BIN_LITERAL: '0b' '_'* [01] [01_]*;
 
 FLOAT_LITERAL
-   : DEC_LITERAL '.' {this.floatDotPossible()}?
+   : {this.floatLiteralPossible()}? (DEC_LITERAL '.' {this.floatDotPossible()}?
    | DEC_LITERAL
    (
       '.' DEC_LITERAL
-   )? FLOAT_EXPONENT? FLOAT_SUFFIX?
+   )? FLOAT_EXPONENT? FLOAT_SUFFIX?)
    ;
 
 fragment INTEGER_SUFFIX
@@ -255,6 +255,8 @@ fragment OCT_DIGIT: [0-7];
 fragment DEC_DIGIT: [0-9];
 
 fragment HEX_DIGIT: [0-9a-fA-F];
+
+// LIFETIME_TOKEN: '\'' IDENTIFIER_OR_KEYWORD | '\'_';
 
 LIFETIME_OR_LABEL: '\'' NON_KEYWORD_IDENTIFIER;
 

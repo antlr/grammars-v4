@@ -1,0 +1,28 @@
+cstype bezier
+deg 1 1
+v 0 0 0
+v 1 0 0
+v 0 1 0
+v 1 1 0
+vp 0 0
+vp 1 0
+vp 1 1
+vp 0 1
+curv2 1 2 3 4 1
+parm u 0.0 1.0 2.0 3.0 4.0
+end
+surf 0.0 1.0 0.0 1.0 1 2 3 4
+parm u 0.0 1.0
+parm v 0.0 1.0
+trim 0.0 4.0 1
+end
+v 1 0 0
+v 2 0 0
+v 1 1 0
+v 2 1 0
+surf 0.0 1.0 0.0 1.0 5 6 7 8
+parm u 0.0 1.0
+parm v 0.0 1.0
+trim 0.0 4.0 1
+end
+con 1 2.0 2.0 1 2 4.0 3.0 1

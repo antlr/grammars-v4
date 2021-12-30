@@ -1,0 +1,50 @@
+#set($foo[0] = 1)
+#set($foo.bar[1] = 3)
+#set($map["apple"] = "orange")
+
+#set( $primate = "monkey" )
+#set( $customer.Behavior = $primate )
+
+#set( $monkey = $bill ) ## variable reference
+#set( $monkey.Friend = "monica" ) ## string literal
+#set( $monkey.Blame = $whitehouse.Leak ) ## property reference
+#set( $monkey.Plan = $spindoctor.weave($web) ) ## method reference
+#set( $monkey.Number = 123 ) ##number literal
+#set( $monkey.Say = ["Not", $my, "fault"] ) ## ArrayList
+#set( $monkey.Map = {"banana" : "good", "roast beef" : "bad"}) ## Map
+
+#set( $value = $foo + 1 )
+#set( $value = $bar - 1 )
+#set( $value = $foo * $bar )
+#set( $value = $foo / $bar )
+
+#set( $result = $query.criteria("name") )
+The result of the first query is $result
+
+#set( $result = $query.criteria("address") )
+The result of the second query is $result
+
+#set( $criteria = ["name", "address"] )
+
+#foreach( $criterion in $criteria )
+
+    #set( $result = $query.criteria($criterion) )
+
+    #if( $result )
+    Query was successful
+    #end
+
+#end
+
+#set( $criteria = ["name", "address"] )
+
+#foreach( $criterion in $criteria )
+
+    #set( $result = false )
+    #set( $result = $query.criteria($criterion) )
+
+    #if( $result )
+    Query was successful
+    #end
+
+#end
