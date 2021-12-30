@@ -196,9 +196,9 @@ NCOMMENT : '{-'~[#] .*? '-}' -> skip;
 
 OCURLY : '{';
 CCURLY : '}';
-VOCURLY : 'VOCURLY' { setChannel(HIDDEN); };
-VCCURLY : 'VCCURLY' { setChannel(HIDDEN); };
-SEMI    : 'SEMI'    { setChannel(HIDDEN); };
+VOCURLY : 'VOCURLY' { this.SetHidden(); };
+VCCURLY : 'VCCURLY' { this.SetHidden(); };
+SEMI    : 'SEMI'    { this.SetHidden(); };
 
 
 

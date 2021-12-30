@@ -436,7 +436,17 @@ FROM @MyTableVar;
 GO
 SELECT EmployeeID, LastName, FirstName, CurrentSales, ProjectedSales
 FROM dbo.EmployeeSales;
+GO
 
+INSERT INTO @Result
+        SELECT ID FROM [schema].[tbl]
+        UNION
+        SELECT ID FROM [schema].[tbl1]
+        UNION
+        SELECT ID FROM [schema].[tbl2]
+        UNION
+        SELECT ID FROM [schema].[tbl3
+GO]
 --+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Inserting data returned from an OUTPUT clause
 -- TODO: uncomment when merge_statement will be implemented.

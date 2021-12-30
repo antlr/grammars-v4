@@ -1,0 +1,5 @@
+start: mod0mod0+
+
+mod0mod0: "0" | "1" mod1mod0
+mod1mod0: "1" | "0" mod2mod1 mod1mod0
+mod2mod1: "0" | "1" mod2mod1

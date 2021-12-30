@@ -24,6 +24,25 @@ public class Lambdas {
         Arrays.sort(copy, (a, b) -> a.compareTo(b));
         printNames("Names sorted with lambda expression:", copy);
      }
+
+}
+
+class LambdaAndCastWithBounds{
+
+    interface I1<T> {
+        void fn();
+    }
+
+    interface I2 {
+        void fn();
+    }
+
+    I1<Byte> i1 = (I1<Byte> & Serializable & Cloneable) () -> {
+    };
+
+    I2 i2 = (I2 & Serializable & Cloneable) () -> {
+    };
+
 }
 
 // Default interface method
@@ -148,6 +167,12 @@ public class Annos {
         return (@Dummy1 @Dummy2 T[] @Dummy1 @Dummy2 []) null;
     }
 
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE_USE, ElementType.METHOD})
+    public @interface TM1{
+    }
+
     class Gen<T> {    }
     class A<@Dummy1 T extends @Dummy1 Gen<@Dummy1 T> >{}
 
@@ -162,4 +187,28 @@ public class Annos {
         return (@Dummy3 T @Dummy3 []) null;
     }
 
+    interface TI1{
+        public @TM1 void im01();
+        public <@Dummy3 T> @TM1 @TM2 T gim01(@TM1 T t);
+    }
+
+    static class Issue2454 {
+        interface I {
+            default <T> void fn1() {
+            }
+
+            default <T, S, U> void fn2() {
+            }
+        }
+
+        class C implements I {
+
+            public void test() {
+                I.super.<Long>fn1(); // fix #2454
+                I.super.fn1(); //ok
+                I.super.<List<Integer>, Byte, Map<Long, String>>fn2(); // fix #2454
+                I.super.fn2(); //ok
+            }
+        }
+    }
 }
