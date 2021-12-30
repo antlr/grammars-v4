@@ -1,0 +1,49 @@
+# outer loop of first region
+deg 1
+cstype bezier
+vp 0.100 0.100
+vp 0.900 0.100
+vp 0.900 0.900
+vp 0.100 0.900
+curv2 1 2 3 4 1
+parm u 0.00 1.00 2.00 3.00 4.00
+end
+# hole in first region
+vp 0.300 0.300
+vp 0.700 0.300
+vp 0.700 0.700
+vp 0.300 0.700
+curv2 5 6 7 8 5
+parm u 0.00 1.00 2.00 3.00 4.00
+end
+# outer loop of second region
+vp 1.100 1.100
+vp 1.900 1.100
+vp 1.900 1.900
+vp 1.100 1.900
+curv2 9 10 11 12 9
+parm u 0.00 1.00 2.00 3.00 4.00
+end
+# hole in second region
+vp 1.300 1.300
+vp 1.700 1.300
+vp 1.700 1.700
+vp 1.300 1.700
+curv2 13 14 15 16 13
+parm u 0.00 1.00 2.00 3.00 4.00
+end
+# surface
+v 0.000 0.000 0.000
+v 1.000 0.000 0.000
+v 0.000 1.000 0.000
+v 1.000 1.000 0.000
+deg 1 1
+cstype bezier
+surf 0.0 2.0 0.0 2.0 1 2 3 4
+parm u 0.00 2.00
+parm v 0.00 2.00
+trim 0.0 4.0 1
+hole 0.0 4.0 2
+trim 0.0 4.0 3
+hole 0.0 4.0 4
+end
