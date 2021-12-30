@@ -17,5 +17,6 @@
 		<module>plsql</module>
 		<module>sqlite</module>
 		<module>tsql</module>
+		<module>postgresql</module>
 	</modules>
 </project>

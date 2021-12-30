@@ -31,11 +31,7 @@ parser grammar PowerBuilderParser;
 options { tokenVocab = PowerBuilderLexer; }
 
 start_rule
-   : header_rule? body_rule+ EOF
-   ;
-
-header_rule
-   : EXPORT_HEADER* (RELEASE NUMBER SEMI)? window_property+
+   : (RELEASE NUMBER SEMI)? body_rule+ EOF
    ;
 
 body_rule
@@ -53,46 +49,8 @@ body_rule
    | event_body
    ;
 
-window_property
-   : attribute_name array_decl_sub? LPAREN window_property_attribute_sub* RPAREN
-   ;
-
-window_property_attribute_sub
-   : ( NULL_
-     | numeric_atom
-     | DQUOTED_STRING
-     | DATE
-     | TIME
-     | attribute_name eq=EQ (attribute_value array_decl_sub? | LPAREN window_property_attribute_sub+ RPAREN)
-     ) COMMA?
-   ;
-
-attribute_name
-   : (identifier_name | TYPE | UPDATE) NUMBER? (DOT (identifier_name | CASE | TYPE | ON | DYNAMIC))*
-   ;
-
-attribute_value
-   : atom_sub_call1
-   | atom_sub_member1
-   | MINUS? numeric_atom
-   | boolean_atom
-   | ENUM
-   | DQUOTED_STRING
-   | QUOTED_STRING
-   | DATE
-   | TIME
-   | TYPE
-   | TO
-   | FROM
-   | REF
-   | NULL_
-   | OPEN
-   | LPAREN LPAREN (expression | dataTypeSub) (COMMA (expression | dataTypeSub))? RPAREN (COMMA LPAREN (expression | dataTypeSub) (COMMA (expression | dataTypeSub))? RPAREN)* RPAREN
-   | dataTypeSub (LPAREN NUMBER RPAREN)?
-   ;
-
 forward_decl
-   : FORWARD (datatype_decl | variable_decl)+ END FORWARD
+   : FORWARD (datatype_decl | variable_decl | global_variables_decl)+ END FORWARD
    ;
 
 datatype_decl
@@ -102,42 +60,66 @@ datatype_decl
    ;
 
 type_variables_decl
-   : TYPE VARIABLES (access_modif | variable_decl | constant_decl)* END VARIABLES
+   : TYPE VARIABLES (variable_decl | constant_decl | public_statement)* END VARIABLES
    ;
 
 global_variables_decl
-   : (GLOBAL | SHARED) VARIABLES (variable_decl | constant_decl)* END VARIABLES
+   : GLOBAL variable_decl
+   | (GLOBAL | SHARED) VARIABLES (variable_decl)* END VARIABLES
    ;
 
 variable_decl
-   : variable_decl_sub SEMI
+   : access_type? variable_decl_sub SEMI?
    ;
 
 variable_decl_sub
-   : INDIRECT? access_modif_part? scope_modif?
+   : INDIRECT? access_modif_part? scope_modif? (variable_decl_sub0 | variable_decl_sub1 | variable_decl_sub2 | variable_decl_event)
    ;
+
+variable_decl_sub0
+  : data_type_name decimal_decl_sub? variable_name (COMMA variable_name)* (EQ assignment_rhs)?
+  ;
+
+variable_decl_sub1
+  : data_type_name assignment_statement (COMMA data_type_name? assignment_statement)*
+  ;
+
+variable_decl_sub2
+  : data_type_name decimal_decl_sub? identifier_name_ex array_decl_sub? ( (EQ)? LCURLY expression_list RCURLY)?
+  ;
+
+variable_decl_event
+  : EVENT identifier (LPAREN expression_list RPAREN)?
+  ;
 
 decimal_decl_sub
    : LCURLY NUMBER RCURLY
    ;
 
 array_decl_sub
-   : BRACES
+   : LBRACE RBRACE
    | LBRACE ((PLUS | MINUS)? NUMBER (TO (PLUS | MINUS)? NUMBER)? (COMMA (PLUS | MINUS)? NUMBER (TO (PLUS | MINUS)? NUMBER)?)*)? RBRACE
    ;
 
 constant_decl_sub
-   :
-   // TODO EQ is mandatory for constants 'CONSTANT' variable_decl_sub
+   : access_type? CONSTANT variable_decl_sub
    ;
 
 constant_decl
-   : constant_decl_sub SEMI
+   : constant_decl_sub SEMI?
    ;
 
 function_forward_decl
-   : access_modif_part? scope_modif? (FUNCTION data_type_name | SUBROUTINE) identifier_name LPAREN parameters_list_sub? RPAREN (LIBRARY (DQUOTED_STRING | QUOTED_STRING) (ALIAS FOR (DQUOTED_STRING | QUOTED_STRING))?)? (RPCFUNC ALIAS FOR (DQUOTED_STRING | QUOTED_STRING))? (THROWS identifier_name)?
+   : access_modif_part? scope_modif? (FUNCTION data_type_name | SUBROUTINE)
+   identifier_name LPAREN parameters_list_sub? RPAREN
+   function_forward_decl_alias
    ;
+
+function_forward_decl_alias
+  : ALIAS FOR identifier_name LIBRARY (DQUOTED_STRING | QUOTED_STRING)
+  | (LIBRARY (DQUOTED_STRING | QUOTED_STRING) (ALIAS FOR (DQUOTED_STRING | QUOTED_STRING))?)?
+  | (RPCFUNC ALIAS FOR (DQUOTED_STRING | QUOTED_STRING))? (THROWS identifier_name)?
+  ;
 
 parameter_sub
    : READONLY? REF? data_type_name decimal_decl_sub? identifier_name array_decl_sub?
@@ -148,15 +130,16 @@ parameters_list_sub
    ;
 
 functions_forward_decl
-   : (FORWARD | TYPE) PROTOTYPES function_forward_decl+ END PROTOTYPES
+   : (FORWARD | TYPE) PROTOTYPES function_forward_decl* END PROTOTYPES
    ;
 
 function_body
-   : access_type? scope_modif? (FUNCTION data_type_name | SUBROUTINE) identifier_name LPAREN parameters_list_sub? RPAREN (THROWS identifier_name)? (SEMI statement)* END (FUNCTION | SUBROUTINE)
+   : access_type? scope_modif? (FUNCTION data_type_name | SUBROUTINE) identifier_name LPAREN parameters_list_sub? RPAREN (THROWS identifier_name)?
+   (SEMI)? (statement SEMI?)* END (FUNCTION | SUBROUTINE)
    ;
 
 on_body
-   : ON (identifier | OPEN | CLOSE)
+   : ON identifier (DOT (CREATE | DESTROY) | OPEN | CLOSE)? SEMI? (statement SEMI?)* END ON
    ;
 
 event_forward_decl
@@ -165,7 +148,8 @@ event_forward_decl
    ;
 
 event_body
-   : EVENT (TYPE data_type_name)? (identifier_name COLONCOLON)? (identifier_name | OPEN | CLOSE) (LPAREN parameters_list_sub? RPAREN)? (SEMI statement)* END EVENT
+   : EVENT (TYPE data_type_name)? (identifier_name COLONCOLON)? (identifier_name | OPEN | CLOSE) (LPAREN parameters_list_sub? RPAREN)? SEMI?
+   (statement SEMI?)* END EVENT
    ;
 
 access_type
@@ -195,56 +179,93 @@ scope_modif
 
 expression
    : close_call_sub
-   | LCURLY
+   | value
+   | function_call_statement
+   | LCURLY expression (COMMA expression)*  RCURLY
+   | expression (PLUS | MINUS | MULT | DIV | CARAT) expression
+   | LPAREN expression RPAREN
+   | boolean_expression
    ;
+
+value
+  : string_literal (PLUS string_literal)*
+   | ENUM
+   | NUMBER
+   | TRUE
+   | FALSE
+   | DATE
+   | TIME
+
+  ;
 
 expression_list
    : REF? expression (COMMA REF? expression)*
    ;
 
 boolean_expression
-   : condition_or
+   : unary_sign_expr
+   | mul_expr
+   | add_expr
+   | condition_or
+   | LPAREN boolean_expression RPAREN
    ;
 
 condition_or
    : condition_and (OR condition_and)*
+   | LPAREN boolean_expression RPAREN
    ;
 
 condition_and
    : condition_not (AND condition_not)*
+   | LPAREN boolean_expression RPAREN
    ;
 
 condition_not
    : NOT? condition_comparison
+   | LPAREN boolean_expression RPAREN
    ;
 
 condition_comparison
    : add_expr ((EQ | GT | LT | GTLT | GTE | LTE) add_expr)?
+   | LPAREN boolean_expression RPAREN
    ;
 
 add_expr
    : mul_expr ((MINUS | PLUS) mul_expr)*
+   | LPAREN boolean_expression RPAREN
    ;
 
 mul_expr
    : unary_sign_expr ((MULT | DIV | CARAT) unary_sign_expr)*
+   | LPAREN boolean_expression RPAREN
    ;
 
 unary_sign_expr
-   : LPAREN expression RPAREN
-   | (MINUS | PLUS)? atom
+   : ENUM
+   | (MINUS | PLUS)? (variable_name | bind_param | value)
+   | function_call_statement
+   | LCURLY function_call_statement RCURLY
+   | LPAREN unary_sign_expr RPAREN
+   | set_value
    ;
 
 statement
-   : if_simple_statement
+   : increment_decrement_statement
+   | public_statement
+   | if_simple_statement
+   | execute_statement
+   | throw_statement
    | DESCRIBE identifier_name
    | assignment_statement
-   | statement_sub SEMI
+   | try_catch_statement
+   | close_sql_statement
+   | statement_sub
    | if_statement
-   | TRY
    | post_event
    | function_call_statement
+   | super_call_statement
    | event_call_statement
+   | declare_procedure_statement
    | constant_decl
    | variable_decl
    | super_call_statement
@@ -253,16 +274,32 @@ statement
    | create_call_statement
    | destroy_call_statement
    | label_stat
-   | identifier
-   | throw_stat
-   | goto_stat
+   | throw_statement
+   | goto_statement
    | choose_statement
    | return_statement
    | for_loop_statement
    | continue_statement
    | exit_statement
-   | atom
+   | sql_statement
+   | sql_commit_statement
+   | open_cursor_statement
+   | prepare_sql_stateent
+   | declare_cursor_statement
+   | close_cursor_statement
+   | fetch_into_statement
+   | call_statement
    ;
+
+public_statement
+  : (PUBLIC | PROTECTED | PRIVATE) COLON
+  ;
+
+throw_statement : THROW expression;
+
+goto_statement
+: GOTO variable_name(statement SEMI?)* variable_name COLON (statement SEMI?)*
+;
 
 statement_sub
    : function_virtual_call_expression_sub
@@ -275,37 +312,163 @@ statement_sub
    | create_call_sub
    | destroy_call_sub
    | continue_sub
-   | goto_stat
-   | assignment_sub
+   | assignment_statement
    ;
 
-assignment_sub
-   : lvalue_sub (EQ | PLUSEQ | MINUSEQ | MULTEQ | DIVEQ) (NOT | LCURLY | boolean_expression | expression)
-   ;
+try_catch_statement
+    : TRY
+    (statement SEMI?)*
+    (
+      CATCH LPAREN variable_decl_sub RPAREN
+      (statement SEMI?)*
+    )*
+    (
+      FINALLY
+      (statement SEMI?)*
+    )?
+    END TRY
+    ;
+
+sql_statement
+  : sql_insert_statement
+  | sql_delete_statement
+  | sql_select_statement
+  | sql_update_statement
+  | sql_connect_statement
+  ;
+
+sql_insert_statement
+  : INSERT INTO variable_name LPAREN variable_name (COMMA variable_name)* RPAREN VALUES LPAREN sql_values (COMMA sql_values)* RPAREN SEMI?
+  ;
+
+sql_values
+  : value
+  | bind_param
+  ;
+
+sql_delete_statement
+  : DELETE FROM variable_name where_clause SEMI?
+  ;
+
+sql_select_statement
+  : (SELECT | SELECTBLOB) select_clause INTO bind_param (COMMA bind_param)* FROM variable_name (COMMA variable_name)*
+  where_clause? (USING variable_name)? SEMI?
+  ;
+
+sql_update_statement
+  : (UPDATE | UPDATEBLOB) variable_name SET set_value (COMMA set_value)* where_clause?
+  ;
+
+ sql_connect_statement
+  : (CONNECT | DISCONNECT | ROLLBACK) (USING (SQLCA | identifier_name))? SEMI
+  ;
+
+set_value
+  : variable_name EQ bind_param
+  | variable_name IS NOT? NULL_
+  ;
+
+where_clause
+  : WHERE set_value (COMMA set_value)*
+  | WHERE condition_or
+  ;
+
+select_clause
+  : variable_name (COMMA variable_name)*
+  | function_call_statement
+  ;
+
+sql_commit_statement
+  : COMMIT USING? (SQLCA | variable_name)? SEMI?
+  ;
+
+execute_statement
+  : EXECUTE IMMEDIATE? (variable_name | value) SEMI?
+  | EXECUTE IMMEDIATE? bind_param (USING (SQLCA | variable_name))? SEMI
+  | EXECUTE DYNAMIC? identifier (USING DESCRIPTOR? (SQLCA | identifier))? SEMI?
+  ;
+
+close_sql_statement
+  : CLOSE variable_name SEMI
+  ;
+
+declare_procedure_statement
+  : DECLARE variable_name DYNAMIC? PROCEDURE FOR variable_name SEMI?
+  ;
+
+declare_cursor_statement
+  : DECLARE variable_name DYNAMIC? CURSOR FOR variable_name SEMI
+  ;
+
+open_cursor_statement
+  : OPEN DYNAMIC? variable_name (USING (DESCRIPTOR | identifier))? identifier? SEMI?
+  ;
+
+close_cursor_statement
+  : CLOSE variable_name
+  ;
+
+fetch_into_statement
+  : FETCH variable_name INTO bind_param SEMI?
+  | FETCH identifier USING DESCRIPTOR? identifier SEMI?
+  ;
+
+prepare_sql_stateent
+  : PREPARE variable_name FROM bind_param USING (SQLCA | identifier_name) SEMI
+  ;
+
+increment_decrement_statement
+  : variable_name (PLUS PLUS | MINUS MINUS)
+  ;
+
+assignment_rhs
+  : value
+  | expression (COMMA expression)*
+  | function_call_statement
+  | describe_function_call
+  | create_call_statement
+  | super_call_statement
+  | event_call_statement
+  ;
+
+describe_function_call
+  : (identifier DOT)? DESCRIBE LPAREN expression_list? RPAREN
+  | DESCRIBE identifier INTO identifier
+  ;
 
 assignment_statement
-   : assignment_sub SEMI?
+   : AT variable_name EQ bind_param SEMI
+   | (function_call_statement DOT)? variable_name (EQ | PLUSEQ | MINUSEQ | MULTEQ | DIVEQ) assignment_rhs SEMI?
    ;
 
-lvalue_sub
-   : atom_sub DOT identifier_name_ex
-   | atom_sub_call1
-   | atom_sub_array1
-   | atom_sub_ref1
-   | atom_sub_member1
-   ;
+variable_name
+  : identifier
+  ;
 
 return_statement
-   : RETURN expression?
+   : RETURN (expression)?
    ;
 
 function_call_expression_sub
-   : atom_sub DOT identifier_name_ex
-   | atom_sub_call1
+   : (variable_name DOT)* FUNCTION? POST? DYNAMIC? EVENT? function_name LPAREN expression_list? RPAREN (DOT (variable_name |
+   function_call_expression_sub))*
    ;
 
+function_name
+  : POST
+  | OPEN
+  | CLOSE
+  | variable_name
+  | dataTypeSub
+  ;
+
+function_event_call
+  : function_name DOT EVENT? POST? DYNAMIC? function_call_expression_sub
+  ;
+
 function_virtual_call_expression_sub
-   : identifier_name DOT (DYNAMIC EVENT? | EVENT DYNAMIC) function_call_expression_sub
+   : identifier DOT TRIGGER EVENT function_call_expression_sub
+   | identifier DOT (DYNAMIC EVENT? | EVENT TRIGGER? DYNAMIC) function_call_expression_sub
    ;
 
 open_call_sub
@@ -314,22 +477,40 @@ open_call_sub
 
 close_call_sub
    : CLOSE LPAREN expression_list RPAREN
-   | HALT CLOSE
+   | HALT CLOSE?
    ;
 
 function_call_statement
    : function_call_expression_sub
+   | ancestor_function_call
+   | describe_function_call
+   | ancestor_event_call_statement
+   | function_event_call
    | function_virtual_call_expression_sub
    | open_call_sub
    | close_call_sub
    ;
 
+ancestor_function_call
+  : COLONCOLON function_call_expression_sub
+  ;
+
+call_statement
+  : CALL variable_name (COLONCOLON (CREATE | DESTROY | OPEN | CLOSE | identifier))? SEMI?
+  ;
+
 super_call_statement
    : CALL (identifier_name TICK)? (atom_sub_call1 | atom_sub_member1)
+   | CALL SUPER COLONCOLON (EVENT | CREATE | DESTROY | OPEN | CLOSE | identifier) function_call_statement?
+   | SUPER COLONCOLON (EVENT | FUNCTION)? POST? function_call_statement
+   ;
+
+ancestor_event_call_statement
+   : (identifier_name DOT)? identifier_name COLONCOLON (EVENT | FUNCTION)? (TRIGGER | POST)? function_call_statement
    ;
 
 event_call_statement_sub
-   : (identifier_name DOT (identifier_name DOT)? | SUPER COLONCOLON)? EVENT atom_sub_call1
+   : (variable_name)? EVENT function_call_statement?
    ;
 
 event_call_statement
@@ -337,7 +518,8 @@ event_call_statement
    ;
 
 create_call_sub
-   : CREATE USING? (identifier_name DOT)? data_type_name (LPAREN expression_list? RPAREN)?
+   : CREATE USING expression
+   | CREATE USING? (identifier_name DOT)? data_type_name (LPAREN expression_list? RPAREN)?
    ;
 
 create_call_statement
@@ -353,11 +535,11 @@ destroy_call_statement
    ;
 
 for_loop_statement
-   : FOR lvalue_sub EQ expression TO expression (STEP expression)? statement NEXT
+   : FOR variable_name EQ expression TO expression (STEP expression)? statement* (NEXT | END FOR)
    ;
 
 do_while_loop_statement
-   : DO (WHILE | UNTIL) boolean_expression statement* LOOP
+   : DO (WHILE | UNTIL) boolean_expression  (statement SEMI?)* LOOP
    ;
 
 do_loop_while_statement
@@ -365,11 +547,20 @@ do_loop_while_statement
    ;
 
 if_statement
-   : IF boolean_expression THEN statement* (ELSEIF boolean_expression THEN statement*)* (ELSE statement*)? END IF SEMI?
+   : IF boolean_expression THEN  (statement SEMI?)* (elseif_statement)* (else_statement)?
+    END IF SEMI?
    ;
 
+elseif_statement
+  : ELSEIF boolean_expression THEN (statement SEMI?)*
+  ;
+
+else_statement
+  : ELSE  (statement SEMI?)*
+  ;
+
 if_simple_statement
-   : IF boolean_expression THEN statement
+   : IF boolean_expression THEN  statement (ELSE statement)? SEMI?
    ;
 
 continue_statement
@@ -389,52 +580,42 @@ exit_statement
    ;
 
 choose_statement
-   : CHOOSE CASE expression ( choose_case_range_sub
-                            | choose_case_cond_sub
+   : CHOOSE CASE expression (choose_case_cond_sub
                             | choose_case_else_sub
                             | choose_case_value_sub)+
      END CHOOSE
    ;
 
 choose_case_value_sub
-   : CASE expression (COMMA expression)* statement*
+   : CASE expression (TO expression)? (COMMA expression (TO expression)?)*  (statement SEMI?)*
    ;
 
 choose_case_cond_sub
-   : CASE IS (EQ | GT | LT | GTLT | GTE | LTE) expression statement*
-   ;
-
-choose_case_range_sub
-   : CASE atom TO atom statement*
+   : CASE IS (EQ | GT | LT | GTLT | GTE | LTE) expression  (statement SEMI?)*
    ;
 
 choose_case_else_sub
-   : CASE ELSE statement*
-   ;
-
-goto_stat
-   : GOTO identifier_name
+   : CASE ELSE  (statement SEMI?)*
    ;
 
 label_stat
    : identifier_name COLON
    ;
 
-try_catch_block
-   : TRY statement* (CATCH LPAREN variable_decl_sub RPAREN statement*)* (FINALLY statement*)? END TRY
-   ;
-
-throw_stat
-   : THROW expression
-   ;
-
 identifier
-   : identifier_name
-   | SUPER COLONCOLON (CREATE | DESTROY | identifier_name_ex)
-   | identifier_name COLONCOLON (CREATE | DESTROY)
-   | identifier_name DOT (CREATE | DESTROY)
-   | identifier_name COLONCOLON identifier_name_ex
+   : identifier_name_ex (DOT identifier_name_ex)* (identifier_array)? (DOT identifier_name_ex (identifier_array)?)*
    ;
+
+string_literal
+  : (DQUOTED_STRING | QUOTED_STRING) (PLUS (variable_name | DQUOTED_STRING | QUOTED_STRING))*
+  ;
+
+identifier_array
+  : LBRACE (identifier | value) (COMMA (identifier | value))* RBRACE
+  | LBRACE (identifier | function_call_statement)? ((operator)? NUMBER)? RBRACE
+  ;
+
+operator: PLUS | MINUS | MULT | DIV;
 
 identifier_name_ex
    : identifier_name
@@ -446,14 +627,23 @@ identifier_name_ex
    | CLOSE
    | GOTO
    | INSERT
-   | DESCRIBE
-   | TIME
+   | TIME_TYPE
    | READONLY
+   | SQLCA
+   | CREATE
+   | VALUES
+   | WINDOW
+   | SYSTEM
+   | DATE_TYPE
    ;
 
 identifier_name
-   : ID
+   : (UNDERSCORE)? ID
    ;
+
+bind_param
+  : COLON identifier
+  ;
 
 atom_sub
    : array_access_atom
@@ -464,50 +654,12 @@ atom_sub_call1
    : (identifier | DESCRIBE) LPAREN expression_list? RPAREN
    ;
 
-atom_sub_array1
-   : identifier_name LBRACE expression_list RBRACE
-   ;
-
-atom_sub_ref1
-   : identifier_name BRACES
-   ;
-
 atom_sub_member1
    : identifier
    ;
 
-atom
-   : event_call_statement_sub
-   | atom_sub (DOT identifier_name_ex)
-   | cast_expression
-   | atom_sub_call1
-   | atom_sub_array1
-   | atom_sub_ref1
-   | atom_sub_member1
-   | numeric_atom
-   | boolean_atom
-   | ENUM
-   | DQUOTED_STRING
-   | QUOTED_STRING
-   | DATE
-   | TIME
-   ;
-
 array_access_atom
    : identifier_name LBRACE expression_list RBRACE
-   ;
-
-numeric_atom
-   : NUMBER
-   ;
-
-boolean_atom
-   : TRUE
-   | FALSE
-   ;
-
-cast_expression
-   : dataTypeSub LPAREN expression (COMMA expression)* RPAREN
    ;
 
 data_type_name
