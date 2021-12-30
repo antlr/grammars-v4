@@ -1,4 +1,4 @@
-// Template generated code from Antlr4BuildTasks.dotnet-antlr v 3.0.13
+// Template generated code from trgen <version>
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);

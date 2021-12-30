@@ -1,4 +1,4 @@
-# Generated code from Antlr4BuildTasks.dotnet-antlr v <version>
+# Generated code from trgen <version>
 GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
 default:
 	dotnet restore

@@ -9,6 +9,7 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
         this.lastToken = null;
         this.useStrictDefault = false;
         this.useStrictCurrent = false;
+        this.templateDepth = 0;
     }
 
     getStrictDefault() {
@@ -24,12 +25,16 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
         return this.useStrictCurrent;
     }
 
+    IsInTemplateString() {
+        return this.templateDepth > 0;
+    }
+
     getCurrentToken() {
-        return nextToken.call(this);
+        return this.nextToken();
     }
 
     nextToken() {
-        var next = super.nextToken.call(this);
+        var next = super.nextToken();
 
         if (next.channel === antlr4.Token.DEFAULT_CHANNEL) {
             this.lastToken = next;
@@ -39,7 +44,7 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
 
     ProcessOpenBrace() {
         this.useStrictCurrent =
-            this.scopeStrictModes.length > 0 && this.scopeStrictModes[0]
+            this.scopeStrictModes.length > 0 && this.scopeStrictModes[this.scopeStrictModes.length - 1]
                 ? true
                 : this.useStrictDefault;
         this.scopeStrictModes.push(this.useStrictCurrent);
@@ -53,13 +58,9 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
     }
 
     ProcessStringLiteral() {
-        if (
-            this.lastToken !== undefined &&
-            (this.lastToken === null ||
-                this.lastToken.type === JavaScriptLexer.OpenBrace)
-        ) {
-            const text = this._input.strdata.slice(0, "use strict".length);
-            if (text === '"use strict"' || text === "'use strict'") {
+        if (this.lastToken === null ||
+                this.lastToken.type === JavaScriptLexer.OpenBrace) {
+            if (super.text === '"use strict"' || super.text === "'use strict'") {
                 if (this.scopeStrictModes.length > 0) {
                     this.scopeStrictModes.pop();
                 }
@@ -67,6 +68,14 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
                 this.scopeStrictModes.push(this.useStrictCurrent);
             }
         }
+    }
+
+    IncreaseTemplateDepth() {
+        this.templateDepth++;
+    }
+
+    DecreaseTemplateDepth() {
+        this.templateDepth--;
     }
 
     IsRegexPossible() {

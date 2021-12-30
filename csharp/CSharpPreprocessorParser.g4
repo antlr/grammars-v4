@@ -4,61 +4,22 @@
 
 parser grammar CSharpPreprocessorParser;
 
-options { tokenVocab=CSharpLexer; }
+options { tokenVocab=CSharpLexer; superClass=CSharpPreprocessorParserBase; }
 
-@parser::header 
-{import java.util.Stack;
-import java.util.HashSet;}
-
-@parser::members
-{Stack<Boolean> conditions = new Stack<Boolean>() {{ conditions.push(true); }};
-public HashSet<String> ConditionalSymbols = new HashSet<String>() {{ ConditionalSymbols.add("DEBUG"); }};
-
-private boolean allConditions() {
-	for(boolean condition: conditions) {
-		if (!condition)
-			return false;
-	}
-	return true;
-}
-}
-
-preprocessor_directive returns [boolean value]
-	: DEFINE CONDITIONAL_SYMBOL directive_new_line_or_sharp{ ConditionalSymbols.add($CONDITIONAL_SYMBOL.text);
-	   $value = allConditions(); } #preprocessorDeclaration
-
-	| UNDEF CONDITIONAL_SYMBOL directive_new_line_or_sharp{ ConditionalSymbols.remove($CONDITIONAL_SYMBOL.text);
-	   $value = allConditions(); } #preprocessorDeclaration
-
-	| IF expr=preprocessor_expression directive_new_line_or_sharp
-	  { $value = $expr.value.equals("true") && allConditions(); conditions.push($expr.value.equals("true")); }
-	  #preprocessorConditional
-
-	| ELIF expr=preprocessor_expression directive_new_line_or_sharp
-	  { if (!conditions.peek()) { conditions.pop(); $value = $expr.value.equals("true") && allConditions();
-	     conditions.push($expr.value.equals("true")); } else $value = false; }
-	     #preprocessorConditional
-
-	| ELSE directive_new_line_or_sharp
-	  { if (!conditions.peek()) { conditions.pop(); $value = true && allConditions(); conditions.push(true); }
-	    else $value = false; }    #preprocessorConditional
-
-	| ENDIF directive_new_line_or_sharp             { conditions.pop(); $value = conditions.peek(); }
-	   #preprocessorConditional
-	| LINE (DIGITS STRING? | DEFAULT | DIRECTIVE_HIDDEN) directive_new_line_or_sharp { $value = allConditions(); }
-	   #preprocessorLine
-
-	| ERROR TEXT directive_new_line_or_sharp       { $value = allConditions(); }   #preprocessorDiagnostic
-
-	| WARNING TEXT directive_new_line_or_sharp     { $value = allConditions(); }   #preprocessorDiagnostic
-
-	| REGION TEXT? directive_new_line_or_sharp      { $value = allConditions(); }   #preprocessorRegion
-
-	| ENDREGION TEXT? directive_new_line_or_sharp  { $value = allConditions(); }   #preprocessorRegion
-
-	| PRAGMA TEXT directive_new_line_or_sharp      { $value = allConditions(); }   #preprocessorPragma
-
-	| NULLABLE TEXT directive_new_line_or_sharp      { $value = allConditions(); }   #preprocessorNullable
+preprocessor_directive returns [Boolean value]
+	: DEFINE CONDITIONAL_SYMBOL directive_new_line_or_sharp { this.OnPreprocessorDirectiveDefine(); }  #preprocessorDeclaration
+	| UNDEF CONDITIONAL_SYMBOL directive_new_line_or_sharp { this.OnPreprocessorDirectiveUndef(); } #preprocessorDeclaration
+	| IF expr=preprocessor_expression directive_new_line_or_sharp { this.OnPreprocessorDirectiveIf(); }	  #preprocessorConditional
+	| ELIF expr=preprocessor_expression directive_new_line_or_sharp { this.OnPreprocessorDirectiveElif(); } #preprocessorConditional
+	| ELSE directive_new_line_or_sharp { this.OnPreprocessorDirectiveElse(); }    #preprocessorConditional
+	| ENDIF directive_new_line_or_sharp { this.OnPreprocessorDirectiveEndif(); } #preprocessorConditional
+	| LINE (DIGITS STRING? | DEFAULT | DIRECTIVE_HIDDEN) directive_new_line_or_sharp { this.OnPreprocessorDirectiveLine(); } #preprocessorLine
+	| ERROR TEXT directive_new_line_or_sharp { this.OnPreprocessorDirectiveError(); }   #preprocessorDiagnostic
+	| WARNING TEXT directive_new_line_or_sharp { this.OnPreprocessorDirectiveWarning(); }   #preprocessorDiagnostic
+	| REGION TEXT? directive_new_line_or_sharp { this.OnPreprocessorDirectiveRegion(); }   #preprocessorRegion
+	| ENDREGION TEXT? directive_new_line_or_sharp { this.OnPreprocessorDirectiveEndregion(); }   #preprocessorRegion
+	| PRAGMA TEXT directive_new_line_or_sharp { this.OnPreprocessorDirectivePragma(); }   #preprocessorPragma
+	| NULLABLE TEXT directive_new_line_or_sharp { this.OnPreprocessorDirectiveNullable(); }   #preprocessorNullable
 	;
 
 directive_new_line_or_sharp
@@ -67,17 +28,13 @@ directive_new_line_or_sharp
     ;
 
 preprocessor_expression returns [String value]
-	: TRUE                                 { $value = "true"; }
-	| FALSE                                { $value = "false"; }
-	| CONDITIONAL_SYMBOL                   { $value = ConditionalSymbols.contains($CONDITIONAL_SYMBOL.text) ? "true" : "false"; }
-	| OPEN_PARENS expr=preprocessor_expression CLOSE_PARENS { $value = $expr.value; }
-	| BANG expr=preprocessor_expression     { $value = $expr.value.equals("true") ? "false" : "true"; }
-	| expr1=preprocessor_expression OP_EQ expr2=preprocessor_expression
-	  { $value = ($expr1.value == $expr2.value ? "true" : "false"); }
-	| expr1=preprocessor_expression OP_NE expr2=preprocessor_expression
-	  { $value = ($expr1.value != $expr2.value ? "true" : "false"); }
-	| expr1=preprocessor_expression OP_AND expr2=preprocessor_expression
-	  { $value = ($expr1.value.equals("true") && $expr2.value.equals("true") ? "true" : "false"); }
-	| expr1=preprocessor_expression OP_OR expr2=preprocessor_expression
-	  { $value = ($expr1.value.equals("true") || $expr2.value.equals("true") ? "true" : "false"); }
+	: TRUE { this.OnPreprocessorExpressionTrue(); }
+	| FALSE { this.OnPreprocessorExpressionFalse(); }
+	| CONDITIONAL_SYMBOL { this.OnPreprocessorExpressionConditionalSymbol(); }
+	| OPEN_PARENS expr=preprocessor_expression CLOSE_PARENS { this.OnPreprocessorExpressionConditionalOpenParens(); }
+	| BANG expr=preprocessor_expression { this.OnPreprocessorExpressionConditionalBang(); }
+	| expr1=preprocessor_expression OP_EQ expr2=preprocessor_expression { this.OnPreprocessorExpressionConditionalEq(); }
+	| expr1=preprocessor_expression OP_NE expr2=preprocessor_expression { this.OnPreprocessorExpressionConditionalNe(); }
+	| expr1=preprocessor_expression OP_AND expr2=preprocessor_expression { this.OnPreprocessorExpressionConditionalAnd(); }
+	| expr1=preprocessor_expression OP_OR expr2=preprocessor_expression { this.OnPreprocessorExpressionConditionalOr(); }
 	;
