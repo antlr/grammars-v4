@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>verilog</artifactId>
 	<packaging>jar</packaging>
-	<name>verilog grammar</name>
+	<name>Verilog grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>verilogparent</artifactId>
@@ -18,7 +17,9 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>Verilog2001.g4</include>
+						<include>VerilogLexer.g4</include>
+						<include>VerilogParser.g4</include>
+						<include>VerilogPreprocessorParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -39,7 +40,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>source_text</entryPoint>
-					<grammarName>Verilog2001</grammarName>
+					<grammarName>Verilog</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
