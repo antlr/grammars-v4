@@ -61,7 +61,6 @@ tinymud
 v
 vb6
 velocity
-wat
 webidl
 xpath/xpath31
 z

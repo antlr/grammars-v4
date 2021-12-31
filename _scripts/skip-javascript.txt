@@ -47,7 +47,6 @@ swift/swift5
 tcpheader
 v
 velocity
-wat
 webidl
 xpath/xpath31
 z
