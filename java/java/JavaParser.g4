@@ -2,7 +2,8 @@
  [The "BSD licence"]
  Copyright (c) 2013 Terence Parr, Sam Harwell
  Copyright (c) 2017 Ivan Kochurkin (upgrade to Java 8)
- Copyright (c) 2021 Michal Lorek (upgrade to Java 11)
+ Copyright (c) 2021 Michał Lorek (upgrade to Java 11)
+ Copyright (c) 2022 Michał Lorek (upgrade to Java 17)
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -37,27 +38,6 @@ compilationUnit
     | moduleDeclaration EOF
     ;
 
-moduleDeclaration
-    : OPEN? MODULE qualifiedName moduleBody
-    ;
-
-moduleBody
-    : '{' moduleDirective* '}'
-    ;
-
-moduleDirective
-	: REQUIRES requiresModifier* qualifiedName ';'
-	| EXPORTS qualifiedName (TO qualifiedName)? ';'
-	| OPENS qualifiedName (TO qualifiedName)? ';'
-	| USES qualifiedName ';'
-	| PROVIDES qualifiedName WITH qualifiedName ';'
-	;
-
-requiresModifier
-	: TRANSITIVE
-	| STATIC
-	;
-
 packageDeclaration
     : annotation* PACKAGE qualifiedName ';'
     ;
@@ -68,7 +48,7 @@ importDeclaration
 
 typeDeclaration
     : classOrInterfaceModifier*
-      (classDeclaration | enumDeclaration | interfaceDeclaration | annotationTypeDeclaration)
+      (classDeclaration | enumDeclaration | interfaceDeclaration | annotationTypeDeclaration | recordDeclaration)
     | ';'
     ;
 
@@ -89,6 +69,8 @@ classOrInterfaceModifier
     | ABSTRACT
     | FINAL    // FINAL for class only -- does not apply to interfaces
     | STRICTFP
+    | SEALED // Java17
+    | NON_SEALED // Java17
     ;
 
 variableModifier
@@ -97,9 +79,10 @@ variableModifier
     ;
 
 classDeclaration
-    : CLASS IDENTIFIER typeParameters?
+    : CLASS identifier typeParameters?
       (EXTENDS typeType)?
       (IMPLEMENTS typeList)?
+      (PERMITS typeList)? // Java17
       classBody
     ;
 
@@ -108,7 +91,7 @@ typeParameters
     ;
 
 typeParameter
-    : annotation* IDENTIFIER (EXTENDS annotation* typeBound)?
+    : annotation* identifier (EXTENDS annotation* typeBound)?
     ;
 
 typeBound
@@ -116,7 +99,7 @@ typeBound
     ;
 
 enumDeclaration
-    : ENUM IDENTIFIER (IMPLEMENTS typeList)? '{' enumConstants? ','? enumBodyDeclarations? '}'
+    : ENUM identifier (IMPLEMENTS typeList)? '{' enumConstants? ','? enumBodyDeclarations? '}'
     ;
 
 enumConstants
@@ -132,7 +115,7 @@ enumBodyDeclarations
     ;
 
 interfaceDeclaration
-    : INTERFACE IDENTIFIER typeParameters? (EXTENDS typeList)? interfaceBody
+    : INTERFACE identifier typeParameters? (EXTENDS typeList)? interfaceBody
     ;
 
 classBody
@@ -159,6 +142,7 @@ memberDeclaration
     | annotationTypeDeclaration
     | classDeclaration
     | enumDeclaration
+    | recordDeclaration //Java17
     ;
 
 /* We use rule this even for void methods which cannot have [] after parameters.
@@ -191,7 +175,7 @@ genericConstructorDeclaration
     ;
 
 constructorDeclaration
-    : IDENTIFIER formalParameters (THROWS qualifiedNameList)? constructorBody=block
+    : identifier formalParameters (THROWS qualifiedNameList)? constructorBody=block
     ;
 
 fieldDeclaration
@@ -211,6 +195,7 @@ interfaceMemberDeclaration
     | annotationTypeDeclaration
     | classDeclaration
     | enumDeclaration
+    | recordDeclaration // Java17
     ;
 
 constDeclaration
@@ -318,6 +303,7 @@ literal
     | STRING_LITERAL
     | BOOL_LITERAL
     | NULL_LITERAL
+    | TEXT_BLOCK // Java17
     ;
 
 integerLiteral
@@ -360,7 +346,7 @@ elementValueArrayInitializer
     ;
 
 annotationTypeDeclaration
-    : '@' INTERFACE IDENTIFIER annotationTypeBody
+    : '@' INTERFACE identifier annotationTypeBody
     ;
 
 annotationTypeBody
@@ -378,6 +364,7 @@ annotationTypeElementRest
     | interfaceDeclaration ';'?
     | enumDeclaration ';'?
     | annotationTypeDeclaration ';'?
+    | recordDeclaration ';'? // Java17
     ;
 
 annotationMethodOrConstantRest
@@ -395,6 +382,53 @@ annotationConstantRest
 
 defaultValue
     : DEFAULT elementValue
+    ;
+
+// MODULES - Java9
+
+moduleDeclaration
+    : OPEN? MODULE qualifiedName moduleBody
+    ;
+
+moduleBody
+    : '{' moduleDirective* '}'
+    ;
+
+moduleDirective
+	: REQUIRES requiresModifier* qualifiedName ';'
+	| EXPORTS qualifiedName (TO qualifiedName)? ';'
+	| OPENS qualifiedName (TO qualifiedName)? ';'
+	| USES qualifiedName ';'
+	| PROVIDES qualifiedName WITH qualifiedName ';'
+	;
+
+requiresModifier
+	: TRANSITIVE
+	| STATIC
+	;
+
+// RECORDS - Java 17
+
+recordDeclaration
+    : RECORD identifier typeParameters? recordHeader
+      (IMPLEMENTS typeList)?
+      recordBody
+    ;
+
+recordHeader
+    : '(' recordComponentList? ')'
+    ;
+
+recordComponentList
+    : recordComponent (',' recordComponent)*
+    ;
+
+recordComponent
+    : typeType identifier
+    ;
+
+recordBody
+    : '{' classBodyDeclaration* '}'
     ;
 
 // STATEMENTS / BLOCKS
@@ -425,12 +459,15 @@ identifier
     | PROVIDES
     | WITH
     | TRANSITIVE
+    | SEALED
+    | PERMITS
+    | RECORD
     | VAR
     ;
 
 localTypeDeclaration
     : classOrInterfaceModifier*
-      (classDeclaration | interfaceDeclaration)
+      (classDeclaration | interfaceDeclaration | recordDeclaration)
     | ';'
     ;
 
@@ -449,13 +486,15 @@ statement
     | THROW expression ';'
     | BREAK identifier? ';'
     | CONTINUE identifier? ';'
+    | YIELD expression ';' // Java17
     | SEMI
     | statementExpression=expression ';'
+    | switchExpression ';'? // Java17
     | identifierLabel=identifier ':' statement
     ;
 
 catchClause
-    : CATCH '(' variableModifier* catchType IDENTIFIER ')' block
+    : CATCH '(' variableModifier* catchType identifier ')' block
     ;
 
 catchType
@@ -487,7 +526,7 @@ switchBlockStatementGroup
     ;
 
 switchLabel
-    : CASE (constantExpression=expression | enumConstantName=IDENTIFIER) ':'
+    : CASE (constantExpression=expression | enumConstantName=IDENTIFIER | typeType varName=identifier) ':'
     | DEFAULT ':'
     ;
 
@@ -543,7 +582,7 @@ expression
     | expression bop=('+'|'-') expression
     | expression ('<' '<' | '>' '>' '>' | '>' '>') expression
     | expression bop=('<=' | '>=' | '>' | '<') expression
-    | expression bop=INSTANCEOF typeType
+    | expression bop=INSTANCEOF (typeType | pattern)
     | expression bop=('==' | '!=') expression
     | expression bop='&' expression
     | expression bop='^' expression
@@ -555,11 +594,17 @@ expression
       bop=('=' | '+=' | '-=' | '*=' | '/=' | '&=' | '|=' | '^=' | '>>=' | '>>>=' | '<<=' | '%=')
       expression
     | lambdaExpression // Java8
+    | switchExpression // Java17
 
     // Java 8 methodReference
     | expression '::' typeArguments? identifier
     | typeType '::' (typeArguments? identifier | NEW)
     | classType '::' typeArguments? NEW
+    ;
+
+// Java17
+pattern
+    : variableModifier* typeType annotation* identifier
     ;
 
 // Java8
@@ -571,7 +616,7 @@ lambdaExpression
 lambdaParameters
     : identifier
     | '(' formalParameterList? ')'
-    | '(' IDENTIFIER (',' IDENTIFIER)* ')'
+    | '(' identifier (',' identifier)* ')'
     | '(' lambdaLVTIList? ')'
     ;
 
@@ -591,8 +636,32 @@ primary
     | nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
     ;
 
+// Java17
+switchExpression
+    : SWITCH parExpression '{' switchLabeledRule* '}'
+    ;
+
+// Java17
+switchLabeledRule
+    : CASE (expressionList | NULL_LITERAL | guardedPattern) (ARROW | COLON) switchRuleOutcome
+    | DEFAULT (ARROW | COLON) switchRuleOutcome
+    ;
+
+// Java17
+guardedPattern
+    : '(' guardedPattern ')'
+    | variableModifier* typeType annotation* identifier ('&&' expression)*
+    | guardedPattern '&&' expression
+    ;
+
+// Java17
+switchRuleOutcome
+    : block
+    | blockStatement*
+    ;
+
 classType
-    : (classOrInterfaceType '.')? annotation* IDENTIFIER typeArguments?
+    : (classOrInterfaceType '.')? annotation* identifier typeArguments?
     ;
 
 creator
@@ -601,12 +670,12 @@ creator
     ;
 
 createdName
-    : IDENTIFIER typeArgumentsOrDiamond? ('.' IDENTIFIER typeArgumentsOrDiamond?)*
+    : identifier typeArgumentsOrDiamond? ('.' identifier typeArgumentsOrDiamond?)*
     | primitiveType
     ;
 
 innerCreator
-    : IDENTIFIER nonWildcardTypeArgumentsOrDiamond? classCreatorRest
+    : identifier nonWildcardTypeArgumentsOrDiamond? classCreatorRest
     ;
 
 arrayCreatorRest
@@ -665,7 +734,7 @@ superSuffix
 
 explicitGenericInvocationSuffix
     : SUPER superSuffix
-    | IDENTIFIER arguments
+    | identifier arguments
     ;
 
 arguments
