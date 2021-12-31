@@ -163,7 +163,6 @@ prov-n
 python/python2
 python/python2-js
 python/python3
-python/python3-js
 python/python3-py
 python/python3-ts
 python/python3-without-actions

@@ -1,10 +1,12 @@
 import antlr4 from 'antlr4';
-import Python3Parser from './Python3Parser';
+import Python3Parser from './Python3Parser.js';
 
-class Python3LexerBase extends antlr4.Lexer {
+export default class Python3LexerBase extends antlr4.Lexer {
     constructor(input) {
         super(input);
-        this.reset()
+        this.tokens = [];
+        this.indents = [];
+        this.opened = 0;
     }
 
     reset() {
@@ -54,7 +56,7 @@ class Python3LexerBase extends antlr4.Lexer {
     commonToken(type, text) {
         let stop = this.getCharIndex() - 1;
         let start = text.length ? stop - text.length + 1 : stop;
-        return new CommonToken(this._tokenFactorySourcePair, type, antlr4.Lexer.DEFAULT_TOKEN_CHANNEL, start, stop);
+        return new antlr4.CommonToken(this._tokenFactorySourcePair, type, antlr4.Lexer.DEFAULT_TOKEN_CHANNEL, start, stop);
     }
 
     getIndentationCount(whitespace) {

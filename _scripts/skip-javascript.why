@@ -84,10 +84,6 @@ python/python2
 python/python3
 	ErrorCaptureStackTrace(err) undefined.
 
-python/python3-js
-	pom.xml does not contain tests, so trgen does not create Generated/. Skip for now.
-	Grammar is not target-agnostic.
-
 python/python3-py
 	pom.xml does not contain tests, so trgen does not create Generated/. Skip for now.
 	Grammar is not target-agnostic.
