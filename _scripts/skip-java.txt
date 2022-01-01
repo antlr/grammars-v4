@@ -11,7 +11,6 @@ p
 php
 powerbuilder
 python/python2
-python/python3-js
 python/python3-py
 python/python3-ts
 python/python3-without-actions
