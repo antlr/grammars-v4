@@ -267,7 +267,13 @@ qualifiedNameList
     ;
 
 formalParameters
-    : '(' formalParameterList? ')'
+    : '(' receiverParameter? ')'
+    | '(' receiverParameter (',' formalParameterList)? ')'
+    | '(' formalParameterList? ')'
+    ;
+
+receiverParameter
+    : typeType (identifier '.')* THIS
     ;
 
 formalParameterList
