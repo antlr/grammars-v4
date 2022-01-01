@@ -2,12 +2,9 @@ package var.var.sealed;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @interface Dummy {
 }
@@ -523,7 +520,7 @@ class Ids {
 
                 void f() {
 
-                    opens<Byte>.provides<Long> b1 = new opens<>.provides() {
+                    opens<Byte>.provides<Long> b1 = new opens<>().new provides<>() {
                     };
                     opens<Byte>.provides<Long> b2 = new opens().new provides() {
                     };
@@ -558,7 +555,7 @@ class Ids {
                 void h() {
                     var o = get().<Long>var();
 
-                    SS.Sup<provides<Long>.with<Long>> s = provides<Long>.@Dummy3 with<Long>::new;
+                    SS.Sup<provides<Long>.with<Long>> s = @Issue1897.Dum1 provides<Long>.with<Long>::new;
                 }
 
                 class R {
@@ -618,4 +615,25 @@ class Ids {
         }
     }
 
+}
+
+class Yield {
+
+    int f(Object o) {
+
+        final var yield = 1;
+        return switch (o) {
+            case Long l -> {
+                //var yield = 1;
+                yield yield;
+            }
+            default -> {
+                yield yield;
+            }
+        };
+    }
+
+    int yield(int yield){
+        return yield;
+    }
 }
