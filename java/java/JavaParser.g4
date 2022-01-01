@@ -465,6 +465,7 @@ identifier
     | PROVIDES
     | WITH
     | TRANSITIVE
+    | YIELD
     | SEALED
     | PERMITS
     | RECORD
