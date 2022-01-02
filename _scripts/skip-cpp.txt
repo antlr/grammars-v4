@@ -260,6 +260,7 @@ webidl
 wkt
 wln
 xml
+xpath/xpath20
 xpath/xpath31
 xsd-regex
 z
