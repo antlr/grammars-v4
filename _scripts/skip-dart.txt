@@ -61,5 +61,6 @@ v
 vb6
 velocity
 webidl
+xpath/xpath20
 xpath/xpath31
 z
