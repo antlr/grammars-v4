@@ -68,7 +68,6 @@ powerbuilder
 protobuf3
 python/python2
 python/python3
-python/python3-js
 python/python3-py
 python/python3-ts
 python/python3-without-actions
@@ -110,7 +109,6 @@ v
 vb6
 vba
 velocity
-wat
 wavefront
 webidl
 xpath/xpath31
