@@ -179,6 +179,7 @@
 				<module>lolcode</module>
 				<module>loop</module>
 				<module>lpc</module>
+                <module>lrc</module>
 				<module>ltl</module>
 				<module>lua</module>
 				<module>matlab</module>
