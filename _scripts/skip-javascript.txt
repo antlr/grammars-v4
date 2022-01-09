@@ -33,7 +33,8 @@ r
 rego
 rexx
 rust
-sql/hive
+sql/hive/v1
+sql/hive/v2
 sql/mysql
 sql/plsql
 sql/postgresql

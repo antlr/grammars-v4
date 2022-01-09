@@ -42,7 +42,6 @@
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
-					<outputDirectory>${project.build.directory}/generated-sources/antlr4</outputDirectory>
 				</configuration>
 				<executions>
 					<execution>
