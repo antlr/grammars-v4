@@ -87,7 +87,8 @@ sexpression
 sgf
 smalltalk
 sparql
-sql/hive
+sql/hive/v1
+sql/hive/v2
 sql/sqlite
 sql/postgresql
 sql/tsql

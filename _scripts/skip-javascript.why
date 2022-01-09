@@ -110,7 +110,7 @@ rexx
 rust
 	ErrorCaptureStackTrace(err) undefined.
 
-sql/hive
+sql/hive/*
 	stack overflow.
 
 sql/mysql

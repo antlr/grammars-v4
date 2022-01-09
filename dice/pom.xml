@@ -41,7 +41,6 @@
 					<showTree>false</showTree>
 					<entryPoint>notation</entryPoint>
 					<grammarName>DiceNotation</grammarName>
-               <lexerName>DiceNotationLexer</lexerName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
