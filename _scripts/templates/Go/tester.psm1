@@ -1,7 +1,7 @@
 # Template generated code from trgen <version>
 function Build-Grammar {
 <tool_grammar_files:{x |
-    $g = antlr <x> -Dlanguage=Go <antlr_tool_args:{y | <y> } >
+    $g = antlr <x> -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } >
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g

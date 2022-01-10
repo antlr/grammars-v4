@@ -2,7 +2,6 @@ package parser
 
 import (
 	"strings"
-
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
