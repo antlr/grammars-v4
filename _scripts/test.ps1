@@ -83,6 +83,9 @@ function Test-Grammar {
         }
     }
 
+    # Attempt 8. Output supposedly what trgen output. ./tester is not outputing anything.
+    type ./tester.psm1 | Write-Error
+
     # build
 
     # see _scripts/templates/*/tester.psm1
