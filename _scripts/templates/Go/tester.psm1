@@ -15,23 +15,30 @@ function Build-Grammar {
     # Attempt 2.
     # Get-Host | Select-Object Version | Out-Host
     # Attempt 3.
-    Get-Host | Select-Object Version | Out-Host | Write-Host
+    # Get-Host | Select-Object Version | Out-Host | Write-Host
+    # Attempt 4.
+    $gm = Get-Host | Select-Object Version
+    $g = -join($g, $gm)
     # Output environmental variables.
-    dir env: | Out-Host | Write-Host
+    $gm = dir env: | Out-String
+    $g = -join($g, $gm)
     # Output go version
-    go version | Out-Host | Write-Host
+    $gm = go version | Out-String
+    $g = -join($g, $gm)
     #
     $env:GO111MODULE = "on"
-    $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
+    $gm = go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
+    $g = -join($g, $gm)
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g
             Success = $false
         }
     }
-    $msg = go build Test.go
+    $g2 = go build Test.go
+    $g = -join($g, $gm)
     return @{
-        Message = $msg
+        Message = $g
         Success = $LASTEXITCODE -eq 0
     }
 }
