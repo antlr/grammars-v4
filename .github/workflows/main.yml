@@ -36,8 +36,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [CSharp, Java, JavaScript, Go, Python3, Dart]
+        os: [windows-latest, ubuntu-latest]
+        language: [Go]
     steps:
     - name: Checkout
       uses: actions/checkout@v2.4.0
