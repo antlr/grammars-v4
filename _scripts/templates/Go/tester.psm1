@@ -10,11 +10,11 @@ function Build-Grammar {
     \}
 }>
     # Output version of pwsh.
-    Get-Host | Select-Object Version | Write-Host
+    #Get-Host | Select-Object Version | Write-Host
     # Output environmental variables.
-    dir env: | Out-String | Write-Host
+    #dir env: | Out-String | Write-Host
     # Output go version
-    go version | Write-Host
+    #go version | Write-Host
 
     $env:GO111MODULE = "on"
     $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
