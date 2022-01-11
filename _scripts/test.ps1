@@ -63,6 +63,11 @@ function Test-Grammar {
     # codegen
     Write-Host "trgen -t $Target --template-sources-directory $templates"
     trgen -t $Target --template-sources-directory $templates | Write-Host
+
+    Write-Host "YO. ATTEMPT 10."
+
+    # Is $LASTEXITCODE for the trgen call or Write-Host call. Terrible syntax of powersucks.
+
     if ($LASTEXITCODE -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
@@ -82,6 +87,8 @@ function Test-Grammar {
             FailedCases = @()
         }
     }
+
+    Write-Host "YO. ATTEMPT 10."
 
     # Attempt 8. Output supposedly what trgen output. ./tester is not outputing anything.
     #type ./tester.psm1 | Write-Error
