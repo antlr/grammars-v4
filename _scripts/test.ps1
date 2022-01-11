@@ -92,8 +92,10 @@ function Test-Grammar {
 
     # Attempt 8. Output supposedly what trgen output. ./tester is not outputing anything.
     #type ./tester.psm1 | Write-Error
-    # Attempt 9. Output to Write-Host instead
-    type ./tester.psm1 | Write-Host
+    # Attempt 9. Output to Write-Host instead. Does not actually output the damn frigging file.
+    #type ./tester.psm1 | Write-Host
+    # Attempt 11.
+    get-content ./tester.psm1 | Write-Host
 
     # build
 
