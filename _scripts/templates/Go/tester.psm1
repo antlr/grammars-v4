@@ -9,6 +9,15 @@ function Build-Grammar {
         \}
     \}
 }>
+    # Attempt 7. Explicitly force fail and message with known data
+    # and test caller is actually outputing any damn thing.
+    # Force failusre as early as possible because I don't know what
+    # caller callee are doing whatsoever. Powersucks.
+    return ${
+        Message = "Just a bunch of garbage."
+        Success = $false
+    }
+
     # Output pwsh (or powershell) version.
     # Attempt 1. Does not work--captured.
     # Get-Host | Select-Object Version

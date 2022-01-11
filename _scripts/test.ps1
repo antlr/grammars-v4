@@ -91,8 +91,8 @@ function Test-Grammar {
     $buildResult = Build-Grammar
 
     # Attempt 6. Write in caller, not callee. Where is this output going?
-    Write-Error $buildResult.Message
-    Write-Host $buildResult.Message
+    #Write-Error $buildResult.Message
+    #Write-Host $buildResult.Message
 
     if (!$buildResult.Success) {
         $failStage = [FailStage]::Compile
