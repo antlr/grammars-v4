@@ -12,31 +12,31 @@ function Build-Grammar {
     # Output pwsh (or powershell) version.
     # Attempt 1. Does not work--captured.
     # Get-Host | Select-Object Version
-    # Attempt 2.
+    # Attempt 2. Does not work. No output.
     # Get-Host | Select-Object Version | Out-Host
-    # Attempt 3.
+    # Attempt 3. Does not work. No output.
     # Get-Host | Select-Object Version | Out-Host | Write-Host
-    # Attempt 4.
-    $gm = Get-Host | Select-Object Version
-    $g = -join($g, $gm)
+    # Attempt 4. Does not work. No output.
+    #$gm = Get-Host | Select-Object Version
+    #$g = -join($g, $gm)
+    # Attempt 5.
+    Get-Host | Select-Object Version | Write-Error
     # Output environmental variables.
-    $gm = dir env: | Out-String
-    $g = -join($g, $gm)
+    dir env: | Out-String | Write-Error
     # Output go version
-    $gm = go version | Out-String
-    $g = -join($g, $gm)
+    go version | Write-Error
     #
     $env:GO111MODULE = "on"
-    $gm = go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
-    $g = -join($g, $gm)
+    $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
+    Write-Error $g
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g
             Success = $false
         }
     }
-    $g2 = go build Test.go
-    $g = -join($g, $gm)
+    $g = go build Test.go
+    Write-Error $g
     return @{
         Message = $g
         Success = $LASTEXITCODE -eq 0
