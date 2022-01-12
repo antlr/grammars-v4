@@ -86,9 +86,9 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
-                <module>bcl</module>
+				<module>bcl</module>
 				<module>bcpl</module>
-                <module>bdf</module>
+				<module>bdf</module>
 				<module>bibcode</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
@@ -97,7 +97,7 @@
 				<module>calculator</module>
 				<module>callable</module>
 				<module>capnproto</module>
-                <module>cayenne</module>
+				<module>cayenne</module>
 				<module>clf</module>
 				<module>clojure</module>
 				<module>clu</module>
@@ -119,7 +119,7 @@
 				<module>dcm</module>
 				<module>dgol</module>
 				<module>dice</module>
-                <module>dif</module>
+				<module>dif</module>
 				<module>doiurl</module>
 				<module>dot</module>
 				<module>edif300</module>
@@ -128,7 +128,7 @@
 				<module>fasta</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
-                <module>flowmatic</module>
+				<module>flowmatic</module>
 				<module>focal</module>
 				<module>fol</module>
 				<module>fortran77</module>
@@ -156,7 +156,7 @@
 				<module>iri</module>
 				<module>iso8601</module>
 				<module>istc</module>
-                <module>itn</module>
+				<module>itn</module>
 				<module>janus</module>
 				<module>java</module>
 				<module>javadoc</module>
@@ -179,7 +179,7 @@
 				<module>lolcode</module>
 				<module>loop</module>
 				<module>lpc</module>
-                <module>lrc</module>
+				<module>lrc</module>
 				<module>ltl</module>
 				<module>lua</module>
 				<module>matlab</module>
@@ -230,7 +230,7 @@
 				<module>protobuf3</module>
 				<module>prov-n</module>
 				<module>python</module>
-                <module>qif</module>
+				<module>qif</module>
 				<module>quakemap</module>
 				<module>r</module>
 				<module>racket-bsl</module>
