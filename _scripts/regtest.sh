@@ -160,11 +160,11 @@ setupdeps()
     date
     echo "Setting up trgen and antlr jar."
     dotnet tool uninstall -g trgen
-    dotnet tool install -g trgen --version 0.13.5
+    dotnet tool install -g trgen --version 0.13.6
     dotnet tool uninstall -g trxml2
-    dotnet tool install -g trxml2 --version 0.13.5
+    dotnet tool install -g trxml2 --version 0.13.6
     dotnet tool uninstall -g trwdog
-    dotnet tool install -g trwdog --version 0.13.5
+    dotnet tool install -g trwdog --version 0.13.6
 	case "${unameOut}" in
 		Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.9.3/antlr4-4.9.3-complete.jar' -o /tmp/antlr-4.9.3-complete.jar;;
 		Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.9.3/antlr4-4.9.3-complete.jar' -o /tmp/antlr-4.9.3-complete.jar;;
