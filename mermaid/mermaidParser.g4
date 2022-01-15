@@ -23,37 +23,28 @@
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-grammar mermaid;
+parser grammar mermaidParser;
+options { tokenVocab = mermaidLexer; }
 
 mermaid: diagram* EOF;
 
-diagram: erdiagram;
+diagram: (erdiagram)+;
 
-erdiagram: 'erDiagram' (erentity | entityattributes)*;
+erdiagram: ER_DIAGRAM (erentity | entityattributes)*;
 
 erentity:
-	entityname relationship entityname ':' relationshiplabel;
+	entityname relationship entityname ER_COLON relationshiplabel;
 
-entityattributes: entityname '{' entityattribute* '}';
+entityattributes: entityname ER_LBRACE entityattribute* ER_RBRACE;
 
 entityattribute: entityattributetype entityattributename;
 
-entityattributetype: 'int' | 'string' | 'float';
+entityattributetype: ER_INTTYPE | ER_STRINGTYPE | ER_FLOATTYPE;
 
-entityattributename: NAME;
+entityattributename: ER_NAME;
 
-relationshiplabel:NAME | STRING;
+relationshiplabel:ER_NAME | ER_STRING;
 
-relationship: CARDINALITY LINETYPE CARDINALITY;
+relationship: ER_CARDINALITY ER_LINETYPE ER_CARDINALITY;
+entityname: ER_NAME;
 
-LINETYPE: '..' | '--';
-
-entityname: NAME;
-
-CARDINALITY: '|o' | 'o|' | '||' | '}o' | 'o{' | '}|' | '|{';
-
-STRING: '"' .*? '"';
-
-NAME: [a-zA-Z] [a-zA-Z0-9-]*;
-
-WS: [ \r\n\t]+ -> skip;

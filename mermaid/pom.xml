@@ -17,7 +17,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-						<include>mermaid.g4</include>
+						<include>mermaidLexer.g4</include>
+                        <include>mermaidParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
@@ -35,7 +36,7 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<verbose>false</verbose>
+					<verbose>true</verbose>
 					<showTree>true</showTree>
 					<entryPoint>mermaid</entryPoint>
 					<grammarName>mermaid</grammarName>
