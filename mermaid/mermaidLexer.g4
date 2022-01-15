@@ -25,7 +25,7 @@
 
 lexer grammar mermaidLexer;
 
-ER_DIAGRAM: 'erDiagram' -> pushMode (ER);
+ER_DIAGRAM: 'erDiagram' -> mode (ER);
 WS: [ \r\n\t]+ -> skip;
 
 mode ER;
@@ -40,4 +40,5 @@ ER_FLOATTYPE:'float';
 ER_STRINGTYPE:'string';
 ER_NAME: [a-zA-Z] [a-zA-Z0-9-]*;
 ER_WS: [ \r\n\t]+ -> skip;
+
 
