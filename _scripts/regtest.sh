@@ -18,6 +18,9 @@
 # List<string> do_not_do_list = ...;
 # idl iri molecule rfc1035 rfc1960 tcpheader unicode/graphemes abb 
 
+# Get full path of this script.
+full_path_script=$(realpath $0)
+full_path_templates=$(dirname $full_path_script)/templates
 target="$1"
 if [[ "$1" == "" ]]
 then
@@ -185,9 +188,9 @@ part1()
     echo "Generating drivers."
     if [[ "$invert" == "" ]]
     then
-        bad=`trgen --skip-pattern "$skip_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.3-complete.jar`
+        bad=`trgen --skip-pattern "$skip_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr-4.9.3-complete.jar`
     else
-        bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.3-complete.jar`
+        bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr-4.9.3-complete.jar`
     fi
     for i in $bad; do failed=`add "$failed" "$i"`; done
     date
