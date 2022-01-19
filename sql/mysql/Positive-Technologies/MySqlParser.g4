@@ -1848,8 +1848,7 @@ flushOption
         | USER_RESOURCES | TABLES (WITH READ LOCK)?
        )                                                            #simpleFlushOption
     | RELAY LOGS channelOption?                                     #channelFlushOption
-    | TABLES tables? flushTableOption?                              #tableFlushOption
-    | TABLE tables? flushTableOption?                               #tableFlushOption
+    | (TABLE | TABLES) tables? flushTableOption?                    #tableFlushOption
     ;
 
 flushTableOption
