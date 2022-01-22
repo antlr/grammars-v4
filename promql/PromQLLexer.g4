@@ -32,7 +32,15 @@ lexer grammar PromQLLexer;
 // label and metric names that are not.
 options { caseInsensitive=true; }
 
-NUMBER: [0-9]+ ('.' [0-9]+)?;
+fragment NUMERAL: [0-9]+ ('.' [0-9]+)?;
+
+fragment SCIENTIFIC_NUMBER
+   : NUMERAL ('e' ('-' | '+')? NUMERAL)?
+   ;
+
+NUMBER
+    : NUMERAL
+    | SCIENTIFIC_NUMBER;
 
 STRING
     : '\'' (~('\'' | '\\') | '\\' .)* '\''
