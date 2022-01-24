@@ -29,7 +29,6 @@ python/tiny-python
 r
 rego
 rexx
-sql/postgresql
 stringtemplate
 swift-fin
 swift/swift2
