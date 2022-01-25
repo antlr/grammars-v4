@@ -35,17 +35,17 @@ lexer grammar PostgreSQLLexer;
 
 
 
-options { language = CSharp; }
+options {
+superClass = PostgreSQLLexerBase;
+}
+
 @ header
 {
-using System.Collections.Generic;
-using System.Diagnostics;
 }
 @ members
 {
 /* This field stores the tags which are used to detect the end of a dollar-quoted string literal.
  */
-private readonly Stack<String> _tags = new Stack<String>();
 }
 //
 
@@ -179,16 +179,15 @@ PARAM
 
 Operator
    : ((OperatorCharacter | ('+' | '-'
-   {InputStream.LA(1) != '-'}?)+ (OperatorCharacter | '/'
-   {InputStream.LA(1) != '*'}?) | '/'
-   {InputStream.LA(1) != '*'}?)+ | // special handling for the single-character operators + and -
+   {checkLA('-')}?)+ (OperatorCharacter | '/'
+   {checkLA('*')}?) | '/'
+   {checkLA('*')}?)+ | // special handling for the single-character operators + and -
    [+-])
    //TODO somehow rewrite this part without using Actions
 
    {
-		    if(Text=="<<") Type = LESS_LESS;
-		    if(Text==">>") Type = GREATER_GREATER;
-		}
+    HandleLessLessGreaterGreater();
+   }
    ;
 /* This rule handles operators which end with + or -, and sets the token type to Operator. It is comprised of four
  * parts, in order:
@@ -204,9 +203,9 @@ Operator
 
 OperatorEndingWithPlusMinus
    : (OperatorCharacterNotAllowPlusMinusAtEnd | '-'
-   {InputStream.LA(1) != '-'}? | '/'
-   {InputStream.LA(1) != '*'}?)* OperatorCharacterAllowPlusMinusAtEnd Operator? ('+' | '-'
-   {InputStream.LA(1) != '-'}?)+ -> type (Operator)
+   {checkLA('-')}? | '/'
+   {checkLA('*')}?)* OperatorCharacterAllowPlusMinusAtEnd Operator? ('+' | '-'
+   {checkLA('-')}?)+ -> type (Operator)
    ;
    // Each of the following fragment rules omits the +, -, and / characters, which must always be handled in a special way
 
@@ -2308,10 +2307,13 @@ fragment IdentifierStartChar
    [\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]
    | // these are the letters above 0xFF which only need a single UTF-16 code unit
    [\u0100-\uD7FF\uE000-\uFFFF]
-   {Char.IsLetter((char)InputStream.LA(-1))}?
+   {charIsLetter()}?
    | // letters which require multiple UTF-16 code units
    [\uD800-\uDBFF] [\uDC00-\uDFFF]
-   {Char.IsLetter(Char.ConvertFromUtf32(Char.ConvertToUtf32((char)InputStream.LA(-2), (char)InputStream.LA(-1))).Substring(0)[0])}?
+   {
+    CheckIfUtf32Letter()
+   }?
+
    ;
 
 fragment IdentifierChar
@@ -2420,7 +2422,7 @@ UnterminatedUnicodeEscapeStringConstant
 
 BeginDollarStringConstant
    : '$' Tag? '$'
-   {_tags.Push(this.Text);} -> pushMode (DollarQuotedStringMode)
+   {pushTag();} -> pushMode (DollarQuotedStringMode)
    ;
 /* "The tag, if any, of a dollar-quoted string follows the same rules as an
  * unquoted identifier, except that it cannot contain a dollar sign."
@@ -2471,7 +2473,7 @@ Integral
 
 NumericFail
    : Digits '..'
-   {InputStream.Seek(InputStream.Index-2); Type = Integral;}
+   {HandleNumericFail();}
    ;
 
 Numeric
@@ -2529,8 +2531,8 @@ UnterminatedBlockComment
    // Optional assertion to make sure this rule is working as intended
 
    {
-		    Debug.Assert( InputStream.LA(1) == -1 /*EOF*/);
-		}
+            UnterminatedBlockCommentDebugAssert();
+   }
    ;
    //
 
@@ -2642,7 +2644,7 @@ DollarText
 
 EndDollarStringConstant
    : ('$' Tag? '$')
-   {this.Text.Equals(_tags.Peek())}?
-   {_tags.Pop();} -> popMode
+   {isTag()}?
+   {popTag();} -> popMode
    ;
 
