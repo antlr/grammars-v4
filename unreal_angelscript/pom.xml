@@ -18,6 +18,7 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
+					   <include>UnrealAngelscriptLexer.g4</include>
 					   <include>UnrealAngelscriptParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
@@ -39,7 +40,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>script</entryPoint>
-					<grammarName>UnrealAngelscriptParser</grammarName>
+					<grammarName>UnrealAngelscript</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
