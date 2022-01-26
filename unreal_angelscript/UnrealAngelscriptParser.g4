@@ -61,6 +61,8 @@ asGeneric:
 simpleTypeSpecifierList:
 	declSpecifierSeq (Comma declSpecifierSeq)*;
 
+booleanLiteral: False_ | True_;
+
 /*Expressions*/
 
 primaryExpression:
@@ -140,7 +142,7 @@ unaryOperator: Or | Star | And | Plus | Tilde | Minus | Not;
 
 newPlacement: LeftParen expressionList RightParen;
 
-newInitializer:
+newInitializer_:
 	LeftParen expressionList? RightParen
 	| bracedInitList;
 
@@ -282,7 +284,7 @@ declaration:
 	| blockDeclaration
 	| functionDefinition
 	| namespaceDefinition
-	| emptyDeclaration;
+	| emptyDeclaration_;
 
 blockDeclaration:
 	simpleDeclaration
@@ -295,7 +297,7 @@ aliasDeclaration: Identifier Assign theTypeId Semi;
 simpleDeclaration:
 	declSpecifierSeq? (initDeclaratorList | assignmentExpression)? Semi;
 
-emptyDeclaration: Semi;
+emptyDeclaration_: Semi;
 
 declSpecifier:
 	typeSpecifier
@@ -489,7 +491,7 @@ memberdeclaration:
 	propertyDefinition
 	| functionDefinition
 	| aliasDeclaration
-	| emptyDeclaration;
+	| emptyDeclaration_;
 
 propertyDefinition:
 	uproperty? accessSpecifier? Default? declSpecifierSeq? (memberDeclaratorList | assignmentExpression)? Semi;
@@ -584,6 +586,6 @@ literal:
 	| CharacterLiteral
 	| FloatingLiteral
 	| StringLiteral
-	| BooleanLiteral
+	| booleanLiteral
 	| UserDefinedLiteral
 	| Nullptr;

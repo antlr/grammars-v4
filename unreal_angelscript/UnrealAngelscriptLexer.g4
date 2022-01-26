@@ -24,8 +24,6 @@ StringLiteral:
 		| Escapesequence
 	)* '"';
 
-BooleanLiteral: False | True;
-
 UserDefinedLiteral:
 	UserDefinedIntegerLiteral
 	| UserDefinedFloatingLiteral
@@ -102,7 +100,7 @@ Enum: 'enum';
 
 Export: 'export';
 
-False: 'false';
+False_: 'false';
 
 Final: 'final';
 
@@ -136,7 +134,7 @@ Switch: 'switch';
 
 This: 'this';
 
-True: 'true';
+True_: 'true';
 
 Virtual: 'virtual';
 
