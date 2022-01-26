@@ -1,7 +1,7 @@
 # Template generated code from trgen <version>
 function Build-Grammar {
 <tool_grammar_files:{x |
-    $g = antlr <x> -Dlanguage=Python3 <antlr_tool_args:{y | <y> } >
+    $g = antlr <x> -Dlanguage=PHP <antlr_tool_args:{y | <y> } >
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g

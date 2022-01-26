@@ -8,9 +8,9 @@ SOURCES = $(GENERATED) Test.go
 default: classes
 classes: setup $(SOURCES) program
 setup:
-	export | grep GO
-	go env
-	go version
+	-export | grep GO
+	-go env
+	-go version
 	export GO111MODULE=on; go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
 program:
 	export GO111MODULE=on; go build Test.go
@@ -22,6 +22,6 @@ run:
 test: FORCE
 	bash test.sh
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
-	java -jar $(JAR) -encoding <antlr_encoding> -Dlanguage=Go <antlr_tool_args:{y | <y> } > $\<
+	java -jar $(JAR) -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } > $\<
 } >
 FORCE: ;

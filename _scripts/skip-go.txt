@@ -15,6 +15,7 @@ csharp
 edif300
 fortran77
 gdscript
+golang
 guitartab
 haskell
 html
