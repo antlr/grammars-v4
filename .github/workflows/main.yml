@@ -37,7 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [CSharp, Java, JavaScript, Go, Python3, Dart, PHP]
+        language: [CSharp, Java, JavaScript, Go, Python3, Dart ]
     steps:
     - name: Checkout
       uses: actions/checkout@v2.4.0
@@ -108,3 +108,18 @@ jobs:
       env:
         CC:   gcc-10
         CXX:  g++-10
+
+  build-php:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.4.0
+    - Setup PHP
+      uses: nanasess/setup-php@master
+      with:
+        php-version: '7.4'
+    - name: Test PHP target
+      run: |
+        bash _scripts/regtest.sh PHP
