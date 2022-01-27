@@ -27,6 +27,10 @@ function Get-GrammarSkipList {
 		$lines = Get-Content -Path _scripts\skip-dart.txt
 		return $lines
         }
+        "PHP" {
+		$lines = Get-Content -Path _scripts\skip-php.txt
+		return $lines
+        }
         Default {
             #    Write-Error "Unknown target $Target"
             #    exit 1

@@ -53,6 +53,10 @@
 ./JavaScript/package.json
 ./JavaScript/test.sh
 ./JavaScript/tester.psm1
+./PHP/makefile
+./PHP/Test.php
+./PHP/test.sh
+./PHP/tester.psm1
 ./Python3/CaseChangingStream.py
 ./Python3/makefile
 ./Python3/Program.py

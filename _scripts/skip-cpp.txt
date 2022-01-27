@@ -149,7 +149,6 @@ pl0
 plucid
 ply
 pmmn
-pom.xml
 postalcode
 powerbuilder
 powerbuilderdw
