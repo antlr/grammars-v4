@@ -116,7 +116,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2.4.0
-    - Setup PHP
+    - name: Setup PHP
       uses: nanasess/setup-php@master
       with:
         php-version: '7.4'
