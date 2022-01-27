@@ -21,7 +21,6 @@ haskell
 html
 icalendar
 informix
-ipc
 iri
 java/java
 java/java8
