@@ -14,7 +14,6 @@
 	<modules>
 		<module>python2</module>
 		<module>python3</module>
-		<module>python3-js</module>
 		<module>python3-py</module>
 		<module>python3-ts</module>
 		<module>python3-without-actions</module>

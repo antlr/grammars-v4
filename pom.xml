@@ -52,7 +52,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.1</version>
+					<version>3.9.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -86,6 +86,7 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
+                <module>bcl</module>
 				<module>bcpl</module>
                 <module>bdf</module>
 				<module>bibcode</module>
@@ -96,6 +97,7 @@
 				<module>calculator</module>
 				<module>callable</module>
 				<module>capnproto</module>
+                <module>cayenne</module>
 				<module>clf</module>
 				<module>clojure</module>
 				<module>clu</module>
@@ -177,6 +179,7 @@
 				<module>lolcode</module>
 				<module>loop</module>
 				<module>lpc</module>
+                <module>lrc</module>
 				<module>ltl</module>
 				<module>lua</module>
 				<module>matlab</module>
@@ -289,6 +292,7 @@
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
+				<module>unreal_angelscript</module>
 				<module>upnp</module>
 				<module>url</module>
 				<module>useragent</module>
