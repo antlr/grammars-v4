@@ -158,7 +158,8 @@ CREATE TABLE keywords (
     iso VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
     usa VARCHAR(100),
     jis VARCHAR(100),
-    internal INT
+    internal INT,
+    instant BIT
 );
 
 create table if not exists tbl_signed_unsigned(
