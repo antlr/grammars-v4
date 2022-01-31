@@ -68,10 +68,10 @@ concatenation
    ;
 
 repetition
-   : repeat? element
+   : repeat_? element
    ;
 
-repeat
+repeat_
    : INT | ( INT? '*' INT? )
    ;
 

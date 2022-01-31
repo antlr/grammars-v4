@@ -8,14 +8,14 @@
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>grammarsv4</artifactId>
 		<version>1.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<build>
+		<sourceDirectory>Java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.3.0</version>
 				<executions>
 					<execution>
 						<id>add-source</id>
@@ -37,7 +37,10 @@
 				<version>${antlr.version}</version>
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
-					<grammars>RustParser.g4</grammars>
+					<includes>
+					   <include>RustLexer.g4</include>
+					   <include>RustParser.g4</include>
+					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
 				</configuration>
@@ -58,7 +61,6 @@
 					<showTree>false</showTree>
 					<entryPoint>crate</entryPoint>
 					<grammarName>Rust</grammarName>
-					<caseInsensitive>true</caseInsensitive>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

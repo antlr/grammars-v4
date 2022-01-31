@@ -105,7 +105,7 @@ tokens { INDENT, DEDENT }
   std::unique_ptr<antlr4::CommonToken> commonToken(size_t type, const std::string& text) {
     int stop = getCharIndex() - 1;
     int start = text.empty() ? stop : stop - text.size() + 1;
-    return _factory->create({ this, _input }, type, text, DEFAULT_TOKEN_CHANNEL, start, stop, m_pLastToken->getLine(), m_pLastToken->getCharPositionInLine());
+    return _factory->create({ this, _input }, type, text, DEFAULT_TOKEN_CHANNEL, start, stop, m_pLastToken ? m_pLastToken->getLine() : 0, m_pLastToken ? m_pLastToken->getCharPositionInLine() : 0);
   }
 
   std::unique_ptr<antlr4::CommonToken> cloneToken(const std::unique_ptr<antlr4::Token>& source) {

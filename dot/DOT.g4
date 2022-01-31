@@ -32,7 +32,7 @@
 grammar DOT;
 
 graph
-   : STRICT? ( GRAPH | DIGRAPH ) id? '{' stmt_list '}'
+   : STRICT? ( GRAPH | DIGRAPH ) id_? '{' stmt_list '}'
    ;
 
 stmt_list
@@ -40,7 +40,7 @@ stmt_list
    ;
 
 stmt
-   : node_stmt | edge_stmt | attr_stmt | id '=' id | subgraph
+   : node_stmt | edge_stmt | attr_stmt | id_ '=' id_ | subgraph
    ;
 
 attr_stmt
@@ -52,7 +52,7 @@ attr_list
    ;
 
 a_list
-   : ( id ( '=' id )? ','? )+
+   : ( id_ ( '=' id_ )? ','? )+
    ;
 
 edge_stmt
@@ -72,18 +72,18 @@ node_stmt
    ;
 
 node_id
-   : id port?
+   : id_ port?
    ;
 
 port
-   : ':' id ( ':' id )?
+   : ':' id_ ( ':' id_ )?
    ;
 
 subgraph
-   : ( SUBGRAPH id? )? '{' stmt_list '}'
+   : ( SUBGRAPH id_? )? '{' stmt_list '}'
    ;
 
-id
+id_
    : ID | STRING | HTML_STRING | NUMBER
    ;
 

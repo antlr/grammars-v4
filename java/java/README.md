@@ -13,12 +13,15 @@ much more faster than original grammar without left recursion expressions.
 
 * Java 7
 * Java 8
+* Java 11
+* Java 17
 
 ## Main contributors
 
 * Terence Parr, 2013
 * Sam Harwell, 2013
 * Ivan Kochurkin ([Positive Technologies](https://github.com/PositiveTechnologies)), 2017
+* Michał Lorek, 2021
 
 ## Tests
 

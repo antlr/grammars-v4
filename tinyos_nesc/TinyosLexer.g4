@@ -1,6 +1,6 @@
 /*
     This file is the grammar for the nesC of the TinyOS.
-    
+
     This grammar is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -19,9 +19,8 @@
 
 lexer grammar TinyosLexer;
 
-//Keywords
-@lexer::members {
-    public static final int WHITESPACE = 1;
+channels{
+    WHITESPACE
 }
 
 ABSTRACT:           'abstract';
@@ -34,7 +33,7 @@ CALL:               'call';
 CASE:               'case';
 CHAR:               'char';
 COFIGURATION:       'configuration';
-COMMAND:            'command'; 
+COMMAND:            'command';
 COMPONENT:          'component';
 COMPONENTS:         'components';
 CONTINUE:           'continue';
@@ -42,7 +41,7 @@ DO:                 'do';
 DOUBLE:             'double';
 DEFINED:            'defined';
 DEFINE:             'define';
-DEFAULT:            'default'; 
+DEFAULT:            'default';
 ELSE:               'else';
 ENUM:               'enum';
 EVENT:              'event';
@@ -56,7 +55,7 @@ FOR:                'for';
 GENERIC:            'generic';
 IF:                 'if';
 IMPLEMENTATION:     'implementation';
-INCLUDE:            'include';  
+INCLUDE:            'include';
 INCLUDES:           'includes';
 INTERFACE:          'interface';
 LOG:                'log';
@@ -132,7 +131,7 @@ INT
 ;
 
 FLOAT
-: [0-9]+ '.' [0-9]* 
+: [0-9]+ '.' [0-9]*
 | '.' [0-9]+
 ;
 
@@ -153,7 +152,7 @@ SPACE
 ;
 
 OTHER
-: . 
+: .
 ;
 
 HEX

@@ -48,7 +48,7 @@ procedureName
    ;
 
 functionDefinition
-   : GLOBAL? DEFFCT type functionName formalParameters NEWLINE routineBody ENDFCT
+   : GLOBAL? DEFFCT type_ functionName formalParameters NEWLINE routineBody ENDFCT
    ;
 
 functionName
@@ -77,7 +77,7 @@ typeDeclaration
    ;
 
 structureDefinition
-   : GLOBAL? STRUC typeName type variableName variableListRest (',' type variableName variableListRest)*
+   : GLOBAL? STRUC typeName type_ variableName variableListRest (',' type_ variableName variableListRest)*
    ;
 
 enumDefinition
@@ -89,7 +89,7 @@ enumValue
    ;
 
 variableDeclaration
-   : DECL? (type variableName variableListRest | signalDeclaration)
+   : DECL? (type_ variableName variableListRest | signalDeclaration)
    ;
 
 signalDeclaration
@@ -97,7 +97,7 @@ signalDeclaration
    ;
 
 variableDeclarationInDataList
-   : DECL? GLOBAL? CONST? (type variableName (variableListRest | variableInitialisation) | signalDeclaration)
+   : DECL? GLOBAL? CONST? (type_ variableName (variableListRest | variableInitialisation) | signalDeclaration)
    ;
 
 variableListRest
@@ -138,7 +138,7 @@ routineDataSection
 
 forwardDeclaration
    : EXT procedureName formalParametersWithType
-   | EXTFCT type functionName formalParametersWithType
+   | EXTFCT type_ functionName formalParametersWithType
    ;
 
 formalParametersWithType
@@ -146,7 +146,7 @@ formalParametersWithType
    ;
 
 parameterWithType
-   : type (parameterCallType)?
+   : type_ (parameterCallType)?
    ;
 
 parameterCallType
@@ -154,7 +154,7 @@ parameterCallType
    ;
 
 importStatement
-   : IMPORT type variableName IS '/R1/' moduleName '..' variableName
+   : IMPORT type_ variableName IS '/R1/' moduleName '..' variableName
    ;
 
 variableName
@@ -290,7 +290,7 @@ parExpression
    : '(' assignmentExpression ')'
    ;
 
-type
+type_
    : primitiveType ('[' (INTLITERAL)? ']')?
    | typeName ('[' (INTLITERAL)? ']')?
    ;

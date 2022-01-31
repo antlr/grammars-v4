@@ -1,8 +1,7 @@
 import antlr4 from 'antlr4';
-import JavaScriptLexer from './JavaScriptLexer.js';
 import JavaScriptParser from './JavaScriptParser.js';
 
-export default class JavaScriptLexerBase extends antlr4.Parser {
+export default class JavaScriptParserBase extends antlr4.Parser {
 
     constructor(input) {
         super(input);
@@ -19,7 +18,7 @@ export default class JavaScriptLexerBase extends antlr4.Parser {
     // Short form for next(String str)
     n(str)
     {
-        return next(str);
+        return this.next(str);
     }
 
     // Whether the next token value equals to @param str
@@ -36,7 +35,7 @@ export default class JavaScriptLexerBase extends antlr4.Parser {
         const nextTokenType = this._input.LT(1).type;
         return (
                 nextTokenType !== JavaScriptParser.OpenBrace &&
-                nextTokenType !== JavaScriptParser.Function
+                nextTokenType !== JavaScriptParser.Function_
                );
     }
 

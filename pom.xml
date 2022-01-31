@@ -8,9 +8,10 @@
 	<name>ANTLR4 grammars</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<target.jvm>1.7</target.jvm>
-		<antlr.version>4.9.1</antlr.version>
-		<antlr4test-maven-plugin.version>1.17</antlr4test-maven-plugin.version>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<antlr.version>4.9.3</antlr.version>
+		<antlr4test-maven-plugin.version>1.19</antlr4test-maven-plugin.version>
 		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
@@ -46,17 +47,15 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>${target.jvm}</source>
-					<target>${target.jvm}</target>
-				</configuration>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.9.0</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<profiles>
 		<profile>
@@ -65,16 +64,21 @@
 			</activation>
 			<id>grammarv4</id>
 			<modules>
-                <module>abb</module>
+				<module>abb</module>
 				<module>abnf</module>
 				<module>acme</module>
 				<module>agc</module>
+				<module>alef</module>
 				<module>algol60</module>
+				<module>alloy</module>
 				<module>alpaca</module>
+				<module>angelscript</module>
 				<module>antlr</module>
 				<module>apex</module>
 				<module>apt</module>
+                <module>argus</module>
 				<module>arithmetic</module>
+				<module>asl</module>
 				<module>asm</module>
 				<module>asn</module>
 				<!-- AspectJ requires the Java grammar which is not on the AspectJ tree -->
@@ -82,15 +86,19 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
+                <module>bcl</module>
+				<module>bcpl</module>
+                <module>bdf</module>
 				<module>bibcode</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
 				<module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
+				<module>callable</module>
 				<module>capnproto</module>
+                <module>cayenne</module>
 				<module>clf</module>
-				<module>clif</module>
 				<module>clojure</module>
 				<module>clu</module>
 				<module>cmake</module>
@@ -104,12 +112,14 @@
 				<module>csharp</module>
 				<module>css3</module>
 				<module>csv</module>
+				<module>ctl</module>
 				<module>cto</module>
 				<module>dart2</module>
 				<module>databank</module>
 				<module>dcm</module>
 				<module>dgol</module>
 				<module>dice</module>
+                <module>dif</module>
 				<module>doiurl</module>
 				<module>dot</module>
 				<module>edif300</module>
@@ -118,13 +128,16 @@
 				<module>fasta</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
+                <module>flowmatic</module>
 				<module>focal</module>
 				<module>fol</module>
 				<module>fortran77</module>
 				<module>fusion-tables</module>
+				<module>gdscript</module>
 				<module>gedcom</module>
 				<module>gff3</module>
 				<module>gml</module>
+				<module>golang</module>
 				<module>graphql</module>
 				<module>graphstream-dgs</module>
 				<module>gtin</module>
@@ -143,6 +156,7 @@
 				<module>iri</module>
 				<module>iso8601</module>
 				<module>istc</module>
+                <module>itn</module>
 				<module>janus</module>
 				<module>java</module>
 				<module>javadoc</module>
@@ -151,16 +165,22 @@
 				<module>jpa</module>
 				<module>json</module>
 				<module>json5</module>
+				<module>karel</module>
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kuka</module>
 				<module>lambda</module>
+				<module>lark</module>
 				<module>lcc</module>
 				<module>less</module>
+				<module>limbo</module>
+				<module>lisa</module>
 				<module>logo</module>
 				<module>lolcode</module>
 				<module>loop</module>
 				<module>lpc</module>
+                <module>lrc</module>
+				<module>ltl</module>
 				<module>lua</module>
 				<module>matlab</module>
 				<module>mckeeman-form</module>
@@ -174,6 +194,7 @@
 				<module>molecule</module>
 				<module>moo</module>
 				<module>morsecode</module>
+				<module>powerquery</module>
 				<module>mps</module>
 				<module>muddb</module>
 				<module>mumath</module>
@@ -184,19 +205,20 @@
 				<module>oberon</module>
 				<!-- <module>objc</module> -->
 				<module>oncrpc</module>
+				<module>orwell</module>
 				<module>p</module>
 				<module>parkingsign</module>
 				<module>pascal</module>
 				<module>pcre</module>
 				<module>pddl</module>
 				<module>pdn</module>
-				<module>pdp7</module>
 				<module>peoplecode</module>
 				<module>pgn</module>
 				<module>php</module>
 				<module>pii</module>
 				<!-- <module>pike</module> -->
 				<module>pl0</module>
+				<module>plucid</module>
 				<module>ply</module>
 				<module>pmmn</module>
 				<module>postalcode</module>
@@ -208,10 +230,14 @@
 				<module>protobuf3</module>
 				<module>prov-n</module>
 				<module>python</module>
+                <module>qif</module>
 				<module>quakemap</module>
 				<module>r</module>
+				<module>racket-bsl</module>
+				<module>racket-isl</module>
 				<module>rcs</module>
 				<module>redcode</module>
+				<module>refal</module>
 				<module>rego</module>
 				<module>restructuredtext</module>
 				<module>rexx</module>
@@ -237,6 +263,7 @@
 				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
+				<module>snowball</module>
 				<module>solidity</module>
 				<module>sparql</module>
 				<module>sql</module>
@@ -254,6 +281,7 @@
 				<module>tinybasic</module>
 				<module>tinyc</module>
 				<module>tinymud</module>
+				<module>tl</module>
 				<module>tnsnames</module>
 				<module>tnt</module>
 				<module>toml</module>
@@ -264,12 +292,14 @@
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
+				<module>unreal_angelscript</module>
 				<module>upnp</module>
 				<module>url</module>
 				<module>useragent</module>
 				<module>v</module>
 				<module>vb6</module>
 				<module>vba</module>
+				<module>velocity</module>
 				<module>verilog</module>
 				<module>vhdl</module>
 				<module>vmf</module>
@@ -335,7 +365,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.2.0	</version>
+						<version>3.3.1	</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -351,7 +381,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
+						<version>3.0.1</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>

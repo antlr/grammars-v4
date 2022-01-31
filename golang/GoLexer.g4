@@ -3,6 +3,7 @@
  Copyright (c) 2017 Sasa Coh, Michał Błotniak
  Copyright (c) 2019 Ivan Kochurkin, kvanttt@gmail.com, Positive Technologies
  Copyright (c) 2019 Dmitry Rassadin, flipparassa@gmail.com, Positive Technologies
+ Copyright (c) 2021 Martin Mirchev, mirchevmartin2203@gmail.com
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -123,19 +124,44 @@ RECEIVE                : '<-';
 
 // Number literals
 
-DECIMAL_LIT            : [1-9] [0-9]*;
-OCTAL_LIT              : '0' OCTAL_DIGIT*;
-HEX_LIT                : '0' [xX] HEX_DIGIT+;
+DECIMAL_LIT            : '0' | [1-9] ('_'? [0-9])*;
+BINARY_LIT             : '0' [bB] ('_'? BIN_DIGIT)+;
+OCTAL_LIT              : '0' [oO]? ('_'? OCTAL_DIGIT)+;
+HEX_LIT                : '0' [xX]  ('_'? HEX_DIGIT)+;
 
-FLOAT_LIT              : DECIMALS ('.' DECIMALS? EXPONENT? | EXPONENT)
+
+FLOAT_LIT : DECIMAL_FLOAT_LIT | HEX_FLOAT_LIT;
+
+DECIMAL_FLOAT_LIT      : DECIMALS ('.' DECIMALS? EXPONENT? | EXPONENT)
                        | '.' DECIMALS EXPONENT?
                        ;
 
-IMAGINARY_LIT          : (DECIMALS | FLOAT_LIT) 'i';
+HEX_FLOAT_LIT          : '0' [xX] HEX_MANTISSA HEX_EXPONENT
+                       ;
+
+fragment HEX_MANTISSA  : ('_'? HEX_DIGIT)+ ('.' ( '_'? HEX_DIGIT )*)?
+                       | '.' HEX_DIGIT ('_'? HEX_DIGIT)*;
+
+fragment HEX_EXPONENT  : [pP] [+-] DECIMALS;
+
+
+IMAGINARY_LIT          : (DECIMAL_LIT | BINARY_LIT |  OCTAL_LIT | HEX_LIT | FLOAT_LIT) 'i';
 
 // Rune literals
 
-RUNE_LIT               : '\'' (~[\n\\] | ESCAPED_VALUE) '\'';
+RUNE_LIT               : '\'' (UNICODE_VALUE | BYTE_VALUE) '\'';//: '\'' (~[\n\\] | ESCAPED_VALUE) '\'';
+
+
+
+BYTE_VALUE : OCTAL_BYTE_VALUE | HEX_BYTE_VALUE;
+
+OCTAL_BYTE_VALUE: '\\' OCTAL_DIGIT OCTAL_DIGIT OCTAL_DIGIT;
+
+HEX_BYTE_VALUE: '\\' 'x'  HEX_DIGIT HEX_DIGIT;
+
+LITTLE_U_VALUE: '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
+
+BIG_U_VALUE: '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
 
 // String literals
 
@@ -149,6 +175,8 @@ COMMENT                : '/*' .*? '*/'      -> channel(HIDDEN);
 TERMINATOR             : [\r\n]+            -> channel(HIDDEN);
 LINE_COMMENT           : '//' ~[\r\n]*      -> channel(HIDDEN);
 
+fragment UNICODE_VALUE: ~[\r\n'] | LITTLE_U_VALUE | BIG_U_VALUE | ESCAPED_VALUE;
+
 // Fragments
 
 fragment ESCAPED_VALUE
@@ -160,7 +188,7 @@ fragment ESCAPED_VALUE
     ;
 
 fragment DECIMALS
-    : [0-9]+
+    : [0-9] ('_'? [0-9])*
     ;
 
 fragment OCTAL_DIGIT
@@ -169,6 +197,10 @@ fragment OCTAL_DIGIT
 
 fragment HEX_DIGIT
     : [0-9a-fA-F]
+    ;
+
+fragment BIN_DIGIT
+    : [01]
     ;
 
 fragment EXPONENT
@@ -181,7 +213,9 @@ fragment LETTER
     ;
 
 fragment UNICODE_DIGIT
-    : [\u0030-\u0039]
+    : [\p{Nd}]
+
+    /*  [\u0030-\u0039]
     | [\u0660-\u0669]
     | [\u06F0-\u06F9]
     | [\u0966-\u096F]
@@ -200,11 +234,12 @@ fragment UNICODE_DIGIT
     | [\u1369-\u1371]
     | [\u17E0-\u17E9]
     | [\u1810-\u1819]
-    | [\uFF10-\uFF19]
+    | [\uFF10-\uFF19]*/
     ;
 
 fragment UNICODE_LETTER
-    : [\u0041-\u005A]
+    : [\p{L}]
+    /*  [\u0041-\u005A]
     | [\u0061-\u007A]
     | [\u00AA]
     | [\u00B5]
@@ -465,4 +500,5 @@ fragment UNICODE_LETTER
     | [\uFFCA-\uFFCF]
     | [\uFFD2-\uFFD7]
     | [\uFFDA-\uFFDC]
+    */
     ;

@@ -44,29 +44,16 @@ repositories {
 }
 
 dependencies {
-  compile group:'org.mockito', name:'mockito-all', version:'1.9.5'
-  compile group:'org.testng', name:'testng', version:'6.1.1'
-  compile group:'antlr', name:'antlr-complete', version:'4.2.2'
+  compile group:'antlr', name:'antlr-complete', version:'4.9.1'
 
-
+  testCompile 'junit:junit:4.12'
+  testImplementation "com.google.truth:truth:1.1.2"
 }
 
-sourceSets {
-  main {
-    java {
-      srcDir file(relativePath('src'))
-    }
-
-  }
-}
-
-test {
-  useTestNG {
-  }
-}
+sourceSets.main.java.srcDirs = ['src']
+sourceSets.test.java.srcDirs = ['testsrc']
 
 task createClasses() {
-
   def jarFile = project.configurations.compile.find { it.name.contains("antlr-complete") }
   def dir = project.file("./src/main/java")
   if (dir.exists())
@@ -84,7 +71,4 @@ task createClasses() {
   if (result.exitValue != 0) {
     throw new GradleScriptException("Couldn't compile ANTLR", new GradleScriptException(err.toString(), null));
   }
-
-
 }
-

@@ -12,7 +12,7 @@ program
 statement
     : block 
     | variableStatement
-    | emptyStatement
+    | emptyStatement_
     | classDeclaration
     | expressionStatement
     | ifStatement
@@ -45,7 +45,7 @@ variable
     : Identifier ('=' expression)?
     ;
 
-emptyStatement
+emptyStatement_
     : SemiColon
     ;
 
@@ -117,11 +117,11 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Function Identifier ('(' functionParameters? ')')? block
+    : Function_ Identifier ('(' functionParameters? ')')? block
     ;
 
 anoymousFunctionDeclaration
-    : Function ('(' functionParameters? ')')? block
+    : Function_ ('(' functionParameters? ')')? block
     ;
 
 classDeclaration
@@ -295,7 +295,7 @@ keyword
     | Switch
     | While
     | Debugger
-    | Function
+    | Function_
     | This
     | With
     | Default

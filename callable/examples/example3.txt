@@ -1,0 +1,3 @@
+VAR-SET("n", INPUT())
+WHILE-EQ(VAR-GET("n"), "1", PRINT("1"))
+PRINT("0")

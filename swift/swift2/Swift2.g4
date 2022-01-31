@@ -269,17 +269,17 @@ requirement_list : requirement | requirement ',' requirement_list  ;
 requirement : conformance_requirement | same_type_requirement  ;
 
 conformance_requirement : type_identifier ':' type_identifier | type_identifier ':' protocol_composition_type  ;
-same_type_requirement : type_identifier same_type_equals type  ;
+same_type_requirement : type_identifier same_type_equals type_  ;
 
 // GRAMMAR OF A GENERIC ARGUMENT CLAUSE
 
 generic_argument_clause : '<' generic_argument_list '>'  ;
 generic_argument_list : generic_argument (',' generic_argument)* ;
-generic_argument : type ;
+generic_argument : type_ ;
 
 // context-sensitive. Allow < as pre, post, or binary op
-//lt : {_input.LT(1).getText().equals("<")}? operator ;
-//gt : {_input.LT(1).getText().equals(">")}? operator ;
+//lt : {_input.LT(1).getText().equals("<")}? operator_ ;
+//gt : {_input.LT(1).getText().equals(">")}? operator_ ;
 // Declarations
 
 // GRAMMAR OF A DECLARATION
@@ -317,7 +317,7 @@ code_block : '{' statements? '}' ;
 import_declaration : attributes? 'import' import_kind? import_path  ;
 import_kind : 'typealias' | 'struct' | 'class' | 'enum' | 'protocol' | 'var' | 'func'  ;
 import_path : import_path_identifier | import_path_identifier '.' import_path  ;
-import_path_identifier : identifier | operator  ;
+import_path_identifier : identifier | operator_  ;
 
 // GRAMMAR OF A CONSTANT DECLARATION
 
@@ -363,7 +363,7 @@ didSet_clause : attributes? 'didSet' setter_name? code_block  ;
 typealias_declaration : typealias_head typealias_assignment  ;
 typealias_head : attributes? access_level_modifier? 'typealias' typealias_name  ;
 typealias_name : identifier  ;
-typealias_assignment : assignment_operator type  ;
+typealias_assignment : assignment_operator type_  ;
 
 // GRAMMAR OF A FUNCTION DECLARATION
 // NOTE: Swift Grammar Spec indicates that a function_body is optional
@@ -372,12 +372,12 @@ function_declaration
    function_body?
  ;
 function_head : attributes? declaration_modifiers? 'func'  ;
-function_name : identifier |  operator  ;
+function_name : identifier |  operator_  ;
 function_signature
  : parameter_clauses 'throws'? function_result?
  | parameter_clauses 'rethrows' function_result?
  ;
-function_result : arrow_operator attributes? type  ;
+function_result : arrow_operator attributes? type_  ;
 function_body : code_block  ;
 parameter_clauses : parameter_clause parameter_clauses? ;
 parameter_clause : '(' ')' |  '(' parameter_list ')'  ;
@@ -498,19 +498,19 @@ subscript_declaration
  ;
 
 subscript_head : attributes? declaration_modifiers? 'subscript' parameter_clause  ;
-subscript_result : arrow_operator attributes? type  ;
+subscript_result : arrow_operator attributes? type_  ;
 
 // GRAMMAR OF AN OPERATOR DECLARATION
 
 operator_declaration : prefix_operator_declaration | postfix_operator_declaration | infix_operator_declaration  ;
-prefix_operator_declaration : 'prefix' 'operator' operator '{' '}'  ;
-postfix_operator_declaration : 'postfix' 'operator' operator '{' '}'  ;
-infix_operator_declaration : 'infix' 'operator' operator '{' infix_operator_attributes '}' ; // Note: infix_operator_attributes is optional by definition so no ? needed
+prefix_operator_declaration : 'prefix' 'operator' operator_ '{' '}'  ;
+postfix_operator_declaration : 'postfix' 'operator' operator_ '{' '}'  ;
+infix_operator_declaration : 'infix' 'operator' operator_ '{' infix_operator_attributes '}' ; // Note: infix_operator_attributes is optional by definition so no ? needed
 infix_operator_attributes : precedence_clause? associativity_clause? ;
 precedence_clause : 'precedence' precedence_level ;
 precedence_level : integer_literal ;
-associativity_clause : 'associativity' associativity ;
-associativity : 'left' | 'right' | 'none' ;
+associativity_clause : 'associativity' associativity_ ;
+associativity_ : 'left' | 'right' | 'none' ;
 
 // GRAMMAR OF A DECLARATION MODIFIER
 declaration_modifier
@@ -536,8 +536,8 @@ pattern
  | tuple_pattern type_annotation?
  | enum_case_pattern
  | optional_pattern
- | 'is' type
- | pattern 'as' type
+ | 'is' type_
+ | pattern 'as' type_
  | expression_pattern
  ;
 
@@ -590,7 +590,7 @@ balanced_token
  : '('  balanced_tokens? ')'
  | '[' balanced_tokens? ']'
  | '{' balanced_tokens? '}'
- | identifier | expression | context_sensitive_keyword | literal | operator
+ | identifier | expression | context_sensitive_keyword | literal | operator_
 // | Any punctuation except ( ,  ')' , '[' , ']' , { , or } TODO add?
  ;
 
@@ -636,10 +636,10 @@ conditional_operator : '?' try_operator? expression ':' ;
 // GRAMMAR OF A TYPE_CASTING OPERATOR
 
 type_casting_operator
-  : 'is' type
-  | 'as' type
-  | 'as' '?' type
-  | 'as' '!' type
+  : 'is' type_
+  | 'as' type_
+  | 'as' '?' type_
+  | 'as' '!' type_
   ;
 
 // GRAMMAR OF A PRIMARY EXPRESSION
@@ -776,23 +776,23 @@ trailing_closure : closure_expression ;
 
 // GRAMMAR OF A TYPE
 
-type
- : '[' type ']'
- | '[' type ':' type ']'
- | type 'throws'? arrow_operator type
- | type 'rethrows' arrow_operator type
+type_
+ : '[' type_ ']'
+ | '[' type_ ':' type_ ']'
+ | type_ 'throws'? arrow_operator type_
+ | type_ 'rethrows' arrow_operator type_
  | type_identifier
  | tuple_type
- | type '?'
- | type '!'
+ | type_ '?'
+ | type_ '!'
  | protocol_composition_type
- | type '.' 'Type'
- | type '.' 'Protocol'
+ | type_ '.' 'Type'
+ | type_ '.' 'Protocol'
  ;
 
 // GRAMMAR OF A TYPE ANNOTATION
 
-type_annotation : ':' attributes? type  ;
+type_annotation : ':' attributes? type_  ;
 
 // GRAMMAR OF A TYPE IDENTIFIER
 
@@ -808,7 +808,7 @@ type_name : identifier ;
 tuple_type : '(' tuple_type_body? ')'  ;
 tuple_type_body : tuple_type_element_list range_operator? ;
 tuple_type_element_list : tuple_type_element | tuple_type_element ',' tuple_type_element_list  ;
-tuple_type_element : attributes? 'inout'? type | 'inout'? element_name type_annotation ;
+tuple_type_element : attributes? 'inout'? type_ | 'inout'? element_name type_annotation ;
 element_name : identifier ;
 
 // GRAMMAR OF A FUNCTION TYPE
@@ -1001,14 +1001,14 @@ same_type_equals: {SwiftSupport.isOperator(_input,"==")}? '=' '=' ;
  it is treated as a binary operator. As an example, the + operator in a+b
   and a + b is treated as a binary operator."
 */
-binary_operator : {SwiftSupport.isBinaryOp(_input)}? operator ;
+binary_operator : {SwiftSupport.isBinaryOp(_input)}? operator_ ;
 
 /**
  "If an operator has whitespace on the left side only, it is treated as a
  prefix unary operator. As an example, the ++ operator in a ++b is treated
  as a prefix unary operator."
 */
-prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator ;
+prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator_ ;
 
 /**
  "If an operator has whitespace on the right side only, it is treated as a
@@ -1020,9 +1020,9 @@ prefix_operator : {SwiftSupport.isPrefixOp(_input)}? operator ;
  the ++ operator in a++.b is treated as a postfix unary operator (a++ .b
  rather than a ++ .b)."
  */
-postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator ;
+postfix_operator : {SwiftSupport.isPostfixOp(_input)}? operator_ ;
 
-operator
+operator_
   : operator_head     ({_input.get(_input.index()-1).getType()!=WS}? operator_character)*
   | dot_operator_head ({_input.get(_input.index()-1).getType()!=WS}? dot_operator_character)*
   ;

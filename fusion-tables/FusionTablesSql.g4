@@ -204,7 +204,7 @@ qualified_column_name : ( table_name '.' )? column_name
 aggregate_exp : ( K_SUM | K_COUNT | K_AVERAGE | K_MAXIMUM | K_MINIMUM ) LPAR qualified_column_name RPAR;
 
 expr
- : column_name_beginning_expr ( operator ) literal (and_or_or expr)? 
+ : column_name_beginning_expr ( operator_ ) literal (and_or_or expr)? 
  | column_name_beginning_expr ( K_LIKE | K_MATCHES | K_STARTS K_WITH | K_ENDS K_WITH | K_CONTAINS | K_CONTAINS K_IGNORING K_CASE | K_DOES K_NOT K_CONTAIN | K_NOT K_EQUAL K_TO) string_literal (and_or_or expr)?
  | column_name_beginning_expr K_IN '(' string_literal ( ',' string_literal ) * ')' (and_or_or expr)?
  | column_name_beginning_expr K_BETWEEN literal K_AND literal (and_or_or expr)?
@@ -290,7 +290,7 @@ keyword
  | K_WITH
  ;
 
-operator 
+operator_ 
  : LT
  | LT_EQ
  | GT
