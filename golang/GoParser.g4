@@ -79,7 +79,7 @@ varSpec:
 
 block: L_CURLY statementList? R_CURLY;
 
-statementList: (statement eos)+;
+statementList: (eos? statement eos)+;
 
 statement:
 	declaration
@@ -103,16 +103,7 @@ simpleStmt:
 	| incDecStmt
 	| assignment
 	| expressionStmt
-	| shortVarDecl
-	| emptyStmt;
-
-terminatedSimpleStmt:
-	sendStmt SEMI
-	| incDecStmt SEMI
-	| assignment SEMI
-	| expressionStmt SEMI
-	| shortVarDecl SEMI
-	| emptyStmt;
+	| shortVarDecl;
 
 expressionStmt: expression;
 
@@ -138,7 +129,7 @@ assign_op: (
 
 shortVarDecl: identifierList DECLARE_ASSIGN expressionList;
 
-emptyStmt: SEMI;
+emptyStmt: EOS | SEMI;
 
 labeledStmt: IDENTIFIER COLON statement?;
 
@@ -155,21 +146,21 @@ fallthroughStmt: FALLTHROUGH;
 deferStmt: DEFER expression;
 
 ifStmt:
-	IF terminatedSimpleStmt? expression block (
+	IF (simpleStmt? eos)? expression block (
 		ELSE (ifStmt | block)
 	)?;
 
 switchStmt: exprSwitchStmt | typeSwitchStmt;
 
 exprSwitchStmt:
-	SWITCH terminatedSimpleStmt? expression? L_CURLY exprCaseClause* R_CURLY;
+	SWITCH (expression | ((simpleStmt? eos)? expression?)) L_CURLY exprCaseClause* R_CURLY;
 
 exprCaseClause: exprSwitchCase COLON statementList?;
 
 exprSwitchCase: CASE expressionList | DEFAULT;
 
 typeSwitchStmt:
-	SWITCH terminatedSimpleStmt? typeSwitchGuard L_CURLY typeCaseClause* R_CURLY;
+	SWITCH (simpleStmt? eos)? typeSwitchGuard L_CURLY typeCaseClause* R_CURLY;
 
 typeSwitchGuard: (IDENTIFIER DECLARE_ASSIGN)? primaryExpr DOT L_PAREN TYPE R_PAREN;
 
@@ -190,7 +181,7 @@ recvStmt: (expressionList ASSIGN | identifierList DECLARE_ASSIGN)? recvExpr = ex
 forStmt: FOR (expression | forClause | rangeClause)? block;
 
 forClause:
-	initStmt = terminatedSimpleStmt expression? SEMI postStmt = simpleStmt?;
+	initStmt = simpleStmt? eos expression? eos postStmt = simpleStmt?;
 
 rangeClause: (
 		expressionList ASSIGN
@@ -379,7 +370,7 @@ receiverType: type_;
 eos:
 	SEMI
 	| EOF
-	| {lineTerminatorAhead()}?
+	| EOS
+	| {checkPreviousTokenText(")")}?
 	| {checkPreviousTokenText("}")}?
-	| {checkPreviousTokenText(")")}?;
-
+	;
