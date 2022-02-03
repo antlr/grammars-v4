@@ -156,7 +156,9 @@ ifStmt:
 switchStmt: exprSwitchStmt | typeSwitchStmt;
 
 exprSwitchStmt:
-	SWITCH (expression | ((simpleStmt? eos)? expression?)) L_CURLY exprCaseClause* R_CURLY;
+	SWITCH (expression?
+					| simpleStmt? eos expression?
+					) L_CURLY exprCaseClause* R_CURLY;
 
 exprCaseClause: exprSwitchCase COLON statementList?;
 
@@ -247,7 +249,15 @@ parameterDecl: identifierList? ELLIPSIS? type_;
 
 expression:
 	primaryExpr
-	| unaryExpr
+	| unary_op = (
+		PLUS
+		| MINUS
+		| EXCLAMATION
+		| CARET
+		| STAR
+		| AMPERSAND
+		| RECEIVE
+	) expression
 	| expression mul_op = (
 		STAR
 		| DIV
@@ -281,19 +291,10 @@ primaryExpr:
 		| arguments
 	);
 
-unaryExpr:
-	primaryExpr
-	| unary_op = (
-		PLUS
-		| MINUS
-		| EXCLAMATION
-		| CARET
-		| STAR
-		| AMPERSAND
-		| RECEIVE
-	) expression;
 
-conversion: type_ L_PAREN expression COMMA? R_PAREN;
+conversion: nonNamedType L_PAREN expression COMMA? R_PAREN;
+
+nonNamedType: typeLit | L_PAREN nonNamedType R_PAREN;
 
 operand: literal | operandName | L_PAREN expression R_PAREN;
 
@@ -303,9 +304,7 @@ basicLit:
 	NIL_LIT
 	| integer
 	| string_
-	| FLOAT_LIT
-	| IMAGINARY_LIT
-	| RUNE_LIT;
+	| FLOAT_LIT;
 
 integer:
 	DECIMAL_LIT
@@ -315,7 +314,7 @@ integer:
 	| IMAGINARY_LIT
 	| RUNE_LIT;
 
-operandName: IDENTIFIER (DOT IDENTIFIER)?;
+operandName: IDENTIFIER;
 
 qualifiedIdent: IDENTIFIER DOT IDENTIFIER;
 
@@ -335,14 +334,14 @@ elementList: keyedElement (COMMA keyedElement)*;
 
 keyedElement: (key COLON)? element;
 
-key: IDENTIFIER | expression | literalValue;
+key: expression | literalValue;
 
 element: expression | literalValue;
 
 structType: STRUCT L_CURLY (fieldDecl eos)* R_CURLY;
 
 fieldDecl: (
-		{noTerminatorBetween(2)}? identifierList type_
+		identifierList type_
 		| embeddedField
 	) tag = string_?;
 
@@ -364,10 +363,10 @@ typeAssertion: DOT L_PAREN type_ R_PAREN;
 
 arguments:
 	L_PAREN (
-		(expressionList | type_ (COMMA expressionList)?) ELLIPSIS? COMMA?
+		(expressionList | nonNamedType (COMMA expressionList)?) ELLIPSIS? COMMA?
 	)? R_PAREN;
 
-methodExpr: receiverType DOT IDENTIFIER;
+methodExpr: nonNamedType DOT IDENTIFIER;
 
 //receiverType: typeName | '(' ('*' typeName | receiverType) ')';
 
