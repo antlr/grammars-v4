@@ -146,7 +146,10 @@ fallthroughStmt: FALLTHROUGH;
 deferStmt: DEFER expression;
 
 ifStmt:
-	IF (simpleStmt? eos)? expression block (
+	IF ( expression
+			| eos expression
+			| simpleStmt eos expression
+			) block (
 		ELSE (ifStmt | block)
 	)?;
 
@@ -160,7 +163,10 @@ exprCaseClause: exprSwitchCase COLON statementList?;
 exprSwitchCase: CASE expressionList | DEFAULT;
 
 typeSwitchStmt:
-	SWITCH (simpleStmt? eos)? typeSwitchGuard L_CURLY typeCaseClause* R_CURLY;
+	SWITCH ( typeSwitchGuard
+					| eos typeSwitchGuard
+					| simpleStmt eos typeSwitchGuard)
+					 L_CURLY typeCaseClause* R_CURLY;
 
 typeSwitchGuard: (IDENTIFIER DECLARE_ASSIGN)? primaryExpr DOT L_PAREN TYPE R_PAREN;
 

@@ -64,7 +64,7 @@ IMPORT                 : 'import';
 RETURN                 : 'return' -> mode(NLSEMI);
 VAR                    : 'var';
 
-NIL_LIT                : 'nil';
+NIL_LIT                : 'nil' -> mode(NLSEMI);
 
 IDENTIFIER             : LETTER (LETTER | UNICODE_DIGIT)* -> mode(NLSEMI);
 
@@ -149,7 +149,9 @@ IMAGINARY_LIT          : (DECIMAL_LIT | BINARY_LIT |  OCTAL_LIT | HEX_LIT | FLOA
 
 // Rune literals
 
-RUNE_LIT               : '\'' (UNICODE_VALUE | BYTE_VALUE) '\'';//: '\'' (~[\n\\] | ESCAPED_VALUE) '\'' -> mode(NLSEMI);
+fragment RUNE               : '\'' (UNICODE_VALUE | BYTE_VALUE) '\'';//: '\'' (~[\n\\] | ESCAPED_VALUE) '\'';
+
+RUNE_LIT                : RUNE -> mode(NLSEMI);
 
 
 
