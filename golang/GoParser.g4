@@ -231,13 +231,13 @@ mapType: MAP L_BRACKET type_ R_BRACKET elementType;
 channelType: (CHAN | CHAN RECEIVE | RECEIVE CHAN) elementType;
 
 methodSpec:
-	{noTerminatorAfterParams(2)}? IDENTIFIER parameters result
+	IDENTIFIER parameters result
 	| IDENTIFIER parameters;
 
 functionType: FUNC signature;
 
 signature:
-	{noTerminatorAfterParams(1)}? parameters result
+	parameters result
 	| parameters;
 
 result: parameters | type_;
@@ -376,6 +376,5 @@ eos:
 	SEMI
 	| EOF
 	| EOS
-	| {checkPreviousTokenText(")")}?
-	| {checkPreviousTokenText("}")}?
+	| {closingBracket()}?
 	;
