@@ -509,8 +509,13 @@ fragment UNICODE_LETTER
 mode NLSEMI;
 
 
+// Treat whitespace as normal
 WS_NLSEMI                     : [ \t]+             -> channel(HIDDEN);
+// Ignore any comments that only span one line
 COMMENT_NLSEMI                : '/*' ~[\r\n]*? '*/'      -> channel(HIDDEN);
-EOS:              ([\r\n]+ | ';' | '/*' .*? '*/' | EOF)            -> mode(DEFAULT_MODE);
 LINE_COMMENT_NLSEMI : '//' ~[\r\n]*      -> channel(HIDDEN);
+// Emit an EOS token for any newlines, semicolon, multiline comments or the EOF and 
+//return to normal lexing
+EOS:              ([\r\n]+ | ';' | '/*' .*? '*/' | EOF)            -> mode(DEFAULT_MODE);
+// Did not find an EOS, so go back to normal lexing
 OTHER: -> mode(DEFAULT_MODE), channel(HIDDEN);
