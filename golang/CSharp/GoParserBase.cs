@@ -16,7 +16,7 @@ public abstract class GoParserBase : Parser
     }
 
 
-    protected bool closingBrackets()
+    protected bool closingBracket()
     {
         int la = tokenStream.LA(1);
         return la == GoLexer.R_PAREN || la == GoLexer.R_CURLY;
