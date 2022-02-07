@@ -30,8 +30,8 @@
  */
 grammar PCRE;
 
-// Most single line comments above the lexer- and  parser rules 
-// are copied from the official PCRE man pages (last updated: 
+// Most single line comments above the lexer- and  parser rules
+// are copied from the official PCRE man pages (last updated:
 // 10 January 2012): http://www.pcre.org/pcre.txt
 parse
  : alternation EOF
@@ -483,7 +483,7 @@ number
 
 octal_char
  : ( Backslash (D0 | D1 | D2 | D3) octal_digit octal_digit
-   | Backslash octal_digit octal_digit                     
+   | Backslash octal_digit octal_digit
    )
 
  ;
@@ -491,7 +491,7 @@ octal_char
 octal_digit
  : D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7
  ;
- 
+
 digits
  : digit+
  ;
@@ -541,7 +541,7 @@ BlockQuoted : '\\Q' .*? '\\E';
 //         \xhh       character with hex code hh
 //         \x{hhh..}  character with hex code hhh..
 BellChar       : '\\a';
-ControlChar    : '\\c' ASCII?;
+ControlChar    : '\\c' ASCII;
 EscapeChar     : '\\e';
 FormFeed       : '\\f';
 NewLine        : '\\n';
@@ -651,10 +651,10 @@ Comma        : ',';
 //         \G          first matching position in subject
 WordBoundary                   : '\\b';
 NonWordBoundary                : '\\B';
-StartOfSubject                 : '\\A'; 
+StartOfSubject                 : '\\A';
 EndOfSubjectOrLine             : '$';
-EndOfSubjectOrLineEndOfSubject : '\\Z'; 
-EndOfSubject                   : '\\z'; 
+EndOfSubjectOrLineEndOfSubject : '\\Z';
+EndOfSubject                   : '\\z';
 PreviousMatchInSubject         : '\\G';
 
 // MATCH POINT RESET
