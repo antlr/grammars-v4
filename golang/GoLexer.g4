@@ -142,7 +142,7 @@ HEX_FLOAT_LIT          : '0' [xX] HEX_MANTISSA HEX_EXPONENT
 fragment HEX_MANTISSA  : ('_'? HEX_DIGIT)+ ('.' ( '_'? HEX_DIGIT )*)?
                        | '.' HEX_DIGIT ('_'? HEX_DIGIT)*;
 
-fragment HEX_EXPONENT  : [pP] [+-] DECIMALS;
+fragment HEX_EXPONENT  : [pP] [+-]? DECIMALS;
 
 
 IMAGINARY_LIT          : (DECIMAL_LIT | BINARY_LIT |  OCTAL_LIT | HEX_LIT | FLOAT_LIT) 'i' -> mode(NLSEMI);
