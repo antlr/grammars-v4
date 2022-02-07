@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 by Bart Kiers
+ * Copyright (c) 2014-2022 by Bart Kiers
  *
  * The MIT license.
  *
@@ -424,7 +424,8 @@ shared_atom
  | VerticalWhiteSpace
  | NotVerticalWhiteSpace
  | WordChar
- | NotWordChar 
+ | NotWordChar
+ | Backslash . // will match "unfinished" escape sequences, like `\x`
  ;
 
 literal
@@ -506,7 +507,7 @@ name
 alpha_nums
  : (letter | Underscore) (letter | Underscore | digit)*
  ;
- 
+
 non_close_parens
  : non_close_paren+
  ;
@@ -540,7 +541,7 @@ BlockQuoted : '\\Q' .*? '\\E';
 //         \xhh       character with hex code hh
 //         \x{hhh..}  character with hex code hhh..
 BellChar       : '\\a';
-ControlChar    : '\\c';
+ControlChar    : '\\c' ASCII?;
 EscapeChar     : '\\e';
 FormFeed       : '\\f';
 NewLine        : '\\n';
@@ -751,4 +752,3 @@ fragment AlphaNumeric            : [a-zA-Z0-9];
 fragment NonAlphaNumeric         : ~[a-zA-Z0-9];
 fragment HexDigit                : [0-9a-fA-F];
 fragment ASCII                   : [\u0000-\u007F];
-
