@@ -2959,7 +2959,8 @@ method_call_root
 		| empty_unpacked_array_concatenation
 		| concatenation ( '[' range_expression ']' )?
 		| multiple_concatenation ( '[' range_expression ']' )?
-		| method_call_root '.' method_call_body
+		| //function_subroutine_call
+			method_call_root '.' method_call_body
 		| let_expression
 		| '(' mintypmax_expression ')'
 		//| cast

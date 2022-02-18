@@ -252,7 +252,7 @@ SIMPLE_IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_$]* ;
 SYSTEM_TF_IDENTIFIER : '$' [a-zA-Z0-9_$][a-zA-Z0-9_$]* ;
 WHITE_SPACE : [ \t\r\n]+ -> channel(HIDDEN) ;
 // TODO: define new modes to handle the following rules
-FILE_PATH_SPEC : ( './' | '~' ) .*? ( '.v' | '.vh' ) ;
+FILE_PATH_SPEC : './' .*? ( '.v' | '.vh' ) ; // TODO: remove path name limitations
 INIT_VAL : '1\'' [bB][01xX] | [01] ;
 OUTPUT_SYMBOL : [01xX] ;
 LEVEL_SYMBOL : [01xX?bB] ;
