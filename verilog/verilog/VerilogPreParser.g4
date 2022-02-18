@@ -32,21 +32,21 @@ preprocessor_text
 
 compiler_directive
 	: begin_keywords_directive
-    | celldefine_directive
-    | default_nettype_directive
+	| celldefine_directive
+	| default_nettype_directive
 	| endcelldefine_directive
-    | end_keywords_directive
+	| end_keywords_directive
 	| ifdef_directive
 	| ifndef_directive
 	| include_directive
-    | line_directive
-    | nounconnected_drive_directive
-    | pragma_directive
-    | resetall_directive
+	| line_directive
+	| nounconnected_drive_directive
+	| pragma_directive
+	| resetall_directive
 	| text_macro_definition
 	| text_macro_usage
-    | timescale_directive
-    | unconnected_drive_directive
+	| timescale_directive
+	| unconnected_drive_directive
 	| undef_directive
 	;
 
