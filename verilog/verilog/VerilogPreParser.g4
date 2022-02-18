@@ -26,7 +26,7 @@ parser grammar VerilogPreParser;
 
 options { tokenVocab=VerilogLexer; }
 
-preprocessor_text
+source_text
 	: compiler_directive*
 	;
 
