@@ -1496,7 +1496,7 @@ constant_primary
 	| constant_function_call
 	| constant_system_function_call
 	| '(' constant_mintypmax_expression ')'
-	| string
+	| string_
 	;
 
 module_path_primary
@@ -1517,7 +1517,7 @@ primary
 	| function_call
 	| system_function_call
 	| '(' mintypmax_expression ')'
-	| string
+	| string_
 	;
 
 net_lvalue
@@ -1628,7 +1628,7 @@ unsigned_number
 	: UNSIGNED_NUMBER
 	;
 
-string
+string_
 	: STRING
 	;
 
