@@ -398,7 +398,7 @@ fragment NON_ZERO_UNSIGNED_NUMBER : NON_ZERO_DECIMAL_DIGIT ( '_' | DECIMAL_DIGIT
 REAL_NUMBER : FIXED_POINT_NUMBER | UNSIGNED_NUMBER ( '.' UNSIGNED_NUMBER )? EXP SIGN? UNSIGNED_NUMBER ;
 fragment FIXED_POINT_NUMBER : UNSIGNED_NUMBER '.' UNSIGNED_NUMBER ;
 fragment EXP : [eE] ;
-UNSIGNED_NUMBER : DECIMAL_DIGIT ( '_' | DECIMAL_DIGIT )* ;
+fragment UNSIGNED_NUMBER : DECIMAL_DIGIT ( '_' | DECIMAL_DIGIT )* ;
 fragment BINARY_VALUE : BINARY_DIGIT ( '_' | BINARY_DIGIT )* ;
 fragment OCTAL_VALUE : OCTAL_DIGIT ( '_' | OCTAL_DIGIT )* ;
 fragment HEX_VALUE : HEX_DIGIT ( '_' | HEX_DIGIT )* ;
@@ -408,24 +408,27 @@ fragment OCTAL_BASE : '\'' [sS]? [oO] ;
 fragment HEX_BASE : '\'' [sS]? [hH] ;
 fragment NON_ZERO_DECIMAL_DIGIT : [1-9] ;
 fragment DECIMAL_DIGIT : [0-9] ;
-fragment BINARY_DIGIT : [01xXzZ] ;
-fragment OCTAL_DIGIT : [0-7xXzZ] ;
-fragment HEX_DIGIT : [0-9a-fA-FxXzZ] ;
+fragment BINARY_DIGIT : [01] | X_DIGIT | Z_DIGIT ;
+fragment OCTAL_DIGIT : [0-7] | X_DIGIT | Z_DIGIT ;
+fragment HEX_DIGIT : [0-9a-fA-F] | X_DIGIT | Z_DIGIT ;
 fragment X_DIGIT : [xX] ;
 fragment Z_DIGIT : [zZ?] ;
 UNBASED_UNSIZED_LITERAL : '\'0' | '\'1' | '\'' [xXzZ] ;
-STRING_LITERAL : '"' ( ~["\\]+ | '\\' . )* '"' ;
+STRING_LITERAL : '"' ( ~["\\] | '\\' . )* '"' ;
 COMMENT : ( ONE_LINE_COMMENT | BLOCK_COMMENT ) -> channel(COMMENTS) ;
 fragment ONE_LINE_COMMENT : '//' COMMENT_TEXT '\r'? '\n' ;
 fragment BLOCK_COMMENT : '/*' COMMENT_TEXT '*/' ;
-fragment COMMENT_TEXT : [\u0000-\u007f]*? ;
+fragment COMMENT_TEXT : ASCII_ANY*? ;
 //C_IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]* ;
-ESCAPED_IDENTIFIER : '\\' [\u0021-\u007e]* WHITE_SPACE ;
+ESCAPED_IDENTIFIER : '\\' ASCII_PRINTABLE_EXCEPT_SPACE* WHITE_SPACE ;
 SIMPLE_IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_$]* ;
 SYSTEM_TF_IDENTIFIER : '$' [a-zA-Z0-9_$][a-zA-Z0-9_$]* ;
 WHITE_SPACE : [ \t\r\n]+ -> channel(HIDDEN) ;
+fragment ASCII_ANY : [\u0000-\u007f] ;
+fragment ASCII_PRINTABLE : [\u0020-\u007e] ;
+fragment ASCII_PRINTABLE_EXCEPT_SPACE : [\u0021-\u007e] ;
 // TODO: define new modes to handle the following rules
-FILE_PATH_SPEC : './' .*? ( '.sv' | '.svh' ) ; // TODO: remove path name limitations
+FILE_PATH_SPEC : './' ASCII_PRINTABLE* ( '.sv' | '.svh' ) ; // TODO: remove path name limitations
 FINISH_NUMBER : [012] ;
 INIT_VAL : '1\'' [bB][01xX] | [01] ;
 OUTPUT_SYMBOL : [01xX] ;
@@ -457,10 +460,10 @@ UNCONNECTED_DRIVE_DIRECTIVE : 'unconnected_drive' -> channel(DIRECTIVES), mode(D
 UNDEF_DIRECTIVE : 'undef' -> channel(DIRECTIVES), mode(UNDEF_DIRECTIVE_MODE) ;
 UNDEFINEALL_DIRECTIVE : 'undefineall' -> channel(DIRECTIVES), popMode ;
 DIRECTIVE_IDENTIFIER : ( DIRECTIVE_ESCAPED_IDENTIFIER | DIRECTIVE_SIMPLE_IDENTIFIER ) -> channel(DIRECTIVES), mode(MACRO_USAGE_MODE) ;
-fragment DIRECTIVE_ESCAPED_IDENTIFIER : '\\' [\u0021-\u007e]* WHITE_SPACE ;
+fragment DIRECTIVE_ESCAPED_IDENTIFIER : '\\' ASCII_PRINTABLE_EXCEPT_SPACE* WHITE_SPACE ;
 fragment DIRECTIVE_SIMPLE_IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_$]* ;
 mode DIRECTIVE_TEXT_MODE;
-DIRECTIVE_TEXT : .*? '\r'? '\n' -> channel(DIRECTIVES), popMode ;
+DIRECTIVE_TEXT : ASCII_ANY*? '\r'? '\n' -> channel(DIRECTIVES), popMode ;
 mode DEFINE_DIRECTIVE_MODE;
 DD_IDENTIFIER : ( DIRECTIVE_ESCAPED_IDENTIFIER | DIRECTIVE_SIMPLE_IDENTIFIER ) -> channel(DIRECTIVES), type(DIRECTIVE_IDENTIFIER), mode(MACRO_TEXT_MODE) ;
 DIRECTIVE_COMMENT : ( ONE_LINE_COMMENT | BLOCK_COMMENT ) -> channel(COMMENTS) ;
@@ -480,8 +483,8 @@ mode MACRO_USAGE_MODE;
 MACRO_ARGS : '(' ( MACRO_ARGS | . )*? ')' -> channel(DIRECTIVES), popMode ;
 MU_COMMENT : ( ONE_LINE_COMMENT | BLOCK_COMMENT ) -> channel(COMMENTS), type(DIRECTIVE_COMMENT) ;
 MU_WHITE_SPACE : [ \t]+ -> channel(HIDDEN), type(DIRECTIVE_WHITE_SPACE) ;
-MU_NEWLINE : '\r'? '\n' -> channel(HIDDEN), type(DIRECTIVE_NEWLINE) ;
-MU_OTHER : . -> more, popMode ;
+MU_NEWLINE : '\r'? '\n' -> channel(HIDDEN), type(DIRECTIVE_NEWLINE), popMode ;
+MU_OTHER : . -> more, popMode ; // TODO: do not use 'more' and do not consume the token
 mode IFDEF_DIRECTIVE_MODE;
 ID_IDENTIFIER : ( DIRECTIVE_ESCAPED_IDENTIFIER | DIRECTIVE_SIMPLE_IDENTIFIER ) -> channel(DIRECTIVES), type(DIRECTIVE_IDENTIFIER), pushMode(SOURCE_TEXT_MODE) ;
 ID_COMMENT : ( ONE_LINE_COMMENT | BLOCK_COMMENT ) -> channel(COMMENTS), type(DIRECTIVE_COMMENT) ;

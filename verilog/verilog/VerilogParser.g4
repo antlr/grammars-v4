@@ -1625,7 +1625,8 @@ hex_number
 	;
 
 unsigned_number
-	: UNSIGNED_NUMBER
+	: //UNSIGNED_NUMBER
+		DECIMAL_NUMBER
 	;
 
 string_

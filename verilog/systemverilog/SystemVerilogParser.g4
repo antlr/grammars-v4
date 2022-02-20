@@ -129,7 +129,7 @@ interface_class_type
 	: ps_class_identifier parameter_value_assignment?
 	;
 
-interface_class_declaration
+interface_class_declaration // not referenced anywhere in the spec
 	: 'interface' 'class' class_identifier parameter_port_list? ( 'extends' interface_class_type ( ',' interface_class_type )* )? ';' interface_class_item* 'endclass' ( ':' class_identifier )?
 	;
 
@@ -679,7 +679,7 @@ genvar_declaration
 net_declaration
 	: net_type ( drive_strength | charge_strength )? ( 'vectored' | 'scalared' )? data_type_or_implicit delay3? list_of_net_decl_assignments ';'
 	| net_type_identifier delay_control? list_of_net_decl_assignments ';'
-	| 'interconnect' implicit_data_type ( '#' delay_value )? net_identifier unpacked_dimension* ( ',' net_identifier unpacked_dimension* )? ';'
+	| 'interconnect' implicit_data_type ( '#' delay_value | '#0' )? net_identifier unpacked_dimension* ( ',' net_identifier unpacked_dimension* )? ';'
 	;
 
 type_declaration
@@ -837,12 +837,12 @@ type_reference
 	;
 
 drive_strength
-	: '(' strength0 strength1 ')'
-	| '(' strength1 strength0 ')'
-	| '(' strength0 'highz1' ')'
-	| '(' strength1 'highz0' ')'
-	| '(' 'highz0' strength1 ')'
-	| '(' 'highz1' strength0 ')'
+	: '(' strength0 ',' strength1 ')'
+	| '(' strength1 ',' strength0 ')'
+	| '(' strength0 ',' 'highz1' ')'
+	| '(' strength1 ',' 'highz0' ')'
+	| '(' 'highz0' ',' strength1 ')'
+	| '(' 'highz1' ',' strength0 ')'
 	;
 
 strength0
@@ -867,11 +867,13 @@ charge_strength
 
 delay3
 	: '#' delay_value
+		| '#0'
 	| '#' '(' mintypmax_expression ( ',' mintypmax_expression ( ',' mintypmax_expression )? )? ')'
 	;
 
 delay2
 	: '#' delay_value
+		| '#0'
 	| '#' '(' mintypmax_expression ( ',' mintypmax_expression )? ')'
 	;
 
@@ -2104,6 +2106,7 @@ delay_or_event_control
 
 delay_control
 	: '#' delay_value
+		| '#0'
 	| '#' '(' mintypmax_expression ')'
 	;
 
@@ -2960,7 +2963,10 @@ method_call_root
 		| concatenation ( '[' range_expression ']' )?
 		| multiple_concatenation ( '[' range_expression ']' )?
 		| //function_subroutine_call
-			method_call_root '.' method_call_body
+			tf_call
+			| system_tf_call
+			| method_call_root '.' method_call_body
+			| ( 'std' '::' )? randomize_call
 		| let_expression
 		| '(' mintypmax_expression ')'
 		//| cast
@@ -3326,7 +3332,8 @@ real_number
 	;
 
 unsigned_number
-	: UNSIGNED_NUMBER
+	: //UNSIGNED_NUMBER
+		DECIMAL_NUMBER
 	;
 
 unbased_unsized_literal
@@ -3647,6 +3654,10 @@ specparam_identifier
 
 system_tf_identifier
 	: SYSTEM_TF_IDENTIFIER
+		| '$error'
+		| '$fatal'
+		| '$warning'
+		| '$info'
 	;
 
 task_identifier
