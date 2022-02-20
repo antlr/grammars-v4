@@ -128,11 +128,11 @@ class_declaration
 interface_class_type
 	: ps_class_identifier parameter_value_assignment?
 	;
-
-interface_class_declaration // not referenced anywhere in the spec
+/* not referenced anywhere in the spec
+interface_class_declaration
 	: 'interface' 'class' class_identifier parameter_port_list? ( 'extends' interface_class_type ( ',' interface_class_type )* )? ';' interface_class_item* 'endclass' ( ':' class_identifier )?
 	;
-
+*/
 interface_class_item
 	: type_declaration
 	| attribute_instance* interface_class_method
@@ -2902,11 +2902,11 @@ array_range_expression
 empty_unpacked_array_concatenation
 	: '{' '}'
 	;
-
+/*
 constant_function_call
 	: function_subroutine_call
 	;
-
+*/
 tf_call
 	: ps_or_hierarchical_tf_identifier attribute_instance* ( '(' list_of_arguments ')' )?
 	;
@@ -2956,26 +2956,7 @@ randomize_call
 	;
 
 method_call_root
-	: //primary
-		primary_literal
-		| ( class_qualifier | package_scope? ) hierarchical_identifier select_
-		| empty_unpacked_array_concatenation
-		| concatenation ( '[' range_expression ']' )?
-		| multiple_concatenation ( '[' range_expression ']' )?
-		| //function_subroutine_call
-			tf_call
-			| system_tf_call
-			| method_call_root '.' method_call_body
-			| ( 'std' '::' )? randomize_call
-		| let_expression
-		| '(' mintypmax_expression ')'
-		//| cast
-		| assignment_pattern_expression
-		| streaming_concatenation
-		| sequence_method_call
-		| 'this'
-		| '$'
-		| 'null'
+	: primary
 	| implicit_class_handle
 	;
 
@@ -3112,7 +3093,11 @@ constant_primary
 	| ( package_scope | class_scope )? enum_identifier
 	| constant_concatenation ( '[' constant_range_expression ']' )?
 	| constant_multiple_concatenation ( '[' constant_range_expression ']' )?
-	| constant_function_call
+	| //constant_function_call
+		tf_call
+		| system_tf_call
+		| ( primary | implicit_class_handle ) '.' method_call_body
+		| ( 'std' '::' )? randomize_call
 	| constant_let_expression
 	| '(' constant_mintypmax_expression ')'
 	//| constant_cast
@@ -3136,11 +3121,15 @@ primary
 	| empty_unpacked_array_concatenation
 	| concatenation ( '[' range_expression ']' )?
 	| multiple_concatenation ( '[' range_expression ']' )?
-	| function_subroutine_call
+	| //function_subroutine_call
+		tf_call
+		| system_tf_call
+		| primary '.' method_call_body
+		| implicit_class_handle '.' method_call_body
+		| ( 'std' '::' )? randomize_call
 	| let_expression
 	| '(' mintypmax_expression ')'
-	| //cast
-		( simple_type | constant_primary | signing | 'string' | 'const' ) '\'' '(' expression ')'
+	//| cast
 	| assignment_pattern_expression
 	| streaming_concatenation
 	| sequence_method_call
