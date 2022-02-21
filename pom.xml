@@ -52,7 +52,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.1</version>
+					<version>3.10.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -76,6 +76,7 @@
 				<module>antlr</module>
 				<module>apex</module>
 				<module>apt</module>
+                <module>argus</module>
 				<module>arithmetic</module>
 				<module>asl</module>
 				<module>asm</module>
@@ -85,6 +86,7 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
+                <module>bcl</module>
 				<module>bcpl</module>
                 <module>bdf</module>
 				<module>bibcode</module>
@@ -95,6 +97,7 @@
 				<module>calculator</module>
 				<module>callable</module>
 				<module>capnproto</module>
+                <module>cayenne</module>
 				<module>clf</module>
 				<module>clojure</module>
 				<module>clu</module>
@@ -116,6 +119,7 @@
 				<module>dcm</module>
 				<module>dgol</module>
 				<module>dice</module>
+                <module>dif</module>
 				<module>doiurl</module>
 				<module>dot</module>
 				<module>edif300</module>
@@ -124,6 +128,7 @@
 				<module>fasta</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
+                <module>flowmatic</module>
 				<module>focal</module>
 				<module>fol</module>
 				<module>fortran77</module>
@@ -151,6 +156,7 @@
 				<module>iri</module>
 				<module>iso8601</module>
 				<module>istc</module>
+                <module>itn</module>
 				<module>janus</module>
 				<module>java</module>
 				<module>javadoc</module>
@@ -173,6 +179,7 @@
 				<module>lolcode</module>
 				<module>loop</module>
 				<module>lpc</module>
+                <module>lrc</module>
 				<module>ltl</module>
 				<module>lua</module>
 				<module>matlab</module>
@@ -223,6 +230,7 @@
 				<module>protobuf3</module>
 				<module>prov-n</module>
 				<module>python</module>
+                <module>qif</module>
 				<module>quakemap</module>
 				<module>r</module>
 				<module>racket-bsl</module>
@@ -284,6 +292,7 @@
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
+				<module>unreal_angelscript</module>
 				<module>upnp</module>
 				<module>url</module>
 				<module>useragent</module>
@@ -332,7 +341,7 @@
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.8</version>
+						<version>1.6.11</version>
 						<extensions>true</extensions>
 						<configuration>
 							<serverId>ossrh</serverId>
@@ -356,7 +365,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.3.1	</version>
+						<version>3.3.2	</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
