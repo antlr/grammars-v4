@@ -92,6 +92,7 @@ turtle-doc
 url
 v
 velocity
+verilog/systemverilog
 verilog/verilog
 xpath/xpath1
 xpath/xpath20
