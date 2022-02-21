@@ -218,7 +218,7 @@ TI : '~' ;
 TIAM : '~&' ;
 TICA : '~^' ;
 TIVL : '~|' ;
-DECIMAL_NUMBER : UNSIGNED_NUMBER | SIZE? DECIMAL_BASE UNSIGNED_NUMBER | SIZE? DECIMAL_BASE X_DIGIT ( '_' )* | SIZE? DECIMAL_BASE Z_DIGIT ( '_' )* ;
+DECIMAL_NUMBER : UNSIGNED_NUMBER | SIZE? DECIMAL_BASE UNSIGNED_NUMBER | SIZE? DECIMAL_BASE X_DIGIT '_'* | SIZE? DECIMAL_BASE Z_DIGIT '_'* ;
 BINARY_NUMBER : SIZE? BINARY_BASE BINARY_VALUE ;
 OCTAL_NUMBER : SIZE? OCTAL_BASE OCTAL_VALUE ;
 HEX_NUMBER : SIZE? HEX_BASE HEX_VALUE ;
@@ -255,7 +255,7 @@ fragment ASCII_ANY : [\u0000-\u007f] ;
 fragment ASCII_PRINTABLE : [\u0020-\u007e] ;
 fragment ASCII_PRINTABLE_EXCEPT_SPACE : [\u0021-\u007e] ;
 // TODO: define new modes to handle the following rules
-FILE_PATH_SPEC : './' ASCII_PRINTABLE* ( '.v' | '.vh' ) ; // TODO: remove path name limitations
+FILE_PATH_SPEC : './' ASCII_PRINTABLE*? ( '.vh' | '.v' ) ; // TODO: remove path name limitations
 INIT_VAL : '1\'' [bB][01xX] | [01] ;
 OUTPUT_SYMBOL : [01xX] ;
 LEVEL_SYMBOL : [01xX?bB] ;

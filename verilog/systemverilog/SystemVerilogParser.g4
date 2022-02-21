@@ -27,7 +27,7 @@ parser grammar SystemVerilogParser;
 options { tokenVocab=SystemVerilogLexer; }
 
 library_text
-	: library_description*
+	: library_description* EOF
 	;
 
 library_description
@@ -3455,7 +3455,7 @@ hierarchical_event_identifier
 	;
 
 hierarchical_identifier
-	: ( '$root.' )? ( identifier constant_bit_select '.' )* identifier
+	: '$root.'? ( identifier constant_bit_select '.' )* identifier
 	;
 
 hierarchical_net_identifier

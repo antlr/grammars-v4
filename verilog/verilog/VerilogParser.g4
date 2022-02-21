@@ -27,7 +27,7 @@ parser grammar VerilogParser;
 options { tokenVocab=VerilogLexer; }
 
 library_text
-	: library_description*
+	: library_description* EOF
 	;
 
 library_description
