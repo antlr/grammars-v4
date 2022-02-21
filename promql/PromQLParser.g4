@@ -38,6 +38,7 @@ expression: vectorOperation EOF;
 
 vectorOperation
     : <assoc=right> vectorOperation powOp vectorOperation
+    | <assoc=right> vectorOperation subqueryOp
     | unaryOp vectorOperation
     | vectorOperation multOp vectorOperation
     | vectorOperation addOp vectorOperation
@@ -56,6 +57,8 @@ addOp:       (ADD | SUB) grouping?;
 compareOp:   (DEQ | NE | GT | LT | GE | LE) BOOL? grouping?;
 andUnlessOp: (AND | UNLESS) grouping?;
 orOp:        OR grouping?;
+subqueryOp:  SUBQUERY_RANGE offsetOp?;
+offsetOp:    OFFSET DURATION;
 
 vector
     : function_

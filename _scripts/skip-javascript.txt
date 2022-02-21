@@ -25,7 +25,6 @@ php
 powerbuilder
 python/python2
 python/python3
-python/python3-js
 python/python3-py
 python/python3-ts
 python/python3-without-actions
@@ -34,7 +33,8 @@ r
 rego
 rexx
 rust
-sql/hive
+sql/hive/v2
+sql/hive/v3
 sql/mysql
 sql/plsql
 sql/postgresql
@@ -47,7 +47,7 @@ swift/swift5
 tcpheader
 v
 velocity
-wat
 webidl
+xpath/xpath20
 xpath/xpath31
 z

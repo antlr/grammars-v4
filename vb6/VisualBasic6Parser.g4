@@ -43,7 +43,7 @@ moduleReferenceValue: STRINGLITERAL;
 
 moduleReferenceComponent: STRINGLITERAL;
 
-moduleHeader: VERSION WS DOUBLELITERAL (WS CLASS)?;
+moduleHeader: VERSION WS doubleLiteral (WS CLASS)?;
 
 moduleConfig: BEGIN NEWLINE+ moduleConfigElement+ END NEWLINE+;
 
@@ -55,7 +55,7 @@ moduleAttributes: (attributeStmt NEWLINE+)+;
 moduleOptions: (moduleOption NEWLINE+)+;
 
 moduleOption:
-	OPTION_BASE WS INTEGERLITERAL		# optionBaseStmt
+	OPTION_BASE WS integerLiteral		# optionBaseStmt
 	| OPTION_COMPARE WS (BINARY | TEXT)	# optionCompareStmt
 	| OPTION_EXPLICIT					# optionExplicitStmt
 	| OPTION_PRIVATE_MODULE				# optionPrivateModuleStmt
@@ -106,7 +106,7 @@ cp_PropertyValue:
 
 cp_NestedProperty:
 	WS? BEGINPROPERTY WS ambiguousIdentifier (
-		LPAREN INTEGERLITERAL RPAREN
+		LPAREN integerLiteral RPAREN
 	)? (WS GUID)? NEWLINE+ (cp_Properties+)? ENDPROPERTY NEWLINE+;
 
 cp_ControlType: complexType;
@@ -670,7 +670,7 @@ comparisonOperator: LT | LEQ | GT | GEQ | EQ | NEQ | IS | LIKE;
 
 complexType: ambiguousIdentifier (DOT ambiguousIdentifier)*;
 
-fieldLength: MULT WS? (INTEGERLITERAL | ambiguousIdentifier);
+fieldLength: MULT WS? (integerLiteral | ambiguousIdentifier);
 
 letterrange:
 	certainIdentifier (WS? MINUS WS? certainIdentifier)?;
@@ -680,10 +680,10 @@ lineLabel: ambiguousIdentifier COLON;
 literal:
 	COLORLITERAL
 	| DATELITERAL
-	| DOUBLELITERAL
+	| doubleLiteral
 	| FILENUMBER
-	| INTEGERLITERAL
-	| OCTALLITERAL
+	| integerLiteral
+	| octalLiteral
 	| STRINGLITERAL
 	| TRUE
 	| FALSE
@@ -859,3 +859,7 @@ ambiguousKeyword:
 	| WRITE
 	| XOR
     ;
+
+integerLiteral : (PLUS | MINUS)* INTEGERLITERAL;
+octalLiteral : (PLUS | MINUS)* OCTALLITERAL;
+doubleLiteral : (PLUS | MINUS)* DOUBLELITERAL;

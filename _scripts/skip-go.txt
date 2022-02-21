@@ -15,6 +15,7 @@ csharp
 edif300
 fortran77
 gdscript
+golang
 guitartab
 haskell
 html
@@ -54,7 +55,6 @@ powerbuilder
 python/python2
 python/python3
 python/python3alt
-python/python3-js
 python/python3-py
 python/python3-ts
 python/python3-without-actions
@@ -70,7 +70,8 @@ sieve
 smalltalk
 smtlibv2
 sparql
-sql/hive
+sql/hive/v2
+sql/hive/v3
 sql/mysql
 sql/plsql
 sql/postgresql
@@ -91,8 +92,9 @@ turtle-doc
 url
 v
 velocity
+verilog/systemverilog
 verilog/verilog
-wat
 xpath/xpath1
+xpath/xpath20
 xpath/xpath31
 z
