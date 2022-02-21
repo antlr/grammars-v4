@@ -19,6 +19,7 @@
 					<includes>
 						<include>SystemVerilogLexer.g4</include>
 						<include>SystemVerilogParser.g4</include>
+						<include>SystemVerilogPreParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>

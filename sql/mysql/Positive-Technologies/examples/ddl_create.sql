@@ -158,7 +158,8 @@ CREATE TABLE keywords (
     iso VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
     usa VARCHAR(100),
     jis VARCHAR(100),
-    internal INT
+    internal INT,
+    instant BIT
 );
 
 create table if not exists tbl_signed_unsigned(
@@ -398,6 +399,53 @@ BEGIN  insert into order_config(order_id, attribute, value, performer)
              EXISTS (select 1 from inventory.order_config p2 where p2.order_id = orderID and p2.attribute = 'first_attr' and p2.performer = 'AppConfig')
        ON DUPLICATE KEY UPDATE value = 'true',
                             performer = 'AppConfig'; -- Enable second_attr for order
+END
+#end
+#begin
+CREATE DEFINER=`bettingservice`@`stage-us-nj-app%` PROCEDURE `AggregatePlayerFactDaily`()
+BEGIN
+    DECLARE CID_min BIGINT;
+    DECLARE CID_max BIGINT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    SHOW ERRORS;
+ROLLBACK;
+END;
+
+SELECT LastID+1 INTO CID_min FROM AggregateStatus
+WHERE TableName = 'Combination_Transaction_Player_Fact';
+SELECT Id INTO CID_max FROM Combination_Transaction ORDER BY Id DESC LIMIT 1;
+
+START TRANSACTION;
+UPDATE AggregateStatus SET LastId = CID_max, LastUpdated = CURRENT_TIMESTAMP
+WHERE TableName = 'Combination_Transaction_Player_Fact';
+
+INSERT INTO Combination_Transaction_Player_Fact
+SELECT
+    NULL `Id`,
+    CT.Player_UID,
+    CT.Tx_Type `Type`,
+    DATE(BT.Timestamp) `Date`,
+    SUM(CT.Real_Amount) `Real_Amount`,
+    SUM(CT.Bonus_Amount) `Bonus_Amount`,
+    BT.Currency_UID,
+    COUNT(CT.Id) Tx_Count,
+    SUM(IF(CT.Real_Amount>0,1,0)) `Real_Count`,
+    SUM(IF(CT.Bonus_Amount>0,1,0)) `Bonus_Count`
+FROM Combination_Transaction CT
+    LEFT JOIN Betting_Transaction BT ON CT.Betting_Tx_ID = BT.ID
+WHERE CT.Id BETWEEN CID_min
+  AND CID_max
+GROUP BY CT.Player_UID, CT.Tx_Type, DATE(BT.Timestamp)
+ON DUPLICATE KEY UPDATE
+                     Currency_UID = VALUES(Currency_UID),
+                     Tx_Count     = Tx_Count + VALUES(Tx_Count),
+                     Real_Amount  = Real_Amount + VALUES(Real_Amount),
+                     Bonus_Amount = Bonus_Amount + VALUES(Bonus_Amount),
+                     Real_Count   = Real_Count + VALUES(Real_Count),
+                     Bonus_Count  = Bonus_Count + VALUES(Bonus_Count);
+COMMIT;
 END
 #end
 -- Create procedure

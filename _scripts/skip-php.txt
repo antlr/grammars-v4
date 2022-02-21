@@ -55,8 +55,8 @@ scala
 scss
 smtlibv2
 sparql
-sql/hive/v1
 sql/hive/v2
+sql/hive/v3
 sql/mysql
 sql/plsql
 sql/postgresql
