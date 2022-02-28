@@ -54,7 +54,7 @@ jobs:
       uses: dart-lang/setup-dart@v1
     - name: Install Python
       if: ${{ matrix.language == 'Python3' }}
-      uses: actions/setup-python@v2.3.2
+      uses: actions/setup-python@v3
       with:
         python-version: '3.8'
     - name: Install Nodejs
