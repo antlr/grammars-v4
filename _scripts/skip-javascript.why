@@ -130,10 +130,6 @@ sql/tsql
 stringtemplate
 	Grammar is not target-agnostic.
 
-swift-fin
-	Failed: /mnt/c/Users/Kenne/Documents/GitHub/grammars-issue-2390/swift-fin/
-	System.Exception: Cannot find the parser grammar (SwiftFin | SwiftFinParser).g4
-
 swift/swift2
 	Grammar is not target-agnostic.
 

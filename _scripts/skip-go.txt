@@ -76,7 +76,6 @@ sql/mysql
 sql/plsql
 sql/postgresql
 stringtemplate
-swift-fin
 swift/swift2
 swift/swift3
 swift/swift5
