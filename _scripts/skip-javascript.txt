@@ -40,7 +40,6 @@ sql/plsql
 sql/postgresql
 sql/tsql
 stringtemplate
-swift-fin
 swift/swift2
 swift/swift3
 swift/swift5
