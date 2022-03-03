@@ -1,6 +1,6 @@
 /*
      [The "BSD licence"]
-     Copyright (c) 2013 Sam Harwell
+     Copyright (c) 2013 Sumit Lahiri
      All rights reserved.
      Redistribution and use in source and binary forms, with or without
      modification, are permitted provided that the following conditions
@@ -24,7 +24,7 @@
      THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Grammar for KLEE KQuery parsing.
+// Grammar for KLEE KQuery parsing. (A bit more verbose with richer parsing)
 // Ported to Antlr4 by Sumit Lahiri.
 grammar KQuery;
 
@@ -56,11 +56,11 @@ evalArrayList
     ;
 
 arrayDeclaration
-    : Array arrName LeftBracket arrayElemsStub RightBracket 
+    : Array arrName LeftBracket numArrayElements RightBracket 
         Colon domain Arrow rangeLimit Equal arrayInitializer
     ;
     
-arrayElemsStub
+numArrayElements
     : Constant
     ;
     
@@ -70,40 +70,84 @@ arrayInitializer
     ;
     
 expression
-    : Identifier
-    | Identifier Colon expression   
-    | LeftParen WidthType number RightParen
-    | LeftParen arithmeticExpr WidthType expression expression RightParen
-    | LeftParen NOT LeftBracket WidthType RightBracket expression RightParen
-    | LeftParen bitwiseExpr WidthType expression expression RightParen 
-    | LeftParen SHL WidthType expression expression RightParen
-    | LeftParen LSHR WidthType expression expression RightParen
-    | LeftParen ASHR WidthType expression expression RightParen
-    | LeftParen comparisonExpr WidthType expression expression RightParen 
-    | LeftParen comparisonExpr expression expression RightParen 
-    | LeftParen CONCAT WidthType expression expression RightParen
-    | LeftParen CONCAT expression expression RightParen
-    | LeftParen EXTRACT WidthType number expression RightParen
-    | LeftParen ZEXT WidthType expression RightParen
-    | LeftParen SEXT WidthType expression RightParen
-    | LeftParen READ WidthType expression version RightParen
-    | LeftParen READ WidthType expression RightParen
-    | LeftParen SELECT WidthType expression expression expression RightParen  
-    | LeftParen NEGETION WidthType expression RightParen
-    | LeftParen NEGETION expression RightParen
-    | LeftParen READLSB WidthType expression version RightParen  
-    | LeftParen READMSB WidthType expression version RightParen  
-    | LeftParen READLSB WidthType expression RightParen  
-    | LeftParen READMSB WidthType expression RightParen 
+    : varName
+    | namedConstant Colon fullyQualifiedExpression   
+    | LeftParen widthOrSizeExpr number RightParen
+    | LeftParen arithmeticExpr widthOrSizeExpr leftExpr rightExpr RightParen
+    | LeftParen notExpr LeftBracket widthOrSizeExpr RightBracket expression RightParen
+    | LeftParen bitwiseExpr widthOrSizeExpr leftExpr rightExpr RightParen 
+    | LeftParen comparisonExpr widthOrSizeExpr leftExpr rightExpr RightParen 
+    | LeftParen comparisonExpr leftExpr rightExpr RightParen 
+    | LeftParen concatExpr widthOrSizeExpr leftExpr rightExpr RightParen
+    | LeftParen concatExpr leftExpr rightExpr RightParen
+    | LeftParen arrExtractExpr widthOrSizeExpr number expression RightParen
+    | LeftParen bitExtractExpr widthOrSizeExpr expression RightParen
+    | LeftParen genericBitRead widthOrSizeExpr expression version RightParen
+    | LeftParen selectExpr widthOrSizeExpr leftExpr rightExpr expression RightParen  
+    | LeftParen exprNegation widthOrSizeExpr expression RightParen
+    | LeftParen exprNegation expression RightParen 
+    | LeftParen genericBitRead widthOrSizeExpr expression RightParen
     | version
     | number
     ;
+
+genericBitRead
+    : READ
+    | READLSB
+    | READMSB
+    ;
+
+bitExtractExpr
+    : ZEXT
+    | SEXT
+    ;
     
 version
-    : Identifier 
-    | Identifier Colon expression
+    : varName 
+    | namedConstant Colon fullyQualifiedExpression
     | LeftBracket updateList RightBracket ATR version
     | LeftBracket RightBracket ATR version
+    ;
+
+fullyQualifiedExpression
+    : expression
+    ;
+    
+notExpr
+    : NOT
+    ;
+    
+concatExpr
+    : CONCAT
+    ;
+
+exprNegation
+    : NEGETION
+    ;
+
+selectExpr
+    : SELECT
+    ;
+
+
+arrExtractExpr
+    : EXTRACT
+    ;
+    
+varName
+    : Identifier
+    ;
+    
+leftExpr 
+    : expression
+    ; 
+
+rightExpr
+    : expression
+    ;
+    
+namedConstant
+    : Identifier
     ;
     
 updateList 
@@ -143,8 +187,8 @@ arithmeticExpr
     | SREM
     ;
     
-domain : WidthType ;
-rangeLimit : WidthType ;
+domain : widthOrSizeExpr ;
+rangeLimit : widthOrSizeExpr ;
 arrName : Identifier ;
 
 numberList
@@ -153,10 +197,18 @@ numberList
     ;
 
 number 
-    : TrueMatch 
-    | FalseMatch 
-    | SignedConstant
-    | Constant
+    : boolnum 
+    | signedConstant
+    | constant
+    ;
+
+constant: Constant;
+boolnum: Boolean;
+signedConstant: SignedConstant;
+
+Boolean
+    : TrueMatch
+    | FalseMatch
     ;
     
 SignedConstant 
@@ -188,6 +240,10 @@ FloatingPointType
     
 IntegerType 
     : INT DIGIT+
+    ;
+
+widthOrSizeExpr
+    : WidthType
     ;
 
 WidthType 
@@ -250,15 +306,18 @@ fragment
 DIGIT 
     : ('0'..'9')  
     ;
-
+    
+fragment
 BIN_DIGIT
     : ('0' | '1' | '_')
     ;
-    
+
+fragment
 OCTAL_DIGIT
     : ('0'..'7' | '_')
     ;
 
+fragment
 HEX_DIGIT 
     : ('0'..'9'|'a'..'f'|'A'..'F'|'_') 
     ;
