@@ -278,7 +278,6 @@ READLSB: 'ReadLSB';
 READMSB: 'ReadMSB';
 PLUS : '+';
 MINUS : '-';
-INT : 'i';
 ATR : '@';
 FP : 'fp';
 BITWISEAND : 'And';
@@ -326,6 +325,8 @@ Identifier
     :  ('a'..'z' | 'A'..'Z' | '_')('a'..'z' | 'A'..'Z' | '_' | '0'..'9' | '.' )*
     ;
     
+INT : 'i';
+
 Whitespace
     :   [ \t]+ -> skip
     ;
