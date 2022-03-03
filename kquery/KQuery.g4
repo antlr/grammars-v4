@@ -29,9 +29,13 @@
 grammar KQuery;
 
 kqueryExpression 
-    : ktranslationUnit* EOF
+    : queryStatements EOF
     ;
 
+queryStatements
+    : (ktranslationUnit)*
+    ;
+    
 ktranslationUnit
     : arrayDeclaration
     | queryCommand
