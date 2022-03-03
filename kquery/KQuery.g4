@@ -52,11 +52,11 @@ queryExpr
     ;
     
 evalExprList 
-    : LeftBracket expression* RightBracket  
+    : LeftBracket (expression)* RightBracket  
     ;
     
 evalArrayList 
-    : LeftBracket Identifier* RightBracket  
+    : LeftBracket (Identifier)* RightBracket  
     ;
 
 arrayDeclaration
@@ -227,15 +227,15 @@ Constant
     ;
     
 BinConstant 
-    : BinId BIN_DIGIT+  
+    : BinId (BIN_DIGIT)+  
     ;
     
 OctConstant 
-    : OctId OCTAL_DIGIT+  
+    : OctId (OCTAL_DIGIT)+  
     ;
     
 HexConstant 
-    : HexId HEX_DIGIT+
+    : HexId (HEX_DIGIT)+
     ;
 
 FloatingPointType 
@@ -243,7 +243,7 @@ FloatingPointType
     ;
     
 IntegerType 
-    : INT DIGIT+
+    : INT (DIGIT)+
     ;
 
 widthOrSizeExpr
@@ -251,7 +251,7 @@ widthOrSizeExpr
     ;
 
 WidthType 
-    : WIDTH DIGIT+
+    : WIDTH (DIGIT)+
     ;
     
 BinId : '0b';
