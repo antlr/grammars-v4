@@ -16,5 +16,4 @@ python/python3-ts
 python/python3-without-actions
 python/tiny-python
 stringtemplate
-swift-fin
 tcpheader
