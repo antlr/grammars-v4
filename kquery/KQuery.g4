@@ -46,18 +46,21 @@ queryCommand
     ;
         
 queryExpr 
-    : expression 
-    | expression evalExprList
-    | expression evalExprList evalArrayList
+    : expression                                #SingletonQueryExpr
+    | expression evalExprList                   #WithEvalExpr
+    | expression evalExprList evalArrayList     #WithEvalExprAndArrayList
     ;
     
 evalExprList 
-    : LeftBracket (expression)* RightBracket  
+    : LeftBracket expressionList RightBracket  
     ;
-    
+
 evalArrayList 
-    : LeftBracket (Identifier)* RightBracket  
+    : LeftBracket identifierList RightBracket  
     ;
+
+expressionList : (expression)*;
+identifierList : (Identifier)*;
 
 arrayDeclaration
     : Array arrName LeftBracket numArrayElements RightBracket 
@@ -74,29 +77,29 @@ arrayInitializer
     ;
     
 expression
-    : varName
-    | namedConstant Colon fullyQualifiedExpression   
-    | LeftParen widthOrSizeExpr number RightParen
-    | LeftParen arithmeticExpr widthOrSizeExpr leftExpr rightExpr RightParen
-    | LeftParen notExpr LeftBracket widthOrSizeExpr RightBracket expression RightParen
-    | LeftParen bitwiseExpr widthOrSizeExpr leftExpr rightExpr RightParen 
-    | LeftParen comparisonExpr widthOrSizeExpr leftExpr rightExpr RightParen 
-    | LeftParen comparisonExpr leftExpr rightExpr RightParen 
-    | LeftParen concatExpr widthOrSizeExpr leftExpr rightExpr RightParen
-    | LeftParen concatExpr leftExpr rightExpr RightParen
-    | LeftParen arrExtractExpr widthOrSizeExpr number expression RightParen
-    | LeftParen bitExtractExpr widthOrSizeExpr expression RightParen
-    | LeftParen genericBitRead widthOrSizeExpr expression version RightParen
-    | LeftParen selectExpr widthOrSizeExpr leftExpr rightExpr expression RightParen  
-    | LeftParen exprNegation widthOrSizeExpr expression RightParen
-    | LeftParen exprNegation expression RightParen 
-    | LeftParen genericBitRead widthOrSizeExpr expression RightParen
-    | version
-    | number
+    : varName                                                                               #VariableName
+    | namedConstant Colon expression                                                        #NamedAbbreviation
+    | LeftParen widthOrSizeExpr number RightParen                                           #SizeQuery
+    | LeftParen arithmeticExpr widthOrSizeExpr leftExpr rightExpr RightParen                #ArithExpr
+    | LeftParen notExpr LeftBracket widthOrSizeExpr RightBracket expression RightParen      #NotExprWidth
+    | LeftParen bitwiseExpr widthOrSizeExpr leftExpr rightExpr RightParen                   #BitwExprWidth
+    | LeftParen comparisonExpr widthOrSizeExpr leftExpr rightExpr RightParen                #CompExprWidth
+    | LeftParen comparisonExpr leftExpr rightExpr RightParen                                #CompExpr
+    | LeftParen concatExpr widthOrSizeExpr leftExpr rightExpr RightParen                    #ConcatExprWidth
+    | LeftParen concatExpr leftExpr rightExpr RightParen                                    #ConcatExprNW   
+    | LeftParen arrExtractExpr widthOrSizeExpr number expression RightParen                 #ArrExtractExprWidth
+    | LeftParen bitExtractExpr widthOrSizeExpr expression RightParen                        #BitExtractExprWidth
+    | LeftParen genericBitRead widthOrSizeExpr expression version RightParen                #ReadExpresssionVersioned
+    | LeftParen selectExpr widthOrSizeExpr leftExpr rightExpr expression RightParen         #SelectExprWidth
+    | LeftParen exprNegation widthOrSizeExpr expression RightParen                          #NegationExprWidth
+    | LeftParen exprNegation expression RightParen                                          #NegetionExpr
+    | LeftParen genericBitRead widthOrSizeExpr expression RightParen                        #ReadExpr
+    | version                                                                               #VersionExpr
+    | number                                                                                #Singleton
     ;
 
 genericBitRead
-    : READ
+    : READ          
     | READLSB
     | READMSB
     ;
@@ -107,14 +110,10 @@ bitExtractExpr
     ;
     
 version
-    : varName 
-    | namedConstant Colon fullyQualifiedExpression
-    | LeftBracket updateList RightBracket ATR version
-    | LeftBracket RightBracket ATR version
-    ;
-
-fullyQualifiedExpression
-    : expression
+    : varName                                               #VersionVariableName
+    | namedConstant Colon expression                        #VersionedNamedAbbreviation
+    | LeftBracket updateList RightBracket ATR version       #UpdationList
+    | LeftBracket RightBracket ATR version                  #NoUpdateList
     ;
     
 notExpr
@@ -132,7 +131,6 @@ exprNegation
 selectExpr
     : SELECT
     ;
-
 
 arrExtractExpr
     : EXTRACT
@@ -356,3 +354,4 @@ LeftBracket : '[';
 RightBracket : ']';
 LeftBrace : '{';
 RightBrace : '}';
+
