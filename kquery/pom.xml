@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>file_</entryPoint>
+					<entryPoint>kqueryExpression</entryPoint> 
 					<grammarName>KQuery</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
