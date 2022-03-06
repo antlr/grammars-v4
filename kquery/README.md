@@ -1,6 +1,5 @@
 ## KLEE KQuery Grammar
 
-ANTLRv4 Grammar file for KLEE KQuery expressions.  
-Ported to Antlr4 by Sumit Lahiri.
+ANTLRv4 Grammar file for KLEE KQuery expressions.
 
-KQuery Reference : [KLEE KQuery Language Specifications](https://klee.github.io/docs/kquery/)
+KQuery Language Reference : [KLEE KQuery Language Specifications](https://klee.github.io/docs/kquery/)

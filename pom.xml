@@ -169,6 +169,7 @@
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kuka</module>
+				<module>kquery</module>
 				<module>lambda</module>
 				<module>lark</module>
 				<module>lcc</module>
