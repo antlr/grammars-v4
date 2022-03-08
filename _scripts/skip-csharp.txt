@@ -19,6 +19,7 @@ pgn
 php
 pike
 powerbuilder
+python/python
 python/python2
 python/python2-js
 python/python3-py

@@ -23,6 +23,7 @@ p
 pgn
 php
 powerbuilder
+python/python
 python/python2
 python/python3
 python/python3-py
