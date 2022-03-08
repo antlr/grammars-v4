@@ -45,6 +45,7 @@ php
 plucid
 powerbuilder
 prov-n
+python/python
 python/python3
 r
 racket-bsl

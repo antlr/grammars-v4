@@ -66,6 +66,7 @@ pl0
 ply
 powerbuilder
 protobuf3
+python/python
 python/python2
 python/python3
 python/python3-py
