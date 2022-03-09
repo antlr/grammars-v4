@@ -24,7 +24,9 @@ SOFTWARE.
 
 parser grammar VerilogParser;
 
-options { tokenVocab=VerilogLexer; }
+options {
+	tokenVocab = VerilogLexer;
+}
 
 library_text
 	: library_description* EOF
@@ -721,7 +723,7 @@ if_generate_construct
 	;
 
 case_generate_construct
-	: 'case' '(' constant_expression ')' case_generate_item case_generate_item* 'endcase'
+	: 'case' '(' constant_expression ')' case_generate_item+ 'endcase'
 	;
 
 case_generate_item
@@ -740,7 +742,7 @@ generate_block_or_null
 	;
 
 udp_declaration
-	: attribute_instance* 'primitive' udp_identifier '(' udp_port_list ')' ';' udp_port_declaration udp_port_declaration* udp_body 'endprimitive'
+	: attribute_instance* 'primitive' udp_identifier '(' udp_port_list ')' ';' udp_port_declaration+ udp_body 'endprimitive'
 	| attribute_instance* 'primitive' udp_identifier '(' udp_declaration_port_list ')' ';' udp_body 'endprimitive'
 	;
 
@@ -777,7 +779,7 @@ udp_body
 	;
 
 combinational_body
-	: 'table' combinational_entry combinational_entry* 'endtable'
+	: 'table' combinational_entry+ 'endtable'
 	;
 
 combinational_entry
@@ -785,7 +787,7 @@ combinational_entry
 	;
 
 sequential_body
-	: udp_initial_statement? 'table' sequential_entry sequential_entry* 'endtable'
+	: udp_initial_statement? 'table' sequential_entry+ 'endtable'
 	;
 
 udp_initial_statement
@@ -793,7 +795,9 @@ udp_initial_statement
 	;
 
 init_val
-	: INIT_VAL
+	: //INIT_VAL
+		BINARY_NUMBER // '1\'' [bB][01xX]
+		| DECIMAL_NUMBER // [01]
 	;
 
 sequential_entry
@@ -806,7 +810,7 @@ seq_input_list
 	;
 
 level_input_list
-	: level_symbol level_symbol*
+	: level_symbol+
 	;
 
 edge_input_list
@@ -828,11 +832,14 @@ next_state
 	;
 
 output_symbol
-	: OUTPUT_SYMBOL
+	: //OUTPUT_SYMBOL
+		OUTPUT_OR_LEVEL_SYMBOL
 	;
 
 level_symbol
-	: LEVEL_SYMBOL
+	: //LEVEL_SYMBOL
+		OUTPUT_OR_LEVEL_SYMBOL
+		| LEVEL_ONLY_SYMBOL
 	;
 
 edge_symbol
@@ -979,9 +986,9 @@ conditional_statement
 	;
 
 case_statement
-	: 'case' '(' expression ')' case_item case_item* 'endcase'
-	| 'casez' '(' expression ')' case_item case_item* 'endcase'
-	| 'casex' '(' expression ')' case_item case_item* 'endcase'
+	: 'case' '(' expression ')' case_item+ 'endcase'
+	| 'casez' '(' expression ')' case_item+ 'endcase'
+	| 'casex' '(' expression ')' case_item+ 'endcase'
 	;
 
 case_item
@@ -1348,7 +1355,9 @@ scalar_timing_check_condition
 	;
 
 scalar_constant
-	: SCALAR_CONSTANT
+	: //SCALAR_CONSTANT
+		BINARY_NUMBER // '1'? '\'' [bB] [01]
+		| DECIMAL_NUMBER // [01]
 	;
 
 concatenation
