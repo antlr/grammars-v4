@@ -24,7 +24,9 @@ SOFTWARE.
 
 parser grammar SystemVerilogParser;
 
-options { tokenVocab=SystemVerilogLexer; }
+options {
+	tokenVocab = SystemVerilogLexer;
+}
 
 library_text
 	: library_description* EOF
@@ -128,11 +130,11 @@ class_declaration
 interface_class_type
 	: ps_class_identifier parameter_value_assignment?
 	;
-/* not referenced anywhere in the spec
+
 interface_class_declaration
 	: 'interface' 'class' class_identifier parameter_port_list? ( 'extends' interface_class_type ( ',' interface_class_type )* )? ';' interface_class_item* 'endclass' ( ':' class_identifier )?
 	;
-*/
+
 interface_class_item
 	: type_declaration
 	| attribute_instance* interface_class_method
@@ -233,7 +235,8 @@ elaboration_system_task
 	;
 
 finish_number
-	: FINISH_NUMBER
+	: //FINISH_NUMBER
+		DECIMAL_NUMBER // [012]
 	;
 
 module_common_item
@@ -593,6 +596,7 @@ package_or_generate_item_declaration
 	| dpi_import_export
 	| extern_constraint_declaration
 	| class_declaration
+	| interface_class_declaration
 	| class_constructor_declaration
 	| local_parameter_declaration ';'
 	| parameter_declaration ';'
@@ -609,6 +613,7 @@ anonymous_program_item
 	: task_declaration
 	| function_declaration
 	| class_declaration
+	| interface_class_declaration
 	| covergroup_declaration
 	| class_constructor_declaration
 	| ';'
@@ -679,7 +684,7 @@ genvar_declaration
 net_declaration
 	: net_type ( drive_strength | charge_strength )? ( 'vectored' | 'scalared' )? data_type_or_implicit delay3? list_of_net_decl_assignments ';'
 	| net_type_identifier delay_control? list_of_net_decl_assignments ';'
-	| 'interconnect' implicit_data_type ( '#' delay_value | '#0' )? net_identifier unpacked_dimension* ( ',' net_identifier unpacked_dimension* )? ';'
+	| 'interconnect' implicit_data_type ( '#' delay_value )? net_identifier unpacked_dimension* ( ',' net_identifier unpacked_dimension* )? ';'
 	;
 
 type_declaration
@@ -710,7 +715,7 @@ data_type
 	: integer_vector_type signing? packed_dimension*
 	| integer_atom_type signing?
 	| non_integer_type
-	| struct_union ( 'packed' signing? )? '{' struct_union_member struct_union_member* '}' packed_dimension*
+	| struct_union ( 'packed' signing? )? '{' struct_union_member+ '}' packed_dimension*
 	| 'enum' enum_base_type? '{' enum_name_declaration ( ',' enum_name_declaration )* '}' packed_dimension*
 	| 'string'
 	| 'chandle'
@@ -867,13 +872,11 @@ charge_strength
 
 delay3
 	: '#' delay_value
-		| '#0'
 	| '#' '(' mintypmax_expression ( ',' mintypmax_expression ( ',' mintypmax_expression )? )? ')'
 	;
 
 delay2
 	: '#' delay_value
-		| '#0'
 	| '#' '(' mintypmax_expression ( ',' mintypmax_expression )? ')'
 	;
 
@@ -1243,7 +1246,7 @@ property_expr
 	| sequence_expr '|->' property_expr
 	| sequence_expr '|=>' property_expr
 	| 'if' expression_or_dist property_expr ( 'else' property_expr )?
-	| 'case' expression_or_dist property_case_item property_case_item* 'endcase'
+	| 'case' expression_or_dist property_case_item+ 'endcase'
 	| sequence_expr '#-#' property_expr
 	| sequence_expr '#=#' property_expr
 	| 'nexttime' property_expr
@@ -1808,7 +1811,7 @@ if_generate_construct
 	;
 
 case_generate_construct
-	: 'case' '(' constant_expression ')' case_generate_item case_generate_item* 'endcase'
+	: 'case' '(' constant_expression ')' case_generate_item+ 'endcase'
 	;
 
 case_generate_item
@@ -1836,7 +1839,7 @@ udp_ansi_declaration
 	;
 
 udp_declaration
-	: udp_nonansi_declaration udp_port_declaration udp_port_declaration* udp_body 'endprimitive' ( ':' udp_identifier )?
+	: udp_nonansi_declaration udp_port_declaration+ udp_body 'endprimitive' ( ':' udp_identifier )?
 	| udp_ansi_declaration udp_body 'endprimitive' ( ':' udp_identifier )?
 	| 'extern' udp_nonansi_declaration
 	| 'extern' udp_ansi_declaration
@@ -1876,7 +1879,7 @@ udp_body
 	;
 
 combinational_body
-	: 'table' combinational_entry combinational_entry* 'endtable'
+	: 'table' combinational_entry+ 'endtable'
 	;
 
 combinational_entry
@@ -1884,7 +1887,7 @@ combinational_entry
 	;
 
 sequential_body
-	: udp_initial_statement? 'table' sequential_entry sequential_entry* 'endtable'
+	: udp_initial_statement? 'table' sequential_entry+ 'endtable'
 	;
 
 udp_initial_statement
@@ -1892,7 +1895,9 @@ udp_initial_statement
 	;
 
 init_val
-	: INIT_VAL
+	: //INIT_VAL
+		BINARY_NUMBER // '1\'' [bB][01xX]
+		| DECIMAL_NUMBER // [01]
 	;
 
 sequential_entry
@@ -1905,7 +1910,7 @@ seq_input_list
 	;
 
 level_input_list
-	: level_symbol level_symbol*
+	: level_symbol+
 	;
 
 edge_input_list
@@ -1927,11 +1932,14 @@ next_state
 	;
 
 output_symbol
-	: OUTPUT_SYMBOL
+	: //OUTPUT_SYMBOL
+		OUTPUT_OR_LEVEL_SYMBOL
 	;
 
 level_symbol
-	: LEVEL_SYMBOL
+	: //LEVEL_SYMBOL
+		OUTPUT_OR_LEVEL_SYMBOL
+		| LEVEL_ONLY_SYMBOL
 	;
 
 edge_symbol
@@ -2106,7 +2114,6 @@ delay_or_event_control
 
 delay_control
 	: '#' delay_value
-		| '#0'
 	| '#' '(' mintypmax_expression ')'
 	;
 
@@ -2179,9 +2186,9 @@ cond_pattern
 	;
 
 case_statement
-	: unique_priority? case_keyword '(' case_expression ')' case_item case_item* 'endcase'
-	| unique_priority? case_keyword '(' case_expression ')' 'matches' case_pattern_item case_pattern_item* 'endcase'
-	| unique_priority? 'case' '(' case_expression ')' 'inside' case_inside_item case_inside_item* 'endcase'
+	: unique_priority? case_keyword '(' case_expression ')' case_item+ 'endcase'
+	| unique_priority? case_keyword '(' case_expression ')' 'matches' case_pattern_item+ 'endcase'
+	| unique_priority? 'case' '(' case_expression ')' 'inside' case_inside_item+ 'endcase'
 	;
 
 case_keyword
@@ -2214,7 +2221,7 @@ case_item_expression
 	;
 
 randcase_statement
-	: 'randcase' randcase_item randcase_item* 'endcase'
+	: 'randcase' randcase_item+ 'endcase'
 	;
 
 randcase_item
@@ -2365,17 +2372,20 @@ deferred_immediate_assertion_statement
 	;
 
 deferred_immediate_assert_statement
-	: 'assert' '#0' '(' expression ')' action_block
+	: //'assert' '#' '0' '(' expression ')' action_block
+		'assert' '#' unsigned_number '(' expression ')' action_block
 	| 'assert' 'final' '(' expression ')' action_block
 	;
 
 deferred_immediate_assume_statement
-	: 'assume' '#0' '(' expression ')' action_block
+	: //'assume' '#' '0' '(' expression ')' action_block
+		'assume' '#' unsigned_number '(' expression ')' action_block
 	| 'assume' 'final' '(' expression ')' action_block
 	;
 
 deferred_immediate_cover_statement
-	: 'cover' '#0' '(' expression ')' statement_or_null
+	: //'cover' '#' '0' '(' expression ')' statement_or_null
+		'cover' '#' unsigned_number '(' expression ')' statement_or_null
 	| 'cover' 'final' '(' expression ')' statement_or_null
 	;
 
@@ -2440,7 +2450,7 @@ clockvar_expression
 	;
 
 randsequence_statement
-	: 'randsequence' '(' production_identifier? ')' production production* 'endsequence'
+	: 'randsequence' '(' production_identifier? ')' production+ 'endsequence'
 	;
 
 production
@@ -2452,8 +2462,8 @@ rs_rule
 	;
 
 rs_production_list
-	: rs_prod rs_prod*
-	| 'rand' 'join' ( '(' expression ')' )? production_item production_item production_item*
+	: rs_prod+
+	| 'rand' 'join' ( '(' expression ')' )? production_item production_item+
 	;
 
 weight_specification
@@ -2487,7 +2497,7 @@ rs_repeat
 	;
 
 rs_case
-	: 'case' '(' case_expression ')' rs_case_item rs_case_item* 'endcase'
+	: 'case' '(' case_expression ')' rs_case_item+ 'endcase'
 	;
 
 rs_case_item
@@ -2825,7 +2835,10 @@ edge_control_specifier
 	;
 
 edge_descriptor
-	: EDGE_DESCRIPTOR
+	: //EDGE_DESCRIPTOR
+		DECIMAL_NUMBER // '01' | '10'
+		| SIMPLE_IDENTIFIER // [zZxX][01]
+		| ZERO_OR_ONE_Z_OR_X
 	;
 
 timing_check_condition
@@ -2843,7 +2856,9 @@ scalar_timing_check_condition
 	;
 
 scalar_constant
-	: SCALAR_CONSTANT
+	: //SCALAR_CONSTANT
+		BINARY_NUMBER // '1'? '\'' [bB] [01]
+		| DECIMAL_NUMBER // [01]
 	;
 
 concatenation
@@ -3100,7 +3115,9 @@ constant_primary
 		| ( 'std' '::' )? randomize_call
 	| constant_let_expression
 	| '(' constant_mintypmax_expression ')'
-	//| constant_cast
+	| //constant_cast
+		( simple_type | signing | 'string' | 'const' ) '\'' '(' constant_expression ')'
+		| constant_primary '\'' '(' constant_expression ')'
 	| constant_assignment_pattern_expression
 	| type_reference
 	| 'null'
@@ -3129,7 +3146,9 @@ primary
 		| ( 'std' '::' )? randomize_call
 	| let_expression
 	| '(' mintypmax_expression ')'
-	//| cast
+	| //cast
+		( simple_type | signing | 'string' | 'const' ) '\'' '(' expression ')'
+		| primary '\'' '(' expression ')'
 	| assignment_pattern_expression
 	| streaming_concatenation
 	| sequence_method_call
