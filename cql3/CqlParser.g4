@@ -593,10 +593,7 @@ assignmentList
    ;
 
 assignmentTuple
-   : syntaxBracketLr (
-         constant ((syntaxComma constant)* | (syntaxComma assignmentTuple)*) |
-         assignmentTuple (syntaxComma assignmentTuple)*
-     ) syntaxBracketRr
+   : syntaxBracketLr ( expression (syntaxComma expression)* ) syntaxBracketRr
    ;
 
 insert
