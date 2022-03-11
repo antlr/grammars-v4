@@ -278,7 +278,6 @@ alterTable
 alterTableOperation
    : alterTableAdd
    | alterTableDropColumns
-   | alterTableDropColumns
    | alterTableDropCompactStorage
    | alterTableRename
    | alterTableWith
