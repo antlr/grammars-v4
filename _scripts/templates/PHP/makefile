@@ -7,7 +7,7 @@ GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
 SOURCES = $(GENERATED) Test.php
 default: setup classes
 setup:
-	composer require antlr/antlr4-php-runtime
+	composer install
 classes: $(SOURCES)
 clean:
 	rm -f *.interp

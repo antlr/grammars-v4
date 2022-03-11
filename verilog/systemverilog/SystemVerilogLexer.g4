@@ -1,555 +1,495 @@
-// Author: Mustafa Said Ağca
-// License: MIT
+/*
+MIT License
+
+Copyright (c) 2022 Mustafa Said Ağca
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 
 lexer grammar SystemVerilogLexer;
 
-MINUS: '-';
-MINUSMINS: '--';
-NOT: '!';
-NE: '!=';
-NEQ: '!=?';
-NEE: '!==';
-DPI: '"DPI"';
-DPIC: '"DPI-C"';
-P: '#';
-PP: '##';
-PMP: '#-#';
-PEP: '#=#';
-PZ: '#0';
-DOLLAR: '$';
-DERROR: '$error';
-DFATAL: '$fatal';
-DINFO: '$info';
-DROOT: '$root.';
-DUNIT: '$unit';
-DWARNING: '$warning';
-PER: '%';
-PE: '%=';
-AND: '&';
-ANDAND: '&&';
-ANDANDAND: '&&&';
-AE: '&=';
-LP: '(';
-LPS: '(*';
-RP: ')';
-STAR: '*';
-SRP: '*)';
-SS: '**';
-SCCS: '*::*';
-SEQ: '*=';
-SGT: '*>';
-COMMA: ',';
-DOT: '.';
-DOTSTAR: '.*';
-SLASH: '/';
-SLASHEQ: '/=';
-COLON: ':';
-MCOLON: '-:';
-COLONSLASH: ':/';
-COLONCOLON: '::';
-COLONEQ: ':=';
-SEMI: ';';
-QUES: '?';
-AT: '@';
-ATAT: '@@';
-LB: '[';
-QUOTE: '\'';
-RB: ']';
-CARET: '^';
-CARETSQUIG: '^~';
-CARETEQ: '^=';
-LC: '{';
-BAR: '|';
-BARBAR: '||';
-BAREQ: '|=';
-BAREQGT: '|=>';
-BARARROW: '|->';
-RC: '}';
-SQUIG: '~';
-SQUIGAND: '~&';
-SQUIGCARET: '~^';
-SQUIGBAR: '~|';
-PLUS: '+';
-PLUSCOLON: '+:';
-PLUSPLUS: '++';
-PLUSEQ: '+=';
-LT: '<';
-LTLT: '<<';
-LTLTLT: '<<<';
-LTLTLTEQ: '<<<=';
-LTLTEQ: '<<=';
-LTEQ: '<=';
-LTMINUSGT: '<->';
-EQ: '=';
-MINUSEQ: '-=';
-EQEQ: '==';
-EQEQQUEST: '==?';
-EQEQEQ: '===';
-EQGT: '=>';
-GT: '>';
-ARROW: '->';
-GE: '>=';
-GTGT: '>>';
-MINUSGTGT: '->>';
-GTGTEQ: '>>=';
-GTGTGT: '>>>';
-GTGTGTEQ: '>>>=';
-KONESTEP: '1step';
-KACCEPT_ON: 'accept_on';
-KALIAS: 'alias';
-KALWAYS: 'always';
-KALWAYS_COMB: 'always_comb';
-KALWAYS_FF: 'always_ff';
-KALWAYS_LATCH: 'always_latch';
-KAND: 'and';
-KASSERT: 'assert';
-KASSIGN: 'assign';
-KASSUME: 'assume';
-KAUTOMATIC: 'automatic';
-KBEFORE: 'before';
-KBEGIN: 'begin';
-KBIND: 'bind';
-KBINS: 'bins';
-KBINSOF: 'binsof';
-KBIT: 'bit';
-KBREAK: 'break';
-KBUF: 'buf';
-KBUFIF0: 'bufif0';
-KBUFIF1: 'bufif1';
-KBYTE: 'byte';
-KCASE: 'case';
-KCASEX: 'casex';
-KCASEZ: 'casez';
-KCELL: 'cell';
-KCHANDLE: 'chandle';
-KCHECKER: 'checker';
-KCLASS: 'class';
-KCLOCKING: 'clocking';
-KCMOS: 'cmos';
-KCONFIG: 'config';
-KCONST: 'const';
-KCONSTRAINT: 'constraint';
-KCONTEXT: 'context';
-KCONTINUE: 'continue';
-KCOVER: 'cover';
-KCOVERGROUP: 'covergroup';
-KCOVERPOINT: 'coverpoint';
-KCROSS: 'cross';
-KDEASSIGN: 'deassign';
-KDEFAULT: 'default';
-KDEFPARAM: 'defparam';
-KDESIGN: 'design';
-KDISABLE: 'disable';
-KDIST: 'dist';
-KDO: 'do';
-KEDGE: 'edge';
-KELSE: 'else';
-KEND: 'end';
-KENDCASE: 'endcase';
-KENDCHECKER: 'endchecker';
-KENDCLASS: 'endclass';
-KENDCLOCKING: 'endclocking';
-KENDCONFIG: 'endconfig';
-KENDFUNCTION: 'endfunction';
-KENDGENERATE: 'endgenerate';
-KENDGROUP: 'endgroup';
-KENDINTERFACE: 'endinterface';
-KENDMODULE: 'endmodule';
-KENDPACKAGE: 'endpackage';
-KENDPROGRAM: 'endprogram';
-KENDPROPERTY: 'endproperty';
-KENDSEQUENCE: 'endsequence';
-KENDSPECIFY: 'endspecify';
-KENDTASK: 'endtask';
-KENUM: 'enum';
-KEVENT: 'event';
-KEVENTUALLY: 'eventually';
-KEXPECT: 'expect';
-KEXPORT: 'export';
-KEXTENDS: 'extends';
-KEXTERN: 'extern';
-KFINAL: 'final';
-KFIRST_MATCH: 'first_match';
-KFOR: 'for';
-KFORCE: 'force';
-KFOREACH: 'foreach';
-KFOREVER: 'forever';
-KFORK: 'fork';
-KFORKJOIN: 'forkjoin';
-KFUNCTION: 'function';
-KGENERATE: 'generate';
-KGENVAR: 'genvar';
-KGLOBAL: 'global';
-KHIGHZ0: 'highz0';
-KHIGHZ1: 'highz1';
-KIF: 'if';
-KIFF: 'iff';
-KIFNONE: 'ifnone';
-KIGNORE_BINS: 'ignore_bins';
-KILLEGAL_BINS: 'illegal_bins';
-KIMPLEMENTS: 'implements';
-KIMPLIES: 'implies';
-KIMPORT: 'import';
-KINCDIR: '-incdir';
-KINCLUDE: 'include';
-KINITIAL: 'initial';
-KINOUT: 'inout';
-KINPUT: 'input';
-KINSIDE: 'inside';
-KINSTANCE: 'instance';
-KINT: 'int';
-KINTEGER: 'integer';
-KINTERCONNECT: 'interconnect';
-KINTERFACE: 'interface';
-KINTERSECT: 'intersect';
-KJOIN: 'join';
-KJOIN_ANY: 'join_any';
-KJOIN_NONE: 'join_none';
-KLARGE: 'large';
-KLET: 'let';
-KLIBLIST: 'liblist';
-KLIBRARY: 'library';
-KLOCAL: 'local';
-KLOCALPARAM: 'localparam';
-KLOGIC: 'logic';
-KLONGINT: 'longint';
-KMACROMODULE: 'macromodule';
-KMATCHES: 'matches';
-KMEDIUM: 'medium';
-KMEMBER_IDENTIFIER: 'member_identifier';
-KMODPORT: 'modport';
-KMODULE: 'module';
-KNAND: 'nand';
-KNEGEDGE: 'negedge';
-KNETTYPE: 'nettype';
-KNEW: 'new';
-KNEXTTIME: 'nexttime';
-KNMOS: 'nmos';
-KNOR: 'nor';
-KNOSHOWCANCELLED: 'noshowcancelled';
-KNOT: 'not';
-KNOTIF0: 'notif0';
-KNOTIF1: 'notif1';
-KNULL: 'null';
-KOPTION: 'option';
-KOR: 'or';
-KOUTPUT: 'output';
-KPACKAGE: 'package';
-KPACKED: 'packed';
-KPARAMETER: 'parameter';
-KPATHPULSE: 'PATHPULSE$';
-KPMOS: 'pmos';
-KPOSEDGE: 'posedge';
-KPRIORITY: 'priority';
-KPROGRAM: 'program';
-KPROPERTY: 'property';
-KPROTECTED: 'protected';
-KPULL0: 'pull0';
-KPULL1: 'pull1';
-KPULLDOWN: 'pulldown';
-KPULLUP: 'pullup';
-KPULSESTYLE_ONDETECT: 'pulsestyle_ondetect';
-KPULSESTYLE_ONEVENT: 'pulsestyle_onevent';
-KPURE: 'pure';
-KRAND: 'rand';
-KRANDC: 'randc';
-KRANDCASE: 'randcase';
-KRANDOMIZE: 'randomize';
-KRANDSEQUENCE: 'randsequence';
-KRCMOS: 'rcmos';
-KREAL: 'real';
-KREALTIME: 'realtime';
-KREF: 'ref';
-KREG: 'reg';
-KREJECT_ON: 'reject_on';
-KRELEASE: 'release';
-KREPEAT: 'repeat';
-KRESTRICT: 'restrict';
-KRETURN: 'return';
-KRNMOS: 'rnmos';
-KRPMOS: 'rpmos';
-KRTRAN: 'rtran';
-KRTRANIF0: 'rtranif0';
-KRTRANIF1: 'rtranif1';
-KS_ALWAYS: 's_always';
-KS_EVENTUALLY: 's_eventually';
-KS_NEXTTIME: 's_nexttime';
-KS_UNTIL: 's_until';
-KS_UNTIL_WITH: 's_until_with';
-KSCALARED: 'scalared';
-KSEQUENCE: 'sequence';
-KSHORTINT: 'shortint';
-KSHORTREAL: 'shortreal';
-KSHOWCANCELLED: 'showcancelled';
-KSIGNED: 'signed';
-KSMALL: 'small';
-KSOFT: 'soft';
-KSOLVE: 'solve';
-KSPECIFY: 'specify';
-KSPECPARAM: 'specparam';
-KSTATIC: 'static';
-KSTD: 'std';
-KSTRING: 'string';
-KSTRONG: 'strong';
-KSTRONG0: 'strong0';
-KSTRONG1: 'strong1';
-KSTRUCT: 'struct';
-KSUPER: 'super';
-KSUPPLY0: 'supply0';
-KSUPPLY1: 'supply1';
-KSYNC_ACCEPT_ON: 'sync_accept_on';
-KSYNC_REJECT_ON: 'sync_reject_on';
-KTAGGED: 'tagged';
-KTASK: 'task';
-KTHIS: 'this';
-KTHROUGHOUT: 'throughout';
-KTIME: 'time';
-KTIMEPRECISION: 'timeprecision';
-KTIMEUNIT: 'timeunit';
-KTRAN: 'tran';
-KTRANIF0: 'tranif0';
-KTRANIF1: 'tranif1';
-KTRI: 'tri';
-KTRI0: 'tri0';
-KTRI1: 'tri1';
-KTRIAND: 'triand';
-KTRIOR: 'trior';
-KTRIREG: 'trireg';
-KTYPE: 'type';
-KTYPE_OPTION: 'type_option';
-KTYPEDEF: 'typedef';
-KUNION: 'union';
-KUNIQUE: 'unique';
-KUNIQUE0: 'unique0';
-KUNSIGNED: 'unsigned';
-KUNTIL: 'until';
-KUNTIL_WITH: 'until_with';
-KUNTYPED: 'untyped';
-KUSE: 'use';
-KUWIRE: 'uwire';
-KVAR: 'var';
-KVECTORED: 'vectored';
-KVIRTUAL: 'virtual';
-KVOID: 'void';
-KWAIT: 'wait';
-KWAIT_ORDER: 'wait_order';
-KWAND: 'wand';
-KWEAK: 'weak';
-KWEAK0: 'weak0';
-KWEAK1: 'weak1';
-KWHILE: 'while';
-KWILDCARD: 'wildcard';
-KWIRE: 'wire';
-KWITH: 'with';
-KWITHIN: 'within';
-KWOR: 'wor';
-KXNOR: 'xnor';
-KXOR: 'xor';
+channels { COMMENTS, DIRECTIVES }
 
-// 22. Compiler directives
-
-COMPILER_DIRECTIVE
-	: '`' .*? '\r'? '\n' -> skip
-	;
-
-// 33.3.1 Specifying libraries—the library map file
-
-FILE_PATH_SPEC
-	: ([/~] | './') ~[ \r\t\n]*?
-	;
-
-// A.7.5.3 System timing check event definitions
-
-/*EDGE_DESCRIPTOR
-	: '01'
-	| '10'
-	| Z_OR_X ZERO_OR_ONE
-	| ZERO_OR_ONE Z_OR_X
-	;
-
-fragment
-ZERO_OR_ONE
-	: [01]
-	;
-
-fragment
-Z_OR_X
-	: [xXzZ]
-	;
-*/
-// A.8.4 Primaries
-
-TIME_LITERAL
-	: UNSIGNED_NUMBER TIME_UNIT
-	| FIXED_POINT_NUMBER TIME_UNIT
-	;
-
-fragment
-TIME_UNIT
-	: [mnpf]? 's'
-	;
-
-// A.8.7 Numbers
-
-DECIMAL_NUMBER
-	: SIZE? DECIMAL_BASE (UNSIGNED_NUMBER | (X_DIGIT | Z_DIGIT) '_'*)
-	;
-
-BINARY_NUMBER
-	: SIZE? BINARY_BASE BINARY_VALUE
-	;
-
-OCTAL_NUMBER
-	: SIZE? OCTAL_BASE OCTAL_VALUE
-	;
-
-HEX_NUMBER
-	: SIZE? HEX_BASE HEX_VALUE
-	;
-
-fragment
-SIGN
-	: [+-]
-	;
-
-fragment
-SIZE
-	: NON_ZERO_UNSIGNED_NUMBER
-	;
-
-fragment
-NON_ZERO_UNSIGNED_NUMBER
-	: NON_ZERO_DECIMAL_DIGIT ('_' | DECIMAL_DIGIT)*
-	;
-
-REAL_NUMBER
-	: FIXED_POINT_NUMBER
-	;
-
-fragment
-FIXED_POINT_NUMBER
-	: UNSIGNED_NUMBER '.' UNSIGNED_NUMBER
-	;
-
-fragment
-EXP
-	: [eE]
-	;
-
-UNSIGNED_NUMBER
-	: DECIMAL_DIGIT ('_' | DECIMAL_DIGIT)*
-	;
-
-fragment
-BINARY_VALUE
-	: BINARY_DIGIT ('_' | BINARY_DIGIT)*
-	;
-
-fragment
-OCTAL_VALUE
-	: OCTAL_DIGIT ('_' | OCTAL_DIGIT)*
-	;
-
-fragment
-HEX_VALUE
-	: HEX_DIGIT ('_' | HEX_DIGIT)*
-	;
-
-fragment
-DECIMAL_BASE
-	: '\'' [sS]? [dD]
-	;
-
-fragment
-BINARY_BASE
-	: '\'' [sS]? [bB]
-	;
-
-fragment
-OCTAL_BASE
-	: '\'' [sS]? [oO]
-	;
-
-fragment
-HEX_BASE
-	: '\'' [sS]? [hH]
-	;
-
-fragment
-NON_ZERO_DECIMAL_DIGIT
-	: [1-9]
-	;
-
-fragment
-DECIMAL_DIGIT
-	: [0-9]
-	;
-
-fragment
-BINARY_DIGIT
-	: X_DIGIT
-	| Z_DIGIT
-	| [01]
-	;
-
-fragment
-OCTAL_DIGIT
-	: X_DIGIT
-	| Z_DIGIT
-	| [0-7]
-	;
-
-fragment
-HEX_DIGIT
-	: X_DIGIT
-	| Z_DIGIT
-	| [0-9a-fA-F]
-	;
-
-fragment
-X_DIGIT
-	: [xX]
-	;
-
-fragment
-Z_DIGIT
-	: [zZ?]
-	;
-
-/*UNBASED_UNSIZED_LITERAL
-	: '\'0'
-	| '\'1'
-	| '\'' Z_OR_X
-	;
-*/
-// A.8.8 Strings
-
-STRING_LITERAL
-	: '"' ~["\n\r]* '"'
-	;
-
-// A.9.2 Comments
-
-ONE_LINE_COMMENT
-	: '//' .*? '\r'? '\n' -> channel(HIDDEN)
-	;
-
-BLOCK_COMMENT
-	: '/*' .*? '*/' -> channel(HIDDEN)
-	;
-
-// A.9.3 Identifiers
-
-SIMPLE_IDENTIFIER
-	: [a-zA-Z_] [a-zA-Z0-9_$]*
-	;
-
-SYSTEM_TF_IDENTIFIER
-	: '$' [a-zA-Z0-9_$] [a-zA-Z0-9_$]*
-	;
-
-// A.9.4 White space
-
-WHITE_SPACE
-	: [ \t\n\r]+ -> channel(HIDDEN)
-	;
+EM : '!' ;
+EMEQ : '!=' ;
+EMEQEQ : '!==' ;
+EMEQQM : '!=?' ;
+DQ : '"' ;
+DQDPIDQ : '"DPI"' ;
+DQDPIMICDQ : '"DPI-C"' ;
+HA : '#' ;
+HAHA : '##' ;
+HAMIHA : '#-#' ;
+HAZERO : '#0' ;
+HAEQHA : '#=#' ;
+DL : '$' ;
+DLERROR : '$error' ;
+DLFATAL : '$fatal' ;
+DLFULLSKEW : '$fullskew' ;
+DLHOLD : '$hold' ;
+DLINFO : '$info' ;
+DLNOCHANGE : '$nochange' ;
+DLPERIOD : '$period' ;
+DLRECOVERY : '$recovery' ;
+DLRECREM : '$recrem' ;
+DLREMOVAL : '$removal' ;
+DLROOTDT : '$root.' ;
+DLSETUP : '$setup' ;
+DLSETUPHOLD : '$setuphold' ;
+DLSKEW : '$skew' ;
+DLTIMESKEW : '$timeskew' ;
+DLUNIT : '$unit' ;
+DLWARNING : '$warning' ;
+DLWIDTH : '$width' ;
+MO : '%' ;
+MOEQ : '%=' ;
+AM : '&' ;
+AMAM : '&&' ;
+AMAMAM : '&&&' ;
+AMEQ : '&=' ;
+LP : '(' ;
+RP : ')' ;
+AS : '*' ;
+ASAS : '**' ;
+ASSL : '*/' ;
+ASCLCLAS : '*::*' ;
+ASEQ : '*=' ;
+ASGT : '*>' ;
+PL : '+' ;
+PLPL : '++' ;
+PLCL : '+:' ;
+PLEQ : '+=' ;
+CO : ',' ;
+MI : '-' ;
+MIMI : '--' ;
+MICL : '-:' ;
+MIEQ : '-=' ;
+MIGT : '->' ;
+MIGTGT : '->>' ;
+MIINCDIR : '-incdir' ;
+DT : '.' ;
+DTAS : '.*' ;
+SL : '/' ;
+SLAS : '/*' ;
+SLSL : '//' ;
+SLEQ : '/=' ;
+ONESTEP : '1step' ;
+CL : ':' ;
+CLSL : ':/' ;
+CLCL : '::' ;
+CLEQ : ':=' ;
+SC : ';' ;
+LT : '<' ;
+LTMIGT : '<->' ;
+LTLT : '<<' ;
+LTLTLT : '<<<' ;
+LTLTLTEQ : '<<<=' ;
+LTLTEQ : '<<=' ;
+LTEQ : '<=' ;
+EQ : '=' ;
+EQEQ : '==' ;
+EQEQEQ : '===' ;
+EQEQQM : '==?' ;
+EQGT : '=>' ;
+GT : '>' ;
+GTEQ : '>=' ;
+GTGT : '>>' ;
+GTGTEQ : '>>=' ;
+GTGTGT : '>>>' ;
+GTGTGTEQ : '>>>=' ;
+QM : '?' ;
+AT : '@' ;
+ATAT : '@@' ;
+PATHPULSEDL : 'PATHPULSE$' ;
+LB : '[' ;
+BSAP : '\'' ;
+RB : ']' ;
+CA : '^' ;
+CAEQ : '^=' ;
+CATI : '^~' ;
+GA : '`' -> channel(DIRECTIVES), pushMode(DIRECTIVE_MODE) ;
+ACCEPT_ON : 'accept_on' ;
+ALIAS : 'alias' ;
+ALWAYS : 'always' ;
+ALWAYS_COMB : 'always_comb' ;
+ALWAYS_FF : 'always_ff' ;
+ALWAYS_LATCH : 'always_latch' ;
+AND : 'and' ;
+ASSERT : 'assert' ;
+ASSIGN : 'assign' ;
+ASSUME : 'assume' ;
+AUTOMATIC : 'automatic' ;
+BEFORE : 'before' ;
+BEGIN : 'begin' ;
+BIND : 'bind' ;
+BINS : 'bins' ;
+BINSOF : 'binsof' ;
+BIT : 'bit' ;
+BREAK : 'break' ;
+BUF : 'buf' ;
+BUFIFZERO : 'bufif0' ;
+BUFIFONE : 'bufif1' ;
+BYTE : 'byte' ;
+CASE : 'case' ;
+CASEX : 'casex' ;
+CASEZ : 'casez' ;
+CELL : 'cell' ;
+CHANDLE : 'chandle' ;
+CHECKER : 'checker' ;
+CLASS : 'class' ;
+CLOCKING : 'clocking' ;
+CMOS : 'cmos' ;
+CONFIG : 'config' ;
+CONST : 'const' ;
+CONSTRAINT : 'constraint' ;
+CONTEXT : 'context' ;
+CONTINUE : 'continue' ;
+COVER : 'cover' ;
+COVERGROUP : 'covergroup' ;
+COVERPOINT : 'coverpoint' ;
+CROSS : 'cross' ;
+DEASSIGN : 'deassign' ;
+DEFAULT : 'default' ;
+DEFPARAM : 'defparam' ;
+DESIGN : 'design' ;
+DISABLE : 'disable' ;
+DIST : 'dist' ;
+DO : 'do' ;
+EDGE : 'edge' ;
+ELSE : 'else' ;
+END : 'end' ;
+ENDCASE : 'endcase' ;
+ENDCHECKER : 'endchecker' ;
+ENDCLASS : 'endclass' ;
+ENDCLOCKING : 'endclocking' ;
+ENDCONFIG : 'endconfig' ;
+ENDFUNCTION : 'endfunction' ;
+ENDGENERATE : 'endgenerate' ;
+ENDGROUP : 'endgroup' ;
+ENDINTERFACE : 'endinterface' ;
+ENDMODULE : 'endmodule' ;
+ENDPACKAGE : 'endpackage' ;
+ENDPRIMITIVE : 'endprimitive' ;
+ENDPROGRAM : 'endprogram' ;
+ENDPROPERTY : 'endproperty' ;
+ENDSEQUENCE : 'endsequence' ;
+ENDSPECIFY : 'endspecify' ;
+ENDTABLE : 'endtable' ;
+ENDTASK : 'endtask' ;
+ENUM : 'enum' ;
+EVENT : 'event' ;
+EXPECT : 'expect' ;
+EXPORT : 'export' ;
+EXTENDS : 'extends' ;
+EXTERN : 'extern' ;
+FINAL : 'final' ;
+FIRST_MATCH : 'first_match' ;
+FOR : 'for' ;
+FORCE : 'force' ;
+FOREACH : 'foreach' ;
+FOREVER : 'forever' ;
+FORK : 'fork' ;
+FORKJOIN : 'forkjoin' ;
+FUNCTION : 'function' ;
+GENERATE : 'generate' ;
+GENVAR : 'genvar' ;
+GLOBAL : 'global' ;
+HIGHZZERO : 'highz0' ;
+HIGHZONE : 'highz1' ;
+IF : 'if' ;
+IFF : 'iff' ;
+IFNONE : 'ifnone' ;
+IGNORE_BINS : 'ignore_bins' ;
+ILLEGAL_BINS : 'illegal_bins' ;
+IMPLEMENTS : 'implements' ;
+IMPLIES : 'implies' ;
+IMPORT : 'import' ;
+INCLUDE : 'include' ;
+INITIAL : 'initial' ;
+INOUT : 'inout' ;
+INPUT : 'input' ;
+INSIDE : 'inside' ;
+INSTANCE : 'instance' ;
+INT : 'int' ;
+INTEGER : 'integer' ;
+INTERCONNECT : 'interconnect' ;
+INTERFACE : 'interface' ;
+INTERSECT : 'intersect' ;
+JOIN : 'join' ;
+JOIN_ANY : 'join_any' ;
+JOIN_NONE : 'join_none' ;
+LARGE : 'large' ;
+LET : 'let' ;
+LIBLIST : 'liblist' ;
+LIBRARY : 'library' ;
+LOCAL : 'local' ;
+LOCALPARAM : 'localparam' ;
+LOGIC : 'logic' ;
+LONGINT : 'longint' ;
+MACROMODULE : 'macromodule' ;
+MATCHES : 'matches' ;
+MEDIUM : 'medium' ;
+MODPORT : 'modport' ;
+MODULE : 'module' ;
+NAND : 'nand' ;
+NEGEDGE : 'negedge' ;
+NETTYPE : 'nettype' ;
+NEW : 'new' ;
+NEXTTIME : 'nexttime' ;
+NMOS : 'nmos' ;
+NOR : 'nor' ;
+NOSHOWCANCELLED : 'noshowcancelled' ;
+NOT : 'not' ;
+NOTIFZERO : 'notif0' ;
+NOTIFONE : 'notif1' ;
+NULL : 'null' ;
+OPTIONDT : 'option.' ;
+OR : 'or' ;
+OUTPUT : 'output' ;
+PACKAGE : 'package' ;
+PACKED : 'packed' ;
+PARAMETER : 'parameter' ;
+PMOS : 'pmos' ;
+POSEDGE : 'posedge' ;
+PRIMITIVE : 'primitive' ;
+PRIORITY : 'priority' ;
+PROGRAM : 'program' ;
+PROPERTY : 'property' ;
+PROTECTED : 'protected' ;
+PULLZERO : 'pull0' ;
+PULLONE : 'pull1' ;
+PULLDOWN : 'pulldown' ;
+PULLUP : 'pullup' ;
+PULSESTYLE_ONDETECT : 'pulsestyle_ondetect' ;
+PULSESTYLE_ONEVENT : 'pulsestyle_onevent' ;
+PURE : 'pure' ;
+RAND : 'rand' ;
+RANDC : 'randc' ;
+RANDCASE : 'randcase' ;
+RANDOMIZE : 'randomize' ;
+RANDSEQUENCE : 'randsequence' ;
+RCMOS : 'rcmos' ;
+REAL : 'real' ;
+REALTIME : 'realtime' ;
+REF : 'ref' ;
+REG : 'reg' ;
+REJECT_ON : 'reject_on' ;
+RELEASE : 'release' ;
+REPEAT : 'repeat' ;
+RESTRICT : 'restrict' ;
+RETURN : 'return' ;
+RNMOS : 'rnmos' ;
+RPMOS : 'rpmos' ;
+RTRAN : 'rtran' ;
+RTRANIFZERO : 'rtranif0' ;
+RTRANIFONE : 'rtranif1' ;
+S_ALWAYS : 's_always' ;
+S_EVENTUALLY : 's_eventually' ;
+S_NEXTTIME : 's_nexttime' ;
+S_UNTIL : 's_until' ;
+S_UNTIL_WITH : 's_until_with' ;
+SAMPLE : 'sample' ;
+SCALARED : 'scalared' ;
+SEQUENCE : 'sequence' ;
+SHORTINT : 'shortint' ;
+SHORTREAL : 'shortreal' ;
+SHOWCANCELLED : 'showcancelled' ;
+SIGNED : 'signed' ;
+SMALL : 'small' ;
+SOFT : 'soft' ;
+SOLVE : 'solve' ;
+SPECIFY : 'specify' ;
+SPECPARAM : 'specparam' ;
+STATIC : 'static' ;
+STD : 'std' ;
+STRING : 'string' ;
+STRONG : 'strong' ;
+STRONGZERO : 'strong0' ;
+STRONGONE : 'strong1' ;
+STRUCT : 'struct' ;
+SUPER : 'super' ;
+SUPPLYZERO : 'supply0' ;
+SUPPLYONE : 'supply1' ;
+SYNC_ACCEPT_ON : 'sync_accept_on' ;
+SYNC_REJECT_ON : 'sync_reject_on' ;
+TABLE : 'table' ;
+TAGGED : 'tagged' ;
+TASK : 'task' ;
+THIS : 'this' ;
+THROUGHOUT : 'throughout' ;
+TIME : 'time' ;
+TIMEPRECISION : 'timeprecision' ;
+TIMEUNIT : 'timeunit' ;
+TRAN : 'tran' ;
+TRANIFZERO : 'tranif0' ;
+TRANIFONE : 'tranif1' ;
+TRI : 'tri' ;
+TRIZERO : 'tri0' ;
+TRIONE : 'tri1' ;
+TRIAND : 'triand' ;
+TRIOR : 'trior' ;
+TRIREG : 'trireg' ;
+TYPE : 'type' ;
+TYPE_OPTIONDT : 'type_option.' ;
+TYPEDEF : 'typedef' ;
+UNION : 'union' ;
+UNIQUE : 'unique' ;
+UNIQUEZERO : 'unique0' ;
+UNSIGNED : 'unsigned' ;
+UNTIL : 'until' ;
+UNTIL_WITH : 'until_with' ;
+UNTYPED : 'untyped' ;
+USE : 'use' ;
+UWIRE : 'uwire' ;
+VAR : 'var' ;
+VECTORED : 'vectored' ;
+VIRTUAL : 'virtual' ;
+VOID : 'void' ;
+WAIT : 'wait' ;
+WAIT_ORDER : 'wait_order' ;
+WAND : 'wand' ;
+WEAK : 'weak' ;
+WEAKZERO : 'weak0' ;
+WEAKONE : 'weak1' ;
+WHILE : 'while' ;
+WILDCARD : 'wildcard' ;
+WIRE : 'wire' ;
+WITH : 'with' ;
+WITHIN : 'within' ;
+WOR : 'wor' ;
+XNOR : 'xnor' ;
+XOR : 'xor' ;
+LC : '{' ;
+VL : '|' ;
+VLMIGT : '|->' ;
+VLEQ : '|=' ;
+VLEQGT : '|=>' ;
+VLVL : '||' ;
+RC : '}' ;
+TI : '~' ;
+TIAM : '~&' ;
+TICA : '~^' ;
+TIVL : '~|' ;
+TIME_LITERAL : UNSIGNED_NUMBER TIME_UNIT | FIXED_POINT_NUMBER TIME_UNIT ;
+fragment TIME_UNIT : [munpf]? 's' ;
+DECIMAL_NUMBER : UNSIGNED_NUMBER | SIZE? DECIMAL_BASE UNSIGNED_NUMBER | SIZE? DECIMAL_BASE X_DIGIT ( '_' )* | SIZE? DECIMAL_BASE Z_DIGIT ( '_' )* ;
+BINARY_NUMBER : SIZE? BINARY_BASE BINARY_VALUE ;
+OCTAL_NUMBER : SIZE? OCTAL_BASE OCTAL_VALUE ;
+HEX_NUMBER : SIZE? HEX_BASE HEX_VALUE ;
+fragment SIGN : [+-] ;
+fragment SIZE : NON_ZERO_UNSIGNED_NUMBER ;
+fragment NON_ZERO_UNSIGNED_NUMBER : NON_ZERO_DECIMAL_DIGIT ( '_' | DECIMAL_DIGIT )* ;
+REAL_NUMBER : FIXED_POINT_NUMBER | UNSIGNED_NUMBER ( '.' UNSIGNED_NUMBER )? EXP SIGN? UNSIGNED_NUMBER ;
+fragment FIXED_POINT_NUMBER : UNSIGNED_NUMBER '.' UNSIGNED_NUMBER ;
+fragment EXP : [eE] ;
+fragment UNSIGNED_NUMBER : DECIMAL_DIGIT ( '_' | DECIMAL_DIGIT )* ;
+fragment BINARY_VALUE : BINARY_DIGIT ( '_' | BINARY_DIGIT )* ;
+fragment OCTAL_VALUE : OCTAL_DIGIT ( '_' | OCTAL_DIGIT )* ;
+fragment HEX_VALUE : HEX_DIGIT ( '_' | HEX_DIGIT )* ;
+fragment DECIMAL_BASE : '\'' [sS]? [dD] ;
+fragment BINARY_BASE : '\'' [sS]? [bB] ;
+fragment OCTAL_BASE : '\'' [sS]? [oO] ;
+fragment HEX_BASE : '\'' [sS]? [hH] ;
+fragment NON_ZERO_DECIMAL_DIGIT : [1-9] ;
+fragment DECIMAL_DIGIT : [0-9] ;
+fragment BINARY_DIGIT : [01] | X_DIGIT | Z_DIGIT ;
+fragment OCTAL_DIGIT : [0-7] | X_DIGIT | Z_DIGIT ;
+fragment HEX_DIGIT : [0-9a-fA-F] | X_DIGIT | Z_DIGIT ;
+fragment X_DIGIT : [xX] ;
+fragment Z_DIGIT : [zZ?] ;
+UNBASED_UNSIZED_LITERAL : '\'0' | '\'1' | '\'' [xXzZ] ;
+STRING_LITERAL : '"' ( ~["\\] | '\\' . )* '"' ;
+COMMENT : ( ONE_LINE_COMMENT | BLOCK_COMMENT ) -> channel(COMMENTS) ;
+fragment ONE_LINE_COMMENT : '//' COMMENT_TEXT '\r'? '\n' ;
+fragment BLOCK_COMMENT : '/*' COMMENT_TEXT '*/' ;
+fragment COMMENT_TEXT : ASCII_ANY*? ;
+//C_IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]* ;
+ESCAPED_IDENTIFIER : '\\' ASCII_PRINTABLE_EXCEPT_SPACE* WHITE_SPACE ;
+SIMPLE_IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_$]* ;
+SYSTEM_TF_IDENTIFIER : '$' [a-zA-Z0-9_$][a-zA-Z0-9_$]* ;
+WHITE_SPACE : [ \t\r\n]+ -> channel(HIDDEN) ;
+fragment ASCII_ANY : [\u0000-\u007f] ;
+fragment ASCII_PRINTABLE : [\u0020-\u007e] ;
+fragment ASCII_PRINTABLE_EXCEPT_SPACE : [\u0021-\u007e] ;
+// TODO: define new modes to handle the following rules
+FILE_PATH_SPEC : './' ASCII_PRINTABLE* ( '.sv' | '.svh' ) ; // TODO: remove path name limitations
+FINISH_NUMBER : [012] ;
+INIT_VAL : '1\'' [bB][01xX] | [01] ;
+OUTPUT_SYMBOL : [01xX] ;
+LEVEL_SYMBOL : [01xX?bB] ;
+EDGE_SYMBOL : [rRfFpPnN*] ;
+EDGE_DESCRIPTOR : '01' | '10' | [zZxX][01] | [01][zZxX] ;
+SCALAR_CONSTANT : ( '1'? '\'' [bB] )? [01] ;
+mode DIRECTIVE_MODE;
+FILE_DIRECTIVE : '__FILE__' -> channel(DIRECTIVES), popMode ;
+LINE_DIRECTIVE_ : '__LINE__' -> channel(DIRECTIVES), popMode ;
+BEGIN_KEYWORDS_DIRECTIVE : 'begin_keywords' -> channel(DIRECTIVES), mode(DIRECTIVE_TEXT_MODE) ;
+CELLDEFINE_DIRECTIVE : 'celldefine' -> channel(DIRECTIVES), popMode ;
+DEFAULT_NETTYPE_DIRECTIVE : 'default_nettype' -> channel(DIRECTIVES), mode(DIRECTIVE_TEXT_MODE) ;
+DEFINE_DIRECTIVE : 'define' -> channel(DIRECTIVES), mode(DEFINE_DIRECTIVE_MODE) ;
+ELSE_DIRECTIVE : 'else' -> channel(DIRECTIVES), popMode, mode(SOURCE_TEXT_MODE) ;
+ELSIF_DIRECTIVE : 'elsif' -> channel(DIRECTIVES), popMode, mode(ELSIF_DIRECTIVE_MODE) ;
+END_KEYWORDS_DIRECTIVE : 'end_keywords' -> channel(DIRECTIVES), popMode ;
+ENDCELLDEFINE_DIRECTIVE : 'endcelldefine' -> channel(DIRECTIVES), popMode ;
+ENDIF_DIRECTIVE : 'endif' -> channel(DIRECTIVES), popMode, popMode, popMode ;
+IFDEF_DIRECTIVE : 'ifdef' -> channel(DIRECTIVES), mode(IFDEF_DIRECTIVE_MODE) ;
+IFNDEF_DIRECTIVE : 'ifndef' -> channel(DIRECTIVES), mode(IFDEF_DIRECTIVE_MODE) ;
+INCLUDE_DIRECTIVE : 'include' -> channel(DIRECTIVES), mode(DIRECTIVE_TEXT_MODE) ;
+LINE_DIRECTIVE : 'line' -> channel(DIRECTIVES), mode(DIRECTIVE_TEXT_MODE) ;
+NOUNCONNECTED_DRIVE_DIRECTIVE : 'nounconnected_drive' -> channel(DIRECTIVES), popMode ;
+PRAGMA_DIRECTIVE : 'pragma' -> channel(DIRECTIVES), mode(DIRECTIVE_TEXT_MODE) ;
+RESETALL_DIRECTIVE : 'resetall' -> channel(DIRECTIVES), popMode ;
+TIMESCALE_DIRECTIVE : 'timescale' -> channel(DIRECTIVES), mode(DIRECTIVE_TEXT_MODE) ;
+UNCONNECTED_DRIVE_DIRECTIVE : 'unconnected_drive' -> channel(DIRECTIVES), mode(DIRECTIVE_TEXT_MODE) ;
+UNDEF_DIRECTIVE : 'undef' -> channel(DIRECTIVES), mode(UNDEF_DIRECTIVE_MODE) ;
+UNDEFINEALL_DIRECTIVE : 'undefineall' -> channel(DIRECTIVES), popMode ;
+MACRO_USAGE : ( DIRECTIVE_ESCAPED_IDENTIFIER | DIRECTIVE_SIMPLE_IDENTIFIER ) MACRO_ARGS? -> channel(DIRECTIVES), popMode ;
+fragment DIRECTIVE_ESCAPED_IDENTIFIER : '\\' ASCII_PRINTABLE_EXCEPT_SPACE* WHITE_SPACE ;
+fragment DIRECTIVE_SIMPLE_IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_$]* ;
+fragment MACRO_ARGS : [ \t\r\n]*? '(' ( MACRO_ARGS | . )*? ')' ;
+mode DIRECTIVE_TEXT_MODE;
+DIRECTIVE_TEXT : ASCII_ANY*? '\r'? '\n' -> channel(DIRECTIVES), popMode ;
+mode DEFINE_DIRECTIVE_MODE;
+DIRECTIVE_IDENTIFIER : ( DIRECTIVE_ESCAPED_IDENTIFIER | DIRECTIVE_SIMPLE_IDENTIFIER ) -> channel(DIRECTIVES), mode(MACRO_TEXT_MODE) ;
+DIRECTIVE_COMMENT : ( ONE_LINE_COMMENT | BLOCK_COMMENT ) -> channel(COMMENTS) ;
+DIRECTIVE_WHITE_SPACE : [ \t]+ -> channel(HIDDEN) ;
+DIRECTIVE_NEWLINE : '\r'? '\n' -> channel(HIDDEN) ;
+mode MACRO_TEXT_MODE;
+MACRO_TEXT : ~[\r\n\\]+ -> channel(DIRECTIVES) ;
+MT_ESC_NEWLINE : '\\' '\r'? '\n' -> channel(HIDDEN) ;
+MT_ESC_SEQ : '\\' . -> channel(DIRECTIVES), type(MACRO_TEXT) ;
+MT_NEWLINE : '\r'? '\n' -> channel(HIDDEN), type(DIRECTIVE_NEWLINE), popMode ;
+mode UNDEF_DIRECTIVE_MODE;
+UD_IDENTIFIER : ( DIRECTIVE_ESCAPED_IDENTIFIER | DIRECTIVE_SIMPLE_IDENTIFIER ) -> channel(DIRECTIVES), type(DIRECTIVE_IDENTIFIER), popMode ;
+UD_COMMENT : ( ONE_LINE_COMMENT | BLOCK_COMMENT ) -> channel(COMMENTS), type(DIRECTIVE_COMMENT) ;
+UD_WHITE_SPACE : [ \t]+ -> channel(HIDDEN), type(DIRECTIVE_WHITE_SPACE) ;
+UD_NEWLINE : '\r'? '\n' -> channel(HIDDEN), type(DIRECTIVE_NEWLINE) ;
+mode IFDEF_DIRECTIVE_MODE;
+ID_IDENTIFIER : ( DIRECTIVE_ESCAPED_IDENTIFIER | DIRECTIVE_SIMPLE_IDENTIFIER ) -> channel(DIRECTIVES), type(DIRECTIVE_IDENTIFIER), pushMode(SOURCE_TEXT_MODE) ;
+ID_COMMENT : ( ONE_LINE_COMMENT | BLOCK_COMMENT ) -> channel(COMMENTS), type(DIRECTIVE_COMMENT) ;
+ID_WHITE_SPACE : [ \t]+ -> channel(HIDDEN), type(DIRECTIVE_WHITE_SPACE) ;
+ID_NEWLINE : '\r'? '\n' -> channel(HIDDEN), type(DIRECTIVE_NEWLINE) ;
+mode ELSIF_DIRECTIVE_MODE;
+ED_IDENTIFIER : ( DIRECTIVE_ESCAPED_IDENTIFIER | DIRECTIVE_SIMPLE_IDENTIFIER ) -> channel(DIRECTIVES), type(DIRECTIVE_IDENTIFIER), mode(SOURCE_TEXT_MODE) ;
+ED_COMMENT : ( ONE_LINE_COMMENT | BLOCK_COMMENT ) -> channel(COMMENTS), type(DIRECTIVE_COMMENT) ;
+ED_WHITE_SPACE : [ \t]+ -> channel(HIDDEN), type(DIRECTIVE_WHITE_SPACE) ;
+ED_NEWLINE : '\r'? '\n' -> channel(HIDDEN), type(DIRECTIVE_NEWLINE) ;
+mode SOURCE_TEXT_MODE;
+SOURCE_TEXT : ~'`'+ -> channel(DIRECTIVES) ;
+STGA : '`' -> channel(DIRECTIVES), type(GA), pushMode(DIRECTIVE_MODE) ;

@@ -76,6 +76,7 @@ alter_table_stmt:
             | COLUMN_? old_column_name = column_name TO_ new_column_name = column_name
         )
         | ADD_ COLUMN_? column_def
+        | DROP_ COLUMN_? column_name
     )
 ;
 
@@ -603,7 +604,7 @@ order_by_expr:
 ;
 
 order_by_expr_asc_desc:
-    ORDER_ BY_ order_by_expr_asc_desc
+    ORDER_ BY_ expr_asc_desc
 ;
 
 expr_asc_desc:

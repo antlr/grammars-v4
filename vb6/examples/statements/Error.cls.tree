@@ -1,1 +1,1 @@
-(startRule (module (moduleBody (moduleBodyElement (moduleBlock (block (blockStmt (onErrorStmt On Error   Resume   Next)) \r\n \r\n (blockStmt (errorStmt Error   (valueStmt (literal 12)))))))) \r\n) <EOF>)
+(startRule (module (moduleBody (moduleBodyElement (moduleBlock (block (blockStmt (onErrorStmt On Error   Resume   Next)) \r\n \r\n (blockStmt (errorStmt Error   (valueStmt (literal (integerLiteral 12))))))))) \r\n) <EOF>)

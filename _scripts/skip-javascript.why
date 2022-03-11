@@ -77,6 +77,9 @@ php
 powerbuilder
 	stack overflow.
 
+python/python
+	Grammar is not target-agnostic.
+	
 python/python2
 	pom.xml does not contain tests, so trgen does not create Generated/. Skip for now.
 	Grammar is not target-agnostic.
@@ -129,10 +132,6 @@ sql/tsql
 
 stringtemplate
 	Grammar is not target-agnostic.
-
-swift-fin
-	Failed: /mnt/c/Users/Kenne/Documents/GitHub/grammars-issue-2390/swift-fin/
-	System.Exception: Cannot find the parser grammar (SwiftFin | SwiftFinParser).g4
 
 swift/swift2
 	Grammar is not target-agnostic.

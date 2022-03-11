@@ -9,8 +9,8 @@ do
   if [ "$x1" != "errors" ]
   then
     echo "$file"
-    trwdog php Test.php -file "$file" 2>&1 | head -55
-    status="${PIPESTATUS[0]}"
+    trwdog php Test.php -file "$file"
+    status="$?"
     if [ -f "$file".errors ]
     then
       if [ "$stat" = "0" ]
