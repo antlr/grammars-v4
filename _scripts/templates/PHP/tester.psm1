@@ -9,7 +9,7 @@ function Build-Grammar {
         \}
     \}
 }>
-    $msg = composer require antlr/antlr4-php-runtime
+    $msg = composer install
     return @{
         Message = $msg
         Success = $LASTEXITCODE -eq 0

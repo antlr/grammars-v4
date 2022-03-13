@@ -1,0 +1,5 @@
+{
+    "require": {
+        "antlr/antlr4-php-runtime": "0.5.1"
+    }
+}

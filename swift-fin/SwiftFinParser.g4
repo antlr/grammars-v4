@@ -39,11 +39,11 @@ block1 : BLOCK1 value V_END
 block2 : BLOCK2 value V_END
        ;
 
-block3 : BLOCK3 map RBRACE
+block3 : BLOCK3 map_ RBRACE
        ;
 
 block4 : BLOCK4_A block4Item+ B4_END
-       | BLOCK4_B map RBRACE
+       | BLOCK4_B map_ RBRACE
        ;
 
 block4Item : B4_COLON block4Field B4_COLON block4Line+
@@ -58,13 +58,13 @@ block4Line : B4_VALUE+ B4_CRLF
            | B4_COLON+ B4_VALUE+ B4_COLON* B4_CRLF
            ;
 
-block5 : BLOCK5 map RBRACE
+block5 : BLOCK5 map_ RBRACE
        ;
 
 value : V_VALUE+
       ;
 
-map : keyValue+ ;
+map_ : keyValue+ ;
 
 keyValue : LBRACE mKey M_COLON mValue? RBRACE
          ;

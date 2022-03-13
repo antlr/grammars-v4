@@ -34,6 +34,7 @@ json5
 kirikiri-tjs
 kotlin/kotlin
 kotlin/kotlin-formal
+kquery
 logo/ucb-logo
 lpc
 modula2pim4
@@ -44,6 +45,7 @@ php
 plucid
 powerbuilder
 prov-n
+python/python
 python/python3
 r
 racket-bsl
@@ -55,15 +57,14 @@ scala
 scss
 smtlibv2
 sparql
-sql/hive/v1
 sql/hive/v2
+sql/hive/v3
 sql/mysql
 sql/plsql
 sql/postgresql
 sql/tsql
 stellaris
 stringtemplate
-swift-fin
 swift/swift2
 swift/swift3
 swift/swift5
