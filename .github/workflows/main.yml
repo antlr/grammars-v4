@@ -14,7 +14,7 @@ jobs:
         java: [11, 17 ]
       fail-fast: false
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - name: Test C# target
       run: |
         bash _scripts/regtest.sh CSharp
@@ -37,10 +37,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        language: [CSharp, Java, JavaScript, Go, Python3, Dart]
+        language: [CSharp, Java, JavaScript, Go, Python3, Dart ]
     steps:
     - name: Checkout
-      uses: actions/checkout@v2.4.0
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
@@ -54,11 +54,11 @@ jobs:
       uses: dart-lang/setup-dart@v1
     - name: Install Python
       if: ${{ matrix.language == 'Python3' }}
-      uses: actions/setup-python@v2.3.1
+      uses: actions/setup-python@v3
       with:
         python-version: '3.8'
     - name: Install Nodejs
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3.0.0
       with:
         node-version: '16.13.0'
 
@@ -70,8 +70,8 @@ jobs:
     - name: Install trgen
       shell: pwsh
       run: |
-        dotnet tool install -g trgen --version 0.13.2
-        dotnet tool install -g trwdog --version 0.13.2
+        dotnet tool install -g trgen --version 0.14.1
+        dotnet tool install -g trwdog --version 0.14.1
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
@@ -94,7 +94,7 @@ jobs:
       fail-fast: false
     steps:
     - name: Checkout
-      uses: actions/checkout@v2.4.0
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Setup Cpp
@@ -108,3 +108,18 @@ jobs:
       env:
         CC:   gcc-10
         CXX:  g++-10
+
+  build-php:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup PHP
+      uses: nanasess/setup-php@master
+      with:
+        php-version: '7.4'
+    - name: Test PHP target
+      run: |
+        bash _scripts/regtest.sh PHP

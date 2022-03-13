@@ -3086,6 +3086,8 @@ index_options
 // ALLOW_PAGE_LOCKS, SORT_IN_TEMPDB, ONLINE, MAXDOP, DATA_COMPRESSION, ONLINE).
 index_option
     : (simple_id | keyword) '=' (simple_id | keyword | on_off | DECIMAL)
+    | CLUSTERED COLUMNSTORE INDEX | HEAP
+    | DISTRIBUTION '=' HASH '(' id_ ')' | CLUSTERED INDEX '(' id_ (ASC | DESC)? (',' id_ (ASC | DESC)?)* ')'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms180169.aspx
@@ -4476,6 +4478,7 @@ keyword
     | DEFAULT_SCHEMA
     | DIAGNOSTICS
     | DIFFERENTIAL
+    | DISTRIBUTION
     | DTC_SUPPORT
     | ENABLED
     | ENDPOINT
@@ -4571,6 +4574,7 @@ keyword
     | REGENERATE
     | RELATED_CONVERSATION
     | RELATED_CONVERSATION_GROUP
+    | REPLICATE
     | REQUIRED
     | RESET
     | RESTART
@@ -4579,6 +4583,7 @@ keyword
     | RETURNS
     | REWIND
     | ROLE
+    | ROUND_ROBIN
     | RSA_512
     | RSA_1024
     | RSA_2048

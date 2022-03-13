@@ -23,6 +23,7 @@ p
 pgn
 php
 powerbuilder
+python/python
 python/python2
 python/python3
 python/python3-py
@@ -33,13 +34,13 @@ r
 rego
 rexx
 rust
-sql/hive
+sql/hive/v2
+sql/hive/v3
 sql/mysql
 sql/plsql
 sql/postgresql
 sql/tsql
 stringtemplate
-swift-fin
 swift/swift2
 swift/swift3
 swift/swift5
@@ -47,5 +48,6 @@ tcpheader
 v
 velocity
 webidl
+xpath/xpath20
 xpath/xpath31
 z

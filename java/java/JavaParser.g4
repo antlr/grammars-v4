@@ -115,7 +115,7 @@ enumBodyDeclarations
     ;
 
 interfaceDeclaration
-    : INTERFACE identifier typeParameters? (EXTENDS typeList)? interfaceBody
+    : INTERFACE identifier typeParameters? (EXTENDS typeList)? (PERMITS typeList)? interfaceBody
     ;
 
 classBody
@@ -267,7 +267,14 @@ qualifiedNameList
     ;
 
 formalParameters
-    : '(' formalParameterList? ')'
+    : '(' ( receiverParameter?
+          | receiverParameter (',' formalParameterList)?
+          | formalParameterList?
+          ) ')'
+    ;
+
+receiverParameter
+    : typeType (identifier '.')* THIS
     ;
 
 formalParameterList
@@ -459,6 +466,7 @@ identifier
     | PROVIDES
     | WITH
     | TRANSITIVE
+    | YIELD
     | SEALED
     | PERMITS
     | RECORD

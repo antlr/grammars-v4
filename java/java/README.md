@@ -14,6 +14,7 @@ much more faster than original grammar without left recursion expressions.
 * Java 7
 * Java 8
 * Java 11
+* Java 17
 
 ## Main contributors
 

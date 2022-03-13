@@ -19,6 +19,7 @@ pgn
 php
 pike
 powerbuilder
+python/python
 python/python2
 python/python2-js
 python/python3-py
@@ -29,9 +30,7 @@ python/tiny-python
 r
 rego
 rexx
-sql/postgresql
 stringtemplate
-swift-fin
 swift/swift2
 swift/swift3
 swift/swift5
@@ -40,4 +39,5 @@ thrift
 v
 velocity
 xpath/xpath31
+xpath/xpath20
 z

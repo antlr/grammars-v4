@@ -149,7 +149,6 @@ pl0
 plucid
 ply
 pmmn
-pom.xml
 postalcode
 powerbuilder
 powerbuilderdw
@@ -160,6 +159,7 @@ propcalc
 properties
 protobuf3
 prov-n
+python/python
 python/python2
 python/python2-js
 python/python3
@@ -204,8 +204,8 @@ snobol
 snowball
 solidity
 sparql
-sql/hive
 sql/hive/v2
+sql/hive/v3
 sql/mysql
 sql/plsql
 sql/postgresql
@@ -219,7 +219,6 @@ suokif
 swift/swift2
 swift/swift3
 swift/swift5
-swift-fin
 tcpheader
 teal
 telephone
@@ -258,6 +257,7 @@ webidl
 wkt
 wln
 xml
+xpath/xpath20
 xpath/xpath31
 xsd-regex
 z
