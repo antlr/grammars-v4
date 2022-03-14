@@ -26,13 +26,13 @@ options { tokenVocab=SpassLexer; }
 
 problem : 'begin_problem' '(' identifier ')' '.' description logical_part settings* 'end_problem' '.' EOF ;
 description : 'list_of_descriptions' '.'
- 'name' '(' ( Open text Close )? ')' '.'
- 'author' '(' ( Open text Close )? ')' '.'
- ( 'version' '(' ( Open text Close )? ')' '.' )?
- ( 'logic' '(' ( Open text Close )? ')' '.' )?
+ 'name' '(' ( Open text_ Close )? ')' '.'
+ 'author' '(' ( Open text_ Close )? ')' '.'
+ ( 'version' '(' ( Open text_ Close )? ')' '.' )?
+ ( 'logic' '(' ( Open text_ Close )? ')' '.' )?
  'status' '(' log_state ')' '.'
- 'description' '(' ( Open text Close )? ')' '.'
- ( 'date' '(' ( Open text Close )? ')' '.' )?
+ 'description' '(' ( Open text_ Close )? ')' '.'
+ ( 'date' '(' ( Open text_ Close )? ')' '.' )?
  'end_of_list' '.'
  ;
 log_state : 'satisfiable' | 'unsatisfiable' | 'unknown' ;
@@ -82,8 +82,8 @@ proof_list : 'list_of_proof' ( '(' proof_type ( ',' assoc_list )? ')' )? '.'
 reference : term | identifier | user_reference ;
 result : term | user_result ;
 rule_appl : term | identifier | user_rule_appl ;
-parent_list : '[' parent ( ',' parent )* ']' ;
-parent : term | identifier | user_parent ;
+parent_list : '[' parent_ ( ',' parent_ )* ']' ;
+parent_ : term | identifier | user_parent ;
 assoc_list : '[' key ':' value ( ',' key ':' value )* ']' ;
 key : term | identifier | user_key ;
 value : term | identifier | user_value ;
@@ -96,12 +96,12 @@ user_proof_type : 'SPASS' ;
 user_key : 'splitlevel' ;
 user_value : number ;
 settings : 'list_of_general_settings' setting_entry+ 'end_of_list' '.'
- | 'list_of_settings' '(' setting_label ')' '.' ( Open text Close )? 'end_of_list' '.'
+ | 'list_of_settings' '(' setting_label ')' '.' ( Open text_ Close )? 'end_of_list' '.'
  ;
 setting_entry : 'hypothesis' '[' label ( ',' label )* ']' '.' ;
 setting_label : 'KIV' | 'LEM' | 'OTTER' | 'PROTEIN' | 'SATURATE' | '3TAP' | 'SETHEO' | 'SPASS' ;
 identifier : Identifier ;
 arity : '-1' | number ;
 number : Digit+ ;
-text : JustText ;
+text_ : JustText ;
 
