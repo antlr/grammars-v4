@@ -204,6 +204,7 @@ snobol
 snowball
 solidity
 sparql
+spass
 sql/hive/v2
 sql/hive/v3
 sql/mysql

@@ -57,6 +57,7 @@ scala
 scss
 smtlibv2
 sparql
+spass
 sql/hive/v2
 sql/hive/v3
 sql/mysql
