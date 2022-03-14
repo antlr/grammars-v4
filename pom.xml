@@ -267,6 +267,7 @@
 				<module>snowball</module>
 				<module>solidity</module>
 				<module>sparql</module>
+				<module>spass</module>
 				<module>sql</module>
 				<module>stacktrace</module>
 				<module>stellaris</module>
