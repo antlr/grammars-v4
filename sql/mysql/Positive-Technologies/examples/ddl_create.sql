@@ -234,6 +234,8 @@ create index index4 on antlr_tokens(token(30) asc) lock default;
 create index index5 on antlr_tokens(token(30) asc) algorithm default;
 create index index6 on antlr_tokens(token(30) asc) algorithm default lock default;
 create index index7 on antlr_tokens(token(30) asc) lock default algorithm default;
+-- Create mariadb index
+CREATE INDEX IF NOT EXISTS DX_DT_LAST_UPDATE ON patient(DT_LAST_UPDATE) WAIT 100 KEY_BLOCK_SIZE=1024M CLUSTERING =YES USING RTREE NOT IGNORED ALGORITHM = NOCOPY LOCK EXCLUSIVE;
 #end
 #begin
 -- Create logfile group
