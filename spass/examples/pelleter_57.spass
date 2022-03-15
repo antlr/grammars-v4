@@ -1,7 +1,7 @@
 begin_problem(Pelletier57).
 
 list_of_descriptions.
-name({* Pelletier’s Problem No. 57 *}).
+name({* Pelletier's Problem No. 57 *}).
 author({* Christoph Weidenbach *}).
 status(unsatisfiable).
 description({* Problem taken in revised form from the "Pelletier Collection",
