@@ -2099,7 +2099,7 @@ view_attribute
 alter_table
     : ALTER TABLE table_name (SET '(' LOCK_ESCALATION '=' (AUTO | TABLE | DISABLE) ')'
                              | ADD column_def_table_constraints
-                             | ALTER COLUMN (column_definition | ((ADD | DROP) SPARSE))
+                             | ALTER COLUMN (column_definition | (id_ (ADD | DROP) SPARSE))
                              | DROP COLUMN id_ (',' id_)*
                              | DROP CONSTRAINT constraint=id_
                              | WITH (CHECK | NOCHECK) ADD (CONSTRAINT constraint=id_)?
