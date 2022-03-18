@@ -55,6 +55,12 @@ GO
 ALTER TABLE TestTable REBUILD WITH (DATA_COMPRESSION = PAGE, ONLINE=ON);
 GO
 
+-- Make non-sparse column sparse
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC ADD SPARSE;
+
+-- Make sparse column non-sparse
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC DROP SPARSE;
+
 -- Create Table with Specified Order in Constraint
 CREATE TABLE [dbo].[TestTable] (
   TableID UNIQUEIDENTIFIER NOT NULL,

@@ -1222,7 +1222,7 @@ create_login_sql_server
        (COMMA? CHECK_POLICY EQUAL (ON|OFF) )?
        (COMMA? CREDENTIAL EQUAL credential_name=id_)?
       |(FROM
-	(WINDOWS
+    (WINDOWS
           (WITH (COMMA? DEFAULT_DATABASE EQUAL default_database=id_)? (COMMA?  DEFAULT_LANGUAGE EQUAL default_language=STRING)? )
         | CERTIFICATE certname=id_
         | ASYMMETRIC KEY asym_key_name=id_
@@ -1371,7 +1371,7 @@ alter_schema_sql
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-schema-transact-sql
 create_schema
     : CREATE SCHEMA
-	(schema_name=id_
+    (schema_name=id_
         |AUTHORIZATION owner_name=id_
         | schema_name=id_ AUTHORIZATION owner_name=id_
         )
@@ -1410,7 +1410,7 @@ create_security_policy
          )+
             (WITH LR_BRACKET
                      STATE EQUAL (ON|OFF)
-		     (SCHEMABINDING (ON|OFF) )?
+             (SCHEMABINDING (ON|OFF) )?
                   RR_BRACKET
              )?
              (NOT FOR REPLICATION)?
@@ -2099,7 +2099,7 @@ view_attribute
 alter_table
     : ALTER TABLE table_name (SET '(' LOCK_ESCALATION '=' (AUTO | TABLE | DISABLE) ')'
                              | ADD column_def_table_constraints
-                             | ALTER COLUMN column_definition
+                             | ALTER COLUMN (column_definition | ((ADD | DROP) SPARSE))
                              | DROP COLUMN id_ (',' id_)*
                              | DROP CONSTRAINT constraint=id_
                              | WITH (CHECK | NOCHECK) ADD (CONSTRAINT constraint=id_)?
@@ -3147,7 +3147,7 @@ special_list
     | FORCEPLAN
     | IMPLICIT_TRANSACTIONS
     | NOCOUNT
-    | NOEXEol
+    | NOEXEC
     | NUMERIC_ROUNDABORT
     | PARSEONLY
     | REMOTE_PROC_TRANSACTIONS
