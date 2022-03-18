@@ -3054,7 +3054,7 @@ column_modifier
       | (NOT FOR REPLICATION)
       | SPARSE
       | HIDDEN_
-      | (MASKED (WITH FUNCTION EQUAL STRING)?))
+      | (MASKED (WITH ((FUNCTION EQUAL STRING) | (LR_BRACKET FUNCTION EQUAL STRING RR_BRACKET)))?))
     ;
 
 materialized_column_definition
