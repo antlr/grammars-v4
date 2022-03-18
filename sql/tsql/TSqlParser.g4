@@ -2099,7 +2099,7 @@ view_attribute
 alter_table
     : ALTER TABLE table_name (SET '(' LOCK_ESCALATION '=' (AUTO | TABLE | DISABLE) ')'
                              | ADD column_def_table_constraints
-                             | ALTER COLUMN (column_definition | (id_ (ADD | DROP) SPARSE))
+                             | ALTER COLUMN (column_definition | column_modifier)
                              | DROP COLUMN id_ (',' id_)*
                              | DROP CONSTRAINT constraint=id_
                              | WITH (CHECK | NOCHECK) ADD (CONSTRAINT constraint=id_)?
@@ -3045,6 +3045,16 @@ column_definition
        | IDENTITY ('(' seed=DECIMAL ',' increment=DECIMAL ')')? (NOT FOR REPLICATION)?)?
       ROWGUIDCOL?
       column_constraint*
+    ;
+
+column_modifier
+    : id_ (ADD | DROP) (
+      ROWGUIDCOL
+      | PERSISTED
+      | (NOT FOR REPLICATION)
+      | SPARSE
+      | HIDDEN_
+      | (MASKED (WITH FUNCTION EQUAL STRING)?))
     ;
 
 materialized_column_definition

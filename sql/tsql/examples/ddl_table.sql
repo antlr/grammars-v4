@@ -55,11 +55,44 @@ GO
 ALTER TABLE TestTable REBUILD WITH (DATA_COMPRESSION = PAGE, ONLINE=ON);
 GO
 
--- Make non-sparse column sparse
+-- Make column row GUID column
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC ADD ROWGUIDCOL;
+
+-- Make column not row GUID column
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC DROP ROWGUIDCOL;
+
+-- Mark column persisted
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC ADD PERSISTED;
+
+-- Mark column not persisted
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC DROP PERSISTED;
+
+-- Mark column as not for replication
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC ADD NOT FOR REPLICATION;
+
+-- Mark column as for replication
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC DROP NOT FOR REPLICATION;
+
+-- Mark column sparse
 ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC ADD SPARSE;
 
--- Make sparse column non-sparse
+-- Mark column non-sparse
 ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC DROP SPARSE;
+
+-- Mark column hidden
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC ADD HIDDEN;
+
+-- Mark column not hidden
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC DROP HIDDEN;
+
+-- Mark column masked
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC ADD MASKED;
+
+-- Mark column not masked
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC DROP MASKED;
+
+-- Mark column masked with function
+ALTER TABLE TestTable ALTER COLUMN ModifiedDateUTC ADD MASKED WITH (FUNCTION = 'default()');
 
 -- Create Table with Specified Order in Constraint
 CREATE TABLE [dbo].[TestTable] (
