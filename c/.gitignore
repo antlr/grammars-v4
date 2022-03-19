@@ -1,2 +1,4 @@
 out
 *.class
+examples/*.o
+examples/a.out
