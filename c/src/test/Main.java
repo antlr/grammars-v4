@@ -26,9 +26,10 @@ public class Main {
     static List<File> listf(String directoryName) {
         File directory = new File(directoryName);
 
-        List<File> resultList = new ArrayList<File>();
+        List<File> resultList = new ArrayList<>();
 
         File[] fList = directory.listFiles();
+        assert fList != null;
         for (File file : fList) {
             if (file.isFile()) {
                 if (filter_ch(file))
@@ -48,11 +49,19 @@ public class Main {
         CParser.CompilationUnitContext tree = parser.compilationUnit();
     }
 
-    public static void main(String[] args) throws IOException {
+    static void testDir() throws IOException {
         List<File> files = listf("examples");
         System.out.printf("%d files in directory",files.size());
         for (File file: files) {
             parse(file.getPath());
         }
+    }
+
+    static void testOne() throws IOException {
+        parse("examples/all_in_one.c");
+    }
+
+    public static void main(String[] args) throws IOException {
+        testOne();
     }
 }
