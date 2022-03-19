@@ -3,17 +3,74 @@
 #include <math.h>
 #include <xmmintrin.h>
 
+
+//note: directAbstractDeclarator not used
 extern int ext;
 /* comment
  *
  * */
-int sum();
 //line comment
+
+/*
+//
+
+staticAssertDeclaration*/
+
+const int tab[] = {1,2,3};
+
+struct empty{int a;};
+
+//sample typeQualifierList
+struct TypeQualifierListSample {
+    int val;
+    struct elem * const right;
+    struct elem * restrict r2;
+    struct elem * volatile v;
+    struct elem * _Atomic a;
+    struct elem * const volatile cv;
+    int bits1:4;
+    int bits2:03;
+    int (*g) //directDeclarator |   '(' declarator ')'
+    //without ending ;
+    ;
+};
+
+struct TwoSemi {
+  int a;
+  int bb;
+};
+
+//int bits1:4; int bits2:03; can't compile
+int gener0() __asm("ret");
+int gener1(a,b,c){return 0;}; //empty list: directDeclarator |   directDeclarator '(' identifierList? ')'
+int gener2() __attribute__((__error__("message")));
+
 
 struct elem {
     int val;
-    struct elem * right, * left; //must be 'struct' before struct name
+    struct elem * right,
+       * left; //must be 'struct' before struct name
 };
+
+void access() {
+   struct elem el;
+   el.val = 0;
+   int tab[10];
+   tab[4] = 5;
+}
+
+//designation,designatorList,designator
+int table[40] = {[3]=5,[6]=7};
+struct elem designated = {.val=46};
+
+
+struct Gener {
+    int val;
+    //must be 'struct' before struct name
+    struct elem * right, // __asm ("ret"), = not compile
+       * left; //__attribute__((__error__("message"))); only for functions
+};
+
 
 typedef struct elem Node;
 typedef struct elem* NodePtr;
@@ -47,7 +104,7 @@ int spec() {
         Auto just specifies automatic storage, meaning the variable will go away when
         it goes out of scope.
      * */
-    auto int a1;
+    auto int a101;
     register int reg1;
     return 0;
 }
@@ -90,6 +147,7 @@ int sum()
 {
     int i, sum = 0;
     int _Alignas(int) g;
+    //int* _Alignas(int*) gp;; //* abstractDeclarator , not compile
     const int LAST1 = 4;
     const LAST2 = 3+LAST1;
     const LAST3 = 10;
@@ -124,8 +182,8 @@ And func call as func call argument.
 */
 
 void aX(void);
-int a1(int param1);
-int a1(int param1){return 6;};
+int a102(int param1);
+int a102(int param1){return 6;};
 int a2(int param1, int param2); //params must have type: int a2(int param1, param2); param2 is bad
 void params(a,b,c); //allowed all without types
 void a3();
@@ -135,7 +193,7 @@ void a4(int param1, ...);
 
 int f(int arg1, char arg2)
 {
-    a1(arg1);
+    a102(arg1);
     a2(arg1, arg2);
     a3();
     return 5;
@@ -155,6 +213,7 @@ void params(a,b,c) {
 
 //function pointer
 typedef int MyType;
+
 typedef
 void *
 (*F1)(
@@ -225,10 +284,23 @@ MyStruct  f4(
 };
 
 void * /*__cdecl*/ ff1(unsigned int param1){ return NULL;}; //can't be cdecl
+int tab1 [20][34];
+
+void directDeclarator(int tab2 [static 20], int tab3 [const restrict volatile _Atomic static 20],
+                        int tab4 [const restrict volatile _Atomic]) { //without *
+    int tab1 [20];
+    int (tab);
+    //int k:4;
+
+    struct Bits{
+        int g:4;
+    } bits;
+}
 
 float fpow(float x)
 {
     float x0,xn,h,y[20],so,se,ans,xarr[20];
+    char* p = (char*) 0; //* abstractDeclarator
     return (float)(1/(1+pow(x,2)));
 }
 
@@ -288,7 +360,13 @@ void caseSample() {
     if (f!=4) if (f>3) n=5; else n=6;
 }
 
+/* compiler not uses this
+void qsort_b(void *base, size_t nel, size_t width, int (^compar)(const void *, const void *));
+char ^other;
+*/
+
 void loops() {
+
     for (int i=0; i<10; i++) {}
     for (;;) {break;}
     int n = 0;
@@ -354,9 +432,15 @@ int main() {
 Usage: %s [ignored command line arguments]\n\
   or:  %s OPTION\n\
 ", "vv");
-// standard inline assembly in C++
-/*    __asm__ ("movq $60, %rax\n\t" // the exit syscall number on Linux
+
+    typedef int type;
+    int gg=100;
+    _Generic (gg+2,default : gg=3,int : gg=4);
+    _Atomic(int) atomicVar;
+    _Static_assert(2<3,"2<3");
+// standard inline assembly in C++ , grammar: must be volatile
+    __asm__ __volatile__("movq $60, %rax\n\t" // the exit syscall number on Linux
              "movq $2,  %rdi\n\t" // this program returns 2
-             "syscall");*/
+             "syscall");
     return 0;
 }
