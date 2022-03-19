@@ -18,7 +18,7 @@ staticAssertDeclaration*/
 
 const int tab[] = {1,2,3};
 
-struct empty{int a;};
+struct empty{};
 
 //sample typeQualifierList
 struct TypeQualifierListSample {
@@ -32,12 +32,11 @@ struct TypeQualifierListSample {
     int bits2:03;
     int (*g) //directDeclarator |   '(' declarator ')'
     //without ending ;
-    ;
 };
 
 struct TwoSemi {
-  int a;
-  int bb;
+  int a;;
+  int bb;;
 };
 
 //int bits1:4; int bits2:03; can't compile
@@ -150,7 +149,7 @@ int sum()
     //int* _Alignas(int*) gp;; //* abstractDeclarator , not compile
     const int LAST1 = 4;
     const LAST2 = 3+LAST1;
-    const LAST3 = 10;
+    const LAST3 = 10,be=4;
     const int LAST = 20;
     for ( i = 1; i <= LAST; i++ ) {
         sum += i;
