@@ -155,7 +155,6 @@ int sum()
         sum += i;
     } /*-for-*/
     printf("sum = %d\n", sum);
-
     return 0;
 }
 
@@ -172,6 +171,9 @@ void numberLiterals() {
     float fl3 = 13.4F;
     int bin1 = 0b0011;
     int bin2 = 0B1010;
+    int hex1 = 0x3da2;
+    int hex2 = 0X33a2;
+    int oct = 05345;
 }
 
 /*
