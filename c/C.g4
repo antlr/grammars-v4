@@ -156,6 +156,9 @@ declaration
     |   staticAssertDeclaration
     ;
 
+/*
+more than one typeSpecifier only when several cases like "_Complex double z"
+*/
 declarationSpecifiers
     :   declarationSpecifier+
     ;
