@@ -241,11 +241,11 @@ structOrUnion
     ;
 
 structDeclarationList
-    :   structDeclaration+
+    :   structDeclaration? (';' structDeclaration?)*
     ;
 
 structDeclaration
-    :   specifierQualifierList structDeclaratorList? ';'
+    :   specifierQualifierList structDeclaratorList?
     |   staticAssertDeclaration
     ;
 
@@ -415,7 +415,7 @@ designator
     ;
 
 staticAssertDeclaration
-    :   '_Static_assert' '(' constantExpression ',' StringLiteral+ ')' ';'
+    :   '_Static_assert' '(' constantExpression ',' StringLiteral+ ')'
     ;
 
 statement
