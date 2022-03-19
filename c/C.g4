@@ -152,7 +152,8 @@ constantExpression
     ;
 
 declaration
-    :   declarationSpecifiers initDeclaratorList? ';'
+    : 'const' initDeclaratorList ';' // must be before usual declaration
+    |   declarationSpecifiers initVarDeclaratorList? ';'
     |   staticAssertDeclaration
     ;
 
@@ -160,26 +161,31 @@ declaration
 more than one typeSpecifier only when several cases like "_Complex double z"
 */
 declarationSpecifiers
-    :   declarationSpecifier+
+    :   declarationSpecifier* ('_Complex')? typeSpecifier alignmentSpecifier?
     ;
 
 declarationSpecifiers2
-    :   declarationSpecifier+
+    :   declarationSpecifier* ('_Complex')? typeSpecifier alignmentSpecifier?
     ;
 
 declarationSpecifier
     :   storageClassSpecifier
-    |   typeSpecifier
     |   typeQualifier
-    |   functionSpecifier
-    |   alignmentSpecifier
     ;
 
 initDeclaratorList
     :   initDeclarator (',' initDeclarator)*
     ;
 
+initVarDeclaratorList
+    :   initVarDeclarator (',' initVarDeclarator)*
+    ;
+
 initDeclarator
+    :   declarator '=' initializer
+    ;
+
+initVarDeclarator
     :   declarator ('=' initializer)?
     ;
 
@@ -192,18 +198,26 @@ storageClassSpecifier
     |   'register'
     ;
 
+intType
+    : 'char'
+    | 'short'
+    | 'int'
+    | 'long'
+    ;
+
+signType
+    : 'signed'
+    | 'unsigned'
+    ;
+
 typeSpecifier
     :   ('void'
-    |   'char'
-    |   'short'
-    |   'int'
-    |   'long'
     |   'float'
     |   'double'
-    |   'signed'
-    |   'unsigned'
+    |   intType
+    |   signType
+    |   signType intType
     |   '_Bool'
-    |   '_Complex'
     |   '__m128'
     |   '__m128d'
     |   '__m128i')
@@ -481,13 +495,24 @@ translationUnit
     ;
 
 externalDeclaration
-    :   functionDefinition
+    :   functionDeclaration
+    |   functionDefinition
     |   declaration
     |   ';' // stray ;
     ;
 
+functionDeclaration
+    : function ';'
+    ;
+
 functionDefinition
-    :   declarationSpecifiers? declarator declarationList? compoundStatement
+    : function
+        declarationList? //old K&R style
+            compoundStatement
+    ;
+
+function
+    : functionSpecifier* typeSpecifier? directDeclarator '(' parameterTypeList? ')'
     ;
 
 declarationList
