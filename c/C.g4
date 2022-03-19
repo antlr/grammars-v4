@@ -627,11 +627,13 @@ HexQuad
     :   HexadecimalDigit HexadecimalDigit HexadecimalDigit HexadecimalDigit
     ;
 
-Constant
-    :   IntegerConstant
-    |   FloatingConstant
-    //|   EnumerationConstant
-    |   CharacterConstant
+fragment
+DecimalConstant
+    :   NonzeroDigit Digit*
+    ;
+
+DigitSequence
+    :   Digit+
     ;
 
 fragment
@@ -648,11 +650,6 @@ BinaryConstant
 	;
 
 fragment
-DecimalConstant
-    :   NonzeroDigit Digit*
-    ;
-
-fragment
 OctalConstant
     :   '0' OctalDigit*
     ;
@@ -660,6 +657,13 @@ OctalConstant
 fragment
 HexadecimalConstant
     :   HexadecimalPrefix HexadecimalDigit+
+    ;
+
+Constant
+    :   IntegerConstant
+    |   FloatingConstant
+    //|   EnumerationConstant
+    |   CharacterConstant
     ;
 
 fragment
@@ -736,10 +740,6 @@ ExponentPart
 fragment
 Sign
     :   [+-]
-    ;
-
-DigitSequence
-    :   Digit+
     ;
 
 fragment
