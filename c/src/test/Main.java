@@ -40,13 +40,24 @@ public class Main {
         }
         return resultList;
     }
+
     static void parse(String inputFileName) throws IOException {
         System.out.println(inputFileName);
         CharStream codePointCharStream = CharStreams.fromFileName(inputFileName);
         CLexer lexer = new CLexer(codePointCharStream);
+        /*Token token;
+        do {
+            token = lexer.nextToken();
+            System.out.printf("%s type=%d index=%d line=%d\n",token.getText(),token.getType(), token.getTokenIndex(), token.getLine() );
+        } while (token.getType()!=-1);*/
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         CParser parser = new CParser(tokens);
+        /*parser.removeErrorListeners();
+        MyAntlrErrorListener errorListener = new MyAntlrErrorListener();
+        parser.addErrorListener(errorListener);*/
         CParser.CompilationUnitContext tree = parser.compilationUnit();
+        /*CListener extractor = new CListenerImpl();
+        ParseTreeWalker.DEFAULT.walk(extractor, tree);*/
     }
 
     static void testDir() throws IOException {
