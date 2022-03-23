@@ -460,3 +460,10 @@ BEGIN
   END IF;
 END -- //-- delimiter ;
 #end
+#begin
+-- delimiter //
+CREATE PROCEDURE set_unique_check()
+BEGIN
+    SET unique_checks=on;
+END; -- //-- delimiter ;
+#end

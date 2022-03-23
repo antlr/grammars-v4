@@ -1706,8 +1706,8 @@ uninstallPlugin
 //    Set and show statements
 
 setStatement
-    : SET variableClause ('=' | ':=') expression
-      (',' variableClause ('=' | ':=') expression)*                             #setVariable
+    : SET variableClause ('=' | ':=') (expression | ON)
+      (',' variableClause ('=' | ':=') (expression | ON))*                      #setVariable
     | SET charSet (charsetName | DEFAULT)          #setCharset
     | SET NAMES
         (charsetName (COLLATE collationName)? | DEFAULT)                        #setNames
