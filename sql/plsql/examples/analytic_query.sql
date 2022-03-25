@@ -28,9 +28,15 @@ select deptno
 from emp;
 
 select deptno
-   , ename
-   , hiredate
-   , listagg(ename, ',' ON OVERFLOW TRUNCATE) within group (order by hiredate) over (partition by deptno) as employees
+     , ename
+     , hiredate
+     , listagg(ename, ',' ON OVERFLOW TRUNCATE) within group (order by hiredate) over (partition by deptno) as employees
+from emp;
+
+select deptno
+     , ename
+     , hiredate
+     , listagg(UNIQUE ename, ',' ON OVERFLOW TRUNCATE) within group (order by hiredate) over (partition by deptno) as employees
 from emp;
 
  select metric_id ,bsln_guid ,timegroup ,obs_value as obs_value 

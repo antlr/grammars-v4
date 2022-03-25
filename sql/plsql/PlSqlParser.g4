@@ -3918,6 +3918,10 @@ numeric_function
    | GREATEST '(' expressions ')'
    ;
 
+listagg_overflow_clause
+    : ON OVERFLOW (ERROR | TRUNCATE) (CHAR_STRING)? ((WITH | WITHOUT) COUNT)?
+    ;
+
 other_function
     : over_clause_keyword function_argument_analytic over_clause?
     | /*TODO stantard_function_enabling_using*/ regular_id function_argument_modeling using_clause?
@@ -3926,6 +3930,8 @@ other_function
     | COALESCE '(' table_element (',' (numeric | quoted_string))? ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
+    | LISTAGG '(' (ALL | DISTINCT | UNIQUE)? argument (',' CHAR_STRING)? listagg_overflow_clause? ')'
+      (WITHIN GROUP '(' order_by_clause ')')? over_clause?
     | cursor_name ( PERCENT_ISOPEN | PERCENT_FOUND | PERCENT_NOTFOUND | PERCENT_ROWCOUNT )
     | DECOMPOSE '(' concatenation (CANONICAL | COMPATIBILITY)? ')'
     | EXTRACT '(' regular_id FROM concatenation ')'
@@ -3979,7 +3985,6 @@ over_clause_keyword
 within_or_over_clause_keyword
     : CUME_DIST
     | DENSE_RANK
-    | LISTAGG
     | PERCENT_RANK
     | PERCENTILE_CONT
     | PERCENTILE_DISC
