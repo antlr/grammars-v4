@@ -3919,7 +3919,7 @@ numeric_function
    ;
 
 listagg_overflow_clause
-    : ON OVERFLOW (ERROR | TRUNCATE) (CHAR_STRING)? ((WITH | WITHOUT) COUNT)?
+    : ON OVERFLOW (ERROR | TRUNCATE) CHAR_STRING? ((WITH | WITHOUT) COUNT)?
     ;
 
 other_function
