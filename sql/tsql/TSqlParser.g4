@@ -4179,6 +4179,7 @@ keyword
     | HADR
     | HASH
     | HEALTH_CHECK_TIMEOUT
+    | HIDDEN_
     | HIGH
     | HONOR_BROKER_PRIORITY
     | HOURS
