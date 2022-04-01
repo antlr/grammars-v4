@@ -58,7 +58,7 @@ jobs:
       with:
         python-version: '3.8'
     - name: Install Nodejs
-      uses: actions/setup-node@v3.0.0
+      uses: actions/setup-node@v3.1.0
       with:
         node-version: '16.13.0'
 
