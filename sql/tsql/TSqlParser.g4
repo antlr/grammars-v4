@@ -3051,10 +3051,10 @@ column_modifier
     : id_ (ADD | DROP) (
       ROWGUIDCOL
       | PERSISTED
-      | (NOT FOR REPLICATION)
+      | NOT FOR REPLICATION
       | SPARSE
       | HIDDEN_
-      | (MASKED (WITH ((FUNCTION EQUAL STRING) | (LR_BRACKET FUNCTION EQUAL STRING RR_BRACKET)))?))
+      | MASKED (WITH (FUNCTION EQUAL STRING | LR_BRACKET FUNCTION EQUAL STRING RR_BRACKET))?)
     ;
 
 materialized_column_definition
