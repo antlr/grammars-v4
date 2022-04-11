@@ -10,7 +10,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<maven.compiler.source>1.7</maven.compiler.source>
-		<antlr.version>4.9.3</antlr.version>
+		<antlr.version>4.10</antlr.version>
 		<antlr4test-maven-plugin.version>1.19</antlr4test-maven-plugin.version>
 		<junit.version>4.13.2</junit.version>
 	</properties>
