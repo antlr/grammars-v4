@@ -7,7 +7,7 @@ run, cd to grammar-vs/, then type `bash regtest.sh <target>` where `<target>` is
 of the other targets. To test the target, you will need the NET SDK installed,
 access to the internet, and to toolchain for the target you want to test.
 For CSharp, it will download the Antlr4 tool and runtime. For the other
-targets, you will need to download the Antlr4 tool antlr-4.9.3-complete.jar and
+targets, you will need to download the Antlr4 tool antlr-4.19-complete.jar and
 place it in /tmp.
 
 * test.ps1 -- this is a Powershell script for testing, similar to regtest.sh.
@@ -26,7 +26,7 @@ and provide a symbolic linked file for "make" once installed. I don't know why,
 but the package doesn't define just a plain old "make.exe".
 
     cd to a grammar directory, e.g., `cd abnf`.
-    trgen -t CSharp --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.3-complete.jar
+    trgen -t CSharp --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr4-4.10-complete.jar
     make
     make test
 
@@ -41,7 +41,7 @@ a "~/.trgen.rc" file to override defaults for that program.
 For example,
 
     {
-        "antlr_tool_path" : "c:/users/kenne/downloads/antlr-4.9.3-complete.jar"
+        "antlr_tool_path" : "c:/users/kenne/downloads/antlr4-4.10-complete.jar"
     }
 
 For the trwdog tool, you may want to override the default 5 minute timeout
@@ -130,7 +130,7 @@ Trgen will construct and pass to the template evaluator the following attributes
 | Attribute | Type | Default |
 | ----- | ----- | ----- |
 | additional_sources | list<string> | This is a list of input files with the suffix for the target, e.g., all .cpp files for Cpp. |
-| antlr_tool_path | string | Ubuntu: "~/Downloads/antlr-4.9.1-complete.jar" Win: Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads/antlr-4.9.1-complete.jar" |
+| antlr_tool_path | string | Ubuntu: "~/Downloads/antlr4-4.10-complete.jar" Win: Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads/antlr4-4.10-complete.jar" |
 | cap_start_symbol | string | same as `start_symbol`, but first letter capitalized |
 | cli_bash | bool | Ubuntu: true; Win: false |
 | cli_cmd | bool | Ubuntu: false; Win: true |
