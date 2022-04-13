@@ -45,7 +45,6 @@
 					<showTree>false</showTree>
 					<entryPoint>htmlDocument</entryPoint>
 					<grammarName>Php</grammarName>
-					<caseInsensitiveType>lower</caseInsensitiveType>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

@@ -25,6 +25,8 @@ THE SOFTWARE.
 
 lexer grammar MySqlLexer;
 
+options { caseInsensitive = true; }
+
 channels { MYSQLCOMMENT, ERRORCHANNEL }
 
 // SKIP

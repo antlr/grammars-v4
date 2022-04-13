@@ -30,6 +30,7 @@ channels { PhpComments, ErrorLexem, SkipChannel }
 
 options {
     superClass=PhpLexerBase;
+    caseInsensitive = true;
 }
 
 SeaWhitespace:  [ \t\r\n]+ -> channel(HIDDEN);
@@ -330,7 +331,7 @@ CurlyDollar:                '{' { this.IsCurlyDollar(1) }? { this.SetInsideStrin
 CurlyString:                '{'                                                 -> type(StringPart);
 EscapedChar:                '\\' .                                              -> type(StringPart);
 DoubleQuoteInInterpolation: '"'                                                 -> type(DoubleQuote), popMode;
-UnicodeEscape:              '\\u{' [a-zA-Z0-9][a-zA-Z0-9]+ '}';
+UnicodeEscape:              '\\u{' [a-z0-9][a-z0-9]+ '}';
 StringPart:                 ~[${\\"]+;
 
 mode SingleLineCommentMode;
@@ -349,8 +350,8 @@ HereDocText: ~[\r\n]*? ('\r'? '\n' | '\r');
 // '<?= "Hello world"; ?>' will be transformed to '<?php echo "Hello world"; ?>'
 fragment PhpStartEchoFragment: '<' ('?' '=' | { this.HasAspTags() }? '%' '=');
 fragment PhpStartFragment:     '<' ('?' 'php'? | { this.HasAspTags() }? '%');
-fragment NameString: [a-zA-Z_\u0080-\ufffe][a-zA-Z0-9_\u0080-\ufffe]*;
-fragment HtmlNameChar
+fragment NameString options { caseInsensitive = false; }: [a-zA-Z_\u0080-\ufffe][a-zA-Z0-9_\u0080-\ufffe]*;
+fragment HtmlNameChar options { caseInsensitive = false; }
     : HtmlNameStartChar
     | '-'
     | '_'
@@ -360,8 +361,8 @@ fragment HtmlNameChar
     | '\u0300'..'\u036F'
     | '\u203F'..'\u2040'
     ;
-fragment HtmlNameStartChar
-    : [:a-z]
+fragment HtmlNameStartChar options { caseInsensitive = false; }
+    : [:a-zA-Z]
     | '\u2070'..'\u218F'
     | '\u2C00'..'\u2FEF'
     | '\u3001'..'\uD7FF'

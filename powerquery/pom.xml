@@ -39,7 +39,6 @@
 					<showTree>false</showTree>
 					<entryPoint>document</entryPoint>
 					<grammarName>PowerQuery</grammarName>
-					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<packageName></packageName>
 				</configuration>
 				<executions>
