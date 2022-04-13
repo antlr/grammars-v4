@@ -668,7 +668,7 @@ literalValue
     ;
 
 elementList
-    : keyedElement (eos keyedElement)*
+    : keyedElement (({lineTerminatorAhead()}? | {_input.LT(1).getText().equals("}") }?) keyedElement)*
     ;
 
 keyedElement
