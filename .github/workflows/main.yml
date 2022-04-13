@@ -65,7 +65,7 @@ jobs:
     - name: Download ANTLR
       shell: pwsh
       run: |
-        $antlrPath = _scripts/get-antlr.ps1 latest
+        $antlrPath = _scripts/get-antlr.ps1 4.9.3
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
     - name: Install trgen
       shell: pwsh
