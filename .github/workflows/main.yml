@@ -18,7 +18,7 @@ jobs:
     - name: Install Dotnet
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '6.0.102'
     - name: Set up JDK
       uses: actions/setup-java@v3
       with:
@@ -35,7 +35,13 @@ jobs:
     - name: Install Dotnet
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '6.0.102'
+    - name: Do not trust Dotnet env
+      run: |
+        dotnet --version
+        dotnet --info
+        dotnet --list-runtimes
+        dotnet --list-sdks
     - name: Test C# target
       run: |
         bash _scripts/regtest.sh CSharp
@@ -54,30 +60,58 @@ jobs:
     - name: Install Dotnet
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '6.0.102'
+    - name: Do not trust Dotnet env
+      run: |
+        dotnet --version
+        dotnet --info
+        dotnet --list-runtimes
+        dotnet --list-sdks
     - name: Install Java
       uses: actions/setup-java@v3
       with:
         java-version: '11'
         distribution: 'zulu'
+    - name: Do not trust Java env
+      run: |
+        dotnet --version
+        java --version
+        javac --version
+
     - name: Install Dart
       if: ${{ matrix.language == 'Dart' }}
       uses: dart-lang/setup-dart@v1
+    - name: Do not trust Dart env
+      if: ${{ matrix.language == 'Dart' }}
+      run: |
+        dart --version
+
     - name: Install Python
       if: ${{ matrix.language == 'Python3' }}
       uses: actions/setup-python@v3
       with:
         python-version: '3.8'
-    - name: Install Nodejs
+    - name: Do not trust Python env
+      if: ${{ matrix.language == 'Python3' }}
+      run: |
+        python --version
+
+    - name: Install JavaScript
+      if: ${{ matrix.language == 'JavaScript' }}
       uses: actions/setup-node@v3.1.0
       with:
         node-version: '16.13.0'
+    - name: Do not trust JavaScript env
+      if: ${{ matrix.language == 'JavaScript' }}
+      run: |
+        node --version
 
     - name: Download ANTLR
       shell: pwsh
       run: |
         $antlrPath = _scripts/get-antlr.ps1 "4.10"
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
+
     - name: Install trgen
       shell: pwsh
       run: |
@@ -86,6 +120,7 @@ jobs:
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
+
     - name: Test
       shell: pwsh
       run: |
@@ -111,12 +146,19 @@ jobs:
     - name: Install Dotnet
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '6.0.102'
+    - name: Do not trust Dotnet env
+      run: |
+        dotnet --version
+        dotnet --info
+        dotnet --list-runtimes
+        dotnet --list-sdks
     - name: Setup Cpp
       run: |
          sudo apt update
          sudo apt install gcc-10 g++-10
       shell: bash
+
     - name: Test Cpp target
       run: |
         bash _scripts/regtest.sh Cpp
@@ -134,7 +176,13 @@ jobs:
     - name: Install Dotnet
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '6.0.102'
+    - name: Do not trust Dotnet env
+      run: |
+        dotnet --version
+        dotnet --info
+        dotnet --list-runtimes
+        dotnet --list-sdks
     - name: Setup PHP
       uses: nanasess/setup-php@master
       with:
