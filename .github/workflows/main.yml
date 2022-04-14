@@ -15,6 +15,10 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v3
+    - name: Install Dotnet
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
     - name: Set up JDK
       uses: actions/setup-java@v3
       with:
@@ -28,6 +32,10 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v3
+    - name: Install Dotnet
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
     - name: Test C# target
       run: |
         bash _scripts/regtest.sh CSharp
@@ -43,7 +51,10 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-
+    - name: Install Dotnet
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
     - name: Install Java
       uses: actions/setup-java@v3
       with:
@@ -97,6 +108,10 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
+    - name: Install Dotnet
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
     - name: Setup Cpp
       run: |
          sudo apt update
@@ -116,6 +131,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+    - name: Install Dotnet
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
     - name: Setup PHP
       uses: nanasess/setup-php@master
       with:
