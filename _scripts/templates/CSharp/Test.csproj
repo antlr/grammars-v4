@@ -11,7 +11,7 @@
 } >  \</ItemGroup>
   \<ItemGroup>
     \<PackageReference Include="Antlr4.Runtime.Standard" Version ="4.10" />
-    \<PackageReference Include="Antlr4BuildTasks" Version = "10.1" PrivateAssets="all" />
+    \<PackageReference Include="Antlr4BuildTasks" Version = "10.2" PrivateAssets="all" />
   \</ItemGroup>
   \<PropertyGroup>
     \<RestoreProjectStyle>PackageReference\</RestoreProjectStyle>
