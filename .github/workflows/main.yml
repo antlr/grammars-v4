@@ -65,13 +65,13 @@ jobs:
     - name: Download ANTLR
       shell: pwsh
       run: |
-        $antlrPath = _scripts/get-antlr.ps1 4.9.3
+        $antlrPath = _scripts/get-antlr.ps1 4.10
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
     - name: Install trgen
       shell: pwsh
       run: |
-        dotnet tool install -g trgen --version 0.14.1
-        dotnet tool install -g trwdog --version 0.14.1
+        dotnet tool install -g trgen --version 0.16.0
+        dotnet tool install -g trwdog --version 0.16.0
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
@@ -119,7 +119,7 @@ jobs:
     - name: Setup PHP
       uses: nanasess/setup-php@master
       with:
-        php-version: '7.4'
+        php-version: '8.0'
     - name: Test PHP target
       run: |
         bash _scripts/regtest.sh PHP

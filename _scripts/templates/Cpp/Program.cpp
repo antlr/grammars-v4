@@ -1,6 +1,7 @@
 // Template generated code from trgen <version>
 
 #include \<iostream>
+#include \<iomanip>
 #include \<string>
 #include \<chrono>
 #include \<atomic>
