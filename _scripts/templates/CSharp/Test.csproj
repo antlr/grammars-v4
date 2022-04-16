@@ -7,11 +7,12 @@
   \<ItemGroup>
 <tool_grammar_files:{x |    \<Antlr4 Include="<x>">
 <if(name_space)>\<Package><name_space>\</Package><endif>
+\<AntlrRuntime><antlr_tool_path>\</AntlrRuntime>
 \</Antlr4>
 } >  \</ItemGroup>
   \<ItemGroup>
     \<PackageReference Include="Antlr4.Runtime.Standard" Version ="4.10" />
-    \<PackageReference Include="Antlr4BuildTasks" Version = "10.2" PrivateAssets="all" />
+    \<PackageReference Include="Antlr4BuildTasks" Version = "10.3" PrivateAssets="all" />
   \</ItemGroup>
   \<PropertyGroup>
     \<RestoreProjectStyle>PackageReference\</RestoreProjectStyle>
