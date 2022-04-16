@@ -57,6 +57,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
+
     - name: Install Dotnet
       uses: actions/setup-dotnet@v2
       with:
@@ -72,6 +73,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'zulu'
+
     - name: Do not trust Java env
       run: |
         dotnet --version
@@ -85,6 +87,16 @@ jobs:
       if: ${{ matrix.language == 'Dart' }}
       run: |
         dart --version
+
+    - name: Install Go
+      if: ${{ matrix.language == 'Go' }}
+      uses: actions/setup-go@v3
+      with:
+        go-version: '^1.17.0'
+    - name: Do not trust Go env
+      if: ${{ matrix.language == 'Go' }}
+      run: |
+        go version
 
     - name: Install Python
       if: ${{ matrix.language == 'Python3' }}
