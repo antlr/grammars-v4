@@ -72,7 +72,8 @@ public class Program {
         <parser_name> parser = new <parser_name>(tokens);
         ErrorListener lexer_listener = new ErrorListener();
         ErrorListener listener = new ErrorListener();
-        parser.removeParseListeners();
+        parser.removeErrorListeners();
+	    lexer.removeErrorListeners();
         parser.addErrorListener(listener);
         lexer.addErrorListener(lexer_listener);
         ParseTree tree = parser.<start_symbol>();

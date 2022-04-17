@@ -25,6 +25,12 @@ public class Program
         TokenStream = tokens;
         var parser = new <parser_name>(tokens);
         Parser = parser;
+        var listener_lexer = new ErrorListener\<int>();
+        var listener_parser = new ErrorListener\<IToken>();
+        lexer.RemoveErrorListeners();
+        parser.RemoveErrorListeners();
+        lexer.AddErrorListener(listener_lexer);
+        parser.AddErrorListener(listener_parser);
         var tree = parser.<start_symbol>();
         Input = lexer.InputStream.ToString();
         TokenStream = parser.TokenStream;
@@ -122,6 +128,8 @@ public class Program
         var parser = new <parser_name>(tokens);
         var listener_lexer = new ErrorListener\<int>();
         var listener_parser = new ErrorListener\<IToken>();
+        lexer.RemoveErrorListeners();
+        parser.RemoveErrorListeners();
         lexer.AddErrorListener(listener_lexer);
         parser.AddErrorListener(listener_parser);
         DateTime before = DateTime.Now;

@@ -1,13 +1,11 @@
 // Template generated code from trgen <version>
 
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const antlr4 = require('antlr4');
+import antlr4 from 'antlr4';
 <tool_grammar_tuples: {x | import <x.GrammarAutomName> from './<x.GeneratedFileName>';
 } >
 import CaseChangingStream from './CaseChangingStream.js';
-const strops = require('typescript-string-operations');
-let fs = require('fs-extra')
+import strops from 'typescript-string-operations';
+import fs from 'fs-extra';
 
 function getChar() {
     let buffer = Buffer.alloc(1);
