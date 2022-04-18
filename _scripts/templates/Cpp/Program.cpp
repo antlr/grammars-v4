@@ -1,6 +1,7 @@
 // Template generated code from trgen <version>
 
 #include \<iostream>
+#include \<iomanip>
 #include \<string>
 #include \<chrono>
 #include \<atomic>
@@ -83,6 +84,8 @@ int TryParse(std::vector\<std::string>& args)
     auto * parser = new <parser_name>(tokens);
     auto listener_lexer = new ErrorListener();
     auto listener_parser = new ErrorListener();
+    lexer->removeErrorListeners();
+    parser->removeErrorListeners();
     lexer->addErrorListener(listener_lexer);
     parser->addErrorListener(listener_parser);
     auto before = std::chrono::steady_clock::now();

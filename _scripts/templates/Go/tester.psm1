@@ -16,7 +16,7 @@ function Build-Grammar {
     # Output go version
     #go version | Write-Host
     $env:GO111MODULE = "on"
-    $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
+    $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.10
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g
