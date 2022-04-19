@@ -516,7 +516,7 @@ descFuncNames
     ;
 
 identifier
-    : Identifier
+    : DOLLAR? Identifier DOLLAR?
     | nonReserved
     ;
 

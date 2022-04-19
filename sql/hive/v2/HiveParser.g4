@@ -1225,7 +1225,8 @@ The valuesClause rule below ensures that the parse tree for
 very similar to the tree for "insert into table FOO select a,b from BAR".
 */
 regularBody
-    : insertClause ( selectStatement | valuesClause)
+//    : insertClause ( selectStatement | valuesClause)
+    : (insertClause | cacheClause) ( selectStatement | valuesClause)
     | selectStatement
     ;
 
@@ -1282,6 +1283,10 @@ body
 insertClause
     : KW_INSERT KW_OVERWRITE destination ifNotExists?
     | KW_INSERT KW_INTO KW_TABLE? tableOrPartition (LPAREN columnNameList RPAREN)?
+    ;
+
+cacheClause
+    : KW_CACHE tableOrPartition KW_AS?
     ;
 
 destination
