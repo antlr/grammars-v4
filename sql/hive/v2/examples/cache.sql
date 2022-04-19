@@ -1,0 +1,1 @@
+cache table dim__config as select * from dim_sjptb_cdas_ma_d_channel_appkey_config;
