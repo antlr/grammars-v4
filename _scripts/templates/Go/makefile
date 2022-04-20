@@ -11,7 +11,7 @@ setup:
 	-export | grep GO
 	-go env
 	-go version
-	export GO111MODULE=on; go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
+	export GO111MODULE=on; go get github.com/antlr/antlr4/runtime/Go/antlr@4.10
 program:
 	export GO111MODULE=on; go build Test.go
 clean:

@@ -66,6 +66,7 @@ pl0
 ply
 powerbuilder
 protobuf3
+python/python
 python/python2
 python/python3
 python/python3-py
@@ -94,7 +95,6 @@ sql/postgresql
 sql/tsql
 stellaris
 stringtemplate
-swift-fin
 swift/swift2
 swift/swift3
 swift/swift5

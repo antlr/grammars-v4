@@ -52,6 +52,7 @@ pgn
 php
 ply
 powerbuilder
+python/python
 python/python2
 python/python3
 python/python3alt
@@ -76,7 +77,6 @@ sql/mysql
 sql/plsql
 sql/postgresql
 stringtemplate
-swift-fin
 swift/swift2
 swift/swift3
 swift/swift5

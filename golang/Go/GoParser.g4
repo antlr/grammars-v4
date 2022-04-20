@@ -79,7 +79,7 @@ varSpec:
 
 block: L_CURLY statementList? R_CURLY;
 
-statementList: (eos? statement eos)+;
+statementList: ((SEMI? | EOS? | {closingBracket()}?) statement eos)+;
 
 statement:
 	declaration
@@ -186,7 +186,7 @@ commCase: CASE (sendStmt | recvStmt) | DEFAULT;
 
 recvStmt: (expressionList ASSIGN | identifierList DECLARE_ASSIGN)? recvExpr = expression;
 
-forStmt: FOR (expression | forClause | rangeClause)? block;
+forStmt: FOR (expression? | forClause | rangeClause?) block;
 
 forClause:
 	initStmt = simpleStmt? eos expression? eos postStmt = simpleStmt?;
@@ -286,7 +286,7 @@ primaryExpr:
 	| primaryExpr (
 		(DOT IDENTIFIER)
 		| index
-		| slice
+		| slice_
 		| typeAssertion
 		| arguments
 	);
@@ -353,7 +353,7 @@ functionLit: FUNC signature block; // function
 
 index: L_BRACKET expression R_BRACKET;
 
-slice:
+slice_:
 	L_BRACKET (
 		expression? COLON expression?
 		| expression? COLON expression COLON expression

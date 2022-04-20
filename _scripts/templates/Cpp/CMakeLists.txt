@@ -6,7 +6,11 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 17)
 set(ANTLR_EXECUTABLE "<antlr_tool_path>")
 set(Java_JAVA_EXECUTABLE "java")
-set(ANTLR4_TAG e4c1a74)
+set(ANTLR4_TAG ade6181)
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 #SET(GCC_COVERAGE_COMPILE_FLAGS "-g -pg")
 #SET(GCC_COVERAGE_LINK_FLAGS    "-g -pg")
 #SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
@@ -67,4 +71,4 @@ add_executable(Test
 
 <endif>
 
-target_link_libraries(Test antlr4_static)
+target_link_libraries(Test antlr4_static Threads::Threads)
