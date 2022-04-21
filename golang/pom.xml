@@ -14,7 +14,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.3.0</version>
 				<executions>
 					<execution>
 						<id>add-source</id>
@@ -42,7 +42,6 @@
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
-					<outputDirectory>${project.build.directory}/generated-sources/antlr4</outputDirectory>
 				</configuration>
 				<executions>
 					<execution>

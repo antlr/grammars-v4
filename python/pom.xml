@@ -12,6 +12,7 @@
     </parent>
 
 	<modules>
+		<module>python</module>
 		<module>python2</module>
 		<module>python3</module>
 		<module>python3-py</module>
