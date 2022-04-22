@@ -47,7 +47,7 @@ optionStatement
 
 optionName
   : fullIdent
-  | ( ident | ( LP fullIdent RP ) ) ( DOT fullIdent )?
+  | ( ident | LP fullIdent RP ) ( DOT fullIdent )?
   ;
 
 // Normal Field
@@ -181,7 +181,7 @@ enumElement
   ;
 
 enumField
-  : ident EQ ( MINUS )? intLit enumValueOptions?SEMI
+  : ident EQ MINUS? intLit enumValueOptions?SEMI
   ;
 
 enumValueOptions
@@ -242,8 +242,8 @@ serviceElement
   ;
 
 rpc
-  : RPC rpcName LP ( STREAM )? messageType RP
-        RETURNS LP ( STREAM )? messageType RP
+  : RPC rpcName LP STREAM? messageType RP
+        RETURNS LP STREAM? messageType RP
         (LC ( optionStatement | emptyStatement_ )* RC | SEMI)
   ;
 
@@ -283,8 +283,8 @@ mapName: ident;
 serviceName: ident;
 rpcName: ident;
 streamName: ident;
-messageType: ( DOT )? ( ident DOT )* messageName;
-enumType: ( DOT )? ( ident DOT )* enumName;
+messageType: DOT? ( ident DOT )* messageName;
+enumType: DOT? ( ident DOT )* enumName;
 
 intLit: INT_LIT;
 strLit: STR_LIT | PROTO2_LIT_SINGLE | PROTO2_LIT_DOBULE;
@@ -352,7 +352,7 @@ COLON: ':';
 PLUS: '+';
 MINUS: '-';
 
-STR_LIT: ( '\'' ( CHAR_VALUE )*? '\'' ) |  ( '"' ( CHAR_VALUE )*? '"' );
+STR_LIT: '\'' CHAR_VALUE*? '\'' |  '"' CHAR_VALUE*? '"';
 fragment CHAR_VALUE: HEX_ESCAPE | OCT_ESCAPE | CHAR_ESCAPE | ~[\u0000\n\\];
 fragment HEX_ESCAPE: '\\' ( 'x' | 'X' ) HEX_DIGIT HEX_DIGIT;
 fragment OCT_ESCAPE: '\\' OCTAL_DIGIT OCTAL_DIGIT OCTAL_DIGIT;
@@ -360,12 +360,12 @@ fragment CHAR_ESCAPE: '\\' ( 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' | '\\' | '\
 
 BOOL_LIT: 'true' | 'false';
 
-FLOAT_LIT : ( DECIMALS DOT DECIMALS? EXPONENT? | DECIMALS EXPONENT | DOT DECIMALS EXPONENT? ) | 'inf' | 'nan';
+FLOAT_LIT : DECIMALS DOT DECIMALS? EXPONENT? | DECIMALS EXPONENT | DOT DECIMALS EXPONENT? | 'inf' | 'nan';
 fragment EXPONENT  : ( 'e' | 'E' ) (PLUS | MINUS)? DECIMALS;
 fragment DECIMALS  : DECIMAL_DIGIT+;
 
 INT_LIT     : DECIMAL_LIT | OCTAL_LIT | HEX_LIT;
-fragment DECIMAL_LIT : ( [1-9] ) DECIMAL_DIGIT*;
+fragment DECIMAL_LIT : [1-9] DECIMAL_DIGIT*;
 fragment OCTAL_LIT   : '0' OCTAL_DIGIT*;
 fragment HEX_LIT     : '0' ( 'x' | 'X' ) HEX_DIGIT+ ;
 
