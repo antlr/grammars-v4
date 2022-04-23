@@ -33,10 +33,10 @@ pdn
 pgn
 php
 powerbuilder
+python/python
 python/python2
 python/python3
 python/python3alt
-python/python3-js
 python/python3-py
 python/python3-ts
 python/python3-without-actions
@@ -51,7 +51,6 @@ sql/plsql
 sql/postgresql
 sql/tsql
 stringtemplate
-swift-fin
 swift/swift2
 swift/swift3
 swift/swift5
@@ -61,7 +60,7 @@ tinymud
 v
 vb6
 velocity
-wat
 webidl
+xpath/xpath20
 xpath/xpath31
 z

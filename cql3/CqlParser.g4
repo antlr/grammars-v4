@@ -278,7 +278,6 @@ alterTable
 alterTableOperation
    : alterTableAdd
    | alterTableDropColumns
-   | alterTableDropColumns
    | alterTableDropCompactStorage
    | alterTableRename
    | alterTableWith
@@ -594,10 +593,7 @@ assignmentList
    ;
 
 assignmentTuple
-   : syntaxBracketLr (
-         constant ((syntaxComma constant)* | (syntaxComma assignmentTuple)*) |
-         assignmentTuple (syntaxComma assignmentTuple)*
-     ) syntaxBracketRr
+   : syntaxBracketLr ( expression (syntaxComma expression)* ) syntaxBracketRr
    ;
 
 insert

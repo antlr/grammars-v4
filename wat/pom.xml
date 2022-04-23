@@ -40,7 +40,7 @@
 					<verbose>false</verbose>
 					<showTree>false</showTree>
 					<entryPoint>module_</entryPoint>
-					<grammarName>WatParser</grammarName>
+					<grammarName>Wat</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
