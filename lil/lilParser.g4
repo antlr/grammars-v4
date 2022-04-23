@@ -24,6 +24,7 @@
  */
 parser grammar lilParser;
 
+
 options { tokenVocab = lilLexer; }
 prog
    : line* EOF
@@ -39,11 +40,11 @@ line
    ;
 
 watchcmd
-   : WATCH identifier+ LBRACE line* RBRACE
+   : WATCH identifier+ block
    ;
 
 printcmd
-   : PRINT PRINTSTMT
+   : PRINTSTMT PRINTSTR
    ;
 
 foreachcmd
@@ -67,7 +68,7 @@ identifierlist
    ;
 
 block
-   : LBRACE line* RBRACE
+   : LBRACE line* (RBRACE | RBRACE2)
    ;
 
 arg

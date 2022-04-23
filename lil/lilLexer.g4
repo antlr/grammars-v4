@@ -24,8 +24,8 @@
  */
 lexer grammar lilLexer;
 
-PRINT
-   : 'print'
+PRINTSTMT
+   : 'print' -> pushMode (PRINT_MODE)
    ;
 
 WATCH
@@ -60,10 +60,6 @@ DOLLAR
    : '$'
    ;
 
-PRINTSTMT
-   : PRINT -> pushMode(PRINT_MODE)
-   ;
-
 QUOTED
    : '`' .*? '`'
    ;
@@ -86,7 +82,11 @@ WS
 
 mode PRINT_MODE;
 PRINTSTR
-   :  ~[\r\n\t]*
+   : ~ [}\r\n\t]+
+   ;
+
+RBRACE2
+   : '}' -> popMode
    ;
 
 NEWLINE
