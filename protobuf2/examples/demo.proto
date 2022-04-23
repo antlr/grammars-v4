@@ -9,10 +9,10 @@ service Demo {
 
 // The request message containing the user's name.
 message DemoReq {
-    string name = 1;
+    optional string name = 1;
 }
 
 // The response message containing the greetings
 message DemoResp {
-    string message = 1;
+    optional string message = 1;
 }
