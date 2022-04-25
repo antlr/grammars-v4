@@ -184,6 +184,7 @@ SEMANTICSIMILARITYDETAILSTABLE:        'SEMANTICSIMILARITYDETAILSTABLE';
 SEMANTICSIMILARITYTABLE:               'SEMANTICSIMILARITYTABLE';
 SESSION_USER:                          'SESSION_USER';
 SET:                                   'SET';
+SETS:                                  'SETS';
 SETUSER:                               'SETUSER';
 SHUTDOWN:                              'SHUTDOWN';
 SOME:                                  'SOME';
