@@ -658,7 +658,7 @@ alterSpecification
     | RENAME indexFormat=(INDEX | KEY) uid TO uid                   #alterByRenameIndex
     | ALTER INDEX uid (VISIBLE | INVISIBLE)                         #alterByAlterIndexVisibility
     | DROP indexFormat=(INDEX | KEY) uid                            #alterByDropIndex
-    | DROP FOREIGN KEY uid                                          #alterByDropForeignKey
+    | DROP FOREIGN KEY ifExists? uid                                #alterByDropForeignKey
     | DISABLE KEYS                                                  #alterByDisableKeys
     | ENABLE KEYS                                                   #alterByEnableKeys
     | RENAME renameFormat=(TO | AS)? (uid | fullId)                 #alterByRename
