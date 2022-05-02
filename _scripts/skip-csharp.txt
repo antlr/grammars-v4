@@ -16,7 +16,6 @@ logo/ucb-logo
 lpc
 objc
 pgn
-php
 pike
 powerbuilder
 python/python
