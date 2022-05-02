@@ -14,6 +14,7 @@ creole
 csharp
 css3
 cto
+dart2
 fortran77
 gdscript
 golang

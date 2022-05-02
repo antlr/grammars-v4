@@ -46,6 +46,7 @@ css3
 csv
 ctl
 cto
+dart2
 databank
 dcm
 dgol

@@ -11,6 +11,7 @@ cpp
 cql3
 csharp
 css3
+dart2
 dice
 dot
 edif300
