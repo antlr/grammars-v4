@@ -1,0 +1,10 @@
+name: cli
+description: A sample command-line application.
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+dependencies:
+  antlr4: ^4.10.0
+dev_dependencies:
+  stack: ^0.2.1
+  pedantic: ^1.9.0
+  test: ^1.14.4
