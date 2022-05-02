@@ -32,6 +32,8 @@ alter table table1 add primary key (id);
 alter table table1 add primary key table_pk (id);
 alter table table1 add primary key `table_pk` (id);
 alter table table1 add primary key `table_pk` (`id`);
+alter table table1 drop foreign key fk_name;
+alter table table1 drop foreign key if exists fk_name;
 #end
 #begin
 -- Alter database
