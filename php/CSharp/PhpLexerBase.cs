@@ -29,9 +29,6 @@ using System.Reflection;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 
-// Replace PhpParser with its fully qualified name below
-//using static PhpLexer;
-
 public abstract class PhpLexerBase : Lexer
 {
     protected bool AspTags = true;

@@ -515,7 +515,7 @@ lambdaFunctionExpr
     ;
 
 matchExpr
-    : Match '(' expression ')' OpenCurlyBracket matchItem (',' matchItem)* ','? CloseCurlyBracket
+    : Match_ '(' expression ')' OpenCurlyBracket matchItem (',' matchItem)* ','? CloseCurlyBracket
     ;
 
 matchItem
