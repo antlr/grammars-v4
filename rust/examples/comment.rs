@@ -19,6 +19,8 @@ pub mod outer_module {
     pub mod inner_module {}
 
     pub mod nested_comments {
+        /* let a = 1*1; */
+
         /* In Rust /* we can /* nest comments */ */ */
 
         // All three types of block comments can contain or be nested inside
