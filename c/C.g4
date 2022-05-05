@@ -227,8 +227,9 @@ structDeclarationList
     :   structDeclaration+
     ;
 
-structDeclaration
-    :   specifierQualifierList structDeclaratorList? ';'
+structDeclaration // The first two rules have priority order and cannot be simplified to one expression.
+    :   specifierQualifierList structDeclaratorList ';'
+    |   specifierQualifierList ';'
     |   staticAssertDeclaration
     ;
 
