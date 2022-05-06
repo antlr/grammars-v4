@@ -43,7 +43,11 @@ class LexerAdaptor(Lexer):
       can only occur in lexical rules and arg actions cannot occur.
     """
 
+    PREQUEL_CONSTRUCT = -10
+    OPTIONS_CONSTRUCT = -11
+
     _currentRuleType = Token.INVALID_TYPE
+    insideOptionsBlock = False
 
     def __init__(self, inp, output):
         Lexer.__init__(self, inp, output)
@@ -67,12 +71,28 @@ class LexerAdaptor(Lexer):
             self._type = self.ARGUMENT_CONTENT
 
     def handleEndAction(self):
-        self.popMode()
-        if len(self._modeStack) > 0:
+        oldMode = self._mode
+        newMode = self.popMode()
+        isActionWithinAction = len(self._modeStack) > 0 and newMode == self.TargetLanguageAction and oldMode == newMode
+        if isActionWithinAction:
             self._type = self.ACTION_CONTENT
 
     def emit(self):
-        if self._type == self.ID:
+        if (self._type == self.OPTIONS or self._type == self.TOKENS or self._type == self.CHANNELS) and self._currentRuleType == Token.INVALID_TYPE:
+            self._currentRuleType = self.PREQUEL_CONSTRUCT
+        elif self._type == self.OPTIONS and self._currentRuleType == self.TOKEN_REF:
+            self._currentRuleType = self.OPTIONS_CONSTRUCT
+        elif self._type == self.RBRACE and self._currentRuleType == self.PREQUEL_CONSTRUCT:
+            self._currentRuleType = Token.INVALID_TYPE
+        elif self._type == self.RBRACE and self._currentRuleType == self.OPTIONS_CONSTRUCT:
+            self._currentRuleType = self.TOKEN_REF
+        elif self._type == self.AT and self._currentRuleType == Token.INVALID_TYPE:
+            self._currentRuleType = self.AT
+        elif self._type == self.SEMI and self._currentRuleType == self.OPTIONS_CONSTRUCT:
+            self._currentRuleType = self._currentRuleType
+        elif self._type == self.END_ACTION and self._currentRuleType == self.AT:
+            self._currentRuleType = Token.INVALID_TYPE
+        elif self._type == self.ID:
             firstChar = self._input.getText(self._tokenStartCharIndex, self._tokenStartCharIndex)
             if firstChar[0].isupper():
                 self._type = self.TOKEN_REF
