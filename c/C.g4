@@ -301,6 +301,7 @@ directDeclarator
     |   directDeclarator '(' identifierList? ')'
     |   Identifier ':' DigitSequence  // bit field
     |   vcSpecificModifer Identifier // Visual C Extension
+    |   '(' vcSpecificModifer declarator ')' // Visual C Extension
     ;
 
 vcSpecificModifer
