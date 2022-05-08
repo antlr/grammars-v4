@@ -35,6 +35,7 @@ using Antlr4.Runtime.Misc;
 public abstract class LexerAdaptor : Lexer
 {
     private static readonly int PREQUEL_CONSTRUCT = -10;
+    private static readonly int OPTIONS_CONSTRUCT = -11;
 
     // I copy a reference to the stream, so It can be used as a Char Stream, not as a IISStream
     readonly ICharStream stream;
@@ -45,16 +46,16 @@ public abstract class LexerAdaptor : Lexer
     protected LexerAdaptor(ICharStream input)
          : base(input, Console.Out, Console.Error)
     {
-	    CurrentRuleType = TokenConstants.InvalidType;
-	    _insideOptionsBlock = false;
+        CurrentRuleType = TokenConstants.InvalidType;
+        _insideOptionsBlock = false;
         stream = input;
     }
 
     protected LexerAdaptor(ICharStream input, TextWriter output, TextWriter errorOutput)
          : base(input, output, errorOutput)
     {
-	    CurrentRuleType = TokenConstants.InvalidType;
-	    _insideOptionsBlock = false;
+        CurrentRuleType = TokenConstants.InvalidType;
+        _insideOptionsBlock = false;
         stream = input;
     }
 
@@ -107,20 +108,6 @@ public abstract class LexerAdaptor : Lexer
         }
     }
 
-    protected void handleOptionsLBrace()
-    {
-        if (_insideOptionsBlock)
-        {
-            Type = ANTLRv4Lexer.BEGIN_ACTION;
-            PushMode(ANTLRv4Lexer.TargetLanguageAction);
-        }
-        else
-        {
-            Type = ANTLRv4Lexer.LBRACE;
-            _insideOptionsBlock = true;
-        }
-    }
-
     private bool InLexerRule
     {
         get { return CurrentRuleType == ANTLRv4Lexer.TOKEN_REF; }
@@ -133,15 +120,26 @@ public abstract class LexerAdaptor : Lexer
             // enter prequel construct ending with an RBRACE
             CurrentRuleType = PREQUEL_CONSTRUCT;
         }
+        else if (Type == ANTLRv4Lexer.OPTIONS && CurrentRuleType == ANTLRv4Lexer.TOKEN_REF)
+        {
+            CurrentRuleType = OPTIONS_CONSTRUCT;
+        }
         else if (Type == ANTLRv4Lexer.RBRACE && CurrentRuleType == PREQUEL_CONSTRUCT)
         {
             // exit prequel construct
             CurrentRuleType = TokenConstants.InvalidType;
         }
+        else if (Type == ANTLRv4Lexer.RBRACE && CurrentRuleType == OPTIONS_CONSTRUCT)
+        { // exit options
+            CurrentRuleType = ANTLRv4Lexer.TOKEN_REF;
+        }
         else if (Type == ANTLRv4Lexer.AT && CurrentRuleType == TokenConstants.InvalidType)
         {
             // enter action
             CurrentRuleType = ANTLRv4Lexer.AT;
+        }
+        else if (Type == ANTLRv4Lexer.SEMI && CurrentRuleType == OPTIONS_CONSTRUCT)
+        { // ';' in options { .... }. Don't change anything.
         }
         else if (Type == ANTLRv4Lexer.END_ACTION && CurrentRuleType == ANTLRv4Lexer.AT)
         {
@@ -155,7 +153,6 @@ public abstract class LexerAdaptor : Lexer
             {
                 Type = ANTLRv4Lexer.TOKEN_REF;
             }
-
             if (char.IsLower(firstChar))
             {
                 Type = ANTLRv4Lexer.RULE_REF;
@@ -177,8 +174,8 @@ public abstract class LexerAdaptor : Lexer
 
     public override void Reset()
     {
-	    CurrentRuleType = TokenConstants.InvalidType;
-	    _insideOptionsBlock = false;
+        CurrentRuleType = TokenConstants.InvalidType;
+        _insideOptionsBlock = false;
         base.Reset();
     }
 }
