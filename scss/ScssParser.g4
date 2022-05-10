@@ -210,8 +210,8 @@ eachValueList
 //Imports
 importDeclaration
   : IMPORT referenceUrl SEMI
-  | REQUIRE  referenceUrl SEMI?
-  | USE referenceUrl asClause? withClause? SEMI?
+  | REQUIRE  referenceUrl SEMI
+  | USE referenceUrl asClause? withClause? SEMI
   | FORWARD referenceUrl asClause? (showClause | hideClause)?
   ;
 
