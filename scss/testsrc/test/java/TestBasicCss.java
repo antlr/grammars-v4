@@ -51,6 +51,26 @@ public class TestBasicCss extends TestBase {
   }
 
   @Test
+  public void testIdsAfterBlock() {
+    String[] lines = {
+      ":focus {",
+      "  outline: none;",
+      "}",
+      "#container {",
+      "  top: 0;",
+      "}",
+    };
+
+    assertThat(
+      parse(lines)
+        .statement(1)
+        .ruleset()
+        .selectors()
+        .getText())
+      .isEqualTo("#container");
+  }
+
+  @Test
   public void testBlockWithNoSpacing() {
     String[] lines = {
       "#id1{}",
@@ -219,8 +239,8 @@ public class TestBasicCss extends TestBase {
     };
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
 
-    assertThat(context.property(0).identifier().getText()).isEqualTo("color");
-    ScssParser.PropertyValueContext val = context.property(0).propertyValue();
+    assertThat(context.property_(0).identifier().getText()).isEqualTo("color");
+    ScssParser.PropertyValueContext val = context.property_(0).propertyValue();
     assertThat(val.commandStatement(0).expression().measurement().Number().getText())
         .isEqualTo("1");
     assertThat(val.commandStatement(0).expression().measurement().Unit().getText()).isEqualTo("px");
@@ -448,9 +468,9 @@ public class TestBasicCss extends TestBase {
     String[] lines = {"h1 { p1: -$my-var; }"};
 
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
-    assertThat(context.property(0).identifier().getText()).isEqualTo("p1");
+    assertThat(context.property_(0).identifier().getText()).isEqualTo("p1");
     ScssParser.ExpressionContext expression =
-        context.property(0).propertyValue().commandStatement(0).expression();
+        context.property_(0).propertyValue().commandStatement(0).expression();
     assertThat(expression.getText()).isEqualTo("-$my-var");
     assertThat(expression.variableName().MINUS_DOLLAR()).isNotNull();
     assertThat(expression.variableName().Identifier().getText()).isEqualTo("my-var");
@@ -461,13 +481,13 @@ public class TestBasicCss extends TestBase {
     String[] lines = {"h1 { p1: +(400px - 200px); }"};
 
     ScssParser.BlockContext context = parse(lines).statement(0).ruleset().block();
-    assertThat(context.property(0).identifier().getText()).isEqualTo("p1");
-    assertThat(context.property(0).propertyValue().commandStatement(0).getText())
+    assertThat(context.property_(0).identifier().getText()).isEqualTo("p1");
+    assertThat(context.property_(0).propertyValue().commandStatement(0).getText())
         .isEqualTo("+(400px-200px)");
-    assertThat(context.property(0).propertyValue().commandStatement(0).PLUS_LPAREN()).isNotNull();
+    assertThat(context.property_(0).propertyValue().commandStatement(0).PLUS_LPAREN()).isNotNull();
     assertThat(
             context
-                .property(0)
+                .property_(0)
                 .propertyValue()
                 .commandStatement(0)
                 .commandStatement()
@@ -476,7 +496,7 @@ public class TestBasicCss extends TestBase {
         .isEqualTo("400px");
     assertThat(
             context
-                .property(0)
+                .property_(0)
                 .propertyValue()
                 .commandStatement(0)
                 .commandStatement()
@@ -487,7 +507,7 @@ public class TestBasicCss extends TestBase {
         .isEqualTo("-");
     assertThat(
             context
-                .property(0)
+                .property_(0)
                 .propertyValue()
                 .commandStatement(0)
                 .commandStatement()
@@ -622,8 +642,8 @@ public class TestBasicCss extends TestBase {
     };
 
     ScssParser.StylesheetContext context = parse(lines);
-    assertThat(context.statement(0).ruleset().block().property(0).IMPORTANT()).isNull();
-    assertThat(context.statement(0).ruleset().block().property(1).IMPORTANT()).isNotNull();
+    assertThat(context.statement(0).ruleset().block().property_(0).IMPORTANT()).isNull();
+    assertThat(context.statement(0).ruleset().block().property_(1).IMPORTANT()).isNotNull();
   }
 
   @Test
@@ -638,11 +658,11 @@ public class TestBasicCss extends TestBase {
     };
 
     ScssParser.StylesheetContext context = parse(lines);
-    assertThat(context.statement(0).ruleset().block().property(0).IMPORTANT()).isNotNull();
-    assertThat(context.statement(0).ruleset().block().property(0).block().property(0).IMPORTANT())
+    assertThat(context.statement(0).ruleset().block().property_(0).IMPORTANT()).isNotNull();
+    assertThat(context.statement(0).ruleset().block().property_(0).block().property_(0).IMPORTANT())
         .isNull();
     assertThat(
-            context.statement(0).ruleset().block().property(0).block().lastProperty().IMPORTANT())
+            context.statement(0).ruleset().block().property_(0).block().lastProperty().IMPORTANT())
         .isNotNull();
   }
 
@@ -662,14 +682,14 @@ public class TestBasicCss extends TestBase {
     };
 
     ScssParser.StylesheetContext context = parse(lines);
-    assertThat(context.statement(0).ruleset().block().property(1).identifier().getText())
+    assertThat(context.statement(0).ruleset().block().property_(1).identifier().getText())
         .isEqualTo("transition");
-    assertThat(context.statement(0).ruleset().block().property(1).propertyValue()).isNull();
-    assertThat(context.statement(0).ruleset().block().property(1).block().property(0).getText())
+    assertThat(context.statement(0).ruleset().block().property_(1).propertyValue()).isNull();
+    assertThat(context.statement(0).ruleset().block().property_(1).block().property_(0).getText())
         .isEqualTo("property:font-size;");
-    assertThat(context.statement(0).ruleset().block().property(1).block().property(1).getText())
+    assertThat(context.statement(0).ruleset().block().property_(1).block().property_(1).getText())
         .isEqualTo("duration:4s;");
-    assertThat(context.statement(0).ruleset().block().property(1).block().property(2).getText())
+    assertThat(context.statement(0).ruleset().block().property_(1).block().property_(2).getText())
         .isEqualTo("delay:2s;");
   }
 
@@ -680,13 +700,13 @@ public class TestBasicCss extends TestBase {
     };
 
     ScssParser.StylesheetContext context = parse(lines);
-    assertThat(context.statement(0).ruleset().block().property(0).identifier().getText())
+    assertThat(context.statement(0).ruleset().block().property_(0).identifier().getText())
         .isEqualTo("margin");
-    assertThat(context.statement(0).ruleset().block().property(0).propertyValue().getText())
+    assertThat(context.statement(0).ruleset().block().property_(0).propertyValue().getText())
         .isEqualTo("auto");
-    assertThat(context.statement(0).ruleset().block().property(0).block().property(0).getText())
+    assertThat(context.statement(0).ruleset().block().property_(0).block().property_(0).getText())
         .isEqualTo("bottom:10px;");
-    assertThat(context.statement(0).ruleset().block().property(0).block().property(1).getText())
+    assertThat(context.statement(0).ruleset().block().property_(0).block().property_(1).getText())
         .isEqualTo("top:2px;");
   }
 
@@ -710,15 +730,15 @@ public class TestBasicCss extends TestBase {
     };
 
     ScssParser.StylesheetContext context = parse(lines);
-    assertThat(context.statement(1).ruleset().block().property(0).identifier().getText())
+    assertThat(context.statement(1).ruleset().block().property_(0).identifier().getText())
         .isEqualTo("margin");
-    assertThat(context.statement(1).ruleset().block().property(0).propertyValue()).isNull();
+    assertThat(context.statement(1).ruleset().block().property_(0).propertyValue()).isNull();
     assertThat(
             context
                 .statement(1)
                 .ruleset()
                 .block()
-                .property(0)
+                .property_(0)
                 .block()
                 .statement(0)
                 .includeDeclaration()
@@ -750,6 +770,87 @@ public class TestBasicCss extends TestBase {
         .isEqualTo("right");
   }
 
+  @Test
+  public void testSccVariablePropertyValue() {
+    String[] lines = {
+      "#container {",
+      "  background-color: var(--app-background-color);",
+      "}",
+    };
+
+    assertThat(
+      parse(lines)
+        .statement(0)
+        .ruleset()
+        .block()
+        .property_()
+        .get(0)
+        .propertyValue()
+        .getText())
+      .isEqualTo("var(--app-background-color)");
+  }
+
+  @Test
+  public void testFontFaceDeclaration() {
+    String[] lines = {
+    "@font-face {",
+    "  font-family: 'Google Material Icons';",
+    "  font-style: normal;",
+    "  font-weight: 400;",
+    "  src: url(http://some-uri.com)",
+    "    format('woff2')",
+    "}",
+    };
+
+    ScssParser.StylesheetContext context = parse(lines);
+
+    assertThat(
+      context
+        .statement(0)
+        .fontFaceDeclaration()
+        .FONT_FACE()
+        .getText())
+      .isEqualTo("@font-face");
+
+    assertThat(
+      context
+        .statement(0)
+        .fontFaceDeclaration()
+        .block()
+        .lastProperty()
+        .identifier()
+        .getText())
+      .isEqualTo("src");
+  }
+
+  @Test
+  public void testKeyframesDeclaration() {
+    String[] lines = {
+      "@keyframes spin {",
+      "  transform: rotate(0deg);",
+      "}",
+    };
+
+    ScssParser.StylesheetContext context = parse(lines);
+    assertThat(
+      context
+        .statement(0)
+        .keyframesDeclaration()
+        .KEYFRAMES()
+        .getText())
+      .isEqualTo("@keyframes");
+
+    assertThat(
+      context
+        .statement(0)
+        .keyframesDeclaration()
+        .block()
+        .property_(0)
+        .identifier()
+        .getText())
+      .isEqualTo("transform");
+  }
+
   private ScssParser.SelectorsContext getSelector(String... lines) {
     ScssParser.StylesheetContext context = parse(lines);
     return context.statement(0).ruleset().selectors();
@@ -763,6 +864,6 @@ public class TestBasicCss extends TestBase {
 
     ScssParser.StylesheetContext styleContext = parse(all);
     ScssParser.BlockContext context = styleContext.statement(0).ruleset().block();
-    return context.property(0).propertyValue().commandStatement(0).expression();
+    return context.property_(0).propertyValue().commandStatement(0).expression();
   }
 }

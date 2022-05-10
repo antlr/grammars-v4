@@ -156,7 +156,7 @@ public class TestConditionals extends TestBase {
 
     ScssParser.EachDeclarationContext context = parse(lines).statement(0).eachDeclaration();
     assertThat(context.variableName(0).getText()).isEqualTo("$animal");
-    ScssParser.ListCommaSeparatedContext list = context.eachValueList().list().listCommaSeparated();
+    ScssParser.ListCommaSeparatedContext list = context.eachValueList().list_().listCommaSeparated();
     assertThat(list.listElement(0).commandStatement().getText()).isEqualTo("puma");
     assertThat(list.listElement(1).commandStatement().getText()).isEqualTo("sea-slug");
     assertThat(list.listElement(2).commandStatement().getText()).isEqualTo("egret");
@@ -176,10 +176,10 @@ public class TestConditionals extends TestBase {
     ScssParser.ListCommaSeparatedContext list1 =
         context
             .eachValueList()
-            .list()
+            .list_()
             .listCommaSeparated()
             .listElement(0)
-            .list()
+            .list_()
             .listCommaSeparated();
     assertThat(list1.listElement(0).commandStatement().getText()).isEqualTo("puma");
     assertThat(list1.listElement(1).commandStatement().getText()).isEqualTo("black");
@@ -188,10 +188,10 @@ public class TestConditionals extends TestBase {
     ScssParser.ListCommaSeparatedContext list2 =
         context
             .eachValueList()
-            .list()
+            .list_()
             .listCommaSeparated()
             .listElement(1)
-            .list()
+            .list_()
             .listCommaSeparated();
     assertThat(list2.listElement(0).commandStatement().getText()).isEqualTo("sea-slug");
     assertThat(list2.listElement(1).commandStatement().getText()).isEqualTo("blue");
@@ -209,7 +209,7 @@ public class TestConditionals extends TestBase {
     assertThat(
             context
                 .eachValueList()
-                .map()
+                .map_()
                 .mapEntry(0)
                 .mapKey()
                 .commandStatement()
@@ -220,7 +220,7 @@ public class TestConditionals extends TestBase {
     assertThat(
             context
                 .eachValueList()
-                .map()
+                .map_()
                 .mapEntry(0)
                 .mapValue()
                 .commandStatement()
@@ -229,10 +229,10 @@ public class TestConditionals extends TestBase {
                 .getText())
         .isEqualTo("2em");
 
-    assertThat(context.eachValueList().map().mapEntry(1).mapKey().getText()).isEqualTo("h2");
-    assertThat(context.eachValueList().map().mapEntry(1).mapValue().getText()).isEqualTo("1.5em");
+    assertThat(context.eachValueList().map_().mapEntry(1).mapKey().getText()).isEqualTo("h2");
+    assertThat(context.eachValueList().map_().mapEntry(1).mapValue().getText()).isEqualTo("1.5em");
 
-    assertThat(context.eachValueList().map().mapEntry(2).mapKey().getText()).isEqualTo("h3");
-    assertThat(context.eachValueList().map().mapEntry(2).mapValue().getText()).isEqualTo("1.2em");
+    assertThat(context.eachValueList().map_().mapEntry(2).mapKey().getText()).isEqualTo("h3");
+    assertThat(context.eachValueList().map_().mapEntry(2).mapValue().getText()).isEqualTo("1.2em");
   }
 }
