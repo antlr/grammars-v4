@@ -3278,7 +3278,7 @@ query_specification
       (FROM from=table_sources)?
       (WHERE where=search_condition)?
       // https://msdn.microsoft.com/en-us/library/ms177673.aspx
-      (GROUP BY groupByAll=ALL? groupBys+=group_by_item (',' groupBys+=group_by_item)*)?
+      (GROUP BY ((groupByAll=ALL? groupBys+=group_by_item (',' groupBys+=group_by_item)*) | GROUPING SETS '(' groupSets+=grouping_sets_item (',' groupSets+=grouping_sets_item)* ')'))?
       (HAVING having=search_condition)?
     ;
 
@@ -3325,6 +3325,12 @@ xml_common_directives
 
 order_by_expression
     : order_by=expression (ascending=ASC | descending=DESC)?
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/queries/select-group-by-transact-sql?view=sql-server-ver15
+grouping_sets_item
+    : '('? groupSetItems+=group_by_item (',' groupSetItems+=group_by_item)* ')'?
+    | '(' ')'
     ;
 
 group_by_item

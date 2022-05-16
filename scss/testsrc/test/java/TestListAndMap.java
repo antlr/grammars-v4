@@ -63,7 +63,7 @@ public final class TestListAndMap extends TestBase {
     };
 
     ScssParser.ListCommaSeparatedContext list =
-        parse(lines).statement(0).eachDeclaration().eachValueList().list().listCommaSeparated();
+        parse(lines).statement(0).eachDeclaration().eachValueList().list_().listCommaSeparated();
     assertThat(list.listElement()).hasSize(3);
     assertThat(list.listElement(0).commandStatement().getText()).isEqualTo("red");
     assertThat(list.listElement(1).commandStatement().getText()).isEqualTo("blue");
@@ -104,15 +104,15 @@ public final class TestListAndMap extends TestBase {
 
     ScssParser.ListSpaceSeparatedContext outerList =
         parse(lines).statement(0).variableDeclaration().listBracketed().listSpaceSeparated();
-    assertThat(outerList.listElement(0).list().listSpaceSeparated().listElement()).hasSize(2);
-    assertThat(outerList.listElement(1).list().listCommaSeparated().listElement()).hasSize(4);
+    assertThat(outerList.listElement(0).list_().listSpaceSeparated().listElement()).hasSize(2);
+    assertThat(outerList.listElement(1).list_().listCommaSeparated().listElement()).hasSize(4);
     assertThat(
             outerList
                 .listElement(1)
-                .list()
+                .list_()
                 .listCommaSeparated()
                 .listElement(1)
-                .list()
+                .list_()
                 .listSpaceSeparated()
                 .listElement())
         .hasSize(3);
@@ -122,7 +122,7 @@ public final class TestListAndMap extends TestBase {
   public void map() {
     String[] lines = {"$font-weights: (\"regular\": 400, \"medium\": 500, \"bold\": 700);"};
 
-    ScssParser.MapContext map = parse(lines).statement(0).variableDeclaration().map();
+    ScssParser.Map_Context map = parse(lines).statement(0).variableDeclaration().map_();
     assertThat(map.mapEntry()).hasSize(3);
     assertThat(map.mapEntry(0).mapKey().commandStatement().getText()).isEqualTo("\"regular\"");
     assertThat(map.mapEntry(0).mapValue().commandStatement().getText()).isEqualTo("400");
@@ -132,7 +132,7 @@ public final class TestListAndMap extends TestBase {
   public void mapUnquotedKeys() {
     String[] lines = {"$var: (1: 2, a: b, red: blue);"};
 
-    ScssParser.MapContext map = parse(lines).statement(0).variableDeclaration().map();
+    ScssParser.Map_Context map = parse(lines).statement(0).variableDeclaration().map_();
     assertThat(map.mapEntry()).hasSize(3);
     assertThat(map.mapEntry(2).mapKey().commandStatement().getText()).isEqualTo("red");
     assertThat(map.mapEntry(2).mapValue().commandStatement().getText()).isEqualTo("blue");
@@ -150,7 +150,7 @@ public final class TestListAndMap extends TestBase {
       ");",
     };
 
-    ScssParser.MapContext map =
+    ScssParser.Map_Context map =
         parse(lines)
             .statement(0)
             .variableDeclaration()
@@ -160,10 +160,10 @@ public final class TestListAndMap extends TestBase {
             .functionCall()
             .passedParams()
             .passedParam(1)
-            .map();
+            .map_();
     assertThat(map.mapEntry()).hasSize(2);
     ScssParser.ListSpaceSeparatedContext list =
-        map.mapEntry(1).mapValue().list().listSpaceSeparated();
+        map.mapEntry(1).mapValue().list_().listSpaceSeparated();
     assertThat(list.listElement()).hasSize(3);
     assertThat(list.listElement(0).getText()).isEqualTo("1px");
     assertThat(list.listElement(1).getText()).isEqualTo("solid");
@@ -174,14 +174,14 @@ public final class TestListAndMap extends TestBase {
   public void nestedMap() {
     String[] lines = {"$config: (a: (b: (c: d)));"};
 
-    ScssParser.MapContext map = parse(lines).statement(0).variableDeclaration().map();
+    ScssParser.Map_Context map = parse(lines).statement(0).variableDeclaration().map_();
     assertThat(
             map.mapEntry(0)
                 .mapValue()
-                .map()
+                .map_()
                 .mapEntry(0)
                 .mapValue()
-                .map()
+                .map_()
                 .mapEntry(0)
                 .mapValue()
                 .getText())

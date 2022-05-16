@@ -110,7 +110,7 @@ jobs:
 
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v3.1.0
+      uses: actions/setup-node@v3.1.1
       with:
         node-version: '16.13.0'
     - name: Do not trust JavaScript env
@@ -127,8 +127,8 @@ jobs:
     - name: Install trgen
       shell: pwsh
       run: |
-        dotnet tool install -g trgen --version 0.16.0
-        dotnet tool install -g trwdog --version 0.16.0
+        dotnet tool install -g trgen --version 0.16.3
+        dotnet tool install -g trwdog --version 0.16.3
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }

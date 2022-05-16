@@ -22,6 +22,7 @@ lexer grammar PlSqlLexer;
 
 options {
     superClass=PlSqlLexerBase;
+    caseInsensitive = true;
 }
 
 @lexer::postinclude {

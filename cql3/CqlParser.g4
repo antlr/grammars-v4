@@ -86,10 +86,6 @@ revoke
    : kwRevoke priviledge kwOn resource kwFrom role
    ;
 
-listUsers
-   : kwList kwUsers
-   ;
-
 listRoles
    : kwList kwRoles (kwOf role)? kwNorecursive?
    ;
@@ -1229,10 +1225,6 @@ kwUse
 
 kwUser
    : K_USER
-   ;
-
-kwUsers
-   : K_USERS
    ;
 
 kwUsing

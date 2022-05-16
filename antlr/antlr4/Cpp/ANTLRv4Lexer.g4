@@ -44,6 +44,12 @@ lexer grammar ANTLRv4Lexer;
 options { superClass = LexerAdaptor; }
 import LexBasic;
 
+@header
+{
+#include "LexerAdaptor.h"
+}
+
+
 // Standard set of fragments
 tokens { TOKEN_REF , RULE_REF , LEXER_CHAR_SET }
 channels { OFF_CHANNEL , COMMENT }
@@ -92,7 +98,7 @@ UNTERMINATED_STRING_LITERAL
 // are contained within square brackets.
 BEGIN_ARGUMENT
    : LBrack
-   { this.handleBeginArgument(); }
+   { this->handleBeginArgument(); }
    ;
 
 // -------------------------
@@ -316,7 +322,7 @@ ARGUMENT_CHAR_LITERAL
 
 END_ARGUMENT
    : RBrack
-   { this.handleEndArgument(); }
+   { this->handleEndArgument(); }
    ;
 
 // added this to return non-EOF token type here. EOF does something weird
@@ -327,11 +333,6 @@ UNTERMINATED_ARGUMENT
 ARGUMENT_CONTENT
    : .
    ;
-
-// TODO: This grammar and the one used in the Intellij Antlr4 plugin differ
-// for "actions". This needs to be resolved at some point.
-// The Intellij Antlr4 grammar is here:
-// https://github.com/antlr/intellij-plugin-v4/blob/1f36fde17f7fa63cb18d7eeb9cb213815ac658fb/src/main/antlr/org/antlr/intellij/plugin/parser/ANTLRv4Lexer.g4#L587
 
 // -------------------------
 // Target Language Actions
@@ -373,7 +374,7 @@ ACTION_LINE_COMMENT
 
 END_ACTION
    : RBrace
-   { this.handleEndAction(); }
+   { this->handleEndAction(); }
    ;
 
 UNTERMINATED_ACTION
