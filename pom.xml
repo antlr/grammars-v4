@@ -310,6 +310,7 @@
 				<module>webidl</module>
 				<module>wkt</module>
 				<module>wln</module>
+				<module>wren</module>
 				<module>xml</module>
 				<module>xpath</module>
 				<module>xsd-regex</module>
