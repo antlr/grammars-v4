@@ -33,7 +33,7 @@ options { tokenVocab=WrenLexer; }
 script: fileAtom+ EOF;
 
 fileAtom
-    : class
+    : classDefinition
     | function
     | importModule
     | statement
@@ -60,13 +60,13 @@ assignOp
 
 
 // flow
-if: ifCond bodyFlow elseIf* else?;
+ifSt: ifCond bodyFlow elseIf* elseSt?;
 ifCond: IF LPAREN expression RPAREN;
 elseIf: ELSE ifCond bodyFlow;
-else : ELSE bodyFlow;
+elseSt : ELSE bodyFlow;
 
-while: WHILE LPAREN (expression | assignment) RPAREN bodyFlow;
-for: FOR LPAREN id IN expression RPAREN bodyFlow;
+whileSt: WHILE LPAREN (expression | assignment) RPAREN bodyFlow;
+forSt: FOR LPAREN id IN expression RPAREN bodyFlow;
 
 bodyFlow
     : block
@@ -78,19 +78,19 @@ statement
     : expression
     | assignment
     | assignmentNull
-    | if
-    | while
-    | for
+    | ifSt
+    | whileSt
+    | forSt
     | block
-    | return
+    | returnSt
     ;
 
 lambdaParameters: BITOR (id (COMMA id)*) BITOR;
 block: LBRACE lambdaParameters? statement* RBRACE;
-return: RETURN expression;
+returnSt: RETURN expression;
 
 // class
-class: attributes? FOREIGN? CLASS  id inheritance? LBRACE classBody RBRACE;
+classDefinition: attributes? FOREIGN? CLASS  id inheritance? LBRACE classBody RBRACE;
 inheritance: IS id ;
 
 // class atributes
@@ -181,26 +181,31 @@ callHead
     ;
 // expressions
 expression
-    : expression logic
-    | expression arithBit
-    | expression arithShift
-    | expression arithRange
-    | expression arithAdd
-    | expression arithMul
-    | expression DOT call
-    | expression IS expression
+    : expression compoundExpression
     | BANG expression
     | LPAREN expression  RPAREN
-    | expression elvis
     | atomExpression
     ;
+
+compoundExpression
+     : logic
+     | arithBit
+     | arithShift
+     | arithRange
+     | arithAdd
+     | arithMul
+     | DOT call
+     | IS expression
+     | elvis
+     ;
+
 atomExpression
     : id
-    | bool
-    | char
-    | string
-    | num
-    | null
+    | boolE
+    | charE
+    | stringE
+    | numE
+    | nullE
     | listInit
     | mapInit
     | call
@@ -218,13 +223,13 @@ listInit: LBRACK enumeration? RBRACK;
 mapInit: LBRACE pairEnumeration? RBRACE;
 elem
     : id
-    | string
+    | stringE
     | call
     ;
 collectionElem: elem listInit ;
 rangeExpression
     : id
-    | num
+    | numE
     | call
     ;
 // arithmetic expressions
@@ -254,13 +259,13 @@ elvis: QUESTION expression COLON expression;
 
 // primitives
 id: IDENTIFIER;
-bool: TRUE | FALSE ;
-char: CHAR_LITERAL;
-string: STRING_LITERAL | TEXT_BLOCK ;
-num
+boolE: TRUE | FALSE ;
+charE: CHAR_LITERAL;
+stringE: STRING_LITERAL | TEXT_BLOCK ;
+numE
     : DECIMAL_LITERAL
     | HEX_LITERAL
     | FLOAT_LITERAL
     | HEX_FLOAT_LITERAL
     ;
-null: NULL;
+nullE: NULL;
