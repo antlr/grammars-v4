@@ -41,8 +41,8 @@ fileAtom
     ;
 
 // assignment
-assignment: VAR? expression assignOp (expression | assignment+);
-assignmentNull: VAR id;
+assignment: VAR_T? expression assignOp (expression | assignment+);
+assignmentNull: VAR_T id;
 assignOp
     : ASSIGN
     | ADD_ASSIGN
@@ -61,12 +61,12 @@ assignOp
 
 // flow
 ifSt: ifCond bodyFlow elseIf* elseSt?;
-ifCond: IF LPAREN expression RPAREN;
-elseIf: ELSE ifCond bodyFlow;
-elseSt : ELSE bodyFlow;
+ifCond: IF_T LPAREN expression RPAREN;
+elseIf: ELSE_T ifCond bodyFlow;
+elseSt : ELSE_T bodyFlow;
 
-whileSt: WHILE LPAREN (expression | assignment) RPAREN bodyFlow;
-forSt: FOR LPAREN id IN expression RPAREN bodyFlow;
+whileSt: WHILE_T LPAREN (expression | assignment) RPAREN bodyFlow;
+forSt: FOR_T LPAREN id IN expression RPAREN bodyFlow;
 
 bodyFlow
     : block
@@ -87,10 +87,10 @@ statement
 
 lambdaParameters: BITOR (id (COMMA id)*) BITOR;
 block: LBRACE lambdaParameters? statement* RBRACE;
-returnSt: RETURN expression;
+returnSt: RETURN_T expression;
 
 // class
-classDefinition: attributes? FOREIGN? CLASS  id inheritance? LBRACE classBody RBRACE;
+classDefinition: attributes? FOREIGN_T? CLASS_T  id inheritance? LBRACE classBody RBRACE;
 inheritance: IS id ;
 
 // class atributes
@@ -106,10 +106,10 @@ groupAttribute:HASH BANG? id LPAREN attributeValue (COMMA attributeValue)* RPARE
 // class body
 classBody:(attributes? classBodyTpe? classStatement)*;
 classBodyTpe
-    : FOREIGN
-    | STATIC
-    | STATIC FOREIGN
-    | FOREIGN STATIC
+    : FOREIGN_T
+    | STATIC_T
+    | STATIC_T FOREIGN_T
+    | FOREIGN_T STATIC_T
     ;
 // class statement
 classStatement
@@ -166,9 +166,9 @@ arguments: LPAREN (id (COMMA id)*)? RPAREN;
 function: id arguments block?;
 
 // imports
-importModule: IMPORT STRING_LITERAL importVariables?;
+importModule: IMPORT_T STRING_LITERAL importVariables?;
 importVariable: id (AS id)?;
-importVariables: FOR importVariable (COMMA importVariable);
+importVariables: FOR_T importVariable (COMMA importVariable);
 
 // call
 call: callHead (DOT call)*;
@@ -211,8 +211,8 @@ atomExpression
     | call
     | range
     | collectionElem
-    | BREAK
-    | CONTINUE
+    | BREAK_T
+    | CONTINUE_T
     | importModule
     | SUB atomExpression
     ;
@@ -259,7 +259,7 @@ elvis: QUESTION expression COLON expression;
 
 // primitives
 id: IDENTIFIER;
-boolE: TRUE | FALSE ;
+boolE: TRUE_T | FALSE_T ;
 charE: CHAR_LITERAL;
 stringE: STRING_LITERAL | TEXT_BLOCK ;
 numE
@@ -268,4 +268,4 @@ numE
     | FLOAT_LITERAL
     | HEX_FLOAT_LITERAL
     ;
-nullE: NULL;
+nullE: NULL_T;
