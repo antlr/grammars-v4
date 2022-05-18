@@ -29,7 +29,6 @@ parser grammar WrenParser;
 
 options { tokenVocab=WrenLexer; }
 
-
 script: fileAtom+ EOF;
 
 fileAtom
@@ -60,18 +59,14 @@ assignOp
 
 
 // flow
-ifSt: ifCond bodyFlow elseIf* elseSt?;
+ifSt: ifCond statement elseIf* elseSt?;
 ifCond: IF_T LPAREN expression RPAREN;
-elseIf: ELSE_T ifCond bodyFlow;
-elseSt : ELSE_T bodyFlow;
+elseIf: ELSE_T ifCond statement;
+elseSt : ELSE_T statement;
 
-whileSt: WHILE_T LPAREN (expression | assignment) RPAREN bodyFlow;
-forSt: FOR_T LPAREN id IN expression RPAREN bodyFlow;
+whileSt: WHILE_T LPAREN (expression | assignment) RPAREN statement;
+forSt: FOR_T LPAREN id IN expression RPAREN statement;
 
-bodyFlow
-    : block
-    | statement
-    ;
 
 // statements
 statement
@@ -114,11 +109,10 @@ classBodyTpe
 // class statement
 classStatement
     : function
-    | classGetter
+    | classOpGetter
     | classSetter
     | classSubscriptGet
     | classSubscriptSet
-    | classOpGetter
     | classOpSetter
     | classConstructor
     ;
@@ -150,15 +144,13 @@ operatorSetter
     | GE
     | NOTEQUAL
     | IS
-    | id
     ;
-classOpGetter: operatorGetter block;
+classOpGetter: operatorGetter block?;
 classOpSetter: operatorSetter oneArgument block;
 oneArgument: LPAREN id RPAREN;
 subscript: LBRACK enumeration RBRACK;
 classSubscriptGet:  subscript block;
 classSubscriptSet:  subscript ASSIGN oneArgument block;
-classGetter: id block?;
 classSetter: id assignmentSetter block;
 assignmentSetter:ASSIGN oneArgument;
 arguments: LPAREN (id (COMMA id)*)? RPAREN;
@@ -171,19 +163,14 @@ importVariable: id (AS id)?;
 importVariables: FOR_T importVariable (COMMA importVariable);
 
 // call
-call: callHead (DOT call)*;
-callBlock: id block;
-callSignature: id LPAREN enumeration? RPAREN;
-callHead
-    : callSignature
-    | callBlock
-    | id
-    ;
+call: id (callInvoke | block)? (DOT call)*;
+callInvoke:(LPAREN enumeration? RPAREN) ;
+
 // expressions
 expression
     : expression compoundExpression
     | BANG expression
-    | LPAREN expression  RPAREN
+    | LPAREN expression RPAREN
     | atomExpression
     ;
 
@@ -200,8 +187,7 @@ compoundExpression
      ;
 
 atomExpression
-    : id
-    | boolE
+    : boolE
     | charE
     | stringE
     | numE
@@ -222,15 +208,13 @@ range:rangeExpression (ELLIPSIS_IN | ELLIPSIS_OUT) rangeExpression;
 listInit: LBRACK enumeration? RBRACK;
 mapInit: LBRACE pairEnumeration? RBRACE;
 elem
-    : id
+    : call
     | stringE
-    | call
     ;
 collectionElem: elem listInit ;
 rangeExpression
-    : id
+    : call
     | numE
-    | call
     ;
 // arithmetic expressions
 arithMul: (MUL | DIV | MOD) expression;
