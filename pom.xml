@@ -184,6 +184,7 @@
                 <module>lrc</module>
 				<module>ltl</module>
 				<module>lua</module>
+				<module>lucene</module>
 				<module>matlab</module>
 				<module>mckeeman-form</module>
 				<module>mdx</module>
