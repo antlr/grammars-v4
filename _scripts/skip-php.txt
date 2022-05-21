@@ -37,6 +37,7 @@ kotlin/kotlin-formal
 kquery
 logo/ucb-logo
 lpc
+lucene
 modula2pim4
 pascal
 peoplecode
