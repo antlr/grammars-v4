@@ -1,6 +1,6 @@
 /*
 The MIT License (MIT)
-Copyright (c) 2021 Robert Einhorn
+Copyright (c) 2022 Robert Einhorn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 // *** lexer grammar dependencies to use this class with other (older) ANTLR4 Python grammars
 /*
+
 lexer grammar PythonLexer;
 options { superClass=PythonLexerBase; }
 tokens { INDENT, DEDENT }
@@ -44,6 +45,7 @@ COMMENT      : '#' ~[\r\n\f]* -> channel(HIDDEN);
 WS           : [ \t]+         -> channel(HIDDEN);
 LINE_JOINING : '\\' NEWLINE   -> channel(HIDDEN);
 fragment OS_INDEPEND_NL : '\r'? '\n';
+
  */
 
 
@@ -64,8 +66,8 @@ public abstract class PythonLexerBase extends Lexer {
     // A linked list where tokens are waiting to be loaded into the token stream
     private final LinkedList<Token> _pendingTokens = new LinkedList<>();
     // last pending token types
-    private int _lastPendingTokenTypeOfChannels = 0;
-    private int _lastPendingTokenTypeFromDefaultChannel = 0;
+    private int _previousPendingTokenType = 0;
+    private int _lastPendingTokenTypeToDefaultChannel = 0;
 
     // The amount of opened braces, brackets and parenthesis
     private int _opened = 0;
@@ -89,7 +91,7 @@ public abstract class PythonLexerBase extends Lexer {
     }
 
     private void checkNextToken() {
-        if (_lastPendingTokenTypeOfChannels != EOF) {
+        if (_previousPendingTokenType != EOF) {
             setCurrentAndFollowingTokens();
             handleStartOfInput();
             switch (_curToken.getType()) {
@@ -139,7 +141,7 @@ public abstract class PythonLexerBase extends Lexer {
     }
 
     private void insertLeadingIndentToken() {
-        if (_lastPendingTokenTypeOfChannels == PythonLexer.WS) { // there is an "indentation" before the first statement
+        if (_previousPendingTokenType == PythonLexer.WS) { // there is an "indentation" before the first statement
             // insert an INDENT token before the first statement to raise an 'unexpected indent' error later by the parser
             createAndAddPendingToken(PythonLexer.INDENT, _curToken); // insert an INDENT token before the _curToken
         }
@@ -200,7 +202,7 @@ public abstract class PythonLexerBase extends Lexer {
     }
 
     private void handleEOFtoken() {
-        if (_lastPendingTokenTypeFromDefaultChannel > 0) { // there was statement in the input (leading NEWLINE tokens are hidden)
+        if (_lastPendingTokenTypeToDefaultChannel > 0) { // there was statement in the input (leading NEWLINE tokens are hidden)
             insertTrailingTokens();
             checkSpaceAndTabIndentation();
         }
@@ -208,13 +210,13 @@ public abstract class PythonLexerBase extends Lexer {
     }
 
     private void insertTrailingTokens() {
-        switch (_lastPendingTokenTypeFromDefaultChannel) {
+        switch (_lastPendingTokenTypeToDefaultChannel) {
             case PythonLexer.NEWLINE, PythonLexer.DEDENT -> { // no need for trailing NEWLINE token
             }
             default -> createAndAddPendingToken(PythonLexer.NEWLINE, _ffgToken); // insert before the _ffgToken
             //         insert an extra trailing NEWLINE token that serves as the end of the last statement
         }
-        insertIndentDedentTokens(0); // Now insert as much trailing DEDENT tokens as needed to the token stream
+        insertIndentDedentTokens(0); // Now insert as much trailing DEDENT tokens as needed
     }
 
     private void hideAndAddPendingToken(Token token) {
@@ -241,10 +243,10 @@ public abstract class PythonLexerBase extends Lexer {
     }
 
     private void addPendingToken(Token token) {
-        // save the last pending token types because the _pendingTokens linked list can be empty by the nextToken()
-        _lastPendingTokenTypeOfChannels = token.getType();
+        // save the last pending token type because the _pendingTokens linked list can be empty by the nextToken()
+        _previousPendingTokenType = token.getType();
         if (token.getChannel() == Lexer.DEFAULT_TOKEN_CHANNEL) {
-            _lastPendingTokenTypeFromDefaultChannel = _lastPendingTokenTypeOfChannels;
+            _lastPendingTokenTypeToDefaultChannel = _previousPendingTokenType;
         }
         _pendingTokens.addLast(token); // the token will be added to the token stream
     }

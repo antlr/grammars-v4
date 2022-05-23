@@ -4,8 +4,8 @@ import org.antlr.v4.runtime.TokenStream;
 public abstract class PythonParserBase extends Parser {
     protected PythonParserBase(TokenStream input) {
         super(input);
-        //this.removeErrorListeners();
-        this.addErrorListener(new IndentationErrorListener());
+        //removeErrorListeners();
+        addErrorListener(new IndentationErrorListener());
     }
 
     @Override

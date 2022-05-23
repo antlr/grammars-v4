@@ -1,7 +1,7 @@
 /*
 Python grammar
 The MIT License (MIT)
-Copyright (c) 2021 Robert Einhorn
+Copyright (c) 2022 Robert Einhorn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,12 @@ THE SOFTWARE.
  */
 
  /*
- * Project      : an ANTLR4 parser grammar by the official Python 3.8.12 grammar
- *                https://github.com/RobEin/ANTLR4-parser-for-Python-3.8.12
+ * Project      : an ANTLR4 parser grammar by the official Python 3.8.13 grammar
+ *                https://github.com/antlr/grammars-v4/tree/master/python/python3-8-13
  * Developed by : Robert Einhorn, robert.einhorn.hu@gmail.com
  */
 
-parser grammar PythonParser; // Python 3.8.12    https://docs.python.org/3.8/reference/grammar.html
+parser grammar PythonParser; // Python 3.8.13    https://docs.python.org/3.8/reference/grammar.html
 options { tokenVocab=PythonLexer; superClass=PythonParserBase; }
 // ANTLR4 grammar for Python
 

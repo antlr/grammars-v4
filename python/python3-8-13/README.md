@@ -1,4 +1,4 @@
-# ANTLR4 parser for Python 3.8.12 &nbsp; 
+# ANTLR4 parser for Python 3.8.13 &nbsp; 
 
 ### About files:
  - PythonParser.g4
@@ -14,5 +14,5 @@
 
 
 ### Related link:
-[Python 3 Lexical Analysis](https://docs.python.org/3/reference/lexical_analysis.html)
+[Python 3.8 Lexical Analysis](https://docs.python.org/3.8/reference/lexical_analysis.html)
 
