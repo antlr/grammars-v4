@@ -17,7 +17,7 @@
 		<module>python3</module>
 		<module>python3-py</module>
 		<module>python3-ts</module>
-		<module>python3-8-13</module>
+		<module>python3-without-actions</module>
 		<module>python3alt</module>
 		<module>tiny-python</module>
 	</modules>
