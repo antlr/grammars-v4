@@ -2,20 +2,9 @@ import sys
 from enum import Enum
 from pkgutil import get_data
 from typing import List, Optional, Dict, TextIO
-
 from antlr4 import Lexer, Token, InputStream, Parser, TokenStream
 from antlr4.Token import CommonToken
 
-# To use the PythonLexer in Python,
-#
-# 1. Add the code
-#    ```antlr
-#    @header {
-#      from .PythonLexerBase import PythonLexerBase
-#    }
-#    ```
-#    to PythonLexer.g4, directly below `lexer grammar PythonLexer;`.
-# 2. Make sure that the generated lexer class, the file `PythonLexer.tokens`, and this class are in the same directory.
 class PythonLexerBase(Lexer):
     tab_size = 4
 
@@ -28,13 +17,6 @@ class PythonLexerBase(Lexer):
         self.__last_tokens_ind: int = 0
         self.__buffer: List[Optional[Token]] = [None for _ in range(32)]
         self.__last_token: Optional[Token] = None
-
-        # Cannot import PythonLexer, since this would lead to a circular import.
-        tokens_file: str = get_data(__package__, 'PythonLexer.tokens').decode('utf-8').strip()
-        self.__tokens: Dict[str, int] = {
-            line.rsplit('=', 1)[0].strip("'"): int(line.rsplit('=', 1)[1])
-            for line in tokens_file.split('\n')
-        }
 
     def emitToken(self, token: Token) -> None:
         self._token = token
@@ -61,13 +43,13 @@ class PythonLexerBase(Lexer):
         # Check if the end-of-file is ahead and there are still some DEDENTS expected.
         if self._input.LA(1) == Token.EOF and self.__indents:
             if (self.__buffer[self.__last_tokens_ind] is not None or
-                    self.__buffer[self.__last_tokens_ind].type != self.__tokens['LINE_BREAK']):
+                self.__buffer[self.__last_tokens_ind].type != self.LINE_BREAK):
                 # First emit an extra line break that serves as the end of the statement.
-                self.__emit_token_type(self.__tokens['LINE_BREAK'])
+                self.__emit_token_type(self.LINE_BREAK)
 
             # Now emit as much DEDENT tokens as needed.
             while self.__indents:
-                self.__emit_token_type(self.__tokens['DEDENT'])
+                self.__emit_token_type(self.DEDENT)
                 self.__indents.pop()
 
         next_token: Token = super().nextToken()
@@ -83,19 +65,22 @@ class PythonLexerBase(Lexer):
 
         return result
 
-    def _handle_new_line(self) -> None:
-        self.__emit_token_type_on_channel(self.__tokens['NEWLINE'], self.HIDDEN, self.text)
+    def HandleNewLine(self) -> None:
+        self.__emit_token_type_on_channel(self.NEWLINE, self.HIDDEN, self.text)
 
-        next_char: str = chr(self._input.LA(1))
+        c = self._input.LA(1)
+        if c == -1 :
+            return
+        next_char: str = chr(c)
 
         # Process whitespaces in handle_spaces
         if next_char != ' ' and next_char != '\t' and self.__is_not_new_line_or_comment(next_char):
             self.__process_new_line(0)
 
-    def _handle_spaces(self) -> None:
+    def HandleSpaces(self) -> None:
         next_char: str = chr(self._input.LA(1))
 
-        if ((self.__last_token is None or self.__last_token.type == self.__tokens['NEWLINE']) and
+        if ((self.__last_token is None or self.__last_token.type == self.NEWLINE) and
                 self.__is_not_new_line_or_comment(next_char)):
             # Calculates the indentation of the provided spaces, taking the
             # following rules into account:
@@ -113,12 +98,12 @@ class PythonLexerBase(Lexer):
 
             self.__process_new_line(indent)
 
-        self.__emit_token_type_on_channel(self.__tokens['WS'], self.HIDDEN, self.text)
+        self.__emit_token_type_on_channel(self.WS, self.HIDDEN, self.text)
 
-    def _inc_indent_level(self) -> None:
+    def IncIndentLevel(self) -> None:
         self.__opened += 1
 
-    def _dec_indent_level(self) -> None:
+    def DecIndentLevel(self) -> None:
         if self.__opened:
             self.__opened -= 1
 
@@ -130,17 +115,17 @@ class PythonLexerBase(Lexer):
                 next_char != '#')
 
     def __process_new_line(self, indent: int) -> None:
-        self.__emit_token_type(self.__tokens['LINE_BREAK'])
+        self.__emit_token_type(self.LINE_BREAK)
 
         previous: int = 0 if not self.__indents else self.__indents[-1]
 
         if indent > previous:
             self.__indents.append(indent)
-            self.__emit_token_type(self.__tokens['INDENT'])
+            self.__emit_token_type(self.INDENT)
         else:
             # Possibly emit more than 1 DEDENT token.
             while self.__indents and self.__indents[-1] > indent:
-                self.__emit_token_type(self.__tokens['DEDENT'])
+                self.__emit_token_type(self.DEDENT)
                 self.__indents.pop()
 
     def __inc_token_ind(self, ind: int) -> int:
