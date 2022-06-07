@@ -37,18 +37,16 @@ arglist
    ;
 
 args
-   : (arg)+
+   : arg+
    ;
 
-gid
-   : NUMBER '-' NUMBER ('-' NUMBER)?
-   ;
+
 
 arg
    : ID
    | NUMBER
    | STRING
-   | gid
+   | GID
    ;
 
 command
@@ -57,6 +55,10 @@ command
 
 ID
    : [a-zA-Z_]+
+   ;
+
+GID
+   : NUMBER '-' NUMBER ('-' NUMBER)?
    ;
 
 NUMBER
