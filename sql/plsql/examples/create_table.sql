@@ -78,3 +78,5 @@ CREATE TABLE products (
     weight FLOAT,
     PRICE NUMERIC(10,-2)
 );
+
+create table "DVSADM".CMP3$58238005 nocompress tablespace "DVS_PROOF" nologging lob (VALUE) store as (tablespace "DVS_PROOF" enable storage in row nocache nologging) as select /*+ DYNAMIC_SAMPLING(0) FULL("DVSADM"."DVS_ARCHIVE") */ * from "DVSADM"."DVS_ARCHIVE" sample block( 6.734) mytab;
