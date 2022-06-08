@@ -119,3 +119,7 @@ alter table employee
 
 alter table employee
     add constraint emp_fk foreign key (col1, col2) references other on delete cascade;
+
+ALTER TABLE TABLE_A
+    ADD TABLE_B_ID NUMBER(5)
+    ADD FOREIGN KEY (TABLE_B_ID) REFERENCES TABLE_B (ID);
