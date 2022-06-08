@@ -2629,7 +2629,8 @@ new_column_name
     ;
 
 add_modify_drop_column_clauses
-    : (add_column_clause
+    : (constraint_clauses
+      |add_column_clause
       |modify_column_clauses
       |drop_column_clause
       )+
