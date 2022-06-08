@@ -25,24 +25,27 @@
 grammar fdo91;
 
 file_
-   : line* EOF
+   : atom* EOF
    ;
 
-line
-   : 'atom$'? command (args | arglist)? EOL+
+atom
+   : 'atom$'? command (literal_args | arglist)?
    ;
 
 arglist
    : '<' arg (',' arg)* '>'
    ;
 
-args
-   : arg+
+arg
+   : literal
+   | atom+
    ;
 
+literal_args
+   : literal+
+   ;
 
-
-arg
+literal
    : ID
    | NUMBER
    | STRING
@@ -73,11 +76,7 @@ COMMENT
    : '#' ~ [\r\n]* -> skip
    ;
 
-EOL
-   : [\r\n]+
-   ;
-
 WS
-   : [ \t]+ -> skip
+   : [ \r\n\t]+ -> skip
    ;
 
