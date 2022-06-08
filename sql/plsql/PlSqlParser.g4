@@ -2063,6 +2063,7 @@ deferred_segment_creation
 segment_attributes_clause
     : ( physical_attributes_clause
       | TABLESPACE tablespace_name=id_expression
+      | table_compression
       | logging_clause
       )+
     ;
