@@ -2522,13 +2522,14 @@ alter_table_partitioning
 
 
 add_table_partition
-    : ADD range_partition_desc
-    | ADD list_partition_desc
-    | ADD PARTITION partition_name? (TABLESPACE tablespace)? key_compression? UNUSABLE?
+    : ADD ( range_partition_desc
+          | list_partition_desc
+          | PARTITION partition_name? (TABLESPACE tablespace)? key_compression? UNUSABLE?
+      )
     ;
 
 drop_table_partition
-    : DROP (partition_extended_names|subpartition_extended_names) (update_index_clauses parallel_clause?)?
+    : DROP (partition_extended_names | subpartition_extended_names) (update_index_clauses parallel_clause?)?
     ;
 
 merge_table_partition
@@ -2541,18 +2542,19 @@ modify_table_partition
 
 split_table_partition
     : SPLIT PARTITION partition_name INTO '('
-            (range_partition_desc (',' range_partition_desc)* |
-                list_partition_desc (',' list_partition_desc)* ) ')'
+         (range_partition_desc (',' range_partition_desc)*
+         | list_partition_desc (',' list_partition_desc)* )
+     ')'
     ;
 
 truncate_table_partition
-    : TRUNCATE (partition_extended_names|subpartition_extended_names)
-            ((DROP ALL?|REUSE)? STORAGE)? CASCADE? (update_index_clauses parallel_clause?)?
+    : TRUNCATE (partition_extended_names | subpartition_extended_names)
+            ((DROP ALL? | REUSE)? STORAGE)? CASCADE? (update_index_clauses parallel_clause?)?
     ;
 
 exchange_table_partition
     : EXCHANGE PARTITION partition_name WITH TABLE tableview_name
-            ((INCLUDING|EXCLUDING) INDEXES)?
+            ((INCLUDING | EXCLUDING) INDEXES)?
             ((WITH | WITHOUT) VALIDATION)?
     ;
 
@@ -2566,15 +2568,15 @@ alter_interval_partition
 
 
 partition_extended_names
-    : (PARTITION|PARTITIONS) partition_name
-    | (PARTITION|PARTITIONS) '(' partition_name (',' partition_name)* ')'
-    | (PARTITION|PARTITIONS) FOR '('? partition_key_value (',' partition_key_value)* ')'?
+    : (PARTITION | PARTITIONS) ( partition_name
+                               | '(' partition_name (',' partition_name)* ')'
+                               | FOR '('? partition_key_value (',' partition_key_value)* ')'? )
     ;
 
 subpartition_extended_names
-    : (SUBPARTITION|SUBPARTITIONS) partition_name (UPDATE INDEXES)?
-    | (SUBPARTITION|SUBPARTITIONS) '(' partition_name (',' partition_name)* ')'
-    | (SUBPARTITION|SUBPARTITIONS) FOR '('? subpartition_key_value (',' subpartition_key_value)* ')'?
+    : (SUBPARTITION | SUBPARTITIONS) ( partition_name (UPDATE INDEXES)?
+                                     | '(' partition_name (',' partition_name)* ')'
+                                     | FOR '('? subpartition_key_value (',' subpartition_key_value)* ')'? )
     ;
 
 alter_table_properties_1
@@ -2617,7 +2619,8 @@ add_overflow_clause
 
 
 update_index_clauses
-    : update_global_index_clause | update_all_indexes_clause
+    : update_global_index_clause
+    | update_all_indexes_clause
     ;
 
 update_global_index_clause
