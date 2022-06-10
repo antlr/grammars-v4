@@ -1003,10 +1003,12 @@ into_clause1
 //Making assumption on partition ad subpartition key value clauses
 partition_key_value
     : literal
+    | TIMESTAMP quoted_string
     ;
 
 subpartition_key_value
     : literal
+    | TIMESTAMP quoted_string
     ;
 
 //https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4006.htm#SQLRF01106
@@ -2489,7 +2491,7 @@ alter_table
       | alter_table_properties
       | constraint_clauses
       | column_clauses
-//TODO      | alter_table_partitioning
+      | alter_table_partitioning
 //TODO      | alter_external_table
       | move_table_clause
       )
@@ -2504,6 +2506,77 @@ alter_table_properties
     | READ ONLY
     | READ WRITE
     | REKEY CHAR_STRING
+    ;
+
+alter_table_partitioning
+    : add_table_partition
+    | drop_table_partition
+    | merge_table_partition
+    | modify_table_partition
+    | split_table_partition
+    | truncate_table_partition
+    | exchange_table_partition
+    | coalesce_table_partition
+    | alter_interval_partition
+    ;
+
+
+add_table_partition
+    : ADD ( range_partition_desc
+          | list_partition_desc
+          | PARTITION partition_name? (TABLESPACE tablespace)? key_compression? UNUSABLE?
+      )
+    ;
+
+drop_table_partition
+    : DROP (partition_extended_names | subpartition_extended_names) (update_index_clauses parallel_clause?)?
+    ;
+
+merge_table_partition
+    : MERGE PARTITION partition_name AND partition_name INTO PARTITION partition_name
+    ;
+
+modify_table_partition
+    : MODIFY PARTITION partition_name ((ADD | DROP) list_values_clause)? (ADD range_subpartition_desc)? (REBUILD? UNUSABLE LOCAL INDEXES)?
+    ;
+
+split_table_partition
+    : SPLIT PARTITION partition_name INTO '('
+         (range_partition_desc (',' range_partition_desc)*
+         | list_partition_desc (',' list_partition_desc)* )
+     ')'
+    ;
+
+truncate_table_partition
+    : TRUNCATE (partition_extended_names | subpartition_extended_names)
+            ((DROP ALL? | REUSE)? STORAGE)? CASCADE? (update_index_clauses parallel_clause?)?
+    ;
+
+exchange_table_partition
+    : EXCHANGE PARTITION partition_name WITH TABLE tableview_name
+            ((INCLUDING | EXCLUDING) INDEXES)?
+            ((WITH | WITHOUT) VALIDATION)?
+    ;
+
+coalesce_table_partition
+    : COALESCE PARTITION parallel_clause? (allow_or_disallow CLUSTERING)?
+    ;
+
+alter_interval_partition
+    : SET INTERVAL '(' (constant | expression)? ')'
+    ;
+
+
+partition_extended_names
+    : (PARTITION | PARTITIONS) ( partition_name
+                               | '(' partition_name (',' partition_name)* ')'
+                               | FOR '('? partition_key_value (',' partition_key_value)* ')'? )
+    ;
+
+subpartition_extended_names
+    : (SUBPARTITION | SUBPARTITIONS) ( partition_name (UPDATE INDEXES)?
+                                     | '(' partition_name (',' partition_name)* ')'
+                                     | FOR '('? subpartition_key_value (',' subpartition_key_value)* ')'? )
     ;
 
 alter_table_properties_1
@@ -2544,6 +2617,31 @@ add_overflow_clause
     : ADD OVERFLOW segment_attributes_clause? ('(' PARTITION segment_attributes_clause? (',' PARTITION segment_attributes_clause?)*  ')' )?
     ;
 
+
+update_index_clauses
+    : update_global_index_clause
+    | update_all_indexes_clause
+    ;
+
+update_global_index_clause
+    : (UPDATE | INVALIDATE) GLOBAL INDEXES
+    ;
+
+update_all_indexes_clause
+    : UPDATE INDEXES ('(' update_all_indexes_index_clause ')')?
+    ;
+
+update_all_indexes_index_clause
+    : index_name '(' (update_index_partition | update_index_subpartition) ')' (',' update_all_indexes_clause)*
+    ;
+
+update_index_partition
+    : index_partition_description index_subpartition_clause? (',' update_index_partition)*
+    ;
+
+update_index_subpartition
+    : SUBPARTITION subpartition_name? (TABLESPACE tablespace)? (',' update_index_subpartition)*
+    ;
 
 enable_disable_clause
     : (ENABLE | DISABLE) (VALIDATE | NOVALIDATE)?
