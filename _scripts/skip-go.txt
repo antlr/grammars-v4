@@ -12,6 +12,7 @@ clif
 cobol85
 cpp
 csharp
+dart2
 edif300
 fortran77
 gdscript
