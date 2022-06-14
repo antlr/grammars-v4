@@ -26,6 +26,7 @@
 parser grammar Dart2Parser;
 
 options { tokenVocab=Dart2Lexer; }
+
 additiveExpression : multiplicativeExpression ( additiveOperator multiplicativeExpression )* | SUPER_ ( additiveOperator multiplicativeExpression )+ ;
 additiveOperator : PL | MINUS ;
 argumentList : namedArgument ( C namedArgument )* | expressionList ( C namedArgument )* ;

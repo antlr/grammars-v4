@@ -25,8 +25,8 @@
  */
 lexer grammar Dart2Lexer;
 
-
 options { superClass=Dart2LexerBase; }
+
 A: '&';
 AA: '&&';
 AE: '&=';
@@ -146,47 +146,23 @@ VAR_:'var';
 VOID_:'void';
 WHILE_:'while';
 WITH_:'with';
-YIELD_:'yield';NUMBER : DIGIT+ ( '.' DIGIT+ )? EXPONENT? | '.' DIGIT+ EXPONENT? ;
-fragment EXPONENT : ( 'e' | 'E' ) ( '+' | '-' )? DIGIT+ ;
+YIELD_:'yield';
+NUMBER : DIGIT+ ( '.' DIGIT+ )? EXPONENT? | '.' DIGIT+ EXPONENT? ;
 HEX_NUMBER : '0x' HEX_DIGIT+ | '0X' HEX_DIGIT+ ;
+SingleLineString : StringDQ | StringSQ | 'r\'' (~('\'' | '\n' | '\r'))* '\'' | 'r"' (~('"' | '\n' | '\r'))* '"' ;
+MultiLineString : '"""' StringContentTDQ*? '"""' | '\'\'\'' StringContentTSQ*? '\'\'\'' | 'r"""' (~'"' | '"' ~'"' | '""' ~'"')* '"""' | 'r\'\'\'' (~'\'' | '\'' ~'\'' | '\'\'' ~'\'')* '\'\'\'' ;
+IDENTIFIER : IDENTIFIER_START IDENTIFIER_PART* ;
+WHITESPACE : ( '\t' | ' ' | NEWLINE )+  -> skip;
+SINGLE_LINE_COMMENT : '//' ~[\r\n]* -> skip ;
+MULTI_LINE_COMMENT : '/*' ( MULTI_LINE_COMMENT | . )*? '*/'  -> skip ;
+fragment EXPONENT : ( 'e' | 'E' ) ( '+' | '-' )? DIGIT+ ;
 fragment HEX_DIGIT : 'a' .. 'f' | 'A' .. 'F' | DIGIT ;
-SingleLineString
-  : StringDQ
-  | StringSQ
-  | 'r\'' (~('\'' | '\n' | '\r'))* '\''
-  | 'r"' (~('"' | '\n' | '\r'))* '"'
-  ;
 fragment StringDQ : '"' StringContentDQ*? '"' ;
-fragment StringContentDQ
-  : ~('\\' | '"' | '\n' | '\r' | '$')
-  | '\\' ~('\n' | '\r')
-  | StringDQ
-  | '${' StringContentDQ*? '}'  
-  | '$' { CheckNotOpenBrace() }?
-  ;
+fragment StringContentDQ : ~('\\' | '"' | '\n' | '\r' | '$') | '\\' ~('\n' | '\r') | StringDQ | '${' StringContentDQ*? '}' | '$' { CheckNotOpenBrace() }? ;
 fragment StringSQ : '\'' StringContentSQ*? '\'' ;
-fragment StringContentSQ
-  : ~('\\' | '\'' | '\n' | '\r' | '$')
-  | '\\' ~('\n' | '\r')
-  | StringSQ
-  | '${' StringContentSQ*? '}'
-  | '$' { CheckNotOpenBrace() }?
-  ;
-MultiLineString
-  : '"""' StringContentTDQ*? '"""'
-  | '\'\'\'' StringContentTSQ*? '\'\'\''
-  | 'r"""' (~'"' | '"' ~'"' | '""' ~'"')* '"""'
-  | 'r\'\'\'' (~'\'' | '\'' ~'\'' | '\'\'' ~'\'')* '\'\'\''
-  ;
-fragment StringContentTDQ
-  : ~('\\' | '"')
-  | '"' ~'"' | '""' ~'"'
-  ;
-fragment StringContentTSQ
-  : '\'' ~'\''
-  | '\'\'' ~'\''
-  | .
-  ;
+fragment StringContentSQ : ~('\\' | '\'' | '\n' | '\r' | '$') | '\\' ~('\n' | '\r') | StringSQ | '${' StringContentSQ*? '}' | '$' { CheckNotOpenBrace() }? ;
+fragment StringContentTDQ : ~('\\' | '"') | '"' ~'"' | '""' ~'"' ;
+fragment StringContentTSQ : '\'' ~'\'' | '\'\'' ~'\'' | . ;
 fragment ESCAPE_SEQUENCE : '\n' | '\r' | '\\f' | '\\b' | '\t' | '\\v' | '\\x' HEX_DIGIT HEX_DIGIT | '\\u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT | '\\u{' HEX_DIGIT_SEQUENCE '}' ;
 fragment HEX_DIGIT_SEQUENCE : HEX_DIGIT HEX_DIGIT? HEX_DIGIT? HEX_DIGIT? HEX_DIGIT? HEX_DIGIT? ;
 fragment NEWLINE : '\n' | '\r' | '\r\n' ;
@@ -195,11 +171,7 @@ fragment OTHER_IDENTIFIER : 'async' | 'hide' | 'of' | 'on' | 'show' | 'sync' | '
 fragment IDENTIFIER_NO_DOLLAR : IDENTIFIER_START_NO_DOLLAR IDENTIFIER_PART_NO_DOLLAR* ;
 fragment IDENTIFIER_START_NO_DOLLAR : LETTER | '_' ;
 fragment IDENTIFIER_PART_NO_DOLLAR : IDENTIFIER_START_NO_DOLLAR | DIGIT ;
-IDENTIFIER : IDENTIFIER_START IDENTIFIER_PART* ;
 fragment IDENTIFIER_START : IDENTIFIER_START_NO_DOLLAR | '$' ;
 fragment IDENTIFIER_PART : IDENTIFIER_START | DIGIT ;
 fragment LETTER : 'a' .. 'z' | 'A' .. 'Z' ;
 fragment DIGIT : '0' .. '9' ;
-WHITESPACE : ( '\t' | ' ' | NEWLINE )+  -> skip;
-SINGLE_LINE_COMMENT : '//' ~[\r\n]* -> skip ;
-MULTI_LINE_COMMENT : '/*' ( MULTI_LINE_COMMENT | . )*? '*/'  -> skip ;
