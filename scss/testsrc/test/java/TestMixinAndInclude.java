@@ -311,7 +311,7 @@ public final class TestMixinAndInclude extends TestBase {
         context.statement(1).ruleset().block().statement(0).includeDeclaration();
     assertThat(include.Identifier().getText()).isEqualTo("hover");
     assertThat(include.functionCall()).isNull();
-    assertThat(include.block().property(0).getText()).isEqualTo("border-width:2px;");
+    assertThat(include.block().property_(0).getText()).isEqualTo("border-width:2px;");
   }
 
   @Test

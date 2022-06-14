@@ -71,7 +71,7 @@ methodDecl
 	)? ':' stmtOrSuite
 	;
 parList
-	: parameter (',' parameter)?
+	: parameter (',' parameter)*
 	;
 parameter
 	: 'var'? IDENTIFIER (':' typeHint)? ('=' expression)?
@@ -208,36 +208,39 @@ exprStmt
 	: expression stmtEnd
 	;
 expression
-	: expression '[' expression ']'									# subscription
-	| expression 'as' typeHint										# cast
-	| expression 'if' expression 'else' expression					# ternacyExpr
-	| expression ('or' | '||') expression							# logicOr
-	| expression ('and' | '&&') expression							# logicAnd
-	| ('!' | 'not') expression										# logicNot
-	| expression 'in' expression									# in
-	| expression ('<' | '>' | '<=' | '>=' | '==' | '!=') expression	# comparison
-	| expression '|' expression										# bitOr
-	| expression '^' expression										# bitXor
-	| expression '&' expression										# bitAnd
-	| expression ('<<' | '>>') expression							# bitShift
-	| expression '-' expression										# minus
-	| expression '+' expression										# plus
-	| expression ('*' | '/' | '%') expression						# factor
-	| ('-' | '+') expression										# sign
-	| '~' expression												# bitNot
-	| expression 'is' (IDENTIFIER | BUILTINTYPE)					# is
-	| expression '(' argList? ')'									# call
-	| '.' IDENTIFIER '(' argList? ')'								# call
-	| '$' (STRING | IDENTIFIER ('/' IDENTIFIER)*)					# getNode
-	| expression '.' IDENTIFIER										# attribute
-	| 'true'														# primary
+	: 'true'														# primary
 	| 'false'														# primary
 	| 'null'														# primary
 	| 'self'														# primary
 	| literal														# primary
-	| '[' (expression ( ',' expression)*)? ']'						# arrayDecl
-	| '{' (keyValue (',' keyValue)*)? '}'							# dictDecl
+	| '[' (expression ( ',' expression)* ','?)? ']'					# arrayDecl
+	| '{' (keyValue (',' keyValue)* ','?)? '}'						# dictDecl
 	| '(' expression ')'											# primary
+
+	| expression '[' expression ']'									# subscription
+	| expression '.' IDENTIFIER										# attribute
+	
+	| expression '(' argList? ')'									# call
+	| '.' IDENTIFIER '(' argList? ')'								# call
+	| '$' (STRING | IDENTIFIER ('/' IDENTIFIER)*)					# getNode
+
+	| expression 'is' (IDENTIFIER | BUILTINTYPE)					# is
+	| '~' expression												# bitNot
+	| ('-' | '+') expression										# sign
+	| expression ('*' | '/' | '%') expression						# factor
+	| expression '+' expression										# plus
+	| expression '-' expression										# minus
+	| expression ('<<' | '>>') expression							# bitShift
+	| expression '&' expression										# bitAnd
+	| expression '^' expression										# bitXor
+	| expression '|' expression										# bitOr
+	| expression ('<' | '>' | '<=' | '>=' | '==' | '!=') expression	# comparison
+	| expression 'in' expression									# in
+	| ('!' | 'not') expression										# logicNot
+	| expression ('and' | '&&') expression							# logicAnd
+	| expression ('or' | '||') expression							# logicOr
+	| expression 'if' expression 'else' expression					# ternacyExpr
+	| expression 'as' typeHint										# cast
 	;
 
 literal

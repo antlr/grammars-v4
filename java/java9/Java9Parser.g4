@@ -808,7 +808,7 @@ statementNoShortIf
 
 statementWithoutTrailingSubstatement
 	:	block
-	|	emptyStatement
+	|	emptyStatement_
 	|	expressionStatement
 	|	assertStatement
 	|	switchStatement
@@ -821,7 +821,7 @@ statementWithoutTrailingSubstatement
 	|	tryStatement
 	;
 
-emptyStatement
+emptyStatement_
 	:	';'
 	;
 

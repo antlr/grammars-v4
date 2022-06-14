@@ -1,3 +1,4 @@
+# Template generated code from trgen <version>
 err=0
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
@@ -8,7 +9,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo "$file"
-    trwdog python Program.py -file "$file"
+    trwdog python3 Program.py -file "$file"
     status="$?"
     if [ -f "$file".errors ]
     then

@@ -86,10 +86,6 @@ revoke
    : kwRevoke priviledge kwOn resource kwFrom role
    ;
 
-listUsers
-   : kwList kwUsers
-   ;
-
 listRoles
    : kwList kwRoles (kwOf role)? kwNorecursive?
    ;
@@ -277,7 +273,6 @@ alterTable
 
 alterTableOperation
    : alterTableAdd
-   | alterTableDropColumns
    | alterTableDropColumns
    | alterTableDropCompactStorage
    | alterTableRename
@@ -586,7 +581,7 @@ assignmentSet
    ;
 
 assignmentMap
-   : syntaxBracketLc (constant syntaxColon constant) (constant syntaxColon constant)* syntaxBracketRc
+   : syntaxBracketLc (constant syntaxColon constant) (syntaxComma constant syntaxColon constant)* syntaxBracketRc
    ;
 
 assignmentList
@@ -594,10 +589,7 @@ assignmentList
    ;
 
 assignmentTuple
-   : syntaxBracketLr (
-         constant ((syntaxComma constant)* | (syntaxComma assignmentTuple)*) |
-         assignmentTuple (syntaxComma assignmentTuple)*
-     ) syntaxBracketRr
+   : syntaxBracketLr ( expression (syntaxComma expression)* ) syntaxBracketRr
    ;
 
 insert
@@ -1233,10 +1225,6 @@ kwUse
 
 kwUser
    : K_USER
-   ;
-
-kwUsers
-   : K_USERS
    ;
 
 kwUsing

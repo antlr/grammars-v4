@@ -1,3 +1,4 @@
+# Template generated code from trgen <version>
 function Build-Grammar {
 <tool_grammar_files:{x |
     $g = antlr <x> -Dlanguage=Python3 <antlr_tool_args:{y | <y> } >
@@ -22,7 +23,7 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    $o = trwdog python Program.py -file $InputFile
+    $o = trwdog python3 Program.py -file $InputFile
     $failed = $LASTEXITCODE -ne 0
     if ($failed -and $errorFile) {
         return $true

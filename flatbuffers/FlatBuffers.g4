@@ -54,9 +54,9 @@ value : single_value | object_ | LB commasep_value RB ;
 
 commasep_value : value( COMMA value )* COMMA? ;
 
-file_extension_decl : FILE_EXTENSION STRING_CONSTANT ;
+file_extension_decl : FILE_EXTENSION STRING_CONSTANT SEMI ;
 
-file_identifier_decl : FILE_IDENTIFIER STRING_CONSTANT ;
+file_identifier_decl : FILE_IDENTIFIER STRING_CONSTANT SEMI ;
 
 ns_ident : identifier ( DOT identifier )* ;
 
