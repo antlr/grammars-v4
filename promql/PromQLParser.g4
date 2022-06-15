@@ -94,7 +94,7 @@ offset
 
 // Functions
 
-function_: FUNCTION LEFT_PAREN parameter (COMMA parameter)* RIGHT_PAREN;
+function_: FUNCTION LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
 
 parameter:     literal | vectorOperation;
 parameterList: LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
