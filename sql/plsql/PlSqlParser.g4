@@ -2037,6 +2037,7 @@ physical_attributes_clause
     : (PCTFREE pctfree=UNSIGNED_INTEGER
       | PCTUSED pctused=UNSIGNED_INTEGER
       | INITRANS inittrans=UNSIGNED_INTEGER
+      | MAXTRANS maxtrans=UNSIGNED_INTEGER
       | storage_clause
       )+
     ;
@@ -2787,6 +2788,7 @@ lob_segname
 
 lob_item
     : regular_id
+    | quoted_string
     ;
 
 lob_storage_parameters
