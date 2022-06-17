@@ -27,6 +27,10 @@ function Get-GrammarSkipList {
 		$lines = Get-Content -Path _scripts\skip-dart.txt
 		return $lines
         }
+        "PHP" {
+		$lines = Get-Content -Path _scripts\skip-php.txt
+		return $lines
+        }
         Default {
             #    Write-Error "Unknown target $Target"
             #    exit 1
@@ -61,8 +65,8 @@ function Test-Grammar {
     $start = Get-Date
     Write-Host "Building"
     # codegen
-    Write-Host "trgen -t $Target --template-sources-directory $templates"
-    trgen -t $Target --template-sources-directory $templates | Write-Host
+    Write-Host "trgen --antlr-tool-path $env:ANTLR_JAR_PATH -t $Target --template-sources-directory $templates"
+    trgen --antlr-tool-path $env:ANTLR_JAR_PATH -t $Target --template-sources-directory $templates | Write-Host
     if ($LASTEXITCODE -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red
@@ -227,6 +231,9 @@ function Get-GitChangedDirectories {
         exit 1
     }
     $diff = git diff $PreviousCommit $CurrentCommit --name-only
+    if ($diff -is "string") {
+        $diff = @($diff)
+    }
     $treatAsRootDir = @(".github/", "_scripts/")
     foreach ($item in $diff) {
         foreach ($j in $treatAsRootDir) {

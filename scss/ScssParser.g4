@@ -47,6 +47,8 @@ statement
   | forDeclaration
   | whileDeclaration
   | eachDeclaration
+  | fontFaceDeclaration
+  | keyframesDeclaration
   ;
 
 
@@ -60,7 +62,7 @@ declaredParam
   ;
 
 variableName
-  : (DOLLAR | MINUS_DOLLAR | PLUS_DOLLAR) Identifier
+  : namespace? (DOLLAR | MINUS_DOLLAR | PLUS_DOLLAR) Identifier
   ;
 
 paramOptionalValue
@@ -103,13 +105,20 @@ functionBody
   ;
 
 functionReturn
-  : '@return' commandStatement ';'
+  : RETURN commandStatement SEMI
   ;
 
 functionStatement
-  : commandStatement ';' | statement
+  : commandStatement SEMI | statement
   ;
 
+fontFaceDeclaration
+ : FONT_FACE block
+ ;
+
+keyframesDeclaration
+  : KEYFRAMES identifier? block
+  ;
 
 commandStatement
   : (expression
@@ -132,6 +141,7 @@ expression
   | Color
   | StringLiteral
   | NULL_
+  | Var
   | url
   | variableName
   | functionCall
@@ -157,19 +167,19 @@ conditions
   ;
 
 condition
-  : commandStatement (( '==' | LT | GT | '!=') conditions)?
-  | LPAREN conditions ')'
+  : commandStatement (( EQEQ | LT | GT | NOTEQ) conditions)?
+  | LPAREN conditions RPAREN
   ;
 
 
 variableDeclaration
-  : variableName COLON (propertyValue | listBracketed | map_) '!default'? ';'
+  : variableName COLON (propertyValue | listBracketed | map_) POUND_DEFAULT? SEMI
   ;
 
 
 //for
 forDeclaration
-  : AT_FOR variableName 'from' fromNumber ('to'|'through') throughNumber block
+  : AT_FOR variableName FROM fromNumber (TO|THROUGH) throughNumber block
   ;
 
 fromNumber
@@ -199,7 +209,10 @@ eachValueList
 
 //Imports
 importDeclaration
-  : '@import' referenceUrl ';'
+  : IMPORT referenceUrl SEMI
+  | REQUIRE  referenceUrl SEMI?
+  | USE referenceUrl asClause? withClause? SEMI?
+  | FORWARD referenceUrl asClause? (showClause | hideClause)?
   ;
 
 referenceUrl
@@ -207,9 +220,33 @@ referenceUrl
     | UrlStart Url UrlEnd
     ;
 
+asClause
+  : AS (TIMES | identifier)
+  ;
+
+withClause
+  : WITH LPAREN keywordArgument (COMMA keywordArgument)* COMMA? RPAREN
+  ;
+
+keywordArgument
+  : identifierVariableName COLON expression
+  ;
+
+hideClause
+  : HIDE memberName (COMMA memberName)*
+  ;
+
+showClause
+  : SHOW memberName (COMMA memberName)
+  ;
+
+memberName
+  : DOLLAR? identifier
+  ;
+
 // MEDIA
 mediaDeclaration
-  : '@media' mediaQueryList block
+  : MEDIA mediaQueryList block
   ;
 
 mediaQueryList
@@ -217,8 +254,8 @@ mediaQueryList
   ;
 
 mediaQuery
-  : ('only' | 'not')? mediaType ('and' mediaExpression)*
-  | mediaExpression ('and' mediaExpression)*
+  : (ONLY | NOT)? mediaType (AND_WORD mediaExpression)*
+  | mediaExpression (AND_WORD mediaExpression)*
   ;
 
 // Typically only 'all', 'print', 'screen', and 'speech', but there are some
@@ -228,7 +265,7 @@ mediaType
   ;
 
 mediaExpression
-  : '(' mediaFeature (':' commandStatement)? ')'
+  : LPAREN mediaFeature (COLON commandStatement)? RPAREN
   ;
 
 // Typically 'max-width', 'hover', 'orientation', etc. Many possible values.
@@ -256,10 +293,11 @@ selector
 
 element
   : identifier
-  | '#' identifier
-  | '.' identifier
-  | '&'
-  | '*'
+  | Color identifier
+  | HASH identifier
+  | DOT identifier
+  | AND
+  | TIMES
   | combinator
   | attrib
   | pseudo
@@ -333,10 +371,10 @@ measurement
 
 
 functionCall
-  : functionNamespace? FunctionIdentifier passedParams? RPAREN
+  : namespace? FunctionIdentifier passedParams? RPAREN
   ;
 
-functionNamespace
+namespace
   : (Identifier DOT)+
   ;
 
