@@ -27,6 +27,8 @@ lexer grammar TSqlLexer;
 
 // Basic keywords (from https://msdn.microsoft.com/en-us/library/ms189822.aspx)
 
+options { caseInsensitive = true; }
+
 ADD:                                   'ADD';
 ALL:                                   'ALL';
 ALTER:                                 'ALTER';
@@ -184,6 +186,7 @@ SEMANTICSIMILARITYDETAILSTABLE:        'SEMANTICSIMILARITYDETAILSTABLE';
 SEMANTICSIMILARITYTABLE:               'SEMANTICSIMILARITYTABLE';
 SESSION_USER:                          'SESSION_USER';
 SET:                                   'SET';
+SETS:                                  'SETS';
 SETUSER:                               'SETUSER';
 SHUTDOWN:                              'SHUTDOWN';
 SOME:                                  'SOME';
@@ -894,7 +897,7 @@ SQUARE_BRACKET_ID:  '[' (~']' | ']' ']')* ']';
 LOCAL_ID:           '@' ([A-Z_$@#0-9] | FullWidthLetter)*;
 DECIMAL:             DEC_DIGIT+;
 ID:                  ( [A-Z_#] | FullWidthLetter) ( [A-Z_#$@0-9] | FullWidthLetter )*;
-STRING:              'N'? '\'' (~'\'' | '\'\'')* '\'';
+STRING options { caseInsensitive=false; } : 'N'? '\'' (~'\'' | '\'\'')* '\'';
 BINARY:              '0' 'X' HEX_DIGIT*;
 FLOAT:               DEC_DOT_DEC;
 REAL:                (DECIMAL | DEC_DOT_DEC) ('E' [+-]? DEC_DIGIT+);
@@ -942,7 +945,7 @@ fragment HEX_DIGIT:    [0-9A-F];
 fragment DEC_DIGIT:    [0-9];
 
 
-fragment FullWidthLetter
+fragment FullWidthLetter options { caseInsensitive=false; }
     : '\u00c0'..'\u00d6'
     | '\u00d8'..'\u00f6'
     | '\u00f8'..'\u00ff'

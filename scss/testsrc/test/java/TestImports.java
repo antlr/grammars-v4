@@ -106,6 +106,12 @@ public class TestImports extends TestBase {
         .isEqualTo("$secondary-color:color.scale($base-color,$lightness:-10%)");
   }
 
+  @Test
+  public void testRequire() {
+    ScssParser.ImportDeclarationContext context = parseImport("@require \"sass:color\";");
+    assertThat(context.referenceUrl().StringLiteral().getText()).isEqualTo("\"sass:color\"");
+  }
+
   private ScssParser.ImportDeclarationContext parseImport(String... lines) {
     ScssParser.StylesheetContext context = parse(lines);
     return context.statement(0).importDeclaration();

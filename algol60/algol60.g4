@@ -1,5 +1,7 @@
 grammar algol60;
 
+options { caseInsensitive = true; }
+
 // Derived from the authoratitive source ISO 1538
 // You can download a free copy at:
 // http://www.softwarepreservation.org/projects/ALGOL/report/ISO1538.pdf
@@ -15,32 +17,32 @@ fragment Basic_symbol : Letter | Digit | Logical_value_f | Delimiter ;
 
 // The alphabet can be extended in any way.
 // If memory serves me, I recall no case sensitivity.
-Array_ : [aA] [rR] [rR] [aA] [yY] ;
-Begin_ : [bB] [eE] [gG] [iI] [nN] ;
-Boolean_ : [bB] [oO] [oO] [lL] [eE] [aA] [nN] ;
-Comment_ : [cC] [oO] [mM] [mM] [eE] [nN] [tT] ;
-Do_ : [dD] [oO] ;
-Else_ : [eE] [lL] [sS] [eE] ;
-End_ : [eE] [nN] [dD] ;
-False_ : [fF] [aA] [lL] [sS] [eE] ;
-For_ : [fF] [oO] [rR] ;
-Goto_ : [gG] [oO] Ws* [tT] [oO] ;
-If_ : [iI] [fF] ;
-Integer_ : [iI] [nN] [tT] [eE] [gG] [eE] [rR] ;
-Label_ : [lL] [aA] [bB] [eE] [lL] ;
-Own_ : [oO] [wW] [nN] ;
-Procedure_ : [pP] [rR] [oO] [cC] [eE] [dD] [uU] [rR] [eE] ;
-Real_ : [rR] [eE] [aA] [lL] ;
-Step_ : [sS] [tT] [eE] [pP] ;
-String_ : [sS] [tT] [rR] [iI] [nN] [gG] ;
-Switch_ : [sS] [wW] [iI] [tT] [cC] [hH] ;
-Then_ : [tT] [hH] [eE] [nN] ;
-True_ : [tT] [rR] [uU] [eE] ;
-Until_ : [uU] [nN] [tT] [iI] [lL] ;
-Value_ : [vV] [aA] [lL] [uU] [eE] ;
-While_ : [wW] [hH] [iI] [lL] [eE] ;
+Array_ : 'array';
+Begin_ : 'begin';
+Boolean_ : 'boolean';
+Comment_ : 'comment';
+Do_ : 'do';
+Else_ : 'else';
+End_ : 'end';
+False_ : 'false';
+For_ : 'for';
+Goto_ : 'go' Ws* 'to';
+If_ : 'if';
+Integer_ : 'integer';
+Label_ : 'label';
+Own_ : 'own';
+Procedure_ : 'procedure';
+Real_ : 'real';
+Step_ : 'step';
+String_ : 'string';
+Switch_ : 'switch';
+Then_ : 'then';
+True_ : 'true';
+Until_ : 'until';
+Value_ : 'value';
+While_ : 'while';
 
-And_ : '⋀' | '&' ; //  '⊃' | ∧ | '⋀' 
+And_ : '⋀' | '&' ; //  '⊃' | ∧ | '⋀'
 Assign_ : ':=' ;
 Colon_ : ':' ;
 Comma_ : ',' ;
@@ -69,16 +71,15 @@ Semi_ : ';' ;
 Underscore_ : '_' ;
 
 // 2.1
-fragment Letter : 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' | 
-   'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' 
+fragment Letter : [a-z]
    | '_' // an extension.
    ;
 
 // 2.2.1
 fragment Digit : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
-fragment ULCorner_f : '\u231C' ;
+fragment ULCorner_f options { caseInsensitive=false; } : '\u231C' ;
 ULCorner : ULCorner_f ;
-fragment URCorner_f : '\u231D' ;
+fragment URCorner_f options { caseInsensitive=false; } : '\u231D' ;
 URCorner : URCorner_f ;
 
 // 2.2.2
@@ -116,7 +117,7 @@ Unsigned_number : Decimal_number | Exponential_part | Decimal_number Exponential
 number : Unsigned_number | Plus_ Unsigned_number | Minus_ Unsigned_number ;
 
 // 2.6.1
-fragment Proper_string : (~('\u231C' | '\u231D'))* ;
+fragment Proper_string options { caseInsensitive=false; } : (~('\u231C' | '\u231D'))* ;
 fragment Open_string : Proper_string | Proper_string Closed_string Open_string ;
 fragment Closed_string : ULCorner Open_string URCorner ;
 fragment StdString : Closed_string | Closed_string StdString ;

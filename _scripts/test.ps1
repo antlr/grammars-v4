@@ -65,8 +65,8 @@ function Test-Grammar {
     $start = Get-Date
     Write-Host "Building"
     # codegen
-    Write-Host "trgen -t $Target --template-sources-directory $templates"
-    trgen -t $Target --template-sources-directory $templates | Write-Host
+    Write-Host "trgen --antlr-tool-path $env:ANTLR_JAR_PATH -t $Target --template-sources-directory $templates"
+    trgen --antlr-tool-path $env:ANTLR_JAR_PATH -t $Target --template-sources-directory $templates | Write-Host
     if ($LASTEXITCODE -ne 0) {
         $failStage = [FailStage]::CodeGeneration
         Write-Host "trgen failed" -ForegroundColor Red

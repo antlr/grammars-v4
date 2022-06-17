@@ -1,7 +1,6 @@
 _grammar-test
 antlr/antlr2
 antlr/antlr3
-antlr/antlr4
 apex
 asm/asmMASM
 asm/masm
@@ -66,7 +65,6 @@ pl0
 ply
 powerbuilder
 protobuf3
-python/python
 python/python2
 python/python3
 python/python3-py
