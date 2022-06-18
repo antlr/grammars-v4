@@ -11,6 +11,7 @@ export default class LexerAdaptor extends antlr4.Lexer
 		 *  Generic type for OPTIONS, TOKENS and CHANNELS
 		 */
 		this.PREQUEL_CONSTRUCT = -10;
+		this.OPTIONS_CONSTRUCT = -11;
 
 		/**
 		 * Track whether we are inside of a rule and whether it is lexical parser. _currentRuleType==Token.INVALID_TYPE
@@ -69,25 +70,20 @@ export default class LexerAdaptor extends antlr4.Lexer
 		}
 	}
 
-	handleOptionsLBrace() {
-		if (this.insideOptionsBlock == true) {
-			this._type = ANTLRv4Lexer.BEGIN_ACTION;
-			this.pushMode(ANTLRv4Lexer.TargetLanguageAction);
-		} else {
-			this._type = ANTLRv4Lexer.LBRACE;
-			this.insideOptionsBlock = true;
-		}
-	}
-
 	emit()
 	{
 		if ((this._type == ANTLRv4Lexer.OPTIONS || this._type == ANTLRv4Lexer.TOKENS || this._type == ANTLRv4Lexer.CHANNELS)
 		    && this.getCurrentRuleType() == antlr4.Token.INVALID_TYPE) { // enter prequel construct ending with an RBRACE
 			this.setCurrentRuleType(this.PREQUEL_CONSTRUCT);
+		} else if (this._type == ANTLRv4Lexer.OPTIONS && this.getCurrentRuleType() == ANTLRv4Lexer.TOKEN_REF) {
+			this.setCurrentRuleType(this.OPTIONS_CONSTRUCT);
 		} else if (this._type == ANTLRv4Lexer.RBRACE && this.getCurrentRuleType() == this.PREQUEL_CONSTRUCT) { // exit prequel construct
 			this.setCurrentRuleType(antlr4.Token.INVALID_TYPE);
+		} else if (this._type == ANTLRv4Lexer.RBRACE && this.getCurrentRuleType() == this.OPTIONS_CONSTRUCT) { // exit options
+			this.setCurrentRuleType(ANTLRv4Lexer.TOKEN_REF);
 		} else if (this._type == ANTLRv4Lexer.AT && this.getCurrentRuleType() == antlr4.Token.INVALID_TYPE) { // enter action
 			this.setCurrentRuleType(ANTLRv4Lexer.AT);
+		} else if (this._type == ANTLRv4Lexer.SEMI && this.getCurrentRuleType() == this.OPTIONS_CONSTRUCT) { // ';' in options { .... }. Don't change anything.
 		} else if (this._type == ANTLRv4Lexer.END_ACTION && this.getCurrentRuleType() == ANTLRv4Lexer.AT) { // exit action
 			this.setCurrentRuleType(antlr4.Token.INVALID_TYPE);
 		} else if (this._type == ANTLRv4Lexer.ID) {

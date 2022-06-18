@@ -76,6 +76,7 @@ alter_table_stmt:
             | COLUMN_? old_column_name = column_name TO_ new_column_name = column_name
         )
         | ADD_ COLUMN_? column_def
+        | DROP_ COLUMN_? column_name
     )
 ;
 
@@ -223,7 +224,7 @@ cte_table_name:
 ;
 
 recursive_cte:
-    cte_table_name AS_ OPEN_PAR initial_select UNION_ ALL_? recursive__select CLOSE_PAR
+    cte_table_name AS_ OPEN_PAR initial_select UNION_ ALL_? recursive_select CLOSE_PAR
 ;
 
 common_table_expression:
@@ -579,18 +580,18 @@ window_function:
     | (CUME_DIST_ | PERCENT_RANK_) OPEN_PAR CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr? CLOSE_PAR
     | (DENSE_RANK_ | RANK_ | ROW_NUMBER_) OPEN_PAR CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc
         CLOSE_PAR
-    | (LAG_ | LEAD_) OPEN_PAR expr of_OF_fset? default_DEFAULT__value? CLOSE_PAR OVER_ OPEN_PAR partition_by?
+    | (LAG_ | LEAD_) OPEN_PAR expr offset? default_value? CLOSE_PAR OVER_ OPEN_PAR partition_by?
         order_by_expr_asc_desc CLOSE_PAR
     | NTH_VALUE_ OPEN_PAR expr COMMA signed_number CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc
         frame_clause? CLOSE_PAR
     | NTILE_ OPEN_PAR expr CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc CLOSE_PAR
 ;
 
-of_OF_fset:
+offset:
     COMMA signed_number
 ;
 
-default_DEFAULT__value:
+default_value:
     COMMA signed_number
 ;
 
@@ -603,7 +604,7 @@ order_by_expr:
 ;
 
 order_by_expr_asc_desc:
-    ORDER_ BY_ order_by_expr_asc_desc
+    ORDER_ BY_ expr_asc_desc
 ;
 
 expr_asc_desc:
@@ -615,7 +616,7 @@ initial_select:
     select_stmt
 ;
 
-recursive__select:
+recursive_select:
     select_stmt
 ;
 

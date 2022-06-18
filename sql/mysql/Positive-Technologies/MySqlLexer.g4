@@ -25,6 +25,8 @@ THE SOFTWARE.
 
 lexer grammar MySqlLexer;
 
+options { caseInsensitive = true; }
+
 channels { MYSQLCOMMENT, ERRORCHANNEL }
 
 // SKIP
@@ -112,6 +114,7 @@ HIGH_PRIORITY:                       'HIGH_PRIORITY';
 HISTOGRAM:                           'HISTOGRAM';
 IF:                                  'IF';
 IGNORE:                              'IGNORE';
+IGNORED:                             'IGNORED';
 IN:                                  'IN';
 INDEX:                               'INDEX';
 INFILE:                              'INFILE';
@@ -150,6 +153,7 @@ NUMBER:                              'NUMBER';
 ON:                                  'ON';
 OPTIMIZE:                            'OPTIMIZE';
 OPTION:                              'OPTION';
+OPTIONAL:                            'OPTIONAL';
 OPTIONALLY:                          'OPTIONALLY';
 OR:                                  'OR';
 ORDER:                               'ORDER';
@@ -404,6 +408,7 @@ CIPHER:                              'CIPHER';
 CLASS_ORIGIN:                        'CLASS_ORIGIN';
 CLIENT:                              'CLIENT';
 CLOSE:                               'CLOSE';
+CLUSTERING:                          'CLUSTERING';
 COALESCE:                            'COALESCE';
 CODE:                                'CODE';
 COLUMNS:                             'COLUMNS';
@@ -493,6 +498,7 @@ INPLACE:                             'INPLACE';
 INSERT_METHOD:                       'INSERT_METHOD';
 INSTALL:                             'INSTALL';
 INSTANCE:                            'INSTANCE';
+INSTANT:                             'INSTANT';
 INVISIBLE:                           'INVISIBLE';
 INVOKER:                             'INVOKER';
 IO:                                  'IO';
@@ -556,6 +562,8 @@ NCHAR:                               'NCHAR';
 NEVER:                               'NEVER';
 NEXT:                                'NEXT';
 NO:                                  'NO';
+NOCOPY:                              'NOCOPY';
+NOWAIT:                              'NOWAIT';
 NODEGROUP:                           'NODEGROUP';
 NONE:                                'NONE';
 ODBC:                                'ODBC';
@@ -596,6 +604,7 @@ QUERY:                               'QUERY';
 QUICK:                               'QUICK';
 REBUILD:                             'REBUILD';
 RECOVER:                             'RECOVER';
+RECURSIVE:                           'RECURSIVE';
 REDO_BUFFER_SIZE:                    'REDO_BUFFER_SIZE';
 REDUNDANT:                           'REDUNDANT';
 RELAY:                               'RELAY';
@@ -625,6 +634,7 @@ ROTATE:                              'ROTATE';
 ROW:                                 'ROW';
 ROWS:                                'ROWS';
 ROW_FORMAT:                          'ROW_FORMAT';
+RTREE:                               'RTREE';
 SAVEPOINT:                           'SAVEPOINT';
 SCHEDULE:                            'SCHEDULE';
 SECURITY:                            'SECURITY';
@@ -703,7 +713,7 @@ WRAPPER:                             'WRAPPER';
 X509:                                'X509';
 XA:                                  'XA';
 XML:                                 'XML';
-
+YES:                                 'YES';
 
 // Date format Keywords
 
@@ -751,6 +761,7 @@ FLUSH_OPTIMIZER_COSTS:               'FLUSH_OPTIMIZER_COSTS';
 FLUSH_STATUS:                        'FLUSH_STATUS';
 FLUSH_TABLES:                        'FLUSH_TABLES';
 FLUSH_USER_RESOURCES:                'FLUSH_USER_RESOURCES';
+ADMIN:                               'ADMIN';
 GROUP_REPLICATION_ADMIN:             'GROUP_REPLICATION_ADMIN';
 INNODB_REDO_LOG_ARCHIVE:             'INNODB_REDO_LOG_ARCHIVE';
 INNODB_REDO_LOG_ENABLE:              'INNODB_REDO_LOG_ENABLE';
@@ -918,6 +929,7 @@ ELT:                                 'ELT';
 ENCODE:                              'ENCODE';
 ENCRYPT:                             'ENCRYPT';
 ENDPOINT:                            'ENDPOINT';
+ENGINE_ATTRIBUTE:                    'ENGINE_ATTRIBUTE';
 ENVELOPE:                            'ENVELOPE';
 EQUALS:                              'EQUALS';
 EXP:                                 'EXP';
@@ -1041,6 +1053,7 @@ ROW_COUNT:                           'ROW_COUNT';
 RPAD:                                'RPAD';
 RTRIM:                               'RTRIM';
 SEC_TO_TIME:                         'SEC_TO_TIME';
+SECONDARY_ENGINE_ATTRIBUTE:          'SECONDARY_ENGINE_ATTRIBUTE';
 SESSION_USER:                        'SESSION_USER';
 SHA:                                 'SHA';
 SHA1:                                'SHA1';

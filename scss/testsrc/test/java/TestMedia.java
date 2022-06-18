@@ -219,7 +219,7 @@ public class TestMedia extends TestBase {
     assertThat(
             innerMedia
                 .block()
-                .property(0)
+                .property_(0)
                 .propertyValue()
                 .commandStatement(0)
                 .expression()

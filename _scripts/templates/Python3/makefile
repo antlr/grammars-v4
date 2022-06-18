@@ -14,8 +14,9 @@ clean:
 	rm -f *.interp
 	rm -f *.tokens
 	rm -f $(GENERATED)
+	rm -rf __pycache__
 run:
-	trwdog python Program.py $(RUNARGS)
+	trwdog python3 Program.py $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
 	java -jar $(JAR) -encoding <antlr_encoding> -Dlanguage=Python3 <antlr_tool_args:{y | <y> } > $\<
 } >

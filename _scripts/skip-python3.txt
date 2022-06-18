@@ -1,7 +1,6 @@
 _grammar-test
 antlr/antlr2
 antlr/antlr3
-antlr/antlr4
 apex
 asm/asmMASM
 asm/masm
@@ -11,6 +10,7 @@ cpp
 cql3
 csharp
 css3
+dart2
 dice
 dot
 edif300
@@ -68,7 +68,6 @@ powerbuilder
 protobuf3
 python/python2
 python/python3
-python/python3-js
 python/python3-py
 python/python3-ts
 python/python3-without-actions
@@ -88,13 +87,13 @@ sexpression
 sgf
 smalltalk
 sparql
-sql/hive
+sql/hive/v2
+sql/hive/v3
 sql/sqlite
 sql/postgresql
 sql/tsql
 stellaris
 stringtemplate
-swift-fin
 swift/swift2
 swift/swift3
 swift/swift5
@@ -110,8 +109,8 @@ v
 vb6
 vba
 velocity
-wat
 wavefront
 webidl
+xpath/xpath20
 xpath/xpath31
 z
