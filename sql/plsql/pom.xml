@@ -42,7 +42,6 @@
 					<showTree>false</showTree>
 					<entryPoint>sql_script</entryPoint>
 					<grammarName>PlSql</grammarName>
-					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
@@ -62,7 +61,6 @@
 							<showTree>false</showTree>
 							<entryPoint>sql_script</entryPoint>
 							<grammarName>PlSql</grammarName>
-							<caseInsensitiveType>UPPER</caseInsensitiveType>
 							<packageName></packageName>
 							<exampleFiles>examples-sql-script/</exampleFiles>
 						</configuration>
