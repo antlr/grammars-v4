@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>Python3.g4</include>
+					   <include>PythonLexer.g4</include>
+                       <include>PythonParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>

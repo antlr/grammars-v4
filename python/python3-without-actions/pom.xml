@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>python3-without-actions</artifactId>
 	<packaging>jar</packaging>
-	<name>Python 3 grammar without embedded actions</name>
+	<name> Python 3.8.13 grammar</name>
 	<parent>
 		<groupId>org.antlr.grammars</groupId>
 		<artifactId>pythonparent</artifactId>
@@ -18,7 +18,8 @@
 				<configuration>
 					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
-					   <include>Python3.g4</include>
+					   <include>PythonLexer.g4</include>
+                       <include>PythonParser.g4</include>
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
