@@ -44,15 +44,7 @@ element
    ;
 
 loop
-   : LOOP desc+ loopvalue+
-   ;
-
-desc
-   : KEY KEY
-   ;
-
-loopvalue
-   : value value
+   : LOOP KEY+ (value+ STOP?)+
    ;
 
 keyval
@@ -64,6 +56,7 @@ value
    | NUM
    | STRING
    | LITERAL
+   | loop
    ;
 
 key
@@ -83,7 +76,7 @@ DATE
    ;
 
 NUM
-   : DIGIT+ ('.' DIGIT+)?
+   : ('+' | '-')? DIGIT+ ('.' DIGIT+)?
    ;
 
 STRING
@@ -91,11 +84,15 @@ STRING
    ;
 
 LITERAL
-   : [a-zA-Z] [a-zA-Z0-9]+
+   : [0-9a-zA-Z*] [a-zA-Z0-9()'.]*
    ;
 
 LOOP
    : 'loop_'
+   ;
+
+STOP
+   : 'stop_'
    ;
 
 GLOBAL
