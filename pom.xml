@@ -318,6 +318,7 @@
 				<module>xml</module>
 				<module>xpath</module>
 				<module>xsd-regex</module>
+                <module>xyz</module>
 				<module>z</module>
 				<!-- testing repository -->
 				<!--<module>grammar-test</module> -->
