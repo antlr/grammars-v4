@@ -40,27 +40,34 @@ datablock
    ;
 
 element
-   : (keyval | save | global | loop)+
+   : (keyval | saveframe | global | loop)+
+   ;
+
+saveframe
+   : save (dataname | dataitem | loop)+
    ;
 
 loop
-   : LOOP KEY+ (value+ STOP?)+
+   : LOOP dataname+ (dataitem+ STOP?)+
    ;
 
 keyval
-   : key value
+   : dataname dataitem
    ;
 
-value
-   : DATE
-   | NUM
-   | STRING
-   | LITERAL
+dataitem
+   : string
+   | literal
    | loop
    ;
 
-key
-   : KEY
+string
+   : STRING1
+   | STRING2
+   ;
+
+dataname
+   : DATANAME
    ;
 
 save
@@ -71,20 +78,20 @@ global
    : GLOBAL
    ;
 
-DATE
-   : DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT
+literal
+   : LITERAL
    ;
 
-NUM
-   : ('+' | '-')? DIGIT+ ('.' DIGIT+)?
-   ;
-
-STRING
+STRING1
    : '\'' .*? '\''
    ;
 
+STRING2
+   : '"' .*? '"'
+   ;
+
 LITERAL
-   : [0-9a-zA-Z*] [a-zA-Z0-9()'.]*
+   : [a-zA-Z0-9()'.+-/*]+
    ;
 
 LOOP
@@ -107,12 +114,8 @@ DATA
    : 'data_' [a-zA-Z0-9_]+
    ;
 
-KEY
+DATANAME
    : '_' [a-zA-Z0-9_]+
-   ;
-
-fragment DIGIT
-   : [0-9]
    ;
 
 COMMENT
