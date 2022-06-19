@@ -29,42 +29,253 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar sasl;
 
-program : equation* EOF;
+program
+   : expr?
+   | 'def' defs?
+   ;
 
-program : expr? | 'def' defs?;
+expr
+   : expr 'where' defs
+   | condexp
+   ;
 
-expr : expr 'where' defs | condexp;
-condexp : opexp '→' condexp';' condexp | listexp;
-listexp : opexp (','opexp)* | opexp',' | opexp;
-opexp : prefixopexp | opexpinfixopexp | comb;
-comb : combsimple | simple;
-simple : name | constant | '(' expr ')' | zfexpr;
-defs : clause ';' defs | clause;
-clause : namelist '=' expr | namerhs;
-rhs : formalrhs | formal '=' expr;
-namelist : struct (','struct)*|struct','| struct;
-struct : formal':'struct | '('formal')';
-formal : name | constant | (namelist);
-constant : numeral|charconst|boolconst | '('')' |STRING;
-numeral : realscale-factor | '—' realscale-factor;
-scale-factor : edigit+ | e−digit+;
-zfexpr : (expr';' qualifiers)? | (generator';' qualifiers)?;
-qualifiers : qualifier | qualifiers';' qualifier;
-qualifier : generator | filter;
-generator : name'←'expr | name'←'generator;
-filter : expr;
+condexp
+   : opexp '→' condexp ';' condexp
+   | listexp
+   ;
 
-REAL : DIGIT* | DIGIT*'.'DIGIT* ;
+listexp
+   : opexp (',' opexp)*
+   | opexp ','
+   | opexp
+   ;
 
-BOOLCONST : 'true' | 'false';
-CHARCONST : %any char | sp | n1 | np | tab;
-STRING : '‘' .*? '’';
+opexp
+   : prefix opexp
+   | opexp infix opexp
+   | comb
+   ;
 
-DIGIT: [0-9];
+comb
+   : comb simple
+   | simple
+   ;
+
+simple
+   : name
+   | constant
+   | '(' expr ')'
+   | zfexpr
+   ;
+
+defs
+   : clause ';' defs
+   | clause
+   ;
+
+clause
+   : namelist '=' expr
+   | name rhs
+   ;
+
+rhs
+   : formal rhs
+   | formal '=' expr
+   ;
+
+namelist
+   : struct (',' struct)*
+   | struct ','
+   | struct
+   ;
+
+struct
+   : formal ':' struct
+   | '(' formal ')'
+   ;
+
+formal
+   : name
+   | constant
+   | (namelist)
+   ;
+
+constant
+   : numeral
+   | CHARCONST
+   | BOOLCONST
+   | '(' ')'
+   | STRING
+   ;
+
+numeral
+   : REAL scalefactor
+   | '—' REAL scalefactor
+   ;
+
+scalefactor
+   : 'e' DIGIT+
+   | 'e' '-' DIGIT+
+   ;
+
+zfexpr
+   : (expr ';' qualifiers)?
+   | (generator ';' qualifiers)?
+   ;
+
+qualifiers
+   : qualifier
+   | qualifiers ';' qualifier
+   ;
+
+qualifier
+   : generator
+   | filter
+   ;
+
+generator
+   : name '←' expr
+   | name '←' generator
+   ;
+
+filter
+   : expr
+   ;
+
+prefix
+   : '~'
+   | '+'
+   | '-'
+   | '#'
+   ;
+
+infix
+   : ':'
+   | '++'
+   | '--'
+   | '..'
+   | '|'
+   | '&'
+   | '>>'
+   | '>'
+   | '>='
+   | '='
+   | '~='
+   | '<='
+   | '<'
+   | '<<'
+   | '+'
+   | '-'
+   | '*'
+   | '/'
+   | 'div'
+   | 'rem'
+   | '**'
+   ;
+
+postfix
+   : '...'
+   ;
+
+name
+   : 'abs'
+   | 'all'
+   | 'and'
+   | 'append'
+   | 'arctan'
+   | 'code'
+   | 'cons'
+   | 'converse'
+   | 'char'
+   | 'cjustify'
+   | 'concat'
+   | 'cost'
+   | 'count'
+   | 'decode'
+   | 'digit'
+   | 'digitval'
+   | 'drop'
+   | 'e'
+   | 'entier'
+   | 'eq'
+   | 'exp'
+   | 'filter'
+   | 'foldl'
+   | 'foldr'
+   | 'for'
+   | 'from'
+   | 'function'
+   | 'hd'
+   | 'I'
+   | 'interleave'
+   | 'intersection'
+   | 'iterate'
+   | 'K'
+   | 'lay'
+   | 'layn'
+   | 'length'
+   | 'letter'
+   | 'list'
+   | 'listdiff'
+   | 'ljust'
+   | 'log'
+   | 'logical'
+   | 'map'
+   | 'member'
+   | 'mkset'
+   | 'not'
+   | 'number'
+   | 'or'
+   | 'pi'
+   | 'plus'
+   | 'printwidth'
+   | 'product'
+   | 'reverse'
+   | 'rjustify'
+   | 'show'
+   | 'sin'
+   | 'some'
+   | 'spaces'
+   | 'sqrt'
+   | 'sum'
+   | 'take'
+   | 'times'
+   | 'tl'
+   | 'union'
+   | 'until'
+   | 'while'
+   | 'zip'
+   ;
+
+REAL
+   : DIGIT*
+   | DIGIT* '.' DIGIT*
+   ;
+
+BOOLCONST
+   : 'true'
+   | 'false'
+   ;
+
+CHARCONST
+   : '%' [a-zA-Z0-9]
+   | ' '
+   | '\r'
+   | '\n'
+   | '\t'
+   ;
+
+STRING
+   : '‘' .*? '’'
+   ;
+
+DIGIT
+   : [0-9]
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \r\n\t]+ -> skip
    ;
+
