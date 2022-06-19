@@ -97,6 +97,8 @@ TILD_EQ         : '~=';
 
 MIXIN           : '@mixin';
 FUNCTION        : '@function';
+FONT_FACE       : '@font-face';
+FORWARD         : '@forward';
 AT_ELSE         : '@else';
 IF              : 'if';
 AT_IF           : '@if';
@@ -106,9 +108,11 @@ AT_EACH         : '@each';
 INCLUDE         : '@include';
 IMPORT          : '@import';
 USE             : '@use';
+REQUIRE         : '@require';
 RETURN          : '@return';
 MEDIA           : '@media';
 CONTENT         : '@content';
+KEYFRAMES       : '@keyframes';
 
 FROM            : 'from';
 TO              : 'to';
@@ -151,6 +155,10 @@ StringLiteral
 Number
   : '-' (('0'..'9')* '.')? ('0'..'9')+
   | (('0'..'9')* '.')? ('0'..'9')+
+  ;
+
+Var
+  : FunctionIdentifier MINUS Identifier RPAREN
   ;
 
 Color

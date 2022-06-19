@@ -6,7 +6,6 @@ alpaca
 angelscript
 antlr/antlr2
 antlr/antlr3
-antlr/antlr4
 apex
 apt
 arithmetic
@@ -46,6 +45,7 @@ css3
 csv
 ctl
 cto
+dart2
 databank
 dcm
 dgol
@@ -149,7 +149,6 @@ pl0
 plucid
 ply
 pmmn
-pom.xml
 postalcode
 powerbuilder
 powerbuilderdw
@@ -160,10 +159,10 @@ propcalc
 properties
 protobuf3
 prov-n
+python/python
 python/python2
 python/python2-js
 python/python3
-python/python3-js
 python/python3-py
 python/python3-ts
 python/python3-without-actions
@@ -205,8 +204,8 @@ snobol
 snowball
 solidity
 sparql
-sql/hive
 sql/hive/v2
+sql/hive/v3
 sql/mysql
 sql/plsql
 sql/postgresql
@@ -220,7 +219,6 @@ suokif
 swift/swift2
 swift/swift3
 swift/swift5
-swift-fin
 tcpheader
 teal
 telephone
@@ -254,12 +252,12 @@ verilog/systemverilog
 verilog/verilog
 vhdl
 vmf
-wat
 wavefront
 webidl
 wkt
 wln
 xml
+xpath/xpath20
 xpath/xpath31
 xsd-regex
 z

@@ -2,6 +2,7 @@
 -- Alter Table
 alter table ship_class add column ship_spec varchar(150) first, add somecol int after start_build;
 alter table t3 add column (c2 decimal(10, 2) comment 'comment`' null, c3 enum('abc', 'cba', 'aaa')), add index t3_i1 using btree (c2) comment 'some index';
+alter table t3 add column if not exists (c2 decimal(10, 2), c3 int);
 alter table t3 alter index t3_i1 invisible;
 alter table t3 alter index t3_i1 visible;
 alter table t3 rename index t3_i1 to t3_i2;
@@ -11,6 +12,7 @@ alter table ship_class change column somecol col_for_del tinyint first;
 alter table t5 rename column old to new;
 alter table ship_class drop col_for_del;
 alter table t3 drop index t3_i1;
+alter table t3 drop index if exists t3_i2;
 alter table childtable drop index fk_idParent_parentTable;
 alter table t2 drop primary key;
 alter table t3 rename to table3column;
@@ -24,7 +26,7 @@ alter table with_check add constraint check (c1 in (1, 2, 3, 4));
 alter table with_check add constraint c2 check (c1 in (1, 2, 3, 4));
 alter table with_check add check (c1 in (1, 2, 3, 4));
 alter table with_partition add partition (partition p201901 values less than (737425) engine = InnoDB);
-alter table with_partition add partition (partition p1 values less than (837425) engine = InnoDB, partition p2 values less than (MAXVALUE) engine = InnoDB);
+alter table with_partition add partition if not exists (partition p1 values less than (837425) engine = InnoDB, partition p2 values less than (MAXVALUE) engine = InnoDB);
 alter table t1 stats_auto_recalc=default stats_sample_pages=50;
 alter table t1 stats_auto_recalc=default, stats_sample_pages=50;
 alter table t1 modify column c1 enum('abc','cba','aaa') character set 'utf8' collate 'utf8_unicode_ci' not null default 'abc';
@@ -32,6 +34,9 @@ alter table table1 add primary key (id);
 alter table table1 add primary key table_pk (id);
 alter table table1 add primary key `table_pk` (id);
 alter table table1 add primary key `table_pk` (`id`);
+alter table table1 drop foreign key fk_name;
+alter table table1 drop foreign key if exists fk_name;
+alter table table1 drop constraint if exists cons;
 #end
 #begin
 -- Alter database

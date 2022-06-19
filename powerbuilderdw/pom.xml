@@ -39,7 +39,6 @@
 					<showTree>false</showTree>
 					<entryPoint>start_rule</entryPoint>
 					<grammarName>PowerBuilderDW</grammarName>
-					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<packageName></packageName>
 				</configuration>
 				<executions>

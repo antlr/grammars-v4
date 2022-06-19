@@ -158,7 +158,8 @@ CREATE TABLE keywords (
     iso VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
     usa VARCHAR(100),
     jis VARCHAR(100),
-    internal INT
+    internal INT,
+    instant BIT
 );
 
 create table if not exists tbl_signed_unsigned(
@@ -233,6 +234,8 @@ create index index4 on antlr_tokens(token(30) asc) lock default;
 create index index5 on antlr_tokens(token(30) asc) algorithm default;
 create index index6 on antlr_tokens(token(30) asc) algorithm default lock default;
 create index index7 on antlr_tokens(token(30) asc) lock default algorithm default;
+-- Create mariadb index
+CREATE INDEX IF NOT EXISTS DX_DT_LAST_UPDATE ON patient(DT_LAST_UPDATE) WAIT 100 KEY_BLOCK_SIZE=1024M CLUSTERING =YES USING RTREE NOT IGNORED ALGORITHM = NOCOPY LOCK EXCLUSIVE;
 #end
 #begin
 -- Create logfile group
@@ -299,6 +302,11 @@ BEGIN
         INSERT IGNORE INTO user_platform_badge (platform_badge_id, user_id) VALUES (3, NEW.student_id);
     END IF;
 END
+#end
+#begin
+-- Create trigger 6
+-- delimiter //
+create or replace trigger trg_my1 before delete on test.t1 for each row begin insert into log_table values ("delete row from test.t1"); insert into t4 values (old.col1, old.col1 + 5, old.col1 + 7); end; -- //-- delimiter ;
 #end
 #begin
 -- Create view
@@ -400,6 +408,53 @@ BEGIN  insert into order_config(order_id, attribute, value, performer)
                             performer = 'AppConfig'; -- Enable second_attr for order
 END
 #end
+#begin
+CREATE DEFINER=`bettingservice`@`stage-us-nj-app%` PROCEDURE `AggregatePlayerFactDaily`()
+BEGIN
+    DECLARE CID_min BIGINT;
+    DECLARE CID_max BIGINT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    SHOW ERRORS;
+ROLLBACK;
+END;
+
+SELECT LastID+1 INTO CID_min FROM AggregateStatus
+WHERE TableName = 'Combination_Transaction_Player_Fact';
+SELECT Id INTO CID_max FROM Combination_Transaction ORDER BY Id DESC LIMIT 1;
+
+START TRANSACTION;
+UPDATE AggregateStatus SET LastId = CID_max, LastUpdated = CURRENT_TIMESTAMP
+WHERE TableName = 'Combination_Transaction_Player_Fact';
+
+INSERT INTO Combination_Transaction_Player_Fact
+SELECT
+    NULL `Id`,
+    CT.Player_UID,
+    CT.Tx_Type `Type`,
+    DATE(BT.Timestamp) `Date`,
+    SUM(CT.Real_Amount) `Real_Amount`,
+    SUM(CT.Bonus_Amount) `Bonus_Amount`,
+    BT.Currency_UID,
+    COUNT(CT.Id) Tx_Count,
+    SUM(IF(CT.Real_Amount>0,1,0)) `Real_Count`,
+    SUM(IF(CT.Bonus_Amount>0,1,0)) `Bonus_Count`
+FROM Combination_Transaction CT
+    LEFT JOIN Betting_Transaction BT ON CT.Betting_Tx_ID = BT.ID
+WHERE CT.Id BETWEEN CID_min
+  AND CID_max
+GROUP BY CT.Player_UID, CT.Tx_Type, DATE(BT.Timestamp)
+ON DUPLICATE KEY UPDATE
+                     Currency_UID = VALUES(Currency_UID),
+                     Tx_Count     = Tx_Count + VALUES(Tx_Count),
+                     Real_Amount  = Real_Amount + VALUES(Real_Amount),
+                     Bonus_Amount = Bonus_Amount + VALUES(Bonus_Amount),
+                     Real_Count   = Real_Count + VALUES(Real_Count),
+                     Bonus_Count  = Bonus_Count + VALUES(Bonus_Count);
+COMMIT;
+END
+#end
 -- Create procedure
 -- delimiter //
 CREATE PROCEDURE makesignal(p1 INT)
@@ -409,4 +464,56 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_text;
   END IF;
 END -- //-- delimiter ;
+#end
+#begin
+-- delimiter //
+CREATE PROCEDURE set_unique_check()
+BEGIN
+    SET unique_checks=on;
+END; -- //-- delimiter ;
+#end
+#begin
+CREATE VIEW view_with_cte1 AS
+WITH cte1 AS
+(
+    SELECT column_1 AS a, column_2 AS b
+    FROM table1
+)
+SELECT a, b FROM cte1;
+#end
+#begin
+CREATE VIEW view_with_cte2 AS
+WITH cte1 (col1, col2) AS
+(
+  SELECT 1, 2
+  UNION ALL
+  SELECT 3, 4
+),
+cte2 (col1, col2) AS
+(
+  SELECT 5, 6
+  UNION ALL
+  SELECT 7, 8
+)
+SELECT col1, col2 FROM cte;
+#end
+#begin
+CREATE VIEW view_with_cte3 AS
+WITH cte (col1, col2) AS
+(
+  SELECT 1, 2
+  UNION ALL
+  SELECT 3, 4
+)
+SELECT col1, col2 FROM cte;
+#end
+#begin
+CREATE VIEW view_with_cte4 AS
+WITH RECURSIVE cte (n) AS
+(
+  SELECT 1
+  UNION ALL
+  SELECT n + 1 FROM cte WHERE n < 5
+)
+SELECT * FROM cte;
 #end
