@@ -48,20 +48,19 @@ condexp
 
 listexp
    : opexp (',' opexp)*
-   | opexp ','
-   | opexp
+//   | opexp ','
+ //  | opexp
    ;
 
 opexp
    : prefix opexp
    | opexp infix opexp
-   | comb
+   | simple+
    ;
 
-comb
-   : comb simple
-   | simple
-   ;
+//comb
+  // :  simple+
+  // ;
 
 simple
    : name
@@ -87,8 +86,8 @@ rhs
 
 namelist
    : struct (',' struct)*
-   | struct ','
-   | struct
+ //  | struct ','
+ //  | struct
    ;
 
 struct
@@ -99,7 +98,7 @@ struct
 formal
    : name
    | constant
-   | (namelist)
+   | '(' namelist ')'
    ;
 
 constant
