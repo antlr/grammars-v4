@@ -1,0 +1,44 @@
+data_setA
+
+    _location   'New Mexico'
+
+    save_observation1
+
+        _date   2020-07-01
+
+        loop_
+
+            _sampleID   _height_millimeters
+            1           6.3
+            2           2.5
+
+global_
+
+    _max_height 6.3
+
+data_setB
+
+    _location   California
+
+    save_observation1
+
+        _date       2020-09-15
+
+        loop_
+
+        _sampleID   _height_millimeters
+        1           9.3
+
+    save_observation2
+
+        _date       2020-10-15
+
+        loop_
+
+        _sampleID   _height_millimeters
+        1           9.9
+
+global_
+
+_max_height 9.9
+
