@@ -118,6 +118,10 @@ fragment DIGIT
    : [0-9]
    ;
 
+COMMENT
+   : '#' ~ [\r\n]* -> skip
+   ;
+
 WS
    : [ \r\n\t]+ -> skip
    ;
