@@ -96,3 +96,11 @@ GRANT reader TO topreader WITH ADMIN OPTION;
 GRANT 'db_old_ro'@'%' TO 'oghalawinji'@'%'
 REVOKE reader FROM 'mysqluser'@'localhost'
 REVOKE reader FROM topreader
+-- Set Role
+SET ROLE DEFAULT;
+SET ROLE 'role1', 'role2';
+SET ROLE ALL;
+SET ROLE ALL EXCEPT 'role1', 'role2';
+-- Set Default Role
+SET DEFAULT ROLE 'admin', 'developer' TO 'joe'@'10.0.0.1';
+SET DEFAULT ROLE `admin`@'%' to `dt_user`@`%`;

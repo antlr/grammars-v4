@@ -53,14 +53,14 @@ ddlStatement
     : createDatabase | createEvent | createIndex
     | createLogfileGroup | createProcedure | createFunction
     | createServer | createTable | createTablespaceInnodb
-    | createTablespaceNdb | createTrigger | createView
+    | createTablespaceNdb | createTrigger | createView | createRole
     | alterDatabase | alterEvent | alterFunction
     | alterInstance | alterLogfileGroup | alterProcedure
     | alterServer | alterTable | alterTablespace | alterView
     | dropDatabase | dropEvent | dropIndex
     | dropLogfileGroup | dropProcedure | dropFunction
     | dropServer | dropTable | dropTablespace
-    | dropTrigger | dropView
+    | dropTrigger | dropView | dropRole | setRole
     | renameTable | truncateTable
     ;
 
@@ -177,6 +177,10 @@ createFunction
       RETURNS dataType
       routineOption*
     (routineBody | returnStatement)
+    ;
+
+createRole
+    : CREATE ROLE (IF NOT EXISTS)? roleName (',' roleName)*
     ;
 
 createServer
@@ -750,6 +754,15 @@ dropView
       fullId (',' fullId)* dropType=(RESTRICT | CASCADE)?
     ;
 
+dropRole
+    : DROP ROLE ifExists? roleName (',' roleName)*
+    ;
+
+setRole
+    : SET DEFAULT ROLE (NONE | ALL | roleName (',' roleName)*)
+      TO (userName | uid) (',' (userName | uid))*
+    | SET ROLE roleOption
+    ;
 
 //    Other DDL statements
 
@@ -1983,6 +1996,10 @@ tableName
     : fullId
     ;
 
+roleName
+    : userName | uid
+    ;
+
 fullColumnName
     : uid (dottedId dottedId? )?
     | . dottedId dottedId?
@@ -1993,7 +2010,7 @@ indexColumnName
     ;
 
 userName
-    : STRING_USER_NAME | ID | STRING_LITERAL | ADMIN;
+    : STRING_USER_NAME | STRING_USER_NAME_MARIADB | ID | STRING_LITERAL | ADMIN | keywordsCanBeId;
 
 mysqlVariable
     : LOCAL_ID

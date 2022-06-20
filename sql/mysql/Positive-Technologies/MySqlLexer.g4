@@ -1285,6 +1285,10 @@ IP_ADDRESS:                          (
                                        [0-9]+ '.' [0-9.]+
                                        | [0-9A-F:]+ ':' [0-9A-F:]+
                                      );
+STRING_USER_NAME_MARIADB:            (
+                                        SQUOTA_STRING | DQUOTA_STRING
+                                        | BQUOTA_STRING | ID_LITERAL
+                                     )  '@';
 LOCAL_ID:                            '@'
                                 (
                                   [A-Z0-9._$]+
