@@ -274,6 +274,7 @@
 				<module>spass</module>
 				<module>sql</module>
 				<module>stacktrace</module>
+                <module>star</module>
 				<module>stellaris</module>
 				<module>stringtemplate</module>
 				<module>suokif</module>
