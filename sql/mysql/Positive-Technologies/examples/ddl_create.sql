@@ -473,6 +473,13 @@ BEGIN
 END; -- //-- delimiter ;
 #end
 #begin
+-- Create Role
+create role 'RL_COMPLIANCE_NSA';
+create role if not exists 'RL_COMPLIANCE_NSA';
+CREATE ROLE 'admin', 'developer';
+CREATE ROLE 'webapp'@'localhost';
+#end
+#begin
 CREATE VIEW view_with_cte1 AS
 WITH cte1 AS
 (
