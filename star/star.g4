@@ -32,53 +32,53 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar star;
 
 star
-   : datablock* EOF
+   : datablock_* EOF
    ;
 
-datablock
-   : DATA element+
+datablock_
+   : DATA element_+
    ;
 
-element
-   : (keyval | saveframe | global | loop)+
+element_
+   : (keyval_ | saveframe_ | global_ | loop_)+
    ;
 
-saveframe
-   : save (dataname | dataitem_ | loop)+
+saveframe_
+   : save_ (dataname_ | dataitem_ | loop_)+
    ;
 
-loop
-   : LOOP dataname+ (dataitem_+ STOP?)+
+loop_
+   : LOOP dataname_+ (dataitem_+ STOP?)+
    ;
 
-keyval
-   : dataname dataitem_
+keyval_
+   : dataname_ dataitem_
    ;
 
 dataitem_
-   : string
-   | literal
-   | loop
+   : string_
+   | literal_
+   | loop_
    ;
 
-string
+string_
    : STRING1
    | STRING2
    ;
 
-dataname
+dataname_
    : DATANAME
    ;
 
-save
+save_
    : SAVE
    ;
 
-global
+global_
    : GLOBAL
    ;
 
-literal
+literal_
    : LITERAL
    ;
 
