@@ -44,18 +44,18 @@ element
    ;
 
 saveframe
-   : save (dataname | dataitem | loop)+
+   : save (dataname | dataitem_ | loop)+
    ;
 
 loop
-   : LOOP dataname+ (dataitem+ STOP?)+
+   : LOOP dataname+ (dataitem_+ STOP?)+
    ;
 
 keyval
-   : dataname dataitem
+   : dataname dataitem_
    ;
 
-dataitem
+dataitem_
    : string
    | literal
    | loop
