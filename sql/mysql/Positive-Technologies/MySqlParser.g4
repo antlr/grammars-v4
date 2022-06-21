@@ -1654,7 +1654,7 @@ privilege
     | DELETE | DROP (ROLE)? | EVENT | EXECUTE | FILE | GRANT OPTION
     | INDEX | INSERT | LOCK TABLES | PROCESS | PROXY
     | REFERENCES | RELOAD
-    | REPLICATION (CLIENT | SLAVE)
+    | REPLICATION (CLIENT | SLAVE | REPLICA)     // REPLICA is MariaDB-specific
     | SELECT
     | SHOW (VIEW | DATABASES)
     | SHUTDOWN | SUPER | TRIGGER | UPDATE | USAGE
@@ -1666,6 +1666,8 @@ privilege
     | SERVICE_CONNECTION_ADMIN
     | SESSION_VARIABLES_ADMIN | SET_USER_ID | SHOW_ROUTINE | SYSTEM_USER | SYSTEM_VARIABLES_ADMIN
     | TABLE_ENCRYPTION_ADMIN | VERSION_TOKEN_ADMIN | XA_RECOVER_ADMIN
+    // MariaDB
+    | BINLOG_MONITOR | BINLOG_REPLAY | FEDERATED_ADMIN | READ_ONLY_ADMIN | REPLICATION_MASTER_ADMIN
     ;
 
 privilegeLevel
@@ -2241,13 +2243,22 @@ userVariables
 //    Common Expressons
 
 defaultValue
-    : (NULL_LITERAL | unaryOperator? constant | currentTimestamp | '(' expression ')') (ON UPDATE currentTimestamp)?
+    : NULL_LITERAL
+    | CAST '(' expression AS convertedDataType ')'
+    | unaryOperator? constant
+    | currentTimestamp (ON UPDATE currentTimestamp)?
+    | '(' expression ')'
+    | (LASTVAL | NEXTVAL) '(' fullId ')' // MariaDB
+    | '(' (PREVIOUS | NEXT) VALUE FOR fullId ')' // MariaDB
+    | expression // MariaDB
     ;
 
 currentTimestamp
     :
     (
-      (CURRENT_TIMESTAMP | LOCALTIME | LOCALTIMESTAMP) ('(' decimalLiteral? ')')?
+      (CURRENT_TIMESTAMP | LOCALTIME | LOCALTIMESTAMP
+      | CURDATE | CURTIME) // MariaDB-specific
+      ('(' decimalLiteral? ')')?
       | NOW '(' decimalLiteral? ')'
     )
     ;
@@ -2643,6 +2654,9 @@ keywordsCanBeId
     | UNDO_BUFFER_SIZE | UNINSTALL | UNKNOWN | UNTIL | UPGRADE | USA | USER | USE_FRM | USER_RESOURCES
     | VALIDATION | VALUE | VAR_POP | VAR_SAMP | VARIABLES | VARIANCE | VERSION_TOKEN_ADMIN | VIEW | WAIT | WARNINGS | WITHOUT
     | WORK | WRAPPER | X509 | XA | XA_RECOVER_ADMIN | XML
+    // MariaDB
+    | VIA | LASTVAL | NEXTVAL | SETVAL | PREVIOUS | PERSISTENT | REPLICATION_MASTER_ADMIN | REPLICA | READ_ONLY_ADMIN | FEDERATED_ADMIN | BINLOG_MONITOR | BINLOG_REPLAY
+    | ENCRYPTED | ENCRYPTION_KEY_ID
     ;
 
 functionNameBase
@@ -2733,4 +2747,6 @@ functionNameBase
     | JSON_VALID | JSON_TABLE | JSON_SCHEMA_VALID | JSON_SCHEMA_VALIDATION_REPORT
     | JSON_PRETTY | JSON_STORAGE_FREE | JSON_STORAGE_SIZE | JSON_ARRAYAGG
     | JSON_OBJECTAGG
+    // MariaDB
+    | LASTVAL | NEXTVAL | SETVAL
     ;

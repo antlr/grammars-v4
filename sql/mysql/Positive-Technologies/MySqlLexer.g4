@@ -1162,6 +1162,19 @@ Y_FUNCTION:                          'Y';
 X_FUNCTION:                          'X';
 
 
+// MariaDB tokens
+VIA:                                 'VIA';
+LASTVAL:                             'LASTVAL';
+NEXTVAL:                             'NEXTVAL';
+SETVAL:                              'SETVAL';
+PREVIOUS:                            'PREVIOUS';
+PERSISTENT:                          'PERSISTENT'; // Same as STORED for MySQL
+BINLOG_MONITOR:                      'BINLOG_MONITOR';
+BINLOG_REPLAY:                       'BINLOG_REPLAY';
+FEDERATED_ADMIN:                     'FEDERATED_ADMIN';
+READ_ONLY_ADMIN:                     'READ_ONLY_ADMIN';
+REPLICA:                             'REPLICA';
+REPLICATION_MASTER_ADMIN:            'REPLICATION_MASTER_ADMIN';
 
 // Operators
 // Operators. Assigns
