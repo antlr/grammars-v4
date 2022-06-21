@@ -99,9 +99,17 @@ unicode/graphemes/examples/*.txt eol=lf
 *.pdf binary
 *.png binary
 
+# All input for parsers are to be ignored. Issue #2667
 **/examples/** linguist-vendored
 **/example-scripts/** linguist-vendored
 **/example-scriptlets/** linguist-vendored
 **/examples-sql-script/** linguist-vendored
 **/examples_todo/** linguist-vendored
 **/example/test_scripts/** linguist-vendored
+agc/notworking/** linguist-vendored
+asm/asmMASM/helloworld2.asm linguist-vendored
+basic/print.bas linguist-vendored
+erlang/src/** linguist-vendored
+solidity/test.sol linguist-vendored
+sql/postgresql/examples.errors/** linguist-vendored
+v/failed_examples/** linguist-vendored
