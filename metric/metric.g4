@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar metric;
 
+file_ : uom EOF ;
+
 uom
    : measure (('*' | '/') measure)*
    ;
