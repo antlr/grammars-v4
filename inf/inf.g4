@@ -74,7 +74,7 @@ COMMENT
 
 
 EOL
-   : [\r\n]
+   : [\r\n]+
    ;
 
 
