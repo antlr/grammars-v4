@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar limbo;
 
 program
-   : 'implement' IDENTIFIER ';' top_declaration_sequence
+   : 'implement' IDENTIFIER ';' top_declaration_sequence EOF
    ;
 
 top_declaration_sequence

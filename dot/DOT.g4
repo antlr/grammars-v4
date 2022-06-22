@@ -32,7 +32,7 @@
 grammar DOT;
 
 graph
-   : STRICT? ( GRAPH | DIGRAPH ) id_? '{' stmt_list '}'
+   : STRICT? ( GRAPH | DIGRAPH ) id_? '{' stmt_list '}' EOF
    ;
 
 stmt_list

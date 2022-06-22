@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar fen;
 
 fen
-   : placement ' ' color ' ' castling ' ' enpassant ' ' halfmoveclock ' ' fullmoveclock
+   : placement ' ' color ' ' castling ' ' enpassant ' ' halfmoveclock ' ' fullmoveclock EOF
    ;
 
 color

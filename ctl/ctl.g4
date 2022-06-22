@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar ctl;
 
+file_ : proposition EOF ;
+
 proposition
    : CTL_DOWNTACK
    | CTL_UPTACK

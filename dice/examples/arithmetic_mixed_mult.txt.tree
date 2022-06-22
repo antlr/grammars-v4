@@ -1,1 +1,1 @@
-(notation (addOp (multOp (operand (number 2))) - (multOp (operand (number 8)) * (operand (number 2)))))
+(file_ (notation (addOp (multOp (operand (number 2))) - (multOp (operand (number 8)) * (operand (number 2))))) <EOF>)
