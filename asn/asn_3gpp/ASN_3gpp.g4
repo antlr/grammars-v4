@@ -55,6 +55,7 @@ moduleDefinition :  IDENTIFIER (L_BRACE (IDENTIFIER L_PARAN NUMBER R_PARAN)* R_B
       BEGIN_LITERAL
      moduleBody
       END_LITERAL
+      EOF
         ;
 
 

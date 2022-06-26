@@ -3,7 +3,7 @@
 grammar DCM_2_0_grammar;
 
 konservierung
-   : ( '\n' )* 'KONSERVIERUNG_FORMAT 2.0' ( '\n' )+ kons_kopf kons_rumpf
+   : ( '\n' )* 'KONSERVIERUNG_FORMAT 2.0' ( '\n' )+ kons_kopf kons_rumpf EOF
    ;
 
 kons_kopf

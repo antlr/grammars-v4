@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar dgol;
 
 module
-   : (usedeclaration | NL)* (subroutinedefinition | NL)* (programdefinition | librarydefinition) NL*
+   : (usedeclaration | NL)* (subroutinedefinition | NL)* (programdefinition | librarydefinition) NL* EOF
    ;
 
 usedeclaration
