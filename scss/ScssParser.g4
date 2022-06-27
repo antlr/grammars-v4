@@ -323,7 +323,7 @@ attribRelate
   ;
 
 identifier
-  : Identifier identifierPart*
+  : MINUS? Identifier identifierPart*
   | InterpolationStart identifierVariableName BlockEnd identifierPart*
   // These are keywords in some contexts, but can be used as identifiers too.
   | AND_WORD
