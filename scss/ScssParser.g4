@@ -62,7 +62,7 @@ declaredParam
   ;
 
 variableName
-  : namespace? (DOLLAR | MINUS_DOLLAR | PLUS_DOLLAR) Identifier
+  : namespace? ((MINUS MINUS) | DOLLAR | MINUS_DOLLAR | PLUS_DOLLAR) Identifier
   ;
 
 paramOptionalValue
