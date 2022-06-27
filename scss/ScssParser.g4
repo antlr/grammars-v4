@@ -31,6 +31,446 @@ parser grammar ScssParser;
 options { tokenVocab=ScssLexer; }
 
 stylesheet
+    : ws
+    ( charset ( Comment | Space | Cdo | Cdc )* )*
+    ( import_ ( Comment | Space | Cdo | Cdc )* )*
+    ( namespace_ ( Comment | Space | Cdo | Cdc )* )*
+    ( nestedStatement ( Comment | Space | Cdo | Cdc )* )*
+    EOF
+    ;
+
+charset
+    : Charset ws String_ ws Semi ws
+    | Charset ws String_ ws
+    ;
+
+import_
+    : (Import | Use | Require) ws ( String_ | Uri ) ws mediaQueryList Semi ws
+    | (Import | Use | Require) ws ( String_ | Uri ) ws Semi ws
+    | (Import | Use | Require) ws ( String_ | Uri ) ws mediaQueryList
+    | (Import | Use | Require) ws ( String_ | Uri ) ws
+    ;
+
+// Namespaces
+// https://www.w3.org/TR/css-namespaces-3/
+namespace_
+    : Namespace ws (namespacePrefix ws)? ( String_ | Uri ) ws Semi ws
+    | Namespace ws (namespacePrefix ws)? ( String_ | Uri ) ws
+    ;
+
+namespacePrefix
+    : ident
+    ;
+
+// Media queries
+// https://www.w3.org/TR/css3-mediaqueries/
+media
+    : Media ws mediaQueryList groupRuleBody ws
+    ;
+
+mediaQueryList
+    : ( mediaQuery ( Comma ws mediaQuery )* )? ws
+    ;
+
+mediaQuery
+    : ( MediaOnly | Not )? ws mediaType ws ( And ws mediaExpression )*
+    | mediaExpression ( And ws mediaExpression )*
+    ;
+
+mediaType
+    : ident
+    ;
+
+// Grammar allows for 'and(', which gets tokenized as Function. In practice, people always insert space before '(' to
+// have it work on Chrome.
+mediaExpression
+    : Lparen ws mediaFeature ( Colon ws expr )? Rparen ws
+    ;
+
+mediaFeature
+    : ident ws
+    ;
+
+// Page
+page
+    : Page ws pseudoPage? BlockStart ws declaration? ( Semi ws declaration? )* BlockEnd ws
+    ;
+
+pseudoPage
+    : Colon ident ws
+    ;
+
+// Selectors
+// https://www.w3.org/TR/css3-selectors/
+selectorGroup
+    : selector ( Comma ws selector )*
+    ;
+
+selector
+    : simpleSelectorSequence ws ( combinator simpleSelectorSequence ws )*
+    ;
+
+combinator
+    : Plus ws
+    | Greater ws
+    | Tilde ws
+    | Space ws
+    ;
+
+simpleSelectorSequence
+    : ( typeSelector | universal ) ( Hash | className | attrib | pseudo | negation )*
+    | ( Hash | className | attrib | pseudo | negation )+
+    ;
+
+typeSelector
+    : typeNamespacePrefix? elementName
+    ;
+
+typeNamespacePrefix
+    : ( ident | Times )? Pipe
+    ;
+
+elementName
+    : ident
+    ;
+
+universal
+    : typeNamespacePrefix? Times
+    ;
+
+className
+    : Dot ident
+    ;
+
+attrib
+    : Lbrack ws typeNamespacePrefix? ident ws
+    ( ( PrefixMatch | SuffixMatch | SubstringMatch | Eq | Includes | DashMatch ) ws
+    ( ident | String_ ) ws )? Rbrack
+    ;
+
+pseudo
+    /* '::' starts a pseudo-element, ':' a pseudo-class */
+    /* Exceptions: :first-line, :first-letter, :before And :after. */
+    /* Note that pseudo-elements are restricted to one per selector And */
+    /* occur MediaOnly in the last simple_selector_sequence. */
+    : Colon Colon? ( ident | functionalPseudo )
+    ;
+
+functionalPseudo
+    : Function_ ws expression Rparen
+    ;
+
+expression
+    /* In CSS3, the expressions are identifiers, strings, */
+    /* or of the form "an+b" */
+    : ( ( Plus | Minus | Dimension | UnknownDimension | Number | String_ | ident ) ws )+
+    ;
+
+negation
+    : PseudoNot ws negationArg ws Rparen
+    ;
+
+negationArg
+    : typeSelector
+    | universal
+    | Hash
+    | className
+    | attrib
+    | pseudo
+    ;
+
+// Rules
+operator_
+    : Div ws
+    | Comma ws
+    | Space ws
+    | Eq ws  // IE filter and DXImageTransform function
+    ;
+
+property_
+    : ident ws
+    | Variable ws
+    | Times ident  // IE hacks
+    | Under ident  // IE hacks
+    ;
+
+ruleset
+    : selectorGroup BlockStart ws declarationList? BlockEnd ws
+    | any_* BlockStart ws declarationList? BlockEnd ws
+    ;
+
+declarationList
+    : ( Semi ws )* declaration ws ( Semi ws declaration? )*
+    ;
+
+declaration
+    : property_ Colon ws expr prio?
+    | property_ Colon ws value
+    ;
+
+prio
+    : Important ws
+    ;
+
+value
+    : ( any_ | block | atKeyword ws )+
+    ;
+
+expr
+    : term ( operator_? term )*
+    ;
+
+term
+    : number ws
+    | percentage ws
+    | dimension ws
+    | String_ ws
+    | UnicodeRange ws
+    | ident ws
+    | var_
+    | Uri ws
+    | hexcolor
+    | calc
+    | function_
+    | unknownDimension ws
+    | dxImageTransform
+    ;
+
+function_
+    : Function_ ws expr Rparen ws
+    ;
+
+dxImageTransform
+    : DxImageTransform ws expr Rparen ws    // IE DXImageTransform function
+    ;
+
+hexcolor
+    : Hash ws
+    ;
+
+number
+    : ( Plus | Minus )? Number
+    ;
+
+percentage
+    : ( Plus | Minus )? Percentage
+    ;
+
+dimension
+    : ( Plus | Minus )? Dimension
+    ;
+
+unknownDimension
+    : ( Plus | Minus )? UnknownDimension
+    ;
+
+// Error handling
+any_
+    : ident ws
+    | number ws
+    | percentage ws
+    | dimension ws
+    | unknownDimension ws
+    | String_ ws
+    | Delim ws
+    | Uri ws
+    | Hash ws
+    | UnicodeRange ws
+    | Includes ws
+    | DashMatch ws
+    | Colon ws
+    | Function_ ws ( any_ | unused )* Rparen ws
+    | Lparen ws ( any_ | unused )* Rparen ws
+    | Lbrack ws ( any_ | unused )* Rbrack ws
+    ;
+
+atRule
+    : atKeyword ws any_* ( block | Semi ws )
+    ;
+
+atKeyword
+    : At ident
+    ;
+
+unused
+    : block
+    | atKeyword ws
+    | Semi ws
+    | Cdo ws
+    | Cdc ws
+    ;
+
+block
+    : BlockStart ws (  declarationList | nestedStatement | any_ | block | atKeyword ws | Semi ws )* BlockEnd ws
+    ;
+
+// Conditional
+// https://www.w3.org/TR/css3-conditional/
+nestedStatement
+    : ruleset
+    | media
+    | page
+    | fontFaceRule
+    | keyframesRule
+    | supportsRule
+    | viewport
+    | counterStyle
+    | fontFeatureValuesRule
+    | atRule
+    ;
+
+groupRuleBody
+    : BlockStart ws nestedStatement* BlockEnd ws
+    ;
+
+supportsRule
+    : Supports ws supportsCondition ws groupRuleBody
+    ;
+
+supportsCondition
+    : supportsNegation
+    | supportsConjunction
+    | supportsDisjunction
+    | supportsConditionInParens
+    ;
+
+supportsConditionInParens
+    : Lparen ws supportsCondition ws Rparen
+    | supportsDeclarationCondition
+    | generalEnclosed
+    ;
+
+supportsNegation
+    : Not ws Space ws supportsConditionInParens
+    ;
+
+supportsConjunction
+    : supportsConditionInParens ( ws Space ws And ws Space ws supportsConditionInParens )+
+    ;
+
+supportsDisjunction
+    : supportsConditionInParens ( ws Space ws Or ws Space ws supportsConditionInParens )+
+    ;
+
+supportsDeclarationCondition
+    : Lparen ws declaration Rparen
+    ;
+
+generalEnclosed
+    : ( Function_ | Lparen ) ( any_ | unused )* Rparen
+    ;
+
+// Variable
+// https://www.w3.org/TR/css-variables-1
+var_
+    : Var ws Variable ws Rparen ws
+    ;
+
+// Calc
+// https://www.w3.org/TR/css3-values/#calc-syntax
+calc
+    : Calc ws calcSum Rparen ws
+    ;
+
+calcSum
+    : calcProduct ( Space ws ( Plus | Minus ) ws Space ws calcProduct )*
+    ;
+
+calcProduct
+    : calcValue ( Times ws calcValue | Div ws number ws )*
+    ;
+
+calcValue
+    : number ws
+    | dimension ws
+    | unknownDimension ws
+    | percentage ws
+    | Lparen ws calcSum Rparen ws
+    ;
+
+// Font face
+// https://www.w3.org/TR/2013/CR-css-fonts-3-20131003/#font-face-rule
+fontFaceRule
+    : FontFace ws BlockStart ws fontFaceDeclaration? ( Semi ws fontFaceDeclaration? )* BlockEnd ws
+    ;
+
+fontFaceDeclaration
+    : property_ Colon ws expr     # knownFontFaceDeclaration
+    | property_ Colon ws value    # unknownFontFaceDeclaration
+    ;
+
+// Animations
+// https://www.w3.org/TR/css3-animations/
+keyframesRule
+    : Keyframes ws Space ws ident ws BlockStart ws keyframesBlocks BlockEnd ws
+    ;
+
+keyframesBlocks
+    : ( keyframeSelector BlockStart ws declarationList? BlockEnd ws )*
+    ;
+
+keyframeSelector
+    : ( From | To | Percentage ) ws ( Comma ws ( From | To | Percentage ) ws )*
+    ;
+
+// Viewport
+// https://www.w3.org/TR/css-device-adapt-1/
+viewport
+    : Viewport ws BlockStart ws declarationList? BlockEnd ws
+    ;
+
+// Counter style
+// https://www.w3.org/TR/css-counter-styles-3/
+counterStyle
+    : CounterStyle ws ident ws BlockStart ws declarationList? BlockEnd ws
+    ;
+
+// Font feature values
+// https://www.w3.org/TR/css-fonts-3/
+fontFeatureValuesRule
+    : FontFeatureValues ws fontFamilyNameList ws BlockStart ws featureValueBlock* BlockEnd ws
+    ;
+
+fontFamilyNameList
+    : fontFamilyName ( ws Comma ws fontFamilyName )*
+    ;
+
+fontFamilyName
+    : String_
+    | ident ( ws ident )*
+    ;
+
+featureValueBlock
+    : featureType ws BlockStart ws featureValueDefinition? ( ws Semi ws featureValueDefinition? )* BlockEnd ws
+    ;
+
+featureType
+    : atKeyword
+    ;
+
+featureValueDefinition
+    : ident ws Colon ws number ( ws number )*
+    ;
+
+// The specific words can be identifiers too
+ident
+    : Ident
+    | MediaOnly
+    | Not
+    | And
+    | Or
+    | From
+    | To
+    ;
+
+// Comments might be part of CSS hacks, thus pass them to visitor to decide whether to skip
+// Spaces are significant around '+' '-' '(', thus they should not be skipped
+ws
+    : ( Comment | Space )*
+    ;
+
+/*
+stylesheet
   : statement*
   ;
 
@@ -421,3 +861,4 @@ mapValue
   | list_
   | map_
   ;
+*/
