@@ -2054,6 +2054,7 @@ storage_clause
          | OPTIMAL (size_clause | NULL_ )
          | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
          | FLASH_CACHE (KEEP | NONE | DEFAULT)
+         | CELL_FLASH_CACHE (KEEP | NONE | DEFAULT)
          | ENCRYPT
          )+
        ')'
