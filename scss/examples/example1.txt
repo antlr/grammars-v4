@@ -27,12 +27,6 @@ div.container {
     --search-keyboard: calc(
         var(--collapsed-search) + #{$search-keyboard-offset}
     );
-
-    @abc-toggled (some-var) {
-        --search-keyboard: calc(
-            var(--collapsed-search-offset) + #{$search-keyboard-offset}
-       );
-    }
 }
 
 @keyframes spin {
