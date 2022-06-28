@@ -2038,6 +2038,7 @@ physical_attributes_clause
       | PCTUSED pctused=UNSIGNED_INTEGER
       | INITRANS inittrans=UNSIGNED_INTEGER
       | MAXTRANS maxtrans=UNSIGNED_INTEGER
+      | COMPUTE STATISTICS
       | storage_clause
       )+
     ;
@@ -2856,7 +2857,7 @@ encryption_spec
     : (USING  CHAR_STRING)? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? (NO? SALT)?
     ;
 tablespace
-    : regular_id
+    : id_expression
     ;
 
 varray_item
