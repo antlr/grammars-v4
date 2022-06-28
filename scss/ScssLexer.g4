@@ -129,7 +129,7 @@ WITH            : 'with';
 Identifier
   : (('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
     ('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*
-  | '-' ('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
+  | ('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
     ('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*) -> pushMode(IDENTIFY)
   ;
 
@@ -158,7 +158,7 @@ Number
   ;
 
 Var
-  : FunctionIdentifier MINUS Identifier RPAREN
+  : FunctionIdentifier MINUS MINUS Identifier RPAREN
   ;
 
 Color
