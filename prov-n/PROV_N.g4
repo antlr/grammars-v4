@@ -25,7 +25,7 @@
 grammar PROV_N;
 
 document
-   : DOCUMENT (namespaceDeclarations)? (expression)* (bundle (bundle)*)? ENDDOCUMENT
+   : DOCUMENT (namespaceDeclarations)? (expression)* (bundle (bundle)*)? ENDDOCUMENT EOF
    ;
 
 /* parser */
