@@ -39,9 +39,10 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>query</entryPoint>
+					<entryPoint>script</entryPoint>
 					<grammarName>Cypher</grammarName>
 					<packageName></packageName>
+                    <testFileExtension>.txt</testFileExtension>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

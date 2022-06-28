@@ -49,11 +49,12 @@ DIV: '/';
 MOD: '%';
 CARET: '^';
 MULT: '*';
-ESC_ID: ESC ANY_BUT_ESC ESC;
 ESC: '`';
 COLON: ':';
 STICK: '|';
 DOLLAR: '$';
+
+
 
 CALL:C A L L;
 YIELD:Y I E L D;
@@ -117,13 +118,19 @@ OF: O F;
 ADD: A D D;
 DROP: D R O P;
 
-CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
+ID: LetterOrDigit+;
+
+
+ESC_LITERAL:       '`' .*? '`';
+CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence)? '\'';
 STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
-ANY_BUT_ESC : ~[`];
 
-ID: LetterOrDigit;
-DIGIT: SUB (HexDigit | OctalDigit | Digits);
 
+DIGIT: SUB? (HexDigit | OctalDigit | Digits | FLOAT);
+FLOAT
+    : (Digits '.' Digits | '.' Digits) ExponentPart? [fFdD]?
+    | Digits (ExponentPart [fFdD]? | [fFdD])
+    ;
 WS: [ \t\r\n\u000C]+ -> channel(HIDDEN);
 COMMENT: '/*' .*? '*/' -> channel(2);
 LINE_COMMENT: '//' ~[\r\n]* -> channel(2);
