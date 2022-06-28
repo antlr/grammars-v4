@@ -7,6 +7,7 @@ asm/masm
 asn/asn_3gpp
 clif
 csharp
+dart2
 dice
 erlang
 fortran77

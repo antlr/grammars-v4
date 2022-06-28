@@ -180,6 +180,9 @@ CREATE TABLE `daily_intelligences`(
 `gmt_create` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '',
 PRIMARY KEY (`id`)
 ) ENGINE=innodb DEFAULT CHAR SET=utf8 COMMENT '';
+
+-- Mariadb default value for function: unix_timestamp()
+CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` bigint(20) NOT NULL DEFAULT unix_timestamp());
 #end
 #begin
 -- Rename table
@@ -471,6 +474,13 @@ CREATE PROCEDURE set_unique_check()
 BEGIN
     SET unique_checks=on;
 END; -- //-- delimiter ;
+#end
+#begin
+-- Create Role
+create role 'RL_COMPLIANCE_NSA';
+create role if not exists 'RL_COMPLIANCE_NSA';
+CREATE ROLE 'admin', 'developer';
+CREATE ROLE 'webapp'@'localhost';
 #end
 #begin
 CREATE VIEW view_with_cte1 AS
