@@ -23,6 +23,12 @@ div.container {
   cursor: pointer;
 }
 
+:root {
+    --search-keyboard: calc(
+        var(--collapsed-search) + #{$search-keyboard-offset}
+    );
+}
+
 @keyframes spin {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);

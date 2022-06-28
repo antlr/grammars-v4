@@ -128,6 +128,7 @@
 				<module>edn</module>
 				<module>erlang</module>
 				<module>fasta</module>
+                <module>fdo91</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
 				<module>flowmatic</module>
@@ -274,11 +275,13 @@
 				<module>spass</module>
 				<module>sql</module>
 				<module>stacktrace</module>
+                <module>star</module>
 				<module>stellaris</module>
 				<module>stringtemplate</module>
 				<module>suokif</module>
 				<module>swift</module>
 				<module>swift-fin</module>
+                <module>szf</module>
 				<module>tcpheader</module>
 				<module>telephone</module>
 				<module>terraform</module>
@@ -318,6 +321,7 @@
 				<module>xml</module>
 				<module>xpath</module>
 				<module>xsd-regex</module>
+                <module>xyz</module>
 				<module>z</module>
 				<!-- testing repository -->
 				<!--<module>grammar-test</module> -->

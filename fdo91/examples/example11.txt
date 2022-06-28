@@ -1,0 +1,13 @@
+uni_start_stream
+	man_start_object <ind_group, "Test - Lesson3">
+		mat_orientation <vff>
+		mat_position <center_center>
+		mat_bool_resize_vertical <no>
+		mat_precise_width <300>
+		mat_precise_height <150>
+		mat_bool_precise <yes>
+		mat_art_id <1-1-40898>
+		mat_bool_background_pic <yes>
+	man_end_object
+	man_update_display
+uni_end_stream
