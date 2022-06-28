@@ -37,7 +37,7 @@
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>false</showTree>
+					<showTree>true</showTree>
 					<entryPoint>domain</entryPoint>
 					<grammarName>domain</grammarName>
 					<packageName></packageName>
