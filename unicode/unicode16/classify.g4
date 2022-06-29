@@ -19,7 +19,9 @@ acquired from
 
  */
 
- grammar classify;
+grammar classify;
+
+file_ : codepoint EOF;
 
 codepoint:
       CLASSIFY___  // Error

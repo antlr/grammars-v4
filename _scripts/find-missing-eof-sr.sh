@@ -1,10 +1,11 @@
 #!/bin/sh
 
 test=""
-files=`find . -name pom.xml | grep -v Generated`
+files=`find . -name pom.xml | grep -v Generated | grep -v -E -e "save/|agp/|asm/asm8086/|asn/asn/|bcpl/|clif/|cql3/|databank/|html/|inf/|lark/|metamath/|metric/|mumps/|pdn/|powerquery/|rfc1960/|scala/|scss/|sickbay/|sql/hive/v2/|sql/hive/v3/|stringtemplate/|tcpheader/|turing/|verilog/verilog/|verilog/systemverilog/|wavefront/|wkt/"`
 refined_list=`grep -l -i -e entrypoint $files`
 for i in $refined_list
 do
+	echo $i
 	dir=${i%/*}
 	grammars=`trxml2 $i | grep -i 'includes/include=' | sed 's%.*/include=\(.*\)$%\1%'`
 	sourcedir=`trxml2 $i | grep -i 'configuration/sourceDirectory=' | sed 's%.*/sourceDirectory=\(.*\)$%\1%' | sed 's/[$][{]basedir[}]//' | sed 's%^/%%g'`
