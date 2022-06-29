@@ -250,7 +250,7 @@ stringExpPrefix
     ;
 
 nullExpression
-    : IS NOT? NULL
+    : IS NOT? NULL_W
     ;
 
 propertyOrLabelExpression
@@ -375,7 +375,7 @@ parameter
 literal
     : boolLit
     | numLit
-    | NULL
+    | NULL_W
     | stringLit
     | charLit
     | listLit
@@ -468,7 +468,7 @@ reservedWord
     | XOR
     | FALSE
     | TRUE
-    | NULL
+    | NULL_W
     | CONSTRAINT
     | DO
     | FOR
