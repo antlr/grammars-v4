@@ -42,7 +42,7 @@
 					<entryPoint>script</entryPoint>
 					<grammarName>Cypher</grammarName>
 					<packageName></packageName>
-                    <testFileExtension>.txt</testFileExtension>
+					<testFileExtension>.txt</testFileExtension>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
