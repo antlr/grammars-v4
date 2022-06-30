@@ -115,6 +115,7 @@
 				<module>csv</module>
 				<module>ctl</module>
 				<module>cto</module>
+				<module>cypher</module>
 				<module>dart2</module>
 				<module>databank</module>
 				<module>dcm</module>
