@@ -486,7 +486,6 @@ class SealedClasses {
             var sealed = 2;
             var ns = non - sealed;
             var permits = 1;
-            var record = 1;
         }
     }
 
