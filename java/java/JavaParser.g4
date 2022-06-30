@@ -469,7 +469,6 @@ identifier
     | YIELD
     | SEALED
     | PERMITS
-    | RECORD
     | VAR
     ;
 
