@@ -3182,6 +3182,9 @@ expression
     | DOLLAR_ACTION
     ;
 
+parameter
+    : PLACEHOLDER;
+
 time_zone
     : AT_KEYWORD TIME ZONE expression
     ;
@@ -4015,6 +4018,7 @@ constant
     | sign? DECIMAL
     | sign? (REAL | FLOAT)  // float or decimal
     | sign? dollar='$' (DECIMAL | FLOAT)       // money
+    | parameter
     ;
 
 sign
