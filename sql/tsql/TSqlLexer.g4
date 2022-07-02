@@ -939,6 +939,8 @@ BIT_OR:              '|';
 BIT_AND:             '&';
 BIT_XOR:             '^';
 
+PLACEHOLDER:         '?';
+
 fragment LETTER:       [A-Z_];
 fragment DEC_DOT_DEC:  (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DIGIT+);
 fragment HEX_DIGIT:    [0-9A-F];
