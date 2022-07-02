@@ -3170,6 +3170,7 @@ expression
     : primitive_expression
     | function_call
     | expression '.' (value_call | query_call | exist_call | modify_call)
+    | expression '.' hierarchyid_call
     | expression COLLATE id_
     | case_expression
     | full_column_name
@@ -3554,6 +3555,7 @@ function_call
     | scalar_function_name '(' expression_list? ')'     #SCALAR_FUNCTION
     | freetext_function                                 #FREE_TEXT
     | partition_function                                #PARTITION_FUNC
+    | hierarchyid_static_method                         #HIERARCHYID_METHOD
     ;
 
 partition_function
@@ -3660,6 +3662,20 @@ modify_method
 
 modify_call
     : MODIFY '(' xml_dml=STRING ')'
+    ;
+
+hierarchyid_call
+    : GETANCESTOR '(' n=expression ')'
+    | GETDESCENDANT '(' child1=expression ',' child2=expression ')'
+    | GETLEVEL '(' ')'
+    | ISDESCENDANTOF '(' parent_=expression ')'
+    | GETREPARENTEDVALUE '(' oldroot=expression ',' newroot=expression ')'
+    | TOSTRING '(' ')'
+    ;
+
+hierarchyid_static_method
+    : HIERARCHYID DOUBLE_COLON GETROOT '(' ')'
+    | HIERARCHYID DOUBLE_COLON PARSE '(' input=expression ')'
     ;
 
 nodes_method
@@ -4511,9 +4527,15 @@ keyword
     | FORCESEEK
     | FORCE_SERVICE_ALLOW_DATA_LOSS
     | GET
+    | GETANCESTOR
+    | GETDESCENDANT
+    | GETLEVEL
+    | GETREPARENTEDVALUE
+    | GETROOT
     | GOVERNOR
     | HASHED
     | HEALTHCHECKTIMEOUT
+    | HIERARCHYID
     | IIF
     | IO
     | INCLUDE
@@ -4521,6 +4543,7 @@ keyword
     | INFINITE
     | INIT
     | INSTEAD
+    | ISDESCENDANTOF
     | ISNULL
     | KERBEROS
     | KEY_PATH
@@ -4632,6 +4655,7 @@ keyword
     | TAPE
     | TARGET
     | TCP
+    | TOSTRING
     | TRACK_CAUSALITY
     | TRANSFER
     | TRY_CAST
