@@ -151,6 +151,7 @@ OR:                                    'OR';
 ORDER:                                 'ORDER';
 OUTER:                                 'OUTER';
 OVER:                                  'OVER';
+PARSE:                                 'TRY_'? 'PARSE';
 PERCENT:                               'PERCENT';
 PIVOT:                                 'PIVOT';
 PLAN:                                  'PLAN';
