@@ -145,7 +145,6 @@ OPEN:                                  'OPEN';
 OPENDATASOURCE:                        'OPENDATASOURCE';
 OPENQUERY:                             'OPENQUERY';
 OPENROWSET:                            'OPENROWSET';
-OPENJSON:                              'OPENJSON';
 OPENXML:                               'OPENXML';
 OPTION:                                'OPTION';
 OR:                                    'OR';
@@ -227,7 +226,6 @@ DOLLAR_PARTITION:                      '$PARTITION';
 
 //Keywords that can exist in ID etc
 ABSOLUTE:                              'ABSOLUTE';
-AT_KEYWORD:                            'AT';
 ACCENT_SENSITIVITY:                    'ACCENT_SENSITIVITY';
 ACCESS:                                'ACCESS';
 ACTION:                                'ACTION';
@@ -252,6 +250,7 @@ APPLICATION_LOG:                       'APPLICATION_LOG';
 APPLY:                                 'APPLY';
 ARITHABORT:                            'ARITHABORT';
 ASSEMBLY:                              'ASSEMBLY';
+AT_KEYWORD:                            'AT';
 AUDIT:                                 'AUDIT';
 AUDIT_GUID:                            'AUDIT_GUID';
 AUTO:                                  'AUTO';
@@ -266,10 +265,10 @@ AUTOGROW_SINGLE_FILE:                  'AUTOGROW_SINGLE_FILE';
 AVAILABILITY:                          'AVAILABILITY';
 AVG:                                   'AVG';
 BACKUP_PRIORITY:                       'BACKUP_PRIORITY';
+BASE64:                                'BASE64';
 BEGIN_DIALOG:                          'BEGIN_DIALOG';
 BIGINT:                                'BIGINT';
 BINARY_KEYWORD:                        'BINARY';
-BINARY_BASE64:                         'BINARY BASE64';
 BINARY_CHECKSUM:                       'BINARY_CHECKSUM';
 BINDING:                               'BINDING';
 BLOB_STORAGE:                          'BLOB_STORAGE';
@@ -337,7 +336,6 @@ DIRECTORY_NAME:                        'DIRECTORY_NAME';
 DISABLE:                               'DISABLE';
 DISABLE_BROKER:                        'DISABLE_BROKER';
 DISABLED:                              'DISABLED';
-DISK_DRIVE:                            [A-Z][:];
 DOCUMENT:                              'DOCUMENT';
 DYNAMIC:                               'DYNAMIC';
 ELEMENTS:                              'ELEMENTS';
@@ -381,7 +379,6 @@ GB:                                    'GB';
 GETDATE:                               'GETDATE';
 GETUTCDATE:                            'GETUTCDATE';
 GLOBAL:                                'GLOBAL';
-GO_BATCH:                              [\r\n]* [\t ]* 'GO'[\t\n\r ];
 GO:                                    'GO';
 GROUP_MAX_REQUESTS:                    'GROUP_MAX_REQUESTS';
 GROUPING:                              'GROUPING';
@@ -490,6 +487,7 @@ OLD_ACCOUNT:                           'OLD_ACCOUNT';
 ONLINE:                                'ONLINE';
 ONLY:                                  'ONLY';
 OPEN_EXISTING:                         'OPEN_EXISTING';
+OPENJSON:                              'OPENJSON';
 OPTIMISTIC:                            'OPTIMISTIC';
 OPTIMIZE:                              'OPTIMIZE';
 OUT:                                   'OUT';
@@ -663,8 +661,7 @@ XMLNAMESPACES:                         'XMLNAMESPACES';
 XMLSCHEMA:                             'XMLSCHEMA';
 XSINIL:                                'XSINIL';
 ZONE:                                  'ZONE';
-DOLLAR_ACTION:                         '$ACTION';
-//More keywords
+//More keywords that can also be used as IDs
 ABORT_AFTER_WAIT:                      'ABORT_AFTER_WAIT';
 ABSENT:                                'ABSENT';
 ADMINISTER:                            'ADMINISTER';
@@ -725,7 +722,7 @@ ENABLED:                               'ENABLED';
 ENDPOINT:                              'ENDPOINT';
 ERROR:                                 'ERROR';
 EVENT:                                 'EVENT';
-EVENTDATA:                             'EVENTDATA' '(' ')';
+EVENTDATA:                             'EVENTDATA';
 EVENT_RETENTION_MODE:                  'EVENT_RETENTION_MODE';
 EXECUTABLE_FILE:                       'EXECUTABLE_FILE';
 EXPIREDATE:                            'EXPIREDATE';
@@ -894,6 +891,10 @@ XACT_ABORT:                            'XACT_ABORT';
 //Build-ins:
 VARCHAR:                               'VARCHAR';
 NVARCHAR:                              'NVARCHAR';
+
+//Combinations that cannot be used as IDs
+DISK_DRIVE:                            [A-Z][:];
+DOLLAR_ACTION:                         '$ACTION';
 
 
 SPACE:              [ \t\r\n]+    -> skip;
