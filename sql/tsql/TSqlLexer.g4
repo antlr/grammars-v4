@@ -151,6 +151,7 @@ OR:                                    'OR';
 ORDER:                                 'ORDER';
 OUTER:                                 'OUTER';
 OVER:                                  'OVER';
+PARSE:                                 'TRY_'? 'PARSE';
 PERCENT:                               'PERCENT';
 PIVOT:                                 'PIVOT';
 PLAN:                                  'PLAN';
@@ -938,6 +939,8 @@ BIT_NOT:             '~';
 BIT_OR:              '|';
 BIT_AND:             '&';
 BIT_XOR:             '^';
+
+PLACEHOLDER:         '?';
 
 fragment LETTER:       [A-Z_];
 fragment DEC_DOT_DEC:  (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DIGIT+);

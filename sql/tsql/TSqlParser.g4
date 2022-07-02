@@ -3182,6 +3182,9 @@ expression
     | DOLLAR_ACTION
     ;
 
+parameter
+    : PLACEHOLDER;
+
 time_zone
     : AT_KEYWORD TIME ZONE expression
     ;
@@ -3610,6 +3613,9 @@ built_in_functions
     | USER                                              #USER
     // https://msdn.microsoft.com/en-us/library/ms184325.aspx
     | ISNULL '(' left=expression ',' right=expression ')'          #ISNULL
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/parse-transact-sql
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/try-parse-transact-sql
+    | PARSE '(' str=expression AS data_type ( USING culture=expression )? ')'          #PARSE
     // https://docs.microsoft.com/en-us/sql/t-sql/xml/xml-data-type-methods
     | xml_data_type_methods                             #XML_DATA_TYPE_FUNC
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/logical-functions-iif-transact-sql
@@ -4012,6 +4018,7 @@ constant
     | sign? DECIMAL
     | sign? (REAL | FLOAT)  // float or decimal
     | sign? dollar='$' (DECIMAL | FLOAT)       // money
+    | parameter
     ;
 
 sign

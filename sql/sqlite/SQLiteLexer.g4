@@ -154,6 +154,7 @@ RELEASE_:           'RELEASE';
 RENAME_:            'RENAME';
 REPLACE_:           'REPLACE';
 RESTRICT_:          'RESTRICT';
+RETURNING_:         'RETURNING';
 RIGHT_:             'RIGHT';
 ROLLBACK_:          'ROLLBACK';
 ROW_:               'ROW';
