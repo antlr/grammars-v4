@@ -64,6 +64,7 @@ sql/hive/v3
 sql/mysql
 sql/plsql
 sql/postgresql
+sql/trino
 sql/tsql
 stellaris
 stringtemplate
