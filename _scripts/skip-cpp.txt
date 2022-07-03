@@ -210,7 +210,6 @@ sql/mysql
 sql/plsql
 sql/postgresql
 sql/sqlite
-sql/trino
 sql/tsql
 stacktrace
 stellaris

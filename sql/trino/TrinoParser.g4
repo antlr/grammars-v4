@@ -457,14 +457,14 @@ expression
     ;
 
 booleanExpression
-    : valueExpression predicate_[$valueExpression.ctx]?  #predicated
+    : valueExpression predicate_?  #predicated
     | NOT_ booleanExpression                             #logicalNot
     | booleanExpression AND_ booleanExpression           #and
     | booleanExpression OR_ booleanExpression            #or
     ;
 
 // workaround for https://github.com/antlr/antlr4/issues/780
-predicate_[ParserRuleContext value]
+predicate_
     : comparisonOperator right=valueExpression                            #comparison
     | comparisonOperator comparisonQuantifier LPAREN_ query RPAREN_               #quantifiedComparison
     | NOT_? BETWEEN_ lower=valueExpression AND_ upper=valueExpression        #between
@@ -517,7 +517,7 @@ primaryExpression
     | ARRAY_ LSQUARE_ (expression (COMMA_ expression)*)? RSQUARE_                                       #arrayConstructor
     | value=primaryExpression LSQUARE_ index=valueExpression RSQUARE_                               #subscript
     | identifier                                                                          #columnReference
-    | base=primaryExpression DOT_ fieldName=identifier                                     #dereference
+    | base_=primaryExpression DOT_ fieldName=identifier                                     #dereference
     | name=CURRENT_DATE_                                                                   #specialDateTimeFunction
     | name=CURRENT_TIME_ (LPAREN_ precision=INTEGER_VALUE_ RPAREN_)?                                #specialDateTimeFunction
     | name=CURRENT_TIMESTAMP_ (LPAREN_ precision=INTEGER_VALUE_ RPAREN_)?                           #specialDateTimeFunction

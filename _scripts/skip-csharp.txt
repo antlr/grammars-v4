@@ -32,7 +32,6 @@ stringtemplate
 swift/swift2
 swift/swift3
 swift/swift5
-sql/trino
 tcpheader
 thrift
 v

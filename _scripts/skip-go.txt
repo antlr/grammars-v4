@@ -76,7 +76,6 @@ sql/hive/v3
 sql/mysql
 sql/plsql
 sql/postgresql
-sql/trino
 stringtemplate
 swift/swift2
 swift/swift3
