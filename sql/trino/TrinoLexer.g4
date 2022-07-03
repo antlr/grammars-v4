@@ -340,7 +340,7 @@ UNICODE_STRING_
 // its a correct literal when the AST is being constructed. This
 // allows us to provide more meaningful error messages to the user
 BINARY_LITERAL_
-    : 'X\'' (~'\'')* '\''
+    : 'X\'' ~'\''* '\''
     ;
 
 INTEGER_VALUE_

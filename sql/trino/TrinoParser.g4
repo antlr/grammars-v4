@@ -24,7 +24,11 @@ parse
     ;
 
 statements
-    : singleStatement|standaloneExpression|standalonePathSpecification|standaloneType|standaloneRowPattern SEMICOLON_?
+    : singleStatement
+    |standaloneExpression
+    |standalonePathSpecification
+    |standaloneType
+    |standaloneRowPattern SEMICOLON_?
     ;
 
 singleStatement
@@ -222,8 +226,8 @@ queryNoWith
     : queryTerm
       (ORDER_ BY_ sortItem (COMMA_ sortItem)*)?
       (OFFSET_ offset=rowCount (ROW_ | ROWS_)?)?
-      ( (LIMIT_ limit=limitRowCount)
-      | (FETCH_ (FIRST_ | NEXT_) (fetchFirst=rowCount)? (ROW_ | ROWS_) (ONLY_ | WITH_ TIES_))
+      ( LIMIT_ limit=limitRowCount
+      | FETCH_ (FIRST_ | NEXT_) (fetchFirst=rowCount)? (ROW_ | ROWS_) (ONLY_ | WITH_ TIES_)
       )?
     ;
 
@@ -316,9 +320,7 @@ relation
 
 joinType
     : INNER_?
-    | LEFT_ OUTER_?
-    | RIGHT_ OUTER_?
-    | FULL_ OUTER_?
+    | (LEFT_ | RIGHT_ | FULL_) OUTER_?
     ;
 
 joinCriteria
@@ -349,8 +351,7 @@ listAggOverflowBehavior
     ;
 
 listaggCountIndication
-    : WITH_ COUNT_
-    | WITHOUT_ COUNT_
+    : (WITH_ | WITHOUT_) COUNT_
     ;
 
 patternRecognition
@@ -386,11 +387,10 @@ emptyMatchHandling
     ;
 
 skipTo
-    : SKIP_ TO_ NEXT_ ROW_
-    | SKIP_ PAST_ LAST_ ROW_
-    | SKIP_ TO_ FIRST_ identifier
-    | SKIP_ TO_ LAST_ identifier
-    | SKIP_ TO_ identifier
+    : SKIP_ 
+           ( TO_ (NEXT_ ROW_ | (FIRST_ | LAST_)? identifier)
+           | PAST_ LAST_ ROW_
+           )
     ;
 
 subsetDefinition
@@ -605,8 +605,7 @@ jsonQueryWrapperBehavior
 jsonQueryBehavior
     : ERROR_
     | NULL_
-    | EMPTY_ ARRAY_
-    | EMPTY_ OBJECT_
+    | EMPTY_ (ARRAY_ | OBJECT_)
     ;
 
 jsonObjectMember
@@ -675,7 +674,8 @@ type
 
 rowField
     : type
-    | identifier type;
+    | identifier type
+    ;
 
 typeParameter
     : INTEGER_VALUE_ | type
