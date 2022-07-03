@@ -2471,7 +2471,7 @@ drop_statistics
 
 // https://msdn.microsoft.com/en-us/library/ms173790.aspx
 drop_table
-    : DROP TABLE (IF EXISTS)? table_name ';'?
+    : DROP TABLE (IF EXISTS)? table_name (',' table_name)* ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms173492.aspx
