@@ -3674,8 +3674,7 @@ hierarchyid_call
     ;
 
 hierarchyid_static_method
-    : HIERARCHYID DOUBLE_COLON GETROOT '(' ')'
-    | HIERARCHYID DOUBLE_COLON PARSE '(' input=expression ')'
+    : HIERARCHYID DOUBLE_COLON (GETROOT '(' ')' | PARSE '(' input=expression ')')
     ;
 
 nodes_method
