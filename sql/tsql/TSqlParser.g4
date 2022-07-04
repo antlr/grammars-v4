@@ -324,7 +324,7 @@ print_statement
 // https://docs.microsoft.com/en-us/sql/t-sql/language-elements/raiserror-transact-sql
 raiseerror_statement
     : RAISERROR '(' msg=(DECIMAL | STRING | LOCAL_ID) ',' severity=constant_LOCAL_ID ','
-    state=constant_LOCAL_ID (',' constant_LOCAL_ID)* ')' (WITH (LOG | SETERROR | NOWAIT))? ';'?
+    state=constant_LOCAL_ID (',' (constant_LOCAL_ID | NULL_))* ')' (WITH (LOG | SETERROR | NOWAIT))? ';'?
     | RAISERROR DECIMAL formatstring=(STRING | LOCAL_ID | DOUBLE_QUOTE_ID) (',' argument=(DECIMAL | STRING | LOCAL_ID))*
     ;
 
@@ -2471,7 +2471,7 @@ drop_statistics
 
 // https://msdn.microsoft.com/en-us/library/ms173790.aspx
 drop_table
-    : DROP TABLE (IF EXISTS)? table_name ';'?
+    : DROP TABLE (IF EXISTS)? table_name (',' table_name)* ';'?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms173492.aspx
@@ -3170,6 +3170,7 @@ expression
     : primitive_expression
     | function_call
     | expression '.' (value_call | query_call | exist_call | modify_call)
+    | expression '.' hierarchyid_call
     | expression COLLATE id_
     | case_expression
     | full_column_name
@@ -3554,6 +3555,7 @@ function_call
     | scalar_function_name '(' expression_list? ')'     #SCALAR_FUNCTION
     | freetext_function                                 #FREE_TEXT
     | partition_function                                #PARTITION_FUNC
+    | hierarchyid_static_method                         #HIERARCHYID_METHOD
     ;
 
 partition_function
@@ -3660,6 +3662,19 @@ modify_method
 
 modify_call
     : MODIFY '(' xml_dml=STRING ')'
+    ;
+
+hierarchyid_call
+    : GETANCESTOR '(' n=expression ')'
+    | GETDESCENDANT '(' child1=expression ',' child2=expression ')'
+    | GETLEVEL '(' ')'
+    | ISDESCENDANTOF '(' parent_=expression ')'
+    | GETREPARENTEDVALUE '(' oldroot=expression ',' newroot=expression ')'
+    | TOSTRING '(' ')'
+    ;
+
+hierarchyid_static_method
+    : HIERARCHYID DOUBLE_COLON (GETROOT '(' ')' | PARSE '(' input=expression ')')
     ;
 
 nodes_method
@@ -4511,9 +4526,15 @@ keyword
     | FORCESEEK
     | FORCE_SERVICE_ALLOW_DATA_LOSS
     | GET
+    | GETANCESTOR
+    | GETDESCENDANT
+    | GETLEVEL
+    | GETREPARENTEDVALUE
+    | GETROOT
     | GOVERNOR
     | HASHED
     | HEALTHCHECKTIMEOUT
+    | HIERARCHYID
     | IIF
     | IO
     | INCLUDE
@@ -4521,6 +4542,7 @@ keyword
     | INFINITE
     | INIT
     | INSTEAD
+    | ISDESCENDANTOF
     | ISNULL
     | KERBEROS
     | KEY_PATH
@@ -4632,6 +4654,7 @@ keyword
     | TAPE
     | TARGET
     | TCP
+    | TOSTRING
     | TRACK_CAUSALITY
     | TRANSFER
     | TRY_CAST
