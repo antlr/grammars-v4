@@ -373,8 +373,7 @@ expression
     | expression precedenceBitwiseOrOperator expression
     | expression precedenceComparisonOperator expression
     | expression KW_NOT? precedenceRegexpOperator expression
-    | expression (KW_NOT)? KW_LIKE KW_ANY expressionsInParenthesis
-    | expression (KW_NOT)? KW_LIKE KW_ALL expressionsInParenthesis
+    | expression KW_NOT? KW_LIKE (KW_ANY | KW_ALL) expressionsInParenthesis
     | expression (KW_NOT)? KW_IN precedenceSimilarExpressionIn
     | expression (KW_NOT)? KW_BETWEEN expression KW_AND expression
     | KW_EXISTS subQueryExpression
