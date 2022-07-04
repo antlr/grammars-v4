@@ -290,10 +290,7 @@ precedenceUnaryOperator
     ;
 
 isCondition
-    : (KW_NOT)? KW_NULL
-    | (KW_NOT)? KW_TRUE
-    | (KW_NOT)? KW_FALSE
-    | (KW_NOT)? KW_DISTINCT KW_FROM
+    : KW_NOT? (KW_NULL | KW_TRUE | KW_FALSE | KW_DISTINCT | KW_FROM)
     ;
 
 precedenceBitwiseXorOperator
