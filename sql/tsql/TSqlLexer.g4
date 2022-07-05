@@ -167,6 +167,7 @@ READ:                                  'READ';
 READTEXT:                              'READTEXT';
 RECONFIGURE:                           'RECONFIGURE';
 REFERENCES:                            'REFERENCES';
+REPLACE:                               'REPLACE';
 REPLICATION:                           'REPLICATION';
 RESTORE:                               'RESTORE';
 RESTRICT:                              'RESTRICT';
