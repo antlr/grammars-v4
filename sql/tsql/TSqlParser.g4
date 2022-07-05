@@ -3255,6 +3255,7 @@ predicate
     : EXISTS '(' subquery ')'
     | freetext_predicate
     | expression comparison_operator expression
+    | expression MULT_ASSIGN expression ////SQL-82 syntax for left outer joins; '*='. See https://stackoverflow.com/questions/40665/in-sybase-sql
     | expression comparison_operator (ALL | SOME | ANY) '(' subquery ')'
     | expression NOT* BETWEEN expression AND expression
     | expression NOT* IN '(' (subquery | expression_list) ')'
@@ -3584,6 +3585,8 @@ built_in_functions
     | CHECKSUM '(' '*' ')'                              #CHECKSUM
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
     | COALESCE '(' expression_list ')'                  #COALESCE
+    //https://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc36271.1572/html/blocks/CJADIDHD.htm
+    | CURRENT_DATE '(' ')'                                     #CURRENT_DATE
     // https://msdn.microsoft.com/en-us/library/ms188751.aspx
     | CURRENT_TIMESTAMP                                 #CURRENT_TIMESTAMP
     // https://msdn.microsoft.com/en-us/library/ms176050.aspx
