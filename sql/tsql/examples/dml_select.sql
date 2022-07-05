@@ -761,4 +761,8 @@ FROM   OPENXML (@idoc, '/ROOT/Customer/Order/OrderDetail',2)
                CustomerID  varchar(10) '../@CustomerID',   
                OrderDate   datetime    '../@OrderDate',   
                ProdID      int         '@ProductID',   
-               Qty         int         '@Quantity');  
+               Qty         int         '@Quantity');
+
+
+select distinct t.a_field_1 f1, t.a_field_2 f2 from a_table t
+where f2 = ""

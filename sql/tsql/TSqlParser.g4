@@ -4684,7 +4684,7 @@ keyword
 id_
     : ID
     | DOUBLE_QUOTE_ID
-//    | DOUBLE_QUOTE_BLANK
+    | DOUBLE_QUOTE_BLANK
     | SQUARE_BRACKET_ID
     | keyword
     ;
