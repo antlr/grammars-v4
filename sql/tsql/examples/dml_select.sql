@@ -766,3 +766,6 @@ FROM   OPENXML (@idoc, '/ROOT/Customer/Order/OrderDetail',2)
 
 select distinct t.a_field_1 f1, t.a_field_2 f2 from a_table t
 where f2 = ""
+
+select distinct t.a_field_1 f1 from a_table t noholdlock
+where t.a_field_2 = t.a_field_3

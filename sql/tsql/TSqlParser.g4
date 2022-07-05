@@ -3706,7 +3706,7 @@ table_alias
 // https://msdn.microsoft.com/en-us/library/ms187373.aspx
 with_table_hints
     : WITH? '(' hint+=table_hint (','? hint+=table_hint)* ')'
-//    | table_hint
+    | table_hint
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187373.aspx
@@ -3725,7 +3725,7 @@ table_hint
                 | SNAPSHOT
                 | SPATIAL_WINDOW_MAX_CELLS '=' DECIMAL
                 | HOLDLOCK
-//                | NOHOLDLOCK
+                | NOHOLDLOCK
                 | ID
                 )
     ;

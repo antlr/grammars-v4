@@ -132,6 +132,7 @@ MERGE:                                 'MERGE';
 NATIONAL:                              'NATIONAL';
 NEGOTIATE:                             'NEGOTIATE';
 NOCHECK:                               'NOCHECK';
+NOHOLDLOCK:                            'NOHOLDLOCK';
 NONCLUSTERED:                          'NONCLUSTERED';
 NOT:                                   'NOT';
 NULL_:                                 'NULL';
