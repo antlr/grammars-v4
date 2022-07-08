@@ -132,6 +132,7 @@ MERGE:                                 'MERGE';
 NATIONAL:                              'NATIONAL';
 NEGOTIATE:                             'NEGOTIATE';
 NOCHECK:                               'NOCHECK';
+NOHOLDLOCK:                            'NOHOLDLOCK';
 NONCLUSTERED:                          'NONCLUSTERED';
 NOT:                                   'NOT';
 NULL_:                                 'NULL';
@@ -167,6 +168,7 @@ READ:                                  'READ';
 READTEXT:                              'READTEXT';
 RECONFIGURE:                           'RECONFIGURE';
 REFERENCES:                            'REFERENCES';
+REPLACE:                               'REPLACE';
 REPLICATION:                           'REPLICATION';
 RESTORE:                               'RESTORE';
 RESTRICT:                              'RESTRICT';
@@ -901,6 +903,7 @@ LINE_COMMENT:       '--' ~[\r\n]* -> channel(HIDDEN);
 
 // TODO: ID can be not only Latin.
 DOUBLE_QUOTE_ID:    '"' ~'"'+ '"';
+DOUBLE_QUOTE_BLANK: '""';
 SINGLE_QUOTE:       '\'';
 SQUARE_BRACKET_ID:  '[' (~']' | ']' ']')* ']';
 LOCAL_ID:           '@' ([A-Z_$@#0-9] | FullWidthLetter)*;

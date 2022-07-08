@@ -1959,7 +1959,7 @@ create_xml_index
 
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
 create_or_alter_procedure
-    : ((CREATE (OR ALTER)?) | ALTER) proc=(PROC | PROCEDURE) procName=func_proc_name_schema (';' DECIMAL)?
+    : ((CREATE (OR (ALTER | REPLACE))?) | ALTER) proc=(PROC | PROCEDURE) procName=func_proc_name_schema (';' DECIMAL)?
       ('('? procedure_param (',' procedure_param)* ')'?)?
       (WITH procedure_option (',' procedure_option)*)?
       (FOR REPLICATION)? AS (as_external_name | sql_clauses*)
@@ -3255,6 +3255,7 @@ predicate
     : EXISTS '(' subquery ')'
     | freetext_predicate
     | expression comparison_operator expression
+    | expression MULT_ASSIGN expression ////SQL-82 syntax for left outer joins; '*='. See https://stackoverflow.com/questions/40665/in-sybase-sql
     | expression comparison_operator (ALL | SOME | ANY) '(' subquery ')'
     | expression NOT* BETWEEN expression AND expression
     | expression NOT* IN '(' (subquery | expression_list) ')'
@@ -3584,6 +3585,8 @@ built_in_functions
     | CHECKSUM '(' '*' ')'                              #CHECKSUM
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
     | COALESCE '(' expression_list ')'                  #COALESCE
+    //https://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc36271.1572/html/blocks/CJADIDHD.htm
+    | CURRENT_DATE '(' ')'                                     #CURRENT_DATE
     // https://msdn.microsoft.com/en-us/library/ms188751.aspx
     | CURRENT_TIMESTAMP                                 #CURRENT_TIMESTAMP
     // https://msdn.microsoft.com/en-us/library/ms176050.aspx
@@ -3623,6 +3626,7 @@ built_in_functions
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/logical-functions-iif-transact-sql
     | IIF '(' cond=search_condition ',' left=expression ',' right=expression ')'   #IIF
     | STRING_AGG '(' expr=expression ',' separator=expression ')' (WITHIN GROUP '(' order_by_clause ')')?  #STRINGAGG
+    | REPLACE '(' input=STRING ',' replacing=STRING ',' with=STRING ')'   #REPLACE
     ;
 
 xml_data_type_methods
@@ -3705,6 +3709,7 @@ table_alias
 // https://msdn.microsoft.com/en-us/library/ms187373.aspx
 with_table_hints
     : WITH? '(' hint+=table_hint (','? hint+=table_hint)* ')'
+    | table_hint
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187373.aspx
@@ -3712,7 +3717,7 @@ insert_with_table_hints
     : WITH '(' hint+=table_hint (','? hint+=table_hint)* ')'
     ;
 
-// Id runtime check. Id can be (FORCESCAN, HOLDLOCK, NOLOCK, NOWAIT, PAGLOCK, READCOMMITTED,
+// Id runtime check. Id can be (FORCESCAN, HOLDLOCK, NOHOLDLOCK, NOLOCK, NOWAIT, PAGLOCK, READCOMMITTED,
 // READCOMMITTEDLOCK, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, TABLOCK, TABLOCKX
 // UPDLOCK, XLOCK)
 table_hint
@@ -3723,6 +3728,7 @@ table_hint
                 | SNAPSHOT
                 | SPATIAL_WINDOW_MAX_CELLS '=' DECIMAL
                 | HOLDLOCK
+                | NOHOLDLOCK
                 | ID
                 )
     ;
@@ -4681,6 +4687,7 @@ keyword
 id_
     : ID
     | DOUBLE_QUOTE_ID
+    | DOUBLE_QUOTE_BLANK
     | SQUARE_BRACKET_ID
     | keyword
     ;
