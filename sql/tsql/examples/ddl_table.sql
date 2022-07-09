@@ -73,6 +73,28 @@ CREATE TABLE [dbo].[TestTable] (
   WITH (DATA_COMPRESSION = PAGE)
 GO
 
+-- Create Table with indices
+CREATE TABLE [dbo].[TestTable] (
+  Name NVARCHAR(64) NOT NULL,
+  K NVARCHAR(64) NOT NULL,
+  Value NVARCHAR(64) NOT NULL,
+  Guid NVARCHAR(64) NOT NULL,
+  index ix_name UNIQUE CLUSTERED (Name),
+  INDEX ix_k UNIQUE NONCLUSTERED (K),
+  INDEX ix_value NONCLUSTERED (Value),
+  INDEX ix_guid UNIQUE (Guid))
+GO
+
+-- Create Table with column store index
+CREATE TABLE [dbo].[TestTable] (
+  Name NVARCHAR(64) NOT NULL,
+  Value NVARCHAR(64) NOT NULL,
+  Guid NVARCHAR(64) NOT NULL,
+  index ix_store CLUSTERED COLUMNSTORE,
+  index ix_value_guid COLUMNSTORE (Value, Guid),
+  index ix_value_name NONCLUSTERED (Value, Name)
+)
+
 -- Drop Column
 IF EXISTS(SELECT * FROM sys.columns WHERE NAME = N'Name' AND Object_ID = Object_ID(N'dbo.TestTable'))
 BEGIN
