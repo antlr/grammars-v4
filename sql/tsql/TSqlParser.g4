@@ -29,14 +29,13 @@ options { tokenVocab=TSqlLexer; }
 
 tsql_file
     : batch* EOF
-    | execute_body_batch go_batch_statement* EOF
+    | execute_body_batch go_statement* EOF
     ;
 
 batch
-    : go_batch_statement
-    | execute_body_batch? (go_batch_statement | sql_clauses+) go_statement*
+    : go_statement
+    | execute_body_batch? (go_statement | sql_clauses+) go_statement*
     | batch_level_statement go_statement*
-    | go_statement
     ;
 
 batch_level_statement
@@ -2955,10 +2954,6 @@ transaction_statement
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188037.aspx
-go_batch_statement
-    : GO_BATCH (count=DECIMAL)?
-    ;
-
 go_statement
     : GO (count=DECIMAL)?
     ;
@@ -3082,11 +3077,12 @@ index_options
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms186869.aspx
-// Id runtime checking. Id in (PAD_INDEX, FILLFACTOR, IGNORE_DUP_KEY, STATISTICS_NORECOMPUTE, ALLOW_ROW_LOCKS,
-// ALLOW_PAGE_LOCKS, SORT_IN_TEMPDB, ONLINE, MAXDOP, DATA_COMPRESSION, ONLINE).
+// Id runtime checking. Id in (PAD_INDEX, IGNORE_DUP_KEY, STATISTICS_NORECOMPUTE, ALLOW_ROW_LOCKS,
+// ALLOW_PAGE_LOCKS, SORT_IN_TEMPDB, ONLINE, MAXDOP, DATA_COMPRESSION).
 index_option
     : (simple_id | keyword) '=' (simple_id | keyword | on_off | DECIMAL)
     | CLUSTERED COLUMNSTORE INDEX | HEAP
+    | FILLFACTOR '=' DECIMAL
     | DISTRIBUTION '=' HASH '(' id_ ')' | CLUSTERED INDEX '(' id_ (ASC | DESC)? (',' id_ (ASC | DESC)?)* ')'
     ;
 
@@ -3325,7 +3321,7 @@ for_clause
     ;
 
 xml_common_directives
-    : ',' (BINARY_BASE64 | TYPE | ROOT ('(' STRING ')')?)
+    : ',' (BINARY_KEYWORD BASE64 | TYPE | ROOT ('(' STRING ')')?)
     ;
 
 order_by_expression
@@ -3626,7 +3622,7 @@ built_in_functions
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/logical-functions-iif-transact-sql
     | IIF '(' cond=search_condition ',' left=expression ',' right=expression ')'   #IIF
     | STRING_AGG '(' expr=expression ',' separator=expression ')' (WITHIN GROUP '(' order_by_clause ')')?  #STRINGAGG
-    | REPLACE '(' input=STRING ',' replacing=STRING ',' with=STRING ')'   #REPLACE
+    | REPLACE '(' input=expression ',' replacing=expression ',' with=expression ')'   #REPLACE
     ;
 
 xml_data_type_methods
@@ -3637,7 +3633,7 @@ xml_data_type_methods
     ;
 
 value_method
-    : (loc_id=LOCAL_ID | value_id=id_ | eventdata=EVENTDATA | query=query_method | '(' subquery ')') '.' call=value_call
+    : (loc_id=LOCAL_ID | value_id=id_ | eventdata=EVENTDATA '(' ')'  | query=query_method | '(' subquery ')') '.' call=value_call
     ;
 
 value_call
@@ -4050,10 +4046,11 @@ sign
 keyword
     : ABSOLUTE
     | ACCENT_SENSITIVITY
+    | ACCESS
     | ACTION
     | ACTIVATION
     | ACTIVE
-    | ADD
+    | ADD   // ?
     | ADDRESS
     | AES_128
     | AES_192
@@ -4083,12 +4080,15 @@ keyword
     | AUTO_SHRINK
     | AUTO_UPDATE_STATISTICS
     | AUTO_UPDATE_STATISTICS_ASYNC
+    | AUTOGROW_ALL_FILES
+    | AUTOGROW_SINGLE_FILE
     | AVAILABILITY
     | AVG
     | BACKUP_PRIORITY
+    | BASE64
     | BEGIN_DIALOG
     | BIGINT
-    | BINARY_BASE64
+    | BINARY_KEYWORD
     | BINARY_CHECKSUM
     | BINDING
     | BLOB_STORAGE
@@ -4098,8 +4098,10 @@ keyword
     | CALLER
     | CAP_CPU_PERCENT
     | CAST
+    | TRY_CAST
     | CATALOG
     | CATCH
+    | CHANGE
     | CHANGE_RETENTION
     | CHANGE_TRACKING
     | CHECKSUM
@@ -4107,6 +4109,7 @@ keyword
     | CLEANUP
     | COLLECTION
     | COLUMN_MASTER_KEY
+    | COLUMNSTORE
     | COMMITTED
     | COMPATIBILITY_LEVEL
     | CONCAT
@@ -4122,6 +4125,7 @@ keyword
     | CREATION_DISPOSITION
     | CREDENTIAL
     | CRYPTOGRAPHIC
+    | CUME_DIST
     | CURSOR_CLOSE_ON_COMMIT
     | CURSOR_DEFAULT
     | DATA
@@ -4137,6 +4141,7 @@ keyword
     | DEFAULT_DOUBLE_QUOTE
     | DEFAULT_FULLTEXT_LANGUAGE
     | DEFAULT_LANGUAGE
+    | DEFINITION
     | DELAY
     | DELAYED_DURABILITY
     | DELETED
@@ -4151,7 +4156,6 @@ keyword
     | DISABLE
     | DISABLE_BROKER
     | DISABLED
-    | DISK_DRIVE
     | DOCUMENT
     | DYNAMIC
     | ELEMENTS
@@ -4177,9 +4181,9 @@ keyword
     | FAST_FORWARD
     | FILEGROUP
     | FILEGROWTH
+    | FILENAME
     | FILEPATH
     | FILESTREAM
-    | FILLFACTOR
     | FILTER
     | FIRST
     | FIRST_VALUE
@@ -4196,7 +4200,6 @@ keyword
     | GETUTCDATE
     | GLOBAL
     | GO
-    | GO_BATCH
     | GROUP_MAX_REQUESTS
     | GROUPING
     | GROUPING_ID
@@ -4280,6 +4283,7 @@ keyword
     | NEW_ACCOUNT
     | NEW_BROKER
     | NEW_PASSWORD
+    | NEWNAME
     | NEXT
     | NO
     | NO_TRUNCATE
@@ -4290,6 +4294,7 @@ keyword
     | NON_TRANSACTED_ACCESS
     | NORECOMPUTE
     | NORECOVERY
+    | NOTIFICATIONS
     | NOWAIT
     | NTILE
     | NUMANODE
@@ -4309,12 +4314,16 @@ keyword
     | OUTPUT
     | OVERRIDE
     | OWNER
+    | OWNERSHIP
     | PAGE_VERIFY
     | PARAMETERIZATION
     | PARTITION
     | PARTITIONS
     | PARTNER
     | PATH
+    | PERCENT_RANK
+    | PERCENTILE_CONT
+    | PERCENTILE_DISC
     | POISON_MESSAGE_HANDLING
     | POOL
     | PORT
@@ -4344,6 +4353,7 @@ keyword
     | READ_ONLY_ROUTING_LIST
     | READ_WRITE
     | READONLY
+    | READWRITE
     | REBUILD
     | RECEIVE
     | RECOMPILE
@@ -4355,6 +4365,7 @@ keyword
     | REMOVE
     | REORGANIZE
     | REPEATABLE
+    | REPLACE
     | REPLICA
     | REQUEST_MAX_CPU_TIME_SEC
     | REQUEST_MAX_MEMORY_GRANT_PERCENT
@@ -4383,6 +4394,7 @@ keyword
     | SECONDARY_ROLE
     | SECONDS
     | SECRET
+    | SECURABLES
     | SECURITY
     | SECURITY_LOG
     | SEEDING_MODE
@@ -4415,6 +4427,7 @@ keyword
     | STRING_AGG
     | STUFF
     | SUBJECT
+    | SUBSCRIBE
     | SUBSCRIPTION
     | SUM
     | SUSPEND
@@ -4433,6 +4446,7 @@ keyword
     | TIMER
     | TINYINT
     | TORN_PAGE_DETECTION
+    | TRACKING
     | TRANSFORM_NOISE_WORDS
     | TRIPLE_DES
     | TRIPLE_DES_3KEY
@@ -4446,12 +4460,14 @@ keyword
     | UNCOMMITTED
     | UNKNOWN
     | UNLIMITED
+    | UNMASK
     | UOW
     | USING
     | VALID_XML
     | VALIDATION
     | VALUE
     | VAR
+    | VARBINARY_KEYWORD
     | VARP
     | VIEW_METADATA
     | VIEWS
@@ -4465,7 +4481,11 @@ keyword
     | XMLNAMESPACES
     | XMLSCHEMA
     | XSINIL
+    | ZONE
+//More keywords that can also be used as IDs
+    | ABORT_AFTER_WAIT
     | ABSENT
+    | ADMINISTER
     | AES
     | ALLOW_CONNECTIONS
     | ALLOW_MULTIPLE_EVENT_LOSS
@@ -4475,12 +4495,14 @@ keyword
     | APPLICATION
     | ASYMMETRIC
     | ASYNCHRONOUS_COMMIT
+    | AUTHENTICATE
     | AUTHENTICATION
     | AUTOMATED_BACKUP_PREFERENCE
     | AUTOMATIC
     | AVAILABILITY_MODE
     | BEFORE
     | BLOCK
+    | BLOCKERS
     | BLOCKSIZE
     | BLOCKING_HIERARCHY
     | BUFFER
@@ -4495,6 +4517,8 @@ keyword
     | CLASSIFIER_FUNCTION
     | CLUSTER
     | COMPRESSION
+    | CONNECT
+    | CONNECTION
     | CONFIGURATION
     | CONTAINMENT
     | CONTEXT
@@ -4503,11 +4527,12 @@ keyword
     | CONTRACT_NAME
     | CONVERSATION
     | COPY_ONLY
-    | CUME_DIST
     | CYCLE
     | DATA_COMPRESSION
     | DATA_SOURCE
     | DATABASE_MIRRORING
+    | DATASPACE
+    | DDL
     | DEFAULT_DATABASE
     | DEFAULT_SCHEMA
     | DIAGNOSTICS
@@ -4528,7 +4553,6 @@ keyword
     | FAILURECONDITIONLEVEL
     | FAN_IN
     | FILE_SNAPSHOT
-    | FILENAME
     | FORCESEEK
     | FORCE_SERVICE_ALLOW_DATA_LOSS
     | GET
@@ -4540,6 +4564,7 @@ keyword
     | GOVERNOR
     | HASHED
     | HEALTHCHECKTIMEOUT
+    | HEAP
     | HIERARCHYID
     | IIF
     | IO
@@ -4556,17 +4581,20 @@ keyword
     | LANGUAGE
     | LIBRARY
     | LIFETIME
+    | LINKED
     | LINUX
     | LISTENER_IP
     | LISTENER_PORT
     | LOCAL_SERVICE_NAME
     | LOG
+    | MASK
     | MATCHED
     | MASTER
     | MAX_MEMORY
     | MAXTRANSFER
     | MAXVALUE
     | MAX_DISPATCH_LATENCY
+    | MAX_DURATION
     | MAX_EVENT_SIZE
     | MAX_SIZE
     | MAX_OUTSTANDING_IO_PER_VOLUME
@@ -4592,6 +4620,7 @@ keyword
     | NTLM
     | OLD_PASSWORD
     | ON_FAILURE
+    | OPERATIONS
     | PAGE
     | PARAM_NODE
     | PARTIAL
@@ -4600,9 +4629,6 @@ keyword
     | PER_CPU
     | PER_DB
     | PER_NODE
-    | PERCENTILE_CONT
-    | PERCENTILE_DISC
-    | PERCENT_RANK
     | PERSISTED
     | PLATFORM
     | POLICY
@@ -4618,6 +4644,7 @@ keyword
     | REPLICATE
     | REQUIRED
     | RESET
+    | RESOURCES
     | RESTART
     | RESUME
     | RETAINDAYS
@@ -4634,17 +4661,21 @@ keyword
     | SAFE
     | SCHEDULER
     | SCHEME
+    | SCRIPT
     | SERVER
     | SERVICE
     | SERVICE_BROKER
     | SERVICE_NAME
     | SESSION
+    | SETTINGS
+    | SHRINKLOG
     | SID
     | SKIP_KEYWORD
     | SOFTNUMA
     | SOURCE
     | SPECIFICATION
     | SPLIT
+    | SQL
     | SQLDUMPERFLAGS
     | SQLDUMPERPATH
     | SQLDUMPERTIMEOUT
@@ -4657,13 +4688,14 @@ keyword
     | STOPPED
     | STOP_ON_ERROR
     | SUPPORTED
+    | SWITCH
     | TAPE
     | TARGET
     | TCP
     | TOSTRING
+    | TRACE
     | TRACK_CAUSALITY
     | TRANSFER
-    | TRY_CAST
     | UNCHECKED
     | UNLOCK
     | UNSAFE
@@ -4671,15 +4703,14 @@ keyword
     | USED
     | VERBOSELOGGING
     | VISIBILITY
+    | WAIT_AT_LOW_PRIORITY
     | WINDOWS
     | WITHOUT
     | WITNESS
-    | ZONE
+    | XACT_ABORT
     //Build-ins:
     | VARCHAR
     | NVARCHAR
-    | BINARY_KEYWORD
-    | VARBINARY_KEYWORD
     | PRECISION //For some reason this is possible to use as ID
     ;
 
