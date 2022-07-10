@@ -3622,7 +3622,7 @@ built_in_functions
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/logical-functions-iif-transact-sql
     | IIF '(' cond=search_condition ',' left=expression ',' right=expression ')'   #IIF
     | STRING_AGG '(' expr=expression ',' separator=expression ')' (WITHIN GROUP '(' order_by_clause ')')?  #STRINGAGG
-    | REPLACE '(' input=STRING ',' replacing=STRING ',' with=STRING ')'   #REPLACE
+    | REPLACE '(' input=expression ',' replacing=expression ',' with=expression ')'   #REPLACE
     ;
 
 xml_data_type_methods
@@ -4365,6 +4365,7 @@ keyword
     | REMOVE
     | REORGANIZE
     | REPEATABLE
+    | REPLACE
     | REPLICA
     | REQUEST_MAX_CPU_TIME_SEC
     | REQUEST_MAX_MEMORY_GRANT_PERCENT
