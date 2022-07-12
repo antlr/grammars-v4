@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>filter_</entryPoint>
+					<entryPoint>file_</entryPoint>
 					<grammarName>filter</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
