@@ -4179,7 +4179,7 @@ send_conversation
 // TODO: implement runtime check or add new tokens.
 
 data_type
-    : scaled=(VARCHAR | NVARCHAR | BINARY_KEYWORD | VARBINARY_KEYWORD) '(' MAX ')'
+    : scaled=(VARCHAR | NVARCHAR | BINARY_KEYWORD | VARBINARY_KEYWORD | SQUARE_BRACKET_ID) '(' MAX ')'
     | ext_type=id_ '(' scale=DECIMAL ',' prec=DECIMAL ')'
     | ext_type=id_ '(' scale=DECIMAL ')'
     | ext_type=id_ IDENTITY ('(' seed=DECIMAL ',' inc=DECIMAL ')')?
