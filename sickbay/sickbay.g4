@@ -32,19 +32,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar sickbay;
 
 sickbay
-   : line*
+   : line* EOF
    ;
 
 line
-   : intExpr stmt (':' stmt)* NL
+   : intExpr stmt ';'? (':' stmt)* NL
    ;
 
 stmt
-   : ('REM' ARBTEXT)
+   : REM
    | ('LET' intVar '=' intExpr)
    | ('GOTO' INTCONST)
    | ('GOSUB' INTCONST)
    | ('RETURN' | 'END')
+   | ('PRINT' (STRCONST | intExpr | intVar))
    | ('PROLONG' INTCONST)
    | ('CUTSHORT')
    | ('DIM' 'RING' '(' intExpr ')')
@@ -70,7 +71,7 @@ INTOP
    ;
 
 IINTID
-   : [A-Z] [A-Z0-9%]
+   : [A-Z] [A-Z0-9%]*
    ;
 
 INTCONST
@@ -81,15 +82,15 @@ STRCONST
    : '"' ~ '"'* '"'
    ;
 
-ARBTEXT
-   : ~ '\n'*
-   ;
-
 NL
    : [\r\n]
    ;
 
 WS
    : [ \t\r\n] -> skip
+   ;
+
+REM
+   : 'REM' ([ \t]+) ~'\n'*
    ;
 
