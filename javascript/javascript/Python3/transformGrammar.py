@@ -27,8 +27,10 @@ if __name__ == "__main__":
             output_file.flush()
     elif file_name.lower() == "javascriptlexer.g4":
         for x in input_file:
-            if '!this.IsStrictMode' in x:
-                x = x.replace('!this.Is', 'not self.is')
+            if '!this.' in x:
+                x = x.replace('!this.', 'not self.')
+            if 'this.' in x:
+                x = x.replace('this.', 'self.')
             output_file.write(x)
             output_file.flush()
 
