@@ -31,7 +31,7 @@ parser grammar ScssParser;
 options { tokenVocab=ScssLexer; }
 
 stylesheet
-  : statement*
+  : statement* EOF
   ;
 
 statement

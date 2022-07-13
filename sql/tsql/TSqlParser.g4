@@ -446,7 +446,7 @@ client_assembly_specifier
 
 assembly_option
     : PERMISSION_SET EQUAL (SAFE|EXTERNAL_ACCESS|UNSAFE)
-    | VISIBILITY EQUAL (ON | OFF)
+    | VISIBILITY EQUAL on_off
     | UNCHECKED DATA
     | assembly_option COMMA
     ;
@@ -1725,13 +1725,13 @@ create_queue
 
 queue_settings
     : WITH
-       (STATUS EQUAL (ON | OFF) COMMA?)?
-       (RETENTION EQUAL (ON | OFF) COMMA?)?
+       (STATUS EQUAL on_off COMMA?)?
+       (RETENTION EQUAL on_off COMMA?)?
        (ACTIVATION
          LR_BRACKET
            (
              (
-              (STATUS EQUAL (ON | OFF) COMMA? )?
+              (STATUS EQUAL on_off COMMA? )?
               (PROCEDURE_NAME EQUAL func_proc_name_database_schema COMMA?)?
               (MAX_QUEUE_READERS EQUAL max_readers=DECIMAL COMMA?)?
               (EXECUTE AS (SELF | user_name=STRING | OWNER) COMMA?)?
@@ -1742,7 +1742,7 @@ queue_settings
        )?
        (POISON_MESSAGE_HANDLING
          LR_BRACKET
-           (STATUS EQUAL (ON | OFF))
+           (STATUS EQUAL on_off)
          RR_BRACKET
        )?
     ;
@@ -1754,7 +1754,7 @@ alter_queue
 
 queue_action
     : REBUILD ( WITH LR_BRACKET queue_rebuild_options RR_BRACKET)?
-    | REORGANIZE (WITH LOB_COMPACTION EQUAL (ON | OFF))?
+    | REORGANIZE (WITH LOB_COMPACTION EQUAL on_off)?
     | MOVE TO (id_ | DEFAULT)
     ;
 queue_rebuild_options
@@ -1919,32 +1919,136 @@ create_index
     : CREATE UNIQUE? clustered? INDEX id_ ON table_name '(' column_name_list_with_order ')'
     (INCLUDE '(' column_name_list ')' )?
     (WHERE where=search_condition)?
-    (index_options)?
+    (create_index_options)?
     (ON id_)?
     ';'?
     ;
 
+create_index_options
+    : 'WITH' '(' relational_index_option (',' relational_index_option)* ')'
+    ;
+
+relational_index_option
+    : rebuild_index_option
+    | DROP_EXISTING '=' on_off
+    | OPTIMIZE_FOR_SEQUENTIAL_KEY '=' on_off
+    ;
+
+// https://docs.microsoft.com/en-us/sql/t-sql/statements/alter-index-transact-sql
 alter_index
-    : ALTER INDEX id_ ON table_name (DISABLE | PAUSE | ABORT | rebuild_partition)
+    : ALTER INDEX (id_ | ALL) ON table_name (DISABLE | PAUSE | ABORT | RESUME resumable_index_options? | reorganize_partition | set_index_options | rebuild_partition)
+    ;
+
+resumable_index_options
+    : WITH '(' (resumable_index_option (',' resumable_index_option)*) ')'
+    ;
+
+resumable_index_option
+    : MAXDOP '=' max_degree_of_parallelism=DECIMAL
+    | MAX_DURATION '=' max_duration=DECIMAL MINUTES?
+    | low_priority_lock_wait
+    ;
+
+reorganize_partition
+    : REORGANIZE (PARTITION '=' DECIMAL)? reorganize_options?
+    ;
+
+reorganize_options
+    : WITH '(' (reorganize_option (',' reorganize_option)*) ')'
+    ;
+
+reorganize_option
+    : LOB_COMPACTION '=' on_off
+    | COMPRESS_ALL_ROW_GROUPS '=' on_off
+    ;
+
+set_index_options
+    : SET '(' set_index_option (',' set_index_option)* ')'
+    ;
+
+set_index_option
+    : ALLOW_ROW_LOCKS '=' on_off
+    | ALLOW_PAGE_LOCKS '=' on_off
+    | OPTIMIZE_FOR_SEQUENTIAL_KEY '=' on_off
+    | IGNORE_DUP_KEY '=' on_off
+    | STATISTICS_NORECOMPUTE '=' on_off
+    | COMPRESSION_DELAY '=' delay=DECIMAL MINUTES?
     ;
 
 rebuild_partition
-    : REBUILD (PARTITION '=' ALL)? index_options?
+    : REBUILD (PARTITION '=' ALL)? rebuild_index_options?
+    | REBUILD PARTITION '=' DECIMAL single_partition_rebuild_index_options?
+    ;
+
+rebuild_index_options
+    : WITH '(' rebuild_index_option (',' rebuild_index_option)* ')'
+    ;
+
+rebuild_index_option
+    : PAD_INDEX '=' on_off
+    | FILLFACTOR '=' DECIMAL
+    | SORT_IN_TEMPDB '=' on_off
+    | IGNORE_DUP_KEY '=' on_off
+    | STATISTICS_NORECOMPUTE '=' on_off
+    | STATISTICS_INCREMENTAL '=' on_off
+    | ONLINE '=' (ON ('(' low_priority_lock_wait ')')? | OFF)
+    | RESUMABLE '=' on_off
+    | MAX_DURATION '=' times=DECIMAL MINUTES?
+    | ALLOW_ROW_LOCKS '=' on_off
+    | ALLOW_PAGE_LOCKS '=' on_off
+    | MAXDOP '=' max_degree_of_parallelism=DECIMAL
+    | DATA_COMPRESSION '=' (NONE | ROW | PAGE | COLUMNSTORE | COLUMNSTORE_ARCHIVE)
+        on_partitions?
+    | XML_COMPRESSION '=' on_off
+        on_partitions?
+    ;
+
+single_partition_rebuild_index_options
+    : WITH '(' single_partition_rebuild_index_option (',' single_partition_rebuild_index_option)* ')'
+    ;
+
+single_partition_rebuild_index_option
+    : SORT_IN_TEMPDB '=' on_off
+    | MAXDOP '=' max_degree_of_parallelism=DECIMAL
+    | RESUMABLE '=' on_off
+    | DATA_COMPRESSION '=' (NONE | ROW | PAGE | COLUMNSTORE | COLUMNSTORE_ARCHIVE)
+        on_partitions?
+    | XML_COMPRESSION '=' on_off
+        on_partitions?
+    | ONLINE '=' (ON ('(' low_priority_lock_wait ')')? | OFF)
+    ;
+
+on_partitions
+    : ON PARTITIONS '(' partition_number=DECIMAL ( 'TO' to_partition_number=DECIMAL )? ')'
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
 create_columnstore_index
-    : CREATE (CLUSTERED | NONCLUSTERED?) COLUMNSTORE INDEX id_ ON table_name
-    index_options?
+    : CREATE CLUSTERED COLUMNSTORE INDEX id_ ON table_name
+    create_columnstore_index_options?
     (ON id_)?
     ';'?
+    ;
+
+create_columnstore_index_options
+    : 'WITH' '(' columnstore_index_option (',' columnstore_index_option)* ')'
+    ;
+
+columnstore_index_option
+    :
+      DROP_EXISTING '=' on_off
+    | MAXDOP '=' max_degree_of_parallelism=DECIMAL
+    | ONLINE '=' on_off
+    | COMPRESSION_DELAY '=' delay=DECIMAL MINUTES?
+    | DATA_COMPRESSION '=' (COLUMNSTORE | COLUMNSTORE_ARCHIVE)
+        on_partitions?
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
 create_nonclustered_columnstore_index
     : CREATE NONCLUSTERED? COLUMNSTORE INDEX id_ ON table_name '(' column_name_list_with_order ')'
     (WHERE search_condition)?
-    index_options?
+    create_columnstore_index_options?
     (ON id_)?
     ';'?
     ;
@@ -1952,9 +2056,27 @@ create_nonclustered_columnstore_index
 create_xml_index
     : CREATE PRIMARY? XML INDEX id_ ON table_name '(' id_ ')'
     (USING XML INDEX id_ (FOR (VALUE | PATH | PROPERTY)?)?)?
-    index_options?
+    xml_index_options?
     ';'?
     ;
+
+xml_index_options
+    : 'WITH' '(' xml_index_option (',' xml_index_option)* ')'
+    ;
+
+xml_index_option
+    : PAD_INDEX '=' on_off
+    | FILLFACTOR '=' DECIMAL
+    | SORT_IN_TEMPDB '=' on_off
+    | IGNORE_DUP_KEY '=' on_off
+    | DROP_EXISTING '=' on_off
+    | ONLINE '=' (ON ('(' low_priority_lock_wait ')')? | OFF)
+    | ALLOW_ROW_LOCKS '=' on_off
+    | ALLOW_PAGE_LOCKS '=' on_off
+    | MAXDOP '=' max_degree_of_parallelism=DECIMAL
+    | XML_COMPRESSION '=' on_off
+    ;
+
 
 // https://msdn.microsoft.com/en-us/library/ms187926(v=sql.120).aspx
 create_or_alter_procedure
@@ -2074,13 +2196,45 @@ create_table
     ;
 
 table_indices
-    : INDEX id_  (UNIQUE | CLUSTERED | NONCLUSTERED)? '(' column_name_list_with_order ')'
-    index_options?
+    : INDEX id_  UNIQUE? clustered? '(' column_name_list_with_order ')'
+    | INDEX id_ CLUSTERED COLUMNSTORE
+    | INDEX id_ NONCLUSTERED? COLUMNSTORE '(' column_name_list ')'
+    create_table_index_options?
     (ON id_)?
     ;
 
 table_options
-    : WITH ('(' index_option (',' index_option)* ')' | index_option (',' index_option)*)
+    : WITH ('(' table_option (',' table_option)* ')' | table_option (',' table_option)*)
+    ;
+
+table_option
+    : (simple_id | keyword) '=' (simple_id | keyword | on_off | DECIMAL)
+    | CLUSTERED COLUMNSTORE INDEX | HEAP
+    | FILLFACTOR '=' DECIMAL
+    | DISTRIBUTION '=' HASH '(' id_ ')' | CLUSTERED INDEX '(' id_ (ASC | DESC)? (',' id_ (ASC | DESC)?)* ')'
+    | DATA_COMPRESSION '=' (NONE | ROW | PAGE)
+        on_partitions?
+    | XML_COMPRESSION '=' on_off
+        on_partitions?
+    ;
+
+create_table_index_options
+    : WITH '(' create_table_index_option ( ',' create_table_index_option)* ')'
+    ;
+
+create_table_index_option
+    : PAD_INDEX '=' on_off
+    | FILLFACTOR '=' DECIMAL
+    | IGNORE_DUP_KEY '=' on_off
+    | STATISTICS_NORECOMPUTE '=' on_off
+    | STATISTICS_INCREMENTAL '=' on_off
+    | ALLOW_ROW_LOCKS '=' on_off
+    | ALLOW_PAGE_LOCKS '=' on_off
+    | OPTIMIZE_FOR_SEQUENTIAL_KEY '=' on_off
+    | DATA_COMPRESSION '=' (NONE | ROW | PAGE | COLUMNSTORE | COLUMNSTORE_ARCHIVE)
+        on_partitions?
+    | XML_COMPRESSION '=' on_off
+        on_partitions?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187956.aspx
@@ -2740,7 +2894,7 @@ principal_id:
 create_certificate
     : CREATE CERTIFICATE certificate_name=id_ (AUTHORIZATION user_name=id_)?
       (FROM existing_keys | generate_new_keys)
-      (ACTIVE FOR BEGIN DIALOG '=' (ON | OFF))?
+      (ACTIVE FOR BEGIN DIALOG '=' on_off)?
     ;
 
 existing_keys
@@ -3049,7 +3203,7 @@ materialized_column_definition
 // https://msdn.microsoft.com/en-us/library/ms186712.aspx
 column_constraint
     :(CONSTRAINT constraint=id_)?
-      ((PRIMARY KEY | UNIQUE) clustered? index_options?
+      ((PRIMARY KEY | UNIQUE) clustered? alter_table_index_options?
       | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
       | (FOREIGN KEY)? REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?
       | null_notnull)
@@ -3058,7 +3212,7 @@ column_constraint
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
 table_constraint
     : (CONSTRAINT constraint=id_)?
-       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list_with_order ')' index_options? (ON id_)?
+       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list_with_order ')' alter_table_index_options? (ON id_)?
          | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
          | DEFAULT '('?  ((STRING | PLUS | function_call | DECIMAL)+ | NEXT VALUE FOR table_name) ')'? FOR id_
          | FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name ('(' pk = column_name_list')')? on_delete? on_update?)
@@ -3072,18 +3226,29 @@ on_update
     : ON UPDATE (NO ACTION | CASCADE | SET NULL_ | SET DEFAULT)
     ;
 
-index_options
-    : WITH '(' index_option (',' index_option)* ')'
+alter_table_index_options
+    : WITH '(' alter_table_index_option (',' alter_table_index_option)* ')'
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms186869.aspx
-// Id runtime checking. Id in (PAD_INDEX, IGNORE_DUP_KEY, STATISTICS_NORECOMPUTE, ALLOW_ROW_LOCKS,
-// ALLOW_PAGE_LOCKS, SORT_IN_TEMPDB, ONLINE, MAXDOP, DATA_COMPRESSION).
-index_option
-    : (simple_id | keyword) '=' (simple_id | keyword | on_off | DECIMAL)
-    | CLUSTERED COLUMNSTORE INDEX | HEAP
+alter_table_index_option
+    : PAD_INDEX '=' on_off
     | FILLFACTOR '=' DECIMAL
+    | IGNORE_DUP_KEY '=' on_off
+    | STATISTICS_NORECOMPUTE '=' on_off
+    | ALLOW_ROW_LOCKS '=' on_off
+    | ALLOW_PAGE_LOCKS '=' on_off
+    | OPTIMIZE_FOR_SEQUENTIAL_KEY '=' on_off
+    | SORT_IN_TEMPDB '=' on_off
+    | MAXDOP '=' max_degree_of_parallelism=DECIMAL
+    | DATA_COMPRESSION '=' (NONE | ROW | PAGE | COLUMNSTORE | COLUMNSTORE_ARCHIVE)
+        on_partitions?
+    | XML_COMPRESSION '=' on_off
+        on_partitions?
     | DISTRIBUTION '=' HASH '(' id_ ')' | CLUSTERED INDEX '(' id_ (ASC | DESC)? (',' id_ (ASC | DESC)?)* ')'
+    | ONLINE '=' (ON ('(' low_priority_lock_wait ')')? | OFF)
+    | RESUMABLE '=' on_off
+    | MAX_DURATION '=' times=DECIMAL MINUTES?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms180169.aspx
@@ -3973,7 +4138,7 @@ begin_conversation_dialog
       (WITH
         ((RELATED_CONVERSATION | RELATED_CONVERSATION_GROUP) '=' LOCAL_ID ','?)?
         (LIFETIME '=' (DECIMAL | LOCAL_ID) ','?)?
-        (ENCRYPTION '=' (ON | OFF))? )?
+        (ENCRYPTION '=' on_off)? )?
       ';'?
     ;
 
@@ -4014,7 +4179,7 @@ send_conversation
 // TODO: implement runtime check or add new tokens.
 
 data_type
-    : scaled=(VARCHAR | NVARCHAR | BINARY_KEYWORD | VARBINARY_KEYWORD) '(' MAX ')'
+    : scaled=(VARCHAR | NVARCHAR | BINARY_KEYWORD | VARBINARY_KEYWORD | SQUARE_BRACKET_ID) '(' MAX ')'
     | ext_type=id_ '(' scale=DECIMAL ',' prec=DECIMAL ')'
     | ext_type=id_ '(' scale=DECIMAL ')'
     | ext_type=id_ IDENTITY ('(' seed=DECIMAL ',' inc=DECIMAL ')')?
@@ -4044,7 +4209,8 @@ sign
     ;
 
 keyword
-    : ABSOLUTE
+    : ABORT
+    | ABSOLUTE
     | ACCENT_SENSITIVITY
     | ACCESS
     | ACTION
@@ -4060,6 +4226,8 @@ keyword
     | AGGREGATE
     | ALGORITHM
     | ALLOW_ENCRYPTED_VALUE_MODIFICATIONS
+    | ALLOW_PAGE_LOCKS
+    | ALLOW_ROW_LOCKS
     | ALLOW_SNAPSHOT_ISOLATION
     | ALLOWED
     | ANSI_NULL_DEFAULT
@@ -4110,8 +4278,11 @@ keyword
     | COLLECTION
     | COLUMN_MASTER_KEY
     | COLUMNSTORE
+    | COLUMNSTORE_ARCHIVE
     | COMMITTED
     | COMPATIBILITY_LEVEL
+    | COMPRESS_ALL_ROW_GROUPS
+    | COMPRESSION_DELAY
     | CONCAT
     | CONCAT_NULL_YIELDS_NULL
     | CONTENT
@@ -4157,6 +4328,7 @@ keyword
     | DISABLE_BROKER
     | DISABLED
     | DOCUMENT
+    | DROP_EXISTING
     | DYNAMIC
     | ELEMENTS
     | EMERGENCY
@@ -4210,6 +4382,7 @@ keyword
     | HONOR_BROKER_PRIORITY
     | HOURS
     | IDENTITY_VALUE
+    | IGNORE_DUP_KEY
     | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
     | IMMEDIATE
     | IMPERSONATE
@@ -4310,17 +4483,20 @@ keyword
     | OPENJSON
     | OPTIMISTIC
     | OPTIMIZE
+    | OPTIMIZE_FOR_SEQUENTIAL_KEY
     | OUT
     | OUTPUT
     | OVERRIDE
     | OWNER
     | OWNERSHIP
+    | PAD_INDEX
     | PAGE_VERIFY
     | PARAMETERIZATION
     | PARTITION
     | PARTITIONS
     | PARTNER
     | PATH
+    | PAUSE
     | PERCENT_RANK
     | PERCENTILE_CONT
     | PERCENTILE_DISC
@@ -4375,6 +4551,7 @@ keyword
     | RESOURCE
     | RESOURCE_MANAGER_LOCATION
     | RESTRICTED_USER
+    | RESUMABLE
     | RETENTION
     | ROBUST
     | ROOT
@@ -4414,10 +4591,13 @@ keyword
     | SIZE
     | SMALLINT
     | SNAPSHOT
+    | SORT_IN_TEMPDB
     | SPATIAL_WINDOW_MAX_CELLS
     | STANDBY
     | START_DATE
     | STATIC
+    | STATISTICS_INCREMENTAL
+    | STATISTICS_NORECOMPUTE
     | STATS_STREAM
     | STATUS
     | STATUSONLY
@@ -4477,6 +4657,7 @@ keyword
     | WORK
     | WORKLOAD
     | XML
+    | XML_COMPRESSION
     | XMLDATA
     | XMLNAMESPACES
     | XMLSCHEMA

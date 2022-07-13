@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar muddb;
 
 db
-   : room* END
+   : room* END EOL* EOF
    ;
 
 room
@@ -133,5 +133,5 @@ STRING
 
 
 EOL
-   : '\r'? '\n'
+   : ('\r' '\n' | '\n' | '\r')
    ;
