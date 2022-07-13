@@ -35,7 +35,7 @@
 grammar GraphQL;
 
 //https://spec.graphql.org/June2018/#sec-Language.Document
-document: definition+;
+document: definition+ EOF;
 
 definition:
 	executableDefinition

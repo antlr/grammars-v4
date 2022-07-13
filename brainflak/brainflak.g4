@@ -29,7 +29,7 @@
 grammar brainflak;
 
 file_
-   : statement+
+   : statement+ EOF
    ;
 
 statement

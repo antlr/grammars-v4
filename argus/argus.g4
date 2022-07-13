@@ -31,6 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar argus;
 
+file_
+   : module EOF
+   ;
+
 module
    : equate* equates_
    | equate* guardian

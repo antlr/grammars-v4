@@ -4,7 +4,7 @@ parser grammar SHARCParser;
 options { tokenVocab=SHARCLexer; }
 
 prog
-   : ( statement SEMICOLON )+
+   : ( statement SEMICOLON )+ EOF
    ;
 
 statement

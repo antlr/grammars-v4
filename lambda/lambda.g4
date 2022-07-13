@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar lambda;
 
+file_ : expression EOF ;
+
 expression
     : VARIABLE | function_ | application
     ;

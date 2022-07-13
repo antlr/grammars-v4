@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>proposition</entryPoint>
+					<entryPoint>file_</entryPoint>
 					<grammarName>ltl</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

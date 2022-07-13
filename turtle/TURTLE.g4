@@ -22,7 +22,7 @@
 grammar TURTLE;
 
 turtleDoc
-   : statement*
+   : statement* EOF
    ;
 
 statement

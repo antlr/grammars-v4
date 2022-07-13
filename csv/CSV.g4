@@ -28,7 +28,8 @@
 
 grammar CSV;
 
-csvFile: hdr row+ ;
+csvFile: hdr row+ EOF ;
+
 hdr : row ;
 
 row : field (',' field)* '\r'? '\n' ;

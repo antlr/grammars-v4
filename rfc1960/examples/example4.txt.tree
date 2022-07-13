@@ -1,1 +1,1 @@
-(filter_ ( (filtercomp (item (substring (attr o) = (initial (value univ)) (any_ * (starval (value of) * (starval (value mich) *)))))) ))
+(file_ (filter_ ( (filtercomp (item (substring (attr o) = (initial (value univ)) (any_ * (starval (value of) * (starval (value mich) *)))))) )) <EOF>)
