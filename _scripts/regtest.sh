@@ -201,6 +201,10 @@ part2()
     # 2) Build driver code.
     echo "Building."
     date
+    if [[ -f transformGrammar.py ]]
+    then
+        python3 transformGrammar.py
+    fi
     case "$target" in
         CSharp) build_file_type="Test.csproj" ;;
         *) build_file_type="makefile" ;;

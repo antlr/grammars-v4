@@ -33,7 +33,6 @@ infosapient
 java/java9
 javadoc
 javascript/ecmascript
-javascript/javascript
 javascript/jsx
 javascript/typescript
 joss
