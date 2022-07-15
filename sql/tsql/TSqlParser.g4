@@ -3788,6 +3788,8 @@ built_in_functions
     | IIF '(' cond=search_condition ',' left=expression ',' right=expression ')'   #IIF
     | STRING_AGG '(' expr=expression ',' separator=expression ')' (WITHIN GROUP '(' order_by_clause ')')?  #STRINGAGG
     | REPLACE '(' input=expression ',' replacing=expression ',' with=expression ')'   #REPLACE
+    // https://docs.microsoft.com/ru-ru/sql/t-sql/functions/trim-transact-sql?view=sql-server-ver16
+    | TRIM '(' (characters=expression FROM)? string=expression ')'   #TRIM
     ;
 
 xml_data_type_methods
