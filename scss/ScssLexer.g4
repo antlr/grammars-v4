@@ -67,7 +67,16 @@ fragment Nmchar
 // BadUri :
 
 Comment
+    : LineComment
+    | MultiLineComment
+    ;
+
+MultiLineComment
     : '/*' ~'*'* '*'+ ( ~[/*] ~'*'* '*'+ )* '/'
+    ;
+
+LineComment
+    :   '//' ~([\n\r\u2028\u2029])*
     ;
 
 fragment Name
@@ -313,6 +322,10 @@ Hash
 
 Import
     : '@' I M P O R T
+    ;
+
+Include
+    : '@' I N C L U D E
     ;
 
 Use
@@ -563,6 +576,14 @@ Dollar
     : '$'
     ;
 
+True
+    : T R U E
+    ;
+
+False
+    : F A L S E
+    ;
+
 // https://www.w3.org/TR/css-fonts-3/#font-face-rule
 FontFace
     : '@' F O N T DashChar F A C E
@@ -571,6 +592,10 @@ FontFace
 // https://www.w3.org/TR/css3-conditional/
 Supports
     : '@' S U P P O R T S
+    ;
+
+Forward
+    : '@' F O R W A R D
     ;
 
 Or
