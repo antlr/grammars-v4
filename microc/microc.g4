@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar microc;
 
 program
-   : statement+
+   : statement+ EOF
    ;
 
 statement

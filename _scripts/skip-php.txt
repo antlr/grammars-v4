@@ -15,6 +15,7 @@ csharp
 css3
 cto
 dart2
+databank
 fortran77
 gdscript
 golang

@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar asmZ80;
 
 prog
-   : (line? EOL) +
+   : (line? EOL) + EOF
    ;
 
 line

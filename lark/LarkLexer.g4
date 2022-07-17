@@ -24,15 +24,14 @@ OP: [+*] | '?' ;
 RULE: '!'? [_?]? [a-z] [_a-z0-9]* ;
 TOKEN: '_'? [A-Z] [_A-Z0-9]* ;
 STRING: FSTRING 'i'? ;
-REGEXP: '/' ('\\' '/' | '\\' '\\' | ~'/' )*? '/' [imslux]* ;
+REGEXP: '/' ('\\' '/' | '\\' '\\' | ~'/' ) ('\\' '/' | '\\' '\\' | ~'/' )*? '/' [imslux]* ;
 NL: ('\r'? '\n')+ (' '| '\t' | '\n' | '\r' | '\f' | 'u2B7F' )*  -> channel(OFF_CHANNEL) ;
 
 //
 // Strings
 //
-fragment STRING_INNER: (~'"')*? ;
-fragment STRING_ESC_INNER: STRING_INNER ;
-fragment FSTRING : '"' STRING_ESC_INNER '"' ;
+fragment FSTRING : '"' (~["\\\r\n] | EscapeSequence)* '"';
+fragment EscapeSequence : '\\' [btnfr"'\\] ;
 
 //
 // Numbers
@@ -47,5 +46,5 @@ NUMBER: ('+' | '-')? INT ;
 //
 WS_INLINE: (' ' | '\t')+ -> channel(OFF_CHANNEL) ;
 
-COMMENT: '//' (~'\n')* -> channel(OFF_CHANNEL) ;
+COMMENT: '//' ~[\n\r]* -> channel(OFF_CHANNEL) ;
 

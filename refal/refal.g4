@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar refal;
 
+file_ : program EOF;
+
 program
    : f_definition (';'? program)?
    | external_decl ';' program

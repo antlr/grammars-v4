@@ -9,9 +9,7 @@ grammar WavefrontOBJ;
 // PARSER RULES
 
 start
-    : ( NL* statement )
-      ( NL+ statement )*
-      NL*
+    : NL* (statement (NL+ | EOF))+
     ;
 
 statement
@@ -102,7 +100,7 @@ basis_matrix : 'bmat' ( 'u' | 'v' ) decimal+;
 //   curves and surfaces that use a basis matrix.
 // - `v` is the step size in the v direction. It is required only for
 //   surfaces that use a basis matrix.
-step : u=INTEGER v=INTEGER?;
+step : 'step' u=INTEGER v=INTEGER?;
 
 
 // Elements
@@ -421,7 +419,7 @@ DECIMAL : INTEGER ( '.' DIGIT* )?;
 
 fragment DIGIT : '0' .. '9';
 
-COMMENT : '#' NON_NL* NL -> skip;
+COMMENT : '#' NON_NL* (NL|EOF) -> skip;
 
 // Names of identifiers specified in this file format and other related formats.
 // Possibly more lenient than desired. Officially, for example,
@@ -435,3 +433,5 @@ WS : ( ' ' | '\t' | '\\' NL )+ -> skip;
 NL : ( '\r' '\n'? | '\n' );
 NON_NL : ~[\r\n];
 NON_WS : ( ~[ \t\r\n] )+;
+
+

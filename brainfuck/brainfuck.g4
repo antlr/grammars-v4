@@ -29,7 +29,7 @@
 grammar brainfuck;
 
 file_
-   : statement*
+   : statement* EOF
    ;
 
 statement

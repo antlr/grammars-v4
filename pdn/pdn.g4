@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar pdn;
 
 game
-   : tags moves
+   : tags moves EOF
    ;
 
 tags
@@ -45,7 +45,7 @@ tag
    ;
 
 moves
-   : move+ (result | '*')
+   : move+ (result | '*')+
    ;
 
 move
