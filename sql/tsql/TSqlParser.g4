@@ -3201,21 +3201,83 @@ materialized_column_definition
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms186712.aspx
+// There is a documentation error: NOT NULL is a constraint
+// and therefore can be given a name.
 column_constraint
-    :(CONSTRAINT constraint=id_)?
-      ((PRIMARY KEY | UNIQUE) clustered? alter_table_index_options?
-      | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
-      | (FOREIGN KEY)? REFERENCES table_name '(' pk = column_name_list')' on_delete? on_update?
-      | null_notnull)
+    : (CONSTRAINT constraint=id_)?
+      (
+        null_notnull
+      | (
+            (PRIMARY KEY | UNIQUE)
+            clustered?
+            primary_key_options
+        )
+      | (
+            (FOREIGN KEY)?
+            foreign_key_options
+        )
+      | check_constraint
+      )
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
 table_constraint
     : (CONSTRAINT constraint=id_)?
-       ((PRIMARY KEY | UNIQUE) clustered? '(' column_name_list_with_order ')' alter_table_index_options? (ON id_)?
-         | CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
-         | DEFAULT '('?  ((STRING | PLUS | function_call | DECIMAL)+ | NEXT VALUE FOR table_name) ')'? FOR id_
-         | FOREIGN KEY '(' fk = column_name_list ')' REFERENCES table_name ('(' pk = column_name_list')')? on_delete? on_update?)
+        (
+            (
+                (PRIMARY KEY | UNIQUE)
+                clustered?
+                '(' column_name_list_with_order ')'
+                primary_key_options
+            )
+            |
+            (
+                FOREIGN KEY
+                '(' fk = column_name_list ')'
+                foreign_key_options
+            )
+            |
+            (
+                CONNECTION
+                '(' connection_node ( ',' connection_node )* ')'
+            )
+            |
+            (
+                DEFAULT '('?  ((STRING | PLUS | function_call | DECIMAL)+ | NEXT VALUE FOR table_name) ')'? FOR id_
+            )
+            | check_constraint
+        )
+    ;
+
+connection_node
+    :
+        from_node_table=id_ TO to_node_table=id_
+    ;
+
+primary_key_options
+    :
+        (WITH FILLFACTOR '=' DECIMAL)?
+        alter_table_index_options?
+        (
+            ON (
+                (partition_scheme_name=id_ '(' partition_column_name=id_ ')')
+                | filegroup=id_
+                | DEFAULT_DOUBLE_QUOTE
+            )
+        )?
+    ;
+
+foreign_key_options
+    :
+        REFERENCES table_name '(' pk = column_name_list')'
+        on_delete?
+        on_update?
+        (NOT FOR REPLICATION)?
+    ;
+
+check_constraint
+    :
+    CHECK (NOT FOR REPLICATION)? '(' search_condition ')'
     ;
 
 on_delete
