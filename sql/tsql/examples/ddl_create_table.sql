@@ -23,6 +23,12 @@ CREATE TABLE [#TestTable] (
 ) WITH (DATA_COMPRESSION = PAGE);
 GO;
 
+-- name these constratints
+CREATE TABLE [#TestTable] (
+  [ID] INT constraint pk PRIMARY KEY constraint notnull NOT NULL
+) WITH (DATA_COMPRESSION = PAGE);
+GO;
+
 -- create table with multiple columns and constraints
 CREATE TABLE [#TestTable] (
   [ID] INT PRIMARY KEY NOT NULL,
