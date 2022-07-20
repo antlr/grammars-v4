@@ -3188,12 +3188,31 @@ column_def_table_constraint
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187742.aspx
+// There is a documentation error: column definition elements can be given in
+// any order
 column_definition
-    : id_ (data_type | AS expression PERSISTED? ) (COLLATE id_)? null_notnull?
-      ((CONSTRAINT constraint=id_)? null_or_default null_or_default?
-       | IDENTITY ('(' seed=DECIMAL ',' increment=DECIMAL ')')? (NOT FOR REPLICATION)?)?
-      ROWGUIDCOL?
-      column_constraint*
+    : id_ (data_type | AS expression PERSISTED? )
+      column_definition_element*
+      column_index?
+    ;
+
+column_definition_element
+    : FILESTREAM
+    | COLLATE collation_name=id_
+    | SPARSE
+    | MASKED WITH '(' FUNCTION '=' mask_function=STRING ')'
+    | (CONSTRAINT constraint=id_)? DEFAULT  constant_expr=expression
+    | IDENTITY ('(' seed=DECIMAL ',' increment=DECIMAL ')')?
+    | NOT FOR REPLICATION
+    | GENERATED ALWAYS AS ( ROW | TRANSACTION_ID | SEQUENCE_NUMBER ) ( START | END ) HIDDEN_KEYWORD?
+    // NULL / NOT NULL is a constraint
+    | ROWGUIDCOL
+    | ENCRYPTED WITH
+        '(' COLUMN_ENCRYPTION_KEY '=' key_name=STRING ','
+            ENCRYPTION_TYPE '=' ( DETERMINISTIC | RANDOMIZED ) ','
+            ALGORITHM '=' algo=STRING
+        ')'
+    | column_constraint
     ;
 
 materialized_column_definition
@@ -3218,6 +3237,23 @@ column_constraint
         )
       | check_constraint
       )
+    ;
+
+column_index
+    :
+        INDEX index_name=id_ clustered?
+        create_table_index_options?
+        on_partition_or_filegroup?
+        ( FILESTREAM_ON ( filestream_filegroup_or_partition_schema_name=id_ | NULL_DOUBLE_QUOTE ) )?
+    ;
+
+on_partition_or_filegroup
+    :
+        ON (
+            (partition_scheme_name=id_ '(' partition_column_name=id_ ')')
+            | filegroup=id_
+            | DEFAULT_DOUBLE_QUOTE
+        )
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms188066.aspx
@@ -3258,13 +3294,7 @@ primary_key_options
     :
         (WITH FILLFACTOR '=' DECIMAL)?
         alter_table_index_options?
-        (
-            ON (
-                (partition_scheme_name=id_ '(' partition_column_name=id_ ')')
-                | filegroup=id_
-                | DEFAULT_DOUBLE_QUOTE
-            )
-        )?
+        on_partition_or_filegroup?
     ;
 
 foreign_key_options
@@ -4297,6 +4327,7 @@ keyword
     | ALLOW_ROW_LOCKS
     | ALLOW_SNAPSHOT_ISOLATION
     | ALLOWED
+    | ALWAYS
     | ANSI_NULL_DEFAULT
     | ANSI_NULLS
     | ANSI_PADDING
@@ -4343,6 +4374,7 @@ keyword
     | CHECKSUM_AGG
     | CLEANUP
     | COLLECTION
+    | COLUMN_ENCRYPTION_KEY
     | COLUMN_MASTER_KEY
     | COLUMNSTORE
     | COLUMNSTORE_ARCHIVE
@@ -4388,6 +4420,7 @@ keyword
     | DES
     | DESCRIPTION
     | DESX
+    | DETERMINISTIC
     | DHCP
     | DIALOG
     | DIRECTORY_NAME
@@ -4402,8 +4435,10 @@ keyword
     | EMPTY
     | ENABLE
     | ENABLE_BROKER
+    | ENCRYPTED
     | ENCRYPTED_VALUE
     | ENCRYPTION
+    | ENCRYPTION_TYPE
     | ENDPOINT_URL
     | ERROR_BROKER_CONVERSATIONS
     | EXCLUSIVE
@@ -4439,12 +4474,14 @@ keyword
     | GETUTCDATE
     | GLOBAL
     | GO
+    | GENERATED
     | GROUP_MAX_REQUESTS
     | GROUPING
     | GROUPING_ID
     | HADR
     | HASH
     | HEALTH_CHECK_TIMEOUT
+    | HIDDEN_KEYWORD
     | HIGH
     | HONOR_BROKER_PRIORITY
     | HOURS
@@ -4489,6 +4526,7 @@ keyword
     | LOW
     | MANUAL
     | MARK
+    | MASKED
     | MATERIALIZED
     | MAX
     | MAX_CPU_PERCENT
@@ -4586,6 +4624,7 @@ keyword
     | QUEUE
     | QUEUE_DELAY
     | QUOTED_IDENTIFIER
+    | RANDOMIZED
     | RANGE
     | RANK
     | RC2
@@ -4647,6 +4686,7 @@ keyword
     | SEND
     | SENT
     | SEQUENCE
+    | SEQUENCE_NUMBER
     | SERIALIZABLE
     | SESSION_TIMEOUT
     | SETERROR
@@ -4659,6 +4699,7 @@ keyword
     | SMALLINT
     | SNAPSHOT
     | SORT_IN_TEMPDB
+    | SPARSE
     | SPATIAL_WINDOW_MAX_CELLS
     | STANDBY
     | START_DATE
@@ -4694,6 +4735,7 @@ keyword
     | TINYINT
     | TORN_PAGE_DETECTION
     | TRACKING
+    | TRANSACTION_ID
     | TRANSFORM_NOISE_WORDS
     | TRIM
     | TRIPLE_DES
