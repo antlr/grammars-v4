@@ -79,7 +79,7 @@ varSpec:
 
 block: L_CURLY statementList? R_CURLY;
 
-statementList: ((SEMI? | EOS? | {closingBracket()}?) statement eos)+;
+statementList: ((SEMI? | EOS? | {this.closingBracket()}?) statement eos)+;
 
 statement:
 	declaration
@@ -376,5 +376,5 @@ eos:
 	SEMI
 	| EOF
 	| EOS
-	| {closingBracket()}?
+	| {this.closingBracket()}?
 	;
