@@ -3856,15 +3856,66 @@ freetext_predicate
     | FREETEXT '(' table_name ',' (full_column_name | '(' full_column_name (',' full_column_name)* ')' | '*' ) ',' expression  (',' LANGUAGE expression)? ')'
     ;
 built_in_functions
+    // System functions
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
-    : BINARY_CHECKSUM '(' '*' ')'                       #BINARY_CHECKSUM
+    : BINARY_CHECKSUM '(' ( star='*' | expression (',' expression)* ) ')'   #BINARY_CHECKSUM
+    // https://msdn.microsoft.com/en-us/library/ms189788.aspx
+    | CHECKSUM '(' ( star='*' | expression (',' expression)* ) ')'          #CHECKSUM
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/compress-transact-sql?view=sql-server-ver16
+    | COMPRESS '(' expr=expression ')'                                      #COMPRESS
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/connectionproperty-transact-sql?view=sql-server-ver16
+    | CONNECTIONPROPERTY '(' property=STRING ')'                            #CONNECTIONPROPERTY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/context-info-transact-sql?view=sql-server-ver16
+    | CONTEXT_INFO '(' ')'                                                  #CONTEXT_INFO
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/current-request-id-transact-sql?view=sql-server-ver16
+    | CURRENT_REQUEST_ID '(' ')'                                            #CURRENT_REQUEST_ID
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/current-transaction-id-transact-sql?view=sql-server-ver16
+    | CURRENT_TRANSACTION_ID '(' ')'                                        #CURRENT_TRANSACTION_ID
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/decompress-transact-sql?view=sql-server-ver16
+    | DECOMPRESS '(' expr=expression ')'                                    #DECOMPRESS
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/error-line-transact-sql?view=sql-server-ver16
+    | ERROR_LINE '(' ')'                                                    #ERROR_LINE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/error-message-transact-sql?view=sql-server-ver16
+    | ERROR_MESSAGE '(' ')'                                                 #ERROR_MESSAGE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/error-number-transact-sql?view=sql-server-ver16
+    | ERROR_NUMBER '(' ')'                                                  #ERROR_NUMBER
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/error-procedure-transact-sql?view=sql-server-ver16
+    | ERROR_PROCEDURE '(' ')'                                               #ERROR_PROCEDURE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/error-severity-transact-sql?view=sql-server-ver16
+    | ERROR_SEVERITY '(' ')'                                                #ERROR_SEVERITY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/error-state-transact-sql?view=sql-server-ver16
+    | ERROR_STATE '(' ')'                                                   #ERROR_STATE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/formatmessage-transact-sql?view=sql-server-ver16
+    | FORMATMESSAGE '(' (msg_number=DECIMAL | msg_string=STRING | msg_variable=LOCAL_ID) ',' expression (',' expression)* ')' #FORMATMESSAGE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/get-filestream-transaction-context-transact-sql?view=sql-server-ver16
+    | GET_FILESTREAM_TRANSACTION_CONTEXT '(' ')'                            #GET_FILESTREAM_TRANSACTION_CONTEXT
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/getansinull-transact-sql?view=sql-server-ver16
+    | GETANSINULL '(' (database=STRING)? ')'                                #GETANSINULL
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/host-id-transact-sql?view=sql-server-ver16
+    | HOST_ID '(' ')'                                                       #HOST_ID
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/host-name-transact-sql?view=sql-server-ver16
+    | HOST_NAME '(' ')'                                                     #HOST_NAME
+    // https://msdn.microsoft.com/en-us/library/ms184325.aspx
+    | ISNULL '(' left=expression ',' right=expression ')'                   #ISNULL
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/isnumeric-transact-sql?view=sql-server-ver16
+    | ISNUMERIC '(' expression ')'                                          #ISNUMERIC
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/min-active-rowversion-transact-sql?view=sql-server-ver16
+    | MIN_ACTIVE_ROWVERSION '(' ')'                                         #MIN_ACTIVE_ROWVERSION
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/newid-transact-sql?view=sql-server-ver16
+    | NEWID '(' ')'                                                         #NEWID
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/newsequentialid-transact-sql?view=sql-server-ver16
+    | NEWSEQUENTIALID '(' ')'                                               #NEWSEQUENTIALID
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/rowcount-big-transact-sql?view=sql-server-ver16
+    | ROWCOUNT_BIG '(' ')'                                                  #ROWCOUNT_BIG
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/session-context-transact-sql?view=sql-server-ver16
+    | SESSION_CONTEXT '(' key=STRING ')'                                    #SESSION_CONTEXT
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/xact-state-transact-sql?view=sql-server-ver16
+    | XACT_STATE '(' ')'                                                    #XACT_STATE
     // https://msdn.microsoft.com/en-us/library/hh231076.aspx
     // https://msdn.microsoft.com/en-us/library/ms187928.aspx
     | CAST '(' expression AS data_type ')'              #CAST
     | TRY_CAST '(' expression AS data_type ')'          #TRY_CAST
     | CONVERT '(' convert_data_type=data_type ','convert_expression=expression (',' style=expression)? ')'                              #CONVERT
-    // https://msdn.microsoft.com/en-us/library/ms189788.aspx
-    | CHECKSUM '(' '*' ')'                              #CHECKSUM
     // https://msdn.microsoft.com/en-us/library/ms190349.aspx
     | COALESCE '(' expression_list ')'                  #COALESCE
     //https://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc36271.1572/html/blocks/CJADIDHD.htm
@@ -3898,8 +3949,6 @@ built_in_functions
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
     | SYSTEM_USER                                       #SYSTEM_USER
     | USER                                              #USER
-    // https://msdn.microsoft.com/en-us/library/ms184325.aspx
-    | ISNULL '(' left=expression ',' right=expression ')'          #ISNULL
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/parse-transact-sql
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/try-parse-transact-sql
     | PARSE '(' str=expression AS data_type ( USING culture=expression )? ')'          #PARSE
@@ -4838,23 +4887,29 @@ keyword
     | CHECK_EXPIRATION
     | CLASSIFIER_FUNCTION
     | CLUSTER
+    | COMPRESS
     | COMPRESSION
     | CONNECT
     | CONNECTION
+    | CONNECTIONPROPERTY
     | CONFIGURATION
     | CONTAINMENT
     | CONTEXT
+    | CONTEXT_INFO
     | CONTINUE_AFTER_ERROR
     | CONTRACT
     | CONTRACT_NAME
     | CONVERSATION
     | COPY_ONLY
+    | CURRENT_TRANSACTION_ID
+    | CURRENT_REQUEST_ID
     | CYCLE
     | DATA_COMPRESSION
     | DATA_SOURCE
     | DATABASE_MIRRORING
     | DATASPACE
     | DDL
+    | DECOMPRESS
     | DEFAULT_DATABASE
     | DEFAULT_SCHEMA
     | DIAGNOSTICS
@@ -4864,6 +4919,12 @@ keyword
     | ENABLED
     | ENDPOINT
     | ERROR
+    | ERROR_LINE
+    | ERROR_MESSAGE
+    | ERROR_NUMBER
+    | ERROR_PROCEDURE
+    | ERROR_SEVERITY
+    | ERROR_STATE
     | EVENT
     | EVENTDATA
     | EVENT_RETENTION_MODE
@@ -4877,8 +4938,11 @@ keyword
     | FILE_SNAPSHOT
     | FORCESEEK
     | FORCE_SERVICE_ALLOW_DATA_LOSS
+    | FORMATMESSAGE
     | GET
+    | GET_FILESTREAM_TRANSACTION_CONTEXT
     | GETANCESTOR
+    | GETANSINULL
     | GETDESCENDANT
     | GETLEVEL
     | GETREPARENTEDVALUE
@@ -4888,6 +4952,8 @@ keyword
     | HEALTHCHECKTIMEOUT
     | HEAP
     | HIERARCHYID
+    | HOST_ID
+    | HOST_NAME
     | IIF
     | IO
     | INCLUDE
@@ -4897,6 +4963,7 @@ keyword
     | INSTEAD
     | ISDESCENDANTOF
     | ISNULL
+    | ISNUMERIC
     | KERBEROS
     | KEY_PATH
     | KEY_STORE_PROVIDER_NAME
@@ -4929,6 +4996,8 @@ keyword
     | MINVALUE
     | MIRROR
     | MUST_CHANGE
+    | NEWID
+    | NEWSEQUENTIALID
     | NOFORMAT
     | NOINIT
     | NONE
@@ -4974,6 +5043,7 @@ keyword
     | REWIND
     | ROLE
     | ROUND_ROBIN
+    | ROWCOUNT_BIG
     | RSA_512
     | RSA_1024
     | RSA_2048
@@ -4989,6 +5059,7 @@ keyword
     | SERVICE_BROKER
     | SERVICE_NAME
     | SESSION
+    | SESSION_CONTEXT
     | SETTINGS
     | SHRINKLOG
     | SID
@@ -5030,6 +5101,7 @@ keyword
     | WITHOUT
     | WITNESS
     | XACT_ABORT
+    | XACT_STATE
     //Build-ins:
     | VARCHAR
     | NVARCHAR
