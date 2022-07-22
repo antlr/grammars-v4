@@ -199,6 +199,7 @@
 				<module>moo</module>
 				<module>morsecode</module>
 				<module>powerquery</module>
+				<module>evm-bytecode</module>
 				<module>mps</module>
 				<module>muddb</module>
 				<module>mumath</module>
