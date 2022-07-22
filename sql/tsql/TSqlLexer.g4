@@ -642,6 +642,7 @@ TINYINT:                               'TINYINT';
 TORN_PAGE_DETECTION:                   'TORN_PAGE_DETECTION';
 TRACKING:                              'TRACKING';
 TRANSFORM_NOISE_WORDS:                 'TRANSFORM_NOISE_WORDS';
+TRIM:                                  'TRIM';
 TRIPLE_DES:                            'TRIPLE_DES';
 TRIPLE_DES_3KEY:                       'TRIPLE_DES_3KEY';
 TRUSTWORTHY:                           'TRUSTWORTHY';

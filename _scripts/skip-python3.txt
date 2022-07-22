@@ -23,7 +23,6 @@ fortran77
 gdscript
 gff3
 gml
-golang
 haskell
 html
 hypertalk
