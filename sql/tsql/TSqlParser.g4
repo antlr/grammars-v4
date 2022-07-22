@@ -2019,7 +2019,10 @@ single_partition_rebuild_index_option
     ;
 
 on_partitions
-    : ON PARTITIONS '(' partition_number=DECIMAL ( 'TO' to_partition_number=DECIMAL )? ')'
+    : ON PARTITIONS '('
+        partition_number=DECIMAL ( 'TO' to_partition_number=DECIMAL )?
+        ( ',' partition_number=DECIMAL ( 'TO' to_partition_number=DECIMAL )? )*
+    ')'
     ;
 
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-columnstore-index-transact-sql?view=sql-server-ver15
@@ -2187,7 +2190,30 @@ create_statistics
     ;
 
 update_statistics
-    : UPDATE (INDEX | ALL)? STATISTICS full_table_name id_?  (USING DECIMAL VALUES)?
+    : UPDATE STATISTICS full_table_name
+        ( id_ | '(' id_ ( ',' id_ )* ')' )?
+        update_statistics_options?
+    ;
+
+update_statistics_options
+    : WITH update_statistics_option (',' update_statistics_option)*
+    ;
+
+update_statistics_option
+    : ( FULLSCAN (','? PERSIST_SAMPLE_PERCENT '=' on_off )? )
+    | ( SAMPLE number=DECIMAL (PERCENT | ROWS)
+        (','? PERSIST_SAMPLE_PERCENT '=' on_off )? )
+    | RESAMPLE on_partitions?
+    | STATS_STREAM '=' stats_stream_=expression
+    | ROWCOUNT '=' DECIMAL
+    | PAGECOUNT '=' DECIMAL
+    | ALL
+    | COLUMNS
+    | INDEX
+    | NORECOMPUTE
+    | INCREMENTAL '=' on_off
+    | MAXDOP '=' max_dregree_of_parallelism=DECIMAL
+    | AUTO_DROP '=' on_off
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms174979.aspx
@@ -4343,6 +4369,7 @@ keyword
     | AUTO_CLEANUP
     | AUTO_CLOSE
     | AUTO_CREATE_STATISTICS
+    | AUTO_DROP
     | AUTO_SHRINK
     | AUTO_UPDATE_STATISTICS
     | AUTO_UPDATE_STATISTICS_ASYNC
@@ -4376,6 +4403,7 @@ keyword
     | COLLECTION
     | COLUMN_ENCRYPTION_KEY
     | COLUMN_MASTER_KEY
+    | COLUMNS
     | COLUMNSTORE
     | COLUMNSTORE_ARCHIVE
     | COMMITTED
@@ -4595,6 +4623,7 @@ keyword
     | OWNER
     | OWNERSHIP
     | PAD_INDEX
+    | PAGECOUNT
     | PAGE_VERIFY
     | PARAMETERIZATION
     | PARTITION
@@ -4605,6 +4634,7 @@ keyword
     | PERCENT_RANK
     | PERCENTILE_CONT
     | PERCENTILE_DISC
+    | PERSIST_SAMPLE_PERCENT
     | POISON_MESSAGE_HANDLING
     | POOL
     | PORT
@@ -4653,6 +4683,7 @@ keyword
     | REQUEST_MAX_MEMORY_GRANT_PERCENT
     | REQUEST_MEMORY_GRANT_TIMEOUT_SEC
     | REQUIRED_SYNCHRONIZED_SECONDARIES_TO_COMMIT
+    | RESAMPLE
     | RESERVE_DISK_SPACE
     | RESOURCE
     | RESOURCE_MANAGER_LOCATION
