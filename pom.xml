@@ -126,6 +126,7 @@
 				<module>edif300</module>
 				<module>edn</module>
 				<module>erlang</module>
+				<module>evm-bytecode</module>
 				<module>fasta</module>
                 <module>fdo91</module>
 				<module>fen</module>
@@ -199,7 +200,6 @@
 				<module>moo</module>
 				<module>morsecode</module>
 				<module>powerquery</module>
-				<module>evm-bytecode</module>
 				<module>mps</module>
 				<module>muddb</module>
 				<module>mumath</module>
