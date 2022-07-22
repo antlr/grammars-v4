@@ -398,6 +398,7 @@ select TINYINT from (select 1 as TINYINT) t;
 select TORN_PAGE_DETECTION from (select 1 as TORN_PAGE_DETECTION) t;
 select TRACKING from (select 1 as TRACKING) t;
 select TRANSFORM_NOISE_WORDS from (select 1 as TRANSFORM_NOISE_WORDS) t;
+select trim('{}' from '{some value}')
 select TRIPLE_DES from (select 1 as TRIPLE_DES) t;
 select TRIPLE_DES_3KEY from (select 1 as TRIPLE_DES_3KEY) t;
 select TRUSTWORTHY from (select 1 as TRUSTWORTHY) t;
