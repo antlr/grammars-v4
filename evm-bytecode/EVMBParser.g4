@@ -1,13 +1,8 @@
 parser grammar EVMBParser;
 
-@ header
-{
-	package it.unipr.evm.antlr;
-}
-
 options { tokenVocab = EVMBLexer; }
 program
-   : (opcodes)+ EOF
+   : opcodes+ EOF
    ;
 
 opcodes

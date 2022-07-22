@@ -1,9 +1,5 @@
 lexer grammar EVMBLexer;
 
-@ lexer :: header
-{
-	package it.unipr.evm.antlr;
-}
 STOP
    : 'STOP'
    ;
@@ -653,6 +649,6 @@ fragment Hexs
    ;
 
 WS
-   : [ \n\t\r] -> skip
+   : [ \n\t\r] -> channel(HIDDEN)
    ;
 
