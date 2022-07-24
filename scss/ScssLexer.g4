@@ -643,7 +643,7 @@ FontFeatureValues
 
 // https://msdn.microsoft.com/en-us/library/ms532847.aspx
 DxImageTransform
-    : 'progid:DXImageTransform.Microsoft.' Function_
+    : 'progid:DXImageTransform.Microsoft.' Ident '('
     ;
 
 // Variables
@@ -660,12 +660,6 @@ Var
 Ident
     : '-'? Nmstart Nmchar*
     ;
-
-Function_
-    : Ident '('
-    ;
-
-
 
 /**
 NULL_              : 'null';

@@ -179,7 +179,7 @@ pseudo
     ;
 
 functionalPseudo
-    : Function_ ws expression Rparen
+    : Ident Lparen ws expression Rparen
     ;
 
 expression
@@ -218,12 +218,12 @@ varialbeName
     ;
 
 varialbeValue
-    : expr
-    | value
+    : value
+    | expr
+    | function_
     | map_
     | list_
     | varialbeName
-    | function_
     ;
 
 ruleset
@@ -260,7 +260,7 @@ value
     ;
 
 expr
-    : term ( operator_? term )*
+    : ( term | function_ ) ( operator_? term )*
     ;
 
 term
@@ -275,13 +275,17 @@ term
     | Uri
     | hexcolor
     | calc
-    | function_
     | unknownDimension
     | dxImageTransform
+    | varialbeName
     ;
 
 function_
-    : ( Function_ | Lparen ) ws ( expr | any_ | unused )* Rparen
+    : ident? ws Lparen ws functionParameters ws Rparen
+    ;
+
+functionParameters
+    : ( list_ | map_ )?
     ;
 
 dxImageTransform
@@ -324,7 +328,7 @@ any_
     | Includes ws
     | DashMatch ws
     | Colon ws
-    | Function_ ws ( any_ | unused )* Rparen ws
+    | Ident Lparen ws ( any_ | unused )* Rparen ws
     | Lparen ws ( any_ | unused )* Rparen ws
     | Lbrack ws ( any_ | unused )* Rbrack ws
     ;
@@ -360,16 +364,16 @@ mapEntry
   : mapKey ws Colon ws mapValue;
 
 mapKey
-  : expr
-  | list_
+  : list_
   | map_
+  | expr
   ;
 
 mapValue
-  : expr
-  | list_
+  : list_
   | map_
   | varialbeName
+  | expr
   ;
 
 boolean
@@ -556,5 +560,5 @@ ident
 // Comments might be part of CSS hacks, thus pass them to visitor to decide whether to skip
 // Spaces are significant around '+' '-' '(', thus they should not be skipped
 ws
-    : Space*
+    : ( Comment | Space )*
     ;

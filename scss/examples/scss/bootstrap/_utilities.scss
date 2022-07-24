@@ -10,6 +10,7 @@ $utilities: map-merge(
       class: align,
       values: baseline top middle bottom text-bottom text-top
     ),
+    /*
     // scss-docs-end utils-vertical-align
     // scss-docs-start utils-float
     "float": (
@@ -640,7 +641,7 @@ $utilities: map-merge(
         visible: visible,
         invisible: hidden,
       )
-    )
+    )*/
     // scss-docs-end utils-visibility
   ),
   $utilities
