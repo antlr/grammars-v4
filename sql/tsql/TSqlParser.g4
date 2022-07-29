@@ -3542,9 +3542,12 @@ for_clause
     | FOR XML PATH ('(' STRING ')')? xml_common_directives*
       (COMMA ELEMENTS (XSINIL | ABSENT)?)?
     | FOR JSON (AUTO | PATH)
-      (COMMA ROOT ('(' STRING ')')?)?
-      (COMMA INCLUDE_NULL_VALUES)?
-      (COMMA WITHOUT_ARRAY_WRAPPER)?
+      ( COMMA
+        ( ROOT ('(' STRING ')')
+        | INCLUDE_NULL_VALUES
+        | WITHOUT_ARRAY_WRAPPER
+        )
+      )*
     ;
 
 xml_common_directives
