@@ -3631,9 +3631,9 @@ select_list_elem
     : asterisk
     | column_elem
     | udt_elem
-    | LOCAL_ID (assignment_operator | '=') ( expression | NEXT VALUE FOR table_name)
+    | LOCAL_ID (assignment_operator | '=') ( expression | NEXT VALUE FOR table_name over_clause?)
     | expression_elem
-    | NEXT VALUE FOR table_name as_column_alias?
+    | NEXT VALUE FOR table_name over_clause? as_column_alias?
     ;
 
 table_sources
