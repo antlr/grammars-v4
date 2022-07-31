@@ -317,7 +317,7 @@ DashMatch
     ;
 
 Hash
-    : '#' Name
+    : '#'
     ;
 
 Import
@@ -410,9 +410,17 @@ Percentage
     : Number '%'
     ;
 
+Degree
+    : Number 'deg'
+    ;
+
 Uri
     : U R L '(' Whitespace String_ Whitespace ')'
     | U R L '(' Whitespace Url Whitespace ')'
+    ;
+
+Format
+    : F O R M A T '(' Whitespace String_ Whitespace ')'
     ;
 
 UnicodeRange
@@ -493,6 +501,9 @@ Semi
 Times
     : '*'
     ;
+
+Amp
+    : '&';
 
 Colon
     : ':'
@@ -624,6 +635,10 @@ To
 // https://www.w3.org/TR/css3-values/#calc-syntax
 Calc
     : 'calc('
+    ;
+
+Rotate
+    : 'rotate('
     ;
 
 // https://www.w3.org/TR/css-device-adapt-1/

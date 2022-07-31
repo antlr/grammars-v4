@@ -39,7 +39,7 @@ statement
     : charset
     | nestedStatement
     | import_
-    | namespace_
+    | cssNamespace_
     | variableDeclaration
     | comment
     ;
@@ -75,13 +75,17 @@ importPath
 
 // Namespaces
 // https://www.w3.org/TR/css-namespaces-3/
-namespace_
-    : Namespace ws (namespacePrefix ws)? ( String_ | Uri ) ws Semi ws
-    | Namespace ws (namespacePrefix ws)? ( String_ | Uri ) ws
+cssNamespace_
+    : Namespace ws (cssNamespacePrefix ws)? ( String_ | Uri ) ws Semi ws
+    | Namespace ws (cssNamespacePrefix ws)? ( String_ | Uri ) ws
     ;
 
-namespacePrefix
+cssNamespacePrefix
     : ident
+    ;
+
+namespace_
+    : (ident Dot)+
     ;
 
 // Media queries
@@ -129,7 +133,7 @@ selectorGroup
     ;
 
 selector
-    : simpleSelectorSequence ws ( combinator simpleSelectorSequence ws )*
+    : combinator? simpleSelectorSequence ws ( combinator simpleSelectorSequence ws )*
     ;
 
 combinator
@@ -140,8 +144,8 @@ combinator
     ;
 
 simpleSelectorSequence
-    : ( typeSelector | universal ) ( Hash | className | attrib | pseudo | negation )*
-    | ( Hash | className | attrib | pseudo | negation )+
+    : ( typeSelector | universal ) ( Hash | className | attrib | pseudo | negation | interpolation | parent )*
+    | ( Hash | className | attrib | pseudo | negation | interpolation | parent )+
     ;
 
 typeSelector
@@ -164,6 +168,14 @@ className
     : Dot ident
     ;
 
+interpolation
+    : (elementName Dot)? Hash BlockStart namespace_? varialbeName BlockEnd
+    ;
+
+parent
+    : Amp
+    ;
+
 attrib
     : Lbrack ws typeNamespacePrefix? ident ws
     ( ( PrefixMatch | SuffixMatch | SubstringMatch | Eq | Includes | DashMatch ) ws
@@ -179,13 +191,11 @@ pseudo
     ;
 
 functionalPseudo
-    : Ident Lparen ws expression Rparen
+    : Ident Lparen ws pseudoParameter+ Rparen
     ;
 
-expression
-    /* In CSS3, the expressions are identifiers, strings, */
-    /* or of the form "an+b" */
-    : ( ( Plus | Minus | Dimension | UnknownDimension | Number | String_ | ident ) ws )+
+pseudoParameter
+    : ( ( expr | className | interpolation ) ws Comma? ws)
     ;
 
 negation
@@ -214,7 +224,8 @@ variableDeclaration
     ;
 
 varialbeName
-    : Dollar ident
+    : namespace_ Dollar ident
+    | ((Minus Minus) | Dollar | Plus Dollar | Minus Dollar) ident
     ;
 
 varialbeValue
@@ -238,6 +249,8 @@ declarationList
 declaration
     : variableDeclaration
     | propertyDeclaration
+    | selectorGroup
+    | include
     ;
 
 propertyDeclaration
@@ -260,7 +273,8 @@ value
     ;
 
 expr
-    : ( term | function_ ) ( operator_? term )*
+    : ( term | function_ ) Comma? ws ( ( operator_? term | function_ ) Comma? ws )*
+    | (Plus | Minus)? Lparen ws calcExpression Rparen ws expr*
     ;
 
 term
@@ -270,18 +284,20 @@ term
     | boolean
     | String_
     | UnicodeRange
+    | varialbeName
     | ident
     | var_
     | Uri
+    | Format
     | hexcolor
     | calc
+    | rotate
     | unknownDimension
     | dxImageTransform
-    | varialbeName
     ;
 
 function_
-    : ident? ws Lparen ws functionParameters ws Rparen
+    : namespace_? ident? ws Lparen ws functionParameters ws Rparen
     ;
 
 functionParameters
@@ -304,6 +320,10 @@ percentage
     : ( Plus | Minus )? Percentage
     ;
 
+degree
+    : ( Plus | Minus )? Degree
+    ;
+
 dimension
     : ( Plus | Minus )? Dimension
     ;
@@ -321,6 +341,7 @@ any_
     | dimension ws
     | unknownDimension ws
     | String_ ws
+    | Name ws
     | Delim ws
     | Uri ws
     | Hash ws
@@ -386,7 +407,12 @@ atRule
     ;
 
 atKeyword
-    : At ident
+    : include
+    | At ident
+    ;
+
+include
+    : Include ws
     ;
 
 unused
@@ -462,10 +488,10 @@ var_
 // Calc
 // https://www.w3.org/TR/css3-values/#calc-syntax
 calc
-    : Calc ws calcSum Rparen ws
+    : Calc ws calcExpression Rparen ws
     ;
 
-calcSum
+calcExpression
     : calcProduct ( Space ws ( Plus | Minus ) ws Space ws calcProduct )*
     ;
 
@@ -476,20 +502,20 @@ calcProduct
 calcValue
     : number ws
     | dimension ws
+    | varialbeName
     | unknownDimension ws
     | percentage ws
-    | Lparen ws calcSum Rparen ws
+    | Lparen ws calcExpression Rparen ws
+    ;
+
+rotate
+    : Rotate ws degree Rparen ws
     ;
 
 // Font face
 // https://www.w3.org/TR/2013/CR-css-fonts-3-20131003/#font-face-rule
 fontFaceRule
-    : FontFace ws BlockStart ws fontFaceDeclaration? ( Semi ws fontFaceDeclaration? )* BlockEnd ws
-    ;
-
-fontFaceDeclaration
-    : ident Colon ws expr     # knownFontFaceDeclaration
-    | ident Colon ws value    # unknownFontFaceDeclaration
+    : FontFace ws BlockStart ws declarationList BlockEnd ws
     ;
 
 // Animations
