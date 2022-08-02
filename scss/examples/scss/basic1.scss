@@ -98,7 +98,7 @@ p {
 h {
   margin: 5px !important {
     top: 2px;
-    bottom: 2px !important
+    bottom: 2px !important;
   }
 }
 
@@ -164,4 +164,47 @@ h1 {
 // Keyframes declaration
 @keyframes spin {
   transform: rotate(0deg);
+  transform: rotate(10deg);
+}
+
+@import "mixins/banner";
+@include bsBanner("");
+
+@use 'path/to/source'
+@require 'path/to/source'
+
+$title-font: normal 24px/1.5 'Open Sans', sans-serif;
+$cool-red: #F44336;
+$box-shadow-bottom-only: 0 2px 1px 0 rgba(0, 0, 0, 0.2);
+
+@require 'path/to/source'
+
+h1.title {
+  font: $title-font;
+  color: $cool-red;
+}
+
+div.container {
+  color: $cool-red;
+  background: #fff;
+  width: 100%;
+  box-shadow: $box-shadow-bottom-only;
+  background-color: var(--app-background-color);
+}
+
+#form {
+  cursor: pointer;
+}
+
+@keyframes spin {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+}
+
+@font-face {
+    font-family: 'Google Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(http://some-uri.com)
+        format('woff2')
 }
