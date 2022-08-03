@@ -7,7 +7,7 @@ GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
 SOURCES = $(GENERATED) Test.php
 default: setup classes
 setup:
-	if [[ -f transformGrammar.py ]]; then python3 transformGrammar.py ; fi
+	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 	composer install
 classes: $(SOURCES)
 clean:

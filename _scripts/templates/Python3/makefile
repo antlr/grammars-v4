@@ -8,7 +8,7 @@ SOURCES = $(GENERATED) \
     Program.py
 default: setup classes
 setup:
-	if [[ -f transformGrammar.py ]]; then python3 transformGrammar.py ; fi
+	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 classes: $(SOURCES)
 	pip install -r requirements.txt
 clean:

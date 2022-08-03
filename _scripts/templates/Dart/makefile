@@ -8,7 +8,7 @@ SOURCES = $(GENERATED) \
     cli.dart
 default: setup classes
 setup:
-	if [[ -f transformGrammar.py ]]; then python3 transformGrammar.py ; fi
+	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 classes: $(SOURCES)
 	dart pub get
 	dart compile exe cli.dart
