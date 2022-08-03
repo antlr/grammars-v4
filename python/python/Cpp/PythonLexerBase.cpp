@@ -35,7 +35,7 @@ void PythonLexerBase::emit(std::unique_ptr<antlr4::Token> token)
 		}
 	}
 	_lastTokenNull = copy == nullptr;
-	_lastTokenType = copy != nullptr && copy->getType();
+	_lastTokenType = copy != nullptr ? copy->getType() : 0;
 	_buffer[_lastTokenInd] = std::make_unique<CommonToken>(copy);
 }
 
