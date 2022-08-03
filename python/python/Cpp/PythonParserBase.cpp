@@ -4,6 +4,7 @@ using namespace antlr4;
 
 PythonParserBase::PythonParserBase(antlr4::TokenStream *input) : Parser(input)
 {
+	Version = PythonVersion::Autodetect;
 }
 
 bool PythonParserBase::CheckVersion(int version)
