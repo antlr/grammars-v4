@@ -176,7 +176,7 @@ public abstract class PythonLexerBase : Lexer
                 tokenType,
                 channel, -1, CharIndex - text.Length, CharIndex);
 #else
-            new CommonToken(Tuple.Create((ITokenSource)this, (ICharStream)InputStream), tokenType, channel, CharIndex - text.Length, CharIndex)
+            new CommonToken(Tuple.Create((ITokenSource)this, (ICharStream)InputStream), tokenType, channel, CharIndex - text.Length, CharIndex - 1)
             {
                 Line = Line,
                 Column = Column,
