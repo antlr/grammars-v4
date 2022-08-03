@@ -43,18 +43,17 @@ withClause : With ws Lparen ws parameters ws Rparen;
 
 // Declarations
 variableDeclaration : variableName ws Colon ws variableValue ws prio? ws Semi? ws;
-variableValue : value | functionDeclaration | functionCall | mapDeclaration | listDeclaration | variableName;
+variableValue : value | functionDeclaration | functionCall | mapDeclaration+ | listDeclaration+ | variableName;
 variableName
     : ((Minus Minus) Dollar | plusMinus Dollar | Dollar) identifier
-    | namespace_? Dollar identifier
+    | namespace_ Dollar identifier
     ;
 namespace_: (identifier Dot)+;
 
 propertyDeclaration
     :identifier Colon ws propertyValue ws Semi? ws;
 prio : Important | Default ;
-propertyValue: value ws prio?| value? ws prio? ws block|variableName|valueList|expression|functionCall;
-valueList: (value ws Comma? ws)+ ws;
+propertyValue: value ws prio?| value? ws prio? ws block|variableName|listCommaSeparated|expression|functionCall;
 
 mediaDeclaration: Media ws mediaQueryList ws block ws;
 mediaQueryList: (mediaQuery ws (Comma ws mediaQuery ws)* )? ws;
@@ -104,28 +103,28 @@ negationArg: typeSelector| universal| Hash| className| attrib | pseudo;
 
 // Operators
 operator_: Div|Times|Minus|Plus|Greater|Less|Greater Eq|Less Eq |Eq Eq?|NotEq;
-value: (unit|number|boolean|calc|rotate|rgba|var_|uri|Format|functionCall|variableName|interpolation|expression|hexcolor|identifier|String_ | block)+ ws;
+value: unit|number|boolean|calc|rotate|rgba|var_|uri|Format|String_|functionCall|variableName|interpolation|hexcolor|identifier|expression|block;
 
 // Function
 functionDeclaration: Function ws (namespace_? identifier)? ws Lparen ws parameters ws Rparen ws BlockStart ws functionBody? ws BlockEnd ws;
 parameters: parameter? (ws Comma ws parameter)* ws;
-parameter: (value|expression|variableDeclaration|listSpaceSeparated) arglist? ws;
+parameter: (value|expression|variableDeclaration|listSpaceSeparated|mapDeclaration) arglist? ws;
 functionBody: functionStatement* ws functionReturn? ws;
 functionReturn: Return ws expression ws Semi ws;
 functionStatement: expression Semi | statement;
 
 functionCall: namespace_? identifier ws Lparen ws parameters ws Rparen ws;
 
-expression: expressionPart ws ( operator_ ws expressionPart )* ws;
-expressionPart: unit ws| variableName ws|number ws| plusMinus? Lparen ws expression Rparen ws;
+expression: expressionPart (ws operator_ ws expressionPart )* ws;
+expressionPart: unit ws|identifier| variableName ws|number ws| plusMinus? Lparen ws expression Rparen ws;
 
 
 // List & Map
-listDeclaration: listCommaSeparated| listSpaceSeparated| listBracketed;
-listCommaSeparated: listElement ws (Comma ws listElement)+ ws Comma? ws;
-listSpaceSeparated: listElement ws listElement* ws Comma? ws;
-listBracketed: Lbrack ws (listCommaSeparated | listSpaceSeparated) ws Rbrack ws;
-listElement: Lparen? ws value ws Rparen? ws;
+listDeclaration: listBracketed|listCommaSeparated| listSpaceSeparated;
+listCommaSeparated: listElement ws (Comma ws listElement)* ws Comma? ws;
+listSpaceSeparated: listElement+ ws;
+listBracketed: Lbrack ws (listSpaceSeparated|listCommaSeparated ) ws Rbrack ws;
+listElement: Lparen? ws (value ws Comma? ws)+ ws Rparen? ws Comma? ws;
 
 mapDeclaration: Lparen ws mapEntry ws (Comma ws mapEntry)* ws Comma? ws Rparen;
 mapEntry: mapKey ws Colon ws mapValue;
@@ -155,12 +154,12 @@ dimension: Number (Time| Freq| Resolution| Angle);
 percentage: Number Percentage;
 degree: Number Angle;
 
-uri : Uri ws (String_ ws | Ident ws)+ Rparen ws;
+uri : Uri ws;
 arglist: Dot Dot Dot;
 plusMinus: Plus | Minus;
 hexcolor: Hash color;
 color: (Number | Ident)+;
 boolean : True| False ;
 number: plusMinus? Number;
-identifier : Ident| Not| And| Or| From| To;
+identifier : (VendorPrefix|'-')? Ident| Not| And| Or| From| To;
 ws: ( Comment | Space )*;

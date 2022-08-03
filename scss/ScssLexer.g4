@@ -48,7 +48,7 @@ MultiLineComment : '/*' ~'*'* '*'+ ( ~[/*] ~'*'* '*'+ )* '/';
 LineComment      : '//' ~([\n\r\u2028\u2029])*;
 Space            : [ \t\r\n\f]+;
 
-Uri              : 'url(';
+Uri              : 'url(' Whitespace (Url | String_) (Space (Url | String_))* Whitespace ')';
 Format           : 'format(' Whitespace String_ Whitespace ')';
 
 AbsLength       : 'px'  | 'cm'   | 'mm'   | 'pt' | 'pc' | 'q';
@@ -152,4 +152,4 @@ String_
     ;
 
 // Give Ident least priority so that more specific rules matches first
-Ident : '-'? Nmstart Nmchar*;
+Ident : Nmstart Nmchar*;
