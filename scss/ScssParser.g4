@@ -28,7 +28,11 @@
 parser grammar ScssParser;
 options { tokenVocab=ScssLexer; }
 stylesheet : statement* EOF;
-statement: importDeclaration| variableDeclaration| propertyDeclaration|interpolationDeclaration| mediaDeclaration| mixinDeclaration| contentDeclaration | functionDeclaration| ifDeclaration| forDeclaration| whileDeclaration| eachDeclaration| fontFaceDeclaration| keyframesDeclaration|includeDeclaration| ruleset;
+statement: importDeclaration| variableDeclaration| propertyDeclaration|interpolationDeclaration| mediaDeclaration
+| mixinDeclaration| contentDeclaration | functionDeclaration| ifDeclaration| forDeclaration| whileDeclaration
+| eachDeclaration| fontFaceDeclaration| keyframesDeclaration|includeDeclaration|extendDeclaration|warndingDeclaration|
+errorDeclaration|ruleset|
+((Comment|Space|Cdo|Cdc)+ ws)+;
 
 // Import
 importDeclaration
@@ -47,6 +51,7 @@ variableValue : value | functionDeclaration | functionCall | mapDeclaration+ | l
 variableName
     : ((Minus Minus) Dollar | plusMinus Dollar | Dollar) identifier
     | namespace_ Dollar identifier
+    | Variable
     ;
 namespace_: (identifier Dot)+;
 
@@ -64,14 +69,19 @@ mixinDeclaration: Mixin ws (identifier| identifier Lparen ws parameters ws Rpare
 contentDeclaration: Content ws (Lparen ws parameters ws Rparen)? ws Semi? ws;
 
 fontFaceDeclaration: FontFace ws BlockStart ws statement* BlockEnd ws;
-keyframesDeclaration: Keyframes ws Space ws identifier? ws block;
-includeDeclaration: Include ws (identifier | functionCall) ws (Semi | Using ws Lparen ws parameters ws Rparen ws)? block? ws;
+keyframesDeclaration: Keyframes ws Space ws identifier? ws keyframesBlock ws;
+keyframesBlock: BlockStart ws keyframeStatement* BlockEnd | block;
+keyframeStatement: percentage ws block ws;
 
+includeDeclaration: Include ws (identifier | functionCall) ws (Semi | Using ws Lparen ws parameters ws Rparen ws)? block? ws;
 interpolationDeclaration: interpolation Colon ws propertyValue ws Semi? ws;
+extendDeclaration: Extend ws (id|typeSelector|universal|className|attrib|pseudo|interpolation|parent) ws Semi? ws;
+warndingDeclaration: Warn ws String_ ws Semi ws;
+errorDeclaration: Error ws String_ ws Semi ws;
 
 // Structure
 ruleset: selectorGroup block;
-block: BlockStart ws statement* BlockEnd ws;
+block: BlockStart ws statement* ws functionReturn? ws BlockEnd ws;
 
 // Selectors
 selectorGroup: selector ( Comma ws selector )*;
@@ -84,7 +94,7 @@ selectorSequence
     ;
 
 id: Hash identifier;
-typeSelector: typeNamespacePrefix? identifier;
+typeSelector: typeNamespacePrefix? Percentage? identifier;
 typeNamespacePrefix: ( identifier | Times )? Pipe;
 universal: typeNamespacePrefix? Times;
 className: Dot identifier;
@@ -102,34 +112,42 @@ negation: PseudoNot ws negationArg ws Rparen;
 negationArg: typeSelector| universal| Hash| className| attrib | pseudo;
 
 // Operators
-operator_: Div|Times|Minus|Plus|Greater|Less|Greater Eq|Less Eq |Eq Eq?|NotEq;
-value: unit|number|boolean|calc|rotate|rgba|var_|uri|Format|String_|functionCall|variableName|interpolation|hexcolor|identifier|expression|block;
+operator_: Div|Times|Minus|Plus|Greater|Less|Greater Eq|Less Eq |Eq Eq?|NotEq|And|Or|Not;
+value: unit|number|boolean|calc|rotate|rgba|var_|uri|repeat|Format|String_|functionCall|
+variableName|interpolation|hexcolor|identifier|expression|block|Lparen ws Rparen;
 
 // Function
 functionDeclaration: Function ws (namespace_? identifier)? ws Lparen ws parameters ws Rparen ws BlockStart ws functionBody? ws BlockEnd ws;
 parameters: parameter? (ws Comma ws parameter)* ws;
-parameter: (value|expression|variableDeclaration|listSpaceSeparated|mapDeclaration) arglist? ws;
+parameter: (value|variableDeclaration|listSpaceSeparated|mapDeclaration) arglist? ws;
 functionBody: functionStatement* ws functionReturn? ws;
-functionReturn: Return ws expression ws Semi ws;
+functionReturn: Return ws expression ws (Comma ws expression)* ws Semi? ws;
 functionStatement: expression Semi | statement;
 
 functionCall: namespace_? identifier ws Lparen ws parameters ws Rparen ws;
 
-expression: expressionPart (ws operator_ ws expressionPart )* ws;
-expressionPart: unit ws|identifier| variableName ws|number ws| plusMinus? Lparen ws expression Rparen ws;
+expression: Not? ws expressionPart ws (ws operator_ ws expressionPart )* ws;
+expressionPart: unit|identifier|variableName|var_|boolean|calc|rotate|rgba|number|
+uri|Format|String_|interpolation|hexcolor|ifExpression|functionCall|
+plusMinus? Lparen ws expression Rparen ws;
+
+ifExpression: If Lparen expression Comma value Comma value Rparen prio?;
 
 
 // List & Map
-listDeclaration: listBracketed|listCommaSeparated| listSpaceSeparated;
+listDeclaration
+    : (listBracketed|listCommaSeparated| listSpaceSeparated)
+    | Lparen ws listDeclaration ws Rparen ws;
 listCommaSeparated: listElement ws (Comma ws listElement)* ws Comma? ws;
 listSpaceSeparated: listElement+ ws;
 listBracketed: Lbrack ws (listSpaceSeparated|listCommaSeparated ) ws Rbrack ws;
 listElement: Lparen? ws (value ws Comma? ws)+ ws Rparen? ws Comma? ws;
 
-mapDeclaration: Lparen ws mapEntry ws (Comma ws mapEntry)* ws Comma? ws Rparen;
+mapDeclaration: Lparen ws (mapEntries) ws Rparen;
+mapEntries: mapEntry ws (Comma ws mapEntry)* ws Comma? ws;
 mapEntry: mapKey ws Colon ws mapValue;
-mapKey: listDeclaration| mapDeclaration | identifier;
-mapValue: listDeclaration | mapDeclaration | value;
+mapKey: value|listDeclaration| mapDeclaration;
+mapValue: value|listDeclaration | mapDeclaration;
 
 // Flow control
 ifDeclaration : AtIf ws expression ws block ws elseIfStatement* ws elseStatement? ws;
@@ -142,17 +160,18 @@ eachDeclaration: AtEach ws variableName ws (Comma ws variableName ws)* In ws eac
 eachValueList: listDeclaration| mapDeclaration;
 
 // Embeded functions
-var_: Var ws Variable ws Rparen ws;
+var_: Var ws Variable (ws Comma ws value)? ws Rparen ws;
 calc: Calc ws expression Rparen ws;
 rotate: Rotate ws degree Rparen ws;
-rgba  : Rgba ws (number Comma? ws)* Rparen ws;
+rgba  : Rgba ws value (ws Comma? ws value ws)* Rparen ws;
+repeat: Repeat ws value ws Comma ws number Freq Rparen ws;
 
 // Primitives
-unit: plusMinus? (length|dimension|percentage|degree) ws;
-length: Number (AbsLength|FontRelative|ViewportRelative);
-dimension: Number (Time| Freq| Resolution| Angle);
-percentage: Number Percentage;
-degree: Number Angle;
+unit: (length|dimension|percentage|degree) ws;
+length: plusMinus? Number (AbsLength|FontRelative|ViewportRelative);
+dimension: plusMinus? Number (Time| Freq| Resolution| Angle);
+percentage: plusMinus? Number Percentage;
+degree: plusMinus? Number Angle;
 
 uri : Uri ws;
 arglist: Dot Dot Dot;
@@ -161,5 +180,5 @@ hexcolor: Hash color;
 color: (Number | Ident)+;
 boolean : True| False ;
 number: plusMinus? Number;
-identifier : (VendorPrefix|'-')? Ident| Not| And| Or| From| To;
+identifier : (VendorPrefix|'-')? Ident| From| To;
 ws: ( Comment | Space )*;

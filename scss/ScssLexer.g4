@@ -56,7 +56,7 @@ FontRelative    : 'em'  | 'ex'   | 'ch'   | 'rem';
 ViewportRelative: 'vw'  | 'vh'   | 'vmin' | 'vmax';
 Angle           : 'deg' | 'rad'  | 'grad' | 'turn';
 Resolution      : 'dpi' | 'dpcm' | 'dppx';
-Freq            : 'hz'  | 'khz';
+Freq            : 'hz'  | 'khz'  | 'fr';
 Time            : 'ms'  | 's';
 Percentage      : '%';
 
@@ -73,6 +73,9 @@ Content   : '@content';
 Keyframes : '@keyframes';
 Return    : '@return';
 Media     : '@media';
+Extend    : '@extend';
+Warn      : '@warn';
+Error     : '@error';
 
 If        : 'if';
 AtIf      : '@if';
@@ -137,6 +140,7 @@ Calc      : 'calc(';
 Rotate    : 'rotate(';
 Var       : 'var(';
 Rgba      : 'rgba(';
+Repeat    : 'repeat(';
 
 PrefixMatch    : '^=';
 SuffixMatch    : '$=';
@@ -144,7 +148,8 @@ SubstringMatch : '*=';
 
 VendorPrefix: '-mox-' | '-webkit-' | '-o-';
 
-Variable : '--' Nmstart Nmchar*;
+Variable : '--' (Interpolation|Nmstart) (Interpolation|Nmchar)*;
+fragment Interpolation: Hash BlockStart Dollar? Ident BlockEnd;
 Number   : [0-9]+ | [0-9]* '.' [0-9]+;
 String_
     : '"' ( ~[\n\r\f\\"] | '\\' Newline | Escape )* '"'
