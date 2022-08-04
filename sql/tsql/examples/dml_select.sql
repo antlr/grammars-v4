@@ -647,6 +647,19 @@ GO
 SELECT NEXT VALUE FOR [dbo].[sequenceName]
 GO
 
+-- NEXT VALUE FOR OVER into variable
+DECLARE @T BIGINT;
+
+SELECT @T = NEXT VALUE FOR dbo.sequenceName OVER (ORDER BY SOME_COLUMN ASC)
+FROM (SELECT SOME_COLUMN = 1) AS T
+
+GO
+
+-- NEXT VALUE FOR OVER without variable
+SELECT NEXT VALUE FOR dbo.sequenceName OVER (ORDER BY SOME_COLUMN ASC)
+FROM (SELECT SOME_COLUMN = 1) AS T
+GO
+
 --Select with linked server
 SELECT * FROM [linkedServerName]..[schema].[table] tbl
 GO
