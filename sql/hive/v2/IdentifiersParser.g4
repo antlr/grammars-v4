@@ -290,12 +290,7 @@ precedenceUnaryOperator
     ;
 
 isCondition
-    : KW_NULL
-    | KW_TRUE
-    | KW_FALSE
-    | KW_NOT KW_NULL
-    | KW_NOT KW_TRUE
-    | KW_NOT KW_FALSE
+    : KW_NOT? (KW_NULL | KW_TRUE | KW_FALSE | KW_DISTINCT | KW_FROM)
     ;
 
 precedenceBitwiseXorOperator
@@ -332,35 +327,23 @@ precedenceRegexpOperator
     | KW_REGEXP
     ;
 
-precedenceSimilarOperator
-    : precedenceRegexpOperator
-    | LESSTHANOREQUALTO
+precedenceComparisonOperator
+    : LESSTHANOREQUALTO
     | LESSTHAN
     | GREATERTHANOREQUALTO
     | GREATERTHAN
-    ;
-
-precedenceDistinctOperator
-    : KW_IS KW_DISTINCT KW_FROM
-    ;
-
-precedenceEqualOperator
-    : EQUAL
+    | EQUAL
     | EQUAL_NS
     | NOTEQUAL
-    | KW_IS KW_NOT KW_DISTINCT KW_FROM
     ;
 
 precedenceNotOperator
     : KW_NOT
     ;
 
-precedenceAndOperator
+precedenceLogicOperator
     : KW_AND
-    ;
-
-precedenceOrOperator
-    : KW_OR
+    | KW_OR
     ;
 
 //precedenceFieldExpression
@@ -388,30 +371,15 @@ expression
     | expression precedenceConcatenateOperator expression
     | expression precedenceAmpersandOperator expression
     | expression precedenceBitwiseOrOperator expression
-    | expression precedenceSimilarExpressionPart
+    | expression precedenceComparisonOperator expression
+    | expression KW_NOT? precedenceRegexpOperator expression
+    | expression KW_NOT? KW_LIKE (KW_ANY | KW_ALL) expressionsInParenthesis
+    | expression KW_NOT? KW_IN precedenceSimilarExpressionIn
+    | expression KW_NOT? KW_BETWEEN expression KW_AND expression
     | KW_EXISTS subQueryExpression
-    | expression (precedenceEqualOperator | precedenceDistinctOperator) expression
     | precedenceNotOperator expression
-    | expression precedenceAndOperator expression
-    | expression precedenceOrOperator expression
+    | expression precedenceLogicOperator expression
     | LPAREN expression RPAREN
-    ;
-
-subQueryExpression
-    : LPAREN selectStatement RPAREN
-    ;
-
-precedenceSimilarExpressionPart
-    : precedenceSimilarOperator expression
-    | precedenceSimilarExpressionAtom
-    | KW_NOT precedenceSimilarExpressionPartNot
-    ;
-
-precedenceSimilarExpressionAtom
-    : KW_IN precedenceSimilarExpressionIn
-    | KW_BETWEEN expression KW_AND expression
-    | KW_LIKE KW_ANY expressionsInParenthesis
-    | KW_LIKE KW_ALL expressionsInParenthesis
     ;
 
 precedenceSimilarExpressionIn
@@ -419,9 +387,8 @@ precedenceSimilarExpressionIn
     | expressionsInParenthesis
     ;
 
-precedenceSimilarExpressionPartNot
-    : precedenceRegexpOperator expression
-    | precedenceSimilarExpressionAtom
+subQueryExpression
+    : LPAREN selectStatement RPAREN
     ;
 
 booleanValue

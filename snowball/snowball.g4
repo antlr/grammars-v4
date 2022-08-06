@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar snowball;
 
 program
-   : p*
+   : p* EOF
    ;
 
 p

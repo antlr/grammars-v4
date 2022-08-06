@@ -35,8 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar databank;
 
+options { superClass = DatabankParserBase; }
+
 databank
-   : EOL* (datedseries | undatedseries) sample +
+   : EOL* (datedseries | undatedseries) sample + EOL* EOF
    ;
 
 datedseries
@@ -48,7 +50,7 @@ undatedseries
    ;
 
 datatype
-   : ('-1' | '-4' | '-12') EOL
+   : FLOATINGPOINT { isdatatype() }? EOL
    ;
 
 dateline
@@ -65,7 +67,7 @@ number
 
 
 FLOATINGPOINT
-   : NUMBER (E SIGN? NUMBER)?
+   : ('-'|'+')? NUMBER (E SIGN? NUMBER)?
    ;
 
 

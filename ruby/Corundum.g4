@@ -35,7 +35,7 @@
 
 grammar Corundum;
 
-prog : expression_list;
+prog : expression_list EOF;
 
 expression_list : expression terminator
                 | expression_list expression terminator

@@ -1,0 +1,2 @@
+RESET SESSION foo.bar;
+RESET SESSION foo;

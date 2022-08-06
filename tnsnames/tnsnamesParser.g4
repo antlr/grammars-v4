@@ -9,7 +9,7 @@ options {tokenVocab=tnsnamesLexer;}
 //-----------------------------------------------------------------
 // Top level rule. Start here with a complete tnsnames.ora file.
 //-----------------------------------------------------------------
-tnsnames         : (tns_entry | ifile | lsnr_entry)* ;
+tnsnames         : (tns_entry | ifile | lsnr_entry)* EOF ;
 
 tns_entry        : alias_list EQUAL (description_list | description) ;
 

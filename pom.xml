@@ -68,7 +68,6 @@
 				<module>abb</module>
 				<module>abnf</module>
 				<module>acme</module>
-				<module>agc</module>
 				<module>alef</module>
 				<module>algol60</module>
 				<module>alloy</module>
@@ -115,6 +114,7 @@
 				<module>csv</module>
 				<module>ctl</module>
 				<module>cto</module>
+				<module>cypher</module>
 				<module>dart2</module>
 				<module>databank</module>
 				<module>dcm</module>
@@ -126,6 +126,7 @@
 				<module>edif300</module>
 				<module>edn</module>
 				<module>erlang</module>
+				<module>evm-bytecode</module>
 				<module>fasta</module>
                 <module>fdo91</module>
 				<module>fen</module>
@@ -332,7 +333,7 @@
 				<plugins>
 					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.3.0</version>
+						<version>3.4.2</version>
 						<configuration>
 							<descriptors>
 								<descriptor>${maven.multiModuleProjectDirectory}/assembly.xml</descriptor>

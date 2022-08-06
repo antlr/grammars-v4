@@ -26,7 +26,7 @@
 grammar clu;
 
 module
-   : equate* (procedure | iterator | cluster)
+   : equate* (procedure | iterator | cluster) EOF
    ;
 
 procedure

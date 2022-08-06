@@ -37,6 +37,7 @@ alter table table1 add primary key `table_pk` (`id`);
 alter table table1 drop foreign key fk_name;
 alter table table1 drop foreign key if exists fk_name;
 alter table table1 drop constraint if exists cons;
+alter table add_test wait 100 add column col1 int not null;
 #end
 #begin
 -- Alter database

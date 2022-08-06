@@ -1819,10 +1819,10 @@ relational_table
     ;
 
 relational_property
-    : (column_definition
-        | virtual_column_definition
-        | out_of_line_constraint
+    : ( out_of_line_constraint
         | out_of_line_ref_constraint
+        | column_definition
+        | virtual_column_definition
         | supplemental_logging_props
         )
     ;
@@ -2038,6 +2038,7 @@ physical_attributes_clause
       | PCTUSED pctused=UNSIGNED_INTEGER
       | INITRANS inittrans=UNSIGNED_INTEGER
       | MAXTRANS maxtrans=UNSIGNED_INTEGER
+      | COMPUTE STATISTICS
       | storage_clause
       )+
     ;
@@ -2054,6 +2055,7 @@ storage_clause
          | OPTIMAL (size_clause | NULL_ )
          | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
          | FLASH_CACHE (KEEP | NONE | DEFAULT)
+         | CELL_FLASH_CACHE (KEEP | NONE | DEFAULT)
          | ENCRYPT
          )+
        ')'
@@ -2855,7 +2857,7 @@ encryption_spec
     : (USING  CHAR_STRING)? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? (NO? SALT)?
     ;
 tablespace
-    : regular_id
+    : id_expression
     ;
 
 varray_item

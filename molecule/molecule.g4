@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar molecule;
 
 molecule
-   : part_ ('·' part_)*
+   : part_ ('·' part_)* EOF
    ;
 
 part_

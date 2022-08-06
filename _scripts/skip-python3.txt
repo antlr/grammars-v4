@@ -11,6 +11,7 @@ cql3
 csharp
 css3
 dart2
+databank
 dice
 dot
 edif300
@@ -22,7 +23,6 @@ fortran77
 gdscript
 gff3
 gml
-golang
 haskell
 html
 hypertalk
@@ -33,7 +33,6 @@ infosapient
 java/java9
 javadoc
 javascript/ecmascript
-javascript/javascript
 javascript/jsx
 javascript/typescript
 joss

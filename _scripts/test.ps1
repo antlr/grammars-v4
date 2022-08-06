@@ -86,6 +86,10 @@ function Test-Grammar {
             FailedCases = @()
         }
     }
+    $hasTransform = Test-Path transformGrammar.py
+    if ($hasTransform) {
+        python3 transformGrammar.py
+    }
 
     # build
 

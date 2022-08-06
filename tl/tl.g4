@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar tl;
 
+file_ : proposition EOF;
+
 proposition
    :
    | TL_UPTACK

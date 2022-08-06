@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar janus;
 
 program
-   : (IDENT ('[' NUM ']')?)* ('PROCEDURE' IDENT statements)*
+   : (IDENT ('[' NUM ']')?)* ('PROCEDURE' IDENT statements)* EOF
    ;
 
 statements

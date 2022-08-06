@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar orwell;
 
 program
-   : decl+
+   : decl+ EOF
    ;
 
 decl
