@@ -237,7 +237,7 @@ universal
     ;
 
 className
-    : Dot ( identifier | interpolation )
+    : Dot ( Minus | identifier | interpolation )+
     ;
 
 interpolation
@@ -255,7 +255,7 @@ attrib
     ;
 
 pseudo
-    : Colon Colon? ( identifier | functionalPseudo )
+    : Colon Colon? ( interpolation | identifier | functionalPseudo )
     ;
 
 functionalPseudo
@@ -371,7 +371,8 @@ expressionPart
     | hexcolor
     | ifExpression
     | functionCall
-    | plusMinus? Lparen ws expression Rparen ws
+    | plusMinus? Lparen ws expression? Rparen ws
+    | prio
     ;
 
 ifExpression
@@ -546,7 +547,7 @@ number
     ;
 
 identifier
-    : (VendorPrefix|'-')? Ident
+    : ( VendorPrefix  | Minus )? Ident
     | From
     | To
     ;
