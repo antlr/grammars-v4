@@ -9,7 +9,12 @@ function Build-Grammar {
         \}
     \}
 }>
-    $g = dart pub get
+    For ($i=0; $i -le 5; $i++) {
+        $g = dart pub get
+        if($LASTEXITCODE -eq 0){
+            Break
+        }
+    }
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g
