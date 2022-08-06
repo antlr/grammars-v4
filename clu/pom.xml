@@ -36,9 +36,8 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<enabled>true</enabled>
 					<verbose>false</verbose>
-					<showTree>true</showTree>
+					<showTree>false</showTree>
 					<entryPoint>module</entryPoint>
 					<grammarName>clu</grammarName>
 					<packageName></packageName>

@@ -13,6 +13,7 @@ cobol85
 cpp
 csharp
 dart2
+databank
 edif300
 fortran77
 gdscript

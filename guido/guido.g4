@@ -33,8 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar guido;
 
 prog
-   : (segment +)
-   | sequencelist
+   : ((segment +) | sequencelist) EOF
    ;
 
 segment

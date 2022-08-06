@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar logo;
 
 prog
-   : (line? EOL) + line?
+   : (line? EOL) + line? EOF
    ;
 
 line

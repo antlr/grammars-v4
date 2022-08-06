@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar rpn;
 
 expression
-   : signedAtom term*
+   : signedAtom term* EOF
    ;
 
 term

@@ -1,0 +1,1 @@
+MERGE INTO inventory AS i   USING changes AS c   ON i.part = c.part WHEN MATCHED AND c.action = 'mod'   THEN UPDATE SET     qty = qty + c.qty   , ts = CURRENT_TIMESTAMP WHEN MATCHED AND c.action = 'del'   THEN DELETE WHEN NOT MATCHED AND c.action = 'new'   THEN INSERT (part, qty) VALUES (c.part, c.qty);

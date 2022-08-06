@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar calculator;
 
 equation
-   : expression relop expression
+   : expression relop expression EOF
    ;
 
 expression

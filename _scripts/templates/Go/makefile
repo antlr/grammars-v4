@@ -8,6 +8,7 @@ SOURCES = $(GENERATED) Test.go
 default: classes
 classes: setup $(SOURCES) program
 setup:
+	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 	-export | grep GO
 	-go env
 	-go version

@@ -1,1 +1,1 @@
-(smiles (chain (branched_atom (atom (aliphatic_organic S))) (branched_atom (atom (aromatic_organic c)))))
+(smiles (chain (branched_atom (atom (aliphatic_organic S))) (branched_atom (atom (aromatic_organic c)))) <EOF>)
