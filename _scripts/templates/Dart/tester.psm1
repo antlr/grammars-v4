@@ -14,6 +14,7 @@ function Build-Grammar {
         if($LASTEXITCODE -eq 0){
             Break
         }
+        Write-Host "dart pub get failed. Trying again."
     }
     if($LASTEXITCODE -ne 0){
         return @{
