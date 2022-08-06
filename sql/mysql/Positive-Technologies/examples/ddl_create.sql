@@ -190,6 +190,7 @@ CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` big
 RENAME TABLE old_table TO tmp_table, new_table TO old_table, tmp_table TO new_table;
 RENAME TABLE table_b TO table_a;
 RENAME TABLE current_db.tbl_name TO other_db.tbl_name;
+rename table debezium_all_types_old to debezium_all_types, test_json_object_old wait 10 to test_json_object;
 #end
 #begin
 -- Truncate table
@@ -197,6 +198,7 @@ truncate table t1;
 truncate parent_table;
 truncate `#`;
 truncate `#!^%$`;
+truncate table tbl_without_pk nowait;
 #end
 #begin
 -- Create database
@@ -239,6 +241,7 @@ create index index6 on antlr_tokens(token(30) asc) algorithm default lock defaul
 create index index7 on antlr_tokens(token(30) asc) lock default algorithm default;
 -- Create mariadb index
 CREATE INDEX IF NOT EXISTS DX_DT_LAST_UPDATE ON patient(DT_LAST_UPDATE) WAIT 100 KEY_BLOCK_SIZE=1024M CLUSTERING =YES USING RTREE NOT IGNORED ALGORITHM = NOCOPY LOCK EXCLUSIVE;
+create index index8 on t1(col1) nowait comment 'test index' using btree;
 #end
 #begin
 -- Create logfile group
@@ -526,4 +529,9 @@ WITH RECURSIVE cte (n) AS
   SELECT n + 1 FROM cte WHERE n < 5
 )
 SELECT * FROM cte;
+#end
+
+#begin
+lock tables t1 read nowait;
+lock table t1 read local wait 100;
 #end
