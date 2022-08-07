@@ -241,7 +241,7 @@ className
     ;
 
 interpolation
-    : namespace_? Hash BlockStart namespace_? ( ifExpression | value | parent ) BlockEnd
+    : namespace_? Hash BlockStart namespace_? ( ifExpression | value | parent ) BlockEnd measurment?
     ;
 
 parent
@@ -351,7 +351,7 @@ functionCall
     ;
 
 expression
-    : Not? ws expressionPart ws (ws operator_ ws expressionPart )* ws
+    : Not? ws expressionPart ws (ws operator_ ws Not? ws expressionPart )* ws
     ;
 
 expressionPart
@@ -377,7 +377,7 @@ expressionPart
     ;
 
 ifExpression
-    : If Lparen ( expression | parent ) Comma value Comma value Rparen prio?
+    : If Lparen ( expression | parent ) Comma value Comma value Rparen measurment? ws prio?
     ;
 
 
