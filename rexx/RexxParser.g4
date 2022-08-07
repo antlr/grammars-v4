@@ -226,7 +226,20 @@ comparison                  :   concatenation ( comparison_operator concatenatio
                             |   CMPS_NM
                             |   CMPS_NL
                             ;
-concatenation               :   addition ( CONCAT? addition )* ;
+concatenation               :   addition (concatenation_op addition)* ;
+ concatenation_op           :   {
+                                   (getTokenStream().get(getCurrentToken().getTokenIndex()-1).getChannel() == RexxLexer.WHITESPACE_CHANNEL)
+                                }? blank_concatenation_op // If previous token is whitespace, this is blank-concatenation.
+                            |   normal_concatenation_op
+                            ;
+  normal_concatenation_op   :   {
+                                   (getTokenStream().get(getCurrentToken().getTokenIndex()-1).getChannel() != RexxLexer.WHITESPACE_CHANNEL)
+                                }? // If previous token is not whitespace, this is abuttal-concatenation.
+                                // Note: no token or rule to match here, just the predicate.
+                            |   CONCAT
+                            ;
+  blank_concatenation_op    :   ; // Note: no token or rule to match here, just the predicate.
+
 addition                    :   multiplication ( additive_operator multiplication )* ;
   additive_operator         :   PLUS
                             |   MINUS
