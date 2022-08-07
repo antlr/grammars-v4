@@ -96,7 +96,7 @@ variableValue
 
 variableName
     : ( ( Minus Minus ) Dollar | plusMinus Dollar | Dollar) identifier
-    | plusMinus? ws namespace_? Dollar identifier
+    | plusMinus? ws namespace_? Dollar ( identifier | measurment )
     | Variable
     ;
 
@@ -241,7 +241,7 @@ className
     ;
 
 interpolation
-    : namespace_? Hash BlockStart namespace_? ( value | parent ) BlockEnd
+    : namespace_? Hash BlockStart namespace_? ( ifExpression | value | parent ) BlockEnd
     ;
 
 parent
@@ -376,7 +376,7 @@ expressionPart
     ;
 
 ifExpression
-    : If Lparen expression Comma value Comma value Rparen prio?
+    : If Lparen ( expression | parent ) Comma value Comma value Rparen prio?
     ;
 
 
@@ -448,6 +448,7 @@ forDeclaration
 through
     : Number ws
     | functionCall
+    | expression
     ;
 
 whileDeclaration
