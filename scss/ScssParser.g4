@@ -373,6 +373,7 @@ expressionPart
     | functionCall
     | plusMinus? Lparen ws expression? Rparen ws
     | prio
+    | measurment
     ;
 
 ifExpression
