@@ -1,4 +1,5 @@
 lexer grammar RexxLexer;
+channels { WHITESPACE_CHANNEL }
 
 // Main rules
 // %INCLUDE statement
@@ -8,7 +9,7 @@ LINE_COMMENT                    :   Line_Comment_
                                 ->  channel(HIDDEN);
 BLOCK_COMMENT                   :   Block_Comment_
                                 ->  channel(HIDDEN);
-WHISPACES                       :   Whitespaces_            -> channel(HIDDEN);
+WHITESPACES                     :   Whitespaces_            -> channel(WHITESPACE_CHANNEL);
 CONTINUATION                    :   Continue_               -> channel(HIDDEN);
 
 // Keywords
