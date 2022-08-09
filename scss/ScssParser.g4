@@ -32,7 +32,7 @@ parser grammar ScssParser;
 options { tokenVocab=ScssLexer; }
 
 stylesheet
-    : statement* EOF;
+    : ( statement ( ( Comment | Space | Cdo | Cdc )+ ws )+ )* EOF;
 
 statement
     : importDeclaration
@@ -56,7 +56,6 @@ statement
     | ruleset
     | atStatementDeclaration
     | percentageStatement
-    | ( ( Comment | Space | Cdo | Cdc )+ ws )+
     ;
 
 // Import
