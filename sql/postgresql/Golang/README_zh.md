@@ -50,3 +50,17 @@ java -jar ./antlr-4.10.1-complete.jar -Dlanguage=Go ./Golang/PostgreSQLParser.g4
 
 运行`test/main.go`，康康是否能够正常输出。
 
+# 不想自己动手，有没有弄好的？ 
+
+我有一个编译好的项目： 
+```text 
+https://github.com/CC11001100/go-antlrv4-postgresql-parser
+```
+
+您可以基于这个项目继续做，或者直接添加依赖： 
+```shell
+go get -u github.com/CC11001100/go-antlrv4-postgresql-parser
+```
+
+
+

@@ -45,3 +45,18 @@ java -jar ./antlr-4.10.1-complete.jar -Dlanguage=Go ./Golang/PostgreSQLParser.g4
 # Step 4.
 
 Run `test/main.go` to see if Kangkang can output normally.
+
+# Don't want to do it yourself, have you done it?
+
+I have a compiled project:
+
+````text
+https://github.com/CC11001100/go-antlrv4-postgresql-parser
+````
+
+You can continue based on this project, or add dependencies directly:
+
+```shell
+go get -u github.com/CC11001100/go-antlrv4-postgresql-parser
+````
+
