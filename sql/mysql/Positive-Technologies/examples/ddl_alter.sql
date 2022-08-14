@@ -90,3 +90,8 @@ alter definer = current_user sql security invoker view my_view4(c1, 1c, _, c1_2)
 rename user user1@100.200.1.1 to user2@100.200.1.2;
 alter user 'user'@'%' IDENTIFIED BY 'newpassword' RETAIN CURRENT PASSWORD;
 #end
+#begin
+-- Alter sequence
+ALTER SEQUENCE IF EXISTS s2 start=100;
+ALTER SEQUENCE s1 CACHE=1000 NOCYCLE RESTART WITH 1;
+#end
