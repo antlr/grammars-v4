@@ -7,7 +7,6 @@ asm/masm
 asn/asn_3gpp
 clif
 csharp
-dart2
 databank
 dice
 erlang
