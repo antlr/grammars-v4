@@ -228,12 +228,12 @@ comparison                  :   concatenation ( comparison_operator concatenatio
                             ;
 concatenation               :   addition (concatenation_op addition)* ;
  concatenation_op           :   {
-                                   (getTokenStream().get(getCurrentToken().getTokenIndex()-1).getChannel() == RexxLexer.WHITESPACE_CHANNEL)
+                                   (getTokenStream().get(getCurrentToken().getTokenIndex()-1).getType() == RexxLexer.WHITESPACES)
                                 }? blank_concatenation_op // If previous token is whitespace, this is blank-concatenation.
                             |   normal_concatenation_op
                             ;
   normal_concatenation_op   :   {
-                                   (getTokenStream().get(getCurrentToken().getTokenIndex()-1).getChannel() != RexxLexer.WHITESPACE_CHANNEL)
+                                   (getTokenStream().get(getCurrentToken().getTokenIndex()-1).getType() != RexxLexer.WHITESPACES)
                                 }? // If previous token is not whitespace, this is abuttal-concatenation.
                                 // Note: no token or rule to match here, just the predicate.
                             |   CONCAT
