@@ -255,8 +255,13 @@ power_expression            :   prefix_expression ( POW prefix_expression )* ;
     term                    :   function_
                             |   BR_O expression  BR_C
                             |   symbol
-                            |   STRING
+                            |   binary_string
+                            |   hex_string
+                            |   string
                             ;
+      binary_string         :   BINARY_STRING ;
+      hex_string            :   HEX_STRING ;
+      string                :   STRING ;
       function_             :   function_name function_parameters ;
         function_name       :   KWD_ADDRESS
                             |   KWD_ARG
