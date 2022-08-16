@@ -1872,7 +1872,7 @@ select_statement_standalone
     ;
 
 select_statement
-    : query_expression order_by_clause? for_clause? option_clause? ';'?
+    : query_expression select_order_by_clause? for_clause? option_clause? ';'?
     ;
 
 time
@@ -3546,7 +3546,7 @@ predicate
 
 query_expression
     : (query_specification | '(' query_expression ')' (UNION ALL? query_expression)? )
-    |  query_specification order_by_clause? unions+=sql_union* //if using top, order by can be on the "top" side of union :/
+    |  query_specification select_order_by_clause? unions+=sql_union* //if using top, order by can be on the "top" side of union :/
     ;
 
 sql_union
@@ -3581,9 +3581,14 @@ top_count
     | '(' topcount_expression=expression ')'
     ;
 
-// https://msdn.microsoft.com/en-us/library/ms188385.aspx
+// https://docs.microsoft.com/en-us/sql/t-sql/queries/select-over-clause-transact-sql?view=sql-server-ver16
 order_by_clause
     : ORDER BY order_bys+=order_by_expression (',' order_bys+=order_by_expression)*
+    ;
+
+// https://msdn.microsoft.com/en-us/library/ms188385.aspx
+select_order_by_clause
+    : order_by_clause
       (OFFSET offset_exp=expression offset_rows=(ROW | ROWS) (FETCH fetch_offset=(FIRST | NEXT) fetch_exp=expression fetch_rows=(ROW | ROWS) ONLY)?)?
     ;
 
@@ -3690,9 +3695,8 @@ select_list_elem
     : asterisk
     | column_elem
     | udt_elem
-    | LOCAL_ID (assignment_operator | '=') ( expression | NEXT VALUE FOR table_name over_clause?)
+    | LOCAL_ID (assignment_operator | '=') expression
     | expression_elem
-    | NEXT VALUE FOR table_name over_clause? as_column_alias?
     ;
 
 table_sources
@@ -3856,9 +3860,90 @@ freetext_predicate
     | FREETEXT '(' table_name ',' (full_column_name | '(' full_column_name (',' full_column_name)* ')' | '*' ) ',' expression  (',' LANGUAGE expression)? ')'
     ;
 built_in_functions
+    // Metadata functions
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/app-name-transact-sql?view=sql-server-ver16
+    : APP_NAME '(' ')'                                                      #APP_NAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/applock-mode-transact-sql?view=sql-server-ver16
+    | APPLOCK_MODE '(' database_principal=expression ',' resource_name=expression ',' lock_owner=expression ')' #APPLOCK_MODE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/applock-test-transact-sql?view=sql-server-ver16
+    | APPLOCK_TEST '(' database_principal=expression ',' resource_name=expression ',' lock_mode=expression ',' lock_owner=expression ')' #APPLOCK_TEST
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/assemblyproperty-transact-sql?view=sql-server-ver16
+    | ASSEMBLYPROPERTY '(' assembly_name=expression ',' property_name=expression ')' #ASSEMBLYPROPERTY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/col-length-transact-sql?view=sql-server-ver16
+    | COL_LENGTH '(' table=expression ',' column=expression ')'             #COL_LENGTH
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/col-name-transact-sql?view=sql-server-ver16
+    | COL_NAME '(' table_id=expression ',' column_id=expression ')'         #COL_NAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/columnproperty-transact-sql?view=sql-server-ver16
+    | COLUMNPROPERTY '(' id=expression ',' column=expression ',' property=expression ')' #COLUMNPROPERTY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/databasepropertyex-transact-sql?view=sql-server-ver16
+    | DATABASEPROPERTYEX '(' database=expression ',' property=expression ')' #DATABASEPROPERTYEX
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/db-id-transact-sql?view=sql-server-ver16
+    | DB_ID '(' database_name=expression? ')'                               #DB_ID
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/db-name-transact-sql?view=sql-server-ver16
+    | DB_NAME '(' database_id=expression? ')'                               #DB_NAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/file-id-transact-sql?view=sql-server-ver16
+    | FILE_ID '(' file_name=expression ')'                                  #FILE_ID
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/file-idex-transact-sql?view=sql-server-ver16
+    | FILE_IDEX '(' file_name=expression ')'                                #FILE_IDEX
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/file-name-transact-sql?view=sql-server-ver16
+    | FILE_NAME '(' file_id=expression ')'                                  #FILE_NAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/filegroup-id-transact-sql?view=sql-server-ver16
+    | FILEGROUP_ID '(' filegroup_name=expression ')'                        #FILEGROUP_ID
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/filegroup-name-transact-sql?view=sql-server-ver16
+    | FILEGROUP_NAME '(' filegroup_id=expression ')'                        #FILEGROUP_NAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/filegroupproperty-transact-sql?view=sql-server-ver16
+    | FILEGROUPPROPERTY '(' filegroup_name=expression ',' property=expression ')' #FILEGROUPPROPERTY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/fileproperty-transact-sql?view=sql-server-ver16
+    | FILEPROPERTY '(' file_name=expression ',' property=expression ')'     #FILEPROPERTY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/filepropertyex-transact-sql?view=sql-server-ver16
+    | FILEPROPERTYEX '(' name=expression ',' property=expression ')'        #FILEPROPERTYEX
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/fulltextcatalogproperty-transact-sql?view=sql-server-ver16
+    | FULLTEXTCATALOGPROPERTY '(' catalog_name=expression ',' property=expression ')' #FULLTEXTCATALOGPROPERTY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/fulltextserviceproperty-transact-sql?view=sql-server-ver16
+    | FULLTEXTSERVICEPROPERTY '(' property=expression ')'                   #FULLTEXTSERVICEPROPERTY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/index-col-transact-sql?view=sql-server-ver16
+    | INDEX_COL '(' table_or_view_name=expression ',' index_id=expression ',' key_id=expression ')' #INDEX_COL
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/indexkey-property-transact-sql?view=sql-server-ver16
+    | INDEXKEY_PROPERTY '(' object_id=expression ',' index_id=expression ',' key_id=expression ',' property=expression ')' #INDEXKEY_PROPERTY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/indexproperty-transact-sql?view=sql-server-ver16
+    | INDEXPROPERTY '(' object_id=expression ',' index_or_statistics_name=expression ',' property=expression ')' #INDEXPROPERTY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/next-value-for-transact-sql?view=sql-server-ver16
+    | NEXT VALUE FOR sequence_name=table_name ( OVER '(' order_by_clause ')' )? #NEXT_VALUE_FOR
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/object-definition-transact-sql?view=sql-server-ver16
+    | OBJECT_DEFINITION '(' object_id=expression ')'                        #OBJECT_DEFINITION
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/object-id-transact-sql?view=sql-server-ver16
+    | OBJECT_ID '(' object_name=expression ( ',' object_type=expression )? ')'      #OBJECT_ID
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/object-name-transact-sql?view=sql-server-ver16
+    | OBJECT_NAME '(' object_id=expression ( ',' database_id=expression )? ')' #OBJECT_NAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/object-schema-name-transact-sql?view=sql-server-ver16
+    | OBJECT_SCHEMA_NAME '(' object_id=expression ( ',' database_id=expression )? ')' #OBJECT_SCHEMA_NAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/objectproperty-transact-sql?view=sql-server-ver16
+    | OBJECTPROPERTY '(' id=expression ',' property=expression ')'          #OBJECTPROPERTY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/objectpropertyex-transact-sql?view=sql-server-ver16
+    | OBJECTPROPERTYEX '(' id=expression ',' property=expression ')'        #OBJECTPROPERTYEX
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/original-db-name-transact-sql?view=sql-server-ver16
+    | ORIGINAL_DB_NAME '(' ')'                                              #ORIGINAL_DB_NAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/parsename-transact-sql?view=sql-server-ver16
+    | PARSENAME '(' object_name=expression ',' object_piece=expression ')'  #PARSENAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/schema-id-transact-sql?view=sql-server-ver16
+    | SCHEMA_ID '(' schema_name=expression? ')'                             #SCHEMA_ID
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/schema-name-transact-sql?view=sql-server-ver16
+    | SCHEMA_NAME '(' schema_id=expression? ')'                             #SCHEMA_NAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/scope-identity-transact-sql?view=sql-server-ver16
+    | SCOPE_IDENTITY '(' ')'                                                #SCOPE_IDENTITY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/serverproperty-transact-sql?view=sql-server-ver16
+    | SERVERPROPERTY '(' property=expression ')'                            #SERVERPROPERTY
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/stats-date-transact-sql?view=sql-server-ver16
+    | STATS_DATE '(' object_id=expression ',' stats_id=expression ')'       #STATS_DATE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/type-id-transact-sql?view=sql-server-ver16
+    | TYPE_ID '(' type_name=expression ')'                                  #TYPE_ID
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/type-name-transact-sql?view=sql-server-ver16
+    | TYPE_NAME '(' type_id=expression ')'                                  #TYPE_NAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/typeproperty-transact-sql?view=sql-server-ver16
+    | TYPEPROPERTY '(' type=expression ',' property=expression ')'          #TYPEPROPERTY
     // System functions
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
-    : BINARY_CHECKSUM '(' ( star='*' | expression (',' expression)* ) ')'   #BINARY_CHECKSUM
+    | BINARY_CHECKSUM '(' ( star='*' | expression (',' expression)* ) ')'   #BINARY_CHECKSUM
     // https://msdn.microsoft.com/en-us/library/ms189788.aspx
     | CHECKSUM '(' ( star='*' | expression (',' expression)* ) ')'          #CHECKSUM
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/compress-transact-sql?view=sql-server-ver16
@@ -4109,7 +4194,7 @@ analytic_windowed_function
     : (FIRST_VALUE | LAST_VALUE) '(' expression ')' over_clause
     | (LAG | LEAD) '(' expression  (',' expression (',' expression)? )? ')' over_clause
     | (CUME_DIST | PERCENT_RANK) '(' ')' OVER '(' (PARTITION BY expression_list)? order_by_clause ')'
-    | (PERCENTILE_CONT | PERCENTILE_DISC) '(' expression ')' WITHIN GROUP '(' ORDER BY expression (ASC | DESC)? ')' OVER '(' (PARTITION BY expression_list)? ')'
+    | (PERCENTILE_CONT | PERCENTILE_DISC) '(' expression ')' WITHIN GROUP '(' order_by_clause ')' OVER '(' (PARTITION BY expression_list)? ')'
     ;
 
 all_distinct_expression
@@ -4407,10 +4492,14 @@ keyword
     | ANSI_NULLS
     | ANSI_PADDING
     | ANSI_WARNINGS
+    | APP_NAME
     | APPLICATION_LOG
+    | APPLOCK_MODE
+    | APPLOCK_TEST
     | APPLY
     | ARITHABORT
     | ASSEMBLY
+    | ASSEMBLYPROPERTY
     | AT_KEYWORD
     | AUDIT
     | AUDIT_GUID
@@ -4449,9 +4538,12 @@ keyword
     | CHECKSUM
     | CHECKSUM_AGG
     | CLEANUP
+    | COL_LENGTH
+    | COL_NAME
     | COLLECTION
     | COLUMN_ENCRYPTION_KEY
     | COLUMN_MASTER_KEY
+    | COLUMNPROPERTY
     | COLUMNS
     | COLUMNSTORE
     | COLUMNSTORE_ARCHIVE
@@ -4476,6 +4568,8 @@ keyword
     | CURSOR_CLOSE_ON_COMMIT
     | CURSOR_DEFAULT
     | DATA
+    | DATABASE_PRINCIPAL_ID
+    | DATABASEPROPERTYEX
     | DATE_CORRELATION_OPTIMIZATION
     | DATEADD
     | DATEDIFF
@@ -4484,6 +4578,8 @@ keyword
     | DAYS
     | DB_CHAINING
     | DB_FAILOVER
+    | DB_ID
+    | DB_NAME
     | DECRYPTION
     | DEFAULT_DOUBLE_QUOTE
     | DEFAULT_FULLTEXT_LANGUAGE
@@ -4530,10 +4626,18 @@ keyword
     | FAILURE_CONDITION_LEVEL
     | FAST
     | FAST_FORWARD
+    | FILE_ID
+    | FILE_IDEX
+    | FILE_NAME
     | FILEGROUP
+    | FILEGROUP_ID
+    | FILEGROUP_NAME
+    | FILEGROUPPROPERTY
     | FILEGROWTH
     | FILENAME
     | FILEPATH
+    | FILEPROPERTY
+    | FILEPROPERTYEX
     | FILESTREAM
     | FILTER
     | FIRST
@@ -4546,12 +4650,14 @@ keyword
     | FORWARD_ONLY
     | FULLSCAN
     | FULLTEXT
+    | FULLTEXTCATALOGPROPERTY
+    | FULLTEXTSERVICEPROPERTY
     | GB
+    | GENERATED
     | GETDATE
     | GETUTCDATE
     | GLOBAL
     | GO
-    | GENERATED
     | GROUP_MAX_REQUESTS
     | GROUPING
     | GROUPING_ID
@@ -4570,6 +4676,9 @@ keyword
     | IMPORTANCE
     | INCLUDE_NULL_VALUES
     | INCREMENTAL
+    | INDEX_COL
+    | INDEXKEY_PROPERTY
+    | INDEXPROPERTY
     | INITIATOR
     | INPUT
     | INSENSITIVE
@@ -4656,6 +4765,12 @@ keyword
     | NUMBER
     | NUMERIC_ROUNDABORT
     | OBJECT
+    | OBJECT_DEFINITION
+    | OBJECT_ID
+    | OBJECT_NAME
+    | OBJECT_SCHEMA_NAME
+    | OBJECTPROPERTY
+    | OBJECTPROPERTYEX
     | OFFLINE
     | OFFSET
     | OLD_ACCOUNT
@@ -4666,6 +4781,7 @@ keyword
     | OPTIMISTIC
     | OPTIMIZE
     | OPTIMIZE_FOR_SEQUENTIAL_KEY
+    | ORIGINAL_DB_NAME
     | OUT
     | OUTPUT
     | OVERRIDE
@@ -4675,6 +4791,7 @@ keyword
     | PAGECOUNT
     | PAGE_VERIFY
     | PARAMETERIZATION
+    | PARSENAME
     | PARTITION
     | PARTITIONS
     | PARTNER
@@ -4747,7 +4864,10 @@ keyword
     | ROWGUID
     | ROWS
     | SAMPLE
+    | SCHEMA_ID
+    | SCHEMA_NAME
     | SCHEMABINDING
+    | SCOPE_IDENTITY
     | SCOPED
     | SCROLL
     | SCROLL_LOCKS
@@ -4768,6 +4888,7 @@ keyword
     | SEQUENCE
     | SEQUENCE_NUMBER
     | SERIALIZABLE
+    | SERVERPROPERTY
     | SESSION_TIMEOUT
     | SETERROR
     | SHARE
@@ -4786,6 +4907,7 @@ keyword
     | STATIC
     | STATISTICS_INCREMENTAL
     | STATISTICS_NORECOMPUTE
+    | STATS_DATE
     | STATS_STREAM
     | STATUS
     | STATUSONLY
@@ -4825,7 +4947,10 @@ keyword
     | TSQL
     | TWO_DIGIT_YEAR_CUTOFF
     | TYPE
+    | TYPE_ID
+    | TYPE_NAME
     | TYPE_WARNING
+    | TYPEPROPERTY
     | UNBOUNDED
     | UNCOMMITTED
     | UNKNOWN
@@ -4839,6 +4964,7 @@ keyword
     | VAR
     | VARBINARY_KEYWORD
     | VARP
+    | VERSION
     | VIEW_METADATA
     | VIEWS
     | WAIT
