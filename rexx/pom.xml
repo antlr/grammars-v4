@@ -37,28 +37,13 @@
 				<artifactId>antlr4test-maven-plugin</artifactId>
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
-					<scenarios>
-						<scenario>
-							<scenarioName>Parse-Examples</scenarioName>
-							<verbose>false</verbose>
-							<showTree>false</showTree>
-							<entryPoint>file_</entryPoint>
-							<grammarName>Rexx</grammarName>
-							<exampleFiles>examples/</exampleFiles>
-							<testFileExtension>txt</testFileExtension>
-							<packageName></packageName>
-						</scenario>
-						<scenario>
-							<scenarioName>Parse-And-Verify-Examples</scenarioName>
-							<verbose>false</verbose>
-							<showTree>false</showTree>
-							<entryPoint>file_</entryPoint>
-							<grammarName>Rexx</grammarName>
-							<exampleFiles>temp-examples-to-verify/</exampleFiles>
-							<testFileExtension>rex</testFileExtension>
-							<packageName></packageName>
-						</scenario>
-					</scenarios>
+					<verbose>false</verbose>
+					<showTree>false</showTree>
+					<entryPoint>file_</entryPoint>
+					<grammarName>Rexx</grammarName>
+					<exampleFiles>temp-examples/</exampleFiles>
+					<testFileExtension></testFileExtension>
+					<packageName></packageName>
 				</configuration>
 				<executions>
 					<execution>
@@ -73,14 +58,14 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>prepare-verifable-examples</id>
+						<id>prepare-examples</id>
 						<phase>process-test-resources</phase>
 						<configuration>
 							<tasks>
-								<delete dir="${basedir}/temp-examples-to-verify" quiet="true" />
-								<mkdir dir="${basedir}/temp-examples-to-verify" />
-								<fixcrlf srcdir="${basedir}/examples-to-verify"
-									destdir="${basedir}/temp-examples-to-verify"
+								<delete dir="${basedir}/temp-examples" quiet="true" />
+								<mkdir dir="${basedir}/temp-examples" />
+								<fixcrlf srcdir="${basedir}/examples"
+									destdir="${basedir}/temp-examples"
 									eol="lf"
 									eof="asis"
 									fixlast="false"
@@ -96,7 +81,7 @@
 						<phase>test</phase>
 						<configuration>
 							<tasks>
-								<delete dir="${basedir}/temp-examples-to-verify" />
+								<delete dir="${basedir}/temp-examples" />
 							</tasks>
 						</configuration>
 						<goals>
