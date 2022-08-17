@@ -1,2 +1,2 @@
-select fillfactor from (select 1 as fillfactor) t;
+select fillfactor from (select 1 as [fillfactor]) t;
 
