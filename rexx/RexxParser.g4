@@ -1,5 +1,9 @@
 parser grammar RexxParser;
-options { tokenVocab=RexxLexer; }
+
+options {
+    superClass=RexxParserBase;
+    tokenVocab=RexxLexer;
+}
 
 file_                        :   program_ EOF ;
 
@@ -227,14 +231,10 @@ comparison                  :   concatenation ( comparison_operator concatenatio
                             |   CMPS_NL
                             ;
 concatenation               :   addition (concatenation_op addition)* ;
- concatenation_op           :   {
-                                   (getTokenStream().get(getCurrentToken().getTokenIndex()-1).getType() == RexxLexer.WHITESPACES)
-                                }? blank_concatenation_op // If previous token is whitespace, this is blank-concatenation.
+ concatenation_op           :   { $parser.is_prev_token_whitespace() }? blank_concatenation_op // If previous token is whitespace, this is blank-concatenation.
                             |   normal_concatenation_op
                             ;
-  normal_concatenation_op   :   {
-                                   (getTokenStream().get(getCurrentToken().getTokenIndex()-1).getType() != RexxLexer.WHITESPACES)
-                                }? // If previous token is not whitespace, this is abuttal-concatenation.
+  normal_concatenation_op   :   { $parser.is_prev_token_not_whitespace() }? // If previous token is not whitespace, this is abuttal-concatenation.
                                 // Note: no token or rule to match here, just the predicate.
                             |   CONCAT
                             ;
