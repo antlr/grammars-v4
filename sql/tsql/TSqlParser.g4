@@ -3720,9 +3720,9 @@ table_source_item
     | rowset_function             as_table_alias?
     | '(' derived_table ')'       (as_table_alias column_alias_list?)?
     | change_table                as_table_alias?
+    | nodes_method                (as_table_alias column_alias_list?)?
     | function_call               (as_table_alias column_alias_list?)?
     | loc_id=LOCAL_ID             as_table_alias?
-    | nodes_method                (as_table_alias column_alias_list?)?
     | loc_id_call=LOCAL_ID '.' loc_fcall=function_call (as_table_alias column_alias_list?)?
     | open_xml
     | open_json
@@ -4106,7 +4106,7 @@ xml_data_type_methods
     ;
 
 value_method
-    : (loc_id=LOCAL_ID | value_id=id_ | eventdata=EVENTDATA '(' ')'  | query=query_method | '(' subquery ')') '.' call=value_call
+    : (loc_id=LOCAL_ID | value_id=full_column_name | eventdata=EVENTDATA '(' ')'  | query=query_method | '(' subquery ')') '.' call=value_call
     ;
 
 value_call
@@ -4114,7 +4114,7 @@ value_call
     ;
 
 query_method
-    : (loc_id=LOCAL_ID | value_id=id_ | table=full_table_name | '(' subquery ')' ) '.' call=query_call
+    : (loc_id=LOCAL_ID | value_id=full_column_name | '(' subquery ')' ) '.' call=query_call
     ;
 
 query_call
@@ -4122,7 +4122,7 @@ query_call
     ;
 
 exist_method
-    : (loc_id=LOCAL_ID | value_id=id_ | '(' subquery ')') '.' call=exist_call
+    : (loc_id=LOCAL_ID | value_id=full_column_name | '(' subquery ')') '.' call=exist_call
     ;
 
 exist_call
@@ -4130,7 +4130,7 @@ exist_call
     ;
 
 modify_method
-    : (loc_id=LOCAL_ID | value_id=id_ | '(' subquery ')') '.' call=modify_call
+    : (loc_id=LOCAL_ID | value_id=full_column_name | '(' subquery ')') '.' call=modify_call
     ;
 
 modify_call
@@ -4151,7 +4151,7 @@ hierarchyid_static_method
     ;
 
 nodes_method
-    : (loc_id=LOCAL_ID | value_id=id_ | '(' subquery ')') '.' NODES '(' xquery=STRING ')'
+    : (loc_id=LOCAL_ID | value_id=full_column_name | '(' subquery ')') '.' NODES '(' xquery=STRING ')'
     ;
 
 
