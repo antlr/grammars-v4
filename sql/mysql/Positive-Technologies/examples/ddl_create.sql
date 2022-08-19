@@ -73,6 +73,7 @@ create table rack_shelf_bin ( id int unsigned not null auto_increment unique pri
 CREATE TABLE `tblSRCHjob_desc` (`description_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT, `description` mediumtext NOT NULL, PRIMARY KEY (`description_id`)) ENGINE=TokuDB AUTO_INCREMENT=4095997820 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=TOKUDB_QUICKLZ;
 create table invisible_column_test(id int, col1 int INVISIBLE);
 create table visible_column_test(id int, col1 int VISIBLE);
+create table table_with_buckets(id int(11) auto_increment NOT NULL COMMENT 'ID', buckets int(11) NOT NULL COMMENT '分桶数');
 CREATE TABLE foo (c1 decimal(19), c2 decimal(19.5), c3 decimal(0.0), c4 decimal(0.2), c5 decimal(19,2));
 CREATE TABLE table_items (id INT, purchased DATE)
     PARTITION BY RANGE( YEAR(purchased) )
@@ -181,8 +182,18 @@ CREATE TABLE `daily_intelligences`(
 PRIMARY KEY (`id`)
 ) ENGINE=innodb DEFAULT CHAR SET=utf8 COMMENT '';
 
+CREATE TABLE `auth_realm_clients` (
+`pk_realm` int unsigned NOT NULL DEFAULT '0',
+`fk_realm` int unsigned DEFAULT NULL,
+`client_id` varchar(150) NOT NULL,
+`client_secret` blob NOT NULL,
+PRIMARY KEY (`pk_realm`),
+KEY `auth_realms_auth_realm_clients` (`fk_realm`)
+) START TRANSACTION ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 -- Mariadb default value for function: unix_timestamp()
 CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` bigint(20) NOT NULL DEFAULT unix_timestamp());
+
 #end
 #begin
 -- Rename table
@@ -534,4 +545,11 @@ SELECT * FROM cte;
 #begin
 lock tables t1 read nowait;
 lock table t1 read local wait 100;
+#end
+
+-- Create sequence
+#begin
+CREATE SEQUENCE if NOT EXISTS workdb.s2 START=1 CYCLE MINVALUE=10000 MAXVALUE=999999999999;
+CREATE OR REPLACE SEQUENCE if NOT EXISTS s2 START=100 CACHE 1000;
+CREATE SEQUENCE `seq_8b4d1cdf-377e-4021-aef3-f7c9846903fc` INCREMENT BY 1 START WITH 1;
 #end
