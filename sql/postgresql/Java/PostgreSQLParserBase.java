@@ -1,27 +1,17 @@
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.antlr.v4.runtime.*;
 
-
 public abstract class PostgreSQLParserBase extends Parser {
-    public PostgreSQLParserBase self;
-
-
-    public List<PostgreSQLParseError> ParseErrors = new ArrayList<PostgreSQLParseError>();
 
     public PostgreSQLParserBase(TokenStream input) {
         super(input);
-        self = this;
     }
 
     ParserRuleContext GetParsedSqlTree(String script, int line) {
         PostgreSQLParser ph = getPostgreSQLParser(script);
         ParserRuleContext result = ph.root();
-        for (PostgreSQLParseError err : ph.ParseErrors) {
-            ParseErrors.add(new PostgreSQLParseError(err.Number, err.Offset, err.Line + line, err.Column, err.Message));
-        }
         return result;
     }
 
@@ -62,18 +52,14 @@ public abstract class PostgreSQLParserBase extends Parser {
                     func_as.func_as().Definition = ph.root();
                     break;
             }
-            for (PostgreSQLParseError err : ph.ParseErrors) {
-                ParseErrors.add(new PostgreSQLParseError(err.Number, err.Offset, err.Line + line, err.Column, err.Message));
-            }
         }
-
     }
 
-    private static String TrimQuotes(String s) {
-        return (s == null || s.isEmpty()) ? s : s.substring(1, s.length() - 2);
+    private String TrimQuotes(String s) {
+        return (s == null || s.isEmpty()) ? s : s.substring(1, s.length() - 1);
     }
 
-    public static String unquote(String s) {
+    public String unquote(String s) {
         int slength = s.length();
         StringBuilder r = new StringBuilder(slength);
         int i = 0;
@@ -86,7 +72,7 @@ public abstract class PostgreSQLParserBase extends Parser {
         return r.toString();
     }
 
-    public static String GetRoutineBodyString(PostgreSQLParser.SconstContext rule) {
+    public String GetRoutineBodyString(PostgreSQLParser.SconstContext rule) {
         PostgreSQLParser.AnysconstContext anysconst = rule.anysconst();
         org.antlr.v4.runtime.tree.TerminalNode StringConstant = anysconst.StringConstant();
         if (null != StringConstant) return unquote(TrimQuotes(StringConstant.getText()));
@@ -102,14 +88,17 @@ public abstract class PostgreSQLParserBase extends Parser {
         return result;
     }
 
-    public static PostgreSQLParser getPostgreSQLParser(String script) {
+    public PostgreSQLParser getPostgreSQLParser(String script) {
         CharStream charStream = CharStreams.fromString(script);
         Lexer lexer = new PostgreSQLLexer(charStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PostgreSQLParser parser = new PostgreSQLParser(tokens);
-        PostgreSQLParserErrorListener errorListener = new PostgreSQLParserErrorListener();
-        errorListener.grammar = parser;
-        parser.addErrorListener(errorListener);
+        lexer.removeErrorListeners();
+        parser.removeErrorListeners();
+        LexerDispatchingErrorListener listener_lexer = new LexerDispatchingErrorListener((Lexer)(((CommonTokenStream)(this.getInputStream())).getTokenSource()));
+        ParserDispatchingErrorListener listener_parser = new ParserDispatchingErrorListener(this);
+        lexer.addErrorListener(listener_lexer);
+        parser.addErrorListener(listener_parser);
         return parser;
     }
 }
