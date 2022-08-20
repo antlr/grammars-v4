@@ -60,7 +60,6 @@ pascal
 pddl
 peoplecode
 pgn
-php
 pl0
 ply
 powerbuilder
