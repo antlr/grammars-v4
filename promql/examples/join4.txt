@@ -1,0 +1,1 @@
+rate(container_cpu_usage_seconds_total[1m]) / on(instance, job) group_left test_num_cpus
