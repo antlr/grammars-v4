@@ -173,8 +173,8 @@ interpolationDeclaration
     ;
 
 extendDeclaration
-    : Extend ws ( Percentage | parent )?
-    ( id | typeSelector | universal | className | attrib | pseudo | interpolation | parent )+ ws Semi? ws
+    : Extend ws ( Percentage | parentRef )?
+    ( id | typeSelector | universal | className | attrib | pseudo | interpolation | parentRef )+ ws Semi? ws
     ;
 
 warndingDeclaration
@@ -215,8 +215,8 @@ combinator
     ;
 
 selectorSequence
-    : ( typeSelector | universal ) ( id | className | attrib | pseudo | negation | interpolation ( variableName | Percentage )? | parent )*
-    | ( id | className | attrib | pseudo | negation | interpolation ( variableName | Percentage )? | parent )+
+    : ( typeSelector | universal ) ( id | className | attrib | pseudo | negation | interpolation ( variableName | Percentage )? | parentRef )*
+    | ( id | className | attrib | pseudo | negation | interpolation ( variableName | Percentage )? | parentRef )+
     ;
 
 id
@@ -224,7 +224,7 @@ id
     ;
 
 typeSelector
-    : typeNamespacePrefix? ( Percentage | parent )? ( identifier | variableName )
+    : typeNamespacePrefix? ( Percentage | parentRef )? ( identifier | variableName )
     ;
 
 typeNamespacePrefix
@@ -240,10 +240,10 @@ className
     ;
 
 interpolation
-    : namespace_? Hash BlockStart namespace_? ( ifExpression | value | parent ) BlockEnd measurment?
+    : namespace_? Hash BlockStart namespace_? ( ifExpression | value | parentRef ) BlockEnd measurment?
     ;
 
-parent
+parentRef
     : Amp
     ;
 
@@ -376,7 +376,7 @@ expressionPart
     ;
 
 ifExpression
-    : If Lparen ( expression | parent ) Comma value Comma value Rparen measurment? ws prio?
+    : If Lparen ( expression | parentRef ) Comma value Comma value Rparen measurment? ws prio?
     ;
 
 
