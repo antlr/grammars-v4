@@ -32,7 +32,7 @@ parser grammar ScssParser;
 options { tokenVocab=ScssLexer; }
 
 stylesheet
-    : ( ( Comment | Space | Cdo | Cdc )+ ws )* statement* EOF;
+    : statement* EOF;
 
 statement
     : importDeclaration
@@ -60,10 +60,10 @@ statement
 
 // Import
 importDeclaration
-    : Import ws importPath ws Semi? ws
-    | Require ws importPath ws Semi? ws
-    | Use ws importPath ws asClause? ws withClause? ws Semi? ws
-    | Forward ws importPath ws
+    : Import importPath Semi?
+    | Require importPath Semi?
+    | Use importPath asClause? withClause? Semi?
+    | Forward importPath
     ;
 
 importPath
@@ -72,15 +72,15 @@ importPath
     ;
 
 asClause
-    : As ws (Times | identifier)
+    : As (Times | identifier)
     ;
 
 withClause
-    : With ws Lparen ws parameters ws Rparen;
+    : With Lparen parameters Rparen;
 
 // Declarations
 variableDeclaration
-    : variableName ws Colon ws variableValue ws prio? ws Semi? ws
+    : variableName Colon variableValue prio? Semi?
     ;
 
 variableValue
@@ -95,7 +95,7 @@ variableValue
 
 variableName
     : ( ( Minus Minus ) Dollar | plusMinus Dollar | Dollar) identifier
-    | plusMinus? ws namespace_? Dollar ( identifier | measurment )
+    | plusMinus? namespace_? Dollar ( identifier | measurment )
     | Variable
     ;
 
@@ -104,7 +104,7 @@ namespace_
     ;
 
 propertyDeclaration
-    : identifier Colon ws propertyValue ws Semi? ws
+    : identifier Colon propertyValue Semi?
     ;
 
 prio
@@ -113,80 +113,80 @@ prio
 
 propertyValue
     : ( value
-        | value? ws prio? ws block
+        | value? prio? block
         | variableName
         | listSpaceSeparated
         | listCommaSeparated
         | expression
         | functionCall
-      ) ws prio? ws;
+      ) prio?;
 
 mediaDeclaration
-    : Media ws mediaQueryList ws block ws
+    : Media mediaQueryList block
     ;
 
 mediaQueryList
-    : ( mediaQuery ws ( Comma ws mediaQuery ws )* )? ws
+    : ( mediaQuery ( Comma mediaQuery )* )?
     ;
 
 mediaQuery
-    : ( Only | Not )? ws ( identifier | value ) ws ( And ws mediaExpression )*
-    | ws mediaExpression ws ( And ws mediaExpression )* ws
+    : ( Only | Not )? ( identifier | value ) ( And mediaExpression )*
+    | mediaExpression ( And mediaExpression )*
     ;
 
 mediaExpression
-    : Lparen ws identifier ws ( Colon ws value )? ws Rparen ws
+    : Lparen identifier ( Colon value )? Rparen
     ;
 
 mixinDeclaration
-    : Mixin ws ( identifier| identifier Lparen ws parameters ws Rparen ) ws block
+    : Mixin ( identifier| identifier Lparen parameters Rparen ) block
     ;
 
 contentDeclaration
-    : Content ws (Lparen ws parameters ws Rparen)? ws Semi? ws
+    : Content (Lparen parameters Rparen)? Semi?
     ;
 
 fontFaceDeclaration
-    : FontFace ws BlockStart ws statement* BlockEnd ws
+    : FontFace BlockStart statement* BlockEnd
     ;
 
 keyframesDeclaration
-    : Keyframes ws Space ws identifier? ws keyframesBlock ws
+    : Keyframes identifier? keyframesBlock
     ;
 
 keyframesBlock
-    : BlockStart ws percentageStatement* BlockEnd
+    : BlockStart percentageStatement* BlockEnd
     | block
     ;
 
 percentageStatement
-    : percentage ws block ws
+    : percentage block
     ;
 
 includeDeclaration
-    : Include ws namespace_? (identifier | functionCall) ws
-    ( Semi | Using ws Lparen ws parameters ws Rparen ws )? block? ws
+    : Include namespace_? (identifier | functionCall)
+    ( Semi | Using Lparen parameters Rparen )? block?
     ;
 
 interpolationDeclaration
-    : interpolation Colon ws propertyValue ws Semi? ws
+    : interpolation Colon propertyValue Semi?
     ;
 
 extendDeclaration
-    : Extend ws ( Percentage | parentRef )?
-    ( id | typeSelector | universal | className | attrib | pseudo | interpolation | parentRef )+ ws Semi? ws
+    : Extend ( Percentage | parentRef )?
+    ( id | typeSelector | universal | className | attrib | pseudo | interpolation | parentRef )+ Semi?
     ;
 
 warndingDeclaration
-    : Warn ws String_ ws Semi ws
+    : Warn String_ Semi
     ;
 
 errorDeclaration
-    : Error ws String_ ws Semi ws
+    : Error String_ Semi
     ;
 
 atStatementDeclaration
-    : At ( identifier ws Lparen ws parameters ws Rparen | identifier ) ws block
+    : At ( identifier Lparen parameters Rparen | identifier ) block
     ;
 
 // Structure
@@ -195,16 +195,16 @@ ruleset
     ;
 
 block
-    : BlockStart ws statement* ws functionReturn? ws BlockEnd ws
+    : BlockStart statement* functionReturn? BlockEnd
     ;
 
 // Selectors
 selectorGroup
-    : selector ( Comma ws selector )*
+    : selector ( Comma selector )*
     ;
 
 selector
-    : combinator? ws selectorSequence ws ( combinator ws selectorSequence ws )*
+    : combinator? selectorSequence ( combinator selectorSequence )*
     ;
 
 combinator
@@ -216,7 +216,7 @@ combinator
 
 selectorSequence
     : ( typeSelector | universal ) ( id | className | attrib | pseudo | negation | interpolation ( variableName | Percentage )? | parentRef )*
-    | ( id | className | attrib | pseudo | negation | interpolation ( variableName | Percentage )? | parentRef )+
+    | ( typeSelector| id | className | attrib | pseudo | negation | interpolation ( variableName | Percentage )? | parentRef )+
     ;
 
 id
@@ -248,9 +248,9 @@ parentRef
     ;
 
 attrib
-    : Lbrack ws typeNamespacePrefix? identifier ws
-    ( ( PrefixMatch | SuffixMatch | SubstringMatch | Eq | Includes | DashMatch ) ws
-    ( identifier | String_ ) ws )? Rbrack
+    : Lbrack typeNamespacePrefix? identifier
+    ( ( PrefixMatch | SuffixMatch | SubstringMatch | Eq | Includes | DashMatch )
+    ( identifier | String_ ) )? Rbrack
     ;
 
 pseudo
@@ -258,15 +258,15 @@ pseudo
     ;
 
 functionalPseudo
-    : Ident Lparen ws pseudoParameter+ Rparen
+    : Ident Lparen pseudoParameter+ Rparen
     ;
 
 pseudoParameter
-    : ( ( value | className | interpolation ) ws Comma? ws)
+    : ( ( value | className | interpolation ) Comma?)
     ;
 
 negation
-    : PseudoNot ws negationArg ws Rparen
+    : PseudoNot negationArg Rparen
     ;
 
 negationArg
@@ -314,30 +314,30 @@ value
     | identifier
     | expression
     | block
-    | Lparen ws Rparen
+    | Lparen Rparen
     | measurment
     ;
 
 // Function
 functionDeclaration
-    : Function ws ( namespace_? identifier )? ws
-    Lparen ws parameters ws Rparen ws BlockStart ws functionBody? ws BlockEnd ws
+    : Function ( namespace_? identifier )?
+    Lparen parameters Rparen BlockStart functionBody? BlockEnd
     ;
 
 parameters
-    : parameter? (ws Comma ws parameter)* ws
+    : parameter? (Comma parameter)*
     ;
 
 parameter
-    : ( value | variableDeclaration | listSpaceSeparated | mapDeclaration ) arglist? ws prio? ws
+    : ( value | variableDeclaration | listSpaceSeparated | mapDeclaration ) arglist? prio?
     ;
 
 functionBody
-    : functionStatement* ws functionReturn? ws
+    : functionStatement* functionReturn?
     ;
 
 functionReturn
-    : Return ws expression ws (Comma ws expression)* ws Semi? ws
+    : Return expression (Comma expression)* Semi?
     ;
 
 functionStatement
@@ -346,11 +346,11 @@ functionStatement
     ;
 
 functionCall
-    : namespace_? identifier ws Lparen ws parameters ws Rparen ws
+    : namespace_? identifier Lparen parameters Rparen
     ;
 
 expression
-    : Not? ws expressionPart ws (ws operator_ ws Not? ws expressionPart )* ws
+    : Not? expressionPart (operator_ Not? expressionPart )*
     ;
 
 expressionPart
@@ -370,13 +370,13 @@ expressionPart
     | hexcolor
     | ifExpression
     | functionCall
-    | plusMinus? Lparen ws expression? Rparen ws
+    | plusMinus? Lparen expression? Rparen
     | prio
     | measurment
     ;
 
 ifExpression
-    : If Lparen ( expression | parentRef ) Comma value Comma value Rparen measurment? ws prio?
+    : If Lparen ( expression | parentRef ) Comma value Comma value Rparen measurment? prio?
     ;
 
 
@@ -386,34 +386,34 @@ listDeclaration
         | listCommaSeparated
         | listSpaceSeparated
       )
-    | Lparen ws listDeclaration ws Rparen ws;
+    | Lparen listDeclaration Rparen;
 
 listCommaSeparated
-    : listElement ws (Comma ws listElement)* ws Comma? ws
+    : listElement (Comma listElement)* Comma?
     ;
 
 listSpaceSeparated
-    : listElement+ ws
+    : listElement+
     ;
 
 listBracketed
-    : Lbrack ws ( listSpaceSeparated | listCommaSeparated ) ws Rbrack ws
+    : Lbrack ( listSpaceSeparated | listCommaSeparated ) Rbrack
     ;
 
 listElement
-    : Lparen? ws (value ws Comma? ws)+ ws Rparen? ws Comma? ws
+    : Lparen? (value Comma?)+ Rparen? Comma?
     ;
 
 mapDeclaration
-    : Lparen ws (mapEntries) ws Rparen
+    : Lparen mapEntries Rparen
     ;
 
 mapEntries
-    : mapEntry ws (Comma ws mapEntry)* ws Comma? ws
+    : mapEntry (Comma mapEntry)* Comma?
     ;
 
 mapEntry
-    : mapKey ws Colon ws mapValue
+    : mapKey Colon mapValue
     ;
 
 mapKey
@@ -430,33 +430,33 @@ mapValue
 
 // Flow control
 ifDeclaration
-    : AtIf ws expression ws block ws elseIfStatement* ws elseStatement? ws
+    : AtIf expression block elseIfStatement* elseStatement?
     ;
 
 elseIfStatement
-    : AtElse ws If ws expression ws block ws
+    : AtElse If expression block
     ;
 
 elseStatement
-    : AtElse ws block ws
+    : AtElse block
     ;
 
 forDeclaration
-    : AtFor ws variableName ws From ws Number ws ( To | Through ) ws through ws block ws
+    : AtFor variableName From Number ( To | Through ) through block
     ;
 
 through
-    : Number ws
+    : Number
     | functionCall
     | expression
     ;
 
 whileDeclaration
-    : AtWhile ws expression block
+    : AtWhile expression block
     ;
 
 eachDeclaration
-    : AtEach ws variableName ws (Comma ws variableName ws)* In ws eachValueList ws block
+    : AtEach variableName (Comma variableName)* In eachValueList block
     ;
 
 eachValueList
@@ -466,28 +466,28 @@ eachValueList
 
 // Embeded functions
 var_
-    : Var ws Variable (ws Comma ws value)? ws Rparen ws
+    : Var Variable (Comma value)? Rparen
     ;
 
 calc
-    : Calc ws expression Rparen ws
+    : Calc expression Rparen
     ;
 
 rotate
-    : Rotate ws degree Rparen ws
+    : Rotate degree Rparen
     ;
 
 rgba
-    : Rgba ws value (ws Comma? ws value ws)* Rparen ws
+    : Rgba value (Comma? value)* Rparen
     ;
 
 repeat
-    : Repeat ws value ws Comma ws number Freq Rparen ws
+    : Repeat value Comma number Freq Rparen
     ;
 
 // Primitives
 unit
-    : ( length | dimension | percentage | degree ) ws
+    : ( length | dimension | percentage | degree )
     ;
 
 length
@@ -518,7 +518,7 @@ measurment
     ;
 
 uri
-    : Uri ws
+    : Uri
     ;
 
 arglist
@@ -544,15 +544,11 @@ boolean
     ;
 
 number
-    : plusMinus? ws Number
+    : plusMinus? Number
     ;
 
 identifier
     : ( VendorPrefix  | Minus )? Ident
     | From
     | To
-    ;
-
-ws
-    : ( Comment | Space )*
     ;
