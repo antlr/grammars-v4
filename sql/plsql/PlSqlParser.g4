@@ -1362,7 +1362,7 @@ out_of_line_constraint
           ( UNIQUE '(' column_name (',' column_name)* ')'
           | PRIMARY KEY '(' column_name (',' column_name)* ')'
           | foreign_key_clause
-          | CHECK '(' expression ')'
+          | CHECK '(' condition ')'
           )
        )
       constraint_state?
@@ -3825,6 +3825,12 @@ seed_part
 
 condition
     : expression
+    | json_condition
+    ;
+
+json_condition
+    : column_name IS NOT? JSON (FORMAT JSON)? (STRICT|LAX)? ((WITH|WITHOUT) UNIQUE KEYS)?
+    | JSON_EQUAL '(' expressions ')'
     ;
 
 expressions

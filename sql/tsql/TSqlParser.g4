@@ -3401,6 +3401,7 @@ set_special
     : SET id_ (id_ | constant_LOCAL_ID | on_off) ';'?
     | SET STATISTICS (IO | TIME | XML | PROFILE) on_off ';'?
     | SET ROWCOUNT (LOCAL_ID | DECIMAL) ';'?
+    | SET TEXTSIZE DECIMAL ';'?
     // https://msdn.microsoft.com/en-us/library/ms173763.aspx
     | SET TRANSACTION ISOLATION LEVEL
       (READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SNAPSHOT | SERIALIZABLE | DECIMAL) ';'?
@@ -3941,6 +3942,67 @@ built_in_functions
     | TYPE_NAME '(' type_id=expression ')'                                  #TYPE_NAME
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/typeproperty-transact-sql?view=sql-server-ver16
     | TYPEPROPERTY '(' type=expression ',' property=expression ')'          #TYPEPROPERTY
+    // String functions
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/ascii-transact-sql?view=sql-server-ver16
+    | ASCII '(' character_expression=expression ')'                         #ASCII
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/char-transact-sql?view=sql-server-ver16
+    | CHAR '(' integer_expression=expression ')'                            #CHAR
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/charindex-transact-sql?view=sql-server-ver16
+    | CHARINDEX '(' expressionToFind=expression ',' expressionToSearch=expression ( ',' start_location=expression )? ')' #CHARINDEX
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/concat-transact-sql?view=sql-server-ver16
+    | CONCAT '(' string_value_1=expression ',' string_value_2=expression ( ',' string_value_n+=expression )* ')' #CONCAT
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/concat-ws-transact-sql?view=sql-server-ver16
+    | CONCAT_WS '(' separator=expression ',' argument_1=expression ',' argument_2=expression ( ',' argument_n+=expression )* ')' #CONCAT_WS
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/difference-transact-sql?view=sql-server-ver16
+    | DIFFERENCE '(' character_expression_1=expression ',' character_expression_2=expression ')' #DIFFERENCE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/format-transact-sql?view=sql-server-ver16
+    | FORMAT '(' value=expression ',' format=expression ( ',' culture=expression )? ')' #FORMAT
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/left-transact-sql?view=sql-server-ver16
+    | LEFT '(' character_expression=expression ',' integer_expression=expression ')' #LEFT
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/len-transact-sql?view=sql-server-ver16
+    | LEN '(' string_expression=expression ')'                              #LEN
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/lower-transact-sql?view=sql-server-ver16
+    | LOWER '(' character_expression=expression ')'                         #LOWER
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/ltrim-transact-sql?view=sql-server-ver16
+    | LTRIM '(' character_expression=expression ')'                         #LTRIM
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/nchar-transact-sql?view=sql-server-ver16
+    | NCHAR '(' integer_expression=expression ')'                           #NCHAR
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/patindex-transact-sql?view=sql-server-ver16
+    | PATINDEX '(' pattern=expression ',' string_expression=expression ')'  #PATINDEX
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/quotename-transact-sql?view=sql-server-ver16
+    | QUOTENAME '(' character_string=expression ( ',' quote_character=expression )? ')' #QUOTENAME
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/replace-transact-sql?view=sql-server-ver16
+    | REPLACE '(' input=expression ',' replacing=expression ',' with=expression ')'   #REPLACE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/replicate-transact-sql?view=sql-server-ver16
+    | REPLICATE '(' string_expression=expression ',' integer_expression=expression ')' #REPLICATE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/reverse-transact-sql?view=sql-server-ver16
+    | REVERSE '(' string_expression=expression ')'                          #REVERSE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/right-transact-sql?view=sql-server-ver16
+    | RIGHT '(' character_expression=expression ',' integer_expression=expression ')' #RIGHT
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/rtrim-transact-sql?view=sql-server-ver16
+    | RTRIM '(' character_expression=expression ')'                         #RTRIM
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/soundex-transact-sql?view=sql-server-ver16
+    | SOUNDEX '(' character_expression=expression ')'                       #SOUNDEX
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/space-transact-sql?view=sql-server-ver16
+    | SPACE_KEYWORD '(' integer_expression=expression ')'                   #SPACE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/str-transact-sql?view=sql-server-ver16
+    | STR '(' float_expression=expression ( ',' length_expression=expression ( ',' decimal=expression )? )? ')' #STR
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/string-agg-transact-sql?view=sql-server-ver16
+    | STRING_AGG '(' expr=expression ',' separator=expression ')' (WITHIN GROUP '(' order_by_clause ')')?  #STRINGAGG
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/string-escape-transact-sql?view=sql-server-ver16
+    | STRING_ESCAPE '(' text_=expression ',' type_=expression ')'           #STRING_ESCAPE
+    // https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
+    | STUFF '(' str=expression ',' from=DECIMAL ',' to=DECIMAL ',' str_with=expression ')' #STUFF
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/substring-transact-sql?view=sql-server-ver16
+    | SUBSTRING '(' string_expression=expression ',' start_=expression ',' length=expression ')' #SUBSTRING
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/translate-transact-sql?view=sql-server-ver16
+    | TRANSLATE '(' inputString=expression ',' characters=expression ',' translations=expression ')' #TRANSLATE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/trim-transact-sql?view=sql-server-ver16
+    | TRIM '(' ( characters=expression FROM )? string_=expression ')'       #TRIM
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/unicode-transact-sql?view=sql-server-ver16
+    | UNICODE '(' ncharacter_expression=expression ')'                      #UNICODE
+    // https://docs.microsoft.com/en-us/sql/t-sql/functions/upper-transact-sql?view=sql-server-ver16
+    | UPPER '(' character_expression=expression ')'                         #UPPER
     // System functions
     // https://msdn.microsoft.com/en-us/library/ms173784.aspx
     | BINARY_CHECKSUM '(' ( star='*' | expression (',' expression)* ) ')'   #BINARY_CHECKSUM
@@ -4027,8 +4089,6 @@ built_in_functions
     | MIN_ACTIVE_ROWVERSION '(' ')'                     #MIN_ACTIVE_ROWVERSION
     // https://msdn.microsoft.com/en-us/library/ms177562.aspx
     | NULLIF '(' left=expression ',' right=expression ')'          #NULLIF
-    // https://msdn.microsoft.com/fr-fr/library/ms188043.aspx
-    | STUFF '(' str=expression ',' from=DECIMAL ',' to=DECIMAL ',' str_with=expression ')'                                                                   #STUFF
     // https://msdn.microsoft.com/en-us/library/ms177587.aspx
     | SESSION_USER                                      #SESSION_USER
     // https://msdn.microsoft.com/en-us/library/ms179930.aspx
@@ -4041,10 +4101,6 @@ built_in_functions
     | xml_data_type_methods                             #XML_DATA_TYPE_FUNC
     // https://docs.microsoft.com/en-us/sql/t-sql/functions/logical-functions-iif-transact-sql
     | IIF '(' cond=search_condition ',' left=expression ',' right=expression ')'   #IIF
-    | STRING_AGG '(' expr=expression ',' separator=expression ')' (WITHIN GROUP '(' order_by_clause ')')?  #STRINGAGG
-    | REPLACE '(' input=expression ',' replacing=expression ',' with=expression ')'   #REPLACE
-    // https://docs.microsoft.com/ru-ru/sql/t-sql/functions/trim-transact-sql?view=sql-server-ver16
-    | TRIM '(' (characters=expression FROM)? string=expression ')'   #TRIM
     ;
 
 xml_data_type_methods
@@ -4498,6 +4554,7 @@ keyword
     | APPLOCK_TEST
     | APPLY
     | ARITHABORT
+    | ASCII
     | ASSEMBLY
     | ASSEMBLYPROPERTY
     | AT_KEYWORD
@@ -4535,6 +4592,8 @@ keyword
     | CHANGE
     | CHANGE_RETENTION
     | CHANGE_TRACKING
+    | CHAR
+    | CHARINDEX
     | CHECKSUM
     | CHECKSUM_AGG
     | CLEANUP
@@ -4552,6 +4611,7 @@ keyword
     | COMPRESS_ALL_ROW_GROUPS
     | COMPRESSION_DELAY
     | CONCAT
+    | CONCAT_WS
     | CONCAT_NULL_YIELDS_NULL
     | CONTENT
     | CONTROL
@@ -4596,6 +4656,7 @@ keyword
     | DETERMINISTIC
     | DHCP
     | DIALOG
+    | DIFFERENCE
     | DIRECTORY_NAME
     | DISABLE
     | DISABLE_BROKER
@@ -4698,6 +4759,7 @@ keyword
     | LAST
     | LAST_VALUE
     | LEAD
+    | LEN
     | LEVEL
     | LIST
     | LISTENER
@@ -4710,6 +4772,8 @@ keyword
     | LOGIN
     | LOOP
     | LOW
+    | LOWER
+    | LTRIM
     | MANUAL
     | MARK
     | MASKED
@@ -4743,6 +4807,7 @@ keyword
     | MOVE
     | MULTI_USER
     | NAME
+    | NCHAR
     | NESTED_TRIGGERS
     | NEW_ACCOUNT
     | NEW_BROKER
@@ -4761,6 +4826,7 @@ keyword
     | NOTIFICATIONS
     | NOWAIT
     | NTILE
+    | NULL_DOUBLE_QUOTE
     | NUMANODE
     | NUMBER
     | NUMERIC_ROUNDABORT
@@ -4788,14 +4854,15 @@ keyword
     | OWNER
     | OWNERSHIP
     | PAD_INDEX
-    | PAGECOUNT
     | PAGE_VERIFY
+    | PAGECOUNT
     | PARAMETERIZATION
     | PARSENAME
     | PARTITION
     | PARTITIONS
     | PARTNER
     | PATH
+    | PATINDEX
     | PAUSE
     | PERCENT_RANK
     | PERCENTILE_CONT
@@ -4820,6 +4887,7 @@ keyword
     | QUEUE
     | QUEUE_DELAY
     | QUOTED_IDENTIFIER
+    | QUOTENAME
     | RANDOMIZED
     | RANGE
     | RANK
@@ -4845,6 +4913,7 @@ keyword
     | REPEATABLE
     | REPLACE
     | REPLICA
+    | REPLICATE
     | REQUEST_MAX_CPU_TIME_SEC
     | REQUEST_MAX_MEMORY_GRANT_PERCENT
     | REQUEST_MEMORY_GRANT_TIMEOUT_SEC
@@ -4856,6 +4925,7 @@ keyword
     | RESTRICTED_USER
     | RESUMABLE
     | RETENTION
+    | REVERSE
     | ROBUST
     | ROOT
     | ROUTE
@@ -4863,6 +4933,7 @@ keyword
     | ROW_NUMBER
     | ROWGUID
     | ROWS
+    | RTRIM
     | SAMPLE
     | SCHEMA_ID
     | SCHEMA_NAME
@@ -4900,6 +4971,8 @@ keyword
     | SMALLINT
     | SNAPSHOT
     | SORT_IN_TEMPDB
+    | SOUNDEX
+    | SPACE_KEYWORD
     | SPARSE
     | SPATIAL_WINDOW_MAX_CELLS
     | STANDBY
@@ -4914,11 +4987,14 @@ keyword
     | STDEV
     | STDEVP
     | STOPLIST
+    | STR
     | STRING_AGG
+    | STRING_ESCAPE
     | STUFF
     | SUBJECT
     | SUBSCRIBE
     | SUBSCRIPTION
+    | SUBSTRING
     | SUM
     | SUSPEND
     | SYMMETRIC
@@ -4939,6 +5015,7 @@ keyword
     | TRACKING
     | TRANSACTION_ID
     | TRANSFORM_NOISE_WORDS
+    | TRANSLATE
     | TRIM
     | TRIPLE_DES
     | TRIPLE_DES_3KEY
@@ -4953,10 +5030,12 @@ keyword
     | TYPEPROPERTY
     | UNBOUNDED
     | UNCOMMITTED
+    | UNICODE
     | UNKNOWN
     | UNLIMITED
     | UNMASK
     | UOW
+    | UPPER
     | USING
     | VALID_XML
     | VALIDATION
@@ -5017,8 +5096,8 @@ keyword
     | COMPRESSION
     | CONNECT
     | CONNECTION
-    | CONNECTIONPROPERTY
     | CONFIGURATION
+    | CONNECTIONPROPERTY
     | CONTAINMENT
     | CONTEXT
     | CONTEXT_INFO
@@ -5027,8 +5106,8 @@ keyword
     | CONTRACT_NAME
     | CONVERSATION
     | COPY_ONLY
-    | CURRENT_TRANSACTION_ID
     | CURRENT_REQUEST_ID
+    | CURRENT_TRANSACTION_ID
     | CYCLE
     | DATA_COMPRESSION
     | DATA_SOURCE
@@ -5158,7 +5237,6 @@ keyword
     | REGENERATE
     | RELATED_CONVERSATION
     | RELATED_CONVERSATION_GROUP
-    | REPLICATE
     | REQUIRED
     | RESET
     | RESOURCES
