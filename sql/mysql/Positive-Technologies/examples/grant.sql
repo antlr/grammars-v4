@@ -94,6 +94,7 @@ GRANT reader TO 'mysqluser'@'localhost'
 GRANT reader TO topreader
 GRANT reader TO topreader WITH ADMIN OPTION;
 GRANT 'db_old_ro'@'%' TO 'oghalawinji'@'%'
+GRANT FLUSH_OPTIMIZER_COSTS, FLUSH_STATUS, FLUSH_TABLES, FLUSH_USER_RESOURCES, PASSWORDLESS_USER_ADMIN ON *.* TO "@"
 REVOKE reader FROM 'mysqluser'@'localhost'
 REVOKE reader FROM topreader
 -- Set Role
