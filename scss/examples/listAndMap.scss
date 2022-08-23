@@ -1,0 +1,17 @@
+$var: list.nth(10px 1em 0 -5px, 2);
+@each $var in red, blue, yellow {}
+$var: [$a $b];
+$var: [1 + 2, 3 / 4];
+$var: [(a b) (c, (d e f), g, h)];
+$font-weights: ("regular": 400, "medium": 500, "bold": 700);
+$var: (1: 2, a: b, red: blue);
+
+$new-theme: map-merge(
+  base-theme(),
+  (
+    background-color: $backgroundColor,
+    border: 1px solid $borderColor,
+  )
+);
+
+$config: (a: (b: (c: d)));
