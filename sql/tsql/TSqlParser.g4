@@ -1794,7 +1794,7 @@ message_statement
 merge_statement
     : with_expression?
       MERGE (TOP '(' expression ')' PERCENT?)?
-      INTO? ddl_object insert_with_table_hints? as_table_alias?
+      INTO? ddl_object with_table_hints? as_table_alias?
       USING table_sources
       ON search_condition
       when_matches+
@@ -1826,7 +1826,7 @@ delete_statement
     : with_expression?
       DELETE (TOP '(' expression ')' PERCENT? | TOP DECIMAL)?
       FROM? delete_statement_from
-      insert_with_table_hints?
+      with_table_hints?
       output_clause?
       (FROM table_sources)?
       (WHERE (search_condition | CURRENT OF (GLOBAL? cursor_name | cursor_var=LOCAL_ID)))?
@@ -1835,7 +1835,6 @@ delete_statement
 
 delete_statement_from
     : ddl_object
-    | table_alias
     | rowset_function_limited
     | table_var=LOCAL_ID
     ;
@@ -1845,7 +1844,7 @@ insert_statement
     : with_expression?
       INSERT (TOP '(' expression ')' PERCENT?)?
       INTO? (ddl_object | rowset_function_limited)
-      insert_with_table_hints?
+      with_table_hints?
       ('(' insert_column_name_list ')')?
       output_clause?
       insert_statement_value
@@ -3716,8 +3715,8 @@ table_source_item_joined
     ;
 
 table_source_item
-    : table_name_with_hint        as_table_alias?
-    | full_table_name             as_table_alias?
+    : full_table_name             deprecated_table_hint as_table_alias // this is currently allowed
+    | full_table_name             as_table_alias? (with_table_hints | deprecated_table_hint | sybase_legacy_hints)?
     | rowset_function             as_table_alias?
     | '(' derived_table ')'       (as_table_alias column_alias_list?)?
     | change_table                as_table_alias?
@@ -3809,10 +3808,6 @@ unpivot_clause
 
 full_column_name_list
     : column+=full_column_name (',' column+=full_column_name)*
-    ;
-
-table_name_with_hint
-    : table_name with_table_hints?
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms190312.aspx
@@ -4177,34 +4172,66 @@ as_table_alias
     ;
 
 table_alias
-    : id_ with_table_hints?
+    : id_
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms187373.aspx
 with_table_hints
-    : WITH? '(' hint+=table_hint (','? hint+=table_hint)* ')'
-    | table_hint
-    ;
-
-// https://msdn.microsoft.com/en-us/library/ms187373.aspx
-insert_with_table_hints
     : WITH '(' hint+=table_hint (','? hint+=table_hint)* ')'
     ;
 
-// Id runtime check. Id can be (FORCESCAN, HOLDLOCK, NOHOLDLOCK, NOLOCK, NOWAIT, PAGLOCK, READCOMMITTED,
-// READCOMMITTEDLOCK, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, TABLOCK, TABLOCKX
-// UPDLOCK, XLOCK)
+deprecated_table_hint
+    : '(' table_hint ')'
+    ;
+
+// https://infocenter-archive.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc00938.1502/html/locking/locking103.htm
+// https://infocenter-archive.sybase.com/help/index.jsp?topic=/com.sybase.dc32300_1250/html/sqlug/sqlug792.htm
+// https://infocenter-archive.sybase.com/help/index.jsp?topic=/com.sybase.dc36271_36272_36273_36274_1250/html/refman/X35229.htm
+// Legacy hint with no parenthesis and no WITH keyword. Actually conflicts with table alias name except for holdlock which is
+// a reserved keyword in this grammar. We might want a separate sybase grammar variant.
+sybase_legacy_hints
+    : sybase_legacy_hint+
+    ;
+
+sybase_legacy_hint
+    : HOLDLOCK
+    | NOHOLDLOCK
+    | READPAST
+    | SHARED
+    ;
+
+// For simplicity, we don't build subsets for INSERT/UPDATE/DELETE/SELECT/MERGE
+// which means the grammar accept slightly more than the what the specification (documentation) says.
 table_hint
-    : NOEXPAND? ( INDEX ('(' index_value (',' index_value)* ')' | index_value (',' index_value)*)
-                | INDEX '=' index_value
-                | FORCESEEK ('(' index_value '(' ID  (',' ID)* ')' ')')?
-                | SERIALIZABLE
-                | SNAPSHOT
-                | SPATIAL_WINDOW_MAX_CELLS '=' DECIMAL
-                | HOLDLOCK
-                | NOHOLDLOCK
-                | ID
-                )
+    : NOEXPAND
+    | INDEX (
+            '(' index_value (',' index_value)* ')'
+            | '=' '(' index_value ')'
+            | '=' index_value // examples in the doc include this syntax
+            )
+    | FORCESEEK ( '(' index_value '(' column_name_list ')' ')' )?
+    | FORCESCAN
+    | HOLDLOCK
+    | NOLOCK
+    | NOWAIT
+    | PAGLOCK
+    | READCOMMITTED
+    | READCOMMITTEDLOCK
+    | READPAST
+    | READUNCOMMITTED
+    | REPEATABLEREAD
+    | ROWLOCK
+    | SERIALIZABLE
+    | SNAPSHOT
+    | SPATIAL_WINDOW_MAX_CELLS '=' DECIMAL
+    | TABLOCK
+    | TABLOCKX
+    | UPDLOCK
+    | XLOCK
+    | KEEPIDENTITY
+    | KEEPDEFAULTS
+    | IGNORE_CONSTRAINTS
+    | IGNORE_TRIGGERS
     ;
 
 index_value
@@ -4707,6 +4734,7 @@ keyword
     | FORCE
     | FORCE_FAILOVER_ALLOW_DATA_LOSS
     | FORCED
+    | FORCESCAN
     | FORMAT
     | FORWARD_ONLY
     | FULLSCAN
@@ -4730,8 +4758,10 @@ keyword
     | HONOR_BROKER_PRIORITY
     | HOURS
     | IDENTITY_VALUE
+    | IGNORE_CONSTRAINTS
     | IGNORE_DUP_KEY
     | IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX
+    | IGNORE_TRIGGERS
     | IMMEDIATE
     | IMPERSONATE
     | IMPORTANCE
@@ -4751,7 +4781,9 @@ keyword
     | JSON
     | KB
     | KEEP
+    | KEEPDEFAULTS
     | KEEPFIXED
+    | KEEPIDENTITY
     | KEY_SOURCE
     | KEYS
     | KEYSET
@@ -4820,6 +4852,7 @@ keyword
     | NOCOUNT
     | NODES
     | NOEXPAND
+    | NOLOCK
     | NON_TRANSACTED_ACCESS
     | NORECOMPUTE
     | NORECOVERY
@@ -4856,6 +4889,7 @@ keyword
     | PAD_INDEX
     | PAGE_VERIFY
     | PAGECOUNT
+    | PAGLOCK
     | PARAMETERIZATION
     | PARSENAME
     | PARTITION
@@ -4898,7 +4932,11 @@ keyword
     | READ_ONLY
     | READ_ONLY_ROUTING_LIST
     | READ_WRITE
+    | READCOMMITTED
+    | READCOMMITTEDLOCK
     | READONLY
+    | READPAST
+    | READUNCOMMITTED
     | READWRITE
     | REBUILD
     | RECEIVE
@@ -4911,6 +4949,7 @@ keyword
     | REMOVE
     | REORGANIZE
     | REPEATABLE
+    | REPEATABLEREAD
     | REPLACE
     | REPLICA
     | REPLICATE
@@ -4932,6 +4971,7 @@ keyword
     | ROW
     | ROW_NUMBER
     | ROWGUID
+    | ROWLOCK
     | ROWS
     | RTRIM
     | SAMPLE
@@ -4963,6 +5003,7 @@ keyword
     | SESSION_TIMEOUT
     | SETERROR
     | SHARE
+    | SHARED
     | SHOWPLAN
     | SIGNATURE
     | SIMPLE
@@ -5001,6 +5042,8 @@ keyword
     | SYNCHRONOUS_COMMIT
     | SYNONYM
     | SYSTEM
+    | TABLOCK
+    | TABLOCKX
     | TAKE
     | TARGET_RECOVERY_TIME
     | TB
@@ -5035,6 +5078,7 @@ keyword
     | UNLIMITED
     | UNMASK
     | UOW
+    | UPDLOCK
     | UPPER
     | USING
     | VALID_XML
@@ -5051,6 +5095,7 @@ keyword
     | WITHOUT_ARRAY_WRAPPER
     | WORK
     | WORKLOAD
+    | XLOCK
     | XML
     | XML_COMPRESSION
     | XMLDATA
