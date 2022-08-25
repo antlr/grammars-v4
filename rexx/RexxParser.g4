@@ -1,5 +1,9 @@
 parser grammar RexxParser;
-options { tokenVocab=RexxLexer; }
+
+options {
+    superClass=RexxParserBase;
+    tokenVocab=RexxLexer;
+}
 
 file_                        :   program_ EOF ;
 
@@ -227,14 +231,10 @@ comparison                  :   concatenation ( comparison_operator concatenatio
                             |   CMPS_NL
                             ;
 concatenation               :   addition (concatenation_op addition)* ;
- concatenation_op           :   {
-                                   (getTokenStream().get(getCurrentToken().getTokenIndex()-1).getChannel() == RexxLexer.WHITESPACE_CHANNEL)
-                                }? blank_concatenation_op // If previous token is whitespace, this is blank-concatenation.
+ concatenation_op           :   { $parser.is_prev_token_whitespace() }? blank_concatenation_op // If previous token is whitespace, this is blank-concatenation.
                             |   normal_concatenation_op
                             ;
-  normal_concatenation_op   :   {
-                                   (getTokenStream().get(getCurrentToken().getTokenIndex()-1).getChannel() != RexxLexer.WHITESPACE_CHANNEL)
-                                }? // If previous token is not whitespace, this is abuttal-concatenation.
+  normal_concatenation_op   :   { $parser.is_prev_token_not_whitespace() }? // If previous token is not whitespace, this is abuttal-concatenation.
                                 // Note: no token or rule to match here, just the predicate.
                             |   CONCAT
                             ;
@@ -255,8 +255,13 @@ power_expression            :   prefix_expression ( POW prefix_expression )* ;
     term                    :   function_
                             |   BR_O expression  BR_C
                             |   symbol
-                            |   STRING
+                            |   binary_string
+                            |   hex_string
+                            |   string
                             ;
+      binary_string         :   BINARY_STRING ;
+      hex_string            :   HEX_STRING ;
+      string                :   STRING ;
       function_             :   function_name function_parameters ;
         function_name       :   KWD_ADDRESS
                             |   KWD_ARG

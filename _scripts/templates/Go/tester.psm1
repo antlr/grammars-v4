@@ -16,7 +16,13 @@ function Build-Grammar {
     # Output go version
     #go version | Write-Host
     $env:GO111MODULE = "on"
-    $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.10
+    For ($i=0; $i -le 5; $i++) {
+        $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.10
+        if($LASTEXITCODE -eq 0){
+            Break
+        }
+        Write-Host "go get failed. Trying again."
+    }
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g

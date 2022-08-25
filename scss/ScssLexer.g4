@@ -1,6 +1,7 @@
 /*
  [The "BSD licence"]
  Copyright (c) 2014 Vlad Shlosberg
+ Copyright (c) 2022 Sergei Russkikh
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -28,186 +29,133 @@
 
 lexer grammar ScssLexer;
 
-NULL_              : 'null';
+fragment Hex             : [0-9a-fA-F];
+fragment NewlineOrSpace  : '\r\n' | [ \t\r\n\f] |;
+fragment Unicode         : '\\' Hex Hex? Hex? Hex? Hex? Hex? NewlineOrSpace;
+fragment Escape          : Unicode | '\\' ~[\r\n\f0-9a-fA-F];
+fragment Whitespace      : Space |;
+fragment Newline         : '\n' | '\r\n' | '\r' | '\f';
+fragment ZeroToFourZeros : '0'? '0'? '0'? '0'?;
+fragment DashChar        : '-' | '\\' ZeroToFourZeros '2d' NewlineOrSpace ;
 
+fragment Nmstart : [_a-zA-Z] | Nonascii | Escape;
+fragment Nmchar  : [_a-zA-Z0-9\-] | Nonascii | Escape;
+fragment Nonascii: ~[\u0000-\u007f];
+fragment Name    : Nmchar+;
+fragment Url     : ( [!#$%&*-~] | Nonascii | Escape )*;
 
-IN              : 'in';
+Comment          : (LineComment | MultiLineComment) -> skip;
+MultiLineComment : '/*' ~'*'* '*'+ ( ~[/*] ~'*'* '*'+ )* '/';
+LineComment      : '//' ~([\n\r\u2028\u2029])*;
+Space            : [ \t\r\n\f]+ -> skip;
 
-Unit
-  : ('%'|'px'|'cm'|'mm'|'in'|'pt'|'pc'|'em'|'ex'|'deg'|'rad'|'grad'|'ms'|'s'|'hz'|'khz')
-  ;
+Uri              : 'url(' Whitespace (Url | String_) (Space (Url | String_))* Whitespace ')';
+Format           : 'format(' Whitespace String_ Whitespace ')';
 
-COMBINE_COMPARE : '&&' | '||';
+AbsLength       : 'px'  | 'cm'   | 'mm'   | 'pt' | 'pc' | 'q';
+FontRelative    : 'em'  | 'ex'   | 'ch'   | 'rem';
+ViewportRelative: 'vw'  | 'vh'   | 'vmin' | 'vmax';
+Angle           : 'deg' | 'rad'  | 'grad' | 'turn';
+Resolution      : 'dpi' | 'dpcm' | 'dppx';
+Freq            : 'hz'  | 'khz'  | 'fr';
+Time            : 'ms'  | 's';
+Percentage      : '%';
 
-Ellipsis          : '...';
+Import    : '@import';
+Include   : '@include';
+Use       : '@use';
+Require   : '@require';
+Charset   : '@charset ';
+Mixin     : '@mixin';
+Function  : '@function';
+FontFace  : '@font-face';
+Forward   : '@forward';
+Content   : '@content';
+Keyframes : '@keyframes';
+Return    : '@return';
+Media     : '@media';
+Extend    : '@extend';
+Warn      : '@warn';
+Error     : '@error';
 
-InterpolationStart
-  : HASH BlockStart -> pushMode(IDENTIFY)
-  ;
+If        : 'if';
+AtIf      : '@if';
+AtFor     : '@for';
+AtElse    : '@else';
+AtWhile   : '@while';
+AtEach    : '@each';
 
-//Separators
-LPAREN          : '(';
-RPAREN          : ')';
-BlockStart      : '{';
-BlockEnd        : '}';
-LBRACK          : '[';
-RBRACK          : ']';
-GT              : '>';
-TIL             : '~';
+From      : 'from';
+To        : 'to';
+Through   : 'through';
+Only      : 'only';
+Not       : 'not';
+And       : 'and';
+Using     : 'using';
+As        : 'as';
+With      : 'with';
+Or        : 'or';
+In        : 'in';
 
-LT              : '<';
-COLON           : ':';
-SEMI            : ';';
-COMMA           : ',';
-DOT             : '.';
-DOLLAR          : '$';
-AT              : '@';
-AND             : '&';
-HASH            : '#';
-PLUS            : '+';
-TIMES           : '*';
-DIV             : '/';
-MINUS           : '-';
-PERC            : '%';
+Default   : '!default';
+Important : '!important';
 
-// When a variable or parenthesized statement is negated, there cannot be a
-// space after the - or +.
-MINUS_DOLLAR    : MINUS DOLLAR;
-PLUS_DOLLAR     : PLUS DOLLAR;
-MINUS_LPAREN    : MINUS LPAREN;
-PLUS_LPAREN     : PLUS LPAREN;
+Lparen    : '(';
+Rparen    : ')';
+Lbrack    : '[';
+Rbrack    : ']';
+BlockStart: '{';
+BlockEnd  : '}' ;
 
+Dot       : '.' ;
+Comma     : ',';
+Colon     : ':';
+Semi      : ';';
 
-UrlStart
-  : 'url' LPAREN -> pushMode(URL_STARTED)
-  ;
+Tilde     : '~';
+Under     : '_';
+Dollar    : '$';
+At        : '@';
+Amp       : '&';
+Hash      : '#';
+True      : 'true';
+False     : 'false';
 
+Plus      : '+';
+Div       : '/';
+Minus     : '-';
+Times     : '*';
 
+Eq        : '=';
+NotEq     : '!=';
+Greater   : '>';
+Less      : '<';
+Includes  : '~=';
+DashMatch : '|=';
+Pipe      : '|';
+Cdo       : '<!--';
+Cdc       : '-->';
 
-EQEQ            : '==';
-NOTEQ           : '!=';
+PseudoNot : ':not(';
+Calc      : 'calc(';
+Rotate    : 'rotate(';
+Var       : 'var(';
+Rgba      : 'rgba(';
+Repeat    : 'repeat(';
 
+PrefixMatch    : '^=';
+SuffixMatch    : '$=';
+SubstringMatch : '*=';
 
+VendorPrefix: '-mox-' | '-webkit-' | '-o-';
 
-EQ              : '=';
-PIPE_EQ         : '|=';
-TILD_EQ         : '~=';
-
-
-
-MIXIN           : '@mixin';
-FUNCTION        : '@function';
-FONT_FACE       : '@font-face';
-FORWARD         : '@forward';
-AT_ELSE         : '@else';
-IF              : 'if';
-AT_IF           : '@if';
-AT_FOR          : '@for';
-AT_WHILE        : '@while';
-AT_EACH         : '@each';
-INCLUDE         : '@include';
-IMPORT          : '@import';
-USE             : '@use';
-REQUIRE         : '@require';
-RETURN          : '@return';
-MEDIA           : '@media';
-CONTENT         : '@content';
-KEYFRAMES       : '@keyframes';
-
-FROM            : 'from';
-TO              : 'to';
-THROUGH         : 'through';
-POUND_DEFAULT   : '!default';
-IMPORTANT       : '!important';
-ONLY            : 'only';
-NOT             : 'not';
-AND_WORD        : 'and';
-USING           : 'using';
-AS              : 'as';
-WITH            : 'with';
-
-Identifier
-  : (('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
-    ('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*
-  | ('_' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' )
-    ('_' | '-' | 'a'..'z'| 'A'..'Z' | '\u0100'..'\ufffe' | '0'..'9')*) -> pushMode(IDENTIFY)
-  ;
-
-PseudoIdentifier
-  : COLON COLON? Identifier -> pushMode(IDENTIFY)
-  ;
-
-FunctionIdentifier
-    : Identifier LPAREN
+Variable : '--' (Interpolation|Nmstart) (Interpolation|Nmchar)*;
+fragment Interpolation: Hash BlockStart Dollar? Ident BlockEnd;
+Number   : [0-9]+ | [0-9]* '.' [0-9]+;
+String_
+    : '"' ( ~[\n\r\f\\"] | '\\' Newline | Escape )* '"'
+    | '\'' ( ~[\n\r\f\\'] | '\\' Newline | Escape )* '\''
     ;
 
-fragment STRING
-    : '"' (~('"'|'\n'|'\r'))* '"'
-    | '\'' (~('\''|'\n'|'\r'))* '\''
-    ;
-
-// string literals
-StringLiteral
-  : STRING
-  ;
-
-
-Number
-  : '-' (('0'..'9')* '.')? ('0'..'9')+
-  | (('0'..'9')* '.')? ('0'..'9')+
-  ;
-
-Var
-  : FunctionIdentifier MINUS MINUS Identifier RPAREN
-  ;
-
-Color
-  : '#' ('0'..'9'|'a'..'f'|'A'..'F')+
-  ;
-
-
-// Whitespace -- ignored
-WS
-  : (' '|'\t'|'\n'|'\r'|'\r\n')+ -> skip
-  ;
-
-// Single-line comments
-SL_COMMENT
-  : '//'
-    (~('\n'|'\r'))* ('\n'|'\r'('\n')?) -> skip
-  ;
-
-
-// multiple-line comments
-COMMENT
-  : '/*' .*? '*/' -> skip
-  ;
-
-mode URL_STARTED;
-UrlEnd                 : RPAREN -> popMode;
-Url                    :  STRING | (~(')' | '\n' | '\r' | ';'))+;
-
-mode IDENTIFY;
-BlockStart_ID          : BlockStart -> popMode, type(BlockStart);
-SPACE                  : WS -> popMode, skip;
-DOLLAR_ID              : DOLLAR -> type(DOLLAR);
-
-
-InterpolationStartAfter  : InterpolationStart;
-InterpolationEnd_ID    : BlockEnd -> type(BlockEnd);
-IdentifierAfter        : Identifier;
-
-// All tokens that can signal the end of identifiers
-Ellipsis_ID               : Ellipsis -> popMode, type(Ellipsis);
-DOT_ID                    : DOT -> popMode, type(DOT);
-LBRACK_ID                 : LBRACK -> popMode, type(LBRACK);
-RBRACK_ID                 : RBRACK -> popMode, type(RBRACK);
-LPAREN_ID                 : LPAREN -> popMode, type(LPAREN);
-RPAREN_ID                 : RPAREN -> popMode, type(RPAREN);
-COLON_ID                  : COLON -> popMode, type(COLON);
-COMMA_ID                  : COMMA -> popMode, type(COMMA);
-SEMI_ID                   : SEMI -> popMode, type(SEMI);
-EQ_ID                     : EQ -> popMode, type(EQ);
-PIPE_EQ_ID                : PIPE_EQ -> popMode, type(PIPE_EQ);
-TILD_EQ_ID                : TILD_EQ -> popMode, type(TILD_EQ);
-PseudoIdentifier_ID       : PseudoIdentifier -> popMode, type(PseudoIdentifier);
+// Give Ident least priority so that more specific rules matches first
+Ident : Nmstart Nmchar*;
