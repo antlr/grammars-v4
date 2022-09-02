@@ -200,7 +200,7 @@ ID:                 ID_PARTS;
 
 // Hidden
 
-EXPORT_HEADER:      ('HA')? '$' ~[\r\n]* -> channel(HIDDEN);
+EXPORT_HEADER:      'HA'? '$' ~[\r\n]* -> channel(HIDDEN);
 LINE_CONTINUATION:  '&' WS* [\r\n] -> channel(HIDDEN);
 SL_COMMENT:         '//' ~ [\r\n]* -> channel(HIDDEN);
 ML_COMMENT:         '/*' .*? '*/'  -> channel(HIDDEN);
