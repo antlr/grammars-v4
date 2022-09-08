@@ -92,7 +92,7 @@ jobs:
       if: ${{ matrix.language == 'Go' }}
       uses: actions/setup-go@v3
       with:
-        go-version: '^1.17.0'
+        go-version: '^1.18.0'
     - name: Do not trust Go env
       if: ${{ matrix.language == 'Go' }}
       run: |

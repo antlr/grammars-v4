@@ -17,7 +17,7 @@ function Build-Grammar {
     #go version | Write-Host
     $env:GO111MODULE = "on"
     For ($i=0; $i -le 5; $i++) {
-        $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.11
+        $g = go get github.com/antlr/antlr4/runtime/Go/antlr/v4
         if($LASTEXITCODE -eq 0){
             Break
         }
