@@ -73,13 +73,11 @@ jobs:
       with:
         java-version: '11'
         distribution: 'zulu'
-
     - name: Do not trust Java env
       run: |
         dotnet --version
         java --version
         javac --version
-
     - name: Install Dart
       if: ${{ matrix.language == 'Dart' }}
       uses: dart-lang/setup-dart@v1
@@ -87,17 +85,15 @@ jobs:
       if: ${{ matrix.language == 'Dart' }}
       run: |
         dart --version
-
     - name: Install Go
       if: ${{ matrix.language == 'Go' }}
       uses: actions/setup-go@v3
       with:
-        go-version: '^1.17.0'
+        go-version: '^1.18.0'
     - name: Do not trust Go env
       if: ${{ matrix.language == 'Go' }}
       run: |
         go version
-
     - name: Install Python
       if: ${{ matrix.language == 'Python3' }}
       uses: actions/setup-python@v4.2.0
@@ -107,7 +103,6 @@ jobs:
       if: ${{ matrix.language == 'Python3' }}
       run: |
         python --version
-
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
       uses: actions/setup-node@v3.4.1
@@ -117,13 +112,11 @@ jobs:
       if: ${{ matrix.language == 'JavaScript' }}
       run: |
         node --version
-
     - name: Download ANTLR
       shell: pwsh
       run: |
-        $antlrPath = _scripts/get-antlr.ps1 "4.10"
+        $antlrPath = _scripts/get-antlr.ps1 "4.11.1"
         echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV
-
     - name: Install trgen
       shell: pwsh
       run: |
@@ -132,7 +125,6 @@ jobs:
         if ("${{ matrix.os }}" -eq "ubuntu-latest") {
             echo "$HOME/.dotnet/tools" >> $env:GITHUB_PATH
         }
-
     - name: Test
       shell: pwsh
       run: |
@@ -155,6 +147,16 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
+    - name: Install Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'zulu'
+    - name: Do not trust Java env
+      run: |
+        dotnet --version
+        java --version
+        javac --version
     - name: Install Dotnet
       uses: actions/setup-dotnet@v2
       with:
@@ -185,6 +187,16 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+    - name: Install Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'zulu'
+    - name: Do not trust Java env
+      run: |
+        dotnet --version
+        java --version
+        javac --version
     - name: Install Dotnet
       uses: actions/setup-dotnet@v2
       with:

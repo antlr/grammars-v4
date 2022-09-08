@@ -6,6 +6,8 @@ antlr/antlr4
 apex
 asm/asmMASM
 asm/masm
+asm/asm8080
+asm/asmZ80
 asm/pdp7
 asn/asn_3gpp
 clif
