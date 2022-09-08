@@ -3,11 +3,12 @@
   \<PropertyGroup>
     \<TargetFramework>net6.0\</TargetFramework>
     \<OutputType>Exe\</OutputType>
+    \<ProduceReferenceAssembly>false\</ProduceReferenceAssembly>
   \</PropertyGroup>
   \<ItemGroup>
 <tool_grammar_files:{x |    \<Antlr4 Include="<x>">
 <if(name_space)>\<Package><name_space>\</Package><endif>
-\<AntlrRuntime><antlr_tool_path>\</AntlrRuntime>
+\<!-- AntlrRuntime><antlr_tool_path>\</AntlrRuntime -->
 \</Antlr4>
 } >  \</ItemGroup>
   \<ItemGroup>

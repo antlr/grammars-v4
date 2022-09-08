@@ -150,7 +150,7 @@ public class SwiftSupport {
     private static boolean isCharacterFromSet(Token token, BitSet bitSet) {
         if (token.getType() == Token.EOF) {
             return false;
-        } else {
+	} else {
             String text = token.getText();
             int codepoint = text.codePointAt(0);
             if (Character.charCount(codepoint) != text.length()) {
@@ -171,6 +171,7 @@ public class SwiftSupport {
     }
 
     public static boolean isOpNext(TokenStream tokens) {
+	SwiftSupport.fillUp(tokens);
         int start = tokens.index();
         Token lt = tokens.get(start);
         int stop = getLastOpTokenIndex(tokens);
@@ -182,6 +183,7 @@ public class SwiftSupport {
 
     /** Find stop token index of next operator; return -1 if not operator. */
     public static int getLastOpTokenIndex(TokenStream tokens) {
+	SwiftSupport.fillUp(tokens);
         int currentTokenIndex = tokens.index(); // current on-channel lookahead token index
         Token currentToken = tokens.get(currentTokenIndex);
         
@@ -195,7 +197,7 @@ public class SwiftSupport {
             // dot-operator
             currentTokenIndex += 2; // point at token after ".."
             currentToken = tokens.get(currentTokenIndex);
-            
+
             // dot-operator-character → .­ | operator-character­
             while (currentToken.getType() == Swift3Parser.DOT || isOperatorCharacter(currentToken)) {
                 //System.out.println("DOT");
@@ -211,14 +213,13 @@ public class SwiftSupport {
         
         if (isOperatorHead(currentToken)) {
             //System.out.println("isOperatorHead");
-                
-            tokens.getText(); // TODO. This line strangely fixes crash at mvn test, however, mvn compile gives me perfect working binary.
+
             currentToken = tokens.get(currentTokenIndex);
             while (isOperatorCharacter(currentToken)) {
                 //System.out.println("isOperatorCharacter");
-                currentTokenIndex++;
+		currentTokenIndex++;
                 currentToken = tokens.get(currentTokenIndex);
-            }
+	    }
             //System.out.println("result: "+(currentTokenIndex - 1));
             return currentTokenIndex - 1;
         } else {
@@ -233,6 +234,7 @@ public class SwiftSupport {
      and a + b is treated as a binary operator."
      */
     public static boolean isBinaryOp(TokenStream tokens) {
+	SwiftSupport.fillUp(tokens);
         int stop = getLastOpTokenIndex(tokens);
         if ( stop==-1 ) return false;
 
@@ -253,6 +255,7 @@ public class SwiftSupport {
      as a prefix unary operator."
     */
     public static boolean isPrefixOp(TokenStream tokens) {
+	SwiftSupport.fillUp(tokens);
         int stop = getLastOpTokenIndex(tokens);
         if ( stop==-1 ) return false;
 
@@ -278,6 +281,7 @@ public class SwiftSupport {
      rather than a ++ .b)."
      */
     public static boolean isPostfixOp(TokenStream tokens) {
+	SwiftSupport.fillUp(tokens);
         int stop = getLastOpTokenIndex(tokens);
         if ( stop==-1 ) return false;
 
@@ -295,6 +299,7 @@ public class SwiftSupport {
     }
 
     public static boolean isOperator(TokenStream tokens, String op) {
+	SwiftSupport.fillUp(tokens);
         int stop = getLastOpTokenIndex(tokens);
         if ( stop==-1 ) return false;
 
@@ -318,6 +323,7 @@ public class SwiftSupport {
     }
 
     public static boolean isSeparatedStatement(TokenStream tokens, int indexOfPreviousStatement) {
+	SwiftSupport.fillUp(tokens);
         //System.out.println("------");
         //System.out.println("indexOfPreviousStatement: " + indexOfPreviousStatement);
 
@@ -346,5 +352,14 @@ public class SwiftSupport {
         } else {
             return true;
         }
+    }
+
+    public static void fillUp(TokenStream tokens)
+    {
+	for (int jj = 1;;++jj)
+	{
+	    int t = tokens.LA(jj);
+	    if (t == -1) break;
+	}
     }
 }

@@ -10,15 +10,45 @@ using System.Runtime.CompilerServices;
 
 public class Program
 {
-    public static Parser Parser { get; set; }
+    public static <parser_name> Parser { get; set; }
     public static Lexer Lexer { get; set; }
     public static ITokenStream TokenStream { get; set; }
     public static IParseTree Tree { get; set; }
     public static string StartSymbol { get; set; } = "<start_symbol>";
     public static string Input { get; set; }
+    public static void SetupParse2(string input)
+    {
+        ICharStream str = new AntlrInputStream(input);
+        <if (case_insensitive_type)>
+                str = new Antlr4.Runtime.CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
+        <endif>
+                var lexer = new <lexer_name>(str);
+        Lexer = lexer;
+        var tokens = new CommonTokenStream(lexer);
+        TokenStream = tokens;
+        var parser = new <parser_name>(tokens);
+        Parser = parser;
+        var listener_lexer = new ErrorListener\<int>();
+        var listener_parser = new ErrorListener\<IToken>();
+        lexer.RemoveErrorListeners();
+        parser.RemoveErrorListeners();
+        lexer.AddErrorListener(listener_lexer);
+		parser.AddErrorListener(listener_parser);
+    }
+    public static IParseTree Parse2()
+    {
+        var tree = Parser.<start_symbol>();
+        Input = Lexer.InputStream.ToString();
+        TokenStream = Parser.TokenStream;
+        Tree = tree;
+        return tree;
+    }
     public static IParseTree Parse(string input)
     {
-        var str = new AntlrInputStream(input);
+        ICharStream str = new AntlrInputStream(input);
+    <if (case_insensitive_type)>
+            str = new Antlr4.Runtime.CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
+    < endif >
         var lexer = new <lexer_name>(str);
         Lexer = lexer;
         var tokens = new CommonTokenStream(lexer);
@@ -40,6 +70,7 @@ public class Program
 
     static void Main(string[] args)
     {
+        bool show_profile = false;
         bool show_tree = false;
         bool show_tokens = false;
         bool old = false;
@@ -49,7 +80,12 @@ public class Program
         System.Text.Encoding encoding = null;
         for (int i = 0; i \< args.Length; ++i)
         {
-            if (args[i].Equals("-tokens"))
+            if (args[i].Equals("-profile"))
+            {
+                show_profile = true;
+                continue;
+            }
+            else if (args[i].Equals("-tokens"))
             {
                 show_tokens = true;
                 continue;
@@ -133,6 +169,10 @@ public class Program
         lexer.AddErrorListener(listener_lexer);
         parser.AddErrorListener(listener_parser);
         DateTime before = DateTime.Now;
+        if (show_profile)
+        {
+                parser.Profile = true;
+        }
         var tree = parser.<start_symbol>();
         DateTime after = DateTime.Now;
         System.Console.Error.WriteLine("Time: " + (after - before));
@@ -147,6 +187,10 @@ public class Program
         if (show_tree)
         {
             System.Console.Error.WriteLine(tree.ToStringTree(parser));
+        }
+        if (show_profile)
+        {
+                System.Console.Out.WriteLine(String.Join(",\n\r", parser.ParseInfo.getDecisionInfo().Select(d => d.ToString())));
         }
         System.Environment.Exit(listener_lexer.had_error || listener_parser.had_error ? 1 : 0);
     }

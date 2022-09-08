@@ -104,5 +104,10 @@ namespace Antlr4.Runtime
         {
             stream.Seek(index);
         }
+
+        public override string ToString()
+        {
+            return stream.ToString();
+        }
     }
 }
