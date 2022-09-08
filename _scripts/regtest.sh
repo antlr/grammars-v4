@@ -170,10 +170,10 @@ setupdeps()
         dotnet tool install -g trxml2 --version 0.16.3
         dotnet tool install -g trwdog --version 0.16.3
 	case "${unameOut}" in
-		Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.10/antlr4-4.10-complete.jar' -o /tmp/antlr4-4.10-complete.jar;;
-		Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.10/antlr4-4.10-complete.jar' -o /tmp/antlr4-4.10-complete.jar;;
-		CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.10/antlr4-4.10-complete.jar' -o /tmp/antlr4-4.10-complete.jar;;
-		MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.10/antlr4-4.10-complete.jar' -o /tmp/antlr4-4.10-complete.jar;;
+		Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
+		Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
+		CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
+		MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
 		*)          echo 'unknown machine'
 	esac
         echo "Done setting up."
@@ -189,9 +189,9 @@ part1()
     echo "Generating drivers."
     if [[ "$invert" == "" ]]
     then
-        bad=`trgen --skip-pattern "$skip_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr4-4.10-complete.jar`
+        bad=`trgen --skip-pattern "$skip_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr4-4.11.1-complete.jar`
     else
-        bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr4-4.10-complete.jar`
+        bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr4-4.11.1-complete.jar`
     fi
     for i in $bad; do failed=`add "$failed" "$i"`; done
     date

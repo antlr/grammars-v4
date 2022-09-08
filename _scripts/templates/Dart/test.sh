@@ -9,7 +9,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo "$file"
-    trwdog <if(os_win)>dart.bat<else>dart<endif> run cli.dart -file "$file"
+    trwdog <if(os_win)>./cli.exe<else>./cli<endif> -file "$file"
     status="$?"
     if [ -f "$file".errors ]
     then

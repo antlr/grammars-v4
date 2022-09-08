@@ -6,7 +6,7 @@ import (
     "os"
     "io"
     "time"
-    "github.com/antlr/antlr4/runtime/Go/antlr"
+    "github.com/antlr/antlr4/runtime/Go/antlr/v4"
     "example.com/myparser/<package_name>"
 <if (case_insensitive_type)>
     "example.com/myparser/antlr_resource"
