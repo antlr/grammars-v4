@@ -11,7 +11,7 @@ setup:
 	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 	-go env
 	-go version
-	export GO111MODULE=on; for i in {1..5}; do go get github.com/antlr/antlr4/runtime/Go/antlr@4.11.1; if [ $$? = "0" ]; then break; fi; done; if [ $$? != "0" ]; then exit 1; fi
+	export GO111MODULE=on; for i in {1..5}; do go get github.com/antlr/antlr4/runtime/Go/antlr/v4; if [ $$? = "0" ]; then break; fi; done; if [ $$? != "0" ]; then exit 1; fi
 program:
 	export GO111MODULE=on; go build Test.go
 clean:
