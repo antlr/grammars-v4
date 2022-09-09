@@ -5,7 +5,7 @@ package antlr_resource
 import (
 	"unicode"
 
-	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
 )
 
 // CaseChangingStream wraps an existing CharStream, but upper cases, or
