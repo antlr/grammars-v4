@@ -290,12 +290,7 @@ precedenceUnaryOperator
     ;
 
 isCondition
-    : KW_NULL
-    | KW_TRUE
-    | KW_FALSE
-    | KW_NOT KW_NULL
-    | KW_NOT KW_TRUE
-    | KW_NOT KW_FALSE
+    : KW_NOT? (KW_NULL | KW_TRUE | KW_FALSE | KW_DISTINCT KW_FROM)
     ;
 
 precedenceBitwiseXorOperator
@@ -332,35 +327,23 @@ precedenceRegexpOperator
     | KW_REGEXP
     ;
 
-precedenceSimilarOperator
-    : precedenceRegexpOperator
-    | LESSTHANOREQUALTO
+precedenceComparisonOperator
+    : LESSTHANOREQUALTO
     | LESSTHAN
     | GREATERTHANOREQUALTO
     | GREATERTHAN
-    ;
-
-precedenceDistinctOperator
-    : KW_IS KW_DISTINCT KW_FROM
-    ;
-
-precedenceEqualOperator
-    : EQUAL
+    | EQUAL
     | EQUAL_NS
     | NOTEQUAL
-    | KW_IS KW_NOT KW_DISTINCT KW_FROM
     ;
 
 precedenceNotOperator
     : KW_NOT
     ;
 
-precedenceAndOperator
+precedenceLogicOperator
     : KW_AND
-    ;
-
-precedenceOrOperator
-    : KW_OR
+    | KW_OR
     ;
 
 //precedenceFieldExpression
@@ -379,39 +362,28 @@ precedenceOrOperator
 //precedenceAndExpression
 //precedenceOrExpression
 expression
-    : atomExpression ((LSQUARE expression RSQUARE) | (DOT identifier))*
-    | precedenceUnaryOperator expression
-    | expression KW_IS isCondition
-    | expression precedenceBitwiseXorOperator expression
-    | expression precedenceStarOperator expression
-    | expression precedencePlusOperator expression
-    | expression precedenceConcatenateOperator expression
-    | expression precedenceAmpersandOperator expression
-    | expression precedenceBitwiseOrOperator expression
-    | expression precedenceSimilarExpressionPart
-    | KW_EXISTS subQueryExpression
-    | expression (precedenceEqualOperator | precedenceDistinctOperator) expression
-    | precedenceNotOperator expression
-    | expression precedenceAndOperator expression
-    | expression precedenceOrOperator expression
+    : expression precedenceLogicOperator expression
     | LPAREN expression RPAREN
+    | precedenceExpression
     ;
 
-subQueryExpression
-    : LPAREN selectStatement RPAREN
-    ;
-
-precedenceSimilarExpressionPart
-    : precedenceSimilarOperator expression
-    | precedenceSimilarExpressionAtom
-    | KW_NOT precedenceSimilarExpressionPartNot
-    ;
-
-precedenceSimilarExpressionAtom
-    : KW_IN precedenceSimilarExpressionIn
-    | KW_BETWEEN expression KW_AND expression
-    | KW_LIKE KW_ANY expressionsInParenthesis
-    | KW_LIKE KW_ALL expressionsInParenthesis
+precedenceExpression
+    : atomExpression ((LSQUARE expression RSQUARE) | (DOT identifier))*
+    | precedenceUnaryOperator precedenceExpression
+    | precedenceExpression KW_IS isCondition
+    | precedenceExpression precedenceBitwiseXorOperator precedenceExpression
+    | precedenceExpression precedenceStarOperator precedenceExpression
+    | precedenceExpression precedencePlusOperator precedenceExpression
+    | precedenceExpression precedenceConcatenateOperator precedenceExpression
+    | precedenceExpression precedenceAmpersandOperator precedenceExpression
+    | precedenceExpression precedenceBitwiseOrOperator precedenceExpression
+    | precedenceExpression precedenceComparisonOperator precedenceExpression
+    | precedenceExpression KW_NOT? precedenceRegexpOperator precedenceExpression
+    | precedenceExpression KW_NOT? KW_LIKE (KW_ANY | KW_ALL) expressionsInParenthesis
+    | precedenceExpression KW_NOT? KW_IN precedenceSimilarExpressionIn
+    | precedenceExpression KW_NOT? KW_BETWEEN precedenceExpression KW_AND precedenceExpression
+    | KW_EXISTS subQueryExpression
+    | precedenceNotOperator precedenceExpression
     ;
 
 precedenceSimilarExpressionIn
@@ -419,9 +391,8 @@ precedenceSimilarExpressionIn
     | expressionsInParenthesis
     ;
 
-precedenceSimilarExpressionPartNot
-    : precedenceRegexpOperator expression
-    | precedenceSimilarExpressionAtom
+subQueryExpression
+    : LPAREN selectStatement RPAREN
     ;
 
 booleanValue

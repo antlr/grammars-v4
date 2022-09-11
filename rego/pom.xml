@@ -42,7 +42,6 @@
 					<entryPoint>root</entryPoint>
 					<grammarName>Rego</grammarName>
 					<packageName></packageName>
-					<caseInsensitiveType>None</caseInsensitiveType>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

@@ -1,37 +1,12 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using System.Collections.Generic;
+using Antlr4.Runtime.Atn;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-public class PostgreSQLParserBase : Parser
+public abstract class PostgreSQLParserBase : Parser
 {
-    public class ParseError
-    {
-        public ParseError(int number, int offset, int line, int column, string message)
-        {
-            Number = number;
-            Offset = offset;
-            Message = message;
-            Line = line;
-            Column = column;
-        }
-        public int Number { get; }
-        public int Offset { get; }
-        public int Line { get; }
-        public int Column { get; }
-        public string Message { get; }
-    }
-    internal readonly IList<ParseError> m_ParseErrors = new List<ParseError>();
-    public IList<ParseError> ParseErrors => m_ParseErrors;
-
-    public override string[] RuleNames => throw new System.NotImplementedException();
-
-    public override IVocabulary Vocabulary => throw new System.NotImplementedException();
-
-    public override string GrammarFileName => "PostgreSQLParser.g4";
-
     public PostgreSQLParserBase(ITokenStream input) : base(input)
     {
     }
@@ -44,12 +19,9 @@ public class PostgreSQLParserBase : Parser
     {
         var ph = getPostgreSQLParser(script);
         var result = ph.root();
-        foreach (var err in ph.ParseErrors)
-        {
-            ParseErrors.Add(new ParseError(err.Number, err.Offset, err.Line + line, err.Column, err.Message));
-        }
         return result;
     }
+
     internal void ParseRoutineBody(PostgreSQLParser.Createfunc_opt_listContext _localctx)
     {
         var lang =
@@ -75,18 +47,15 @@ public class PostgreSQLParserBase : Parser
                     func_as.func_as().Definition = ph.root();
                     break;
             }
-            foreach (var err in ph.ParseErrors)
-            {
-                ParseErrors.Add(new ParseError(err.Number, err.Offset, err.Line + line, err.Column, err.Message));
-            }
         }
     }
-    private static string TrimQuotes(string s)
+
+    private string TrimQuotes(string s)
     {
         return string.IsNullOrEmpty(s) ? s : s.Substring(1, s.Length - 2);
     }
 
-    public static string unquote(string s)
+    public string unquote(string s)
     {
         var r = new StringBuilder(s.Length);
         var i = 0;
@@ -99,7 +68,8 @@ public class PostgreSQLParserBase : Parser
         }
         return r.ToString();
     }
-    public static string GetRoutineBodyString(PostgreSQLParser.SconstContext rule)
+
+    public string GetRoutineBodyString(PostgreSQLParser.SconstContext rule)
     {
         var anysconst = rule.anysconst();
         var StringConstant = anysconst.StringConstant();
@@ -117,30 +87,18 @@ public class PostgreSQLParserBase : Parser
         return result;
     }
 
-    public static PostgreSQLParser getPostgreSQLParser(string script)
+    public PostgreSQLParser getPostgreSQLParser(string script)
     {
-        var CharStream = CharStreams.fromString(script);
-        var Lexer = new PostgreSQLLexer(CharStream);
-        var Tokens = new CommonTokenStream(Lexer);
-        var Parser = new PostgreSQLParser(Tokens);
-        var ErrorListener = new PostgreSQLParserErrorListener();
-        ErrorListener.grammar = Parser;
-        Parser.AddErrorListener(ErrorListener);
-        return Parser;
+        var charStream = CharStreams.fromString(script);
+        var lexer = new PostgreSQLLexer(charStream);
+        var tokens = new CommonTokenStream(lexer);
+        var parser = new PostgreSQLParser(tokens);
+        lexer.RemoveErrorListeners();
+        parser.RemoveErrorListeners();
+        var listener_lexer = new LexerDispatchingErrorListener((this.InputStream as CommonTokenStream).TokenSource as Lexer);
+        var listener_parser = new ParserDispatchingErrorListener(this);
+        lexer.AddErrorListener(listener_lexer);
+        parser.AddErrorListener(listener_parser);
+        return parser;
     }
-
-    internal class PostgreSQLParserErrorListener : BaseErrorListener
-    {
-        internal PostgreSQLParser grammar;
-        public PostgreSQLParserErrorListener()
-        {
-        }
-        public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
-        {
-            grammar?.ParseErrors.Add(new ParseError(0, 0, line, charPositionInLine, msg));
-        }
-    }
-
-
-
 }

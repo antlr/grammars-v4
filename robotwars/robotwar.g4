@@ -29,7 +29,7 @@
 grammar robotwar;
 
 program
-   : line +
+   : line + EOF
    ;
 
 line

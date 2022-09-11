@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
+import java.time.Instant;
+import java.time.Duration;
 
 public class Program {
     public static void main(String[] args) throws  FileNotFoundException, IOException
@@ -72,10 +74,15 @@ public class Program {
         <parser_name> parser = new <parser_name>(tokens);
         ErrorListener lexer_listener = new ErrorListener();
         ErrorListener listener = new ErrorListener();
-        parser.removeParseListeners();
+        parser.removeErrorListeners();
+	    lexer.removeErrorListeners();
         parser.addErrorListener(listener);
         lexer.addErrorListener(lexer_listener);
+        Instant start = Instant.now();
         ParseTree tree = parser.<start_symbol>();
+        Instant finish = Instant.now();
+        long timeElapsed = Duration.between(start, finish).toMillis();
+        System.err.println("Time: " + (timeElapsed * 1.0) / 1000.0);
         if (listener.had_error || lexer_listener.had_error)
             System.err.println("Parse failed.");
         else

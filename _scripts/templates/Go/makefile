@@ -8,17 +8,17 @@ SOURCES = $(GENERATED) Test.go
 default: classes
 classes: setup $(SOURCES) program
 setup:
-	-export | grep GO
+	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 	-go env
 	-go version
-	export GO111MODULE=on; go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
+	export GO111MODULE=on; for i in {1..5}; do go get github.com/antlr/antlr4/runtime/Go/antlr/v4; if [ $$? = "0" ]; then break; fi; done; if [ $$? != "0" ]; then exit 1; fi
 program:
 	export GO111MODULE=on; go build Test.go
 clean:
 	rm -f *.tokens *.interp
 	rm -f $(GENERATED)
 run:
-	export GO111MODULE=on; trwdog go run Test.go $(RUNARGS)
+	trwdog ./<exec_name> $(RUNARGS)
 test: FORCE
 	bash test.sh
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>

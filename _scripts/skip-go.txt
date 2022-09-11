@@ -6,12 +6,16 @@ antlr/antlr4
 apex
 asm/asmMASM
 asm/masm
+asm/asm8080
+asm/asmZ80
 asm/pdp7
 asn/asn_3gpp
 clif
 cobol85
 cpp
 csharp
+dart2
+databank
 edif300
 fortran77
 gdscript
@@ -70,7 +74,6 @@ scss
 sieve
 smalltalk
 smtlibv2
-sparql
 sql/hive/v2
 sql/hive/v3
 sql/mysql

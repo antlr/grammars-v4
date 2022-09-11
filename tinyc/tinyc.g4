@@ -52,7 +52,7 @@ grammar tinyc;
  *  <int> ::= <an_unsigned_decimal_integer>
 */
 program
-   : statement +
+   : statement + EOF
    ;
 
 statement

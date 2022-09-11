@@ -20,32 +20,35 @@
 
  GraphQL grammar derived from:
 
- GraphQL Draft Specification - July 2015
+ GraphQL Draft Specification - Oct 2021 upgraded from June 2018
 
  http://facebook.github.io/graphql/ https://github.com/facebook/graphql
 
  AB:10-sep19: replaced type with type_ to resolve conflict for golang generator
 
  AB: 13-oct-19: added type system as per June 2018 specs
- AB: 26-oct-19: added ID type
- AB: 30-Oct-19: description, boolean, schema & Block string fix.
-     now parses: https://raw.githubusercontent.com/graphql-cats/graphql-cats/master/scenarios/validation/validation.schema.graphql
+ 
+ AB: 28-aug-22 made changes for 2021 (since 2018) specs
+    
 
  */
 grammar GraphQL;
 
-//https://spec.graphql.org/June2018/#sec-Language.Document
-document: definition+;
+//https://spec.graphql.org/October2021/#sec-Document
+document: definition+ EOF;
 
 definition:
-	executableDefinition
-	| typeSystemDefinition
-	| typeSystemExtension;
+	executableDocument  // deviation from 2018 (new)
+	| typeSystemDocument //https://spec.graphql.org/October2021/#TypeSystemDocument (new in 2021)
+	| typeSystemExtensionDocument; //https://spec.graphql.org/October2021/#TypeSystemExtensionDocument (new in 2021)
 
-//https://spec.graphql.org/June2018/#ExecutableDefinition
+//https://spec.graphql.org/October2021/#ExecutableDocument
+executableDocument: executableDefinition+;  //(new) 2021
+
+//https://spec.graphql.org/October2021/#ExecutableDefinition
 executableDefinition: operationDefinition | fragmentDefinition;
 
-//https://spec.graphql.org/June2018/#sec-Language.Operations
+//https://spec.graphql.org/October2021/#sec-Language.Operations
 operationDefinition:
 	operationType name? variableDefinitions? directives? selectionSet
 	| selectionSet
@@ -53,36 +56,36 @@ operationDefinition:
 
 operationType: 'query' | 'mutation' | 'subscription';
 
-//https://spec.graphql.org/June2018/#sec-Selection-Sets
+//https://spec.graphql.org/October2021/#sec-Selection-Sets
 selectionSet: '{' selection+ '}';
 
 selection: field
     | fragmentSpread
     | inlineFragment
     ;
-//https://spec.graphql.org/June2018/#sec-Language.Fields
+//https://spec.graphql.org/October2021/#sec-Language.Fields
 field: alias? name arguments? directives? selectionSet?;
 
-//https://spec.graphql.org/June2018/#sec-Language.Arguments
+//https://spec.graphql.org/October2021/#sec-Language.Arguments
 arguments: '(' argument+ ')';
 argument: name ':' value;
 
-//https://spec.graphql.org/June2018/#sec-Field-Alias
+//https://spec.graphql.org/October2021/#sec-Field-Alias
 alias: name ':';
 
-//https://spec.graphql.org/June2018/#sec-Language.Fragments
+//https://spec.graphql.org/October2021/#sec-Language.Fragments
 fragmentSpread: '...' fragmentName directives?;
 fragmentDefinition:
 	'fragment' fragmentName typeCondition directives? selectionSet;
 fragmentName: name; // except on
 
-//https://spec.graphql.org/June2018/#sec-Type-Conditions
+//https://spec.graphql.org/October2021/#sec-Type-Conditions
 typeCondition: 'on' namedType;
 
-//https://spec.graphql.org/June2018/#sec-Inline-Fragments
+//https://spec.graphql.org/October2021/#sec-Inline-Fragments
 inlineFragment:	'...' typeCondition? directives? selectionSet;
 
-//https://spec.graphql.org/June2018/#sec-Input-Values
+//https://spec.graphql.org/October2021/#sec-Input-Values
 value:
 	 variable
 	| intValue
@@ -95,44 +98,44 @@ value:
 	| objectValue
    ;
 
-//https://spec.graphql.org/June2018/#sec-Int-Value
+//https://spec.graphql.org/October2021/#sec-Int-Value
 intValue: INT;
 
-//https://spec.graphql.org/June2018/#sec-Float-Value
+//https://spec.graphql.org/October2021/#sec-Float-Value
 floatValue: FLOAT;
 
-//https://spec.graphql.org/June2018/#sec-Boolean-Value
+//https://spec.graphql.org/October2021/#sec-Boolean-Value
 booleanValue
 	:	'true'
 	|	'false'
 	;
 
-//https://spec.graphql.org/June2018/#sec-String-Value
+//https://spec.graphql.org/October2021/#sec-String-Value
 stringValue : STRING | BLOCK_STRING;
 
-//https://spec.graphql.org/June2018/#sec-Null-Value
+//https://spec.graphql.org/October2021/#sec-Null-Value
 nullValue: 'null';
 
-//https://spec.graphql.org/June2018/#sec-Enum-Value
+//https://spec.graphql.org/October2021/#sec-Enum-Value
 enumValue: name; //{ not (nullValue | booleanValue) };
 
-//https://spec.graphql.org/June2018/#sec-List-Value
+//https://spec.graphql.org/October2021/#sec-List-Value
 listValue: '[' ']'
     | '[' value+ ']'
     ;
 
-//https://spec.graphql.org/June2018/#sec-Input-Object-Values
+//https://spec.graphql.org/October2021/#sec-Input-Object-Values
 objectValue: '{' objectField* '}';
 
 objectField: name ':' value;
 
-//https://spec.graphql.org/June2018/#sec-Language.Variables
+//https://spec.graphql.org/October2021/#sec-Language.Variables
 variable: '$' name;
 variableDefinitions: '(' variableDefinition+ ')';
 variableDefinition: variable ':' type_ defaultValue?;
 defaultValue: '=' value;
 
-//https://spec.graphql.org/June2018/#sec-Type-References
+//https://spec.graphql.org/October2021/#sec-Type-References
 type_: namedType '!'?
     | listType '!'?
     ;
@@ -141,41 +144,49 @@ namedType: name;
 listType: '[' type_ ']';
 
 
-//https://spec.graphql.org/June2018/#sec-Language.Directives
+//https://spec.graphql.org/October2021/#sec-Language.Directives
 directives:  directive+;
 directive: '@' name arguments?;
 
-// https://graphql.github.io/graphql-spec/June2018/#TypeSystemDefinition
+// https://spec.graphql.org/October2021/#sec-Type-System
+// deviation from 2018 specs. Added type system document
+//https://spec.graphql.org/October2021/#TypeSystemDocument (new in 2021)
+typeSystemDocument: typeSystemDefinition+;
 typeSystemDefinition: schemaDefinition
 	| typeDefinition
 	| directiveDefinition
 	;
 
-//https://spec.graphql.org/June2018/#TypeSystemExtension
+// https://spec.graphql.org/October2021/#TypeSystemExtensionDocument (new in 2021)
+typeSystemExtensionDocument: typeSystemExtension+;
+
+//https://spec.graphql.org/October2021/#sec-Type-System-Extensions
 typeSystemExtension: schemaExtension
     | typeExtension
     ;
 
-// https://graphql.github.io/graphql-spec/June2018/#sec-Schema
+// https://spec.graphql.org/October2021/#sec-Schema
 schemaDefinition:
 	 'schema' directives? '{' rootOperationTypeDefinition+ '}';
 
 rootOperationTypeDefinition: operationType ':' namedType;
 
-//https://spec.graphql.org/June2018/#sec-Schema-Extension
+
+//https://spec.graphql.org/October2021/#sec-Schema-Extension (deviation from 2018)
 schemaExtension:
-    'extend' 'schema' directives? '{' operationTypeDefinition+ '}'
+    'extend' 'schema' directives? '{' rootOperationTypeDefinition+ '}' //(new 2021)
     | 'extend' 'schema' directives
     ;
 
 //https://spec.graphql.org/June2018/#OperationTypeDefinition
-operationTypeDefinition: operationType ':' namedType;
+//operationTypeDefinition: operationType ':' namedType; //removed in 2021
+
 
 
 //https://spec.graphql.org/June2018/#sec-Descriptions
 description: stringValue;
 
-//https://spec.graphql.org/June2018/#sec-Types
+//https://spec.graphql.org/October2021/#sec-Types
 typeDefinition:
 	scalarTypeDefinition
 	| objectTypeDefinition
@@ -193,13 +204,13 @@ typeExtension : scalarTypeExtension
     | inputObjectTypeExtension
     ;
 
-//https://spec.graphql.org/June2018/#sec-Scalars
+//https://spec.graphql.org/October2021/#sec-Scalars
 scalarTypeDefinition: description? 'scalar' name directives?;
 
-//https://spec.graphql.org/June2018/#sec-Scalar-Extensions
+//https://spec.graphql.org/October2021/#sec-Scalar-Extensions
 scalarTypeExtension:  'extend' 'scalar' name directives;
 
-// https://graphql.github.io/graphql-spec/June2018/#sec-Objects
+// https://spec.graphql.org/October2021/#sec-Objects
 objectTypeDefinition :
     description?   'type' name implementsInterfaces?  directives? fieldsDefinition?;
 
@@ -211,45 +222,45 @@ implementsInterfaces: 'implements' '&'? namedType
 fieldsDefinition: '{'  fieldDefinition+ '}';
 fieldDefinition: description? name  argumentsDefinition? ':' type_  directives? ;
 
-//https://spec.graphql.org/June2018/#sec-Field-Arguments
+//https://spec.graphql.org/October2021/#sec-Field-Arguments
 argumentsDefinition: '(' inputValueDefinition+ ')';
 inputValueDefinition:  description? name ':' type_ defaultValue? directives?;
 
-//https://spec.graphql.org/June2018/#sec-Object-Extensions
+//https://spec.graphql.org/October2021/#sec-Object-Extensions
 objectTypeExtension:
     'extend' 'type' name implementsInterfaces? directives? fieldsDefinition
     | 'extend' 'type' name implementsInterfaces? directives
     | 'extend' 'type' name implementsInterfaces
     ;
 
-//https://spec.graphql.org/June2018/#sec-Interfaces
-interfaceTypeDefinition: description? 'interface' name directives? fieldsDefinition?;
+//https://spec.graphql.org/October2021/#sec-Interfaces  (deviation from 2018)
+interfaceTypeDefinition: description? 'interface' name implementsInterfaces? directives? fieldsDefinition?;
 
-//https://spec.graphql.org/June2018/#sec-Interface-Extensions
-interfaceTypeExtension:  'extend' 'interface' name directives? fieldsDefinition
-    | 'extend' 'interface' name directives
+//https://spec.graphql.org/October2021/#sec-Interface-Extensions (deviation from 2018)
+interfaceTypeExtension:  'extend' 'interface' name implementsInterfaces? directives? fieldsDefinition
+    | 'extend' 'interface' name  implementsInterfaces? directives
     ;
 
-// https://graphql.github.io/graphql-spec/June2018/#sec-Unions
+//https://spec.graphql.org/October2021/#sec-Unions
 unionTypeDefinition:  description? 'union' name directives? unionMemberTypes?;
 unionMemberTypes: '=' '|'?  namedType ('|'namedType)* ;
 
-//https://spec.graphql.org/June2018/#sec-Union-Extensions
+//https://spec.graphql.org/October2021/#sec-Union-Extensions
 unionTypeExtension : 'extend' 'union' name directives? unionMemberTypes
     | 'extend' 'union' name directives
     ;
 
-//https://spec.graphql.org/June2018/#sec-Enums
+//https://spec.graphql.org/October2021/#sec-Enums
 enumTypeDefinition:  description? 'enum' name directives? enumValuesDefinition?;
 enumValuesDefinition: '{' enumValueDefinition+  '}';
 enumValueDefinition: description? enumValue  directives?;
 
-//https://spec.graphql.org/June2018/#sec-Enum-Extensions
+//https://spec.graphql.org/October2021/#sec-Enum-Extensions
 enumTypeExtension: 'extend' 'enum' name directives? enumValuesDefinition
     | 'extend' 'enum' name directives
     ;
 
-//https://spec.graphql.org/June2018/#sec-Input-Objects
+//https://spec.graphql.org/October2021/#sec-Input-Objects
 inputObjectTypeDefinition: description? 'input' name directives? inputFieldsDefinition?;
 inputFieldsDefinition: '{' inputValueDefinition+ '}';
 
@@ -258,8 +269,8 @@ inputObjectTypeExtension:  'extend' 'input' name directives? inputFieldsDefiniti
     | 'extend' 'input' name directives
     ;
 
-//https://spec.graphql.org/June2018/#sec-Type-System.Directives
-directiveDefinition: description? 'directive' '@' name argumentsDefinition? 'on' directiveLocations;
+//https://spec.graphql.org/October2021/#sec-Type-System.Directives (new 2021, repeatable )
+directiveDefinition: description? 'directive' '@' name argumentsDefinition? 'repeatable'? 'on' directiveLocations;
 directiveLocations: directiveLocation ('|' directiveLocation)*;
 directiveLocation: executableDirectiveLocation | typeSystemDirectiveLocation;
 
@@ -271,6 +282,7 @@ executableDirectiveLocation:
     | 'FRAGMENT_DEFINITION'
     | 'FRAGMENT_SPREAD'
     | 'INLINE_FRAGMENT'
+    | 'VARIABLE_DEFINITION'   // new 2021
     ;
 
 typeSystemDirectiveLocation:
@@ -287,8 +299,10 @@ typeSystemDirectiveLocation:
     | 'INPUT_FIELD_DEFINITION'
     ;
 
+//https://spec.graphql.org/October2021/#sec-Names
 name: NAME;
 
+//https://spec.graphql.org/October2021/#sec-Language.Source-Text.Lexical-Tokens
 //Start lexer
 NAME: [_A-Za-z] [_0-9A-Za-z]*;
 
@@ -301,6 +315,7 @@ BLOCK_STRING
 
 ID: STRING;
 
+//https://spec.graphql.org/October2021/#EscapedCharacter
 fragment ESC: '\\' ( ["\\/bfnrt] | UNICODE);
 
 fragment UNICODE: 'u' HEX HEX HEX HEX;
@@ -315,6 +330,7 @@ fragment EXPONENT_INDICATOR: [eE];
 fragment SIGN: [+-];
 fragment NEGATIVE_SIGN: '-';
 
+//https://spec.graphql.org/October2021/#sec-Float-Value
 FLOAT: INT FRACTIONAL_PART
     | INT EXPONENTIAL_PART
     | INT FRACTIONAL_PART EXPONENTIAL_PART
@@ -324,6 +340,7 @@ INT: NEGATIVE_SIGN? '0'
     | NEGATIVE_SIGN? NONZERO_DIGIT DIGIT*
     ;
 
+//https://spec.graphql.org/October2021/#Punctuator
 PUNCTUATOR: '!'
     | '$'
     | '(' | ')'
@@ -339,6 +356,8 @@ PUNCTUATOR: '!'
 // no leading zeros
 
 fragment EXP: [Ee] [+\-]? INT;
+
+//https://spec.graphql.org/October2021/#sec-Language.Source-Text.Ignored-Tokens
 
 // \- since - means "range" inside [...]
 

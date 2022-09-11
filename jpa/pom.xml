@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>ql_statement</entryPoint>
+					<entryPoint>file_</entryPoint>
 					<grammarName>JPA</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

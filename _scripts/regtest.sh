@@ -162,23 +162,23 @@ test()
 setupdeps()
 {
     date
-    echo "Setting up trgen and antlr jar."
-    dotnet tool uninstall -g trgen
-    dotnet tool install -g trgen --version 0.14.1
-    dotnet tool uninstall -g trxml2
-    dotnet tool install -g trxml2 --version 0.14.1
-    dotnet tool uninstall -g trwdog
-    dotnet tool install -g trwdog --version 0.14.1
+    trgen --version
+    if [ $? != "0" ]
+    then
+        echo "Setting up trgen and antlr jar."
+        dotnet tool install -g trgen --version 0.16.3
+        dotnet tool install -g trxml2 --version 0.16.3
+        dotnet tool install -g trwdog --version 0.16.3
 	case "${unameOut}" in
-		Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.9.3/antlr4-4.9.3-complete.jar' -o /tmp/antlr-4.9.3-complete.jar;;
-		Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.9.3/antlr4-4.9.3-complete.jar' -o /tmp/antlr-4.9.3-complete.jar;;
-		CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.9.3/antlr4-4.9.3-complete.jar' -o /tmp/antlr-4.9.3-complete.jar;;
-		MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.9.3/antlr4-4.9.3-complete.jar' -o /tmp/antlr-4.9.3-complete.jar;;
+		Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
+		Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
+		CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
+		MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
 		*)          echo 'unknown machine'
 	esac
-	ls -l /tmp/antlr4-runtime-4.9.3.jar
-    echo "Done setting up."
-    date
+        echo "Done setting up."
+        date
+    fi
 }
 
 part1()
@@ -189,9 +189,9 @@ part1()
     echo "Generating drivers."
     if [[ "$invert" == "" ]]
     then
-        bad=`trgen --skip-pattern "$skip_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr-4.9.3-complete.jar`
+        bad=`trgen --skip-pattern "$skip_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr4-4.11.1-complete.jar`
     else
-        bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr-4.9.3-complete.jar`
+        bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr4-4.11.1-complete.jar`
     fi
     for i in $bad; do failed=`add "$failed" "$i"`; done
     date

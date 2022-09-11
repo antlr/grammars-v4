@@ -14,6 +14,8 @@ creole
 csharp
 css3
 cto
+dart2
+databank
 fortran77
 gdscript
 golang
@@ -37,6 +39,7 @@ kotlin/kotlin-formal
 kquery
 logo/ucb-logo
 lpc
+lucene
 modula2pim4
 pascal
 peoplecode
@@ -100,6 +103,7 @@ wat
 wavefront
 webidl
 wkt
+wren
 wln
 xml
 xpath/xpath1

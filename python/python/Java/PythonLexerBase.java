@@ -172,7 +172,7 @@ public abstract class PythonLexerBase extends Lexer {
 
     private void emit(int tokenType, int channel, String text) {
         int charIndex = getCharIndex();
-        CommonToken token = new CommonToken(_tokenFactorySourcePair, tokenType, channel, charIndex - text.length(), charIndex);
+        CommonToken token = new CommonToken(_tokenFactorySourcePair, tokenType, channel, charIndex - text.length(), charIndex - 1);
         token.setLine(getLine());
         token.setCharPositionInLine(getCharPositionInLine());
         token.setText(text);

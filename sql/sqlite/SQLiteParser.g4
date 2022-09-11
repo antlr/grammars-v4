@@ -72,7 +72,7 @@ sql_stmt: (EXPLAIN_ (QUERY_ PLAN_)?)? (
 alter_table_stmt:
     ALTER_ TABLE_ (schema_name DOT)? table_name (
         RENAME_ (
-            TO_ new_table_name
+            TO_ new_table_name = table_name
             | COLUMN_? old_column_name = column_name TO_ new_column_name = column_name
         )
         | ADD_ COLUMN_? column_def
@@ -224,7 +224,7 @@ cte_table_name:
 ;
 
 recursive_cte:
-    cte_table_name AS_ OPEN_PAR initial_select UNION_ ALL_? recursive__select CLOSE_PAR
+    cte_table_name AS_ OPEN_PAR initial_select UNION_ ALL_? recursive_select CLOSE_PAR
 ;
 
 common_table_expression:
@@ -232,11 +232,11 @@ common_table_expression:
 ;
 
 delete_stmt:
-    with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)?
+    with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? returning_clause?
 ;
 
 delete_stmt_limited:
-    with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? (
+    with_clause? DELETE_ FROM_ qualified_table_name (WHERE_ expr)? returning_clause? (
         order_by_stmt? limit_stmt
     )?
 ;
@@ -341,13 +341,19 @@ insert_stmt:
         OPEN_PAR column_name ( COMMA column_name)* CLOSE_PAR
     )? (
         (
-            VALUES_ OPEN_PAR expr (COMMA expr)* CLOSE_PAR (
-                COMMA OPEN_PAR expr ( COMMA expr)* CLOSE_PAR
-            )*
-            | select_stmt
-        ) upsert_clause?
-    )
-    | DEFAULT_ VALUES_
+            (
+                VALUES_ OPEN_PAR expr (COMMA expr)* CLOSE_PAR (
+                    COMMA OPEN_PAR expr ( COMMA expr)* CLOSE_PAR
+                )*
+                | select_stmt
+            ) upsert_clause?
+        )
+        | DEFAULT_ VALUES_
+    ) returning_clause?
+;
+
+returning_clause:
+    RETURNING_ result_column (COMMA result_column)*
 ;
 
 upsert_clause:
@@ -356,8 +362,8 @@ upsert_clause:
     )? DO_ (
         NOTHING_
         | UPDATE_ SET_ (
-            (column_name | column_name_list) EQ expr (
-                COMMA (column_name | column_name_list) EQ expr
+            (column_name | column_name_list) ASSIGN expr (
+                COMMA (column_name | column_name_list) ASSIGN expr
             )* (WHERE_ expr)?
         )
     )
@@ -457,7 +463,9 @@ update_stmt:
         OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_)
     )? qualified_table_name SET_ (column_name | column_name_list) ASSIGN expr (
         COMMA (column_name | column_name_list) ASSIGN expr
-    )* (WHERE_ expr)?
+    )* (
+        FROM_ (table_or_subquery (COMMA table_or_subquery)* | join_clause)
+    )? (WHERE_ expr)? returning_clause?
 ;
 
 column_name_list:
@@ -469,7 +477,7 @@ update_stmt_limited:
         OR_ (ROLLBACK_ | ABORT_ | REPLACE_ | FAIL_ | IGNORE_)
     )? qualified_table_name SET_ (column_name | column_name_list) ASSIGN expr (
         COMMA (column_name | column_name_list) ASSIGN expr
-    )* (WHERE_ expr)? (order_by_stmt? limit_stmt)?
+    )* (WHERE_ expr)? returning_clause? (order_by_stmt? limit_stmt)?
 ;
 
 qualified_table_name: (schema_name DOT)? table_name (AS_ alias)? (
@@ -580,18 +588,18 @@ window_function:
     | (CUME_DIST_ | PERCENT_RANK_) OPEN_PAR CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr? CLOSE_PAR
     | (DENSE_RANK_ | RANK_ | ROW_NUMBER_) OPEN_PAR CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc
         CLOSE_PAR
-    | (LAG_ | LEAD_) OPEN_PAR expr of_OF_fset? default_DEFAULT__value? CLOSE_PAR OVER_ OPEN_PAR partition_by?
+    | (LAG_ | LEAD_) OPEN_PAR expr offset? default_value? CLOSE_PAR OVER_ OPEN_PAR partition_by?
         order_by_expr_asc_desc CLOSE_PAR
     | NTH_VALUE_ OPEN_PAR expr COMMA signed_number CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc
         frame_clause? CLOSE_PAR
     | NTILE_ OPEN_PAR expr CLOSE_PAR OVER_ OPEN_PAR partition_by? order_by_expr_asc_desc CLOSE_PAR
 ;
 
-of_OF_fset:
+offset:
     COMMA signed_number
 ;
 
-default_DEFAULT__value:
+default_value:
     COMMA signed_number
 ;
 
@@ -616,7 +624,7 @@ initial_select:
     select_stmt
 ;
 
-recursive__select:
+recursive_select:
     select_stmt
 ;
 
@@ -818,10 +826,6 @@ table_name:
 ;
 
 table_or_index_name:
-    any_name
-;
-
-new_table_name:
     any_name
 ;
 

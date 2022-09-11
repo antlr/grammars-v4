@@ -3,6 +3,8 @@ apex
 asn/asn_3gpp
 cql3
 csharp
+dart2
+databank
 fortran77
 gdscript
 golang

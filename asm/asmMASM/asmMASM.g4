@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar asmMASM;
 
 prog
-   : (line EOL)*
+   : (line EOL)* EOF
    ;
 
 line

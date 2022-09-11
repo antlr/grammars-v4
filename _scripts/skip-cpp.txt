@@ -6,15 +6,12 @@ alpaca
 angelscript
 antlr/antlr2
 antlr/antlr3
-antlr/antlr4
 apex
 apt
 arithmetic
 asm/asm6502
-asm/asm8080
 asm/asm8086
 asm/asmMASM
-asm/asmZ80
 asm/masm
 asm/pdp7
 asn/asn
@@ -46,6 +43,7 @@ css3
 csv
 ctl
 cto
+dart2
 databank
 dcm
 dgol
@@ -159,7 +157,6 @@ propcalc
 properties
 protobuf3
 prov-n
-python/python
 python/python2
 python/python2-js
 python/python3

@@ -54,7 +54,8 @@ forward_decl
    ;
 
 datatype_decl
-   : scope_modif? TYPE identifier_name FROM (identifier_name TICK)? data_type_name (WITHIN identifier_name)? AUTOINSTANTIATE? (DESCRIPTOR DQUOTED_STRING EQ DQUOTED_STRING)?
+   : scope_modif? TYPE identifier_name FROM (identifier_name TICK)? data_type_name
+     (WITHIN identifier_name)? AUTOINSTANTIATE? (DESCRIPTOR DQUOTED_STRING EQ DQUOTED_STRING)?
      (variable_decl | event_forward_decl)*
      END TYPE
    ;
@@ -65,7 +66,7 @@ type_variables_decl
 
 global_variables_decl
    : GLOBAL variable_decl
-   | (GLOBAL | SHARED) VARIABLES (variable_decl)* END VARIABLES
+   | (GLOBAL | SHARED) VARIABLES variable_decl* END VARIABLES
    ;
 
 variable_decl
@@ -85,7 +86,7 @@ variable_decl_sub1
   ;
 
 variable_decl_sub2
-  : data_type_name decimal_decl_sub? identifier_name_ex array_decl_sub? ( (EQ)? LCURLY expression_list RCURLY)?
+  : data_type_name decimal_decl_sub? identifier_name_ex array_decl_sub? (EQ? LCURLY expression_list RCURLY)?
   ;
 
 variable_decl_event
@@ -97,8 +98,7 @@ decimal_decl_sub
    ;
 
 array_decl_sub
-   : LBRACE RBRACE
-   | LBRACE ((PLUS | MINUS)? NUMBER (TO (PLUS | MINUS)? NUMBER)? (COMMA (PLUS | MINUS)? NUMBER (TO (PLUS | MINUS)? NUMBER)?)*)? RBRACE
+   : LBRACE ((PLUS | MINUS)? NUMBER (TO (PLUS | MINUS)? NUMBER)? (COMMA (PLUS | MINUS)? NUMBER (TO (PLUS | MINUS)? NUMBER)?)*)? RBRACE
    ;
 
 constant_decl_sub
@@ -111,15 +111,16 @@ constant_decl
 
 function_forward_decl
    : access_modif_part? scope_modif? (FUNCTION data_type_name | SUBROUTINE)
-   identifier_name LPAREN parameters_list_sub? RPAREN
-   function_forward_decl_alias
+     identifier_name LPAREN parameters_list_sub? RPAREN
+     function_forward_decl_alias?
    ;
 
 function_forward_decl_alias
-  : ALIAS FOR identifier_name LIBRARY (DQUOTED_STRING | QUOTED_STRING)
-  | (LIBRARY (DQUOTED_STRING | QUOTED_STRING) (ALIAS FOR (DQUOTED_STRING | QUOTED_STRING))?)?
-  | (RPCFUNC ALIAS FOR (DQUOTED_STRING | QUOTED_STRING))? (THROWS identifier_name)?
-  ;
+   : ALIAS FOR identifier_name LIBRARY (DQUOTED_STRING | QUOTED_STRING)
+   | LIBRARY (DQUOTED_STRING | QUOTED_STRING) (ALIAS FOR (DQUOTED_STRING | QUOTED_STRING))?
+   | RPCFUNC ALIAS FOR (DQUOTED_STRING | QUOTED_STRING)? (THROWS identifier_name)?
+   | THROWS identifier_name
+   ;
 
 parameter_sub
    : READONLY? REF? data_type_name decimal_decl_sub? identifier_name array_decl_sub?
@@ -134,8 +135,9 @@ functions_forward_decl
    ;
 
 function_body
-   : access_type? scope_modif? (FUNCTION data_type_name | SUBROUTINE) identifier_name LPAREN parameters_list_sub? RPAREN (THROWS identifier_name)?
-   (SEMI)? (statement SEMI?)* END (FUNCTION | SUBROUTINE)
+   : access_type? scope_modif? (FUNCTION data_type_name | SUBROUTINE) identifier_name LPAREN parameters_list_sub? RPAREN
+     (THROWS identifier_name)?
+     SEMI? (statement SEMI?)* END (FUNCTION | SUBROUTINE)
    ;
 
 on_body
@@ -143,13 +145,15 @@ on_body
    ;
 
 event_forward_decl
-   : EVENT (identifier_name | CREATE | DESTROY) identifier_name? (LPAREN parameters_list_sub? RPAREN)?
-   | EVENT TYPE data_type_name identifier_name (LPAREN parameters_list_sub? RPAREN)
+   : EVENT ( (identifier_name | CREATE | DESTROY) identifier_name? (LPAREN parameters_list_sub? RPAREN)?
+           | TYPE data_type_name identifier_name (LPAREN parameters_list_sub? RPAREN)
+           )
    ;
 
 event_body
-   : EVENT (TYPE data_type_name)? (identifier_name COLONCOLON)? (identifier_name | OPEN | CLOSE) (LPAREN parameters_list_sub? RPAREN)? SEMI?
-   (statement SEMI?)* END EVENT
+   : EVENT (TYPE data_type_name)? (identifier_name COLONCOLON)? (identifier_name | OPEN | CLOSE)
+     (LPAREN parameters_list_sub? RPAREN)? SEMI? (statement SEMI?)*
+     END EVENT
    ;
 
 access_type
@@ -195,7 +199,6 @@ value
    | FALSE
    | DATE
    | TIME
-
   ;
 
 expression_list
@@ -298,8 +301,8 @@ public_statement
 throw_statement : THROW expression;
 
 goto_statement
-: GOTO variable_name(statement SEMI?)* variable_name COLON (statement SEMI?)*
-;
+  : GOTO variable_name (statement SEMI?)* variable_name COLON (statement SEMI?)*
+  ;
 
 statement_sub
    : function_virtual_call_expression_sub
@@ -352,7 +355,7 @@ sql_delete_statement
 
 sql_select_statement
   : (SELECT | SELECTBLOB) select_clause INTO bind_param (COMMA bind_param)* FROM variable_name (COMMA variable_name)*
-  where_clause? (USING variable_name)? SEMI?
+    where_clause? (USING variable_name)? SEMI?
   ;
 
 sql_update_statement
@@ -364,13 +367,11 @@ sql_update_statement
   ;
 
 set_value
-  : variable_name EQ bind_param
-  | variable_name IS NOT? NULL_
+  : variable_name (EQ bind_param | IS NOT? NULL_)
   ;
 
 where_clause
-  : WHERE set_value (COMMA set_value)*
-  | WHERE condition_or
+  : WHERE (set_value (COMMA set_value)* | condition_or)
   ;
 
 select_clause
@@ -383,9 +384,8 @@ sql_commit_statement
   ;
 
 execute_statement
-  : EXECUTE IMMEDIATE? (variable_name | value) SEMI?
-  | EXECUTE IMMEDIATE? bind_param (USING (SQLCA | variable_name))? SEMI
-  | EXECUTE DYNAMIC? identifier (USING DESCRIPTOR? (SQLCA | identifier))? SEMI?
+  : EXECUTE (IMMEDIATE? ((variable_name | value) SEMI? | bind_param (USING (SQLCA | variable_name))? SEMI) |
+             DYNAMIC? identifier (USING DESCRIPTOR? (SQLCA | identifier))? SEMI?)
   ;
 
 close_sql_statement
@@ -409,8 +409,7 @@ close_cursor_statement
   ;
 
 fetch_into_statement
-  : FETCH variable_name INTO bind_param SEMI?
-  | FETCH identifier USING DESCRIPTOR? identifier SEMI?
+  : FETCH (variable_name INTO bind_param | identifier USING DESCRIPTOR? identifier) SEMI?
   ;
 
 prepare_sql_stateent
@@ -450,8 +449,8 @@ return_statement
    ;
 
 function_call_expression_sub
-   : (variable_name DOT)* FUNCTION? POST? DYNAMIC? EVENT? function_name LPAREN expression_list? RPAREN (DOT (variable_name |
-   function_call_expression_sub))*
+   : (variable_name DOT)* FUNCTION? POST? DYNAMIC? EVENT? function_name LPAREN expression_list? RPAREN
+     (DOT (variable_name | function_call_expression_sub))*
    ;
 
 function_name
@@ -467,8 +466,7 @@ function_event_call
   ;
 
 function_virtual_call_expression_sub
-   : identifier DOT TRIGGER EVENT function_call_expression_sub
-   | identifier DOT (DYNAMIC EVENT? | EVENT TRIGGER? DYNAMIC) function_call_expression_sub
+   : identifier DOT (TRIGGER EVENT | DYNAMIC EVENT? | EVENT TRIGGER? DYNAMIC) function_call_expression_sub
    ;
 
 open_call_sub
@@ -510,7 +508,7 @@ ancestor_event_call_statement
    ;
 
 event_call_statement_sub
-   : (variable_name)? EVENT function_call_statement?
+   : variable_name? EVENT function_call_statement?
    ;
 
 event_call_statement
@@ -518,8 +516,7 @@ event_call_statement
    ;
 
 create_call_sub
-   : CREATE USING expression
-   | CREATE USING? (identifier_name DOT)? data_type_name (LPAREN expression_list? RPAREN)?
+   : CREATE (USING expression | USING? (identifier_name DOT)? data_type_name (LPAREN expression_list? RPAREN)?)
    ;
 
 create_call_statement
@@ -547,20 +544,19 @@ do_loop_while_statement
    ;
 
 if_statement
-   : IF boolean_expression THEN  (statement SEMI?)* (elseif_statement)* (else_statement)?
-    END IF SEMI?
+   : IF boolean_expression THEN  (statement SEMI?)* elseif_statement* else_statement? END IF SEMI?
    ;
 
 elseif_statement
-  : ELSEIF boolean_expression THEN (statement SEMI?)*
-  ;
+   : ELSEIF boolean_expression THEN (statement SEMI?)*
+   ;
 
 else_statement
-  : ELSE  (statement SEMI?)*
-  ;
+   : ELSE (statement SEMI?)*
+   ;
 
 if_simple_statement
-   : IF boolean_expression THEN  statement (ELSE statement)? SEMI?
+   : IF boolean_expression THEN statement (ELSE statement)? SEMI?
    ;
 
 continue_statement
@@ -611,8 +607,11 @@ string_literal
   ;
 
 identifier_array
-  : LBRACE (identifier | value) (COMMA (identifier | value))* RBRACE
-  | LBRACE (identifier | function_call_statement)? ((operator)? NUMBER)? RBRACE
+  : LBRACE ( (identifier | value) (COMMA (identifier | value))*
+           | (identifier | function_call_statement) (operator? NUMBER)?
+           | operator? NUMBER
+           )?
+    RBRACE
   ;
 
 operator: PLUS | MINUS | MULT | DIV;
@@ -638,7 +637,7 @@ identifier_name_ex
    ;
 
 identifier_name
-   : (UNDERSCORE)? ID
+   : UNDERSCORE? ID
    ;
 
 bind_param

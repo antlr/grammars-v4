@@ -25,6 +25,8 @@ THE SOFTWARE.
 
 lexer grammar MySqlLexer;
 
+options { caseInsensitive = true; }
+
 channels { MYSQLCOMMENT, ERRORCHANNEL }
 
 // SKIP
@@ -136,12 +138,14 @@ LINEAR:                              'LINEAR';
 LINES:                               'LINES';
 LOAD:                                'LOAD';
 LOCK:                                'LOCK';
+LOCKED:                              'LOCKED';
 LOOP:                                'LOOP';
 LOW_PRIORITY:                        'LOW_PRIORITY';
 MASTER_BIND:                         'MASTER_BIND';
 MASTER_SSL_VERIFY_SERVER_CERT:       'MASTER_SSL_VERIFY_SERVER_CERT';
 MATCH:                               'MATCH';
 MAXVALUE:                            'MAXVALUE';
+MINVALUE:                            'MINVALUE';
 MODIFIES:                            'MODIFIES';
 NATURAL:                             'NATURAL';
 NOT:                                 'NOT';
@@ -187,6 +191,7 @@ SET:                                 'SET';
 SEPARATOR:                           'SEPARATOR';
 SHOW:                                'SHOW';
 SIGNAL:                              'SIGNAL';
+SKIP_:                               'SKIP';
 SPATIAL:                             'SPATIAL';
 SQL:                                 'SQL';
 SQLEXCEPTION:                        'SQLEXCEPTION';
@@ -430,6 +435,7 @@ CONTEXT:                             'CONTEXT';
 CONTRIBUTORS:                        'CONTRIBUTORS';
 COPY:                                'COPY';
 CPU:                                 'CPU';
+CYCLE:                               'CYCLE';
 CURSOR_NAME:                         'CURSOR_NAME';
 DATA:                                'DATA';
 DATAFILE:                            'DATAFILE';
@@ -490,6 +496,7 @@ HOSTS:                               'HOSTS';
 IDENTIFIED:                          'IDENTIFIED';
 IGNORE_SERVER_IDS:                   'IGNORE_SERVER_IDS';
 IMPORT:                              'IMPORT';
+INCREMENT:                           'INCREMENT';
 INDEXES:                             'INDEXES';
 INITIAL_SIZE:                        'INITIAL_SIZE';
 INPLACE:                             'INPLACE';
@@ -560,7 +567,11 @@ NCHAR:                               'NCHAR';
 NEVER:                               'NEVER';
 NEXT:                                'NEXT';
 NO:                                  'NO';
+NOCACHE:                             'NOCACHE';
 NOCOPY:                              'NOCOPY';
+NOCYCLE:                             'NOCYCLE';
+NOMAXVALUE:                          'NOMAXVALUE';
+NOMINVALUE:                          'NOMINVALUE';
 NOWAIT:                              'NOWAIT';
 NODEGROUP:                           'NODEGROUP';
 NONE:                                'NONE';
@@ -602,6 +613,7 @@ QUERY:                               'QUERY';
 QUICK:                               'QUICK';
 REBUILD:                             'REBUILD';
 RECOVER:                             'RECOVER';
+RECURSIVE:                           'RECURSIVE';
 REDO_BUFFER_SIZE:                    'REDO_BUFFER_SIZE';
 REDUNDANT:                           'REDUNDANT';
 RELAY:                               'RELAY';
@@ -620,6 +632,7 @@ REPLICATE_WILD_DO_TABLE:             'REPLICATE_WILD_DO_TABLE';
 REPLICATE_WILD_IGNORE_TABLE:         'REPLICATE_WILD_IGNORE_TABLE';
 REPLICATION:                         'REPLICATION';
 RESET:                               'RESET';
+RESTART:                             'RESTART';
 RESUME:                              'RESUME';
 RETURNED_SQLSTATE:                   'RETURNED_SQLSTATE';
 RETURNING:                           'RETURNING';
@@ -635,6 +648,7 @@ RTREE:                               'RTREE';
 SAVEPOINT:                           'SAVEPOINT';
 SCHEDULE:                            'SCHEDULE';
 SECURITY:                            'SECURITY';
+SEQUENCE:                            'SEQUENCE';
 SERVER:                              'SERVER';
 SESSION:                             'SESSION';
 SHARE:                               'SHARE';
@@ -763,6 +777,7 @@ GROUP_REPLICATION_ADMIN:             'GROUP_REPLICATION_ADMIN';
 INNODB_REDO_LOG_ARCHIVE:             'INNODB_REDO_LOG_ARCHIVE';
 INNODB_REDO_LOG_ENABLE:              'INNODB_REDO_LOG_ENABLE';
 NDB_STORED_USER:                     'NDB_STORED_USER';
+PASSWORDLESS_USER_ADMIN:             'PASSWORDLESS_USER_ADMIN';
 PERSIST_RO_VARIABLES_ADMIN:          'PERSIST_RO_VARIABLES_ADMIN';
 REPLICATION_APPLIER:                 'REPLICATION_APPLIER';
 REPLICATION_SLAVE_ADMIN:             'REPLICATION_SLAVE_ADMIN';
@@ -1159,6 +1174,19 @@ Y_FUNCTION:                          'Y';
 X_FUNCTION:                          'X';
 
 
+// MariaDB tokens
+VIA:                                 'VIA';
+LASTVAL:                             'LASTVAL';
+NEXTVAL:                             'NEXTVAL';
+SETVAL:                              'SETVAL';
+PREVIOUS:                            'PREVIOUS';
+PERSISTENT:                          'PERSISTENT'; // Same as STORED for MySQL
+BINLOG_MONITOR:                      'BINLOG_MONITOR';
+BINLOG_REPLAY:                       'BINLOG_REPLAY';
+FEDERATED_ADMIN:                     'FEDERATED_ADMIN';
+READ_ONLY_ADMIN:                     'READ_ONLY_ADMIN';
+REPLICA:                             'REPLICA';
+REPLICATION_MASTER_ADMIN:            'REPLICATION_MASTER_ADMIN';
 
 // Operators
 // Operators. Assigns
@@ -1282,6 +1310,10 @@ IP_ADDRESS:                          (
                                        [0-9]+ '.' [0-9.]+
                                        | [0-9A-F:]+ ':' [0-9A-F:]+
                                      );
+STRING_USER_NAME_MARIADB:            (
+                                        SQUOTA_STRING | DQUOTA_STRING
+                                        | BQUOTA_STRING | ID_LITERAL
+                                     )  '@';
 LOCAL_ID:                            '@'
                                 (
                                   [A-Z0-9._$]+

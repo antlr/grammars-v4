@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar PMMN;
 
+file_ : commandlist EOF;
+
 commandlist
    : command
    | commandlist command

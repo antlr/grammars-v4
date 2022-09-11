@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar tsv;
 
 tsvFile
-   : hdr row*
+   : hdr row* EOF
    ;
 
 hdr
