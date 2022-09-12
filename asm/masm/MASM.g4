@@ -126,7 +126,7 @@ directive_exp1
    ;
 
 variabledeclaration
-   : Identifier ty (question | String | Integer)
+   : Identifier ty (question | String_ | Integer)
    ;
 
 memory
@@ -1771,7 +1771,7 @@ fragment Exponent
    ;
 
 
-String
+String_
    : ' \'' ('\\' . | ~ ('\\' | '\''))* '\''
    ;
 
