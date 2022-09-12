@@ -10,10 +10,8 @@ apex
 apt
 arithmetic
 asm/asm6502
-asm/asm8080
 asm/asm8086
 asm/asmMASM
-asm/asmZ80
 asm/masm
 asm/pdp7
 asn/asn
