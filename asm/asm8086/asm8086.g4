@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar asm8086;
 
 prog
-   : (line (NOT_ line)* EOL)* EOF
+   : line* EOF
    ;
 
 line
-   : lbl? (assemblerdirective | instruction)? comment?
+   : lbl? (assemblerdirective | instruction)? ('!' instruction)* EOL
    ;
 
 instruction
@@ -120,7 +120,7 @@ assemblerlogical
 assemblerterm
    : name
    | number
-   | (NOT assemblerterm)
+   | NOT assemblerterm
    ;
 
 endif_
@@ -165,13 +165,13 @@ argument
    | register_
    | name
    | string_
-   | (RP expression LP)
-   | ((number | name)? LB expression RB_)
+   | RP expression LP
+   | (number | name)? LB expression RB_
    | ptr expression
    | NOT expression
    | OFFSET expression
    | LENGTH expression
-   | (register_ COLON) expression
+   | register_ COLON expression
    ;
 
 ptr
@@ -345,10 +345,6 @@ rep
    | REPNE
    | REPNZ
    | REPZ
-   ;
-
-comment
-   : COMMENT
    ;
 
 sign : PLUS | MINUS ;

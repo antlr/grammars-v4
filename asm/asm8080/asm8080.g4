@@ -91,7 +91,7 @@ argument
    | dollar
    | name
    | string_
-   | ('(' expression ')')
+   | '(' expression ')'
    ;
 
 dollar
