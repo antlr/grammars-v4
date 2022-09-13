@@ -9,11 +9,6 @@ antlr/antlr3
 apex
 apt
 arithmetic
-asm/asm6502
-asm/asm8086
-asm/asmMASM
-asm/masm
-asm/pdp7
 asn/asn
 asn/asn_3gpp
 atl

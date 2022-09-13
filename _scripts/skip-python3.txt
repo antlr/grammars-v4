@@ -2,8 +2,6 @@ _grammar-test
 antlr/antlr2
 antlr/antlr3
 apex
-asm/asmMASM
-asm/masm
 asn/asn_3gpp
 clif
 cpp
