@@ -2056,6 +2056,7 @@ physical_attributes_clause
       | MAXTRANS maxtrans=UNSIGNED_INTEGER
       | COMPUTE STATISTICS
       | storage_clause
+      | compute_clauses
       )+
     ;
 
