@@ -995,16 +995,11 @@ validation_clauses
 compute_clauses
     : COMPUTE SYSTEM? STATISTICS for_clause?
     ;
-
 for_clause
      : FOR ( TABLE for_clause*
            | ALL (INDEXED? COLUMNS (SIZE UNSIGNED_INTEGER)? for_clause* | LOCAL? INDEXES)
-           | COLUMNS (SIZE UNSIGNED_INTEGER)? for_column_clauses for_clause*
+           | COLUMNS (SIZE UNSIGNED_INTEGER)? (column_name SIZE UNSIGNED_INTEGER)+ for_clause*
            )
-    ;
-
-for_column_clauses
-    : column_name SIZE UNSIGNED_INTEGER for_column_clauses*
     ;
 
 online_or_offline
