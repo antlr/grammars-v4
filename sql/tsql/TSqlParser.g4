@@ -1221,7 +1221,7 @@ create_login_sql_server
        (COMMA? CHECK_POLICY EQUAL (ON|OFF) )?
        (COMMA? CREDENTIAL EQUAL credential_name=id_)?
       |(FROM
-	(WINDOWS
+    (WINDOWS
           (WITH (COMMA? DEFAULT_DATABASE EQUAL default_database=id_)? (COMMA?  DEFAULT_LANGUAGE EQUAL default_language=STRING)? )
         | CERTIFICATE certname=id_
         | ASYMMETRIC KEY asym_key_name=id_
@@ -1370,7 +1370,7 @@ alter_schema_sql
 // https://docs.microsoft.com/en-us/sql/t-sql/statements/create-schema-transact-sql
 create_schema
     : CREATE SCHEMA
-	(schema_name=id_
+    (schema_name=id_
         |AUTHORIZATION owner_name=id_
         | schema_name=id_ AUTHORIZATION owner_name=id_
         )
@@ -1409,7 +1409,7 @@ create_security_policy
          )+
             (WITH LR_BRACKET
                      STATE EQUAL (ON|OFF)
-		     (SCHEMABINDING (ON|OFF) )?
+             (SCHEMABINDING (ON|OFF) )?
                   RR_BRACKET
              )?
              (NOT FOR REPLICATION)?
@@ -2277,7 +2277,7 @@ view_attribute
 alter_table
     : ALTER TABLE table_name (SET '(' LOCK_ESCALATION '=' (AUTO | TABLE | DISABLE) ')'
                              | ADD column_def_table_constraints
-                             | ALTER COLUMN column_definition
+                             | ALTER COLUMN (column_definition | column_modifier)
                              | DROP COLUMN id_ (',' id_)*
                              | DROP CONSTRAINT constraint=id_
                              | WITH (CHECK | NOCHECK) ADD (CONSTRAINT constraint=id_)?
@@ -3240,6 +3240,16 @@ column_definition_element
     | column_constraint
     ;
 
+column_modifier
+    : id_ (ADD | DROP) (
+      ROWGUIDCOL
+      | PERSISTED
+      | NOT FOR REPLICATION
+      | SPARSE
+      | HIDDEN_KEYWORD
+      | MASKED (WITH (FUNCTION EQUAL STRING | LR_BRACKET FUNCTION EQUAL STRING RR_BRACKET))?)
+    ;
+
 materialized_column_definition
     : id_ (COMPUTE | AS) expression (MATERIALIZED | NOT MATERIALIZED)?
     ;
@@ -3426,7 +3436,7 @@ special_list
     | FORCEPLAN
     | IMPLICIT_TRANSACTIONS
     | NOCOUNT
-    | NOEXEol
+    | NOEXEC
     | NUMERIC_ROUNDABORT
     | PARSEONLY
     | REMOTE_PROC_TRANSACTIONS
@@ -4571,7 +4581,10 @@ keyword
     | ALLOW_SNAPSHOT_ISOLATION
     | ALLOWED
     | ALWAYS
+    | ANSI_DEFAULTS
     | ANSI_NULL_DEFAULT
+    | ANSI_NULL_DFLT_OFF
+    | ANSI_NULL_DFLT_ON
     | ANSI_NULLS
     | ANSI_PADDING
     | ANSI_WARNINGS
@@ -4581,6 +4594,7 @@ keyword
     | APPLOCK_TEST
     | APPLY
     | ARITHABORT
+    | ARITHIGNORE
     | ASCII
     | ASSEMBLY
     | ASSEMBLYPROPERTY
@@ -4730,10 +4744,12 @@ keyword
     | FILTER
     | FIRST
     | FIRST_VALUE
+    | FMTONLY
     | FOLLOWING
     | FORCE
     | FORCE_FAILOVER_ALLOW_DATA_LOSS
     | FORCED
+    | FORCEPLAN
     | FORCESCAN
     | FORMAT
     | FORWARD_ONLY
@@ -4764,6 +4780,7 @@ keyword
     | IGNORE_TRIGGERS
     | IMMEDIATE
     | IMPERSONATE
+    | IMPLICIT_TRANSACTIONS
     | IMPORTANCE
     | INCLUDE_NULL_VALUES
     | INCREMENTAL
@@ -4851,6 +4868,7 @@ keyword
     | NO_WAIT
     | NOCOUNT
     | NODES
+    | NOEXEC
     | NOEXPAND
     | NOLOCK
     | NON_TRANSACTED_ACCESS
@@ -4892,6 +4910,7 @@ keyword
     | PAGLOCK
     | PARAMETERIZATION
     | PARSENAME
+    | PARSEONLY
     | PARTITION
     | PARTITIONS
     | PARTNER
@@ -4945,6 +4964,7 @@ keyword
     | RECURSIVE_TRIGGERS
     | RELATIVE
     | REMOTE
+    | REMOTE_PROC_TRANSACTIONS
     | REMOTE_SERVICE_NAME
     | REMOVE
     | REORGANIZE
@@ -5005,6 +5025,9 @@ keyword
     | SHARE
     | SHARED
     | SHOWPLAN
+    | SHOWPLAN_ALL
+    | SHOWPLAN_TEXT
+    | SHOWPLAN_XML
     | SIGNATURE
     | SIMPLE
     | SINGLE_USER
