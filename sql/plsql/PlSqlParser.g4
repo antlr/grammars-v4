@@ -992,6 +992,16 @@ validation_clauses
         online_or_offline? into_clause?
     ;
 
+compute_clauses
+    : COMPUTE SYSTEM? STATISTICS for_clause?
+    ;
+for_clause
+     : FOR ( TABLE for_clause*
+           | ALL (INDEXED? COLUMNS (SIZE UNSIGNED_INTEGER)? for_clause* | LOCAL? INDEXES)
+           | COLUMNS (SIZE UNSIGNED_INTEGER)? (column_name SIZE UNSIGNED_INTEGER)+ for_clause*
+           )
+    ;
+
 online_or_offline
     : OFFLINE
     | ONLINE
@@ -1983,7 +1993,7 @@ range_values_clause
     ;
 
 list_values_clause
-    : VALUES '(' (literal (',' literal)* | DEFAULT) ')'
+    : VALUES '(' (literal (',' literal)* | TIMESTAMP literal (',' TIMESTAMP literal)* | DEFAULT) ')'
     ;
 
 table_partition_description
@@ -2041,6 +2051,7 @@ physical_attributes_clause
       | MAXTRANS maxtrans=UNSIGNED_INTEGER
       | COMPUTE STATISTICS
       | storage_clause
+      | compute_clauses
       )+
     ;
 
@@ -2929,6 +2940,7 @@ substitutable_column_clause
 
 partition_name
     : regular_id
+    | DELIMITED_ID
     ;
 
 supplemental_logging_props
