@@ -91,6 +91,9 @@ access_log text
 unicode/graphemes/examples/*.txt eol=lf
 # T-SQL tests with trees can fail with multiline strings
 sql/tsql/examples/*.sql eol=lf
+# Rexx places EOL on default channel, so the .tree's contain EOL.
+# Make sure EOL's are consistent regardless of OS.
+rexx/examples/* eol=lf
 
 # Declare files that will always have CRLF line endings on checkout.
 # Currently the /vb6/**/*.cls and *.frm file need this, otherwise the grammar fails. 

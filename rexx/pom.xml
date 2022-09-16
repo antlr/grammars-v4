@@ -46,7 +46,7 @@
 					<showTree>false</showTree>
 					<entryPoint>file_</entryPoint>
 					<grammarName>Rexx</grammarName>
-					<exampleFiles>temp-examples/</exampleFiles>
+					<exampleFiles>examples/</exampleFiles>
 					<testFileExtension></testFileExtension>
 					<packageName></packageName>
 				</configuration>
@@ -54,43 +54,6 @@
 					<execution>
 						<goals>
 							<goal>test</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>prepare-examples</id>
-						<phase>process-test-resources</phase>
-						<configuration>
-							<tasks>
-								<delete dir="${basedir}/temp-examples" quiet="true" />
-								<mkdir dir="${basedir}/temp-examples" />
-								<fixcrlf srcdir="${basedir}/examples"
-									destdir="${basedir}/temp-examples"
-									eol="lf"
-									eof="asis"
-									fixlast="false"
-								/>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>delete-temp-files</id>
-						<phase>test</phase>
-						<configuration>
-							<tasks>
-								<delete dir="${basedir}/temp-examples" />
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
 						</goals>
 					</execution>
 				</executions>
