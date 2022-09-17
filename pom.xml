@@ -323,8 +323,6 @@
 				<module>xsd-regex</module>
                 <module>xyz</module>
 				<module>z</module>
-				<!-- testing repository -->
-				<!--<module>grammar-test</module> -->
 			</modules>
 		</profile>
 		<profile>
@@ -405,15 +403,6 @@
 					</plugin>
 				</plugins>
 			</build>
-		</profile>
-		<profile>
-			<id>test</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<modules>
-				<module>_grammar-test</module>
-			</modules>
 		</profile>
 	</profiles>
 	<distributionManagement>
