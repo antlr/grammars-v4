@@ -253,4 +253,3 @@ xpath/xpath20
 xpath/xpath31
 xsd-regex
 z
-_grammar-test
