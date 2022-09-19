@@ -2,6 +2,7 @@
 err=0
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
+stderr_file=`mktemp --tmpdir=. stderr.XXXXXXXXXX`
 for g in `find ../<example_files_unix> -type f | grep -v '.errors$' | grep -v '.tree$'`
 do
   file="$g"
@@ -9,8 +10,9 @@ do
   if [ "$x1" != "errors" ]
   then
     echo "$file"
-    trwdog node index.js -file "$file" 2>&1 | head -55
-    status="${PIPESTATUS[0]}"
+    trwdog node index.js -file "$file" 2> "$stderr_file"
+    status="$?"
+    head -55 "$stderr_file"
     if [ -f "$file".errors ]
     then
       if [ "$stat" = "0" ]
@@ -30,4 +32,5 @@ do
     fi
   fi
 done
+rm "$stderr_file"
 exit $err

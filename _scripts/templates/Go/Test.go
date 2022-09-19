@@ -110,12 +110,12 @@ func main() {
     start := time.Now()
     var tree = parser.<cap_start_symbol>()
     elapsed := time.Since(start)
-    fmt.Printf("Time: %.3f s", elapsed.Seconds())
-    fmt.Println()
+    fmt.Fprintf(os.stderr, "Time: %.3f s", elapsed.Seconds())
+    fmt.Fprintln(os.stderr)
     if parserErrors.errors > 0 || lexerErrors.errors > 0 {
-        fmt.Println("Parse failed.");
+        fmt.Fprintln(os.stderr, "Parse failed.");
     } else {
-        fmt.Println("Parse succeeded.")
+        fmt.Fprintln(os.stderr, "Parse succeeded.")
     }
     if show_tree {
         ss := tree.ToStringTree(parser.RuleNames, parser)

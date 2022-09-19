@@ -112,7 +112,7 @@ public class Program
         }
         if (show_tree)
         {
-            System.Console.Error.WriteLine(tree.ToStringTree(parser));
+            System.Console.Out.WriteLine(tree.ToStringTree(parser));
         }
         System.Environment.Exit(parser.NumberOfSyntaxErrors > 0 ? 1 : 0);
     }
