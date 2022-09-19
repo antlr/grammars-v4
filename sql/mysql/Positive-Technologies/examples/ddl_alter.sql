@@ -43,6 +43,7 @@ alter table add_test wait 100 add column col1 int not null;
 -- Alter database
 alter database test default character set = utf8;
 alter schema somedb_name upgrade data directory name;
+alter database test_1 default encryption = 'Y' read only = 1;
 #end
 #begin
 -- Alter event
