@@ -292,6 +292,8 @@ sequenceSpec
 createDatabaseOption
     : DEFAULT? charSet '='? (charsetName | DEFAULT)
     | DEFAULT? COLLATE '='? collationName
+    | DEFAULT? ENCRYPTION '='? STRING_LITERAL
+    | READ ONLY '='? (DEFAULT | ZERO_DECIMAL | ONE_DECIMAL)
     ;
 
 charSet
@@ -492,7 +494,7 @@ tableOption
     | SECONDARY_ENGINE_ATTRIBUTE '='? STRING_LITERAL                                #tableOptionSecondaryEngineAttribute
     | STATS_AUTO_RECALC '='? extBoolValue=(DEFAULT | '0' | '1')                     #tableOptionRecalculation
     | STATS_PERSISTENT '='? extBoolValue=(DEFAULT | '0' | '1')                      #tableOptionPersistent
-    | STATS_SAMPLE_PAGES '='? decimalLiteral                                        #tableOptionSamplePage
+    | STATS_SAMPLE_PAGES '='? extValue=(DEFAULT | DECIMAL_LITERAL)                  #tableOptionSamplePage
     | TABLESPACE uid tablespaceStorage?                                             #tableOptionTablespace
     | TABLE_TYPE '=' tableType                                                      #tableOptionTableType
     | tablespaceStorage                                                             #tableOptionTablespace
@@ -726,6 +728,8 @@ alterSpecification
     | REPAIR PARTITION (uidList | ALL)                              #alterByRepairPartition
     | REMOVE PARTITIONING                                           #alterByRemovePartitioning
     | UPGRADE PARTITIONING                                          #alterByUpgradePartitioning
+    | ADD COLUMN? ifNotExists?
+        '(' createDefinition (',' createDefinition)* ')'            #alterByAddDefinitions
     ;
 
 
