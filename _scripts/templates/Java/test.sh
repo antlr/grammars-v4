@@ -15,7 +15,7 @@ do
     status="$?"
     if [ -f "$file".errors ]
     then
-      if [ "$stat" = "0" ]
+      if [ "$status" = "0" ]
       then
         echo Expected parse fail.
         err=1
