@@ -24,13 +24,22 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    $o = trwdog java Program -file $InputFile
+    $treeOutFile = $TreeFile + ".out"
+    $o = trwdog java -cp "<antlr_tool_path><if(path_sep_semi)>;<else>:<endif>." Program -file $InputFile -tree > $treeOutFile
     $failed = $LASTEXITCODE -ne 0
+    $parseOk = !$failed
     if ($failed -and $errorFile) {
-        return $true
+        $parseOk = $true
     }
     if(!$failed -and !$errorFile){
-        return $true
+        $parseOk = $true
     }
-    return $false
+    $treeMatch = $true
+    if (Test-Path $TreeFile) {
+        $expectedData = Get-Content $TreeFile
+        $actualData = Get-Content $treeOutFile
+        $treeMatch = ($actualData -eq $expectedData)
+    }
+    Remove-Item $treeOutFile
+    return $parseOk, $treeMatch
 }

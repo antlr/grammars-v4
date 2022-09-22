@@ -23,13 +23,22 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    $o = trwdog python3 Program.py -file $InputFile
+    $treeOutFile = $TreeFile + ".out"
+    $o = trwdog python3 Program.py -file $InputFile -tree > $treeOutFile
     $failed = $LASTEXITCODE -ne 0
+    $parseOk = !$failed
     if ($failed -and $errorFile) {
-        return $true
+        $parseOk = $true
     }
     if(!$failed -and !$errorFile){
-        return $true
+        $parseOk = $true
     }
-    return $false
+    $treeMatch = $true
+    if (Test-Path $TreeFile) {
+        $expectedData = Get-Content $TreeFile
+        $actualData = Get-Content $treeOutFile
+        $treeMatch = ($actualData -eq $expectedData)
+    }
+    Remove-Item $treeOutFile
+    return $parseOk, $treeMatch
 }
