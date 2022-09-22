@@ -147,8 +147,8 @@ function Test-GrammarTestCases {
 
         Write-Host "Test case: $item"
 
-        $case = $item
-        $ext = $case.Extension
+        $case = $item.fullname
+        $ext = $item.Extension
         if (($ext -eq ".errors") -or ($ext -eq ".tree")) {
             continue
         }
