@@ -311,7 +311,7 @@ expressionSequence
 singleExpression
     : anonymousFunction                                                     # FunctionExpression
     | Class identifier? classTail                                           # ClassExpression
-    | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
+    | singleExpression '?.'? '[' expressionSequence ']'                     # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
     // Split to try `new Date()` first, then `new Date`.
     | New singleExpression arguments                                        # NewExpression
