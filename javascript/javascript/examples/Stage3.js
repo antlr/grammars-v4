@@ -11,3 +11,5 @@ class CF {
     #priv_var = 9961;
 
 }
+
+var a = b??c;

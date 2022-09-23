@@ -1,8 +1,9 @@
 "use strict";
 
-// optional chain
+// Optional Chain
+//
+// https://262.ecma-international.org/11.0/#prod-OptionalChain
 
-var a = b??c;
 var d = e?.f?.g;
 var h = i?.j();
 var k = l?.['m']?.n?.['o'];
