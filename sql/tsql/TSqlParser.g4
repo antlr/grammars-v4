@@ -3199,7 +3199,7 @@ xml_type_definition
     ;
 
 xml_schema_collection
-    : ID '.' ID
+    : id_ '.' id_
     ;
 
 column_def_table_constraints
@@ -4535,6 +4535,7 @@ data_type
     | ext_type=id_ IDENTITY ('(' seed=DECIMAL ',' inc=DECIMAL ')')?
     | double_prec=DOUBLE PRECISION?
     | unscaled_type=id_
+    | xml_type_definition
     ;
 
 default_value
