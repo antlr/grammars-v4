@@ -11,7 +11,3 @@ class CF {
     #priv_var = 9961;
 
 }
-
-var a = b??c;
-var d = e?.f?.g;
-var h = i?.j();
