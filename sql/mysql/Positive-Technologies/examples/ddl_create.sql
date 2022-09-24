@@ -136,6 +136,10 @@ CREATE TABLE CustomerTable (
     Phone varchar(24)
  ) ENGINE = CONNECT TABLE_TYPE = ODBC;
 
+CREATE TABLE CustomerTable (
+    table_type varchar(5)
+);
+
 CREATE TABLE tbl (
     col1 LONGTEXT,
     data JSON,
