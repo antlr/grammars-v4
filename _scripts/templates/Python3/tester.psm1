@@ -24,7 +24,7 @@ function Test-Case {
         $ErrorFile
     )
     $treeOutFile = $TreeFile + ".out"
-    $o = trwdog python3 Program.py -file $InputFile -tree > $treeOutFile
+    $o = trwdog python3 -X utf8 Program.py -file $InputFile -tree > $treeOutFile
     $failed = $LASTEXITCODE -ne 0
     $parseOk = !$failed
     if ($failed -and $errorFile) {

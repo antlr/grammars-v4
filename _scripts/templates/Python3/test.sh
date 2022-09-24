@@ -10,7 +10,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo "$file"
-    trwdog python3 Program.py -file "$file" -tree > "$tree_file"
+    trwdog python3 -X utf8 Program.py -file "$file" -tree > "$tree_file"
     status="$?"
     if [ -f "$file".errors ]
     then
