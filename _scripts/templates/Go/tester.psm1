@@ -44,7 +44,7 @@ function Test-Case {
         $ErrorFile
     )
     $treeOutFile = $TreeFile + ".out"
-    $o = trwdog ./Test -file $InputFile -tree > $treeOutFile
+    $o = trwdog ./Test -file $InputFile -tree | Out-File -LiteralPath "$treeOutFile"
     $failed = $LASTEXITCODE -ne 0
     $parseOk = !$failed
     if ($failed -and $errorFile) {

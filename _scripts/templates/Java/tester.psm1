@@ -25,7 +25,7 @@ function Test-Case {
         $ErrorFile
     )
     $treeOutFile = $TreeFile + ".out"
-    $o = trwdog java -cp "<antlr_tool_path><if(path_sep_semi)>;<else>:<endif>." Program -file $InputFile -tree > $treeOutFile
+    $o = trwdog java -cp "<antlr_tool_path><if(path_sep_semi)>;<else>:<endif>." Program -file $InputFile -tree | Out-File -LiteralPath "$treeOutFile"
     $failed = $LASTEXITCODE -ne 0
     $parseOk = !$failed
     if ($failed -and $errorFile) {
