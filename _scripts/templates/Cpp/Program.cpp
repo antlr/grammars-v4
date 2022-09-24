@@ -102,7 +102,7 @@ int TryParse(std::vector\<std::string>& args)
     }
     if (show_tree)
     {
-        std::cout \<\< tree.ToStringTree(parser) \<\< std::endl;
+        std::cout \<\< tree->toStringTree(parser, false) \<\< std::endl;
     }
     std::cerr \<\< "Time: " \<\< formatDuration(duration.count()) \<\< std::endl;
     return 0;
