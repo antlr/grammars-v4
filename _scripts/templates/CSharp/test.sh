@@ -31,7 +31,8 @@ do
     fi
     if [ -f "$file".tree ]
     then
-      diff -q "$file".tree "$tree_file" > /dev/null
+      #diff -q "$file".tree "$tree_file" > /dev/null
+      diff "$file".tree "$tree_file"
 	  status="$?"
       if [ "$status" = "0" ]
       then
