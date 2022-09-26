@@ -32,7 +32,7 @@ do
     if [ -f "$file".tree ]
     then
       #diff -q "$file".tree "$tree_file" > /dev/null
-      diff "$file".tree "$tree_file"
+      diff \<(tr -d "\r\n" \< "$file".tree) \<(tr -d "\r\n" \< "$tree_file")
 	  status="$?"
       if [ "$status" = "0" ]
       then
