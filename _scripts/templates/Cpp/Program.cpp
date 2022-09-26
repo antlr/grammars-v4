@@ -105,7 +105,7 @@ int TryParse(std::vector\<std::string>& args)
         std::cout \<\< tree->toStringTree(parser, false) \<\< std::endl;
     }
     std::cerr \<\< "Time: " \<\< formatDuration(duration.count()) \<\< std::endl;
-    return 0;
+    return listener_parser->had_error || listener_lexer->had_error ? 1 : 0;
 }
 
 int main(int argc, const char * argv[])
