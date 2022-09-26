@@ -3199,7 +3199,7 @@ xml_type_definition
     ;
 
 xml_schema_collection
-    : id_ '.' id_
+    : ID '.' ID
     ;
 
 column_def_table_constraints
