@@ -21,7 +21,7 @@ function Test-Case {
     $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 
     $treeOutFile = $TreeFile + ".out"
-    $o = trwdog dotnet CSharp/Test.dll -file $InputFile -tree | Out-File -LiteralPath "$treeOutFile" -Encoding UTF8r
+    $o = trwdog dotnet CSharp/Test.dll -file $InputFile -tree | Out-File -LiteralPath "$treeOutFile" -Encoding UTF8
     $failed = $LASTEXITCODE -ne 0
     $parseOk = !$failed
     if ($failed -and $errorFile) {
