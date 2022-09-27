@@ -115,6 +115,6 @@ int main(int argc, const char * argv[])
     {
         args.push_back(argv[i]);
     }   
-    TryParse(args);
+    return TryParse(args);
 }
 
