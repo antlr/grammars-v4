@@ -105,7 +105,7 @@ jobs:
         python --version
     - name: Install JavaScript
       if: ${{ matrix.language == 'JavaScript' }}
-      uses: actions/setup-node@v3.4.1
+      uses: actions/setup-node@v3.5.0
       with:
         node-version: '16.13.0'
     - name: Do not trust JavaScript env
