@@ -1,4 +1,5 @@
 # Template generated code from trgen <version>
+# Template generated code from trgen <version>
 function Build-Grammar {
     $msg = dotnet build -o CSharp
     return @{
@@ -14,7 +15,7 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    Save input and output character encodings and switch to UTF-8.
+    # Save input and output character encodings and switch to UTF-8.
     $oldInputEncoding = [console]::InputEncoding
     $oldOutputEncoding = [console]::OutputEncoding
     $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
