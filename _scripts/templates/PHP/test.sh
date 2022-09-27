@@ -31,7 +31,6 @@ do
     fi
     if [ -f "$file".tree ]
     then
-      #diff -q "$file".tree "$tree_file" > /dev/null
       diff \<(tr -d "\r\n" \< "$file".tree) \<(tr -d "\r\n" \< "$tree_file")
 	  status="$?"
       if [ "$status" = "0" ]
