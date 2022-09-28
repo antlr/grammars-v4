@@ -24,13 +24,31 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    $o = trwdog java Program -file $InputFile
+	# Save input and output character encodings and switch to UTF-8.
+    $oldInputEncoding = [console]::InputEncoding
+    $oldOutputEncoding = [console]::OutputEncoding
+    $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+
+    $treeOutFile = $TreeFile + ".out"
+    $o = trwdog java -cp "<antlr_tool_path><if(path_sep_semi)>;<else>:<endif>." Program -file $InputFile -tree | Out-File -LiteralPath "$treeOutFile" -Encoding UTF8
     $failed = $LASTEXITCODE -ne 0
+    $parseOk = !$failed
     if ($failed -and $errorFile) {
-        return $true
+        $parseOk = $true
     }
     if(!$failed -and !$errorFile){
-        return $true
+        $parseOk = $true
     }
-    return $false
+    $treeMatch = $true
+    if (Test-Path $TreeFile) {
+        $expectedData = Get-Content $TreeFile -Encoding UTF8
+        $actualData = Get-Content $treeOutFile -Encoding UTF8
+        $treeMatch = ($actualData -eq $expectedData)
+    }
+    # Restore input and output character encodings.
+    [console]::InputEncoding = $oldInputEncoding
+    [console]::OutputEncoding = $oldOutputEncoding
+
+    Remove-Item $treeOutFile
+    return $parseOk, $treeMatch
 }
