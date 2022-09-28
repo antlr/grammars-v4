@@ -21,6 +21,6 @@ public class ErrorListener\<S> : ConsoleErrorListener\<S>
         int col, string msg, RecognitionException e)
     {
         had_error = true;
-		if (!_quiet) base.SyntaxError(output, recognizer, offendingSymbol, line, col, msg, e);
+		if (!_quiet) System.Console.Out.WriteLine("line " + line + ":" + col + " " + msg);
     }
 }
