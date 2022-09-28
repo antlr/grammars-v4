@@ -6,8 +6,12 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import java.time.Instant;
 import java.time.Duration;
+import java.nio.charset.StandardCharsets;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 public class Program {
+    private static PrintWriter stdout_utf8 = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
     public static void main(String[] args) throws  FileNotFoundException, IOException
     {
         boolean show_tree = false;
@@ -75,7 +79,7 @@ public class Program {
         ErrorListener lexer_listener = new ErrorListener();
         ErrorListener listener = new ErrorListener();
         parser.removeErrorListeners();
-	    lexer.removeErrorListeners();
+        lexer.removeErrorListeners();
         parser.addErrorListener(listener);
         lexer.addErrorListener(lexer_listener);
         Instant start = Instant.now();
@@ -89,7 +93,7 @@ public class Program {
             System.err.println("Parse succeeded.");
         if (show_tree)
         {
-            System.out.println(tree.toStringTree(parser));
+            stdout_utf8.println(tree.toStringTree(parser));
         }
         java.lang.System.exit(listener.had_error || lexer_listener.had_error ? 1 : 0);
     }

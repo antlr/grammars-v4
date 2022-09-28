@@ -147,8 +147,8 @@ function Test-GrammarTestCases {
 
         Write-Host "Test case: $item"
 
-        $case = $item
-        $ext = $case.Extension
+        $case = $item.fullname
+        $ext = $item.Extension
         if (($ext -eq ".errors") -or ($ext -eq ".tree")) {
             continue
         }
@@ -161,21 +161,30 @@ function Test-GrammarTestCases {
         if (!$shouldFail) {
             $errorFile = ""
         }
+        $treeFile = "$case.tree"
         Write-Host "--- Testing file $item ---"
-        $ok = Test-Case -InputFile $case -ErrorFile $errorFile
+        $parseOk, $treeMatch = Test-Case -InputFile $case -ErrorFile $errorFile -TreeFile $treeFile
 
-        if (!$ok) {
+        if (!$parseOk) {
             if ($shouldFail) {
-                Write-Host "Text case should return error"
-                Write-Host "$Directory test $case failed" -ForegroundColor Red
+                Write-Host "Test case should return error"
+                Write-Host "$TestDirectory test $case failed" -ForegroundColor Red
                 $failedList += $case
                 continue
             }
             else { 
-                Write-Host "$Directory test $case failed" -ForegroundColor Red
+                Write-Host "$TestDirectory test $case failed" -ForegroundColor Red
                 $failedList += $case
                 continue
             }
+        }
+        if (Test-Path $treeFile) {
+			if ($treeMatch) {
+				Write-Host "Parse tree match succeeded"
+			} else {
+				Write-Host "$TestDirectory test $case parse tree match failed" -ForegroundColor Red
+				$failedList += $case
+			}
         }
     }
     return $failedList
