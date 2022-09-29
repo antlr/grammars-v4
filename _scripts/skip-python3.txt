@@ -1,9 +1,6 @@
-_grammar-test
 antlr/antlr2
 antlr/antlr3
 apex
-asm/asmMASM
-asm/masm
 asn/asn_3gpp
 clif
 cpp
@@ -60,13 +57,11 @@ pascal
 pddl
 peoplecode
 pgn
-php
 pl0
 ply
 powerbuilder
 protobuf3
 python/python2
-python/python3
 python/python3-py
 python/python3-ts
 python/python3-without-actions

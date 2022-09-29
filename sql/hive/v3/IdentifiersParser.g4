@@ -362,24 +362,28 @@ precedenceLogicOperator
 //precedenceAndExpression
 //precedenceOrExpression
 expression
-    : atomExpression ((LSQUARE expression RSQUARE) | (DOT identifier))*
-    | precedenceUnaryOperator expression
-    | expression KW_IS isCondition
-    | expression precedenceBitwiseXorOperator expression
-    | expression precedenceStarOperator expression
-    | expression precedencePlusOperator expression
-    | expression precedenceConcatenateOperator expression
-    | expression precedenceAmpersandOperator expression
-    | expression precedenceBitwiseOrOperator expression
-    | expression precedenceComparisonOperator expression
-    | expression KW_NOT? precedenceRegexpOperator expression
-    | expression KW_NOT? KW_LIKE (KW_ANY | KW_ALL) expressionsInParenthesis
-    | expression KW_NOT? KW_IN precedenceSimilarExpressionIn
-    | expression KW_NOT? KW_BETWEEN expression KW_AND expression
-    | KW_EXISTS subQueryExpression
-    | precedenceNotOperator expression
-    | expression precedenceLogicOperator expression
+    : expression precedenceLogicOperator expression
     | LPAREN expression RPAREN
+    | precedenceExpression
+    ;
+
+precedenceExpression
+    : atomExpression ((LSQUARE expression RSQUARE) | (DOT identifier))*
+    | precedenceUnaryOperator precedenceExpression
+    | precedenceExpression KW_IS isCondition
+    | precedenceExpression precedenceBitwiseXorOperator precedenceExpression
+    | precedenceExpression precedenceStarOperator precedenceExpression
+    | precedenceExpression precedencePlusOperator precedenceExpression
+    | precedenceExpression precedenceConcatenateOperator precedenceExpression
+    | precedenceExpression precedenceAmpersandOperator precedenceExpression
+    | precedenceExpression precedenceBitwiseOrOperator precedenceExpression
+    | precedenceExpression precedenceComparisonOperator precedenceExpression
+    | precedenceExpression KW_NOT? precedenceRegexpOperator precedenceExpression
+    | precedenceExpression KW_NOT? KW_LIKE (KW_ANY | KW_ALL) expressionsInParenthesis
+    | precedenceExpression KW_NOT? KW_IN precedenceSimilarExpressionIn
+    | precedenceExpression KW_NOT? KW_BETWEEN precedenceExpression KW_AND precedenceExpression
+    | KW_EXISTS subQueryExpression
+    | precedenceNotOperator precedenceExpression
     ;
 
 precedenceSimilarExpressionIn

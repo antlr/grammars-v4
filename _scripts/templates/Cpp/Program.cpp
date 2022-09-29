@@ -102,10 +102,10 @@ int TryParse(std::vector\<std::string>& args)
     }
     if (show_tree)
     {
-//        System.Console.Error.WriteLine(tree.ToStringTree(parser));
+        std::cout \<\< tree->toStringTree(parser, false) \<\< std::endl;
     }
     std::cerr \<\< "Time: " \<\< formatDuration(duration.count()) \<\< std::endl;
-    return 0;
+    return listener_parser->had_error || listener_lexer->had_error ? 1 : 0;
 }
 
 int main(int argc, const char * argv[])
@@ -115,6 +115,6 @@ int main(int argc, const char * argv[])
     {
         args.push_back(argv[i]);
     }   
-    TryParse(args);
+    return TryParse(args);
 }
 

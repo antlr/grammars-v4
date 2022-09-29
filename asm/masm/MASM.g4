@@ -20,7 +20,7 @@ segments
    ;
 
 proc
-   : Identifier 'proc' (code)* 'ret' Identifier 'endp'
+   : Identifier 'proc' code* 'ret' Identifier 'endp'
    ;
 
 code
@@ -121,15 +121,16 @@ binary_exp12
    ;
 
 directive_exp1
-   : (directives Identifier | directives)
+   : directives Identifier
+   | directives
    ;
 
 variabledeclaration
-   : Identifier ty (question | String | Integer)
+   : Identifier ty (question | String_ | Integer)
    ;
 
 memory
-   : '[' (register_ | Identifier) ('+' ((register_ ('+' (Integer | Hexnum | Octalnum))?) | Integer | Hexnum | Octalnum))? ']'
+   : '[' (register_ | Identifier) ('+' (register_ ('+' (Integer | Hexnum | Octalnum))? | Integer | Hexnum | Octalnum))? ']'
    ;
 
 segmentos
@@ -1770,7 +1771,7 @@ fragment Exponent
    ;
 
 
-String
+String_
    : ' \'' ('\\' . | ~ ('\\' | '\''))* '\''
    ;
 

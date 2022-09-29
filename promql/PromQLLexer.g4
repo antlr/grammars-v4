@@ -151,6 +151,7 @@ FUNCTION options { caseInsensitive=false; }
     | 'quantile_over_time'
     | 'stddev_over_time'
     | 'stdvar_over_time'
+    | 'last_over_time'
     ;
 
 LEFT_BRACE:  '{';

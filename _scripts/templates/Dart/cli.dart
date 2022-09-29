@@ -133,7 +133,12 @@ void main(List\<String> args) async {
 //    var listener_parser = ErrorListener();
 //    lexer.AddErrorListener(listener_lexer);
 //    parser.AddErrorListener(listener_parser);
+    Stopwatch s = new Stopwatch();
+    s.start();
     var tree = parser.<start_symbol>();
+    s.stop();
+    var et = s.elapsedMilliseconds / 1000.0;
+    stderr.writeln("Time: " + et.toString());
     if (parser.numberOfSyntaxErrors > 0)
     {
         stderr.writeln("Parse failed.");

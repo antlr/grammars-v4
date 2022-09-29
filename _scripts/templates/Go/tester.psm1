@@ -16,7 +16,13 @@ function Build-Grammar {
     # Output go version
     #go version | Write-Host
     $env:GO111MODULE = "on"
-    $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.10
+    For ($i=0; $i -le 5; $i++) {
+        $g = go get github.com/antlr/antlr4/runtime/Go/antlr/v4
+        if($LASTEXITCODE -eq 0){
+            Break
+        }
+        Write-Host "go get failed. Trying again."
+    }
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g
@@ -37,13 +43,31 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    $o = trwdog ./Test -file $InputFile
+    # Save input and output character encodings and switch to UTF-8.
+    $oldInputEncoding = [console]::InputEncoding
+    $oldOutputEncoding = [console]::OutputEncoding
+    $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+
+    $treeOutFile = $TreeFile + ".out"
+    $o = trwdog ./Test -file $InputFile -tree | Out-File -LiteralPath "$treeOutFile" -Encoding UTF8
     $failed = $LASTEXITCODE -ne 0
+    $parseOk = !$failed
     if ($failed -and $errorFile) {
-        return $true
+        $parseOk = $true
     }
     if(!$failed -and !$errorFile){
-        return $true
+        $parseOk = $true
     }
-    return $false
+    $treeMatch = $true
+    if (Test-Path $TreeFile) {
+        $expectedData = Get-Content $TreeFile -Encoding UTF8
+        $actualData = Get-Content $treeOutFile -Encoding UTF8
+        $treeMatch = ($actualData -eq $expectedData)
+    }
+    # Restore input and output character encodings.
+    [console]::InputEncoding = $oldInputEncoding
+    [console]::OutputEncoding = $oldOutputEncoding
+
+    Remove-Item $treeOutFile
+    return $parseOk, $treeMatch
 }

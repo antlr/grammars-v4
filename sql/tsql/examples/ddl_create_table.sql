@@ -45,3 +45,11 @@ create table xyz  (
   constraint pk primary key clustered (ccc)
 )
 go
+
+-- non clustered index
+create table #t (
+    id varchar(50) not null index ix2 nonclustered,
+    other_id uniqueidentifier not null index ix1 clustered,
+    value float
+)
+go
