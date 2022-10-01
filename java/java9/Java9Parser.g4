@@ -250,8 +250,7 @@ ambiguousName
  */
 
 compilationUnit
-	:	ordinaryCompilation
-	|	modularCompilation
+	: ( ordinaryCompilation | modularCompilation ) EOF
 	;
 
 ordinaryCompilation

@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar datetime;
 
 date_time
-   : (day ',')? date time
+   : (day ',')? date time EOF
    ;
 
 day

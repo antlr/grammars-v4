@@ -273,7 +273,7 @@ set_rest_more
    : generic_set
    | var_name FROM CURRENT_P
    | TIME ZONE zone_value
-   | CATALOG_P sconst
+   | CATALOG sconst
    | SCHEMA sconst
    | NAMES opt_encoding
    | ROLE nonreservedword_or_sconst
@@ -1578,7 +1578,7 @@ any_name
    ;
 
 attrs
-   :DOT attr_name+
+   :(DOT attr_name)+
    ;
 
 type_name_list
@@ -4157,7 +4157,7 @@ unreserved_keyword
    | CALLED
    | CASCADE
    | CASCADED
-   | CATALOG_P
+   | CATALOG
    | CHAIN
    | CHARACTERISTICS
    | CHECKPOINT

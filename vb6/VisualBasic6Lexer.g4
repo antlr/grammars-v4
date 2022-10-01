@@ -1,361 +1,363 @@
 lexer grammar VisualBasic6Lexer;
 
+options { caseInsensitive = true; }
+
 // keywords
 
-ACCESS: A C C E S S;
+ACCESS: 'ACCESS';
 
-ADDRESSOF: A D D R E S S O F;
+ADDRESSOF: 'ADDRESSOF';
 
-ALIAS: A L I A S;
+ALIAS: 'ALIAS';
 
-AND: A N D;
+AND: 'AND';
 
-ATTRIBUTE: A T T R I B U T E;
+ATTRIBUTE: 'ATTRIBUTE';
 
-APPACTIVATE: A P P A C T I V A T E;
+APPACTIVATE: 'APPACTIVATE';
 
-APPEND: A P P E N D;
+APPEND: 'APPEND';
 
-AS: A S;
+AS: 'AS';
 
-BEEP: B E E P;
+BEEP: 'BEEP';
 
-BEGIN: B E G I N;
+BEGIN: 'BEGIN';
 
-BEGINPROPERTY: B E G I N P R O P E R T Y;
+BEGINPROPERTY: 'BEGINPROPERTY';
 
-BINARY: B I N A R Y;
+BINARY: 'BINARY';
 
-BOOLEAN: B O O L E A N;
+BOOLEAN: 'BOOLEAN';
 
-BYVAL: B Y V A L;
+BYVAL: 'BYVAL';
 
-BYREF: B Y R E F;
+BYREF: 'BYREF';
 
-BYTE: B Y T E;
+BYTE: 'BYTE';
 
-CALL: C A L L;
+CALL: 'CALL';
 
-CASE: C A S E;
+CASE: 'CASE';
 
-CHDIR: C H D I R;
+CHDIR: 'CHDIR';
 
-CHDRIVE: C H D R I V E;
+CHDRIVE: 'CHDRIVE';
 
-CLASS: C L A S S;
+CLASS: 'CLASS';
 
-CLOSE: C L O S E;
+CLOSE: 'CLOSE';
 
-COLLECTION: C O L L E C T I O N;
+COLLECTION: 'COLLECTION';
 
-CONST: C O N S T;
+CONST: 'CONST';
 
-DATE: D A T E;
+DATE: 'DATE';
 
-DECLARE: D E C L A R E;
+DECLARE: 'DECLARE';
 
-DEFBOOL: D E F B O O L;
+DEFBOOL: 'DEFBOOL';
 
-DEFBYTE: D E F B Y T E;
+DEFBYTE: 'DEFBYTE';
 
-DEFDATE: D E F D A T E;
+DEFDATE: 'DEFDATE';
 
-DEFDBL: D E F D B L;
+DEFDBL: 'DEFDBL';
 
-DEFDEC: D E F D E C;
+DEFDEC: 'DEFDEC';
 
-DEFCUR: D E F C U R;
+DEFCUR: 'DEFCUR';
 
-DEFINT: D E F I N T;
+DEFINT: 'DEFINT';
 
-DEFLNG: D E F L N G;
+DEFLNG: 'DEFLNG';
 
-DEFOBJ: D E F O B J;
+DEFOBJ: 'DEFOBJ';
 
-DEFSNG: D E F S N G;
+DEFSNG: 'DEFSNG';
 
-DEFSTR: D E F S T R;
+DEFSTR: 'DEFSTR';
 
-DEFVAR: D E F V A R;
+DEFVAR: 'DEFVAR';
 
-DELETESETTING: D E L E T E S E T T I N G;
+DELETESETTING: 'DELETESETTING';
 
-DIM: D I M;
+DIM: 'DIM';
 
-DO: D O;
+DO: 'DO';
 
-DOUBLE: D O U B L E;
+DOUBLE: 'DOUBLE';
 
-EACH: E A C H;
+EACH: 'EACH';
 
-ELSE: E L S E;
+ELSE: 'ELSE';
 
-ELSEIF: E L S E I F;
+ELSEIF: 'ELSEIF';
 
-END_ENUM: E N D ' ' E N U M;
+END_ENUM: 'END ENUM';
 
-END_FUNCTION: E N D ' ' F U N C T I O N;
+END_FUNCTION: 'END FUNCTION';
 
-END_IF: E N D ' ' I F;
+END_IF: 'END IF';
 
-END_PROPERTY: E N D ' ' P R O P E R T Y;
+END_PROPERTY: 'END PROPERTY';
 
-END_SELECT: E N D ' ' S E L E C T;
+END_SELECT: 'END SELECT';
 
-END_SUB: E N D ' ' S U B;
+END_SUB: 'END SUB';
 
-END_TYPE: E N D ' ' T Y P E;
+END_TYPE: 'END TYPE';
 
-END_WITH: E N D ' ' W I T H;
+END_WITH: 'END WITH';
 
-END: E N D;
+END: 'END';
 
-ENDPROPERTY: E N D P R O P E R T Y;
+ENDPROPERTY: 'ENDPROPERTY';
 
-ENUM: E N U M;
+ENUM: 'ENUM';
 
-EQV: E Q V;
+EQV: 'EQV';
 
-ERASE: E R A S E;
+ERASE: 'ERASE';
 
-ERROR: E R R O R;
+ERROR: 'ERROR';
 
-EVENT: E V E N T;
+EVENT: 'EVENT';
 
-EXIT_DO: E X I T ' ' D O;
+EXIT_DO: 'EXIT DO';
 
-EXIT_FOR: E X I T ' ' F O R;
+EXIT_FOR: 'EXIT FOR';
 
-EXIT_FUNCTION: E X I T ' ' F U N C T I O N;
+EXIT_FUNCTION: 'EXIT FUNCTION';
 
-EXIT_PROPERTY: E X I T ' ' P R O P E R T Y;
+EXIT_PROPERTY: 'EXIT PROPERTY';
 
-EXIT_SUB: E X I T ' ' S U B;
+EXIT_SUB: 'EXIT SUB';
 
-FALSE: F A L S E;
+FALSE: 'FALSE';
 
-FILECOPY: F I L E C O P Y;
+FILECOPY: 'FILECOPY';
 
-FRIEND: F R I E N D;
+FRIEND: 'FRIEND';
 
-FOR: F O R;
+FOR: 'FOR';
 
-FUNCTION: F U N C T I O N;
+FUNCTION: 'FUNCTION';
 
-GET: G E T;
+GET: 'GET';
 
-GLOBAL: G L O B A L;
+GLOBAL: 'GLOBAL';
 
-GOSUB: G O S U B;
+GOSUB: 'GOSUB';
 
-GOTO: G O T O;
+GOTO: 'GOTO';
 
-IF: I F;
+IF: 'IF';
 
-IMP: I M P;
+IMP: 'IMP';
 
-IMPLEMENTS: I M P L E M E N T S;
+IMPLEMENTS: 'IMPLEMENTS';
 
-IN: I N;
+IN: 'IN';
 
-INPUT: I N P U T;
+INPUT: 'INPUT';
 
-IS: I S;
+IS: 'IS';
 
-INTEGER: I N T E G E R;
+INTEGER: 'INTEGER';
 
-KILL: K I L L;
+KILL: 'KILL';
 
-LOAD: L O A D;
+LOAD: 'LOAD';
 
-LOCK: L O C K;
+LOCK: 'LOCK';
 
-LONG: L O N G;
+LONG: 'LONG';
 
-LOOP: L O O P;
+LOOP: 'LOOP';
 
-LEN: L E N;
+LEN: 'LEN';
 
-LET: L E T;
+LET: 'LET';
 
-LIB: L I B;
+LIB: 'LIB';
 
-LIKE: L I K E;
+LIKE: 'LIKE';
 
-LINE_INPUT: L I N E ' ' I N P U T;
+LINE_INPUT: 'LINE INPUT';
 
-LOCK_READ: L O C K ' ' R E A D;
+LOCK_READ: 'LOCK READ';
 
-LOCK_WRITE: L O C K ' ' W R I T E;
+LOCK_WRITE: 'LOCK WRITE';
 
-LOCK_READ_WRITE: L O C K ' ' R E A D ' ' W R I T E;
+LOCK_READ_WRITE: 'LOCK READ WRITE';
 
-LSET: L S E T;
+LSET: 'LSET';
 
-MACRO_IF: HASH I F;
+MACRO_IF: HASH 'IF';
 
-MACRO_ELSEIF: HASH E L S E I F;
+MACRO_ELSEIF: HASH 'ELSEIF';
 
-MACRO_ELSE: HASH E L S E;
+MACRO_ELSE: HASH 'ELSE';
 
-MACRO_END_IF: HASH E N D ' ' I F;
+MACRO_END_IF: HASH 'END IF';
 
-ME: M E;
+ME: 'ME';
 
-MID: M I D;
+MID: 'MID';
 
-MKDIR: M K D I R;
+MKDIR: 'MKDIR';
 
-MOD: M O D;
+MOD: 'MOD';
 
-NAME: N A M E;
+NAME: 'NAME';
 
-NEXT: N E X T;
+NEXT: 'NEXT';
 
-NEW: N E W;
+NEW: 'NEW';
 
-NOT: N O T;
+NOT: 'NOT';
 
-NOTHING: N O T H I N G;
+NOTHING: 'NOTHING';
 
-NULL_: N U L L;
+NULL_: 'NULL';
 
-OBJECT: O B J E C T;
+OBJECT: 'OBJECT';
 
-ON: O N;
+ON: 'ON';
 
-ON_ERROR: O N ' ' E R R O R;
+ON_ERROR: 'ON ERROR';
 
-ON_LOCAL_ERROR: O N ' ' L O C A L ' ' E R R O R;
+ON_LOCAL_ERROR: 'ON LOCAL ERROR';
 
-OPEN: O P E N;
+OPEN: 'OPEN';
 
-OPTIONAL: O P T I O N A L;
+OPTIONAL: 'OPTIONAL';
 
-OPTION_BASE: O P T I O N ' ' B A S E;
+OPTION_BASE: 'OPTION BASE';
 
-OPTION_EXPLICIT: O P T I O N ' ' E X P L I C I T;
+OPTION_EXPLICIT: 'OPTION EXPLICIT';
 
-OPTION_COMPARE: O P T I O N ' ' C O M P A R E;
+OPTION_COMPARE: 'OPTION COMPARE';
 
 OPTION_PRIVATE_MODULE:
-	O P T I O N ' ' P R I V A T E ' ' M O D U L E;
+	'OPTION PRIVATE MODULE';
 
-OR: O R;
+OR: 'OR';
 
-OUTPUT: O U T P U T;
+OUTPUT: 'OUTPUT';
 
-PARAMARRAY: P A R A M A R R A Y;
+PARAMARRAY: 'PARAMARRAY';
 
-PRESERVE: P R E S E R V E;
+PRESERVE: 'PRESERVE';
 
-PRINT: P R I N T;
+PRINT: 'PRINT';
 
-PRIVATE: P R I V A T E;
+PRIVATE: 'PRIVATE';
 
-PROPERTY_GET: P R O P E R T Y ' ' G E T;
+PROPERTY_GET: 'PROPERTY GET';
 
-PROPERTY_LET: P R O P E R T Y ' ' L E T;
+PROPERTY_LET: 'PROPERTY LET';
 
-PROPERTY_SET: P R O P E R T Y ' ' S E T;
+PROPERTY_SET: 'PROPERTY SET';
 
-PUBLIC: P U B L I C;
+PUBLIC: 'PUBLIC';
 
-PUT: P U T;
+PUT: 'PUT';
 
-RANDOM: R A N D O M;
+RANDOM: 'RANDOM';
 
-RANDOMIZE: R A N D O M I Z E;
+RANDOMIZE: 'RANDOMIZE';
 
-RAISEEVENT: R A I S E E V E N T;
+RAISEEVENT: 'RAISEEVENT';
 
-READ: R E A D;
+READ: 'READ';
 
-READ_WRITE: R E A D ' ' W R I T E;
+READ_WRITE: 'READ WRITE';
 
-REDIM: R E D I M;
+REDIM: 'REDIM';
 
-REM: R E M;
+REM: 'REM';
 
-RESET: R E S E T;
+RESET: 'RESET';
 
-RESUME: R E S U M E;
+RESUME: 'RESUME';
 
-RETURN: R E T U R N;
+RETURN: 'RETURN';
 
-RMDIR: R M D I R;
+RMDIR: 'RMDIR';
 
-RSET: R S E T;
+RSET: 'RSET';
 
-SAVEPICTURE: S A V E P I C T U R E;
+SAVEPICTURE: 'SAVEPICTURE';
 
-SAVESETTING: S A V E S E T T I N G;
+SAVESETTING: 'SAVESETTING';
 
-SEEK: S E E K;
+SEEK: 'SEEK';
 
-SELECT: S E L E C T;
+SELECT: 'SELECT';
 
-SENDKEYS: S E N D K E Y S;
+SENDKEYS: 'SENDKEYS';
 
-SET: S E T;
+SET: 'SET';
 
-SETATTR: S E T A T T R;
+SETATTR: 'SETATTR';
 
-SHARED: S H A R E D;
+SHARED: 'SHARED';
 
-SINGLE: S I N G L E;
+SINGLE: 'SINGLE';
 
-SPC: S P C;
+SPC: 'SPC';
 
-STATIC: S T A T I C;
+STATIC: 'STATIC';
 
-STEP: S T E P;
+STEP: 'STEP';
 
-STOP: S T O P;
+STOP: 'STOP';
 
-STRING: S T R I N G;
+STRING: 'STRING';
 
-SUB: S U B;
+SUB: 'SUB';
 
-TAB: T A B;
+TAB: 'TAB';
 
-TEXT: T E X T;
+TEXT: 'TEXT';
 
-THEN: T H E N;
+THEN: 'THEN';
 
-TIME: T I M E;
+TIME: 'TIME';
 
-TO: T O;
+TO: 'TO';
 
-TRUE: T R U E;
+TRUE: 'TRUE';
 
-TYPE: T Y P E;
+TYPE: 'TYPE';
 
-TYPEOF: T Y P E O F;
+TYPEOF: 'TYPEOF';
 
-UNLOAD: U N L O A D;
+UNLOAD: 'UNLOAD';
 
-UNLOCK: U N L O C K;
+UNLOCK: 'UNLOCK';
 
-UNTIL: U N T I L;
+UNTIL: 'UNTIL';
 
-VARIANT: V A R I A N T;
+VARIANT: 'VARIANT';
 
-VERSION: V E R S I O N;
+VERSION: 'VERSION';
 
-WEND: W E N D;
+WEND: 'WEND';
 
-WHILE: W H I L E;
+WHILE: 'WHILE';
 
-WIDTH: W I D T H;
+WIDTH: 'WIDTH';
 
-WITH: W I T H;
+WITH: 'WITH';
 
-WITHEVENTS: W I T H E V E N T S;
+WITHEVENTS: 'WITHEVENTS';
 
-WRITE: W R I T E;
+WRITE: 'WRITE';
 
-XOR: X O R;
+XOR: 'XOR';
 
 // symbols
 
@@ -428,7 +430,7 @@ DATELITERAL: HASH (~ [#\r\n])* HASH;
 
 COLORLITERAL: '&H' [0-9A-F]+ AMPERSAND?;
 
-INTEGERLITERAL: [0-9]+ (E INTEGERLITERAL)* (
+INTEGERLITERAL: [0-9]+ ('E' INTEGERLITERAL)* (
 		HASH
 		| AMPERSAND
 		| EXCLAMATIONMARK
@@ -436,7 +438,7 @@ INTEGERLITERAL: [0-9]+ (E INTEGERLITERAL)* (
 	)?;
 
 DOUBLELITERAL: [0-9]* DOT [0-9]+ (
-		E (PLUS | MINUS)? [0-9]+
+		'E' (PLUS | MINUS)? [0-9]+
 	)* (HASH | AMPERSAND | EXCLAMATIONMARK | AT)?;
 
 FILENUMBER: HASH LETTERORDIGIT+;
@@ -470,61 +472,7 @@ WS: [ \t]+;
 // letters
 
 fragment LETTER:
-	[a-zA-Z_äöüÄÖÜáéíóúÁÉÍÓÚâêîôûÂÊÎÔÛàèìòùÀÈÌÒÙãẽĩõũÃẼĨÕŨçÇ];
+	[A-Z_ÄÖÜÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙÃẼĨÕŨÇ];
 
 fragment LETTERORDIGIT:
-	[a-zA-Z0-9_äöüÄÖÜáéíóúÁÉÍÓÚâêîôûÂÊÎÔÛàèìòùÀÈÌÒÙãẽĩõũÃẼĨÕŨçÇ];
-
-// case insensitive chars
-
-fragment A: [aA];
-
-fragment B: [bB];
-
-fragment C: [cC];
-
-fragment D: [dD];
-
-fragment E: [eE];
-
-fragment F: [fF];
-
-fragment G: [gG];
-
-fragment H: [hH];
-
-fragment I: [iI];
-
-fragment J: [jJ];
-
-fragment K: [kK];
-
-fragment L: [lL];
-
-fragment M: [mM];
-
-fragment N: [nN];
-
-fragment O: [oO];
-
-fragment P: [pP];
-
-fragment Q: [qQ];
-
-fragment R: [rR];
-
-fragment S: [sS];
-
-fragment T: [tT];
-
-fragment U: [uU];
-
-fragment V: [vV];
-
-fragment W: [wW];
-
-fragment X: [xX];
-
-fragment Y: [yY];
-
-fragment Z: [zZ];
+	[A-Z0-9_ÄÖÜÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙÃẼĨÕŨÇ];

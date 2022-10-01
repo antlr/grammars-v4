@@ -5,7 +5,9 @@ CLASSPATH = $(JAR)<if(path_sep_semi)>\;<else>:<endif>.
 ANTLRGRAMMARS ?= $(wildcard *.g4)
 GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
 SOURCES = $(GENERATED) index.js
-default: classes
+default: setup classes
+setup:
+	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 classes: $(SOURCES)
 	npm install
 clean:

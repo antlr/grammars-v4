@@ -22,9 +22,7 @@ grammar ATL;
  * Parser Rules
  */
 unit
-   : module
-   | library_
-   | query
+   : ( module | library_ | query ) EOF
    ;
 
 module

@@ -7,6 +7,7 @@ from readchar import readchar
 from <lexer_name> import <lexer_name>;
 from <parser_name> import <parser_name>;
 from CaseChangingStream import *;
+from datetime import datetime
 
 def getChar():
     xx = readchar()
@@ -87,7 +88,12 @@ def main(argv):
             if (token.type == -1):
                 break
         lexer.reset()
+    start_time = datetime.now()
     tree = parser.<start_symbol>()
+    end_time = datetime.now()
+    diff = end_time - start_time
+    diff_time = diff.total_seconds()
+    print(f'Time: {diff_time}', file=sys.stderr);
     if (show_tree):
         print(tree.toStringTree(recog=parser))
     if p_listener.num_errors > 0 or l_listener.num_errors > 0:

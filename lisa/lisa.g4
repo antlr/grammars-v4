@@ -24,7 +24,7 @@
  */
 grammar lisa;
 
-program: declaration_block program_block;
+program: declaration_block program_block EOF;
 
 declaration_block: 'declare' '{' declaration_statements '}';
 

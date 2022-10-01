@@ -7,7 +7,7 @@
 
 grammar sgf;
 
-collection      :   gameTree+;
+collection      :   gameTree+ EOF;
 gameTree        :   '(' sequence gameTree* ')';
 sequence        :   node+;
 node            :   ';' property_*;

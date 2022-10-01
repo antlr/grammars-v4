@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar focal;
 
 prog
-   : statement+
+   : statement+ EOF
    ;
 
 statement

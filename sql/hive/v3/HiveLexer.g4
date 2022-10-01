@@ -19,6 +19,8 @@
 
 lexer grammar HiveLexer;
 
+options { caseInsensitive = true; }
+
 //关键词
 
 KW_TRUE : 'TRUE';
@@ -396,12 +398,12 @@ DOLLAR : '$';
 // LITERALS
 fragment
 Letter
-    : 'a'..'z' | 'A'..'Z'
+    : 'A'..'Z'
     ;
 
 fragment
 HexDigit
-    : 'a'..'f' | 'A'..'F'
+    : 'A'..'F'
     ;
 
 fragment
@@ -411,12 +413,12 @@ Digit
 
 fragment
 Exponent
-    : ('e' | 'E') ( PLUS|MINUS )? (Digit)+
+    : 'E' ( PLUS|MINUS )? (Digit)+
     ;
 
 fragment
 RegexComponent
-    : 'a'..'z' | 'A'..'Z' | '0'..'9' | '_'
+    : 'A'..'Z' | '0'..'9' | '_'
     | PLUS | STAR | QUESTION | MINUS | DOT
     | LPAREN | RPAREN | LSQUARE | RSQUARE | LCURLY | RCURLY
     | BITWISEXOR | BITWISEOR | DOLLAR | '!'
@@ -442,7 +444,7 @@ NumberLiteral
     ;
 
 ByteLengthLiteral
-    : (Digit)+ ('b' | 'B' | 'k' | 'K' | 'm' | 'M' | 'g' | 'G')
+    : Digit+ ('B' | 'K' | 'M' | 'G')
     ;
 
 Number

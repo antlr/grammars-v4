@@ -29,7 +29,7 @@
 grammar redcode;
 
 file_
-   : line +
+   : line + EOF
    ;
 
 line

@@ -1,1 +1,1 @@
-(equation (expression (multiplyingExpression (powExpression (signedAtom (atom (variable a)))))) (relop =) (expression (multiplyingExpression (powExpression (signedAtom (atom (scientific 12.3e13.2)))))))
+(equation (expression (multiplyingExpression (powExpression (signedAtom (atom (variable a)))))) (relop =) (expression (multiplyingExpression (powExpression (signedAtom (atom (scientific 12.3e13.2)))))) <EOF>)
