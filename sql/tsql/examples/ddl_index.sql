@@ -41,3 +41,114 @@ GO
 ALTER INDEX [indexName] ON [dbo].[tbl] REBUILD PARTITION = ALL
 GO
 
+ALTER INDEX index1 ON table1 REBUILD;
+
+ALTER INDEX ALL ON table1 REBUILD;
+
+ALTER INDEX ALL ON dbo.table1 REBUILD;
+
+CREATE CLUSTERED COLUMNSTORE INDEX idxcci_cci_target ON cci_target;
+
+ALTER INDEX idxcci_cci_target ON cci_target REORGANIZE WITH (COMPRESS_ALL_ROW_GROUPS = ON);
+
+ALTER INDEX idxcci_cci_target ON cci_target REORGANIZE WITH (COMPRESS_ALL_ROW_GROUPS = ON);
+
+ALTER INDEX cci_FactInternetSales2 ON FactInternetSales2 REORGANIZE;
+
+-- REORGANIZE a specific partition
+ALTER INDEX cci_FactInternetSales2 ON FactInternetSales2 REORGANIZE PARTITION = 0;
+
+ALTER INDEX cci_FactInternetSales2 ON FactInternetSales2 REORGANIZE WITH (COMPRESS_ALL_ROW_GROUPS = ON);
+
+ALTER INDEX cci_FactInternetSales2 ON FactInternetSales2 REORGANIZE PARTITION = 0 WITH (COMPRESS_ALL_ROW_GROUPS = ON);
+
+CREATE CLUSTERED COLUMNSTORE INDEX cci_FactInternetSales2
+ON dbo.FactInternetSales2;
+
+ALTER INDEX cci_FactInternetSales2 ON FactInternetSales2 REBUILD;
+
+ALTER INDEX cci_fact3
+ON fact3
+REBUILD PARTITION = 12;
+
+CREATE CLUSTERED INDEX cci_SimpleTable ON SimpleTable (ProductKey);
+
+CREATE CLUSTERED COLUMNSTORE INDEX cci_SimpleTable
+ON SimpleTable
+WITH (DROP_EXISTING = ON);
+
+--Compress the table further by using archival compression.
+ALTER INDEX cci_SimpleTable ON SimpleTable
+REBUILD
+WITH (DATA_COMPRESSION = COLUMNSTORE_ARCHIVE);
+GO
+
+ALTER INDEX cci_SimpleTable ON SimpleTable
+REBUILD
+WITH (DATA_COMPRESSION = COLUMNSTORE);
+GO
+
+ALTER INDEX PK_Employee_EmployeeID ON HumanResources.Employee REBUILD;
+
+ALTER INDEX ALL ON Production.Product
+REBUILD WITH (FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON);
+
+ALTER INDEX ALL ON Production.Product
+REBUILD WITH
+(
+    FILLFACTOR = 80,
+    SORT_IN_TEMPDB = ON,
+    STATISTICS_NORECOMPUTE = ON,
+    ONLINE = ON ( WAIT_AT_LOW_PRIORITY ( MAX_DURATION = 4 MINUTES, ABORT_AFTER_WAIT = BLOCKERS ) ),
+    DATA_COMPRESSION = ROW
+);
+
+ALTER INDEX PK_ProductPhoto_ProductPhotoID ON Production.ProductPhoto REORGANIZE WITH (LOB_COMPACTION = ON);
+
+ALTER INDEX AK_SalesOrderHeader_SalesOrderNumber ON
+    Sales.SalesOrderHeader
+SET (
+    STATISTICS_NORECOMPUTE = ON,
+    IGNORE_DUP_KEY = ON,
+    ALLOW_PAGE_LOCKS = ON
+    ) ;
+GO
+
+ALTER INDEX IX_Employee_ManagerID ON HumanResources.Employee DISABLE;
+
+ALTER INDEX PK_Department_DepartmentID ON HumanResources.Department DISABLE;
+
+ALTER INDEX PK_Department_DepartmentID ON HumanResources.Department REBUILD;
+
+--Rebuild only partition 5.
+ALTER INDEX IX_TransactionHistory_TransactionDate
+ON Production.TransactionHistory
+REBUILD Partition = 5
+   WITH (ONLINE = ON (WAIT_AT_LOW_PRIORITY (MAX_DURATION = 10 minutes, ABORT_AFTER_WAIT = SELF)));
+GO
+
+ALTER INDEX IX_INDEX1
+ON T1
+REBUILD
+WITH (DATA_COMPRESSION = PAGE);
+GO
+
+ALTER INDEX IX_INDEX1
+ON T1
+REBUILD
+WITH (XML_COMPRESSION = ON);
+GO
+
+ALTER INDEX test_idx on test_table REBUILD WITH (ONLINE = ON, MAXDOP = 1, RESUMABLE = ON) ;
+
+ALTER INDEX test_idx on test_table REBUILD WITH (ONLINE = ON, RESUMABLE = ON, MAX_DURATION = 240) ;
+
+ALTER INDEX test_idx on test_table PAUSE ;
+
+ALTER INDEX test_idx on test_table RESUME WITH (MAXDOP = 4) ;
+
+ALTER INDEX test_idx on test_table
+      RESUME WITH (MAXDOP = 2, MAX_DURATION = 240 MINUTES,
+      WAIT_AT_LOW_PRIORITY (MAX_DURATION = 10, ABORT_AFTER_WAIT = BLOCKERS)) ;
+
+ALTER INDEX test_idx on test_table ABORT ;

@@ -8,6 +8,8 @@ grammar JPA;
 /*
 ported to Antlr4 by Tom Everett
 */
+file_ : ql_statement EOF ;
+
 ql_statement
    : select_statement
    | update_statement

@@ -29,6 +29,8 @@ lexer grammar PythonLexer;
 
 options { superClass=PythonLexerBase; }
 
+// Insert here @header for C++ lexer.
+
 // Artificial tokens only for parser purposes
 
 tokens { INDENT, DEDENT, LINE_BREAK }
@@ -132,18 +134,18 @@ BIN_INTEGER        : '0' [bB] [01]+;
 IMAG_NUMBER        : (EXPONENT_OR_POINT_FLOAT | [0-9]+) [jJ];
 FLOAT_NUMBER       : EXPONENT_OR_POINT_FLOAT;
 
-OPEN_PAREN         : '(' {IncIndentLevel();};
-CLOSE_PAREN        : ')' {DecIndentLevel();};
-OPEN_BRACE         : '{' {IncIndentLevel();};
-CLOSE_BRACE        : '}' {DecIndentLevel();};
-OPEN_BRACKET       : '[' {IncIndentLevel();};
-CLOSE_BRACKET      : ']' {DecIndentLevel();};
+OPEN_PAREN         : '(' {this.IncIndentLevel();};
+CLOSE_PAREN        : ')' {this.DecIndentLevel();};
+OPEN_BRACE         : '{' {this.IncIndentLevel();};
+CLOSE_BRACE        : '}' {this.DecIndentLevel();};
+OPEN_BRACKET       : '[' {this.IncIndentLevel();};
+CLOSE_BRACKET      : ']' {this.DecIndentLevel();};
 
 NAME               : ID_START ID_CONTINUE*;
 
 LINE_JOIN          : '\\' [ \t]* RN                        -> channel(HIDDEN);
-NEWLINE            : RN                {HandleNewLine();}  -> channel(HIDDEN);
-WS                 : [ \t]+            {HandleSpaces();}   -> channel(HIDDEN);
+NEWLINE            : RN                {this.HandleNewLine();}  -> channel(HIDDEN);
+WS                 : [ \t]+            {this.HandleSpaces();}   -> channel(HIDDEN);
 COMMENT            : '#' ~[\r\n\f]*                        -> channel(HIDDEN);
 
 // Fragments
