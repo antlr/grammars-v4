@@ -1,9 +1,5 @@
-in(alan, R) ←
-teaches(alan, cs322) ∧
-in(cs322, R).
-grandf ather(william, X) ←
-f ather(william, Y ) ∧
-parent(Y, X).
-slithy(toves) ←
-mimsy ∧ borogroves ∧
-outgrabe(mome, Raths).
+# lang datalog
+edge(a, b). edge(b, c). edge(c, d). edge(d, a).
+path(X, Y) :- edge(X, Y).
+path(X, Y) :- edge(X, Z), path(Z, Y).
+path(X, Y)?

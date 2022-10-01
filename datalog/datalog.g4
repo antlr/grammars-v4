@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2020, Tom Everett
+Copyright (c) 2022, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,63 +32,96 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar datalog;
 
 program
-   : (fact | rule_) program
+   : statement*
    ;
 
-fact
-   : relation '(' constantlist ').'
+statement
+   : assertion
+   | retraction
+   | query
+   | requirement
    ;
 
-rule_
-   : atom ':-' atomlist '.'
+assertion
+   : clause '.'
    ;
 
-atom
-   : relation '(' termlist ')'
+retraction
+   : clause '~'
    ;
 
-atomlist
-   : atom (',' atom)*
+query
+   : literal '?'
+   ;
+
+requirement
+   : '(' IDENTIFIER ')' '.'
+   ;
+
+clause
+   : literal ':-' body
+   | literal
+   ;
+
+body
+   : literal ',' body
+   | literal
+   ;
+
+literal
+   : predicate_sym '(' ')'
+   | predicate_sym '(' terms ')'
+   | predicate_sym
+   | term '=' term
+   | term '!=' term
+   | VARIABLE ':-' external_sym '(' terms ')'
+   ;
+
+predicate_sym
+   : IDENTIFIER
+   | STRING
+   ;
+
+terms
+   : term
+   | term ',' terms
    ;
 
 term
-   : constant
-   | variable
+   : VARIABLE
+   | constant
    ;
-
-termlist
-   : term (',' term)*
-   ;
-
-constantlist
-   : constant (',' constant)*
-    ;
 
 constant
-   : CONSTANT
+   : IDENTIFIER
+   | STRING
+   | INTEGER
+   | 'true'
+   | 'false'
    ;
 
-variable
-   : VARIABLE
+external_sym
+   : IDENTIFIER
    ;
 
-relation
-   : RELATION
-   ;
-
-RELATION
-   : '^'
-   | 'v'
-   ;
-
-// A constant starts with lower-case letter or is a sequence of digits.
-CONSTANT
-   : [a-z] [a-zA-Z0-9]*
-   ;
-
-// A variable starts with upper-case letter.
 VARIABLE
-   : [A-Z] [a-zA-Z0-9]*
+   : [A-Z] [a-zA-Z_]*
+   ;
+
+IDENTIFIER
+   : [a-z] [a-zA-Z0-9_-]*
+   ;
+
+STRING
+   : '"' ~ '"'* '"'
+   ;
+
+INTEGER
+   : [0-9]+
+   ;
+
+COMMENT
+   : '#' (~ [\n\r])* -> skip
    ;
 
 WS
