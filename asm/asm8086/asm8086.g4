@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar asm8086;
 
 prog
-   : (line ('!' line)* EOL)*
+   : line* EOF
    ;
 
 line
-   : lbl? (assemblerdirective | instruction)? comment?
+   : lbl? (assemblerdirective | instruction)? ('!' instruction)* EOL
    ;
 
 instruction
@@ -45,7 +45,7 @@ instruction
    ;
 
 lbl
-   : label ':'?
+   : label COLON?
    ;
 
 assemblerdirective
@@ -64,7 +64,7 @@ assemblerdirective
    | rw
    | rb
    | rs
-   | '.'
+   | DOT
    ;
 
 rw
@@ -109,18 +109,18 @@ if_
 
 assemblerexpression
    : assemblerterm (assemblerlogical assemblerterm)*
-   | '(' assemblerexpression ')'
+   | RP assemblerexpression LP
    ;
 
 assemblerlogical
-   : 'eq'
-   | 'ne'
+   : EQ
+   | NE
    ;
 
 assemblerterm
    : name
    | number
-   | (NOT assemblerterm)
+   | NOT assemblerterm
    ;
 
 endif_
@@ -144,7 +144,7 @@ include_
    ;
 
 expressionlist
-   : expression (',' expression)*
+   : expression (COMMA expression)*
    ;
 
 label
@@ -152,11 +152,11 @@ label
    ;
 
 expression
-   : multiplyingExpression (SIGN multiplyingExpression)*
+   : multiplyingExpression (sign multiplyingExpression)*
    ;
 
 multiplyingExpression
-   : argument (('*' | '/' | 'mod' | 'and') argument)*
+   : argument ((STAR | SLASH | MOD | AND) argument)*
    ;
 
 argument
@@ -165,13 +165,13 @@ argument
    | register_
    | name
    | string_
-   | ('(' expression ')')
-   | ((number | name)? '[' expression ']')
+   | RP expression LP
+   | (number | name)? LB expression RB_
    | ptr expression
    | NOT expression
    | OFFSET expression
    | LENGTH expression
-   | (register_ ':') expression
+   | register_ COLON expression
    ;
 
 ptr
@@ -183,7 +183,27 @@ dollar
    ;
 
 register_
-   : REGISTER
+   : AH
+   | AL
+   | BH
+   | BL
+   | CH
+   | CL
+   | DH
+   | DL
+   | AX
+   | BX
+   | CX
+   | DX
+   | CI
+   | DI
+   | BP
+   | SP
+   | IP
+   | CS
+   | DS
+   | ES
+   | SS
    ;
 
 string_
@@ -195,261 +215,412 @@ name
    ;
 
 number
-   : SIGN? NUMBER
+   : sign? NUMBER
    ;
 
 opcode
-   : OPCODE
+   : AAA
+   | AAD
+   | AAM
+   | AAS
+   | ADC
+   | ADD
+   | AND
+   | CALL
+   | CBW
+   | CLC
+   | CLD
+   | CLI
+   | CMC
+   | CMP
+   | CMPSB
+   | CMPSW
+   | CWD
+   | DAA
+   | DAS
+   | DEC
+   | DIV
+   | ESC
+   | HLT
+   | IDIV
+   | IMUL
+   | IN
+   | INC
+   | INT
+   | INTO
+   | IRET
+   | JA
+   | JAE
+   | JB
+   | JBE
+   | JC
+   | JE
+   | JG
+   | JGE
+   | JL
+   | JLE
+   | JNA
+   | JNAE
+   | JNB
+   | JNBE
+   | JNC
+   | JNE
+   | JNG
+   | JNGE
+   | JNL
+   | JNLE
+   | JNO
+   | JNP
+   | JNS
+   | JNZ
+   | JO
+   | JP
+   | JPE
+   | JPO
+   | JS
+   | JZ
+   | JCXZ
+   | JMP
+   | JMPS
+   | JMPF
+   | LAHF
+   | LDS
+   | LEA
+   | LES
+   | LOCK
+   | LODS
+   | LODSB
+   | LODSW
+   | LOOP
+   | LOOPE
+   | LOOPNE
+   | LOOPNZ
+   | LOOPZ
+   | MOV
+   | MOVS
+   | MOVSB
+   | MOVSW
+   | MUL
+   | NEG
+   | NOP
+   | NOT
+   | OR
+   | OUT
+   | POP
+   | POPF
+   | PUSH
+   | PUSHF
+   | RCL
+   | RCR
+   | RET
+   | RETN
+   | RETF
+   | ROL
+   | ROR
+   | SAHF
+   | SAL
+   | SAR
+   | SALC
+   | SBB
+   | SCASB
+   | SCASW
+   | SHL
+   | SHR
+   | STC
+   | STD
+   | STI
+   | STOSB
+   | STOSW
+   | SUB
+   | TEST
+   | WAIT
+   | XCHG
+   | XLAT
+   | XOR
    ;
 
 rep
    : REP
+   | REPE
+   | REPNE
+   | REPNZ
+   | REPZ
    ;
 
-comment
-   : COMMENT
-   ;
+sign : PLUS | MINUS ;
 
-
-BYTE
-   : B Y T E
-   ;
-
-
-WORD
-   : W O R D
-   ;
-
-
-DWORD
-   : D W O R D
-   ;
-
-
-DSEG
-   : D S E G
-   ;
-
-
-CSEG
-   : C S E G
-   ;
-
-
-INCLUDE
-   : I N C L U D E
-   ;
-
-
-TITLE
-   : T I T L E
-   ;
-
-
-END
-   : E N D
-   ;
-
-
-ORG
-   : O R G
-   ;
-
-
-ENDIF
-   : E N D I F
-   ;
-
-
-IF
-   : I F
-   ;
-
-
-EQU
-   : E Q U
-   ;
-
-
-DW
-   : D W
-   ;
-
-
-DB
-   : D B
-   ;
-
-
-DD
-   : D D
-   ;
-
-
-PTR
-   : P T R
-   ;
-
-
-NOT
-   : N O T
-   ;
-
-
-OFFSET
-   : O F F S E T
-   ;
-
-
-RW
-   : R W
-   ;
-
-
-RB
-   : R B
-   ;
-
-
-RS
-   : R S
-   ;
-
-
-LENGTH
-   : L E N G T H
-   ;
-
+BYTE : B Y T E ;
+WORD : W O R D ;
+DWORD : D W O R D ;
+DSEG : D S E G ;
+CSEG : C S E G ;
+INCLUDE : I N C L U D E ;
+TITLE : T I T L E ;
+END : E N D ;
+ORG : O R G ;
+ENDIF : E N D I F ;
+IF : I F ;
+EQU : E Q U ;
+DW : D W ;
+DB : D B ;
+DD : D D ;
+PTR : P T R ;
+OFFSET : O F F S E T ;
+RW : R W ;
+RB : R B ;
+RS : R S ;
+LENGTH : L E N G T H ;
+EQ : E Q ;
+NE : N E ;
+MOD : M O D ;
 
 COMMENT
    : ';' ~ [\r\n]* -> skip
    ;
 
+AH : A H ;
+AL : A L ;
+BH : B H ;
+BL : B L ;
+CH : C H ;
+CL : C L ;
+DH : D H ;
+DL : D L ;
+AX : A X ;
+BX : B X ;
+CX : C X ;
+DX : D X ;
+CI : C I ;
+DI : D I ;
+BP : B P ;
+SP : S P ;
+IP : I P ;
+CS : C S ;
+DS : D S ;
+ES : E S ;
+SS : S S ;
 
-REGISTER
-   : A H | A L | B H | B L | C H | C L | D H | D L | A X | B X | C X | D X | C I | D I | B P | S P | I P | C S | D S | E S | S S
-   ;
+AAA : A A A ;
+AAD : A A D ;
+AAM : A A M ;
+AAS : A A S ;
+ADC : A D C ;
+ADD : A D D ;
+AND : A N D ;
+CALL : C A L L ;
+CBW : C B W ;
+CLC : C L C ;
+CLD : C L D ;
+CLI : C L I ;
+CMC : C M C ;
+CMP : C M P ;
+CMPSB : C M P S B ;
+CMPSW : C M P S W ;
+CWD : C W D ;
+DAA : D A A ;
+DAS : D A S ;
+DEC : D E C ;
+DIV : D I V ;
+ESC : E S C ;
+HLT : H L T ;
+IDIV : I D I V ;
+IMUL : I M U L ;
+IN : I N ;
+INC : I N C ;
+INT : I N T ;
+INTO : I N T O ;
+IRET : I R E T ;
+JA : J A ;
+JAE : J A E ;
+JB : J B ;
+JBE : J B E ;
+JC : J C ;
+JE : J E ;
+JG : J G ;
+JGE : J G E ;
+JL : J L ;
+JLE : J L E ;
+JNA : J N A ;
+JNAE : J N A E ;
+JNB : J N B ;
+JNBE : J N B E ;
+JNC : J N C ;
+JNE : J N E ;
+JNG : J N G ;
+JNGE : J N G E ;
+JNL : J N L ;
+JNLE : J N L E ;
+JNO : J N O ;
+JNP : J N P ;
+JNS : J N S ;
+JNZ : J N Z ;
+JO : J O ;
+JP : J P ;
+JPE : J P E ;
+JPO : J P O ;
+JS : J S ;
+JZ : J Z ;
+JCXZ : J C X Z ;
+JMP : J M P ;
+JMPS : J M P S ;
+JMPF : J M P F ;
+LAHF : L A H F ;
+LDS : L D S ;
+LEA : L E A ;
+LES : L E S ;
+LOCK : L O C K ;
+LODS : L O D S ;
+LODSB : L O D S B ;
+LODSW : L O D S W ;
+LOOP : L O O P ;
+LOOPE : L O O P E ;
+LOOPNE : L O O P N E ;
+LOOPNZ : L O O P N Z ;
+LOOPZ : L O O P Z ;
+MOV : M O V ;
+MOVS : M O V S ;
+MOVSB : M O V S B ;
+MOVSW : M O V S W ;
+MUL : M U L ;
+NEG : N E G ;
+NOP : N O P ;
+NOT : N O T ;
+OR : O R ;
+OUT : O U T ;
+POP : P O P ;
+POPF : P O P F ;
+PUSH : P U S H ;
+PUSHF : P U S H F ;
+RCL : R C L ;
+RCR : R C R ;
+RET : R E T ;
+RETN : R E T N ;
+RETF : R E T F ;
+ROL : R O L ;
+ROR : R O R ;
+SAHF : S A H F ;
+SAL : S A L ;
+SAR : S A R ;
+SALC : S A L C ;
+SBB : S B B ;
+SCASB : S C A S B ;
+SCASW : S C A S W ;
+SHL : S H L ;
+SHR : S H R ;
+STC : S T C ;
+STD : S T D ;
+STI : S T I ;
+STOSB : S T O S B ;
+STOSW : S T O S W ;
+SUB : S U B ;
+TEST : T E S T ;
+WAIT : W A I T ;
+XCHG : X C H G ;
+XLAT : X L A T ;
+XOR : X O R ;
+
+REP : R E P ;
+REPE : R E P E ;
+REPNE : R E P N E ;
+REPNZ : R E P N Z ;
+REPZ : R E P Z ;
 
 
-OPCODE
-   : A A A | A A D | A A M | A A S | A D C | A D D | A N D | C A L L | C B W | C L C | C L D | C L I | C M C | C M P | C M P S B | C M P S W | C W D | D A A | D A S | D E C | D I V | E S C | H L T | I D I V | I M U L | I N | I N C | I N T | I N T O | I R E T | J A | J A E | J B | J B E | J C | J E | J G | J G E | J L | J L E | J N A | J N A E | J N B | J N B E | J N C | J N E | J N G | J N G E | J N L | J N L E | J N O | J N P | J N S | J N Z | J O | J P | J P E | J P O | J S | J Z | J C X Z | J M P | J M P S | J M P F | L A H F | L D S | L E A | L E S | L O C K | L O D S | L O D S B | L O D S W | L O O P | L O O P E | L O O P N E | L O O P N Z | L O O P Z | M O V | M O V S | M O V S B | M O V S W | M U L | N E G | N O P | N O T | O R | O U T | P O P | P O P F | P U S H | P U S H F | R C L | R C R | R E T | R E T N | R E T F | R O L | R O R | S A H F | S A L | S A R | S A L C | S B B | S C A S B | S C A S W | S H L | S H R | S T C | S T D | S T I | S T O S B | S T O S W | S U B | T E S T | W A I T | X C H G | X L A T | X O R
-   ;
-
-
-REP
-   : R E P | R E P E | R E P N E | R E P N Z | R E P Z
-   ;
-
-
-DOLLAR
-   : '$'
-   ;
-
-
-SIGN
-   : '+' | '-'
-   ;
+STAR : '*' ;
+SLASH : '/' ;
+DOLLAR : '$' ;
+PLUS : '+' ;
+MINUS : '-' ;
+NOT_ : '!' ;
+COLON : ':' ;
+DOT : '.' ;
+RP : '(' ;
+LP : ')' ;
+COMMA : ',' ;
+SEMI : ';' ;
+LB : '[' ;
+RB_ : ']' ;
 
 
 NAME
    : [.a-zA-Z] [a-zA-Z0-9."_]*
    ;
 
-
 NUMBER
    : [0-9a-fA-F] + ('H' | 'h')?
    ;
-
 
 STRING
    : '\u0027' ~'\u0027'* '\u0027'
    ;
 
-
 EOL
    : [\r\n] +
    ;
-
 
 WS
    : [ \t] -> skip
    ;
 
-
 fragment A
    : ('a' | 'A')
    ;
-
 
 fragment B
    : ('b' | 'B')
    ;
 
-
 fragment C
    : ('c' | 'C')
    ;
-
 
 fragment D
    : ('d' | 'D')
    ;
 
-
 fragment E
    : ('e' | 'E')
    ;
-
 
 fragment F
    : ('f' | 'F')
    ;
 
-
 fragment G
    : ('g' | 'G')
    ;
-
 
 fragment H
    : ('h' | 'H')
    ;
 
-
 fragment I
    : ('i' | 'I')
    ;
-
 
 fragment J
    : ('j' | 'J')
    ;
 
-
 fragment K
    : ('k' | 'K')
    ;
-
 
 fragment L
    : ('l' | 'L')
    ;
 
-
 fragment M
    : ('m' | 'M')
    ;
-
 
 fragment N
    : ('n' | 'N')
    ;
 
-
 fragment O
    : ('o' | 'O')
    ;
-
 
 fragment P
    : ('p' | 'P')
@@ -460,46 +631,37 @@ fragment Q
    : ('q' | 'Q')
    ;
 
-
 fragment R
    : ('r' | 'R')
    ;
-
 
 fragment S
    : ('s' | 'S')
    ;
 
-
 fragment T
    : ('t' | 'T')
    ;
-
 
 fragment U
    : ('u' | 'U')
    ;
 
-
 fragment V
    : ('v' | 'V')
    ;
-
 
 fragment W
    : ('w' | 'W')
    ;
 
-
 fragment X
    : ('x' | 'X')
    ;
 
-
 fragment Y
    : ('y' | 'Y')
    ;
-
 
 fragment Z
    : ('z' | 'Z')

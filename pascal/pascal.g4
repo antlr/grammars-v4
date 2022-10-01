@@ -38,7 +38,7 @@ grammar pascal;
 options { caseInsensitive = true; }
 
 program
-   : programHeading (INTERFACE)? block DOT
+   : programHeading (INTERFACE)? block DOT EOF
    ;
 
 programHeading

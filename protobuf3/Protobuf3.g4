@@ -22,7 +22,7 @@ proto
       | optionStatement
       | topLevelDef
       | emptyStatement_
-    )*
+    )* EOF
   ;
 
 // Syntax
