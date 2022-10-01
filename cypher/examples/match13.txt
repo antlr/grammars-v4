@@ -1,0 +1,1 @@
+MATCH (n) WITH n.prop AS p RETURN toInteger(DISTINCT p)

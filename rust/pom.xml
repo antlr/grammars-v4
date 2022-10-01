@@ -10,11 +10,12 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<build>
+		<sourceDirectory>Java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.3.0</version>
 				<executions>
 					<execution>
 						<id>add-source</id>
@@ -60,7 +61,6 @@
 					<showTree>false</showTree>
 					<entryPoint>crate</entryPoint>
 					<grammarName>Rust</grammarName>
-					<caseInsensitive>true</caseInsensitive>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

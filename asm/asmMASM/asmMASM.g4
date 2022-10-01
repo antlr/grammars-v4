@@ -33,19 +33,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar asmMASM;
 
 prog
-   : (line EOL)*
+   : line* EOF
    ;
 
 line
-   : lbl? (assemblerdirective | masmdirectives | instruction)? comment?
+   : (lbl | endlbl)? (assemblerdirective | masmdirectives | instruction)? EOL
    ;
 
 instruction
-   : rep? opcode? expressionlist?
+   : rep? opcode expressionlist?
    ;
 
 lbl
    : label ':'?
+   ;
+
+endlbl
+   : END name?
    ;
 
 assemblerdirective
@@ -57,6 +61,10 @@ assemblerdirective
    | dw
    | dm
    | ds
+   | include
+   | includelib
+   | invoke
+   | option
    | put
    | assign
    | segment
@@ -65,7 +73,8 @@ assemblerdirective
    | label_
    | assume
    | extern_
-   | (type_ expressionlist +)
+   | public_
+   | type_ expressionlist+
    ;
 
 masmdirectives
@@ -104,8 +113,8 @@ endsegment
    ;
 
 align
-   : (BYTE | WORD | DWORD | PARA | PAGE)
-   | (ALIGN '(' number ')')
+   : BYTE | WORD | DWORD | PARA | PAGE
+   | ALIGN '(' number ')'
    ;
 
 assign
@@ -114,6 +123,22 @@ assign
 
 put
    : PUT expressionlist
+   ;
+
+include
+   : INCLUDE expressionlist
+   ;
+
+includelib
+   : INCLUDELIB expressionlist
+   ;
+
+invoke
+   : INVOKE expressionlist
+   ;
+
+option
+   : OPTION expressionlist
    ;
 
 ds
@@ -142,6 +167,10 @@ equ
 
 extern_
    : EXTERN expression
+   ;
+
+public_
+   : PUBLIC expression
    ;
 
 if_
@@ -180,8 +209,8 @@ argument
    | register_
    | (name ':')? name
    | string
-   | ('(' expression ')')
-   | ('[' expression ']')
+   | '(' expression ')'
+   | '[' expression ']'
    | NOT expression
    | OFFSET expression
    | gross
@@ -237,15 +266,13 @@ rep
    : REP
    ;
 
-comment
-   : COMMENT
-   ;
-
-
 ORG
    : O R G
    ;
 
+END
+   : E N D
+   ;
 
 ENDIF
    : E N D I F
@@ -281,6 +308,22 @@ DS
    : D S
    ;
 
+
+INCLUDE
+   : I N C L U D E
+   ;
+
+INCLUDELIB
+   : I N C L U D E L I B
+   ;
+
+INVOKE
+   : I N V O K E
+   ;
+
+OPTION
+   : O P T I O N
+   ;
 
 PUT
    : P U T
@@ -399,6 +442,9 @@ EXTERN
    : E X T E R N
    ;
 
+PUBLIC
+   : P U B L I C
+   ;
 
 MASMDIRECTIVE
    : '.' [a-zA-Z0-9] +
@@ -428,7 +474,6 @@ STRING2
 COMMENT
    : ';' ~ [\r\n]* -> skip
    ;
-
 
 EOL
    : [\r\n] +

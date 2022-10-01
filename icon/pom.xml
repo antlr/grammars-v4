@@ -38,7 +38,7 @@
 				<configuration>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>prog</entryPoint>
+					<entryPoint>start</entryPoint>
 					<grammarName>icon</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

@@ -79,7 +79,7 @@ varSpec:
 
 block: L_CURLY statementList? R_CURLY;
 
-statementList: (statement eos)+;
+statementList: ((SEMI? | EOS? | {this.closingBracket()}?) statement eos)+;
 
 statement:
 	declaration
@@ -103,8 +103,7 @@ simpleStmt:
 	| incDecStmt
 	| assignment
 	| expressionStmt
-	| shortVarDecl
-	| emptyStmt;
+	| shortVarDecl;
 
 expressionStmt: expression;
 
@@ -130,9 +129,9 @@ assign_op: (
 
 shortVarDecl: identifierList DECLARE_ASSIGN expressionList;
 
-emptyStmt: SEMI;
+emptyStmt: EOS | SEMI;
 
-labeledStmt: IDENTIFIER COLON statement;
+labeledStmt: IDENTIFIER COLON statement?;
 
 returnStmt: RETURN expressionList?;
 
@@ -147,21 +146,29 @@ fallthroughStmt: FALLTHROUGH;
 deferStmt: DEFER expression;
 
 ifStmt:
-	IF (simpleStmt SEMI)? expression block (
+	IF ( expression
+			| eos expression
+			| simpleStmt eos expression
+			) block (
 		ELSE (ifStmt | block)
 	)?;
 
 switchStmt: exprSwitchStmt | typeSwitchStmt;
 
 exprSwitchStmt:
-	SWITCH (simpleStmt SEMI)? expression? L_CURLY exprCaseClause* R_CURLY;
+	SWITCH (expression?
+					| simpleStmt? eos expression?
+					) L_CURLY exprCaseClause* R_CURLY;
 
 exprCaseClause: exprSwitchCase COLON statementList?;
 
 exprSwitchCase: CASE expressionList | DEFAULT;
 
 typeSwitchStmt:
-	SWITCH (simpleStmt SEMI)? typeSwitchGuard L_CURLY typeCaseClause* R_CURLY;
+	SWITCH ( typeSwitchGuard
+					| eos typeSwitchGuard
+					| simpleStmt eos typeSwitchGuard)
+					 L_CURLY typeCaseClause* R_CURLY;
 
 typeSwitchGuard: (IDENTIFIER DECLARE_ASSIGN)? primaryExpr DOT L_PAREN TYPE R_PAREN;
 
@@ -179,10 +186,10 @@ commCase: CASE (sendStmt | recvStmt) | DEFAULT;
 
 recvStmt: (expressionList ASSIGN | identifierList DECLARE_ASSIGN)? recvExpr = expression;
 
-forStmt: FOR (expression | forClause | rangeClause)? block;
+forStmt: FOR (expression? | forClause | rangeClause?) block;
 
 forClause:
-	initStmt = simpleStmt? SEMI expression? SEMI postStmt = simpleStmt?;
+	initStmt = simpleStmt? eos expression? eos postStmt = simpleStmt?;
 
 rangeClause: (
 		expressionList ASSIGN
@@ -224,13 +231,13 @@ mapType: MAP L_BRACKET type_ R_BRACKET elementType;
 channelType: (CHAN | CHAN RECEIVE | RECEIVE CHAN) elementType;
 
 methodSpec:
-	{noTerminatorAfterParams(2)}? IDENTIFIER parameters result
+	IDENTIFIER parameters result
 	| IDENTIFIER parameters;
 
 functionType: FUNC signature;
 
 signature:
-	{noTerminatorAfterParams(1)}? parameters result
+	parameters result
 	| parameters;
 
 result: parameters | type_;
@@ -242,7 +249,15 @@ parameterDecl: identifierList? ELLIPSIS? type_;
 
 expression:
 	primaryExpr
-	| unaryExpr
+	| unary_op = (
+		PLUS
+		| MINUS
+		| EXCLAMATION
+		| CARET
+		| STAR
+		| AMPERSAND
+		| RECEIVE
+	) expression
 	| expression mul_op = (
 		STAR
 		| DIV
@@ -276,19 +291,10 @@ primaryExpr:
 		| arguments
 	);
 
-unaryExpr:
-	primaryExpr
-	| unary_op = (
-		PLUS
-		| MINUS
-		| EXCLAMATION
-		| CARET
-		| STAR
-		| AMPERSAND
-		| RECEIVE
-	) expression;
 
-conversion: type_ L_PAREN expression COMMA? R_PAREN;
+conversion: nonNamedType L_PAREN expression COMMA? R_PAREN;
+
+nonNamedType: typeLit | L_PAREN nonNamedType R_PAREN;
 
 operand: literal | operandName | L_PAREN expression R_PAREN;
 
@@ -298,9 +304,7 @@ basicLit:
 	NIL_LIT
 	| integer
 	| string_
-	| FLOAT_LIT
-	| IMAGINARY_LIT
-	| RUNE_LIT;
+	| FLOAT_LIT;
 
 integer:
 	DECIMAL_LIT
@@ -310,7 +314,7 @@ integer:
 	| IMAGINARY_LIT
 	| RUNE_LIT;
 
-operandName: IDENTIFIER (DOT IDENTIFIER)?;
+operandName: IDENTIFIER;
 
 qualifiedIdent: IDENTIFIER DOT IDENTIFIER;
 
@@ -330,14 +334,14 @@ elementList: keyedElement (COMMA keyedElement)*;
 
 keyedElement: (key COLON)? element;
 
-key: IDENTIFIER | expression | literalValue;
+key: expression | literalValue;
 
 element: expression | literalValue;
 
 structType: STRUCT L_CURLY (fieldDecl eos)* R_CURLY;
 
 fieldDecl: (
-		{noTerminatorBetween(2)}? identifierList type_
+		identifierList type_
 		| embeddedField
 	) tag = string_?;
 
@@ -359,10 +363,10 @@ typeAssertion: DOT L_PAREN type_ R_PAREN;
 
 arguments:
 	L_PAREN (
-		(expressionList | type_ (COMMA expressionList)?) ELLIPSIS? COMMA?
+		(expressionList | nonNamedType (COMMA expressionList)?) ELLIPSIS? COMMA?
 	)? R_PAREN;
 
-methodExpr: receiverType DOT IDENTIFIER;
+methodExpr: nonNamedType DOT IDENTIFIER;
 
 //receiverType: typeName | '(' ('*' typeName | receiverType) ')';
 
@@ -371,6 +375,6 @@ receiverType: type_;
 eos:
 	SEMI
 	| EOF
-	| {lineTerminatorAhead()}?
-	| {checkPreviousTokenText("}")}?;
-
+	| EOS
+	| {this.closingBracket()}?
+	;

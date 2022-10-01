@@ -1,0 +1,23 @@
+atom$uni_start_stream
+
+atom$buf_start_buffer 159
+
+atom$buf_set_token "xx" # Needs customization.
+
+atom$buf_add_atom_pointer_ascii "101,1;105,2" # Needs customization.
+
+atom$de_start_extraction
+
+atom$buf_set_data_atom 1 9
+
+atom$de_set_data_type datatype_global_id
+
+atom$de_get_data_value 1
+
+atom$uni_use_last_atom_value 4 2
+
+atom$de_end_extraction
+
+atom$buf_close_buffer
+
+atom$uni_end_stream

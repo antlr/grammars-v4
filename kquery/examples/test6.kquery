@@ -1,0 +1,16 @@
+array sample1_pse[4] : w32 -> w8 = symbolic
+array sample2_pse[4] : w32 -> w8 = symbolic
+array sample3_pse[4] : w32 -> w8 = symbolic
+(query [(Ule N0:(ReadLSB w32 0 sample1_pse)
+              4294967295)
+         (Ule N1:(ReadLSB w32 0 sample2_pse)
+              (SDiv w32 N0 2))
+         (Ule N2:(ReadLSB w32 0 sample3_pse)
+              (SDiv w32 N1 3))
+         (Ule (Add w32 82763 N2) (Add w32 45392 N1))
+         (Eq false
+             (Ule (Add w32 4294961753 N0)
+                  (Add w32 19 (Add w32 N1 N2))))
+         (Ule 9877866
+              (Add w32 19 (Add w32 N1 N0)))]
+        false)

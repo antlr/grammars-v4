@@ -1,0 +1,1 @@
+MATCH (n) CREATE () WITH n SET n.foo = 1 RETURN n.bar

@@ -95,6 +95,7 @@ unit_statement
 
     | comment_on_column
     | comment_on_table
+    | comment_on_materialized
 
     | anonymous_block
 
@@ -165,10 +166,10 @@ create_package_body
 
 package_obj_spec
     : pragma_declaration
+    | exception_declaration
     | variable_declaration
     | subtype_declaration
     | cursor_declaration
-    | exception_declaration
     | type_declaration
     | procedure_spec
     | function_spec
@@ -184,10 +185,10 @@ function_spec
     ;
 
 package_obj_body
-    : variable_declaration
+    : exception_declaration
     | subtype_declaration
     | cursor_declaration
-    | exception_declaration
+    | variable_declaration
     | type_declaration
     | procedure_body
     | function_body
@@ -991,6 +992,16 @@ validation_clauses
         online_or_offline? into_clause?
     ;
 
+compute_clauses
+    : COMPUTE SYSTEM? STATISTICS for_clause?
+    ;
+for_clause
+     : FOR ( TABLE for_clause*
+           | ALL (INDEXED? COLUMNS (SIZE UNSIGNED_INTEGER)? for_clause* | LOCAL? INDEXES)
+           | COLUMNS (SIZE UNSIGNED_INTEGER)? (column_name SIZE UNSIGNED_INTEGER)+ for_clause*
+           )
+    ;
+
 online_or_offline
     : OFFLINE
     | ONLINE
@@ -1003,10 +1014,12 @@ into_clause1
 //Making assumption on partition ad subpartition key value clauses
 partition_key_value
     : literal
+    | TIMESTAMP quoted_string
     ;
 
 subpartition_key_value
     : literal
+    | TIMESTAMP quoted_string
     ;
 
 //https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_4006.htm#SQLRF01106
@@ -1078,7 +1091,7 @@ storage_table_clause
 
 // https://docs.oracle.com/database/121/SQLRF/statements_4008.htm#SQLRF56110
 unified_auditing
-    : {isVersion12()}?
+    : {self.isVersion12()}?
       AUDIT (POLICY policy_name ((BY | EXCEPT) audit_user (',' audit_user)* )?
                                 (WHENEVER NOT? SUCCESSFUL)?
             | CONTEXT NAMESPACE oracle_namespace
@@ -1106,11 +1119,11 @@ audit_traditional
     ;
 
 audit_direct_path
-    : {isVersion12()}? DIRECT_PATH auditing_by_clause
+    : {self.isVersion12()}? DIRECT_PATH auditing_by_clause
     ;
 
 audit_container_clause
-    : {isVersion12()}? (CONTAINER EQUALS_OP (CURRENT | ALL))
+    : {self.isVersion12()}? (CONTAINER EQUALS_OP (CURRENT | ALL))
     ;
 
 audit_operation_clause
@@ -1152,7 +1165,7 @@ auditing_on_clause
     : ON ( object_name
          | DIRECTORY regular_id
          | MINING MODEL model_name
-         | {isVersion12()}? SQL TRANSLATION PROFILE profile_name
+         | {self.isVersion12()}? SQL TRANSLATION PROFILE profile_name
          | DEFAULT
          )
     ;
@@ -1180,7 +1193,7 @@ sql_statement_shortcut
     | MATERIALIZED VIEW
     | NOT EXISTS
     | OUTLINE
-    | {isVersion12()}? PLUGGABLE DATABASE
+    | {self.isVersion12()}? PLUGGABLE DATABASE
     | PROCEDURE
     | PROFILE
     | PUBLIC DATABASE LINK
@@ -1267,11 +1280,11 @@ alter_library
     ;
 
 library_editionable
-    : {isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
+    : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
 library_debug
-    : {isVersion12()}? DEBUG
+    : {self.isVersion12()}? DEBUG
     ;
 
 
@@ -1305,7 +1318,7 @@ alter_view
     ;
 
 alter_view_editionable
-    : {isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
+    : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
 
 create_view
@@ -1360,7 +1373,7 @@ out_of_line_constraint
           ( UNIQUE '(' column_name (',' column_name)* ')'
           | PRIMARY KEY '(' column_name (',' column_name)* ')'
           | foreign_key_clause
-          | CHECK '(' expression ')'
+          | CHECK '(' condition ')'
           )
        )
       constraint_state?
@@ -1817,10 +1830,10 @@ relational_table
     ;
 
 relational_property
-    : (column_definition
-        | virtual_column_definition
-        | out_of_line_constraint
+    : ( out_of_line_constraint
         | out_of_line_ref_constraint
+        | column_definition
+        | virtual_column_definition
         | supplemental_logging_props
         )
     ;
@@ -1980,7 +1993,7 @@ range_values_clause
     ;
 
 list_values_clause
-    : VALUES '(' (literal (',' literal)* | DEFAULT) ')'
+    : VALUES '(' (literal (',' literal)* | TIMESTAMP literal (',' TIMESTAMP literal)* | DEFAULT) ')'
     ;
 
 table_partition_description
@@ -2035,7 +2048,10 @@ physical_attributes_clause
     : (PCTFREE pctfree=UNSIGNED_INTEGER
       | PCTUSED pctused=UNSIGNED_INTEGER
       | INITRANS inittrans=UNSIGNED_INTEGER
+      | MAXTRANS maxtrans=UNSIGNED_INTEGER
+      | COMPUTE STATISTICS
       | storage_clause
+      | compute_clauses
       )+
     ;
 
@@ -2051,6 +2067,7 @@ storage_clause
          | OPTIMAL (size_clause | NULL_ )
          | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
          | FLASH_CACHE (KEEP | NONE | DEFAULT)
+         | CELL_FLASH_CACHE (KEEP | NONE | DEFAULT)
          | ENCRYPT
          )+
        ')'
@@ -2063,6 +2080,7 @@ deferred_segment_creation
 segment_attributes_clause
     : ( physical_attributes_clause
       | TABLESPACE tablespace_name=id_expression
+      | table_compression
       | logging_clause
       )+
     ;
@@ -2169,6 +2187,10 @@ comment_on_table
     : COMMENT ON TABLE tableview_name IS quoted_string
     ;
 
+comment_on_materialized
+    : COMMENT ON MATERIALIZED VIEW tableview_name IS quoted_string
+    ;
+
 alter_cluster
     : ALTER CLUSTER  cluster_name
         ( physical_attributes_clause
@@ -2257,7 +2279,7 @@ partial_database_recovery
     ;
 
 partial_database_recovery_10g
-    : {isVersion10()}? STANDBY
+    : {self.isVersion10()}? STANDBY
       ( TABLESPACE tablespace (',' tablespace)*
       | DATAFILE CHAR_STRING | filenumber (',' CHAR_STRING | filenumber)*
       )
@@ -2488,7 +2510,7 @@ alter_table
       | alter_table_properties
       | constraint_clauses
       | column_clauses
-//TODO      | alter_table_partitioning
+      | alter_table_partitioning
 //TODO      | alter_external_table
       | move_table_clause
       )
@@ -2503,6 +2525,77 @@ alter_table_properties
     | READ ONLY
     | READ WRITE
     | REKEY CHAR_STRING
+    ;
+
+alter_table_partitioning
+    : add_table_partition
+    | drop_table_partition
+    | merge_table_partition
+    | modify_table_partition
+    | split_table_partition
+    | truncate_table_partition
+    | exchange_table_partition
+    | coalesce_table_partition
+    | alter_interval_partition
+    ;
+
+
+add_table_partition
+    : ADD ( range_partition_desc
+          | list_partition_desc
+          | PARTITION partition_name? (TABLESPACE tablespace)? key_compression? UNUSABLE?
+      )
+    ;
+
+drop_table_partition
+    : DROP (partition_extended_names | subpartition_extended_names) (update_index_clauses parallel_clause?)?
+    ;
+
+merge_table_partition
+    : MERGE PARTITION partition_name AND partition_name INTO PARTITION partition_name
+    ;
+
+modify_table_partition
+    : MODIFY PARTITION partition_name ((ADD | DROP) list_values_clause)? (ADD range_subpartition_desc)? (REBUILD? UNUSABLE LOCAL INDEXES)?
+    ;
+
+split_table_partition
+    : SPLIT PARTITION partition_name INTO '('
+         (range_partition_desc (',' range_partition_desc)*
+         | list_partition_desc (',' list_partition_desc)* )
+     ')'
+    ;
+
+truncate_table_partition
+    : TRUNCATE (partition_extended_names | subpartition_extended_names)
+            ((DROP ALL? | REUSE)? STORAGE)? CASCADE? (update_index_clauses parallel_clause?)?
+    ;
+
+exchange_table_partition
+    : EXCHANGE PARTITION partition_name WITH TABLE tableview_name
+            ((INCLUDING | EXCLUDING) INDEXES)?
+            ((WITH | WITHOUT) VALIDATION)?
+    ;
+
+coalesce_table_partition
+    : COALESCE PARTITION parallel_clause? (allow_or_disallow CLUSTERING)?
+    ;
+
+alter_interval_partition
+    : SET INTERVAL '(' (constant | expression)? ')'
+    ;
+
+
+partition_extended_names
+    : (PARTITION | PARTITIONS) ( partition_name
+                               | '(' partition_name (',' partition_name)* ')'
+                               | FOR '('? partition_key_value (',' partition_key_value)* ')'? )
+    ;
+
+subpartition_extended_names
+    : (SUBPARTITION | SUBPARTITIONS) ( partition_name (UPDATE INDEXES)?
+                                     | '(' partition_name (',' partition_name)* ')'
+                                     | FOR '('? subpartition_key_value (',' subpartition_key_value)* ')'? )
     ;
 
 alter_table_properties_1
@@ -2543,6 +2636,31 @@ add_overflow_clause
     : ADD OVERFLOW segment_attributes_clause? ('(' PARTITION segment_attributes_clause? (',' PARTITION segment_attributes_clause?)*  ')' )?
     ;
 
+
+update_index_clauses
+    : update_global_index_clause
+    | update_all_indexes_clause
+    ;
+
+update_global_index_clause
+    : (UPDATE | INVALIDATE) GLOBAL INDEXES
+    ;
+
+update_all_indexes_clause
+    : UPDATE INDEXES ('(' update_all_indexes_index_clause ')')?
+    ;
+
+update_all_indexes_index_clause
+    : index_name '(' (update_index_partition | update_index_subpartition) ')' (',' update_all_indexes_clause)*
+    ;
+
+update_index_partition
+    : index_partition_description index_subpartition_clause? (',' update_index_partition)*
+    ;
+
+update_index_subpartition
+    : SUBPARTITION subpartition_name? (TABLESPACE tablespace)? (',' update_index_subpartition)*
+    ;
 
 enable_disable_clause
     : (ENABLE | DISABLE) (VALIDATE | NOVALIDATE)?
@@ -2628,7 +2746,8 @@ new_column_name
     ;
 
 add_modify_drop_column_clauses
-    : (add_column_clause
+    : (constraint_clauses
+      |add_column_clause
       |modify_column_clauses
       |drop_column_clause
       )+
@@ -2687,16 +2806,17 @@ lob_segname
 
 lob_item
     : regular_id
+    | quoted_string
     ;
 
 lob_storage_parameters
-    :  TABLESPACE tablespace | (lob_parameters storage_clause? )
+    :  TABLESPACE tablespace_name=id_expression | (lob_parameters storage_clause? )
     |  storage_clause
     ;
 
 lob_storage_clause
-    : LOB ( '(' lob_item (',' lob_item)* ')' STORE AS ( (SECUREFILE|BASICFILE) | '(' lob_storage_parameters ')' )+
-          | '(' lob_item ')' STORE AS ( (SECUREFILE | BASICFILE) | lob_segname | '(' lob_storage_parameters ')' )+
+    : LOB ( '(' lob_item (',' lob_item)* ')' STORE AS ( (SECUREFILE|BASICFILE) | '(' lob_storage_parameters* ')' )+
+          | '(' lob_item ')' STORE AS ( (SECUREFILE | BASICFILE) | lob_segname | '(' lob_storage_parameters* ')' )+
           )
     ;
 
@@ -2753,7 +2873,7 @@ encryption_spec
     : (USING  CHAR_STRING)? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? (NO? SALT)?
     ;
 tablespace
-    : regular_id
+    : id_expression
     ;
 
 varray_item
@@ -2768,7 +2888,7 @@ column_properties
     ;
 
 period_definition
-    : {isVersion12()}? PERIOD FOR column_name
+    : {self.isVersion12()}? PERIOD FOR column_name
         ( '(' start_time_column ',' end_time_column ')' )?
     ;
 
@@ -2820,6 +2940,7 @@ substitutable_column_clause
 
 partition_name
     : regular_id
+    | DELIMITED_ID
     ;
 
 supplemental_logging_props
@@ -2891,7 +3012,7 @@ foreign_key_clause
     ;
 
 references_clause
-    : REFERENCES tableview_name paren_column_list
+    : REFERENCES tableview_name paren_column_list? (ON DELETE (CASCADE | SET NULL_))?
     ;
 
 on_delete_clause
@@ -2956,10 +3077,10 @@ seq_of_declare_specs
 
 declare_spec
     : pragma_declaration
+    | exception_declaration
     | variable_declaration
     | subtype_declaration
     | cursor_declaration
-    | exception_declaration
     | type_declaration
     | procedure_spec
     | function_spec
@@ -3721,6 +3842,12 @@ seed_part
 
 condition
     : expression
+    | json_condition
+    ;
+
+json_condition
+    : column_name IS NOT? JSON (FORMAT JSON)? (STRICT|LAX)? ((WITH|WITHOUT) UNIQUE KEYS)?
+    | JSON_EQUAL '(' expressions ')'
     ;
 
 expressions
@@ -3918,6 +4045,10 @@ numeric_function
    | GREATEST '(' expressions ')'
    ;
 
+listagg_overflow_clause
+    : ON OVERFLOW (ERROR | TRUNCATE) CHAR_STRING? ((WITH | WITHOUT) COUNT)?
+    ;
+
 other_function
     : over_clause_keyword function_argument_analytic over_clause?
     | /*TODO stantard_function_enabling_using*/ regular_id function_argument_modeling using_clause?
@@ -3926,6 +4057,8 @@ other_function
     | COALESCE '(' table_element (',' (numeric | quoted_string))? ')'
     | COLLECT '(' (DISTINCT | UNIQUE)? concatenation collect_order_by_part? ')'
     | within_or_over_clause_keyword function_argument within_or_over_part+
+    | LISTAGG '(' (ALL | DISTINCT | UNIQUE)? argument (',' CHAR_STRING)? listagg_overflow_clause? ')'
+      (WITHIN GROUP '(' order_by_clause ')')? over_clause?
     | cursor_name ( PERCENT_ISOPEN | PERCENT_FOUND | PERCENT_NOTFOUND | PERCENT_ROWCOUNT )
     | DECOMPOSE '(' concatenation (CANONICAL | COMPATIBILITY)? ')'
     | EXTRACT '(' regular_id FROM concatenation ')'
@@ -3979,7 +4112,6 @@ over_clause_keyword
 within_or_over_clause_keyword
     : CUME_DIST
     | DENSE_RANK
-    | LISTAGG
     | PERCENT_RANK
     | PERCENTILE_CONT
     | PERCENTILE_DISC
@@ -4128,7 +4260,7 @@ where_clause
     ;
 
 into_clause
-    : (BULK COLLECT)? INTO variable_name (',' variable_name)*
+    : (BULK COLLECT)? INTO (general_element | bind_variable) (',' (general_element | bind_variable))*
     ;
 
 // Common Named Elements
@@ -4688,6 +4820,7 @@ regular_id
     | YMINTERVAL_UNCONSTRAINED
     | REGR_
     | VAR_
+    | VALUE
     | COVAR_
     ;
 

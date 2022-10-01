@@ -44,11 +44,13 @@ CloseBracket:                   ']';
 OpenParen:                      '(';
 CloseParen:                     ')';
 OpenBrace:                      '{' {this.ProcessOpenBrace();};
+TemplateCloseBrace:             {this.IsInTemplateString()}? '}' -> popMode;
 CloseBrace:                     '}' {this.ProcessCloseBrace();};
 SemiColon:                      ';';
 Comma:                          ',';
 Assign:                         '=';
 QuestionMark:                   '?';
+QuestionMarkDot:                '?.';
 Colon:                          ':';
 Ellipsis:                       '...';
 Dot:                            '.';
@@ -165,6 +167,7 @@ Import:                         'import';
 
 Async:                          'async';
 Await:                          'await';
+Yield:                          'yield';
 
 /// The following tokens are also considered to be FutureReservedWords
 /// when parsing strict mode
@@ -178,7 +181,6 @@ Interface:                      'interface' {this.IsStrictMode()}?;
 Package:                        'package' {this.IsStrictMode()}?;
 Protected:                      'protected' {this.IsStrictMode()}?;
 Static:                         'static' {this.IsStrictMode()}?;
-Yield:                          'yield' {this.IsStrictMode()}?;
 
 /// Identifier Names and Identifiers
 
@@ -188,8 +190,7 @@ StringLiteral:                 ('"' DoubleStringCharacter* '"'
              |                  '\'' SingleStringCharacter* '\'') {this.ProcessStringLiteral();}
              ;
 
-// TODO: `${`tmp`}`
-TemplateStringLiteral:          '`' ('\\`' | ~'`')* '`';
+BackTick:                       '`' {this.IncreaseTemplateDepth();} -> pushMode(TEMPLATE);
 
 WhiteSpaces:                    [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN);
 
@@ -201,6 +202,12 @@ LineTerminator:                 [\r\n\u2028\u2029] -> channel(HIDDEN);
 HtmlComment:                    '<!--' .*? '-->' -> channel(HIDDEN);
 CDataComment:                   '<![CDATA[' .*? ']]>' -> channel(HIDDEN);
 UnexpectedCharacter:            . -> channel(ERROR);
+
+mode TEMPLATE;
+
+BackTickInside:                 '`' {this.DecreaseTemplateDepth();} -> type(BackTick), popMode;
+TemplateStringStartExpression:  '${' -> pushMode(DEFAULT_MODE);
+TemplateStringAtom:             ~[`];
 
 // Fragment rules
 

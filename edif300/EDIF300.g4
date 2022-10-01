@@ -28,7 +28,7 @@
 */
 grammar EDIF300;
 
-goal : edif;
+goal : edif EOF ;
 
 absolute : '(absolute'
 	integerExpression

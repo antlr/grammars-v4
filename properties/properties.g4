@@ -3,7 +3,7 @@ grammar properties;
 
 propertiesFile
     :
-    row+ ;
+    row+ EOF ;
 
 row
     :

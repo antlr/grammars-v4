@@ -38,6 +38,7 @@ public abstract class LexerAdaptor extends Lexer {
      *  Generic type for OPTIONS, TOKENS and CHANNELS
      */
     private static final int PREQUEL_CONSTRUCT = -10;
+    private static final int OPTIONS_CONSTRUCT = -11;
 
     public LexerAdaptor(CharStream input) {
         super(input);
@@ -95,25 +96,23 @@ public abstract class LexerAdaptor extends Lexer {
         }
     }
 
-    protected void handleOptionsLBrace() {
-        if (insideOptionsBlock) {
-            setType(ANTLRv4Lexer.BEGIN_ACTION);
-            pushMode(ANTLRv4Lexer.TargetLanguageAction);
-        } else {
-            setType(ANTLRv4Lexer.LBRACE);
-            insideOptionsBlock = true;
-        }
-    }
-
     @Override
     public Token emit() {
         if ((_type == ANTLRv4Lexer.OPTIONS || _type == ANTLRv4Lexer.TOKENS || _type == ANTLRv4Lexer.CHANNELS)
                 && getCurrentRuleType() == Token.INVALID_TYPE) { // enter prequel construct ending with an RBRACE
             setCurrentRuleType(PREQUEL_CONSTRUCT);
+        } else if (_type == ANTLRv4Lexer.OPTIONS && getCurrentRuleType() == ANTLRv4Lexer.TOKEN_REF)
+        {
+            setCurrentRuleType(OPTIONS_CONSTRUCT);
         } else if (_type == ANTLRv4Lexer.RBRACE && getCurrentRuleType() == PREQUEL_CONSTRUCT) { // exit prequel construct
             setCurrentRuleType(Token.INVALID_TYPE);
+        } else if (_type == ANTLRv4Lexer.RBRACE && getCurrentRuleType() == OPTIONS_CONSTRUCT)
+        { // exit options
+            setCurrentRuleType(ANTLRv4Lexer.TOKEN_REF);
         } else if (_type == ANTLRv4Lexer.AT && getCurrentRuleType() == Token.INVALID_TYPE) { // enter action
             setCurrentRuleType(ANTLRv4Lexer.AT);
+        } else if (_type == ANTLRv4Lexer.SEMI && getCurrentRuleType() == OPTIONS_CONSTRUCT)
+        { // ';' in options { .... }. Don't change anything.
         } else if (_type == ANTLRv4Lexer.END_ACTION && getCurrentRuleType() == ANTLRv4Lexer.AT) { // exit action
             setCurrentRuleType(Token.INVALID_TYPE);
         } else if (_type == ANTLRv4Lexer.ID) {

@@ -1,6 +1,6 @@
 /*
 Copyright (c) 2010 The Rust Project Developers
-Copyright (c) 2020-2021 Student Main
+Copyright (c) 2020-2022 Student Main
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
@@ -92,7 +92,35 @@ KW_UNDERLINELIFETIME: '\'_';
 KW_DOLLARCRATE: '$crate';
 
 // rule itself allow any identifier, but keyword has been matched before
-NON_KEYWORD_IDENTIFIER: [a-zA-Z][a-zA-Z0-9_]* | '_' [a-zA-Z0-9_]+;
+NON_KEYWORD_IDENTIFIER: XID_Start XID_Continue* | '_' XID_Continue+;
+
+// [\p{L}\p{Nl}\p{Other_ID_Start}-\p{Pattern_Syntax}-\p{Pattern_White_Space}]
+fragment XID_Start
+   : [\p{L}\p{Nl}]
+   | UNICODE_OIDS
+   ;
+
+// [\p{ID_Start}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Other_ID_Continue}-\p{Pattern_Syntax}-\p{Pattern_White_Space}]
+fragment XID_Continue
+   : XID_Start
+   | [\p{Mn}\p{Mc}\p{Nd}\p{Pc}]
+   | UNICODE_OIDC
+   ;
+
+fragment UNICODE_OIDS
+   : '\u1885'..'\u1886'
+   | '\u2118'
+   | '\u212e'
+   | '\u309b'..'\u309c'
+   ;
+
+fragment UNICODE_OIDC
+   : '\u00b7'
+   | '\u0387'
+   | '\u1369'..'\u1371'
+   | '\u19da'
+   ;
+
 RAW_IDENTIFIER: 'r#' NON_KEYWORD_IDENTIFIER;
 // comments https://doc.rust-lang.org/reference/comments.html
 LINE_COMMENT: ('//' (~[/!] | '//') ~[\r\n]* | '//') -> channel (HIDDEN);
@@ -185,7 +213,7 @@ fragment RAW_STRING_CONTENT: '#' RAW_STRING_CONTENT '#' | '"' .*? '"';
 
 BYTE_LITERAL: 'b\'' (. | QUOTE_ESCAPE | BYTE_ESCAPE) '\'';
 
-BYTE_STRING_LITERAL: 'b"' (. | QUOTE_ESCAPE | BYTE_ESCAPE)*? '"';
+BYTE_STRING_LITERAL: 'b"' (~["] | QUOTE_ESCAPE | BYTE_ESCAPE)* '"';
 
 RAW_BYTE_STRING_LITERAL: 'br' RAW_STRING_CONTENT;
 
@@ -224,11 +252,11 @@ OCT_LITERAL: '0o' '_'* OCT_DIGIT (OCT_DIGIT | '_')*;
 BIN_LITERAL: '0b' '_'* [01] [01_]*;
 
 FLOAT_LITERAL
-   : DEC_LITERAL '.' {this.floatDotPossible()}?
+   : {this.floatLiteralPossible()}? (DEC_LITERAL '.' {this.floatDotPossible()}?
    | DEC_LITERAL
    (
       '.' DEC_LITERAL
-   )? FLOAT_EXPONENT? FLOAT_SUFFIX?
+   )? FLOAT_EXPONENT? FLOAT_SUFFIX?)
    ;
 
 fragment INTEGER_SUFFIX
@@ -255,6 +283,8 @@ fragment OCT_DIGIT: [0-7];
 fragment DEC_DIGIT: [0-9];
 
 fragment HEX_DIGIT: [0-9a-fA-F];
+
+// LIFETIME_TOKEN: '\'' IDENTIFIER_OR_KEYWORD | '\'_';
 
 LIFETIME_OR_LABEL: '\'' NON_KEYWORD_IDENTIFIER;
 

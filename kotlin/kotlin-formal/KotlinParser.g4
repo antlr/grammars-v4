@@ -302,7 +302,7 @@ block
     ;
 
 statements
-    : (statement (semis statement)* semis?)?
+    : (statement ((';' | NL)+ statement)* semis?)?
     ;
 
 statement
@@ -885,7 +885,9 @@ excl
 
 semi
     : (';' | NL) NL* // actually, it's WS or comment between ';', here it's handled in lexer (see ;; token)
-    | EOF;
+    | EOF
+    ;
+
 semis // writing this as "semi+" sends antlr into infinite loop or smth
     : (';' | NL)+
     | EOF

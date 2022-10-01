@@ -35,27 +35,27 @@ import 'dart:convert';
 abstract class Java9LexerBase extends Lexer
 {
     Java9LexerBase(CharStream input) : super(input)
-	{
+    {
     }
 
     bool Check1()
     {
-        return Character.isJavaIdentifierStart(inputStream.LA(-1));
+        return Character.isJavaIdentifierStart(inputStream.LA(-1)!);
     }
 
     bool Check2()
     {
-        return Character.isJavaIdentifierStart(Character.toCodePoint(inputStream.LA(-2), inputStream.LA(-1)));
+        return Character.isJavaIdentifierStart(Character.toCodePoint(inputStream.LA(-2)!, inputStream.LA(-1)!));
     }
 
     bool Check3()
     {
-        return Character.isJavaIdentifierPart(inputStream.LA(-1));
+        return Character.isJavaIdentifierPart(inputStream.LA(-1)!);
     }
 
     bool Check4()
     {
-        return Character.isJavaIdentifierPart(Character.toCodePoint(inputStream.LA(-2), inputStream.LA(-1)));
+        return Character.isJavaIdentifierPart(Character.toCodePoint(inputStream.LA(-2)!, inputStream.LA(-1)!));
     }
 }
 
@@ -89,7 +89,7 @@ class Character
 
     static int toCodePoint(int high, int low)
     {
-		List<int> encoded = List<int>(2);
+		List<int> encoded = List.filled(2, 0, growable: false);
 		encoded.add(high);
 		encoded.add(low);
 		return base64.encode(encoded).codeUnitAt(0);

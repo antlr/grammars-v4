@@ -205,7 +205,7 @@ sourceElement
 statement
  : block
  | variableStatement
- | emptyStatement
+ | emptyStatement_
  | {self._input.LA(1) != ECMAScriptParser.OpenBrace}? expressionStatement
  | ifStatement
  | iterationStatement
@@ -260,7 +260,7 @@ initialiser
 
 /// EmptyStatement :
 ///     ;
-emptyStatement
+emptyStatement_
  : SemiColon
  ;
 

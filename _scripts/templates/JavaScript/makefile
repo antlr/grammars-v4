@@ -1,12 +1,13 @@
-# Generated code from Antlr4BuildTasks.dotnet-antlr v <version>
-# Makefile for Arithmetic.g4
+# Template generated code from trgen <version>
 JAR = <antlr_tool_path>
 CLASSPATH = $(JAR)<if(path_sep_semi)>\;<else>:<endif>.
 .SUFFIXES: .g4 .js
 ANTLRGRAMMARS ?= $(wildcard *.g4)
 GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
 SOURCES = $(GENERATED) index.js
-default: classes
+default: setup classes
+setup:
+	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 classes: $(SOURCES)
 	npm install
 clean:
@@ -18,7 +19,7 @@ clean:
 run:
 	trwdog node index.js $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
-	java -jar $(JAR) -Dlanguage=JavaScript <antlr_tool_args:{y | <y> } > $\<
+	java -jar $(JAR) -encoding <antlr_encoding> -Dlanguage=JavaScript <antlr_tool_args:{y | <y> } > $\<
 } >
 test:
 	bash test.sh

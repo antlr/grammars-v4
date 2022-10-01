@@ -1,17 +1,24 @@
-// Template generated code from Antlr4BuildTasks.dotnet-antlr v <version>
+// Template generated code from trgen <version>
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
+import java.time.Instant;
+import java.time.Duration;
+import java.nio.charset.StandardCharsets;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 public class Program {
+    private static PrintWriter stdout_utf8 = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
     public static void main(String[] args) throws  FileNotFoundException, IOException
     {
         boolean show_tree = false;
         boolean show_tokens = false;
         String file_name = null;
         String input = null;
+        java.nio.charset.Charset charset = null;
         for (int i = 0; i \< args.length; ++i)
         {
             if (args[i].equals("-tokens"))
@@ -28,6 +35,10 @@ public class Program {
                 input = args[++i];
             else if (args[i].equals("-file"))
                 file_name = args[++i];
+            else if (args[i].equals("-encoding"))
+            {
+                charset = java.nio.charset.Charset.forName(args[++i]);
+            }
         }
         CharStream str = null;
         if (input == null && file_name == null)
@@ -38,7 +49,10 @@ public class Program {
             str = CharStreams.fromString(input);
         } else if (file_name != null)
         {
+            if (charset == null)
             str = CharStreams.fromFileName(file_name);
+            else
+                str = CharStreams.fromFileName(file_name, charset);
         }
 <if (case_insensitive_type)>
         str = new CaseChangingCharStream(str, "<case_insensitive_type>" == "Upper");
@@ -64,17 +78,22 @@ public class Program {
         <parser_name> parser = new <parser_name>(tokens);
         ErrorListener lexer_listener = new ErrorListener();
         ErrorListener listener = new ErrorListener();
-        parser.removeParseListeners();
+        parser.removeErrorListeners();
+        lexer.removeErrorListeners();
         parser.addErrorListener(listener);
         lexer.addErrorListener(lexer_listener);
+        Instant start = Instant.now();
         ParseTree tree = parser.<start_symbol>();
+        Instant finish = Instant.now();
+        long timeElapsed = Duration.between(start, finish).toMillis();
+        System.err.println("Time: " + (timeElapsed * 1.0) / 1000.0);
         if (listener.had_error || lexer_listener.had_error)
             System.err.println("Parse failed.");
         else
             System.err.println("Parse succeeded.");
         if (show_tree)
         {
-            System.out.println(tree.toStringTree(parser));
+            stdout_utf8.println(tree.toStringTree(parser));
         }
         java.lang.System.exit(listener.had_error || lexer_listener.had_error ? 1 : 0);
     }

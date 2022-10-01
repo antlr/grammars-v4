@@ -13,6 +13,7 @@ type JavaScriptLexerBase struct {
 	lastToken        antlr.Token
 	useStrictDefault bool
 	useStrictCurrent bool
+	templateDepth    int
 }
 
 func (l *JavaScriptLexerBase) IsStartOfFile() bool {
@@ -100,4 +101,16 @@ func (l *JavaScriptLexerBase) IsRegexPossible() bool {
 	default:
 		return true
 	}
+}
+
+func (l *JavaScriptLexerBase) IncreaseTemplateDepth() {
+	l.templateDepth++
+}
+
+func (l *JavaScriptLexerBase) DecreaseTemplateDepth() {
+	l.templateDepth--
+}
+
+func (l *JavaScriptLexerBase) IsInTemplateString() bool {
+	return l.templateDepth > 0
 }

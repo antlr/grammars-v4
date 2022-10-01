@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar inf;
 
 inf
-   : (section | EOL)*
+   : (section | EOL)* EOF
    ;
 
 section
@@ -74,7 +74,7 @@ COMMENT
 
 
 EOL
-   : [\r\n]
+   : [\r\n]+
    ;
 
 

@@ -23,10 +23,6 @@
 					</includes>
 					<visitor>true</visitor>
 					<listener>true</listener>
-					<arguments>
-					  <argument>-package</argument>
-					  <argument>org.antlr.grammars</argument>
-					</arguments>
 				</configuration>
 				<executions>
 					<execution>
@@ -45,8 +41,7 @@
 					<showTree>false</showTree>
 					<entryPoint>kotlinFile</entryPoint>
 					<grammarName>Kotlin</grammarName>
-					<caseInsensitive>true</caseInsensitive>
-					<packageName>org.antlr.grammars</packageName>
+					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

@@ -1,7 +1,7 @@
 grammar stellaris;
 
 content: 
-   expr+
+   expr+ EOF
    ;
 
 expr: 

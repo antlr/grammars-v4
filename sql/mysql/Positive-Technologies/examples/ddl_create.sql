@@ -71,6 +71,10 @@ create table column_names_as_aggr_funcs(min varchar(100), max varchar(100), sum 
 CREATE TABLE char_table (c1 CHAR VARYING(10), c2 CHARACTER VARYING(10), c3 NCHAR VARYING(10));
 create table rack_shelf_bin ( id int unsigned not null auto_increment unique primary key, bin_volume decimal(20, 4) default (bin_len * bin_width * bin_height));
 CREATE TABLE `tblSRCHjob_desc` (`description_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT, `description` mediumtext NOT NULL, PRIMARY KEY (`description_id`)) ENGINE=TokuDB AUTO_INCREMENT=4095997820 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=TOKUDB_QUICKLZ;
+create table invisible_column_test(id int, col1 int INVISIBLE);
+create table visible_column_test(id int, col1 int VISIBLE);
+create table table_with_buckets(id int(11) auto_increment NOT NULL COMMENT 'ID', buckets int(11) NOT NULL COMMENT '分桶数');
+CREATE TABLE foo (c1 decimal(19), c2 decimal(19.5), c3 decimal(0.0), c4 decimal(0.2), c5 decimal(19,2));
 CREATE TABLE table_items (id INT, purchased DATE)
     PARTITION BY RANGE( YEAR(purchased) )
         SUBPARTITION BY HASH( TO_DAYS(purchased) )
@@ -96,6 +100,104 @@ CREATE TABLE table_items_with_subpartitions (id INT, purchased DATE)
             SUBPARTITION s5
         )
     );
+
+CREATE TABLE positions_rollover (
+    id bigint(20) NOT NULL AUTO_INCREMENT,
+    time datetime NOT NULL,
+    partition_index int(10) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (id,partition_index),
+    KEY time (time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+PARTITION BY LIST (partition_index) (
+    PARTITION positions_rollover_partition VALUES IN (0) ENGINE = InnoDB,
+    PARTITION default_positions_rollover_partition DEFAULT ENGINE = InnoDB
+);
+
+CREATE TABLE `tab_with_json_value` (
+   `col0` JSON NOT NULL,
+   `col1` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
+      JSON_VALUE(`col0`, _utf8mb4'$._field1' RETURNING CHAR(36) CHARACTER SET latin1)
+   ) STORED NOT NULL,
+   `col2` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
+      JSON_VALUE(`col0`, _utf8mb4'$._field1' ERROR ON EMPTY)
+   ) STORED NOT NULL,
+   `col3` VARCHAR(36) COLLATE utf8mb4_bin GENERATED ALWAYS AS (
+      JSON_VALUE(`col0`, _utf8mb4'$._field1' DEFAULT 'xx' ON ERROR)
+   ) STORED NOT NULL,
+   `col4` JSON NOT NULL,
+   PRIMARY KEY (`col1`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = COMPRESSED;
+
+CREATE TABLE CustomerTable (
+    CustomerID varchar(5),
+    CompanyName varchar(40),
+    ContactName varchar(30),
+    Address varchar(60),
+    Phone varchar(24)
+ ) ENGINE = CONNECT TABLE_TYPE = ODBC;
+
+CREATE TABLE CustomerTable (
+    table_type varchar(5)
+);
+
+CREATE TABLE tbl (
+    col1 LONGTEXT,
+    data JSON,
+    INDEX idx1 ((SUBSTRING(col1, 1, 10))),
+    INDEX idx2 ((CAST(JSON_EXTRACT(data, _utf8mb4'$') AS UNSIGNED ARRAY))),
+    INDEX ((CAST(data->>'$.name' AS CHAR(30))))
+);
+
+CREATE TABLE `orders_json_2` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `reward` json DEFAULT NULL,
+  `additional_info` json DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_order_codes` ((cast(json_extract(`additional_info`,_utf8mb4'$.order_codes') as char(17) array)))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE keywords (
+    eur VARCHAR(100),
+    iso VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+    usa VARCHAR(100),
+    jis VARCHAR(100),
+    internal INT,
+    instant BIT
+);
+
+create table if not exists tbl_signed_unsigned(
+  `id` bigint(20) ZEROFILL signed UNSIGNED signed ZEROFILL unsigned ZEROFILL NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  c1 int signed unsigned,
+  c2 decimal(10, 2) SIGNED UNSIGNED ZEROFILL,
+  c3 float SIGNED ZEROFILL,
+  c4 double precision(18, 4) UNSIGNED SIGNED ZEROFILL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `daily_intelligences`(
+`id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '',
+`partner_code` varchar(32) DEFAULT NULL COMMENT '',
+`text` LONGTEXT DEFAULT NULL COMMENT '',
+`monitor_time` TIMESTAMP DEFAULT NULL COMMENT '',
+`gmt_modify` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '',
+`gmt_create` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '',
+PRIMARY KEY (`id`)
+) ENGINE=innodb DEFAULT CHAR SET=utf8 COMMENT '';
+
+CREATE TABLE `auth_realm_clients` (
+`pk_realm` int unsigned NOT NULL DEFAULT '0',
+`fk_realm` int unsigned DEFAULT NULL,
+`client_id` varchar(150) NOT NULL,
+`client_secret` blob NOT NULL,
+PRIMARY KEY (`pk_realm`),
+KEY `auth_realms_auth_realm_clients` (`fk_realm`)
+) START TRANSACTION ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Mariadb default value for function: unix_timestamp()
+CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` bigint(20) NOT NULL DEFAULT unix_timestamp());
+
 #end
 #begin
 -- Rename table
@@ -103,6 +205,7 @@ CREATE TABLE table_items_with_subpartitions (id INT, purchased DATE)
 RENAME TABLE old_table TO tmp_table, new_table TO old_table, tmp_table TO new_table;
 RENAME TABLE table_b TO table_a;
 RENAME TABLE current_db.tbl_name TO other_db.tbl_name;
+rename table debezium_all_types_old to debezium_all_types, test_json_object_old wait 10 to test_json_object;
 #end
 #begin
 -- Truncate table
@@ -110,6 +213,7 @@ truncate table t1;
 truncate parent_table;
 truncate `#`;
 truncate `#!^%$`;
+truncate table tbl_without_pk nowait;
 #end
 #begin
 -- Create database
@@ -121,6 +225,8 @@ create database super default character set utf8 collate = utf8_bin character se
 create database super_cs default charset utf8 collate = utf8_bin character set utf8 collate utf8_bin;
 create database db_with_character_set_eq character set = default;
 create database db_with_character_set character set default;
+create database `ymsun_test1` charset gb18030 collate gb18030_bin;
+create database `test` charset binary collate binary;
 #end
 #begin
 -- Create event 1
@@ -148,6 +254,9 @@ create index index4 on antlr_tokens(token(30) asc) lock default;
 create index index5 on antlr_tokens(token(30) asc) algorithm default;
 create index index6 on antlr_tokens(token(30) asc) algorithm default lock default;
 create index index7 on antlr_tokens(token(30) asc) lock default algorithm default;
+-- Create mariadb index
+CREATE INDEX IF NOT EXISTS DX_DT_LAST_UPDATE ON patient(DT_LAST_UPDATE) WAIT 100 KEY_BLOCK_SIZE=1024M CLUSTERING =YES USING RTREE NOT IGNORED ALGORITHM = NOCOPY LOCK EXCLUSIVE;
+create index index8 on t1(col1) nowait comment 'test index' using btree;
 #end
 #begin
 -- Create logfile group
@@ -214,6 +323,11 @@ BEGIN
         INSERT IGNORE INTO user_platform_badge (platform_badge_id, user_id) VALUES (3, NEW.student_id);
     END IF;
 END
+#end
+#begin
+-- Create trigger 6
+-- delimiter //
+create or replace trigger trg_my1 before delete on test.t1 for each row begin insert into log_table values ("delete row from test.t1"); insert into t4 values (old.col1, old.col1 + 5, old.col1 + 7); end; -- //-- delimiter ;
 #end
 #begin
 -- Create view
@@ -305,6 +419,63 @@ BEGIN
   DECLARE var3 INT unsigned default 2 + var1;
 END -- //-- delimiter ;
 #end
+#begin
+CREATE DEFINER=`system_user`@`%` PROCEDURE `update_order`(IN orderID bigint(11))
+BEGIN  insert into order_config(order_id, attribute, value, performer)
+       SELECT orderID, 'first_attr', 'true', 'AppConfig'
+       WHERE NOT EXISTS (select 1 from inventory.order_config t1 where t1.order_id = orderID and t1.attribute = 'first_attr') OR
+             EXISTS (select 1 from inventory.order_config p2 where p2.order_id = orderID and p2.attribute = 'first_attr' and p2.performer = 'AppConfig')
+       ON DUPLICATE KEY UPDATE value = 'true',
+                            performer = 'AppConfig'; -- Enable second_attr for order
+END
+#end
+#begin
+CREATE DEFINER=`bettingservice`@`stage-us-nj-app%` PROCEDURE `AggregatePlayerFactDaily`()
+BEGIN
+    DECLARE CID_min BIGINT;
+    DECLARE CID_max BIGINT;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    SHOW ERRORS;
+ROLLBACK;
+END;
+
+SELECT LastID+1 INTO CID_min FROM AggregateStatus
+WHERE TableName = 'Combination_Transaction_Player_Fact';
+SELECT Id INTO CID_max FROM Combination_Transaction ORDER BY Id DESC LIMIT 1;
+
+START TRANSACTION;
+UPDATE AggregateStatus SET LastId = CID_max, LastUpdated = CURRENT_TIMESTAMP
+WHERE TableName = 'Combination_Transaction_Player_Fact';
+
+INSERT INTO Combination_Transaction_Player_Fact
+SELECT
+    NULL `Id`,
+    CT.Player_UID,
+    CT.Tx_Type `Type`,
+    DATE(BT.Timestamp) `Date`,
+    SUM(CT.Real_Amount) `Real_Amount`,
+    SUM(CT.Bonus_Amount) `Bonus_Amount`,
+    BT.Currency_UID,
+    COUNT(CT.Id) Tx_Count,
+    SUM(IF(CT.Real_Amount>0,1,0)) `Real_Count`,
+    SUM(IF(CT.Bonus_Amount>0,1,0)) `Bonus_Count`
+FROM Combination_Transaction CT
+    LEFT JOIN Betting_Transaction BT ON CT.Betting_Tx_ID = BT.ID
+WHERE CT.Id BETWEEN CID_min
+  AND CID_max
+GROUP BY CT.Player_UID, CT.Tx_Type, DATE(BT.Timestamp)
+ON DUPLICATE KEY UPDATE
+                     Currency_UID = VALUES(Currency_UID),
+                     Tx_Count     = Tx_Count + VALUES(Tx_Count),
+                     Real_Amount  = Real_Amount + VALUES(Real_Amount),
+                     Bonus_Amount = Bonus_Amount + VALUES(Bonus_Amount),
+                     Real_Count   = Real_Count + VALUES(Real_Count),
+                     Bonus_Count  = Bonus_Count + VALUES(Bonus_Count);
+COMMIT;
+END
+#end
 -- Create procedure
 -- delimiter //
 CREATE PROCEDURE makesignal(p1 INT)
@@ -314,4 +485,75 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_text;
   END IF;
 END -- //-- delimiter ;
+#end
+#begin
+-- delimiter //
+CREATE PROCEDURE set_unique_check()
+BEGIN
+    SET unique_checks=on;
+END; -- //-- delimiter ;
+#end
+#begin
+-- Create Role
+create role 'RL_COMPLIANCE_NSA';
+create role if not exists 'RL_COMPLIANCE_NSA';
+CREATE ROLE 'admin', 'developer';
+CREATE ROLE 'webapp'@'localhost';
+#end
+#begin
+CREATE VIEW view_with_cte1 AS
+WITH cte1 AS
+(
+    SELECT column_1 AS a, column_2 AS b
+    FROM table1
+)
+SELECT a, b FROM cte1;
+#end
+#begin
+CREATE VIEW view_with_cte2 AS
+WITH cte1 (col1, col2) AS
+(
+  SELECT 1, 2
+  UNION ALL
+  SELECT 3, 4
+),
+cte2 (col1, col2) AS
+(
+  SELECT 5, 6
+  UNION ALL
+  SELECT 7, 8
+)
+SELECT col1, col2 FROM cte;
+#end
+#begin
+CREATE VIEW view_with_cte3 AS
+WITH cte (col1, col2) AS
+(
+  SELECT 1, 2
+  UNION ALL
+  SELECT 3, 4
+)
+SELECT col1, col2 FROM cte;
+#end
+#begin
+CREATE VIEW view_with_cte4 AS
+WITH RECURSIVE cte (n) AS
+(
+  SELECT 1
+  UNION ALL
+  SELECT n + 1 FROM cte WHERE n < 5
+)
+SELECT * FROM cte;
+#end
+
+#begin
+lock tables t1 read nowait;
+lock table t1 read local wait 100;
+#end
+
+-- Create sequence
+#begin
+CREATE SEQUENCE if NOT EXISTS workdb.s2 START=1 CYCLE MINVALUE=10000 MAXVALUE=999999999999;
+CREATE OR REPLACE SEQUENCE if NOT EXISTS s2 START=100 CACHE 1000;
+CREATE SEQUENCE `seq_8b4d1cdf-377e-4021-aef3-f7c9846903fc` INCREMENT BY 1 START WITH 1;
 #end

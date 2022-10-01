@@ -10,7 +10,7 @@
 grammar Pddl;
 
 /************* Start of grammar *******************/ pddlDoc
-   : domain | problem
+   : ( domain | problem ) EOF
    ;
 
 /************* DOMAINS ****************************/ domain
