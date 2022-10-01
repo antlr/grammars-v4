@@ -16,6 +16,7 @@
 		<module>mysql</module>
 		<module>plsql</module>
 		<module>sqlite</module>
+        <module>trino</module>
 		<module>tsql</module>
 		<module>postgresql</module>
 	</modules>

@@ -1,0 +1,1 @@
+MATCH (s:Store) WHERE s.storeFormat = 'Open' RETURN DISTINCT s.storeFormat ORDER BY s.storeFormat DESCENDING LIMIT 5

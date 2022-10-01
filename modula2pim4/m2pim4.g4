@@ -363,8 +363,7 @@ programModule
    ;
 
 compilationUnit
-   : definitionModule
-   | IMPLEMENTATION? programModule
+   : ( definitionModule | IMPLEMENTATION? programModule ) EOF
    ;
 
 

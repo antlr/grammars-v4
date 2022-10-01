@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar guitartab;
 
 tab
-   : string+
+   : string+ EOF
    ;
 
 string
