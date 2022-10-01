@@ -70,11 +70,11 @@ body
 
 literal
    : predicate_sym '(' ')'
-   | predicate_sym '(' terms ')'
+   | predicate_sym '(' terms_ ')'
    | predicate_sym
-   | term '=' term
-   | term '!=' term
-   | VARIABLE ':-' external_sym '(' terms ')'
+   | term_ '=' term_
+   | term_ '!=' term_
+   | VARIABLE ':-' external_sym '(' terms_ ')'
    ;
 
 predicate_sym
@@ -82,12 +82,12 @@ predicate_sym
    | STRING
    ;
 
-terms
-   : term
-   | term ',' terms
+terms_
+   : term_
+   | term_ ',' terms_
    ;
 
-term
+term_
    : VARIABLE
    | constant
    ;
