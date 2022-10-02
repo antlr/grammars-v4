@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar acme;
 
 acmeCompUnit
-   : (acmeImportDeclaration)* (acmeSystemDeclaration | acmeFamilyDeclaration | acmeDesignDeclaration)+
+   : (acmeImportDeclaration)* (acmeSystemDeclaration | acmeFamilyDeclaration | acmeDesignDeclaration)+ EOF
    ;
 
 acmeImportDeclaration

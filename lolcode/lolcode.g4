@@ -32,7 +32,7 @@ Adapted from https://github.com/jynnantonix/lolcode/blob/master/BNFGrammar.txt
 grammar lolcode;
 
 program
-   : 'HAI' code_block 'KTHXBYE'?
+   : 'HAI' code_block 'KTHXBYE'? EOF
    ;
 
 code_block

@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar tiny;
 
 program
-   : 'BEGIN' stmt_list 'END'
+   : 'BEGIN' stmt_list 'END' EOF
    ;
 
 stmt_list
