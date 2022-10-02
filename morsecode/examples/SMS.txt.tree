@@ -1,1 +1,1 @@
-(morsecode (letter (s . . .))   (letter (m - -))   (letter (s . . .)))
+(morsecode (letter (s . . .))   (letter (m - -))   (letter (s . . .)) <EOF>)

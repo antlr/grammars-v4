@@ -19,12 +19,11 @@
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>${antlr.version}</version>
                 <configuration>
-                    <outputDirectory>${project.build.directory}/generated-sources/antlr4/cz/bedla/antlr/swiftfin
-                    </outputDirectory>
-                    <arguments>
-                        <argument>-package</argument>
-                        <argument>cz.bedla.antlr.swiftfin</argument>
-                    </arguments>
+		   <sourceDirectory>${basedir}</sourceDirectory>
+		   <includes>
+		      <include>SwiftFinLexer.g4</include>
+		      <include>SwiftFinParser.g4</include>
+		   </includes>
                     <visitor>true</visitor>
                     <listener>true</listener>
                 </configuration>
@@ -45,7 +44,6 @@
                     <showTree>false</showTree>
                     <entryPoint>messages</entryPoint>
                     <grammarName>SwiftFin</grammarName>
-                    <packageName>cz.bedla.antlr.swiftfin</packageName>
                     <exampleFiles>examples/</exampleFiles>
                 </configuration>
                 <executions>

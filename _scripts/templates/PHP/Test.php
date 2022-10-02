@@ -86,10 +86,12 @@ if ($show_tokens) {
 	$lexer->reset();
 }
 $lexerErrorListener = new MyErrorListener();
+$lexer->removeErrorListeners();
 $lexer->addErrorListener($lexerErrorListener);
 $tokens = new CommonTokenStream($lexer);
 $parser = new <parser_name>($tokens);
 $parserErrorListener = new MyErrorListener();
+$parser->removeErrorListeners();
 $parser->addErrorListener($parserErrorListener);
 $tree = $parser-><start_symbol>();
 if ($show_tree) {

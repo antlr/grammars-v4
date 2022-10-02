@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar scotty;
 
 prog
-   : program_lines
+   : program_lines EOF
    ;
 
 program_lines

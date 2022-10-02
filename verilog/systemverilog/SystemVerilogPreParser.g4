@@ -24,7 +24,9 @@ SOFTWARE.
 
 parser grammar SystemVerilogPreParser;
 
-options { tokenVocab=SystemVerilogLexer; }
+options {
+	tokenVocab = SystemVerilogLexer;
+}
 
 source_text
 	: compiler_directive*
@@ -81,4 +83,4 @@ ifdef_group_of_lines : ( SOURCE_TEXT | compiler_directive )* ;
 ifndef_group_of_lines : ( SOURCE_TEXT | compiler_directive )* ;
 elsif_group_of_lines : ( SOURCE_TEXT | compiler_directive )* ;
 else_group_of_lines : ( SOURCE_TEXT | compiler_directive )* ;
-macro_text : MACRO_TEXT* ;
+macro_text : ( MACRO_TEXT | MACRO_ESC_NEWLINE )* ;

@@ -1,8 +1,9 @@
-_grammar-test
 apex
 asn/asn_3gpp
 cql3
 csharp
+dart2
+databank
 fortran77
 gdscript
 golang
@@ -23,6 +24,7 @@ p
 pgn
 php
 powerbuilder
+python/python
 python/python2
 python/python3
 python/python3-py
@@ -40,7 +42,6 @@ sql/plsql
 sql/postgresql
 sql/tsql
 stringtemplate
-swift-fin
 swift/swift2
 swift/swift3
 swift/swift5

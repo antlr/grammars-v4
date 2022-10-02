@@ -1,6 +1,7 @@
 // Template generated code from trgen <version>
 
 #include \<iostream>
+#include \<iomanip>
 #include \<string>
 #include \<chrono>
 #include \<atomic>
@@ -83,6 +84,8 @@ int TryParse(std::vector\<std::string>& args)
     auto * parser = new <parser_name>(tokens);
     auto listener_lexer = new ErrorListener();
     auto listener_parser = new ErrorListener();
+    lexer->removeErrorListeners();
+    parser->removeErrorListeners();
     lexer->addErrorListener(listener_lexer);
     parser->addErrorListener(listener_parser);
     auto before = std::chrono::steady_clock::now();
@@ -99,10 +102,10 @@ int TryParse(std::vector\<std::string>& args)
     }
     if (show_tree)
     {
-//        System.Console.Error.WriteLine(tree.ToStringTree(parser));
+        std::cout \<\< tree->toStringTree(parser, false) \<\< std::endl;
     }
     std::cerr \<\< "Time: " \<\< formatDuration(duration.count()) \<\< std::endl;
-    return 0;
+    return listener_parser->had_error || listener_lexer->had_error ? 1 : 0;
 }
 
 int main(int argc, const char * argv[])
@@ -112,6 +115,6 @@ int main(int argc, const char * argv[])
     {
         args.push_back(argv[i]);
     }   
-    TryParse(args);
+    return TryParse(args);
 }
 

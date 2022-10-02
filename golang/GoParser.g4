@@ -79,7 +79,7 @@ varSpec:
 
 block: L_CURLY statementList? R_CURLY;
 
-statementList: (eos? statement eos)+;
+statementList: ((SEMI? | EOS? | {this.closingBracket()}?) statement eos)+;
 
 statement:
 	declaration
@@ -186,7 +186,7 @@ commCase: CASE (sendStmt | recvStmt) | DEFAULT;
 
 recvStmt: (expressionList ASSIGN | identifierList DECLARE_ASSIGN)? recvExpr = expression;
 
-forStmt: FOR (expression | forClause | rangeClause)? block;
+forStmt: FOR (expression? | forClause | rangeClause?) block;
 
 forClause:
 	initStmt = simpleStmt? eos expression? eos postStmt = simpleStmt?;
@@ -376,5 +376,5 @@ eos:
 	SEMI
 	| EOF
 	| EOS
-	| {closingBracket()}?
+	| {this.closingBracket()}?
 	;

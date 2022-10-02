@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar gff3;
 
 document
-   : HEADER line+
+   : HEADER line+ EOF
    ; 
 
 line

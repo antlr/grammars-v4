@@ -33,22 +33,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar asm6502;
 
 prog
-   : (line? EOL) +
+   : line* EOF
    ;
 
 line
-   : comment
-   | instruction
-   | assemblerinstruction
-   | lbl
+   : (instruction | assemblerinstruction | lbl)? EOL
    ;
 
 instruction
-   : label? opcode argumentlist? comment?
+   : label? opcode argumentlist?
    ;
 
 assemblerinstruction
-   : argument? assembleropcode argumentlist? comment?
+   : argument? assembleropcode argumentlist?
    ;
 
 assembleropcode
@@ -86,10 +83,6 @@ name
 
 number
    : NUMBER
-   ;
-
-comment
-   : COMMENT
    ;
 
 opcode
