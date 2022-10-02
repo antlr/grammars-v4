@@ -117,6 +117,7 @@
 				<module>cypher</module>
 				<module>dart2</module>
 				<module>databank</module>
+				<module>datalog</module>				
 				<module>dcm</module>
 				<module>dgol</module>
 				<module>dice</module>
