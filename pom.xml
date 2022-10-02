@@ -215,6 +215,7 @@
 				<module>p</module>
 				<module>parkingsign</module>
 				<module>pascal</module>
+                <module>pbm</module>
 				<module>pcre</module>
 				<module>pddl</module>
 				<module>pdn</module>
