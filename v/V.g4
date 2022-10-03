@@ -164,7 +164,7 @@ grammar V;
 
 //SourceFile       = ModuleClause ";" { ImportDecl ";" } { TopLevelDecl ";" } .
 sourceFile
-    : (moduleClause eos)? ( importDecl eos )* ( topLevelDecl eos )*
+    : (moduleClause eos)? ( importDecl eos )* ( topLevelDecl eos )* EOF
     ;
 
 /*
@@ -668,7 +668,7 @@ literalValue
     ;
 
 elementList
-    : keyedElement (eos keyedElement)*
+    : keyedElement (({lineTerminatorAhead()}? | {_input.LT(1).getText().equals("}") }?) keyedElement)*
     ;
 
 keyedElement

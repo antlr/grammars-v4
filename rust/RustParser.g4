@@ -1,6 +1,6 @@
 /*
 Copyright (c) 2010 The Rust Project Developers
-Copyright (c) 2020-2021 Student Main
+Copyright (c) 2020-2022 Student Main
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
@@ -383,7 +383,7 @@ statement
    ;
 
 letStatement
-   : outerAttribute* 'let' pattern (':' type_)? ('=' expression)? ';'
+   : outerAttribute* 'let' patternNoTopAlt (':' type_)? ('=' expression)? ';'
    ;
 
 expressionStatement
@@ -603,7 +603,7 @@ predicateLoopExpression
    : 'while' expression /*except structExpression*/ blockExpression
    ;
 predicatePatternLoopExpression
-   : 'while' 'let' matchArmPatterns '=' expression blockExpression
+   : 'while' 'let' pattern '=' expression blockExpression
    ;
 iteratorLoopExpression
    : 'for' pattern 'in' expression blockExpression
@@ -620,7 +620,7 @@ ifExpression
    )?
    ;
 ifLetExpression
-   : 'if' 'let' matchArmPatterns '=' expression blockExpression
+   : 'if' 'let' pattern '=' expression blockExpression
    (
       'else' (blockExpression | ifExpression | ifLetExpression)
    )?
@@ -638,17 +638,19 @@ matchArmExpression
    | expressionWithBlock ','?
    ;
 matchArm
-   : outerAttribute* matchArmPatterns matchArmGuard?
+   : outerAttribute* pattern matchArmGuard?
    ;
-matchArmPatterns
-   : '|'? pattern ('|' pattern)*
-   ;
+
 matchArmGuard
    : 'if' expression
    ;
 
 // 9
 pattern
+   : '|'? patternNoTopAlt ('|' patternNoTopAlt)*
+   ;
+
+patternNoTopAlt
    : patternWithoutRange
    | rangePattern
    ;
@@ -657,7 +659,6 @@ patternWithoutRange
    | identifierPattern
    | wildcardPattern
    | restPattern
-   | obsoleteRangePattern
    | referencePattern
    | structPattern
    | tupleStructPattern
@@ -691,18 +692,16 @@ restPattern
    : '..'
    ;
 rangePattern
-   : rangePatternBound '..=' rangePatternBound
-   ;
-obsoleteRangePattern
-   : rangePatternBound '...' rangePatternBound
+   : rangePatternBound '..=' rangePatternBound  # InclusiveRangePattern
+   | rangePatternBound '..'                     # HalfOpenRangePattern
+   | rangePatternBound '...' rangePatternBound  # ObsoleteRangePattern
    ;
 rangePatternBound
    : CHAR_LITERAL
    | BYTE_LITERAL
    | '-'? INTEGER_LITERAL
    | '-'? FLOAT_LITERAL
-   | pathInExpression
-   | qualifiedPathInExpression
+   | pathPattern
    ;
 referencePattern
    : ('&' | '&&') 'mut'? patternWithoutRange

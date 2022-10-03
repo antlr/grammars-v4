@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar ply;
 
 ply
-   : header vertices? faces?
+   : header vertices? faces? EOF
    ;
 
 header

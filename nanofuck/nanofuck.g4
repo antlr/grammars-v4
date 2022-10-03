@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 grammar nanofuck;
 
+file_ : exp EOF ;
+
 exp
    : '*'
    | '{' exp? '}'

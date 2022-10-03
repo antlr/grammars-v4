@@ -31,7 +31,7 @@ grammar Upnp;
  * Parser Rules
  */
  
-searchCrit : searchExp | ASTERISK ;
+searchCrit : (searchExp | ASTERISK) EOF;
 searchExp : relExp | searchExp WCHAR+ LOGOP WCHAR+ searchExp | '(' WCHAR* searchExp WCHAR* ')'  ;
 relExp : PROPERTY WCHAR+ BINOP WCHAR+ quotedVal | PROPERTY WCHAR+ EXISTSOP WCHAR+ BOOLVAL ;
 quotedVal : DQUOTE escapedQuote DQUOTE ;
