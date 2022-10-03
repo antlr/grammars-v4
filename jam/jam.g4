@@ -48,7 +48,7 @@ chord
    ;
 
 chordquality
-   : ('m' | 'maj' | 'min' | 'dim' | 'aug')? NUM? (('-' | '+') NUM)?
+   : ('m' | 'M' | 'P' | 'd' | 'maj' | 'min' | 'dim' | 'aug')? NUM? (('-' | '+') NUM)?
    ;
 
 repeatchord
