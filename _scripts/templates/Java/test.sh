@@ -54,19 +54,6 @@ do
         fi
       fi
     fi
-    if [ -f "$file".tree ]
-    then
-      diff \<(tr -d "\r\n" \< "$file".tree) \<(tr -d "\r\n" \< "$tree_file")
-	  status="$?"
-      if [ "$status" = "0" ]
-      then
-        echo Parse tree match succeeded.
-      else
-        echo Expected parse tree match.
-        err=1
-        break
-      fi
-    fi
   fi
 done
 rm "$parse_out_file"
