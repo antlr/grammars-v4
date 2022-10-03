@@ -1,0 +1,8 @@
+GRANT role1 TO user1;
+GRANT role1, role2, role3 TO user1, USER user2, ROLE role4 WITH ADMIN OPTION;
+GRANT role1 TO user1 WITH ADMIN OPTION GRANTED BY admin;
+GRANT role1 TO USER user1 WITH ADMIN OPTION GRANTED BY USER admin;
+GRANT role1 TO ROLE role2 WITH ADMIN OPTION GRANTED BY ROLE admin;
+GRANT role1 TO ROLE role2 GRANTED BY ROLE admin;
+GRANT "role1" TO ROLE "role2" GRANTED BY ROLE "admin";
+GRANT role1 TO user1 IN my_catalog;

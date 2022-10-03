@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar useragent;
 
 prog
-   : (product comment?) +
+   : (product comment?) + EOF
    ;
 
 product

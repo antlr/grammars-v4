@@ -1,5 +1,9 @@
 parser grammar RexxParser;
-options { tokenVocab=RexxLexer; }
+
+options {
+    superClass=RexxParserBase;
+    tokenVocab=RexxLexer;
+}
 
 file_                        :   program_ EOF ;
 
@@ -226,7 +230,16 @@ comparison                  :   concatenation ( comparison_operator concatenatio
                             |   CMPS_NM
                             |   CMPS_NL
                             ;
-concatenation               :   addition ( CONCAT? addition )* ;
+concatenation               :   addition (concatenation_op addition)* ;
+ concatenation_op           :   { $parser.is_prev_token_whitespace() }? blank_concatenation_op // If previous token is whitespace, this is blank-concatenation.
+                            |   normal_concatenation_op
+                            ;
+  normal_concatenation_op   :   { $parser.is_prev_token_not_whitespace() }? // If previous token is not whitespace, this is abuttal-concatenation.
+                                // Note: no token or rule to match here, just the predicate.
+                            |   CONCAT
+                            ;
+  blank_concatenation_op    :   ; // Note: no token or rule to match here, just the predicate.
+
 addition                    :   multiplication ( additive_operator multiplication )* ;
   additive_operator         :   PLUS
                             |   MINUS
@@ -242,8 +255,13 @@ power_expression            :   prefix_expression ( POW prefix_expression )* ;
     term                    :   function_
                             |   BR_O expression  BR_C
                             |   symbol
-                            |   STRING
+                            |   binary_string
+                            |   hex_string
+                            |   string
                             ;
+      binary_string         :   BINARY_STRING ;
+      hex_string            :   HEX_STRING ;
+      string                :   STRING ;
       function_             :   function_name function_parameters ;
         function_name       :   KWD_ADDRESS
                             |   KWD_ARG

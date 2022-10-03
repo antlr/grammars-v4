@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar pl0;
 
 program
-   : block '.'
+   : block '.' EOF
    ;
 
 block

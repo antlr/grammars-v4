@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar propcalc;
 
 proposition
-   : expression THEREFORE expression
+   : expression THEREFORE expression EOF
    ;
 
 expression

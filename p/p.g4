@@ -29,7 +29,7 @@
 grammar p;
 
 prog
-   : symbol+
+   : symbol+ EOF
    ;
 
 symbol

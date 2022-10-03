@@ -32,7 +32,7 @@
 grammar creole;
 
 document
-   : (line? CR)*
+   : (line? CR)* EOF
    ;
 
 line

@@ -1,0 +1,229 @@
+// Variables
+//
+// Variables should follow the `$component-state-property-size` formula for
+// consistent naming. Ex: $nav-link-disabled-color and $modal-content-box-shadow-xs.
+
+// Color system
+
+// scss-docs-start gray-color-variables
+
+@keyframes spinner-grow {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+body {}
+#id1 {}
+
+// ID after block
+:focus {
+  outline: none;
+}
+#container {
+  top: 0;
+}
+
+// Block with no spicing
+#id1{}
+
+// Class
+.cls {}
+body .cls {}
+
+// Different selectors
+body .cls, h1 {}
+
+// Multiple selectors with the same element
+body .cls, h1.cls1 {}
+
+// Multiple selectors mix
+.cls1 .cls2, .cls3, .cls4 > .cls5 {}
+
+// Nesting with combinator at start of line
+p {
+  > p {}
+}
+
+// Simple property
+h1 {
+  display: block;
+}
+
+// Space separated
+h1 {border: 2px solid black;}
+
+// Comma separated
+h1 {font-family:  Arial, 'Roboto', sans-serif;}
+
+// Mixed separators
+h1 {
+  background: url('a'), 1px 2px;
+}
+
+// Multi line property
+h1 {
+  color: 1px;
+  font-size: #fff;
+}
+
+h1 { p1: 1; } // Measurement
+h1 { p1: 1px; } // Measurement and unit
+h1 { p1: #fff; }  // Short color
+h1 { p1: #ababab; } // Long color
+h1 { p1: solid; } // Property identifier
+h1 { p1: url("hello"); } // Property ULR string
+h1 { p1: url(hello); } // Property URL
+h1 { p1: "hello"; } // Property string
+h1 { p1: mat.$hello; } // Namespaced variable
+h1 { p1: calc(100% / 3); } // Property function math
+h1 { p1: calc(100% - 80px); } // Property function math with subtraction
+h1 { p1: calc(100% - $var); } // Property function math with variable
+h1 { p1: calc(((100%))); } // Property function math pattern
+h1 { p1: -$my-var; } // Property with negative math value
+h1 { p1: +(400px - 200px); } // Property with plus prefix
+
+p.#{$name} > select2 {} // Interpolation
+p #{$name} {}
+:host(.fullscreen) {} // Pseudo class with class parameter
+button:not([disabled]) {} // Pseudo class with attribute parameter
+button:nth-child(4) {} // Pseudo class with number parameter
+input[type=number] {} // Attribute selector
+[disabled] {}
+h1:hover { color: blue; } // Pseudo class at end of selector
+
+// After is a pseudo-element and hover is a pseduo-class.
+// After is supported with 1 or 2 colons.
+h1:after:hover, h2:hover::after { color: blue; }
+
+// Pseudo element
+::placeholder { color: blue; }
+
+// Variable declaration
+$black: #000 !default;
+$white: #fff;
+
+// Important
+p {
+  color: blue;
+  background-color: red !important;
+}
+
+// Important with block property
+h {
+  margin: 5px !important {
+    top: 2px;
+    bottom: 2px !important;
+  }
+}
+
+// Nested property declaration
+.enlarge {
+  font-size: 14px;
+  transition: {
+    property: font-size;
+    duration: 4s;
+    delay: 2s;
+  }
+
+  &:hover { font-size: 36px; }
+
+  a:hover & {
+    display: block;
+  }
+}
+
+// Nested property declaration with shortstand value
+.info-page {
+  margin: auto {
+    bottom: 10px;
+    top: 2px;
+  }
+}
+
+// Nested property declaration with mixin
+@mixin my-margin {
+  bottom: 10px;
+  top: 2px;
+}
+.info-page {
+  margin: {
+    @include my-margin;
+  }
+}
+
+h1 {
+    // Keyword as an identifier
+    background-image: linear-gradient(
+      to bottom right,
+      rgba(200, 200, 200, 0.3) 0%,
+      rgba(200, 200, 200, 0.5) 50%,
+      rgba(200, 200, 200, 0.7) 100%
+    );
+}
+
+// CSS variable property value
+#container {
+  background-color: var(--app-background-color);
+}
+
+// Font face declaration
+@font-face {
+  font-family: 'Google Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(http://some-uri.com)
+    format('woff2')
+}
+
+// Keyframes declaration
+@keyframes spin {
+  transform: rotate(0deg);
+  transform: rotate(10deg);
+}
+
+@import "mixins/banner";
+@include bsBanner("");
+
+@use 'path/to/source'
+@require 'path/to/source'
+
+//$title-font: normal 24px/1.5 'Open Sans', sans-serif;
+$cool-red: #F44336;
+$box-shadow-bottom-only: 0 2px 1px 0 rgba(0, 0, 0, 0.2);
+
+@require 'path/to/source'
+
+h1.title {
+  font: $title-font;
+  color: $cool-red;
+}
+
+div.container {
+  color: $cool-red;
+  background: #fff;
+  width: 100%;
+  box-shadow: $box-shadow-bottom-only;
+  background-color: var(--app-background-color);
+}
+
+#form {
+  cursor: pointer;
+}
+
+@keyframes spin {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+}
+
+@font-face {
+    font-family: 'Google Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(http://some-uri.com)
+        format('woff2')
+}

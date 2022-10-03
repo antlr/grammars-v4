@@ -1,0 +1,1 @@
+rate(http_requests_total[5m])[30m:1m]

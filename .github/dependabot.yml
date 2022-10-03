@@ -4,7 +4,65 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:java"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+  # script based multiple runtime test
+  # antlr4cs test is not supported by this repo
+  # cpp cmake is not supported by bot
+  # csharp
+  - package-ecosystem: "nuget"
+    directory: "/_scripts/templates/CSharp"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:csharp-standard"
+  # dart is not supported by bot
+  # go
+  # TODO: go runtime need tagged version, may need another repository
+  # - package-ecosystem: "gomod"
+  #   directory: "/_scripts/templates/Go"
+  #   schedule:
+  #     interval: "daily"
+  #   labels:
+  #     - "infrastructure"
+  #     - "dependencies"
+  #     - "target:go"
+  # java support is unnecessary, it's runtime is in antlr4.jar itself
+  # javascript
+  - package-ecosystem: "npm"
+    directory: "/_scripts/templates/JavaScript"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:javascript"
+  # php
+  - package-ecosystem: "composer"
+    directory: "/_scripts/templates/PHP"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:php"
+  # python3
+  - package-ecosystem: "pip"
+    directory: "/_scripts/templates/Python3"
+    schedule:
+      interval: "daily"
+    labels:
+      - "infrastructure"
+      - "dependencies"
+      - "target:python3"
