@@ -19,7 +19,7 @@ function getChar() {
 class MyErrorListener extends antlr4.error.ErrorListener {
     syntaxError(recognizer, offendingSymbol, line, column, msg, err) {
         num_errors++;
-        console.error(`"line ${line}:${column} ${msg}`);
+        console.log(`line ${line}:${column} ${msg}`);
     }
 }
 
