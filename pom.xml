@@ -117,6 +117,7 @@
 				<module>cypher</module>
 				<module>dart2</module>
 				<module>databank</module>
+				<module>datalog</module>				
 				<module>dcm</module>
 				<module>dgol</module>
 				<module>dice</module>
@@ -160,6 +161,7 @@
 				<module>iso8601</module>
 				<module>istc</module>
 				<module>itn</module>
+                <module>jam</module>
 				<module>janus</module>
 				<module>java</module>
 				<module>javadoc</module>
@@ -214,6 +216,7 @@
 				<module>p</module>
 				<module>parkingsign</module>
 				<module>pascal</module>
+                <module>pbm</module>
 				<module>pcre</module>
 				<module>pddl</module>
 				<module>pdn</module>
