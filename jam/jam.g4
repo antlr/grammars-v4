@@ -29,19 +29,85 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar jam;
 
-jam : section* EOF;
+jam
+   : section* EOF
+   ;
 
-section: CHORD (CHORD | '/') '|'?;
+section
+   : measure ('|' measure)*
+   ;
 
-CHORD: [A-G] ('M' |'m')? '7' ('+' '7');
+measure
+   : meter? (chord | repeatchord | rest | extendchord | repeatmeasure)+
+   ;
+
+chord
+   : note (notetype bass?)
+   ;
+
+notetype
+   : 'm'? NUM? (('-' | '+') NUM)?
+   ;
+
+repeatchord
+   : SLASH
+   ;
+
+extendchord
+   : EQ
+   ;
+
+repeatmeasure
+   : PCT
+   ;
+
+rest
+   : REST
+   ;
+
+bass
+   : SLASH KEY
+   ;
+
+note
+   : KEY ('b' | '#')?
+   ;
+
+meter
+   : '[' NUM '/' NUM ']'
+   ;
+
+KEY
+   : [A-G]
+   ;
+
+REST
+   : '-'
+   ;
+
+SLASH
+   : '/'
+   ;
+
+EQ
+   : '='
+   ;
+
+PCT
+   : '%'
+   ;
+
+NUM
+   : [0-9]+
+   ;
 
 COMMENT
-   : '#' ~ [\n\r] -> skip
+   : '#' ~ [\n\r]+ -> skip
    ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \r\n\t]+ -> skip
    ;
+
