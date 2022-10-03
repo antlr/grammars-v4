@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar callable_;
 
 program
-   : line (EOL+ line)*
+   : line (EOL+ line)* EOF
    ;
 
 line

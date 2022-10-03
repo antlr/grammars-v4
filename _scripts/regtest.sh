@@ -18,6 +18,9 @@
 # List<string> do_not_do_list = ...;
 # idl iri molecule rfc1035 rfc1960 tcpheader unicode/graphemes abb 
 
+# Get full path of this script.
+full_path_script=$(realpath $0)
+full_path_templates=$(dirname $full_path_script)/templates
 target="$1"
 if [[ "$1" == "" ]]
 then
@@ -31,11 +34,18 @@ case "$target" in
     Java) do_not_do_list=`cat _scripts/skip-java.txt` ;;
     JavaScript) do_not_do_list=`cat _scripts/skip-javascript.txt` ;;
     Python3) do_not_do_list=`cat _scripts/skip-python3.txt` ;;
+    PHP) do_not_do_list=`cat _scripts/skip-php.txt` ;;
     *) echo "Unknown target"; exit 1;;
 esac
-todo_pattern="^(?!.*(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'`)/\$)"
-echo $todo_pattern
-do_not_do_list=`echo $do_not_do_list | sed 's/^ //g' | sed 's/  / /g' | sed 's/ /,/g'`
+invert="$2"
+if [[ "$invert" == "" ]]
+then
+    skip_pattern="^(.*/(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g' | sed 's/-/\\-/g'`))/\$"
+    echo Skip list pattern = $skip_pattern
+else
+    todo_pattern="^(.*/(`echo $do_not_do_list | sed 's/\n/ /g' | sed 's/\r/ /g' | sed 's/  / /g' | sed 's/ $//g' | sed 's/ /|/g'| sed 's/-/\\-/g'`))/\$"
+    echo To do list pattern = $todo_pattern
+fi
 
 # Sanity checks for required environment.
 unameOut="$(uname -s)"
@@ -149,19 +159,40 @@ test()
 
 # Main
 # 0) Set up.
+setupdeps()
+{
+    date
+    trgen --version
+    if [ $? != "0" ]
+    then
+        echo "Setting up trgen and antlr jar."
+        dotnet tool install -g trgen --version 0.16.3
+        dotnet tool install -g trxml2 --version 0.16.3
+        dotnet tool install -g trwdog --version 0.16.3
+	case "${unameOut}" in
+		Linux*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
+		Darwin*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
+		CYGWIN*)    curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
+		MINGW*)     curl 'https://repo1.maven.org/maven2/org/antlr/antlr4/4.11.1/antlr4-4.11.1-complete.jar' -o /tmp/antlr4-4.11.1-complete.jar;;
+		*)          echo 'unknown machine'
+	esac
+        echo "Done setting up."
+        date
+    fi
+}
+
 part1()
 {
     date
-    dotnet tool uninstall -g trgen
-    dotnet tool install -g trgen --version 0.7.0
-    dotnet tool uninstall -g trxml2
-    dotnet tool install -g trxml2 --version 0.7.0
-    dotnet tool uninstall -g trwdog
-    dotnet tool install -g trwdog --version 0.7.0
     # 1) Generate driver source code from poms.
     rm -rf `find . -name Generated -type d`
     echo "Generating drivers."
-    bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory _scripts/templates/ --antlr-tool-path /tmp/antlr-4.9.2-complete.jar`
+    if [[ "$invert" == "" ]]
+    then
+        bad=`trgen --skip-pattern "$skip_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr4-4.11.1-complete.jar`
+    else
+        bad=`trgen --todo-pattern "$todo_pattern" -t "$target" --template-sources-directory "$full_path_templates" --antlr-tool-path /tmp/antlr4-4.11.1-complete.jar`
+    fi
     for i in $bad; do failed=`add "$failed" "$i"`; done
     date
 }
@@ -214,6 +245,7 @@ part3()
     date
 }
 
+setupdeps
 part1
 part2
 part3

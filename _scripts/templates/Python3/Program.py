@@ -1,4 +1,4 @@
-# Template generated code from Antlr4BuildTasks.dotnet-antlr v 2.2
+# Template generated code from trgen <version>
 
 import sys
 from antlr4 import *
@@ -7,6 +7,7 @@ from readchar import readchar
 from <lexer_name> import <lexer_name>;
 from <parser_name> import <parser_name>;
 from CaseChangingStream import *;
+from datetime import datetime
 
 def getChar():
     xx = readchar()
@@ -31,6 +32,7 @@ def main(argv):
     input = None
     file_name = None
     i = 1
+    encoding = "utf-8"
     while i \< len(argv):
         arg = argv[i]
         if arg in ("-tokens"):
@@ -43,6 +45,9 @@ def main(argv):
         elif arg in ("-file"):
             i = i + 1
             file_name = argv[i]
+        elif arg in ("-encoding"):
+            i = i + 1
+            encoding = argv[i]
         else:
             print("unknown")
         i = i + 1
@@ -58,7 +63,7 @@ def main(argv):
     elif (input != None):
         str = InputStream(input);
     elif (file_name != None):
-        str = FileStream(file_name, 'utf8');
+        str = FileStream(file_name, encoding);
 <if (case_insensitive_type)>
     str = CaseChangingStream(str, "<case_insensitive_type>" == "Upper")
 <endif>
@@ -83,7 +88,12 @@ def main(argv):
             if (token.type == -1):
                 break
         lexer.reset()
+    start_time = datetime.now()
     tree = parser.<start_symbol>()
+    end_time = datetime.now()
+    diff = end_time - start_time
+    diff_time = diff.total_seconds()
+    print(f'Time: {diff_time}', file=sys.stderr);
     if (show_tree):
         print(tree.toStringTree(recog=parser))
     if p_listener.num_errors > 0 or l_listener.num_errors > 0:

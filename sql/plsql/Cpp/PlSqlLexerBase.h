@@ -6,9 +6,12 @@
 class PlSqlLexerBase : public antlr4::Lexer
 {
 public:
-  PlSqlLexerBase(antlr4::CharStream *input) : Lexer(input) {}
+  PlSqlLexerBase(antlr4::CharStream *input) : Lexer(input), self(*this) { }
 
-protected:
+public:
+  PlSqlLexerBase & self;
+
+public:
   bool IsNewlineAtPos(int pos)
   {
     int la = _input->LA(pos);

@@ -1,0 +1,1 @@
+CALL proc() YIELD a AS v RETURN *

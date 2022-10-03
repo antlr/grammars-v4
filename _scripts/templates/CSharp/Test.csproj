@@ -1,17 +1,19 @@
-\<!-- Template generated code from Antlr4BuildTasks.dotnet-antlr v <version> -->
+\<!-- Template generated code from trgen <version> -->
 \<Project Sdk="Microsoft.NET.Sdk" >
   \<PropertyGroup>
-    \<TargetFramework>net5.0\</TargetFramework>
+    \<TargetFramework>net6.0\</TargetFramework>
     \<OutputType>Exe\</OutputType>
+    \<ProduceReferenceAssembly>false\</ProduceReferenceAssembly>
   \</PropertyGroup>
   \<ItemGroup>
 <tool_grammar_files:{x |    \<Antlr4 Include="<x>">
 <if(name_space)>\<Package><name_space>\</Package><endif>
+\<!-- AntlrRuntime><antlr_tool_path>\</AntlrRuntime -->
 \</Antlr4>
 } >  \</ItemGroup>
   \<ItemGroup>
-    \<PackageReference Include="Antlr4.Runtime.Standard" Version ="4.9.2" />
-    \<PackageReference Include="Antlr4BuildTasks" Version = "8.14" PrivateAssets="all" />
+    \<PackageReference Include="Antlr4.Runtime.Standard" Version ="4.11.1" />
+    \<PackageReference Include="Antlr4BuildTasks" Version = "11.1" PrivateAssets="all" />
   \</ItemGroup>
   \<PropertyGroup>
     \<RestoreProjectStyle>PackageReference\</RestoreProjectStyle>
@@ -34,7 +36,7 @@ do
   if [ "$x1" != "errors" ]
   then
     echo $file
-    cat $file | bin/Debug/net5.0/Test
+    cat $file | bin/Debug/net6.0/Test
     status="$?"
     if [ -f "$file".errors ]
     then
@@ -70,7 +72,7 @@ for %%G in (..\\<example_files_win>\*) do (
   set X3=%%~pG
   if !X1! neq .errors (
     echo !FILE!
-    cat !FILE! | bin\Debug\net5.0\Test.exe
+    cat !FILE! | bin\Debug\net6.0\Test.exe
     if not exist !FILE!.errors (
       if ERRORLEVEL 1 set ERR=1
     ) else (

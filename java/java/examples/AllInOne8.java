@@ -24,6 +24,25 @@ public class Lambdas {
         Arrays.sort(copy, (a, b) -> a.compareTo(b));
         printNames("Names sorted with lambda expression:", copy);
      }
+
+}
+
+class LambdaAndCastWithBounds{
+
+    interface I1<T> {
+        void fn();
+    }
+
+    interface I2 {
+        void fn();
+    }
+
+    I1<Byte> i1 = (I1<Byte> & Serializable & Cloneable) () -> {
+    };
+
+    I2 i2 = (I2 & Serializable & Cloneable) () -> {
+    };
+
 }
 
 // Default interface method
@@ -148,6 +167,12 @@ public class Annos {
         return (@Dummy1 @Dummy2 T[] @Dummy1 @Dummy2 []) null;
     }
 
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE_USE, ElementType.METHOD})
+    public @interface TM1{
+    }
+
     class Gen<T> {    }
     class A<@Dummy1 T extends @Dummy1 Gen<@Dummy1 T> >{}
 
@@ -162,4 +187,93 @@ public class Annos {
         return (@Dummy3 T @Dummy3 []) null;
     }
 
+    interface TI1{
+        public @TM1 void im01();
+        public <@Dummy3 T> @TM1 @TM2 T gim01(@TM1 T t);
+    }
+
+    static class Issue2454 {
+        interface I {
+            default <T> void fn1() {
+            }
+
+            default <T, S, U> void fn2() {
+            }
+        }
+
+        class C implements I {
+
+            public void test() {
+                I.super.<Long>fn1(); // fix #2454
+                I.super.fn1(); //ok
+                I.super.<List<Integer>, Byte, Map<Long, String>>fn2(); // fix #2454
+                I.super.fn2(); //ok
+            }
+        }
+    }
+
+}
+
+class Issue1897 {
+    @Target({ElementType.TYPE, ElementType.TYPE_USE})
+    @interface Dum1 {
+    }
+
+    @Target(ElementType.TYPE_USE)
+    @interface Dum2 {
+    }
+
+    @Target(ElementType.TYPE_USE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Dum3 {
+    }
+
+    abstract class C {
+        // https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.4.1
+        void f(@Dum1 @Dum2 C this) {
+
+        }
+
+        void d(C this, int i, int j) {
+
+        }
+
+        void e(C this, int i, int j, int... k) {
+
+        }
+
+        void c(C this, int... k) {
+
+        }
+
+        abstract void am(C this);
+
+        class D {
+
+            class E {
+                E(Issue1897.C.D D.this) {
+                }
+            }
+
+            class GE {
+                <TY> GE(Issue1897.C.D D.this) {
+
+                }
+            }
+
+            void b(Issue1897.C.@Dum3 D Issue1897.C.D.this) {
+
+            }
+
+            void b2(Issue1897.C.@Dum3 D this) {
+            }
+
+            void b3(@Dum1 D this) {
+            }
+        }
+
+        void b(Issue1897.C Issue1897.C.this) {
+
+        }
+    }
 }

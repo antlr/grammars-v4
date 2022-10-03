@@ -1,1 +1,1 @@
-(equation (expression (multiplyingExpression (powExpression (signedAtom (atom (variable A)))))) (relop =) (expression (multiplyingExpression (powExpression (signedAtom (atom (constant pi)))) * (powExpression (signedAtom (atom (variable r))) ^ (signedAtom (atom (scientific 2)))))))
+(equation (expression (multiplyingExpression (powExpression (signedAtom (atom (variable A)))))) (relop =) (expression (multiplyingExpression (powExpression (signedAtom (atom (constant pi)))) * (powExpression (signedAtom (atom (variable r))) ^ (signedAtom (atom (scientific 2)))))) <EOF>)
