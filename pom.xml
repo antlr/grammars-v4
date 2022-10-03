@@ -311,7 +311,6 @@
 				<module>wat</module>
 				<module>wavefront</module>
 				<module>webidl</module>
-                <module>wheel</module>
 				<module>wkt</module>
 				<module>wln</module>
 				<module>wren</module>

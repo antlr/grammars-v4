@@ -20,5 +20,6 @@
         <module>nanofuck</module>
         <module>sickbay</module>
         <module>snowball</module>
+        <module>wheel</module>
     </modules>
 </project>
