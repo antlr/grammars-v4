@@ -2,7 +2,7 @@ grammar FlatBuffers ;
 
 // Parser rules
 
-schema : include_* ( namespace_decl | type_decl | enum_decl | union_decl | root_decl | file_extension_decl | file_identifier_decl | attribute_decl | rpc_decl | object_ )* ;
+schema : include_* ( namespace_decl | type_decl | enum_decl | union_decl | root_decl | file_extension_decl | file_identifier_decl | attribute_decl | rpc_decl | object_ )* EOF ;
 
 include_ : ( INCLUDE | NATIVE_INCLUDE ) STRING_CONSTANT SEMI ;
 

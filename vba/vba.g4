@@ -623,7 +623,7 @@ iCS_S_ProcedureOrArrayCall : (ambiguousIdentifier | baseType) typeHint? WS? LPAR
 
 iCS_S_MembersCall : (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall)? iCS_S_MemberCall+ dictionaryCallStmt? (WS? LPAREN subscripts RPAREN)*;
 
-iCS_S_MemberCall : ('.' | '!') (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall);
+iCS_S_MemberCall : LINE_CONTINUATION? ('.' | '!') LINE_CONTINUATION? (iCS_S_VariableOrProcedureCall | iCS_S_ProcedureOrArrayCall);
 
 iCS_S_DictionaryCall : dictionaryCallStmt;
 
@@ -769,7 +769,7 @@ ELSEIF: 'ELSEIF';
 END_ENUM: 'END' WS 'ENUM';
 END_FUNCTION: 'END' WS 'FUNCTION';
 END_IF: 'END' WS 'IF';
-END_PROPERTY: 'END' WS' PROPERTY';
+END_PROPERTY: 'END' WS 'PROPERTY';
 END_SELECT: 'END' WS 'SELECT';
 END_SUB: 'END' WS 'SUB';
 END_TYPE: 'END' WS 'TYPE';
@@ -936,13 +936,13 @@ fragment DATEVALUEPART : DIGIT+ | MONTHNAME;
 fragment DATESEPARATOR : WS? [/,-]? WS?;
 fragment MONTHNAME : ENGLISHMONTHNAME | ENGLISHMONTHABBREVIATION;
 fragment ENGLISHMONTHNAME: 'JANUARY' | 'FEBRUARY' | 'MARCH' | 'APRIL' | 'MAY' | 'JUNE | AUGUST' | 'SEPTEMBER' | 'OCTOBER' | 'NOVEMBER' | 'DECEMBER';
-fragment ENGLISHMONTHABBREVIATION: 'JAN' | 'FEB' | 'MAR' | 'APR' | 'JUN' | 'JUL' | 'AUG' | 'SEP' | ' OCT' | 'NOV' | 'DEC';
+fragment ENGLISHMONTHABBREVIATION: 'JAN' | 'FEB' | 'MAR' | 'APR' | 'JUN' | 'JUL' | 'AUG' | 'SEP' | 'OCT' | 'NOV' | 'DEC';
 fragment TIMEVALUE : DIGIT+ AMPM | DIGIT+ TIMESEPARATOR DIGIT+ (TIMESEPARATOR DIGIT+)? AMPM?;
 fragment TIMESEPARATOR : WS? (':' | '.') WS?;
 fragment AMPM : WS? ('AM' | 'PM' | 'A' | 'P');
 
 // whitespace, line breaks, comments, ...
-LINE_CONTINUATION : [ \t]+ UNDERSCORE '\r'? '\n' -> skip;
+LINE_CONTINUATION : [ \t]+ UNDERSCORE '\r'? '\n' WS* -> skip;
 NEWLINE : [\r\n\u2028\u2029]+;
 REMCOMMENT : COLON? REM WS (LINE_CONTINUATION | ~[\r\n\u2028\u2029])*;
 COMMENT : SINGLEQUOTE (LINE_CONTINUATION | ~[\r\n\u2028\u2029])*;

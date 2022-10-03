@@ -3,7 +3,7 @@ grammar http;
 /*
  HTTP-message = start‑line ( header‑field  CRLF ) CRLF [ message‑body ]
  */
-http_message: start_line (header_field CRLF)* CRLF //message_body
+http_message: start_line (header_field CRLF)* CRLF EOF //message_body
             ;
 
 /*

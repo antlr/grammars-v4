@@ -41,7 +41,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar IDL;
 
 specification
-   : import_decl* definition +
+   : import_decl* definition + EOF
    ;
 
 definition

@@ -41,7 +41,7 @@
                 <configuration>
                     <verbose>false</verbose>
                     <showTree>false</showTree>
-                    <entryPoint>statement</entryPoint>
+                    <entryPoint>statements</entryPoint>
                     <grammarName>Hive</grammarName>
                     <packageName></packageName>
                     <exampleFiles>examples/</exampleFiles>

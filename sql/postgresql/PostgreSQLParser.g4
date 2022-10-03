@@ -1578,7 +1578,7 @@ any_name
    ;
 
 attrs
-   :DOT attr_name+
+   :(DOT attr_name)+
    ;
 
 type_name_list
