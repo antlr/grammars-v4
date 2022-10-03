@@ -10,7 +10,7 @@ options
    { tokenVocab = LessLexer; }
 
 stylesheet
-   : statement*
+   : statement* EOF
    ;
 
 statement

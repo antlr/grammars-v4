@@ -37,7 +37,7 @@
 				<version>${antlr4test-maven-plugin.version}</version>
 				<configuration>
 					<verbose>false</verbose>
-					<showTree>true</showTree>
+					<showTree>false</showTree>
 					<entryPoint>conditionalRule</entryPoint>
 					<grammarName>infosapient</grammarName>
 					<packageName></packageName>

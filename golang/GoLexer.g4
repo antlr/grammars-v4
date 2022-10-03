@@ -38,7 +38,7 @@ lexer grammar GoLexer;
 
 // Keywords
 
-BREAK                  : 'break';
+BREAK                  : 'break' -> mode(NLSEMI);
 DEFAULT                : 'default';
 FUNC                   : 'func';
 INTERFACE              : 'interface';
@@ -54,35 +54,35 @@ GOTO                   : 'goto';
 PACKAGE                : 'package';
 SWITCH                 : 'switch';
 CONST                  : 'const';
-FALLTHROUGH            : 'fallthrough';
+FALLTHROUGH            : 'fallthrough' -> mode(NLSEMI);
 IF                     : 'if';
 RANGE                  : 'range';
 TYPE                   : 'type';
-CONTINUE               : 'continue';
+CONTINUE               : 'continue' -> mode(NLSEMI);
 FOR                    : 'for';
 IMPORT                 : 'import';
-RETURN                 : 'return';
+RETURN                 : 'return' -> mode(NLSEMI);
 VAR                    : 'var';
 
-NIL_LIT                : 'nil';
+NIL_LIT                : 'nil' -> mode(NLSEMI);
 
-IDENTIFIER             : LETTER (LETTER | UNICODE_DIGIT)*;
+IDENTIFIER             : LETTER (LETTER | UNICODE_DIGIT)* -> mode(NLSEMI);
 
 // Punctuation
 
 L_PAREN                : '(';
-R_PAREN                : ')';
+R_PAREN                : ')' -> mode(NLSEMI);
 L_CURLY                : '{';
-R_CURLY                : '}';
+R_CURLY                : '}' -> mode(NLSEMI);
 L_BRACKET              : '[';
-R_BRACKET              : ']';
+R_BRACKET              : ']' -> mode(NLSEMI);
 ASSIGN                 : '=';
 COMMA                  : ',';
 SEMI                   : ';';
 COLON                  : ':';
 DOT                    : '.';
-PLUS_PLUS              : '++';
-MINUS_MINUS            : '--';
+PLUS_PLUS              : '++' -> mode(NLSEMI);
+MINUS_MINUS            : '--' -> mode(NLSEMI);
 DECLARE_ASSIGN         : ':=';
 ELLIPSIS               : '...';
 
@@ -124,13 +124,13 @@ RECEIVE                : '<-';
 
 // Number literals
 
-DECIMAL_LIT            : '0' | [1-9] ('_'? [0-9])*;
-BINARY_LIT             : '0' [bB] ('_'? BIN_DIGIT)+;
-OCTAL_LIT              : '0' [oO]? ('_'? OCTAL_DIGIT)+;
-HEX_LIT                : '0' [xX]  ('_'? HEX_DIGIT)+;
+DECIMAL_LIT            : ('0' | [1-9] ('_'? [0-9])*) -> mode(NLSEMI);
+BINARY_LIT             : '0' [bB] ('_'? BIN_DIGIT)+ -> mode(NLSEMI);
+OCTAL_LIT              : '0' [oO]? ('_'? OCTAL_DIGIT)+ -> mode(NLSEMI);
+HEX_LIT                : '0' [xX]  ('_'? HEX_DIGIT)+ -> mode(NLSEMI);
 
 
-FLOAT_LIT : DECIMAL_FLOAT_LIT | HEX_FLOAT_LIT;
+FLOAT_LIT : (DECIMAL_FLOAT_LIT | HEX_FLOAT_LIT) -> mode(NLSEMI);
 
 DECIMAL_FLOAT_LIT      : DECIMALS ('.' DECIMALS? EXPONENT? | EXPONENT)
                        | '.' DECIMALS EXPONENT?
@@ -142,14 +142,16 @@ HEX_FLOAT_LIT          : '0' [xX] HEX_MANTISSA HEX_EXPONENT
 fragment HEX_MANTISSA  : ('_'? HEX_DIGIT)+ ('.' ( '_'? HEX_DIGIT )*)?
                        | '.' HEX_DIGIT ('_'? HEX_DIGIT)*;
 
-fragment HEX_EXPONENT  : [pP] [+-] DECIMALS;
+fragment HEX_EXPONENT  : [pP] [+-]? DECIMALS;
 
 
-IMAGINARY_LIT          : (DECIMAL_LIT | BINARY_LIT |  OCTAL_LIT | HEX_LIT | FLOAT_LIT) 'i';
+IMAGINARY_LIT          : (DECIMAL_LIT | BINARY_LIT |  OCTAL_LIT | HEX_LIT | FLOAT_LIT) 'i' -> mode(NLSEMI);
 
 // Rune literals
 
-RUNE_LIT               : '\'' (UNICODE_VALUE | BYTE_VALUE) '\'';//: '\'' (~[\n\\] | ESCAPED_VALUE) '\'';
+fragment RUNE               : '\'' (UNICODE_VALUE | BYTE_VALUE) '\'';//: '\'' (~[\n\\] | ESCAPED_VALUE) '\'';
+
+RUNE_LIT                : RUNE -> mode(NLSEMI);
 
 
 
@@ -165,8 +167,8 @@ BIG_U_VALUE: '\\' 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGI
 
 // String literals
 
-RAW_STRING_LIT         : '`' ~'`'*                      '`';
-INTERPRETED_STRING_LIT : '"' (~["\\] | ESCAPED_VALUE)*  '"';
+RAW_STRING_LIT         : '`' ~'`'*                      '`' -> mode(NLSEMI);
+INTERPRETED_STRING_LIT : '"' (~["\\] | ESCAPED_VALUE)*  '"' -> mode(NLSEMI);
 
 // Hidden tokens
 
@@ -502,3 +504,18 @@ fragment UNICODE_LETTER
     | [\uFFDA-\uFFDC]
     */
     ;
+
+
+mode NLSEMI;
+
+
+// Treat whitespace as normal
+WS_NLSEMI                     : [ \t]+             -> channel(HIDDEN);
+// Ignore any comments that only span one line
+COMMENT_NLSEMI                : '/*' ~[\r\n]*? '*/'      -> channel(HIDDEN);
+LINE_COMMENT_NLSEMI : '//' ~[\r\n]*      -> channel(HIDDEN);
+// Emit an EOS token for any newlines, semicolon, multiline comments or the EOF and 
+//return to normal lexing
+EOS:              ([\r\n]+ | ';' | '/*' .*? '*/' | EOF)            -> mode(DEFAULT_MODE);
+// Did not find an EOS, so go back to normal lexing
+OTHER: -> mode(DEFAULT_MODE), channel(HIDDEN);

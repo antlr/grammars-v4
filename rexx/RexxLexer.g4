@@ -8,7 +8,7 @@ LINE_COMMENT                    :   Line_Comment_
                                 ->  channel(HIDDEN);
 BLOCK_COMMENT                   :   Block_Comment_
                                 ->  channel(HIDDEN);
-WHISPACES                       :   Whitespaces_            -> channel(HIDDEN);
+WHITESPACES                     :   Whitespaces_            -> channel(HIDDEN);
 CONTINUATION                    :   Continue_               -> channel(HIDDEN);
 
 // Keywords
@@ -83,26 +83,10 @@ CONST_SYMBOL                    :   Const_symbol_ ;
 VAR_SYMBOL                      :   Var_Symbol_ ;
 
 // String and concatenation
-STRING                          :   String_
-// Additionally, need to consume X or B at the end not followed by
-// _!?A-Za-z.#@$0-9
-{int currPos = this.getCharIndex();
-int textLen = super.getInputStream().size();
-if (textLen > currPos) {
-    if (textLen == currPos + 1) {
-        if (super.getInputStream()
-            .getText(
-                new Interval(currPos, currPos))
-            .matches("[XxBb]"))
-            super.getInputStream().consume();
-    } else {
-        if (super.getInputStream().getText(
-            new Interval(currPos, currPos + 1))
-            .matches("[XxBb][^_!?A-Za-z.#@$0-9]"))
-            super.getInputStream().consume();
-    }
-}}
-                                ;
+BINARY_STRING                   :   Binary_string_ ;
+HEX_STRING                      :   Hex_string_ ;
+STRING                          :   String_ ;
+
 // In concatenation don't need the blanks - will be precoeesed by WHITESPACES
 CONCAT                          :   VBar_ VBar_ ;
 
@@ -264,6 +248,16 @@ fragment Plain_number           :   Digit_+ Stop_? Digit_*
 fragment Exponent_              :   E ( Plus_ | Minus_ )? Digit_+ ;
 // String and concatenation
 fragment String_                :   Quoted_string ;
+fragment Binary_string_         :   Quote_ Binary_string_value_ Quote_ B
+                                |   Apostrophe_ Binary_string_value_ Apostrophe_ B
+                                ;
+fragment Binary_string_value_   :   Binary_digit_? Binary_digit_? Binary_digit_? Binary_digit_ (' '* Binary_digit_ Binary_digit_ Binary_digit_ Binary_digit_)* ;
+fragment Binary_digit_          :   [0-1] ;
+fragment Hex_string_            :   Quote_ Hex_string_value_ Quote_ X
+                                |   Apostrophe_ Hex_string_value_ Apostrophe_ X
+                                ;
+fragment Hex_string_value_      :   Hex_digit_? Hex_digit_ (' '* Hex_digit_ Hex_digit_)* ;
+fragment Hex_digit_             :   Digit_ | A | B | C | D | E | F ;
 fragment Quoted_string          :   Quotation_mark_string
                                 |   Apostrophe_string
                                 ;

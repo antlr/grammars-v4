@@ -26,6 +26,8 @@ options { tokenVocab=DiceNotationLexer; }
 /**
  * Rules.
  */
+
+file_ : notation EOF ;
  
 notation
 :

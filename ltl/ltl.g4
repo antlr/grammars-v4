@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar ltl;
 
+file_ : proposition EOF ;
+
 proposition
    : 'true'
    | 'false'
