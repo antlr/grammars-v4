@@ -95,6 +95,7 @@ unit_statement
 
     | comment_on_column
     | comment_on_table
+    | comment_on_materialized
 
     | anonymous_block
 
@@ -991,6 +992,16 @@ validation_clauses
         online_or_offline? into_clause?
     ;
 
+compute_clauses
+    : COMPUTE SYSTEM? STATISTICS for_clause?
+    ;
+for_clause
+     : FOR ( TABLE for_clause*
+           | ALL (INDEXED? COLUMNS (SIZE UNSIGNED_INTEGER)? for_clause* | LOCAL? INDEXES)
+           | COLUMNS (SIZE UNSIGNED_INTEGER)? (column_name SIZE UNSIGNED_INTEGER)+ for_clause*
+           )
+    ;
+
 online_or_offline
     : OFFLINE
     | ONLINE
@@ -1362,7 +1373,7 @@ out_of_line_constraint
           ( UNIQUE '(' column_name (',' column_name)* ')'
           | PRIMARY KEY '(' column_name (',' column_name)* ')'
           | foreign_key_clause
-          | CHECK '(' expression ')'
+          | CHECK '(' condition ')'
           )
        )
       constraint_state?
@@ -1819,10 +1830,10 @@ relational_table
     ;
 
 relational_property
-    : (column_definition
-        | virtual_column_definition
-        | out_of_line_constraint
+    : ( out_of_line_constraint
         | out_of_line_ref_constraint
+        | column_definition
+        | virtual_column_definition
         | supplemental_logging_props
         )
     ;
@@ -1982,7 +1993,7 @@ range_values_clause
     ;
 
 list_values_clause
-    : VALUES '(' (literal (',' literal)* | DEFAULT) ')'
+    : VALUES '(' (literal (',' literal)* | TIMESTAMP literal (',' TIMESTAMP literal)* | DEFAULT) ')'
     ;
 
 table_partition_description
@@ -2037,7 +2048,10 @@ physical_attributes_clause
     : (PCTFREE pctfree=UNSIGNED_INTEGER
       | PCTUSED pctused=UNSIGNED_INTEGER
       | INITRANS inittrans=UNSIGNED_INTEGER
+      | MAXTRANS maxtrans=UNSIGNED_INTEGER
+      | COMPUTE STATISTICS
       | storage_clause
+      | compute_clauses
       )+
     ;
 
@@ -2053,6 +2067,7 @@ storage_clause
          | OPTIMAL (size_clause | NULL_ )
          | BUFFER_POOL (KEEP | RECYCLE | DEFAULT)
          | FLASH_CACHE (KEEP | NONE | DEFAULT)
+         | CELL_FLASH_CACHE (KEEP | NONE | DEFAULT)
          | ENCRYPT
          )+
        ')'
@@ -2170,6 +2185,10 @@ create_synonym
 
 comment_on_table
     : COMMENT ON TABLE tableview_name IS quoted_string
+    ;
+
+comment_on_materialized
+    : COMMENT ON MATERIALIZED VIEW tableview_name IS quoted_string
     ;
 
 alter_cluster
@@ -2787,6 +2806,7 @@ lob_segname
 
 lob_item
     : regular_id
+    | quoted_string
     ;
 
 lob_storage_parameters
@@ -2853,7 +2873,7 @@ encryption_spec
     : (USING  CHAR_STRING)? (IDENTIFIED BY REGULAR_ID)? CHAR_STRING? (NO? SALT)?
     ;
 tablespace
-    : regular_id
+    : id_expression
     ;
 
 varray_item
@@ -2920,6 +2940,7 @@ substitutable_column_clause
 
 partition_name
     : regular_id
+    | DELIMITED_ID
     ;
 
 supplemental_logging_props
@@ -3821,6 +3842,12 @@ seed_part
 
 condition
     : expression
+    | json_condition
+    ;
+
+json_condition
+    : column_name IS NOT? JSON (FORMAT JSON)? (STRICT|LAX)? ((WITH|WITHOUT) UNIQUE KEYS)?
+    | JSON_EQUAL '(' expressions ')'
     ;
 
 expressions

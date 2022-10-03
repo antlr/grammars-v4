@@ -94,7 +94,7 @@ offset
 
 // Functions
 
-function_: FUNCTION LEFT_PAREN parameter (COMMA parameter)* RIGHT_PAREN;
+function_: FUNCTION LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
 
 parameter:     literal | vectorOperation;
 parameterList: LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
@@ -114,8 +114,8 @@ without: WITHOUT labelNameList;
 grouping:   (on_ | ignoring) (groupLeft | groupRight)?;
 on_:         ON labelNameList;
 ignoring:   IGNORING labelNameList;
-groupLeft:  GROUP_LEFT labelNameList;
-groupRight: GROUP_RIGHT labelNameList;
+groupLeft:  GROUP_LEFT labelNameList?;
+groupRight: GROUP_RIGHT labelNameList?;
 
 // Label names
 
