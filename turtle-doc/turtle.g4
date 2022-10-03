@@ -7,7 +7,7 @@
 grammar turtle;
 
 turtleDoc
-   : statement*
+   : statement* EOF
    ;
 
 statement

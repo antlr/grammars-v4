@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar terraform;
 
 file_
-   : (local | module | output | provider | variable | data | resource | terraform)+
+   : (local | module | output | provider | variable | data | resource | terraform)+ EOF
    ;
 
 terraform

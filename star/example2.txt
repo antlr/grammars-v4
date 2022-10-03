@@ -1,0 +1,13 @@
+
+data_1
+
+_cell_volume  2310(2)
+_chemical_formula_moiety      'C23 H36 O7'
+_publ_contact_author
+;
+   Prof Barry O'Connell
+   Department of Chemistry
+   Building #57-M5
+   University of Kalamazoo
+   Michigan        USA.
+;
