@@ -9,7 +9,12 @@
 		<artifactId>grammarsv4</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
+	<properties>
+		<!-- location of java sources -->
+		<src.dir>Java</src.dir>
+	</properties>
 	<build>
+		<sourceDirectory>${src.dir}</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.antlr</groupId>
@@ -41,8 +46,9 @@
 					<showTree>false</showTree>
 					<entryPoint>file_</entryPoint>
 					<grammarName>Rexx</grammarName>
-					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
+					<testFileExtension></testFileExtension>
+					<packageName></packageName>
 				</configuration>
 				<executions>
 					<execution>

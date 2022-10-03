@@ -1,0 +1,30 @@
+begin_problem(Sorts).
+
+list_of_descriptions.
+name({* Sorts and Plus *}).
+author({* Christoph Weidenbach *}).
+status(satisfiable).
+description({* Defines plus over successor and zero. *}).
+end_of_list.
+
+list_of_symbols.
+functions[plus,s,zero].
+sorts[even,nat].
+end_of_list.
+
+list_of_declarations.
+subsort(even,nat).
+even(zero).
+forall([nat(x)],nat(s(x))).
+forall([nat(x),nat(y)],nat(plus(x,y))).
+forall([even(x),even(y)],even(plus(x,y))).
+forall([even(x)],even(s(s(x)))).
+forall([nat(y)],even(plus(y,y))).
+end_of_list.
+
+list_of_formulae(axioms).
+formula(forall([nat(y)],equal(plus(y,zero),y))).
+formula(forall([nat(y),nat(z)],equal(plus(y,s(z)),s(plus(y,z))))).
+end_of_list.
+
+end_problem.

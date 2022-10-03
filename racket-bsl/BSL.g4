@@ -2,7 +2,7 @@
 grammar BSL;
 
 program
-    : defOrExpr+
+    : defOrExpr+ EOF
     ;
 
 defOrExpr

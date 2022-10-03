@@ -6,7 +6,9 @@ ANTLRGRAMMARS ?= $(wildcard *.g4)
 GENERATED = <tool_grammar_tuples:{x|<x.GeneratedFileName> }>
 SOURCES = $(GENERATED) \
     Program.py
-default: classes
+default: setup classes
+setup:
+	if [ -f transformGrammar.py ]; then python3 transformGrammar.py ; fi
 classes: $(SOURCES)
 	pip install -r requirements.txt
 clean:
@@ -14,8 +16,9 @@ clean:
 	rm -f *.interp
 	rm -f *.tokens
 	rm -f $(GENERATED)
+	rm -rf __pycache__
 run:
-	trwdog python Program.py $(RUNARGS)
+	trwdog python3 Program.py $(RUNARGS)
 <tool_grammar_tuples:{x | <x.GeneratedFileName> : <x.GrammarFileName>
 	java -jar $(JAR) -encoding <antlr_encoding> -Dlanguage=Python3 <antlr_tool_args:{y | <y> } > $\<
 } >

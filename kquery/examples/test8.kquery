@@ -1,0 +1,93 @@
+array const_arr1[23] : w32 -> w8 = [12 34 45 56 67 67 87 65 455 465 65 34 345 655 5 43 554 35 5]
+array f[1] : w32 -> w8 = symbolic
+array f_1[1] : w32 -> w8 = symbolic
+array f_10[1] : w32 -> w8 = symbolic
+array f_11[1] : w32 -> w8 = symbolic
+array f_12[1] : w32 -> w8 = symbolic
+array f_13[1] : w32 -> w8 = symbolic
+array f_14[1] : w32 -> w8 = symbolic
+array f_15[1] : w32 -> w8 = symbolic
+array f_16[1] : w32 -> w8 = symbolic
+array f_17[1] : w32 -> w8 = symbolic
+array f_18[1] : w32 -> w8 = symbolic
+array f_19[1] : w32 -> w8 = symbolic
+array f_2[1] : w32 -> w8 = symbolic
+array f_20[1] : w32 -> w8 = symbolic
+array f_21[1] : w32 -> w8 = symbolic
+array f_22[1] : w32 -> w8 = symbolic
+array f_3[1] : w32 -> w8 = symbolic
+array f_4[1] : w32 -> w8 = symbolic
+array f_5[1] : w32 -> w8 = symbolic
+array f_6[1] : w32 -> w8 = symbolic
+array f_7[1] : w32 -> w8 = symbolic
+array f_8[1] : w32 -> w8 = symbolic
+array f_9[1] : w32 -> w8 = symbolic
+array i[1] : w32 -> w8 = symbolic
+array x[8] : w32 -> w8 = symbolic
+(query [(Ult N0:(ReadLSB w64 0 x)
+              23)
+         (Eq (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (Add w64 (ZExt w64 (Ult N1:(Read w8 0 f_1) N2:(Read w8 0 f)))
+                                                                                                                                                                                                          (ZExt w64 (Ult N3:(Read w8 0 f_2) N1)))
+                                                                                                                                                                                                 (ZExt w64 (Ult N4:(Read w8 0 f_3) N3)))
+                                                                                                                                                                                        (ZExt w64 (Ult N5:(Read w8 0 f_4) N4)))
+                                                                                                                                                                               (ZExt w64 (Ult N6:(Read w8 0 f_5) N5)))
+                                                                                                                                                                      (ZExt w64 (Ult N7:(Read w8 0 f_6) N6)))
+                                                                                                                                                             (ZExt w64 (Ult N8:(Read w8 0 f_7) N7)))
+                                                                                                                                                    (ZExt w64 (Ult N9:(Read w8 0 f_8) N8)))
+                                                                                                                                           (ZExt w64 (Ult N10:(Read w8 0 f_9) N9)))
+                                                                                                                                  (ZExt w64 (Ult N11:(Read w8 0 f_10) N10)))
+                                                                                                                         (ZExt w64 (Ult N12:(Read w8 0 f_11) N11)))
+                                                                                                                (ZExt w64 (Ult N13:(Read w8 0 f_12) N12)))
+                                                                                                       (ZExt w64 (Ult N14:(Read w8 0 f_13) N13)))
+                                                                                              (ZExt w64 (Ult N15:(Read w8 0 f_14) N14)))
+                                                                                     (ZExt w64 (Ult N16:(Read w8 0 f_15) N15)))
+                                                                            (ZExt w64 (Ult N17:(Read w8 0 f_16) N16)))
+                                                                   (ZExt w64 (Ult N18:(Read w8 0 f_17) N17)))
+                                                          (ZExt w64 (Ult N19:(Read w8 0 f_18) N18)))
+                                                 (ZExt w64 (Ult N20:(Read w8 0 f_19) N19)))
+                                        (ZExt w64 (Ult N21:(Read w8 0 f_20) N20)))
+                               (ZExt w64 (Ult N22:(Read w8 0 f_21) N21)))
+                      (ZExt w64 (Ult N23:(Read w8 0 f_22) N22)))
+             N0)
+         (Ule 0 N24:(Read w8 0 i))
+         (Ule N24 22)
+         (Eq false (Ult 11 N24))
+         (Eq false (Ult 6 N24))
+         (Ult 3 N24)
+         (Eq false (Ult 5 N24))
+         (Eq 0
+             (And w8 (Select w8 N25:(Ult N6
+                                         N26:(Read w8 (Extract w32 0 (ZExt w64 N24))
+                                                      [22=N23,
+                                                       21=N22,
+                                                       20=N21,
+                                                       19=N20,
+                                                       18=N19,
+                                                       17=N18,
+                                                       16=N17,
+                                                       15=N16,
+                                                       14=N15,
+                                                       13=N14,
+                                                       12=N13,
+                                                       11=N12,
+                                                       10=N11,
+                                                       9=N10,
+                                                       8=N9,
+                                                       7=N8,
+                                                       6=N7,
+                                                       5=N6,
+                                                       4=N5,
+                                                       3=N4,
+                                                       2=N3,
+                                                       1=N1,
+                                                       0=N2] @ const_arr1))
+                                1
+                                (Select w8 N25
+                                           1
+                                           (Select w8 (Ult N26 N4)
+                                                      1
+                                                      (Select w8 (Ult N7 N26)
+                                                                 1
+                                                                 (Select w8 (Ult N12 N26) 1 0)))))
+                     1))]
+        false)

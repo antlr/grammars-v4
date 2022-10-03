@@ -39,7 +39,6 @@
 					<showTree>false</showTree>
 					<entryPoint>tsql_file</entryPoint>
 					<grammarName>TSql</grammarName>
-					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>

@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar infosapient;
 
 conditionalRule
-   : IDENTIFIER premise consequent ';'
+   : IDENTIFIER premise consequent ';' EOF
    ;
 
 premise

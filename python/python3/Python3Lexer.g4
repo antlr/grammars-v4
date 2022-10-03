@@ -98,10 +98,10 @@ ASYNC : 'async';
 AWAIT : 'await';
 
 NEWLINE
- : ( {atStartOfInput()}?   SPACES
+ : ( {this.atStartOfInput()}?   SPACES
    | ( '\r'? '\n' | '\r' | '\f' ) SPACES?
    )
-   {onNewLine();}
+   {this.onNewLine();}
  ;
 
 /// identifier   ::=  id_start id_continue*
@@ -157,15 +157,15 @@ IMAG_NUMBER
 DOT : '.';
 ELLIPSIS : '...';
 STAR : '*';
-OPEN_PAREN : '(' {openBrace();};
-CLOSE_PAREN : ')' {closeBrace();};
+OPEN_PAREN : '(' {this.openBrace();};
+CLOSE_PAREN : ')' {this.closeBrace();};
 COMMA : ',';
 COLON : ':';
 SEMI_COLON : ';';
 POWER : '**';
 ASSIGN : '=';
-OPEN_BRACK : '[' {openBrace();};
-CLOSE_BRACK : ']' {closeBrace();};
+OPEN_BRACK : '[' {this.openBrace();};
+CLOSE_BRACK : ']' {this.closeBrace();};
 OR_OP : '|';
 XOR : '^';
 AND_OP : '&';
@@ -177,8 +177,8 @@ DIV : '/';
 MOD : '%';
 IDIV : '//';
 NOT_OP : '~';
-OPEN_BRACE : '{' {openBrace();};
-CLOSE_BRACE : '}' {closeBrace();};
+OPEN_BRACE : '{' {this.openBrace();};
+CLOSE_BRACE : '}' {this.closeBrace();};
 LESS_THAN : '<';
 GREATER_THAN : '>';
 EQUALS : '==';

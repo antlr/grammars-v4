@@ -14,7 +14,7 @@ include_
 
 namespace_
     : 'namespace' '*' (IDENTIFIER | LITERAL)
-    | 'namespace' IDENTIFIER (IDENTIFIER | LITERAL)
+    | 'namespace' IDENTIFIER (IDENTIFIER | LITERAL) type_annotations?
     | 'cpp_namespace' IDENTIFIER
     | 'php_namespace' IDENTIFIER
     ;

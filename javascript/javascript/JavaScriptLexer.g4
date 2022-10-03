@@ -50,6 +50,7 @@ SemiColon:                      ';';
 Comma:                          ',';
 Assign:                         '=';
 QuestionMark:                   '?';
+QuestionMarkDot:                '?.';
 Colon:                          ':';
 Ellipsis:                       '...';
 Dot:                            '.';
@@ -166,6 +167,7 @@ Import:                         'import';
 
 Async:                          'async';
 Await:                          'await';
+Yield:                          'yield';
 
 /// The following tokens are also considered to be FutureReservedWords
 /// when parsing strict mode
@@ -179,7 +181,6 @@ Interface:                      'interface' {this.IsStrictMode()}?;
 Package:                        'package' {this.IsStrictMode()}?;
 Protected:                      'protected' {this.IsStrictMode()}?;
 Static:                         'static' {this.IsStrictMode()}?;
-Yield:                          'yield' {this.IsStrictMode()}?;
 
 /// Identifier Names and Identifiers
 

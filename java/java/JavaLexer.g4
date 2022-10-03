@@ -2,6 +2,8 @@
  [The "BSD licence"]
  Copyright (c) 2013 Terence Parr, Sam Harwell
  Copyright (c) 2017 Ivan Kochurkin (upgrade to Java 8)
+ Copyright (c) 2021 Michał Lorek (upgrade to Java 11)
+ Copyright (c) 2022 Michał Lorek (upgrade to Java 17)
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -82,13 +84,39 @@ VOID:               'void';
 VOLATILE:           'volatile';
 WHILE:              'while';
 
+// Module related keywords
+MODULE:             'module';
+OPEN:               'open';
+REQUIRES:           'requires';
+EXPORTS:            'exports';
+OPENS:              'opens';
+TO:                 'to';
+USES:               'uses';
+PROVIDES:           'provides';
+WITH:               'with';
+TRANSITIVE:         'transitive';
+
+// Local Variable Type Inference
+VAR:                'var'; // reserved type name
+
+// Switch Expressions
+YIELD:              'yield';
+
+// Records
+RECORD:             'record';
+
+// Sealed Classes
+SEALED:             'sealed';
+PERMITS:            'permits';
+NON_SEALED:         'non-sealed';
+
 // Literals
 
 DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;
 HEX_LITERAL:        '0' [xX] [0-9a-fA-F] ([0-9a-fA-F_]* [0-9a-fA-F])? [lL]?;
 OCT_LITERAL:        '0' '_'* [0-7] ([0-7_]* [0-7])? [lL]?;
 BINARY_LITERAL:     '0' [bB] [01] ([01_]* [01])? [lL]?;
-                    
+
 FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?
              |       Digits (ExponentPart [fFdD]? | [fFdD])
              ;
@@ -102,6 +130,8 @@ BOOL_LITERAL:       'true'
 CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
 
 STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
+
+TEXT_BLOCK:         '"""' [ \t]* [\r\n] (. | EscapeSequence)*? '"""';
 
 NULL_LITERAL:       'null';
 

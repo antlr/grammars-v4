@@ -210,7 +210,6 @@ typeSpecifier
     |   enumSpecifier
     |   typedefName
     |   '__typeof__' '(' constantExpression ')' // GCC extension
-    |   typeSpecifier pointer
     ;
 
 structOrUnionSpecifier
@@ -227,8 +226,9 @@ structDeclarationList
     :   structDeclaration+
     ;
 
-structDeclaration
-    :   specifierQualifierList structDeclaratorList? ';'
+structDeclaration // The first two rules have priority order and cannot be simplified to one expression.
+    :   specifierQualifierList structDeclaratorList ';'
+    |   specifierQualifierList ';'
     |   staticAssertDeclaration
     ;
 
@@ -300,8 +300,19 @@ directDeclarator
     |   directDeclarator '(' parameterTypeList ')'
     |   directDeclarator '(' identifierList? ')'
     |   Identifier ':' DigitSequence  // bit field
-    |   '(' typeSpecifier? pointer directDeclarator ')' // function pointer like: (__cdecl *f)
+    |   vcSpecificModifer Identifier // Visual C Extension
+    |   '(' vcSpecificModifer declarator ')' // Visual C Extension
     ;
+
+vcSpecificModifer
+    :   ('__cdecl' 
+    |   '__clrcall' 
+    |   '__stdcall' 
+    |   '__fastcall' 
+    |   '__thiscall' 
+    |   '__vectorcall') 
+    ;
+
 
 gccDeclaratorExtension
     :   '__asm' '(' StringLiteral+ ')'

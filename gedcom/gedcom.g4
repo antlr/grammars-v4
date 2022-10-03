@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar gedcom;
 
 gedcom
-   : line+
+   : line+ EOF
    ;
 
 line

@@ -64,6 +64,7 @@ $versions = $versioning.versions.version
 
 # choose version
 $ver = $args[0]
+Write-Host "Version desired is $ver"
 if (!$ver) {
     throw "Must set a version"
 }

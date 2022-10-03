@@ -8,10 +8,11 @@
 	<name>ANTLR4 grammars</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.target>1.7</maven.compiler.target>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<antlr.version>4.9.3</antlr.version>
-		<antlr4test-maven-plugin.version>1.19</antlr4test-maven-plugin.version>
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<antlr4test-maven-plugin.version>1.22</antlr4test-maven-plugin.version>
+		<antlr.version>4.11.1</antlr.version>
+		<antlr4test-maven-plugin.version>1.21</antlr4test-maven-plugin.version>
 		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
@@ -52,7 +53,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.1</version>
+					<version>3.10.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -67,7 +68,6 @@
 				<module>abb</module>
 				<module>abnf</module>
 				<module>acme</module>
-				<module>agc</module>
 				<module>alef</module>
 				<module>algol60</module>
 				<module>alloy</module>
@@ -76,6 +76,7 @@
 				<module>antlr</module>
 				<module>apex</module>
 				<module>apt</module>
+				<module>argus</module>
 				<module>arithmetic</module>
 				<module>asl</module>
 				<module>asm</module>
@@ -85,8 +86,9 @@
 				<module>atl</module>
 				<module>b</module>
 				<module>basic</module>
+				<module>bcl</module>
 				<module>bcpl</module>
-                <module>bdf</module>
+				<module>bdf</module>
 				<module>bibcode</module>
 				<module>bnf</module>
 				<module>brainfuck</module>
@@ -95,6 +97,7 @@
 				<module>calculator</module>
 				<module>callable</module>
 				<module>capnproto</module>
+				<module>cayenne</module>
 				<module>clf</module>
 				<module>clojure</module>
 				<module>clu</module>
@@ -111,19 +114,25 @@
 				<module>csv</module>
 				<module>ctl</module>
 				<module>cto</module>
+				<module>cypher</module>
 				<module>dart2</module>
 				<module>databank</module>
+				<module>datalog</module>				
 				<module>dcm</module>
 				<module>dgol</module>
 				<module>dice</module>
+				<module>dif</module>
 				<module>doiurl</module>
 				<module>dot</module>
 				<module>edif300</module>
 				<module>edn</module>
 				<module>erlang</module>
+				<module>evm-bytecode</module>
 				<module>fasta</module>
+                <module>fdo91</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
+				<module>flowmatic</module>
 				<module>focal</module>
 				<module>fol</module>
 				<module>fortran77</module>
@@ -151,6 +160,7 @@
 				<module>iri</module>
 				<module>iso8601</module>
 				<module>istc</module>
+				<module>itn</module>
 				<module>janus</module>
 				<module>java</module>
 				<module>javadoc</module>
@@ -163,6 +173,7 @@
 				<module>kirikiri-tjs</module>
 				<module>kotlin</module>
 				<module>kuka</module>
+				<module>kquery</module>
 				<module>lambda</module>
 				<module>lark</module>
 				<module>lcc</module>
@@ -173,8 +184,10 @@
 				<module>lolcode</module>
 				<module>loop</module>
 				<module>lpc</module>
+				<module>lrc</module>
 				<module>ltl</module>
 				<module>lua</module>
+				<module>lucene</module>
 				<module>matlab</module>
 				<module>mckeeman-form</module>
 				<module>mdx</module>
@@ -202,6 +215,7 @@
 				<module>p</module>
 				<module>parkingsign</module>
 				<module>pascal</module>
+                <module>pbm</module>
 				<module>pcre</module>
 				<module>pddl</module>
 				<module>pdn</module>
@@ -220,9 +234,11 @@
 				<module>promql</module>
 				<module>propcalc</module>
 				<module>properties</module>
+				<module>protobuf2</module>
 				<module>protobuf3</module>
 				<module>prov-n</module>
 				<module>python</module>
+				<module>qif</module>
 				<module>quakemap</module>
 				<module>r</module>
 				<module>racket-bsl</module>
@@ -258,13 +274,16 @@
 				<module>snowball</module>
 				<module>solidity</module>
 				<module>sparql</module>
+				<module>spass</module>
 				<module>sql</module>
 				<module>stacktrace</module>
+                <module>star</module>
 				<module>stellaris</module>
 				<module>stringtemplate</module>
 				<module>suokif</module>
 				<module>swift</module>
 				<module>swift-fin</module>
+                <module>szf</module>
 				<module>tcpheader</module>
 				<module>telephone</module>
 				<module>terraform</module>
@@ -284,6 +303,7 @@
 				<module>turtle</module>
 				<module>turtle-doc</module>
 				<module>unicode</module>
+				<module>unreal_angelscript</module>
 				<module>upnp</module>
 				<module>url</module>
 				<module>useragent</module>
@@ -299,12 +319,12 @@
 				<module>webidl</module>
 				<module>wkt</module>
 				<module>wln</module>
+				<module>wren</module>
 				<module>xml</module>
 				<module>xpath</module>
 				<module>xsd-regex</module>
+                <module>xyz</module>
 				<module>z</module>
-				<!-- testing repository -->
-				<!--<module>grammar-test</module> -->
 			</modules>
 		</profile>
 		<profile>
@@ -313,7 +333,7 @@
 				<plugins>
 					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.3.0</version>
+						<version>3.4.2</version>
 						<configuration>
 							<descriptors>
 								<descriptor>${maven.multiModuleProjectDirectory}/assembly.xml</descriptor>
@@ -332,7 +352,7 @@
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.8</version>
+						<version>1.6.13</version>
 						<extensions>true</extensions>
 						<configuration>
 							<serverId>ossrh</serverId>
@@ -356,7 +376,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.3.1	</version>
+						<version>3.4.1	</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -385,15 +405,6 @@
 					</plugin>
 				</plugins>
 			</build>
-		</profile>
-		<profile>
-			<id>test</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<modules>
-				<module>_grammar-test</module>
-			</modules>
 		</profile>
 	</profiles>
 	<distributionManagement>

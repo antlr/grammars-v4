@@ -25,6 +25,8 @@ THE SOFTWARE.
 
 lexer grammar MySqlLexer;
 
+options { caseInsensitive = true; }
+
 channels { MYSQLCOMMENT, ERRORCHANNEL }
 
 // SKIP
@@ -112,6 +114,7 @@ HIGH_PRIORITY:                       'HIGH_PRIORITY';
 HISTOGRAM:                           'HISTOGRAM';
 IF:                                  'IF';
 IGNORE:                              'IGNORE';
+IGNORED:                             'IGNORED';
 IN:                                  'IN';
 INDEX:                               'INDEX';
 INFILE:                              'INFILE';
@@ -135,12 +138,14 @@ LINEAR:                              'LINEAR';
 LINES:                               'LINES';
 LOAD:                                'LOAD';
 LOCK:                                'LOCK';
+LOCKED:                              'LOCKED';
 LOOP:                                'LOOP';
 LOW_PRIORITY:                        'LOW_PRIORITY';
 MASTER_BIND:                         'MASTER_BIND';
 MASTER_SSL_VERIFY_SERVER_CERT:       'MASTER_SSL_VERIFY_SERVER_CERT';
 MATCH:                               'MATCH';
 MAXVALUE:                            'MAXVALUE';
+MINVALUE:                            'MINVALUE';
 MODIFIES:                            'MODIFIES';
 NATURAL:                             'NATURAL';
 NOT:                                 'NOT';
@@ -150,6 +155,7 @@ NUMBER:                              'NUMBER';
 ON:                                  'ON';
 OPTIMIZE:                            'OPTIMIZE';
 OPTION:                              'OPTION';
+OPTIONAL:                            'OPTIONAL';
 OPTIONALLY:                          'OPTIONALLY';
 OR:                                  'OR';
 ORDER:                               'ORDER';
@@ -185,6 +191,7 @@ SET:                                 'SET';
 SEPARATOR:                           'SEPARATOR';
 SHOW:                                'SHOW';
 SIGNAL:                              'SIGNAL';
+SKIP_:                               'SKIP';
 SPATIAL:                             'SPATIAL';
 SQL:                                 'SQL';
 SQLEXCEPTION:                        'SQLEXCEPTION';
@@ -404,6 +411,7 @@ CIPHER:                              'CIPHER';
 CLASS_ORIGIN:                        'CLASS_ORIGIN';
 CLIENT:                              'CLIENT';
 CLOSE:                               'CLOSE';
+CLUSTERING:                          'CLUSTERING';
 COALESCE:                            'COALESCE';
 CODE:                                'CODE';
 COLUMNS:                             'COLUMNS';
@@ -427,6 +435,7 @@ CONTEXT:                             'CONTEXT';
 CONTRIBUTORS:                        'CONTRIBUTORS';
 COPY:                                'COPY';
 CPU:                                 'CPU';
+CYCLE:                               'CYCLE';
 CURSOR_NAME:                         'CURSOR_NAME';
 DATA:                                'DATA';
 DATAFILE:                            'DATAFILE';
@@ -487,12 +496,14 @@ HOSTS:                               'HOSTS';
 IDENTIFIED:                          'IDENTIFIED';
 IGNORE_SERVER_IDS:                   'IGNORE_SERVER_IDS';
 IMPORT:                              'IMPORT';
+INCREMENT:                           'INCREMENT';
 INDEXES:                             'INDEXES';
 INITIAL_SIZE:                        'INITIAL_SIZE';
 INPLACE:                             'INPLACE';
 INSERT_METHOD:                       'INSERT_METHOD';
 INSTALL:                             'INSTALL';
 INSTANCE:                            'INSTANCE';
+INSTANT:                             'INSTANT';
 INVISIBLE:                           'INVISIBLE';
 INVOKER:                             'INVOKER';
 IO:                                  'IO';
@@ -556,6 +567,12 @@ NCHAR:                               'NCHAR';
 NEVER:                               'NEVER';
 NEXT:                                'NEXT';
 NO:                                  'NO';
+NOCACHE:                             'NOCACHE';
+NOCOPY:                              'NOCOPY';
+NOCYCLE:                             'NOCYCLE';
+NOMAXVALUE:                          'NOMAXVALUE';
+NOMINVALUE:                          'NOMINVALUE';
+NOWAIT:                              'NOWAIT';
 NODEGROUP:                           'NODEGROUP';
 NONE:                                'NONE';
 ODBC:                                'ODBC';
@@ -596,6 +613,7 @@ QUERY:                               'QUERY';
 QUICK:                               'QUICK';
 REBUILD:                             'REBUILD';
 RECOVER:                             'RECOVER';
+RECURSIVE:                           'RECURSIVE';
 REDO_BUFFER_SIZE:                    'REDO_BUFFER_SIZE';
 REDUNDANT:                           'REDUNDANT';
 RELAY:                               'RELAY';
@@ -614,6 +632,7 @@ REPLICATE_WILD_DO_TABLE:             'REPLICATE_WILD_DO_TABLE';
 REPLICATE_WILD_IGNORE_TABLE:         'REPLICATE_WILD_IGNORE_TABLE';
 REPLICATION:                         'REPLICATION';
 RESET:                               'RESET';
+RESTART:                             'RESTART';
 RESUME:                              'RESUME';
 RETURNED_SQLSTATE:                   'RETURNED_SQLSTATE';
 RETURNING:                           'RETURNING';
@@ -625,9 +644,11 @@ ROTATE:                              'ROTATE';
 ROW:                                 'ROW';
 ROWS:                                'ROWS';
 ROW_FORMAT:                          'ROW_FORMAT';
+RTREE:                               'RTREE';
 SAVEPOINT:                           'SAVEPOINT';
 SCHEDULE:                            'SCHEDULE';
 SECURITY:                            'SECURITY';
+SEQUENCE:                            'SEQUENCE';
 SERVER:                              'SERVER';
 SESSION:                             'SESSION';
 SHARE:                               'SHARE';
@@ -703,7 +724,7 @@ WRAPPER:                             'WRAPPER';
 X509:                                'X509';
 XA:                                  'XA';
 XML:                                 'XML';
-
+YES:                                 'YES';
 
 // Date format Keywords
 
@@ -751,16 +772,21 @@ FLUSH_OPTIMIZER_COSTS:               'FLUSH_OPTIMIZER_COSTS';
 FLUSH_STATUS:                        'FLUSH_STATUS';
 FLUSH_TABLES:                        'FLUSH_TABLES';
 FLUSH_USER_RESOURCES:                'FLUSH_USER_RESOURCES';
+ADMIN:                               'ADMIN';
 GROUP_REPLICATION_ADMIN:             'GROUP_REPLICATION_ADMIN';
 INNODB_REDO_LOG_ARCHIVE:             'INNODB_REDO_LOG_ARCHIVE';
 INNODB_REDO_LOG_ENABLE:              'INNODB_REDO_LOG_ENABLE';
+INVOKE:                              'INVOKE';
+LAMBDA:                              'LAMBDA';
 NDB_STORED_USER:                     'NDB_STORED_USER';
+PASSWORDLESS_USER_ADMIN:             'PASSWORDLESS_USER_ADMIN';
 PERSIST_RO_VARIABLES_ADMIN:          'PERSIST_RO_VARIABLES_ADMIN';
 REPLICATION_APPLIER:                 'REPLICATION_APPLIER';
 REPLICATION_SLAVE_ADMIN:             'REPLICATION_SLAVE_ADMIN';
 RESOURCE_GROUP_ADMIN:                'RESOURCE_GROUP_ADMIN';
 RESOURCE_GROUP_USER:                 'RESOURCE_GROUP_USER';
 ROLE_ADMIN:                          'ROLE_ADMIN';
+S3:                                  'S3';
 SERVICE_CONNECTION_ADMIN:            'SERVICE_CONNECTION_ADMIN';
 SESSION_VARIABLES_ADMIN:             QUOTE_SYMB? 'SESSION_VARIABLES_ADMIN' QUOTE_SYMB?;
 SET_USER_ID:                         'SET_USER_ID';
@@ -918,6 +944,7 @@ ELT:                                 'ELT';
 ENCODE:                              'ENCODE';
 ENCRYPT:                             'ENCRYPT';
 ENDPOINT:                            'ENDPOINT';
+ENGINE_ATTRIBUTE:                    'ENGINE_ATTRIBUTE';
 ENVELOPE:                            'ENVELOPE';
 EQUALS:                              'EQUALS';
 EXP:                                 'EXP';
@@ -1041,6 +1068,7 @@ ROW_COUNT:                           'ROW_COUNT';
 RPAD:                                'RPAD';
 RTRIM:                               'RTRIM';
 SEC_TO_TIME:                         'SEC_TO_TIME';
+SECONDARY_ENGINE_ATTRIBUTE:          'SECONDARY_ENGINE_ATTRIBUTE';
 SESSION_USER:                        'SESSION_USER';
 SHA:                                 'SHA';
 SHA1:                                'SHA1';
@@ -1149,6 +1177,19 @@ Y_FUNCTION:                          'Y';
 X_FUNCTION:                          'X';
 
 
+// MariaDB tokens
+VIA:                                 'VIA';
+LASTVAL:                             'LASTVAL';
+NEXTVAL:                             'NEXTVAL';
+SETVAL:                              'SETVAL';
+PREVIOUS:                            'PREVIOUS';
+PERSISTENT:                          'PERSISTENT'; // Same as STORED for MySQL
+BINLOG_MONITOR:                      'BINLOG_MONITOR';
+BINLOG_REPLAY:                       'BINLOG_REPLAY';
+FEDERATED_ADMIN:                     'FEDERATED_ADMIN';
+READ_ONLY_ADMIN:                     'READ_ONLY_ADMIN';
+REPLICA:                             'REPLICA';
+REPLICATION_MASTER_ADMIN:            'REPLICATION_MASTER_ADMIN';
 
 // Operators
 // Operators. Assigns
@@ -1272,6 +1313,10 @@ IP_ADDRESS:                          (
                                        [0-9]+ '.' [0-9.]+
                                        | [0-9A-F:]+ ':' [0-9A-F:]+
                                      );
+STRING_USER_NAME_MARIADB:            (
+                                        SQUOTA_STRING | DQUOTA_STRING
+                                        | BQUOTA_STRING | ID_LITERAL
+                                     )  '@';
 LOCAL_ID:                            '@'
                                 (
                                   [A-Z0-9._$]+

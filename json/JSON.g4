@@ -5,7 +5,7 @@
 grammar JSON;
 
 json
-   : value
+   : value EOF
    ;
 
 obj
