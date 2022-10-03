@@ -76,19 +76,19 @@ substituted_application
    ;
 
 identity
-   : 'i'
+   : IDENTITY
    ;
 
 void_
-   : 'v'
+   : VOID_
    ;
 
 call
-   : 'c'
+   : CALL
    ;
 
 delay
-   : 'd'
+   : DELAY
    ;
 
 promise
@@ -100,14 +100,42 @@ print
    ;
 
 carriage_return
-   : 'r'
+   : CARRIAGE_RETURN
    ;
 
 exit
-   : 'e'
+   : EXIT
    ;
 
 read
+   : READ
+   ;
+
+IDENTITY
+   : 'i'
+   ;
+
+VOID_
+   : 'v'
+   ;
+
+CALL
+   : 'c'
+   ;
+
+DELAY
+   : 'd'
+   ;
+
+CARRIAGE_RETURN
+   : 'r'
+   ;
+
+EXIT
+   : 'e'
+   ;
+
+READ
    : '@'
    ;
 
