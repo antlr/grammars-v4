@@ -998,6 +998,26 @@ stopping
    | while_key bit_exp
    ;
 
+identifier
+   : IDENTIFIER
+   ;
+
+char_string
+   : STRING
+   ;
+
+label
+   : IDENTIFER
+   ;
+
+STRING
+   : '\'' ~ '\''* '\''
+   ;
+
+IDENTIFER
+   : [a-zA-Z] [a-zA-Z0-9]*
+   ;
+
 WS
    : [ \r\n\t]+ -> skip
    ;
