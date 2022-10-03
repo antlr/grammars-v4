@@ -1,0 +1,14 @@
+<group>
+lovel=0
+hivel=127
+
+<region> trigger=attack  pitch_keycenter=60 lokey=30 hikey=61 sample=SubDir/01C4.wav
+<region> trigger=attack  pitch_keycenter=62 lokey=62 hikey=63 sample=SubDir/02D4.wav
+<region> trigger=attack  pitch_keycenter=64 lokey=64 hikey=64 sample=SubDir/03E4.wav
+<region> trigger=attack  pitch_keycenter=65 lokey=65 hikey=66 sample=SubDir/04F4.wav
+<region> trigger=attack  pitch_keycenter=67 lokey=67 hikey=68 sample=SubDir/05G4.wav
+<region> trigger=attack  pitch_keycenter=69 lokey=69 hikey=70 sample=SubDir/06A4.wav
+<region> trigger=attack  pitch_keycenter=71 lokey=71 hikey=71 sample=SubDir/07B4.wav
+<region> trigger=attack  pitch_keycenter=72 lokey=72 hikey=73 sample=SubDir/08C5.wav
+<region> trigger=attack  pitch_keycenter=74 lokey=74 hikey=75 sample=SubDir/09D5.wav
+<region> trigger=attack  pitch_keycenter=76 lokey=76 hikey=108 sample=SubDir/10E5.wav

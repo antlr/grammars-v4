@@ -1,0 +1,1 @@
+MATCH (other:Person) WHERE NOT other.age > 25 RETURN other.name

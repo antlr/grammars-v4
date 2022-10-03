@@ -9,7 +9,7 @@
 
 # Download Antlr .jar.
 # Parameter to get-antlr.ps1 must be in double quotes.
-$antlrPath = _scripts/get-antlr.ps1 "4.10"
+$antlrPath = _scripts/get-antlr.ps1 "4.11.1"
 
 # Set up env as it is used in test script.
 echo "antlr_path=$antlrPath" >> $env:GITHUB_ENV

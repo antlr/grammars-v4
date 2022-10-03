@@ -28,11 +28,12 @@ options
 
 // starting rule
 statements
-   : (statement statementSeparator | empty)* EOF
+   : (statement statementSeparator)* EOF
    ;
 
 statementSeparator
    : SEMICOLON
+   |
    ;
 
 empty

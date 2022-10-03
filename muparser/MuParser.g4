@@ -40,7 +40,7 @@
 grammar MuParser;
 
 prog
- : expr ('\n' expr)*  # progExpr
+ : expr+ EOF  # progExpr
  ;
 
 expr

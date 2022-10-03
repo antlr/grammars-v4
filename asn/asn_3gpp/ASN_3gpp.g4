@@ -45,7 +45,7 @@ If you have some comments/improvements, send me an e-mail.
 
 grammar ASN_3gpp;
 
-modules: moduleDefinition+;
+modules: moduleDefinition+ EOF;
 
 moduleDefinition :  IDENTIFIER (L_BRACE (IDENTIFIER L_PARAN NUMBER R_PARAN)* R_BRACE)?
      DEFINITIONS_LITERAL
@@ -55,6 +55,7 @@ moduleDefinition :  IDENTIFIER (L_BRACE (IDENTIFIER L_PARAN NUMBER R_PARAN)* R_B
       BEGIN_LITERAL
      moduleBody
       END_LITERAL
+      EOF
         ;
 
 

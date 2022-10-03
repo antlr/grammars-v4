@@ -37,7 +37,7 @@ commentStatement
     ;
     
 program
-   : commentStatement* (executableUnit commentStatement*)+ EOL*
+   : commentStatement* (executableUnit commentStatement*)+ EOL* EOF
    ;
 
 executableUnit
