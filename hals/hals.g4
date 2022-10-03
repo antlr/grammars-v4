@@ -32,16 +32,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar hals;
 
-compilation:compile_list _|_;
+compilation:compile_list '_'|'_';
 
 compile_list : block_definiton
  |compile_list block_definiton;
 
 arith_exp : term
  | '+' term
- | '-' '1' term
+ | '-1' term
  |arith_exp '+' term
- |arith_exp '-''1' term;
+ |arith_exp '-1' term;
 
  term : product
  | product '/' term;
@@ -52,11 +52,11 @@ arith_exp : term
  |factor product;
 
 factor :primary
- |primary <**>factor;
+ |primary starstar factor;
 
- <**> : '**';
+starstar: '**';
 
- pre_primary : (arith_exp)
+ pre_primary : '(' arith_exp')'
  | number
  | compound_number;
 
@@ -70,7 +70,7 @@ arith_func_head : arith_func
 
 primary : arith_var;
 
- pre_primary :arith_func_head (call_list);
+ pre_primary :arith_func_head '('call_list')';
 
 primary : modified_arith_func
  | arith_unline_def block_body closing';'
@@ -96,9 +96,9 @@ other_statement : on_phrase statement
  | GO TO label';'
  |';'
  | call_key';'
- | call_key (call_list)';'
- | call_key assign (call_assign_list)';'
- |call_key(call_list)assign (call_assign_list)';'
+ | call_key '('call_list')' ';'
+ | call_key assign '('call_assign_list')' ';'
+ |call_key(call_list)assign '('call_assign_list')' ';'
  | RETURN';'
  | RETURN expression';'
  | do_group_head ending';'
@@ -106,9 +106,9 @@ other_statement : on_phrase statement
  | read_phrase';'
  | write_key';'
  | write_phrase';'
- | file_exp = expression';'
- | variable = file_exp';'
- | wait_keyFOR DEPENDENT';'
+ | file_exp '=' expression';'
+ | variable '=' file_exp';'
+ | wait_key FOR DEPENDENT';'
  | wait_key arith_exp';'
  | wait_key UNTIL arith_exp';'
  | wait_key FOR bit_exp';'
@@ -124,9 +124,10 @@ other_statement : on_phrase statement
  | on_clause AND signal_clause';'
  | OFF ERROR subscript';'
  | pct_macro_name';'
- | pct_macro_head pct_macro_arg)';'
- pct_macro_head : pct_macro_name (
- | pct_macro_head pct_macro_arg ,;
+ | pct_macro_head pct_macro_arg ')'';';
+
+ pct_macro_head : pct_macro_name '('
+ | pct_macro_head pct_macro_arg ',';
 
  pct_macro_arg : name_var
  |constant;
@@ -135,31 +136,36 @@ other_statement : on_phrase statement
  | label_var
  | event_var
  | bit_const
- | (bit_exp)
+ | '('bit_exp')'
  | modified_bit_func
- | bit_inline_def block_body closing;
- | subbit_head expression)
- | bit_func_head (call_list)
- bit_func_head : bit_func
- | BIT sub_or_qualifier
- bit_cat : bit_prim
- | bit_cat catbit_prim
- | <NOT> bit_prim
- | bit_cat cat<NOT> bit_prim
- bit_factor : bit_cat
- | bit_factor and bit_cat
- bit_exp : bit_factor
- | bit_exp or bit_factor
- relational_op : =
- | <NOT> =
- | <
- | >
- | < =
- | > =
- | <NOT> <
- | <NOT> >;
+ | bit_inline_def block_body closing';'
+ | subbit_head expression')'
+ | bit_func_head '('call_list')';
 
- comparison :arith_exp relational_oparith_exp
+ bit_func_head : bit_func
+ | BIT sub_or_qualifier;
+
+ bit_cat : bit_prim
+ | bit_cat cat bit_prim
+ | not bit_prim
+ | bit_cat catnot bit_prim;
+
+ bit_factor : bit_cat
+ | bit_factor and bit_cat;
+
+ bit_exp : bit_factor
+ | bit_exp or bit_factor;
+
+ relational_op : '='
+ | not '='
+ | '<'
+ | '>'
+ | '< ='
+ | '> ='
+ | not '<'
+ | not '>';
+
+ comparison :arith_exp relational_op arith_exp
  | char_exp relational_op char_exp
  | bit_cat relational_op bit_cat
  | structure_exp relational_op structure_exp
@@ -171,16 +177,16 @@ other_statement : on_phrase statement
  relational_exp : relational_factor
  | relational_exp or relational_factor;
 
- rel_prim : (relational_exp)
- | <NOT> (relational_exp)
+ rel_prim : '('relational_exp')'
+ | not '('relational_exp')'
  | comparison;
 
  char_prim : char_var
  | char_const
  | modified_char_func
- | char_inline_def block_body closing;
- | char_func_head (call_list)
- | (char_exp);
+ | char_inline_def block_body closing';'
+ | char_func_head '('call_list')'
+ | '('char_exp')';
 
  char_func_head : char_func
  | CHARACTER sub_or_qualifier;
@@ -194,8 +200,8 @@ other_statement : on_phrase statement
  |arith_exp cat arith_exp
  |arith_exp catchar_prim;
 
- assignment : variable <=1> expression
- | variable , assignment;
+ assignment : variable eq expression
+ | variable ',' assignment;
 
  if_statement : if_clause statement
  | true_part statement;
@@ -207,16 +213,16 @@ other_statement : on_phrase statement
 
  if : IF;
 
- do_group_head : DO;
- | DO for_list;
- | DO for_list while_clause;
- | DO while_clause;
- | DO CASE arith_exp;
+ do_group_head : DO';'
+ | DO for_list';'
+ | DO for_list while_clause';'
+ | DO while_clause';'
+ | DO CASE arith_exp';'
  | case_else statement
  | do_group_head any_statement
  | do_group_head temporary_stmt;
 
- case_else : DO CASE arith_exp; ELSE;
+ case_else : DO CASE arith_exp';' ELSE;
 
  while_key : WHILE
  | UNTIL;
@@ -228,13 +234,13 @@ other_statement : on_phrase statement
  | for_key iteration_body;
 
  iteration_body :arith_exp
- | iteration_body ,arith_exp;
+ | iteration_body ','arith_exp;
 
- iteration_control : TOarith_exp
- | TO arith_exp BYarith_exp;
+ iteration_control : TO arith_exp
+ | TO arith_exp BY arith_exp;
 
- for_key : FOR arith_var =
- | FOR TEMPORARY identifier =;
+ for_key : FOR arith_var '='
+ | FOR TEMPORARY identifier '=';
 
  ending : END
  | END label
@@ -249,17 +255,17 @@ other_statement : on_phrase statement
  | RESET event_var
  | SIGNAL event_var;
 
- file_exp : file_head ,arith_exp);
+ file_exp : file_head ','arith_exp')';
 
- file_head : FILE (number;
+ file_head : FILE '('number;
 
  call_key : CALL label_var;
 
  call_list : list_exp
- | call_list , list_exp;
+ | call_list ',' list_exp;
 
  call_assign_list : variable
- | call_assign_list , variable;
+ | call_assign_list ',' variable;
 
  expression :arith_exp
  | bit_exp
@@ -269,21 +275,21 @@ other_statement : on_phrase statement
 
  structure_exp : structure_var
  | modified_struct_func
- | struc_inline_def block_body closing;
- | struct_func_head (call_list);
+ | struc_inline_def block_body closing';'
+ | struct_func_head '('call_list')';
 
  struct_func_head : struct_func;
 
  list_exp : expression
- |arith_exp # expression;
+ |arith_exp '#' expression;
 
  variable : arith_var
  | structure_var
  | bit_var
  | event_var
- | subbit_head variable)
+ | subbit_head variable ')'
  | char_var
- | name_key (name_var);
+ | name_key '('name_var')';
 
  name_var : variable
  | label_var
@@ -292,9 +298,9 @@ other_statement : on_phrase statement
  | modified_char_func
  | modified_struct_func;
 
- name_exp : name_key (name_var)
+ name_exp : name_key '('name_var')'
  | NULL
- | name_key (NULL);
+ | name_key '('NULL')';
 
  name_key : NAME;
 
@@ -313,55 +319,62 @@ other_statement : on_phrase statement
  qual_struct : structure_id
  | qual_struct . structure_id;
 
- prefix : <EMPTY>
- | qual_struct .;
- subbit_head : subbit_key subscript (;
- subbit_key : SUBBIT;
- subscript : sub_head)
- | qualifier
- | <$> number
- | <$> arith_var
- | <EMPTY>;
+ prefix : empty
+ | qual_struct '.';
 
- sub_start : <$>(
- | <$> (@prec_spec ,
- | sub_head;
- | sub_head :
- | sub_head,;
+ subbit_head : subbit_key subscript '(';
+ subbit_key : SUBBIT;
+ subscript : sub_head ')'
+ | qualifier
+ | dollar number
+ | dollar arith_var
+ | empty;
+
+ sub_start : dollar '('
+ | dollar '(''@'prec_spec ','
+ | sub_head';'
+ | sub_head ':'
+ | sub_head',';
 
  sub_head : sub_start
  | sub_start sub;
+
  sub : sub_exp
- | *
+ | '*'
  | sub_run_head sub_exp
  |arith_exp AT sub_exp;
 
  sub_run_head : sub_exp TO;
  sub_exp :arith_exp
- | <# EXPRESSION>
- <# EXPRESSION> : #
- | <# EXPRESSION> + term
- | <# EXPRESSION> -1 term;
+ | hash_expression;
 
- <=1> : =;
- <$> : $;
- and : &
+ hash_expression : '#'
+ | hash_expression '+' term
+ | hash_expression '-1' term;
+
+ eq : '=';
+
+ dollar : '$';
+
+ and : '&'
  | AND;
- or : =|
+
+ or : '=|'
  | OR;
 
- <NOT> :  
+ not : 'squiggly thing'
  | NOT;
- cat: ||
+ cat: '||'
  | CAT;
 
- qualifier : <$> (@prec_spec)
- | <$> (scale_headarith_exp)
- | <$> (@prec_spec, scale_head arith_exp);
+ qualifier : dollar '(' '@' prec_spec ')'
+ | dollar '('scale_head arith_exp')'
+ | dollar '(' '@' prec_spec ',' scale_head arith_exp ')';
 
- scale_head : @
- | @ @;
- bit_qualifier : <$(@radix);
+ scale_head : '@'
+ | '@@';
+
+ bit_qualifier : '<$' '(' '@' radix ')';
 
  radix : HEX
  | OCT
@@ -369,7 +382,7 @@ other_statement : on_phrase statement
  | DEC;
 
  bit_const_head : radix
- | radix (number);
+ | radix '('number')';
 
  bit_const : bit_const_head char_string
  | TRUE
@@ -378,19 +391,19 @@ other_statement : on_phrase statement
  | OFF;
 
  char_const : char_string
- | CHAR (number) char_string;
+ | CHAR '('number')' char_string;
 
- io_control : SKIP (arith_exp)
- | TAB (arith_exp)
- | COLUMN (arith_exp)
- | LINE (arith_exp)
- | PAGE (arith_exp);
+ io_control : SKIP '('arith_exp')'
+ | TAB '('arith_exp')'
+ | COLUMN '('arith_exp')'
+ | LINE '('arith_exp')'
+ | PAGE '('arith_exp')';
 
  read_phrase : read_key read_arg
- | read_phrase , read_arg;
+ | read_phrase ',' read_arg;
 
  write_phrase : write_key write_arg
- | write_phrase , write_arg;
+ | write_phrase ',' write_arg;
 
  read_arg : variable
  | io_control;
@@ -398,27 +411,30 @@ other_statement : on_phrase statement
  write_arg : expression
  | io_control;
 
- read_key : READ (number)
- | READALL (number);
+ read_key : READ '('number')'
+ | READALL '('number')';
 
- write_key : WRITE (number);
- block_definiton : block_stmt block_body closing;
- block_body : <EMPTY>
+ write_key : WRITE '('number')';
+ block_definiton : block_stmt block_body closing';';
+ block_body : empty
  | declare_group
  | block_body any_statement;
 
- arith_unline_def : FUNCTION arith_spec;
- | FUNCTION;
- bit_inline_def : FUNCTION bit_spec;
- char_inline_def : FUNCTION char_spec;
- struc_inline_def : FUNCTION struct_spec;
- block_stmt : block_stmt_top;
+ arith_unline_def : FUNCTION arith_spec';'
+ | FUNCTION';';
+
+ bit_inline_def : FUNCTION bit_spec';';
+ char_inline_def : FUNCTION char_spec';';
+ struc_inline_def : FUNCTION struct_spec';';
+ block_stmt : block_stmt_top';';
+
  block_stmt_top : block_stmt_top ACCESS
  | block_stmt_top RIGID
  | block_stmt_head
  | block_stmt_head EXCLUSIVE
- | block_stmt_head REENTRANT
- label_definition : label: ;
+ | block_stmt_head REENTRANT;
+
+ label_definition : label':' ;
 
  label_external : label_definition
  | label_definition EXTERNAL;
@@ -436,6 +452,7 @@ other_statement : on_phrase statement
 
  function_name : label_external FUNCTION;
  procedure_name : label_external PROCEDURE;
+
  func_stmt_body : parameter_list
  | type_spec
  | parameter_list type_spec;
@@ -444,9 +461,9 @@ other_statement : on_phrase statement
  | assign_list
  | parameter_list assign_list;
 
- parameter_list : parameter_head identifier);
- parameter_head : (
- | parameter_head identifier,;
+ parameter_list : parameter_head identifier ')';
+ parameter_head : '('
+ | parameter_head identifier',';
  assign_list : assign parameter_list;
  assign : ASSIGN;
  declare_element : declare_statement
@@ -454,56 +471,59 @@ other_statement : on_phrase statement
  | structure_stmt
  | EQUATE EXTERNAL identifier TO variable;
 
- replace_stmt : REPLACE replace_head BY <TEXT>;
+ replace_stmt : REPLACE replace_head BY text;
  replace_head : identifier
- | identifier (arg_list);
+ | identifier '('arg_list')';
  arg_list : identifier
- | arg_list , identifier;
+ | arg_list ',' identifier;
 
  temporary_stmt : TEMPORARY declare_body;
  declare_statement : DECLARE declare_body;
  declare_body : declaration_list
- | attributes , declaration_list;
- declaration_list : declaration
- | <DCL LIST,> declaration;
+ | attributes ',' declaration_list;
 
- <DCL LIST ,> : declaration_list,;
+ declaration_list : declaration
+ | dcl_list declaration;
+
+dcl_list: declaration_list',';
+
  declare_group : declare_element
  | declare_group declare_element;
 
  structure_stmt : STRUCTURE struct_stmt_head struct_stmt_tail;
 
- struct_stmt_head : identifier : level
- | identifier minor_attr_list: level
- | struct_stmt_head declaration , level;
+ struct_stmt_head : identifier ':' level
+ | identifier minor_attr_list':' level
+ | struct_stmt_head declaration ',' level;
 
- struct_stmt_tail : declaration;
+ struct_stmt_tail : declaration';';
+
  struct_spec : struct_template struct_spec_body;
- struct_spec_body : - STRUCTURE
- | struct_spec_head <LITERAL EXP OR *>);
+ struct_spec_body : '-' STRUCTURE
+ | struct_spec_head literal_exp_or_star ')';
 
- struct_spec_head : - STRUCTURE (
+ struct_spec_head : '-' STRUCTURE '(';
  declaration : name_id
  | name_id attributes;
 
  name_id : identifier
- | identifier NAME
+ | identifier NAME;
 
- attributes : array_spec <TYPE & MINOR ATTR>
+ attributes : array_spectype_and_minor_attr
  | array_spec
- | <TYPE & MINOR ATTR>;
+ |type_and_minor_attr;
 
- array_spec : array_head <LITERAL EXP OR *>)
+ array_spec : array_head literal_exp_or_star ')'
  | FUNCTION
  | PROCEDURE
  | PROGRAM
  | TASK;
 
 
- array_head : ARRAY (
- | array_head <LITERAL EXP OR *>,;
+ array_head : ARRAY '('
+ | array_head literal_exp_or_star ',';
 
- <TYPE & MINOR ATTR> : type_spec
+type_and_minor_attr : type_spec
  | type_spec minor_attr_list
  | minor_attr_list;
 
@@ -514,53 +534,56 @@ other_statement : on_phrase statement
  | EVENT;
 
  bit_spec : BOOLEAN
- | BIT (<LITERAL EXP OR *>);
+ | BIT '('literal_exp_or_star')';
 
- char_spec : CHARACTER (<LITERAL EXP OR *>);
+ char_spec : CHARACTER '('literal_exp_or_star')';
  arith_spec : prec_spec
  | sq_dq_name
  | sq_dq_name prec_spec;
 
- sq_dq_name : doubly_qual_name_head <LITERAL EXP OR *>)
+ sq_dq_name : doubly_qual_name_head literal_exp_or_star')'
  | INTEGER
  | SCALAR
  | VECTOR
  | MATRIX;
 
- doubly_qual_name_head : VECTOR (
- | MATRIX (<LITERAL EXP OR *> ,;
+ doubly_qual_name_head : VECTOR '('
+ | MATRIX '('literal_exp_or_star ',';
 
- <LITERAL EXP OR *> :arith_exp
- | *;
+literal_exp_or_star :arith_exp
+ | '*';
+
  prec_spec : SINGLE
  | DOUBLE;
+
  minor_attr_list : minor_attribute
  | minor_attr_list minor_attribute;
+
  minor_attribute : STATIC
  | AUTOMATIC
  | DENSE
  | ALIGNED
  | ACCESS
- | LOCK (<LITERAL EXP OR *>)
+ | LOCK '('literal_exp_or_star')'
  | REMOTE
  | RIGID
- | init_const_head repeated_constant)
- | init_const_head *)
+ | init_const_head repeated_constant')'
+ | init_const_head '*)'
  | LATCHED
- | NONHAL (level);
+ | NONHAL '('level')';
 
- init_const_head : INITIAL (
- | CONSTANT (
- | init_const_head <REPEATED CONSTATN> ,;
+ init_const_head : INITIAL '('
+ | CONSTANT '('
+ | init_const_head repeated_constant ',';
  repeated_constant : EXPRESSION
  | repeat_head variable
  | repeat_headconstant
- | nested_repeat_head repeated_constant)
+ | nested_repeat_head repeated_constant')'
  | repeat_head;
 
- repeat_head :arith_exp #;
- nested_repeat_head : repeat_head (
- | nested_repeat_head repeated_constant ,;
+ repeat_head :arith_exp '#';
+ nested_repeat_head : repeat_head '('
+ | nested_repeat_head repeated_constant ',';
 
 constant : number
  | compound_number
@@ -576,14 +599,15 @@ constant : number
  terminator : TERMINATE
  | CANCEL;
  terminate_list : label_var
- | terminate_list , label_var;
+ | terminate_list ',' label_var;
  wait_key: WAIT;
  schedule_head : SCHEDULE label_var
- | schedule_head ATarith_exp
- | schedule_head INarith_exp
- | schedule_head ON bit_exp
+ | schedule_head AT arith_exp
+ | schedule_head IN arith_exp
+ | schedule_head ON bit_exp;
+
  schedule_phrase : schedule_head
- | schedule_head PRIORITY(arith_exp)
+ | schedule_head PRIORITY '('arith_exp')'
  | schedule_phrase DEPENDENT;
 
  schedule_control : stopping
@@ -594,7 +618,7 @@ constant : number
  | repeat AFTER arith_exp
  | repeat;
 
- repeat : , REPEAT;
+ repeat : ',' REPEAT;
  stopping : while_keyarith_exp
  | while_key bit_exp;
 
