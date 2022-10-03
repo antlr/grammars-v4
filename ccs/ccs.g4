@@ -192,7 +192,7 @@ NUM
    ;
 
 NAME
-   : LETTER+
+   : LETTER (LETTER|DIGIT)*
    ;
 
 DIGIT

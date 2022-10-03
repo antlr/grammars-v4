@@ -1,0 +1,4 @@
+selector {
+    st1: v ;
+    st2: va, vb, vc ;
+};
