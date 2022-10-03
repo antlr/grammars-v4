@@ -91,8 +91,6 @@
 				<module>bdf</module>
 				<module>bibcode</module>
 				<module>bnf</module>
-				<module>brainfuck</module>
-				<module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
 				<module>callable</module>
@@ -104,7 +102,6 @@
 				<module>cmake</module>
 				<module>cobol85</module>
 				<module>cookie</module>
-				<module>cool</module>
 				<module>cpp</module>
 				<module>cql</module>
 				<module>cql3</module>
@@ -127,6 +124,7 @@
 				<module>edif300</module>
 				<module>edn</module>
 				<module>erlang</module>
+                <module>esolang</module>
 				<module>evm-bytecode</module>
 				<module>fasta</module>
                 <module>fdo91</module>
@@ -182,8 +180,6 @@
 				<module>limbo</module>
 				<module>lisa</module>
 				<module>logo</module>
-				<module>lolcode</module>
-				<module>loop</module>
 				<module>lpc</module>
 				<module>lrc</module>
 				<module>ltl</module>
@@ -207,7 +203,6 @@
 				<module>mumath</module>
 				<module>mumps</module>
 				<module>muparser</module>
-				<module>nanofuck</module>
 				<module>newick</module>
 				<module>oberon</module>
 				<!-- <module>objc</module> -->
@@ -266,13 +261,11 @@
 				<module>sgf</module>
 				<module>sharc</module>
 				<module>sici</module>
-				<module>sickbay</module>
 				<module>sieve</module>
 				<module>smalltalk</module>
 				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
-				<module>snowball</module>
 				<module>solidity</module>
 				<module>sparql</module>
 				<module>spass</module>
