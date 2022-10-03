@@ -44,11 +44,11 @@ measure
    ;
 
 chord
-   : note (notetype bass?)
+   : note (chordquality bass?)
    ;
 
-notetype
-   : 'm'? NUM? (('-' | '+') NUM)?
+chordquality
+   : ('m' | 'maj' | 'min' | 'dim' | 'aug')? NUM? (('-' | '+') NUM)?
    ;
 
 repeatchord
