@@ -29,7 +29,7 @@ function Test-Case {
     $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 
     $parseOutFile = $InputFile + ".out"
-    $o = trwdog python3 Program.py -file $InputFile -tree | Out-File -LiteralPath "$parseOutFile" -Encoding UTF8
+    $o = trwdog python3 -X utf8 Program.py -file $InputFile -tree | Out-File -LiteralPath "$parseOutFile" -Encoding UTF8
     $parseOk = $LASTEXITCODE -eq 0
     $treeMatch = $true
     if ($errorFile) {
