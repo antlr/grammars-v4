@@ -284,7 +284,7 @@ formalType
    ;
 
 module
-   : MODULE ident ';' importList? declarationSequence (BEGIN statementSequence)? END ident '.'
+   : MODULE ident ';' importList? declarationSequence (BEGIN statementSequence)? END ident '.' EOF
    ;
 
 importList

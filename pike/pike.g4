@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar pike;
 
 program
-   : definition*
+   : definition* EOF
    ;
 
 definition

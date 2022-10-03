@@ -111,7 +111,7 @@ DOUBLE_QUOTE_STRING_LITERAL
 // This seems to be available in Antlr3.
 
 DOUBLE_ANGLE_STRING_LITERAL
-   : '<<' ()*? '>>'
+   : '<<' .*? '>>'
    ;
 
 fragment ESC

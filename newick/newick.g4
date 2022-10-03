@@ -32,9 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar newick;
 
 tree_
-   : (rootLeaf ';')
-   | (rootInternal ';')
-   | (branch ';')
+   : ( (rootLeaf ';') | (rootInternal ';') | (branch ';') ) EOF
    ;
 
 rootLeaf

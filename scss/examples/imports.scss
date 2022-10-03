@@ -1,0 +1,14 @@
+@import "hello";
+@import url("hello");
+@import url(hello);
+@import url(hello world);
+
+@use "sass:color";
+@use 'third_party/javascript/angular2/material' as mat;
+
+@use "library" with (
+  $base-color: $base-color,
+  $secondary-color: color.scale($base-color, $lightness: -10%),
+);
+
+@require "sass:color";
