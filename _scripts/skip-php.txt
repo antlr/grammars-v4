@@ -36,6 +36,7 @@ kirikiri-tjs
 kotlin/kotlin
 kotlin/kotlin-formal
 kquery
+logo/logo
 logo/ucb-logo
 lpc
 lucene
