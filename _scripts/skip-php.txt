@@ -49,6 +49,7 @@ powerbuilder
 prov-n
 python/python
 python/python3
+python/python3alt
 r
 racket-bsl
 racket-isl

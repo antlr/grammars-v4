@@ -1,0 +1,2 @@
+python/python3alt
+	"SyntaxError: Unexpected strict mode reserved word", see issue #2858.
