@@ -94,15 +94,16 @@ int TryParse(std::vector\<std::string>& args)
     auto duration = std::chrono::duration_cast\<std::chrono::microseconds>(after - before);
     if (listener_parser->had_error || listener_lexer->had_error)
     {
+        // Listener will have already printed the error(s) to stdout.
         std::cerr \<\< "Parse failed." \<\< std::endl;
     }
     else
     {
         std::cerr \<\< "Parse succeeded." \<\< std::endl;
-    }
-    if (show_tree)
-    {
-        std::cout \<\< tree->toStringTree(parser, false) \<\< std::endl;
+        if (show_tree)
+        {
+            std::cout \<\< tree->toStringTree(parser, false) \<\< std::endl;
+        }
     }
     std::cerr \<\< "Time: " \<\< formatDuration(duration.count()) \<\< std::endl;
     return listener_parser->had_error || listener_lexer->had_error ? 1 : 0;
