@@ -40,7 +40,7 @@ lambda
 less
 logo/logo
 logo/ucb-logo
-lolcode
+esolang/lolcode
 mckeeman-form
 mdx
 metric
