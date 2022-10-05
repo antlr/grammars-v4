@@ -109,10 +109,10 @@ public class Program
         else
         {
             System.Console.Error.WriteLine("Parse succeeded.");
-        }
-        if (show_tree)
-        {
-            System.Console.Out.WriteLine(tree.ToStringTree(parser));
+            if (show_tree)
+            {
+                System.Console.Out.WriteLine(tree.ToStringTree(parser));
+            }
         }
         System.Environment.Exit(parser.NumberOfSyntaxErrors > 0 ? 1 : 0);
     }

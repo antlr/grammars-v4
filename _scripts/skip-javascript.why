@@ -84,6 +84,8 @@ python/python2
 python/python3
 	ErrorCaptureStackTrace(err) undefined.
 
+python/python3alt
+	"SyntaxError: Unexpected strict mode reserved word", see issue #2858.
 python/python3-py
 	pom.xml does not contain tests, so trgen does not create Generated/. Skip for now.
 	Grammar is not target-agnostic.

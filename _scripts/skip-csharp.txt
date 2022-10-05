@@ -2,6 +2,7 @@ apex
 asn/asn_3gpp
 clif
 cpp
+csharp
 fortran77
 html
 hypertalk
