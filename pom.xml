@@ -116,7 +116,6 @@
 				<module>databank</module>
 				<module>datalog</module>				
 				<module>dcm</module>
-				<module>dgol</module>
 				<module>dice</module>
 				<module>dif</module>
 				<module>doiurl</module>

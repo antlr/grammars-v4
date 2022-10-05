@@ -15,6 +15,7 @@
         <module>brainfuck</module>
         <module>brainflak</module>
         <module>cool</module>
+        <module>dgol</module>
         <module>lolcode</module>
         <module>loop</module>
         <module>nanofuck</module>
