@@ -1,0 +1,2 @@
+csharp
+	antlr4 issue #3700(https://github.com/antlr/antlr4/issues/3700) descibes an incorrect error message from `grammars-v4/csharp` example `issue-2612`.  When that bug is fixed, this parser can be removed from skip-csharp.txt.

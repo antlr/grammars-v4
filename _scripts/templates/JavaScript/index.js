@@ -19,7 +19,7 @@ function getChar() {
 class MyErrorListener extends antlr4.error.ErrorListener {
     syntaxError(recognizer, offendingSymbol, line, column, msg, err) {
         num_errors++;
-        console.error(`${offendingSymbol} line ${line}, col ${column}: ${msg}`);
+        console.log(`line ${line}:${column} ${msg}`);
     }
 }
 
@@ -90,12 +90,9 @@ if (show_tokens)
     lexer.reset();
 }
 const tree = parser.<start_symbol>();
-if (show_tree)
-{
-    console.log(tree.toStringTree(parser.ruleNames));
-}
 if (num_errors > 0)
 {
+    // Listener will have already printed the error(s) to stdout.
     console.error('Parse failed.');
     process.exitCode = 1;
 }
@@ -103,4 +100,8 @@ else
 {
     console.error('Parse succeeded.');
     process.exitCode = 0;
+    if (show_tree)
+    {
+        console.log(tree.toStringTree(parser.ruleNames));
+    }
 }
