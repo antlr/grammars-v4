@@ -195,6 +195,13 @@ PRIMARY KEY (`pk_realm`),
 KEY `auth_realms_auth_realm_clients` (`fk_realm`)
 ) START TRANSACTION ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+create table `site_checker_b_sonet_group_favorites` (
+USER_ID int(11) not null,
+GROUP_ID int(11) not null,
+DATE_ADD datetime DEFAULT NULL,
+primary key (USER_ID, GROUP_ID)
+);
+
 -- Mariadb default value for function: unix_timestamp()
 CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` bigint(20) NOT NULL DEFAULT unix_timestamp());
 
