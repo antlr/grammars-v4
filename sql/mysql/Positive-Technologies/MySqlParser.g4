@@ -2117,7 +2117,7 @@ simpleId
     | intervalTypeBase
     | dataTypeBase
     | keywordsCanBeId
-    | functionNameBase
+    | scalarFunctionName
     ;
 
 dottedId
