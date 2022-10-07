@@ -81,7 +81,7 @@ def get_values(tagName, txt):
 
 
 def index_grammars(root : str) -> Sequence[dict]:
-    grammars = []
+    entries = []
     for path, subdirs, files in os.walk(root):
         if is_grammar_dir(path, files):
             pomfile = os.path.join(path, "pom.xml")
@@ -117,13 +117,13 @@ def index_grammars(root : str) -> Sequence[dict]:
                 'start' : get_single_value("entryPoint", pom),
                 'example' : examplesFiles[0]
             }
-            print(json.dumps(entry))
-            grammars.append(entry)
-    return grammars
+            entries.append(entry)
+    return entries
 
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: python mkindex.py grammars-v4-path")
         exit(1)
-    index_grammars(sys.argv[1])
+    grammars = index_grammars(sys.argv[1])
+    print(json.dumps(grammars))
