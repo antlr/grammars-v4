@@ -33,18 +33,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar logo;
 
 prog
-   : (line? EOL) + line?
+   : (line? EOL) + line? EOF
    ;
 
 line
    : cmd + comment?
    | comment
-   | print comment?
+   | print_ comment?
    | procedureDeclaration
    ;
 
 cmd
-   : repeat
+   : repeat_
    | fd
    | bk
    | rt
@@ -76,11 +76,11 @@ parameterDeclarations
    : ':' name (',' parameterDeclarations)*
    ;
 
-func
+func_
    : random
    ;
 
-repeat
+repeat_
    : 'repeat' number block
    ;
 
@@ -106,7 +106,7 @@ make
    : 'make' STRINGLITERAL value
    ;
 
-print
+print_
    : 'print' (value | quotedstring)
    ;
 
@@ -125,7 +125,7 @@ value
    ;
 
 signExpression
-   : (('+' | '-'))* (number | deref | func)
+   : (('+' | '-'))* (number | deref | func_)
    ;
 
 multiplyingExpression

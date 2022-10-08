@@ -1,0 +1,7 @@
+// See #1718
+
+syntax = "proto3";
+
+message message {
+  string body = 1;
+}

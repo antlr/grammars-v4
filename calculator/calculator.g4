@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar calculator;
 
 equation
-   : expression relop expression
+   : expression relop expression EOF
    ;
 
 expression
@@ -51,7 +51,7 @@ powExpression
 signedAtom
    : PLUS signedAtom
    | MINUS signedAtom
-   | func
+   | func_
    | atom
    ;
 
@@ -76,7 +76,7 @@ variable
    : VARIABLE
    ;
 
-func
+func_
    : funcname LPAREN expression (COMMA expression)* RPAREN
    ;
 

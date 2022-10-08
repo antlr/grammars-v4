@@ -65,7 +65,7 @@ subruleOptionsSpec
    ;
 
 option
-   : id EQUAL optionValue SEMI
+   : id_ EQUAL optionValue SEMI
    ;
 
 optionValue
@@ -76,7 +76,7 @@ optionValue
    ;
 
 lexerOption
-   : id EQUAL lexerOptionValue SEMI
+   : id_ EQUAL lexerOptionValue SEMI
    ;
 
 lexerOptionValue
@@ -108,7 +108,7 @@ tokenEntry
    ;
 
 tokensSpecOptions
-   : OPEN_ELEMENT_OPTION id EQUAL optionValue ( SEMI id EQUAL optionValue )* CLOSE_ELEMENT_OPTION
+   : OPEN_ELEMENT_OPTION id_ EQUAL optionValue ( SEMI id_ EQUAL optionValue )* CLOSE_ELEMENT_OPTION
    ;
 
 superClass
@@ -116,16 +116,16 @@ superClass
    ;
 
 parserSpec
-   : CLASS id (EXTENDS PARSER superClass? | ) SEMI parserOptionsSpec? tokensSpec? actionBlock?
+   : CLASS id_ (EXTENDS PARSER superClass? | ) SEMI parserOptionsSpec? tokensSpec? actionBlock?
    ;
 
 lexerSpec
-   : (LEXCLASS id | CLASS id EXTENDS LEXER superClass?)
+   : (LEXCLASS id_ | CLASS id_ EXTENDS LEXER superClass?)
    SEMI lexerOptionsSpec? tokensSpec? actionBlock?
    ;
 
 treeParserSpec
-   : CLASS id EXTENDS TREEPARSER superClass? SEMI treeParserOptionsSpec? tokensSpec? actionBlock?
+   : CLASS id_ EXTENDS TREEPARSER superClass? SEMI treeParserOptionsSpec? tokensSpec? actionBlock?
    ;
 
 rules
@@ -133,7 +133,7 @@ rules
    ;
 
 rule_
-   : DOC_COMMENT? ((PROTECTED | PUBLIC | PRIVATE))? id BANG? argActionBlock? (RETURNS argActionBlock)? throwsSpec? ruleOptionsSpec? ruleAction* COLON altList SEMI exceptionGroup?
+   : DOC_COMMENT? ((PROTECTED | PUBLIC | PRIVATE))? id_ BANG? argActionBlock? (RETURNS argActionBlock)? throwsSpec? ruleOptionsSpec? ruleAction* COLON altList SEMI exceptionGroup?
    ;
 
 ruleOptionsSpec
@@ -141,7 +141,7 @@ ruleOptionsSpec
    ;
 
 throwsSpec
-   : THROWS id (COMMA id)*
+   : THROWS id_ (COMMA id_)*
    ;
 
 block
@@ -177,14 +177,14 @@ element
 
 elementOptionSpec
    : OPEN_ELEMENT_OPTION
-     id EQUAL optionValue
-     ( SEMI id EQUAL optionValue )*
+     id_ EQUAL optionValue
+     ( SEMI id_ EQUAL optionValue )*
      CLOSE_ELEMENT_OPTION
      ;
 
 elementNoOptionSpec
-   : (id EQUAL (id COLON)? (rule_ref_or_keyword_as argActionBlock? BANG? | TOKEN_REF argActionBlock?))
-   | ((id COLON)? (rule_ref_or_keyword_as argActionBlock? BANG? | range | terminal_ | NOT ( notTerminal | ebnf) | ebnf))
+   : (id_ EQUAL (id_ COLON)? (rule_ref_or_keyword_as argActionBlock? BANG? | TOKEN_REF argActionBlock?))
+   | ((id_ COLON)? (rule_ref_or_keyword_as argActionBlock? BANG? | range_ | terminal_ | NOT ( notTerminal | ebnf) | ebnf))
    | actionBlock QM?
    | tree_
    ;
@@ -200,7 +200,7 @@ tree_
    ;
 
 rootNode
-   : (id COLON)? terminal_
+   : (id_ COLON)? terminal_
    ;
 
 ebnf
@@ -212,7 +212,7 @@ ast_type_spec
    : (ROOT | BANG)?
    ;
 
-range
+range_
    : CHAR_LITERAL RANGE CHAR_LITERAL BANG?
    | (TOKEN_REF | STRING_LITERAL) RANGE ast_type_spec
    ;
@@ -230,10 +230,10 @@ notTerminal
    ;
 
 qualifiedID
-   : id ( DOT id)*
+   : id_ ( DOT id_)*
    ;
 
-id
+id_
    : TOKEN_REF
    | RULE_REF
    | GRAMMAR
@@ -242,11 +242,11 @@ id
 
 
 action
-   : AT (actionScopeName COLONCOLON)? id actionBlock
+   : AT (actionScopeName COLONCOLON)? id_ actionBlock
    ;
 
 actionScopeName
-   : id
+   : id_
    | LEXER
    | PARSER
    ;

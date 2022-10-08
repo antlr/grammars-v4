@@ -48,7 +48,7 @@ statement
     | variableStatement
     | importStatement
     | exportStatement
-    | emptyStatement
+    | emptyStatement_
     | classDeclaration
     | expressionStatement
     | ifStatement
@@ -131,7 +131,7 @@ variableDeclaration
     : assignable ('=' singleExpression)? // ECMAScript 6: Array & Object Matching
     ;
 
-emptyStatement
+emptyStatement_
     : SemiColon
     ;
 
@@ -155,7 +155,7 @@ iterationStatement
 
 varModifier  // let, const - ECMAScript 6
     : Var
-    | let
+    | let_
     | Const
     ;
 
@@ -225,7 +225,7 @@ debuggerStatement
     ;
 
 functionDeclaration
-    : Async? Function '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
+    : Async? Function_ '*'? identifier '(' formalParameterList? ')' '{' functionBody '}'
     ;
 
 classDeclaration
@@ -238,7 +238,7 @@ classTail
 
 classElement
     : (Static | {this.n("static")}? identifier | Async)* (methodDefinition | assignable '=' objectLiteral ';')
-    | emptyStatement
+    | emptyStatement_
     | '#'? propertyName '=' singleExpression
     ;
 
@@ -314,8 +314,10 @@ singleExpression
     | Class identifier? classTail                                           # ClassExpression
     | singleExpression '[' expressionSequence ']'                           # MemberIndexExpression
     | singleExpression '?'? '.' '#'? identifierName                         # MemberDotExpression
+    // Split to try `new Date()` first, then `new Date`.
+    | New singleExpression arguments                                        # NewExpression
+    | New singleExpression                                                  # NewExpression
     | singleExpression arguments                                            # ArgumentsExpression
-    | New singleExpression arguments?                                       # NewExpression
     | New '.' identifier                                                    # MetaExpression // new.target
     | singleExpression {this.notLineTerminator()}? '++'                     # PostIncrementExpression
     | singleExpression {this.notLineTerminator()}? '--'                     # PostDecreaseExpression
@@ -347,7 +349,7 @@ singleExpression
     | <assoc=right> singleExpression '=' singleExpression                   # AssignmentExpression
     | <assoc=right> singleExpression assignmentOperator singleExpression    # AssignmentOperatorExpression
     | Import '(' singleExpression ')'                                       # ImportExpression
-    | singleExpression TemplateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
+    | singleExpression templateStringLiteral                                # TemplateStringExpression  // ECMAScript 6
     | yieldStatement                                                        # YieldExpression // ECMAScript 6
     | This                                                                  # ThisExpression
     | identifier                                                            # IdentifierExpression
@@ -415,7 +417,7 @@ assignable
     ;
 
 objectLiteral
-    : '{' (propertyAssignment (',' propertyAssignment)*)? ','? '}'
+    : '{' (propertyAssignment (',' propertyAssignment)* ','?)? '}'
     ;
 
 objectExpressionSequence
@@ -424,7 +426,7 @@ objectExpressionSequence
 
 anoymousFunction
     : functionDeclaration                                                       # FunctionDecl
-    | Async? Function '*'? '(' formalParameterList? ')' '{' functionBody '}'    # AnoymousFunctionDecl
+    | Async? Function_ '*'? '(' formalParameterList? ')' '{' functionBody '}'    # AnoymousFunctionDecl
     | Async? arrowFunctionParameters '=>' arrowFunctionBody                     # ArrowFunction
     ;
 
@@ -457,10 +459,19 @@ literal
     : NullLiteral
     | BooleanLiteral
     | StringLiteral
-    | TemplateStringLiteral
+    | templateStringLiteral
     | RegularExpressionLiteral
     | numericLiteral
     | bigintLiteral
+    ;
+
+templateStringLiteral
+    : BackTick templateStringAtom* BackTick
+    ;
+
+templateStringAtom
+    : TemplateStringAtom
+    | TemplateStringStartExpression singleExpression TemplateCloseBrace
     ;
 
 numericLiteral
@@ -521,7 +532,7 @@ keyword
     | Switch
     | While
     | Debugger
-    | Function
+    | Function_
     | This
     | With
     | Default
@@ -539,7 +550,7 @@ keyword
     | Export
     | Import
     | Implements
-    | let
+    | let_
     | Private
     | Public
     | Interface
@@ -553,7 +564,7 @@ keyword
     | As
     ;
 
-let
+let_
     : NonStrictLet
     | StrictLet
     ;

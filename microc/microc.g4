@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar microc;
 
 program
-   : statement+
+   : statement+ EOF
    ;
 
 statement
@@ -64,27 +64,27 @@ paren_expr
 
 expr
    : test
-   | id '=' expr
+   | id_ '=' expr
    ;
 
 test
-   : sum
-   | sum '<' sum
+   : sum_
+   | sum_ '<' sum_
    ;
 
-sum
+sum_
    : term
-   | sum '+' term
-   | sum '-' term
+   | sum_ '+' term
+   | sum_ '-' term
    ;
 
 term
-   : id
+   : id_
    | integer
    | paren_expr
    ;
 
-id
+id_
    : STRING
    ;
 

@@ -43,7 +43,7 @@ moduleReferenceValue: STRINGLITERAL;
 
 moduleReferenceComponent: STRINGLITERAL;
 
-moduleHeader: VERSION WS DOUBLELITERAL (WS CLASS)?;
+moduleHeader: VERSION WS doubleLiteral (WS CLASS)?;
 
 moduleConfig: BEGIN NEWLINE+ moduleConfigElement+ END NEWLINE+;
 
@@ -55,7 +55,7 @@ moduleAttributes: (attributeStmt NEWLINE+)+;
 moduleOptions: (moduleOption NEWLINE+)+;
 
 moduleOption:
-	OPTION_BASE WS INTEGERLITERAL		# optionBaseStmt
+	OPTION_BASE WS integerLiteral		# optionBaseStmt
 	| OPTION_COMPARE WS (BINARY | TEXT)	# optionCompareStmt
 	| OPTION_EXPLICIT					# optionExplicitStmt
 	| OPTION_PRIVATE_MODULE				# optionPrivateModuleStmt
@@ -106,7 +106,7 @@ cp_PropertyValue:
 
 cp_NestedProperty:
 	WS? BEGINPROPERTY WS ambiguousIdentifier (
-		LPAREN INTEGERLITERAL RPAREN
+		LPAREN integerLiteral RPAREN
 	)? (WS GUID)? NEWLINE+ (cp_Properties+)? ENDPROPERTY NEWLINE+;
 
 cp_ControlType: complexType;
@@ -500,7 +500,7 @@ typeStmt_Element:
 		WS asTypeClause
 	)? NEWLINE+;
 
-typeOfStmt: TYPEOF WS valueStmt (WS IS WS type)?;
+typeOfStmt: TYPEOF WS valueStmt (WS IS WS type_)?;
 
 unloadStmt: UNLOAD WS valueStmt;
 
@@ -637,16 +637,16 @@ arg: (OPTIONAL WS)? ((BYVAL | BYREF) WS)? (PARAMARRAY WS)? ambiguousIdentifier t
 
 argDefaultValue: EQ WS? valueStmt;
 
-subscripts: subscript (WS? COMMA WS? subscript)*;
+subscripts: subscript_ (WS? COMMA WS? subscript_)*;
 
-subscript: (valueStmt WS TO WS)? valueStmt;
+subscript_: (valueStmt WS TO WS)? valueStmt;
 
 // atomic rules ----------------------------------
 
 ambiguousIdentifier: (IDENTIFIER | ambiguousKeyword)+
 	| L_SQUARE_BRACKET (IDENTIFIER | ambiguousKeyword)+ R_SQUARE_BRACKET;
 
-asTypeClause: AS WS (NEW WS)? type (WS fieldLength)?;
+asTypeClause: AS WS (NEW WS)? type_ (WS fieldLength)?;
 
 baseType:
 	BOOLEAN
@@ -670,7 +670,7 @@ comparisonOperator: LT | LEQ | GT | GEQ | EQ | NEQ | IS | LIKE;
 
 complexType: ambiguousIdentifier (DOT ambiguousIdentifier)*;
 
-fieldLength: MULT WS? (INTEGERLITERAL | ambiguousIdentifier);
+fieldLength: MULT WS? (integerLiteral | ambiguousIdentifier);
 
 letterrange:
 	certainIdentifier (WS? MINUS WS? certainIdentifier)?;
@@ -680,22 +680,22 @@ lineLabel: ambiguousIdentifier COLON;
 literal:
 	COLORLITERAL
 	| DATELITERAL
-	| DOUBLELITERAL
+	| doubleLiteral
 	| FILENUMBER
-	| INTEGERLITERAL
-	| OCTALLITERAL
+	| integerLiteral
+	| octalLiteral
 	| STRINGLITERAL
 	| TRUE
 	| FALSE
 	| NOTHING
-	| NULL
+	| NULL_
     ;
 
 publicPrivateVisibility: PRIVATE | PUBLIC;
 
 publicPrivateGlobalVisibility: PRIVATE | PUBLIC | GLOBAL;
 
-type: (baseType | complexType) (WS? LPAREN WS? RPAREN)?;
+type_: (baseType | complexType) (WS? LPAREN WS? RPAREN)?;
 
 typeHint:
 	AMPERSAND
@@ -799,7 +799,7 @@ ambiguousKeyword:
 	| NEW
 	| NOT
 	| NOTHING
-	| NULL
+	| NULL_
 	| OBJECT
 	| ON
 	| OPEN
@@ -859,3 +859,7 @@ ambiguousKeyword:
 	| WRITE
 	| XOR
     ;
+
+integerLiteral : (PLUS | MINUS)* INTEGERLITERAL;
+octalLiteral : (PLUS | MINUS)* OCTALLITERAL;
+doubleLiteral : (PLUS | MINUS)* DOUBLELITERAL;

@@ -1,0 +1,1 @@
+RETURN [  x   IN   [  1  ,   ''  ,   n  ]    |    toString(x)   +   '-string'  ] AS list

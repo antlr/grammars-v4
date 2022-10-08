@@ -33,18 +33,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar pl0;
 
 program
-   : block '.'
+   : block '.' EOF
    ;
 
 block
-   : consts? vars? procedure* statement
+   : consts? vars_? procedure* statement
    ;
 
 consts
    : CONST ident '=' number (',' ident '=' number)* ';'
    ;
 
-vars
+vars_
    : VAR ident (',' ident)* ';'
    ;
 

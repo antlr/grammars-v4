@@ -2,10 +2,6 @@
 
 using namespace antlr4;
 
-JavaScriptParserBase::JavaScriptParserBase(TokenStream *input) : Parser(input)
-{
-}
-
 bool JavaScriptParserBase::p(std::string str)
 {
     return prev(str);
@@ -34,7 +30,7 @@ bool JavaScriptParserBase::notLineTerminator()
 bool JavaScriptParserBase::notOpenBraceAndNotFunction()
 {
     int nextTokenType = _input->LT(1)->getType();
-    return nextTokenType != JavaScriptParser::OpenBrace && nextTokenType != JavaScriptParser::Function;
+    return nextTokenType != JavaScriptParser::OpenBrace && nextTokenType != JavaScriptParser::Function_;
 
 }
 

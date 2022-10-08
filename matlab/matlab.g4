@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar matlab;
 
+file_ : statement_list? EOF;
+
 primary_expression
    : IDENTIFIER
    | CONSTANT

@@ -1,1 +1,1 @@
-((- a ^ 2 * b + c) > 1) and d or e
+((- a ^ 2 * b + c) > 1) and d or e or (a < -1e-05 > 1e-05)

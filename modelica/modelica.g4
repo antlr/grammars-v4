@@ -27,7 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar modelica;
 
 stored_definition
-   : ('within' (name)? ';')* (('final')? class_definition ';')*
+   : ('within' (name)? ';')* (('final')? class_definition ';')* EOF
    ;
 
 class_definition
@@ -351,10 +351,10 @@ expression_list
    ;
 
 array_subscripts
-   : '[' subscript (',' subscript)* ']'
+   : '[' subscript_ (',' subscript_)* ']'
    ;
 
-subscript
+subscript_
    : ':'
    | expression
    ;

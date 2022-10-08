@@ -142,9 +142,9 @@ term
   : arrayComprehension 
   | objectComprehension 
   | setComprehension 
-  | object 
-  | array 
-  | set 
+  | object_ 
+  | array_ 
+  | set_ 
   | ArithOperator? scalar 
   | functionCall
   | Not? ref
@@ -164,7 +164,7 @@ objectComprehension
   : LCBrace termPair Mid query RCBrace
   ;
 
-object 
+object_ 
   : LCBrace ( objectItem ( Comma objectItem )* Comma? )? RCBrace
   ;
 
@@ -172,11 +172,11 @@ objectItem
   : ( scalar | ref ) Colon term
   ;
 
-array 
+array_ 
   : LSBrace exprTermList? RSBrace
   ;
 
-set 
+set_ 
   : emptySet 
   | nonEmptySet
   ;

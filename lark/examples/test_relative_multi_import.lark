@@ -1,0 +1,4 @@
+start: NUMBER WORD
+
+%import .grammars.test (NUMBER, WORD, WS)
+%ignore WS

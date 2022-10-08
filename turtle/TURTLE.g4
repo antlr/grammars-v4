@@ -22,7 +22,7 @@
 grammar TURTLE;
 
 turtleDoc
-   : statement*
+   : statement* EOF
    ;
 
 statement
@@ -63,7 +63,7 @@ predicateObjectList
    ;
 
 objectList
-   : object (',' object)*
+   : object_ (',' object_)*
    ;
 
 verb
@@ -81,7 +81,7 @@ predicate
    : iri
    ;
 
-object
+object_
    : iri
    | BlankNode
    | collection
@@ -100,7 +100,7 @@ blankNodePropertyList
    ;
 
 collection
-   : '(' object* ')'
+   : '(' object_* ')'
    ;
 
 
@@ -273,3 +273,9 @@ HEX
 PN_LOCAL_ESC
    : '\\' ('_' | '~' | '.' | '-' | '!' | '$' | '&' | '\'' | '(' | ')' | '*' | '+' | ',' | ';' | '=' | '/' | '?' | '#' | '@' | '%')
    ;
+
+
+LC
+   : '#' ~[\r\n]+  -> channel(HIDDEN)
+   ;
+

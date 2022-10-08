@@ -45,7 +45,7 @@ If you have some comments/improvements, send me an e-mail.
 
 grammar ASN_3gpp;
 
-modules: moduleDefinition+;
+modules: moduleDefinition+ EOF;
 
 moduleDefinition :  IDENTIFIER (L_BRACE (IDENTIFIER L_PARAN NUMBER R_PARAN)* R_BRACE)?
      DEFINITIONS_LITERAL
@@ -55,6 +55,7 @@ moduleDefinition :  IDENTIFIER (L_BRACE (IDENTIFIER L_PARAN NUMBER R_PARAN)* R_B
       BEGIN_LITERAL
      moduleBody
       END_LITERAL
+      EOF
         ;
 
 
@@ -197,7 +198,7 @@ parameterizedAssignment :
 	)
 )
 |( definedObjectClass ASSIGN_OP
-	( object
+	( object_
 		|	objectClass
 		|	objectSet
 	)
@@ -268,7 +269,7 @@ fieldSpec :
 	  typeOptionalitySpec?
   	| asnType (valueSetOptionalitySpec?  | UNIQUE_LITERAL? valueOptionalitySpec? )
 	| fieldName (OPTIONAL_LITERAL | (DEFAULT_LITERAL (valueSet | value)))?
-	| definedObjectClass (OPTIONAL_LITERAL | (DEFAULT_LITERAL (objectSet | object)))?
+	| definedObjectClass (OPTIONAL_LITERAL | (DEFAULT_LITERAL (objectSet | object_)))?
 
 	)
 
@@ -299,7 +300,7 @@ fixedTypeValueSetFieldSpec : AMPERSAND IDENTIFIER   asnType valueSetOptionalityS
 valueSetOptionalitySpec : OPTIONAL_LITERAL | DEFAULT_LITERAL valueSet
 ;
 
-object : definedObject /*| objectDefn | objectFromObject */|  parameterizedObject
+object_ : definedObject /*| objectDefn | objectFromObject */|  parameterizedObject
 ;
 parameterizedObject : definedObject actualParameterList
 ;
@@ -346,7 +347,7 @@ elements  : subtypeElements
 // |  L_PARAN elementSetSpec R_PARAN
 ;
 objectSetElements :
-    object | definedObject /*| objectSetFromObjects | parameterizedObjectSet      */
+    object_ | definedObject /*| objectSetFromObjects | parameterizedObjectSet      */
 ;
 
 
@@ -364,7 +365,7 @@ variableTypeValueSetFieldSpec : AMPERSAND IDENTIFIER    fieldName valueSetOption
 ;
 objectFieldSpec : AMPERSAND IDENTIFIER definedObjectClass objectOptionalitySpec?
 ;
-objectOptionalitySpec : OPTIONAL_LITERAL | DEFAULT_LITERAL object
+objectOptionalitySpec : OPTIONAL_LITERAL | DEFAULT_LITERAL object_
 ;
 objectSetFieldSpec : AMPERSAND IDENTIFIER definedObjectClass objectSetOptionalitySpec ?
 ;
@@ -436,7 +437,7 @@ userDefinedConstraintParameter :
 	governor (COLON
  		value
  		| valueSet
- 		| object
+ 		| object_
  		| objectSet
  		)?
 ;

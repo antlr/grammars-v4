@@ -33,10 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar gml;
 
 graph
-   : kv +
+   : kv + EOF
    ;
 
-list
+list_
    : '[' kv + ']'
    ;
 
@@ -48,8 +48,8 @@ value
    : integer
    | realnum
    | stringliteral
-   | str
-   | list
+   | str_
+   | list_
    ;
 
 key
@@ -64,7 +64,7 @@ realnum
    : REAL
    ;
 
-str
+str_
    : VALUE
    ;
 

@@ -1,0 +1,8 @@
+man_start_object <trigger, "Welcome">
+act_replace_select_action
+<
+uni_start_stream
+sm_m_send_token_arg <"f1", 32-30>
+uni_end_stream
+>
+man_end_object

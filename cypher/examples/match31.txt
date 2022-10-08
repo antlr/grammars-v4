@@ -1,0 +1,1 @@
+RETURN [p=(a)-->()WHERE a:Label|55 + a.prop]
