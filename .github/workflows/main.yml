@@ -228,7 +228,9 @@ jobs:
 
     - name: Checkout.
       uses: actions/checkout@v3
+
       # see https://github.com/actions/checkout#Push-a-commit-using-the-built-in-token
+    - name: Update
       run: |
           python _scripts/mkindex.py . > grammars.json
           git config user.name github-actions
