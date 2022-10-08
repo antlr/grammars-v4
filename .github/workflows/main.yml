@@ -218,31 +218,25 @@ jobs:
   reindex:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install Python
-	uses: actions/setup-python@v4.2.0
-        with:
+    - uses: actions/checkout@v3
+    - name: Install Python
+      uses: actions/setup-python@v4.2.0
+      with:
           python-version: '3.10'
-
-      - name: Do not trust Python env
-        run: |
+    - name: Do not trust Python env
+      run: |
           python --version
-
-      - name: Create index.
-        run: |
+    - name: Create index.
+      run: |
           # do some operation that changes a file in the git repo
           python _scripts/mkindex.py . > grammars.json
-
-      - name: setup git config
-        run: |
+    - name: setup git config
+      run: |
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
-
-      - name: commit
-        run: |
+    - name: Commit
+      run: |
           # Stage the file, commit and push
           git add grammars.json
           git commit -m "New index of grammars in repo."
