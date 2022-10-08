@@ -1,8 +1,6 @@
 // Template generated code from trgen <version>
 
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const antlr4 = require('antlr4');
+import antlr4 from 'antlr4';
 
 export default class CaseChangingStream extends antlr4.InputStream {
 

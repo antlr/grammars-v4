@@ -79,7 +79,7 @@ we are analyzing.
 
 
 parkingSigns
-   : parkingSign*
+   : parkingSign* EOF
    ;
 
 parkingSign

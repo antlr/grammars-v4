@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar alef;
 
 program
-   : decllist?
+   : decllist? EOF
    ;
 
 decllist

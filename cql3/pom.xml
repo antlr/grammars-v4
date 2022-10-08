@@ -42,7 +42,6 @@
 					<entryPoint>root</entryPoint>
 					<grammarName>Cql</grammarName>
 					<packageName></packageName>
-					<caseInsensitiveType>UPPER</caseInsensitiveType>
 					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>

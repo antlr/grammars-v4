@@ -7,6 +7,7 @@ from readchar import readchar
 from <lexer_name> import <lexer_name>;
 from <parser_name> import <parser_name>;
 from CaseChangingStream import *;
+from datetime import datetime
 
 def getChar():
     xx = readchar()
@@ -23,7 +24,7 @@ class MyErrorListener(ErrorListener):
 
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         self.num_errors = self.num_errors + 1
-        super().syntaxError(recognizer, offendingSymbol, line, column, msg, e)
+        print(f"line {line}:{column} {msg}");
 
 def main(argv):
     show_tokens = False
@@ -87,14 +88,20 @@ def main(argv):
             if (token.type == -1):
                 break
         lexer.reset()
+    start_time = datetime.now()
     tree = parser.<start_symbol>()
-    if (show_tree):
-        print(tree.toStringTree(recog=parser))
+    end_time = datetime.now()
+    diff = end_time - start_time
+    diff_time = diff.total_seconds()
+    print(f'Time: {diff_time}', file=sys.stderr);
     if p_listener.num_errors > 0 or l_listener.num_errors > 0:
+        # Listener will have already printed the error(s) to stdout.
         print('Parse failed.', file=sys.stderr);
         sys.exit(1)
     else:
         print('Parse succeeded.', file=sys.stderr);
+        if (show_tree):
+            print(tree.toStringTree(recog=parser))
         sys.exit(0)
 
 if __name__ == '__main__':

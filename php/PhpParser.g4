@@ -449,6 +449,7 @@ expression
 
     | Print expression                                          #PrintExpression
 
+    | arrayCreation                                             #ArrayCreationExpression
     | chain                                                     #ChainExpression
     | constant                                                  #ScalarExpression
     | string                                                    #ScalarExpression
@@ -456,7 +457,6 @@ expression
 
     | BackQuoteString                                           #BackQuoteStringExpression
     | parentheses                                               #ParenthesisExpression
-    | arrayCreation                                             #ArrayCreationExpression
 
     | Yield                                                     #SpecialWordExpression
     | List '(' assignmentList ')' Eq expression                 #SpecialWordExpression
@@ -515,7 +515,7 @@ lambdaFunctionExpr
     ;
 
 matchExpr
-    : Match '(' expression ')' OpenCurlyBracket matchItem (',' matchItem)* ','? CloseCurlyBracket
+    : Match_ '(' expression ')' OpenCurlyBracket matchItem (',' matchItem)* ','? CloseCurlyBracket
     ;
 
 matchItem

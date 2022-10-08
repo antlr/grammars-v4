@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar turing;
 
 program
-   : declarationOrStatementInMainProgram+
+   : declarationOrStatementInMainProgram+ EOF
    ;
 
 declarationOrStatementInMainProgram
@@ -171,7 +171,7 @@ forStatement
    ;
 
 putStatement
-   : 'put' (':' streamNumber ',')? putItem (',' putItem)? ('..')?
+   : 'put' (':' streamNumber ',')? putItem (',' putItem)* ('..')?
    ;
 
 putItem

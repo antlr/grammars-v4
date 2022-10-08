@@ -1,8 +1,10 @@
 
 grammar wkt;
 
+file_ : geometry* EOF ;
+
 geometryCollection
-   : GEOMETRYCOLLECTION ( LPAR geometry (COMMA geometry)* RPAR | EMPTY)
+   : GEOMETRYCOLLECTION ( LPAR geometry (COMMA geometry)* RPAR | EMPTY_)
    ;
 
 geometry
@@ -10,7 +12,7 @@ geometry
    ;
 
 pointGeometry
-   : POINT ((name? LPAR point RPAR) | EMPTY)
+   : POINT ((name? LPAR point RPAR) | EMPTY_)
    ;
 
 lineStringGeometry
@@ -22,39 +24,39 @@ polygonGeometry
    ;
 
 multiCurveGeometry
-   : MULTICURVE ((LPAR (lineString | circularStringGeometry | compoundCurveGeometry) (COMMA (circularStringGeometry | lineString | compoundCurveGeometry))* RPAR) | EMPTY)
+   : MULTICURVE ((LPAR (lineString | circularStringGeometry | compoundCurveGeometry) (COMMA (circularStringGeometry | lineString | compoundCurveGeometry))* RPAR) | EMPTY_)
    ;
 
 multiSurfaceGeometry
-   : MULTISURFACE ((LPAR (polygon | curvePolygonGeometry) (COMMA (polygon | curvePolygonGeometry))* RPAR) | EMPTY)
+   : MULTISURFACE ((LPAR (polygon | curvePolygonGeometry) (COMMA (polygon | curvePolygonGeometry))* RPAR) | EMPTY_)
    ;
 
 curvePolygonGeometry
-   : CURVEPOLYGON ((LPAR (lineString | circularStringGeometry | compoundCurveGeometry) (COMMA (circularStringGeometry | lineString | compoundCurveGeometry))* RPAR) | EMPTY)
+   : CURVEPOLYGON ((LPAR (lineString | circularStringGeometry | compoundCurveGeometry) (COMMA (circularStringGeometry | lineString | compoundCurveGeometry))* RPAR) | EMPTY_)
    ;
 
 compoundCurveGeometry
-   : COMPOUNDCURVE ((LPAR (lineString | circularStringGeometry) (COMMA (circularStringGeometry | lineString))* RPAR) | EMPTY)
+   : COMPOUNDCURVE ((LPAR (lineString | circularStringGeometry) (COMMA (circularStringGeometry | lineString))* RPAR) | EMPTY_)
    ;
 
 multiPointGeometry
-   : MULTIPOINT ((LPAR pointOrClosedPoint (COMMA pointOrClosedPoint)* RPAR) | EMPTY)
+   : MULTIPOINT ((LPAR pointOrClosedPoint (COMMA pointOrClosedPoint)* RPAR) | EMPTY_)
    ;
 
 multiLineStringGeometry
-   : MULTILINESTRING ((LPAR lineString (COMMA lineString)* RPAR) | EMPTY)
+   : MULTILINESTRING ((LPAR lineString (COMMA lineString)* RPAR) | EMPTY_)
    ;
 
 multiPolygonGeometry
-   : MULTIPOLYGON ((LPAR polygon (COMMA polygon)* RPAR) | EMPTY)
+   : MULTIPOLYGON ((LPAR polygon (COMMA polygon)* RPAR) | EMPTY_)
    ;
 
 multiPolyhedralSurfaceGeometry
-   : POLYHEDRALSURFACE ((LPAR polygon (COMMA polygon)* RPAR) | EMPTY)
+   : POLYHEDRALSURFACE ((LPAR polygon (COMMA polygon)* RPAR) | EMPTY_)
    ;
 
 multiTinGeometry
-   : TIN ((LPAR polygon (COMMA polygon)* RPAR) | EMPTY)
+   : TIN ((LPAR polygon (COMMA polygon)* RPAR) | EMPTY_)
    ;
 
 circularStringGeometry
@@ -67,11 +69,11 @@ pointOrClosedPoint
    ;
 
 polygon
-   : LPAR lineString (COMMA lineString)* RPAR | EMPTY
+   : LPAR lineString (COMMA lineString)* RPAR | EMPTY_
    ;
 
 lineString
-   : LPAR point (COMMA point)* RPAR | EMPTY
+   : LPAR point (COMMA point)* RPAR | EMPTY_
    ;
 
 point
@@ -166,7 +168,7 @@ GEOMETRYCOLLECTION
    ;
 
 
-EMPTY
+EMPTY_
    : E M P T Y
    ;
 

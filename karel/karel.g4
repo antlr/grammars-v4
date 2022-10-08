@@ -25,7 +25,7 @@
 grammar karel;
 
 karel
-   : 'BEGINNING-OF-PROGRAM' definition* 'BEGINNING-OF-EXECUTION' statement* 'END-OF-EXECUTION' 'END-OF-PROGRAM'
+   : 'BEGINNING-OF-PROGRAM' definition* 'BEGINNING-OF-EXECUTION' statement* 'END-OF-EXECUTION' 'END-OF-PROGRAM' EOF
    ;
 
 definition

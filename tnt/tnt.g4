@@ -31,7 +31,7 @@
 grammar tnt;
 
 equation
-   : expression '=' expression
+   : expression '=' expression EOF
    ;
 
 atom

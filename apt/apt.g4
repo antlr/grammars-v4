@@ -3,7 +3,7 @@
 grammar apt;
 
 //  productions
-record: commented=commenterR? rType=TypeR WSS options=optionsR? uri=uriR WSS distribution=wordWithDash components=componentsR WSS?;
+record: commented=commenterR? rType=TypeR WSS options=optionsR? uri=uriR WSS distribution=wordWithDash components=componentsR WSS? EOF;
 wordWithDashSegment: Word | Dash;
 wordWithDash: wordWithDashSegment+;
 component: WSS cId=wordWithDash;
