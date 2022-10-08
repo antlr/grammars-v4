@@ -218,7 +218,6 @@ jobs:
   reindex:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
     - name: Install Python
       uses: actions/setup-python@v4.2.0
       with:
@@ -226,18 +225,14 @@ jobs:
     - name: Do not trust Python env
       run: |
           python --version
-    - name: Create index.
+
+    - name: Checkout.
+      uses: actions/checkout@v3
+      # see https://github.com/actions/checkout#Push-a-commit-using-the-built-in-token
       run: |
-          # do some operation that changes a file in the git repo
           python _scripts/mkindex.py . > grammars.json
-    - name: setup git config
-      run: |
-          # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-    - name: Commit
-      run: |
-          # Stage the file, commit and push
-          git add grammars.json
-          git commit -m "New index of grammars in repo."
-          git push origin master
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "generated"
+          git push
