@@ -22,7 +22,7 @@
 grammar TURTLE;
 
 turtleDoc
-   : statement*
+   : statement* EOF
    ;
 
 statement
@@ -273,3 +273,9 @@ HEX
 PN_LOCAL_ESC
    : '\\' ('_' | '~' | '.' | '-' | '!' | '$' | '&' | '\'' | '(' | ')' | '*' | '+' | ',' | ';' | '=' | '/' | '?' | '#' | '@' | '%')
    ;
+
+
+LC
+   : '#' ~[\r\n]+  -> channel(HIDDEN)
+   ;
+

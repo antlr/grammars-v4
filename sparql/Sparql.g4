@@ -297,7 +297,7 @@ iriRefOrFunction
     ;
 
 rdfLiteral
-    : string ( LANGTAG | ( '^^' iriRef ) )?
+    : string_ ( LANGTAG | ( '^^' iriRef ) )?
     ;
 
 numericLiteral
@@ -327,7 +327,7 @@ booleanLiteral
     | 'false'
     ;
 
-string
+string_
     : STRING_LITERAL1
     | STRING_LITERAL2
     /* | STRING_LITERAL_LONG('0'..'9') | STRING_LITERAL_LONG('0'..'9')*/

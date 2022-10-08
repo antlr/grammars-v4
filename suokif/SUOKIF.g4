@@ -32,7 +32,7 @@
 grammar SUOKIF;
 
 top_level
-   : sentence*
+   : sentence* EOF
    ;
 
 term

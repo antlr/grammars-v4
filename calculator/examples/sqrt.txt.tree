@@ -1,1 +1,1 @@
-(equation (expression (multiplyingExpression (powExpression (signedAtom (atom (variable y)))))) (relop =) (expression (multiplyingExpression (powExpression (signedAtom (func_ (funcname cos) ( (expression (multiplyingExpression (powExpression (signedAtom (atom (scientific 4)))))) )))))))
+(equation (expression (multiplyingExpression (powExpression (signedAtom (atom (variable y)))))) (relop =) (expression (multiplyingExpression (powExpression (signedAtom (func_ (funcname cos) ( (expression (multiplyingExpression (powExpression (signedAtom (atom (scientific 4)))))) )))))) <EOF>)

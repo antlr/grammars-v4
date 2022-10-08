@@ -1,7 +1,7 @@
 # Template generated code from trgen <version>
 function Build-Grammar {
-<tool_grammar_files:{x |
-    $g = antlr <x> -Dlanguage=Go <antlr_tool_args:{y | <y> } >
+<tool_grammar_tuples:{x |
+    $g = antlr <x.GrammarFileName> -encoding <antlr_encoding> -Dlanguage=Go <x.AntlrArgs> <antlr_tool_args:{y | <y> } >
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g
@@ -9,8 +9,20 @@ function Build-Grammar {
         \}
     \}
 }>
+    # Output version of pwsh.
+    #Get-Host | Select-Object Version | Write-Host
+    # Output environmental variables.
+    #dir env: | Out-String | Write-Host
+    # Output go version
+    #go version | Write-Host
     $env:GO111MODULE = "on"
-    $g = go get github.com/antlr/antlr4/runtime/Go/antlr@4.9.3
+    For ($i=0; $i -le 5; $i++) {
+        $g = go get github.com/antlr/antlr4/runtime/Go/antlr/v4
+        if($LASTEXITCODE -eq 0){
+            Break
+        }
+        Write-Host "go get failed. Trying again."
+    }
     if($LASTEXITCODE -ne 0){
         return @{
             Message = $g
@@ -31,13 +43,41 @@ function Test-Case {
         $TreeFile,
         $ErrorFile
     )
-    $o = trwdog ./Test -file $InputFile
-    $failed = $LASTEXITCODE -ne 0
-    if ($failed -and $errorFile) {
-        return $true
+    # Save input and output character encodings and switch to UTF-8.
+    $oldInputEncoding = [console]::InputEncoding
+    $oldOutputEncoding = [console]::OutputEncoding
+    $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+
+    $parseOutFile = $InputFile + ".out"
+    $o = trwdog ./Test -file $InputFile -tree | Out-File -LiteralPath "$parseOutFile" -Encoding UTF8
+    $parseOk = $LASTEXITCODE -eq 0
+    $treeMatch = $true
+    if ($errorFile) {
+        # If we expected errors, then a failed parse was a successful test.
+        if (!$parseOk) {
+            Write-Host "Expected."
+            # Confirm that the errors we received are the ones we expected.
+            $expectedData = (Get-Content $errorFile -Encoding UTF8) -join "" -replace "\r\n",""
+            $actualData = (Get-Content $parseOutFile -Encoding UTF8) -join "" -replace "\r\n",""
+            $parseOk = ($actualData -eq $expectedData)
+            if ($parseOk) {
+                Write-Host "Error list match succeeded."
+            } else {
+                Write-Host "Expected error list match." -ForegroundColor Red
+            }
+        }
+    } else {
+        if ($parseOk -and (Test-Path $TreeFile)) {
+            # Confirm that the parse tree we received is the one we expected.
+            $expectedData = Get-Content $TreeFile -Encoding UTF8
+            $actualData = Get-Content $parseOutFile -Encoding UTF8
+            $treeMatch = ($actualData -eq $expectedData)
+        }
     }
-    if(!$failed -and !$errorFile){
-        return $true
-    }
-    return $false
+    # Restore input and output character encodings.
+    [console]::InputEncoding = $oldInputEncoding
+    [console]::OutputEncoding = $oldOutputEncoding
+
+    Remove-Item $parseOutFile
+    return $parseOk, $treeMatch
 }

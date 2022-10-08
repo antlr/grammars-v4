@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar clf;
 
 log
-   : (line? EOL) + line?
+   : (line? EOL) + line? EOF
    ;
 
 // combined log format has the referer and useragent fields

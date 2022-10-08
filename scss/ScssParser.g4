@@ -1,6 +1,7 @@
 /*
  [The "BSD licence"]
  Copyright (c) 2014 Vlad Shlosberg
+ Copyright (c) 2022 Sergei Russkikh
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -31,368 +32,523 @@ parser grammar ScssParser;
 options { tokenVocab=ScssLexer; }
 
 stylesheet
-  : statement*
-  ;
+    : statement* EOF;
 
 statement
-  : importDeclaration
-  | mediaDeclaration
-  | ruleset
-  | mixinDeclaration
-  | contentDeclaration
-  | functionDeclaration
-  | variableDeclaration
-  | includeDeclaration
-  | ifDeclaration
-  | forDeclaration
-  | whileDeclaration
-  | eachDeclaration
-  ;
+    : importDeclaration
+    | variableDeclaration
+    | propertyDeclaration
+    | interpolationDeclaration
+    | mediaDeclaration
+    | mixinDeclaration
+    | contentDeclaration
+    | functionDeclaration
+    | ifDeclaration
+    | forDeclaration
+    | whileDeclaration
+    | eachDeclaration
+    | fontFaceDeclaration
+    | keyframesDeclaration
+    | includeDeclaration
+    | extendDeclaration
+    | warndingDeclaration
+    | errorDeclaration
+    | ruleset
+    | atStatementDeclaration
+    | percentageStatement
+    ;
 
-
-// Params declared by rules such as @mixin and @function.
-declaredParams
-  : declaredParam (COMMA declaredParam)* Ellipsis?
-  ;
-
-declaredParam
-  : variableName paramOptionalValue?
-  ;
-
-variableName
-  : namespace? (DOLLAR | MINUS_DOLLAR | PLUS_DOLLAR) Identifier
-  ;
-
-paramOptionalValue
-  : COLON expression+
-  ;
-
-// Params passed to rules such as @include and @content.
-passedParams
-  : passedParam (COMMA passedParam)* (COMMA|Ellipsis)?
-  ;
-
-passedParam
-  : (variableName COLON)? (commandStatement | listSpaceSeparated | listBracketed | map_)
-  ;
-
-// MIXINS and related rules
-mixinDeclaration
-  : MIXIN (FunctionIdentifier declaredParams? RPAREN |
-           Identifier (LPAREN declaredParams? RPAREN)?) block
-  ;
-
-contentDeclaration
-  : CONTENT (LPAREN passedParams? RPAREN)? SEMI
-  ;
-
-includeDeclaration
-  : INCLUDE (Identifier | functionCall)
-    (SEMI | (USING LPAREN declaredParams RPAREN)? block)?
-  ;
-
-
-// FUNCTIONS
-functionDeclaration
-  : FUNCTION (FunctionIdentifier | Identifier LPAREN) declaredParams? RPAREN
-    BlockStart functionBody? BlockEnd
-  ;
-
-functionBody
-  : functionStatement* functionReturn
-  ;
-
-functionReturn
-  : '@return' commandStatement ';'
-  ;
-
-functionStatement
-  : commandStatement ';' | statement
-  ;
-
-
-commandStatement
-  : (expression
-      | (LPAREN | MINUS_LPAREN | PLUS_LPAREN) commandStatement RPAREN
-    ) mathStatement?
-  ;
-
-mathCharacter
-  : TIMES | PLUS | DIV | MINUS | PERC
-  ;
-
-mathStatement
-  : mathCharacter commandStatement
-  ;
-
-
-expression
-  : measurement
-  | identifier
-  | Color
-  | StringLiteral
-  | NULL_
-  | url
-  | variableName
-  | functionCall
-  ;
-
-
-//If statement
-ifDeclaration
-  : AT_IF conditions block elseIfStatement* elseStatement?
-  ;
-
-elseIfStatement
-  : AT_ELSE IF conditions block
-  ;
-
-elseStatement
-  : AT_ELSE block
-  ;
-
-conditions
-  : condition (COMBINE_COMPARE conditions)?
-  | NULL_
-  ;
-
-condition
-  : commandStatement (( '==' | LT | GT | '!=') conditions)?
-  | LPAREN conditions ')'
-  ;
-
-
-variableDeclaration
-  : variableName COLON (propertyValue | listBracketed | map_) '!default'? ';'
-  ;
-
-
-//for
-forDeclaration
-  : AT_FOR variableName 'from' fromNumber ('to'|'through') throughNumber block
-  ;
-
-fromNumber
-  : Number
-  ;
-
-throughNumber
-  : Number
-  | functionCall
-  ;
-
-//while
-whileDeclaration
-  : AT_WHILE conditions block
-  ;
-
-//EACH
-eachDeclaration
-  : AT_EACH variableName (COMMA variableName)* IN eachValueList block
-  ;
-
-eachValueList
-  : commandStatement
-  | list_
-  | map_
-  ;
-
-//Imports
+// Import
 importDeclaration
-  : '@import' referenceUrl ';'
-  | '@use' referenceUrl asClause? withClause? ';'
-  ;
+    : Import importPath Semi?
+    | Require importPath Semi?
+    | Use importPath asClause? withClause? Semi?
+    | Forward importPath
+    ;
 
-referenceUrl
-    : StringLiteral
-    | UrlStart Url UrlEnd
+importPath
+    : uri
+    | String_
     ;
 
 asClause
-  : 'as' ('*' | identifier)
-  ;
+    : As (Times | identifier)
+    ;
 
 withClause
-  : 'with' LPAREN keywordArgument (COMMA keywordArgument)* COMMA? RPAREN
-  ;
+    : With Lparen parameters Rparen;
 
-keywordArgument
-  : identifierVariableName ':' expression
-  ;
+// Declarations
+variableDeclaration
+    : variableName Colon variableValue prio? Semi?
+    ;
 
-// MEDIA
-mediaDeclaration
-  : '@media' mediaQueryList block
-  ;
+variableValue
+    : value
+    | functionDeclaration
+    | functionCall
+    | mapDeclaration+
+    | listDeclaration+
+    | variableName
+    | identifier
+    ;
 
-mediaQueryList
-  : (mediaQuery (COMMA mediaQuery)* )?
-  ;
+variableName
+    : ( ( Minus Minus ) Dollar | plusMinus Dollar | Dollar) identifier
+    | plusMinus? namespace_? Dollar ( identifier | measurment )
+    | Variable
+    ;
 
-mediaQuery
-  : ('only' | 'not')? mediaType ('and' mediaExpression)*
-  | mediaExpression ('and' mediaExpression)*
-  ;
+namespace_
+    : (identifier Dot)+
+    ;
 
-// Typically only 'all', 'print', 'screen', and 'speech', but there are some
-// deprecated values too.
-mediaType
-  : Identifier
-  ;
+propertyDeclaration
+    : identifier Colon propertyValue Semi?
+    ;
 
-mediaExpression
-  : '(' mediaFeature (':' commandStatement)? ')'
-  ;
-
-// Typically 'max-width', 'hover', 'orientation', etc. Many possible values.
-mediaFeature
-  : Identifier
-  ;
-
-
-//Rules
-ruleset
-  : selectors block
-  ;
-
-block
-  : BlockStart (property_ | statement)* lastProperty? BlockEnd
-  ;
-
-selectors
-  : selector (COMMA selector)*
-  ;
-
-selector
-  : element+
-  ;
-
-element
-  : identifier
-  | '#' identifier
-  | '.' identifier
-  | '&'
-  | '*'
-  | combinator
-  | attrib
-  | pseudo
-  ;
-
-combinator
-  : (GT | PLUS | TIL)
-  ;
-
-pseudo
-  : pseudoIdentifier
-  | pseudoIdentifier LPAREN (selector | commandStatement) RPAREN
-  ;
-
-attrib
-  : LBRACK Identifier (attribRelate (StringLiteral | Identifier))? RBRACK
-  ;
-
-attribRelate
-  : EQ
-  | PIPE_EQ
-  | TILD_EQ
-  ;
-
-identifier
-  : Identifier identifierPart*
-  | InterpolationStart identifierVariableName BlockEnd identifierPart*
-  // These are keywords in some contexts, but can be used as identifiers too.
-  | AND_WORD
-  | FROM
-  | NOT
-  | ONLY
-  | THROUGH
-  | TO
-  | USING
-  ;
-
-pseudoIdentifier
-  : PseudoIdentifier identifierPart*
-  ;
-
-identifierPart
-  : InterpolationStartAfter identifierVariableName BlockEnd
-  | IdentifierAfter
-  ;
-identifierVariableName
-  : DOLLAR (Identifier | IdentifierAfter)
-  ;
-
-property_
-  : identifier COLON propertyValue IMPORTANT? SEMI
-  | identifier COLON block
-  | identifier COLON propertyValue IMPORTANT? block
-  ;
-
-lastProperty
-  : identifier COLON propertyValue IMPORTANT?
-  ;
+prio
+    : Important | Default
+    ;
 
 propertyValue
-  : commandStatement (COMMA? commandStatement)*
-  ;
+    : ( value
+        | value? prio? block
+        | variableName
+        | listSpaceSeparated
+        | listCommaSeparated
+        | expression
+        | functionCall
+      ) prio?;
 
-url
-  : UrlStart Url UrlEnd
-  ;
+mediaDeclaration
+    : Media mediaQueryList block
+    ;
 
-measurement
-  : Number Unit?
-  ;
+mediaQueryList
+    : ( mediaQuery ( Comma mediaQuery )* )?
+    ;
 
+mediaQuery
+    : ( Only | Not )? ( identifier | value ) ( And mediaExpression )*
+    | mediaExpression ( And mediaExpression )*
+    ;
+
+mediaExpression
+    : Lparen identifier ( Colon value )? Rparen
+    ;
+
+mixinDeclaration
+    : Mixin ( identifier| identifier Lparen parameters Rparen ) block
+    ;
+
+contentDeclaration
+    : Content (Lparen parameters Rparen)? Semi?
+    ;
+
+fontFaceDeclaration
+    : FontFace BlockStart statement* BlockEnd
+    ;
+
+keyframesDeclaration
+    : Keyframes identifier? keyframesBlock
+    ;
+
+keyframesBlock
+    : BlockStart percentageStatement* BlockEnd
+    | block
+    ;
+
+percentageStatement
+    : percentage block
+    ;
+
+includeDeclaration
+    : Include namespace_? (identifier | functionCall)
+    ( Semi | Using Lparen parameters Rparen )? block?
+    ;
+
+interpolationDeclaration
+    : interpolation Colon propertyValue Semi?
+    ;
+
+extendDeclaration
+    : Extend ( Percentage | parentRef )?
+    ( id | typeSelector | universal | className | attrib | pseudo | interpolation | parentRef )+ Semi?
+    ;
+
+warndingDeclaration
+    : Warn String_ Semi
+    ;
+
+errorDeclaration
+    : Error String_ Semi
+    ;
+
+atStatementDeclaration
+    : At ( identifier Lparen parameters Rparen | identifier ) block
+    ;
+
+// Structure
+ruleset
+    : selectorGroup block
+    ;
+
+block
+    : BlockStart statement* functionReturn? BlockEnd
+    ;
+
+// Selectors
+selectorGroup
+    : selector ( Comma selector )*
+    ;
+
+selector
+    : combinator? selectorSequence ( combinator selectorSequence )*
+    ;
+
+combinator
+    : Plus
+    | Greater
+    | Tilde
+    | Space
+    ;
+
+selectorSequence
+    : ( typeSelector | universal ) ( id | className | attrib | pseudo | negation | interpolation ( variableName | Percentage )? | parentRef )*
+    | ( typeSelector| id | className | attrib | pseudo | negation | interpolation ( variableName | Percentage )? | parentRef )+
+    ;
+
+id
+    : Hash identifier
+    ;
+
+typeSelector
+    : typeNamespacePrefix? ( Percentage | parentRef )? ( identifier | variableName )
+    ;
+
+typeNamespacePrefix
+    : ( identifier | Times )? Pipe
+    ;
+
+universal
+    : typeNamespacePrefix? Times
+    ;
+
+className
+    : Dot ( Minus | identifier | interpolation )+
+    ;
+
+interpolation
+    : namespace_? Hash BlockStart namespace_? ( ifExpression | value | parentRef ) BlockEnd measurment?
+    ;
+
+parentRef
+    : Amp
+    ;
+
+attrib
+    : Lbrack typeNamespacePrefix? identifier
+    ( ( PrefixMatch | SuffixMatch | SubstringMatch | Eq | Includes | DashMatch )
+    ( identifier | String_ ) )? Rbrack
+    ;
+
+pseudo
+    : Colon Colon? ( interpolation | identifier | functionalPseudo )
+    ;
+
+functionalPseudo
+    : Ident Lparen pseudoParameter+ Rparen
+    ;
+
+pseudoParameter
+    : ( ( value | className | interpolation ) Comma?)
+    ;
+
+negation
+    : PseudoNot negationArg Rparen
+    ;
+
+negationArg
+    : typeSelector
+    | universal
+    | Hash
+    | className
+    | attrib
+    | pseudo
+    ;
+
+// Operators
+operator_
+    : Div
+    | Times
+    | Minus
+    | Plus
+    | Greater
+    | Less
+    | Greater Eq
+    | Less Eq
+    | Eq Eq?
+    | NotEq
+    | And
+    | Or
+    | Not
+    ;
+
+value
+    : unit
+    | number
+    | boolean
+    | calc
+    | rotate
+    | rgba
+    | var_
+    | uri
+    | repeat
+    | Format
+    | String_
+    | functionCall
+    | variableName
+    | interpolation
+    | hexcolor
+    | identifier
+    | expression
+    | block
+    | Lparen Rparen
+    | measurment
+    ;
+
+// Function
+functionDeclaration
+    : Function ( namespace_? identifier )?
+    Lparen parameters Rparen BlockStart functionBody? BlockEnd
+    ;
+
+parameters
+    : parameter? (Comma parameter)*
+    ;
+
+parameter
+    : ( value | variableDeclaration | listSpaceSeparated | mapDeclaration ) arglist? prio?
+    ;
+
+functionBody
+    : functionStatement* functionReturn?
+    ;
+
+functionReturn
+    : Return expression (Comma expression)* Semi?
+    ;
+
+functionStatement
+    : expression Semi
+    | statement
+    ;
 
 functionCall
-  : namespace? FunctionIdentifier passedParams? RPAREN
-  ;
+    : namespace_? identifier Lparen parameters Rparen
+    ;
 
-namespace
-  : (Identifier DOT)+
-  ;
+expression
+    : Not? expressionPart (operator_ Not? expressionPart )*
+    ;
+
+expressionPart
+    : unit
+    | identifier
+    | variableName
+    | var_
+    | boolean
+    | calc
+    | rotate
+    | rgba
+    | number
+    | uri
+    | Format
+    | String_
+    | interpolation
+    | hexcolor
+    | ifExpression
+    | functionCall
+    | plusMinus? Lparen expression? Rparen
+    | prio
+    | measurment
+    ;
+
+ifExpression
+    : If Lparen ( expression | parentRef ) Comma value Comma value Rparen measurment? prio?
+    ;
 
 
-list_
-  : listCommaSeparated
-  | listSpaceSeparated
-  | listBracketed
-  ;
+// List & Map
+listDeclaration
+    : ( listBracketed
+        | listCommaSeparated
+        | listSpaceSeparated
+      )
+    | Lparen listDeclaration Rparen;
 
 listCommaSeparated
-  : listElement (COMMA listElement)+ COMMA?
-  ;
+    : listElement (Comma listElement)* Comma?
+    ;
 
 listSpaceSeparated
-  : listElement listElement+
-  ;
+    : listElement+
+    ;
 
 listBracketed
-  : LBRACK (listCommaSeparated | listSpaceSeparated) RBRACK
-  ;
+    : Lbrack ( listSpaceSeparated | listCommaSeparated ) Rbrack
+    ;
 
 listElement
-  : commandStatement
-  | LPAREN list_ RPAREN
-  ;
+    : Lparen? (value Comma?)+ Rparen? Comma?
+    ;
 
+mapDeclaration
+    : Lparen mapEntries Rparen
+    ;
 
-map_
-  : LPAREN mapEntry (COMMA mapEntry)* COMMA? RPAREN
-  ;
+mapEntries
+    : mapEntry (Comma mapEntry)* Comma?
+    ;
 
 mapEntry
-  : mapKey COLON mapValue;
+    : mapKey Colon mapValue
+    ;
 
 mapKey
-  : commandStatement
-  | list_
-  | map_
-  ;
+    : value
+    | listDeclaration
+    | mapDeclaration
+    ;
 
 mapValue
-  : commandStatement
-  | list_
-  | map_
-  ;
+    : value
+    | listDeclaration
+    | mapDeclaration
+    ;
+
+// Flow control
+ifDeclaration
+    : AtIf expression block elseIfStatement* elseStatement?
+    ;
+
+elseIfStatement
+    : AtElse If expression block
+    ;
+
+elseStatement
+    : AtElse block
+    ;
+
+forDeclaration
+    : AtFor variableName From Number ( To | Through ) through block
+    ;
+
+through
+    : Number
+    | functionCall
+    | expression
+    ;
+
+whileDeclaration
+    : AtWhile expression block
+    ;
+
+eachDeclaration
+    : AtEach variableName (Comma variableName)* In eachValueList block
+    ;
+
+eachValueList
+    : listDeclaration
+    | mapDeclaration
+    ;
+
+// Embeded functions
+var_
+    : Var Variable (Comma value)? Rparen
+    ;
+
+calc
+    : Calc expression Rparen
+    ;
+
+rotate
+    : Rotate degree Rparen
+    ;
+
+rgba
+    : Rgba value (Comma? value)* Rparen
+    ;
+
+repeat
+    : Repeat value Comma number Freq Rparen
+    ;
+
+// Primitives
+unit
+    : ( length | dimension | percentage | degree )
+    ;
+
+length
+    : plusMinus? Number ( AbsLength | FontRelative | ViewportRelative )
+    ;
+
+dimension
+    : plusMinus? Number ( Time | Freq | Resolution | Angle)
+    ;
+
+percentage
+    : plusMinus? Number Percentage
+    ;
+
+degree
+    : plusMinus? Number Angle
+    ;
+
+measurment
+    : AbsLength
+    | FontRelative
+    | ViewportRelative
+    | Time
+    | Freq
+    | Resolution
+    | Angle
+    | Percentage
+    ;
+
+uri
+    : Uri
+    ;
+
+arglist
+    : Dot Dot Dot
+    ;
+
+plusMinus
+    : Plus
+    | Minus
+    ;
+
+hexcolor
+    : Hash color
+    ;
+
+color
+    : ( Number | Ident )+
+    ;
+
+boolean
+    : True
+    | False
+    ;
+
+number
+    : plusMinus? Number
+    ;
+
+identifier
+    : ( VendorPrefix  | Minus )? Ident
+    | From
+    | To
+    ;

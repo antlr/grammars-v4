@@ -314,9 +314,9 @@ variable_declaration:
 		variable_name (
 			initializer willSet_didSet_block
 			| type_annotation (
-				getter_setter_block // contains code_block
+			    initializer? willSet_didSet_block
+				| getter_setter_block // contains code_block
 				| getter_setter_keyword_block
-				| initializer? willSet_didSet_block
 			)
 		)
 		| pattern_initializer_list

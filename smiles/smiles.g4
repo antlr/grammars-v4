@@ -18,7 +18,7 @@
  */
 grammar smiles;
 
-smiles: chain terminator?;
+smiles: chain terminator? EOF;
 
 atom: bracket_atom | aliphatic_organic | aromatic_organic | '*';
 

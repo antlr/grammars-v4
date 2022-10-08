@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar joss;
 
 prog
-   : statement+
+   : statement+ EOF
    ;
 
 statement
