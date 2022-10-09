@@ -133,7 +133,8 @@ classBodyDeclaration
     ;
 
 memberDeclaration
-    : methodDeclaration
+    : recordDeclaration //Java17
+    | methodDeclaration
     | genericMethodDeclaration
     | fieldDeclaration
     | constructorDeclaration
@@ -142,7 +143,6 @@ memberDeclaration
     | annotationTypeDeclaration
     | classDeclaration
     | enumDeclaration
-    | recordDeclaration //Java17
     ;
 
 /* We use rule this even for void methods which cannot have [] after parameters.
