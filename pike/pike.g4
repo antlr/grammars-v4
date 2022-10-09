@@ -1,7 +1,7 @@
 /*
 BSD License
 
-Copyright (c) 2018, Tom Everett
+Copyright (c) 2022, Tom Everett
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 grammar pike;
 
 program
-   : definition* EOF
+   : definition* EOF?
    ;
 
 definition
@@ -120,6 +120,7 @@ statement
    | case_stmt
    | default_stmt
    | block
+   | return_stmt
    | foreach_stmt
    | break_stmt
    | continue_stmt
@@ -132,6 +133,10 @@ cond
 
 while_stmt
    : 'while' '(' expression ')' statement
+   ;
+
+return_stmt
+   : 'return' expression
    ;
 
 do_while_stmt
@@ -288,10 +293,6 @@ identifier
    : IDENTIFIER
    ;
 
-PROGRAM
-   : 'program'
-   ;
-
 INTTYPE
    : 'int'
    ;
@@ -329,33 +330,7 @@ FUNCTIONTYPE
    ;
 
 IDENTIFIER
-   : LETTER (LETTER | DIGIT | SYMBOL)*
-   ;
-
-fragment SYMBOL
-   : '+'
-   | '/'
-   | '%'
-   | '*'
-   | '&'
-   | '|'
-   | '^'
-   | '~'
-   | '<'
-   | '<<'
-   | '<='
-   | '>'
-   | '>>'
-   | '>='
-   | '=='
-   | '!='
-   | '!'
-   | '()'
-   | '-'
-   | '->'
-   | '->='
-   | '[]'
-   | '[]='
+   : LETTER (LETTER | DIGIT | IDSYMBOL)*
    ;
 
 LETTER
@@ -364,21 +339,46 @@ LETTER
    | '_'
    ;
 
-DIGIT
-   : '0' .. '9'
-   ;
-
 FLOAT
-   : DIGIT DIGIT* '.' DIGIT*
+   : DIGIT+ '.' DIGIT+
    ;
 
 NUMBER
-   : DIGIT DIGIT*
-   | '0x' DIGIT*
+   : '0x'? DIGIT+
    ;
 
 STRING
    : '"' ~ '"'* '"'
+   ;
+
+fragment DIGIT
+   : '0' .. '9'
+   ;
+
+fragment IDSYMBOL
+   : '`+'
+   | '`/'
+   | '`%'
+   | '`*'
+   | '`&'
+   | '`|'
+   | '`^'
+   | '`~'
+   | '`<'
+   | '`<<'
+   | '`<='
+   | '`>'
+   | '`>>'
+   | '`>='
+   | '`=='
+   | '`!='
+   | '`!'
+   | '`()'
+   | '`-'
+   | '`->'
+   | '`->='
+   | '`[]'
+   | '`[]='
    ;
 
 WS
