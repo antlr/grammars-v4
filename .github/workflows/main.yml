@@ -6,6 +6,36 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
+
+  reindex:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Python
+      uses: actions/setup-python@v4.2.0
+      with:
+          python-version: '3.10'
+    - name: Do not trust Python env
+      run: |
+          python --version
+
+    - uses: actions/checkout@v3
+      with:
+        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+        fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+    - name: Create local changes
+      run: |
+        python _scripts/mkindex.py . > grammars.json
+    - name: Commit files
+      run: |
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git commit -m "generated" -a
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -215,26 +245,3 @@ jobs:
       run: |
         bash _scripts/regtest.sh PHP
 
-  reindex:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Install Python
-      uses: actions/setup-python@v4.2.0
-      with:
-          python-version: '3.10'
-    - name: Do not trust Python env
-      run: |
-          python --version
-
-    - name: Checkout.
-      uses: actions/checkout@v3
-
-      # see https://github.com/actions/checkout#Push-a-commit-using-the-built-in-token
-    - name: Update
-      run: |
-          python _scripts/mkindex.py . > grammars.json
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "generated"
-          git push origin HEAD:master
