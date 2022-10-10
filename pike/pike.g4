@@ -196,6 +196,7 @@ expression5
    | expression6 '++'
    | '~' expression5
    | '-' expression5
+   | '!' expression5
    ;
 
 expression6
