@@ -29,23 +29,37 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 grammar bms;
 
-file_ : header_ EOF;
+file_
+   : header_ EOF?
+   ;
 
-header_: headerstart_ headerline_+;
+header_
+   : headerstart_ headerline_+
+   ;
 
-headerstart_: '*' .*?;
+headerstart_
+   : '*' .*?
+   ;
 
-headerline_: '#' key_ value_;
+headerline_
+   : '#' key_ value_
+   ;
 
-key_: ID;
+key_
+   : ID
+   ;
 
-value_: ID;
+value_
+   : ID
+   ;
 
-ID: [a-zA-Z0-9._-]+;
+ID
+   : [a-zA-Z0-9:._-]+
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \r\n\t]+ -> skip
    ;
+
