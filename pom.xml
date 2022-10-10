@@ -177,6 +177,7 @@
 				<module>less</module>
 				<module>limbo</module>
 				<module>lisa</module>
+                <module>lisp</module>
 				<module>logo</module>
 				<module>lpc</module>
 				<module>lrc</module>
