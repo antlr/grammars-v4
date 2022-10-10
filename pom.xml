@@ -12,7 +12,6 @@
 		<maven.compiler.source>11</maven.compiler.source>
 		<antlr4test-maven-plugin.version>1.22</antlr4test-maven-plugin.version>
 		<antlr.version>4.11.1</antlr.version>
-		<antlr4test-maven-plugin.version>1.21</antlr4test-maven-plugin.version>
 		<junit.version>4.13.2</junit.version>
 	</properties>
 	<prerequisites>
@@ -91,8 +90,6 @@
 				<module>bdf</module>
 				<module>bibcode</module>
 				<module>bnf</module>
-				<module>brainfuck</module>
-				<module>brainflak</module>
 				<module>c</module>
 				<module>calculator</module>
 				<module>callable</module>
@@ -104,7 +101,6 @@
 				<module>cmake</module>
 				<module>cobol85</module>
 				<module>cookie</module>
-				<module>cool</module>
 				<module>cpp</module>
 				<module>cql</module>
 				<module>cql3</module>
@@ -117,9 +113,8 @@
 				<module>cypher</module>
 				<module>dart2</module>
 				<module>databank</module>
-				<module>datalog</module>				
+				<module>datalog</module>
 				<module>dcm</module>
-				<module>dgol</module>
 				<module>dice</module>
 				<module>dif</module>
 				<module>doiurl</module>
@@ -127,9 +122,10 @@
 				<module>edif300</module>
 				<module>edn</module>
 				<module>erlang</module>
+				<module>esolang</module>
 				<module>evm-bytecode</module>
 				<module>fasta</module>
-                <module>fdo91</module>
+				<module>fdo91</module>
 				<module>fen</module>
 				<module>flatbuffers</module>
 				<module>flowmatic</module>
@@ -161,7 +157,7 @@
 				<module>iso8601</module>
 				<module>istc</module>
 				<module>itn</module>
-                <module>jam</module>
+				<module>jam</module>
 				<module>janus</module>
 				<module>java</module>
 				<module>javadoc</module>
@@ -182,8 +178,6 @@
 				<module>limbo</module>
 				<module>lisa</module>
 				<module>logo</module>
-				<module>lolcode</module>
-				<module>loop</module>
 				<module>lpc</module>
 				<module>lrc</module>
 				<module>ltl</module>
@@ -207,7 +201,6 @@
 				<module>mumath</module>
 				<module>mumps</module>
 				<module>muparser</module>
-				<module>nanofuck</module>
 				<module>newick</module>
 				<module>oberon</module>
 				<!-- <module>objc</module> -->
@@ -216,7 +209,7 @@
 				<module>p</module>
 				<module>parkingsign</module>
 				<module>pascal</module>
-                <module>pbm</module>
+				<module>pbm</module>
 				<module>pcre</module>
 				<module>pddl</module>
 				<module>pdn</module>
@@ -266,25 +259,23 @@
 				<module>sgf</module>
 				<module>sharc</module>
 				<module>sici</module>
-				<module>sickbay</module>
 				<module>sieve</module>
 				<module>smalltalk</module>
 				<module>smiles</module>
 				<module>smtlibv2</module>
 				<module>snobol</module>
-				<module>snowball</module>
 				<module>solidity</module>
 				<module>sparql</module>
 				<module>spass</module>
 				<module>sql</module>
 				<module>stacktrace</module>
-                <module>star</module>
+				<module>star</module>
 				<module>stellaris</module>
 				<module>stringtemplate</module>
 				<module>suokif</module>
 				<module>swift</module>
 				<module>swift-fin</module>
-                <module>szf</module>
+				<module>szf</module>
 				<module>tcpheader</module>
 				<module>telephone</module>
 				<module>terraform</module>
@@ -324,7 +315,7 @@
 				<module>xml</module>
 				<module>xpath</module>
 				<module>xsd-regex</module>
-                <module>xyz</module>
+				<module>xyz</module>
 				<module>z</module>
 			</modules>
 		</profile>

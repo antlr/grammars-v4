@@ -178,15 +178,16 @@ public class Program
         System.Console.Error.WriteLine("Time: " + (after - before));
         if (listener_lexer.had_error || listener_parser.had_error)
         {
+            // Listener will have already printed the error(s) to stdout.
             System.Console.Error.WriteLine("Parse failed.");
         }
         else
         {
             System.Console.Error.WriteLine("Parse succeeded.");
-        }
-        if (show_tree)
-        {
-            System.Console.Out.WriteLine(tree.ToStringTree(parser));
+            if (show_tree)
+            {
+                System.Console.Out.WriteLine(tree.ToStringTree(parser));
+            }
         }
         if (show_profile)
         {

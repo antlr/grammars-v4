@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 
 public class Program {
     private static PrintWriter stdout_utf8 = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
+    private static PrintWriter stderr_utf8 = new PrintWriter(new OutputStreamWriter(System.err, StandardCharsets.UTF_8), true);
     public static void main(String[] args) throws  FileNotFoundException, IOException
     {
         boolean show_tree = false;
@@ -86,14 +87,16 @@ public class Program {
         ParseTree tree = parser.<start_symbol>();
         Instant finish = Instant.now();
         long timeElapsed = Duration.between(start, finish).toMillis();
-        System.err.println("Time: " + (timeElapsed * 1.0) / 1000.0);
-        if (listener.had_error || lexer_listener.had_error)
-            System.err.println("Parse failed.");
-        else
-            System.err.println("Parse succeeded.");
-        if (show_tree)
-        {
-            stdout_utf8.println(tree.toStringTree(parser));
+        stderr_utf8.println("Time: " + (timeElapsed * 1.0) / 1000.0);
+        if (listener.had_error || lexer_listener.had_error) {
+            // Listener will have already printed the error(s) to stdout.
+            stderr_utf8.println("Parse failed.");
+        } else {
+            stderr_utf8.println("Parse succeeded.");
+            if (show_tree)
+            {
+                stdout_utf8.println(tree.toStringTree(parser));
+            }
         }
         java.lang.System.exit(listener.had_error || lexer_listener.had_error ? 1 : 0);
     }

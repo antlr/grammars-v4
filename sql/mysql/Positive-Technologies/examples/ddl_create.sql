@@ -195,6 +195,13 @@ PRIMARY KEY (`pk_realm`),
 KEY `auth_realms_auth_realm_clients` (`fk_realm`)
 ) START TRANSACTION ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+create table `site_checker_b_sonet_group_favorites` (
+USER_ID int(11) not null,
+GROUP_ID int(11) not null,
+DATE_ADD datetime DEFAULT NULL,
+primary key (USER_ID, GROUP_ID)
+);
+
 -- Mariadb default value for function: unix_timestamp()
 CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` bigint(20) NOT NULL DEFAULT unix_timestamp());
 
@@ -492,6 +499,67 @@ CREATE PROCEDURE set_unique_check()
 BEGIN
     SET unique_checks=on;
 END; -- //-- delimiter ;
+#end
+#begin
+CREATE DEFINER=`prod_migrations`@`%` PROCEDURE `upsert_virtual_item`(IN name VARCHAR(45), IN type TINYINT UNSIGNED)
+BEGIN
+    SET @merchantId := (SELECT merchant_id FROM merchant LIMIT 1);
+    IF @merchantId > 0 THEN
+        SET @rows := (SELECT COUNT(*) FROM item WHERE item_type = type);
+        IF @rows > 0 THEN
+UPDATE item SET
+                merchant_id = @merchantId,
+                cz_title = name,
+                price = 0,
+                orderer = 2,
+                takeaway = 0,
+                currency_id = (
+                    SELECT currency_currency_id
+                    FROM merchant
+                    WHERE merchant_id = @merchantId
+                ),
+                tax_vat_id = (
+                    SELECT tax_vat.tax_vat_id
+                    FROM tax_vat
+                             JOIN merchant
+                                  ON merchant.place_country_id = tax_vat.country_id
+                                      AND merchant.merchant_id = @merchantId
+                    WHERE tax_vat.default = 1
+                ),
+                item_measure_id = 1,
+                kitchen_print = 0,
+                deleted = 0,
+                virtual = 1
+WHERE item_type = type;
+ELSE
+            INSERT INTO item SET
+                merchant_id = @merchantId,
+                cz_title = name,
+                price = 0,
+                orderer = 2,
+                takeaway = 0,
+                currency_id = (
+                    SELECT currency_currency_id
+                    FROM merchant
+                    WHERE merchant_id = @merchantId
+                ),
+                tax_vat_id = (
+                    SELECT tax_vat.tax_vat_id
+                    FROM tax_vat
+                    JOIN merchant
+                        ON merchant.place_country_id = tax_vat.country_id
+                        AND merchant.merchant_id = @merchantId
+                    WHERE tax_vat.default = 1
+                ),
+                item_measure_id = 1,
+                kitchen_print = 0,
+                deleted = 0,
+                virtual = 1,
+                item_type = type
+            ;
+END IF;
+END IF;
+END
 #end
 #begin
 -- Create Role

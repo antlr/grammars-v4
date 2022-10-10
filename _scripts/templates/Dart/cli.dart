@@ -70,6 +70,27 @@ class CaseChangingCharStream extends CharStream {
 
 <endif>
 
+class MyErrorListener extends BaseErrorListener {
+  /// Provides a default instance of [MyErrorListener].
+  static final INSTANCE = MyErrorListener();
+
+  /// {@inheritDoc}
+  ///
+  /// <p>
+  /// This implementation prints messages to {@link System//err} containing the
+  /// values of [line], [charPositionInLine], and [msg] using
+  /// the following format.</p>
+  ///
+  /// <pre>
+  /// line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
+  /// </pre>
+  @override
+  void syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
+    stdout.writeln('line $line:$column $msg');
+  }
+}
+
+
 void main(List\<String> args) async {
     var show_tree = false;
     var show_tokens = false;
@@ -129,10 +150,10 @@ void main(List\<String> args) async {
     }
     var tokens = CommonTokenStream(lexer);
     var parser = <parser_name>(tokens);
-//    var listener_lexer = ErrorListener();
-//    var listener_parser = ErrorListener();
-//    lexer.AddErrorListener(listener_lexer);
-//    parser.AddErrorListener(listener_parser);
+    var listener_lexer = MyErrorListener();
+    var listener_parser = MyErrorListener();
+    lexer.addErrorListener(listener_lexer);
+    parser.addErrorListener(listener_parser);
     Stopwatch s = new Stopwatch();
     s.start();
     var tree = parser.<start_symbol>();
@@ -141,15 +162,16 @@ void main(List\<String> args) async {
     stderr.writeln("Time: " + et.toString());
     if (parser.numberOfSyntaxErrors > 0)
     {
+        // Listener will have already printed the error(s) to stdout.
         stderr.writeln("Parse failed.");
     }
     else
     {
         stderr.writeln("Parse succeeded.");
-    }
-    if (show_tree)
-    {
-        print(tree.toStringTree(parser: parser));
+        if (show_tree)
+        {
+            print(tree.toStringTree(parser: parser));
+        }
     }
     exit(parser.numberOfSyntaxErrors > 0 ? 1 : 0);
 }
