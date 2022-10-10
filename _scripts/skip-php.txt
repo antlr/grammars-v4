@@ -36,6 +36,7 @@ kirikiri-tjs
 kotlin/kotlin
 kotlin/kotlin-formal
 kquery
+logo/logo
 logo/ucb-logo
 lpc
 lucene
@@ -49,6 +50,7 @@ powerbuilder
 prov-n
 python/python
 python/python3
+python/python3alt
 r
 racket-bsl
 racket-isl

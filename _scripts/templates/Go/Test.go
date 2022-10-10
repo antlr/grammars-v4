@@ -22,7 +22,7 @@ func NewCustomErrorListener() *CustomErrorListener {
 
 func (l *CustomErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
     l.errors += 1
-    antlr.ConsoleErrorListenerINSTANCE.SyntaxError(recognizer, offendingSymbol, line, column, msg, e)
+    fmt.Printf("line %d:%d %s", line, column, msg)
 }
 
 func (l *CustomErrorListener) ReportAmbiguity(recognizer antlr.Parser, dfa *antlr.DFA, startIndex, stopIndex int, exact bool, ambigAlts *antlr.BitSet, configs antlr.ATNConfigSet) {
@@ -116,10 +116,10 @@ func main() {
         fmt.Fprintln(os.Stderr, "Parse failed.");
     } else {
         fmt.Fprintln(os.Stderr, "Parse succeeded.")
-    }
-    if show_tree {
-        ss := tree.ToStringTree(parser.RuleNames, parser)
-        fmt.Println(ss)
+        if show_tree {
+            ss := tree.ToStringTree(parser.RuleNames, parser)
+            fmt.Println(ss)
+        }
     }
     if parserErrors.errors > 0 || lexerErrors.errors > 0 {
         os.Exit(1)

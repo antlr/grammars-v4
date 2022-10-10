@@ -24,7 +24,7 @@ class MyErrorListener(ErrorListener):
 
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         self.num_errors = self.num_errors + 1
-        super().syntaxError(recognizer, offendingSymbol, line, column, msg, e)
+        print(f"line {line}:{column} {msg}");
 
 def main(argv):
     show_tokens = False
@@ -94,13 +94,14 @@ def main(argv):
     diff = end_time - start_time
     diff_time = diff.total_seconds()
     print(f'Time: {diff_time}', file=sys.stderr);
-    if (show_tree):
-        print(tree.toStringTree(recog=parser))
     if p_listener.num_errors > 0 or l_listener.num_errors > 0:
+        # Listener will have already printed the error(s) to stdout.
         print('Parse failed.', file=sys.stderr);
         sys.exit(1)
     else:
         print('Parse succeeded.', file=sys.stderr);
+        if (show_tree):
+            print(tree.toStringTree(recog=parser))
         sys.exit(0)
 
 if __name__ == '__main__':

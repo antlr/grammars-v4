@@ -36,7 +36,7 @@ class MyErrorListener extends BaseErrorListener /*extends ConsoleErrorListener*/
 		string $msg,
 		?RecognitionException $e
 	) : void {
-		\fwrite(\STDERR, \sprintf("line %d:%d %s\n", $line, $charPositionInLine, $msg));
+		\fwrite(\STDOUT, \sprintf("line %d:%d %s\n", $line, $charPositionInLine, $msg));
 		//parent::syntaxError($recognizer,$offendingSymbol,$line,$charPositionInLine,$msg,$e);
 		$this->noError = false;
 	}
@@ -94,10 +94,11 @@ $parserErrorListener = new MyErrorListener();
 $parser->removeErrorListeners();
 $parser->addErrorListener($parserErrorListener);
 $tree = $parser-><start_symbol>();
-if ($show_tree) {
-	print($tree->toStringTree($parser->getRuleNames()) . "\n");
-}
 if ($parserErrorListener->noError&&$lexerErrorListener->noError){
+	if ($show_tree) {
+		print($tree->toStringTree($parser->getRuleNames()) . "\n");
+	}
 	exit(0);
 }
+// Listener will have already printed the error(s) to stdout.
 exit(1);
