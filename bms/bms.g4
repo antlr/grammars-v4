@@ -52,11 +52,21 @@ key_
    ;
 
 value_
-   : ID
+   : ID | data
    ;
 
+data: measure_number channel_number ':' message;
+
+measure_number: DIGIT DIGIT DIGIT;
+
+channel_number: DIGIT DIGIT;
+
+message: DIGIT+;
+
+DIGIT: [0-9];
+
 ID
-   : [a-zA-Z0-9:._-]+
+   : [a-zA-Z0-9._-]+
    ;
 
 WS
