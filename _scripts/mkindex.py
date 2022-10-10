@@ -115,7 +115,7 @@ def index_grammars(root : str) -> Sequence[dict]:
                 'lexer' : lexer,
                 'parser' : parser,
                 'start' : get_single_value("entryPoint", pom),
-                'example' : examplesFiles[0]
+                'example' : examplesFiles
             }
             entries.append(entry)
     return entries
