@@ -3,8 +3,8 @@ name: REINDEX
 on:
   push:
     branches: [ master ]
-jobs:
 
+jobs:
   reindex:
     runs-on: ubuntu-latest
     steps:
@@ -22,13 +22,7 @@ jobs:
         fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
     - name: Create local changes
       run: |
-        python _scripts/mkindex.py . > grammars.json
-    - name: Commit files
-      run: |
-        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git add grammars.json
-        git commit -m "generated"
+        cd _scripts; bash reindex.sh
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
