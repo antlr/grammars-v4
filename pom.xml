@@ -249,6 +249,7 @@
 				<module>rfc3080</module>
 				<module>robotwars</module>
 				<module>romannumerals</module>
+                <module>ron</module>
 				<module>rpn</module>
 				<module>ruby</module>
 				<module>rust</module>
