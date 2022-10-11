@@ -1,11 +1,17 @@
 #!/usr/bin/bash
 
 # Generate index.
-python mkindex.py .. > ../grammars.json
+pwd
+ls -l mkindex.py
+echo "creating ../grammars.json"
+python3 mkindex.py .. > ../grammars.json
+echo "finished creating ../grammars.json"
+ls -l ../grammars.json
 
 # Compute diff. Check in if there is new content.
 git diff --quiet
 if [ "$?" == "1" ]; then
+  echo "The grammars.json file is new. Checking in."
   git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
   git config --local user.name "github-actions[bot]"
   git add ../grammars.json
