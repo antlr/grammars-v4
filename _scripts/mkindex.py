@@ -92,15 +92,22 @@ def index_grammars(root : str) -> Sequence[dict]:
                 continue
 
             grammars = get_values("include", pom)
-            if grammars is None or len(grammars)!=2:
+            if grammars is None:
                 continue
-            lexer = grammars[0] if 'Lexer' in grammars[0] else grammars[1]
-            parser = grammars[0] if 'Parser' in grammars[0] else grammars[1]
-            gdir = path[len(root)+1:]
-            if lexer:
-                lexer = f'https://raw.githubusercontent.com/antlr/grammars-v4/master/{gdir}/{lexer}'
-            if parser:
-                parser = f'https://raw.githubusercontent.com/antlr/grammars-v4/master/{gdir}/{parser}'
+            if len(grammars) > 1:
+                lexer = grammars[0] if 'Lexer' in grammars[0] else grammars[1]
+                parser = grammars[0] if 'Parser' in grammars[0] else grammars[1]
+                gdir = path[len(root)+1:]
+                if lexer:
+                    lexer = f'https://raw.githubusercontent.com/antlr/grammars-v4/master/{gdir}/{lexer}'
+                if parser:
+                    parser = f'https://raw.githubusercontent.com/antlr/grammars-v4/master/{gdir}/{parser}'
+            else:
+                lexer = ""
+                parser = grammars[0]
+                gdir = path[len(root)+1:]
+                if parser:
+                    parser = f'https://raw.githubusercontent.com/antlr/grammars-v4/master/{gdir}/{parser}'
 
             exampleFilesDir = get_single_value("exampleFiles", pom)
             if exampleFilesDir is None:
