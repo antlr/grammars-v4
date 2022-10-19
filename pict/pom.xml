@@ -39,7 +39,7 @@
 					<enabled>true</enabled>
 					<verbose>false</verbose>
 					<showTree>false</showTree>
-					<entryPoint>htmlDocument</entryPoint>
+					<entryPoint>model_file</entryPoint>
 					<grammarName>PICT</grammarName>
 					<packageName></packageName>
 					<exampleFiles>examples/</exampleFiles>

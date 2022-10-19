@@ -3,7 +3,7 @@ grammar PICT;
 options { caseInsensitive = true; }
 
 /// https://github.com/Microsoft/pict/blob/main/doc/pict.md
-input
+model_file
  : parameter_definitions sub_models constraints EOF
  ;
 
