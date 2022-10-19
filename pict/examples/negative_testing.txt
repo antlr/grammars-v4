@@ -1,0 +1,6 @@
+#
+# Trivial model for SumSquareRoots
+#
+
+A: ~-1, 0, 1, 2
+B: ~-1, 0, 1, 2

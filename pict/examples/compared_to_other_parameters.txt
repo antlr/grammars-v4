@@ -1,0 +1,16 @@
+#
+# Machine 1
+#
+OS_1:   Win7, Win8, Win10
+SKU_1:  Home, Pro
+LANG_1: English, Spanish, Chinese
+
+#
+# Machine 2
+#
+OS_2:   Win7, Win8, Win10
+SKU_2:  Home, Pro
+LANG_2: English, Spanish, Chinese, Hindi
+
+IF [LANG_1] = [LANG_2]
+THEN [OS_1] <> [OS_2] AND [SKU_1] <> [SKU_2];

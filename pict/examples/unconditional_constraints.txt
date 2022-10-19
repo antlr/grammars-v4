@@ -1,0 +1,11 @@
+#
+# At least one parameter must be different to be a meaningful test case
+#
+
+[OS_1] <> [OS_2] or [SKU_1] <> [SKU_2] or [LANG_1] <> [LANG_2];
+
+#
+# All parameters must be different (we use AND operator)
+#
+
+[OS_1] <> [OS_2] and [SKU_1] <> [SKU_2] and [LANG_1] <> [LANG_2];

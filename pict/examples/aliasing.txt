@@ -1,0 +1,2 @@
+OS_1:   Win2008, Win2012, Win2016
+SKU_1:  Professional, Server | Datacenter

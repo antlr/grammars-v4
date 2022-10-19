@@ -1,0 +1,13 @@
+#
+# Machine 1
+#
+OS_1:   Win7, Win8, Win10
+SKU_1:  Home, Pro
+LANG_1: English, Spanish, Chinese
+
+#
+# Machine 2
+#
+OS_2:   <OS_1>
+SKU_2:  <SKU_1>
+LANG_2: <LANG_1>, Hindi

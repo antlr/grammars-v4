@@ -1,0 +1,4 @@
+Size:  1, 2, 3, 4, 5
+Value: a, b, c, d
+
+IF [Size] > 3 THEN [Value] > "b";

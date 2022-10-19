@@ -1,0 +1,14 @@
+[Size] < 10000
+[Compression] = "OFF"
+[File system] like "FAT*"
+
+IF [Cluster size] in {512, 1024, 2048} THEN [Compression] = "Off";
+IF [File system] in {"FAT", "FAT32"}   THEN [Compression] = "Off";
+
+IF [File system] <> "NTFS" OR
+ ( [File system] =  "NTFS" AND [Cluster size] > 4096 )
+THEN [Compression] = "Off";
+
+IF NOT ( [File system] = "NTFS" OR
+       ( [File system] = "NTFS" AND NOT [Cluster size] <= 4096 ))
+THEN [Compression] = "Off";

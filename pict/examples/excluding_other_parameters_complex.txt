@@ -1,0 +1,11 @@
+P1: -1, 0, 1
+P2: A, B, C, Null, NA
+P3: X, Y, Z, NA
+
+IF [P1] = -1
+  THEN [P2] = "NA" AND [P3] = "NA"
+  ELSE [P2] <> "NA" AND
+     ( [P3] <> "NA" OR [P2] = "Null" );
+
+IF [P2] = "Null" OR [P2] = "NA"
+  THEN [P3] = "NA";

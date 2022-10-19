@@ -1,0 +1,10 @@
+PLATFORM:  x86, x64, arm
+CPUS:      1, 2, 4
+RAM:       1GB, 4GB, 64GB
+HDD:       SCSI, IDE
+OS:        Win7, Win8, Win10
+Browser:   Edge, Opera, Chrome, Firefox
+APP:       Word, Excel, Powerpoint
+
+{ PLATFORM, CPUS, RAM, HDD } @ 3
+{ OS, Browser } @ 2
