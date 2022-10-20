@@ -45,10 +45,6 @@ parameter_definition
  : parameter COLON parameter_values
  ;
 
-parameter
- : VALUE+
- ;
-
 parameter_values
  : parameter_value ( COMMA parameter_value )*
  ;
@@ -56,8 +52,8 @@ parameter_values
 parameter_value
  : parameter_value OPAR parameter_value CPAR
  | TILDE parameter_value
- | VALUE+ ( PIPE VALUE+ )?
- | LT VALUE+ GT
+ | parameter ( PIPE parameter )?
+ | LT parameter GT
  | NUMBER
  ;
 
@@ -146,7 +142,16 @@ relation
 
 /// ParameterName ::= [String]
 parameter_name
- : OBRACK VALUE+ CBRACK
+ : OBRACK parameter CBRACK
+ ;
+
+// A paramater can contain spaces, hence the `VALUE+`. For example, this sis valid:
+//
+//   File system:    FAT, FAT32, NTFS
+//
+//   IF [File system] = "FAT" THEN [Size] <= 4096;
+parameter
+ : VALUE+
  ;
 
 /// Value :: =
