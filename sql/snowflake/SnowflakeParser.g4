@@ -536,7 +536,7 @@ object_params
     ;
 
 default_ddl_collation
-    : DEFAULT_DDL_COLLATION EQ string
+    : DEFAULT_DDL_COLLATION_ EQ string
     ;
 
 object_properties
@@ -651,7 +651,7 @@ alter_database
 database_property
     : DATA_RETENTION_TIME_IN_DAYS
     | MAX_DATA_EXTENSION_TIME_IN_DAYS
-    | DEFAULT_DDL_COLLATION
+    | DEFAULT_DDL_COLLATION_
     | COMMENT
     ;
 
@@ -887,7 +887,7 @@ alter_schema
 schema_property
     : DATA_RETENTION_TIME_IN_DAYS
     | MAX_DATA_EXTENSION_TIME_IN_DAYS
-    | DEFAULT_DDL_COLLATION
+    | DEFAULT_DDL_COLLATION_
     | COMMENT
     ;
 
@@ -1088,7 +1088,7 @@ alter_table
                                              DATA_RETENTION_TIME_IN_DAYS         |
                                              MAX_DATA_EXTENSION_TIME_IN_DAYS     |
                                              CHANGE_TRACKING                     |
-                                             DEFAULT_DDL_COLLATION               |
+                                             DEFAULT_DDL_COLLATION_              |
                                              COMMENT                             |
                                              )
                                              //[ , ... ]

@@ -237,7 +237,7 @@ DAYS:                                                  'DAYS';
 DAYS_TO_EXPIRY:                                        'DAYS_TO_EXPIRY';
 DECLARE:                                               'DECLARE';
 DEFAULT:                                               'DEFAULT';
-DEFAULT_DDL_COLLATION:                                 'DEFAULT_DDL_COLLATION';
+DEFAULT_DDL_COLLATION_:                                'DEFAULT_DDL_COLLATION';
 DEFAULT_NAMESPACE:                                     'DEFAULT_NAMESPACE';
 DEFAULT_ROLE:                                          'DEFAULT_ROLE';
 DEFAULT_WAREHOUSE:                                     'DEFAULT_WAREHOUSE';
