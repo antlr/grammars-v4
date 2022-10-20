@@ -1030,14 +1030,14 @@ alter_stage
     | ALTER STAGE if_exists? id_ SET (
           internal_stage_params?
           file_format?
-          ( COPY_OPTIONS EQ '(' copy_options ')' )?
+          ( COPY_OPTIONS_ EQ '(' copy_options ')' )?
           comment_clause
           )
     // External stage
     | ALTER STAGE if_exists? id_ SET (
           external_stage_params?
           file_format?
-          ( COPY_OPTIONS EQ '(' copy_options ')' )?
+          ( COPY_OPTIONS_ EQ '(' copy_options ')' )?
           comment_clause?
           )
     ;
@@ -2059,7 +2059,7 @@ create_stage
           internal_stage_params?
           directory_table_params?
         ( FILE_FORMAT EQ LR_BRACKET ( FORMAT_NAME EQ string | TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML ) format_type_options* ) RR_BRACKET )?
-        ( COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET )?
+        ( COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET )?
         with_tags?
         comment_clause?
     //External stage
@@ -2067,7 +2067,7 @@ create_stage
           external_stage_params
           directory_table_params?
         ( FILE_FORMAT EQ LR_BRACKET ( FORMAT_NAME EQ string | TYPE EQ ( CSV | JSON | AVRO | ORC | PARQUET | XML ) format_type_options* ) RR_BRACKET )?
-        ( COPY_OPTIONS EQ LR_BRACKET copy_options RR_BRACKET )?
+        ( COPY_OPTIONS_ EQ LR_BRACKET copy_options RR_BRACKET )?
         with_tags?
         comment_clause?
     ;

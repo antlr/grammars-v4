@@ -204,7 +204,7 @@ CONVERSATION:                                          'CONVERSATION';
 COOKIE:                                                'COOKIE';
 COPY:                                                  'COPY';
 COPY_ONLY:                                             'COPY_ONLY';
-COPY_OPTIONS:                                          'COPY_OPTIONS';
+COPY_OPTIONS_:                                         'COPY_OPTIONS';
 COUNT:                                                 'COUNT';
 COUNT_BIG:                                             'COUNT_BIG';
 CREATE:                                                'CREATE';
