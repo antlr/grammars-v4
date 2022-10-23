@@ -1,0 +1,685 @@
+/*
+Apache Derby grammar.
+The MIT License (MIT).
+
+Copyright (c) 2022, Michał Lorek.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+lexer grammar DerbyLexer;
+
+options { caseInsensitive = true; }
+
+ABS:                                                   'ABS';
+ABSVAL:                                                'ABSVAL';
+ACOS:                                                  'ACOS';
+ACTION:                                                'ACTION';
+ADD:                                                   'ADD';
+AGGREGATE:                                             'AGGREGATE';
+ALL:                                                   'ALL';
+ALLOCATE:                                              'ALLOCATE';
+ALTER:                                                 'ALTER';
+ALWAYS:                                                'ALWAYS';
+AND:                                                   'AND';
+ANONYMOUS:                                             'ANONYMOUS';
+ANY:                                                   'ANY';
+ARE:                                                   'ARE';
+AS:                                                    'AS';
+ASC:                                                   'ASC';
+ASIN:                                                  'ASIN';
+ASSERTION:                                             'ASSERTION';
+ATAN2:                                                 'ATAN2';
+ATAN:                                                  'ATAN';
+ATTACH:                                                'ATTACH';
+AUTHORIZATION:                                         'AUTHORIZATION';
+AUTO:                                                  'AUTO';
+AVG:                                                   'AVG';
+BEFORE:                                                'BEFORE';
+BEGIN:                                                 'BEGIN';
+BETWEEN:                                               'BETWEEN';
+BIGINT:                                                'BIGINT';
+BINARY:                                                'BINARY';
+BIT:                                                   'BIT';
+BLOB:                                                  'BLOB';
+BOOLEAN:                                               'BOOLEAN';
+BOTH:                                                  'BOTH';
+BY:                                                    'BY';
+CALL:                                                  'CALL';
+CALLED:                                                'CALLED';
+CALLER:                                                'CALLER';
+CASCADE:                                               'CASCADE';
+CASCADED:                                              'CASCADED';
+CASE:                                                  'CASE';
+CASE_INSENSITIVE:                                      'CASE_INSENSITIVE';
+CASE_SENSITIVE:                                        'CASE_SENSITIVE';
+CAST:                                                  'CAST';
+CATCH:                                                 'CATCH';
+CEIL:                                                  'CEIL';
+CEILING:                                               'CEILING';
+CHANGE:                                                'CHANGE';
+CHANGES:                                               'CHANGES';
+CHANGETABLE:                                           'CHANGETABLE';
+CHAR:                                                  'CHAR';
+CHARACTER:                                             'CHARACTER';
+CHARACTER_LENGTH:                                      'CHARACTER_LENGTH';
+CHARINDEX:                                             'CHARINDEX';
+CHECK:                                                 'CHECK';
+CLEANUP:                                               'CLEANUP';
+CLOB:                                                  'CLOB';
+CLONE:                                                 'CLONE';
+CLOSE:                                                 'CLOSE';
+COALESCE:                                              'COALESCE';
+COLLATE:                                               'COLLATE';
+COLLATION:                                             'COLLATION';
+COLUMN:                                                'COLUMN';
+COLUMNS:                                               'COLUMNS';
+COMMENT:                                               'COMMENT';
+COMMIT:                                                'COMMIT';
+COMMITTED:                                             'COMMITTED';
+COMPRESS:                                              'COMPRESS';
+COMPRESSION:                                           'COMPRESSION';
+CONCAT:                                                'CONCAT';
+CONCAT_NULL_YIELDS_NULL:                               'CONCAT_NULL_YIELDS_NULL';
+CONCAT_WS:                                             'CONCAT_WS';
+CONFIGURATION:                                         'CONFIGURATION';
+CONNECT:                                               'CONNECT';
+CONNECTION:                                            'CONNECTION';
+CONNECTIONS:                                           'CONNECTIONS';
+CONSTRAINT:                                            'CONSTRAINT';
+CONSTRAINTS:                                           'CONSTRAINTS';
+CONTAINMENT:                                           'CONTAINMENT';
+CONTAINS:                                              'CONTAINS';
+CONTENT:                                               'CONTENT';
+CONTEXT:                                               'CONTEXT';
+CONTEXT_HEADERS:                                       'CONTEXT_HEADERS';
+CONTEXT_INFO:                                          'CONTEXT_INFO';
+CONTINUE:                                              'CONTINUE';
+CONTROL:                                               'CONTROL';
+CONVERSATION:                                          'CONVERSATION';
+CONVERT:                                               'CONVERT';
+COOKIE:                                                'COOKIE';
+COPY:                                                  'COPY';
+COPY_ONLY:                                             'COPY_ONLY';
+COPY_OPTIONS_:                                         'COPY_OPTIONS';
+CORRESPONDING:                                         'CORRESPONDING';
+COS:                                                   'COS';
+COUNT:                                                 'COUNT';
+COUNT_BIG:                                             'COUNT_BIG';
+CREATE:                                                'CREATE';
+CREDENTIALS:                                           'CREDENTIALS';
+CREDIT_QUOTA:                                          'CREDIT_QUOTA';
+CROSS:                                                 'CROSS';
+CS:                                                    'CS';
+CSV:                                                   'CSV';
+CUBE:                                                  'CUBE';
+CURRENT:                                               'CURRENT';
+CURRENT_DATE:                                          'CURRENT_DATE';
+CURRENT_ROLE:                                          'CURRENT_ROLE';
+CURRENT_TIME:                                          'CURRENT_TIME';
+CURRENT_TIMESTAMP:                                     'CURRENT_TIMESTAMP';
+CURRENT_USER:                                          'CURRENT_USER';
+CURSOR:                                                'CURSOR';
+CUSTOM:                                                'CUSTOM';
+CYCLE:                                                 'CYCLE';
+DAILY:                                                 'DAILY';
+DATA:                                                  'DATA';
+DATE:                                                  'DATE';
+DATEADD:                                               'DATEADD';
+DATEDIFF:                                              'DATEDIFF';
+DATENAME:                                              'DATENAME';
+DATEPART:                                              'DATEPART';
+DATETIME:                                              'DATETIME';
+DAY:                                                   'DAY';
+DAYS:                                                  'DAYS';
+DAYS_TO_EXPIRY:                                        'DAYS_TO_EXPIRY';
+DEALLOCATE:                                            'DEALLOCATE';
+DEC:                                                   'DEC';
+DECIMAL:                                               'DECIMAL';
+DECLARE:                                               'DECLARE';
+DEFAULT:                                               'DEFAULT';
+DEFERRABLE:                                            'DEFERRABLE';
+DEFERRED:                                              'DEFERRED';
+DEFINE:                                                'DEFINE';
+DEFINER:                                               'DEFINER';
+DEFINITION:                                            'DEFINITION';
+DEFLATE:                                               'DEFLATE';
+DEGREES:                                               'DEGREES';
+DELEGATED:                                             'DELEGATED';
+DELETE:                                                'DELETE';
+DELTA:                                                 'DELTA';
+DENSE_RANK:                                            'DENSE_RANK';
+DERBY:                                                 'DERBY';
+DERBY_JDBC_RESULT_SET:                                 'DERBY_JDBC_RESULT_SET';
+DESC:                                                  'DESC';
+DESCRIBE:                                              'DESCRIBE';
+DETERMINISTIC:                                         'DETERMINISTIC';
+DIAGNOSTICS:                                           'DIAGNOSTICS';
+DIRTY:                                                 'DIRTY';
+DISABLE:                                               'DISABLE';
+DISABLED:                                              'DISABLED';
+DISCONNECT:                                            'DISCONNECT';
+DISK:                                                  'DISK';
+DISPLAY_NAME:                                          'DISPLAY_NAME';
+DISTINCT:                                              'DISTINCT';
+DO:                                                    'DO';
+DOUBLE:                                                'DOUBLE';
+DROP:                                                  'DROP';
+DYNAMIC:                                               'DYNAMIC';
+ELSE:                                                  'ELSE';
+ENABLE:                                                'ENABLE';
+ENABLED:                                               'ENABLED';
+END:                                                   'END';
+END_EXEC:                                              'END_EXEC';
+ENFORCED:                                              'ENFORCED';
+ESCAPE:                                                'ESCAPE';
+EXCEPT:                                                'EXCEPT';
+EXCEPTION:                                             'EXCEPTION';
+EXCHANGE:                                              'EXCHANGE';
+EXCLUSIVE:                                             'EXCLUSIVE';
+EXEC:                                                  'EXEC';
+EXECUTE:                                               'EXEC' 'UTE'?;
+EXECUTION:                                             'EXECUTION';
+EXIST:                                                 'EXIST';
+EXISTS:                                                'EXISTS';
+EXIT:                                                  'EXIT';
+EXP:                                                   'EXP';
+EXPAND:                                                'EXPAND';
+EXPIRY_DATE:                                           'EXPIRY_DATE';
+EXPLAIN:                                               'EXPLAIN';
+EXPLICIT:                                              'EXPLICIT';
+EXTERNAL:                                              'EXTERNAL';
+FAIL_OPERATION:                                        'FAIL_OPERATION';
+FAILOVER:                                              'FAILOVER';
+FAILOVER_MODE:                                         'FAILOVER_MODE';
+FALSE:                                                 'FALSE';
+FETCH:                                                 'FETCH';
+FILE:                                                  'FILE';
+FILE_EXTENSION:                                        'FILE_EXTENSION';
+FILTER:                                                'FILTER';
+FIRST:                                                 'FIRST';
+FIRST_NAME:                                            'FIRST_NAME';
+FLOAT:                                                 'FLOAT';
+FLOOR:                                                 'FLOOR';
+FOR:                                                   'FOR';
+FORCE:                                                 'FORCE';
+FOREIGN:                                               'FOREIGN';
+FORMAT:                                                'FORMAT';
+FORMAT_NAME:                                           'FORMAT_NAME';
+FORMATS:                                               'FORMATS';
+FOUND:                                                 'FOUND';
+FROM:                                                  'FROM';
+FULL:                                                  'FULL';
+FUNCTION:                                              'FUNCTION';
+GENERATED:                                             'GENERATED';
+GET:                                                   'GET';
+GETCURRENTCONNECTION:                                  'GETCURRENTCONNECTION';
+GIGA:                                                  'G';
+GLOBAL:                                                'GLOBAL';
+GO:                                                    'GO';
+GOTO:                                                  'GOTO';
+GRANT:                                                 'GRANT';
+GRANTS:                                                'GRANTS';
+GROUP:                                                 'GROUP';
+GROUPING:                                              'GROUPING';
+GROUPING_ID:                                           'GROUPING_ID';
+GROUPS:                                                'GROUPS';
+HAVING:                                                'HAVING';
+HEADER:                                                'HEADER';
+HEADERS:                                               'HEADERS';
+HEX:                                                   'HEX';
+HIGH:                                                  'HIGH';
+HISTORY:                                               'HISTORY';
+HOUR:                                                  'HOUR';
+HOURS:                                                 'HOURS';
+IDENTITY:                                              'IDENTITY';
+IDENTITY_VAL_LOCAL:                                    'IDENTITY_VAL_LOCAL';
+IF:                                                    'IF';
+IGNORE:                                                'IGNORE';
+IMMEDIATE:                                             'IMMEDIATE';
+IMMEDIATELY:                                           'IMMEDIATELY';
+IMMUTABLE:                                             'IMMUTABLE';
+IMPLICIT:                                              'IMPLICIT';
+IMPORT:                                                'IMPORT';
+IMPORTED:                                              'IMPORTED';
+IN:                                                    'IN';
+INCREMENT:                                             'INCREMENT';
+INDEX:                                                 'INDEX';
+INDICATOR:                                             'INDICATOR';
+INFORMATION:                                           'INFORMATION';
+INIT:                                                  'INIT';
+INITIALLY:                                             'INITIALLY';
+INNER:                                                 'INNER';
+INOUT:                                                 'INOUT';
+INPUT:                                                 'INPUT';
+INSENSITIVE:                                           'INSENSITIVE';
+INSERT:                                                'INSERT';
+INSERT_ONLY:                                           'INSERT_ONLY';
+INSTEAD:                                               'INSTEAD';
+INT:                                                   'INT';
+INTEGER:                                               'INTEGER';
+INTERSECT:                                             'INTERSECT';
+INTO:                                                  'INTO';
+INVOKER:                                               'INVOKER';
+IS:                                                    'IS';
+ISNULL:                                                'ISNULL';
+ISNUMERIC:                                             'ISNUMERIC';
+ISOLATION:                                             'ISOLATION';
+JAVA:                                                  'JAVA';
+JOIN:                                                  'JOIN';
+KB:                                                    'KB';
+KEEP:                                                  'KEEP';
+KEY:                                                   'KEY';
+KEYS:                                                  'KEYS';
+KEYSET:                                                'KEYSET';
+KILO:                                                  'K';
+KMS_KEY_ID:                                            'KMS_KEY_ID';
+LAG:                                                   'LAG';
+LANGUAGE:                                              'LANGUAGE';
+LARGE:                                                 'LARGE';
+LAST:                                                  'LAST';
+LAST_NAME:                                             'LAST_NAME';
+LAST_QUERY_ID:                                         'LAST_QUERY_ID';
+LAST_VALUE:                                            'LAST_VALUE';
+LATERAL:                                               'LATERAL';
+LCASE:                                                 'LCASE';
+LEAD:                                                  'LEAD';
+LEADING:                                               'LEADING';
+LEFT:                                                  'LEFT';
+LEN:                                                   'LEN';
+LENGTH:                                                'LENGTH';
+LIKE:                                                  'LIKE';
+LIMIT:                                                 'LIMIT';
+LINENO:                                                'LINENO';
+LIST:                                                  'LIST';
+LISTING:                                               'LISTING';
+LN:                                                    'LN';
+LOAD:                                                  'LOAD';
+LOCAL:                                                 'LOCAL';
+LOCATE:                                                'LOCATE';
+LOCK:                                                  'LOCK';
+LOCK_TIMEOUT:                                          'LOCK_TIMEOUT';
+LOCKS:                                                 'LOCKS';
+LOCKSIZE:                                              'LOCKSIZE';
+LOG10:                                                 'LOG10';
+LOG:                                                   'LOG';
+LOGGED:                                                'LOGGED';
+LOGIN:                                                 'LOGIN';
+LOGIN_NAME:                                            'LOGIN_NAME';
+LONG:                                                  'LONG';
+LOW:                                                   'LOW';
+LOWER:                                                 'LOWER';
+LTRIM:                                                 'LTRIM';
+MATCH:                                                 'MATCH';
+MATCH_BY_COLUMN_NAME:                                  'MATCH_BY_COLUMN_NAME';
+MATCH_RECOGNIZE:                                       'MATCH_RECOGNIZE';
+MATCHED:                                               'MATCHED';
+MATCHES:                                               'MATCHES';
+MATERIALIZED:                                          'MATERIALIZED';
+MAX:                                                   'MAX';
+MAX_BATCH_ROWS:                                        'MAX_BATCH_ROWS';
+MAX_CLUSTER_COUNT:                                     'MAX_CLUSTER_COUNT';
+MAX_CONCURRENCY_LEVEL:                                 'MAX_CONCURRENCY_LEVEL';
+MAX_DATA_EXTENSION_TIME_IN_DAYS:                       'MAX_DATA_EXTENSION_TIME_IN_DAYS';
+MAX_SIZE:                                              'MAX_SIZE';
+MAXVALUE:                                              'MAXVALUE';
+MEASURES:                                              'MEASURES';
+MEDIUM:                                                'MEDIUM';
+MEGA:                                                  'M';
+MERGE:                                                 'MERGE';
+MIN:                                                   'MIN';
+MINUS_:                                                'MINUS';
+MINUTE:                                                'MINUTE';
+MINUTES:                                               'MINUTES';
+MINVALUE:                                              'MINVALUE';
+MOD:                                                   'MOD';
+MODE:                                                  'MODE';
+MODIFIED_AFTER:                                        'MODIFIED_AFTER';
+MODIFIES:                                              'MODIFIES';
+MODIFY:                                                'MODIFY';
+MONTH:                                                 'MONTH';
+MONTHLY:                                               'MONTHLY';
+MOVE:                                                  'MOVE';
+MULTI_STATEMENT_COUNT:                                 'MULTI_STATEMENT_COUNT';
+MULTI_USER:                                            'MULTI_USER';
+MUST_CHANGE:                                           'MUST_CHANGE';
+MUST_CHANGE_PASSWORD:                                  'MUST_CHANGE_PASSWORD';
+NAME:                                                  'NAME';
+NATIONAL:                                              'NATIONAL';
+NATURAL:                                               'NATURAL';
+NCHAR:                                                 'NCHAR';
+NESTED_TRIGGERS:                                       'NESTED_TRIGGERS';
+NETWORK:                                               'NETWORK';
+NETWORK_POLICY:                                        'NETWORK_POLICY';
+NEVER:                                                 'NEVER';
+NEXT:                                                  'NEXT';
+NEXTVAL:                                               'NEXTVAL';
+NO:                                                    'NO';
+NONE:                                                  'NONE';
+NORELY:                                                'NORELY';
+NOT:                                                   'NOT';
+NULL_:                                                 'NULL';
+NULL_IF:                                               'NULL_IF';
+NULLIF:                                                'NULLIF';
+NULLS:                                                 'NULLS';
+NUMBER:                                                'NUMBER';
+NUMERIC:                                               'NUMERIC';
+NVARCHAR:                                              'NVARCHAR';
+OBJECT:                                                'OBJECT';
+OF:                                                    'OF';
+OFF:                                                   'OFF';
+OFFSET:                                                'OFFSET';
+OFFSETS:                                               'OFFSETS';
+ON:                                                    'ON';
+ONE:                                                   'ONE';
+ONLINE:                                                'ONLINE';
+ONLY:                                                  'ONLY';
+OPEN:                                                  'OPEN';
+OPTIMIZATION:                                          'OPTIMIZATION';
+OPTION:                                                'OPTION';
+OR:                                                    'OR';
+ORC:                                                   'ORC';
+ORDER:                                                 'ORDER';
+OUT:                                                   'OUT';
+OUTER:                                                 'OUTER';
+OUTPUT:                                                'OUTPUT';
+OVER:                                                  'OVER';
+OVERLAPS:                                              'OVERLAPS';
+PAD:                                                   'PAD';
+PARAMETER:                                             'PARAMETER';
+PARAMETERS:                                            'PARAMETERS';
+PARTIAL:                                               'PARTIAL';
+PI:                                                    'PI';
+PIVOT:                                                 'PIVOT';
+PLAN:                                                  'PLAN';
+PRECISION:                                             'PRECISION';
+PREPARE:                                               'PREPARE';
+PRESERVE:                                              'PRESERVE';
+PRIMARY:                                               'PRIMARY';
+PRIOR:                                                 'PRIOR';
+PRIVILEGES:                                            'PRIVILEGES';
+PROC:                                                  'PROC';
+PROCEDURE:                                             'PROCEDURE';
+PROCESS:                                               'PROCESS';
+PUBLIC:                                                'PUBLIC';
+QUEUE:                                                 'QUEUE';
+RADIANS:                                               'RADIANS';
+RANGE:                                                 'RANGE';
+RANK:                                                  'RANK';
+RAW:                                                   'RAW';
+RAW_DEFLATE:                                           'RAW_DEFLATE';
+READ:                                                  'READ';
+READ_COMMITTED_SNAPSHOT:                               'READ_COMMITTED_SNAPSHOT';
+READ_ONLY:                                             'READ_ONLY';
+READ_ONLY_ROUTING_LIST:                                'READ_ONLY_ROUTING_LIST';
+READ_WRITE:                                            'READ_WRITE';
+READER:                                                'READER';
+READONLY:                                              'READONLY';
+READPAST:                                              'READPAST';
+READS:                                                 'READS';
+REAL:                                                  'REAL';
+REFERENCES:                                            'REFERENCES';
+RELATIVE:                                              'RELATIVE';
+REMOVE:                                                'REMOVE';
+RENAME:                                                'RENAME';
+REPEATABLE:                                            'REPEATABLE';
+REPLACE:                                               'REPLACE';
+REQUIRED:                                              'REQUIRED';
+RESET:                                                 'RESET';
+RESTART:                                               'RESTART';
+RESTORE:                                               'RESTORE';
+RESTRICT:                                              'RESTRICT';
+RESTRICTIONS:                                          'RESTRICTIONS';
+RESULT:                                                'RESULT';
+RESUME:                                                'RESUME';
+RETAINDAYS:                                            'RETAINDAYS';
+RETURN:                                                'RETURN';
+RETURNS:                                               'RETURNS';
+REVOKE:                                                'REVOKE';
+RIGHT:                                                 'RIGHT';
+ROLE:                                                  'ROLE';
+ROLLBACK:                                              'ROLLBACK';
+ROLLUP:                                                'ROLLUP';
+ROW:                                                   'ROW';
+ROW_NUMBER:                                            'ROW_NUMBER';
+ROWCOUNT:                                              'ROWCOUNT';
+ROWS:                                                  'ROWS';
+RR:                                                    'RR';
+RS:                                                    'RS';
+RTRIM:                                                 'RTRIM';
+RUN_AS_ROLE:                                           'RUN_AS_ROLE';
+SAFE:                                                  'SAFE';
+SAFETY:                                                'SAFETY';
+SAMPLE:                                                'SAMPLE';
+SCHEMA:                                                'SCHEMA';
+SCHEME:                                                'SCHEME';
+SCROLL:                                                'SCROLL';
+SEARCH:                                                'SEARCH';
+SECOND:                                                'SECOND';
+SECONDS:                                               'SECONDS';
+SECURITY:                                              'SECURITY';
+SEED:                                                  'SEED';
+SELECT:                                                'SELECT';
+SELF:                                                  'SELF';
+SEQUENCE:                                              'SEQUENCE';
+SERIALIZABLE:                                          'SERIALIZABLE';
+SESSION_USER:                                          'SESSION_USER';
+SET:                                                   'SET';
+SETS:                                                  'SETS';
+SETUSER:                                               'SETUSER';
+SHARE:                                                 'SHARE';
+SHOW:                                                  'SHOW';
+SIMPLE:                                                'SIMPLE';
+SIN:                                                   'SIN';
+SMALL:                                                 'SMALL';
+SMALLINT:                                              'SMALLINT';
+SOME:                                                  'SOME';
+SPACE:                                                 'SPACE';
+SPARSE:                                                'SPARSE';
+SPECIFICATION:                                         'SPECIFICATION';
+SPLIT:                                                 'SPLIT';
+SQL:                                                   'SQL';
+SQLCODE:                                               'SQLCODE';
+SQLERROR:                                              'SQLERROR';
+SQLID:                                                 'SQLID';
+SQLSTATE:                                              'SQLSTATE';
+SQRT:                                                  'SQRT';
+STABILITY:                                             'STABILITY';
+STANDARD:                                              'STANDARD';
+STANDBY:                                               'STANDBY';
+START:                                                 'START';
+START_DATE:                                            'START_DATE';
+START_TIMESTAMP:                                       'START_TIMESTAMP';
+STARTED:                                               'STARTED';
+STARTS:                                                'STARTS';
+STATE:                                                 'STATE';
+STATEMENT:                                             'STATEMENT';
+STDDEV_POP:                                            'STDDEV_POP';
+STDDEV_SAMP:                                           'STDDEV_SAMP';
+STR:                                                   'STR';
+STRICT:                                                'STRICT';
+STRING_AGG:                                            'STRING_AGG';
+STRING_ESCAPE:                                         'STRING_ESCAPE';
+STRIP_NULL_VALUES:                                     'STRIP_NULL_VALUES';
+STRIP_OUTER_ARRAY:                                     'STRIP_OUTER_ARRAY';
+STRIP_OUTER_ELEMENT:                                   'STRIP_OUTER_ELEMENT';
+STYLE:                                                 'STYLE';
+SUBSTR:                                                'SUBSTR';
+SUBSTRING:                                             'SUBSTRING';
+SUM:                                                   'SUM';
+SUPPORTED:                                             'SUPPORTED';
+SYNC_PASSWORD:                                         'SYNC_PASSWORD';
+SYNONYM:                                               'SYNONYM';
+SYSTEM:                                                'SYSTEM';
+SYSTEM_USER:                                           'SYSTEM_USER';
+TABLE:                                                 'TABLE';
+TABLE_FORMAT:                                          'TABLE_FORMAT';
+TABLES:                                                'TABLES';
+TAN:                                                   'TAN';
+TARGET:                                                'TARGET';
+TEMPORARY:                                             'TEMPORARY';
+THEN:                                                  'THEN';
+TIES:                                                  'TIES';
+TIME:                                                  'TIME';
+TIME_FORMAT:                                           'TIME_FORMAT';
+TIMEOUT:                                               'TIMEOUT';
+TIMER:                                                 'TIMER';
+TIMESTAMP:                                             'TIMESTAMP';
+TIMEZONE:                                              'TIMEZONE';
+TIMEZONE_HOUR:                                         'TIMEZONE_HOUR';
+TIMEZONE_MINUTE:                                       'TIMEZONE_MINUTE';
+TO:                                                    'TO';
+TOP:                                                   'TOP';
+TRANSACTION:                                           'TRANSACTION';
+TRANSLATE:                                             'TRANSLATE';
+TRANSLATION:                                           'TRANSLATION';
+TRIGGER:                                               'TRIGGER';
+TRIGGERS:                                              'TRIGGERS';
+TRIM:                                                  'TRIM';
+TRUE:                                                  'TRUE';
+TRUNCATE:                                              'TRUNCATE';
+TRY:                                                   'TRY';
+TSEQUAL:                                               'TSEQUAL';
+TSQL:                                                  'TSQL';
+TYPE:                                                  'TYPE';
+UCASE:                                                 'UCASE';
+UN:                                                    'UN';
+UNBOUNDED:                                             'UNBOUNDED';
+UNCHECKED:                                             'UNCHECKED';
+UNCOMMITTED:                                           'UNCOMMITTED';
+UNICODE:                                               'UNICODE';
+UNION:                                                 'UNION';
+UNIQUE:                                                'UNIQUE';
+UNKNOWN:                                               'UNKNOWN';
+UNLIMITED:                                             'UNLIMITED';
+UNLOCK:                                                'UNLOCK';
+UNPIVOT:                                               'UNPIVOT';
+UNSAFE:                                                'UNSAFE';
+UNSET:                                                 'UNSET';
+UPDATE:                                                'UPDATE';
+UPPER:                                                 'UPPER';
+UR:                                                    'UR';
+USAGE:                                                 'USAGE';
+USE:                                                   'USE';
+USE_ANY_ROLE:                                          'USE_ANY_ROLE';
+USED:                                                  'USED';
+USER:                                                  'USER';
+USING:                                                 'USING';
+VALUES:                                                'VALUES';
+VAR:                                                   'VAR';
+VAR_POP:                                               'VAR_POP';
+VAR_SAMP:                                              'VAR_SAMP';
+VARCHAR:                                               'VARCHAR';
+VARYING:                                               'VARYING';
+VIEW:                                                  'VIEW';
+WHEN:                                                  'WHEN';
+WHENEVER:                                              'WHENEVER';
+WHERE:                                                 'WHERE';
+WINDOW:                                                'WINDOW';
+WITH:                                                  'WITH';
+WORK:                                                  'WORK';
+WRITE:                                                 'WRITE';
+XML:                                                   'XML';
+XMLEXISTS:                                             'XMLEXISTS';
+XMLPARSE:                                              'XMLPARSE';
+XMLQUERY:                                              'XMLQUERY';
+XMLSERIALIZE:                                          'XMLSERIALIZE';
+YEAR:                                                  'YEAR';
+
+
+DUMMY: 'DUMMY';
+
+
+WHITE_SPACE:             [ \t\r\n]+                    -> skip;
+
+SQL_COMMENT:            '/*' (SQL_COMMENT | .)*? '*/' -> channel(HIDDEN);
+LINE_COMMENT:           '--' ~[\r\n]*                 -> channel(HIDDEN);
+
+// TODO: ID can be not only Latin.
+DOUBLE_QUOTE_ID:        '"' ~'"'+ '"';
+SINGLE_QUOTE:           '\'';
+
+ID:                     [A-Z_] ( [A-Z0-9_] )*;
+
+
+STRING_LITERAL       options { caseInsensitive=false; }     : '\'' (~'\'' | '\'\'')* '\'';
+
+DECIMAL_LITERAL:             DEC_DIGIT+;
+FLOAT_LITERAL:               DEC_DOT_DEC;
+REAL_LITERAL:                (DECIMAL_LITERAL | DEC_DOT_DEC) ('E' [+-]? DEC_DIGIT+);
+
+CHAR_LITERAL:                '\'' (~['\\\r\n] | EscapeSequence) '\'';
+
+fragment EscapeSequence
+    : '\\' [btnfr"'\\]
+    | '\\' ([0-3]? [0-7])? [0-7]
+    | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
+    ;
+
+fragment HexDigit
+    : [0-9a-f]
+    ;
+
+ARROW:               '->';
+ASSOC:               '=>';
+
+NE:                  '!=';
+LTGT:                '<>';
+EQ:                  '=';
+GT:                  '>';
+GE:                  '>=';
+LT:                  '<';
+LE:                  '<=';
+EXCLAMATION:         '!';
+PIPE_PIPE:           '||';
+DOT:                 '.';
+UNDERLINE:           '_';
+AT:                  '@';
+DOLLAR:              '$';
+LR_BRACKET:          '(';
+RR_BRACKET:          ')';
+COMMA:               ',';
+SEMI:                ';';
+STAR:                '*';
+DIVIDE:              '/';
+MODULE:              '%';
+PLUS:                '+';
+MINUS:               '-';
+
+PLACEHOLDER:         '?';
+
+fragment LETTER:       [A-Z_];
+fragment DEC_DOT_DEC:  (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DIGIT+);
+fragment DEC_DIGIT:    [0-9];
+
+
+fragment FullWidthLetter options { caseInsensitive=false; }
+    : '\u00c0'..'\u00d6'
+    | '\u00d8'..'\u00f6'
+    | '\u00f8'..'\u00ff'
+    | '\u0100'..'\u1fff'
+    | '\u2c00'..'\u2fff'
+    | '\u3040'..'\u318f'
+    | '\u3300'..'\u337f'
+    | '\u3400'..'\u3fff'
+    | '\u4e00'..'\u9fff'
+    | '\ua000'..'\ud7ff'
+    | '\uf900'..'\ufaff'
+    | '\uff00'..'\ufff0'
+    // | '\u10000'..'\u1F9FF'  //not support four bytes chars
+    // | '\u20000'..'\u2FA1F'
+    ;
