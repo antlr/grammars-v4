@@ -1011,7 +1011,7 @@ id_
     ;
 
 num
-    : DECIMAL
+    : DECIMAL_LITERAL
     ;
 
 // expressions
