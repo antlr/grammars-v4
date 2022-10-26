@@ -2180,7 +2180,7 @@ allow_or_disallow
 // Synonym DDL Clauses
 
 alter_synonym
-    : ALTER PUBLIC? SYNONYM (schema_name '.')? synonym_name ( (EDITIONABLE | NONEDITIONABLE) | COMPILE )
+    : ALTER PUBLIC? SYNONYM (schema_name '.')? synonym_name (EDITIONABLE | NONEDITIONABLE | COMPILE)
     ;
 
 create_synonym
