@@ -42,6 +42,7 @@ unit_statement
     | alter_procedure
     | alter_sequence
     | alter_session
+    | alter_synonym
     | alter_trigger
     | alter_type
     | alter_table
@@ -2177,6 +2178,10 @@ allow_or_disallow
     ;
 
 // Synonym DDL Clauses
+
+alter_synonym
+    : ALTER PUBLIC? SYNONYM (schema_name '.')? synonym_name ( (EDITIONABLE | NONEDITIONABLE) | COMPILE )
+    ;
 
 create_synonym
     // Synonym's schema cannot be specified for public synonyms
