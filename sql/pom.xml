@@ -21,5 +21,6 @@
         <module>tsql</module>
         <module>postgresql</module>
         <module>snowflake</module>
+        <module>derby</module>
     </modules>
 </project>
