@@ -631,7 +631,11 @@ integer_constant
     ;
 
 defaultValue
-    : DUMMY
+    : constant_expression_null
+    ;
+
+constant_expression_null
+    : num | string | NULL_
     ;
 
 always_by_default
