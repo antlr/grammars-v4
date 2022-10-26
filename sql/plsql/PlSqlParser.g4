@@ -82,6 +82,7 @@ unit_statement
     | drop_function
     | drop_package
     | drop_procedure
+    | drop_synonym
     | drop_sequence
     | drop_trigger
     | drop_type
@@ -2181,6 +2182,10 @@ create_synonym
     // Synonym's schema cannot be specified for public synonyms
     : CREATE (OR REPLACE)? PUBLIC SYNONYM synonym_name FOR (schema_name PERIOD)? schema_object_name (AT_SIGN link_name)?
     | CREATE (OR REPLACE)? SYNONYM (schema_name PERIOD)? synonym_name FOR (schema_name PERIOD)? schema_object_name (AT_SIGN link_name)?
+    ;
+
+drop_synonym
+    : DROP PUBLIC? SYNONYM (schema_name '.')? synonym_name FORCE?
     ;
 
 comment_on_table
