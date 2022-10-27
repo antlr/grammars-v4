@@ -353,9 +353,6 @@ XMLSERIALIZE:                                          'XMLSERIALIZE';
 YEAR:                                                  'YEAR';
 
 
-DUMMY: 'DUMMY';
-
-
 WHITE_SPACE:             [ \t\r\n]+                    -> skip;
 
 SQL_COMMENT:            '/*' (SQL_COMMENT | .)*? '*/' -> channel(HIDDEN);
@@ -365,15 +362,13 @@ LINE_COMMENT:           '--' ~[\r\n]*                 -> channel(HIDDEN);
 DOUBLE_QUOTE_ID:        '"' ~'"'+ '"';
 SINGLE_QUOTE:           '\'';
 
-ID:                     [A-Z_] ( [A-Z0-9_] )*;
+ID:                     [A-Z_] [A-Z0-9_]*;
 
 
-STRING_LITERAL       options { caseInsensitive=false; }     : '\'' (~'\'' | '\'\'')* '\'';
-
+STRING_LITERAL:              '\'' (~'\'' | '\'\'')* '\'';
 DECIMAL_LITERAL:             DEC_DIGIT+;
 FLOAT_LITERAL:               DEC_DOT_DEC;
 REAL_LITERAL:                (DECIMAL_LITERAL | DEC_DOT_DEC) ('E' [+-]? DEC_DIGIT+);
-
 CHAR_LITERAL:                '\'' (~['\\\r\n] | EscapeSequence) '\'';
 
 fragment EscapeSequence
