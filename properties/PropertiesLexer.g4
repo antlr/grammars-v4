@@ -1,7 +1,7 @@
 lexer grammar PropertiesLexer;
 
 COMMENT
-    : [!#] (~[\r\n])*
+    : [!#] ~[\r\n]*
     ;
 NEWLINE
     : [\r\n]+
