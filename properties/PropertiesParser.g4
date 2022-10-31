@@ -10,9 +10,7 @@ row
     | line
     ;
 line
-    : key DELIMITER value=key eol
-    | key DELIMITER eol
-    | key eol
+    : key (DELIMITER value=key?)? eol
     ;
 key
     : CHARACTER+
