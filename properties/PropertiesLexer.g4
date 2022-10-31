@@ -19,7 +19,7 @@ CHARACTER
 mode INSIDE;
 
 SLASH_DELIMITER: ~[\r\n] -> type(CHARACTER), popMode;
-SLASH_JOINT: ('\r')? '\n' -> type(CHARACTER),popMode;
+SLASH_JOINT: '\r'? '\n' -> type(CHARACTER), popMode;
 
 mode VALUE_MODE;
 VALUE_TERM: '\r'? '\n' -> type(NEWLINE), popMode;
