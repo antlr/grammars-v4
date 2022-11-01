@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.2
+      uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: '6.0.102'
     - name: Set up JDK
@@ -34,7 +34,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.2
+      uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: '6.0.102'
     - name: Do not trust Dotnet env
@@ -60,7 +60,7 @@ jobs:
         fetch-depth: 0
 
     - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.2
+      uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: '6.0.102'
     - name: Do not trust Dotnet env
@@ -159,7 +159,7 @@ jobs:
         java --version
         javac --version
     - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.2
+      uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: '6.0.102'
     - name: Do not trust Dotnet env
@@ -199,7 +199,7 @@ jobs:
         java --version
         javac --version
     - name: Install Dotnet
-      uses: actions/setup-dotnet@v3.0.2
+      uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: '6.0.102'
     - name: Do not trust Dotnet env
