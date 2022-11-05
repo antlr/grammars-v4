@@ -180,7 +180,7 @@ createFunction
    ;
 
 codeBlock
-   : CODE_BLOCK
+   : (CODE_BLOCK | STRING_LITERAL)
    ;
 
 paramList
@@ -642,6 +642,7 @@ expressionList
 
 expression
    : constant
+   | functionCall
    | assignmentMap
    | assignmentSet
    | assignmentList
@@ -722,6 +723,7 @@ relalationContainsKey
 functionCall
    : OBJECT_NAME '(' STAR ')'
    | OBJECT_NAME '(' functionArgs? ')'
+   | K_UUID '(' ')'
    ;
 
 functionArgs
@@ -869,6 +871,7 @@ param
 
 paramName
    : OBJECT_NAME
+   | K_INPUT
    ;
 
 kwAdd
