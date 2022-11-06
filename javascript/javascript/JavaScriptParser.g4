@@ -30,6 +30,8 @@
  */
 parser grammar JavaScriptParser;
 
+// Insert here @header for C++ parser.
+
 options {
     tokenVocab=JavaScriptLexer;
     superClass=JavaScriptParserBase;

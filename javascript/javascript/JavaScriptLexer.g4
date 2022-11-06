@@ -34,6 +34,8 @@ channels { ERROR }
 
 options { superClass=JavaScriptLexerBase; }
 
+// Insert here @header for C++ lexer.
+
 HashBangLine:                   { this.IsStartOfFile()}? '#!' ~[\r\n\u2028\u2029]*; // only allowed at start
 MultiLineComment:               '/*' .*? '*/'             -> channel(HIDDEN);
 SingleLineComment:              '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN);
