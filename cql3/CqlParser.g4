@@ -180,7 +180,8 @@ createFunction
    ;
 
 codeBlock
-   : (CODE_BLOCK | STRING_LITERAL)
+   : CODE_BLOCK
+   | STRING_LITERAL
    ;
 
 paramList
