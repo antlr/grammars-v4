@@ -41,6 +41,7 @@ alter table table1 drop constraint if exists cons;
 alter table add_test wait 100 add column col1 int not null;
 alter table `some_table` add (primary key `id` (`id`),`k_id` int unsigned not null,`another_field` smallint not null,index `k_id` (`k_id`));
 alter table `some_table` add column (unique key `another_field` (`another_field`));
+alter table default.task add column xxxx varchar(200) comment 'cdc test';
 #end
 #begin
 -- Alter database

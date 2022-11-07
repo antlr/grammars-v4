@@ -445,8 +445,8 @@ block
     ;
 
 blockStatement
-    : localVariableDeclaration ';'
-    | statement
+    : statement
+    | localVariableDeclaration ';'
     | localTypeDeclaration
     ;
 
