@@ -141,7 +141,7 @@ type_name:
 
 column_constraint: (CONSTRAINT_ name)? (
         (PRIMARY_ KEY_ asc_desc? conflict_clause? AUTOINCREMENT_?)
-        | (NOT_ NULL_ | UNIQUE_) conflict_clause?
+        | (NOT_? NULL_ | UNIQUE_) conflict_clause?
         | CHECK_ OPEN_PAR expr CLOSE_PAR
         | DEFAULT_ (signed_number | literal_value | OPEN_PAR expr CLOSE_PAR)
         | COLLATE_ collation_name
