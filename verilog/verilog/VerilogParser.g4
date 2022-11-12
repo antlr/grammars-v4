@@ -56,8 +56,7 @@ description
 	| config_declaration
 	;
 module_declaration
-	: attribute_instance* module_keyword module_identifier module_parameter_port_list? list_of_ports ';' module_item* 'endmodule'
-	| attribute_instance* module_keyword module_identifier module_parameter_port_list? list_of_port_declarations? ';' non_port_module_item* 'endmodule'
+	: attribute_instance* module_keyword module_identifier module_parameter_port_list? list_of_port_declarations? ';' module_item* 'endmodule'
 	;
 module_keyword
 	: 'module'
@@ -67,12 +66,9 @@ module_keyword
 module_parameter_port_list
 	: '#' '(' parameter_declaration ( ',' parameter_declaration )* ')'
 	;
-list_of_ports
-	: '(' port ( ',' port )* ')'
-	;
 list_of_port_declarations
 	: '(' port_declaration ( ',' port_declaration )* ')'
-	| '(' ')'
+	| '(' port ( ',' port )* ')'
 	;
 port
 	: port_expression?
@@ -93,7 +89,11 @@ port_declaration
 // A.1.4 Module items
 module_item
 	: port_declaration ';'
-	| non_port_module_item
+	| module_or_generate_item
+	| generate_region
+	| specify_block
+	| attribute_instance* parameter_declaration ';'
+	| attribute_instance* specparam_declaration
 	;
 module_or_generate_item
 	: attribute_instance* module_or_generate_item_declaration
@@ -101,8 +101,8 @@ module_or_generate_item
 	| attribute_instance* parameter_override
 	| attribute_instance* continuous_assign
 	| attribute_instance* gate_instantiation
-	| attribute_instance* udp_instantiation
 	| attribute_instance* module_instantiation
+	| attribute_instance* udp_instantiation
 	| attribute_instance* initial_construct
 	| attribute_instance* always_construct
 	| attribute_instance* loop_generate_construct
@@ -119,13 +119,6 @@ module_or_generate_item_declaration
 	| genvar_declaration
 	| task_declaration
 	| function_declaration
-	;
-non_port_module_item
-	: module_or_generate_item
-	| generate_region
-	| specify_block
-	| attribute_instance* parameter_declaration ';'
-	| attribute_instance* specparam_declaration
 	;
 parameter_override
 	: 'defparam' list_of_defparam_assignments ';'
@@ -605,27 +598,10 @@ genvar_initialization
 	: genvar_identifier '=' constant_expression
 	;
 genvar_expression
-	: genvar_primary
-	| unary_operator attribute_instance* genvar_primary
-	| genvar_expression '**' attribute_instance* genvar_expression
-	| genvar_expression ( '*' | '/' | '%' ) attribute_instance* genvar_expression
-	| genvar_expression ( '+' | '-' ) attribute_instance* genvar_expression
-	| genvar_expression ( '>>' | '<<' | '>>>' | '<<<' ) attribute_instance* genvar_expression
-	| genvar_expression ( '<' | '<=' | '>' | '>=' ) attribute_instance* genvar_expression
-	| genvar_expression ( '==' | '!=' | '===' | '!==' ) attribute_instance* genvar_expression
-	| genvar_expression '&' attribute_instance* genvar_expression
-	| genvar_expression ( '^' | '^~' | '~^' ) attribute_instance* genvar_expression
-	| genvar_expression '|' attribute_instance* genvar_expression
-	| genvar_expression '&&' attribute_instance* genvar_expression
-	| genvar_expression '||' attribute_instance* genvar_expression
-	| <assoc=right> genvar_expression '?' attribute_instance* genvar_expression ':' genvar_expression
+	: constant_expression
 	;
 genvar_iteration
 	: genvar_identifier '=' genvar_expression
-	;
-genvar_primary
-	: constant_primary
-	| genvar_identifier
 	;
 conditional_generate_construct
 	: if_generate_construct
@@ -697,8 +673,8 @@ udp_initial_statement
 	: 'initial' output_port_identifier '=' init_val ';'
 	;
 init_val
-	: BINARY_NUMBER
-	| DECIMAL_NUMBER
+	: binary_number
+	| unsigned_number
 	;
 sequential_entry
 	: seq_input_list ':' current_state ':' next_state ';'
@@ -1188,8 +1164,8 @@ scalar_timing_check_condition
 	| expression '!==' scalar_constant
 	;
 scalar_constant
-	: BINARY_NUMBER
-	| DECIMAL_NUMBER
+	: binary_number
+	| unsigned_number
 	;
 // A.8.1 Concatenations
 concatenation
@@ -1394,22 +1370,58 @@ number
 	| real_number
 	;
 real_number
-	: REAL_NUMBER
+	: fixed_point_number
+	| exponential_number
 	;
 decimal_number
-	: DECIMAL_NUMBER
+	: unsigned_number
+	| size? decimal_base decimal_value
 	;
 binary_number
-	: BINARY_NUMBER
+	: size? binary_base binary_value
 	;
 octal_number
-	: OCTAL_NUMBER
+	: size? octal_base octal_value
 	;
 hex_number
-	: HEX_NUMBER
+	: size? hex_base hex_value
+	;
+size
+	: UNSIGNED_NUMBER
+	;
+fixed_point_number
+	: FIXED_POINT_NUMBER
+	;
+exponential_number
+	: EXPONENTIAL_NUMBER
 	;
 unsigned_number
-	: DECIMAL_NUMBER
+	: UNSIGNED_NUMBER
+	;
+decimal_value
+	: UNSIGNED_NUMBER
+	| X_OR_Z_UNDERSCORE
+	;
+binary_value
+	: BINARY_VALUE
+	;
+octal_value
+	: OCTAL_VALUE
+	;
+hex_value
+	: HEX_VALUE
+	;
+decimal_base
+	: DECIMAL_BASE
+	;
+binary_base
+	: BINARY_BASE
+	;
+octal_base
+	: OCTAL_BASE
+	;
+hex_base
+	: HEX_BASE
 	;
 // A.8.8 Strings
 string_

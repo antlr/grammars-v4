@@ -61,18 +61,13 @@ description
 	| attribute_instance* bind_directive
 	| config_declaration
 	;
-module_nonansi_header
-	: attribute_instance* module_keyword lifetime? module_identifier package_import_declaration* parameter_port_list? list_of_ports ';'
-	;
-module_ansi_header
+module_header
 	: attribute_instance* module_keyword lifetime? module_identifier package_import_declaration* parameter_port_list? list_of_port_declarations? ';'
 	;
 module_declaration
-	: module_nonansi_header timeunits_declaration? module_item* 'endmodule' module_name?
-	| module_ansi_header timeunits_declaration? non_port_module_item* 'endmodule' module_name?
+	: module_header timeunits_declaration? module_item* 'endmodule' module_name?
 	| attribute_instance* module_keyword lifetime? module_identifier '(' '.*' ')' ';' timeunits_declaration? module_item* 'endmodule' module_name?
-	| 'extern' module_nonansi_header
-	| 'extern' module_ansi_header
+	| 'extern' module_header
 	;
 module_name
 	: ':' module_identifier
@@ -82,35 +77,25 @@ module_keyword
 	| 'macromodule'
 	;
 interface_declaration
-	: interface_nonansi_header timeunits_declaration? interface_item* 'endinterface' interface_name?
-	| interface_ansi_header timeunits_declaration? non_port_interface_item* 'endinterface' interface_name?
+	: interface_header timeunits_declaration? interface_item* 'endinterface' interface_name?
 	| attribute_instance* 'interface' interface_identifier '(' '.*' ')' ';' timeunits_declaration? interface_item* 'endinterface' interface_name?
-	| 'extern' interface_nonansi_header
-	| 'extern' interface_ansi_header
+	| 'extern' interface_header
 	;
 interface_name
 	: ':' interface_identifier
 	;
-interface_nonansi_header
-	: attribute_instance* 'interface' lifetime? interface_identifier package_import_declaration* parameter_port_list? list_of_ports ';'
-	;
-interface_ansi_header
+interface_header
 	: attribute_instance* 'interface' lifetime? interface_identifier package_import_declaration* parameter_port_list? list_of_port_declarations? ';'
 	;
 program_declaration
-	: program_nonansi_header timeunits_declaration? program_item* 'endprogram' program_name?
-	| program_ansi_header timeunits_declaration? non_port_program_item* 'endprogram' program_name?
+	: program_header timeunits_declaration? program_item* 'endprogram' program_name?
 	| attribute_instance* 'program' program_identifier '(' '.*' ')' ';' timeunits_declaration? program_item* 'endprogram' program_name?
-	| 'extern' program_nonansi_header
-	| 'extern' program_ansi_header
+	| 'extern' program_header
 	;
 program_name
 	: ':' program_identifier
 	;
-program_nonansi_header
-	: attribute_instance* 'program' lifetime? program_identifier package_import_declaration* parameter_port_list? list_of_ports ';'
-	;
-program_ansi_header
+program_header
 	: attribute_instance* 'program' lifetime? program_identifier package_import_declaration* parameter_port_list? list_of_port_declarations? ';'
 	;
 checker_declaration
@@ -183,14 +168,9 @@ parameter_port_declaration
 	| data_type list_of_param_assignments
 	| 'type' list_of_type_assignments
 	;
-list_of_ports
-	: '(' port ( ',' port )* ')'
-	;
 list_of_port_declarations
-	: '(' port_decl_list? ')'
-	;
-port_decl_list
-	: port_decl ( ',' port_decl )*
+	: '(' port_decl ( ',' port_decl )* ')'
+	| '(' port ( ',' port )* ')'
 	;
 port_decl
 	: attribute_instance* ansi_port_declaration
@@ -204,10 +184,10 @@ port_declaration
 	;
 port
 	: port_expression?
-	| '.' port_identifier '(' port_expression? ')'
 	;
 port_expression
-	: port_reference
+	: port_identifier constant_bit_select? '[' constant_indexed_range ']'
+	| port_identifier const_member_select+ ( '[' constant_part_select_range ']' )?
 	| '{' port_reference ( ',' port_reference )* '}'
 	;
 port_reference
@@ -240,7 +220,7 @@ fatal_arg_list
 	: '(' finish_number ( ',' list_of_arguments )? ')'
 	;
 finish_number
-	: DECIMAL_NUMBER
+	: unsigned_number
 	;
 module_common_item
 	: module_item_declaration
@@ -258,7 +238,17 @@ module_common_item
 	;
 module_item
 	: port_declaration ';'
-	| non_port_module_item
+	| generate_region
+	| attribute_instance* parameter_override
+	| attribute_instance* gate_instantiation
+	| attribute_instance* module_common_item
+	| attribute_instance* udp_instantiation
+	| specify_block
+	| attribute_instance* specparam_declaration
+	| program_declaration
+	| module_declaration
+	| interface_declaration
+	| timeunits_declaration
 	;
 module_item_declaration
 	: package_item_declaration
@@ -266,19 +256,6 @@ module_item_declaration
 	| clocking_declaration
 	| 'default' 'clocking' clocking_identifier ';'
 	| 'default' 'disable' 'iff' expression_or_dist ';'
-	;
-non_port_module_item
-	: generate_region
-	| attribute_instance* parameter_override
-	| attribute_instance* gate_instantiation
-	| attribute_instance* udp_instantiation
-	| attribute_instance* module_common_item
-	| specify_block
-	| attribute_instance* specparam_declaration
-	| program_declaration
-	| module_declaration
-	| interface_declaration
-	| timeunits_declaration
 	;
 parameter_override
 	: 'defparam' list_of_defparam_assignments ';'
@@ -348,10 +325,7 @@ extern_tf_declaration
 	;
 interface_item
 	: port_declaration ';'
-	| non_port_interface_item
-	;
-non_port_interface_item
-	: generate_region
+	| generate_region
 	| attribute_instance* module_common_item
 	| attribute_instance* extern_tf_declaration
 	| program_declaration
@@ -362,10 +336,7 @@ non_port_interface_item
 // A.1.7 Program items
 program_item
 	: port_declaration ';'
-	| non_port_program_item
-	;
-non_port_program_item
-	: attribute_instance* continuous_assign
+	| attribute_instance* continuous_assign
 	| attribute_instance* module_item_declaration
 	| attribute_instance* initial_construct
 	| attribute_instance* final_construct
@@ -617,7 +588,7 @@ package_import_item
 	| package_identifier '::' '*'
 	;
 package_export_declaration
-	: 'export' '*::*' ';'
+	: 'export' '*' '::' '*' ';'
 	| 'export' package_import_item ( ',' package_import_item )* ';'
 	;
 genvar_declaration
@@ -1648,7 +1619,6 @@ generate_block_name
 generate_item
 	: attribute_instance* parameter_override
 	| attribute_instance* gate_instantiation
-	| attribute_instance* udp_instantiation
 	| attribute_instance* net_declaration
 	| ( attribute_instance+ | 'rand' )? data_declaration
 	| attribute_instance* task_declaration
@@ -1670,6 +1640,7 @@ generate_item
 	| attribute_instance* 'default' 'disable' 'iff' expression_or_dist ';'
 	| attribute_instance* module_program_interface_instantiation
 	| attribute_instance* assertion_item
+	| attribute_instance* udp_instantiation
 	| attribute_instance* bind_directive
 	| attribute_instance* continuous_assign
 	| attribute_instance* net_alias
@@ -1739,8 +1710,8 @@ udp_initial_statement
 	: 'initial' output_port_identifier '=' init_val ';'
 	;
 init_val
-	: BINARY_NUMBER
-	| DECIMAL_NUMBER
+	: binary_number
+	| unsigned_number
 	;
 sequential_entry
 	: seq_input_list ':' current_state ':' next_state ';'
@@ -1796,7 +1767,7 @@ list_of_variable_assignments
 	: variable_assignment ( ',' variable_assignment )*
 	;
 net_alias
-	: 'alias' net_lvalue '=' net_lvalue ( '=' net_lvalue )* ';'
+	: 'alias' net_lvalue ( '=' net_lvalue )+ ';'
 	;
 net_assignment
 	: net_lvalue '=' expression
@@ -1848,9 +1819,7 @@ procedural_continuous_assignment
 	: 'assign' variable_assignment
 	| 'deassign' variable_lvalue
 	| 'force' variable_assignment
-	| 'force' net_assignment
 	| 'release' variable_lvalue
-	| 'release' net_lvalue
 	;
 variable_assignment
 	: variable_lvalue '=' expression
@@ -2531,16 +2500,15 @@ timing_check_event_control
 	| edge_control_specifier
 	;
 specify_terminal_descriptor
-	: specify_input_terminal_descriptor
-	| specify_output_terminal_descriptor
+	: ( interface_identifier '.' )? port_identifier ( '[' constant_range_expression ']' )?
 	;
 edge_control_specifier
 	: 'edge' '[' edge_descriptor ( ',' edge_descriptor )* ']'
 	;
 edge_descriptor
-	: DECIMAL_NUMBER
-	| SIMPLE_IDENTIFIER
-	| ZERO_OR_ONE_Z_OR_X
+	: SIMPLE_IDENTIFIER
+	| UNSIGNED_NUMBER
+	| ZERO_OR_ONE_X_OR_Z
 	;
 timing_check_condition
 	: scalar_timing_check_condition
@@ -2555,8 +2523,8 @@ scalar_timing_check_condition
 	| expression '!==' scalar_constant
 	;
 scalar_constant
-	: BINARY_NUMBER
-	| DECIMAL_NUMBER
+	: binary_number
+	| unsigned_number
 	;
 // A.8.1 Concatenations
 concatenation
@@ -2607,7 +2575,7 @@ empty_unpacked_array_concatenation
 system_tf_call
 	: system_tf_identifier arg_list?
 	| system_tf_identifier '(' data_type ( ',' expression )? ')'
-	| system_tf_identifier '(' expression ( ',' ordered_arg )* ( ',' clocking_event )? ')'
+	| system_tf_identifier '(' expression ( ',' ordered_arg )* ',' clocking_event ')'
 	;
 arg_list
 	: '(' list_of_arguments ')'
@@ -2909,22 +2877,58 @@ integral_number
 	| hex_number
 	;
 decimal_number
-	: DECIMAL_NUMBER
+	: unsigned_number
+	| size? decimal_base decimal_value
 	;
 binary_number
-	: BINARY_NUMBER
+	: size? binary_base binary_value
 	;
 octal_number
-	: OCTAL_NUMBER
+	: size? octal_base octal_value
 	;
 hex_number
-	: HEX_NUMBER
+	: size? hex_base hex_value
+	;
+size
+	: UNSIGNED_NUMBER
 	;
 real_number
-	: REAL_NUMBER
+	: fixed_point_number
+	| exponential_number
+	;
+fixed_point_number
+	: FIXED_POINT_NUMBER
+	;
+exponential_number
+	: EXPONENTIAL_NUMBER
 	;
 unsigned_number
-	: DECIMAL_NUMBER
+	: UNSIGNED_NUMBER
+	;
+decimal_value
+	: UNSIGNED_NUMBER
+	| X_OR_Z_UNDERSCORE
+	;
+binary_value
+	: BINARY_VALUE
+	;
+octal_value
+	: OCTAL_VALUE
+	;
+hex_value
+	: HEX_VALUE
+	;
+decimal_base
+	: DECIMAL_BASE
+	;
+binary_base
+	: BINARY_BASE
+	;
+octal_base
+	: OCTAL_BASE
+	;
+hex_base
+	: HEX_BASE
 	;
 unbased_unsized_literal
 	: UNBASED_UNSIZED_LITERAL
