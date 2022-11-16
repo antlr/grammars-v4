@@ -254,7 +254,7 @@ arrayInitializer
     ;
 
 classOrInterfaceType
-    : identifier typeArguments? ('.' identifier typeArguments?)*
+    : typeIdentifier typeArguments? ('.' identifier typeArguments?)*
     ;
 
 typeArgument
@@ -445,9 +445,9 @@ block
     ;
 
 blockStatement
-    : statement
-    | localVariableDeclaration ';'
+    : localVariableDeclaration ';'
     | localTypeDeclaration
+    | statement
     ;
 
 localVariableDeclaration
@@ -467,6 +467,24 @@ identifier
     | WITH
     | TRANSITIVE
     | YIELD
+    | SEALED
+    | PERMITS
+    | RECORD
+    | VAR
+    ;
+
+typeIdentifier  // Identifiers that are not restricted for type declarations
+    : IDENTIFIER
+    | MODULE
+    | OPEN
+    | REQUIRES
+    | EXPORTS
+    | OPENS
+    | TO
+    | USES
+    | PROVIDES
+    | WITH
+    | TRANSITIVE
     | SEALED
     | PERMITS
     | RECORD
