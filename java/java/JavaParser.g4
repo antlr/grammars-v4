@@ -254,7 +254,7 @@ arrayInitializer
     ;
 
 classOrInterfaceType
-    : typeIdentifier typeArguments? ('.' identifier typeArguments?)*
+    : (identifier typeArguments? '.')* typeIdentifier typeArguments?
     ;
 
 typeArgument
@@ -488,7 +488,6 @@ typeIdentifier  // Identifiers that are not restricted for type declarations
     | SEALED
     | PERMITS
     | RECORD
-    | VAR
     ;
 
 localTypeDeclaration
