@@ -90,6 +90,7 @@ unit_statement
     | data_manipulation_language_statements
     | truncate_table
     | drop_table
+    | drop_user
     | drop_view
     | drop_index
 
@@ -883,6 +884,10 @@ alter_user
         )+
       ';'
       | user_object_name (',' user_object_name)* proxy_clause ';'
+    ;
+
+drop_user
+    : DROP USER user_object_name CASCADE?
     ;
 
 alter_identified_by
