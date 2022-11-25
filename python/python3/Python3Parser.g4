@@ -28,6 +28,9 @@
  *                https://github.com/bkiers/python3-parser
  * Developed by : Bart Kiers, bart@big-o.nl
  */
+
+// Scraping from https://docs.python.org/3/reference/grammar.html
+
 parser grammar Python3Parser;
 
 options {
@@ -37,7 +40,7 @@ options {
 // All comments that start with "///" are copy-pasted from
 // The Python Language Reference
 
-single_input: NEWLINE | simple_stmt | compound_stmt NEWLINE;
+single_input: NEWLINE | simple_stmts | compound_stmt NEWLINE;
 file_input: (NEWLINE | stmt)* EOF;
 eval_input: testlist NEWLINE* EOF;
 
@@ -46,7 +49,7 @@ decorators: decorator+;
 decorated: decorators (classdef | funcdef | async_funcdef);
 
 async_funcdef: ASYNC funcdef;
-funcdef: 'def' NAME parameters ('->' test)? ':' suite;
+funcdef: 'def' NAME parameters ('->' test)? ':' block;
 
 parameters: '(' (typedargslist)? ')';
 typedargslist: (tfpdef ('=' test)? (',' tfpdef ('=' test)?)* (',' (
@@ -63,9 +66,9 @@ varargslist: (vfpdef ('=' test)? (',' vfpdef ('=' test)?)* (',' (
 );
 vfpdef: NAME;
 
-stmt: simple_stmt | compound_stmt;
-simple_stmt: small_stmt (';' small_stmt)* (';')? NEWLINE;
-small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
+stmt: simple_stmts | compound_stmt;
+simple_stmts: simple_stmt (';' simple_stmt)* (';')? NEWLINE;
+simple_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
              import_stmt | global_stmt | nonlocal_stmt | assert_stmt);
 expr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
                      ('=' (yield_expr|testlist_star_expr))*);
@@ -96,21 +99,75 @@ global_stmt: 'global' NAME (',' NAME)*;
 nonlocal_stmt: 'nonlocal' NAME (',' NAME)*;
 assert_stmt: 'assert' test (',' test)?;
 
-compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated | async_stmt;
+compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated | async_stmt | match_stmt;
 async_stmt: ASYNC (funcdef | with_stmt | for_stmt);
-if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ('else' ':' suite)?;
-while_stmt: 'while' test ':' suite ('else' ':' suite)?;
-for_stmt: 'for' exprlist 'in' testlist ':' suite ('else' ':' suite)?;
-try_stmt: ('try' ':' suite
-           ((except_clause ':' suite)+
-            ('else' ':' suite)?
-            ('finally' ':' suite)? |
-           'finally' ':' suite));
-with_stmt: 'with' with_item (',' with_item)*  ':' suite;
+if_stmt: 'if' test ':' block ('elif' test ':' block)* ('else' ':' block)?;
+while_stmt: 'while' test ':' block ('else' ':' block)?;
+for_stmt: 'for' exprlist 'in' testlist ':' block ('else' ':' block)?;
+try_stmt: ('try' ':' block
+           ((except_clause ':' block)+
+            ('else' ':' block)?
+            ('finally' ':' block)? |
+           'finally' ':' block));
+with_stmt: 'with' with_item (',' with_item)*  ':' block;
 with_item: test ('as' expr)?;
 // NB compile.c makes sure that the default except clause is last
 except_clause: 'except' (test ('as' NAME)?)?;
-suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT;
+block: simple_stmts | NEWLINE INDENT stmt+ DEDENT;
+match_stmt: 'match' subject_expr ':' NEWLINE INDENT case_block+ DEDENT ;
+subject_expr: star_named_expression ',' star_named_expressions? | test ;
+star_named_expressions: ',' star_named_expression+ ','? ;
+star_named_expression: '*' expr | test ;
+case_block: 'case' patterns guard? ':' block ;
+guard: 'if' test ;
+patterns: open_sequence_pattern | pattern ;
+pattern: as_pattern | or_pattern ;
+as_pattern: or_pattern 'as' pattern_capture_target ;
+or_pattern: closed_pattern ('|' closed_pattern)* ;
+closed_pattern: literal_pattern | capture_pattern | wildcard_pattern | value_pattern | group_pattern | sequence_pattern | mapping_pattern | class_pattern ;
+literal_pattern: signed_number { /* cannot be ('+' | '-') */ true }? | complex_number | strings | 'None' | 'True' | 'False' ;
+literal_expr: signed_number { /* cannot be ('+' | '-') */ true }? | complex_number | strings | 'None' | 'True' | 'False' ;
+complex_number: signed_real_number '+' imaginary_number 
+    | signed_real_number '-' imaginary_number  
+    ;
+signed_number: NUMBER | '-' NUMBER ;
+signed_real_number: real_number | '-' real_number ;
+real_number: NUMBER ;
+imaginary_number: NUMBER ;
+capture_pattern: pattern_capture_target ;
+pattern_capture_target: { /* cannot be '_' */ true }? NAME { /* cannot be ('.' | '(' | '=') */ true }? ;
+wildcard_pattern: '_' ;
+value_pattern: attr { /* cannot be ('.' | '(' | '=') */ true }? ;
+attr: NAME ('.' NAME)+ ;
+name_or_attr: attr | NAME ;
+group_pattern: '(' pattern ')' ;
+sequence_pattern:
+    '[' maybe_sequence_pattern? ']' 
+    | '(' open_sequence_pattern? ')' 
+    ;
+open_sequence_pattern: maybe_star_pattern ',' maybe_sequence_pattern? ;
+maybe_sequence_pattern: maybe_star_pattern (',' maybe_star_pattern)* ','? ;
+maybe_star_pattern: star_pattern pattern ;
+star_pattern:
+    '*' pattern_capture_target 
+    | '*' wildcard_pattern 
+    ;
+mapping_pattern: '{' '}' 
+    | '{' double_star_pattern ','? '}' 
+    | '{' items_pattern ',' double_star_pattern ','? '}' 
+    | '{' items_pattern ','? '}' 
+    ;
+items_pattern: key_value_pattern (',' key_value_pattern)* ;
+key_value_pattern: (literal_expr | attr) ':' pattern ;
+double_star_pattern: '**' pattern_capture_target ;
+class_pattern: name_or_attr '(' ')' 
+    | name_or_attr '(' positional_patterns ','? ')' 
+    | name_or_attr '(' keyword_patterns ','? ')' 
+    | name_or_attr '(' positional_patterns ',' keyword_patterns ','? ')' 
+    ;
+positional_patterns: pattern (',' pattern)* ;
+keyword_patterns: keyword_pattern (',' keyword_pattern)* ;
+keyword_pattern: NAME '=' pattern ;
 
 test: or_test ('if' or_test 'else' test)? | lambdef;
 test_nocond: or_test | lambdef_nocond;
@@ -136,7 +193,7 @@ atom_expr: (AWAIT)? atom trailer*;
 atom: ('(' (yield_expr|testlist_comp)? ')' |
        '[' (testlist_comp)? ']' |
        '{' (dictorsetmaker)? '}' |
-       NAME | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False');
+       NAME | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False' | '_');
 testlist_comp: (test|star_expr) ( comp_for | (',' (test|star_expr))* (',')? );
 trailer: '(' (arglist)? ')' | '[' subscriptlist ']' | '.' NAME;
 subscriptlist: subscript_ (',' subscript_)* (',')?;
@@ -149,7 +206,7 @@ dictorsetmaker: ( ((test ':' test | '**' expr)
                   ((test | star_expr)
                    (comp_for | (',' (test | star_expr))* (',')?)) );
 
-classdef: 'class' NAME ('(' (arglist)? ')')? ':' suite;
+classdef: 'class' NAME ('(' (arglist)? ')')? ':' block;
 
 arglist: argument (',' argument)*  (',')?;
 
@@ -176,3 +233,5 @@ encoding_decl: NAME;
 
 yield_expr: 'yield' (yield_arg)?;
 yield_arg: 'from' test | testlist;
+
+strings: STRING+ ;
