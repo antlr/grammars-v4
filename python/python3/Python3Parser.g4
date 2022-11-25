@@ -34,6 +34,7 @@
 parser grammar Python3Parser;
 
 options {
+    superClass = Python3ParserBase;
     tokenVocab=Python3Lexer;
 }
 
@@ -125,8 +126,8 @@ pattern: as_pattern | or_pattern ;
 as_pattern: or_pattern 'as' pattern_capture_target ;
 or_pattern: closed_pattern ('|' closed_pattern)* ;
 closed_pattern: literal_pattern | capture_pattern | wildcard_pattern | value_pattern | group_pattern | sequence_pattern | mapping_pattern | class_pattern ;
-literal_pattern: signed_number { /* cannot be ('+' | '-') */ true }? | complex_number | strings | 'None' | 'True' | 'False' ;
-literal_expr: signed_number { /* cannot be ('+' | '-') */ true }? | complex_number | strings | 'None' | 'True' | 'False' ;
+literal_pattern: signed_number { this.CannotBePlusMinus() }? | complex_number | strings | 'None' | 'True' | 'False' ;
+literal_expr: signed_number { this.CannotBePlusMinus() }? | complex_number | strings | 'None' | 'True' | 'False' ;
 complex_number: signed_real_number '+' imaginary_number 
     | signed_real_number '-' imaginary_number  
     ;
@@ -135,9 +136,9 @@ signed_real_number: real_number | '-' real_number ;
 real_number: NUMBER ;
 imaginary_number: NUMBER ;
 capture_pattern: pattern_capture_target ;
-pattern_capture_target: { /* cannot be '_' */ true }? NAME { /* cannot be ('.' | '(' | '=') */ true }? ;
+pattern_capture_target: /* cannot be '_' */ NAME { this.CannotBeDotLpEq() }? ;
 wildcard_pattern: '_' ;
-value_pattern: attr { /* cannot be ('.' | '(' | '=') */ true }? ;
+value_pattern: attr { this.CannotBeDotLpEq() }? ;
 attr: NAME ('.' NAME)+ ;
 name_or_attr: attr | NAME ;
 group_pattern: '(' pattern ')' ;
