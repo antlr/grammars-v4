@@ -2220,7 +2220,7 @@ alter_cluster
     ;
 
 drop_cluster
-    : DROP CLUSTER (schema_name '.')? cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
+    : DROP CLUSTER cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
     ;
 
 cache_or_nocache
