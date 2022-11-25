@@ -80,6 +80,7 @@ unit_statement
     | create_type
     | create_synonym
 
+    | drop_cluster
     | drop_function
     | drop_package
     | drop_procedure
@@ -2216,6 +2217,10 @@ alter_cluster
         )+
         parallel_clause?
         ';'
+    ;
+
+drop_cluster
+    : DROP CLUSTER (schema_name '.')? cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
     ;
 
 cache_or_nocache
