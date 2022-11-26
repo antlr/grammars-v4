@@ -7,6 +7,7 @@ fi
 files=`find cpython -name '*.py'`
 total=0
 failed=0
+date
 for i in $files
 do
     total=$((total+1))
@@ -16,7 +17,9 @@ do
     if [ $status != "0" ]
     then
         failed=$((failed+1))
-        echo $((100*failed/total))
     fi
+	echo $failed failed out of $total total.
+    echo $((100*failed/total)) '%'
 done
 echo $((failed*100/total))
+date
