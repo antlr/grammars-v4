@@ -45,36 +45,36 @@ single_input: NEWLINE | simple_stmts | compound_stmt NEWLINE;
 file_input: (NEWLINE | stmt)* EOF;
 eval_input: testlist NEWLINE* EOF;
 
-decorator: '@' dotted_name ( '(' (arglist)? ')' )? NEWLINE;
+decorator: '@' dotted_name ( '(' arglist? ')' )? NEWLINE;
 decorators: decorator+;
 decorated: decorators (classdef | funcdef | async_funcdef);
 
 async_funcdef: ASYNC funcdef;
 funcdef: 'def' NAME parameters ('->' test)? ':' block;
 
-parameters: '(' (typedargslist)? ')';
+parameters: '(' typedargslist? ')';
 typedargslist: (tfpdef ('=' test)? (',' tfpdef ('=' test)?)* (',' (
-        '*' (tfpdef)? (',' tfpdef ('=' test)?)* (',' ('**' tfpdef (',')?)?)?
-      | '**' tfpdef (',')?)?)?
-  | '*' (tfpdef)? (',' tfpdef ('=' test)?)* (',' ('**' tfpdef (',')?)?)?
-  | '**' tfpdef (',')?);
+        '*' tfpdef? (',' tfpdef ('=' test)?)* (',' ('**' tfpdef ','? )? )?
+      | '**' tfpdef ','? )? )?
+  | '*' tfpdef? (',' tfpdef ('=' test)?)* (',' ('**' tfpdef ','? )? )?
+  | '**' tfpdef ','?);
 tfpdef: NAME (':' test)?;
 varargslist: (vfpdef ('=' test)? (',' vfpdef ('=' test)?)* (',' (
-        '*' (vfpdef)? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef (',')?)?)?
+        '*' vfpdef? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef ','? )? )?
       | '**' vfpdef (',')?)?)?
-  | '*' (vfpdef)? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef (',')?)?)?
-  | '**' vfpdef (',')?
+  | '*' vfpdef? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef ','? )? )?
+  | '**' vfpdef ','?
 );
 vfpdef: NAME;
 
 stmt: simple_stmts | compound_stmt;
-simple_stmts: simple_stmt (';' simple_stmt)* (';')? NEWLINE;
+simple_stmts: simple_stmt (';' simple_stmt)* ';'? NEWLINE;
 simple_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
              import_stmt | global_stmt | nonlocal_stmt | assert_stmt);
 expr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
                      ('=' (yield_expr|testlist_star_expr))*);
 annassign: ':' test ('=' test)?;
-testlist_star_expr: (test|star_expr) (',' (test|star_expr))* (',')?;
+testlist_star_expr: (test|star_expr) (',' (test|star_expr))* ','?;
 augassign: ('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' |
             '<<=' | '>>=' | '**=' | '//=');
 // For normal and annotated assignments, additional restrictions enforced by the interpreter
@@ -83,7 +83,7 @@ pass_stmt: 'pass';
 flow_stmt: break_stmt | continue_stmt | return_stmt | raise_stmt | yield_stmt;
 break_stmt: 'break';
 continue_stmt: 'continue';
-return_stmt: 'return' (testlist)?;
+return_stmt: 'return' testlist?;
 yield_stmt: yield_expr;
 raise_stmt: 'raise' (test ('from' test)?)?;
 import_stmt: import_name | import_from;
@@ -93,7 +93,7 @@ import_from: ('from' (('.' | '...')* dotted_name | ('.' | '...')+)
               'import' ('*' | '(' import_as_names ')' | import_as_names));
 import_as_name: NAME ('as' NAME)?;
 dotted_as_name: dotted_name ('as' NAME)?;
-import_as_names: import_as_name (',' import_as_name)* (',')?;
+import_as_names: import_as_name (',' import_as_name)* ','?;
 dotted_as_names: dotted_as_name (',' dotted_as_name)*;
 dotted_name: NAME ('.' NAME)*;
 global_stmt: 'global' NAME (',' NAME)*;
@@ -148,7 +148,7 @@ sequence_pattern:
     ;
 open_sequence_pattern: maybe_star_pattern ',' maybe_sequence_pattern? ;
 maybe_sequence_pattern: maybe_star_pattern (',' maybe_star_pattern)* ','? ;
-maybe_star_pattern: star_pattern pattern ;
+maybe_star_pattern: star_pattern | pattern ;
 star_pattern:
     '*' pattern_capture_target 
     | '*' wildcard_pattern 
@@ -172,8 +172,8 @@ keyword_pattern: NAME '=' pattern ;
 
 test: or_test ('if' or_test 'else' test)? | lambdef;
 test_nocond: or_test | lambdef_nocond;
-lambdef: 'lambda' (varargslist)? ':' test;
-lambdef_nocond: 'lambda' (varargslist)? ':' test_nocond;
+lambdef: 'lambda' varargslist? ':' test;
+lambdef_nocond: 'lambda' varargslist? ':' test_nocond;
 or_test: and_test ('or' and_test)*;
 and_test: not_test ('and' not_test)*;
 not_test: 'not' not_test | comparison;
@@ -190,26 +190,26 @@ arith_expr: term (('+'|'-') term)*;
 term: factor (('*'|'@'|'/'|'%'|'//') factor)*;
 factor: ('+'|'-'|'~') factor | power;
 power: atom_expr ('**' factor)?;
-atom_expr: (AWAIT)? atom trailer*;
-atom: ('(' (yield_expr|testlist_comp)? ')' |
-       '[' (testlist_comp)? ']' |
-       '{' (dictorsetmaker)? '}' |
-       NAME | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False' | '_');
-testlist_comp: (test|star_expr) ( comp_for | (',' (test|star_expr))* (',')? );
-trailer: '(' (arglist)? ')' | '[' subscriptlist ']' | '.' NAME;
-subscriptlist: subscript_ (',' subscript_)* (',')?;
-subscript_: test | (test)? ':' (test)? (sliceop)?;
-sliceop: ':' (test)?;
-exprlist: (expr|star_expr) (',' (expr|star_expr))* (',')?;
-testlist: test (',' test)* (',')?;
+atom_expr: AWAIT? atom trailer*;
+atom: '(' (yield_expr|testlist_comp)? ')'
+   | '[' testlist_comp? ']'
+   | '{' dictorsetmaker? '}'
+   | NAME | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False' | '_';
+testlist_comp: (test|star_expr) ( comp_for | (',' (test|star_expr))* ','? );
+trailer: '(' arglist? ')' | '[' subscriptlist ']' | '.' NAME;
+subscriptlist: subscript_ (',' subscript_)* ','?;
+subscript_: test | test? ':' test? sliceop?;
+sliceop: ':' test?;
+exprlist: (expr|star_expr) (',' (expr|star_expr))* ','?;
+testlist: test (',' test)* ','?;
 dictorsetmaker: ( ((test ':' test | '**' expr)
-                   (comp_for | (',' (test ':' test | '**' expr))* (',')?)) |
+                   (comp_for | (',' (test ':' test | '**' expr))* ','?)) |
                   ((test | star_expr)
-                   (comp_for | (',' (test | star_expr))* (',')?)) );
+                   (comp_for | (',' (test | star_expr))* ','?)) );
 
-classdef: 'class' NAME ('(' (arglist)? ')')? ':' block;
+classdef: 'class' NAME ('(' arglist? ')')? ':' block;
 
-arglist: argument (',' argument)*  (',')?;
+arglist: argument (',' argument)* ','?;
 
 // The reason that keywords are test nodes instead of NAME is that using NAME
 // results in an ambiguity. ast.c makes sure it's a NAME.
@@ -220,19 +220,19 @@ arglist: argument (',' argument)*  (',')?;
 // Illegal combinations and orderings are blocked in ast.c:
 // multiple (test comp_for) arguments are blocked; keyword unpackings
 // that precede iterable unpackings are blocked; etc.
-argument: ( test (comp_for)? |
+argument: ( test comp_for? |
             test '=' test |
             '**' test |
             '*' test );
 
 comp_iter: comp_for | comp_if;
-comp_for: (ASYNC)? 'for' exprlist 'in' or_test (comp_iter)?;
-comp_if: 'if' test_nocond (comp_iter)?;
+comp_for: ASYNC? 'for' exprlist 'in' or_test comp_iter?;
+comp_if: 'if' test_nocond comp_iter?;
 
 // not used in grammar, but may appear in "node" passed from Parser to Compiler
 encoding_decl: NAME;
 
-yield_expr: 'yield' (yield_arg)?;
+yield_expr: 'yield' yield_arg?;
 yield_arg: 'from' test | testlist;
 
 strings: STRING+ ;
