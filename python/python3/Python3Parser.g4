@@ -50,7 +50,7 @@ decorators: decorator+;
 decorated: decorators (classdef | funcdef | async_funcdef);
 
 async_funcdef: ASYNC funcdef;
-funcdef: 'def' NAME parameters ('->' test)? ':' block;
+funcdef: 'def' name parameters ('->' test)? ':' block;
 
 parameters: '(' typedargslist? ')';
 typedargslist: (tfpdef ('=' test)? (',' tfpdef ('=' test)?)* (',' (
@@ -58,14 +58,14 @@ typedargslist: (tfpdef ('=' test)? (',' tfpdef ('=' test)?)* (',' (
       | '**' tfpdef ','? )? )?
   | '*' tfpdef? (',' tfpdef ('=' test)?)* (',' ('**' tfpdef ','? )? )?
   | '**' tfpdef ','?);
-tfpdef: NAME (':' test)?;
+tfpdef: name (':' test)?;
 varargslist: (vfpdef ('=' test)? (',' vfpdef ('=' test)?)* (',' (
         '*' vfpdef? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef ','? )? )?
       | '**' vfpdef (',')?)?)?
   | '*' vfpdef? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef ','? )? )?
   | '**' vfpdef ','?
 );
-vfpdef: NAME;
+vfpdef: name;
 
 stmt: simple_stmts | compound_stmt;
 simple_stmts: simple_stmt (';' simple_stmt)* ';'? NEWLINE;
@@ -91,13 +91,13 @@ import_name: 'import' dotted_as_names;
 // note below: the ('.' | '...') is necessary because '...' is tokenized as ELLIPSIS
 import_from: ('from' (('.' | '...')* dotted_name | ('.' | '...')+)
               'import' ('*' | '(' import_as_names ')' | import_as_names));
-import_as_name: NAME ('as' NAME)?;
-dotted_as_name: dotted_name ('as' NAME)?;
+import_as_name: name ('as' name)?;
+dotted_as_name: dotted_name ('as' name)?;
 import_as_names: import_as_name (',' import_as_name)* ','?;
 dotted_as_names: dotted_as_name (',' dotted_as_name)*;
-dotted_name: NAME ('.' NAME)*;
-global_stmt: 'global' NAME (',' NAME)*;
-nonlocal_stmt: 'nonlocal' NAME (',' NAME)*;
+dotted_name: name ('.' name)*;
+global_stmt: 'global' name (',' name)*;
+nonlocal_stmt: 'nonlocal' name (',' name)*;
 assert_stmt: 'assert' test (',' test)?;
 
 compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated | async_stmt | match_stmt;
@@ -113,7 +113,7 @@ try_stmt: ('try' ':' block
 with_stmt: 'with' with_item (',' with_item)*  ':' block;
 with_item: test ('as' expr)?;
 // NB compile.c makes sure that the default except clause is last
-except_clause: 'except' (test ('as' NAME)?)?;
+except_clause: 'except' (test ('as' name)?)?;
 block: simple_stmts | NEWLINE INDENT stmt+ DEDENT;
 match_stmt: 'match' subject_expr ':' NEWLINE INDENT case_block+ DEDENT ;
 subject_expr: star_named_expression ',' star_named_expressions? | test ;
@@ -136,11 +136,11 @@ signed_real_number: real_number | '-' real_number ;
 real_number: NUMBER ;
 imaginary_number: NUMBER ;
 capture_pattern: pattern_capture_target ;
-pattern_capture_target: /* cannot be '_' */ NAME { this.CannotBeDotLpEq() }? ;
+pattern_capture_target: /* cannot be '_' */ name { this.CannotBeDotLpEq() }? ;
 wildcard_pattern: '_' ;
 value_pattern: attr { this.CannotBeDotLpEq() }? ;
-attr: NAME ('.' NAME)+ ;
-name_or_attr: attr | NAME ;
+attr: name ('.' name)+ ;
+name_or_attr: attr | name ;
 group_pattern: '(' pattern ')' ;
 sequence_pattern:
     '[' maybe_sequence_pattern? ']' 
@@ -168,7 +168,7 @@ class_pattern: name_or_attr '(' ')'
     ;
 positional_patterns: pattern (',' pattern)* ;
 keyword_patterns: keyword_pattern (',' keyword_pattern)* ;
-keyword_pattern: NAME '=' pattern ;
+keyword_pattern: name '=' pattern ;
 
 test: or_test ('if' or_test 'else' test)? | lambdef;
 test_nocond: or_test | lambdef_nocond;
@@ -194,9 +194,10 @@ atom_expr: AWAIT? atom trailer*;
 atom: '(' (yield_expr|testlist_comp)? ')'
    | '[' testlist_comp? ']'
    | '{' dictorsetmaker? '}'
-   | NAME | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False' | '_';
+   | name | NUMBER | STRING+ | '...' | 'None' | 'True' | 'False' ;
+name : NAME | '_' | 'match' ;
 testlist_comp: (test|star_expr) ( comp_for | (',' (test|star_expr))* ','? );
-trailer: '(' arglist? ')' | '[' subscriptlist ']' | '.' NAME;
+trailer: '(' arglist? ')' | '[' subscriptlist ']' | '.' name ;
 subscriptlist: subscript_ (',' subscript_)* ','?;
 subscript_: test | test? ':' test? sliceop?;
 sliceop: ':' test?;
@@ -207,7 +208,7 @@ dictorsetmaker: ( ((test ':' test | '**' expr)
                   ((test | star_expr)
                    (comp_for | (',' (test | star_expr))* ','?)) );
 
-classdef: 'class' NAME ('(' arglist? ')')? ':' block;
+classdef: 'class' name ('(' arglist? ')')? ':' block;
 
 arglist: argument (',' argument)* ','?;
 
@@ -230,7 +231,7 @@ comp_for: ASYNC? 'for' exprlist 'in' or_test comp_iter?;
 comp_if: 'if' test_nocond comp_iter?;
 
 // not used in grammar, but may appear in "node" passed from Parser to Compiler
-encoding_decl: NAME;
+encoding_decl: name;
 
 yield_expr: 'yield' yield_arg?;
 yield_arg: 'from' test | testlist;
