@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "antlr4": "^4.11.0",
-    "fs-extra": "^10.1.0",
+    "fs-extra": "^11.0.0",
     "typescript-string-operations": "^1.4.1"
   },
   "type": "module"
