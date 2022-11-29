@@ -80,6 +80,7 @@ unit_statement
     | create_type
     | create_synonym
 
+    | drop_cluster
     | drop_function
     | drop_package
     | drop_procedure
@@ -89,7 +90,9 @@ unit_statement
     | drop_type
     | data_manipulation_language_statements
     | truncate_table
+    | truncate_cluster
     | drop_table
+    | drop_user
     | drop_view
     | drop_index
 
@@ -883,6 +886,10 @@ alter_user
         )+
       ';'
       | user_object_name (',' user_object_name)* proxy_clause ';'
+    ;
+
+drop_user
+    : DROP USER user_object_name CASCADE?
     ;
 
 alter_identified_by
@@ -2211,6 +2218,14 @@ alter_cluster
         )+
         parallel_clause?
         ';'
+    ;
+
+drop_cluster
+    : DROP CLUSTER cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
+    ;
+
+truncate_cluster
+    : TRUNCATE CLUSTER cluster_name ((DROP | REUSE) STORAGE)?
     ;
 
 cache_or_nocache

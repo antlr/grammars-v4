@@ -1,4 +1,6 @@
 #begin
+-- Create User
+CREATE USER 'test_crm_debezium'@'%' IDENTIFIED WITH 'mysql_native_password' AS '*6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9' PASSWORD EXPIRE NEVER COMMENT '-';
 -- Create Table
 create table new_t  (like t1);
 create table log_table(row varchar(512));
