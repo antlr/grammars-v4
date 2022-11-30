@@ -186,11 +186,12 @@ TYPE_STRING: 'string';
 TYPE_BINARY: 'binary';
 
 LITERAL
-    : ( ( '"'  (('\\' ('r'|'n'|'t'|'"'|'\''|'\\') ) | ~('\\' | '"' ))* '"')
-        |
-        ( '\'' (('\\' ('r'|'n'|'t'|'"'|'\''|'\\') ) | ~('\\' | '\''))* '\'')
-      )
+    : '"' ( ESC_SEQ | ~[\\"] )* '"'
+    | '\'' ( ESC_SEQ | ~[\\'] )* '\''
     ;
+
+fragment ESC_SEQ : '\\' [rnt"'\\] ;
+
 
 IDENTIFIER
     : (LETTER | '_') (LETTER | DIGIT | '.' | '_')*
