@@ -1302,7 +1302,7 @@ create_library
     ;
 
 plsql_library_source
-    : library_name (IS | AS) ((quoted_string) | (quoted_string IN directory_name))
+    : library_name (IS | AS) quoted_string (IN directory_name)?
         (AGENT quoted_string)? (CREDENTIAL credential_name)?
     ;
 
