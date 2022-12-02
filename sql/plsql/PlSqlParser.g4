@@ -66,6 +66,7 @@ unit_statement
     | create_package_body
 
     | create_index
+    | create_library
     | create_table
     | create_tablespace
     | create_cluster
@@ -84,6 +85,7 @@ unit_statement
 
     | drop_cluster
     | drop_function
+    | drop_library
     | drop_package
     | drop_procedure
     | drop_materialized_zonemap
@@ -1289,6 +1291,23 @@ alter_library
        | library_editionable
        )
      ';'
+    ;
+
+drop_library
+    : DROP LIBRARY library_name
+    ;
+
+create_library
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? LIBRARY plsql_library_source
+    ;
+
+plsql_library_source
+    : library_name (IS | AS) quoted_string (IN directory_name)?
+        (AGENT quoted_string)? (CREDENTIAL credential_name)?
+    ;
+
+credential_name
+    : (id_expression '.')? id_expression
     ;
 
 library_editionable
