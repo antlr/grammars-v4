@@ -1,8 +1,6 @@
 /*
-MySQL (Positive Technologies) grammar
+MariaDB grammar
 The MIT License (MIT).
-Copyright (c) 2015-2017, Ivan Kochurkin (kvanttt@gmail.com), Positive Technologies.
-Copyright (c) 2017, Ivan Khudyashev (IHudyashov@ptsecurity.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-parser grammar MySqlParser;
+parser grammar MariaDBParser;
 
-options { tokenVocab=MySqlLexer; }
+options { tokenVocab=MariaDBLexer; }
 
 
 // Top Level Description
