@@ -126,11 +126,11 @@ utilityStatement
 
 createDatabase
     : CREATE dbFormat=(DATABASE | SCHEMA)
-      ifNotExists? uid createDatabaseOption*
+      ifNotExists? uid createDatabaseOption*                    // here ifNotExists is MariaDB-specific only
     ;
 
 createEvent
-    : CREATE ownerStatement? EVENT ifNotExists? fullId
+    : CREATE ownerStatement? EVENT ifNotExists? fullId          // here ifNotExists is MariaDB-specific only
       ON SCHEDULE scheduleExpression
       (ON COMPLETION NOT? PRESERVE)? enableType?
       (COMMENT STRING_LITERAL)?
@@ -141,7 +141,7 @@ createIndex
     : CREATE orReplace?                                         // orReplace is MariaDB-specific only
       intimeAction=(ONLINE | OFFLINE)?
       indexCategory=(UNIQUE | FULLTEXT | SPATIAL)? INDEX
-      ifNotExists?                                              // ifNotExists is MariaDB-specific only
+      ifNotExists?                                              // here ifNotExists is MariaDB-specific only
       uid indexType?
       ON tableName indexColumnNames
       waitNowaitClause?                                         // waitNowaitClause is MariaDB-specific only
@@ -174,7 +174,7 @@ createProcedure
 
 createFunction
     : CREATE orReplace? ownerStatement? AGGREGATE?              // orReplace is MariaDB-specific only
-      FUNCTION ifNotExists? fullId                              // ifNotExists is MariaDB-specific only
+      FUNCTION ifNotExists? fullId
       '(' functionParameter? (',' functionParameter)* ')'
       RETURNS dataType
       routineOption*
@@ -272,7 +272,7 @@ createView
       )
     ;
 
-createSequence
+createSequence                                                   // sequence is MariaDB-specific only
     : CREATE orReplace? TEMPORARY? SEQUENCE ifNotExists? fullId  // orReplace is MariaDB-specific only
       (sequenceSpec | tableOption)*
     ;
@@ -638,7 +638,7 @@ alterServer
 
 alterTable
     : ALTER intimeAction=(ONLINE | OFFLINE)?
-      IGNORE? TABLE tableName waitNowaitClause?
+      IGNORE? TABLE tableName waitNowaitClause?                     // waitNowaitClause is MariaDB-specific only
       (alterSpecification (',' alterSpecification)*)?
       partitionDefinitions?
     ;
@@ -662,20 +662,20 @@ alterView
       (WITH checkOpt=(CASCADED | LOCAL)? CHECK OPTION)?
     ;
 
-alterSequence
-    : ALTER SEQUENCE ifExists? fullId sequenceSpec+                 // MariaDB-specific only
+alterSequence                                                       // sequence is MariaDB-specific only
+    : ALTER SEQUENCE ifExists? fullId sequenceSpec+
     ;
 
 // details
 
 alterSpecification
     : tableOption (','? tableOption)*                               #alterByTableOption
-    | ADD COLUMN? ifNotExists? uid columnDefinition (FIRST | AFTER uid)?         #alterByAddColumn // ifNotExists is MariaDB-specific only 
-    | ADD COLUMN? ifNotExists?                                      // ifNotExists is MariaDB-specific only
+    | ADD COLUMN? ifNotExists? uid columnDefinition (FIRST | AFTER uid)?         #alterByAddColumn // here ifNotExists is MariaDB-specific only
+    | ADD COLUMN? ifNotExists?                                      // here ifNotExists is MariaDB-specific only
         '('
           uid columnDefinition ( ',' uid columnDefinition)*
         ')'                                                         #alterByAddColumns
-    | ADD indexFormat=(INDEX | KEY) ifNotExists? uid? indexType?    // ifNotExists is MariaDB-specific only
+    | ADD indexFormat=(INDEX | KEY) ifNotExists? uid? indexType?    // here ifNotExists is MariaDB-specific only
       indexColumnNames indexOption*                                 #alterByAddIndex
     | ADD (CONSTRAINT name=uid?)? PRIMARY KEY index=uid?
       indexType? indexColumnNames indexOption*                      #alterByAddPrimaryKey
@@ -685,7 +685,7 @@ alterSpecification
     | ADD keyType=(FULLTEXT | SPATIAL)
       indexFormat=(INDEX | KEY)? uid?
       indexColumnNames indexOption*                                 #alterByAddSpecialIndex
-    | ADD (CONSTRAINT name=uid?)? FOREIGN KEY ifNotExists?          // ifNotExists is MariaDB-specific only
+    | ADD (CONSTRAINT name=uid?)? FOREIGN KEY ifNotExists?          // here ifNotExists is MariaDB-specific only
       indexName=uid? indexColumnNames referenceDefinition           #alterByAddForeignKey
     | ADD (CONSTRAINT name=uid?)? CHECK '(' expression ')'          #alterByAddCheckTableConstraint
     | ALGORITHM '='? algType=(DEFAULT | INSTANT | INPLACE | COPY)   #alterBySetAlgorithm
@@ -717,7 +717,7 @@ alterSpecification
     | IMPORT TABLESPACE                                             #alterByImportTablespace
     | FORCE                                                         #alterByForce
     | validationFormat=(WITHOUT | WITH) VALIDATION                  #alterByValidate
-    | ADD PARTITION ifNotExists?                                    // ifNotExists is MariaDB-specific only
+    | ADD PARTITION ifNotExists?                                    // here ifNotExists is MariaDB-specific only
         '('
           partitionDefinition (',' partitionDefinition)*
         ')'                                                         #alterByAddPartition
@@ -739,7 +739,7 @@ alterSpecification
     | REPAIR PARTITION (uidList | ALL)                              #alterByRepairPartition
     | REMOVE PARTITIONING                                           #alterByRemovePartitioning
     | UPGRADE PARTITIONING                                          #alterByUpgradePartitioning
-    | ADD COLUMN? ifNotExists?                                      // ifNotExists is MariaDB-specific only
+    | ADD COLUMN? ifNotExists?                                      // here ifNotExists is MariaDB-specific only
         '(' createDefinition (',' createDefinition)* ')'            #alterByAddDefinitions
     ;
 
@@ -762,7 +762,7 @@ dropIndex
         | LOCK '='?
           lockType=(DEFAULT | NONE | SHARED | EXCLUSIVE)
       )*
-      waitNowaitClause?
+      waitNowaitClause?                                            // waitNowaitClause is MariaDB-specific only
     ;
 
 dropLogfileGroup
@@ -783,7 +783,7 @@ dropServer
 
 dropTable
     : DROP TEMPORARY? TABLE ifExists?
-      tables waitNowaitClause? dropType=(RESTRICT | CASCADE)?
+      tables waitNowaitClause? dropType=(RESTRICT | CASCADE)?     // waitNowaitClause is MariaDB-specific only
     ;
 
 dropTablespace
@@ -809,7 +809,7 @@ setRole
     | SET ROLE roleOption
     ;
 
-dropSequence
+dropSequence                                                     // sequence is MariaDB-specific only
     : DROP TEMPORARY? SEQUENCE ifExists? COMMENT_INPUT? fullId (',' fullId)*
     ;
 
@@ -821,11 +821,11 @@ renameTable
     ;
 
 renameTableClause
-    : tableName waitNowaitClause? TO tableName
+    : tableName waitNowaitClause? TO tableName                  // waitNowaitClause is MariaDB-specific only
     ;
 
 truncateTable
-    : TRUNCATE TABLE? tableName waitNowaitClause?
+    : TRUNCATE TABLE? tableName waitNowaitClause?               // waitNowaitClause is MariaDB-specific only
     ;
 
 
@@ -962,7 +962,7 @@ assignmentField
     ;
 
 lockClause
-    : (FOR UPDATE | LOCK IN SHARE MODE) lockOption?
+    : (FOR UPDATE | LOCK IN SHARE MODE) lockOption?             // lockOption is MariaDB-specific only
     ;
 
 //    Detailed DML Statements
@@ -1234,7 +1234,7 @@ releaseStatement
     ;
 
 lockTables
-    : LOCK (TABLE | TABLES) lockTableElement (',' lockTableElement)* waitNowaitClause?
+    : LOCK (TABLE | TABLES) lockTableElement (',' lockTableElement)* waitNowaitClause?  // waitNowaitClause is MariaDB-specific only
     ;
 
 unlockTables
@@ -1772,7 +1772,7 @@ checksumTable
 
 optimizeTable
     : OPTIMIZE actionOption=(NO_WRITE_TO_BINLOG | LOCAL)?
-      (TABLE | TABLES) tables waitNowaitClause?
+      (TABLE | TABLES) tables waitNowaitClause?                    // waitNowaitClause is MariaDB-specific only
     ;
 
 repairTable
@@ -1791,7 +1791,7 @@ checkTableOption
 //    Plugin and udf statements
 
 createUdfunction
-    : CREATE orReplace? AGGREGATE? FUNCTION ifNotExists? uid       // or replace is MariaDB-specific
+    : CREATE orReplace? AGGREGATE? FUNCTION ifNotExists? uid       // orReplace is MariaDB-specific only
       RETURNS returnType=(STRING | INTEGER | REAL | DECIMAL)
       SONAME STRING_LITERAL
     ;
@@ -2748,9 +2748,9 @@ keywordsCanBeId
     | VALIDATION | VALUE | VAR_POP | VAR_SAMP | VARIABLES | VARIANCE | VERSION_TOKEN_ADMIN | VIEW | VIRTUAL
     | WAIT | WARNINGS | WITHOUT | WORK | WRAPPER | X509 | XA | XA_RECOVER_ADMIN | XML
     // MariaDB-specific only
-    | BINLOG_MONITOR | BINLOG_REPLAY | CURRENT_ROLE | CYCLE | ENCRYPTED | ENCRYPTION_KEY_ID | FEDERATED_ADMIN 
-    | INCREMENT | LASTVAL | LOCKED | MAXVALUE | MINVALUE | NEXTVAL | NOCACHE | NOCYCLE | NOMAXVALUE | NOMINVALUE 
-    | PERSISTENT | PREVIOUS | READ_ONLY_ADMIN | REPLICA | REPLICATION_MASTER_ADMIN | RESTART | SEQUENCE | SETVAL | SKIP_ | STATEMENT | VIA 
+    | BINLOG_MONITOR | BINLOG_REPLAY | CURRENT_ROLE | CYCLE | ENCRYPTED | ENCRYPTION_KEY_ID | FEDERATED_ADMIN
+    | INCREMENT | LASTVAL | LOCKED | MAXVALUE | MINVALUE | NEXTVAL | NOCACHE | NOCYCLE | NOMAXVALUE | NOMINVALUE
+    | PERSISTENT | PREVIOUS | READ_ONLY_ADMIN | REPLICA | REPLICATION_MASTER_ADMIN | RESTART | SEQUENCE | SETVAL | SKIP_ | STATEMENT | VIA
     ;
 
 functionNameBase
