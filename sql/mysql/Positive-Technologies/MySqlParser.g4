@@ -35,8 +35,8 @@ root
     ;
 
 sqlStatements
-    : (sqlStatement (MINUS MINUS)? SEMI? | emptyStatement)*
-    (sqlStatement ((MINUS MINUS)? SEMI)? | emptyStatement)
+    : (sqlStatement (MINUS MINUS)? SEMI? | emptyStatement_)*
+    (sqlStatement ((MINUS MINUS)? SEMI)? | emptyStatement_)
     ;
 
 sqlStatement
@@ -45,7 +45,7 @@ sqlStatement
     | administrationStatement | utilityStatement
     ;
 
-emptyStatement
+emptyStatement_
     : SEMI
     ;
 
