@@ -33,8 +33,8 @@ root
     ;
 
 sqlStatements
-    : (sqlStatement (MINUS MINUS)? SEMI? | emptyStatement)*
-    (sqlStatement ((MINUS MINUS)? SEMI)? | emptyStatement)
+    : (sqlStatement (MINUS MINUS)? SEMI? | emptyStatement_)*
+    (sqlStatement ((MINUS MINUS)? SEMI)? | emptyStatement_)
     ;
 
 sqlStatement
@@ -47,7 +47,7 @@ setStatementFor                                            // setStatementFor is
     :SET STATEMENT ID EQUAL_SYMBOL constant (COMMA ID EQUAL_SYMBOL constant)* FOR
     ;
 
-emptyStatement
+emptyStatement_
     : SEMI
     ;
 
