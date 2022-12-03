@@ -51,6 +51,7 @@ unit_statement
     | alter_library
     | alter_materialized_view
     | alter_materialized_view_log
+    | alter_materialized_zonemap
     | alter_user
     | alter_view
 
@@ -65,6 +66,7 @@ unit_statement
     | create_package_body
 
     | create_index
+    | create_library
     | create_table
     | create_tablespace
     | create_cluster
@@ -73,6 +75,7 @@ unit_statement
     | create_directory
     | create_materialized_view
     | create_materialized_view_log
+    | create_materialized_zonemap
     | create_user
 
     | create_sequence
@@ -82,8 +85,10 @@ unit_statement
 
     | drop_cluster
     | drop_function
+    | drop_library
     | drop_package
     | drop_procedure
+    | drop_materialized_zonemap
     | drop_synonym
     | drop_sequence
     | drop_trigger
@@ -1288,6 +1293,23 @@ alter_library
      ';'
     ;
 
+drop_library
+    : DROP LIBRARY library_name
+    ;
+
+create_library
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? LIBRARY plsql_library_source
+    ;
+
+plsql_library_source
+    : library_name (IS | AS) quoted_string (IN directory_name)?
+        (AGENT quoted_string)? (CREDENTIAL credential_name)?
+    ;
+
+credential_name
+    : (id_expression '.')? id_expression
+    ;
+
 library_editionable
     : {self.isVersion12()}? (EDITIONABLE | NONEDITIONABLE)
     ;
@@ -1700,6 +1722,41 @@ mv_log_purge_clause
          ( IMMEDIATE (SYNCHRONOUS | ASYNCHRONOUS)?
       // |START WITH CLAUSES TODO
          )
+    ;
+
+create_materialized_zonemap
+    : CREATE MATERIALIZED ZONEMAP zonemap_name (LEFT_PAREN column_list RIGHT_PAREN)? zonemap_attributes? zonemap_refresh_clause?
+        ((ENABLE | DISABLE) PRUNING)? (create_zonemap_on_table | create_zonemap_as_subquery)
+    ;
+
+alter_materialized_zonemap
+    : ALTER MATERIALIZED ZONEMAP zonemap_name
+        ( zonemap_attributes | zonemap_refresh_clause| (ENABLE | DISABLE) PRUNING | COMPILE | REBUILD | UNUSABLE
+        )
+    ;
+
+drop_materialized_zonemap
+    : DROP MATERIALIZED ZONEMAP zonemap_name
+    ;
+
+zonemap_refresh_clause
+    : REFRESH (FAST | COMPILE | FORCE)? (ON (DEMAND | COMMIT | LOAD | DATA MOVEMENT | LOAD DATA MOVEMENT))?
+    ;
+
+zonemap_attributes
+    : (PCTFREE numeric | PCTUSED numeric | SCALE numeric | TABLESPACE tablespace | (CACHE | NOCACHE))+
+    ;
+
+zonemap_name
+    : identifier ('.' id_expression)?
+    ;
+
+create_zonemap_on_table
+    : ON tableview_name LEFT_PAREN column_list RIGHT_PAREN
+    ;
+
+create_zonemap_as_subquery
+    : AS subquery
     ;
 
 create_materialized_view
