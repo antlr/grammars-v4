@@ -90,6 +90,7 @@ unit_statement
     | drop_package
     | drop_procedure
     | drop_materialized_zonemap
+    | drop_rollback_segment
     | drop_synonym
     | drop_sequence
     | drop_trigger
@@ -239,6 +240,10 @@ create_procedure_body
 //https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_2011.htm#SQLRF00816
 alter_rollback_segment
     : ALTER ROLLBACK SEGMENT rollback_segment_name (ONLINE | OFFLINE | storage_clause | SHRINK (TO size_clause)?)
+    ;
+
+drop_rollback_segment
+    : DROP ROLLBACK SEGMENT rollback_segment_name
     ;
 
 // Trigger DDLs
