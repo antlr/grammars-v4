@@ -40,6 +40,7 @@ unit_statement
     | alter_function
     | alter_package
     | alter_procedure
+    | alter_rollback_segment
     | alter_sequence
     | alter_session
     | alter_synonym
@@ -231,6 +232,13 @@ create_procedure_body
     : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')?
       invoker_rights_clause? (IS | AS)
       (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL) ';'
+    ;
+
+// Rollback Segment DDLs
+
+//https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_2011.htm#SQLRF00816
+alter_rollback_segment
+    : ALTER ROLLBACK SEGMENT rollback_segment_name (ONLINE | OFFLINE | storage_clause | SHRINK (TO size_clause)?)
     ;
 
 // Trigger DDLs
