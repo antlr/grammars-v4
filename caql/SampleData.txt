@@ -1,3 +1,2 @@
-Input:
-(find('*Mon_MCS_Info.num_of_active*video*clients`gauge*','or(__check_name:b\"Km1tcG1jcyptYnRzMipq\",
-__check_name:b\"Km1tcG1jcyptYnRzNCptY3\",__check_name:b\"Km1tcG1jcyptYnRzNSptq\")')|stats:sum())
+(find('*Mon_MCS_Info.num_of_active*video*clients`gauge*','or(__check_name:b\"host1\",
+__check_name:b\"host2\",__check_name:b\"host3\")')|stats:sum())
