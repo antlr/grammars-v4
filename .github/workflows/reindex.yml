@@ -23,9 +23,8 @@ jobs:
     - name: Create local changes
       run: |
         cd _scripts; bash reindex.sh
-    - name: Push changes
-      uses: ad-m/github-push-action@master
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
-
+        name: grammars-index
+        path: grammars.json

@@ -1564,7 +1564,8 @@ alterUser
           (tlsNone=NONE | tlsOption (AND? tlsOption)* )
         )?
         (WITH userResourceOption+)?
-        (userPasswordOption | userLockOption)*                      #alterUserMysqlV57
+        (userPasswordOption | userLockOption)*
+        (COMMENT STRING_LITERAL |  ATTRIBUTE STRING_LITERAL)?      #alterUserMysqlV80
     ;
 
 createUser
@@ -1576,7 +1577,8 @@ createUser
           (tlsNone=NONE | tlsOption (AND? tlsOption)* )
         )?
         (WITH userResourceOption+)?
-        (userPasswordOption | userLockOption)*                      #createUserMysqlV57
+        (userPasswordOption | userLockOption)*
+        (COMMENT STRING_LITERAL |  ATTRIBUTE STRING_LITERAL)?       #createUserMysqlV80
     ;
 
 dropUser
@@ -2644,7 +2646,7 @@ dataTypeBase
 keywordsCanBeId
     : ACCOUNT | ACTION | ADMIN | AFTER | AGGREGATE | ALGORITHM | ANY
     | AT | AUDIT_ADMIN | AUTHORS | AUTOCOMMIT | AUTOEXTEND_SIZE
-    | AUTO_INCREMENT | AVG | AVG_ROW_LENGTH | BACKUP_ADMIN | BEGIN | BINLOG | BINLOG_ADMIN | BINLOG_ENCRYPTION_ADMIN | BIT | BIT_AND | BIT_OR | BIT_XOR
+    | AUTO_INCREMENT | AVG | AVG_ROW_LENGTH | ATTRIBUTE | BACKUP_ADMIN | BEGIN | BINLOG | BINLOG_ADMIN | BINLOG_ENCRYPTION_ADMIN | BIT | BIT_AND | BIT_OR | BIT_XOR
     | BLOCK | BOOL | BOOLEAN | BTREE | BUCKETS | CACHE | CASCADED | CHAIN | CHANGED
     | CHANNEL | CHECKSUM | PAGE_CHECKSUM | CATALOG_NAME | CIPHER
     | CLASS_ORIGIN | CLIENT | CLONE_ADMIN | CLOSE | CLUSTERING | COALESCE | CODE

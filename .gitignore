@@ -19,7 +19,7 @@
 *.tokens
 
 # Ignore C# regression temporaries.
-**/Generated/
+**/Generated*/
 
 # Ignore Emacs backup files.
 *~

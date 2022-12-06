@@ -40,6 +40,7 @@ unit_statement
     | alter_function
     | alter_package
     | alter_procedure
+    | alter_rollback_segment
     | alter_sequence
     | alter_session
     | alter_synonym
@@ -51,6 +52,7 @@ unit_statement
     | alter_library
     | alter_materialized_view
     | alter_materialized_view_log
+    | alter_materialized_zonemap
     | alter_user
     | alter_view
 
@@ -65,6 +67,7 @@ unit_statement
     | create_package_body
 
     | create_index
+    | create_library
     | create_table
     | create_tablespace
     | create_cluster
@@ -73,6 +76,7 @@ unit_statement
     | create_directory
     | create_materialized_view
     | create_materialized_view_log
+    | create_materialized_zonemap
     | create_user
 
     | create_sequence
@@ -80,16 +84,22 @@ unit_statement
     | create_type
     | create_synonym
 
+    | drop_cluster
     | drop_function
+    | drop_library
     | drop_package
     | drop_procedure
+    | drop_materialized_zonemap
+    | drop_rollback_segment
     | drop_synonym
     | drop_sequence
     | drop_trigger
     | drop_type
     | data_manipulation_language_statements
     | truncate_table
+    | truncate_cluster
     | drop_table
+    | drop_user
     | drop_view
     | drop_index
 
@@ -223,6 +233,17 @@ create_procedure_body
     : CREATE (OR REPLACE)? PROCEDURE procedure_name ('(' parameter (',' parameter)* ')')?
       invoker_rights_clause? (IS | AS)
       (DECLARE? seq_of_declare_specs? body | call_spec | EXTERNAL) ';'
+    ;
+
+// Rollback Segment DDLs
+
+//https://docs.oracle.com/cd/E11882_01/server.112/e41084/statements_2011.htm#SQLRF00816
+alter_rollback_segment
+    : ALTER ROLLBACK SEGMENT rollback_segment_name (ONLINE | OFFLINE | storage_clause | SHRINK (TO size_clause)?)
+    ;
+
+drop_rollback_segment
+    : DROP ROLLBACK SEGMENT rollback_segment_name
     ;
 
 // Trigger DDLs
@@ -885,6 +906,10 @@ alter_user
       | user_object_name (',' user_object_name)* proxy_clause ';'
     ;
 
+drop_user
+    : DROP USER user_object_name CASCADE?
+    ;
+
 alter_identified_by
     : identified_by (REPLACE id_expression)?
     ;
@@ -1279,6 +1304,23 @@ alter_library
        | library_editionable
        )
      ';'
+    ;
+
+drop_library
+    : DROP LIBRARY library_name
+    ;
+
+create_library
+    : CREATE (OR REPLACE)? (EDITIONABLE | NONEDITIONABLE)? LIBRARY plsql_library_source
+    ;
+
+plsql_library_source
+    : library_name (IS | AS) quoted_string (IN directory_name)?
+        (AGENT quoted_string)? (CREDENTIAL credential_name)?
+    ;
+
+credential_name
+    : (id_expression '.')? id_expression
     ;
 
 library_editionable
@@ -1693,6 +1735,41 @@ mv_log_purge_clause
          ( IMMEDIATE (SYNCHRONOUS | ASYNCHRONOUS)?
       // |START WITH CLAUSES TODO
          )
+    ;
+
+create_materialized_zonemap
+    : CREATE MATERIALIZED ZONEMAP zonemap_name (LEFT_PAREN column_list RIGHT_PAREN)? zonemap_attributes? zonemap_refresh_clause?
+        ((ENABLE | DISABLE) PRUNING)? (create_zonemap_on_table | create_zonemap_as_subquery)
+    ;
+
+alter_materialized_zonemap
+    : ALTER MATERIALIZED ZONEMAP zonemap_name
+        ( zonemap_attributes | zonemap_refresh_clause| (ENABLE | DISABLE) PRUNING | COMPILE | REBUILD | UNUSABLE
+        )
+    ;
+
+drop_materialized_zonemap
+    : DROP MATERIALIZED ZONEMAP zonemap_name
+    ;
+
+zonemap_refresh_clause
+    : REFRESH (FAST | COMPILE | FORCE)? (ON (DEMAND | COMMIT | LOAD | DATA MOVEMENT | LOAD DATA MOVEMENT))?
+    ;
+
+zonemap_attributes
+    : (PCTFREE numeric | PCTUSED numeric | SCALE numeric | TABLESPACE tablespace | (CACHE | NOCACHE))+
+    ;
+
+zonemap_name
+    : identifier ('.' id_expression)?
+    ;
+
+create_zonemap_on_table
+    : ON tableview_name LEFT_PAREN column_list RIGHT_PAREN
+    ;
+
+create_zonemap_as_subquery
+    : AS subquery
     ;
 
 create_materialized_view
@@ -2211,6 +2288,14 @@ alter_cluster
         )+
         parallel_clause?
         ';'
+    ;
+
+drop_cluster
+    : DROP CLUSTER cluster_name (INCLUDING TABLES (CASCADE CONSTRAINTS)?)?
+    ;
+
+truncate_cluster
+    : TRUNCATE CLUSTER cluster_name ((DROP | REUSE) STORAGE)?
     ;
 
 cache_or_nocache
