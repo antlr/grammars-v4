@@ -9,8 +9,7 @@ expression: vectorOperation;
 // Unary operations have the same precedence as multiplications
 
 vectorOperation
-    : <assoc=right> vectorOperation powOp vectorOperation # assocRight
-    | <assoc=right> vectorOperation subqueryOp  # assocRight
+    : <assoc=right> vectorOperation (powOp vectorOperation | subqueryOp) # assocRight
     | unaryOp vectorOperation   # unary
     | vectorOperation multOp vectorOperation #mult
     | vectorOperation addOp vectorOperation  #add
@@ -19,17 +18,16 @@ vectorOperation
     | vectorOperation orOp vectorOperation #or
     | vectorOperation vectorMatchOp vectorOperation #match
 
-    | FUNCTION LEFT_BRACE vectorOperation (multMetrics)*  RIGHT_BRACE # opMethod
+    | FUNCTION LEFT_BRACE vectorOperation multMetrics*  RIGHT_BRACE # opMethod
     | LEFT_PAREN vectorOperation RIGHT_PAREN #paren
-    | FUNCTION LEFT_PAREN  metricsName=STRING COMMA  condition=STRING RIGHT_PAREN (metricsAggregation)* #fuction
-    | FUNCTION LEFT_PAREN  metricsName=STRING COMMA  condition=STRING COMMA  LIMIT size=NUMBER RIGHT_PAREN (metricsAggregation)* #fuction
+    | FUNCTION LEFT_PAREN  metricsName=STRING COMMA  condition=STRING (COMMA LIMIT size=NUMBER)? RIGHT_PAREN metricsAggregation* #fuction
     | vectorOperation metricsAggregation # pip
     | NUMBER #number
     ;
 // Operators
 
 
-unaryOp:        (ADD | SUB);
+unaryOp:        ADD | SUB;
 powOp:          POW grouping?;
 multOp:         (MULT | DIV | MOD) grouping?;
 addOp:          (ADD | SUB) grouping?;
@@ -46,10 +44,6 @@ parameter:     literal | vectorOperation;
 parameterList: LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
 metricsAggregation: Line AGGREGATION_OPERATOR parameterList;
 multMetrics: COMMA vectorOperation;
-//metricsCondition:  oop=(AND|OR) LEFT_PAREN METRIC_NAME METRIC_NAME (metricsMult)* RIGHT_PAREN  ;
-//metricsMult: COMMA METRIC_NAME  METRIC_NAME;
-
-// Aggregations
 
 
 by:      BY labelNameList;
