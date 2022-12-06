@@ -94,6 +94,7 @@
 				<module>calculator</module>
 				<module>callable</module>
 				<module>capnproto</module>
+				<module>caql</module>
 				<module>cayenne</module>
 				<module>clf</module>
 				<module>clojure</module>
