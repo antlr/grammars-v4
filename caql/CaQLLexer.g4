@@ -84,7 +84,7 @@ RIGHT_BRACKET: ']';
 
 COMMA: ',';
 
-Line: '|';
+LINE_: '|';
 
 COLON: ':';
 

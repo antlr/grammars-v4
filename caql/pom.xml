@@ -42,7 +42,7 @@
 					<entryPoint>expression</entryPoint>
 					<grammarName>CaQL</grammarName>
 					<packageName></packageName>
-					<exampleFiles>SampleData.txt</exampleFiles>
+					<exampleFiles>examples/</exampleFiles>
 				</configuration>
 				<executions>
 					<execution>

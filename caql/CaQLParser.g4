@@ -42,7 +42,7 @@ offsetOp:       OFFSET DURATION;
 
 parameter:     literal | vectorOperation;
 parameterList: LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
-metricsAggregation: Line AGGREGATION_OPERATOR parameterList;
+metricsAggregation: LINE_ AGGREGATION_OPERATOR parameterList;
 multMetrics: COMMA vectorOperation;
 
 
