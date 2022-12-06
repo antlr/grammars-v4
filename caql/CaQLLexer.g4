@@ -1,9 +1,5 @@
 lexer grammar CaQLLexer;
 
-// All keywords in PromQL are case insensitive, it is just function,
-// label and metric names that are not.
-
-
 fragment NUMERAL: [0-9]+ ('.' [0-9]+)?;
 
 fragment SCIENTIFIC_NUMBER
@@ -86,7 +82,7 @@ RIGHT_PAREN: ')';
 LEFT_BRACKET:  '[';
 RIGHT_BRACKET: ']';
 
-COMMA: [,];
+COMMA: ',';
 
 Line: '|';
 
