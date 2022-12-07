@@ -250,6 +250,7 @@ statementSeq: statement+;
 
 selectionStatement:
 	If LeftParen condition RightParen statement (Else statement)?
+    If LeftParen condition RightParen statement ElseIf LeftParen condition RightParen statement (Else statement)?
 	| Switch LeftParen condition RightParen statement;
 
 condition:
