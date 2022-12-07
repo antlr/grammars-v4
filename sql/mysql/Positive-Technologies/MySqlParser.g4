@@ -325,7 +325,7 @@ enableType
     ;
 
 indexType
-    : USING (BTREE | HASH )
+    : USING (BTREE | HASH)
     ;
 
 indexOption
@@ -926,7 +926,7 @@ assignmentField
     ;
 
 lockClause
-    : (FOR UPDATE | LOCK IN SHARE MODE)
+    : FOR UPDATE | LOCK IN SHARE MODE
     ;
 
 //    Detailed DML Statements
@@ -1075,8 +1075,10 @@ unionStatement
     ;
 
 lateralStatement
-    : LATERAL (querySpecificationNointo | queryExpressionNointo)
-    | LATERAL '(' (querySpecificationNointo | queryExpressionNointo) ')' (AS? uid)?
+    : LATERAL (querySpecificationNointo |
+               queryExpressionNointo |
+               ('(' (querySpecificationNointo | queryExpressionNointo) ')' (AS? uid)?)
+              )
     ;
 
 // details
