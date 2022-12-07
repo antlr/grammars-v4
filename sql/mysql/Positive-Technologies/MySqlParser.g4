@@ -164,10 +164,10 @@ createLogfileGroup
 
 createProcedure
     : CREATE ownerStatement?
-    PROCEDURE fullId
+      PROCEDURE fullId
       '(' procedureParameter? (',' procedureParameter)* ')'
       routineOption*
-    routineBody
+      routineBody
     ;
 
 createFunction
@@ -176,7 +176,7 @@ createFunction
       '(' functionParameter? (',' functionParameter)* ')'
       RETURNS dataType
       routineOption*
-    (routineBody | returnStatement)
+      (routineBody | returnStatement)
     ;
 
 createRole

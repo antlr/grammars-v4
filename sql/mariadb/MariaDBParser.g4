@@ -1111,8 +1111,10 @@ unionStatement
     ;
 
 lateralStatement
-    : LATERAL (querySpecificationNointo | queryExpressionNointo)
-    | LATERAL '(' (querySpecificationNointo | queryExpressionNointo) ')' (AS? uid)?
+    : LATERAL (querySpecificationNointo |
+               queryExpressionNointo |
+               ('(' (querySpecificationNointo | queryExpressionNointo) ')' (AS? uid)?)
+              )
     ;
 
 // details
