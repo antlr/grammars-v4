@@ -511,10 +511,12 @@ over_clause:
 
 frame_spec:
     frame_clause (
-        EXCLUDE_ (NO_ OTHERS_)
-        | CURRENT_ ROW_
-        | GROUP_
-        | TIES_
+        EXCLUDE_ (
+            NO_ OTHERS_
+            | CURRENT_ ROW_
+            | GROUP_
+            | TIES_
+        )
     )?
 ;
 
