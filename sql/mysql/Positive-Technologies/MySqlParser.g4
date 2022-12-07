@@ -285,7 +285,7 @@ charSet
     ;
 
 ownerStatement
-    : DEFINER '=' (userName | CURRENT_USER ( '(' ')')? )
+    : DEFINER '=' (userName | CURRENT_USER ( '(' ')')?)
     ;
 
 scheduleExpression

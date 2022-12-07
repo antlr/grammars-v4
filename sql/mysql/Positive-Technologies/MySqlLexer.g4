@@ -122,7 +122,6 @@ INDEX:                               'INDEX';
 INFILE:                              'INFILE';
 INNER:                               'INNER';
 INOUT:                               'INOUT';
-OUT:                                 'OUT';
 INSERT:                              'INSERT';
 INTERVAL:                            'INTERVAL';
 INTO:                                'INTO';
