@@ -68,11 +68,20 @@ module_parameter_port_list
 	;
 list_of_port_declarations
 	: '(' port_declaration ( ',' port_declaration )* ')'
-	| '(' port ( ',' port )* ')'
+	| '(' port ( ',' port )+ ')'
+	| '(' port_implicit ')'
+	| '(' port_explicit ')'
+	| '(' ')'
 	;
 port
-	: port_expression?
-	| '.' port_identifier '(' port_expression? ')'
+	: port_implicit?
+	| port_explicit
+	;
+port_implicit
+	: port_expression
+	;
+port_explicit
+	: '.' port_identifier '(' port_expression? ')'
 	;
 port_expression
 	: port_reference
@@ -747,9 +756,7 @@ procedural_continuous_assignments
 	: 'assign' variable_assignment
 	| 'deassign' variable_lvalue
 	| 'force' variable_assignment
-	| 'force' net_assignment
 	| 'release' variable_lvalue
-	| 'release' net_lvalue
 	;
 variable_assignment
 	: variable_lvalue '=' expression
@@ -1447,6 +1454,9 @@ cell_identifier
 config_identifier
 	: identifier
 	;
+escaped_identifier
+	: ESCAPED_IDENTIFIER
+	;
 event_identifier
 	: identifier
 	;
@@ -1469,8 +1479,8 @@ hier_ref
 	: identifier const_bit_select? '.'
 	;
 identifier
-	: ESCAPED_IDENTIFIER
-	| SIMPLE_IDENTIFIER
+	: escaped_identifier
+	| simple_identifier
 	;
 input_port_identifier
 	: identifier
@@ -1501,6 +1511,9 @@ port_identifier
 	;
 real_identifier
 	: identifier
+	;
+simple_identifier
+	: SIMPLE_IDENTIFIER
 	;
 specparam_identifier
 	: identifier
