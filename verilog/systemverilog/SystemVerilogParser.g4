@@ -152,9 +152,8 @@ pkg_decl_item
 	;
 timeunits_declaration
 	: 'timeunit' time_literal ( '/' time_literal )? ';'
-	| 'timeprecision' time_literal ';'
+	| 'timeprecision' time_literal ';' ( 'timeunit' time_literal ';' )?
 	| 'timeunit' time_literal ';' 'timeprecision' time_literal ';'
-	| 'timeprecision' time_literal ';' 'timeunit' time_literal ';'
 	;
 // A.1.3 Module parameters and ports
 parameter_port_list
@@ -170,7 +169,9 @@ parameter_port_declaration
 	;
 list_of_port_declarations
 	: '(' port_decl ( ',' port_decl )* ')'
-	| '(' port ( ',' port )* ')'
+	| '(' port ( ',' port )+ ')'
+	| '(' port_implicit ')'
+	| '(' ')'
 	;
 port_decl
 	: attribute_instance* ansi_port_declaration
@@ -183,7 +184,10 @@ port_declaration
 	| attribute_instance* interface_port_declaration
 	;
 port
-	: port_expression?
+	: port_implicit?
+	;
+port_implicit
+	: port_expression
 	;
 port_expression
 	: port_identifier constant_bit_select? '[' constant_indexed_range ']'
@@ -570,7 +574,7 @@ interface_port_declaration
 	: interface_identifier ( '.' modport_identifier )? list_of_interface_identifiers
 	;
 ref_declaration
-	: 'ref' var_data_type list_of_variable_identifiers
+	: 'ref' variable_port_type list_of_variable_identifiers
 	;
 // A.2.1.3 Type declarations
 data_declaration
@@ -705,8 +709,10 @@ net_type
 net_port_type
 	: data_type_or_implicit
 	| net_type data_type_or_implicit?
-	| net_type_identifier
 	| 'interconnect' implicit_data_type?
+	;
+variable_port_type
+	: var_data_type
 	;
 var_data_type
 	: data_type
@@ -2996,6 +3002,9 @@ dynamic_array_variable_identifier
 enum_identifier
 	: identifier
 	;
+escaped_identifier
+	: ESCAPED_IDENTIFIER
+	;
 formal_port_identifier
 	: identifier
 	;
@@ -3015,8 +3024,8 @@ hier_ref
 	: identifier constant_bit_select? '.'
 	;
 identifier
-	: SIMPLE_IDENTIFIER
-	| ESCAPED_IDENTIFIER
+	: simple_identifier
+	| escaped_identifier
 	;
 index_variable_identifier
 	: identifier
@@ -3101,6 +3110,9 @@ sequence_identifier
 	;
 signal_identifier
 	: identifier
+	;
+simple_identifier
+	: SIMPLE_IDENTIFIER
 	;
 specparam_identifier
 	: identifier
