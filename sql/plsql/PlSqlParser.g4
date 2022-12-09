@@ -70,6 +70,7 @@ unit_statement
     | create_index
     | create_library
     | create_table
+    | create_role
     | create_tablespace
     | create_cluster
     | create_context
@@ -92,6 +93,7 @@ unit_statement
     | drop_procedure
     | drop_materialized_zonemap
     | drop_rollback_segment
+    | drop_role
     | drop_synonym
     | drop_sequence
     | drop_trigger
@@ -245,6 +247,10 @@ alter_rollback_segment
 
 drop_rollback_segment
     : DROP ROLLBACK SEGMENT rollback_segment_name
+    ;
+
+drop_role
+    :DROP ROLE role_name
     ;
 
 // Trigger DDLs
@@ -1842,6 +1848,10 @@ create_cluster
           parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)?
           (CACHE | NOCACHE)?
           ';'
+    ;
+
+create_role
+    : CREATE ROLE role_name role_identified_clause? container_clause?
     ;
 
 create_table
