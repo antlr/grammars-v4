@@ -1,7 +1,3 @@
-drop role TEST_ROLE_AAA;
-
-create role TEST_ROLE_AAA ;
-
 alter role TEST_ROLE_AAA NOT IDENTIFIED;
 
 alter role TEST_ROLE_AAA  IDENTIFIED BY data;
