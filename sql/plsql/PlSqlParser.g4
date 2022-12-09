@@ -250,7 +250,7 @@ drop_rollback_segment
     ;
 
 drop_role
-    :DROP ROLE role_name
+    :DROP ROLE role_name ';'
     ;
 
 // Trigger DDLs
@@ -1382,6 +1382,7 @@ create_view
 no_force_clause
     : NO? FORCE
     | NOFORCE
+    | OR? FORCE
     ;
 
 editioning_clause
