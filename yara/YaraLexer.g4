@@ -23,15 +23,10 @@ THE SOFTWARE.
 
 lexer grammar YaraLexer;
 
-options { caseInsensitive = false; }
-
 ALL                       : 'all';
 AND                       : 'and';
 ANY                       : 'any';
-//ASCII                     : 'ascii';
 AT                        : 'at';
-//BASE64                    : 'base64';
-//BASE64WIDE                : 'base64wide';
 CONDITION                 : 'condition' -> mode(DEFAULT_MODE);
 CONTAINS                  : 'contains';
 ENDSWITH                  : 'endswith';
@@ -39,7 +34,6 @@ ENTRYPOINT                : 'entrypoint';
 FALSE                     : 'false';
 FILESIZE                  : 'filesize';
 FOR                       : 'for';
-//FULLWORD                  : 'fullword';
 GLOBAL                    : 'global';
 IMPORT                    : 'import';
 ICONTAINS                 : 'icontains';
@@ -55,8 +49,7 @@ INT8                      : 'int8';
 INT8BE                    : 'int8be';
 ISTARTSWITH               : 'istartswith';
 MATCHES                   : 'matches';
-META                      : 'meta' ;//-> mode(META);
-//NOCASE                    : 'nocase';
+META                      : 'meta' ;
 NONE                      : 'none';
 NOT                       : 'not';
 OF                        : 'of';
@@ -73,8 +66,6 @@ UINT32                    : 'uint32';
 UINT32BE                  : 'uint32be';
 UINT8                     : 'uint8';
 UINT8BE                   : 'uint8be';
-//WIDE                      : 'wide';
-//XOR                       : 'xor';
 DEFINED                   : 'defined';
 
 LP                        : '(';
@@ -96,7 +87,6 @@ STAR                      : '*';
 DIV                       : '\\';
 MOD                       : '%';
 BITAND                    : '&';
-//BITOR                   : '|';
 BITXOR                    : '^';
 BITNOT                    : '~';
 LT                        : '<';
@@ -113,7 +103,7 @@ COMMA                     : ',';
 DOLLAR                    : '$';
 HASH                      : '#';
 
-WHITE_SPACE:             [ \t\r\n]+                     -> skip;
+WHITE_SPACE:             [ \t\r\n]+                      -> channel(HIDDEN);
 
 BLOCK_COMMENT:           '/*' (BLOCK_COMMENT | .)*? '*/' -> channel(HIDDEN);
 LINE_COMMENT:            '//' ~[\r\n]*                   -> channel(HIDDEN);
@@ -152,8 +142,6 @@ fragment HEX_DIGIT_MASKED
 fragment DEC_DIGIT
     : [0-9]
     ;
-
-//fragment LETTER:       [A-Z_];
 
 mode STR;
 
