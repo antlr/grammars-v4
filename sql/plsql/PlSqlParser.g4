@@ -1367,9 +1367,21 @@ alter_view_editionable
     ;
 
 create_view
-    : CREATE (OR REPLACE)? (OR? FORCE)? EDITIONABLE? EDITIONING? VIEW
+    : CREATE (OR REPLACE)? no_force_clause? editioning_clause? VIEW
       tableview_name view_options?
       AS select_only_statement subquery_restriction_clause?
+    ;
+
+
+no_force_clause
+    : NO? FORCE
+    | NOFORCE
+    ;
+
+editioning_clause
+    : EDITIONING
+    | EDITIONABLE EDITIONING?
+    | NONEDITIONABLE
     ;
 
 view_options
