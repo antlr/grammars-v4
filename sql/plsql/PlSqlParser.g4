@@ -48,6 +48,7 @@ unit_statement
     | alter_type
     | alter_table
     | alter_tablespace
+    | alter_role
     | alter_index
     | alter_library
     | alter_materialized_view
@@ -2597,6 +2598,18 @@ filenumber
 
 filename
     : CHAR_STRING
+    ;
+
+alter_role
+    : ALTER ROLE role_name role_identified_clause container_clause?
+    ;
+
+role_identified_clause
+    : NOT IDENTIFIED
+    | IDENTIFIED BY identifier
+    | IDENTIFIED USING identifier ('.' id_expression)?
+    | IDENTIFIED EXTERNALLY
+    | IDENTIFIED GLOBALLY
     ;
 
 alter_table
