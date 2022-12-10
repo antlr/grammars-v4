@@ -248,7 +248,7 @@ drop_rollback_segment
     ;
 
 create_rollback_segment
-    : CREATE PUBLIC? ROLLBACK SEGMENT rollback_segment_name ((TABLESPACE tablespace) | storage_clause)*
+    : CREATE PUBLIC? ROLLBACK SEGMENT rollback_segment_name (TABLESPACE tablespace | storage_clause)*
     ;
 
 // Trigger DDLs
