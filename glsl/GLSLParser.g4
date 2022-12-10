@@ -136,11 +136,7 @@ function_prototype
 	: function_declarator RIGHT_PAREN
 	;
 function_declarator
-	: function_header
-	| function_header_with_parameters
-	;
-function_header_with_parameters
-	: function_header function_parameters
+	: function_header function_parameters?
 	;
 function_parameters
 	: parameter_declaration (COMMA parameter_declaration)*
@@ -160,10 +156,13 @@ parameter_type_specifier
 	: type_specifier
 	;
 init_declarator_list
-	: single_declaration (COMMA IDENTIFIER array_specifier? (EQUAL initializer)?)*
+	: single_declaration (COMMA typeless_declaration)*
 	;
 single_declaration
-	: fully_specified_type (IDENTIFIER array_specifier? (EQUAL initializer)?)?
+	: fully_specified_type typeless_declaration?
+	;
+typeless_declaration
+	: IDENTIFIER array_specifier? (EQUAL initializer)?
 	;
 fully_specified_type
 	: type_specifier
@@ -231,8 +230,10 @@ type_specifier
 	: type_specifier_nonarray array_specifier?
 	;
 array_specifier
+	: dimension+
+	;
+dimension
 	: LEFT_BRACKET constant_expression? RIGHT_BRACKET
-	| array_specifier LEFT_BRACKET constant_expression? RIGHT_BRACKET
 	;
 type_specifier_nonarray
 	: VOID
@@ -429,10 +430,7 @@ condition
 	| fully_specified_type IDENTIFIER EQUAL initializer
 	;
 switch_statement
-	: SWITCH LEFT_PAREN expression RIGHT_PAREN LEFT_BRACE switch_statement_list RIGHT_BRACE
-	;
-switch_statement_list
-	: statement_list?
+	: SWITCH LEFT_PAREN expression RIGHT_PAREN LEFT_BRACE statement_list? RIGHT_BRACE
 	;
 case_label
 	: CASE expression COLON
@@ -447,11 +445,8 @@ for_init_statement
 	: expression_statement
 	| declaration_statement
 	;
-conditionopt
-	: condition?
-	;
 for_rest_statement
-	: conditionopt SEMICOLON expression?
+	: condition? SEMICOLON expression?
 	;
 jump_statement
 	: CONTINUE SEMICOLON
