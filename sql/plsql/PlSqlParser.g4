@@ -603,7 +603,7 @@ sequence_start_clause
 create_index
     : CREATE (UNIQUE | BITMAP)? INDEX index_name
        ON (cluster_index_clause | table_index_clause | bitmap_join_index_clause)
-       UNUSABLE?
+       (USABLE | UNUSABLE)?
        ';'
     ;
 
@@ -654,7 +654,7 @@ local_xmlindex_clause
     ;
 
 global_partitioned_index
-    : GLOBAL PARTITION BY (RANGE '(' column_name (',' column_name)* ')' '(' index_partitioning_clause ')'
+    : GLOBAL PARTITION BY (RANGE '(' column_name (',' column_name)* ')' '(' index_partitioning_clause (',' index_partitioning_clause)* ')'
                           | HASH '(' column_name (',' column_name)* ')'
                                             (individual_hash_partitions
                                             | hash_partitions_by_quantity
