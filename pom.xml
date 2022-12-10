@@ -137,6 +137,7 @@
 				<module>gdscript</module>
 				<module>gedcom</module>
 				<module>gff3</module>
+				<module>glsl</module>
 				<module>gml</module>
 				<module>golang</module>
 				<module>graphql</module>
