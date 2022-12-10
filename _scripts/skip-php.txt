@@ -17,6 +17,7 @@ dart2
 databank
 fortran77
 gdscript
+glsl
 golang
 haskell
 html

@@ -33,8 +33,8 @@ variable_identifier
 	;
 primary_expression
 	: variable_identifier
-	| BOOL_TRUE
-	| BOOL_FALSE
+	| TRUE
+	| FALSE
 	| INTCONSTANT
 	| UINTCONSTANT
 	| FLOATCONSTANT
