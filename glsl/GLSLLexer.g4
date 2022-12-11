@@ -282,7 +282,8 @@ FLOATCONSTANT : FRACTIONAL_CONSTANT EXPONENT_PART? FLOAT_SUFFIX? | DIGIT_SEQUENC
 INTCONSTANT : DECIMAL_CONSTANT | HEX_CONSTANT | OCTAL_CONSTANT ;
 UINTCONSTANT : INTCONSTANT INTEGER_SUFFIX ;
 BLOCK_COMMENT : '/*' .*? '*/' -> channel (COMMENTS) ;
-LINE_COMMENT : '//' (~ [\r\n\\] | '\\' NEWLINE)* -> channel (COMMENTS) ;
+LINE_COMMENT : '//' (~ [\r\n\\] | '\\' (NEWLINE | .))* -> channel (COMMENTS) ;
+LINE_CONTINUATION : '\\' NEWLINE -> channel (HIDDEN) ;
 IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_]* ;
 WHITE_SPACE : [ \t\r\n]+ -> channel (HIDDEN) ;
 
@@ -333,13 +334,16 @@ NEWLINE_6 : NEWLINE -> skip , pushMode (PROGRAM_TEXT_MODE) ;
 SPACE_TAB_3 : SPACE_TAB -> skip ;
 
 mode LINE_DIRECTIVE_MODE;
-NEWLINE_7 : NEWLINE -> skip , popMode ;
-NUMBER : DECIMAL_CONSTANT -> channel (DIRECTIVES) ;
-SPACE_TAB_4 : SPACE_TAB -> skip ;
+LINE_EXPRESSION : ~ [\r\n]+ -> channel (DIRECTIVES) ;
+NEWLINE_7 : NEWLINE -> skip , mode (PROGRAM_TEXT_MODE) ;
 
 mode MACRO_TEXT_MODE;
-MACRO_TEXT : ~ [\r\n]+ -> channel (DIRECTIVES) ;
+BLOCK_COMMENT_0 : BLOCK_COMMENT -> channel (COMMENTS) , type(BLOCK_COMMENT) ;
+MACRO_ESC_NEWLINE : '\\' NEWLINE -> channel(DIRECTIVES) ;
+MACRO_ESC_SEQUENCE : '\\' . -> channel(DIRECTIVES) , type (MACRO_TEXT) ;
+MACRO_TEXT : ~ [/\r\n\\]+ -> channel (DIRECTIVES) ;
 NEWLINE_8 : NEWLINE -> skip , popMode ;
+SLASH_0 : SLASH -> more ;
 
 mode PRAGMA_DIRECTIVE_MODE;
 DEBUG : 'debug' -> channel (DIRECTIVES) ;
@@ -353,11 +357,11 @@ SPACE_TAB_5 : SPACE_TAB -> skip ;
 STDGL : 'STDGL' -> channel (DIRECTIVES) ;
 
 mode PROGRAM_TEXT_MODE;
-BLOCK_COMMENT_0 : BLOCK_COMMENT -> channel (COMMENTS) , type (BLOCK_COMMENT) ;
+BLOCK_COMMENT_1 : BLOCK_COMMENT -> channel (COMMENTS) , type (BLOCK_COMMENT) ;
 LINE_COMMENT_0 : LINE_COMMENT -> channel (COMMENTS) , type (LINE_COMMENT) ;
 NUMBER_SIGN_0 : NUMBER_SIGN -> channel (DIRECTIVES) , type (NUMBER_SIGN) , pushMode (DIRECTIVE_MODE) ;
 PROGRAM_TEXT : ~ [#/]+ -> channel (DIRECTIVES) ;
-SLASH_0 : SLASH -> more ;
+SLASH_1 : SLASH -> more ;
 
 mode UNDEF_DIRECTIVE_MODE;
 MACRO_IDENTIFIER_0 : MACRO_IDENTIFIER -> channel (DIRECTIVES) , type (MACRO_IDENTIFIER) ;
@@ -366,7 +370,7 @@ SPACE_TAB_6 : SPACE_TAB -> skip ;
 
 mode VERSION_DIRECTIVE_MODE;
 NEWLINE_11 : NEWLINE -> skip , popMode ;
-NUMBER_0 : NUMBER -> channel (DIRECTIVES) , type (NUMBER) ;
+NUMBER : [0-9]+ -> channel (DIRECTIVES) ;
 PROFILE : ('core' | 'compatibility' | 'es') -> channel (DIRECTIVES) ;
 SPACE_TAB_7 : SPACE_TAB -> skip ;
 
