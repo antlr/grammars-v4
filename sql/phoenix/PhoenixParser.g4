@@ -600,8 +600,8 @@ any_all
 value
     : string
     | numeric
-    | boolean
-    | null_
+    | true_false
+    | NULL
     | ID
     ;
 
@@ -610,16 +610,11 @@ string
     ;
 
 numeric
-    : int
-    | long
+    : integer
     | decimal
     ;
 
-int
-    : '-'? DECIMAL_LITERAL
-    ;
-
-long
+integer
     : '-'? DECIMAL_LITERAL
     ;
 
@@ -627,13 +622,9 @@ decimal
     : '-'? number ('.' number)?
     ;
 
-boolean
+true_false
     : TRUE
     | FALSE
-    ;
-
-null_
-    : NULL
     ;
 
 case
@@ -699,15 +690,15 @@ aggregate_functions
     ;
 
 dimension_int
-    : int
+    : integer
     ;
 
 precision_int
-    : int
+    : integer
     ;
 
 scale_int
-    : int
+    : integer
     ;
 
 sql_data_type
