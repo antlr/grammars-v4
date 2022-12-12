@@ -250,7 +250,7 @@ drop_rollback_segment
     ;
 
 drop_role
-    :DROP ROLE role_name ';'
+    : DROP ROLE role_name ';'
     ;
 
 // Trigger DDLs
