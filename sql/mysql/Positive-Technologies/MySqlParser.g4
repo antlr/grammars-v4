@@ -124,11 +124,11 @@ utilityStatement
 
 createDatabase
     : CREATE dbFormat=(DATABASE | SCHEMA)
-      uid createDatabaseOption*
+      ifNotExists? uid createDatabaseOption*
     ;
 
 createEvent
-    : CREATE ownerStatement? EVENT fullId
+    : CREATE ownerStatement? EVENT ifNotExists? fullId
       ON SCHEDULE scheduleExpression
       (ON COMPLETION NOT? PRESERVE)? enableType?
       (COMMENT STRING_LITERAL)?
@@ -254,7 +254,7 @@ cteColumnName
     ;
 
 createView
-    : CREATE
+    : CREATE orReplace?
       (
         ALGORITHM '=' algType=(UNDEFINED | MERGE | TEMPTABLE)
       )?
@@ -2304,6 +2304,10 @@ ifExists
 
 ifNotExists
     : IF NOT EXISTS
+    ;
+
+orReplace
+    : OR REPLACE
     ;
 
 waitNowaitClause
