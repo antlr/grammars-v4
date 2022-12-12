@@ -1380,9 +1380,8 @@ create_view
 
 
 no_force_clause
-    : NO? FORCE
+    : (NO | OR)? FORCE
     | NOFORCE
-    | OR? FORCE
     ;
 
 editioning_clause
