@@ -2628,10 +2628,11 @@ alter_role
 
 role_identified_clause
     : NOT IDENTIFIED
-    | IDENTIFIED BY identifier
-    | IDENTIFIED USING identifier ('.' id_expression)?
-    | IDENTIFIED EXTERNALLY
-    | IDENTIFIED GLOBALLY
+    | IDENTIFIED ( BY identifier
+                 | USING identifier ('.' id_expression)?
+                 | EXTERNALLY
+                 | GLOBALLY
+                 )
     ;
 
 alter_table
