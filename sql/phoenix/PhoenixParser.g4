@@ -507,7 +507,7 @@ table_name
     ;
 
 column_def
-    : column_ref data_type (NOT? NULL)? (DEFAULT constant_operand)? (PRIMARY KEY asc_desc? ROW_TIMESTAMP? )?
+    : column_ref data_type (NOT? NULL_)? (DEFAULT constant_operand)? (PRIMARY KEY asc_desc? ROW_TIMESTAMP? )?
     ;
 
 column_ref
@@ -579,7 +579,7 @@ boolean_condition
 condition
     : operand ('='|'<'|'>'|'<='|'>='|'<>'|'!=') rhs_operand
     | (LIKE | ILIKE) operand
-    | ID NOT? NULL
+    | ID NOT? NULL_
     | NOT? (
           IN '(' (select_command | (constant_operand (',' constant_operand)?) ) ')'
         | EXISTS '(' select_command ')'
@@ -601,7 +601,7 @@ value
     : string
     | numeric
     | true_false
-    | NULL
+    | NULL_
     | ID
     ;
 
