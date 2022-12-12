@@ -522,35 +522,6 @@ data_type
     : (sql_data_type | hbase_data_type) (ARRAY ('[' dimension_int ']')?)?
     ;
 
-sql_data_type
-    : char_type
-    | varchar_type
-    | decimal_type
-    | tinyint_type
-    | smallint_type
-    | integer_type
-    | bigint_type
-    | float_type
-    | double_type
-    | timestamp_type
-    | date_type
-    | time_type
-    | binary_type
-    | varbinary_type
-    ;
-
-hbase_data_type
-    : unsigned_timestamp_type
-    | unsigned_date_type
-    | unsigned_time_type
-    | unsigned_tinyint_type
-    | unsigned_smallint_type
-    | unsigned_int_type
-    | unsigned_long_type
-    | unsigned_float_type
-    | unsigned_double_type
-    ;
-
 asc_desc
     : ASC
     | DESC
@@ -645,11 +616,11 @@ numeric
     ;
 
 int
-    : '-'? number
+    : '-'? DECIMAL_LITERAL
     ;
 
 long
-    : '-'? number
+    : '-'? DECIMAL_LITERAL
     ;
 
 decimal
@@ -739,94 +710,31 @@ scale_int
     : int
     ;
 
-char_type
+sql_data_type
     : CHAR '(' precision_int ')'
+    | VARCHAR '(' precision_int ')'
+    | DECIMAL (precision_int ',' scale_int)?
+    | TINYINT
+    | SMALLINT
+    | INT
+    | BIGINT
+    | FLOAT
+    | DOUBLE
+    | TIMESTAMP
+    | DATE
+    | TIME
+    | BINARY '(' precision_int ')'
+    | VARBINARY '(' precision_int ')'
     ;
 
-varchar_type
-    : VARCHAR '(' precision_int ')'
-    ;
-
-decimal_type
-    : DECIMAL (precision_int ',' scale_int)?
-    ;
-
-tinyint_type
-    : TINYINT
-    ;
-
-smallint_type
-    : SMALLINT
-    ;
-
-integer_type
-    : INT
-    ;
-
-bigint_type
-    : BIGINT
-    ;
-
-float_type
-    : FLOAT
-    ;
-
-double_type
-    : DOUBLE
-    ;
-
-timestamp_type
-    : TIMESTAMP
-    ;
-
-date_type
-    : DATE
-    ;
-
-time_type
-    : TIME
-    ;
-
-binary_type
-    : BINARY '(' precision_int ')'
-    ;
-
-varbinary_type
-    :  VARBINARY '(' precision_int ')'
-    ;
-
-unsigned_timestamp_type
+hbase_data_type
     : UNSIGNED_TIMESTAMP
-    ;
-
-unsigned_date_type
-    : UNSIGNED_DATE
-    ;
-
-unsigned_time_type
-    : UNSIGNED_TIME
-    ;
-
-unsigned_tinyint_type
-    : UNSIGNED_TINYINT
-    ;
-
-unsigned_smallint_type
-    : UNSIGNED_SMALLINT
-    ;
-
-unsigned_int_type
-    : UNSIGNED_INT
-    ;
-
-unsigned_long_type
-    : UNSIGNED_LONG
-    ;
-
-unsigned_float_type
-    : UNSIGNED_FLOAT
-    ;
-
-unsigned_double_type
-    : UNSIGNED_DOUBLE
+    | UNSIGNED_DATE
+    | UNSIGNED_TIME
+    | UNSIGNED_TINYINT
+    | UNSIGNED_SMALLINT
+    | UNSIGNED_INT
+    | UNSIGNED_LONG
+    | UNSIGNED_FLOAT
+    | UNSIGNED_DOUBLE
     ;
