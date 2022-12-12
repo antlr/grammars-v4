@@ -16,7 +16,7 @@
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>${antlr.version}</version>
 				<configuration>
-					<sourceDirectory>${basedir}/Positive-Technologies</sourceDirectory>
+					<sourceDirectory>${basedir}</sourceDirectory>
 					<includes>
 						<include>MariaDBLexer.g4</include>
 						<include>MariaDBParser.g4</include>

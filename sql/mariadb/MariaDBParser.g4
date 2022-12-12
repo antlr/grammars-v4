@@ -138,7 +138,7 @@ createEvent
     ;
 
 createIndex
-    : CREATE orReplace?                                         // orReplace is MariaDB-specific only
+    : CREATE orReplace?                                         // here orReplace is MariaDB-specific only
       intimeAction=(ONLINE | OFFLINE)?
       indexCategory=(UNIQUE | FULLTEXT | SPATIAL)? INDEX
       ifNotExists?                                              // here ifNotExists is MariaDB-specific only
@@ -165,7 +165,7 @@ createLogfileGroup
     ;
 
 createProcedure
-    : CREATE orReplace? ownerStatement?                         // orReplace is MariaDB-specific only
+    : CREATE orReplace? ownerStatement?                         // here orReplace is MariaDB-specific only
       PROCEDURE fullId
       '(' procedureParameter? (',' procedureParameter)* ')'
       routineOption*
@@ -173,7 +173,7 @@ createProcedure
     ;
 
 createFunction
-    : CREATE orReplace? ownerStatement? AGGREGATE?              // orReplace is MariaDB-specific only
+    : CREATE orReplace? ownerStatement? AGGREGATE?              // here orReplace is MariaDB-specific only
       FUNCTION ifNotExists? fullId
       '(' functionParameter? (',' functionParameter)* ')'
       RETURNS dataType
@@ -192,18 +192,18 @@ createServer
     ;
 
 createTable
-    : CREATE orReplace? TEMPORARY? TABLE ifNotExists?           // orReplace is MariaDB-specific only
+    : CREATE orReplace? TEMPORARY? TABLE ifNotExists?           // here orReplace is MariaDB-specific only
        tableName
        (
          LIKE tableName
          | '(' LIKE parenthesisTable=tableName ')'
        )                                                            #copyCreateTable
-    | CREATE orReplace? TEMPORARY? TABLE ifNotExists?           // orReplace is MariaDB-specific only
+    | CREATE orReplace? TEMPORARY? TABLE ifNotExists?           // here orReplace is MariaDB-specific only
        tableName createDefinitions?
        ( tableOption (','? tableOption)* )?
        partitionDefinitions? keyViolate=(IGNORE | REPLACE)?
        AS? selectStatement                                          #queryCreateTable
-    | CREATE orReplace? TEMPORARY? TABLE ifNotExists?           // orReplace is MariaDB-specific only
+    | CREATE orReplace? TEMPORARY? TABLE ifNotExists?           // here orReplace is MariaDB-specific only
        tableName createDefinitions
        ( tableOption (','? tableOption)* )?
        partitionDefinitions?                                        #columnCreateTable
@@ -231,7 +231,7 @@ createTablespaceNdb
     ;
 
 createTrigger
-    : CREATE orReplace? ownerStatement?                         // orReplace is MariaDB-specific only
+    : CREATE orReplace? ownerStatement?                         // here orReplace is MariaDB-specific only
       TRIGGER thisTrigger=fullId
       triggerTime=(BEFORE | AFTER)
       triggerEvent=(INSERT | UPDATE | DELETE)
@@ -258,7 +258,7 @@ cteColumnName
     ;
 
 createView
-    : CREATE orReplace?                                         // orReplace is MariaDB-specific only
+    : CREATE orReplace?
       (
         ALGORITHM '=' algType=(UNDEFINED | MERGE | TEMPTABLE)
       )?
@@ -273,7 +273,7 @@ createView
     ;
 
 createSequence                                                   // sequence is MariaDB-specific only
-    : CREATE orReplace? TEMPORARY? SEQUENCE ifNotExists? fullId  // orReplace is MariaDB-specific only
+    : CREATE orReplace? TEMPORARY? SEQUENCE ifNotExists? fullId  // here orReplace is MariaDB-specific only
       (sequenceSpec | tableOption)*
     ;
 
@@ -349,7 +349,7 @@ enableType
     ;
 
 indexType
-    : USING (BTREE | HASH | RTREE)  // RTREE is MariaDB-specific only
+    : USING (BTREE | HASH | RTREE)                             // RTREE is MariaDB-specific only
     ;
 
 indexOption
@@ -1793,7 +1793,7 @@ checkTableOption
 //    Plugin and udf statements
 
 createUdfunction
-    : CREATE orReplace? AGGREGATE? FUNCTION ifNotExists? uid       // orReplace is MariaDB-specific only
+    : CREATE orReplace? AGGREGATE? FUNCTION ifNotExists? uid       // here orReplace is MariaDB-specific only
       RETURNS returnType=(STRING | INTEGER | REAL | DECIMAL)
       SONAME STRING_LITERAL
     ;
@@ -2325,8 +2325,8 @@ defaultValue
     | unaryOperator? constant
     | currentTimestamp (ON UPDATE currentTimestamp)?
     | '(' expression ')'
-    | (LASTVAL | NEXTVAL) '(' fullId ')' // MariaDB
-    | '(' (PREVIOUS | NEXT) VALUE FOR fullId ')' // MariaDB
+    | (LASTVAL | NEXTVAL) '(' fullId ')'         // MariaDB-specific
+    | '(' (PREVIOUS | NEXT) VALUE FOR fullId ')' // MariaDB-specific
     | expression // MariaDB
     ;
 
@@ -2334,7 +2334,7 @@ currentTimestamp
     :
     (
       (CURRENT_TIMESTAMP | LOCALTIME | LOCALTIMESTAMP
-      | CURDATE | CURTIME) // MariaDB-specific
+      | CURDATE | CURTIME)                       // MariaDB-specific
       ('(' decimalLiteral? ')')?
       | NOW '(' decimalLiteral? ')'
     )
@@ -2348,8 +2348,6 @@ ifExists
     : IF EXISTS
     ;
 
-// Mariadb-specific
-
 ifNotExists
     : IF NOT EXISTS
     ;
@@ -2357,6 +2355,8 @@ ifNotExists
 orReplace
     : OR REPLACE
     ;
+
+// MariaDB-specific
 
 waitNowaitClause
     : WAIT decimalLiteral
@@ -2843,6 +2843,6 @@ functionNameBase
     | JSON_VALID | JSON_TABLE | JSON_SCHEMA_VALID | JSON_SCHEMA_VALIDATION_REPORT
     | JSON_PRETTY | JSON_STORAGE_FREE | JSON_STORAGE_SIZE | JSON_ARRAYAGG
     | JSON_OBJECTAGG
-    // MariaDB
+    // MariaDB-specific only
     | LASTVAL | NEXTVAL | SETVAL
     ;
