@@ -60,7 +60,7 @@ fieldLabel
   ;
 
 field
-  : ( fieldLabel )? type_ fieldName EQ fieldNumber ( LB fieldOptions RB )? SEMI
+  : fieldLabel? type_ fieldName EQ fieldNumber ( LB fieldOptions RB )? SEMI
   ;
 
 fieldOptions
