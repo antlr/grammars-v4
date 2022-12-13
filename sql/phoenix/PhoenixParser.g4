@@ -163,7 +163,7 @@ split_point_list
     ;
 
 split_point
-    : value
+    : literal
     | bind_parameter
     ;
 
@@ -180,7 +180,7 @@ options_
     ;
 
 option
-    : (family_name '.')? name '=' value
+    : (family_name '.')? name '=' literal
     ;
 
 func_argument_list
@@ -280,7 +280,7 @@ revoke_command
     ;
 
 on_schema_table
-    : ON (SCHEMA schema_name)? table_name
+    : ON (SCHEMA schema_name | table_ref )
     ;
 
 permission_string
@@ -296,13 +296,13 @@ cursor_name
     ;
 
 guide_post_options
-    : (family_name '.')? name '=' value (',' name '=' value)*
+    : (family_name '.')? name '=' literal (',' name '=' literal)*
     ;
 
 upsert_values_command
-    : UPSERT INTO table_name ('(' column_ref_list | column_def_list ')')?
-        VALUES '(' constant_term (',' constant_term)? ')'
-        (ON DUPLICATE KEY (IGNORE | UPDATE column_ref '=' operand))?
+    : UPSERT INTO table_name ('(' (column_ref_list | column_def_list) ')')?
+        VALUES '(' literal (',' literal)* ')'
+        (ON DUPLICATE KEY (IGNORE | UPDATE column_ref '=' expression))?
     ;
 
 column_ref_list
@@ -314,11 +314,7 @@ column_def_list
     ;
 
 upsert_select_command
-    : UPSERT hint? INTO table_name ('(' column_ref_list | column_def_list ')')? select_command //TODO hint
-    ;
-
-constant_term
-    : term
+    : UPSERT hint? INTO table_name ('(' (column_ref_list | column_def_list) ')')? select_command //TODO hint
     ;
 
 delete_command
@@ -410,6 +406,10 @@ number
     ;
 
 hint
+    : '/*+' hint_name '*/'
+    ;
+
+hint_name
     : scan_hint
     | index_hint
     | cache_hint
@@ -456,7 +456,7 @@ serial_hint
 
 select_expression
     : '*'
-    | '(' family_name '.' '*' ')'
+    | family_name '.' '*'
     | expression (AS? column_alias)?
     ;
 
@@ -507,7 +507,7 @@ table_name
     ;
 
 column_def
-    : column_ref data_type (NOT? NULL_)? (DEFAULT constant_operand)? (PRIMARY KEY asc_desc? ROW_TIMESTAMP? )?
+    : column_ref data_type (NOT? NULL_)? (DEFAULT literal)? (PRIMARY KEY asc_desc? ROW_TIMESTAMP? )?
     ;
 
 column_ref
@@ -527,82 +527,56 @@ asc_desc
     | DESC
     ;
 
-join_type
-    : INNER
-    | (LEFT | RIGHT) OUTER?
-    ;
-
-constant_operand
-    : operand
-    ;
-
-operand
-    : summand ('||' summand)*
-    ;
-
-summand
-    : factor ( ('+'|'-') factor )*
-    ;
-
-factor
-    : term ( ('*'|'/'|'%') term )*
-    ;
-
-term
-    : (
-        value
-        | '(' expression ')'
-        | bind_parameter
-        | function_
-        | case
-        | case_when
-        | (table_alias '.')? column_ref
-        | row_value_constructor
-        | cast
-        | sequence
-        | array_constructor
-    ) ('[' expression ']')?
-    ;
-
-expression
-    : and_condition (OR and_condition)* // FIXME
-    ;
-
-and_condition
-    : boolean_condition (AND boolean_condition)*
-    ;
-
-boolean_condition
-    : NOT? condition
-    ;
-
-condition
-    : operand ('='|'<'|'>'|'<='|'>='|'<>'|'!=') rhs_operand
-    | (LIKE | ILIKE) operand
-    | ID NOT? NULL_
-    | NOT? (
-          IN '(' (select_command | (constant_operand (',' constant_operand)?) ) ')'
-        | EXISTS '(' select_command ')'
-        | BETWEEN operand AND operand
-    )
-    ;
-
-rhs_operand
-    : operand
-    | any_all '(' operand | select_command ')'
-    ;
-
 any_all
     : ANY
     | ALL
     ;
 
-value
+join_type
+    : INNER
+    | (LEFT | RIGHT) OUTER?
+    ;
+
+expression
+    : literal
+    | bind_parameter
+    | ((schema_name DOT)? table_name DOT)? column_name
+    | MINUS expression
+    | expression PIPEPIPE expression
+    | expression (STAR | DIV | MOD) expression
+    | expression (PLUS | MINUS) expression
+    | expression comp_op expression
+    | expression comp_op any_all LP (select_command) RP
+    | expression (LIKE | ILIKE) expression
+    | expression IS NOT? NULL_
+    | expression NOT? IN LP (select_command | expression_list ) RP
+    | expression NOT? BETWEEN expression AND expression
+    | NOT? EXISTS LP select_command RP
+    | ID LP expression_list RP
+    | NOT expression
+    | expression AND expression
+    | expression OR expression
+    | row_value_constructor
+    | case
+    | case_when
+    | cast
+    | sequence
+    | array_constructor
+    ;
+
+comp_op
+    : EQ | GT | GE | LT | LE | NE | NE2
+    ;
+
+expression_list
+    : expression (COMMA expression)*
+    ;
+
+literal
     : string
     | numeric
     | true_false
     | NULL_
-    | ID
     ;
 
 string
@@ -628,22 +602,22 @@ true_false
     ;
 
 case
-    : CASE term
-        WHEN expression THEN term
-        (WHEN expression THEN term)*
+    : CASE expression
+        WHEN expression THEN expression
+        (WHEN expression THEN expression)*
         (ELSE expression)?
       END
     ;
 
 case_when
-    : CASE WHEN expression THEN term
-        (WHEN expression THEN term)?
-        (ELSE term)?
+    : CASE WHEN expression THEN expression
+        (WHEN expression THEN expression)?
+        (ELSE expression)?
       END
     ;
 
 row_value_constructor
-    : '(' expression (',' expression)* ')'
+    : '(' expression_list ')'
     ;
 
 cast
@@ -666,29 +640,6 @@ array_constructor
     : ARRAY '[' expression (',' expression)* ']'
     ;
 
-function_
-    : aggregate_functions
-    ;
-
-aggregate_functions
-    : AVG
-    | COUNT
-    | APPROX_COUNT_DISTINCT
-    | MAX
-    | MIN
-    | SUM
-    | PERCENTILE_CONT
-    | PERCENTILE_DISC
-    | PERCENT_RANK
-    | FIRST_VALUE
-    | LAST_VALUE
-    | FIRST_VALUES
-    | LAST_VALUES
-    | NTH_VALUE
-    | STDDEV_POP
-    | STDDEV_SAMP
-    ;
-
 dimension_int
     : integer
     ;
@@ -703,11 +654,11 @@ scale_int
 
 sql_data_type
     : CHAR '(' precision_int ')'
-    | VARCHAR '(' precision_int ')'
+    | VARCHAR ('(' precision_int ')')?
     | DECIMAL (precision_int ',' scale_int)?
     | TINYINT
     | SMALLINT
-    | INT
+    | INTEGER
     | BIGINT
     | FLOAT
     | DOUBLE
