@@ -205,8 +205,7 @@ DATE_ADD datetime DEFAULT NULL,
 primary key (USER_ID, GROUP_ID)
 );
 
--- Mariadb default value for function: unix_timestamp()
-CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` bigint(20) NOT NULL DEFAULT unix_timestamp());
+CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` bigint(20) NOT NULL);
 
 #end
 #begin
@@ -215,7 +214,7 @@ CREATE TABLE `table_default_fn`(`quote_id` varchar(32) NOT NULL,`created_at` big
 RENAME TABLE old_table TO tmp_table, new_table TO old_table, tmp_table TO new_table;
 RENAME TABLE table_b TO table_a;
 RENAME TABLE current_db.tbl_name TO other_db.tbl_name;
-rename table debezium_all_types_old to debezium_all_types, test_json_object_old wait 10 to test_json_object;
+rename table debezium_all_types_old to debezium_all_types, test_json_object_old to test_json_object;
 #end
 #begin
 -- Truncate table
@@ -223,7 +222,7 @@ truncate table t1;
 truncate parent_table;
 truncate `#`;
 truncate `#!^%$`;
-truncate table tbl_without_pk nowait;
+truncate table tbl_without_pk;
 #end
 #begin
 -- Create database
@@ -264,9 +263,7 @@ create index index4 on antlr_tokens(token(30) asc) lock default;
 create index index5 on antlr_tokens(token(30) asc) algorithm default;
 create index index6 on antlr_tokens(token(30) asc) algorithm default lock default;
 create index index7 on antlr_tokens(token(30) asc) lock default algorithm default;
--- Create mariadb index
-CREATE INDEX IF NOT EXISTS DX_DT_LAST_UPDATE ON patient(DT_LAST_UPDATE) WAIT 100 KEY_BLOCK_SIZE=1024M CLUSTERING =YES USING RTREE NOT IGNORED ALGORITHM = NOCOPY LOCK EXCLUSIVE;
-create index index8 on t1(col1) nowait comment 'test index' using btree;
+create index index8 on t1(col1) comment 'test index' using btree;
 #end
 #begin
 -- Create logfile group
@@ -337,7 +334,7 @@ END
 #begin
 -- Create trigger 6
 -- delimiter //
-create or replace trigger trg_my1 before delete on test.t1 for each row begin insert into log_table values ("delete row from test.t1"); insert into t4 values (old.col1, old.col1 + 5, old.col1 + 7); end; -- //-- delimiter ;
+create trigger trg_my1 before delete on test.t1 for each row begin insert into log_table values ("delete row from test.t1"); insert into t4 values (old.col1, old.col1 + 5, old.col1 + 7); end; -- //-- delimiter ;
 #end
 #begin
 -- Create view
@@ -619,13 +616,6 @@ SELECT * FROM cte;
 #end
 
 #begin
-lock tables t1 read nowait;
+lock tables t1 read;
 lock table t1 read local wait 100;
-#end
-
--- Create sequence
-#begin
-CREATE SEQUENCE if NOT EXISTS workdb.s2 START=1 CYCLE MINVALUE=10000 MAXVALUE=999999999999;
-CREATE OR REPLACE SEQUENCE if NOT EXISTS s2 START=100 CACHE 1000;
-CREATE SEQUENCE `seq_8b4d1cdf-377e-4021-aef3-f7c9846903fc` INCREMENT BY 1 START WITH 1;
 #end
