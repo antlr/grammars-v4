@@ -137,6 +137,7 @@
 				<module>gdscript</module>
 				<module>gedcom</module>
 				<module>gff3</module>
+				<module>glsl</module>
 				<module>gml</module>
 				<module>golang</module>
 				<module>graphql</module>
@@ -319,6 +320,7 @@
 				<module>xpath</module>
 				<module>xsd-regex</module>
 				<module>xyz</module>
+				<module>yara</module>
 				<module>z</module>
 			</modules>
 		</profile>

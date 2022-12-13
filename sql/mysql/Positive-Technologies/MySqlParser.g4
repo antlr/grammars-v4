@@ -396,7 +396,7 @@ createDefinitions
     ;
 
 createDefinition
-    : uid columnDefinition                                          #columnDeclaration
+    : fullColumnName columnDefinition                               #columnDeclaration
     | tableConstraint                                               #constraintDeclaration
     | indexColumnDefinition                                         #indexDeclaration
     ;
@@ -855,7 +855,7 @@ insertStatement
       IGNORE? INTO? tableName
       (PARTITION '(' partitions=uidList? ')' )?
       (
-        ('(' columns=uidList ')')? insertStatementValue
+        ('(' columns=fullColumnNameList ')')? insertStatementValue
         | SET
             setFirst=updatedElement
             (',' setElements+=updatedElement)*
@@ -2049,7 +2049,7 @@ roleName
 
 fullColumnName
     : uid (dottedId dottedId? )?
-    | . dottedId dottedId?
+    | .? dottedId dottedId?
     ;
 
 indexColumnName
@@ -2254,6 +2254,10 @@ lengthTwoOptionalDimension
 
 uidList
     : uid (',' uid)*
+    ;
+
+fullColumnNameList
+    : fullColumnName (',' fullColumnName)*
     ;
 
 tables

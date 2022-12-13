@@ -79,6 +79,7 @@ unit_statement
     | create_materialized_view
     | create_materialized_view_log
     | create_materialized_zonemap
+    | create_rollback_segment
     | create_user
 
     | create_sequence
@@ -251,6 +252,10 @@ drop_rollback_segment
 
 drop_role
     : DROP ROLE role_name ';'
+    ;
+ 
+create_rollback_segment
+    : CREATE PUBLIC? ROLLBACK SEGMENT rollback_segment_name (TABLESPACE tablespace | storage_clause)*
     ;
 
 // Trigger DDLs
