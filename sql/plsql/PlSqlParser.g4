@@ -48,6 +48,7 @@ unit_statement
     | alter_type
     | alter_table
     | alter_tablespace
+    | alter_role
     | alter_index
     | alter_library
     | alter_materialized_view
@@ -69,6 +70,7 @@ unit_statement
     | create_index
     | create_library
     | create_table
+    | create_role
     | create_tablespace
     | create_cluster
     | create_context
@@ -92,6 +94,7 @@ unit_statement
     | drop_procedure
     | drop_materialized_zonemap
     | drop_rollback_segment
+    | drop_role
     | drop_synonym
     | drop_sequence
     | drop_trigger
@@ -247,6 +250,10 @@ drop_rollback_segment
     : DROP ROLLBACK SEGMENT rollback_segment_name
     ;
 
+drop_role
+    : DROP ROLE role_name ';'
+    ;
+ 
 create_rollback_segment
     : CREATE PUBLIC? ROLLBACK SEGMENT rollback_segment_name (TABLESPACE tablespace | storage_clause)*
     ;
@@ -1371,9 +1378,21 @@ alter_view_editionable
     ;
 
 create_view
-    : CREATE (OR REPLACE)? (OR? FORCE)? EDITIONABLE? EDITIONING? VIEW
+    : CREATE (OR REPLACE)? no_force_clause? editioning_clause? VIEW
       tableview_name view_options?
       AS select_only_statement subquery_restriction_clause?
+    ;
+
+
+no_force_clause
+    : (NO | OR)? FORCE
+    | NOFORCE
+    ;
+
+editioning_clause
+    : EDITIONING
+    | EDITIONABLE EDITIONING?
+    | NONEDITIONABLE
     ;
 
 view_options
@@ -1834,6 +1853,10 @@ create_cluster
           parallel_clause? (ROWDEPENDENCIES | NOROWDEPENDENCIES)?
           (CACHE | NOCACHE)?
           ';'
+    ;
+
+create_role
+    : CREATE ROLE role_name role_identified_clause? container_clause?
     ;
 
 create_table
@@ -2602,6 +2625,19 @@ filenumber
 
 filename
     : CHAR_STRING
+    ;
+
+alter_role
+    : ALTER ROLE role_name role_identified_clause container_clause?
+    ;
+
+role_identified_clause
+    : NOT IDENTIFIED
+    | IDENTIFIED ( BY identifier
+                 | USING identifier ('.' id_expression)?
+                 | EXTERNALLY
+                 | GLOBALLY
+                 )
     ;
 
 alter_table
