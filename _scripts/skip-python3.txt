@@ -83,8 +83,9 @@ smalltalk
 sparql
 sql/hive/v2
 sql/hive/v3
-sql/sqlite
+sql/mariadb
 sql/postgresql
+sql/sqlite
 sql/tsql
 stellaris
 stringtemplate
