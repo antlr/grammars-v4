@@ -118,11 +118,13 @@ collection
     ;
 
 collect
-    : COLLECT expr (INTO expr)? options_?
-    | COLLECT expr (INTO id_ KEEP id_)? options_?
-    | COLLECT expr WITH COUNT INTO id_ options_?
-    | COLLECT expr? aggregate_assign (INTO id_)? options_?
-    | COLLECT WITH COUNT INTO id_ options_?
+    : COLLECT ( expr (INTO expr)?
+              | expr (INTO id_ KEEP id_)?
+              | expr WITH COUNT INTO id_
+              | expr? aggregate_assign (INTO id_)?
+              | WITH COUNT INTO id_
+              )
+      options_?
     ;
 
 window
