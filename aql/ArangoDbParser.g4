@@ -35,16 +35,15 @@ data_query
     ;
 
 data_access_query
-    : with_collection_list? for_op* return_expr
-    | with_collection_list?
-        FOR v=id_ (',' e=id_ (',' p=id_)? )?
-        IN (numeric_literal ('..' numeric_literal)? )?
-        (OUTBOUND | INBOUND | ANY) expr
-        (GRAPH expr | collection_list) // collections support direction: ANY
-        (PRUNE expr)?
-        filter*
-        options_?
-        return_expr?
+    : with_collection_list? ( for_op* return_expr
+                            | FOR v=id_ (',' e=id_ (',' p=id_)? )?
+                             IN (numeric_literal ('..' numeric_literal)? )?
+                             (OUTBOUND | INBOUND | ANY) expr
+                             (GRAPH expr | collection_list) // collections support direction: ANY
+                             (PRUNE expr)?
+                             filter*
+                             options_?
+                             return_expr? )
     ;
 
 for_op
