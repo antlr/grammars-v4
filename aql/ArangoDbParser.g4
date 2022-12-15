@@ -121,7 +121,8 @@ collection_list
     ;
 
 collection
-    : id_ | BIND_PARAMETER_COLL
+    : id_
+    | BIND_PARAMETER_COLL
     ;
 
 collect
