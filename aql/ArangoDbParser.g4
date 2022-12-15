@@ -134,8 +134,7 @@ collect
     ;
 
 window
-    : WINDOW object_literal aggregate_assign
-    | WINDOW expr WITH object_literal aggregate_assign
+    : WINDOW (expr WITH)? object_literal aggregate_assign
     ;
 
 aggregate_assign
