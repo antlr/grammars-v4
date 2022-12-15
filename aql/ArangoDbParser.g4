@@ -151,7 +151,8 @@ id_
     ;
 
 new_old
-    : NEW | OLD
+    : NEW
+    | OLD
     ;
 
 expr
