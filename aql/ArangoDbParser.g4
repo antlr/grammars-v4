@@ -58,20 +58,13 @@ for_op
 
 data_modification_query
     : with_collection_list? for_op*
-         INSERT object_literal in_into collection options_?
-        return_expr?
-    | with_collection_list? for_op*
-        UPDATE (expr WITH)? object_literal IN collection options_?
-        return_expr?
-    | with_collection_list? for_op*
-        REPLACE (expr WITH)? object_literal IN collection options_?
-         return_expr?
-    | with_collection_list? for_op*
-        (REMOVE expr IN collection options_?)+
-        return_expr?
-    | with_collection_list? for_op*
-        UPSERT expr INSERT expr (UPDATE | REPLACE) expr IN collection options_?
-        return_expr?
+        ( INSERT object_literal in_into collection options_?  
+        | UPDATE (expr WITH)? object_literal IN collection options_?
+        | REPLACE (expr WITH)? object_literal IN collection options_?
+        | (REMOVE expr IN collection options_?)+
+        | UPSERT expr INSERT expr (UPDATE | REPLACE) expr IN collection options_?
+        )
+      return_expr?
     ;
 
 options_
