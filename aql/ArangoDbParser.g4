@@ -178,7 +178,8 @@ expr
 
 literal
     : numeric_literal
-    | TRUE | FALSE
+    | TRUE
+    | FALSE
     | string
     | array_literal
     | object_literal
