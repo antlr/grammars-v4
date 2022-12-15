@@ -1,0 +1,4 @@
+FOR u IN users
+  REMOVE u IN users
+  LET removed = OLD
+  RETURN removed._key
