@@ -191,8 +191,7 @@ array_literal
     ;
 
 object_literal
-    : '{' pair_list? '}'
-    | '{' id_ (',' id_)* '}' // accepted in RETURN clause
+    : '{' (pair_list | id_ (',' id_)*)? '}' // accepted in RETURN clause
     ;
 
 pair_list
