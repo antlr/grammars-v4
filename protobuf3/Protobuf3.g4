@@ -55,9 +55,12 @@ optionName
   ;
 
 // Normal Field
+fieldLabel
+  : OPTIONAL | REPEATED
+  ;
 
 field
-  : ( REPEATED )? type_ fieldName EQ fieldNumber ( LB fieldOptions RB )? SEMI
+  : fieldLabel? type_ fieldName EQ fieldNumber ( LB fieldOptions RB )? SEMI
   ;
 
 fieldOptions
@@ -277,6 +280,7 @@ WEAK: 'weak';
 PUBLIC: 'public';
 PACKAGE: 'package';
 OPTION: 'option';
+OPTIONAL: 'optional';
 REPEATED: 'repeated';
 ONEOF: 'oneof';
 MAP: 'map';
@@ -363,6 +367,7 @@ keywords
   | PUBLIC
   | PACKAGE
   | OPTION
+  | OPTIONAL
   | REPEATED
   | ONEOF
   | MAP

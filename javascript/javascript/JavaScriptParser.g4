@@ -454,6 +454,7 @@ identifier
     : Identifier
     | NonStrictLet
     | Async
+    | As
     ;
 
 reservedWord

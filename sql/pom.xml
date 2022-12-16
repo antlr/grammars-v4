@@ -13,14 +13,16 @@
     </parent>
 
     <modules>
+        <module>derby</module>
         <module>hive</module>
+        <module>mariadb</module>
         <module>mysql</module>
+        <module>phoenix</module>
         <module>plsql</module>
+        <module>postgresql</module>
+        <module>snowflake</module>
         <module>sqlite</module>
         <module>trino</module>
         <module>tsql</module>
-        <module>postgresql</module>
-        <module>snowflake</module>
-        <module>derby</module>
     </modules>
 </project>
