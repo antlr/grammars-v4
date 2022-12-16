@@ -17,6 +17,7 @@
         <module>hive</module>
         <module>mariadb</module>
         <module>mysql</module>
+        <module>phoenix</module>
         <module>plsql</module>
         <module>postgresql</module>
         <module>snowflake</module>
