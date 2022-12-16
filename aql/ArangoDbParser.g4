@@ -57,7 +57,7 @@ for_op
 
 data_modification_query
     : with_collection_list? for_op*
-        ( INSERT object_literal in_into collection options_?  
+        ( INSERT object_literal in_into collection options_?
         | UPDATE (expr WITH)? object_literal IN collection options_?
         | REPLACE (expr WITH)? object_literal IN collection options_?
         | (REMOVE expr IN collection options_?)+
@@ -136,7 +136,7 @@ aggregate_assign
     ;
 
 let_list
-    : (LET expr_list)+
+    : (LET expr)+
     ;
 
 id_
@@ -151,10 +151,10 @@ new_old
 expr
     : literal
     | '(' (expr | data_access_query) ')'
-    | expr '[' (expr_list | '*') ']'
+    | expr '[' (expr | '*') ']'
     | expr ACCESS expr
     | ('+'|'-') expr
-    | id_ LRB expr_list RRB
+    | id_ LRB expr RRB
     | expr ('*' | '/' | '%') expr
     | expr ('+' | '-') expr
     | expr ('==' | '!=' | '>' | '<' | '>=' | '<=' | '=~' | '!~') expr
@@ -183,7 +183,7 @@ literal
     ;
 
 array_literal
-    : '[' expr_list? ']'
+    : '[' expr? ']'
     ;
 
 object_literal
@@ -196,10 +196,6 @@ pair_list
 
 pair
     : (string | id_) ':' expr
-    ;
-
-expr_list
-    : expr (',' expr)*
     ;
 
 string
