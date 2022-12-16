@@ -234,6 +234,6 @@ CHAR_LITERAL:                '\'' (~['\\\r\n]) '\'';
 
 fragment LETTER:       [A-Z_];
 
-fragment DEC_DOT_DEC:  (DEC_DIGIT+ '.' DEC_DIGIT+ |  DEC_DIGIT+ '.' | '.' DEC_DIGIT+);
+fragment DEC_DOT_DEC:  DEC_DIGIT+ '.' DEC_DIGIT* | '.' DEC_DIGIT+;
 
 fragment DEC_DIGIT:    [0-9];
