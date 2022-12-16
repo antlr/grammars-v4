@@ -660,7 +660,7 @@ singleExpression
     | arrowFunctionDeclaration                                               # ArrowFunctionExpression   // ECMAScript 6
     | Class Identifier? classTail                                            # ClassExpression
     | singleExpression '[' expressionSequence ']'                            # MemberIndexExpression
-    | singleExpression '!'? '.' identifierName nestedTypeGeneric?                 # MemberDotExpression
+    | singleExpression '!'? '.' identifierName nestedTypeGeneric?            # MemberDotExpression
     // Split to try `new Date()` first, then `new Date`.
     | New singleExpression typeArguments? arguments                          # NewExpression
     | New singleExpression typeArguments?                                    # NewExpression
