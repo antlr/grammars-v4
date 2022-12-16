@@ -1,0 +1,14 @@
+let a = 1
+for i in [1]
+let b=1
+filter a==1
+let c=1
+sort a
+let d=1
+limit 1
+let e=1
+for j in [2]
+
+insert {} into coll2
+let f=1
+return NEW
