@@ -1,0 +1,27 @@
+//with coll2
+let a = 1
+for i in coll2
+let b=1
+//collect jj=1
+//collect kk=2
+let bb=1
+filter a==1
+//filter true
+let c=1
+sort a
+//sort i
+let d=1
+limit 1
+limit 2
+let ee=1
+window {following:1} aggregate tt= avg(a)
+let e=1
+    for j in coll3
+    limit 1
+
+let hhh=1
+remove i in coll2
+remove j in coll4
+let f=1
+return f
+//return tt

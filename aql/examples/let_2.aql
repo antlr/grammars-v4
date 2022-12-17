@@ -1,0 +1,15 @@
+with coll2, coll3
+let a=1
+for i in [4]
+    let b=1
+    filter a == 1
+    let f=1
+    sort a
+    let g=1
+    limit 1
+    let gh=1
+    for j in [1]
+        let v=1
+        sort a
+        limit 1
+        return [i, a]
