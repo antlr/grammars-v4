@@ -35,7 +35,7 @@ SPACE:                               [ \t\r\n]+    -> channel(HIDDEN);
 SPEC_MYSQL_COMMENT:                  '/*!' .+? '*/' -> channel(MYSQLCOMMENT);
 COMMENT_INPUT:                       '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT:                        (
-                                       ('--' [ \t] | '#') ~[\r\n]* ('\r'? '\n' | EOF)
+                                       ('--' [ \t]* | '#') ~[\r\n]* ('\r'? '\n' | EOF)
                                        | '--' ('\r'? '\n' | EOF)
                                      ) -> channel(HIDDEN);
 
@@ -328,6 +328,9 @@ JSON_STORAGE_FREE:                   'JSON_STORAGE_FREE';
 JSON_STORAGE_SIZE:                   'JSON_STORAGE_SIZE';
 JSON_ARRAYAGG:                       'JSON_ARRAYAGG';
 JSON_OBJECTAGG:                      'JSON_OBJECTAGG';
+NESTED:                              'NESTED';
+ORDINALITY:                          'ORDINALITY';
+PATH:                                'PATH';
 
 // Group function Keywords
 
