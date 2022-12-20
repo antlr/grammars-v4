@@ -394,7 +394,7 @@ columnConstraint
     | STORAGE storageval=(DISK | MEMORY | DEFAULT)                  #storageColumnConstraint
     | referenceDefinition                                           #referenceColumnConstraint
     | COLLATE collationName                                         #collateColumnConstraint
-    | (GENERATED ALWAYS)? AS '(' expression ')' (VIRTUAL | STORED | PERSISTENT)? #generatedColumnConstraint
+    | (GENERATED ALWAYS)? AS '(' expression ')' (VIRTUAL | STORED)? #generatedColumnConstraint
     | SERIAL DEFAULT VALUE                                          #serialDefaultColumnConstraint
     | (CONSTRAINT name=uid?)?
       CHECK '(' expression ')'                                      #checkColumnConstraint
@@ -1002,6 +1002,7 @@ tableSources
 tableSource
     : tableSourceItem joinPart*                                     #tableSourceBase
     | '(' tableSourceItem joinPart* ')'                             #tableSourceNested
+    | jsonTable                                                     #tableJson
     ;
 
 tableSourceItem
@@ -1079,6 +1080,36 @@ lateralStatement
                queryExpressionNointo |
                ('(' (querySpecificationNointo | queryExpressionNointo) ')' (AS? uid)?)
               )
+    ;
+
+// JSON
+
+// https://dev.mysql.com/doc/refman/8.0/en/json-table-functions.html
+jsonTable
+    : JSON_TABLE '('
+        STRING_LITERAL ','
+        STRING_LITERAL
+        COLUMNS '(' jsonColumnList ')'
+      ')' (AS? uid)?
+    ;
+
+jsonColumnList
+    : jsonColumn (',' jsonColumn)*
+    ;
+
+jsonColumn
+    : fullColumnName ( FOR ORDINALITY
+                     | dataType ( PATH STRING_LITERAL jsonOnEmpty? jsonOnError?
+                                | EXISTS PATH STRING_LITERAL ) )
+    | NESTED PATH? STRING_LITERAL COLUMNS '(' jsonColumnList ')'
+    ;
+
+jsonOnEmpty
+    : (NULL_LITERAL | ERROR | DEFAULT defaultValue) ON EMPTY
+    ;
+
+jsonOnError
+    : (NULL_LITERAL | ERROR | DEFAULT defaultValue) ON ERROR
     ;
 
 // details
@@ -2423,8 +2454,8 @@ specificFunction
       '(' expression
        ',' expression
          (RETURNING convertedDataType)?
-         ((NULL_LITERAL | ERROR | (DEFAULT defaultValue)) ON EMPTY)?
-         ((NULL_LITERAL | ERROR | (DEFAULT defaultValue)) ON ERROR)?
+         jsonOnEmpty?
+         jsonOnError?
        ')'                                                          #jsonValueFunctionCall
     ;
 
@@ -2671,10 +2702,10 @@ keywordsCanBeId
     | MAX_USER_CONNECTIONS | MEDIUM | MEMBER | MEMORY | MERGE | MESSAGE_TEXT
     | MID | MIGRATE
     | MIN | MIN_ROWS | MODE | MODIFY | MUTEX | MYSQL | MYSQL_ERRNO | NAME | NAMES
-    | NCHAR | NDB_STORED_USER | NEVER | NEXT | NO | NOCOPY | NODEGROUP | NONE | NOWAIT | NUMBER | ODBC | OFFLINE | OFFSET
+    | NCHAR | NDB_STORED_USER | NESTED | NEVER | NEXT | NO | NOCOPY | NODEGROUP | NONE | NOWAIT | NUMBER | ODBC | OFFLINE | OFFSET
     | OF | OJ | OLD_PASSWORD | ONE | ONLINE | ONLY | OPEN | OPTIMIZER_COSTS
-    | OPTIONAL | OPTIONS | ORDER | OWNER | PACK_KEYS | PAGE | PARSER | PARTIAL
-    | PARTITIONING | PARTITIONS | PASSWORD | PASSWORDLESS_USER_ADMIN | PASSWORD_LOCK_TIME | PERSIST_RO_VARIABLES_ADMIN | PHASE | PLUGINS
+    | OPTIONAL | OPTIONS | ORDER | ORDINALITY | OWNER | PACK_KEYS | PAGE | PARSER | PARTIAL
+    | PARTITIONING | PARTITIONS | PASSWORD | PASSWORDLESS_USER_ADMIN | PASSWORD_LOCK_TIME | PATH | PERSIST_RO_VARIABLES_ADMIN | PHASE | PLUGINS
     | PLUGIN_DIR | PLUGIN | PORT | PRECEDES | PREPARE | PRESERVE | PREV | PRIMARY
     | PROCESSLIST | PROFILE | PROFILES | PROXY | QUERY | QUICK
     | REBUILD | RECOVER | RECURSIVE | REDO_BUFFER_SIZE | REDUNDANT
