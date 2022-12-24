@@ -28,7 +28,7 @@ options { caseInsensitive = true; }
 ABORT             : 'abort';
 ABS               : 'abs';
 ABSTRACT          : 'abstract';
-ACCEPT            : 'accept';
+ACCEPT_           : 'accept';
 ACCESS            : 'access';
 ALIASED           : 'aliased';
 ALL               : 'all';

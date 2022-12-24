@@ -395,7 +395,7 @@ entry_declaration
     ;
 
 accept_statement
-    : ACCEPT entry_direct_name ('('entry_index')')? formal_part? /*parameter_profile*/
+    : ACCEPT_ entry_direct_name ('('entry_index')')? formal_part? /*parameter_profile*/
         (DO handled_sequence_of_statements END entry_identifier? )? SEMI
     ;
 
