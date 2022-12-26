@@ -56,7 +56,7 @@ scientific
    ;
 
 variable
-   : VARIABLE
+   : VARIABLE_
    ;
 
 relop
@@ -66,7 +66,7 @@ relop
    ;
 
 
-VARIABLE
+VARIABLE_
    : VALID_ID_START VALID_ID_CHAR*
    ;
 
