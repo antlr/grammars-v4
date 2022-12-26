@@ -75,19 +75,19 @@ for_in
     ;
 
 filter
-    : let_list? FILTER expr let_list?
+    : let_list? FILTER_ expr let_list?
     ;
 
 sort
-    : let_list? SORT expr asc_desc? (',' expr asc_desc)* let_list?
+    : let_list? SORT_ expr asc_desc? (',' expr asc_desc)* let_list?
     ;
 
 limit
-    : let_list? LIMIT numeric_literal (',' numeric_literal)? let_list?
+    : let_list? LIMIT_ numeric_literal (',' numeric_literal)? let_list?
     ;
 
 search
-    : SEARCH expr options_?
+    : SEARCH_ expr options_?
     ;
 
 asc_desc
@@ -118,7 +118,7 @@ collection
     ;
 
 collect
-    : COLLECT ( expr (INTO expr)?
+    : COLLECT_ ( expr (INTO expr)?
               | expr (INTO id_ KEEP id_)?
               | expr WITH COUNT INTO id_
               | expr? aggregate_assign (INTO id_)?
@@ -128,7 +128,7 @@ collect
     ;
 
 window
-    : WINDOW (expr WITH)? object_literal aggregate_assign
+    : WINDOW_ (expr WITH)? object_literal aggregate_assign
     ;
 
 aggregate_assign

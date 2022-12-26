@@ -26,20 +26,20 @@ lexer grammar ArangoDbLexer;
 options { caseInsensitive = true; }
 
 //keywrods
-COLLECT:                  'COLLECT';
-FILTER:                   'FILTER';
+COLLECT_:                  'COLLECT';
+FILTER_:                   'FILTER';
 FOR:                      'FOR';
 INSERT:                   'INSERT';
 LET:                      'LET';
-LIMIT:                    'LIMIT';
+LIMIT_:                    'LIMIT';
 REMOVE:                   'REMOVE';
 REPLACE:                  'REPLACE';
 RETURN:                   'RETURN';
-SEARCH:                   'SEARCH';
-SORT:                     'SORT';
+SEARCH_:                   'SEARCH';
+SORT_:                     'SORT';
 UPDATE:                   'UPDATE';
 UPSERT:                   'UPSERT';
-WINDOW:                   'WINDOW';
+WINDOW_:                   'WINDOW';
 WITH:                     'WITH';
 
 AGGREGATE:                'AGGREGATE';
