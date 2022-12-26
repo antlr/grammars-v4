@@ -78,11 +78,11 @@ string_
    ;
 
 name
-   : NAME
+   : NAME_
    ;
 
 number
-   : NUMBER
+   : NUMBER_
    ;
 
 opcode
@@ -593,12 +593,12 @@ TYA
    ;
 
 
-NAME
+NAME_
    : [a-zA-Z] [a-zA-Z0-9."]*
    ;
 
 
-NUMBER
+NUMBER_
    : '$'? [0-9a-fA-F] +
    ;
 
