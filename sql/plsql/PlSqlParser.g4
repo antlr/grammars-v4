@@ -253,7 +253,7 @@ drop_rollback_segment
 drop_role
     : DROP ROLE role_name ';'
     ;
- 
+
 create_rollback_segment
     : CREATE PUBLIC? ROLLBACK SEGMENT rollback_segment_name (TABLESPACE tablespace | storage_clause)*
     ;
@@ -4392,7 +4392,20 @@ table_alias
     ;
 
 where_clause
-    : WHERE (CURRENT OF cursor_name | expression)
+    : WHERE ((CURRENT OF cursor_name | expression) | all_some_any_where_statment)
+    ;
+
+all_some_any_where_statment
+    :expression dingliang_compare_operator (SOME | ALL | ANY) '(' expression (',' expression)* ')'
+    ;
+
+//定量比较运算符
+dingliang_compare_operator: EQUALS_OP
+    | GREATER_THAN_OP
+    | LESS_THAN_OP
+    | GREATER_OR_EQ_THAN_OP
+    | LESS_OR_EQ_THAN_OP
+    | NOT_EQUAL_OP
     ;
 
 into_clause
