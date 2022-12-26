@@ -87,31 +87,31 @@ argument
    ;
 
 ws
-   : WS
+   : WS_
    ;
 
 eol
-   : WS? EOL
+   : WS_? EOL_
    ;
 
 comment
-   : COMMENT
+   : COMMENT_
    ;
 
 label
-   : LABEL
+   : LABEL_
    | register_
    | standard_opcode
    | pseudo_opcode
    ;
 
 variable
-   : LABEL
+   : LABEL_
    | register_
    | standard_opcode
    | pseudo_opcode
-   | LPAREN LABEL RPAREN
-   | variable LPAREN LABEL RPAREN
+   | LPAREN LABEL_ RPAREN
+   | variable LPAREN LABEL_ RPAREN
    ;
 
 expression
@@ -131,11 +131,11 @@ atom
    ;
 
 inte
-   : INTE
+   : INTE_
    ;
 
 decimal
-   : (PLUS | MINUS)? DECIMAL
+   : (PLUS | MINUS)? DECIMAL_
    ;
 
 register_
@@ -545,7 +545,7 @@ ZL : 'ZL';
 ZOUT : 'ZOUT';
 ZQ : 'ZQ';
 
-COMMENT
+COMMENT_
    : '#' ~ [\r\n]*
    ;
 
@@ -581,24 +581,24 @@ RPAREN
    : ')'
    ;
 
-EOL
+EOL_
    : [\r\n]+
    ;
 
-LABEL
+LABEL_
    : [a-zA-Z0-9_.+\\\-/*=&]+
    ;
 
-INTE
+INTE_
    : [0-9]+ ('DEC' | 'D')
    ;
 
-DECIMAL
+DECIMAL_
    : ([0-9]+ ('.' [0-9]+)?)
    | ('.' [0-9]+)
    ;
 
-WS
+WS_
    : [ \t]+
    ;
 
