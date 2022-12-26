@@ -36,7 +36,7 @@ AND               : 'and';
 ARRAY             : 'array';
 AT                : 'at';
 BEGIN             : 'begin';
-BODY              : 'body';
+BODY_              : 'body';
 CASE              : 'case';
 CONSTANT          : 'constant';
 DECLARE           : 'declare';
@@ -103,7 +103,7 @@ WHITESPACE        : [ \t\r\n]+               -> channel(HIDDEN);
 LINE_COMMENT      : '--' ~[\r\n]*            -> channel(HIDDEN);
 
 IDENTIFIER        : LETTER+ [A-Z_0-9]*;
-NUMERIC_LITERAL   : DECIMAL_LITERAL | BASED_LITERAL;
+NUMERIC_LITERAL_   : DECIMAL_LITERAL | BASED_LITERAL;
 DECIMAL_LITERAL   : NUMERAL ('.' NUMERAL)? EXPONENT?;
 NUMERAL           : DIGIT+ ('_'? DIGIT)*;
 EXPONENT          : 'E' '+'? NUMERAL | 'E' '-' NUMERAL;
@@ -112,8 +112,8 @@ BASED_NUMERAL     : EXTENDED_DIGIT ('_'? EXTENDED_DIGIT)*;
 EXTENDED_DIGIT    : DIGIT | [A-F];
 BASE              : NUMERAL;
 
-CHARACTER_LITERAL : '\'' (~['\\\r\n]) '\'';
-STRING_LITERAL    : '"' ('""' | ~('"') )* '"';
+CHARACTER_LITERAL_ : '\'' (~['\\\r\n]) '\'';
+STRING_LITERAL_    : '"' ('""' | ~('"') )* '"';
 
 fragment LETTER   : [A-Z];
 fragment DIGIT    : [0-9];

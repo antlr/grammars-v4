@@ -154,7 +154,7 @@ task_item
     ;
 
 task_body
-    : TASK BODY defining_identifier aspect_specification? IS declarative_part
+    : TASK BODY_ defining_identifier aspect_specification? IS declarative_part
         BEGIN handled_sequence_of_statements END task_identifier? SEMI
     ;
 
@@ -189,7 +189,7 @@ protected_element_declaration
     ;
 
 protected_body
-    : PROTECTED BODY defining_identifier aspect_specification? IS protected_operation_item* END protected_identifier? SEMI
+    : PROTECTED BODY_ defining_identifier aspect_specification? IS protected_operation_item* END protected_identifier? SEMI
     ;
 
 protected_operation_item
@@ -512,7 +512,7 @@ component_definition
     ;
 
 defining_character_literal
-    : CHARACTER_LITERAL
+    : CHARACTER_LITERAL_
     ;
 
 assign_expression
@@ -585,15 +585,15 @@ primary
     ;
 
 numeric_literal
-    : NUMERIC_LITERAL
+    : NUMERIC_LITERAL_
     ;
 
 character_literal
-    : CHARACTER_LITERAL
+    : CHARACTER_LITERAL_
     ;
 
 string_literal
-    : STRING_LITERAL
+    : STRING_LITERAL_
     ;
 
 logical_operator
@@ -873,7 +873,7 @@ name
     ;
 
 package_body
-    : PACKAGE BODY defining_program_unit_name aspect_specification? IS
+    : PACKAGE BODY_ defining_program_unit_name aspect_specification? IS
         declarative_part
         (BEGIN handled_sequence_of_statements)?
         END ( (name DOT)? id_)? SEMI
@@ -891,15 +891,15 @@ subprogram_body_stub
     ;
 
 package_body_stub
-    : PACKAGE BODY defining_identifier IS SEPARATE aspect_specification? SEMI
+    : PACKAGE BODY_ defining_identifier IS SEPARATE aspect_specification? SEMI
     ;
 
 task_body_stub
-    : TASK BODY defining_identifier IS SEPARATE aspect_specification? SEMI
+    : TASK BODY_ defining_identifier IS SEPARATE aspect_specification? SEMI
     ;
 
 protected_body_stub
-    : PROTECTED BODY defining_identifier IS SEPARATE aspect_specification? SEMI
+    : PROTECTED BODY_ defining_identifier IS SEPARATE aspect_specification? SEMI
     ;
 
 selector_name
