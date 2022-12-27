@@ -4396,17 +4396,7 @@ where_clause
     ;
 
 quantitative_where_stmt
-    : expression quantitative_compare_operator (SOME | ALL | ANY) '(' expression (',' expression)* ')'
-    ;
-
-//quantitative comparison operator
-quantitative_compare_operator
-    : EQUALS_OP
-    | GREATER_THAN_OP
-    | LESS_THAN_OP
-    | GREATER_THAN_OR_EQ_OP
-    | LESS_THAN_OR_EQ_OP
-    | NOT_EQUAL_OP
+    : expression relational_operator (SOME | ALL | ANY) '(' expression (',' expression)* ')'
     ;
 
 into_clause

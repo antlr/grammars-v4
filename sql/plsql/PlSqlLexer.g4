@@ -2326,9 +2326,7 @@ CARRET_OPERATOR_PART:      '^';
 TILDE_OPERATOR_PART:       '~';
 EXCLAMATION_OPERATOR_PART: '!';
 GREATER_THAN_OP:           '>';
-GREATER_THAN_OR_EQ_OP:     '>=';
 LESS_THAN_OP:              '<';
-LESS_THAN_OR_EQ_OP:        '<=';
 COLON:                     ':';
 SEMICOLON:                 ';';
 
