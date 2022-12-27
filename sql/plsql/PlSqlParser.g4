@@ -4392,20 +4392,20 @@ table_alias
     ;
 
 where_clause
-    : WHERE ((CURRENT OF cursor_name | expression) | all_some_any_where_statment)
+    : WHERE (CURRENT OF cursor_name | expression | quantitative_where_stmt)
     ;
 
-all_some_any_where_statment
-    : expression dingliang_compare_operator (SOME | ALL | ANY) '(' expression (',' expression)* ')'
+quantitative_where_stmt
+    : expression quantitative_compare_operator (SOME | ALL | ANY) '(' expression (',' expression)* ')'
     ;
 
-//定量比较运算符
-dingliang_compare_operator
+//quantitative comparison operator
+quantitative_compare_operator
     : EQUALS_OP
     | GREATER_THAN_OP
     | LESS_THAN_OP
-    | GREATER_OR_EQ_THAN_OP
-    | LESS_OR_EQ_THAN_OP
+    | GREATER_THAN_OR_EQ_OP
+    | LESS_THAN_OR_EQ_OP
     | NOT_EQUAL_OP
     ;
 
