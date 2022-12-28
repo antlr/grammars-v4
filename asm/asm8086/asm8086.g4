@@ -45,7 +45,7 @@ instruction
    ;
 
 lbl
-   : label COLON?
+   : label COLON_OP?
    ;
 
 assemblerdirective
@@ -64,43 +64,43 @@ assemblerdirective
    | rw
    | rb
    | rs
-   | DOT
+   | DOT_OP
    ;
 
 rw
-   : name? RW expression
+   : name? RW_ expression
    ;
 
 rb
-   : name? RB expression
+   : name? RB_ expression
    ;
 
 rs
-   : name? RS expression
+   : name? RS_ expression
    ;
 
 cseg
-   : CSEG expression?
+   : CSEG_ expression?
    ;
 
 dseg
-   : DSEG expression?
+   : DSEG_ expression?
    ;
 
 dw
-   : DW expressionlist
+   : DW_ expressionlist
    ;
 
 db
-   : DB expressionlist
+   : DB_ expressionlist
    ;
 
 dd
-   : DD expressionlist
+   : DD_ expressionlist
    ;
 
 equ
-   : name EQU expression
+   : name EQU_ expression
    ;
 
 if_
@@ -109,7 +109,7 @@ if_
 
 assemblerexpression
    : assemblerterm (assemblerlogical assemblerterm)*
-   | RP assemblerexpression LP
+   | RP_OP assemblerexpression LP_OP
    ;
 
 assemblerlogical
@@ -128,15 +128,15 @@ endif_
    ;
 
 end
-   : END
+   : END_
    ;
 
 org
-   : ORG expression
+   : ORG_ expression
    ;
 
 title
-   : TITLE string_
+   : TITLE_ string_
    ;
 
 include_
@@ -144,7 +144,7 @@ include_
    ;
 
 expressionlist
-   : expression (COMMA expression)*
+   : expression (COMMA_OP expression)*
    ;
 
 label
@@ -156,7 +156,7 @@ expression
    ;
 
 multiplyingExpression
-   : argument ((STAR | SLASH | MOD | AND) argument)*
+   : argument ((STAR_OP | SLASH_OP | MOD | AND) argument)*
    ;
 
 argument
@@ -165,21 +165,21 @@ argument
    | register_
    | name
    | string_
-   | RP expression LP
-   | (number | name)? LB expression RB_
+   | RP_OP expression LP_OP
+   | (number | name)? LB_OP expression RB_OP
    | ptr expression
    | NOT expression
    | OFFSET expression
    | LENGTH expression
-   | register_ COLON expression
+   | register_ COLON_OP expression
    ;
 
 ptr
-   : (BYTE | WORD | DWORD)? PTR
+   : (BYTE | WORD | DWORD)? PTR_
    ;
 
 dollar
-   : DOLLAR
+   : DOLLAR_OP
    ;
 
 register_
@@ -211,11 +211,11 @@ string_
    ;
 
 name
-   : NAME
+   : NAME_
    ;
 
 number
-   : sign? NUMBER
+   : sign? NUMBER_
    ;
 
 opcode
@@ -340,35 +340,35 @@ opcode
    ;
 
 rep
-   : REP
+   : REP_
    | REPE
    | REPNE
    | REPNZ
    | REPZ
    ;
 
-sign : PLUS | MINUS ;
+sign : PLUS_OP | MINUS_OP ;
 
 BYTE : B Y T E ;
 WORD : W O R D ;
 DWORD : D W O R D ;
-DSEG : D S E G ;
-CSEG : C S E G ;
+DSEG_ : D S E G ;
+CSEG_ : C S E G ;
 INCLUDE : I N C L U D E ;
-TITLE : T I T L E ;
-END : E N D ;
-ORG : O R G ;
+TITLE_ : T I T L E ;
+END_ : E N D ;
+ORG_ : O R G ;
 ENDIF : E N D I F ;
 IF : I F ;
-EQU : E Q U ;
-DW : D W ;
-DB : D B ;
-DD : D D ;
-PTR : P T R ;
+EQU_ : E Q U ;
+DW_ : D W ;
+DB_ : D B ;
+DD_ : D D ;
+PTR_ : P T R ;
 OFFSET : O F F S E T ;
-RW : R W ;
-RB : R B ;
-RS : R S ;
+RW_ : R W ;
+RB_ : R B ;
+RS_ : R S ;
 LENGTH : L E N G T H ;
 EQ : E Q ;
 NE : N E ;
@@ -519,34 +519,33 @@ XCHG : X C H G ;
 XLAT : X L A T ;
 XOR : X O R ;
 
-REP : R E P ;
+REP_ : R E P ;
 REPE : R E P E ;
 REPNE : R E P N E ;
 REPNZ : R E P N Z ;
 REPZ : R E P Z ;
 
 
-STAR : '*' ;
-SLASH : '/' ;
-DOLLAR : '$' ;
-PLUS : '+' ;
-MINUS : '-' ;
-NOT_ : '!' ;
-COLON : ':' ;
-DOT : '.' ;
-RP : '(' ;
-LP : ')' ;
-COMMA : ',' ;
-SEMI : ';' ;
-LB : '[' ;
-RB_ : ']' ;
+COLON_OP : ':' ;
+COMMA_OP : ',' ;
+DOLLAR_OP : '$' ;
+DOT_OP : '.' ;
+LB_OP : '[' ;
+LP_OP : ')' ;
+MINUS_OP : '-' ;
+NOT_OP : '!' ;
+PLUS_OP : '+' ;
+RB_OP : ']' ;
+RP_OP : '(' ;
+SEMI_OP : ';' ;
+SLASH_OP : '/' ;
+STAR_OP : '*' ;
 
-
-NAME
+NAME_
    : [.a-zA-Z] [a-zA-Z0-9."_]*
    ;
 
-NUMBER
+NUMBER_
    : [0-9a-fA-F] + ('H' | 'h')?
    ;
 
