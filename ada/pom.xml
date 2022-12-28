@@ -12,6 +12,7 @@
     </parent>
 
 	<modules>
+		<module>ada95</module>
 		<module>ada2012</module>
 	</modules>
 </project>
