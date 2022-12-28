@@ -94,19 +94,19 @@ atom
 
 // string chars, then potentially more than 1 octal constant, then potentially '>'
 string
-    : STRING NUMERIC_LITERAL* '>'?
+    : STRING_ NUMERIC_LITERAL* '>'?
     ;
 
 eol
-   : EOL
+   : EOL_
    ;
 
 comment
-   : COMMENT
+   : COMMENT_
    ;
 
 label
-   : LABEL
+   : LABEL_
    ;
 
 variable
@@ -213,42 +213,34 @@ LOC
    : '.'
    ;
 
-
 RELOC
    : '..'
    ;
-
 
 PLUS
    : '+'
    ;
 
-
 MINUS
    : '-'
    ;
-
 
 TIMES
    : '*'
    ;
 
-
 DIV
    : '/'
    ;
 
-
-LABEL
+LABEL_
    : [a-zA-Z0-9.] + ':'
    ;
-
 
 // the period is considered a letter
 IDENTIFIER
    : [a-zA-Z] [a-zA-Z0-9.]*
    ;
-
 
 NUMERIC_LITERAL
    : [0-9][0-9a-f]*
@@ -266,7 +258,7 @@ DECIMAL_MINUS
    : 'dm' [0-9] +
    ;
 
-STRING
+STRING_
    : '<' [a-zA-Z0-9$*,%/:?#@.]*
    ;
 
@@ -274,15 +266,13 @@ CHAR
     : [a-zA-Z0-9>.] '>' 
     ;
       
-COMMENT
+COMMENT_
    : '"' ~ [\r\n]*
    ;
 
-
-EOL
+EOL_
    : [\r\n]+
    ;
-
 
 WS
    : [ \t] -> skip
