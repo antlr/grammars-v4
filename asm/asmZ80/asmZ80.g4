@@ -50,7 +50,7 @@ instruction
    ;
 
 opcode
-   : OPCODE
+   : OPCODE_
    ;
 
 register_
@@ -103,15 +103,15 @@ string_
    ;
 
 name
-   : NAME
+   : NAME_
    ;
 
 number
-   : NUMBER
+   : NUMBER_
    ;
 
 comment
-   : COMMENT
+   : COMMENT_
    ;
 
 REGISTER
@@ -122,7 +122,7 @@ ASSEMBLER_DIRECTIVE
    : (O R G) | (E N D) | (E Q U) | (D E F B) | (D E F W) | (D S) | (I F) | (E N D I F) | (S E T)
    ;
 
-OPCODE
+OPCODE_
    : (A D C) | (A D D) | (A N D) | (B I T) | (C A L L) | (C C F) | (C P) | (C P D) | (C P D R) | (C P I) | (C P I R) | (C P L) | (D A A) | (D E C) | (D I) | (D J N Z) | (E I) | (E X) | (E X X) | (I M) | (I N) | (I N C) | (I N D) | (I N D R) | (I N I) | (I N I R) | (J P) | (J R) | (L D) | (L D D) | (L D D R) | (L D I) | (L D I R) | (N E G) | (N O P) | (O R) | (O T D R) | (O T I R) | (O U T) | (O U T D) | (O U T I) | (P O P) | (P U S H) | (R E S) | (R E T) | (R E T I) | (R E T N) | (R L) | (R L A) | (R L C) | (R L C A) | (R L D) | (R R) | (R R A) | (R R C) | (R R C A) | (R R D) | (R S T) | (S B C) | (S C F) | (S E T) | (S L A) | (S L L) | (S L '1') | (S R A) | (S R L) | (S U B) | (X O R)
    ;
 
@@ -230,15 +230,15 @@ fragment Z
    : ('z' | 'Z')
    ;
 
-NAME
+NAME_
    : [a-zA-Z] [a-zA-Z0-9."]*
    ;
 
-NUMBER
+NUMBER_
    : '$'? [0-9a-fA-F] + ('H' | 'h')?
    ;
 
-COMMENT
+COMMENT_
    : ';' ~ [\r\n]*
    ;
 
