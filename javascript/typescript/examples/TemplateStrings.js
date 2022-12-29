@@ -11,3 +11,10 @@ var nested = `aaa${`bbb`}ccc`;
 let str =
     `${dsName}${parameterStr ? `( ${parameterStr} )` : ""}${returns ? `{
 ${returns}}` : ""}`;
+
+// https://github.com/antlr/grammars-v4/issues/2978
+let templateStringWithEscapes = `\\ \` \n \$`;
+
+// https://github.com/antlr/grammars-v4/issues/2978
+let templateStringWithEscapedLineBreak = `\
+`;
