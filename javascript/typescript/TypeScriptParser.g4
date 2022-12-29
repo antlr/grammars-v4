@@ -756,6 +756,7 @@ templateStringLiteral
 templateStringAtom
     : TemplateStringAtom
     | TemplateStringStartExpression singleExpression TemplateCloseBrace
+    | TemplateStringEscapeAtom
     ;
 
 numericLiteral
