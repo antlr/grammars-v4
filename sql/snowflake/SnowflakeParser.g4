@@ -149,6 +149,7 @@ other_command
     | truncate_materialized_view
     | truncate_table
     | unset
+    | call
     ;
 
 copy_into_table
