@@ -37,3 +37,4 @@ create task t as call sp1();
 create user u;
 create view v as select 1 as c;
 create warehouse w;
+create temporary table t(i int);

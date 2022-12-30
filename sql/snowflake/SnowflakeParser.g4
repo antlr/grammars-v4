@@ -2162,7 +2162,7 @@ temporary
     ;
 
 table_type
-    : ( ( LOCAL | GLOBAL ) temporary | VOLATILE ) | TRANSIENT
+    : ( ( LOCAL | GLOBAL )? temporary | VOLATILE ) | TRANSIENT
     ;
 
 with_tags
