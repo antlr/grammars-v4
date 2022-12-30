@@ -253,7 +253,7 @@ drop_rollback_segment
 drop_role
     : DROP ROLE role_name ';'
     ;
- 
+
 create_rollback_segment
     : CREATE PUBLIC? ROLLBACK SEGMENT rollback_segment_name (TABLESPACE tablespace | storage_clause)*
     ;
