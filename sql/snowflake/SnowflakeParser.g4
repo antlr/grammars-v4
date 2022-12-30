@@ -1388,6 +1388,7 @@ create_command
     | create_storage_integration
     | create_stream
     | create_table
+    | create_table_as_select
     //    | create_|_alter_table_…_constraint
     | create_tag
     | create_task
@@ -2245,6 +2246,17 @@ create_table
         with_row_access_policy?
         with_tags?
         comment_clause?
+    ;
+
+create_table_as_select
+    : CREATE or_replace? table_type? TABLE if_not_exists? object_name
+        ('(' column_decl_item_list ')')?
+        cluster_by?
+        copy_grants?
+        with_row_access_policy?
+        with_tags?
+        comment_clause?
+        AS select_statement
     ;
 
 create_tag

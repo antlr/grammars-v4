@@ -38,3 +38,5 @@ create user u;
 create view v as select 1 as c;
 create warehouse w;
 create temporary table t(i int);
+create table t2(i int) as select(i) from t;
+create table t3 as select(i) from t;
