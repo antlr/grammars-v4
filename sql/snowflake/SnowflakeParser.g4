@@ -3228,6 +3228,7 @@ id_
     | DOUBLE_QUOTE_ID
     | DOUBLE_QUOTE_BLANK
     | keyword
+    | builtin_function
     ;
 
 keyword
@@ -3235,6 +3236,13 @@ keyword
     | BIGINT
     | STAGE
     // etc
+    ;
+
+builtin_function
+    : IFF
+    | SUM
+    | AVG
+    | MIN
     ;
 
 pattern
@@ -3273,6 +3281,7 @@ expr
     | function_call
     | expr COLLATE string
     | case_expression
+    | iff_expr
     | full_column_name
     | bracket_expression
     | op=('+' | '-') expr
@@ -3287,6 +3296,10 @@ expr
     | over_clause
     | CAST LR_BRACKET expr AS data_type RR_BRACKET
     | json_literal
+    ;
+
+iff_expr
+    : IFF '(' search_condition ',' expr ',' expr ')'
     ;
 
 json_literal
