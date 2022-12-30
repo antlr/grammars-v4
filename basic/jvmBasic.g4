@@ -43,7 +43,7 @@ amperoper
    ;
 
 linenumber
-   : NUMBER
+   : NUMBER_
    ;
 
 amprstmt
@@ -288,11 +288,11 @@ onerrstmt
    ;
 
 prstmt
-   : PRNUMBER NUMBER
+   : PRNUMBER NUMBER_
    ;
 
 instmt
-   : INNUMBER NUMBER
+   : INNUMBER NUMBER_
    ;
 
 storestmt
@@ -333,7 +333,7 @@ restorestmt
 
 // expressions and such
 number
-   :  ('+' | '-')? (NUMBER | FLOAT)
+   :  ('+' | '-')? (NUMBER_ | FLOAT)
    ;
 
 func_
@@ -402,7 +402,7 @@ var_
    ;
 
 varname
-   : LETTERS (LETTERS | NUMBER)*
+   : LETTERS (LETTERS | NUMBER_)*
    ;
 
 varsuffix
@@ -1126,8 +1126,8 @@ LETTERS
    ;
 
 
-NUMBER
-   : ('0' .. '9') + ('E' NUMBER)*
+NUMBER_
+   : ('0' .. '9') + ('E' NUMBER_)*
    ;
 
 
