@@ -3225,9 +3225,11 @@ string_list
 
 id_
     : ID
+    | ID2
     | DOUBLE_QUOTE_ID
     | DOUBLE_QUOTE_BLANK
     | keyword
+    | data_type
     | builtin_function
     ;
 
@@ -3235,14 +3237,28 @@ keyword
     : INT
     | BIGINT
     | STAGE
+    | USER
+    | TYPE
+    | CLUSTER
+    | TEMP
+    | FUNCTION
+    | REGION
+    | ROLLUP
+    | AT_KEYWORD
+    | TIMESTAMP
     // etc
     ;
 
 builtin_function
+    // If there is a lexer entry for a function we also need to add the token here
+    // as it otherwise will not be picked up by the id_ rule
     : IFF
     | SUM
     | AVG
     | MIN
+    | COALESCE
+    | CURRENT_TIMESTAMP
+    | CURRENT_DATE
     ;
 
 pattern
