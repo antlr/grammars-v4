@@ -3637,14 +3637,14 @@ join_clause
     ;
 
 at_before
-    : AT
+    : AT_KEYWORD
       LR_BRACKET (
-        TIMESTAMP ARROW string
-        | OFFSET ARROW string
-        | STATEMENT ARROW id_
-        | STREAM ARROW string
+        TIMESTAMP ASSOC expr
+        | OFFSET ASSOC expr
+        | STATEMENT ASSOC string
+        | STREAM ASSOC string
       ) RR_BRACKET
-    | BEFORE LR_BRACKET STATEMENT ARROW id_ RR_BRACKET
+    | BEFORE LR_BRACKET STATEMENT ASSOC string RR_BRACKET
     ;
 
 end
