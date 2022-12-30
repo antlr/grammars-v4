@@ -19,3 +19,6 @@ select oldt.* ,newt.*
     full outer join my_table at(statement => '8e5d0ca9-005e-44e6-b858-a8f5b37c5726') as newt
     on oldt.id = newt.id
 where oldt.id is null or newt.id is null;
+
+-- having
+select department_id from employees group by department_id having count(*) < 10;

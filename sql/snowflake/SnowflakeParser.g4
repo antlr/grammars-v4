@@ -3256,6 +3256,7 @@ builtin_function
     | SUM
     | AVG
     | MIN
+    | COUNT
     | COALESCE
     | CURRENT_TIMESTAMP
     | CURRENT_DATE
@@ -3801,7 +3802,7 @@ group_by_clause
     ;
 
 having_clause
-    : HAVING expr
+    : HAVING search_condition
     ;
 
 qualify_clause
