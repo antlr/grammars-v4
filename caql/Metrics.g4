@@ -1,16 +1,16 @@
 grammar Metrics;
 
 expr:
-    op=(AND|OR) LEFT_PAREN metricsName=STRING COLON metricsValue=STRING (metricsMult)* RIGHT_PAREN
+    op=(AND_|OR_) LEFT_PAREN_ metricsName=STRING_ COLON_ metricsValue=STRING_ (metricsMult)* RIGHT_PAREN_
     ;
-metricsMult: COMMA metricsName=STRING COLON metricsValue=STRING;
-LEFT_PAREN:  '(';
-RIGHT_PAREN: ')';
-AND:    'and';
-OR:     'or';
-COMMA: ',';
-STRING: [a-zA-Z0-9_*=/"]+[a-zA-Z0-9_*=/ "]+[a-zA-Z0-9_*=/"]+;
-COLON: ':';
+metricsMult: COMMA_ metricsName=STRING_ COLON_ metricsValue=STRING_;
+LEFT_PAREN_:  '(';
+RIGHT_PAREN_: ')';
+AND_:    'and';
+OR_:     'or';
+COMMA_: ',';
+STRING_: [a-zA-Z0-9_*=/"]+[a-zA-Z0-9_*=/ "]+[a-zA-Z0-9_*=/"]+;
+COLON_: ':';
 
-WS: [ \t\n\r\u000C]+ -> skip;
+WS_: [ \t\n\r\u000C]+ -> skip;
 SHEBANG : '#' '!' ~('\n'|'\r')* -> channel(HIDDEN);

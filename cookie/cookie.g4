@@ -58,7 +58,7 @@ word
    ;
 
 token
-   : TOKEN
+   : TOKEN_
    ;
 
 quoted_string
@@ -71,7 +71,7 @@ STRING
    ;
 
 
-TOKEN
+TOKEN_
    : ('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '-' | ' ' | '/' | '_' | ':' | ',')+
    ;
 

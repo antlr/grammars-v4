@@ -19,8 +19,8 @@ vectorOperation
     | vectorOperation vectorMatchOp vectorOperation #match
 
     | FUNCTION LEFT_BRACE vectorOperation multMetrics*  RIGHT_BRACE # opMethod
-    | LEFT_PAREN vectorOperation RIGHT_PAREN #paren
-    | FUNCTION LEFT_PAREN  metricsName=STRING COMMA  condition=STRING (COMMA LIMIT size=NUMBER)? RIGHT_PAREN metricsAggregation* #fuction
+    | LEFT_PAREN_ vectorOperation RIGHT_PAREN_ #paren
+    | FUNCTION LEFT_PAREN_  metricsName=STRING_ COMMA_  condition=STRING_ (COMMA_ LIMIT size=NUMBER)? RIGHT_PAREN_ metricsAggregation* #fuction
     | vectorOperation metricsAggregation # pip
     | NUMBER #number
     ;
@@ -32,8 +32,8 @@ powOp:          POW grouping?;
 multOp:         (MULT | DIV | MOD) grouping?;
 addOp:          (ADD | SUB) grouping?;
 compareOp:      (DEQ | NE | GT | LT | GE | LE) BOOL? grouping?;
-andUnlessOp:    (AND | UNLESS) grouping?;
-orOp:           OR grouping?;
+andUnlessOp:    (AND_ | UNLESS) grouping?;
+orOp:           OR_ grouping?;
 vectorMatchOp:  (ON | UNLESS) grouping?;
 subqueryOp:     SUBQUERY_RANGE offsetOp?;
 offsetOp:       OFFSET DURATION;
@@ -41,35 +41,35 @@ offsetOp:       OFFSET DURATION;
 // Functions
 
 parameter:     literal | vectorOperation;
-parameterList: LEFT_PAREN (parameter (COMMA parameter)*)? RIGHT_PAREN;
+parameterList: LEFT_PAREN_ (parameter (COMMA_ parameter)*)? RIGHT_PAREN_;
 metricsAggregation: LINE_ AGGREGATION_OPERATOR parameterList;
-multMetrics: COMMA vectorOperation;
+multMetrics: COMMA_ vectorOperation;
 
 
-by:      BY labelNameList;
-without: WITHOUT labelNameList;
+by:      BY_ labelNameList;
+without: WITHOUT_ labelNameList;
 
 // Vector one-to-one/one-to-many joins
 
 grouping:   (on_ | ignoring) (groupLeft | groupRight)?;
 on_:         ON labelNameList;
-ignoring:   IGNORING labelNameList;
+ignoring:   IGNORING_ labelNameList;
 groupLeft:  GROUP_LEFT labelNameList?;
 groupRight: GROUP_RIGHT labelNameList?;
 
 // Label names
 
 labelName:     keyword | METRIC_NAME | LABEL_NAME;
-labelNameList: LEFT_PAREN (labelName (COMMA labelName)*)? RIGHT_PAREN;
+labelNameList: LEFT_PAREN_ (labelName (COMMA_ labelName)*)? RIGHT_PAREN_;
 
 keyword
-    : AND
-    | OR
+    : AND_
+    | OR_
     | UNLESS
-    | BY
-    | WITHOUT
+    | BY_
+    | WITHOUT_
     | ON
-    | IGNORING
+    | IGNORING_
     | GROUP_LEFT
     | GROUP_RIGHT
     | OFFSET
@@ -78,4 +78,4 @@ keyword
     | FUNCTION
     ;
 
-literal: NUMBER | STRING;
+literal: NUMBER | STRING_;

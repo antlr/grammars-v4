@@ -88,7 +88,7 @@ deref
     ;
 
 gensym
-    : SYMBOL '#'
+    : SYMBOL_ '#'
     ;
 
 lambda_
@@ -133,7 +133,7 @@ literal
 string_: STRING;
 hex_: HEX;
 bin_: BIN;
-bign: BIGN;
+bign: BIGN_;
 number
     : FLOAT
     | hex_
@@ -158,10 +158,10 @@ simple_keyword: ':' symbol;
 macro_keyword: ':' ':' symbol;
 
 symbol: ns_symbol | simple_sym;
-simple_sym: SYMBOL;
-ns_symbol: NS_SYMBOL;
+simple_sym: SYMBOL_;
+ns_symbol: NS_SYMBOL_;
 
-param_name: PARAM_NAME;
+param_name: PARAM_NAME_;
 
 // Lexers
 //--------------------------------------------------------------------
@@ -196,7 +196,7 @@ HEXD: [0-9a-fA-F] ;
 HEX: '0' [xX] HEXD+ ;
 BIN: '0' [bB] [10]+ ;
 LONG: '-'? [0-9]+[lL]?;
-BIGN: '-'? [0-9]+[nN];
+BIGN_: '-'? [0-9]+[nN];
 
 CHAR_U
     : '\\' 'u'[0-9D-Fd-f] HEXD HEXD HEXD ;
@@ -214,17 +214,17 @@ NIL : 'nil';
 
 BOOLEAN : 'true' | 'false' ;
 
-SYMBOL
+SYMBOL_
     : '.'
     | '/'
     | NAME
     ;
 
-NS_SYMBOL
-    : NAME '/' SYMBOL
+NS_SYMBOL_
+    : NAME '/' SYMBOL_
     ;
 
-PARAM_NAME: '%' ((('1'..'9')('0'..'9')*)|'&')? ;
+PARAM_NAME_: '%' ((('1'..'9')('0'..'9')*)|'&')? ;
 
 // Fragments
 //--------------------------------------------------------------------
