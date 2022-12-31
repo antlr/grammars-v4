@@ -73,7 +73,7 @@ constant
    ;
 
 variable
-   : VARIABLE
+   : VARIABLE_
    ;
 
 func_
@@ -219,7 +219,7 @@ I
    ;
 
 
-VARIABLE
+VARIABLE_
    : VALID_ID_START VALID_ID_CHAR*
    ;
 

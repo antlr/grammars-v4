@@ -39,7 +39,7 @@ bibcode
    ;
 
 year
-   : DIGIT DIGIT DIGIT DIGIT
+   : DIGIT_ DIGIT_ DIGIT_ DIGIT_
    ;
 
 publish
@@ -76,7 +76,7 @@ letter
    ;
 
 digit
-   : DIGIT
+   : DIGIT_
    ;
 
 UPPERLETTER
@@ -87,7 +87,7 @@ LOWERLETTER
    : [a-z]
    ;
 
-DIGIT
+DIGIT_
    : [0-9]
    ;
 
