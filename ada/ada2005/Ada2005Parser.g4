@@ -1,5 +1,5 @@
 /*
-Ada 2012 grammar.
+Ada 2005 grammar.
 The MIT License (MIT).
 
 Copyright (c) 2022, Michał Lorek.
@@ -20,17 +20,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-parser grammar AdaParser;
+parser grammar Ada2005Parser;
 
 
-options { tokenVocab = AdaLexer; }
+options { tokenVocab = Ada2005Lexer; }
 /*
-2 - Lexical Elements
+2 -
 */
 
 
 identifier
    : IDENTIFIER_
+   ;
+
+string_literal
+   : STRING_LITERAL_
    ;
 
 numeric_literal
@@ -40,15 +44,11 @@ numeric_literal
 character_literal
    : CHARACTER_LITERAL_
    ;
-
-string_literal
-   : STRING_LITERAL_
-   ;
 /*
 3 - Declarations and Types
 */
-
-
+   
+   
 basic_declaration
    : type_declaration
    | subtype_declaration
@@ -57,7 +57,6 @@ basic_declaration
    | subprogram_declaration
    | abstract_subprogram_declaration
    | null_procedure_declaration
-   | expression_function_declaration
    | package_declaration
    | renaming_declaration
    | exception_declaration
@@ -77,7 +76,7 @@ type_declaration
    ;
 
 full_type_declaration
-   : TYPE defining_identifier known_discriminant_part? IS type_definition aspect_specification? SEMI
+   : TYPE defining_identifier known_discriminant_part? IS type_definition ';'
    | task_type_declaration
    | protected_type_declaration
    ;
@@ -94,15 +93,11 @@ type_definition
    ;
 
 subtype_declaration
-   : SUBTYPE defining_identifier IS subtype_indication aspect_specification?
+   : SUBTYPE defining_identifier IS subtype_indication ';'
    ;
 
 subtype_indication
-   : null_exclusion? subtype_mark constraint?
-   ;
-
-subtype_mark
-   : identifier
+   : null_exclusion? subtype_mark = name constraint?
    ;
 
 constraint
@@ -122,9 +117,9 @@ composite_constraint
    ;
 
 object_declaration
-   : defining_identifier_list COLON ALIASED? CONSTANT? subtype_indication (ASSIGN expression)? aspect_specification? SEMI
-   | defining_identifier_list COLON ALIASED? CONSTANT? access_definition (ASSIGN expression)? aspect_specification? SEMI
-   | defining_identifier_list COLON ALIASED? CONSTANT? array_type_definition (ASSIGN expression)? aspect_specification? SEMI
+   : defining_identifier_list ':' ALIASED? CONSTANT? subtype_indication (':=' expression)? ';'
+   | defining_identifier_list ':' ALIASED? CONSTANT? access_definition (':=' expression)? ';'
+   | defining_identifier_list ':' ALIASED? CONSTANT? array_type_definition (':=' expression)? ';'
    | single_task_declaration
    | single_protected_declaration
    ;
@@ -134,11 +129,11 @@ defining_identifier_list
    ;
 
 number_declaration
-   : defining_identifier_list COLON CONSTANT ASSIGN expression
+   : defining_identifier_list ':' CONSTANT ':=' static_expression = expression ';'
    ;
 
 derived_type_definition
-   : ABSTRACT? LIMITED? NEW subtype_indication ((AND interface_list)? record_extension_part)?
+   : ABSTRACT? LIMITED? NEW parent_subtype_indication = subtype_indication ((AND interface_list)? record_extension_part)?
    ;
 
 range_constraint
@@ -147,7 +142,7 @@ range_constraint
 
 range
    : range_attribute_reference
-   | simple_expression DOTDOT simple_expression
+   | simple_expression '..' simple_expression
    ;
 
 enumeration_type_definition
@@ -156,7 +151,11 @@ enumeration_type_definition
 
 enumeration_literal_specification
    : defining_identifier
-   | character_literal
+   | defining_character_literal
+   ;
+
+defining_character_literal
+   : character_literal
    ;
 
 integer_type_definition
@@ -165,11 +164,11 @@ integer_type_definition
    ;
 
 signed_integer_type_definition
-   : RANGE_ expression '..' expression
+   : RANGE_ static_simple_expression = simple_expression '..' static_simple_expression = simple_expression
    ;
 
 modular_type_definition
-   : MOD expression
+   : MOD static_expression = expression
    ;
 
 real_type_definition
@@ -178,11 +177,11 @@ real_type_definition
    ;
 
 floating_point_definition
-   : DIGITS expression real_range_specification?
+   : DIGITS static_expression = expression real_range_specification?
    ;
 
 real_range_specification
-   : RANGE_ expression DOTDOT expression
+   : RANGE_ static_simple_expression = simple_expression '..' static_simple_expression = simple_expression
    ;
 
 fixed_point_definition
@@ -191,15 +190,15 @@ fixed_point_definition
    ;
 
 ordinary_fixed_point_definition
-   : DELTA expression real_range_specification
+   : DELTA static_expression = expression real_range_specification
    ;
 
 decimal_fixed_point_definition
-   : DELTA expression DIGITS expression real_range_specification?
+   : DELTA static_expression = expression DIGITS static_expression = expression real_range_specification?
    ;
 
 digits_constraint
-   : DIGITS expression range_constraint?
+   : DIGITS static_expression = expression range_constraint?
    ;
 
 array_type_definition
@@ -212,7 +211,7 @@ unconstrained_array_definition
    ;
 
 index_subtype_definition
-   : subtype_mark RANGE_ BOX
+   : subtype_mark = name RANGE_ '<>'
    ;
 
 constrained_array_definition
@@ -220,7 +219,7 @@ constrained_array_definition
    ;
 
 discrete_subtype_definition
-   : subtype_indication
+   : discrete_subtype_indication = subtype_indication
    | range
    ;
 
@@ -234,7 +233,7 @@ index_constraint
    ;
 
 discrete_range
-   : subtype_indication
+   : discrete_subtype_indication = subtype_indication
    | range
    ;
 
@@ -244,16 +243,16 @@ discriminant_part
    ;
 
 unknown_discriminant_part
-   : '(' BOX ')'
+   : '(' '<>' ')'
    ;
 
 known_discriminant_part
-   : '(' discriminant_specification (SEMI discriminant_specification)* ')'
+   : '(' discriminant_specification (';' discriminant_specification)* ')'
    ;
 
 discriminant_specification
-   : defining_identifier_list COLON null_exclusion? subtype_mark (ASSIGN expression)?
-   | defining_identifier_list COLON access_definition (ASSIGN expression)?
+   : defining_identifier_list ':' null_exclusion? subtype_mark = name (':=' default_expression)?
+   | defining_identifier_list ':' access_definition (':=' default_expression)?
    ;
 
 default_expression
@@ -265,7 +264,7 @@ discriminant_constraint
    ;
 
 discriminant_association
-   : (selector_name (VL selector_name)* ARROW)? expression
+   : (discriminant_selector_name = selector_name ('|' discriminant_selector_name = selector_name)* '=>')? expression
    ;
 
 record_type_definition
@@ -278,9 +277,9 @@ record_definition
    ;
 
 component_list
-   : component_item+
+   : component_item component_item*
    | component_item* variant_part
-   | NULL_ SEMI
+   | NULL_ ';'
    ;
 
 component_item
@@ -289,25 +288,24 @@ component_item
    ;
 
 component_declaration
-   : defining_identifier_list COLON component_definition (ASSIGN default_expression)? aspect_specification? SEMI
+   : defining_identifier_list ':' component_definition (':=' default_expression)? ';'
    ;
 
 variant_part
-   : CASE direct_name IS variant+ END CASE SEMI
+   : CASE discriminant_direct_name = direct_name IS variant variant* END CASE ';'
    ;
 
 variant
-   : WHEN discrete_choice_list ARROW component_list
+   : WHEN discrete_choice_list '=>' component_list
    ;
 
 discrete_choice_list
-   : discrete_choice (VL discrete_choice)*
+   : discrete_choice ('|' discrete_choice)*
    ;
 
 discrete_choice
-   : choice_expression
-   | subtype_indication
-   | range
+   : expression
+   | discrete_range
    | OTHERS
    ;
 
@@ -316,7 +314,7 @@ record_extension_part
    ;
 
 abstract_subprogram_declaration
-   : overriding_indicator? subprogram_specification IS ABSTRACT aspect_specification?
+   : overriding_indicator? subprogram_specification IS ABSTRACT ';'
    ;
 
 interface_type_definition
@@ -324,7 +322,7 @@ interface_type_definition
    ;
 
 interface_list
-   : subtype_mark (AND subtype_mark)*
+   : interface_subtype_mark = name (AND interface_subtype_mark = name)*
    ;
 
 access_type_definition
@@ -342,7 +340,7 @@ general_access_modifier
    ;
 
 access_to_subprogram_definition
-   : ACCESS PROTECTED? PROCEDURE formal_part? //parameter_profile
+   : ACCESS PROTECTED? PROCEDURE parameter_profile
    | ACCESS PROTECTED? FUNCTION parameter_and_result_profile
    ;
 
@@ -351,13 +349,13 @@ null_exclusion
    ;
 
 access_definition
-   : null_exclusion? ACCESS CONSTANT? subtype_mark
-   | null_exclusion? ACCESS PROTECTED? PROCEDURE formal_part? //parameter_profile
+   : null_exclusion? ACCESS CONSTANT? subtype_mark = name
+   | null_exclusion? ACCESS PROTECTED? PROCEDURE parameter_profile
    | null_exclusion? ACCESS PROTECTED? FUNCTION parameter_and_result_profile
    ;
 
 incomplete_type_declaration
-   : TYPE defining_identifier discriminant_part? (IS TAGGED)? SEMI
+   : TYPE defining_identifier discriminant_part? (IS TAGGED)? ';'
    ;
 
 declarative_part
@@ -389,23 +387,20 @@ proper_body
 /*
 4 - Names and Expressions
 */
-
-
+   
+   
 name
    : direct_name
-   //| explicit_dereference
-   | name DOT ALL
-   | name '(' expression (',' expression)* ')' //indexed_component
-   | name '(' discrete_range ')' //slice
-   | name DOT selector_name //selected_component
-   | name SQ attribute_designator //attribute_reference
-   | type_conversion
-   | name actual_parameter_part //function_call
+   | name '.' ALL //explicit_dereference
+   | prefix = name '(' expression (',' expression)* ')' //indexed_component
+   | prefix = name '(' discrete_range ')' //slice
+   | prefix = name '.' selector_name //selected_component
+   | prefix = name SQ attribute_designator //attribute_reference
+   | subtype_mark = name '(' expression ')'
+   | subtype_mark = name '(' name ')'
+   //| function_name = name
+   | function_prefix = name actual_parameter_part
    | character_literal
-   | qualified_expression
-   //| name                       //generalized_reference
-   | name actual_parameter_part //generalized_indexing
-
    ;
 
 direct_name
@@ -420,20 +415,20 @@ selector_name
    ;
 
 attribute_designator
-   : identifier ('(' expression ')')?
-   | ACCESS__
-   | DELTA__
-   | DIGITS__
-   | MOD__
+   : identifier ('(' static_expression = expression ')')?
+   | Access__
+   | Delta__
+   | Digits__ // TODO
+   
    ;
 
 range_attribute_reference
-   //    : prefix '\'' range_attribute_designator
-   : name '\'' range_attribute_designator
+   : prefix = name SQ range_attribute_designator
    ;
 
 range_attribute_designator
-   : RANGE_ ('(' expression ')')?
+   : Range__ ('(' static_expression = expression ')')? //TODO
+   
    ;
 
 aggregate
@@ -452,12 +447,12 @@ record_component_association_list
    ;
 
 record_component_association
-   : (component_choice_list ARROW)? expression
-   | component_choice_list ARROW BOX
+   : (component_choice_list '=>')? expression
+   | component_choice_list '=>' '<>'
    ;
 
 component_choice_list
-   : selector_name (VL selector_name)*
+   : component_selector_name = selector_name ('|' component_selector_name = selector_name)*
    | OTHERS
    ;
 
@@ -467,7 +462,7 @@ extension_aggregate
 
 ancestor_part
    : expression
-   | subtype_mark
+   | subtype_mark = name
    ;
 
 array_aggregate
@@ -477,8 +472,8 @@ array_aggregate
 
 positional_array_aggregate
    : '(' expression ',' expression (',' expression)* ')'
-   | '(' expression (',' expression)* ',' OTHERS ARROW expression ')'
-   | '(' expression (',' expression)* ',' OTHERS ARROW BOX ')'
+   | '(' expression (',' expression)* ',' OTHERS '=>' expression ')'
+   | '(' expression (',' expression)* ',' OTHERS '=>' '<>' ')'
    ;
 
 named_array_aggregate
@@ -486,8 +481,8 @@ named_array_aggregate
    ;
 
 array_component_association
-   : discrete_choice_list ARROW expression
-   | discrete_choice_list ARROW BOX
+   : discrete_choice_list '=>' expression
+   | discrete_choice_list '=>' '<>'
    ;
 
 expression
@@ -498,35 +493,14 @@ expression
    | relation (XOR relation)*
    ;
 
-choice_expression
-   : choice_relation (AND choice_relation)*
-   | choice_relation (OR choice_relation)*
-   | choice_relation (XOR choice_relation)*
-   | choice_relation (AND THEN choice_relation)*
-   | choice_relation (OR ELSE choice_relation)*
-   ;
-
-choice_relation
-   : simple_expression (relational_operator simple_expression)?
-   ;
-
 relation
    : simple_expression (relational_operator simple_expression)?
-   | simple_expression NOT? IN membership_choice_list
-   ;
-
-membership_choice_list
-   : membership_choice (VL membership_choice)*
-   ;
-
-membership_choice
-   : choice_expression
-   | range
-   | subtype_mark
+   | simple_expression NOT? IN range
+   | simple_expression NOT? IN subtype_mark = name
    ;
 
 simple_expression
-   : (unary_adding_operator)? term (binary_adding_operator term)*
+   : unary_adding_operator? term (binary_adding_operator term)*
    ;
 
 term
@@ -534,7 +508,7 @@ term
    ;
 
 factor
-   : primary (EXPON primary)?
+   : primary ('**' primary)?
    | ABS primary
    | NOT primary
    ;
@@ -545,10 +519,9 @@ primary
    | string_literal
    | aggregate
    | name
+   | qualified_expression
    | allocator
    | '(' expression ')'
-   | '(' conditional_expression ')'
-   | '(' qualified_expression ')'
    ;
 
 logical_operator
@@ -558,98 +531,54 @@ logical_operator
    ;
 
 relational_operator
-   : EQ
-   | NE
-   | LE
-   | GT
-   | LE
-   | GE
+   : '='
+   | '/='
+   | '<'
+   | '<='
+   | '>'
+   | '>='
    ;
 
 binary_adding_operator
-   : PLUS
+   : '+'
    | MINUS
-   | AMPERSAND
+   | '&'
    ;
 
 unary_adding_operator
-   : PLUS
+   : '+'
    | MINUS
    ;
 
 multiplying_operator
-   : MULT
-   | DIV
+   : '*'
+   | '/'
    | MOD
    | REM
    ;
 
 highest_precedence_operator
-   : EXPON
+   : '**'
    | ABS
    | NOT
    ;
 
-conditional_expression
-   : if_expression
-   | case_expression
-   ;
-
-if_expression
-   : IF condition THEN expression (ELSIF condition THEN expression)* (ELSE expression)?
-   ;
-
-condition
-   : expression
-   ;
-
-case_expression
-   : CASE expression IS case_expression_alternative (',' case_expression_alternative)*
-   ;
-
-case_expression_alternative
-   : WHEN discrete_choice_list ARROW expression
-   ;
-
-quantified_expression
-   : FOR quantifier loop_parameter_specification ARROW predicate
-   | FOR quantifier iterator_specification ARROW predicate
-   ;
-
-quantifier
-   : ALL
-   | SOME
-   ;
-
-predicate
-   : expression
-   ;
-
-type_conversion
-   : subtype_mark '(' expression ')'
-   | subtype_mark '(' name ')'
-   ;
-
 qualified_expression
-   : subtype_mark SQ '(' expression ')'
-   | subtype_mark SQ '(' aggregate ')'
+   : subtype_mark = name SQ '(' expression ')'
+   | subtype_mark = name SQ aggregate
    ;
 
 allocator
-   : NEW (subpool_specification)? subtype_indication
-   | NEW (subpool_specification)? qualified_expression
-   ;
-
-subpool_specification
-   : '(' name ')'
+   : NEW subtype_indication
+   | NEW qualified_expression
    ;
 /*
 5 - Statements
 */
-
-
+   
+   
 sequence_of_statements
-   : statement+ label*
+   : statement statement*
    ;
 
 statement
@@ -669,8 +598,7 @@ simple_statement
    | delay_statement
    | abort_statement
    | raise_statement
-   | qualified_expression //code_statement
-
+   | code_statement
    ;
 
 compound_statement
@@ -684,66 +612,68 @@ compound_statement
    ;
 
 null_statement
-   : NULL_ SEMI
+   : NULL_ ';'
    ;
 
 label
+   : '<<' label_statement_identifier = statement_identifier '>>'
+   ;
+
+statement_identifier
    : direct_name
    ;
 
 assignment_statement
-   : name ASSIGN expression SEMI
+   : variable_name = name ':=' expression ';'
    ;
 
 if_statement
-   : IF condition THEN sequence_of_statements (ELSIF condition THEN sequence_of_statements)* (ELSE sequence_of_statements)? END IF SEMI
+   : IF condition THEN sequence_of_statements (ELSIF condition THEN sequence_of_statements)* (ELSE sequence_of_statements)? END IF ';'
+   ;
+
+condition
+   : boolean_expression = expression
    ;
 
 case_statement
-   : CASE expression IS case_statement_alternative case_statement_alternative* END CASE SEMI
+   : CASE expression IS case_statement_alternative case_statement_alternative* END CASE ';'
    ;
 
 case_statement_alternative
-   : WHEN discrete_choice_list ARROW sequence_of_statements
+   : WHEN discrete_choice_list '=>' sequence_of_statements
    ;
 
 loop_statement
-   : (direct_name COLON)? iteration_scheme? LOOP sequence_of_statements END LOOP identifier? SEMI
+   : (loop_statement_identifier = statement_identifier ':')? iteration_scheme? LOOP sequence_of_statements END LOOP loop_identifier = identifier? ';'
    ;
 
 iteration_scheme
    : WHILE condition
    | FOR loop_parameter_specification
-   | FOR iterator_specification
    ;
 
 loop_parameter_specification
    : defining_identifier IN REVERSE? discrete_subtype_definition
    ;
 
-iterator_specification
-   : defining_identifier IN REVERSE? name
-   | defining_identifier (COLON subtype_indication) OF REVERSE? name
-   ;
-
 block_statement
-   : (direct_name COLON)? (DECLARE declarative_part)? BEGIN handled_sequence_of_statements END (identifier)? SEMI
+   : (block_statement_identifier = statement_identifier ':')? (DECLARE declarative_part)? BEGIN handled_sequence_of_statements END block_identifier = identifier? ';'
    ;
 
 exit_statement
-   : EXIT name? (WHEN condition)? SEMI
+   : EXIT loop_name = name? (WHEN condition)? ';'
    ;
 
 goto_statement
-   : GOTO name
+   : GOTO label_name = name ';'
    ;
 /*
 6 - Subprograms
 */
-
-
+   
+   
 subprogram_declaration
-   : overriding_indicator? subprogram_specification aspect_specification? SEMI
+   : overriding_indicator? subprogram_specification ';'
    ;
 
 subprogram_specification
@@ -752,8 +682,7 @@ subprogram_specification
    ;
 
 procedure_specification
-   : PROCEDURE defining_program_unit_name formal_part? //parameter_profile?
-
+   : PROCEDURE defining_program_unit_name parameter_profile
    ;
 
 function_specification
@@ -761,7 +690,7 @@ function_specification
    ;
 
 designator
-   : (name DOT)? identifier
+   : (parent_unit_name '.')? identifier
    | operator_symbol
    ;
 
@@ -771,7 +700,7 @@ defining_designator
    ;
 
 defining_program_unit_name
-   : (name DOT)? defining_identifier
+   : (parent_unit_name '.')? defining_identifier
    ;
 
 operator_symbol
@@ -782,18 +711,22 @@ defining_operator_symbol
    : operator_symbol
    ;
 
+parameter_profile
+   : formal_part?
+   ;
+
 parameter_and_result_profile
-   : formal_part? RETURN null_exclusion? subtype_mark
+   : formal_part? RETURN null_exclusion? subtype_mark = name
    | formal_part? RETURN access_definition
    ;
 
 formal_part
-   : '(' parameter_specification (SEMI parameter_specification)* ')'
+   : '(' parameter_specification (';' parameter_specification)* ')'
    ;
 
 parameter_specification
-   : defining_identifier_list COLON ALIASED? mode_ null_exclusion? subtype_mark (ASSIGN default_expression)?
-   | defining_identifier_list COLON access_definition (ASSIGN default_expression)?
+   : defining_identifier_list ':' mode_ null_exclusion? subtype_mark = name (':=' default_expression)?
+   | defining_identifier_list ':' access_definition (':=' default_expression)?
    ;
 
 mode_
@@ -801,12 +734,12 @@ mode_
    ;
 
 subprogram_body
-   : overriding_indicator? subprogram_specification aspect_specification? IS declarative_part BEGIN handled_sequence_of_statements END designator? SEMI
+   : overriding_indicator? subprogram_specification IS declarative_part BEGIN handled_sequence_of_statements END designator? ';'
    ;
 
 procedure_call_statement
-   : name
-   | name actual_parameter_part SEMI
+   : procedure_name = name ';'
+   | procedure_prefix = name actual_parameter_part ';'
    ;
 
 actual_parameter_part
@@ -814,24 +747,20 @@ actual_parameter_part
    ;
 
 parameter_association
-   : (selector_name ARROW)? explicit_actual_parameter
+   : (formal_parameter_selector_name = selector_name '=>')? explicit_actual_parameter
    ;
 
 explicit_actual_parameter
    : expression
-   | name
+   | variable_name = name
    ;
 
 simple_return_statement
-   : RETURN expression? SEMI
-   ;
-
-extended_return_object_declaration
-   : defining_identifier COLON ALIASED? CONSTANT? return_subtype_indication (ASSIGN expression)?
+   : RETURN expression? ';'
    ;
 
 extended_return_statement
-   : RETURN extended_return_object_declaration (DO handled_sequence_of_statements END RETURN)? SEMI
+   : RETURN defining_identifier ':' ALIASED? return_subtype_indication (':=' expression)? (DO handled_sequence_of_statements END RETURN)? ';'
    ;
 
 return_subtype_indication
@@ -840,41 +769,37 @@ return_subtype_indication
    ;
 
 null_procedure_declaration
-   : overriding_indicator? procedure_specification IS NULL_ aspect_specification? SEMI
-   ;
-
-expression_function_declaration
-   : overriding_indicator? function_specification IS '(' expression ')' aspect_specification? SEMI
+   : overriding_indicator? procedure_specification IS NULL_ ';'
    ;
 /*
 7 - Packages
 */
-
-
+   
+   
 package_declaration
-   : package_specification SEMI
+   : package_specification ';'
    ;
 
 package_specification
-   : PACKAGE defining_program_unit_name aspect_specification? IS basic_declarative_item* (PRIVATE basic_declarative_item*)? END ((name DOT)? identifier)?
+   : PACKAGE defining_program_unit_name IS basic_declarative_item* (PRIVATE basic_declarative_item*)? END ((parent_unit_name '.')? identifier)?
    ;
 
 package_body
-   : PACKAGE BODY_ defining_program_unit_name aspect_specification? IS declarative_part (BEGIN handled_sequence_of_statements)? END ((name DOT)? identifier)? SEMI
+   : PACKAGE BODY_ defining_program_unit_name IS declarative_part (BEGIN handled_sequence_of_statements)? END ((parent_unit_name '.')? identifier)? ';'
    ;
 
 private_type_declaration
-   : TYPE defining_identifier discriminant_part? IS (ABSTRACT? TAGGED)? LIMITED? PRIVATE aspect_specification? SEMI
+   : TYPE defining_identifier discriminant_part? IS (ABSTRACT? TAGGED)? LIMITED? PRIVATE ';'
    ;
 
 private_extension_declaration
-   : TYPE defining_identifier discriminant_part? IS ABSTRACT? (LIMITED | SYNCHRONIZED) NEW subtype_indication (AND interface_list)? WITH PRIVATE aspect_specification? SEMI
+   : TYPE defining_identifier discriminant_part? IS ABSTRACT? (LIMITED | SYNCHRONIZED)? NEW ancestor_subtype_indication = subtype_indication (AND interface_list)? WITH PRIVATE ';'
    ;
 /*
 8 - Visibility Rules
 */
-
-
+   
+   
 overriding_indicator
    : NOT? OVERRIDING
    ;
@@ -885,11 +810,11 @@ use_clause
    ;
 
 use_package_clause
-   : USE name (',' name)* SEMI
+   : USE package_name = name (',' package_name = name)* ';'
    ;
 
 use_type_clause
-   : USE ALL? TYPE subtype_mark (',' subtype_mark)* SEMI
+   : USE TYPE subtype_mark = name (',' subtype_mark = name)* ';'
    ;
 
 renaming_declaration
@@ -901,42 +826,42 @@ renaming_declaration
    ;
 
 object_renaming_declaration
-   : defining_identifier COLON null_exclusion? subtype_mark RENAMES name aspect_specification? SEMI
-   | defining_identifier COLON access_definition RENAMES name aspect_specification? SEMI
+   : defining_identifier ':' null_exclusion? subtype_mark = name RENAMES object_name = name ';'
+   | defining_identifier ':' access_definition RENAMES object_name = name ';'
    ;
 
 exception_renaming_declaration
-   : defining_identifier COLON EXCEPTION RENAMES name aspect_specification? SEMI
+   : defining_identifier ':' EXCEPTION RENAMES exception_name = name ';'
    ;
 
 package_renaming_declaration
-   : PACKAGE defining_program_unit_name RENAMES name aspect_specification? SEMI
+   : PACKAGE defining_program_unit_name RENAMES package_name = name ';'
    ;
 
 subprogram_renaming_declaration
-   : overriding_indicator? subprogram_specification RENAMES name aspect_specification? SEMI
+   : overriding_indicator? subprogram_specification RENAMES callable_entity_name = name ';'
    ;
 
 generic_renaming_declaration
-   : GENERIC PACKAGE defining_program_unit_name RENAMES name aspect_specification? SEMI
-   | GENERIC PROCEDURE defining_program_unit_name RENAMES name aspect_specification? SEMI
-   | GENERIC FUNCTION defining_program_unit_name RENAMES name aspect_specification? SEMI
+   : GENERIC PACKAGE defining_program_unit_name RENAMES generic_package_name = name ';'
+   | GENERIC PROCEDURE defining_program_unit_name RENAMES generic_procedure_name = name ';'
+   | GENERIC FUNCTION defining_program_unit_name RENAMES generic_function_name = name ';'
    ;
 /*
 9 - Tasks and Synchronization
 */
-
-
+   
+   
 task_type_declaration
-   : TASK TYPE defining_identifier known_discriminant_part? aspect_specification? (IS (NEW interface_list WITH)? task_definition)? SEMI
+   : TASK TYPE defining_identifier known_discriminant_part? (IS (NEW interface_list WITH)? task_definition)? ';'
    ;
 
 single_task_declaration
-   : TASK defining_identifier aspect_specification? (IS (NEW interface_list WITH)? task_definition)? SEMI
+   : TASK defining_identifier (IS (NEW interface_list WITH)? task_definition)? ';'
    ;
 
 task_definition
-   : task_item* (PRIVATE task_item*)? END identifier?
+   : task_item* (PRIVATE task_item*)? END task_identifier = identifier?
    ;
 
 task_item
@@ -945,19 +870,19 @@ task_item
    ;
 
 task_body
-   : TASK BODY_ defining_identifier aspect_specification? IS declarative_part BEGIN handled_sequence_of_statements END identifier? SEMI
+   : TASK BODY_ defining_identifier IS declarative_part BEGIN handled_sequence_of_statements END task_identifier = identifier? ';'
    ;
 
 protected_type_declaration
-   : PROTECTED TYPE defining_identifier known_discriminant_part? aspect_specification? IS (NEW interface_list WITH)? protected_definition SEMI
+   : PROTECTED TYPE defining_identifier known_discriminant_part? IS (NEW interface_list WITH)? protected_definition ';'
    ;
 
 single_protected_declaration
-   : PROTECTED defining_identifier aspect_specification? IS (NEW interface_list WITH)? protected_definition SEMI
+   : PROTECTED defining_identifier IS (NEW interface_list WITH)? protected_definition ';'
    ;
 
 protected_definition
-   : protected_operation_declaration* (PRIVATE protected_element_declaration*)? END identifier?
+   : protected_operation_declaration* (PRIVATE protected_element_declaration*)? END protected_identifier = identifier?
    ;
 
 protected_operation_declaration
@@ -972,7 +897,7 @@ protected_element_declaration
    ;
 
 protected_body
-   : PROTECTED BODY_ defining_identifier aspect_specification? IS protected_operation_item* END identifier? SEMI
+   : PROTECTED BODY_ defining_identifier IS protected_operation_item* END protected_identifier = identifier? ';'
    ;
 
 protected_operation_item
@@ -983,18 +908,11 @@ protected_operation_item
    ;
 
 entry_declaration
-   : overriding_indicator? ENTRY defining_identifier ('(' discrete_subtype_definition ')')? formal_part? //parameter_profile
-   aspect_specification? SEMI
+   : overriding_indicator? ENTRY defining_identifier ('(' discrete_subtype_definition ')')? parameter_profile ';'
    ;
 
 accept_statement
-   : ACCEPT_ entry_direct_name ('(' entry_index ')')? formal_part? /*parameter_profile*/
-
-   (DO handled_sequence_of_statements END entry_identifier?)? SEMI
-   ;
-
-entry_direct_name
-   : direct_name
+   : ACCEPT_ entry_direct_name = direct_name ('(' entry_index ')')? parameter_profile (DO handled_sequence_of_statements END entry_identifier = identifier?)? ';'
    ;
 
 entry_index
@@ -1002,16 +920,11 @@ entry_index
    ;
 
 entry_body
-   : ENTRY defining_identifier entry_body_formal_part entry_barrier IS declarative_part BEGIN handled_sequence_of_statements END entry_identifier? SEMI
-   ;
-
-entry_identifier
-   : identifier
+   : ENTRY defining_identifier entry_body_formal_part entry_barrier IS declarative_part BEGIN handled_sequence_of_statements END entry_identifier = identifier? ';'
    ;
 
 entry_body_formal_part
-   : ('(' entry_index_specification ')')? formal_part? //parameter_profile
-
+   : ('(' entry_index_specification ')')? parameter_profile
    ;
 
 entry_barrier
@@ -1023,11 +936,11 @@ entry_index_specification
    ;
 
 entry_call_statement
-   : name actual_parameter_part? SEMI
+   : entry_name = name actual_parameter_part? ';'
    ;
 
 requeue_statement
-   : REQUEUE name (WITH ABORT)? SEMI
+   : REQUEUE entry_name = name (WITH ABORT)? ';'
    ;
 
 delay_statement
@@ -1036,15 +949,11 @@ delay_statement
    ;
 
 delay_until_statement
-   : DELAY UNTIL delay_expression
+   : DELAY UNTIL delay_expression = expression ';'
    ;
 
 delay_relative_statement
-   : DELAY delay_expression
-   ;
-
-delay_expression
-   : expression
+   : DELAY delay_expression = expression ';'
    ;
 
 select_statement
@@ -1055,11 +964,11 @@ select_statement
    ;
 
 selective_accept
-   : SELECT guard? select_alternative (OR guard? select_alternative)* (ELSE sequence_of_statements)? END SELECT SEMI
+   : SELECT guard? select_alternative (OR guard? select_alternative)* (ELSE sequence_of_statements)? END SELECT ';'
    ;
 
 guard
-   : WHEN condition ARROW
+   : WHEN condition '=>'
    ;
 
 select_alternative
@@ -1077,11 +986,11 @@ delay_alternative
    ;
 
 terminate_alternative
-   : TERMINATE SEMI
+   : TERMINATE ';'
    ;
 
 timed_entry_call
-   : SELECT entry_call_alternative OR delay_alternative END SELECT SEMI
+   : SELECT entry_call_alternative OR delay_alternative END SELECT ';'
    ;
 
 entry_call_alternative
@@ -1094,11 +1003,11 @@ procedure_or_entry_call
    ;
 
 conditional_entry_call
-   : SELECT entry_call_alternative ELSE sequence_of_statements END SELECT SEMI
+   : SELECT entry_call_alternative ELSE sequence_of_statements END SELECT ';'
    ;
 
 asynchronous_select
-   : SELECT triggering_alternative THEN ABORT abortable_part END SELECT SEMI
+   : SELECT triggering_alternative THEN ABORT abortable_part END SELECT ';'
    ;
 
 triggering_alternative
@@ -1115,19 +1024,20 @@ abortable_part
    ;
 
 abort_statement
-   : ABORT name (',' name)*
+   : ABORT task_name = name (',' task_name = name)* ';'
    ;
 /*
 10 - Program Structure and Compilation Issues
 */
-
-
+   
+   
 compilation
-   : compilation_unit* EOF
+   : compilation_unit*
    ;
 
 compilation_unit
-   : context_item* (library_item | subunit)
+   : context_clause library_item
+   | context_clause subunit
    ;
 
 library_item
@@ -1154,6 +1064,14 @@ library_unit_body
    | package_body
    ;
 
+parent_unit_name
+   : name
+   ;
+
+context_clause
+   : context_item*
+   ;
+
 context_item
    : with_clause
    | use_clause
@@ -1165,11 +1083,11 @@ with_clause
    ;
 
 limited_with_clause
-   : LIMITED PRIVATE? WITH name (',' name)* SEMI
+   : LIMITED PRIVATE? WITH library_unit_name = name (',' library_unit_name = name)* ';'
    ;
 
 nonlimited_with_clause
-   : PRIVATE? WITH name (',' name)* SEMI
+   : PRIVATE? WITH library_unit_name = name (',' library_unit_name = name)* ';'
    ;
 
 body_stub
@@ -1180,39 +1098,39 @@ body_stub
    ;
 
 subprogram_body_stub
-   : overriding_indicator? subprogram_specification IS SEPARATE aspect_specification? SEMI
+   : overriding_indicator? subprogram_specification IS SEPARATE ';'
    ;
 
 package_body_stub
-   : PACKAGE BODY_ defining_identifier IS SEPARATE aspect_specification? SEMI
+   : PACKAGE BODY_ defining_identifier IS SEPARATE ';'
    ;
 
 task_body_stub
-   : TASK BODY_ defining_identifier IS SEPARATE aspect_specification? SEMI
+   : TASK BODY_ defining_identifier IS SEPARATE ';'
    ;
 
 protected_body_stub
-   : PROTECTED BODY_ defining_identifier IS SEPARATE aspect_specification? SEMI
+   : PROTECTED BODY_ defining_identifier IS SEPARATE ';'
    ;
 
 subunit
-   : SEPARATE '(' name ')' proper_body
+   : SEPARATE '(' parent_unit_name ')' proper_body
    ;
 /*
 11 - Exceptions
 */
-
-
+   
+   
 exception_declaration
-   : defining_identifier_list COLON EXCEPTION aspect_specification? SEMI
+   : defining_identifier_list ':' EXCEPTION ';'
    ;
 
 handled_sequence_of_statements
-   : sequence_of_statements (EXCEPTION exception_handler+)?
+   : sequence_of_statements (EXCEPTION exception_handler exception_handler*)?
    ;
 
 exception_handler
-   : WHEN (choice_parameter_specification COLON)? exception_choice (VL exception_choice)* ARROW sequence_of_statements
+   : WHEN (choice_parameter_specification ':')? exception_choice ('|' exception_choice)* '=>' sequence_of_statements
    ;
 
 choice_parameter_specification
@@ -1220,30 +1138,30 @@ choice_parameter_specification
    ;
 
 exception_choice
-   : name
+   : exception_name = name
    | OTHERS
    ;
 
 raise_statement
-   : RAISE SEMI
-   | RAISE name (WITH expression)? SEMI
+   : RAISE ';'
+   | RAISE exception_name = name (WITH string_expression = expression)? ';'
    ;
 /*
 12 - Generic Units
 */
-
-
+   
+   
 generic_declaration
    : generic_subprogram_declaration
    | generic_package_declaration
    ;
 
 generic_subprogram_declaration
-   : generic_formal_part subprogram_specification aspect_specification? SEMI
+   : generic_formal_part subprogram_specification ';'
    ;
 
 generic_package_declaration
-   : generic_formal_part package_specification SEMI
+   : generic_formal_part package_specification ';'
    ;
 
 generic_formal_part
@@ -1258,9 +1176,9 @@ generic_formal_parameter_declaration
    ;
 
 generic_instantiation
-   : PACKAGE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification?
-   | overriding_indicator? PROCEDURE defining_program_unit_name IS NEW name generic_actual_part? aspect_specification?
-   | overriding_indicator? FUNCTION defining_designator IS NEW name generic_actual_part? aspect_specification?
+   : PACKAGE defining_program_unit_name IS NEW generic_package_name = name generic_actual_part? ';'
+   | overriding_indicator? PROCEDURE defining_program_unit_name IS NEW generic_procedure_name = name generic_actual_part? ';'
+   | overriding_indicator? FUNCTION defining_designator IS NEW generic_function_name = name generic_actual_part? ';'
    ;
 
 generic_actual_part
@@ -1268,31 +1186,24 @@ generic_actual_part
    ;
 
 generic_association
-   : (selector_name ARROW)? explicit_generic_actual_parameter
+   : (generic_formal_parameter_selector_name = selector_name '=>')? explicit_generic_actual_parameter
    ;
 
 explicit_generic_actual_parameter
    : expression
-   | name
-   | subtype_mark
+   | variable_name = name
+   | subprogram_name = name
+   | entry_name = name
+   | subtype_mark = name
+   | package_instance_name = name
    ;
 
 formal_object_declaration
-   : defining_identifier_list COLON mode_ null_exclusion? subtype_mark (ASSIGN default_expression)? aspect_specification? SEMI
-   | defining_identifier_list COLON mode_ access_definition (ASSIGN default_expression)? aspect_specification?
+   : defining_identifier_list ':' mode_ null_exclusion? subtype_mark = name (':=' default_expression)? ';' defining_identifier_list ':' mode_ access_definition (':=' default_expression)? ';'
    ;
 
 formal_type_declaration
-   : formal_complete_type_declaration
-   | formal_incomplete_type_declaration
-   ;
-
-formal_complete_type_declaration
-   : TYPE defining_identifier discriminant_part? IS formal_type_definition aspect_specification? SEMI
-   ;
-
-formal_incomplete_type_declaration
-   : TYPE defining_identifier discriminant_part? (IS TAGGED)? SEMI
+   : TYPE defining_identifier discriminant_part? IS formal_type_definition ';'
    ;
 
 formal_type_definition
@@ -1301,44 +1212,44 @@ formal_type_definition
    | formal_discrete_type_definition
    | formal_signed_integer_type_definition
    | formal_modular_type_definition
-   | formal_floating_point_type_definition
-   | formal_ordinary_fixed_point_type_definition
-   | formal_decimal_fixed_point_type_definition
+   | formal_floating_point_definition
+   | formal_ordinary_fixed_point_definition
+   | formal_decimal_fixed_point_definition
    | formal_array_type_definition
    | formal_access_type_definition
    | formal_interface_type_definition
    ;
 
 formal_private_type_definition
-   : ((ABSTRACT)? TAGGED)? LIMITED? PRIVATE
+   : (ABSTRACT? TAGGED)? LIMITED? PRIVATE
    ;
 
 formal_derived_type_definition
-   : ABSTRACT? LIMITED? SYNCHRONIZED NEW subtype_mark ((AND interface_list)? WITH PRIVATE)?
+   : ABSTRACT? (LIMITED | SYNCHRONIZED)? NEW subtype_mark = name ((AND interface_list)? WITH PRIVATE)?
    ;
 
 formal_discrete_type_definition
-   : '(' BOX ')'
+   : '(' '<>' ')'
    ;
 
 formal_signed_integer_type_definition
-   : range BOX
+   : RANGE_ '<>'
    ;
 
 formal_modular_type_definition
-   : MOD BOX
+   : MOD '<>'
    ;
 
-formal_floating_point_type_definition
-   : DIGITS BOX
+formal_floating_point_definition
+   : DIGITS '<>'
    ;
 
-formal_ordinary_fixed_point_type_definition
-   : DELTA BOX
+formal_ordinary_fixed_point_definition
+   : DELTA '<>'
    ;
 
-formal_decimal_fixed_point_type_definition
-   : DELTA BOX DIGITS BOX
+formal_decimal_fixed_point_definition
+   : DELTA '<>' DIGITS '<>'
    ;
 
 formal_array_type_definition
@@ -1359,38 +1270,42 @@ formal_subprogram_declaration
    ;
 
 formal_concrete_subprogram_declaration
-   : WITH subprogram_specification (IS subprogram_default)? aspect_specification? SEMI
+   : WITH subprogram_specification (IS subprogram_default)? ';'
    ;
 
 formal_abstract_subprogram_declaration
-   : WITH subprogram_specification IS ABSTRACT subprogram_default? aspect_specification? SEMI
+   : WITH subprogram_specification IS ABSTRACT (subprogram_default)? ';'
    ;
 
 subprogram_default
-   : name
-   | BOX
+   : default_name
+   | '<>'
    | NULL_
    ;
 
+default_name
+   : name
+   ;
+
 formal_package_declaration
-   : WITH PACKAGE defining_identifier IS NEW name formal_package_actual_part aspect_specification? SEMI
+   : WITH PACKAGE defining_identifier IS NEW generic_package_name = name formal_package_actual_part ';'
    ;
 
 formal_package_actual_part
-   : '(' (OTHERS ARROW)? BOX ')'
+   : '(' (OTHERS '=>')? '<>' ')'
    | generic_actual_part?
-   | '(' formal_package_association (',' formal_package_association)* (',' OTHERS ARROW BOX)? ')'
+   | '(' formal_package_association (',' formal_package_association)* (',' OTHERS '=>' '<>')? ')'
    ;
 
 formal_package_association
    : generic_association
-   | selector_name ARROW BOX
+   | generic_formal_parameter_selector_name = selector_name '=>' '<>'
    ;
 /*
 13 - Representation Issues
 */
-
-
+   
+   
 aspect_clause
    : attribute_definition_clause
    | enumeration_representation_clause
@@ -1401,35 +1316,16 @@ aspect_clause
 local_name
    : direct_name
    | direct_name SQ attribute_designator
-   | name
-   ;
-
-aspect_specification
-   : WITH aspect_mark (ARROW aspect_definition)? (',' aspect_mark (ARROW aspect_definition)?)*
-   ;
-
-aspect_mark
-   : aspect_identifier (SQ CLASS__)? //TODO Class or id_
-
-   ;
-
-aspect_identifier
-   : identifier
-   ;
-
-aspect_definition
-   : name
-   | expression
-   | identifier
+   | library_unit_name = name
    ;
 
 attribute_definition_clause
-   : FOR local_name SQ attribute_designator USE expression SEMI
-   | FOR local_name SQ attribute_designator USE name SEMI
+   : FOR local_name SQ attribute_designator USE expression ';'
+   | FOR local_name SQ attribute_designator USE name ';'
    ;
 
 enumeration_representation_clause
-   : FOR local_name USE enumeration_aggregate SEMI
+   : FOR first_subtype_local_name = local_name USE enumeration_aggregate ';'
    ;
 
 enumeration_aggregate
@@ -1437,41 +1333,42 @@ enumeration_aggregate
    ;
 
 record_representation_clause
-   : FOR local_name USE RECORD mod_clause? component_clause* END RECORD?
+   : FOR first_subtype_local_name = local_name USE RECORD mod_clause? component_clause* END RECORD ';'
    ;
 
 component_clause
-   : component_local_name AT position RANGE_ first_bit DOTDOT last_bit SEMI
-   ;
-
-component_local_name
-   : local_name
+   : component_local_name = local_name AT position RANGE_ first_bit '..' last_bit ';'
    ;
 
 position
-   : expression
+   : static_expression = expression
    ;
 
 first_bit
-   : expression
+   : static_simple_expression = simple_expression
    ;
 
 last_bit
-   : expression
+   : static_simple_expression = simple_expression
+   ;
+
+code_statement
+   : qualified_expression ';'
    ;
 /*
-J.*
+ -
 */
-
-
-delta_constraint
-   : DELTA expression range_constraint?
-   ;
-
+   
+   
 at_clause
-   : FOR direct_name USE AT expression SEMI
+   : FOR direct_name USE AT expression ';'
    ;
 
 mod_clause
-   : AT MOD expression SEMI
+   : AT MOD static_expression = expression ';'
    ;
+
+delta_constraint
+   : DELTA static_expression = expression range_constraint?
+   ;
+

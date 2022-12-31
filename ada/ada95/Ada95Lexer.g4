@@ -1,5 +1,5 @@
 /*
-Ada 2012 grammar.
+Ada 95 grammar.
 The MIT License (MIT).
 
 Copyright (c) 2022, Michał Lorek.
@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-lexer grammar AdaLexer;
+lexer grammar Ada95Lexer;
 
 options { caseInsensitive = true; }
 
@@ -63,7 +63,6 @@ GOTO              : 'goto';
 
 IF                : 'if';
 IN                : 'in';
-INTERFACE         : 'interface';
 IS                : 'is';
 
 LIMITED           : 'limited';
@@ -79,7 +78,7 @@ OF                : 'of';
 OR                : 'or';
 OTHERS            : 'others';
 OUT               : 'out';
-OVERRIDING        : 'overriding';
+
 PACKAGE           : 'package';
 PRAGMA            : 'pragma';
 PRIVATE           : 'private';
@@ -97,9 +96,7 @@ REVERSE           : 'reverse';
 
 SELECT            : 'select';
 SEPARATE          : 'separate';
-SOME              : 'some';
 SUBTYPE           : 'subtype';
-SYNCHRONIZED      : 'synchronized';
 
 TAGGED            : 'tagged';
 TASK              : 'task';
@@ -116,12 +113,6 @@ WITH              : 'with';
 
 XOR               : 'xor';
 
-CLASS__    options { caseInsensitive = false; }         : 'Class';
-ACCESS__   options { caseInsensitive = false; }         : 'Access';
-DELTA__    options { caseInsensitive = false; }         : 'Delta';
-DIGITS__   options { caseInsensitive = false; }         : 'Digits';
-MOD__      options { caseInsensitive = false; }         : 'Mod';
-
 WHITESPACE        : [ \t\r\n]+               -> channel(HIDDEN);
 LINE_COMMENT      : '--' ~[\r\n]*            -> channel(HIDDEN);
 
@@ -135,7 +126,7 @@ BASED_NUMERAL     : EXTENDED_DIGIT ('_'? EXTENDED_DIGIT)*;
 EXTENDED_DIGIT    : DIGIT | [A-F];
 BASE              : NUMERAL;
 
-CHARACTER_LITERAL_: '\'' (~['\\\r\n]) '\'';
+CHARACTER_LITERAL : '\'' (~['\\\r\n]) '\'';
 STRING_LITERAL_   : '"' ('""' | ~('"') )* '"';
 
 fragment LETTER   : [A-Z];
