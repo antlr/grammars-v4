@@ -96,7 +96,7 @@ title
    ;
 
 nowiki
-   : NOWIKI
+   : NOWIKI_
    ;
 
 
@@ -140,7 +140,7 @@ CR
    ;
 
 
-NOWIKI
+NOWIKI_
    : '{{{' .*? '}}}'
    ;
 
