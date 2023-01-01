@@ -87,7 +87,7 @@ REMOVE          : 'REMOVE';
 RETURN          : 'RETURN';
 SET             : 'SET';
 SKIP_W          : 'SKIP';
-WHERE           : 'WHERE';
+WHERE_           : 'WHERE';
 WITH            : 'WITH';
 UNION           : 'UNION';
 UNWIND          : 'UNWIND';

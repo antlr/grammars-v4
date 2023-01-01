@@ -63,45 +63,45 @@ classModifier
 
 assetDeclaration
     : classModifier*
-      ASSET IDENTIFIER
+      ASSET IDENTIFIER_
       extendsOrIdentified
       classBody
     ;
 
 conceptDeclaration
     : classModifier*
-      CONCEPT IDENTIFIER
-      (EXTENDS IDENTIFIER)?
+      CONCEPT IDENTIFIER_
+      (EXTENDS IDENTIFIER_)?
       classBody
     ;
 
 enumDeclaration
-    : ENUM IDENTIFIER '{' enumConstant* '}';
+    : ENUM IDENTIFIER_ '{' enumConstant* '}';
 
 enumConstant
-    : VAR IDENTIFIER;
+    : VAR IDENTIFIER_;
 
 eventDeclaration
-    : EVENT IDENTIFIER
+    : EVENT IDENTIFIER_
       classBody
     ;
 
 participantDeclaration
     : classModifier*
-      PARTICIPANT IDENTIFIER
+      PARTICIPANT IDENTIFIER_
       extendsOrIdentified
       classBody
     ;
 
 transactionDeclaration
     : classModifier*
-      TRANSACTION IDENTIFIER
+      TRANSACTION IDENTIFIER_
       classBody
     ;
 
-extendsOrIdentified: ((EXTENDS IDENTIFIER) | identified);
+extendsOrIdentified: ((EXTENDS IDENTIFIER_) | identified);
 
-identified: (IDENTIFIED IDENTIFIER);
+identified: (IDENTIFIED_ IDENTIFIER_);
 
 classBody
     : '{' classBodyDeclaration* '}';
@@ -120,7 +120,7 @@ fieldDeclaration
     | reference identifier;
 
 identifierField
-    : VAR IDENTIFIER (square)*;
+    : VAR IDENTIFIER_ (square)*;
 
 numericField
     : VAR numericPrimitive (square)*;
@@ -147,10 +147,10 @@ stringField
     : VAR STRING (square)*;
 
 reference
-    : REF IDENTIFIER (square)*;
+    : REF IDENTIFIER_ (square)*;
 
 qualifiedName
-    : IDENTIFIER ('.' IDENTIFIER)*;
+    : IDENTIFIER_ ('.' IDENTIFIER_)*;
 
 rangeValidation
     : RANGE ASSIGN rangeDeclaration;
@@ -169,7 +169,7 @@ defaultString
 defaultNumber
     : (DEFAULT ASSIGN numberLiteral);
 
-identifier: IDENTIFIER | ASSET | PARTICIPANT;
+identifier: IDENTIFIER_ | ASSET | PARTICIPANT;
 
 literal
     : numberLiteral

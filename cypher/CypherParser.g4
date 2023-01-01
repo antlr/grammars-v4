@@ -179,7 +179,7 @@ patternWhere
     ;
 
 where
-    : WHERE expression
+    : WHERE_ expression
     ;
 
 pattern
@@ -451,7 +451,7 @@ reservedWord
     | RETURN
     | SET
     | SKIP_W
-    | WHERE
+    | WHERE_
     | WITH
     | UNION
     | UNWIND

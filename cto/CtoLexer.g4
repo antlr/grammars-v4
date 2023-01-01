@@ -41,7 +41,7 @@ DEFAULT:            'default';
 ENUM:               'enum';
 EVENT:              'event';
 EXTENDS:            'extends';
-IDENTIFIED:         'identified by';
+IDENTIFIED_:         'identified by';
 IMPORT:             'import';
 NAMESPACE:          'namespace';
 OPTIONAL:           'optional';
@@ -120,7 +120,7 @@ fragment Sixty: [0-5] Digit;
 fragment Digit: [0-9];
 
 
-IDENTIFIER:         LetterOrDigit+;
+IDENTIFIER_:         LetterOrDigit+;
 
 CHAR_LITERAL:       '\'' (~["\\\r\n] | EscapeSequence)* '\'';
 STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
