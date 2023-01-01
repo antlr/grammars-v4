@@ -3361,7 +3361,7 @@ data_type
     | TIMESTAMP_TZ
     | STRING_
     | CHAR | CHARACTER
-    | VARCHAR
+    | VARCHAR ('(' num ')')?
     | TEXT
     | BINARY
     | VARBINARY
