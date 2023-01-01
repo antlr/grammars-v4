@@ -10,8 +10,8 @@ stylesheet
     ;
 
 charset
-    : Charset ws String_ ws ';' ws    # goodCharset
-    | Charset ws String_ ws           # badCharset
+    : Charset_ ws String_ ws ';' ws    # goodCharset
+    | Charset_ ws String_ ws           # badCharset
     ;
 
 imports
@@ -35,7 +35,7 @@ namespacePrefix
 // Media queries
 // https://www.w3.org/TR/css3-mediaqueries/
 media
-    : Media ws mediaQueryList groupRuleBody ws
+    : Media_ ws mediaQueryList groupRuleBody ws
     ;
 
 mediaQueryList
@@ -61,7 +61,7 @@ mediaFeature
 
 // Page
 page
-    : Page ws pseudoPage? '{' ws declaration? ( ';' ws declaration? )* '}' ws
+    : Page_ ws pseudoPage? '{' ws declaration? ( ';' ws declaration? )* '}' ws
     ;
 
 pseudoPage
@@ -123,13 +123,13 @@ pseudo
     ;
 
 functionalPseudo
-    : Function_ ws expression ')'
+    : Function__ ws expression ')'
     ;
 
 expression
     /* In CSS3, the expressions are identifiers, strings, */
     /* or of the form "an+b" */
-    : ( ( Plus | Minus | Dimension | UnknownDimension | Number | String_ | ident ) ws )+
+    : ( ( Plus | Minus | Dimension_ | UnknownDimension_ | Number_ | String_ | ident ) ws )+
     ;
 
 negation
@@ -203,11 +203,11 @@ term
     ;
 
 function_
-    : Function_ ws expr ')' ws
+    : Function__ ws expr ')' ws
     ;
 
 dxImageTransform
-    : DxImageTransform ws expr ')' ws    // IE DXImageTransform function
+    : DxImageTransform_ ws expr ')' ws    // IE DXImageTransform function
     ;
 
 hexcolor
@@ -215,19 +215,19 @@ hexcolor
     ;
 
 number
-    : ( Plus | Minus )? Number
+    : ( Plus | Minus )? Number_
     ;
 
 percentage
-    : ( Plus | Minus )? Percentage
+    : ( Plus | Minus )? Percentage_
     ;
 
 dimension
-    : ( Plus | Minus )? Dimension
+    : ( Plus | Minus )? Dimension_
     ;
 
 unknownDimension
-    : ( Plus | Minus )? UnknownDimension
+    : ( Plus | Minus )? UnknownDimension_
     ;
 
 // Error handling
@@ -245,7 +245,7 @@ any_
     | Includes ws
     | DashMatch ws
     | ':' ws
-    | Function_ ws ( any_ | unused )* ')' ws
+    | Function__ ws ( any_ | unused )* ')' ws
     | '(' ws ( any_ | unused )* ')' ws
     | '[' ws ( any_ | unused )* ']' ws
     ;
@@ -323,7 +323,7 @@ supportsDeclarationCondition
     ;
 
 generalEnclosed
-    : ( Function_ | '(' ) ( any_ | unused )* ')'
+    : ( Function__ | '(' ) ( any_ | unused )* ')'
     ;
 
 // Variable
@@ -335,7 +335,7 @@ var_
 // Calc
 // https://www.w3.org/TR/css3-values/#calc-syntax
 calc
-    : Calc ws calcSum ')' ws
+    : Calc_ ws calcSum ')' ws
     ;
 
 calcSum
@@ -376,19 +376,19 @@ keyframesBlocks
     ;
 
 keyframeSelector
-    : ( From | To | Percentage ) ws ( Comma ws ( From | To | Percentage ) ws )*
+    : ( From | To | Percentage_ ) ws ( Comma ws ( From | To | Percentage_ ) ws )*
     ;
 
 // Viewport
 // https://www.w3.org/TR/css-device-adapt-1/
 viewport
-    : Viewport ws '{' ws declarationList? '}' ws
+    : Viewport_ ws '{' ws declarationList? '}' ws
     ;
 
 // Counter style
 // https://www.w3.org/TR/css-counter-styles-3/
 counterStyle
-    : CounterStyle ws ident ws '{' ws declarationList? '}' ws
+    : CounterStyle_ ws ident ws '{' ws declarationList? '}' ws
     ;
 
 // Font feature values
@@ -420,7 +420,7 @@ featureValueDefinition
 
 // The specific words can be identifiers too
 ident
-    : Ident
+    : Ident_
     | MediaOnly
     | Not
     | And
@@ -722,11 +722,11 @@ Import
     : '@' I M P O R T
     ;
 
-Page
+Page_
     : '@' P A G E
     ;
 
-Media
+Media_
     : '@' M E D I A
     ;
 
@@ -734,11 +734,11 @@ Namespace
     : '@' N A M E S P A C E
     ;
 
-fragment AtKeyword
-    : '@' Ident
+fragment AtKeyword_
+    : '@' Ident_
     ;
 
-Charset
+Charset_
     : '@charset '
     ;
 
@@ -747,49 +747,49 @@ Important
     ;
 
 fragment FontRelative
-    : Number E M
-    | Number E X
-    | Number C H
-    | Number R E M
+    : Number_ E M
+    | Number_ E X
+    | Number_ C H
+    | Number_ R E M
     ;
 
 // https://www.w3.org/TR/css3-values/#viewport-relative-lengths
 fragment ViewportRelative
-    : Number V W
-    | Number V H
-    | Number V M I N
-    | Number V M A X
+    : Number_ V W
+    | Number_ V H
+    | Number_ V M I N
+    | Number_ V M A X
     ;
 
 fragment AbsLength
-    : Number P X
-    | Number C M
-    | Number M M
-    | Number I N
-    | Number P T
-    | Number P C
-    | Number Q
+    : Number_ P X
+    | Number_ C M
+    | Number_ M M
+    | Number_ I N
+    | Number_ P T
+    | Number_ P C
+    | Number_ Q
     ;
 
 fragment Angle
-    : Number D E G
-    | Number R A D
-    | Number G R A D
-    | Number T U R N
+    : Number_ D E G
+    | Number_ R A D
+    | Number_ G R A D
+    | Number_ T U R N
     ;
 
 fragment Time
-    : Number M S
-    | Number S
+    : Number_ M S
+    | Number_ S
     ;
 
 fragment Freq
-    : Number H Z
-    | Number K H Z
+    : Number_ H Z
+    | Number_ K H Z
     ;
 
-Percentage
-    : Number '%'
+Percentage_
+    : Number_ '%'
     ;
 
 Uri
@@ -820,9 +820,9 @@ And
     ;
 
 fragment Resolution
-    : Number D P I
-    | Number D P C M
-    | Number D P P X
+    : Number_ D P I
+    | Number_ D P C M
+    | Number_ D P P X
     ;
 
 fragment Length
@@ -831,7 +831,7 @@ fragment Length
     | ViewportRelative
     ;
 
-Dimension
+Dimension_
     : Length
     | Time
     | Freq
@@ -839,8 +839,8 @@ Dimension
     | Angle
     ;
 
-UnknownDimension
-    : Number Ident
+UnknownDimension_
+    : Number_ Ident_
     ;
 
 // https://www.w3.org/TR/css3-selectors/
@@ -872,7 +872,7 @@ PseudoNot
     : ':' N O T '('
     ;
 
-Number
+Number_
     : [0-9]+
     | [0-9]* '.' [0-9]+
     ;
@@ -928,17 +928,17 @@ To
     ;
 
 // https://www.w3.org/TR/css3-values/#calc-syntax
-Calc
+Calc_
     : 'calc('
     ;
 
 // https://www.w3.org/TR/css-device-adapt-1/
-Viewport
+Viewport_
     : '@' V I E W P O R T
     ;
 
 // https://www.w3.org/TR/css-counter-styles-3/
-CounterStyle
+CounterStyle_
     : '@' C O U N T E R DashChar S T Y L E
     ;
 
@@ -948,8 +948,8 @@ FontFeatureValues
     ;
 
 // https://msdn.microsoft.com/en-us/library/ms532847.aspx
-DxImageTransform
-    : 'progid:DXImageTransform.Microsoft.' Function_
+DxImageTransform_
+    : 'progid:DXImageTransform.Microsoft.' Function__
     ;
 
 // Variables
@@ -963,10 +963,10 @@ Var
     ;
 
 // Give Ident least priority so that more specific rules matches first
-Ident
+Ident_
     : '-'? Nmstart Nmchar*
     ;
 
-Function_
-    : Ident '('
+Function__
+    : Ident_ '('
     ;
