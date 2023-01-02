@@ -497,7 +497,6 @@ typeIdentifier  // Identifiers that are not restricted for type declarations
 localTypeDeclaration
     : classOrInterfaceModifier*
       (classDeclaration | interfaceDeclaration | recordDeclaration)
-    | ';'
     ;
 
 statement
