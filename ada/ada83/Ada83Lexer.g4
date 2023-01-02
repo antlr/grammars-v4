@@ -1,5 +1,5 @@
 /*
-Ada 2012 grammar.
+Ada 83 grammar.
 The MIT License (MIT).
 
 Copyright (c) 2022, Michał Lorek.
@@ -21,16 +21,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-lexer grammar AdaLexer;
+lexer grammar Ada83Lexer;
 
 options { caseInsensitive = true; }
 
 ABORT             : 'abort';
 ABS               : 'abs';
-ABSTRACT          : 'abstract';
 ACCEPT_           : 'accept';
 ACCESS            : 'access';
-ALIASED           : 'aliased';
 ALL               : 'all';
 AND               : 'and';
 ARRAY             : 'array';
@@ -52,7 +50,7 @@ ELSE              : 'else';
 ELSIF             : 'elsif';
 END               : 'end';
 ENTRY             : 'entry';
-EXCEPTION         : 'exception';
+EXCEPTION_        : 'exception';
 EXIT              : 'exit';
 
 FOR               : 'for';
@@ -63,7 +61,6 @@ GOTO              : 'goto';
 
 IF                : 'if';
 IN                : 'in';
-INTERFACE         : 'interface';
 IS                : 'is';
 
 LIMITED           : 'limited';
@@ -79,35 +76,29 @@ OF                : 'of';
 OR                : 'or';
 OTHERS            : 'others';
 OUT               : 'out';
-OVERRIDING        : 'overriding';
+
 PACKAGE           : 'package';
 PRAGMA            : 'pragma';
 PRIVATE           : 'private';
 PROCEDURE         : 'procedure';
-PROTECTED         : 'protected';
 
 RAISE             : 'raise';
 RANGE_            : 'range';
 RECORD            : 'record';
 REM               : 'rem';
 RENAMES           : 'renames';
-REQUEUE           : 'requeue';
 RETURN            : 'return';
 REVERSE           : 'reverse';
 
 SELECT            : 'select';
 SEPARATE          : 'separate';
-SOME              : 'some';
 SUBTYPE           : 'subtype';
-SYNCHRONIZED      : 'synchronized';
 
-TAGGED            : 'tagged';
 TASK              : 'task';
 TERMINATE         : 'terminate';
 THEN              : 'then';
 TYPE              : 'type';
 
-UNTIL             : 'until';
 USE               : 'use';
 
 WHEN              : 'when';
@@ -116,18 +107,12 @@ WITH              : 'with';
 
 XOR               : 'xor';
 
-CLASS__    options { caseInsensitive = false; }         : 'Class';
-ACCESS__   options { caseInsensitive = false; }         : 'Access';
-DELTA__    options { caseInsensitive = false; }         : 'Delta';
-DIGITS__   options { caseInsensitive = false; }         : 'Digits';
-MOD__      options { caseInsensitive = false; }         : 'Mod';
-
 WHITESPACE        : [ \t\r\n]+               -> channel(HIDDEN);
 LINE_COMMENT      : '--' ~[\r\n]*            -> channel(HIDDEN);
 
 IDENTIFIER_       : LETTER+ [A-Z_0-9]*;
-NUMERIC_LITERAL_  : DECIMAL_LITERAL_ | BASED_LITERAL;
-DECIMAL_LITERAL_  : NUMERAL ('.' NUMERAL)? EXPONENT?;
+NUMERIC_LITERAL_  : DECIMAL_LITERAL | BASED_LITERAL;
+DECIMAL_LITERAL   : NUMERAL ('.' NUMERAL)? EXPONENT?;
 NUMERAL           : DIGIT+ ('_'? DIGIT)*;
 EXPONENT          : 'E' '+'? NUMERAL | 'E' '-' NUMERAL;
 BASED_LITERAL     : BASE '#' BASED_NUMERAL ('.' BASED_NUMERAL)? '#' EXPONENT?;
