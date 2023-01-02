@@ -2,7 +2,7 @@ public class RecordsTesting {
     public record BindingsSnapshot(int a) { }
 
     private record OtherRecord(int b) {
-        OtherRecord {
+        protected OtherRecord {
             ;
         }
     }

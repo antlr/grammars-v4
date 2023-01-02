@@ -179,7 +179,7 @@ constructorDeclaration
     ;
 
 compactConstructorDeclaration
-    : identifier constructorBody=block
+    : modifier* identifier constructorBody=block
     ;
 
 fieldDeclaration
